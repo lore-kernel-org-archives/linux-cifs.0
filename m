@@ -1,115 +1,159 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4319F134A1
-	for <linux-cifs@vger.kernel.org>; Sun,  7 Jan 2024 13:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d426ad4433so1481925ad.0
-        for <linux-cifs@vger.kernel.org>; Sun, 07 Jan 2024 05:08:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704632909; x=1705237709;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3v5HCn1F8lSkJInaLk7JtVN24aTwWfHIdO5dB23XuZA=;
-        b=h1+1/u9377O3NHHbwaULIHKErdOzc1k2Kd5FiiUJje4bUUlGcu1LiMI7164qDiRetq
-         6TLPHsqCEKLSiBtANxhoQa/Nmg0LyLiTK/xPO8KJPwBF77Be+GiMduAw/e2HtCsN+WzF
-         jYZl7EgBOn0sdZfUujKUk/rhzfwZGHHbFjWkmb9DY+y327G9+CfH+PolUN1J+XaxjkT+
-         ZxNgarDCTT1dDdWXhsiH08mVcMhKzkkoUHGYQsK9s5nLUO8QI6EqDx+GbQvUcmJKafDO
-         nQn2nqAmTKuX1qdVWzXDhVAn9YNXqfhiFT0ImZo2gLXPgMVyHDcTtJvbnq1oj25obGIu
-         3cJg==
-X-Gm-Message-State: AOJu0YzDDpH3yDGLNwRk4wpRWloiU6M1l5IlDzkIxDVstNFt2g12EVJ0
-	O6y74sBYSZC2M4MKgNoJjCrHVJ57NDM=
-X-Google-Smtp-Source: AGHT+IFAzjUqIKdaoiZ7J3d3ItJKjSa4eCt6rJuY222ZHWnIzzFJSmF96ZHpRxWSS7X+HBgJhH+y6A==
-X-Received: by 2002:a17:902:e845:b0:1d4:39a4:25be with SMTP id t5-20020a170902e84500b001d439a425bemr728639plg.59.1704632909119;
-        Sun, 07 Jan 2024 05:08:29 -0800 (PST)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id w14-20020a170902e88e00b001d04c097d32sm4394086plg.270.2024.01.07.05.08.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jan 2024 05:08:28 -0800 (PST)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 2/2] ksmbd: send lease break notification on FILE_RENAME_INFORMATION
-Date: Sun,  7 Jan 2024 22:08:14 +0900
-Message-Id: <20240107130814.7247-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240107130814.7247-1-linkinjeon@kernel.org>
-References: <20240107130814.7247-1-linkinjeon@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B17513AD1;
+	Sun,  7 Jan 2024 16:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Je4QSk1X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CDAAC433C8;
+	Sun,  7 Jan 2024 16:09:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704643764;
+	bh=vtEdJ8x0t9Cig7F/OQ58765CvJpN5U3pnuPNn8bEtX0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Je4QSk1Xsi5jvomPOikxCGlVFwk8iqkAbNF6aVYGaBGYI1jkUw+CADMBs0/wZQr36
+	 xy22SDkRZMP5sMid5EvoeH3h/Kwf68Tcbn77GX8EDm+cjFQlFTs6TguY93Et6BFDPv
+	 UlIs+e2Jheeb2/ck0biFbtZrf0Vw9LMCbIX3TaJmqJZgdrEhhfSfxUMIfjU8lZxJF7
+	 Q+aCdvG3kA6VLZkjLHS+Vga8pwGe2Z6VghL3LobYtAq3sM2rUGAW8uNlztGT7uqIEc
+	 x+WdUyce0Wh+SeZcYOdm2MG39rO2B8pkIyqp3viKoDClILrK1BwA1eJJXlvP2hGICM
+	 kq7yyH7rMCZgg==
+Date: Sun, 7 Jan 2024 16:09:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Yiqun Leng <yqleng@linux.alibaba.com>,
+	Jia Zhu <zhujia.zj@bytedance.com>
+Subject: Re: [PATCH 1/5] cachefiles: Fix __cachefiles_prepare_write()
+Message-ID: <20240107160916.GA129355@kernel.org>
+References: <20240103145935.384404-1-dhowells@redhat.com>
+ <20240103145935.384404-2-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240103145935.384404-2-dhowells@redhat.com>
 
-Send lease break notification on FILE_RENAME_INFORMATION request.
-This patch fix smb2.lease.v2_epoch2 test failure.
+On Wed, Jan 03, 2024 at 02:59:25PM +0000, David Howells wrote:
+> Fix __cachefiles_prepare_write() to correctly determine whether the
+> requested write will fit correctly with the DIO alignment.
+> 
+> Reported-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Tested-by: Yiqun Leng <yqleng@linux.alibaba.com>
+> Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cachefs@redhat.com
+> cc: linux-erofs@lists.ozlabs.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  fs/cachefiles/io.c | 28 +++++++++++++++++-----------
+>  1 file changed, 17 insertions(+), 11 deletions(-)
+> 
+> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+> index bffffedce4a9..7529b40bc95a 100644
+> --- a/fs/cachefiles/io.c
+> +++ b/fs/cachefiles/io.c
+> @@ -522,16 +522,22 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>  			       bool no_space_allocated_yet)
+>  {
+>  	struct cachefiles_cache *cache = object->volume->cache;
+> -	loff_t start = *_start, pos;
+> -	size_t len = *_len, down;
+> +	unsigned long long start = *_start, pos;
+> +	size_t len = *_len;
+>  	int ret;
+>  
+>  	/* Round to DIO size */
+> -	down = start - round_down(start, PAGE_SIZE);
+> -	*_start = start - down;
+> -	*_len = round_up(down + len, PAGE_SIZE);
+> -	if (down < start || *_len > upper_len)
+> +	start = round_down(*_start, PAGE_SIZE);
+> +	if (start != *_start) {
+> +		kleave(" = -ENOBUFS [down]");
+> +		return -ENOBUFS;
+> +	}
+> +	if (*_len > upper_len) {
+> +		kleave(" = -ENOBUFS [up]");
+>  		return -ENOBUFS;
+> +	}
+> +
+> +	*_len = round_up(len, PAGE_SIZE);
+>  
+>  	/* We need to work out whether there's sufficient disk space to perform
+>  	 * the write - but we can skip that check if we have space already
+> @@ -542,7 +548,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>  
+>  	pos = cachefiles_inject_read_error();
+>  	if (pos == 0)
+> -		pos = vfs_llseek(file, *_start, SEEK_DATA);
+> +		pos = vfs_llseek(file, start, SEEK_DATA);
+>  	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/oplock.c  | 12 +++++++-----
- fs/smb/server/smb2pdu.c |  1 +
- 2 files changed, 8 insertions(+), 5 deletions(-)
+Hi David,
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 77f20d34ed9a..001926d3b348 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -541,14 +541,12 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 				continue;
- 			}
- 
--			if (lctx->req_state != lease->state)
--				lease->epoch++;
--
- 			/* upgrading lease */
- 			if ((atomic_read(&ci->op_count) +
- 			     atomic_read(&ci->sop_count)) == 1) {
- 				if (lease->state != SMB2_LEASE_NONE_LE &&
- 				    lease->state == (lctx->req_state & lease->state)) {
-+					lease->epoch++;
- 					lease->state |= lctx->req_state;
- 					if (lctx->req_state &
- 						SMB2_LEASE_WRITE_CACHING_LE)
-@@ -559,13 +557,17 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 				    atomic_read(&ci->sop_count)) > 1) {
- 				if (lctx->req_state ==
- 				    (SMB2_LEASE_READ_CACHING_LE |
--				     SMB2_LEASE_HANDLE_CACHING_LE))
-+				     SMB2_LEASE_HANDLE_CACHING_LE)) {
-+					lease->epoch++;
- 					lease->state = lctx->req_state;
-+				}
- 			}
- 
- 			if (lctx->req_state && lease->state ==
--			    SMB2_LEASE_NONE_LE)
-+			    SMB2_LEASE_NONE_LE) {
-+				lease->epoch++;
- 				lease_none_upgrade(opinfo, lctx->req_state);
-+			}
- 		}
- 		read_lock(&ci->m_lock);
- 	}
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 2a335bfe25a4..3143819935dc 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5569,6 +5569,7 @@ static int smb2_rename(struct ksmbd_work *work,
- 	if (!file_info->ReplaceIfExists)
- 		flags = RENAME_NOREPLACE;
- 
-+	smb_break_all_levII_oplock(work, fp, 0);
- 	rc = ksmbd_vfs_rename(work, &fp->filp->f_path, new_name, flags);
- out:
- 	kfree(new_name);
--- 
-2.25.1
+I realise these patches have been accepted, but I have a minor nit:
+pos is now unsigned, and so cannot be less than zero.
 
+Flagged by Smatch and Coccinelle.
+
+>  		if (pos == -ENXIO)
+>  			goto check_space; /* Unallocated tail */
+> @@ -550,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>  					  cachefiles_trace_seek_error);
+>  		return pos;
+>  	}
+> -	if ((u64)pos >= (u64)*_start + *_len)
+> +	if (pos >= start + *_len)
+>  		goto check_space; /* Unallocated region */
+>  
+>  	/* We have a block that's at least partially filled - if we're low on
+> @@ -563,13 +569,13 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>  
+>  	pos = cachefiles_inject_read_error();
+>  	if (pos == 0)
+> -		pos = vfs_llseek(file, *_start, SEEK_HOLE);
+> +		pos = vfs_llseek(file, start, SEEK_HOLE);
+>  	if (pos < 0 && pos >= (loff_t)-MAX_ERRNO) {
+
+Ditto.
+
+>  		trace_cachefiles_io_error(object, file_inode(file), pos,
+>  					  cachefiles_trace_seek_error);
+>  		return pos;
+>  	}
+> -	if ((u64)pos >= (u64)*_start + *_len)
+> +	if (pos >= start + *_len)
+>  		return 0; /* Fully allocated */
+>  
+>  	/* Partially allocated, but insufficient space: cull. */
+> @@ -577,7 +583,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+>  	ret = cachefiles_inject_remove_error();
+>  	if (ret == 0)
+>  		ret = vfs_fallocate(file, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> -				    *_start, *_len);
+> +				    start, *_len);
+>  	if (ret < 0) {
+>  		trace_cachefiles_io_error(object, file_inode(file), ret,
+>  					  cachefiles_trace_fallocate_error);
+> 
