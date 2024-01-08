@@ -1,83 +1,143 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901A9537E9
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 16:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCE754BD0
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 18:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPy4S1AW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704730430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type;
-	bh=lFQMv9XwK9ej+tAG2vSPh6/ex1rfcZMiQqZcNXWZROs=;
-	b=NPy4S1AW3BsEa85Tok/3ZAqrxAO30dTQrWDBmvEkbYAmhQPfRFW8HN34j4HzNhlyjdYCVf
-	nOiBcU7/1mmgTZ/dqPdWggdhlccKvP1CzWGj0MF/nQZUwnGakakm+dFba3XiO2fVr50Rw4
-	9ybNuKsuzBKkbr6zJkn5qMkHfeQZddU=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-Zj7gtdEPMGKxNCdLnVNkog-1; Mon, 08 Jan 2024 11:13:48 -0500
-X-MC-Unique: Zj7gtdEPMGKxNCdLnVNkog-1
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5e73e6a17d5so32174907b3.0
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 08:13:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704730428; x=1705335228;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lFQMv9XwK9ej+tAG2vSPh6/ex1rfcZMiQqZcNXWZROs=;
-        b=n9FlnEDqX1TYzY6kcXdqOG3gclI8wCIOIdKNn7VATIzT9LlqCnnJ1joW4D3Ul6uM72
-         GsUc5SLLFa7KbARZm0yUcAybo93t4u4OFqlhJV2BbOjXffRSvPpTArn832FagT2xoAg1
-         cv/SUoMJ5BOKFg+dL05NWS/zT7oHm9k7eL3nB5P0WEM2a8iAaBgcnnAYWeFDsxSjx7RQ
-         dhhR4c2peCuBn7SVCNlh4YO+5fnasWWdQEBf4rRjfbsXnNYMGM6g2Ok10FijPYhmoCZI
-         salFAacroiXzL0oSbIuhF9HVaUQRYSvHLJV0wqZHLwhAfqheuYV+YxxZlQevCkGtCvZg
-         pg/g==
-X-Gm-Message-State: AOJu0Yy81XgzwOetwPbCn8S13A7sGtMS8+eU/lBecL4EZzvqtizm8kFn
-	bZT1EJsCeB2Y1pJzF0pavDfrStTDE2LIqeNqmNrNnqgC5F+FOSGqGmcYjs1ZvJcJiuAL+HkNeBS
-	hPytJ4y0q60YExvK294ZIwm9NXYICZ8KV8mN4TwYJRr9WxFLf1EGj48Tk
-X-Received: by 2002:a81:a0cb:0:b0:5f5:ca34:c1d with SMTP id x194-20020a81a0cb000000b005f5ca340c1dmr2469045ywg.49.1704730428143;
-        Mon, 08 Jan 2024 08:13:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHeEMgaCZVBx0ixfeLvGAxJPO59TIbNQsubdgH3bNAFRgaSAlSLNFmVBSOZWkzfm0AOQ03fJlmlNmG4ZoHECNI=
-X-Received: by 2002:a81:a0cb:0:b0:5f5:ca34:c1d with SMTP id
- x194-20020a81a0cb000000b005f5ca340c1dmr2469038ywg.49.1704730427923; Mon, 08
- Jan 2024 08:13:47 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b4WiDj5A";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VSNAmRZL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b4WiDj5A";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VSNAmRZL"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9A0BE21A44;
+	Mon,  8 Jan 2024 18:17:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704737874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XnX6ipO5Et8uSKZ6QpR/U4DH7wzjvjb3DDbGBhY65qE=;
+	b=b4WiDj5AUEiY2IBAiuXY2c7Yei5NSm83IcU1AC3MQm85SnyDZxeo2BWAyWOqTW/l3cfbkh
+	Q4/SaEXu+l0/AI1FzhZeXAgkxOen8oBxM4s1CyDmMs3ZFhy93cFeliswDCPBWAOAz17dvO
+	Rs3vNkrAED7RWl1WtOCsejgQjPhOV9Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704737874;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XnX6ipO5Et8uSKZ6QpR/U4DH7wzjvjb3DDbGBhY65qE=;
+	b=VSNAmRZLPF0pfvdq9U6ta377nHamNu6GZxhZNXN4ZVxhws2IGnUMwB8F4aVTvitj8TZNHj
+	GwpiEJJrja/r4PDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1704737874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XnX6ipO5Et8uSKZ6QpR/U4DH7wzjvjb3DDbGBhY65qE=;
+	b=b4WiDj5AUEiY2IBAiuXY2c7Yei5NSm83IcU1AC3MQm85SnyDZxeo2BWAyWOqTW/l3cfbkh
+	Q4/SaEXu+l0/AI1FzhZeXAgkxOen8oBxM4s1CyDmMs3ZFhy93cFeliswDCPBWAOAz17dvO
+	Rs3vNkrAED7RWl1WtOCsejgQjPhOV9Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1704737874;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XnX6ipO5Et8uSKZ6QpR/U4DH7wzjvjb3DDbGBhY65qE=;
+	b=VSNAmRZLPF0pfvdq9U6ta377nHamNu6GZxhZNXN4ZVxhws2IGnUMwB8F4aVTvitj8TZNHj
+	GwpiEJJrja/r4PDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1676A13686;
+	Mon,  8 Jan 2024 18:17:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 9NsAMlE8nGWsXgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 08 Jan 2024 18:17:53 +0000
+Date: Mon, 8 Jan 2024 15:17:51 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Jacob Shivers <jshivers@redhat.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>
+Subject: Re: Linux client SMB and DFS site awareness
+Message-ID: <20240108181751.natpy6fac7fzdjqd@suse.de>
+References: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jacob Shivers <jshivers@redhat.com>
-Date: Mon, 8 Jan 2024 11:13:11 -0500
-Message-ID: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
-Subject: Linux client SMB and DFS site awareness
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
+X-Spam-Level: 
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=b4WiDj5A;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=VSNAmRZL
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[3];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.00)[40.31%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 TO_DN_ALL(0.00)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Score: -1.51
+X-Rspamd-Queue-Id: 9A0BE21A44
+X-Spam-Flag: NO
 
-Hello,
+On 01/08, Jacob Shivers wrote:
+>Hello,
+>
+>I have a use-case for a Linux SMB client to mount DFS replicated
+>shares, with a preference for sites that are closer geographically.
+>DNS site discovery/awareness exists within DFS[0], but I have not read
+>of any work currently under investigation.
 
-I have a use-case for a Linux SMB client to mount DFS replicated
-shares, with a preference for sites that are closer geographically.
-DNS site discovery/awareness exists within DFS[0], but I have not read
-of any work currently under investigation.
+DFS supports referral responses based both on site location and site costing,
+which are done on the _server_ (MS-DFSC 3.2.1.1 and 3.2.1.2).
 
-Is anyone actively working on this issue in any capacity? If so, would
-they like help in some capacity whether testing/coding?
+For site location, the targets are sorted with targets on the same site as
+the client first, in random order, and then targets outside of client's site
+are appended, also in random order.
 
-If this issue is not being actively engaged is there a reason for
-this, e.g. low priority, technical complexity/implementation issues,
-or some other reason?
+If supported and enabled, referral responses based on site cost will, practically,
+sort the targets from lowest to highest cost (relative to the client,
+and in random order if same cost).
+
+On either case, the client will try to connect to the targets in order
+it was received.
+
+>[0] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/7fcdce70-5205-44d6-9c3a-260e616a2f04?redirectedfrom=MSDN
+
+I don't see how the info on that link would apply to this particular
+scenario, as doing such discovery on the client would be redundant since
+the server, if properly implemented, already did it.
+
+Please clarify if you think I misunderstood your case.
 
 
-I had searched through mailing list archives and found no prior
-mention, but I do apologize if this has been discussed and is a
-broadly known discussion point.
+Cheers,
 
-Thanks for any feedback,
-
-Jacob Shivers
-
-[0] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/7fcdce70-5205-44d6-9c3a-260e616a2f04?redirectedfrom=MSDN
-
+Enzo
