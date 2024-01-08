@@ -1,130 +1,152 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FDB56442
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 21:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD48E8468
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 22:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P17I2cxE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZ2kbWTE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704750620;
+	s=mimecast20190719; t=1704753100;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=h3L9Ms3RJbkhDRpENMDIIkYxze9oX7IYZ5aUjYfsps8=;
-	b=P17I2cxE8Ijp+ve3OqPoIjQq4xz2PheqvzOTVja1FR6BgR+E/Q0+OP9vIFmHxemuhAfXZE
-	yAOl/pP6oAqxWNJHONBgr7NoH8kOH8BMnx06GlSilH962NpL90ArPT5uvQ2kZ0EOA2FLyH
-	fFyAW6p0pbDxoK36i43MQh37yZNs7WI=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-1RGEkE0AOtqTrlrTZuVunQ-1; Mon, 08 Jan 2024 16:50:18 -0500
-X-MC-Unique: 1RGEkE0AOtqTrlrTZuVunQ-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5f240ace2efso29370757b3.1
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 13:50:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704750618; x=1705355418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h3L9Ms3RJbkhDRpENMDIIkYxze9oX7IYZ5aUjYfsps8=;
-        b=V2GNPRHnxsEUSw12/sPhGu3Hg0xksT7ehni6aIOAtOzk3O/lY0zICOlzVQQsXSHXEP
-         juwWeCYgIhuGMnngOKzyIGKUhpjMrJMdzm6O9195RnOlfcDulsQiOvl5G8z8UXphx9ny
-         tD3JBkkfHIp9vA71s5E/rEXpt4T9g4NTWMDHssH/9s3fgmmG/50P8phLNRq6VAmB8id/
-         dcMq7C616RS26ZybvHHkfGTnjY+r2p8BEJrW+QIoi8p2dNPzeavJ2yz5OauwFT2XfAgK
-         op2EQAH50S/HkVrNF2l+710jk5k/iVX9V2U1Zr5zZ13R/yQprMPy22ByzF6sDYzwN+c6
-         IHrQ==
-X-Gm-Message-State: AOJu0YxeNB7KvSrUR64Hrk4vm+OIzerXvt9wNYNOaHYcSVx3mNfMHYoN
-	QMMlkgcTeX3469AX1+AXdKw/InL93JkrjfK6I3t8y+Rvc3Y0FOuDiXnnQgZKGG1NLvAYqFrBFjg
-	I9PabUlCbQURv3xaW6V61jUmuRq/ndjEhZzWkZuDNpyFkktdEehQrp1vP
-X-Received: by 2002:a81:4742:0:b0:5eb:29e:45a3 with SMTP id u63-20020a814742000000b005eb029e45a3mr2758877ywa.32.1704750618189;
-        Mon, 08 Jan 2024 13:50:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH0mjHn+eWP2TDMMlnHgtyr6G7HK36SREVu7O3klmm/rR5VIOWgvJQG4p4WgEySWe6CPqFJQ0L1ReKsmKeeIbI=
-X-Received: by 2002:a81:4742:0:b0:5eb:29e:45a3 with SMTP id
- u63-20020a814742000000b005eb029e45a3mr2758873ywa.32.1704750617915; Mon, 08
- Jan 2024 13:50:17 -0800 (PST)
+	bh=g3fhJdYhF0Jh8djZ9CbUM5+BZiYxRI9hKlm7wmHneNE=;
+	b=OZ2kbWTEKRjY7eLh/D6Pl/LNC4wp20P+DlQGzXqRRcV3H6fXLsrgkoa/RUhyHLVcdRDt8L
+	Z7d/Kaf2lPh4bRlWiVBboEFPQfIJGUkuWdDSNa1akYM0q2wQ6+DVbrEk/rqFw+y4PgSAMu
+	3qIkfa5i8zavapoiHZ7MfjUnQ2G5J2U=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-mFt6nnssNiyKD7dLtjUHgg-1; Mon,
+ 08 Jan 2024 17:31:35 -0500
+X-MC-Unique: mFt6nnssNiyKD7dLtjUHgg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4CFBE1C29EAA;
+	Mon,  8 Jan 2024 22:31:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.27])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BECCF1121306;
+	Mon,  8 Jan 2024 22:31:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240107160916.GA129355@kernel.org>
+References: <20240107160916.GA129355@kernel.org> <20240103145935.384404-1-dhowells@redhat.com> <20240103145935.384404-2-dhowells@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+    Yiqun Leng <yqleng@linux.alibaba.com>,
+    Jia Zhu <zhujia.zj@bytedance.com>
+Subject: Re: [PATCH 1/5] cachefiles: Fix __cachefiles_prepare_write()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
- <20240108181751.natpy6fac7fzdjqd@suse.de>
-In-Reply-To: <20240108181751.natpy6fac7fzdjqd@suse.de>
-From: Jacob Shivers <jshivers@redhat.com>
-Date: Mon, 8 Jan 2024 16:49:41 -0500
-Message-ID: <CALe0_777GL=XQYSochOoph73madKm8DsRn+xQOcTmz9xh+wcHQ@mail.gmail.com>
-Subject: Re: Linux client SMB and DFS site awareness
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1544729.1704753090.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Jan 2024 22:31:30 +0000
+Message-ID: <1544730.1704753090@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hello Enzo,
+Simon Horman <horms@kernel.org> wrote:
 
-Thank you for the response!
+> I realise these patches have been accepted, but I have a minor nit:
+> pos is now unsigned, and so cannot be less than zero.
 
-I failed to mention the initial aspect that is specific to mounting a
-domain based DFS share. This would contact a random domain controller
-instead of a DC local to the calling client's site, should it exist. A
-CLAP ping like that used by SSSD[0] could be used to identify the
-nearest domain controller prior to initiating a subsequent mount
-request. This is where the DNS discovery for a ldap entry would be
-applicable.
-
-Hope that helps to clarify the use case.
-
-Thanks again for the response.
+Good point.  How about the attached patch.  Whilst I would prefer to use
+unsigned long long to avoid the casts, it might =
 
 
-[0] https://docs.pagure.org/sssd.sssd/design_pages/active_directory_dns_sit=
-es.html
+David
+---
+cachefiles: Fix signed/unsigned mixup
 
-On Mon, Jan 8, 2024 at 1:22=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de> =
-wrote:
->
-> On 01/08, Jacob Shivers wrote:
-> >Hello,
-> >
-> >I have a use-case for a Linux SMB client to mount DFS replicated
-> >shares, with a preference for sites that are closer geographically.
-> >DNS site discovery/awareness exists within DFS[0], but I have not read
-> >of any work currently under investigation.
->
-> DFS supports referral responses based both on site location and site cost=
-ing,
-> which are done on the _server_ (MS-DFSC 3.2.1.1 and 3.2.1.2).
->
-> For site location, the targets are sorted with targets on the same site a=
-s
-> the client first, in random order, and then targets outside of client's s=
-ite
-> are appended, also in random order.
->
-> If supported and enabled, referral responses based on site cost will, pra=
-ctically,
-> sort the targets from lowest to highest cost (relative to the client,
-> and in random order if same cost).
->
-> On either case, the client will try to connect to the targets in order
-> it was received.
->
-> >[0] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adt=
-s/7fcdce70-5205-44d6-9c3a-260e616a2f04?redirectedfrom=3DMSDN
->
-> I don't see how the info on that link would apply to this particular
-> scenario, as doing such discovery on the client would be redundant since
-> the server, if properly implemented, already did it.
->
-> Please clarify if you think I misunderstood your case.
->
->
-> Cheers,
->
-> Enzo
->
+In __cachefiles_prepare_write(), the start and pos variables were made
+unsigned 64-bit so that the casts in the checking could be got rid of -
+which should be fine since absolute file offsets can't be negative, except
+that an error code may be obtained from vfs_llseek(), which *would* be
+negative.  This breaks the error check.
+
+Fix this for now by reverting pos and start to be signed and putting back
+the casts.  Unfortunately, the error value checks cannot be replaced with
+IS_ERR_VALUE() as long might be 32-bits.
+
+Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
+Reported-by: Simon Horman <horms@kernel.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@in=
+tel.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Gao Xiang <hsiangkao@linux.alibaba.com>
+cc: Yiqun Leng <yqleng@linux.alibaba.com>
+cc: Jia Zhu <zhujia.zj@bytedance.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cachefs@redhat.com
+cc: linux-erofs@lists.ozlabs.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
+ fs/cachefiles/io.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 3eec26967437..9a2cb2868e90 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 			       bool no_space_allocated_yet)
+ {
+ 	struct cachefiles_cache *cache =3D object->volume->cache;
+-	unsigned long long start =3D *_start, pos;
++	loff_t start =3D *_start, pos;
+ 	size_t len =3D *_len;
+ 	int ret;
+ =
+
+@@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if (pos >=3D start + *_len)
++	if ((u64)pos >=3D (u64)start + *_len)
+ 		goto check_space; /* Unallocated region */
+ =
+
+ 	/* We have a block that's at least partially filled - if we're low on
+@@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_objec=
+t *object,
+ 					  cachefiles_trace_seek_error);
+ 		return pos;
+ 	}
+-	if (pos >=3D start + *_len)
++	if ((u64)pos >=3D (u64)start + *_len)
+ 		return 0; /* Fully allocated */
+ =
+
+ 	/* Partially allocated, but insufficient space: cull. */
 
