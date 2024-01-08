@@ -1,77 +1,101 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6EA4C3C8;
-	Mon,  8 Jan 2024 14:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=schenkel.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=schenkel.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF9E43140;
+	Mon,  8 Jan 2024 14:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=schenkel.net header.i=@schenkel.net header.b="YtiLh9tL";
-	dkim=pass (2048-bit key) header.d=schenkel.net header.i=@schenkel.net header.b="UH9Qr1Vk"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4T7xR13Jt5z9sb4;
-	Mon,  8 Jan 2024 15:34:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schenkel.net;
-	s=MBO0001; t=1704724477;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="KdPWUVIq"
+Message-ID: <446860c571d0699ed664175262a9e84b@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1704725570;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UOl6ByWBJ/gZDfQoMzTkCP7SAswXsTnB6KMowssrUXs=;
-	b=YtiLh9tLhXjS/c+5c96sfhcqrZDVjFxecV701uXlIV0fIQoYGLLmM+9FZYCfRDN1E31djz
-	X7rL1K6ZIuZfTkd2GHpVCwSsYaPceFv6DJ42UC0tNUpUOpEBx5H1jtCW2GQV2r4U3wwbYs
-	+ybCaX6nccnJdfVp9kw23dfKoP0OK5hZOhJUBmZZ8uuNKgfvQqi49tlhWLh79BEk7L8ORR
-	GJqeFrQQpCwyk2dolkqEFBbGWoOAWyNS5bgHfJ6lg0mXqiJFCFCwJDNkHVdFq1fzD7icaV
-	JZmHAnGZ/tC+i44Rvk7BjnkqKUY19gzYAAY8UNW66p2ii7GDJUQFYIV7a23b8g==
-Message-ID: <e8aed716-68ba-458c-bcde-f7ea39d6774d@schenkel.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=schenkel.net;
-	s=mail; t=1704724475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	bh=t+i5JdjKCVjgU6vgNmEIDAR0g7GR4mu/Bvs75gpMMnE=;
+	b=KdPWUVIqX+Xh926sXVwSBYIO6gfEPBWlJ1qkNFoBRmZH4o4EY3ZvhF/GjDxh/FVHf8FNNX
+	/UH9mFM39l8mH7m+jQFVE9OdvHxmwpmh7jaZzNjIeEXiICjxHGKV8GwJGi81NN9H7nm5Iq
+	l8kOVX4qY7LggrbNhAW5JIA5qxsG6xjWGpsPZwIHxG8WsqprsqbHKSjk2BTF2v9QXUu2Z6
+	XYf9SQM2ccltnN9+A2PiaCnjvC6fAcpHN1mxRlXqLcfX8xUq33VQ7SiQEs4ALAiQe50tnJ
+	R5rt3xFuUFnmMFbTqjeLB6ufA64kY1f30tjyghe8oE5ZTKZGZjJ5Xj1R4iDqzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1704725570; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UOl6ByWBJ/gZDfQoMzTkCP7SAswXsTnB6KMowssrUXs=;
-	b=UH9Qr1VkBpTZysz2uvQ9TFdA9cik8wmg8O/2hrjKgjbsWNRS2dvZRoE51ERiGxjy41s9Ep
-	XnHdCN+mUdHBWTRBfYeMKgboZrrpLx8QC98To+u14t5jw1hunTt9xszyvUS2YAmOcxvR6l
-	OEDtLI+E5oPYnFqjsV5QDdQOn9TbGFLriZ9M5CxYsRkrbxE5YDpo/vxxJtOD8m9+MAYFtO
-	cx9MNNYia8bBIHZiPkR1USV01B/a0xBYK7l41NHLn0zo1SUyoFvAcQe3vsG0E0mvrNEtzx
-	CCYtIV58dIPZHoopsqyUA6hLR619k/cQQ//qvB/dTHU/hJyE6xLeRcuDxQ8MMg==
-Date: Mon, 8 Jan 2024 15:34:34 +0100
+	bh=t+i5JdjKCVjgU6vgNmEIDAR0g7GR4mu/Bvs75gpMMnE=;
+	b=TccRxjs6rPyPYQjuZvktAOMRhZYCLWTGDuWV0AG+Ruz7rkpqmFPBQnGmDzZY73gQUqzIrL
+	qlJ/uAJvU9sGoG6iyEc3Mk6fYjvZ2NOwOUHfhzRBxpM5LTLV6DdVU1y01uTf9Fr87XLvFG
+	KILXHkADqkGWxfyHt8Xb2ru7PWvKCEsRYADziGh6g4tjNGf5irGvqDB6lrtQ8+9WqnQfoe
+	pABEK8PRQcUdL/UupqNqGROZg1xN75Z6tzOwFh6YVKU2YsmfEEDzXjNKADtEMUE1oDMTTG
+	ut9ysVPR4iXBFryPujnlwVqmgNiL6T0XCPSbWbbzIZbIc+sGDo++ACNjL+d0YA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1704725570; a=rsa-sha256;
+	cv=none;
+	b=r9kVvNpNv7obhsk1ANYiPmKIqp/nUSBKIpuxQWB4fpQ9ItzWBU12jCnWpoTn7g3DhqOJpo
+	wi29P26fzH6D7cHIjb+Bg+oAxBsOA0+Nc/V7pXQtdw/Pb3OBr3z1OZGccUMA3rAifAVxYS
+	SQsbbbcYqeGnX93/cyZ1WTqad/+YsWNn/z5WGAEYIzwN8TIDpG9Es1910MBWWSWkAJx4JG
+	+P2nvdNq5TPobIHGRwLqXv8hjoPrjnIRUcSVw9czrPP3Ydf3PGLmkKHJeULeASOecWbJBd
+	L7AC6t6JxVrPjt0Y7qENuBXE94bjobvMvq1st0cJPn0k9Y2T4OnlvXf8XirYDA==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Jan =?utf-8?B?xIxlcm3DoWs=?= <sairon@sairon.cz>, Leonardo Brondani
+ Schenkel
+ <leonardo@schenkel.net>, stable@vger.kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>
+Cc: regressions@lists.linux.dev, linux-cifs@vger.kernel.org, Mathias
+ =?utf-8?Q?Wei=C3=9Fbach?= <m.weissbach@info-gate.de>
+Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with
+ "Resource temporarily unavailable"
+In-Reply-To: <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
+References: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
+ <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
+Date: Mon, 08 Jan 2024 11:52:45 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with
- "Resource temporarily unavailable"
-Content-Language: en-US, pt-BR, sv-SE
-To: Greg KH <gregkh@linuxfoundation.org>, =?UTF-8?B?SmFuIMSMZXJtw6Fr?=
- <sairon@sairon.cz>
-Cc: stable@vger.kernel.org, regressions@lists.linux.dev,
- linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
-References: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
- <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
- <2024010838-saddlebag-overspend-e027@gregkh>
-From: Leonardo Brondani Schenkel <leonardo@schenkel.net>
-In-Reply-To: <2024010838-saddlebag-overspend-e027@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 2024-01-08 15:13, Greg KH wrote:
-> That's interesting, there's a different cifs report that says a
-> different commit was the issue:
-> 	https://lore.kernel.org/r/ZZhrpNJ3zxMR8wcU@eldamar.lan
-> 
-> is that the same as this one?
+Hi Jan,
 
-It looks like a different issue. The linked report claims that the 
-problem was introduced in 6.1.69 by a different commit, but both
-Jan Čermák and I don't experience anything wrong with 6.1.69. Jan Čermák 
-found commit bef4315f19ba6f434054f58b958c0cf058c7a43f via bisection and 
-compiled a kernel that reverts it, and the problem stopped manifesting.
+Thanks for the report.
 
+So this bug is related to an off-by-one in smb2_set_next_command() when
+the client attempts to pad SMB2_QUERY_INFO request -- since it isn't 8 byte
+aligned -- even though smb2_query_info_compound() doesn't provide an extra
+iov for such padding.
 
+v6.1.y doesn't have
+
+        eb3e28c1e89b ("smb3: Replace smb2pdu 1-element arrays with flex-arrays")
+
+and the commit does
+
+	+	if (unlikely(check_add_overflow(input_len, sizeof(*req), &len) ||
+	+		     len > CIFSMaxBufSize))
+	+		return -EINVAL;
+	+
+
+so sizeof(*req) will wrongly include the extra byte from
+smb2_query_info_req::Buffer making @len unaligned and therefore causing
+OOB in smb2_set_next_command().
+
+A simple fix for that would be
+
+	diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+	index 05ff8a457a3d..aed5067661de 100644
+	--- a/fs/smb/client/smb2pdu.c
+	+++ b/fs/smb/client/smb2pdu.c
+	@@ -3556,7 +3556,7 @@ SMB2_query_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+	 
+	 	iov[0].iov_base = (char *)req;
+	 	/* 1 for Buffer */
+	-	iov[0].iov_len = len;
+	+	iov[0].iov_len = len - 1;
+	 	return 0;
+	 }
