@@ -1,47 +1,47 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA57B10799
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 09:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BCF11715
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 09:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zOIaUch/"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3374eb61cbcso1646930f8f.0
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 01:08:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AFGpGo04"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d60c49ee7so18654095e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 01:09:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704704913; x=1705309713; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704704971; x=1705309771; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y29ZjWS+kMxK2hHYGSpll/bK2F92ct4CoCPibAWT7g8=;
-        b=zOIaUch/6Dq+YyeHYAy9WW0oNPnFrtRNLgfv5OxBMfSlFJIhvLUpGEpamyR3LO90Na
-         bqPrakEwgFzCW/wPg97dB0wx6bdVixs8sLCXwBvszUMd5ZSwwdGgwpYXjojCvd38HSjh
-         S4dmxe7VH2c5uoqEyO9APb0jedksgMc5iyrIAPJw7a2CHgo2j8i0SnbKkPLUIZshBQ4B
-         c0S1seboX9JMV6ROsDKm2t/p3Ac2oLfu1rjaQCM0jpjnsZj0g9czeO753rBXk9v3qPAk
-         Ou2ti5FjcwusRvk4McFQdd6tzEcs1BSxKUFGj9UrnjRPh8f61IELQZVr2573WhPCCTeM
-         mUEQ==
+        bh=TpH6e5f9CwrQldKdZ83I+BJ56xcegVaU/llwUYD/L+Y=;
+        b=AFGpGo04OG/UOdW/snZ+nSH+V0RLndPg+hnfmBW/LftAEgeD8U83ltQRl/n5E+96ma
+         /t+XAI8hB6bYwEmrjIaO58DOmJueYfsBpr1Qy2vQfQ98wPBjYv1gCep/+9KGUFEqxgty
+         ZDitpY3n8SsYkUcN4GlzvUQVsLldYNNE14D1jgoVdP0zADqR1rb4j+/kBZasBl9v5JTJ
+         Cx4vV+Ehux6dCDA6+hF7dJwfWyXJogtGnRlsIRwT5O9h072AnUwTE+1u9FkYLz6yo8Gc
+         lk0d+VcdbhLE2s9hVwpJYR02vFqiF4sL6je8xkonDc1ClRJtYIt0tgDzEOha8G9qtbjX
+         Li0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704704913; x=1705309713;
+        d=1e100.net; s=20230601; t=1704704971; x=1705309771;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=y29ZjWS+kMxK2hHYGSpll/bK2F92ct4CoCPibAWT7g8=;
-        b=hAyBGl2qEyD/E7vXE0gWbyuc5hDdPcfwsqaLrSBrsGRmcDd/SfgJ5F0s4LndjiR8e2
-         cYl5etgNv1QfzYVbxhAX3IjLLjNNF15DR/Po++Rb/r30nAAuGyB8Kk2GQkqCYyov6bAH
-         iRhDRr69ozyPd20amWoMpsINn8br2k8zUt7k27Q6kf8hjULXENwfe2CMT2QqEMtMFmIS
-         bD7LOTuEMYZTS8HJt5fvnnRW0nVKXFJivSUTw1C9jYqNl3h3mhUD+OweNOqwd0lV6++1
-         k2Yj2lH4w9jnyBPlUkBHAyYQotfCGtQIKh7BkCVQJ2Sc4L/jXCX57km6lL8lkKakTQKs
-         8tfg==
-X-Gm-Message-State: AOJu0Yw9yzDf9IZKvooxXqZz21D0h3tP+2IOgf1Frejwj+BPNEpuJLkj
-	6unHcq4IfDWUqytL3Ie8sW6Tj0VmeNfTngcdvB4HsIgEUi4=
-X-Google-Smtp-Source: AGHT+IEcM1W8EH04zf4EmzgY+xU5a9CPXqgAsul1BoLblvAd/N5+wWUE8d/RH22ujaG7vEybe6rZtA==
-X-Received: by 2002:adf:e848:0:b0:336:6db8:a00c with SMTP id d8-20020adfe848000000b003366db8a00cmr1329791wrn.26.1704704912925;
-        Mon, 08 Jan 2024 01:08:32 -0800 (PST)
+        bh=TpH6e5f9CwrQldKdZ83I+BJ56xcegVaU/llwUYD/L+Y=;
+        b=WK0riIU2gwdNkK+U8IQH20bNvwg7AL42XXEvKB2a+bmK048CxlyJA7Hi1pnXDHXzMp
+         BpI6gBYAVpBOATsXgwJi9UeS6v5J6UBx6VPk1w7EkMrWeghb3c/g+s3D7MCiLlzqnAKW
+         XXXEERdkdGfbfFX4rTSIRDrN85jT1ydnmfllqKXPIOiYo0Mc2R9k+1Uj9UPBiaJbCZpz
+         DAwfMuX4/eFKMfAcOUfL4M3HoWuhnj6lIZVa1FeicII7Ieh3IFWpeDPGMK1WWgbg5eFO
+         XVDiFdD293JLbMfZpLcv6bOclWVpxH1rVEJe0JGAz/v07EUXkevWSH1sJQ9/hd5hCcWj
+         9gJg==
+X-Gm-Message-State: AOJu0YxdyY+IdiPifnFeOjLlgXn8tNxAuMVWVdVGLRarndWAa536J2s1
+	fzw1FKs1aOYO59yvgJY57ScW21DXK8J6/A==
+X-Google-Smtp-Source: AGHT+IFAWLQ1wAIfuj8nS99qhKD77kxRlCvb4NjoLF3gKRyK3iywjpF/YFgt0Qpj5Po/c+PM2OoGGA==
+X-Received: by 2002:a05:600c:1d24:b0:40d:83e1:6c62 with SMTP id l36-20020a05600c1d2400b0040d83e16c62mr1798205wms.7.1704704971098;
+        Mon, 08 Jan 2024 01:09:31 -0800 (PST)
 Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id k4-20020adfe3c4000000b00336e15fbc85sm7227038wrm.82.2024.01.08.01.08.31
+        by smtp.gmail.com with ESMTPSA id n43-20020a05600c502b00b0040e45799541sm3892170wmr.15.2024.01.08.01.09.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 01:08:32 -0800 (PST)
-Date: Mon, 8 Jan 2024 12:08:29 +0300
+        Mon, 08 Jan 2024 01:09:30 -0800 (PST)
+Date: Mon, 8 Jan 2024 12:09:27 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Steve French <sfrench@samba.org>
 Cc: Paulo Alcantara <pc@manguebit.com>,
@@ -49,8 +49,8 @@ Cc: Paulo Alcantara <pc@manguebit.com>,
 	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 2/3] cifs: make cifs_chan_update_iface() a void function
-Message-ID: <eac139a7-76d4-4067-8c25-15e30692aaf9@moroto.mountain>
+Subject: [PATCH 3/3] cifs: simplify a check in cifs_chan_update_iface()
+Message-ID: <eef8b278-97b5-4858-b05f-5cfc454cc614@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,110 +62,41 @@ Content-Disposition: inline
 In-Reply-To: <b628a706-d356-4629-a433-59dfda24bb94@moroto.mountain>
 X-Mailer: git-send-email haha only kidding
 
-The return values for cifs_chan_update_iface() didn't match what the
-documentation said and nothing was checking them anyway.  Just make it
-a void function.
+The loop iterator in a list_for_each() loop is never NULL at the end.
+This condition uses a two step process of setting the iterator, "iface",
+from non-NULL to NULL and then checking if it's NULL.  It's easier to do
+in one step.
 
 Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- fs/smb/client/cifsproto.h |  2 +-
- fs/smb/client/sess.c      | 17 +++++++----------
- 2 files changed, 8 insertions(+), 11 deletions(-)
+ fs/smb/client/sess.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index afbab86331a1..a841bf4967fa 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -656,7 +656,7 @@ cifs_chan_is_iface_active(struct cifs_ses *ses,
- 			  struct TCP_Server_Info *server);
- void
- cifs_disable_secondary_channels(struct cifs_ses *ses);
--int
-+void
- cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server);
- int
- SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon, bool in_mount);
 diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index 775c6a4a2f4b..f7b216dd06b2 100644
+index f7b216dd06b2..987188e1929e 100644
 --- a/fs/smb/client/sess.c
 +++ b/fs/smb/client/sess.c
-@@ -356,10 +356,9 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
- 
- /*
-  * update the iface for the channel if necessary.
-- * will return 0 when iface is updated, 1 if removed, 2 otherwise
-  * Must be called with chan_lock held.
-  */
--int
-+void
- cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+@@ -363,7 +363,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
  {
  	unsigned int chan_index;
-@@ -368,20 +367,19 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 	size_t iface_weight = 0, iface_min_speed = 0;
+-	struct cifs_server_iface *iface = NULL;
++	struct cifs_server_iface *iface;
  	struct cifs_server_iface *old_iface = NULL;
  	struct cifs_server_iface *last_iface = NULL;
  	struct sockaddr_storage ss;
--	int rc = 0;
- 
- 	spin_lock(&ses->chan_lock);
- 	chan_index = cifs_ses_get_chan_index(ses, server);
- 	if (chan_index == CIFS_INVAL_CHAN_INDEX) {
- 		spin_unlock(&ses->chan_lock);
--		return 0;
-+		return;
- 	}
- 
- 	if (ses->chans[chan_index].iface) {
- 		old_iface = ses->chans[chan_index].iface;
- 		if (old_iface->is_active) {
- 			spin_unlock(&ses->chan_lock);
--			return 1;
-+			return;
- 		}
- 	}
- 	spin_unlock(&ses->chan_lock);
-@@ -394,7 +392,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	if (!ses->iface_count) {
- 		spin_unlock(&ses->iface_lock);
- 		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
--		return 0;
-+		return;
- 	}
- 
- 	last_iface = list_last_entry(&ses->iface_list, struct cifs_server_iface,
-@@ -434,7 +432,6 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+@@ -432,11 +432,6 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
  	}
  
  	if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
--		rc = 1;
- 		iface = NULL;
- 		cifs_dbg(FYI, "unable to find a suitable iface\n");
- 	}
-@@ -449,7 +446,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 		}
- 
- 		spin_unlock(&ses->iface_lock);
--		return 0;
-+		return;
- 	}
- 
- 	/* now drop the ref to the current iface */
-@@ -478,13 +475,13 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	chan_index = cifs_ses_get_chan_index(ses, server);
- 	if (chan_index == CIFS_INVAL_CHAN_INDEX) {
- 		spin_unlock(&ses->chan_lock);
--		return 0;
-+		return;
- 	}
- 
- 	ses->chans[chan_index].iface = iface;
- 	spin_unlock(&ses->chan_lock);
- 
--	return rc;
-+	return;
- }
- 
- /*
+-		iface = NULL;
+-		cifs_dbg(FYI, "unable to find a suitable iface\n");
+-	}
+-
+-	if (!iface) {
+ 		if (!chan_index)
+ 			cifs_dbg(FYI, "unable to get the interface matching: %pIS\n",
+ 				 &ss);
 -- 
 2.42.0
 
