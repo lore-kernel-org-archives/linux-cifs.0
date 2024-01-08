@@ -1,102 +1,147 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BCF11715
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 09:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949FF14295
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 11:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sairon.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sairon.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AFGpGo04"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40d60c49ee7so18654095e9.0
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 01:09:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sairon.cz header.i=@sairon.cz header.b="DFySzoXf"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5542a7f1f3cso1834726a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 03:18:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704704971; x=1705309771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TpH6e5f9CwrQldKdZ83I+BJ56xcegVaU/llwUYD/L+Y=;
-        b=AFGpGo04OG/UOdW/snZ+nSH+V0RLndPg+hnfmBW/LftAEgeD8U83ltQRl/n5E+96ma
-         /t+XAI8hB6bYwEmrjIaO58DOmJueYfsBpr1Qy2vQfQ98wPBjYv1gCep/+9KGUFEqxgty
-         ZDitpY3n8SsYkUcN4GlzvUQVsLldYNNE14D1jgoVdP0zADqR1rb4j+/kBZasBl9v5JTJ
-         Cx4vV+Ehux6dCDA6+hF7dJwfWyXJogtGnRlsIRwT5O9h072AnUwTE+1u9FkYLz6yo8Gc
-         lk0d+VcdbhLE2s9hVwpJYR02vFqiF4sL6je8xkonDc1ClRJtYIt0tgDzEOha8G9qtbjX
-         Li0g==
+        d=sairon.cz; s=google; t=1704712708; x=1705317508; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vvHvf7c2821g7elCMwADffZNIAMAL4JPAyxBNttzCkU=;
+        b=DFySzoXfz3uK9SXKhm73+RdjE3XhSxU2iTvCyfnADYPAQ3q2ISkCg9CBpXRZgIPMfo
+         R3bHmzy6tR4tjbQ4eXfw+d4FLfwOP7jrK7BHxBPdtu73peWpnPW90SCKwnxJ33Np0jqt
+         cU6h7j1NFVikEtd9+rsAmXPl5Y3XbWbNC2N4shsxeMC3ga/4uRt9puZLjHRTkRk6v6Lt
+         U4aRxguXBLDjC3vbXQVBeKNoMEC2OZVNssYBK4XZKOBUDUShcRRUXZgGxs/qfk+Sfmf0
+         9eu6ZROdTUdg+PIcYAz3sHRiJdjk/wpB9k0PaTCrKGxPMK7fqN24smUpeBbHARvKKKyG
+         S/xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704704971; x=1705309771;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TpH6e5f9CwrQldKdZ83I+BJ56xcegVaU/llwUYD/L+Y=;
-        b=WK0riIU2gwdNkK+U8IQH20bNvwg7AL42XXEvKB2a+bmK048CxlyJA7Hi1pnXDHXzMp
-         BpI6gBYAVpBOATsXgwJi9UeS6v5J6UBx6VPk1w7EkMrWeghb3c/g+s3D7MCiLlzqnAKW
-         XXXEERdkdGfbfFX4rTSIRDrN85jT1ydnmfllqKXPIOiYo0Mc2R9k+1Uj9UPBiaJbCZpz
-         DAwfMuX4/eFKMfAcOUfL4M3HoWuhnj6lIZVa1FeicII7Ieh3IFWpeDPGMK1WWgbg5eFO
-         XVDiFdD293JLbMfZpLcv6bOclWVpxH1rVEJe0JGAz/v07EUXkevWSH1sJQ9/hd5hCcWj
-         9gJg==
-X-Gm-Message-State: AOJu0YxdyY+IdiPifnFeOjLlgXn8tNxAuMVWVdVGLRarndWAa536J2s1
-	fzw1FKs1aOYO59yvgJY57ScW21DXK8J6/A==
-X-Google-Smtp-Source: AGHT+IFAWLQ1wAIfuj8nS99qhKD77kxRlCvb4NjoLF3gKRyK3iywjpF/YFgt0Qpj5Po/c+PM2OoGGA==
-X-Received: by 2002:a05:600c:1d24:b0:40d:83e1:6c62 with SMTP id l36-20020a05600c1d2400b0040d83e16c62mr1798205wms.7.1704704971098;
-        Mon, 08 Jan 2024 01:09:31 -0800 (PST)
-Received: from localhost ([102.140.209.237])
-        by smtp.gmail.com with ESMTPSA id n43-20020a05600c502b00b0040e45799541sm3892170wmr.15.2024.01.08.01.09.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jan 2024 01:09:30 -0800 (PST)
-Date: Mon, 8 Jan 2024 12:09:27 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 3/3] cifs: simplify a check in cifs_chan_update_iface()
-Message-ID: <eef8b278-97b5-4858-b05f-5cfc454cc614@moroto.mountain>
+        d=1e100.net; s=20230601; t=1704712708; x=1705317508;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvHvf7c2821g7elCMwADffZNIAMAL4JPAyxBNttzCkU=;
+        b=rOB6ChF5lkEcUIoQIp2f+I4XkcF6O+aHx8LJUKn3wRADp5lfo67WYezdiRoPKZBxet
+         +VP3Gq0l0WEoUzrk1TI0ptP9VOOSDnM2revI8Rg817wBB3+zcbtWbp6cVjE2fzmgu3Yo
+         tgcKiGvZcgeew5n4G3h05woQH8dbVHdfwQj11Uu6zc/Bb1S69vJdnExz68mQo7dZyhfP
+         9/JKmZjT0NrR3+IyVwoKrSVmbjzmYRNw18W9Fy+cfmDwm+/8N1PYrR1hSN3kI6kjVDjR
+         QUJ/PIrAmtUwEVFu6GQRFMB9C3GzitDmLvynkIn9mJRtMNiW75BlMsG74sdCgeTAwSYy
+         bgmQ==
+X-Gm-Message-State: AOJu0Yw06fp+EuIOlcAeUhpVyOYSTUp8PCsKtSiv8LfiADjY5NMFpq84
+	clVDtzHjYm24qXyPsQFwy2+5W0J+QWYXZA==
+X-Google-Smtp-Source: AGHT+IGrpOZtNKtQZgl0zlvg91S7nqHPfwc08Q05UcG0tbmEZZ41We+pivW5aWIKtkq+TGhVcx09YQ==
+X-Received: by 2002:a17:906:7252:b0:a27:eeca:c344 with SMTP id n18-20020a170906725200b00a27eecac344mr1151838ejk.65.1704712707592;
+        Mon, 08 Jan 2024 03:18:27 -0800 (PST)
+Received: from [192.168.127.42] (ip-89-103-66-201.bb.vodafone.cz. [89.103.66.201])
+        by smtp.gmail.com with ESMTPSA id n15-20020a170906688f00b00a281f88f2ebsm3818651ejr.38.2024.01.08.03.18.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jan 2024 03:18:27 -0800 (PST)
+Message-ID: <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
+Date: Mon, 8 Jan 2024 12:18:26 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b628a706-d356-4629-a433-59dfda24bb94@moroto.mountain>
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with
+ "Resource temporarily unavailable"
+Content-Language: en-US
+To: Leonardo Brondani Schenkel <leonardo@schenkel.net>, stable@vger.kernel.org
+Cc: regressions@lists.linux.dev, linux-cifs@vger.kernel.org,
+ Paulo Alcantara <pc@manguebit.com>
+References: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
+From: =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
+In-Reply-To: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The loop iterator in a list_for_each() loop is never NULL at the end.
-This condition uses a two step process of setting the iterator, "iface",
-from non-NULL to NULL and then checking if it's NULL.  It's easier to do
-in one step.
+Hi,
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/client/sess.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+I confirm Leonardo's findings about 6.1.70 introducing this regression, 
+this issue manifested in Home Assistant OS [1] which was recently bumped 
+to that version. I bisected the issue between 6.1.69 and 6.1.70 which 
+pointed me to this bad commit:
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index f7b216dd06b2..987188e1929e 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -363,7 +363,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- {
- 	unsigned int chan_index;
- 	size_t iface_weight = 0, iface_min_speed = 0;
--	struct cifs_server_iface *iface = NULL;
-+	struct cifs_server_iface *iface;
- 	struct cifs_server_iface *old_iface = NULL;
- 	struct cifs_server_iface *last_iface = NULL;
- 	struct sockaddr_storage ss;
-@@ -432,11 +432,6 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	}
- 
- 	if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
--		iface = NULL;
--		cifs_dbg(FYI, "unable to find a suitable iface\n");
--	}
--
--	if (!iface) {
- 		if (!chan_index)
- 			cifs_dbg(FYI, "unable to get the interface matching: %pIS\n",
- 				 &ss);
--- 
-2.42.0
+----
+commit bef4315f19ba6f434054f58b958c0cf058c7a43f (refs/bisect/bad)
+Author: Paulo Alcantara <pc@manguebit.com>
+Date:   Wed Dec 13 12:25:57 2023 -0300
 
+     smb: client: fix OOB in SMB2_query_info_init()
+
+     commit 33eae65c6f49770fec7a662935d4eb4a6406d24b upstream.
+
+     A small CIFS buffer (448 bytes) isn't big enough to hold
+     SMB2_QUERY_INFO request along with user's input data from
+     CIFS_QUERY_INFO ioctl.  That is, if the user passed an input buffer >
+     344 bytes, the client will memcpy() off the end of @req->Buffer in
+     SMB2_query_info_init() thus causing the following KASAN splat:
+
+(snip...)
+----
+
+Reverting this change on 6.1.y makes the error go away.
+
+Adding linux-cifs and Paolo to CC.
+
+Cheers,
+Jan
+
+
+[1] https://github.com/home-assistant/operating-system/issues/3041
+
+
+On 08. 01. 24 11:44, Leonardo Brondani Schenkel wrote:
+> I'm new here, first time reporting a regression, apologies in advance if 
+> I'm doing something wrong of if this was already reported (I found some 
+> CIFS issues but not exactly this one).
+> 
+> I'm using x86-64 Arch Linux and LTS kernel (6.1.71 as I write this) and 
+> I noticed a regression that I could reproduce in other boxes with other 
+> architectures as well (aarch64 with 6.1.70).
+> 
+> # mount.cifs //server/share /mnt
+> # mount
+> //server/share on /mnt type cifs (rw,relatime,vers=3.1.1...)
+> # cd /mnt
+> # df .
+> df: .: Resource temporarily unavailable
+> # ls -al
+> ls: .: Resource temporarily unavailable
+> ls: file1: Resource temporarily unavailable
+> ls: file2: Resource temporarily unavailable
+> [...then ls shows the listing...]
+> 
+> If I use strace with df, the problem is:
+> statfs(".", 0x.....) = -1 EAGAIN (Resource temporarily unavailable)
+> 
+> And with ls:
+> listxattr(".", 0x..., 152): -1 EAGAIN (Resource temporarily unavailable)
+> listxattr("file1", ..., 152): -1 EAGAIN (same as above)
+> ...
+> 
+> Initially I thought the problem was with the Samba server and/or the 
+> client mount flags, but I've spent a day trying a *lot* of different 
+> combinations and nothing worked. This happens with any share that I try, 
+> and I've tried mounting shares from multiple Linux boxes running 
+> different Samba and kernel versions.
+> 
+> Then I tried changing kernel versions at my client box. I booted latest 
+> 6.6.9 and the problem simply disappeared. My Debian server with 6.5.11 
+> also doesn't have it. I then started a VM and tried a "bisection" of 
+> 6.1.x versions, leading to kernel 6.1.70 when this started to happen.
+> 6.1.69 and older look fine.
+> 
+> I hope that this is enough information to reproduce this issue. I will 
+> be glad to provide more info if necessary.
+> 
+> // Leonardo.
+> 
