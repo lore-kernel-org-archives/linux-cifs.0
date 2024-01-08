@@ -1,76 +1,83 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FDE51C48;
-	Mon,  8 Jan 2024 15:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901A9537E9
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Jan 2024 16:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="OwA1GDQt"
-Message-ID: <88a9efbd0718039e6214fd23978250d1@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1704729533;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPy4S1AW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704730430;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eITOrU7IqmoWhpytvEyQabfj5gns6LHywe5FDzXfE3I=;
-	b=OwA1GDQte2vVJv4t2oEXmyULIMZroyX++8uuhOiq+2vKnQaxlMMxKPzhTEGU7DtucW5Dnd
-	RxtGI3f951dUkpvBoQ5DL9mPjVaTRVPSTBMg1ijyBCvE9AOc318hTiHbS+PoiHBAC/Xubh
-	/Ahga3oDK2wzRBKzv4FMDo9xCeHOJbQqOZNUSc6scOBzPYpSXLsYXhkVqZzuHMfl/deLg+
-	7OVcVz7w2/AJwQb1WuO8GNPZeHobwTZ8t51v/UhgCwZCautNFHaANQteYuPOajA9EyDgVG
-	USfYElfJ0KZeSXX1sT7njzmhn/DNAezoPwV9q0pOATTLKVLfdUe1lF7e6t+Bww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1704729533; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eITOrU7IqmoWhpytvEyQabfj5gns6LHywe5FDzXfE3I=;
-	b=Rn2nQt5bbJlxsfSwqjECOK7V7iOe5xBSgyFQzqmddIIHDC/BD4wIZ5JA+ycAYVESjA60Lg
-	ppdPG3EfuwTkaWJcFpeDdTtr6U6idBEmsUhFnDA6rhb8WhTJh7pYfdxX5LHpTE4jyxVLky
-	661uwbwWE9rnlodkiMnFFssNhtLDuHnHxvZC1wRXYXT8cdwU8P/OjGZO0ryYj0BS2GQe3q
-	/ERnS3SNJ0FhMEiPZ8wSG4FxTfG1VYYUAAduhysIabGEmELr/KymTYIEECoTLiUkrhxnlz
-	JnnIdRaoSxsz2s1zWAJDzQ1N+69ns5vdnLAAPYHaYBoCl+aSiYM/YPiprymEZA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1704729533; a=rsa-sha256;
-	cv=none;
-	b=FD19sst25bnkqFJXf+jHnwLV2Blhsmi3ur8qASu/5tfZAReRUmcbBuvn04D/331Q2K8LlU
-	oISzkU1iKCLOqcwJNhV/Q9VRbgpDvQB1tM30W8vy6OC3ElNXxjERNUGiegphBkZFk7V7Ij
-	Zo/sVnTBd04aU3oYtNdvvq03ke81gdeT57nQQpYBtCtUdpAt/GqN/ofJ6iuIIKXVjJF9+9
-	iKeJ69GOSkLmSuP8078/HbTgmIw5VRUOMv3ICjt/Wmc6kUfRICdso5uNJfkvGZTsBwmDL9
-	5Npw7C1u7kuAQyJL4OAOIIN674GsUgXXgcyAZtUK6C8S5f6+wAHAowx2BdMKpw==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jan =?utf-8?B?xIxlcm3DoWs=?= <sairon@sairon.cz>, Leonardo Brondani
- Schenkel
- <leonardo@schenkel.net>, stable@vger.kernel.org,
- regressions@lists.linux.dev, linux-cifs@vger.kernel.org, Mathias
- =?utf-8?Q?Wei=C3=9Fbach?=
- <m.weissbach@info-gate.de>
-Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with
- "Resource temporarily unavailable"
-In-Reply-To: <2024010846-hefty-program-09c0@gregkh>
-References: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
- <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
- <446860c571d0699ed664175262a9e84b@manguebit.com>
- <2024010846-hefty-program-09c0@gregkh>
-Date: Mon, 08 Jan 2024 12:58:49 -0300
+	 to:to:cc:mime-version:mime-version:content-type:content-type;
+	bh=lFQMv9XwK9ej+tAG2vSPh6/ex1rfcZMiQqZcNXWZROs=;
+	b=NPy4S1AW3BsEa85Tok/3ZAqrxAO30dTQrWDBmvEkbYAmhQPfRFW8HN34j4HzNhlyjdYCVf
+	nOiBcU7/1mmgTZ/dqPdWggdhlccKvP1CzWGj0MF/nQZUwnGakakm+dFba3XiO2fVr50Rw4
+	9ybNuKsuzBKkbr6zJkn5qMkHfeQZddU=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-Zj7gtdEPMGKxNCdLnVNkog-1; Mon, 08 Jan 2024 11:13:48 -0500
+X-MC-Unique: Zj7gtdEPMGKxNCdLnVNkog-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5e73e6a17d5so32174907b3.0
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Jan 2024 08:13:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704730428; x=1705335228;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lFQMv9XwK9ej+tAG2vSPh6/ex1rfcZMiQqZcNXWZROs=;
+        b=n9FlnEDqX1TYzY6kcXdqOG3gclI8wCIOIdKNn7VATIzT9LlqCnnJ1joW4D3Ul6uM72
+         GsUc5SLLFa7KbARZm0yUcAybo93t4u4OFqlhJV2BbOjXffRSvPpTArn832FagT2xoAg1
+         cv/SUoMJ5BOKFg+dL05NWS/zT7oHm9k7eL3nB5P0WEM2a8iAaBgcnnAYWeFDsxSjx7RQ
+         dhhR4c2peCuBn7SVCNlh4YO+5fnasWWdQEBf4rRjfbsXnNYMGM6g2Ok10FijPYhmoCZI
+         salFAacroiXzL0oSbIuhF9HVaUQRYSvHLJV0wqZHLwhAfqheuYV+YxxZlQevCkGtCvZg
+         pg/g==
+X-Gm-Message-State: AOJu0Yy81XgzwOetwPbCn8S13A7sGtMS8+eU/lBecL4EZzvqtizm8kFn
+	bZT1EJsCeB2Y1pJzF0pavDfrStTDE2LIqeNqmNrNnqgC5F+FOSGqGmcYjs1ZvJcJiuAL+HkNeBS
+	hPytJ4y0q60YExvK294ZIwm9NXYICZ8KV8mN4TwYJRr9WxFLf1EGj48Tk
+X-Received: by 2002:a81:a0cb:0:b0:5f5:ca34:c1d with SMTP id x194-20020a81a0cb000000b005f5ca340c1dmr2469045ywg.49.1704730428143;
+        Mon, 08 Jan 2024 08:13:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHeEMgaCZVBx0ixfeLvGAxJPO59TIbNQsubdgH3bNAFRgaSAlSLNFmVBSOZWkzfm0AOQ03fJlmlNmG4ZoHECNI=
+X-Received: by 2002:a81:a0cb:0:b0:5f5:ca34:c1d with SMTP id
+ x194-20020a81a0cb000000b005f5ca340c1dmr2469038ywg.49.1704730427923; Mon, 08
+ Jan 2024 08:13:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Jacob Shivers <jshivers@redhat.com>
+Date: Mon, 8 Jan 2024 11:13:11 -0500
+Message-ID: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
+Subject: Linux client SMB and DFS site awareness
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+Hello,
 
-> Why can't we just include eb3e28c1e89b ("smb3: Replace smb2pdu 1-element
-> arrays with flex-arrays") to resolve this?
+I have a use-case for a Linux SMB client to mount DFS replicated
+shares, with a preference for sites that are closer geographically.
+DNS site discovery/awareness exists within DFS[0], but I have not read
+of any work currently under investigation.
 
-Yep, this is the right way to go.
+Is anyone actively working on this issue in any capacity? If so, would
+they like help in some capacity whether testing/coding?
 
-> I've queued it up now.
+If this issue is not being actively engaged is there a reason for
+this, e.g. low priority, technical complexity/implementation issues,
+or some other reason?
 
-Thanks!
+
+I had searched through mailing list archives and found no prior
+mention, but I do apologize if this has been discussed and is a
+broadly known discussion point.
+
+Thanks for any feedback,
+
+Jacob Shivers
+
+[0] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/7fcdce70-5205-44d6-9c3a-260e616a2f04?redirectedfrom=MSDN
+
