@@ -1,136 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7449339FCB
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Jan 2024 11:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FD137160;
+	Tue,  9 Jan 2024 11:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GSLAF2Mb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704799269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z0xNWJpdRPanEuZiAQenKRA87zeZrifRwyW7XU8kxYA=;
-	b=GSLAF2MbCg3mWsy3PLKVMHxZGHi341HR2h47BeM0ZzIWOjksLKiOP00CIgF1UQF47UTz3g
-	bbRS9jRrzv12R9quosdLnoxzqPoDv48RfaCEtEmW/vLMuBqbhXaVIZ358xh6OORZDsMztB
-	4z5zSuISx1oNVvzF7883EpYThpn1u4o=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-EPXp23K5MHONs8COTGeLaw-1; Tue,
- 09 Jan 2024 06:20:58 -0500
-X-MC-Unique: EPXp23K5MHONs8COTGeLaw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 357C31C06505;
-	Tue,  9 Jan 2024 11:20:57 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C71151121306;
-	Tue,  9 Jan 2024 11:20:53 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KM3sSo58"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70214C433F1;
+	Tue,  9 Jan 2024 11:41:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1704800463;
+	bh=4aNVYkq/75x5lsWqp/Rnxx++cD+4B1lu9Dpu8b5mH5s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KM3sSo58mWq1zh+cUHgm3H/wAVSH9GC8bUWFzrVIq5IPTR4zmbM8XPkTNjHW6Q/8v
+	 FyxpY5nQJZEarLnbBJh4TLxQ4aBdhDnUImLac5j8K9irhoU7UbqGAojWL4GSKLa2KS
+	 qdHMxI7DReat6uPnLqaDjZ0YDo4rMwh6LiNcnLWc=
+Date: Tue, 9 Jan 2024 12:40:59 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: stable@vger.kernel.org, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@cjr.nz>, Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	kernel test robot <lkp@intel.com>,
-	Yiqun Leng <yqleng@linux.alibaba.com>,
-	Jia Zhu <zhujia.zj@bytedance.com>
-Subject: [PATCH 5/6] cachefiles: Fix signed/unsigned mixup
-Date: Tue,  9 Jan 2024 11:20:22 +0000
-Message-ID: <20240109112029.1572463-6-dhowells@redhat.com>
-In-Reply-To: <20240109112029.1572463-1-dhowells@redhat.com>
-References: <20240109112029.1572463-1-dhowells@redhat.com>
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-cifs@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+	Steve French <stfrench@microsoft.com>,
+	Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 6.1.y ] smb3: Replace smb2pdu 1-element arrays with
+ flex-arrays
+Message-ID: <2024010937-eggplant-bauble-d556@gregkh>
+References: <CAKYAXd-aYvX9nOZ=gjruv5Mk0eS9ZdF569QBk2YCqEvR_nwxPQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKYAXd-aYvX9nOZ=gjruv5Mk0eS9ZdF569QBk2YCqEvR_nwxPQ@mail.gmail.com>
 
-In __cachefiles_prepare_write(), the start and pos variables were made
-unsigned 64-bit so that the casts in the checking could be got rid of -
-which should be fine since absolute file offsets can't be negative, except
-that an error code may be obtained from vfs_llseek(), which *would* be
-negative.  This breaks the error check.
+On Tue, Jan 09, 2024 at 04:18:39PM +0900, Namjae Jeon wrote:
+> From: Kees Cook <keescook@chromium.org>
+> 
+> commit eb3e28c1e89b4984308777231887e41aa8a0151f upstream.
+> 
+> The kernel is globally removing the ambiguous 0-length and 1-element
+> arrays in favor of flexible arrays, so that we can gain both compile-time
+> and run-time array bounds checking[1].
+> 
+> Replace the trailing 1-element array with a flexible array in the
+> following structures:
+> 
+> 	struct smb2_err_rsp
+> 	struct smb2_tree_connect_req
+> 	struct smb2_negotiate_rsp
+> 	struct smb2_sess_setup_req
+> 	struct smb2_sess_setup_rsp
+> 	struct smb2_read_req
+> 	struct smb2_read_rsp
+> 	struct smb2_write_req
+> 	struct smb2_write_rsp
+> 	struct smb2_query_directory_req
+> 	struct smb2_query_directory_rsp
+> 	struct smb2_set_info_req
+> 	struct smb2_change_notify_rsp
+> 	struct smb2_create_rsp
+> 	struct smb2_query_info_req
+> 	struct smb2_query_info_rsp
+> 
+> Replace the trailing 1-element array with a flexible array, but leave
+> the existing structure padding:
+> 
+> 	struct smb2_file_all_info
+> 	struct smb2_lock_req
+> 
+> Adjust all related size calculations to match the changes to sizeof().
+> 
+> No machine code output or .data section differences are produced after
+> these changes.
+> 
+> [1] For lots of details, see both:
+>     https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+>     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+> 
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Paulo Alcantara <pc@cjr.nz>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
 
-Fix this for now by reverting pos and start to be signed and putting back
-the casts.  Unfortunately, the error value checks cannot be replaced with
-IS_ERR_VALUE() as long might be 32-bits.
+Thanks for the updated patch, good catch on my mistake in backporting
+this.  Now queued up.
 
-Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
-Reported-by: Simon Horman <horms@kernel.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@intel.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-cc: Gao Xiang <hsiangkao@linux.alibaba.com>
-cc: Yiqun Leng <yqleng@linux.alibaba.com>
-cc: Jia Zhu <zhujia.zj@bytedance.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cachefs@redhat.com
-cc: linux-erofs@lists.ozlabs.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/cachefiles/io.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-index 3eec26967437..9a2cb2868e90 100644
---- a/fs/cachefiles/io.c
-+++ b/fs/cachefiles/io.c
-@@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
- 			       bool no_space_allocated_yet)
- {
- 	struct cachefiles_cache *cache = object->volume->cache;
--	unsigned long long start = *_start, pos;
-+	loff_t start = *_start, pos;
- 	size_t len = *_len;
- 	int ret;
- 
-@@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
- 					  cachefiles_trace_seek_error);
- 		return pos;
- 	}
--	if (pos >= start + *_len)
-+	if ((u64)pos >= (u64)start + *_len)
- 		goto check_space; /* Unallocated region */
- 
- 	/* We have a block that's at least partially filled - if we're low on
-@@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
- 					  cachefiles_trace_seek_error);
- 		return pos;
- 	}
--	if (pos >= start + *_len)
-+	if ((u64)pos >= (u64)start + *_len)
- 		return 0; /* Fully allocated */
- 
- 	/* Partially allocated, but insufficient space: cull. */
-
+greg k-h
