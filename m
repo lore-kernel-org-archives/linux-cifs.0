@@ -1,36 +1,36 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D3838DD2
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Jan 2024 11:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A136C39AC1
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Jan 2024 11:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heoe8sLg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elitUFS1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704799253;
+	s=mimecast20190719; t=1704799258;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WPQwieeKN1qerHU6y651BO8nE/WRIhipjKm0fUBOfew=;
-	b=heoe8sLgG9EyKJ//oqcSHgWi5VFfkCxdY2rVlK57qqZYjhhTP9sd8vRztL6GBq5lSbjPlY
-	iQg3gSZuxgCVoAopTuxlGLZp8c3fbGvam+k0qH2r6VzWdKXqc6Cb+m8vgD/DRYKcVF5LvN
-	UeFqWjExQTlk+Cddaib9xMfxFaJIUYs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-E31DJX2lMH602RvDfJCjMg-1; Tue, 09 Jan 2024 06:20:46 -0500
-X-MC-Unique: E31DJX2lMH602RvDfJCjMg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	bh=v9Zmt8qPNtA4BbCqgJuw0LKGT28DtGNcpxFrcZYWG/0=;
+	b=elitUFS17RNYLyh4NrsXXo12fnyDkbYf77V6a9cH4wTJCJzRHAK9Y8m9R4LZtLzv1llWY9
+	YMpeKjKk+8DLsHvjL2/XuICFUmubB4ut/GZpbO8G1MvRAhNW9ZB6x76u9R8prQ9Zz/gsqH
+	8bnSAqyDbAjfykeaZNjShBmm6dr+0AM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-aZtDJMnWPAi-V2MIXSUMUQ-1; Tue,
+ 09 Jan 2024 06:20:54 -0500
+X-MC-Unique: aZtDJMnWPAi-V2MIXSUMUQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E3D56811E86;
-	Tue,  9 Jan 2024 11:20:45 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 28F8329AA3AF;
+	Tue,  9 Jan 2024 11:20:53 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0C7D83C39;
-	Tue,  9 Jan 2024 11:20:42 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4CD382166B32;
+	Tue,  9 Jan 2024 11:20:50 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Jeff Layton <jlayton@kernel.org>,
@@ -56,9 +56,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/6] netfs: Count DIO writes
-Date: Tue,  9 Jan 2024 11:20:19 +0000
-Message-ID: <20240109112029.1572463-3-dhowells@redhat.com>
+Subject: [PATCH 4/6] netfs: Fix the loop that unmarks folios after writing to the cache
+Date: Tue,  9 Jan 2024 11:20:21 +0000
+Message-ID: <20240109112029.1572463-5-dhowells@redhat.com>
 In-Reply-To: <20240109112029.1572463-1-dhowells@redhat.com>
 References: <20240109112029.1572463-1-dhowells@redhat.com>
 Precedence: bulk
@@ -68,83 +68,51 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Provide a counter for DIO writes to match that for DIO reads.
+In the loop in netfs_rreq_unmark_after_write() that removes the PG_fscache
+from folios after they've been written to the cache, as soon as we remove
+the mark from a multipage folio, it can get split - and then we might see a
+fragment of folio again.
 
+Guard against this by advancing the 'unlocked' tracker to the index of the
+last page in the folio to avoid a double removal of the PG_fscache mark.
+
+Reported-by: Marc Dionne <marc.dionne@auristor.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-afs@lists.infradead.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/direct_write.c |  1 +
- fs/netfs/internal.h     |  1 +
- fs/netfs/stats.c        | 11 +++++++----
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ fs/netfs/buffered_write.c | 1 +
+ fs/netfs/io.c             | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index b9cbfd6a8a01..60a40d293c87 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -140,6 +140,7 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 6cd8f7422e9a..0b2b7a60dabc 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -698,6 +698,7 @@ static void netfs_pages_written_back(struct netfs_io_request *wreq)
+ 	end_wb:
+ 		if (folio_test_fscache(folio))
+ 			folio_end_fscache(folio);
++		xas_advance(&xas, folio_next_index(folio) - 1);
+ 		folio_end_writeback(folio);
+ 	}
  
- 	trace_netfs_write_iter(iocb, from);
-+	netfs_stat(&netfs_n_rh_dio_write);
- 
- 	ret = netfs_start_io_direct(inode);
- 	if (ret < 0)
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index a6dfc8888377..3f9620d0fa63 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -104,6 +104,7 @@ int netfs_end_writethrough(struct netfs_io_request *wreq, struct kiocb *iocb);
-  */
- #ifdef CONFIG_NETFS_STATS
- extern atomic_t netfs_n_rh_dio_read;
-+extern atomic_t netfs_n_rh_dio_write;
- extern atomic_t netfs_n_rh_readahead;
- extern atomic_t netfs_n_rh_readpage;
- extern atomic_t netfs_n_rh_rreq;
-diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
-index 15fd5c3f0f39..42db36528d92 100644
---- a/fs/netfs/stats.c
-+++ b/fs/netfs/stats.c
-@@ -10,6 +10,7 @@
- #include "internal.h"
- 
- atomic_t netfs_n_rh_dio_read;
-+atomic_t netfs_n_rh_dio_write;
- atomic_t netfs_n_rh_readahead;
- atomic_t netfs_n_rh_readpage;
- atomic_t netfs_n_rh_rreq;
-@@ -37,14 +38,13 @@ atomic_t netfs_n_wh_write_failed;
- 
- int netfs_stats_show(struct seq_file *m, void *v)
- {
--	seq_printf(m, "Netfs  : DR=%u RA=%u RP=%u WB=%u WBZ=%u rr=%u sr=%u\n",
-+	seq_printf(m, "Netfs  : DR=%u DW=%u RA=%u RP=%u WB=%u WBZ=%u\n",
- 		   atomic_read(&netfs_n_rh_dio_read),
-+		   atomic_read(&netfs_n_rh_dio_write),
- 		   atomic_read(&netfs_n_rh_readahead),
- 		   atomic_read(&netfs_n_rh_readpage),
- 		   atomic_read(&netfs_n_rh_write_begin),
--		   atomic_read(&netfs_n_rh_write_zskip),
--		   atomic_read(&netfs_n_rh_rreq),
--		   atomic_read(&netfs_n_rh_sreq));
-+		   atomic_read(&netfs_n_rh_write_zskip));
- 	seq_printf(m, "Netfs  : ZR=%u sh=%u sk=%u\n",
- 		   atomic_read(&netfs_n_rh_zero),
- 		   atomic_read(&netfs_n_rh_short_read),
-@@ -66,6 +66,9 @@ int netfs_stats_show(struct seq_file *m, void *v)
- 		   atomic_read(&netfs_n_wh_write),
- 		   atomic_read(&netfs_n_wh_write_done),
- 		   atomic_read(&netfs_n_wh_write_failed));
-+	seq_printf(m, "Netfs  : rr=%u sr=%u\n",
-+		   atomic_read(&netfs_n_rh_rreq),
-+		   atomic_read(&netfs_n_rh_sreq));
- 	return fscache_stats_show(m);
- }
- EXPORT_SYMBOL(netfs_stats_show);
+diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+index 5b5af96cd4b9..4309edf33862 100644
+--- a/fs/netfs/io.c
++++ b/fs/netfs/io.c
+@@ -126,7 +126,7 @@ static void netfs_rreq_unmark_after_write(struct netfs_io_request *rreq,
+ 			 */
+ 			if (have_unlocked && folio_index(folio) <= unlocked)
+ 				continue;
+-			unlocked = folio_index(folio);
++			unlocked = folio_next_index(folio) - 1;
+ 			trace_netfs_folio(folio, netfs_folio_trace_end_copy);
+ 			folio_end_fscache(folio);
+ 			have_unlocked = true;
 
