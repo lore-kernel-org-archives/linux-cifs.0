@@ -1,96 +1,137 @@
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9BE39AD7;
-	Tue,  9 Jan 2024 14:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="Vb4lgO2c"
-Received: from localhost.ispras.ru (unknown [10.10.165.2])
-	by mail.ispras.ru (Postfix) with ESMTPSA id E530440737DF;
-	Tue,  9 Jan 2024 14:14:57 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru E530440737DF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1704809699;
-	bh=XMIzVQnRbcJ5ogx4U8zN3UNWCXEPu8snS7SZ8/UXCXE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vb4lgO2cPqV1X86JmrbOBvMFfqjl2B4Y0cchENo4XdBEKl2zN5l2PQ3OXcwaZ7M15
-	 qhYLbXHfYILKsFYoRd1ZImObiR+/4Z1q4dLfYOYsX+3Tup0/CgV2t+k4z+x9N1ru1q
-	 V+WEqHVHqtUhcGNUX04Z5wMUNvXM+pU0Bu/qwQGo=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v2] ksmbd: free ppace array on error in parse_dacl
-Date: Tue,  9 Jan 2024 17:14:44 +0300
-Message-ID: <20240109141445.6808-1-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CAKYAXd-ULRwKdDLs2XPwf6n9_HTHUJv1+aLmbWN5SqjUxw_xNQ@mail.gmail.com>
-References: 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91273B18E;
+	Tue,  9 Jan 2024 17:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40d87df95ddso33516145e9.0;
+        Tue, 09 Jan 2024 09:11:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704820312; x=1705425112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=74pgZ+nMyMyCi7Q0sf1ChPH+6TyfRgWiK4L8xKykjS8=;
+        b=GnFrthI2RBRtog0nPtZWOBaNg9bje2KZUGLypvDGOwW2XFCk+uKLUmVE3fA71XyXN0
+         l0iLSew9vf6HIHPtSalEz1IkoM3Hyenqu+EwtybxuVNg3UBOQ6ARIj8Jr+VDQXkj3Cwn
+         8sSRnaXce04fDK6GtyW19LSPTslynGVOjjr2i+/fE7vPIbTZ3zRHjb6gMFN++99YJ5V8
+         xj1TA1HLWE4Upb+YOIjouMTc9sOH/DdLGxJjIEz/Ho0soknB0AX/deNe7wRP8O3TgSOK
+         DW7WnPUJF4+jEmXY9lMOu3t/CmAEotaBfwZ/nqZVatBSu4d68eOjT8La0VCYmUgGONFg
+         GSdA==
+X-Gm-Message-State: AOJu0YzC9c8vfY9J44hgHmCXmpqpev8kAtE5hreOROutPRj9gFhnDLLs
+	RBluz/dIjaUAZYvEseTroVZvVqB2VqrEe9fB
+X-Google-Smtp-Source: AGHT+IGIJos/i3ipnkFdLmYM2EEGbfIzf/lnl4N7OeDdNGtTp5964SxNKeNBrFk3MQ87L6RBTC7++g==
+X-Received: by 2002:a05:600c:4ecc:b0:40e:4b1d:753 with SMTP id g12-20020a05600c4ecc00b0040e4b1d0753mr581661wmq.181.1704820311991;
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com. [209.85.218.41])
+        by smtp.gmail.com with ESMTPSA id se12-20020a170906ce4c00b00a1d5c52d628sm1236183ejb.3.2024.01.09.09.11.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a294295dda3so364442366b.0;
+        Tue, 09 Jan 2024 09:11:51 -0800 (PST)
+X-Received: by 2002:a17:907:1c19:b0:a27:5397:74ed with SMTP id
+ nc25-20020a1709071c1900b00a27539774edmr523050ejc.175.1704820311478; Tue, 09
+ Jan 2024 09:11:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240109112029.1572463-1-dhowells@redhat.com>
+In-Reply-To: <20240109112029.1572463-1-dhowells@redhat.com>
+From: Marc Dionne <marc.dionne@auristor.com>
+Date: Tue, 9 Jan 2024 13:11:39 -0400
+X-Gmail-Original-Message-ID: <CAB9dFdt0haftd1LPo=_GmtcZvFR84w81eaARfUKW2KMSM5gxqg@mail.gmail.com>
+Message-ID: <CAB9dFdt0haftd1LPo=_GmtcZvFR84w81eaARfUKW2KMSM5gxqg@mail.gmail.com>
+Subject: Re: [PATCH 0/6] netfs, cachefiles: More additional patches
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com, 
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The ppace array is not freed if one of the init_acl_state() calls inside
-parse_dacl() fails. At the moment the function may fail only due to the
-memory allocation errors so it's highly unlikely in this case but
-nevertheless a fix is needed.
+On Tue, Jan 9, 2024 at 7:20=E2=80=AFAM David Howells <dhowells@redhat.com> =
+wrote:
+>
+> Hi Christian, Jeff, Gao,
+>
+> Here are some additional patches for my netfs-lib tree:
+>
+>  (1) Mark netfs_unbuffered_write_iter_locked() static as it's only used i=
+n
+>      the file in which it is defined.
+>
+>  (2) Display a counter for DIO writes in /proc/fs/netfs/stats.
+>
+>  (3) Fix the interaction between write-streaming (dirty data in
+>      non-uptodate pages) and the culling of a cache file trying to write
+>      that to the cache.
+>
+>  (4) Fix the loop that unmarks folios after writing to the cache.  The
+>      xarray iterator only advances the index by 1, so if we unmarked a
+>      multipage folio and that got split before we advance to the next
+>      folio, we see a repeat of a fragment of the folio.
+>
+>  (5) Fix a mixup with signed/unsigned offsets when prepping for writing t=
+o
+>      the cache that leads to missing error detection.
+>
+>  (6) Fix a wrong ifdef hiding a wait.
+>
+> David
+>
+> The netfslib postings:
+> Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.=
+com/ # v1
+> Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.=
+com/ # v2
+> Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.=
+com/ # v3
+> Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.c=
+om/ # v4
+> Link: https://lore.kernel.org/r/20231221132400.1601991-1-dhowells@redhat.=
+com/ # v5
+> Link: https://lore.kernel.org/r/20240103145935.384404-1-dhowells@redhat.c=
+om/ # added patches
+>
+> David Howells (6):
+>   netfs: Mark netfs_unbuffered_write_iter_locked() static
+>   netfs: Count DIO writes
+>   netfs: Fix interaction between write-streaming and cachefiles culling
+>   netfs: Fix the loop that unmarks folios after writing to the cache
+>   cachefiles: Fix signed/unsigned mixup
+>   netfs: Fix wrong #ifdef hiding wait
+>
+>  fs/cachefiles/io.c            | 18 +++++++++---------
+>  fs/netfs/buffered_write.c     | 27 ++++++++++++++++++++++-----
+>  fs/netfs/direct_write.c       |  5 +++--
+>  fs/netfs/fscache_stats.c      |  9 ++++++---
+>  fs/netfs/internal.h           |  8 ++------
+>  fs/netfs/io.c                 |  2 +-
+>  fs/netfs/stats.c              | 13 +++++++++----
+>  include/linux/fscache-cache.h |  3 +++
+>  include/linux/netfs.h         |  1 +
+>  9 files changed, 56 insertions(+), 30 deletions(-)
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "linux-cachefs@redhat.com" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to linux-cachefs+unsubscribe@redhat.com.
 
-Move ppace allocation after the init_acl_state() calls with proper error
-handling.
+This passes our kafs tests where a few of the issues fixed here had been se=
+en.
+I made the framework use 9p and no related issues were seen there either.
 
-Found by Linux Verification Center (linuxtesting.org).
+Tested-by: Marc Dionne <marc.dionne@auristor.com>
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
----
-v2: refine the patch with moving ppace allocation into another place per
-    Namjae's suggestion; update the commit description accordingly.
-
- fs/smb/server/smbacl.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 1164365533f0..1c9775f1efa5 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -401,10 +401,6 @@ static void parse_dacl(struct mnt_idmap *idmap,
- 	if (num_aces > ULONG_MAX / sizeof(struct smb_ace *))
- 		return;
- 
--	ppace = kmalloc_array(num_aces, sizeof(struct smb_ace *), GFP_KERNEL);
--	if (!ppace)
--		return;
--
- 	ret = init_acl_state(&acl_state, num_aces);
- 	if (ret)
- 		return;
-@@ -414,6 +410,13 @@ static void parse_dacl(struct mnt_idmap *idmap,
- 		return;
- 	}
- 
-+	ppace = kmalloc_array(num_aces, sizeof(struct smb_ace *), GFP_KERNEL);
-+	if (!ppace) {
-+		free_acl_state(&default_acl_state);
-+		free_acl_state(&acl_state);
-+		return;
-+	}
-+
- 	/*
- 	 * reset rwx permissions for user/group/other.
- 	 * Also, if num_aces is 0 i.e. DACL has no ACEs,
--- 
-2.43.0
-
+Marc
