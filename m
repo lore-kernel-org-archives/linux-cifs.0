@@ -1,75 +1,80 @@
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDB238DE9;
-	Tue,  9 Jan 2024 13:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=27;SR=0;TI=SMTPD_---0W-IeJTb_1704805422;
-Received: from 192.168.33.9(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W-IeJTb_1704805422)
-          by smtp.aliyun-inc.com;
-          Tue, 09 Jan 2024 21:03:44 +0800
-Message-ID: <cab7415b-3c5b-49ea-86c2-bdd0aee3c4b9@linux.alibaba.com>
-Date: Tue, 9 Jan 2024 21:03:39 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1141838F9F;
+	Tue,  9 Jan 2024 13:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="Rl1Ovwlq"
+Received: from localhost.ispras.ru (unknown [10.10.165.2])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 5CB2240737DD;
+	Tue,  9 Jan 2024 13:37:15 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 5CB2240737DD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1704807436;
+	bh=TdzphiKewiAEGb5mVeNRXY8JwRsEqxcS+5rYPinKWAY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Rl1OvwlqxuwvpisiP4VBWnGLxvuCidOwAPlrS6WQp+tgypcJOmosmZNGPAyUSSXKn
+	 l01p+tt421gxRXq14syQ/JhWyMnZkzlmbwsDeenhMvaKkPVNsoclgqx30ksVstFfV2
+	 kFLKJvkOV5udxD91wDb77P3lvTpiIURTuGsdMbtQ=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Steve French <sfrench@samba.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] ksmbd: free ppace array on error in parse_dacl
+Date: Tue,  9 Jan 2024 16:34:27 +0300
+Message-ID: <20240109133429.31752-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] cachefiles: Fix signed/unsigned mixup
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>,
- Dominique Martinet <asmadeus@codewreck.org>
-Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, kernel test robot <lkp@intel.com>,
- Yiqun Leng <yqleng@linux.alibaba.com>, Jia Zhu <zhujia.zj@bytedance.com>
-References: <20240109112029.1572463-1-dhowells@redhat.com>
- <20240109112029.1572463-6-dhowells@redhat.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20240109112029.1572463-6-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Free the ppace array if one of the init_acl_state() calls inside
+parse_dacl() fails. At the moment the function may fail only due to the
+memory allocation errors so it's highly unlikely in this case but
+nevertheless a fix is needed.
 
+Found by Linux Verification Center (linuxtesting.org).
 
-On 2024/1/9 19:20, David Howells wrote:
-> In __cachefiles_prepare_write(), the start and pos variables were made
-> unsigned 64-bit so that the casts in the checking could be got rid of -
-> which should be fine since absolute file offsets can't be negative, except
-> that an error code may be obtained from vfs_llseek(), which *would* be
-> negative.  This breaks the error check.
-> 
-> Fix this for now by reverting pos and start to be signed and putting back
-> the casts.  Unfortunately, the error value checks cannot be replaced with
-> IS_ERR_VALUE() as long might be 32-bits.
-> 
-> Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
-> Reported-by: Simon Horman <horms@kernel.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@intel.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> cc: Gao Xiang <hsiangkao@linux.alibaba.com>
-> cc: Yiqun Leng <yqleng@linux.alibaba.com>
-> cc: Jia Zhu <zhujia.zj@bytedance.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-erofs@lists.ozlabs.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+ fs/smb/server/smbacl.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-It looks good to me,
-Reviewed-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 1164365533f0..e6d0537cab49 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -406,11 +406,14 @@ static void parse_dacl(struct mnt_idmap *idmap,
+ 		return;
+ 
+ 	ret = init_acl_state(&acl_state, num_aces);
+-	if (ret)
++	if (ret) {
++		kfree(ppace);
+ 		return;
++	}
+ 	ret = init_acl_state(&default_acl_state, num_aces);
+ 	if (ret) {
+ 		free_acl_state(&acl_state);
++		kfree(ppace);
+ 		return;
+ 	}
+ 
+-- 
+2.43.0
 
-Thanks,
-Gao Xiang
