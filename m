@@ -1,103 +1,67 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FFE3E46E
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Jan 2024 23:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E90389;
+	Wed, 10 Jan 2024 00:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGJIV4XF"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cd08f0c12aso37942761fa.0
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Jan 2024 15:44:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704843889; x=1705448689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r0xssl5eNQfkC5b8fxkYPbQCZF+UqOUjcvTJ1Q4A1i0=;
-        b=KGJIV4XFvdrvnmyD/ywCTgzjmFdsaEN+klbGotqfOSrPShFXKls+7EqBWYSTS35TsN
-         PdUsXvGKRPviOogkONCzKjL3CAwb+mPWZnjp0qClKl60dB6THK9XQeYRSjdBG79PPcnP
-         ssexTsvP858Oh7AD5bJRa63LLRej8Plf4BxzDKymQoXR2RcqMj2W/tB6KCQVRUN7wHrJ
-         87hJO1tc9xJfZQacIaVmgRa4JIHn3O892D6UJqgR0Qh/8ayE/DlitRZhZWImXdtEH7rA
-         XsnB1rEshHkXYf5hVHmQgvnju5jWiIEKoppeRqLEog3dpW9DUJDs9AfA7xqX5bh0dV7f
-         4Jog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704843889; x=1705448689;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r0xssl5eNQfkC5b8fxkYPbQCZF+UqOUjcvTJ1Q4A1i0=;
-        b=kYTlg2J/2eqpdSkaNRtvxzy/JneO7ZhYZlCFRbpF/ek7JnEopq/GIRkEsQwWfHhfAV
-         M9x+7TEvpehLiIrcYvb3GbeJpRtNGuxNy8f0gFiT9pX2CzMS4hw1CJI6diG5aVD+rZEe
-         tPTvMBH7VlUx8teKjNmTnuKHtGYYCRffvO3uY8lo1rpMRxuFOJG8VUxtfapoHCMRtpBj
-         peIPSeQOeP1T1wYlbfonLrf9I53zWbwFMdT+kqYI8yDZj4Fe6qs9/uBQUcOuWkhXJSLM
-         iHGpz7Ln2/CiKHPQj16BhBoZMjY3uze3oPMECO1YPyxdaq4z8ekeXJme3GQfiR+o0LtT
-         SN4Q==
-X-Gm-Message-State: AOJu0Yx1YPUXqzSIZFP0151SJl9Qvzb6YU7FVXhxK3uyylUET8Ypb0qe
-	jhv5YhV8gnP5o8tV+1kvo6csumUSAAv7EItwMkc=
-X-Google-Smtp-Source: AGHT+IFwtPAUzLEm51hXQ6PHtBTTtd4txFwdltu9e/8LXt505SwKnOff2gtcy3FE5xHEp6vwRhXq+3iRhmyNX6uyd/o=
-X-Received: by 2002:a2e:a4c5:0:b0:2cc:f3b1:e3b8 with SMTP id
- p5-20020a2ea4c5000000b002ccf3b1e3b8mr44395ljm.61.1704843889189; Tue, 09 Jan
- 2024 15:44:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5VcNG+Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B615CC43394;
+	Wed, 10 Jan 2024 00:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704846497;
+	bh=9WkGAQtgB05uUdmYyfkP3v6E2CugYXvS+PZbpjodQaw=;
+	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+	b=U5VcNG+Z0qVlRy24Oq6lB0Wgl6INOPZ5Z920J/v1W9PF8ZwmiddonaBJg+kQ1jT5r
+	 xb3oJBOv0VpzBlf6hZr24PgBb3HiD1akbOFFpINacyFlzEw4dnbEpWA5xOv+TdS61c
+	 JFQcfFAw2/Dx6sY6Mkm9q8gR1yF5xBBUjxtcfw9pztHpYpmvX0pjvk+bdHD15G1fiA
+	 VXn5JSTer1pmpSwK6uztv0e/7pJ4VZiUgs56A0e1sgTuYD3tgAUv4aEXhSpOus/6TH
+	 jPUCwtYtqN3EgkFGMbCOrOc6KMRTg+v5cNfaLT3FVM5WA06IMmKFqbDBVSYFPg03oI
+	 KjgHW55a7Ti0w==
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-59502aa878aso1926059eaf.1;
+        Tue, 09 Jan 2024 16:28:17 -0800 (PST)
+X-Gm-Message-State: AOJu0YwelHCuHreN1ET0ksvIKjFtaxj3EvBhdaLurfNFO915UyYPSRf3
+	lBRta6f2t1xJEHnTSVNkwjOnqLF96PXaVghabjI=
+X-Google-Smtp-Source: AGHT+IFAIGn0a8vQ6sKHqEOZtiRlFmyG4Xc3vza2/LjNavKjlr5yWzi4FR6bJS8xLTbeUTb7wnIc+XqYNTEGsKJZBHA=
+X-Received: by 2002:a05:6820:2382:b0:595:87a7:26a5 with SMTP id
+ co2-20020a056820238200b0059587a726a5mr261025oob.18.1704846497045; Tue, 09 Jan
+ 2024 16:28:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3c4154d3192607277bc3a7453f05cbae8a7bba5b.1701062286.git.pierre.mariani@gmail.com>
- <1f2c738ab53d6aa430001b5847feee0f73dd51c4.1701062286.git.pierre.mariani@gmail.com>
-In-Reply-To: <1f2c738ab53d6aa430001b5847feee0f73dd51c4.1701062286.git.pierre.mariani@gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 9 Jan 2024 17:44:37 -0600
-Message-ID: <CAH2r5mvBQkJcGVNYDrYiPNv-4h5mA11jQkB30_8ytUv-=ZCssA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] smb: client: Protect tcon->status with tc_lock
- spin lock
-To: Pierre Mariani <pierre.mariani@gmail.com>
-Cc: linux-cifs@vger.kernel.org
+Received: by 2002:a8a:c13:0:b0:511:f2c1:11ee with HTTP; Tue, 9 Jan 2024
+ 16:28:16 -0800 (PST)
+In-Reply-To: <20240109141445.6808-1-pchelkin@ispras.ru>
+References: <CAKYAXd-ULRwKdDLs2XPwf6n9_HTHUJv1+aLmbWN5SqjUxw_xNQ@mail.gmail.com>
+ <20240109141445.6808-1-pchelkin@ispras.ru>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 10 Jan 2024 09:28:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8g4k8kF+GyOv-jX5mw+PtKb9HxLrcWy5c4qpFwXFPTAQ@mail.gmail.com>
+Message-ID: <CAKYAXd8g4k8kF+GyOv-jX5mw+PtKb9HxLrcWy5c4qpFwXFPTAQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: free ppace array on error in parse_dacl
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Alexey Khoroshilov <khoroshilov@ispras.ru>, 
+	lvc-project@linuxtesting.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-presumably this is unneeded since in this code path we are
-initializing - we have a newly allocated tcon which hasn't been
-returned to anyone yet so no other threads could update those fields
-(until e.g. worker threads or launched which doesn't happen until a
-few lines lower, or the tcon returned)
+2024-01-09 23:14 GMT+09:00, Fedor Pchelkin <pchelkin@ispras.ru>:
+> The ppace array is not freed if one of the init_acl_state() calls inside
+> parse_dacl() fails. At the moment the function may fail only due to the
+> memory allocation errors so it's highly unlikely in this case but
+> nevertheless a fix is needed.
+>
+> Move ppace allocation after the init_acl_state() calls with proper error
+> handling.
+>
+> Found by Linux Verification Center (linuxtesting.org).
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Applied it to #ksmbd-for-next-next.
 
-On Sun, Nov 26, 2023 at 11:23=E2=80=AFPM Pierre Mariani
-<pierre.mariani@gmail.com> wrote:
->
-> Protect the update of tcon->status with tc_lock spin lock as per document=
-ation
-> from cifsglob.h.
-> Fixes Coverity 1560722 Data race condition.
->
-> Signed-off-by: Pierre Mariani <pierre.mariani@gmail.com>
-> ---
->  fs/smb/client/connect.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index f7d436daaa80..26e3eeda0c4c 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -2711,7 +2711,9 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_=
-context *ctx)
->         tcon->nodelete =3D ctx->nodelete;
->         tcon->local_lease =3D ctx->local_lease;
->         INIT_LIST_HEAD(&tcon->pending_opens);
-> +       spin_lock(&tcon->tc_lock);
->         tcon->status =3D TID_GOOD;
-> +       spin_unlock(&tcon->tc_lock);
->
->         INIT_DELAYED_WORK(&tcon->query_interfaces,
->                           smb2_query_server_interfaces);
-> --
-> 2.39.2
->
-
-
---=20
-Thanks,
-
-Steve
+Thanks for your patch!
