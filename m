@@ -1,86 +1,119 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02DD4B5CB
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 18:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2834F5EB
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 21:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="dj0M7TTe"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a294295dda3so519971466b.0
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 10:52:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1704912746; x=1705517546; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=m3UJsqaOgk5eE2VQnILkdg8C0bn7x8fx0mLavVcEL4o=;
-        b=dj0M7TTece/M/QVsuPimKT0XNEk/rCwQCicsBcOo/zK5UTjIdCDgPHDJpNLQ8Hh4Ic
-         0KvcAJrCIyHNWQNK+evF9RQH+wmD/1SY88mH34RH0m5rM2T3Q5zkO/VRWZ7qVuXTPttg
-         GqfmbbXMv8haRE5h2kLXskNPeCt0sDQVIS3r8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704912746; x=1705517546;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m3UJsqaOgk5eE2VQnILkdg8C0bn7x8fx0mLavVcEL4o=;
-        b=psf9qNzulMgtJJx+EfoOoNmlp/wOAB9ccmJ1oXG1x0nMmg4IwprPbCeOlUjLFE8mio
-         8kIqvcDv5OTCOz1YyffN2aEBPAPyF0YBU5DHYz/aFyON1uGJZ9q0+A7erbXG2mx1IZWC
-         mX4I1N+deqebeL2TxxNrcpeMuUcRIlVOxuX9A0hg4KMIfo2O9BlFYbWEp5YVPnfCwNK0
-         LrHGn0hDun6myWXW6IUDGNfKfDjSQeEIdTzKP/oLV255MX5HJlEBt9kzhuCMVi3WDhGy
-         sotIS3GLGW67eChxHAJIcMHmT1WJnun4L3uDGv+HGObXGkAiwyKpE8vwveJeX4IKida8
-         ILag==
-X-Gm-Message-State: AOJu0YyfQO5PBlkYFZS6nJE9u9xVzbP2anHLf+TdfkQhfX4Kj1gz2mKT
-	x/WUjcPTk0vay90Y5I8Y/GzHIUo+cZjIcZQP50hfxs/F1QP4JkbL
-X-Google-Smtp-Source: AGHT+IFcgI5gVEiUR8OwQZ0hJ297GH2RL9zS3xtNx5Slx+EsihAfDJrk2Ak0p0YaUcNQABGEmPn5vw==
-X-Received: by 2002:a17:906:4546:b0:a28:e66d:6df0 with SMTP id s6-20020a170906454600b00a28e66d6df0mr415028ejq.10.1704912745824;
-        Wed, 10 Jan 2024 10:52:25 -0800 (PST)
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com. [209.85.128.49])
-        by smtp.gmail.com with ESMTPSA id s9-20020a1709060c0900b00a2c189de7b8sm293628ejf.124.2024.01.10.10.52.24
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 10:52:25 -0800 (PST)
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e4582ed74so37434505e9.1
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 10:52:24 -0800 (PST)
-X-Received: by 2002:a7b:cb45:0:b0:40e:4ada:b377 with SMTP id
- v5-20020a7bcb45000000b0040e4adab377mr402184wmj.62.1704912744493; Wed, 10 Jan
- 2024 10:52:24 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GD1Qp3dz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704921111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gbbBO9lNpJR0MfDA9zvC1wgSIs185cCcwjZiJnDa0wI=;
+	b=GD1Qp3dz0kSWpPMIFetsuV5rG5JPGfCrbNIXV1IssPkXuKjkTsVVv+3Sh38GsNQmGQ2lAi
+	ziO2zS8/lJ/iGQaw8XiUhOCXor7h4P9E/lpcw+cMbD/ftIgfWnbb0dNu8YNgaLOXoCdXiG
+	YfWcoGyv6VxjEIRrp/e59MHSd+zC3+I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-99-OxrgtCRHNg-my24eDO2Ukg-1; Wed, 10 Jan 2024 16:11:45 -0500
+X-MC-Unique: OxrgtCRHNg-my24eDO2Ukg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 421108371C0;
+	Wed, 10 Jan 2024 21:11:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 795C61121306;
+	Wed, 10 Jan 2024 21:11:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+    Edward Adam Davis <eadavis@qq.com>,
+    Pengfei Xu <pengfei.xu@intel.com>
+Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
+    Markus Suvanto <markus.suvanto@gmail.com>,
+    Jeffrey E Altman <jaltman@auristor.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
+    Steve French <smfrench@gmail.com>,
+    Jarkko Sakkinen <jarkko@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
+    keyrings@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] keys, dns: Fix size check of V1 server-list header
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com> <CAHk-=wgJz36ZE66_8gXjP_TofkkugXBZEpTr_Dtc_JANsH1SEw@mail.gmail.com>
- <1843374.1703172614@warthog.procyon.org.uk> <20231223172858.GI201037@kernel.org>
- <2592945.1703376169@warthog.procyon.org.uk> <1694631.1704881668@warthog.procyon.org.uk>
- <ZZ56MMinZLrmF9Z+@xpf.sh.intel.com> <1784441.1704907412@warthog.procyon.org.uk>
-In-Reply-To: <1784441.1704907412@warthog.procyon.org.uk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 10 Jan 2024 10:52:07 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wiyG8BKKZmU7CDHC8+rmvBndrqNSgLV6LtuqN8W_gL3hA@mail.gmail.com>
-Message-ID: <CAHk-=wiyG8BKKZmU7CDHC8+rmvBndrqNSgLV6LtuqN8W_gL3hA@mail.gmail.com>
-Subject: Re: [PATCH] keys, dns: Fix missing size check of V1 server-list header
-To: David Howells <dhowells@redhat.com>
-Cc: Pengfei Xu <pengfei.xu@intel.com>, eadavis@qq.com, Simon Horman <horms@kernel.org>, 
-	Markus Suvanto <markus.suvanto@gmail.com>, Jeffrey E Altman <jaltman@auristor.com>, 
-	Marc Dionne <marc.dionne@auristor.com>, Wang Lei <wang840925@gmail.com>, 
-	Jeff Layton <jlayton@redhat.com>, Steve French <smfrench@gmail.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-afs@lists.infradead.org, keyrings@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	heng.su@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1850030.1704921100.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Jan 2024 21:11:40 +0000
+Message-ID: <1850031.1704921100@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, 10 Jan 2024 at 09:23, David Howells <dhowells@redhat.com> wrote:
->
-> Meh.  Does the attached fix it for you?
+    =
 
-Bah. Obvious fix is obvious.
+Fix the size check added to dns_resolver_preparse() for the V1 server-list
+header so that it doesn't give EINVAL if the size supplied is the same as
+the size of the header struct (which should be valid).
 
-Mind sending it as a proper patch with sign-off etc, and we'll get
-this fixed and marked for stable.
+This can be tested with:
 
-           Linus
+        echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+
+which will give "add_key: Invalid argument" without this fix.
+
+Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list =
+header")
+Reported-by: Pengfei Xu <pengfei.xu@intel.com>
+Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Edward Adam Davis <eadavis@qq.com>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: Simon Horman <horms@kernel.org>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Jeffrey E Altman <jaltman@auristor.com>
+Cc: Wang Lei <wang840925@gmail.com>
+Cc: Jeff Layton <jlayton@redhat.com>
+Cc: Steve French <sfrench@us.ibm.com>
+Cc: Marc Dionne <marc.dionne@auristor.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ net/dns_resolver/dns_key.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index f18ca02aa95a..c42ddd85ff1f 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *pr=
+ep)
+ 		const struct dns_server_list_v1_header *v1;
+ =
+
+ 		/* It may be a server list. */
+-		if (datalen <=3D sizeof(*v1))
++		if (datalen < sizeof(*v1))
+ 			return -EINVAL;
+ =
+
+ 		v1 =3D (const struct dns_server_list_v1_header *)data;
+
