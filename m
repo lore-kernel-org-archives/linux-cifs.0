@@ -1,139 +1,116 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9673347F5D
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 12:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D57F4BAB5;
+	Wed, 10 Jan 2024 16:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="PJtUFaYl"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6d9a79a1ad4so1972369b3a.2
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jan 2024 04:06:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RG4lNkjW"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5571e662b93so3716318a12.2;
+        Wed, 10 Jan 2024 08:20:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1704888363; x=1705493163; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
-        b=PJtUFaYlvrO5pZ/l4ETd5F/BPGWcdK9syqEBKz7ARCHtTxn3QP/aujLMCw3/Dejj/r
-         abT6WdbwqedaIU90uhQbNbR0zGVsaEOavXLAe+teunPX13SkyMbgWujpBdSEWWg1uMV2
-         A4ja+jyQdgycjg7qmn65D3XBbG8529pbOsdlFAWzhXAmePHu6cdBkx3mTIGz5p9aTASC
-         Oi7GTnY5REMW+srPlJ2buiPKuL3+smB+duhsJv4ocXGfOa1h5FC16XBeOwO9iJ6XJ8ce
-         a8a+yY1XLWZc4/wXe8QzNtDp7iWFGuf9/+yLHMm/vdpT/IfP/ukSEqxdX2iVHWqsz/Ho
-         CzIQ==
+        d=gmail.com; s=20230601; t=1704903630; x=1705508430; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GiGQ3HzqRw9BhGq2ukZfu7U4Ux6Gx0fec0Z0CywCxtU=;
+        b=RG4lNkjWWdnPtqE+8AEccWeqIEicxZTP8bCadI2UA8+WX3FKFYA1aOVZgzXM3n1giS
+         t4Wf24pJXo44G1IgwOB2v0y/oqJSJKuDaa7AjMVGGSGkvJl70ZWlknUBy0g/JOrG7549
+         nTlq27CjrPoaDM7KAezNsNmS4Q2fUKg92CX3i3jc+ItpQ9T1aaAM0W6/Afkm78GXK9qv
+         Zik7DEI3z7eyfwAZwrrkOaKtBOGSte+2fFUXGore9JnuYfkxAXkNsCt84fUaHxisGx4e
+         r5CsT1uBSgk4uqrnJaMWFTZRVBMOapXg9N8lX5QpsW/8TRBZdz1Wv64XDnu4cxYUHsvY
+         xYsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704888363; x=1705493163;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=l8cKztzv2ZktLOe0dzMuixqOyjC0S8dozIynxhbNLCA=;
-        b=TKIoUgzI+ckQhkpGxlbirsYhL03MNIkCWloybGih6L7ow37tLYY9aE1KqI8l5HxlXB
-         Hcc80+Y069apmCSQNkWu14ztrV8lVnFsYbpR++6EuaVUztchOvz8fwCCRJV9f58pynX8
-         WJ8h5iOnwr7eMQoR+cvAz8+B+eourcjx38/wMrhJNB80/VJeupQP1QR+amJr3vZ8XO7i
-         fOg0s5h6MWOmhhAXfyeTIM8Rq4mHyEBfhhP59qbEymt7y/LurFzdWSelkB1zZoXxCT+s
-         J3Yamhs+yi70Kbs16Ogh9Dl7lWkT2Y/S1/5YCnWMJe72WDt7KUreTYMwYnmErcR2b4eQ
-         hVPw==
-X-Gm-Message-State: AOJu0YxOB2U5Qd5gdmJwsQ6UwsBYyhUl0eyJ51eIhQU9acfOwAlSAuHy
-	1JeCKpLQg68+ZC/rVa5l9IVoomK5uNr/4w==
-X-Google-Smtp-Source: AGHT+IFsVj/4XzAFKalFZR2COx2846rqnoRx+GhgwtyxD4J0CYsNkiv/V9CNEvpVyo59dEDH4l9dyw==
-X-Received: by 2002:a05:6a00:3204:b0:6da:63a5:3f32 with SMTP id bm4-20020a056a00320400b006da63a53f32mr612723pfb.66.1704888362874;
-        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
-Received: from [10.255.187.86] ([139.177.225.245])
-        by smtp.gmail.com with ESMTPSA id i128-20020a625486000000b006d99056c4edsm3470845pfb.187.2024.01.10.04.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jan 2024 04:06:02 -0800 (PST)
-Message-ID: <abcc18ec-4006-4c51-96a8-e61d0ec2f092@bytedance.com>
-Date: Wed, 10 Jan 2024 20:05:50 +0800
+        d=1e100.net; s=20230601; t=1704903630; x=1705508430;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GiGQ3HzqRw9BhGq2ukZfu7U4Ux6Gx0fec0Z0CywCxtU=;
+        b=fqYn002n9nOmdG4pBKWmejKR0wIh2ssUoQUpgQI/xLRaBnZxdfq5gvFqISvyV4yEWk
+         w0llMZrkGNy2rZCYiDAJBJJuDZChDYotL3Pi1tL3Gehsda3c2DwctU5pCjqoWOK8lBSM
+         l3LahjSzzq0PAoCPBnDqb6hfIkHHCTPCY1FVV06XLbOKxjvxSFzmgnGdGNwTXPnsz7/N
+         Eb4GPLh66dhe28PCiWKoUe6LUeMCAWQJJDCSUXXSm5FkwQb6h9/PwpXjsA6Iio+Js7hF
+         YCVb+2XIyae6K/wev2cfKns5eIZwa3fztHbEgTXm6Jsstv7j9E0CKPy3CqS7Wccncmp/
+         L0kQ==
+X-Gm-Message-State: AOJu0YzLgMqw7w3cBjtZqk81FwOAWCsvf/vRA+Y8qd9e2ntirpFfrvdv
+	pvkQYcctU46KsaTwkfa5eP8=
+X-Google-Smtp-Source: AGHT+IHIX8ycHGd0EqT2+MdwAY36uRF5Dgt9eDaeEe5o8UpwwsXB+tUmydMpiBcVjI8SP8rgJa9KIw==
+X-Received: by 2002:a50:9e87:0:b0:557:ba20:839 with SMTP id a7-20020a509e87000000b00557ba200839mr643069edf.41.1704903630339;
+        Wed, 10 Jan 2024 08:20:30 -0800 (PST)
+Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
+        by smtp.gmail.com with ESMTPSA id ig15-20020a056402458f00b0055871ed18f9sm390720edb.89.2024.01.10.08.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jan 2024 08:20:28 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 0525EBE2DE0; Wed, 10 Jan 2024 17:20:28 +0100 (CET)
+Date: Wed, 10 Jan 2024 17:20:27 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <nspmangalore@gmail.com>,
+	Rohith Surabattula <rohiths.msft@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve French <stfrench@microsoft.com>
+Cc: "Jitindar Singh, Suraj" <surajjs@amazon.com>,
+	"rohiths.msft@gmail.com" <rohiths.msft@gmail.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"stfrench@microsoft.com" <stfrench@microsoft.com>,
+	"pc@manguebit.com" <pc@manguebit.com>,
+	"jlayton@kernel.org" <jlayton@kernel.org>,
+	"nspmangalore@gmail.com" <nspmangalore@gmail.com>,
+	"willy@infradead.org" <willy@infradead.org>,
+	"stable-commits@vger.kernel.org" <stable-commits@vger.kernel.org>,
+	stable@vger.kernel.org, linux-cifs@vger.kernel.org,
+	Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: [Regression 6.1.y] From "cifs: Fix flushing, invalidation and
+ file size with copy_file_range()"
+Message-ID: <ZZ7Dy69ZJCEyKhhS@eldamar.lan>
+References: <2023121124-trifle-uncharted-2622@gregkh>
+ <a76b370f93cb928c049b94e1fde0d2da506dfcb2.camel@amazon.com>
+ <ZZhrpNJ3zxMR8wcU@eldamar.lan>
+ <8e59220d-b0f3-4dae-afc3-36acfa6873e4@leemhuis.info>
+ <ZZk6qA54A-KfzmSz@eldamar.lan>
+ <13a70cc5-78fc-49a4-8d78-41e5479e3023@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] [PATCH 5/6] cachefiles: Fix signed/unsigned mixup
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>,
- Gao Xiang <hsiangkao@linux.alibaba.com>,
- Dominique Martinet <asmadeus@codewreck.org>
-Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, kernel test robot <lkp@intel.com>,
- Yiqun Leng <yqleng@linux.alibaba.com>, zhujia.zj@bytedance.com
-References: <20240109112029.1572463-1-dhowells@redhat.com>
- <20240109112029.1572463-6-dhowells@redhat.com>
-From: Jia Zhu <zhujia.zj@bytedance.com>
-In-Reply-To: <20240109112029.1572463-6-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <13a70cc5-78fc-49a4-8d78-41e5479e3023@leemhuis.info>
 
-Tested-by: Jia Zhu <zhujia.zj@bytedance.com>
+Hi
 
-在 2024/1/9 19:20, David Howells 写道:
-> In __cachefiles_prepare_write(), the start and pos variables were made
-> unsigned 64-bit so that the casts in the checking could be got rid of -
-> which should be fine since absolute file offsets can't be negative, except
-> that an error code may be obtained from vfs_llseek(), which *would* be
-> negative.  This breaks the error check.
+Sorry if this is to prematurely to ask already again.
+
+On Sat, Jan 06, 2024 at 01:02:16PM +0100, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 06.01.24 12:34, Salvatore Bonaccorso wrote:
+> > On Sat, Jan 06, 2024 at 11:40:58AM +0100, Linux regression tracking (Thorsten Leemhuis) wrote:
+> >>
+> >> Does this problem also happen in mainline, e.g. with 6.7-rc8?
+> > 
+> > Thanks a lot for replying back. So far I can tell, the regression is
+> > in 6.1.y only 
 > 
-> Fix this for now by reverting pos and start to be signed and putting back
-> the casts.  Unfortunately, the error value checks cannot be replaced with
-> IS_ERR_VALUE() as long might be 32-bits.
+> Ahh, good to know, thx!
 > 
-> Fixes: 7097c96411d2 ("cachefiles: Fix __cachefiles_prepare_write()")
-> Reported-by: Simon Horman <horms@kernel.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202401071152.DbKqMQMu-lkp@intel.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> cc: Gao Xiang <hsiangkao@linux.alibaba.com>
-> cc: Yiqun Leng <yqleng@linux.alibaba.com>
-> cc: Jia Zhu <zhujia.zj@bytedance.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-erofs@lists.ozlabs.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->   fs/cachefiles/io.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+> > For this reason I added to regzbot only "regzbot ^introduced
+> > 18b02e4343e8f5be6a2f44c7ad9899b385a92730" which is the commit in
+> > v6.1.68.
 > 
-> diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
-> index 3eec26967437..9a2cb2868e90 100644
-> --- a/fs/cachefiles/io.c
-> +++ b/fs/cachefiles/io.c
-> @@ -522,7 +522,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   			       bool no_space_allocated_yet)
->   {
->   	struct cachefiles_cache *cache = object->volume->cache;
-> -	unsigned long long start = *_start, pos;
-> +	loff_t start = *_start, pos;
->   	size_t len = *_len;
->   	int ret;
->   
-> @@ -556,7 +556,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if (pos >= start + *_len)
-> +	if ((u64)pos >= (u64)start + *_len)
->   		goto check_space; /* Unallocated region */
->   
->   	/* We have a block that's at least partially filled - if we're low on
-> @@ -575,7 +575,7 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
->   					  cachefiles_trace_seek_error);
->   		return pos;
->   	}
-> -	if (pos >= start + *_len)
-> +	if ((u64)pos >= (u64)start + *_len)
->   		return 0; /* Fully allocated */
->   
->   	/* Partially allocated, but insufficient space: cull. */
-> 
+> Which was the totally right thing to do, thx. Guess I sooner or later
+> will add something like "#regzbot tag notinmainline" to avoid the
+> ambiguity we just cleared up, but maybe that's overkill.
+
+Do we have already a picture on the best move forward? Should the
+patch and the what depends on it be reverted or was someone already
+able to isolate where the problem comes from specifically for the
+6.1.y series? 
+
+Regards,
+Salvatore
