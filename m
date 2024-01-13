@@ -1,33 +1,33 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83CE33C8
-	for <linux-cifs@vger.kernel.org>; Sat, 13 Jan 2024 06:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BD033C8
+	for <linux-cifs@vger.kernel.org>; Sat, 13 Jan 2024 06:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cdfed46372so5640706a12.3
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Jan 2024 22:46:35 -0800 (PST)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28bc870c540so5983092a91.2
+        for <linux-cifs@vger.kernel.org>; Fri, 12 Jan 2024 22:46:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705128394; x=1705733194;
+        d=1e100.net; s=20230601; t=1705128414; x=1705733214;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
         bh=ihcc4kqZFV/E3AOuls4rSSEVxPRpmGjLFFpn1fYNgYA=;
-        b=XRe16vzcjKh5Z8tKCMa6Omufv1RW13D69BGB2Y0U4CBu8//jOJCBCOuKQzDN1KHU+z
-         84FcQua8OI7HEgJos2iu+V4Bggz+j4TBixgl2tdNVV5suvp94yx5jU4vo70EtK9W0njY
-         3YpJg9ES+LK8k07dIUTExSSFiC9bBB8bc7QTWrsWrGvUNdCuxsNkrsx8pWefWF9LSlgV
-         B3zabKmUYwmlWj9fuBZ2HrW1L+L55/dArlrWqzHOdiZqaD/Rz/j9g14wS32fTqwelmuq
-         e7b+S3LXw/yzrxSNXRq4X9kzytaNl4Ocdjec9VQN+1Adsty1WwNBrSolKBrBTAEnzJgO
-         mL8Q==
-X-Gm-Message-State: AOJu0Yy1YDz2Js76DMzsYYTmjrk8mVEP1IVjiHFP3uFj17V+NuCOUnmW
-	uWENH/OV1nFkVYBqzVScbayyqtWo++Q=
-X-Google-Smtp-Source: AGHT+IG5uYNAIB2fjBAcN4HagEUjfewDun8xDqyFX8YEYXOmT63qbCG0ftkECBWLt1qZp4ElxrAm9A==
-X-Received: by 2002:a05:6a20:1303:b0:199:a11d:921b with SMTP id g3-20020a056a20130300b00199a11d921bmr1949004pzh.45.1705128394620;
-        Fri, 12 Jan 2024 22:46:34 -0800 (PST)
+        b=kdlm0hkMkG95a80wRaJcLh/Y1SRFzmHi9xCHS+RQp6Xh0lGJg7AjnVkRHlrdNl2Utj
+         fpbks0enVgu/hMfR1VsJLtdP5+Fwoh61TzgZKSVJSCMmfG39cAXyY6ZC+jLZRv8HsupT
+         t/81tZZzvSqvSmLEuJnYfpvw4LUZjloSJkE+rx/tDYEzj+oJf+758ZiRuWEya4laV2QN
+         2fl9DCTyWzCkgxDbOKQq+9wdRoswyULJ9lrJ5trQeGBZBk/AQhjD/03gTu9CgbHAjLzD
+         rqv//1PJ/8TbcnE7OWXPabWCOCauZeVX0TB5QGJ5j4uoxrP6+xnA6XwcJ0mhdVEVL1EI
+         oyKQ==
+X-Gm-Message-State: AOJu0YzT8tu2kJzSZ3EmFRF2QG2Fhgctmezao5Kt/RaolmbsMaz1LQyf
+	27Q3mB36NCR1enOIw2l5AmDfBcR644s=
+X-Google-Smtp-Source: AGHT+IGMMT4W8oWf7o9FtzbGK2RcfhOkSYKRLCqWVeRpjC4SGxV80cdYtMEl8bylxD6IKDwXZdAhAA==
+X-Received: by 2002:a17:903:3251:b0:1d5:36bd:c61 with SMTP id ji17-20020a170903325100b001d536bd0c61mr2194419plb.87.1705128413638;
+        Fri, 12 Jan 2024 22:46:53 -0800 (PST)
 Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id e2-20020a170902f1c200b001d1d6f6b67dsm4208995plc.147.2024.01.12.22.46.32
+        by smtp.gmail.com with ESMTPSA id kh15-20020a170903064f00b001cf658f20ecsm4225784plb.96.2024.01.12.22.46.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 22:46:33 -0800 (PST)
+        Fri, 12 Jan 2024 22:46:53 -0800 (PST)
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -36,8 +36,8 @@ Cc: smfrench@gmail.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
 Subject: [PATCH] ksmbd: update feature status in documentation
-Date: Sat, 13 Jan 2024 15:45:52 +0900
-Message-Id: <20240113064555.3839-1-linkinjeon@kernel.org>
+Date: Sat, 13 Jan 2024 15:46:41 +0900
+Message-Id: <20240113064643.4151-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
