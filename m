@@ -1,204 +1,152 @@
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B5D25565;
-	Tue, 16 Jan 2024 20:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.255.230.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991F2604C3;
+	Tue, 16 Jan 2024 22:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705438121; cv=none; b=p7TND41/JM6z8hFKBKxlmMPk7lvwB4+9r/6JymHvc6AnwS2VFYvMwh9CaY07LsaYQ4XI8jJeeshrWqLM1Lldk7Jjkt2BT1UWirQZeDT+QYuB540s7N8FuVuAGVNB+Cz2LlVmPFQJZibKT2Fj05VWH8RW9Be1LWQtK4JxpZnlxB8=
+	t=1705442842; cv=none; b=mxA/fBe0P7/k1b/gR4jrApKQvmo2A/g4J4NaB5GXODTEbtUlFeVYyEfSykWWeU87L/JW3I2KM+CXz2r2K1T9i0crFFVtmQWPE1TK83fq/r1OTnpAYlwCfzA2aNbAOgYg1WsWlZxn85NRsC1cQz0PcCJEYS0DaXwPRnFRz6raDQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705438121; c=relaxed/simple;
-	bh=Y3w3f3kce+eXjMPg/fWB2OkjLHS6gd02jYqc7dXVnQU=;
-	h=Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=uYueRi56aQ6S+4xJONO6y4hKNoaMp+nWIHxutf17aCKk/XVd+RbbNiniy9Lbg2ck7Hpl3efxLIyem2nS8u6V7j+MgOv3CE/9d4W6H5AY6Mj0QfDljz2cObER4t9qjdZh+vxenTjpvjekA15MUqOsCGpganAC7V0m3SwXxphFZDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=denx.de; spf=fail smtp.mailfrom=denx.de; arc=none smtp.client-ip=46.255.230.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=denx.de
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-	id 55D1F1C0071; Tue, 16 Jan 2024 21:48:38 +0100 (CET)
-Date: Tue, 16 Jan 2024 21:48:37 +0100
-From: Pavel Machek <pavel@denx.de>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Pierre Mariani <pierre.mariani@gmail.com>,
-	Steve French <stfrench@microsoft.com>, sfrench@samba.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: Re: [PATCH AUTOSEL 6.1 09/14] smb: client: Fix minor whitespace
- errors and warnings
-Message-ID: <ZabrpUrKf1yolVi3@duo.ucw.cz>
-References: <20240116010642.218876-1-sashal@kernel.org>
- <20240116010642.218876-9-sashal@kernel.org>
+	s=arc-20240116; t=1705442842; c=relaxed/simple;
+	bh=IYYnR2EFburvoZquoTc+yWa7KgPsEyYwG1E6dao281I=;
+	h=Received:Received:Received:Content-Type:Content-Transfer-Encoding:
+	 MIME-Version:From:To:Cc:Subject:In-reply-to:References:Date:
+	 Message-id:X-Spamd-Result:X-Rspamd-Server:X-Rspamd-Queue-Id:
+	 X-Spam-Level:X-Spam-Score:X-Spam-Flag; b=pDF6nvhUZZq3diTsTd1xPhM1zGrgIy4BzgfRcKZKyhhZW8ye8fSbyg7NuJIU2ye13gL69oO2YSqpXR+85pE6OMgaSIZy2M/TKCmL+snyjGwgJIEr0puHO5M+9Tfhy5vYPmc08w2RBJGUCt5TJCzn0riVgvXPKwziVEucDK032Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B7C1322168;
+	Tue, 16 Jan 2024 22:07:18 +0000 (UTC)
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2BB4613751;
+	Tue, 16 Jan 2024 22:07:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 0xBrNAj+pmWWeAAAD6G6ig
+	(envelope-from <neilb@suse.de>); Tue, 16 Jan 2024 22:07:04 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/Fi84FJxVfiuW0PY"
-Content-Disposition: inline
-In-Reply-To: <20240116010642.218876-9-sashal@kernel.org>
+From: "NeilBrown" <neilb@suse.de>
+To: "Jeff Layton" <jlayton@kernel.org>
+Cc: "Christian Brauner" <brauner@kernel.org>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Eric Van Hensbergen" <ericvh@kernel.org>,
+ "Latchesar Ionkov" <lucho@ionkov.net>,
+ "Dominique Martinet" <asmadeus@codewreck.org>,
+ "Christian Schoenebeck" <linux_oss@crudebyte.com>,
+ "David Howells" <dhowells@redhat.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>, "Xiubo Li" <xiubli@redhat.com>,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Alexander Aring" <aahringo@redhat.com>,
+ "David Teigland" <teigland@redhat.com>, "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>,
+ "Trond Myklebust" <trond.myklebust@hammerspace.com>,
+ "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
+ "Olga Kornievskaia" <kolga@netapp.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>, "Jan Kara" <jack@suse.cz>,
+ "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
+ "Joseph Qi" <joseph.qi@linux.alibaba.com>, "Steve French" <sfrench@samba.org>,
+ "Paulo Alcantara" <pc@manguebit.com>, "Ronnie Sahlberg" <lsahlber@redhat.com>,
+ "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Namjae Jeon" <linkinjeon@kernel.org>,
+ "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+ gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-trace-kernel@vger.kernel.org, "Jeff Layton" <jlayton@kernel.org>
+Subject:
+ Re: [PATCH 01/20] filelock: split common fields into struct file_lock_core
+In-reply-to: <20240116-flsplit-v1-1-c9d0f4370a5d@kernel.org>
+References: <20240116-flsplit-v1-0-c9d0f4370a5d@kernel.org>,
+ <20240116-flsplit-v1-1-c9d0f4370a5d@kernel.org>
+Date: Wed, 17 Jan 2024 09:07:02 +1100
+Message-id: <170544282220.23031.10628392788633554158@noble.neil.brown.name>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	 REPLY(-4.00)[]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: B7C1322168
+X-Spam-Level: 
+X-Spam-Score: -4.00
+X-Spam-Flag: NO
 
-
---/Fi84FJxVfiuW0PY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi!
-
-> [ Upstream commit 0108ce08aed195d200ffbad74c1948bbaefe6625 ]
->=20
-> Fixes no-op checkpatch errors and warnings.
-
-Why did AUTOSEL pick this? It should not be picking whitespace changes.
-
-BR,
-							Pavel
-
-
-> index f725a119ce31..a957efaa5e74 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -505,6 +505,7 @@ static int reconnect_dfs_server(struct TCP_Server_Inf=
-o *server)
->  {
->  	int rc =3D 0;
->  	const char *refpath =3D server->current_fullpath + 1;
+On Wed, 17 Jan 2024, Jeff Layton wrote:
+> In a future patch, we're going to split file leases into their own
+> structure. Since a lot of the underlying machinery uses the same fields
+> move those into a new file_lock_core, and embed that inside struct
+> file_lock.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  include/linux/filelock.h | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/filelock.h b/include/linux/filelock.h
+> index 95e868e09e29..7825511c1c11 100644
+> --- a/include/linux/filelock.h
+> +++ b/include/linux/filelock.h
+> @@ -85,8 +85,9 @@ bool opens_in_grace(struct net *);
+>   *
+>   * Obviously, the last two criteria only matter for POSIX locks.
+>   */
+> -struct file_lock {
+> -	struct file_lock *fl_blocker;	/* The lock, that is blocking us */
 > +
->  	struct dfs_cache_tgt_list tl =3D DFS_CACHE_TGT_LIST_INIT(tl);
->  	struct dfs_cache_tgt_iterator *target_hint =3D NULL;
->  	int num_targets =3D 0;
-> @@ -773,6 +774,7 @@ cifs_read_from_socket(struct TCP_Server_Info *server,=
- char *buf,
->  {
->  	struct msghdr smb_msg =3D {};
->  	struct kvec iov =3D {.iov_base =3D buf, .iov_len =3D to_read};
+> +struct file_lock_core {
+> +	struct file_lock *fl_blocker;	/* The lock that is blocking us */
+>  	struct list_head fl_list;	/* link into file_lock_context */
+>  	struct hlist_node fl_link;	/* node in global lists */
+>  	struct list_head fl_blocked_requests;	/* list of requests with
+> @@ -102,6 +103,10 @@ struct file_lock {
+>  	int fl_link_cpu;		/* what cpu's list is this on? */
+>  	wait_queue_head_t fl_wait;
+>  	struct file *fl_file;
+> +};
 > +
->  	iov_iter_kvec(&smb_msg.msg_iter, ITER_DEST, &iov, 1, to_read);
-> =20
->  	return cifs_readv_from_socket(server, &smb_msg);
-> @@ -1412,11 +1414,13 @@ cifs_match_ipaddr(struct sockaddr *srcaddr, struc=
-t sockaddr *rhs)
->  	case AF_INET: {
->  		struct sockaddr_in *saddr4 =3D (struct sockaddr_in *)srcaddr;
->  		struct sockaddr_in *vaddr4 =3D (struct sockaddr_in *)rhs;
-> +
->  		return (saddr4->sin_addr.s_addr =3D=3D vaddr4->sin_addr.s_addr);
->  	}
->  	case AF_INET6: {
->  		struct sockaddr_in6 *saddr6 =3D (struct sockaddr_in6 *)srcaddr;
->  		struct sockaddr_in6 *vaddr6 =3D (struct sockaddr_in6 *)rhs;
-> +
->  		return ipv6_addr_equal(&saddr6->sin6_addr, &vaddr6->sin6_addr);
->  	}
->  	default:
-> @@ -2588,8 +2592,8 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_=
-context *ctx)
->  			rc =3D -EOPNOTSUPP;
->  			goto out_fail;
->  		} else {
-> -			cifs_dbg(VFS, "Check vers=3D mount option. SMB3.11 "
-> -				"disabled but required for POSIX extensions\n");
-> +			cifs_dbg(VFS,
-> +				"Check vers=3D mount option. SMB3.11 disabled but required for POSIX=
- extensions\n");
->  			rc =3D -EOPNOTSUPP;
->  			goto out_fail;
->  		}
-> @@ -2733,7 +2737,6 @@ cifs_put_tlink(struct tcon_link *tlink)
->  	if (!IS_ERR(tlink_tcon(tlink)))
->  		cifs_put_tcon(tlink_tcon(tlink));
->  	kfree(tlink);
-> -	return;
->  }
-> =20
->  static int
-> @@ -2867,6 +2870,7 @@ static inline void
->  cifs_reclassify_socket4(struct socket *sock)
->  {
->  	struct sock *sk =3D sock->sk;
-> +
->  	BUG_ON(!sock_allow_reclassification(sk));
->  	sock_lock_init_class_and_name(sk, "slock-AF_INET-CIFS",
->  		&cifs_slock_key[0], "sk_lock-AF_INET-CIFS", &cifs_key[0]);
-> @@ -2876,6 +2880,7 @@ static inline void
->  cifs_reclassify_socket6(struct socket *sock)
->  {
->  	struct sock *sk =3D sock->sk;
-> +
->  	BUG_ON(!sock_allow_reclassification(sk));
->  	sock_lock_init_class_and_name(sk, "slock-AF_INET6-CIFS",
->  		&cifs_slock_key[1], "sk_lock-AF_INET6-CIFS", &cifs_key[1]);
-> @@ -2910,15 +2915,18 @@ static int
->  bind_socket(struct TCP_Server_Info *server)
->  {
->  	int rc =3D 0;
-> +
->  	if (server->srcaddr.ss_family !=3D AF_UNSPEC) {
->  		/* Bind to the specified local IP address */
->  		struct socket *socket =3D server->ssocket;
-> +
->  		rc =3D kernel_bind(socket,
->  				 (struct sockaddr *) &server->srcaddr,
->  				 sizeof(server->srcaddr));
->  		if (rc < 0) {
->  			struct sockaddr_in *saddr4;
->  			struct sockaddr_in6 *saddr6;
-> +
->  			saddr4 =3D (struct sockaddr_in *)&server->srcaddr;
->  			saddr6 =3D (struct sockaddr_in6 *)&server->srcaddr;
->  			if (saddr6->sin6_family =3D=3D AF_INET6)
-> @@ -3146,6 +3154,7 @@ void reset_cifs_unix_caps(unsigned int xid, struct =
-cifs_tcon *tcon,
-> =20
->  	if (!CIFSSMBQFSUnixInfo(xid, tcon)) {
->  		__u64 cap =3D le64_to_cpu(tcon->fsUnixInfo.Capability);
-> +
->  		cifs_dbg(FYI, "unix caps which server supports %lld\n", cap);
->  		/*
->  		 * check for reconnect case in which we do not
-> @@ -3997,7 +4006,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *s=
-es,
->  	smb_buffer_response =3D smb_buffer;
-> =20
->  	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
-> -			NULL /*no tid */ , 4 /*wct */ );
-> +			NULL /*no tid */, 4 /*wct */);
-> =20
->  	smb_buffer->Mid =3D get_next_mid(ses->server);
->  	smb_buffer->Uid =3D ses->Suid;
-> @@ -4016,12 +4025,12 @@ CIFSTCon(const unsigned int xid, struct cifs_ses =
-*ses,
->  	if (ses->server->sign)
->  		smb_buffer->Flags2 |=3D SMBFLG2_SECURITY_SIGNATURE;
-> =20
-> -	if (ses->capabilities & CAP_STATUS32) {
-> +	if (ses->capabilities & CAP_STATUS32)
->  		smb_buffer->Flags2 |=3D SMBFLG2_ERR_STATUS;
-> -	}
-> -	if (ses->capabilities & CAP_DFS) {
-> +
-> +	if (ses->capabilities & CAP_DFS)
->  		smb_buffer->Flags2 |=3D SMBFLG2_DFS;
-> -	}
-> +
->  	if (ses->capabilities & CAP_UNICODE) {
->  		smb_buffer->Flags2 |=3D SMBFLG2_UNICODE;
->  		length =3D
+> +struct file_lock {
+> +	struct file_lock_core fl_core;
+>  	loff_t fl_start;
+>  	loff_t fl_end;
+>  
 
---=20
-DENX Software Engineering GmbH,        Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+If I we doing this, I would rename all the fields in file_lock_core to
+have an "flc_" prefix, and add some #defines like
 
---/Fi84FJxVfiuW0PY
-Content-Type: application/pgp-signature; name="signature.asc"
+ #define fl_list fl_core.flc_list
 
------BEGIN PGP SIGNATURE-----
+so there would be no need to squash this with later patches to achieve
+bisectability.
 
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCZabrpQAKCRAw5/Bqldv6
-8vCiAKCSTvWI5Trv0C+z0NvMhyUpJCX8OQCfcsXC/pHkdCrseZx3gXdW55c3d1Y=
-=WufH
------END PGP SIGNATURE-----
+The #defines would be removed after the coccinelle scripts etc are
+applied.
 
---/Fi84FJxVfiuW0PY--
+I would also do the "convert some internal functions" patches *before*
+the bulk conversion of fl_foo to fl_code.flc_foo so that those functions
+don't get patched twice.
+
+But this is all personal preference.  If you prefer your approach,
+please leave it that way.  The only clear benefit of my approach is that
+you don't need to squash patches together, and that is probably not a
+big deal.
+
+Thanks,
+NeilBrown
