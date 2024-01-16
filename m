@@ -1,176 +1,167 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2B91D6A8;
-	Tue, 16 Jan 2024 22:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681EB67C5B;
+	Tue, 16 Jan 2024 23:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705445072; cv=none; b=J/j0nT2kqmRDP1KqtTQbciSLQ2OX2cYla/SyXga4mjSS99EIc6MSSSXNOHg0VuqcZhmbOh4eCHbc+mYrwTujc/nSIPSX8f6G/ChuGjS2FkRlHR6Ggyqn/t3btH1Z03DEcBPDIJO4UZBjbesCkEZYeCb43chcGhbwQdBhnarJKkQ=
+	t=1705447062; cv=none; b=DJF7ZgmqieZBtywkb9js3x9PkBgwFCCI4ypkoE5JRnE/SqQOCYb/Hq8AQEOWoWAMwyaBNZXXjWadnxplSNSS38JNh3aNqagKxYDn5NgagwX6Y+KurgmBeiecfWHFNTRfksGjRa5Emy9pCxZ9rzT4KR+Z/P/OCp1QyeR6kZG/eao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705445072; c=relaxed/simple;
-	bh=AKPYrNOerbRHsirgEfZ0p1S5QHwiWw7x8ovHOI5lE1o=;
-	h=Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
-	 DKIM-Signature:Received:Received:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:From:To:Cc:Subject:
-	 In-reply-to:References:Date:Message-id:X-Spam-Level:X-Spam-Score:
-	 X-Spamd-Result:X-Spam-Flag; b=M39EnUL400qnev8vMtKtrSlTaRf0Olee+4TYLnWnh/irCGY0qRKsRWPx8RU6z4BjeZqp/R813liO1wdQ1Uu7aopyop39IitwlZBIhUYZ4I2FrHo6ZNpeDSaAEl7xAC/eM648B+DboBLqfKXPCZBEoEjIfpQCfKVafnTrPiDStqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f6Kejs3y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HjfwTsYn; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f6Kejs3y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HjfwTsYn; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1705447062; c=relaxed/simple;
+	bh=33l3Pw/ShMdGyM9eq8Q6qJOYs0Ey95awHOBXX/zSi64=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=hfUOeYl6hqnWZvqNttyX0UICSHYkXGxvxg90YSVdPrgPizeLAS5/cR4jfA+b2rGklsquqEuAx8fEYFJDYQH38hbe0F5I65G0dAlG7SydJy3pYrv5o1yNZ5l5zEH2drHHwDpupf5iNELUIUDZBMtGjR/jx/lUJgzfdT7swJsDoeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDp6fpzO; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f6Kejs3y";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HjfwTsYn";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f6Kejs3y";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HjfwTsYn"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0DE9E21FD7;
-	Tue, 16 Jan 2024 22:44:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1705445069; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rh+oq1spB9mXnL92/e4GJ7ibfkaNrbj9dH8Tk64Djcw=;
-	b=f6Kejs3ynwExykrJLsf6I7d5bcEDabcWJXxJV92F4iHVc7UOqw1z6bgFyUdjZB1nZZzUCy
-	uYn6ovQ2wTV5Uxps5LTHqoIi8FbN9c3jpKoKlo+yzVUeHRhsOYMjfowfic3prCOTRXHmJI
-	i8ViuIPt524UHL9J9oGTH1HL5w0L8M4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1705445069;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rh+oq1spB9mXnL92/e4GJ7ibfkaNrbj9dH8Tk64Djcw=;
-	b=HjfwTsYnAa/QGGZbmcPUUDcpirEYaDZy2aVFXUHAzwLEEj1ZabVT5GkD0w3g233fYFYFkp
-	/MP1zNcr5sIVRlCA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1705445069; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rh+oq1spB9mXnL92/e4GJ7ibfkaNrbj9dH8Tk64Djcw=;
-	b=f6Kejs3ynwExykrJLsf6I7d5bcEDabcWJXxJV92F4iHVc7UOqw1z6bgFyUdjZB1nZZzUCy
-	uYn6ovQ2wTV5Uxps5LTHqoIi8FbN9c3jpKoKlo+yzVUeHRhsOYMjfowfic3prCOTRXHmJI
-	i8ViuIPt524UHL9J9oGTH1HL5w0L8M4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1705445069;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rh+oq1spB9mXnL92/e4GJ7ibfkaNrbj9dH8Tk64Djcw=;
-	b=HjfwTsYnAa/QGGZbmcPUUDcpirEYaDZy2aVFXUHAzwLEEj1ZabVT5GkD0w3g233fYFYFkp
-	/MP1zNcr5sIVRlCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BCF6513751;
-	Tue, 16 Jan 2024 22:44:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id nzD3HL8Gp2UWAgAAD6G6ig
-	(envelope-from <neilb@suse.de>); Tue, 16 Jan 2024 22:44:15 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDp6fpzO"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cd880ceaf2so64878881fa.2;
+        Tue, 16 Jan 2024 15:17:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705447058; x=1706051858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sgi/x32AtrRpAtlUrAUzikypQdqgt00q+aRRQsUjrKw=;
+        b=QDp6fpzOcWn9HCAbnSB6Kc6j/U3tlRitJGyHy+vRk3bABk4Cb4uhHjff5WfWPcZ73f
+         Yucy0oQeocQuU0WTztIuMLOiDTEqBNFgQMoICmr5SoU+XYt8evctDDKjRLChx8HaaE5r
+         Zh3dMbkH4b06+c2f6wl+PqIYLCozc2P5JE1dbVIfyAd9BhiWcj1MEHuQP6P8p8cweQ6X
+         yHdkyIofEnnb6Iuf/NmnL6YEI8aqA+oPgouTH7tZVBJePSOzYoRtfwA0I+Q216nhOiC1
+         itcRRZQroZhFG0LI39QirAEI6r/ghzJyOUH6cYk2ttuxGa68ih/8qvgGaH7ZNMzYNdJN
+         I2ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705447058; x=1706051858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sgi/x32AtrRpAtlUrAUzikypQdqgt00q+aRRQsUjrKw=;
+        b=gDxWG6dffW2Xg96J4Xtnc3MS6xWfeyxxHpaKWmEeEivc5yNcffo8o67KSGBsByNrhT
+         nLVVRbOl/zvUNNdIB2ltyjLRbZ/uao+fN+/s1XBCCgoHDMl1lcpFglHcm3Zm17V2W4hA
+         MdPqqvlra70wYYUhT9gB71bGISOt77ys79pXZOnxqFHO2gGwcGXD9QddOwJUKoPRgPfF
+         YOk3+xHiebSfIz7ID0yKo2nMoSCceVnh9Dy8rJTkzTDtxUBeIUaOQrpRwwln3QACnn3J
+         yXuikZn99Qdwxp8lLBiA9ozXV01UnHiVWPF/mAPDAeJsasiibMKs3A5uhiEoxYiu7wrV
+         uFHQ==
+X-Gm-Message-State: AOJu0YyUl/RsfJERUMh65pniMWvbNE5ywH3usXBnnv44FSkvFOoiTB2W
+	9vUJ3xzenDFyxfW1kztyfugIeuhu29IgPwZ8ciF50XklJttb0Q==
+X-Google-Smtp-Source: AGHT+IEsAm9zDWmYl8th45/sWyIYVODxCtIh83Fdjbug3h68CTsTNrN3iXVGpe173uP/14flCe4eqoOfSE/TuCY8deM=
+X-Received: by 2002:a2e:9b0f:0:b0:2cc:ce6d:5ae5 with SMTP id
+ u15-20020a2e9b0f000000b002ccce6d5ae5mr3869179lji.54.1705447057989; Tue, 16
+ Jan 2024 15:17:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Christian Brauner" <brauner@kernel.org>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Eric Van Hensbergen" <ericvh@kernel.org>,
- "Latchesar Ionkov" <lucho@ionkov.net>,
- "Dominique Martinet" <asmadeus@codewreck.org>,
- "Christian Schoenebeck" <linux_oss@crudebyte.com>,
- "David Howells" <dhowells@redhat.com>,
- "Marc Dionne" <marc.dionne@auristor.com>, "Xiubo Li" <xiubli@redhat.com>,
- "Ilya Dryomov" <idryomov@gmail.com>, "Alexander Aring" <aahringo@redhat.com>,
- "David Teigland" <teigland@redhat.com>, "Miklos Szeredi" <miklos@szeredi.hu>,
- "Andreas Gruenbacher" <agruenba@redhat.com>,
- "Trond Myklebust" <trond.myklebust@hammerspace.com>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
- "Olga Kornievskaia" <kolga@netapp.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
- "Tom Talpey" <tom@talpey.com>, "Jan Kara" <jack@suse.cz>,
- "Mark Fasheh" <mark@fasheh.com>, "Joel Becker" <jlbec@evilplan.org>,
- "Joseph Qi" <joseph.qi@linux.alibaba.com>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.com>, "Ronnie Sahlberg" <lsahlber@redhat.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Steven Rostedt" <rostedt@goodmis.org>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
- linux-kernel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
- gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-trace-kernel@vger.kernel.org, "Jeff Layton" <jlayton@kernel.org>
-Subject: Re: [PATCH 20/20] filelock: split leases out of struct file_lock
-In-reply-to: <20240116-flsplit-v1-20-c9d0f4370a5d@kernel.org>
-References: <20240116-flsplit-v1-0-c9d0f4370a5d@kernel.org>,
- <20240116-flsplit-v1-20-c9d0f4370a5d@kernel.org>
-Date: Wed, 17 Jan 2024 09:44:12 +1100
-Message-id: <170544505284.23031.2594557379971928071@noble.neil.brown.name>
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -5.32
-X-Spamd-Result: default: False [-5.32 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 REPLY(-4.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 R_RATELIMIT(0.00)[to_ip_from(RLx183r465j9c4mdtrpq4cws5u)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_TWELVE(0.00)[46];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 FREEMAIL_CC(0.00)[kernel.org,zeniv.linux.org.uk,ionkov.net,codewreck.org,crudebyte.com,redhat.com,auristor.com,gmail.com,szeredi.hu,hammerspace.com,oracle.com,netapp.com,talpey.com,suse.cz,fasheh.com,evilplan.org,linux.alibaba.com,samba.org,manguebit.com,microsoft.com,chromium.org,goodmis.org,efficios.com,vger.kernel.org,lists.linux.dev,lists.infradead.org,lists.samba.org];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.02)[54.77%]
-X-Spam-Flag: NO
+References: <20240116105134.2245640-1-colin.i.king@gmail.com>
+In-Reply-To: <20240116105134.2245640-1-colin.i.king@gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 16 Jan 2024 17:17:26 -0600
+Message-ID: <CAH2r5mvf+ZMyqpnFQUaO=DWC8ixXspsjWKE7BxQ1wW4WuvTVcA@mail.gmail.com>
+Subject: Re: [PATCH][next] cifs: remove redundant variable tcon_exist
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 Jan 2024, Jeff Layton wrote:
-> Add a new struct file_lease and move the lease-specific fields from
-> struct file_lock to it. Convert the appropriate API calls to take
-> struct file_lease instead, and convert the callers to use them.
+Yes - it looks like Shyam's commit made that variable obsolete.
 
-I think that splitting of struct lease_manager_operations out from
-lock_manager_operations should be mentioned here too.
+Shyam/Paulo,
+Let me know if any objections.  Will put into cifs-2.6.git for-next
+
+commit 04909192ada3285070f8ced0af7f07735478b364 (tag: 6.7-rc4-smb3-client-f=
+ixes)
+Author: Shyam Prasad N <sprasad@microsoft.com>
+Date:   Wed Dec 6 16:37:38 2023 +0000
+
+    cifs: reconnect worker should take reference on server struct
+unconditionally
+
+    Reconnect worker currently assumes that the server struct
+    is alive and only takes reference on the server if it needs
+    to call smb2_reconnect.
+
+    With the new ability to disable channels based on whether the
+    server has multichannel disabled, this becomes a problem when
+    we need to disable established channels. While disabling the
+    channels and deallocating the server, there could be reconnect
+    work that could not be cancelled (because it started).
+
+    This change forces the reconnect worker to unconditionally
+    take a reference on the server when it runs.
+
+    Also, this change now allows smb2_reconnect to know if it was
+    called by the reconnect worker. Based on this, the cifs_put_tcp_session
+    can decide whether it can cancel the reconnect work synchronously or no=
+t.
+
+    Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+
+On Tue, Jan 16, 2024 at 4:51=E2=80=AFAM Colin Ian King <colin.i.king@gmail.=
+com> wrote:
+>
+> The variable tcon_exist is being assigned however it is never read, the
+> variable is redundant and can be removed.
+>
+> Cleans up clang scan build warning:
+> warning: Although the value stored to 'tcon_exist' is used in
+> the enclosing expression, the value is never actually readfrom
+> 'tcon_exist' [deadcode.DeadStores]
+>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  fs/smb/client/smb2pdu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index bd25c34dc398..50f6bf16b624 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -3918,7 +3918,7 @@ void smb2_reconnect_server(struct work_struct *work=
+)
+>         struct cifs_ses *ses, *ses2;
+>         struct cifs_tcon *tcon, *tcon2;
+>         struct list_head tmp_list, tmp_ses_list;
+> -       bool tcon_exist =3D false, ses_exist =3D false;
+> +       bool ses_exist =3D false;
+>         bool tcon_selected =3D false;
+>         int rc;
+>         bool resched =3D false;
+> @@ -3964,7 +3964,7 @@ void smb2_reconnect_server(struct work_struct *work=
+)
+>                         if (tcon->need_reconnect || tcon->need_reopen_fil=
+es) {
+>                                 tcon->tc_count++;
+>                                 list_add_tail(&tcon->rlist, &tmp_list);
+> -                               tcon_selected =3D tcon_exist =3D true;
+> +                               tcon_selected =3D true;
+>                         }
+>                 }
+>                 /*
+> @@ -3973,7 +3973,7 @@ void smb2_reconnect_server(struct work_struct *work=
+)
+>                  */
+>                 if (ses->tcon_ipc && ses->tcon_ipc->need_reconnect) {
+>                         list_add_tail(&ses->tcon_ipc->rlist, &tmp_list);
+> -                       tcon_selected =3D tcon_exist =3D true;
+> +                       tcon_selected =3D true;
+>                         cifs_smb_ses_inc_refcount(ses);
+>                 }
+>                 /*
+> --
+> 2.39.2
+>
+>
 
 
-> =20
-> +struct file_lease {
-> +	struct file_lock_core fl_core;
-> +	struct fasync_struct *	fl_fasync; /* for lease break notifications */
-> +	/* for lease breaks: */
-> +	unsigned long fl_break_time;
-> +	unsigned long fl_downgrade_time;
-> +	const struct lease_manager_operations *fl_lmops;	/* Callbacks for lockman=
-agers */
+--=20
+Thanks,
 
-comment should be "Callbacks for leasemanagers".  Or maybe=20
-"lease managers".=20
-
-It is unfortunate that "lock" and "lease" both start with 'l' as we now
-have two quite different fields in different structures with the same
-name - fl_lmops.
-
-NeilBrown
+Steve
