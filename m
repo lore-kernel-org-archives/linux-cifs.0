@@ -1,59 +1,37 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0064718ED9;
-	Tue, 16 Jan 2024 10:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553DA64CF8;
+	Tue, 16 Jan 2024 19:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705434407; cv=none; b=MijsS1sfewAe8pwJUtPdfU1g3bcek+nmm7vRRfQk2/jpZeDcEHGldhgxDBgfK4Cu3mIT7zYklMzntLOrSsoEM2MSSewzoX8Lm4pl8AfHI4g4+pcby210Dic1jj3BQ/cH8AWdst98IxxQ91dwFjXNlst31Fq9shMWRsWXdA/2OHA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705434407; c=relaxed/simple;
+	bh=+jfAumQNnkzv9I79/OPpoM4LCmBymLZ6ObiQOrhxH0w=;
+	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key; b=jwyESINJp2XXgW4X8n2dOZ1+QqMjD84rLBTHv+1DFvXBwTDp1yj6nd/vEGI+mdcLtQcGYdNPW0TMcDY2TVqLiSaTkxVtJLXbx0dfmgYN7y6ig/rvSuFLwTIe69dwiOEHVOzixkV9mcPZtsKc0fLA77B+e0+kNWJvtxI2lj+bZhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OE0PHYDR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8kYel86"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40e76109cdeso21142085e9.0;
-        Tue, 16 Jan 2024 02:51:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705402295; x=1706007095; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QmW3E1M++L+e6C8eJiaAiTpNXnV9f8Z6oWcF270MPX8=;
-        b=e8kYel86+UXggl7qe9PXaB+qHYnCSKK/K0eIwjs1il8+HYc6+dRo0xevRzCbSAM9pq
-         Lz2EF1+xr3gkS6UBVHpzmuVbM+k4OlDbC19TTpxAKf/MTgMICqP7981etJqxPz9nnuaP
-         YnHREKbuC/nxHqeZepGTSr37UaLXzo/vjx1RooFgXvtn736XlShVv02dznYM3vMVptAB
-         AG1MzFVinomd4MLr3XPbLa9RMID4kCa1A+Y0o0zMKkexnqTK7hYysc+NUJLnotyxXKGA
-         pYRMM3NZW7Rk/SoHoMgLPWShpnEGEqhTgmTwiRKcuWW22aLYtr9ZlshVAvtDcimt/eYG
-         eRFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705402295; x=1706007095;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QmW3E1M++L+e6C8eJiaAiTpNXnV9f8Z6oWcF270MPX8=;
-        b=liUDg6fWqiRtn/77f+uR5hrDzDkeA8J3Vb3doaXlJE9aZ2d5motFCN6hrwXqdBNy8J
-         yUOX8+Z6rSme7DiaO6GBegznfvAbSRKSZIGZUIP0ACTMAa1IXj6kfdNKdii34KaEk03H
-         k1TxO8VYAyUMEIQc+CKrBR8MVdm3ZhvUk2BaOoNlN/Kk1jrznXTaUcWekj+z0mi61W6U
-         QD5mVtHkHhhOiPTmVgFvMBAnyAX1RlxF6QpUAZMaiU2Wc6JOH6gOfpJd4pplKLCKs/SQ
-         FLpx4uYab71Jati3oAx9ZLkxlU+yd9mM6xtXibboYDOLV56HIkd7AZEkgyfrRjI1lgWH
-         WX5A==
-X-Gm-Message-State: AOJu0YyDJTZhGLWm++t8S5nEBnH+/eMkuvzr7C0KMki3fOZSRiVZavE2
-	VuRhKdFBruvU2UvFmUYG8H4=
-X-Google-Smtp-Source: AGHT+IGsRM2SQvZwTko+3YSCVvtjJBo13ZTflclOl7C3d7usUv8K2vrGo9hRAFWuejKivQmhjFmcnw==
-X-Received: by 2002:a05:600c:1310:b0:40e:4a58:3c1c with SMTP id j16-20020a05600c131000b0040e4a583c1cmr3706765wmf.154.1705402295001;
-        Tue, 16 Jan 2024 02:51:35 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id g7-20020a7bc4c7000000b0040d5c58c41dsm18400875wmk.24.2024.01.16.02.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 02:51:34 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] cifs: remove redundant variable tcon_exist
-Date: Tue, 16 Jan 2024 10:51:34 +0000
-Message-Id: <20240116105134.2245640-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OE0PHYDR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F6CC433B1;
+	Tue, 16 Jan 2024 19:46:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705434406;
+	bh=+jfAumQNnkzv9I79/OPpoM4LCmBymLZ6ObiQOrhxH0w=;
+	h=From:Subject:Date:To:Cc:From;
+	b=OE0PHYDRr27Lj0JVd5OY7CULI9axTc05pbGbQNnslL4ulzD4U5h75uneDW18itYj3
+	 Wvzbmg/5qqyEwOY7sasMaFTyarhnzUGK4d//nOpec98nvoBa0a4DPBSu0O2DCkUROj
+	 qX6rzGWm/Qqk3ev1qM0VK7ueXT8O8P5TOcu9ryS2Hain83qn9pjuuxlfvIBNX3HiwG
+	 jm6uHWO3Ju/36EtoCuO0kG6318kVEaCEBVOFRCzqEkKdRk4NrpT6/vN+SlOQLFCmXR
+	 Mc8pdjTTs8F5A9Ylew8DRxnna6RYtiQtR9eDUD3cC+Q7wzBHAonbevYGeFmd/AQV99
+	 MEW2LPM4uQriQ==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 00/20] filelock: split struct file_lock into file_lock and
+ file_lease structs
+Date: Tue, 16 Jan 2024 14:45:56 -0500
+Message-Id: <20240116-flsplit-v1-0-c9d0f4370a5d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -61,52 +39,172 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPXcpmUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDQ0Mz3bSc4oKczBLdpJQkEzMLI5OUJDMLJaDqgqLUtMwKsEnRsbW1AEa
+ nPdxZAAAA
+To: Christian Brauner <brauner@kernel.org>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+ Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+ Alexander Aring <aahringo@redhat.com>, David Teigland <teigland@redhat.com>, 
+ Miklos Szeredi <miklos@szeredi.hu>, 
+ Andreas Gruenbacher <agruenba@redhat.com>, 
+ Trond Myklebust <trond.myklebust@hammerspace.com>, 
+ Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+ Jan Kara <jack@suse.cz>, Mark Fasheh <mark@fasheh.com>, 
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+ Ronnie Sahlberg <lsahlber@redhat.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: linux-kernel@vger.kernel.org, v9fs@lists.linux.dev, 
+ linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org, 
+ gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev, 
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+ linux-trace-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5588; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=+jfAumQNnkzv9I79/OPpoM4LCmBymLZ6ObiQOrhxH0w=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBlpt0ftqJwQuqAD38FN6MoC29Q0W1W9QXxgUAdV
+ kpvyO+OpfKJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZabdHwAKCRAADmhBGVaC
+ FYuoD/0citvA0J2DhINaMqSXWn5Xpj24lo64MwYEBG1Y97QveOHDi5+KKxVVKG1xoO1rDxMptqR
+ qaT6JEi5qs613mZ7A1s2AInOfU/SJAiI0DoPNzmbqOVmZte+wk06nmV3oXbsQtCDRWAhY7mXzWc
+ 0QKrxLHPFSb7m6/nmjSxWBUWzhripWiyDd8PPqxpuE2rQGPUwI8o+pop815DhSUsVwBYnnXphGo
+ 60IV3K/e19/H/BbYJflkf838lI41U1Igkjw7d7IY8uskoTqGqWW4pe/CO97hyftI0tFwOY5OHnh
+ PhwI4dinEh14pi/50opiudRbL7Vc3zgVEEqmWShzVI5sGz3SUsBngOFRS5qLqiZ9OMgaod7E/gM
+ Vwf3a5NlILJjAleixtNLywe7xW6V4vchaP2pCUdM5bQ2ks2+fMmHQKmsCQVVVmrzZG9xjbQQ6vA
+ R6gUeeGfidpaZJadjA8Hw0lCiOPKNKcHiycgu9W2niTpt0MZjzu5DnWv9k2R4t9EELlKyICvXcf
+ uOxhKR/fgNQnTJu7zK9Uku3vCCj4gG/mKG01YhWLIeAB/f3feeyHJiKWsRxYzjZfTuScN4Wepn2
+ dx+/QflCrACPDo/n+qTrubHdnI11DdXEgLwRD5DkoeC7f5Prjw8lWn3j33kWbjp5kTPW5EF0ZV1
+ Mw9Mtry0LNNhQ/A==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-The variable tcon_exist is being assigned however it is never read, the
-variable is redundant and can be removed.
+Long ago, file locks used to hang off of a singly-linked list in struct
+inode. Because of this, when leases were added, they were added to the
+same list and so they had to be tracked using the same sort of
+structure.
 
-Cleans up clang scan build warning:
-warning: Although the value stored to 'tcon_exist' is used in
-the enclosing expression, the value is never actually readfrom
-'tcon_exist' [deadcode.DeadStores]
+Several years ago, we added struct file_lock_context, which allowed us
+to use separate lists to track different types of file locks. Given
+that, leases no longer need to be tracked using struct file_lock.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+That said, a lot of the underlying infrastructure _is_ the same between
+file leases and locks, so we can't completely separate everything.
+
+This patchset first splits a group of fields used by both file locks and
+leases into a new struct file_lock_core, that is then embedded in struct
+file_lock. Coccinelle was then used to convert a lot of the callers to
+deal with the move, with the remaining 25% or so converted by hand.
+
+It then converts several internal functions in fs/locks.c to work
+with struct file_lock_core. Lastly, struct file_lock is split into
+struct file_lock and file_lease, and the lease-related APIs converted to
+take struct file_lease.
+
+After the first few patches (which I left split up for easier review),
+the set should be bisectable. I'll plan to squash the first few
+together to make sure the resulting set is bisectable before merge.
+
+Finally, I left the coccinelle scripts I used in tree. I had heard it
+was preferable to merge those along with the patches that they
+generate, but I wasn't sure where they go. I can either move those to a
+more appropriate location or we can just drop that commit if it's not
+needed.
+
+I'd like to have this considered for inclusion in v6.9. Christian, would
+you be amenable to shepherding this into mainline (assuming there are no
+major objections, of course)?
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- fs/smb/client/smb2pdu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Jeff Layton (20):
+      filelock: split common fields into struct file_lock_core
+      filelock: add coccinelle scripts to move fields to struct file_lock_core
+      filelock: the results of the coccinelle conversion
+      filelock: fixups after the coccinelle changes
+      filelock: convert some internal functions to use file_lock_core instead
+      filelock: convert more internal functions to use file_lock_core
+      filelock: make posix_same_owner take file_lock_core pointers
+      filelock: convert posix_owner_key to take file_lock_core arg
+      filelock: make locks_{insert,delete}_global_locks take file_lock_core arg
+      filelock: convert locks_{insert,delete}_global_blocked
+      filelock: convert the IS_* macros to take file_lock_core
+      filelock: make __locks_delete_block and __locks_wake_up_blocks take file_lock_core
+      filelock: convert __locks_insert_block, conflict and deadlock checks to use file_lock_core
+      filelock: convert fl_blocker to file_lock_core
+      filelock: clean up locks_delete_block internals
+      filelock: reorganize locks_delete_block and __locks_insert_block
+      filelock: make assign_type helper take a file_lock_core pointer
+      filelock: convert locks_wake_up_blocks to take a file_lock_core pointer
+      filelock: convert locks_insert_lock_ctx and locks_delete_lock_ctx
+      filelock: split leases out of struct file_lock
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index bd25c34dc398..50f6bf16b624 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3918,7 +3918,7 @@ void smb2_reconnect_server(struct work_struct *work)
- 	struct cifs_ses *ses, *ses2;
- 	struct cifs_tcon *tcon, *tcon2;
- 	struct list_head tmp_list, tmp_ses_list;
--	bool tcon_exist = false, ses_exist = false;
-+	bool ses_exist = false;
- 	bool tcon_selected = false;
- 	int rc;
- 	bool resched = false;
-@@ -3964,7 +3964,7 @@ void smb2_reconnect_server(struct work_struct *work)
- 			if (tcon->need_reconnect || tcon->need_reopen_files) {
- 				tcon->tc_count++;
- 				list_add_tail(&tcon->rlist, &tmp_list);
--				tcon_selected = tcon_exist = true;
-+				tcon_selected = true;
- 			}
- 		}
- 		/*
-@@ -3973,7 +3973,7 @@ void smb2_reconnect_server(struct work_struct *work)
- 		 */
- 		if (ses->tcon_ipc && ses->tcon_ipc->need_reconnect) {
- 			list_add_tail(&ses->tcon_ipc->rlist, &tmp_list);
--			tcon_selected = tcon_exist = true;
-+			tcon_selected = true;
- 			cifs_smb_ses_inc_refcount(ses);
- 		}
- 		/*
+ cocci/filelock.cocci            |  81 +++++
+ cocci/filelock2.cocci           |   6 +
+ cocci/nlm.cocci                 |  81 +++++
+ fs/9p/vfs_file.c                |  38 +-
+ fs/afs/flock.c                  |  55 +--
+ fs/ceph/locks.c                 |  74 ++--
+ fs/dlm/plock.c                  |  44 +--
+ fs/fuse/file.c                  |  14 +-
+ fs/gfs2/file.c                  |  16 +-
+ fs/libfs.c                      |   2 +-
+ fs/lockd/clnt4xdr.c             |  14 +-
+ fs/lockd/clntlock.c             |   2 +-
+ fs/lockd/clntproc.c             |  60 +--
+ fs/lockd/clntxdr.c              |  14 +-
+ fs/lockd/svc4proc.c             |  10 +-
+ fs/lockd/svclock.c              |  64 ++--
+ fs/lockd/svcproc.c              |  10 +-
+ fs/lockd/svcsubs.c              |  24 +-
+ fs/lockd/xdr.c                  |  14 +-
+ fs/lockd/xdr4.c                 |  14 +-
+ fs/locks.c                      | 785 ++++++++++++++++++++++------------------
+ fs/nfs/delegation.c             |   4 +-
+ fs/nfs/file.c                   |  22 +-
+ fs/nfs/nfs3proc.c               |   2 +-
+ fs/nfs/nfs4_fs.h                |   2 +-
+ fs/nfs/nfs4file.c               |   2 +-
+ fs/nfs/nfs4proc.c               |  39 +-
+ fs/nfs/nfs4state.c              |   6 +-
+ fs/nfs/nfs4trace.h              |   4 +-
+ fs/nfs/nfs4xdr.c                |   8 +-
+ fs/nfs/write.c                  |   8 +-
+ fs/nfsd/filecache.c             |   4 +-
+ fs/nfsd/nfs4callback.c          |   2 +-
+ fs/nfsd/nfs4layouts.c           |  34 +-
+ fs/nfsd/nfs4state.c             |  98 ++---
+ fs/ocfs2/locks.c                |  12 +-
+ fs/ocfs2/stack_user.c           |   2 +-
+ fs/smb/client/cifsfs.c          |   2 +-
+ fs/smb/client/cifssmb.c         |   8 +-
+ fs/smb/client/file.c            |  74 ++--
+ fs/smb/client/smb2file.c        |   2 +-
+ fs/smb/server/smb2pdu.c         |  44 +--
+ fs/smb/server/vfs.c             |  14 +-
+ include/linux/filelock.h        |  58 ++-
+ include/linux/fs.h              |   5 +-
+ include/linux/lockd/lockd.h     |   8 +-
+ include/trace/events/afs.h      |   4 +-
+ include/trace/events/filelock.h |  54 +--
+ 48 files changed, 1119 insertions(+), 825 deletions(-)
+---
+base-commit: 052d534373b7ed33712a63d5e17b2b6cdbce84fd
+change-id: 20240116-flsplit-bdb46824db68
+
+Best regards,
 -- 
-2.39.2
+Jeff Layton <jlayton@kernel.org>
 
