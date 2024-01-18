@@ -1,107 +1,152 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12olkn2082.outbound.protection.outlook.com [40.92.21.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B3917C7;
-	Thu, 18 Jan 2024 00:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705538400; cv=none; b=iJ6CdcHhfbjaopoX3hiAaSa+8Fy+Cf5RauueUs0VR6rF9AT7IPKn1BmQjyb7c8BJkss6Pbqk4JyJHX2HdieMPURzEobGkRrXe4KPJPrZmrJX8aYRBZreCrY6ljRKcgXEbSitbUvlwyDqzf9lofTUw38NCSM8LQ7+QeJyhmMZIUw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705538400; c=relaxed/simple;
-	bh=xfSRm8NYBQgeSl23nqbKW5dBqQgWEKEtHeDQhZjOa3o=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 From:Date:Message-ID:Subject:To:Cc:Content-Type; b=s8ucYZvkaeMULw5RhEONGJrPTNFcCXlsLQA4CBZIL1Xsj1hP+DZSPK6UWsg9c8oEm340i1AmlfvFl8aJITr0RBSF//MjhkJRLzMOCi9mjOZNV0ymGMAT99MHrdNgpyNUgIagCdBHegsa6fkHi1/9LMfy5jhN+D6gBG1qiN2B3yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mDAAu3cK; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F53125A4;
+	Thu, 18 Jan 2024 07:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.21.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705563854; cv=fail; b=J6GsmXbq/04EwlyAFJOOmspkGjgVWMRiecMj8aHeD5Z8ccWiC4HhIoTX1u5PQnc8MYgh70i3qpcG8oCIGpn/+0qlvVW0oDE97cBa08WMoGD2IzxyXOMQ+csXmMKV4SjaiIi8ZpfHzYimxS0YVYjqWq0IHop8izGstSIXm1Qin6g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705563854; c=relaxed/simple;
+	bh=yHFjywHy/un70BFVFuB8javPxWwMIjrK4GEoByvZn3U=;
+	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
+	 Received:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 Content-Transfer-Encoding:Content-Type:X-TMN:X-ClientProxiedBy:
+	 X-Microsoft-Original-Message-ID:MIME-Version:
+	 X-MS-Exchange-MessageSentRepresentingType:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=gzC0UbKeXrp+YIeNpZw6Wb351P0xGGHKg+SSm/4dxqBPYP1eSqDWPK4UboH4Y72u765N5A0WHvi7b2+LW3omxfUOKth21bEztaVAJefOYtMBQY+3tXCQfuGPonhidV8jP/h9xCQTzDP1IzJGuVFbp1mY6cc81BhS9awwzOyq9L8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=ReNQAq5U; arc=fail smtp.client-ip=40.92.21.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDAAu3cK"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50e7b273352so13072614e87.1;
-        Wed, 17 Jan 2024 16:39:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705538397; x=1706143197; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=F9BqwFmg7PAKPDz/4wrpx1bRNJyJhn0vNuUNbGSy8TU=;
-        b=mDAAu3cKmZYS5NpgesLJfxbgMdsxGymXWTFw5VcE1jBX1wOk6xgq5eDpW8nlhUFPN2
-         it+rCtVZnrszS5NXiUNOiBEbqJCoFD45XWip8qdGYysrXnFkHRXQ6kbKBJhu60psJD36
-         6C2FVj5APK9O9ZOB3SrpZyHm1BZMIVN15YRgbhhHSvmG7zSkDOA/4o7I9sp2YKLZOFzR
-         U2JDFtvqsA8222XGvRn8t0uwqdqeR1UcPxzyWlf4trdflSnpzetWXC8h4yq+azrhb7T2
-         hiz3w7EH2cVQbB3DxpfUcVvDP29Ry8IesmcODFzBuCvOaJp1YRL/4QyNgdV6SPVgkGZG
-         Zx2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705538397; x=1706143197;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F9BqwFmg7PAKPDz/4wrpx1bRNJyJhn0vNuUNbGSy8TU=;
-        b=TOeQ5l46PiWVtpPQ45b0G8B/v/ay9UWlaMZdX2o9CHKdqTRbq4ELD1cCMbJrxesmI1
-         otEfs76SVIw/YizqlVy+pRjyLF3QLRZWM77rrq1/GP8xExY9Ha8C2Gd/0ecMP5fXXFoa
-         6oMztiPi3aXeKitJFrthRFnnHBoNupTDcK4f3RFEffQ7rIP53e4QbNiqn+j8E2c9Tfei
-         5Xx17Sd3JqK2T+BTaSVHTIZ4/62QGGz9BPldl8d7QtN6g+PYqLL5lVbe1EZvYRsz6VMe
-         p3AAR4hmrxKqifdU5zaHj6KzeeL7d5p3nGCXVHD8XBzroixulBbPvkPLzo7XeH2XHCxk
-         AKtQ==
-X-Gm-Message-State: AOJu0YxNGZKlZdpnra4RNVK9hucv8dHlOS76QWpyrjHTJkLqnUJk+kYC
-	8TaNs4CpoKfq5A2CinW/nsBkmzic5mZzfL5BpxuCV87kI9RJd/Pb6PfT9w+68kXQHnqO9MVlOcT
-	7Ud9wbF8YHCJziLM1D1G5m2xDyTTdNz8D63P4Hg==
-X-Google-Smtp-Source: AGHT+IHEPhIiOZgJv9JLiCnLY+mq7HxxpH6beNx2tl0YcvdNI9emQRmCV4DOo4GJpIOSZq0kWr6lGlGBxJ82q5MsmUk=
-X-Received: by 2002:a05:6512:31d0:b0:50e:757c:cab4 with SMTP id
- j16-20020a05651231d000b0050e757ccab4mr20156lfe.52.1705538396717; Wed, 17 Jan
- 2024 16:39:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="ReNQAq5U"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Lv2Zf2wc2fqBKUfov0pl2wsYhCbXNhery2PTyiVUPATKyLoTadZd5fD4At/JOPbWgZb4PdlJxOBOzohY3HwTp32Icw48yp+y1034RZ6CDoO+GYGehv1Y7j/00tXvtAKaRJWuioT8OP0S7ZixZhhd4djDxsVa5T/C/w1yvLFOwMg47qYmpDtZkfAcl3pJBHC/qWiN95ilM/QKgIplbdC5l8bIs3rOIw/P9mOUkWIgfJQ6n0NoG5RWsCwfFbIe0IzkwShHUW3p8cocinH18yYTw6pX+pPcbxcKl2nngSrbrGVepE7f8FsBBQoCkgNX30TaRzmlR+OUYXW+GD8J5AWUQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UjUhQuYRUnao2JX1I8SmUUOOA8OuPk1ZzIJUCIoqRYQ=;
+ b=CIs/6cdExkZ/7GSIjdGldsjozNRE3013/Zl7Z0a01vuXgbFNLOUx8kgDAiH5F/SuqZZpm91MSE7ns9yOXXpB/IZbGOx+2wo4nXZQo4fhl1YeePKUjiRNzXsa085+CWpvaLkeTQvTVEZRGm7t/Al/L8/pCIRFgf058YFYLQpr1UbJT1BLbQxRigZzyNgmseHTKLmjEhL54lfOq3nTEh2OXE9V6yb3TK6i1THP2Zs1krAHwxItpTt5kwJOltsKdVyf3UxGazZk6c5lZcDhXbWH1BxM87w/yjELpLcXUWAiG+pph3SMH3ptQg5NsHdyqt5e+m+jgk7vbmsjRa6f6+Ml6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UjUhQuYRUnao2JX1I8SmUUOOA8OuPk1ZzIJUCIoqRYQ=;
+ b=ReNQAq5U6ZzDhaxNl9rgHxVKo3znPp4Q/fEsElIn+3pCBjoXTwtQGzluu157QVuRpWtamOW5F1y/mxA6lmTZa3ra7ledO138Vd+5lTEdBWonOyH7yprrmzJfbDmKp4g5FfHZP1z0w2GmA3OHma+VsZ342WboXg+QcAlQN7WCVV6QusUlHYR+TRCJyhbawFSabldw5HVMkBPAqUHZrd1he8oianrAZPXusJI9Nwei68kAqznF8V4aVs7Molq+3oV1HpI1PZJRfGCYBXHI//qbiFtqlOMtgcv6ljyc7fKb1nbPBsXpmOCECDKSA5tBuaIIiZMmbB4k6gASdWDfPhLAFA==
+Received: from PH7PR20MB5925.namprd20.prod.outlook.com (2603:10b6:510:27f::21)
+ by DS7PR20MB4144.namprd20.prod.outlook.com (2603:10b6:5:3b0::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Thu, 18 Jan
+ 2024 07:44:10 +0000
+Received: from PH7PR20MB5925.namprd20.prod.outlook.com
+ ([fe80::e1de:29a8:e090:5b7b]) by PH7PR20MB5925.namprd20.prod.outlook.com
+ ([fe80::e1de:29a8:e090:5b7b%4]) with mapi id 15.20.7202.020; Thu, 18 Jan 2024
+ 07:44:10 +0000
+From: Fullway Wang <fullwaywang@outlook.com>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	lsahlber@redhat.com,
+	sprasad@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	fullwaywang@tencent.com,
+	Fullway Wang <fullwaywang@outlook.com>
+Subject: [PATCH] fs: smb: client: Reset password pointer to NULL
+Date: Thu, 18 Jan 2024 15:43:57 +0800
+Message-ID:
+ <PH7PR20MB592590F74C734584DCF88D6CBF712@PH7PR20MB5925.namprd20.prod.outlook.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [gGgyD2zOo3hECuXWJgiyvzctplrwnpgSTrbB9o2Ez0o=]
+X-ClientProxiedBy: SG2PR04CA0181.apcprd04.prod.outlook.com
+ (2603:1096:4:14::19) To PH7PR20MB5925.namprd20.prod.outlook.com
+ (2603:10b6:510:27f::21)
+X-Microsoft-Original-Message-ID:
+ <20240118074357.42205-1-fullwaywang@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 17 Jan 2024 18:39:45 -0600
-Message-ID: <CAH2r5mu+MHtC7VsKcv+x=Mr3=eghEfSrp-A4_0Sm2cuPDEzW3A@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR20MB5925:EE_|DS7PR20MB4144:EE_
+X-MS-Office365-Filtering-Correlation-Id: adc9c6e9-24f3-452e-92aa-08dc17f94202
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	XO7YmQd76vzosO47gHBRFgorWEnyO3Md+ZyaOakCCAOmT0Hk+KsC6IIMmOgzVzjmvIprRcumqvld/i6msD8tvn4p30R7a/I3lshllvAwgOG/2R65HjRyk/jhnjZ17uqTmkLsMvjg5RHTyZmkL/USirlnJHSiY5KJhR8z4sVGGOlqQBcHt0owMn7jltdODi5X5THffGOzprQQAOHAJIfwhEuEWcaI3jyyXF9xdhQ4x+/rkz7PmKKmh89v0PRpmIJTNoTqdoJjSa1uX7v0DAxv737ujPqgeCfjJ52bPf5QQrQnGfNCzWvvMNF1C+HjRYXMHg1s0sY94FbfeRXQZO65rR7v6qUuoJDl1QNazE0UixzBaOZaW7UJ/eMHYakSbwzQWQv9jhWz51OSwaUhrglvhdzyitm9+wyjhtRcfXmN+2LaPbilSdA8Mf59kkC6+LnIVdA9rJLv2Sf72oanN80c2MMSFKoCgs/E4xGW/MKICrDUC3JrKxU7vEUGHz1xNQG8A6xkEX5rFH9QOzSMq0IO3YCwAUhjRmjFJPcaUGX4FCBXZcaKl5IdjLfC2K2YCXc5Fz2KD/56UMBGPSoBDQzmh2S7fxRNgGPDVL255uXj123JFZxm+OFg+F3ov0unEKnj
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+0D2HDsgPtDFOUESmylZwgEjxuLwQkTu5uF0G84fh4BUj3WNNbR7neixu9Rj?=
+ =?us-ascii?Q?yh/dyrhGgLRkikprcx+08UEVg5klnG9nUNA4v3CaUBrYObeEzsebu/pYl2L6?=
+ =?us-ascii?Q?pnqo0KwiMG4oIThSKAgwO6EOlUHuLt1DTAoL9Q5WnmoE8X5fH7cwWvJCF+6+?=
+ =?us-ascii?Q?AC8IUGFOspGJIPux3ar+Je3tPngTKpO3tF0zGXkwGg7qZhsxnFVFI63Cw33+?=
+ =?us-ascii?Q?P+YkqRfuyN91Vezr3IMcAcTWFbbI3EIMHK9ZIX1E9bsoSseqPT7SqBFDWbzO?=
+ =?us-ascii?Q?Fp6vl2t0QoXwsTiQ3XQUJzDlHT5GV3StybvGI2c3JqcZ/uVLKfHL2l+pC6mo?=
+ =?us-ascii?Q?CnWYPWqTqwD+Oh+dQiPABIna/nO6OlgE9+BWagoiBR740aoXeXYB62I/0dcF?=
+ =?us-ascii?Q?pkA99mLMEu2Ym+/3DEXDEP/qKtPc8t+oZEKLw+nTMb6pEo5TXmDTNpSJSc76?=
+ =?us-ascii?Q?NEuIwVRNFfXKM3bkoycion+JmugrXzF/9Y7FWncIgeEHzXAc/03Tx1KH0NmT?=
+ =?us-ascii?Q?e+nsG1uppzNT7pINrwfFSOwxsxfKCYPm/foPXOtPcdDMDCT2BqcgcIJDnxYw?=
+ =?us-ascii?Q?ai1n3awdmmxhf40SmmhIyx1gX1aV5ES+z6EBRnQhjw9AmWseSUfXpxGQgFCe?=
+ =?us-ascii?Q?ytwEeEftfQGpvto2rc5hb4vjKWyRe3ytfjYydTm1OQ7QoSDsZLHEFNrPIfvL?=
+ =?us-ascii?Q?litLDONwMHh/ZdK3jTRZvQHTFsSj8VHZcXpR5qt0b9QbxLx/nIqyCxjcYIsy?=
+ =?us-ascii?Q?mbZ4hJ3NzKGJzZeOJTrfBNepfLKYRhkCzQWEN1thYHe/qasR8kEIFzhR5QSQ?=
+ =?us-ascii?Q?Z/EEZRTI4a2/1tn8OvGRLVHcrRtUvQimRXKz5NGeKN3CqMCKrWmiAt6HIdzH?=
+ =?us-ascii?Q?HLQCa79V7mrBb6goh4+suvuclQhTuJ4FV9c6L/QRCtHbJK0yBo+YIvpOlxAr?=
+ =?us-ascii?Q?7Jk6hLxDtIMbosFMJhM7qw0wakGLnpI2rwclhOsiyMpaYeV7fls0vt+H3O2Z?=
+ =?us-ascii?Q?LN53/a07tvb1z9ryJSkflMu/0L01e2GiARBV5/FCsi5mVbxf3OECGlfoQqUH?=
+ =?us-ascii?Q?NbNSRC5s79Na1oGbXrYQXp9PRM5noYi6eGANocXhTV/b1JeMdqDrle7VSGrr?=
+ =?us-ascii?Q?Yi02TFooi/TGNAOpn4ZCjLNRyerWuGCbQ2K62po25rn0aRJhiKkR2HC4Ke1H?=
+ =?us-ascii?Q?yVW8oKy9zQwKpAIzkocs5buUZW+WDO5R2193lCuX0PJYvHEv0Y2NZhlP5G8?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: adc9c6e9-24f3-452e-92aa-08dc17f94202
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR20MB5925.namprd20.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2024 07:44:10.5428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR20MB4144
 
-Please pull the following changes since commit
-6a31658aa1c0b757df652f6fcf3a001f90fda302:
+ctx->password was freed but not reset to NULL, which may lead to double
+free and secrets leak issues.
 
-  Merge tag '6.8-rc-smb-server-fixes' of git://git.samba.org/ksmbd
-(2024-01-11 20:27:41 -0800)
+This is similar to CVE-2023-5345, which was fixed in commit e6e43b8.
 
-are available in the Git repository at:
+Signed-off-by: Fullway Wang <fullwaywang@outlook.com>
+---
+ fs/smb/client/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-  git://git.samba.org/ksmbd.git tags/6.8-rc-smb-server-fixes-part2
-
-for you to fetch changes up to 77bebd186442a7d703b796784db7495129cc3e70:
-
-  ksmbd: only v2 leases handle the directory (2024-01-14 22:14:56 -0600)
-
-----------------------------------------------------------------
-Four ksmbd server fixes
-- Fix for incorrect oplock break on directories when leases disabled
-- UAF fix for race between create and destroy of tcp connection
-- Important session setup SPNEGO fix
-- Update ksmbd feature status summary
-
-----------------------------------------------------------------
-Namjae Jeon (4):
-      ksmbd: update feature status in documentation
-      ksmbd: validate mech token in session setup
-      ksmbd: fix UAF issue in ksmbd_tcp_new_connection()
-      ksmbd: only v2 leases handle the directory
-
- Documentation/filesystems/smb/ksmbd.rst |  9 ++++++---
- fs/smb/server/asn1.c                    |  5 +++++
- fs/smb/server/connection.c              |  6 ------
- fs/smb/server/connection.h              |  2 +-
- fs/smb/server/oplock.c                  |  6 ++++++
- fs/smb/server/smb2pdu.c                 | 22 +++++++++++++++++-----
- fs/smb/server/transport_rdma.c          | 11 ++++++-----
- fs/smb/server/transport_tcp.c           | 13 +++++++------
- 8 files changed, 48 insertions(+), 26 deletions(-)
-
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 3052a208c6ca..fb96a234b9b1 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4028,6 +4028,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+ out:
+ 	kfree(ctx->username);
+ 	kfree_sensitive(ctx->password);
++	ctx->password = NULL;
+ 	kfree(ctx);
+ 
+ 	return tcon;
 -- 
-Thanks,
+2.39.3 (Apple Git-145)
 
-Steve
