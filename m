@@ -1,91 +1,101 @@
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA1B4691;
-	Fri, 19 Jan 2024 01:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0F4138F;
+	Fri, 19 Jan 2024 03:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705628846; cv=none; b=tI3376qsQspeAx4lhd8zWQfo96qrFs3l5yuG0ZVqIr8/1xqGxtBhBhEkjVDNS8eCIHIQge9b3eIoC57zimJCVyX5R4GxsatiEyddARx8rSfcmMW7e78TU/Dhz5mvi+1lretU3H6HCvwvaIPh0ZOJr7K47RP0tHEOiMqPgc+kPaQ=
+	t=1705633344; cv=none; b=LVCoehVkq9q9bpKVd2vs7wzbS0A5KU2Q2cyPfAaI3g2mlacewT2Fs9YqmUzoHSYX0zFxqfZx7mYyPofOU5go+UaZtvECi6QEt+/lYvtKq0kOLLxvnfGXE9agEpVmP+zXPWcHQqdbe/mskF1ed1/4Yu9ufinRG5iZY+DByz+evEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705628846; c=relaxed/simple;
-	bh=wQivY0pWW6w7xKu/OOnqm/ChK0c4f+0qQZR/pZI3LCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=sYBZwjeqKnEg3QFvateC4oPKUXmRnNqzDMqF1im2g9Kjzrq7Qe2Gg6XdIOK5shbUofouDmzso+F+B9n/OgxsYUA0JYhlpXdmbHHwA2MWhM5jK25Hk4r9E1wqQuP2/DsANJP4gYIQI1jneM50VZPiqW17QPMQd/VdgpRE4WAwZGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=srtiBcBV; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1705633344; c=relaxed/simple;
+	bh=oUJxG83KMUbt4dCXkDxt7l4cI50LzKxgafl4u4YyKSQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZwKQp/Rd85E3NFpL0TjRbY/rjtaybVKI9AhdTca8OMg8FFRTrnZs4EKy1aCWz15wJW6xqo9muaVoUbFXTWn6qALq33wIpW6SuFXcheSlreZGAPioXvpmfUGRi+z0bRlD/fqjK/oCXwa2Wfct5bSYLdw3eFXX9C8K11NheWJAS1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QrB8UTV4; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="srtiBcBV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1705628839;
-	bh=KtGZVy2bxqM8exDfb7DvTYM5vDGOCgBQyRjFAA6zJws=;
-	h=Date:From:To:Cc:Subject:From;
-	b=srtiBcBV/92pcjHNjpwRASIOenAa5LUdfiMXh2tTyRFOrEnagjM5Sz9Ure4V0M6vQ
-	 T99sK2m8sYZkZLQPWJPxB2JtJDTqsbGikrxPdNT0S0fEGwrhhtZ3TH9Rs7wckdp0Tl
-	 h5w1fOD1ZjIWQ26CDwYCP87qfTy3LA3IgKTNvkgZ1YfK2qTFRbsJQ56AG6ElCbybTN
-	 xi/I8dn0+/isDZ7gk5PtvaRXDyHV/3hMFaxrmnrw6gNyO9ABFYL/bcATZ9oJ8WHp8V
-	 wRj+CcDQH+Q+/UXVUsMXvk/p3iZo0+F1oE+u4KDQICfVVmeZePYmIpYJWBrkoSC6Yv
-	 7cT6smvbGB9Ng==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TGMtZ5mdmz4wy9;
-	Fri, 19 Jan 2024 12:47:18 +1100 (AEDT)
-Date: Fri, 19 Jan 2024 12:47:15 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Steve French
- <stfrench@microsoft.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the cifs tree
-Message-ID: <20240119124715.7be9a3d7@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrB8UTV4"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50e7c6f0487so296373e87.3;
+        Thu, 18 Jan 2024 19:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705633340; x=1706238140; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q66bntN7QSO/os9dzasJoSSuv+HLCYEBJBs3UyFG0Ao=;
+        b=QrB8UTV4cfHO1bllEUGXqPCqvcCW4mSd97ESPlSwZ+7kjfKT/iM3Xzd+ZlX0pjblVu
+         UIN1olyVdl0/l1EUp/YUuOxJaS0jtlNY4vaNCgfvjPqvP9TrgbCIObgLsQCE3nBxTvex
+         Q/WqCvCDV/15OOMfGqeU3mGL0qLZal8h3ZhXCDq5Atllb2Y3owhx7KdjJvw6KJFhms/0
+         KXEH4cn7koV5mELosvrAciCGtS4eX5Can2n1O79zsHE5j0rXVuMxMLMvBqK4LCS6wpzQ
+         v1y3Jj4muH1r3QxyrzCUnHaANU/zneW7xOaYOkGdTf3cGBkiIv4iCztVz2UkZIx25otD
+         p4tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705633340; x=1706238140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q66bntN7QSO/os9dzasJoSSuv+HLCYEBJBs3UyFG0Ao=;
+        b=MTPSKiH9ssjQ/JPgVrJ+RDX1oSzkDxfBJazwz9rWzBwd2r6nOotzvsanvYJOCxAhCp
+         FLU2OEFKp3WZAey4LN4VDXAjHjO0aE4K2T3Y4sC2wnEgCCAfcAztO5WblauYCAKxjIh7
+         BYNRJwirdfovaSoOVdIa/mOqxU/gKiruQDGPOVAjma/ASo+h1fawz71PSceGU6FReIGX
+         /6HRraow+9N7btsYoOC06uP6lmjeecuIRXeEZ5hxUZsh/TSEEM8gBsTEaUbb7t63iTKu
+         AEqLGw7S4EfWxqocjGOHetAh1/KDvclGLkeXZt5GcIs8YlATMnHkkUJ9UabATIi+Qypm
+         IYVg==
+X-Gm-Message-State: AOJu0YwIPtDbJ9O7/4Vs202LwF1WySIz42jiLczq8CEY6V2bCwJXz5Bi
+	uvfesaH6NVYNyX9CBYlFl/uh2wZ/LhainRiXSWCZTPw3maGhwVGHCtps4xTn7VFaXLMeKAITv3U
+	H3qEibJSu9w6nWmT1qPDcrqJ/tnI=
+X-Google-Smtp-Source: AGHT+IEd7MwUOENPLVCvF1ap8TBBFmbGRmlOWO1crHTJetcfbl7r8XHGJuGvyNHne7uciIfOWBUe2Mr4IwccyXG2gME=
+X-Received: by 2002:ac2:5b5a:0:b0:50e:a9c0:70a6 with SMTP id
+ i26-20020ac25b5a000000b0050ea9c070a6mr206568lfp.43.1705633340309; Thu, 18 Jan
+ 2024 19:02:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/F4BzNxJH3cRkWVtPzKyKz=Q";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/F4BzNxJH3cRkWVtPzKyKz=Q
-Content-Type: text/plain; charset=US-ASCII
+References: <20240119124715.7be9a3d7@canb.auug.org.au>
+In-Reply-To: <20240119124715.7be9a3d7@canb.auug.org.au>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 18 Jan 2024 21:02:09 -0600
+Message-ID: <CAH2r5msKy0t-+s0c7HOxK2RzpSHE65itLH7YNhDFzZpRheAxZA@mail.gmail.com>
+Subject: Re: linux-next: build warning after merge of the cifs tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Steve French <stfrench@microsoft.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+fixed
 
-After merging the cifs tree, today's linux-next build (htmldocs) produced
-this warning:
+On Thu, Jan 18, 2024 at 7:47=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (htmldocs) produced
+> this warning:
+>
+> Documentation/admin-guide/cifs/todo.rst:7: WARNING: Definition list ends =
+without a blank line; unexpected unindent.
+> Documentation/admin-guide/cifs/todo.rst:20: ERROR: Unexpected indentation=
+.
+> Documentation/admin-guide/cifs/todo.rst:21: WARNING: Block quote ends wit=
+hout a blank line; unexpected unindent.
+>
+> Introduced by commit
+>
+>   e7dccb219fde ("smb3: minor documentation updates")
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-Documentation/admin-guide/cifs/todo.rst:7: WARNING: Definition list ends wi=
-thout a blank line; unexpected unindent.
-Documentation/admin-guide/cifs/todo.rst:20: ERROR: Unexpected indentation.
-Documentation/admin-guide/cifs/todo.rst:21: WARNING: Block quote ends witho=
-ut a blank line; unexpected unindent.
 
-Introduced by commit
-
-  e7dccb219fde ("smb3: minor documentation updates")
 
 --=20
-Cheers,
-Stephen Rothwell
+Thanks,
 
---Sig_/F4BzNxJH3cRkWVtPzKyKz=Q
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmWp1KMACgkQAVBC80lX
-0GzQHQf8CxeQqMZ38/JSJ3yNqBinSX0qKVxwNkji223x3zo5bLjkkmIO9GNE6Req
-dlLMYVP4DpGfJvTnWcf0vATrdqxyc0G0pgvbrsxOiHN3rN55qPjwiPzIKPExLBsg
-8sfo+GiSTe1ZPO+E8GBDl5LurAW7GvOQPn41ssak61wyAvtIcGGnGrDnX91ohxXw
-YKaCeFaCkibQzl1WLSSeGkukmGZM7QoV0H89vo3yejfgp9VSX4FgRYELcQEfa8y6
-ZkUEROGi0WWpASf05D36pvWumt27l+aDiXYEIoj43Qerf91gSRx5yWtY3b6O+9+A
-Y2L33at6kZSvLl8MmCxKXPI0PENLAw==
-=awMF
------END PGP SIGNATURE-----
-
---Sig_/F4BzNxJH3cRkWVtPzKyKz=Q--
+Steve
