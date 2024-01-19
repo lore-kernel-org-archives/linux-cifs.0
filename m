@@ -1,61 +1,61 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602B21870
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60257139D
 	for <linux-cifs@vger.kernel.org>; Fri, 19 Jan 2024 04:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705637861; cv=pass; b=OzsQm741P0os6mDoFl5dImsdYjLpiXXOrrRTpX57iXck61x5r2TJevCIi8lWbOb7vyWpoDl7bt7Q2hqUKstv4wM2CFlgVzOIn94UG3hch4k687gRyJ31JZJ0w6PPo6nOx4lZVBHk4fdxGMYUZzLga/LyaocrDfVC3WuLvs/5L8s=
+	t=1705637861; cv=pass; b=Wq7IyvqilmKM4VUXk/EGJmblr0SPMpVtElGZbIclP/zPKJ+0pVmCeE5wxdcCqlXqT/LWcvFkDiZaUXNlCP09T/EyhbuteBJXcQPOvbHEJvc+gqOA42+0sZ2PdKzJP6dF7TRKGdbVOBPy4KQtIsUOAnuoAb6iSLQKJzX20rOorKU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705637861; c=relaxed/simple;
-	bh=MofMvPLW0lPLCW+sh2tdwJhDkpxOCTJTapam5QL2R04=;
+	bh=ZKvEyeegAkVjTqWwKwY5hq4xB9OKye0Bz/AhTSD2JsM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S6puhTiWkpaSuuHqkRIu6WBPHbiKqLwp5LgnDAJtDHI6nN9cP6j7Rxl0nB5fRrQ12J5ix8ZpFXmlMHDx9rpj/9JLahHvYw+I1FzfTL9t/kqs8cYiD9uV85lavQG/67Nag7ODIUCZ67O36dnsDI49iZltL+4d+GMFbo9FYOILXPQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=LrEj94/d; arc=pass smtp.client-ip=167.235.159.17
+	 MIME-Version; b=aM6j0TIZNxbMU+mRxk+U0fWhvpuHfXNIY+adoISJbP/+7mrLbrcha8S7nUq3VHjBFIEEI9uVl7kqJAovF7rudihUSuNiXGqJrnX1UXHAqqd4ZrELm3frA6X/ZZwLDF3jfVSQXWCaFdbeZ111JTveqHNxDdYC/kmUIRAkaVpODok=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=DAXaT2H1; arc=pass smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="LrEj94/d"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="DAXaT2H1"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1705637319;
+	s=dkim; t=1705637321;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=scRtB2e1kRHgib0dK7BImVNYHKu+WQf9Dn9RGu/SIZ4=;
-	b=LrEj94/d9arS8P/RN6ZvWEn9nFCBGPrKzsJRpF7gzJ1tfhnk0TEOMbfFPVIaCKTaiHNVvb
-	hka+M04HzNs+mC8YDTh3IvTC5JsFuW+6AHxR20AFbuslsCD2DMGkNmV+dfAz7WNWdlhdno
-	AdEPIX5fjRNwgwLqqf0ZbZxWtv1aiRT9GXu7HK4upEUk9plOhFCL1B2Dyl637rKxHyV6Z6
-	9jhw+lzCQbH/VyxbnTkEF0fn0qgagyL0zYNcM8Xh6vTf5LnT8eyTO2/9mf7/rvNDmXSoYX
-	8IiwL5bpPPwpeTcT0bSLq2Ago6qa9m3heQscDBhegcyckDmBNCBWnRDY52tvxw==
+	bh=SHy964wVJYJ8EnKxUL00MVp6Ooaa5CzzhTjV8ksQS/w=;
+	b=DAXaT2H1cx9+Xoj0eNQPh2pLWspRv71dTFKHQLtmB20pJbNo/r0Q3wFny2WU3mAxAa38gm
+	0ykBtKQQLMXWDtXNVPISKS+P7o3RLsMBWkfGkfk2g0KGBQnsjXp9rBCX4arvANZaFHNXGo
+	Ntb0yOyzH9R6+GeBapWK9i2xpNRzKT6T1CrkROvfaWYPM+7QBlPgkzy6y9204r/7SRnfzO
+	m0g9Tru23C0rQbwzd5dxemTULOqK9QJyLyNvhjhqfChIeCCakc5UCPM5gKCDRt1tEhh4Bo
+	gcV/Z+5psF8zxdXYZbK8Nu+LKQh9G9LELLR1E92jckr4YlY4SckdFWpFzDDPCg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1705637319; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1705637321; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=scRtB2e1kRHgib0dK7BImVNYHKu+WQf9Dn9RGu/SIZ4=;
-	b=FaFMDgtx2Dl50T0Ghjbn4LYt9ZvrHTEAglp4NxZh3BJoACwn1L8F8y1LDHBFzVLPcsxML4
-	QIgg8q2L1h1ludgxAZbC8BoiXEsuF1efFYVjuDLgZr+0b7ZfTXCRzPf95LwTsZFmN2dJ4Q
-	fE+wglDAZjlhUsXm+4vVFjiI7ntnfajdVF5AA5/OVrTqNZtcuqCrRHzwYP9VS9/3aZmTMU
-	XuW3M8j9JeEd4IyTDSG0LdCnX0X05vnZghswTJDsj95hOuZisBniiNN3Zx8DluiLlpRZSu
-	whohKTYFmIkaEDQ8toNRzNRqa/cjVjidk8YKGPFnZTP211Lbi5GZCw8robY3Fw==
+	bh=SHy964wVJYJ8EnKxUL00MVp6Ooaa5CzzhTjV8ksQS/w=;
+	b=LcFJrP0I7zDicRZpyhT03s1CF5YoX3C5WkGWMjY4QYydVLzWQCwFCskPNsjIrOj4O3dIur
+	LQS+TnWYs/e322zyyQZbCdswY0yZ7BcIpfZSDrBdf4gXqZ3rWTsgWGfZMXXLx2yLZCqs4P
+	E832Jvr8mh779XwaGZ5K8Bb6sOVwja3YOmmPXbss5aR3+SGodtcS9t4ajdDXyB3ypstMVs
+	7hhxlyO6TsSMOjaNWTShybWvvwhlTFAmRo76RkPF8qGJQ5S8aQulLC/f4AhZzR2Y546PDw
+	He64ycwqJknpVklKPy66PA49SSvO21y4lQx/E0gweIWyuUToGuTxf3Ew3jD1Ng==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1705637319; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1705637321; a=rsa-sha256;
 	cv=none;
-	b=iAJYuuMlg2v3ejbpTwXkX7qmjpasgFRs0scxKp6ihmthkTE8yoAZsWqz9WEWKIK+sbL9GL
-	+Jmzq1jjPTpHa+QGMlaz1gmEBmKTFcEBM9Irc7t3e4pMS1SrN0yLvGy8MwoQgqDiztzzGP
-	DGRZS+/hXwy/3hUoVUzchByto2l9TmT91JIFMEKemVRuUUUX6Mywt8K1PH0HDHqB+L7q89
-	ll5DBauTAOPb08e6omlW3e2dj9Yq4L6dy2TNggmpkEMlLXOMIFe9f2GMbiGHakqWhPo/Ad
-	mo2tGw+5FH9zCW55XUbRQgdQxlSSCSDkrUinHP6CFISLE1KK+l6HiC/KyO/PEg==
+	b=PK6RhieJnlxh8CdGAcnfj7H4UbNOnIsWUTYp7nz0gYTU7rNQD1Yav6b/2NKUs2m7oSw9fl
+	6GTpCDqhFia8/D5lkrWGolYlOBGlUUxWendWkzQlmot65mx2NWzNhwnK2/7ltfH76Iwttf
+	IjKSOBNWAcYcjqBm/gF3AmsmJYfDUBC7Lxp2xXOaRusd7wo7SYlfH6lmpQnEM7wF/SQPFy
+	fyV5Hh5XRHKKQhuaHIDmP3Yia67joDeGy3bl+oILraOdhgyj19BEHEqk/jL2VArgEY4VT7
+	JOlPlkZ7BJfdvrOiIWeD+zYiXI1ljqXLQhW56/93ndr2kr7GPFhjs/n5Ast2tw==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 2/4] smb: client: parse owner/group when creating reparse points
-Date: Fri, 19 Jan 2024 01:08:27 -0300
-Message-ID: <20240119040829.18428-2-pc@manguebit.com>
+Subject: [PATCH 3/4] smb: client: get rid of smb311_posix_query_path_info()
+Date: Fri, 19 Jan 2024 01:08:28 -0300
+Message-ID: <20240119040829.18428-3-pc@manguebit.com>
 In-Reply-To: <20240119040829.18428-1-pc@manguebit.com>
 References: <20240119040829.18428-1-pc@manguebit.com>
 Precedence: bulk
@@ -66,403 +66,191 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Parse owner/group when creating special files and symlinks under
-SMB3.1.1 POSIX mounts.
-
-Move the parsing of owner/group to smb2_compound_op() so we don't have
-to duplicate it in both smb2_get_reparse_inode() and
-smb311_posix_query_path_info().
+Merge smb311_posix_query_path_info into ->query_path_info() to get rid
+of duplicate code.
 
 Signed-off-by: Paulo Alcantara <pc@manguebit.com>
 ---
- fs/smb/client/cifsglob.h  |   2 +
- fs/smb/client/inode.c     |  25 +++-----
- fs/smb/client/smb2inode.c | 127 ++++++++++++++++++--------------------
- fs/smb/client/smb2proto.h |   4 +-
- 4 files changed, 70 insertions(+), 88 deletions(-)
+ fs/smb/client/inode.c     |   4 +-
+ fs/smb/client/smb2inode.c | 115 +++++++++++---------------------------
+ 2 files changed, 36 insertions(+), 83 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 1f30f0bf0223..20036fb16cec 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -204,6 +204,8 @@ struct cifs_open_info_data {
- 		};
- 	} reparse;
- 	char *symlink_target;
-+	struct cifs_sid posix_owner;
-+	struct cifs_sid posix_group;
- 	union {
- 		struct smb2_file_all_info fi;
- 		struct smb311_posix_qinfo posix_fi;
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 9f37c1758f73..cedffaad86ae 100644
+index cedffaad86ae..f0989484f2c6 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -665,8 +665,6 @@ static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
- /* Fill a cifs_fattr struct with info from POSIX info struct */
- static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 				       struct cifs_open_info_data *data,
--				       struct cifs_sid *owner,
--				       struct cifs_sid *group,
- 				       struct super_block *sb)
+@@ -1312,6 +1312,7 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
+ 				  const unsigned int xid)
  {
- 	struct smb311_posix_qinfo *info = &data->posix_fi;
-@@ -722,8 +720,8 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 		fattr->cf_symlink_target = data->symlink_target;
- 		data->symlink_target = NULL;
- 	}
--	sid_to_id(cifs_sb, owner, fattr, SIDOWNER);
--	sid_to_id(cifs_sb, group, fattr, SIDGROUP);
-+	sid_to_id(cifs_sb, &data->posix_owner, fattr, SIDOWNER);
-+	sid_to_id(cifs_sb, &data->posix_group, fattr, SIDGROUP);
- 
- 	cifs_dbg(FYI, "POSIX query info: mode 0x%x uniqueid 0x%llx nlink %d\n",
- 		fattr->cf_mode, fattr->cf_uniqueid, fattr->cf_nlink);
-@@ -1070,9 +1068,7 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 				 const unsigned int xid,
- 				 struct cifs_tcon *tcon,
- 				 const char *full_path,
--				 struct cifs_fattr *fattr,
--				 struct cifs_sid *owner,
--				 struct cifs_sid *group)
-+				 struct cifs_fattr *fattr)
- {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-@@ -1117,7 +1113,7 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 	}
- 
- 	if (tcon->posix_extensions)
--		smb311_posix_info_to_fattr(fattr, data, owner, group, sb);
-+		smb311_posix_info_to_fattr(fattr, data, sb);
- 	else
- 		cifs_open_info_to_fattr(fattr, data, sb);
- out:
-@@ -1171,8 +1167,7 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
- 		 */
- 		if (cifs_open_data_reparse(data)) {
- 			rc = reparse_info_to_fattr(data, sb, xid, tcon,
--						   full_path, fattr,
--						   NULL, NULL);
-+						   full_path, fattr);
- 		} else {
- 			cifs_open_info_to_fattr(fattr, data, sb);
- 		}
-@@ -1320,7 +1315,6 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
+ 	struct cifs_open_info_data tmp_data = {};
++	struct TCP_Server_Info *server;
  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
  	struct cifs_tcon *tcon;
  	struct tcon_link *tlink;
--	struct cifs_sid owner, group;
- 	int tmprc;
- 	int rc = 0;
+@@ -1322,12 +1323,13 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+ 	tcon = tlink_tcon(tlink);
++	server = tcon->ses->server;
  
-@@ -1334,8 +1328,7 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
+ 	/*
+ 	 * 1. Fetch file metadata if not provided (data)
  	 */
  	if (!data) {
- 		rc = smb311_posix_query_path_info(xid, tcon, cifs_sb,
--						  full_path, &tmp_data,
--						  &owner, &group);
-+						  full_path, &tmp_data);
+-		rc = smb311_posix_query_path_info(xid, tcon, cifs_sb,
++		rc = server->ops->query_path_info(xid, tcon, cifs_sb,
+ 						  full_path, &tmp_data);
  		data = &tmp_data;
  	}
- 
-@@ -1347,11 +1340,9 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
- 	case 0:
- 		if (cifs_open_data_reparse(data)) {
- 			rc = reparse_info_to_fattr(data, sb, xid, tcon,
--						   full_path, fattr,
--						   &owner, &group);
-+						   full_path, fattr);
- 		} else {
--			smb311_posix_info_to_fattr(fattr, data,
--						   &owner, &group, sb);
-+			smb311_posix_info_to_fattr(fattr, data, sb);
- 		}
- 		break;
- 	case -EREMOTE:
 diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 5053a5550abe..f38cdc38f10c 100644
+index f38cdc38f10c..a652200540c8 100644
 --- a/fs/smb/client/smb2inode.c
 +++ b/fs/smb/client/smb2inode.c
-@@ -56,6 +56,35 @@ static inline __u32 file_create_options(struct dentry *dentry)
- 	return 0;
- }
- 
-+/* Parse owner and group from SMB3.1.1 POSIX query info */
-+static int parse_posix_sids(struct cifs_open_info_data *data,
-+			    struct kvec *rsp_iov)
-+{
-+	struct smb2_query_info_rsp *qi = rsp_iov->iov_base;
-+	unsigned int out_len = le32_to_cpu(qi->OutputBufferLength);
-+	unsigned int qi_len = sizeof(data->posix_fi);
-+	int owner_len, group_len;
-+	u8 *sidsbuf, *sidsbuf_end;
-+
-+	if (out_len <= qi_len)
-+		return -EINVAL;
-+
-+	sidsbuf = (u8 *)qi + le16_to_cpu(qi->OutputBufferOffset) + qi_len;
-+	sidsbuf_end = sidsbuf + out_len - qi_len;
-+
-+	owner_len = posix_info_sid_size(sidsbuf, sidsbuf_end);
-+	if (owner_len == -1)
-+		return -EINVAL;
-+
-+	memcpy(&data->posix_owner, sidsbuf, owner_len);
-+	group_len = posix_info_sid_size(sidsbuf + owner_len, sidsbuf_end);
-+	if (group_len == -1)
-+		return -EINVAL;
-+
-+	memcpy(&data->posix_group, sidsbuf + owner_len, group_len);
-+	return 0;
-+}
-+
- /*
-  * note: If cfile is passed, the reference to it is dropped here.
-  * So make sure that you do not reuse cfile after return from this func.
-@@ -69,7 +98,6 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 			    __u32 desired_access, __u32 create_disposition,
- 			    __u32 create_options, umode_t mode, struct kvec *in_iov,
- 			    int *cmds, int num_cmds, struct cifsFileInfo *cfile,
--			    __u8 **extbuf, size_t *extbuflen,
- 			    struct kvec *out_iov, int *out_buftype)
- {
- 
-@@ -494,21 +522,9 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 					&rsp_iov[i + 1], sizeof(idata->posix_fi) /* add SIDs */,
- 					(char *)&idata->posix_fi);
- 			}
--			if (rc == 0) {
--				unsigned int length = le32_to_cpu(qi_rsp->OutputBufferLength);
-+			if (rc == 0)
-+				rc = parse_posix_sids(idata, &rsp_iov[i + 1]);
- 
--				if (length > sizeof(idata->posix_fi)) {
--					char *base = (char *)rsp_iov[i + 1].iov_base +
--						le16_to_cpu(qi_rsp->OutputBufferOffset) +
--						sizeof(idata->posix_fi);
--					*extbuflen = length - sizeof(idata->posix_fi);
--					*extbuf = kmemdup(base, *extbuflen, GFP_KERNEL);
--					if (!*extbuf)
--						rc = -ENOMEM;
--				} else {
--					rc = -EINVAL;
--				}
--			}
- 			SMB2_query_info_free(&rqst[num_rqst++]);
- 			if (rc)
- 				trace_smb3_posix_query_info_compound_err(xid,  ses->Suid,
-@@ -693,9 +709,8 @@ int smb2_query_path_info(const unsigned int xid,
- 	cifs_get_readable_path(tcon, full_path, &cfile);
- 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 			      FILE_READ_ATTRIBUTES, FILE_OPEN,
--			      create_options, ACL_NO_MODE,
--			      in_iov, cmds, 1, cfile,
--			      NULL, NULL, out_iov, out_buftype);
-+			      create_options, ACL_NO_MODE, in_iov,
-+			      cmds, 1, cfile, out_iov, out_buftype);
- 	hdr = out_iov[0].iov_base;
- 	/*
- 	 * If first iov is unset, then SMB session was dropped or we've got a
-@@ -722,8 +737,8 @@ int smb2_query_path_info(const unsigned int xid,
- 		cifs_get_readable_path(tcon, full_path, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      FILE_READ_ATTRIBUTES, FILE_OPEN,
--				      create_options, ACL_NO_MODE, in_iov, cmds,
--				      num_cmds, cfile, NULL, NULL, NULL, NULL);
-+				      create_options, ACL_NO_MODE, in_iov,
-+				      cmds, num_cmds, cfile, NULL, NULL);
- 		break;
- 	case -EREMOTE:
- 		break;
-@@ -750,19 +765,13 @@ int smb311_posix_query_path_info(const unsigned int xid,
- 				 struct cifs_tcon *tcon,
- 				 struct cifs_sb_info *cifs_sb,
- 				 const char *full_path,
--				 struct cifs_open_info_data *data,
--				 struct cifs_sid *owner,
--				 struct cifs_sid *group)
-+				 struct cifs_open_info_data *data)
- {
- 	int rc;
- 	__u32 create_options = 0;
- 	struct cifsFileInfo *cfile;
+@@ -678,7 +678,7 @@ int smb2_query_path_info(const unsigned int xid,
+ 	struct smb2_hdr *hdr;
  	struct kvec in_iov[2], out_iov[3] = {};
  	int out_buftype[3] = {};
--	__u8 *sidsbuf = NULL;
--	__u8 *sidsbuf_end = NULL;
--	size_t sidsbuflen = 0;
--	size_t owner_len, group_len;
- 	int cmds[2] = { SMB2_OP_POSIX_QUERY_INFO,  };
+-	int cmds[2] = { SMB2_OP_QUERY_INFO,  };
++	int cmds[2];
+ 	bool islink;
  	int i, num_cmds;
+ 	int rc, rc2;
+@@ -686,20 +686,36 @@ int smb2_query_path_info(const unsigned int xid,
+ 	data->adjust_tz = false;
+ 	data->reparse_point = false;
  
-@@ -782,8 +791,8 @@ int smb311_posix_query_path_info(const unsigned int xid,
- 	cifs_get_readable_path(tcon, full_path, &cfile);
- 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 			      FILE_READ_ATTRIBUTES, FILE_OPEN,
--			      create_options, ACL_NO_MODE, in_iov, cmds, 1,
--			      cfile, &sidsbuf, &sidsbuflen, out_iov, out_buftype);
-+			      create_options, ACL_NO_MODE, in_iov,
-+			      cmds, 1, cfile, out_iov, out_buftype);
- 	/*
- 	 * If first iov is unset, then SMB session was dropped or we've got a
- 	 * cached open file (@cfile).
-@@ -810,32 +819,12 @@ int smb311_posix_query_path_info(const unsigned int xid,
- 		cifs_get_readable_path(tcon, full_path, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      FILE_READ_ATTRIBUTES, FILE_OPEN,
--				      create_options, ACL_NO_MODE, in_iov, cmds,
--				      num_cmds, cfile, &sidsbuf, &sidsbuflen, NULL, NULL);
-+				      create_options, ACL_NO_MODE, in_iov,
-+				      cmds, num_cmds, cfile, NULL, NULL);
- 		break;
+-	if (strcmp(full_path, ""))
+-		rc = -ENOENT;
+-	else
+-		rc = open_cached_dir(xid, tcon, full_path, cifs_sb, false, &cfid);
+-	/* If it is a root and its handle is cached then use it */
+-	if (!rc) {
+-		if (cfid->file_all_info_is_valid) {
+-			memcpy(&data->fi, &cfid->file_all_info, sizeof(data->fi));
++	/*
++	 * BB TODO: Add support for using cached root handle in SMB3.1.1 POSIX.
++	 * Create SMB2_query_posix_info worker function to do non-compounded
++	 * query when we already have an open file handle for this. For now this
++	 * is fast enough (always using the compounded version).
++	 */
++	if (!tcon->posix_extensions) {
++		if (*full_path) {
++			rc = -ENOENT;
+ 		} else {
+-			rc = SMB2_query_info(xid, tcon, cfid->fid.persistent_fid,
+-					     cfid->fid.volatile_fid, &data->fi);
++			rc = open_cached_dir(xid, tcon, full_path,
++					     cifs_sb, false, &cfid);
+ 		}
+-		close_cached_dir(cfid);
+-		return rc;
++		/* If it is a root and its handle is cached then use it */
++		if (!rc) {
++			if (cfid->file_all_info_is_valid) {
++				memcpy(&data->fi, &cfid->file_all_info,
++				       sizeof(data->fi));
++			} else {
++				rc = SMB2_query_info(xid, tcon,
++						     cfid->fid.persistent_fid,
++						     cfid->fid.volatile_fid,
++						     &data->fi);
++			}
++			close_cached_dir(cfid);
++			return rc;
++		}
++		cmds[0] = SMB2_OP_QUERY_INFO;
++	} else {
++		cmds[0] = SMB2_OP_POSIX_QUERY_INFO;
  	}
  
- out:
--	if (rc == 0) {
--		sidsbuf_end = sidsbuf + sidsbuflen;
+ 	in_iov[0].iov_base = data;
+@@ -722,6 +738,10 @@ int smb2_query_path_info(const unsigned int xid,
+ 	switch (rc) {
+ 	case 0:
+ 	case -EOPNOTSUPP:
++		/*
++		 * BB TODO: When support for special files added to Samba
++		 * re-verify this path.
++		 */
+ 		rc = parse_create_response(data, cifs_sb, &out_iov[0]);
+ 		if (rc || !data->reparse_point)
+ 			goto out;
+@@ -761,75 +781,6 @@ int smb2_query_path_info(const unsigned int xid,
+ 	return rc;
+ }
+ 
+-int smb311_posix_query_path_info(const unsigned int xid,
+-				 struct cifs_tcon *tcon,
+-				 struct cifs_sb_info *cifs_sb,
+-				 const char *full_path,
+-				 struct cifs_open_info_data *data)
+-{
+-	int rc;
+-	__u32 create_options = 0;
+-	struct cifsFileInfo *cfile;
+-	struct kvec in_iov[2], out_iov[3] = {};
+-	int out_buftype[3] = {};
+-	int cmds[2] = { SMB2_OP_POSIX_QUERY_INFO,  };
+-	int i, num_cmds;
 -
--		owner_len = posix_info_sid_size(sidsbuf, sidsbuf_end);
--		if (owner_len == -1) {
--			rc = -EINVAL;
--			goto out;
--		}
--		memcpy(owner, sidsbuf, owner_len);
+-	data->adjust_tz = false;
+-	data->reparse_point = false;
 -
--		group_len = posix_info_sid_size(
--			sidsbuf + owner_len, sidsbuf_end);
--		if (group_len == -1) {
--			rc = -EINVAL;
+-	/*
+-	 * BB TODO: Add support for using the cached root handle.
+-	 * Create SMB2_query_posix_info worker function to do non-compounded query
+-	 * when we already have an open file handle for this. For now this is fast enough
+-	 * (always using the compounded version).
+-	 */
+-	in_iov[0].iov_base = data;
+-	in_iov[0].iov_len = sizeof(*data);
+-	in_iov[1] = in_iov[0];
+-
+-	cifs_get_readable_path(tcon, full_path, &cfile);
+-	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+-			      FILE_READ_ATTRIBUTES, FILE_OPEN,
+-			      create_options, ACL_NO_MODE, in_iov,
+-			      cmds, 1, cfile, out_iov, out_buftype);
+-	/*
+-	 * If first iov is unset, then SMB session was dropped or we've got a
+-	 * cached open file (@cfile).
+-	 */
+-	if (!out_iov[0].iov_base || out_buftype[0] == CIFS_NO_BUFFER)
+-		goto out;
+-
+-	switch (rc) {
+-	case 0:
+-	case -EOPNOTSUPP:
+-		/* BB TODO: When support for special files added to Samba re-verify this path */
+-		rc = parse_create_response(data, cifs_sb, &out_iov[0]);
+-		if (rc || !data->reparse_point)
 -			goto out;
+-
+-		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK) {
+-			/* symlink already parsed in create response */
+-			num_cmds = 1;
+-		} else {
+-			cmds[1] = SMB2_OP_GET_REPARSE;
+-			num_cmds = 2;
 -		}
--		memcpy(group, sidsbuf + owner_len, group_len);
+-		create_options |= OPEN_REPARSE_POINT;
+-		cifs_get_readable_path(tcon, full_path, &cfile);
+-		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+-				      FILE_READ_ATTRIBUTES, FILE_OPEN,
+-				      create_options, ACL_NO_MODE, in_iov,
+-				      cmds, num_cmds, cfile, NULL, NULL);
+-		break;
 -	}
 -
--	kfree(sidsbuf);
- 	for (i = 0; i < ARRAY_SIZE(out_buftype); i++)
- 		free_rsp_buf(out_buftype[i], out_iov[i].iov_base);
- 	return rc;
-@@ -848,9 +837,9 @@ smb2_mkdir(const unsigned int xid, struct inode *parent_inode, umode_t mode,
- {
- 	return smb2_compound_op(xid, tcon, cifs_sb, name,
- 				FILE_WRITE_ATTRIBUTES, FILE_CREATE,
--				CREATE_NOT_FILE, mode, NULL,
--				&(int){SMB2_OP_MKDIR}, 1,
--				NULL, NULL, NULL, NULL, NULL);
-+				CREATE_NOT_FILE, mode,
-+				NULL, &(int){SMB2_OP_MKDIR}, 1,
-+				NULL, NULL, NULL);
- }
- 
- void
-@@ -875,7 +864,7 @@ smb2_mkdir_setinfo(struct inode *inode, const char *name,
- 				 FILE_WRITE_ATTRIBUTES, FILE_CREATE,
- 				 CREATE_NOT_FILE, ACL_NO_MODE, &in_iov,
- 				 &(int){SMB2_OP_SET_INFO}, 1,
--				 cfile, NULL, NULL, NULL, NULL);
-+				 cfile, NULL, NULL);
- 	if (tmprc == 0)
- 		cifs_i->cifsAttrs = dosattrs;
- }
-@@ -887,8 +876,9 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- 	drop_cached_dir_by_name(xid, tcon, name, cifs_sb);
- 	return smb2_compound_op(xid, tcon, cifs_sb, name,
- 				DELETE, FILE_OPEN, CREATE_NOT_FILE,
--				ACL_NO_MODE, NULL, &(int){SMB2_OP_RMDIR}, 1,
--				NULL, NULL, NULL, NULL, NULL);
-+				ACL_NO_MODE, NULL,
-+				&(int){SMB2_OP_RMDIR}, 1,
-+				NULL, NULL, NULL);
- }
- 
+-out:
+-	for (i = 0; i < ARRAY_SIZE(out_buftype); i++)
+-		free_rsp_buf(out_buftype[i], out_iov[i].iov_base);
+-	return rc;
+-}
+-
  int
-@@ -897,8 +887,9 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
- {
- 	return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
- 				CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POINT,
--				ACL_NO_MODE, NULL, &(int){SMB2_OP_DELETE}, 1,
--				NULL, NULL, NULL, NULL, NULL);
-+				ACL_NO_MODE, NULL,
-+				&(int){SMB2_OP_DELETE}, 1,
-+				NULL, NULL, NULL);
- }
- 
- static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
-@@ -919,8 +910,8 @@ static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
- 	in_iov.iov_base = smb2_to_name;
- 	in_iov.iov_len = 2 * UniStrnlen((wchar_t *)smb2_to_name, PATH_MAX);
- 	rc = smb2_compound_op(xid, tcon, cifs_sb, from_name, access,
--			      FILE_OPEN, create_options, ACL_NO_MODE, &in_iov,
--			      &command, 1, cfile, NULL, NULL, NULL, NULL);
-+			      FILE_OPEN, create_options, ACL_NO_MODE,
-+			      &in_iov, &command, 1, cfile, NULL, NULL);
- smb2_rename_path:
- 	kfree(smb2_to_name);
- 	return rc;
-@@ -971,7 +962,7 @@ smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
- 				FILE_WRITE_DATA, FILE_OPEN,
- 				0, ACL_NO_MODE, &in_iov,
- 				&(int){SMB2_OP_SET_EOF}, 1,
--				cfile, NULL, NULL, NULL, NULL);
-+				cfile, NULL, NULL);
- }
- 
- int
-@@ -999,8 +990,8 @@ smb2_set_file_info(struct inode *inode, const char *full_path,
- 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 			      FILE_WRITE_ATTRIBUTES, FILE_OPEN,
- 			      0, ACL_NO_MODE, &in_iov,
--			      &(int){SMB2_OP_SET_INFO}, 1, cfile,
--			      NULL, NULL, NULL, NULL);
-+			      &(int){SMB2_OP_SET_INFO}, 1,
-+			      cfile, NULL, NULL);
- 	cifs_put_tlink(tlink);
- 	return rc;
- }
-@@ -1035,7 +1026,7 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
- 		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      da, cd, co, ACL_NO_MODE, in_iov,
--				      cmds, 2, cfile, NULL, NULL, NULL, NULL);
-+				      cmds, 2, cfile, NULL, NULL);
- 		if (!rc) {
- 			rc = smb311_posix_get_inode_info(&new, full_path,
- 							 data, sb, xid);
-@@ -1045,7 +1036,7 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
- 		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      da, cd, co, ACL_NO_MODE, in_iov,
--				      cmds, 2, cfile, NULL, NULL, NULL, NULL);
-+				      cmds, 2, cfile, NULL, NULL);
- 		if (!rc) {
- 			rc = cifs_get_inode_info(&new, full_path,
- 						 data, sb, xid, NULL);
-@@ -1072,8 +1063,8 @@ int smb2_query_reparse_point(const unsigned int xid,
- 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 			      FILE_READ_ATTRIBUTES, FILE_OPEN,
- 			      OPEN_REPARSE_POINT, ACL_NO_MODE, &in_iov,
--			      &(int){SMB2_OP_GET_REPARSE}, 1, cfile,
--			      NULL, NULL, NULL, NULL);
-+			      &(int){SMB2_OP_GET_REPARSE}, 1,
-+			      cfile, NULL, NULL);
- 	if (rc)
- 		goto out;
- 
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 343ada691e76..0034b537b0b3 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -299,9 +299,7 @@ int smb311_posix_query_path_info(const unsigned int xid,
- 				 struct cifs_tcon *tcon,
- 				 struct cifs_sb_info *cifs_sb,
- 				 const char *full_path,
--				 struct cifs_open_info_data *data,
--				 struct cifs_sid *owner,
--				 struct cifs_sid *group);
-+				 struct cifs_open_info_data *data);
- int posix_info_parse(const void *beg, const void *end,
- 		     struct smb2_posix_info_parsed *out);
- int posix_info_sid_size(const void *beg, const void *end);
+ smb2_mkdir(const unsigned int xid, struct inode *parent_inode, umode_t mode,
+ 	   struct cifs_tcon *tcon, const char *name,
 -- 
 2.43.0
 
