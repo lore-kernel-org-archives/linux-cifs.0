@@ -1,101 +1,112 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602D81871
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Jan 2024 04:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705637862; cv=pass; b=IAnUHMklpHGO5FY/9B+eMYp7Nc3ieglRKD4bC4HncuZ3xH7QiQ/Y0wvRDreX2Gn+vTCxkNHGgSsd6jC0XY9PRNi+bcJk0jA+g9PKQ02TPAy3k4w8ZCCOIrlhEMTTREBIVDqQX+XzoW/eSI2APW86Gd4ht8iTUTPgf+3pqIi0CtM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705637862; c=relaxed/simple;
-	bh=JJnLl5yzH9AqLK3/JA+hBkrA0J9TOxtW8/7KE+uai/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M0RCdUik10fKGnl7CEsLodFPQ5mEniUu5q6lxV+fTEv65Swk8Zn0bNw5NJ+rntPNg4S4a1yYHC5KkAx44tuvE6RJ8fyBZR8f5yWDiSzZn2ru9b/Rr8HqwEQ+PebOH/+zoKjbMhpqVbqN3EV6AGmsQKuuOQnQJ6zEKhjZpRYxwvc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=XKa6bIN7; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B20C63CF
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Jan 2024 04:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705639523; cv=none; b=FHDax21pE4B4PttifaDDnaQEQt2e0om1vsTbb16Rjhk4ObXW7ZSEc1T00V2fGhx++MoFdpVo7LB79QGZ9ah9rUguAbvuJbzhF8ZFmP0z82gDCyJtLRJDZSpO8GksO+A+TpJG9VEXjHge/MrFT+5tdMWjHWOdztYo2G2mjYpJkGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705639523; c=relaxed/simple;
+	bh=btkcjHTZXKO1tlAbvh0wNM0GoPYNwyuPJQaWbb0fYaQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MjFuP1Y1HvQfAlDdUrMHQJiHtFAOuqxzv9EOV8tnclsMkZ8iCAAg9Ciy0ZqC6vuUPV+qTdPQbB5p5PuhW42NR1x7rN1hZytuGmcY8lPbU1m7YzmtZs7Ka+PB84wXKCzbBgcXTiqcclJ/SnlbT0WpwrwMCexv2rYoi6D+iTYudK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KeaMKL9N; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XKa6bIN7"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1705637323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4rRnB6NqOgLp1m+be3/3zjog0BjTjB5PtkyR2yV4Do4=;
-	b=XKa6bIN7M/jIy8oy0g1SfzUhCSpcn09NQuw+UWw0F83rp30ekAI/4V5tIdV6SPmwrk3YyQ
-	B2B0itXRv/ebNk1udaXthR8OpHvfjtrE49sA4O4wqvOuMJP1+WzTEmkzlaj46XelkpiAKT
-	OyB3Jqpq59K+0g/z5pWQUdNvP8iarzrCl8X3wfqqPDSN02kFUvYA0m9zN9yGmhLqfaGSKN
-	qHv3L1Cf6DuxTuc7oFNTzib7dtOEh3DmPBY+wYcOkr3EKF1hy02vAu3xvAceaTph1lQ6PW
-	KFwjwvkxBWVA1C1eurdDYTNVwDO4y+cSHYg8PWXIzsqrF/j0USPYDk8xd15+Xg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1705637323; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4rRnB6NqOgLp1m+be3/3zjog0BjTjB5PtkyR2yV4Do4=;
-	b=iyv/TvHukCQCHsO5mq1uiusIEmfxAr64oqMc44VXl8BoJWjxwwfRBNRcyYJy2l1WtrXOVe
-	tHCSVunSRl0c+gh1yauqYQoq+sKTqm4S3+nPWN7dlFdr7vPUzAfew30nLVbnUbIy/Z/KNa
-	zrKUyiIDCj4cIAxWfSrZBSnPH/NMTdXYEduyg/z+Pm+XZMLwbPOgpv0Q8o0/KjXUTO5Tz9
-	q/J8uCN7N+wazsq6SuwgdpbITnoB88lu1hL2H76N8CnP6uZ6jJg+IApk042oZR4LZwqh1E
-	j3TArF0u37PHfQyQnF/6SC0vMtrUlfvZhVVNIWDolvn0n1fj2bdPR1MmLJs6Yw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1705637323; a=rsa-sha256;
-	cv=none;
-	b=WxoGtBJ8VDuHUA93lYZsQXHLCFvM6nO+m8GK+dppJYyk938DcAm3FfLOibcqoXN1uCYxuH
-	N9lSbw/8ptg6ACaaP9Yg0UOa+f3NWpX7DErn6VfyjQBdj2j5YEpEqymKmT8h0hZsJtsPnf
-	we/2EwJYPHnRRRwrDH0UOGHEMgiwN0rbi+EH9zlQMfYhhfLKA949XA1ZeZ5PlQ69dJ6eaa
-	Ljufxo/+Rl0Cfytp2NLz4vRz5E2R1rlUXRQNpbLyi65ePhQsZTpwiGyRbPS9Rik0P18FgF
-	v0EnRST0zpTocVuAsPH/bKPR5oNsJuyRNXG2nkD07cGC/7/zBO5cBWgsrgtL3g==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 4/4] smb: client: don't clobber ->i_rdev from cached reparse points
-Date: Fri, 19 Jan 2024 01:08:29 -0300
-Message-ID: <20240119040829.18428-4-pc@manguebit.com>
-In-Reply-To: <20240119040829.18428-1-pc@manguebit.com>
-References: <20240119040829.18428-1-pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeaMKL9N"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cc9fa5e8e1so4546901fa.3
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Jan 2024 20:45:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705639519; x=1706244319; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z6nl0OlxMVOwb860OgbFr+vrFzUySrE/uYS/VWIBC4Y=;
+        b=KeaMKL9Nfi+5Y/U4mL+JrFaTLlVc+82QCD4xaZGsrQ13ulnyq6j+j6vXJ3BY2XkIrN
+         ZoKQo4avmVJSBetNHkrkrrCRKWvF+GkbTJaXIxkcqK2yQw8KDckd3sR2eJtKUaUHJU5K
+         tk4zckUCioX7Ek1GoCBGPUluGsVmYE5NJLwX0x6CaPaOS/2PE3OQe/yeSS8wd/EKp7+F
+         BYhE8qN8/kRUtBWzhtSG6u7ITBOLi9/nNKKCCqxs3suqxj2rYi7NOwnuEDDutaTIGrOM
+         We+HVZM6gjeG5P/t4Zg/SXmldpoiONR0rsJMzyj/zMobap7QjYHr1j1Y4iL2ecPrAMlE
+         FIoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705639519; x=1706244319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z6nl0OlxMVOwb860OgbFr+vrFzUySrE/uYS/VWIBC4Y=;
+        b=gWe1lmOFioKN4sXJRWX/Qi4qHexuChiPcHxxTW1CPYx7kzQW5LrK7BsWXDelXnUsC/
+         dVVmggVRf8yfMOhqtIMXn0nFD4Qp8r7NVyuo5uk9euJVZ02/yd/XBL162bILtEeq1djB
+         v4bvgFEJBKBPQHnSn4HyxiDgwV4bO3Ogwn7fNV/BBCWtkt4EJItmDkg23gAi2UI1a0ih
+         P0dOMqjPgo9CVyjY7YJ0OTuzgTPmX04Z8ScUPdW7stMxARV1efVpZeQZnQvMTLC7OeZu
+         uzMEt6sB79Fipph6mvWK5lbUGwIRYkTnpOHPgpVyk55Xkd+ARq9OQiqcr/hFE9DLCX2g
+         qTPg==
+X-Gm-Message-State: AOJu0YyRt2RehoIjvn2zBPbTKQYxCC8OeqD4ZJ99vlTOFtJjid9rZz/u
+	IgJx6aMns1GUotGANEMGXfEtq23Z0EC/5m2ISQ5DBNuiv5LllV496ZUjbvhIkh1i7TsWTtepBkR
+	2s41gIXqX6217usnNrExWHy+zvAuTMY5p9TQ=
+X-Google-Smtp-Source: AGHT+IE7aSLzucWbnEbOXA31GFNhW4iorRMGGq2/CrrR0ztXIo0c/ZrbWsB+0/L5aLvJwdK6ZKsEf0LQFHbuwe9o0F0=
+X-Received: by 2002:a2e:8682:0:b0:2cc:db17:64af with SMTP id
+ l2-20020a2e8682000000b002ccdb1764afmr925424lji.93.1705639519265; Thu, 18 Jan
+ 2024 20:45:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240119040829.18428-1-pc@manguebit.com>
+In-Reply-To: <20240119040829.18428-1-pc@manguebit.com>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 18 Jan 2024 22:45:08 -0600
+Message-ID: <CAH2r5murawfUdwaqYQBim5xervxvwgFatYox92NyiHRtuQWa6w@mail.gmail.com>
+Subject: Re: [PATCH 1/4] smb: client: fix parsing of SMB3.1.1 POSIX create context
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Don't clobber ->i_rdev from valid reparse inodes over readdir(2) as it
-can't be provided by query dir responses.
+merged this 4 patch series into cifs-2.6.git for-next pending
+additional review and testing
 
-Signed-off-by: Paulo Alcantara <pc@manguebit.com>
----
- fs/smb/client/readdir.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index e24684112ab0..94255401b38d 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -133,14 +133,14 @@ cifs_prime_dcache(struct dentry *parent, struct qstr *name,
- 				 * Query dir responses don't provide enough
- 				 * information about reparse points other than
- 				 * their reparse tags.  Save an invalidation by
--				 * not clobbering the existing mode, size and
--				 * symlink target (if any) when reparse tag and
--				 * ctime haven't changed.
-+				 * not clobbering some existing attributes when
-+				 * reparse tag and ctime haven't changed.
- 				 */
- 				rc = 0;
- 				if (fattr->cf_cifsattrs & ATTR_REPARSE) {
- 					if (likely(reparse_inode_match(inode, fattr))) {
- 						fattr->cf_mode = inode->i_mode;
-+						fattr->cf_rdev = inode->i_rdev;
- 						fattr->cf_eof = CIFS_I(inode)->server_eof;
- 						fattr->cf_symlink_target = NULL;
- 					} else {
--- 
-2.43.0
+On Thu, Jan 18, 2024 at 10:08=E2=80=AFPM Paulo Alcantara <pc@manguebit.com>=
+ wrote:
+>
+> The data offset for the SMB3.1.1 POSIX create context will always be
+> 8-byte aligned so having the check 'noff + nlen >=3D doff' in
+> smb2_parse_contexts() is wrong as it will lead to -EINVAL because noff
+> + nlen =3D=3D doff.
+>
+> Fix the sanity check to correctly handle aligned create context data.
+>
+> Fixes: af1689a9b770 ("smb: client: fix potential OOBs in smb2_parse_conte=
+xts()")
+> Signed-off-by: Paulo Alcantara <pc@manguebit.com>
+> ---
+>  fs/smb/client/smb2pdu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 44abd4deb9eb..288199f0b987 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -2308,7 +2308,7 @@ int smb2_parse_contexts(struct TCP_Server_Info *ser=
+ver,
+>
+>                 noff =3D le16_to_cpu(cc->NameOffset);
+>                 nlen =3D le16_to_cpu(cc->NameLength);
+> -               if (noff + nlen >=3D doff)
+> +               if (noff + nlen > doff)
+>                         return -EINVAL;
+>
+>                 name =3D (char *)cc + noff;
+> --
+> 2.43.0
+>
 
+
+--=20
+Thanks,
+
+Steve
