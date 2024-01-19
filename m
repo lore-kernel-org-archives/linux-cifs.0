@@ -1,93 +1,63 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDFF24B47
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Jan 2024 11:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7C656744;
+	Fri, 19 Jan 2024 18:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705664524; cv=none; b=Ml27NLrkEmaUyylI2ZfV+IfCv1Qdk7/P0XBiA7O8piLThZznUpcSyvuuqNQvPDHPiWK5KDxaIlArcV1+p1Rip9CNuZPC25DoMcnB/jQQLY8jDpUVLQ+U75vi5l1iRXdq6Uzv90Iz0eMG1YMrYj4o4cn1hyVWUuQVBJji9u/XrOE=
+	t=1705687383; cv=none; b=owdBd8waEs3PAf5+jma+jg6S9RvI+pZrkcG5+XJola+zj0eg+H7V3sPUovk2AwBf86IXtkLJCyErxDlEPlTKOS3/mdch3uobR+fiYeghnPeUo+zYFKxMwyfrFaAi76kAU8RUqP7u3FLu1qw/SWsLJ7OA/e3RVsnwPttM1BJMcyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705664524; c=relaxed/simple;
-	bh=tRHrL6ql5K26Jo+CH41fEB1iRUWkc+qmv65VOM2uhRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y3uf6KMjDWkEIyp7lQRhv3JfTrEoz8vc3XYu4Wko9C6Wp5wSnTYkCp6FsH5bWYIQSAmLP+LXndyVftS/x/oeEzs3tjpdfXVnAzrz4QMAZtPoijZGWSzy80ehtclC9S6fKRyl04+hasfNhZDAWeqdhLTVJ5ozeSVyIGxv8d4TthU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PzllsL9C; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1705687383; c=relaxed/simple;
+	bh=Gr4/L+APJuGGptFHS6/JYjZ/xtV1YF0B3Gfi7Mc+/9E=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=usuz4R2A501iVt4Xru5v/G2Scrh55rBQGkLi+h/pDT+bedord+jpvgo97Go+kAmX95swo3tdWYmvMUq2qeDlhc7OvB5J53kytCaiVF2wYacmJ0qtVJsLunQax92wOCx1O9isct5ORzt12t1otQ3oQD9X23YdbelQqlxI1j0xDA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOfqoMoL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzllsL9C"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50e7c6f0487so685955e87.3
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Jan 2024 03:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705664521; x=1706269321; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tRHrL6ql5K26Jo+CH41fEB1iRUWkc+qmv65VOM2uhRg=;
-        b=PzllsL9CjfzKh5Z1+7o4/O5ZRmXnPuCKaTTdjT/WQS9/rZjwbs60kaJ/vnjjk4yO0N
-         /xuKc3nnB2W5PkhA1Y+Cu5/ApRzXMTw/XsCXY8+t4TtHiB5gRbe+VSjb+nhRbMBk12Ng
-         nOREkqGpIEhWaAkr0WysNN1O6CkTNZorQhk6Euc+WqQ8cWcdapyo7/YZ6AObzQCoWjcN
-         QkO9mvjPcQG7IzZyw8Lv+EcIy2x/dWtmocwySYlPBILDTnJDwXF+1/ehY5uscoPGezog
-         u4KVGjK1z0JtgW0MQK1hbw6/pfc9ERmHxKiRnAK0nA8BHwVDBUFG7OJdWRKkmBBOdE4L
-         UEaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705664521; x=1706269321;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tRHrL6ql5K26Jo+CH41fEB1iRUWkc+qmv65VOM2uhRg=;
-        b=WNDjRdVJlLxS9E3DqxH9GecdHK7uCLY5d9anjPSw5oN6fnhgIwJznd9m0L3rm5ZE1B
-         4GpW4Dswh5BDlu0PnRhYhpjt1albS45aR1IGKAhfsF8eJfwp2soCF62G6AkBlX2K7OCp
-         POoSrQ2qZ9d43iRWi1DQLY2KZwyQK0YLrItu3WjnuFhte/18w9iHKSux8hrYzCXdayuX
-         UzwJ1U7jGQOMNyC51X2ujdpldrXC0ouIe6ybwxo7/XY1pRYUy52xxy77pwLObOZjXiMw
-         BZm7yOC4TqzF21OM00mqR4nk0qfVhYUPsfax36I5He3cW3Ls3RJNFkc6YKHNZSygAfIx
-         VAlg==
-X-Gm-Message-State: AOJu0YwzfN/zYsgFlSFV05ls7bhHe7DEgGKXxhWIJVUVF1nR/VKoh1sW
-	WK5Jtg2Ups4bwzhI6R0LG0+ukOsuKpa9pI6kO4pQyl5ZIL4ZNek597UJbooCPYImCvt6PUHQK/s
-	E5+N5+uN62JoJpS49Buh8HA9hreU=
-X-Google-Smtp-Source: AGHT+IHOIGLX/1pAqPlKGrKesAHe30ZaorTFQcaJyEF18TCDizUo6QPipht9hfGUYN5Hyi4QFF86VZg4+uQM5dDpU1E=
-X-Received: by 2002:a19:914b:0:b0:50e:7e55:1b0c with SMTP id
- y11-20020a19914b000000b0050e7e551b0cmr383372lfj.27.1705664520677; Fri, 19 Jan
- 2024 03:42:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOfqoMoL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AC26BC433C7;
+	Fri, 19 Jan 2024 18:03:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705687383;
+	bh=Gr4/L+APJuGGptFHS6/JYjZ/xtV1YF0B3Gfi7Mc+/9E=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=cOfqoMoLSRmaWRXbiWTnPNuZs99LfkHeUKUrFGpw5uJ945nDhBjR2kh4e5Y4HLIPE
+	 4UXLVrJYRiRBm/CI1krG+SCBGviTj1NZYExFupAiZpLTCliRsNeXOx49pvVV/Yob8q
+	 aIFgvsDvnyNoi0Z1hAFvTX39356EVOK3vRoBiCU5DZ3/IZLJXzU/0atHkOmNU9omX6
+	 4NgoK5AZUC0/bbGKIZKDY2Wx5pKG2SAFGUXyfWsnzM9Sm4E+8BARgDUXkdmQ2V4n6k
+	 5u0ZZjzwUJvu7GqzWZCdxaGzOwpCnBX7OTvyxpAQQMRvu+YvrHBuIhLZ6uahWppV60
+	 VJ74hJL7QUrHg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C215DFC688;
+	Fri, 19 Jan 2024 18:03:03 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mu+MHtC7VsKcv+x=Mr3=eghEfSrp-A4_0Sm2cuPDEzW3A@mail.gmail.com>
+References: <CAH2r5mu+MHtC7VsKcv+x=Mr3=eghEfSrp-A4_0Sm2cuPDEzW3A@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mu+MHtC7VsKcv+x=Mr3=eghEfSrp-A4_0Sm2cuPDEzW3A@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.8-rc-smb-server-fixes-part2
+X-PR-Tracked-Commit-Id: 77bebd186442a7d703b796784db7495129cc3e70
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8cb1bb178cdbdf005b7ac07bb67a1e1f3e365e5a
+Message-Id: <170568738363.12972.239242121930944627.pr-tracker-bot@kernel.org>
+Date: Fri, 19 Jan 2024 18:03:03 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAH2r5mtnq1WjAiZ7sLB3uVdFHCxDh=_QEvB=YZfhCvL-SUCsRg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtnq1WjAiZ7sLB3uVdFHCxDh=_QEvB=YZfhCvL-SUCsRg@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 19 Jan 2024 17:11:49 +0530
-Message-ID: <CANT5p=rj+8TBcF82-rB6F2iGQ6Tje4W1vNU0AQFGfbXg6JC6dQ@mail.gmail.com>
-Subject: Re: lightly updated versions of Shyam's recent multichannel patches
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 19, 2024 at 8:35=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> multichannel set of patches from Shyam.
->
-> There are three additional patches of his that need more fixup, but
-> these eight looked ok (I did minor updates to a few)
->
->
->
-> --
-> Thanks,
->
-> Steve
+The pull request you sent on Wed, 17 Jan 2024 18:39:45 -0600:
 
-Please hold off on the following patch till I do some more rounds of testin=
-g:
-0004-cifs-cifs_pick_channel-should-try-selecting-active-c.patch
+> git://git.samba.org/ksmbd.git tags/6.8-rc-smb-server-fixes-part2
 
-Rest looks good.
-I'll send these out formally in some time with some additional patches.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8cb1bb178cdbdf005b7ac07bb67a1e1f3e365e5a
 
---=20
-Regards,
-Shyam
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
