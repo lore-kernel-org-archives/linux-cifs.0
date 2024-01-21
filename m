@@ -1,56 +1,56 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2374014A86
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Jan 2024 03:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15FE14A86
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Jan 2024 03:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705808019; cv=none; b=QCbnJtntxeci9vYNyqYVt6sSQTWTgJZU2h/HZd0KULkfnhbmPVVapvDYeVFP/dir3C9ot3wfWoPaYtH/5s37DG1GGszs9Sd20amNQ1GLhB/AwZZXHaUEbaPeAnUBk6LEjh/N7he7JD0dsZ6akJpHf2Mfg4OfJU6VRmCmRfdSKnI=
+	t=1705808022; cv=none; b=oGocPSYhYf2sTMNjQU8/jxw+yg4Vlu34hy9UhI1rsGiZOXHlsWkM9rcKUVxqSrRMAjqExktRvcMCKvOShLwL3b5j3wyoq1I7R5THL2fAvSPd6vxM9swdq88hJ1rhgtiT6e/5iQozDVWy5d7mQsDCXiCCrjqXXg3R3l01I6JTKuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705808019; c=relaxed/simple;
-	bh=i61PuFh/wQd+kXhI4UUBpYJWFFE3nBkckJ8tFi9JYHw=;
+	s=arc-20240116; t=1705808022; c=relaxed/simple;
+	bh=ezL4tFtj37vizPg8VDCsPn5VQNBt17K7UfRKtptiuQg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q6yC3gXDYQliBjh5VVj8KzxHJ+rVWcNOFRmhjhhrQJfPkTG2Oue4Jcnf3h9JhcPHXwSGxQYrhndgoKCtU3hF0R0M2YHvvsvfSlmHKtuOYW0F4r6kqzswvLw2xWxBpu7JvM1NGCFJd/iuemxBVg+54zsHPITl8hYSdGLkU/dtY7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PIveEs13; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=H++xp1D0T3aeivl3AW6ybCB9atGo11uNP0cCaNDGp+G+edzkqsyVHgLx8YIHcEvJCIywB3BCOqelqBgNcQYbeQbIuMsCRTwQ0QpZOZuL+bI9t3Ab+NwzAmNAC0WDqdOtPwI/p4B0pgy0uHKGmqGTNF+js0Qw+fVOC6/7mY7815g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGCObl84; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIveEs13"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d50d0c98c3so24948655ad.1
-        for <linux-cifs@vger.kernel.org>; Sat, 20 Jan 2024 19:33:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGCObl84"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d51ba18e1bso18597275ad.0
+        for <linux-cifs@vger.kernel.org>; Sat, 20 Jan 2024 19:33:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705808016; x=1706412816; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705808019; x=1706412819; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EST9085IKoYTHTEDL2YdtVvlycK0/tJ49SC7HqvCQM0=;
-        b=PIveEs13IVHDNqzEYR76bYbPFh1WniZKUR5zwRy9OZ0f2Bo2U9TDGQ1xoNLhpyvC/A
-         hRFRBMK+Vf1A5KrtCpiCeLx7Ej84K9AWOk+Gu5AfIvw1prm10EOKN2giMpaGeKoY8d59
-         cQ/ofyzBDcyRycLwkrlZHCJCWZu0a5s+JXi9ZS3BDj6z4QkieErG3GrD0+/8lgu2XGi4
-         CRk2QXhroKSnGyMMTxyQ66af9j5w2sCYWpkjFRw0wQOswU+/9NogObLXZBLaznAg0Y3z
-         nUKLcxEHQumz8KkKRAD8CDhzEyLt5hYxH96PvWTcK6FErzfUnesdzt2UpRC6QIMiIHBU
-         r3kQ==
+        bh=KKSAYhZIbcehbrlijLijLmeT7Q+zPuIM/lOAGoSkaas=;
+        b=YGCObl84MFD+oatonuEsMzOfVh/9xrCik7FiFys7J25h+6dwkm4FtYGFqhIXPqzvnk
+         Q6hTpz/9X6JqYpJjWngu4SqKZgNaFEqe+yetLseiWTVBB3IASEJXbpFfyfCY/J1AmyOT
+         qapaigqmY8jrd6iUkqGFKOQGSSYCF9VfWu4SP6NLc5Mwl1KakgE5ESAIZl9a9UMSDBek
+         sNXR1eT0rRNEs3EvQOrWO2+WC4r+tf4RM1vrXIBQSCXFKqs+DxOhR11jW7vqE5pulvoz
+         6oGFf1OvBzPzvlyfEFTB9d7h8eA+6oCIHHUeeKTbsz0agb3wegM1wb9SFqWPSWCbgsPW
+         STAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705808016; x=1706412816;
+        d=1e100.net; s=20230601; t=1705808019; x=1706412819;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EST9085IKoYTHTEDL2YdtVvlycK0/tJ49SC7HqvCQM0=;
-        b=QfX+2VuZDAS+64p7+4zkK6jviIkoJmHeQ8hPjiEFtqGnWzdts7qdN4N5ohaWLcwj2X
-         jrNdtvaY517pgX775FRwR13n6/b27kM9o544KIXwP3jiBjvTV7EzquGT1MpxsFlfUWL5
-         KsiIy07itnlmVPlGDmgEEiQA5r8/RRTh0/46fxHP/VSHRHlVRMHiy+ApyslUTLY9tVRn
-         jj1uMJWrKOia0Yycseig0fW3NHy0+7efeBESnbhb1pX8i3Nr7fhOIPS0cZCGl6Xq9ueM
-         EWt7/CEcRhmuujDirA+kHIZdkLi7VIxwv1DGp2WDUoO3SPtzAigwUs6g2IcMwA6520EO
-         JwrA==
-X-Gm-Message-State: AOJu0YzD15Fv0a6hhznWZeYOF82wHxJQPG0cSgoF8nQOz16qFdaxjY5D
-	gwdAyIOa/FhFXvX6eryzNIO1Ne1Ch7LkMdmkvdt1ylhm9lALZp7jHTObkIiZ
-X-Google-Smtp-Source: AGHT+IHKSku4zCmHXp8q229sKRSYzHiRP/Udfyn7rIgZvJLODv3i0iJyMlfLrvGdKcGQH6UQKypCMw==
-X-Received: by 2002:a17:902:ec06:b0:1d7:271f:b15f with SMTP id l6-20020a170902ec0600b001d7271fb15fmr2972158pld.25.1705808016534;
-        Sat, 20 Jan 2024 19:33:36 -0800 (PST)
+        bh=KKSAYhZIbcehbrlijLijLmeT7Q+zPuIM/lOAGoSkaas=;
+        b=I4fwjye7gl7/ctpKv78KKhZB7C8J3YYG6fpRMcFYwccovp95mjmlq+cCRJBqQBjhX9
+         Ff9aJB9r5w0psryCSPGTFcN8NqPlRuXFXABHe6Cu2IP1MTK3XZXmVyaQRQHL9M+0eTRL
+         kT9LtMPUGNqipOK+I1coZbOYh/rm4PEyAOj9P7x4mNYy7wknyCFx455fMt8K9qTcfVpm
+         3fuhw/TLM8x1JVB218rlxh3bXbPoB4SxaYGkX+NBYxmNRnzYYRqhUGLSL3jIfpe/dN1V
+         7RhgUDv89PdoZ1Nv2iEdxnbQnTgIDcnuXqmuSbBFVPf/kMf9WkIoSMX2F2w7YnokWVbP
+         GAMQ==
+X-Gm-Message-State: AOJu0YzCaMSvPMEG9swK9JZ4hk4UwB2G6lsisWz4R9NuRuc95+NEarSQ
+	q1nGvyzwuScf39UT1SEPurbrS8A+z+aQL5ogHbeGOPw0jIKLh82MK/wMQD00
+X-Google-Smtp-Source: AGHT+IFvSIAnu7ubFbPyTZmnILpr47eAFwYi81QGR0V31Unmv36WLLbWpEzNmuYxnrM/4VfB0Y3jcw==
+X-Received: by 2002:a17:902:dac6:b0:1d7:215a:8065 with SMTP id q6-20020a170902dac600b001d7215a8065mr3559860plx.34.1705808019236;
+        Sat, 20 Jan 2024 19:33:39 -0800 (PST)
 Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id lg14-20020a170902fb8e00b001d058ad8770sm5193166plb.306.2024.01.20.19.33.34
+        by smtp.gmail.com with ESMTPSA id lg14-20020a170902fb8e00b001d058ad8770sm5193166plb.306.2024.01.20.19.33.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Jan 2024 19:33:36 -0800 (PST)
+        Sat, 20 Jan 2024 19:33:38 -0800 (PST)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -59,9 +59,9 @@ To: linux-cifs@vger.kernel.org,
 	bharathsm@microsoft.com,
 	tom@talpey.com
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 4/7] cifs: translate network errors on send to -ECONNABORTED
-Date: Sun, 21 Jan 2024 03:32:45 +0000
-Message-Id: <20240121033248.125282-4-sprasad@microsoft.com>
+Subject: [PATCH 5/7] cifs: helper function to check replayable error codes
+Date: Sun, 21 Jan 2024 03:32:46 +0000
+Message-Id: <20240121033248.125282-5-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240121033248.125282-1-sprasad@microsoft.com>
 References: <20240121033248.125282-1-sprasad@microsoft.com>
@@ -75,45 +75,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-When the network stack returns various errors, we today bubble
-up the error to the user (in case of soft mounts).
+The code to check for replay is not just -EAGAIN. In some
+cases, the send request or receive response may result in
+network errors, which we're now mapping to -ECONNABORTED.
 
-This change translates all network errors except -EINTR and
--EAGAIN to -ECONNABORTED. A similar approach is taken when
-we receive network errors when reading from the socket.
-
-The change also forces the cifsd thread to reconnect during
-it's next activity.
+This change introduces a helper function which checks
+if the error returned in one of the above two errors.
+And all checks for replays will now use this helper.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/transport.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/client/cached_dir.c | 1 +
+ fs/smb/client/cifsglob.h   | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 8695c9961f5a..e00278fcfa4f 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -400,10 +400,17 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 						  server->conn_id, server->hostname);
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 971892620504..5730c65ffb40 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -367,6 +367,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 		atomic_inc(&tcon->num_remote_opens);
  	}
- smbd_done:
--	if (rc < 0 && rc != -EINTR)
-+	/*
-+	 * there's hardly any use for the layers above to know the
-+	 * actual error code here. All they should do at this point is
-+	 * to retry the connection and hope it goes away.
-+	 */
-+	if (rc < 0 && rc != -EINTR && rc != -EAGAIN) {
- 		cifs_server_dbg(VFS, "Error %d sending data on socket to server\n",
- 			 rc);
--	else if (rc > 0)
-+		rc = -ECONNABORTED;
-+		cifs_signal_cifsd_for_reconnect(server, false);
-+	} else if (rc > 0)
- 		rc = 0;
- out:
- 	cifs_in_send_dec(server);
+ 	kfree(utf16_path);
++
+ 	return rc;
+ }
+ 
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 20036fb16cec..6e4cfaec98e3 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1831,6 +1831,13 @@ static inline bool is_retryable_error(int error)
+ 	return false;
+ }
+ 
++static inline bool is_replayable_error(int error)
++{
++	if (error == -EAGAIN || error == -ECONNABORTED)
++		return true;
++	return false;
++}
++
+ 
+ /* cifs_get_writable_file() flags */
+ #define FIND_WR_ANY         0
 -- 
 2.34.1
 
