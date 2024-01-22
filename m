@@ -1,115 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EC95FEE4;
-	Mon, 22 Jan 2024 15:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33835FF0C;
+	Mon, 22 Jan 2024 15:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705935746; cv=none; b=AdON/dukGg6xOux8oqXmijmnXPKv56U4FBdp6j7v3kxE9uQlqAT7jXE1ZGjEtbfqyw+Ht1pqWLaL4OSHjtoassKkq3R69AJkTwtMPYTnnYLsv0Yt/dLINDRrtrdgej1mpuUzHy9K916CSKuXffejK6KWwtC3tx5tBaFQxmX17L0=
+	t=1705935754; cv=none; b=QL7aqc3jzU8gNLvwPaZ1yLcdzjsWC7vMiZJ6evKV+ezp7HzohipULnkYBJvrSTWVE+qqKzF5mi8qAWZezdcmI0kOpKFZJ6QPOu4PkhqkeB0eyr7Fn8P60JBv/9WCN40ZjaTTeSq2/QDqgYPs4yN0guMUKseg++Wbcshgt/2XixQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705935746; c=relaxed/simple;
-	bh=6MUIiwQtfzOMU4krgJ1pAmawqGlakVp+3hazCD2oV6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HPvaxcFdwYJb0sFTmfnlnrFhSDqbHu5VQwkWBl6b1hdbwuo2dKjIBTMORRtcXm/mEKY4sHgelbCIGcxKJqSPi27Hut7KwnvAYN/gFrkmF0XWkHJFqZcGcvYfWDhkn0YHMiEm6I2cx2pVldgist+YFpdCXCuuNVK8Yz0aaMd9oHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iD6QXqRD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705935754; c=relaxed/simple;
+	bh=kyWsi1lflAk62F6EHmBXI3C2GexH6zr3BdO3AakAaSg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C0VT3xQqPn+IEOz4o/WBoRvrUqUUmZTiXE9CqzUYnhWf/4p7ey3nqeEzRhZVvSKx1vU1A16qp2IVNh54e3hcRm6STcNflgKqvLW/vQ2DZXYLtQ8PESL1NqmjPPs0B2FEyKZ6sIyPTsX5P7YhEJccGOmz+yBhqulNZfHqmkNR0og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PtQvFDUJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iD6QXqRD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 135A7C43141;
-	Mon, 22 Jan 2024 15:02:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705935746;
-	bh=6MUIiwQtfzOMU4krgJ1pAmawqGlakVp+3hazCD2oV6Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iD6QXqRDhLgF+cyY1MZIl683Cxu4o3MjxglaT3xtbcYn2iko/qalBsi0qWDNKQD6a
-	 F4d6FP1fHrKLYenedX2B6ZKzANpCGSFItej89D5Jen06BHPt2BeYKGrPTAyLo6iqTB
-	 Oo+BuMffRjUd2bcN3ub6SUu5dgyfrcEBdHS656ukIVcx6mK2vfCODpH1p0wdeLLwKS
-	 ky2HNh72MdxMNYBeyGnKr65ldEoDkH70AwE9JRwlUUqgrxHCNgmUu1L57yr+AsWKlG
-	 QEEUDMq5+2zgkDm8YqJnH6DupCqCgHTaod0P5zGxuIZ/YUPdEx+bPzCZXKFR4GXw8v
-	 rFWfrjMDMBoSg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 88/88] ksmbd: send lease break notification on FILE_RENAME_INFORMATION
-Date: Mon, 22 Jan 2024 09:52:01 -0500
-Message-ID: <20240122145608.990137-88-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240122145608.990137-1-sashal@kernel.org>
-References: <20240122145608.990137-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PtQvFDUJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7FB7C433B1;
+	Mon, 22 Jan 2024 15:02:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1705935753;
+	bh=kyWsi1lflAk62F6EHmBXI3C2GexH6zr3BdO3AakAaSg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PtQvFDUJAtrOcjflFRQ0iI04ZPcVZ541fBxhg8XqTxh6yY2C+z6QU7W5ScDPb9nk0
+	 bmfPyQqnEFrrhI86mtQz6gY3jag4IJGcXFTw2q442B4O+YY5nrV20ay69AUTfXSgST
+	 jbQEosMvABiE2as/ZBbnGG7cII6G3ltI46of09ik=
+Date: Mon, 22 Jan 2024 07:02:32 -0800
+From: Greg KH <gregkh@linuxfoundation.org>
+To: sedat.dilek@gmail.com
+Cc: David Howells <dhowells@redhat.com>, ceph-devel@vger.kernel.org,
+	davem@davemloft.net, eadavis@qq.com, edumazet@google.com,
+	horms@kernel.org, jaltman@auristor.com, jarkko@kernel.org,
+	jlayton@redhat.com, keyrings@vger.kernel.org, kuba@kernel.org,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+	markus.suvanto@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
+	pengfei.xu@intel.com, smfrench@gmail.com, stable@vger.kernel.org,
+	torvalds@linux-foundation.org, wang840925@gmail.com,
+	sashal@kernel.org, pvorel@suse.cz
+Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
+Message-ID: <2024012218-unlocking-pushy-c7e6@gregkh>
+References: <1850031.1704921100@warthog.procyon.org.uk>
+ <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+On Mon, Jan 22, 2024 at 08:32:20AM +0100, Petr Vorel wrote:
+> From: Sedat Dilek <sedat.dilek@gmail.com>
+> 
+> On Wed, Jan 10, 2024 at 10:12 PM David Howells <dhowells@redhat.com> wrote:
+> >
+> >
+> > Fix the size check added to dns_resolver_preparse() for the V1 server-list
+> > header so that it doesn't give EINVAL if the size supplied is the same as
+> > the size of the header struct (which should be valid).
+> >
+> > This can be tested with:
+> >
+> >         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+> >
+> > which will give "add_key: Invalid argument" without this fix.
+> >
+> > Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list header")
+> 
+> [ CC stable@vger.kernel.org ]
+> 
+> Your (follow-up) patch is now upstream.
+> 
+> https://git.kernel.org/linus/acc657692aed438e9931438f8c923b2b107aebf9
+> 
+> This misses CC: Stable Tag as suggested by Linus.
+> 
+> Looks like linux-6.1.y and linux-6.6.y needs it, too.
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.6.11&id=da89365158f6f656b28bcdbcbbe9eaf97c63c474
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.1.72&id=079eefaecfd7bbb8fcc30eccb0dfdf50c91f1805
 
-[ Upstream commit 3fc74c65b367476874da5fe6f633398674b78e5a ]
+And 5.10.y and 5.15.y.  Now queued up, thanks.
 
-Send lease break notification on FILE_RENAME_INFORMATION request.
-This patch fix smb2.lease.v2_epoch2 test failure.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/server/oplock.c  | 9 +++++++--
- fs/smb/server/smb2pdu.c | 1 +
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 9a19d8b06c8c..6bf2b675add9 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -546,6 +546,7 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 			     atomic_read(&ci->sop_count)) == 1) {
- 				if (lease->state != SMB2_LEASE_NONE_LE &&
- 				    lease->state == (lctx->req_state & lease->state)) {
-+					lease->epoch++;
- 					lease->state |= lctx->req_state;
- 					if (lctx->req_state &
- 						SMB2_LEASE_WRITE_CACHING_LE)
-@@ -556,13 +557,17 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 				    atomic_read(&ci->sop_count)) > 1) {
- 				if (lctx->req_state ==
- 				    (SMB2_LEASE_READ_CACHING_LE |
--				     SMB2_LEASE_HANDLE_CACHING_LE))
-+				     SMB2_LEASE_HANDLE_CACHING_LE)) {
-+					lease->epoch++;
- 					lease->state = lctx->req_state;
-+				}
- 			}
- 
- 			if (lctx->req_state && lease->state ==
--			    SMB2_LEASE_NONE_LE)
-+			    SMB2_LEASE_NONE_LE) {
-+				lease->epoch++;
- 				lease_none_upgrade(opinfo, lctx->req_state);
-+			}
- 		}
- 		read_lock(&ci->m_lock);
- 	}
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index a2f729675183..5a31d47875da 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5569,6 +5569,7 @@ static int smb2_rename(struct ksmbd_work *work,
- 	if (!file_info->ReplaceIfExists)
- 		flags = RENAME_NOREPLACE;
- 
-+	smb_break_all_levII_oplock(work, fp, 0);
- 	rc = ksmbd_vfs_rename(work, &fp->filp->f_path, new_name, flags);
- out:
- 	kfree(new_name);
--- 
-2.43.0
-
+greg k-h
