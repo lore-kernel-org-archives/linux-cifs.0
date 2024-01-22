@@ -1,94 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A850F3D556;
-	Mon, 22 Jan 2024 14:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C855FDA7;
+	Mon, 22 Jan 2024 15:02:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705934638; cv=none; b=HjFuI3XVSb7fzrIBupbQYLulL8HZnIhBGLXGc9g6ctggHyWyJCEfx11ADVGt57ljabZTU4mr/zd9rbrf5DQfEOeT+QBqp6eRbQHz418Z7Ta5/FzJPgANmDEMvt8Snoxa5w7Rdv2vJmLCwuVDbjdfy39V0LkZ22WZgPQrdX0gdR4=
+	t=1705935743; cv=none; b=LP9K63JPCdZMTLWrWeFP2ZaaW296X5qVIyj7Q1USHGgJkVma7Azm/NV6GtCU9zKOEC9ig6UxrcnCouxnAD2fm3Plon+ckWtpPRcFfVmeWj4rEVP4uV/bFxz0lkL5W4nk07hjvZvJKLdNnwzydJfmFTKUz9S84BTDfBmOQtKWmaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705934638; c=relaxed/simple;
-	bh=okSe00Plf0urDpy7xMnzOmvyVyrPmVJSvxNEVIQ9gyo=;
+	s=arc-20240116; t=1705935743; c=relaxed/simple;
+	bh=WEZtMWkUIVh0idP1DuCajZLtTaEoy5YLC8AvqYloBZk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=szIccTCUXesdUSpEeTsfNv+EYaju/radVDsya1GsFP1NkLu+rBxDlt0bJIAbo8XeVo3YV9E7+57VVWp7JyqZM5fQIoU3OUqGMSgPmf73ArcAykdlRMFvannfcAkrpm90E0x3BkraXKMxOma18S/x0MC0px4E5+chiD0GMt+GgMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbCYmBLt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=dQ1NeWNttdaUkdHTE1naRErPYA1Nbef6uFMS25xhB/0XiWDQnIQy7B6/iEWNoqd7d78zJIBT8u2BG2/dPXocxEkn8pCKy9qrGWLA4zHrIWh5QjWw/nE6dYnHbEAXUGBOwVXj8494sJbjoe3Lo2YTA2eGULJ+/ja5VUKkGPLxvBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPnnF0b+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbCYmBLt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6DB0C433C7;
-	Mon, 22 Jan 2024 14:43:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPnnF0b+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CE1C433B2;
+	Mon, 22 Jan 2024 15:02:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705934638;
-	bh=okSe00Plf0urDpy7xMnzOmvyVyrPmVJSvxNEVIQ9gyo=;
+	s=k20201202; t=1705935743;
+	bh=WEZtMWkUIVh0idP1DuCajZLtTaEoy5YLC8AvqYloBZk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rbCYmBLtGU7jcVEHLqY8mJViCCeFdbnSkSezt6XhBxQd/01t73Mz7+YDNj/JVZ90U
-	 h8yfCER0idrxElrXoY754rURY4Cwj8gCFWocsxQRhd4JnNzkPGjN5UhivZz3fLCfpJ
-	 J25Y7IgJI7fZ23D71v7P0htUUIrDZcEXSp7ujveSupdBO3l73RWrifGBJJX/wVtetI
-	 4c5cdYWRJI5qMfMHrFBX7hbxtTaEpEZS30sFegdRHddze+871iZ4hcQ0DNVJM2LP3X
-	 HbsCVa26Db2yy48nWIhZHASl8uU/Y3niK/h5wZR+n2iUqW9KKDbxuGMH1r+1Bmzg/9
-	 dZ5ltFqAFHpyQ==
-From: Christian Brauner <brauner@kernel.org>
-To: netfs@lists.linux.dev,
-	David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] netfs, cachefiles: Update MAINTAINERS records
-Date: Mon, 22 Jan 2024 15:43:17 +0100
-Message-ID: <20240122-benennen-lastzug-8560ff9a85aa@brauner>
+	b=aPnnF0b+u1ogRKqC0sy/Aqukj+IuFm3SrKkDa67Ngz9cO0sB7+fJoHbBKjKewrp3g
+	 r5MDCN5lfhXmddC54g+GHmMW3RiikI5SlF10A4VHH9Yx1rRiF6ByTljdqeFKsoI3NO
+	 tvPGax3LmRoJl/QM8D01DYgZ+UhscH2BqNWZ/aqc/ZtNlnxwm0XVhpzYgEpXu6PteA
+	 46GW6HSp/gKWh0u5AHOfRcnwAX/CLdo8XfQjr/+THwDiRKG+MKLfYo6e+dEITThef6
+	 0d8p2h7N+Pt9pZJJCI4wlWuoO9kl5fM8w1exDw+/N5SgcJDkw0L6h1r84ymZYv0/Z3
+	 NYUJe/CNiIiTA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Tom Talpey <tom@talpey.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 86/88] ksmbd: set v2 lease version on lease upgrade
+Date: Mon, 22 Jan 2024 09:51:59 -0500
+Message-ID: <20240122145608.990137-86-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240122115007.3820330-1-dhowells@redhat.com>
-References: <20240122115007.3820330-1-dhowells@redhat.com>
+In-Reply-To: <20240122145608.990137-1-sashal@kernel.org>
+References: <20240122145608.990137-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1180; i=brauner@kernel.org; h=from:subject:message-id; bh=5wiNsvaXup0M7lS0bpBvZ1QaDid4vN5t5fSW7E6j0v4=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSuqxd8sTntwGK1+pv1Wqdvf1h0sHr63/XfiqbHZSbUn Z7nFxbk0VHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRVA1Ghm6bneUf3F9MUHl+ VXbbTrG/+TlnZa7w9O47pZzuLXU3dTXD/4Dva27OE3jinqMqVpaoZeks2rBD87Cfq0CYx7lNwat X8wIA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7.1
 Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 11:49:59 +0000, David Howells wrote:
-> Update the MAINTAINERS records for netfs and cachefiles to reflect a change of
-> mailing list for both as Red Hat no longer archives the mailing list in a
-> publicly accessible place.
-> 
-> Also add Jeff Layton as a reviewer.
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-Yay!
+[ Upstream commit bb05367a66a9990d2c561282f5620bb1dbe40c28 ]
 
-> 
-> The patches are here:
-> 
-> [...]
+If file opened with v2 lease is upgraded with v1 lease, smb server
+should response v2 lease create context to client.
+This patch fix smb2.lease.v2_epoch2 test failure.
 
-Applied to the vfs.netfs branch of the vfs/vfs.git tree.
-Patches in the vfs.netfs branch should appear in linux-next soon.
+This test case assumes the following scenario:
+ 1. smb2 create with v2 lease(R, LEASE1 key)
+ 2. smb server return smb2 create response with v2 lease context(R,
+LEASE1 key, epoch + 1)
+ 3. smb2 create with v1 lease(RH, LEASE1 key)
+ 4. smb server return smb2 create response with v2 lease context(RH,
+LEASE1 key, epoch + 2)
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+i.e. If same client(same lease key) try to open a file that is being
+opened with v2 lease with v1 lease, smb server should return v2 lease.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Acked-by: Tom Talpey <tom@talpey.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/server/oplock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 562b180459a1..9a19d8b06c8c 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -1036,6 +1036,7 @@ static void copy_lease(struct oplock_info *op1, struct oplock_info *op2)
+ 	lease2->duration = lease1->duration;
+ 	lease2->flags = lease1->flags;
+ 	lease2->epoch = lease1->epoch++;
++	lease2->version = lease1->version;
+ }
+ 
+ static int add_lease_global_list(struct oplock_info *opinfo)
+-- 
+2.43.0
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.netfs
-
-[1/2] netfs, cachefiles: Change mailing list
-      https://git.kernel.org/vfs/vfs/c/3c18703079b6
-[2/2] netfs: Add Jeff Layton as reviewer
-      https://git.kernel.org/vfs/vfs/c/d59da02d1ab6
