@@ -1,91 +1,148 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B1D4C7B
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jan 2024 20:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B52E53E19
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jan 2024 23:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706043024; cv=none; b=a0ZZRolSq3XJCrkDcqJHLUqmU7VpX3/n+LIzHPKTDxOZLmek+R0ffZQibGurwmhmb7kRfh+b4sxV9p6WFX7jKMt4wzcKcVPwucNZizI/lymPNknWL9DQY1yOkSICZ5gL7kN5WjiaviKMb7q5e8RQcg4sE7KZ74SrwG79wy66QXA=
+	t=1706053660; cv=none; b=Gb6CiZBz8tKsm/++Cxf9skAMw/CX/r3BmiG1igyfdgN3QT3LjMul2TOeUByJwwJfr2wD1mP4ezHmsyE7XA0HmYyn3Yx5/+zCC+c73eg2vmYxptQNqaTPPTFja9tcvR/iQrwBHwJUyt5J1QpeBEQMwNbxROTdUtPbd5bcWFjGBpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706043024; c=relaxed/simple;
-	bh=MiYZmYYMrLmyj1MfMvdJLticCMBbB3Yg0/Tv3yNlqfE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=c94IUiCpQd7IBXtEb/g/2X8LLH5kZyXvcUBc70z0XkkvGKDJy5POkr7eIokVKO3TcudYim2rgJFn96KWPYs6KQXu88UegNJffYTf0yjRI2++N1SzWAaj7pOGHcP8dfHzHdk9miuSmKCiQB6uYFhnkVscNoNe1I2F1zCdYfns8Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DTsk6xSP; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706053660; c=relaxed/simple;
+	bh=IeM0NmFIQcW0aOz8Y2fNy6aqOUIg9hjVHd/pk89b+u4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U3DGkbUuiBXfMa7JErsLMJ9iVn2Rn3KmFV5Rj8eT5KUOvt55mMOtK+j8kY6d0vf0iQ8scwnbokGNyLczvtMFo5p7tsh/mmE696Q6e7AGAFa4dAHClv3CF9B5NbeVhqHOkS3U43Kkv7HL5ZMjR4iKJGxhj28R6S98lR6R8BT8woQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=BgKIvB0k; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DTsk6xSP"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d73066880eso27315895ad.3
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jan 2024 12:50:22 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BgKIvB0k"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-595d24ad466so3106609eaf.0
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jan 2024 15:47:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706043022; x=1706647822; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5LF7enKIFNTOUznrYEEtapJ8sft39y4HKd2BucZR1Mw=;
-        b=DTsk6xSPTBXlpONpAYfxTe1dWk8KaJBP3OXEbqwY+mxKHjGh0p13aii/e09YZrz2t6
-         nlRpUUxD9/aY55pM8sgXbJHX1T108oLpaGLt+UoKm8hQ8AR8z/SZqDUIVJH3wiypztqN
-         kjO9B+XkKMTDY7hffOHnSXA5jM0s7zauchjfVyXoOPRVnDf9lW9gY6mAidV6GV6hD2PU
-         pS+SCXOR4H+2dEc5j+JrS1J42L9W0SY1aSwzIT3sCrZ1lnf8rFloVbkyC8xdO7j9L6Ea
-         Vqk34WArCF6IIjHmMXB2dB2TumXj+w9crb/JRGN8uB7c+o1/gEDHhQEETFINnTn0yXeJ
-         e9SA==
+        d=chromium.org; s=google; t=1706053657; x=1706658457; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Byey+oL1IfCOxjCaYQp1J8nG8dIGW6Zh+MZe1d2CaXE=;
+        b=BgKIvB0kP8XICzMS7BlfoiQW9n+pKJTu3lCT72ATyFujZfkNyvK2FqAsBDpsnu8hqR
+         xTW28AIETzozfCR+lHVLxZzhAVa6p4SuJypS3GuDU8ekry2h1x49fvOMQ1SLENbf+gsR
+         QD0OI+MxBZXv+CDMam/9MTHMGGR5Q7iKJ+kAg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706043022; x=1706647822;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5LF7enKIFNTOUznrYEEtapJ8sft39y4HKd2BucZR1Mw=;
-        b=lVf3F0oqDI4OxVAr066MwFJrRnqngTxHBUrqJBCy96jinBRklS84z1/IjlWo5qC5Vu
-         ThUsmA0VdiXDT7F3RJo+ccYvNWKsT1TIUWdiT7jBLJyhXCs3aipoFl/WKrxQSaaw++px
-         RbiFy3AB1fi4Duw0Bsizd4YSQYuBf45Rj0ed8RQgvaIKka2Z7wHQZMiB43sKiI0L6CMp
-         NGSS9QeDfmeEXQTTCs3yclfcc9CqSqBBIxFDWxOT1xFfzpLOopeTbx9Zn6uABBVk8+ZW
-         VsD57NvnUZy9LvxeB+EcFtR8qXmqsl8ygwq9I5TjNMFsB8w/pA/eREPy1fAzMfQZBUkw
-         nALA==
-X-Gm-Message-State: AOJu0Yy8Sxc3377tQo9M8FzNC87m8iSRvbluj7GbmB64Kh8J9fW+f5/h
-	0jp6UdaZaj17IpV3x0C7pZTy0xnmC7CXtGE4VqlRx020TRVp0Emr
-X-Google-Smtp-Source: AGHT+IHdVI184z55d5YhUolFX5crq2ms343Z3EOUHGOQkMLHUdodRWz6ayfcD7zn9uBDx+Z8RFQvNQ==
-X-Received: by 2002:a17:902:dac6:b0:1d7:1e5d:ab41 with SMTP id q6-20020a170902dac600b001d71e5dab41mr9094949plx.29.1706043021874;
-        Tue, 23 Jan 2024 12:50:21 -0800 (PST)
-Received: from westworld (209-147-138-147.nat.asu.edu. [209.147.138.147])
-        by smtp.gmail.com with ESMTPSA id s4-20020a170902988400b001d7180b107fsm7792973plp.228.2024.01.23.12.50.20
+        d=1e100.net; s=20230601; t=1706053657; x=1706658457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Byey+oL1IfCOxjCaYQp1J8nG8dIGW6Zh+MZe1d2CaXE=;
+        b=ZcnPT12YgSx9eDL+1CBSOm0FebL06H9II/CTw5Bc1ay6VM3qKGnfrRe2j8CfaFlldn
+         XibuAqoBp2JeWls+/bAOl6OwOK8terawXduRcAoJo/9Lk2Go1fxMzzmpNCQFrEnKFQ/2
+         AkEdyEC8HX1I3ijIbGPMx6bER8rsHMdzKBUmfkWM8VM9lVnozUUS881Z5DrHM5k7ohzh
+         P1HMxPp6EFMN48AAhvMG2jEl6rwO5kiKiqhpRlCVAYQH9xUSkgPc3IpvS14gYX/xUlzh
+         8mPSbsBP+N/WZJMwDIXY4MexYJRpELUflF/3eXFuz4j1Lr3MmrrQuPZb4KoSGbqZKiTd
+         IYtw==
+X-Gm-Message-State: AOJu0Yz7LJlqV+FCw2Nwi5jhz1TWmbADeadvIsp4OP/zn2H8OCT2yBIW
+	9O32bswYTrFK74W4S9ot72hXzJ/9GOq7303EpjOjISdJcGyC+mAYNZrx+sB4dg==
+X-Google-Smtp-Source: AGHT+IFwLyO9rJaJWRj5fpagu/7UQJb6PJH1NhmnvMhw7EfYEMCFG/DBTGnWIv8q3a/IL8/3KNMsvw==
+X-Received: by 2002:a05:6359:45a4:b0:176:4aae:5fe8 with SMTP id no36-20020a05635945a400b001764aae5fe8mr4864506rwb.27.1706053657198;
+        Tue, 23 Jan 2024 15:47:37 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id t19-20020a056a0021d300b006d9be753ac7sm12184383pfj.108.2024.01.23.15.47.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 12:50:21 -0800 (PST)
-Date: Tue, 23 Jan 2024 13:50:19 -0700
-From: Kyle Zeng <zengyhkyle@gmail.com>
-To: linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-	tom@talpey.com, linux-cifs@vger.kernel.org
-Subject: [PATCH] fs/smb/server: fix off-by-one in ksmbd_nl_policy
-Message-ID: <ZbAmi0VQRY2zdLN6@westworld>
+        Tue, 23 Jan 2024 15:47:36 -0800 (PST)
+From: Kees Cook <keescook@chromium.org>
+To: Steve French <sfrench@samba.org>
+Cc: Kees Cook <keescook@chromium.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] smb: Work around Clang __bdos() type confusion
+Date: Tue, 23 Jan 2024 15:47:34 -0800
+Message-Id: <20240123234731.work.358-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2056; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=IeM0NmFIQcW0aOz8Y2fNy6aqOUIg9hjVHd/pk89b+u4=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlsFAWkLxmekOiD6JMUP2NjwIMzfRNEuzHrOIKn
+ KJgVAqyQBOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZbBQFgAKCRCJcvTf3G3A
+ JuU0D/4r8yMRZ45F/ySlkdZZlrkq438nNjdyWMLfNMt2htoNEKNPRn09MNQuqxbSnbnts/ZfNIo
+ cnmUeq9KPtd5hVOfp5tt9k4XQgSxWmUcJ6ppjbpqthGZ3qgrSmPnbUKc6yT/t8sotWOsK/dCR45
+ Uoq9+7rgk0/Wtnak25xEEuyDhKkzg/BZ7PKc1fDE7H0FH2pURSFLHct+1Wxaw8ITTSj8IVMFM+L
+ rbtW75C4011Nx4ud1zOiqO01n9qloHWomiAWrLdtCh29hKW4WWIjaJAmrhr8sWSGlTU+303dByG
+ xjQxfD9VxFZcjkPgQjXtu2WNp5Rw53ZsDc71Z0v5/4JS6JNYb3lbTjxuM4sX7QQzjIGUCYtVcEp
+ iTrN73BalurOaP6BHceFb/h7fgzpxiYHeez+wUx2KceNnSJKZHe9cxVl450EKObYhXCe0mz252V
+ kgVlZcH00bBKy5uW3uamI1O0Yjd1z3P8wabDNB5ftOkMdoO3Bl8w494D1dMWZyw9JHlI8QpikH4
+ pEAPi3np3UmHkcO/FRCFYOXmxWVG2eGht4qL39RAcfG3r2e1MFR+rMi5zgEBr+uf6WXVWFwPDCT
+ XnpVxywkBgftxAv4RcanaHhm7gbn1w3TW3ZIAr4LvzM8eFuVQ8UOXLHbEnaOX0f/nPrYZjJQ/uf
+ DC9OTKa J6Kyq2pA==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-The size of the policy array should be one larger than genl_family.maxattr, or it
-will lead to an off-by-one read during nlattr parsing because
-gennl_family.maxattr should be the *largest expected* value
+Recent versions of Clang gets confused about the possible size of the
+"user" allocation, and CONFIG_FORTIFY_SOURCE ends up emitting a
+warning[1]:
 
-Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
+repro.c:126:4: warning: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
+  126 |                         __write_overflow_field(p_size_field, size);
+      |                         ^
+
+for this memset():
+
+        int len;
+        __le16 *user;
+	...
+        len = ses->user_name ? strlen(ses->user_name) : 0;
+        user = kmalloc(2 + (len * 2), GFP_KERNEL);
+	...
+	if (len) {
+		...
+	} else {
+		memset(user, '\0', 2);
+	}
+
+While Clang works on this bug[2], switch to using a direct assignment,
+which avoids memset() entirely which both simplifies the code and silences
+the false positive warning. (Making "len" size_t also silences the
+warning, but the direct assignment seems better.)
+
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://github.com/ClangBuiltLinux/linux/issues/1966 [1]
+Link: https://github.com/llvm/llvm-project/issues/77813 [2]
+Cc: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: llvm@lists.linux.dev
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- fs/smb/server/transport_ipc.c | 2 +-
+ fs/smb/client/cifsencrypt.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index b49d47bdafc..185db4d7f2b 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -74,7 +74,7 @@ static int handle_unsupported_event(struct sk_buff *skb, struct genl_info *info)
- static int handle_generic_event(struct sk_buff *skb, struct genl_info *info);
- static int ksmbd_ipc_heartbeat_request(void);
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index ef4c2e3c9fa6..6322f0f68a17 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -572,7 +572,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		len = cifs_strtoUTF16(user, ses->user_name, len, nls_cp);
+ 		UniStrupr(user);
+ 	} else {
+-		memset(user, '\0', 2);
++		*(u16 *)user = 0;
+ 	}
  
--static const struct nla_policy ksmbd_nl_policy[KSMBD_EVENT_MAX] = {
-+static const struct nla_policy ksmbd_nl_policy[KSMBD_EVENT_MAX + 1] = {
- 	[KSMBD_EVENT_UNSPEC] = {
- 		.len = 0,
- 	},
+ 	rc = crypto_shash_update(ses->server->secmech.hmacmd5,
 -- 
 2.34.1
 
