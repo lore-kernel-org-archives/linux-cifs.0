@@ -1,150 +1,115 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6AD13B7B5
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jan 2024 00:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7627851008;
+	Tue, 23 Jan 2024 01:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705970765; cv=none; b=Vv5Csw9eJ43Hvl/38ZhgklaCQnbo2uA2iJXoM23jJVO3QMagKbASlrwgzGd1dX3azbj3uud/lpxVlwsOnLZNRofX3J3D5YdtTYLuFsyEBlsYrjOznSsug/siZGz87e64qrKEI/Vr68iZgBT61vtgj47TZTn3GbXTwb1iZJ9Xhlo=
+	t=1705973584; cv=none; b=OonXxavJZK8YQdbffwlHNnxvdzL26BqSEIFft7HEG4OvaI3h65icbsgo0K5ciL3unC+R+aLZbubTrGPnpk0rHjucVIJHjgjQ6dQAxsj+W/Ke7L49X94U8DtdlTACTd8BldGnpIiOOXjep561916l2YNTAtJNsUREsopXBPAV+hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705970765; c=relaxed/simple;
-	bh=xNoy2DEKxPexmysOm1XEIuiIvV0tGdJOvp+eDp29H/0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UC9yCPtzoV1kQyqW2GlR31fnayjtC6rFtjn0eBb6SdXG+esjJm7Ggzk3ZNJopCdXmv0s1KNV/Y4iEkaLXiREO51RQyWTmea2mYOESa6CDHWti9iG479IyNrFZC2KDEHkG79GkVynrE/QM33hIJKK7t4b4EyObnmgTMnkhe6NzS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MRjAVZJb; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MRjAVZJb"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d71cb97937so21231705ad.3
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Jan 2024 16:46:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1705970763; x=1706575563; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sf0op9UA6jGtVwywOsAePMFRok3+ELaOdVPcTfD4XW0=;
-        b=MRjAVZJbe42rSHmoOvvFIwJvZNVonvQg/oqutEfbNGF0UTgPcHbZ93GkDEbE+u8vAq
-         qkZ4bWljeIcLpy8gcfFJOHNKPUb6+Z8M0WTNUbnoAyAnq+B6egwKtnudItlaJiTl3KYz
-         ff+8RMc43P1FAS7qpz3hkvSn+NmpWDsWEtPfI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705970763; x=1706575563;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Sf0op9UA6jGtVwywOsAePMFRok3+ELaOdVPcTfD4XW0=;
-        b=Rq/1Xm1jG1oSXvnlEmCwDiyEcC+MLoFB1pIC6Fk7cKEGYr32Hu9zDOyJpe/J6aFYcP
-         baQ+NWIIckjNrhr+2lQTTUZr2JdJ9txlHxbnyEAcl1Yh3cK5Z0SoTEut9eJguqELsVJd
-         WOwgO2ou6qVYBhU/nWncVKGGtUgCgkpXuT9IjmtHRdiwURIl9Tx6QvHbe1BclXjBZ5G9
-         I85k/31KiI6JgDlbGTzWdpd/3slHXSVn5shxOA28HBvUdYfRhM9aDQATamtb7QFE3BQT
-         HiLeLGDA48RY+Qqz5lbJqScdj7LpLSZVx59qEIgf76z1SWqTmKW8JXIsiA+DQYrmNIEY
-         +oLA==
-X-Gm-Message-State: AOJu0YzSh2Q05jUFNYwcdk6D0vnv8JreEm1RNB3CWDKfVv3F8BKHvqj0
-	EIXABryTb79qzjBbiudyCWPcjqRleaNL24elWw+5VuefvadYQnNKbm5RB6nyCw==
-X-Google-Smtp-Source: AGHT+IE/WhXYgKQUaYpV5E0ASAMI7oMgYNg2DdzzRnLz2Ll1a0tefzWqoAbEPID43E3715pmMfsXlg==
-X-Received: by 2002:a17:903:2348:b0:1d7:617f:6dea with SMTP id c8-20020a170903234800b001d7617f6deamr1290475plh.59.1705970763650;
-        Mon, 22 Jan 2024 16:46:03 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id r9-20020a170903014900b001d7211cd3f7sm5853984plc.265.2024.01.22.16.45.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 16:45:57 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: linux-hardening@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 45/82] cifs: Refactor intentional wrap-around test
-Date: Mon, 22 Jan 2024 16:27:20 -0800
-Message-Id: <20240123002814.1396804-45-keescook@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240122235208.work.748-kees@kernel.org>
-References: <20240122235208.work.748-kees@kernel.org>
+	s=arc-20240116; t=1705973584; c=relaxed/simple;
+	bh=2JHya8zw5vfik3Fy0mpAMmr+pW0n5iF6d2DFfFJs8JY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LWVdfws+UeIh541YKZExU8P4Y+EWiIWSNzwC9uwolsuNkhWkuw7A7ptjrXZxlR45OraAc+3BCZCCPkRh/dyAZoyzmc0AQ8Jcv+BRDGLPlOKWiCVgOKOtiXdwPUBiNfzQ0p5c8FYk1jRYwVMjEz8s9lJ8xJ2Zn97S9oSyi9+KomE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W.Avp97_1705973576;
+Received: from 30.221.145.142(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0W.Avp97_1705973576)
+          by smtp.aliyun-inc.com;
+          Tue, 23 Jan 2024 09:32:57 +0800
+Message-ID: <9bbf3d38-71bd-49c0-9148-6066420d1d91@linux.alibaba.com>
+Date: Tue, 23 Jan 2024 09:32:56 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2484; i=keescook@chromium.org;
- h=from:subject; bh=xNoy2DEKxPexmysOm1XEIuiIvV0tGdJOvp+eDp29H/0=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlrwgIC9jJ8iaLQLpMHm2oaP/gJFWo6z16pwWIH
- frFA2mk5NyJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZa8ICAAKCRCJcvTf3G3A
- JidPD/43jyw+n24wTT1kk3hrH8GaVm1jhQv0Peatn4T8EGaS6EeAlVVxyaPfgjyRlynINUrXvsK
- HaEtBB4FIngOHcdhwrcU6rjQ6dR1uIlyMg4E72yb8tVbdliP6qwkiT2ecDroeGiBrW1oaJGvoBV
- +BW2xWnKw/xUWkEuY5/gOAg70JYqLdhrj1+O/sBKrVG3Z//+lHssd0Gua1rN5yLWCexaUbs98/P
- fUwsGsPV3XXcpZRHQm6gxLzlUxUl2QRmAZpbc6yHf+iQqeQJNvMF+U9LjgVvk+FancFxNeVl71s
- 1kNlAm/+gBZou1Mk97HK49dTT5BMklB1S9hoNjZWRMtCnuCxRyYOuMS6RpQxRkCQnU0BUBHuE2K
- h/F4dHaFnL67EdIG87Kkpl9QtRSQWBwr4BNIYF0jfEo/cM19ltK1b6Rs8D4X/OFvNYs0IABel5w
- znOAKXPr7JmH6UW2Sld9YPHUedVxOCMuk/i9PgzIUxJkF3D3W1yv/A0YaN/j0jNvdSkE3qalwbg
- QSWUHXbJtPytx7L+XPKl1zACMCU0Ul5NQUl11Vk2NbjuxayThC1Y0A1TayLxVq1gtmBUyO09nsS
- dH3jGnzw/kZTzoU6P0S5pw7QDLI6CVNv3Hho4jhx+k2DERI0biLRv+dl2VEtnMsVph/T9izC/Va gR1KNJ/P1/j+s7Q==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/10] cachefiles, erofs: Fix NULL deref in when
+ cachefiles is not doing ondemand-mode
+Content-Language: en-US
+To: David Howells <dhowells@redhat.com>,
+ Christian Brauner <christian@brauner.io>
+Cc: Jeff Layton <jlayton@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ netfs@lists.linux.dev, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Marc Dionne <marc.dionne@auristor.com>, Gao Xiang <xiang@kernel.org>,
+ Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>
+References: <20240122223230.4000595-1-dhowells@redhat.com>
+ <20240122223230.4000595-7-dhowells@redhat.com>
+From: Jingbo Xu <jefflexu@linux.alibaba.com>
+In-Reply-To: <20240122223230.4000595-7-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In an effort to separate intentional arithmetic wrap-around from
-unexpected wrap-around, we need to refactor places that depend on this
-kind of math. One of the most common code patterns of this is:
 
-	VAR + value < VAR
 
-Notably, this is considered "undefined behavior" for signed and pointer
-types, which the kernel works around by using the -fno-strict-overflow
-option in the build[1] (which used to just be -fwrapv). Regardless, we
-want to get the kernel source to the position where we can meaningfully
-instrument arithmetic wrap-around conditions and catch them when they
-are unexpected, regardless of whether they are signed[2], unsigned[3],
-or pointer[4] types.
+On 1/23/24 6:32 AM, David Howells wrote:
+> cachefiles_ondemand_init_object() as called from cachefiles_open_file() and
+> cachefiles_create_tmpfile() does not check if object->ondemand is set
+> before dereferencing it, leading to an oops something like:
+> 
+> 	RIP: 0010:cachefiles_ondemand_init_object+0x9/0x41
+> 	...
+> 	Call Trace:
+> 	 <TASK>
+> 	 cachefiles_open_file+0xc9/0x187
+> 	 cachefiles_lookup_cookie+0x122/0x2be
+> 	 fscache_cookie_state_machine+0xbe/0x32b
+> 	 fscache_cookie_worker+0x1f/0x2d
+> 	 process_one_work+0x136/0x208
+> 	 process_scheduled_works+0x3a/0x41
+> 	 worker_thread+0x1a2/0x1f6
+> 	 kthread+0xca/0xd2
+> 	 ret_from_fork+0x21/0x33
+> 
+> Fix this by making cachefiles_ondemand_init_object() return immediately if
+> cachefiles->ondemand is NULL.
+> 
+> Fixes: 3c5ecfe16e76 ("cachefiles: extract ondemand info field from cachefiles_object")
+> Reported-by: Marc Dionne <marc.dionne@auristor.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Gao Xiang <xiang@kernel.org>
+> cc: Chao Yu <chao@kernel.org>
+> cc: Yue Hu <huyue2@coolpad.com>
+> cc: Jeffle Xu <jefflexu@linux.alibaba.com>
+> cc: linux-erofs@lists.ozlabs.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> 
+> Notes:
+>     Changes
+>     =======
+>     ver #2)
+>      - Move check of object->ondemand into cachefiles_ondemand_init_object()
+> 
+>  fs/cachefiles/ondemand.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/fs/cachefiles/ondemand.c b/fs/cachefiles/ondemand.c
+> index 5fd74ec60bef..4ba42f1fa3b4 100644
+> --- a/fs/cachefiles/ondemand.c
+> +++ b/fs/cachefiles/ondemand.c
+> @@ -539,6 +539,9 @@ int cachefiles_ondemand_init_object(struct cachefiles_object *object)
+>  	struct fscache_volume *volume = object->volume->vcookie;
+>  	size_t volume_key_size, cookie_key_size, data_len;
+>  
+> +	if (!object->ondemand)
+> +		return 0;
+> +
+>  	/*
+>  	 * CacheFiles will firstly check the cache file under the root cache
+>  	 * directory. If the coherency check failed, it will fallback to
 
-Refactor open-coded wrap-around addition test to use add_would_overflow().
-This paves the way to enabling the wrap-around sanitizers in the future.
 
-Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
-Link: https://github.com/KSPP/linux/issues/26 [2]
-Link: https://github.com/KSPP/linux/issues/27 [3]
-Link: https://github.com/KSPP/linux/issues/344 [4]
-Cc: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.com>
-Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- fs/smb/client/smb2pdu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Jingbo Xu <jefflexu@linux.alibaba.com>
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 288199f0b987..85399525f0a7 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5007,7 +5007,7 @@ num_entries(int infotype, char *bufstart, char *end_of_buf, char **lastentry,
- 	entryptr = bufstart;
- 
- 	while (1) {
--		if (entryptr + next_offset < entryptr ||
-+		if (add_would_overflow(entryptr, next_offset) ||
- 		    entryptr + next_offset > end_of_buf ||
- 		    entryptr + next_offset + size > end_of_buf) {
- 			cifs_dbg(VFS, "malformed search entry would overflow\n");
-@@ -5023,7 +5023,7 @@ num_entries(int infotype, char *bufstart, char *end_of_buf, char **lastentry,
- 			len = le32_to_cpu(dir_info->FileNameLength);
- 
- 		if (len < 0 ||
--		    entryptr + len < entryptr ||
-+		    add_would_overflow(entryptr, len) ||
- 		    entryptr + len > end_of_buf ||
- 		    entryptr + len + size > end_of_buf) {
- 			cifs_dbg(VFS, "directory entry name would overflow frame end of buf %p\n",
 -- 
-2.34.1
-
+Thanks,
+Jingbo
