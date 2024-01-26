@@ -1,48 +1,40 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFEA1DFE4;
-	Fri, 26 Jan 2024 19:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638D22375D;
+	Fri, 26 Jan 2024 19:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706296434; cv=none; b=nVZ3FbYI23g5Opfy9s1rGQHAj9/zWXkh3Xk4uUqwjiZ8N+QWkxOiTZuFRGUcDZA6VP9GFAUDVBpPvkJseVG2ndbgJxelLMdIn5aE1IpRDNtT2T5oGGqSKspCm52g4KXwLGTxEMVeAuuZU8ZfWuIyMDV9uaJOzusDkadvMf34Asg=
+	t=1706297535; cv=none; b=CPb76cG332f6I+CgC4tb9rIX2CA5EdJtZs37b7y8pUFTYbSIsbEF1t7XtTX/+8hGVGJxswOx6Syg4217xZjU3HCVi1cHKaKyyu5BSI5FYTOw6f1PzabRdYIh5kSQQpMbdP9JhoP6tkuVaYU+9OGUirnPGX8fTv0mJllYi/YXX1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706296434; c=relaxed/simple;
-	bh=auOG/6WTlLMP42/ZwkTSWVSQm5vUsuTst6mpxgMIz24=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EKDgnBPMp6G26km/+vDSWHMMMBhmsyadmpPq3MimdycPsKLXaoAYl2BlN2eKXIU/Wmn5Qk3N5/cFaPmKnkS/kLgPdzh3p/QvsDADLYBSCW1yg0d/ZSZcUDDGBNowtRqCFGVQxuNwmcq3ruOJ6e65oujvsosm2GLqpfmHZGf96ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYiauapo; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYiauapo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C8E8C433C7;
-	Fri, 26 Jan 2024 19:13:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706296433;
-	bh=auOG/6WTlLMP42/ZwkTSWVSQm5vUsuTst6mpxgMIz24=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sYiauapoWVGAe94yJ/y2zleJiqh8/VxTWLJf5qUxzbo9u9LvKVNSPluSJsGP29+Jm
-	 SA46IgmcZFXsE61puOybnv4X4yuQBlWO20K0Mg9Qg/Ev+PgcYYZtHbtdgZyZoxNhTQ
-	 EBNiTeHVIxvRO/R6BDMJPfePZTH22J+vxelMYbUwGkdBOnWwmX8M5IRIhNAkIpKVDV
-	 NCtjtrsc9GrmnMRvBtOd6ssprkTqcFFAL1QxWzbX8mrvFwjZJuWnquT2dHxbLNPoky
-	 O15F0Sc53QxcmnPbyoml86VtdL01Z4I2kW3YOmzqS8nDZrduteA75g6QmzZCgkgpkV
-	 CM1nUizZMqyTg==
-From: SeongJae Park <sj@kernel.org>
-To: 
-Cc: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"pc@manguebit.com" <pc@manguebit.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"leonardo@schenkel.net" <leonardo@schenkel.net>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"m.weissbach@info-gate.de" <m.weissbach@info-gate.de>,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"sairon@sairon.cz" <sairon@sairon.cz>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with "Resource temporarily unavailable"
-Date: Fri, 26 Jan 2024 11:13:51 -0800
-Message-Id: <20240126191351.56183-1-sj@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <53F11617-D406-47C6-8CA7-5BE26EB042BE@amazon.com>
-References: 
+	s=arc-20240116; t=1706297535; c=relaxed/simple;
+	bh=/hxB9mWKi9mgLDpS2dW9KVNxf5L9+nCnH/rGPcZKBWE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PhN2NowXya16d6cPaW3+xQxQI2hkjmtZY5rLaGieBOdQRXHWdg5TXHxzNx8zhKTD43mmWVcuPdR90JxA49L2gfyH95TPNk/EBLvhrYWWhNVs4BSyw2wKtCmiiimnGvy7jSw1q2gBoMxsNMoV3QIjoUy9cEvFC+pUErI8Gm35AJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 17B3C2F2023C; Fri, 26 Jan 2024 19:32:09 +0000 (UTC)
+X-Spam-Level: 
+Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
+	by air.basealt.ru (Postfix) with ESMTPSA id 59C002F20236;
+	Fri, 26 Jan 2024 19:32:04 +0000 (UTC)
+From: kovalev@altlinux.org
+To: stable@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: keescook@chromium.org,
+	sfrench@samba.org,
+	corbet@lwn.net,
+	natechancellor@gmail.com,
+	ndesaulniers@google.com,
+	kovalev@altlinux.org
+Subject: [PATCH 0/2] smb: client: fix "df: Resource temporarily unavailable" on 5.10 stable kernel
+Date: Fri, 26 Jan 2024 22:31:41 +0300
+Message-Id: <20240126193143.245122-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,22 +43,25 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Mon, 15 Jan 2024 14:22:39 +0000 "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com> wrote:
+After mounting a remote cifs resource, it becomes unavailable:
+df: /mnt/sambashare: Resource temporarily unavailable
 
-> It looks like both 5.15.146 and 5.10.206 are impacted by this regression as
-> they both have the bad commit 33eae65c6f (smb: client: fix OOB in
-> SMB2_query_info_init()).
+It was tested on the following Linux kernels:
+Linux altlinux 5.10.208-std-def-alt1
+Linux fedora 5.10.208-200.el8.x86_64
 
-Let me try to tell this to the regression tracking bot, following the doc[1].
-This is my first time using #regzbot, so please feel free to correct me if I'm
-doing something wrong.
+The error appeared starting from kernel 5.10.206 after adding
+the commit [1] "smb: client: fix OOB in SMB2_query_info_init()",
+in which the buffer length increases by 1 as a result of changes:
+...
+-      iov[0].iov_len = total_len - 1 + input_len;
++      iov[0].iov_len = len;
+...
 
-#regzbot introduced: 33eae65c6f
+[1] https://patchwork.kernel.org/project/cifs-client/patch/20231213152557.6634-2-pc@manguebit.com/
 
-[1] https://docs.kernel.org/admin-guide/reporting-regressions.html#how-do-i-report-a-regression
+Error fixed by backported commits in next two patches  adapted for the 5.10 kernel:
 
+[PATCH 1/2] stddef: Introduce DECLARE_FLEX_ARRAY() helper
+[PATCH 2/2] smb3: Replace smb2pdu 1-element arrays with flex-arrays
 
-Thanks,
-SJ
-
-[...]
