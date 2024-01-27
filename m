@@ -1,116 +1,137 @@
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AC81A723;
-	Sat, 27 Jan 2024 21:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBAC1F93F;
+	Sat, 27 Jan 2024 23:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706390422; cv=none; b=Pz3jM7kJ4WWT+f+VvdrjXZ3PWUBBy9ZFF4RKYiI/sXq9FPru8+Ymu82gUCCyy/U4kHJNUnj8PGY5Co5H+I08aeoTUyl2XJmk3PpoqQnKUNEIw2x4Uj2zQ0XX1FPM7jz18E4wkBCXNSgAnJUIQNzx6O2x5Aj54YCpDvv3EV5AvUs=
+	t=1706396494; cv=none; b=P7Jb4VOMNVRT5Lc/a+bjsMj63WIg+8TlA2nr7ysWDyeDRqCv5nVEaVhbTUVtmPhnNdkJyRrdPFj3RsY10BHPvs/lPF+uzhjhT3anN7qlsqWDIrp4auJiG8YXqZLXZjG43a9O0/2wpBFjfjdQ9avuCYK3Bi9Jh7m9qpvPqsLGCEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706390422; c=relaxed/simple;
-	bh=ZwsAmgZApPQl6UcX4NZ85FITCeQi1lWhLsxv2X98pc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qmCSIo3Sn7dquWQTGodkWRn05kfD3uVj1AH8JbVWkOTS8fX91zJy+UQpSzR6aMChCu0gzMlG/IVEHoMkj95HYuFnBACWxPCnLr8v5fhfYzIBNG1wOhQg6VZnYJH6Y53rj9V+2GReQASIeHdCn5Adhxy2NaGfgIfwAivjVxjoMHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=AU/CnMFS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ixsic8fM; arc=none smtp.client-ip=66.111.4.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	s=arc-20240116; t=1706396494; c=relaxed/simple;
+	bh=HQMTgPB4Bhpi6XTnDbAxXcr86RjC0yJcJ4MlTGyCRJA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vByzMnmkPalTqv3JQOB2QamBYo+tGWtP+tV1532BILz5KpK2mWY70BXav3dWS5aRSEmNd2bbG0eoAG4fz8b75CIwz4m3PbWAyOP5ado0kNbylgTyVPV1K5SVbdPiMqyOYWO+DFWaOtxnTXbFXXPCGU1OJ+vn+o3LMzNrQ3lDE/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3D7F0cN; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="AU/CnMFS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ixsic8fM"
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 525C15808BF;
-	Sat, 27 Jan 2024 16:20:19 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Sat, 27 Jan 2024 16:20:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1706390419; x=1706397619; bh=vl7A5tB7tb
-	/TqrGN7zKDKDidJXhLI9itkoXMD7OD1W8=; b=AU/CnMFSB3VE2OditYKkN9RDmL
-	a09lnP+jf2t0+QlPmNGaKX2Bo46pu2wwmXltSB1TC+O8JRxoUeowKVhe/G3+PJxD
-	N5QkVK7WmXicWGBQ9Kxbc0V9F5GDiWEFTw5HgqZ3kUDPduuWH7WBBGWI4Bra0b7u
-	28PIAvnI2h13n7b0PdIjFl1VGCI4sRgnZE4ttaG7yhiCeaB/+PEfsX4CmHC8KLct
-	GoZEBMI6boF386ZpQYXuM4lOXn0qJ+ZovU994CWhdcb6gVok7tzpZ1/X302qfWIm
-	K0VGMzvRXM1Of4Tr8XdetUCnXkT075FQDhVbY0APrBoe0O1s5uAseDT7Z4TQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706390419; x=1706397619; bh=vl7A5tB7tb/TqrGN7zKDKDidJXhL
-	I9itkoXMD7OD1W8=; b=ixsic8fM907SI64oZJ1hXuRpDwLdNXJQGJ7ngk7ig2KD
-	nHfufxLq2FqokSBdpKQ5PyZ41S1VHcKLphDasiKKwtYgXsKtOVkqXqFtnbD9SqAa
-	911zpe81neI1J58vF5IUP5YH+IqhJB5iJTHRkI8lzrAYOFEJlo/fmQ3P4PaoTIkG
-	lLQZjD4iEeEkNNrunVdujhXfz2Ae6lfsM9OcHdRWeItImG57ZEiJhMGelm0rLMVd
-	PEo2d8J2U6sZiu5hDRi5f/VGUJy1nE2V8XWLE6hQvnuNj6mGkaQn2SH50FDQiwJd
-	SIccKQaTRMr6uWVxxAlH9vtGY+aHGhK/s9FnGGKKzw==
-X-ME-Sender: <xms:knO1ZXS1eEDL5fsf2yvykeaFl-i759gkOgMq90hKm8bDl1Bl5VkWyw>
-    <xme:knO1ZYyWUQ196Li0y2qx7GVxrh9Eaqo-lgLMC7dl4SrjqaWKacwFApqI_2NmS5No1
-    U_rhx0Aa_cuTA>
-X-ME-Received: <xmr:knO1Zc05byHj2SHn5D9W0G-Y1yZZ61F7Ap779-2H7kGvs8vJE0nZiOgGcxgW>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdelledgudegiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
-    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehge
-    dvvedvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhu
-    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhroh
-    grhhdrtghomh
-X-ME-Proxy: <xmx:knO1ZXA2KX4kRKj_eSzAT1yLnZ7VpeYDT1mdVGbTKN26DgCLdU5J0A>
-    <xmx:knO1ZQiS-Em0pL-1f4xRU4d2FcAsBdBNYTB8FCSuIPLAYrdt30zD8A>
-    <xmx:knO1Zbr5T-IlXYO8UwelejQ07wUHEuPtkT-nmGo1aj8Bk00KlDXFrQ>
-    <xmx:k3O1ZZCnrFwC3_SnFMBTlBtg2ZxVxebxlmAhMFnrU6DGtq_ZUV1t0A>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 27 Jan 2024 16:20:18 -0500 (EST)
-Date: Sat, 27 Jan 2024 13:20:17 -0800
-From: Greg KH <greg@kroah.com>
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: kovalev@altlinux.org, stable@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, keescook@chromium.org,
-	sfrench@samba.org, corbet@lwn.net, natechancellor@gmail.com,
-	ndesaulniers@google.com, "pc@manguebit.com" <pc@manguebit.com>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Vegard Nossum <vegard.nossum@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>, linkinjeon@kernel.org
-Subject: Re: [PATCH 0/2] smb: client: fix "df: Resource temporarily
- unavailable" on 5.10 stable kernel
-Message-ID: <2024012708-satchel-canteen-d949@gregkh>
-References: <20240126193143.245122-1-kovalev@altlinux.org>
- <2024012613-woozy-exhume-7b9d@gregkh>
- <472d92aa-1b49-43c9-a91f-80dfc8f25ad3@oracle.com>
- <57fda449-0d18-485a-0858-39f48722fe27@basealt.ru>
- <8ad7fac4-dcd5-4ef7-8e40-0c9fd1c6fd0a@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3D7F0cN"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51028acdcf0so1739089e87.0;
+        Sat, 27 Jan 2024 15:01:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706396490; x=1707001290; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N3PtoOCmflXE8JrM44LwtaHSMNzcJ3eR+Esxbam8yVg=;
+        b=f3D7F0cN6227EU//2JzlSDOIKY/ezUigjsNgebcu4VF4MlPXvEsoxqmHSCwDaoXy7F
+         8pUUUnU1//oHObBsvHBcS4aHwoFYvqEU7KDLvDcsXiRLrmOzKN2bFmCaiuzY4JwOi7d8
+         17a9M9l8cPonHek/25o9d+wNfaWVT+O5z/bSJ0/NaNbGp2uQpjNM8r9oDAjwy64FKsuI
+         k0LJGGumZ4SfcWtxiq+SeoIM8AZ+9fpIp4h/OoSQ5j4pyDtfeqyhz8YFofMl3Vev8XjP
+         o0P7G2riYXWfI4Yqr+H9v/DjJUJkLYbi1dSxJ2TQ67Q7W+OG8THEjZX+Y2oC3Dr2oGqq
+         dSSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706396490; x=1707001290;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N3PtoOCmflXE8JrM44LwtaHSMNzcJ3eR+Esxbam8yVg=;
+        b=JQsJ7j7f4YBED6KyzbbW2FFyy6QC5sA06EStPkl+fNtaDSB3nNnIXLf/7Kx534k1GL
+         qKY+dR9OmZ5uZOsfCD01ideMmKK/Jkz5LkCeslcjbjRQ49gVGEMDQRd2lbxcTMB+neXN
+         m7O1rAJbE9fjZhkylecTOTqNPX8SpYGECyYiZ4y84Q7o2egqQutXi+9D7UxTgYC4+aNt
+         c3VQTaP5B9I16pkc8Dol/1VGo10OcTZ4qSw+00iS3EyrHrkClAJsM4mfcCRQUNHD+ljb
+         3L3IWTIi1I2J2+wFiCWv7NtKvl9ZF6/HwzNqxWI7QUQZ2jroVjjwKrGLMzikETy0Jp/w
+         wmcw==
+X-Gm-Message-State: AOJu0YwTZ+kj+xrOVkNeQJoEfGos5QSnlriVRI0eiYAMgjg6ezF8lAc6
+	J4tbnxfzFhO0XnNR4Q75/inelmchLIStgYPRAi19elw0JlTQKD2IZYetcKArjkMnbjE2IYAv2Zg
+	eoN0EiLAK+RVZRUGdJyQWGL5o/5c=
+X-Google-Smtp-Source: AGHT+IE+iOPuu6oBq6RfhXdXaSlN1kLy8vx7/5kCGbP8mMThNsfKdD+U3LBhdWItjkggF7qNNwFD84CJsW07upVjH9M=
+X-Received: by 2002:a05:6512:20d2:b0:50e:7aaf:ec53 with SMTP id
+ u18-20020a05651220d200b0050e7aafec53mr1226739lfr.12.1706396490033; Sat, 27
+ Jan 2024 15:01:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ad7fac4-dcd5-4ef7-8e40-0c9fd1c6fd0a@oracle.com>
+References: <20240126193143.245122-1-kovalev@altlinux.org> <2024012613-woozy-exhume-7b9d@gregkh>
+ <472d92aa-1b49-43c9-a91f-80dfc8f25ad3@oracle.com>
+In-Reply-To: <472d92aa-1b49-43c9-a91f-80dfc8f25ad3@oracle.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 27 Jan 2024 17:01:18 -0600
+Message-ID: <CAH2r5mv2ipr4KJfMDXwHgq9L+kGdnRd1C2svcM=PCoDjA7uALA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] smb: client: fix "df: Resource temporarily
+ unavailable" on 5.10 stable kernel
+To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc: kovalev@altlinux.org, Greg KH <greg@kroah.com>, stable@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	keescook@chromium.org, sfrench@samba.org, corbet@lwn.net, 
+	natechancellor@gmail.com, ndesaulniers@google.com, 
+	"pc@manguebit.com" <pc@manguebit.com>, "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>, 
+	Shyam Prasad N <nspmangalore@gmail.com>, Vegard Nossum <vegard.nossum@oracle.com>, 
+	Darren Kenny <darren.kenny@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 27, 2024 at 06:59:15PM +0530, Harshit Mogalapalli wrote:
-> Hi Kovalev,
-> 
-> On 27/01/24 1:32 pm, kovalev@altlinux.org wrote:
-> > Hi,
-> > 
-> > 27.01.2024 09:42, Harshit Mogalapalli wrote:
-> > > We can reproduce this on 5.15.148(latest 5.15.y) and Mohamed
-> > > reported this on 6.1.y, so we need backports there as well.
-> > 
-> > in the 6.1.72 kernel, this problem was fixed by the commit [1] "smb3:
-> > Replace smb2pdu 1-element arrays with flex-arrays", which was proposed
-> > in this series of patches.
-> > 
-> Thanks for sharing this, I didnot notice that the above commit was
-> backported to 6.1.72.
-> 
-> I think we still need fixing in 5.15.y as the commit eb3e28c1e89b ("smb3:
-> Replace smb2pdu 1-element arrays with flex-arrays") is not in 5.15.148
+On Sat, Jan 27, 2024 at 12:43=E2=80=AFAM Harshit Mogalapalli
+<harshit.m.mogalapalli@oracle.com> wrote:
+>
+> Hi,
+>
+> Adding more people to CC.(who have looked at this issue)
+>
+> On 27/01/24 6:19 am, Greg KH wrote:
+> > On Fri, Jan 26, 2024 at 10:31:41PM +0300, kovalev@altlinux.org wrote:
+> >> After mounting a remote cifs resource, it becomes unavailable:
+> >> df: /mnt/sambashare: Resource temporarily unavailable
+> >>
+> >> It was tested on the following Linux kernels:
+> >> Linux altlinux 5.10.208-std-def-alt1
+> >> Linux fedora 5.10.208-200.el8.x86_64
+> >>
+> >> The error appeared starting from kernel 5.10.206 after adding
+> >> the commit [1] "smb: client: fix OOB in SMB2_query_info_init()",
+> >> in which the buffer length increases by 1 as a result of changes:
+> >> ...
+> >> -      iov[0].iov_len =3D total_len - 1 + input_len;
+> >> +      iov[0].iov_len =3D len;
+> >> ...
+> >>
+>
+> We can reproduce this on 5.15.148(latest 5.15.y) and Mohamed reported
+> this on 6.1.y, so we need backports there as well.
+>
+> https://lore.kernel.org/all/09738f0f-53a2-43f1-a09d-a2bef48e1344@oracle.c=
+om/
+>
+>
+> [root@vm1 xfstests-dev]# ./check -g quick -s smb3
+> TEST_DEV=3D//<SERVER_IP>/TEST is mounted but not a type cifs filesystem
+> [root@vm1 xfstests-dev]# df
+> df: /mnt/test: Resource temporarily unavailable
+>
+>
+> This two patch series doesn't cleanly apply to 5.15.y.
+>
+> Also I am unsure, which is the better approach to go with
+>
+> Approach 1 - suggested by Paulo:
+> https://lore.kernel.org/all/446860c571d0699ed664175262a9e84b@manguebit.co=
+m/
+>
+> Approach 2 - this series
+> Pulling in [PATCH 2/2] smb3: Replace smb2pdu 1-element arrays with
+> flex-arrays like this series did.
+>
+> I think approach 1 is better as the changes are minimal, but please
+> correct me if that seems wrong.
 
-Patches gladly accepted :)
+Yes - Paulo's fix looks simple
+
+
+--=20
+Thanks,
+
+Steve
