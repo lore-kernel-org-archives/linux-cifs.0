@@ -1,97 +1,71 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B191D524;
-	Sat, 27 Jan 2024 07:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F571D6B6;
+	Sat, 27 Jan 2024 08:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706340036; cv=none; b=G8SE7mANLk1J/VK3M8IRBHdUPCl5CmWg+EZF4yJjw03/MLj72iiWn1RZHQS/Mje8l5P3PZABIsdmexlw+OhfbwAe/O+qKr345rGRGkmbLZd1hH1In0NQs5fifSVW4DVI/dgy7E/p3t9guvJ31wJCfDkRLywf7WDxcI6kCWC/f+I=
+	t=1706342583; cv=none; b=TiBTWCvfPuVBfqo+qSTH3/ZXV9A5YbKMnx5k4K4pg8xBO7c4yUziG4pCWFjcXldFcswBBbhIFlS/wJU+QErsDqjkGCN24pdEtacof52jWCDE6XkAt80pesv1gast8QqxFRVu4+SVBl6oeu0vma14iM9qPD4VCmToS1jPvy8V5E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706340036; c=relaxed/simple;
-	bh=DG0T+i0aFTOnH0ZkHPv2DZqh/O1e2GiaMwd2yGa/MLY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=gfxrlDr1dEN/2BC8nJDXNRsKwyos9jdw3EpAgzTvvXaPleqb8SNqV1hSPFN6sXQz5jmIvLChzLHnoUsvvRV0Rk3/+JPSVvLbPmzLllaKxCYllawNnquE7gyrjyoukYCpdsQ5fgaB2j/1yiOuvNmzJlrXkLPOsLlio5Woc0/tGpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jIQioKD8; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jIQioKD8"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51028acdcf0so1235838e87.0;
-        Fri, 26 Jan 2024 23:20:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706340032; x=1706944832; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qkT/O48GLFNhmSB0dmvxtjrh5cflJ0MwZ+5bygqYP8o=;
-        b=jIQioKD8SMFuC5AvVWAXf2phcaRBuwWxe6shf4+LR12qkw5TCRqlzoqnJJtTgP+Vpx
-         Hf2WgKKgE4DCyrED+vwu6aKyCqQs+0Y/qKqsGcgsYScng51ssPj8M1kwmElFP3rUMBDz
-         qZdzmgULoQvSe2IioPW8xMgXWcrbS7VPP4YHnl6Iz+I4IL2LkOCtStyhKzZZcliYxWJ2
-         jRPv0bl86UtZI7MpBiOPS1G8DtkChZMMMckEMX2CA5Z0xnvj3I8V+YYmK/S5sVH/NnNA
-         jweXgzmcVWdaLF3dCeHSSNI8tDPx00o3tNjSKWkD5O9pesB+YhJc2plPBXBC3dgyvgR0
-         Enfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706340032; x=1706944832;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qkT/O48GLFNhmSB0dmvxtjrh5cflJ0MwZ+5bygqYP8o=;
-        b=CLCMjLOA1daKOF1fk1HwrpqRI7o/pjjWCbJ1WM9Zbs56QedhOded/vAqOcpVTIPqpO
-         09lABxXQUGnkT7BDr2aUZIkv1jcpakYArGnQ/sDLADf8Fsu2CC3H8CVISdWyrl3Qf/GO
-         Lp5eq0stzDqsTOygHuBudO6GnOQ9cmwwpKS9sgk5oerPuliK8mMRF0U34TQsYyfBqFwI
-         /xskthFf97BoM9fcOHwM+ybGOQKM+LJ4o5MRbSMtTg/zBR/sUOGspfqQ9rsVRCpKkKtX
-         xN0GgHH1dEk+HYWtr+FHsT/ezpFWdIzWs9CNkg+ail0Zae1vTb7Cxn6uF6/9huOG8h88
-         1iLg==
-X-Gm-Message-State: AOJu0YxarfJqrKuzVOe+T3DMtJD7M11YqQCQtzg6I28O/313NqeS5Ns5
-	LvyoQl+9w7ivWb9ZamunmaDOYby/dhIdTNGIcqL1kAaA66RocXd0k5mDnhZvc8rSkn6sujoyPHZ
-	odpSFooz52OHoMvwD1xPHkfdr8K0msEFm
-X-Google-Smtp-Source: AGHT+IE0uFI9d15jjQoRZIaWTwIjN4NeIlsEkhnwWccKMrv58WW9QFr7XZJfb0a9tXxtsDWjS7fCo3E8yl7DH98YV5Y=
-X-Received: by 2002:a2e:9794:0:b0:2cf:4f79:9b4e with SMTP id
- y20-20020a2e9794000000b002cf4f799b4emr683645lji.41.1706340032284; Fri, 26 Jan
- 2024 23:20:32 -0800 (PST)
+	s=arc-20240116; t=1706342583; c=relaxed/simple;
+	bh=jCdjWKQK7HL95zpeESitIw6yDltgmHC4OEMcv4BXJ3Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DQO7FUGtflXuO2mBF95HKuG816wFJ8snpOunGl45YYLRAaLAQm90V2QSDK1l2rrT+bDGxFKG2q5w9wB17SiXOXbXMRSll7jnGGmfTj5Or38xqIdmRo4eZpztJCVTIlqBTjI4ZJm+XCPus/eZ1Cmb6fAql1gQnzepD9tJT6gElHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 32F5A2F20227; Sat, 27 Jan 2024 08:02:58 +0000 (UTC)
+X-Spam-Level: 
+Received: from [192.168.0.102] (unknown [178.76.204.78])
+	by air.basealt.ru (Postfix) with ESMTPSA id 9D48B2F2021D;
+	Sat, 27 Jan 2024 08:02:54 +0000 (UTC)
+Message-ID: <57fda449-0d18-485a-0858-39f48722fe27@basealt.ru>
+Date: Sat, 27 Jan 2024 11:02:53 +0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 27 Jan 2024 01:20:21 -0600
-Message-ID: <CAH2r5mt0S22dHKCYSK2pMOX8mc+K9Dp+zV-Ocdy_15ZCHvdMWg@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/2] smb: client: fix "df: Resource temporarily
+ unavailable" on 5.10 stable kernel
+Content-Language: en-US
+To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
+ Greg KH <greg@kroah.com>
+Cc: stable@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, keescook@chromium.org, sfrench@samba.org,
+ corbet@lwn.net, natechancellor@gmail.com, ndesaulniers@google.com,
+ "pc@manguebit.com" <pc@manguebit.com>,
+ "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+ Shyam Prasad N <nspmangalore@gmail.com>,
+ Vegard Nossum <vegard.nossum@oracle.com>,
+ Darren Kenny <darren.kenny@oracle.com>
+References: <20240126193143.245122-1-kovalev@altlinux.org>
+ <2024012613-woozy-exhume-7b9d@gregkh>
+ <472d92aa-1b49-43c9-a91f-80dfc8f25ad3@oracle.com>
+From: kovalev@altlinux.org
+In-Reply-To: <472d92aa-1b49-43c9-a91f-80dfc8f25ad3@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Please pull the following changes since commit
-6613476e225e090cc9aad49be7fa504e290dd33d:
+Hi,
 
-  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
+27.01.2024 09:42, Harshit Mogalapalli wrote:
+> We can reproduce this on 5.15.148(latest 5.15.y) and Mohamed reported 
+> this on 6.1.y, so we need backports there as well.
 
-are available in the Git repository at:
+in the 6.1.72 kernel, this problem was fixed by the commit [1] "smb3: 
+Replace smb2pdu 1-element arrays with flex-arrays", which was proposed 
+in this series of patches.
 
-  git://git.samba.org/ksmbd.git tags/6.8-rc2-smb3-server-fixes
 
-for you to fetch changes up to ebeae8adf89d9a82359f6659b1663d09beec2faa:
+[1] https://lore.kernel.org/all/2024010937-eggplant-bauble-d556@gregkh/T/
 
-  ksmbd: fix global oob in ksmbd_nl_policy (2024-01-25 00:16:54 -0600)
+-- 
+Regards,
+Vasiliy Kovalev
 
-----------------------------------------------------------------
-2 ksmbd fixes, including one for stable
-- Fix netlink OOB
-- Minor kernel doc fix
-
-----------------------------------------------------------------
-Lin Ma (1):
-      ksmbd: fix global oob in ksmbd_nl_policy
-
-Yang Li (1):
-      smb: Fix some kernel-doc comments
-
- fs/smb/server/ksmbd_netlink.h | 3 ++-
- fs/smb/server/transport_ipc.c | 4 ++--
- fs/smb/server/transport_tcp.c | 2 ++
- 3 files changed, 6 insertions(+), 3 deletions(-)
-
---
-Thanks,
-
-Steve
