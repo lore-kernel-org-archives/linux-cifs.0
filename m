@@ -1,43 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD3C55C3C
-	for <linux-cifs@vger.kernel.org>; Mon, 29 Jan 2024 09:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB365787F
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Jan 2024 09:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706521778; cv=none; b=fc9rMiSQLY7oEIFciIWpvG96TW4/6rp9Zi7Iig0eJewf82gm665y4WIGgYBPCGpQQ1EHs9cbWDamqHf8UYS27QewWJxMPLWHpu+m3NqHot/R/AMQf9rcDvu7+iK43+WKA+XHAprAID1zvynKdrzsnbKal9H5qNKB2hbKfOP5gbo=
+	t=1706521783; cv=none; b=tz3SOrQhVGFlhz9uca56Ph/DlQyl0fO17McyQOIzJNf4LNK2wbqOVXcPO5t+F5zlhYaCz4UjNIxUYfWnmf6rj856Eq6zwa8qpC+eqjEkKBo82tNVki5lug00je1si2laieBLqejGgAd9ew3uhtkGZnMCFCpEaRkRbqgr4+Q59ZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706521778; c=relaxed/simple;
-	bh=9fwTsy09+zhtJYD5oZvv7jgCqz036BRm5TDsLVRnhYU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8ddyDaeRjaY5SjJYUr60fXHs/SCkXgwd4XF+r2E88XSjey/Lt4XjEDQPcFIejenX1+A6+TRGF6LkCtD5cHaCSLE3OdoYj3i+O4Hi/TeUgNSSxWuyVNpoHEaCx1u63K7TASQdDf14ZB71IHil10xqOVxgTO3YSJ4SYLtuh94Scc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cyp5jKka; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706521783; c=relaxed/simple;
+	bh=GNEZC7jukHLtUekXJTCkBRDymlNX9cTfVheqMT+wF+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hGm0O3gTGHZgOB3nshOuib1KTVEONOV4csrzeeWLyclgpiY7bjHMZqocjqwVhqu1gKlihbPJK7w4fGgaLTrZGN21o6Rmy8O66zMF03xZt7fFrr5DVDIgdhmi5xAfyFhKLo7ZMkwkHBoHCrYDRp6iMXK0Y04SS5G3+fjzqsXR9fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ddo3xmi5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cyp5jKka"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddo3xmi5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706521775;
+	s=mimecast20190719; t=1706521780;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=OCIW9vJhBOYMefsIUqmT/GeymZeEusUcC32sI5mr9No=;
-	b=cyp5jKkat2FykfsccWx2YpP3e0Ci9SYgHnbZIdX+BrjzpGuqgPx8+Anzn528vROXxXxCNk
-	LtRuxaj3oKduhJefpU/j5HkH2tf6p8RMZ9O+Ieqn5/LgpU027227Z3SzoQAnXGnxsp159X
-	Cgt/h76Ij3v9jOBOgGA+9TvlCLZpIoc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ty0Sx4Ua+2bn5g9HXUfTFpOpeFYCT/PUmNHnpETf4uo=;
+	b=ddo3xmi5FNEtITVh40eljg/sOUWZ2KS/bNInO5f2O7ajtnFP4U3rCT1Ybn6gjja7ghgGr1
+	sahWb0jDhDmo6zKQEImCgI8vGSuh+kpKE5IzqJf++Zaa6IT1JYsmtZfp0RWN+6J1GK5/6M
+	4ScpvAzzIBLozZ9Ka+juIwVgcKssnhg=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-_Qr3tQcfP8S6khmn53WbBQ-1; Mon, 29 Jan 2024 04:49:29 -0500
-X-MC-Unique: _Qr3tQcfP8S6khmn53WbBQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-605-X_1LCiW7OoeQwPj1VhB6fQ-1; Mon, 29 Jan 2024 04:49:35 -0500
+X-MC-Unique: X_1LCiW7OoeQwPj1VhB6fQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEBED811E81;
-	Mon, 29 Jan 2024 09:49:28 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8808688B7A3;
+	Mon, 29 Jan 2024 09:49:34 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 844B91C060AF;
-	Mon, 29 Jan 2024 09:49:26 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 79BAB492BE2;
+	Mon, 29 Jan 2024 09:49:32 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -54,10 +56,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] netfs: Miscellaneous fixes
-Date: Mon, 29 Jan 2024 09:49:17 +0000
-Message-ID: <20240129094924.1221977-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	linux_oss@crudebyte.com
+Subject: [PATCH 2/2] netfs: Fix missing zero-length check in unbuffered write
+Date: Mon, 29 Jan 2024 09:49:19 +0000
+Message-ID: <20240129094924.1221977-3-dhowells@redhat.com>
+In-Reply-To: <20240129094924.1221977-1-dhowells@redhat.com>
+References: <20240129094924.1221977-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -65,32 +70,78 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Hi Christian,
+Fix netfs_unbuffered_write_iter() to return immediately if
+generic_write_checks() returns 0, indicating there's nothing to write.
+Note that netfs_file_write_iter() already does this.
 
-Here are a couple of fixes for netfslib:
+Also, whilst we're at it, put in checks for the size being zero before we
+even take the locks.  Note that generic_write_checks() can still reduce the
+size to zero, so we still need that check.
 
- (1) Fix an i_dio_count leak on a DIO read starting beyond EOF.
+Without this, a warning similar to the following is logged to dmesg:
 
- (2) Fix a missing zero-length check in an unbuffered write causing 9p to
-     indicate EIO.
+	netfs: Zero-sized write [R=1b6da]
 
-The patches can also be found here:
+and the syscall fails with EIO, e.g.:
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+	/sbin/ldconfig.real: Writing of cache extension data failed: Input/output error
 
-Thanks,
-David
+This can be reproduced on 9p by:
 
-David Howells (1):
-  netfs: Fix missing zero-length check in unbuffered write
+	xfs_io -f -c 'pwrite 0 0' /xfstest.test/foo
 
-Marc Dionne (1):
-  netfs: Fix i_dio_count leak on DIO read past i_size
-
+Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+Reported-by: Eric Van Hensbergen <ericvh@kernel.org>
+Link: https://lore.kernel.org/r/ZbQUU6QKmIftKsmo@FV7GG9FTHL/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: v9fs@lists.linux.dev
+cc: linux_oss@crudebyte.com
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
  fs/netfs/buffered_write.c | 3 +++
  fs/netfs/direct_write.c   | 5 ++++-
- fs/netfs/io.c             | 2 ++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index a3059b3168fd..9a0d32e4b422 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -477,6 +477,9 @@ ssize_t netfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ 	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
+ 
++	if (!iov_iter_count(from))
++		return 0;
++
+ 	if ((iocb->ki_flags & IOCB_DIRECT) ||
+ 	    test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags))
+ 		return netfs_unbuffered_write_iter(iocb, from);
+diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
+index 60a40d293c87..bee047e20f5d 100644
+--- a/fs/netfs/direct_write.c
++++ b/fs/netfs/direct_write.c
+@@ -139,6 +139,9 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ 	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
+ 
++	if (!iov_iter_count(from))
++		return 0;
++
+ 	trace_netfs_write_iter(iocb, from);
+ 	netfs_stat(&netfs_n_rh_dio_write);
+ 
+@@ -146,7 +149,7 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	if (ret < 0)
+ 		return ret;
+ 	ret = generic_write_checks(iocb, from);
+-	if (ret < 0)
++	if (ret <= 0)
+ 		goto out;
+ 	ret = file_remove_privs(file);
+ 	if (ret < 0)
 
