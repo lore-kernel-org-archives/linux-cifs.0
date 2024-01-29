@@ -1,65 +1,110 @@
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B72537E7;
-	Mon, 29 Jan 2024 08:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008E75645F
+	for <linux-cifs@vger.kernel.org>; Mon, 29 Jan 2024 09:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706516376; cv=none; b=VWis4kk/Dbo2QbArjpxNfUqzCQMcNPk0f+f1kxtwqeZ56W7+qEqu6HWh1aJlEFKK96M786VoEy3IPsrzMmquZg94FIlwDoUM1TCVpbBMMZFkYegM7OxSH3gSG9vgwSlXEBtwl6hvhtvuZRC400cuP1BEuflBF8Fh6FzuOSRHfrQ=
+	t=1706521778; cv=none; b=uQ/LzLSLxA6z3i+YiSXQ06wVSiFbsbHq9XkpLOkRo16pmfnT7IhHjCBUSMEMYz3+MH3t5y/+1s+9I5dgx3Nm7m2rbagSju5Kwk6I6P2BZWF4hSgy1dRI4n2fhO67YJF5/a2EaZvHmAP5LjZXj3wg+MXyjZyO2lpB1iUdGDBy6qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706516376; c=relaxed/simple;
-	bh=JVQ8C19NhA4E5YeKHFAnWi4eMOlJPZhQ5BYVrlIRvfY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MggLGn2endfHTedwgw0efT7Ea8zp9/PFmpW9/1BcJXed6xG9T1fhDLg2AEhTiTjiKfYbKV5FYE2MWirMYfb5ugX2SC+Vo1WxriCZSQ2D8ibLUTh+trurGAm2ms9WHVNP/6nHyO3uRYdyb1o6Jkb9+WtJfKG/6eEcV4EnMYFwaFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id A814D2F2023C; Mon, 29 Jan 2024 08:19:23 +0000 (UTC)
-X-Spam-Level: 
-Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id CFD762F2023B;
-	Mon, 29 Jan 2024 08:19:19 +0000 (UTC)
-Message-ID: <06bddf4e-a15f-bf1b-b9e5-d173cdacf4d0@basealt.ru>
-Date: Mon, 29 Jan 2024 11:19:19 +0300
+	s=arc-20240116; t=1706521778; c=relaxed/simple;
+	bh=3SKQ1UY5AtuT9Hi3kMvGeBfzklACbNG9lR2rVyYGSFM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e1Ja2zMFNFnWkEWb1KJikZsmRoopVIO8++TyTnmYpCJCKnfe7VXcOxiJuvc5ggJf4KaZNRDZNCb+d8krT2DNpL+ZCGqR2VN/ADA//eaa9uLyDKUJkLpF3KF5mCsqyju+wTc+iVVu+Qq+r5E1M357cW9QS7KTWPewtZQwlI2NK6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+ovavLR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+ovavLR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706521774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pRcl53v/D7LNYmHWLVDHFLzWMRLsRvElPDySPluG9Xk=;
+	b=C+ovavLRBE7UFrezDOlKwLgut6MKJdxjY5j9aFrPIUUZm2DhPCXOoA+65C8gkQFP7Tf9UB
+	VOrTrEpgya1NuhFJX/SkQpXtUeBhw/4rJMbk6QT9g3+4TEFFl7fja8iXbv6CdYU26zFUVt
+	aeDqR8Zz8jxamyR9LPxZKCvIwmdpVFU=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-2MqNdY6VNp-CfaPkR9IzXg-1; Mon,
+ 29 Jan 2024 04:49:32 -0500
+X-MC-Unique: 2MqNdY6VNp-CfaPkR9IzXg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0F563C2B606;
+	Mon, 29 Jan 2024 09:49:31 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4EF73492BC7;
+	Mon, 29 Jan 2024 09:49:29 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	Marc Dionne <marc.dionne@auristor.com>
+Subject: [PATCH 1/2] netfs: Fix i_dio_count leak on DIO read past i_size
+Date: Mon, 29 Jan 2024 09:49:18 +0000
+Message-ID: <20240129094924.1221977-2-dhowells@redhat.com>
+In-Reply-To: <20240129094924.1221977-1-dhowells@redhat.com>
+References: <20240129094924.1221977-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 5.10.y] cifs: fix off-by-one in SMB2_query_info_init()
-Content-Language: en-US
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- stable@vger.kernel.org
-Cc: abuehaze@amazon.com, smfrench@gmail.com, greg@kroah.com,
- linux-cifs@vger.kernel.org, keescook@chromium.org, darren.kenny@oracle.com,
- pc@manguebit.com, nspmangalore@gmail.com, vegard.nossum@oracle.com
-References: <20240129054342.2472454-1-harshit.m.mogalapalli@oracle.com>
-From: kovalev@altlinux.org
-In-Reply-To: <20240129054342.2472454-1-harshit.m.mogalapalli@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-29.01.2024 08:43, Harshit Mogalapalli wrote:
-> This patch is only for v5.10.y stable kernel.
-> I have tested the patched kernel, after mounting it doesn't become
-> unavailable.
->
-> Context:
-> [1] https://lore.kernel.org/all/CAH2r5mv2ipr4KJfMDXwHgq9L+kGdnRd1C2svcM=PCoDjA7uALA@mail.gmail.com/#t
->
-> Note to Greg: This is alternative way to fix by not taking commit
-> eb3e28c1e89b ("smb3: Replace smb2pdu 1-element arrays with
-> flex-arrays").
-> before applying this patch a patch in the queue needs to be removed: https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tree/queue-5.10/smb3-replace-smb2pdu-1-element-arrays-with-flex-arrays.patch
-Maybe I don't understand something, but isn't there a goal when fixing 
-bugs to keep the code of stable branches with upstream code as much as 
-possible? Otherwise, the following fixes will not be compatible..
+From: Marc Dionne <marc.dionne@auristor.com>
 
--- 
-Regards,
-Vasiliy Kovalev
+If netfs_begin_read gets a NETFS_DIO_READ request that begins
+past i_size, it won't perform any i/o and just return 0.  This
+will leak an increment to i_dio_count that is done at the top
+of the function.
+
+This can cause subsequent buffered read requests to block
+indefinitely, waiting for a non existing dio operation to complete.
+
+Add a inode_dio_end() for the NETFS_DIO_READ case, before returning.
+
+Signed-off-by: Marc Dionne <marc.dionne@auristor.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/netfs/io.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+index e8ff1e61ce79..4261ad6c55b6 100644
+--- a/fs/netfs/io.c
++++ b/fs/netfs/io.c
+@@ -748,6 +748,8 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+ 
+ 	if (!rreq->submitted) {
+ 		netfs_put_request(rreq, false, netfs_rreq_trace_put_no_submit);
++		if (rreq->origin == NETFS_DIO_READ)
++			inode_dio_end(rreq->inode);
+ 		ret = 0;
+ 		goto out;
+ 	}
 
