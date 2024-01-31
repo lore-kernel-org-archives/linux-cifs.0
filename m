@@ -1,97 +1,83 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FBA78683
-	for <linux-cifs@vger.kernel.org>; Wed, 31 Jan 2024 07:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706685024; cv=none; b=m63B7TQfIEJXmKHktn2S/UTAdcMNu6dJcuK+iPKZmTB6trwkXFlGZSPO9YKdXof/UjoG/jLiFLDcQA11yJMKSsunagBGggnUOKs6Js4jr3Z+8n8hRtE7BrF8CY+7e7CrsH9P1IVjzC99Wb2vcr+22iHFu5C8U0KCQI8DDUKFSf8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706685024; c=relaxed/simple;
-	bh=64+50SEu7bMaznhj+tfj6rGm3p7Mn6Ou6pGwTLtkJU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hBVbOSKhfDzNA5ctm6NGMXWjnYUSyPHy8j2LSmsFjvjTX/leUkz0RzsWsqoNJduubT8uObBoidjnr8KrWE97YJl0xTHwtoo+kIN+Js6cM2JxDwcjnhDqHMtkTNgJQDjAhcPIQmMdQtNlpEgle4DC4KGD9YVBE8H2L5abgLZwsn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JPs80czN; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC80912DD84;
+	Wed, 31 Jan 2024 17:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706721802; cv=pass; b=r2ttYtRCJoMky9DAIlAoXaF0A2ZMUgthSYJ2J/WpyIP4V8uDfvLfEwcayHLFfm5aVA+I5JuYogSJSBk+KID/iI7fBZENnSWMsou7Lc3IDlQ+gtjs/J1mhUyUpZmXyHHnjV1WffIYZOgkwL+d4k7sYKWphy+Pu8Qz5X0bisoO3ok=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706721802; c=relaxed/simple;
+	bh=OkbyR1eOud37M5OLwfX1vWYkrALqqo3FGkCmHla/MMA=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=pB4xvcP5dTCnXtZRWcPk+IEU2twgSD3YLBVV3g7sJTdic7D7nr41jQOkt6bHmmDVuDvCCNwh2vcivR7BcrSstlCQfWsgkxrKt4kMQf9Yh4mUQJkMVhdZoXbzcY8Zf/S5vPeWF9DtQJCq8blyI8ui2EzoYwLXkhv0bM9DsWi+aWY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=T5SxKhAA; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JPs80czN"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40f02b8d150so12379745e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Jan 2024 23:10:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706685021; x=1707289821; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vc7Ay37ay3645f2H/l3hoUbCFFGpLA9KuX/mQOmWXIA=;
-        b=JPs80czNPh/LAg6Y6gi4RQkBT1BcxdCf5ZzhL92x/FA+1RjPC6qFmVrHLe3O9sK5wU
-         oAlfIJHBMzHP5apviTANB2P3t/3ctHOlKernQZiZY45ItPHqLYXhPYgdzsXkYtQ+dSPO
-         naU5rccvkGCjrXlWi52NrwlzrwjkrE+/CixDEpBC8II1l5NcjSBoYUw2P/0uXmaMDmsg
-         D4rWoyoAFuhJmqytAgmYxTmLMN1KNER3pKjjhAqG/yciLSI24Fl8Br2ZFghcf0yHoVIM
-         b5HzawekLeohOLaahuLy25SuJTqbtcpt/VUczpWBpmc0mqGyK/xpvmODRH2z90TE3S+4
-         SCeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706685021; x=1707289821;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vc7Ay37ay3645f2H/l3hoUbCFFGpLA9KuX/mQOmWXIA=;
-        b=k8Vf5Gy7uuKyp14u/XL0KF2JcAaICK+O9/vKMUdoVkPrtkMODKQZKxBucV1266DjqV
-         WlYZvDmPShAbLRLS7TLlut6GRqUnOWQVPGzcUnisqFpGAm2FjfgsI/lLHcXNV0X+eS80
-         +VvZNhnuP7RqEdkNxMjapXXA7E/Wwy/c1ocP1WD31uFhSkdVEu6TaHRC0WWMjPSQwJ0d
-         mNZkT46smcL8+7ec+dY5y6G0LbsVzt6vxOpoxY1rnSoVz6B2UgP/r/H9ntOUT0YN0efV
-         6T4Kt4E1qUzNZ8dgF0AlBnrxt0Nr2dyALVpxKwdVQXlzlXPTcmDLvK0tpK7/DbPj7b5C
-         QHgw==
-X-Gm-Message-State: AOJu0Yw8fPCNfYZTevp3UabeghqiIHCfcExH69MmqWhvaAh8tF3V+THq
-	LACXSyz/mrC99R9GoK3wFaVpKdPQzbst3WAztpG6ncB3IEFG2FMamiA8MGoZoZaP0OIblUJABmu
-	I
-X-Google-Smtp-Source: AGHT+IFXo2HcWmvuyG4b6xsYseqZ6xdR/0xrJoLYo/RaHcbhl9ESjeisij6PH95V7cr1Hrpo3n4U7Q==
-X-Received: by 2002:a05:600c:4749:b0:40e:545b:80bc with SMTP id w9-20020a05600c474900b0040e545b80bcmr619945wmo.29.1706685021366;
-        Tue, 30 Jan 2024 23:10:21 -0800 (PST)
-Received: from localhost ([102.140.226.10])
-        by smtp.gmail.com with ESMTPSA id v16-20020a05600c471000b0040fb30f17e8sm650884wmo.38.2024.01.30.23.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 23:10:21 -0800 (PST)
-Date: Wed, 31 Jan 2024 10:10:18 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: Steve French <sfrench@samba.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] smb: client: Fix a NULL vs IS_ERR() check in wsl_set_xattrs()
-Message-ID: <571c33b3-8378-49fd-84e1-57f622ef6db5@moroto.mountain>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="T5SxKhAA"
+Message-ID: <e0861faa7b564362e384783d4e52e38c@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1706721797;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T7jJIaYqMSfxPjtLTr60DeUKvzsmBPgfKadAEZC9wwo=;
+	b=T5SxKhAAJiH0NWcSdazzl+wRI6/ATIDRkkLlsiQNj6P+XSRcZbj16uQSZC0qMDWHAm/t32
+	y3POA/YOv31Sz7HR3CLt+qJJexg5TUwkuKcp5NJTBbFLZzZnu9zaEDytRQivcziCm+AZWH
+	LMgHe6mCtAMfq17ajMJCzLrvpP5ktkIwK78qGV82ODHXyN8rT0x2zsb3tG5RiAFgCsrTzy
+	NH74VvHMxbJKrFOC0ImAbgSq1Zfq9XhmDUE/MQUqsX4418pw5a2QvC9/S7qhsFiMZ1WXUL
+	mhzMCgYV1wv98suc2P4xMB91L0BXTjcy8EBwMzcdjcoQOHF8uG6EldVD2ldU7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1706721797; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T7jJIaYqMSfxPjtLTr60DeUKvzsmBPgfKadAEZC9wwo=;
+	b=C7S5PNyeFynbMjNaJdSIVnEfbdRFQhB66SkNb1tyfxDZGujMTB0pCmkhAgVK0B/IzSCNn1
+	DAFhaayE8FIoBcoPKWW/aZ+0d9i7F7bfeTiHJ5DggJGzVECZnNjp757YOVxmGKTbFj1oc9
+	7EUdrv8LuXa8AwB/9Sak9f74/9s76JnCe15r3D0Trtna3aMjyINxdnnEbQu95upfGYiDWH
+	MiDCKRwrq3JZfXl2IuDN2jJ53NpTh6XV15v+VU1vfKKZMBuzf9p1Es70dUre7kXa3rO1Ji
+	vVf1fYcK5zOWB4CBmewCsiBV4Hg/MYs4GAkvoyAtLLbwpAZviVA4gi8fLQQGLA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1706721797; a=rsa-sha256;
+	cv=none;
+	b=o37iH5DlZhudX0g7wrQFXivWYBlZfw6KV7qoPJAOAGnneqnGleIIuyAbIJCgSkfaJercFA
+	C3wJSco9alFsazIkS88c9WTPVBCfqUiTAlYmkz2x/KW8rBkWJ9+ODTPvF3Zr4QMbyrGaAI
+	tQ1FMh0x1QNMcTKe7c9+xnOZnGfrxfdmGBxAngqv5a3U7ww6sF3xf0MW2VYeXOHpeOGHc5
+	tGudQ+zfB1Jrnx5O6JrqvOJDG9iCcS0yk0Oah8eGvnuN7xNPAUiTVqtezehrQKk6AnpWOX
+	BKHyojikbjpT6meialC9E4L4rrFOFFHt60tZVArrThILfV7IQDYxKBswH/fnwA==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Steve French <sfrench@samba.org>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] smb: client: Fix a NULL vs IS_ERR() check in
+ wsl_set_xattrs()
+In-Reply-To: <571c33b3-8378-49fd-84e1-57f622ef6db5@moroto.mountain>
+References: <571c33b3-8378-49fd-84e1-57f622ef6db5@moroto.mountain>
+Date: Wed, 31 Jan 2024 14:23:13 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Type: text/plain
 
-This was intended to be an IS_ERR() check.  The ea_create_context()
-function doesn't return NULL.
+Dan Carpenter <dan.carpenter@linaro.org> writes:
 
-Fixes: 1eab17fe485c ("smb: client: add support for WSL reparse points")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/client/reparse.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> This was intended to be an IS_ERR() check.  The ea_create_context()
+> function doesn't return NULL.
+>
+> Fixes: 1eab17fe485c ("smb: client: add support for WSL reparse points")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  fs/smb/client/reparse.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index ce69d67feefa..d4d2555ebd38 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -225,7 +225,7 @@ static int wsl_set_xattrs(struct inode *inode, umode_t mode,
- 	}
- 
- 	cc = ea_create_context(dlen, &cc_len);
--	if (!cc)
-+	if (IS_ERR(cc))
- 		return PTR_ERR(cc);
- 
- 	ea = &cc->ea;
--- 
-2.43.0
-
+Reviewed-by: Paulo Alcantara <pc@manguebit.com>
