@@ -1,116 +1,113 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD122134F
-	for <linux-cifs@vger.kernel.org>; Wed, 31 Jan 2024 18:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD3F3FB39;
+	Wed, 31 Jan 2024 20:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706726807; cv=none; b=Ru1Lv18FlJ02gp/KPxYcE/HnHpGZ5DaQvtTi5ov0gWvakfUTq/aYwsb+wo0L72lfbY9+me2PHCnltEFjiZenoLuuobPMFns8S40dnXaZ8jrcupH3BwcBINTv4mPUZyeQFAFOACFDdk4nBhetMOQLmiCs2EsGTY98ZbWI7EuI7w0=
+	t=1706732452; cv=none; b=Vt6B3ueld0QRLyn8pYYehEntTb0bI5MoIxSv7WVrVfcCMeut7NaQls0Fpw5cppr+5EC3O6ZMeNVyz+3z+6A2tzZkYsnUgISGJ8HTyqBmJKATRz6NEFX21hfzqXwAc+lQRyuUCl5Lw+uVujHSGablcsMLgNGmlBUPJJosYzNdYQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706726807; c=relaxed/simple;
-	bh=AZv2Lb5jovdsTBtDNuZSBrXMQpXu/M73zfFem6LfC8s=;
+	s=arc-20240116; t=1706732452; c=relaxed/simple;
+	bh=jZewVfEeg5K9SkK5UySM3h5rrkjoCak4+ZjrIOKh0cA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=s9r4RRcUXpdZ+ZD0s2kidSd2YqnFCAldLDeRNeGE9GEGeL44F69O6O0WGN32w92sRJo9YKdi2Qs8dczIMkm8Erllc3kW73toeC2IOR63wpOHy2A3VQwWlHieBiXHaoQermlAOHYPjJ80hlHuFsmUa3OE+8oxQGY7p09jPb0Xe+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mG53SePG; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=KN7VmHDqS7RRXXP06hpsEcJRuqz3ffnxt3Z0Xh/LhIwai37jJkB2GQ4qg9xzx/jpgr1OwilpDu7/7PSH/4Sh8BiZpxv88UA/JI7OOpGjTTzuThN+QK/Blev9ZlZoPxMiX5paLN0v2JVCZ+PeAx1LfGSRDSJIBpSG7FEnKrvnKUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4hzoWcK; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mG53SePG"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cf33b909e8so11823961fa.0
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Jan 2024 10:46:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4hzoWcK"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5111e5e4e2bso183676e87.3;
+        Wed, 31 Jan 2024 12:20:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706726803; x=1707331603; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=gmail.com; s=20230601; t=1706732448; x=1707337248; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AZv2Lb5jovdsTBtDNuZSBrXMQpXu/M73zfFem6LfC8s=;
-        b=mG53SePG0Yxm5ayCLR/Chww/bI+uqfbix3rItbFNRCEC7aYlxovfNlIL9uP4T41sbC
-         JUCoqvDdUsQgnMUSzcbQ16Gg4blKM/NGa6Y8T+R0KfpXQWOvWyrD63xtdms6JxNi3X+g
-         nOIeBrX+vgvlrtV8K057J/qDBiZF59Wi5WmuSvoAJS5T05R/9g19IqnqC5rWsMz4IVGe
-         Hs7zeO8PVpyCSXq9Awgj7FcBFi7aFa+IPYGQINEHu4QiEgJgVRydSElU56C7tp0zNonF
-         ddW/cz0/TUB9towCRW7sJ//LaVq0HYIXPDARDaedutJq1PPxPGFvnIGPi1E830qnVxGu
-         2S1A==
+        bh=YeIsgl8+EFYn5S6ni1qvspvfCQnicxx3gHZ+U13Srac=;
+        b=R4hzoWcKKoyTVosqeyrKm3ShYUvpt+koT41ICXht4vNEVDg46l3YUjETZsZpOR+BIM
+         fjF3ZC/ceyDAucyBmqRYchkVLN/mgp7EaAEL/dz4S7qI4kAMbcd9VydRid9SGx7/5nis
+         A4AoIUqraeJ4X6AJFOAU0rFnc2Y/Hf/0FY+FTQKmjn0R082NY1M0H+RW3OCldbbWWyjl
+         /ly8DfLUsFrw81nkN3QrV8klBn4VdP//YVp3vA9Proy05Y+OBADBlbka9N8i9qTZ22Jp
+         hGk2iItKNfmZ86z3Zlf+qRHAaznfhz7RkiyI5uwR+87o1vyMbiF6QhHo+cskodpSXoA3
+         Xz7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706726803; x=1707331603;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1706732448; x=1707337248;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AZv2Lb5jovdsTBtDNuZSBrXMQpXu/M73zfFem6LfC8s=;
-        b=GuMwQRatGUy5p0KxmG74CdzG8KXdcVPAM3WwCBv3JJ9rw8HPcXwfFvy6ml9hCZWRcA
-         BYuXqrT34LhOczQmTtRxU7Dr+/3BkWPU2/k/e1HGo9HQ7lraKWGmlfsCnLTPqjL3U9AT
-         AlAABqMEmRqg0sEryBMLOLu5hNOdw8fcouQ4RwsW6h9wxlnP+sCfsE4i8n7NuLic14zh
-         0AFVyVanKCU6mjfT4s+WE45zAKJIMQfmL1FqZjozjrO9Do/3Ekj8bA6ASOuh7uCH6C/o
-         /7+YjUh1gDdC2gt8uKlyTg714dWJwk2l7BEioEw6d/id5X9WXQq/dZRn8Bavl8i2Cngh
-         Dgzg==
-X-Gm-Message-State: AOJu0YxrGvX6XWGfOh+Iqy0ymreLEHP2DgDsYyndHidDP9+sQiGdihHs
-	bUFks0Adza85w4fBCXCgRm4vDoYNpjwltTt/tuxlfifX0xheFbP/kaGT6nPRIVRyzDHPVUb2GYV
-	0JJdODvK4Hbfj5MiXWLJk8H1b/DmEpG4V
-X-Google-Smtp-Source: AGHT+IFkV1Xw+BBKYIr1HD49YOCW3XpEB1dBpEt6p0dy+Ncg6uUNYZ01J64Kg+x0p6QLVfznwOE3d98lrGKBwHx2KPg=
-X-Received: by 2002:a19:6404:0:b0:510:1798:788e with SMTP id
- y4-20020a196404000000b005101798788emr43860lfb.32.1706726802833; Wed, 31 Jan
- 2024 10:46:42 -0800 (PST)
+        bh=YeIsgl8+EFYn5S6ni1qvspvfCQnicxx3gHZ+U13Srac=;
+        b=sCuhjgzO8h/Lx2xvdOYqWDk/WlWQB1sGRBiH3om4B3gxVNEo92ZXkJ1Rz96W5fAdTe
+         XvWEH6+CUMtn9WUMC2JD5hGihTt7xLENYZTvgi68IGZcPoM1WkJn2G3EY2t5KZvsUPFT
+         J2KdDzTXRq4MIl3Tm/Kpc/ESBPsNhH+JkSvMiAJ1gm0cH5Vw9j0vmOKZxdv++gSc7Q1E
+         waFfJqpAtTG9YNMKfBEZ2bHyZO/9vcjZHsai7e8/9N5Hgd1A9lMkux7AVNkoDzsQkQJF
+         vgd98ZNmk79AxlLG6zEw5E2/NrQHRPEz0LwM6iqPINsE/zhJA+yVMdsiDlvpqvXaAdyZ
+         Oquw==
+X-Gm-Message-State: AOJu0YyoxhL0dlJRNQPof6BbT0WC9BstUpKYTPENVxvKoKZelAQ6116p
+	fSzron8OTbdhC/txuDN0O+zFUPlcDs31rME0X7iR1bS5jYONSmpmwo7pVMY8BS4Lu3t/YlG+fUo
+	62Ds61MtAbvLllHkimZ8TZ8Gqhyg=
+X-Google-Smtp-Source: AGHT+IFctTMEsBEALITPd9P9JYlZ+E6XiMU7oZunjT4jHOqSTOqn77q3mWKKZy/qhtYsP7ZUL8dO7lVf8n5NdeS5c6w=
+X-Received: by 2002:a05:6512:1394:b0:511:fb6:b1a0 with SMTP id
+ fc20-20020a056512139400b005110fb6b1a0mr207585lfb.52.1706732448077; Wed, 31
+ Jan 2024 12:20:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHgtwXSTxL=bj7u2rSvOgoEuWtq0eMtSUacy88GV3N8+LT7dJA@mail.gmail.com>
-In-Reply-To: <CAHgtwXSTxL=bj7u2rSvOgoEuWtq0eMtSUacy88GV3N8+LT7dJA@mail.gmail.com>
-From: Tashrif <tashrifbillah@gmail.com>
-Date: Wed, 31 Jan 2024 13:46:31 -0500
-Message-ID: <CAHgtwXT5S-w8iFPbO7GfDJthjeRh39vvpOc3hqRS8Uzt=8XFFg@mail.gmail.com>
-Subject: Re: multiuser mount not working in CentOS 9
-To: linux-cifs@vger.kernel.org
+References: <571c33b3-8378-49fd-84e1-57f622ef6db5@moroto.mountain>
+In-Reply-To: <571c33b3-8378-49fd-84e1-57f622ef6db5@moroto.mountain>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 31 Jan 2024 14:20:36 -0600
+Message-ID: <CAH2r5mvFYd0bjajnNVwMzdmKwbMGwgrbxUV9+4-FOBxe5Ejx+A@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: Fix a NULL vs IS_ERR() check in wsl_set_xattrs()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Paulo Alcantara <pc@manguebit.com>, Steve French <sfrench@samba.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-The issue happened between CentOS 6 server and 9 client. Once I moved
-to a CentOS 7 or 9 server, it did not happen anymore for the 9 client.
-So I suppose kernel of CentOS 6 cannot recognize 9's ntlmssp method.
+Good catch.  Thx.
 
-Best,
-Tashrif
+Added Paulo's RB and added to cifs-2.6.git for-next
 
-On Wed, Jan 24, 2024 at 12:17=E2=80=AFPM Tashrif <tashrifbillah@gmail.com> =
-wrote:
+
+On Wed, Jan 31, 2024 at 1:17=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
 >
-> As root, this works fine:
+> This was intended to be an IS_ERR() check.  The ea_create_context()
+> function doesn't return NULL.
 >
-> $ mount -t cifs -o
-> credentials=3D/etc/creds,vers=3D1.0,multiuser,sec=3Dntlmss
-> //example.host.org/pnl /data/pnl/
-> $ ls /data/pnl/
-> (all files are listed)
+> Fixes: 1eab17fe485c ("smb: client: add support for WSL reparse points")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  fs/smb/client/reparse.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> But as unprivileged user abc, this does not work:
+> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> index ce69d67feefa..d4d2555ebd38 100644
+> --- a/fs/smb/client/reparse.c
+> +++ b/fs/smb/client/reparse.c
+> @@ -225,7 +225,7 @@ static int wsl_set_xattrs(struct inode *inode, umode_=
+t mode,
+>         }
 >
-> $ cifscreds add -u abc example.host.org
-> $ ls /data/pnl/
-> ls: cannot access '/data/pnl/': Permission denied
+>         cc =3D ea_create_context(dlen, &cc_len);
+> -       if (!cc)
+> +       if (IS_ERR(cc))
+>                 return PTR_ERR(cc);
 >
-> =3D=3D=3D
+>         ea =3D &cc->ea;
+> --
+> 2.43.0
 >
-> In /var/log/messages, I get the unhelpful error log:
 >
-> CIFS: Status code returned 0xc000006d NT_STATUS_LOGON_FAILURE
-> CIFS: VFS: \\erisonefs.partners.org Send error in SessSetup =3D -13
->
-> =3D=3D=3D
->
-> Observations contradictory to the above:
->
-> (1) The above multiuser mount worked fine in CentOS 7. The problem is
-> happening after upgrade to CentOS 9 Stream.
->
-> (2) Direct mount as abc works fine:
->
-> mount -t cifs -o user=3Dabc,vers=3D1.0 //example.host.org/pnl /data/pnl/
-> ls /data/pnl/
-> (all files are listed)
->
-> =3D=3D=3D
->
-> Can I get some help?
-> Thanks,
-> Tashrif
+
+
+--=20
+Thanks,
+
+Steve
