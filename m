@@ -1,180 +1,228 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6057D3A8C3
-	for <linux-cifs@vger.kernel.org>; Wed, 31 Jan 2024 22:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14FB39ACA;
+	Wed, 31 Jan 2024 23:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706741853; cv=none; b=OWQKNYY+rXvKKus/mToI4C+i7ug6hkOPRj/L3UAE9jMX1F7k+R/qy6e5N/b21SKkP4lE0RkmIu4qM/JJ4qvxXW9i364DMX6pLDVgubIYnX2t9w0OFqqwwHylkhfc8dI5B3SEzNWHu9yCNfWV10XBWMxycWuuv43h7lBiri1YO28=
+	t=1706742137; cv=none; b=Hhi3wtisvX4PFmePI93TNrZOnqik8663/+3uGwpnAX/3MDR5+jz/xLOsZhlgrwA4L60qdSVwmmdq3PuoLruQQGFo8Af4p+u2zOCkn7dlbgr6lkKQWFbXUqyiKVzKsrYHpgYUa6BzC60CHr9m+qZYKoEQP5GzLE24sWsOs8WH89c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706741853; c=relaxed/simple;
-	bh=djCqGu4DCLbaWX7yDUPgiMMeH/lFBvE+fxQa8RfvVMc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CfaOKT23d/xuA9IFTU48s8q2Mj3KuiEUAzD6tULRRSXu+ItHi54RCE+KZPmRgLO4lD9Xu9hTH1kj1ZHCKh1hzGCM+6dZSY3fo46/vM2to3fPPY9gk9sscXf3HuEoBtK40vNJQp8HFsBP3kAiIlKbphGj46onIt5oySSfi+5aGhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VUbNps3u; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1706742137; c=relaxed/simple;
+	bh=1ymBo0INWu+oPCIXg5dFg0fy8TzeUnBhzt2lS0EtzoY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pKt7SoQv5cZno2fXZZyaIHzng+PvdkKGRltYFWsrHziqUcXhz/pJUFNPwQNvwFlDwGebcj/ylbeTaj+oLlbEbVjxOBZpWV9Pbg5IWcIf0MgWS/47uP6fpG80llU+yhYdmwumKJN1hU+H9lI5drTUcHmgXB0pywpCzGfDhcxCrm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhirEnt1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUbNps3u"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf1fd1cc5bso4420161fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Jan 2024 14:57:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706741849; x=1707346649; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1YSVk2NTb6fYemgBF8wyotfr/Ir5x+g+RZVbtVef4yU=;
-        b=VUbNps3uMbCOituXcOfpnQB1dMojT8De4vFXpFoSo2Hs0zbaLlBdAUiTjf9VOba3rF
-         z6Zja5iuXpODWk/3XAx1E9H+Gkzp+uIrbLzCdn7nSVez3mK67N8v/RO2LPez4JSvO9iG
-         VbTNxGeHXq6lmE5yd3kLkcuYQ7JEkuz9vGianmBM17LHCkwXnRuAl3PFd6IEGYpAMCOA
-         wuosQ6q4J5YvTr+xuwR7mwdMgsXftyu0UHHaw6aeLhXC4WfyvrMJikBqN5zcVSD/pPeh
-         cTleeyEyMGSyz6x99rXv5ZdBN4RmLTKl54my+uBHbk+uIh7XO1p3mLxFFt1RJjF1+bT5
-         5M5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706741849; x=1707346649;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1YSVk2NTb6fYemgBF8wyotfr/Ir5x+g+RZVbtVef4yU=;
-        b=I2zDQD7F45LTyD9r7WkZaybi8lz3kxyi1qQZiQLMTsrhPYqwuRdVoRv1YbqwFRUEWQ
-         BYryPjM5XhVrwto3nm++jg5JvZZ4jemrzWYNCkAYd2O4nfWeWuA3e/kNqOMd2BOf/j5C
-         3drBb/UyggKdGRsiYweDlr8MnN7p5rhvk/3l52atnngSnTR5TgZrylYSqOHd9ZaPeCVF
-         saQKljLUiUWUQvQiqHOHUo8asZeIFjMhmP6+eqaDueWkCHwlMkuXB/idTDcRC888jP00
-         TwUD4mkSBBqhtwW2Xndxor8k/JqoapKWBiwYOBfcpm1JiiWxd+BjhVGLE4cFtXdwHG8x
-         Zdbw==
-X-Gm-Message-State: AOJu0Yy5t9YQZ+FEejYwROG5ypdNFj605GAOPEZoCVKKSSNcfAbQbRZq
-	lnI9rKHkK9IZ3WgvOChtTOECEETzbUuO7Oxzs8F/9bNbshsSMdmmRvsNDNHiD/8KN6SZaQO7vqP
-	M0QY5h1+2FA8fy4Vvlj3zl0HXwLk=
-X-Google-Smtp-Source: AGHT+IGC2IS633FPYU9H7yS2NaPxsY0wE1QcqIcHQ8R5f7wGMWKlTigDzLicUwzpCOmaQnBGx+EfQRlUvEo4S7giAKc=
-X-Received: by 2002:a2e:a401:0:b0:2d0:5435:7b11 with SMTP id
- p1-20020a2ea401000000b002d054357b11mr2001936ljn.52.1706741848626; Wed, 31 Jan
- 2024 14:57:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhirEnt1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922D9C433F1;
+	Wed, 31 Jan 2024 23:02:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706742136;
+	bh=1ymBo0INWu+oPCIXg5dFg0fy8TzeUnBhzt2lS0EtzoY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=YhirEnt1Zyoo4luUVzDdhSoDLVYvWigAqZF0B6hVmStfBkJ81ZoY39zwG3iBO9dS3
+	 UYBF0Q8RcOdj4DLYqYcLH9+HwFhRPqM8sr4l+4Il/5FK5xaENi8BPZzoQ3LTc/ySys
+	 Y4fu6SPpYhOe8o4BbIfWndzP03DZi1TDZo3BkgcEoqnW1M841wkkTaIjktr55VVGnH
+	 6j46ERLyOG+jxpZy48Kyyx/spWmdM5QedwoaChlR9qlOraUOKjp69/lHRqhu5ydVI0
+	 RQ37ndFqeTkfovRnE0B+DYp/FMolc046xp3Tq9jE5seO5eqxXw2ryDiMg2kMBQ0z8c
+	 dIzjdHR4VqszA==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v3 00/47] filelock: split file leases out of struct
+ file_lock
+Date: Wed, 31 Jan 2024 18:01:41 -0500
+Message-Id: <20240131-flsplit-v3-0-c6129007ee8d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mvEHKkYqu6CEgk5fzY8tR+UFa-Ynh38gB9Sej4u41YjkA@mail.gmail.com>
-In-Reply-To: <CAH2r5mvEHKkYqu6CEgk5fzY8tR+UFa-Ynh38gB9Sej4u41YjkA@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 31 Jan 2024 16:57:17 -0600
-Message-ID: <CAH2r5mvHJZN4Gx5p6bjNzWjHJCHzFa0cZu5mxSuE07AMpkVrcA@mail.gmail.com>
-Subject: Re: fix for patch "cifs" make sure that channel scaling is done only once"
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: Bharath S M <bharathsm@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000009c73a5061045cd3d"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFbRumUC/2WMQQ6CMBBFr2JmbU07lIKuvIdxQekAEwmQljQaw
+ t0tbNS4fD//vQUCeaYAl8MCniIHHocE2fEAdVcNLQl2iQElaqmUEU0fpp5nYZ3VpkTtrCkhvSd
+ PDT/30u2euOMwj/61h6Pa1v9GVEKK+uxko7NCVrm7PsgP1J9G38IWifglYv4RMYmFLvMM0Rqsi
+ x9xXdc3cRWMZtgAAAA=
+To: Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ Chuck Lever <chuck.lever@oracle.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Eric Van Hensbergen <ericvh@kernel.org>, 
+ Latchesar Ionkov <lucho@ionkov.net>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Christian Schoenebeck <linux_oss@crudebyte.com>, 
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+ Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+ Alexander Aring <aahringo@redhat.com>, David Teigland <teigland@redhat.com>, 
+ Andreas Gruenbacher <agruenba@redhat.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, 
+ Trond Myklebust <trond.myklebust@hammerspace.com>, 
+ Anna Schumaker <anna@kernel.org>, Mark Fasheh <mark@fasheh.com>, 
+ Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Miklos Szeredi <miklos@szeredi.hu>
+Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, v9fs@lists.linux.dev, 
+ linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org, 
+ gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
+ ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6354; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=1ymBo0INWu+oPCIXg5dFg0fy8TzeUnBhzt2lS0EtzoY=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBlutFn5pVegv7wNPnRDWvz5ftMiiWf6qEKdb/80
+ QHt3K4JatCJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZbrRZwAKCRAADmhBGVaC
+ FaDtD/45qGT25WHA6zNfMY4o5AjgAKZZlcUtRncdLVT81F2yreqMOIaNjye9MC055FEkD5eD/yn
+ 5qGUPayFTJnbXrWOJ6qCHgdWPvOC+N0uF/REAlEvKvDfNrVSZcytjZJjZ7EiN+Wo3hJ0YVgaR85
+ yObKm+iEt+pVQGn7ZjEpowyjMZHFB0rg992VC3+gMVpVg3f+2Brk6AvoUkVt37xDoykVj+XWyU2
+ A9uEpvwZArHybQTiLDX6sAHTAwFII4CZ3SdtcW3If/O8fbZfrj7wUxLx8W6me8AbdJhZ9+Ftq1b
+ V4WznhWm6dPkSSM5+85TLMhwZZ7UHdFau30VG+1Hng4D1KKqIZeFRvG0LYHXI+BXIpysYSf975R
+ X6URKIL/rU4sXiADc3XwbFr1uB/rK8vMsqMtFzjeikeUUJwUMtPtH4kboUFPoYpLCJNIWCFW5St
+ aMvmAS6pP0qiBuiD1Ys9qPFFJ6+7bVEp52AbjgfGNcr4DrXOSbIgZgFNLvhfmnBlVl3fVINHljH
+ dyaKRXELg73UFp9S2NpQg86UFtLiNfn/eJcFPCdiQrpTYlU3QP1glBfaInAaqLEUK16Kqjoy3SO
+ vPsEegggG3uCfKeIk0PPW4Cyv6BILX88fkRb9jRlEW8PriwPL7iQSJz/2pydIb6xuEYI3qqvdQ2
+ EUZuYzpqa6UbpxQ==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
---0000000000009c73a5061045cd3d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I'm not sure this is much prettier than the last, but contracting
+"fl_core" to "c", as Neil suggested is a bit easier on the eyes.
 
-Updated patch (with fix merged into it) attached - and pushed to
-for-next pending review and testing
+I also added a few small helpers and converted several users over to
+them. That reduces the size of the per-fs conversion patches later in
+the series. I played with some others too, but they were too awkward
+or not frequently used enough to make it worthwhile.
 
+Many thanks to Chuck and Neil for the earlier R-b's and comments. I've
+dropped those for now since this set is a bit different from the last.
 
-On Wed, Jan 31, 2024 at 4:43=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
->
-> Looks like the patch in for-next "cifs: make sure that channel scaling
-> is done only once" (see attached) was missing some unlocks that were
-> noticed by compile with C=3D1 and/or sparse.   See below.
->
->
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index 2837fc4465a7..3110aabc32c5 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -400,8 +400,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon=
- *tcon,
->         }
->
->         spin_lock(&ses->ses_lock);
-> -       if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS)
-> +       if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-> +               spin_unlock(&ses->ses_lock);
-> +               mutex_unlock(&ses->session_mutex);
->                 goto skip_add_channels;
-> +       }
->         ses->flags |=3D CIFS_SES_FLAG_SCALE_CHANNELS;
->         spin_unlock(&ses->ses_lock);
->
->
-> --
-> Thanks,
->
-> Steve
+I'd like to get this into linux-next soon and we can see about merging
+it for v6.9, unless anyone has major objections.
 
+Thanks!
 
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v3:
+- Rename "flc_core" fields in file_lock and file_lease to "c"
+- new helpers: locks_wake_up, for_each_file_lock, and lock_is_{unlock,read,write}
+- Link to v2: https://lore.kernel.org/r/20240125-flsplit-v2-0-7485322b62c7@kernel.org
 
---=20
-Thanks,
+Changes in v2:
+- renamed file_lock_core fields to have "flc_" prefix
+- used macros to more easily do the change piecemeal
+- broke up patches into per-subsystem ones
+- Link to v1: https://lore.kernel.org/r/20240116-flsplit-v1-0-c9d0f4370a5d@kernel.org
 
-Steve
+---
+Jeff Layton (47):
+      filelock: fl_pid field should be signed int
+      filelock: rename some fields in tracepoints
+      filelock: rename fl_pid variable in lock_get_status
+      filelock: add some new helper functions
+      9p: rename fl_type variable in v9fs_file_do_lock
+      afs: convert to using new filelock helpers
+      ceph: convert to using new filelock helpers
+      dlm: convert to using new filelock helpers
+      gfs2: convert to using new filelock helpers
+      lockd: convert to using new filelock helpers
+      nfs: convert to using new filelock helpers
+      nfsd: convert to using new filelock helpers
+      ocfs2: convert to using new filelock helpers
+      smb/client: convert to using new filelock helpers
+      smb/server: convert to using new filelock helpers
+      filelock: drop the IS_* macros
+      filelock: split common fields into struct file_lock_core
+      filelock: have fs/locks.c deal with file_lock_core directly
+      filelock: convert more internal functions to use file_lock_core
+      filelock: make posix_same_owner take file_lock_core pointers
+      filelock: convert posix_owner_key to take file_lock_core arg
+      filelock: make locks_{insert,delete}_global_locks take file_lock_core arg
+      filelock: convert locks_{insert,delete}_global_blocked
+      filelock: make __locks_delete_block and __locks_wake_up_blocks take file_lock_core
+      filelock: convert __locks_insert_block, conflict and deadlock checks to use file_lock_core
+      filelock: convert fl_blocker to file_lock_core
+      filelock: clean up locks_delete_block internals
+      filelock: reorganize locks_delete_block and __locks_insert_block
+      filelock: make assign_type helper take a file_lock_core pointer
+      filelock: convert locks_wake_up_blocks to take a file_lock_core pointer
+      filelock: convert locks_insert_lock_ctx and locks_delete_lock_ctx
+      filelock: convert locks_translate_pid to take file_lock_core
+      filelock: convert seqfile handling to use file_lock_core
+      9p: adapt to breakup of struct file_lock
+      afs: adapt to breakup of struct file_lock
+      ceph: adapt to breakup of struct file_lock
+      dlm: adapt to breakup of struct file_lock
+      gfs2: adapt to breakup of struct file_lock
+      fuse: adapt to breakup of struct file_lock
+      lockd: adapt to breakup of struct file_lock
+      nfs: adapt to breakup of struct file_lock
+      nfsd: adapt to breakup of struct file_lock
+      ocfs2: adapt to breakup of struct file_lock
+      smb/client: adapt to breakup of struct file_lock
+      smb/server: adapt to breakup of struct file_lock
+      filelock: remove temporary compatibility macros
+      filelock: split leases out of struct file_lock
 
---0000000000009c73a5061045cd3d
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-make-sure-that-channel-scaling-is-done-only-onc.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-make-sure-that-channel-scaling-is-done-only-onc.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ls2e0s2r0>
-X-Attachment-Id: f_ls2e0s2r0
+ fs/9p/vfs_file.c                |  40 +-
+ fs/afs/flock.c                  |  60 +--
+ fs/ceph/locks.c                 |  74 ++--
+ fs/dlm/plock.c                  |  44 +--
+ fs/fuse/file.c                  |  14 +-
+ fs/gfs2/file.c                  |  16 +-
+ fs/libfs.c                      |   2 +-
+ fs/lockd/clnt4xdr.c             |  14 +-
+ fs/lockd/clntlock.c             |   2 +-
+ fs/lockd/clntproc.c             |  65 +--
+ fs/lockd/clntxdr.c              |  14 +-
+ fs/lockd/svc4proc.c             |  10 +-
+ fs/lockd/svclock.c              |  64 +--
+ fs/lockd/svcproc.c              |  10 +-
+ fs/lockd/svcsubs.c              |  24 +-
+ fs/lockd/xdr.c                  |  14 +-
+ fs/lockd/xdr4.c                 |  14 +-
+ fs/locks.c                      | 851 ++++++++++++++++++++++------------------
+ fs/nfs/delegation.c             |   4 +-
+ fs/nfs/file.c                   |  22 +-
+ fs/nfs/nfs3proc.c               |   2 +-
+ fs/nfs/nfs4_fs.h                |   2 +-
+ fs/nfs/nfs4file.c               |   2 +-
+ fs/nfs/nfs4proc.c               |  39 +-
+ fs/nfs/nfs4state.c              |  22 +-
+ fs/nfs/nfs4trace.h              |   4 +-
+ fs/nfs/nfs4xdr.c                |   8 +-
+ fs/nfs/write.c                  |   8 +-
+ fs/nfsd/filecache.c             |   4 +-
+ fs/nfsd/nfs4callback.c          |   2 +-
+ fs/nfsd/nfs4layouts.c           |  34 +-
+ fs/nfsd/nfs4state.c             | 120 +++---
+ fs/ocfs2/locks.c                |  12 +-
+ fs/ocfs2/stack_user.c           |   2 +-
+ fs/open.c                       |   2 +-
+ fs/posix_acl.c                  |   4 +-
+ fs/smb/client/cifsfs.c          |   2 +-
+ fs/smb/client/cifssmb.c         |   8 +-
+ fs/smb/client/file.c            |  78 ++--
+ fs/smb/client/smb2file.c        |   2 +-
+ fs/smb/server/smb2pdu.c         |  44 +--
+ fs/smb/server/vfs.c             |  14 +-
+ include/linux/filelock.h        | 103 +++--
+ include/linux/fs.h              |   5 +-
+ include/linux/lockd/lockd.h     |   8 +-
+ include/linux/lockd/xdr.h       |   2 +-
+ include/trace/events/afs.h      |   4 +-
+ include/trace/events/filelock.h | 102 ++---
+ 48 files changed, 1064 insertions(+), 933 deletions(-)
+---
+base-commit: e96efe9f69ebb12b38c722c159413fd6850b782c
+change-id: 20240116-flsplit-bdb46824db68
 
-RnJvbSBlZTM2YTNiMzQ1YzQzM2E4NDZlZmZjZGNmYmE0MzdjMjI5OGVlZGE1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBNb24sIDI5IEphbiAyMDI0IDEzOjU4OjEzICswMDAwClN1YmplY3Q6IFtQQVRDSF0g
-Y2lmczogbWFrZSBzdXJlIHRoYXQgY2hhbm5lbCBzY2FsaW5nIGlzIGRvbmUgb25seSBvbmNlCgpG
-b2xsb3dpbmcgYSBzdWNjZXNzZnVsIGNpZnNfdHJlZV9jb25uZWN0LCB3ZSBoYXZlIHRoZSBjb2Rl
-CnRvIHNjYWxlIHVwL2Rvd24gdGhlIG51bWJlciBvZiBjaGFubmVscyBpbiB0aGUgc2Vzc2lvbi4K
-SG93ZXZlciwgaXQgaXMgbm90IHByb3RlY3RlZCBieSBhIGxvY2sgdG9kYXkuCgpBcyBhIHJlc3Vs
-dCwgdGhpcyBjb2RlIGNhbiBiZSBleGVjdXRlZCBieSBzZXZlcmFsIHByb2Nlc3Nlcwp0aGF0IHNl
-bGVjdCB0aGUgc2FtZSBjaGFubmVsLiBUaGUgY29yZSBmdW5jdGlvbnMgaGFuZGxlIHRoaXMKd2Vs
-bCwgYXMgdGhleSBwaWNrIGNoYW5fbG9jay4gSG93ZXZlciwgd2UndmUgc2VlbiBjYXNlcyB3aGVy
-ZQpzbWIyX3JlY29ubmVjdCB0aHJvd3Mgc29tZSB3YXJuaW5ncy4KClRvIGZpeCB0aGF0LCB0aGlz
-IGNoYW5nZSBpbnRyb2R1Y2VzIGEgZmxhZ3MgYml0bWFwIGluc2lkZSB0aGUKY2lmc19zZXMgc3Ry
-dWN0dXJlLiBBIG5ldyBmbGFnIHR5cGUgaXMgdXNlZCB0byBlbnN1cmUgdGhhdApvbmx5IG9uZSBw
-cm9jZXNzIGVudGVycyB0aGlzIHNlY3Rpb24gYXQgYW55IHRpbWUuCgpTaWduZWQtb2ZmLWJ5OiBT
-aHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2
-ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9jaWZz
-Z2xvYi5oIHwgIDMgKysrCiBmcy9zbWIvY2xpZW50L3NtYjJwZHUuYyAgfCAyMCArKysrKysrKysr
-KysrKysrKy0tLQogMiBmaWxlcyBjaGFuZ2VkLCAyMCBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9u
-cygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaCBiL2ZzL3NtYi9jbGll
-bnQvY2lmc2dsb2IuaAppbmRleCAxNmJlZmZmNGNiYjQuLjkwOTNjNTA3MDQyZiAxMDA2NDQKLS0t
-IGEvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCisrKyBiL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2Iu
-aApAQCAtMTAzMiw2ICsxMDMyLDggQEAgc3RydWN0IGNpZnNfY2hhbiB7CiAJX191OCBzaWdua2V5
-W1NNQjNfU0lHTl9LRVlfU0laRV07CiB9OwogCisjZGVmaW5lIENJRlNfU0VTX0ZMQUdfU0NBTEVf
-Q0hBTk5FTFMgKDB4MSkKKwogLyoKICAqIFNlc3Npb24gc3RydWN0dXJlLiAgT25lIG9mIHRoZXNl
-IGZvciBlYWNoIHVpZCBzZXNzaW9uIHdpdGggYSBwYXJ0aWN1bGFyIGhvc3QKICAqLwpAQCAtMTA2
-NCw2ICsxMDY2LDcgQEAgc3RydWN0IGNpZnNfc2VzIHsKIAllbnVtIHNlY3VyaXR5RW51bSBzZWN0
-eXBlOyAvKiB3aGF0IHNlY3VyaXR5IGZsYXZvciB3YXMgc3BlY2lmaWVkPyAqLwogCWJvb2wgc2ln
-bjsJCS8qIGlzIHNpZ25pbmcgcmVxdWlyZWQ/ICovCiAJYm9vbCBkb21haW5BdXRvOjE7CisJdW5z
-aWduZWQgaW50IGZsYWdzOwogCV9fdTE2IHNlc3Npb25fZmxhZ3M7CiAJX191OCBzbWIzc2lnbmlu
-Z2tleVtTTUIzX1NJR05fS0VZX1NJWkVdOwogCV9fdTggc21iM2VuY3J5cHRpb25rZXlbU01CM19F
-TkNfREVDX0tFWV9TSVpFXTsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jIGIv
-ZnMvc21iL2NsaWVudC9zbWIycGR1LmMKaW5kZXggODZmNmYzNWI3ZjMyLi42ZGI1NGM2ZWY1NzEg
-MTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jCisrKyBiL2ZzL3NtYi9jbGllbnQv
-c21iMnBkdS5jCkBAIC0zOTksNiArMzk5LDE1IEBAIHNtYjJfcmVjb25uZWN0KF9fbGUxNiBzbWIy
-X2NvbW1hbmQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJCWdvdG8gb3V0OwogCX0KIAorCXNw
-aW5fbG9jaygmc2VzLT5zZXNfbG9jayk7CisJaWYgKHNlcy0+ZmxhZ3MgJiBDSUZTX1NFU19GTEFH
-X1NDQUxFX0NIQU5ORUxTKSB7CisJCXNwaW5fdW5sb2NrKCZzZXMtPnNlc19sb2NrKTsKKwkJbXV0
-ZXhfdW5sb2NrKCZzZXMtPnNlc3Npb25fbXV0ZXgpOworCQlnb3RvIHNraXBfYWRkX2NoYW5uZWxz
-OworCX0KKwlzZXMtPmZsYWdzIHw9IENJRlNfU0VTX0ZMQUdfU0NBTEVfQ0hBTk5FTFM7CisJc3Bp
-bl91bmxvY2soJnNlcy0+c2VzX2xvY2spOworCiAJaWYgKCFyYyAmJgogCSAgICAoc2VydmVyLT5j
-YXBhYmlsaXRpZXMgJiBTTUIyX0dMT0JBTF9DQVBfTVVMVElfQ0hBTk5FTCkpIHsKIAkJbXV0ZXhf
-dW5sb2NrKCZzZXMtPnNlc3Npb25fbXV0ZXgpOwpAQCAtNDI4LDE3ICs0MzcsMjIgQEAgc21iMl9y
-ZWNvbm5lY3QoX19sZTE2IHNtYjJfY29tbWFuZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJ
-aWYgKHNlcy0+Y2hhbl9tYXggPiBzZXMtPmNoYW5fY291bnQgJiYKIAkJICAgIHNlcy0+aWZhY2Vf
-Y291bnQgJiYKIAkJICAgICFTRVJWRVJfSVNfQ0hBTihzZXJ2ZXIpKSB7Ci0JCQlpZiAoc2VzLT5j
-aGFuX2NvdW50ID09IDEpCisJCQlpZiAoc2VzLT5jaGFuX2NvdW50ID09IDEpIHsKIAkJCQljaWZz
-X3NlcnZlcl9kYmcoVkZTLCAic3VwcG9ydHMgbXVsdGljaGFubmVsIG5vd1xuIik7CisJCQkJcXVl
-dWVfZGVsYXllZF93b3JrKGNpZnNpb2Rfd3EsICZ0Y29uLT5xdWVyeV9pbnRlcmZhY2VzLAorCQkJ
-CQkJIChTTUJfSU5URVJGQUNFX1BPTExfSU5URVJWQUwgKiBIWikpOworCQkJfQogCiAJCQljaWZz
-X3RyeV9hZGRpbmdfY2hhbm5lbHMoc2VzKTsKLQkJCXF1ZXVlX2RlbGF5ZWRfd29yayhjaWZzaW9k
-X3dxLCAmdGNvbi0+cXVlcnlfaW50ZXJmYWNlcywKLQkJCQkJICAgKFNNQl9JTlRFUkZBQ0VfUE9M
-TF9JTlRFUlZBTCAqIEhaKSk7CiAJCX0KIAl9IGVsc2UgewogCQltdXRleF91bmxvY2soJnNlcy0+
-c2Vzc2lvbl9tdXRleCk7CiAJfQorCiBza2lwX2FkZF9jaGFubmVsczoKKwlzcGluX2xvY2soJnNl
-cy0+c2VzX2xvY2spOworCXNlcy0+ZmxhZ3MgJj0gfkNJRlNfU0VTX0ZMQUdfU0NBTEVfQ0hBTk5F
-TFM7CisJc3Bpbl91bmxvY2soJnNlcy0+c2VzX2xvY2spOwogCiAJaWYgKHNtYjJfY29tbWFuZCAh
-PSBTTUIyX0lOVEVSTkFMX0NNRCkKIAkJbW9kX2RlbGF5ZWRfd29yayhjaWZzaW9kX3dxLCAmc2Vy
-dmVyLT5yZWNvbm5lY3QsIDApOwotLSAKMi40MC4xCgo=
---0000000000009c73a5061045cd3d--
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
