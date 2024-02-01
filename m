@@ -1,103 +1,101 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9593D15DBB9
-	for <linux-cifs@vger.kernel.org>; Thu,  1 Feb 2024 12:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113A853362;
+	Thu,  1 Feb 2024 12:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706789939; cv=none; b=L8WIsh0HsMUKPlVNrujg4fTEJ+axaTaxQK0III4AMOe7/p6W0YJbtxYDmuORgYoWCjEb5T2T4T2lj2r42fUPPL82pNwZxmL5L4/WBcS6cTM48wg3/uFOWe/slQ8b9+0oGdcqC3aZFKGiaQGzaXhfXiHC4jyiPeodI9iBzJ4czIM=
+	t=1706792320; cv=none; b=QiiQ61zsdVscBO7bH7+9Q7z+Pl/LUCiT+wAZC+cJZ1xH4VxM3Fs6VjtBzFEmesjdK/0gEJmhar9VQNBMsVNaBxdP71voU3Izsq8lGOot95Xek17CmLSch+GRqvZtH7k8H2of7RwW6VYMpPmjKUq9lmIC4KiM1Ft7LU/ORxWgWFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706789939; c=relaxed/simple;
-	bh=0u6CPpAAjikGWkMcjodbvpI7eJQQxDmT7SnkrkSi7S4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=elpTFhlNQFtzml0q1BxXzFtOfxqtWZ1C9l28x/Rggc+OqxZLeHf+4Nl5PSXFru3ntRbY6jlw9DJkUWcyKg5ry7Za3PXF6T3+F2qAWDAR9TgI3iS/4MimsrVDohC8P8mXFIfuKtXxwCPF9y5FO7rA+RJQe2lEK2WFPgPXj0o8pzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wcuTGGCd; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1706792320; c=relaxed/simple;
+	bh=MHDfNdMw12sIWRU7RfM/N1sTc3Fx1OjZKgjklgYHhcE=;
+	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Ycg8M5W6BNRz6QYDnH+4nxl8wFmgieBN0o+vN7zM002/QNgJoX1q5n1hpwOIUwlRR7U1eQrwDNn3nI8mWPKzvKBtB6q9i/frcrBQ545QauEea5qjBHNAbvvHwoKo10ZhGC//DMKI3ScwCT0wv16wfQqUh7vCED5ATD8L+nlB0Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=q88rvNhv; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wcuTGGCd"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a36126e7459so95340066b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Feb 2024 04:18:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="q88rvNhv"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706789936; x=1707394736; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yxKM8B/+4uxDJuVV6uI4MZb9Fe6fGclb+oWzaAjZwbg=;
-        b=wcuTGGCd7KHQFMh15xHt52CWUf8IG/oO/bFEKZjHnFRrfnA/1KG2r6BoJHNLRa0WKb
-         dbSur/MUTkW4zyJ9wkOcPd1DyrZHEdunYokX4/Z+w0uBk/SwrVjaA6a8mAKQKSLEtDUm
-         8M0hM7DcuYQ9dBY7hsm8Z09PBcDbm79zUoX84mG7QRzvq0HcXsl0oveNlH8wj7fZvWS3
-         bhydJ1TjykGGGB+YcSA3yXLf4c/WHKq27teuZPH50Vipv/f5+2pRUANZQUoJHu6DgQNT
-         +GpWcjouTYRpLveiSitHNjIu1jPbbetsWAIc3C5wOaSsrEQyiGQuVmGlFeiTx/RlKpuZ
-         yX6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706789936; x=1707394736;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yxKM8B/+4uxDJuVV6uI4MZb9Fe6fGclb+oWzaAjZwbg=;
-        b=TOy1pfYB583WGaKwNuRTGEmilMoLmfdlFhGcyQl77mSKQWlFvAQgKMPFln26cDwdlt
-         5p6CbArXeUTHrzcRDQIthB1TRhuWqbfv8MjEEbpp/UxVOh46cYdtORgkK6vRctJi6BCw
-         L0oUIZT+Bt9zvEQdDrHR6IKuIboHdORvEsalcE7GYP0UgJxdR/hikHMo5j04nnDlUQ3Z
-         pTqq3I0/7rJCxbl63mmFbbnttqHkQ8UofxV0j0hwY4xERg3Y4NM90l2i/0Oc345XNzcu
-         XkWQsFHuNdxBXTy5lgRnlrS542co7MboyEGvh0hN/LGnJxLZDc8twpXq5aZxk7MXiiQ4
-         7foA==
-X-Gm-Message-State: AOJu0YzNunnMqylRU+VYdL5McsnD9l3tjq4IftcrpNSHKLT+QZ2tPzBc
-	HHdWYi71JnZ5BNYfbDGlhcA4KIs+4uq9/Ygh/1BQahWJtPi4RMYUdtiJVMBJztw=
-X-Google-Smtp-Source: AGHT+IHqio1K2v4vG6WifOFqQbnp6NNXN3nUmPKstb3Bh6hAXEkf1XIqP2kKhvVoaKMBDGuWSm9xFQ==
-X-Received: by 2002:a17:906:4ec1:b0:a30:b47:b626 with SMTP id i1-20020a1709064ec100b00a300b47b626mr3459192ejv.35.1706789935736;
-        Thu, 01 Feb 2024 04:18:55 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWhiYEyqdGIGJMv+e9C8Q6+387DAMQBjdrXrjTP7/sLkqF260wnCrmJ8XbnG53BpkG2kJSird5Evpn0AkAEcKChG9uk/BJWV0zDR2XU+RPKBew/s4iFw88ddPX2Xax3fLbBffXOyaiGaAP8COSWaQSNfOo5GpW5dYEBcLde/9Gq8vzJDIfrAz9tvQrDPgKcMLaqaG2YVIuoScE6Yi0mEcND6u+wwYd93sqB6xK7vzdq0393OHif5uTeqZDqFBpr6fR8tRLdn0fklSjFQHK8cCMF+rwdIlCdoOjIc6o6uwE8
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id wb12-20020a170907d50c00b00a369b47996esm1013203ejc.80.2024.02.01.04.18.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 04:18:55 -0800 (PST)
-Date: Thu, 1 Feb 2024 15:18:52 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] smb: client: Fix a double lock bug in smb2_reconnect()
-Message-ID: <bf90de00-4d6a-4440-b6a1-42ac9e358158@moroto.mountain>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706792319; x=1738328319;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=waFRF+K7gEDtO0MzxpQ/w+uoFORktzAU96B8ZA3JvFs=;
+  b=q88rvNhvS4MoTgje1wHxIokNCfIkfzgzb252WDU70XxgYuE/lQPiQxd6
+   Fr4kV44tsWtJHrEuTJMWylaQG2qZuXW/CEkf883mZKTfX3KgJ34+TdeZ4
+   36+0BBAdfBEemQ4jylUylHqOwjtqlx/62soVTdUMIP1RfybSctl98T6xw
+   4=;
+X-IronPort-AV: E=Sophos;i="6.05,234,1701129600"; 
+   d="scan'208";a="631327036"
+Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with "Resource
+ temporarily unavailable"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 12:58:37 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:53331]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.233:2525] with esmtp (Farcaster)
+ id c4031593-8aa9-42fd-b6fc-de37a98e7084; Thu, 1 Feb 2024 12:58:35 +0000 (UTC)
+X-Farcaster-Flow-ID: c4031593-8aa9-42fd-b6fc-de37a98e7084
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 1 Feb 2024 12:58:35 +0000
+Received: from [192.168.7.223] (10.106.82.33) by EX19D018EUA004.ant.amazon.com
+ (10.252.50.85) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 1 Feb
+ 2024 12:58:32 +0000
+Message-ID: <3bfc7bc4-05cd-4353-8fca-a391d6cb9bf4@amazon.com>
+Date: Thu, 1 Feb 2024 12:58:28 +0000
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+To: Paulo Alcantara <pc@manguebit.com>, Salvatore Bonaccorso
+	<carnil@debian.org>
+CC: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"leonardo@schenkel.net" <leonardo@schenkel.net>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>, "m.weissbach@info-gate.de"
+	<m.weissbach@info-gate.de>, "regressions@lists.linux.dev"
+	<regressions@lists.linux.dev>, "sairon@sairon.cz" <sairon@sairon.cz>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <53F11617-D406-47C6-8CA7-5BE26EB042BE@amazon.com>
+ <9B20AAD6-2C27-4791-8CA9-D7DB912EDC86@amazon.com>
+ <2024011521-feed-vanish-5626@gregkh>
+ <716A5E86-9D25-4729-BF65-90AC2A335301@amazon.com>
+ <ZbnpDbgV7ZCRy3TT@eldamar.lan>
+ <848c0723a10638fcf293514fab8cfa2e@manguebit.com>
+Content-Language: en-US
+From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+In-Reply-To: <848c0723a10638fcf293514fab8cfa2e@manguebit.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-This goto will try to lock spin_lock(&ses->ses_lock) twice which will
-lead to a deadlock.
 
-Fixes: 17525952fa83 ("cifs: make sure that channel scaling is done only once")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/client/smb2pdu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 31/01/2024 17:19, Paulo Alcantara wrote:
+> Greg, could you please drop
+> 
+>          b3632baa5045 ("cifs: fix off-by-one in SMB2_query_info_init()")
+> 
+> from v5.10.y as suggested by Salvatore?
+> 
+> Thanks.
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 2837fc4465a7..dcd3f6f08c7f 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -401,7 +401,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 
- 	spin_lock(&ses->ses_lock);
- 	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS)
--		goto skip_add_channels;
-+		goto skip_add_channels_locked;
- 	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
- 	spin_unlock(&ses->ses_lock);
- 
-@@ -448,6 +448,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 
- skip_add_channels:
- 	spin_lock(&ses->ses_lock);
-+skip_add_channels_locked:
- 	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
- 	spin_unlock(&ses->ses_lock);
- 
--- 
-2.43.0
+Are we dropping b3632baa5045 ("cifs: fix off-by-one in 
+SMB2_query_info_init()") from v5.10.y while keeping it on v5.15.y? if we 
+are dropping it from v5.15.y as well then we should backport 06aa6eff7b 
+smb3: Replace smb2pdu 1-element arrays with flex-arrays to v5.15.y I 
+remember trying to backport this patch on v5.15.y but there were some 
+merge conflicts there.
+
+06aa6eff7b smb3: Replace smb2pdu 1-element arrays with flex-arrays
+
+
+Thank you.
+
+Hazem
 
