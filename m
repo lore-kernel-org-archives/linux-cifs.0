@@ -1,96 +1,118 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C062812FB1F
-	for <linux-cifs@vger.kernel.org>; Thu,  1 Feb 2024 18:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F74963064;
+	Thu,  1 Feb 2024 18:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810521; cv=none; b=Pzt+oVjtL6RA3m/KgxtEqRv0kd5CcBXxzVtxiPBDyjLa/CpODuCcIFetoSmrKQtd6QYFneDSvSTbdR0fJ8EqHn+v8URl9c5FBxY2KNmug90b9jZVGhe3thhE+ZeXIXgROH48ghxAQiqIx4RHrdcNVo/wd4cGzTIIDk4ZNRRgocg=
+	t=1706810638; cv=none; b=e1RygEiqbxGxwmSoAy7T2SG5TLvCDMIOmWKPpEtJIVn1y7V/gg2WI471iVbfT+Pa5+53rIvcLwd0Uwhxwg7C4Kn++UnfOcy8wW/Bl4Ig97MqZu/fToo4yz7FpWzQOwAWVao/YT5CoCnYtmbdPeRPqnP2OeU1t7LgjfSV6Lmu0cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810521; c=relaxed/simple;
-	bh=TrEuetKSQJ5r5qtP6MiuYxSo6cTt/zNrMR9D9fW4kG0=;
+	s=arc-20240116; t=1706810638; c=relaxed/simple;
+	bh=ei3GU93TpcAtuwfzbvmohYvxmckdj+VwphSS7eolsSU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pIfspzNLeqVXDnu+j+W4NBfV0v/vNqf9deLbaioBTJoxgEyp4bDONtampmGEVd1sxbxwgeVxwREZQYIjlAkCgL5y1ytsx52HEkURc0nV7I3aYwwFR4yCATBtNV/+5bGBcvLzZmrpitJzt3LLwDvmwmH9RP2YQDGVrmKv2WoPW0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPZyHWv8; arc=none smtp.client-ip=209.85.167.46
+	 To:Cc:Content-Type; b=oJthlddWggC1yVFCf6WOe2ezskBzPklWYLQkhWu5f4kfyVIa+4PnmpIwpvMLEXheOWeRvL2aLKDfuhtVxNzlclMiJu60wFm8/8R17yyvvSQo/HBcuvEQKCaGwd80lKEvw1vX1lHWBPRer1MHaoYbOv230rhzb0ER6dDemiHUSOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNiOOtZ7; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPZyHWv8"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5100cb238bcso2364368e87.3
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Feb 2024 10:01:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNiOOtZ7"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d04fb2f36bso13628291fa.2;
+        Thu, 01 Feb 2024 10:03:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706810517; x=1707415317; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706810634; x=1707415434; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XO6MI34sx7y7sKtG0/owVEIu61lP2sL9c6sYjJfuMnM=;
-        b=lPZyHWv8gKSpwk4I3FQrMo6wIEmzT85qDRpPQOtksdJ76XIiaE9/pPxwlmwM0kkLDr
-         mIFtobg3MHDbh9d1xeStC8XA03Xhsf/Q/gfdmq8zuGjKrG+9vzHFEOrK0gJKowKtSEko
-         njVdgcLcK6VuxmtCXDCT7MBrdYu+E/GJbvgip/DpkZnGeiq7VEPQqWk1AYQ2z0naJmv3
-         nGgtYQQ+E3RIIYN8JksVDyNMiHIGF9Qu434x9C+SLTZPFYUEGZp6uyUgz1R1pM8pVYa0
-         xV4QGl8Je+J1ktxZ9Ab5WMosBUT47gl+DpHiblV/0F8aKS5LyDNWcwS8SswSMUkh91Yr
-         HW1g==
+        bh=hTAoHYeKQLtPBdjixfUnNuljkxxPtCdOxpFFRhJl/2Q=;
+        b=KNiOOtZ7Mz9h6rE+y5/ee9DcHRRNnvUVf6UdWpFykYHlug0zyu9JVub06MzMTXdC6z
+         cytZWE5HXpLaJfUc9gHfWihAYeUjSR7XJCYA+WOm9hydTKfiU+NS4qrZzFdQXFgfIb0B
+         Ts6qtfCFKCeQy0gbTRAnpmj1nxNsbqWLMxbiiJU3pRCoP/pTChU5phJRYuNFA1addXbC
+         yqnH8t3YoI6ok54CY4uY97z1ZjWH7wxAt0M4beDTNaU5Qzaqt5hTvFc2EhszzNFoNggi
+         RIJ9f1e0rQbR62nDLaupURSS3PTHZaE+2bR2K4F5nQ5YbM9hA7/SgWbiD7Abzr0P70pz
+         2xhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706810517; x=1707415317;
+        d=1e100.net; s=20230601; t=1706810634; x=1707415434;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XO6MI34sx7y7sKtG0/owVEIu61lP2sL9c6sYjJfuMnM=;
-        b=ppTGstne1Kzf+1l85Dsy8fpdm1JFxyqdSN73uqlGQ9KfHDERwCyZ8CTBLoyPzjngew
-         yulLNg+i4VtC/NjnWDc5M5hTpFFpQfkUJqxWnGPGuFX0RALOGHlbcx+d5PM2tErg444d
-         L0tBn6NwbHsLrDnPu8J44jgmcEvPH2V/ZhUkQOpwI0hFAAZb0xc+HKkdJodHfora0Xjm
-         UxEe3O8/1gjFrMqxNzTYYhAtrZUfjbEeAMf96CFTZ1yis0JNWvVHW7Y8Hf4ty2j+qyMI
-         VL5j3vFI3YhdXsGPVElmS5nIO5tv3Mhoag8nCUqJUFPs8rB47rMq1WciWIvJjcwuHTDr
-         CskQ==
-X-Gm-Message-State: AOJu0Yy5U27QUaSzWpvid3vsNAgOeVNjJCIHd/KZw20gUY+ECGrqiRyI
-	Spgq08QqIpWi6JVJVHTbgEkGc7vxlgWHhKjjIUyM4Il17ZKGeciZtvj3fOK7HC2cTM3ZE1ggmHt
-	pE/cUfGded2hCLtd/MT6cuQqxL1RdJn9F
-X-Google-Smtp-Source: AGHT+IHuqoNPXgvjEts1kVWihMQu4JBgCDfOEuP3f3vDrRUiz+eDTghA25P/bF2vzA9TqscdoYX0lhuA7pck61vIO68=
-X-Received: by 2002:ac2:4579:0:b0:511:33d4:c99b with SMTP id
- k25-20020ac24579000000b0051133d4c99bmr127913lfm.43.1706810517341; Thu, 01 Feb
- 2024 10:01:57 -0800 (PST)
+        bh=hTAoHYeKQLtPBdjixfUnNuljkxxPtCdOxpFFRhJl/2Q=;
+        b=SjkOh46HrT+Hp7PaP59trGDmq1sSY2Gpv2h+1K8zWnVAKlz8ot2q7udLVURRoxHwG+
+         bPP0drbLcUrAvbajYWEto1iTeAy49I4is8NsHLaYx0xSUIFTw2PdIpCm5+xtPfMcAIyN
+         DGIIQd17vRb3toEEcnT/qaNjdf29TzQGrt42zhcW+jq0yY+m7F26mnQyVKZ+33KCpPiA
+         Um8blJpBwbLRa7ZQHnIDbrCz5vi6MYYVSJW8ngHN/yOGoMFKWwLCxOH1AOlE14xHtpys
+         vKiM+lcL3BlH2LQdjPxiTXboU09ie44g6fFDFbdQrOkNlBpRnIZJCChAE8BLJHlR3XQo
+         NXjA==
+X-Gm-Message-State: AOJu0Yw6hAlh0TvANysBA1dE8VeC8orcU8GQUSsZM7mtL5MTBVVDFIwA
+	YtExibKYviojg8itBcharURVsKzgitsEqsSuJddmQSKJvaC62j9z9oGSvFv3b/kGZZu1mk7v0x0
+	BY+6i57zvhhpEKdfp/VXUit1/uh4=
+X-Google-Smtp-Source: AGHT+IG6aFTsoUrEMDYFANpK5HAl7Gn8TU4aWP4RDoIE0rQHqlzep51EeKVr0UR3GkDC6FxhKRvQUk8SgxCd4RvOjO8=
+X-Received: by 2002:a2e:b254:0:b0:2d0:506f:5c0a with SMTP id
+ n20-20020a2eb254000000b002d0506f5c0amr4357647ljm.9.1706810634318; Thu, 01 Feb
+ 2024 10:03:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2c310e00-84ac-49d7-88f4-e742d9170088@lrose.de>
-In-Reply-To: <2c310e00-84ac-49d7-88f4-e742d9170088@lrose.de>
+References: <bf90de00-4d6a-4440-b6a1-42ac9e358158@moroto.mountain>
+In-Reply-To: <bf90de00-4d6a-4440-b6a1-42ac9e358158@moroto.mountain>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 1 Feb 2024 12:01:45 -0600
-Message-ID: <CAH2r5muS+w+pv-32pYhui7yyvitdmCgbkfZdmbTyo3ffOHKpqA@mail.gmail.com>
-Subject: Re: State of unix extensions and symlink support
-To: LuKaRo <lists@lrose.de>
-Cc: samba-technical@lists.samba.org, CIFS <linux-cifs@vger.kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>
+Date: Thu, 1 Feb 2024 12:03:43 -0600
+Message-ID: <CAH2r5mv-HdiM2zasyq1F-LN=kqD93EfKf+UMcnR+0_GNv3xB2Q@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: Fix a double lock bug in smb2_reconnect()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Tom Talpey <tom@talpey.com>, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-To clarify, are you asking about symlinks that appear as symlinks both
-to the client and the server?
+This (and a loosely related problem   were already fixed in an updated
+version of that patch (updated in cifs-2.6.git for-next yesterday);
+https://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dcommit;h=3Dee36a3b345c4=
+33a846effcdcfba437c2298eeda5
 
-There are many cases where emulated symlinks (that appear as symlinks
-to the client, but expose no security risk on the server as they are
-emulated) - "mfysmlinks" (also what the Mac client uses) are preferred
-to enable.   The Linux client has this mount option so that symlinks
-can be emulated without requiring the server to support reparse points
-(see Paulo's recent patches for example) which are common for Windows
-for symlinks or without requiring the SMB3.1.1 Unix Extensions.
 
-On Thu, Feb 1, 2024 at 10:17=E2=80=AFAM LuKaRo via samba-technical
-<samba-technical@lists.samba.org> wrote:
+On Thu, Feb 1, 2024 at 6:19=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro.=
+org> wrote:
 >
-> Hi everyone,
+> This goto will try to lock spin_lock(&ses->ses_lock) twice which will
+> lead to a deadlock.
 >
-> is it possible to create symbolic links using the Linux cifs client
-> within a Samba share on a Linux server? Or is that entirely not possible
-> at the moment? I have read that smb3 unix extensions are part of Samba
-> 4.18, but only when compiling in developer mode?
+> Fixes: 17525952fa83 ("cifs: make sure that channel scaling is done only o=
+nce")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  fs/smb/client/smb2pdu.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> Thanks for anyone who can shed some light in this regard,
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 2837fc4465a7..dcd3f6f08c7f 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -401,7 +401,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
+*tcon,
 >
-> Lukaro
+>         spin_lock(&ses->ses_lock);
+>         if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS)
+> -               goto skip_add_channels;
+> +               goto skip_add_channels_locked;
+>         ses->flags |=3D CIFS_SES_FLAG_SCALE_CHANNELS;
+>         spin_unlock(&ses->ses_lock);
+>
+> @@ -448,6 +448,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
+*tcon,
+>
+>  skip_add_channels:
+>         spin_lock(&ses->ses_lock);
+> +skip_add_channels_locked:
+>         ses->flags &=3D ~CIFS_SES_FLAG_SCALE_CHANNELS;
+>         spin_unlock(&ses->ses_lock);
+>
+> --
+> 2.43.0
 >
 >
 
