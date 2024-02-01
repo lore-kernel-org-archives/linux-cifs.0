@@ -1,57 +1,57 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFC115B995
-	for <linux-cifs@vger.kernel.org>; Thu,  1 Feb 2024 11:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DF615B995
+	for <linux-cifs@vger.kernel.org>; Thu,  1 Feb 2024 11:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706786148; cv=none; b=cIQCpuJIeGH63vp653NTvUC3ZxiPaB/FJLALPs5GCYs9Y4vdzS8vK5NMAeo60CWMmBXutUhmdV2YSQ9DKZ1xcYB1GPexNp/bvSfrPdJHmrrE0u6f0ixELSJaeKk0YwFTKidU0Tfd0HluAnecT5xHKvVBQHmNIuUIL8mojficoUE=
+	t=1706786151; cv=none; b=KZBlYfXgguuHMMPaVIjHl1TJu6zNEndLWfVPpRLQvf4RZrbnGjm6rPZnlvn0Vtdba1DaJUlvpxOIvN9exPlKibY5DoOBEgH1KmQLUA/xwqVfocxN5/mBqfuQ5Pzi+GQStRRHl7H4TzTzxLcj6rNg1BYaUi0rB4GbmIHxFd9bJn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706786148; c=relaxed/simple;
-	bh=oNmmTMO7rOwaVme3DvinibUY2cfpn+t6Zgwg8eU4VBs=;
+	s=arc-20240116; t=1706786151; c=relaxed/simple;
+	bh=HCOcu/1rbGO5BBk94tFa9ME7lPJDOr2W8q6UVAEJNqk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m5iFsqiEN47YzCL0KX5u8KTWxoH4rIbZWGs5gyF6T9MekNTT9XSSybP00Z9dOiR7k/pS5JtpTePv/EkQbLfsf234xulyDSsmCo4ghvhg3f21GeJqG6OZXy0MSvAci+zMuEW/4E2hk84G+NOzuns9M/5wjAfdvLzn6HaftVksHB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EB35kQiz; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=FKR20YT6u6yaCZ8Q/qv9mHO5C6YxpXcFhAFKYSuYwbQ4rZJTLXZpG2WJVnLKy/ZNuym8jgCfE/M/fXLUisXjCu70sX8eCcZ2cf+87R+NQSI9V2785Eu7brPmb3shgIYtJrxJa0i7VwG8FoOaUsZAoXB1Ju4EZr9AWvk5Lq/AohM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzUJ4qpb; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EB35kQiz"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d73066880eso6692645ad.3
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Feb 2024 03:15:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzUJ4qpb"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5d8b276979aso581842a12.2
+        for <linux-cifs@vger.kernel.org>; Thu, 01 Feb 2024 03:15:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706786146; x=1707390946; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706786148; x=1707390948; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UWYUhLumUFEGz6dKMdxqU7bBIDX9o62TKGXvyMevSgA=;
-        b=EB35kQiz64wWL+llJ4EiaCN9QrD2SNshrbw9IwM4cXM3CS4//ZKKyowu1V97SYDOJU
-         jSDrViRmrBiTAvOEseVoms+/5jTy2jkC+Pq/OCE0zpbVBCBoWvX4f2IQLJKQYHL7B++t
-         /BuG6Sgb4Rlf9/PPBdGJn0lCRppzqnGgn03BdLD1M7CUMTtQI6eXJ5DUsH1hun5X71/M
-         VjxA11OYBEAHEDdaxEA1WlXAZ2maRUj61cdbT0lri04XBkndc0bOGr6nXwkKyZl+glaj
-         pGTwvsVVkZLY5IEkPtCa8+hu+xmmWqOPDdIVqCHZpW8jV4W12wCWtVpfe32RLfMkomMt
-         F80Q==
+        bh=Frl2WBgfcQjJvWCrb+CbUqOaJYs+6rcVF+uT2seRujQ=;
+        b=IzUJ4qpbgbVhVWIWwFem6ijk/HKXrCyGtlfSlTXTu/3XIKJEght24HIqYQ7Tdq2/m4
+         /SRrCfafWX7fs5zvzUzCZbsUAj5Az37V6RjGXcb7jk0x0oWfsmUea7kM+yJ3xOOpArHD
+         HuSBL6LHy5NYarHbDvtwI4sbeNidy8aiPTkMWvn15VgsPm1g2RbiGouLAU6nqfVAJaZA
+         DJ2hdgIpVjhoBWrQcpVxq60S2cS+bylzvDqd+RRiVXFAxYfErcrREI3TdcF8PgRCCpVK
+         nZ+NiOimy7j5XCsJWU8D1013t9tNO9C6RuQU/ZLg5NHGVQfijzEOOKsfFFL3AQTYPXwC
+         rd4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706786146; x=1707390946;
+        d=1e100.net; s=20230601; t=1706786148; x=1707390948;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UWYUhLumUFEGz6dKMdxqU7bBIDX9o62TKGXvyMevSgA=;
-        b=TrjDyCbXP7+mGKBm1BybpYkq0idm1jrFr9BLGiokegJPJ7qIsjZOlPIlLKCeDW3z2T
-         braQkZlhKRxirpTi7dvmtrd5E2YsQvxDx/wo5Jv/tozNB7PPJhkLDKhIMwEbZ71Qxw7M
-         WtVXD1In3z+IinbCTN8wiGwfQgy3IJ8xzgcezLL7dIEI5476VodigrBTzryqw+WEX8iB
-         4qqPVCvrPJcRp8jWoqyXENmjuDFG5/zoiIaSsGTgWISnL45HvTbE3cUukZgraQ5dKzn1
-         0KU+7Hx8jQlBxp3+XcHzBPwGplCJgnq1eVRBxgGGJfjmDWDdpJOcbQkgQLgEVaE1e/z3
-         6GCA==
-X-Gm-Message-State: AOJu0YwbfVb8tjZRDoiUJvB2nSG6Vj3mbmDrd17+ScNnq2RCXYAA5rKr
-	8mHbkL0AHy1kXmzrclyOwSC+Wz+tSoHbp36adGcVPzJbix+iv1bU5JDQJ7z7
-X-Google-Smtp-Source: AGHT+IE5sNL+4bDkBs3Jnigb9Gc/BZBNR64+sGn1VdPPJqd3wrW2uzpWqvv7Jjq4X/axHiSQAxchug==
-X-Received: by 2002:a17:903:248:b0:1d9:1359:75ec with SMTP id j8-20020a170903024800b001d9135975ecmr5825036plh.30.1706786145791;
-        Thu, 01 Feb 2024 03:15:45 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVZC/SyF9RD80LDpn6oF/0lLzF63k03/+ccefA3gGh5SxiS387vbTGEFVbhwu4Z14FXdiHI1XGR8mYYfH5nTw4kNmVJYpVHpOD6EsQAl7Fr+f9CH/44vhJIzaEC/ClvVNIjnobHvBdlHfQ2EAjy
+        bh=Frl2WBgfcQjJvWCrb+CbUqOaJYs+6rcVF+uT2seRujQ=;
+        b=VW/BfsuyiRkCuSG7y9ssQEs+WrbADSZltn6fZ3Pa9/M3OiWkLyBHrh8sd2FxTjf14M
+         nYmd+i/Y2Ypah+wOp5NplKnA+wYL8q5R4JJXsiiYnWcH2gR5WxOtOYxNvQaf5LmSLsM2
+         zWeq9Bj86uJJISLiR47mfASdcjxl2TVC/ue51uY5srTUHin1wf9JBhlOEV17HhsNsxZn
+         Xr3Y7jmRpgiEHllM3opnGqH9qLpGVEpxGhKq1SLWQqaGxEwK8ZhUd0Lq7u31yaYbPjWy
+         Zk2D6pYQ6IspJeXk6KuQkisNxEqps2rqRhNxrG1UwKB/uc3jIbLk7V9W8nDewBaqca6r
+         LkQA==
+X-Gm-Message-State: AOJu0YwNgG0PVqAH8Oe1O9UEooKa4yLaNoEujIPJR2T2vgq9NAvYqis5
+	YcgPZkZpRefII9T63OMLbdIHXV3uxFWRgHTIb0sUC3eSrI96LIFMCUv9Jyjr
+X-Google-Smtp-Source: AGHT+IH48XlmqjbCnQuy5MGjqtUQ8eXWgEQgKVAwtGYoC7FnBKNoVDQipxRfZVL3jWrRBQ/h5xyRFg==
+X-Received: by 2002:a05:6a20:1e8a:b0:19c:9419:1f37 with SMTP id dl10-20020a056a201e8a00b0019c94191f37mr3549896pzb.13.1706786148367;
+        Thu, 01 Feb 2024 03:15:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWzhx/07OQ78AVVqULElFiAnO3JCWlsPlwsKUZ5JLDZfmkuQIVl3fHSNPsLQ2gwv+WlwNIxjhyUo2PgDRUdtpT62aBZzkUZ5tpo52ZgRBatxtTXmBsBni3lf9vl9i0PSy6gjaR6jcKKDeGN7uA+
 Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id l19-20020a170902f69300b001d94c4938b3sm1129926plg.262.2024.02.01.03.15.43
+        by smtp.gmail.com with ESMTPSA id l19-20020a170902f69300b001d94c4938b3sm1129926plg.262.2024.02.01.03.15.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 03:15:45 -0800 (PST)
+        Thu, 01 Feb 2024 03:15:48 -0800 (PST)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -59,9 +59,9 @@ To: linux-cifs@vger.kernel.org,
 	pc@manguebit.com,
 	bharathsm@microsoft.com
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 3/5] cifs: do not search for channel if server is terminating
-Date: Thu,  1 Feb 2024 11:15:28 +0000
-Message-Id: <20240201111530.17194-3-sprasad@microsoft.com>
+Subject: [PATCH 4/5] cifs: failure to add channel on iface should bump up weight
+Date: Thu,  1 Feb 2024 11:15:29 +0000
+Message-Id: <20240201111530.17194-4-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240201111530.17194-1-sprasad@microsoft.com>
 References: <20240201111530.17194-1-sprasad@microsoft.com>
@@ -75,61 +75,43 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-In order to scale down the channels, the following sequence
-of operations happen:
-1. server struct is marked for terminate
-2. the channel is deallocated in the ses->chans array
-3. at a later point the cifsd thread actually terminates the server
+After the interface selection policy change to do a weighted
+round robin, each iface maintains a weight_fulfilled. When the
+weight_fulfilled reaches the total weight for the iface, we know
+that the weights can be reset and ifaces can be allocated from
+scratch again.
 
-Between 2 and 3, there can be calls to find the channel for
-a server struct. When that happens, there can be an ugly warning
-that's logged. But this is expected.
+During channel allocation failures on a particular channel,
+weight_fulfilled is not incremented. If a few interfaces are
+inactive, we could end up in a situation where the active
+interfaces are all allocated for the total_weight, and inactive
+ones are all that remain. This can cause a situation where
+no more channels can be allocated further.
 
-So this change does two things:
-1. in cifs_ses_get_chan_index, if server->terminate is set, return
-2. always make sure server->terminate is set with chan_lock held
+This change fixes it by increasing weight_fulfilled, even when
+channel allocation failure happens. This could mean that if
+there are temporary failures in channel allocation, the iface
+weights may not strictly be adhered to. But that's still okay.
 
+Fixes: a6d8fb54a515 ("cifs: distribute channels across interfaces based on speed")
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/sess.c    | 4 ++++
- fs/smb/client/smb2pdu.c | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ fs/smb/client/sess.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index cde81042bebd..3d2548c35c9d 100644
+index 3d2548c35c9d..ed4bd88dd528 100644
 --- a/fs/smb/client/sess.c
 +++ b/fs/smb/client/sess.c
-@@ -75,6 +75,10 @@ cifs_ses_get_chan_index(struct cifs_ses *ses,
- {
- 	unsigned int i;
+@@ -273,6 +273,8 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
+ 					 &iface->sockaddr,
+ 					 rc);
+ 				kref_put(&iface->refcount, release_iface);
++				/* failure to add chan should increase weight */
++				iface->weight_fulfilled++;
+ 				continue;
+ 			}
  
-+	/* if the channel is waiting for termination */
-+	if (server->terminate)
-+		return CIFS_INVAL_CHAN_INDEX;
-+
- 	for (i = 0; i < ses->chan_count; i++) {
- 		if (ses->chans[i].server == server)
- 			return i;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 75713559e69f..cf5665f6f220 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -178,6 +178,7 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
- 		}
- 
- 		ses->chans[chan_index].server = NULL;
-+		server->terminate = true;
- 		spin_unlock(&ses->chan_lock);
- 
- 		/*
-@@ -188,7 +189,6 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
- 		 */
- 		cifs_put_tcp_session(server, from_reconnect);
- 
--		server->terminate = true;
- 		cifs_signal_cifsd_for_reconnect(server, false);
- 
- 		/* mark primary server as needing reconnect */
 -- 
 2.34.1
 
