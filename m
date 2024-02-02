@@ -1,46 +1,52 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438E61332AA;
-	Fri,  2 Feb 2024 18:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA5013CE9B;
+	Fri,  2 Feb 2024 18:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899237; cv=none; b=aRYR6h3fqXbcNnDA9TdO527Ihew7VDz6jMz8sgmKxIGnyy2vnI8jqGb6aWDQ+9ncK8iJ+iFkb4sApWfaL3gegR0fuh6qulG3D/ChPUDEEFYgVqDT7RPWsrSq/cBv1HqQRWhef/YzH2bQ/BjRStxv3+vN3SJPUeOWFotkIRgNvus=
+	t=1706899273; cv=none; b=eXP4sFZ+ltFcUM4FtlCTrBh2r4IEp0IvFDk/sRGhOpLF56yLTsv71LipaztefRjI02lGNIJQAdAsMUs+sq1w+98PApW85/fw1/4sYsLlbslWoqIOkAWs3mnpXp1aSBNPLsHd0v3GXdCUz4jxbdU2N50F6iO+FjZO3Z7Mmk0ZOz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899237; c=relaxed/simple;
-	bh=X10j6hIkapjDwin0+mzTVm9pOVNX2fDuyoPHpwhjl5E=;
+	s=arc-20240116; t=1706899273; c=relaxed/simple;
+	bh=gqHXrMkDHlKxmoYDuWfVtLdvPEZ9IDVXLemBL1p9mvA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nibgJ+bCDfhtVrMtKMRJxy9vOZ2LoIpLiDhGgcB27eaWerrf+CbF8/RnjUcmD5hVp8cOV7e8yRvfAROaZbpKQWgiVkJvk0ON4c8mF1qn1EFG5LE6pvwfeHBIBO2Y7+gw2a1EGpvUdkk49EBJIlRbX0f7tj/Rhk5BRYcgks20QKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tW8Pgvr9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=AdTCimNTE5c7v6Pu0E5iE8qOv9JEzfa3TsjLlbde44F7/+AZ+IwUznAnYq7uc3CN2Inip33MDatN8MVh2WujT5LK6Dnu5b+BBoRKYhfnZhWDSFrnAhLCpImL8gT5Ub0z68tgYTC5swSPZEow/9/+PQ1Ym64NUJgxHABF6Eo6ppc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkreZhq0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tW8Pgvr9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6518C43390;
-	Fri,  2 Feb 2024 18:40:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkreZhq0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018A3C433C7;
+	Fri,  2 Feb 2024 18:41:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899236;
-	bh=X10j6hIkapjDwin0+mzTVm9pOVNX2fDuyoPHpwhjl5E=;
+	s=k20201202; t=1706899272;
+	bh=gqHXrMkDHlKxmoYDuWfVtLdvPEZ9IDVXLemBL1p9mvA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tW8Pgvr9cU9otJ9k0NFhJEvK2Db6FjLVm8uOORYr3yYFnoF42zCDDs4d5yIhQ0pm/
-	 wTGxRd1BaFSwFzyYBhDlrdTl2Ov75F+RYCDcNlNzjap9NcXJ9LewdqdWg8cuuQbzJr
-	 YEeAxHkVPgGHCpBg0BjlQIBbuqtN3S7xmfF2Kgk61uqCeydH94oFz79Rpdvrv831HS
-	 HigbJVl/LsE0u+seIliwklFKr9Z2f685NMhFR5k44vO4lfVBN/z5tCJVer8Di1vOWX
-	 1rLSEZ4zhrm0kwYd/0sgh/ZmyDrA9NYyZ/t2HKWd8HZF3AntOHGpSb4MUHLqAetdyy
-	 HxSVMCiM91rIQ==
+	b=rkreZhq0U0CjZapbftVpnR51E0G1+XOBcGuaR+UvCNX1Bc4eBwU1XDTs7apCBZx24
+	 A3UEtUQadau5Hb7VFmAu5QRDUdTpnwtb/541o4fZ5OdL+TZ98XbC+vY6eZArTZhnpQ
+	 eb+U6jPJKD4AVHjujBpOkWkqtWxMwK3KIxNfvdXWxShVzPVU8k4m4ec8MrRMsd4TSG
+	 yTvNnIZIQU4tWft1uQDjpHosZTVmJLymR41UyDuF+bAq3MelFSt4wP4zKIRWwPVfSU
+	 B+ldC0UGVm9kM1GMl/8PMHJ4yRZ9pf6Ls/TynjfPOzb7a6ZqN8QFtPB1yB9dmJ6qKy
+	 O2qH5qLUAFl7w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
+Cc: Kees Cook <keescook@chromium.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	llvm@lists.linux.dev,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.6 13/21] cifs: helper function to check replayable error codes
-Date: Fri,  2 Feb 2024 13:40:00 -0500
-Message-ID: <20240202184015.540966-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 08/15] smb: Work around Clang __bdos() type confusion
+Date: Fri,  2 Feb 2024 13:40:45 -0500
+Message-ID: <20240202184057.541411-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240202184015.540966-1-sashal@kernel.org>
-References: <20240202184015.540966-1-sashal@kernel.org>
+In-Reply-To: <20240202184057.541411-1-sashal@kernel.org>
+References: <20240202184057.541411-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,59 +55,70 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.15
+X-stable-base: Linux 6.1.76
 Content-Transfer-Encoding: 8bit
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+From: Kees Cook <keescook@chromium.org>
 
-[ Upstream commit 64cc377b7628b81ffdbdb1c6bacfba895dcac3f8 ]
+[ Upstream commit 8deb05c84b63b4fdb8549e08942867a68924a5b8 ]
 
-The code to check for replay is not just -EAGAIN. In some
-cases, the send request or receive response may result in
-network errors, which we're now mapping to -ECONNABORTED.
+Recent versions of Clang gets confused about the possible size of the
+"user" allocation, and CONFIG_FORTIFY_SOURCE ends up emitting a
+warning[1]:
 
-This change introduces a helper function which checks
-if the error returned in one of the above two errors.
-And all checks for replays will now use this helper.
+repro.c:126:4: warning: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Wattribute-warning]
+  126 |                         __write_overflow_field(p_size_field, size);
+      |                         ^
 
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+for this memset():
+
+        int len;
+        __le16 *user;
+	...
+        len = ses->user_name ? strlen(ses->user_name) : 0;
+        user = kmalloc(2 + (len * 2), GFP_KERNEL);
+	...
+	if (len) {
+		...
+	} else {
+		memset(user, '\0', 2);
+	}
+
+While Clang works on this bug[2], switch to using a direct assignment,
+which avoids memset() entirely which both simplifies the code and silences
+the false positive warning. (Making "len" size_t also silences the
+warning, but the direct assignment seems better.)
+
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://github.com/ClangBuiltLinux/linux/issues/1966 [1]
+Link: https://github.com/llvm/llvm-project/issues/77813 [2]
+Cc: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: llvm@lists.linux.dev
+Signed-off-by: Kees Cook <keescook@chromium.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cached_dir.c | 1 +
- fs/smb/client/cifsglob.h   | 7 +++++++
- 2 files changed, 8 insertions(+)
+ fs/smb/client/cifsencrypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index d64a306a414b..ef96d5f7809e 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -367,6 +367,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		atomic_inc(&tcon->num_remote_opens);
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index d0ac2648c0d6..d3d4cf6321fd 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -444,7 +444,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		len = cifs_strtoUTF16(user, ses->user_name, len, nls_cp);
+ 		UniStrupr(user);
+ 	} else {
+-		memset(user, '\0', 2);
++		*(u16 *)user = 0;
  	}
- 	kfree(utf16_path);
-+
- 	return rc;
- }
  
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index ec1e5e20a36b..000ed4a01624 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1804,6 +1804,13 @@ static inline bool is_retryable_error(int error)
- 	return false;
- }
- 
-+static inline bool is_replayable_error(int error)
-+{
-+	if (error == -EAGAIN || error == -ECONNABORTED)
-+		return true;
-+	return false;
-+}
-+
- 
- /* cifs_get_writable_file() flags */
- #define FIND_WR_ANY         0
+ 	rc = crypto_shash_update(ses->server->secmech.hmacmd5,
 -- 
 2.43.0
 
