@@ -1,102 +1,65 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1A714D913;
-	Fri,  2 Feb 2024 18:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF518593F;
+	Fri,  2 Feb 2024 22:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899274; cv=none; b=TDrnWsO2SRwqcfVRh+jV8eMfGZyHiLCpK+C943INgSEiI1LI6k/PqTv/b539dxqFJyQAOhtv0KO9fegR5lJ+ah/Xu6X22M1FsQVFO9lz5EP6P+ODPMsX2bDPwqq8/P/X3A8Dsdwp0qBQWTnKx1+7LBLjjmwvfW2QO40ofHFfN2g=
+	t=1706914675; cv=none; b=fHRISQCi3aUXTfaXxmqa3j68fn/ZTOvGg1676d9W/ZrlKUBKasd0KceJzBCbeTE+TGjqWpGlnftrCem9dVjyGQ5CM9Kkwn66aIiUtqwdFwrdsnANDo2xKxFGxQ2vpMEZpm36NROzSBwS6a9uoeU9J3i/A3Y07cssKQ641W0MS0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899274; c=relaxed/simple;
-	bh=z+kMQvyKLJl5WYHGbGbyDn+Jv6UN7scqw716sR9s0pE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dagmAm0WuzXOAzg61g0TVNypnOVLB74hL6LDfy7NjclWyCEsasGbugWoJ4jw/Zmig/auJ9glmlL9A0Meb1lTNdLnj1AX4r9QQQHWpX12U725wsVFhXA3v2dAXF78EzaEd9KoE1ZwWHLExkwvMlMDi86Dm90H+gmqhM/J7CDKr4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsS88CRH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706914675; c=relaxed/simple;
+	bh=MxXvRNhRQV3ez+vTFS4T4y0bBEnlLlneX57Ow78rfLY=;
+	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qs9TjNlCJ8Nc2SZ2rHaAp+sm+b/HRiyd1aY9hKNEsIM2ziUWvYEptiYdfjv51GVair7ulrbs/3eY3YtapQ0rRhcyI8bb34fKli6/074rb3lyf1dRUjO1TTe/7mJVzbHi4gD53nsGb7tiRhYd75+Pb6nL0bNVbvhMoL4lEGyqoGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jg+yGgYL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsS88CRH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E34D5C43399;
-	Fri,  2 Feb 2024 18:41:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jg+yGgYL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D387C43394;
+	Fri,  2 Feb 2024 22:57:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899273;
-	bh=z+kMQvyKLJl5WYHGbGbyDn+Jv6UN7scqw716sR9s0pE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qsS88CRHwp6/LJTnOxoyFbtEQzrTScKhQDMusddwvxLR+P7D/QfRBZZDrFDRknK3U
-	 teqG5bN4GWdBQ78KzE5U8MMbgz0hhylffxlM6UMjh7UhQbTmBGuXQDaSkTUBaqPadH
-	 fUKrZX2bmTcFCtCnu/vvr0UL7fEBoEjE+7tUusU9POLYaPBbpil1M0XAqHllneHg7M
-	 JnHG9ORcc60CI6+FCTPboq+0uiAJEgEl/Oj5KtEymLDpjipWXVRgis0HC2vAQEd1vv
-	 wBmAnUyaodQI3PGhCoOty4xo8T7qgn3psovDbWyhdD50BxfXNCaCAr0No6Bb/lVVAM
-	 KD0++mc2l/bSw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 09/15] cifs: translate network errors on send to -ECONNABORTED
-Date: Fri,  2 Feb 2024 13:40:46 -0500
-Message-ID: <20240202184057.541411-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240202184057.541411-1-sashal@kernel.org>
-References: <20240202184057.541411-1-sashal@kernel.org>
+	s=k20201202; t=1706914674;
+	bh=MxXvRNhRQV3ez+vTFS4T4y0bBEnlLlneX57Ow78rfLY=;
+	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+	b=jg+yGgYLVSG043qQDEw6lDMo7zwq1maYwt+e1Zw+RkXWkwOPpqf0qfhuk+xDEmSWz
+	 XXR6tlnzb6ylKdNRdeR1B1CW2NZRh0SqB91TzrEI9A6Yew7vR0ajNbCGTqvC5DVNBv
+	 wsAa0qjqWzxL+M1S+kANQ6XkLIO40FIv1aXqocPsn+DNUJKpla+0vLzQOmDRkpOLiZ
+	 QCxc4zwM3w80HzgJ7p7assBr/FRbSK99lenhHNiUeWC8/3MR9yoNRv29N1UbL6NRn1
+	 1Nnu6q9EXOUlYywkdRK7ngFVLjg7RDzNFgGGYxWbUaUdVmQhXwMgg3x4xwezVOtVHb
+	 XI6rD7lcgp3Zw==
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-59a94c0fb55so1332912eaf.0;
+        Fri, 02 Feb 2024 14:57:54 -0800 (PST)
+X-Gm-Message-State: AOJu0YxYqVFJKvucc9t02dV5y765IyVcwYEAeua+s1q2eJOQYempRvUP
+	BlbwhwMOPiQKK/wqskBeBcyx7KfpsL7U3ZhtTNX8zhDO3TZlVzOM+DRBZ0j96oDl20Z7fq614yM
+	rVVjc+tErjyV+FngNtEo9KuxzOLE=
+X-Google-Smtp-Source: AGHT+IGKDU432zvrh2YD9SDCT8yNyv2tot4NOdlmKs/VFBxd84o8jhy0jFTzOu5IjKEGG1t+9Gi8Fvp9Vl6yPZAa/sY=
+X-Received: by 2002:a4a:d750:0:b0:59a:9ff:9ed0 with SMTP id
+ h16-20020a4ad750000000b0059a09ff9ed0mr6777199oot.0.1706914673738; Fri, 02 Feb
+ 2024 14:57:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.76
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ac9:5e89:0:b0:514:c0b3:431 with HTTP; Fri, 2 Feb 2024
+ 14:57:52 -0800 (PST)
+In-Reply-To: <20240202081317.128980-1-yang.lee@linux.alibaba.com>
+References: <20240202081317.128980-1-yang.lee@linux.alibaba.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 3 Feb 2024 07:57:52 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8NktM=Q7Px9ZjsTKnAC043XOTKL+QCL2WuEVrs_giPqw@mail.gmail.com>
+Message-ID: <CAKYAXd8NktM=Q7Px9ZjsTKnAC043XOTKL+QCL2WuEVrs_giPqw@mail.gmail.com>
+Subject: Re: [PATCH -next] ksmbd: Add kernel-doc for ksmbd_extract_sharename() function
+To: Yang Li <yang.lee@linux.alibaba.com>
+Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Shyam Prasad N <sprasad@microsoft.com>
-
-[ Upstream commit a68106a6928e0a6680f12bcc7338c0dddcfe4d11 ]
-
-When the network stack returns various errors, we today bubble
-up the error to the user (in case of soft mounts).
-
-This change translates all network errors except -EINTR and
--EAGAIN to -ECONNABORTED. A similar approach is taken when
-we receive network errors when reading from the socket.
-
-The change also forces the cifsd thread to reconnect during
-it's next activity.
-
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/transport.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 8a1dd8407a3a..97bf46de8e42 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -427,10 +427,17 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 						  server->conn_id, server->hostname);
- 	}
- smbd_done:
--	if (rc < 0 && rc != -EINTR)
-+	/*
-+	 * there's hardly any use for the layers above to know the
-+	 * actual error code here. All they should do at this point is
-+	 * to retry the connection and hope it goes away.
-+	 */
-+	if (rc < 0 && rc != -EINTR && rc != -EAGAIN) {
- 		cifs_server_dbg(VFS, "Error %d sending data on socket to server\n",
- 			 rc);
--	else if (rc > 0)
-+		rc = -ECONNABORTED;
-+		cifs_signal_cifsd_for_reconnect(server, false);
-+	} else if (rc > 0)
- 		rc = 0;
- out:
- 	cifs_in_send_dec(server);
--- 
-2.43.0
-
+2024-02-02 17:13 GMT+09:00, Yang Li <yang.lee@linux.alibaba.com>:
+> The ksmbd_extract_sharename() function lacked a complete kernel-doc
+> comment. This patch adds parameter descriptions and detailed function
+> behavior to improve code readability and maintainability.
+>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+Applied it with Randy's acked-by tag to #ksmbd-for-next-next.
+Thanks for your patch.
