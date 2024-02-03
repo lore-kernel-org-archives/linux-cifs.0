@@ -1,49 +1,50 @@
 Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3723B13AC0
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 22:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5485312E68
+	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707000972; cv=none; b=WsTEKb/1c6margzpShcQ/s3TMZtMJpxaRl08nvo0a6Vqqjad48iTL3Q3EwbBriOZa9WmKaTJYU4DVjVUCinqv1cpOhSTuw7bFpz5q80bAPTzVfwnWf599XCK7PBinJNPA0fObpP2GGRdXknXbGtYEPKIQC2Dxof++9VAmEoiFZc=
+	t=1707001376; cv=none; b=oCNuTLJxV0WgXV5ArEQsDuHUKDr3twMSGfKmV0OhXvNK9KwBrKwrD1jPK9e5u8TdlbmSwZmyFd/cgiiMwedsDYhwIhx17NIdRtuzoIil8Y/2GlyY4bUq5tcGz23u0DDkhbCEsyr03R957hqGG5jaSemXwBCfTJ2Gj9EqNEooaMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707000972; c=relaxed/simple;
-	bh=PwgPWnkLVZled+tYovuN8BYLpSoA/sa6lODw7vunpm8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=n0OkL2vJDjbfGMKP8TUWg3f1TJ2E8zqk3DNO5Lixj404hC/2j0AECMq9cBojnOC7cqkH4QkA8jvbYLlIsM19tDsqSF8keOXkVpOIdZOoqlmgNK0rBT5qswM0zPU2Y3L9jQPKfDGhAeaRAiFMV5CU/eXUgWELGBTjDoCe/Fh6auc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=J5SMMx5d; arc=none smtp.client-ip=188.68.63.102
+	s=arc-20240116; t=1707001376; c=relaxed/simple;
+	bh=fK01hh23ykgw3qutGPm7o9kaGeUktmDS8ZA3wcS1zUo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h0ifAajILkkRhCgxUWCzLcYIRMsjC3YIO5nOp75LV0SbHSCIhkEBH70Xk/fi2ZWErUvlz3/3nZFTebrzDCnkvi/mYdGlgDHp2rj5Mqgprs7og/TjLWZ6j3QTEly0SaITc344jVa4qWtQSPf3rBwEntEDvXMb1mcf2TxyOqCv/E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=Z3psgwzd; arc=none smtp.client-ip=188.68.63.102
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="J5SMMx5d"
+	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="Z3psgwzd"
 Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS79D0W6Xz5ylm
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:48:48 +0100 (CET)
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS7TR1TFFz5yVG;
+	Sun,  4 Feb 2024 00:02:51 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
-	t=1707000528; bh=PwgPWnkLVZled+tYovuN8BYLpSoA/sa6lODw7vunpm8=;
-	h=Date:From:Subject:To:From;
-	b=J5SMMx5drvBVMDTiPoBjCvqmrl2KB2LVgBGDFIvT4yitB40cJKG3M4lg4RW7y1CoF
-	 hiXE+5bUdxMiy+7aFIzzyZYweQkIqEvQYTnXxgC5e3P9WrXPEhs8M7wA+Fj2Q46Qv9
-	 CDMHVfRImvEXuPk1Ib3onBv6e5efWqmIuIA9VdG3S+pAeZOiLLWPUMhC+SFflvK5Mt
-	 hkc2uRAo9tjZkpIb13EZ5fkjM2fdjB2Fh6T/YU7Qrafjfy5kNuV0Rrz+eSF6lCjMBL
-	 3krn/2/Bm1g/0Tj3gMAvbzBQ7L/KmiUxy/yEwmYIT7q34E1mVimwu4LRGi8xXjGOl+
-	 z19qOErQ+G2/A==
+	t=1707001371; bh=fK01hh23ykgw3qutGPm7o9kaGeUktmDS8ZA3wcS1zUo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Z3psgwzducIHmP363Rg3ChFu0S+DEx49dxHIshj5vf4/Zhxd7zZOEXyvyQwOalcl+
+	 0bR52tsbmhb5ifJFgKXasITpTUrAjeYadIlQRrppkYUpwZTphEF0nSOTkOxt2bQJlH
+	 cB9ZijiwYdT29uqjJBdqkD9+YEmj0c/uQtyTr1yP5UWNBivpeaPlVq4/bphcjszWcY
+	 9GqWLFecEd7t5x5QtFvbzAbqXl0S5BM8Qz4N5d8YTowxd15uiLc5kEvJOB4WrYJxma
+	 sGJBLNXwjXG2qnGUlbPVUD4IBDD6zOHUFu7vtyqzrU+A4UKI49TqVMFyFAvIdmXyVj
+	 NTws1Vt/49xjQ==
 Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS79C6vzkz4xYf
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:48:47 +0100 (CET)
+	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS7TR0mV8z4xYq;
+	Sun,  4 Feb 2024 00:02:51 +0100 (CET)
 Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TS79C5C2xz8svC
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:48:47 +0100 (CET)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TS7TQ5tZ6z8sZf;
+	Sun,  4 Feb 2024 00:02:50 +0100 (CET)
 Received: from [192.168.115.138] (unknown [62.27.244.140])
-	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 3DC731007EB
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:48:43 +0100 (CET)
+	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 424B61007EB;
+	Sun,  4 Feb 2024 00:02:46 +0100 (CET)
 Authentication-Results: mx2eb1;
         spf=pass (sender IP is 62.27.244.140) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[192.168.115.138]
 Received-SPF: pass (mx2eb1: connection is authenticated)
-Message-ID: <428ab7ba-0960-4e5e-a4ab-290dac58f45b@rd10.de>
-Date: Sat, 3 Feb 2024 23:48:42 +0100
+Message-ID: <fb4abd14-b002-4056-9dfc-1b7f5c83f84a@rd10.de>
+Date: Sun, 4 Feb 2024 00:02:45 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,38 +52,38 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
 Content-Language: en-GB
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>
+References: <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de>
+ <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
 From: "R. Diez" <rdiez-2006@rd10.de>
-Subject: How to automatically drop unresponsive CIFS /SMB connections
-To: linux-cifs@vger.kernel.org
+In-Reply-To: 
+ <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <170700052347.24372.17255394097938511916@mx2eb1.netcup.net>
-X-Rspamd-Queue-Id: 3DC731007EB
+X-PPP-Message-ID: <170700136654.29116.14943511454839720127@mx2eb1.netcup.net>
+X-Rspamd-Queue-Id: 424B61007EB
 X-Rspamd-Server: rspamd-worker-8404
-X-NC-CID: 5MUOYGKUfvpdhiP6W2GOCU3D0MVX5f4kTuXHohPy
+X-NC-CID: F+tQCHWzTPT+xThRjrhpa8hLy1DsGWGUwRVNh6rW
 
-Hi all:
 
-I have been mounting Windows shares for years with this script, which just boils down to "sudo mount -t cifs":
+> Do you know if this is also broken in current mainline e.g. 6.7 or
+> 6.8-rc2 (for Ubuntu and some other distros it is fairly easy to
+> download from their website current kernel packages to make testing
+> easy).
 
-https://github.com/rdiez/Tools/blob/master/MountWindowsShares/mount-windows-shares-sudo.sh
+I don't know, I didn't test so much. I am not familiar with this kind of Kernel work.
 
-I noticed under Linux that some applications (like Emacs), the desktop's file manager (like Caja) or even the whole desktop sometimes hang for a number of seconds. It is very annoying. It turns out the reason is that the hanging software is trying to look at a file or a directory on an unresponsive CIFS / SMB mount.
+I found some newer Kernels for Ubuntu here:
 
-The easiest way to reproduce this issue is from outside the office: I start the VPN, connect to the Windows shares, and then tear down the VPN.
+https://kernel.ubuntu.com/mainline/?C=N;O=D
 
-I have tried mount option "echo_interval=4", but that does not really help. The Kernel does seem to notice more quickly that the connection has become unresponsive:
+But it looks like many of the self-tests fail, which does not help build confidence. I fear breaking my Linux PCs, which I need daily.
 
-Feb 03 23:24:37 rdiez4 kernel: CIFS: VFS: \\192.168.1.3 has not responded in 12 seconds. Reconnecting...
+I'll see if I can find some time and some spare computer to try this out, but it may take some time.
 
-The trouble is, it tries to reconnect automatically. That means that the next application which attempts to access something under the unresponsive mount will hang again. I think the pauses last 10 seconds, it must be hard-coded in the CIFS Kernel code. If the application retries itself, or tries to look at more than 1 file before failing the whole operation, then the time adds up accordingly. If the shell's current directory is on such a failing path, it bugs you for a while.
-
-What I need is for the connection to automatically drop when it becomes unresponsive, and do not retry to connect again.
-
-Alternatively, applications should fail immediately if a connection has been deemed unresponsive in the meantime, and hasn't been successfully re-established yet.
-
-Is there a way to achieve that behaviour?
-
-Thanks in advance,
+Regards,
    rdiez
+
