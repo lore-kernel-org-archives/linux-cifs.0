@@ -1,89 +1,110 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.102])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5485312E68
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Feb 2024 23:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB3B10E9;
+	Sun,  4 Feb 2024 02:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707001376; cv=none; b=oCNuTLJxV0WgXV5ArEQsDuHUKDr3twMSGfKmV0OhXvNK9KwBrKwrD1jPK9e5u8TdlbmSwZmyFd/cgiiMwedsDYhwIhx17NIdRtuzoIil8Y/2GlyY4bUq5tcGz23u0DDkhbCEsyr03R957hqGG5jaSemXwBCfTJ2Gj9EqNEooaMw=
+	t=1707012882; cv=none; b=pJoM1gPcN8cgvvzcrtvu8gKPcUHf6XPZwEHejHBj4vVhvN5mSxfsDa3zoSnp1ad9A3LQ0Ju+799yS91ByTeAD90GaDvjnGHADHZCI7BWoKKi6IbRl/6rI3wH0BMEBoVlJZ6BKbEC2odKKK5xAd9xY7k6S+iO5AG/Ubc3zs5FKcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707001376; c=relaxed/simple;
-	bh=fK01hh23ykgw3qutGPm7o9kaGeUktmDS8ZA3wcS1zUo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h0ifAajILkkRhCgxUWCzLcYIRMsjC3YIO5nOp75LV0SbHSCIhkEBH70Xk/fi2ZWErUvlz3/3nZFTebrzDCnkvi/mYdGlgDHp2rj5Mqgprs7og/TjLWZ6j3QTEly0SaITc344jVa4qWtQSPf3rBwEntEDvXMb1mcf2TxyOqCv/E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=Z3psgwzd; arc=none smtp.client-ip=188.68.63.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
+	s=arc-20240116; t=1707012882; c=relaxed/simple;
+	bh=iw2JbmP3n4xThPeqMrHzCJB0Mvrs4t2jpGYi+wwN+WU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=MULp5ma9UId3+J6aq9H2mhuISdFei9xDR8AtyQWqCQMn7kgaXopkeLcib3f2U/pwCcboOMT+Fk1i+ECwAiGcrLMWKaSoqh+epXK3i8cWygk09DoneXKfI0A6YzQjpjIkLnEBH6G2Ux73hWYIrdpDhBYqXxeUq7C4MEiMhFOWgdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=gY2nsqug; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="Z3psgwzd"
-Received: from mors-relay-2502.netcup.net (localhost [127.0.0.1])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS7TR1TFFz5yVG;
-	Sun,  4 Feb 2024 00:02:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
-	t=1707001371; bh=fK01hh23ykgw3qutGPm7o9kaGeUktmDS8ZA3wcS1zUo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Z3psgwzducIHmP363Rg3ChFu0S+DEx49dxHIshj5vf4/Zhxd7zZOEXyvyQwOalcl+
-	 0bR52tsbmhb5ifJFgKXasITpTUrAjeYadIlQRrppkYUpwZTphEF0nSOTkOxt2bQJlH
-	 cB9ZijiwYdT29uqjJBdqkD9+YEmj0c/uQtyTr1yP5UWNBivpeaPlVq4/bphcjszWcY
-	 9GqWLFecEd7t5x5QtFvbzAbqXl0S5BM8Qz4N5d8YTowxd15uiLc5kEvJOB4WrYJxma
-	 sGJBLNXwjXG2qnGUlbPVUD4IBDD6zOHUFu7vtyqzrU+A4UKI49TqVMFyFAvIdmXyVj
-	 NTws1Vt/49xjQ==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-2502.netcup.net (Postfix) with ESMTPS id 4TS7TR0mV8z4xYq;
-	Sun,  4 Feb 2024 00:02:51 +0100 (CET)
-Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TS7TQ5tZ6z8sZf;
-	Sun,  4 Feb 2024 00:02:50 +0100 (CET)
-Received: from [192.168.115.138] (unknown [62.27.244.140])
-	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 424B61007EB;
-	Sun,  4 Feb 2024 00:02:46 +0100 (CET)
-Authentication-Results: mx2eb1;
-        spf=pass (sender IP is 62.27.244.140) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[192.168.115.138]
-Received-SPF: pass (mx2eb1: connection is authenticated)
-Message-ID: <fb4abd14-b002-4056-9dfc-1b7f5c83f84a@rd10.de>
-Date: Sun, 4 Feb 2024 00:02:45 +0100
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="gY2nsqug"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=ZuR11fBjLGQWXEZ1T0kl/SRe7MKQ+YGDCG8pAWsXzfw=; b=gY2nsqug5SELFzl+lMzL51GyNX
+	CKCAQzK7tt8Z3+31QSKXylEuMKQZBOhYIAY9afAwnrNXEZefdhyrFAh8YcfQmMayiSKIRBlDjL55v
+	xCUQCjLoEC+K552+nMqZwnuGPLufR0mEZdrOhsv6fI05+aYlncxBFYJvsObOR82PBTEKQC/ihp3O2
+	8cEE5yCXkB9MYNvTRP/GSLbuRHN6ew5t2q2j6QeEOrZ0TsorjHYLF5Snkt+uFITta4oTdSfEAvo1Z
+	kmmIMlB7Al17Rnis5j9qs85bBKC4XJ+SJFSze1pRd3a9idtph/UMSkEDLCYJVguhRSQgMR66VtlHG
+	iER0Iy5w==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rWS1k-004r7D-1R;
+	Sun, 04 Feb 2024 02:14:36 +0000
+Date: Sun, 4 Feb 2024 02:14:36 +0000
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: linux-fsdevel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Christian Brauner <brauner@kernel.org>, linux-ext4@vger.kernel.org,
+	linux-nfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+	linux-cifs@vger.kernel.org
+Subject: [PATCHES] RCU pathwalk race fixes
+Message-ID: <20240204021436.GH2087318@ZenIV>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
-Content-Language: en-GB
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>
-References: <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de>
- <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
-From: "R. Diez" <rdiez-2006@rd10.de>
-In-Reply-To: 
- <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <170700136654.29116.14943511454839720127@mx2eb1.netcup.net>
-X-Rspamd-Queue-Id: 424B61007EB
-X-Rspamd-Server: rspamd-worker-8404
-X-NC-CID: F+tQCHWzTPT+xThRjrhpa8hLy1DsGWGUwRVNh6rW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
+	We still have some races in filesystem methods when exposed
+to RCU pathwalk.  The series below is a result of code audit (the
+second round of it) and it should deal with most of that stuff.
+Exceptions: ntfs3 ->d_hash()/->d_compare() and ceph_d_revalidate().
+Up to maintainers (a note for NTFS folks - when documentation says
+that a method may not block, it *does* imply that blocking allocations
+are to be avoided.  Really).
 
-> Do you know if this is also broken in current mainline e.g. 6.7 or
-> 6.8-rc2 (for Ubuntu and some other distros it is fairly easy to
-> download from their website current kernel packages to make testing
-> easy).
+	Branch is 6.8-rc1-based; it lives in
+git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git fixes.pathwalk-rcu
 
-I don't know, I didn't test so much. I am not familiar with this kind of Kernel work.
+Individual patches are in followups; ditto for code audit notes.  Beginning
+of the latter should probably be converted into docs; if anyone is willing
+to help with such conversion, please say so - I'll be glad to answer any
+questions, etc.
 
-I found some newer Kernels for Ubuntu here:
+If somebody wants to grab bits and pieces of that series into individual
+filesystem git trees, please say so.  Same for any problems spotted in
+the patches, obviously.  If nothing shows up, that goes into #fixes and
+into mainline.
 
-https://kernel.ubuntu.com/mainline/?C=N;O=D
+Shortlog:
+      fs/super.c: don't drop ->s_user_ns until we free struct super_block itself
+      rcu pathwalk: prevent bogus hard errors from may_lookup()
+      affs: free affs_sb_info with kfree_rcu()
+      exfat: move freeing sbi, upcase table and dropping nls into rcu-delayed helper
+      hfsplus: switch to rcu-delayed unloading of nls and freeing ->s_fs_info
+      afs: fix __afs_break_callback() / afs_drop_open_mmap() race
+      nfs: make nfs_set_verifier() safe for use in RCU pathwalk
+      nfs: fix UAF on pathwalk running into umount
+      procfs: move dropping pde and pid from ->evict_inode() to ->free_inode()
+      procfs: make freeing proc_fs_info rcu-delayed
+      fuse: fix UAF in rcu pathwalks
+      cifs_get_link(): bail out in unsafe case
+      ext4_get_link(): fix breakage in RCU mode
 
-But it looks like many of the self-tests fail, which does not help build confidence. I fear breaking my Linux PCs, which I need daily.
-
-I'll see if I can find some time and some spare computer to try this out, but it may take some time.
-
-Regards,
-   rdiez
-
+Diffstat:
+ fs/affs/affs.h            |  1 +
+ fs/affs/super.c           |  2 +-
+ fs/afs/file.c             |  8 ++++++--
+ fs/exfat/exfat_fs.h       |  1 +
+ fs/exfat/nls.c            | 14 ++++----------
+ fs/exfat/super.c          | 20 +++++++++++---------
+ fs/ext4/symlink.c         |  8 +++++---
+ fs/fuse/cuse.c            |  3 +--
+ fs/fuse/fuse_i.h          |  1 +
+ fs/fuse/inode.c           | 15 +++++++++++----
+ fs/hfsplus/hfsplus_fs.h   |  1 +
+ fs/hfsplus/super.c        | 12 +++++++++---
+ fs/namei.c                |  6 +++++-
+ fs/nfs/client.c           | 13 ++++++++++---
+ fs/nfs/dir.c              |  4 ++--
+ fs/proc/base.c            |  2 --
+ fs/proc/inode.c           | 19 ++++++++-----------
+ fs/proc/root.c            |  2 +-
+ fs/smb/client/cifsfs.c    |  3 +++
+ fs/super.c                | 13 ++++---------
+ include/linux/nfs_fs_sb.h |  2 ++
+ include/linux/proc_fs.h   |  1 +
+ 22 files changed, 88 insertions(+), 63 deletions(-)
