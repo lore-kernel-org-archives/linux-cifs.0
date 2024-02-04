@@ -1,86 +1,83 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.63.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACA323747;
-	Sun,  4 Feb 2024 16:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB7C24B2B
+	for <linux-cifs@vger.kernel.org>; Sun,  4 Feb 2024 19:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.63.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707064911; cv=none; b=Mhtgg9NvU5RvrK3uJvfhN19XQxSvC95sOIfTQMNPA/nwTjSEQW2pcvyCY0s4qyWlNNVAO6sBDzTNMyR017RySm7azqAeallyzXqZEp+iy8r5vZj8ifhbLZcl2ZV6TVT1iSEIh/n8MoC8qUcVpQl7Bbl/Myk8a7GYJyRFuI5c2J8=
+	t=1707074129; cv=none; b=uzM5iB9YHZoqf6T6uoeC+DJIbjJjoJKukN5F8iPLPOmjsNxiFFSnjSw4GsDdh5CA6+6OMTiV8X3PtFe/ZzoIVmMeMtTZpeHwKh5j5hf94clXzom3bwTR8XzNmaWlBBeaD+IfSAovXCR0uJqce/6UawmtFyRxmBj6v7QeOiUuw4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707064911; c=relaxed/simple;
-	bh=Z+i8ZnLnu+yuCUsTgI/p9zrFwjfvBrXRwMGnykiUOVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fy24vviQrhCUN3anSnyCiIwpwhR2FlvFrm7BigePLAy0RjYewAKEoL5HNl8p+bZOfilHe8XOOP23y78Mfgzdf5bLHsOJztJzoROGL5hU50rDGc8x4ho8aok2x0PmuGhW1LAO+APRZlGN7UjDcjfxtAjTQN2TRDZNEYkoWcfSsDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=Urvtlx4+; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1707074129; c=relaxed/simple;
+	bh=BSQFI1jOLgbBn5T9cdQtRPSN9aFRYcL13Q48TeyZW/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pwwQ8s1gYl999tgNuuFLt6rw6G8Z8rF8HyryBGRRN9SSUcYz6QxEJy5SfRCDju1YjcHhbQ3F+xGMNqBcGnLKr1Pw2bobwNC4CAfkre+TSFOFytj+EV8IUTycNWC5/jF6ae5yy4jlCpuhQdFE7u7I62wRHdKIcZMYaHYXswQTHXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=ly0xl6nP; arc=none smtp.client-ip=188.68.63.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="Urvtlx4+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=wv7P0rVm2KXkPgPl8p9VAbf4b3ShCucsZuYwZ4OooIA=; b=Urvtlx4+K9Z4QSk4/uWv+PPdmF
-	PhHTvsf6KM2LiTmx3BOLnDSr7qwGOvTKMv6Ya7a79LEDhrMJKbaVq1ClgwzHxoiq9kmvq5QNMwt2g
-	ludzZTU9YP4oU6uZmxzsB3r7FpOucewKJUaL641nF9uQeiEFG6pnz4MNj9GH7fAFqIT7zjj1JmNww
-	itrb4+1t+yP6hQZ++OelA/zrjwbRogMmnKgF9Lt5yTxNphguv1XOhtQPiwE8f/dGnYhDM5J9dPKf7
-	Qysc6tUD0qSMzld5t4jvMnSXbx828/h0E0U+AiTQ2ivEOzDA5K1KtzXx9UKHRXtwLMpEymOTRFneF
-	k8Xqcp8g==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1rWfYv-005BhY-0l;
-	Sun, 04 Feb 2024 16:41:45 +0000
-Date: Sun, 4 Feb 2024 16:41:45 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Miklos Szeredi <miklos@szeredi.hu>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 12/13] cifs_get_link(): bail out in unsafe case
-Message-ID: <20240204164145.GK2087318@ZenIV>
-References: <20240204021436.GH2087318@ZenIV>
- <20240204021739.1157830-1-viro@zeniv.linux.org.uk>
- <20240204021739.1157830-12-viro@zeniv.linux.org.uk>
- <CAH2r5muOY-K6AEG_fMgTLfc5LBa1x291kCjb3C4Q_TKS8yn1xw@mail.gmail.com>
- <20240204162558.GJ2087318@ZenIV>
+	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="ly0xl6nP"
+Received: from mors-relay-8201.netcup.net (localhost [127.0.0.1])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4TSfNN16Tjz3trv;
+	Sun,  4 Feb 2024 20:15:16 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
+	t=1707074116; bh=BSQFI1jOLgbBn5T9cdQtRPSN9aFRYcL13Q48TeyZW/0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ly0xl6nPlP0NoTpItXcQYEPcPkV/6NQotQ7YAResoM5sNCS1PK9XEB8mJVZ4yd5rN
+	 +1ecRQcyKtPdKAD4h+2FZovfK7yhyDaLZwCzw1A0w+FosfmvDBuKaIXRzqe7ynnvjo
+	 UBqaY1OeHY8FZRm0xfW3g79DB3zLTHH88sUQgsw2HxgzIo8owXL+2OyhTeWvCIbkqL
+	 kCIXOcEPNvQkSDI8CFnFFx+3GFj5DFsgjNBwR99A1g5bABxdUH3vF9PsJ4gH/1wzFC
+	 RKKj76hmE8ah0QqFWAamOUrFHRUUYcoekjJbY+uGtm4g5Jri/SuUszxQutgr16hwBY
+	 BbyxLBV/bq5HQ==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by mors-relay-8201.netcup.net (Postfix) with ESMTPS id 4TSfNN0QKdz3trm;
+	Sun,  4 Feb 2024 20:15:16 +0100 (CET)
+Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TSfNM511Tz8sbF;
+	Sun,  4 Feb 2024 20:15:15 +0100 (CET)
+Received: from [192.168.115.138] (unknown [62.27.251.92])
+	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 322D5100721;
+	Sun,  4 Feb 2024 20:15:11 +0100 (CET)
+Authentication-Results: mx2eb1;
+        spf=pass (sender IP is 62.27.251.92) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[192.168.115.138]
+Received-SPF: pass (mx2eb1: connection is authenticated)
+Message-ID: <6a65b2d1-7596-438a-8ade-2f7526b15596@rd10.de>
+Date: Sun, 4 Feb 2024 20:15:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240204162558.GJ2087318@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+Content-Language: en-GB
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>
+References: <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de>
+ <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
+From: "R. Diez" <rdiez-2006@rd10.de>
+In-Reply-To: 
+ <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <170707411146.32644.8143352906168118458@mx2eb1.netcup.net>
+X-Rspamd-Queue-Id: 322D5100721
+X-Rspamd-Server: rspamd-worker-8404
+X-NC-CID: /SZHVKucXEsJmmb0+/tmNdpvLY+dUANJTMcPzfnx
 
-On Sun, Feb 04, 2024 at 04:25:58PM +0000, Al Viro wrote:
 
-> *IF* you can tell the symlink body without blocking (e.g. you
-> have some cached information from the last time you've asked
-> the server and have reasons to trust it to be still valid),
-> sure, you can return it without dropping out of RCU mode.
-> 
-> It would be fairly useless for CIFS, since ->d_revalidate() of
-> CIFS dentries would reject RCU mode anyway.  That's what normally
-> saves you from having ->get_link() called that way, but it's not
-> guaranteed - there are convoluted setups that avoid having
-> ->d_revalidate() called first.
-> 
-> See the description of RCU mode filesystem exposure in the
-> last posting in this thread for more details.
+> Do you know if this is also broken in current mainline e.g. 6.7 or
+> [...]
 
-PS: if you decide to go for handling RCU pathwalk mode in CIFS,
-you definitely want to read the first half of
-https://lore.kernel.org/linux-fsdevel/20240204022743.GI2087318@ZenIV/
-or whatever it eventually turns into.  It obviously needs quite
-a bit of massage before it starts to resemble proper docs -
-currently it's just the summary I'd put together while going through
-the audit: which methods are exposed, how can they tell,
-what is and what is not guaranteed for them, etc., with a bit of
-"why does VFS bother with something that unpleasant" thrown into the mix
-as an explanation.
+I just tested on an older laptop with the same Ubuntu MATE 22.04.3. I tried with the latest Linux Kernel build I found:
 
-Any assistance with turning that into a coherent text would be
-very welcome - I think that description of RCU pathwalk regarding
-its impact on the filesystems would be useful.
+Linux rdiez-L2017 6.8.0-060800rc3-generic #202402041232 SMP PREEMPT_DYNAMIC Sun Feb  4 12:41:05 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+The test text file was corrupted in the same way. In fact, the resulting corrupted file compares (with 'cmp') with the other laptop running 6.5.0-15-generic #15~22.04.1-Ubuntu.
+
+Regards,
+   rdiez
+
