@@ -1,45 +1,43 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270CD4A99C
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 22:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41214F8AD
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 22:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707173876; cv=none; b=CRvc43U8hcUI8sCQ9hqBEorbOosilJDWABc2tP6BKKl9yVMl5tpRVhfsFO/VScj0LoTQyEbBei2bIGW+AOwtdDCwqnvmnSpK9q42st6hQa6cQTjpFx5OTxEpdb1AUGCcT4H1fI1r4OSB6RMa8OdcZY5xuyVB1xiHNY34GkA/L9s=
+	t=1707173878; cv=none; b=XVTbflWU8Xm6Cu1GPmTK/9ZHZMx9uHUYchxto9lJ9MeUeX2s703ci3cxo/yXDi/j0s5/uhSXYx1MRuahgUi8CYw0XNNKISUHKWh6eUTHnsriO6Mm++b6J1DcNapinMDGNyYo3vEDosdV+al3E4ds6tKzQi+dPztZIbJ+cnfvfx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707173876; c=relaxed/simple;
-	bh=dLHPCDdqZyYqcKsH5vxgCp7lOfDq1Dp1o0GtCoHXsMo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DW+inTHGibSn3i5ppZOzCb0qQxkq0/FYqYdj31R/z5KotrMXy2UW5ntIVo0v8vpIIGwVL2Na3QqK/+h74KTGQo2tHCIPySi/FX9oSk18/wdqftkp+k9UALX2ZknveiPGb+Zsd3z9duWLtNDDCXpC/pgtWI5S5HS3hwZagh3E3cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FdeI9Oso; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1707173878; c=relaxed/simple;
+	bh=cOQGLVhiiObfyloDgcZhWjtXBhQA9sfsF7RZwDC1qa4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G5gcbxrnG9CzCfkMNKvMDGlnuWSgW2/jBMJNFD8I7b7Vi8W2jMjBpUMpo3z7Ot5YzL2iJOUHUpKGINJ6giO+9Tr2KjbvRbu7D24gyHPqm6dAVLUif0QmtcxL72HfG5i/qf6MkBEDvs/6UBfQfoW8hM86JEpE7bU3OeKJ3YegM6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QlCW8NzK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FdeI9Oso"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlCW8NzK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707173874;
+	s=mimecast20190719; t=1707173875;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3wa+MhW5WY7m0Mgt6HSqvOGHHNP0rK9YvsBe6EDxi5k=;
-	b=FdeI9Oso9kHnSBAuS6Tde9+wqwMCk0DcVgNQKE6rqsr82/3/BQVQABO0ZqX8Qql/9RjRNw
-	ZKzvEk9A9p5EqCW0xgDctT4pfvz52WCHCgoosuD1kkSXUvB5kkcGwk+7NzC54A082ccv4P
-	8CnkfyHz9xP3jKCPlWQc7E2zmN3r7cE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-QlhvDllSPfKdJhAef6Pv0g-1; Mon,
- 05 Feb 2024 17:57:51 -0500
-X-MC-Unique: QlhvDllSPfKdJhAef6Pv0g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m84d7QF2RHzKEpc2iYUiWaNTbg9vVp06SyHcrHDZtG0=;
+	b=QlCW8NzKX6zrixOgP1/8VMZc24004pDunvjd82ZOxFUDZL++OvOHT4KuO7zgERHUSLPlzi
+	hUGeQ1wViJUmYxHzj5yQnwBPcD97gD+uyKNweT/QsS7//K6CduXe3nHK5onTaJ9tUKo2JN
+	+x8zonNH2MJzQZ4rNwUrGwwAEU/Kz6U=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-287-kn07yk8aMjSd8XV0XktC_Q-1; Mon, 05 Feb 2024 17:57:31 -0500
+X-MC-Unique: kn07yk8aMjSd8XV0XktC_Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1131F3CBD509;
-	Mon,  5 Feb 2024 22:57:50 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 35A77845DC0;
+	Mon,  5 Feb 2024 22:57:31 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1EAB02166B31;
-	Mon,  5 Feb 2024 22:57:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 19C7B1121312;
+	Mon,  5 Feb 2024 22:57:29 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <smfrench@gmail.com>
 Cc: David Howells <dhowells@redhat.com>,
@@ -54,15 +52,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: [PATCH v5 07/12] cifs: Replace the writedata replay bool with a netfs sreq flag
-Date: Mon,  5 Feb 2024 22:57:19 +0000
-Message-ID: <20240205225726.3104808-8-dhowells@redhat.com>
-In-Reply-To: <20240205225726.3104808-1-dhowells@redhat.com>
-References: <20240205225726.3104808-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 00/12] netfs, cifs: Delegate high-level I/O to netfslib
+Date: Mon,  5 Feb 2024 22:57:12 +0000
+Message-ID: <20240205225726.3104808-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -70,84 +63,134 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Replace the 'replay' bool in cifs_writedata (now cifs_io_subrequest) with a
-flag in the netfs_io_subrequest flags.
+Hi Steve,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/smb/client/cifsglob.h | 1 -
- fs/smb/client/file.c     | 2 +-
- fs/smb/client/smb2pdu.c  | 4 ++--
- include/linux/netfs.h    | 1 +
- 4 files changed, 4 insertions(+), 4 deletions(-)
+Here are patches to convert cifs to use the netfslib library.  With this I
+can run a certain amount of xfstests on CIFS, though not all the tests work
+correctly because of fallocate issues.
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index dd0cef742a64..1dfed3eddaa2 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1479,7 +1479,6 @@ struct cifs_io_subrequest {
- 	unsigned int			xid;
- 	int				result;
- 	bool				have_credits;
--	bool				replay;
- 	struct kvec			iov[2];
- 	struct TCP_Server_Info		*server;
- #ifdef CONFIG_CIFS_SMB_DIRECT
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index ce5f24206be0..14602ed6bc39 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -3645,7 +3645,7 @@ cifs_resend_wdata(struct cifs_io_subrequest *wdata, struct list_head *wdata_list
- 			if (wdata->cfile->invalidHandle)
- 				rc = -EAGAIN;
- 			else {
--				wdata->replay = true;
-+				set_bit(NETFS_SREQ_RETRYING, &wdata->subreq.flags);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 				if (wdata->mr) {
- 					wdata->mr->need_invalidate = true;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 2ecc5f210329..84e3675eb41e 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4797,7 +4797,7 @@ smb2_async_writev(struct cifs_io_subrequest *wdata)
- 	struct cifs_io_parms *io_parms = NULL;
- 	int credit_request;
- 
--	if (!wdata->server || wdata->replay)
-+	if (!wdata->server || test_bit(NETFS_SREQ_RETRYING, &wdata->subreq.flags))
- 		server = wdata->server = cifs_pick_channel(tcon->ses);
- 
- 	/*
-@@ -4882,7 +4882,7 @@ smb2_async_writev(struct cifs_io_subrequest *wdata)
- 	rqst.rq_nvec = 1;
- 	rqst.rq_iter = wdata->subreq.io_iter;
- 	rqst.rq_iter_size = iov_iter_count(&rqst.rq_iter);
--	if (wdata->replay)
-+	if (test_bit(NETFS_SREQ_RETRYING, &wdata->subreq.flags))
- 		smb2_set_replay(server, &rqst);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (wdata->mr)
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 61195cf16d6e..455ccfe8bffa 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -224,6 +224,7 @@ struct netfs_io_subrequest {
- #define NETFS_SREQ_SEEK_DATA_READ	3	/* Set if ->read() should SEEK_DATA first */
- #define NETFS_SREQ_NO_PROGRESS		4	/* Set if we didn't manage to read any data */
- #define NETFS_SREQ_ONDEMAND		5	/* Set if it's from on-demand read mode */
-+#define NETFS_SREQ_RETRYING		6	/* Set if we're retrying the op */
- };
- 
- enum netfs_io_origin {
+The patches remove around 2000 lines from CIFS
+
+To do:
+
+ (*) Implement write-retry.  Currently, netfslib errors out on a failed DIO
+     write and relies on the VM to drive writepages again on a failed
+     buffered write.  This needs some retry logic adding into
+     fs/netfs/output.c.
+
+     I'm not sure what the best way to handle this is.  One way is to
+     resend each failing subreq as it fails, offloading this to a kernel
+     thread that re-splits the subreq, calling out to a rreq->op to do the
+     splitting, thereby allowing cifs to renegotiate credits.  If a subreq
+     is split, the two parts need to be adjacent in the rreq->subrequests
+     list.
+
+     An alternative way might be to try and combine failing tests and then
+     split them.
+
+     Yet a third way might be to try each failing subreq a smaller bit at a
+     time and keep track of what has been sent in
+     wdata->subreq.transferred.
+
+     Whichever way is chosen, NETFS_SREQ_RETRYING should be set in
+     wdata->subreq.flags instead of setting wdata->replay.
+
+Notes:
+
+ (1) CIFS is made to use unbuffered I/O for unbuffered caching modes and
+     write-through caching for cache=strict.
+
+ (2) Various cifs fallocate() function implementations have issues that
+     aren't easily fixed without enhanced protocol support.
+
+ (3) It should be possible to turn on multipage folio support in CIFS now.
+
+ (4) The then-unused CIFS code is removed in three patches, not one, to
+     avoid the git patch generator from producing confusing patches in
+     which it thinks code is being moved around rather than just being
+     removed.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-netfs
+
+Changes
+=======
+ver #5)
+ - Rebased to -rc3 plus SteveF's for-next branch as netfslib is now
+   upstream, as are a couple of patches from this series.
+ - Replace the ->replay bool Shyam added with a flag on the netfs
+   subrequest.  This is tested by the code, but not currently set (see
+   above).
+
+ver #4)
+ - Slimmed down the branch:
+   - Split the cifs-related patches off to a separate branch (cifs-netfs)
+   - Deferred the content-encryption to the in-progress ceph changes.
+   - Deferred the use-PG_writeback rather than PG_fscache patch
+ - Rebased on a later linux-next with afs-rotation patches.
+
+ver #3)
+ - Moved the fscache module into netfslib to avoid export cycles.
+ - Fixed a bunch of bugs.
+ - Got CIFS to pass as much of xfstests as possible.
+ - Added a patch to make 9P use all the helpers.
+ - Added a patch to stop using PG_fscache, but rather dirty pages on
+   reading and have writepages write to the cache.
+
+ver #2)
+ - Folded the addition of NETFS_RREQ_NONBLOCK/BLOCKED into first patch that
+   uses them.
+ - Folded addition of rsize member into first user.
+ - Don't set rsize in ceph (yet) and set it in kafs to 256KiB.  cifs sets
+   it dynamically.
+ - Moved direct_bv next to direct_bv_count in struct netfs_io_request and
+   labelled it with a __counted_by().
+ - Passed flags into netfs_xa_store_and_mark() rather than two bools.
+ - Removed netfs_set_up_buffer() as it wasn't used.
+
+David
+
+Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.com/ [1]
+Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.com/ # v2
+Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.com/ # v3
+Link: https://lore.kernel.org/r/20231213154139.432922-1-dhowells@redhat.com/ # v4
+
+David Howells (12):
+  cifs: Replace cifs_readdata with a wrapper around netfs_io_subrequest
+  cifs: Set zero_point in the copy_file_range() and remap_file_range()
+  cifs: Replace cifs_writedata with a wrapper around netfs_io_subrequest
+  cifs: Use more fields from netfs_io_subrequest
+  cifs: Make wait_mtu_credits take size_t args
+  cifs: Implement netfslib hooks
+  cifs: Replace the writedata replay bool with a netfs sreq flag
+  cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+  cifs: Cut over to using netfslib
+  cifs: Remove some code that's no longer used, part 1
+  cifs: Remove some code that's no longer used, part 2
+  cifs: Remove some code that's no longer used, part 3
+
+ fs/netfs/buffered_write.c    |    3 +
+ fs/netfs/io.c                |    7 +-
+ fs/smb/client/Kconfig        |    1 +
+ fs/smb/client/cifsfs.c       |   69 +-
+ fs/smb/client/cifsfs.h       |   10 +-
+ fs/smb/client/cifsglob.h     |   59 +-
+ fs/smb/client/cifsproto.h    |   14 +-
+ fs/smb/client/cifssmb.c      |  111 +-
+ fs/smb/client/file.c         | 2911 ++++++----------------------------
+ fs/smb/client/fscache.c      |  109 --
+ fs/smb/client/fscache.h      |   54 -
+ fs/smb/client/inode.c        |   19 +-
+ fs/smb/client/smb2ops.c      |   10 +-
+ fs/smb/client/smb2pdu.c      |  169 +-
+ fs/smb/client/smb2proto.h    |    5 +-
+ fs/smb/client/trace.h        |  144 +-
+ fs/smb/client/transport.c    |   17 +-
+ include/linux/netfs.h        |    2 +
+ include/trace/events/netfs.h |    1 +
+ 19 files changed, 852 insertions(+), 2863 deletions(-)
 
