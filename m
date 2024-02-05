@@ -1,97 +1,72 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [194.59.206.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3933913ADD
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 09:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.59.206.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CE012B9B
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 09:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707124397; cv=none; b=j8FEs0Uj9rYFmz3mYg0G3QSTxri3goxORYiM21OWvjUFpTH1DHCu5ikl/6WDephR4+sIFhLgXj6PvbWINqgHb3lpnRJEse5E4RkocADtUYJEK5tOxx1/nIu1KuIVn1OgC4TXiN+Dw7QIw4KHQ7Mrb8fXXZQQW3p3fn14Map2K9k=
+	t=1707125156; cv=none; b=lc2Y2yFkAa73LGqw6Yhq6YkmsV3stG5leXSraK76/ULsfE4D2IvtKhZ/T85dApxBytQIxRrt+P9UcbKO0nipWjzSH1e7/IjwdSIDpIQuKSEoQ/mGXCaX17KJ0U6DIiOKHCjBNJZiC68N6XFn5o+6fCmZGHvdoa07VMynmcGGmFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707124397; c=relaxed/simple;
-	bh=0mULUSENfdJreEXktXDQZ/g/mgQBjBd1TqTi5XWD1Vc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=OHXxkYIbzRGb/AoYtjrSVpqTnRxe8y6T6hu1WJGeERigWbYaVprpQtcrWJIJsakgjW/kWxR08LE6zDjR3IuhNQO1J+SnTJBEBqx36+/88aZTWKDDQW1xrDY+TVCTbEOWspMiAbXj2qxv7w3pGOlzL2X76kWgk1DwT+6SDTn2dVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=jy+Cl3pL; arc=none smtp.client-ip=194.59.206.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
+	s=arc-20240116; t=1707125156; c=relaxed/simple;
+	bh=RSYIxUYjbixSS3kCMiLD3BcrnKj3Xwcbw3PzO116WhU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Hr/JSQ81aJ2eYkE8EEgzKIkXkM5dfJ/bzrynhcG4HhXWyWx/F+1C7RLjF5qtbj05cJUEpE3VdtLCp/t8OQn0mF/cbTjqM8VhNiHHKYVy/DCyS/iud1s9/GA1y1nvqSXmbjRX282B/eNfW/zVRqEzRFfoHirJjDmWwrrjrnYhBy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QCd5Mc7M; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="jy+Cl3pL"
-Received: from relay02-mors.netcup.net (localhost [127.0.0.1])
-	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4TT0rH2lp8z41xy;
-	Mon,  5 Feb 2024 10:07:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
-	t=1707124031; bh=0mULUSENfdJreEXktXDQZ/g/mgQBjBd1TqTi5XWD1Vc=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=jy+Cl3pLW3eW8HnZHEgbx0zRyXs1ecCfO7HbJSkBdmxtI37m3/ih+REmBLIdre2f3
-	 fBOqAZ1QuAwAge/qg3gmszOj6kIA5jDcYHV4HTfE6ijK7TiuEYwruJkq15/p5vWFOB
-	 C78cB3dQ3RkB+Ivt/1uMoUmvTs8CBgBCyaP7x36mwfOSRxDdYondFuJERVoded9Zh5
-	 1REaJ3TdRU+0vbYYx0UOwB4N4w8Cq08p6R3xECBg+cb5BJAr8QZ1+IiMXIvNTkKpFm
-	 /L7idaF7B2fBmVw+zP6s7kf+ied/0WjttkJQdWIQMS/MEq2RxOMttLEFaJXRdnogty
-	 AkXtFVQl4tVdA==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4TT0rH2N9Bz7wPh;
-	Mon,  5 Feb 2024 10:07:11 +0100 (CET)
-Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCd5Mc7M"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707125153;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RSYIxUYjbixSS3kCMiLD3BcrnKj3Xwcbw3PzO116WhU=;
+	b=QCd5Mc7Me/u3tc3iV2XKzmh6K95rYkKa8Eww33CvomCSFPMIrLLe0P9HykGTrMG5nfqcer
+	1Z9ZzmXxtND/3LkrIfHlI2tYQlO1KRE9p2Lf6sc3ZhHB83VM+d8EY/d2VtQBfzEGPhyr41
+	RaUzKPy0a24fOKFwfUApc7qRxOqQOpM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-494-dcJlkHKjOVikM0ba2XXQOQ-1; Mon,
+ 05 Feb 2024 04:25:50 -0500
+X-MC-Unique: dcJlkHKjOVikM0ba2XXQOQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TT0rH0qgNz8sbH;
-	Mon,  5 Feb 2024 10:07:11 +0100 (CET)
-Received: from [192.168.115.138] (unknown [62.27.251.92])
-	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 69B951005CA;
-	Mon,  5 Feb 2024 10:07:06 +0100 (CET)
-Authentication-Results: mx2eb1;
-        spf=pass (sender IP is 62.27.251.92) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[192.168.115.138]
-Received-SPF: pass (mx2eb1: connection is authenticated)
-Message-ID: <ec340836-831e-462e-8a4d-3aece977e19e@rd10.de>
-Date: Mon, 5 Feb 2024 10:07:06 +0100
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B8C741C29EA5;
+	Mon,  5 Feb 2024 09:25:49 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 37C8D40C9444;
+	Mon,  5 Feb 2024 09:25:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
+References: <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com> <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de>
+To: Steve French <smfrench@gmail.com>
+Cc: dhowells@redhat.com, "R. Diez" <rdiez-2006@rd10.de>,
+    linux-cifs@vger.kernel.org
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to automatically drop unresponsive CIFS /SMB connections
-Content-Language: en-GB, es-CO
-To: Lucy Kueny <lucy@kueny.fr>
-References: <428ab7ba-0960-4e5e-a4ab-290dac58f45b@rd10.de>
- <b5a481ec-7c97-4b28-a807-606bea3617ff@kueny.fr>
-From: "R. Diez" <rdiez-2006@rd10.de>
-Cc: linux-cifs@vger.kernel.org
-In-Reply-To: <b5a481ec-7c97-4b28-a807-606bea3617ff@kueny.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <170712402669.20480.8089113010699496196@mx2eb1.netcup.net>
-X-Rspamd-Queue-Id: 69B951005CA
-X-Rspamd-Server: rspamd-worker-8404
-X-NC-CID: u/fQSj0cGytiR/b3i2hYBCVX6R5Cv0+eLhuRIcbF
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3003955.1707125148.1@warthog.procyon.org.uk>
+Date: Mon, 05 Feb 2024 09:25:48 +0000
+Message-ID: <3003956.1707125148@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Hallo Lucy:
-> I have written a patch that does this.
+Steve French <smfrench@gmail.com> wrote:
 
-Many thanks for confirming that this problem exists and bugs other people too.
+> any thoughts whether this could be related to folios/netfs changes?
 
-Unfortunately, I lack the time and the skills to apply Kernel patches to my Linux PCs.
+Unlikely as you didn't take them for the last merge window, let alone 6.2.
 
-
-> It adds a mount flag to return as unavailable immediately after N reconnect attempts.
-> [...]
-
-I wonder whether the approach you followed is ideal. I do not know much about this area, so I might be wrong.
-
-The first issue is that there appears to be no documentation about the Linux Kernel CIFS client's behaviour on connection timeout. I find this frustrating. I have done some research in the past, search for 'echo_interval' here:
-
-https://github.com/rdiez/Tools/blob/master/MountWindowsShares/mount-windows-shares-sudo.sh
-
-Based on my empirical research, there is a fixed 10-second timeout when reconnecting. Therefore, I would rather have an error returned as soon as the connection has been marked as lost by means of 'echo_interval', instead of after attempting to reconnect.
-
-This may be hard to achieve if the reconnection only happens single threaded and on demand (when a process is trying to access a file under the mount point), instead of automatically on the background.
-
-I would also welcome a configurable connection timeout. I normally set echo_interval to 4 seconds, as 8 seconds is long enough to declare a connection unresponsive. In fact, even 8 seconds is rather high with today's networks and servers. If the connection timeout is 10 seconds, that means an application may take up to 18 seconds the first time to "unfreeze", and 10 seconds every time afterwards, which I still find too long.
-
-Let's hope that the CIFS guys take this problem seriously. The Linux desktop freezing for many seconds in a row is probably putting off many users.
-
-Best regards,
-   rdiez
+Daivd
 
