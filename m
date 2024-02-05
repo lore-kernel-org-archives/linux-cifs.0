@@ -1,94 +1,150 @@
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3B92E63B
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 15:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FE413A877
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 20:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707147092; cv=none; b=c+OUeDX2xzTXjIfs78bbEN7L6L84QOFyXkzs5jVuOVrIn8x+PJ3Ow6Or4ycl6tH5qKKzTEzfUfJRPp16UOWbw6QUQBbbYA02omFRz4w9w9wAYaOKWvzKDc8MUJysrWsaETNJfM+tmJZNptPX2ax83BGsJja6Ld+L8YHBA7L7VG8=
+	t=1707166484; cv=none; b=mpnpBZuNqO2dY7QTUo/ZlQCGnaDpWLYccC4UUNs19uV+GE6S2Wm43gR2JNVLGYrd8JRaPaJgXrN+pn/oNipmT345xflQVNKpMVRuBn52ptf6Ei6nOjBi5TdANG+fvcVQs1CHRJqk+ORg4g26EWUXSqHmg/gjZGjl/AeWGT4kO7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707147092; c=relaxed/simple;
-	bh=sFn85562wQscrqlW2SWfz1OLFvmKD6XAbCq8DINb7Y0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=TjTBW9HNn8aJHeIiJl7PhJ6L6Jbemaz6y67t4cJOzVyLogR3/D+7epS9CA+XYe8InIHhfU4/gz8umOBksX9YQOtlrLBYniW3Kmi8P2fCICt84C9VbzyUJ3uNVPHAp+LWv1roy98FHGfEYPh5xaCHiAya0iheay+tQxxBoEWFTE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=brvqgXB0; arc=none smtp.client-ip=46.38.247.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
+	s=arc-20240116; t=1707166484; c=relaxed/simple;
+	bh=6hLNk4p1KRII9P6PC0lI1AtY/n/DPyRv+vPndiPep/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jGruD9WPfzQcao3mnasPN9p+ui+hhmbYOvYogvnYjoVTOZCKMMPJ2hUPnRrJ8pzzLfMD+m6mmqHZkeJH8yedJUUUr21fHL89IjhBOxyFpYgqdnQGdkvbOcHEYOyDAHJ0e7qa/rnDS7ZAN8CLWFjrymFflUa30C1PKLoPxCicHls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nga/rylj; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="brvqgXB0"
-Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4TT99k19Knz7yXS;
-	Mon,  5 Feb 2024 16:22:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
-	t=1707146570; bh=sFn85562wQscrqlW2SWfz1OLFvmKD6XAbCq8DINb7Y0=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=brvqgXB0noSeXt8RvxRVX1ZhAfur3JEVQzhcrzcnecPJzUljpcuntcS2KkIAetW8T
-	 GhSxyLgBqcphlcjCWvmVazyfuSF2Epos4Pm5XUmAxCQc3HTZtT1TIn2rMP26T0FznD
-	 GrI0bHlyd0UzmOEfLk+XAn+c5JZ1921lL9+4Tpe6wjiTdGkx5V1vVKAgPSZ2UrMndR
-	 G6kZqwOlHg7afb+g5CToiYvM3ha4lkxzQhd/rpdlE/OIHlm2wfTMkuEUvVu7uwh9qZ
-	 Ex5pYDxsVP0KqYRFTcCXqRjon26OC+jvqPaD43xDJi4qfaK9KSyLPz7De27U+e3gmj
-	 FKACd5BROWmXw==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4TT99k0nYZz4x8n;
-	Mon,  5 Feb 2024 16:22:50 +0100 (CET)
-Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TT99j6Djpz8scr;
-	Mon,  5 Feb 2024 16:22:49 +0100 (CET)
-Received: from [192.168.115.138] (unknown [62.27.251.92])
-	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 574AE1005CA;
-	Mon,  5 Feb 2024 16:22:45 +0100 (CET)
-Authentication-Results: mx2eb1;
-        spf=pass (sender IP is 62.27.251.92) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[192.168.115.138]
-Received-SPF: pass (mx2eb1: connection is authenticated)
-Message-ID: <1d06fc42-48f1-48fa-bdb3-5a70464d4d6a@rd10.de>
-Date: Mon, 5 Feb 2024 16:22:44 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nga/rylj"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5115744dfe5so426829e87.2
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Feb 2024 12:54:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707166480; x=1707771280; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BnJSR0bQOaMziHWyVwo+In+bP0caTb/Kri3L6TTzsGM=;
+        b=Nga/ryljMOe69DlMCS54h9qQDJkYJkyCeLz4UmMmnQrmnOxHxf2Wt+G8O9Dnzu0Pfj
+         tdj21abvZVXnpm7R3UQFlVogNu6x3kYqmegbzl2Aw6PG6G7GCBXpkrZbyyv7DAlrwfOf
+         kQSly2IHyGd0UGn9T32GbXq2qzV6W2xSjezL0+YY4YU2pjN2SsDbeE7VxAklhQ0ad+wA
+         oSfuxIvmMcvdqS5QwZJ45mH1IWiqCYoX1JwivClD0rj4N+/Cu4Yh5kZb7vwDcoNTS6N3
+         XAleF+po8bxAqv3kAsjBoZRlHG539Bi5BUaFSA62yz0MnIiv1/nID1ajNNR2oiOx9oYq
+         pWTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707166480; x=1707771280;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BnJSR0bQOaMziHWyVwo+In+bP0caTb/Kri3L6TTzsGM=;
+        b=J8A3/BezbiEDExCX0YQrZ6Z4Aj3M/xAS1RB0HPAYrPN4Rm92HooFUn1Je8McExtwxp
+         XfNRPXGsSQSTCwU47GAWh/+sILo0bmrWhF6GKeY1/GbdWrY8VzOOkKjXlglj1hCj4k+h
+         q1c6VAOeT1P3qGuexKqN6LKKIJJk9pO4Ksz9Fg6o2i4yuNdf8xuCZ1oKHjdfA31Fc3RQ
+         Pez8YE6cY1oUR4zPamqaWzH1gd+CNLu//yOOH+4LNlhdrrq9yXD2tIrVu2n3aR1x5XPO
+         0n+JKQ30UEUggz8fG6dxL5RAzTubkcql81C4wkCIxGq5zD4T41L8kfkbEjmXZHnv1p6U
+         2T2g==
+X-Gm-Message-State: AOJu0Yw2XwAvqZFiQR+8hYcTSaxRaWy8rqzQl35DK8LRIWHuVy3wTmSZ
+	Va0JFppx+t21nMI0Ah8Fx0sBlyqtpPKCKnTs+NEV7RmmvVQZ4b6ivVI/rCt5UL+aRq2CHU0W+vC
+	JKsuVqAbqNTu/KuS51Ctg7YMZQ/c=
+X-Google-Smtp-Source: AGHT+IEsv11OASS8h8kdH061TFLjKXQXgbneaxiCPuWpzdauV6AiMWHmeRHkdIVJ6ZHaRi5hEjyFPDl6UEiu0zW2r18=
+X-Received: by 2002:a19:f805:0:b0:50e:ac97:8bbe with SMTP id
+ a5-20020a19f805000000b0050eac978bbemr509760lff.45.1707166479731; Mon, 05 Feb
+ 2024 12:54:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to automatically drop unresponsive CIFS /SMB connections
-Content-Language: en-GB, es-CO
-To: Lucy Kueny <lucy@kueny.fr>
-References: <428ab7ba-0960-4e5e-a4ab-290dac58f45b@rd10.de>
- <b5a481ec-7c97-4b28-a807-606bea3617ff@kueny.fr>
- <ec340836-831e-462e-8a4d-3aece977e19e@rd10.de>
- <fbf6d02b-ea48-48d3-b273-47d6e545ea3f@kueny.fr>
-From: "R. Diez" <rdiez-2006@rd10.de>
-Cc: linux-cifs@vger.kernel.org
-In-Reply-To: <fbf6d02b-ea48-48d3-b273-47d6e545ea3f@kueny.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: <170714656560.19847.18055257460856111304@mx2eb1.netcup.net>
-X-Rspamd-Queue-Id: 574AE1005CA
-X-Rspamd-Server: rspamd-worker-8404
-X-NC-CID: lVltOmWlckiO45AN/wv82TZyuDSk5k/ahwtih8nM
+References: <84dddfd9-c8d3-4e68-a228-f599649c8e8c@moroto.mountain>
+In-Reply-To: <84dddfd9-c8d3-4e68-a228-f599649c8e8c@moroto.mountain>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 5 Feb 2024 14:54:28 -0600
+Message-ID: <CAH2r5muqs2JFqECJY2R+0AEF4Y_ofdN8Wb55TH8UpfXU7L1ZGQ@mail.gmail.com>
+Subject: Re: [bug report] cifs: do not search for channel if server is terminating
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: sprasad@microsoft.com, linux-cifs@vger.kernel.org
+Content-Type: multipart/mixed; boundary="00000000000098e4a30610a8abf9"
+
+--00000000000098e4a30610a8abf9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Shyam,
+Let me know if any objections to this fix, similar to what was pointed
+out by Dan.
+
+See attached.
 
 
-> On my desktop, the UI can freeze for hours and require a reboot from TTY.
-> The 'recent files' submenu in software seems to trigger repeated connection attempts.
-> This is a major usability issue, and probably why FUSE is used by KDE.
-> [...]
+On Mon, Feb 5, 2024 at 2:52=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro.=
+org> wrote:
+>
+> Hello Shyam Prasad N,
+>
+> This is a semi-automatic email about new static checker warnings.
+>
+>     fs/smb/client/sess.c:88 cifs_ses_get_chan_index()
+>     warn: variable dereferenced before check 'server' (see line 79)
+>
+> fs/smb/client/sess.c
+>     78          /* if the channel is waiting for termination */
+>     79          if (server->terminate)
+>                     ^^^^^^^^^^^^^^^^^
+> The patch adds an unchecked dereference
+>
+>     80                  return CIFS_INVAL_CHAN_INDEX;
+>     81
+>     82          for (i =3D 0; i < ses->chan_count; i++) {
+>     83                  if (ses->chans[i].server =3D=3D server)
+>     84                          return i;
+>     85          }
+>     86
+>     87          /* If we didn't find the channel, it is likely a bug */
+>     88          if (server)
+>                     ^^^^^^
+> But the existing code assumed that server could be NULL
+>
+>     89                  cifs_dbg(VFS, "unable to get chan index for serve=
+r: 0x%llx",
+>     90                           server->conn_id);
+>
+> regards,
+> dan carpenter
+>
 
-You are right, a lost SMB connection can take a long time to recover from. I just made the mistake again of switching off my Windows 10 PC without severing an existing SMB connection from my Linux laptop. It took me several minutes to tear the connection down from a terminal window. I wasn't even using the connection actively, but I had a Caja window (MATE's file manager) open on that mount, and "umount -t cifs" kept complaining that the connection was still in use, so it refused to close it.
 
-I even clicked on NetworkManager's "Enable networking" option, in order to disable network support completely, in the hope that this way all internal state machines would timeout or fail immediately, to no avail.
+--=20
+Thanks,
 
-Now that you talk about FUSE, I tried using GVfs for a while, but it is full of long-standing issues too. I kept some notes about it inside the comments of this script:
+Steve
 
-https://github.com/rdiez/Tools/blob/master/MountWindowsShares/mount-windows-shares-gvfs.sh
+--00000000000098e4a30610a8abf9
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-add-missing-null-server-pointer-check.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-missing-null-server-pointer-check.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_ls9eu2np0>
+X-Attachment-Id: f_ls9eu2np0
 
-I wonder whether the KDE way is better, and how I could use it myself. I have had many issues with KDE over the years, so a long time ago I decided to stop using it. At the moment, I sway between Xfce and MATE, as both still have their share of problems, but that is a different subject altogether.
-
-I have heard that KDE has its own "KIO Slaves", which would be the equivalent to GNOME's GVfs. Do you know if it is really more reliable for CIFS / SMB connections? Can you install and use it without installing the whole KDE desktop?
-
-I also wonder about installing an SSHFS server on the Windows boxes. I tried Cygwin's SSH server on Windows 7, and it worked rather well, but I haven't tried its SSHFS support yet. Modern versions of Windows bring their own SSH server, I wonder if that would be more reliable for Linux clients, and whether it integrates with Windows security (so that you do not have to distribute SSH keys around).
-
-Best regards,
-   rdiez
-
+RnJvbSBhZmI1MTFiZTlkZmIyN2ZmNTdiOTIxM2VmNTZjMjY0ZWFmZjZkYjM0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgNSBGZWIgMjAyNCAxNDo0MzoxNyAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
+YjM6IGFkZCBtaXNzaW5nIG51bGwgc2VydmVyIHBvaW50ZXIgY2hlY2sKCkFkZHJlc3Mgc3RhdGlj
+IGNoZWNrZXIgd2FybmluZyBpbiBjaWZzX3Nlc19nZXRfY2hhbl9pbmRleCgpOgogICAgd2Fybjog
+dmFyaWFibGUgZGVyZWZlcmVuY2VkIGJlZm9yZSBjaGVjayAnc2VydmVyJwpUbyBiZSBjb25zaXN0
+ZW50LCBhbmQgcmVkdWNlIHJpc2ssIHdlIHNob3VsZCBhZGQgYW5vdGhlciBjaGVjawpmb3IgbnVs
+bCBzZXJ2ZXIgcG9pbnRlci4KCkZpeGVzOiA4ODY3NWIyMmQzNGUgKCJjaWZzOiBkbyBub3Qgc2Vh
+cmNoIGZvciBjaGFubmVsIGlmIHNlcnZlciBpcyB0ZXJtaW5hdGluZyIpClJlcG9ydGVkLWJ5OiBE
+YW4gQ2FycGVudGVyIDxkYW4uY2FycGVudGVyQGxpbmFyby5vcmc+CkNjOiBTaHlhbSBQcmFzYWQg
+TiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0
+ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9zZXNzLmMgfCAyICstCiAx
+IGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQg
+YS9mcy9zbWIvY2xpZW50L3Nlc3MuYyBiL2ZzL3NtYi9jbGllbnQvc2Vzcy5jCmluZGV4IGVkNGJk
+ODhkZDUyOC4uNDc2ZDU0ZmNlYjUwIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3Nlc3MuYwor
+KysgYi9mcy9zbWIvY2xpZW50L3Nlc3MuYwpAQCAtNzYsNyArNzYsNyBAQCBjaWZzX3Nlc19nZXRf
+Y2hhbl9pbmRleChzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAl1bnNpZ25lZCBpbnQgaTsKIAogCS8q
+IGlmIHRoZSBjaGFubmVsIGlzIHdhaXRpbmcgZm9yIHRlcm1pbmF0aW9uICovCi0JaWYgKHNlcnZl
+ci0+dGVybWluYXRlKQorCWlmIChzZXJ2ZXIgJiYgc2VydmVyLT50ZXJtaW5hdGUpCiAJCXJldHVy
+biBDSUZTX0lOVkFMX0NIQU5fSU5ERVg7CiAKIAlmb3IgKGkgPSAwOyBpIDwgc2VzLT5jaGFuX2Nv
+dW50OyBpKyspIHsKLS0gCjIuNDAuMQoK
+--00000000000098e4a30610a8abf9--
