@@ -1,64 +1,127 @@
-Received: from smtp2-g21.free.fr (smtp2-g21.free.fr [212.27.42.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5D91B94C
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 12:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.27.42.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0871BC3A;
+	Mon,  5 Feb 2024 12:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707135051; cv=none; b=SNLfayW8Ir7iqZU0E/XsCSaTKa1r/AXsjanrqzMs9y3yHvpO/zQ6mIthlrT/kSL5tNBaNzkR9njIZ4QiFO0Wg+yLXe/4wOvfaOkc200zyvOky9ZNvxX1m6lSpATNqplVX3P2rckhABqO+kPk/GA7cdWKRcaEM4Uk/6T2IJqkn64=
+	t=1707135609; cv=none; b=M32jxlRBK1Bi6wxXjgj0BBINnZRF+0XWhCWaPp07HLb/BetPSDkJOdLJmkcIX7VlL4f220jhISRmeH8R/FLdg6b9419pi7nlunMMpombtN0j2qbXUEK/d0e3+/yX0lKqLBXB5cyDoR5flBKYLy7aNXijhr7YuKqVUjboV68h8mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707135051; c=relaxed/simple;
-	bh=syXo3fg0izAVeytsQ4bx8K2N7S+iUD8da40RgFr/nrs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=bdvrJv1fuAGbrVMVyOJFlHTH4Y8eiNRSem0TyjBonzJCE4bApDXgzm9m6Igi1jXGQJLRMD4ktR7N3cPiIlNnXd07zBbJUBzHSWccQpotqKd3J7x+NAxVqCMXHxeAU4B1+fOrEBzoyuuevPTfCjDfJyPFBQR3l7EEbIcfhoJhcpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kueny.fr; spf=none smtp.mailfrom=kueny.fr; arc=none smtp.client-ip=212.27.42.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kueny.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kueny.fr
-Received: from [192.168.0.17] (unknown [86.242.90.107])
-	(Authenticated sender: lucy.kueny@free.fr)
-	by smtp2-g21.free.fr (Postfix) with ESMTPSA id 4F2D42003F3;
-	Mon,  5 Feb 2024 13:10:46 +0100 (CET)
-Message-ID: <fbf6d02b-ea48-48d3-b273-47d6e545ea3f@kueny.fr>
-Date: Mon, 5 Feb 2024 13:10:44 +0100
+	s=arc-20240116; t=1707135609; c=relaxed/simple;
+	bh=7//g9J4D+ZXpm9UU4QExrEcw6hVi83+PWFQfkzUzwQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=umu2cF5gD4dIt1c6IXxfxrL2lFRXkhDJf4rB+/onymC6e20b4ahpfIMNUpr5g3Q7WkAYNyTFtOQYuUMfUE6BOjITaSf91ZfIMovJJEPpDwdp8fYIgFPylIW4u3e6r3G0mXkaWakEFpuxdOtDDSZgz/E0iM0JaKHoCQ6AGdDhn/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NI3CgvHq; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NI3CgvHq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6DC7C433F1;
+	Mon,  5 Feb 2024 12:19:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707135609;
+	bh=7//g9J4D+ZXpm9UU4QExrEcw6hVi83+PWFQfkzUzwQg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NI3CgvHqbCduKOUG55PcantMhEuO6cn+Q82WktDz/McB8+xXuzAr9oWfxBNRDlJIq
+	 EUGGrhAl14I7YROetxKLGMcqGt8Ru+AmVB9bfDoQy4MxBuJTscGI6an5jXX1a1UxlY
+	 iH0tINjNfz+a+kl3LaOWdJAlnwQq7npi5RyjBS1soNm/JRgw9c+6hBFsGgc/vYpFgs
+	 dev0mLv7LL+uzC+/lrHORqWInlmNXxUEGlfF+z82l0aWpZ8rLwcWppSKbu1HoVVCxo
+	 MqPT8nFMBRA5HdSKbdJcN8lFf+Y1tStm+kUjtpb43bBeSysyW23YnK908iHBQqL4uI
+	 oEI2OhqzX3GkA==
+Date: Mon, 5 Feb 2024 13:19:57 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Christian Schoenebeck <linux_oss@crudebyte.com>, David Howells <dhowells@redhat.com>, 
+	Marc Dionne <marc.dionne@auristor.com>, Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Alexander Aring <aahringo@redhat.com>, David Teigland <teigland@redhat.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, Mark Fasheh <mark@fasheh.com>, 
+	Joel Becker <jlbec@evilplan.org>, Joseph Qi <joseph.qi@linux.alibaba.com>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	ceph-devel@vger.kernel.org, gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, 
+	ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v3 04/47] filelock: add some new helper functions
+Message-ID: <20240205-fragil-begraben-4b78fd1b5981@brauner>
+References: <20240131-flsplit-v3-0-c6129007ee8d@kernel.org>
+ <20240131-flsplit-v3-4-c6129007ee8d@kernel.org>
+ <20240205-wegschauen-unappetitlich-2b0926023605@brauner>
+ <de77ec5ade7fac7e72445cb2d10d95efe8bf9c92.camel@kernel.org>
+ <20240205-laufen-hosen-38578e076df5@brauner>
+ <f7ec5cfe94ff1472e309e8c4d92f24f2fc6cd618.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to automatically drop unresponsive CIFS /SMB connections
-Content-Language: en-US
-To: "R. Diez" <rdiez-2006@rd10.de>, linux-cifs@vger.kernel.org
-References: <428ab7ba-0960-4e5e-a4ab-290dac58f45b@rd10.de>
- <b5a481ec-7c97-4b28-a807-606bea3617ff@kueny.fr>
- <ec340836-831e-462e-8a4d-3aece977e19e@rd10.de>
-From: Lucy Kueny <lucy@kueny.fr>
-In-Reply-To: <ec340836-831e-462e-8a4d-3aece977e19e@rd10.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f7ec5cfe94ff1472e309e8c4d92f24f2fc6cd618.camel@kernel.org>
 
-Hello rdiez,
+On Mon, Feb 05, 2024 at 07:06:00AM -0500, Jeff Layton wrote:
+> On Mon, 2024-02-05 at 12:57 +0100, Christian Brauner wrote:
+> > On Mon, Feb 05, 2024 at 06:55:44AM -0500, Jeff Layton wrote:
+> > > On Mon, 2024-02-05 at 12:36 +0100, Christian Brauner wrote:
+> > > > > diff --git a/include/linux/filelock.h b/include/linux/filelock.h
+> > > > > index 085ff6ba0653..a814664b1053 100644
+> > > > > --- a/include/linux/filelock.h
+> > > > > +++ b/include/linux/filelock.h
+> > > > > @@ -147,6 +147,29 @@ int fcntl_setlk64(unsigned int, struct file *, unsigned int,
+> > > > >  int fcntl_setlease(unsigned int fd, struct file *filp, int arg);
+> > > > >  int fcntl_getlease(struct file *filp);
+> > > > >  
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > +static inline bool lock_is_unlock(struct file_lock *fl)
+> > > > > +{
+> > > > > +	return fl->fl_type == F_UNLCK;
+> > > > > +}
+> > > > > +
+> > > > > +static inline bool lock_is_read(struct file_lock *fl)
+> > > > > +{
+> > > > > +	return fl->fl_type == F_RDLCK;
+> > > > > +}
+> > > > > +
+> > > > > +static inline bool lock_is_write(struct file_lock *fl)
+> > > > > +{
+> > > > > +	return fl->fl_type == F_WRLCK;
+> > > > > +}
+> > > > > +
+> > > > > +static inline void locks_wake_up(struct file_lock *fl)
+> > > > > +{
+> > > > > +	wake_up(&fl->fl_wait);
+> > > > > +}
+> > > > > +
+> > > > > +/* for walking lists of file_locks linked by fl_list */
+> > > > > +#define for_each_file_lock(_fl, _head)	list_for_each_entry(_fl, _head, fl_list)
+> > > > > +
+> > > > 
+> > > > This causes a build warning for fs/ceph/ and fs/afs when
+> > > > !CONFIG_FILE_LOCKING. I'm about to fold the following diff into this
+> > > > patch. The diff looks a bit wonky but essentially I've moved
+> > > > lock_is_unlock(), lock_is_{read,write}(), locks_wake_up() and
+> > > > for_each_file_lock() out of the ifdef CONFIG_FILE_LOCKING:
+> > > > 
+> > > 
+> > > I sent a patch for this problem yesterday. Did you not get it?
+> > 
+> > Whoops, probably missed it on the trip back from fosdem.
+> > I'll double check now.
+> 
+> No worries. If you choose to go with your version, you can add:
 
-> Many thanks for confirming that this problem exists and bugs other people too.
-
-> Let's hope that the CIFS guys take this problem seriously. The Linux desktop freezing for many seconds in a row is probably putting off many users.
-
-On my desktop, the UI can freeze for hours and require a reboot from TTY. The 'recent files' submenu in software seems to trigger repeated connection attempts.
-This is a major usability issue, and probably why FUSE is used by KDE.
-
-> The first issue is that there appears to be no documentation about the Linux Kernel CIFS client's behaviour on connection timeout. I find this frustrating. I have done some research in the past, search for 'echo_interval' here:
-
-> Based on my empirical research, there is a fixed 10-second timeout when reconnecting. Therefore, I would rather have an error returned as soon as the connection has been marked as lost by means of 'echo_interval', instead of after attempting to reconnect.
-
-> This may be hard to achieve if the reconnection only happens single threaded and on demand (when a process is trying to access a file under the mount point), instead of automatically on the background.
-
-As I understand it, the connection is managed in a separate thread.
-The 10-second timeout depends on multiple smaller timeouts in different parts of the kernel. It's almost impossible to change.
-
-I believe the echo_interval triggers will cause a reconnect attempt to happen, thus "freezes" will be gone after echo_interval+10 seconds.
-
-It's not the best, but it allows the use of a permanent mount to a NAS without trashing userspace if the network goes out of range.
-
-Best regards,
-Lucy Kueny
+No, I took yours. :)
