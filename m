@@ -1,84 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF33249EB
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 13:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F74620DF6
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 13:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707138734; cv=none; b=JvVGA6pPRy06R8LMg1qQoeISrNL6kV1nZbDV9G35m6SsVF8nbFjt1yJsCCOQBSov9DmX5QOgeJamiGWRTkVmOcLO5ITJVIB1skltx5f9zzU7zdDlzbDSQj7zqnWMrO9wrf3M2smb5LmCoirgy0SqmDmb3vYN14Wudf0EH8pr3jE=
+	t=1707141130; cv=none; b=qU7k2+CkYbU4B4SBOGyXbXEI8ldSslJ52gtNDN+/rGcIaD6S8uJ97wIMkNBKAiWiITK20QIj7ejp9EQ8JsxCfeChhNQgYkSpwU5MTq70KNG6NGan/3E++MJJ8eZ4wnU/mkGmtoEcuPbEQVx2EorbVngFgrCQeldSCIy3Ts1H/6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707138734; c=relaxed/simple;
-	bh=NgQELpPpt9/O3+vUcZYkPORr/iT9FFmyju0mdWvHzo0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=RsstPuMrznLUwLn2py42hJK+21Np+BMuhLs3f7g7242xyAYeC4rLgr2A7UYG99SAdUnqoJIW7lHbHxbQvyhCUsRFCGbz+fQaPBzaTJRLVZx7PY7kUT2qDo05tQ15foJh1tZx2AGiLYtbOARbRDZSJMg7sPsJtzkUDdijHzWXQCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ASnnXux3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1707141130; c=relaxed/simple;
+	bh=2Xv/TMPnZ6ACI/uw5nCEWZWMTiYPSRlxi3KzNmIW+M8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LxISBcScBO/lR8Mw9FuH4om1A2z9TQWuHdC/FnViI83qPGzfekjc4n9/rmWUd3A5gL5BATgyHezcoH3QMccgMXgfqB3LWNi42zr9q/EsKRIu4Vk1djaFcEc3vLqniFEeNNh6oPHNJjnn8Fnp2TePQr0flCON5BRSDRqjU1ZwGQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=NcuWp1nl; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ASnnXux3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707138731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NgQELpPpt9/O3+vUcZYkPORr/iT9FFmyju0mdWvHzo0=;
-	b=ASnnXux3Fe3GL+CgBzh0B2cf0gDgaKw+fxXu2UWkoyAiJsKaOJ1dVYYY/6Cctj1vDooQR+
-	pyOzVYnqMvIIDR8y7Pj/upl8C0aKZqqP0EwtpiRdPSZ/ZTTY0AbPUB4Bv3YZpOFcIgPLMD
-	V5mWdOXKKvDO9dZSQvySxhgXfn+lf1s=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-aI1aWVQjMeSF3pG6UfuWwQ-1; Mon,
- 05 Feb 2024 08:12:08 -0500
-X-MC-Unique: aI1aWVQjMeSF3pG6UfuWwQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE61F383CCEE;
-	Mon,  5 Feb 2024 13:12:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E91B492BC6;
-	Mon,  5 Feb 2024 13:12:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <262547e6-72e1-436f-8683-86f7a861f219@rd10.de>
-References: <262547e6-72e1-436f-8683-86f7a861f219@rd10.de> <3003956.1707125148@warthog.procyon.org.uk> <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com> <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de> <3004197.1707125484@warthog.procyon.org.uk>
-To: "R. Diez" <rdiez-2006@rd10.de>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    linux-cifs@vger.kernel.org
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="NcuWp1nl"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51121637524so6641042e87.1
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Feb 2024 05:52:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1707141125; x=1707745925; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Xv/TMPnZ6ACI/uw5nCEWZWMTiYPSRlxi3KzNmIW+M8=;
+        b=NcuWp1nlWvOmKDC+Us3xfB23YsW8RgUJlLlIRMYExr0fBNaaUQJBoDuLQn6Hzgd7ux
+         5mS8g5eqer8E27aG2gtEBQlGEYw6eCfqtfGJ/JcpLxVKxlgtFL5dNs41yfVDg7eHBsN6
+         ziM2eIdru4OyBQneL4aO4SU8i+lLz0z5AlCvU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707141125; x=1707745925;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Xv/TMPnZ6ACI/uw5nCEWZWMTiYPSRlxi3KzNmIW+M8=;
+        b=a5KnlCID+hVB47kk4BmWfh2gOYFZ8fET+TGN/JcSjjq8U2Bc2/39EWXuOAwbEe20As
+         S+1d+BgWJwvu1Ggcw/vHnFefWX7MrGzLLB+wxUQBnmWbXpq0s5UW1iyd1a4xkCyGPoIH
+         /0X8QoC+isp9sqKXbpZQwYwqUVWoExCoFqITe9Cf6qHzxL82RzV9HV8upq6u95WZMmrY
+         afjy3xsx12eDZzTKg05YYe+/PvgIkQQvZPIV029xyy8QkeordZfRrPN/oN+8pEOc9t+N
+         6FVvqaDLt2LXRVnI/3XUoxtRSy76TK+pi31oVHz0Vcmo1YsmShMYPCNywgINC4KQftAj
+         nTYg==
+X-Gm-Message-State: AOJu0YwK6LDlKMVj4WKOjPPkKoFCS3Yp1XFkCmtDorPiM6AlnFoZ1Ur3
+	k5g8M+QIO53Lg9OwDHPMnIiHMkm6OEhtVrspjK7eYzYeRvZ3BqWbS4dBpQltsZ6675cE4jlb5we
+	p2yVOnmKchVb/GpNchGFbnyD7t4CfUOfBLhgqgQ==
+X-Google-Smtp-Source: AGHT+IGCaEVVe6GrK1mvmKbk8cfbvkS3XUvRFFWxmUF4PfOm8rDUxdDRR8CpRP+LOC3U4ed7OovlnHoRwjwU+gtFl6o=
+X-Received: by 2002:a05:6512:3b8b:b0:511:3e58:3cff with SMTP id
+ g11-20020a0565123b8b00b005113e583cffmr6188837lfv.16.1707141125271; Mon, 05
+ Feb 2024 05:52:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3011688.1707138726.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Feb 2024 13:12:06 +0000
-Message-ID: <3011689.1707138726@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+References: <20240204021436.GH2087318@ZenIV> <20240204021739.1157830-1-viro@zeniv.linux.org.uk>
+ <20240204021739.1157830-11-viro@zeniv.linux.org.uk> <20240205-gesponnen-mahnmal-ad1aef11676a@brauner>
+In-Reply-To: <20240205-gesponnen-mahnmal-ad1aef11676a@brauner>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Mon, 5 Feb 2024 14:51:53 +0100
+Message-ID: <CAJfpegtJtrCTeRCT3w3qCLWsoDopePwUXmL5O9JtJfSJg17LNg@mail.gmail.com>
+Subject: Re: [PATCH 11/13] fuse: fix UAF in rcu pathwalks
+To: Christian Brauner <brauner@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, linux-fsdevel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linux-ext4@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-R. Diez <rdiez-2006@rd10.de> wrote:
+On Mon, 5 Feb 2024 at 13:31, Christian Brauner <brauner@kernel.org> wrote:
+>
+> On Sun, Feb 04, 2024 at 02:17:37AM +0000, Al Viro wrote:
+> > ->permission(), ->get_link() and ->inode_get_acl() might dereference
+> > ->s_fs_info (and, in case of ->permission(), ->s_fs_info->fc->user_ns
+> > as well) when called from rcu pathwalk.
+> >
+> > Freeing ->s_fs_info->fc is rcu-delayed; we need to make freeing ->s_fs_info
+> > and dropping ->user_ns rcu-delayed too.
+> >
+> > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > ---
+>
+> Reviewed-by: Christian Brauner <brauner@kernel.org>
 
-> >> Unlikely as you didn't take them for the last merge window, let alone=
- 6.2.
-> > That said, you did take my iteratorisation patches in 6.3 - but that
-> > shouldn't
-> > affect 6.2 unless someone backported them.
-> =
-
-> Please note that 6.2 is not affected, the breakage occurred afterwards. =
-See
-> the bug report here for more information:
-
-Ah, right - so the 6.2 in the subject is the last definitely working versi=
-on.
-
-David
-
+Acked-by: Miklos Szeredi <mszeredi@redhat.com>
