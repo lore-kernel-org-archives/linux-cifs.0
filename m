@@ -1,43 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41214F8AD
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 22:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E351012
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Feb 2024 22:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707173878; cv=none; b=XVTbflWU8Xm6Cu1GPmTK/9ZHZMx9uHUYchxto9lJ9MeUeX2s703ci3cxo/yXDi/j0s5/uhSXYx1MRuahgUi8CYw0XNNKISUHKWh6eUTHnsriO6Mm++b6J1DcNapinMDGNyYo3vEDosdV+al3E4ds6tKzQi+dPztZIbJ+cnfvfx8=
+	t=1707173882; cv=none; b=fJUwzMN/8JvRDV2spSZRP7z3VYiNmBOP14k3o4ECJEnrPH9X1XzJrirAQAzGIogkTOA2dVbbt4k+FtmfImlliLHfajaft7WCczhhm2M2phr/cpqY3QJ5/WZwtfr4FLpWYRj+1IPEG6zqnqVH0UfL/WX1ni5Nl4+JucjSxwgR8O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707173878; c=relaxed/simple;
-	bh=cOQGLVhiiObfyloDgcZhWjtXBhQA9sfsF7RZwDC1qa4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G5gcbxrnG9CzCfkMNKvMDGlnuWSgW2/jBMJNFD8I7b7Vi8W2jMjBpUMpo3z7Ot5YzL2iJOUHUpKGINJ6giO+9Tr2KjbvRbu7D24gyHPqm6dAVLUif0QmtcxL72HfG5i/qf6MkBEDvs/6UBfQfoW8hM86JEpE7bU3OeKJ3YegM6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QlCW8NzK; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1707173882; c=relaxed/simple;
+	bh=SKb3E7W4WhaRGmBfAfKjvqEtOqpcRYCQ8Ot/YOETWzg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ODZiuuaIiD/srT/JF0/d3rSsOkSJ/K0GMK3/8K9Sg6jREc+TrE7ZBTII5sLuoDgySpyU4bgnLMnY4kXgrZzbe8GeRFKP35uQmN5LkxSMt5djrHbja+tOISEgNBTk2NdTRm3njvBE0VeZAVyjYl7PaSyaWOJ+ahuj2GewPuHjUBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=al327m/Z; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlCW8NzK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="al327m/Z"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707173875;
+	s=mimecast20190719; t=1707173879;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=m84d7QF2RHzKEpc2iYUiWaNTbg9vVp06SyHcrHDZtG0=;
-	b=QlCW8NzKX6zrixOgP1/8VMZc24004pDunvjd82ZOxFUDZL++OvOHT4KuO7zgERHUSLPlzi
-	hUGeQ1wViJUmYxHzj5yQnwBPcD97gD+uyKNweT/QsS7//K6CduXe3nHK5onTaJ9tUKo2JN
-	+x8zonNH2MJzQZ4rNwUrGwwAEU/Kz6U=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-287-kn07yk8aMjSd8XV0XktC_Q-1; Mon, 05 Feb 2024 17:57:31 -0500
-X-MC-Unique: kn07yk8aMjSd8XV0XktC_Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gEDfM0YmOVVjZkqrLm5MW20CtKMi1zvofDx7AFNwinE=;
+	b=al327m/ZkTr+0GHyoP0ImeZi/MdNODu8FyR/wAK5nJRnEHRATsPCOzxBIRc40ci+xZ0kNZ
+	0is9vNv0gleteuwQmzHSxcNdpHaN4Gj3Yn4hWI3266XSeItqQabSVM72b6ryQTa1sk8Pka
+	jINb3nfCZxt3gUi+Bp77MBiTm8RzMdg=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-45-jLdc7QWiO9W-lp1ehv9R1A-1; Mon,
+ 05 Feb 2024 17:57:54 -0500
+X-MC-Unique: jLdc7QWiO9W-lp1ehv9R1A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 35A77845DC0;
-	Mon,  5 Feb 2024 22:57:31 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0A521C05EC0;
+	Mon,  5 Feb 2024 22:57:52 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 19C7B1121312;
-	Mon,  5 Feb 2024 22:57:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BE9961C060AF;
+	Mon,  5 Feb 2024 22:57:50 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <smfrench@gmail.com>
 Cc: David Howells <dhowells@redhat.com>,
@@ -52,10 +54,15 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 00/12] netfs, cifs: Delegate high-level I/O to netfslib
-Date: Mon,  5 Feb 2024 22:57:12 +0000
-Message-ID: <20240205225726.3104808-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Steve French <sfrench@samba.org>,
+	Shyam Prasad N <nspmangalore@gmail.com>,
+	Rohith Surabattula <rohiths.msft@gmail.com>
+Subject: [PATCH v5 08/12] cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+Date: Mon,  5 Feb 2024 22:57:20 +0000
+Message-ID: <20240205225726.3104808-9-dhowells@redhat.com>
+In-Reply-To: <20240205225726.3104808-1-dhowells@redhat.com>
+References: <20240205225726.3104808-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,134 +70,168 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Hi Steve,
+Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c so that
+they are colocated with similar functions rather than being split with
+cifsfs.c.
 
-Here are patches to convert cifs to use the netfslib library.  With this I
-can run a certain amount of xfstests on CIFS, though not all the tests work
-correctly because of fallocate issues.
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
+ fs/smb/client/cifsfs.c | 55 ------------------------------------------
+ fs/smb/client/cifsfs.h |  2 ++
+ fs/smb/client/file.c   | 53 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 55 deletions(-)
 
-The patches remove around 2000 lines from CIFS
-
-To do:
-
- (*) Implement write-retry.  Currently, netfslib errors out on a failed DIO
-     write and relies on the VM to drive writepages again on a failed
-     buffered write.  This needs some retry logic adding into
-     fs/netfs/output.c.
-
-     I'm not sure what the best way to handle this is.  One way is to
-     resend each failing subreq as it fails, offloading this to a kernel
-     thread that re-splits the subreq, calling out to a rreq->op to do the
-     splitting, thereby allowing cifs to renegotiate credits.  If a subreq
-     is split, the two parts need to be adjacent in the rreq->subrequests
-     list.
-
-     An alternative way might be to try and combine failing tests and then
-     split them.
-
-     Yet a third way might be to try each failing subreq a smaller bit at a
-     time and keep track of what has been sent in
-     wdata->subreq.transferred.
-
-     Whichever way is chosen, NETFS_SREQ_RETRYING should be set in
-     wdata->subreq.flags instead of setting wdata->replay.
-
-Notes:
-
- (1) CIFS is made to use unbuffered I/O for unbuffered caching modes and
-     write-through caching for cache=strict.
-
- (2) Various cifs fallocate() function implementations have issues that
-     aren't easily fixed without enhanced protocol support.
-
- (3) It should be possible to turn on multipage folio support in CIFS now.
-
- (4) The then-unused CIFS code is removed in three patches, not one, to
-     avoid the git patch generator from producing confusing patches in
-     which it thinks code is being moved around rather than just being
-     removed.
-
-The patches can be found here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-netfs
-
-Changes
-=======
-ver #5)
- - Rebased to -rc3 plus SteveF's for-next branch as netfslib is now
-   upstream, as are a couple of patches from this series.
- - Replace the ->replay bool Shyam added with a flag on the netfs
-   subrequest.  This is tested by the code, but not currently set (see
-   above).
-
-ver #4)
- - Slimmed down the branch:
-   - Split the cifs-related patches off to a separate branch (cifs-netfs)
-   - Deferred the content-encryption to the in-progress ceph changes.
-   - Deferred the use-PG_writeback rather than PG_fscache patch
- - Rebased on a later linux-next with afs-rotation patches.
-
-ver #3)
- - Moved the fscache module into netfslib to avoid export cycles.
- - Fixed a bunch of bugs.
- - Got CIFS to pass as much of xfstests as possible.
- - Added a patch to make 9P use all the helpers.
- - Added a patch to stop using PG_fscache, but rather dirty pages on
-   reading and have writepages write to the cache.
-
-ver #2)
- - Folded the addition of NETFS_RREQ_NONBLOCK/BLOCKED into first patch that
-   uses them.
- - Folded addition of rsize member into first user.
- - Don't set rsize in ceph (yet) and set it in kafs to 256KiB.  cifs sets
-   it dynamically.
- - Moved direct_bv next to direct_bv_count in struct netfs_io_request and
-   labelled it with a __counted_by().
- - Passed flags into netfs_xa_store_and_mark() rather than two bools.
- - Removed netfs_set_up_buffer() as it wasn't used.
-
-David
-
-Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.com/ [1]
-Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.com/ # v1
-Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.com/ # v2
-Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.com/ # v3
-Link: https://lore.kernel.org/r/20231213154139.432922-1-dhowells@redhat.com/ # v4
-
-David Howells (12):
-  cifs: Replace cifs_readdata with a wrapper around netfs_io_subrequest
-  cifs: Set zero_point in the copy_file_range() and remap_file_range()
-  cifs: Replace cifs_writedata with a wrapper around netfs_io_subrequest
-  cifs: Use more fields from netfs_io_subrequest
-  cifs: Make wait_mtu_credits take size_t args
-  cifs: Implement netfslib hooks
-  cifs: Replace the writedata replay bool with a netfs sreq flag
-  cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
-  cifs: Cut over to using netfslib
-  cifs: Remove some code that's no longer used, part 1
-  cifs: Remove some code that's no longer used, part 2
-  cifs: Remove some code that's no longer used, part 3
-
- fs/netfs/buffered_write.c    |    3 +
- fs/netfs/io.c                |    7 +-
- fs/smb/client/Kconfig        |    1 +
- fs/smb/client/cifsfs.c       |   69 +-
- fs/smb/client/cifsfs.h       |   10 +-
- fs/smb/client/cifsglob.h     |   59 +-
- fs/smb/client/cifsproto.h    |   14 +-
- fs/smb/client/cifssmb.c      |  111 +-
- fs/smb/client/file.c         | 2911 ++++++----------------------------
- fs/smb/client/fscache.c      |  109 --
- fs/smb/client/fscache.h      |   54 -
- fs/smb/client/inode.c        |   19 +-
- fs/smb/client/smb2ops.c      |   10 +-
- fs/smb/client/smb2pdu.c      |  169 +-
- fs/smb/client/smb2proto.h    |    5 +-
- fs/smb/client/trace.h        |  144 +-
- fs/smb/client/transport.c    |   17 +-
- include/linux/netfs.h        |    2 +
- include/trace/events/netfs.h |    1 +
- 19 files changed, 852 insertions(+), 2863 deletions(-)
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 41617541d175..4b6d1a5e4741 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -984,61 +984,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	return root;
+ }
+ 
+-
+-static ssize_t
+-cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+-{
+-	ssize_t rc;
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-
+-	if (iocb->ki_flags & IOCB_DIRECT)
+-		return cifs_user_readv(iocb, iter);
+-
+-	rc = cifs_revalidate_mapping(inode);
+-	if (rc)
+-		return rc;
+-
+-	return generic_file_read_iter(iocb, iter);
+-}
+-
+-static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+-{
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-	struct cifsInodeInfo *cinode = CIFS_I(inode);
+-	ssize_t written;
+-	int rc;
+-
+-	if (iocb->ki_filp->f_flags & O_DIRECT) {
+-		written = cifs_user_writev(iocb, from);
+-		if (written > 0 && CIFS_CACHE_READ(cinode)) {
+-			cifs_zap_mapping(inode);
+-			cifs_dbg(FYI,
+-				 "Set no oplock for inode=%p after a write operation\n",
+-				 inode);
+-			cinode->oplock = 0;
+-		}
+-		return written;
+-	}
+-
+-	written = cifs_get_writer(cinode);
+-	if (written)
+-		return written;
+-
+-	written = generic_file_write_iter(iocb, from);
+-
+-	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
+-		goto out;
+-
+-	rc = filemap_fdatawrite(inode->i_mapping);
+-	if (rc)
+-		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
+-			 rc, inode);
+-
+-out:
+-	cifs_put_writer(cinode);
+-	return written;
+-}
+-
+ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
+ {
+ 	struct cifsFileInfo *cfile = file->private_data;
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 685f7d1139c6..e8e0f863e935 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -100,6 +100,8 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 14602ed6bc39..a1e6a4c83dc6 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -4570,6 +4570,59 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+ 	return __cifs_readv(iocb, to, false);
+ }
+ 
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	ssize_t rc;
++	struct inode *inode = file_inode(iocb->ki_filp);
++
++	if (iocb->ki_flags & IOCB_DIRECT)
++		return cifs_user_readv(iocb, iter);
++
++	rc = cifs_revalidate_mapping(inode);
++	if (rc)
++		return rc;
++
++	return generic_file_read_iter(iocb, iter);
++}
++
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct inode *inode = file_inode(iocb->ki_filp);
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	ssize_t written;
++	int rc;
++
++	if (iocb->ki_filp->f_flags & O_DIRECT) {
++		written = cifs_user_writev(iocb, from);
++		if (written > 0 && CIFS_CACHE_READ(cinode)) {
++			cifs_zap_mapping(inode);
++			cifs_dbg(FYI,
++				 "Set no oplock for inode=%p after a write operation\n",
++				 inode);
++			cinode->oplock = 0;
++		}
++		return written;
++	}
++
++	written = cifs_get_writer(cinode);
++	if (written)
++		return written;
++
++	written = generic_file_write_iter(iocb, from);
++
++	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
++		goto out;
++
++	rc = filemap_fdatawrite(inode->i_mapping);
++	if (rc)
++		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
++			 rc, inode);
++
++out:
++	cifs_put_writer(cinode);
++	return written;
++}
++
+ ssize_t
+ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
+ {
 
