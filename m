@@ -1,56 +1,62 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C15712AAD7
-	for <linux-cifs@vger.kernel.org>; Tue,  6 Feb 2024 08:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9125C1DFCD
+	for <linux-cifs@vger.kernel.org>; Tue,  6 Feb 2024 08:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707207726; cv=none; b=miY5EVL1exDZs9dYRckFQcU/cBtwmXbPztwIjRUaBnIjawHZuH+zK2YI5qDKltXTFnt6yAVmcmhtCPAamX/K9A6yRiM1TYioD4BBxWkHxFadcdIHFnp9gsGaVCTgKgCXcTNah4mq3ggZZn3booB9YT7TQ/14eTaHDfaxBZQKzUM=
+	t=1707208749; cv=none; b=o1bg7uO7XDyYC1ykJdKfewGuFMk8Sv7Yatu65jlrSELYfK5QNEfQ0/8dwXt0I5nq5v2sYp5B7g+WTAfe71YaehBmFplHgCgugq6ZeR3eUtOtI2+JE6KM0VYvhm4ZVTW6zkGp7SLWDzCgCA57nCgGaAonLlNTHNtdmqsRYPEITeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707207726; c=relaxed/simple;
-	bh=kelaMat/AOTeAa8/plgeOwsnR/i6DPcZ9A5qzyjIPg8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=bdhAOH97WaSsyf610iTIOm3SHENEyHuQUdlJis0cPYTzxqOPuj9ZSI7IVc0NTViQcVGK2Cnt++roeV5dKRkjpRHOJL7gdql+Bv6y7mfneiPpupKuVPn5X1xQtM7aAv5bG7yZf8PkfAY2KpUSlEZYrkmH2UB7ITvanghsLplyBOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LtnpRot1; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1707208749; c=relaxed/simple;
+	bh=l+JMszkFYy6lH6a9tczp4WqafiooarXArqiBuWtq2nA=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=qytjkZ0kXrqO3vw8lP01RtDl42DB8PZBsUH7h2VGLW2vrPILL6GIP3v2j4hJkIYcK8QPt/R2V8UzH9IAZVMTZzH9yP2GbjB425R0cnNOnP2RAduL3voyQn3umN0xXPU65TE+JfNOcq8NX3tzdYIGPHr7u8SXCluI1Bi1nYzVFL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bkJyc3nn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtnpRot1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bkJyc3nn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707207722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1707208746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xWfVAO1uz9Wu1LuxFYpWyRes31teEZ7e3K0pGLWRHfo=;
-	b=LtnpRot1c7xWwlCL7mKCZiLalWRA1CCE/SAVC3BjOOzdQWUjOQH7Hk6l+GKseSHn0aG0TT
-	NUs9cNNrrrDx0KlAXQftxzTWozd9zbFkPcqsXjiygZ9dy66AnAbzrH/AeMHBZh0oX3U/2Y
-	F3K8YzTLpE5Ug246bwQ4kFoTF1AaWvI=
+	bh=zVAaAYx+uRJrIVM9VYECDgmw/4CaprkfGNuPI6DSTlw=;
+	b=bkJyc3nnJGUcrxnf0EpkkoVEMBLHuURk5gWu+6ZakBIURb1ym4NH5h5goQ73Eg2Ivi4HoF
+	xiQxuiubeBdWbud1O1BJXz0PMbPrmzTAqiK827G702+ZoSi6UDSQ/R2Fr0dO/lkhN7fyIZ
+	q9/GDQ3E4zHMZvwCzCTOaGPJeOQr30k=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-s00yOtGBOXqQ2ry5FI57VA-1; Tue, 06 Feb 2024 03:22:01 -0500
-X-MC-Unique: s00yOtGBOXqQ2ry5FI57VA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-343-cq73PueiM7GdY63RPfS8Fg-1; Tue, 06 Feb 2024 03:39:04 -0500
+X-MC-Unique: cq73PueiM7GdY63RPfS8Fg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BCFBC101FA2C;
-	Tue,  6 Feb 2024 08:22:00 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1158383B7E6;
+	Tue,  6 Feb 2024 08:39:04 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 38B31111F9;
-	Tue,  6 Feb 2024 08:22:00 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 61BE3492BF0;
+	Tue,  6 Feb 2024 08:39:02 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <a384b6e0-b32f-43b4-be09-99a919d78f91@rd10.de>
-References: <a384b6e0-b32f-43b4-be09-99a919d78f91@rd10.de> <262547e6-72e1-436f-8683-86f7a861f219@rd10.de> <3003956.1707125148@warthog.procyon.org.uk> <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com> <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de> <3004197.1707125484@warthog.procyon.org.uk> <3113886.1707204762@warthog.procyon.org.uk>
-To: "R. Diez" <rdiez-2006@rd10.de>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    linux-cifs@vger.kernel.org
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+In-Reply-To: <520668.1706191347@warthog.procyon.org.uk>
+References: <520668.1706191347@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Gao Xiang <xiang@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <brauner@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Eric Sandeen <esandeen@redhat.com>, v9fs@lists.linux.dev,
+    linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+    linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: Roadmap for netfslib and local caching (cachefiles)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,30 +64,96 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3114514.1707207719.1@warthog.procyon.org.uk>
+Content-ID: <3114773.1707208741.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Feb 2024 08:21:59 +0000
-Message-ID: <3114515.1707207719@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Date: Tue, 06 Feb 2024 08:39:01 +0000
+Message-ID: <3114774.1707208741@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-R. Diez <rdiez-2006@rd10.de> wrote:
+David Howells <dhowells@redhat.com> wrote:
 
-> > Out of interest, are you able to try an arbitrary kernel?
+> Disconnected Operation
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 > =
 
-> I'm afraid that is beyond my Linux Kernel abilities. I am just a user ab=
-le to poke in some configuration files, and maybe fight a little with Syna=
-ptic / APT.
+> I'm working towards providing support for disconnected operation, so tha=
+t,
+> provided you've got your working set pinned in the cache, you can contin=
+ue to
+> work on your network-provided files when the network goes away and resyn=
+c the
+> changes later.
 > =
 
-> But maybe the Ubuntu guys can. You can reach the guy doing some extra te=
-sting here:
+> This is going to require a number of things:
 > =
 
-> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2049634
+>  (1) A user API by which files can be preloaded into the cache and pinne=
+d.
+> =
 
-No worries.  Steve can probably try that.
+>  (2) The ability to track changes in the cache.
+> =
 
-Thanks,
+>  (3) A way to synchronise changes on reconnection.
+> =
+
+>  (4) A way to communicate to the user when there's a conflict with a thi=
+rd
+>      party change on reconnect.  This might involve communicating via sy=
+stemd
+>      to the desktop environment to ask the user to indicate how they'd l=
+ike
+>      conflicts recolved.
+> =
+
+>  (5) A way to prompt the user to re-enter their authentication/crypto ke=
+ys.
+> =
+
+>  (6) A way to ask the user how to handle a process that wants to access =
+data
+>      we don't have (error/wait) - and how to handle the DE getting stuck=
+ in
+>      this fashion.
+
+Some further thoughts stemming from a discussion with Willy:
+
+ - Would need to store the pre-disconnection metadata as well as any updat=
+ed
+   metadata.  When performing conflict resolution, userspace would need to=
+ be
+   able to access these in addition to the current state (local) and curre=
+nt
+   state (server).
+
+ - Would need the ability to include extra stats, such as the AFS data
+   version, that are used for cache coherency management.
+
+ - Would need to provide an API by which userspace can access both states =
+of
+   the data, possibly including the original data if we still have it in t=
+he
+   cache.  That could be a number of ioctls on the target file.
+
+ - Would need a range of resolution options in userspace, not limited to k=
+eep
+   local, keep remote, but also the option to stash one/both somewhere.  M=
+ay
+   also need to provide app-specific resolvers - merging git trees for
+   example, but also what do you do about sqlite databases, say?
+
+ - There may be bulk changes that the user would want to resolve in bulk,
+   perhaps by "everything in the subtree" or pattern matching rules,
+   e.g. "disard all .o files" or "take the .o file matching the newest .c =
+file
+   in the same directory".
+
+ - May need to change how expired keys are handled so that they aren't alr=
+eady
+   garbage collected, but can continue to be used as a token off which to =
+hang
+   cached access rights.
+
 David
 
