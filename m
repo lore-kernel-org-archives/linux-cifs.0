@@ -1,131 +1,150 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D884839FF
-	for <linux-cifs@vger.kernel.org>; Tue,  6 Feb 2024 06:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D0083CA1
+	for <linux-cifs@vger.kernel.org>; Tue,  6 Feb 2024 06:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707200043; cv=none; b=YllEzxsW9NctCp1BLg/HoS2KU0DvMp0E6qw8fyHUZ/drDGL6JdV9k9swuqEL1pdew0gMlkmth7iGZg8NXibIRIUDjWnLiBYo6Ov1Rz2GpOKychlSsFoljuMeFsigHFiet0Zw7fC/e5tWXfoddk5AeSC6Gvk180zi/Ya+ddJ6ER8=
+	t=1707200432; cv=none; b=ME28XJFQPbGDgooS1zemJRLlVdcuDpqIMHM1uVfDhbSYg0fO0ES3DNZIYFLSR7hJF+EU3O49DXfV1OnucyUCGJSodq/Zm0lwUeusDAMzZF3kl/4iFEFsb/51McneAqh4eGkJG4cDEEWApKX/vZQfec7kmvwa15B3UyY2D2/Venk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707200043; c=relaxed/simple;
-	bh=6GZu6i73tP5ygSrBIdRW1sbW6QEiEpA6UYZD9tp4bWY=;
+	s=arc-20240116; t=1707200432; c=relaxed/simple;
+	bh=ReCp4sgmL5SJ02/JaoXPw6mab3sKCa9odhCqMwKrNE0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CEyo2ojH1ylb/LdJ5H1n5RoCrRj9WGHmLMUp71xj4WGUmSwl5QjUwoVYEIjy6w79YLBm+WnSmUlj/7X2kHQug0j0mYJsTl7DT5dA6mtaWAxMyoDXDg/xGQWSjhXCspEc++LfiqSdqaIgTERshCi/DTpfjNPA9G0xcQ+6s4ocvHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/i3KF57; arc=none smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=usEEl7aGPqfjl4lMBCFlFJRQ2Xp/mImAJly6aBWxQ0HZOXN8NvpLhKU884YaodVLd7n1uQJ8wAdPodSJbRsmgws7SH3A5pJZ21RFkwSe/UQY1Hy3MWF18hNF+A+7w2Wy4BnlBt2ifUREnJi4FfLBQKHyekTf0KDFvWA3Nipy+zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VJh2dU/+; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/i3KF57"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51137c8088dso5652156e87.1
-        for <linux-cifs@vger.kernel.org>; Mon, 05 Feb 2024 22:14:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJh2dU/+"
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-290d59df3f0so4275332a91.2
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Feb 2024 22:20:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707200040; x=1707804840; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707200430; x=1707805230; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dtylrecvxxp8VUC5crHrURPX8SaEtdLHapIjvpGa3cA=;
-        b=W/i3KF57fo2vi7h1DG0z/nTidACZvovtBKi9nN236Y0oeGR2S7ebvn9whDYs5+cAKv
-         p68qIj3KHxkV8jyx/mt9vgyGy4yl935t05CpLTXBOBg/DO/IhG6+tC4Q4uaWfKqFC1k/
-         euqpRaRjEEVA8ADDlSiKSyMMBMWn7tGf5gdHhu81VTCfiCAzCAT66Xr1u+RqMuSYJHWb
-         usBIG0Ib3x7cgx0xIYc9ViUmqkXJwbi/cudev6qDqCyS/rs25j2gP2gxFqo/Y7up7nTe
-         3lfwTDdPky2kFGozCipXaUe9UwxtQuu7C2N4xAMItn3bIT1oQVwUJXxE3xLxaWHvK56z
-         zP2A==
+        bh=JbWgYY2uQ6d1qovYv9Lh8MRY+9F4l+2JGmUdykkJWGw=;
+        b=VJh2dU/+BmWjfRgkVdXpk/FYdBISljMBmTY2MpID54Xg3buf3Fx8lCS26u2yHxfwQm
+         63iTVd9MsOACAMbcUE40bkMXPLVwM3IfJwDk0WnYnlu4A5XWFMF1IfhtB0npFS5fBOJz
+         CUrWN+Xf21mNn3sTXhIcGPgtKbpiT1C45gfuH3giCe32VGh6hAQ6x120ywPZT/xN0FhW
+         0mGEOVHzVQw8eLXpOSwFN1s4+vTh/EtmG1xjvxvcItZAqFoiOHgCVdEbQx4Qnd+l05aB
+         8TL+hmv6M3r4sDKoRSUF1o/coNXkQSKx7ysJhemzvYkrzK1zk9PnZfhFPfTzuypsivUr
+         HKNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707200040; x=1707804840;
+        d=1e100.net; s=20230601; t=1707200430; x=1707805230;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dtylrecvxxp8VUC5crHrURPX8SaEtdLHapIjvpGa3cA=;
-        b=mVkzcGh0ckmn8ArVmdRJ/DXNMJcUbNzjUVFXfdAJ5SNtyjAHQ205dB5SVnVYVmnHk1
-         6TXpciAON0aJGKTzhfeNzZgGDk7im3+jpNHMhP/n44pqhp57dLxDBfCZufZtbFQyNB8X
-         cCLnLcl3IuMj9qU10BheBOXPQmDiaKagWjnRRAIenPfsEMSAc67pSaWbw1ADYSro5RRK
-         5UCF9B+0DisWMZdKnzK+Eokf8OUNl511Tx0GVpfukZ0s98gi+tPmMGZHvbClnLhT94l+
-         nz1Jd0bOwf625ZWwApYgQXl/aCsVbqyCa8rkXcYenof3FJ4aVLzxAM5bonnGvMDNV/ER
-         F0pA==
-X-Gm-Message-State: AOJu0YzZxNSftDEVceJTeaf8lpFDrS5q5pXr8mpmvnvwYuOCPFi4OTeF
-	H1qOCrGxVZfHlEbVw/AUluWZolqbo2gUAZHX8wf6axCKFo43gKnhH5hHODiuXsC7wdVbTs64spu
-	OUV208LIzrnS6UaxKx8mW8HtlMXK2qjdb
-X-Google-Smtp-Source: AGHT+IF5T7FTnDOcHFuF3SE3+tZu62ONmdNTRMTtqax+83kxZIWixL7CdSeJFzUMEFVVPKgjcKtrlFBIY+pWVM748/o=
-X-Received: by 2002:a05:6512:64:b0:511:32cc:1c4c with SMTP id
- i4-20020a056512006400b0051132cc1c4cmr1049605lfo.40.1707200039594; Mon, 05 Feb
- 2024 22:13:59 -0800 (PST)
+        bh=JbWgYY2uQ6d1qovYv9Lh8MRY+9F4l+2JGmUdykkJWGw=;
+        b=gR/xE2UXIT+B0MPDqbiLDOcb/gKSMq8II136wfGqhbHgg5WMuKX5XuTU/K2S83uZmC
+         Ph3GiSvKR7lZPcrEHmqJAfWlT8S1XWljSwKUxvGSVM19MzbY3Fh7T1eHGfJBxXdEiri6
+         ynDRkKK9YDlx2s/GmlluwJM1h+YxUYZ2655CxjMpebw2mNdFMbim+kF0sEaj0WFgn833
+         gjXzHWvkOZrkyeq7P8HbVtzrFlYQ4j3uaO9oi3g9/PVtB79dAu/5sVlqoJmgtacHGNuO
+         lAqgqDinuIMyQilQkEyPjy+OyBJHJb8Z9fU6kbl+t93dLec+Rgf6yj6vtnR96uqXbG6+
+         ZnFA==
+X-Gm-Message-State: AOJu0YzaM6gfmJM3el2DnWpKVwRu4ejCfWHlo3D1nWmKe3xZauNlhUPa
+	CyXNT5lQdb0imwgld3HRhfU8gNx78GBxxE0fQWORpUtT0FJ0F/VUN/scMku1VyYHL1i5DVNuvXP
+	oBGqaNWy4XBhlaffXoG2tI7PErYA=
+X-Google-Smtp-Source: AGHT+IFrXiMcnCpeOgTtQ6bazYH6TkCwptsmDtFFrQl0y35r0VsyizHSGhC4DX0glz4uTrTEjOS9cJnidIpP9Eg58xU=
+X-Received: by 2002:a17:90a:b38c:b0:296:2589:c05e with SMTP id
+ e12-20020a17090ab38c00b002962589c05emr1606702pjr.30.1707200429949; Mon, 05
+ Feb 2024 22:20:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201111530.17194-1-sprasad@microsoft.com> <20240201111530.17194-5-sprasad@microsoft.com>
-In-Reply-To: <20240201111530.17194-5-sprasad@microsoft.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 6 Feb 2024 11:43:47 +0530
-Message-ID: <CANT5p=oNrsP6ZMuUjZ=JT2wg9-6BBS=t03xhmfHxZHMgM9QjOw@mail.gmail.com>
-Subject: Re: [PATCH 5/5] cifs: enforce nosharesock when multichannel is used
-To: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
-	bharathsm@microsoft.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>
+References: <3003956.1707125148@warthog.procyon.org.uk> <CAH2r5mtYF4MgTz8v3DGfYiDycMMaGywuyPxF9-61d4575-S0bw@mail.gmail.com>
+ <a356847f-afa0-446a-b896-fd2b9af2e393@rd10.de> <3004197.1707125484@warthog.procyon.org.uk>
+ <262547e6-72e1-436f-8683-86f7a861f219@rd10.de> <CAH2r5mt3we_rcKrkyweaVcH53QVYE8jaV9NCvaEvOrt16bwr1w@mail.gmail.com>
+ <CAH2r5mv6mvtSD3VpHKUtA_3zNDMGhFFkeLus1h5HpNZEJ2Q1pw@mail.gmail.com> <CAH2r5muy0UEnG1KmSgz1P_y9hP+-nj8wvZK5aGTGp6WW3F4mSA@mail.gmail.com>
+In-Reply-To: <CAH2r5muy0UEnG1KmSgz1P_y9hP+-nj8wvZK5aGTGp6WW3F4mSA@mail.gmail.com>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Tue, 6 Feb 2024 16:20:18 +1000
+Message-ID: <CAN05THS4HuTfCHEpKG8D3mzo7omoz9mZFVuZGVTH_C2gqhKSHQ@mail.gmail.com>
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+To: Steve French <smfrench@gmail.com>
+Cc: "R. Diez" <rdiez-2006@rd10.de>, David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 1, 2024 at 4:45=E2=80=AFPM <nspmangalore@gmail.com> wrote:
+On Tue, 6 Feb 2024 at 15:52, Steve French <smfrench@gmail.com> wrote:
 >
-> From: Shyam Prasad N <sprasad@microsoft.com>
+> Digging deeper into this it looks like the problem is not the size
+> being bigger than 32K but picking a write size (wsize) that is not a
+> multiple of page size (4096).  I was able to reproduce this e.g. with
+> wsize=3D70000 but not with 69632 (ie a multiple of page size, 17*4096)
+
+Probably the easiest/quickest fix is to enforce rsize/wsize MUST be a
+multiple of page-size ?
+Is there any reason to support other sizes?
+In the mount api you could just round these sizes up to the nearest
+page size multiple.
+
 >
-> In the current architecture, multiple sessions can
-> share the primary channel, but secondary channels for
-> each session is not shared.
+> On Mon, Feb 5, 2024 at 10:05=E2=80=AFPM Steve French <smfrench@gmail.com>=
+ wrote:
+> >
+> > In my additional experiments I could reproduce this but only with
+> > wsize < 32768 but it wasn't SMB1 specific - I could reproduce it with
+> > current dialects (smb3.1.1 e.g.) too not just SMB1 - so it is more
+> > about you picking  small wsize that found the bug than an SMB1
+> > specific problem.
+> >
+> > On Mon, Feb 5, 2024 at 7:30=E2=80=AFPM Steve French <smfrench@gmail.com=
+> wrote:
+> > >
+> > > I can reproduce this now with a simple smb1 cp - but only with the sm=
+all wsize
+> > > ie mount option: wsize=3D16850.  As mentioned earlier the problem is
+> > > that we see a 16K write, then the next write is at the wrong offset
+> > > (leaving a hole)
+> > >
+> > > (it worked for SMB1 with default wsize)
+> > >
+> > > so focus is on these two functions in the call stack:
+> > >
+> > > [19085.611988]  cifs_async_writev+0x90/0x380 [cifs]
+> > > [19085.612083]  cifs_writepages_region+0xadc/0xbb0 [cifs]
+> > >
+> > > On Mon, Feb 5, 2024 at 3:37=E2=80=AFAM R. Diez <rdiez-2006@rd10.de> w=
+rote:
+> > > >
+> > > >
+> > > > >> Unlikely as you didn't take them for the last merge window, let =
+alone 6.2.
+> > > > >
+> > > > > That said, you did take my iteratorisation patches in 6.3 - but t=
+hat shouldn't
+> > > > > affect 6.2 unless someone backported them.
+> > > >
+> > > > Please note that 6.2 is not affected, the breakage occurred afterwa=
+rds. See the bug report here for more information:
+> > > >
+> > > > https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2049634
+> > > >
+> > > > Regards,
+> > > >    rdiez
+> > > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 >
-> This can create two problems when primary channel is
-> shared among several sessions. For one, there could be
-> uneven utilization of channels due to this skew.
 >
-> Another major issue is how a cifsd thread can get to
-> the channel for a secondary channel. The process is
-> already cumbersome. We also need to find the right
-> session for the server struct.
 >
-> To avoid both the problems, this change marks even the
-> primary channel as nosharesock. Secondary channels are
-> marked as nosharesock anyway.
->
-> We can remove this when we fix the mchan architecture
-> to share all channels.
->
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/fs_context.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 82eafe0815dc..e7543574ea9e 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1043,6 +1043,8 @@ static int smb3_fs_context_parse_param(struct fs_co=
-ntext *fc,
->                         ctx->max_channels =3D 1;
->                 } else {
->                         ctx->multichannel =3D true;
-> +                       /* enforce nosharesock */
-> +                       ctx->nosharesock =3D true;
->                         /* if number of channels not specified, default t=
-o 2 */
->                         if (ctx->max_channels < 2)
->                                 ctx->max_channels =3D 2;
 > --
-> 2.34.1
+> Thanks,
 >
-
-This was discussed offline with Steve. And we decided it's best not to
-use this one.
-This patch may unnecessarily increase socket utilization for mounts
-that could otherwise have shared the sessions.
-
-Our multichannel implementation makes it difficult to solve this problem.
-I'll send another patch for now to work around the problem in another
-way. (the cumbersome method as mentioned above)
-However, please note that the perf skew problem can still happen with
-that change. Maybe we can address that in the next kernel version.
-
---=20
-Regards,
-Shyam
+> Steve
+>
