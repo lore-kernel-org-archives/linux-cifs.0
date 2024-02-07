@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A82D153BF3;
-	Wed,  7 Feb 2024 21:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CD5157047;
+	Wed,  7 Feb 2024 21:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707341090; cv=none; b=as9z59bpYnCeGzcfcVM5iegST/jkwaLdUK1MXz9CRD6X+53KvaIomlCpJp+h7vVwI9aZyGqwFF4A3ASj3W58n3uPJrInHc/taK2Hd5jVoKoq+Jn6XPW4knE7LYYMxvCxm/xRiTYR3M3JLTFu904zWAqqr41ht2RScpSguRC/rj0=
+	t=1707341160; cv=none; b=WJJW/2n6bv8wVS3fsK1aJ9T0ntgMX61owzPTUIOCuewKqbKFWBX0D99g2s0uB+81hsMjg6DlwCRs6cag3XfPVygq1RYksn6wHaOjLFmnbtlImHJWRf8v5e347+W3w29YuUiSqf/HZ4dFFz4Jq8T9+8k8kY7CCBR6azluMfQ0ewY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707341090; c=relaxed/simple;
-	bh=Ba8y75ugfKC0c+0AUawHfVBNym71ulVihe5wwvG66mw=;
+	s=arc-20240116; t=1707341160; c=relaxed/simple;
+	bh=3Zria3SDjxCD65ZC/gxaL0fTaARSqCzzrAlR5RzhxVM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KOf2hRTWNC8yW1wtiK/5A8j4hdYTeYL5+p4z7bBDz+6RdZiCh8NHCbG+t9PXq8iPNSuypAmHMibDny9m5fWWZjJd7xXU5/AL7alswDPupbo1o9mf68qiJVnGQ1+miVHxXYiIZcyX48oeYcrXNO3vTKuFgPBwjv0zsOTmLjnlHrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0I0X5oR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=lZoSC0ebHk+lrfNE/v2+xw3rfvEFLAoxiZ6Ptu6d1Phlwp80QTOHSTFhrlNC3grd25aFpZZB/aN1bd3r5jFznlywp3wgoBzjJr5lXYBBwdMz5m5yx5QNUkS8AHz59BELIGuhlTzanuebbwBqTHdDBV6ND0kUQEkt+z0RImfMJdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPVxFCGu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S0I0X5oR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EE84C43390;
-	Wed,  7 Feb 2024 21:24:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPVxFCGu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7C37C433F1;
+	Wed,  7 Feb 2024 21:25:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707341089;
-	bh=Ba8y75ugfKC0c+0AUawHfVBNym71ulVihe5wwvG66mw=;
+	s=k20201202; t=1707341159;
+	bh=3Zria3SDjxCD65ZC/gxaL0fTaARSqCzzrAlR5RzhxVM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=S0I0X5oRw1U5rKoaQoinb41MPIItQG7CvqrgOctdAkt+sal2J19/nhVpkxwVDDByu
-	 qMCfP7NofRiaFLf7aA/b1KEbkCY32ZgX0VSYLTVXXDlqBqm4IkzRhVV33xkFGcHFJb
-	 4lFOt/ZWm+4XBa/EP/ubJOdJSFp0HM2Bj6gwDdi15RZPBL8peeKvJVfp58RPalCKcF
-	 TsifQLsPPfJ18u9ecDLqe1q5MONs//AWk2wNVzwtz6k3cpWHd790GATiH1IEq50mXA
-	 wxNdmZ1JTw/4GwqN75z6TLr0NWcw4shE0DoT6KentDHrhXbm5tU8xe52PcEh+nDPen
-	 LFBmeX900smxg==
+	b=iPVxFCGum/F+LblTBTWL8Sn+tBXlVxiitMU//oo7LnorzSQLhSDJ8t2CZXlVUDgsH
+	 tyXU9IqVtK4yzDw+AVxaUQlSKVL8CfSTb9tyfoVO5pKqWgN1YOYjZv5Dinicamg6ti
+	 j/VQN7TwXmeml95y7IGOxqJIQGZ3Z78BlJpUS3BWgzbZh+qH6U9/AC2jDzKWBPuBT3
+	 3jvpDdmGE00D4vwQ6VSaY0O2iqgYN9IYKekrpo8yJFfGBUcT0WFrl8haEXHk9lovbE
+	 i1PvIQlsgbvD0uplLYybR1nRskLDcP3Fmiv9Y6ERSEIUlby9hzYoPQkpK4JsSDubfR
+	 AMlxd19bbaVww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Paulo Alcantara <pc@manguebit.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.6 36/38] smb: client: increase number of PDUs allowed in a compound request
-Date: Wed,  7 Feb 2024 16:23:22 -0500
-Message-ID: <20240207212337.2351-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 27/29] smb: client: increase number of PDUs allowed in a compound request
+Date: Wed,  7 Feb 2024 16:24:52 -0500
+Message-ID: <20240207212505.3169-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240207212337.2351-1-sashal@kernel.org>
-References: <20240207212337.2351-1-sashal@kernel.org>
+In-Reply-To: <20240207212505.3169-1-sashal@kernel.org>
+References: <20240207212505.3169-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.16
+X-stable-base: Linux 6.1.77
 Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.com>
@@ -78,10 +78,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 75ca732a1679..b65ce8d13143 100644
+index 7f1aea4c11b9..58bb54994e22 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -82,7 +82,7 @@
+@@ -86,7 +86,7 @@
  #define SMB_INTERFACE_POLL_INTERVAL	600
  
  /* maximum number of PDUs in one compound */
@@ -91,10 +91,10 @@ index 75ca732a1679..b65ce8d13143 100644
  /*
   * Default number of credits to keep available for SMB3.
 diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 4f717ad7c21b..2d9146600371 100644
+index 8a1dd8407a3a..c7254b321184 100644
 --- a/fs/smb/client/transport.c
 +++ b/fs/smb/client/transport.c
-@@ -428,8 +428,8 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+@@ -449,8 +449,8 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
  	if (!(flags & CIFS_TRANSFORM_REQ))
  		return __smb_send_rqst(server, num_rqst, rqst);
  
