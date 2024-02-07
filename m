@@ -1,46 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B1E13DBB0;
-	Wed,  7 Feb 2024 21:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A99A151469;
+	Wed,  7 Feb 2024 21:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707341000; cv=none; b=ZqS6VRXBs9tHyCqNNEIZMv94gixxYxMRBYjZkbwsMPvq7V6mKuIayMlHGHD0miqrWTpOWhlkueNogb4rJSo4keLQUFMF6z8Q+N3g3D0lxxmRkZe8wHHK1bp2vBXkjBZzNl52vSU0QGCNZx2JFe9K5Pxr+Szuy8eRwRccagIOkc0=
+	t=1707341067; cv=none; b=eJgkZwkfVsxOO4U2cItG1qDKQ2Oo/zbj4Gl/LpS29tO6L3Um1Q4tSF/AsvpMMNOi9eCEapSNKs3Q8EBxUiPyidKQovJzrUaO5iquneekwhSyj/PWEtXYL9lYs2vsNsHw63O7HXI6zhXboxoaSgZQiEhYxsAfkJrRk7o2Ud+yPLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707341000; c=relaxed/simple;
-	bh=Ba8y75ugfKC0c+0AUawHfVBNym71ulVihe5wwvG66mw=;
+	s=arc-20240116; t=1707341067; c=relaxed/simple;
+	bh=j2pD5hUy6ikBMlbVLzADzaYatT7YY7pGsXPuO6keV1E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PdcMXneK3hOzMSg/RUXWxDZ5L0lL8cL4PgWZXa9SAR9muUea7mytfjQ5GuJ111A+yjuvOll1Quyl6f14dF1DWC70X1L6Vhx9Tjz+pZS1KAjKZCDSCL/LW6xr+n4fy+9ZA4MM27r6m/MJ/LL1t0J3OCoWjcIOmQoRtN9RSvqdjao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2JHFzQj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mnrKMhaeECuL4lKO0Ja8j3hzHcOwz08n6/bxGC0z6tHNjn9EnPj9WQD33Asoo050meEbL8cb6l25oG3ZW2YZygZtxQ18tHw/5sJv4BppK1//WivSY3sWT1G6PQwv52OOOQtOW/+1rXIQW+3D6Vic2Nj+6WUiWTYEeywizi2BfBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TqXTtZtz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2JHFzQj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C74C4C43399;
-	Wed,  7 Feb 2024 21:23:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TqXTtZtz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 215C8C43390;
+	Wed,  7 Feb 2024 21:24:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707340999;
-	bh=Ba8y75ugfKC0c+0AUawHfVBNym71ulVihe5wwvG66mw=;
+	s=k20201202; t=1707341067;
+	bh=j2pD5hUy6ikBMlbVLzADzaYatT7YY7pGsXPuO6keV1E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z2JHFzQjGRLzmblnklMgamHubmPfeNzyVlmZWj5V76PEYwcO85eijDN8c1sjercda
-	 RMM7HehsNHO9PEGxzQCI910BrMlQkx+dQVwAUexYHWWdxMuzHKASGjNb0q5pOpIpVr
-	 rGmB8A3cTVz+aRU4vAHWNNLrDUTpH6tV+aWXJW/9M+zwdA+2ZU7aW+tXXyeyVLJniO
-	 NmjO1ks0SBPghDbTlrgf8UQyWj4OrRzp9MKAc9ilNwXXmMe18jsOso/2kLfZo0dynP
-	 sZ7oJTurX/oJ45XMpanGZYsI3XAc9dQd6Ub+xQCFO36EyiSivkgUVXzs8AFONZaes8
-	 YcLKjSnY7fIiQ==
+	b=TqXTtZtzU1jqkiCQgCsv5flelwmhrUhKsnPyOBgxT3hYKuAmpdC3uZmYjhk+RvERT
+	 +bmcXjMJnAtsvSLFyn/Zv819EMJiB02xC5UvYyyRgG2g9IxT237d/nQhswIMBivRdj
+	 qZfdftESbdZDJIhu3s4UWtNSv82Qgsa81dkNYrs3GS8XXOULZXXdxt++aPNgb3CU/s
+	 N0WfbVoWiWhJP2C+KlEgwGnRqX1o0esKRvU4C71UK87X4ktRDNLod4JFfz5D69DoKn
+	 ljMz3Ms/StDOqxjYxn5mkot/qo+xCZCKPKoOuMHefykfWsvNDM9bHQm+0ovWrz27f8
+	 2iwI0u7C2LJQg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.com>,
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.7 42/44] smb: client: increase number of PDUs allowed in a compound request
-Date: Wed,  7 Feb 2024 16:21:09 -0500
-Message-ID: <20240207212142.1399-42-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 24/38] cifs: make sure that channel scaling is done only once
+Date: Wed,  7 Feb 2024 16:23:10 -0500
+Message-ID: <20240207212337.2351-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240207212142.1399-1-sashal@kernel.org>
-References: <20240207212142.1399-1-sashal@kernel.org>
+In-Reply-To: <20240207212337.2351-1-sashal@kernel.org>
+References: <20240207212337.2351-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,62 +49,99 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.4
+X-stable-base: Linux 6.6.16
 Content-Transfer-Encoding: 8bit
 
-From: Paulo Alcantara <pc@manguebit.com>
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-[ Upstream commit 11d4d1dba3315f73d2d1d386f5bf4811a8241d45 ]
+[ Upstream commit ee36a3b345c433a846effcdcfba437c2298eeda5 ]
 
-With the introduction of SMB2_OP_QUERY_WSL_EA, the client may now send
-5 commands in a single compound request in order to query xattrs from
-potential WSL reparse points, which should be fine as we currently
-allow up to 5 PDUs in a single compound request.  However, if
-encryption is enabled (e.g. 'seal' mount option) or enforced by the
-server, current MAX_COMPOUND(5) won't be enough as we require an extra
-PDU for the transform header.
+Following a successful cifs_tree_connect, we have the code
+to scale up/down the number of channels in the session.
+However, it is not protected by a lock today.
 
-Fix this by increasing MAX_COMPOUND to 7 and, while we're at it, add
-an WARN_ON_ONCE() and return -EIO instead of -ENOMEM in case we
-attempt to send a compound request that couldn't include the extra
-transform header.
+As a result, this code can be executed by several processes
+that select the same channel. The core functions handle this
+well, as they pick chan_lock. However, we've seen cases where
+smb2_reconnect throws some warnings.
 
-Signed-off-by: Paulo Alcantara <pc@manguebit.com>
+To fix that, this change introduces a flags bitmap inside the
+cifs_ses structure. A new flag type is used to ensure that
+only one process enters this section at any time.
+
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsglob.h  | 2 +-
- fs/smb/client/transport.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/client/cifsglob.h |  3 +++
+ fs/smb/client/smb2pdu.c  | 18 +++++++++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 75ca732a1679..b65ce8d13143 100644
+index 5e32c79f03a7..75ca732a1679 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -82,7 +82,7 @@
- #define SMB_INTERFACE_POLL_INTERVAL	600
+@@ -1004,6 +1004,8 @@ struct cifs_chan {
+ 	__u8 signkey[SMB3_SIGN_KEY_SIZE];
+ };
  
- /* maximum number of PDUs in one compound */
--#define MAX_COMPOUND 5
-+#define MAX_COMPOUND 7
- 
++#define CIFS_SES_FLAG_SCALE_CHANNELS (0x1)
++
  /*
-  * Default number of credits to keep available for SMB3.
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 4f717ad7c21b..2d9146600371 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -428,8 +428,8 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 	if (!(flags & CIFS_TRANSFORM_REQ))
- 		return __smb_send_rqst(server, num_rqst, rqst);
+  * Session structure.  One of these for each uid session with a particular host
+  */
+@@ -1036,6 +1038,7 @@ struct cifs_ses {
+ 	enum securityEnum sectype; /* what security flavor was specified? */
+ 	bool sign;		/* is signing required? */
+ 	bool domainAuto:1;
++	unsigned int flags;
+ 	__u16 session_flags;
+ 	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
+ 	__u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index f5006aa97f5b..ab8765113392 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -399,6 +399,15 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		goto out;
+ 	}
  
--	if (num_rqst > MAX_COMPOUND - 1)
--		return -ENOMEM;
-+	if (WARN_ON_ONCE(num_rqst > MAX_COMPOUND - 1))
-+		return -EIO;
++	spin_lock(&ses->ses_lock);
++	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
++		spin_unlock(&ses->ses_lock);
++		mutex_unlock(&ses->session_mutex);
++		goto skip_add_channels;
++	}
++	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
++	spin_unlock(&ses->ses_lock);
++
+ 	if (!rc &&
+ 	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
+ 		mutex_unlock(&ses->session_mutex);
+@@ -428,15 +437,22 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		if (ses->chan_max > ses->chan_count &&
+ 		    ses->iface_count &&
+ 		    !SERVER_IS_CHAN(server)) {
+-			if (ses->chan_count == 1)
++			if (ses->chan_count == 1) {
+ 				cifs_server_dbg(VFS, "supports multichannel now\n");
++				queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
++						 (SMB_INTERFACE_POLL_INTERVAL * HZ));
++			}
  
- 	if (!server->ops->init_transform_rq) {
- 		cifs_server_dbg(VFS, "Encryption requested but transform callback is missing\n");
+ 			cifs_try_adding_channels(ses);
+ 		}
+ 	} else {
+ 		mutex_unlock(&ses->session_mutex);
+ 	}
++
+ skip_add_channels:
++	spin_lock(&ses->ses_lock);
++	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
++	spin_unlock(&ses->ses_lock);
+ 
+ 	if (smb2_command != SMB2_INTERNAL_CMD)
+ 		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
 -- 
 2.43.0
 
