@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D8A13A273;
-	Wed,  7 Feb 2024 21:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824A613D512;
+	Wed,  7 Feb 2024 21:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707340974; cv=none; b=aKTfWa9C8E18Y2YXT+UHoh5QnsSXiEGhz1rqnp5VWwgo3w8cwrw3x0ZdJpyNUBm5IXY1F91LVoKGIkBsIx2EGbT8FH1iR5i4gRRmRv+65RP5plX7OhYEoE60VeWdf0H2/j2hXvqzPv5SCaFoMyJQgA++5ePshSL0ZfonzDkqiVk=
+	t=1707340998; cv=none; b=tzOWY/HfFYKMFo71EUrQx81L8e+IodEjwc+4om8213T61AF1QyAuqHWG2Ryk8kqSGmaTvEJ4lJI4at1jzvi7TU6M0lSPWQVpDyj2IE1jiVhPXQ66xrQnL9Ijt0VRBL5gTkoVEuYS1AUIxd6OThv+n5gft2yGoq6M7RhJgwCuTuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707340974; c=relaxed/simple;
-	bh=j2pD5hUy6ikBMlbVLzADzaYatT7YY7pGsXPuO6keV1E=;
+	s=arc-20240116; t=1707340998; c=relaxed/simple;
+	bh=iV8TDHDm87heF1yhhXW1+AK8m7ySSOw9hdNKZx8k57M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pnjTN1Hj1Xan0b7NA38VG9wWghxPkf054MP8/9JqdZtHS0sTHoelHThBnQqWez7Nhj8orNv6IzdfHgALqwaUyZ8tWGfQUJs8G4U4k+dkddt0LZHy0RQ5Q9gwO7MBVClzA7i8R4chYwRWg9Z39haW5KwymuzZSdmmnKXYn1+XpyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gN94f+Ln; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mvZLl0ftxyt5U863JZySfzUChU49TZ2RhL82Zh1ES75vtzDoYZuYAzxjGT6yBQ31wdM8eEw0XNZhrTs5woCqATf+xLJ19AJbbsqDMoWD0c0gtKhUPiqHKqMz5atlTUSw0dfToJu098JDJcCzuWFqSBAjKFrEsumDh+U3YmM0NXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBUZHXac; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gN94f+Ln"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 534AFC433C7;
-	Wed,  7 Feb 2024 21:22:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBUZHXac"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44813C43390;
+	Wed,  7 Feb 2024 21:23:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707340974;
-	bh=j2pD5hUy6ikBMlbVLzADzaYatT7YY7pGsXPuO6keV1E=;
+	s=k20201202; t=1707340998;
+	bh=iV8TDHDm87heF1yhhXW1+AK8m7ySSOw9hdNKZx8k57M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gN94f+LnWsF2Or9XDDDxEX5zRfdWFzQU9AO8tbUmd9BMiNxjPWjspB2sgaJUyTjNe
-	 k7dowaxVOFAU0TWRf+h5nUQaSd6BMbPvVfj7dEZazJjylCbYSyveOWNKc0hoX1frQ5
-	 WHy2J7oqcI2pZn2drpmrWeFuWRKnlM+QDHL4F1rkIRu8U3jJ0hFCFEGAlHj+tSOZQY
-	 Sz8ogPJ4jOK6qGmIhdiW1Iv7bf31QlGyBaEuRW/oOkJJ24bkL+knpEdOwsKTnYC2on
-	 11DCzW25GUYqUGliH1IJ62jZRSNXtWLERNJ3pLThW+8vB8bLrIo5cDr/bhHghhBb6/
-	 eLmudRFJOQYpw==
+	b=hBUZHXacq/LTMCSbpQMSMqPLKBVjtXonFZoCVOudnReY4SdDIvt4HsgnGY9lKZIbG
+	 QXFR1K98WIQ1avWCKxJstVp4oZbmG/11epDMvG1i9ooqRmc3vXwWxs13fly4yRby7z
+	 nWZlY/suwbIkhjSX/xqsUAOMxsNcXnUlxQbqrUOWUJJHOnPuicj+dCdhGy6Ao03Fni
+	 FcSf1pJ/2k8yQkMk0yr+na9Iftx5tk2pTDPKRrJ5BQdNd4UTmL+gGiJCKdOr5okLZ/
+	 0BLgSXdU5vxst9+24FOjeJYJLu3g9Bs5KweRR2n8WZr1f/Y+xM+qHoHOFH1gIuUV/w
+	 0gNUgmgIGcUPg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,9 +35,9 @@ Cc: Shyam Prasad N <sprasad@microsoft.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.7 28/44] cifs: make sure that channel scaling is done only once
-Date: Wed,  7 Feb 2024 16:20:55 -0500
-Message-ID: <20240207212142.1399-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 41/44] cifs: do not search for channel if server is terminating
+Date: Wed,  7 Feb 2024 16:21:08 -0500
+Message-ID: <20240207212142.1399-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240207212142.1399-1-sashal@kernel.org>
 References: <20240207212142.1399-1-sashal@kernel.org>
@@ -54,94 +54,65 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-[ Upstream commit ee36a3b345c433a846effcdcfba437c2298eeda5 ]
+[ Upstream commit 88675b22d34e6e815ad4bde09c590ccb2d50c59d ]
 
-Following a successful cifs_tree_connect, we have the code
-to scale up/down the number of channels in the session.
-However, it is not protected by a lock today.
+In order to scale down the channels, the following sequence
+of operations happen:
+1. server struct is marked for terminate
+2. the channel is deallocated in the ses->chans array
+3. at a later point the cifsd thread actually terminates the server
 
-As a result, this code can be executed by several processes
-that select the same channel. The core functions handle this
-well, as they pick chan_lock. However, we've seen cases where
-smb2_reconnect throws some warnings.
+Between 2 and 3, there can be calls to find the channel for
+a server struct. When that happens, there can be an ugly warning
+that's logged. But this is expected.
 
-To fix that, this change introduces a flags bitmap inside the
-cifs_ses structure. A new flag type is used to ensure that
-only one process enters this section at any time.
+So this change does two things:
+1. in cifs_ses_get_chan_index, if server->terminate is set, return
+2. always make sure server->terminate is set with chan_lock held
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsglob.h |  3 +++
- fs/smb/client/smb2pdu.c  | 18 +++++++++++++++++-
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ fs/smb/client/sess.c    | 4 ++++
+ fs/smb/client/smb2pdu.c | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 5e32c79f03a7..75ca732a1679 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1004,6 +1004,8 @@ struct cifs_chan {
- 	__u8 signkey[SMB3_SIGN_KEY_SIZE];
- };
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 2d3b332a79a1..b503a4833ae0 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -75,6 +75,10 @@ cifs_ses_get_chan_index(struct cifs_ses *ses,
+ {
+ 	unsigned int i;
  
-+#define CIFS_SES_FLAG_SCALE_CHANNELS (0x1)
++	/* if the channel is waiting for termination */
++	if (server->terminate)
++		return CIFS_INVAL_CHAN_INDEX;
 +
- /*
-  * Session structure.  One of these for each uid session with a particular host
-  */
-@@ -1036,6 +1038,7 @@ struct cifs_ses {
- 	enum securityEnum sectype; /* what security flavor was specified? */
- 	bool sign;		/* is signing required? */
- 	bool domainAuto:1;
-+	unsigned int flags;
- 	__u16 session_flags;
- 	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
- 	__u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+ 	for (i = 0; i < ses->chan_count; i++) {
+ 		if (ses->chans[i].server == server)
+ 			return i;
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index f5006aa97f5b..ab8765113392 100644
+index ab8765113392..bd2822ad9b22 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -399,6 +399,15 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		goto out;
- 	}
- 
-+	spin_lock(&ses->ses_lock);
-+	if (ses->flags & CIFS_SES_FLAG_SCALE_CHANNELS) {
-+		spin_unlock(&ses->ses_lock);
-+		mutex_unlock(&ses->session_mutex);
-+		goto skip_add_channels;
-+	}
-+	ses->flags |= CIFS_SES_FLAG_SCALE_CHANNELS;
-+	spin_unlock(&ses->ses_lock);
-+
- 	if (!rc &&
- 	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
- 		mutex_unlock(&ses->session_mutex);
-@@ -428,15 +437,22 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		if (ses->chan_max > ses->chan_count &&
- 		    ses->iface_count &&
- 		    !SERVER_IS_CHAN(server)) {
--			if (ses->chan_count == 1)
-+			if (ses->chan_count == 1) {
- 				cifs_server_dbg(VFS, "supports multichannel now\n");
-+				queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
-+						 (SMB_INTERFACE_POLL_INTERVAL * HZ));
-+			}
- 
- 			cifs_try_adding_channels(ses);
+@@ -178,6 +178,7 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
  		}
- 	} else {
- 		mutex_unlock(&ses->session_mutex);
- 	}
-+
- skip_add_channels:
-+	spin_lock(&ses->ses_lock);
-+	ses->flags &= ~CIFS_SES_FLAG_SCALE_CHANNELS;
-+	spin_unlock(&ses->ses_lock);
  
- 	if (smb2_command != SMB2_INTERNAL_CMD)
- 		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+ 		ses->chans[chan_index].server = NULL;
++		server->terminate = true;
+ 		spin_unlock(&ses->chan_lock);
+ 
+ 		/*
+@@ -188,7 +189,6 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
+ 		 */
+ 		cifs_put_tcp_session(server, from_reconnect);
+ 
+-		server->terminate = true;
+ 		cifs_signal_cifsd_for_reconnect(server, false);
+ 
+ 		/* mark primary server as needing reconnect */
 -- 
 2.43.0
 
