@@ -1,102 +1,99 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736846D1B9
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Feb 2024 10:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E866EB67
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Feb 2024 10:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707387533; cv=none; b=dmHKly0mMMavl5cM/Ce5Y4gq77U+RQLLZcaYHZRIN6ANJtW7Fi74Cx9Wzr2BfLnQ/39wgZk1WmSxqAW1Kv16QLe/WKJp7RirwC6YvNtAEBzK22JczT2NJLYT19qcwEyVn3rSQs8bFiBkVghaCRdJqHLd6hSOTXmTQDpawnAh9zk=
+	t=1707389489; cv=none; b=O8y74kHw16tnI4D9LCJwL8WrjCYAvyHFm+XIQrJoGwOwlk0fd1jKRkaWSW4288dZAQwBpaHl4+SiuQSFASUVUMTa9x0yC8ggOslI0uKqwb/cxyr1O79HtuZ899Zz9Z4DPQOoA9inqnVaGk3AmPtbQPZPslIP6yJrbc2bZnWtalQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707387533; c=relaxed/simple;
-	bh=+wnJqL+pqGvJcwEHa93fmS0oXb5TjuFDPjn/Uorknjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dj4DmyCONmG3lwn45WTygN8rJ8PZUmjojSsDPJHWEVRm9RHya73Ty8BMylW9v5GTAvus1Spn8uzZVludao7qAXCWIBqN9BOZzWx46IpyqUdUc5pkaVCpnunstO0uxHNcdARj8cI2cC1uDWQgRQCoimHexpysmtQk3/ZOzEquVM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rWwwsMOH; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1707389489; c=relaxed/simple;
+	bh=pYnaFJzslrxypFw25Sj8Mfon+EIE+K8wzEHhCt4dOzA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=XmGVc1DP3bjtrbb6/5khssglT3Q+hcW7HyZ0yuygwRN2wolWWoq3Pv9rkP7f928axQZYzX7gmWEHDipYnr3DhRvy/4nsk/MnF9DsyJHamuPIlmr78ATNa3m/iVMbHM4OVm7PG6kZvz7cvQYk0kL50Qd/OVVCy3QD3J182TSKycw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Af0MjhcI; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rWwwsMOH"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a29c4bbb2f4so218527466b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Feb 2024 02:18:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Af0MjhcI"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d0c9967fdcso8052651fa.0
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Feb 2024 02:51:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707387530; x=1707992330; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U3l3rhYnvc20HMeICU1VJe+MdTxuoHKteQqL6qQ8unM=;
-        b=rWwwsMOHTe3iisBKEAdsmfn8Cy2zcBTq3kIP0YXVVSOx36wVkz0Qg9oxEoUrcQbhsT
-         EaeNzmXbvNFiCPVE8UpL4ja9Ht6E4n6BP5/OBYvCPJmEbZCDXNxgYrMPjGLVUmqAcfHw
-         RsILEN3KBlxnR9ZNGn9/G//OgcmFegt6kCwx0SHyjhbo6A4jjb1reSj9QysED+//Nlyl
-         H4gV27Sk+SvhPSPYK3CPOXS1skkLselGXbHOvfkXulzz6f994ZVKjcV0XAgkNLH6KSnj
-         Pk5T0nNi1AZ6lNQW2MELkSyWnWVDOis8GwiT4lCssRUO4AHIUfaEjxdFRbhmrAkZrhkO
-         j6Hw==
+        d=gmail.com; s=20230601; t=1707389485; x=1707994285; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tSs951ohOy5CJPMPL0sE/ubGnZuXslG0T8Idw6fk40c=;
+        b=Af0MjhcIiC/OTIxbMOCRFeHrNGvf7HLUGrSeaSVUIVAcFbIH4OUj7D5dqHvTFu9RHV
+         h+EmnliLbOO4gIqh2a+lPV5CjE53Mnpg7o1KQzYCjO5ufRHI6A2BPmIMtgIIeNEOFZ9/
+         9KyeDljqLGoOl5rZSHqUxlFctrSkrmPxAgYILNDoPyY0z8Bypa493FH/H1Mp0oNa620m
+         plBTe3cRh/BJUwQxqxJ04/UpHb6G/tvkLUdRfcwYekV1epCo25446TNFMvsMn7+VqPxT
+         RIfAynQXedvUUt/Hp8M+D8YgPG2X3Bv2lpeexUjRm8MYIY+1NM5jq4lVKvnLL/0jv68B
+         dWaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707387530; x=1707992330;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U3l3rhYnvc20HMeICU1VJe+MdTxuoHKteQqL6qQ8unM=;
-        b=mK0hzTiPOfuwydZvfU7jFk2JTfFBxm7FBT3lfPvFETDzBwESbaBEA1b35HWyclBc8q
-         sGl+sPsQ0iQJz61WNuRFOa6xpz/gU8uDNSE34jNrlwtp6mGg7GNGDwsThArjqnVFHPb3
-         9N9C932v/XtkCyB8tW6cjpuBhapLY1Oqy0Mx1Jw9FtiU3stab6s4kmNjUAV2hiZdn8Fo
-         hWzB8YZQaMNV2FQoeBL7b7Aul7pfEsNOKvS0uWrwSds24S5Fak0TBjhYUHFWNVYi1ZtN
-         iPC1Ef0v8oAujsfxdmlVUKndbvPkW2Qw9XP1FQu9zIpjLBw8fNu72e93akISH2tx2Ojh
-         5dfg==
-X-Gm-Message-State: AOJu0YzCMQmyKXqAMPBDBvYmUNtMBsRgLhxhXT6sB443NBLbqEtfQXId
-	pn8bHaqIJ6wai2UTkfhWn3duavPKHSxMfwcCmlzhDMY5AdbJLQ10xmQHgEroOMcXZVA6PVqg+lJ
-	0
-X-Google-Smtp-Source: AGHT+IE58kzQNKsgAZE7QzdfSsUOh1a2HwCrg81I60aaDwW7QliqB5Rtf2DpP5/iwu31bmTlV+6Qew==
-X-Received: by 2002:a17:906:386:b0:a37:3b00:199b with SMTP id b6-20020a170906038600b00a373b00199bmr6727416eja.30.1707387529681;
-        Thu, 08 Feb 2024 02:18:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVnj0O9VjVBXDc9EkEsJ3HBmiZix7NO1jblKXDiOm1U0BHjdFpDjp3SJVaHoWpFWNli0Kt74isuuHqJVBtULNlTVxyshw92DSgDV6EoUgv2kQnnqDnMpxlugArvm2jsxuYn9h3Faz4AQUffrBdCto960O/HhVY/hhA+F5ZbmGjtCkRttyKq3t4ELUsrmOW0sSSa4f8chX043hiYVZP5gO+Ts/tiRUYRph6Wjy2ZkW6umKwYRnFi0my/gVhwF3+gIEG/qjwVak5YyJKA6cm9cEBngYeTah+VhqQ7gCQKe28OqzdNmgZKJWtaAQRr56XrXyfx9KcDTU7TZPPy7VfeNbRuU4sv0trFfsC71586wZrsAxh7YDLujH4=
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id hw19-20020a170907a0d300b00a376d1a18adsm1753615ejc.98.2024.02.08.02.18.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 02:18:49 -0800 (PST)
-Date: Thu, 8 Feb 2024 13:18:46 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Aurelien Aptel <aaptel@suse.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] cifs: fix underflow in parse_server_interfaces()
-Message-ID: <05c63e91-ce29-40aa-807c-ac730181c83e@moroto.mountain>
+        d=1e100.net; s=20230601; t=1707389485; x=1707994285;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tSs951ohOy5CJPMPL0sE/ubGnZuXslG0T8Idw6fk40c=;
+        b=jyLYvN9r0824azeQUdGUqheWVtngfwvy4U3CMhuoAWHuHXrS7HwsWwU0WNiuWJE1CN
+         z8tIkJNA5tvakHe37/faUeYo7znuvX2QpXngZ3a888Uu4MCO4+VpGEmHAjYwaXhE0tAu
+         VWUlGjFXUlN1HMtFa5QOj6lspiLJKsO7+B0WiKFGsG1qhEf7+2GDh+IrfKjBJ1LwHKzy
+         Cynm63jPPU1jWZsOoY7loClWdmTiAQM00U6i2gf4OqVja/+pWqxmO1tqIWNdwfHbwye1
+         16dFzH5KWvZ/NtOoytada5jA10HLlh9L66/o3N+gCFfyZffLpUKGOl6kx0wHv1wbV4Pj
+         KAWw==
+X-Forwarded-Encrypted: i=1; AJvYcCXaMpOsGhyYuliyNgmrxQkp2kwUCamgbQTP12KKDUmrDMjH7Za35Ht0zbOgsH48hY9ozX7batsANdX5lDmzGPU6Cx6qzXkCMy/jCQ==
+X-Gm-Message-State: AOJu0YxX5tDJNr/9Zsvw6irJOp8z4Ig26/7rquUCog2qBQoLvskknco7
+	GLm5o5lmjrn0FljmQfr0Ul3Vx4oXYOYEUPpnqN0/856YfXkaIVAspcE/2wMn3P67g3L4FUo0BCM
+	nyd6yGZvdGZAdXbdhvO2fGqo2xvY=
+X-Google-Smtp-Source: AGHT+IFVY3AdNpSox9beNeCqgYJD1qJybWfr8tKYAtzfbCIGBI+7u7jkI19WWbkymzZdOpggvtqyHwVFhoEDIZlFsaU=
+X-Received: by 2002:a2e:b042:0:b0:2d0:8e95:612e with SMTP id
+ d2-20020a2eb042000000b002d08e95612emr907367ljl.16.1707389485104; Thu, 08 Feb
+ 2024 02:51:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 8 Feb 2024 16:21:13 +0530
+Message-ID: <CANT5p=pcSGGEEtEzJKmv6i5Cd4_Qki0kc=gVfk5omXSJjvaBrQ@mail.gmail.com>
+Subject: Rename replay request semantics on SMB2
+To: Stefan Metzmacher <metze@samba.org>, Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-In this loop, we step through the buffer and after each item we check
-if the size_left is greater than the minimum size we need.  However,
-the problem is that "bytes_left" is type ssize_t while sizeof() is type
-size_t.  That means that because of type promotion, the comparison is
-done as an unsigned and if we have negative bytes left the loop
-continues instead of ending.
+Hi all,
 
-Fixes: fe856be475f7 ("CIFS: parse and store info on iface queries")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/client/smb2ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I wanted to understand the server behaviour for a specific scenario,
+as it was not very clear what the spec says about this.
+We recently implemented the ChannelSequence and
+SMB2_FLAGS_REPLAY_OPERATION header flags, which we did not do earlier.
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index b79b6bbd7103..bb3975dc9072 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -620,7 +620,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		goto out;
- 	}
- 
--	while (bytes_left >= sizeof(*p)) {
-+	while (bytes_left >= (ssize_t)sizeof(*p)) {
- 		memset(&tmp_iface, 0, sizeof(tmp_iface));
- 		tmp_iface.speed = le64_to_cpu(p->LinkSpeed);
- 		tmp_iface.rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE) ? 1 : 0;
+After this, if there is a channel disconnect, and some requests are
+in-flight, we are now retrying the same operation with the replay flag
+set. The expectation was that the server sees this as a replayed
+request, and responds to it accordingly.
+However, it looks like it may not be that simple.
+
+I noticed during my tests that when a channel is disconnected in the
+middle of a rename compound operation, and the client replays this
+again on another channel, the server returns STATUS_OBJECT_NOT_FOUND.
+I would have expected a following replay to get this error if it was
+not a replay request. But for replayed requests, my expectation was
+that the server returns success, even if the rename had completed.
+
+Re-reading through the spec, it looks to me like these (chan-seq-num +
+replay) may only be used to maintain ordering of operations, and seems
+to concern the ordering of ONGOING operations, and not the ones that
+have already completed.
+So if a rename operation completed, but the server could not send the
+response back, regardless of the replay flag, the server is going to
+treat this as a new rename.
+
+Does this mean that the client needs to be aware that the server may
+already have completed the prev operation and handle
+STATUS_OBJECT_NOT_FOUND only for rename requests?
+I would imagine similar handling needed for all non-idempotent requests.
+
 -- 
-2.43.0
-
+Regards,
+Shyam
