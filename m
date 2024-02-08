@@ -1,239 +1,99 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FF73164;
-	Thu,  8 Feb 2024 16:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B01823A7
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Feb 2024 16:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707410475; cv=none; b=mb51eyhAMZz00AstxhLRD3aPTbbnzTg/zRecV7fZJGC2sIN1PIpAM53BpjI8ZCyQhC1cWmwj9AY4ZRrhmGHlrwCT4RjD98tHocknClkBhXqIETe+wv7urG5XRyydDN2dh/WXGMaIZWScNcG+thldt4X14du0NPYgePA/dVLLgJw=
+	t=1707410650; cv=none; b=Ljh5tJHPwbtq5jmS91mytZWTeL/ysJ+d1+hGr4PNVK8eOQ8w4zl/9qsRJmWM/u1frxhWzIe/zux0SXM3j23xpkDCN5RDOURdgdTBxKTWB3VSoPy0PmWnKfFT9EH71kGIvlsRHjr0z//4bUotlOpm+V1LAIvfDeWx7j2NMq7T/Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707410475; c=relaxed/simple;
-	bh=99upx2OvKz08x4ODDCpSfglp0MX3/+wADi/+EIRLQkI=;
+	s=arc-20240116; t=1707410650; c=relaxed/simple;
+	bh=SWvbZtY6qDxfyW4KrS1B9epqrolbuJvO9ct5FT9Nqr8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gWXWB2nE4qALE6la5x6yXYFQnTsX9kAgiZPNVXbdKsw+olsCvcgIYX2iw0+GydUQTrmo0WRZIbr0aRjWJ6rd1FPbBNAYnd4Oo0D0ZspLOXeU63tQMZfQGQoMivOCE1sHJibWdGqIyYIF4ysDocSz5vV7O1o3+t1n/yoYFXyrFn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQCPngQ9; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=qrXn5B6l0+lzCQFxReKglEZB+uuBHfeAIYRfezGDxx4Ljk0hnGP09kSkA0sRqpyENXk7/I18VW6F5axHqrVNmiRLPfekZaCnoF5FhyIGloGc8W8QzGd6oQmaA5MKyPwYLb0mwajOLIn36ft/fAZhddUEcWf2pIMbIy2E4wTBGok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XAfI6iLG; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQCPngQ9"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d0d100336cso713031fa.2;
-        Thu, 08 Feb 2024 08:41:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAfI6iLG"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-511717cfa62so697653e87.3
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Feb 2024 08:44:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707410471; x=1708015271; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707410647; x=1708015447; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cXgQyc4QqV21RGZWHkg0afbuVd4wVESNNL3AHhWR3mg=;
-        b=gQCPngQ96Fd0MGVhpbEkm5Cn0cUT6xKMnxzGqs0K5ASAfDVFXmNH3m6+TJjdcOFhtp
-         5CGn+9/hUGm05OQIaSJOn3Yy2meuxh+MXr4/P3Dhq5nRDSHIwWXdZ13o9TW2Ku+N2Ws3
-         5KKHH4i2e80y95qg0+uzp1M2CXoAx9geJ1DBd/OtgO4V5v5w8tGl2HgFHLRIrjZuuCV1
-         jlJF+1jWhinMe/G3U/wOPX4wxgzcx2ShmmD1hP4L59DGBww/AvL4p1VJ6hkN8KswFeLC
-         xcOzIIQjM+tVxkwAd1d8cPOtKar/3yOfp9vWZyNDblvmqLgaD0RVhKb0IVtdnp4fxEiJ
-         nRDw==
+        bh=Bn99mLYfBA4B9quQ0tHmCrwkV7dDVY8lFI/viLoh/Io=;
+        b=XAfI6iLGaxHDDoOfe5LabItK0uEf9w9ZzS2+GTc05GwvkXFP5EDr9kwURbNAjWT/Cr
+         5u081xF2m2FHJVUC3FTJiAnA6Q3CXcWcCPBDfLfdGUIlYbNOmVyuJJ1HXPe/+s7o6jCi
+         JOB/GvNou/F4/NbEQA3irFdcYelOMLPYrYNvAun6rTNuIqinIodLG7a7DAY+OSF2WcUs
+         JMfx1L6lVqnEgMhTjNUo0TYGWddfL0JoCODyitU6eThwT8ElHq0C2cjgJTqn+fGu83NE
+         3Vkdt8toy9o9N7LyWUFMMW9DRn22u+wiTQboVdj3a1475x0QZb7ZfQFa8+dAsIQOMzyJ
+         rN9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707410471; x=1708015271;
+        d=1e100.net; s=20230601; t=1707410647; x=1708015447;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cXgQyc4QqV21RGZWHkg0afbuVd4wVESNNL3AHhWR3mg=;
-        b=p1JO1zg/PG1QAra+7SXU262C09szCxET+qnMaeJEJBgcKolc/50C1BGnCO6PCvR/ad
-         9y1pq1QVhZXmTCaNguriTF9nXYS+dfVSXGtnxR3bQRHlQdseESiuLfz/bs1w8zx9Dx7N
-         vp0bHUwiCKt1RBqeACvscskDlny0tPS/H7kb+d0Ka7EFpUYEf3nUiFMXkPQQOaA6VSHs
-         Vx32ADkbmxtwbaMC9OiBK2mVSi7vY7Oh7o4Wm+XiKH/ICjQ6JPYkQyibMkSixkYIebTq
-         VLE8HCWuWwkWHXOhNVEy0DOUuXqE5M5UyM40GQXM4ycZf0qqSQZ1FdrMok2BgQNiIKEO
-         /9Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWK+DETarrsA9AsrQ570jg2m6ZcgzRo24G+c92xGksP8veAumWI46rjwo4fPGxJc9KTkZ6YKtfOHWLaA2JnYl5ZBe5MYhBQR3qnJoTuXUODeczQnPnH6XQHOVJ/M3YsuM+5DJmT4wFbag==
-X-Gm-Message-State: AOJu0YwU0xl6nxiVsZjjQa7HOShyDkrTonYSx8sjzAM0oxhKQwTydyyM
-	FXhdUXLA2P2HGhqFgJgHGWsLQV++2tp2yfYDIZpINk3VUvzp/qDHqtxFG3GDrGPx1hlQsmi7X8e
-	qhK0YK9OB4WgPZVh7wIju9NTqMqwsoUjJaRM=
-X-Google-Smtp-Source: AGHT+IEG6/2Uae+FIWY8AXFLdzEo77r9eAOikawO8s4/Yp57o1zDl12a9H2lKvmAjH4yyEnF6ywgjMs3jfO7TCbFkQs=
-X-Received: by 2002:a2e:b1c2:0:b0:2d0:a154:f38a with SMTP id
- e2-20020a2eb1c2000000b002d0a154f38amr6575566lja.47.1707410471146; Thu, 08 Feb
- 2024 08:41:11 -0800 (PST)
+        bh=Bn99mLYfBA4B9quQ0tHmCrwkV7dDVY8lFI/viLoh/Io=;
+        b=OEsuTDjmVwDNbaSICsaUdD1zfpt4kBfjvUtQ1jyXbcRXZVpuOQjqRarTMWqT9QZVXJ
+         HMkYhxaGONzGAKOyUuEH+LhDDwAOmnHmuAIOvusrGlmbCSzAWXnAUoeQx7QLgZOkIyV/
+         J561MdN5Y33wSzxMfEgnxG7EbN4hosbcbjfwcJuGMZSo/+QBOuPTQeAKK8ZzkTaBZEpO
+         uKkwd2+MhdbPQAKCweTLLQ7SklwR5j64O+Z+YLQXiI4NwSCDSHc0w/BgZomna9AGLWbr
+         SOKNGb0k2lnygiZPmfQjH7IwClcZF2+ocgc/I+mDvhdOuTTsIwPdLRTMOqlcAiwiCIKO
+         8WdQ==
+X-Gm-Message-State: AOJu0Yzgz7e7wdCx+9m+nuLbiq5XPCHuLGaXFRShnafbxa4vqYPgGN/q
+	n4xBfBVkz/iuQj8BEF2+7EDuu6c9FgmTx/QWenVtd80ah9yiYXeaMYzEa+xJ1Rqnq0oLBdWwn4O
+	c5SNFffYCAVqlrsTB6IZIT9VUdApkdqrOB3M=
+X-Google-Smtp-Source: AGHT+IHDXo7hJEjVCsdZUNorRY4OQ9Cn2/PoeJI4ym3rhvQ0Vw3q1GxEdBhqZFZaCNzfLJ2xNYz6jBwmY+C6jKCkF48=
+X-Received: by 2002:ac2:4116:0:b0:511:617a:3130 with SMTP id
+ b22-20020ac24116000000b00511617a3130mr4671813lfi.35.1707410646485; Thu, 08
+ Feb 2024 08:44:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202170537.409508-1-meetakshisetiyaoss@gmail.com> <CAH2r5msEtpJGTvK2F2TY0jR9hU0e7LYJekiyV1zD7MM+i9Oxgg@mail.gmail.com>
-In-Reply-To: <CAH2r5msEtpJGTvK2F2TY0jR9hU0e7LYJekiyV1zD7MM+i9Oxgg@mail.gmail.com>
+References: <CAH2r5mutYBiXyBnMWKF66DGrKHd7=ypsPGcg_XSrJW=JykNBbQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mutYBiXyBnMWKF66DGrKHd7=ypsPGcg_XSrJW=JykNBbQ@mail.gmail.com>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 8 Feb 2024 22:10:59 +0530
-Message-ID: <CANT5p=p8BxhPANdU=YsJiXg_s=j8COG3-VgPK0MopFeMzDUfhA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: do not defer close open handles to deleted files
+Date: Thu, 8 Feb 2024 22:13:55 +0530
+Message-ID: <CANT5p=qRUd3w6E9v7zhLjmtTkQkM_fgoPqH=QNDF4dOoePwXTg@mail.gmail.com>
+Subject: Re: [PATCH][smb client] updating warning message for sec=krb5p
 To: Steve French <smfrench@gmail.com>
-Cc: meetakshisetiyaoss@gmail.com, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, samba-technical@lists.samba.org, 
-	bharathsm.hsk@gmail.com, msetiya@microsoft.com
+Cc: samba-technical <samba-technical@lists.samba.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 5, 2024 at 3:27=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
-ote:
+On Wed, Feb 7, 2024 at 11:38=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> This was puzzling because I tried some experiments with deleting files
-> that were deferred close and noticed that we already making sure that
-> they weren't deferred close in cifs_unlink by calling
-> cifs_close_deferred_file_under_dentry(tcon, full_path) even in
-> Rohith's original code from a few years ago - so I didn't see cases
-> where we had a file marked for delete that was deferred close.  How
-> did you reproduce that problem?
+>     smb3: clarify mount warning
 >
-The issue here is that other bugs are hiding this bug.
-When Meetakshi fixed the missing lease key bug for deletes/renames/set
-size, the tests started breaking.
-But the bug definitely exists.
-
-> On Fri, Feb 2, 2024 at 11:39=E2=80=AFAM <meetakshisetiyaoss@gmail.com> wr=
-ote:
-> >
-> > From: Meetakshi Setiya <msetiya@microsoft.com>
-> >
-> > When a file/dentry has been deleted before closing all its open
-> > handles, currently, closing them can add them to the deferred close
-> > list. This can lead to problems in creating file with the same name
-> > when the file is re-created before the deferred close completes. This
-> > issue was seen while reusing a client's already existing lease on a
-> > file for compound operations and xfstest 591 failed because of the
-> > deferred close handle that remained valid even after the file was
-> > deleted and was being reused to create a file with the same name. The
-> > server in this case returns an error on open with
-> > STATUS_DELETE_PENDING. Recreating the file would fail till the
-> > deferred handles are closed (duration specified in closetimeo).
-> >
-> > This patch fixes the issue by flagging all open handles for the
-> > deleted file (file path to be precise) with FILE_DELETED at the end
-> > of the unlink operation. When doing close in cifs_close for each of
-> > these handles, check the flag and do not defer close these handles if
-> > the corresponding filepath has been deleted.
-> >
-> > Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> > ---
-> >  fs/smb/client/cifsglob.h  |  1 +
-> >  fs/smb/client/cifsproto.h |  4 ++++
-> >  fs/smb/client/file.c      |  2 +-
-> >  fs/smb/client/inode.c     |  2 ++
-> >  fs/smb/client/misc.c      | 22 ++++++++++++++++++++++
-> >  5 files changed, 30 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> > index decf80131bbe..826da216a9e1 100644
-> > --- a/fs/smb/client/cifsglob.h
-> > +++ b/fs/smb/client/cifsglob.h
-> > @@ -1399,6 +1399,7 @@ struct cifs_fid_locks {
-> >         struct list_head locks;         /* locks held by fid above */
-> >  };
-> >
-> > +#define FILE_DELETED   0x550
-> >  struct cifsFileInfo {
-> >         /* following two lists are protected by tcon->open_file_lock */
-> >         struct list_head tlist; /* pointer to next fid owned by tcon */
-> > diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> > index 770db9026850..67f75497db02 100644
-> > --- a/fs/smb/client/cifsproto.h
-> > +++ b/fs/smb/client/cifsproto.h
-> > @@ -292,6 +292,10 @@ extern void cifs_close_all_deferred_files(struct c=
-ifs_tcon *cifs_tcon);
-> >
-> >  extern void cifs_close_deferred_file_under_dentry(struct cifs_tcon *ci=
-fs_tcon,
-> >                                 const char *path);
-> > +
-> > +extern void cifs_mark_open_handles_for_deleted_file(struct cifs_tcon
-> > +                               *cifs_tcon, const char *path);
-> > +
-> >  extern struct TCP_Server_Info *
-> >  cifs_get_tcp_session(struct smb3_fs_context *ctx,
-> >                      struct TCP_Server_Info *primary_server);
-> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> > index b75282c204da..4c87ddbe8a5a 100644
-> > --- a/fs/smb/client/file.c
-> > +++ b/fs/smb/client/file.c
-> > @@ -1085,7 +1085,7 @@ int cifs_close(struct inode *inode, struct file *=
-file)
-> >                 if ((cifs_sb->ctx->closetimeo && cinode->oplock =3D=3D =
-CIFS_CACHE_RHW_FLG)
-> >                     && cinode->lease_granted &&
-> >                     !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &=
-&
-> > -                   dclose) {
-> > +                   dclose && !(cfile->f_flags & FILE_DELETED)) {
-> >                         if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, =
-&cinode->flags)) {
-> >                                 inode_set_mtime_to_ts(inode,
-> >                                                       inode_set_ctime_c=
-urrent(inode));
-> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> > index 24489e1e238a..be5bc01319d8 100644
-> > --- a/fs/smb/client/inode.c
-> > +++ b/fs/smb/client/inode.c
-> > @@ -1822,6 +1822,8 @@ int cifs_unlink(struct inode *dir, struct dentry =
-*dentry)
-> >         cifs_inode =3D CIFS_I(dir);
-> >         CIFS_I(dir)->time =3D 0;  /* force revalidate of dir as well */
-> >  unlink_out:
-> > +       if (rc =3D=3D 0)
-> > +               cifs_mark_open_handles_for_deleted_file(tcon, full_path=
-);
-> >         free_dentry_path(page);
-> >         kfree(attrs);
-> >         free_xid(xid);
-> > diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> > index 0748d7b757b9..ebc867bfc034 100644
-> > --- a/fs/smb/client/misc.c
-> > +++ b/fs/smb/client/misc.c
-> > @@ -853,6 +853,28 @@ cifs_close_deferred_file_under_dentry(struct cifs_=
-tcon *tcon, const char *path)
-> >         free_dentry_path(page);
-> >  }
-> >
-> > +/*
-> > + * If a dentry has been deleted, all corresponding open handles should=
- know the
-> > + * same, so that we do not defer close them.
-> > + */
-> > +void
-> > +cifs_mark_open_handles_for_deleted_file(struct cifs_tcon *tcon, const =
-char
-> > +*path)
-> > +{
-> > +       struct cifsFileInfo *cfile;
-> > +       void *page;
-> > +       const char *full_path;
-> > +
-> > +       page =3D alloc_dentry_path();
-> > +       spin_lock(&tcon->open_file_lock);
-> > +       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-> > +               full_path =3D build_path_from_dentry(cfile->dentry, pag=
-e);
-> > +               if (strcmp(full_path, path) =3D=3D 0)
-> > +                       cfile->f_flags |=3D FILE_DELETED;
-> > +       }
-> > +       spin_unlock(&tcon->open_file_lock);
-> > +}
-> > +
-> >  /* parses DFS referral V3 structure
-> >   * caller is responsible for freeing target_nodes
-> >   * returns:
-> > --
-> > 2.39.2
-> >
-> >
+>     When a user tries to use the "sec=3Dkrb5p" mount parameter to encrypt
+>     data on connection to a server (when authenticating with Kerberos), w=
+e
+>     indicate that it is not supported, but do not note the equivalent
+>     recommended mount parameter ("sec=3Dkrb5,seal") which turns on encryp=
+tion
+>     for that mount (and uses Kerberos for auth).  Without an updated
+> mount warning
+>     it could confuse some NFS users.   Note that for SMB3+ we support
+> encryption,
+>     but consider it ("seal") a distinct mount parameter since the same
+> user may choose
+>     to encrypt to one share but not another from the same client.
+> Update the warning message
+>     to reduce confusion.
 >
->
+>     See attached.
 > --
 > Thanks,
 >
 > Steve
 
-Hi Meetakshi,
-
-Please fix the issue that Steve indicated in our call.
-i.e. use new "flags" field for cfile, rather than f_flags. And use a
-power of 2 value for FILE_DELETED.
-Other than that, it looks good to me.
+Looks good to me.
 
 --=20
 Regards,
