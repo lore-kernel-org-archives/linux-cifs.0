@@ -1,576 +1,228 @@
 Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF4656B89;
-	Fri,  9 Feb 2024 05:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA67756B63;
+	Fri,  9 Feb 2024 05:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707456923; cv=none; b=WTmV5wY1Qo2yB9WmQyz0NzCScBFPSxov7s0ClruPnjpnkdCzx+WlXWydJeBHWmpzqVX2WSlmU2Qt3JxKm4ttahWsxEdSe+gcxdNONWe57PDhbibmKg9tqP12W3S+l4ChC6h4tunCDrkNLMQluXPJdpCYLdSCw9P1eh4nk2HeHI0=
+	t=1707457122; cv=none; b=mYXvyc2cVmjO3rS3NNLPapZnnldDWiwW+NcPom/6qQ4Jgy7cOURWi9CRGKfo8mPBuPxyiSsCywINQtFjkzjRvI2RpRONVG5TDVBw1r6+CllbsPLX660cD/Iy2y3gKtm1oj21XKq7vBBZGKO/VUJu1cRucE3gvBppLtZ6lK11sVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707456923; c=relaxed/simple;
-	bh=C6tBVERpdTIuhzfp5Ou9UKsbTwdksnhIal55frNHhk4=;
+	s=arc-20240116; t=1707457122; c=relaxed/simple;
+	bh=tV0isjsKbv8xrtfkEWlbYqhVclTpDzX3NjW4HZcAWpI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t/ogXdt9hoyRJJgw1vzVigGWjBt6j25usQqa9pVEd3f4L0KCNOvIoqEGYRJVoZsbHqLiufue+nQPPq3EC3nam7Akf355kcB6uy3ir4p+MLn/KJMVgxQjDLh5x3FBh+Vyaqm+BetnTPNEpZkCTipa6YFWo79VKv1qIOqxgogRHGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gkNWQBt0; arc=none smtp.client-ip=209.85.167.49
+	 To:Cc:Content-Type; b=iwSIe3jBquQA+32S6676RyBv1wPwRTPYf+vBbisCR7AeMRQJHBKOZrTOgz/tpYN46n4YZ/MahqzMaM8ch5+1NV/ZQPOGBYPA/eUAPB4CO6h3CnxkyODO6bP1GYQCc+oa79dU7YB85kwm1EoBaeCAbT1Ofdcqxv55Tynpw4Mqf7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+zrUFHY; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gkNWQBt0"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51168addef1so1026156e87.1;
-        Thu, 08 Feb 2024 21:35:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+zrUFHY"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-511717231bfso731522e87.2;
+        Thu, 08 Feb 2024 21:38:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707456919; x=1708061719; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707457119; x=1708061919; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UTj8SSHvn0ZHFXcMz6w6muyxECXQg/MQZZumRAAuc8U=;
-        b=gkNWQBt0lKxLS7a/qfw8EU6PLjTCpkC8G4jX7kSxP/kkQDgyrJgMzq3HAWEI6HhfCA
-         939Sj649fAdGxCa158kxSM7RvpqEeiwdSrsbPcX4UqAVJgce179ANya6FxSbsNboulYD
-         iVDp5bU+hvZpsUfK5zI7+VNhIaSkQwn/mqcXUk9Jy3LR6EspWv1Vb/kd5Agz+xn/hYS5
-         ydww2NcmpG3F3zJrXHAB2KitgEQ1TUXNz7rSkC3lQ3s46HYimrt4hpuJLdgoHhIgaqBR
-         ztzE3k9boyjDHYwQkr0icQDm6q532udMJwAkVcDLZFjVUIi5aTvlT0Cw/sVC/z/gRb6d
-         ivkw==
+        bh=K2ON2A+lOO3nREYQrtCJ2Mpgawap/rmj0NZtvf1XemM=;
+        b=m+zrUFHYzKAvlSbEJ7uyNX/C1fCkWCJ1M1+RkCWv1vy39LRULDl4dTAz+csaqcp4gp
+         Osj44lmAC6MNSEQXg9fWeoyM502ZcISsuqbJ4g5CFZnqKCqZvkulIL4IHA8dLYZf7zfa
+         7U45xewwMkPK1Vt5bpi7k9a4OZjIZ40Dc2Is59VgaDTrQ2IL2LmLSwTdSNLdj0DmZJVh
+         2CV4siWjK0RWuoEE0I36n3Wx8pQq35znuCgpeWsycWIvKlP9opsoxGpWDB0Sc3ns4DAV
+         yVMyxK9+AHdhtCRHezQ4XyLMgz/l7SJIstmCVkN3pDeOVD0+wFhklMD616zFvCdl/Uks
+         Jihw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707456919; x=1708061719;
+        d=1e100.net; s=20230601; t=1707457119; x=1708061919;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UTj8SSHvn0ZHFXcMz6w6muyxECXQg/MQZZumRAAuc8U=;
-        b=NYR0iGw7J+bTbIj0P8GZs2+9tu+gEpBHfowvbvZPoNw3GWuPyiHzTWkjtZGf0Y5YEI
-         jMYBhrA2PwS/3v0VDXE9ezoanDeBGJjWLG4PBvwEmfgbawVYl1FQOY1yWrjFZ53era1T
-         mbuH9KTLYOCgGR7RyS8XCcpDv2eLefgukN/izjqZ+xCiTBn32Nx0ErPfLTz15tzdDmM6
-         OqWN9rqqFzRSxDi2n4ITvsQosiqbv9Gtb+pFFPEnqMSI/LihdN0qlfz+/gU7c0EsnobE
-         el99IuvKoPDz9u2utMQWgLDpOzQokYpAlJ1v0qliY1FDt5zejnr5A4ZRj7uqqxNsPgDw
-         htBA==
-X-Gm-Message-State: AOJu0YzTyZ796VhKwwlD6ZjOAcoszg8Fy4aaoz0ZObfXxx4BdStL9DxT
-	arzT0T+yT5OcLh+FIpRVTAgUsdQ5jAQ2czm01fXRH/MDSyfO9ZLgKEc+eiyJ+uGc+PvSwriOSc4
-	UdRv91b6QizppklJBaInGp3eoYD8+rrfwywQ=
-X-Google-Smtp-Source: AGHT+IHa/oG8fyHbaD6W3os8lSXtf3mjiqoUoTLMxqjb3mz47Esh+GHtIX7HR1zaeD8vSGgkZve7vsrey14N/L+coDE=
-X-Received: by 2002:ac2:495a:0:b0:511:4ff0:5328 with SMTP id
- o26-20020ac2495a000000b005114ff05328mr269374lfi.32.1707456918483; Thu, 08 Feb
- 2024 21:35:18 -0800 (PST)
+        bh=K2ON2A+lOO3nREYQrtCJ2Mpgawap/rmj0NZtvf1XemM=;
+        b=jYhcB33XuLG+urrFcaspi1OsYsiQaG2YZMlvdKtjsO0iTpnwkbfYwHWUtiTNUnBQOP
+         /KcG0nKypo8r5dY2AfpNeJiunxVsAAaOKmSMZwRTmFSUgq7ztcxTRU7wydgXD12ehDJg
+         SNyU1cDU/fLUjk23bXKC6Q2dlVRrZuH26LAOCpKnetY8lhHiLoNOxZxFB1ui/MRzv8Ln
+         DKx6tjw0encSO6PiO0FF2upp+bIvhMQlD4nc3kRkgcrv3zeSzPXlYn/lopqIA6yJISh0
+         UV39B9v8igH+T2rkct2digPvU4eVcbfgUZQLcoKW1FqIxYeQVhMTiSdDR52sEiFlETTB
+         0FGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxFrV1h09fqREVuYkZYRfRqoJmV8IbntPC1sc9r5cMkI1lv9w/HUdybguisC+/xXoXaaQ2Hw+MW8YrMMZMkOV/6chBufaVFEaJ6ehX6K5rHEYDuFGo7E2n2yZO0/X5sn0VpyPWrEtHnQE=
+X-Gm-Message-State: AOJu0YzUG3Y0I440o/kGSN2GU5obbA9RjVlPe11namNNdDF5II7zSkRy
+	8fm2Xn1Ew7xK/P7nHLGfRRaJF3qVxe529bngDChP5okf7YmcIxD5NZphNuMfxgrq+E0/eKnIFap
+	UMhnQbUN4BzEBOAVO36q2OgDqDCsc2Ue8Kd4=
+X-Google-Smtp-Source: AGHT+IGMlH2PriUAf55IhhR4053vLAuO/sXZe50YH+HHBn5j2JbcsqjbweiSwxVDwAiz4kQy1ufc9RS/6mDODdKwL88=
+X-Received: by 2002:a19:c219:0:b0:511:6ff9:8b8d with SMTP id
+ l25-20020a19c219000000b005116ff98b8dmr268670lfc.59.1707457118610; Thu, 08 Feb
+ 2024 21:38:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230925201827.1703857-1-aahringo@redhat.com> <20240209052631.wfbjveicfosubwns@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
-In-Reply-To: <20240209052631.wfbjveicfosubwns@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
+ <20240207034117.20714-1-matthew.ruffell@canonical.com> <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
+ <CAH2r5msJ12ShH+ZUOeEg3OZaJ-OJ53-mCHONftmec7FNm3znWQ@mail.gmail.com>
+ <CAH2r5muiod=thF6tnSrgd_LEUCdqy03a2Ln1RU40OMETqt2Z_A@mail.gmail.com>
+ <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com> <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com>
+In-Reply-To: <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 8 Feb 2024 23:35:06 -0600
-Message-ID: <CAH2r5msWwX7QdXrzmR3tapU85WMga9Y-waNOHm+hMWmWPUF=tQ@mail.gmail.com>
-Subject: Re: [PATCHv2] generic: add fcntl corner cases tests
-To: Zorro Lang <zlang@redhat.com>
-Cc: Alexander Aring <aahringo@redhat.com>, fstests@vger.kernel.org, gfs2@lists.linux.dev, 
-	jlayton@kernel.org, linux-cifs@vger.kernel.org
+Date: Thu, 8 Feb 2024 23:38:27 -0600
+Message-ID: <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com>
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+To: Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Matthew Wilcox <willy@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Could you forward the changeset for this so we could try it?
+Are you specifying "wsize" on the mount in your example?  The intent
+of the patch is to warn the user using a non-recommended wsize (since
+the user can control and fix that) but to force round_down when the
+server sends a dangerous wsize (ie one that is not a multiple of
+4096).
 
-On Thu, Feb 8, 2024 at 11:26=E2=80=AFPM Zorro Lang <zlang@redhat.com> wrote=
-:
+On Thu, Feb 8, 2024 at 3:31=E2=80=AFAM Matthew Ruffell
+<matthew.ruffell@canonical.com> wrote:
 >
-> On Mon, Sep 25, 2023 at 04:18:27PM -0400, Alexander Aring wrote:
-> > This patch adds fcntl corner cases that was being used to confirm issue=
-s
-> > on a GFS2 filesystem. The GFS2 filesystem has it's own ->lock()
-> > implementation and in those corner cases issues was being found and
-> > fixed.
-> >
-> > Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> > ---
+> Hi Steve,
 >
-> Hi Alexander,
+> I built your latest patch ontop of 6.8-rc3, but the problem still persist=
+s.
 >
-> This test case directly hang on CIFS testing. Actually it's not a
-> real hang, the fcntl_lock_corner_tests process can be killed, but
-> before killing it manually, it was blocked there.
+> Looking at dmesg, I see the debug statement from the second hunk, but not=
+ from
+> the first hunk, so I don't believe that wsize was ever rounded down to
+> PAGE_SIZE.
 >
-> Please check if it's a case issue or cifs bug, or it's not suitable
-> for cifs? I'll try to delay this patch merging to next release,
-> leave some time to have a discission. CC cifs list to get more
-> reviewing.
+> [  541.918267] Use of the less secure dialect vers=3D1.0 is not
+> recommended unless required for access to very old servers
+> [  541.920913] CIFS: VFS: Use of the less secure dialect vers=3D1.0 is
+> not recommended unless required for access to very old servers
+> [  541.923533] CIFS: VFS: wsize should be a multiple of 4096 (PAGE_SIZE)
+> [  541.924755] CIFS: Attempting to mount //192.168.122.172/sambashare
+>
+> $ sha256sum sambashare/testdata.txt
+> 9e573a0aa795f9cd4de4ac684a1c056dbc7d2ba5494d02e71b6225ff5f0fd866
+> sambashare/testdata.txt
+> $ less sambashare/testdata.txt
+> ...
+> 8dc8da96f7e5de0f312a2dbcc3c5c6facbfcc2fc206e29283274582ec93daa2a1496ca8ed=
+d49e3c1
+> 6b^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^=
+@^@^@^@^
+> ...
+>
+> Would you be able compile and test your patch and see if we enter the log=
+ic from
+> the first hunk?
+>
+> I'll be happy to test a V2 tomorrow.
 >
 > Thanks,
-> Zorro
+> Matthew
 >
-> FSTYP         -- cifs
-> PLATFORM      -- Linux/ppc64le ibm-xxx-xxx-xxxx 6.8.0-rc3+ #1 SMP Wed Feb=
-  7 01:38:35 EST 2024
-> MKFS_OPTIONS  -- //xxx-xxx-xx-xxxx.xxxx.xxx.com/SCRATCH_dev
-> MOUNT_OPTIONS -- -o vers=3D3.11,mfsymlinks,username=3Droot,password=3Dred=
-hat -o context=3Dsystem_u:object_r:root_t:s0 //xxx-xxx-xx-xxxx.xxxx.xxx.com=
-/SCRATCH_dev /mnt/xfstests/scratch/cifs-client
->
-> generic/740
-> ...
-> ...
->
-> # ps axu|grep fcntl
-> root     1138909  0.0  0.0   5056     0 ?        S    Feb07   0:00 /var/l=
-ib/xfstests/src/fcntl_lock_corner_tests /mnt/xfstests/test/cifs-client/test=
-file
-> root     1138910  0.0  0.0  21760     0 ?        Sl   Feb07   0:00 /var/l=
-ib/xfstests/src/fcntl_lock_corner_tests /mnt/xfstests/test/cifs-client/test=
-file
-> # cat /proc/1138909/stack
-> [<0>] 0xc00000008d068a00
-> [<0>] __switch_to+0x13c/0x228
-> [<0>] do_wait+0x15c/0x224
-> [<0>] kernel_wait4+0xb8/0x2c8
-> [<0>] system_call_exception+0x134/0x390
-> [<0>] system_call_vectored_common+0x15c/0x2ec
-> # cat /proc/1138910/stack
-> [<0>] 0xc00000008de94400
-> [<0>] __switch_to+0x13c/0x228
-> [<0>] futex_wait_queue+0xa8/0x134
-> [<0>] __futex_wait+0xb4/0x15c
-> [<0>] futex_wait+0x94/0x150
-> [<0>] do_futex+0xe8/0x374
-> [<0>] sys_futex+0xa4/0x234
-> [<0>] system_call_exception+0x134/0x390
-> [<0>] system_call_vectored_common+0x15c/0x2ec
->
-> # strace -p 1138909
-> strace: Process 1138909 attached
-> wait4(-1,
-> (nothing more output)
-> strace: Process 1138909 detached
-> ^C <detached ...>
-> # strace -p 1138910
-> strace: Process 1138910 attached
-> futex(0x7fff97a8f110, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, 1138912, NU=
-LL, FUTEX_BITSET_MATCH_ANY
-> (nothing more output)
-> ^Cstrace: Process 1138910 detached
->  <detached ...>
->
->
-> > changes since v2:
-> > - move fcntl tests into one fcntl c file
-> > - remove ofd and same owner tests, should be reflected by only one test
-> > - simplify commit message (remove testname out of it)
-> > - add error messages in fcntl.c to give more information if an error
-> >   occur
+> On Thu, 8 Feb 2024 at 03:50, Steve French <smfrench@gmail.com> wrote:
 > >
-> >  src/Makefile          |   3 +-
-> >  src/fcntl.c           | 322 ++++++++++++++++++++++++++++++++++++++++++
-> >  tests/generic/732     |  32 +++++
-> >  tests/generic/732.out |   2 +
-> >  4 files changed, 358 insertions(+), 1 deletion(-)
-> >  create mode 100644 src/fcntl.c
-> >  create mode 100755 tests/generic/732
-> >  create mode 100644 tests/generic/732.out
+> > I had attached the wrong file - reattaching the correct patch (ie that
+> > updates the previous version to use PAGE_SIZE instead of 4096)
 > >
-> > diff --git a/src/Makefile b/src/Makefile
-> > index 2815f919..67f936d3 100644
-> > --- a/src/Makefile
-> > +++ b/src/Makefile
-> > @@ -19,7 +19,8 @@ TARGETS =3D dirstress fill fill2 getpagesize holes ls=
-tat64 \
-> >       t_ofd_locks t_mmap_collision mmap-write-concurrent \
-> >       t_get_file_time t_create_short_dirs t_create_long_dirs t_enospc \
-> >       t_mmap_writev_overlap checkpoint_journal mmap-rw-fault allocstale=
- \
-> > -     t_mmap_cow_memory_failure fake-dump-rootino dio-buf-fault rewindd=
-ir-test
-> > +     t_mmap_cow_memory_failure fake-dump-rootino dio-buf-fault rewindd=
-ir-test \
-> > +     fcntl
+> > On Wed, Feb 7, 2024 at 1:12=E2=80=AFAM Steve French <smfrench@gmail.com=
+> wrote:
+> > >
+> > > Updated patch - now use PAGE_SIZE instead of hard coding to 4096.
+> > >
+> > > See attached
+> > >
+> > > On Tue, Feb 6, 2024 at 11:32=E2=80=AFPM Steve French <smfrench@gmail.=
+com> wrote:
+> > > >
+> > > > Attached updated patch which also adds check to make sure max write
+> > > > size is at least 4K
+> > > >
+> > > > On Tue, Feb 6, 2024 at 10:58=E2=80=AFPM Steve French <smfrench@gmai=
+l.com> wrote:
+> > > > >
+> > > > > > his netfslib work looks like quite a big refactor. Is there any=
+ plans to land this in 6.8? Or will this be 6.9 / later?
+> > > > >
+> > > > > I don't object to putting them in 6.8 if there was additional rev=
+iew
+> > > > > (it is quite large), but I expect there would be pushback, and am
+> > > > > concerned that David's status update did still show some TODOs fo=
+r
+> > > > > that patch series.  I do plan to upload his most recent set to
+> > > > > cifs-2.6.git for-next later in the week and target would be for
+> > > > > merging the patch series would be 6.9-rc1 unless major issues wer=
+e
+> > > > > found in review or testing
+> > > > >
+> > > > > On Tue, Feb 6, 2024 at 9:42=E2=80=AFPM Matthew Ruffell
+> > > > > <matthew.ruffell@canonical.com> wrote:
+> > > > > >
+> > > > > > I have bisected the issue, and found the commit that introduces=
+ the problem:
+> > > > > >
+> > > > > > commit d08089f649a0cfb2099c8551ac47eef0cc23fdf2
+> > > > > > Author: David Howells <dhowells@redhat.com>
+> > > > > > Date:   Mon Jan 24 21:13:24 2022 +0000
+> > > > > > Subject: cifs: Change the I/O paths to use an iterator rather t=
+han a page list
+> > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/=
+linux.git/commit/?id=3Dd08089f649a0cfb2099c8551ac47eef0cc23fdf2
+> > > > > >
+> > > > > > $ git describe --contains d08089f649a0cfb2099c8551ac47eef0cc23f=
+df2
+> > > > > > v6.3-rc1~136^2~7
+> > > > > >
+> > > > > > David, I also tried your cifs-netfs tree available here:
+> > > > > >
+> > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-=
+fs.git/log/?h=3Dcifs-netfs
+> > > > > >
+> > > > > > This tree solves the issue. Specifically:
+> > > > > >
+> > > > > > commit 34efb2a814f1882ddb4a518c2e8a54db119fd0d8
+> > > > > > Author: David Howells <dhowells@redhat.com>
+> > > > > > Date:   Fri Oct 6 18:29:59 2023 +0100
+> > > > > > Subject: cifs: Cut over to using netfslib
+> > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/=
+linux-fs.git/commit/?h=3Dcifs-netfs&id=3D34efb2a814f1882ddb4a518c2e8a54db11=
+9fd0d8
+> > > > > >
+> > > > > > This netfslib work looks like quite a big refactor. Is there an=
+y plans to land this in 6.8? Or will this be 6.9 / later?
+> > > > > >
+> > > > > > Do you have any suggestions on how to fix this with a smaller d=
+elta in 6.3 -> 6.8-rc3 that the stable kernels can use?
+> > > > > >
+> > > > > > Thanks,
+> > > > > > Matthew
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Thanks,
+> > > > >
+> > > > > Steve
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
+> > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
 > >
-> >  LINUX_TARGETS =3D xfsctl bstat t_mtab getdevicesize preallo_rw_pattern=
-_reader \
-> >       preallo_rw_pattern_writer ftrunc trunc fs_perms testx looptest \
-> > diff --git a/src/fcntl.c b/src/fcntl.c
-> > new file mode 100644
-> > index 00000000..8e375357
-> > --- /dev/null
-> > +++ b/src/fcntl.c
-> > @@ -0,0 +1,322 @@
-> > +// SPDX-License-Identifier: GPL-2.0+
-> > +/* Copyright (c) 2023 Alexander Aring.  All Rights Reserved.
-> > + */
-> > +
-> > +#include <pthread.h>
-> > +#include <unistd.h>
-> > +#include <string.h>
-> > +#include <limits.h>
-> > +#include <stdlib.h>
-> > +#include <errno.h>
-> > +#include <fcntl.h>
-> > +#include <stdio.h>
-> > +#include <wait.h>
-> > +
-> > +static char filename[PATH_MAX + 1];
-> > +static int fd;
-> > +
-> > +static void usage(char *name, const char *msg)
-> > +{
-> > +     printf("Fatal: %s\nUsage:\n"
-> > +            "%s <file for fcntl>\n", msg, name);
-> > +     _exit(1);
-> > +}
-> > +
-> > +static void *do_equal_file_lock_thread(void *arg)
-> > +{
-> > +       struct flock fl =3D {
-> > +            .l_type =3D F_WRLCK,
-> > +            .l_whence =3D SEEK_SET,
-> > +            .l_start =3D 0L,
-> > +            .l_len =3D 1L,
-> > +       };
-> > +       int rv;
-> > +
-> > +       rv =3D fcntl(fd, F_SETLKW, &fl);
-> > +       if (rv =3D=3D -1) {
-> > +            perror("fcntl");
-> > +            _exit(1);
-> > +       }
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +static void do_test_equal_file_lock(void)
-> > +{
-> > +     struct flock fl;
-> > +     pthread_t t[2];
-> > +     int pid, rv;
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0L;
-> > +     fl.l_len =3D 1L;
-> > +
-> > +     /* acquire range 0-0 */
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +            perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     pid =3D fork();
-> > +     if (pid =3D=3D 0) {
-> > +             rv =3D pthread_create(&t[0], NULL, do_equal_file_lock_thr=
-ead, NULL);
-> > +             if (rv !=3D 0) {
-> > +                     fprintf(stderr, "failed to create pthread\n");
-> > +                     _exit(1);
-> > +             }
-> > +
-> > +             rv =3D pthread_create(&t[1], NULL, do_equal_file_lock_thr=
-ead, NULL);
-> > +             if (rv !=3D 0) {
-> > +                     fprintf(stderr, "failed to create pthread\n");
-> > +                     _exit(1);
-> > +             }
-> > +
-> > +             pthread_join(t[0], NULL);
-> > +             pthread_join(t[1], NULL);
-> > +
-> > +             _exit(0);
-> > +     }
-> > +
-> > +     /* wait until threads block on 0-0 */
-> > +     sleep(3);
-> > +
-> > +     fl.l_type =3D F_UNLCK;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     sleep(3);
-> > +
-> > +     /* check if the ->lock() implementation got the
-> > +      * right locks granted because two waiter with the
-> > +      * same file_lock fields are waiting
-> > +      */
-> > +     fl.l_type =3D F_WRLCK;
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1 && errno =3D=3D EAGAIN) {
-> > +             fprintf(stderr, "deadlock, pthread not cleaned up correct=
-ly\n");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     wait(NULL);
-> > +}
-> > +
-> > +static void catch_alarm(int num) { }
-> > +
-> > +static void do_test_signal_interrupt_child(int *pfd)
-> > +{
-> > +     struct sigaction act;
-> > +     unsigned char m;
-> > +     struct flock fl;
-> > +     int rv;
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 1;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     memset(&act, 0, sizeof(act));
-> > +     act.sa_handler =3D catch_alarm;
-> > +     sigemptyset(&act.sa_mask);
-> > +     sigaddset(&act.sa_mask, SIGALRM);
-> > +     sigaction(SIGALRM, &act, NULL);
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     /* interrupt SETLKW by signal in 3 secs */
-> > +     alarm(3);
-> > +     rv =3D fcntl(fd, F_SETLKW, &fl);
-> > +     if (rv =3D=3D 0) {
-> > +             fprintf(stderr, "fcntl interrupt successful but should fa=
-il with EINTR\n");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     /* synchronize to move parent to test region 1-1 */
-> > +     write(pfd[1], &m, sizeof(m));
-> > +
-> > +     /* keep child alive */
-> > +     read(pfd[1], &m, sizeof(m));
-> > +}
-> > +
-> > +static void do_test_signal_interrupt(void)
-> > +{
-> > +     struct flock fl;
-> > +     unsigned char m;
-> > +     int pid, rv;
-> > +     int pfd[2];
-> > +
-> > +     rv =3D pipe(pfd);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("pipe");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     pid =3D fork();
-> > +     if (pid =3D=3D 0) {
-> > +             do_test_signal_interrupt_child(pfd);
-> > +             _exit(0);
-> > +     }
-> > +
-> > +     /* wait until child writes */
-> > +     read(pfd[0], &m, sizeof(m));
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 1;
-> > +     fl.l_len =3D 1;
-> > +     /* parent testing childs region, the child will think
-> > +      * it has region 1-1 locked because it was interrupted
-> > +      * by region 0-0. Due bugs the interruption also unlocked
-> > +      * region 1-1.
-> > +      */
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D 0) {
-> > +             fprintf(stderr, "fcntl trylock successful but should fail=
- because child still acquires region\n");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     write(pfd[0], &m, sizeof(m));
-> > +
-> > +     wait(NULL);
-> > +
-> > +     close(pfd[0]);
-> > +     close(pfd[1]);
-> > +
-> > +     /* cleanup everything */
-> > +     fl.l_type =3D F_UNLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 2;
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +}
-> > +
-> > +static void do_test_kill_child(void)
-> > +{
-> > +     struct flock fl;
-> > +     int rv;
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     rv =3D fcntl(fd, F_SETLKW, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +}
-> > +
-> > +static void do_test_kill(void)
-> > +{
-> > +     struct flock fl;
-> > +     int pid_to_kill;
-> > +     int rv;
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     pid_to_kill =3D fork();
-> > +     if (pid_to_kill =3D=3D 0) {
-> > +             do_test_kill_child();
-> > +             _exit(0);
-> > +     }
-> > +
-> > +     /* wait until child blocks */
-> > +     sleep(3);
-> > +
-> > +     kill(pid_to_kill, SIGKILL);
-> > +
-> > +     /* wait until Linux did plock cleanup */
-> > +     sleep(3);
-> > +
-> > +     fl.l_type =3D F_UNLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     /* cleanup parent lock */
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if (rv =3D=3D -1) {
-> > +             perror("fcntl");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     fl.l_type =3D F_WRLCK;
-> > +     fl.l_whence =3D SEEK_SET;
-> > +     fl.l_start =3D 0;
-> > +     fl.l_len =3D 1;
-> > +
-> > +     /* check if the child still holds the lock
-> > +      * and killing the child was not cleaning
-> > +      * up locks.
-> > +      */
-> > +     rv =3D fcntl(fd, F_SETLK, &fl);
-> > +     if ((rv =3D=3D -1 && errno =3D=3D EAGAIN)) {
-> > +             fprintf(stderr, "fcntl trylock failed but should be succe=
-ssful because killing child should cleanup acquired lock\n");
-> > +             _exit(1);
-> > +     }
-> > +}
-> > +
-> > +int main(int argc, char * const argv[])
-> > +{
-> > +     if (optind !=3D argc - 1)
-> > +             usage(argv[0], "<file for fcntl> is mandatory to tell the=
- file where to run fcntl() on it");
-> > +
-> > +     strncpy(filename, argv[1], PATH_MAX);
-> > +
-> > +     fd =3D open(filename, O_RDWR | O_CREAT, 0700);
-> > +     if (fd =3D=3D -1) {
-> > +             perror("open");
-> > +             _exit(1);
-> > +     }
-> > +
-> > +     /* test to have to equal struct file_lock requests in ->lock() */
-> > +     do_test_equal_file_lock();
-> > +     /* test to interrupt F_SETLKW by a signal and cleanup only cancel=
-ed the pending interrupted request */
-> > +     do_test_signal_interrupt();
-> > +     /* test if cleanup is correct if a child gets killed while being =
-blocked in F_SETLKW */
-> > +     do_test_kill();
-> > +
-> > +     close(fd);
-> > +
-> > +     return 0;
-> > +}
-> > diff --git a/tests/generic/732 b/tests/generic/732
-> > new file mode 100755
-> > index 00000000..d77f9fc2
-> > --- /dev/null
-> > +++ b/tests/generic/732
-> > @@ -0,0 +1,32 @@
-> > +#! /bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +# Copyright (c) 2023 Alexander Aring.  All Rights Reserved.
-> > +#
-> > +# FS QA Test 732
-> > +#
-> > +# This tests performs some fcntl() corner cases. See fcntl test
-> > +# program for more details.
-> > +#
-> > +. ./common/preamble
-> > +_begin_fstest auto
-> > +
-> > +# Import common functions.
-> > +. ./common/filter
-> > +
-> > +# real QA test starts here
-> > +
-> > +# Modify as appropriate.
-> > +_supported_fs generic
-> > +_require_test
-> > +_require_test_program fcntl
-> > +
-> > +echo "Silence is golden"
-> > +
-> > +$here/src/fcntl $TEST_DIR/testfile
-> > +if [ $? -ne 0 ]
-> > +then
-> > +     exit
-> > +fi
-> > +
-> > +status=3D0
-> > +exit
-> > diff --git a/tests/generic/732.out b/tests/generic/732.out
-> > new file mode 100644
-> > index 00000000..451f82ce
-> > --- /dev/null
-> > +++ b/tests/generic/732.out
-> > @@ -0,0 +1,2 @@
-> > +QA output created by 732
-> > +Silence is golden
+> >
+> >
 > > --
-> > 2.31.1
+> > Thanks,
 > >
->
->
+> > Steve
+
 
 
 --=20
