@@ -1,122 +1,220 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E6C1C10;
-	Fri,  9 Feb 2024 20:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B91B38399;
+	Fri,  9 Feb 2024 22:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510898; cv=none; b=ov4XcQrF0QqbarYrO+euYpghZsGIQLZC1gZvWilnGFqZIfMB6GaDil3YudLVHiKrWvjwE7G2xnJUkfNSMIm5Qgfp0/M1sc2tyB+CP0UvXhWEzZfatVQ0lzT0sM7fe5uYzeS8llRoti06UJ/1k89p2Ubyot4BhQ+QcUqzKOJySdA=
+	t=1707517147; cv=none; b=QJNLa5BxZ7UYXHrkqhN4AXDbyRG+qayVBdBGtVRvn36JYkhvJ2/+PXXejWB9G1IWdQIRDBeWR/uA99ffQKMbWKHsW0U4HhCn8EtEPslNA7FxaU9Jol4Ahv7FNPZmZflTuqLdPcGkMk+iDsiqObjSG7GO4VUq8OVxSCSZX244+qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510898; c=relaxed/simple;
-	bh=Nhcj9DPiHCkuEemzq4+XBqgkPDJz+Mbq1jpF87vjhKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rdPfehTAf6jtRfRx5Mf0qF/FrQ5BjQ4LpQAzX9DGtub2iAioshzspfgUhBwgi6t8UAVDQgYPap0CUQ2pmt+0OiZveseSByB5+edsgj0gO7Uhi8FQsyfz0OreKAQ9y6C6FkFSiKPCuHaSZFwgrZOjJaWkoMiMXHY0v+13ufjOjCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRRBmZbQ; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRRBmZbQ"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5114c05806eso2186033e87.1;
-        Fri, 09 Feb 2024 12:34:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707510894; x=1708115694; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CUN8b7/S7YXII4W3X1WElde9eqEXoxcQDnp8+sG/BgE=;
-        b=dRRBmZbQp0HEmH9ikd+upqQ+8XBNJaM5W4Pc/JrmDFXMULOz3y25UCYaZ0o0fVs2We
-         S2CyTiexjHiqRbdycUeFSstF+yZYbU7P5UO+C3ZU87NmXoZUne3Mpv/efKWYuitSVUcr
-         Y9yXqlMx96x9fzvncTzWHTvoDSgyqY9nzulHHkP4D7FUrc2OJmiP036VS7Y6rd9SV3JQ
-         9Z6MmbEJtmkI+XSGbBoarNjsrzf78TEi7p9uGTfsEZmIMVbbPYNCpPCJaxMXJsF2cRv7
-         1la2tgMTJSg//5CpBOnG364em96vlOb6yxan719IoWFfEOss08Jahe9PCjYKplkY0ZLG
-         sPyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707510894; x=1708115694;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CUN8b7/S7YXII4W3X1WElde9eqEXoxcQDnp8+sG/BgE=;
-        b=jULbkU+cZ+ki8GbXvigF38FSXtlZwUd3ty5cFOPWO8e9QcqY4a7U6wVnrhFXrey15Z
-         YZu4bhLXxNEVys6PMZkb1P4qyWFVjR3ZF8EB/gdrgzGir//srQaGLN6dGvSMRgeWh8Ad
-         xt9cWenfHx+TpyY3T2XuWnbFMwj1xlNELNFUpccRxhBj4qT3z+uZT/cE+H6bo/Iy6OTC
-         BBHqazC71QRuE+rC5ki7U2+SVa0eOVyh2q1PhYQDwLnmzyO3Cd0QDLJsqDxDJcualIeb
-         Vm7pEcTPSyOUOVpAquVFrhzU++BwQNdWlTLzsQbbxUqtaArJoXjS1aDeYnj/AIrTQfvT
-         +oWg==
-X-Gm-Message-State: AOJu0Yzowt8n0c3PLlTznVPn5bPLagKdxWTEG8G0YN6pysEtav797vVE
-	DijptVBfCoWLg163hgZOE5Yad5+HiUn5UTkTrv1UK5l58eeFj+mlMBKhOtBoJZ4913BQqD5z6ku
-	MB0VIEVEguovvQkmpJTtsFV9iTpo8USAH1mI=
-X-Google-Smtp-Source: AGHT+IHY+3bC9RrkKLvACoZnqJXmO8zdYFcMlf2PGSqkOf/ErSIr6eVNnCGgcJUatD3Wkecd/8lWk4G0DBBrQjGO2xs=
-X-Received: by 2002:a05:6512:368b:b0:511:5e2c:e63 with SMTP id
- d11-20020a056512368b00b005115e2c0e63mr78851lfs.59.1707510894295; Fri, 09 Feb
- 2024 12:34:54 -0800 (PST)
+	s=arc-20240116; t=1707517147; c=relaxed/simple;
+	bh=7xft6VdjJIn9OrQvD8ZcJDWYsG2EyFJWTBnzONoipxg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lCO0D1dx9NLQTmg0uj+pogz5w6KrhiJNwZdzbMMnyZ1enhegPFa2h7o1+Nn36eGJElSCbcu+LfDFoWtRmOg108H6Yb6snfk70O/21XSxnbNLzkk2YG0pDBd8XFhXOotZygX0rGg+EfaWovoTZe8pailav8rUguiyai9ZKQkrMXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id B1B1E72C8F5;
+	Sat, 10 Feb 2024 01:13:06 +0300 (MSK)
+Received: from pony.office.basealt.ru (unknown [193.43.10.9])
+	by imap.altlinux.org (Postfix) with ESMTPSA id 9F4FE36D0246;
+	Sat, 10 Feb 2024 01:13:06 +0300 (MSK)
+Received: by pony.office.basealt.ru (Postfix, from userid 500)
+	id 75D12360AE77; Sat, 10 Feb 2024 01:13:06 +0300 (MSK)
+Date: Sat, 10 Feb 2024 01:13:06 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>, 
+	Ronnie Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
+Message-ID: <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
+References: <20230215000832.never.591-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
- <20240207034117.20714-1-matthew.ruffell@canonical.com> <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
- <CAH2r5msJ12ShH+ZUOeEg3OZaJ-OJ53-mCHONftmec7FNm3znWQ@mail.gmail.com>
- <CAH2r5muiod=thF6tnSrgd_LEUCdqy03a2Ln1RU40OMETqt2Z_A@mail.gmail.com>
- <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com>
- <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com>
- <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com>
- <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com> <617c148c-4a18-49b4-974a-18f1f500358e@rd10.de>
-In-Reply-To: <617c148c-4a18-49b4-974a-18f1f500358e@rd10.de>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 9 Feb 2024 14:34:43 -0600
-Message-ID: <CAH2r5muANsy5U4Xgsi3BtvRMEFR1cnj5jFjJVUbrGAn86N8ejg@mail.gmail.com>
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
-To: "R. Diez" <rdiez-2006@rd10.de>
-Cc: Matthew Ruffell <matthew.ruffell@canonical.com>, dhowells@redhat.com, 
-	linux-cifs@vger.kernel.org, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230215000832.never.591-kees@kernel.org>
 
-On Fri, Feb 9, 2024 at 3:42=E2=80=AFAM R. Diez <rdiez-2006@rd10.de> wrote:
-<...>
-> Now that I mentioned misleading messages: The man page for mount.cifs, pa=
-rameters rsize and wsize, talks about "maximum amount of data the kernel wi=
-ll request", and about the "maximum size that servers will accept". It is n=
-ot clear that this is a maximum value for the negotiation phase, so 1) you =
-do not have to worry about setting it too high on the Linux client, as the =
-server will not reject it but negotiate it down if necessary (is that true?=
-), and 2) the negotiation result may actually be much lower than the value =
-you requested, but that is fine, as it wasn't really a hard request, but a =
-soft petition.
->
-> I suggest that you guys rephrase that man page, in order to prevent other=
- people scratching their heads again.
->
-> I would write something along this line: "Maximum amount of data that the=
- kernel will negotiate for read [or write] requests in bytes. Maximum size =
-that servers will negotiate is typically ...".
+Kees,
 
-That is a good idea - there are also other changes to the mount.cifs
-man page to be done (e.g. to go through the mount parameters in
-fs/smb/client/fs_context.c and compare with the mount.cifs man page to
-see which are missing descriptions)
+On Tue, Feb 14, 2023 at 04:08:39PM -0800, Kees Cook wrote:
+> The kernel is globally removing the ambiguous 0-length and 1-element
+> arrays in favor of flexible arrays, so that we can gain both compile-time
+> and run-time array bounds checking[1].
+> 
+> While struct fealist is defined as a "fake" flexible array (via a
+> 1-element array), it is only used for examination of the first array
+> element. Walking the list is performed separately, so there is no reason
+> to treat the "list" member of struct fealist as anything other than a
+> single entry. Adjust the struct and code to match.
+> 
+> Additionally, struct fea uses the "name" member either as a dynamic
+> string, or is manually calculated from the start of the struct. Redefine
+> the member as a flexible array.
+> 
+> No machine code output differences are produced after these changes.
+> 
+> [1] For lots of details, see both:
+>     https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+>     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+> 
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Paulo Alcantara <pc@cjr.nz>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  fs/cifs/cifspdu.h |  4 ++--
+>  fs/cifs/cifssmb.c | 16 ++++++++--------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index 623caece2b10..add73be4902c 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -2583,7 +2583,7 @@ struct fea {
+>  	unsigned char EA_flags;
+>  	__u8 name_len;
+>  	__le16 value_len;
+> -	char name[1];
+> +	char name[];
+>  	/* optionally followed by value */
+>  } __attribute__((packed));
+>  /* flags for _FEA.fEA */
+> @@ -2591,7 +2591,7 @@ struct fea {
+>  
+>  struct fealist {
+>  	__le32 list_len;
+> -	struct fea list[1];
+> +	struct fea list;
+>  } __attribute__((packed));
+>  
+>  /* used to hold an arbitrary blob of data */
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 60dd4e37030a..7c587157d030 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -5787,7 +5787,7 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
+>  
+>  	/* account for ea list len */
+>  	list_len -= 4;
+> -	temp_fea = ea_response_data->list;
+> +	temp_fea = &ea_response_data->list;
+>  	temp_ptr = (char *)temp_fea;
+>  	while (list_len > 0) {
+>  		unsigned int name_len;
+> @@ -5902,7 +5902,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>  	else
+>  		name_len = strnlen(ea_name, 255);
+>  
+> -	count = sizeof(*parm_data) + ea_value_len + name_len;
+> +	count = sizeof(*parm_data) + 1 + ea_value_len + name_len;
+>  	pSMB->MaxParameterCount = cpu_to_le16(2);
+>  	/* BB find max SMB PDU from sess */
+>  	pSMB->MaxDataCount = cpu_to_le16(1000);
+> @@ -5926,14 +5926,14 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>  	byte_count = 3 /* pad */  + params + count;
+>  	pSMB->DataCount = cpu_to_le16(count);
+>  	parm_data->list_len = cpu_to_le32(count);
+> -	parm_data->list[0].EA_flags = 0;
+> +	parm_data->list.EA_flags = 0;
+>  	/* we checked above that name len is less than 255 */
+> -	parm_data->list[0].name_len = (__u8)name_len;
+> +	parm_data->list.name_len = (__u8)name_len;
+>  	/* EA names are always ASCII */
+>  	if (ea_name)
+> -		strncpy(parm_data->list[0].name, ea_name, name_len);
+> -	parm_data->list[0].name[name_len] = 0;
+> -	parm_data->list[0].value_len = cpu_to_le16(ea_value_len);
+> +		strncpy(parm_data->list.name, ea_name, name_len);
 
+Could non-applying this patch cause false-positive fortify_panic?
+We got a bug report from user of 6.1.73:
 
-> By the way, the current option naming is quite misleading too. I am guess=
-ing that you can specify "wsize=3Dxxx" and then "mount -l" will show "wsize=
-=3Dyyy", leaving you wondering why your value was not actually taken. Or, l=
-ike it happened this time, other people automatically assume that I specifi=
-ed a wsize, when I didn't. I would have called these parameters "maxwsize" =
-and "negotiatedwsize", to make the distinction clear. I wonder if it is not=
- too late to change the name of the one listed by "mount -l", that is, the =
-"negotiatedwsize".
->
-> Regards,
->    rdiez
+   Jan 24 15:15:20 kalt2test.dpt.local kernel: detected buffer overflow in strncpy
+   Jan 24 15:15:20 kalt2test.dpt.local kernel: ------------[ cut here ]------------
+   Jan 24 15:15:20 kalt2test.dpt.local kernel: kernel BUG at lib/string_helpers.c:1027!
+   ...
+   Jan 24 15:15:20 kalt2test.dpt.local kernel: Call Trace:
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  <TASK>
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? __die_body.cold+0x1a/0x1f
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? die+0x2b/0x50
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? do_trap+0xcf/0x120
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? fortify_panic+0xf/0x11
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? do_error_trap+0x83/0xb0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? fortify_panic+0xf/0x11
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? exc_invalid_op+0x4e/0x70
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? fortify_panic+0xf/0x11
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? asm_exc_invalid_op+0x16/0x20
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? fortify_panic+0xf/0x11
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  CIFSSMBSetEA.cold+0xc/0x18 [cifs]
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  cifs_xattr_set+0x596/0x690 [cifs]
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? evm_protected_xattr_common+0x41/0xb0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  __vfs_removexattr+0x52/0x70
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  __vfs_removexattr_locked+0xbc/0x150
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  vfs_removexattr+0x56/0x100
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  removexattr+0x58/0x90
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? get_vtime_delta+0xf/0xb0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? ct_kernel_exit.constprop.0+0x6b/0x80
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? __ct_user_enter+0x5a/0xd0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? syscall_exit_to_user_mode+0x31/0x50
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? int80_emulation+0xb9/0x110
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? get_vtime_delta+0xf/0xb0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? ct_kernel_exit.constprop.0+0x6b/0x80
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? __ct_user_enter+0x5a/0xd0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? __fget_light.part.0+0x83/0xd0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  __ia32_sys_fremovexattr+0x80/0xa0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  int80_emulation+0xa9/0x110
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? get_vtime_delta+0xf/0xb0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? vtime_user_exit+0x1c/0x70
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? __ct_user_exit+0x6c/0xc0
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  ? int80_emulation+0x1b/0x110
+   Jan 24 15:15:20 kalt2test.dpt.local kernel:  asm_int80_emulation+0x16/0x20
 
-The mount parm names wsize=3D and rsize=3D were used to match other
-filesystems (e.g. nfs) which have similarly named mount params for a
-similar purpose.
+I don't find this patch appled to stable/linux-6.1.y.
 
---=20
 Thanks,
 
-Steve
+ps. (Unfortunately `CIFSSMBSetEA+0xc` address is not resolvable to the
+actual line inside of CIFSSMBSetEA pointing just to the head of it.
+
+   (gdb) l *CIFSSMBSetEA+0xc
+   0x6de3c is in CIFSSMBSetEA (fs/smb/client/cifssmb.c:5776).
+   5771    int
+   5772    CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+   5773                 const char *fileName, const char *ea_name, const void *ea_value,
+   5774                 const __u16 ea_value_len, const struct nls_table *nls_codepage,
+   5775                 struct cifs_sb_info *cifs_sb)
+   5776    {
+   5777            struct smb_com_transaction2_spi_req *pSMB = NULL;
+   5778            struct smb_com_transaction2_spi_rsp *pSMBr = NULL;
+   5779            struct fealist *parm_data;
+   5780            int name_len;
+
+But there is only one strncpy there.
+
+> +	parm_data->list.name[name_len] = '\0';
+> +	parm_data->list.value_len = cpu_to_le16(ea_value_len);
+>  	/* caller ensures that ea_value_len is less than 64K but
+>  	we need to ensure that it fits within the smb */
+>  
+> @@ -5941,7 +5941,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>  	     negotiated SMB buffer size BB */
+>  	/* if (ea_value_len > buffer_size - 512 (enough for header)) */
+>  	if (ea_value_len)
+> -		memcpy(parm_data->list[0].name+name_len+1,
+> +		memcpy(parm_data->list.name + name_len + 1,
+>  		       ea_value, ea_value_len);
+>  
+>  	pSMB->TotalDataCount = pSMB->DataCount;
+> -- 
+> 2.34.1
+> 
