@@ -1,238 +1,314 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE7538388;
-	Fri,  9 Feb 2024 13:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B7654F86;
+	Fri,  9 Feb 2024 20:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707485850; cv=none; b=WAnofjBpe84yYaaDcBCrbQVCZ1gib/7xznAdocn+JHfMQSZsHSSwWrkpIZgr6T/lyVtfr7qQVbQ/y+3WB9kwsH117dAAYuwOFT7j0Ta/kPVL+MbQiC7E8T2vRQgiHv/lX8bttmtbO3oTdeFXkyswAU2WXU2e5XMMUBwpabpOitY=
+	t=1707510324; cv=none; b=cxqD3HM6SUbZ/pPHkNvH4o/rLm/OSzcbo6DSGKa5uhN5O6ixfvgBFf9hvX7O76+8yr+fBSK1L4Li8iyFHT5oHlkhHUkl/Dz6gkqZ8um4tfOSBUktQp5yI7flYZTu2/hPnE7/6jNVDwyHdyvcpQAdW/KO0jNmuVnMDbfAmubStyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707485850; c=relaxed/simple;
-	bh=nCDRSi5fuNvnVfeHvc8gHPOlDxG9J2HzLW0aZ3aJDpw=;
+	s=arc-20240116; t=1707510324; c=relaxed/simple;
+	bh=sCcPAezktbDMbjHUQleZfGQXAfWr5khO57a7d+GAdzI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L4unWMyMzn/JxC3ag4Zu9JR8yImrVa+vJKYNG2TRyLYkntf7r1qaC9mqhKw3vPgetoius7TWFTLyB330FBqLJBbrtA1+s7Izr3M8YhWMYEtl5kdP9rq31sEAXmmUer/KqbLmaNh6dmJIh9KLUSHrE2atYP05f2OUALDXF3MQ0vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEOyf1O2; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=UVP87O2I0FQZbKuqOSSUQpXtj9b7EKCAFwEcCKDJeWz6niV3JueS1UbL3QPwa7hbM6gP9GtfQuKPsb4i7XlbZDSa31tsWArQj5+oXEX6MAN7c+1Lp0bYtib1SK6O2pyo/6vEgijKoBwmjfKgf7ou/QIGl5PnZBCiBStf+fMPOIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0OlrThF; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEOyf1O2"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d0d95e8133so11945461fa.1;
-        Fri, 09 Feb 2024 05:37:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0OlrThF"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-511531f03f6so1602087e87.0;
+        Fri, 09 Feb 2024 12:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707485847; x=1708090647; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707510321; x=1708115121; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TdMFIWsVbpXKdg1uzGMEB3Krt6UJuq96Wxd52+lxyAY=;
-        b=aEOyf1O2I80HuN8uhANUeGzZO+bByLsMGnnL17UU1DTudsU8pivFVFnhtk/ugnBBbC
-         1TViBgsUXjdublMpw/yG+xgJH9o2M5NCqrW1cBhjL5wYiDLcUxZQZorJGHnnGQosRxgu
-         JJapmlErclH+tFT80uvezW87cThWKiOqg95luI8A5YO8nIPVEod2DEynuWBNPnUH6g2b
-         WaCCnbWVvdaqByNAf2kiRqiQfW3JdX8ynN5p0V5GO9GIYTaxR2BcfxTkxjWs3A+gmsve
-         6hZ3eJHZNgjf90um1E9xGWRGYRHZHSdlNoHtrC1PR3FDncA26w/PIfK1ZgEveO9uEQiw
-         1jfQ==
+        bh=5A6EDNme+q77i6ZjmBPxQuGv8x2KqWecsrBUU0WJby4=;
+        b=Y0OlrThFpj2R6KdxujGI5+2JuWIf6xeze5FahVeYYnJjNQ1jV2zTugrFdF/o6Gwu8j
+         rk77aF0hQR7UTvQ0K6aRZFurdzrQdOEs4OO0Mhq3kjj/bzxxuzSJ+Yc2cH6KoBaZzCFo
+         vlTtMchwZSeYnk3FIrA1kB0NSqlIclsgvDvK8iPF0Ia/JxlmU4eIJidvXSn6RDQWUPNg
+         MfZhQpT1YOHeexgNJzvGFvQgrFt/bOvQdCBPizYUc9ll0A6/Ot80ilPXAsdRrj7Mp8bQ
+         1l0d+EzNw/YGfHA/uEFFNZ9a6NhlAUVeVCaJcNrmCSE+EEXZCIK55nVQ5+j2B4vrzo98
+         j/Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707485847; x=1708090647;
+        d=1e100.net; s=20230601; t=1707510321; x=1708115121;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TdMFIWsVbpXKdg1uzGMEB3Krt6UJuq96Wxd52+lxyAY=;
-        b=vWvFZrCF5yz3ohtHtH2yYBlCcY2DJatHeKxj27539Yl4JZj3+QA4uhVbXVLRZSMQP0
-         iT2lQ//rGBtkQwe2kgXmqFqjy77pIetPLwsx09aGB4NLnBi7gfoJeLR8XhKjLBm4ufen
-         H101HHKHpco0t6GoR72ICGxhYNHzpaj0D84lJ1DKiYwYhClnlmTaZ884Tv3yIULWcJIS
-         xMI11Vg5vrTVEWa2ys9ybVI8UFoJqBi6Ja+JwY8LLQBN84blFF8NU/MEEWYrCtscuzFh
-         +RDbpqUXd9P+3bb801CfRr/fIzHfotW4D7EIWyqKSuw0VitX4oxdjQ++fJrW5DiD+wVz
-         ijCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpmTaByRW/m535GOWfO8g5274v+H387IsnP23/nnS3oZcQOomIrwgtTmuAF9dHM5I7JItwfim3KNcQ/R1x64HUVZeAnuTI3cpNbRm5ydzxP8AQDipCcNFSqHJqRJQW16l/vvkgpppG+g==
-X-Gm-Message-State: AOJu0YzkaUDAz3RRLvXBcPt0fdpfvniSi+6dDa562PWvcjVIY1haS4RX
-	sKOoyf5pfFf8LS7D7suI7NHbFS0ox9oVLXAmiQIONsAvNUfSZcfQ61QDFpDO3YDIOeMBktiuQno
-	eom3K2zOJg4E7/eILDo4+ysoy3VprKp2FLLBbtA==
-X-Google-Smtp-Source: AGHT+IFLo/pWMJyF4jE2tljsLDr02wXcR4IvKrf2+dlsZSurBLetoXtD2gBSEjCQMifCIvkIvviQl644BzeBdtRjUYs=
-X-Received: by 2002:a2e:8315:0:b0:2d0:c7a3:e971 with SMTP id
- a21-20020a2e8315000000b002d0c7a3e971mr1391358ljh.0.1707485846803; Fri, 09 Feb
- 2024 05:37:26 -0800 (PST)
+        bh=5A6EDNme+q77i6ZjmBPxQuGv8x2KqWecsrBUU0WJby4=;
+        b=mIcpRIv3cKlq3jvuRLWlkm4YuJmw1gqJ7DqiULpcfPH0BAlvEIssv4wd57u5TRA4pJ
+         JSr8zwwLp+dWLY6X0AFdvT81EIOfdvfWe9bB+NQmSPRnjzUFmU9FPa6OwzelRQtyWf5k
+         IA2EsvSdql9a1Ewl2CrHaYvUmt33XXspOYcB93FaZvtFB5zeK+WrYjbNq05MYyjsx2ed
+         HgNj7Ic8N4KWPKKngZ1ye00Qypt/OppIJ786Skw8/ovTsw3a4PvFYP1ikRuWPcQUXXgG
+         19eCh434uGiw0CYCKkcWmiTVR7K5+V9GtQyK80UKVLoTrmmVIkAPoOzGk0iStYLF4T9u
+         gWlA==
+X-Gm-Message-State: AOJu0YzUTX9qLgR+w8x26jtz7+MEQ3e6gU6Dcnrm1MpXriqOUaUldzBQ
+	qtsPhTsTm320jUfKiC/SuqML0HG/0yFxxnp2WwedkTdHN8et2rvStwQvTFmu1VScqXB/MezjILv
+	1EjtE/pcaFJHLqU5Yx5ipiTelBiE=
+X-Google-Smtp-Source: AGHT+IGl9gJCY0cKGK/X9Ja2x/BwzGMP83bAZr+UA7oieXEJm/MXAkQ5AAKiCyq23IGqeVXPciNk8lNWYNy1kxrc9BI=
+X-Received: by 2002:a19:7617:0:b0:511:60af:165b with SMTP id
+ c23-20020a197617000000b0051160af165bmr67596lff.7.1707510320408; Fri, 09 Feb
+ 2024 12:25:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209131552.471765-1-meetakshisetiyaoss@gmail.com> <20240209131552.471765-3-meetakshisetiyaoss@gmail.com>
-In-Reply-To: <20240209131552.471765-3-meetakshisetiyaoss@gmail.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Fri, 9 Feb 2024 19:07:13 +0530
-Message-ID: <CAFTVevVeRb-dKkQK2gVEhoDQH1QhJXh-xHZXz-GW35d26y--uA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] smb: client: retry compound request without reusing lease
-To: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, nspmangalore@gmail.com, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	samba-technical@lists.samba.org, bharathsm.hsk@gmail.com
-Cc: Meetakshi Setiya <msetiya@microsoft.com>
+References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
+ <20240207034117.20714-1-matthew.ruffell@canonical.com> <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
+ <CAH2r5msJ12ShH+ZUOeEg3OZaJ-OJ53-mCHONftmec7FNm3znWQ@mail.gmail.com>
+ <CAH2r5muiod=thF6tnSrgd_LEUCdqy03a2Ln1RU40OMETqt2Z_A@mail.gmail.com>
+ <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com>
+ <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com>
+ <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com> <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
+In-Reply-To: <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 9 Feb 2024 14:25:08 -0600
+Message-ID: <CAH2r5mvSsmm2WzAakAKWGJMs3C-9+z0EJ-msV0Qjkt5q9ZPBzA@mail.gmail.com>
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+To: Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Matthew Wilcox <willy@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Patch 2 of this patch series
-https://lore.kernel.org/linux-cifs/20240209131552.471765-2-meetakshisetiyao=
-ss@gmail.com/
-aims to fix a customer reported bug by reusing lease key in unlink,
-rename and set_path_size compound operations on the smb client. The
-bug, its implications and reproduction has been described in the
-commit message of the patch. In short, unlink, rename and
-set_path_size operations can cause the server to send lease breaks to
-the same client, on the same connection which hurts performance.
+> > If the user does set their own "wsize", any value that is not a multipl=
+e of
+> PAGE_SIZE is dangerous right?
 
-The aim is to have a fix in place for this problem without regressing
-existing behaviour. Also, the proposed changes should go in smaller
-batches so that they can be backported with relative ease. Patch 2
-regressed a few operations on hardlinks (eg., xfstests generic 002,
-013).  As per MS-SMB2, lease keys are associated with the file name.
-Linux cifs client maintains lease keys with the inode. If the file
-has hardlinks, it is possible that the lease for a file be wrongly
-reused for an operation on the hardlink or vice versa. In these
-cases, the mentioned compound operations fail with
-STATUS_INVALID_PARAMETER.
+Yes for kernels 6.3 through 6.8-rc such a write size (ie that is not a
+multiple of page size) can
+be dangerous - that is why I added the warning on mount if the user
+specifies the
+potentially problematic wsize, since the wsize specified on mount
+unlike the server
+negotiated maximum write size is under the user's control.  The server
+negotiated
+maximum write size can't be controlled by the user, so for this
+temporary fix we are
+forced to round it down.   The actually bug is due to a folios/netfs
+bug that David or
+one of the mm experts may be able to spot (and fix) so for this
+temporary workaround
+I wanted to do the smaller change here so we don't have to revert it
+later. I got close to
+finding the actual bug (where the offset was getting reset, rounded up
+incorrectly
+inside one of the folios routines mentioned earlier in the thread) but
+wanted to get something
 
-A simple fix for the regressions would be to have a two-phased
-approach and resend the compound op request again without the lease
-key if STATUS_INVALID_PARAMETER is received. This would help patch 2
-fix the original issue. Fix(es) for the hardlink-leasekey problem can
-come in the next batch.
+On Fri, Feb 9, 2024 at 2:51=E2=80=AFAM Matthew Ruffell
+<matthew.ruffell@canonical.com> wrote:
+>
+> Hi Steve,
+>
+> Yes, I am specifying "wsize" on the mount in my example, as its a little =
+easier
+> to reproduce the issue that way.
+>
+> If the user does set their own "wsize", any value that is not a multiple =
+of
+> PAGE_SIZE is dangerous right? Shouldn't we prevent the user from corrupti=
+ng
+> their data (un)intentionally if they happen to specify a wrong value? Esp=
+ecially
+> since we know about it now. I know there haven't been any other reports i=
+n the
+> year or so between 6.3 and present day, so there probably isn't any users=
+ out
+> there actually setting their own "wsize", but it still feels bad to allow=
+ users
+> to expose themselves to data corruption in this form.
+>
+> Please consider also rounding down "wsize" set on mount command line to a=
+ safe
+> multiple of PAGE_SIZE. The code will only be around until David's netfsli=
+b cut
+> over is merged anyway.
+>
+> I built a distro kernel and sent it to R. Diez for testing, so hopefully =
+we will
+> have some testing performed against an actual SMB server that sends a dan=
+gerous
+> wsize during negotiation. I'll let you know how that goes, or R. Diez, yo=
+u can
+> tell us about how it goes here.
+>
+> Thanks,
+> Matthew
+>
+> On Fri, 9 Feb 2024 at 18:38, Steve French <smfrench@gmail.com> wrote:
+> >
+> > Are you specifying "wsize" on the mount in your example?  The intent
+> > of the patch is to warn the user using a non-recommended wsize (since
+> > the user can control and fix that) but to force round_down when the
+> > server sends a dangerous wsize (ie one that is not a multiple of
+> > 4096).
+> >
+> > On Thu, Feb 8, 2024 at 3:31=E2=80=AFAM Matthew Ruffell
+> > <matthew.ruffell@canonical.com> wrote:
+> > >
+> > > Hi Steve,
+> > >
+> > > I built your latest patch ontop of 6.8-rc3, but the problem still per=
+sists.
+> > >
+> > > Looking at dmesg, I see the debug statement from the second hunk, but=
+ not from
+> > > the first hunk, so I don't believe that wsize was ever rounded down t=
+o
+> > > PAGE_SIZE.
+> > >
+> > > [  541.918267] Use of the less secure dialect vers=3D1.0 is not
+> > > recommended unless required for access to very old servers
+> > > [  541.920913] CIFS: VFS: Use of the less secure dialect vers=3D1.0 i=
+s
+> > > not recommended unless required for access to very old servers
+> > > [  541.923533] CIFS: VFS: wsize should be a multiple of 4096 (PAGE_SI=
+ZE)
+> > > [  541.924755] CIFS: Attempting to mount //192.168.122.172/sambashare
+> > >
+> > > $ sha256sum sambashare/testdata.txt
+> > > 9e573a0aa795f9cd4de4ac684a1c056dbc7d2ba5494d02e71b6225ff5f0fd866
+> > > sambashare/testdata.txt
+> > > $ less sambashare/testdata.txt
+> > > ...
+> > > 8dc8da96f7e5de0f312a2dbcc3c5c6facbfcc2fc206e29283274582ec93daa2a1496c=
+a8edd49e3c1
+> > > 6b^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^=
+@^@^@^@^@^@^
+> > > ...
+> > >
+> > > Would you be able compile and test your patch and see if we enter the=
+ logic from
+> > > the first hunk?
+> > >
+> > > I'll be happy to test a V2 tomorrow.
+> > >
+> > > Thanks,
+> > > Matthew
+> > >
+> > > On Thu, 8 Feb 2024 at 03:50, Steve French <smfrench@gmail.com> wrote:
+> > > >
+> > > > I had attached the wrong file - reattaching the correct patch (ie t=
+hat
+> > > > updates the previous version to use PAGE_SIZE instead of 4096)
+> > > >
+> > > > On Wed, Feb 7, 2024 at 1:12=E2=80=AFAM Steve French <smfrench@gmail=
+.com> wrote:
+> > > > >
+> > > > > Updated patch - now use PAGE_SIZE instead of hard coding to 4096.
+> > > > >
+> > > > > See attached
+> > > > >
+> > > > > On Tue, Feb 6, 2024 at 11:32=E2=80=AFPM Steve French <smfrench@gm=
+ail.com> wrote:
+> > > > > >
+> > > > > > Attached updated patch which also adds check to make sure max w=
+rite
+> > > > > > size is at least 4K
+> > > > > >
+> > > > > > On Tue, Feb 6, 2024 at 10:58=E2=80=AFPM Steve French <smfrench@=
+gmail.com> wrote:
+> > > > > > >
+> > > > > > > > his netfslib work looks like quite a big refactor. Is there=
+ any plans to land this in 6.8? Or will this be 6.9 / later?
+> > > > > > >
+> > > > > > > I don't object to putting them in 6.8 if there was additional=
+ review
+> > > > > > > (it is quite large), but I expect there would be pushback, an=
+d am
+> > > > > > > concerned that David's status update did still show some TODO=
+s for
+> > > > > > > that patch series.  I do plan to upload his most recent set t=
+o
+> > > > > > > cifs-2.6.git for-next later in the week and target would be f=
+or
+> > > > > > > merging the patch series would be 6.9-rc1 unless major issues=
+ were
+> > > > > > > found in review or testing
+> > > > > > >
+> > > > > > > On Tue, Feb 6, 2024 at 9:42=E2=80=AFPM Matthew Ruffell
+> > > > > > > <matthew.ruffell@canonical.com> wrote:
+> > > > > > > >
+> > > > > > > > I have bisected the issue, and found the commit that introd=
+uces the problem:
+> > > > > > > >
+> > > > > > > > commit d08089f649a0cfb2099c8551ac47eef0cc23fdf2
+> > > > > > > > Author: David Howells <dhowells@redhat.com>
+> > > > > > > > Date:   Mon Jan 24 21:13:24 2022 +0000
+> > > > > > > > Subject: cifs: Change the I/O paths to use an iterator rath=
+er than a page list
+> > > > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/torva=
+lds/linux.git/commit/?id=3Dd08089f649a0cfb2099c8551ac47eef0cc23fdf2
+> > > > > > > >
+> > > > > > > > $ git describe --contains d08089f649a0cfb2099c8551ac47eef0c=
+c23fdf2
+> > > > > > > > v6.3-rc1~136^2~7
+> > > > > > > >
+> > > > > > > > David, I also tried your cifs-netfs tree available here:
+> > > > > > > >
+> > > > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/li=
+nux-fs.git/log/?h=3Dcifs-netfs
+> > > > > > > >
+> > > > > > > > This tree solves the issue. Specifically:
+> > > > > > > >
+> > > > > > > > commit 34efb2a814f1882ddb4a518c2e8a54db119fd0d8
+> > > > > > > > Author: David Howells <dhowells@redhat.com>
+> > > > > > > > Date:   Fri Oct 6 18:29:59 2023 +0100
+> > > > > > > > Subject: cifs: Cut over to using netfslib
+> > > > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowe=
+lls/linux-fs.git/commit/?h=3Dcifs-netfs&id=3D34efb2a814f1882ddb4a518c2e8a54=
+db119fd0d8
+> > > > > > > >
+> > > > > > > > This netfslib work looks like quite a big refactor. Is ther=
+e any plans to land this in 6.8? Or will this be 6.9 / later?
+> > > > > > > >
+> > > > > > > > Do you have any suggestions on how to fix this with a small=
+er delta in 6.3 -> 6.8-rc3 that the stable kernels can use?
+> > > > > > > >
+> > > > > > > > Thanks,
+> > > > > > > > Matthew
+> > > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > --
+> > > > > > > Thanks,
+> > > > > > >
+> > > > > > > Steve
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > --
+> > > > > > Thanks,
+> > > > > >
+> > > > > > Steve
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Thanks,
+> > > > >
+> > > > > Steve
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 
-Thanks
-Meetakshi
 
-On Fri, Feb 9, 2024 at 6:46=E2=80=AFPM <meetakshisetiyaoss@gmail.com> wrote=
-:
->
-> From: Meetakshi Setiya <msetiya@microsoft.com>
->
-> There is a shortcoming in the current implementation of the file
-> lease mechanism exposed when the lease keys were attempted to be
-> reused for unlink, rename and set_path_size operations for a client. As
-> per MS-SMB2, lease keys are associated with the file name. Linux smb
-> client maintains lease keys with the inode. If the file has any hardlinks=
-,
-> it is possible that the lease for a file be wrongly reused for an
-> operation on the hardlink or vice versa. In these cases, the mentioned
-> compound operations fail with STATUS_INVALID_PARAMETER.
-> This patch adds a fallback to the old mechanism of not sending any
-> lease with these compound operations if the request with lease key fails
-> with STATUS_INVALID_PARAMETER.
-> Resending the same request without lease key should not hurt any
-> functionality, but might impact performance especially in cases where
-> the error is not because of the usage of wrong lease key and we might
-> end up doing an extra roundtrip.
->
-> Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> ---
->  fs/smb/client/smb2inode.c | 41 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 38 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 69f3442c5b96..c0d099a9e1ee 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -154,6 +154,17 @@ static int smb2_compound_op(const unsigned int xid, =
-struct cifs_tcon *tcon,
->         }
->
->         /* if there is an existing lease, reuse it */
-> +
-> +       /*
-> +        * note: files with hardlinks cause unexpected behaviour. As per =
-MS-SMB2,
-> +        * lease keys are associated with the filepath. We are maintainin=
-g lease keys
-> +        * with the inode on the client. If the file has hardlinks, it is=
- possible
-> +        * that the lease for a file be reused for an operation on its ha=
-rdlink or
-> +        * vice versa.
-> +        * As a workaround, send request using an existing lease key and =
-if the server
-> +        * returns STATUS_INVALID_PARAMETER, which maps to EINVAL, send t=
-he request
-> +        * again without the lease.
-> +        */
->         if (dentry) {
->                 inode =3D d_inode(dentry);
->                 if (CIFS_I(inode)->lease_granted && server->ops->get_leas=
-e_key) {
-> @@ -867,11 +878,20 @@ int
->  smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *=
-name,
->             struct cifs_sb_info *cifs_sb, struct dentry *dentry)
->  {
-> -       return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OP=
-EN,
-> +       int rc =3D smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FIL=
-E_OPEN,
->                                 CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POI=
-NT,
->                                 ACL_NO_MODE, NULL,
->                                 &(int){SMB2_OP_DELETE}, 1,
->                                 NULL, NULL, NULL, dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_compound_op(xid, tcon, cifs_sb, name, DELETE,=
- FILE_OPEN,
-> +                               CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POI=
-NT,
-> +                               ACL_NO_MODE, NULL,
-> +                               &(int){SMB2_OP_DELETE}, 1,
-> +                               NULL, NULL, NULL, NULL);
-> +       }
-> +       return rc;
->  }
->
->  static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *=
-tcon,
-> @@ -912,8 +932,14 @@ int smb2_rename_path(const unsigned int xid,
->         drop_cached_dir_by_name(xid, tcon, from_name, cifs_sb);
->         cifs_get_writable_path(tcon, from_name, FIND_WR_WITH_DELETE, &cfi=
-le);
->
-> -       return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
-> +       int rc =3D smb2_set_path_attr(xid, tcon, from_name, to_name, cifs=
-_sb,
->                                   co, DELETE, SMB2_OP_RENAME, cfile, sour=
-ce_dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_set_path_attr(xid, tcon, from_name, to_name, =
-cifs_sb,
-> +                                 co, DELETE, SMB2_OP_RENAME, cfile, NULL=
-);
-> +       }
-> +       return rc;
->  }
->
->  int smb2_create_hardlink(const unsigned int xid,
-> @@ -942,11 +968,20 @@ smb2_set_path_size(const unsigned int xid, struct c=
-ifs_tcon *tcon,
->         in_iov.iov_base =3D &eof;
->         in_iov.iov_len =3D sizeof(eof);
->         cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
-> -       return smb2_compound_op(xid, tcon, cifs_sb, full_path,
-> +       int rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
->                                 FILE_WRITE_DATA, FILE_OPEN,
->                                 0, ACL_NO_MODE, &in_iov,
->                                 &(int){SMB2_OP_SET_EOF}, 1,
->                                 cfile, NULL, NULL, dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
-> +                               FILE_WRITE_DATA, FILE_OPEN,
-> +                               0, ACL_NO_MODE, &in_iov,
-> +                               &(int){SMB2_OP_SET_EOF}, 1,
-> +                               cfile, NULL, NULL, NULL);
-> +       }
-> +       return rc;
->  }
->
->  int
-> --
-> 2.39.2
->
+
+--=20
+Thanks,
+
+Steve
