@@ -1,280 +1,115 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [194.59.206.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4904067E61
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Feb 2024 08:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D93E679FE;
+	Fri,  9 Feb 2024 09:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.59.206.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707468675; cv=none; b=BRxxracpLaOITWRia/9KUSD+crUWijlLZXQ5uh1aaqw5ymfEqq3VcTaNczbQMVzUt6HzuLoMBm8aHj2jItLPy5VPEkLhpj8bDtXF9Ek6OXlwYJUR+MSpGrcMuuB8iwQr4kUkdTTwnaErhR99PxdWjJv/Hmxr4U+LTnGYDhHOuQo=
+	t=1707471738; cv=none; b=ISZrBkDKoKuH7LA8sxMsCeZn52/PejX43JDA9bd/x6ZBk0e1d6b+xGvVqApvmmmjaHWlyAF2xfQVlK4LzKJtp3CGbpFNYYxEnZnR/rudRt63I0kU86NSy5O8BRqHbjd5TaqwkYWYVPG8okG0+L1hxhNMluGW8FTwmgAniBJRHho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707468675; c=relaxed/simple;
-	bh=5kRNuoPL140t9BwjXIY+LDVJvq8k5b+JD/xF5dhKkuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lMVUG0P19Q2+1r3AAHl62rVgZyUvd3ZMFuzCxQVU2XGK0mE1Lsk3i4RqtI+tM8IaufJDtbdZ6ENvVk8WFs/dr+0783ZHYkVHs85YSOpLnB+qkCRokmZJn/GwRvmqgF1AEQrwxePfY78faFhsG4Far3Fwtpv1Z9IF8EhBI7O36x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=GU0fN4Hu; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1707471738; c=relaxed/simple;
+	bh=VpbPPD2abpD/atAVzzmAsiRhcyN5uyakVD9kGT25DM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X0KQ1rQGGeXK3ptZiaMnDifyZVYqKSLCJ/HrT1g2YE/a2DoFFQlE6OGvSvYGkAqjXFT3ac5GRsXz4LGQMROKuf3kEVy4JtMd2qdxIRST+o2n7n01vExJ4UjToKYv4KoctDUIrjqa8DIhG/QPso1TAifbS7bkNFQtcwpDPZ9N/Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de; spf=pass smtp.mailfrom=rd10.de; dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b=jpFo3RVz; arc=none smtp.client-ip=194.59.206.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rd10.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rd10.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="GU0fN4Hu"
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	dkim=pass (2048-bit key) header.d=rd10.de header.i=@rd10.de header.b="jpFo3RVz"
+Received: from relay02-mors.netcup.net (localhost [127.0.0.1])
+	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4TWTQh6rnlz42xT;
+	Fri,  9 Feb 2024 10:42:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rd10.de; s=key2;
+	t=1707471725; bh=VpbPPD2abpD/atAVzzmAsiRhcyN5uyakVD9kGT25DM4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jpFo3RVz03t+mf4FQsAqZyZCLFr4Dh8llvo3/zRq4OZSK7LkRpBoQ9rQ6Fj+HbLB8
+	 sNswweQF4rqQODV6CUv/tQn135LdM77DFWQEURLtNm7eMYz5frxc91VGuk3xXP+eOw
+	 kQVTJJdRHqcm7MnPcrb/G1y17sUYWIo6hw+9beohbcyZdHyAoxD6M9jT72Dlt1ZDED
+	 xZSyflNjTx1SNuTi3bNg4EUgR861cgRS0drRvkr5n6cCyLCbH43RhsOqmW1k6k+6cP
+	 kHZLUPwHcuD0Ow2JvUce6eH6f3/orcnk/qKy0AcZOIIWbLK0EV9HQ5DUXr4nBVU2eM
+	 fC/d7HlG/vxpA==
+Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
+	by relay02-mors.netcup.net (Postfix) with ESMTPS id 4TWTQh6TBLz7wVm;
+	Fri,  9 Feb 2024 10:42:04 +0100 (CET)
+Received: from mx2eb1.netcup.net (unknown [10.243.12.53])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id F0EBD3F5D9
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Feb 2024 08:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1707468664;
-	bh=ZOis+6PIXMFRF8sRW0y0YYjqTXkkGX9bSDbpA1lDxl4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=GU0fN4HuqFbpUH4UW38OszXuM79pOPXBNn0fbxfw4KA1XSaFthp/MnXX6hiHbf/SB
-	 NXNov2rOrbKY8OibqlD5HIfbiT0wCGl8mVeADx2J7+gDJGmlA65pj58tKlx2u9nKzz
-	 9uvzUwnjx+K2TBAj6hFzxHVxF0nHTZtBwMFZOc6lRJY1CAfpBE2zoVlHCdy75wEoTD
-	 0O/2WuOQRLJG5AFRUjy6jeljNnOgxItMNeKrqzdyrSuIXVM/870rqp/JL+UPliFbhz
-	 /jLAoMpXqZ+fWARP1NxgOy8muAqM+mPwtPKF907uhw+v5OJGgOVJObZxGBdUIkZrAK
-	 q3P4/l9ItGk8g==
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2967b607cb1so647900a91.3
-        for <linux-cifs@vger.kernel.org>; Fri, 09 Feb 2024 00:51:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707468662; x=1708073462;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOis+6PIXMFRF8sRW0y0YYjqTXkkGX9bSDbpA1lDxl4=;
-        b=sDvI3r4eKJoP6g1q6Y+fFsSJ65Pbme69gaKS+LsHbqheOLe75COTKQgW5Ow1ZG84zL
-         JYewR/+m7hs0IeIQVGKr11npDqswjW8dp854EQpdiBCXkcm4ERu276w3A96Mg+EShcSq
-         btx4pEFeukT+j74pReuZ+d7DEjsOHStYvLMi77Y26JfCelkdmYKnqEwcxeP6VEKiC+OK
-         /hv9FuIYhq2QruDClaXZPD2Oy0AGqoT5X+GXzeRBzWmDXlsS5fAx19k4I3vsKMEjslXK
-         Ct6lgJIvfInZSafd9m+gX2C7WtIFOw/iBei6s1c/oj6v98Zi2U9K/E3ykIF5rHbjPhvW
-         h35w==
-X-Gm-Message-State: AOJu0YxlRymlEsbdKTFUgfmZwm/PAtnWFNiQSydLj4Cu03Vd61DTqdMQ
-	+pExVbE+6MP8lqxvQ/2beHWj3TeX62M7LJNWcZu32Y0Lc4pKKQfm20OamJNo9VuLUF4YHLElyJP
-	fkhwzPofZ/YPmUD8+9tfta/3cKYzAqUJM1wX32lhK8ZuIaSTHp+Qa7X1M+lZ63uXuHuvyBKAzyF
-	V3WhHwG+OL01+ir/8ruhNzYfV1kJShhxVmUuvC6rbfZYkYYepQ8g==
-X-Received: by 2002:a17:90a:948a:b0:295:cb78:a6f7 with SMTP id s10-20020a17090a948a00b00295cb78a6f7mr809770pjo.8.1707468662376;
-        Fri, 09 Feb 2024 00:51:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEbHy2HAJgClKagQGxo7+nvyFeVCiFVJ5Y0z8TK2IFp0uR4VNs/y3U/7Hxetr/yKuWyhlQBQ4YWl+3d69HeXgs=
-X-Received: by 2002:a17:90a:948a:b0:295:cb78:a6f7 with SMTP id
- s10-20020a17090a948a00b00295cb78a6f7mr809761pjo.8.1707468662087; Fri, 09 Feb
- 2024 00:51:02 -0800 (PST)
+	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4TWTQg2mFpz8sbF;
+	Fri,  9 Feb 2024 10:42:03 +0100 (CET)
+Received: from [IPV6:2003:cf:cf12:7800:df32:47f6:a74f:aa6f] (p200300cfcf127800df3247f6a74faa6f.dip0.t-ipconnect.de [IPv6:2003:cf:cf12:7800:df32:47f6:a74f:aa6f])
+	by mx2eb1.netcup.net (Postfix) with ESMTPSA id 9D8E41016DF;
+	Fri,  9 Feb 2024 10:41:58 +0100 (CET)
+Authentication-Results: mx2eb1;
+        spf=pass (sender IP is 2003:cf:cf12:7800:df32:47f6:a74f:aa6f) smtp.mailfrom=rdiez-2006@rd10.de smtp.helo=[IPV6:2003:cf:cf12:7800:df32:47f6:a74f:aa6f]
+Received-SPF: pass (mx2eb1: connection is authenticated)
+Message-ID: <617c148c-4a18-49b4-974a-18f1f500358e@rd10.de>
+Date: Fri, 9 Feb 2024 10:41:58 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
- <20240207034117.20714-1-matthew.ruffell@canonical.com> <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
+Content-Language: en-GB, es
+To: Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Steve French <smfrench@gmail.com>
+References: 
+ <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
+ <20240207034117.20714-1-matthew.ruffell@canonical.com>
+ <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
  <CAH2r5msJ12ShH+ZUOeEg3OZaJ-OJ53-mCHONftmec7FNm3znWQ@mail.gmail.com>
  <CAH2r5muiod=thF6tnSrgd_LEUCdqy03a2Ln1RU40OMETqt2Z_A@mail.gmail.com>
  <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com>
- <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com> <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com>
-In-Reply-To: <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com>
-From: Matthew Ruffell <matthew.ruffell@canonical.com>
-Date: Fri, 9 Feb 2024 21:50:50 +1300
-Message-ID: <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
-To: Steve French <smfrench@gmail.com>
-Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CAKAwkKuJvFDFG7=bCYmj0jdMMhYTLUnyGDuEAubToctbNqT5CQ@mail.gmail.com>
+ <CAH2r5mt9gPhUSka56yk28+nksw7=LPuS4VAMzGQyJEOfcpOc=g@mail.gmail.com>
+ <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
+From: "R. Diez" <rdiez-2006@rd10.de>
+In-Reply-To: 
+ <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <170747171908.17604.5646654263356021088@mx2eb1.netcup.net>
+X-Rspamd-Queue-Id: 9D8E41016DF
+X-Rspamd-Server: rspamd-worker-8404
+X-NC-CID: CT6WUtMWv2WOJl+6yF1RJndA/4CnXC/crGMNg0fY
 
-Hi Steve,
+Hallo Matthew:
 
-Yes, I am specifying "wsize" on the mount in my example, as its a little ea=
-sier
-to reproduce the issue that way.
+> [...]
+> If the user does set their own "wsize", any value that is not a multiple of
+> PAGE_SIZE is dangerous right? Shouldn't we prevent the user from corrupting
+> their data (un)intentionally if they happen to specify a wrong value?
 
-If the user does set their own "wsize", any value that is not a multiple of
-PAGE_SIZE is dangerous right? Shouldn't we prevent the user from corrupting
-their data (un)intentionally if they happen to specify a wrong value? Espec=
-ially
-since we know about it now. I know there haven't been any other reports in =
-the
-year or so between 6.3 and present day, so there probably isn't any users o=
-ut
-there actually setting their own "wsize", but it still feels bad to allow u=
-sers
-to expose themselves to data corruption in this form.
+I already pointed that out in my e-mail dated 07.02.24 together with other potential issues:
 
-Please consider also rounding down "wsize" set on mount command line to a s=
-afe
-multiple of PAGE_SIZE. The code will only be around until David's netfslib =
-cut
-over is merged anyway.
+https://www.spinics.net/lists/linux-cifs/msg30973.html
 
-I built a distro kernel and sent it to R. Diez for testing, so hopefully we=
- will
-have some testing performed against an actual SMB server that sends a dange=
-rous
-wsize during negotiation. I'll let you know how that goes, or R. Diez, you =
-can
-tell us about how it goes here.
+I'll recap here:
 
-Thanks,
-Matthew
+1) If the user specifies a wsize which is not multiple of PAGE_SIZE, I would abort, instead of issuing a warning. Like you said, it's too risky, you will corrupt data and you may not see the warning in an automated environment where connections are scripted.
 
-On Fri, 9 Feb 2024 at 18:38, Steve French <smfrench@gmail.com> wrote:
->
-> Are you specifying "wsize" on the mount in your example?  The intent
-> of the patch is to warn the user using a non-recommended wsize (since
-> the user can control and fix that) but to force round_down when the
-> server sends a dangerous wsize (ie one that is not a multiple of
-> 4096).
->
-> On Thu, Feb 8, 2024 at 3:31=E2=80=AFAM Matthew Ruffell
-> <matthew.ruffell@canonical.com> wrote:
-> >
-> > Hi Steve,
-> >
-> > I built your latest patch ontop of 6.8-rc3, but the problem still persi=
-sts.
-> >
-> > Looking at dmesg, I see the debug statement from the second hunk, but n=
-ot from
-> > the first hunk, so I don't believe that wsize was ever rounded down to
-> > PAGE_SIZE.
-> >
-> > [  541.918267] Use of the less secure dialect vers=3D1.0 is not
-> > recommended unless required for access to very old servers
-> > [  541.920913] CIFS: VFS: Use of the less secure dialect vers=3D1.0 is
-> > not recommended unless required for access to very old servers
-> > [  541.923533] CIFS: VFS: wsize should be a multiple of 4096 (PAGE_SIZE=
-)
-> > [  541.924755] CIFS: Attempting to mount //192.168.122.172/sambashare
-> >
-> > $ sha256sum sambashare/testdata.txt
-> > 9e573a0aa795f9cd4de4ac684a1c056dbc7d2ba5494d02e71b6225ff5f0fd866
-> > sambashare/testdata.txt
-> > $ less sambashare/testdata.txt
-> > ...
-> > 8dc8da96f7e5de0f312a2dbcc3c5c6facbfcc2fc206e29283274582ec93daa2a1496ca8=
-edd49e3c1
-> > 6b^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^=
-@^@^@^@^@^
-> > ...
-> >
-> > Would you be able compile and test your patch and see if we enter the l=
-ogic from
-> > the first hunk?
-> >
-> > I'll be happy to test a V2 tomorrow.
-> >
-> > Thanks,
-> > Matthew
-> >
-> > On Thu, 8 Feb 2024 at 03:50, Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > I had attached the wrong file - reattaching the correct patch (ie tha=
-t
-> > > updates the previous version to use PAGE_SIZE instead of 4096)
-> > >
-> > > On Wed, Feb 7, 2024 at 1:12=E2=80=AFAM Steve French <smfrench@gmail.c=
-om> wrote:
-> > > >
-> > > > Updated patch - now use PAGE_SIZE instead of hard coding to 4096.
-> > > >
-> > > > See attached
-> > > >
-> > > > On Tue, Feb 6, 2024 at 11:32=E2=80=AFPM Steve French <smfrench@gmai=
-l.com> wrote:
-> > > > >
-> > > > > Attached updated patch which also adds check to make sure max wri=
-te
-> > > > > size is at least 4K
-> > > > >
-> > > > > On Tue, Feb 6, 2024 at 10:58=E2=80=AFPM Steve French <smfrench@gm=
-ail.com> wrote:
-> > > > > >
-> > > > > > > his netfslib work looks like quite a big refactor. Is there a=
-ny plans to land this in 6.8? Or will this be 6.9 / later?
-> > > > > >
-> > > > > > I don't object to putting them in 6.8 if there was additional r=
-eview
-> > > > > > (it is quite large), but I expect there would be pushback, and =
-am
-> > > > > > concerned that David's status update did still show some TODOs =
-for
-> > > > > > that patch series.  I do plan to upload his most recent set to
-> > > > > > cifs-2.6.git for-next later in the week and target would be for
-> > > > > > merging the patch series would be 6.9-rc1 unless major issues w=
-ere
-> > > > > > found in review or testing
-> > > > > >
-> > > > > > On Tue, Feb 6, 2024 at 9:42=E2=80=AFPM Matthew Ruffell
-> > > > > > <matthew.ruffell@canonical.com> wrote:
-> > > > > > >
-> > > > > > > I have bisected the issue, and found the commit that introduc=
-es the problem:
-> > > > > > >
-> > > > > > > commit d08089f649a0cfb2099c8551ac47eef0cc23fdf2
-> > > > > > > Author: David Howells <dhowells@redhat.com>
-> > > > > > > Date:   Mon Jan 24 21:13:24 2022 +0000
-> > > > > > > Subject: cifs: Change the I/O paths to use an iterator rather=
- than a page list
-> > > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvald=
-s/linux.git/commit/?id=3Dd08089f649a0cfb2099c8551ac47eef0cc23fdf2
-> > > > > > >
-> > > > > > > $ git describe --contains d08089f649a0cfb2099c8551ac47eef0cc2=
-3fdf2
-> > > > > > > v6.3-rc1~136^2~7
-> > > > > > >
-> > > > > > > David, I also tried your cifs-netfs tree available here:
-> > > > > > >
-> > > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linu=
-x-fs.git/log/?h=3Dcifs-netfs
-> > > > > > >
-> > > > > > > This tree solves the issue. Specifically:
-> > > > > > >
-> > > > > > > commit 34efb2a814f1882ddb4a518c2e8a54db119fd0d8
-> > > > > > > Author: David Howells <dhowells@redhat.com>
-> > > > > > > Date:   Fri Oct 6 18:29:59 2023 +0100
-> > > > > > > Subject: cifs: Cut over to using netfslib
-> > > > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowell=
-s/linux-fs.git/commit/?h=3Dcifs-netfs&id=3D34efb2a814f1882ddb4a518c2e8a54db=
-119fd0d8
-> > > > > > >
-> > > > > > > This netfslib work looks like quite a big refactor. Is there =
-any plans to land this in 6.8? Or will this be 6.9 / later?
-> > > > > > >
-> > > > > > > Do you have any suggestions on how to fix this with a smaller=
- delta in 6.3 -> 6.8-rc3 that the stable kernels can use?
-> > > > > > >
-> > > > > > > Thanks,
-> > > > > > > Matthew
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Thanks,
-> > > > > >
-> > > > > > Steve
-> > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Thanks,
-> > > > >
-> > > > > Steve
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+2) Whether error or warning, I would state in the message that this is a temporary limitation. This "fix", which is more of a work-around, will probably be used for years, and people are going to think that the multiple of PAGE_SIZE is a permanent limitation in the client or the SMB protocol, which is not the case.
+
+3) I am worried that, if the server states 60 KiB, and the CIFS client rounds it up to 64 KiB, then the connection will no longer work, because the CIFS client is exceeding the maximum that the server stated.
+
+I wouldn't warn, I would just abort the connection in this case too.
+
+With an old Windows Server and a page size of 64 KiB (like some ARM architecture already has), it is no longer an unlikely scenario, it will certainly occur. In my case, the connection negotiated a wsize of 16580, even though the server should actually default to 16644 bytes(?). In any case, well below 64 KiB.
+
+
+Now that I mentioned misleading messages: The man page for mount.cifs, parameters rsize and wsize, talks about "maximum amount of data the kernel will request", and about the "maximum size that servers will accept". It is not clear that this is a maximum value for the negotiation phase, so 1) you do not have to worry about setting it too high on the Linux client, as the server will not reject it but negotiate it down if necessary (is that true?), and 2) the negotiation result may actually be much lower than the value you requested, but that is fine, as it wasn't really a hard request, but a soft petition.
+
+I suggest that you guys rephrase that man page, in order to prevent other people scratching their heads again.
+
+I would write something along this line: "Maximum amount of data that the kernel will negotiate for read [or write] requests in bytes. Maximum size that servers will negotiate is typically ...".
+
+By the way, the current option naming is quite misleading too. I am guessing that you can specify "wsize=xxx" and then "mount -l" will show "wsize=yyy", leaving you wondering why your value was not actually taken. Or, like it happened this time, other people automatically assume that I specified a wsize, when I didn't. I would have called these parameters "maxwsize" and "negotiatedwsize", to make the distinction clear. I wonder if it is not too late to change the name of the one listed by "mount -l", that is, the "negotiatedwsize".
+
+Regards,
+   rdiez
+
