@@ -1,268 +1,553 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715D756458;
-	Thu,  8 Feb 2024 23:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A6557310
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Feb 2024 05:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707434762; cv=none; b=Tpw8BCGEgZ0IN+QR2Y4W8+MdlJvYLeCt7zxDUGXWb/joVHBsuFrYisGr3aWQG50dUuS+F3H9Ng7MIi0Kad+BXIuXt0BzhlWJp9hlCZ9SYhbhxHIfc0a6Xa/p8WB5ygLFDhI7VDeWd/JzB+Ye/fa9sgy7n/pwonKoka98GTam5BI=
+	t=1707456402; cv=none; b=boBQJSr4jKLqyoG9xKcfhCmdUkFNDXpo2ewkQcY7c314Fhq7lnA5WXMNUsPPt7hmoJgYfOD5OMVmYFU/eUWUdfY7UNZsQOwPQJ0wTbFaFoHiyLNwzXjslWXtTYJNakIgKR8nG/bzWMAL9RRwy/04/O4+5ixAKtPfRl6bBqhirmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707434762; c=relaxed/simple;
-	bh=ltOS/Js3Dm6l4sxheTCRdreloaB158cvUG64Xz6J9dk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h9hO8FmxFbEDZl5t6Mihzl8NhjV1JQWMADfAroaIc/oWHlyPiIo1VzU5aPWKCJJorh7rfgCCpWB+YmKxiVbaT7x8t4HO286GCRWrMrLBYUupEhdpXIeQqDma7zaITewkWZfMKTMdbXdehuvRzmTwxdloIm1+/sw0xRXhuXbOz+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IU0zvL5z; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1707456402; c=relaxed/simple;
+	bh=NIxxNckcwnBcJ0gxR0Eo1Efye/vIzvTp2RwDo2/wb8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T/BVWC3UFCxUicT+IMFy5sS2Z+MHWmxVpMRfTjkio8sdZTtL632itnSglcR6rbJsw0WpeuX46Zh7zPfZaAUuzS1AK0u8Fq3M0xrU7xIK5Qt32Z5oOBqcSAexzjq5RpGWRiQDIn0E7KAbnMBWTvDrRO7OJ8hvjAgSCSjdjYL6JRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HJp/KYdl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IU0zvL5z"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-511689cc22aso577614e87.0;
-        Thu, 08 Feb 2024 15:26:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707434758; x=1708039558; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ijliBSIb+fWqPQdA69fOELGAiVQKN7CFVcarJ41DoRw=;
-        b=IU0zvL5zqaBRb2LW/Xmxuka+CP6zBReH13Xc7+VHTu1Q0soDot2eFr6Ffkfuh3C2Ik
-         hoh4IBK+cW8r0frsuwi1PoMmTVAxdM3lVbhaiFXifN7rrcblec9CZIHz7FalNjZd0Q0Z
-         cabw9RNAvJagtVUoLdstbSOYLz0qlpOpKLGFtashEvwyHocktvz8v0M8m6P63v9sFUIp
-         E3RF+ZLLuvrYZMKZqXxmO9JhojAo1C9x2Rguij+NWbglartSBGT268ZdSsYNALN5PYgu
-         T8c7sH3tEBqtVU6uKPFo+ut2Gt/YL8HKnNXO7fFREtqS4h/f8hBDNeI/lpUFqgPNi6Yw
-         ZLEQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJp/KYdl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707456398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9sZmsEH9nDLpQQFRF72pno9wjk/CvQL3KOnQrVwpe5g=;
+	b=HJp/KYdlP7e3GbcYxCtjhES6pMSDPPXZwCmzWlD1TpdMh8zExHfTUeQ3W7DWCvrI6DgQV/
+	YH3NQumZVnADEfIjvHVEJFe4Sa7veUD0is5QZY30goPMHXJLiImKC3TLdMR4g1Kst7YEAb
+	B/G7uZOgJceX+8RlDp4EttrTB+fseSQ=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-vmhBMTdzNuGVpvJ-N3g-dQ-1; Fri, 09 Feb 2024 00:26:37 -0500
+X-MC-Unique: vmhBMTdzNuGVpvJ-N3g-dQ-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5dc148f91faso624129a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Feb 2024 21:26:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707434758; x=1708039558;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ijliBSIb+fWqPQdA69fOELGAiVQKN7CFVcarJ41DoRw=;
-        b=cZlKUkfRtTMzq3RDgFbk5nUpZz+n3RBAwQV7XUQfSxN4xrOiyb5HBTls4rEwl750VP
-         Hv5KkHkQ72fmEuH7KTfC8E+82ztFcQPJmojzS5TwHlTxatlkEjhlY0ECOpTj83FtoCwZ
-         tJ4Mc2keII+0641gFoPXUTd5vs7vE/p9a1JogyDypALdCcthia9b7TMMWkrC7nAuGayz
-         iUq1dXBjhmkyV5qjxfkaNZ7yKkOWYRwybr5RYw2cJUOFgBI18KeLXTA6s/JiePHdb8Km
-         3TxtZpBxwh+ZAB7ltJtGaJJmF1/ZGgkVY1gG7bcdRAVQA4/ft6qNd8GvxznQ3LRAvEpG
-         4OWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXg4SokhEC4QvuNQbAX9UBD0tlrPbtJZF9TZhAUuL5cO8jXVr+s63UVI6OOechhmQEZ7aZgHv3sepLIEEU+qbyIeQkWKDuqvfs+HNx407CkdHkn3tFBYyGxS+Ly+yCYT1F3MpWbi345peM=
-X-Gm-Message-State: AOJu0YyOjvgd4sGYzjucXWwUlD2zfg/ROsMydlwBtRjOo3xc5zZCp6gl
-	hF1ljzxeJne8amU/x2MIUi1aocKZGRh1ZBaQMjtShlodejQQBuEb3Ll094sFHYFy9xDuZW5/WRs
-	LcPo81bwppYsmHs43UJfNsHUF228=
-X-Google-Smtp-Source: AGHT+IFZvm6/IEtLrKWwT7b8HLfBb9pgpb2VK/+4B/qJTJEnIkJ68GYUmI9B0SgHpzFJg7bn+ds7pwLUUBIrhUvt/HE=
-X-Received: by 2002:a05:6512:3ac:b0:511:48ab:2f9c with SMTP id
- v12-20020a05651203ac00b0051148ab2f9cmr370135lfp.42.1707434758096; Thu, 08 Feb
- 2024 15:25:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707456396; x=1708061196;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9sZmsEH9nDLpQQFRF72pno9wjk/CvQL3KOnQrVwpe5g=;
+        b=j7UY6/KvE24tqd7CduhU7rP0ZYoel5S5mrttzLEXPRJPYsKKXA8luniXNAImn1bT83
+         3jsdWheNj2/FV4ovi0koejIiTaCrJS3+UwPOFJcV6fLCmiE83USZZ9wQA9Bb0kDMRx8w
+         YNqVMvZxGxF1PXkqRGz5CFtqnCw0FUYLUr1VGOXhX+KBG79j/bwvUydXobHmUfvNhCYc
+         loy2bZlnzzgEk1A0hv6MYC/znSQxSbMuSkabI0k5CnLzQe4qOj0OxFfa3nc5rcZmajh+
+         TdfadR3VtlpQuqpvB4LQg97SmOJIqYveuctlU7MK/zG7lT83zNxVoeOLv4NO0zYfLu/L
+         AsTw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6sPvV2at8NTPK3hZ3bc02zjQZNfeXBgYY8aYGpK42KzO0aPAJboir7n4BIf+mFc1xS+rDqkyq11gSJBhbfRwIZHL/YZgaXgRmdA==
+X-Gm-Message-State: AOJu0Yxn67YaVuLic+QEhRm87AqwhPgbxilMnNKAarc7jETKrmapPIeI
+	mEBUp+fYgNres+YjRAR8uQndqQ6BmsO7Qd2nUoZF6RCQo4fzUBMjJlAzl4DSIGQI6XGZ0t7WD3l
+	B2lXAWxSv2FdUEoeu5LZMxHN7rzNxLRtT34tgKPqfScZ91rx1DsFXhcmcGB4=
+X-Received: by 2002:a05:6a21:2d06:b0:19e:39d4:284c with SMTP id tw6-20020a056a212d0600b0019e39d4284cmr852893pzb.29.1707456396320;
+        Thu, 08 Feb 2024 21:26:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXBoNmxlbfze/fTiODXnCpjixOiH7l8HMLMjbJ9o3gsgtrJcA1upDbs3fuEfcgTRFIFL8Euw==
+X-Received: by 2002:a05:6a21:2d06:b0:19e:39d4:284c with SMTP id tw6-20020a056a212d0600b0019e39d4284cmr852882pzb.29.1707456395949;
+        Thu, 08 Feb 2024 21:26:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUP8WytfG0iSiMJE1rFaS6ZEIJrjrdSx38gJ9DRoYa6epYXNIgOi7RVthqsOklEc9Rq3wcJMWD1HHlRYmc/8TKEn1AR6iqzt7vM2pafWkHbXdyU2rmzfhlnxSdr3IllZoDaEIpkT9ptqqemiXljHmOcPpF4cw==
+Received: from dell-per750-06-vm-08.rhts.eng.pek2.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170902758500b001d8f2438298sm653223pll.269.2024.02.08.21.26.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 21:26:35 -0800 (PST)
+Date: Fri, 9 Feb 2024 13:26:31 +0800
+From: Zorro Lang <zlang@redhat.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: fstests@vger.kernel.org, gfs2@lists.linux.dev, jlayton@kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: [PATCHv2] generic: add fcntl corner cases tests
+Message-ID: <20240209052631.wfbjveicfosubwns@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+References: <20230925201827.1703857-1-aahringo@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
- <20240207034117.20714-1-matthew.ruffell@canonical.com> <CAH2r5mu04KHQV3wynaBSrwkptSE_0ARq5YU1aGt7hmZkdsVsng@mail.gmail.com>
- <CAH2r5msJ12ShH+ZUOeEg3OZaJ-OJ53-mCHONftmec7FNm3znWQ@mail.gmail.com>
- <CAH2r5muiod=thF6tnSrgd_LEUCdqy03a2Ln1RU40OMETqt2Z_A@mail.gmail.com> <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvzyxP7vHQVcT6ieP4NmXDAz2UqTT7G4yrxcVObkV_3YQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 8 Feb 2024 17:25:46 -0600
-Message-ID: <CAH2r5msRy_KB95yyqrRbTmcaL-5Y_Wh+zD8KYfu+mtroO1d2UQ@mail.gmail.com>
-Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
-To: Matthew Ruffell <matthew.ruffell@canonical.com>
-Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Matthew Wilcox <willy@infradead.org>, 
-	Shyam Prasad N <nspmangalore@gmail.com>
-Content-Type: multipart/mixed; boundary="0000000000003be0dc0610e7223f"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230925201827.1703857-1-aahringo@redhat.com>
 
---0000000000003be0dc0610e7223f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 25, 2023 at 04:18:27PM -0400, Alexander Aring wrote:
+> This patch adds fcntl corner cases that was being used to confirm issues
+> on a GFS2 filesystem. The GFS2 filesystem has it's own ->lock()
+> implementation and in those corner cases issues was being found and
+> fixed.
+> 
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
 
-Minor update to patch following suggestion by Shyam - more accurately
-state the PAGE_SIZE in the debug message from:
+Hi Alexander,
 
-   cifs_dbg(VFS, "wsize should be a multiple of 4096 (PAGE_SIZE)\n");
+This test case directly hang on CIFS testing. Actually it's not a
+real hang, the fcntl_lock_corner_tests process can be killed, but
+before killing it manually, it was blocked there.
 
-to
+Please check if it's a case issue or cifs bug, or it's not suitable
+for cifs? I'll try to delay this patch merging to next release,
+leave some time to have a discission. CC cifs list to get more
+reviewing.
 
-   cifs_dbg(VFS, "wsize should be a multiple of %ld (PAGE_SIZE)\n", PAGE_SI=
-ZE);
-
-On Wed, Feb 7, 2024 at 8:50=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
-ote:
->
-> I had attached the wrong file - reattaching the correct patch (ie that
-> updates the previous version to use PAGE_SIZE instead of 4096)
->
-> On Wed, Feb 7, 2024 at 1:12=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
-> >
-> > Updated patch - now use PAGE_SIZE instead of hard coding to 4096.
-> >
-> > See attached
-> >
-> > On Tue, Feb 6, 2024 at 11:32=E2=80=AFPM Steve French <smfrench@gmail.co=
-m> wrote:
-> > >
-> > > Attached updated patch which also adds check to make sure max write
-> > > size is at least 4K
-> > >
-> > > On Tue, Feb 6, 2024 at 10:58=E2=80=AFPM Steve French <smfrench@gmail.=
-com> wrote:
-> > > >
-> > > > > his netfslib work looks like quite a big refactor. Is there any p=
-lans to land this in 6.8? Or will this be 6.9 / later?
-> > > >
-> > > > I don't object to putting them in 6.8 if there was additional revie=
-w
-> > > > (it is quite large), but I expect there would be pushback, and am
-> > > > concerned that David's status update did still show some TODOs for
-> > > > that patch series.  I do plan to upload his most recent set to
-> > > > cifs-2.6.git for-next later in the week and target would be for
-> > > > merging the patch series would be 6.9-rc1 unless major issues were
-> > > > found in review or testing
-> > > >
-> > > > On Tue, Feb 6, 2024 at 9:42=E2=80=AFPM Matthew Ruffell
-> > > > <matthew.ruffell@canonical.com> wrote:
-> > > > >
-> > > > > I have bisected the issue, and found the commit that introduces t=
-he problem:
-> > > > >
-> > > > > commit d08089f649a0cfb2099c8551ac47eef0cc23fdf2
-> > > > > Author: David Howells <dhowells@redhat.com>
-> > > > > Date:   Mon Jan 24 21:13:24 2022 +0000
-> > > > > Subject: cifs: Change the I/O paths to use an iterator rather tha=
-n a page list
-> > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/li=
-nux.git/commit/?id=3Dd08089f649a0cfb2099c8551ac47eef0cc23fdf2
-> > > > >
-> > > > > $ git describe --contains d08089f649a0cfb2099c8551ac47eef0cc23fdf=
-2
-> > > > > v6.3-rc1~136^2~7
-> > > > >
-> > > > > David, I also tried your cifs-netfs tree available here:
-> > > > >
-> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs=
-.git/log/?h=3Dcifs-netfs
-> > > > >
-> > > > > This tree solves the issue. Specifically:
-> > > > >
-> > > > > commit 34efb2a814f1882ddb4a518c2e8a54db119fd0d8
-> > > > > Author: David Howells <dhowells@redhat.com>
-> > > > > Date:   Fri Oct 6 18:29:59 2023 +0100
-> > > > > Subject: cifs: Cut over to using netfslib
-> > > > > Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/li=
-nux-fs.git/commit/?h=3Dcifs-netfs&id=3D34efb2a814f1882ddb4a518c2e8a54db119f=
-d0d8
-> > > > >
-> > > > > This netfslib work looks like quite a big refactor. Is there any =
-plans to land this in 6.8? Or will this be 6.9 / later?
-> > > > >
-> > > > > Do you have any suggestions on how to fix this with a smaller del=
-ta in 6.3 -> 6.8-rc3 that the stable kernels can use?
-> > > > >
-> > > > > Thanks,
-> > > > > Matthew
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
-
-
-
---=20
 Thanks,
+Zorro
 
-Steve
+FSTYP         -- cifs
+PLATFORM      -- Linux/ppc64le ibm-xxx-xxx-xxxx 6.8.0-rc3+ #1 SMP Wed Feb  7 01:38:35 EST 2024
+MKFS_OPTIONS  -- //xxx-xxx-xx-xxxx.xxxx.xxx.com/SCRATCH_dev
+MOUNT_OPTIONS -- -o vers=3.11,mfsymlinks,username=root,password=redhat -o context=system_u:object_r:root_t:s0 //xxx-xxx-xx-xxxx.xxxx.xxx.com/SCRATCH_dev /mnt/xfstests/scratch/cifs-client
 
---0000000000003be0dc0610e7223f
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb-Fix-regression-in-writes-when-non-standard-maxim.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb-Fix-regression-in-writes-when-non-standard-maxim.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lsduk1l70>
-X-Attachment-Id: f_lsduk1l70
+generic/740
+...
+...
 
-RnJvbSAxMGI3ZGFmMTQyN2Q2YmNlOGMwMWI4MzYxNzJlODk2ODlmZTBhZWNmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgNiBGZWIgMjAyNCAxNjozNDoyMiAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjogRml4IHJlZ3Jlc3Npb24gaW4gd3JpdGVzIHdoZW4gbm9uLXN0YW5kYXJkIG1heGltdW0gd3Jp
-dGUKIHNpemUgbmVnb3RpYXRlZAoKVGhlIGNvbnZlcnNpb24gdG8gbmV0ZnMgaW4gdGhlIDYuMyBr
-ZXJuZWwgY2F1c2VkIGEgcmVncmVzc2lvbiB3aGVuCm1heGltdW0gd3JpdGUgc2l6ZSBpcyBzZXQg
-YnkgdGhlIHNlcnZlciB0byBhbiB1bmV4cGVjdGVkIHZhbHVlIHdoaWNoIGlzCm5vdCBhIG11bHRp
-cGxlIG9mIDQwOTYgKHNpbWlsYXJseSBpZiB0aGUgdXNlciBvdmVycmlkZXMgdGhlIG1heGltdW0K
-d3JpdGUgc2l6ZSBieSBzZXR0aW5nIG1vdW50IHBhcm0gIndzaXplIiwgYnV0IHNldHMgaXQgdG8g
-YSB2YWx1ZSB0aGF0CmlzIG5vdCBhIG11bHRpcGxlIG9mIDQwOTYpLiAgV2hlbiBuZWdvdGlhdGVk
-IHdyaXRlIHNpemUgaXMgbm90IGEKbXVsdGlwbGUgb2YgNDA5NiB0aGUgbmV0ZnMgY29kZSBjYW4g
-c2tpcCB0aGUgZW5kIG9mIHRoZSBmaW5hbApwYWdlIHdoZW4gZG9pbmcgbGFyZ2Ugc2VxdWVudGlh
-bCB3cml0ZXMsIGNhdXNpbmcgZGF0YSBjb3JydXB0aW9uLgoKVGhpcyBzZWN0aW9uIG9mIGNvZGUg
-aXMgYmVpbmcgcmV3cml0dGVuL3JlbW92ZWQgZHVlIHRvIGEgbGFyZ2UKbmV0ZnMgY2hhbmdlLCBi
-dXQgdW50aWwgdGhhdCBwb2ludCAoaWUgZm9yIHRoZSA2LjMga2VybmVsIHVudGlsIG5vdykKd2Ug
-Y2FuIG5vdCBzdXBwb3J0IG5vbi1zdGFuZGFyZCBtYXhpbXVtIHdyaXRlIHNpemVzLgoKQWRkIGEg
-d2FybmluZyBpZiBhIHVzZXIgc3BlY2lmaWVzIGEgd3NpemUgb24gbW91bnQgdGhhdCBpcyBub3QK
-YSBtdWx0aXBsZSBvZiA0MDk2LCBhbmQgYWxzbyBhZGQgYSBjaGFuZ2Ugd2hlcmUgd2Ugcm91bmQg
-ZG93biB0aGUKbWF4aW11bSB3cml0ZSBzaXplIGlmIHRoZSBzZXJ2ZXIgbmVnb3RpYXRlcyBhIHZh
-bHVlIHRoYXQgaXMgbm90CmEgbXVsdGlwbGUgb2YgNDA5NiAod2UgYWxzbyBoYXZlIHRvIGNoZWNr
-IHRvIG1ha2Ugc3VyZSB0aGF0CndlIGRvIG5vdCByb3VuZCBpdCBkb3duIHRvIHplcm8pLgoKUmVw
-b3J0ZWQtYnk6IFIuIERpZXoiIDxyZGllei0yMDA2QHJkMTAuZGU+CkZpeGVzOiBkMDgwODlmNjQ5
-YTAgKCJjaWZzOiBDaGFuZ2UgdGhlIEkvTyBwYXRocyB0byB1c2UgYW4gaXRlcmF0b3IgcmF0aGVy
-IHRoYW4gYSBwYWdlIGxpc3QiKQpTdWdnZXN0ZWQtYnk6IFJvbm5pZSBTYWhsYmVyZyA8cm9ubmll
-c2FobGJlcmdAZ21haWwuY29tPgpBY2tlZC1ieTogUm9ubmllIFNhaGxiZXJnIDxyb25uaWVzYWhs
-YmVyZ0BnbWFpbC5jb20+ClJldmlld2VkLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNy
-b3NvZnQuY29tPgpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZyAjIHY2LjMrCkNjOiBEYXZpZCBI
-b3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2gg
-PHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9jb25uZWN0LmMgICAg
-fCAxMyArKysrKysrKysrKy0tCiBmcy9zbWIvY2xpZW50L2ZzX2NvbnRleHQuYyB8ICAyICsrCiAy
-IGZpbGVzIGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvZnMvc21iL2NsaWVudC9jb25uZWN0LmMgYi9mcy9zbWIvY2xpZW50L2Nvbm5lY3QuYwpp
-bmRleCBiZmQ1NjhmODk3MTAuLjc5Y2U0YTI5ZDFlZiAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVu
-dC9jb25uZWN0LmMKKysrIGIvZnMvc21iL2NsaWVudC9jb25uZWN0LmMKQEAgLTM0MzgsOCArMzQz
-OCwxNyBAQCBpbnQgY2lmc19tb3VudF9nZXRfdGNvbihzdHJ1Y3QgY2lmc19tb3VudF9jdHggKm1u
-dF9jdHgpCiAJICogdGhlIHVzZXIgb24gbW91bnQKIAkgKi8KIAlpZiAoKGNpZnNfc2ItPmN0eC0+
-d3NpemUgPT0gMCkgfHwKLQkgICAgKGNpZnNfc2ItPmN0eC0+d3NpemUgPiBzZXJ2ZXItPm9wcy0+
-bmVnb3RpYXRlX3dzaXplKHRjb24sIGN0eCkpKQotCQljaWZzX3NiLT5jdHgtPndzaXplID0gc2Vy
-dmVyLT5vcHMtPm5lZ290aWF0ZV93c2l6ZSh0Y29uLCBjdHgpOworCSAgICAoY2lmc19zYi0+Y3R4
-LT53c2l6ZSA+IHNlcnZlci0+b3BzLT5uZWdvdGlhdGVfd3NpemUodGNvbiwgY3R4KSkpIHsKKwkJ
-Y2lmc19zYi0+Y3R4LT53c2l6ZSA9IHJvdW5kX2Rvd24oc2VydmVyLT5vcHMtPm5lZ290aWF0ZV93
-c2l6ZSh0Y29uLCBjdHgpLCBQQUdFX1NJWkUpOworCQkvKgorCQkgKiBpbiB0aGUgdmVyeSB1bmxp
-a2VseSBldmVudCB0aGF0IHRoZSBzZXJ2ZXIgc2VudCBhIG1heCB3cml0ZSBzaXplIHVuZGVyIFBB
-R0VfU0laRSwKKwkJICogKHdoaWNoIHdvdWxkIGdldCByb3VuZGVkIGRvd24gdG8gMCkgdGhlbiBy
-ZXNldCB3c2l6ZSB0byBhYnNvbHV0ZSBtaW5pbXVtIGVnIDQwOTYKKwkJICovCisJCWlmIChjaWZz
-X3NiLT5jdHgtPndzaXplID09IDApIHsKKwkJCWNpZnNfc2ItPmN0eC0+d3NpemUgPSBQQUdFX1NJ
-WkU7CisJCQljaWZzX2RiZyhWRlMsICJ3c2l6ZSB0b28gc21hbGwsIHJlc2V0IHRvIG1pbmltdW0g
-aWUgUEFHRV9TSVpFLCB1c3VhbGx5IDQwOTZcbiIpOworCQl9CisJfQogCWlmICgoY2lmc19zYi0+
-Y3R4LT5yc2l6ZSA9PSAwKSB8fAogCSAgICAoY2lmc19zYi0+Y3R4LT5yc2l6ZSA+IHNlcnZlci0+
-b3BzLT5uZWdvdGlhdGVfcnNpemUodGNvbiwgY3R4KSkpCiAJCWNpZnNfc2ItPmN0eC0+cnNpemUg
-PSBzZXJ2ZXItPm9wcy0+bmVnb3RpYXRlX3JzaXplKHRjb24sIGN0eCk7CmRpZmYgLS1naXQgYS9m
-cy9zbWIvY2xpZW50L2ZzX2NvbnRleHQuYyBiL2ZzL3NtYi9jbGllbnQvZnNfY29udGV4dC5jCmlu
-ZGV4IDUyY2JlZjJlZWIyOC4uOGIwOTBmNzA5MTk0IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50
-L2ZzX2NvbnRleHQuYworKysgYi9mcy9zbWIvY2xpZW50L2ZzX2NvbnRleHQuYwpAQCAtMTExMSw2
-ICsxMTExLDggQEAgc3RhdGljIGludCBzbWIzX2ZzX2NvbnRleHRfcGFyc2VfcGFyYW0oc3RydWN0
-IGZzX2NvbnRleHQgKmZjLAogCWNhc2UgT3B0X3dzaXplOgogCQljdHgtPndzaXplID0gcmVzdWx0
-LnVpbnRfMzI7CiAJCWN0eC0+Z290X3dzaXplID0gdHJ1ZTsKKwkJaWYgKHJvdW5kX3VwKGN0eC0+
-d3NpemUsIFBBR0VfU0laRSkgIT0gY3R4LT53c2l6ZSkKKwkJCWNpZnNfZGJnKFZGUywgIndzaXpl
-IHNob3VsZCBiZSBhIG11bHRpcGxlIG9mICVsZCAoUEFHRV9TSVpFKVxuIiwgUEFHRV9TSVpFKTsK
-IAkJYnJlYWs7CiAJY2FzZSBPcHRfYWNyZWdtYXg6CiAJCWN0eC0+YWNyZWdtYXggPSBIWiAqIHJl
-c3VsdC51aW50XzMyOwotLSAKMi40MC4xCgo=
---0000000000003be0dc0610e7223f--
+# ps axu|grep fcntl
+root     1138909  0.0  0.0   5056     0 ?        S    Feb07   0:00 /var/lib/xfstests/src/fcntl_lock_corner_tests /mnt/xfstests/test/cifs-client/testfile
+root     1138910  0.0  0.0  21760     0 ?        Sl   Feb07   0:00 /var/lib/xfstests/src/fcntl_lock_corner_tests /mnt/xfstests/test/cifs-client/testfile
+# cat /proc/1138909/stack 
+[<0>] 0xc00000008d068a00
+[<0>] __switch_to+0x13c/0x228
+[<0>] do_wait+0x15c/0x224
+[<0>] kernel_wait4+0xb8/0x2c8
+[<0>] system_call_exception+0x134/0x390
+[<0>] system_call_vectored_common+0x15c/0x2ec
+# cat /proc/1138910/stack 
+[<0>] 0xc00000008de94400
+[<0>] __switch_to+0x13c/0x228
+[<0>] futex_wait_queue+0xa8/0x134
+[<0>] __futex_wait+0xb4/0x15c
+[<0>] futex_wait+0x94/0x150
+[<0>] do_futex+0xe8/0x374
+[<0>] sys_futex+0xa4/0x234
+[<0>] system_call_exception+0x134/0x390
+[<0>] system_call_vectored_common+0x15c/0x2ec
+
+# strace -p 1138909
+strace: Process 1138909 attached
+wait4(-1, 
+(nothing more output)
+strace: Process 1138909 detached
+^C <detached ...>
+# strace -p 1138910
+strace: Process 1138910 attached
+futex(0x7fff97a8f110, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, 1138912, NULL, FUTEX_BITSET_MATCH_ANY
+(nothing more output)
+^Cstrace: Process 1138910 detached
+ <detached ...>
+
+
+> changes since v2:
+> - move fcntl tests into one fcntl c file
+> - remove ofd and same owner tests, should be reflected by only one test
+> - simplify commit message (remove testname out of it)
+> - add error messages in fcntl.c to give more information if an error
+>   occur
+> 
+>  src/Makefile          |   3 +-
+>  src/fcntl.c           | 322 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/generic/732     |  32 +++++
+>  tests/generic/732.out |   2 +
+>  4 files changed, 358 insertions(+), 1 deletion(-)
+>  create mode 100644 src/fcntl.c
+>  create mode 100755 tests/generic/732
+>  create mode 100644 tests/generic/732.out
+> 
+> diff --git a/src/Makefile b/src/Makefile
+> index 2815f919..67f936d3 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -19,7 +19,8 @@ TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
+>  	t_ofd_locks t_mmap_collision mmap-write-concurrent \
+>  	t_get_file_time t_create_short_dirs t_create_long_dirs t_enospc \
+>  	t_mmap_writev_overlap checkpoint_journal mmap-rw-fault allocstale \
+> -	t_mmap_cow_memory_failure fake-dump-rootino dio-buf-fault rewinddir-test
+> +	t_mmap_cow_memory_failure fake-dump-rootino dio-buf-fault rewinddir-test \
+> +	fcntl
+>  
+>  LINUX_TARGETS = xfsctl bstat t_mtab getdevicesize preallo_rw_pattern_reader \
+>  	preallo_rw_pattern_writer ftrunc trunc fs_perms testx looptest \
+> diff --git a/src/fcntl.c b/src/fcntl.c
+> new file mode 100644
+> index 00000000..8e375357
+> --- /dev/null
+> +++ b/src/fcntl.c
+> @@ -0,0 +1,322 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/* Copyright (c) 2023 Alexander Aring.  All Rights Reserved.
+> + */
+> +
+> +#include <pthread.h>
+> +#include <unistd.h>
+> +#include <string.h>
+> +#include <limits.h>
+> +#include <stdlib.h>
+> +#include <errno.h>
+> +#include <fcntl.h>
+> +#include <stdio.h>
+> +#include <wait.h>
+> +
+> +static char filename[PATH_MAX + 1];
+> +static int fd;
+> +
+> +static void usage(char *name, const char *msg)
+> +{
+> +	printf("Fatal: %s\nUsage:\n"
+> +	       "%s <file for fcntl>\n", msg, name);
+> +	_exit(1);
+> +}
+> +
+> +static void *do_equal_file_lock_thread(void *arg)
+> +{
+> +       struct flock fl = {
+> +	       .l_type = F_WRLCK,
+> +	       .l_whence = SEEK_SET,
+> +	       .l_start = 0L,
+> +	       .l_len = 1L,
+> +       };
+> +       int rv;
+> +
+> +       rv = fcntl(fd, F_SETLKW, &fl);
+> +       if (rv == -1) {
+> +	       perror("fcntl");
+> +	       _exit(1);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void do_test_equal_file_lock(void)
+> +{
+> +	struct flock fl;
+> +	pthread_t t[2];
+> +	int pid, rv;
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0L;
+> +	fl.l_len = 1L;
+> +
+> +	/* acquire range 0-0 */
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +	       perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	pid = fork();
+> +	if (pid == 0) {
+> +		rv = pthread_create(&t[0], NULL, do_equal_file_lock_thread, NULL);
+> +		if (rv != 0) {
+> +			fprintf(stderr, "failed to create pthread\n");
+> +			_exit(1);
+> +		}
+> +
+> +		rv = pthread_create(&t[1], NULL, do_equal_file_lock_thread, NULL);
+> +		if (rv != 0) {
+> +			fprintf(stderr, "failed to create pthread\n");
+> +			_exit(1);
+> +		}
+> +
+> +		pthread_join(t[0], NULL);
+> +		pthread_join(t[1], NULL);
+> +
+> +		_exit(0);
+> +	}
+> +
+> +	/* wait until threads block on 0-0 */
+> +	sleep(3);
+> +
+> +	fl.l_type = F_UNLCK;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	sleep(3);
+> +
+> +	/* check if the ->lock() implementation got the
+> +	 * right locks granted because two waiter with the
+> +	 * same file_lock fields are waiting
+> +	 */
+> +	fl.l_type = F_WRLCK;
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1 && errno == EAGAIN) {
+> +		fprintf(stderr, "deadlock, pthread not cleaned up correctly\n");
+> +		_exit(1);
+> +	}
+> +
+> +	wait(NULL);
+> +}
+> +
+> +static void catch_alarm(int num) { }
+> +
+> +static void do_test_signal_interrupt_child(int *pfd)
+> +{
+> +	struct sigaction act;
+> +	unsigned char m;
+> +	struct flock fl;
+> +	int rv;
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 1;
+> +	fl.l_len = 1;
+> +
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	memset(&act, 0, sizeof(act));
+> +	act.sa_handler = catch_alarm;
+> +	sigemptyset(&act.sa_mask);
+> +	sigaddset(&act.sa_mask, SIGALRM);
+> +	sigaction(SIGALRM, &act, NULL);
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	/* interrupt SETLKW by signal in 3 secs */
+> +	alarm(3);
+> +	rv = fcntl(fd, F_SETLKW, &fl);
+> +	if (rv == 0) {
+> +		fprintf(stderr, "fcntl interrupt successful but should fail with EINTR\n");
+> +		_exit(1);
+> +	}
+> +
+> +	/* synchronize to move parent to test region 1-1 */
+> +	write(pfd[1], &m, sizeof(m));
+> +
+> +	/* keep child alive */
+> +	read(pfd[1], &m, sizeof(m));
+> +}
+> +
+> +static void do_test_signal_interrupt(void)
+> +{
+> +	struct flock fl;
+> +	unsigned char m;
+> +	int pid, rv;
+> +	int pfd[2];
+> +
+> +	rv = pipe(pfd);
+> +	if (rv == -1) {
+> +		perror("pipe");
+> +		_exit(1);
+> +	}
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	pid = fork();
+> +	if (pid == 0) {
+> +		do_test_signal_interrupt_child(pfd);
+> +		_exit(0);
+> +	}
+> +
+> +	/* wait until child writes */
+> +	read(pfd[0], &m, sizeof(m));
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 1;
+> +	fl.l_len = 1;
+> +	/* parent testing childs region, the child will think
+> +	 * it has region 1-1 locked because it was interrupted
+> +	 * by region 0-0. Due bugs the interruption also unlocked
+> +	 * region 1-1.
+> +	 */
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == 0) {
+> +		fprintf(stderr, "fcntl trylock successful but should fail because child still acquires region\n");
+> +		_exit(1);
+> +	}
+> +
+> +	write(pfd[0], &m, sizeof(m));
+> +
+> +	wait(NULL);
+> +
+> +	close(pfd[0]);
+> +	close(pfd[1]);
+> +
+> +	/* cleanup everything */
+> +	fl.l_type = F_UNLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 2;
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +}
+> +
+> +static void do_test_kill_child(void)
+> +{
+> +	struct flock fl;
+> +	int rv;
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	rv = fcntl(fd, F_SETLKW, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +}
+> +
+> +static void do_test_kill(void)
+> +{
+> +	struct flock fl;
+> +	int pid_to_kill;
+> +	int rv;
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	pid_to_kill = fork();
+> +	if (pid_to_kill == 0) {
+> +		do_test_kill_child();
+> +		_exit(0);
+> +	}
+> +
+> +	/* wait until child blocks */
+> +	sleep(3);
+> +
+> +	kill(pid_to_kill, SIGKILL);
+> +
+> +	/* wait until Linux did plock cleanup */
+> +	sleep(3);
+> +
+> +	fl.l_type = F_UNLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	/* cleanup parent lock */
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if (rv == -1) {
+> +		perror("fcntl");
+> +		_exit(1);
+> +	}
+> +
+> +	fl.l_type = F_WRLCK;
+> +	fl.l_whence = SEEK_SET;
+> +	fl.l_start = 0;
+> +	fl.l_len = 1;
+> +
+> +	/* check if the child still holds the lock
+> +	 * and killing the child was not cleaning
+> +	 * up locks.
+> +	 */
+> +	rv = fcntl(fd, F_SETLK, &fl);
+> +	if ((rv == -1 && errno == EAGAIN)) {
+> +		fprintf(stderr, "fcntl trylock failed but should be successful because killing child should cleanup acquired lock\n");
+> +		_exit(1);
+> +	}
+> +}
+> +
+> +int main(int argc, char * const argv[])
+> +{
+> +	if (optind != argc - 1)
+> +		usage(argv[0], "<file for fcntl> is mandatory to tell the file where to run fcntl() on it");
+> +
+> +	strncpy(filename, argv[1], PATH_MAX);
+> +
+> +	fd = open(filename, O_RDWR | O_CREAT, 0700);
+> +	if (fd == -1) {
+> +		perror("open");
+> +		_exit(1);
+> +	}
+> +
+> +	/* test to have to equal struct file_lock requests in ->lock() */
+> +	do_test_equal_file_lock();
+> +	/* test to interrupt F_SETLKW by a signal and cleanup only canceled the pending interrupted request */
+> +	do_test_signal_interrupt();
+> +	/* test if cleanup is correct if a child gets killed while being blocked in F_SETLKW */
+> +	do_test_kill();
+> +
+> +	close(fd);
+> +
+> +	return 0;
+> +}
+> diff --git a/tests/generic/732 b/tests/generic/732
+> new file mode 100755
+> index 00000000..d77f9fc2
+> --- /dev/null
+> +++ b/tests/generic/732
+> @@ -0,0 +1,32 @@
+> +#! /bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Copyright (c) 2023 Alexander Aring.  All Rights Reserved.
+> +#
+> +# FS QA Test 732
+> +#
+> +# This tests performs some fcntl() corner cases. See fcntl test
+> +# program for more details.
+> +#
+> +. ./common/preamble
+> +_begin_fstest auto
+> +
+> +# Import common functions.
+> +. ./common/filter
+> +
+> +# real QA test starts here
+> +
+> +# Modify as appropriate.
+> +_supported_fs generic
+> +_require_test
+> +_require_test_program fcntl
+> +
+> +echo "Silence is golden"
+> +
+> +$here/src/fcntl $TEST_DIR/testfile
+> +if [ $? -ne 0 ]
+> +then
+> +	exit
+> +fi
+> +
+> +status=0
+> +exit
+> diff --git a/tests/generic/732.out b/tests/generic/732.out
+> new file mode 100644
+> index 00000000..451f82ce
+> --- /dev/null
+> +++ b/tests/generic/732.out
+> @@ -0,0 +1,2 @@
+> +QA output created by 732
+> +Silence is golden
+> -- 
+> 2.31.1
+> 
+
