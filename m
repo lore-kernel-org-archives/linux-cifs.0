@@ -1,213 +1,118 @@
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1E046B3;
-	Sat, 10 Feb 2024 00:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B1146B7;
+	Sat, 10 Feb 2024 00:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707525198; cv=none; b=EVv9amN7po6R4SUYSqFXYh7A9olv1L9DuoCNdL0ZxDAd7TChFKh1wUays20BfOYdao40WvG78AzTdcDFr09A+g6QO6fTTGhnijgVF84CxSsvL+v62DEJ52GQ6hB8tiGwxo6YnIAVZG4IcRjAqh3a6hsA7L9dQEmIwNPkf614RLk=
+	t=1707525208; cv=none; b=lQleoQFAuh+zaJi/1ThgBNRyIROWyG+THe7TaAp5iX1z/owdPhvJhA/NZVfZuDj2fgXvgy+gO0oJ8hsSjMbAQ5pjxI9tqaGVK7Vtr5i7qU4U5kf1Na8yzyK9kIJapSaE7r19OL7fcP4QawonP1ElH0gbM1bkABYeuKMDo5TkZMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707525198; c=relaxed/simple;
-	bh=CSw8FLjbOKmeCyZoKciRVteX2Z7MbqpbK9QJvOVY2Uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XuFDFoLfC1uhQigTYyneP7k3VLlZDb9ClLyjXlJ5hx24lFo+gDx1lTvPWl22tzrTXKkBlmWYgPodEhdM5jvqmde9DEWeBk0KK8sm9q95crlFztAjuVyDYzxd31K9ggluRX+6O0bZfLGJw4gMRmz2dWjEmALBE7y5dlBK5bjPfDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 77CA072C8F5;
-	Sat, 10 Feb 2024 03:33:14 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id 6AA4D36D0246;
-	Sat, 10 Feb 2024 03:33:14 +0300 (MSK)
-Date: Sat, 10 Feb 2024 03:33:14 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
-Message-ID: <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
-References: <20230215000832.never.591-kees@kernel.org>
- <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
- <202402091559.52D7C2AC@keescook>
+	s=arc-20240116; t=1707525208; c=relaxed/simple;
+	bh=uPqddtDeveMUR9lDQdTvz4prZw9wnSAFOhZG+7wNXis=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IsCn3ghrjWqFFCUf7WjPt1lT/ZU4IyHETk22byD/xJwpzcNcLoMrLE2l9CQ5IHreijKk3wy1qe83IaCs25/rvayNlufnbnPuzyWjdH5bziX/yWkVO2k2nGbzwnaaiw+St8srFCJ0v2u9jZVHHu/9rwES8ZpDSIzNW7x/pHNKjbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PczHgql1; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PczHgql1"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d0aabed735so20075981fa.0;
+        Fri, 09 Feb 2024 16:33:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707525204; x=1708130004; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JVmXUIQ9UJWry6RwNVeR+t5g05HdWzy5ayEHtArp6E4=;
+        b=PczHgql1WYRP1W4YRkQU4PG9o9J9LMNKYeo5yZRZZFlFf5cJfS1NPpFYQ7l17Jl9cM
+         Y81ZIBpCLPoIPvBC0MBlN9KLiyHzu1Xu1Jb+yKIyJI9we+jK3axXe2sPyMZOLaPaPrfv
+         7JtLBxQT50ik98tYAw3Rp2Dl3HaD4Rzvd9DBgy4f7NlSQEfK4DIhz6kewqd/o7BiooM6
+         wy+HOAubTb7eZIPv2HIpZKUwNV5mITam/Uude4wgWjQOYfZOCeXXDenMASAqwM/jNt3p
+         f5C9SS024pOxjmtRx1aD2B8G6/UGZH8PWAjXCasuAsSGDYzlQFUOz8DWXV97AymSrGIY
+         jv+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707525204; x=1708130004;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JVmXUIQ9UJWry6RwNVeR+t5g05HdWzy5ayEHtArp6E4=;
+        b=UtkZl7x67IaSu2w4T15alDoIu0kf+32lBFi0Gu/o1OI6Dr66AsyhWvlYHpM4Bs2zKP
+         /SmCKJSdNz6Hn3MYptdd6PmaAENmasSeFo1Bn3gsr8xX1Z0wy5hnnsBLKGbSd/Tl8G97
+         mlacIaK1+2ijKGXb9BNxiduuf/ICcWvS11z7YXzi5Kw0QuTuZweaGgJcYoN0uG2DnfpF
+         4xlBE0V9mYtxhc+/wRnIIT0AmTXtMrWydalALY9dfa1OYbiGcZ/E/5u6pJ2W9Wd70pUS
+         m7XigWV9l+iBikrvWNfvEI3i+ld0r2QzJnJNiOKqvf39Vii8hauhOzupW5PjUh/6j/Xk
+         BKAA==
+X-Gm-Message-State: AOJu0Yx5nTR3thpUwxQq+m09t+i8ddGdP3NeoqklW6lnGoFTxcG64C+l
+	ZGev2frs76NIx0EAUop3Uak7l7YfFnamPs5DtYOXh50tcP4QbZv5oZh5paYZXye2mS5/Ulfwwks
+	qYyB1vy1aGmANV4AycYiHZCCj+NK5N4IcJg7U9w==
+X-Google-Smtp-Source: AGHT+IF9ChRIDCiwt+wUBQq1Qzk+lA3hp0qHKPg7z08bb8ffql0BiLWOn16JSc21/uv6xvd2ibr19W975hs89La7Jfk=
+X-Received: by 2002:a2e:9218:0:b0:2d0:c176:ebcc with SMTP id
+ k24-20020a2e9218000000b002d0c176ebccmr393297ljg.18.1707525203824; Fri, 09 Feb
+ 2024 16:33:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <202402091559.52D7C2AC@keescook>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 9 Feb 2024 18:33:12 -0600
+Message-ID: <CAH2r5ms4uMTJ0V-eLhFcrpQe8f-LYYr-PLp8ixGyXwaWzjxH7w@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Greg, Sasha,
+Please pull the following changes since commit
+54be6c6c5ae8e0d93a6c4641cb7528eb0b6ba478:
 
-Can you please backport this commit (below) to a stable 6.1.y tree, it's
-confirmed be Kees this could cause kernel panic due to false positive
-strncpy fortify, and this is already happened for some users.
+  Linux 6.8-rc3 (2024-02-04 12:20:36 +0000)
 
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.8-rc3-smb3-client-fixes
+
+for you to fetch changes up to a5cc98eba2592d6e3c5a4351319595ddde2a5901:
+
+  smb3: clarify mount warning (2024-02-09 14:43:27 -0600)
+
+----------------------------------------------------------------
+Five smb3 client fixes
+- reconnect fix
+- multichannel channel selection fix
+- minor mount warning fix
+- reparse point fix
+- null pointer check improvement
+
+I removed from this P/R the workaround fix for the netfs/folio data
+corruption bug (ie
+simple patch to force cifs max write size to be set to a multiple of
+PAGE_SIZE). This
+bug is important to address. Although the netfs changes targeted for
+6.9 fix this
+they have other problems - so lean toward waiting a week more to see if we can
+identify what in the folios code broke this before deciding whether to
+send you the
+workaround patch.
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      smb: client: set correct d_type for reparse points under DFS mounts
+
+Shyam Prasad N (2):
+      cifs: change tcon status when need_reconnect is set on it
+      cifs: handle cases where multiple sessions share connection
+
+Steve French (2):
+      smb3: add missing null server pointer check
+      smb3: clarify mount warning
+
+ fs/smb/client/connect.c    | 11 +++++++++++
+ fs/smb/client/dfs.c        |  7 ++++++-
+ fs/smb/client/file.c       |  3 +++
+ fs/smb/client/fs_context.c |  2 +-
+ fs/smb/client/readdir.c    | 15 ++++++++-------
+ fs/smb/client/sess.c       |  3 +--
+ fs/smb/client/smb2pdu.c    |  6 ++++++
+ 7 files changed, 36 insertions(+), 11 deletions(-)
+
+-- 
 Thanks,
 
-On Fri, Feb 09, 2024 at 04:02:32PM -0800, Kees Cook wrote:
-> On Sat, Feb 10, 2024 at 01:13:06AM +0300, Vitaly Chikunov wrote:
-> > 
-> > On Tue, Feb 14, 2023 at 04:08:39PM -0800, Kees Cook wrote:
-> > > The kernel is globally removing the ambiguous 0-length and 1-element
-> > > arrays in favor of flexible arrays, so that we can gain both compile-time
-> > > and run-time array bounds checking[1].
-> > > 
-> > > While struct fealist is defined as a "fake" flexible array (via a
-> > > 1-element array), it is only used for examination of the first array
-> > > element. Walking the list is performed separately, so there is no reason
-> > > to treat the "list" member of struct fealist as anything other than a
-> > > single entry. Adjust the struct and code to match.
-> > > 
-> > > Additionally, struct fea uses the "name" member either as a dynamic
-> > > string, or is manually calculated from the start of the struct. Redefine
-> > > the member as a flexible array.
-> > > 
-> > > No machine code output differences are produced after these changes.
-> > > 
-> > > [1] For lots of details, see both:
-> > >     https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-> > >     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
-> > > 
-> > > Cc: Steve French <sfrench@samba.org>
-> > > Cc: Paulo Alcantara <pc@cjr.nz>
-> > > Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > Cc: Shyam Prasad N <sprasad@microsoft.com>
-> > > Cc: Tom Talpey <tom@talpey.com>
-> > > Cc: linux-cifs@vger.kernel.org
-> > > Cc: samba-technical@lists.samba.org
-> > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > > ---
-> > >  fs/cifs/cifspdu.h |  4 ++--
-> > >  fs/cifs/cifssmb.c | 16 ++++++++--------
-> > >  2 files changed, 10 insertions(+), 10 deletions(-)
-> > > 
-> > > diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> > > index 623caece2b10..add73be4902c 100644
-> > > --- a/fs/cifs/cifspdu.h
-> > > +++ b/fs/cifs/cifspdu.h
-> > > @@ -2583,7 +2583,7 @@ struct fea {
-> > >  	unsigned char EA_flags;
-> > >  	__u8 name_len;
-> > >  	__le16 value_len;
-> > > -	char name[1];
-> > > +	char name[];
-> > >  	/* optionally followed by value */
-> > >  } __attribute__((packed));
-> > >  /* flags for _FEA.fEA */
-> > > @@ -2591,7 +2591,7 @@ struct fea {
-> > >  
-> > >  struct fealist {
-> > >  	__le32 list_len;
-> > > -	struct fea list[1];
-> > > +	struct fea list;
-> > >  } __attribute__((packed));
-> > >  
-> > >  /* used to hold an arbitrary blob of data */
-> > > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > > index 60dd4e37030a..7c587157d030 100644
-> > > --- a/fs/cifs/cifssmb.c
-> > > +++ b/fs/cifs/cifssmb.c
-> > > @@ -5787,7 +5787,7 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
-> > >  
-> > >  	/* account for ea list len */
-> > >  	list_len -= 4;
-> > > -	temp_fea = ea_response_data->list;
-> > > +	temp_fea = &ea_response_data->list;
-> > >  	temp_ptr = (char *)temp_fea;
-> > >  	while (list_len > 0) {
-> > >  		unsigned int name_len;
-> > > @@ -5902,7 +5902,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
-> > >  	else
-> > >  		name_len = strnlen(ea_name, 255);
-> > >  
-> > > -	count = sizeof(*parm_data) + ea_value_len + name_len;
-> > > +	count = sizeof(*parm_data) + 1 + ea_value_len + name_len;
-> > >  	pSMB->MaxParameterCount = cpu_to_le16(2);
-> > >  	/* BB find max SMB PDU from sess */
-> > >  	pSMB->MaxDataCount = cpu_to_le16(1000);
-> > > @@ -5926,14 +5926,14 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
-> > >  	byte_count = 3 /* pad */  + params + count;
-> > >  	pSMB->DataCount = cpu_to_le16(count);
-> > >  	parm_data->list_len = cpu_to_le32(count);
-> > > -	parm_data->list[0].EA_flags = 0;
-> > > +	parm_data->list.EA_flags = 0;
-> > >  	/* we checked above that name len is less than 255 */
-> > > -	parm_data->list[0].name_len = (__u8)name_len;
-> > > +	parm_data->list.name_len = (__u8)name_len;
-> > >  	/* EA names are always ASCII */
-> > >  	if (ea_name)
-> > > -		strncpy(parm_data->list[0].name, ea_name, name_len);
-> > > -	parm_data->list[0].name[name_len] = 0;
-> > > -	parm_data->list[0].value_len = cpu_to_le16(ea_value_len);
-> > > +		strncpy(parm_data->list.name, ea_name, name_len);
-> > 
-> > Could non-applying this patch cause false-positive fortify_panic?
-> > We got a bug report from user of 6.1.73:
-> > 
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel: detected buffer overflow in strncpy
-> 
-> Yes, this seems likely. I would backport this change.
-> 
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel: ------------[ cut here ]------------
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel: kernel BUG at lib/string_helpers.c:1027!
-> >    ...
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel: Call Trace:
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  CIFSSMBSetEA.cold+0xc/0x18 [cifs]
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  cifs_xattr_set+0x596/0x690 [cifs]
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  __vfs_removexattr+0x52/0x70
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  __vfs_removexattr_locked+0xbc/0x150
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  vfs_removexattr+0x56/0x100
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  removexattr+0x58/0x90
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  __ia32_sys_fremovexattr+0x80/0xa0
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  int80_emulation+0xa9/0x110
-> >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  asm_int80_emulation+0x16/0x20
-> 
-> This appears to be a compat call?
-> 
-> -Kees
-> 
-> > 
-> > I don't find this patch appled to stable/linux-6.1.y.
-> > 
-> > Thanks,
-> > 
-> > ps. (Unfortunately `CIFSSMBSetEA+0xc` address is not resolvable to the
-> > actual line inside of CIFSSMBSetEA pointing just to the head of it.
-> > 
-> >    (gdb) l *CIFSSMBSetEA+0xc
-> >    0x6de3c is in CIFSSMBSetEA (fs/smb/client/cifssmb.c:5776).
-> >    5771    int
-> >    5772    CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
-> >    5773                 const char *fileName, const char *ea_name, const void *ea_value,
-> >    5774                 const __u16 ea_value_len, const struct nls_table *nls_codepage,
-> >    5775                 struct cifs_sb_info *cifs_sb)
-> >    5776    {
-> >    5777            struct smb_com_transaction2_spi_req *pSMB = NULL;
-> >    5778            struct smb_com_transaction2_spi_rsp *pSMBr = NULL;
-> >    5779            struct fealist *parm_data;
-> >    5780            int name_len;
-> > 
-> > But there is only one strncpy there.
-> > 
-> > > +	parm_data->list.name[name_len] = '\0';
-> > > +	parm_data->list.value_len = cpu_to_le16(ea_value_len);
-> > >  	/* caller ensures that ea_value_len is less than 64K but
-> > >  	we need to ensure that it fits within the smb */
-> > >  
-> > > @@ -5941,7 +5941,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
-> > >  	     negotiated SMB buffer size BB */
-> > >  	/* if (ea_value_len > buffer_size - 512 (enough for header)) */
-> > >  	if (ea_value_len)
-> > > -		memcpy(parm_data->list[0].name+name_len+1,
-> > > +		memcpy(parm_data->list.name + name_len + 1,
-> > >  		       ea_value, ea_value_len);
-> > >  
-> > >  	pSMB->TotalDataCount = pSMB->DataCount;
-> > > -- 
-> > > 2.34.1
-> > > 
-> 
-> -- 
-> Kees Cook
+Steve
