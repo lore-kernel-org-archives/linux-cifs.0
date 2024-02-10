@@ -1,96 +1,112 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D828A2114;
-	Sat, 10 Feb 2024 01:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC18149E18;
+	Sat, 10 Feb 2024 05:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707529548; cv=none; b=d4ERJSs7QrZwAIRT0D+gga3rPDQcvt3/o4HiER/fPJ90ltg2t+nShX4tHfQuoayITs8XWej0HQ2Vb909EqhKTi3HDFXOfaN7haGLN1BsQbG4Ehecxoe8mwUkhm89jbcXWe1etRyMYgw6H6udnAcCdkhL1E+f0r6aFrnk1kg/PIM=
+	t=1707543977; cv=none; b=JVaxQu4G3b+ETMRiZNpNYdOCZ35k7GByQsAAJvSJqWQR6CGPtPtJ1Z3ReWUf7/R4+gEhIjYIW+5zNwxleqEXnqFiCD3fgYwrztbKTn8UpbMT0h+ao+fJgM8HkDd3NZ6OAyYHff9R/WuHmyxqdrhJne8pbHiueBhBaJuam6Mc9hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707529548; c=relaxed/simple;
-	bh=2yfvd+UOHE9k/whi9aCvesy2TCSIkYl20+/09zmCEro=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=nr46huJDLh2KEHeSkdQBYmqRStkys3MUBE+t0z2mnc6Up4xkQTDOQcNxKUWzlKPG6yoPM1vWwVEW0hSGBipqiQlnq2oSYOwYv0idVVmYmZei9EwFafYiGjidWFUcdK90Qk/ntA9FSRoPIMSStxES4GORSbAZIwMb8Ak2DKbpdxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JlIwYez/; arc=none smtp.client-ip=209.85.208.173
+	s=arc-20240116; t=1707543977; c=relaxed/simple;
+	bh=MBf5Zzij0GH4HLOFPObi1GK+7rUimCuiRJZFiQNYFaQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kvz1au9EZQ96d1YldyoRx4cn5uUX0aPz+NrJhYpPPhuxakmq5z5hYq2YBLdSsHr31D1SlYZ6gCBQumG7CaauPqwEf9pbPOtVOjw8gMSlLvlu1RhmZFX5jQrRTc6y5wwpAM/O1SwWyrvvDSOz3WQbHugCkqsio5K9YFDvxdOWjcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9+M5HFU; arc=none smtp.client-ip=209.85.208.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JlIwYez/"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d0512f6e32so20645501fa.1;
-        Fri, 09 Feb 2024 17:45:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9+M5HFU"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d0b750518bso22721581fa.0;
+        Fri, 09 Feb 2024 21:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707529545; x=1708134345; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4wHnI+G2KlCxMV8YeoXbiNTjvO50wKmVlXFN7Oe6Ys0=;
-        b=JlIwYez/ab2GxIrEdk/ggc2hXq8dybquFkmx6YQmXidFkWknnRJfLFL29heiaCUzJe
-         YsyKs8d7FfgCSWAkLYOwWpU9IC+j0iLUcj3jeAJTqQamBFSzOlt7h5Wd82O4BTTwuKUQ
-         mhcKD6A6n5dxxJQWIvHVqpknWDZFyL1JSNHbW4+0w/aR58n2Mb/cg0QHN12x6sy35C12
-         9zzZEziL9QCrm1Or0U4UWwNAhOL7RYqF05IwlGfq5LwlZNf6rf7Zo1e0Ygak86GBCx8a
-         fHzLgpfY/umV8gGojkvFhWx6nMd0KC8TvWpWIKtoml9mU6kdQ5fJfz35VaZQzCl9Yg5Z
-         FweA==
+        d=gmail.com; s=20230601; t=1707543974; x=1708148774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nr/YtxF3BFNZRWNv3aGcSVFM6dTYAIJfY7M0G8cUw9Y=;
+        b=j9+M5HFU/7S4eYEH+AudB2+Ly2ZekQ3yZKqxsttKwUaUu4iWjkQhEU0XlhLbG7wv+g
+         UwSS19FPKTkEYsW38sM4JZ3n83eMQbe8lvqd6al9EeIJvHSGH4R3R9cjLDFkjRq15YuS
+         RMEEw8933iA+b8J4dku9MM9B6cuFgPvypGDw195EJnDtHLSn7kNTGA4plJmfX/QzYRlV
+         iYVVsva7zt3viryHCGrmbaUu/cqbXjZ3xRu8koZyCRa9GLX9lqjZ0g7yARu+/zf5Pewq
+         DsBCIx4ecgfHeDkGDZA4P1rBipgposniufjpg6xzw4amPuFu3h4O8Qsd4Shz1TajOLFX
+         39Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707529545; x=1708134345;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4wHnI+G2KlCxMV8YeoXbiNTjvO50wKmVlXFN7Oe6Ys0=;
-        b=vbpjLS1ZGPpdeqz7PQyY7VBdRhf8P9whnP4lPQETFU0ZoX14fLTNhattZ38xlQTq/t
-         At5Fx3TaGBpfudaX4W4w1ogAVYW6tmyxGr/obbrDzZyfBGQgjDKQPal2CXMeKeX4eyQn
-         WfAQK1tDOLBmSMxrd71DTa2Tpr/U89Jq+KL5Bt6Cp7m6IFMu/4D+Z0o3YEInE+btvQUv
-         cMBQ5F+2YBpcrNO86ubEA7JgKm9VWrUe/bM/UEYTwGcb/Xg9S0mAqE8X9bxbWuHwyoEe
-         o5y5i+bQm65nyoIGSxIotxye26WpcdMDLXsMoi69zX5WoMatJcnuAQ7kfbfML4KXXMv0
-         6haQ==
-X-Gm-Message-State: AOJu0YzwXI05XqslBcTxhTkDEpTwGPjBXPJeCFvGihZxxI7XHwZHgSP0
-	a7bZJE3WZeALCt8tSYtVn/P0DDl/OxES8pOUkECgn6lCAx3vsQ2PEb2ZYuoxk8sk8fPL52jt4+4
-	gJRBWG3V0TXwNgCWT4UlkTfhBNNKkfM935iGDGg==
-X-Google-Smtp-Source: AGHT+IE9fuBzla98nLgvABcO1uL+Qyv3kwu+7GCThsKpowKw6y3w6tVIO/HFVEWPq2tRQKUYf4YL/SzcbhrvTVJp4Pk=
-X-Received: by 2002:a05:651c:220d:b0:2d0:ae3d:d393 with SMTP id
- y13-20020a05651c220d00b002d0ae3dd393mr502521ljq.1.1707529544518; Fri, 09 Feb
- 2024 17:45:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707543974; x=1708148774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nr/YtxF3BFNZRWNv3aGcSVFM6dTYAIJfY7M0G8cUw9Y=;
+        b=q1VKOqi1myS8WQIX/spsX4EiB+KsSU8i4cJ3nuNV/MYlL/AtjN7dJd/hNm90UHfTd3
+         5eOXZAbkLFv1pkwJup4MU8vGogKLo8SiVagpQcu4rhmKxkppZb2FDSV8nGKQvAKRdtrf
+         dJNDh9txJ3LLhRDQLKuS+JcC4QHHUWX+UgFUfY+xAOAUXMIyGydGELODd4N7Qadt4+dr
+         jkBE9o5G4bpraWvO6w+MyZpijj9vxoTKWeGfz3W/1nc0pUaH0DjxbrtB8noxMc47s+hL
+         prYsYYqR7KeWehTndJ6XPHJ5cnwiGGNZT7PlMFjL+Hi0VVT0Tq0r0aKhnrmDB2jyF17p
+         suNQ==
+X-Gm-Message-State: AOJu0YzgG6LoBcioe93TMicTKCkLh6HSiU+0jKfOsnGjhVJMAdE8L5KS
+	J01CRXQyikr2rlSFuzZFyAGI3R/jxb0l2KSo5o9lGfOXw6P19IZTKmcRqo9kWMnySkkzHtTqZb8
+	aRVNdY0xQIZ0U6Yn5K5tZbdQ5STE=
+X-Google-Smtp-Source: AGHT+IERbHbSI2rDdP2RflyeCzz64n8ng6lhVYaUb7+Xq/lX3aXFdWdJpW24+zNjUi9SxE5r++8y5rHRrj8a3fGFDpU=
+X-Received: by 2002:a2e:9ad3:0:b0:2d0:e2d3:37a2 with SMTP id
+ p19-20020a2e9ad3000000b002d0e2d337a2mr570350ljj.2.1707543973804; Fri, 09 Feb
+ 2024 21:46:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <PH7PR20MB592590F74C734584DCF88D6CBF712@PH7PR20MB5925.namprd20.prod.outlook.com>
+In-Reply-To: <PH7PR20MB592590F74C734584DCF88D6CBF712@PH7PR20MB5925.namprd20.prod.outlook.com>
 From: Steve French <smfrench@gmail.com>
-Date: Fri, 9 Feb 2024 19:45:31 -0600
-Message-ID: <CAH2r5mtdu3ng8E7e3h5iLYA+hcMQNjF+iwiAzh3xNw1dTnBydQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+Date: Fri, 9 Feb 2024 23:46:00 -0600
+Message-ID: <CAH2r5mue1Xgx+rotMta_Em03-E=wij-w_-i3eoj9rQsA-R9DPg@mail.gmail.com>
+Subject: Re: [PATCH] fs: smb: client: Reset password pointer to NULL
+To: Fullway Wang <fullwaywang@outlook.com>
+Cc: sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com, 
+	sprasad@microsoft.com, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, fullwaywang@tencent.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-54be6c6c5ae8e0d93a6c4641cb7528eb0b6ba478:
+On Thu, Jan 18, 2024 at 1:44=E2=80=AFAM Fullway Wang <fullwaywang@outlook.c=
+om> wrote:
+>
+> ctx->password was freed but not reset to NULL, which may lead to double
+> free and secrets leak issues.
 
-  Linux 6.8-rc3 (2024-02-04 12:20:36 +0000)
+But no one else could use this pointer to double free this since it is
+allocated in this function, and exits a few lines after it is freed
+(and its parent is freed on the next line so the pointer could not be
+accessed either)
 
-are available in the Git repository at:
 
-  git://git.samba.org/ksmbd.git tags/6.8-rc3-ksmbd-server-fixes
+> This is similar to CVE-2023-5345, which was fixed in commit e6e43b8.
+>
+> Signed-off-by: Fullway Wang <fullwaywang@outlook.com>
+> ---
+>  fs/smb/client/connect.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index 3052a208c6ca..fb96a234b9b1 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -4028,6 +4028,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, k=
+uid_t fsuid)
+>  out:
+>         kfree(ctx->username);
+>         kfree_sensitive(ctx->password);
+> +       ctx->password =3D NULL;
+>         kfree(ctx);
+>
+>         return tcon;
+> --
+> 2.39.3 (Apple Git-145)
+>
+>
 
-for you to fetch changes up to 108a020c64434fed4b69762879d78cd24088b4c7:
 
-  ksmbd: free aux buffer if ksmbd_iov_pin_rsp_read fails (2024-02-07
-20:23:37 -0600)
-
-----------------------------------------------------------------
-Two small ksmbd server fixes:
-- one for a memory leak
-- the other a minor kernel-doc fix
-
-----------------------------------------------------------------
-Fedor Pchelkin (1):
-      ksmbd: free aux buffer if ksmbd_iov_pin_rsp_read fails
-
-Yang Li (1):
-      ksmbd: Add kernel-doc for ksmbd_extract_sharename() function
-
- fs/smb/server/misc.c    | 1 +
- fs/smb/server/smb2pdu.c | 8 ++++++--
-
--- 
+--=20
 Thanks,
 
 Steve
