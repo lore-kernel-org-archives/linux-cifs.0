@@ -1,61 +1,63 @@
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD71D3612E;
-	Sat, 10 Feb 2024 10:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7805BAF6;
+	Sat, 10 Feb 2024 16:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707560510; cv=none; b=piIgJ2+/HSmlRiNeW5MeEIE1PUIc8FWIo2kunnWgBzIKQtNxC7uGkV87BgK3u9GWmGBiHs/C4+rJcZHCkjDuHGQEOpoE8S9QljlRp1moyso5nhYLOYem9QF4zKfrFmo8N156rmKjpUal75cvt6e9hW0ydib+2TnpS/ecFG9j6gQ=
+	t=1707582372; cv=none; b=cXA17c7znKeGsaTMrC+gy3E4ENm8i3fbqjzWCRmga375VCl7TfTAD9NDvfFhd6nr/g+OGdePDVZt55Tj+ALUOfGxfXL0H1KmtriYtq5BM0Ei0jig9UDArv733jVG2ST4Se7sJ1q8p7nprLETMYmwq9sYlh3UHfW5A2UkREF47f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707560510; c=relaxed/simple;
-	bh=Dsxo8YjEUONWUnrqrGPvbFDLMUbCP6guDxtq2y91Umk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ba8K9ytQOFS6SweIzfyN/F0LsyWNwLdBAYJEs5f3fgwjSSypJ815ta1diVI7vvaOaoClAnIirud68BxRDeCAYkEKnd7wYsCENYAWtiSQwsWkRNropuumtt/i7NwPBFsiScw4B6yjjj05g7+rF2wwvhkp+KBkRHb32sgaGCmRjWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id CA06E72C8FB;
-	Sat, 10 Feb 2024 13:21:45 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id BC7BE36D0246;
-	Sat, 10 Feb 2024 13:21:45 +0300 (MSK)
-Date: Sat, 10 Feb 2024 13:21:45 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
-Message-ID: <20240210102145.p4diskhnevicn6am@altlinux.org>
-References: <20230215000832.never.591-kees@kernel.org>
- <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
- <202402091559.52D7C2AC@keescook>
- <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
- <2024021034-populace-aerospace-03f3@gregkh>
+	s=arc-20240116; t=1707582372; c=relaxed/simple;
+	bh=F4CzGC9B27b7GO6X/MD/XHVPsyeN5xCCXUH/5q5zw2g=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=hunc0IJz7fyc7fOCSuOrPDyUWfTh9MM9YTEtKFOrwqkDZp1BTICmLXASv/YJKYSvFGhYJ6xqCf9R12RecvtGA5H+bdUgFPdCn3U3DKgj63XlsFN3eLRwhvdoWuCDwo9IhFwlNmYG0UEPi9TkX9JQUTMnLf71N3u7ij0seaELgb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADV4CZ3I; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADV4CZ3I"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A75BC433F1;
+	Sat, 10 Feb 2024 16:26:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707582372;
+	bh=F4CzGC9B27b7GO6X/MD/XHVPsyeN5xCCXUH/5q5zw2g=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=ADV4CZ3I1um22KIdG2Ku4GiS70QZVk60C2gOL/13JNRaLrq0omUfXAXuhSZM5CwbG
+	 i8on+AhrIGuenAGlWpGc09rKewiqToxTd3sLKSCxSUA3SaXUGc4iV/45rYxoJ1BVt/
+	 WP3g+hYFLYd60ZJpJ1cvIgq8ZVZIRjSQ+gph+TM1UebvlvpqySAbb6Gdw3Og4p2Zmv
+	 TsTCfb0F8pd8IhBIsWNGQ8U7nKhQbsOXbWbZTf0r2d+MoVr2MK7KzkgZ67vVhOiCP4
+	 PwegrvCFE173Pn1UE6l3uJSBD53+D1d3JVhYlYbMsqkDWfb6vb/8SpCK7ce476Uy/k
+	 x9HLamSHvibig==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27B43E2F2F0;
+	Sat, 10 Feb 2024 16:26:12 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtdu3ng8E7e3h5iLYA+hcMQNjF+iwiAzh3xNw1dTnBydQ@mail.gmail.com>
+References: <CAH2r5mtdu3ng8E7e3h5iLYA+hcMQNjF+iwiAzh3xNw1dTnBydQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtdu3ng8E7e3h5iLYA+hcMQNjF+iwiAzh3xNw1dTnBydQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.8-rc3-ksmbd-server-fixes
+X-PR-Tracked-Commit-Id: 108a020c64434fed4b69762879d78cd24088b4c7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5a7ec87063c0fbb7706fdccb0cc890757da6f4a1
+Message-Id: <170758237214.1913.6316302817273858424.pr-tracker-bot@kernel.org>
+Date: Sat, 10 Feb 2024 16:26:12 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <2024021034-populace-aerospace-03f3@gregkh>
 
-Greg,
+The pull request you sent on Fri, 9 Feb 2024 19:45:31 -0600:
 
-On Sat, Feb 10, 2024 at 10:19:46AM +0000, Greg Kroah-Hartman wrote:
-> On Sat, Feb 10, 2024 at 03:33:14AM +0300, Vitaly Chikunov wrote:
-> > 
-> > Can you please backport this commit (below) to a stable 6.1.y tree, it's
-> > confirmed be Kees this could cause kernel panic due to false positive
-> > strncpy fortify, and this is already happened for some users.
-> 
-> What is the git commit id?
+> git://git.samba.org/ksmbd.git tags/6.8-rc3-ksmbd-server-fixes
 
-398d5843c03261a2b68730f2f00643826bcec6ba
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5a7ec87063c0fbb7706fdccb0cc890757da6f4a1
 
-Thanks,
+Thank you!
 
-> 
-> thanks,
-> 
-> greg k-h
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
