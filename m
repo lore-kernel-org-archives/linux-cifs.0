@@ -1,33 +1,30 @@
 Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF57365;
-	Sat, 10 Feb 2024 00:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1E046B3;
+	Sat, 10 Feb 2024 00:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707524915; cv=none; b=pyzv/Oo+nYBN/9HS2X3R8LOIfP2QP5V7jtwt0O6ldhmpRMUFeG6pAogwHDhkMIsLojgAAVCWABdxzBdBHMQUfjyP6d1Wlkl0ZEXgZD5zFPCXh6/QZetW3uVe+NUve2GZFauWDOP2zJdXnqGJUlClb8UJPP28MqkJR26N/mpbZOo=
+	t=1707525198; cv=none; b=EVv9amN7po6R4SUYSqFXYh7A9olv1L9DuoCNdL0ZxDAd7TChFKh1wUays20BfOYdao40WvG78AzTdcDFr09A+g6QO6fTTGhnijgVF84CxSsvL+v62DEJ52GQ6hB8tiGwxo6YnIAVZG4IcRjAqh3a6hsA7L9dQEmIwNPkf614RLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707524915; c=relaxed/simple;
-	bh=1aldXA7qX7BJQwCosF1vpPxnrS0eikCsVyMupUViDPc=;
+	s=arc-20240116; t=1707525198; c=relaxed/simple;
+	bh=CSw8FLjbOKmeCyZoKciRVteX2Z7MbqpbK9QJvOVY2Uc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNORlMFcyUM15B+xHcnru20/GEb28qbU1ZJKF7sSJuapbl+etjLsPqCxksUE7H+OBVRxk1+fjwyKf+VOtr0vUcQwEQ5HZiQ0yqIOhU/h+ymMaaPHDM7yMlU95LmAPXjs0dNpQVwASFYtGs6aMlbk1LiBWa0Igzl0nnbwrB3mfhE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=XuFDFoLfC1uhQigTYyneP7k3VLlZDb9ClLyjXlJ5hx24lFo+gDx1lTvPWl22tzrTXKkBlmWYgPodEhdM5jvqmde9DEWeBk0KK8sm9q95crlFztAjuVyDYzxd31K9ggluRX+6O0bZfLGJw4gMRmz2dWjEmALBE7y5dlBK5bjPfDI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
 Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id D2BE472C8F5;
-	Sat, 10 Feb 2024 03:28:30 +0300 (MSK)
+	by vmicros1.altlinux.org (Postfix) with ESMTP id 77CA072C8F5;
+	Sat, 10 Feb 2024 03:33:14 +0300 (MSK)
 Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id C35DA36D0246;
-	Sat, 10 Feb 2024 03:28:30 +0300 (MSK)
-Date: Sat, 10 Feb 2024 03:28:30 +0300
+	by imap.altlinux.org (Postfix) with ESMTPSA id 6AA4D36D0246;
+	Sat, 10 Feb 2024 03:33:14 +0300 (MSK)
+Date: Sat, 10 Feb 2024 03:33:14 +0300
 From: Vitaly Chikunov <vt@altlinux.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
 Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
-Message-ID: <20240210002830.g3orqr3d2cwcmadz@altlinux.org>
+Message-ID: <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
 References: <20230215000832.never.591-kees@kernel.org>
  <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
  <202402091559.52D7C2AC@keescook>
@@ -41,10 +38,17 @@ Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
 In-Reply-To: <202402091559.52D7C2AC@keescook>
 
-Kees,
+Greg, Sasha,
+
+Can you please backport this commit (below) to a stable 6.1.y tree, it's
+confirmed be Kees this could cause kernel panic due to false positive
+strncpy fortify, and this is already happened for some users.
+
+Thanks,
 
 On Fri, Feb 09, 2024 at 04:02:32PM -0800, Kees Cook wrote:
 > On Sat, Feb 10, 2024 at 01:13:06AM +0300, Vitaly Chikunov wrote:
+> > 
 > > On Tue, Feb 14, 2023 at 04:08:39PM -0800, Kees Cook wrote:
 > > > The kernel is globally removing the ambiguous 0-length and 1-element
 > > > arrays in favor of flexible arrays, so that we can gain both compile-time
@@ -161,11 +165,6 @@ On Fri, Feb 09, 2024 at 04:02:32PM -0800, Kees Cook wrote:
 > >    Jan 24 15:15:20 kalt2test.dpt.local kernel:  asm_int80_emulation+0x16/0x20
 > 
 > This appears to be a compat call?
-
-Likely. This is caused through Wine.
-
-Thanks,
-
 > 
 > -Kees
 > 
