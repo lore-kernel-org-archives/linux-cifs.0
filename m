@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615E75D48A;
-	Tue, 13 Feb 2024 00:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9785D909;
+	Tue, 13 Feb 2024 00:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707783621; cv=none; b=KcOtMbGD+Id0sIYtw1iofjW0C/mW9Kym7TA0ewvOD/b0MKsPt9EDxqnrY/704Ki55a4wLBaIMjCtdLpa20U+LLcizFkB4NfImEepaKkvD3O+xpOEtWwp7Xc90fSvvh9xYcDtAq9/LNWUYGPqm4QHuybfXxT5cDgLpoxs0Ci3PKA=
+	t=1707783624; cv=none; b=jsFDt35gXu8G7lWzZTqpQyyjkcPFjWp4qgsaaox7Y2ggW74JJlUBsoA4kBdJc9yQgcWMgswwGwx/vRRnNJWsB/m3xosfPyYjhjGJw7th1OGSoeXcPD+rpcA8SDENihMq9UL1EwPL88ku/9nqOFGU1FWMnp03W2CScoBr/XYi5WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707783621; c=relaxed/simple;
-	bh=ui3CxEU90r00z7qIItBRftOAkWzgenjEHY/ojM5WoFg=;
+	s=arc-20240116; t=1707783624; c=relaxed/simple;
+	bh=oPMFjA9VlPUGHrEFuSDSdhxzO7uU0L5pnGwiQ0oZPEw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sWzyQbotAS2URhYo91rdfz6j8yjsyW5Hk/NXvWcW5cYe2CeAQ7hG0a/l6Kp1HtzSRIIH3SfHudcicp6dfC3XaiRd6vnywdFcU0idzF2zLSuY2mnhB9SF+IggKSM4lHsw4yWktJxZzIeXHEgeaY2PqmWuOkRCRza50HdFzylkjHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcu0jjsl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZKeyO+jt7Z9yDrTDzSUGsvV34n7ToizT8e0elWrR/THr2SsdmGkkbaYva2aMMgu942sS9UwfS64am4F3SpWrLqYB3yTH0MiurzdaIbfrn70hxk1Sfv0ZVIEj1WIaUvJHAVqv2Ryca09cRGg5/T+N2XCcTH4M1VMMJcJs6YHnWtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oxc6jgLf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcu0jjsl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 427E1C433C7;
-	Tue, 13 Feb 2024 00:20:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oxc6jgLf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F2BC433F1;
+	Tue, 13 Feb 2024 00:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707783621;
-	bh=ui3CxEU90r00z7qIItBRftOAkWzgenjEHY/ojM5WoFg=;
+	s=k20201202; t=1707783624;
+	bh=oPMFjA9VlPUGHrEFuSDSdhxzO7uU0L5pnGwiQ0oZPEw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rcu0jjsl12yUrIQ7ZD96M3PWNU0DEHNIrHAgVzZhzCS3e/QF3rP3Owvtz5pcLJQvD
-	 CpioPZOUP07gSldOMSgGbtTsNjuBMpbQZzR0EWe2mZTfaxvS3FcH+JqkYvT0pRCths
-	 1SWhyuBcQwwEc6BsaX546DzcMLoa5JE1Hzqw6boz2QyGXm747b8qDotXOFYN7RC02Q
-	 4/FbyPRn9Wtup/J1ajrBcOdh4kVfLWPNJ3m1F/Ul70qPWFIs/jDKGpLWmKtzEjDN1c
-	 4SEagfHwWYQshrfyE0hkXdRP92LFK8fJ5TJSAlJEFjvjSBOC9hCZSKV4DUZzVklG0G
-	 GC0QEppQj52ug==
+	b=Oxc6jgLfjCFLemOC5vUSOxh/5ltrTvYKXx4Mh/aGKa1y8TERdSMvoC1CsyRhCTLkX
+	 0RZP2FeBBU1/bEkGlDNzPfk3sRKx94X+DaooluqAkcC9cvdOH1A6TRy3LIQ9lwLY3o
+	 pw37o/NJvE9uuaPwse0Ex9a3ZA/EiiB95XSuwjG+qY0uFiUHE7MJJZWv2zjRej6gZn
+	 BsVENGzlccPSsUxsExBZc6fwm7PtxCjuALvEMTMzpvAVnc6aRVqouNj4jf40eHv2ad
+	 Ga18pCwczBmZHb+6YO1d8xlfSS0jwgLuXEJ8bmKS9jTOAEX6cG0m8mCDrmxKusi+4b
+	 JSflW9YSuxpLg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.com>,
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.7 54/58] smb: client: set correct d_type for reparse points under DFS mounts
-Date: Mon, 12 Feb 2024 19:18:00 -0500
-Message-ID: <20240213001837.668862-54-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 56/58] cifs: change tcon status when need_reconnect is set on it
+Date: Mon, 12 Feb 2024 19:18:02 -0500
+Message-ID: <20240213001837.668862-56-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240213001837.668862-1-sashal@kernel.org>
 References: <20240213001837.668862-1-sashal@kernel.org>
@@ -52,95 +52,83 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7.4
 Content-Transfer-Encoding: 8bit
 
-From: Paulo Alcantara <pc@manguebit.com>
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-[ Upstream commit 55c7788c37242702868bfac7861cdf0c358d6c3d ]
+[ Upstream commit c6e02eefd6ace3da3369c764f15429f5647056af ]
 
-Send query dir requests with an info level of
-SMB_FIND_FILE_FULL_DIRECTORY_INFO rather than
-SMB_FIND_FILE_DIRECTORY_INFO when the client is generating its own
-inode numbers (e.g. noserverino) so that reparse tags still
-can be parsed directly from the responses, but server won't
-send UniqueId (server inode number)
+When a tcon is marked for need_reconnect, the intention
+is to have it reconnected.
 
-Signed-off-by: Paulo Alcantara <pc@manguebit.com>
+This change adjusts tcon->status in cifs_tree_connect
+when need_reconnect is set. Also, this change has a minor
+correction in resetting need_reconnect on success. It makes
+sure that it is done with tc_lock held.
+
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/readdir.c | 15 ++++++++-------
- fs/smb/client/smb2pdu.c |  6 ++++++
- 2 files changed, 14 insertions(+), 7 deletions(-)
+ fs/smb/client/connect.c | 5 +++++
+ fs/smb/client/dfs.c     | 7 ++++++-
+ fs/smb/client/file.c    | 3 +++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index d30ea2005eb3..e23cd216bffb 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -299,14 +299,16 @@ cifs_dir_info_to_fattr(struct cifs_fattr *fattr, FILE_DIRECTORY_INFO *info,
- }
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index dc9b95ca71e6..87f0cb95a2a7 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4215,6 +4215,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
  
- static void cifs_fulldir_info_to_fattr(struct cifs_fattr *fattr,
--				       SEARCH_ID_FULL_DIR_INFO *info,
-+				       const void *info,
- 				       struct cifs_sb_info *cifs_sb)
- {
-+	const FILE_FULL_DIRECTORY_INFO *di = info;
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
 +
- 	__dir_info_to_fattr(fattr, info);
++	/* if tcon is marked for needing reconnect, update state */
++	if (tcon->need_reconnect)
++		tcon->status = TID_NEED_TCON;
++
+ 	if (tcon->status == TID_GOOD) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return 0;
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index a8a1d386da65..449c59830039 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -565,6 +565,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
  
--	/* See MS-FSCC 2.4.19 FileIdFullDirectoryInformation */
-+	/* See MS-FSCC 2.4.14, 2.4.19 */
- 	if (fattr->cf_cifsattrs & ATTR_REPARSE)
--		fattr->cf_cifstag = le32_to_cpu(info->EaSize);
-+		fattr->cf_cifstag = le32_to_cpu(di->EaSize);
- 	cifs_fill_common_info(fattr, cifs_sb);
- }
- 
-@@ -420,7 +422,7 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
- 	} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
- 	} else /* not srvinos - BB fixme add check for backlevel? */ {
--		cifsFile->srch_inf.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
-+		cifsFile->srch_inf.info_level = SMB_FIND_FILE_FULL_DIRECTORY_INFO;
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
++
++	/* if tcon is marked for needing reconnect, update state */
++	if (tcon->need_reconnect)
++		tcon->status = TID_NEED_TCON;
++
+ 	if (tcon->status == TID_GOOD) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return 0;
+@@ -625,8 +630,8 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+ 			tcon->status = TID_GOOD;
+-		spin_unlock(&tcon->tc_lock);
+ 		tcon->need_reconnect = false;
++		spin_unlock(&tcon->tc_lock);
  	}
  
- 	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
-@@ -1014,10 +1016,9 @@ static int cifs_filldir(char *find_entry, struct file *file,
- 				       (FIND_FILE_STANDARD_INFO *)find_entry,
- 				       cifs_sb);
- 		break;
-+	case SMB_FIND_FILE_FULL_DIRECTORY_INFO:
- 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
--		cifs_fulldir_info_to_fattr(&fattr,
--					   (SEARCH_ID_FULL_DIR_INFO *)find_entry,
--					   cifs_sb);
-+		cifs_fulldir_info_to_fattr(&fattr, find_entry, cifs_sb);
- 		break;
- 	default:
- 		cifs_dir_info_to_fattr(&fattr,
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index f5006aa97f5b..c84d65dba813 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5076,6 +5076,9 @@ int SMB2_query_directory_init(const unsigned int xid,
- 	case SMB_FIND_FILE_POSIX_INFO:
- 		req->FileInformationClass = SMB_FIND_FILE_POSIX_INFO;
- 		break;
-+	case SMB_FIND_FILE_FULL_DIRECTORY_INFO:
-+		req->FileInformationClass = FILE_FULL_DIRECTORY_INFORMATION;
-+		break;
- 	default:
- 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
- 			info_level);
-@@ -5145,6 +5148,9 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 		/* note that posix payload are variable size */
- 		info_buf_size = sizeof(struct smb2_posix_info);
- 		break;
-+	case SMB_FIND_FILE_FULL_DIRECTORY_INFO:
-+		info_buf_size = sizeof(FILE_FULL_DIRECTORY_INFO);
-+		break;
- 	default:
- 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
- 			 srch_inf->info_level);
+ 	return rc;
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 32a8525415d9..4cbb5487bd8d 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -175,6 +175,9 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
++	if (tcon->need_reconnect)
++		tcon->status = TID_NEED_RECON;
++
+ 	if (tcon->status != TID_NEED_RECON) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return;
 -- 
 2.43.0
 
