@@ -1,55 +1,63 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B6A1B94E;
-	Fri, 16 Feb 2024 00:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF09FC0C
+	for <linux-cifs@vger.kernel.org>; Fri, 16 Feb 2024 03:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708045191; cv=none; b=ksHoL72B2NznPApgB2BrBMQuQ6ROWqUWlDdUjMnFh3B02OqkSbXlqfGbjRYBcTM+LZPESGvBx0U3RVvfX2TT7Bc+8HhUjsulPdFZJTPQnoWSEdnHxfeKlcZufKz9SFHMThsGxofblT7hmYX1w1P7JVAYqSOHikNVcY4QFA4etoQ=
+	t=1708055192; cv=none; b=B2RMaMsUAW9/ZKhdsgzqXytWcuQZfSVDjfMbqeSiW0sVYjaM+aM1Vul1rw6klM2UyTLd0xW7veA1elnRXx3JdcQG6iixJKixDc+KS3k7FeGtobEKnPo2Mk01mHbrhIHyGM3G0zcZg7FauNQKHZKb2jQls45YqNy/X9/yMzuiuuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708045191; c=relaxed/simple;
-	bh=Gz1qBCJgYa4sI0XXpDKFTnCUFtfXZhdQgo8s7WL8ISo=;
+	s=arc-20240116; t=1708055192; c=relaxed/simple;
+	bh=yd/1AuvvJ50vwThAXABCUvrExaC4xvwRTKDpMrhTRLI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j7h5WBIKX5g3iFv6VWyP9HtWlkn/Ft68JWNlKw5GNZicOHXhvU2qTmACubkHwzR69kFAZnNi7BpnYMCVLYAkyfQCRRkoQ54PKSHWe5PwSkXiax3POyzAaENyuSrdqd/uuu8oBU6aDxO0gTHaH7jgoBmvn0HCybzMrHwUBdr3+Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LT8H4rqA; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=re+BZluUYLJFWZrIQfFP9bUPn+nJ11T53I/10ofQBIeeezIFfMRTSkoTuc0TnFP7z56TjzzQCSNZmdySKv2J6+JH/OaFyaFAYkF+22i9HN+65uNOpoXAkwZhEiOPptONHnqFnB9x19camyBCZeskGSBQOJ5t03a7smMDIgC1Pi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=dgga68XB; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LT8H4rqA"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d10ad265d5so3410771fa.0;
-        Thu, 15 Feb 2024 16:59:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708045187; x=1708649987; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QGeZNIWrwGCFN5tnpI3ZYrr58l8YE+botW14fPD50bA=;
-        b=LT8H4rqA1aEwJRgO5a+lUSQa6JP+WEuso5NlnpLjvwB1I9bproJdtLzZ3snr7SvhD8
-         KWmAEQMCKDyCh9K9l2drY5626ys5nWEs1Op7AUTGBfSKGvmA3c3mgDA89JwhfgvkhzTd
-         Sj/aYqesXvnPoFFFB9e3w6me+IhIMXB/RqEVZbB1v9uL0X7Sf/3fdjiZfhBKjja1gsm0
-         xqChe5rvesZo8OSK4r22Ii/sGchPGK/4AHGi0mQ0dF6YvQ4QiF7JoXrIeC7ZmFecwO+p
-         H/Sve/JnTq/B0/jfWYHMQCHdX6vWRtav0QYufLBYFyEPQhhBZlL562Oc0taaD6UXBOMM
-         bP6Q==
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="dgga68XB"
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 347733F670
+	for <linux-cifs@vger.kernel.org>; Fri, 16 Feb 2024 03:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1708055182;
+	bh=NpKs3rrlFvfdfLylcjk/hf+qLhfwNVkba72SYiQlDGk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=dgga68XBeb5qBgt2Rf6rIsdq+l1Zer/MuTQuwr3fmfv74NzmfF7FASlDa2jUMTTTA
+	 4JrDc6+yGeTAjud+qM0qkeFQTLOklQywbOoMCD6qHVilYCWdxquHKYtouvUQDc361H
+	 aJ2gTw3YBJ0L5Bwj4ScEu61Oo6Jx/81SqJDzo/QfPWXBQHY0lvHDWbdV+PfnRapaIP
+	 5124mJ9CHVrEIQb5dPGlyLHNPxrOftduPxb8En9vLPcZgYqfFKnzYzUnylNzaDNjF/
+	 atbrt9mooWSFYqIMRxg7vPkGIZVhBvtyheEKHNzby4mSQkPywDHNdsRUH4h5nREapZ
+	 00O2CSFFbEu3w==
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2966de4a9baso1545525a91.1
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Feb 2024 19:46:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708045187; x=1708649987;
+        d=1e100.net; s=20230601; t=1708055181; x=1708659981;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QGeZNIWrwGCFN5tnpI3ZYrr58l8YE+botW14fPD50bA=;
-        b=bv7qPUmV1i5yt33TicO8qnEckYrj3dHx+Xt5ixOrOKaRJOOjt99mO8d+itpgch+84E
-         QpOpSXFb/uwfOljLmlw06Dsw/jWI7NEBNPEj2xq3jHlG0G7F0YFrTR61hq3z4pnAnAx6
-         lKSi3CXknuc3vXBrqNkv8HsuMvJGP9QVBc3lQJMHtdPPXCfj0s6pfNHFCrPy+7eOhWjH
-         Qd2kPBylIMbROKc+m0RhnZmRBAUAx0BHf6f5qYzXhK/m29cxGvsiG3rS7RRAPE3m1SAh
-         ajNpmpSDoqPXdEcPaQabxZab2V/EJO1wqdzhs1CGbS2fUhuOR48/K+Sn5583fJOoZ/J4
-         XqSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+lFBD6aSMgOqJ6wO1QgFB/HEGt3AMUqhF1xzULrzA+O9F0bYN6dxiBy6sWjGlslLAG0Rixre7BVFPG6L3195x0z9qjgOHi3yAS+U8wgJlzqogixpUkkWapOYOJpYORSZi+j1zpK48xHY=
-X-Gm-Message-State: AOJu0YyTorOUf90l+tOjUnb//BrGQ9XLlXF0dyg8Vjmtkneqe1om219I
-	vj6dE6a7s9iK31ynXw+oBrrVvHWXyNlUjdZs70Uelsc1ajO6aEg3/YGmrmo0fVe9WFKAixYiWOI
-	ustq6wZc5NMWRTnAtXlD7N9NYzoM=
-X-Google-Smtp-Source: AGHT+IHbOvUsOz8/O5UpkLTizz6EQpfFPLy9AyQPltYAlmwAqpVwwLAAx5ZWZgbdJfS8M3KCkjpLdvm+yFdOL2kk3x8=
-X-Received: by 2002:a2e:8186:0:b0:2d2:178a:4f96 with SMTP id
- e6-20020a2e8186000000b002d2178a4f96mr293516ljg.14.1708045187350; Thu, 15 Feb
- 2024 16:59:47 -0800 (PST)
+        bh=NpKs3rrlFvfdfLylcjk/hf+qLhfwNVkba72SYiQlDGk=;
+        b=aR+HyXnCZBFMd24dVW5Xz+P6WETaoanYbB1uQj4BIM4taDjuVAuvUlfyg1x5KYw2MX
+         NJ6fMCfcGXQnFdiGg1iG0ceHznQ5+v+sFhcNMgmYZYRN/CpnWGRVDk2/q70fgkFdCK7M
+         EIei8yzAhGVGQDmL1mpAe6H7Io52+QY2cNcq7MsdrPA/eMjxIiJtkj24EeXG9mc9A7ks
+         dhLu+KrM8i1BdzAUIOPl+Kl+YbL5/32tcuwhPUuCS7sHtqCr4bHSIsn5kZL79rVeB0Bq
+         ApWJLfWIboiTJYT8j83TCpwc76PoRFWVoqGxlAOnguGdXn2D+hwINrQek4Gi8ror2ZVS
+         62dA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgnrAWUjyhgcywiPDqlkrHo9trbtqO0cX0y0Hfv15Ys8hK0WSe4zPUlweJWyI78fTsYL1P81rBDHXrDdIsDiE1Zi+deTWWdNJlXw==
+X-Gm-Message-State: AOJu0YxR38Iy6HNvSvfh40XNaEiKiwtTY3vZRkdX9sCL+1SdZA1SZYSQ
+	adNuJ5cGWr7aEarweNnKDZ3B/kAYNUfGkPLFIJt5K+MjaOg/21qEQkswQkb2WuVT8MxhyS95Gcq
+	6hgbWL7FUucQQtULIqwp6O4WxiZtPD4SkiekL65Mq8xXrFTaatAuSOAGenCtgRu9HX8QfJl3bNR
+	qrijAd2n8Jr4OrvEObO0asxhNBaVOf35Gfvda2dYzw+bvkRHLQAA==
+X-Received: by 2002:a17:90a:cb11:b0:297:efb:c33d with SMTP id z17-20020a17090acb1100b002970efbc33dmr3144181pjt.47.1708055180723;
+        Thu, 15 Feb 2024 19:46:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFfWx0b28tpTAKEAuv8o+ylZknwr9EjymNvf10lq7gjJQeoajAW/wyKcBAZegdJ73clO+Bl5D9nhdTF1P0UKjI=
+X-Received: by 2002:a17:90a:cb11:b0:297:efb:c33d with SMTP id
+ z17-20020a17090acb1100b002970efbc33dmr3144169pjt.47.1708055180305; Thu, 15
+ Feb 2024 19:46:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -66,19 +74,55 @@ References: <CAH2r5mswELNv2Mo-aWNoq3fRUC7Rk0TjfY8kwdPc=JSEuZZObw@mail.gmail.com>
  <CAKAwkKsm3dvM_zGtYR8VHzHyA_6hzCie3mhA4gFQKYtWx12ZXw@mail.gmail.com>
  <CAH2r5mvSsmm2WzAakAKWGJMs3C-9+z0EJ-msV0Qjkt5q9ZPBzA@mail.gmail.com> <CAH2r5mvPz2CUyKDZv_9fYGu=9L=3UiME7xaJGBbu+iF8CH8YEQ@mail.gmail.com>
 In-Reply-To: <CAH2r5mvPz2CUyKDZv_9fYGu=9L=3UiME7xaJGBbu+iF8CH8YEQ@mail.gmail.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 16 Feb 2024 06:29:34 +0530
-Message-ID: <CANT5p=r=DySxfSVsm9drGvJs9cBdwF_xx7Qj3=HqQ5LQfk_5mA@mail.gmail.com>
+From: Matthew Ruffell <matthew.ruffell@canonical.com>
+Date: Fri, 16 Feb 2024 16:46:08 +1300
+Message-ID: <CAKAwkKu=v8GYX0Mhf1mzDYWT2v6dnLB=_zs7jk6trocAN2++4g@mail.gmail.com>
 Subject: Re: SMB 1.0 broken between Kernel versions 6.2 and 6.5
 To: Steve French <smfrench@gmail.com>
-Cc: Matthew Ruffell <matthew.ruffell@canonical.com>, dhowells@redhat.com, 
-	linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org, rdiez-2006@rd10.de, 
 	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Matthew Wilcox <willy@infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 15, 2024 at 1:02=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
+Hi Steve,
+
+I tested the patch ontop of 6.8-rc4 and it works great.
+
+$ sudo mount -t cifs -o username=3Dubuntu,vers=3D1.0,wsize=3D16850
+//192.168.122.172/sambashare ~/share
+$ mount -l
+//192.168.122.172/sambashare on /home/ubuntu/share type cifs
+(rw,relatime,vers=3D1.0,cache=3Dstrict,username=3Dubuntu,uid=3D0,noforceuid=
+,gid=3D0,noforcegid,
+addr=3D192.168.122.172,soft,unix,posixpaths,serverino,mapposix,acl,rsize=3D=
+1048576,wsize=3D16384,bsize=3D1048576,retrans=3D1,echo_interval=3D60,actime=
+o=3D1,closetimeo=3D1)
+$ sudo dmesg | tail
+[   48.767560] Use of the less secure dialect vers=3D1.0 is not
+recommended unless required for access to very old servers
+[   48.768399] CIFS: VFS: Use of the less secure dialect vers=3D1.0 is
+not recommended unless required for access to very old servers
+[   48.769427] CIFS: VFS: wsize rounded down to 16384 to multiple of
+PAGE_SIZE 4096
+[   48.770069] CIFS: Attempting to mount //192.168.122.172/sambashare
+
+Setting the wsize=3D16850 rounds it down to 16384 like clockwork.
+
+I have built R. Diez a new distro kernel with the patch applied, and will a=
+sk
+him to test it. He did test the last one, which worked, and also rounded do=
+wn
+the wsize that was negotiated with his old 1.0 server.
+
+When I get some time I can help try bisect and locate the folios/netfs data
+corruption, but I think this is a good solution for the time being, or unti=
+l
+the netfslib changeover happens.
+
+Thanks,
+Matthew
+
+On Thu, 15 Feb 2024 at 20:32, Steve French <smfrench@gmail.com> wrote:
 >
 > Minor update to patch to work around the folios/netfs data corruption.
 >
@@ -343,13 +387,3 @@ maller delta in 6.3 -> 6.8-rc3 that the stable kernels can use?
 > Thanks,
 >
 > Steve
-
-Minor comments.
-In smb3_fs_context_parse_param, we don't strictly need to use
-round_down twice. We could use a modulo operation for the check.
-Also, there's an unnecessary change in fs_context.h though.
-Other than that, the patch looks good to me. RB
-
---=20
-Regards,
-Shyam
