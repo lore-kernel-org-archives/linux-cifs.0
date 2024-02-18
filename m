@@ -1,103 +1,157 @@
 Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0701B944;
-	Sun, 18 Feb 2024 09:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B74B5B5DE;
+	Sun, 18 Feb 2024 11:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708250348; cv=none; b=mn/1fPohnZDBCL50BYIN0I10JWiPfuUrqlDJZ0Kww6tNirT/yotAjnm5iUhL0WO2CyFtWm9XffqOPauMC4IAGmTT4YFcD2PhGbiL90UBm7PEQssA5Q7VHoMx9AoUh/l9kyRmoPtDlJu8EVECO5gZrxk7ZemVRZb0EohrS2AqyO8=
+	t=1708254953; cv=none; b=qV3of2w6i2ZB7okH/17y19tnUnK4pQjB/ndBiJWJChteYT0J7qU6t9ZD3tWP8q81lhCvTfnyBLPDoyx51PUvMsR1AkHgFdtSzJRFK9egn+68yEqVrd6RH0l44IVgSPolCJL+BbSceGLC8/nvklPqgvgVi9D5wkQlCTM51pV0TH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708250348; c=relaxed/simple;
-	bh=IGCnPy2SRJuc9eaAUbdC20XKH7Zdj+g2ydOyooARQwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hxyaKnzx2aGC7HTMZ2zvKzZOoW9AlQF22XV+l/hl8FqJrKYDNpxb2/zP58fErNrJ8Pcq7QIfVdxAOiGP7O/4ho9lLVpeynRz585BoEsCZpSYpPVRxPE6e+BatnsDSkRKAbev0Q69RyP6CHAL4uikxApiIvnDQGDiAfnMYc3eQ3M=
+	s=arc-20240116; t=1708254953; c=relaxed/simple;
+	bh=3RCAC2tGPp94QxUIfOSNRlkwK8c+7r6xMMR+D5gQG6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gmdhp2+/T9KjCiv069Lo9kIwMeqcMdHiwhG9k9bTKoATVkHfHJiena//FiVbzevhB3SdIu6wiZD1o5cCDdTdR182ZxfHo3Pymh/esIbndxus/S/SVUaoUyA4KNOv3y7TitOp02XOQlh7pD9fuj9l1H//oDp3yV+kChNq3Hmome8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
 Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id 934A672C90D;
-	Sun, 18 Feb 2024 12:59:03 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-	by imap.altlinux.org (Postfix) with ESMTPSA id 81D7336D016F;
-	Sun, 18 Feb 2024 12:59:03 +0300 (MSK)
-Date: Sun, 18 Feb 2024 12:59:03 +0300
+	by vmicros1.altlinux.org (Postfix) with ESMTP id B1E4C72C90D;
+	Sun, 18 Feb 2024 14:15:47 +0300 (MSK)
+Received: from beacon.altlinux.org (unknown [193.43.10.9])
+	by imap.altlinux.org (Postfix) with ESMTPSA id A290936D016F;
+	Sun, 18 Feb 2024 14:15:47 +0300 (MSK)
 From: Vitaly Chikunov <vt@altlinux.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
-Message-ID: <20240218095903.5tg6wo3jvnguyzf6@altlinux.org>
-References: <20230215000832.never.591-kees@kernel.org>
- <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
- <202402091559.52D7C2AC@keescook>
- <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
- <2024021034-populace-aerospace-03f3@gregkh>
- <20240210102145.p4diskhnevicn6am@altlinux.org>
- <20240217215016.emqr3stdm3yrh4dq@altlinux.org>
- <2024021808-coach-wired-41cb@gregkh>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	stable@vger.kernel.org
+Cc: Vitaly Chikunov <vt@altlinux.org>,
+	Kees Cook <keescook@chromium.org>,
+	linux-cifs@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.1.y] cifs: Convert struct fealist away from 1-element array
+Date: Sun, 18 Feb 2024 14:15:38 +0300
+Message-ID: <20240218111538.2592901-1-vt@altlinux.org>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <2024021808-coach-wired-41cb@gregkh>
+Content-Transfer-Encoding: 8bit
 
-Greg,
+From: Kees Cook <keescook@chromium.org>
 
-On Sun, Feb 18, 2024 at 10:31:29AM +0100, Greg Kroah-Hartman wrote:
-> On Sun, Feb 18, 2024 at 12:50:16AM +0300, Vitaly Chikunov wrote:
-> > 
-> > On Sat, Feb 10, 2024 at 01:21:45PM +0300, Vitaly Chikunov wrote:
-> > > On Sat, Feb 10, 2024 at 10:19:46AM +0000, Greg Kroah-Hartman wrote:
-> > > > On Sat, Feb 10, 2024 at 03:33:14AM +0300, Vitaly Chikunov wrote:
-> > > > > 
-> > > > > Can you please backport this commit (below) to a stable 6.1.y tree, it's
-> > > > > confirmed be Kees this could cause kernel panic due to false positive
-> > > > > strncpy fortify, and this is already happened for some users.
-> > > > 
-> > > > What is the git commit id?
-> > > 
-> > > 398d5843c03261a2b68730f2f00643826bcec6ba
-> > 
-> > Can you please apply this to the next 6.1.y release?
-> > 
-> > There is still non-theoretical crash as reported in
-> >   https://lore.kernel.org/all/qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf/
-> > 
-> > If commit hash was not enough:
-> > 
-> >   commit 398d5843c03261a2b68730f2f00643826bcec6ba
-> >   Author:     Kees Cook <keescook@chromium.org>
-> >   AuthorDate: Tue Feb 14 16:08:39 2023 -0800
-> > 
-> >       cifs: Convert struct fealist away from 1-element array
-> > 
-> > The commit is in mainline and is applying well to linux-6.1.y:
-> > 
-> >   (linux-6.1.y)$ git cherry-pick 398d5843c03261a2b68730f2f00643826bcec6ba
-> >   Auto-merging fs/smb/client/cifspdu.h
-> >   Auto-merging fs/smb/client/cifssmb.c
-> >   [linux-6.1.y 4a80b516f202] cifs: Convert struct fealist away from 1-element array
-> >    Author: Kees Cook <keescook@chromium.org>
-> >    Date: Tue Feb 14 16:08:39 2023 -0800
-> >    2 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> It does not apply cleanly due to renames, can you provide a backported,
-> and tested, patch please?
+commit 398d5843c03261a2b68730f2f00643826bcec6ba upstream.
 
-I cannot test it solves the bug since I don't use software that triggers
-the crash. But crash logic is obvious - sizeof of first element of char
-array is 1 byte and fortify code for strncpy issues panic. The patch is
-obviously missed.
+The kernel is globally removing the ambiguous 0-length and 1-element
+arrays in favor of flexible arrays, so that we can gain both compile-time
+and run-time array bounds checking[1].
 
-I can send that patch that is result of my git applying cleanly 398d5843c03261a2b68730f2f00643826bcec6ba.
-And I will try to build kernel and ensure it compiles well.
-Will this be enough?
+While struct fealist is defined as a "fake" flexible array (via a
+1-element array), it is only used for examination of the first array
+element. Walking the list is performed separately, so there is no reason
+to treat the "list" member of struct fealist as anything other than a
+single entry. Adjust the struct and code to match.
 
-Thanks,
+Additionally, struct fea uses the "name" member either as a dynamic
+string, or is manually calculated from the start of the struct. Redefine
+the member as a flexible array.
 
-> 
-> thanks,
-> 
-> greg k-h
+No machine code output differences are produced after these changes.
+
+[1] For lots of details, see both:
+    https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+    https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+
+Cc: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@cjr.nz>
+Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[ vt: Tested to not break build on x86_64 over v6.1.78. Bug report at [1]. ]
+Link: https://lore.kernel.org/all/qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf/
+Cc: stable@vger.kernel.org # 6.1
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+---
+ fs/smb/client/cifspdu.h |  4 ++--
+ fs/smb/client/cifssmb.c | 16 ++++++++--------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index 97bb1838555b..96ed0a4a2ce2 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -2593,7 +2593,7 @@ struct fea {
+ 	unsigned char EA_flags;
+ 	__u8 name_len;
+ 	__le16 value_len;
+-	char name[1];
++	char name[];
+ 	/* optionally followed by value */
+ } __attribute__((packed));
+ /* flags for _FEA.fEA */
+@@ -2601,7 +2601,7 @@ struct fea {
+ 
+ struct fealist {
+ 	__le32 list_len;
+-	struct fea list[1];
++	struct fea list;
+ } __attribute__((packed));
+ 
+ /* used to hold an arbitrary blob of data */
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 67c5fc2b2db9..784fc5ba2c44 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -5697,7 +5697,7 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* account for ea list len */
+ 	list_len -= 4;
+-	temp_fea = ea_response_data->list;
++	temp_fea = &ea_response_data->list;
+ 	temp_ptr = (char *)temp_fea;
+ 	while (list_len > 0) {
+ 		unsigned int name_len;
+@@ -5812,7 +5812,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+ 	else
+ 		name_len = strnlen(ea_name, 255);
+ 
+-	count = sizeof(*parm_data) + ea_value_len + name_len;
++	count = sizeof(*parm_data) + 1 + ea_value_len + name_len;
+ 	pSMB->MaxParameterCount = cpu_to_le16(2);
+ 	/* BB find max SMB PDU from sess */
+ 	pSMB->MaxDataCount = cpu_to_le16(1000);
+@@ -5836,14 +5836,14 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+ 	byte_count = 3 /* pad */  + params + count;
+ 	pSMB->DataCount = cpu_to_le16(count);
+ 	parm_data->list_len = cpu_to_le32(count);
+-	parm_data->list[0].EA_flags = 0;
++	parm_data->list.EA_flags = 0;
+ 	/* we checked above that name len is less than 255 */
+-	parm_data->list[0].name_len = (__u8)name_len;
++	parm_data->list.name_len = (__u8)name_len;
+ 	/* EA names are always ASCII */
+ 	if (ea_name)
+-		strncpy(parm_data->list[0].name, ea_name, name_len);
+-	parm_data->list[0].name[name_len] = 0;
+-	parm_data->list[0].value_len = cpu_to_le16(ea_value_len);
++		strncpy(parm_data->list.name, ea_name, name_len);
++	parm_data->list.name[name_len] = '\0';
++	parm_data->list.value_len = cpu_to_le16(ea_value_len);
+ 	/* caller ensures that ea_value_len is less than 64K but
+ 	we need to ensure that it fits within the smb */
+ 
+@@ -5851,7 +5851,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+ 	     negotiated SMB buffer size BB */
+ 	/* if (ea_value_len > buffer_size - 512 (enough for header)) */
+ 	if (ea_value_len)
+-		memcpy(parm_data->list[0].name+name_len+1,
++		memcpy(parm_data->list.name + name_len + 1,
+ 		       ea_value, ea_value_len);
+ 
+ 	pSMB->TotalDataCount = pSMB->DataCount;
+-- 
+2.42.1
+
