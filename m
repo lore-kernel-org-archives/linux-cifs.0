@@ -1,82 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45093D3AC
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Feb 2024 16:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DF66168D;
+	Tue, 20 Feb 2024 09:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708359182; cv=none; b=mDFhT5V89v8RqMz3EuO6h9YaoIXXYtp0H2K/h0q1r1yP3kczkbHdomcgNeea9gfEDlMEgRWp3gLFj68n0keWx9lO3sZfrflRmhVyN8E2wQErTMPsJC9cosgMIdSJjfXQRQXG8leEQih6OMEonzX2OzfNx/QIvuyZ4xB0rE8X1EE=
+	t=1708422693; cv=none; b=QUqvfM8XEmLxNGErxZCGJhs2pSPgJtRjqf2g1wKSrrMUjdWPH4MNmYIPjmOxy+m0rg/6oPcfR6cOZTVwQWdHOIYG4L19x81ark7KS/NRSLOd1zBx6Jeckt6UocBzP6m6xdA/YBGMvJDerIJkcK3DOcTAPF6JaXR7rcaISdOePCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708359182; c=relaxed/simple;
-	bh=TEbeuKi1D4WwK34OueQCHICSRhZ5+jaTYtBPp4NOkog=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=vEEbohQr0HoB9Zr4dIgvkXiaE5sjxscDlhX9W7/FiuKGGcdX9qibmyE+2U2444BFHxb2GA/l/W8SoF5+Mmte8euHiF/e4gXpisPp8P2XJye0SRHm2Gq99yOHbu3T5xDhFUko9pW+xmaGtd+bxtDCqbCIoBBLM5x0A/OwOK+6P4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwyaOQWi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1708422693; c=relaxed/simple;
+	bh=TPGKN24CaFtGRIE0VeP5mwAzn+ZOxDeAL3aTzRUirss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FErqkJetXFh+M/h1XCdH+ftOQKwZ47nKLsA1TszeJ3lrI55+/ZybXEZIum3repOOiyiIR7XMJ8beCe6Tf/IO5nbU6Zl0137JULHwtTz8+qlRrFtPDvVYQ1Ao//HAYWXTHi9pXLeXm7VFPeOZbSpfUSniDolafooP7qotdAkkzIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HdGmA/T8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwyaOQWi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708359179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qw1Zo0E33/fdGs8X8g9v7Lf2Wcxxz6qcLyaGW55/s6Y=;
-	b=gwyaOQWiC4UyoY03u19z7Dh4VVkp7glu13R5RF5WlQKeBiljp1J0SVb4Kcbag+paOE60/l
-	JDGZINPNyjosqysfBC6ZuaRYB68lJqTxrLCruc0fTVnU+es+Jbe7ybQEsK+mQLs1h4MAAp
-	laKd5Vbu86OG4sXedG5n2YPvmtoG5Z0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-3bJK7h8bOYeO_1GkDHJOeg-1; Mon, 19 Feb 2024 11:12:52 -0500
-X-MC-Unique: 3bJK7h8bOYeO_1GkDHJOeg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B26D2882087;
-	Mon, 19 Feb 2024 16:12:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0EFA71121306;
-	Mon, 19 Feb 2024 16:12:48 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240209105947.GF1516992@kernel.org>
-References: <20240209105947.GF1516992@kernel.org> <20240205225726.3104808-1-dhowells@redhat.com> <20240205225726.3104808-10-dhowells@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: Re: [PATCH v5 09/12] cifs: Cut over to using netfslib
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HdGmA/T8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C02F3C433F1;
+	Tue, 20 Feb 2024 09:51:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708422692;
+	bh=TPGKN24CaFtGRIE0VeP5mwAzn+ZOxDeAL3aTzRUirss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HdGmA/T8Yh36xJUAh9kQ4QRKg7xEAQSuwUEa0iQfBV+TmOCP9i2ysDi55lCEigAVt
+	 iMT8PDu6Rsb3s5qii2+KygzOb/oCQ9TYhW7beSNZoJsCyQepfzdtxrVNl6qdJpDfM9
+	 ENot3D+ATZi+xZnx9fTxI67SE5FeCahLHb/4spD+As4ZJA9cprBz+57uYMwVLGHLxo
+	 dUoQEOj3B16cNb7kuh8ze8i6nhjOtYUO6nOlEpyjUfRbKUX24e7uigjhU/IF3uPzzV
+	 3e6/jprnSqfIlqBk7V1r9K0s6hbEbuvieS7jIy8VvBS7T/S/8Pa9u5ZtLGfGibQ3us
+	 f9XfJxph4bz1g==
+Date: Tue, 20 Feb 2024 10:51:26 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: David Howells <dhowells@redhat.com>, 
+	Christian Brauner <christian@brauner.io>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Jeff Layton <jlayton@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, linux_oss@crudebyte.com
+Subject: Re: [PATCH 2/2] netfs: Fix missing zero-length check in unbuffered
+ write
+Message-ID: <20240220-autoteile-enthoben-a9a16739b2b9@brauner>
+References: <20240129094924.1221977-1-dhowells@redhat.com>
+ <20240129094924.1221977-3-dhowells@redhat.com>
+ <960e015a-ec2e-42c2-bd9e-4aa47ab4ef2a@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <229304.1708359168.1@warthog.procyon.org.uk>
-Date: Mon, 19 Feb 2024 16:12:48 +0000
-Message-ID: <229305.1708359168@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <960e015a-ec2e-42c2-bd9e-4aa47ab4ef2a@leemhuis.info>
 
-Simon Horman <horms@kernel.org> wrote:
+On Mon, Feb 19, 2024 at 09:38:33AM +0100, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 29.01.24 10:49, David Howells wrote:
+> > Fix netfs_unbuffered_write_iter() to return immediately if
+> > generic_write_checks() returns 0, indicating there's nothing to write.
+> > Note that netfs_file_write_iter() already does this.
+> > 
+> > Also, whilst we're at it, put in checks for the size being zero before we
+> > even take the locks.  Note that generic_write_checks() can still reduce the
+> > size to zero, so we still need that check.
+> > 
+> > Without this, a warning similar to the following is logged to dmesg:
+> > 
+> > 	netfs: Zero-sized write [R=1b6da]
+> > 
+> > and the syscall fails with EIO, e.g.:
+> > 
+> > 	/sbin/ldconfig.real: Writing of cache extension data failed: Input/output error
+> > 
+> > This can be reproduced on 9p by:
+> > 
+> > 	xfs_io -f -c 'pwrite 0 0' /xfstest.test/foo
+> > 
+> > Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+> > Reported-by: Eric Van Hensbergen <ericvh@kernel.org>
+> > Link: https://lore.kernel.org/r/ZbQUU6QKmIftKsmo@FV7GG9FTHL/
+> 
+> David, thx for fixing Eric's regression, which I'm tracking.
+> 
+> Christian, just wondering: that patch afaics is sitting in vfs.netfs for
+> about three weeks now -- is that intentional or did it maybe fell
+> through the cracks somehow?
 
-> Nit: this hunk would probably be better placed in the
->      patch at adds cifs_req_ops to fs/smb/client/file.c
-
-I've moved that to the patch that adds cifs_req_ops.
-
-David
-
+I've moved it to vfs.fixes now and will send later this week. Thanks for
+the reminder!
