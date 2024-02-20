@@ -1,43 +1,47 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CA676C89;
-	Tue, 20 Feb 2024 19:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DB4137C41;
+	Tue, 20 Feb 2024 20:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708457549; cv=none; b=YvwX0qWxpqFL+lM4cXroPQcbA4oyhZxbJbk5ooQyDl11HU20rPukBQV99nLG1jjnM5s6PaIwcrROCTFMhnwT/HDVdDoofH83zzsUCo+3wBb0BWxX/HtzfpYrj0FC5SwBjqlamhHqYApjGg+VPZlsLk/NML/dYF0v9SWfGMVweJM=
+	t=1708460873; cv=none; b=IznzjKtqzm2WapX6cKFsDxq95d+/USmYq0xzZm6ghnt3qL1e50sjjvS0ID7VNkihxfD3BdvtAvsqDDe0lFTNiTwu+Pb53toCQ9recCBWpEnmG9Tb3di+CZNUA1V4bLB2N5bSigHXGdKK70YnIF2835Pl59JA8xVTFU1/WIuPPIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708457549; c=relaxed/simple;
-	bh=IdvaFvhm79uZiC83q8Okzw3yGRUceDjDYvrDd2qCOyA=;
+	s=arc-20240116; t=1708460873; c=relaxed/simple;
+	bh=TsvFKFz3wRTd8DYn1XhKWst0S8r7DOuRv0SpGXlwJ00=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pvTTqp0gcGbxtXom+MgZOUEkep9YxCuGWSiDxJKVMgcyt5eHiwyAnRrZJh2Hpo5k8iKjJUHrlmkoUEsQsabXX8SPgWHKENpkTRl+t6W73QJQx3dkXFoRyq1M5uRcyFivZlBrzzfPj3GC6tFweEcovIpKgP0Kexem7hvYmzHQqww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=M5fNXZ02; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHPBPGNt+dmXRCsRexdx0dWtaOzTX9xQh8dT7+VvpIK9prhSp7NRhBxj6SglfonGYnk5uFWNGKukNynWQ/a33Z2APwfh+6VjqPEm4ofBLTZlDDhaIm1MDcNYm2cIbsNw2L+1gL2BAHvWzXe4m2uG31OQTybFH6F8+OG99W81uV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=AD9TOdBr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="M5fNXZ02"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9EeLMmuj2gBRx3tMUzCZ8WVsu/6ToXUdH4WzDVXZTQ4=; b=M5fNXZ02w/eoM/RRtl9bP2IekM
-	rKkZ6vbrC9qUlnqWk3B3OdAF0FLLpopzPx/6AJUHm0aEe8bO7NGr9sx1IYFYusx74M9gXy+ldsLLc
-	cry8b4XY66mE+sk4cFcukfSdX80v0FPktd/Gxi/vZopLYq+TfXJ1eIF+R15SOTAU29so/3AYZRGPH
-	x5HokIHk0Gi8uofz+qWSO0NU8zYwRH/JiAlvGvt2l/QCC1s4SBSyyYfBp3dYt6zuOu2Egn7GZUzv2
-	HPzlq618z9fG1e8kFv21sA1nAreJqS53N+I8kJgGX1gK6eMFfV842aA7mcN32JgHdrIVaw9dkjw+Y
-	2+FjgfEg==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rcVqq-0000000GOLF-3443;
-	Tue, 20 Feb 2024 19:32:24 +0000
-Date: Tue, 20 Feb 2024 19:32:24 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Steve French <smfrench@gmail.com>
-Cc: David Howells <dhowells@redhat.com>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: folio oops
-Message-ID: <ZdT-SOlTdrDoFqnX@casper.infradead.org>
-References: <CAH2r5ms2Hn1cmYEmmbGXTpCo2DY8FY8mfMewcvzEe2S-vjV0pQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="AD9TOdBr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A6CC433C7;
+	Tue, 20 Feb 2024 20:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1708460872;
+	bh=TsvFKFz3wRTd8DYn1XhKWst0S8r7DOuRv0SpGXlwJ00=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AD9TOdBrP7PwrvU/gp/NPzsp+80VT395aj8UXDMP9t8CBHbVlXI0W4c3VraOno6sM
+	 JFv8SdpGT+aYh9t3wFILLXpw5O/JADnRmYD/BQWDOdtH44xFwX3qqYuJyTdIqEl1TN
+	 +45tKu8Zwk9lauW/BkfHeGpPp0WzFbOCEgEvo1+g=
+Date: Tue, 20 Feb 2024 21:27:49 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: Paulo Alcantara <pc@manguebit.com>,
+	Jan =?utf-8?B?xIxlcm3DoWs=?= <sairon@sairon.cz>,
+	Leonardo Brondani Schenkel <leonardo@schenkel.net>,
+	stable@vger.kernel.org, regressions@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	Mathias =?iso-8859-1?Q?Wei=DFbach?= <m.weissbach@info-gate.de>
+Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with
+ "Resource temporarily unavailable"
+Message-ID: <2024022058-scrubber-canola-37d2@gregkh>
+References: <8ad7c20e-0645-40f3-96e6-75257b4bd31a@schenkel.net>
+ <7425b05a-d9a1-4c06-89a2-575504e132c3@sairon.cz>
+ <446860c571d0699ed664175262a9e84b@manguebit.com>
+ <2024010846-hefty-program-09c0@gregkh>
+ <88a9efbd0718039e6214fd23978250d1@manguebit.com>
+ <Zbl7qIcpekgPmLDP@eldamar.lan>
+ <Zbl881W5S-nL7iof@eldamar.lan>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,67 +50,85 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH2r5ms2Hn1cmYEmmbGXTpCo2DY8FY8mfMewcvzEe2S-vjV0pQ@mail.gmail.com>
+In-Reply-To: <Zbl881W5S-nL7iof@eldamar.lan>
 
-On Tue, Feb 20, 2024 at 12:09:17PM -0600, Steve French wrote:
-> FYI - I hit this oops in xfstests (around generic/048) today.  This is
-> with 6.8-rc5
+On Tue, Jan 30, 2024 at 11:49:23PM +0100, Salvatore Bonaccorso wrote:
+> Hi Paulo, hi Greg,
 > 
-> Any thoughts?
+> On Tue, Jan 30, 2024 at 11:43:52PM +0100, Salvatore Bonaccorso wrote:
+> > Hi Paulo, hi Greg,
+> > 
+> > Note this is about the 5.10.y backports of the cifs issue, were system
+> > calls fail with "Resource temporarily unavailable".
+> > 
+> > On Mon, Jan 08, 2024 at 12:58:49PM -0300, Paulo Alcantara wrote:
+> > > Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+> > > 
+> > > > Why can't we just include eb3e28c1e89b ("smb3: Replace smb2pdu 1-element
+> > > > arrays with flex-arrays") to resolve this?
+> > > 
+> > > Yep, this is the right way to go.
+> > > 
+> > > > I've queued it up now.
+> > > 
+> > > Thanks!
+> > 
+> > Is the underlying issue by picking the three commits:
+> > 
+> > 3080ea5553cc ("stddef: Introduce DECLARE_FLEX_ARRAY() helper")
+> > eb3e28c1e89b ("smb3: Replace smb2pdu 1-element arrays with flex-arrays")
+> > 
+> > and the last commit in linux-stable-rc for 5.10.y:
+> > 
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit?id=a280ecca48beb40ca6c0fc20dd5a7fdd9b3ee0b7
+> > 
+> > really fixing the issue?
+> > 
+> > Since we need to release a new update in Debian, I picked those three
+> > for testing on top of the 5.10.209-1 and while testing explicitly a
+> > cifs mount, I still get:
+> > 
+> > statfs(".", 0x7ffd809d5a70)             = -1 EAGAIN (Resource temporarily unavailable)
+> > 
+> > The same happens if I build
+> > https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit?id=a280ecca48beb40ca6c0fc20dd5a7fdd9b3ee0b7
+> > (knowing that it is not yet ready for review).
+> > 
+> > I'm slight confused as a280ecca48be ("cifs: fix off-by-one in
+> > SMB2_query_info_init()") says in the commit message:
+> > 
+> > [...]
+> > 	v5.10.y doesn't have
+> > 
+> >         eb3e28c1e89b ("smb3: Replace smb2pdu 1-element arrays with flex-arrays")
+> > 
+> > 	and the commit does
+> > [...]
+> > 
+> > and in meanwhile though the eb3e28c1e89b was picked (in a backported
+> > version). As 6.1.75-rc2 itself does not show the same problem, might
+> > there be a prerequisite missing in the backports for 5.10.y or a
+> > backport being wrong?
+> 
+> The problem seems to be that we are picking the backport for
+> eb3e28c1e89b, but then still applying 
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit?id=a280ecca48beb40ca6c0fc20dd5
+> 
+> which was made for the case in 5.10.y where eb3e28c1e89b is not
+> present.
+> 
+> I reverted a280ecca48beb40ca6c0fc20dd5 and now:
+> 
+> statfs(".", {f_type=SMB2_MAGIC_NUMBER, f_bsize=4096, f_blocks=2189197, f_bfree=593878, f_bavail=593878, f_files=0, f_ffree=0, f_fsid={val=[2004816114, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0
 
-Umm, this isn't an oops, it's just a backtrace.  Do you have anything
-that was printed before the backtrace?  I'd expect to see something
-complaining about sleeping for too long, since this is where we wait for
-writeback to finish ... the bug is probably something not calling
-folio_end_writeback() when it should.
+So this works?  Would that just be easier to do overall?  I feel like
+that might be best here.
 
-> 125545.834971] task:xfs_io          state:D stack:0     pid:1697299
-> tgid:1697299 ppid:1692194 flags:0x00004002
-> [125545.834987] Call Trace:
-> [125545.834992]  <TASK>
-> [125545.835002]  __schedule+0x2cb/0x760
-> [125545.835022]  schedule+0x33/0x110
-> [125545.835031]  io_schedule+0x46/0x80
-> [125545.835039]  folio_wait_bit_common+0x136/0x330
-> [125545.835052]  ? __pfx_wake_page_function+0x10/0x10
-> [125545.835069]  folio_wait_bit+0x18/0x30
-> [125545.835076]  folio_wait_writeback+0x2b/0xa0
-> [125545.835087]  __filemap_fdatawait_range+0x93/0x110
-> [125545.835104]  filemap_write_and_wait_range+0x94/0xc0
-> [125545.835120]  cifs_flush+0x9a/0x140 [cifs]
-> [125545.835315]  filp_flush+0x35/0x90
-> [125545.835329]  filp_close+0x14/0x30
-> [125545.835341]  put_files_struct+0x85/0xf0
-> [125545.835354]  exit_files+0x47/0x60
-> [125545.835365]  do_exit+0x295/0x530
-> [125545.835377]  ? wake_up_state+0x10/0x20
-> [125545.835391]  do_group_exit+0x35/0x90
-> [125545.835403]  __x64_sys_exit_group+0x18/0x20
-> [125545.835414]  do_syscall_64+0x74/0x140
-> [125545.835424]  ? handle_mm_fault+0xad/0x380
-> [125545.835437]  ? do_user_addr_fault+0x338/0x6b0
-> [125545.835446]  ? irqentry_exit_to_user_mode+0x6b/0x1a0
-> [125545.835458]  ? irqentry_exit+0x43/0x50
-> [125545.835467]  ? exc_page_fault+0x94/0x1b0
-> [125545.835478]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> [125545.835490] RIP: 0033:0x7f9b67eea36d
-> [125545.835549] RSP: 002b:00007ffde6442cd8 EFLAGS: 00000202 ORIG_RAX:
-> 00000000000000e7
-> [125545.835560] RAX: ffffffffffffffda RBX: 00007f9b68000188 RCX:
-> 00007f9b67eea36d
-> [125545.835566] RDX: 00000000000000e7 RSI: ffffffffffffff28 RDI:
-> 0000000000000000
-> [125545.835572] RBP: 0000000000000001 R08: 0000000000000000 R09:
-> 0000000000000000
-> [125545.835576] R10: 00005b88e60ec720 R11: 0000000000000202 R12:
-> 0000000000000000
-> [125545.835582] R13: 0000000000000000 R14: 00007f9b67ffe860 R15:
-> 00007f9b680001a0
-> [125545.835597]  </TASK>
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
-> 
+Again, a set of simple "do this and this and this" would be nice to
+have, as there are too many threads here, some incomplete and missing
+commits on my end.
+
+confused,
+
+greg k-h
