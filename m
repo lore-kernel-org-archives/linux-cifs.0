@@ -1,120 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C828633F7
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Feb 2024 16:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A280733F7;
+	Wed, 21 Feb 2024 17:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708533280; cv=none; b=NszM6O2q2S4c6YYPhulB3Leq6gdHfPtlLX/h6PHm5izmyYlRh5qOvmAO+Hmh4ybUJXMHVHElPAlfYhy6Xb3kPlNufTAnDA5Xd71mHFMS2M/9oo11TycaE1UAY+8WJguk+oCfhPRLgS05gqW3cMo3xG6rpDg0czHN64LuDvKQTEA=
+	t=1708535631; cv=none; b=VXJiBwY8cg3cdSBIWgfA/LYBKskpKmy/dhMoyT17Uz3Sp5yGiUYK5gSYf9zY+kq9uo2e1wDohuk3qh3boVRke4ivr7GBg4LeMNktjTM/sbLi2JF4f/EAvmYXhGM4Oyso82gyHPoAh1sFvEH/JEO4Q2e3JmKNK7VcTzaiCiWOwCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708533280; c=relaxed/simple;
-	bh=tCh8EfGupR/stySfs1KIXEiN5NJgJJ4/TRW+x+mLWx0=;
-	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iDVWwXkEgBs7H1uNfKEPcP+omn/2jGDV6apmdKn0fvUzD5OIqLE/qEOGQgvyjdt56+yp8ZquSE1nVdbUiPSf09O5CudTbtqS/ok4J9NRbbbAAOJSIO2JfEsFaJS4WdIddiSef2avv0ilWuclKZU9kIF7rIJhk6ePDw5Z0I8jOvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggAHjApw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggAHjApw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68975C433C7
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Feb 2024 16:34:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708533280;
-	bh=tCh8EfGupR/stySfs1KIXEiN5NJgJJ4/TRW+x+mLWx0=;
-	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-	b=ggAHjApwdMVlNrO3MAa1lH1TO+VNP64IzdapTMQ0qMRd0d84LgXOowN8WwSSCE2Za
-	 4dyzGk19xpUyft5cqqE9NSBZKi7jmSPrbeYRr78Vd+oPz2lK1w9MSx2J900E2ZYOFn
-	 6Lb1Q8fMRDQzUIfX8IdmOchkpdu1RFH8fslwNVMfA2kxBC/z3o4FCDyI8M2h2gVkLC
-	 aAdU5Vzz2OsycK1/FVSsLwMwBaa3aKDBDVs96f6fFzaO4zCQ+D7cCOarojfCdWpSLk
-	 +CViZPdacn7RRPa4dde/DQcIQrUicDZIiB5JxFMUHGZb04qQd5rpzdrAiPODUF9kKi
-	 5VZsNfjRkHkDw==
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-599fc25071bso4523320eaf.3
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Feb 2024 08:34:40 -0800 (PST)
-X-Gm-Message-State: AOJu0YzdeCpkHJEkdeAEvTJ8FR8pkAxGosbXdHpbqHnviJHWweZotWsS
-	GOiscVfMSGUfiNTCcPHVeUwjYh7/YrbhsY+IToaNE5JJsRWMdnyPnQXNOjg6u5Y0B/IzFHSCqoZ
-	Xhjm3Ezq+pEab2d2aTdHLjgzVzL8=
-X-Google-Smtp-Source: AGHT+IEa4D42TdH/qKL1khWhSJoVtZ5UIz/OB7/80npw3VBIjIdFdlIHovquVGVgt2ROyr8obOOSBP0PZwx9Adb/+mY=
-X-Received: by 2002:a4a:6b46:0:b0:59a:e669:a37c with SMTP id
- h6-20020a4a6b46000000b0059ae669a37cmr20248022oof.1.1708533279716; Wed, 21 Feb
- 2024 08:34:39 -0800 (PST)
+	s=arc-20240116; t=1708535631; c=relaxed/simple;
+	bh=jggTDE9oGVLyy1ERt5LYHY11LaM/dNOjk89c0ST+Bfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MZN+f4rUa+2t3IvyuIjtXe1oW91OaYss/uK+KMYeu1Ncaa3VCtGf8fE5dzHXHbN/1AoMdNOt/QQOpvJufqs+qwSspueUYilnoBI+GRzbs1/ds7fdXZ2wxPRccdSlrNBJhL+xxRBRqOk/KrREIrFKMVkgYsUtO4ZbMhWEYUs4PaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id BA4B572C90D;
+	Wed, 21 Feb 2024 20:13:46 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+	by imap.altlinux.org (Postfix) with ESMTPSA id AD97136D016F;
+	Wed, 21 Feb 2024 20:13:46 +0300 (MSK)
+Date: Wed, 21 Feb 2024 20:13:46 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
+Message-ID: <20240221171346.iur7yuuogg2bu3lq@altlinux.org>
+References: <20230215000832.never.591-kees@kernel.org>
+ <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
+ <202402091559.52D7C2AC@keescook>
+ <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
+ <2024021034-populace-aerospace-03f3@gregkh>
+ <20240210102145.p4diskhnevicn6am@altlinux.org>
+ <20240217215016.emqr3stdm3yrh4dq@altlinux.org>
+ <2024021808-coach-wired-41cb@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a8a:c12:0:b0:51b:642f:123c with HTTP; Wed, 21 Feb 2024
- 08:34:38 -0800 (PST)
-In-Reply-To: <20240220142601.3624584-2-mmakassikis@freebox.fr>
-References: <20240220142601.3624584-1-mmakassikis@freebox.fr> <20240220142601.3624584-2-mmakassikis@freebox.fr>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Feb 2024 01:34:38 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9JnrLdULRttM7FApWF1jTaF5+JAm+=dvhO0a6fB1Pizw@mail.gmail.com>
-Message-ID: <CAKYAXd9JnrLdULRttM7FApWF1jTaF5+JAm+=dvhO0a6fB1Pizw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ksmbd: retrieve number of blocks using vfs_getattr in set_file_allocation_info
-To: Marios Makassikis <mmakassikis@freebox.fr>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <2024021808-coach-wired-41cb@gregkh>
 
-2024-02-20 23:26 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
-> Use vfs_getattr() as inode->i_blocks may be 0 on some filesystems (XFS
-> for example).
->
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-> ---
->  fs/smb/server/smb2pdu.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index 1a594753f606..f4de2198b71b 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -5812,15 +5812,21 @@ static int set_file_allocation_info(struct
-> ksmbd_work *work,
->
->  	loff_t alloc_blks;
->  	struct inode *inode;
-> +	struct kstat stat;
->  	int rc;
->
->  	if (!(fp->daccess & FILE_WRITE_DATA_LE))
->  		return -EACCES;
->
-> +	rc =3D vfs_getattr(&path, &stat, STATX_BASIC_STATS | STATX_BTIME,
-> +			 AT_STATX_SYNC_AS_STAT);
-fs/smb/server/smb2pdu.c: In function =E2=80=98set_file_allocation_info=E2=
-=80=99:
-fs/smb/server/smb2pdu.c:5821:20: error: =E2=80=98path=E2=80=99 undeclared (=
-first use
-in this function)
- 5821 |  rc =3D vfs_getattr(&path, &stat, STATX_BASIC_STATS | STATX_BTIME,
+Greg,
 
-There is a build error with your patch.
-You need to change it with fp->filp->f_path.
-> +	if (rc)
-> +		return rc;
-> +
->  	alloc_blks =3D (le64_to_cpu(file_alloc_info->AllocationSize) + 511) >> =
-9;
->  	inode =3D file_inode(fp->filp);
->
-> -	if (alloc_blks > inode->i_blocks) {
-> +	if (alloc_blks > stat.blocks) {
->  		smb_break_all_levII_oplock(work, fp, 1);
->  		rc =3D vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0,
->  				   alloc_blks * 512);
-> @@ -5828,7 +5834,7 @@ static int set_file_allocation_info(struct ksmbd_wo=
-rk
-> *work,
->  			pr_err("vfs_fallocate is failed : %d\n", rc);
->  			return rc;
->  		}
-> -	} else if (alloc_blks < inode->i_blocks) {
-> +	} else if (alloc_blks < stat.blocks) {
->  		loff_t size;
->
->  		/*
-> --
-> 2.34.1
->
->
->
+On Sun, Feb 18, 2024 at 10:31:29AM +0100, Greg Kroah-Hartman wrote:
+> On Sun, Feb 18, 2024 at 12:50:16AM +0300, Vitaly Chikunov wrote:
+> > 
+> > On Sat, Feb 10, 2024 at 01:21:45PM +0300, Vitaly Chikunov wrote:
+> > > On Sat, Feb 10, 2024 at 10:19:46AM +0000, Greg Kroah-Hartman wrote:
+> > > > On Sat, Feb 10, 2024 at 03:33:14AM +0300, Vitaly Chikunov wrote:
+> > > > > 
+> > > > > Can you please backport this commit (below) to a stable 6.1.y tree, it's
+> > > > > confirmed be Kees this could cause kernel panic due to false positive
+> > > > > strncpy fortify, and this is already happened for some users.
+> > > > 
+> > > > What is the git commit id?
+> > > 
+> > > 398d5843c03261a2b68730f2f00643826bcec6ba
+> > 
+> > Can you please apply this to the next 6.1.y release?
+> > 
+> > There is still non-theoretical crash as reported in
+> >   https://lore.kernel.org/all/qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf/
+> > 
+> > If commit hash was not enough:
+> > 
+> >   commit 398d5843c03261a2b68730f2f00643826bcec6ba
+> >   Author:     Kees Cook <keescook@chromium.org>
+> >   AuthorDate: Tue Feb 14 16:08:39 2023 -0800
+> > 
+> >       cifs: Convert struct fealist away from 1-element array
+> > 
+> > The commit is in mainline and is applying well to linux-6.1.y:
+> > 
+> >   (linux-6.1.y)$ git cherry-pick 398d5843c03261a2b68730f2f00643826bcec6ba
+> >   Auto-merging fs/smb/client/cifspdu.h
+> >   Auto-merging fs/smb/client/cifssmb.c
+> >   [linux-6.1.y 4a80b516f202] cifs: Convert struct fealist away from 1-element array
+> >    Author: Kees Cook <keescook@chromium.org>
+> >    Date: Tue Feb 14 16:08:39 2023 -0800
+> >    2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> It does not apply cleanly due to renames, can you provide a backported,
+> and tested, patch please?
+
+I sent the backported patch as you suggested[1] but I don't see it
+appearing in 6.1.79-rc1 review. Did I make some mistake while sending
+it?
+
+Thanks,
+
+[1] https://lore.kernel.org/stable/20240218111538.2592901-1-vt@altlinux.org/
+
+> 
+> thanks,
+> 
+> greg k-h
