@@ -1,133 +1,109 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57151C8E2
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 06:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE86C7469;
+	Thu, 22 Feb 2024 07:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708584047; cv=none; b=PWIRxV+iJ8IRDmody8N1kAqvXM7tPnMtyBtEOYdGkKoyZ8FCTCR8TIf7DG33bYZwYWjjkAzgcXGq+7OrVMig9IQaSz/g5SXupY79+zZE3r5iJcVrbalpl6RD9n2WRXt9m9jbTdnaHyibId4+dngJhrzgo5u49qF+11pI8AagiRY=
+	t=1708585694; cv=none; b=CDKxdixJanvm2ycXjiwvYAde2DeHf2g4WPL4Btk8/wTSJ5rqiVYIccHdx3jiHg70zI9I80NhEWJHkmu7Z19bs6Y6xZ28RVqyWGB2HnMLEs54Po0+UijzVPKXJi7kKkI53dsxTLYVhhYaz9bCH9BPpSUsS6qYTd0GHB9TQUu2Pa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708584047; c=relaxed/simple;
-	bh=8qbDf5r+Lp32ivHPTyddRBGp9CEEjoAS+Qo9YS0wenk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=cWN2DqdDjs9feLUIoniIU1zBb03Kao8RbctM4iHNFoeHxW439e5Jb/ath/amHeF4tfhOKXf5A0XM9L43XXis16t0LUS50YGfKqlZHefPZ/hOxcWsBQrOW0Hz1ExZyahYRzmac81kSQj2/GIpgEqEJMnzvWbDnOFSP2ivZOl6WwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNR6utzw; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNR6utzw"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d0a4e1789cso16032791fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Feb 2024 22:40:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708584043; x=1709188843; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Is1Hk8pJRrHgKq2pzPZI4LIXhrl9F/LhHiQKLEGareo=;
-        b=kNR6utzwarK+JBzp4U8YQkw7XSV7KB2FLmj4tzSGt31wJUQUZoay9qdg+dh0jtTZAe
-         TghPkJnsPbhEGyJQIqf0kM8F1wgGnHDkz+cZgdtGaWTye4lehCzsAW8eFeUWRyImc4q6
-         oeSBv+KnYIK9MJA2sFGv0Q1DwtvnVz7jK93uNPo4QN3FcntzMkIghPBpOnKmR5+iUCOA
-         86krGyYndz4/8/DtSEXcb74Lh/ENW78/XEOQ6Hat2dsFWjQZNNhonwO3WoRc/ChmeCqu
-         s0zNRcQU6BQyE28vVkS/hZOLihP5/3HZjfNbWI47HLp1V99CLvhfHINERHQxIMkslRGO
-         EPMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708584043; x=1709188843;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Is1Hk8pJRrHgKq2pzPZI4LIXhrl9F/LhHiQKLEGareo=;
-        b=rjoGGDXKjzeKCKlv8z4S/2S5VLCtTa0y7s6s8cwHNdfs6gErtbuepqqKnrXq4RMbOt
-         v5ebautaKjt4HyflkLuHRDl5Fl/EaHTlp6uR6Y3Pi0ORsSt3iFmg4N7NcxYDUr/Hcs3Q
-         XVPHK1pHVvqzfvQyQGTCPKkkq/xx24ivfiOE7A+GuvsFpDFK4I/CKWe+9bUKBYtK1aDw
-         JS6EA6Ar7cgf6TpxV/aSLC+I/NrUeYA4b9AqzzN5u0fCyolVjR822Ts2TKGTN7nYm3kx
-         9w3MkTYQaNn+AV10wsALlj6PIYGzyWIBmPe+Q6uMhTBlE3Z76uaV9lxRIDJHBycuBWUO
-         /UcQ==
-X-Gm-Message-State: AOJu0YwBEeKblKCSG4k8DlbcpTIOPPDPJRThXGg8k1JkHb8FA1KhHsCn
-	/2K0ZPWqfkhQWH0mTmi2fhXol8KF0u2tXzPwMbIsqnze5Iubs3ME+RbUhDLFpAEUn63yeSL3iC1
-	6HPe628krHrr2T2MDrEbFkW1b4/C89jRMZQlx7g==
-X-Google-Smtp-Source: AGHT+IHQXZxOP9ohz38J//7Gnu4POLd1jWz4klsApGXUawi8i8JkCd+NqBdhgrO+WpD+mRBEfGqw3TI13Bb0MOfccgY=
-X-Received: by 2002:a2e:b1c9:0:b0:2d2:3f13:52e7 with SMTP id
- e9-20020a2eb1c9000000b002d23f1352e7mr6006238lja.12.1708584042872; Wed, 21 Feb
- 2024 22:40:42 -0800 (PST)
+	s=arc-20240116; t=1708585694; c=relaxed/simple;
+	bh=E5w37cV2AfWcKZkEVnT1YF4RZvFBCkYgBD97N+YjcJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y4b5FDm85VvqF1b/Wi67Huo8xR+Ilh8Bw8xKlmBhf16+WxFvDY6kwfq3PidbQMnlR/hlQzF/gbn9v2N7gWPFGIa9yPhxih6Mxlt4RQ4pxgf0mJabh2/QUisN2OF8LrSI9hvfp3Zfp+2cGowmRvwnTD7JpguWjstG6jtgnG4u8pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id 1B1DC72C90D;
+	Thu, 22 Feb 2024 10:08:03 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+	by imap.altlinux.org (Postfix) with ESMTPSA id 0B90536D016F;
+	Thu, 22 Feb 2024 10:08:03 +0300 (MSK)
+Date: Thu, 22 Feb 2024 10:08:02 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
+Message-ID: <20240222070802.pdxetqgin7cxdp7x@altlinux.org>
+References: <20230215000832.never.591-kees@kernel.org>
+ <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
+ <202402091559.52D7C2AC@keescook>
+ <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
+ <2024021034-populace-aerospace-03f3@gregkh>
+ <20240210102145.p4diskhnevicn6am@altlinux.org>
+ <20240217215016.emqr3stdm3yrh4dq@altlinux.org>
+ <2024021808-coach-wired-41cb@gregkh>
+ <20240221171346.iur7yuuogg2bu3lq@altlinux.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 22 Feb 2024 00:40:31 -0600
-Message-ID: <CAH2r5mtsvNU--3EDFvAPSVuSnLpmbDr5A4YbaY=9rrndLyOpiA@mail.gmail.com>
-Subject: [PATCH][SMB3 client] update allocation size more accurately on write completion
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: Shyam Prasad N <nspmangalore@gmail.com>, Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, 
-	Bharath S M <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.com>
-Content-Type: multipart/mixed; boundary="000000000000f1d8440611f2b89e"
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <20240221171346.iur7yuuogg2bu3lq@altlinux.org>
 
---000000000000f1d8440611f2b89e
-Content-Type: text/plain; charset="UTF-8"
+Greg,
 
-Changes to allocation size are approximated for extending writes of
-cached files until the server returns the actual value (on SMB3 close
-or query info for example), but it was setting the estimated value for
-number of blocks to larger than the file size even if the file is
-likely sparse which breaks various xfstests (e.g. generic/129, 130,
-221, 228).
+On Wed, Feb 21, 2024 at 08:13:46PM +0300, Vitaly Chikunov wrote:
+> On Sun, Feb 18, 2024 at 10:31:29AM +0100, Greg Kroah-Hartman wrote:
+> > On Sun, Feb 18, 2024 at 12:50:16AM +0300, Vitaly Chikunov wrote:
+> > > 
+> > > On Sat, Feb 10, 2024 at 01:21:45PM +0300, Vitaly Chikunov wrote:
+> > > > On Sat, Feb 10, 2024 at 10:19:46AM +0000, Greg Kroah-Hartman wrote:
+> > > > > On Sat, Feb 10, 2024 at 03:33:14AM +0300, Vitaly Chikunov wrote:
+> > > > > > 
+> > > > > > Can you please backport this commit (below) to a stable 6.1.y tree, it's
+> > > > > > confirmed be Kees this could cause kernel panic due to false positive
+> > > > > > strncpy fortify, and this is already happened for some users.
+> > > > > 
+> > > > > What is the git commit id?
+> > > > 
+> > > > 398d5843c03261a2b68730f2f00643826bcec6ba
+> > > 
+> > > Can you please apply this to the next 6.1.y release?
+> > > 
+> > > There is still non-theoretical crash as reported in
+> > >   https://lore.kernel.org/all/qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf/
+> > > 
+> > > If commit hash was not enough:
+> > > 
+> > >   commit 398d5843c03261a2b68730f2f00643826bcec6ba
+> > >   Author:     Kees Cook <keescook@chromium.org>
+> > >   AuthorDate: Tue Feb 14 16:08:39 2023 -0800
+> > > 
+> > >       cifs: Convert struct fealist away from 1-element array
+> > > 
+> > > The commit is in mainline and is applying well to linux-6.1.y:
+> > > 
+> > >   (linux-6.1.y)$ git cherry-pick 398d5843c03261a2b68730f2f00643826bcec6ba
+> > >   Auto-merging fs/smb/client/cifspdu.h
+> > >   Auto-merging fs/smb/client/cifssmb.c
+> > >   [linux-6.1.y 4a80b516f202] cifs: Convert struct fealist away from 1-element array
+> > >    Author: Kees Cook <keescook@chromium.org>
+> > >    Date: Tue Feb 14 16:08:39 2023 -0800
+> > >    2 files changed, 10 insertions(+), 10 deletions(-)
+> > 
+> > It does not apply cleanly due to renames, can you provide a backported,
+> > and tested, patch please?
+> 
+> I sent the backported patch as you suggested[1] but I don't see it
+> appearing in 6.1.79-rc1 review. Did I make some mistake while sending
+> it?
 
-When i_size and i_blocks are updated in write completion do not
-increase allocation size more than what was written (rounded up to 512
-bytes).
+Testing update - user (who had the kernel panic) tested and reported to
+me that 6.1.78 with the patch applied does not cause the kernel panic
+anymore in their workflow.
 
-See attached.
-
-This fixes the recent regression in various xfstests caused by the
-xfstest change
-
-commit b4396efc75aba5325f22690303857af4f63d128e
-Author: Alexander Patrakov <patrakov@gmail.com>
-Date:   Tue Dec 19 04:57:20 2023 +0800
-
-    _require_sparse_files: rewrite as a direct test instead of a black list
-
-
--- 
 Thanks,
 
-Steve
-
---000000000000f1d8440611f2b89e
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-update-allocation-size-more-accurately-on-write.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-update-allocation-size-more-accurately-on-write.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lswur5k10>
-X-Attachment-Id: f_lswur5k10
-
-RnJvbSBhZTMzZjFiNjkxY2M5ZmQ2ZmMwZGZlODQ5ODFlNWU4ZDVmMGNkM2QyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFRodSwgMjIgRmViIDIwMjQgMDA6MjY6NTIgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiB1cGRhdGUgYWxsb2NhdGlvbiBzaXplIG1vcmUgYWNjdXJhdGVseSBvbiB3cml0ZQogY29t
-cGxldGlvbgoKQ2hhbmdlcyB0byBhbGxvY2F0aW9uIHNpemUgYXJlIGFwcHJveGltYXRlZCBmb3Ig
-ZXh0ZW5kaW5nIHdyaXRlcyBvZiBjYWNoZWQKZmlsZXMgdW50aWwgdGhlIHNlcnZlciByZXR1cm5z
-IHRoZSBhY3R1YWwgdmFsdWUgKG9uIFNNQjMgY2xvc2Ugb3IgcXVlcnkgaW5mbwpmb3IgZXhhbXBs
-ZSksIGJ1dCBpdCB3YXMgc2V0dGluZyB0aGUgZXN0aW1hdGVkIHZhbHVlIGZvciBudW1iZXIgb2Yg
-YmxvY2tzCnRvIGxhcmdlciB0aGFuIHRoZSBmaWxlIHNpemUgZXZlbiBpZiB0aGUgZmlsZSBpcyBs
-aWtlbHkgc3BhcnNlIHdoaWNoCmJyZWFrcyB2YXJpb3VzIHhmc3Rlc3RzIChlLmcuIGdlbmVyaWMv
-MTI5LCAxMzAsIDIyMSwgMjI4KS4KCldoZW4gaV9zaXplIGFuZCBpX2Jsb2NrcyBhcmUgdXBkYXRl
-ZCBpbiB3cml0ZSBjb21wbGV0aW9uIGRvIG5vdCBpbmNyZWFzZQphbGxvY2F0aW9uIHNpemUgbW9y
-ZSB0aGFuIHdoYXQgd2FzIHdyaXR0ZW4gKHJvdW5kZWQgdXAgdG8gNTEyIGJ5dGVzKS4KClNpZ25l
-ZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9z
-bWIvY2xpZW50L2ZpbGUuYyB8IDkgKysrKysrKystCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRp
-b25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9maWxlLmMg
-Yi9mcy9zbWIvY2xpZW50L2ZpbGUuYwppbmRleCAwNWU5MTUxNjJmMDUuLjZiMmRhMzY4ZDUyZCAx
-MDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9maWxlLmMKKysrIGIvZnMvc21iL2NsaWVudC9maWxl
-LmMKQEAgLTMwOTUsOCArMzA5NSwxNSBAQCBzdGF0aWMgaW50IGNpZnNfd3JpdGVfZW5kKHN0cnVj
-dCBmaWxlICpmaWxlLCBzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywKIAlpZiAocmMgPiAw
-KSB7CiAJCXNwaW5fbG9jaygmaW5vZGUtPmlfbG9jayk7CiAJCWlmIChwb3MgPiBpbm9kZS0+aV9z
-aXplKSB7CisJCQlsb2ZmX3QgYWRkaXRpb25hbF9ibG9ja3MgPSAoNTEyIC0gMSArIGNvcGllZCkg
-Pj4gOTsKKwogCQkJaV9zaXplX3dyaXRlKGlub2RlLCBwb3MpOwotCQkJaW5vZGUtPmlfYmxvY2tz
-ID0gKDUxMiAtIDEgKyBwb3MpID4+IDk7CisJCQkvKgorCQkJICogRXN0aW1hdGUgbmV3IGFsbG9j
-YXRpb24gc2l6ZSBiYXNlZCBvbiB0aGUgYW1vdW50IHdyaXR0ZW4uCisJCQkgKiBUaGlzIHdpbGwg
-YmUgdXBkYXRlZCBmcm9tIHNlcnZlciBvbiBjbG9zZSAoYW5kIG9uIHF1ZXJ5aW5mbykKKwkJCSAq
-LworCQkJaW5vZGUtPmlfYmxvY2tzID0gbWluX3QoYmxrY250X3QsICg1MTIgLSAxICsgcG9zKSA+
-PiA5LAorCQkJCQkJaW5vZGUtPmlfYmxvY2tzICsgYWRkaXRpb25hbF9ibG9ja3MpOwogCQl9CiAJ
-CXNwaW5fdW5sb2NrKCZpbm9kZS0+aV9sb2NrKTsKIAl9Ci0tIAoyLjQwLjEKCg==
---000000000000f1d8440611f2b89e--
+> 
+> Thanks,
+> 
+> [1] https://lore.kernel.org/stable/20240218111538.2592901-1-vt@altlinux.org/
+> 
+> > 
+> > thanks,
+> > 
+> > greg k-h
