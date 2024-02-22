@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FA7182D2
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 10:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612D7405E6
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 11:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708599588; cv=none; b=pN/6LZ6bxzUIJybM31JAH3q2CT8YiKU6m5QkN7re1Uo8lxcN1d6GbTls6L/uTBOEnOOwAe0f+fvD6T1vvt+juP3d9ef8t3vqSU/tsukCJ/dDsoNgopLr5cGAVgg6whqTyxNvGxPapYsJfHFyRrAOmJPigPWB+DnA+KDtJ+VJJgI=
+	t=1708599608; cv=none; b=Ql6StmgoKelDOEd5KfkTrZr5FtZKdv+NtXx2kRvIWgtDTm6lRPB1Q4j4jsDP0SBezU5Ypxx2GNC4sZpOsK8L8d7hmSZnyU3MGikFnseSOeIHpEuZMLEZb3xWOLDhdAa8eM+2wgFXX1Hyae6rK0pt/FeuuzWRA8rqg06puRDeFoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708599588; c=relaxed/simple;
-	bh=cztcTemOY5qrfcyaTt7BhxLARF9Co5w5kdiVX/DSwEU=;
+	s=arc-20240116; t=1708599608; c=relaxed/simple;
+	bh=y7J9garjOFBKVkRwFyzigJ9mw3821TdAVEud7kRnn1g=;
 	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W16w5lGFWHIN2QpdSyEXQvkhak2jdJT95VXKOs7DrM9L5pxS3gzBBZKlL62jJxoRftoayguYjSqmMzuFML5kL3ppWUM3E6fStNoszts+2tEBwuEaHSQwyA7xBNvkl9+Ti04OohKKAiFtniNKBh6nG4JzjpP3FZAK5JjCH3bD5yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qF0s2JLs; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=Ek52Xr1djJmVSqOC/dPHhu+XvAY6GNklhlB0Z8x0+rfG1kddialLFYpbFqsYBHUbG+ynMQrKAZaTkU1qM1RGLbXlVRpuQHp15ucft+VAjSRcuxWO+zASB7fERfeYq5Ohlnv7+vJVOMRageclXUYEN8Wrb+SSIADY18XHnb9ZtQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2bsgfY1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qF0s2JLs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFBBC43390
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 10:59:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2bsgfY1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40864C43394
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 11:00:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708599588;
-	bh=cztcTemOY5qrfcyaTt7BhxLARF9Co5w5kdiVX/DSwEU=;
+	s=k20201202; t=1708599608;
+	bh=y7J9garjOFBKVkRwFyzigJ9mw3821TdAVEud7kRnn1g=;
 	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-	b=qF0s2JLsiwp2FgyUjjz1TcuvPnkSonO/b+vhwcGXVKXpu8c8NN9YnpiySVuyt+yjP
-	 Q0ktif5BQ+JAal23TscRjnyRBmFjpMNDet55C4LFLGnwv9O++V64JalLpu6YO1LBpz
-	 eeKztun2+ddwPFZB2xnazykJsKR8wXsbw+NgyvNNxUDvvbgorWzp+YIxt8/Kf7CVaY
-	 eqRieNJyfwOeroYHZuxEumiYVgx8l6DAQK8UUWWe3QpH8e6NPyuxW/OUcKQL6bQ5WD
-	 vg5cfHXwHLszTQvnbtLgMr2mIXIN7mmU8pxm8ghV3IuL6baU5e3Z87vKAk1QV/nPVC
-	 7rTmqpqK3xadQ==
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5a02eb63ebcso198052eaf.0
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 02:59:48 -0800 (PST)
-X-Gm-Message-State: AOJu0YyAn/MVvs6jN2AF5BJKjDcjuOqNFDm3+ricTDVmlLJmKEFhWoIk
-	BKJ3/x5Lo49GqBGEGNDazec0dnb4GV4Az6Zek/gvkY0K2IuV80RhfAA0kYDbWDICclz/L0CfgZv
-	BpO9JDrUHPJYEp2iRXw5SljSAoS4=
-X-Google-Smtp-Source: AGHT+IF16NFOO/ZMJtzsKKbxRS+B+nyie7adPuv4hVqFqQiW/TFEzn8o/oBml3VL5hyGTDGe/9X2yZiE94d8/G3DRf4=
-X-Received: by 2002:a4a:dcd4:0:b0:5a0:3917:5d4c with SMTP id
- h20-20020a4adcd4000000b005a039175d4cmr130244oou.7.1708599587432; Thu, 22 Feb
- 2024 02:59:47 -0800 (PST)
+	b=f2bsgfY1BbTTvmNaA9BjzbtnDjDG+csVs/+ryQvmB6wYzwnqs8G10EnFnJe5tAr5n
+	 9Xp8cw9m/h7QGqYInUf5IOyzBEG+L0Izvxn5j56DimKg4C+KBikkFGul7YP93H6cXK
+	 fkygC1Eh33/b8pLR9XTmWQqiP6pD08/tqPDyZ/DN9n4U1nrhp7Y2dLY3Tb07gzR+WV
+	 3NgW6fuzUR/K56nVZYV7Oga1nIS8cciI6XXmmkJu0lJdgG2Z+WYdFzrMFd6qJvcXOU
+	 hU8jWrSmYCYFb85h/gulIKfYF4Jpej4R7ODlDa+ha5A0kcoXUxZhmaZdvC5NCCpbnl
+	 JkhHiK9XK9ETw==
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-59a1a03d067so1547459eaf.1
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Feb 2024 03:00:08 -0800 (PST)
+X-Gm-Message-State: AOJu0YyUv2+YWgv1BS/bO/JzVrrGBL3nltlfvotJfg194nAfCQ8g1NE9
+	uzO3LHJ0tIJKfTaJR0Zo077PR9tPqsexDExyZ5VV3WudM4afnsMvqom8kVtMW7ItJdf5ZqYltJn
+	fBPz3RwgDvq6l8kUGEu+LPGCk6PM=
+X-Google-Smtp-Source: AGHT+IEXqAU8T1qnfBK3tF0rDZpFj+ee/d/yT5wZ2vRgTN2Ba3nQ31K7eF1FS3pEfwtHVrOyWjqtaBXJE9YJFByMMTo=
+X-Received: by 2002:a4a:6b51:0:b0:59f:f3e6:cbc3 with SMTP id
+ h17-20020a4a6b51000000b0059ff3e6cbc3mr8622435oof.4.1708599607545; Thu, 22 Feb
+ 2024 03:00:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -42,22 +42,24 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Received: by 2002:a8a:c12:0:b0:51b:642f:123c with HTTP; Thu, 22 Feb 2024
- 02:59:46 -0800 (PST)
-In-Reply-To: <20240222095819.2188726-2-mmakassikis@freebox.fr>
-References: <20240222095819.2188726-1-mmakassikis@freebox.fr> <20240222095819.2188726-2-mmakassikis@freebox.fr>
+ 03:00:06 -0800 (PST)
+In-Reply-To: <20240222095819.2188726-1-mmakassikis@freebox.fr>
+References: <20240222095819.2188726-1-mmakassikis@freebox.fr>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Feb 2024 19:59:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8HS5vziqN0Q8vFAuA1J_q214PcUPcR+wmomqFjb2eG2Q@mail.gmail.com>
-Message-ID: <CAKYAXd8HS5vziqN0Q8vFAuA1J_q214PcUPcR+wmomqFjb2eG2Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] ksmbd: retrieve number of blocks using vfs_getattr
- in set_file_allocation_info
+Date: Thu, 22 Feb 2024 20:00:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-xCNCTE0virFCMC9pfW1NQQFWL3LRn0SeHjLGqxXfpng@mail.gmail.com>
+Message-ID: <CAKYAXd-xCNCTE0virFCMC9pfW1NQQFWL3LRn0SeHjLGqxXfpng@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] ksmbd: replace generic_fillattr with vfs_getattr
 To: Marios Makassikis <mmakassikis@freebox.fr>
 Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 2024-02-22 18:58 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
-> Use vfs_getattr() to retrieve stat information, rather than make
-> assumptions about how a filesystem fills inode structs.
+> generic_fillattr should not be used outside of ->getattr
+> implementations.
+>
+> Use vfs_getattr instead, and adapt functions to return an
+> error code to the caller.
 >
 > Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
 Applied it to #ksmbd-for-next-next.
