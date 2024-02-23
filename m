@@ -1,75 +1,88 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F6381ADF;
-	Fri, 23 Feb 2024 13:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CDB22EF5
+	for <linux-cifs@vger.kernel.org>; Fri, 23 Feb 2024 13:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708695723; cv=none; b=OhWj4kb1eGbv/kYN9uwOgfhhl0it4Mg7wpMsLl1cBK7rI9lCSQEOQPCGIeBsV3CeKokEYVUFrmlZFfb5T2joyI1Bnt+FkiEWDgH6Y/UoIyD6ZiqIGmwvwTCRvcabRDzIhOTZYQm4ARh9Cl1hKgoQanKSM03cp2mLxYKRgqfgMF8=
+	t=1708695735; cv=none; b=gyR3FP2e6I7PaKjtbhrNrWRpMPTSOfX9YrkAPobC6iSjhQr8B3A1SytNnMzDTXWbi+NihPeTdZEUQOrZ9ErA8Bg4Usmikgvg+TeKUD8m7A/6P0+A3bAsm8syXCSt/yBJARznLQUDLDcj2W36xMlKh6bx40EGEvxPNTk5SHGMtYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708695723; c=relaxed/simple;
-	bh=gF2VaFBFzA+2ZeXFtiLLVrvLvDWeAxLKSzdG/N1wuyE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=i2WBmwUCvm4nvz2ee7TIHghVrJqNLO/HbN7Fc1t0qZmleMb9aGrFaHzz+f+WfGnCGwvK5E4Ubyt6vzA/WGPKkZc+hqAO1Bht2/mva0pNvfc8oPrMhTdXHHXpvSihDYDBCApYw5dYQIHwwep6I9kWJm7xNz+rJa9UNF2EervmyDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MMtJu6/4; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1708695735; c=relaxed/simple;
+	bh=ZqtV8zSnTj81VnqWzZxmflTkzjnaExiKfNrfuKn5r2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e0tXo3Me7htgpDEgVqseeWU9dp2mQNA+1/cLSfjyEHleiMFZGNCCZtXKLYDKnf62ZjT1nbHvQud2nzpaCIs/sKgJ/7wBX4PJlKQR/549ZFA1X+FuZfr3VP/aDBKBOnd/KMM13YEt4VzuTD1hdz9VEJvjEX3e1SDDPxk2DGg3jRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HKZtNYU9; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMtJu6/4"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-512ea6ce06aso497973e87.2;
-        Fri, 23 Feb 2024 05:42:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKZtNYU9"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512ed491872so1809e87.3
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Feb 2024 05:42:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708695719; x=1709300519; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=H8baDiRw1MiqTav0cH+AmCLuh3He/m/eygkvxB3xdtQ=;
-        b=MMtJu6/4QsNBnXii6Vx22oY5VkYCr3Zt6np/Mkc7L50XXMMaPy146KR/1VVR6g2SDh
-         4ZZ+5xhzYYSpaGpKfyZe0uPOgK1CxTsNv/5k4tC9T+Cjoelu+55DBIRGSH1XbXm52VCn
-         hJXvxcAsEN/vbujsa9eJGH7yRip3WO6FmlSoyZHKWa2aC38roBDVoH0glYpxxJDNb9cn
-         Dbf22gYVWF75iKSs72OQB4MGwfytP63HoOiOHhaaA+F/XqPiWMTdiwHAjbdsupns+Mia
-         PBoz2KoXIwHET4qzNCVr5rQS2U6eATYhNAAGXXL86Wfowe+GfNsne7lIu6VK7IyyrABM
-         9wFA==
+        d=gmail.com; s=20230601; t=1708695732; x=1709300532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZqtV8zSnTj81VnqWzZxmflTkzjnaExiKfNrfuKn5r2M=;
+        b=HKZtNYU9LhDWuWzSFI9eNH7EbG3KwXbb4gLbGxREvGRWjhtW3Bue2UjwS6tZqa0ZvT
+         xEbqS6MabrfacfDDzD0VOOHYggDDp1BE/aSpsuWuEO5xFFbJIrCxKUzCnH+0tKaJH9Vq
+         K15e5BXc0PXX7B0I0HUCy5NSWSdHwF3r/1zQQJtgt0MzUULUpashE1Hu0+xZdb1kvpXj
+         nL1Nit/hI3lpYKUGRhhG6mz4ND1RPlNJP9MwqU66BTV4MM2k/ridmhC11+10wJtXqFUB
+         o0w6Elf/7vLJrXpfYgui4syakNw1m5xORv3IWJ05dfbxcorcl5s1ohkB1W+ofvjuuziJ
+         I8Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708695719; x=1709300519;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H8baDiRw1MiqTav0cH+AmCLuh3He/m/eygkvxB3xdtQ=;
-        b=wU6w2F7RDto4KkNMPTVvDeTqYeg2DqLFS2XhlF8zEfJVTy152hghBbC/uO+IKol4T2
-         y5mz6jrj6axKphZwvNreMDTMuTCvL2QXNx62jpggRyuhhaDaDOfymrDPIXkKJOa9aGBa
-         MN5xmE6YoVpd3q9I53S4vAZaOHcSdhwer0lJ1RSZ0+T1cDwmEVKcqPrAkDJUxoSeA+aI
-         ZAzxkvTukj3du+jnsUezwhKk/5Y18ei4jd9faSzJVPCm8w6Otj4hIOpjFD0ZCz8IZirS
-         j/8B5Fpb7woo2gjs7PvBgGrczrIJQbjVbr06fLFwtxaGm/h0+DqACWLWXjZM7yd8MtgK
-         slfw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+EXLdbz9Z8JDZjDoggn20wT9D7iHAwNkFr5dxGLXpqSJJxCXwEYJuaaUC+2aNl0EGr7cPYxwa6vBMjIryeNyWQ6jBtNQL1YDWlw==
-X-Gm-Message-State: AOJu0YzGmp9MswGcnMO3fmutupgoP4kUtL4Hrk/QiZcY6UcJgwYX/uIr
-	ioT0QS7MKY59lD1bI3J6yJXmCSgO3EkAIXhSX5mBOdqDH1G+vkm43iMBmt/LueGUIM+omkX9bzC
-	TLvkl8bXgfgEYwuX6TaHJgnCgsK1T6cDzXhChtQ==
-X-Google-Smtp-Source: AGHT+IHNkEurwp3mC2jbPgs/f3j27sWHgKxxlq1I3Alp/u6ogpZkqenKsmfCqwauOZgNF6xIlvAQ4NxWtbXHhU/nFAA=
-X-Received: by 2002:a05:6512:239a:b0:512:b04e:fb52 with SMTP id
- c26-20020a056512239a00b00512b04efb52mr1878678lfv.4.1708695719422; Fri, 23 Feb
- 2024 05:41:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708695732; x=1709300532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZqtV8zSnTj81VnqWzZxmflTkzjnaExiKfNrfuKn5r2M=;
+        b=EMKRnrXh/lQ0ILS89DSuGenZG0Qj4nF6dSV1dIoxcv4thpzAnooCuVrRDZW1EHewUo
+         2taC4AVDXKLszH4y8P56ODOL0R+OiYJFt/YyvdsvPgQetDodm8EXxVNihMyrPKrKHlgD
+         nXORcgp/7bypVKA800Xe7Uig5UmFWjTbDb6KA6xsXBHgKTyfcQ8X8WWB2W/W/YucFsbU
+         UyutiMs3W7Qmfl9cBjzPl/ZIQG+GSGg6C9kd+F1w9+2coelcgvnffvjaay68+0ULAnoS
+         /xHdEkLnQEBIawP5XTgHiDZXJ7DnBzTQXdTZz27q4awP2NlQrg1ejqOxB6AhE3HTSWrh
+         NqQQ==
+X-Gm-Message-State: AOJu0Yzc4JwiN1/yn3Q2iaUSLeUed1nE7UGiJzKv+nTMos7AkNEXmf8t
+	3FPfIobyhyhcgla8kNTO0BIEEiivL6OWFhdOaq2PtaauflsC+0Op+MqE5t9fchmyTm5sGbR91Zu
+	aPokQ7v3mS9ibAFV64ho3L8hCEtyMcHT2QEg=
+X-Google-Smtp-Source: AGHT+IGC62BECBtbJaIZQhvfaSdsEsC0zAp29qVsBYULjlIV9MYyXvo/Cf0qLNlTSOc208b4UYICH5pFzLqABjCMtpw=
+X-Received: by 2002:a05:6512:3c97:b0:512:99c2:dfa with SMTP id
+ h23-20020a0565123c9700b0051299c20dfamr1933795lfv.42.1708695731398; Fri, 23
+ Feb 2024 05:42:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 23 Feb 2024 19:11:48 +0530
-Message-ID: <CANT5p=rYFOkpnB_SMGd0dAV5orX--Z53O-gjVg4qRkgrH6HiqA@mail.gmail.com>
-Subject: Request to include a couple of fixes to stable branches
-To: Stable <stable@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Steve French <smfrench@gmail.com>
+References: <CAH2r5mtsvNU--3EDFvAPSVuSnLpmbDr5A4YbaY=9rrndLyOpiA@mail.gmail.com>
+ <CANT5p=rqWiiYtRnCjd-SYv5SLqAzEPwLknLUqT0AGibtwNq+Vw@mail.gmail.com>
+In-Reply-To: <CANT5p=rqWiiYtRnCjd-SYv5SLqAzEPwLknLUqT0AGibtwNq+Vw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 23 Feb 2024 07:41:58 -0600
+Message-ID: <CAH2r5muW75oaXPM8+Lwhxxfs+JFPDP-z=guJAYNxZ9eNdNCXzg@mail.gmail.com>
+Subject: Re: [PATCH][SMB3 client] update allocation size more accurately on
+ write completion
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, Bharath S M <bharathsm@microsoft.com>, 
+	Paulo Alcantara <pc@manguebit.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi stable maintainers,
+On Fri, Feb 23, 2024 at 7:00=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
+com> wrote:
+> Regardless of this patch, is this really a bug? This is only an
+> estimation that we do till we get the true value from the server.
+> A filesystem is free to allocate blocks as necessary. This patch
+> definitely improves this estimation though.
 
-We seem to have missed adding the stable tag to a couple of important
-patches that went upstream for fs/smb/client. Can you please include
-them in all the stable trees?
+It is needed to pass various xfstests (due to a recent change in late
+December of how xfstests checks), but I agree that this is just an
+improvement of an estimation (and in any case a local file system or a
+remote server filesystem can change allocation size for a file)
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4f1fffa2376922f3d1d506e49c0fd445b023a28e
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=79520587fe42cd4988aff8695d60621e689109cb
+--=20
+Thanks,
 
--- 
-Regards,
-Shyam
+Steve
