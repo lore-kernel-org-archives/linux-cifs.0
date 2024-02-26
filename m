@@ -1,91 +1,112 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EF5605A6
-	for <linux-cifs@vger.kernel.org>; Mon, 26 Feb 2024 13:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2CB1292D9;
+	Mon, 26 Feb 2024 14:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708954972; cv=none; b=Nq92/+H1Q8X/ocZjpYlk9Kw65UeyBZEqyLIVmT38Kw3wiXDGhsr+3sJSluFYrVmOTTG0Unx5JcmNASpMYRxXWp6NIFMnQ1dhsuYPvMxb0b9/ZRTNbFq6lVjLZPZy7pa50judW0+akDLpguMd42uu0FP74hUGPHrfwpcM7E+Q/+I=
+	t=1708957734; cv=none; b=PPJCcTeHQs9XDCJLysqyPMs8aRXVovAAXJqcNog8+F4hDp2rJAOVAIDHH679DQANsxqoZwn9AdasZcGYYAF+avErZyKWG6CeXmQkYMCrLZohM6r4+N1JVVwMBIrHkCpSW/o1TtXAChWqD1gi50q51US3lYuy0d2MimWNCVglfag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708954972; c=relaxed/simple;
-	bh=5VzFVl3ewLk1iaSOZQ+38ykbStvrzYHePQDBDpwVxvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=BchovacWAy4a1P8b3V90/So1QrGq70i+91vOrNyScUgDbu/Bpx8a9T+FLskvTHEaFCWSMIkj3i5QdzIUc4Lt81m0u19VhSny353rzut0LG/l8ihVY8wtdl9r8MRL9m4ErZkzmxQTy5OpJBcz13IPypYXzlGjmxap/fShLdWFhOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RBJzfTPl; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1708957734; c=relaxed/simple;
+	bh=0BRotfMPalXo5hqdz05sY70qLfIXoUMYoqgjhMDvYlY=;
+	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PUdogk3H1GiVUc6BPv1sbgY8JhYzAIC67fBn+jbl8XTfryJjCon/l84R6kWVTCWzT94KCICRxQnAYXAvq+z+U/ut7ziL2gF1zjcNNAe89QgZiX/+I1eJG+wLCfaMU+SQ0GZxchBNp6BsWvu8WYEKLIqyMNZOfkwEVffK4c8M1Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pb0l6H3N; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RBJzfTPl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708954971; x=1740490971;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=5VzFVl3ewLk1iaSOZQ+38ykbStvrzYHePQDBDpwVxvo=;
-  b=RBJzfTPlsM9c8R96UgOBtJTZx24L8aP0HVucYgXiE8/WKILwV70e6V7h
-   mXNFq9ORhsrCrXtguLdvvlf77zfR4x4XNlAuu5SbwqW8GXWDzvuHwTwTF
-   yfWoyRqFLGRg5yFN6jL+QxPL7E+0xPP/sAdCfuDONebjUAKAKcQsAoBjZ
-   Crh+iyw1yyy/jYVRwyMTSivSC/tfvCeh2/oU6ymEiV348DyQioQO5mlrc
-   mT8n+xhzE1mX9tnP6TU97UFxFasl6vaOTihs9lWALPpz3c7WE3qIMt/wb
-   VDmkMQ8B9eYKMVLv6p4nbSKPrlNjVH1LooO/UfbR9vp+JxavyOr17oWgh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10995"; a="3355309"
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="3355309"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 05:42:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,185,1705392000"; 
-   d="scan'208";a="29849301"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 26 Feb 2024 05:42:48 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rebFl-000AKY-1V;
-	Mon, 26 Feb 2024 13:42:45 +0000
-Date: Mon, 26 Feb 2024 21:42:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [cifs:for-next 17/19] fs/smb/client/cifsglob.h:162:26: warning:
- 'cifs_reparse_type_str' defined but not used
-Message-ID: <202402262152.YZOwDlCM-lkp@intel.com>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pb0l6H3N"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708957734; x=1740493734;
+  h=message-id:date:mime-version:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:subject;
+  bh=RMTQzJS8lecM3Zt817XwKvIJXzxu0vlxx0W01zNW6N4=;
+  b=pb0l6H3NZLnVv8K8Y6tyNY84sy75BHDCQ0avgNSqCuAbXKU8i601hJws
+   6mHWVSxgKIIWZ50t47hWfYjsyQIPhWgCxAlREoV+wNjf3nj+X3+4ZcYWu
+   Etlder+IdxJb0TD2db/6H8Nh7NrbVYWs2BQZ2nZilOlZsZvgsTZeLkycG
+   s=;
+X-IronPort-AV: E=Sophos;i="6.06,185,1705363200"; 
+   d="scan'208";a="636818919"
+Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with "Resource
+ temporarily unavailable"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 14:28:50 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:32633]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.37.70:2525] with esmtp (Farcaster)
+ id 91a80cc8-7a22-4c01-9163-242ce4817eeb; Mon, 26 Feb 2024 14:28:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 91a80cc8-7a22-4c01-9163-242ce4817eeb
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 26 Feb 2024 14:28:43 +0000
+Received: from [192.168.17.69] (10.106.82.23) by EX19D018EUA004.ant.amazon.com
+ (10.252.50.85) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Mon, 26 Feb
+ 2024 14:28:43 +0000
+Message-ID: <fd0174a5-8319-436d-bf05-0f6a3794f6f9@amazon.com>
+Date: Mon, 26 Feb 2024 14:28:41 +0000
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+To: Linux regressions mailing list <regressions@lists.linux.dev>, "SeongJae
+ Park" <sj@kernel.org>
+CC: "pc@manguebit.com" <pc@manguebit.com>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "leonardo@schenkel.net"
+	<leonardo@schenkel.net>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>, "m.weissbach@info-gate.de"
+	<m.weissbach@info-gate.de>, "sairon@sairon.cz" <sairon@sairon.cz>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+References: <20240126191351.56183-1-sj@kernel.org>
+ <2ab43584-8b6f-4c39-ae49-401530570c7a@leemhuis.info>
+Content-Language: en-US
+From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+In-Reply-To: <2ab43584-8b6f-4c39-ae49-401530570c7a@leemhuis.info>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D015EUA004.ant.amazon.com (10.252.50.202) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-head:   5fae8cba6fedfdec784c69b803120ac074d48145
-commit: d0adfca80208fa7ffbdd76eb701807de55c0e14b [17/19] smb: client: return reparse type in /proc/mounts
-config: i386-randconfig-002-20240226 (https://download.01.org/0day-ci/archive/20240226/202402262152.YZOwDlCM-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240226/202402262152.YZOwDlCM-lkp@intel.com/reproduce)
+On 23/02/2024 06:14, Linux regression tracking #update (Thorsten 
+Leemhuis) wrote:
+> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+> 
+> 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402262152.YZOwDlCM-lkp@intel.com/
+> Thx. Took a while (among others because the stable team worked a bit
+> slower that usual), but from what Paulo Alcantara and Salvatore
+> Bonaccorso recently said everything is afaics now fixed or on track to
+> be fixed in all affected stable/longterm branches:
+> https://lore.kernel.org/all/ZdgyEfNsev8WGIl5@eldamar.lan/
+> 
+> If I got this wrong and that's not the case, please holler.
+> 
+> #regzbot resolve: apparently fixed in all affected stable/longterm
+> branches with various commits
+> #regzbot ignore-activity
+> 
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> That page also explains what to do if mails like this annoy you.
+> 
+> 
 
-All warnings (new ones prefixed by >>):
+We are seeing CIFS mount failures after upgrading from v5.15.148 to 
+v5.15.149, I have reverted eb3e28c1e8 ("smb3: Replace smb2pdu 1-element 
+arrays with flex-arrays") and I no longer see the regression. It looks 
+like the issue is also impacting v5.10.y as the mentioned reverted patch 
+has also been merged to v5.10.210. I am currently running the CIFS mount 
+test manually and will update the thread with the exact mount failure 
+error. I think we should revert eb3e28c1e8 ("smb3: Replace smb2pdu 
+1-element arrays with flex-arrays") from both v5.15.y & v5.10.y until we 
+come up with a proper fix on this versions, please note that if we will 
+take this path then we will need to re-introduce. b3632baa5045 ("cifs: 
+fix off-by-one in SMB2_query_info_init()") which has been removed from 
+latest v5.10.y and v5.15.y releases.
 
-   In file included from fs/smb/client/namespace.c:19:
->> fs/smb/client/cifsglob.h:162:26: warning: 'cifs_reparse_type_str' defined but not used [-Wunused-const-variable=]
-     162 | static const char *const cifs_reparse_type_str[] = { "nfs", "wsl", };
-         |                          ^~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/cifs_reparse_type_str +162 fs/smb/client/cifsglob.h
-
-   161	
- > 162	static const char *const cifs_reparse_type_str[] = { "nfs", "wsl", };
-   163	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
