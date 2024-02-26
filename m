@@ -1,102 +1,113 @@
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274FB173;
-	Mon, 26 Feb 2024 00:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9A4EEDE
+	for <linux-cifs@vger.kernel.org>; Mon, 26 Feb 2024 04:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708905828; cv=none; b=ZaFPbCjdvdLF4qj1pgGHVeevtb1Vg0dj7BntTyxrv8PXqMtSewxLravEEPn2HshuS3qJxs7L3XJIuXxj6VLl11G/dOjTDY7zPd4GI1/zALNh1ZVm/8cItInO+HpykNILpwGY0+t/Sxy5RxoyX7tPYljnWEJRPSW6XxWx+tvlj3A=
+	t=1708923032; cv=none; b=tb7abjH3Z1qgvn9txwuHIVuzHd9VwAnzyPZtDW7hbe7ltDlhlkr0kL+4kWhj2iFxD5AQd2CZo4et75Y3O9oZFlNl7js0A9QaTt/V93Jok4KaaY7E2vGuKIGLOuKIP7Jbqu0VmhCro7Z9/t2Rp1xXp+4N9QhTgYgbYwWsB7t6Ak8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708905828; c=relaxed/simple;
-	bh=fnEvOrO1k5JWNVipLI8U/c/k/XQR9Ok+LP4dmL8s0Ac=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nbUxp9IVcmlOXZGZL15f5pPOgtoKCIa21c48j2kamoLz3H5zVpHmtARhsaKW5hRMvGEhoG4TLJzom8142NgClLhtGrxS8+99ubSUTesofY86TR/+nf1FU6aeKA3oKypaVBmujnBiuckmR/nGWVfAeZvDqmECVwaTqTesp5ohtsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=QJOXE1g/; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1708923032; c=relaxed/simple;
+	bh=QERqCXSGr4xPyF1wOXxkecBp0Zzgeav9P0hNSt9YmW4=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=jFGZwkj0S+qeonqI9RWBt6cdAdaVtRd6aSvyrvNFWvKoHVnsAP8WPzU9b4mo3abLR5gKd+JlHJ65yx+pYeGdhFfji7DOaE/7t9j1OkxSKckgXAMPTJUlorO2HIMYQJqr3lbGOHW/BWaZsdCYOpd0X9ymOBSWKv40IfGSN2GEtGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpEKxV8Q; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="QJOXE1g/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1708905824;
-	bh=1fAQ2/PKsEagwRfg9sC2E9Bl6mn8gmCy2OfiKeNgfi8=;
-	h=Date:From:To:Cc:Subject:From;
-	b=QJOXE1g/K4bhGQnk/NYbLOB5HAA1A1Sa36fbEb8MAIPguMk7o9O9xJAr+zrkN2Lc5
-	 gVebqt71q69rDd0LW54xNYPxeRCnt9dJvGIOYqUw9srlTMA/m+Jfl/CuBiyXczf4+j
-	 YZ5PU4F79vdW6xn8scntX4tX2Sb2egxjoQUa/oPAmVdtZ9XTjDX0p1iatClv+sGeCF
-	 uzbBQc8fWirQT+o0r0aW7dbpalCyOfsAD1v2qvbTQp5VO6wa59KodCyX+/OFiZ1RVn
-	 EnLwSMs+N5OaKkCUiWMDcnr74vD9sT3ZT/Jp0SUQQVikGbQ0JNRzpK8Fbj/3tuq1DR
-	 2UQU4wgO3b0AQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TjgnX1ZBYz4wc8;
-	Mon, 26 Feb 2024 11:03:44 +1100 (AEDT)
-Date: Mon, 26 Feb 2024 11:03:43 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Christian Brauner <brauner@kernel.org>, Steve French
- <smfrench@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Jeff Layton <jlayton@kernel.org>,
- CIFS <linux-cifs@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Steve French <stfrench@microsoft.com>
-Subject: linux-next: manual merge of the vfs-brauner tree with the cifs tree
-Message-ID: <20240226110343.28e340eb@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpEKxV8Q"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e4c359e48aso1516137b3a.1
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Feb 2024 20:50:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708923030; x=1709527830; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Y+VMceEnLUvEVfNYCJp1NC9eyGJ2RmM5wM0EEaHCuU=;
+        b=kpEKxV8Q6amU57S87wd2FYlkkl2pb39QGIIHMhdX7rGwpKo3lVSBI7KaiAM5kaKRmf
+         cIfjRr/ES5hWHfsK8GExkTTa4m3aZfNTEDGR28Ayjfzn1Km1icoFpxcioGyRa+LPVHlv
+         2dw8S85dV9unl62Z8GGPCGrm38CasKDJJVcaf07X2xzSozXhc66pvTDBVbwwjD/vbE5S
+         wI3xtCj+LEZ2FXrGgHve7eqUsaqO0ZUoTMXtvlLP2U07r+hjqb5t+xt291JO07oci2Z3
+         vYJrwM+AE6CuNlcTpwP+3/Gw8M5Aga5D5tkOUh92irIR84cQBXXFaMtTkihlgEpPTq44
+         C8QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708923030; x=1709527830;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Y+VMceEnLUvEVfNYCJp1NC9eyGJ2RmM5wM0EEaHCuU=;
+        b=dSoupfa8bY/yEafwSj5S7vDJd89mn8FBC4JxMdoXCBRzE49ifCfffp3EkDjq/NKzcu
+         JXf5zFQxBZKi6pe7PL7kPJHM4J9JxqUSh0T8zmj4T8NFq0zmJYMpTKVkPqcOWJfesBk3
+         Niy1UHd9LqTQfrgIoKvnp+tdA8sm8rfRofix9slTC4PgYdBES89xLykHQEhXCteXPpKv
+         Dzd40h10IFspDjTNtszIO4p0FQjDm/zuf6WGPNYQTVdK1EH9xJHHcY2vexqtrU6A0g7P
+         FaQOhpVLT2NyZjurXjataYGRvJ2T0rREtyG3skk053f++4YuXOGhpbUB8F5j5xlTyUdA
+         mnPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXzyiZgjc0FtWuMpS9U6RADzv8+vLQOE89ciCrqcHD+Quc/cHdivXzWMzw/Q9qH2gMot9W9AuHYr27vRAlAajCgx4rmOoNqVYFD8A==
+X-Gm-Message-State: AOJu0Yy/etpM5zcVeY+JbX3eOeZ2qsrhufPuCFwqbGGS4jF9Zk/i5AvO
+	GhWDrNanmHAlL29RVYKI2phj3Q3MgYlSJ5i5+DAW8aGiq/5DAcjP
+X-Google-Smtp-Source: AGHT+IGPa9zqmM/g76KnJuACq6dIhAbbEltCKfD4xmlog934SDKOj33R5iZfGb3jZPoNV5MP7i1fnA==
+X-Received: by 2002:aa7:814e:0:b0:6e3:90c5:17ec with SMTP id d14-20020aa7814e000000b006e390c517ecmr7197546pfn.18.1708923030056;
+        Sun, 25 Feb 2024 20:50:30 -0800 (PST)
+Received: from bharathsm-Virtual-Machine.. ([167.220.2.189])
+        by smtp.googlemail.com with ESMTPSA id s188-20020a625ec5000000b006e46672df97sm3238039pfb.75.2024.02.25.20.50.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Feb 2024 20:50:29 -0800 (PST)
+From: Bharath SM <bharathsm.hsk@gmail.com>
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
+To: pc@cjr.nz,
+	sfrench@samba.org,
+	nspmangalore@gmail.com,
+	lsahlber@redhat.com,
+	smfrench@gmail.com,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	bharathsm@microsoft.com
+Subject: [PATCH] cifs: prevent updating file size from server if we have a read/write lease
+Date: Mon, 26 Feb 2024 10:20:10 +0530
+Message-Id: <20240226045010.30908-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/qI5ugzFz2F5LCxVdGo=J9Ul";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/qI5ugzFz2F5LCxVdGo=J9Ul
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+In cases of large directories, the readdir operation may span multiple
+round trips to retrieve contents. This introduces a potential race
+condition in case of concurrent write and readdir operations. If the
+readdir operation initiates before a write has been processed by the
+server, it may update the file size attribute to an older value.
+Address this issue by avoiding file size updates from server when a
+read/write lease.
 
-Hi all,
+Scenario:
+1) process1: open dir xyz
+2) process1: readdir instance 1 on xyz
+3) process2: create file.txt for write
+4) process2: write x bytes to file.txt
+5) process2: close file.txt
+6) process2: open file.txt for read
+7) process1: readdir 2 - overwrites file.txt inode size to 0
+8) process2: read contents of file.txt - bug, short read with 0 bytes
 
-Today's linux-next merge of the vfs-brauner tree got a conflict in:
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/smb/client/file.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  fs/smb/client/file.c
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index f2db4a1f81ad..e742d0d0e579 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -2952,7 +2952,8 @@ bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file)
+ 	if (!cifsInode)
+ 		return true;
+ 
+-	if (is_inode_writable(cifsInode)) {
++	if (is_inode_writable(cifsInode) ||
++			((cifsInode->oplock & CIFS_CACHE_RW_FLG) != 0)) {
+ 		/* This inode is open for write at least once */
+ 		struct cifs_sb_info *cifs_sb;
+ 
+-- 
+2.34.1
 
-between commit:
-
-  d7e87923939a ("cifs: Fix writeback data corruption")
-
-from the cifs tree and commit:
-
-  a69ce85ec9af ("filelock: split common fields into struct file_lock_core")
-
-from the vfs-brauner tree.
-
-Please do not do unrelated white space cleanups ...
-
-I fixed it up (I used the former version) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/qI5ugzFz2F5LCxVdGo=J9Ul
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXb1V8ACgkQAVBC80lX
-0GwUmwf/am9zWAuEqziEydqmjGDaawepn69ZqkkZRw+Xo6PLS25lKY8UbvL1ozZj
-bOrTe+Pxj49Tlh9DPmhnxQxGb4kUDANJp7WeP3Uts6zEPbiCkceqdDYbFkjzFMQ3
-CZPeRZZ2urX5WOsjCDhWch5yQDYCeVammx+YnEgTYu4ZqF1qw0zqAqpiGvM5+Tvn
-sm7He1Fw7phJwVDo2fJsXfDMRD7PHWYvec3A5Unv3O82qf+UEGcDIcYYS933VrPz
-iHyj0iMHgvXvz7L6QUBVzxZd2ewJVUtN/h3msws4dhuH+4AcyXo58KcnoC1ANRcw
-z2ovBoRbOj5zQQMOWcp+N4EcmF5Lyg==
-=eT63
------END PGP SIGNATURE-----
-
---Sig_/qI5ugzFz2F5LCxVdGo=J9Ul--
