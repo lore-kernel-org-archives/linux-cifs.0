@@ -1,126 +1,112 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6B7EADD
-	for <linux-cifs@vger.kernel.org>; Mon, 26 Feb 2024 05:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C721CD2F;
+	Mon, 26 Feb 2024 10:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708924455; cv=none; b=HPGILadLN683ijND8mtn1IUcSFmCrNCp+qayEtAok1YyG5Bwfr9RzkgoYRj7/lSBE765Ed82QMVKT5hAjGo/LwLC/qNk0vW0FgVLBhcskP7ZBOQ8cJuByXFqYHCzowG7XgC2/UI+bw7+BwLtOEUiclzQ95crM9gp7wNHjgqTQnU=
+	t=1708944988; cv=none; b=EfjvphxCRxFjKe5BRbjYNv2swNnoimwSKkILXfyW0lAujtp4m8eqUajlRr/nE9BxJLjjStBx1jApT6crc5a0NW1yODXoZEcqnktCcO4xtU2DvrIU6he+ZVAfniw1nb9Bnm7Cu/FHZvtV+yfa0oGVakqH5pIXoyeLY8aY1J4aOM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708924455; c=relaxed/simple;
-	bh=ewSEZzAFRNacusSYSNEl7d9XknK38Ah9+CH3SeLBlpI=;
+	s=arc-20240116; t=1708944988; c=relaxed/simple;
+	bh=SI0ijatx+CA+XCLUPsJKOZ7njhSleBQdAsZ2YXXWjaI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GmcvX+5SbQtnxBuZz/fJhkT3HfwReic2UV+x2buiT2abE4grC38goj2VYfmDIjjJuo3sfjTujao+Zvn+5kEkt1vkSZByLFkq2I/X93GkXKEp8Pdxj7K06pmFj/QMLeNksuZTY2wrxLBl6URfr81NHRIXC/9kj7ghERObNK90msM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KkTD+gZ6; arc=none smtp.client-ip=209.85.167.41
+	 To:Cc:Content-Type; b=HphfS9mvyBuz/x9+QJoUmvJETfJGYnKqgDoFQlHp74upKKx7SI50rvTc4bM6Yui+sPcky/aomcZ9FHKf8XXlllYoSNxofUXrmwjS5+1Ct3xFbwqw/ylKBQhE2tthlY9bdJ7+u1H4vLZcISF8LF+jr2l/zfkWNwXNzo4/Tfxdfu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRlAPXWv; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkTD+gZ6"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-512b700c8ebso3358441e87.0
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Feb 2024 21:14:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRlAPXWv"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512d6bcd696so2619449e87.1;
+        Mon, 26 Feb 2024 02:56:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708924452; x=1709529252; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708944985; x=1709549785; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OabW5s8KvNhiOMg5Dyvun0ZV1OXYn36recY6yBYC0mA=;
-        b=KkTD+gZ6D52qF+2jRdC1EfOZ3xMyzCmvFfCMcpWl96Q76flwadzaqv8JCr9XQhvoKB
-         phiUMhKAZjujBWmvzXNr5Zykeg8dZHt/05Ojj9iSKgFwQef/Z1yf0bRzf4I920Iw6gTy
-         HY+wvtmZQrVz9IkyJKWsltuMQDHOUyLSTcwWt7BJCTd6hdmHpOuOoOKOO5MERjFw0ICq
-         BY3UAHasFwJR00OwskD2DSW0u0A8AGWdwQ+3UdaQyJkhUODHWO7Fm7x3EsvcgV1W3Nt0
-         hm+4AP1/cbuj725de9XRYqH/5ayOJisY4k1gALGH0jkAorpZ/RjDO77EsLeJe+u37vNI
-         NpVg==
+        bh=h7fB0a/5ZcbNw+Zj1uUC8jy+nhy/LiwshbicAgHsNIg=;
+        b=KRlAPXWvGbaMl/3MX0FlcROnRKyBF47oaYLT3OxITWFoyakiwox38OW9DgoN+czz/g
+         vHO6lv5w25Yrg3uDHuqgsO0GygDWO/iu2lHlYFe2fVAUcv9MgCgKs/c+WnBFJlF4ofAX
+         NqIe0QzsdZxQtsDaHZMBQDIzFp2RCQrmqglma0kZV9zA5jW/IKEib5U8wHwleDWapDcK
+         Cv2q5h9AqvzAq26MwpgiOAqkVHclpLrOcTVoChtJT945h21dmAdX9/Sf4Z2aW1iCDIqh
+         7mZ2rmCdCn537U8YhT48C6BeIoC7/fmJe/HuYe2KW7WW1lHawREF4uWLxRk5o0GtKOni
+         B4Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708924452; x=1709529252;
+        d=1e100.net; s=20230601; t=1708944985; x=1709549785;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OabW5s8KvNhiOMg5Dyvun0ZV1OXYn36recY6yBYC0mA=;
-        b=uCm0srNHGqrO/ZLhqKvyeLTK5ViZwSshXTedFdkDBpVXEoXmAaHwirjTBgNAtY5Zav
-         fbUM8wyDzXzu4M1fW0W/3jPkPdYj5+gd8WwCPcwnTznbFbgqxV8JEO7gpeKkJwacj89l
-         PYrf1FOvlXtEXqpihS4KxTohZ8PEEr0Lq0+ihNaeiDuN5AZsNlNuuIbEI6/14Td6T4UJ
-         1sOvDLx7wbcsaCmJyDWcAGs7bqlkSSWKNxA3Ux9Yzge4d+k9xrKb0ggi+wbFjBaVf4K8
-         Yw5V2vwUd1ni/5x0NjbP4PBCPREHvQxfmHFt81sz2zhPiZeVSjtf5C8KiLzjO+dT7eER
-         Bl9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXqWPEVMJ8cDYKQi3LxwE+880d/AsBtCrR+XFuQUHvfj5jhzdZyXda2k0Oryk742GruaCUMFdrPknGoA7LDl2W8GF08cyaQonfInA==
-X-Gm-Message-State: AOJu0Yzd/V3fJ+EgZ0QdMsjBy+xvvfCMhWj5GLG/ObrpCRhghaC6NYC3
-	RbBw41IwAiw9kBYBiWSQFr8aUcPeQQm2PuUvAviIl3DKJBzXLlGz49WxOn5lqAKD6Z4O+L1Eyr/
-	kQ3x9ZsSfFueXUpzUGkyElMP+dMs=
-X-Google-Smtp-Source: AGHT+IF3Zcyfw7cJqQuMBiuBx7ojt7Wz5K+qsqrcjgf4G2h+u7Fo567e58Zh8z7F4UIc4vLjyndCbAlsH3Q62PinLZs=
-X-Received: by 2002:ac2:4344:0:b0:512:bebf:1a with SMTP id o4-20020ac24344000000b00512bebf001amr3922608lfl.57.1708924451413;
- Sun, 25 Feb 2024 21:14:11 -0800 (PST)
+        bh=h7fB0a/5ZcbNw+Zj1uUC8jy+nhy/LiwshbicAgHsNIg=;
+        b=nH3cbMz1PPh2SUPmXyhrkyiYLV4/AlXTRXtz2hu+2QJqVh/k3FClTeVMaK2zIKAGpA
+         n5tIcB3NJb+C0t4+I0JtIrGMkskBVcci0k/vLZwd6EmWtvaDJoVpEIaLeTGGuc9hk3eB
+         euhFWlfI7i3M5Ycix2K7A8JiwZF1vXIpK7SU+cVqNDoUtFFH5pSlj10c4nPhsGTLhRrt
+         p+Xu9tz4uAqfFtOxlOxP3B6zxnx7odYP0goq6bm7fNqmdd3Q//RIw+X3uZkAujatXHLZ
+         +EWTIuQ1t27cujD/DvjqAHPdgUdG00qg8evM4XFkHTPvdHwGP+DlR0EYxUqXgZXEUJsu
+         a7DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIqgtzk2H/5otm5UYvYA+YNSVxl+X2YLN6AvWk9owHncLyyMy5Ly72tX7/FTfu7v5mevJqldWVCSGrW/L1LEAXsJ5IjPJJL4ipGQ==
+X-Gm-Message-State: AOJu0YzT3x5ToUHmoi7+3YrIo+APVLVxZ/nzo/8fjtKVHV1r04lGXcKo
+	VNSXLlnqGvJ+PZpFgyejOs2qu6JpATr1wj64J4TV2xICStIf1UICywY9sMG/S3UYkZ2OBn0kWWL
+	xk9GC6vXVL2h1xj6hUznePo8fSCOToPAgbrI=
+X-Google-Smtp-Source: AGHT+IGWZejTrnXyiwIqx/+lXlbxX3JTiyKintL4lQKrwfz6ujFLgEmkjGHcl/yKez/mE0xqMEn1SjcuGnXks0B3hiE=
+X-Received: by 2002:a05:6512:1093:b0:513:d1:770e with SMTP id
+ j19-20020a056512109300b0051300d1770emr435234lfg.21.1708944984590; Mon, 26 Feb
+ 2024 02:56:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240226045010.30908-1-bharathsm@microsoft.com>
-In-Reply-To: <20240226045010.30908-1-bharathsm@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 25 Feb 2024 23:13:59 -0600
-Message-ID: <CAH2r5msYJncggqkeNQRceNhcnQ1_BdYiQw9mw7fLogHfm8AySw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: prevent updating file size from server if we have a
- read/write lease
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: pc@cjr.nz, sfrench@samba.org, nspmangalore@gmail.com, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, bharathsm@microsoft.com, 
-	ronnie sahlberg <ronniesahlberg@gmail.com>
+References: <CANT5p=rYFOkpnB_SMGd0dAV5orX--Z53O-gjVg4qRkgrH6HiqA@mail.gmail.com>
+ <2024022347-blinking-dingo-1411@gregkh>
+In-Reply-To: <2024022347-blinking-dingo-1411@gregkh>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Mon, 26 Feb 2024 16:26:13 +0530
+Message-ID: <CANT5p=qsAtUCp0W=gZ=-8sjoUtg8uUKda04=ou+ABx-mjVUeUA@mail.gmail.com>
+Subject: Re: Request to include a couple of fixes to stable branches
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Stable <stable@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-My only worry is that perhaps we should make it more narrow (ie only
-when called from readdir ie cifs_prime_dcache()  rather than also
-never updating it on query_info calls)
+On Fri, Feb 23, 2024 at 8:41=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> On Fri, Feb 23, 2024 at 07:11:48PM +0530, Shyam Prasad N wrote:
+> > Hi stable maintainers,
+> >
+> > We seem to have missed adding the stable tag to a couple of important
+> > patches that went upstream for fs/smb/client. Can you please include
+> > them in all the stable trees?
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D4f1fffa2376922f3d1d506e49c0fd445b023a28e
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D79520587fe42cd4988aff8695d60621e689109cb
+>
+> These do not apply properly at all to any stable kernel trees, did you
+> get them to work?  How did you test this?
+>
+> Please send a set of working backports and we will be glad to apply
+> them.
+>
+> thanks,
+>
+> greg k-h
 
-On Sun, Feb 25, 2024 at 10:50=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
-m> wrote:
->
-> In cases of large directories, the readdir operation may span multiple
-> round trips to retrieve contents. This introduces a potential race
-> condition in case of concurrent write and readdir operations. If the
-> readdir operation initiates before a write has been processed by the
-> server, it may update the file size attribute to an older value.
-> Address this issue by avoiding file size updates from server when a
-> read/write lease.
->
-> Scenario:
-> 1) process1: open dir xyz
-> 2) process1: readdir instance 1 on xyz
-> 3) process2: create file.txt for write
-> 4) process2: write x bytes to file.txt
-> 5) process2: close file.txt
-> 6) process2: open file.txt for read
-> 7) process1: readdir 2 - overwrites file.txt inode size to 0
-> 8) process2: read contents of file.txt - bug, short read with 0 bytes
->
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> ---
->  fs/smb/client/file.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index f2db4a1f81ad..e742d0d0e579 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -2952,7 +2952,8 @@ bool is_size_safe_to_change(struct cifsInodeInfo *c=
-ifsInode, __u64 end_of_file)
->         if (!cifsInode)
->                 return true;
->
-> -       if (is_inode_writable(cifsInode)) {
-> +       if (is_inode_writable(cifsInode) ||
-> +                       ((cifsInode->oplock & CIFS_CACHE_RW_FLG) !=3D 0))=
- {
->                 /* This inode is open for write at least once */
->                 struct cifs_sb_info *cifs_sb;
->
-> --
-> 2.34.1
->
+Hi Greg,
 
+I have not applied these to stable kernel versions yet.
+So no testing has been run on stable trees yet.
+Let me work on patches to the stable trees and share them with you soon.
 
---
-Thanks,
+All the tests so far have been with the mainline kernel.
+The testing involved simulated network disconnects when the Linux
+kernel source code was being copied into the SMB share.
+Our team has been running stress tests on the mainline kernel, and
+there's nothing alarming seen so far.
+Also, these changes have not regressed any of the xfstests.
 
-Steve
+--=20
+Regards,
+Shyam
