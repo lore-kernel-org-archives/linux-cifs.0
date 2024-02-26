@@ -1,113 +1,102 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A42C79D3;
-	Sun, 25 Feb 2024 16:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274FB173;
+	Mon, 26 Feb 2024 00:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708879925; cv=none; b=Z0OiW03iCg7p3V22ngYr5OL0cJfMlx9swPQlIL0lDpc4z/e1CNrvF+B/hS5nC1s7Vvdg3YftM0bTuKk6bWolgVktGJaSzaRaOwvzzcp2uMgqyW57hyd9GRvg2t4c4kkUJDZtiXlKhqlm9bH4B+x4zM5h4TxqFu15+omjeTk+Sdc=
+	t=1708905828; cv=none; b=ZaFPbCjdvdLF4qj1pgGHVeevtb1Vg0dj7BntTyxrv8PXqMtSewxLravEEPn2HshuS3qJxs7L3XJIuXxj6VLl11G/dOjTDY7zPd4GI1/zALNh1ZVm/8cItInO+HpykNILpwGY0+t/Sxy5RxoyX7tPYljnWEJRPSW6XxWx+tvlj3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708879925; c=relaxed/simple;
-	bh=Lm8WAuY1Y40qJ1RVfUtI8EqsUKGH8Fdkh/n4dpYLEyw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HOzPLZQZ66+RnT/qo7iOZbVRAutRLB3hAgbevMleqcpWuoze2RekGG+PHVICJtwU59XIp5wWW7qwx6WtZ1UbaxvLyqDzpV1su3Kj2oO1L9xSgba5Iinry389LRXQ8dbzsKA10o3ZFTaY+D7b0kuNsMMa5y8XZ/gfNGDi4Qe5YOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IB1xlc07; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708905828; c=relaxed/simple;
+	bh=fnEvOrO1k5JWNVipLI8U/c/k/XQR9Ok+LP4dmL8s0Ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=nbUxp9IVcmlOXZGZL15f5pPOgtoKCIa21c48j2kamoLz3H5zVpHmtARhsaKW5hRMvGEhoG4TLJzom8142NgClLhtGrxS8+99ubSUTesofY86TR/+nf1FU6aeKA3oKypaVBmujnBiuckmR/nGWVfAeZvDqmECVwaTqTesp5ohtsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=QJOXE1g/; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IB1xlc07"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-512b29f82d1so3016915e87.1;
-        Sun, 25 Feb 2024 08:52:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708879922; x=1709484722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OVBARaDhY4/ZJwxqvZSGq2HB0eTnWoqOZB0E4z9T7/A=;
-        b=IB1xlc07NRYy+1PTwwHSi2HtTIKm336cvZIdacuTJCTJOd1OmH1xS5mnrXT5ld60p1
-         3mhJvVbUgyn/V34PUs6wnDyQ3Piugsc2JWqgpEEJR6dnFgTYYIIS/pe5gFeoqIJQ0ba0
-         gFuY4Ki2yh+0tU65Zw3tGlVQ6E8MaDh6D+ZUp6W8SbvTG/6nzuvQOmaWQ89YSHU48E7h
-         BAYTPfOIjMmTu27yuhqoZpHlVR1aAzRHBHL0Bxz1MJgCUX3zmKPAXY2ntYgb2aVMlv8u
-         vhnm4wyy2kH5upjxAPuhrDWhw0H0i8L5dV12Opd0VW43tz9qmy6WLFr+GFxbn0r0PSDp
-         IMMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708879922; x=1709484722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OVBARaDhY4/ZJwxqvZSGq2HB0eTnWoqOZB0E4z9T7/A=;
-        b=GTCWAmouvnTcM4CMbHMY4HY+RArGAHzfS/uBry7TGa2yIXI1Ibe4wrKucG/Ekj0OZV
-         VMDWEKtGiaxcwWGS2IICBfWIdiA/fUzjWODcXmoGJA+KDbEiqxBVaaV2SUqFTzKY6+hx
-         iuMGpybCcvgZ/mgXMP3rELajuhqJ0pXmEHMEhGEuaeiIy8GgUiG3klsXdFtCgVx6qzHa
-         srPXKJc7G+6j3GPDjCFHoH3svJlihB++6SUO2/54EQNPHRkBExAnqyOaOeQQyNUPvEgN
-         XvKwCvdPewv3frHanCSrJFtdiFjVyVzGXMi70PT6Zj1jq9zWsEWzdICgbVLoGndiiY8Z
-         Y5Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHSF178LA86xprwNNnnuB2CLeEhD1bPRpXpKjbVnqGw6ZVVgHuVfZg3uwqFu6qCrgc/nudhw9EnW1i2Unu4U6YOTKRLwE8Rk8vKuvlcGvA/W/5fkN20ZNIndbXdCKFuih3e24ZQTAZxw==
-X-Gm-Message-State: AOJu0Yyp7f9sZb+HY8lIwy3HXY8E1W4QeCiUYuovKHt7VcpVq1Yc/eAo
-	IUuWaRYUOMWIdGw4Ordo/GFvwvoru5+6HiU/YbPHIG54g43pAlM2GSoXLb7UAcD/HrksEEc64bn
-	Z7KBBPnOz5weMjf1mrXOCSftJ9D0=
-X-Google-Smtp-Source: AGHT+IEgmqbO9wxfKjJgwrgk/OccX2wFSH4UyEXLgZcgtXOEMyUIPc3FHLXpzE3nabPMr+da8zY76L6BygSBRqMVwdA=
-X-Received: by 2002:a05:6512:614:b0:512:e51f:b58 with SMTP id
- b20-20020a056512061400b00512e51f0b58mr3178846lfe.24.1708879921986; Sun, 25
- Feb 2024 08:52:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="QJOXE1g/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1708905824;
+	bh=1fAQ2/PKsEagwRfg9sC2E9Bl6mn8gmCy2OfiKeNgfi8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=QJOXE1g/K4bhGQnk/NYbLOB5HAA1A1Sa36fbEb8MAIPguMk7o9O9xJAr+zrkN2Lc5
+	 gVebqt71q69rDd0LW54xNYPxeRCnt9dJvGIOYqUw9srlTMA/m+Jfl/CuBiyXczf4+j
+	 YZ5PU4F79vdW6xn8scntX4tX2Sb2egxjoQUa/oPAmVdtZ9XTjDX0p1iatClv+sGeCF
+	 uzbBQc8fWirQT+o0r0aW7dbpalCyOfsAD1v2qvbTQp5VO6wa59KodCyX+/OFiZ1RVn
+	 EnLwSMs+N5OaKkCUiWMDcnr74vD9sT3ZT/Jp0SUQQVikGbQ0JNRzpK8Fbj/3tuq1DR
+	 2UQU4wgO3b0AQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TjgnX1ZBYz4wc8;
+	Mon, 26 Feb 2024 11:03:44 +1100 (AEDT)
+Date: Mon, 26 Feb 2024 11:03:43 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Christian Brauner <brauner@kernel.org>, Steve French
+ <smfrench@gmail.com>
+Cc: David Howells <dhowells@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+ CIFS <linux-cifs@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Steve French <stfrench@microsoft.com>
+Subject: linux-next: manual merge of the vfs-brauner tree with the cifs tree
+Message-ID: <20240226110343.28e340eb@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240224135809.830610-1-chengming.zhou@linux.dev>
-In-Reply-To: <20240224135809.830610-1-chengming.zhou@linux.dev>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 25 Feb 2024 10:51:50 -0600
-Message-ID: <CAH2r5mvoS1+52SvT3XCPiBtOWAFyoVy3LajfQSFGOAa2h8Wy3w@mail.gmail.com>
-Subject: Re: [PATCH] smb: remove SLAB_MEM_SPREAD flag usage
-To: chengming.zhou@linux.dev
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, samba-technical@lists.samba.org, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	vbabka@suse.cz, roman.gushchin@linux.dev, Xiongwei.Song@windriver.com, 
-	Chengming Zhou <zhouchengming@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/qI5ugzFz2F5LCxVdGo=J9Ul";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/qI5ugzFz2F5LCxVdGo=J9Ul
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-added to cifs-2.6.git for-next (minor update to put "Link: ...") line
-in the description
+Hi all,
 
-On Sat, Feb 24, 2024 at 7:58=E2=80=AFAM <chengming.zhou@linux.dev> wrote:
->
-> From: Chengming Zhou <zhouchengming@bytedance.com>
->
-> The SLAB_MEM_SPREAD flag is already a no-op as of 6.8-rc1, remove
-> its usage so we can delete it from slab. No functional change.
->
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->  fs/smb/client/cifsfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-> index 9cd3bb48bd3b..45e57c852f33 100644
-> --- a/fs/smb/client/cifsfs.c
-> +++ b/fs/smb/client/cifsfs.c
-> @@ -1661,7 +1661,7 @@ cifs_init_inodecache(void)
->         cifs_inode_cachep =3D kmem_cache_create("cifs_inode_cache",
->                                               sizeof(struct cifsInodeInfo=
-),
->                                               0, (SLAB_RECLAIM_ACCOUNT|
-> -                                               SLAB_MEM_SPREAD|SLAB_ACCO=
-UNT),
-> +                                               SLAB_ACCOUNT),
->                                               cifs_init_once);
->         if (cifs_inode_cachep =3D=3D NULL)
->                 return -ENOMEM;
-> --
-> 2.40.1
->
->
+Today's linux-next merge of the vfs-brauner tree got a conflict in:
 
+  fs/smb/client/file.c
+
+between commit:
+
+  d7e87923939a ("cifs: Fix writeback data corruption")
+
+from the cifs tree and commit:
+
+  a69ce85ec9af ("filelock: split common fields into struct file_lock_core")
+
+from the vfs-brauner tree.
+
+Please do not do unrelated white space cleanups ...
+
+I fixed it up (I used the former version) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
 
 --=20
-Thanks,
+Cheers,
+Stephen Rothwell
 
-Steve
+--Sig_/qI5ugzFz2F5LCxVdGo=J9Ul
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXb1V8ACgkQAVBC80lX
+0GwUmwf/am9zWAuEqziEydqmjGDaawepn69ZqkkZRw+Xo6PLS25lKY8UbvL1ozZj
+bOrTe+Pxj49Tlh9DPmhnxQxGb4kUDANJp7WeP3Uts6zEPbiCkceqdDYbFkjzFMQ3
+CZPeRZZ2urX5WOsjCDhWch5yQDYCeVammx+YnEgTYu4ZqF1qw0zqAqpiGvM5+Tvn
+sm7He1Fw7phJwVDo2fJsXfDMRD7PHWYvec3A5Unv3O82qf+UEGcDIcYYS933VrPz
+iHyj0iMHgvXvz7L6QUBVzxZd2ewJVUtN/h3msws4dhuH+4AcyXo58KcnoC1ANRcw
+z2ovBoRbOj5zQQMOWcp+N4EcmF5Lyg==
+=eT63
+-----END PGP SIGNATURE-----
+
+--Sig_/qI5ugzFz2F5LCxVdGo=J9Ul--
