@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B42913B2B3;
-	Tue, 27 Feb 2024 13:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B0A1420C8;
+	Tue, 27 Feb 2024 13:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709040650; cv=none; b=cofDijjT9PekB9Nb1sPLhfqELQkKvCwdSNStAr6W991C56a1UE2jWiZzaVFGsdy4q3rNzoM/IAKzWxT6VIfT/+uHj3VjY5Biyo5r/nZbjDSxSJAGFFOzIHOojWCUJuI/P6BkkwZRfmisii+6SoPXoFowBgq+XOT+Y2jBSSFeqXg=
+	t=1709041649; cv=none; b=BddCiiAF7g1TmfUsnPRtDX/aNMX9HYwTIXm9axf2Pdp0xJ3UwPojYjnyT7cljvRLjEcX911UphtmxctxQ90ZhUBAUXILnnMcPRDKxOUkDQTPiMz9rpWrpQLeJ0zKfcy/xnEPUndPh5veBKMGMXZ/GW56IrTqfe1E3yvdTZcrg9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709040650; c=relaxed/simple;
-	bh=MFKtR2fS4L0WjPDdjEGVFgoJTEjHDdqSj3YnJjAp2+A=;
+	s=arc-20240116; t=1709041649; c=relaxed/simple;
+	bh=nw0/20MxZXuTSTm5jYy9oiQ732AcTs2QwpEpjgykd9o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F1YOq0BGmOGY22Jolbxt9cn6tx1DulcVhWdu2OkSTlj3HWQd+E1/Od6tBWbYVQshwjZsRoPds8G1g10zQZhmUsew5C0ZFEe8a/IlsERfgHhEn2/NmO25/4Dm7QxTNrodRuYfup011HOb+3ym91C2J+LMWibAZZecXWVuDhT+eWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bNB77hTw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I2XDa4vVxC7L8yv6cEgwunAB9UHZqeIkvWyGWdIBMFvjGM7AGvK5weEiwGG/lrG8qzx4Axm5J8MWFbxLOCA7LnGkHnQuPwcblbUl2JUZfcB+5axWorJlz1Aqtxqx8ZdakYIOCkXSsIL0dpX3Po5Q7Y5WWU3JjG2aO44Z+OlE12w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Aq/TIvUp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bNB77hTw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 947ACC433F1;
-	Tue, 27 Feb 2024 13:30:49 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Aq/TIvUp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEFFC433C7;
+	Tue, 27 Feb 2024 13:47:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1709040650;
-	bh=MFKtR2fS4L0WjPDdjEGVFgoJTEjHDdqSj3YnJjAp2+A=;
+	s=korg; t=1709041649;
+	bh=nw0/20MxZXuTSTm5jYy9oiQ732AcTs2QwpEpjgykd9o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bNB77hTwgcxSnvc4Le4q048uzOlXWmxGskWMDYJfRH2C0qwFA9FdU4aqkgMT5Hggg
-	 Ktx8XyLJsufPdfdn5+dkmrsB1ryyp7AXgdymvjPdgey/jQL3eP1aATLCr3BSjEl41i
-	 dQiVVoLCCouD7Nw8ePhyxRpBc5A4DkfSaq+Mnvd8=
+	b=Aq/TIvUp6vi/jKYt/AaODbQj5iASsJ/LtUprpRHoeP5s9Fxy2tDE10mKaM4d3gWFN
+	 lwqoYAq2IHu0ts/sxOJ388oF2EW6u0FxWF3wv49WNifM5sm32co5GSY0zs/zHEcRuc
+	 fYbQAgQBXHIyL//uPjejpTEGFTAGV7Cv2Mnr+/FU=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,12 +38,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Kees Cook <keescook@chromium.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.7 022/334] smb: Work around Clang __bdos() type confusion
-Date: Tue, 27 Feb 2024 14:18:00 +0100
-Message-ID: <20240227131631.324135878@linuxfoundation.org>
+Subject: [PATCH 6.6 022/299] smb: Work around Clang __bdos() type confusion
+Date: Tue, 27 Feb 2024 14:22:13 +0100
+Message-ID: <20240227131626.544984138@linuxfoundation.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240227131630.636392135@linuxfoundation.org>
-References: <20240227131630.636392135@linuxfoundation.org>
+In-Reply-To: <20240227131625.847743063@linuxfoundation.org>
+References: <20240227131625.847743063@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.7-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
