@@ -1,51 +1,59 @@
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B0B1E878;
-	Mon, 26 Feb 2024 22:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EC92E3EB
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 11:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708988058; cv=none; b=fkdm7lCmScaFFf6U1RbpnUhiIi/0+Q1ZuaY4tQh6u/M+k9k2Ag8sGhd4+WqvT1GC2X+6cbHlHu70UATc4t2Ui9DqLl+hP2UltLnRJhkuwypU8nHD2TCCYBLSndKCEPlgu+G2JINCnr+g7U1NzpQak0ERgZXwPHAUdS6OBIjIdmk=
+	t=1709032606; cv=none; b=QsUGRORzYdwqsD1LM8cQ0mufbjWoGN7y0HH1ztQhkp22i7uFl5aCYUk2lPXtMqgscBbawlecdGm8g8DNqhdY0yve/IaJWwJql06ZSNkK854HGcQn8ylzTZtzS9UdlsaeqPphN0Oc33Mv4uarePqHhAFBC7Gw7661cHZtf5rZ4Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708988058; c=relaxed/simple;
-	bh=R7yJHhMUzALWUVwkqwEb0QPTmDVjJOjmsFPrpsU34/s=;
-	h=Subject:Message-ID:Date:MIME-Version:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WwgELkyiQS4csYc+1YE50gf83Jf6E0eAvL8lIRMqxp95/HYYEhi+E2mdsq3DWniVEqCJPJCkvU3nTq5kk9/a7mzLWYh5nJ4oyd9vGuyEXdHLmWI8ZNked0D5XK17fNChMGYlzN42wTDma/1P7EiWG7Tl7OQFbFeRPcxOuwX20R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pkl4HWtD; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1709032606; c=relaxed/simple;
+	bh=1gaEDmNOVRml9fS6nqQ4XU65DMVolDGYGSAHdUVeeG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=noDhs+idQdgfA4p0x/TGSUJIJYFV6+wGjDH0iaktrURrtb/CRSi9eJM6R5YhvdFYUABDkBwGSl9HfCjfaCiokLuAzf2pst8cOutZqByODVD3owStHWXIV5+BsDIw+JSMShSFzRgDhfFwgEVGR/qZIwOQ+OUUKpCV0ljJXYKD0+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sairon.cz; spf=pass smtp.mailfrom=sairon.cz; dkim=pass (2048-bit key) header.d=sairon.cz header.i=@sairon.cz header.b=hf6NEEYY; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sairon.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sairon.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pkl4HWtD"
+	dkim=pass (2048-bit key) header.d=sairon.cz header.i=@sairon.cz header.b="hf6NEEYY"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a3f1bf03722so441574766b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 03:16:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708988057; x=1740524057;
-  h=message-id:date:mime-version:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=EBOK6+JFDrs7P79a2vp69jn0JzK7kVNq2lvjt1XUtPg=;
-  b=pkl4HWtD023Oa4Y88bQNxdZrEHkpxk2XuL/zACHCAIJotQfDo8dCKLNT
-   S+kJrXIx6AXFgMtafbUKHTB7eiv/lMTlWsORCcd0ZeaPC0VBHfZS5IAzI
-   PSwlQJD6DAb3+ci7kFl/agG4/BhAIOUyO2O3llrbOtYOLdU29B1LaRVHa
-   E=;
-X-IronPort-AV: E=Sophos;i="6.06,186,1705363200"; 
-   d="scan'208";a="276895848"
-Subject: Re: [REGRESSION 6.1.70] system calls with CIFS mounts failing with "Resource
- temporarily unavailable"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2024 22:54:15 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.43.254:51768]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.210:2525] with esmtp (Farcaster)
- id 42027716-0bfb-4a9f-a713-883e7afe5f50; Mon, 26 Feb 2024 22:54:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 42027716-0bfb-4a9f-a713-883e7afe5f50
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 26 Feb 2024 22:54:13 +0000
-Received: from [192.168.17.69] (10.106.82.23) by EX19D018EUA004.ant.amazon.com
- (10.252.50.85) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Mon, 26 Feb
- 2024 22:54:13 +0000
-Message-ID: <fd3af426-ee53-45be-9220-2ff253ea255b@amazon.com>
-Date: Mon, 26 Feb 2024 22:54:12 +0000
+        d=sairon.cz; s=google; t=1709032603; x=1709637403; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8maodQ7SVk0lsGRMUshinQhJllk+8zH3K5kldXH3WEE=;
+        b=hf6NEEYYHf948KQ1FMDIg4nYVr4qKroKOvA5l9GCGy5kTUSlFpKjitneOp2PtGQJ/N
+         gP1WxCht3UPm+X8XtOzJNe2b49OPZl6GjJO/+twHOcQMnPkSG0LajIMoqmmv7MW6tFbr
+         IS/OqV6QxMN40uy0rdboeF9mQuEC8tfdlptMtiokYqH/1ddQDia4iblyx0macqZelgJo
+         ozHXBxa2xbDdWSeqLDZgfGe6Z0ecU207CInsljjBAExg0f9vsky95fcYMAzi1fvsCvBT
+         lyWAxsdUS1ex8H3EErRZDllUIEIxyl8D04SzThjJuc8zrAos8lDxRJeRbsu/VtL/lX+B
+         GYRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709032603; x=1709637403;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8maodQ7SVk0lsGRMUshinQhJllk+8zH3K5kldXH3WEE=;
+        b=qzQkDD4dxiZvIEt0HP/FsXF5lKVFFyMJymjSpWOb2MDtWCdWwTzWD2YcI8SwULTOco
+         2KUsrPw+ssl+oyh30y2qA5FF371lUor5nojaqGrrpSmu0moOvGw0pbtmx6iQuDvIavp1
+         GNfy3j/dTbpc7OKIq/uMyX5X1J9/9BLUmrFU8GeZjv+qOPSWiXvZTmwxiQOsSLFk7yiP
+         IFNrfSd9F3fIHWLkMtHqFjizin3Pxs6IQxXEYAn3gyYY9LJoOXL3IHpTJhq0ucO3L0ZZ
+         EAQT6WxIZ/zuYXY3HDNci5URRNATuWNifSktdrftaRXgM7v1ns/S6arIrCUTgtMXzZC5
+         Tm8g==
+X-Forwarded-Encrypted: i=1; AJvYcCXsGLW0nNGOCERu208qYZIZanTIzUWVW+dqbImZmUpJMZ6TY130yiMk/H8ikNqoia8Koe8SYCxqyiI0CYNfqvM7fn3iX7AaOd+qsg==
+X-Gm-Message-State: AOJu0YzkBi3gGdgMbDiLCL7ub8WLOKzRNFFpdEcN6eOltkcvB7VSLWQr
+	lwXMpT0lbfLrXY8vIYEnGwOitwQmmQnrTtZSG1Hc2g0S8epJxxD2VDVFNaEvBVI=
+X-Google-Smtp-Source: AGHT+IFSDEZMw4pB3qIf0ADk/Sl8+9EQWUUj6CGFXQtfJNm7NkQsovbyK2dKUim2oxfMVSf4ZHYhtQ==
+X-Received: by 2002:a17:906:b216:b0:a43:4335:cbbb with SMTP id p22-20020a170906b21600b00a434335cbbbmr3811723ejz.75.1709032602962;
+        Tue, 27 Feb 2024 03:16:42 -0800 (PST)
+Received: from [192.168.127.42] (ip-89-103-66-201.bb.vodafone.cz. [89.103.66.201])
+        by smtp.gmail.com with ESMTPSA id lv8-20020a170906bc8800b00a4306ac4c77sm646652ejb.197.2024.02.27.03.16.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Feb 2024 03:16:42 -0800 (PST)
+Message-ID: <4b04b2c4-b3ff-48e7-9c24-04b1f124e7fa@sairon.cz>
+Date: Tue, 27 Feb 2024 12:16:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,39 +61,40 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/11] cifs: distribute channels across interfaces based
+ on speed
 Content-Language: en-US
-To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-CC: Linux regressions mailing list <regressions@lists.linux.dev>, "SeongJae
- Park" <sj@kernel.org>, "pc@manguebit.com" <pc@manguebit.com>,
-	"leonardo@schenkel.net" <leonardo@schenkel.net>, "linux-cifs@vger.kernel.org"
-	<linux-cifs@vger.kernel.org>, "m.weissbach@info-gate.de"
-	<m.weissbach@info-gate.de>, "sairon@sairon.cz" <sairon@sairon.cz>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-References: <20240126191351.56183-1-sj@kernel.org>
- <2ab43584-8b6f-4c39-ae49-401530570c7a@leemhuis.info>
- <fd0174a5-8319-436d-bf05-0f6a3794f6f9@amazon.com>
- <2024022604-encrypt-dullness-8127@gregkh>
-From: "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-In-Reply-To: <2024022604-encrypt-dullness-8127@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Shyam Prasad N <nspmangalore@gmail.com>, smfrench@gmail.com,
+ bharathsm.hsk@gmail.com, pc@cjr.nz, tom@talpey.com,
+ linux-cifs@vger.kernel.org
+Cc: Shyam Prasad N <sprasad@microsoft.com>, Stefan Agner <stefan@agner.ch>
+References: <20230310153211.10982-1-sprasad@microsoft.com>
+ <20230310153211.10982-8-sprasad@microsoft.com>
+From: =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
+In-Reply-To: <20230310153211.10982-8-sprasad@microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D008EUA003.ant.amazon.com (10.252.50.155) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-On 26/02/2024 14:55, gregkh@linuxfoundation.org wrote:
+Hi Shyam, everyone,
 
-> 
-> Please send this as a patch series, in a new thread, so we can properly
-> track this, we have too many different threads here (and the subject
-> line is wrong...)
-> 
-> thanks,
-> 
-> greg k-h
+On 10. 03. 23 16:32, Shyam Prasad N wrote:
 
-Thanks Greg and apologize for the noise, I figured out that this has 
-something to do with our test environment setup. I have redone the test 
-manually and a looks good so I'd say we can close this thread for now :)
+> +	if (!ses->iface_count) {
+> +		spin_unlock(&ses->iface_lock);
+> +		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
+> +		return 0;
+> +	}
 
-Hazem
+May I ask why this is now being logged, and what can be tweaked in the 
+case that a server does not advertise interfaces? After updating the 
+kernel from 6.1 to 6.6 in Home Assistant OS, we got a report [1] of 
+these messages appearing, yet so far only from a single attentive user. 
+I wonder if we are going to see them more often, and it that case a 
+suggestion to users would come handy. If there's not a simple 
+resolution, could the verbosity be lowered to FYI, maybe?
 
+Thanks,
+Jan
+
+
+[1] https://github.com/home-assistant/operating-system/issues/3201
