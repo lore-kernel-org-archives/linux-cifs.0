@@ -1,60 +1,61 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9FD54FB1
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 15:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558D054FB1
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 15:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709047390; cv=none; b=U5077CwlIBpceoaRWLF9eLj0a0H0zsUoR1nDPCuU9n7SI97RLZHRyP54FbQa4PlT65MmDJ0Ew3wuBbobGSV2zPc6UuTD99VUuFb9/MAOQC7yETcpJRSGAtAMP3g3vgH2+/0nZLt6pWJDWICBEYm6bUDr7PwyVqfJIhemcyRLCog=
+	t=1709047438; cv=none; b=aOqmsOZJj7xQHfEdwkVf0+BfR/UsiDuio43aU6GwQRFX59e7Cs8Hc9sicrNbY8iaVjfZGfNmXpI/BOY8S41h4SneR/BJr1AdJF+732I1pyN78FbSsiwiv5gJN9khh/KWnN5uHzk8KouDvoEojRL2Wg7gSSmCNiOBdY0GHJOSISc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709047390; c=relaxed/simple;
-	bh=pNSUe1j6JzEbhfRhN4fC7tjZaJNzWR148k+4gf91dMo=;
+	s=arc-20240116; t=1709047438; c=relaxed/simple;
+	bh=B7NoCc2yXpna3QNmZyF4Xk7Zd0ejE97S2NBOwTiicmE=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=XeFSKGD8F7XdNTfRZL1hVNK/4dhWujdGe/NSq9sSyGzwWlkyGXgwoGPDBv5Pzawjd435uK/Tz/8HIaKufjnnmFqt7QRWoc2uTd5CZnicLpvk+ZXukHuALwHomHRjwvfyMVu/UxGkB3hHvObOhkQvYKuIN6jvBu5Xgcx6iOdS5P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=atEWE61z; arc=none smtp.client-ip=209.85.128.45
+	 Content-Disposition; b=Zpf4GsxExS89+xgkeM7nqaQii6jUBmM8vsnx8eT+nFJGr5TP9bC5hvD0MVr3ZW68iIglXuLoI3JqFapx3H4pHd8PDmUW0uw3fE53myyTCENfem779tEn45YFkmRt39U4wKgN7xe3wTtGSOGDtTgswqSaNYA1Om/UgC6fOspD61E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=br3GmiAd; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="atEWE61z"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-412b15c97d4so515705e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 07:23:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="br3GmiAd"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-412a14299a4so22658385e9.1
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Feb 2024 07:23:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709047388; x=1709652188; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709047435; x=1709652235; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLu9xoaZZ/zvZx9RbS72f5mmr59ofCeLSP4gb9+idZM=;
-        b=atEWE61zWmTrA1yNoHVR4jRjL9j9WlngqDt8n+GWBJbKBiubHj7JTptiB5YYPA+KsN
-         4DBT9Am3UHYyBzfyw8X33GZLz2B1TWVVnO9rE1GrkL9hdYJYBZocXVAWiIds9Hfr2rQU
-         U1Yfi+ac14Nu5ytUSPinq78bp8r3Fgbe0JAG8mnYJiZTOZmGu7KywXmCQgpd8bsjwJKK
-         WQpdsNnQOD0noRLsJ3TUi8le4TuKIB6A7nNl2QUmKntFz0nMdLlUr64UaNpIvLkPDOX3
-         5qVdB+QWXZDHBREJ3UDfpW7ZmAZV9GDoVeHxV46uo/j2IkFa79Y7Tb/VGlrngwck5P4a
-         Doqg==
+        bh=CkT+3PCH4HA+LgSVwf+s4ecbaGZq1qd3r50SNFzDNAE=;
+        b=br3GmiAdI2H7HgGy6sYPQN2fbT8xL79oX765FkALaKk5Vd6uCB32k5scEs2qCpq7Iq
+         YPcPv2vrSYrvarERZMLnI+TyHc5p8bZN2x0dimQ+qBeYR6refa/F50Z6slvVCoVDsMZz
+         eG52o9k4xhKW0HjNqSdrMoKSC1VS2tRCSd4Zu4jei+6rlxfcnFCAEQKzEsTLzDhaMZBH
+         b2l8SoUhVsUQlvihHFgl0gQkCd5nfHA98PfMNjZW17mkc1VmNXVGldYIE1Z8dev9CjWI
+         ygs/czinN1uWKRvk5OzVrr2r2WCavbsuck93GAYXh1IRvAYNzLhdDBr1gtwrS4mXIh8s
+         pkuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709047388; x=1709652188;
+        d=1e100.net; s=20230601; t=1709047435; x=1709652235;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLu9xoaZZ/zvZx9RbS72f5mmr59ofCeLSP4gb9+idZM=;
-        b=fJk/pO12CuMC4n3ohPGViJimOjMl5/ZhwItR/+IV6X45xqMv9kKqy+ntua+OCU9wOY
-         7Vqwk4U1BFhLr+YKBaiqHTK/schOqabv/Xke2aCIern++c2HaaXzofWtp4yTdsHNeTl7
-         sBuhn5xCfGAeXeKYoaGcK53Plj4Uyq1OdXWBfMB2a06AEwjDfynCjM8loBzGIVhfvSbR
-         DbrTjQFkk+YP7ijkTEMhZddotltS29i5de0tCdMBhpeVqQOWOdTlAAVnhYn3yEWj8WpG
-         gQrP4+EnHo1nSlW5H7II1PbxDSfL+7rLhMrNuDl/hHmr1DYM9vaajAlCmZ43tjvJtVJ9
-         d+TQ==
-X-Gm-Message-State: AOJu0YyuGslvmdNu+PMCZUgkEXqOut77L1UgDTQpWKDH+SXNnDZHsNct
-	U0dtKgTNwS0FH1YSFyFBNYN26ZbZ+4cI4gJ0vZ8CiSvkl+mGA93F+j3pspRHK6E=
-X-Google-Smtp-Source: AGHT+IF2ZIkotu8w/SK0EEif/ASzSbkjmW0uKX2H8vcXzyHK/8OXDMaPGqGoWsD+gy1KTty1vSBIiw==
-X-Received: by 2002:a05:600c:1f81:b0:412:b4c:58da with SMTP id je1-20020a05600c1f8100b004120b4c58damr7864894wmb.9.1709047387815;
-        Tue, 27 Feb 2024 07:23:07 -0800 (PST)
+        bh=CkT+3PCH4HA+LgSVwf+s4ecbaGZq1qd3r50SNFzDNAE=;
+        b=Q1yPqVbmKWWkLpjD3I2ukQFheZTadJovYQ+gZxeoyWqqmA6/x3jCBlgGdw2mQHB0Ja
+         MzYTZ4MP3T6uCKj+9PafbPzV99cW7FbHAOjQTWvAcuzGLtFN5cvJo5I9z34uou0N2o+w
+         m3N1KdkbizV3EpCprhty70mbu8upU+7EZd0pTguY+1i7+2KkK/GTtv5lD3+5X9PpSVfX
+         B65fDTkRxys/n3Lt8y6Q698jI7cxQcG/cW0FOXURsQsmuHtVaqiqGuyaBhDoq4sx6Gnb
+         iDjKl0IVont63pCbRdac9rD2gjcgwxLtWkKjJoq4Z3D0axAfMUvnScMSQ33hA4CiX4Hj
+         HRTA==
+X-Gm-Message-State: AOJu0Ywjrb2M3ohTi/MoUQKoeltiJ4Ia3HapNE4yR8hx9qdmbxYaDZhZ
+	3vN5J0om5LEOzoK0XEhrFmkY8QXnudWd8YU+0ZLIB6mb3wh2EcUpyWPIhog2c9E=
+X-Google-Smtp-Source: AGHT+IFS1IGWR17SzRNSGQkwkJZbB5Jj6fgtlDRisQOoa84e0H+OTNjuZdAbOGL/QTx1JzSixDs/MQ==
+X-Received: by 2002:a05:600c:4f86:b0:412:8814:9885 with SMTP id n6-20020a05600c4f8600b0041288149885mr7931676wmq.4.1709047434712;
+        Tue, 27 Feb 2024 07:23:54 -0800 (PST)
 Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id y9-20020a7bcd89000000b00412706c3ddasm15010407wmj.18.2024.02.27.07.23.06
+        by smtp.gmail.com with ESMTPSA id hg26-20020a05600c539a00b0041297d7e181sm11703755wmb.6.2024.02.27.07.23.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Feb 2024 07:23:07 -0800 (PST)
-Date: Tue, 27 Feb 2024 18:23:03 +0300
+        Tue, 27 Feb 2024 07:23:54 -0800 (PST)
+Date: Tue, 27 Feb 2024 18:23:50 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: sprasad@microsoft.com
+To: msetiya@microsoft.com
 Cc: linux-cifs@vger.kernel.org
-Subject: [bug report] cifs: missed ref-counting smb session in find
-Message-ID: <4bd0de41-528f-4506-9c12-d635ee478f64@moroto.mountain>
+Subject: [bug report] smb: client: do not defer close open handles to deleted
+ files
+Message-ID: <eb0bd6c4-07a9-4f23-b857-2367835cb8ef@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -64,85 +65,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Hello Shyam Prasad N,
+Hello Meetakshi Setiya,
 
-The patch e695a9ad0305: "cifs: missed ref-counting smb session in
-find" from May 23, 2021 (linux-next), leads to the following Smatch
-static checker warning:
+The patch 05211603b73a: "smb: client: do not defer close open handles
+to deleted files" from Feb 9, 2024 (linux-next), leads to the
+following Smatch static checker warning:
 
-	fs/smb/client/connect.c:1636 cifs_put_tcp_session()
-	warn: sleeping in atomic context
+	fs/smb/client/misc.c:871 cifs_mark_open_handles_for_deleted_file()
+	error: 'full_path' dereferencing possible ERR_PTR()
 
-What happened here is that we recently shuffled some code around so
-now Smatch is aware that cancel_delayed_work_sync() is a might sleep
-function.
+fs/smb/client/misc.c
+    860 void cifs_mark_open_handles_for_deleted_file(struct cifs_tcon *tcon,
+    861                                              const char *path)
+    862 {
+    863         struct cifsFileInfo *cfile;
+    864         void *page;
+    865         const char *full_path;
+    866 
+    867         page = alloc_dentry_path();
+    868         spin_lock(&tcon->open_file_lock);
+    869         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+    870                 full_path = build_path_from_dentry(cfile->dentry, page);
 
-fs/smb/client/smb2transport.c
-   204  smb2_find_smb_tcon(struct TCP_Server_Info *server, __u64 ses_id, __u32  tid)
-   205  {
-   206          struct cifs_ses *ses;
-   207          struct cifs_tcon *tcon;
-   208  
-   209          spin_lock(&cifs_tcp_ses_lock);
-   210          ses = smb2_find_smb_ses_unlocked(server, ses_id);
-   211          if (!ses) {
-   212                  spin_unlock(&cifs_tcp_ses_lock);
-   213                  return NULL;
-   214          }
-   215          tcon = smb2_find_smb_sess_tcon_unlocked(ses, tid);
-   216          if (!tcon) {
-   217                  cifs_put_smb_ses(ses);
-   218                  spin_unlock(&cifs_tcp_ses_lock);
+build_path_from_dentry() can only fail when the name is too long.  I
+don't know if that's possible here...
 
-Smatch thinks calling cifs_put_smb_ses() might be a problem.  This is
-a cross function thing involving reference counting and I haven't worked
-through where we're holding references so it might be a false positive...
-But I see below we drop the lock before calling cifs_put_smb_ses() so
-maybe it's okay here too?
+--> 871                 if (strcmp(full_path, path) == 0)
+                                   ^^^^^^^^^
+This is the dereference Smatch is warning about.  Feel free to ignore
+this warning if it's a false positive.  These are one time emails so
+it's not a huge stress situation.
 
-   219                  return NULL;
-   220          }
-   221          spin_unlock(&cifs_tcp_ses_lock);
-   222          /* tcon already has a ref to ses, so we don't need ses anymore */
-   223          cifs_put_smb_ses(ses);
-   224  
-   225          return tcon;
-   226  }
-
-The call tree Smatch warns about is:
-
-smb2_find_smb_tcon() <- disables preempt
--> cifs_put_smb_ses()
-   -> __cifs_put_smb_ses()
-      -> cifs_put_tcp_session()
-
-fs/smb/client/connect.c
-    1617 void
-    1618 cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
-    1619 {
-    1620         struct task_struct *task;
-    1621 
-    1622         spin_lock(&cifs_tcp_ses_lock);
-    1623         if (--server->srv_count > 0) {
-    1624                 spin_unlock(&cifs_tcp_ses_lock);
-    1625                 return;
-    1626         }
-    1627 
-    1628         /* srv_count can never go negative */
-    1629         WARN_ON(server->srv_count < 0);
-    1630 
-    1631         put_net(cifs_net_ns(server));
-    1632 
-    1633         list_del_init(&server->tcp_ses_list);
-    1634         spin_unlock(&cifs_tcp_ses_lock);
-    1635 
---> 1636         cancel_delayed_work_sync(&server->echo);
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Sleeps.
-
-    1637 
-    1638         if (from_reconnect)
-    1639                 /*
+    872                         cfile->status_file_deleted = true;
+    873         }
+    874         spin_unlock(&tcon->open_file_lock);
+    875         free_dentry_path(page);
+    876 }
 
 regards,
 dan carpenter
