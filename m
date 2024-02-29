@@ -1,231 +1,141 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC43861665
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 10:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D90C757E4
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 17:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709203930; cv=none; b=ZhBMszY0LXn6eqWxKtGQPf53b/FTWWLRr7NbEW6o1ChZGeLcqm7SHmGYcltPulVPDxiTz2nt9lSHN+Cr4WyCynKt4j2Sj3OLKKnfIiuv+HYFy8/X3r5ASqv+dXzT9Qpc8fdwX6Hy3ErC2NK7/scMW2xKipF9BuavaN82eoPfv/o=
+	t=1709229142; cv=none; b=N0OW8lisOryFg6Ox4w2ojfx78qnJRGP7UopM45EVyfA2XCChMUReH7Nj9KPTmZgYafTYXDpMiqQpHEroghq4KJvh7m/nDX0HwDiHbHi4NdwcsS+DhwWJ8ObEw/SSr89HVkgm1bhnHRnlGEu3lq4CCWPDZTapO6fxIkzHIzmfL/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709203930; c=relaxed/simple;
-	bh=wzclJkp/PMHmCUIanJ5iCC0ywGWT2v+3auYNPhKRAz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RJJC6M+9jXNysvj0oXil+b1jmO2NaOVEelG9jiPNXEbIb4doD3aj+NQeOVET7szeiwwHzJCMGqHV/13g/Zr6rX1CfYQaYykeipTBbgUo9mFNqXmesLGbnEOfdmtKJWhs3AP6g9BgZ3zWugZoWZFt1cA/+gKxmTyb8zEhByv8pfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=U+LYr/q9; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1709229142; c=relaxed/simple;
+	bh=wE2PZ8bliNun+QTcNai73f/ciV0qVxgkZMp00JokK0E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YIfKVclWmeuIm5m42EINYTKNNgutzQ6FUojXN15UvDwh8NRD5/q9Feefx3RoeKmhStFzaPsLBh8wl1tt7EfmPgJ4Y5OmJw88bGidNEIxCRf4pnvSiSm2ccpw1KhzO1EsJSNNZFlsN2f3Vk5fnynbajpmfkpGvv/jzjCqR27OqG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MKxnaPYz; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U+LYr/q9"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33d2b354c72so594064f8f.1
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 02:52:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKxnaPYz"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso1174144276.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 09:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709203927; x=1709808727; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m9LKYuXITcmyGT0s68hpSLiocDO/Blxy8rAYinhfVfs=;
-        b=U+LYr/q90106axvizUYl7RfIOaLbfuzKGEeFm4rFeRSMBLhraizwSMUY+lO8Cgq0TP
-         34Th2BtehThtUW1ecuvT2xGode9L35xXCxqyuwgtxiqpMHR6ZjTg1B0voNK3TIdGNhx5
-         Jy0D924gk1FTZYR6sA9ueh6nitqbeQCQQ+8K/NmNngMZgKmfPc4YFpzj6Om30p2LALfJ
-         /YLk8S7upz25pUyzvkBAQDRftzTZNj6ksRiKhN1upfmI0YUGMMV752ZsFb8khppjx1/G
-         Jc5sL8Sz8tcekSkDS4dEfY2EuUq+Ne/Jq3d01ji85IMNTDrAY2TRxi/bOxrBc5egxagm
-         ELtw==
+        d=gmail.com; s=20230601; t=1709229140; x=1709833940; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K8+8otMoxwMqgEQQ4tdqaPS5Pluv66jSW4EuPLqwnxA=;
+        b=MKxnaPYznBWi/lbtcy5r2ttAD0AZVLxGrgQOjs0EG/ifazs7ZyEqEzaHmrteEJbcrm
+         qJtCy1PuUS458FHdAC7AB3lEmkdc06UcPbpQLZrMVLivoupGzV3aOIGW4TfiFSXacp+7
+         EyTRUSIzOKl8ywZJCpUIyIEDwJVgbHXjrFugEyctcrWRFtfPNDjbCgrFlJsOU1J68Iwf
+         1f2vrNCaTEO4HXpnej/oshhNDnGrABjhbIxW1BKw0G845gmAu1q6rFs3ldNjQX6PiyKD
+         WGyTQtHJyab/3IpTinlOediciO296xKWgXueWiJu9hMqfuK1wQiKVlBNYE8FCJis+8jS
+         8QmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709203927; x=1709808727;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m9LKYuXITcmyGT0s68hpSLiocDO/Blxy8rAYinhfVfs=;
-        b=w1Q7F1DKDy7XVXPaYCZj/0oPFZggmAGKj7zHZi0ds42fz6LuMO68F4ikhzYrlp4tHg
-         4+Lnn9PBF8RV8xqHmePyhMY8BkEAbHPI+9SNPF/vlDMchIGEGtB73TJ4CNfY6jm9FBJH
-         NOYQ6hACmHHHBd/2V5HERJxkS1sNATg3URYaTRBm1OcZBAIdR+AREtAyYw1tew8DUjn2
-         NsDHcQwH7kHtNQBFeeJcyU7XykNKCjt26t8ybm3pAXE/pk0IgQopc1s/com92aD5A4v7
-         Fo9uyge2IRrcdKA6bCwi9yaFkC+4R6LSwOCjYMCFZdtq4x9dXQG6db6bp0byNqhNo/gS
-         xJBA==
-X-Gm-Message-State: AOJu0YyEyGCa78nV+Y3RtaeIl6OusAFd5ag87Js73ors3AYuGiU5+85Y
-	6vSQ1V0nvq1f3+MeDDj6bze9vHYuk2dqYQjQukIFE02LuI5gdkQRaW99dvCNtZg=
-X-Google-Smtp-Source: AGHT+IHTSqADHE67G/CP+kYt89oRpWc0qPODS8C2xIK1G2KY9hUezBjt8Cr6UlKWhFt1RxespdXU+g==
-X-Received: by 2002:a5d:48c2:0:b0:33d:31dc:cff7 with SMTP id p2-20020a5d48c2000000b0033d31dccff7mr1254288wrs.32.1709203927270;
-        Thu, 29 Feb 2024 02:52:07 -0800 (PST)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id cr14-20020a05600004ee00b0033dd06e628asm1437823wrb.27.2024.02.29.02.52.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 02:52:06 -0800 (PST)
-Date: Thu, 29 Feb 2024 13:52:02 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: dhowells@redhat.com
-Cc: linux-cifs@vger.kernel.org
-Subject: [bug report] cifs: Fix writeback data corruption
-Message-ID: <862d95d6-5aa5-4542-a22c-2be58fd5c733@moroto.mountain>
+        d=1e100.net; s=20230601; t=1709229140; x=1709833940;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K8+8otMoxwMqgEQQ4tdqaPS5Pluv66jSW4EuPLqwnxA=;
+        b=CJfNrAaPlZHtQY/PEvNoQ9pXFV2WZUtAf4RGWUXpmjKLvpmbikqlbEbumRaCcZ5EUJ
+         R8IKbpy1ghc5kZQURJPS8Cdt+Eq6UvHx8uCgcIydFoiOYSjKPmps3e/r9WIs7YZNOvet
+         E4t7Vrzie4nDPC9/1fzPzgZyF2bVo4N1LLWHwyk0z4enzGhXZ0u0b6lo1tqOSfzTihGn
+         hLVm2RP2C/4RLl5vwckaSUe91o3M9ACbnND0ecQjCoAmT67MA3SGGLM7Ji/HnEecm+9F
+         ReKWN4UfVXSC/J+tQTqdfk5KtclrUD3wVgbV+cpJI2QYsEymrf9Ur/U20Tv7qCXzBgo9
+         /YdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWk/dYxTDsL10WznMUpK6mACf7S6SWtXinWQzBYpUETJd6D1gtpLJ9DtV9IqZPzDnVfZQEZxLJLShog0NYbHkhB+jxYbTHYvMuRw==
+X-Gm-Message-State: AOJu0Yzy3gsOgVRieurU6bEmVj1HJqF4L/1mFfLf08fnp/kzudrvH1fH
+	fX4X+52xYkNL3B3CRfFTBEKeWiEf7mgSJDlbUFSh38Qz8utmjRLE70coUaT2DAFRiMGU7jkBQu2
+	fp+u9iofLraDhGqQGYSKzpDqO4AAmaQ/W7Y0=
+X-Google-Smtp-Source: AGHT+IELpG/W/e309pxwtRN7JP2Lz8R0a88bsj6Krmpq7PhGcgb/IOV8JJzI9QoW1q7cZ9KEjlNWPAaldYHxyaFYZDA=
+X-Received: by 2002:a25:6b04:0:b0:dcd:5635:5c11 with SMTP id
+ g4-20020a256b04000000b00dcd56355c11mr3083924ybc.45.1709229140138; Thu, 29 Feb
+ 2024 09:52:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240226045010.30908-1-bharathsm@microsoft.com>
+ <CAH2r5msYJncggqkeNQRceNhcnQ1_BdYiQw9mw7fLogHfm8AySw@mail.gmail.com> <CAGypqWzZoQZW4=EK_bCAORMXmw1+bdA7icptFEQCge05rrB14g@mail.gmail.com>
+In-Reply-To: <CAGypqWzZoQZW4=EK_bCAORMXmw1+bdA7icptFEQCge05rrB14g@mail.gmail.com>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Thu, 29 Feb 2024 23:22:08 +0530
+Message-ID: <CAGypqWx9JwO5nz-S+Yr8kw3UBsZPk5n0hiwzGa632pm_f1zpWA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: prevent updating file size from server if we have a
+ read/write lease
+To: Steve French <smfrench@gmail.com>
+Cc: pc@cjr.nz, sfrench@samba.org, nspmangalore@gmail.com, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, bharathsm@microsoft.com, 
+	ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello David Howells,
+minor update to resolve conflicts.
+And Cc: stable@vger.kernel.org
 
-The patch 374ce0748c79: "cifs: Fix writeback data corruption" from
-Feb 22, 2024 (linux-next), leads to the following Smatch static
-checker warning:
-
-	fs/smb/client/file.c:2869 cifs_write_back_from_locked_folio()
-	error: uninitialized symbol 'len'.
-
-fs/smb/client/file.c
-    2741 static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
-    2742                                                  struct writeback_control *wbc,
-    2743                                                  struct xa_state *xas,
-    2744                                                  struct folio *folio,
-    2745                                                  unsigned long long start,
-    2746                                                  unsigned long long end)
-    2747 {
-    2748         struct inode *inode = mapping->host;
-    2749         struct TCP_Server_Info *server;
-    2750         struct cifs_writedata *wdata;
-    2751         struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-    2752         struct cifs_credits credits_on_stack;
-    2753         struct cifs_credits *credits = &credits_on_stack;
-    2754         struct cifsFileInfo *cfile = NULL;
-    2755         unsigned long long i_size = i_size_read(inode), max_len;
-    2756         unsigned int xid, wsize;
-    2757         size_t len;
-    2758         long count = wbc->nr_to_write;
-    2759         int rc;
-    2760 
-    2761         /* The folio should be locked, dirty and not undergoing writeback. */
-    2762         if (!folio_clear_dirty_for_io(folio))
-    2763                 BUG();
-    2764         folio_start_writeback(folio);
-    2765 
-    2766         count -= folio_nr_pages(folio);
-    2767 
-    2768         xid = get_xid();
-    2769         server = cifs_pick_channel(cifs_sb_master_tcon(cifs_sb)->ses);
-    2770 
-    2771         rc = cifs_get_writable_file(CIFS_I(inode), FIND_WR_ANY, &cfile);
-    2772         if (rc) {
-    2773                 cifs_dbg(VFS, "No writable handle in writepages rc=%d\n", rc);
-    2774                 goto err_xid;
-                         ^^^^^^^^^^^^^
-len isn't initialized until later
-
-
-    2775         }
-    2776 
-    2777         rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->wsize,
-    2778                                            &wsize, credits);
-    2779         if (rc != 0)
-    2780                 goto err_close;
-
-same
-
-    2781 
-    2782         wdata = cifs_writedata_alloc(cifs_writev_complete);
-    2783         if (!wdata) {
-    2784                 rc = -ENOMEM;
-    2785                 goto err_uncredit;
-
-same
-
-    2786         }
-    2787 
-    2788         wdata->sync_mode = wbc->sync_mode;
-    2789         wdata->offset = folio_pos(folio);
-    2790         wdata->pid = cfile->pid;
-    2791         wdata->credits = credits_on_stack;
-    2792         wdata->cfile = cfile;
-    2793         wdata->server = server;
-    2794         cfile = NULL;
-    2795 
-    2796         /* Find all consecutive lockable dirty pages that have contiguous
-    2797          * written regions, stopping when we find a page that is not
-    2798          * immediately lockable, is not dirty or is missing, or we reach the
-    2799          * end of the range.
-    2800          */
-    2801         len = folio_size(folio);
-    2802         if (start < i_size) {
-    2803                 /* Trim the write to the EOF; the extra data is ignored.  Also
-    2804                  * put an upper limit on the size of a single storedata op.
-    2805                  */
-    2806                 max_len = wsize;
-    2807                 max_len = min_t(unsigned long long, max_len, end - start + 1);
-    2808                 max_len = min_t(unsigned long long, max_len, i_size - start);
-    2809 
-    2810                 if (len < max_len) {
-    2811                         int max_pages = INT_MAX;
-    2812 
-    2813 #ifdef CONFIG_CIFS_SMB_DIRECT
-    2814                         if (server->smbd_conn)
-    2815                                 max_pages = server->smbd_conn->max_frmr_depth;
-    2816 #endif
-    2817                         max_pages -= folio_nr_pages(folio);
-    2818 
-    2819                         if (max_pages > 0)
-    2820                                 cifs_extend_writeback(mapping, xas, &count, start,
-    2821                                                       max_pages, max_len, &len);
-    2822                 }
-    2823         }
-    2824         len = min_t(unsigned long long, len, i_size - start);
-    2825 
-    2826         /* We now have a contiguous set of dirty pages, each with writeback
-    2827          * set; the first page is still locked at this point, but all the rest
-    2828          * have been unlocked.
-    2829          */
-    2830         folio_unlock(folio);
-    2831         wdata->bytes = len;
-    2832 
-    2833         if (start < i_size) {
-    2834                 iov_iter_xarray(&wdata->iter, ITER_SOURCE, &mapping->i_pages,
-    2835                                 start, len);
-    2836 
-    2837                 rc = adjust_credits(wdata->server, &wdata->credits, wdata->bytes);
-    2838                 if (rc)
-    2839                         goto err_wdata;
-    2840 
-    2841                 if (wdata->cfile->invalidHandle)
-    2842                         rc = -EAGAIN;
-    2843                 else
-    2844                         rc = wdata->server->ops->async_writev(wdata,
-    2845                                                               cifs_writedata_release);
-    2846                 if (rc >= 0) {
-    2847                         kref_put(&wdata->refcount, cifs_writedata_release);
-    2848                         goto err_close;
-    2849                 }
-    2850         } else {
-    2851                 /* The dirty region was entirely beyond the EOF. */
-    2852                 cifs_pages_written_back(inode, start, len);
-    2853                 rc = 0;
-    2854         }
-    2855 
-    2856 err_wdata:
-    2857         kref_put(&wdata->refcount, cifs_writedata_release);
-    2858 err_uncredit:
-    2859         add_credits_and_wake_if(server, credits, 0);
-    2860 err_close:
-    2861         if (cfile)
-    2862                 cifsFileInfo_put(cfile);
-    2863 err_xid:
-    2864         free_xid(xid);
-    2865         if (rc == 0) {
-    2866                 wbc->nr_to_write = count;
-    2867                 rc = len;
-    2868         } else if (is_retryable_error(rc)) {
---> 2869                 cifs_pages_write_redirty(inode, start, len);
-                                                                ^^^
-
-    2870         } else {
-    2871                 cifs_pages_write_failed(inode, start, len);
-                                                               ^^^
-Uninitialized
-
-    2872                 mapping_set_error(mapping, rc);
-    2873         }
-    2874         /* Indication to update ctime and mtime as close is deferred */
-    2875         set_bit(CIFS_INO_MODIFIED_ATTR, &CIFS_I(inode)->flags);
-    2876         return rc;
-    2877 }
-
-regards,
-dan carpenter
+On Wed, Feb 28, 2024 at 3:57=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.com=
+> wrote:
+>
+> Attached updated patch to have this fix only for calls from readdir
+> i.e cifs_prime_dcache.
+>
+> On Mon, Feb 26, 2024 at 10:44=E2=80=AFAM Steve French <smfrench@gmail.com=
+> wrote:
+> >
+> > My only worry is that perhaps we should make it more narrow (ie only
+> > when called from readdir ie cifs_prime_dcache()  rather than also
+> > never updating it on query_info calls)
+> >
+> > On Sun, Feb 25, 2024 at 10:50=E2=80=AFPM Bharath SM <bharathsm.hsk@gmai=
+l.com> wrote:
+> > >
+> > > In cases of large directories, the readdir operation may span multipl=
+e
+> > > round trips to retrieve contents. This introduces a potential race
+> > > condition in case of concurrent write and readdir operations. If the
+> > > readdir operation initiates before a write has been processed by the
+> > > server, it may update the file size attribute to an older value.
+> > > Address this issue by avoiding file size updates from server when a
+> > > read/write lease.
+> > >
+> > > Scenario:
+> > > 1) process1: open dir xyz
+> > > 2) process1: readdir instance 1 on xyz
+> > > 3) process2: create file.txt for write
+> > > 4) process2: write x bytes to file.txt
+> > > 5) process2: close file.txt
+> > > 6) process2: open file.txt for read
+> > > 7) process1: readdir 2 - overwrites file.txt inode size to 0
+> > > 8) process2: read contents of file.txt - bug, short read with 0 bytes
+> > >
+> > > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > > ---
+> > >  fs/smb/client/file.c | 3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> > > index f2db4a1f81ad..e742d0d0e579 100644
+> > > --- a/fs/smb/client/file.c
+> > > +++ b/fs/smb/client/file.c
+> > > @@ -2952,7 +2952,8 @@ bool is_size_safe_to_change(struct cifsInodeInf=
+o *cifsInode, __u64 end_of_file)
+> > >         if (!cifsInode)
+> > >                 return true;
+> > >
+> > > -       if (is_inode_writable(cifsInode)) {
+> > > +       if (is_inode_writable(cifsInode) ||
+> > > +                       ((cifsInode->oplock & CIFS_CACHE_RW_FLG) !=3D=
+ 0)) {
+> > >                 /* This inode is open for write at least once */
+> > >                 struct cifs_sb_info *cifs_sb;
+> > >
+> > > --
+> > > 2.34.1
+> > >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
