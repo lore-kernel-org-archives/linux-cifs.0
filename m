@@ -1,70 +1,105 @@
-Received: from new-mail.astralinux.ru (new-mail.astralinux.ru [51.250.53.244])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC143987D;
-	Fri,  1 Mar 2024 14:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.250.53.244
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709304847; cv=none; b=AVGOlTVGtKopB6VpGjx+qUdY3eQ5jdanPwySeyVUV8hDu1fCdOz7hSN/uYobmVcnRWC4vzJyEVKlHKrq1CtQg7Tf9zCT7ZJMeWqTV9JBx+1PFFyn0Ir1w2a8Ay722wbw6UpMQVZXvmngHQ1wuJChaMylFKAlYLbLMtJP1CAymKU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709304847; c=relaxed/simple;
-	bh=hSEvV1uGXnbUmk4BJckyjC9QO5qiJ5UDBiW72C1lb3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tLEDj2Cw/5HOHi9qvRFNHmTzWaJDHnjz782m1fS5BinPnZPYLMp2e28ycv6r/ukkIvu7FCHQr1zuOFfFjFKExk5qZKVyXKotKbx+AL03pbU10E0aDS2lySObLfdGhzLwBXuqYuOOSRyT7KlWre9ThwaPEYznt4luIIfkSyAwrQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=51.250.53.244
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from debian-BULLSEYE-live-builder-AMD64 (unknown [192.168.32.68])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4TmWLl1X1bzlVv2;
-	Fri,  1 Mar 2024 17:53:51 +0300 (MSK)
-Date: Fri, 1 Mar 2024 17:53:44 +0300
-From: Eugene Korenevsky <ekorenevsky@astralinux.ru>
-To: linux-cifs@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: open_cached_dir(): add FILE_READ_EA to desired access
-Message-ID: <ZeHr+PH8spL5F+iZ@debian-BULLSEYE-live-builder-AMD64>
-Mail-Followup-To: Eugene Korenevsky <ekorenevsky@astralinux.ru>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C548C70CD6;
+	Fri,  1 Mar 2024 16:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709310323; cv=pass; b=TBHmp/CQaMSKLo4XeOKe5xaNS8M4VV8Zu7sL/WFMxf7ikBf8kd/J6xQe4pjVb6563ft9Q7eWUEZFsdgvI6sjxoZoExd6/vVtwjCF3SA9wwXH4sOgVtsmBxD/uJIjkUAPCN6gJJI+jke0hO3Dzk+x1L6SppnBB5JKEuWuUs8xyOw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709310323; c=relaxed/simple;
+	bh=vp9j+n7oHAMzhQAPDZrdwUi+rl+SJYuXuVX9dsC9oD8=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=EfhpVVyjJBFmdBwrqAtzZSe86KmPUfgEzVUe/I2qa9n+dstksas5Drb+RwiuAuavaSSQ7glczze+g8TNh2DlZoNT3QJY9oQQAYsT58BgP+Wy7mmB/zmqXDg1UzvANtQByIII443elsw0hhPUn9Pr01G+BtPTm6/cyN7EX3AefbM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=o9HD4HyZ; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="o9HD4HyZ"
+Message-ID: <a5eb6c3a2de1b959117d49c436b81904@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1709310314;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fwOTFlXkv+q9d5OsMsOmpSMt8s2dJvrQ+Z2Vcq62GTU=;
+	b=o9HD4HyZmGs9XwXYz5e5oGYG4BH6LlgEskS33m0mawinQjvy0l2XtXcNNDIZY3w3SS463w
+	+Y1ms5gHVPBUipTHOZd5L2PPC0h65kYp7Edp5YmFVRTG2yGvQJGPH9/jUWrBDOu3Ij0x2Y
+	oqtFdHeFkE8EEWIvL/sa+LiM/LYEgPSAfwUizXwj02yfC97AS6kaFe2lZIHVw7eEAVYyiF
+	8nle3eUj5SChg2i1HMkChK4wpO91xX1O6LehuiNZEbaI3UAUn6skxHuVM2DNyf9Y8QNrbg
+	6UrT214vsjv1BYi/X/OBAIATRmeQm/2TfdAox+MRUvDykOu0PNz28DrPNuY0WQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1709310314; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fwOTFlXkv+q9d5OsMsOmpSMt8s2dJvrQ+Z2Vcq62GTU=;
+	b=SSknn35ORpMzxneG5O72CYo0v/GtE2cx66WHdDyR+/qc27O8GS4h5cU/uablmq46e4qHHo
+	QvnRax5IAvbCSC4Ia7Ol5ezRxif/iVSnlpVi1tfcI3TqgcdJsFK3vrTiC9StxKu5M3laAV
+	hWwrJuG+mczcyUujDrlXT8N6hPlOfZcEl51zF9uRAWFG25lj3pLpHqkeXWeARBzsJZE8nG
+	w1zCeuow1uCjepGYahPpu8MpndkYSR6o7L1WIqJwyzOlOpRhtivmiOEFJL/7fMv9VCJrc2
+	X5UyNJuPTv3z3LGCRIkupLuoCNHLliu6Ejhs6Wp474nw0Ua4/1p+ADAq4FCn6A==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1709310314; a=rsa-sha256;
+	cv=none;
+	b=GZgh/jErm3xYjyFqOQuAOip0khNaolhZSBKhcSMMNsDDhD5DMopTl20x2KuEvieE0GERi5
+	aAWrPVyhyUhTB6eq0v8GywKB2HDAmsZvm+R5BUYY7pZ9JuIAnjrsG+VeyJVuOrwKX3PYGl
+	F7SToTWGDKdiRA8o/HDmD4BLPL1cuJhGKBVQO1CP7313X6dQLUUz/I0sXvuxu4hMtSHGpQ
+	5wtAiFlYCDJGiZRp0kCPtpk04pRWRcsCpGamiNrQ+UadFHHhYI40ItnLX71Sw9ORnTsHT3
+	3nSNNnqtT7GoWxwWF+iiveLFi+aDRZHXPs7FhlaN33rtdt9aE3pRiMSXWhTtbQ==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Alexander Aring <aahringo@redhat.com>, Zorro Lang <zlang@kernel.org>
+Cc: Zorro Lang <zlang@redhat.com>, Steve French <smfrench@gmail.com>,
+ fstests@vger.kernel.org, gfs2@lists.linux.dev, jlayton@kernel.org,
+ linux-cifs@vger.kernel.org
+Subject: Re: [PATCHv2] generic: add fcntl corner cases tests
+In-Reply-To: <CAK-6q+jZVfK2=Z6RCCU+K+TLYuHgC4ynqOBz3K-nhcypCoN3ww@mail.gmail.com>
+References: <20230925201827.1703857-1-aahringo@redhat.com>
+ <20240209052631.wfbjveicfosubwns@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <CAH2r5msWwX7QdXrzmR3tapU85WMga9Y-waNOHm+hMWmWPUF=tQ@mail.gmail.com>
+ <20240209114310.c4ny2dptikr24wx5@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <20240301103835.gylf2lzud2azgvx7@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <CAK-6q+jZVfK2=Z6RCCU+K+TLYuHgC4ynqOBz3K-nhcypCoN3ww@mail.gmail.com>
+Date: Fri, 01 Mar 2024 13:25:10 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-DrWeb-SpamScore: 0
-X-DrWeb-SpamState: legit
-X-DrWeb-SpamDetail: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddgtddvucetufdoteggodetrfcurfhrohhfihhlvgemucfftfghgfeunecuuegrihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkgggtugesthdtredttddtvdenucfhrhhomhepgfhughgvnhgvucfmohhrvghnvghvshhkhicuoegvkhhorhgvnhgvvhhskhihsegrshhtrhgrlhhinhhugidrrhhuqeenucggtffrrghtthgvrhhnpeehteefudduuddtjeffffeigedutdekteffkeetieffueefudffhfdugfffleekudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeduledvrdduieekrdefvddrieeknecurfgrrhgrmhephhgvlhhopeguvggsihgrnhdquegfnffnuffgjgfgqdhlihhvvgdqsghuihhluggvrhdqtefoffeigedpihhnvghtpeduledvrdduieekrdefvddrieekmeehkeeivdeipdhmrghilhhfrhhomhepvghkohhrvghnvghvshhkhiesrghsthhrrghlihhnuhigrdhruhdpnhgspghrtghpthhtohepvddprhgtphhtthhopehlihhnuhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-DrWeb-SpamVersion: Vade Retro 01.423.251#02 AS+AV+AP Profile: DRWEB; Bailout: 300
-X-AntiVirus: Checked by Dr.Web [MailD: 11.1.19.2307031128, SE: 11.1.12.2210241838, Core engine: 7.00.62.01180, Virus records: 12439106, Updated: 2024-Mar-01 12:56:39 UTC]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Since smb2_query_eas() reads EA and uses cached directory,
-open_cached_dir() should request FILE_READ_EA access.
+Hi Zorro,
 
-Otherwise listxattr() and getxattr() will fail with EACCES
-(0xc0000022 STATUS_ACCESS_DENIED SMB status).
+The problem is that cifs.ko is returning -EACCES from fcntl(2) called
+in do_test_equal_file_lock() but it is expecting -EAGAIN to be
+returned, so it hangs in wait4(2):
 
-BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=218543
-Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
----
- fs/smb/client/cached_dir.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+...
+[pid 14846] fcntl(3, F_SETLK, {l_type=3DF_WRLCK, l_whence=3DSEEK_SET, l_sta=
+rt=3D0, l_len=3D1}) =3D -1 EACCES (Permission denied)
+[pid 14846] wait4(-1,
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 3de5047a7ff9..a0017724d523 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -239,7 +239,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		.tcon = tcon,
- 		.path = path,
- 		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE),
--		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES,
-+		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES |
-+				   FILE_READ_EA,
- 		.disposition = FILE_OPEN,
- 		.fid = pfid,
- 		.replay = !!(retries),
--- 
-2.30.2
+The man page says:
 
+      F_SETLK (struct flock *)
+              Acquire a lock (when l_type is F_RDLCK or F_WRLCK) or release=
+  a
+              lock  (when  l_type  is  F_UNLCK)  on the bytes specified by =
+the
+              l_whence, l_start, and l_len fields of lock.  If  a  conflict=
+ing
+              lock  is  held by another process, this call returns -1 and s=
+ets
+              errno to EACCES or EAGAIN.  (The error  returned  in  this  c=
+ase
+              differs across implementations, so POSIX requires a portable =
+ap=E2=80=90
+              plication to check for both errors.)
+
+so fcntl_lock_corner_tests should also handle -EACCES.
