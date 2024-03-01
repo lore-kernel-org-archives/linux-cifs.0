@@ -1,180 +1,181 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from SG2PR03CU006.outbound.protection.outlook.com (mail-southeastasiaazon11020003.outbound.protection.outlook.com [52.101.133.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34A77A125
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 19:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709233992; cv=none; b=MUtJbYdhUkMbyOMKZqx6KX0G8JuOQEp4ekHkyUOMNrsGyhv/Ct9tJopCDPn4bZl/2lTgq0xQ4Xv3e0NTOkeL8CTE2cm/4xtNPzZgQopswEpzJ1t2Wrh31JOd/yE1eAR4KMRz5TLRSsnL/ULAfN4PBzb91almAHsrusEox9RfJ4g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709233992; c=relaxed/simple;
-	bh=xYXHYdIRS0M2yLAqgI5O9Gm0wB/j+4SpXV13LchZvU4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VLax77mzQZWW4yOHOasyPqVOBbo8dsTuweN77A1E/dEpPoGKssZJ8pjNi7sAc80PC3ISKLeEZKphPZXtEQvca0EPkona+ZrgtV+Tz5g9I+8XzFpj1bNAcbdbLsdIuusoqqBauP6eieL9EsXVURlcvQIMsxaj0jOkPBRj1SFcCyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZN9XFDq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143892F5B
+	for <linux-cifs@vger.kernel.org>; Fri,  1 Mar 2024 07:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.133.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709278275; cv=fail; b=Cv6fFspTD6IHFBZbL08VXDRFoBsTBGo+ZOGhCMXA7CIdlZLQJclkg8MrKRwH8JvfFPclXIbfSwd9NNcFT5qFLSIghmNpsOoInKiMYv7ylH2wII1NHyw8MUz+ZyPnWhMR4ib0LveHNvSFirnZxK/F7HhbEOYUR2981n0nbZWIZ8c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709278275; c=relaxed/simple;
+	bh=N61VDYyvbeaGmDmdfPkf1bbQ0DWLaTUkb3S7cr+QZnM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gHu29T/uh6r0Z/eHzpnMDthWFSAEcMqsML/0XL3XcmmD5bM6A2VHNX4wlu7KaXoT8tZT5se+59Zi2FCL6dZgzKo1C0eJWBD+ZHCFx1k2s6jZqSbpcbAr1gJJOWps2iP0ix6DdPgMWCDeP189jJ4LqfhcWlivleYi0c2BzgTgsVU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=Q7o1xLKB; arc=fail smtp.client-ip=52.101.133.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZN9XFDq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709233989;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jej1sBhkxdN1NAiBzWebNP2TZcnnFsyGp0VQDOU7J9U=;
-	b=ZZN9XFDqEAR/V7kANm3ku4L4ymauUd9GqHKY9yVgxmUULC92RrihYi1sbyuM4LskSZl2ef
-	poJzxuq3HrQpGPTxuOKRv0BfZfb40Y1BahLAwmhNW6e3qmVv37T/9ccQTOxj/c/xvPjZIe
-	ph1v5gdRKMboqSk1LJdeggrfPHD7CKg=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-NoeAa1fVPLuzoik7Vy2woA-1; Thu, 29 Feb 2024 14:13:08 -0500
-X-MC-Unique: NoeAa1fVPLuzoik7Vy2woA-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-dc64f63d768so2283836276.2
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Feb 2024 11:13:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709233986; x=1709838786;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jej1sBhkxdN1NAiBzWebNP2TZcnnFsyGp0VQDOU7J9U=;
-        b=Ig68nNtw2CswgLyUn+A/zMA9Rzb/VqCqI86dyLNbCjIJ51LttC9RALCOc7NLo9tXud
-         davTBzqUil3MkVgajo2nLdwXTukJ2DMFProz34QafRFkhub0dFCPbgUodgKOPI9svR5H
-         z3D5Lv6yJY8WJZ/+izuQNwcfnypEWMBNrWmoUAs0XrKp7fjphPy4Dg2aiokQFMu50rQg
-         Duk5lh8N/OQfAYms8IxO+vzFdOIY/qgQVDIBm8JbOwpU9GmhiPNDR9hIbiJUiM9/zU6Y
-         AwhCyO0wLf311feUIQCEv0ey5t6V/flFUgqiWx4Vy1GnXor2OeUM/+3Y8Fc1gbeL3JeJ
-         0DvA==
-X-Gm-Message-State: AOJu0YzltaKwIsQfIvNrxMN10wwuvSxfZi6hX5+CvMZji8nWZk8dgw80
-	sqX0WhVKZMwpm9eKNKSs2HeRQwFyuQ5sCDSMXtfcYdTyh36aqwt/62TINHolAiNLUsh7PWwpEXJ
-	G08ajqlEDq0OH5uS1QpdR+2rYASfUKGmWoYQ5a1r38t/RQ5O5kZ+cZ8croAnuilxmx/NltlLx4B
-	oD7AvNutoX/YrHdb3MiqMkUnLqZh6WQ9HIYirmAUo/Cw==
-X-Received: by 2002:a05:6902:cc9:b0:dcc:8e02:a6b6 with SMTP id cq9-20020a0569020cc900b00dcc8e02a6b6mr3922606ybb.2.1709233984782;
-        Thu, 29 Feb 2024 11:13:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHA59zpRQtAVJA4vyNSPAGfM5CBzPhLKr8lq/O35tnmstVuQuSV9Rxm5tAk81hR4TTTpPuut/kHCSMzA6zHckk=
-X-Received: by 2002:a05:6902:cc9:b0:dcc:8e02:a6b6 with SMTP id
- cq9-20020a0569020cc900b00dcc8e02a6b6mr3922530ybb.2.1709233983243; Thu, 29 Feb
- 2024 11:13:03 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="Q7o1xLKB"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=foDoG4yu5lGNwDprpf0ZV3N2wQN/8nlyvGzYftd87q+4oWJcyAkty6L88CDce7YnxaMWnYZbumUouGUzhBX+ychFfvbRrGVmut7FLwlFEOSm4W1dxUxcU8wzRnYuE2leQKbJ6fIUy6UVCUjRfTPWVQwK6vs42L1F+UCWFlXTHTmP/X75hztlYqPeO9M3sGUjsZH2kxFEIQ3kFI6GK17hDa+jhtuiB/STR8sThDZO/zhYEYaNXyaaTxY13aT3YlC8m+flZBrbPhPuLFPYCSJPDDe9fDvb3k/S4rff903djIAwoJg3cLT7EHPWm/DZ8iUScNCxE1hHH9M6qT6EUuEpIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nqiLYrROoLFAKeceA/5PA29I7lO9ABOtGVyA1hKFfIQ=;
+ b=lK8hCvpLnnra9TQeuxRwpkpsOo1we7U9mUk+F/WfYeedPI4OputCDJotpgDniJW5MF/y45UC1t55K0MrAPoTw2nyGMhUHO1mM+RvAjV/KCbBaCSyuPyuuuH4Od+qbyDca5u7efCEJ2Psw9g+eCkuHgHuVvMC1RFiiROg/xBZP+7zw0+IvOs5KxhrLOt902xgDtfzF6lpiY8MfVyr4se6AP+g/KQi9qgVq7MtUttzmnUtEDytNrw2ntixdOqTjrB9TuV64lJ1IXWHxK0MoYAwBxkDXHIuRlylB8j9DsHgTBPPPYV1Njs0fpoRwL/9P7yZc7A2oURncW7YrsIYChdcew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nqiLYrROoLFAKeceA/5PA29I7lO9ABOtGVyA1hKFfIQ=;
+ b=Q7o1xLKBaZycKbC4x8wdZ9jtMTJKuM6LfxkBCHXZT0wgpxrGRVpWHoNu/9aRln3qYeaJGIiulQ52+i+khkF2BLSdlFp0WoD+wH6Zh3yaRXV0gFuLi1GNG3S+gptLIGa8Dk0qWpU1QMhr9/KA3WIoYu3ereS5q7F6rxCXwlsHp5g=
+Received: from KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM (2603:1096:820:56::9)
+ by SEZP153MB1022.APCP153.PROD.OUTLOOK.COM (2603:1096:101:1e9::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.18; Fri, 1 Mar
+ 2024 07:30:55 +0000
+Received: from KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM
+ ([fe80::75a3:953b:91d2:28e5]) by KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM
+ ([fe80::75a3:953b:91d2:28e5%2]) with mapi id 15.20.7362.017; Fri, 1 Mar 2024
+ 07:30:53 +0000
+From: Meetakshi Setiya <msetiya@microsoft.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: RE: [EXTERNAL] [bug report] smb: client: do not defer close open
+ handles to deleted files
+Thread-Topic: [EXTERNAL] [bug report] smb: client: do not defer close open
+ handles to deleted files
+Thread-Index: AQHaaZD9yCVuLjHlskKIxPHlogSALLEigNaQ
+Date: Fri, 1 Mar 2024 07:30:53 +0000
+Message-ID:
+ <KL1P15301MB045056FBD4172633039051F3BF5E2@KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM>
+References: <eb0bd6c4-07a9-4f23-b857-2367835cb8ef@moroto.mountain>
+In-Reply-To: <eb0bd6c4-07a9-4f23-b857-2367835cb8ef@moroto.mountain>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=7335cf56-3582-4f3d-8412-b86ec2105794;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-03-01T07:27:58Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: KL1P15301MB0450:EE_|SEZP153MB1022:EE_
+x-ms-office365-filtering-correlation-id: b6b67508-54dd-4061-9af1-08dc39c18715
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ e3DTpy9goa4ikSfHAOu0JLEO5hYXn/vP7Ro3Xx8y7dCxhx0e3lGZgOGHcpPT5ke3b4X3zQ/gm7CxxkasKirykQAlMcsk5K6juVTxMG2jgMRp7VGMoT2bejsvO3J4u2DJi+JnKKELY8TRMNeutH96N5tiojWam9Ym+i1FShcPXlAjazuaXtVC78zK8boIQ91KOD4O1GZOYfYKF+X4wntMk42SPDRjjGUF7KjIDIEcXq/gOcWasixV9NrJsmNNSe3+WL9Ti4oddrXvD+LkEtMSCyQ+7tVxXm2SI+SHvNV2MspNjfEMbotmAhNyf3KokD74P0sjCMZ0qx5KwhpLMtoQEXJmh8Y7w10VUHmEZ16lz1xZYvmID8n/huHRC14oZuY7E6g45vcQXQoePXQo1HZd6VSDGd3WE0JdABqvtKOx9AUtM3mb5/Gv8cVnqboVB1WG28Zt0ip0WPD4PECj0UsJxxGibdqqxcSIYgCDSsAb4JgaqZZlZXitCihKJUs+O+JFqw/6QVoLWbDya88KGFYBbEHDulOEWYeAwsTk6VktrCHlrHe478H/xVgsL3iLlbgO1FIeyQX+zmy9dakXVERtQZUZFZjcN7tHi5pT7IxhZhApOT041bT8ddnyZKOubR4JKHIUhuHpadvlDKYzXjC1ZJyyi94bjq+wQ7L4Mn2gq0jMkNXX/73GqUci9IznTCzCC+UN238JCk/2yKMY8X0Tfw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?1LtfZH/RjnnWPaCCYrdXKSNiYZotS/Z3hC2xhCpa8b6OFy7Koac6/sltaGvM?=
+ =?us-ascii?Q?/Hj7XEiIpfZdnmCYNI2JHm/HX1Wn57GkXT4+0zy3eTxMiHQNw/CifaEFP+lK?=
+ =?us-ascii?Q?nFcHzhq1P0+8JhSPNSWPZfkSmN+Grodm256S6iRiiKx5wFE7PABJlAqWtkHb?=
+ =?us-ascii?Q?0lN5CHgLQLyOVtijdS/fGSzS9g+Yxxm+UN2HHf4ACrP5UkxIF/hXqLd5tmfu?=
+ =?us-ascii?Q?ecmZ2okmf+PvVb978snZgn4N1gBkiFDgX/4Dd8mnBh9UwQ1p0IlysXYJ5G79?=
+ =?us-ascii?Q?cG4WolxSa3Yis8HQ6uhTI+hUB/Lsz9TITgtRT3ApHO44Zk0VLhr67vNNWSZp?=
+ =?us-ascii?Q?DR0oDN9F7ArGstQLzDoVc5kTNB28TlLEx4m0GRjsYEKX7/+rjr0rIOTOr/EV?=
+ =?us-ascii?Q?XRg30ZuTt/ipimRUBxyVt/OauRngn+nTd7+IkJWg2nu3hHm1pWRv8SPczH9F?=
+ =?us-ascii?Q?sNFUdsabjWLsfnEGhOp2q64/QfXVOJligmLkWGIlJYyEfxUS9EDR7dC1Wakc?=
+ =?us-ascii?Q?uyP2YwzIrCjT6ENQDM066RkbForJmCat/ApeajaIApZeRFYtytMXa2a6RRsU?=
+ =?us-ascii?Q?nrl4Un3CsVA5xVCBvpzfnCH3ipAN7Y5OGxTahkExAvb1SkA4Gyr7nf6JvO9l?=
+ =?us-ascii?Q?kZKVY4QFHHSzw+Ms2c7xhi/PJP3UtmcH13Og4IzD+VDkKjK3jsh/mle9OuwB?=
+ =?us-ascii?Q?aB8UggUkdamntBwvIJL2Gs5vEhmttdixLR6+edCRx16S0c/xXu/uFTIJ0kUw?=
+ =?us-ascii?Q?wQNRZ5U/pV8hW/elZbo/VeBF5XjwOMNE5JvDKOyKqd+R4dFDWeVEjsnqrYKb?=
+ =?us-ascii?Q?Fkju/A8lpurdQeJab1M7qZ+Zx3FlTL6GgfwSDUg1BlvLS4wTSeXJCPbIgwBK?=
+ =?us-ascii?Q?eQfQH+3wwYLIzJFSkUMG1YtiXvKDKJ3ziRCoYAw4jNfpH+QAQ6T8ox7xLyfx?=
+ =?us-ascii?Q?ovWz5U2r+7x5KYLOQbKeMSGKP1rlpt9+3+4TRiNxhiC/HUIXeK8So9VOoIln?=
+ =?us-ascii?Q?oXzoayWAe1xbMkBwBNlTPMJsLchwzzJob55C77/4IYE2kavD8Cs1T96NmEqR?=
+ =?us-ascii?Q?nCYvJltFIhoE4FDWzLp9eitWcCAEF78xalM4nDof1LoFOAaorkmXKiF3PYgD?=
+ =?us-ascii?Q?JOmUaVcgqOWst4BMMVW470WZ6wbHv3s2ZPs8CjAHK/c9qqSIDn6v7k1VLWPx?=
+ =?us-ascii?Q?Z9Kh26eY9JABd0JlpPaOp6EyL6Unh5VEpRoPzqFvOfgR5nfJGDOwwcfzkH+6?=
+ =?us-ascii?Q?BGAaosjah3akR8TVHW3yr+F5lL+L4vDzUVrJChibwW8HZObdCxSO50aPLTGE?=
+ =?us-ascii?Q?OUu7nlSwzRNPdOwu9eOK4eJ6l2ueTR4wtOCRElCUx4lQ4ff8aYiTiXJkz/gs?=
+ =?us-ascii?Q?eyl7UHWfZZSZC/0HvM5TnFv68SEhexpyj+2cK59xt0d2NKvyMEu9RIOZQg89?=
+ =?us-ascii?Q?4v4bfB+Gzh8yk9KOE6kekjeXHrHZ0CkNwxaqV5Ph1sW7Fm0a5xwnSAgTCl89?=
+ =?us-ascii?Q?F4+6XDXD6J/1fkGYMp83eqLdwPh6BEC2kshCSRej4407Z01+KVHPxNAnrz88?=
+ =?us-ascii?Q?fQ5Xr7z0u/j1TjK707o=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALe0_77CgEXNiXrM4oQ47sfHnDoML18oz5rmEu-_57Av0KRTkg@mail.gmail.com>
- <20240108181751.natpy6fac7fzdjqd@suse.de> <CALe0_777GL=XQYSochOoph73madKm8DsRn+xQOcTmz9xh+wcHQ@mail.gmail.com>
- <20240109005628.5xbwpkqc75okxmcg@suse.de>
-In-Reply-To: <20240109005628.5xbwpkqc75okxmcg@suse.de>
-From: Jacob Shivers <jshivers@redhat.com>
-Date: Thu, 29 Feb 2024 14:12:26 -0500
-Message-ID: <CALe0_77mahrd+ggWApLYRqCLC0k252r=_89qHW7Oa10RK4D4JA@mail.gmail.com>
-Subject: Re: Linux client SMB and DFS site awareness
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: KL1P15301MB0450.APCP153.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6b67508-54dd-4061-9af1-08dc39c18715
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2024 07:30:53.7475
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: knhxdRWC341cE9+W6p4j059z3eBDOL3PZKho2/ttTd/aHPhSzcEihKOLCfc+k7xvG3Ad3ZSvwfG9V1lisDiOpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZP153MB1022
 
-Hello Enzo,
+Hi Dan,
 
-Sorry for the delay in response. To further clarify the use-case it is
-not pertaining to the target shares, but concerning the namespace
-server that we connect to as part of the initial mount for the domain
-based DFS share. Assume an environment with some N number of DCs where
-each DC is in their own site, a DFS namespace member for the same
-namespace, and the domain resolves to each DC in a round-robin.
+Thanks for pointing it out. Seems like I did miss an error check for build_=
+path_from_dentry. I will fix this and send the updated patch.
 
-Condition #1
-For AD client site members that are in the same subnet as the site
-local DC, we only ever connect to said DC when mounting a domain based
-DFS share.
+Regards
+Meetakshi
 
-Condition #2
-For AD client site members that are *not* in the same subnet as the
-site local DC, we connect to a DC that the domain name resolves to,
-site local DC, and then the SMB target. We have a  1/N chance of
-connecting to the site local DC initially which is not desirable.
+-----Original Message-----
+From: Dan Carpenter <dan.carpenter@linaro.org>=20
+Sent: Tuesday, February 27, 2024 8:54 PM
+To: Meetakshi Setiya <msetiya@microsoft.com>
+Cc: linux-cifs@vger.kernel.org
+Subject: [EXTERNAL] [bug report] smb: client: do not defer close open handl=
+es to deleted files
 
-For condition #2, we could be potentially connecting to DCs that could
-be prohibitively far geographically and incur a non-trivial delay with
-possible timeout. While certainly the appeal of a domain based DFS
-mount is the abstraction to know which SMB server to access, condition
-#2 can yield mount issues when the AD client does not have the
-capacity/opportunity to add a DC to the subnet for whatever reason.
-This could include heavily siloed environments, separate teams, or
-cross vendor interactions.
+[You don't often get email from dan.carpenter@linaro.org. Learn why this is=
+ important at https://aka.ms/LearnAboutSenderIdentification ]
 
-I could see a use-case where should the SMB client want to limit which
-DCs to connect to, with the intent to exclude non-desirable DCs, a
-flag be passed that invokes a CLDAP ping to affect such a change. This
-can already be done with a hacky wrapper script, but I am curious as
-to what level of interest there would be for a more durable
-implementation.
+Hello Meetakshi Setiya,
 
-Hope that helps to clarify the situation and please ask any follow-up
-questions should you or anyone else have any.
+The patch 05211603b73a: "smb: client: do not defer close open handles to de=
+leted files" from Feb 9, 2024 (linux-next), leads to the following Smatch s=
+tatic checker warning:
 
-Regards,
+        fs/smb/client/misc.c:871 cifs_mark_open_handles_for_deleted_file()
+        error: 'full_path' dereferencing possible ERR_PTR()
 
-Jacob Shivers
+fs/smb/client/misc.c
+    860 void cifs_mark_open_handles_for_deleted_file(struct cifs_tcon *tcon=
+,
+    861                                              const char *path)
+    862 {
+    863         struct cifsFileInfo *cfile;
+    864         void *page;
+    865         const char *full_path;
+    866
+    867         page =3D alloc_dentry_path();
+    868         spin_lock(&tcon->open_file_lock);
+    869         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+    870                 full_path =3D build_path_from_dentry(cfile->dentry,=
+ page);
 
-On Mon, Jan 8, 2024 at 7:56=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de> =
-wrote:
->
-> Hi Jacob,
->
-> On 01/08, Jacob Shivers wrote:
-> >Hello Enzo,
-> >
-> >Thank you for the response!
->
-> Thanks for elaborating.
->
-> >I failed to mention the initial aspect that is specific to mounting a
-> >domain based DFS share. This would contact a random domain controller
-> >instead of a DC local to the calling client's site, should it exist. A
-> >CLAP ping like that used by SSSD[0] could be used to identify the
-> >nearest domain controller prior to initiating a subsequent mount
-> >request. This is where the DNS discovery for a ldap entry would be
-> >applicable.
-> >
-> >Hope that helps to clarify the use case.
->
-> This is pretty much what I had in mind, but I still see it as a
-> server-side situation, both from the spec side, as from a personal POV.
->
-> The DC the client connects to should have all the info in-place and
-> ordered (either by site location or by cost) to return to the client,
-> where it will contain the highest priority target as the first entry on
-> the list (that will probably not be itself, see below).
->
-> On Windows Server, you can create a registry key [0] on the DC to force t=
-o
-> put the logon server (the server the client is authenticated to) as the
-> topmost entry on the DC referrals list.
->
-> This behaviour is disabled by default, and the reason (as I understand),
-> just like your proposal, is because it would defeat the transparency that
-> DFS offers; the client would be "forced" (either by manual input or by
-> discovery) to know beforehand where it's connecting to, where MS-DFSC sho=
-ws
-> that the client shouldn't be aware of such details.
->
-> I haven't tested, but I would expect the DC I'm connecting to to offer
-> the closest targets, no matter if on the same domain, different
-> domain/same forest, or even in a forest-forest (with a trust
-> relationship) scenario.  Do you have a practical test case where this
-> doesn't happen?  OS type and version, along with an overview of the DFS
-> setup would be helpful to analyze as well.
->
-> [0]
-> add/set HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dfs\PreferLo=
-gonDC
-> (DWORD) to 1
->
->
-> Cheers,
->
-> Enzo
->
+build_path_from_dentry() can only fail when the name is too long.  I don't =
+know if that's possible here...
 
+--> 871                 if (strcmp(full_path, path) =3D=3D 0)
+                                   ^^^^^^^^^ This is the dereference Smatch=
+ is warning about.  Feel free to ignore this warning if it's a false positi=
+ve.  These are one time emails so it's not a huge stress situation.
+
+    872                         cfile->status_file_deleted =3D true;
+    873         }
+    874         spin_unlock(&tcon->open_file_lock);
+    875         free_dentry_path(page);
+    876 }
+
+regards,
+dan carpenter
