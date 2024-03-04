@@ -1,89 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9AA224D5
-	for <linux-cifs@vger.kernel.org>; Mon,  4 Mar 2024 14:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916C83CF68;
+	Mon,  4 Mar 2024 14:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709561599; cv=none; b=p8nvB3Z6xYpOvLORCrEkVdJYLIE036JmZ++37zEmbk5YoQI1ES/R3z17Nd3tKxMFNwb9VkgtSVFbwH7L+EB6dcqaBfU3Lp8bn5enVVy9mnMqjOPLiJSdcYiDa5WkTCb2emV46f/89XJXeahsyAzWHhfyBXWUFSMbUro9KNNe9jo=
+	t=1709563020; cv=none; b=TQ2h56SvD/Ku+Bpxnc3X2MKPmgAjoEXJPyZL6Fh+rusd/PeFtGvCC4ZPwoWEXZlxjzv6DUbdUoDRNh7fYGQ26ZS5T50bEVfBblaQw7Qevqrq0+CAZB65VWnl8FA7poiHuFNWlhRkI4h4EefbUxOT77EUX4+QFghLgOlPK1hGEM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709561599; c=relaxed/simple;
-	bh=l3wbRppRlIGdhh7sG3IfW6f4awjUymHJzULXxsdVVgA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=lTuqYnL/zrxYWnlhOukdcsK7AfBJindVouCxPBlgv7dtJcv/zIOxv2Q9Yi74F9xtvThuxI07jA22ua/GXp3lKK4ZTFAXN3QsupiYkw3K8Qnm3n4qNPXnwGQHSYrpT0BlhvwUpKQQhUSTpVsVo3MDLab4hEONVuc20wQ0v0xBNoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGs4eBU8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1709563020; c=relaxed/simple;
+	bh=7Q8u//I0NChFb/SG3nPqpu2hUZlVNJ0AXcNfX8C2AG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hDlJH8Wmfp7lDJsoJzjDI32dxZ0lrjrlBDSNOLYWqEdQyb7sR5MwCxcYTzlem/qIfu3lcq8Tv8+aKWFmdHjHSivlYtNcFnT4eOvWLAUXnU1PQvchPz4UjGIlPjzFQg0i5Mcu4No7TG+KegjPHIUWKNkh8PEaoHaG5FjxQ2C7aG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Prx35QaI; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGs4eBU8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709561596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A6QmjxoXan6noqde6BD8aOvSG2Tm9X9t0A12q963Qzc=;
-	b=QGs4eBU8oXrBEzP7AjDj9CInEE+DxfvgBAhA+WzPVmAduSPWpo7teihYArtlj4fpyEEBUR
-	7ncwqjgcq97A4nN0ij0WtyXXjaB2YXM87aIMfoSE3EgsiWFVvk4bkwCKVFEMc9cZXkYTce
-	i7LXNQYGcAPvnDVofUKTVJLRVhWfgrQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-1SvP3154M52MqgTLh5tieQ-1; Mon, 04 Mar 2024 09:13:11 -0500
-X-MC-Unique: 1SvP3154M52MqgTLh5tieQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 41B3485A58A;
-	Mon,  4 Mar 2024 14:13:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 54A9B112131D;
-	Mon,  4 Mar 2024 14:13:09 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAH2r5ms4UVc2Lzp+171j_d_ZDXrXNhu4=EFyyiub2+gVmyHQPQ@mail.gmail.com>
-References: <CAH2r5ms4UVc2Lzp+171j_d_ZDXrXNhu4=EFyyiub2+gVmyHQPQ@mail.gmail.com>
-To: Steve French <smfrench@gmail.com>
-Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Bharath S M <bharathsm@microsoft.com>,
-    Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
-    CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: file size bug with some configurations for test generic/586
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Prx35QaI"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-42e8758fd52so34266951cf.1;
+        Mon, 04 Mar 2024 06:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709563017; x=1710167817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ueg1LzXX/gmckj0YGtUgOHDVn1Q5Y8WQ6pvHjt3CJBY=;
+        b=Prx35QaIQB1wnZH/u+yaDhzUv3T+PMePLJatRTyQuy/7fIGvZgTd4NDYTwq0GfUjgp
+         wKmWpb+1L0MkHGvBdgUox13Q3LvEkIMhenxPva8HqY6Q6OWM0eT6jZOZ3vJv0NKVwm7u
+         DcnGjE2sc0Iiz9e/1nAu+B+rgY0hqmUkSNtNMe/tisECw90KqyJvlGA6mJdzdbeUeAEX
+         Wp88abgbC/5eINlom2F/wQjNTKF5HqDIszetg7lOb90kzuI5JvEWmGtrD45FFHhW6dvt
+         jd0ciKtXTWnOBt1SMOm8jjTvgH1fdptNAoz+P2D+i/B6ShC7bEMl+Aft6CbodbHMXLUo
+         oV9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709563017; x=1710167817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ueg1LzXX/gmckj0YGtUgOHDVn1Q5Y8WQ6pvHjt3CJBY=;
+        b=YmEJiSEizrJgG/EsFYTFPEFtzoYIRxei3b+5dHZZTyW9vWTDPIhS7jUV/ZUOSAZpjT
+         BtKOWXjWUbWJK32TbfPck+DvKAR31AbY/2ksqigfxes3xPLTo5wqFOM7rGn8BpoBobXK
+         5QB5grCb3DDW5MqszOlHX+ueaihnTkvu8FHYssLRB8hewdHv+TPEu6i9lOUvfqVYe+vr
+         VtY4CEnArlT5IDEeU4p6kFGEz3k6dj826Epvk6OHn9n8pWuRvVG+93EAZPEHMn/VYmRe
+         Lr07tzIU+nfPVxPjFGEoUT7dlkLYifCt+GJL34F9nDJOVBR0z8WZWQKFavrzniCsHbcj
+         s4CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtwi1tZu/f69wfqcCMEt542e97TzLOYfPudA2kvtjxQ9F+UnEef8EpSm7owTT8p2mJBUWs6+yWOPuDHB88mW9jxeY6jOC/2/ScqIX/ZQSKUMPSF7uwj9veixL6uCXLtxUntzG7BS/ZD6z3ZSFW6Srdo2GW0srLKvN4SAsGSltyhaoXjR+sgNb6/4ZzydD6EyeP8cxEWFauttemq261Y/Fw
+X-Gm-Message-State: AOJu0Yyd4kCb7fs3nKoG026reYWPDbcNaqxc4/ztgmAQ8j1gncIFl0HP
+	Zbgz2LV71DMVU6BDclohx3N5BrnQNW0bAzV86cLZFFy8O5ipy+T3qBqFmQ1hVbmBCzJbdhHjgRN
+	Sl1UGpyeE6zqFC4NOyI+AgBJNMBZypf3ihWg=
+X-Google-Smtp-Source: AGHT+IHz5+H37MGVV7IGn2MGmA63Pt/2gNaEx+CQKMOYep0lh2b/cdqPyygE9RKmyqzM791YiilhqAporHp9m7ClBYg=
+X-Received: by 2002:ac8:5e46:0:b0:42e:f4aa:e737 with SMTP id
+ i6-20020ac85e46000000b0042ef4aae737mr2336629qtx.50.1709563017482; Mon, 04 Mar
+ 2024 06:36:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <808309.1709561588.1@warthog.procyon.org.uk>
-Date: Mon, 04 Mar 2024 14:13:08 +0000
-Message-ID: <808310.1709561588@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+References: <20240204021436.GH2087318@ZenIV> <20240204021739.1157830-1-viro@zeniv.linux.org.uk>
+ <20240204021739.1157830-11-viro@zeniv.linux.org.uk> <20240205-gesponnen-mahnmal-ad1aef11676a@brauner>
+ <CAJfpegtJtrCTeRCT3w3qCLWsoDopePwUXmL5O9JtJfSJg17LNg@mail.gmail.com>
+In-Reply-To: <CAJfpegtJtrCTeRCT3w3qCLWsoDopePwUXmL5O9JtJfSJg17LNg@mail.gmail.com>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Mon, 4 Mar 2024 16:36:46 +0200
+Message-ID: <CAOQ4uxhBwmZ1LDcWD6jdaheUkDQAQUTeSNNMygRAg3v_0H5sDQ@mail.gmail.com>
+Subject: Re: [PATCH 11/13] fuse: fix UAF in rcu pathwalks
+To: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+	linux-fsdevel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, 
+	linux-ext4@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Steve French <smfrench@gmail.com> wrote:
+On Mon, Feb 5, 2024 at 3:52=E2=80=AFPM Miklos Szeredi <miklos@szeredi.hu> w=
+rote:
+>
+> On Mon, 5 Feb 2024 at 13:31, Christian Brauner <brauner@kernel.org> wrote=
+:
+> >
+> > On Sun, Feb 04, 2024 at 02:17:37AM +0000, Al Viro wrote:
+> > > ->permission(), ->get_link() and ->inode_get_acl() might dereference
+> > > ->s_fs_info (and, in case of ->permission(), ->s_fs_info->fc->user_ns
+> > > as well) when called from rcu pathwalk.
+> > >
+> > > Freeing ->s_fs_info->fc is rcu-delayed; we need to make freeing ->s_f=
+s_info
+> > > and dropping ->user_ns rcu-delayed too.
+> > >
+> > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > > ---
+> >
+> > Reviewed-by: Christian Brauner <brauner@kernel.org>
+>
+> Acked-by: Miklos Szeredi <mszeredi@redhat.com>
+>
 
-> Noticed an interesting bug with test generic/586 where the file size
-> can be reset smaller (shrinking the file) due to being sent too late
-> (after the last write, instead of before it).
-> 
-> Trying it to Samba e.g. if I use default mount parms it works, I see
-> write of 1MB at 1MB, then filesize shrinks to 1MB, then write of 1MB
-> against at 1MB so file size up at its expected value (2MB) at end of
-> test, but when mounting with cifsacl (perhaps due to lease breaks) I
-> see different ordering of the final write and  set file size so the
-> final set file size shrinks it to 1MB.
-> 
-> The test is intended to test:
-> "Race an appending aio dio write to the second block of a file while
-> simultaneously fallocating to the first block."
-> so it is plausible that we are missing a lock somewhere.
+Miklos,
 
-What kernel and patches?
+FYI, this is now merged and conflicts with:
 
-David
+dc076c73b9f9 ("fuse: implement ioctls to manage backing files")
 
+from fuse/for-next:
+
+--- a/fs/fuse/inode.c
++++ b/fs/fuse/inode.c
+@@@ -1373,7 -1398,9 +1405,13 @@@ EXPORT_SYMBOL_GPL(fuse_send_init)
+  void fuse_free_conn(struct fuse_conn *fc)
+  {
+        WARN_ON(!list_empty(&fc->devices));
+++<<<<<<< HEAD
+ +      kfree(fc);
+++=3D=3D=3D=3D=3D=3D=3D
++       if (IS_ENABLED(CONFIG_FUSE_PASSTHROUGH))
++               fuse_backing_files_free(fc);
++       kfree_rcu(fc, rcu);
+++>>>>>>> fuse/for-next
+  }
+  EXPORT_SYMBOL_GPL(fuse_free_conn);
+
+Note that fuse_backing_files_free() calls
+fuse_backing_id_free() =3D> fuse_backing_free() =3D> kfree_rcu()
+
+Should we move fuse_backing_files_free() into
+fuse_conn_put() above fuse_dax_conn_free()?
+
+That will avoid the merge conflict and still be correct. no?
+
+Thanks,
+Amir.
