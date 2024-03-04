@@ -1,86 +1,96 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9887323BE
-	for <linux-cifs@vger.kernel.org>; Mon,  4 Mar 2024 00:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BF125764
+	for <linux-cifs@vger.kernel.org>; Mon,  4 Mar 2024 12:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709510682; cv=none; b=Cxy8a6Oqrx23RZ2ol0j79OQtwiW4OcTPRog+f17ggZcmIcbm2znhEvfNmrTcDLxVbujgeOe9I0I2tJZUth1jS5vsCYfuIwKKFb5Hv/sOuY0ivDcQD8ZIlnN//RRomDeFLuTG293nPzI4NJDZtERXAZR2TIpZh4IW8TcJz4E02wE=
+	t=1709555019; cv=none; b=PUgMmf4ULpssxvhk+jUdlED4KGRZI0eTxAub7DfrRpnOlYlLVKZQ/nEWeLxWI0gatVOkx7zxLT/0OrUjmHb8XtWHlT8zVJX5LZSMvUxoVanel7R9uEf1vfQI6Fb+e0IefX0OQhgaUJFhZPHanBtCZUnxvS2Zdq3aDB1ekOUllnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709510682; c=relaxed/simple;
-	bh=17CGikz0VR6A5EZQTJTdtltrHDfsN5kE8KuTuZl8cdg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=iDjfq2Tr5O6aY4+OmLblC8CzCsCl/DW2VLvzmjcq4okQk8M8Wyz4GfbQt+ATn2+u5QLl25CY2xbAFS737UgVMhH6lWILC6XpIBDNE+GewGptvsivcynmtAa664w1tGpT2s6YvqyAPvlxbrOaDGrOITONyc6VNSBPS6ZG/n8eAco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPaic30G; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1709555019; c=relaxed/simple;
+	bh=EXenmv0/q0mV/dDQ6PMX6rTmD0T28XkSu1+mJ1GWpzE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWaXbWUSmQiTyTsQg4KRxeSaxMWOh7LKMsThqtygT9mDmIGJlpGYaDXIU8A27oy+HuC6cMrystyXS4RRknZQXoQ3/bUaNZj1t57fENaR6/0unoNQ/LooJc8JjsOdbOpmbW8trgT9tGMgJCA1jr3PQZ9/JoRWinisvufwEQTcuks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NS5W5C5k; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPaic30G"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d204e102a9so39303361fa.0
-        for <linux-cifs@vger.kernel.org>; Sun, 03 Mar 2024 16:04:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NS5W5C5k"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-563b7b3e3ecso6688276a12.0
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Mar 2024 04:23:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709510679; x=1710115479; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uEFM3tIddoI4VsuZDzMXEw7q6ghGDqLz2kopdTACJro=;
-        b=DPaic30GiLjUeJ1zjK6rfH/7yefFgw2KTFyizQsTa7lY2ASfAeVPD8KBJ7T0HEHpxd
-         pOwona8v315B9W+6vh7Zh43RzmB8RTRgS/lZcucg+s5DTr2F9HlIyPbYfAtkPTCND3Lq
-         RszHNzDqAbTIPDzNonvwKIZBXlvMHkE0tQ7uSAt8w0mLwr4NhHhULpuwnYUus7L316Dw
-         t1hbJ95+eC0rf3h7YT91vGIHvnKoewA84xWWE9JPrhCosU+74RfhFdFLmXASo18RJI8K
-         2AadFcvwtE23Kd8qA2sImJCOtxHvtjtvEdbJ4GSAaoZwp6AB6FlflMqWtoSS1SQgtPeZ
-         wzeA==
+        d=gmail.com; s=20230601; t=1709555016; x=1710159816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pzFgQunS0YCjbrNelt4MFei0I8t6kgpOJqjf39sdpoU=;
+        b=NS5W5C5kOorU22R/UcGGmXB3lPeNrBpXmo4xssC01Zu0Syevj7CsRfjbAeM3OB3Frg
+         BqMRjsN4HydPaQkY6gt6gQrj1UyN79GoEbwPZvNRR2mP3+43h3IgaJCwGbGNN2lyBKll
+         AhoeTPshKMgcHaWHUpEKPs3NNjxkiJtPIFYF+qTzu1it5Egsr/+r2fBJKqTULK+wtx80
+         FG9DmNS5HQHColmcgd5I48jHDu5TvTH4u4uEu3njMNIRp5cHnC7gqUkAdPaxqUKqNO+A
+         sNjSs3isPoP04lK+MRZockKuqhFNzUilLQmAp6CKhA/Qk9OQWJ/FDgbqRGiCHziKlk1J
+         7qhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709510679; x=1710115479;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uEFM3tIddoI4VsuZDzMXEw7q6ghGDqLz2kopdTACJro=;
-        b=LLkaG41R4IWSLc6jL9ohDNITvPrh7uZD0ry6RmcaMI/aIciV7aSsQP7d0rQAsOUmq+
-         BJFE3T1h3aN9/9QruQDDNue0wbctuHhVH6XCl+EIivbJWI/88q49CrAx/+/d+WoaephX
-         Q1nlXMR7wDOS/xPU8CB+fRsJCq3jPGsmx6r6DvKoM654dlkXuYUDjw4HgbCn6OIJso3N
-         abKsJkz9Ea1Ttprnbw45P/jmoZoBiHgkjJnOu7QWWyA0Sv6sipALZ/KXoho49/C5aTIJ
-         sklj0GrWYYOf3QQ93tWERT+gchuWwI33W5KPFgrJM4Jdz/eDdJsLvzOCaCi9DTcowl+k
-         /zKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3f6Oh8y5ng5ihMqjglWsBF1DbC5DnrMdRlKWWTkP9c5GZhbj5mELQrCS/2vjr3zJAg1TswSsjlnixAvsgdw1KfRE32zFFLL2Yiw==
-X-Gm-Message-State: AOJu0YyoRrIYLFv4mVzprxepjq4cUoYISNfE5wcOGbo3xe8k6xAV3CUb
-	E/2oV/uQyJmll67PEwB/HJ7WL7vzRh4MM8W5sJY3U9Ip3cr9FtbTLTT8Ebj1KO3std8+WEz4R0t
-	BWcdnUYzsH9x63ZBJpID3UPPk3no=
-X-Google-Smtp-Source: AGHT+IG47zBRlwY6Dw7jPfx9phyhXKcCEsFYDNmEH1gBpKHleOvr6iVV8xZnNTE5DpcKAkw0fWkAnu4PQuuQw+02FgA=
-X-Received: by 2002:a2e:9254:0:b0:2d2:4637:63f with SMTP id
- v20-20020a2e9254000000b002d24637063fmr4912340ljg.45.1709510678398; Sun, 03
- Mar 2024 16:04:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709555016; x=1710159816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pzFgQunS0YCjbrNelt4MFei0I8t6kgpOJqjf39sdpoU=;
+        b=kmOUrZxDW+dcCYGUBsYikc1PTNLUk9bI8jmJWWjCuAnHy8gb0bLUPQO6GW3h1KK5n4
+         CUWkkcjZmHyP2jRjEERX2AFmdS+b1jfMErWYWL53hnMzxoHLil6sTKHaWaVQqq8G51ju
+         UvdCHc3pleduBn3hfZMKH4sW74n8iTWicX3lHv4BuvECZsJN1Ip+1THUl/yq6IhzJ4vr
+         Kp1UT7+34H78w6o57RE15NTkmCWGraUjmMMqbyj0bvO6Xh5FhZPRM0VYbAbHyHQvMvel
+         3Z7g0E7GXKndu7YE+3M9h9ylgSWbV5pyMLD68kv58FjvhprmYviF3kGi/6+yImJxQ4S7
+         6DHQ==
+X-Gm-Message-State: AOJu0Yw/MbCNHwatB+xTH2XrGQsZfVyBn8P1MChoxg6wXgGqF7ID8vLn
+	NLGDxLNAyF+6u/428OLmK2pm/yhX9KQw9Jmi9VHeCXAe2hUz7uSK7Z3Q+Zs=
+X-Google-Smtp-Source: AGHT+IEF3JEWZhIHVnuM60P7+MvarFKAx3arJFs+G8QIiJkn3dSk7PxEaTJ2I7EhMoQWyvyxoul/9g==
+X-Received: by 2002:a17:906:6813:b0:a44:51d8:7dd with SMTP id k19-20020a170906681300b00a4451d807ddmr6288212ejr.0.1709555015909;
+        Mon, 04 Mar 2024 04:23:35 -0800 (PST)
+Received: from torus.fritz.box ([2a02:810d:b83f:e400:16a0:2f96:e202:fd52])
+        by smtp.gmail.com with ESMTPSA id tb5-20020a1709078b8500b00a4329670e9csm4739841ejc.126.2024.03.04.04.23.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 04:23:35 -0800 (PST)
+From: David Voit <david.voit@gmail.com>
+To: linux-cifs@vger.kernel.org
+Cc: David Voit <david.voit@gmail.com>
+Subject: [PATCH v2 0/1] cifs-utils: CLDAP-Ping to find the correct site
+Date: Mon,  4 Mar 2024 13:23:00 +0100
+Message-ID: <20240304122302.96156-1-david.voit@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 3 Mar 2024 18:04:24 -0600
-Message-ID: <CAH2r5ms4UVc2Lzp+171j_d_ZDXrXNhu4=EFyyiub2+gVmyHQPQ@mail.gmail.com>
-Subject: file size bug with some configurations for test generic/586
-To: Paulo Alcantara <pc@manguebit.com>, David Howells <dhowells@redhat.com>, 
-	Shyam Prasad N <nspmangalore@gmail.com>, Bharath S M <bharathsm@microsoft.com>, 
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Noticed an interesting bug with test generic/586 where the file size
-can be reset smaller (shrinking the file) due to being sent too late
-(after the last write, instead of before it).
+Hi All,
 
-Trying it to Samba e.g. if I use default mount parms it works, I see
-write of 1MB at 1MB, then filesize shrinks to 1MB, then write of 1MB
-against at 1MB so file size up at its expected value (2MB) at end of
-test, but when mounting with cifsacl (perhaps due to lease breaks) I
-see different ordering of the final write and  set file size so the
-final set file size shrinks it to 1MB.
+we had some internal review of the patchset and I had some
+misunderstanding of the dn_expand call. Thought it returns the
+uncompressed size, but it always returns the compressed size, which
+easily can be transformed to the next offset. This code was so or so a
+little bit flaky, hope this makes the review of the rest of the code
+easier for you guys.
 
-The test is intended to test:
-"Race an appending aio dio write to the second block of a file while
-simultaneously fallocating to the first block."
-so it is plausible that we are missing a lock somewhere.
+summary of changes from last revision:
+ - use dn_expand instead of custom implementation
+ - check for minimum length in netlogon_size
+ - inline read_dns_string return value check
 
-Any ideas?
+David Voit (1):
+  Implement CLDAP Ping to find the closest site
+
+ Makefile.am    |  15 +--
+ cldap_ping.c   | 284 +++++++++++++++++++++++++++++++++++++++++++++++++
+ cldap_ping.h   |   9 ++
+ mount.cifs.c   |   5 +-
+ resolve_host.c | 270 +++++++++++++++++++++++++++++++++++++++++-----
+ resolve_host.h |   6 +-
+ 6 files changed, 551 insertions(+), 38 deletions(-)
+ create mode 100644 cldap_ping.c
+ create mode 100644 cldap_ping.h
 
 -- 
-Thanks,
+2.44.0
 
-Steve
