@@ -1,85 +1,148 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CA885640
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Mar 2024 12:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340AC6127
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Mar 2024 14:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709642626; cv=none; b=pUZNMY4fIQe1jYSUT4ltEl1ZUisS3mZP9BHiQV2vQ311VLNL7/+l/3AqbAEw3cU5R++HSBn+VUTI8twFpkBEiWvxltxf9l6Pr7pTadhfjXiz96ZSBDVLBbnCnUTPjqyxa1laBMefxhFgUkIZKeVTerjwlOZQLmgZy47Es70HUe4=
+	t=1709650627; cv=none; b=lQirX+aKqLZ2CRop9g+C9SUtjnGYtYIFTdy1XJsFOcvlX6wWaZlt0rWuWxzaCrRL9FZqAslck9h2j+G23RrVqtkjKbkWPiaCxIfzDUbvgFnQ3loYpn63e8qzY9OD/NE6jncdxAYMEJVJJnVU02K3A+iYkgSOWnJzcQM37NXN8NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709642626; c=relaxed/simple;
-	bh=hqXu4Imvd+YZYd3LEDpX+ZnPOXEZjX0E+C7N/22uaKY=;
+	s=arc-20240116; t=1709650627; c=relaxed/simple;
+	bh=7K3f8N56AxnxIkmFSfvFHk5XrFx4+WdeNbL92uFplgo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YKmpfLfUzdUhJDMkmN2FuS6/ucTDcWjkIy5xZRoEGVxdz3kN5ad4AFRutdCweYG5blMe1es7QXLU7evo6n7AouyT3bj9NUMQ/OCt82NDMnm4Nd/5lxAK1Ec7IZ61DpxWNMLo4Y/udmGeQekfNV/jYED4OlwTT5mW8ZoLxQh7Yu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=dKC+KEve; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+	 To:Cc:Content-Type; b=ewaZDnhBRIUly+o9gAk3IKAu9Ibzq3ylCWuFFrUxrke7rWU/DPFikSm0epaQJgSRcguX2OQZzknkifSLd1eQFQVm8ztQolJIXaSHzn0xDmrxy/UGjjGLBkXpxPQu2PNhjWMeT+gVXVJMrE4d6uAPDRTSzsTeS3VMIlEH3LHpn7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K86pr52f; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="dKC+KEve"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d3b93e992aso27908751fa.1
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Mar 2024 04:43:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K86pr52f"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5131c48055cso974183e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 05 Mar 2024 06:57:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1709642623; x=1710247423; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hqXu4Imvd+YZYd3LEDpX+ZnPOXEZjX0E+C7N/22uaKY=;
-        b=dKC+KEveoMrJox2JYoN1rvvJPEQQ5mCmK3iLWi4q4dPWC+fFRrXaIlNn1m/iKZ10cP
-         nZeuPDRqkY+/3JruQ5n7cNfVoY9390s/JhFXC1tW0Qhc1LLfB2JFqWhBMHgPOxs48N93
-         WQ+YO514bBN++CfZKG7X0nrtv1qxDtPJMscfE=
+        d=gmail.com; s=20230601; t=1709650624; x=1710255424; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7K3f8N56AxnxIkmFSfvFHk5XrFx4+WdeNbL92uFplgo=;
+        b=K86pr52fi+xeX7+6JyKFtL5N5NXak2D06e+dRurxDuu+kbZIXDJIt3AV6Emagcugpm
+         H2L1G0nlU3YhlsMcgivRq5PCSh/oOp9AtG0U6+D+CT7xbpzz13WsTFsWTGS/HpellzSW
+         DOx0A//TnAiU3l9X04+1WZTI3AiwjOpeS+tvpvlDik+HWGmtALbcXstoBdzoId5t08hY
+         GG+5Sq7s0m7C61UdOVGFpB21fMg14HxiP7Lg+EswIpMs+7HA3rkPF4ukG0BpVgiKuQuI
+         Z8U39gPURcxMAmAPHFdtntH8P6lsnKvDRrozpjDzx0BVKIyqM6lN/SfK3HlyfEz8h2k6
+         rlyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709642623; x=1710247423;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hqXu4Imvd+YZYd3LEDpX+ZnPOXEZjX0E+C7N/22uaKY=;
-        b=fslBjQX1PMgns6xmezkBftd5kDVD2Z7nQIaMTqmKggCkMdd1bAyFn2T/lqBr2O6HpC
-         lHH2EhoxtyWhyawbUmvx3TPeDalyuSqz48WgXchwOyu3LO86YiHlr9h+TILzJrnY5xjf
-         8x+20cjp8BOimsMb1imEyGGDAWlas9i6H0wC1n0EZX9ao5QYIjg/RXJvODB75TxKMqAx
-         JXI/D3/z9e9y9AGhrPTaUxHotJwkofvFT4qEGzkdwQGcmYTLeJNw4NJaLKBo+larUAyQ
-         FjP2Z1ndjRXe6kFek0NpHk8K6hf1y9ijwI4ZUGAPbCAdQByfjWTDNRg3BNywxhWu3erT
-         z/iw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3EYCYdgiL8V1b2Rujid9bfNlvZPReCgi9Bn58TXJ7Knwet3gLVeQsfLSRl3+ypros74/4QY7DclNpxLH85LDdhpQVc8TFTiKA4A==
-X-Gm-Message-State: AOJu0Yx8Ev/wwuEdebcchGfcwV6m+FvOXQF/OkMrIo/GvUrv4Pl5ZGhK
-	Ko/70W6yzUsNoKg3YhJiaOqbGg0KeG9pF2hPfV5407LIlwuRT7qGhwftyTW1n7dzrramUKidwk1
-	0sxJecoBEv7JxoJNj2TeCFN+SduoNq1avL0h91Q==
-X-Google-Smtp-Source: AGHT+IFDaUTfRvZDVguiUspJ8bW9xNWfKoMVLiqWzzQ2oinl9J77SQ70Ly+nbCnni8ZMPAqYVspxryxBQbzNkvrnVDU=
-X-Received: by 2002:ac2:5e7c:0:b0:512:f5af:3bdf with SMTP id
- a28-20020ac25e7c000000b00512f5af3bdfmr1088535lfr.68.1709642622758; Tue, 05
- Mar 2024 04:43:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709650624; x=1710255424;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7K3f8N56AxnxIkmFSfvFHk5XrFx4+WdeNbL92uFplgo=;
+        b=wMrSkY0rl2UxCKTerRJWcdB6pU/dMOeFtY86d46Pki2TZ3CJ5LcNxnFgGMsDPZHO5E
+         63OxKbLkPkMMJxJ+I44dthYF3rfLa8gXgI4AILI/cPybk+JZBkg20vSR3DrqRC0SVI/V
+         JYCSiLrLeDRCZwEWSKb6rikeuy4x4Xx6SezvTQyCTwoHF5ruZXDH6IqgjFGFghFMJew4
+         wjCE8QJSwsBFdEgT6+0jO7QUmdhYvQHqUvtLgNQrjx/TVWDSQjyD6mpNcSMyGM+5MJm3
+         b+x4XvZqw0gD0CeZ4Iphzhx22fbleello66ZVlJvNMpON31tuHnwXyCcRKzqk4JSj7q3
+         Siqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMGnICKOxMvBwH33wVkejJoyFVFPDwhueSXDZFdV6FBVSU98JL9jhuZHaHDE1yRX1w9eCjRW2SHoGcWN6vu3F5FFjN1/tmEmikSQ==
+X-Gm-Message-State: AOJu0YwOVWgzOleqzDkIwfatqqImQ1BoWPc837GSALVFAWPVjv2FkiiU
+	1zJddXmwBYaHU5H5q8C4EDUQe0BT/ozZDgNkEZJ/E5Z67yfZY/4svV5UzlPneSXKYLN7AjFwKlf
+	LviGhXai0IpddWUHTCfImV0OxAeQggBkG/HpPCg==
+X-Google-Smtp-Source: AGHT+IHfi+jophyewzgEZaadL//ZGttBKQQR6XHkiMsCvJSQC6wIriNiBQIWLoev1hXsjI1iGRQZYQBjLROTEv3NGvk=
+X-Received: by 2002:ac2:4ed3:0:b0:512:d7e8:7046 with SMTP id
+ p19-20020ac24ed3000000b00512d7e87046mr1295663lfr.42.1709650623975; Tue, 05
+ Mar 2024 06:57:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240204021436.GH2087318@ZenIV> <20240204021739.1157830-1-viro@zeniv.linux.org.uk>
- <20240204021739.1157830-11-viro@zeniv.linux.org.uk> <20240205-gesponnen-mahnmal-ad1aef11676a@brauner>
- <CAJfpegtJtrCTeRCT3w3qCLWsoDopePwUXmL5O9JtJfSJg17LNg@mail.gmail.com> <CAOQ4uxhBwmZ1LDcWD6jdaheUkDQAQUTeSNNMygRAg3v_0H5sDQ@mail.gmail.com>
-In-Reply-To: <CAOQ4uxhBwmZ1LDcWD6jdaheUkDQAQUTeSNNMygRAg3v_0H5sDQ@mail.gmail.com>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Tue, 5 Mar 2024 13:43:31 +0100
-Message-ID: <CAJfpegtQ5+3Fn8gk_4o3uW6SEotZqy6pPxG3kRh8z-pfiF48ow@mail.gmail.com>
-Subject: Re: [PATCH 11/13] fuse: fix UAF in rcu pathwalks
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
-	linux-fsdevel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, 
-	linux-ext4@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org
+References: <20230310153211.10982-1-sprasad@microsoft.com> <20230310153211.10982-8-sprasad@microsoft.com>
+ <4b04b2c4-b3ff-48e7-9c24-04b1f124e7fa@sairon.cz> <CANT5p=p4+7uiWFBa6KBsqB1z1xW2fQwYD8gbnZviCA8crFqeQw@mail.gmail.com>
+ <2abdfcf3-49e7-42fe-a985-4ce3a3562d73@sairon.cz>
+In-Reply-To: <2abdfcf3-49e7-42fe-a985-4ce3a3562d73@sairon.cz>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Tue, 5 Mar 2024 20:26:52 +0530
+Message-ID: <CANT5p=oFg28z7vTgyHBOMvOeMU=-cgQQdiZOw22j4RHO94C3UA@mail.gmail.com>
+Subject: Re: [PATCH 08/11] cifs: distribute channels across interfaces based
+ on speed
+To: =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
+Cc: smfrench@gmail.com, bharathsm.hsk@gmail.com, pc@cjr.nz, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>, 
+	Stefan Agner <stefan@agner.ch>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 4 Mar 2024 at 15:36, Amir Goldstein <amir73il@gmail.com> wrote:
-
-> Note that fuse_backing_files_free() calls
-> fuse_backing_id_free() => fuse_backing_free() => kfree_rcu()
+On Wed, Feb 28, 2024 at 2:52=E2=80=AFPM Jan =C4=8Cerm=C3=A1k <sairon@sairon=
+.cz> wrote:
 >
-> Should we move fuse_backing_files_free() into
-> fuse_conn_put() above fuse_dax_conn_free()?
+> Hi Shyam,
 >
-> That will avoid the merge conflict and still be correct. no?
 
-Looks like a good cleanup.
+Hi Jan,
+Apologies for the delay.
 
-Force-pushed to fuse.git#for-next.
+> On 27. 02. 24 17:17, Shyam Prasad N wrote:
+> > These messages (in theory) should not show up if either multichannel
+> > or max_channels are not specified mount options.
+>
+> That shouldn't be the case here, I checked with the user and he's not
+> doing anything fishy himself (like interfering with the standard mount
+> utilities), and the userspace tools creating the mounts should not be
+> setting any of these options, which I confirmed by asking for his mounts
+> list:
+>
+> //192.168.1.12/folder on /mnt/data/supervisor/mounts/folder type cifs
+> (rw,relatime,vers=3Ddefault,cache=3Dstrict,username=3Duser,uid=3D0,noforc=
+euid,gid=3D0,noforcegid,addr=3D192.168.1.12,file_mode=3D0755,dir_mode=3D075=
+5,soft,nounix,mapposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo=
+_interval=3D60,actimeo=3D1,closetimeo=3D1)
+> //192.168.1.12/folder on /mnt/data/supervisor/media/folder type cifs
+> (rw,relatime,vers=3Ddefault,cache=3Dstrict,username=3Duser,uid=3D0,noforc=
+euid,gid=3D0,noforcegid,addr=3D192.168.1.12,file_mode=3D0755,dir_mode=3D075=
+5,soft,nounix,mapposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo=
+_interval=3D60,actimeo=3D1,closetimeo=3D1)
 
-Thanks,
-Miklos
+Hmmm.. That seems like a bug.
+Is there any chance that the user is willing to try out if the same
+bug reproduces with the latest mainline kernel?
+
+The other option is for us to try with the 6.6 kernel. But without the
+steps to repro, it'll just be shots in the dark.
+Let me try to go through the code and see if I can spot anything here.
+
+>
+>
+> Or am I missing anything here?
+>
+> > The repeating nature of these messages here leads me to also believe
+> > that there's something fishy going on here.
+> > Either the network health is not good, or that there's some bug at play=
+ here.
+>
+> Maybe, however I'm not able to reproduce the above behavior yet. But
+> there's been so far one more report of this happening, so it's not a
+> single isolated case. I appreciate any advice what to look at further.
+
+If a user has reproduced this issue, the one thing they can send us is
+the ftrace output of cifs events when the issue is being seen.
+i.e. something like this:
+# trace-cmd start -e cifs
+# <now wait for the issue to reproduce>
+# trace-cmd stop
+# trace-cmd extract > /tmp/outputs.txt
+# uname -r >> /tmp/outputs,txt
+# cat /proc/fs/cifs/DebugData >> /tmp/outputs,txt
+# cat /proc/fs/cifs/Stats >> /tmp/outputs,txt
+
+And then provide the outputs.txt file to us.
+Going through that capture can help us understand this better.
+
+>
+> Cheers,
+> Jan
+
+
+
+--=20
+Regards,
+Shyam
