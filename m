@@ -1,396 +1,736 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A24B1361D0
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Mar 2024 16:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43BC1C280
+	for <linux-cifs@vger.kernel.org>; Wed,  6 Mar 2024 22:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709741216; cv=none; b=aseVTL/gp+LzABahyzl/oKdJEELUA6ck+VMSS64FWSo6UXj4XCS//mV4sNikllbEBe3ZfMZ+tgiInr8PiJai4sXGc8NLEmRxY2Qybh00a7AyPyQ8r3Vnin9Wus0WLbR6HXMPw3h8gIhidyPzmrsUv5Efihsto1ND8gkmb+aFjgM=
+	t=1709764788; cv=none; b=r1BIfp0MHcsxs9oJ+xr8diXsKvCjUrZd4B79FW1O+6MA565JkMRu9qamSoyoLVki+IQ4hJDf6ULRjaZOnG9cz1C4hoh+EcmgmAOh6R3DMxkkArfkzAm3dZpX8a+cDDJTKZwvuA7GjZzsYOe6lj9ZbfilWPkjtYxtbt7M1va2TQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709741216; c=relaxed/simple;
-	bh=iIO9YWRZ6VIfGwqCcHPNvoeftFIT7xemRyPpPnngjFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JC+4HAexwCKP8nnPiXmvB0GCAd/LbyaZWGfJjVQ5XEAxtLxE90dIxL5UYQJdJrY6Kl+xHSnami9dh6OkT/uhkwblpUiTfjr64FfGhWcOEXgHMlz/EpdfOjENmZKWfm9R+dQCg8iWyhamgyBA2j6z9A+Ml5DAkgIkJbE2snIUU/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CndfkdD7; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709764788; c=relaxed/simple;
+	bh=qufHCtFusJJJxZd4PbPONLjM4Ikhqt19eKZn1UE7gb8=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=VdjdBimTILulUC8+bxXTAE0FaPWVqzA4IEyVZF3/yNP08S/PsuC40LDF4o6rHCOPohqnPJCMeiNCond7tY44O1PafbPPdPb25gPxbsD+Sef9Trx00Y5EFlIA5olmJy50TsPtgKVmOMMe2TbhA672RLYZkx3U7B/B8tH1NbMOHyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=igCjj6kS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CndfkdD7"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d2509c66daso91662621fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 06 Mar 2024 08:06:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709741212; x=1710346012; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Amo50KBBFwgw5xaCIl/vRH0OZr0ehdbjm7OqH3BKsow=;
-        b=CndfkdD7VHsI98Bj03mE4VwN72NHJSWeAOW6Y0Mz4Pz1rt9MIO8yX5jL+xxdtB9C0i
-         kRTpEjxxxCZRqk9a60c4XUyMBvTGL6QoFb1ZaVe4/yD+hVqtw8Uj/P6Us6H9fkpUwlic
-         jd2oH8K7a6NCe5dMcTrSjrQV0aclnEStNxbP8jx2f49smaF3jHKui4mE3VSzVxHLi26J
-         9GpXio90yetySybPpyDHYiWwYl71eCVU2nyDi0wkT4fI/1WFP4YdPjrCG9qKbqz6N808
-         hNw5KlkvScAAQTKGOeRMPkzGOT23NI9qoRC21EtESkVVEp9hWFej05+RNGX75fVlMFZv
-         X80w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709741212; x=1710346012;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Amo50KBBFwgw5xaCIl/vRH0OZr0ehdbjm7OqH3BKsow=;
-        b=hgcqiRkTDlG39XoK5qfBWImrDpZfKqTP5PHkpz8BVGXTKeZn9A8bLOG7umPzAUEgZm
-         luF2w6aghEnX8X1qEXb3czWbeaqGvBpBk8PONw0NAPWNmJTFj5r05qE0B0mRSNtmYWLP
-         /Rsi3LRb/QcVGdK07ARC63sJig609+1MFyOJQl1cTK8QU0ur7JikO6xP/D2SCM+xWuSb
-         kEr4xHpl8UQYa53uKyvq0K+ZxH5aA8qZgDK7IyM00mWbyvtcLmipMk079L70PLZs3T29
-         IDvNcrl3AcOzJsJTUhq3t8ecFLqrNwi9/bDOOJRqI0OfbB5FPMIXAbR3iOu+3oLchM/w
-         gBWg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9beyULtD2hkTk7spPEe9EW4svTLCwbIsmNLZNzPnDwtF9+jr88HNosr35xIrN7M933duVemY8fbbS1RJePEpcCkuhwHnTJcVzjA==
-X-Gm-Message-State: AOJu0YxVpkIjxhoqGYenX6O2PrrQxXPFXXiKuyEV8+rzvAYwHHZyDsUg
-	l6ovqb2jRvdC48mQb7AgEg4yvTe+GiUQKV4n5Z1qJAMLIj+Byitc88pohyFIK82BaNzYrT3tiuS
-	HXuFOj+dhnhqSbbLY0rTqlJVHlWw=
-X-Google-Smtp-Source: AGHT+IFYW3My1nUJZSD+S0XwmJ2SqkGj5mrhrjs8+oSMtK4GbF2ntEvZamvEAKIJx3Zk7jS2fYhcMxnXj2T2IVaaQCg=
-X-Received: by 2002:a2e:95cc:0:b0:2d2:36fa:dd2 with SMTP id
- y12-20020a2e95cc000000b002d236fa0dd2mr3359070ljh.23.1709741212407; Wed, 06
- Mar 2024 08:06:52 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igCjj6kS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709764785;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IDP3EJMVLQHfCuzda2hObBpANfqkgEpN6vZzonFm8bY=;
+	b=igCjj6kSoxZjpTF90y3BjvoU+YZeQqzY44HwEH8nsicj7TZ21zpkd6vMw4nXqfwuxNFgEC
+	9lMt6L42GJG2XbBXJ83eplGqG/Q7qs1A76Q7l/Jh5mtgid+/FFRTSXrwckw/uz8stR4p4v
+	i0HOpvR3Mv86d+UZ+tRYa+A9fhrvbKI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-374-ZvAokr5yO86t8o-0aYvYkw-1; Wed,
+ 06 Mar 2024 17:39:41 -0500
+X-MC-Unique: ZvAokr5yO86t8o-0aYvYkw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F5151E441D7;
+	Wed,  6 Mar 2024 22:39:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 258C7111D785;
+	Wed,  6 Mar 2024 22:39:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+cc: dhowells@redhat.com, Christoph Hellwig <hch@lst.de>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, devel@lists.orangefs.org,
+    linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] mm: Replace ->launder_folio() with flush and wait
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <862d95d6-5aa5-4542-a22c-2be58fd5c733@moroto.mountain> <450034.1709313916@warthog.procyon.org.uk>
-In-Reply-To: <450034.1709313916@warthog.procyon.org.uk>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 6 Mar 2024 10:06:41 -0600
-Message-ID: <CAH2r5mtYZs2gCrOrLiDCnap9A8DpSr-MwjeK8xJatVEJT9WVDQ@mail.gmail.com>
-Subject: Re: [bug report] cifs: Fix writeback data corruption
-To: David Howells <dhowells@redhat.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, linux-cifs@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000009fb9790613002560"
-
---0000000000009fb9790613002560
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1668171.1709764777.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 06 Mar 2024 22:39:37 +0000
+Message-ID: <1668172.1709764777@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-updated patch attached (and tentatively added to cifs-2.6.git for-next
-pending more testing) and also fixed the BUG() vs. WARN_ON_ONCE()
-warning.
+Here's a patch to have a go at getting rid of ->launder_folio().  Since it=
+'s
+failable and cannot guarantee that pages in the range are removed, I've tr=
+ied
+to replace laundering with just flush-and-wait, dropping the folio lock ar=
+ound
+the I/O.
 
+Are there any tests for launder_folio as triggering it is tricky?
 
-On Fri, Mar 1, 2024 at 11:25=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Dan Carpenter <dan.carpenter@linaro.org> wrote:
->
-> >
-> > The patch 374ce0748c79: "cifs: Fix writeback data corruption" from
-> > Feb 22, 2024 (linux-next), leads to the following Smatch static
-> > checker warning:
-> >
-> >       fs/smb/client/file.c:2869 cifs_write_back_from_locked_folio()
-> >       error: uninitialized symbol 'len'.
->
-> Good catch.  len should be the length of the start folio we're given:
->
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -2749,7 +2749,7 @@ static ssize_t cifs_write_back_from_locked_folio(st=
-ruct address_space *mapping,
->         struct cifsFileInfo *cfile =3D NULL;
->         unsigned long long i_size =3D i_size_read(inode), max_len;
->         unsigned int xid, wsize;
-> -       size_t len;
-> +       size_t len =3D folio_size(folio);
->         long count =3D wbc->nr_to_write;
->         int rc;
->
-> @@ -2793,7 +2793,6 @@ static ssize_t cifs_write_back_from_locked_folio(st=
-ruct address_space *mapping,
->          * immediately lockable, is not dirty or is missing, or we reach =
-the
->          * end of the range.
->          */
-> -       len =3D folio_size(folio);
->         if (start < i_size) {
->                 /* Trim the write to the EOF; the extra data is ignored. =
- Also
->                  * put an upper limit on the size of a single storedata o=
-p.
->
-> David
->
->
+David
+---
+mm: Replace ->launder_folio() with flush and wait
 
+invalidate_inode_pages2_range() and its wrappers are frequently used to
+invalidate overlapping folios prior to and after doing direct I/O.  This
+calls ->launder_folio() to flush dirty folios out to the backing store,
+keeping the folio lock across the I/O - presumably to prevent the folio
+from being redirtied and thereby prevent it from being removed.
 
---=20
-Thanks,
+However...  If we're doing this prior to doing DIO on a file, there may be
+nothing preventing an mmapped write from recreating and redirtying the
+folio the moment it is removed from the mapping lest the kernel deadlock o=
+n
+doing DIO to/from a buffer mmapped from the target file.
 
-Steve
+Further, invalidate_inode_pages2_range() is permitted to fail - and half
+the callers don't even check to see if it *did* fail, probably not
+unreasonably.
 
---0000000000009fb9790613002560
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-Fix-writeback-data-corruption.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-Fix-writeback-data-corruption.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ltfzr7pp0>
-X-Attachment-Id: f_ltfzr7pp0
+In which case, there's no need to keep the folio lock and no need for a
+special op.  Instead, drop the lock and flush the range covering the page
+to the end of the range to be invalidated (with a flag set in the wbc to
+say what we're doing) and then wait for it to complete.
 
-RnJvbSBlNzQ2NzE1MWUzMzlkOTk5MGU5ODBiNmI0N2FjZWY2YTgzMjcyNDQ1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpE
-YXRlOiBUaHUsIDIyIEZlYiAyMDI0IDExOjIwOjI2ICswMDAwClN1YmplY3Q6IFtQQVRDSF0gY2lm
-czogRml4IHdyaXRlYmFjayBkYXRhIGNvcnJ1cHRpb24KCmNpZnMgd3JpdGViYWNrIGRvZXNuJ3Qg
-Y29ycmVjdGx5IGhhbmRsZSB0aGUgY2FzZSB3aGVyZQpjaWZzX2V4dGVuZF93cml0ZWJhY2soKSBo
-aXRzIGEgcG9pbnQgd2hlcmUgaXQgaXMgY29uc2lkZXJpbmcgYW4gYWRkaXRpb25hbApmb2xpbywg
-YnV0IHRoaXMgd291bGQgb3ZlcnJ1biB0aGUgd3NpemUgLSBhdCB3aGljaCBwb2ludCBpdCBkcm9w
-cyBvdXQgb2YKdGhlIHhhcnJheSBzY2FubmluZyBsb29wIGFuZCBjYWxscyB4YXNfcGF1c2UoKS4g
-IFRoZSBwcm9ibGVtIGlzIHRoYXQKeGFzX3BhdXNlKCkgYWR2YW5jZXMgdGhlIGxvb3AgY291bnRl
-ciAtIHRoZXJlYnkgc2tpcHBpbmcgdGhhdCBwYWdlLgoKV2hhdCBuZWVkcyB0byBoYXBwZW4gaXMg
-Zm9yIHhhc19yZXNldCgpIHRvIGJlIGNhbGxlZCBhbnkgdGltZSB3ZSBkZWNpZGUgd2UKZG9uJ3Qg
-d2FudCB0byBwcm9jZXNzIHRoZSBwYWdlIHdlJ3JlIGxvb2tpbmcgYXQsIGJ1dCByYXRoZXIgc2Vu
-ZCB0aGUKcmVxdWVzdCB3ZSBhcmUgYnVpbGRpbmcgYW5kIHN0YXJ0IGEgbmV3IG9uZS4KCkZpeCB0
-aGlzIGJ5IGNvcHlpbmcgYW5kIGFkYXB0aW5nIHRoZSBuZXRmc2xpYiB3cml0ZXBhZ2VzIGNvZGUg
-YXMgYQp0ZW1wb3JhcnkgbWVhc3VyZSwgd2l0aCBjaWZzIHdyaXRlYmFjayBpbnRlbmRpbmcgdG8g
-YmUgb2ZmbG9hZGVkIHRvCm5ldGZzbGliIGluIHRoZSBuZWFyIGZ1dHVyZS4KClRoaXMgYWxzbyBm
-aXhlcyB0aGUgaXNzdWUgd2l0aCB0aGUgdXNlIG9mIGZpbGVtYXBfZ2V0X2ZvbGlvc190YWcoKSBj
-YXVzaW5nCnJldHJ5IG9mIGEgYnVuY2ggb2YgcGFnZXMgd2hpY2ggdGhlIGV4dGVuZGVyIGFscmVh
-ZHkgZGVhbHQgd2l0aC4KClRoaXMgY2FuIGJlIHRlc3RlZCBieSBjcmVhdGluZywgc2F5LCBhIDY0
-SyBmaWxlIHNvbWV3aGVyZSBub3Qgb24gY2lmcwoob3RoZXJ3aXNlIGNvcHktb2ZmbG9hZCBtYXkg
-Z2V0IHVuZGVyZm9vdCksIG1vdW50aW5nIGEgY2lmcyBzaGFyZSB3aXRoIGEKd3NpemUgb2YgNjQw
-MDAsIGNvcHlpbmcgdGhlIGZpbGUgdG8gaXQgYW5kIHRoZW4gY29tcGFyaW5nIHRoZSBvcmlnaW5h
-bCBmaWxlCmFuZCB0aGUgY29weToKCiAgICAgICAgZGQgaWY9L2Rldi91cmFuZG9tIG9mPS90bXAv
-NjRLIGJzPTY0ayBjb3VudD0xCiAgICAgICAgbW91bnQgLy8xOTIuMTY4LjYuMS90ZXN0IC9tbnQg
-LW8gdXNlcj0uLi4scGFzcz0uLi4sd3NpemU9NjQwMDAKICAgICAgICBjcCAvdG1wLzY0SyAvbW50
-LzY0SwogICAgICAgIGNtcCAvdG1wLzY0SyAvbW50LzY0SwoKV2l0aG91dCB0aGUgZml4LCB0aGUg
-Y21wIGZhaWxzIGF0IHBvc2l0aW9uIDY0MDAwIChvciBzaG9ydGx5IHRoZXJlYWZ0ZXIpLgoKRml4
-ZXM6IGQwODA4OWY2NDlhMCAoImNpZnM6IENoYW5nZSB0aGUgSS9PIHBhdGhzIHRvIHVzZSBhbiBp
-dGVyYXRvciByYXRoZXIgdGhhbiBhIHBhZ2UgbGlzdCIpClNpZ25lZC1vZmYtYnk6IERhdmlkIEhv
-d2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+CmNjOiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAc2Ft
-YmEub3JnPgpjYzogUGF1bG8gQWxjYW50YXJhIDxwY0BtYW5ndWViaXQuY29tPgpjYzogUm9ubmll
-IFNhaGxiZXJnIDxyb25uaWVzYWhsYmVyZ0BnbWFpbC5jb20+CmNjOiBTaHlhbSBQcmFzYWQgTiA8
-c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpjYzogVG9tIFRhbHBleSA8dG9tQHRhbHBleS5jb20+CmNj
-OiBKZWZmIExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPgpjYzogbGludXgtY2lmc0B2Z2VyLmtl
-cm5lbC5vcmcKY2M6IHNhbWJhLXRlY2huaWNhbEBsaXN0cy5zYW1iYS5vcmcKY2M6IG5ldGZzQGxp
-c3RzLmxpbnV4LmRldgpjYzogbGludXgtZnNkZXZlbEB2Z2VyLmtlcm5lbC5vcmcKU2lnbmVkLW9m
-Zi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9j
-bGllbnQvZmlsZS5jIHwgMjgzICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0t
-LS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxNTcgaW5zZXJ0aW9ucygrKSwgMTI2IGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvZmlsZS5jIGIvZnMvc21iL2NsaWVudC9maWxl
-LmMKaW5kZXggZTVmODkxZTQzOTg0Li40MWQyOTg1ODM5ODAgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9j
-bGllbnQvZmlsZS5jCisrKyBiL2ZzL3NtYi9jbGllbnQvZmlsZS5jCkBAIC0yNjI1LDIwICsyNjI1
-LDIwIEBAIHN0YXRpYyBpbnQgY2lmc19wYXJ0aWFscGFnZXdyaXRlKHN0cnVjdCBwYWdlICpwYWdl
-LCB1bnNpZ25lZCBmcm9tLCB1bnNpZ25lZCB0bykKICAqIGRpcnR5IHBhZ2VzIGlmIHBvc3NpYmxl
-LCBidXQgZG9uJ3Qgc2xlZXAgd2hpbGUgZG9pbmcgc28uCiAgKi8KIHN0YXRpYyB2b2lkIGNpZnNf
-ZXh0ZW5kX3dyaXRlYmFjayhzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywKKwkJCQkgIHN0
-cnVjdCB4YV9zdGF0ZSAqeGFzLAogCQkJCSAgbG9uZyAqX2NvdW50LAogCQkJCSAgbG9mZl90IHN0
-YXJ0LAogCQkJCSAgaW50IG1heF9wYWdlcywKLQkJCQkgIHNpemVfdCBtYXhfbGVuLAotCQkJCSAg
-dW5zaWduZWQgaW50ICpfbGVuKQorCQkJCSAgbG9mZl90IG1heF9sZW4sCisJCQkJICBzaXplX3Qg
-Kl9sZW4pCiB7CiAJc3RydWN0IGZvbGlvX2JhdGNoIGJhdGNoOwogCXN0cnVjdCBmb2xpbyAqZm9s
-aW87Ci0JdW5zaWduZWQgaW50IHBzaXplLCBucl9wYWdlczsKLQlzaXplX3QgbGVuID0gKl9sZW47
-Ci0JcGdvZmZfdCBpbmRleCA9IChzdGFydCArIGxlbikgLyBQQUdFX1NJWkU7CisJdW5zaWduZWQg
-aW50IG5yX3BhZ2VzOworCXBnb2ZmX3QgaW5kZXggPSAoc3RhcnQgKyAqX2xlbikgLyBQQUdFX1NJ
-WkU7CisJc2l6ZV90IGxlbjsKIAlib29sIHN0b3AgPSB0cnVlOwogCXVuc2lnbmVkIGludCBpOwot
-CVhBX1NUQVRFKHhhcywgJm1hcHBpbmctPmlfcGFnZXMsIGluZGV4KTsKIAogCWZvbGlvX2JhdGNo
-X2luaXQoJmJhdGNoKTsKIApAQCAtMjY0OSw1NCArMjY0OSw2NCBAQCBzdGF0aWMgdm9pZCBjaWZz
-X2V4dGVuZF93cml0ZWJhY2soc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcsCiAJCSAqLwog
-CQlyY3VfcmVhZF9sb2NrKCk7CiAKLQkJeGFzX2Zvcl9lYWNoKCZ4YXMsIGZvbGlvLCBVTE9OR19N
-QVgpIHsKKwkJeGFzX2Zvcl9lYWNoKHhhcywgZm9saW8sIFVMT05HX01BWCkgewogCQkJc3RvcCA9
-IHRydWU7Ci0JCQlpZiAoeGFzX3JldHJ5KCZ4YXMsIGZvbGlvKSkKKwkJCWlmICh4YXNfcmV0cnko
-eGFzLCBmb2xpbykpCiAJCQkJY29udGludWU7CiAJCQlpZiAoeGFfaXNfdmFsdWUoZm9saW8pKQog
-CQkJCWJyZWFrOwotCQkJaWYgKGZvbGlvLT5pbmRleCAhPSBpbmRleCkKKwkJCWlmIChmb2xpby0+
-aW5kZXggIT0gaW5kZXgpIHsKKwkJCQl4YXNfcmVzZXQoeGFzKTsKIAkJCQlicmVhazsKKwkJCX0K
-KwogCQkJaWYgKCFmb2xpb190cnlfZ2V0X3JjdShmb2xpbykpIHsKLQkJCQl4YXNfcmVzZXQoJnhh
-cyk7CisJCQkJeGFzX3Jlc2V0KHhhcyk7CiAJCQkJY29udGludWU7CiAJCQl9CiAJCQlucl9wYWdl
-cyA9IGZvbGlvX25yX3BhZ2VzKGZvbGlvKTsKLQkJCWlmIChucl9wYWdlcyA+IG1heF9wYWdlcykK
-KwkJCWlmIChucl9wYWdlcyA+IG1heF9wYWdlcykgeworCQkJCXhhc19yZXNldCh4YXMpOwogCQkJ
-CWJyZWFrOworCQkJfQogCiAJCQkvKiBIYXMgdGhlIHBhZ2UgbW92ZWQgb3IgYmVlbiBzcGxpdD8g
-Ki8KLQkJCWlmICh1bmxpa2VseShmb2xpbyAhPSB4YXNfcmVsb2FkKCZ4YXMpKSkgeworCQkJaWYg
-KHVubGlrZWx5KGZvbGlvICE9IHhhc19yZWxvYWQoeGFzKSkpIHsKIAkJCQlmb2xpb19wdXQoZm9s
-aW8pOworCQkJCXhhc19yZXNldCh4YXMpOwogCQkJCWJyZWFrOwogCQkJfQogCiAJCQlpZiAoIWZv
-bGlvX3RyeWxvY2soZm9saW8pKSB7CiAJCQkJZm9saW9fcHV0KGZvbGlvKTsKKwkJCQl4YXNfcmVz
-ZXQoeGFzKTsKIAkJCQlicmVhazsKIAkJCX0KLQkJCWlmICghZm9saW9fdGVzdF9kaXJ0eShmb2xp
-bykgfHwgZm9saW9fdGVzdF93cml0ZWJhY2soZm9saW8pKSB7CisJCQlpZiAoIWZvbGlvX3Rlc3Rf
-ZGlydHkoZm9saW8pIHx8CisJCQkgICAgZm9saW9fdGVzdF93cml0ZWJhY2soZm9saW8pKSB7CiAJ
-CQkJZm9saW9fdW5sb2NrKGZvbGlvKTsKIAkJCQlmb2xpb19wdXQoZm9saW8pOworCQkJCXhhc19y
-ZXNldCh4YXMpOwogCQkJCWJyZWFrOwogCQkJfQogCiAJCQltYXhfcGFnZXMgLT0gbnJfcGFnZXM7
-Ci0JCQlwc2l6ZSA9IGZvbGlvX3NpemUoZm9saW8pOwotCQkJbGVuICs9IHBzaXplOworCQkJbGVu
-ID0gZm9saW9fc2l6ZShmb2xpbyk7CiAJCQlzdG9wID0gZmFsc2U7Ci0JCQlpZiAobWF4X3BhZ2Vz
-IDw9IDAgfHwgbGVuID49IG1heF9sZW4gfHwgKl9jb3VudCA8PSAwKQotCQkJCXN0b3AgPSB0cnVl
-OwogCiAJCQlpbmRleCArPSBucl9wYWdlczsKKwkJCSpfY291bnQgLT0gbnJfcGFnZXM7CisJCQkq
-X2xlbiArPSBsZW47CisJCQlpZiAobWF4X3BhZ2VzIDw9IDAgfHwgKl9sZW4gPj0gbWF4X2xlbiB8
-fCAqX2NvdW50IDw9IDApCisJCQkJc3RvcCA9IHRydWU7CisKIAkJCWlmICghZm9saW9fYmF0Y2hf
-YWRkKCZiYXRjaCwgZm9saW8pKQogCQkJCWJyZWFrOwogCQkJaWYgKHN0b3ApCiAJCQkJYnJlYWs7
-CiAJCX0KIAotCQlpZiAoIXN0b3ApCi0JCQl4YXNfcGF1c2UoJnhhcyk7CisJCXhhc19wYXVzZSh4
-YXMpOwogCQlyY3VfcmVhZF91bmxvY2soKTsKIAogCQkvKiBOb3csIGlmIHdlIG9idGFpbmVkIGFu
-eSBwYWdlcywgd2UgY2FuIHNoaWZ0IHRoZW0gdG8gYmVpbmcKQEAgLTI3MTMsMTYgKzI3MjMsMTIg
-QEAgc3RhdGljIHZvaWQgY2lmc19leHRlbmRfd3JpdGViYWNrKHN0cnVjdCBhZGRyZXNzX3NwYWNl
-ICptYXBwaW5nLAogCQkJaWYgKCFmb2xpb19jbGVhcl9kaXJ0eV9mb3JfaW8oZm9saW8pKQogCQkJ
-CVdBUk5fT04oMSk7CiAJCQlmb2xpb19zdGFydF93cml0ZWJhY2soZm9saW8pOwotCi0JCQkqX2Nv
-dW50IC09IGZvbGlvX25yX3BhZ2VzKGZvbGlvKTsKIAkJCWZvbGlvX3VubG9jayhmb2xpbyk7CiAJ
-CX0KIAogCQlmb2xpb19iYXRjaF9yZWxlYXNlKCZiYXRjaCk7CiAJCWNvbmRfcmVzY2hlZCgpOwog
-CX0gd2hpbGUgKCFzdG9wKTsKLQotCSpfbGVuID0gbGVuOwogfQogCiAvKgpAQCAtMjczMCw4ICsy
-NzM2LDEwIEBAIHN0YXRpYyB2b2lkIGNpZnNfZXh0ZW5kX3dyaXRlYmFjayhzdHJ1Y3QgYWRkcmVz
-c19zcGFjZSAqbWFwcGluZywKICAqLwogc3RhdGljIHNzaXplX3QgY2lmc193cml0ZV9iYWNrX2Zy
-b21fbG9ja2VkX2ZvbGlvKHN0cnVjdCBhZGRyZXNzX3NwYWNlICptYXBwaW5nLAogCQkJCQkJIHN0
-cnVjdCB3cml0ZWJhY2tfY29udHJvbCAqd2JjLAorCQkJCQkJIHN0cnVjdCB4YV9zdGF0ZSAqeGFz
-LAogCQkJCQkJIHN0cnVjdCBmb2xpbyAqZm9saW8sCi0JCQkJCQkgbG9mZl90IHN0YXJ0LCBsb2Zm
-X3QgZW5kKQorCQkJCQkJIHVuc2lnbmVkIGxvbmcgbG9uZyBzdGFydCwKKwkJCQkJCSB1bnNpZ25l
-ZCBsb25nIGxvbmcgZW5kKQogewogCXN0cnVjdCBpbm9kZSAqaW5vZGUgPSBtYXBwaW5nLT5ob3N0
-OwogCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcjsKQEAgLTI3NDAsMTcgKzI3NDgsMTgg
-QEAgc3RhdGljIHNzaXplX3QgY2lmc193cml0ZV9iYWNrX2Zyb21fbG9ja2VkX2ZvbGlvKHN0cnVj
-dCBhZGRyZXNzX3NwYWNlICptYXBwaW5nLAogCXN0cnVjdCBjaWZzX2NyZWRpdHMgY3JlZGl0c19v
-bl9zdGFjazsKIAlzdHJ1Y3QgY2lmc19jcmVkaXRzICpjcmVkaXRzID0gJmNyZWRpdHNfb25fc3Rh
-Y2s7CiAJc3RydWN0IGNpZnNGaWxlSW5mbyAqY2ZpbGUgPSBOVUxMOwotCXVuc2lnbmVkIGludCB4
-aWQsIHdzaXplLCBsZW47Ci0JbG9mZl90IGlfc2l6ZSA9IGlfc2l6ZV9yZWFkKGlub2RlKTsKLQlz
-aXplX3QgbWF4X2xlbjsKKwl1bnNpZ25lZCBsb25nIGxvbmcgaV9zaXplID0gaV9zaXplX3JlYWQo
-aW5vZGUpLCBtYXhfbGVuOworCXVuc2lnbmVkIGludCB4aWQsIHdzaXplOworCXNpemVfdCBsZW4g
-PSBmb2xpb19zaXplKGZvbGlvKTsKIAlsb25nIGNvdW50ID0gd2JjLT5ucl90b193cml0ZTsKIAlp
-bnQgcmM7CiAKIAkvKiBUaGUgZm9saW8gc2hvdWxkIGJlIGxvY2tlZCwgZGlydHkgYW5kIG5vdCB1
-bmRlcmdvaW5nIHdyaXRlYmFjay4gKi8KKwlpZiAoIWZvbGlvX2NsZWFyX2RpcnR5X2Zvcl9pbyhm
-b2xpbykpCisJCVdBUk5fT05fT05DRSgxKTsKIAlmb2xpb19zdGFydF93cml0ZWJhY2soZm9saW8p
-OwogCiAJY291bnQgLT0gZm9saW9fbnJfcGFnZXMoZm9saW8pOwotCWxlbiA9IGZvbGlvX3NpemUo
-Zm9saW8pOwogCiAJeGlkID0gZ2V0X3hpZCgpOwogCXNlcnZlciA9IGNpZnNfcGlja19jaGFubmVs
-KGNpZnNfc2JfbWFzdGVyX3Rjb24oY2lmc19zYiktPnNlcyk7CkBAIC0yNzgwLDkgKzI3ODksMTAg
-QEAgc3RhdGljIHNzaXplX3QgY2lmc193cml0ZV9iYWNrX2Zyb21fbG9ja2VkX2ZvbGlvKHN0cnVj
-dCBhZGRyZXNzX3NwYWNlICptYXBwaW5nLAogCXdkYXRhLT5zZXJ2ZXIgPSBzZXJ2ZXI7CiAJY2Zp
-bGUgPSBOVUxMOwogCi0JLyogRmluZCBhbGwgY29uc2VjdXRpdmUgbG9ja2FibGUgZGlydHkgcGFn
-ZXMsIHN0b3BwaW5nIHdoZW4gd2UgZmluZCBhCi0JICogcGFnZSB0aGF0IGlzIG5vdCBpbW1lZGlh
-dGVseSBsb2NrYWJsZSwgaXMgbm90IGRpcnR5IG9yIGlzIG1pc3NpbmcsCi0JICogb3Igd2UgcmVh
-Y2ggdGhlIGVuZCBvZiB0aGUgcmFuZ2UuCisJLyogRmluZCBhbGwgY29uc2VjdXRpdmUgbG9ja2Fi
-bGUgZGlydHkgcGFnZXMgdGhhdCBoYXZlIGNvbnRpZ3VvdXMKKwkgKiB3cml0dGVuIHJlZ2lvbnMs
-IHN0b3BwaW5nIHdoZW4gd2UgZmluZCBhIHBhZ2UgdGhhdCBpcyBub3QKKwkgKiBpbW1lZGlhdGVs
-eSBsb2NrYWJsZSwgaXMgbm90IGRpcnR5IG9yIGlzIG1pc3NpbmcsIG9yIHdlIHJlYWNoIHRoZQor
-CSAqIGVuZCBvZiB0aGUgcmFuZ2UuCiAJICovCiAJaWYgKHN0YXJ0IDwgaV9zaXplKSB7CiAJCS8q
-IFRyaW0gdGhlIHdyaXRlIHRvIHRoZSBFT0Y7IHRoZSBleHRyYSBkYXRhIGlzIGlnbm9yZWQuICBB
-bHNvCkBAIC0yODAyLDE5ICsyODEyLDE4IEBAIHN0YXRpYyBzc2l6ZV90IGNpZnNfd3JpdGVfYmFj
-a19mcm9tX2xvY2tlZF9mb2xpbyhzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywKIAkJCW1h
-eF9wYWdlcyAtPSBmb2xpb19ucl9wYWdlcyhmb2xpbyk7CiAKIAkJCWlmIChtYXhfcGFnZXMgPiAw
-KQotCQkJCWNpZnNfZXh0ZW5kX3dyaXRlYmFjayhtYXBwaW5nLCAmY291bnQsIHN0YXJ0LAorCQkJ
-CWNpZnNfZXh0ZW5kX3dyaXRlYmFjayhtYXBwaW5nLCB4YXMsICZjb3VudCwgc3RhcnQsCiAJCQkJ
-CQkgICAgICBtYXhfcGFnZXMsIG1heF9sZW4sICZsZW4pOwogCQl9Ci0JCWxlbiA9IG1pbl90KGxv
-ZmZfdCwgbGVuLCBtYXhfbGVuKTsKIAl9Ci0KLQl3ZGF0YS0+Ynl0ZXMgPSBsZW47CisJbGVuID0g
-bWluX3QodW5zaWduZWQgbG9uZyBsb25nLCBsZW4sIGlfc2l6ZSAtIHN0YXJ0KTsKIAogCS8qIFdl
-IG5vdyBoYXZlIGEgY29udGlndW91cyBzZXQgb2YgZGlydHkgcGFnZXMsIGVhY2ggd2l0aCB3cml0
-ZWJhY2sKIAkgKiBzZXQ7IHRoZSBmaXJzdCBwYWdlIGlzIHN0aWxsIGxvY2tlZCBhdCB0aGlzIHBv
-aW50LCBidXQgYWxsIHRoZSByZXN0CiAJICogaGF2ZSBiZWVuIHVubG9ja2VkLgogCSAqLwogCWZv
-bGlvX3VubG9jayhmb2xpbyk7CisJd2RhdGEtPmJ5dGVzID0gbGVuOwogCiAJaWYgKHN0YXJ0IDwg
-aV9zaXplKSB7CiAJCWlvdl9pdGVyX3hhcnJheSgmd2RhdGEtPml0ZXIsIElURVJfU09VUkNFLCAm
-bWFwcGluZy0+aV9wYWdlcywKQEAgLTI4NjUsMTAyICsyODc0LDExOCBAQCBzdGF0aWMgc3NpemVf
-dCBjaWZzX3dyaXRlX2JhY2tfZnJvbV9sb2NrZWRfZm9saW8oc3RydWN0IGFkZHJlc3Nfc3BhY2Ug
-Km1hcHBpbmcsCiAvKgogICogd3JpdGUgYSByZWdpb24gb2YgcGFnZXMgYmFjayB0byB0aGUgc2Vy
-dmVyCiAgKi8KLXN0YXRpYyBpbnQgY2lmc193cml0ZXBhZ2VzX3JlZ2lvbihzdHJ1Y3QgYWRkcmVz
-c19zcGFjZSAqbWFwcGluZywKLQkJCQkgIHN0cnVjdCB3cml0ZWJhY2tfY29udHJvbCAqd2JjLAot
-CQkJCSAgbG9mZl90IHN0YXJ0LCBsb2ZmX3QgZW5kLCBsb2ZmX3QgKl9uZXh0KQorc3RhdGljIHNz
-aXplX3QgY2lmc193cml0ZXBhZ2VzX2JlZ2luKHN0cnVjdCBhZGRyZXNzX3NwYWNlICptYXBwaW5n
-LAorCQkJCSAgICAgc3RydWN0IHdyaXRlYmFja19jb250cm9sICp3YmMsCisJCQkJICAgICBzdHJ1
-Y3QgeGFfc3RhdGUgKnhhcywKKwkJCQkgICAgIHVuc2lnbmVkIGxvbmcgbG9uZyAqX3N0YXJ0LAor
-CQkJCSAgICAgdW5zaWduZWQgbG9uZyBsb25nIGVuZCkKIHsKLQlzdHJ1Y3QgZm9saW9fYmF0Y2gg
-ZmJhdGNoOworCXN0cnVjdCBmb2xpbyAqZm9saW87CisJdW5zaWduZWQgbG9uZyBsb25nIHN0YXJ0
-ID0gKl9zdGFydDsKKwlzc2l6ZV90IHJldDsKIAlpbnQgc2tpcHMgPSAwOwogCi0JZm9saW9fYmF0
-Y2hfaW5pdCgmZmJhdGNoKTsKLQlkbyB7Ci0JCWludCBucjsKLQkJcGdvZmZfdCBpbmRleCA9IHN0
-YXJ0IC8gUEFHRV9TSVpFOworc2VhcmNoX2FnYWluOgorCS8qIEZpbmQgdGhlIGZpcnN0IGRpcnR5
-IHBhZ2UuICovCisJcmN1X3JlYWRfbG9jaygpOwogCi0JCW5yID0gZmlsZW1hcF9nZXRfZm9saW9z
-X3RhZyhtYXBwaW5nLCAmaW5kZXgsIGVuZCAvIFBBR0VfU0laRSwKLQkJCQkJICAgIFBBR0VDQUNI
-RV9UQUdfRElSVFksICZmYmF0Y2gpOwotCQlpZiAoIW5yKQorCWZvciAoOzspIHsKKwkJZm9saW8g
-PSB4YXNfZmluZF9tYXJrZWQoeGFzLCBlbmQgLyBQQUdFX1NJWkUsIFBBR0VDQUNIRV9UQUdfRElS
-VFkpOworCQlpZiAoeGFzX3JldHJ5KHhhcywgZm9saW8pIHx8IHhhX2lzX3ZhbHVlKGZvbGlvKSkK
-KwkJCWNvbnRpbnVlOworCQlpZiAoIWZvbGlvKQogCQkJYnJlYWs7CiAKLQkJZm9yIChpbnQgaSA9
-IDA7IGkgPCBucjsgaSsrKSB7Ci0JCQlzc2l6ZV90IHJldDsKLQkJCXN0cnVjdCBmb2xpbyAqZm9s
-aW8gPSBmYmF0Y2guZm9saW9zW2ldOworCQlpZiAoIWZvbGlvX3RyeV9nZXRfcmN1KGZvbGlvKSkg
-eworCQkJeGFzX3Jlc2V0KHhhcyk7CisJCQljb250aW51ZTsKKwkJfQogCi1yZWRvX2ZvbGlvOgot
-CQkJc3RhcnQgPSBmb2xpb19wb3MoZm9saW8pOyAvKiBNYXkgcmVncmVzcyB3aXRoIFRIUHMgKi8K
-KwkJaWYgKHVubGlrZWx5KGZvbGlvICE9IHhhc19yZWxvYWQoeGFzKSkpIHsKKwkJCWZvbGlvX3B1
-dChmb2xpbyk7CisJCQl4YXNfcmVzZXQoeGFzKTsKKwkJCWNvbnRpbnVlOworCQl9CiAKLQkJCS8q
-IEF0IHRoaXMgcG9pbnQgd2UgaG9sZCBuZWl0aGVyIHRoZSBpX3BhZ2VzIGxvY2sgbm9yIHRoZQot
-CQkJICogcGFnZSBsb2NrOiB0aGUgcGFnZSBtYXkgYmUgdHJ1bmNhdGVkIG9yIGludmFsaWRhdGVk
-Ci0JCQkgKiAoY2hhbmdpbmcgcGFnZS0+bWFwcGluZyB0byBOVUxMKSwgb3IgZXZlbiBzd2l6emxl
-ZAotCQkJICogYmFjayBmcm9tIHN3YXBwZXJfc3BhY2UgdG8gdG1wZnMgZmlsZSBtYXBwaW5nCi0J
-CQkgKi8KLQkJCWlmICh3YmMtPnN5bmNfbW9kZSAhPSBXQl9TWU5DX05PTkUpIHsKLQkJCQlyZXQg
-PSBmb2xpb19sb2NrX2tpbGxhYmxlKGZvbGlvKTsKLQkJCQlpZiAocmV0IDwgMCkKLQkJCQkJZ290
-byB3cml0ZV9lcnJvcjsKLQkJCX0gZWxzZSB7Ci0JCQkJaWYgKCFmb2xpb190cnlsb2NrKGZvbGlv
-KSkKLQkJCQkJZ290byBza2lwX3dyaXRlOwotCQkJfQorCQl4YXNfcGF1c2UoeGFzKTsKKwkJYnJl
-YWs7CisJfQorCXJjdV9yZWFkX3VubG9jaygpOworCWlmICghZm9saW8pCisJCXJldHVybiAwOwog
-Ci0JCQlpZiAoZm9saW8tPm1hcHBpbmcgIT0gbWFwcGluZyB8fAotCQkJICAgICFmb2xpb190ZXN0
-X2RpcnR5KGZvbGlvKSkgewotCQkJCXN0YXJ0ICs9IGZvbGlvX3NpemUoZm9saW8pOwotCQkJCWZv
-bGlvX3VubG9jayhmb2xpbyk7Ci0JCQkJY29udGludWU7Ci0JCQl9CisJc3RhcnQgPSBmb2xpb19w
-b3MoZm9saW8pOyAvKiBNYXkgcmVncmVzcyB3aXRoIFRIUHMgKi8KIAotCQkJaWYgKGZvbGlvX3Rl
-c3Rfd3JpdGViYWNrKGZvbGlvKSB8fAotCQkJICAgIGZvbGlvX3Rlc3RfZnNjYWNoZShmb2xpbykp
-IHsKLQkJCQlmb2xpb191bmxvY2soZm9saW8pOwotCQkJCWlmICh3YmMtPnN5bmNfbW9kZSA9PSBX
-Ql9TWU5DX05PTkUpCi0JCQkJCWdvdG8gc2tpcF93cml0ZTsKKwkvKiBBdCB0aGlzIHBvaW50IHdl
-IGhvbGQgbmVpdGhlciB0aGUgaV9wYWdlcyBsb2NrIG5vciB0aGUgcGFnZSBsb2NrOgorCSAqIHRo
-ZSBwYWdlIG1heSBiZSB0cnVuY2F0ZWQgb3IgaW52YWxpZGF0ZWQgKGNoYW5naW5nIHBhZ2UtPm1h
-cHBpbmcgdG8KKwkgKiBOVUxMKSwgb3IgZXZlbiBzd2l6emxlZCBiYWNrIGZyb20gc3dhcHBlcl9z
-cGFjZSB0byB0bXBmcyBmaWxlCisJICogbWFwcGluZworCSAqLworbG9ja19hZ2FpbjoKKwlpZiAo
-d2JjLT5zeW5jX21vZGUgIT0gV0JfU1lOQ19OT05FKSB7CisJCXJldCA9IGZvbGlvX2xvY2tfa2ls
-bGFibGUoZm9saW8pOworCQlpZiAocmV0IDwgMCkKKwkJCXJldHVybiByZXQ7CisJfSBlbHNlIHsK
-KwkJaWYgKCFmb2xpb190cnlsb2NrKGZvbGlvKSkKKwkJCWdvdG8gc2VhcmNoX2FnYWluOworCX0K
-IAotCQkJCWZvbGlvX3dhaXRfd3JpdGViYWNrKGZvbGlvKTsKKwlpZiAoZm9saW8tPm1hcHBpbmcg
-IT0gbWFwcGluZyB8fAorCSAgICAhZm9saW9fdGVzdF9kaXJ0eShmb2xpbykpIHsKKwkJc3RhcnQg
-Kz0gZm9saW9fc2l6ZShmb2xpbyk7CisJCWZvbGlvX3VubG9jayhmb2xpbyk7CisJCWdvdG8gc2Vh
-cmNoX2FnYWluOworCX0KKworCWlmIChmb2xpb190ZXN0X3dyaXRlYmFjayhmb2xpbykgfHwKKwkg
-ICAgZm9saW9fdGVzdF9mc2NhY2hlKGZvbGlvKSkgeworCQlmb2xpb191bmxvY2soZm9saW8pOwor
-CQlpZiAod2JjLT5zeW5jX21vZGUgIT0gV0JfU1lOQ19OT05FKSB7CisJCQlmb2xpb193YWl0X3dy
-aXRlYmFjayhmb2xpbyk7CiAjaWZkZWYgQ09ORklHX0NJRlNfRlNDQUNIRQotCQkJCWZvbGlvX3dh
-aXRfZnNjYWNoZShmb2xpbyk7CisJCQlmb2xpb193YWl0X2ZzY2FjaGUoZm9saW8pOwogI2VuZGlm
-Ci0JCQkJZ290byByZWRvX2ZvbGlvOwotCQkJfQotCi0JCQlpZiAoIWZvbGlvX2NsZWFyX2RpcnR5
-X2Zvcl9pbyhmb2xpbykpCi0JCQkJLyogV2UgaG9sZCB0aGUgcGFnZSBsb2NrIC0gaXQgc2hvdWxk
-J3ZlIGJlZW4gZGlydHkuICovCi0JCQkJV0FSTl9PTigxKTsKLQotCQkJcmV0ID0gY2lmc193cml0
-ZV9iYWNrX2Zyb21fbG9ja2VkX2ZvbGlvKG1hcHBpbmcsIHdiYywgZm9saW8sIHN0YXJ0LCBlbmQp
-OwotCQkJaWYgKHJldCA8IDApCi0JCQkJZ290byB3cml0ZV9lcnJvcjsKLQotCQkJc3RhcnQgKz0g
-cmV0OwotCQkJY29udGludWU7Ci0KLXdyaXRlX2Vycm9yOgotCQkJZm9saW9fYmF0Y2hfcmVsZWFz
-ZSgmZmJhdGNoKTsKLQkJCSpfbmV4dCA9IHN0YXJ0OwotCQkJcmV0dXJuIHJldDsKKwkJCWdvdG8g
-bG9ja19hZ2FpbjsKKwkJfQogCi1za2lwX3dyaXRlOgotCQkJLyoKLQkJCSAqIFRvbyBtYW55IHNr
-aXBwZWQgd3JpdGVzLCBvciBuZWVkIHRvIHJlc2NoZWR1bGU/Ci0JCQkgKiBUcmVhdCBpdCBhcyBh
-IHdyaXRlIGVycm9yIHdpdGhvdXQgYW4gZXJyb3IgY29kZS4KLQkJCSAqLworCQlzdGFydCArPSBm
-b2xpb19zaXplKGZvbGlvKTsKKwkJaWYgKHdiYy0+c3luY19tb2RlID09IFdCX1NZTkNfTk9ORSkg
-ewogCQkJaWYgKHNraXBzID49IDUgfHwgbmVlZF9yZXNjaGVkKCkpIHsKIAkJCQlyZXQgPSAwOwot
-CQkJCWdvdG8gd3JpdGVfZXJyb3I7CisJCQkJZ290byBvdXQ7CiAJCQl9Ci0KLQkJCS8qIE90aGVy
-d2lzZSwganVzdCBza2lwIHRoYXQgZm9saW8gYW5kIGdvIG9uIHRvIHRoZSBuZXh0ICovCiAJCQlz
-a2lwcysrOwotCQkJc3RhcnQgKz0gZm9saW9fc2l6ZShmb2xpbyk7Ci0JCQljb250aW51ZTsKIAkJ
-fQorCQlnb3RvIHNlYXJjaF9hZ2FpbjsKKwl9CiAKLQkJZm9saW9fYmF0Y2hfcmVsZWFzZSgmZmJh
-dGNoKTsJCQotCQljb25kX3Jlc2NoZWQoKTsKLQl9IHdoaWxlICh3YmMtPm5yX3RvX3dyaXRlID4g
-MCk7CisJcmV0ID0gY2lmc193cml0ZV9iYWNrX2Zyb21fbG9ja2VkX2ZvbGlvKG1hcHBpbmcsIHdi
-YywgeGFzLCBmb2xpbywgc3RhcnQsIGVuZCk7CitvdXQ6CisJaWYgKHJldCA+IDApCisJCSpfc3Rh
-cnQgPSBzdGFydCArIHJldDsKKwlyZXR1cm4gcmV0OworfQogCi0JKl9uZXh0ID0gc3RhcnQ7Ci0J
-cmV0dXJuIDA7CisvKgorICogV3JpdGUgYSByZWdpb24gb2YgcGFnZXMgYmFjayB0byB0aGUgc2Vy
-dmVyCisgKi8KK3N0YXRpYyBpbnQgY2lmc193cml0ZXBhZ2VzX3JlZ2lvbihzdHJ1Y3QgYWRkcmVz
-c19zcGFjZSAqbWFwcGluZywKKwkJCQkgIHN0cnVjdCB3cml0ZWJhY2tfY29udHJvbCAqd2JjLAor
-CQkJCSAgdW5zaWduZWQgbG9uZyBsb25nICpfc3RhcnQsCisJCQkJICB1bnNpZ25lZCBsb25nIGxv
-bmcgZW5kKQoreworCXNzaXplX3QgcmV0OworCisJWEFfU1RBVEUoeGFzLCAmbWFwcGluZy0+aV9w
-YWdlcywgKl9zdGFydCAvIFBBR0VfU0laRSk7CisKKwlkbyB7CisJCXJldCA9IGNpZnNfd3JpdGVw
-YWdlc19iZWdpbihtYXBwaW5nLCB3YmMsICZ4YXMsIF9zdGFydCwgZW5kKTsKKwkJaWYgKHJldCA+
-IDAgJiYgd2JjLT5ucl90b193cml0ZSA+IDApCisJCQljb25kX3Jlc2NoZWQoKTsKKwl9IHdoaWxl
-IChyZXQgPiAwICYmIHdiYy0+bnJfdG9fd3JpdGUgPiAwKTsKKworCXJldHVybiByZXQgPiAwID8g
-MCA6IHJldDsKIH0KIAogLyoKQEAgLTI5NjksNyArMjk5NCw3IEBAIHN0YXRpYyBpbnQgY2lmc193
-cml0ZXBhZ2VzX3JlZ2lvbihzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywKIHN0YXRpYyBp
-bnQgY2lmc193cml0ZXBhZ2VzKHN0cnVjdCBhZGRyZXNzX3NwYWNlICptYXBwaW5nLAogCQkJICAg
-c3RydWN0IHdyaXRlYmFja19jb250cm9sICp3YmMpCiB7Ci0JbG9mZl90IHN0YXJ0LCBuZXh0Owor
-CWxvZmZfdCBzdGFydCwgZW5kOwogCWludCByZXQ7CiAKIAkvKiBXZSBoYXZlIHRvIGJlIGNhcmVm
-dWwgYXMgd2UgY2FuIGVuZCB1cCByYWNpbmcgd2l0aCBzZXRhdHRyKCkKQEAgLTI5NzcsMjggKzMw
-MDIsMzQgQEAgc3RhdGljIGludCBjaWZzX3dyaXRlcGFnZXMoc3RydWN0IGFkZHJlc3Nfc3BhY2Ug
-Km1hcHBpbmcsCiAJICogdG8gcHJldmVudCBpdC4KIAkgKi8KIAotCWlmICh3YmMtPnJhbmdlX2N5
-Y2xpYykgeworCWlmICh3YmMtPnJhbmdlX2N5Y2xpYyAmJiBtYXBwaW5nLT53cml0ZWJhY2tfaW5k
-ZXgpIHsKIAkJc3RhcnQgPSBtYXBwaW5nLT53cml0ZWJhY2tfaW5kZXggKiBQQUdFX1NJWkU7Ci0J
-CXJldCA9IGNpZnNfd3JpdGVwYWdlc19yZWdpb24obWFwcGluZywgd2JjLCBzdGFydCwgTExPTkdf
-TUFYLCAmbmV4dCk7Ci0JCWlmIChyZXQgPT0gMCkgewotCQkJbWFwcGluZy0+d3JpdGViYWNrX2lu
-ZGV4ID0gbmV4dCAvIFBBR0VfU0laRTsKLQkJCWlmIChzdGFydCA+IDAgJiYgd2JjLT5ucl90b193
-cml0ZSA+IDApIHsKLQkJCQlyZXQgPSBjaWZzX3dyaXRlcGFnZXNfcmVnaW9uKG1hcHBpbmcsIHdi
-YywgMCwKLQkJCQkJCQkgICAgIHN0YXJ0LCAmbmV4dCk7Ci0JCQkJaWYgKHJldCA9PSAwKQotCQkJ
-CQltYXBwaW5nLT53cml0ZWJhY2tfaW5kZXggPQotCQkJCQkJbmV4dCAvIFBBR0VfU0laRTsKLQkJ
-CX0KKwkJcmV0ID0gY2lmc193cml0ZXBhZ2VzX3JlZ2lvbihtYXBwaW5nLCB3YmMsICZzdGFydCwg
-TExPTkdfTUFYKTsKKwkJaWYgKHJldCA8IDApCisJCQlnb3RvIG91dDsKKworCQlpZiAod2JjLT5u
-cl90b193cml0ZSA8PSAwKSB7CisJCQltYXBwaW5nLT53cml0ZWJhY2tfaW5kZXggPSBzdGFydCAv
-IFBBR0VfU0laRTsKKwkJCWdvdG8gb3V0OwogCQl9CisKKwkJc3RhcnQgPSAwOworCQllbmQgPSBt
-YXBwaW5nLT53cml0ZWJhY2tfaW5kZXggKiBQQUdFX1NJWkU7CisJCW1hcHBpbmctPndyaXRlYmFj
-a19pbmRleCA9IDA7CisJCXJldCA9IGNpZnNfd3JpdGVwYWdlc19yZWdpb24obWFwcGluZywgd2Jj
-LCAmc3RhcnQsIGVuZCk7CisJCWlmIChyZXQgPT0gMCkKKwkJCW1hcHBpbmctPndyaXRlYmFja19p
-bmRleCA9IHN0YXJ0IC8gUEFHRV9TSVpFOwogCX0gZWxzZSBpZiAod2JjLT5yYW5nZV9zdGFydCA9
-PSAwICYmIHdiYy0+cmFuZ2VfZW5kID09IExMT05HX01BWCkgewotCQlyZXQgPSBjaWZzX3dyaXRl
-cGFnZXNfcmVnaW9uKG1hcHBpbmcsIHdiYywgMCwgTExPTkdfTUFYLCAmbmV4dCk7CisJCXN0YXJ0
-ID0gMDsKKwkJcmV0ID0gY2lmc193cml0ZXBhZ2VzX3JlZ2lvbihtYXBwaW5nLCB3YmMsICZzdGFy
-dCwgTExPTkdfTUFYKTsKIAkJaWYgKHdiYy0+bnJfdG9fd3JpdGUgPiAwICYmIHJldCA9PSAwKQot
-CQkJbWFwcGluZy0+d3JpdGViYWNrX2luZGV4ID0gbmV4dCAvIFBBR0VfU0laRTsKKwkJCW1hcHBp
-bmctPndyaXRlYmFja19pbmRleCA9IHN0YXJ0IC8gUEFHRV9TSVpFOwogCX0gZWxzZSB7Ci0JCXJl
-dCA9IGNpZnNfd3JpdGVwYWdlc19yZWdpb24obWFwcGluZywgd2JjLAotCQkJCQkgICAgIHdiYy0+
-cmFuZ2Vfc3RhcnQsIHdiYy0+cmFuZ2VfZW5kLCAmbmV4dCk7CisJCXN0YXJ0ID0gd2JjLT5yYW5n
-ZV9zdGFydDsKKwkJcmV0ID0gY2lmc193cml0ZXBhZ2VzX3JlZ2lvbihtYXBwaW5nLCB3YmMsICZz
-dGFydCwgd2JjLT5yYW5nZV9lbmQpOwogCX0KIAorb3V0OgogCXJldHVybiByZXQ7CiB9CiAKLS0g
-CjIuNDAuMQoK
---0000000000009fb9790613002560--
+That said, there are other places that use invalidate_inode_pages2_range()
+and most of those don't implement launder_page, so add a flag to only do
+this in those filesystems that implemented it: 9p, afs, cifs, fuse, nfs an=
+d
+orangefs.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Andrew Morton <akpm@linux-foundation.org>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-mm@kvack.org
+cc: linux-fsdevel@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: ceph-devel@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: devel@lists.orangefs.org
+---
+ Documentation/filesystems/locking.rst |    8 ---
+ Documentation/filesystems/vfs.rst     |    6 --
+ fs/9p/vfs_addr.c                      |    1 =
+
+ fs/9p/vfs_inode.c                     |    1 =
+
+ fs/afs/file.c                         |    1 =
+
+ fs/afs/inode.c                        |    1 =
+
+ fs/fuse/dir.c                         |    2 =
+
+ fs/fuse/file.c                        |   17 -------
+ fs/netfs/buffered_write.c             |   76 ----------------------------=
+------
+ fs/nfs/file.c                         |   23 ----------
+ fs/nfs/inode.c                        |    1 =
+
+ fs/nfs/nfstrace.h                     |    1 =
+
+ fs/orangefs/inode.c                   |    2 =
+
+ fs/smb/client/file.c                  |   23 ----------
+ fs/smb/client/inode.c                 |    1 =
+
+ include/linux/fs.h                    |    1 =
+
+ include/linux/netfs.h                 |    1 =
+
+ include/linux/pagemap.h               |    6 ++
+ include/linux/writeback.h             |    1 =
+
+ mm/truncate.c                         |   35 +++++++++------
+ 20 files changed, 36 insertions(+), 172 deletions(-)
+
+diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesys=
+tems/locking.rst
+index d5bf4b6b7509..139554d1ab51 100644
+--- a/Documentation/filesystems/locking.rst
++++ b/Documentation/filesystems/locking.rst
+@@ -262,7 +262,6 @@ prototypes::
+ 	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+ 	int (*migrate_folio)(struct address_space *, struct folio *dst,
+ 			struct folio *src, enum migrate_mode);
+-	int (*launder_folio)(struct folio *);
+ 	bool (*is_partially_uptodate)(struct folio *, size_t from, size_t count)=
+;
+ 	int (*error_remove_folio)(struct address_space *, struct folio *);
+ 	int (*swap_activate)(struct swap_info_struct *sis, struct file *f, secto=
+r_t *span)
+@@ -288,7 +287,6 @@ release_folio:		yes
+ free_folio:		yes
+ direct_IO:
+ migrate_folio:		yes (both)
+-launder_folio:		yes
+ is_partially_uptodate:	yes
+ error_remove_folio:	yes
+ swap_activate:		no
+@@ -394,12 +392,6 @@ try_to_free_buffers().
+ ->free_folio() is called when the kernel has dropped the folio
+ from the page cache.
+ =
+
+-->launder_folio() may be called prior to releasing a folio if
+-it is still found to be dirty. It returns zero if the folio was successfu=
+lly
+-cleaned, or an error value if not. Note that in order to prevent the foli=
+o
+-getting mapped back in and redirtied, it needs to be kept locked
+-across the entire operation.
+-
+ ->swap_activate() will be called to prepare the given file for swap.  It
+ should perform any validation and preparation necessary to ensure that
+ writes can be performed with minimal memory allocation.  It should call
+diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems=
+/vfs.rst
+index eebcc0f9e2bc..b2af9ee6515a 100644
+--- a/Documentation/filesystems/vfs.rst
++++ b/Documentation/filesystems/vfs.rst
+@@ -818,7 +818,6 @@ cache in your filesystem.  The following members are d=
+efined:
+ 		ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+ 		int (*migrate_folio)(struct mapping *, struct folio *dst,
+ 				struct folio *src, enum migrate_mode);
+-		int (*launder_folio) (struct folio *);
+ =
+
+ 		bool (*is_partially_uptodate) (struct folio *, size_t from,
+ 					       size_t count);
+@@ -1012,11 +1011,6 @@ cache in your filesystem.  The following members ar=
+e defined:
+ 	folio to this function.  migrate_folio should transfer any private
+ 	data across and update any references that it has to the folio.
+ =
+
+-``launder_folio``
+-	Called before freeing a folio - it writes back the dirty folio.
+-	To prevent redirtying the folio, it is kept locked during the
+-	whole operation.
+-
+ ``is_partially_uptodate``
+ 	Called by the VM when reading a file through the pagecache when
+ 	the underlying blocksize is smaller than the size of the folio.
+diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+index 047855033d32..967c81b7aa73 100644
+--- a/fs/9p/vfs_addr.c
++++ b/fs/9p/vfs_addr.c
+@@ -141,7 +141,6 @@ const struct address_space_operations v9fs_addr_operat=
+ions =3D {
+ 	.dirty_folio		=3D netfs_dirty_folio,
+ 	.release_folio		=3D netfs_release_folio,
+ 	.invalidate_folio	=3D netfs_invalidate_folio,
+-	.launder_folio		=3D netfs_launder_folio,
+ 	.direct_IO		=3D noop_direct_IO,
+ 	.writepages		=3D netfs_writepages,
+ };
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index 32572982f72e..e085e520cb12 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -263,6 +263,7 @@ int v9fs_init_inode(struct v9fs_session_info *v9ses,
+ 	simple_inode_init_ts(inode);
+ 	inode->i_mapping->a_ops =3D &v9fs_addr_operations;
+ 	inode->i_private =3D NULL;
++	mapping_set_launder_folios(inode->i_mapping);
+ =
+
+ 	switch (mode & S_IFMT) {
+ 	case S_IFIFO:
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index ef2cc8f565d2..dfd8f60f5e1f 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -54,7 +54,6 @@ const struct address_space_operations afs_file_aops =3D =
+{
+ 	.read_folio	=3D netfs_read_folio,
+ 	.readahead	=3D netfs_readahead,
+ 	.dirty_folio	=3D netfs_dirty_folio,
+-	.launder_folio	=3D netfs_launder_folio,
+ 	.release_folio	=3D netfs_release_folio,
+ 	.invalidate_folio =3D netfs_invalidate_folio,
+ 	.migrate_folio	=3D filemap_migrate_folio,
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index 94fc049aff58..4041d9a4dae8 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -104,6 +104,7 @@ static int afs_inode_init_from_status(struct afs_opera=
+tion *op,
+ 		inode->i_fop	=3D &afs_file_operations;
+ 		inode->i_mapping->a_ops	=3D &afs_file_aops;
+ 		mapping_set_large_folios(inode->i_mapping);
++		mapping_set_launder_folios(inode->i_mapping);
+ 		break;
+ 	case AFS_FTYPE_DIR:
+ 		inode->i_mode	=3D S_IFDIR |  (status->mode & S_IALLUGO);
+diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+index d19cbf34c634..d87ee76bc578 100644
+--- a/fs/fuse/dir.c
++++ b/fs/fuse/dir.c
+@@ -1978,7 +1978,7 @@ int fuse_do_setattr(struct dentry *dentry, struct ia=
+ttr *attr,
+ =
+
+ 	/*
+ 	 * Only call invalidate_inode_pages2() after removing
+-	 * FUSE_NOWRITE, otherwise fuse_launder_folio() would deadlock.
++	 * FUSE_NOWRITE, otherwise writeback would deadlock.
+ 	 */
+ 	if ((is_truncate || !is_wb) &&
+ 	    S_ISREG(inode->i_mode) && oldsize !=3D outarg.attr.size) {
+diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+index 148a71b8b4d0..4933fe0b3269 100644
+--- a/fs/fuse/file.c
++++ b/fs/fuse/file.c
+@@ -2393,21 +2393,6 @@ static int fuse_write_end(struct file *file, struct=
+ address_space *mapping,
+ 	return copied;
+ }
+ =
+
+-static int fuse_launder_folio(struct folio *folio)
+-{
+-	int err =3D 0;
+-	if (folio_clear_dirty_for_io(folio)) {
+-		struct inode *inode =3D folio->mapping->host;
+-
+-		/* Serialize with pending writeback for the same page */
+-		fuse_wait_on_page_writeback(inode, folio->index);
+-		err =3D fuse_writepage_locked(&folio->page);
+-		if (!err)
+-			fuse_wait_on_page_writeback(inode, folio->index);
+-	}
+-	return err;
+-}
+-
+ /*
+  * Write back dirty data/metadata now (there may not be any suitable
+  * open files later for data)
+@@ -3227,7 +3212,6 @@ static const struct address_space_operations fuse_fi=
+le_aops  =3D {
+ 	.readahead	=3D fuse_readahead,
+ 	.writepage	=3D fuse_writepage,
+ 	.writepages	=3D fuse_writepages,
+-	.launder_folio	=3D fuse_launder_folio,
+ 	.dirty_folio	=3D filemap_dirty_folio,
+ 	.bmap		=3D fuse_bmap,
+ 	.direct_IO	=3D fuse_direct_IO,
+@@ -3241,6 +3225,7 @@ void fuse_init_file_inode(struct inode *inode, unsig=
+ned int flags)
+ =
+
+ 	inode->i_fop =3D &fuse_file_operations;
+ 	inode->i_data.a_ops =3D &fuse_file_aops;
++	mapping_set_launder_folios(inode->i_mapping);
+ =
+
+ 	INIT_LIST_HEAD(&fi->write_files);
+ 	INIT_LIST_HEAD(&fi->queued_writes);
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 9a0d32e4b422..56aeb7e70bc8 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -908,7 +908,7 @@ static ssize_t netfs_write_back_from_locked_folio(stru=
+ct address_space *mapping,
+ 	_enter(",%lx,%llx-%llx,%u", folio->index, start, end, caching);
+ =
+
+ 	wreq =3D netfs_alloc_request(mapping, NULL, start, folio_size(folio),
+-				   NETFS_WRITEBACK);
++				   wbc->for_launder ? NETFS_LAUNDER_WRITE : NETFS_WRITEBACK);
+ 	if (IS_ERR(wreq)) {
+ 		folio_unlock(folio);
+ 		return PTR_ERR(wreq);
+@@ -1181,77 +1181,3 @@ int netfs_writepages(struct address_space *mapping,
+ 	return ret;
+ }
+ EXPORT_SYMBOL(netfs_writepages);
+-
+-/*
+- * Deal with the disposition of a laundered folio.
+- */
+-static void netfs_cleanup_launder_folio(struct netfs_io_request *wreq)
+-{
+-	if (wreq->error) {
+-		pr_notice("R=3D%08x Laundering error %d\n", wreq->debug_id, wreq->error=
+);
+-		mapping_set_error(wreq->mapping, wreq->error);
+-	}
+-}
+-
+-/**
+- * netfs_launder_folio - Clean up a dirty folio that's being invalidated
+- * @folio: The folio to clean
+- *
+- * This is called to write back a folio that's being invalidated when an =
+inode
+- * is getting torn down.  Ideally, writepages would be used instead.
+- */
+-int netfs_launder_folio(struct folio *folio)
+-{
+-	struct netfs_io_request *wreq;
+-	struct address_space *mapping =3D folio->mapping;
+-	struct netfs_folio *finfo =3D netfs_folio_info(folio);
+-	struct netfs_group *group =3D netfs_folio_group(folio);
+-	struct bio_vec bvec;
+-	unsigned long long i_size =3D i_size_read(mapping->host);
+-	unsigned long long start =3D folio_pos(folio);
+-	size_t offset =3D 0, len;
+-	int ret =3D 0;
+-
+-	if (finfo) {
+-		offset =3D finfo->dirty_offset;
+-		start +=3D offset;
+-		len =3D finfo->dirty_len;
+-	} else {
+-		len =3D folio_size(folio);
+-	}
+-	len =3D min_t(unsigned long long, len, i_size - start);
+-
+-	wreq =3D netfs_alloc_request(mapping, NULL, start, len, NETFS_LAUNDER_WR=
+ITE);
+-	if (IS_ERR(wreq)) {
+-		ret =3D PTR_ERR(wreq);
+-		goto out;
+-	}
+-
+-	if (!folio_clear_dirty_for_io(folio))
+-		goto out_put;
+-
+-	trace_netfs_folio(folio, netfs_folio_trace_launder);
+-
+-	_debug("launder %llx-%llx", start, start + len - 1);
+-
+-	/* Speculatively write to the cache.  We have to fix this up later if
+-	 * the store fails.
+-	 */
+-	wreq->cleanup =3D netfs_cleanup_launder_folio;
+-
+-	bvec_set_folio(&bvec, folio, len, offset);
+-	iov_iter_bvec(&wreq->iter, ITER_SOURCE, &bvec, 1, len);
+-	__set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags);
+-	ret =3D netfs_begin_write(wreq, true, netfs_write_trace_launder);
+-
+-out_put:
+-	folio_detach_private(folio);
+-	netfs_put_group(group);
+-	kfree(finfo);
+-	netfs_put_request(wreq, false, netfs_rreq_trace_put_return);
+-out:
+-	folio_wait_fscache(folio);
+-	_leave(" =3D %d", ret);
+-	return ret;
+-}
+-EXPORT_SYMBOL(netfs_launder_folio);
+diff --git a/fs/nfs/file.c b/fs/nfs/file.c
+index 8577ccf621f5..6efe0af3ba80 100644
+--- a/fs/nfs/file.c
++++ b/fs/nfs/file.c
+@@ -484,28 +484,6 @@ static void nfs_check_dirty_writeback(struct folio *f=
+olio,
+ 		*dirty =3D true;
+ }
+ =
+
+-/*
+- * Attempt to clear the private state associated with a page when an erro=
+r
+- * occurs that requires the cached contents of an inode to be written bac=
+k or
+- * destroyed
+- * - Called if either PG_private or fscache is set on the page
+- * - Caller holds page lock
+- * - Return 0 if successful, -error otherwise
+- */
+-static int nfs_launder_folio(struct folio *folio)
+-{
+-	struct inode *inode =3D folio->mapping->host;
+-	int ret;
+-
+-	dfprintk(PAGECACHE, "NFS: launder_folio(%ld, %llu)\n",
+-		inode->i_ino, folio_pos(folio));
+-
+-	folio_wait_fscache(folio);
+-	ret =3D nfs_wb_folio(inode, folio);
+-	trace_nfs_launder_folio_done(inode, folio, ret);
+-	return ret;
+-}
+-
+ static int nfs_swap_activate(struct swap_info_struct *sis, struct file *f=
+ile,
+ 						sector_t *span)
+ {
+@@ -564,7 +542,6 @@ const struct address_space_operations nfs_file_aops =3D=
+ {
+ 	.invalidate_folio =3D nfs_invalidate_folio,
+ 	.release_folio =3D nfs_release_folio,
+ 	.migrate_folio =3D nfs_migrate_folio,
+-	.launder_folio =3D nfs_launder_folio,
+ 	.is_dirty_writeback =3D nfs_check_dirty_writeback,
+ 	.error_remove_folio =3D generic_error_remove_folio,
+ 	.swap_activate =3D nfs_swap_activate,
+diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
+index ebb8d60e1152..f2f8cf00a442 100644
+--- a/fs/nfs/inode.c
++++ b/fs/nfs/inode.c
+@@ -491,6 +491,7 @@ nfs_fhget(struct super_block *sb, struct nfs_fh *fh, s=
+truct nfs_fattr *fattr)
+ 			inode->i_fop =3D NFS_SB(sb)->nfs_client->rpc_ops->file_ops;
+ 			inode->i_data.a_ops =3D &nfs_file_aops;
+ 			nfs_inode_init_regular(nfsi);
++			mapping_set_launder_folios(inode->i_mapping);
+ 		} else if (S_ISDIR(inode->i_mode)) {
+ 			inode->i_op =3D NFS_SB(sb)->nfs_client->rpc_ops->dir_inode_ops;
+ 			inode->i_fop =3D &nfs_dir_operations;
+diff --git a/fs/nfs/nfstrace.h b/fs/nfs/nfstrace.h
+index afedb449b54f..f0e8c0fb9447 100644
+--- a/fs/nfs/nfstrace.h
++++ b/fs/nfs/nfstrace.h
+@@ -1039,7 +1039,6 @@ DEFINE_NFS_FOLIO_EVENT(nfs_writeback_folio);
+ DEFINE_NFS_FOLIO_EVENT_DONE(nfs_writeback_folio_done);
+ =
+
+ DEFINE_NFS_FOLIO_EVENT(nfs_invalidate_folio);
+-DEFINE_NFS_FOLIO_EVENT_DONE(nfs_launder_folio_done);
+ =
+
+ TRACE_EVENT(nfs_aop_readahead,
+ 		TP_PROTO(
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index 085912268442..a9ea40261832 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -626,7 +626,6 @@ static const struct address_space_operations orangefs_=
+address_operations =3D {
+ 	.invalidate_folio =3D orangefs_invalidate_folio,
+ 	.release_folio =3D orangefs_release_folio,
+ 	.free_folio =3D orangefs_free_folio,
+-	.launder_folio =3D orangefs_launder_folio,
+ 	.direct_IO =3D orangefs_direct_IO,
+ };
+ =
+
+@@ -980,6 +979,7 @@ static const struct inode_operations orangefs_file_ino=
+de_operations =3D {
+ static int orangefs_init_iops(struct inode *inode)
+ {
+ 	inode->i_mapping->a_ops =3D &orangefs_address_operations;
++	mapping_set_launder_folios(inode->i_mapping);
+ =
+
+ 	switch (inode->i_mode & S_IFMT) {
+ 	case S_IFREG:
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index f391c9b803d8..4fd871ba00f9 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -4858,27 +4858,6 @@ static void cifs_invalidate_folio(struct folio *fol=
+io, size_t offset,
+ 	folio_wait_fscache(folio);
+ }
+ =
+
+-static int cifs_launder_folio(struct folio *folio)
+-{
+-	int rc =3D 0;
+-	loff_t range_start =3D folio_pos(folio);
+-	loff_t range_end =3D range_start + folio_size(folio);
+-	struct writeback_control wbc =3D {
+-		.sync_mode =3D WB_SYNC_ALL,
+-		.nr_to_write =3D 0,
+-		.range_start =3D range_start,
+-		.range_end =3D range_end,
+-	};
+-
+-	cifs_dbg(FYI, "Launder page: %lu\n", folio->index);
+-
+-	if (folio_clear_dirty_for_io(folio))
+-		rc =3D cifs_writepage_locked(&folio->page, &wbc);
+-
+-	folio_wait_fscache(folio);
+-	return rc;
+-}
+-
+ void cifs_oplock_break(struct work_struct *work)
+ {
+ 	struct cifsFileInfo *cfile =3D container_of(work, struct cifsFileInfo,
+@@ -5057,7 +5036,6 @@ const struct address_space_operations cifs_addr_ops =
+=3D {
+ 	.release_folio =3D cifs_release_folio,
+ 	.direct_IO =3D cifs_direct_io,
+ 	.invalidate_folio =3D cifs_invalidate_folio,
+-	.launder_folio =3D cifs_launder_folio,
+ 	.migrate_folio =3D filemap_migrate_folio,
+ 	/*
+ 	 * TODO: investigate and if useful we could add an is_dirty_writeback
+@@ -5080,6 +5058,5 @@ const struct address_space_operations cifs_addr_ops_=
+smallbuf =3D {
+ 	.dirty_folio =3D netfs_dirty_folio,
+ 	.release_folio =3D cifs_release_folio,
+ 	.invalidate_folio =3D cifs_invalidate_folio,
+-	.launder_folio =3D cifs_launder_folio,
+ 	.migrate_folio =3D filemap_migrate_folio,
+ };
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index d02f8ba29cb5..24c1c2610e04 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -56,6 +56,7 @@ static void cifs_set_ops(struct inode *inode)
+ 			inode->i_data.a_ops =3D &cifs_addr_ops_smallbuf;
+ 		else
+ 			inode->i_data.a_ops =3D &cifs_addr_ops;
++		mapping_set_launder_folios(inode->i_mapping);
+ 		break;
+ 	case S_IFDIR:
+ 		if (IS_AUTOMOUNT(inode)) {
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 1fbc72c5f112..ded54555ab30 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -432,7 +432,6 @@ struct address_space_operations {
+ 	 */
+ 	int (*migrate_folio)(struct address_space *, struct folio *dst,
+ 			struct folio *src, enum migrate_mode);
+-	int (*launder_folio)(struct folio *);
+ 	bool (*is_partially_uptodate) (struct folio *, size_t from,
+ 			size_t count);
+ 	void (*is_dirty_writeback) (struct folio *, bool *dirty, bool *wb);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 100cbb261269..e566d31afb04 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -410,7 +410,6 @@ int netfs_unpin_writeback(struct inode *inode, struct =
+writeback_control *wbc);
+ void netfs_clear_inode_writeback(struct inode *inode, const void *aux);
+ void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t le=
+ngth);
+ bool netfs_release_folio(struct folio *folio, gfp_t gfp);
+-int netfs_launder_folio(struct folio *folio);
+ =
+
+ /* VMA operations API. */
+ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *n=
+etfs_group);
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 2df35e65557d..27ea8b9139a3 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -207,6 +207,7 @@ enum mapping_flags {
+ 	AS_STABLE_WRITES,	/* must wait for writeback before modifying
+ 				   folio contents */
+ 	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
++	AS_LAUNDER_FOLIOS,	/* Use laundering in invalidate_inode_pages2*() */
+ };
+ =
+
+ /**
+@@ -323,6 +324,11 @@ static inline bool mapping_unmovable(struct address_s=
+pace *mapping)
+ 	return test_bit(AS_UNMOVABLE, &mapping->flags);
+ }
+ =
+
++static inline void mapping_set_launder_folios(struct address_space *mappi=
+ng)
++{
++	set_bit(AS_LAUNDER_FOLIOS, &mapping->flags);
++}
++
+ static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
+ {
+ 	return mapping->gfp_mask;
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index 9845cb62e40b..7a1b79b344fa 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -62,6 +62,7 @@ struct writeback_control {
+ 	unsigned for_reclaim:1;		/* Invoked from the page allocator */
+ 	unsigned range_cyclic:1;	/* range_start is cyclic */
+ 	unsigned for_sync:1;		/* sync(2) WB_SYNC_ALL writeback */
++	unsigned for_launder:1;		/* Called from invalidate_inode_pages2_range() =
+*/
+ 	unsigned unpinned_netfs_wb:1;	/* Cleared I_PINNING_NETFS_WB */
+ =
+
+ 	/*
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 725b150e47ac..cb92759c4d8d 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -586,15 +586,6 @@ static int invalidate_complete_folio2(struct address_=
+space *mapping,
+ 	return 0;
+ }
+ =
+
+-static int folio_launder(struct address_space *mapping, struct folio *fol=
+io)
+-{
+-	if (!folio_test_dirty(folio))
+-		return 0;
+-	if (folio->mapping !=3D mapping || mapping->a_ops->launder_folio =3D=3D =
+NULL)
+-		return 0;
+-	return mapping->a_ops->launder_folio(folio);
+-}
+-
+ /**
+  * invalidate_inode_pages2_range - remove range of pages from an address_=
+space
+  * @mapping: the address_space
+@@ -657,13 +648,29 @@ int invalidate_inode_pages2_range(struct address_spa=
+ce *mapping,
+ 				unmap_mapping_folio(folio);
+ 			BUG_ON(folio_mapped(folio));
+ =
+
+-			ret2 =3D folio_launder(mapping, folio);
+-			if (ret2 =3D=3D 0) {
+-				if (!invalidate_complete_folio2(mapping, folio))
++			if (folio_test_dirty(folio) &&
++			    test_bit(AS_LAUNDER_FOLIOS, &mapping->flags)) {
++				struct writeback_control wbc =3D {
++					.sync_mode   =3D WB_SYNC_ALL,
++					.nr_to_write =3D LLONG_MAX,
++					.range_start =3D folio_pos(folio),
++					.range_end   =3D (end + 1ULL) * PAGE_SIZE - 1,
++					.for_launder =3D true,
++				};
++
++				folio_unlock(folio);
++				ret2 =3D filemap_fdatawrite_wbc(mapping, &wbc);
++				folio_lock(folio);
++				if (ret2 < 0)
++					ret =3D ret2;
++				else if (!invalidate_complete_folio2(mapping, folio) &&
++					 ret =3D=3D 0)
++					ret2 =3D -EBUSY;
++			} else {
++				if (!invalidate_complete_folio2(mapping, folio) &&
++				    ret =3D=3D 0)
+ 					ret2 =3D -EBUSY;
+ 			}
+-			if (ret2 < 0)
+-				ret =3D ret2;
+ 			folio_unlock(folio);
+ 		}
+ 		folio_batch_remove_exceptionals(&fbatch);
+
