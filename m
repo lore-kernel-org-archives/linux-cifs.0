@@ -1,142 +1,163 @@
-Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-pr2fra01on2101.outbound.protection.outlook.com [40.107.12.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8165605DC
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Mar 2024 12:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.12.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC215B03B;
+	Wed,  6 Mar 2024 14:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709728538; cv=fail; b=eqTcV3cg88D4PyITBM9mM7TGyezaH8larCp1QJfJw7uwK1QqQb+yfNwDMzDrdMazH2Gvdi1YMgmxuwMB1UYb4m6IdcMUZpVU2E4yWtlEZvQHgJ2nejQWIupFPiHXFFU6WhXK9f9fgCuJ8vEZdgHVX7RfLaXfVAHSfUh47s5+F34=
+	t=1709735523; cv=pass; b=K68HsiiXL4o0hQNp0vp4tlcGqeKKfYPrLizYxI6zV2dIC2WyeQAgnfbvDCoI/2fTb9tvZEloSxtYB+YNZwPoRnE/uDuC/HzBuF3SAtxSShG/KQdbikXT8KQi5sWkXFj/O/kn21UdW7Crcg5SjEs0EFJFH+79Yf6GDgg4tAwiexY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709728538; c=relaxed/simple;
-	bh=vfImhSYQumL2i5LKhcH3X+oHj+/ENB7P5fwmgc+Y9k8=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y/WhOS3X8uky4Oc/su9WZBAjIBW2P9onDE9a0V712kUw8qufdGAzvw4/9CIl1EqnenIyV76M0hm/irmWDcgskfwq+LaqYrNa8C5Unau5+bEBKE+ZbnjlS9AppO26bUtIdXYHgfYgYx8G5b83KnQD+8Jy60xoNjBmqJek/wnOAXw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=biocoop.fr; spf=pass smtp.mailfrom=biocoop.fr; dkim=pass (1024-bit key) header.d=biocoop.fr header.i=@biocoop.fr header.b=fwCXytLf; arc=fail smtp.client-ip=40.107.12.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=biocoop.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=biocoop.fr
+	s=arc-20240116; t=1709735523; c=relaxed/simple;
+	bh=O5o5/OA7JuN94HF72oh+BTl554LZzCHZf0lK5td3uKg=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=rYG0F6wL8q+j4K30+bV/RGjTIVOduJcVRV3WfVhhdokhPmjbYYK+R9oaz5iT4hdz/Ddk3iZfcGrBLdMD+BWsK9LY5BL6XmFhSu0b11mNMaTqpNFEGwe3izM5vjJWi3NJj5ehnORyYoQt00XN/eEMlVOLv/f2evjbatjda1CcCes=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=PDOM8VVm; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=biocoop.fr header.i=@biocoop.fr header.b="fwCXytLf"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YXo1oWk77IWDpjc9HbxMoW9z05CMbWN3FL3+oqq/e8FPNTZHaaxsjRDGwCX/HqMHLgG6RiM79s2u35nIZJhb0Iu2x7cdnGQ0sTSTJeDjMYcs8sOoHEgGC9pr4bt1T91v32A9/QAOXWDPNuV0N1l5K7pAv/yDzgp7ys2+W2SzUf15PZQTVorMk+uLpVSgJmrm87nvfdBEFUxy7AqGjg3fQCYl1K3zJwWCY5X1nesAIiG0qKwxFZYMwRm5gtiQJ1G9xEd191W1uXfe/mkwaVdywRQxs27Gqir3Ss0zL2l33Uk1uwtDwkyr6eokxVNl32l1iwBbD8Q17gxIaLvfycHmVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NRbaWkzveiwkLnQcgPN3np1FEj6HvlLmg6fakNB0TY4=;
- b=I+hLDcBe3YmS4W2dvmGgsDy7E27qbQJoMKp+acEf/iZgmbela8lK07OiUXRwk1B6tH5eqo+hy6Y88bJXGxrBjLpYc2Voo7QxRly9ewQLmPZS1PT1zYQ0hGwibYpkA7njMnfLtVtFSi3mibY6v9SXfE2giVaskeG43wxvkNtUQoW4mP7wYmXJ6ONtEwHxDDgiCtqpBMxzdpb0doB9OUgt4P9ZXGbj/oRuVhpkiKqvsIk5n9ksZk6LauSxTgXRdg2maCftRGg6HQTtaPits0rFrgYrICY9LoE2GzP74EPOh+9CBV20hDAwhvZqzfu2tXOE9Etzn3tWGK5RZCRoyGArBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=biocoop.fr; dmarc=pass action=none header.from=biocoop.fr;
- dkim=pass header.d=biocoop.fr; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=biocoop.fr;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NRbaWkzveiwkLnQcgPN3np1FEj6HvlLmg6fakNB0TY4=;
- b=fwCXytLfFdmavqxvm5be1WpcYV/YVPqr6HeARJV2EWiEOTR1UhM3el9pyi29RrUwZmlPeDS55RFDJIEkpOO7DYYvDpQGx+7jSfvBNc7z9xc2pFZJB2yj5c7dRXNbMiiJmyN2ze0VH4eQhZbSKNZR9w8W2z5+9vuu0rgKYtWIdfQ=
-Received: from MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM (2603:10a6:500:17::22)
- by MR1P264MB3746.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:2a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.24; Wed, 6 Mar
- 2024 12:35:33 +0000
-Received: from MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM
- ([fe80::ed11:6059:5c42:c9ab]) by MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM
- ([fe80::ed11:6059:5c42:c9ab%7]) with mapi id 15.20.7339.035; Wed, 6 Mar 2024
- 12:35:33 +0000
-From: MATHIEU Vincent <v.mathieu@biocoop.fr>
-To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Oracle linux 9 - last kernel - Resource temporarily unavailable on
- cifs mount
-Thread-Topic: Oracle linux 9 - last kernel - Resource temporarily unavailable
- on cifs mount
-Thread-Index: AdpvtANNj2t7hY6gQ2Or6c8JHqp87AADqYqg
-Date: Wed, 6 Mar 2024 12:35:33 +0000
-Message-ID:
- <MRXP264MB072607F16FDE71DA2925A00886212@MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM>
-References:
- <MRXP264MB07267BE5C9D0059C5FD18CBC86212@MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM>
-In-Reply-To:
- <MRXP264MB07267BE5C9D0059C5FD18CBC86212@MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=biocoop.fr;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MRXP264MB0726:EE_|MR1P264MB3746:EE_
-x-ms-office365-filtering-correlation-id: 20c62d7f-1fd9-4c56-4c9e-08dc3dd9ea7c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- xji8GOnZrCuXuW8f1FANOGqMiokTis7jsV27afvidHE8cQsgmExotF5cjnK5KWOCHmeOGkCK/AW74pw0Q+WjpSCF5gNsr2Mu02+sYq9+VTy5TAaTQIfmPjJ6dZXdUCsQdWCa0sRT6yIVPQjAFCADNtj+MgJNfor5+7tcHxRo49M5Wsb8ButH38xm6bZkcueMmijyQ+7Y/SeJJ333Um1BlQPWPxeu6ZkZmBh/Ppz8zEyJQWYn0jWoPV/boGSJIdBsU7b9INo1rjbSe6Xtad0bCYTv79SnDKLG2dcE/XTG3IUaIqjUmikzaEXJmgkQWhCKkFP+rlObFMl/UBSnMs4GtFNT+qboqarv569/jDeSRnrk2qTMN2BGzlhCD7bjOZDvkky1geaxw8hTjNvIe0RJNZs0Fb3KY/GMqY1f0xPxkZ2mYS0DNy8PXbwnG/CYiIkIoZSWC0zau40uoZejxLCoWXsu34Bhx14it6/H0J2vqYQ71xyu5Uk724eoBlYc6ZYdYCpsHEdGs59FRYAQeJPNCymyr28deGf7DWJ3qEcSs+r6GB/43hUofefkAOEJ+t77K14JWTFxihZbmxZG2NBrejGAuiVjpxR4ofeiM3HuSz81xw6sKmeFP9039Ze735H7uS7VfZwE4eQFdKwoPyL4A+2dhX181nQDfkl2PT3QYJ7ps4bAEfnpa3dzRZ3HgJ4aYb799vV0ngmlaUqFfyMBbmOE8Z9aIuWx+1cAmJs+LTw=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?45BD3nh95Fa441O1brrVWGkMauvZPO6mJAmk0x0HzbpbPyRCGJfgPzC2pP+w?=
- =?us-ascii?Q?S2Qjwz5xaf+FHFhSBf4ojgN6ZPADlBFk+vPUDzkHU5/NABNubb+QbC6KA8Yq?=
- =?us-ascii?Q?V978FKSN0tCN8rgPJIGQgW6O3l9MaSrUcuV8zWhCDgLav2utPwnsr2av1/iI?=
- =?us-ascii?Q?9kX8gYx9A9hZ2BrxshP6YWXPaJSZANxbBMZQxK/zFeOy5yuc31WWfAJRc3Kd?=
- =?us-ascii?Q?2sI3aUrIgTAJ+L4/bbP0zBHTOg95kdFOZtGtUn5WV5ckoO2WwNTW8rM4EYrS?=
- =?us-ascii?Q?MszAM6GuL6HLy7Ci3Fusr1ktWkv07HXf3AtCTzrQqAewo0JXLo4Ylan6R55K?=
- =?us-ascii?Q?5NWlfZ+8XP80LVCs6j9tTc0LWLGufO3aXWLQisALFldVsD/FXGeEYNA8qvCf?=
- =?us-ascii?Q?tarFOalhKPU+ntuDGT4RXwD5tids7WUK6+R2dfpcXi1kKrJfctZXADlLkvia?=
- =?us-ascii?Q?GLy4OL1ZiNNMkI8Bstm1XZXR7WTiJzjQqfq6CpAN5CJTBX5lUwyrSIW9AaA3?=
- =?us-ascii?Q?OW2C9JuxTtQKwxt9Ss0UIjoJERkKoBH1z6rt1pMSPtYFTBWAgk+yFC0QO0SS?=
- =?us-ascii?Q?/nG6Cfn+qvzmmSpwI5d5jL74UZg4QdsvF1CqChq/GcYYaJ6W5kj+6OU6hFg5?=
- =?us-ascii?Q?cGR88SPbb6RMG/NeLuSCvYNzZcNeasw1sftRaFNUaDKx1ec2W4BIwHrmQDZ6?=
- =?us-ascii?Q?KlG/2XpKn0WhdcVMuPSb9sz3AFc2b+TLRqLcb7wGLy9AMS6j6iQ0ToEbCB1C?=
- =?us-ascii?Q?3+jAmrPjZMiODwq8hRxuPAauAyxYfjZnXuUZTe6/HoKk18lbZWiY79YxRj3Z?=
- =?us-ascii?Q?ullC5C7gS/MSZhkhABoipacqZJ0hHWWOtqT4M6dvO0zu4pRJzWAfRnFuNU7E?=
- =?us-ascii?Q?Opjw1BiPqDl9Hs1rybhbbmBhqR2bZDdK50qD9wThRgIyJTtuE4POOii1H1Sr?=
- =?us-ascii?Q?MvDIEkSZZIuDtGXiWb6aL7ZH9SNobZQi0rJNowvpxpOwJ2kxxwD1L1W1gheF?=
- =?us-ascii?Q?5SCSLbHswJeXvqjl5L9ymxWz85+JAYFxdm+o1MMrw6+UHQeC7y54T9ok54h6?=
- =?us-ascii?Q?6BB2/dtWwydrv0GuJdCKvyPXx4w+0WZ6+KmZHV1bMfMCfYLR5pwqoIwDyVKs?=
- =?us-ascii?Q?ip7MHj5XHpWHFVuiSzlg69XtPgjONbEHqzC/6kMWFtivugiSW4tXGXJGRQUP?=
- =?us-ascii?Q?TUXSqExXSS3KdHxYUoYMWSrqJK0uXYvpdrFVQ2Ev5bW03l3s1Z7DSRic+T1S?=
- =?us-ascii?Q?Mc4s2yHJTh/VIXW61vCJdA3gWjOqfwRDdAhuZrdpAstkQYmUUw2L5NFAS1/y?=
- =?us-ascii?Q?kKUEUNGNNkv+vNFtyVSHOhrDAu02f4cHfb0nCnHgHE2UTD6DltJKAqwSLpbC?=
- =?us-ascii?Q?SBZx06JQSveRy84VA16ihggo88jY4J8Bgt0Ti4HJpzVX86G9bWdRRnCkDD1w?=
- =?us-ascii?Q?fKS/BPTE7E83uE3Hur0+EpG6czuFfXlb0qscW2sNfAcfI95kxqSke3R4tbSi?=
- =?us-ascii?Q?/uvDqd11PeVr646RY+5Gxr85k8yuzwTbv5xNKtg2wEr82/CfgMQzmKXc01BO?=
- =?us-ascii?Q?9DBE/lZFynJle6Lx3zO1h2uBQ9XRfQyfhKcFBqei?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="PDOM8VVm"
+Message-ID: <8e729f88f285fefaa8a089da09484ed2@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1709735512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZUsDDiQHbmberqEw7P+uyxdapk5dWId2FXk+DJYvkNo=;
+	b=PDOM8VVmK+dA94QTLqGKu5HQNdyoDZErJzR4z7BH4pTmZ1yls9Ef78Gy0tQbhx3wki0jMQ
+	bKokoSi01Z5mW5+5npMKEMmL0WZ2BXLqUzVtixzhKlIaTG/6daAvCPpmyZCdUzvKv096an
+	E5nVjODhM1IV2Nj7xOHezrYDj7JYs7TJ176FaOep9KcdqmCqyJXUJk3jHXQpDE6YBbnmjm
+	yTh9WA1WYxM0jOgAoPgeF/BiKlR5XQSoYDSomHj0XXFyFHf+igRb1DJeWtqfFK5gxzhP+p
+	LAJnqx6n5v/4ZGyc2ootXMchCbwgsagaNJuIpw9Z6adcZGJ+v18d7ba6RZrojQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1709735512; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZUsDDiQHbmberqEw7P+uyxdapk5dWId2FXk+DJYvkNo=;
+	b=o5+1wqzA4JcV+8ZVNtYjv0YS4jgozP0rk2FmEEtvkCbIX+6I5KxzyoS6kdfdkq5f+sFPjV
+	l88XrkPm3hsmJXYRuC6RjbV39UTceTvFamOOmOoSJ3S8LdaRtpA5kyYZsESRM/NDKp4C8v
+	atWWKd7i79vwnbFUBIepSFpBpikNnevsweRs/FkAEIAlxpd/m3j/ZajNeYUlpgWEpmql6g
+	aaWREcA+9Di4/3Oaw9/RPplBcIyNa/U6jQXA33vPL/SyWGAOd+gpqler5reNbE+CgwbXaW
+	ub8v72Q45Pr2KSEgf9C42sUcj5Blf+AttPO8PhqR2If4eA3ShcHsVXykn1iEjg==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1709735512; a=rsa-sha256;
+	cv=none;
+	b=YkDDd74Db54F3nw6gr6hbVWeVbLjw2J9WdH4c/S63RZD/5XHDeCurWAsYCE1ub+oVbj+66
+	orSjB9xLepIurz0hXubtrpXUy/75HvO3DuFxmdrxWTVgZVu38uOZd9HJiZmHqzRxwt2fVO
+	H59SBZ0pZvUkJkCiNrsmw+2uJq2bDESP69FetvZfwCxQr5XHVYmO/va3sg+pj6V+SDx5ue
+	C2oI3Uut6zn1b/IfKU8lC2iUwVU10ENmMR6ZlAYSfw/iy94SBW62KvsK/JvmbdaZ77NAed
+	fSyIECGDUY+LholIRUbqnNvJnVOYZnzkOGx9hcaW6NFGm7PUeAPdw/9eydtFQQ==
+From: Paulo Alcantara <pc@manguebit.com>
+To: meetakshisetiyaoss@gmail.com, sfrench@samba.org,
+ ronniesahlberg@gmail.com, sprasad@microsoft.com, nspmangalore@gmail.com,
+ tom@talpey.com, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ samba-technical@lists.samba.org, bharathsm.hsk@gmail.com
+Cc: Meetakshi Setiya <msetiya@microsoft.com>
+Subject: Re: [PATCH 2/3] smb: client: do not defer close open handles to
+ deleted files
+In-Reply-To: <20240306034353.190039-2-meetakshisetiyaoss@gmail.com>
+References: <20240306034353.190039-1-meetakshisetiyaoss@gmail.com>
+ <20240306034353.190039-2-meetakshisetiyaoss@gmail.com>
+Date: Wed, 06 Mar 2024 11:31:48 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: biocoop.fr
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MRXP264MB0726.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20c62d7f-1fd9-4c56-4c9e-08dc3dd9ea7c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 12:35:33.0855
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 254ce57b-bda2-49bb-9b4d-dc236c664f5e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MXCKe7BmifD/VJI7h4dT9OtQf+WIhmD9dlLxVeaoNepwsdON3KIYuAM10sgH73n+yxd9Gy467PjGXB36nOVRYw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MR1P264MB3746
+Content-Type: text/plain
 
-Hello,
+meetakshisetiyaoss@gmail.com writes:
 
-I have an issue with the last kernel on Oracle Linux 9 (5.15.0-203.146.5.1.=
-el9uek.x86_64), when I do a 'df -h' and/or with python/java script to acces=
-s to files on a cifs mount :
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index b75282c204da..46951f403d31 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -483,6 +483,7 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+>  	cfile->uid = current_fsuid();
+>  	cfile->dentry = dget(dentry);
+>  	cfile->f_flags = file->f_flags;
+> +	cfile->status_file_deleted = false;
 
-      df: /mnt/data_appli_test : Resource temporarily unavailable
+This is unnecessary as @cfile is kzalloc()'d.
 
-However, I have access to the files on the mount point on linux command lin=
-e.
+>  	cfile->invalidHandle = false;
+>  	cfile->deferred_close_scheduled = false;
+>  	cfile->tlink = cifs_get_tlink(tlink);
+> @@ -1085,7 +1086,7 @@ int cifs_close(struct inode *inode, struct file *file)
+>  		if ((cifs_sb->ctx->closetimeo && cinode->oplock == CIFS_CACHE_RHW_FLG)
+>  		    && cinode->lease_granted &&
+>  		    !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &&
+> -		    dclose) {
+> +		    dclose && !(cfile->status_file_deleted)) {
+>  			if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, &cinode->flags)) {
+>  				inode_set_mtime_to_ts(inode,
+>  						      inode_set_ctime_current(inode));
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 3073eac989ea..3242e3b74386 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -893,6 +893,9 @@ cifs_get_file_info(struct file *filp)
+>  	struct cifsFileInfo *cfile = filp->private_data;
+>  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+>  	struct TCP_Server_Info *server = tcon->ses->server;
+> +	struct dentry *dentry = filp->f_path.dentry;
+> +	void *page = alloc_dentry_path();
+> +	const unsigned char *path;
+>  
+>  	if (!server->ops->query_file_info)
+>  		return -ENOSYS;
 
-mount.cifs version: 7.0.
-Windows 2019 standard server for the network share.
+You're leaking @page if above condition is true.
 
-No problem with another precedent kernel like 5.15.0-201.135.6.el9uek.x86_6=
-4.
+> @@ -907,7 +910,14 @@ cifs_get_file_info(struct file *filp)
+>  			data.symlink = true;
+>  			data.reparse.tag = IO_REPARSE_TAG_SYMLINK;
+>  		}
+> +		path = build_path_from_dentry(dentry, page);
+> +		if (IS_ERR(path)) {
+> +			free_dentry_path(page);
+> +			return PTR_ERR(path);
 
-Is this problem known ?
-An idea to resolve it please ?
+Now you're leaking @data and @fid if above condition is true.
 
-Vincent.
+> +		}
+>  		cifs_open_info_to_fattr(&fattr, &data, inode->i_sb);
+> +		if (fattr.cf_flags & CIFS_FATTR_DELETE_PENDING)
+> +			cifs_mark_open_handles_for_deleted_file(inode, path);
+>  		break;
+>  	case -EREMOTE:
+>  		cifs_create_junction_fattr(&fattr, inode->i_sb);
+> @@ -937,6 +947,7 @@ cifs_get_file_info(struct file *filp)
+>  	rc = cifs_fattr_to_inode(inode, &fattr);
+>  cgfi_exit:
+>  	cifs_free_open_info(&data);
+> +	free_dentry_path(page);
+>  	free_xid(xid);
+>  	return rc;
+>  }
+> @@ -1075,6 +1086,7 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+>  	struct kvec rsp_iov, *iov = NULL;
+>  	int rsp_buftype = CIFS_NO_BUFFER;
+>  	u32 tag = data->reparse.tag;
+> +	struct inode *inode = NULL;
+>  	int rc = 0;
+>  
+>  	if (!tag && server->ops->query_reparse_point) {
+> @@ -1114,8 +1126,12 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+>  
+>  	if (tcon->posix_extensions)
+>  		smb311_posix_info_to_fattr(fattr, data, sb);
+> -	else
+> +	else {
+>  		cifs_open_info_to_fattr(fattr, data, sb);
+> +		inode = cifs_iget(sb, fattr);
+> +		if (inode && fattr->cf_flags & CIFS_FATTR_DELETE_PENDING)
+
+You shouldn't ignore if cifs_iget() failed.  Return -ENOMEM instead.
+
+Besides, calling cifs_iget() here looks wrong as @fattr is not fully
+set, yet.  Why can't you use @inode from cifs_get_fattr() or do above
+check right after cifs_get_fattr() in cifs_get_inode_info{,_unix}()?
