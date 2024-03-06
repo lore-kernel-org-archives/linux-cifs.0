@@ -1,235 +1,367 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F3F156C2;
-	Wed,  6 Mar 2024 04:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E256171BB;
+	Wed,  6 Mar 2024 07:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709698802; cv=none; b=abngduwDnDD3DeS7h9ZDj3bCcethR8LxA4kfhLyR1q5RNVbfUKMoOPpad4/yCkT14Jf3AgWh/l6JSOKbF78wKn4la91nhNZE1OUD6OXruwyV6lYue4MOVMFA1O35O8yxTgaTooZB1eJYaWSiFz5WkGhVgT+7vKQSdDyk35GFYAc=
+	t=1709708982; cv=none; b=NY07NmpSJxqWWSmfxlFQtZRm7zppJBMto+H2z0izFbWboEqskvNXY6jtNL7w1G6G4GIBvKTiGuZRTr1UDqkQuNMbZZB/3UTK5Gwj9MFc0nUjT6dT8cRjWVjvzN/3zlfzzvfaIOQSz90HURTR+fMXcSciEdu7IKdxfMJNk17xDQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709698802; c=relaxed/simple;
-	bh=2dfHSc6VAPcDWCQt/cCbwQloxCdMhdHYVlV59fu3gco=;
+	s=arc-20240116; t=1709708982; c=relaxed/simple;
+	bh=StweNtPpC0lTWstisxCBeMYC2cNUG3bA8NN1BNOXZNk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W6MrA4r1DoPRsjxYSJuTyVZ2SzaV2S319e/wCoPsbXQtEZbnTEec1LxmarmU7S4W2HZdD6YHJDrcZRew6ZvpHyJBq8do2Hdh9/GRFjJDb5ntZ3EK41RmJUosLpALiybQWVWBtnloeb6AFZcmwW7Ue9K3AuvQhOBhektvU1PqqNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4O0q2ZR; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=eqA4O8D2DkNaqJqB3Z+TJ0I+wn6M4cgtQeX2LaIOfJEZXC1T1WF4WXclfaJcMrSkMbyJhNA6o4pZZKVz2ueqWxmz6rIaRezlY89J4iOKGS9S9xaH6Z3UPBo0/j24p9T73o2Hb6ojdLpFC+pZoDyEsw/jahnnGqb6gdN9rlZVNic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dnj8J3ud; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4O0q2ZR"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-566adfeced4so6812473a12.1;
-        Tue, 05 Mar 2024 20:20:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dnj8J3ud"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so80103061fa.3;
+        Tue, 05 Mar 2024 23:09:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709698799; x=1710303599; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709708978; x=1710313778; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WaH+OCLP7mlTp2cQYeBoaU4GpsCEpVFbSMUWSfBpzj4=;
-        b=D4O0q2ZR6u5FWDJter/0OMCZgp64c6ghXhAQErDZqrYRXN+NfdhYFQuzerOzSpzfUI
-         zctrJbJ3koVQztShuEmmvFg4q312no+v7UQnloiiIfj4M5MfgXxSwo1Xu4TWdPWsxwyX
-         JGCkZwdaGrC3VG6tIscrREwkt95m0Ep3Ty56pPBsA+PlwtuIP0aeLKlMsCLO4852xP3b
-         ugtudB3ieQCxrEf/B7TuUICSWGhguA/Wg/Noy3JDBH/IhJk6vZ2OUke58ZhjK7uSmDI9
-         3CWUshuSiP2lrkpVPUEbd1qOZsibpohomBYUIK23I3UuNOKJWdN8pkUa9QIrN3dhb+Ed
-         E06Q==
+        bh=ao/NqUHnXz0y/dqbjymF0MdeSFoyjq+6regVYQoE+cU=;
+        b=Dnj8J3udgAc45/SVevPKC8XUOESWvt984NfoI433eXbBM3/ypY7ctTxC+Oh7q9XjVa
+         hwut02QFRNA9NpKT1EU8Q41qcUAlW8ONffMkXmT+P3vNf0E/a3uXh91pR/G3XjH5Bxzb
+         z/3rw4J+mStA3eSqinf0fn5PVkIPsQ5fIlWaCx2lwZld81H2MUf/Pkx60xG+bin94M03
+         Kcqs0E1jTpd0Rph1SdugYSFHp9E6cwf+AhOCXvPGDMgH1Cca2ev7DuBzs2Ilt+tlCvNM
+         LtHf1QHbshUwcTMT8AwmS1erBXnVYEFtoNySA4r0eo2cldV6CZhu8r1z/kOitkdGn9Zt
+         Gxeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709698799; x=1710303599;
+        d=1e100.net; s=20230601; t=1709708978; x=1710313778;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WaH+OCLP7mlTp2cQYeBoaU4GpsCEpVFbSMUWSfBpzj4=;
-        b=bup4+vi/vC7L4TRzFe/SUTMoJ5CFbHrbgoMRxzxleFsKf4Q0ZcTsTuhXH6Erj5wSfG
-         FCbe7p1f6cbFxBeiAgWkMkrjW0VDodQpu0IpidBBjgGwzRiU6QgZ4XeGZq7osxjRagrP
-         co+TEr/MBTBd7jD1A2piqH7SbP9yZ+W39+AEuTxDX+F0cU/6tS51CQSzA/jXKFe/TEzf
-         nko2aCysDUutJpwOLSdqFkwQHaijPCeX/urnGkvz52KFkCf/tDy6/zIvS4tMtAFuRZbI
-         IIi5LaGlxnk/nG3Bwq21xpIwAaU574NgKLaZG9w70j3YPJBUPuQsXM2t1tfDBjHCjmu+
-         0mtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYjioRWa9R3aVpbZ5hmOIX91Up3exZ73v43RUU1aIJMEycvsNwPePzbzp5vaZcMP1WPL83icOgbyTigphHRx7aqaN01NUPCPa05gww4XWGwDUJG4oxocleZ89nhFhnRMhFYSffz2A1Kg==
-X-Gm-Message-State: AOJu0Yz2yzJ4QiTIhAx4BrqIKg6mFA7SieXkMYrjYrQprb24E7/v0Xrq
-	5do6eU/isaWDmRMmcxD9lUN2tn0sg89H072Rxk4zAThA6s2jNNVrT99hVLMqLYZK6ZP31dkY9ST
-	/MiC5ZMo7xEMRDpmkGy4DUUVI0hU=
-X-Google-Smtp-Source: AGHT+IH6WeM5K5ozItkPrXyQnS7z4bZGXlodgcMTNodDbP+NOiy5zKGGL8SKFF2nN/YMM+5a3ATuQENiA20NBuzQR+0=
-X-Received: by 2002:a05:6402:2152:b0:565:7c8d:5790 with SMTP id
- bq18-20020a056402215200b005657c8d5790mr9575483edb.4.1709698798675; Tue, 05
- Mar 2024 20:19:58 -0800 (PST)
+        bh=ao/NqUHnXz0y/dqbjymF0MdeSFoyjq+6regVYQoE+cU=;
+        b=OQjiqZMpYZBNCRT5Y8mQD9eKh5OWQPQvErJVt1k0GAhojedE25KtcH5XlqlmggWY3k
+         5m+V+eCJGlKHB/54xDagMV628rRVTIFAnHBRy+q1B2C3gMdGpWJSM7w106EEAbw3VINv
+         EvVuk4MPCJzAI6WzzjGfous/7gthW+lYk85V/ZBrqgyjSA6iEB060pNbxrJUsMCp42kb
+         XXPvGnQO+7Z291Y0Vf4rYyC+p0ohrVBdpjIuKRcxIKWYiU8s9zJG1J52PR6WSbEYTBkZ
+         PaUJ5+bQWrwC8Pka/Qe49C8Q94qAo/LxETMf+P35LegPzxkPZSvC7vgiEK/mwAVoLe/U
+         TpLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPFiJdrjJDOKHSWPgZL55WoZ+zTtZ1rGMULQQKkQX6DRgiXf3NcOuHEZf7d5lnhjcYCcZ0Mc4PcfbeDG49euZQfirQSKV39qR91AJyJL5Bb7B6TjhGG+YPuzGqgZtwh+htw5U7tQoocA==
+X-Gm-Message-State: AOJu0Yx398rBsW9hfzwnBPdG5momNn25EUCSWw71+THoMLeaU3f0oxg1
+	y8p452x+e0WDnmkKAh0vdI0fO3PxyQj1G+UZmqQMPbxHovDmUWSQPd+7FiVftcA6tLkbfEzD3Nz
+	CmvF83H3yhjKWOcQ8kJhaMZEQwXs=
+X-Google-Smtp-Source: AGHT+IHEXGZGzM810gptGkkjCkQG6oalmgYTpxBuR9tExjJMf3LON51g7QyuOvfN3tMBE7e75vN8ehUOaY5/mnhRqbY=
+X-Received: by 2002:a2e:86c8:0:b0:2d2:e784:abc2 with SMTP id
+ n8-20020a2e86c8000000b002d2e784abc2mr2836590ljj.33.1709708977667; Tue, 05 Mar
+ 2024 23:09:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306034353.190039-1-meetakshisetiyaoss@gmail.com> <20240306034353.190039-3-meetakshisetiyaoss@gmail.com>
-In-Reply-To: <20240306034353.190039-3-meetakshisetiyaoss@gmail.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Wed, 6 Mar 2024 09:49:46 +0530
-Message-ID: <CAFTVevUYbPCTQs7V5EcqaRy1B3kpFwj+NKCemUamDa0P10QVUg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] smb: client: retry compound request without reusing lease
-To: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+References: <20240306034353.190039-1-meetakshisetiyaoss@gmail.com> <20240306034353.190039-2-meetakshisetiyaoss@gmail.com>
+In-Reply-To: <20240306034353.190039-2-meetakshisetiyaoss@gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 6 Mar 2024 01:09:25 -0600
+Message-ID: <CAH2r5mtt0aBrWCK3QgkHv7HHv0wpRHeOVM=5aXr=E5MFsmfFfg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] smb: client: do not defer close open handles to
+ deleted files
+To: meetakshisetiyaoss@gmail.com
+Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, nspmangalore@gmail.com, tom@talpey.com, 
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	samba-technical@lists.samba.org, bharathsm.hsk@gmail.com
-Cc: Meetakshi Setiya <msetiya@microsoft.com>
+	samba-technical@lists.samba.org, bharathsm.hsk@gmail.com, 
+	Meetakshi Setiya <msetiya@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Patch 1 of this patch series
-https://lore.kernel.org/all/20240306034353.190039-1-meetakshisetiyaoss@gmai=
-l.com/
-aims to fix a customer reported bug by reusing lease key in unlink,
-rename and set_path_size compound operations on the smb client. The
-bug, its implications and reproduction has been described in the
-commit message of the patch. In short, unlink, rename and
-set_path_size operations can cause the server to send lease breaks to
-the same client, on the same connection which hurts performance.
+Merged the three patches into cifs-2.6.git pending testing but I had
+to rebase this one.  I also had to rebase one of Paulo's patches "smb:
+client: move most of reparse point handling code to common file"
 
-The aim is to have a fix in place for this problem without regressing
-existing behaviour. Also, the proposed changes should go in smaller
-batches so that they can be backported with relative ease. Patch 1
-regressed a few operations on hardlinks (eg., xfstests generic 002,
-013).  As per MS-SMB2, lease keys are associated with the file name.
-Linux cifs client maintains lease keys with the inode. If the file
-has hardlinks, it is possible that the lease for a file be wrongly
-reused for an operation on the hardlink or vice versa. In these
-cases, the mentioned compound operations fail with
-STATUS_INVALID_PARAMETER.
+If you see anything wrong with the minor rebase let me know.
 
-A simple fix for the regressions would be to have a two-phased
-approach and resend the compound op request again without the lease
-key if STATUS_INVALID_PARAMETER is received. This would help patch 1
-fix the original issue. Fix(es) for the hardlink-leasekey problem can
-come in the next batch.
-
-On Wed, Mar 6, 2024 at 9:14=E2=80=AFAM <meetakshisetiyaoss@gmail.com> wrote=
+On Tue, Mar 5, 2024 at 9:44=E2=80=AFPM <meetakshisetiyaoss@gmail.com> wrote=
 :
 >
 > From: Meetakshi Setiya <msetiya@microsoft.com>
 >
-> There is a shortcoming in the current implementation of the file
-> lease mechanism exposed when the lease keys were attempted to be
-> reused for unlink, rename and set_path_size operations for a client. As
-> per MS-SMB2, lease keys are associated with the file name. Linux smb
-> client maintains lease keys with the inode. If the file has any hardlinks=
-,
-> it is possible that the lease for a file be wrongly reused for an
-> operation on the hardlink or vice versa. In these cases, the mentioned
-> compound operations fail with STATUS_INVALID_PARAMETER.
-> This patch adds a fallback to the old mechanism of not sending any
-> lease with these compound operations if the request with lease key fails
-> with STATUS_INVALID_PARAMETER.
-> Resending the same request without lease key should not hurt any
-> functionality, but might impact performance especially in cases where
-> the error is not because of the usage of wrong lease key and we might
-> end up doing an extra roundtrip.
+> When a file/dentry has been deleted before closing all its open
+> handles, currently, closing them can add them to the deferred
+> close list. This can lead to problems in creating file with the
+> same name when the file is re-created before the deferred close
+> completes. This issue was seen while reusing a client's already
+> existing lease on a file for compound operations and xfstest 591
+> failed because of the deferred close handle that remained valid
+> even after the file was deleted and was being reused to create a
+> file with the same name. The server in this case returns an error
+> on open with STATUS_DELETE_PENDING. Recreating the file would
+> fail till the deferred handles are closed (duration specified in
+> closetimeo).
+>
+> This patch fixes the issue by flagging all open handles for the
+> deleted file (file path to be precise) by setting
+> status_file_deleted to true in the cifsFileInfo structure. As per
+> the information classes specified in MS-FSCC, SMB2 query info
+> response from the server has a DeletePending field, set to true
+> to indicate that deletion has been requested on that file. If
+> this is the case, flag the open handles for this file too.
+>
+> When doing close in cifs_close for each of these handles, check the
+> value of this boolean field and do not defer close these handles
+> if the corresponding filepath has been deleted.
 >
 > Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
 > ---
->  fs/smb/client/smb2inode.c | 41 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 38 insertions(+), 3 deletions(-)
+>  fs/smb/client/cifsglob.h  |  1 +
+>  fs/smb/client/cifsproto.h |  4 ++++
+>  fs/smb/client/file.c      |  3 ++-
+>  fs/smb/client/inode.c     | 28 +++++++++++++++++++++++++---
+>  fs/smb/client/misc.c      | 34 ++++++++++++++++++++++++++++++++++
+>  fs/smb/client/smb2inode.c |  9 ++++++++-
+>  6 files changed, 74 insertions(+), 5 deletions(-)
 >
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 429d83d31280..f697c14cd8c6 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -154,6 +154,17 @@ static int smb2_compound_op(const unsigned int xid, =
-struct cifs_tcon *tcon,
->         }
+> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+> index 50f7e47c2229..a88c8328b29c 100644
+> --- a/fs/smb/client/cifsglob.h
+> +++ b/fs/smb/client/cifsglob.h
+> @@ -1417,6 +1417,7 @@ struct cifsFileInfo {
+>         bool invalidHandle:1;   /* file closed via session abend */
+>         bool swapfile:1;
+>         bool oplock_break_cancelled:1;
+> +       bool status_file_deleted:1; /* file has been deleted */
+>         unsigned int oplock_epoch; /* epoch from the lease break */
+>         __u32 oplock_level; /* oplock/lease level from the lease break */
+>         int count;
+> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+> index ef98c840791f..1f46e0db6e92 100644
+> --- a/fs/smb/client/cifsproto.h
+> +++ b/fs/smb/client/cifsproto.h
+> @@ -296,6 +296,10 @@ extern void cifs_close_all_deferred_files(struct cif=
+s_tcon *cifs_tcon);
 >
->         /* if there is an existing lease, reuse it */
+>  extern void cifs_close_deferred_file_under_dentry(struct cifs_tcon *cifs=
+_tcon,
+>                                 const char *path);
+> +
+> +extern void cifs_mark_open_handles_for_deleted_file(struct inode *inode,
+> +                               const char *path);
+> +
+>  extern struct TCP_Server_Info *
+>  cifs_get_tcp_session(struct smb3_fs_context *ctx,
+>                      struct TCP_Server_Info *primary_server);
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index b75282c204da..46951f403d31 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -483,6 +483,7 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fi=
+d *fid, struct file *file,
+>         cfile->uid =3D current_fsuid();
+>         cfile->dentry =3D dget(dentry);
+>         cfile->f_flags =3D file->f_flags;
+> +       cfile->status_file_deleted =3D false;
+>         cfile->invalidHandle =3D false;
+>         cfile->deferred_close_scheduled =3D false;
+>         cfile->tlink =3D cifs_get_tlink(tlink);
+> @@ -1085,7 +1086,7 @@ int cifs_close(struct inode *inode, struct file *fi=
+le)
+>                 if ((cifs_sb->ctx->closetimeo && cinode->oplock =3D=3D CI=
+FS_CACHE_RHW_FLG)
+>                     && cinode->lease_granted &&
+>                     !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &&
+> -                   dclose) {
+> +                   dclose && !(cfile->status_file_deleted)) {
+>                         if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, &c=
+inode->flags)) {
+>                                 inode_set_mtime_to_ts(inode,
+>                                                       inode_set_ctime_cur=
+rent(inode));
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 3073eac989ea..3242e3b74386 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -893,6 +893,9 @@ cifs_get_file_info(struct file *filp)
+>         struct cifsFileInfo *cfile =3D filp->private_data;
+>         struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
+>         struct TCP_Server_Info *server =3D tcon->ses->server;
+> +       struct dentry *dentry =3D filp->f_path.dentry;
+> +       void *page =3D alloc_dentry_path();
+> +       const unsigned char *path;
+>
+>         if (!server->ops->query_file_info)
+>                 return -ENOSYS;
+> @@ -907,7 +910,14 @@ cifs_get_file_info(struct file *filp)
+>                         data.symlink =3D true;
+>                         data.reparse.tag =3D IO_REPARSE_TAG_SYMLINK;
+>                 }
+> +               path =3D build_path_from_dentry(dentry, page);
+> +               if (IS_ERR(path)) {
+> +                       free_dentry_path(page);
+> +                       return PTR_ERR(path);
+> +               }
+>                 cifs_open_info_to_fattr(&fattr, &data, inode->i_sb);
+> +               if (fattr.cf_flags & CIFS_FATTR_DELETE_PENDING)
+> +                       cifs_mark_open_handles_for_deleted_file(inode, pa=
+th);
+>                 break;
+>         case -EREMOTE:
+>                 cifs_create_junction_fattr(&fattr, inode->i_sb);
+> @@ -937,6 +947,7 @@ cifs_get_file_info(struct file *filp)
+>         rc =3D cifs_fattr_to_inode(inode, &fattr);
+>  cgfi_exit:
+>         cifs_free_open_info(&data);
+> +       free_dentry_path(page);
+>         free_xid(xid);
+>         return rc;
+>  }
+> @@ -1075,6 +1086,7 @@ static int reparse_info_to_fattr(struct cifs_open_i=
+nfo_data *data,
+>         struct kvec rsp_iov, *iov =3D NULL;
+>         int rsp_buftype =3D CIFS_NO_BUFFER;
+>         u32 tag =3D data->reparse.tag;
+> +       struct inode *inode =3D NULL;
+>         int rc =3D 0;
+>
+>         if (!tag && server->ops->query_reparse_point) {
+> @@ -1114,8 +1126,12 @@ static int reparse_info_to_fattr(struct cifs_open_=
+info_data *data,
+>
+>         if (tcon->posix_extensions)
+>                 smb311_posix_info_to_fattr(fattr, data, sb);
+> -       else
+> +       else {
+>                 cifs_open_info_to_fattr(fattr, data, sb);
+> +               inode =3D cifs_iget(sb, fattr);
+> +               if (inode && fattr->cf_flags & CIFS_FATTR_DELETE_PENDING)
+> +                       cifs_mark_open_handles_for_deleted_file(inode, fu=
+ll_path);
+> +       }
+>  out:
+>         fattr->cf_cifstag =3D data->reparse.tag;
+>         free_rsp_buf(rsp_buftype, rsp_iov.iov_base);
+> @@ -1170,6 +1186,8 @@ static int cifs_get_fattr(struct cifs_open_info_dat=
+a *data,
+>                                                    full_path, fattr);
+>                 } else {
+>                         cifs_open_info_to_fattr(fattr, data, sb);
+> +                       if (fattr->cf_flags & CIFS_FATTR_DELETE_PENDING)
+> +                               cifs_mark_open_handles_for_deleted_file(*=
+inode, full_path);
+>                 }
+>                 break;
+>         case -EREMOTE:
+> @@ -1850,16 +1868,20 @@ int cifs_unlink(struct inode *dir, struct dentry =
+*dentry)
+>
+>  psx_del_no_retry:
+>         if (!rc) {
+> -               if (inode)
+> +               if (inode) {
+> +                       cifs_mark_open_handles_for_deleted_file(inode, fu=
+ll_path);
+>                         cifs_drop_nlink(inode);
+> +               }
+>         } else if (rc =3D=3D -ENOENT) {
+>                 d_drop(dentry);
+>         } else if (rc =3D=3D -EBUSY) {
+>                 if (server->ops->rename_pending_delete) {
+>                         rc =3D server->ops->rename_pending_delete(full_pa=
+th,
+>                                                                 dentry, x=
+id);
+> -                       if (rc =3D=3D 0)
+> +                       if (rc =3D=3D 0) {
+> +                               cifs_mark_open_handles_for_deleted_file(i=
+node, full_path);
+>                                 cifs_drop_nlink(inode);
+> +                       }
+>                 }
+>         } else if ((rc =3D=3D -EACCES) && (dosattr =3D=3D 0) && inode) {
+>                 attrs =3D kzalloc(sizeof(*attrs), GFP_KERNEL);
+> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+> index 0748d7b757b9..9428a0db7718 100644
+> --- a/fs/smb/client/misc.c
+> +++ b/fs/smb/client/misc.c
+> @@ -853,6 +853,40 @@ cifs_close_deferred_file_under_dentry(struct cifs_tc=
+on *tcon, const char *path)
+>         free_dentry_path(page);
+>  }
+>
+> +/*
+> + * If a dentry has been deleted, all corresponding open handles should k=
+now that
+> + * so that we do not defer close them.
+> + */
+> +void cifs_mark_open_handles_for_deleted_file(struct inode *inode,
+> +                                            const char *path)
+> +{
+> +       struct cifsFileInfo *cfile;
+> +       void *page;
+> +       const char *full_path;
+> +       struct cifsInodeInfo *cinode =3D CIFS_I(inode);
+> +
+> +       page =3D alloc_dentry_path();
+> +       spin_lock(&cinode->open_file_lock);
 > +
 > +       /*
-> +        * note: files with hardlinks cause unexpected behaviour. As per =
-MS-SMB2,
-> +        * lease keys are associated with the filepath. We are maintainin=
-g lease keys
-> +        * with the inode on the client. If the file has hardlinks, it is=
- possible
-> +        * that the lease for a file be reused for an operation on its ha=
-rdlink or
-> +        * vice versa.
-> +        * As a workaround, send request using an existing lease key and =
-if the server
-> +        * returns STATUS_INVALID_PARAMETER, which maps to EINVAL, send t=
-he request
-> +        * again without the lease.
+> +        * note: we need to construct path from dentry and compare only i=
+f the
+> +        * inode has any hardlinks. When number of hardlinks is 1, we can=
+ just
+> +        * mark all open handles since they are going to be from the same=
+ file.
 > +        */
->         if (dentry) {
->                 inode =3D d_inode(dentry);
->                 if (CIFS_I(inode)->lease_granted && server->ops->get_leas=
-e_key) {
-> @@ -874,11 +885,20 @@ int
->  smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *=
-name,
->             struct cifs_sb_info *cifs_sb, struct dentry *dentry)
->  {
-> -       return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OP=
-EN,
-> +       int rc =3D smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FIL=
-E_OPEN,
->                                 CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POI=
-NT,
->                                 ACL_NO_MODE, NULL,
->                                 &(int){SMB2_OP_DELETE}, 1,
->                                 NULL, NULL, NULL, dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_compound_op(xid, tcon, cifs_sb, name, DELETE,=
- FILE_OPEN,
-> +                               CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POI=
-NT,
-> +                               ACL_NO_MODE, NULL,
-> +                               &(int){SMB2_OP_DELETE}, 1,
-> +                               NULL, NULL, NULL, NULL);
+> +       if (inode->i_nlink > 1) {
+> +               list_for_each_entry(cfile, &cinode->openFileList, flist) =
+{
+> +                       full_path =3D build_path_from_dentry(cfile->dentr=
+y, page);
+> +                       if (!IS_ERR(full_path) && strcmp(full_path, path)=
+ =3D=3D 0)
+> +                               cfile->status_file_deleted =3D true;
+> +               }
+> +       } else {
+> +               list_for_each_entry(cfile, &cinode->openFileList, flist)
+> +                       cfile->status_file_deleted =3D true;
 > +       }
-> +       return rc;
->  }
->
->  static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *=
-tcon,
-> @@ -919,8 +939,14 @@ int smb2_rename_path(const unsigned int xid,
->         drop_cached_dir_by_name(xid, tcon, from_name, cifs_sb);
->         cifs_get_writable_path(tcon, from_name, FIND_WR_WITH_DELETE, &cfi=
-le);
->
-> -       return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
-> +       int rc =3D smb2_set_path_attr(xid, tcon, from_name, to_name, cifs=
-_sb,
->                                   co, DELETE, SMB2_OP_RENAME, cfile, sour=
-ce_dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_set_path_attr(xid, tcon, from_name, to_name, =
-cifs_sb,
-> +                                 co, DELETE, SMB2_OP_RENAME, cfile, NULL=
-);
-> +       }
-> +       return rc;
->  }
->
->  int smb2_create_hardlink(const unsigned int xid,
-> @@ -949,11 +975,20 @@ smb2_set_path_size(const unsigned int xid, struct c=
-ifs_tcon *tcon,
->         in_iov.iov_base =3D &eof;
->         in_iov.iov_len =3D sizeof(eof);
->         cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
-> -       return smb2_compound_op(xid, tcon, cifs_sb, full_path,
-> +       int rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
->                                 FILE_WRITE_DATA, FILE_OPEN,
->                                 0, ACL_NO_MODE, &in_iov,
->                                 &(int){SMB2_OP_SET_EOF}, 1,
->                                 cfile, NULL, NULL, dentry);
-> +       if (rc =3D=3D -EINVAL) {
-> +               cifs_dbg(FYI, "invalid lease key, resending request witho=
-ut lease");
-> +               rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
-> +                               FILE_WRITE_DATA, FILE_OPEN,
-> +                               0, ACL_NO_MODE, &in_iov,
-> +                               &(int){SMB2_OP_SET_EOF}, 1,
-> +                               cfile, NULL, NULL, NULL);
-> +       }
-> +       return rc;
->  }
->
->  int
+> +       spin_unlock(&cinode->open_file_lock);
+> +       free_dentry_path(page);
+> +}
+> +
+>  /* parses DFS referral V3 structure
+>   * caller is responsible for freeing target_nodes
+>   * returns:
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index 69f3442c5b96..429d83d31280 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -561,8 +561,15 @@ static int smb2_compound_op(const unsigned int xid, =
+struct cifs_tcon *tcon,
+>                 case SMB2_OP_DELETE:
+>                         if (rc)
+>                                 trace_smb3_delete_err(xid,  ses->Suid, tc=
+on->tid, rc);
+> -                       else
+> +                       else {
+> +                               /*
+> +                                * If dentry (hence, inode) is NULL, leas=
+e break is going to
+> +                                * take care of degrading leases on handl=
+es for deleted files.
+> +                                */
+> +                               if (inode)
+> +                                       cifs_mark_open_handles_for_delete=
+d_file(inode, full_path);
+>                                 trace_smb3_delete_done(xid, ses->Suid, tc=
+on->tid);
+> +                       }
+>                         break;
+>                 case SMB2_OP_MKDIR:
+>                         if (rc)
 > --
 > 2.39.2
 >
+>
+
+
+--=20
+Thanks,
+
+Steve
