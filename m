@@ -1,83 +1,110 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3031A7484;
-	Thu,  7 Mar 2024 05:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8990E63405
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Mar 2024 08:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709789814; cv=none; b=AtsTU0cx+9ZVbVm5b+3OjtqOGrkTPwurboIPODy8xWicJtjC9mrv92dw42+Vjfl622kgCdTbFBGLg3AhZXptoaOZ9PwLIfxGG3LYFJtQE68ZpMCtzS76BFej2Rf7U+iQ0KTDQJUfLfkXHbW3Fl7scK6GapX6Howhsj9AimR8c0Q=
+	t=1709800013; cv=none; b=q/fPqsG4Uv2ju+hvL6mfpSFpgwZryXykdVQJY0cttENo61yQ4Cti35K680rO/dSZ926xHJRsYZaL7q0C9i6Dg/U0XoSp1OOlIK/pM1a92oJ1UZ5Kj08XNhsYA9yeGfYQ72k7gr2i06yyM+nA3B9scabN46k5ZleNQVyA8GD/8kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709789814; c=relaxed/simple;
-	bh=TD8msV2zeyBaMuMv7cfRWPrwWrXio8E6N0eM4m/ZpZU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Aus/ix8Cll7iBFBKZXgC6sl2hqPdzP0I0UZLhWRNjl1aGkS5ZZ4SOo4BxISNsK4MDTbq+UmsmDbV96O7iSTSpdzk49zoaLAU7fbap1PG8/Sa492HoR4X6UvTfH3XFJ6/5TzUyA0l4eEROWnnFmNk8fd8zpAkV/Wh3BFo8S6YbVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P91vmZfn; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1709800013; c=relaxed/simple;
+	bh=GSLLGWd6A4v0+iH8U2RooYpIV7bjKBaVVn5koXyUZhs=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=GvoDFwEVGnm1XIk3NvOyNELzFak6KLoF2tSzgwiu97WwhV8ypsVB4v5j1UxpxSOvcQ74p96iv6ufpC4fF8DKK1Ul5TMo2i8NmfBUWOI0rTdOuXN0DlNFd6KVmd9SmfuadvKLboDX1igVBLTF+b1t73ApmLhVe8+JW/8awpwtUzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QqtUIJRv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P91vmZfn"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d3fb16f1a9so16603261fa.0;
-        Wed, 06 Mar 2024 21:36:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709789811; x=1710394611; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GIrvpzBTukWFdsGEEJPsX9FRjzXiM/mO16C/Fo07irw=;
-        b=P91vmZfnVlziU8oDsakrAELZ2lJ1dyBkHB4zqO6rcjjpcd/2FJs2Ve34d/vIXn2YPC
-         mnCrO6PCYxGS+K2x7K9pBzRcNZiLtg3kuOUy0+JOZcJRGapLr1yYJ4tjCssD30dZIT3v
-         Th/HpFChSo05gJA1GunLpuLA3XUX0dXlNuxqqL1uegpYDfuq7hD5jgMd/mYb2HeYGvdi
-         LyzElMRdJIg563102cwhg/lYQ2SDn1faVNDIHXTrGJlgIJ94XkaAOyhRioYgWdfn74F/
-         JBVwFMcF0TDGDrvvn9LntMxtkC/A+Cw0zsBdeYmR07l58lQ58gMAEZiHl29wQIZ+p+Ny
-         yahg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709789811; x=1710394611;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GIrvpzBTukWFdsGEEJPsX9FRjzXiM/mO16C/Fo07irw=;
-        b=drkyq53tUK7gDPFTovyMnCJYZGd2VjtT55xLgSGdESse0jYMFUZInQ5KiUMcURV6Dl
-         ZJekH4cdD++GWFc0W0Pa00eCdx/tf2VrjL7Jyg5jGZnswpB+M9KdrknF8e1Cbo8eItH8
-         USE/PXiP6L5iM1jh1A0Z3kXjhR6lzDuQxHnVlmxWKe1oNAUrOYxWYQLvXjeV87BBOGiF
-         TmmdhO5bgivpzJOFWKHYHnbCFNQLVkp+YfG6zd6/ahBaOrtzTGYIX3c965zytAnP+ats
-         P3aMpNyo0s77THlRUR9sVnOf0fJDsgQipdUbKyps8AYixiVOzLO8mJj2eawerbvaE93c
-         lEeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUslLt8gKgehIhny9D6uyrRXdZRPnvnNnryrnw7qOZNsRxDOF4nwPsZne3WHHMO83oCA6raSkx0J2JlLUbiSOX6BWy00MMFI7j+N16sg==
-X-Gm-Message-State: AOJu0YyrPzxn55N9dxSHIdH6PpMCXgjaO+dQMQcquKu1IiGqp8Zwj7KA
-	jb2KcAipya+KDgz0zV+2wAPUhqcbNXb6nl9L5pWO5C5dnWStdii/mD9Tb2gJZPDavyldeNk6R8F
-	D6WiuRHNDNDIYyEGWAXT1J/iyU4OsnahyO0I=
-X-Google-Smtp-Source: AGHT+IGERnrC50EnykrFQjVM4vn6b1mtVwkcZVLvrVDE4u7GblPYyzsRtKs2PMhLIzAy2o7G0qix8B/sTze0/8spuKo=
-X-Received: by 2002:a2e:9915:0:b0:2d3:3999:bba9 with SMTP id
- v21-20020a2e9915000000b002d33999bba9mr117741lji.21.1709789810782; Wed, 06 Mar
- 2024 21:36:50 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QqtUIJRv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709800010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GNYFlX4GZ3sigkzX5bE6FkuPu9beg0e7HrY2SFlhQWw=;
+	b=QqtUIJRvj3cQ75rPH375N5q9byV0RHZjGKWzF9GHjxoRmgH1X9uQu1QHavVUZ/UlH4AsgD
+	+zNWJmxvSA7FA1ESW5GooLymhhgTpXPT5Ydp7FyZs4nuvNB0oTLZUl9Qrz1b7Wb6r8qnSN
+	haBskzFOOyM+0vXTaoINGW6C2AnqcOs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-479-YCH9Z4zEMva3JJyiGTu8eQ-1; Thu,
+ 07 Mar 2024 03:26:45 -0500
+X-MC-Unique: YCH9Z4zEMva3JJyiGTu8eQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A97D91C006AE;
+	Thu,  7 Mar 2024 08:26:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 177F9C37A83;
+	Thu,  7 Mar 2024 08:26:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZelGX3vVlGfEZm8H@casper.infradead.org>
+References: <ZelGX3vVlGfEZm8H@casper.infradead.org> <1668172.1709764777@warthog.procyon.org.uk>
+To: Matthew Wilcox <willy@infradead.org>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>
+Cc: dhowells@redhat.com, Christoph Hellwig <hch@lst.de>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, devel@lists.orangefs.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] mm: Replace ->launder_folio() with flush and wait
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 6 Mar 2024 23:36:39 -0600
-Message-ID: <CAH2r5mutAn2G3eC7yRByF5YeCMokzo=Br0AdVRrre0AqRRmTEQ@mail.gmail.com>
-Subject: [LSF/MM/BPF TOPIC] statx attributes
-To: lsf-pc <lsf-pc@lists.linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1821329.1709800001.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Mar 2024 08:26:41 +0000
+Message-ID: <1821330.1709800001@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Following up on a discussion a few years ago about missing STATX
-attributes, I noticed a case recently where some tools on other OS
-have an option to skip offline files (e.g. the Windows equivalent of
-grep, "findstr", and some Mac tools also seem to do this).
+Matthew Wilcox <willy@infradead.org> wrote:
 
-This reminded me that there are a few additional STATX attribute flags
-that could be helpful beyond the 8 that are currently defined (e.g.
-STATX_ATTR_COMPRESSED, STATX_ATTR_ENCRYPTED, STATX_ATTR_NO_DUMP,
-STATX_ATTR_VERITY) and that it be worthwhile revisiting which
-additional STATX attribute flags would be most useful.
+> commit e3db7691e9f3dff3289f64e3d98583e28afe03db
+> Author: Trond Myklebust <Trond.Myklebust@netapp.com>
+> Date:   Wed Jan 10 23:15:39 2007 -0800
+> =
 
-"offline" could be helpful for fuse and cifs.ko and probably multiple
-fs to be able to report, but there are likely other examples that
-could help various filesystems.
--- 
-Thanks,
+>     [PATCH] NFS: Fix race in nfs_release_page()
+>... =
 
-Steve
+>       invalidate_inode_pages2() may find the dirty bit has been set on a=
+ page
+>       owing to the fact that the page may still be mapped after it was l=
+ocked.
+>       Only after the call to unmap_mapping_range() are we sure that the =
+page
+>       can no longer be dirtied.
+
+Is that last sentence even true?  It evicts folios from the TLB and/or
+pagetables, but it doesn't actually trim any mmap made - in which case,
+userspace is perfectly at liberty to regenerate and dirty the folio the mo=
+ment
+the folio is removed from the page tables.  Otherwise DIO-to/from-mmap wil=
+l
+deadlock.
+
+> but my belief is that we should be able to get rid of it.
+
+I think you're probably correct.  The best we can do, I think, is to prefa=
+ce
+any call to invalidate_inode_pages2() with a flush-and-wait over the same
+range.
+
+David
+
