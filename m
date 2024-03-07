@@ -1,89 +1,122 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6475B1FD
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Mar 2024 17:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB5312DDB6;
+	Thu,  7 Mar 2024 20:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709833524; cv=none; b=SywskLRTFz4NuwJSglq8dTyG07bmSRswIsIAMKI0saVacKIlyRqh14zmZiRm3q9FMDoj9wyYDMP1JgNw8g8AKLTs7b7re+XXQkVxH1z7uOsw7dsJBUI2FS+r33TbXX8IU3QcDBllC71wQJFZkwkgwI/B4HVgLIP6r38hTUCku1Y=
+	t=1709841842; cv=none; b=u7y6bem4TJ7W8BUQVyr0rJh0ScLKDgFYmEx2PJ7Z7w8D406HQZRbHImHpbIDNS/k5njGummi/LCO+p4bo2hyjj1+RvFsNUyL+mqagE+OaRc754h2ifZgCjOoIY0zmsMfPuR8BooOHdoRmYt8kshH9p3gduOPxUs0QdNWAhGWgfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709833524; c=relaxed/simple;
-	bh=0g2CmrW3zSwMXehy0USG53S+gcTB61LcPmT7dZEnlbA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EzshjXOlsRs0ozAD8m/PD7ZnuFZgKiHNWAYcdhtbrDAcGw722evtlHcTIEcqAHtCaOYj2PlMn6hOmbpemfXcENklplOqRW5m7KtmGQvPM/sG83O9PEhSfSExODi8Sp8ie2RJnc6rZbAqdpRisUpp7f3sFAk9iESA0CfuenRrvMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tws/8trx; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1709841842; c=relaxed/simple;
+	bh=bFGaOL7CsGWWQ3ESPYsyOYEUh8ZB4xpnCbVUp1CivDQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RKO0/FUf/apsb/9Kzxsa2VXOedjFgipkLN4+C0ZDe1AMmDnZkTmtS4s0cwrkhBNDhlOaRxDvzo55+Mt4qitMkEkuXl2HBYZzzHc2ya9IEbGiNuHS5+L+VoW1JNlsEjVlkdqvyDmhQgxzZOUeHOVPbMs7p0m2V9JlBSKZ4O2IXlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxkTT/A5; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tws/8trx"
-Date: Thu, 7 Mar 2024 12:45:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709833520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1E6eVA0ox3wTfDXp5qDGeEi3j9jsvxPth1X63WCpYd8=;
-	b=tws/8trx5AMSUNUCRnOBThosM3Fn0/xa3dAOE/V3A/jfIhXzn9SYN88RgcwU6jtzljrfAH
-	MogmVxRqjwI/owyB293GOPprfgCJkEmV0J+h/fe3FFzo2gTa48HL6hOnI5rrm6FocQBM1j
-	leggh2Fh6DeVOqjJVO3e2BpbIn721Kc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Steve French <smfrench@gmail.com>
-Cc: Amir Goldstein <amir73il@gmail.com>, 
-	lsf-pc <lsf-pc@lists.linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
-	Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>, 
-	David Howells <dhowells@redhat.com>
-Subject: Re: [LSF/MM/BPF TOPIC] statx attributes
-Message-ID: <nbqjigckee7m3b5btquetn3wfj3bzcirm75jwnbmhjyxyqximr@ouyqocmrjmfa>
-References: <CAH2r5mutAn2G3eC7yRByF5YeCMokzo=Br0AdVRrre0AqRRmTEQ@mail.gmail.com>
- <CAOQ4uxg8YbaYVU1ns5BMtbW8b0Wd8_k=eFWj7o36SkZ5Lokhpg@mail.gmail.com>
- <CAH2r5msvgB19yQsxJtTCeZN+1np3TGkSPnQvgu_C=VyyhT=_6Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxkTT/A5"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d3b93e992aso845891fa.1;
+        Thu, 07 Mar 2024 12:04:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1709841839; x=1710446639; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y3AdFgaBRFiwWtav38oyxf2w+fmQE2Ye/PD5BoJP0Q0=;
+        b=HxkTT/A5IUYiptgODrIPWsQv/FtvZ2kYxG3e7wRjuUYHWHqXGz3AUZrqBZPz6uEvi7
+         grz5l2h6GzOKt5NrdSugglh//dADnz9sIVR4mPBRJ+z5GkGCjnGJoFglnGW1Vux3KBYc
+         mDhLRwxQqlp2bVNZG1xeQA5HUCpaeisnT9+bc10dRMF51zXOx434+qcvfJ62MzJwTnx+
+         PGLMk1cRJtzsaZj+evRTWlFGXQ3B5kYa5hgnqtpNhmvyfobO06BtPumzZ4tI64qPYPTq
+         y2T77DouP9suTvrNaoOJ6eB4J5NOEBRAK4PJVMXjod3TjCb9prCqv850kE/8kXy9L+Dt
+         jSTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709841839; x=1710446639;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y3AdFgaBRFiwWtav38oyxf2w+fmQE2Ye/PD5BoJP0Q0=;
+        b=osrCCpbqoL/GJVOH567kJ9bkZ5RVXYM2ZmHr2mfJfuoxBUCDPNDb6TAK26SRYyt903
+         0xMuK22uetxVmL6/8+yeLbYDtmb+7vZvKNEyiRYeYXP+59PEITxjhrGIKJGAtUlE6hlQ
+         DGwSgaleJnQoNFN/Q0m46gucYzpgzrmtmyqmgsNnj9TNc8cWiU4LsngCuk4r/gWlDz5m
+         U19/f67w5MkGypptagMth2500XxpgDUVoWsZC4O/61VKO9iOGt1BxDIKBc1n/rMGBT+R
+         uCUIepPHXD1ifbUl19ZETUsM5vEc/MUiGrhsKNe0cQo9Zuv2ewo0B8mEg0fHRcAGfDjT
+         v9HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUS67nuWWqXuS7FEJk8+T+V8i6+44Ivzw95LtatLbkn3SyREaEupHVtDRyANYSoF7+m6Sph5jDKo+MMQCFt/G3XRX+GKkGRdvrxgyAdMNKO/O5NOa0sdEIuwLiikqYZ+lqcXSO32/UYQLA=
+X-Gm-Message-State: AOJu0YwKDL4nasrouFdTnt6eOf+J1R1LmbeZxA2hSXUlUubUZrnqcrJZ
+	HvNhetjlVx6OgACf+YnJp8FEIQdKu4M02g7ZSd+hxl1/4QZjsWChBdsysUn8qoDbi3VNmpNZjkc
+	hFV1jm0/whTurN2r3nMYnC0r6syw=
+X-Google-Smtp-Source: AGHT+IGfavhueNtP7xow4zNB7u0dZSEHD2R1a0/Gm2T/Fnh7eQfE1Bl5R+agVylZLwcVfqFX/T/DQv5CFvPlI7quFyM=
+X-Received: by 2002:a2e:b282:0:b0:2d3:f3fe:48ac with SMTP id
+ 2-20020a2eb282000000b002d3f3fe48acmr1934371ljx.27.1709841838435; Thu, 07 Mar
+ 2024 12:03:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msvgB19yQsxJtTCeZN+1np3TGkSPnQvgu_C=VyyhT=_6Q@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+References: <CAH2r5mutAn2G3eC7yRByF5YeCMokzo=Br0AdVRrre0AqRRmTEQ@mail.gmail.com>
+ <CAOQ4uxg8YbaYVU1ns5BMtbW8b0Wd8_k=eFWj7o36SkZ5Lokhpg@mail.gmail.com>
+ <CAH2r5msvgB19yQsxJtTCeZN+1np3TGkSPnQvgu_C=VyyhT=_6Q@mail.gmail.com> <nbqjigckee7m3b5btquetn3wfj3bzcirm75jwnbmhjyxyqximr@ouyqocmrjmfa>
+In-Reply-To: <nbqjigckee7m3b5btquetn3wfj3bzcirm75jwnbmhjyxyqximr@ouyqocmrjmfa>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 7 Mar 2024 14:03:46 -0600
+Message-ID: <CAH2r5mt_FY=9Dg6_K1+gYMAKuyPAPO0yRZ9hKcLkyypmUjxQZA@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] statx attributes
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Amir Goldstein <amir73il@gmail.com>, lsf-pc <lsf-pc@lists.linux-foundation.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Jan Kara <jack@suse.cz>, 
+	Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 07, 2024 at 10:37:13AM -0600, Steve French wrote:
-> > Which API is used in other OS to query the offline bit?
-> > Do they use SMB specific API, as Windows does?
-> 
-> No it is not smb specific - a local fs can also report this.  It is
-> included in the attribute bits for files and directories, it also
-> includes a few additional bits that are used by HSM software on local
-> drives (e.g. FILE_ATTRIBUTE_PINNED when the file may not be taken
-> offline by HSM software)
-> ATTRIBUTE_HIDDEN
-> ATTRIBUTE_SYSTEM
-> ATTRIBUTE_DIRECTORY
-> ATTRIGBUTE_ARCHIVE
-> ATTRIBUTE_TEMPORARY
-> ATTRIBUTE_SPARSE_FILE
-> ATTRIBUTE_REPARE_POINT
-> ATTRIBUTE_COMPRESSED
-> ATTRIBUTE_NOT_CONTENT_INDEXED
-> ATTRIBUTE_ENCRYPTED
-> ATTRIBUTE_OFFLINE
+On Thu, Mar 7, 2024 at 11:45=E2=80=AFAM Kent Overstreet
+<kent.overstreet@linux.dev> wrote:
+>
+> On Thu, Mar 07, 2024 at 10:37:13AM -0600, Steve French wrote:
+> > > Which API is used in other OS to query the offline bit?
+> > > Do they use SMB specific API, as Windows does?
+> >
+> > No it is not smb specific - a local fs can also report this.  It is
+> > included in the attribute bits for files and directories, it also
+> > includes a few additional bits that are used by HSM software on local
+> > drives (e.g. FILE_ATTRIBUTE_PINNED when the file may not be taken
+> > offline by HSM software)
+> > ATTRIBUTE_HIDDEN
+> > ATTRIBUTE_SYSTEM
+> > ATTRIBUTE_DIRECTORY
+> > ATTRIGBUTE_ARCHIVE
+> > ATTRIBUTE_TEMPORARY
+> > ATTRIBUTE_SPARSE_FILE
+> > ATTRIBUTE_REPARE_POINT
+> > ATTRIBUTE_COMPRESSED
+> > ATTRIBUTE_NOT_CONTENT_INDEXED
+> > ATTRIBUTE_ENCRYPTED
+> > ATTRIBUTE_OFFLINE
+>
+> we've already got some of these as inode flags available with the
+> getflags ioctl (compressed, also perhaps encrypted?) - but statx does
+> seem a better place for them.
+>
+> statx can also report when they're supported, which does make sense for
+> these.
+>
+> ATTRIBUTE_DIRECTORY, though?
+>
+> we also need to try to define the semantics for these and not just dump
+> them in as just a bunch of identifiers if we want them to be used by
+> other things - and we do.
 
-we've already got some of these as inode flags available with the
-getflags ioctl (compressed, also perhaps encrypted?) - but statx does
-seem a better place for them.
+They are all pretty clearly defined, but many are already in Linux,
+and a few are not relevant (e.g. ATTRIBUTE_DIRECTORY is handled in
+mode bits).  I suspect that Macs have equivalents of most of these
+too.
 
-statx can also report when they're supported, which does make sense for
-these.
 
-ATTRIBUTE_DIRECTORY, though?
+--=20
+Thanks,
 
-we also need to try to define the semantics for these and not just dump
-them in as just a bunch of identifiers if we want them to be used by
-other things - and we do.
-
-ATTRIBUTE_TEMPORARY is the one I'm eyeing; I've been planning tmpfile
-support in bcachefs, it'll turn fsyncs into noops and also ensure files
-are deleted on unmount/remount.
+Steve
