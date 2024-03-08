@@ -1,94 +1,106 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A18D4F1FB
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Mar 2024 07:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEED92C85C;
+	Fri,  8 Mar 2024 08:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709884380; cv=none; b=a+38dpUtsmJ7DuwnHFq8cNQbZXupwQRu8SFRfgJLppxzUpzL5avIVIP0p8/eQkyN8QBrXzdfKEwVvQMBeDyLJ04rRVZuQe8dh+Rbr32R5UQEAXPlvgjmJ4SM5++XIG0+iVlcRcy0Eur+0FDC9wvI9mO3/053reMR8Wc2NpG0BGY=
+	t=1709887729; cv=none; b=rk041+5s0EpiUaPbN3FrrGFjj56mDCUA6tGNR7rPOP1rOx5RGqMdxLx6aW+996Or2EF6qvfn9xlaIf5BGLeD2riJ4cwSp7sTvDQ3k5E9Lzlg7h+X2HcwFbadjxTumZWwI/KFIml+b50WS3vCpyRmYLl8wdwqnQdYGclehmV9II0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709884380; c=relaxed/simple;
-	bh=sH4bAKDnIswJKnbTcqpk0Pb3FW7/UPFUpIR+aBApz4U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R4eNpgo59n+D3Z3cOvUFXsD0gzLn8SnYhp3z4TxsJMtXnL8h75dEQHgIUcuqZayrw1ctYLHuF+sxd8iTIO2XhOtcM0e2E4LTp/9GRWZj+YaUnYtRvnXcCAwsHbUxpX1NFntKf6Jt8STkNi9XyHZW8CivxViZ37S9tPZeVknYMzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=rOFY+bfK; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="rOFY+bfK"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a452877ddcaso235528466b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 07 Mar 2024 23:52:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1709884376; x=1710489176; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hrvCXGaVO3HhvR4A5xt8TDit+qLJ9i7NLCGUzaXWqIQ=;
-        b=rOFY+bfK+k8+GVG7m5U9B3i2k0CHJlG1bQPzVjFG6hEfEKbfsJ8ty0BXbr/l8SOZ36
-         b1Libwo+P0O519HMzwnrc3bSvuLYAc66Jox3XPUV0AROzk+X5APywrZbmKaVqdPlGnQq
-         7kG4z9LIM0C0AGbXlcZ2+ka7IFIvl7RVsyKAs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709884376; x=1710489176;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hrvCXGaVO3HhvR4A5xt8TDit+qLJ9i7NLCGUzaXWqIQ=;
-        b=R/KhhW85bDJkWxyK3CsVVZS9O96H4OX1Ci7dv4OQ2G7aXn/HlsnX74qWwW95nuKYzL
-         O4Ya7URnSTEY9CL/rdQBnHxKgIaw0IbDPcb/5r4q4Z20QGQoa+4VtpuJ2AYJ9+Tc+Vgo
-         IfWZPCJYo6at/N8cRNr/c6s4duLlDcBjgy4tetTEvUze7smyZOrfspyA1Is3pY6e8NnU
-         I2ylm+lVi1SqhV43lS2swlHH5Ltd+VNwaJiLknMElRxUp45XfvODWrrSU3+LIR5HGrtb
-         SrenXsNRqikXjgVIAvaQe9viWnz5eD9bZNgl6t8swNZSu/+49DcBtQD5asAHL4VuLF39
-         igjw==
-X-Forwarded-Encrypted: i=1; AJvYcCUce3JtCturslnxcANQAp1D9CiwkolQvZZXsi0gTaxVLUXLgQ8FvnpSc0z7XR3gYYTEWsrnmaAYL2cgZhQiXEKa9C1QgBqVKrq0Rg==
-X-Gm-Message-State: AOJu0Ywprv03UtrBKKUxoxKvjzXslWYwZjsjOJs9XGYzJw2UsYeU6kQC
-	9cMEePMyCa9FGjA/lgeK8Fjbv2SqYn+0Hn2OLbUYMLd6xS85u+KLgym6LhjPfISde3BztC9RoEb
-	6mfFjNkyjKaVBGlxf+vlosq3pvu3SnsmtAbTITg==
-X-Google-Smtp-Source: AGHT+IGfxe+G6Hzhhm3qO2+tkAluEdwQIf++vT61Cv18s0V9jevPsUAy++K+ZRtxdczK/SgeeJRbLSjfJGJhUS+augI=
-X-Received: by 2002:a17:906:a2cf:b0:a44:488d:8e42 with SMTP id
- by15-20020a170906a2cf00b00a44488d8e42mr13783793ejb.66.1709884376420; Thu, 07
- Mar 2024 23:52:56 -0800 (PST)
+	s=arc-20240116; t=1709887729; c=relaxed/simple;
+	bh=2EhPOInGWCrsY5uTbTdzHscFzz1mz3zEHPzsntxauqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HKZKB798hGPW+18SZuNCB9fUOvbwIcoALYSxt8olkC4FuhqpzNt1uUvj4GIOHXgPIn/UszNUIhc9/KIsfzPn+GBZ5vXmzWZT4KEhpqyrb3GmvB0Y4P882N1omi//CaWPVo1CENVMBZx/sck1paKmbJwKeOSKgq9F6EMgIfb9y5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id 8965672C8CC;
+	Fri,  8 Mar 2024 11:48:44 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+	by imap.altlinux.org (Postfix) with ESMTPSA id 7AB4036D0168;
+	Fri,  8 Mar 2024 11:48:44 +0300 (MSK)
+Date: Fri, 8 Mar 2024 11:48:44 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
+Message-ID: <20240308084844.xo333plkzxtssbqj@altlinux.org>
+References: <20230215000832.never.591-kees@kernel.org>
+ <qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf>
+ <202402091559.52D7C2AC@keescook>
+ <20240210003314.jyrvg57z6ox3is5u@altlinux.org>
+ <2024021034-populace-aerospace-03f3@gregkh>
+ <20240210102145.p4diskhnevicn6am@altlinux.org>
+ <20240217215016.emqr3stdm3yrh4dq@altlinux.org>
+ <2024021808-coach-wired-41cb@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1668172.1709764777@warthog.procyon.org.uk> <ZelGX3vVlGfEZm8H@casper.infradead.org>
- <1831809.1709807788@warthog.procyon.org.uk>
-In-Reply-To: <1831809.1709807788@warthog.procyon.org.uk>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Fri, 8 Mar 2024 08:52:44 +0100
-Message-ID: <CAJfpegv8X0PY7PvxEF=zEwRbdZ7yZZcwB80iDO+XLverognx+g@mail.gmail.com>
-Subject: Re: [RFC PATCH] mm: Replace ->launder_folio() with flush and wait
-To: David Howells <dhowells@redhat.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	netfs@lists.linux.dev, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, devel@lists.orangefs.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <2024021808-coach-wired-41cb@gregkh>
 
-On Thu, 7 Mar 2024 at 11:36, David Howells <dhowells@redhat.com> wrote:
+Greg, Sasha,
 
->  (2) invalidate_inode_pages2() is used in some places to effect invalidation
->      of the pagecache in the case where the server tells us that a third party
->      modified the server copy of a file.  What the right behaviour should be
->      here, I'm not sure, but at the moment, any dirty data will get laundered
->      back to the server.  Possibly it should be simply invalidated locally or
->      the user asked how they want to handle the divergence.
+Ping.
 
-Skipping ->launder_page will mean there's a window where the data
-*will* be lost, AFAICS.
+On Sun, Feb 18, 2024 at 10:31:29AM +0100, Greg Kroah-Hartman wrote:
+> On Sun, Feb 18, 2024 at 12:50:16AM +0300, Vitaly Chikunov wrote:
+> > On Sat, Feb 10, 2024 at 01:21:45PM +0300, Vitaly Chikunov wrote:
+> > > On Sat, Feb 10, 2024 at 10:19:46AM +0000, Greg Kroah-Hartman wrote:
+> > > > On Sat, Feb 10, 2024 at 03:33:14AM +0300, Vitaly Chikunov wrote:
+> > > > > 
+> > > > > Can you please backport this commit (below) to a stable 6.1.y tree, it's
+> > > > > confirmed be Kees this could cause kernel panic due to false positive
+> > > > > strncpy fortify, and this is already happened for some users.
+> > > > 
+> > > > What is the git commit id?
+> > > 
+> > > 398d5843c03261a2b68730f2f00643826bcec6ba
+> > 
+> > Can you please apply this to the next 6.1.y release?
+> > 
+> > There is still non-theoretical crash as reported in
+> >   https://lore.kernel.org/all/qjyfz2xftsbch6aozgplxyjfyqnuhn7j44udrucls4pqa5ey35@adxvvrdtagqf/
+> > 
+> > If commit hash was not enough:
+> > 
+> >   commit 398d5843c03261a2b68730f2f00643826bcec6ba
+> >   Author:     Kees Cook <keescook@chromium.org>
+> >   AuthorDate: Tue Feb 14 16:08:39 2023 -0800
+> > 
+> >       cifs: Convert struct fealist away from 1-element array
+> > 
+> > The commit is in mainline and is applying well to linux-6.1.y:
+> > 
+> >   (linux-6.1.y)$ git cherry-pick 398d5843c03261a2b68730f2f00643826bcec6ba
+> >   Auto-merging fs/smb/client/cifspdu.h
+> >   Auto-merging fs/smb/client/cifssmb.c
+> >   [linux-6.1.y 4a80b516f202] cifs: Convert struct fealist away from 1-element array
+> >    Author: Kees Cook <keescook@chromium.org>
+> >    Date: Tue Feb 14 16:08:39 2023 -0800
+> >    2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> It does not apply cleanly due to renames, can you provide a backported,
+> and tested, patch please?
 
-Of course concurrent cached writes on different hosts against the same
-region (the size of which depends on how the caching is done) will
-conflict.
+Can you explain please why the patch submission [1] is silently not
+accepted so I could possibly resubmit it?
 
-But if concurrent writes are to different regions, then they shouldn't
-be lost, no?  Without the current ->launder_page thing I don't see how
-that could be guaranteed.
+[1] https://lore.kernel.org/stable/20240218111538.2592901-1-vt@altlinux.org/
+
+It's tested to compile well and to fix the real crash.
+
+I also think the submission conforms to Option 3 of
+process/stable-kernel-rules.rst so I would be glad to know why if it
+isn't.
 
 Thanks,
-Miklos
+
+> 
+> thanks,
+> 
+> greg k-h
