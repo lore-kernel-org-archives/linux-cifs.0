@@ -1,122 +1,136 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1606940846
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2024 11:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD9841757
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2024 14:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710155712; cv=none; b=MViTd5nEuF3xZ5xsMkfRO7uAlwGIScG34LHjNl693QsxWhH+Y4qPPAARxY8NWpw0IEXUDpDdcXyoHx+n20olLL5Bvgg2QIpxGvboZEYtvhoJrx7KoqzhhXbcyDjPmkeGvQ0FRJc9sZGhiqFPv5kNBTjx21CBpoZu1qrE0/in+Zc=
+	t=1710168001; cv=none; b=KspQKBRpr6l8uxHHrgrgc0o4Ylf4mW9V4AaxzEVi1q2BmrB8Bk4dYoiTflKgi7gc4LumHi8REG5ZplhSp2emjpA1wo0qxjmtYWnKoP/KyliXB9HaMTq1PV+Exnb45WGhyGeSgpRNEcgR5YfkoJpaF0Dm0QHixJrwUxXenpk55VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710155712; c=relaxed/simple;
-	bh=NV7WaJlZY8cJowu6rP1BdugepBnD9TtBVgmojuI2ulo=;
+	s=arc-20240116; t=1710168001; c=relaxed/simple;
+	bh=YzXfKRMkFpzS2EepEb0P0kHreWX3il8z2j7rWbSb7Xo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pYwSDZRfvnNZj+O3uS/REnt6xQ9dsF0y4a6/L1jQSWkPY2oKdyAwZCpjLyyir0Cv2il0I1sBTn/W8YREBTmTo2vx/3urnQENPntNW28eFoxnsQ0f1sxsYLHfFfdbBU/oDOiJ/5C/bX/Nw8ZUfBrJnChd0io8qbpi10BGypX6FJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MwYxPnCK; arc=none smtp.client-ip=209.85.208.178
+	 To:Cc:Content-Type; b=X509ZGT5Aa4q2KWTowOyoOqd7diGINysxIijtKE5X1N97iTe9War+oHm3v4Vx5c41lQXUyGLukyClQpilJDZA82eF0m153MxVOq6Ux9Q0e2RKvACXMuSxP0lB2lFyzCQ1XViTwJAreoozgNta3qsplrwkfVytlPdL1ZmhP1AcXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LivbrN2O; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwYxPnCK"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d309a23d76so45117541fa.1
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2024 04:15:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LivbrN2O"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5131a9b3d5bso3820818e87.0
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Mar 2024 07:39:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710155708; x=1710760508; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710167998; x=1710772798; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YZX/JTbH1IoiGOc3ngSDiJ8E+JC6UZKwvpbxQ5HNkRQ=;
-        b=MwYxPnCKwE1ir4EobRNl/kFtpFz68D3Xd9BvTXPA2RpKXCgh0M1daGEQDWhzPiPE5n
-         4ZakUad/Zd48fthytgntZuEHAPp20deVWGJG3NybD8+Zcvr4DoPzB4+L2YbJXiQSWlXW
-         rNSTKgE9Ho7Oeg1FY6ZNqRpnq/3IaACGNNVFEoK9/TmGsZ2E+uKHCWRQSMbtWAiAVeMt
-         YGpXpW0s+NYnz5y+EHDHMpA85ztoA3XAyzSGNbrKBxmltA5CGmwlyL3PlFtNs5PNEe1e
-         niOFqYFkgO4bLQSh56pzeT7gzVLhQzH3Qt/CGJsoVviAqj2GcTNQZzyti7jyVvqHzTju
-         dKyQ==
+        bh=Bp0xFofWrxDS6exdLwIEbaN316KVk7xGemggEwhjQk4=;
+        b=LivbrN2O8tCY8NgB6WJa2puAokHZ9O91WQzYHc5h0adxVD+YCfIz4OMVoruQ2Nvf0P
+         hnvwGmyBoGsqdGCJtt14m643yUKXzUnt99XVvRc7kNAWC2suG2t/cF8Ip+hDVs3mXpXX
+         a5K42Cc54PF4qAl7DFGpQkutGbYSOFIFyEHVYi5NwNw/Oy7py9C+5KOtuZDdtrN9pBDQ
+         KvHKAe5QZRcBM6ncWLr46pXUN1hXhiQbiwUy/8/+KyK/euJyK+8if3hOrFrMjqzvP2XD
+         S2vBMGtp10hYl4DIzb3mGLigfovDrw7NVSIUhOK3buq0FeUoJCo+36iHb6mq8bnwU4HR
+         gQkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710155708; x=1710760508;
+        d=1e100.net; s=20230601; t=1710167998; x=1710772798;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YZX/JTbH1IoiGOc3ngSDiJ8E+JC6UZKwvpbxQ5HNkRQ=;
-        b=PBfUfCT/d42SfedKPbrRB82IylW0naLsIo+PjIQdPUnUxsfGg/nn52eUbR29G4rWBY
-         /TccfPNKsoQGEa+gA7Sh/Pzm8XmfLfuLXFvI4DmS9D+Jb2LiKw1MzlcvD2PTPpOUP9ie
-         VbPpoMRzCTi3jU9QuyPfDNPwTOHHN5LfiNNWuql0EBY5N+DbLCtxYPTUCwRxuSIsyTFd
-         NOaZhy2D3+FOdTDR8s0PROIlN6Qpoh07mPxkGp8hxiGyC1fT4SaZSJ46nUutXjdOVrdz
-         qCHITr8zYIzVLjz0HXgNyMYP2ie6ekR9puhhFwCBwQUinMdNQd0BBBR5ovfS3n0/hEjt
-         ylyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMbjGgeSOWYb+NVvVCbiK9RGUfuJrpRC7y0AdrrfmQkOYWbMsa/VWn3+guYc/cUAdc+peFD3wjwlwmMQQGGaAt3jt0XF5Sg5QedA==
-X-Gm-Message-State: AOJu0Yy1nHsJ9CIsqp6g7M+QYlPJuqKMSAN4QsAq5PDtPV8z0FIVN7xD
-	HZVWk5TUamY/HNV+/k88kWiGy7AEpWTMSMkLYwNsJ90glDoy4i6cDGooqW77AKM6bBfq6jlvnhh
-	YdGop3Nyxukt+dgbD88btDGTz9yk=
-X-Google-Smtp-Source: AGHT+IHVjUgP1J1DfBvAuBLY4L2TU665ZEJqZTvB2QuzfMd0XjKAUG/RIOyNXt+ZgE6C9+Q8YMASfqS4PDwcZsiBDBA=
-X-Received: by 2002:a2e:9c05:0:b0:2d4:22d9:b01a with SMTP id
- s5-20020a2e9c05000000b002d422d9b01amr2310370lji.11.1710155707868; Mon, 11 Mar
- 2024 04:15:07 -0700 (PDT)
+        bh=Bp0xFofWrxDS6exdLwIEbaN316KVk7xGemggEwhjQk4=;
+        b=BbgdeW5qNV/RRxF2EX7q5bISozyq5lXDeik/AjcKl2NFbp1/vFcN6HlbaimVWvAzms
+         wL6YhbSBaYLHswa0bpP/godxLwirgZtc/iGV3XtMnHQPJEkFEEgOA1nBKHC22twYdNYb
+         TFFJd45s+TxT+8qU+Cg3LAY0LQbd1yTxrvclGo82dWo9QbtzGNQJvgYbXgln43dOagwQ
+         lYg+kBKM6arys4Tt4WVewxGdQ3ORZsiwfLdpTsPIIEhEd5KZnaYgSFRq+2U9nZLXgDmL
+         xVoQmR9xn++wyjhfHjTjHsheicCh1L5nIIRq6XPj9O6bPA1SomrJ++Tl1XZ//UzMXMPj
+         ESiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtz8hqZIamuu3s0Yb5kXkJ7Iv9KqqCHY1YIgHCjwu9tNJ3YaVD561s01rlSWz3AMqZTpzVLvvjrYH9sQtuWTMWOGUpG92trgEEJQ==
+X-Gm-Message-State: AOJu0YxdMwxQfN2CuYk/RA25hDLdpHcOJ57+QTjoeYYK1hJKd+4CVJvy
+	qGtiuvF40Hyf/bPxnJcJM1j6gEH9OAY/gjGJ6lZqWCNAHCofew5fWIXES19o9X7DZJ+SFm9gwas
+	mBSbFEJffxI5ah4T0pk67MJxNBf8=
+X-Google-Smtp-Source: AGHT+IEUXmHS0Eq/REGcXHCS/ca58Zj7/jZTAWZmBF/ZWHDIWCJnH6hCr/0mWqxypZUnjeOT9AqcTK6DHP5c5+D+quI=
+X-Received: by 2002:a05:6512:480f:b0:513:1804:9359 with SMTP id
+ eo15-20020a056512480f00b0051318049359mr4419122lfb.17.1710167997654; Mon, 11
+ Mar 2024 07:39:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230310153211.10982-1-sprasad@microsoft.com> <20230310153211.10982-8-sprasad@microsoft.com>
- <4b04b2c4-b3ff-48e7-9c24-04b1f124e7fa@sairon.cz> <CANT5p=p4+7uiWFBa6KBsqB1z1xW2fQwYD8gbnZviCA8crFqeQw@mail.gmail.com>
- <2abdfcf3-49e7-42fe-a985-4ce3a3562d73@sairon.cz> <CANT5p=oFg28z7vTgyHBOMvOeMU=-cgQQdiZOw22j4RHO94C3UA@mail.gmail.com>
- <f395be9305cbe75c3171a84e45db42fe@manguebit.com> <3fc78929-2b5e-4961-b5da-6914f2dc45e1@sairon.cz>
-In-Reply-To: <3fc78929-2b5e-4961-b5da-6914f2dc45e1@sairon.cz>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Mon, 11 Mar 2024 16:44:56 +0530
-Message-ID: <CANT5p=oX_d-aZMJLhECU47mqsxz+oeaqqZEzjjVv5pq2gxwtVA@mail.gmail.com>
-Subject: Re: [PATCH 08/11] cifs: distribute channels across interfaces based
- on speed
-To: =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
-Cc: Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com, bharathsm.hsk@gmail.com, 
-	tom@talpey.com, linux-cifs@vger.kernel.org, 
-	Shyam Prasad N <sprasad@microsoft.com>, Stefan Agner <stefan@agner.ch>
+References: <20240311012425.156879-1-pc@manguebit.com> <20240311012425.156879-2-pc@manguebit.com>
+In-Reply-To: <20240311012425.156879-2-pc@manguebit.com>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 11 Mar 2024 09:39:45 -0500
+Message-ID: <CAH2r5mvXVfH8g0R0086qBtAcpR1NV8oyK5OF1ENGMqUeitbBBQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] mount.cifs.rst: update section about xattr/acl support
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: piastryyy@gmail.com, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 11, 2024 at 3:31=E2=80=AFPM Jan =C4=8Cerm=C3=A1k <sairon@sairon=
-.cz> wrote:
+You can add my Reviewed-by: Steve French <stfrench@microsoft.com>
+
+On Sun, Mar 10, 2024 at 8:24=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
 >
-> Hi Paulo, Shyam,
+> Update section about required xattr/acl support for UID/GID mapping.
 >
-> On 06. 03. 24 16:43, Paulo Alcantara wrote:
-> >
-> > Yes.  I see a couple of issues here:
-> >
-
-Thanks for the review, Paulo.
-
-> > (1) cifs_chan_update_iface() seems to be called over reconnect for all
-> > dialect versions and servers that do not support
-> > FSCTL_QUERY_NETWORK_INTERFACE_INFO, so @ses->iface_count will be zero i=
-n
-> > some cases and then VFS message will start being flooded on dmesg.
-
-Valid point.
-
-> >
-> > (2) __cifs_reconnect() is queueing smb2_reconnect_server() even for SMB=
-1
-> > mounts, so smb2_reconnect() ends up being called and then call
-> > SMB3_request_interfaces() because SMB2_GLOBAL_CAP_MULTI_CHANNEL is mixe=
-d
-> > with CAP_LARGE_FILES.
-
-Excellent catch. I did not take this into account.
-It is very likely that this is going on here.
-
-Let me submit a patch to check the exact dialect before calling these
-functions to make sure we only do it for SMB3+.
-
+> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> ---
+>  mount.cifs.rst | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
 >
-> thanks for looking into this! Is there anything else you'll need from me
-> or to test by the users who are observing the issue, or do you have
-> enough information for a fix?
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index f0ddef97a0e8..bd39c165c130 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -321,11 +321,12 @@ soft
+>  noacl
+>    Do not allow POSIX ACL operations even if server would support them.
 >
-> Regards,
-> Jan
+> -  The CIFS client can get and set POSIX ACLs (getfacl, setfacl) to Samba
+> -  servers version 3.0.10 and later. Setting POSIX ACLs requires enabling
+> -  both ``CIFS_XATTR`` and then ``CIFS_POSIX`` support in the CIFS
+> -  configuration options when building the cifs module. POSIX ACL support
+> -  can be disabled on a per mount basis by specifying ``noacl`` on mount.
+> +  The CIFS client can get and set POSIX ACLs (getfacl, setfacl) to
+> +  Samba servers version 3.0.10 and later. Setting POSIX ACLs requires
+> +  enabling both ``CONFIG_CIFS_XATTR`` and then ``CONFIG_CIFS_POSIX``
+> +  support in the CIFS configuration options when building the cifs
+> +  module. POSIX ACL support can be disabled on a per mount basis by
+> +  specifying ``noacl`` on mount.
+>
+>  cifsacl
+>    This option is used to map CIFS/NTFS ACLs to/from Linux permission
+> @@ -750,8 +751,19 @@ bits, and POSIX ACL as user authentication model. Th=
+is is the most
+>  common authentication model for CIFS servers and is the one used by
+>  Windows.
+>
+> -Support for this requires both CIFS_XATTR and CIFS_ACL support in the
+> -CIFS configuration options when building the cifs module.
+> +Support for this requires cifs kernel module built with both
+> +``CONFIG_CIFS_XATTR`` and ``CONFIG_CIFS_ACL`` options enabled.  Since
+> +Linux 5.3, ``CONFIG_CIFS_ACL`` option no longer exists as CIFS/NTFS
+> +ACL support is always built into cifs kernel module.
+> +
+> +Most distribution kernels will already have those options enabled by
+> +default, but you can still check if they are enabled with::
+> +
+> +  cat /lib/modules/$(uname -r)/build/.config
+> +
+> +Alternatively, if kernel is configured with ``CONFIG_IKCONFIG_PROC``::
+> +
+> +  zcat /proc/config.gz
+>
+>  A CIFS/NTFS ACL is mapped to file permission bits using an algorithm
+>  specified in the following Microsoft TechNet document:
+> --
+> 2.44.0
+>
+>
 
-Thanks for bringing this to our notice, Jan.
 
 --=20
-Regards,
-Shyam
+Thanks,
+
+Steve
