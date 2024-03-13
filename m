@@ -1,181 +1,107 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D73383BD;
-	Wed, 13 Mar 2024 10:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CE23D386
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Mar 2024 10:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710326461; cv=none; b=Pr65I3rbWwyCCnqVXL/xlr5gYzxqZVxGZVZQUnwvChbcyqMDrHCjRZc/NLxC6rqWAn2NXURAl1+S7DI6ZpMoi4neo40oYhxlZU5xsr+l8MungYDFT43C6OHOT4av+d3ZI93KYxmx8Qf+LfXlEkCYUM8S0H0p/NzbG7yZ80mbLe0=
+	t=1710326737; cv=none; b=WR5ONnmsVmOpJuNK2JoYcKZpR8VQEqcDyEPJe2S0mC3aYFsoU/RdE7qnov9W/K+e2hlmZI5eT/WoYaxhji43e15sHXiKl4iJ2N0WfyG3lYRvjjNOicD3jTENHdUBps+6cwNvZNOAi/v1YotKNLCwSl4akLel6hdicT+STwSBcsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710326461; c=relaxed/simple;
-	bh=iniw4FjfzHJdtwpcTqrZL65yCg8M9Kq+nWaVRTEzJ7c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LGSPW6FtZPdPksZK8sI21aLClX0Lw2g4IUKrXtPZ6uVRkA2T8T56MZVwlDu/9Px//q3XXOvBy+b15sbFF1b9OfRwVvTX+KLH8b9HIGaL/iAL9K41e2im8Rid7SHwURR0gfuxyXcRrO6N6M39hRq+QyuQWcYoAyxE9eGSFhHNpp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V4KOQBJJ; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1710326737; c=relaxed/simple;
+	bh=8HBh+WXEdt1wIlSF5vgTLeDOy2vNRKWif75mR2BLQqo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hjBhjffDmWFG8ZQ4DUqm/QJ8htGWRjwTy4fuDjxmetvH6VAi5ldA9PLLtsRwOg8+aRK+bzVpBIwlis7wiC4zSouaH56pJ0o5rbHIthggYAQteBs3nNvPlZRW4QJD2Uw1bcQl/+g6LArny8QEaSxDdkjp1nv2OG77DZj7bgNh7v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/+e/wM3; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V4KOQBJJ"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1dd7df835a8so36844315ad.1;
-        Wed, 13 Mar 2024 03:40:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/+e/wM3"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512f54fc2dbso821988e87.1
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Mar 2024 03:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710326458; x=1710931258; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1710326734; x=1710931534; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6MTmoXI1DvsvyziwsWc47N2vchUh9twoshfIbZ2A0NI=;
-        b=V4KOQBJJPM9XSDSh0WHQR/Ev9Cm6dsXrgyOGNxIV9qwnyG7KNaMXn7MDdUwRxrQwMk
-         JGiV3B5KI9vaXZXphjIC8FwAOxqlwhRxpHukupc1auC0S4kO0v+5E+O5gbSsOAOcNBZt
-         DzUstrH1GQSIRFhvpC9Aii02Tdc05zawSoKRYsGlIfDQz6GvogmL8vJGpl/QngmakT8N
-         N7mTHFKIxTVLCgS6QQInAbLWKwOg4ibRi+lSBB93HesOEnC86tadUemRMF7eZ2Mjajfg
-         JBhH8yIDaeV9t0XdcPf1GBCNjUzT8y0SpSkI/PwPmuzWrUDpR7iDEZnQcokWiuKokQoA
-         D/Pg==
+        bh=8HBh+WXEdt1wIlSF5vgTLeDOy2vNRKWif75mR2BLQqo=;
+        b=P/+e/wM34KDmzvu1Wn4f9cC7yHxPvIA1t8NE6Bk1fCNS8c2fXNVCIcFOtQBwpaw6p8
+         nawa+KrGZj9VYyYwmLKQuhE3m8N/kn/AKhtzbIiay7VRtQJ41UMKUzWV8ISfzzYaqFRw
+         0cVbEBc/BXtZg8tc+Xm410jMe0H2c4sSEPvm41AJhe30C8SOx1EotcNn2UBqPB/9+zKJ
+         NN+Auc4tE5oVJuPvtOPLWvhymQlfBPeG0Ouk5W3wzvKg0LYGY0QDWoFdt+DXv3TT8ap3
+         9M8psK/yQB1kta0+H4DOqbt4CH79Y8ouRubh5lrVA2osWszqcv7uVdDiBL9yPokimS2Z
+         2Ecg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710326458; x=1710931258;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710326734; x=1710931534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6MTmoXI1DvsvyziwsWc47N2vchUh9twoshfIbZ2A0NI=;
-        b=wyoEXZomTlb6fk0hiNR/3lG66GhByGTcda1h2cgnLRaTLhe5J1u0msWjt+wxvC29cm
-         gLi4Rdke5UoWzhx7b0+BKGp8FWOHaMnFQw/44FRR3iQijzMFLVZ+zZmxSBj+RTJmAzRa
-         R1K66TXApRN50tbCWC0Z7r9fRVXLFofQVwX7z4GkY6HgLvM2V811aG4rSz1mFQ2U6K29
-         KslSDWqBDiHZg3QpCDti1TLYEtQ83PW8SuiG3IJl74fdercHQDrZesL5uE5ZCp44bORv
-         KbSV/6COL5hJDkkLqgFA1ZJH2H2cW79jlGz1DBteMst8KiLMWJ9lglXT5FL1bSmXjdDl
-         lYng==
-X-Forwarded-Encrypted: i=1; AJvYcCXrEHhWLcdMVSn1T8qYBAmil+xpIeJzJGtve6rC8ITLSm3Pe9cq7t2SuWzZYdJiteAnvDAh3uBet26pmgpQRj5jhXZePdbp
-X-Gm-Message-State: AOJu0Yyg5rOmTEmw90VEhoRL/ZJuXxS/x5zSbWjlgho2BH5mo4dGKm2J
-	BZhtw4OuT7AoF9KKofzl/8bpsox1PQc2YnihNZ0khruskzW5nmceqIZIw/3E+tA=
-X-Google-Smtp-Source: AGHT+IHLGc6WF2afTyIgZU+HNVN527Kh1r1dFBHrijZ8ZZIu5s966ZxkKGm5flnZSAJGAa7AJpwM1g==
-X-Received: by 2002:a17:902:f813:b0:1db:7c5e:f07c with SMTP id ix19-20020a170902f81300b001db7c5ef07cmr2573491plb.66.1710326458008;
-        Wed, 13 Mar 2024 03:40:58 -0700 (PDT)
-Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id u6-20020a170902e80600b001dd88cf204dsm7175433plg.80.2024.03.13.03.40.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 03:40:57 -0700 (PDT)
-From: nspmangalore@gmail.com
-X-Google-Original-From: sprasad@microsoft.com
-To: linux-cifs@vger.kernel.org,
-	smfrench@gmail.com,
-	pc@manguebit.com,
-	bharathsm@microsoft.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	Stable <stable@vger.kernel.org>,
-	=?UTF-8?q?Jan=20=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>
-Subject: [PATCH 2/2] cifs: make sure server interfaces are requested only for SMB3+
-Date: Wed, 13 Mar 2024 10:40:41 +0000
-Message-Id: <20240313104041.188204-2-sprasad@microsoft.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240313104041.188204-1-sprasad@microsoft.com>
-References: <20240313104041.188204-1-sprasad@microsoft.com>
+        bh=8HBh+WXEdt1wIlSF5vgTLeDOy2vNRKWif75mR2BLQqo=;
+        b=Yl8Apmh5LWXx/HHZlDGT2YxozV6rJwxYaMRw2s/ujI8gZDx8g2WlFNYc6Su5AODNtZ
+         8ikM6FN27/VCl8TTi4TjX7czGfdskqxyLFf+kA3J/m/C89BdA3QwuPwVAb4qSm0SEDM9
+         I/w43equnlV+cmOnl+LAjV4cxdn9Q4dC8r66dtFBrX00HH1/M93oIggyPlB/LNEPC6+1
+         Ak9JQPU49fIlKfrE9Uf2s/kjJ7tWgqAZ2jdAdGB53SfU9hb2DG1GgyGQcrp7mu5csJ5g
+         nKaWeucAf5UyRONR1qbX8Aew0dHuNkGTqd1UEwvK3OVB/vWkHssPjZyNvTq8jgXXcvzT
+         maGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVAVESNAh6NjH9gn3BrwJ/OV0Ks0Ah4O98G8cqdbadB+an2+1siR6HhE3tzY1X+bGZu2K/Ed8hLCXGEemySwAD9lr2/guLDUVSIhg==
+X-Gm-Message-State: AOJu0Yw8unqY/uR4H1TOtvtonnh+0yCo0C5b4U4GIJ7EAshiyNmfJCdg
+	aQDLrGVsbDJm4IF/n0bTpngw3fiTpZHawsmu9ZnUOl0sB3kUm1BIyBvgB90jbh6+pS9alexs7Nx
+	wn8vSepafSEzvtx52TWP3WDvA3AY=
+X-Google-Smtp-Source: AGHT+IFeZeuIJt4bSv3fzvXZnurDkK6lqcXZYIgBmM51ztXo3Hoh7qiy+ScjN00rFPFJEt0KV7dj8wM9ahP65AZWuNc=
+X-Received: by 2002:a05:6512:282a:b0:513:a1eb:c084 with SMTP id
+ cf42-20020a056512282a00b00513a1ebc084mr2089744lfb.7.1710326733287; Wed, 13
+ Mar 2024 03:45:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230310153211.10982-1-sprasad@microsoft.com> <20230310153211.10982-8-sprasad@microsoft.com>
+ <4b04b2c4-b3ff-48e7-9c24-04b1f124e7fa@sairon.cz> <CANT5p=p4+7uiWFBa6KBsqB1z1xW2fQwYD8gbnZviCA8crFqeQw@mail.gmail.com>
+ <2abdfcf3-49e7-42fe-a985-4ce3a3562d73@sairon.cz> <CANT5p=oFg28z7vTgyHBOMvOeMU=-cgQQdiZOw22j4RHO94C3UA@mail.gmail.com>
+ <f395be9305cbe75c3171a84e45db42fe@manguebit.com> <3fc78929-2b5e-4961-b5da-6914f2dc45e1@sairon.cz>
+ <CANT5p=oX_d-aZMJLhECU47mqsxz+oeaqqZEzjjVv5pq2gxwtVA@mail.gmail.com> <669bc66f-74ce-4753-bbff-bfa497c8905c@sairon.cz>
+In-Reply-To: <669bc66f-74ce-4753-bbff-bfa497c8905c@sairon.cz>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Wed, 13 Mar 2024 16:15:21 +0530
+Message-ID: <CANT5p=oSYbhVsupD5r0uDU3Miq7gnL15RoB-i2cwBmkap9Hj+w@mail.gmail.com>
+Subject: Re: [PATCH 08/11] cifs: distribute channels across interfaces based
+ on speed
+To: =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
+Cc: Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com, bharathsm.hsk@gmail.com, 
+	tom@talpey.com, linux-cifs@vger.kernel.org, 
+	Shyam Prasad N <sprasad@microsoft.com>, Stefan Agner <stefan@agner.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+On Tue, Mar 12, 2024 at 7:50=E2=80=AFPM Jan =C4=8Cerm=C3=A1k <sairon@sairon=
+.cz> wrote:
+>
+> On 11. 03. 24 12:14, Shyam Prasad N wrote:
+> > Let me submit a patch to check the exact dialect before calling these
+> > functions to make sure we only do it for SMB3+.
+> >
+>
+> FWIW, most of the reports (except the first one with macOS) are users
+> running their SMB server on QNAP NAS's (more details are in the GH
+> ticket I linked earlier).
+>
+> Please CC me in the e-mail with the patch as well, I can create a build
+> with that patch applied to 6.6.y and ask if someone could try if it
+> resolves the issue in their environment.
+>
+> Cheers,
+> Jan
 
-Some code paths for querying server interfaces make a false
-assumption that it will only get called for SMB3+. Since this
-function now can get called from a generic code paths, the correct
-thing to do is to have specific handler for this functionality
-per SMB dialect, and call this handler.
+Just sent two patches for this.
+One patch is just to change the log level for this log from VFS -> FYI.
+The other one is for the suggestions made by Paulo.
+#1 will fix this anyway. I'm curious to know if #2 alone would fix this pro=
+blem.
+Also, please ask for the output of the following command while testing this=
+ out:
+# cat /proc/fs/cifs/DebugData
 
-This change adds such a handler and implements this handler only
-for SMB 3.0 and 3.1.1.
-
-Cc: Stable <stable@vger.kernel.org>
-Cc: Jan Čermák <sairon@sairon.cz>
-Reported-by: Paulo Alcantara <pc@manguebit.com>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
----
- fs/smb/client/cifsglob.h | 3 +++
- fs/smb/client/connect.c  | 6 +++++-
- fs/smb/client/smb2ops.c  | 2 ++
- fs/smb/client/smb2pdu.c  | 5 +++--
- 4 files changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 53c75cfb33ab..b29b57ab9807 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -346,6 +346,9 @@ struct smb_version_operations {
- 	/* informational QFS call */
- 	void (*qfs_tcon)(const unsigned int, struct cifs_tcon *,
- 			 struct cifs_sb_info *);
-+	/* query for server interfaces */
-+	int (*query_server_interfaces)(const unsigned int, struct cifs_tcon *,
-+				       bool);
- 	/* check if a path is accessible or not */
- 	int (*is_path_accessible)(const unsigned int, struct cifs_tcon *,
- 				  struct cifs_sb_info *, const char *);
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index ac9595504f4b..234160460615 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -123,12 +123,16 @@ static void smb2_query_server_interfaces(struct work_struct *work)
- 	struct cifs_tcon *tcon = container_of(work,
- 					struct cifs_tcon,
- 					query_interfaces.work);
-+	struct TCP_Server_Info *server = tcon->ses->server;
- 
- 	/*
- 	 * query server network interfaces, in case they change
- 	 */
-+	if (!server->ops->query_server_interfaces)
-+		return;
-+
- 	xid = get_xid();
--	rc = SMB3_request_interfaces(xid, tcon, false);
-+	rc = server->ops->query_server_interfaces(xid, tcon, false);
- 	free_xid(xid);
- 
- 	if (rc) {
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 4695433fcf39..3b8896987197 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -5538,6 +5538,7 @@ struct smb_version_operations smb30_operations = {
- 	.tree_connect = SMB2_tcon,
- 	.tree_disconnect = SMB2_tdis,
- 	.qfs_tcon = smb3_qfs_tcon,
-+	.query_server_interfaces = SMB3_request_interfaces,
- 	.is_path_accessible = smb2_is_path_accessible,
- 	.can_echo = smb2_can_echo,
- 	.echo = SMB2_echo,
-@@ -5653,6 +5654,7 @@ struct smb_version_operations smb311_operations = {
- 	.tree_connect = SMB2_tcon,
- 	.tree_disconnect = SMB2_tdis,
- 	.qfs_tcon = smb3_qfs_tcon,
-+	.query_server_interfaces = SMB3_request_interfaces,
- 	.is_path_accessible = smb2_is_path_accessible,
- 	.can_echo = smb2_can_echo,
- 	.echo = SMB2_echo,
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 608ee05491e2..4fa47c59cc04 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -409,14 +409,15 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	spin_unlock(&ses->ses_lock);
- 
- 	if (!rc &&
--	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
-+	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
-+	    server->ops->query_server_interfaces) {
- 		mutex_unlock(&ses->session_mutex);
- 
- 		/*
- 		 * query server network interfaces, in case they change
- 		 */
- 		xid = get_xid();
--		rc = SMB3_request_interfaces(xid, tcon, false);
-+		rc = server->ops->query_server_interfaces(xid, tcon, false);
- 		free_xid(xid);
- 
- 		if (rc == -EOPNOTSUPP && ses->chan_count > 1) {
--- 
-2.34.1
-
+--=20
+Regards,
+Shyam
