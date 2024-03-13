@@ -1,96 +1,117 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A5D1B298;
-	Wed, 13 Mar 2024 09:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66213D0DD;
+	Wed, 13 Mar 2024 10:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710321381; cv=none; b=IIEPQF3ocOebo7F98dgX1s5UC1djVB8Rwc3/Di5Xr8HbPAx2gGvP/VqcCTCwgueIzajBTwEaojWqqxAP0cEijv5P4nSad/vlVGBRsk3UZgb+v12tOYZlEhl3liZuRWB3KX+2pox6jxX6XCLClRrw4G43iOD0GoFEUpwCY/rt+g0=
+	t=1710326458; cv=none; b=m5zWf5JG+C5U0fEdEgyuDasajYcG+pwe59YKn74fqH420CrApuOO/EPGzAGUAjL3jGKyaxkdx7+vtutM960owQfRXqSgIKgYzktPmlYaxW/lczo1OYmsYEiCkOb303tO70gTQZLtINysixZhhZL4VNsAGRkYw8CZzUxmpHNPFkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710321381; c=relaxed/simple;
-	bh=Atlbt8XHVDTUdCT97W7QdTOXLmd6AcNECPeg4I4RqlM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=RQtd/LNhxVIXisxN5tEmQEHRUMl8Z7KUOoIl1cbobG0ja//5tTmDNTAWopMllfMXORiulANJ9kAm9EUh4HQohM8AQOE1UY8Kf5/s+8s8+BxUNk5zxlWJUueJSUcju4Ipd/EnnW5Z6v8qXihANsu7mJj45XcBRDzawJiHVOdF4+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdYURgJ3; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1710326458; c=relaxed/simple;
+	bh=UNelH5wTjTT8i5mdCLk5Ttahrbgzioby/Lc2B/x0uB8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Zm/BxzLj8QcvWk+UKMngjHCkHFbQTfAAs25d+e2ijEegtdtf4ZlRW6Gg3OExw6xkZ5d+5KIYa9IC+L03A3+v27EW7jnuqpeikghsocyfP03KFm6wh63YNc4vvlnHaltJGzVy+B4hsd2uv2fVBy4vzQ3Sh0gVW4GOIOoLNFq5MMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Io1OYrKT; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdYURgJ3"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33e95b68b3eso2932527f8f.1;
-        Wed, 13 Mar 2024 02:16:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Io1OYrKT"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dd8dd198d0so26675945ad.3;
+        Wed, 13 Mar 2024 03:40:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710321378; x=1710926178; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710326455; x=1710931255; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mGDcHoSk1YuhKsU3tKb5CF1JuJEf/myqjNAnBVPHlLo=;
-        b=HdYURgJ3QjM7vHQRMylTNx8Ek1XtyZMUiljxpzyBFGuLZrUX37u7MDGmVsd4894zRf
-         /y+0R1xPK+v0PE586WzkDG6BQC6TAkvX52AfwgYHaVtYut/9kU1A9jBzoMxZCmLzOZm2
-         WfMuu4UosEg0zMM02mqIiwpH7Dfuzmp0mjVKMWHTJeEupQdzDMAJcMjvhJRM3bFKRWuW
-         iuyYUXIKNcFVkYWgsdKdlW3/1aLq8F6GckDTsXd150jovZ6Unxb82wAY9QQ0SawBPXbL
-         OhuYRzN7vnkIRuAJjoyxVik0IuaFtw6iiX6z5/jisc8UE3C0Fq20i44bvkVCR7koGB87
-         K6eQ==
+        bh=C5s1glts79sNex9bVlpA0c1lBh0VMrNrvQIOC8soHhM=;
+        b=Io1OYrKToCHGcZY+JOKAMfXdCa4FdCZkhhAuMpLW2qLSjdn0oXKPOYmoQPVp7bBnBq
+         F1nuadO9h/KzW9HGqnwLOIKZHw36zX5Jc/t0aQrxOtAKKPv8c1VH6KT/mINbdoDWvV3E
+         M8SyOU0muVPXbx5WDx/bqfctEfzN/a98gRWLR5ic/qaitOb6KM5vob+7U87yx0WrNFaQ
+         i8FGBtqEy0hw4/oLz0gev4WTB00rusH9+Y90ZJ8ekmCfNBUH0UZscOLApLE0tN/hnZ+d
+         manD/TvLXg6cH9DEbY0qgjP0oG42Z3ic2mJf58ytEq2OxXrxx4BDJv1fVhFk3nN8I2Vq
+         F0oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710321378; x=1710926178;
+        d=1e100.net; s=20230601; t=1710326455; x=1710931255;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mGDcHoSk1YuhKsU3tKb5CF1JuJEf/myqjNAnBVPHlLo=;
-        b=fpEFH61mt7M/u6AFE4tUrsfZIDypdTjrz9nVt4du9PvwZK2OT67V4KujnLPLi51xd6
-         NVofh8KtQKGAnM7Y6ZavXe6KrW23Ov3e7gAVO1LpxUi8r9SH0DM9aV+KN9JKW5K7d0i9
-         Ep47BdcyuTcjBRFvx9pdWBwgWZlOsDJkhrHiwSxKM11/1gZhobVJMMvRgx6J1oG2d5co
-         aCELgMaDtSCJwWvHq4d23Uz9QtJzDyqf1uq04AAcb00ZVu1oi0VMXRqEUtmoNw70wC62
-         RvZS/PicgYP1bBEg0M/tRcuY2r4FU/50iddmie43dBgSDWq525oofLdJcRQtNNzQhFJd
-         890A==
-X-Forwarded-Encrypted: i=1; AJvYcCXQQ1FXKKyIlQrmF60G6tKnHUj6GnM/Gaff0zY1sSgKe8T8MiSSL5ADmRIiCcIrOMHpV3+20kGt4CBO8fEezKd/6XMGDSbowI+sC77C9y1YEXs53d7cvWVq6GEoS70RhU+phLP6NY4jMg==
-X-Gm-Message-State: AOJu0YwhP/np7nAbHIm+cD4EXGpGQScojydeLr/8fKUzvIiGJlSbnprD
-	8OljKlBdnObmoZRcjCv7C4yUMijFxB6xWLFLigvVhhkZGEVjBG/e
-X-Google-Smtp-Source: AGHT+IEruf3cpMcjdOkRLg3eoF7si8rSAhEbBa0Ar3XOh98WB9H4ieC6eWWoBlx+qNRNT7qF6mweCQ==
-X-Received: by 2002:adf:cf07:0:b0:33e:b316:8597 with SMTP id o7-20020adfcf07000000b0033eb3168597mr1086816wrj.50.1710321377725;
-        Wed, 13 Mar 2024 02:16:17 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id g5-20020a5d6985000000b0033d6c928a95sm11210707wru.63.2024.03.13.02.16.16
+        bh=C5s1glts79sNex9bVlpA0c1lBh0VMrNrvQIOC8soHhM=;
+        b=jyBBiwnSKpJilfn/xNBnhudSWFYoslnwsViNb3fOrCiYKSyxFNV3PhDHtJDcjn2xYD
+         kp5HU4Q80W/Y8JQFIAmpVzMthI5ffOrqBelid8RNPwq+nOzyOro3DaQKZnpvoEeIhriw
+         dGSdg6ZZskbqbs9Wn/F8IZa/qYucwg6ugxKzPP+RVOmb7bTb1m9Q8+vhWNoJWcEzGCAe
+         3MPYayeUKdnIfJXtLoX+u9U2C0QDOgd2Dt1+nrSuKf5Y+PNO3O7qJ+WWGQOIZ2ftkJlw
+         tYJqkgjgDg1tnLDZoJ4k9hkijT5fY/C0GGHSktJd4Xhaux7yyKzBpcKgxHI8fOm847fJ
+         aqOw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9lGrA0ALIwnF+jVFvhoD2K+O6zn7UQ/qVUzm4kEJ+/vFCurjTCd3wx0d9ugVe/CpO1aT2GoqMMAj1GwkdrmD1qFqCqgwA
+X-Gm-Message-State: AOJu0YxFX3K/fyYbKT/yzzPBePyMkSVolxrIxsZMiOWIYwW/3mE/GJDH
+	w7UJfOY80F+W4GV7ypURBhMDl9/WYCGrbjxizKqa+Bc87k8ID9AdXPow8UmzBXs=
+X-Google-Smtp-Source: AGHT+IGDLrLMn9X0u3tp4D6RyjCsWeTOhWxeZ5pHgx6xYzwGOuN/E1yeatexknW60aQPWKk8kkRn8Q==
+X-Received: by 2002:a17:902:d54e:b0:1dd:7e30:4b15 with SMTP id z14-20020a170902d54e00b001dd7e304b15mr13831222plf.29.1710326455054;
+        Wed, 13 Mar 2024 03:40:55 -0700 (PDT)
+Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
+        by smtp.gmail.com with ESMTPSA id u6-20020a170902e80600b001dd88cf204dsm7175433plg.80.2024.03.13.03.40.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 02:16:17 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] ksmbd: Fix spelling mistake "connction" -> "connection"
-Date: Wed, 13 Mar 2024 09:16:16 +0000
-Message-Id: <20240313091616.2266107-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Wed, 13 Mar 2024 03:40:54 -0700 (PDT)
+From: nspmangalore@gmail.com
+X-Google-Original-From: sprasad@microsoft.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	pc@manguebit.com,
+	bharathsm@microsoft.com
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
+	Stable <stable@vger.kernel.org>,
+	=?UTF-8?q?Jan=20=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>
+Subject: [PATCH 1/2] cifs: reduce warning log level for server not advertising interfaces
+Date: Wed, 13 Mar 2024 10:40:40 +0000
+Message-Id: <20240313104041.188204-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-There is a spelling mistake in a ksmbd_debug debug message. Fix it.
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Several users have reported this log getting dumped too regularly to
+kernel log. The likely root cause has been identified, and it suggests
+that this situation is expected for some configurations
+(for example SMB2.1).
+
+Since the function returns appropriately even for such cases, it is
+fairly harmless to make this a debug log. When needed, the verbosity
+can be increased to capture this log.
+
+Cc: Stable <stable@vger.kernel.org>
+Reported-by: Jan Čermák <sairon@sairon.cz>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/server/oplock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/client/sess.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 9af5fd68bd85..80971e60ca10 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1843,7 +1843,7 @@ int smb2_check_durable_oplock(struct ksmbd_conn *conn,
- 
- 	if (memcmp(conn->ClientGUID, fp->client_guid,
- 				SMB2_CLIENT_GUID_SIZE)) {
--		ksmbd_debug(SMB, "Client guid of fp is not equal to the one of connction\n");
-+		ksmbd_debug(SMB, "Client guid of fp is not equal to the one of connection\n");
- 		ret = -EBADF;
- 		goto out;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 8f37373fd333..37cdf5b55108 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -230,7 +230,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
+ 		spin_lock(&ses->iface_lock);
+ 		if (!ses->iface_count) {
+ 			spin_unlock(&ses->iface_lock);
+-			cifs_dbg(VFS, "server %s does not advertise interfaces\n",
++			cifs_dbg(FYI, "server %s does not advertise interfaces\n",
+ 				      ses->server->hostname);
+ 			break;
+ 		}
+@@ -396,7 +396,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 	spin_lock(&ses->iface_lock);
+ 	if (!ses->iface_count) {
+ 		spin_unlock(&ses->iface_lock);
+-		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
++		cifs_dbg(FYI, "server %s does not advertise interfaces\n", ses->server->hostname);
+ 		return;
  	}
+ 
 -- 
-2.39.2
+2.34.1
 
