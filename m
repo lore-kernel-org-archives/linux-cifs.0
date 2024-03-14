@@ -1,179 +1,168 @@
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F981A38EC
-	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 18:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39117350B;
+	Thu, 14 Mar 2024 18:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710440092; cv=none; b=jLVrR+uAhXcmpVEOtiSl58YrkZu7VJtXLvnXCcqHMrLDu9FI2P4It0WqHxEVroZoJNv1hXMxOMpzdWcuvORFo1iG/RC5WtyaWXM3cEz6toR7EwcpBJR2y+IsWAH7iIutkDFZzni3mRyjNqx90f6Z9huAKsMkFrBMZ/ep68zYK30=
+	t=1710441121; cv=none; b=EZoUVEHF++UUYYt9fb4/hpjdkwvysB7w0VUIEI9O2BDkfjP0eTCf6ipD2zul41ZM0Vay59ZbvyxbNemQA6K2KZ/JiceRnVHizaFGaAt7qQxyvwHP8orXEaXHYptopGpdU5Qq6kM/b2cyAyj/DouG1jAfxb0+2g+ND+dPzIeYFjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710440092; c=relaxed/simple;
-	bh=asHZtgjoDYbab099bWBBkQlTy2yfk+LLzCLZV4EdIKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q5m98Jh3ivS8rPnvuHny+3FOhCTtVsKjlP6cmFkegEe5qVOz1Yvk90aZxSCsxyP/IexdCVu9My8z3Uwc7BmHZabA6vjKHABWccy+t9MDmMOsWil72BuB38t6LFzW8J1cAX6nuul85yILG0uRQmNuIAxsOTy8xXBIlbA2N5BzAj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mDl4BgP5; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDl4BgP5"
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dd14d8e7026so1110561276.2
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 11:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710440090; x=1711044890; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Chh9vmxVe3V0d/LrbnqQnwrcKDDdwIPuxFJw5BJoeEY=;
-        b=mDl4BgP5m358vCQsFm3FH5psRJ1M65HSExC/4tBfMe/UFD/LopV4GETCpVZ0h3YIgf
-         YrczVpVwnB+T74FxqFAJh6Mx1MFw6Y8I6YAvzW/piprBHm/EnPib7J6hFMa8COvSjgkY
-         oUSjncxRVaYCUe5u5n0xqUVPrq3Lk8va5cKeiBswjqXjUiTLlHoR3zuoZgUQEKsHSPs2
-         haEHCYrre8oi1wNwVY6h+1OSobLIP1MY1V2A6ugRWxaXV110xeTHCPWe1vvQYdy5M0Cl
-         vJr628+VQRTbfxASuxX7zKTfBz+Wr9b1lUytFCrgY8xT8w+tF+X8ioPypqn3t2AyjVZT
-         Wyvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710440090; x=1711044890;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Chh9vmxVe3V0d/LrbnqQnwrcKDDdwIPuxFJw5BJoeEY=;
-        b=w7Mynhu7xpcaLxSW6vxninVwKDFCXtVxR70OK+fSkFedQlsFqAqhG4rwmQiFy/DSNH
-         MhME9H3LhnFF+umf/m5tp/vQP81r0KXjqHjUScb6Y/ozkI7DvctwuBLVNjIBmfJND+2G
-         1Ns8ozVGN7WEF0ffk32AI+1BbKNLOOMsSPxsmGA0nli7fTyOXCz1x67DzYuQCOHlK+vx
-         OQejKIZobTP5HDV69+dzluPEirZNoiIQ0KOBojCFfaNDnwE0xInUsv+Ftt8BJ9DxNkTQ
-         eg71Fv1U1ugEaEhXru0i1MbX3W4HuNNe1eQGy8DH5ye/rxp584F76iaWYES5MU86WRwE
-         lsLw==
-X-Gm-Message-State: AOJu0Yy+cTvTukijtNPiWKKO0O5vo8G1FUIGeLppp9RJAdj1yR7eHUC5
-	8hZNR/HHyVLHJ81KIWktYGpLmG4ToU6XV3uHUcXJJEO79YGs0V6JarF90lKxyu+Xbvx40oGJsHD
-	YkVnSLLLadX+HGePHkBW9w/PfASC0rR3Y
-X-Google-Smtp-Source: AGHT+IF0u/MaQLkn6B2fu5azwyvIp2l8D1k+dpc2HL3VGKOR8oxSW/peZa7acGMC4MekpTjcA3HKqCVB4W3n9Xejlyo=
-X-Received: by 2002:a25:8447:0:b0:dcd:3663:b5e5 with SMTP id
- r7-20020a258447000000b00dcd3663b5e5mr2314357ybm.25.1710440089941; Thu, 14 Mar
- 2024 11:14:49 -0700 (PDT)
+	s=arc-20240116; t=1710441121; c=relaxed/simple;
+	bh=mvdnoLfy3ROkxmfR7t2H/wROfPIdheF/nBqPtCWPX4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=caLa/U/pxbHZR3c2cgLYTWNfRiA+6oquCYVT0Zmwd3BR/OrkH/rbhZk1lY5pP3oWRjph2JZwAmOZLHBdGaQYp7AYEQdESRFcyNEAwWBKfS3IFbfttuB+96ugNrUdTjPMYwMOfjTBCQ7G8BRIlMWMFp5hWA2G/VbK2/563kweVw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A243FC43390;
+	Thu, 14 Mar 2024 18:31:55 +0000 (UTC)
+Date: Thu, 14 Mar 2024 14:34:06 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Alison Schofield <alison.schofield@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
+ linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
+ iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+ ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
+ brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
+ selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org,
+ linux-wpan@vger.kernel.org, dev@openvswitch.org,
+ linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
+ Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <20240314143406.6289a060@gandalf.local.home>
+In-Reply-To: <ZfMslbCmCtyEaEWN@aschofie-mobl2>
+References: <20240223125634.2888c973@gandalf.local.home>
+	<ZfMslbCmCtyEaEWN@aschofie-mobl2>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313150034.165152-1-bharathsm@microsoft.com> <CAH2r5mvu3Rwbv=b86MwOTYv5W4U4x7+OpM2DMCfwEvyvAEYsEg@mail.gmail.com>
-In-Reply-To: <CAH2r5mvu3Rwbv=b86MwOTYv5W4U4x7+OpM2DMCfwEvyvAEYsEg@mail.gmail.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Thu, 14 Mar 2024 23:44:38 +0530
-Message-ID: <CAGypqWx3T1AXufg+KrTfhTQeZsRR7ON2jtep7c11R8N_1t=jTA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: remove redundant variable assignment
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, bharathsm@microsoft.com
-Content-Type: multipart/mixed; boundary="000000000000f91c3b0613a2ddf3"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
---000000000000f91c3b0613a2ddf3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, 14 Mar 2024 09:57:57 -0700
+Alison Schofield <alison.schofield@intel.com> wrote:
 
-Thanks for pointing it out. Updated patch.
+> On Fri, Feb 23, 2024 at 12:56:34PM -0500, Steven Rostedt wrote:
+> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> > 
+> > [
+> >    This is a treewide change. I will likely re-create this patch again in
+> >    the second week of the merge window of v6.9 and submit it then. Hoping
+> >    to keep the conflicts that it will cause to a minimum.
+> > ]
 
-On Thu, Mar 14, 2024 at 8:19=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> The second change in this looks a few lines off (didn't you mean to
-> remove the rc =3D 0 nine lines earlier, ie the one from the EREMOTE not
-> the EINVAL calse?).  See below:
->
->         case -EREMOTE:
->                 cifs_create_junction_fattr(&fattr, inode->i_sb);
->                 rc =3D 0;   /* FIX: shouldn't you remove this one */
->                 break;
->         case -EOPNOTSUPP:
->         case -EINVAL:
->                 /*
->                  * FIXME: legacy server -- fall back to path-based call?
->                  * for now, just skip revalidating and mark inode for
->                  * immediate reval.
->                  */
-> -               rc =3D 0;   /* FIX: and not remove this one ? */
->                 CIFS_I(inode)->time =3D 0;
->                 goto cgfi_exit;
->         default:
->                 goto cgfi_exit;
->         }
->
->         /*
->          * don't bother with SFU junk here -- just mark inode as needing
->          * revalidation.
->          */
->         fattr.cf_uniqueid =3D CIFS_I(inode)->uniqueid;
->         fattr.cf_flags |=3D CIFS_FATTR_NEED_REVAL;
->         /* if filetype is different, return error */
->         rc =3D cifs_fattr_to_inode(inode, &fattr, false);
->
->
-> On Wed, Mar 13, 2024 at 10:01=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.=
-com> wrote:
-> >
-> > This removes an unnecessary variable assignment. The assigned
-> > value will be overwritten by cifs_fattr_to_inode before it
-> > is accessed, making the line redundant.
-> >
-> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> > ---
-> >  fs/smb/client/inode.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> >
-> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> > index 00aae4515a09..50e939234a8e 100644
-> > --- a/fs/smb/client/inode.c
-> > +++ b/fs/smb/client/inode.c
-> > @@ -400,7 +400,6 @@ cifs_get_file_info_unix(struct file *filp)
-> >                 cifs_unix_basic_to_fattr(&fattr, &find_data, cifs_sb);
-> >         } else if (rc =3D=3D -EREMOTE) {
-> >                 cifs_create_junction_fattr(&fattr, inode->i_sb);
-> > -               rc =3D 0;
-> >         } else
-> >                 goto cifs_gfiunix_out;
-> >
-> > @@ -852,7 +851,6 @@ cifs_get_file_info(struct file *filp)
-> >                  * for now, just skip revalidating and mark inode for
-> >                  * immediate reval.
-> >                  */
-> > -               rc =3D 0;
-> >                 CIFS_I(inode)->time =3D 0;
-> >                 goto cgfi_exit;
-> >         default:
-> > --
-> > 2.34.1
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+Note, change of plans. I plan on sending this in the next merge window, as
+this merge window I have this patch:
 
---000000000000f91c3b0613a2ddf3
-Content-Type: application/octet-stream; 
-	name="0001-cifs-remove-redundant-variable-assignment.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-remove-redundant-variable-assignment.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ltrjs7xp0>
-X-Attachment-Id: f_ltrjs7xp0
+  https://lore.kernel.org/linux-trace-kernel/20240312113002.00031668@gandalf.local.home/
 
-RnJvbSBhOWZmOTZlNmExNDk1MTI5YWFiMGJiMDgzMjVmNTgwNGMwMzBlYjZmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
-RGF0ZTogVGh1LCAxNCBNYXIgMjAyNCAyMzozNjozNiArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIGNp
-ZnM6IHJlbW92ZSByZWR1bmRhbnQgdmFyaWFibGUgYXNzaWdubWVudAoKVGhpcyByZW1vdmVzIGFu
-IHVubmVjZXNzYXJ5IHZhcmlhYmxlIGFzc2lnbm1lbnQuIFRoZSBhc3NpZ25lZAp2YWx1ZSB3aWxs
-IGJlIG92ZXJ3cml0dGVuIGJ5IGNpZnNfZmF0dHJfdG9faW5vZGUgYmVmb3JlIGl0CmlzIGFjY2Vz
-c2VkLCBtYWtpbmcgdGhlIGxpbmUgcmVkdW5kYW50LgoKU2lnbmVkLW9mZi1ieTogQmhhcmF0aCBT
-TSA8YmhhcmF0aHNtQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9pbm9kZS5jIHwg
-MiAtLQogMSBmaWxlIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21i
-L2NsaWVudC9pbm9kZS5jIGIvZnMvc21iL2NsaWVudC9pbm9kZS5jCmluZGV4IDYwOTI3MjliZjdm
-Ni4uZDI4YWIwYWY2MDQ5IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2lub2RlLmMKKysrIGIv
-ZnMvc21iL2NsaWVudC9pbm9kZS5jCkBAIC00MDEsNyArNDAxLDYgQEAgY2lmc19nZXRfZmlsZV9p
-bmZvX3VuaXgoc3RydWN0IGZpbGUgKmZpbHApCiAJCWNpZnNfdW5peF9iYXNpY190b19mYXR0cigm
-ZmF0dHIsICZmaW5kX2RhdGEsIGNpZnNfc2IpOwogCX0gZWxzZSBpZiAocmMgPT0gLUVSRU1PVEUp
-IHsKIAkJY2lmc19jcmVhdGVfanVuY3Rpb25fZmF0dHIoJmZhdHRyLCBpbm9kZS0+aV9zYik7Ci0J
-CXJjID0gMDsKIAl9IGVsc2UKIAkJZ290byBjaWZzX2dmaXVuaXhfb3V0OwogCkBAIC04NDYsNyAr
-ODQ1LDYgQEAgY2lmc19nZXRfZmlsZV9pbmZvKHN0cnVjdCBmaWxlICpmaWxwKQogCQlicmVhazsK
-IAljYXNlIC1FUkVNT1RFOgogCQljaWZzX2NyZWF0ZV9qdW5jdGlvbl9mYXR0cigmZmF0dHIsIGlu
-b2RlLT5pX3NiKTsKLQkJcmMgPSAwOwogCQlicmVhazsKIAljYXNlIC1FT1BOT1RTVVBQOgogCWNh
-c2UgLUVJTlZBTDoKLS0gCjIuMzQuMQoK
---000000000000f91c3b0613a2ddf3--
+That will warn if the source string of __string() is different than the
+source string of __assign_str(). I want to make sure they are identical
+before just dropping one of them.
+
+
+> 
+> > diff --git a/drivers/cxl/core/trace.h b/drivers/cxl/core/trace.h
+> > index bdf117a33744..07ba4e033347 100644
+> > --- a/drivers/cxl/core/trace.h
+> > +++ b/drivers/cxl/core/trace.h  
+> 
+> snip to poison
+> 
+> > @@ -668,8 +668,8 @@ TRACE_EVENT(cxl_poison,
+> >  	    ),
+> >  
+> >  	TP_fast_assign(
+> > -		__assign_str(memdev, dev_name(&cxlmd->dev));
+> > -		__assign_str(host, dev_name(cxlmd->dev.parent));
+> > +		__assign_str(memdev);
+> > +		__assign_str(host);  
+> 
+> I think I get that the above changes work because the TP_STRUCT__entry for
+> these did:
+> 	__string(memdev, dev_name(&cxlmd->dev))
+> 	__string(host, dev_name(cxlmd->dev.parent))
+
+That's the point. They have to be identical or you will likely bug.
+
+The __string(name, src) is used to find the string length of src which
+allocates the necessary length on the ring buffer. The __assign_str(name, src)
+will copy src into the ring buffer.
+
+Similar to:
+
+	len = strlen(src);
+	buf = malloc(len);
+	strcpy(buf, str);
+
+Where __string() is strlen() and __assign_str() is strcpy(). It doesn't
+make sense to use two different strings, and if you did, it would likely be
+a bug.
+
+But the magic behind __string() does much more than just get the length of
+the string, and it could easily save the pointer to the string (along with
+its length) and have it copy that in the __assign_str() call, making the
+src parameter of __assign_str() useless.
+
+> 
+> >  		__entry->serial = cxlmd->cxlds->serial;
+> >  		__entry->overflow_ts = cxl_poison_overflow(flags, overflow_ts);
+> >  		__entry->dpa = cxl_poison_record_dpa(record);
+> > @@ -678,12 +678,12 @@ TRACE_EVENT(cxl_poison,
+> >  		__entry->trace_type = trace_type;
+> >  		__entry->flags = flags;
+> >  		if (region) {
+> > -			__assign_str(region, dev_name(&region->dev));
+> > +			__assign_str(region);
+> >  			memcpy(__entry->uuid, &region->params.uuid, 16);
+> >  			__entry->hpa = cxl_trace_hpa(region, cxlmd,
+> >  						     __entry->dpa);
+> >  		} else {
+> > -			__assign_str(region, "");
+> > +			__assign_str(region);
+> >  			memset(__entry->uuid, 0, 16);
+> >  			__entry->hpa = ULLONG_MAX;  
+> 
+> For the above 2, there was no helper in TP_STRUCT__entry. A recently
+> posted patch is fixing that up to be __string(region, NULL) See [1],
+> with the actual assignment still happening in TP_fast_assign.
+
+__string(region, NULL) doesn't make sense. It's like:
+
+	len = strlen(NULL);
+	buf = malloc(len);
+	strcpy(buf, NULL);
+
+??
+
+I'll reply to that email.
+
+-- Steve
+
+> 
+> Does that assign logic need to move to the TP_STRUCT__entry definition
+> when you merge these changes? I'm not clear how much logic is able to be
+> included, ie like 'C' style code in the TP_STRUCT__entry.
+> 
+> [1]
+> https://lore.kernel.org/linux-cxl/20240314044301.2108650-1-alison.schofield@intel.com/
