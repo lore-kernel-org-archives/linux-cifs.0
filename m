@@ -1,169 +1,155 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061B174BE8;
-	Thu, 14 Mar 2024 19:56:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DFB13FFC
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 23:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710446165; cv=none; b=pYP8g86iXNUr56UqvfqWu/9RcFvfN1aC/PwQspALIf2bX4saqhXc2O19rKZyCvdTByk6G6J8Co5aQabqIiVtT1HsaECnPfV61t76tGPfnW/CDwP0X2oPoPjRgG8+NBrm0UnfTtZfWZ9cWALRYkpzla11ghDA1QCXWmhxr6JeqgM=
+	t=1710460056; cv=none; b=di+D1vkRiCQ2sNz2PkEleZp/U8Zx5MS/yPNDvdc7csrVwK1pbgR+7QBHtoDa1WUjSy9eUWHmIHCzW2jKTAvyoK1gsU6wIVY3cogmN4b1qvvxK4QP/7h+VwdcxP6gGoyyqwx0+it/KeNcrPplvsT0UUZY3TZzsiC3+ONPHxYZXYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710446165; c=relaxed/simple;
-	bh=dMtdr+z4geWEk1nGxP9DZ1xFcbrcm4t9EL/q1iF77rM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nDjzAQWVYB9T3ZLkBM+1PEfY7UhKlRgQMCMDGnHrefQCG+7MKsiudEyC7jljDRnAM7b7tdrodOFWaH5GKiKQ/8mWNofRu9JrvJADjPKL3o1jlFDfuQogDB/kp0T+Ma8tsFNLmGDr3y8wawPwfu00i5ooC0RiAv3AYRc6SXvn4lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhACOGk4; arc=none smtp.client-ip=209.85.167.44
+	s=arc-20240116; t=1710460056; c=relaxed/simple;
+	bh=xC45Bb4a3dmdnIJ0vIzzxsMmhIG8y+WilTWYO4nQ/eA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=JaxeWi463PqEX7HNJNcpBtZT1Vwlj64rOTqJAZNAjP8HMA8f1BWaINQc62vvnTPmuciLslhBH4Nx1fxlguxY1+FFHkW/y4WgmfBB13fSA3cbxhzy4RrVDwb+mN0nO4s+tNiFPMNcf4X61sYh9AsOFb4fY5b3S8kc+fuIYubl5bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I98+5n1F; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhACOGk4"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-513d4559fb4so1032029e87.3;
-        Thu, 14 Mar 2024 12:56:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I98+5n1F"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-512ed314881so1395653e87.2
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 16:47:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710446162; x=1711050962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WmU5kHfUbvawQJQeqNyzZ92DSbRivWiIURaaWWNvTq0=;
-        b=hhACOGk4kNkVMdShtb6IDPmfV5idflHYDAkLrKsbt9G0xWvLfVqr226pUilH6Ig1wW
-         oodm39SfrPNyYHe96Jgsqe85SWj/2jmmC4sa69RR4xUI4YV95+/av/O+4LwLu/6UwpSF
-         6uZ9/IYsZsZQWuqxSuJc3IX0tgbt0Fsp9+m38NZ231EqKoUiRb6+RQY4L+NC8h1iO3+k
-         +hJI1owALr9BpQMY/XwVXIYxVvhzWkej/pXtKneVan2ZRIbM4y0bwfmout4/Lp0ME5wD
-         5IL9pNu+qetg9xMuzHj63VCMNNRp6oGnV/ncXxnUkshrI+C8qaIjTRtwB/PonhlYEQZy
-         2IUQ==
+        d=gmail.com; s=20230601; t=1710460052; x=1711064852; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0iVItpnFQluoBoOPkj1VI8rK2Hyc44DmMMqpPJeZdvQ=;
+        b=I98+5n1FfdG2JHwzOz7op9ZGn6MM1uTufMT02Y0ZAeRjnLnfaDrKmVheCN/DPGeJ6E
+         VpqgAC4kbmdolAsZ3yXWa0lFikbtT3HfaY6KjP3sPiGDc9U/Q+aGagil4UWswG2hkUMh
+         ELuP5eMTa4LgYMEAHFpqPKJRcEs74Td0711O99BV2s7FAo4yi9R3L1gB/5ni0liYB1s+
+         uCA+mjyNPPYYVk+VNHr4poEdUJihp+a/lD6/9KT1tovj8NQ/DipAm1GcXDgfDJYdxIOq
+         Efc/Lr0JTOi65CIqIU6tFeGzJ210s/hWh8iLcGXYDG/V20iNFQKRrl/U2aI/OLuejbbf
+         5CsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710446162; x=1711050962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WmU5kHfUbvawQJQeqNyzZ92DSbRivWiIURaaWWNvTq0=;
-        b=aPegjSnqmFX3tzx5e0SRrD7Q7Gwr06AZ+tQc1ETzqpWH483w5MhNrtaqRLpuSq7Rkw
-         qvUEbo90RTzAa53hY68+gwtXExbxnckTbl66KD7PHZNHJIqQtDJFLatPv3XlV9u9o1Vu
-         NNVo/n54f0PQuoivT6DKWtbGPTcXJV1xc0wt17fPSxNaW35X6F0s2Gl6bNwGuEO7O5bC
-         uqYB62d4hqT617EZHP26/qTU19nIecYr5whan0uwn9tw1BccLSu5RGzkk026+qkXROua
-         b30iqA/LRB06gJRes8uuD+CJXQADv41BjTsJ7PGDh7jDT21vjOcpCvnZAoQxQSZ5Xxv6
-         gLtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVw8twsV9P8vUU/YBMAZ50vtH2zuVHtWX4hUw0TgMTstU9EDQNDZJMCMmL1uQwzztGvC0AEG0xX18a+PePzGHe6XrIWRzUaXXlZ/N9RAyAcuw7Z/dFchZ2tCoT4P3nGkJYKewR5NIbaCAk=
-X-Gm-Message-State: AOJu0YyJ2Qs7+N2w5coQuj7Oa8yzIK3AXLPFVgDF095F153fbn+FIik7
-	0CsN09K2rQe2RgmNaNxm6NRoK3/3v3Z7qm198FnwDpVanfbrEbS2NSqmvlz9g5Gna4fSaNDRfVg
-	FlE14UQhdSzgOLtBYKrQfGVLWdQc=
-X-Google-Smtp-Source: AGHT+IHVjuQkZFwa6Zwnan4Px4We41FJXhl7ioG9TTa71PGzxxVT7QOjctjDO9GawpmgI5YMmim5zZ1OQ0sDuixZmk0=
-X-Received: by 2002:a05:6512:469:b0:513:c9de:ee30 with SMTP id
- x9-20020a056512046900b00513c9deee30mr2228965lfd.17.1710446161749; Thu, 14 Mar
- 2024 12:56:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710460052; x=1711064852;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0iVItpnFQluoBoOPkj1VI8rK2Hyc44DmMMqpPJeZdvQ=;
+        b=d+SyCm4Tmhdu3V40xIB7wG81ldBGCNAYsr5w+fX61Hw87QpMRYleC41j14V9JNiuFa
+         JWf8Wt+SGtVhbMDujsBGZtzK23BZIYO1LZAl5JNxJa47o13mxeBlz1vopL739DkldL1h
+         Ac1UlZbkYhh9cRME7J8bzxfKfRlVX7DyDPOY22pAMkLGqoJUN4+ZFuy/HbRUhsAGde54
+         an3rPh4f98bZih1Hkp8xuftxk/n+RcVC/SLufBAPqK0NPvhSPJJoOhvVMhB0MtwwVN6I
+         kytP2e2bg61PTPeSPMvovyPw7iNCT5FF6nrVljoxVrRnTeeAm3M7T+SD8ic+HD02YAMP
+         Z50w==
+X-Gm-Message-State: AOJu0Yy9QdN6ln9NxiXk2lyxLLyAaXHpEtGixkIb60sIPdXzTYOxUnDI
+	69Fd+5s43ATzwPCxU9suExzPnprec2v9tYdl0YhrlVlQcTJGc7zlbutJkhNFR8+mLhc/V7xdOYJ
+	XpruQoT1bDs+IewMFJTpbLlJsKedRHamyHK5eCA==
+X-Google-Smtp-Source: AGHT+IH4RESBKugn+rIAkdAYsBYbefi0NbyPax/0WF9L+akE0KRyPIPoR6YncCL317ADLz2gDoG7H9Ul8M1HiSerLGc=
+X-Received: by 2002:a19:ca07:0:b0:513:d08e:4105 with SMTP id
+ a7-20020a19ca07000000b00513d08e4105mr2338455lfg.24.1710460051825; Thu, 14 Mar
+ 2024 16:47:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240308-vfs-uuid-f917b2acae70@brauner>
-In-Reply-To: <20240308-vfs-uuid-f917b2acae70@brauner>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 14 Mar 2024 14:55:50 -0500
-Message-ID: <CAH2r5mvXYwLJbKJhAVd34zyDcM4YNM5_n4G-aUNjrjG3VT5KQQ@mail.gmail.com>
-Subject: Fwd: [GIT PULL] vfs uuid
-To: Kent Overstreet <kent.overstreet@linux.dev>, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Kent Overstreet <kent.overstreet@gmail.com>
+Date: Thu, 14 Mar 2024 18:47:20 -0500
+Message-ID: <CAH2r5mt7f14ro=chmg8VmjCaad1ZaFmhx91+iNgM-pBCOhq_yQ@mail.gmail.com>
+Subject: testing progress
+To: CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Do you have sample programs for these programs (or even better
-mini-xfstest programs) that we can use to make sure this e.g. works
-for cifs.ko (which has similar concept to FS UUID for most remote
-filesystems etc.)?
+With the current patches in for-next including Bharath's updated
+deferred close patch, I see improvements in the test runs.
 
----------- Forwarded message ---------
-From: Christian Brauner <brauner@kernel.org>
-Date: Fri, Mar 8, 2024 at 4:19=E2=80=AFAM
-Subject: [GIT PULL] vfs uuid
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+I did see this warning during test generic/132 (run to Windows) in the
+broad test run, but so far everything is passing for the main test
+group (there are two tests to debug that fail in the azure test target
+test group) that need to be debugged
 
-
-Hey Linus,
-
-/* Summary */
-This adds two new ioctl()s for getting the filesystem uuid and
-retrieving the sysfs path based on the path of a mounted filesystem. The
-bcachefs pull request should include a merge of this as well as it
-depends on the two new ioctls. Getting the filesystem uuid has been
-implemented in filesystem specific code for a while it's now lifted as a
-generic ioctl.
-
-/* Testing */
-clang: Debian clang version 16.0.6 (19)
-gcc: (Debian 13.2.0-7) 13.2.0
-
-All patches are based on v6.8-rc1 and have been sitting in linux-next.
-No build failures or warnings were observed.
-
-/* Conflicts */
-At the time of creating this PR no merge conflicts were reported from
-linux-next and no merge conflicts showed up doing a test-merge with
-current mainline.
-
-The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d=
-:
-
-  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
-
-are available in the Git repository at:
-
-  git@gitolite.kernel.org:pub/scm/linux/kernel/git/vfs/vfs tags/vfs-6.9.uui=
-d
-
-for you to fetch changes up to 01edea1bbd1768be41729fd018a82556fa1810ec:
-
-  Merge series "filesystem visibility ioctls" of
-https://lore.kernel.org/r/20240207025624.1019754-1-kent.overstreet@linux.de=
-v
-(2024-02-12 13:14:21 +0100)
-
-Please consider pulling these changes from the signed vfs-6.9.uuid tag.
-
-Thanks!
-Christian
-
-----------------------------------------------------------------
-vfs-6.9.uuid
-
-----------------------------------------------------------------
-Christian Brauner (1):
-      Merge series "filesystem visibility ioctls" of
-https://lore.kernel.org/r/20240207025624.1019754-1-kent.overstreet@linux.de=
-v
-
-Kent Overstreet (6):
-      fs: super_set_uuid()
-      ovl: convert to super_set_uuid()
-      fs: FS_IOC_GETUUID
-      fat: Hook up sb->s_uuid
-      fs: add FS_IOC_GETFSSYSFSPATH
-      xfs: add support for FS_IOC_GETFSSYSFSPATH
-
- Documentation/userspace-api/ioctl/ioctl-number.rst |  3 +-
- fs/ext4/super.c                                    |  2 +-
- fs/f2fs/super.c                                    |  2 +-
- fs/fat/inode.c                                     |  3 ++
- fs/gfs2/ops_fstype.c                               |  2 +-
- fs/ioctl.c                                         | 33 ++++++++++++++
- fs/kernfs/mount.c                                  |  4 +-
- fs/ocfs2/super.c                                   |  4 +-
- fs/overlayfs/util.c                                | 18 +++++---
- fs/ubifs/super.c                                   |  2 +-
- fs/xfs/xfs_mount.c                                 |  4 +-
- include/linux/fs.h                                 | 52 ++++++++++++++++++=
-++++
- include/uapi/linux/fs.h                            | 25 +++++++++++
- mm/shmem.c                                         |  4 +-
- 14 files changed, 141 insertions(+), 17 deletions(-)
+Mar 14 18:03:04 fedora29 kernel: ------------[ cut here ]------------
+Mar 14 18:03:04 fedora29 kernel: BUG: Dentry
+00000000e744dbca{i=6000000019c6c,n=/}  still in use (2) [unmount of
+cifs cifs]
+Mar 14 18:03:04 fedora29 kernel: WARNING: CPU: 0 PID: 21735 at
+fs/dcache.c:1524 umount_check+0xc3/0xf0
+Mar 14 18:03:04 fedora29 kernel: Modules linked in: cifs ccm cmac
+nls_utf8 cifs_arc4 nls_ucs2_utils cifs_md4 rpcsec_gss_krb5 auth_rpcgss
+nfsv4 dns_resolver nfs lockd grace netfs nf_conntrack_netbios_ns
+nf_conntrack_broadcast xt_CT ip6t_rpfilter ip6t_REJECT nf_reject_ipv6
+ipt_REJECT nf_reject_ipv4 xt_conntrack ebtable_nat ip6table_nat
+ip6table_mangle ip6table_raw ip6table_security iptable_nat nf_nat
+iptable_mangle iptable_raw iptable_security nf_conntrack
+nf_defrag_ipv6 nf_defrag_ipv4 ip_set nfnetlink ebtable_filter ebtables
+ip6table_filter ip6_tables iptable_filter sunrpc kvm_intel kvm
+irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel
+sha512_ssse3 bochs drm_vram_helper sha1_ssse3 drm_ttm_helper ttm
+drm_kms_helper drm floppy virtio_balloon ip_tables xfs virtio_net
+crc32c_intel net_failover sha256_ssse3 virtio_blk virtio_console
+failover qemu_fw_cfg [last unloaded: cifs]
+Mar 14 18:03:04 fedora29 kernel: CPU: 0 PID: 21735 Comm: kworker/0:0
+Not tainted 6.8.0 #1
+Mar 14 18:03:04 fedora29 kernel: Hardware name: Red Hat KVM, BIOS
+1.16.1-1.el9 04/01/2014
+Mar 14 18:03:04 fedora29 kernel: Workqueue: deferredclose
+smb2_deferred_work_close [cifs]
+Mar 14 18:03:04 fedora29 kernel: RIP: 0010:umount_check+0xc3/0xf0
+Mar 14 18:03:04 fedora29 kernel: Code: db 74 0d 48 8d 7b 40 e8 0b 96
+f5 ff 48 8b 53 40 41 55 4d 89 f1 45 89 e0 48 89 e9 48 89 ee 48 c7 c7
+80 c4 b9 b1 e8 8d 8c a6 ff <0f> 0b 58 31 c0 5b 5d 41 5c 41 5d 41 5e c3
+cc cc cc cc 41 83 fc 01
+Mar 14 18:03:04 fedora29 kernel: RSP: 0018:ff1100011c5879f8 EFLAGS: 00010282
+Mar 14 18:03:04 fedora29 kernel: RAX: dffffc0000000000 RBX:
+ff1100010e869c80 RCX: 0000000000000027
+Mar 14 18:03:04 fedora29 kernel: RDX: 0000000000000027 RSI:
+0000000000000004 RDI: ff110004cb0319c8
+Mar 14 18:03:04 fedora29 kernel: RBP: ff11000121e43490 R08:
+ffffffffb040852e R09: ffe21c0099606339
+Mar 14 18:03:04 fedora29 kernel: R10: ff110004cb0319cb R11:
+0000000000000001 R12: 0000000000000002
+Mar 14 18:03:04 fedora29 kernel: R13: ff1100012aee2668 R14:
+ffffffffc1c5c0c0 R15: ffffffffc1ba09e0
+Mar 14 18:03:04 fedora29 kernel: FS:  0000000000000000(0000)
+GS:ff110004cb000000(0000) knlGS:0000000000000000
+Mar 14 18:03:04 fedora29 kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Mar 14 18:03:04 fedora29 kernel: CR2: 00007fc34296e1f8 CR3:
+00000000a4660004 CR4: 0000000000371ef0
+Mar 14 18:03:04 fedora29 kernel: DR0: 0000000000000000 DR1:
+0000000000000000 DR2: 0000000000000000
+Mar 14 18:03:04 fedora29 kernel: DR3: 0000000000000000 DR6:
+00000000fffe0ff0 DR7: 0000000000000400
+Mar 14 18:03:04 fedora29 kernel: Call Trace:
+Mar 14 18:03:04 fedora29 kernel: <TASK>
+Mar 14 18:03:04 fedora29 kernel: ? __warn+0xa4/0x200
+Mar 14 18:03:04 fedora29 kernel: ? umount_check+0xc3/0xf0
+Mar 14 18:03:04 fedora29 kernel: ? report_bug+0x1d4/0x1e0
+Mar 14 18:03:04 fedora29 kernel: ? handle_bug+0x42/0x80
+Mar 14 18:03:04 fedora29 kernel: ? exc_invalid_op+0x18/0x50
+Mar 14 18:03:04 fedora29 kernel: ? asm_exc_invalid_op+0x1a/0x20
+Mar 14 18:03:04 fedora29 kernel: ? irq_work_claim+0x1e/0x40
+Mar 14 18:03:04 fedora29 kernel: ? umount_check+0xc3/0xf0
+Mar 14 18:03:04 fedora29 kernel: ? umount_check+0xc3/0xf0
+Mar 14 18:03:04 fedora29 kernel: ? __pfx_umount_check+0x10/0x10
+Mar 14 18:03:04 fedora29 kernel: d_walk+0x72/0x4e0
+Mar 14 18:03:04 fedora29 kernel: ? d_walk+0x58/0x4e0
+Mar 14 18:03:04 fedora29 kernel: shrink_dcache_for_umount+0x64/0x210
+Mar 14 18:03:04 fedora29 kernel: generic_shutdown_super+0x4a/0x1c0
+Mar 14 18:03:04 fedora29 kernel: kill_anon_super+0x22/0x40
+Mar 14 18:03:04 fedora29 kernel: cifs_kill_sb+0x78/0x90 [cifs]
+Mar 14 18:03:04 fedora29 kernel: deactivate_locked_super+0x69/0xf0
+Mar 14 18:03:04 fedora29 kernel: cifsFileInfo_put_final+0x25a/0x290 [cifs]
+Mar 14 18:03:04 fedora29 kernel: _cifsFileInfo_put+0x448/0x7b0 [cifs]
+Mar 14 18:03:04 fedora29 kernel: ? __pfx__cifsFileInfo_put+0x10/0x10 [cifs]
+Mar 14 18:03:04 fedora29 kernel: ? lock_release+0x1c7/0x390
+Mar 14 18:03:04 fedora29 kernel: ? do_raw_spin_unlock+0x9c/0x100
+Mar 14 18:03:04 fedora29 kernel: ? _raw_spin_unlock+0x23/0x40
+Mar 14 18:03:04 fedora29 kernel: process_one_work+0x49b/0xbb0
 
 
 
---
+
+-- 
 Thanks,
 
 Steve
