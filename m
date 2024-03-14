@@ -1,65 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94A8211C
-	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 02:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BEFA55
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 02:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710384409; cv=none; b=Gs7/sDGzVj4AoyvVkL7CDeSSHl2OH1DbjGb1AJ40JOHqY2jk7KFsEbEkNxryoh7y28qIp+kB23c5nSvrGKZ4pAo5StcePyGB3m1L7Zk1hRe3L+DfDrx0aCKPV7/551aKpN+KxvOPyIyb8nXSkyq/+oG9sqdsLSPNysDMakOzHXo=
+	t=1710384560; cv=none; b=mt6rXwppw6G7qwN8sBOt8sT4FsfBHNua1vVV+X/xvX28mghoG9s2sV+Wsi94YFSB+PbmtfWOy/lmnvOLqeB9BK48WzXKTn8jgh8+kyhQn+tZ1U4V+C80icKtJPFdgJeYr5lZC45iu6hsIy2oqEcex7W8XwQ9DnGksf3uKHicXCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710384409; c=relaxed/simple;
-	bh=ujjWpNThNQSn3CXM+LmSBWOnS+bSl1jdjEbnvf1WnAM=;
+	s=arc-20240116; t=1710384560; c=relaxed/simple;
+	bh=rSn7gYHRJaSTYeK61gZrDpJnAtY30mxdqd/Sf9GwYpo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SRbtKoHL61YiUCpPZzFacO5bThO3TOPnkXr7rHpJYdadl1uCtyqNXQW5EIxkS7m27fc6UZtWuZGTeoIfYN3UxZ+H70oAEwXea1V8EAdhHu4VPoDb8XkU7bDpecVSDSrZ51yvknlAMWG4fpF7Hd6e+JRfM6HLNJ75YsoFz4nbjac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvZTYrfj; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=sWCEO9xxyTwytVlh/iRa1P9jCpzgaMNF1W/D71L8W9o3yduBbG8uM7mUygf868m/29uI11YyUhrRAeHUZ1P0QxPQxaVn8ci1dPf7MWK9HHE+sddzjMxqDcB87WHD/XPJYyUZa22Bunq2LrRKEnwPuGVDRdpwJwoTaBTSrHbq24g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLNeoU6g; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvZTYrfj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38D97C433C7
-	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 02:46:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710384409;
-	bh=ujjWpNThNQSn3CXM+LmSBWOnS+bSl1jdjEbnvf1WnAM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hvZTYrfjqgYcCO/sIj0V/RKxeXLsWJHlO6VkRbGDgKttIkQLkSERA2tpwR+sT/R4a
-	 1FELTc5I5bebSksZdMuouJvgazRlnelLCYU0YRxE1m87EUd1jSBO3EoqRD2lI/7lVt
-	 xS/r/3II5hnYBm7uOV+bWdt8dC/esgOsST/BeC2HIQT0Vf6kQSAV5bhhrbh9JdW2Fk
-	 y/Wups6TgZBB3Oylde3PxSHPl4J9xNvxOM4DzhlIc1jTm0nHWNTh2i9gtw13GXLTFZ
-	 +hsiq4Y8uPPAuT5PybR7qrdzxbgjfcY8Xe2vF6URbpCrWx6LSg6kbxIYUeqAPtzXOa
-	 onfVvYGBAbErg==
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3bbbc6e51d0so359190b6e.3
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Mar 2024 19:46:49 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yzz7dgdMC3qBTadSQQTIFdIZh27TxDP/pVSJjvR0TMZxdw2zDcD
-	sy/nq+qAqXoUvGRPfK8AzrtlSfjZ0Cnco1F20Ik89hy+nLtMxLZEbcPJbq6pXx0Sl+BuUy5qEhF
-	HCAgaxAtCt1cZKluMLgPxAzarWmE=
-X-Google-Smtp-Source: AGHT+IHKPwq5dX82WH2CK1cJ2NX417v88NB4AwIHj6UWbrF2mIVr4nOdNcrweYdRH6Kfhohe0y98urXTcYKAxTOJZfg=
-X-Received: by 2002:a05:6870:510:b0:221:8a03:6dea with SMTP id
- j16-20020a056870051000b002218a036deamr695786oao.38.1710384408508; Wed, 13 Mar
- 2024 19:46:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLNeoU6g"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so5236441fa.3
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Mar 2024 19:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710384557; x=1710989357; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QQDC1TFAMkPMJr9wg7EkwiBsIJW8Z9gXpD9ACLzsu2s=;
+        b=aLNeoU6gd7YZOEDAaVIaSOuO+T50co3XGEby/GrPE9LOBiHKJmCsw8jFKXf2Mg7eWv
+         OgjFwHylqnr7EDqBK/RvbRbkr/2HN+LboqV/YWdrcr2jl0R8vRdM9vdtqPQnVtN9Z+gu
+         3+B7pvye6oEDjB3I5pz1T91+it6bQL2gnf/292BxIwwg71fXimMf3XBjiKp3EXE4QMjX
+         ipxOvQMKf08swfccZBHGoEmyiHwLvhRmg7/S+O1C8Sc70Gg6Z1Sh1l2FFgl7Qf/wj2tv
+         x1z90dtpYZOYOLsDJQafiwEXFpxqwW3li7fJXXQUAaE2QwaSEQCdms5DZLSCzLHaB/hq
+         s4Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710384557; x=1710989357;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QQDC1TFAMkPMJr9wg7EkwiBsIJW8Z9gXpD9ACLzsu2s=;
+        b=EqhOgJdF2kcQLs03YReqRx9Aeo1879MQdBX5/N/ipwASzZ85edKQi80j1d7IWdCdfL
+         I95XoHyLG+DYfImiCM2W51UUwlFbXPJWeNZwrgwNoFtf0eWzqxRuaZtBEhB6bl8o1IzN
+         W04Na8GIeE14MppXz4xHyTbuP3xTEH4fs1VB/VI+kykeLKq+WPQoPHEizkz2h6dnH1WC
+         YxQ7cX3qnGRDjSdI+kSqIydibTPwmKwEOFRmupPlZcwj42m9J+JGdGDf7X/egKKK4Dqh
+         ZIeSyEmqcPJHRgPRhBRSVDfmucXZbMFfkG2XVg4KY0PKXVW0Nz/9J+XjBzR2NLWX0J7n
+         Jb7g==
+X-Gm-Message-State: AOJu0YygJY6tjWlIyz1YeOQIoFHxQr9wzooIFlRhEIFciP0857bdPJBx
+	+jcitIx9yRMsfUiF5rFB4r/g82vB72dxLqrYoZrCsxDeOQQHfQoovpc/mjA3go+DWl25eKk1Y9z
+	sqBW1yA1AwsitZJVSqUUlVib7Qgo=
+X-Google-Smtp-Source: AGHT+IGflfirgFyFk6iSnnG7L4cdc9TZBc6xmW3fSYroHmehnN9ldJxGoZ8y7gmBQH0+Hfn6GUVm+3DW3as+RiB1Wf8=
+X-Received: by 2002:a2e:7806:0:b0:2d4:778c:5edf with SMTP id
+ t6-20020a2e7806000000b002d4778c5edfmr163902ljc.13.1710384556909; Wed, 13 Mar
+ 2024 19:49:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313141138.3058492-1-mmakassikis@freebox.fr>
-In-Reply-To: <20240313141138.3058492-1-mmakassikis@freebox.fr>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 14 Mar 2024 11:46:37 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9j_SvvSY=1_pKpnd7qPS1zkYj37zejtX3=2C9jY9m_xg@mail.gmail.com>
-Message-ID: <CAKYAXd9j_SvvSY=1_pKpnd7qPS1zkYj37zejtX3=2C9jY9m_xg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix possible null-deref in smb_lazy_parent_lease_break_close
-To: Marios Makassikis <mmakassikis@freebox.fr>
-Cc: linux-cifs@vger.kernel.org
+References: <20240313150034.165152-1-bharathsm@microsoft.com>
+In-Reply-To: <20240313150034.165152-1-bharathsm@microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 13 Mar 2024 21:49:05 -0500
+Message-ID: <CAH2r5mvu3Rwbv=b86MwOTYv5W4U4x7+OpM2DMCfwEvyvAEYsEg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove redundant variable assignment
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: linux-cifs@vger.kernel.org, bharathsm@microsoft.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-2024=EB=85=84 3=EC=9B=94 13=EC=9D=BC (=EC=88=98) =EC=98=A4=ED=9B=84 11:12, =
-Marios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=
-=84=B1:
+The second change in this looks a few lines off (didn't you mean to
+remove the rc =3D 0 nine lines earlier, ie the one from the EREMOTE not
+the EINVAL calse?).  See below:
+
+        case -EREMOTE:
+                cifs_create_junction_fattr(&fattr, inode->i_sb);
+                rc =3D 0;   /* FIX: shouldn't you remove this one */
+                break;
+        case -EOPNOTSUPP:
+        case -EINVAL:
+                /*
+                 * FIXME: legacy server -- fall back to path-based call?
+                 * for now, just skip revalidating and mark inode for
+                 * immediate reval.
+                 */
+-               rc =3D 0;   /* FIX: and not remove this one ? */
+                CIFS_I(inode)->time =3D 0;
+                goto cgfi_exit;
+        default:
+                goto cgfi_exit;
+        }
+
+        /*
+         * don't bother with SFU junk here -- just mark inode as needing
+         * revalidation.
+         */
+        fattr.cf_uniqueid =3D CIFS_I(inode)->uniqueid;
+        fattr.cf_flags |=3D CIFS_FATTR_NEED_REVAL;
+        /* if filetype is different, return error */
+        rc =3D cifs_fattr_to_inode(inode, &fattr, false);
+
+
+On Wed, Mar 13, 2024 at 10:01=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.co=
+m> wrote:
 >
-> rcu_dereference can return NULL, so make sure we check against that.
+> This removes an unnecessary variable assignment. The assigned
+> value will be overwritten by cifs_fattr_to_inode before it
+> is accessed, making the line redundant.
 >
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Applied it to #ksmbd-for-next-next.
-Thanks for your patch!
+> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> ---
+>  fs/smb/client/inode.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 00aae4515a09..50e939234a8e 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -400,7 +400,6 @@ cifs_get_file_info_unix(struct file *filp)
+>                 cifs_unix_basic_to_fattr(&fattr, &find_data, cifs_sb);
+>         } else if (rc =3D=3D -EREMOTE) {
+>                 cifs_create_junction_fattr(&fattr, inode->i_sb);
+> -               rc =3D 0;
+>         } else
+>                 goto cifs_gfiunix_out;
+>
+> @@ -852,7 +851,6 @@ cifs_get_file_info(struct file *filp)
+>                  * for now, just skip revalidating and mark inode for
+>                  * immediate reval.
+>                  */
+> -               rc =3D 0;
+>                 CIFS_I(inode)->time =3D 0;
+>                 goto cgfi_exit;
+>         default:
+> --
+> 2.34.1
+>
+
+
+--=20
+Thanks,
+
+Steve
