@@ -1,168 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39117350B;
-	Thu, 14 Mar 2024 18:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061B174BE8;
+	Thu, 14 Mar 2024 19:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710441121; cv=none; b=EZoUVEHF++UUYYt9fb4/hpjdkwvysB7w0VUIEI9O2BDkfjP0eTCf6ipD2zul41ZM0Vay59ZbvyxbNemQA6K2KZ/JiceRnVHizaFGaAt7qQxyvwHP8orXEaXHYptopGpdU5Qq6kM/b2cyAyj/DouG1jAfxb0+2g+ND+dPzIeYFjc=
+	t=1710446165; cv=none; b=pYP8g86iXNUr56UqvfqWu/9RcFvfN1aC/PwQspALIf2bX4saqhXc2O19rKZyCvdTByk6G6J8Co5aQabqIiVtT1HsaECnPfV61t76tGPfnW/CDwP0X2oPoPjRgG8+NBrm0UnfTtZfWZ9cWALRYkpzla11ghDA1QCXWmhxr6JeqgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710441121; c=relaxed/simple;
-	bh=mvdnoLfy3ROkxmfR7t2H/wROfPIdheF/nBqPtCWPX4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=caLa/U/pxbHZR3c2cgLYTWNfRiA+6oquCYVT0Zmwd3BR/OrkH/rbhZk1lY5pP3oWRjph2JZwAmOZLHBdGaQYp7AYEQdESRFcyNEAwWBKfS3IFbfttuB+96ugNrUdTjPMYwMOfjTBCQ7G8BRIlMWMFp5hWA2G/VbK2/563kweVw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A243FC43390;
-	Thu, 14 Mar 2024 18:31:55 +0000 (UTC)
-Date: Thu, 14 Mar 2024 14:34:06 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alison Schofield <alison.schofield@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
- linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
- iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org,
- linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240314143406.6289a060@gandalf.local.home>
-In-Reply-To: <ZfMslbCmCtyEaEWN@aschofie-mobl2>
-References: <20240223125634.2888c973@gandalf.local.home>
-	<ZfMslbCmCtyEaEWN@aschofie-mobl2>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1710446165; c=relaxed/simple;
+	bh=dMtdr+z4geWEk1nGxP9DZ1xFcbrcm4t9EL/q1iF77rM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nDjzAQWVYB9T3ZLkBM+1PEfY7UhKlRgQMCMDGnHrefQCG+7MKsiudEyC7jljDRnAM7b7tdrodOFWaH5GKiKQ/8mWNofRu9JrvJADjPKL3o1jlFDfuQogDB/kp0T+Ma8tsFNLmGDr3y8wawPwfu00i5ooC0RiAv3AYRc6SXvn4lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhACOGk4; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhACOGk4"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-513d4559fb4so1032029e87.3;
+        Thu, 14 Mar 2024 12:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710446162; x=1711050962; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WmU5kHfUbvawQJQeqNyzZ92DSbRivWiIURaaWWNvTq0=;
+        b=hhACOGk4kNkVMdShtb6IDPmfV5idflHYDAkLrKsbt9G0xWvLfVqr226pUilH6Ig1wW
+         oodm39SfrPNyYHe96Jgsqe85SWj/2jmmC4sa69RR4xUI4YV95+/av/O+4LwLu/6UwpSF
+         6uZ9/IYsZsZQWuqxSuJc3IX0tgbt0Fsp9+m38NZ231EqKoUiRb6+RQY4L+NC8h1iO3+k
+         +hJI1owALr9BpQMY/XwVXIYxVvhzWkej/pXtKneVan2ZRIbM4y0bwfmout4/Lp0ME5wD
+         5IL9pNu+qetg9xMuzHj63VCMNNRp6oGnV/ncXxnUkshrI+C8qaIjTRtwB/PonhlYEQZy
+         2IUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710446162; x=1711050962;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WmU5kHfUbvawQJQeqNyzZ92DSbRivWiIURaaWWNvTq0=;
+        b=aPegjSnqmFX3tzx5e0SRrD7Q7Gwr06AZ+tQc1ETzqpWH483w5MhNrtaqRLpuSq7Rkw
+         qvUEbo90RTzAa53hY68+gwtXExbxnckTbl66KD7PHZNHJIqQtDJFLatPv3XlV9u9o1Vu
+         NNVo/n54f0PQuoivT6DKWtbGPTcXJV1xc0wt17fPSxNaW35X6F0s2Gl6bNwGuEO7O5bC
+         uqYB62d4hqT617EZHP26/qTU19nIecYr5whan0uwn9tw1BccLSu5RGzkk026+qkXROua
+         b30iqA/LRB06gJRes8uuD+CJXQADv41BjTsJ7PGDh7jDT21vjOcpCvnZAoQxQSZ5Xxv6
+         gLtg==
+X-Forwarded-Encrypted: i=1; AJvYcCVw8twsV9P8vUU/YBMAZ50vtH2zuVHtWX4hUw0TgMTstU9EDQNDZJMCMmL1uQwzztGvC0AEG0xX18a+PePzGHe6XrIWRzUaXXlZ/N9RAyAcuw7Z/dFchZ2tCoT4P3nGkJYKewR5NIbaCAk=
+X-Gm-Message-State: AOJu0YyJ2Qs7+N2w5coQuj7Oa8yzIK3AXLPFVgDF095F153fbn+FIik7
+	0CsN09K2rQe2RgmNaNxm6NRoK3/3v3Z7qm198FnwDpVanfbrEbS2NSqmvlz9g5Gna4fSaNDRfVg
+	FlE14UQhdSzgOLtBYKrQfGVLWdQc=
+X-Google-Smtp-Source: AGHT+IHVjuQkZFwa6Zwnan4Px4We41FJXhl7ioG9TTa71PGzxxVT7QOjctjDO9GawpmgI5YMmim5zZ1OQ0sDuixZmk0=
+X-Received: by 2002:a05:6512:469:b0:513:c9de:ee30 with SMTP id
+ x9-20020a056512046900b00513c9deee30mr2228965lfd.17.1710446161749; Thu, 14 Mar
+ 2024 12:56:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240308-vfs-uuid-f917b2acae70@brauner>
+In-Reply-To: <20240308-vfs-uuid-f917b2acae70@brauner>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 14 Mar 2024 14:55:50 -0500
+Message-ID: <CAH2r5mvXYwLJbKJhAVd34zyDcM4YNM5_n4G-aUNjrjG3VT5KQQ@mail.gmail.com>
+Subject: Fwd: [GIT PULL] vfs uuid
+To: Kent Overstreet <kent.overstreet@linux.dev>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Kent Overstreet <kent.overstreet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 14 Mar 2024 09:57:57 -0700
-Alison Schofield <alison.schofield@intel.com> wrote:
+Do you have sample programs for these programs (or even better
+mini-xfstest programs) that we can use to make sure this e.g. works
+for cifs.ko (which has similar concept to FS UUID for most remote
+filesystems etc.)?
 
-> On Fri, Feb 23, 2024 at 12:56:34PM -0500, Steven Rostedt wrote:
-> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> > 
-> > [
-> >    This is a treewide change. I will likely re-create this patch again in
-> >    the second week of the merge window of v6.9 and submit it then. Hoping
-> >    to keep the conflicts that it will cause to a minimum.
-> > ]
-
-Note, change of plans. I plan on sending this in the next merge window, as
-this merge window I have this patch:
-
-  https://lore.kernel.org/linux-trace-kernel/20240312113002.00031668@gandalf.local.home/
-
-That will warn if the source string of __string() is different than the
-source string of __assign_str(). I want to make sure they are identical
-before just dropping one of them.
+---------- Forwarded message ---------
+From: Christian Brauner <brauner@kernel.org>
+Date: Fri, Mar 8, 2024 at 4:19=E2=80=AFAM
+Subject: [GIT PULL] vfs uuid
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 
 
-> 
-> > diff --git a/drivers/cxl/core/trace.h b/drivers/cxl/core/trace.h
-> > index bdf117a33744..07ba4e033347 100644
-> > --- a/drivers/cxl/core/trace.h
-> > +++ b/drivers/cxl/core/trace.h  
-> 
-> snip to poison
-> 
-> > @@ -668,8 +668,8 @@ TRACE_EVENT(cxl_poison,
-> >  	    ),
-> >  
-> >  	TP_fast_assign(
-> > -		__assign_str(memdev, dev_name(&cxlmd->dev));
-> > -		__assign_str(host, dev_name(cxlmd->dev.parent));
-> > +		__assign_str(memdev);
-> > +		__assign_str(host);  
-> 
-> I think I get that the above changes work because the TP_STRUCT__entry for
-> these did:
-> 	__string(memdev, dev_name(&cxlmd->dev))
-> 	__string(host, dev_name(cxlmd->dev.parent))
+Hey Linus,
 
-That's the point. They have to be identical or you will likely bug.
+/* Summary */
+This adds two new ioctl()s for getting the filesystem uuid and
+retrieving the sysfs path based on the path of a mounted filesystem. The
+bcachefs pull request should include a merge of this as well as it
+depends on the two new ioctls. Getting the filesystem uuid has been
+implemented in filesystem specific code for a while it's now lifted as a
+generic ioctl.
 
-The __string(name, src) is used to find the string length of src which
-allocates the necessary length on the ring buffer. The __assign_str(name, src)
-will copy src into the ring buffer.
+/* Testing */
+clang: Debian clang version 16.0.6 (19)
+gcc: (Debian 13.2.0-7) 13.2.0
 
-Similar to:
+All patches are based on v6.8-rc1 and have been sitting in linux-next.
+No build failures or warnings were observed.
 
-	len = strlen(src);
-	buf = malloc(len);
-	strcpy(buf, str);
+/* Conflicts */
+At the time of creating this PR no merge conflicts were reported from
+linux-next and no merge conflicts showed up doing a test-merge with
+current mainline.
 
-Where __string() is strlen() and __assign_str() is strcpy(). It doesn't
-make sense to use two different strings, and if you did, it would likely be
-a bug.
+The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d=
+:
 
-But the magic behind __string() does much more than just get the length of
-the string, and it could easily save the pointer to the string (along with
-its length) and have it copy that in the __assign_str() call, making the
-src parameter of __assign_str() useless.
+  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
 
-> 
-> >  		__entry->serial = cxlmd->cxlds->serial;
-> >  		__entry->overflow_ts = cxl_poison_overflow(flags, overflow_ts);
-> >  		__entry->dpa = cxl_poison_record_dpa(record);
-> > @@ -678,12 +678,12 @@ TRACE_EVENT(cxl_poison,
-> >  		__entry->trace_type = trace_type;
-> >  		__entry->flags = flags;
-> >  		if (region) {
-> > -			__assign_str(region, dev_name(&region->dev));
-> > +			__assign_str(region);
-> >  			memcpy(__entry->uuid, &region->params.uuid, 16);
-> >  			__entry->hpa = cxl_trace_hpa(region, cxlmd,
-> >  						     __entry->dpa);
-> >  		} else {
-> > -			__assign_str(region, "");
-> > +			__assign_str(region);
-> >  			memset(__entry->uuid, 0, 16);
-> >  			__entry->hpa = ULLONG_MAX;  
-> 
-> For the above 2, there was no helper in TP_STRUCT__entry. A recently
-> posted patch is fixing that up to be __string(region, NULL) See [1],
-> with the actual assignment still happening in TP_fast_assign.
+are available in the Git repository at:
 
-__string(region, NULL) doesn't make sense. It's like:
+  git@gitolite.kernel.org:pub/scm/linux/kernel/git/vfs/vfs tags/vfs-6.9.uui=
+d
 
-	len = strlen(NULL);
-	buf = malloc(len);
-	strcpy(buf, NULL);
+for you to fetch changes up to 01edea1bbd1768be41729fd018a82556fa1810ec:
 
-??
+  Merge series "filesystem visibility ioctls" of
+https://lore.kernel.org/r/20240207025624.1019754-1-kent.overstreet@linux.de=
+v
+(2024-02-12 13:14:21 +0100)
 
-I'll reply to that email.
+Please consider pulling these changes from the signed vfs-6.9.uuid tag.
 
--- Steve
+Thanks!
+Christian
 
-> 
-> Does that assign logic need to move to the TP_STRUCT__entry definition
-> when you merge these changes? I'm not clear how much logic is able to be
-> included, ie like 'C' style code in the TP_STRUCT__entry.
-> 
-> [1]
-> https://lore.kernel.org/linux-cxl/20240314044301.2108650-1-alison.schofield@intel.com/
+----------------------------------------------------------------
+vfs-6.9.uuid
+
+----------------------------------------------------------------
+Christian Brauner (1):
+      Merge series "filesystem visibility ioctls" of
+https://lore.kernel.org/r/20240207025624.1019754-1-kent.overstreet@linux.de=
+v
+
+Kent Overstreet (6):
+      fs: super_set_uuid()
+      ovl: convert to super_set_uuid()
+      fs: FS_IOC_GETUUID
+      fat: Hook up sb->s_uuid
+      fs: add FS_IOC_GETFSSYSFSPATH
+      xfs: add support for FS_IOC_GETFSSYSFSPATH
+
+ Documentation/userspace-api/ioctl/ioctl-number.rst |  3 +-
+ fs/ext4/super.c                                    |  2 +-
+ fs/f2fs/super.c                                    |  2 +-
+ fs/fat/inode.c                                     |  3 ++
+ fs/gfs2/ops_fstype.c                               |  2 +-
+ fs/ioctl.c                                         | 33 ++++++++++++++
+ fs/kernfs/mount.c                                  |  4 +-
+ fs/ocfs2/super.c                                   |  4 +-
+ fs/overlayfs/util.c                                | 18 +++++---
+ fs/ubifs/super.c                                   |  2 +-
+ fs/xfs/xfs_mount.c                                 |  4 +-
+ include/linux/fs.h                                 | 52 ++++++++++++++++++=
+++++
+ include/uapi/linux/fs.h                            | 25 +++++++++++
+ mm/shmem.c                                         |  4 +-
+ 14 files changed, 141 insertions(+), 17 deletions(-)
+
+
+
+--
+Thanks,
+
+Steve
