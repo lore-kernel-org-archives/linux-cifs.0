@@ -1,135 +1,142 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FB2745C4;
-	Thu, 14 Mar 2024 17:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F981A38EC
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 18:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710436621; cv=none; b=PGKVgO+7l5eztiQKQHpmQsmkDiUjA8uARjjLwKvfFuOuyxNTkrksS6rrsiAvIamQCpoqw2z4yMNQeRf9f/zyeuY5GDKazfRu/VhG+ZWih5ziOsrTdZMPNyhpyLlGxrX0gKCuNCF8XkyvYASMn+WKxQQqffg+XA0xnfNikwgmHww=
+	t=1710440092; cv=none; b=jLVrR+uAhXcmpVEOtiSl58YrkZu7VJtXLvnXCcqHMrLDu9FI2P4It0WqHxEVroZoJNv1hXMxOMpzdWcuvORFo1iG/RC5WtyaWXM3cEz6toR7EwcpBJR2y+IsWAH7iIutkDFZzni3mRyjNqx90f6Z9huAKsMkFrBMZ/ep68zYK30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710436621; c=relaxed/simple;
-	bh=yEAjYlZS8Vh+1fKydHwx2mrd3ZlQrmK6jZP9pcEiSao=;
+	s=arc-20240116; t=1710440092; c=relaxed/simple;
+	bh=asHZtgjoDYbab099bWBBkQlTy2yfk+LLzCLZV4EdIKQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZGqOSTOXrrYjTNvqNgDFM61OQRO6Udm9I/XOm6Nojudcf0XVFXSiIuCkyvfR5Ell5y56Ez+uyA1B9EtKPtkyB8c3AIGdtnNVnNRE+E92B8DMhbT/AeyLyQhOmiAYklF41KFfQ9d5rvVYOBbd7a6gMLBVozfnR1pzmdlXWladsqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdRwXXn9; arc=none smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=Q5m98Jh3ivS8rPnvuHny+3FOhCTtVsKjlP6cmFkegEe5qVOz1Yvk90aZxSCsxyP/IexdCVu9My8z3Uwc7BmHZabA6vjKHABWccy+t9MDmMOsWil72BuB38t6LFzW8J1cAX6nuul85yILG0uRQmNuIAxsOTy8xXBIlbA2N5BzAj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mDl4BgP5; arc=none smtp.client-ip=209.85.219.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdRwXXn9"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5101cd91017so1959503e87.2;
-        Thu, 14 Mar 2024 10:16:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDl4BgP5"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dd14d8e7026so1110561276.2
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Mar 2024 11:14:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710436618; x=1711041418; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710440090; x=1711044890; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ps1g2qP3yY2atcEULtu4ABg5GWK/bG/BRx3OnM+x7Uk=;
-        b=mdRwXXn9pEgSXjeKzudqq40ZcbZ841WqZsPn+jjqkxlCuB/VO3BXKb57oDWolWaXYU
-         NFbGTeKMm42yjYstDFh7ozRhQUlp/s91VoBotmYkvE35Ft+rbBQCoZITQc0z9Wj2h9Xt
-         0cApql2m6YTR8Iey5BR1qO2ofuMMoUVJOgtYss3sX/7TkUxMdZ/WGRQYWAX/LEo06jbR
-         1gMZtEpUMDVHYw9jcq6iBs7fAL4ShQmJmIrdiCQXfs0BxpNnTwCfhVj7CCaeEDL8+6hW
-         XpOILbCZSrD0KVWUU9aeYvu+McatPrjWTvbzS5oLQEosq1+L6N1lTUHCqIx25Q92LiVP
-         90Gw==
+        bh=Chh9vmxVe3V0d/LrbnqQnwrcKDDdwIPuxFJw5BJoeEY=;
+        b=mDl4BgP5m358vCQsFm3FH5psRJ1M65HSExC/4tBfMe/UFD/LopV4GETCpVZ0h3YIgf
+         YrczVpVwnB+T74FxqFAJh6Mx1MFw6Y8I6YAvzW/piprBHm/EnPib7J6hFMa8COvSjgkY
+         oUSjncxRVaYCUe5u5n0xqUVPrq3Lk8va5cKeiBswjqXjUiTLlHoR3zuoZgUQEKsHSPs2
+         haEHCYrre8oi1wNwVY6h+1OSobLIP1MY1V2A6ugRWxaXV110xeTHCPWe1vvQYdy5M0Cl
+         vJr628+VQRTbfxASuxX7zKTfBz+Wr9b1lUytFCrgY8xT8w+tF+X8ioPypqn3t2AyjVZT
+         Wyvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710436618; x=1711041418;
+        d=1e100.net; s=20230601; t=1710440090; x=1711044890;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ps1g2qP3yY2atcEULtu4ABg5GWK/bG/BRx3OnM+x7Uk=;
-        b=jyNrPdgHNbXMxEt3sDVCrd5SFW8hkJdX+oUBxFUesIt4OsOJ/qxvSCgoEJ6HG/BxAI
-         6HVFufgP8dS207EU/FqH8jo5JZ34voQQPdt/Q9YgRXtA9sPZIQgT79cJIp5+kLdRpEed
-         Tbmg8ZN4U6M/udn4512eTkCccl3XINiFL3JtU7uK01GaxYgN2unEMy6kY2aT7gBbs/w8
-         AWYin1DtaJUNqWnnv1AK94sKU/aPtycN6LawqlJ21HzuWzDF/3W1g8CFc6XKRoFZc+Ou
-         +5aDba2OFfm5q5ZJsc+LWxdeoplUIkgTwHlY0gnnrSDHOlYK+77j1LgSjUq8PlOAwCvC
-         r5Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLHfxyjc5a9wvMvu6d9GARBiHXZf+WWj0mN1vOao2kq50MlUX0QxoHs4h1NOeMWImgCRYv8KOE2hmyjA/u7ky1OoebWd/F
-X-Gm-Message-State: AOJu0YwV+4Aw5rBjG1x2Lt/KxsV/iigs5YiKBRyvPst+jRrxQLith6b0
-	dFgO9Uh3NwMUzk0m17v7KXyS/LqtlgH2jVh25u5hqlqxO5eDIGPGbk5ew8pODi2j6DDpnmnWJEN
-	t/l+VSoYtW+WsAqUwMA4LgnCjzmDDZY/eg74=
-X-Google-Smtp-Source: AGHT+IGnNkZfIrZK0fk9oI9S6n4rZ91KqKQ0oQkBcAnZKu/84cEtprsvR3FCp8gL91zrVZtlMb3PV5GClNq4tnWAFJY=
-X-Received: by 2002:a05:6512:3e1e:b0:513:4fb4:5388 with SMTP id
- i30-20020a0565123e1e00b005134fb45388mr2105234lfv.41.1710436617459; Thu, 14
- Mar 2024 10:16:57 -0700 (PDT)
+        bh=Chh9vmxVe3V0d/LrbnqQnwrcKDDdwIPuxFJw5BJoeEY=;
+        b=w7Mynhu7xpcaLxSW6vxninVwKDFCXtVxR70OK+fSkFedQlsFqAqhG4rwmQiFy/DSNH
+         MhME9H3LhnFF+umf/m5tp/vQP81r0KXjqHjUScb6Y/ozkI7DvctwuBLVNjIBmfJND+2G
+         1Ns8ozVGN7WEF0ffk32AI+1BbKNLOOMsSPxsmGA0nli7fTyOXCz1x67DzYuQCOHlK+vx
+         OQejKIZobTP5HDV69+dzluPEirZNoiIQ0KOBojCFfaNDnwE0xInUsv+Ftt8BJ9DxNkTQ
+         eg71Fv1U1ugEaEhXru0i1MbX3W4HuNNe1eQGy8DH5ye/rxp584F76iaWYES5MU86WRwE
+         lsLw==
+X-Gm-Message-State: AOJu0Yy+cTvTukijtNPiWKKO0O5vo8G1FUIGeLppp9RJAdj1yR7eHUC5
+	8hZNR/HHyVLHJ81KIWktYGpLmG4ToU6XV3uHUcXJJEO79YGs0V6JarF90lKxyu+Xbvx40oGJsHD
+	YkVnSLLLadX+HGePHkBW9w/PfASC0rR3Y
+X-Google-Smtp-Source: AGHT+IF0u/MaQLkn6B2fu5azwyvIp2l8D1k+dpc2HL3VGKOR8oxSW/peZa7acGMC4MekpTjcA3HKqCVB4W3n9Xejlyo=
+X-Received: by 2002:a25:8447:0:b0:dcd:3663:b5e5 with SMTP id
+ r7-20020a258447000000b00dcd3663b5e5mr2314357ybm.25.1710440089941; Thu, 14 Mar
+ 2024 11:14:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313104041.188204-1-sprasad@microsoft.com> <CAH2r5mtDe_E9=mGx1mOjfEMfgdhV9W=TjijXOdqgTkasVE81=g@mail.gmail.com>
-In-Reply-To: <CAH2r5mtDe_E9=mGx1mOjfEMfgdhV9W=TjijXOdqgTkasVE81=g@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 14 Mar 2024 12:16:45 -0500
-Message-ID: <CAH2r5mu-8eyykEN4yaQ1C-yzg0_hdHDE=x2rxjuxh1sZFHirAA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cifs: reduce warning log level for server not
- advertising interfaces
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com, 
-	Shyam Prasad N <sprasad@microsoft.com>, Stable <stable@vger.kernel.org>, 
-	=?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
-Content-Type: multipart/mixed; boundary="000000000000fec02d0613a20e79"
+References: <20240313150034.165152-1-bharathsm@microsoft.com> <CAH2r5mvu3Rwbv=b86MwOTYv5W4U4x7+OpM2DMCfwEvyvAEYsEg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvu3Rwbv=b86MwOTYv5W4U4x7+OpM2DMCfwEvyvAEYsEg@mail.gmail.com>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Thu, 14 Mar 2024 23:44:38 +0530
+Message-ID: <CAGypqWx3T1AXufg+KrTfhTQeZsRR7ON2jtep7c11R8N_1t=jTA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove redundant variable assignment
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, bharathsm@microsoft.com
+Content-Type: multipart/mixed; boundary="000000000000f91c3b0613a2ddf3"
 
---000000000000fec02d0613a20e79
+--000000000000f91c3b0613a2ddf3
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-updated patch to change to warn once, and to fix a minor checkpatch
-warning (about format of stable tag)
+Thanks for pointing it out. Updated patch.
 
-
-On Wed, Mar 13, 2024 at 11:45=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
+On Thu, Mar 14, 2024 at 8:19=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> what about simply a "warn_once" since it is useful for the user to
-> know that their server does not advertise interfaces so can affect
-> performance (multichannel) and perhaps some reconnect scenarios.
+> The second change in this looks a few lines off (didn't you mean to
+> remove the rc =3D 0 nine lines earlier, ie the one from the EREMOTE not
+> the EINVAL calse?).  See below:
 >
-> On Wed, Mar 13, 2024 at 5:40=E2=80=AFAM <nspmangalore@gmail.com> wrote:
+>         case -EREMOTE:
+>                 cifs_create_junction_fattr(&fattr, inode->i_sb);
+>                 rc =3D 0;   /* FIX: shouldn't you remove this one */
+>                 break;
+>         case -EOPNOTSUPP:
+>         case -EINVAL:
+>                 /*
+>                  * FIXME: legacy server -- fall back to path-based call?
+>                  * for now, just skip revalidating and mark inode for
+>                  * immediate reval.
+>                  */
+> -               rc =3D 0;   /* FIX: and not remove this one ? */
+>                 CIFS_I(inode)->time =3D 0;
+>                 goto cgfi_exit;
+>         default:
+>                 goto cgfi_exit;
+>         }
+>
+>         /*
+>          * don't bother with SFU junk here -- just mark inode as needing
+>          * revalidation.
+>          */
+>         fattr.cf_uniqueid =3D CIFS_I(inode)->uniqueid;
+>         fattr.cf_flags |=3D CIFS_FATTR_NEED_REVAL;
+>         /* if filetype is different, return error */
+>         rc =3D cifs_fattr_to_inode(inode, &fattr, false);
+>
+>
+> On Wed, Mar 13, 2024 at 10:01=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.=
+com> wrote:
 > >
-> > From: Shyam Prasad N <sprasad@microsoft.com>
+> > This removes an unnecessary variable assignment. The assigned
+> > value will be overwritten by cifs_fattr_to_inode before it
+> > is accessed, making the line redundant.
 > >
-> > Several users have reported this log getting dumped too regularly to
-> > kernel log. The likely root cause has been identified, and it suggests
-> > that this situation is expected for some configurations
-> > (for example SMB2.1).
-> >
-> > Since the function returns appropriately even for such cases, it is
-> > fairly harmless to make this a debug log. When needed, the verbosity
-> > can be increased to capture this log.
-> >
-> > Cc: Stable <stable@vger.kernel.org>
-> > Reported-by: Jan =C4=8Cerm=C3=A1k <sairon@sairon.cz>
-> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 > > ---
-> >  fs/smb/client/sess.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >  fs/smb/client/inode.c | 2 --
+> >  1 file changed, 2 deletions(-)
 > >
-> > diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> > index 8f37373fd333..37cdf5b55108 100644
-> > --- a/fs/smb/client/sess.c
-> > +++ b/fs/smb/client/sess.c
-> > @@ -230,7 +230,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
-> >                 spin_lock(&ses->iface_lock);
-> >                 if (!ses->iface_count) {
-> >                         spin_unlock(&ses->iface_lock);
-> > -                       cifs_dbg(VFS, "server %s does not advertise int=
-erfaces\n",
-> > +                       cifs_dbg(FYI, "server %s does not advertise int=
-erfaces\n",
-> >                                       ses->server->hostname);
-> >                         break;
-> >                 }
-> > @@ -396,7 +396,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct=
- TCP_Server_Info *server)
-> >         spin_lock(&ses->iface_lock);
-> >         if (!ses->iface_count) {
-> >                 spin_unlock(&ses->iface_lock);
-> > -               cifs_dbg(VFS, "server %s does not advertise interfaces\=
-n", ses->server->hostname);
-> > +               cifs_dbg(FYI, "server %s does not advertise interfaces\=
-n", ses->server->hostname);
-> >                 return;
-> >         }
+> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> > index 00aae4515a09..50e939234a8e 100644
+> > --- a/fs/smb/client/inode.c
+> > +++ b/fs/smb/client/inode.c
+> > @@ -400,7 +400,6 @@ cifs_get_file_info_unix(struct file *filp)
+> >                 cifs_unix_basic_to_fattr(&fattr, &find_data, cifs_sb);
+> >         } else if (rc =3D=3D -EREMOTE) {
+> >                 cifs_create_junction_fattr(&fattr, inode->i_sb);
+> > -               rc =3D 0;
+> >         } else
+> >                 goto cifs_gfiunix_out;
 > >
+> > @@ -852,7 +851,6 @@ cifs_get_file_info(struct file *filp)
+> >                  * for now, just skip revalidating and mark inode for
+> >                  * immediate reval.
+> >                  */
+> > -               rc =3D 0;
+> >                 CIFS_I(inode)->time =3D 0;
+> >                 goto cgfi_exit;
+> >         default:
 > > --
 > > 2.34.1
 > >
@@ -140,53 +147,33 @@ n", ses->server->hostname);
 >
 > Steve
 
-
-
---=20
-Thanks,
-
-Steve
-
---000000000000fec02d0613a20e79
-Content-Type: text/x-patch; charset="UTF-8"; 
-	name="0002-cifs-reduce-warning-log-level-for-server-not-adverti.patch"
+--000000000000f91c3b0613a2ddf3
+Content-Type: application/octet-stream; 
+	name="0001-cifs-remove-redundant-variable-assignment.patch"
 Content-Disposition: attachment; 
-	filename="0002-cifs-reduce-warning-log-level-for-server-not-adverti.patch"
+	filename="0001-cifs-remove-redundant-variable-assignment.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_ltrhshwa0>
-X-Attachment-Id: f_ltrhshwa0
+Content-ID: <f_ltrjs7xp0>
+X-Attachment-Id: f_ltrjs7xp0
 
-RnJvbSAyMWRkOGRmNjVhN2Y4N2VjYzkyOGFkMzI1YWIxNjNhYjA4YTU1NmJlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBXZWQsIDEzIE1hciAyMDI0IDEwOjQwOjQwICswMDAwClN1YmplY3Q6IFtQQVRDSCAy
-LzRdIGNpZnM6IHJlZHVjZSB3YXJuaW5nIGxvZyBsZXZlbCBmb3Igc2VydmVyIG5vdCBhZHZlcnRp
-c2luZwogaW50ZXJmYWNlcwpNSU1FLVZlcnNpb246IDEuMApDb250ZW50LVR5cGU6IHRleHQvcGxh
-aW47IGNoYXJzZXQ9VVRGLTgKQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogOGJpdAoKU2V2ZXJh
-bCB1c2VycyBoYXZlIHJlcG9ydGVkIHRoaXMgbG9nIGdldHRpbmcgZHVtcGVkIHRvbyByZWd1bGFy
-bHkgdG8Ka2VybmVsIGxvZy4gVGhlIGxpa2VseSByb290IGNhdXNlIGhhcyBiZWVuIGlkZW50aWZp
-ZWQsIGFuZCBpdCBzdWdnZXN0cwp0aGF0IHRoaXMgc2l0dWF0aW9uIGlzIGV4cGVjdGVkIGZvciBz
-b21lIGNvbmZpZ3VyYXRpb25zCihmb3IgZXhhbXBsZSBTTUIyLjEpLgoKU2luY2UgdGhlIGZ1bmN0
-aW9uIHJldHVybnMgYXBwcm9wcmlhdGVseSBldmVuIGZvciBzdWNoIGNhc2VzLCBpdCBpcwpmYWly
-bHkgaGFybWxlc3MgdG8gbWFrZSB0aGlzIGEgZGVidWcgbG9nLiBXaGVuIG5lZWRlZCwgdGhlIHZl
-cmJvc2l0eQpjYW4gYmUgaW5jcmVhc2VkIHRvIGNhcHR1cmUgdGhpcyBsb2cuCgpDYzogc3RhYmxl
-QHZnZXIua2VybmVsLm9yZwpSZXBvcnRlZC1ieTogSmFuIMSMZXJtw6FrIDxzYWlyb25Ac2Fpcm9u
-LmN6PgpTaWduZWQtb2ZmLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0t
-LQogZnMvc21iL2NsaWVudC9zZXNzLmMgfCA0ICsrLS0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2Vy
-dGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zZXNz
-LmMgYi9mcy9zbWIvY2xpZW50L3Nlc3MuYwppbmRleCA4ZjM3MzczZmQzMzMuLjMyMTZmNzg2OTA4
-ZiAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zZXNzLmMKKysrIGIvZnMvc21iL2NsaWVudC9z
-ZXNzLmMKQEAgLTIzMCw3ICsyMzAsNyBAQCBpbnQgY2lmc190cnlfYWRkaW5nX2NoYW5uZWxzKHN0
-cnVjdCBjaWZzX3NlcyAqc2VzKQogCQlzcGluX2xvY2soJnNlcy0+aWZhY2VfbG9jayk7CiAJCWlm
-ICghc2VzLT5pZmFjZV9jb3VudCkgewogCQkJc3Bpbl91bmxvY2soJnNlcy0+aWZhY2VfbG9jayk7
-Ci0JCQljaWZzX2RiZyhWRlMsICJzZXJ2ZXIgJXMgZG9lcyBub3QgYWR2ZXJ0aXNlIGludGVyZmFj
-ZXNcbiIsCisJCQljaWZzX2RiZyhPTkNFLCAic2VydmVyICVzIGRvZXMgbm90IGFkdmVydGlzZSBp
-bnRlcmZhY2VzXG4iLAogCQkJCSAgICAgIHNlcy0+c2VydmVyLT5ob3N0bmFtZSk7CiAJCQlicmVh
-azsKIAkJfQpAQCAtMzk2LDcgKzM5Niw3IEBAIGNpZnNfY2hhbl91cGRhdGVfaWZhY2Uoc3RydWN0
-IGNpZnNfc2VzICpzZXMsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKIAlzcGluX2xv
-Y2soJnNlcy0+aWZhY2VfbG9jayk7CiAJaWYgKCFzZXMtPmlmYWNlX2NvdW50KSB7CiAJCXNwaW5f
-dW5sb2NrKCZzZXMtPmlmYWNlX2xvY2spOwotCQljaWZzX2RiZyhWRlMsICJzZXJ2ZXIgJXMgZG9l
-cyBub3QgYWR2ZXJ0aXNlIGludGVyZmFjZXNcbiIsIHNlcy0+c2VydmVyLT5ob3N0bmFtZSk7CisJ
-CWNpZnNfZGJnKE9OQ0UsICJzZXJ2ZXIgJXMgZG9lcyBub3QgYWR2ZXJ0aXNlIGludGVyZmFjZXNc
-biIsIHNlcy0+c2VydmVyLT5ob3N0bmFtZSk7CiAJCXJldHVybjsKIAl9CiAKLS0gCjIuNDAuMQoK
---000000000000fec02d0613a20e79--
+RnJvbSBhOWZmOTZlNmExNDk1MTI5YWFiMGJiMDgzMjVmNTgwNGMwMzBlYjZmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
+RGF0ZTogVGh1LCAxNCBNYXIgMjAyNCAyMzozNjozNiArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIGNp
+ZnM6IHJlbW92ZSByZWR1bmRhbnQgdmFyaWFibGUgYXNzaWdubWVudAoKVGhpcyByZW1vdmVzIGFu
+IHVubmVjZXNzYXJ5IHZhcmlhYmxlIGFzc2lnbm1lbnQuIFRoZSBhc3NpZ25lZAp2YWx1ZSB3aWxs
+IGJlIG92ZXJ3cml0dGVuIGJ5IGNpZnNfZmF0dHJfdG9faW5vZGUgYmVmb3JlIGl0CmlzIGFjY2Vz
+c2VkLCBtYWtpbmcgdGhlIGxpbmUgcmVkdW5kYW50LgoKU2lnbmVkLW9mZi1ieTogQmhhcmF0aCBT
+TSA8YmhhcmF0aHNtQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9pbm9kZS5jIHwg
+MiAtLQogMSBmaWxlIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21i
+L2NsaWVudC9pbm9kZS5jIGIvZnMvc21iL2NsaWVudC9pbm9kZS5jCmluZGV4IDYwOTI3MjliZjdm
+Ni4uZDI4YWIwYWY2MDQ5IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2lub2RlLmMKKysrIGIv
+ZnMvc21iL2NsaWVudC9pbm9kZS5jCkBAIC00MDEsNyArNDAxLDYgQEAgY2lmc19nZXRfZmlsZV9p
+bmZvX3VuaXgoc3RydWN0IGZpbGUgKmZpbHApCiAJCWNpZnNfdW5peF9iYXNpY190b19mYXR0cigm
+ZmF0dHIsICZmaW5kX2RhdGEsIGNpZnNfc2IpOwogCX0gZWxzZSBpZiAocmMgPT0gLUVSRU1PVEUp
+IHsKIAkJY2lmc19jcmVhdGVfanVuY3Rpb25fZmF0dHIoJmZhdHRyLCBpbm9kZS0+aV9zYik7Ci0J
+CXJjID0gMDsKIAl9IGVsc2UKIAkJZ290byBjaWZzX2dmaXVuaXhfb3V0OwogCkBAIC04NDYsNyAr
+ODQ1LDYgQEAgY2lmc19nZXRfZmlsZV9pbmZvKHN0cnVjdCBmaWxlICpmaWxwKQogCQlicmVhazsK
+IAljYXNlIC1FUkVNT1RFOgogCQljaWZzX2NyZWF0ZV9qdW5jdGlvbl9mYXR0cigmZmF0dHIsIGlu
+b2RlLT5pX3NiKTsKLQkJcmMgPSAwOwogCQlicmVhazsKIAljYXNlIC1FT1BOT1RTVVBQOgogCWNh
+c2UgLUVJTlZBTDoKLS0gCjIuMzQuMQoK
+--000000000000f91c3b0613a2ddf3--
