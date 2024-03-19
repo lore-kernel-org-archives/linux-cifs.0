@@ -1,51 +1,51 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C66784A51
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 16:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5D7F9FF
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 16:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710864843; cv=none; b=rIl3CQs4amt0Y8ZnzCbaCAXoGTLuy3SXaXMJphhYTkt8uzhaEBbos0kPFwdsA2BJX6FYI4FdA0ZYmxYXJoTEWv9Xw0aBpZKi/ZmK6baI61ctwp9Xud9x1g5btyvI0V8bs16ndKIZfJ1iWZbolOXo37dGttEQPMPgwKW6L2SeCz8=
+	t=1710866473; cv=none; b=LWaOXltz3s/eBSp5xDdPyvwtmo5cKe6f/3thUrVnOqq5+GWDVFlAoJVtVE/hgyMbQYANaKv/E+45Cp3SolGHD1+5hJHDNfWryIIA7yTEqr21iAkMo+973E4c27JWO3a39tcm6Gx/ue+U7xjdd+UPR0Y7uyZ7YCqT+BF0RL7KSpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710864843; c=relaxed/simple;
-	bh=xK6oFtMSPOO/+MFMrzgdRfpeW/yJYOp63dnRub6XKM4=;
+	s=arc-20240116; t=1710866473; c=relaxed/simple;
+	bh=nRp7+YyTBHw31NX7xj7EtsXhg3dkAR+p6w1ZMt+sOEU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ciQ7VJdgbwgRdQx+D6ysbPnNO/XJyczAfUMUNLhWOgE0+fsA0tMODuunLMjSl5aCUVqaEXmbDOl4Kqc/xaUuHqjKkeoFvqH3wn7um1V47Rv/Kid/t3SarwA9r03kkkLvzPVpahCQOGDU7KhKl8vba50dQJ/ZIqmRyg7YiWeicJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=l+V0fC34; arc=none smtp.client-ip=209.85.218.53
+	 To:Cc:Content-Type; b=ThEpqmgwh85lGDivYXOnw1GbijIkET8zgTgFNC7ANOMoAyn1Dcr6FhulTKQMdkgphbhmzfnXCc6/sY0QBYN5xhOcsZ4LmkFG7TnWAS/l7XadJNGxcqoT+JOmuFUtAL8Ph4fYHdTYepw0yhKUv7jyRjoKOLWCqh7KHbyTrsCesKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=Bjc+xpQA; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="l+V0fC34"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a46aaf6081fso422997866b.2
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 09:14:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="Bjc+xpQA"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4644bde1d4so760711066b.3
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 09:41:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1710864839; x=1711469639; darn=vger.kernel.org;
+        d=szeredi.hu; s=google; t=1710866470; x=1711471270; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qssoFyi0EHVSMQZ8tvcNSLF8ll1cyBFfjAUL3WkFTKQ=;
-        b=l+V0fC34qbWms3t2kAM2Tsaco+GNRpzk32yyo0NNeSGtZuo5iLyGwkDFxfHS7jyxuT
-         EjYfJjUYY/jl10/fim6+6QLQfSlCeSzFvYZY0aAjsYBNlqdd16aIRTso+2GaFAMF86Wh
-         g0+a6IL6vAXBN23hxZ4lFYPLWdEr8CCHoiv+E=
+        bh=931BN8XdKyOBXgviRQCefbI6odUP2QsuOngK2FvcTOs=;
+        b=Bjc+xpQAwY3z3fbUSs5mWFZqOgAsXiWOfTt2fETf32xVt5LGMFFT8BlXOVa1nShF4e
+         u3hKGCc3sXooS8tjsd1KJrhLeAY0AsQHmlDDydrwglGH1JSvNWnPALsWFn98NxkI4Uc4
+         VoScTVzsNWKZM++T29YZIQ9ySLCKZz1WGzusQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710864839; x=1711469639;
+        d=1e100.net; s=20230601; t=1710866470; x=1711471270;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qssoFyi0EHVSMQZ8tvcNSLF8ll1cyBFfjAUL3WkFTKQ=;
-        b=Pw4RqaS9b6hnU3SKOA5t0csbZWLHsU/EP2MEtITDKBuEN6ezL3oOxsJlCqSOQz547x
-         JOQQi4uTZIk2rzoQ5fbE3MUM+kYyMOD4eooPt0kEnbBFx2CrxDqbQrYxkf61jhIKXtYy
-         T1cklLHEemFkEKqWHSpB94fCS4UcNMixqeGpn9lyiowa2xhhc8esAXa/1FiyRmb13wB8
-         656buP7yZe53ZIKdPALGcY4SCYPAUkpm+k8wgbgLQNkPrXoHpUrE27AYT0+/jkKf0pxg
-         rQcl3zQsp4UBXQpMwp9evJbnDcKqRcs/dJYJosT3cvGilqF1471YgX3s+GuJ26+Yb1jJ
-         dkfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQpUqnP053YYavVuV1wFbArQY21HLm7v/Zr1o38kqoAh6BX3F6+HehvMfzOKUnAyI1y5/ddxuZ142fcy5TvSYmjJO3+iRTWtYlOw==
-X-Gm-Message-State: AOJu0Yym5JFiBdoGNKbT1lSiPrFKebWhvZLnC1aUtV1+fxBSPg55ulHJ
-	tHitHkm2juQj9mJXuzBIhQusqRWcQquKo0853a1t1Y2t3QETdgoY7Eypf+1Oz/ywwURPif2pNQP
-	wAcZrDO9PkmwU1KK6cl2cvL0bN5CqMTU03aWYww==
-X-Google-Smtp-Source: AGHT+IG80idJ/eoHfs/tS8xY4ItmYTZEjrCulMFp8PsOW5O33PBCGW/QH9XqH6EWMgC+d4lP/zrFK1SKGKNE4vf/7pM=
-X-Received: by 2002:a17:906:af07:b0:a46:47bc:580b with SMTP id
- lx7-20020a170906af0700b00a4647bc580bmr2203920ejb.56.1710864838625; Tue, 19
- Mar 2024 09:13:58 -0700 (PDT)
+        bh=931BN8XdKyOBXgviRQCefbI6odUP2QsuOngK2FvcTOs=;
+        b=WQhvOfJ3SxrBiiCMrO0LJ/vqtF4CzpupAqikdmNNn3kzdm+ljr7Xb5oVVgpMkVfkGl
+         Iy6ENiukMfuTb3bvfwwOOZPhFppXEnkOofsiHDJxirSv/2s5eGs2MtvBqZxTBvmwWjvD
+         fF5/CqQaF0cXbwoVyrNg9cwattHMYd2a1GG9JegOnWi7szF+tvVPSbLBvJnYwg4Whvzp
+         bxdHxTkuBiCRyjqx4pCLdm0vfanI/Z9CqULwg8ZifbvKATWPNlkNTWHNyBiLzW+KuVm4
+         0hiPhCc67NbXojE9owHW5gfGvBAupY5ajL1sTxNWp8pr1xaxG8/xvhUC7eQCHBH2Wpjd
+         Xsnw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5+vI0T+misWiEwUpgXqmJra1e2Jjb77SZjp+zZW6NuaeKzKSRf+YsgExBBAlELVCdTxl+ev+SyN90gZn3OET7XaZ+1Ca1o2u01w==
+X-Gm-Message-State: AOJu0YwZmz2C2O0DNlBipSY1SEBJ9IxvF0BZXYT5gGPESVqNf/guviQl
+	T/X+aLev1ajbWYFtkwSiPiAdhT0jLZ7EolDtrI5uLXB3ZZKseB3HDNCW3zBpKUgrgiczCjh9h/A
+	YIEbwcAo0oq4kKvHlBfxJX+R8ovJUXqahSM485A==
+X-Google-Smtp-Source: AGHT+IFDeEEaIOtSBG5DGppYGHWRw4rXZqpgILKwzYCMW4SSXhcYWj+KFRDuw5xeuXxFLrQ0w0/J7Jaydr+ESekL/l8=
+X-Received: by 2002:a17:906:70c9:b0:a46:6bb8:1ec4 with SMTP id
+ g9-20020a17090670c900b00a466bb81ec4mr8429584ejk.76.1710866470240; Tue, 19 Mar
+ 2024 09:41:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,11 +54,11 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <1668172.1709764777@warthog.procyon.org.uk> <ZelGX3vVlGfEZm8H@casper.infradead.org>
  <1831809.1709807788@warthog.procyon.org.uk> <CAJfpegv8X0PY7PvxEF=zEwRbdZ7yZZcwB80iDO+XLverognx+g@mail.gmail.com>
- <651179.1710857687@warthog.procyon.org.uk>
-In-Reply-To: <651179.1710857687@warthog.procyon.org.uk>
+ <651179.1710857687@warthog.procyon.org.uk> <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
+In-Reply-To: <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
 From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Tue, 19 Mar 2024 17:13:47 +0100
-Message-ID: <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
+Date: Tue, 19 Mar 2024 17:40:58 +0100
+Message-ID: <CAJfpegsCBEm11OHS8bfQdgossOgofPcYhLTFtw7_+T66iBvznw@mail.gmail.com>
 Subject: Re: [RFC PATCH] mm: Replace ->launder_folio() with flush and wait
 To: David Howells <dhowells@redhat.com>
 Cc: Matthew Wilcox <willy@infradead.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
@@ -67,26 +67,33 @@ Cc: Matthew Wilcox <willy@infradead.org>, Trond Myklebust <trond.myklebust@hamme
 	Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
 	netfs@lists.linux.dev, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
 	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, devel@lists.orangefs.org, 
-	linux-kernel@vger.kernel.org
+	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 19 Mar 2024 at 15:15, David Howells <dhowells@redhat.com> wrote:
+On Tue, 19 Mar 2024 at 17:13, Miklos Szeredi <miklos@szeredi.hu> wrote:
+>
+> On Tue, 19 Mar 2024 at 15:15, David Howells <dhowells@redhat.com> wrote:
+>
+> > What particular usage case of invalidate_inode_pages2() are you thinking of?
+>
+> FUSE_NOTIFY_INVAL_INODE will trigger invalidate_inode_pages2_range()
+> to clean up the cache.
+>
+> The server is free to discard writes resulting from this invalidation
+> and delay reads in the region until the invalidation finishes.  This
+> would no longer work with your change, since the mapping could
+> silently be reinstated between the writeback and the removal from the
+> cache due to the page being unlocked/relocked.
 
-> What particular usage case of invalidate_inode_pages2() are you thinking of?
+This would also matter if a distributed filesystem wanted to implement
+coherence even if there are mmaps.   I.e. a client could get exclusive
+access to a region by issuing FUSE_NOTIFY_INVAL_INODE on all other
+clients and blocking reads.  With your change this would fail.
 
-FUSE_NOTIFY_INVAL_INODE will trigger invalidate_inode_pages2_range()
-to clean up the cache.
-
-The server is free to discard writes resulting from this invalidation
-and delay reads in the region until the invalidation finishes.  This
-would no longer work with your change, since the mapping could
-silently be reinstated between the writeback and the removal from the
-cache due to the page being unlocked/relocked.
-
-I'm not saying such a filesystem actually exists, but it's a
-theoretical possibility.  And maybe there are cases which I haven't
-thought of.
+Again, this is purely theoretical, and without a way to differentiate
+between the read-only and write cases it has limited usefulness.
+Adding leases to fuse (which I plan to do) would make this much more
+useful.
 
 Thanks,
 Miklos
