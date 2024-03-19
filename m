@@ -1,99 +1,136 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5D7F9FF
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 16:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698FC1118E;
+	Tue, 19 Mar 2024 16:59:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710866473; cv=none; b=LWaOXltz3s/eBSp5xDdPyvwtmo5cKe6f/3thUrVnOqq5+GWDVFlAoJVtVE/hgyMbQYANaKv/E+45Cp3SolGHD1+5hJHDNfWryIIA7yTEqr21iAkMo+973E4c27JWO3a39tcm6Gx/ue+U7xjdd+UPR0Y7uyZ7YCqT+BF0RL7KSpU=
+	t=1710867590; cv=none; b=cbrqfawiaPDJOumImTYUGOhyDTd6Totzd5pLDLxWl1h2LFmrCASZB2ZZc2HuEg0roKn5U+qnskUaifWfASWYb5CsuUoQGQS/jC2auTeCEvPy9YIjdyufLl13Vb13FYqbdI3pAHB/l938aOH7Ib4BmUZHhtT1E63+LlI8mZNIfT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710866473; c=relaxed/simple;
-	bh=nRp7+YyTBHw31NX7xj7EtsXhg3dkAR+p6w1ZMt+sOEU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ThEpqmgwh85lGDivYXOnw1GbijIkET8zgTgFNC7ANOMoAyn1Dcr6FhulTKQMdkgphbhmzfnXCc6/sY0QBYN5xhOcsZ4LmkFG7TnWAS/l7XadJNGxcqoT+JOmuFUtAL8Ph4fYHdTYepw0yhKUv7jyRjoKOLWCqh7KHbyTrsCesKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=Bjc+xpQA; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
+	s=arc-20240116; t=1710867590; c=relaxed/simple;
+	bh=TPYwpJrngVJym4yY5SzYj0P5kZ+FMMniYM2lAo+nnhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VO+ahk80UR8HHCy8r8La9dAtuzltYDny1OZdJ1muhMHrlMoFCvLZAG6JjwBu4HN53O5efHOWmlW5fF5izkglVozXTJ7xnK2OGi1hZhAs6d0S5amOwgnTW5emDwACBoKKid4DFmmh7ik3O9Z6t6pH3liOXYf3ANNTtqIzcb/eYzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.fm; spf=pass smtp.mailfrom=fastmail.fm; dkim=pass (2048-bit key) header.d=fastmail.fm header.i=@fastmail.fm header.b=0u9/fpcI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lrNIPM4x; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.fm
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.fm
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="Bjc+xpQA"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4644bde1d4so760711066b.3
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Mar 2024 09:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1710866470; x=1711471270; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=931BN8XdKyOBXgviRQCefbI6odUP2QsuOngK2FvcTOs=;
-        b=Bjc+xpQAwY3z3fbUSs5mWFZqOgAsXiWOfTt2fETf32xVt5LGMFFT8BlXOVa1nShF4e
-         u3hKGCc3sXooS8tjsd1KJrhLeAY0AsQHmlDDydrwglGH1JSvNWnPALsWFn98NxkI4Uc4
-         VoScTVzsNWKZM++T29YZIQ9ySLCKZz1WGzusQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710866470; x=1711471270;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=931BN8XdKyOBXgviRQCefbI6odUP2QsuOngK2FvcTOs=;
-        b=WQhvOfJ3SxrBiiCMrO0LJ/vqtF4CzpupAqikdmNNn3kzdm+ljr7Xb5oVVgpMkVfkGl
-         Iy6ENiukMfuTb3bvfwwOOZPhFppXEnkOofsiHDJxirSv/2s5eGs2MtvBqZxTBvmwWjvD
-         fF5/CqQaF0cXbwoVyrNg9cwattHMYd2a1GG9JegOnWi7szF+tvVPSbLBvJnYwg4Whvzp
-         bxdHxTkuBiCRyjqx4pCLdm0vfanI/Z9CqULwg8ZifbvKATWPNlkNTWHNyBiLzW+KuVm4
-         0hiPhCc67NbXojE9owHW5gfGvBAupY5ajL1sTxNWp8pr1xaxG8/xvhUC7eQCHBH2Wpjd
-         Xsnw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5+vI0T+misWiEwUpgXqmJra1e2Jjb77SZjp+zZW6NuaeKzKSRf+YsgExBBAlELVCdTxl+ev+SyN90gZn3OET7XaZ+1Ca1o2u01w==
-X-Gm-Message-State: AOJu0YwZmz2C2O0DNlBipSY1SEBJ9IxvF0BZXYT5gGPESVqNf/guviQl
-	T/X+aLev1ajbWYFtkwSiPiAdhT0jLZ7EolDtrI5uLXB3ZZKseB3HDNCW3zBpKUgrgiczCjh9h/A
-	YIEbwcAo0oq4kKvHlBfxJX+R8ovJUXqahSM485A==
-X-Google-Smtp-Source: AGHT+IFDeEEaIOtSBG5DGppYGHWRw4rXZqpgILKwzYCMW4SSXhcYWj+KFRDuw5xeuXxFLrQ0w0/J7Jaydr+ESekL/l8=
-X-Received: by 2002:a17:906:70c9:b0:a46:6bb8:1ec4 with SMTP id
- g9-20020a17090670c900b00a466bb81ec4mr8429584ejk.76.1710866470240; Tue, 19 Mar
- 2024 09:41:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fastmail.fm header.i=@fastmail.fm header.b="0u9/fpcI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lrNIPM4x"
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 8750E1140101;
+	Tue, 19 Mar 2024 12:59:47 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Tue, 19 Mar 2024 12:59:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.fm; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1710867587;
+	 x=1710953987; bh=cHdFUwNUaNtHseK/mzgvFDOdmo7eBJ0OS3s8iO/q7R0=; b=
+	0u9/fpcIJQPoY0zpSCSJ6gTPGTGnlb3KOcQLJQwVoFNWumffgMIIO56GHh0ukM4I
+	PWYbUjIJOaDdaZZ3BKwmOQIybUPlcppqssGdWvfDmEfRO1C+EhqIHG5qLORrYn1o
+	qq6MWOx/cN4EvD9Wu/N9lFNoUoWXO1uo9Aa+Py8FP7yFheRD3pvRA4a6VyaWd+Rb
+	yqy2xrgqf+UftdQXAjWZorzwEthFH1X4bUPGo5GhF13V1yLhgioycWUwQLGTQ1BP
+	E4Jc5iJ4+9kAOv2HXWSWAp1Xxj+FuEJ9YkgfYRN2bwlUe96iq7tSRA01cR+2list
+	hQl6u6AbGGgsmn8nPUK2xQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1710867587; x=
+	1710953987; bh=cHdFUwNUaNtHseK/mzgvFDOdmo7eBJ0OS3s8iO/q7R0=; b=l
+	rNIPM4xpEKf2RZpW1L6EY8hMPyl0jjOpe1MzAtqVxSww7hjUNwG+igvOnMrB2vKD
+	uk5/6o9swhOhRdTEBhPQFfKaj2tVsMMNPM5/dnt4AMFILolNuIwVeOnWY2ciHnyf
+	WN58rRHTp6Mo14sWlR8R0Yap+DaTkJMfaGFljXx5ENWroxZPgRr3/BmE6e0bNba7
+	U2BXvYFY+eiV8fi8BFz5gTGNoHm4orSK7Gja3/QQsrhR0aTgZOUVC7b3Yuj2UBry
+	8bn/qTnv6kojC+Hzm+5xruFjYzL6RIr66kh6rlkc/RP1JlEFJydP1JVI4wkb4yEL
+	1eKgP3HUkQNAR3pU7X/Cg==
+X-ME-Sender: <xms:gsT5ZcZAHXxbcYEsXh2kFe2XEGrKSbNqGQBdQc-OzhXhZ7TWuh1B9Q>
+    <xme:gsT5ZXaUJNPxGEC-EGUIISLXOzYax5A6JWwRmGSgMLewfoFfXMLfjJvPstAyL2Oiy
+    4ZRT7XKSrQL8SE0>
+X-ME-Received: <xmr:gsT5ZW-SHey_qu8C_n65vo9NmpDxAoNNWHaiCuCOvvihVmXqK7X5lJfVjYvTCYCktg6McJZf_WNCST2JODi6EI6tUlu4y9gsfgZw7W-x_DDDaaeQ2BvN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrledtgdejtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepuegvrhhn
+    ugcuufgthhhusggvrhhtuceosggvrhhnugdrshgthhhusggvrhhtsehfrghsthhmrghilh
+    drfhhmqeenucggtffrrghtthgvrhhnpeevhffgvdeltddugfdtgfegleefvdehfeeiveej
+    ieefveeiteeggffggfeulefgjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpegsvghrnhgurdhstghhuhgsvghrthesfhgrshhtmhgrihhlrdhf
+    mh
+X-ME-Proxy: <xmx:gsT5ZWp_Xp8g-XeIUTn3R3XwcTxPEI87lEYYuBopKtA1ZW2yuelMCA>
+    <xmx:gsT5ZXpAsV-4kCS8ULBvaHC4sBvy5j1Au1FZfetCOl79nYNNGA7CyQ>
+    <xmx:gsT5ZUSsxLu4tR4TgEBX3FnVK8rJNxhJI8Q-5dX6YQnrD8gAnJxrrg>
+    <xmx:gsT5ZXoC0N7zIHK-a-_46_RtZYXB5rwZGTfRRa9OZt-BiFUrc2fU6g>
+    <xmx:g8T5ZeelEAZbKzgWvJSrQWBb4nfdzh9IQCPESFVTj-2G0oAdFX45Qg>
+Feedback-ID: id8a24192:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 19 Mar 2024 12:59:44 -0400 (EDT)
+Message-ID: <63e67db9-7425-4928-afb2-cbe7cc6232bb@fastmail.fm>
+Date: Tue, 19 Mar 2024 17:59:42 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1668172.1709764777@warthog.procyon.org.uk> <ZelGX3vVlGfEZm8H@casper.infradead.org>
- <1831809.1709807788@warthog.procyon.org.uk> <CAJfpegv8X0PY7PvxEF=zEwRbdZ7yZZcwB80iDO+XLverognx+g@mail.gmail.com>
- <651179.1710857687@warthog.procyon.org.uk> <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
-In-Reply-To: <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
-From: Miklos Szeredi <miklos@szeredi.hu>
-Date: Tue, 19 Mar 2024 17:40:58 +0100
-Message-ID: <CAJfpegsCBEm11OHS8bfQdgossOgofPcYhLTFtw7_+T66iBvznw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH] mm: Replace ->launder_folio() with flush and wait
-To: David Howells <dhowells@redhat.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	netfs@lists.linux.dev, v9fs@lists.linux.dev, linux-afs@lists.infradead.org, 
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: Miklos Szeredi <miklos@szeredi.hu>, David Howells <dhowells@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+ linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+ v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+ ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1668172.1709764777@warthog.procyon.org.uk>
+ <ZelGX3vVlGfEZm8H@casper.infradead.org>
+ <1831809.1709807788@warthog.procyon.org.uk>
+ <CAJfpegv8X0PY7PvxEF=zEwRbdZ7yZZcwB80iDO+XLverognx+g@mail.gmail.com>
+ <651179.1710857687@warthog.procyon.org.uk>
+ <CAJfpegsUYUwp2YNnCE3ZP+JtL0whgQ=3+wcsBABGXH9MjXC0zA@mail.gmail.com>
+ <CAJfpegsCBEm11OHS8bfQdgossOgofPcYhLTFtw7_+T66iBvznw@mail.gmail.com>
+Content-Language: en-US, de-DE, fr
+From: Bernd Schubert <bernd.schubert@fastmail.fm>
+In-Reply-To: <CAJfpegsCBEm11OHS8bfQdgossOgofPcYhLTFtw7_+T66iBvznw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 19 Mar 2024 at 17:13, Miklos Szeredi <miklos@szeredi.hu> wrote:
->
-> On Tue, 19 Mar 2024 at 15:15, David Howells <dhowells@redhat.com> wrote:
->
-> > What particular usage case of invalidate_inode_pages2() are you thinking of?
->
-> FUSE_NOTIFY_INVAL_INODE will trigger invalidate_inode_pages2_range()
-> to clean up the cache.
->
-> The server is free to discard writes resulting from this invalidation
-> and delay reads in the region until the invalidation finishes.  This
-> would no longer work with your change, since the mapping could
-> silently be reinstated between the writeback and the removal from the
-> cache due to the page being unlocked/relocked.
 
-This would also matter if a distributed filesystem wanted to implement
-coherence even if there are mmaps.   I.e. a client could get exclusive
-access to a region by issuing FUSE_NOTIFY_INVAL_INODE on all other
-clients and blocking reads.  With your change this would fail.
 
-Again, this is purely theoretical, and without a way to differentiate
-between the read-only and write cases it has limited usefulness.
-Adding leases to fuse (which I plan to do) would make this much more
-useful.
+On 3/19/24 17:40, Miklos Szeredi wrote:
+> On Tue, 19 Mar 2024 at 17:13, Miklos Szeredi <miklos@szeredi.hu> wrote:
+>>
+>> On Tue, 19 Mar 2024 at 15:15, David Howells <dhowells@redhat.com> wrote:
+>>
+>>> What particular usage case of invalidate_inode_pages2() are you thinking of?
+>>
+>> FUSE_NOTIFY_INVAL_INODE will trigger invalidate_inode_pages2_range()
+>> to clean up the cache.
+>>
+>> The server is free to discard writes resulting from this invalidation
+>> and delay reads in the region until the invalidation finishes.  This
+>> would no longer work with your change, since the mapping could
+>> silently be reinstated between the writeback and the removal from the
+>> cache due to the page being unlocked/relocked.
+> 
+> This would also matter if a distributed filesystem wanted to implement
+> coherence even if there are mmaps.   I.e. a client could get exclusive
+> access to a region by issuing FUSE_NOTIFY_INVAL_INODE on all other
+> clients and blocking reads.  With your change this would fail.
+> 
+> Again, this is purely theoretical, and without a way to differentiate
+> between the read-only and write cases it has limited usefulness.
+> Adding leases to fuse (which I plan to do) would make this much more
+> useful.
+
+Thanks Miklos! Fyi, we are actually planning to extend fuse
+notifications from inode to page ranges.
+
 
 Thanks,
-Miklos
+Bernd
