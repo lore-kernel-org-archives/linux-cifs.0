@@ -1,104 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4081638F9B;
-	Tue, 19 Mar 2024 18:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A3D2F2C;
+	Tue, 19 Mar 2024 23:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710871952; cv=none; b=grAljBCgUipjPrpBTe3hkNH5QhabfxuSy5fd7t70Kh5rYhdPp0lDIZpVKEoBxccU468OVYw101hoKJrGLPcEYHZbLKvpcdZBIi/KJWexcUlHbQ4COyLxyamGYUA3iu4wEy29i7Zy0wiwFVQwD9LCCZyJnIHYU/2YTfqctFbs3tE=
+	t=1710889213; cv=none; b=rk8jAFDpsXYDA5rzTlRGad3RYcyfJgmT7x/D9vPtTdOml+7v+AX/gjyTd09xxc1bV3hNGlosxMLznk15SV5mbywyG7nAzhQ6epTx44KaTEpOz0Lxodi9MCoJdt1QMt7zyplCjhYoXCZyuXiKvw4W3r10CcPCGSMVP3pV5DqyZvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710871952; c=relaxed/simple;
-	bh=Atcxj90hTF+zxrJlwSGVzi+lpYqnTHj82OPJjJr/fpc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=NH/f1NhsFKZAAa5qXpbA6ZUnGrEd/8y+D0BVcvk6TZDBGWCiEUBLcPiUTc8mXCKLXfgrbA5tawWS1mFORU529UZ95BswoMmSc7hQQI/B4RKhAuo6+SjkNuxMMoW9r1GRmU5EdxT2JefM6PWsA+1qosN17xG09FYnL5hsNCTib4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swWCCn3Y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710889213; c=relaxed/simple;
+	bh=XHWs2TDukjWaaM4rMlR7z3I+PmKwh7KX8+TCMymIhAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=sczpHTkQ7fxo77R9RRoFic7DfY4YOTjEVjIi5W6YMPRB3siwJAfG5bcNL/ePuRynMCxN9OHOurOcJD0FJU8vw737CrCHlX6v+MIhStKvsBJOefCJCNtxYnuNGzSAetPv7O5uI8cLQMsdDBH0pTSLuPP01y5Zv98FTMRnWPUy3IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=VluhFGrs; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swWCCn3Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0640C433F1;
-	Tue, 19 Mar 2024 18:12:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710871951;
-	bh=Atcxj90hTF+zxrJlwSGVzi+lpYqnTHj82OPJjJr/fpc=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=swWCCn3YjhWpcbRhKwXi6lQMfdcw+V2TnlNtcjw+3rqqCc0GqYkx+iRPfAjpxvtEe
-	 Z8LAW92UtslUF8R34qBtQhF/TZ8OTcNfosxYm4vhUVOMdyOzR/fslPNxihdnyc4GhH
-	 dAT91c8Snem5ZKgueZFzflacmds3x4ABxyih7gcKkQNdpeVxs0c9UZPXNp2VOjJH38
-	 a3M8he9LGm7YMhAtLRCJL4vICo5/RLjws+7piZHmvii71pbfjvBA0Yaiqv3YTJkySL
-	 //m9pptx0GcX1tXFs5T1Y+/VFuZmPGjCQNV/NQGUsYaaC/UJcE4BnGS7ilHn2LFTls
-	 b9D9bGh08DEtQ==
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="VluhFGrs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710889199;
+	bh=1l5ZS/wHawdSMjrNk1CO13TVElMFEtzAMIJXZOHtZgk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=VluhFGrs+d4RzzohQs6oQjBVGtOGsfg6cLPIPLjdf6MOLOcH8kqtlSem4tdgkQPF7
+	 4zjOaSH4jeh8DEHWRDxveB6W3sfb6MS7ZuObNU32u9u4452hig6VZoMDib4wpo+iEN
+	 IhXeVBlsX9ZV+juIWZsrjcEtALQnmDyNbaAHu9JDiTb8NCRt+HKkkflICKLZQJ1hnC
+	 LfVwYAQf5at/KlkYQMrwxP5Q9vlgW9AuJ60tZJMRe8/WdC0j4HABSA4cMIJVfgKpln
+	 CBvEVjL+inwC4q1O7IIWL+eM7veW1gExr6iqTGOyyuG1iYlXSMqNT7Phm6bS5tG/QO
+	 HkjX78uc7+nYA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TznHL6mNbz4wc9;
+	Wed, 20 Mar 2024 09:59:58 +1100 (AEDT)
+Date: Wed, 20 Mar 2024 09:59:57 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the cifs tree
+Message-ID: <20240320095957.324ec03b@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/C.hddX4Iwyg3ysjcjrO=mvA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/C.hddX4Iwyg3ysjcjrO=mvA
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 19 Mar 2024 20:12:28 +0200
-Message-Id: <CZXXHMPCCCE5.2SSZ17WVZPGRX@kernel.org>
-Cc: "Hazem Mohamed Abuelfotoh" <abuehaze@amazon.com>,
- <linux-afs@lists.infradead.org>, <linux-cifs@vger.kernel.org>,
- <keyrings@vger.kernel.org>, <netdev@vger.kernel.org>,
- <stable@vger.kernel.org>
-Subject: Re: [PATCH] keys: Fix overwrite of key expiration on instantiation
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Silvio Gissi"
- <sifonsec@amazon.com>, "David Howells" <dhowells@redhat.com>
-X-Mailer: aerc 0.15.2
-References: <20240315190539.1976-1-sifonsec@amazon.com>
- <CZX9KHAO8163.2IASOXWIT4OZ5@kernel.org>
-In-Reply-To: <CZX9KHAO8163.2IASOXWIT4OZ5@kernel.org>
 
-On Tue Mar 19, 2024 at 1:27 AM EET, Jarkko Sakkinen wrote:
-> On Fri Mar 15, 2024 at 9:05 PM EET, Silvio Gissi wrote:
-> > The expiry time of a key is unconditionally overwritten during
-> > instantiation, defaulting to turn it permanent. This causes a problem
-> > for DNS resolution as the expiration set by user-space is overwritten t=
-o
-> > TIME64_MAX, disabling further DNS updates. Fix this by restoring the
-> > condition that key_set_expiry is only called when the pre-parser sets a
-> > specific expiry.
-> >
-> > Fixes: 39299bdd2546 ("keys, dns: Allow key types (eg. DNS) to be reclai=
-med immediately on expiry")
-> > Signed-off-by: Silvio Gissi <sifonsec@amazon.com>
-> > cc: David Howells <dhowells@redhat.com>
-> > cc: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
-> > cc: linux-afs@lists.infradead.org
-> > cc: linux-cifs@vger.kernel.org
-> > cc: keyrings@vger.kernel.org
-> > cc: netdev@vger.kernel.org
-> > cc: stable@vger.kernel.org
-> > ---
-> >  security/keys/key.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/security/keys/key.c b/security/keys/key.c
-> > index 560790038329..0aa5f01d16ff 100644
-> > --- a/security/keys/key.c
-> > +++ b/security/keys/key.c
-> > @@ -463,7 +463,8 @@ static int __key_instantiate_and_link(struct key *k=
-ey,
-> >  			if (authkey)
-> >  				key_invalidate(authkey);
-> > =20
-> > -			key_set_expiry(key, prep->expiry);
-> > +			if (prep->expiry !=3D TIME64_MAX)
-> > +				key_set_expiry(key, prep->expiry);
-> >  		}
-> >  	}
-> > =20
->
-> I checked the original commit and reflected to the fix:
->
-> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
->
-> David, I can pick this one too as I'm anyway sending PR for rc2?
->
-> [1] https://lore.kernel.org/keyrings/CZX77XLG67HZ.UAU4NUQO27JP@kernel.org=
-/
+Hi all,
 
-I've applied this to my tree. Can drop on request but otherwise
-including to rc2 PR.
+After merging the cifs tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
 
-BR, Jarkko
+In file included from fs/smb/client/cifsglob.h:27,
+                 from fs/smb/client/cifsfs.c:36:
+fs/smb/client/../common/smb2pdu.h:291:9: error: unknown type name '_u8'
+  291 |         _u8 BlobData[];
+      |         ^~~
+
+Caused by commit
+
+  354c620afff2 ("smb311: additional compression flag defined in updated pro=
+tocol spec")
+
+I have used the cifs tree from next-20240319 for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/C.hddX4Iwyg3ysjcjrO=mvA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmX6GO0ACgkQAVBC80lX
+0GyCrQf/QtN3N7SKfmC9l+xkLpw8xEp0XDS3i2wNT0NHq30jzlpH+skmGLaROFxV
+GDdPolyXLomLufURWbGm0+NaIK4BlVFU+kpeG447UOdlwSbtfrjLr2zMxlmm1rD8
+5Kb96kgdC+xBXe62fofXVlluhStykbXyVOFg4jCh1wiIZ91Pq4c6wyFVv6h+y8Of
+C+mMC0kFLpXl4WDPZNVvTYVn6LEDNRcEWtI6Q3pfMJB+WnwUkEzJosUseVdAGr7Z
+U9k22JAcVILCuCiDl1elJS17t/On17HN2oFR9NdFrHiZDP6RPSF87kxqN1FD85eC
+KX7NaGH4NsnDiUOyT0D4hpiio5sRCg==
+=K3J+
+-----END PGP SIGNATURE-----
+
+--Sig_/C.hddX4Iwyg3ysjcjrO=mvA--
