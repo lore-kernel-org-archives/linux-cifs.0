@@ -1,104 +1,114 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2191E532;
-	Tue, 19 Mar 2024 23:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81E240847;
+	Wed, 20 Mar 2024 13:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710891467; cv=none; b=Zmbs7ve21lXzUYrujtU62afh79LmsMpwjFJO3cgA35d4q/4brRz10DcsWKrjWsFWC93jyKE0AxV7/Uu6F2WNoGryD6v5kQe6Fb7PkJtpKSveoyAhdUhCaOKfDJAdCuZs+bskKU0LEonEZDc/DDtYdpouda45OImAFBmYXvhZ8Ws=
+	t=1710940438; cv=none; b=IBQ28E857yOPIuWcosWbYs2exuZ0XxEJpiVVC90A/7o4bbGXwy3kwLLFriV27Hk2gII/6C8SlG9yvbLr0Ei45r3+w3nwzocal12lb9D0mHpuN/zvJIalcu3iBbTv3dqReUL04kRUoDihyROrusElcSNLJY+bOipJG+nI5rIEtqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710891467; c=relaxed/simple;
-	bh=TA+MAvG6JzImlBiWlPnS4xkF7qajQFEsGeJD6fZf2As=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PGfMC1xuQ0wf1Cu8SkN4kW+hDxxgLg6y6VBs4xCwd0NM/0ND2tvxQGnEpSzny0Vjugfm9/Eiq06e7QHJb73mmooxfOQb6B+r0ketcdybclEGDDFYNTNnHrNsfW//9rBqlX/84rjG82uHp/NtC9OL1sTe/w1EnQr3m8Aasrp12s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=leTn0/J+; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710940438; c=relaxed/simple;
+	bh=ghCN61ofXI0Tf62QAiLIvxh+oQl1kd8cAWHEsmu/bDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HysKZ5mJzoqPt/4t9pGF1nip2Q270uDY8MHF1GqGLQYkbq4tG06woA21N7jxQoKe/4Jh3Vu5ITYQov0EwUXxUjyFuD/0umqntQ3j9btB+vozlqRynFgV0TEk3rkO8xr014ueb8S2Cg+DucTLxDHKWAMt7x7FwmjUMI7Iuqzrpy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUeELnCF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="leTn0/J+"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51588f70d2dso202168e87.3;
-        Tue, 19 Mar 2024 16:37:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710891463; x=1711496263; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jqJR4Bfl5/9Mw0uEi+g9JF38Q7VWzrrFkiKr7uV0fiM=;
-        b=leTn0/J+/fEAYXX+fdVOzSHkx1bJSQYbyDnGd3/GVwdf0He/pdsLEyhblwauYVzXCx
-         7req3tLxDzGe+zJk1Ubj7bEw3SfwNELiEx0yNX1v0LQbvenRsNwa4p7qdK4rYY8V+kgN
-         rqf90Ydp7KYrFo2wkKHaepTCim4ET6rn/5mqH6zdNfDjmbBLTOPdPN2AVsEu/4W1AbTW
-         x8K4LU462ew5xSjV6EEOhJL3WKhnojX/WKufwfachx22OlYoJzb7klPJgQpBmgRGbcz1
-         Bv4n9wVwv/uUlEVwy4vKmDbcbOIA1i7sqqut3LFJ1/WHJw5tc4sxKYenlFzzc1JWCqLd
-         DZHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710891463; x=1711496263;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jqJR4Bfl5/9Mw0uEi+g9JF38Q7VWzrrFkiKr7uV0fiM=;
-        b=MBZ07eEjVSv4E3P7O5XCDDRAPaMuufmApO2q65Yz9PximwgLrHUiO4E4aMq8WqCclM
-         mDuszb4EVk2IlWigK1uUFLUDu66pxQdwMQz58H+dbdQS/B456nU1g0O4A5jcHIgMHlLb
-         lJkoHjL3UPUPC85QGIVAx1m0X5kR4L5hecC9fXbb4fMijJceGcGu+UQZU3LXaTdIBfLK
-         2iuevuHTxNyyJqx5Z+qKnD0td6oDsl286CYN5oSOvGgMDxW1CHLckAj72MTkyKyIvoSw
-         bfGXGeETwPMJvF3AJC7WbDsJHscf0J0UUvObCDgyhyvWT4afIXuwrRoAf2ioBVpL1GlU
-         oq2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUP5KP1nqD7JWm6nOn3gwQfTGitsUowAnIRBWG6nVEAwphzwDANQtR4YIb2X/cjEyckU/UjV7X1z5d2IKW5pyC7MwxE26f130gAJJELvvjt8SfpKlmL9GaqC9kbdM/WqCbHshUmnZx6ww==
-X-Gm-Message-State: AOJu0YzEi8m4KJHF/PFVXHPb6VA1ITXlj+4Ws2ibSDcmtq9+aaAuXju+
-	FchQcBYeyUOJ2paGYmdRVFJdaZ39NMgzqrF4tgQpgeeL8Ln4aAcb9c/4S2dJWoLnu3qy7avBc5j
-	csEjGk798uc5zC266vocM1KtIHRs=
-X-Google-Smtp-Source: AGHT+IGNXqoOg5hm8s4j6pbxepRWmB711QfgLrlsH051wKqjU0FoQteoWI2oNIOqhhBLVBVJUFauYU0Ppeb81Ee8LQc=
-X-Received: by 2002:ac2:5b03:0:b0:513:bd72:a677 with SMTP id
- v3-20020ac25b03000000b00513bd72a677mr11238403lfn.19.1710891463156; Tue, 19
- Mar 2024 16:37:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUeELnCF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9396C433F1;
+	Wed, 20 Mar 2024 13:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710940438;
+	bh=ghCN61ofXI0Tf62QAiLIvxh+oQl1kd8cAWHEsmu/bDg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HUeELnCFnUj3wvloClJuzTNugchOpDzTWWkkMdQaB3sqR8vtfAqyHagXs+H2Xj1mO
+	 ecblLQCaISXQFeqgrXi8ZNaf8EaEaC663/0+5jfAcIxV8cMPHlm0QxutNY/nvBG6tE
+	 JKq1+g+QgLAXEKFWocsj6dvM2Ps6ybe/+G8AVxC/ncU9GOrG9UN955V8DQHkXrJq4p
+	 PDGewkWQ65RfOMJNcTGVS4aCkpd4tRRZfbF01WI4EXaEzbqun2MJLUGyHykPw+frbW
+	 65ijs0IFtmvHd685+YoIjn8J+nJ21RtcsMfVqTp/nTG3cTwvBq/boKoJ8KPm3bD92I
+	 i6s9gHFkYdo7A==
+Date: Wed, 20 Mar 2024 14:13:47 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, David Howells <dhowells@redhat.com>, 
+	Tyler Hicks <code@tyhicks.com>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 02/24] filelock: add a lm_set_conflict lease_manager
+ callback
+Message-ID: <20240320-gaspreis-mitunter-217e0d82f50f@brauner>
+References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
+ <20240315-dir-deleg-v1-2-a1d6209a3654@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320095957.324ec03b@canb.auug.org.au>
-In-Reply-To: <20240320095957.324ec03b@canb.auug.org.au>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 19 Mar 2024 18:37:31 -0500
-Message-ID: <CAH2r5mtpdFrGX90O5LAAKLKVJVT62LzqQNXby05MofhbUE5GVg@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240315-dir-deleg-v1-2-a1d6209a3654@kernel.org>
 
-Typo fixed - updated the patch in cifs-2.6.git for-next
+On Fri, Mar 15, 2024 at 12:52:53PM -0400, Jeff Layton wrote:
+> The NFSv4.1 protocol adds support for directory delegations, but it
+> specifies that if you already have a delegation and try to request a new
+> one on the same filehandle, the server must reply that the delegation is
+> unavailable.
+> 
+> Add a new lease_manager callback to allow the lease manager (nfsd in
+> this case) to impose extra checks when performing a setlease.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  fs/locks.c               |  5 +++++
+>  include/linux/filelock.h | 10 ++++++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/fs/locks.c b/fs/locks.c
+> index cb4b35d26162..415cca8e9565 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -1822,6 +1822,11 @@ generic_add_lease(struct file *filp, int arg, struct file_lease **flp, void **pr
+>  			continue;
+>  		}
+>  
+> +		/* Allow the lease manager to veto the setlease */
+> +		if (lease->fl_lmops->lm_set_conflict &&
+> +		    lease->fl_lmops->lm_set_conflict(lease, fl))
+> +			goto out;
+> +
+>  		/*
+>  		 * No exclusive leases if someone else has a lease on
+>  		 * this file:
+> diff --git a/include/linux/filelock.h b/include/linux/filelock.h
+> index daee999d05f3..c5fc768087df 100644
+> --- a/include/linux/filelock.h
+> +++ b/include/linux/filelock.h
+> @@ -49,6 +49,16 @@ struct lease_manager_operations {
+>  	int (*lm_change)(struct file_lease *, int, struct list_head *);
+>  	void (*lm_setup)(struct file_lease *, void **);
+>  	bool (*lm_breaker_owns_lease)(struct file_lease *);
+> +
+> +	/**
+> +	 * lm_set_conflict - extra conditions for setlease
+> +	 * @new: new file_lease being set
+> +	 * @old: old (extant) file_lease
+> +	 *
+> +	 * This allows the lease manager to add extra conditions when
+> +	 * setting a lease.
+> +	 */
+> +	bool (*lm_set_conflict)(struct file_lease *new, struct file_lease *old);
 
-On Tue, Mar 19, 2024 at 6:00=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) failed like this:
->
-> In file included from fs/smb/client/cifsglob.h:27,
->                  from fs/smb/client/cifsfs.c:36:
-> fs/smb/client/../common/smb2pdu.h:291:9: error: unknown type name '_u8'
->   291 |         _u8 BlobData[];
->       |         ^~~
->
-> Caused by commit
->
->   354c620afff2 ("smb311: additional compression flag defined in updated p=
-rotocol spec")
->
-> I have used the cifs tree from next-20240319 for today.
->
-> --
-> Cheers,
-> Stephen Rothwell
-
-
-
---=20
-Thanks,
-
-Steve
+Minor, but it seems a bit misnamed to me. I'd recommend calling this
+lm_may_set_lease() or lm_may_lease().
