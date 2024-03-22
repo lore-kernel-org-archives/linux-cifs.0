@@ -1,118 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B568B12BF3E
-	for <linux-cifs@vger.kernel.org>; Thu, 21 Mar 2024 17:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19E910E3;
+	Fri, 22 Mar 2024 01:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711043331; cv=none; b=aPPiHA29AY3gzjzIbBFwKIEeI6kgP8OtfAH0EpvYwGJ7JNa6eMw2ynkw/lfI9yp5wyERXdMHqoF/ZCsdz2d3JsLAVSQ2MAkJv4J7aOm1ohFet7K1oXxMHiyRVpsdkgdaRuIAuE9OoQexNyLOfL2ZuWUAnmDJdDTm1amNUgZNfpw=
+	t=1711072568; cv=none; b=FDt57KcDvwYcZ6UsKO5169Lhlm3NloX6yIaA2nF5GDU8YxOznajUtG+X/xf+2pe8MVqAaUO56F2G7fowatBYe6r2oqZpqE9lVc4Laxc7T2gJo/LOZbgN1wAsTA1cOcH6ygq/+0V/HaGcZh7ZTQSBC292ysFbNQwZ/bbq7k0kgdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711043331; c=relaxed/simple;
-	bh=xjoQ1Y4FwsRU0J/6mtCCmbaFFQQmQTU70I4D7iHgpFE=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=fqy+HCw/GwOIyvZPqRh+osUfZetbvmWEqZsUDrtjKfvMNsYo1PPD9rz4VF3oHW0zC0LLuBQVikUCCcJteGceojwbCO2IaFoo4XNeuTUE8cW7bBWq6whWaIPatLgAvo+iQL06ksyu+oHgoKpxmh5qlHyRpTugwbF5NptfmNjxXks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=inDSvEK4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711072568; c=relaxed/simple;
+	bh=RMKkVWlMi3qpcXxfdqH8qCZEDuD5oSIGYu4ULjWoV+w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sgPcO5gn+r9cI12ZaE97dGOoGe8lrDfW2pqZepWJV2Bpvws1vC9HdiIt5Bue1yddvqShHxY1fQfWnRyG7Eet2oLLYkbMNSYkUPprogK9bv36kKCYD/7Dirm0ps0N2OD4fCmy3dfbBGZu/Jysn8eM+oYtNnLhutQsJPLA7Pf0FxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYENYrwf; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inDSvEK4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711043328;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=93nq3ioGXBO9aGa34ehrEaFOrnNf0efnwUN/i2IdS94=;
-	b=inDSvEK4kNwztguzmClAz7VSv0P/OXRh3G9GS2amQSCdtDoXhyywsgNXowtIph8tF1uXog
-	yZVG4w3RgxInLOlviFziw+Zecv/KfLzLvcME+51wmpHQ+wuTxdG5YB/BkaYubwd9s2O5Ly
-	n9EVehHL15Z1S+Ew09i4+h8pzVswsys=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-HIRkdtXAO32AuHMqC1eQww-1; Thu, 21 Mar 2024 13:48:46 -0400
-X-MC-Unique: HIRkdtXAO32AuHMqC1eQww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4C659800268;
-	Thu, 21 Mar 2024 17:48:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 10F292022C1D;
-	Thu, 21 Mar 2024 17:48:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>,
-    Shyam Prasad N <sprasad@microsoft.com>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
-    Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-    Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>,
-    jlayton@kernel.org, linux-cifs@vger.kernel.org
-Subject: How to manage credits handling in cifs read and write paths?
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYENYrwf"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-513dc99b709so2088626e87.1;
+        Thu, 21 Mar 2024 18:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711072565; x=1711677365; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bwWa4BgJJkr16k/nzdvDFnFjU1oDVg5Ayz3jjJ3bhPc=;
+        b=iYENYrwf9leVJH303ga+SDdZM/zF1MUgKNWLq6HSEEDm133iYTqUUF7eCsItLtQnYl
+         lMYJWk7TcWTGy86/xL7M+G4oEGdPzjmqvEbJBPC/aO/NBgn0NO2YGEUG5ebnMjEzi9us
+         AQIFPsYLdkHVDctxlVEEic4kNFePg61yqNc7VadOZ4jKSsgkFiCK7gJfE46DPGXkpCKf
+         XHhHvp5P5LGSyrRhKj+zvcsY+sO/nQzKhfR6MODPLo2veibe3N0j690Mkp+3B2qwdM5n
+         4iDK8fDzknjUNduIjkCF+6GXZPPW7yk5WWdWGXuHGBZjfc6tiPDqHG51ugg2z43NiLZw
+         9jzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711072565; x=1711677365;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bwWa4BgJJkr16k/nzdvDFnFjU1oDVg5Ayz3jjJ3bhPc=;
+        b=IwyO1I6nRV/0k2TR/J8y5vm5TsP6LAOg0TxXmSTBgK/dijwGJ7E9TZHy708+5aJUqG
+         i6GOAGx48iR4cSmwK+ATlkzvbgdR2OYKlFBTKWAeJXcaCuLzVA1/TBh3hVmRztaWzMq0
+         dbp9FQr0dvy7F2p65WM+WWWODuc8aM5FNaw8XobjeHrUZEmCkoNtfSgEBfrb9M0ZR3LY
+         51unhfJLYSQf8h7V9Q0SkSCpy7rpL0yyKN67Sx9Qliq03RCI1NQ2cGPjps9nRsmoDhUK
+         YvetLWFcqxO3k5PRhPDzyd2kwnerFq1AOrw9JnldYgSuet801MWLlyLlOQBmS07Jn6AF
+         QM5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXUmx4IL3rlgFfoOuPar1HFN7bMdXpiySqIesJC1ywJSVOCg3vN+7lUYITkk105+vvN9bHgLKGBF4q06K2Y4ypV6ye9sJ6f7BUxug==
+X-Gm-Message-State: AOJu0Yx6xTsAXQs5cyAZts6oRnN7p3tmoLtGJF32tGJIDVvLLWHya+dx
+	QUQEqtuIDeivlYuFiyWcC61yOXNatIl7pIrTdLbVRCLqcLKUOrJF1jRIs2S4khavs0yOJBABxJ/
+	OzkWsM0eFWm5m23uX/DixUnCDTFQ=
+X-Google-Smtp-Source: AGHT+IF/TqelXBddl5IJ2N+BQNQfXFVg2IpOsyaGGMvVibUEayH8FltMU6QmTnbIqWKfxUYO9eIDLUXRtoiVnhDvSl0=
+X-Received: by 2002:a05:6512:285:b0:513:e375:12c1 with SMTP id
+ j5-20020a056512028500b00513e37512c1mr592514lfp.41.1711072564918; Thu, 21 Mar
+ 2024 18:56:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1419722.1711043320.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 21 Mar 2024 17:48:40 +0000
-Message-ID: <1419723.1711043320@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 21 Mar 2024 20:55:53 -0500
+Message-ID: <CAH2r5mtMVc02DmB_hw_j49o6YQSD7Jwr4tbSMuTjxX5L7ZgkVA@mail.gmail.com>
+Subject: [GIT PULL] smb client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Steve, Shyam,
+Please pull the following changes since commit
+279d44ceb8a495d287ec563964f2ed04b0d53b0e:
 
-I'd like to make the attached change to add_credits_and_wake_if().  It's
-called in various places along the error handling paths, but it's not obvi=
-ous
-that it's consistent and that we don't get double accounting.
+  Merge tag '6.9-rc-smb3-client-fixes-part1' of
+git://git.samba.org/sfrench/cifs-2.6 (2024-03-13 13:15:24 -0700)
 
-The obvious change would be to clear credits->value if we return the credi=
-ts
-back to the pool.  Assuming that's how this works.  That makes it easier t=
-o
-(a) clean up the netfs_io_subrequest struct or (b) renegotiate and retry w=
-ith
-it because I can just call it multiple times.
+are available in the Git repository at:
 
-Also, add_credits_and_wake_if() wakes up server->request_q... but so do
-cifs_add_credits() and smb2_add_credits(), so is this superfluous?
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc-smb3-client-fixes-part2
 
-Additionally, what's the scope of a 'xid'?  I think I should add one to ea=
-ch
-subrequest I generate and deallocate it when the subrequest is freed.  If
-that's the case, can I add an explicit "rc" argument to free_xid()?
+for you to fetch changes up to e56bc745fa1de77abc2ad8debc4b1b83e0426c49:
 
-And finally, I have my cifs conversion to netfslib down to the same xfstes=
-t
-failures as upstream[*].  Those patches can be found here, with an additio=
-nal
-one on top to address the credits and part of the xid thing:
+  smb311: additional compression flag defined in updated protocol spec
+(2024-03-20 11:49:44 -0500)
 
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/=
-?h=3Dcifs-netfs
+----------------------------------------------------------------
+Nine cifs.ko changesets, including three for stable
+- Various get_inode_info_fixes
+- Fix for querying xattrs of cached dirs
+- Four minor cleanup fixes (including adding some header corrections
+and a missing flag)
+- Performance improvement for deferred close
+- Two query interface fixes
 
-David
+Still working on the important fix to enable a way to handle password
+rotation and testing some misc small features/fixes
+----------------------------------------------------------------
+Bharath SM (2):
+      cifs: defer close file handles having RH lease
+      cifs: remove redundant variable assignment
 
-[*] With Samba; I still need to sort out ksmbd.
----
-@@ -878,11 +878,12 @@ add_credits(struct TCP_Server_Info *server, const st=
-ruct cifs_credits *credits,
- =
+David Howells (1):
+      cifs: Move some extern decls from .c files to .h
 
- static inline void
- add_credits_and_wake_if(struct TCP_Server_Info *server,
--			const struct cifs_credits *credits, const int optype)
-+			struct cifs_credits *credits, const int optype)
- {
- 	if (credits->value) {
- 		server->ops->add_credits(server, credits, optype);
- 		wake_up(&server->request_q);
-+		credits->value =3D 0;
- 	}
- }
- =
+Eugene Korenevsky (1):
+      cifs: open_cached_dir(): add FILE_READ_EA to desired access
 
+Meetakshi Setiya (1):
+      cifs: fixes for get_inode_info
+
+Shyam Prasad N (2):
+      cifs: make sure server interfaces are requested only for SMB3+
+      cifs: reduce warning log level for server not advertising interfaces
+
+Steve French (2):
+      smb311: correct incorrect offset field in compression header
+      smb311: additional compression flag defined in updated protocol spec
+
+ fs/smb/client/cached_dir.c |  3 ++-
+ fs/smb/client/cifsfs.c     |  4 ----
+ fs/smb/client/cifsglob.h   |  5 +++++
+ fs/smb/client/connect.c    |  9 +++++----
+ fs/smb/client/file.c       | 20 +++++++++++++++-----
+ fs/smb/client/inode.c      | 26 +++++++++++++-------------
+ fs/smb/client/misc.c       |  3 ---
+ fs/smb/client/sess.c       |  4 ++--
+ fs/smb/client/smb2ops.c    |  2 ++
+ fs/smb/client/smb2pdu.c    |  5 +++--
+ fs/smb/common/smb2pdu.h    | 12 +++++++-----
+ 11 files changed, 54 insertions(+), 39 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
