@@ -1,52 +1,51 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12E6944F;
-	Sun, 24 Mar 2024 05:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3681A38DE
+	for <linux-cifs@vger.kernel.org>; Sun, 24 Mar 2024 05:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711256431; cv=none; b=m6uaeP1RJ4ru04+I8rxZhTdsQfpu/kwR2bd68OEhfDgbg6limvv9jeVIJuImflU1d1MmAsuJlbVowuZUHb0iBLdyDhL6run3r32kXvgcULibtdGP6xEnuJsL5/ufA2R+GZXmjpekjwNEAbYGLIP/p5xosoOWkfn8yLruYjOhdQA=
+	t=1711256824; cv=none; b=FAd3iH5cAZGvEtL748wIDebudSDGMv/iEHyJfUTi9UFgq/RkwTIqLk9jxxrpHFcBGVHfAmLsXR4OmysQ8JBiJOPg2jJ5Ufaicj0zjaMnt9L8E8d7h0SBPPwgbGyhva9iTPKNLgZk2xk37ze2WNyl6/YHSNEVr/Ba8SLCaezZAvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711256431; c=relaxed/simple;
-	bh=s2PpLuMCSXF9aw2S1I7AerrJRZw6llL62KMpMWQBEEY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=FX72TdZNpfGllkpz55Smc3DceIlrheZdnsmewO8tKSAyrgZpubJk1LyeHckv3L5/J/AXlkCOLEABZyPmUxLCDpjIYp/GGCNxhfvkEUd+mck7JCLMhaMDrZpIsTSreuSaoXlyWRk3Thoz13xV5R8yYd5QHbqiaguljSgR5xLhwjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGdorOui; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1711256824; c=relaxed/simple;
+	bh=ncV0v/GBgCE1cXW8ubWdMNaflE8Tslwj0jY6Rx+cNu8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=r/QrAzNUBivTx74mzSwhOoGnZOvP0EaS6nU2gaGFZiKYFCmOhnvLvpMRswBnqvrgAzilcvPpWpj4QRnLEPSmtGHx57G7V85h5gP5j5GTV/A760J29cOd66q9TgrIZykAVAAlrRtkn1mNWvejEU51SvVchJOUcZAUn1mFRyQKoIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TUWA1PhG; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGdorOui"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-515a86daf09so321311e87.3;
-        Sat, 23 Mar 2024 22:00:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TUWA1PhG"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-51381021af1so5246580e87.0
+        for <linux-cifs@vger.kernel.org>; Sat, 23 Mar 2024 22:07:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711256427; x=1711861227; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711256820; x=1711861620; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=yvEdxnpAVsEIe0YNE5Idfj6+Zl6YWvhI7C+nvup/Fgw=;
-        b=gGdorOuih3uOmAu7ADmNnh9Y1GULQ0MbemyCYuqjXN6zipYOxzgA+BWf8uXPZDr/Sn
-         0tEVxt4Z4/BL2a4NLaD8lzxNUl71sGuYFJ9WJPT235EYBgKQcYV1JaxsO6LIXzBS7TB5
-         E/AaHcjx38+Y2vpx8PmxvpkhJ9ys+G21h0yzOaQ3zRj77jTHbDNaKcAtfJ5pC6WXKSRz
-         5UgzeTwDOso7mi3fEs47+peW+oPLXQ55vxPXRLP3CUz5z6TJ7IDQJMUkop5v4y7XZU9s
-         Q1QPF0RcfjBIH3e9tt68R+7Q39PaSLxOlDVLA6N7U0ftAlJ4sAX7o3iL/X3OxMLfE1P0
-         HCYA==
+        bh=kcQ7aqapAzWh9V2jYgjZvNL++i4wCg6TaQgakyEunLo=;
+        b=TUWA1PhGt3E/xUkhZzJnYVARHSoUYQzLUSvDgJMxpg5EmIbHbdbLCF5I5YmXxq9Ld1
+         ZRIH6Va+YQZIj5TIbS5p684yrHx2ImpljPq93h0havdn5wNgbyuO86wuZVRjMGVCPJRW
+         Mn6dZJKAGFycOVnVWP90dvbZj6OhJDkt8E4xKs8JZnr7RgzaiBablsG+/yilnzIQKknC
+         cYM2JbLN8UrHKdE/+SZaOz8gxWO72fP6cpU3UAw1dal7gO/WI0/lKPP0bym5OzrFIO0q
+         w0eIuDbDZq4rBM8Te4zMnE4kGqS+wnWNSnzltOqO/amJj1fq8MCN/DIvhx0Jf3a3vpfR
+         pQWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711256427; x=1711861227;
+        d=1e100.net; s=20230601; t=1711256820; x=1711861620;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yvEdxnpAVsEIe0YNE5Idfj6+Zl6YWvhI7C+nvup/Fgw=;
-        b=mH5Ra3Yu9doJlKM8GXZvVlpIrKLoBYqsSBF7nhidQudK40X/3ubfWccY0VadFtoRT0
-         gn+8wG4tggVAgLlMmPgmVd6tvh1cvLlTJZSbJrx49h/HBQMZsKOfIayQA4LCVieEFGps
-         PaS3+N1Mepe5PpqAEJOjMFiq4Dak/aLCHeBmkL34GoI25EbV4piu6Xo7GAboLH6OGrNk
-         klkSh0AqXL5qox7WzmezcEBYR+HIUh+w/xJPPE+3Sn0pL5X27x6HdiOTdmdoFNh43C8g
-         UKllPMLOx/6l1Dto+JsScEZllBY26sg/XUqeytHOeNyd54vTfYgQADMGEt5qhILKmdgP
-         sGeA==
-X-Forwarded-Encrypted: i=1; AJvYcCUni7DTRaI62rUnDl2UkbrpuuyxFA8lLi/losT/DS3hbOmmW/hfvNJj/H7JpzSsYXtnJ3KNHU6RXuIchev0V6sarg/wXFQUj01AkUPivA==
-X-Gm-Message-State: AOJu0YxY/r6mBXiu5SMBV5ryjojJHA74ULptFj7qUsLaPEt1HyP3CpI9
-	b0DEyID0CqtFxWXFnyzG3Lud8J0O2WOqai3A3fH/YlVeQDWhOknZs0++HpXEAU699+KFNpdWlPe
-	6ujBQW+Xs5oxrwGaoPaApPYCfmYwQJT4F9v0=
-X-Google-Smtp-Source: AGHT+IFDlM7PxTIiXR+ZmPGP67FVm99FaL3V3gogWvv54SBA4jhbjyqeg40wLbYRkAw2FRoxovQ6kGhRNxVIFuJTqso=
-X-Received: by 2002:a05:6512:616:b0:513:ccec:a822 with SMTP id
- b22-20020a056512061600b00513cceca822mr2667910lfe.28.1711256427032; Sat, 23
- Mar 2024 22:00:27 -0700 (PDT)
+        bh=kcQ7aqapAzWh9V2jYgjZvNL++i4wCg6TaQgakyEunLo=;
+        b=FRlWPSP7qf9trkHgJiByWVoSUJmLG8Cvj3xAP3rsg7RK7TTAxrvkrcmTlm0adORfFG
+         YY7qonmRYjkKXB1owCrZhLL+/W5uSDS3WL9e3U/OdukNEQUGFsQiIgtq/0BVIq37aFcX
+         CeVav8LKjgGkeEjRrXQEd7s6mxOjs8rHYdgk5I351RlesOAxIcd0rjWcmA3/iNqATZIg
+         so984/oVd3UbwSsvvCGyLIMMLDfYl+XGgHqKAjxe/fYDbO/yOtRQ7bB0pXe/5mId8xBE
+         yVj1U1NVZF8uMWgQVNxZbUtbyYlKWQsOYiqE4tNUdho5SkD39TQ5D3iw4B/+TF6c63wE
+         xRlg==
+X-Gm-Message-State: AOJu0YyORfS8dxrul7upsF6PmHFVkZI+AHb9qqj2KsoyD6+EIX1CFjgW
+	haeAYpQ+Oe/+DHFgPfPq0n4x/CioEdMxT0gqDT0zXisL3LWYr42h45Z5fz2FHPnLIsCKdYzAPe3
+	bV6dWJ0cjvxFSfEfFaP2mzibB1VPYP8rY4+Q=
+X-Google-Smtp-Source: AGHT+IEjiRV5XamzppIO6hae9gz9OzZSCuvxxDzciOqIO3plgnEYfQJ8Z1a7g7B/mvxwm+w4orKTmCSUKzZgcjakZUU=
+X-Received: by 2002:a05:6512:715:b0:513:2f96:72b5 with SMTP id
+ b21-20020a056512071500b005132f9672b5mr2482250lfs.33.1711256820226; Sat, 23
+ Mar 2024 22:07:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,93 +53,95 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 24 Mar 2024 00:00:15 -0500
-Message-ID: <CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com>
-Subject: kernel crash in mknod
-To: LKML <linux-kernel@vger.kernel.org>, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Christian Brauner <christian@brauner.io>
+Date: Sun, 24 Mar 2024 00:06:49 -0500
+Message-ID: <CAH2r5mu0HtRs_5hmKFLoh+OhWsHroAAHwvH51chaPJWWmpGPSg@mail.gmail.com>
+Subject: [PATCH][SMB3 client] add trace event for mknod
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>, Paulo Alcantara <pc@manguebit.com>
+Content-Type: multipart/mixed; boundary="000000000000e3fe3f06146106ee"
+
+--000000000000e3fe3f06146106ee
 Content-Type: text/plain; charset="UTF-8"
 
-Anyone else seeing this kernel crash in do_mknodat (I see it with a
-simple "mkfifo" on smb3 mount).  I started seeing this in 6.9-rc (did
-not see it in 6.8).   I did not see it with the 3/12/23 mainline
-(early in the 6.9-rc merge Window) but I do see it in the 3/22 build
-so it looks like the regression was introduced by:
+See attached
 
-commit 08abce60d63fb55f440c393f4508e99064f2fd91
-Author: Roberto Sassu <roberto.sassu@huawei.com>
-Date:   Thu Feb 15 11:31:02 2024 +0100
+Add trace points to help debug mknod and mkfifo:
 
-    security: Introduce path_post_mknod hook
+   smb3_mknod_done
+   smb3_mknod_enter
+   smb3_mknod_err
 
-    In preparation for moving IMA and EVM to the LSM infrastructure, introduce
-    the path_post_mknod hook.
+Example output:
 
-    IMA-appraisal requires all existing files in policy to have a file
-    hash/signature stored in security.ima. An exception is made for empty files
-    created by mknod, by tagging them as new files.
-
-    LSMs could also take some action after files are created.
-
-    The new hook cannot return an error and cannot cause the operation to be
-    reverted.
-
-Dmesg showing the crash it causes below:
-
-[   84.862122] RIP: 0010:security_path_post_mknod+0x9/0x60
-[   84.862139] Code: 41 5e 5d 31 d2 31 f6 31 ff c3 cc cc cc cc 0f 1f
-00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48
-8b 46 30 <f6> 40 0d 02 75 43 55 48 89 e5 41 55 49 89 fd 41 54 49 89 f4
-53 48
-[   84.862149] RSP: 0018:ffffa22dc1f6bdc8 EFLAGS: 00010246
-[   84.862159] RAX: 0000000000000000 RBX: ffff8d4fc85da000 RCX: 0000000000000000
-[   84.862167] RDX: 0000000000000000 RSI: ffff8d502473a900 RDI: ffffffffaa26f6e0
-[   84.862174] RBP: ffffa22dc1f6be28 R08: 0000000000000000 R09: 0000000000000000
-[   84.862181] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[   84.862187] R13: ffff8d502473a900 R14: 0000000000001000 R15: 0000000000000000
-[   84.862195] FS:  00007d2c5c075800(0000) GS:ffff8d573b880000(0000)
-knlGS:0000000000000000
-[   84.862204] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   84.862211] CR2: 000000000000000d CR3: 000000018d63a005 CR4: 00000000003706f0
-[   84.862219] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   84.862225] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   84.862232] Call Trace:
-[   84.862238]  <TASK>
-[   84.862248]  ? show_regs+0x6c/0x80
-[   84.862262]  ? __die+0x24/0x80
-[   84.862273]  ? page_fault_oops+0x96/0x1b0
-[   84.862290]  ? do_user_addr_fault+0x30c/0x730
-[   84.862304]  ? exc_page_fault+0x82/0x1b0
-[   84.862318]  ? asm_exc_page_fault+0x27/0x30
-[   84.862338]  ? security_path_post_mknod+0x9/0x60
-[   84.862350]  ? do_mknodat+0x191/0x2c0
-[   84.862365]  __x64_sys_mknodat+0x37/0x50
-[   84.862376]  do_syscall_64+0x81/0x180
-[   84.862387]  ? count_memcg_events.constprop.0+0x2a/0x50
-[   84.862402]  ? handle_mm_fault+0xaf/0x330
-[   84.862418]  ? do_user_addr_fault+0x33f/0x730
-[   84.862430]  ? irqentry_exit_to_user_mode+0x6a/0x260
-[   84.862442]  ? irqentry_exit+0x43/0x50
-[   84.862453]  ? exc_page_fault+0x93/0x1b0
-[   84.862464]  entry_SYSCALL_64_after_hwframe+0x6c/0x74
-[   84.862476] RIP: 0033:0x7d2c5bf19e07
-[   84.862536] Code: 9c ff ff ff e9 0a 00 00 00 66 2e 0f 1f 84 00 00
-00 00 00 f3 0f 1e fa 48 89 c8 48 c1 e8 20 75 2b 41 89 ca b8 03 01 00
-00 0f 05 <48> 3d 00 f0 ff ff 77 01 c3 48 8b 15 e1 3f 0e 00 f7 d8 64 89
-02 b8
-[   84.862544] RSP: 002b:00007ffc1b2c4568 EFLAGS: 00000246 ORIG_RAX:
-0000000000000103
-[   84.862556] RAX: ffffffffffffffda RBX: 00007ffc1b2c4718 RCX: 00007d2c5bf19e07
-[   84.862563] RDX: 00000000000011b6 RSI: 00007ffc1b2c6712 RDI: 00000000ffffff9c
-[   84.862570] RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
-[   84.862576] R10: 0000000000000000 R11: 0000000000000246 R12: 00007d2c5bffe428
-[   84.862582] R13: 0000000000000000 R14: 00007ffc1b2c6712 R15: 00007d2c5c199000
-[   84.862597]  </TASK>
+      TASK-PID     CPU#  |||||  TIMESTAMP  FUNCTION
+         | |         |   |||||     |         |
+    mkfifo-6163    [003] .....   960.425558: smb3_mknod_enter: xid=12
+sid=0xb55130f6 tid=0x46e6241c path=\fifo1
+    mkfifo-6163    [003] .....   960.432719: smb3_mknod_done: xid=12
+sid=0xb55130f6 tid=0x46e6241c
 
 
---
+-- 
 Thanks,
 
 Steve
+
+--000000000000e3fe3f06146106ee
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-add-trace-event-for-mknod.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-trace-event-for-mknod.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lu523hfx0>
+X-Attachment-Id: f_lu523hfx0
+
+RnJvbSBiZGEwYjA2YzAyNjNkNGQ0Mjk4OTEyNDgyNjc1MWQ5ZTdmYTgyOTc4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFN1biwgMjQgTWFyIDIwMjQgMDA6MDE6MDIgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhZGQgdHJhY2UgZXZlbnQgZm9yIG1rbm9kCgpBZGQgdHJhY2UgcG9pbnRzIHRvIGhlbHAg
+ZGVidWcgbWtub2QgYW5kIG1rZmlmbzoKCiAgIHNtYjNfbWtub2RfZG9uZQogICBzbWIzX21rbm9k
+X2VudGVyCiAgIHNtYjNfbWtub2RfZXJyCgpFeGFtcGxlIG91dHB1dDoKCiAgICAgIFRBU0stUElE
+ICAgICBDUFUjICB8fHx8fCAgVElNRVNUQU1QICBGVU5DVElPTgogICAgICAgICB8IHwgICAgICAg
+ICB8ICAgfHx8fHwgICAgIHwgICAgICAgICB8CiAgICBta2ZpZm8tNjE2MyAgICBbMDAzXSAuLi4u
+LiAgIDk2MC40MjU1NTg6IHNtYjNfbWtub2RfZW50ZXI6IHhpZD0xMiBzaWQ9MHhiNTUxMzBmNiB0
+aWQ9MHg0NmU2MjQxYyBwYXRoPVxmaWZvMQogICAgbWtmaWZvLTYxNjMgICAgWzAwM10gLi4uLi4g
+ICA5NjAuNDMyNzE5OiBzbWIzX21rbm9kX2RvbmU6IHhpZD0xMiBzaWQ9MHhiNTUxMzBmNiB0aWQ9
+MHg0NmU2MjQxYwoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3Nv
+ZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvZGlyLmMgICB8IDcgKysrKysrKwogZnMvc21iL2Ns
+aWVudC90cmFjZS5oIHwgNCArKystCiAyIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyks
+IDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2Rpci5jIGIvZnMvc21i
+L2NsaWVudC9kaXIuYwppbmRleCA4OTMzM2Q5YmNlMzYuLmQxMWRjM2FhNDU4YiAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NsaWVudC9kaXIuYworKysgYi9mcy9zbWIvY2xpZW50L2Rpci5jCkBAIC02MTIs
+MTEgKzYxMiwxOCBAQCBpbnQgY2lmc19ta25vZChzdHJ1Y3QgbW50X2lkbWFwICppZG1hcCwgc3Ry
+dWN0IGlub2RlICppbm9kZSwKIAkJZ290byBta25vZF9vdXQ7CiAJfQogCisJdHJhY2Vfc21iM19t
+a25vZF9lbnRlcih4aWQsIHRjb24tPnNlcy0+U3VpZCwgdGNvbi0+dGlkLCBmdWxsX3BhdGgpOwor
+CiAJcmMgPSB0Y29uLT5zZXMtPnNlcnZlci0+b3BzLT5tYWtlX25vZGUoeGlkLCBpbm9kZSwgZGly
+ZW50cnksIHRjb24sCiAJCQkJCSAgICAgICBmdWxsX3BhdGgsIG1vZGUsCiAJCQkJCSAgICAgICBk
+ZXZpY2VfbnVtYmVyKTsKIAogbWtub2Rfb3V0OgorCWlmIChyYykKKwkJdHJhY2Vfc21iM19ta25v
+ZF9lcnIoeGlkLCAgdGNvbi0+c2VzLT5TdWlkLCB0Y29uLT50aWQsIHJjKTsKKwllbHNlCisJCXRy
+YWNlX3NtYjNfbWtub2RfZG9uZSh4aWQsIHRjb24tPnNlcy0+U3VpZCwgdGNvbi0+dGlkKTsKKwog
+CWZyZWVfZGVudHJ5X3BhdGgocGFnZSk7CiAJZnJlZV94aWQoeGlkKTsKIAljaWZzX3B1dF90bGlu
+ayh0bGluayk7CmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L3RyYWNlLmggYi9mcy9zbWIvY2xp
+ZW50L3RyYWNlLmgKaW5kZXggZjljMWZkMzJkMGI4Li41ZTgzY2I5ZGE5MDIgMTAwNjQ0Ci0tLSBh
+L2ZzL3NtYi9jbGllbnQvdHJhY2UuaAorKysgYi9mcy9zbWIvY2xpZW50L3RyYWNlLmgKQEAgLTM3
+NSw2ICszNzUsNyBAQCBERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRU5URVJfRVZFTlQoZ2V0X3Jl
+cGFyc2VfY29tcG91bmRfZW50ZXIpOwogREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VW
+RU5UKGRlbGV0ZV9lbnRlcik7CiBERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRU5URVJfRVZFTlQo
+bWtkaXJfZW50ZXIpOwogREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5UKHRkaXNf
+ZW50ZXIpOworREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VOVEVSX0VWRU5UKG1rbm9kX2VudGVy
+KTsKIAogREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIzX2luZl9jb21wb3VuZF9kb25lX2NsYXNzLAog
+CVRQX1BST1RPKHVuc2lnbmVkIGludCB4aWQsCkBAIC00MTUsNyArNDE2LDcgQEAgREVGSU5FX1NN
+QjNfSU5GX0NPTVBPVU5EX0RPTkVfRVZFTlQocXVlcnlfd3NsX2VhX2NvbXBvdW5kX2RvbmUpOwog
+REVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0RPTkVfRVZFTlQoZGVsZXRlX2RvbmUpOwogREVGSU5F
+X1NNQjNfSU5GX0NPTVBPVU5EX0RPTkVfRVZFTlQobWtkaXJfZG9uZSk7CiBERUZJTkVfU01CM19J
+TkZfQ09NUE9VTkRfRE9ORV9FVkVOVCh0ZGlzX2RvbmUpOwotCitERUZJTkVfU01CM19JTkZfQ09N
+UE9VTkRfRE9ORV9FVkVOVChta25vZF9kb25lKTsKIAogREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIz
+X2luZl9jb21wb3VuZF9lcnJfY2xhc3MsCiAJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwKQEAg
+LTQ2MSw2ICs0NjIsNyBAQCBERUZJTkVfU01CM19JTkZfQ09NUE9VTkRfRVJSX0VWRU5UKHF1ZXJ5
+X3dzbF9lYV9jb21wb3VuZF9lcnIpOwogREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VSUl9FVkVO
+VChta2Rpcl9lcnIpOwogREVGSU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VSUl9FVkVOVChkZWxldGVf
+ZXJyKTsKIERFRklORV9TTUIzX0lORl9DT01QT1VORF9FUlJfRVZFTlQodGRpc19lcnIpOworREVG
+SU5FX1NNQjNfSU5GX0NPTVBPVU5EX0VSUl9FVkVOVChta25vZF9lcnIpOwogCiAvKgogICogRm9y
+IGxvZ2dpbmcgU01CMyBTdGF0dXMgY29kZSBhbmQgQ29tbWFuZCBmb3IgcmVzcG9uc2VzIHdoaWNo
+IHJldHVybiBlcnJvcnMKLS0gCjIuNDAuMQoK
+--000000000000e3fe3f06146106ee--
