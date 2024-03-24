@@ -1,66 +1,71 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28860EDF;
-	Sun, 24 Mar 2024 06:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03756171D1;
+	Sun, 24 Mar 2024 16:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711261887; cv=none; b=DNuScgRL+CvpdR7TmSLRhehvFRELgRJh5ev503LF1XNHp4qMoMdiRxjCtb0sztgZQPihKQaOe6kdaf9vrnQvqoZp8R/gzyqnPEFhLjKNQ8uVz6DJ6v/cimn1+ThA7qzMbaxMIBMozjtvQK2CtvmuMebBMIuWwOj6K8TkNpSTHP8=
+	t=1711299037; cv=none; b=s3ATE9PF+1J875MCaAxsL/K4heWSn06ZYsztn3M+ouSnA7JYZKLFXbaKbEgY9zTH9qts4dzTZJVv1ASeLQLjbkXJ8Jx6bT/q0Nr+CmPCQDrrorMwfwcIVHa555x55GsHz6Y85rfE457MkALwno3BcMlMWct1mf3c8ocHYvC2Yro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711261887; c=relaxed/simple;
-	bh=cLlni/sYFCp4yZq/4zZObQlCIwkr407x59M6hzBGL2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZEJTAlgfvoL/S+kEp1jlbeE7INKC59G06cCF43yNINBLYHXm1fvLwIPgau3BfeGABv5cOoOYSqTtpwUnlzCEvv26BxXpw7BDa7ouKHtjsTEBAI46XFvt1cR/jtOg0qhP8tYXt5HjPHf31iZ+Hr+4wc1Xr9cviQR8QObkSyfUXSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KAS2qNon; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KAS2qNon"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1bRjI31Kru6q2HzYlM9QQ8aib/DK+l7dXD005qCESDc=; b=KAS2qNonaaHiNFt7HnXin8g1Mj
-	3MR9tCC7z1JEUdg1aWaEgPxHQLhRwJpDn9zUsWB7BzIzv7tryw2lsy28FddJrNHazuUQcirhz2MYF
-	t8mm2efxaaSnv4sWaR3p55MxRNrgukP1FETVXeKw7qyO0YITo1ZSWIzkj84erVGLrkMLMCpZ4DS6L
-	nbrGJHuK3lJ3sU73G1zyzRlaYuKe7CaDna8ZVjHr77Z/1IMrUmGy5gIXi7AbAqYBnjdImgNJNVaq3
-	uBw5lROORECsYvMJRBnw3elDVg8iPBRytmga+ZWbGztyFrJZguAdalMmH7qeAHpd9oXexDM/yDPJI
-	riD6/wsg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1roHO4-00FeGb-2J;
-	Sun, 24 Mar 2024 06:31:20 +0000
-Date: Sun, 24 Mar 2024 06:31:20 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Steve French <smfrench@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	CIFS <linux-cifs@vger.kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Christian Brauner <christian@brauner.io>
-Subject: Re: kernel crash in mknod
-Message-ID: <20240324063120.GU538574@ZenIV>
+	s=arc-20240116; t=1711299037; c=relaxed/simple;
+	bh=XTqqWBJYofix9/upqo66g0+ko3ZgqhuOv6+PQmT0aqg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RXwBpy6A2kStUAxAEXCUpGiakRjrMWzWoB/2rh3S0e39NEfuRNwLhM+tYz73qZR1FNLId5LPVTP2N5mdpoWwcvRoXeaqdi2Q19ZDO9Teu4z5BF0MiCHO6bEszltnfb3cwd0VjaGsGwpc0M7bbIqPEwKijgMf+lXRYER8dkfuy4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4V2hlZ1fj7z6K7JS;
+	Mon, 25 Mar 2024 00:46:02 +0800 (CST)
+Received: from frapeml100008.china.huawei.com (unknown [7.182.85.131])
+	by mail.maildlp.com (Postfix) with ESMTPS id 401151400DB;
+	Mon, 25 Mar 2024 00:50:25 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (7.182.85.13) by
+ frapeml100008.china.huawei.com (7.182.85.131) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 24 Mar 2024 17:50:24 +0100
+Received: from frapeml500005.china.huawei.com ([7.182.85.13]) by
+ frapeml500005.china.huawei.com ([7.182.85.13]) with mapi id 15.01.2507.035;
+ Sun, 24 Mar 2024 17:50:24 +0100
+From: Roberto Sassu <roberto.sassu@huawei.com>
+To: Al Viro <viro@zeniv.linux.org.uk>, Steve French <smfrench@gmail.com>
+CC: LKML <linux-kernel@vger.kernel.org>, linux-fsdevel
+	<linux-fsdevel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, "Paulo
+ Alcantara" <pc@manguebit.com>, Christian Brauner <christian@brauner.io>,
+	"Mimi Zohar" <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
+	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+	"linux-security-module@vger.kernel.org"
+	<linux-security-module@vger.kernel.org>
+Subject: RE: kernel crash in mknod
+Thread-Topic: kernel crash in mknod
+Thread-Index: AQHafag2XY/u/k17xEe65QyoT7TnEbFGUTAAgADHHcA=
+Date: Sun, 24 Mar 2024 16:50:24 +0000
+Message-ID: <3441a4a1140944f5b418b70f557bca72@huawei.com>
 References: <CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com>
  <20240324054636.GT538574@ZenIV>
+In-Reply-To: <20240324054636.GT538574@ZenIV>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240324054636.GT538574@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Sun, Mar 24, 2024 at 05:46:36AM +0000, Al Viro wrote:
+> From: Al Viro [mailto:viro@ftp.linux.org.uk] On Behalf Of Al Viro
+> Sent: Sunday, March 24, 2024 6:47 AM
 > On Sun, Mar 24, 2024 at 12:00:15AM -0500, Steve French wrote:
 > > Anyone else seeing this kernel crash in do_mknodat (I see it with a
 > > simple "mkfifo" on smb3 mount).  I started seeing this in 6.9-rc (did
 > > not see it in 6.8).   I did not see it with the 3/12/23 mainline
 > > (early in the 6.9-rc merge Window) but I do see it in the 3/22 build
 > > so it looks like the regression was introduced by:
-> 
+>=20
 > 	FWIW, successful ->mknod() is allowed to return 0 and unhash
 > dentry, rather than bothering with lookups.  So commit in question
 > is bogus - lack of error does *NOT* mean that you have struct inode
@@ -68,35 +73,64 @@ On Sun, Mar 24, 2024 at 05:46:36AM +0000, Al Viro wrote:
 > used to be common for network filesystems more than just for ->mknod(),
 > the theory being "if somebody wants to look at it, they can bloody
 > well pay the cost of lookup after dcache miss".
-> 
+>=20
 > Said that, the language in D/f/vfs.rst is vague as hell and is very easy
 > to misread in direction of "you must instantiate".
-> 
+>=20
 > Thankfully, there's no counterpart with mkdir - *there* it's not just
 > possible, it's inevitable in some cases for e.g. nfs.
-> 
+>=20
 > What the hell is that hook doing in non-S_IFREG cases, anyway?  Move it
 > up and be done with it...
 
-PS: moving the call site up to S_IFREG case deals with the immediate
-problem (->create() *IS* required to make dentry uptodate), but the other
-side of what had lead to that bug needs to be dealt with separately.
+Hi Al
 
-It needs to be documented clearly (for all object-creating methods) and
-we need to decide what their behaviours should be.  Right now it's
-	successful ->create() must make positive
-	successful ->mkdir() may leave negative unhashed (and it might be forced to)
-	successful ->tmpfile() must make positive
-->mknod() and ->symlink() are uncertain.  VFS doesn't give a damn;
-other users might.  FWIW, ecryptfs is fine with either behaviour.
-nfsd and overlayfs might or might not break.  AF_UNIX bind()
-probably *does* break on such ->mknod() behaviour and unless I'm
-misreading the history it had been that way since way back.
+thanks for the patch. Indeed, it was like that before, when instead of
+an LSM hook there was an IMA call.
 
-From a quick look through ->mknod() instances it looks like
-CIFS_MOUNT_UNX_EMUL case in cifs is the odd man out at the moment.
+However, I thought, since we were promoting it as an LSM hook,
+we should be as generic possible, and support more usages than
+what was needed for IMA.
 
-Could you check it AF_UNIX bind() with ->sun_path containing
-a pathname that resolves to (inexistent) file on your filesystem
-breaks with your setup?
-setup?
+> diff --git a/fs/namei.c b/fs/namei.c
+> index ceb9ddf8dfdd..821fe0e3f171 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -4050,6 +4050,8 @@ static int do_mknodat(int dfd, struct filename *nam=
+e, umode_t mode,
+>  		case 0: case S_IFREG:
+>  			error =3D vfs_create(idmap, path.dentry->d_inode,
+>  					   dentry, mode, true);
+> +			if (!error)
+> +				error =3D security_path_post_mknod(idmap, dentry);
+
+Minor issue, security_path_post_mknod() does not return an error.
+
+Also, please update the description of security_path_post_mknod() to say
+that it is not going to be called for non-regular files.
+
+Hopefully, Paul also agrees with this change.
+
+Other than that, please add my:
+
+Reviewed-by: Roberto Sassu <roberto.sassu@huawei.com>
+
+Thanks
+
+Roberto
+
+>  			break;
+>  		case S_IFCHR: case S_IFBLK:
+>  			error =3D vfs_mknod(idmap, path.dentry->d_inode,
+> @@ -4061,10 +4063,6 @@ static int do_mknodat(int dfd, struct filename *na=
+me, umode_t mode,
+>  			break;
+>  	}
+>=20
+> -	if (error)
+> -		goto out2;
+> -
+> -	security_path_post_mknod(idmap, dentry);
+>  out2:
+>  	done_path_create(&path, dentry);
+>  	if (retry_estale(error, lookup_flags)) {
