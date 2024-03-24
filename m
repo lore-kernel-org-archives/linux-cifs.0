@@ -1,188 +1,146 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332E253361;
-	Fri, 22 Mar 2024 21:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12E6944F;
+	Sun, 24 Mar 2024 05:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711142654; cv=none; b=JIMtMtsX6WspQQU/JJr82WZ/yZE0fd2bIf0jc1zdyMaUXBUM5k50du3K3OcGq0F9OR8OlVe8tNeHXevgYV/AjR5itRC6Gs6IK5bwwggb4emhtS6QpFuZWCSyD26ou65WpY7OKo7AlFWO0JHbboTpOsX9lAgTLiu740VchC1jjY8=
+	t=1711256431; cv=none; b=m6uaeP1RJ4ru04+I8rxZhTdsQfpu/kwR2bd68OEhfDgbg6limvv9jeVIJuImflU1d1MmAsuJlbVowuZUHb0iBLdyDhL6run3r32kXvgcULibtdGP6xEnuJsL5/ufA2R+GZXmjpekjwNEAbYGLIP/p5xosoOWkfn8yLruYjOhdQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711142654; c=relaxed/simple;
-	bh=svZLIF9IPDRJYqbxji62ysRA098GzVPv/gg4mN30tOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fH66UM5sXgA5GuMpeIYo7LzIenffOKVDRq1tjkZ/o6QulFjtChUr0Y1d9cfmaN01ekqnXNN4CSUaeK4atsCV1oMO7szxpWj/ZcgJ55NRJ2iPPSiFmFvWF/YgSL/RnUIfPGDdT+2cUjbu5BOlNxtQmF8GPGXiqG9NdM4SLXluhQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CwCxXsr1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=diahKUCp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CwCxXsr1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=diahKUCp; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1711256431; c=relaxed/simple;
+	bh=s2PpLuMCSXF9aw2S1I7AerrJRZw6llL62KMpMWQBEEY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=FX72TdZNpfGllkpz55Smc3DceIlrheZdnsmewO8tKSAyrgZpubJk1LyeHckv3L5/J/AXlkCOLEABZyPmUxLCDpjIYp/GGCNxhfvkEUd+mck7JCLMhaMDrZpIsTSreuSaoXlyWRk3Thoz13xV5R8yYd5QHbqiaguljSgR5xLhwjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGdorOui; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CwCxXsr1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="diahKUCp";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CwCxXsr1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="diahKUCp"
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 125435BD01;
-	Fri, 22 Mar 2024 21:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711142649; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTiBoCCpgcJDrCWIm/y2+RUNah4H94FoOE1Xfb7BT/0=;
-	b=CwCxXsr1U4WYPyx0HSjjWrIbYLfgj8wc+ITOAPX0i9CghdmDJtCuzEwFNCKe+puhq1J0yF
-	QIzobejC2nz4Xw/Rgv88u3b9L2SS2/9gyLCtbr6UXP6JmdA2dmq9w04NxQYW10i+CLIR3d
-	RQHARTUoZtLCisc/JT0K5zqgLvVJwJg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711142649;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTiBoCCpgcJDrCWIm/y2+RUNah4H94FoOE1Xfb7BT/0=;
-	b=diahKUCpSDSSlVrghuVWwDZy7EhJg7+YbHFGbryXiUDft15wMazZZI38iFNwdEXGFxYdQZ
-	dHOC/EGu91FIhqAw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711142649; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTiBoCCpgcJDrCWIm/y2+RUNah4H94FoOE1Xfb7BT/0=;
-	b=CwCxXsr1U4WYPyx0HSjjWrIbYLfgj8wc+ITOAPX0i9CghdmDJtCuzEwFNCKe+puhq1J0yF
-	QIzobejC2nz4Xw/Rgv88u3b9L2SS2/9gyLCtbr6UXP6JmdA2dmq9w04NxQYW10i+CLIR3d
-	RQHARTUoZtLCisc/JT0K5zqgLvVJwJg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711142649;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QTiBoCCpgcJDrCWIm/y2+RUNah4H94FoOE1Xfb7BT/0=;
-	b=diahKUCpSDSSlVrghuVWwDZy7EhJg7+YbHFGbryXiUDft15wMazZZI38iFNwdEXGFxYdQZ
-	dHOC/EGu91FIhqAw==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 8229F138E8;
-	Fri, 22 Mar 2024 21:24:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id 5I5wEvj2/WU+PgAAn2gu4w
-	(envelope-from <ematsumiya@suse.de>); Fri, 22 Mar 2024 21:24:08 +0000
-Date: Fri, 22 Mar 2024 18:23:54 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: David Disseldorp <ddiss@suse.de>
-Cc: Jan Kara <jack@suse.cz>, lsf-pc@lists.linux-foundation.org, 
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [Lsf-pc] [LSF/MM ATTEND] Over-the-wire data compression
-Message-ID: <vvwzjchwqlgmwrsaphak7zvwoecqjavq7zdwds2zvjuqj65dev@xbv77wuvvjyl>
-References: <rnx34bfst5gyomkwooq2pvkxsjw5mrx5vxszhz7m4hy54yuma5@huwvwzgvrrru>
- <20240315122231.ktyx3ebd5mulo5or@quack3>
- <20240318215955.47e408bf@echidna>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGdorOui"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-515a86daf09so321311e87.3;
+        Sat, 23 Mar 2024 22:00:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711256427; x=1711861227; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yvEdxnpAVsEIe0YNE5Idfj6+Zl6YWvhI7C+nvup/Fgw=;
+        b=gGdorOuih3uOmAu7ADmNnh9Y1GULQ0MbemyCYuqjXN6zipYOxzgA+BWf8uXPZDr/Sn
+         0tEVxt4Z4/BL2a4NLaD8lzxNUl71sGuYFJ9WJPT235EYBgKQcYV1JaxsO6LIXzBS7TB5
+         E/AaHcjx38+Y2vpx8PmxvpkhJ9ys+G21h0yzOaQ3zRj77jTHbDNaKcAtfJ5pC6WXKSRz
+         5UgzeTwDOso7mi3fEs47+peW+oPLXQ55vxPXRLP3CUz5z6TJ7IDQJMUkop5v4y7XZU9s
+         Q1QPF0RcfjBIH3e9tt68R+7Q39PaSLxOlDVLA6N7U0ftAlJ4sAX7o3iL/X3OxMLfE1P0
+         HCYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711256427; x=1711861227;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yvEdxnpAVsEIe0YNE5Idfj6+Zl6YWvhI7C+nvup/Fgw=;
+        b=mH5Ra3Yu9doJlKM8GXZvVlpIrKLoBYqsSBF7nhidQudK40X/3ubfWccY0VadFtoRT0
+         gn+8wG4tggVAgLlMmPgmVd6tvh1cvLlTJZSbJrx49h/HBQMZsKOfIayQA4LCVieEFGps
+         PaS3+N1Mepe5PpqAEJOjMFiq4Dak/aLCHeBmkL34GoI25EbV4piu6Xo7GAboLH6OGrNk
+         klkSh0AqXL5qox7WzmezcEBYR+HIUh+w/xJPPE+3Sn0pL5X27x6HdiOTdmdoFNh43C8g
+         UKllPMLOx/6l1Dto+JsScEZllBY26sg/XUqeytHOeNyd54vTfYgQADMGEt5qhILKmdgP
+         sGeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUni7DTRaI62rUnDl2UkbrpuuyxFA8lLi/losT/DS3hbOmmW/hfvNJj/H7JpzSsYXtnJ3KNHU6RXuIchev0V6sarg/wXFQUj01AkUPivA==
+X-Gm-Message-State: AOJu0YxY/r6mBXiu5SMBV5ryjojJHA74ULptFj7qUsLaPEt1HyP3CpI9
+	b0DEyID0CqtFxWXFnyzG3Lud8J0O2WOqai3A3fH/YlVeQDWhOknZs0++HpXEAU699+KFNpdWlPe
+	6ujBQW+Xs5oxrwGaoPaApPYCfmYwQJT4F9v0=
+X-Google-Smtp-Source: AGHT+IFDlM7PxTIiXR+ZmPGP67FVm99FaL3V3gogWvv54SBA4jhbjyqeg40wLbYRkAw2FRoxovQ6kGhRNxVIFuJTqso=
+X-Received: by 2002:a05:6512:616:b0:513:ccec:a822 with SMTP id
+ b22-20020a056512061600b00513cceca822mr2667910lfe.28.1711256427032; Sat, 23
+ Mar 2024 22:00:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240318215955.47e408bf@echidna>
-X-Spam-Score: -6.01
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-6.01 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	 RCPT_COUNT_FIVE(0.00)[5];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:98:from]
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=CwCxXsr1;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=diahKUCp
-X-Rspamd-Queue-Id: 125435BD01
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 24 Mar 2024 00:00:15 -0500
+Message-ID: <CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com>
+Subject: kernel crash in mknod
+To: LKML <linux-kernel@vger.kernel.org>, 
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Christian Brauner <christian@brauner.io>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Dave,
+Anyone else seeing this kernel crash in do_mknodat (I see it with a
+simple "mkfifo" on smb3 mount).  I started seeing this in 6.9-rc (did
+not see it in 6.8).   I did not see it with the 3/12/23 mainline
+(early in the 6.9-rc merge Window) but I do see it in the 3/22 build
+so it looks like the regression was introduced by:
 
-On 03/18, David Disseldorp wrote:
->Hi Enzo,
->
->...
->> On Thu 14-03-24 15:14:49, Enzo Matsumiya wrote:
->> > Hello,
->> >
->> > Having implemented data compression for SMB2 messages in cifs.ko, I'd
->> > like to attend LSF/MM to discuss:
->> >
->> > - implementation decisions, both in the protocol level and in the
->> >   compression algorithms; e.g. performance improvements, what could,
->> >   if possible/wanted, turn into a lib/ module, etc
->> >
->> > - compression algorithms in general; talk about algorithms to determine
->> >   if/how compressible a blob of data is
->> >     * several such algorithms already exist and are used by on-disk
->> >       compression tools, but for over-the-wire compression maybe the
->> >       fastest one with good (not great nor best) predictability
->> >       could work?
->
->Ideally there could be some overlap between on-disk and over-the-wire
->compression algorithm support. That could allow optimally aligned /
->sized IOs to avoid unnecessary compression / decompression cycles on an
->SMB server / client if the underlying filesystem supports encoded I/O
->via e.g. BTRFS_IOC_ENCODED_READ/WRITE.
+commit 08abce60d63fb55f440c393f4508e99064f2fd91
+Author: Roberto Sassu <roberto.sassu@huawei.com>
+Date:   Thu Feb 15 11:31:02 2024 +0100
 
-That's exactly the kind of discussion I'd be interested in when I
-mentioned 'modules/subsystems with such overlapping
-requirements/desire', and not only from the feature/integration
-perspective, but the performance part is something I really wanted to
-get right (good) from the beginning.
+    security: Introduce path_post_mknod hook
 
-Which brought me to the 'how to detect uncompressible data' subject;
-practical test at hand: when writing this 289MiB ISO file to an SMB
-share with compression enabled, only 7 out of 69 WRITE requests
-(~10%) are compressed.
+    In preparation for moving IMA and EVM to the LSM infrastructure, introduce
+    the path_post_mknod hook.
 
-(this is not the problem since SMB2 compression is supposed to be
-done on a best-effort basis)
+    IMA-appraisal requires all existing files in policy to have a file
+    hash/signature stored in security.ima. An exception is made for empty files
+    created by mknod, by tagging them as new files.
 
-So, best effort... for 90% of this particular ISO file, cifs.ko "compressed"
-those requests, reached an output with size >= to input size, discarded it
-all, and sent the original uncompressed request instead => lots of CPU
-cycles wasted.  Would be nice to not try to compress such data right of
-the bat, or at least with minimal parsing, instead.
+    LSMs could also take some action after files are created.
 
->IIUC, we currently have:
->SMB: LZ77, LZ77+Huffman (DEFLATE?), LZNT1, LZ4
->Btrfs: zlib/DEFLATE, LZO, Zstd
->Bcachefs: zlib/DEFLATE, LZ4, Zstd. Currently no encoded I/O support.
+    The new hook cannot return an error and cannot cause the operation to be
+    reverted.
 
-The algorithms required by SMB2 looks generic from an initial POV,
-but due to some minor, but very important, implementation details,
-I couldn't make a Windows Server decompress a DEFLATE'd buffer,
-for example.  So I'm not really sure how such integration with other
-subsystems would play out.
+Dmesg showing the crash it causes below:
 
-LZ4 might change this, but I haven't implemented it yet (btw thanks for
-pointing me to its support in newest MS-SMB2 :)).
+[   84.862122] RIP: 0010:security_path_post_mknod+0x9/0x60
+[   84.862139] Code: 41 5e 5d 31 d2 31 f6 31 ff c3 cc cc cc cc 0f 1f
+00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48
+8b 46 30 <f6> 40 0d 02 75 43 55 48 89 e5 41 55 49 89 fd 41 54 49 89 f4
+53 48
+[   84.862149] RSP: 0018:ffffa22dc1f6bdc8 EFLAGS: 00010246
+[   84.862159] RAX: 0000000000000000 RBX: ffff8d4fc85da000 RCX: 0000000000000000
+[   84.862167] RDX: 0000000000000000 RSI: ffff8d502473a900 RDI: ffffffffaa26f6e0
+[   84.862174] RBP: ffffa22dc1f6be28 R08: 0000000000000000 R09: 0000000000000000
+[   84.862181] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+[   84.862187] R13: ffff8d502473a900 R14: 0000000000001000 R15: 0000000000000000
+[   84.862195] FS:  00007d2c5c075800(0000) GS:ffff8d573b880000(0000)
+knlGS:0000000000000000
+[   84.862204] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   84.862211] CR2: 000000000000000d CR3: 000000018d63a005 CR4: 00000000003706f0
+[   84.862219] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   84.862225] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   84.862232] Call Trace:
+[   84.862238]  <TASK>
+[   84.862248]  ? show_regs+0x6c/0x80
+[   84.862262]  ? __die+0x24/0x80
+[   84.862273]  ? page_fault_oops+0x96/0x1b0
+[   84.862290]  ? do_user_addr_fault+0x30c/0x730
+[   84.862304]  ? exc_page_fault+0x82/0x1b0
+[   84.862318]  ? asm_exc_page_fault+0x27/0x30
+[   84.862338]  ? security_path_post_mknod+0x9/0x60
+[   84.862350]  ? do_mknodat+0x191/0x2c0
+[   84.862365]  __x64_sys_mknodat+0x37/0x50
+[   84.862376]  do_syscall_64+0x81/0x180
+[   84.862387]  ? count_memcg_events.constprop.0+0x2a/0x50
+[   84.862402]  ? handle_mm_fault+0xaf/0x330
+[   84.862418]  ? do_user_addr_fault+0x33f/0x730
+[   84.862430]  ? irqentry_exit_to_user_mode+0x6a/0x260
+[   84.862442]  ? irqentry_exit+0x43/0x50
+[   84.862453]  ? exc_page_fault+0x93/0x1b0
+[   84.862464]  entry_SYSCALL_64_after_hwframe+0x6c/0x74
+[   84.862476] RIP: 0033:0x7d2c5bf19e07
+[   84.862536] Code: 9c ff ff ff e9 0a 00 00 00 66 2e 0f 1f 84 00 00
+00 00 00 f3 0f 1e fa 48 89 c8 48 c1 e8 20 75 2b 41 89 ca b8 03 01 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 01 c3 48 8b 15 e1 3f 0e 00 f7 d8 64 89
+02 b8
+[   84.862544] RSP: 002b:00007ffc1b2c4568 EFLAGS: 00000246 ORIG_RAX:
+0000000000000103
+[   84.862556] RAX: ffffffffffffffda RBX: 00007ffc1b2c4718 RCX: 00007d2c5bf19e07
+[   84.862563] RDX: 00000000000011b6 RSI: 00007ffc1b2c6712 RDI: 00000000ffffff9c
+[   84.862570] RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
+[   84.862576] R10: 0000000000000000 R11: 0000000000000246 R12: 00007d2c5bffe428
+[   84.862582] R13: 0000000000000000 R14: 00007ffc1b2c6712 R15: 00007d2c5c199000
+[   84.862597]  </TASK>
 
 
-Cheers,
+--
+Thanks,
 
-Enzo
+Steve
