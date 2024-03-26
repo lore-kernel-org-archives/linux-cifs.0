@@ -1,128 +1,109 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CD96D1B4;
-	Mon, 25 Mar 2024 21:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711402309; cv=pass; b=MquG1fKqgotoeRILD6lqCI3zVJC6wEZQSIH3ereYRbNm5qpxT5XS7uP6iYPL2FuArRRjZ6elpEP7/Am9uA3qtE1Kxqp24QEAhvfXEYUOgMMtYtIhHQTou4/pHcoyedhlF0p3AS999JLH2y/bzfA/NjL0QuyPSGzuvaRg7ngtsc8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711402309; c=relaxed/simple;
-	bh=jM8DE0qFFQaJbtgDolpV6bNT0zgeGrR+Odr5JnEP7JE=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=JQMuNHcyea65aNcDmz3BLKlqmbuk/Rr0om96ApenfDZtYdK9XUqwfdUnEzjA3xW4pCM3F1BmcJI2MHFVMrKN3HFAPRu5bRgpbXrnaP6aRHGEbg6dzbHSmxhIR6A3NtbIuaDTR//1mGr3Y2ufzRcxsTZQqyWDxFSf1E94/Xc7uPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=VaDEcqoR; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1D03217
+	for <linux-cifs@vger.kernel.org>; Tue, 26 Mar 2024 01:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711415945; cv=none; b=akWC+xFMYCF4frVDoOEkrtEEc7awrOnYxBDMR2U138y6oKCcsUnAsL1vhsmNqfWij/M3zoDMv4sOlSPKUFDmifY9Xbe9J2xQ7gdSVAwP+NW7a6MR5r3ZZaHxf/FDXJv95RzaWrqy9PO0n//+b+8THCfP6NF+XaNmKsMbZrBPKgY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711415945; c=relaxed/simple;
+	bh=RJqZWwsapDHXC1Vom3nNou/Swnk/dTv8/zxI2PkdVrQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MdQX/3mG4WMHAWbzV8R51q89/Pe6blRqVeb/yyZIBCL+NlnpVrdaJDNfeEWzD45cS1gDUrsQa172GlHqhdlVwgIaE6EaBpct3pFAxyIYmI+uxZecPI27tno+mNm1oYyXza5PtGHz9D2PL5MYTO3DOpKlor7pKb1ObtEHrU/23OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izfvtk75; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="VaDEcqoR"
-Message-ID: <072a3e1b9f40a44174f0738bf592a528@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1711402305;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mOxBkMuWBbb/HgWApjXW5r8lNYj02xvMJWQoocF0dLg=;
-	b=VaDEcqoR/iQn20ivyB6qKpzWuAhrid8TWvhBgmBTPQtmXjCM9sXby9gHn/MyuwDH3cJKX6
-	792OfXZsOEECPjY/NN7kSH34h2fgOEpUyBopztxqyXx6gjPDmbZsVIBcamEle/lqPgnB5U
-	3dkQ+YX8FOT2OSkbGvJi9ok+Xk0nQDMzF6xe3m0U1OXCd8oi08Zx/q7hzfp0dOBylpu9JS
-	Y/jULULETYvogwV7tdznJdqSnnMUsyvN+JNuLgJIitPZ2jeS7Y2yGAg+Iz6kR1seSv1YYf
-	99qWq4OsxYUKbRJS7T0RPcqk/RN/LuiP0c93696giecqNAx21GzW7mNUJGPSEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1711402305; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mOxBkMuWBbb/HgWApjXW5r8lNYj02xvMJWQoocF0dLg=;
-	b=T7APEAYUuDTM6KUiKx1UI2w1ZudxjgYPPWNbzhAMNyeUmHUUY0il18Pum/kgOO6PJkLNMr
-	R2RmY2eCg7/22pwprXOCJThJArpxU0o2nXdapKnMAkfGR415DegGNF7oSqIjLrv02iCJeX
-	uKqy0mEJmGLs4f2ztE6+0P9CNpcB8QBt345yVqrj4pcXcC+etnJhxpUFpsfgVDQWVGZqIX
-	L/ZK0p1BV1pdbcrAtcaSVfbP659t2UOBAGyT6KJSfqc7WS3xr7NEC6JItR9Y8L1n+Fw54P
-	hK5v5WaDL8c4g/BstbV+5dEuJGXT4B2vvFlC+7iqKHHBfEvBaCAGY+fM3mBgWA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1711402305; a=rsa-sha256;
-	cv=none;
-	b=Uj7D4acrZpkcjfPnAjNwrjb2g0SfxqONscDsMCo1DiYUg8KNGGp5v7kzdBrVkdprStS1A8
-	k4FSOeUVYVw1+kGLYLLt6pxzvvjV7PgJzOS7DW6wjquYPXkxdxMgaPQ3fxhBdn5IiSgc6z
-	NpgPOEm06ZuvGs63moGxGsvkQOHcydUbd4igNfXqxXwDbpJHRt4L/iCwM6XnTVBFVN5QHU
-	QRXTGlICiVRo6p/G5gNQrHkPq/Fg9xOJSZQBqn9r0hKVFFBAxKlssdscnXJqCfhrJ5+dFD
-	Tgq8A05S3m2TBek7szKUOmRkcIT0uNBimUpHexjsb/GwAUcDVD+t7tKdfGwTsA==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Al Viro <viro@zeniv.linux.org.uk>, Steve French <smfrench@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>, Roberto Sassu
- <roberto.sassu@huawei.com>, LKML <linux-kernel@vger.kernel.org>,
- linux-fsdevel <linux-fsdevel@vger.kernel.org>, CIFS
- <linux-cifs@vger.kernel.org>, Christian Brauner <christian@brauner.io>,
- Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
- "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
- "linux-security-module@vger.kernel.org"
- <linux-security-module@vger.kernel.org>
-Subject: Re: kernel crash in mknod
-In-Reply-To: <20240325211305.GY538574@ZenIV>
-References: <CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com>
- <20240324054636.GT538574@ZenIV>
- <3441a4a1140944f5b418b70f557bca72@huawei.com>
- <20240325-beugen-kraftvoll-1390fd52d59c@brauner>
- <CAH2r5muL4NEwLxq_qnPOCTHunLB_vmDA-1jJ152POwBv+aTcXg@mail.gmail.com>
- <20240325195413.GW538574@ZenIV>
- <a5d0ee8c54ec2f80cb71cd72e3b4aec3@manguebit.com>
- <20240325211305.GY538574@ZenIV>
-Date: Mon, 25 Mar 2024 18:31:42 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izfvtk75"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a46ba938de0so669147666b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 25 Mar 2024 18:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711415941; x=1712020741; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nK41PCszesUC54WGtHBM6CmKBZyvyxvO+O1eGz7u44s=;
+        b=izfvtk75J4XCG6FbkXuVP/4ZTxdpEPz196wJGDvu7QeTbQG0bENsR5yFeX/25OcDGk
+         i6eIjNU2dXfatQDrx1E43DtBrYnVAnlxsUN7x4xN7A/BByzq2T0WfzLS2WPhdSncMebu
+         wfna7YsJ8klIQCwafXufLF++US9+l0WKq6IiYTXM9PyxkVPKvWmQoAhkpUpozcsVBqo7
+         KI+DwmrirMigPkRgBYtVZey2OlpxD5KT0ndnbUMayJ+x/gS5mCjgd2ajqe72C1MYjy75
+         mde2c+lvgGjr+ba+PUK/vPFK7rDcKw2e2FqLwE+pe0bAKgkS2nB4uByY8IuA8LAaKn7H
+         yoJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711415941; x=1712020741;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nK41PCszesUC54WGtHBM6CmKBZyvyxvO+O1eGz7u44s=;
+        b=S5ZVWR7Gc9/3zBa9uLWbXbVAiBTmlUvXN6rc9bWDuWoZH6ytelDxWWxKjAOf3+C0qe
+         jCtHuunvrU3cDND2o42XoCfNdqO/sOXp/VYrdEwGBC5am+eyy6ujWSZsdczIymVLQnxw
+         G6jnVLPJ6rlTdalEY9yaopToYpN/i0uoszx59KvuvSV5dt/+kIuEhn+cD3X4OFoA9MkT
+         RvMAJhQehK9VUYdETSBP+RPB/FVCQ1+NKrYGyGeqNdJvDHkWkfmZu4Xa0EO3SmrW05Tg
+         7idKvlsd/enpjq4ivXjNOkEpjm5ckUaEE1Y1lBvluI1zvEEs08/V5gd3YjXgmc8DC/em
+         zUsw==
+X-Gm-Message-State: AOJu0YzUtw/dR8qp3yTg6lyP1bKvLPrNB0T/Ec3fJeOhu8syHSQGuz9K
+	H3ayQh4K9XgOzZJ1x7bM1mW9R7Odpr4SWl78zf56lk8YXi/JYV8PsNaOXMtX8hdqYiNAZjbNjzx
+	xRRosTbUVugkYE7kPrf7KsJc2fWH59Mo=
+X-Google-Smtp-Source: AGHT+IE9EST0WPWPakGDpg0FT8DROWO7mYwdefcPdoIJ0J+734RTOyUq92vOZibfQZb/cJ+LDFNUYl71Qa6D9HDrpkA=
+X-Received: by 2002:a17:906:5910:b0:a4d:f0c3:a9e9 with SMTP id
+ h16-20020a170906591000b00a4df0c3a9e9mr441952ejq.28.1711415941323; Mon, 25 Mar
+ 2024 18:19:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20220603203459.21422-1-danielrparks@ti.com>
+In-Reply-To: <20220603203459.21422-1-danielrparks@ti.com>
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Date: Mon, 25 Mar 2024 18:18:49 -0700
+Message-ID: <CAKywueTOwZDtArbHFddkTdUROgVGd-Q9EP9pBuFKSQYXPdBf5A@mail.gmail.com>
+Subject: Re: [PATCH] cifs-utils: Make automake treat /sbin as exec, not data
+To: Daniel Parks <danielrparks@ti.com>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Al Viro <viro@zeniv.linux.org.uk> writes:
+Merged into the next branch. Sorry, I somehow missed this patch before.
+--
+Best regards,
+Pavel Shilovsky
 
-> On Mon, Mar 25, 2024 at 05:47:16PM -0300, Paulo Alcantara wrote:
->> Al Viro <viro@zeniv.linux.org.uk> writes:
->> 
->> > On Mon, Mar 25, 2024 at 11:26:59AM -0500, Steve French wrote:
->> >
->> >> A loosely related question.  Do I need to change cifs.ko to return the
->> >> pointer to inode on mknod now?  dentry->inode is NULL in the case of mknod
->> >> from cifs.ko (and presumably some other fs as Al noted), unlike mkdir and
->> >> create where it is filled in.   Is there a perf advantage in filling in the
->> >> dentry->inode in the mknod path in the fs or better to leave it as is?  Is
->> >> there a good example to borrow from on this?
->> >
->> > AFAICS, that case in in CIFS is the only instance of ->mknod() that does this
->> > "skip lookups, just unhash and return 0" at the moment.
->> >
->> > What's more, it really had been broken all along for one important case -
->> > AF_UNIX bind(2) with address (== socket pathname) being on the filesystem
->> > in question.
->> 
->> Yes, except that we currently return -EPERM for such cases.  I don't
->> even know if this SFU thing supports sockets.
+=D0=B2=D1=81, 5 =D0=B8=D1=8E=D0=BD. 2022=E2=80=AF=D0=B3. =D0=B2 22:05, Dani=
+el Parks <danielrparks@ti.com>:
 >
-> 	Sure, but we really want the rules to be reasonably simple and
-> "you may leave dentry unhashed negative and return 0, provided that you
-> hadn't been asked to create a socket" is anything but ;-)
-
-Agreed :-)
-
->> > Note that cifs_sfu_make_node() is the only case in CIFS where that happens -
->> > other codepaths (both in cifs_make_node() and in smb2_make_node()) will
->> > instantiate.  How painful would it be for cifs_sfu_make_node()?
->> > AFAICS, you do open/sync_write/close there; would it be hard to do
->> > an eqiuvalent of fstat and set the inode up?
->> 
->> This should be pretty straightforward as it would only require an extra
->> query info call and then {smb311_posix,cifs}_get_inode_info() ->
->> d_instantiate().  We could even make it a single compound request of
->> open/write/getinfo/close for SMB2+ case.
+> Otherwise, $(DESTDIR)/sbin doesn't get created until install-data on a
+> -j1 build and install-exec-hook can fail because it might not exist.
 >
-> 	If that's the case, I believe that we should simply declare that
-> ->mknod() must instantiate on success and have vfs_mknod() check and
-> warn if it hadn't.
-
-LGTM.
-
-Steve, any objections?
+> Steps to reproduce this bug:
+> $ autoreconf -i
+> $ ./configure
+> $ mkdir image
+> $ make DESTDIR=3Dimage install -j1
+>
+> Signed-off-by: Daniel Parks <danielrparks@ti.com>
+> ---
+>  Makefile.am | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 84dd119..b1444f6 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -1,8 +1,8 @@
+>  AM_CFLAGS =3D -Wall -Wextra -D_FORTIFY_SOURCE=3D2 $(PIE_CFLAGS) $(RELRO_=
+CFLAGS)
+>  ACLOCAL_AMFLAGS =3D -I aclocal
+>
+> -root_sbindir =3D $(ROOTSBINDIR)
+> -root_sbin_PROGRAMS =3D mount.cifs
+> +root_exec_sbindir =3D $(ROOTSBINDIR)
+> +root_exec_sbin_PROGRAMS =3D mount.cifs
+>  mount_cifs_SOURCES =3D mount.cifs.c mtab.c resolve_host.c util.c
+>  mount_cifs_LDADD =3D $(LIBCAP) $(CAPNG_LDADD) $(RT_LDADD)
+>  include_HEADERS =3D cifsidmap.h
+> --
+> 2.17.1
+>
