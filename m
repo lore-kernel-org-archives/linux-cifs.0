@@ -1,111 +1,120 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A42D1CAB5
-	for <linux-cifs@vger.kernel.org>; Tue, 26 Mar 2024 01:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C0F21106
+	for <linux-cifs@vger.kernel.org>; Tue, 26 Mar 2024 01:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711416418; cv=none; b=QdpsYOgI+nWlj/SMBwDMrcuKFfpx7jW4thZ+/kC3CxCOXr5KdS89RRyQb82XZ+EwyIQ1uhNo20jllNji/Itu25KdzLf5Bq4qpU6RMwicwqSCD/0CErDXR49Jn7kc9GPXrrGnLd6hMHD663tI6tKsHeSQtBUCMw3r8g/mA8xiFl8=
+	t=1711417432; cv=none; b=B/FUERRKY4x+z2EfU+aKeGEyzMpnuvboF/6C5B8HTpo6tCc0FcsIO50RRsyJGAmvdBKaUWGDUbzWhlHPXYS1jFDa9KYNR19A3leyRwV5P7GUY4QVYl0/iJ8sHZTPsLb5vKvn/tXaTHTfDhfKX43t/dYhIkid5dBc/9NovF3J0ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711416418; c=relaxed/simple;
-	bh=lCH886INZXeO6dZhtoT5wP0+e1hXNKhcqzhydCUvLhk=;
+	s=arc-20240116; t=1711417432; c=relaxed/simple;
+	bh=4KVBO1crUFGsijK2YQBISuBhSI+OnF9RC3jdb5ggDz4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J/MfBCKhdGSSsKFbjZcvEPPihHdyLNCtdlJ1AY91K0BUM9NB63bF9RJ6KKATYB9pxxexUrMClBfHImFENUQwZ6iJG0m4qFRujuNL/sS+X67RTiVeQ01j/X9Wv497vZ7EfJax2O7V0aRUlK/VIssVn/LEgsnwPMslvphGY5jqzu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=samba.org
+	 To:Cc:Content-Type; b=cOVPMdyo4ljtGPwF0O5WCMa7S2Z5QZ3Ip7TZ4sgL4WVdOhC4kDriEQ33bFgsH+kt4MEXnDaCR6Rs4nyJciH5lr3epPUkbXvx0bzQPu1I7uBLqBCMScETwt5eSi2jhYbqET25QyGGHdR4Okw6OhbUZnk2JEw4apGCaRrOgSGnPVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0meuYKb; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so649577566b.0
-        for <linux-cifs@vger.kernel.org>; Mon, 25 Mar 2024 18:26:56 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0meuYKb"
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a472f8c6a55so441922866b.0
+        for <linux-cifs@vger.kernel.org>; Mon, 25 Mar 2024 18:43:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711417429; x=1712022229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBZZrT9enK3BUQPCDDlFqApOPRo8aGrsy8oT6NmAD34=;
+        b=g0meuYKbY25wgsyoPsGqEwLs+qdkL9oc2kwEt275vVeQ8nHLSygqqwp9NYwUKrwzua
+         HV+MvFcxkIk4TQ1jPTPzyWvJtWcufFUsIsldtjDupQg0B4Ia2cb0MeYCVbpH1VeNbQo6
+         R04QiWJ7CTbQCrFPoir57LULl7Bmxh9a6OZFvp5B/HwCzInB+loubONtA2nHtysMKGug
+         qQMhmofPcxKny78KuOGAjv8C6dgIlCEhx+70P0YGyaDzwCHsdir58wCKAAG2IcyENXko
+         FcrtYSpfW11Ga3YLLnlLuwkpyWT3seXcF3SjUwHzB2Pl5mI6B41r+k2xbR+nG9mmP2Ba
+         ayag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711416414; x=1712021214;
+        d=1e100.net; s=20230601; t=1711417429; x=1712022229;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iQcQ1A+iKbmSgwzRlJixyw3CK9rLbpP+XkxQCC5qKos=;
-        b=u7PREBpp4hMnhw6xZO63mbpm/uDfcE6dB0H4CLm/698e8utoA533uO5WDrUgHgTIph
-         TCst0noe+7z+TMjfZG3kbrIUC4U0mLDy2H+oEe79NK/IrqjhhKjFCqGbNy6+QMgH5mlB
-         cB3bRCsZpb9BymfwMKtkQAmDTV4QLi6+RqaUphh70SRMA+T5mKu5WoDs/TyXQJqjA0RC
-         MFcy7ph8eCHUOQmYjueJjjqFOnc7NJH8TnlzEeIyhtJEl0oOpxRUlQXji1pT52d3vCC9
-         PsMQfX+nGNqwv90EISDU6OCShPhNGkLTdlN3/nfd00oOcN3exQHIOFTCK8gA6aMcfHIy
-         7zyA==
-X-Gm-Message-State: AOJu0Yw29ffQGLX+HO6bm5RT2aFf4tkoY1mXhRTbAZ+ppZKhLoNHZ78O
-	zOe4R9HNQFWnRZazaOnUIyyO/P8goCEPV4M2vI5n+35Zm8Av2D+ZWLaDS+kLdN0d2X2zI61eB8I
-	WABFx4Bhaszx3LdNWKITUiM9qhbjwjDi+7A==
-X-Google-Smtp-Source: AGHT+IGx0GbO++xneozxzeKJG9RvfJ+/LCKJhZAXnkykGzXJqlMt1tLbleijd4VBg9hO+Ha+DcQrhqMXPlT0VBfS4Sg=
-X-Received: by 2002:a17:906:260a:b0:a46:de64:c479 with SMTP id
- h10-20020a170906260a00b00a46de64c479mr5487153ejc.69.1711416414453; Mon, 25
- Mar 2024 18:26:54 -0700 (PDT)
+        bh=JBZZrT9enK3BUQPCDDlFqApOPRo8aGrsy8oT6NmAD34=;
+        b=n8DnfZBg1Fy3cD4t3gm/xX5hmWIvS8o16ULOu8T/XdFJMcYq0phE1YJwXx6Ad7lrb0
+         zqkSW6echHHzmE2VQGbyyNuUIXZCOoRFIOztRZLsKLDCwYN6dTJALdjsHJnYTpdUZasJ
+         nXFK2V1hb9IGBIUxEbdwpzUMQ4C2iJFk49aYP43G3x+wDnQOLnxaT0/b0yZyCzLwQBL7
+         YhXaDdLBgYPFY1EpfAam7nkYQ7VAXoxwAs/+KqE094jactigWiNnF87Ojt8f1RYSqqQs
+         rNBoZcZbDUeoOA/6S3ZcZy/wNutD8N0mR7Me0Zui710KrivNgAC5+3xrRqTTeVCgcEgU
+         Aj1w==
+X-Gm-Message-State: AOJu0Yy0ENgoZc7x8YoKVXVvggjwqeHrr+/MvdH8a70iDSDERExiXTX7
+	dTxtlYm5Jx1VJV2i3t+d524RjByzpUplUd1W1aYFABnmgny7KsmObcHMFlIPNp8uuPs3P56g9pA
+	nDaE8jCcNAOEZfmz/8MP7Ymibm12bwQs=
+X-Google-Smtp-Source: AGHT+IEpS+oIae6G9dXSOT2C+HmpzeuWr8Gju3pT6XQ4MQyZAE9ohwu7R9OQCiARogcobO3K5/WT5/AqreUnQ/3IQ38=
+X-Received: by 2002:a17:906:fa90:b0:a46:faa7:d014 with SMTP id
+ lt16-20020a170906fa9000b00a46faa7d014mr5541243ejb.9.1711417429013; Mon, 25
+ Mar 2024 18:43:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20220816004335.2634169-1-sam@gentoo.org>
-In-Reply-To: <20220816004335.2634169-1-sam@gentoo.org>
-From: Pavel Shilovsky <pshilovsky@samba.org>
-Date: Mon, 25 Mar 2024 18:26:42 -0700
-Message-ID: <CAKywueTjdJRwRwwFYjiy9xppZ_xggUWjBDBirrQhw_gM-0qoXA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] getcifsacl, setcifsacl: add missing <linux/limits.h>
- include for XATTR_SIZE_MAX
-To: Sam James <sam@gentoo.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
+References: <20240308150615.339103-1-pc@manguebit.com>
+In-Reply-To: <20240308150615.339103-1-pc@manguebit.com>
+From: Pavel Shilovsky <piastryyy@gmail.com>
+Date: Mon, 25 Mar 2024 18:43:36 -0700
+Message-ID: <CAKywueTgWhQMz+_bi01dzCVNfWzceXe8LkqR=AySseFL8wOw-Q@mail.gmail.com>
+Subject: Re: [PATCH] cifs.upcall: fix UAF in get_cachename_from_process_env()
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Merged #1 and #2 into next. Thanks. Sorry, I missed these patches previousl=
-y.
-
+Merged this and the other patch to the next branch. Thanks!
+--
 Best regards,
 Pavel Shilovsky
 
-=D0=BF=D0=BD, 15 =D0=B0=D0=B2=D0=B3. 2022=E2=80=AF=D0=B3. =D0=B2 17:43, Sam=
- James <sam@gentoo.org>:
+=D0=BF=D1=82, 8 =D0=BC=D0=B0=D1=80. 2024=E2=80=AF=D0=B3. =D0=B2 07:06, Paul=
+o Alcantara <pc@manguebit.com>:
 >
-> Needed to build on musl. It only works on glibc because of transitive inc=
-ludes
-> (which could break in future).
+> Whether lseek(2) fails or @bufsize * 2 > ENV_BUF_MAX, then @buf would
+> end up being freed twice.  For instance:
 >
-> Example failure:
-> ```
-> getcifsacl.c: In function 'getcifsacl':
-> getcifsacl.c:429:24: error: 'XATTR_SIZE_MAX' undeclared (first use in thi=
-s function)
->   429 |         if (bufsize >=3D XATTR_SIZE_MAX) {
->       |                        ^~~~~~~~~~~~~~
-> ```
+>   cifs-utils-7.0/cifs.upcall.c:501: freed_arg: "free" frees "buf".
+>   cifs-utils-7.0/cifs.upcall.c:524: double_free: Calling "free" frees
+>   pointer "buf" which has already been freed.
+>     522|           }
+>     523|   out_close:
+>     524|->         free(buf);
+>     525|           close(fd);
+>     526|           return cachename;
 >
-> Bug: https://bugs.gentoo.org/842195
-> Signed-off-by: Sam James <sam@gentoo.org>
+> Fix this by setting @buf to NULL after freeing it to prevent UAF.
+>
+> Fixes: ed97e4ecab4e ("cifs.upcall: allow scraping of KRB5CCNAME out of in=
+itiating task's /proc/<pid>/environ file")
+> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 > ---
->  getcifsacl.c | 1 +
->  setcifsacl.c | 1 +
->  2 files changed, 2 insertions(+)
+>  cifs.upcall.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/getcifsacl.c b/getcifsacl.c
-> index 1c01062..d69d40a 100644
-> --- a/getcifsacl.c
-> +++ b/getcifsacl.c
-> @@ -34,6 +34,7 @@
->  #include <errno.h>
->  #include <limits.h>
->  #include <ctype.h>
-> +#include <linux/limits.h>
->  #include <sys/xattr.h>
->  #include "cifsacl.h"
->  #include "idmap_plugin.h"
-> diff --git a/setcifsacl.c b/setcifsacl.c
-> index d832cec..b7079ab 100644
-> --- a/setcifsacl.c
-> +++ b/setcifsacl.c
-> @@ -48,6 +48,7 @@
->  #include <errno.h>
->  #include <limits.h>
->  #include <ctype.h>
-> +#include <linux/limits.h>
->  #include <sys/xattr.h>
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index 52c03280dbe0..ff6f2bd271bc 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -498,10 +498,11 @@ retry:
+>                 /* We read to the end of the buffer. Double and try again=
+ */
+>                 syslog(LOG_DEBUG, "%s: read to end of buffer (%zu bytes)\=
+n",
+>                                         __func__, bufsize);
+> -               free(buf);
+> -               bufsize *=3D 2;
+>                 if (lseek(fd, 0, SEEK_SET) < 0)
+>                         goto out_close;
+> +               free(buf);
+> +               buf =3D NULL;
+> +               bufsize *=3D 2;
+>                 goto retry;
+>         }
 >
->  #include "cifsacl.h"
 > --
-> 2.37.2
+> 2.44.0
 >
