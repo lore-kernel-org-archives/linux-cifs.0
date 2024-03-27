@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131CB1B251D;
-	Wed, 27 Mar 2024 12:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01ED712FF90;
+	Wed, 27 Mar 2024 12:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542486; cv=none; b=cz2a19zVZY39g2/xp+xlNRIlU58e2u5oZbmtFeZThWv2mYZyFpCiVlCWoUj3vrpuTH23rGvN/856jJZQ/qtJqzI10+lv1fkIrsO6STGS2w0g8NpvlA7DruB05vjYmP25lUMyKYCEbTkDIV+XPBxihE064yA5/UsTb8hENuq3EzQ=
+	t=1711542492; cv=none; b=QObnJ5FVZluR0ZE+ZagpbkHJKx8QUr7Bz+Fb2U73sqCHJFW2f3ULM1l1qFp5jlMyr4DrdVL5fZOuhyiXa5BbNa6rvMWUMfq8/BFNdeCVEGKAYk1T27uFdM3h9QgEjb2i/wUpWUhsDRNpWxt9Y7cHS64IrYk1uxWb34hhLsivNYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542486; c=relaxed/simple;
-	bh=e8GShj3b/QegssZeOdi7xhcwDpqEv8JRH8/NZVhM858=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I+73Zx99JU/BfUV4+ohf11Qts3onHmUO6YdKFNBO2/7tbH+jXf8LJmHWZggt2D9vsk7W4nuzwmMAQ/3h/6YXaoEc2RDw7/175zKSXxeF//tpYvvK+gsJJlyyRLbhASKGyCew7PNqVxT0mdywLM+Djsweioe+AqZ3o4mZfszxAM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MhcV6GLJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711542492; c=relaxed/simple;
+	bh=KjUPHk5TMnLbi7J1LA4Mk+gyMYXkhcoH0vmVhoCTkvM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NvvRBIux3dUASFKqSbY6Ae6zA3EC7F9vzkO45dF0xSyWjW1k4LOVRpiC5LWmOHqHVAk4L1ZLO/f0paeXkywn+RSXBC3+NLkdAQmuZOCKdRS2q1jZE0dbq1JbDvcpPdhDPtpRU97c035xtxV2bDKAnJXVxhGyY6BHKoMe5IQy59Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxYuM/uO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MhcV6GLJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1725DC433C7;
-	Wed, 27 Mar 2024 12:28:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxYuM/uO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0103EC43390;
+	Wed, 27 Mar 2024 12:28:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542485;
-	bh=e8GShj3b/QegssZeOdi7xhcwDpqEv8JRH8/NZVhM858=;
+	s=k20201202; t=1711542491;
+	bh=KjUPHk5TMnLbi7J1LA4Mk+gyMYXkhcoH0vmVhoCTkvM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=MhcV6GLJIkXzbTIMprviVw1aob0yHBY0M7j6dzH+R1XOl2qEp3SpGGgQtwhODdx/Y
-	 40VvHXJCGZjmqDEPIBqP6o7FACR2Wg5mQ1UYtV1fJC7webUVMLhZOTFlPP3tion867
-	 Y//6ZdCzvuGQJjx3kWuiSyTyN3xTmge1CjsnlIuCiWkcVo9UHDipSJu1bhIQbqORkp
-	 MLYI/EuBqHssNtzjKDEIpfs7GNZSn3TDN3q4j3ZVvzC4tClorfgn51kZJdYmmzCcdr
-	 zNsFwNbDpLniVtSYxRJrpS1iaG/r6DdTbKTZY+8FxAnN4c3yDQz0wq6LU3LE9qe5Fi
-	 PnOMdYpvsEObQ==
+	b=DxYuM/uOovaaxBchzLw5KHVKxDO4BQ44m85iuFPSCyQQtlVQykYwG4LE68p/Ry1cI
+	 2nFJfXmbaqqPA4TxV2ieLtRVgNFNV0hfl3nvdnwe/9XZiXHtupZZVikfzJVpOq+T47
+	 gQn+pQ8KPdNiGLDLOrwJSA3mMny20LQ5vnPPJFwQ9oLRkwhmLVPiMmfosvyPKQHXCC
+	 PbhrvfbRaNvpOV7+/lqG/RfRXLUDhTQzm3heipJTHxjTsS8aoGI+b/s+u92rXRHFqc
+	 RW4VsDyiZr7leW7HdUTwAni8vkmOS+V1KEiDVFucOnG4d8rGuerBsYOYWlMNxeQP7f
+	 LXRhbTh2ztWJA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	sprasad@microsoft.com
 Cc: =?UTF-8?q?Jan=20=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>,
+	Paulo Alcantara <pc@manguebit.com>,
 	Steve French <stfrench@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "cifs: reduce warning log level for server not advertising interfaces" failed to apply to 4.19-stable tree
-Date: Wed, 27 Mar 2024 08:28:03 -0400
-Message-ID: <20240327122804.2842456-1-sashal@kernel.org>
+Subject: FAILED: Patch "cifs: make sure server interfaces are requested only for SMB3+" failed to apply to 4.19-stable tree
+Date: Wed, 27 Mar 2024 08:28:09 -0400
+Message-ID: <20240327122810.2842532-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -58,54 +59,114 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 16a57d7681110b25708c7042688412238e6f73a9 Mon Sep 17 00:00:00 2001
+From 13c0a74747cb7fdadf58c5d3a7d52cfca2d51736 Mon Sep 17 00:00:00 2001
 From: Shyam Prasad N <sprasad@microsoft.com>
-Date: Wed, 13 Mar 2024 10:40:40 +0000
-Subject: [PATCH] cifs: reduce warning log level for server not advertising
- interfaces
+Date: Wed, 13 Mar 2024 10:40:41 +0000
+Subject: [PATCH] cifs: make sure server interfaces are requested only for
+ SMB3+
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Several users have reported this log getting dumped too regularly to
-kernel log. The likely root cause has been identified, and it suggests
-that this situation is expected for some configurations
-(for example SMB2.1).
+Some code paths for querying server interfaces make a false
+assumption that it will only get called for SMB3+. Since this
+function now can get called from a generic code paths, the correct
+thing to do is to have specific handler for this functionality
+per SMB dialect, and call this handler.
 
-Since the function returns appropriately even for such cases, it is
-fairly harmless to make this a debug log. When needed, the verbosity
-can be increased to capture this log.
+This change adds such a handler and implements this handler only
+for SMB 3.0 and 3.1.1.
 
 Cc: stable@vger.kernel.org
-Reported-by: Jan Čermák <sairon@sairon.cz>
+Cc: Jan Čermák <sairon@sairon.cz>
+Reported-by: Paulo Alcantara <pc@manguebit.com>
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/sess.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsglob.h | 3 +++
+ fs/smb/client/connect.c  | 6 +++++-
+ fs/smb/client/smb2ops.c  | 2 ++
+ fs/smb/client/smb2pdu.c  | 5 +++--
+ 4 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index 8f37373fd3334..3216f786908fb 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -230,7 +230,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
- 		spin_lock(&ses->iface_lock);
- 		if (!ses->iface_count) {
- 			spin_unlock(&ses->iface_lock);
--			cifs_dbg(VFS, "server %s does not advertise interfaces\n",
-+			cifs_dbg(ONCE, "server %s does not advertise interfaces\n",
- 				      ses->server->hostname);
- 			break;
- 		}
-@@ -396,7 +396,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	spin_lock(&ses->iface_lock);
- 	if (!ses->iface_count) {
- 		spin_unlock(&ses->iface_lock);
--		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
-+		cifs_dbg(ONCE, "server %s does not advertise interfaces\n", ses->server->hostname);
- 		return;
- 	}
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 8be62ed053a25..3da625d532359 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -355,6 +355,9 @@ struct smb_version_operations {
+ 	/* informational QFS call */
+ 	void (*qfs_tcon)(const unsigned int, struct cifs_tcon *,
+ 			 struct cifs_sb_info *);
++	/* query for server interfaces */
++	int (*query_server_interfaces)(const unsigned int, struct cifs_tcon *,
++				       bool);
+ 	/* check if a path is accessible or not */
+ 	int (*is_path_accessible)(const unsigned int, struct cifs_tcon *,
+ 				  struct cifs_sb_info *, const char *);
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 86ae578904a26..4cbb79418e506 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -123,12 +123,16 @@ static void smb2_query_server_interfaces(struct work_struct *work)
+ 	struct cifs_tcon *tcon = container_of(work,
+ 					struct cifs_tcon,
+ 					query_interfaces.work);
++	struct TCP_Server_Info *server = tcon->ses->server;
  
+ 	/*
+ 	 * query server network interfaces, in case they change
+ 	 */
++	if (!server->ops->query_server_interfaces)
++		return;
++
+ 	xid = get_xid();
+-	rc = SMB3_request_interfaces(xid, tcon, false);
++	rc = server->ops->query_server_interfaces(xid, tcon, false);
+ 	free_xid(xid);
+ 
+ 	if (rc) {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 6ee22d0dbc006..2ed456948f34c 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -5290,6 +5290,7 @@ struct smb_version_operations smb30_operations = {
+ 	.tree_connect = SMB2_tcon,
+ 	.tree_disconnect = SMB2_tdis,
+ 	.qfs_tcon = smb3_qfs_tcon,
++	.query_server_interfaces = SMB3_request_interfaces,
+ 	.is_path_accessible = smb2_is_path_accessible,
+ 	.can_echo = smb2_can_echo,
+ 	.echo = SMB2_echo,
+@@ -5405,6 +5406,7 @@ struct smb_version_operations smb311_operations = {
+ 	.tree_connect = SMB2_tcon,
+ 	.tree_disconnect = SMB2_tdis,
+ 	.qfs_tcon = smb3_qfs_tcon,
++	.query_server_interfaces = SMB3_request_interfaces,
+ 	.is_path_accessible = smb2_is_path_accessible,
+ 	.can_echo = smb2_can_echo,
+ 	.echo = SMB2_echo,
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index e5e6b14f8cae3..3ea688558e6c9 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -409,14 +409,15 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	spin_unlock(&ses->ses_lock);
+ 
+ 	if (!rc &&
+-	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
++	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
++	    server->ops->query_server_interfaces) {
+ 		mutex_unlock(&ses->session_mutex);
+ 
+ 		/*
+ 		 * query server network interfaces, in case they change
+ 		 */
+ 		xid = get_xid();
+-		rc = SMB3_request_interfaces(xid, tcon, false);
++		rc = server->ops->query_server_interfaces(xid, tcon, false);
+ 		free_xid(xid);
+ 
+ 		if (rc == -EOPNOTSUPP && ses->chan_count > 1) {
 -- 
 2.43.0
 
