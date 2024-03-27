@@ -1,89 +1,98 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D0912E1ED;
-	Wed, 27 Mar 2024 18:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D547E152E1C
+	for <linux-cifs@vger.kernel.org>; Wed, 27 Mar 2024 20:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711565125; cv=none; b=j1JqJ59WNN1JN4fwibY656KwoFoNkq5zD0yq1xI8+oUugjkyVUly0YNyV+ObP4IwrsmVDNx6RpX08HO401lL5Z1JTY2K/meaFEeyA0KLIJbMJSOKw34JA82fFpxGTojTeOklMUltZ0TiliyEldbgGm7dRABWqMVADLh8bqQ9dnk=
+	t=1711571882; cv=none; b=PNoGpuSs/LlpOKCmWC16t9lo1Hl3g2vTqc3x/e0DGYf2oI7cmDqrXdmiHpJKbdJYGW/0lw28oxv3wnQxj3re6Ich0tloKd4VShRdg6ayOVVgrAqMTDFVy/uPPGmVSFQ6ocy0gykvhoaIcF7RNMWNS9wVJREzFm9YYMzVq2YUjkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711565125; c=relaxed/simple;
-	bh=biJi2IrgVq30FOqS2hK3EobFrX84OW9MAMNbFsaV0RQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6MPiqohL4Ot5PvHL+7ri36OVtcTGkngh5Ex1Y4WXh/r0ENH+SP3jKAgEM7V0VVolhY9g9ztzqfVxCOHqmd3KubM0OPFDQ2PN+jHq7hPYGAKFIeaxXxa6OU/ZOzqkHwj0FBiFwXwwEGcDXLWejxpOQUJ4cYJX5RWjK0qC4EBszQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FsHkB3Ok; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1711571882; c=relaxed/simple;
+	bh=+q1X6OO5OjLhXHnuIwVLwdI8semz6sAtm2DvDrQfzL0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=V8sl7PncDeNzpQ2qzXE8h6y3JKUtZBoYeEr4n3eRJupqsCCfuOlIc2Z6Ts97ARcNLvCIvcAwxVxi/nQSYCRpG93zkk9vfiBype3eIcPoypkuXgnkiuj7Nl1QWrXWK25fhzu7xAvgf0uKOw6h4TVv+rhkxy++mN15jx8HEKTUtq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PmYI8g55; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FsHkB3Ok"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Jto/UBY8qFeuax+A/OGqBK80cikOQZ4LUK0jo01qdKA=; b=FsHkB3OkZbvW2lIRluP+DvQYvf
-	oZF2Vx+216ffdZcTX7SPEY+DrhaoR16macUM0BQ9ipEBL7pt2KI1KrDuisYWoBe5+QdXSBIAguCug
-	jVETiIojDCW3h2JAaMqm9Y7WcU4tjfJyqKwJGQkgZsXj6Ghb75RwIUPk2RFlvDniY3cq8OHmLrCVC
-	GMMrX1c9UOcPqnUPrdbPwAXAMN/N2Km8/39X7qiw/oYgZNm1r082v4A+l5Hkeb22X300tTDg2k+x+
-	pimn0w+kw7PQkid5OR1tbpViET52ntLiFHV1DtYAbvRjBgOyLa6kcSmbplUC/xm73JgT75/JVJxrh
-	Y9cTQbag==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rpYGz-00000004UtR-2mcl;
-	Wed, 27 Mar 2024 18:45:17 +0000
-Date: Wed, 27 Mar 2024 18:45:17 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Miklos Szeredi <miklos@szeredi.hu>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
-	v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, devel@lists.orangefs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2] mm, netfs: Provide a means of invalidation
- without using launder_folio
-Message-ID: <ZgRpPd1Ado-0_iYx@casper.infradead.org>
-References: <2318298.1711551844@warthog.procyon.org.uk>
- <2506007.1711562145@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmYI8g55"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711571879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6qoPQD+VTVHHhRyd75iNpboVK+lvHVLazCUjHaMH4s4=;
+	b=PmYI8g55S5qfdXX5X6eeOiLSim66iGBJsYWnk0YTjf1vtjAryVpxo4WDKhwbhEYEnPzM6H
+	Mmlo2xV7Ft9WjNsOgApizHz/9r+bUxYLOdNy+tUbXcdrtPULZdUZOY1K48V0yZgS6pfSaM
+	gQbNT5bxX0G7AUQU8zW1VMZzoOBk/Wk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-393-9x-QYYaoNBy5Yt-5m2eKqg-1; Wed, 27 Mar 2024 16:37:55 -0400
+X-MC-Unique: 9x-QYYaoNBy5Yt-5m2eKqg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2DAB0101A552;
+	Wed, 27 Mar 2024 20:37:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9A6CBC53360;
+	Wed, 27 Mar 2024 20:37:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZgRpPd1Ado-0_iYx@casper.infradead.org>
+References: <ZgRpPd1Ado-0_iYx@casper.infradead.org> <2318298.1711551844@warthog.procyon.org.uk> <2506007.1711562145@warthog.procyon.org.uk>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Miklos Szeredi <miklos@szeredi.hu>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    Christoph Hellwig <hch@lst.de>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, devel@lists.orangefs.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2] mm, netfs: Provide a means of invalidation without using launder_folio
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2506007.1711562145@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2541307.1711571866.1@warthog.procyon.org.uk>
+Date: Wed, 27 Mar 2024 20:37:46 +0000
+Message-ID: <2541308.1711571866@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Wed, Mar 27, 2024 at 05:55:45PM +0000, David Howells wrote:
-> +int filemap_invalidate_inode(struct inode *inode, bool flush)
-> +{
-> +	struct address_space *mapping = inode->i_mapping;
-> +
-> +	if (!mapping || !mapping->nrpages)
-> +		goto out;
-> +
-> +	/* Prevent new folios from being added to the inode. */
-> +	filemap_invalidate_lock(mapping);
+Matthew Wilcox <willy@infradead.org> wrote:
 
-I'm kind of surprised that the callers wouldn't want to hold that lock
-over a call to this function.  I guess you're working on the callers,
-so you'd know better than I would, but I would have used lockdep to
-assert that invalidate_lock was held.
+> > +	/* Prevent new folios from being added to the inode. */
+> > +	filemap_invalidate_lock(mapping);
+> 
+> I'm kind of surprised that the callers wouldn't want to hold that lock
+> over a call to this function.  I guess you're working on the callers,
+> so you'd know better than I would, but I would have used lockdep to
+> assert that invalidate_lock was held.
 
-> +	if (!mapping->nrpages)
-> +		goto unlock;
-> +
-> +	/* Assume there are probably PTEs only if there are mmaps. */
-> +	if (unlikely(!RB_EMPTY_ROOT(&mapping->i_mmap.rb_root)))
-> +		unmap_mapping_pages(mapping, 0, ULONG_MAX, false);
+I'm not sure.  None of the places that look like they'd be calling this
+currently take that lock (though possibly they should).
 
-Is this optimisation worth it?  We're already doing some expensive
-operations here, does saving cycling the i_mmap_lock really help
-anything?  You'll note that unmap_mapping_pages() already does this
-check inside the lock.
+Also, should I provide it with explicit range, I wonder?
+
+> > +	if (unlikely(!RB_EMPTY_ROOT(&mapping->i_mmap.rb_root)))
+> > +		unmap_mapping_pages(mapping, 0, ULONG_MAX, false);
+> 
+> Is this optimisation worth it?
+
+Perhaps not.
+
+David
 
