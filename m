@@ -1,56 +1,62 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E02512D21C
-	for <linux-cifs@vger.kernel.org>; Wed, 27 Mar 2024 14:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AA41411FD
+	for <linux-cifs@vger.kernel.org>; Wed, 27 Mar 2024 15:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711548817; cv=none; b=eGc5OHDC5+O1P6rcMFzmzQKadT/JOkTeyEff5w2BWTX9gsq40CdJ5f7dPrwxXrP3BWqKBJxTl/ZqB9N5RGi2U10ZxTf2Oj6VKv1KWaEwgIAtYiG4C3VAACeaclSFF5zvENJ6/ht5A3cb8Ax6ONJrJszy5QFfQ5qxEEXz3nQQsBw=
+	t=1711551861; cv=none; b=GBOqnCBVCh//r9FPBLcKrpZqbaO8q46waohkP6u7Tw+ClRXi2TQC/jYy9HK9fdN2QnudtlkYFo+E2pUTII+IBVaRdCUcXO/bM5a9uO4Fk+zFTIi04+Mlt8aTQEVdMQ5xWEiAVJQlfr7f7OKyrAZw/FTRv91iNvJ3JRUKXCHwiYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711548817; c=relaxed/simple;
-	bh=7stkxD8LcUkgd6MZgtGDEXBV8+4CKxCvxSZFtRvHSQ8=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=gYP7vVDRvEi0pntC/8Y3UTfQezxO4Mwmw1nezT22zSIx6EHxaD2dSJK8iiJMul11/kIORkuNcmdgmXgmsDExwOb/b5YQNUKTd+LMqA8TgjxR822EK2MdKgw+Pi3dbj4ss2cP/3WRFGiFxKT/jq9GZvz+ppm/jNGtRWjo9RaJIWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aF74zIXW; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1711551861; c=relaxed/simple;
+	bh=lKYcHiXaapYY9EDdipb2qGnG72rc4km3T4CzGt+fgpQ=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=a6Hz1oI/psK08BCt3dOxeEY2STbADDQZHAjhy3zr8GHQgGWyX5eiKbqYykY0F0ktaEAcW4RUX6JgAc/MXPUr67ON2HPT/qIVY6185FMj+R/POuAfiwqS5O4uiueYRwIbnfSj9zocmjdDHwZNdXUx0yVR690At7oCbq/CXzBpZ5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VLQVEXbL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aF74zIXW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLQVEXbL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711548814;
+	s=mimecast20190719; t=1711551857;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=Qut9wqKpTNwmM2gET59mhKtRBrovobZzNxOyH6sbgc8=;
-	b=aF74zIXWSp7HiWBoBoUF4opdnYL6Lsc4QgiSBuYZdQ4XVzcFLbPPB7hsyzzkZ2BU40G0sn
-	qrhPMwr8IIlYRypy6NEmL2+Kjbevvt11LH0dEDmhd3zKzfqNbbRZuhr/7jHCC76qzL4Qtk
-	AZPAiMhPe2V+n/SbpckyLZEylW7Pwbg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-10nbk4m5PIa1cEig9JI9nw-1; Wed,
- 27 Mar 2024 10:13:31 -0400
-X-MC-Unique: 10nbk4m5PIa1cEig9JI9nw-1
+	bh=bWNSBg8at2ybCmMWCY4Y8Gsbxal/bw2ZagDjU70FTzA=;
+	b=VLQVEXbL/E2tJ5Ijs4ZDicJDUqPGNGSGb3kKHLkBERYdENu3Aj54h4ZlrZE2Pin2I3kVWu
+	2axXJGnPIKOcwUav8S7cmmeeH2zyPdEvZ+u/plTes8rBDEH2GgfqbLyh/3mIS4tBc76mEd
+	x2orn3HaOzuy+OCruEOqW0Lf/OafFCI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-196-hpxMHw0oNR6KhiHzPfvrXw-1; Wed, 27 Mar 2024 11:04:12 -0400
+X-MC-Unique: hpxMHw0oNR6KhiHzPfvrXw-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EDB928000A0;
-	Wed, 27 Mar 2024 14:13:30 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87AEC801900;
+	Wed, 27 Mar 2024 15:04:11 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0CA0D492BC8;
-	Wed, 27 Mar 2024 14:13:28 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B0A18492BC9;
+	Wed, 27 Mar 2024 15:04:08 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Christian Brauner <brauner@kernel.org>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+To: Matthew Wilcox <willy@infradead.org>,
+    Miklos Szeredi <miklos@szeredi.hu>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    Christoph Hellwig <hch@lst.de>
+cc: dhowells@redhat.com, Andrew Morton <akpm@linux-foundation.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, devel@lists.orangefs.org,
     linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix duplicate fscache cookie warnings
+Subject: [RFC PATCH] mm, netfs: Provide a means of invalidation without using launder_folio
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,97 +64,173 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2305514.1711548804.1@warthog.procyon.org.uk>
+Content-ID: <2318297.1711551844.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Mar 2024 14:13:24 +0000
-Message-ID: <2305515.1711548804@warthog.procyon.org.uk>
+Date: Wed, 27 Mar 2024 15:04:04 +0000
+Message-ID: <2318298.1711551844@warthog.procyon.org.uk>
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-fscache emits a lot of duplicate cookie warnings with cifs because the
-index key for the fscache cookies does not include everything that the
-cifs_find_inode() function does.  The latter is used with iget5_locked() t=
+Implement a replacement for launder_folio[1].  The key feature of
+invalidate_inode_pages2() is that it locks each folio individually, unmaps
+it to prevent mmap'd accesses interfering and calls the ->launder_folio()
+address_space op to flush it.  This has problems: firstly, each folio is
+written individually as one or more small writes; secondly, adjacent folio=
+s
+cannot be added so easily into the laundry; thirdly, it's yet another op t=
 o
-distinguish between inodes in the local inode cache.
+implement.
 
-Fix this by adding the creation time and file type to the fscache cookie
-key.
+Here's a bit of a hacked together solution which should probably be moved
+to mm/:
 
-Additionally, add a couple of comments to note that if one is changed the
-other must be also.
+Use the mmap lock to cause future faulting to wait, then unmap all the
+folios if we have mmaps, then, conditionally, use ->writepages() to flush
+any dirty data back and then discard all pages.  The caller needs to hold =
+a
+lock to prevent ->write_iter() getting underfoot.
+
+Note that this does not prevent ->read_iter() from accessing the file
+whilst we do this since that may operate without locking.
+
+We also have the writeback_control available and so have the opportunity t=
+o
+set a flag in it to tell the filesystem that we're doing an invalidation.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Miklos Szeredi <miklos@szeredi.hu>
+cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Andrew Morton <akpm@linux-foundation.org>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Christian Brauner <brauner@kernel.org>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
+cc: linux-mm@kvack.org
 cc: linux-fsdevel@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: ceph-devel@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: devel@lists.orangefs.org
+Link: https://lore.kernel.org/r/1668172.1709764777@warthog.procyon.org.uk/=
+ [1]
 ---
- fs/smb/client/fscache.c |   16 +++++++++++++++-
- fs/smb/client/inode.c   |    2 ++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ fs/netfs/misc.c       |   56 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ include/linux/netfs.h |    3 ++
+ mm/memory.c           |    3 +-
+ 3 files changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index c4a3cb736881..340efce8f052 100644
---- a/fs/smb/client/fscache.c
-+++ b/fs/smb/client/fscache.c
-@@ -12,6 +12,16 @@
- #include "cifs_fs_sb.h"
- #include "cifsproto.h"
- =
-
-+/*
-+ * Key for fscache inode.  [!] Contents must match comparisons in cifs_fi=
-nd_inode().
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index bc1fc54fb724..774ce825fbec 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -250,3 +250,59 @@ bool netfs_release_folio(struct folio *folio, gfp_t g=
+fp)
+ 	return true;
+ }
+ EXPORT_SYMBOL(netfs_release_folio);
++
++extern void unmap_mapping_range_tree(struct rb_root_cached *root,
++				     pgoff_t first_index,
++				     pgoff_t last_index,
++				     struct zap_details *details);
++
++/**
++ * netfs_invalidate_inode - Invalidate/forcibly write back an inode's pag=
+ecache
++ * @inode: The inode to flush
++ * @flush: Set to write back rather than simply invalidate.
++ *
++ * Invalidate all the folios on an inode, possibly writing them back firs=
+t.
++ * Whilst the operation is undertaken, the mmap lock is held to prevent
++ * ->fault() from reinstalling the folios.  The caller must hold a lock o=
+n the
++ * inode sufficient to prevent ->write_iter() from dirtying more folios.
 + */
-+struct cifs_fscache_inode_key {
++int netfs_invalidate_inode(struct inode *inode, bool flush)
++{
++	struct address_space *mapping =3D inode->i_mapping;
 +
-+	__le64  uniqueid;	/* server inode number */
-+	__le64  createtime;	/* creation time on server */
-+	u8	type;		/* S_IFMT file type */
-+} __packed;
++	if (!mapping || !mapping->nrpages)
++		goto out;
 +
- static void cifs_fscache_fill_volume_coherency(
- 	struct cifs_tcon *tcon,
- 	struct cifs_fscache_volume_coherency_data *cd)
-@@ -97,15 +107,19 @@ void cifs_fscache_release_super_cookie(struct cifs_tc=
-on *tcon)
- void cifs_fscache_get_inode_cookie(struct inode *inode)
- {
- 	struct cifs_fscache_inode_coherency_data cd;
-+	struct cifs_fscache_inode_key key;
- 	struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
- 	struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
- 	struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
++	/* Prevent folios from being faulted in. */
++	i_mmap_lock_write(mapping);
++
++	if (!mapping->nrpages)
++		goto unlock;
++
++	/* Assume there are probably PTEs only if there are mmaps. */
++	if (unlikely(!RB_EMPTY_ROOT(&mapping->i_mmap.rb_root))) {
++		struct zap_details details =3D { };
++
++		unmap_mapping_range_tree(&mapping->i_mmap, 0, LLONG_MAX, &details);
++	}
++
++	/* Write back the data if we're asked to. */
++	if (flush) {
++		struct writeback_control wbc =3D {
++			.sync_mode	=3D WB_SYNC_ALL,
++			.nr_to_write	=3D LONG_MAX,
++			.range_start	=3D 0,
++			.range_end	=3D LLONG_MAX,
++		};
++
++		filemap_fdatawrite_wbc(mapping, &wbc);
++	}
++
++	/* Wait for writeback to complete on all folios and discard. */
++	truncate_inode_pages_range(mapping, 0, LLONG_MAX);
++
++unlock:
++	i_mmap_unlock_write(mapping);
++out:
++	return filemap_check_errors(mapping);
++}
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 298552f5122c..40dc34ee291d 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -400,6 +400,9 @@ ssize_t netfs_buffered_write_iter_locked(struct kiocb =
+*iocb, struct iov_iter *fr
+ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *=
+from);
+ ssize_t netfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
  =
 
-+	key.uniqueid	=3D cpu_to_le64(cifsi->uniqueid);
-+	key.createtime	=3D cpu_to_le64(cifsi->createtime);
-+	key.type	=3D (inode->i_mode & S_IFMT) >> 12;
- 	cifs_fscache_fill_coherency(&cifsi->netfs.inode, &cd);
- =
-
- 	cifsi->netfs.cache =3D
- 		fscache_acquire_cookie(tcon->fscache, 0,
--				       &cifsi->uniqueid, sizeof(cifsi->uniqueid),
-+				       &key, sizeof(key),
- 				       &cd, sizeof(cd),
- 				       i_size_read(&cifsi->netfs.inode));
- 	if (cifsi->netfs.cache)
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index d28ab0af6049..91b07ef9e25c 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1351,6 +1351,8 @@ cifs_find_inode(struct inode *inode, void *opaque)
- {
- 	struct cifs_fattr *fattr =3D opaque;
- =
-
-+	/* [!] The compared values must be the same in struct cifs_fscache_inode=
-_key. */
++/* High-level invalidation API */
++int netfs_invalidate_inode(struct inode *inode, bool flush);
 +
- 	/* don't match inode with different uniqueid */
- 	if (CIFS_I(inode)->uniqueid !=3D fattr->cf_uniqueid)
- 		return 0;
+ /* Address operations API */
+ struct readahead_control;
+ void netfs_readahead(struct readahead_control *);
+diff --git a/mm/memory.c b/mm/memory.c
+index f2bc6dd15eb8..106f32c7d7fb 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -3665,7 +3665,7 @@ static void unmap_mapping_range_vma(struct vm_area_s=
+truct *vma,
+ 	zap_page_range_single(vma, start_addr, end_addr - start_addr, details);
+ }
+ =
+
+-static inline void unmap_mapping_range_tree(struct rb_root_cached *root,
++inline void unmap_mapping_range_tree(struct rb_root_cached *root,
+ 					    pgoff_t first_index,
+ 					    pgoff_t last_index,
+ 					    struct zap_details *details)
+@@ -3685,6 +3685,7 @@ static inline void unmap_mapping_range_tree(struct r=
+b_root_cached *root,
+ 				details);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(unmap_mapping_range_tree);
+ =
+
+ /**
+  * unmap_mapping_folio() - Unmap single folio from processes.
 
