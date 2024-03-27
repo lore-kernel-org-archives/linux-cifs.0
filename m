@@ -1,40 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A7D1422DE;
-	Wed, 27 Mar 2024 12:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131CB1B251D;
+	Wed, 27 Mar 2024 12:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542469; cv=none; b=pdMg9WZKl19OEU1ZR2ifxiocblCn33gAUA0PKx5+whTN77Mm3tRAoBIO6/hGkfSk9MZP8CW6TsI63CwzZCPtvN55kGnjZyTurhmUkqugyc0iwsHftMbDuiDjW0TYAnf6PEstjwBlboSvS7dHwW6wIkvEMg9Rx2urmjliAKCXvFE=
+	t=1711542486; cv=none; b=cz2a19zVZY39g2/xp+xlNRIlU58e2u5oZbmtFeZThWv2mYZyFpCiVlCWoUj3vrpuTH23rGvN/856jJZQ/qtJqzI10+lv1fkIrsO6STGS2w0g8NpvlA7DruB05vjYmP25lUMyKYCEbTkDIV+XPBxihE064yA5/UsTb8hENuq3EzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542469; c=relaxed/simple;
-	bh=GuThiu88jslfOpu4M5qOFs7lY97oECR5vktwUGjQj1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lyri6sAM+WnYupYqhWsSpXHst6JGy/cLuJIG18t38eyAuy/bgY9KXFCvfLu72E1RGgAj7/abm4wHx4WUGcp3N40FpEsL61mLqvb+FcytFPIlpSErfP1nh0akaH3Ihej7zVNXVcn7Yb1WBxyoSJtpWRUkoFaEbMKnGbaYTAK33Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S50GLx+O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711542486; c=relaxed/simple;
+	bh=e8GShj3b/QegssZeOdi7xhcwDpqEv8JRH8/NZVhM858=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I+73Zx99JU/BfUV4+ohf11Qts3onHmUO6YdKFNBO2/7tbH+jXf8LJmHWZggt2D9vsk7W4nuzwmMAQ/3h/6YXaoEc2RDw7/175zKSXxeF//tpYvvK+gsJJlyyRLbhASKGyCew7PNqVxT0mdywLM+Djsweioe+AqZ3o4mZfszxAM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MhcV6GLJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S50GLx+O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44587C433F1;
-	Wed, 27 Mar 2024 12:27:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MhcV6GLJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1725DC433C7;
+	Wed, 27 Mar 2024 12:28:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542469;
-	bh=GuThiu88jslfOpu4M5qOFs7lY97oECR5vktwUGjQj1c=;
+	s=k20201202; t=1711542485;
+	bh=e8GShj3b/QegssZeOdi7xhcwDpqEv8JRH8/NZVhM858=;
 	h=From:To:Cc:Subject:Date:From;
-	b=S50GLx+OTGXKLfCMC8kuRBMiIIesFsOHWcHdDUtM1prXFRoNEwxn1rD6OKlenFabt
-	 IgInOnDU2W/OHa9kFuqwXtoFP54pMZRKkPPxTd03edzeV7JYeAkKj92/kEA8L+7lSU
-	 bK5SopYgpcGlNXvmUpTZXqQp3SVkk1vR0xkHoXzcsIVGylNf2HcfaRHWc88EIIjN0f
-	 xUndpY86KhMecvYHvRMtjuSl9AizGHdBv4lKCTEoZQyAUNJkdf7kz5I15wc9qaK7NQ
-	 2ewEvi9vPzKApNumvHBvmY56IwlSBB3D2sgA8rrfY1touqNc4CvqR8Qs2YzDCucEPu
-	 8QHSQnwHY2zuQ==
+	b=MhcV6GLJIkXzbTIMprviVw1aob0yHBY0M7j6dzH+R1XOl2qEp3SpGGgQtwhODdx/Y
+	 40VvHXJCGZjmqDEPIBqP6o7FACR2Wg5mQ1UYtV1fJC7webUVMLhZOTFlPP3tion867
+	 Y//6ZdCzvuGQJjx3kWuiSyTyN3xTmge1CjsnlIuCiWkcVo9UHDipSJu1bhIQbqORkp
+	 MLYI/EuBqHssNtzjKDEIpfs7GNZSn3TDN3q4j3ZVvzC4tClorfgn51kZJdYmmzCcdr
+	 zNsFwNbDpLniVtSYxRJrpS1iaG/r6DdTbKTZY+8FxAnN4c3yDQz0wq6LU3LE9qe5Fi
+	 PnOMdYpvsEObQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	mmakassikis@freebox.fr
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	sprasad@microsoft.com
+Cc: =?UTF-8?q?Jan=20=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>,
 	Steve French <stfrench@microsoft.com>,
 	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "ksmbd: retrieve number of blocks using vfs_getattr in set_file_allocation_info" failed to apply to 4.19-stable tree
-Date: Wed, 27 Mar 2024 08:27:47 -0400
-Message-ID: <20240327122747.2842216-1-sashal@kernel.org>
+Subject: FAILED: Patch "cifs: reduce warning log level for server not advertising interfaces" failed to apply to 4.19-stable tree
+Date: Wed, 27 Mar 2024 08:28:03 -0400
+Message-ID: <20240327122804.2842456-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -44,6 +45,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: ignore
 X-stable: review
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 The patch below does not apply to the 4.19-stable tree.
@@ -56,59 +58,54 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 34cd86b6632718b7df3999d96f51e63de41c5e4f Mon Sep 17 00:00:00 2001
-From: Marios Makassikis <mmakassikis@freebox.fr>
-Date: Thu, 22 Feb 2024 10:58:21 +0100
-Subject: [PATCH] ksmbd: retrieve number of blocks using vfs_getattr in
- set_file_allocation_info
+From 16a57d7681110b25708c7042688412238e6f73a9 Mon Sep 17 00:00:00 2001
+From: Shyam Prasad N <sprasad@microsoft.com>
+Date: Wed, 13 Mar 2024 10:40:40 +0000
+Subject: [PATCH] cifs: reduce warning log level for server not advertising
+ interfaces
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Use vfs_getattr() to retrieve stat information, rather than make
-assumptions about how a filesystem fills inode structs.
+Several users have reported this log getting dumped too regularly to
+kernel log. The likely root cause has been identified, and it suggests
+that this situation is expected for some configurations
+(for example SMB2.1).
+
+Since the function returns appropriately even for such cases, it is
+fairly harmless to make this a debug log. When needed, the verbosity
+can be increased to capture this log.
 
 Cc: stable@vger.kernel.org
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Reported-by: Jan Čermák <sairon@sairon.cz>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/server/smb2pdu.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ fs/smb/client/sess.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index f6cc5d2730ffb..199c31c275e5b 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5809,15 +5809,21 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 
- 	loff_t alloc_blks;
- 	struct inode *inode;
-+	struct kstat stat;
- 	int rc;
- 
- 	if (!(fp->daccess & FILE_WRITE_DATA_LE))
- 		return -EACCES;
- 
-+	rc = vfs_getattr(&fp->filp->f_path, &stat, STATX_BASIC_STATS,
-+			 AT_STATX_SYNC_AS_STAT);
-+	if (rc)
-+		return rc;
-+
- 	alloc_blks = (le64_to_cpu(file_alloc_info->AllocationSize) + 511) >> 9;
- 	inode = file_inode(fp->filp);
- 
--	if (alloc_blks > inode->i_blocks) {
-+	if (alloc_blks > stat.blocks) {
- 		smb_break_all_levII_oplock(work, fp, 1);
- 		rc = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0,
- 				   alloc_blks * 512);
-@@ -5825,7 +5831,7 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 			pr_err("vfs_fallocate is failed : %d\n", rc);
- 			return rc;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 8f37373fd3334..3216f786908fb 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -230,7 +230,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
+ 		spin_lock(&ses->iface_lock);
+ 		if (!ses->iface_count) {
+ 			spin_unlock(&ses->iface_lock);
+-			cifs_dbg(VFS, "server %s does not advertise interfaces\n",
++			cifs_dbg(ONCE, "server %s does not advertise interfaces\n",
+ 				      ses->server->hostname);
+ 			break;
  		}
--	} else if (alloc_blks < inode->i_blocks) {
-+	} else if (alloc_blks < stat.blocks) {
- 		loff_t size;
+@@ -396,7 +396,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 	spin_lock(&ses->iface_lock);
+ 	if (!ses->iface_count) {
+ 		spin_unlock(&ses->iface_lock);
+-		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
++		cifs_dbg(ONCE, "server %s does not advertise interfaces\n", ses->server->hostname);
+ 		return;
+ 	}
  
- 		/*
 -- 
 2.43.0
 
