@@ -1,42 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903F517B501;
-	Wed, 27 Mar 2024 12:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB7C184108;
+	Wed, 27 Mar 2024 12:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542261; cv=none; b=gHd6WDkNMzruOVcu1AQP+w1QEfmg8dx790V+6TCL5CIYcmNNSDnCljBx3W9T8ENx6gwDNGrX/WelFLw+B7nIWBby4mYxPSsok7U0Yavd/f5JFJL+Ory3qqmYx0FjeaLnbBHDrC/mvh4inQzLNurQuQGp3oM7v4a+JmrQj1jgkmA=
+	t=1711542325; cv=none; b=AK7RA1Aa9t5O46vSRFZMX/wvCK4wGSaR18iRRyhF6CdBZPxQQb+OFstp4aZN1OWS208B1r4+z/F+JMLbWPqbfa43qP5cEjq0gh+RoqBqsFkM5MSJpLbihmxaIf5HwZb2ScRFU1k3Fmqrqt39x/VAZPfhmTLUTzKm44xOOcmAzBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542261; c=relaxed/simple;
-	bh=TFwScC8lPWBvLGeSG1RgGYulOSwTyzn+0lEOPbziDOs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Vzq/35eppR6GdAMXVA9aaiGGYNIqwIXFzqbf6HDT4oJrr+Qxdc8TGnmpCcic28TblQimzv9pPF2e822U/GeLGBXCkCLDKLxnMYrSQk62XdS/QgZBQbeJWUl+VyKiQWTUzM0sKAIFidx5mS/iRP9Jm7gv4dRigOb0ENZtkjGhfZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6YtDHo/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711542325; c=relaxed/simple;
+	bh=mJZYKMtrrTuEV8WhZd4pepdH5Oqrz6U/ELgMWFf3jmg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UY7wAxIlzzGXDEqPvL3zTNWZ2PMVDqdr8z+x5y6IJKi9beQ4Z60XLEYLiAZBmcvsALQfZKGf17eXsZklO1rWtD8eIE2y785bdYdrWgI+FIIGysBmrLA9nlgI5/gxRss+XwIBNBMLYPzwqAUrRMLkbhgzkYG6lXCFd1At/5ypKDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RpPFp3jA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6YtDHo/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F98DC433F1;
-	Wed, 27 Mar 2024 12:24:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RpPFp3jA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87147C433C7;
+	Wed, 27 Mar 2024 12:25:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542261;
-	bh=TFwScC8lPWBvLGeSG1RgGYulOSwTyzn+0lEOPbziDOs=;
+	s=k20201202; t=1711542325;
+	bh=mJZYKMtrrTuEV8WhZd4pepdH5Oqrz6U/ELgMWFf3jmg=;
 	h=From:To:Cc:Subject:Date:From;
-	b=U6YtDHo/dK1LzZbvbY84JcWIU95y51JzTR53emC+xdbhI2akQcn6r7MrPvPCOhmc5
-	 X560KPfMUyTqo4z9kMOGr1L6RsyuMgM55eOro+s9qndEUyVr6QZlEfIBQ1kgURXy+M
-	 pZhDCGyNynu5lNAVVJUzdzBj+46IW6x1CblVPLsMXZGdCwtgHSGBpYNXFErONKcJF9
-	 UPX1GnS+gEFvwZf6GlGWWiG3+jzbm+4ERSAf7bhdqWSUQsomTUqHkM+bP9zUBI3EIS
-	 G70nI+wTUDgcLgAxmaCWGCj3hW9RVoLC8Xsx0JJGvwQBkzSFEfFISxbs2ZhV7Ukr9+
-	 U8jO9Or4iz2uA==
+	b=RpPFp3jAh5Min6xIfkQvs+2WPzaIuibR7WVmd4gn/SLz9Z3yYj9/Ii1VTxOTUJ95F
+	 nJiBp6+da4E4B8VGuvB7wipyEK2iHaW9ZFl2IeKZx20guKyn0v3KhrcPVhtE58zo9m
+	 dsO/oMeM4H4d1p072WceRh4qTzvUeFjVa7KWDJjgsqRP+VQ9ZLfn9DrhRPWv78YZkL
+	 +Wwb5XZgNG+bdxrrHN23JEeJPVGarf2iGH5luiVu5VnqcsU7gPwMBuu1+HEsF6uEg7
+	 W+r2RitbZiZB7nh64TjDzedhvLY4VQl2Bd46nSAQFhsEo2BBA6tvFGN7FujCa/Bd6o
+	 dXuOFYMtCeLRg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	sprasad@microsoft.com
-Cc: =?UTF-8?q?Jan=20=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Steve French <stfrench@microsoft.com>,
+	ekorenevsky@astralinux.ru
+Cc: Steve French <stfrench@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "cifs: make sure server interfaces are requested only for SMB3+" failed to apply to 5.4-stable tree
-Date: Wed, 27 Mar 2024 08:24:18 -0400
-Message-ID: <20240327122419.2839315-1-sashal@kernel.org>
+Subject: FAILED: Patch "cifs: open_cached_dir(): add FILE_READ_EA to desired access" failed to apply to 4.19-stable tree
+Date: Wed, 27 Mar 2024 08:25:23 -0400
+Message-ID: <20240327122523.2840193-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -46,10 +44,9 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: ignore
 X-stable: review
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The patch below does not apply to the 5.4-stable tree.
+The patch below does not apply to the 4.19-stable tree.
 If someone wants it applied there, or to any other stable or longterm
 tree, then please email the backport, including the original git commit
 id to <stable@vger.kernel.org>.
@@ -59,114 +56,39 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 13c0a74747cb7fdadf58c5d3a7d52cfca2d51736 Mon Sep 17 00:00:00 2001
-From: Shyam Prasad N <sprasad@microsoft.com>
-Date: Wed, 13 Mar 2024 10:40:41 +0000
-Subject: [PATCH] cifs: make sure server interfaces are requested only for
- SMB3+
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From f1b8224b4e6ed59e7e6f5c548673c67410098d8d Mon Sep 17 00:00:00 2001
+From: Eugene Korenevsky <ekorenevsky@astralinux.ru>
+Date: Fri, 1 Mar 2024 17:53:44 +0300
+Subject: [PATCH] cifs: open_cached_dir(): add FILE_READ_EA to desired access
 
-Some code paths for querying server interfaces make a false
-assumption that it will only get called for SMB3+. Since this
-function now can get called from a generic code paths, the correct
-thing to do is to have specific handler for this functionality
-per SMB dialect, and call this handler.
+Since smb2_query_eas() reads EA and uses cached directory,
+open_cached_dir() should request FILE_READ_EA access.
 
-This change adds such a handler and implements this handler only
-for SMB 3.0 and 3.1.1.
+Otherwise listxattr() and getxattr() will fail with EACCES
+(0xc0000022 STATUS_ACCESS_DENIED SMB status).
 
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=218543
 Cc: stable@vger.kernel.org
-Cc: Jan Čermák <sairon@sairon.cz>
-Reported-by: Paulo Alcantara <pc@manguebit.com>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/cifsglob.h | 3 +++
- fs/smb/client/connect.c  | 6 +++++-
- fs/smb/client/smb2ops.c  | 2 ++
- fs/smb/client/smb2pdu.c  | 5 +++--
- 4 files changed, 13 insertions(+), 3 deletions(-)
+ fs/smb/client/cached_dir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 8be62ed053a25..3da625d532359 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -355,6 +355,9 @@ struct smb_version_operations {
- 	/* informational QFS call */
- 	void (*qfs_tcon)(const unsigned int, struct cifs_tcon *,
- 			 struct cifs_sb_info *);
-+	/* query for server interfaces */
-+	int (*query_server_interfaces)(const unsigned int, struct cifs_tcon *,
-+				       bool);
- 	/* check if a path is accessible or not */
- 	int (*is_path_accessible)(const unsigned int, struct cifs_tcon *,
- 				  struct cifs_sb_info *, const char *);
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 86ae578904a26..4cbb79418e506 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -123,12 +123,16 @@ static void smb2_query_server_interfaces(struct work_struct *work)
- 	struct cifs_tcon *tcon = container_of(work,
- 					struct cifs_tcon,
- 					query_interfaces.work);
-+	struct TCP_Server_Info *server = tcon->ses->server;
- 
- 	/*
- 	 * query server network interfaces, in case they change
- 	 */
-+	if (!server->ops->query_server_interfaces)
-+		return;
-+
- 	xid = get_xid();
--	rc = SMB3_request_interfaces(xid, tcon, false);
-+	rc = server->ops->query_server_interfaces(xid, tcon, false);
- 	free_xid(xid);
- 
- 	if (rc) {
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 6ee22d0dbc006..2ed456948f34c 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -5290,6 +5290,7 @@ struct smb_version_operations smb30_operations = {
- 	.tree_connect = SMB2_tcon,
- 	.tree_disconnect = SMB2_tdis,
- 	.qfs_tcon = smb3_qfs_tcon,
-+	.query_server_interfaces = SMB3_request_interfaces,
- 	.is_path_accessible = smb2_is_path_accessible,
- 	.can_echo = smb2_can_echo,
- 	.echo = SMB2_echo,
-@@ -5405,6 +5406,7 @@ struct smb_version_operations smb311_operations = {
- 	.tree_connect = SMB2_tcon,
- 	.tree_disconnect = SMB2_tdis,
- 	.qfs_tcon = smb3_qfs_tcon,
-+	.query_server_interfaces = SMB3_request_interfaces,
- 	.is_path_accessible = smb2_is_path_accessible,
- 	.can_echo = smb2_can_echo,
- 	.echo = SMB2_echo,
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index e5e6b14f8cae3..3ea688558e6c9 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -409,14 +409,15 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	spin_unlock(&ses->ses_lock);
- 
- 	if (!rc &&
--	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
-+	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
-+	    server->ops->query_server_interfaces) {
- 		mutex_unlock(&ses->session_mutex);
- 
- 		/*
- 		 * query server network interfaces, in case they change
- 		 */
- 		xid = get_xid();
--		rc = SMB3_request_interfaces(xid, tcon, false);
-+		rc = server->ops->query_server_interfaces(xid, tcon, false);
- 		free_xid(xid);
- 
- 		if (rc == -EOPNOTSUPP && ses->chan_count > 1) {
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 3de5047a7ff98..a0017724d5239 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -239,7 +239,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 		.tcon = tcon,
+ 		.path = path,
+ 		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE),
+-		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES,
++		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES |
++				   FILE_READ_EA,
+ 		.disposition = FILE_OPEN,
+ 		.fid = pfid,
+ 		.replay = !!(retries),
 -- 
 2.43.0
 
