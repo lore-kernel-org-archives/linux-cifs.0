@@ -1,40 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB49152166;
-	Wed, 27 Mar 2024 12:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A3015219D;
+	Wed, 27 Mar 2024 12:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711541684; cv=none; b=hdVfLhxcw7wKjXNiTkGd2i1+jAd8RHfeCdKy96S4gJgMyVsN979qrpfbXvMWSRC/aaYGigdUAoYt+LTYFEVMGNTs4ynyAoWVXjI1WfbSSrUKdUXF+cDfHipwDINwkHP9SnEuu56szXjoK1vI5pEsAR+QKOhxMAC2snkt/HqhUaQ=
+	t=1711541690; cv=none; b=pehEFnCewzPLdP3feVLGXQliVrywsW1f2NnVU3pnc8TV9g/UZgw4mBNRl/FoamdZi8zZz+fw5Dej2KiEVi/H49VsdeVah81gDAC0y1CVEDTDPazdQxZ7QB7gd6fuAvA0tQjbvor+Nrkx4OXHmN0gNvPCXdH3Fh1ga4cubkjJlY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711541684; c=relaxed/simple;
-	bh=wuTit2sxYCEdnSs212cpa9uLxc70sSmaZGKXufWzt9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nYeHogQ+2+d3iyzMjxXpt40E9DyAyDB8+6ofORQ8ZNlqG1qSt8P5OlEkl90P8gI55dqCZ6wg5c5iAJEVlQq+XIoT5FHk9XM2HrgS7n4vvuv1NAM7n6fiEF93iCvjvvLuzO3Rye5bKIjeLAi88umKBvODG0kYNeX0E7oxcvVNtcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kk5R+f2K; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711541690; c=relaxed/simple;
+	bh=0sPBcFnE5vZkf0Qhj5W4AyG/7WAm/5udhCmy+iZOIFI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nex9w0hC2jIIwg1C8uFIX0v904detCfF+64TCTW3IpXTXbvjdUiN9xjdF5aKQ9W5vmy/G5IpuThM8SO0PV140fkg77ueEc2Vgq3ud8FU8S2hb22AScoYKo3JFS8oEf/nlJShdmnuOocYnykkFZCGir/Av7U5KLvOqpTDVbYnz5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFdyqitj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kk5R+f2K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F390C433C7;
-	Wed, 27 Mar 2024 12:14:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFdyqitj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60108C433F1;
+	Wed, 27 Mar 2024 12:14:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711541683;
-	bh=wuTit2sxYCEdnSs212cpa9uLxc70sSmaZGKXufWzt9Q=;
+	s=k20201202; t=1711541690;
+	bh=0sPBcFnE5vZkf0Qhj5W4AyG/7WAm/5udhCmy+iZOIFI=;
 	h=From:To:Cc:Subject:Date:From;
-	b=kk5R+f2Kfx8hy+5oZAKeH5B3+7Dd+uhdAyt2oR0ymUhxU8o+WfOaN8r6cb8zwqL9K
-	 jw8SVrtWHXVr5S7klPWM+k04NRjDdUU+rWWoZvO/qH+GuSFd/K8QxoZZzAVxl9S5is
-	 rEjGHnQWcKEacmvSs3+ZU8IafFy6coTXkDsaBHvIniupEosj5V83uCzonAGMYsOP49
-	 1bJcXYSi96lPsbrsYI30MmhrTqUzP2H0dMqpQ2VIoLGiYSkVzGTK+wUSsvEPnRPhom
-	 83HvHL6BzdbPoYPqRpTAFJcNcTCAPKLslwijl5PVTCD7iTsItmdHn9lkyYIhdlW77M
-	 BmfRzJgCQxM4A==
+	b=fFdyqitjzL9saixBx59BdlSJc4/vzST/IDkdJ0AZTH84osWGGx5YVqoolDlIxywl3
+	 ejU2vbmV8Cfz5dz2nX06HXaSn7oFqsq2ILN4qL5hYlejoDIi99FINEcM0Qq0BdLbpp
+	 JbbYigXh7OiprksMZT9vTIE0IzbaVdPqnejh+XO8qdTcLZywsHWXOiUPZSlDdtHA6S
+	 wqZObfNZOjxSnK5yKzz6ylf1hO1w12Uai6l5gKCOLPXkPe2xoBuL4O+XkfdzmP5pQ1
+	 wPd3lDfoevv3H2jcqtdHv5yAgz7atDq8xlXJntyw7O0OeyU3S4v9sOjlXgc3VQGqgl
+	 1C06dc3tgJTXg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	ekorenevsky@astralinux.ru
-Cc: Steve French <stfrench@microsoft.com>,
+	bharathsm@microsoft.com
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
+	Steve French <stfrench@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "cifs: open_cached_dir(): add FILE_READ_EA to desired access" failed to apply to 5.15-stable tree
-Date: Wed, 27 Mar 2024 08:14:41 -0400
-Message-ID: <20240327121442.2831301-1-sashal@kernel.org>
+Subject: FAILED: Patch "cifs: prevent updating file size from server if we have a read/write lease" failed to apply to 5.15-stable tree
+Date: Wed, 27 Mar 2024 08:14:47 -0400
+Message-ID: <20240327121448.2831375-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -56,39 +57,167 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From f1b8224b4e6ed59e7e6f5c548673c67410098d8d Mon Sep 17 00:00:00 2001
-From: Eugene Korenevsky <ekorenevsky@astralinux.ru>
-Date: Fri, 1 Mar 2024 17:53:44 +0300
-Subject: [PATCH] cifs: open_cached_dir(): add FILE_READ_EA to desired access
+From e4b61f3b1c67f5068590965f64ea6e8d5d5bd961 Mon Sep 17 00:00:00 2001
+From: Bharath SM <bharathsm@microsoft.com>
+Date: Thu, 29 Feb 2024 23:09:52 +0530
+Subject: [PATCH] cifs: prevent updating file size from server if we have a
+ read/write lease
 
-Since smb2_query_eas() reads EA and uses cached directory,
-open_cached_dir() should request FILE_READ_EA access.
+In cases of large directories, the readdir operation may span multiple
+round trips to retrieve contents. This introduces a potential race
+condition in case of concurrent write and readdir operations. If the
+readdir operation initiates before a write has been processed by the
+server, it may update the file size attribute to an older value.
+Address this issue by avoiding file size updates from readdir when we
+have read/write lease.
 
-Otherwise listxattr() and getxattr() will fail with EACCES
-(0xc0000022 STATUS_ACCESS_DENIED SMB status).
+Scenario:
+1) process1: open dir xyz
+2) process1: readdir instance 1 on xyz
+3) process2: create file.txt for write
+4) process2: write x bytes to file.txt
+5) process2: close file.txt
+6) process2: open file.txt for read
+7) process1: readdir 2 - overwrites file.txt inode size to 0
+8) process2: read contents of file.txt - bug, short read with 0 bytes
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=218543
 Cc: stable@vger.kernel.org
-Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsproto.h |  6 ++++--
+ fs/smb/client/file.c      |  8 +++++---
+ fs/smb/client/inode.c     | 13 +++++++------
+ fs/smb/client/readdir.c   |  2 +-
+ 4 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 3de5047a7ff98..a0017724d5239 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -239,7 +239,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		.tcon = tcon,
- 		.path = path,
- 		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE),
--		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES,
-+		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES |
-+				   FILE_READ_EA,
- 		.disposition = FILE_OPEN,
- 		.fid = pfid,
- 		.replay = !!(retries),
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index a841bf4967fa4..58cfbd450a55e 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -144,7 +144,8 @@ extern int cifs_reconnect(struct TCP_Server_Info *server,
+ extern int checkSMB(char *buf, unsigned int len, struct TCP_Server_Info *srvr);
+ extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
+ extern bool backup_cred(struct cifs_sb_info *);
+-extern bool is_size_safe_to_change(struct cifsInodeInfo *, __u64 eof);
++extern bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 eof,
++				   bool from_readdir);
+ extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+ 			    unsigned int bytes_written);
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, int);
+@@ -201,7 +202,8 @@ extern void cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
+ 				     struct cifs_sb_info *cifs_sb);
+ extern void cifs_dir_info_to_fattr(struct cifs_fattr *, FILE_DIRECTORY_INFO *,
+ 					struct cifs_sb_info *);
+-extern int cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr);
++extern int cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
++			       bool from_readdir);
+ extern struct inode *cifs_iget(struct super_block *sb,
+ 			       struct cifs_fattr *fattr);
+ 
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index f391c9b803d84..9cff5f7dc062e 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -329,7 +329,7 @@ int cifs_posix_open(const char *full_path, struct inode **pinode,
+ 		}
+ 	} else {
+ 		cifs_revalidate_mapping(*pinode);
+-		rc = cifs_fattr_to_inode(*pinode, &fattr);
++		rc = cifs_fattr_to_inode(*pinode, &fattr, false);
+ 	}
+ 
+ posix_open_ret:
+@@ -4738,12 +4738,14 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
+    refreshing the inode only on increases in the file size
+    but this is tricky to do without racing with writebehind
+    page caching in the current Linux kernel design */
+-bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file)
++bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file,
++			    bool from_readdir)
+ {
+ 	if (!cifsInode)
+ 		return true;
+ 
+-	if (is_inode_writable(cifsInode)) {
++	if (is_inode_writable(cifsInode) ||
++		((cifsInode->oplock & CIFS_CACHE_RW_FLG) != 0 && from_readdir)) {
+ 		/* This inode is open for write at least once */
+ 		struct cifs_sb_info *cifs_sb;
+ 
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index d02f8ba29cb5b..7f28edf4b20f3 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -147,7 +147,8 @@ cifs_nlink_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+ 
+ /* populate an inode with info from a cifs_fattr struct */
+ int
+-cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
++cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
++		    bool from_readdir)
+ {
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+@@ -199,7 +200,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+ 	 * Can't safely change the file size here if the client is writing to
+ 	 * it due to potential races.
+ 	 */
+-	if (is_size_safe_to_change(cifs_i, fattr->cf_eof)) {
++	if (is_size_safe_to_change(cifs_i, fattr->cf_eof, from_readdir)) {
+ 		i_size_write(inode, fattr->cf_eof);
+ 
+ 		/*
+@@ -368,7 +369,7 @@ static int update_inode_info(struct super_block *sb,
+ 		CIFS_I(*inode)->time = 0; /* force reval */
+ 		return -ESTALE;
+ 	}
+-	return cifs_fattr_to_inode(*inode, fattr);
++	return cifs_fattr_to_inode(*inode, fattr, false);
+ }
+ 
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+@@ -403,7 +404,7 @@ cifs_get_file_info_unix(struct file *filp)
+ 	} else
+ 		goto cifs_gfiunix_out;
+ 
+-	rc = cifs_fattr_to_inode(inode, &fattr);
++	rc = cifs_fattr_to_inode(inode, &fattr, false);
+ 
+ cifs_gfiunix_out:
+ 	free_xid(xid);
+@@ -934,7 +935,7 @@ cifs_get_file_info(struct file *filp)
+ 	fattr.cf_uniqueid = CIFS_I(inode)->uniqueid;
+ 	fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 	/* if filetype is different, return error */
+-	rc = cifs_fattr_to_inode(inode, &fattr);
++	rc = cifs_fattr_to_inode(inode, &fattr, false);
+ cgfi_exit:
+ 	cifs_free_open_info(&data);
+ 	free_xid(xid);
+@@ -1491,7 +1492,7 @@ cifs_iget(struct super_block *sb, struct cifs_fattr *fattr)
+ 		}
+ 
+ 		/* can't fail - see cifs_find_inode() */
+-		cifs_fattr_to_inode(inode, fattr);
++		cifs_fattr_to_inode(inode, fattr, false);
+ 		if (sb->s_flags & SB_NOATIME)
+ 			inode->i_flags |= S_NOATIME | S_NOCMTIME;
+ 		if (inode->i_state & I_NEW) {
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index b520eea7bfce8..132ae7d884a97 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -148,7 +148,7 @@ cifs_prime_dcache(struct dentry *parent, struct qstr *name,
+ 						rc = -ESTALE;
+ 					}
+ 				}
+-				if (!rc && !cifs_fattr_to_inode(inode, fattr)) {
++				if (!rc && !cifs_fattr_to_inode(inode, fattr, true)) {
+ 					dput(dentry);
+ 					return;
+ 				}
 -- 
 2.43.0
 
