@@ -1,113 +1,248 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1677FBC8
-	for <linux-cifs@vger.kernel.org>; Thu, 28 Mar 2024 13:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66879225D0
+	for <linux-cifs@vger.kernel.org>; Thu, 28 Mar 2024 16:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711631041; cv=none; b=R2JhWGR011mMzIYOLjZjT5BkmrmaBEvVOCDQr7fpw+6S1iDh0SihQ/CZAf0h/UnI6QsiCud0QDXoQm/Ki4PZo4t08n3mk8PAuGrzwkWrhpH1rAZoxwTUkYBeGkHL8OxdXMjo/W85E8H1JEtJ4JhtmpEyogfPu6dD7e/98iA9RCk=
+	t=1711643683; cv=none; b=K/a/qRS2ggdun0An8MxXioqKdsdHL2tJWxiwNoogk1jI+KKuTG89UfdJwoY4Xxw79X/oFb1CiZdUXq/SJEWZ+4EfK9LAnGV6yR5rvMZMIppGk/P6E6duwkfKhUssDRbdCR51K6dSWMBQe7Lf+vcY1ZGXrhSM69TQWeZsKW1SgTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711631041; c=relaxed/simple;
-	bh=0V+RuvRGf3jpxS1g7uK7AxOydCxdLV5z/H6WKNFKKl8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VMUDroy4e+NwLJjeUskEv9iX3kmvGcincipBXIcYFUujd9OeiIwUTx+ToSZtWOrwAj7S5RGMKT+brMV4GDCOGh2f5kehULWHcMya6OllHNNOvH8tUWTlsFcXZs0fXu9mohVrtbl0iaS9REB6jezCLz3RlOlhawc98yKNyAY08yU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GpCbYrLk; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1711643683; c=relaxed/simple;
+	bh=FxowD6lDojXc8FSJtt52Ai9DVogDp93KiS0BtjsLW1Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gBHX+e2/rfeptGUXCDaRlF6tm/IyuwU31++A3J/Gwfeg7EU1qtTmpfr/3kCZ2mjpzvBMUO6It8WTNqXjRGxRXrNKpCiql3XPLdzdOG1WCiuyRe8cheOVS4jwOPuW5JrV4QGioILDmFcFdiKAgNqeIVO0yhrZl0LOMdVsDYB0D9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iV7WMMps; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GpCbYrLk"
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a470320194so452565eaf.3
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Mar 2024 06:03:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1711631039; x=1712235839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3XaX3hd7hmwSRaUGNwS3s92AS3tUn8V75RR5Xnstjxs=;
-        b=GpCbYrLkOZz0PqvGumjdTSNlcachVwHWVgD+rWFYNZPKY1e0X3o4bL3imK+oDopbwP
-         UgoQ7TqQ//Kt5fj0m2NqAOnnnB1qavj/eoqsrcsdY4Dx6HUYhsp3WiL8Qal+SzR/cXSZ
-         r+Xi8Sl9ZHIBzGUrEAH9Fze1Z0LDT0JISegoQmJHSFMCMREAXA1NPRYHLYEfbBcoMnIl
-         3izzn3pC5+kkw+bUds40yKL+iLAN9dtHoiPE86Pv2XbcBHCrHvG80MUikNDqxzVwsb34
-         YTitKbnQK4SyWDhDoO+GVxwIBKYZ2U9RMGUCB1NdFRJ/xAb1t7CIndZdNK5CkRZEeMAN
-         ZgQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711631039; x=1712235839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3XaX3hd7hmwSRaUGNwS3s92AS3tUn8V75RR5Xnstjxs=;
-        b=fD1KoHKlTfe8xfIzqtSd15fqjuGwcmRNM5Ndrqhqq71Dfm10YUDHTlDtYLqmBqZAjz
-         u4v15d1Baz2o0i9d8KNH5kFTEv8lBIxSLADAIz9sUjLlkgzUKZuOVKWdJYHuzulQ21nX
-         A/0GD+VinfdXKvPTDDLHX2Datsnd/7gswcW8gdyoEzOMZ9O8zFxtKmjhkQ9UgWo/i9Mt
-         Eqkqigkb/JpRcMZA32dGgJw0LWnKGYSbQy5bzrtbIgsxdE+xNoLkXLwjXlTl2S4+7cEA
-         WUIItDXrvbMVxUjKbFuBU9fuFA44Hm3L+mVRvoCaAmB0ubhk85jQ66Qzyk235AvpSD/5
-         aG3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXDUuqrAdtCA+q/d+ur8XHKDTGURgUEPzOpcrmdKHS8mMogKPCa6T6axG0EcgSShM4qqJJtPPddChHzhKLe7b6ACpEuLL9YxVQ31A==
-X-Gm-Message-State: AOJu0YwMa56fVswvSpEpuv7Mzot9NMeuoR4eTfcikJ5rglXI6qflv+oy
-	uhjjwgMQKtLteXJYb3wXlRsF2zMc9FLEBll9AIWOBRbXbcnU2ZXGo7FwaGwkFUiSNYjQbumxvcl
-	0yu3JUdOvyOhqsTYaYxx75ccgZujJari7luj6
-X-Google-Smtp-Source: AGHT+IGAwrK5RVxI1FWdhaGdJk53oz1JIu4utEj/2i2Z5bPasaIK4TuD1PGNGJfhSHVlWdkONFw134Hc6Aj0/tfXdLo=
-X-Received: by 2002:a05:6359:3187:b0:183:6350:bfb7 with SMTP id
- ri7-20020a056359318700b001836350bfb7mr464536rwb.7.1711631038700; Thu, 28 Mar
- 2024 06:03:58 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iV7WMMps"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711643679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ffhOAbislEtDui9sz/UMzHfpFDxhB+Cw1cNj4X99Z0A=;
+	b=iV7WMMpshcKzMlSPsuEjVxcVvXBFDI7LKV1O19Z2GoHa9hW8CSxYrJ53fusdjsToCwctsP
+	25MZ/6fWtBEWswPg76sr3EvjaFqpwC+6SENhVVKa9KBBCqxQPoU/T8lmazoBegX3lZ53p4
+	ZZYG+o8RdafLmoxFQhfjvWaHgGjjRkg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-452-2dgsIfgmMnmMsc1zau3KSw-1; Thu, 28 Mar 2024 12:34:36 -0400
+X-MC-Unique: 2dgsIfgmMnmMsc1zau3KSw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1B630800262;
+	Thu, 28 Mar 2024 16:34:35 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D4330492BC6;
+	Thu, 28 Mar 2024 16:34:31 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/26] netfs, afs, 9p, cifs: Rework netfs to use ->writepages() to copy to cache
+Date: Thu, 28 Mar 2024 16:33:52 +0000
+Message-ID: <20240328163424.2781320-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com>
- <20240324054636.GT538574@ZenIV> <3441a4a1140944f5b418b70f557bca72@huawei.com>
- <20240325-beugen-kraftvoll-1390fd52d59c@brauner> <cb267d1c7988460094dbe19d1e7bcece@huawei.com>
- <20240326-halbkreis-wegstecken-8d5886e54d28@brauner> <4a0b28ba-be57-4443-b91e-1a744a0feabf@huaweicloud.com>
- <20240328-raushalten-krass-cb040068bde9@brauner> <4ad908dc-ddc5-492e-8ed4-d304156b5810@huaweicloud.com>
- <20240328-verfrachten-geebnet-19181fb9ad65@brauner>
-In-Reply-To: <20240328-verfrachten-geebnet-19181fb9ad65@brauner>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 28 Mar 2024 09:03:46 -0400
-Message-ID: <CAHC9VhQ_w6uaOAKCj6mx7n7SNjk4d7vcUb3Bd6Wybx_1dA=ttQ@mail.gmail.com>
-Subject: Re: kernel crash in mknod
-To: Roberto Sassu <roberto.sassu@huaweicloud.com>, Christian Brauner <brauner@kernel.org>
-Cc: Roberto Sassu <roberto.sassu@huawei.com>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Steve French <smfrench@gmail.com>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Christian Brauner <christian@brauner.io>, 
-	Mimi Zohar <zohar@linux.ibm.com>, 
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>, 
-	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Thu, Mar 28, 2024 at 8:07=E2=80=AFAM Christian Brauner <brauner@kernel.o=
-rg> wrote:
-> On Thu, Mar 28, 2024 at 01:24:25PM +0200, Roberto Sassu wrote:
-> > Also, consider that the pre hook security_path_mknod() has the dentry a=
-s
-> > parameter. For symmetry, we could keep it in the post hook.
->
-> I think that's not that important.
+Hi Christian, Willy,
 
-It is important to me.  If you change security_path_post_mknod() to
-take an inode, please also change security_path_mknod() to take an
-inode ... actually, looking quickly at the code it looks like at least
-AppArmor and TOMOYO make use of the dentry and not just the associated
-inode.  I didn't dive deeply into either so perhaps they could be
-modified to use an inode instead, but that is a decision I would leave
-up to John and Tetsuo.  While Landlock does make use of the hook, it
-doesn't look like it cares about anything in the dentry.
+The primary purpose of these patches is to rework the netfslib writeback
+implementation such that pages read from the cache are written to the cache
+through ->writepages(), thereby allowing the fscache page flag to be
+retired.
 
-With that in mind, unless Christian has a strong argument as to why
-security_path_post_mknod() must change its parameter from a dentry to
-an inode, I would very much prefer to have both hooks continue to take
-a dentry, unless we all decide they can be safely changed to use an
-inode as a parameter.  As the previous IMA/EVM hook took a dentry for
-years, and Christian originally reviewed/OK'd the LSM hook, I'm
-guessing there is not any significant harm in continuing to pass a
-dentry, but if that isn't the case please say so ...
+The reworking also:
 
-Of course this doesn't change anything with respect to the necessary
-bugfix and/or the hook name/bikeshedding effort; no objections from me
-on either.
+ (1) builds on top of the new writeback_iter() infrastructure;
 
---=20
-paul-moore.com
+ (2) makes it possible to use vectored write RPCs as discontiguous streams
+     of pages can be accommodated;
+
+ (3) makes it easier to do simultaneous content crypto and stream division.
+
+ (4) provides support for retrying writes and re-dividing a stream;
+
+ (5) replaces the ->launder_folio() op, so that ->writepages() is used
+     instead;
+
+ (6) uses mempools to allocate the netfs_io_request and netfs_io_subrequest
+     structs to avoid allocation failure in the writeback path.
+
+Some code that uses the fscache page flag is retained for compatibility
+purposes with nfs and ceph.  The code is switched to using the synonymous
+private_2 label instead and marked with deprecation comments.  I have a
+separate set of patches that convert cifs to use this code.
+
+-~-
+
+In this new implementation, writeback_iter() is used to pump folios,
+progressively creating two parallel, but separate streams.  Either or both
+streams can contain gaps, and the subrequests in each stream can be of
+variable size, don't need to align with each other and don't need to align
+with the folios.  (Note that more streams can be added if we have multiple
+servers to duplicate data to).
+
+Indeed, subrequests can cross folio boundaries, may cover several folios or
+a folio may be spanned by multiple subrequests, e.g.:
+
+         +---+---+-----+-----+---+----------+
+Folios:  |   |   |     |     |   |          |
+         +---+---+-----+-----+---+----------+
+
+           +------+------+     +----+----+
+Upload:    |      |      |.....|    |    |
+           +------+------+     +----+----+
+
+         +------+------+------+------+------+
+Cache:   |      |      |      |      |      |
+         +------+------+------+------+------+
+
+Data that got read from the server that needs copying to the cache is
+stored in folios that are marked dirty and have folio->private set to a
+special value.
+
+The progressive subrequest construction permits the algorithm to be
+preparing both the next upload to the server and the next write to the
+cache whilst the previous ones are already in progress.  Throttling can be
+applied to control the rate of production of subrequests - and, in any
+case, we probably want to write them to the server in ascending order,
+particularly if the file will be extended.
+
+Content crypto can also be prepared at the same time as the subrequests and
+run asynchronously, with the prepped requests being stalled until the
+crypto catches up with them.  This might also be useful for transport
+crypto, but that happens at a lower layer, so probably would be harder to
+pull off.
+
+The algorithm is split into three parts:
+
+ (1) The issuer.  This walks through the data, packaging it up, encrypting
+     it and creating subrequests.  The part of this that generates
+     subrequests only deals with file positions and spans and so is usable
+     for DIO/unbuffered writes as well as buffered writes.
+
+ (2) The collector.  This asynchronously collects completed subrequests,
+     unlocks folios, frees crypto buffers and performs any retries.  This
+     runs in a work queue so that the issuer can return to the caller for
+     writeback (so that the VM can have its kswapd thread back) or async
+     writes.
+
+     Collection is slightly complex as the collector has to work out where
+     discontiguities happen in the folio list so that it doesn't try and
+     collect folios that weren't included in the write out.
+
+ (3) The retryer.  This pauses the issuer, waits for all outstanding
+     subrequests to complete and then goes through the failed subrequests
+     to reissue them.  This may involve reprepping them (with cifs, the
+     credits must be renegotiated and a subrequest may need splitting), and
+     doing RMW for content crypto if there's a conflicting change on the
+     server.
+
+David
+
+David Howells (26):
+  cifs: Fix duplicate fscache cookie warnings
+  9p: Clean up some kdoc and unused var warnings.
+  netfs: Update i_blocks when write committed to pagecache
+  netfs: Replace PG_fscache by setting folio->private and marking dirty
+  mm: Remove the PG_fscache alias for PG_private_2
+  netfs: Remove deprecated use of PG_private_2 as a second writeback
+    flag
+  netfs: Make netfs_io_request::subreq_counter an atomic_t
+  netfs: Use subreq_counter to allocate subreq debug_index values
+  mm: Provide a means of invalidation without using launder_folio
+  cifs: Use alternative invalidation to using launder_folio
+  9p: Use alternative invalidation to using launder_folio
+  afs: Use alternative invalidation to using launder_folio
+  netfs: Remove ->launder_folio() support
+  netfs: Use mempools for allocating requests and subrequests
+  mm: Export writeback_iter()
+  netfs: Switch to using unsigned long long rather than loff_t
+  netfs: Fix writethrough-mode error handling
+  netfs: Add some write-side stats and clean up some stat names
+  netfs: New writeback implementation
+  netfs, afs: Implement helpers for new write code
+  netfs, 9p: Implement helpers for new write code
+  netfs, cachefiles: Implement helpers for new write code
+  netfs: Cut over to using new writeback code
+  netfs: Remove the old writeback code
+  netfs: Miscellaneous tidy ups
+  netfs, afs: Use writeback retry to deal with alternate keys
+
+ fs/9p/vfs_addr.c             |  60 +--
+ fs/9p/vfs_inode_dotl.c       |   4 -
+ fs/afs/file.c                |   8 +-
+ fs/afs/internal.h            |   6 +-
+ fs/afs/validation.c          |   4 +-
+ fs/afs/write.c               | 187 ++++----
+ fs/cachefiles/io.c           |  75 +++-
+ fs/ceph/addr.c               |  24 +-
+ fs/ceph/inode.c              |   2 +
+ fs/netfs/Makefile            |   3 +-
+ fs/netfs/buffered_read.c     |  40 +-
+ fs/netfs/buffered_write.c    | 832 ++++-------------------------------
+ fs/netfs/direct_write.c      |  30 +-
+ fs/netfs/fscache_io.c        |  14 +-
+ fs/netfs/internal.h          |  55 ++-
+ fs/netfs/io.c                | 155 +------
+ fs/netfs/main.c              |  55 ++-
+ fs/netfs/misc.c              |  10 +-
+ fs/netfs/objects.c           |  81 +++-
+ fs/netfs/output.c            | 478 --------------------
+ fs/netfs/stats.c             |  17 +-
+ fs/netfs/write_collect.c     | 813 ++++++++++++++++++++++++++++++++++
+ fs/netfs/write_issue.c       | 673 ++++++++++++++++++++++++++++
+ fs/nfs/file.c                |   8 +-
+ fs/nfs/fscache.h             |   6 +-
+ fs/nfs/write.c               |   4 +-
+ fs/smb/client/cifsfs.h       |   1 -
+ fs/smb/client/file.c         | 136 +-----
+ fs/smb/client/fscache.c      |  16 +-
+ fs/smb/client/inode.c        |  27 +-
+ include/linux/fscache.h      |  22 +-
+ include/linux/netfs.h        | 196 +++++----
+ include/linux/pagemap.h      |   1 +
+ include/net/9p/client.h      |   2 +
+ include/trace/events/netfs.h | 249 ++++++++++-
+ mm/filemap.c                 |  52 ++-
+ mm/page-writeback.c          |   1 +
+ net/9p/Kconfig               |   1 +
+ net/9p/client.c              |  49 +++
+ net/9p/trans_fd.c            |   1 -
+ 40 files changed, 2492 insertions(+), 1906 deletions(-)
+ delete mode 100644 fs/netfs/output.c
+ create mode 100644 fs/netfs/write_collect.c
+ create mode 100644 fs/netfs/write_issue.c
+
