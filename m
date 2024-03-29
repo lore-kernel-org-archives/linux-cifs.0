@@ -1,127 +1,117 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184E113958C;
-	Fri, 29 Mar 2024 19:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FECD131E59
+	for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2024 19:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711740529; cv=none; b=gjT4lFL9nbbUZ8kGA2kMU6WYVimGVTPhaQcnKppJqmlhrfH1Pc6XR3xNSqW28TXHaWzdBQ7BHHiuQ2jdfJlQZqHbGYJ03XnprIKhr2QwJ7aekwU2EG8+x3mu+MpWyR4NaZ65ScITgCiCaZkWonfz26mVgV0GA6fNkMs0tWvNzqw=
+	t=1711742202; cv=none; b=CK4oY9JJ7bO0At9bXtSMXTbSyDlhU5VvWnCJbPOAzB7bRpwbVbIkc0poXLtEbixtIRIIsZ+HaYKem12ElUFfHGt8EB1isQX2x5fehAme+fNsvXv1VwHbhGixUjXlfU3gRS7CHkUm8Ys/fBMvL9UHe3sdW2qHFc0yJMNo32oGb+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711740529; c=relaxed/simple;
-	bh=EuthMF2I/CGCzxqbIW6CTFTU3WJ9GvZd0sLdLmgf2QM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:Mime-Version; b=RksE7e0w28O8cUNyFEDkqLWY3XTf70U4dAK/8cje+wovQOhIsqjcXvHJrAiWXrRjWVFEdncldifozBn1aIv/h912oWbmAyNszvdMZfENef3SMLLPxw76Mbo161L5fvoreeN9gRAX1OHEu2nwK/o4N20cUEPf7k/EJPbYaX+UlAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QpzfPYRT; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1711742202; c=relaxed/simple;
+	bh=kl3r4t6JEKPhRbXJ7T+YhSza5u8zPgVfF6ukpjkWUEs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j71Tnph1yCogpySi5wj7x7bHmW2mijLyG4D5ypTas+YIuimH166BYR8QoQwrQswRjZBT8jiIEQ51OkBWd1c50vELHfef0SU/Su7T6SLlQKrGhiUVOkGQ4u6e05GjDHxRbyrhK0vhlAcAVKHbI2djvawTPO7vyk5QXwH+IT3tJX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=CBUkVwZr; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QpzfPYRT"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42TJOar2005192;
-	Fri, 29 Mar 2024 19:28:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=RPm6LRHYSctRSd+zM9QadhHObB66yv7gwSwuVesuA4Q=;
- b=QpzfPYRTKVLh+Nmh2zSXApG3hcBPdLM/EAUwlCEcKdPZfpAKQh4rDmWySWa+O8IH9HOv
- IcW67No8lUENsqTIjGSF9Z1hvun1we3W0qrOAZWg/S8odqEuwmaKw4eQr2MAzjn+rj8e
- IpKoGhJ3m0CqrGlW8Wms6p5o0iaMOvUDc+orarW7exVzH3Hi19dsOeDyF6zehkKruCyK
- cBu9NopCa4gVQxEkBBXkL1H+hUp2oLL3CV2Q9UiA/yPnvl6uGNjeXm3TAivgUX+nD91X
- B4OPdtV79Vfo8UX3i45vIgq+fVetYGQV8ukp2me1ed/a6h2yDxBDCkVDctroSZgJ7usi 8g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x61peg9dy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Mar 2024 19:28:05 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42TJS4B2011403;
-	Fri, 29 Mar 2024 19:28:04 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x61peg9de-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Mar 2024 19:28:04 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42TGmPMS028620;
-	Fri, 29 Mar 2024 19:28:02 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3x2adpwyqr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Mar 2024 19:28:02 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42TJS0gu42205732
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 29 Mar 2024 19:28:02 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0890258074;
-	Fri, 29 Mar 2024 19:28:00 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DFAAA58070;
-	Fri, 29 Mar 2024 19:27:58 +0000 (GMT)
-Received: from li-5cd3c5cc-21f9-11b2-a85c-a4381f30c2f3.ibm.com (unknown [9.61.12.217])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 29 Mar 2024 19:27:58 +0000 (GMT)
-Message-ID: <1fe6813db395563be658a9b557931cf4db949100.camel@linux.ibm.com>
-Subject: Re: [PATCH 2/2] ima: evm: Rename *_post_path_mknod() to
- *_path_post_mknod()
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Roberto Sassu <roberto.sassu@huaweicloud.com>, dmitry.kasatkin@gmail.com,
-        eric.snowberg@oracle.com, jmorris@namei.org, serge@hallyn.com,
-        linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, viro@zeniv.linux.org.uk, pc@manguebit.com,
-        christian@brauner.io, Roberto
- Sassu <roberto.sassu@huawei.com>,
-        stable@vger.kernel.org, Sasha Levin
- <sashal@kernel.org>,
-        Greg KH <greg@kroah.com>
-Date: Fri, 29 Mar 2024 15:27:58 -0400
-In-Reply-To: <CAHC9VhS49p-rffsP4gW5C-C6kOqFfBWJhLrfB_zunp7adXe2cQ@mail.gmail.com>
-References: <20240329105609.1566309-1-roberto.sassu@huaweicloud.com>
-	 <20240329105609.1566309-2-roberto.sassu@huaweicloud.com>
-	 <e9181ec0bc07a23fc694d47b4ed49635d1039d89.camel@linux.ibm.com>
-	 <CAHC9VhS49p-rffsP4gW5C-C6kOqFfBWJhLrfB_zunp7adXe2cQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-23.el8_9) 
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="CBUkVwZr"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-60a0a1bd04eso25811917b3.1
+        for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2024 12:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1711742199; x=1712346999; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6A9jbG9CdaDPP1v6fWuwcIQF8qoPPnl16dGzz2qlT0=;
+        b=CBUkVwZr6fDdpu1CS2Uchp+UMiOJJcC/5ubPJMrFby2ed8H/XnyFZX6xxLglV1czkg
+         jFjntZNznVWUaqtNtoysFOUSv9fdkCv/c8qbMJE3ZDaHsq6bcs4zoWAkoHy9ueZYC+/U
+         8IOkRJhBh1jpe5TAhnmnY6ROVaMK/0gJI4Q0Hb67GGwE8HUJxdCcQ8HkURjV20ZZ/B62
+         CjDtw0YOQ/2z/R8VUhGf4XJ0REDeKDy11otkkCBXauFEf0MytH0KsL0G+MdbKF1xxh6K
+         vSC5m1bC2bPGo7inX9ggy6BxfA8jsn25P8erH6YKdXs1sO4s/7m2XjuxqEyQ7W/rqj2p
+         xL7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711742199; x=1712346999;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F6A9jbG9CdaDPP1v6fWuwcIQF8qoPPnl16dGzz2qlT0=;
+        b=siYV9WMM9Rvr57htByQhQu7PLvg6XqfPyeJUpb7OAj+82SRSXYEWVvul3K2QmB6+6X
+         6uTqTN7ll/qjnXocKwLeMvzSHmzjdIFNwv9334cGfcKg5p1VB/tboxqVGQ2TiXYplTf3
+         F6rklwU/UGKFLUpprj9E6hB9CE/1wTEewqestALPqSJmr3b6YEnf14a6Fkq2JGBpsuWc
+         CEf7Q0v1AnP3mN9NPTYliegB9l+RfLT3vBPEIp7Fk9Z3522CdX8N7QX3ZbwsJoQezFUo
+         364RnxX7he2Fby/novneccoatIhuJnfAcCvyOpe53/8LJs2Lc9tkV6AvAgTfYzqS6iEB
+         MWLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEYRMBjbjysQJhDjzezJPPNI2cXyNcS+4ZUoukaQmvq58rj5+llXkOYCaiWXy5/yyTnxgo4fnYD4nV4pLB0pclxLE1jfpnBVJeEA==
+X-Gm-Message-State: AOJu0YxECBCINVtKOB7IRHZtbd3xTimfUeIE/mZ86c0tQEz0XiUljzEW
+	PKqE+hwBCkiJPEVkTGOdBVihovur9II08nRJQ1iJ5s43meH9Y6srtIyJQ2n72ZzLQzHghyOPPIH
+	nM0yzti7ODeb3jWt5N/V1+FAUUNTpwmGDqDov
+X-Google-Smtp-Source: AGHT+IFxyLSFxbUR+gusm9UKIGf6amr40sayZYaOUaH9So5UHH1MFJgsFV6241YbxJom5p/x/nu93KVnKL1nyMhNoOY=
+X-Received: by 2002:a81:494b:0:b0:60c:bdb0:cd28 with SMTP id
+ w72-20020a81494b000000b0060cbdb0cd28mr3336888ywa.6.1711742199706; Fri, 29 Mar
+ 2024 12:56:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZNE1V6pIpT0OlP36vtct_NB6tvbA6TUj
-X-Proofpoint-ORIG-GUID: HCT9qPZXNSd6ke-dTfHCrx6LyGPgzf-y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-29_13,2024-03-28_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 mlxscore=0 adultscore=0 bulkscore=0
- clxscore=1011 malwarescore=0 mlxlogscore=940 spamscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2403290174
+MIME-Version: 1.0
+References: <20240329105609.1566309-1-roberto.sassu@huaweicloud.com>
+ <20240329105609.1566309-2-roberto.sassu@huaweicloud.com> <e9181ec0bc07a23fc694d47b4ed49635d1039d89.camel@linux.ibm.com>
+ <CAHC9VhS49p-rffsP4gW5C-C6kOqFfBWJhLrfB_zunp7adXe2cQ@mail.gmail.com> <1fe6813db395563be658a9b557931cf4db949100.camel@linux.ibm.com>
+In-Reply-To: <1fe6813db395563be658a9b557931cf4db949100.camel@linux.ibm.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 29 Mar 2024 15:56:28 -0400
+Message-ID: <CAHC9VhQaQErZyqe88wKvVwHKHDdgYB1SR11Z9iZC6VisgmiLpw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ima: evm: Rename *_post_path_mknod() to *_path_post_mknod()
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Roberto Sassu <roberto.sassu@huaweicloud.com>, dmitry.kasatkin@gmail.com, 
+	eric.snowberg@oracle.com, jmorris@namei.org, serge@hallyn.com, 
+	linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, viro@zeniv.linux.org.uk, pc@manguebit.com, 
+	christian@brauner.io, Roberto Sassu <roberto.sassu@huawei.com>, stable@vger.kernel.org, 
+	Sasha Levin <sashal@kernel.org>, Greg KH <greg@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[Cc: Sasha, Greg]
+On Fri, Mar 29, 2024 at 3:28=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.com> wr=
+ote:
+> On Fri, 2024-03-29 at 15:12 -0400, Paul Moore wrote:
+> > Another important thing to keep in mind about 'Fixes' tags, unless
+> > you've told the stable kernel folks to only take patches that you've
+> > explicitly marked for stable, they are likely going to attempt to
+> > backport anything with a 'Fixes' tag.
+>
+> How do we go about doing that?  Do we just send an email to stable?
 
-On Fri, 2024-03-29 at 15:12 -0400, Paul Moore wrote:
-> I'd take it one step further and remove both 'Fixes' tags.  A 'Fixes'
-> tag implies a flaw in the functionality of the code, this is just a
-> function rename.
+When I asked for a change to the stable policy, it was an email
+exchange with Greg where we setup what is essentially a shell glob to
+filter out the files to skip unless explicitly tagged:
 
-Totally agree.
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tre=
+e/ignore_list
 
-> Another important thing to keep in mind about 'Fixes' tags, unless
-> you've told the stable kernel folks to only take patches that you've
-> explicitly marked for stable, they are likely going to attempt to
-> backport anything with a 'Fixes' tag.
+> Is it disabled for security?
 
-How do we go about doing that?  Do we just send an email to stable?
+I asked for it to be disabled for the LSM layer, SELinux, and audit.
+I sent a note about it last year to the mailing list:
 
-Is it disabled for security?  I thought new functionality won't be backported. 
-Hopefully the changes for making IMA & EVM full fledged LSMs won't be
-automatically backported to stable.
+https://lore.kernel.org/linux-security-module/CAHC9VhQgzshziG2tvaQMd9jchAVM=
+u39M4Ym9RCComgbXj+WF0Q@mail.gmail.com
 
-thanks,
+> I thought new functionality won't be backported.
 
-Mimi
+One thing I noticed fairly consistently in the trees I maintained is
+that commits marked with a 'Fixes' tag were generally backported
+regardless of if they were marked for stable.
 
+> Hopefully the changes for making IMA & EVM full fledged LSMs won't be
+> automatically backported to stable.
+
+I haven't seen that happening, and I wouldn't expect it in the future
+as none of those patches were explicitly marked for stable or had a
+'Fixes' tag.
+
+--
+paul-moore.com
