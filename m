@@ -1,159 +1,454 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A91368
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2024 06:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711693858; cv=none; b=URxhXqBHedEoDdx5xI+Gb6F5khrIY9/GGMc39dsr09Xcj2sGYz6m6QEupmxogWcGssAb13yhl8ypqQW4g0RFPw7N/4Y9tpudbmeAR51P5T+P+6hw7QT8AaAutXs3sAXW/yNb2Kw9eVaxt5oGc7sct1Z6AAInFVYBL3713g+kkmU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711693858; c=relaxed/simple;
-	bh=yefb00dYkOw4HUkVqK7aKYEePX0QeskAqyXWT3nV72E=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ontrSkaTGpdLx+wEuFmBXF9PBck+QBnbfjIh8lJypEg7BX1C3g0CVM3NmGvT8rn1PYDGR/PpOdM5Jtxq6SIcAUYKh/+1okj5DZYf7UkhOsz13eGS4st+ca+b6/uwPrFbn1sFzai9NmKpRkZ8gN/a4htu0gIK7S4gHcnMl2FWocE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Un6dT+s2; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD60751C4C;
+	Fri, 29 Mar 2024 09:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711706348; cv=fail; b=qgsoHeaHjnUu0zXuhxkBpp/uC/NsbBXEBEXHgOhTt8+8T9QUNQKIxKftD6hxb4TW+WRCUwEC5FFPT081TKnJGUlkftpmEUPX8148nVmkX3Pa0ktvmZoWjjmqGOLPHURAUsn+uuvIfmNC8EY1Q6Mad7rRrwPoMKrInbjQYIZCSO4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711706348; c=relaxed/simple;
+	bh=uFeS/mJIXe4RjkQ/g4YstaSAoLb9JH9qeCiwuATBAn8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=honcoK2AMioJor5RceCvmvaLjKhawzvNP/p6tLLeTJG6bRchvB9pJScjTGKUgzWu6IpyZ+LaApbOH+Zko08FndmNuJXDgopgkAsiZ6HCyzO6RpBXi2Wh/HUYycJ3zeGJZQz05kN9bc6EMTobewbB6YQShFIlM5/p+UyDz0625u4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=K+5GaPC5; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Un6dT+s2"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-515c50dc2afso1802713e87.1
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Mar 2024 23:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711693854; x=1712298654; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=M99wBygfGsxC5Fq3pgTqPVft4uFNhZ02XjuB4v30Nes=;
-        b=Un6dT+s2so8b76afjxwSS5im8sTl+zkpKj1LllBIY/BUUBu6gL29bRD6p3aqFXAXeZ
-         a3VASP5Lr6JERqT9mWIEuI0O01J/C+R0G/s1oIBYlPGyYJsl6Ku+rLgvPDJzJJj8fmw2
-         UKTQywZvcb/ed8HrteAjpDUOWwion+IvAVjDAu0ho2KkGtMlHGVmvqwcYObnbwdIOxdv
-         8SiVnuE9ArnNuOFl6VPw6qpHNYkyN1BzFALtxI4x7cOMqOe/pOVixWDVepcFhqAnifpH
-         DpCQyJVLJyGl0ZfNfiqRAKtXye9qPd2K2gGVELM+TvAy0Ex5okYXiZJEAeQHWIVyx2ks
-         m4OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711693854; x=1712298654;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M99wBygfGsxC5Fq3pgTqPVft4uFNhZ02XjuB4v30Nes=;
-        b=lmPb0CQJFfiRjhr6FHGZVEdfNrZrhYnTN4PcrX0QwRBUYCPY+6GC/+8Bsa9iW1Gssw
-         AmQoNOfoxv+jLVnIhOSES5kQEl9/fzN0K6lKroHGvSHqFW5O1O3h34zGryHVrShjqnGG
-         U5AAExVyEUd/SrVpuTWgsIQgolpdXowG8FRt6GesRLJ6BaXUMEY+oUvMWDEzcgQPayPZ
-         +c2BReHTtSz4L73nVB7SBeFtKqYO7owxd77SdPelhkSpcfSKeUkTlgO9CNHJU8Vm6DOK
-         kSb2j3wY5KHeMzLk2chAmY2CUolgMmvaRqQwXe4AfkgIWXatKWKWo5QP1/XlxxyU1uMk
-         MI/Q==
-X-Gm-Message-State: AOJu0Yxrqexa9szFeKsNDTm5TG0aUwgfVWea8TJ1yTCyslnqVDJwrLpD
-	7vZk1/FXYUn4KrGjsOKV7dy+7aDgNxPxTQcwdmxdsV6ah6cF/yo+NZ+KwkAvcl0HVI7Che0q5Xg
-	CB/fBt4VhD5QIRJcFSmzZ0hdC9J8XxMaQrbE=
-X-Google-Smtp-Source: AGHT+IFCrzw2EW7Rs5fpfTVOyMybC5a4YPCWuZtNq14XUWpTYFqCr/K3jGnGZLkLlCQxU0RnuREZWHmYfDOYVfR+ezc=
-X-Received: by 2002:ac2:4642:0:b0:515:b764:9057 with SMTP id
- s2-20020ac24642000000b00515b7649057mr1020533lfo.35.1711693853910; Thu, 28 Mar
- 2024 23:30:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="K+5GaPC5"
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42T0QgVJ006367;
+	Fri, 29 Mar 2024 02:58:31 -0700
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3x5gm3hxbw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Mar 2024 02:58:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A5PXrjpJmoSQqQhIFJhUvjdjVUS9Qfi2vHAgJT4FjLNMSCFK9C1OkALiea3Toj3f1SVRWI9bmvG/bUdhNXr7M07hadEzZAxUMjU+qAkjD8X1vU8G0qrsO+MOpX+ie+frZLToQDao7CrC3/nwl6IWomoBP3pEc/1/EQzzfxpSKyJBYGgNIM5MOcq3l/R8ZBC8BOVVBwjR4qIJD/4GVjdi+D4FG1pg7QbIePYAwyVYuPuhwvDpUwcTyzEFD6eciuBlZxnFMtvvgsawn42gF2EgGZmjWW8fJBU/3n8Mo/prNM4MKZxPxuhRrVUPQCqapw6vmWMWDaO53sVDuAcA7JJIMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9JhUqML4zjS2Q2eHYvoKkfAMPHpawo6RXrDJhvddxNs=;
+ b=dcC49zfR/cbde0EWWkT39Ulb/VCgRXn4SOmH6Rq4Ms6b/njVjd+7PYzX0/mECcW0CbSDPu/d4OsQ8w9b4068AEgdtoDsbmRVICbvAm1QENQt2Oty/Oj8HA2gxk/oR+tW/KqRHl4zS57fbF6MrEFkki0Lt+8GsZkG/s8SfaRAgkh6tekTc2zI8p8ui/DUjTJKz6wu/6XRc9VJumD86gIn5qTYznEG49RHc1/HFrh8Tv1b3avDxMLEM41ri5+TJeIXlgTQzgiIAeypFysM/XZM4xctK3cEADDykQGZ1PjT2A9E2diMe/RW1kzyZfzoNHQf9cx9RSh/dum5upE2FiDBWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9JhUqML4zjS2Q2eHYvoKkfAMPHpawo6RXrDJhvddxNs=;
+ b=K+5GaPC5u+aRA5LaVfUFrhzQ3lHbe4HOESma9mdtkaI7oTLe63oCqOu0Q3P7y0bMRYgW2EZBWfgFP+EI1Z1t1v91L2NnP5Uihm+XLg5TzhmKRlLrDrSalF+3Yg8cAq1USx0t6ILMuEdXqLJlF3MNfSCzReBiaB/JuRDOWXeMCbM=
+Received: from SJ2PR18MB5635.namprd18.prod.outlook.com (2603:10b6:a03:55a::21)
+ by BY1PR18MB5350.namprd18.prod.outlook.com (2603:10b6:a03:524::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.32; Fri, 29 Mar
+ 2024 09:58:29 +0000
+Received: from SJ2PR18MB5635.namprd18.prod.outlook.com
+ ([fe80::317:8d8c:2585:2f58]) by SJ2PR18MB5635.namprd18.prod.outlook.com
+ ([fe80::317:8d8c:2585:2f58%3]) with mapi id 15.20.7409.031; Fri, 29 Mar 2024
+ 09:58:29 +0000
+From: Naveen Mamindlapalli <naveenm@marvell.com>
+To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
+CC: Jeff Layton <jlayton@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+        Christian Brauner <christian@brauner.io>,
+        "netfs@lists.linux.dev" <netfs@lists.linux.dev>,
+        "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Steve French
+	<sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith
+ Surabattula <rohiths.msft@gmail.com>
+Subject: RE: [PATCH v6 11/15] cifs: When caching, try to open O_WRONLY file
+ rdwr on server
+Thread-Topic: [PATCH v6 11/15] cifs: When caching, try to open O_WRONLY file
+ rdwr on server
+Thread-Index: AQHagb+muX0JMo5O+UG0te/3gFUHIQ==
+Date: Fri, 29 Mar 2024 09:58:28 +0000
+Message-ID: 
+ <SJ2PR18MB5635CA3F5A382FC12D6CE58FA23A2@SJ2PR18MB5635.namprd18.prod.outlook.com>
+References: <20240328165845.2782259-1-dhowells@redhat.com>
+ <20240328165845.2782259-12-dhowells@redhat.com>
+In-Reply-To: <20240328165845.2782259-12-dhowells@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR18MB5635:EE_|BY1PR18MB5350:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ t82/4/zxg+/xKf/hvL3P7VxYR19CuJCqe6Mr2E2odSu3LqV7TUsGVcqihxd6BB0KjltlMUITUc5IJK3K/q+D2b9n1Y0xC3agqwilBIaTz9C5M3Mk53UVz+ea+4/fyfR/Zfww9ny4Yz78Vqb9EKkqrK7yHRHqJg0RXU5AaZP8OrEbtJqx6ROBEDeuEIJdMYGYWNi+56K3OSNXqQSu7WH+VITcrGpkPoNFp4fLtojz6+Z7Te4dMH3z2jqWMIqAfmXYmYSM1IBH74LhkEfjWQtdMBeAaHBC4jjudYcx9s9bN8vsGyuIEqQ8fhHMuf7GAAXFejD6n5RrMquoHKfVjPEk/NVyqHiOnBmesi+8vZhxmxIPhKnvvjSZSLRlTvHUi8FQIgvvwpDa8a7rCdQ/MCMKZuAPUYkP86aZbNqAc9i6MjzIUPuC+ijfJzQCn0WDbcO5P5p6D2ZHF6HXAzreuqezfVo9alZq+cfV33ij84zt/CdlkVQUuP/HwWo0APJ1dyZVkLn6t13uUuv69LruwHcTIqcnm1gCkMD0pgeUIkLXxQzsxY8nTb5ysW3GBzsagtAc6PeIYDb5R03KfJeSQMNMZDp7fjolF1BlqtrPoonvqxeF3ljFb9oLp2Y6BQBZ8CS+8zb1nmt8/LOIZA915Alk1pZ074BZSVnBOFAP5P/Hk+w=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR18MB5635.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?vbhtN7JR14V+hdJyscv9SrrZkYawzfLNKFoMKbBXn5sILSc/MmpUnZvkiJEr?=
+ =?us-ascii?Q?uLYfLbZwwXpLHApKPQMrvcABnKv4YR9bpz6myNiPWvBd54DaRsgj1WrZ59wz?=
+ =?us-ascii?Q?upbbTfDS+3JjVF6NX9PPCPp4NdmnL3+T7vRjCFe0Hq3R0RhwGGMkZ1zOqXrV?=
+ =?us-ascii?Q?4UqMordjxUMRp4vc08VOsekxn3LCPqYkBy53s71PncT0RXUAxpaDEJzY54c6?=
+ =?us-ascii?Q?rBrgQuduMUpBoy1XNGC/7sD56gBRUQEEhvleIKbzN8AlA/lBm6H1ukBBQTLB?=
+ =?us-ascii?Q?fkV3fw1i21LzKX3WOuJSflxycdDC7z4HfOYtYcTAyzWWWnXyqKu5jt8AgDxk?=
+ =?us-ascii?Q?ejOw0b9eK1JIbEZT/klunNAA1Km+zbe5ZN6v3RtjKGfdS6BJ+Mdw+sZpwJcs?=
+ =?us-ascii?Q?ryBQ1kwX8uUqFyLSoDBvN0yrAA8rTb4cF/gcbyiiFrfh6MdlDSRf2v1F2EVJ?=
+ =?us-ascii?Q?j8BYoKbTG/3WrvJfTQCp3UlhSL8I/iz4EQXVEYx6NI6Jg7xFPAUyc468CCX7?=
+ =?us-ascii?Q?vrHrFh9fPHbdbUivhUwgDhYb6hmF/pN6dGKCcTZ+lITsqqqrpTbvFAMvN08k?=
+ =?us-ascii?Q?bWFuTStL4HAMq0DIvXuU4sz7jjSjyyHf3eyUSJBNMK5hO1pCstr6Vvq6MZGV?=
+ =?us-ascii?Q?qmPRU1SpYTSzJWXuJwaEr0smXjZk968hYPFpSEmdSaEqUZ+fBGRWovU6xYDJ?=
+ =?us-ascii?Q?5/t9ZU6fF0OPolE0BG8LtEsynFPOa7EwV2iSYN+F8WwX19/hmw/z1kG3qoCT?=
+ =?us-ascii?Q?22fKL7GgqyGYfEtB1wpRZk2v/H6khrJELk1CJcci7f4vkoiHNdvajoeeIkhF?=
+ =?us-ascii?Q?EcSHJIMOdmJ4OqP5D+LyuWJ4QlWcfOUMZS0gyNZtWVM7XPFtsZrpmFRT5iAQ?=
+ =?us-ascii?Q?45sRr4OeFBjRwAA1m2MXfrDDXsi1mmUNHhJWFeL3QN+V3r+bAQ2KZcXmiL2e?=
+ =?us-ascii?Q?ncZt5XwIFOC2NJK11U8gRnDF9YGHx01CM2ngihFaxJU42gaesC7u4HAJIu3X?=
+ =?us-ascii?Q?zeVFOebPBLVLLWuNkR77H/jcw06Eiv2cpNOpcIOCs3bd6J1V+5VHg/q84FAL?=
+ =?us-ascii?Q?XSZLNFVpHP9yICgGVvFWakN2OjCMUgiXPLgpeqnDMpxWPDXy+VA84BSp67oU?=
+ =?us-ascii?Q?3EU84jKiOnU237uuQvhngs3bCQsO3gYucod0ZYPsvIAKs98Wk9Y0PtkLKy5d?=
+ =?us-ascii?Q?0JB057Zn3IjG1Xpr9ar1SuvrJWAizf0prcPzN7KgksJS53J/5JD2lMxyANkI?=
+ =?us-ascii?Q?PlHZW2P4tXwjWDotX9y4zm9S+i2hNQJ7x27XgFjwKZL0fCiXsXBJATVb9o/s?=
+ =?us-ascii?Q?yfDcD7vGhsqTflTbMuP+QUi4iYCPMdl3lxK1137gCK/xIC4nWl8acWZHDDGP?=
+ =?us-ascii?Q?0jk4RSjYQSiylTwZPkxKnziUF/U+zm0zZ80LgEiQ6lSK4dxjEDaygFWKnNw8?=
+ =?us-ascii?Q?KQ1kbkC+vVTAfHPYzKa/hvEVfYT4SNEIITipIj3JqF5XGXl4zsqryUTtgctR?=
+ =?us-ascii?Q?Nv/BKVc1/x/UmI+bj+wel/7uDEOaiNWAVP5HRzV2CuZeebvSoGpSHnXcHTHi?=
+ =?us-ascii?Q?Af8Qa5KDzx/jKGA+Ijw6F9A3qR//lBGnq3ozNU5U?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 29 Mar 2024 01:30:42 -0500
-Message-ID: <CAH2r5muYgYr=kxSkzCmNQLaF0br_QZ2s=BLPd_TnOnPmTUz_WQ@mail.gmail.com>
-Subject: [PATCH][WIP] populate superblock uuid at mount time
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000002089d50614c6c85c"
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR18MB5635.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cd9aa64-52e0-4f33-b94e-08dc4fd6c8cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2024 09:58:28.9945
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g2DWz+KC0UmvoIX0LpuUhwNX6toyBuowDDYKsxAGx/zTiHvfxOT+f0WjQc9VntxzcXLh6HoXpXwlaxJHyga3JA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR18MB5350
+X-Proofpoint-GUID: lH4i3t_xW62ZspnC561E08_TcugXwosJ
+X-Proofpoint-ORIG-GUID: lH4i3t_xW62ZspnC561E08_TcugXwosJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-29_09,2024-03-28_01,2023-05-22_02
 
---0000000000002089d50614c6c85c
-Content-Type: text/plain; charset="UTF-8"
 
-In order to get the unique id for the volume (the 8 byte
-VolumeSerialNumber) we need to issue a QUERY_INFO level 59
-(FILE_ID_INFORMATION).  Today we only query the older 4 byte (not
-guaranteed to be unique serial number).   See section 2.4.21 of
-MS-FSCC.  Looks like Samba and ksmbd do not support this info level
-though - although Windows does support it.
+> -----Original Message-----
+> From: David Howells <dhowells@redhat.com>
+> Sent: Thursday, March 28, 2024 10:28 PM
+> To: Steve French <smfrench@gmail.com>
+> Cc: David Howells <dhowells@redhat.com>; Jeff Layton <jlayton@kernel.org>=
+;
+> Matthew Wilcox <willy@infradead.org>; Paulo Alcantara <pc@manguebit.com>;
+> Shyam Prasad N <sprasad@microsoft.com>; Tom Talpey <tom@talpey.com>;
+> Christian Brauner <christian@brauner.io>; netfs@lists.linux.dev; linux-
+> cifs@vger.kernel.org; linux-fsdevel@vger.kernel.org; linux-mm@kvack.org;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Steve French
+> <sfrench@samba.org>; Shyam Prasad N <nspmangalore@gmail.com>; Rohith
+> Surabattula <rohiths.msft@gmail.com>
+> Subject: [PATCH v6 11/15] cifs: When caching, try to open
+> O_WRONLY file rdwr on server
+>=20
+> When we're engaged in local caching of a cifs filesystem, we cannot perfo=
+rm
+> caching of a partially written cache granule unless we can read the rest =
+of the
+> granule.  To deal with this, if a file is opened O_WRONLY locally, but th=
+e mount
+> was given the "-o fsc" flag, try first opening the remote file with
+> GENERIC_READ|GENERIC_WRITE and if that returns -EACCES, try dropping
+> the GENERIC_READ and doing the open again.  If that last succeeds, invali=
+date
+> the cache for that file as for O_DIRECT.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  fs/smb/client/dir.c     | 15 ++++++++++++
+>  fs/smb/client/file.c    | 51 +++++++++++++++++++++++++++++++++--------
+>  fs/smb/client/fscache.h |  6 +++++
+>  3 files changed, 62 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c index
+> 89333d9bce36..37897b919dd5 100644
+> --- a/fs/smb/client/dir.c
+> +++ b/fs/smb/client/dir.c
+> @@ -189,6 +189,7 @@ static int cifs_do_create(struct inode *inode, struct=
+ dentry
+> *direntry, unsigned
+>  	int disposition;
+>  	struct TCP_Server_Info *server =3D tcon->ses->server;
+>  	struct cifs_open_parms oparms;
+> +	int rdwr_for_fscache =3D 0;
+>=20
+>  	*oplock =3D 0;
+>  	if (tcon->ses->server->oplocks)
+> @@ -200,6 +201,10 @@ static int cifs_do_create(struct inode *inode, struc=
+t
+> dentry *direntry, unsigned
+>  		return PTR_ERR(full_path);
+>  	}
+>=20
+> +	/* If we're caching, we need to be able to fill in around partial write=
+s. */
+> +	if (cifs_fscache_enabled(inode) && (oflags & O_ACCMODE) =3D=3D
+> O_WRONLY)
+> +		rdwr_for_fscache =3D 1;
+> +
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>  	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open
+> &&
+>  	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+> @@ -276,6 +281,8 @@ static int cifs_do_create(struct inode *inode, struct=
+ dentry
+> *direntry, unsigned
+>  		desired_access |=3D GENERIC_READ; /* is this too little? */
+>  	if (OPEN_FMODE(oflags) & FMODE_WRITE)
+>  		desired_access |=3D GENERIC_WRITE;
+> +	if (rdwr_for_fscache =3D=3D 1)
+> +		desired_access |=3D GENERIC_READ;
+>=20
+>  	disposition =3D FILE_OVERWRITE_IF;
+>  	if ((oflags & (O_CREAT | O_EXCL)) =3D=3D (O_CREAT | O_EXCL)) @@ -
+> 304,6 +311,7 @@ static int cifs_do_create(struct inode *inode, struct den=
+try
+> *direntry, unsigned
+>  	if (!tcon->unix_ext && (mode & S_IWUGO) =3D=3D 0)
+>  		create_options |=3D CREATE_OPTION_READONLY;
+>=20
+> +retry_open:
+>  	oparms =3D (struct cifs_open_parms) {
+>  		.tcon =3D tcon,
+>  		.cifs_sb =3D cifs_sb,
+> @@ -317,8 +325,15 @@ static int cifs_do_create(struct inode *inode, struc=
+t
+> dentry *direntry, unsigned
+>  	rc =3D server->ops->open(xid, &oparms, oplock, buf);
+>  	if (rc) {
+>  		cifs_dbg(FYI, "cifs_create returned 0x%x\n", rc);
+> +		if (rc =3D=3D -EACCES && rdwr_for_fscache =3D=3D 1) {
+> +			desired_access &=3D ~GENERIC_READ;
+> +			rdwr_for_fscache =3D 2;
+> +			goto retry_open;
+> +		}
+>  		goto out;
+>  	}
+> +	if (rdwr_for_fscache =3D=3D 2)
+> +		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
+>=20
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>  	/*
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c index
+> 73573dadf90e..761a80963f76 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -521,12 +521,12 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon=
+)
+>  	 */
+>  }
+>=20
+> -static inline int cifs_convert_flags(unsigned int flags)
+> +static inline int cifs_convert_flags(unsigned int flags, int
+> +rdwr_for_fscache)
+>  {
+>  	if ((flags & O_ACCMODE) =3D=3D O_RDONLY)
+>  		return GENERIC_READ;
+>  	else if ((flags & O_ACCMODE) =3D=3D O_WRONLY)
+> -		return GENERIC_WRITE;
+> +		return rdwr_for_fscache =3D=3D 1 ? (GENERIC_READ |
+> GENERIC_WRITE) :
+> +GENERIC_WRITE;
+>  	else if ((flags & O_ACCMODE) =3D=3D O_RDWR) {
+>  		/* GENERIC_ALL is too much permission to request
+>  		   can cause unnecessary access denied on create */ @@ -
+> 663,11 +663,16 @@ static int cifs_nt_open(const char *full_path, struct i=
+node
+> *inode, struct cifs_
+>  	int create_options =3D CREATE_NOT_DIR;
+>  	struct TCP_Server_Info *server =3D tcon->ses->server;
+>  	struct cifs_open_parms oparms;
+> +	int rdwr_for_fscache =3D 0;
+>=20
+>  	if (!server->ops->open)
+>  		return -ENOSYS;
+>=20
+> -	desired_access =3D cifs_convert_flags(f_flags);
+> +	/* If we're caching, we need to be able to fill in around partial write=
+s. */
+> +	if (cifs_fscache_enabled(inode) && (f_flags & O_ACCMODE) =3D=3D
+> O_WRONLY)
+> +		rdwr_for_fscache =3D 1;
+> +
+> +	desired_access =3D cifs_convert_flags(f_flags, rdwr_for_fscache);
+>=20
+>  /*********************************************************************
+>   *  open flag mapping table:
+> @@ -704,6 +709,7 @@ static int cifs_nt_open(const char *full_path, struct=
+ inode
+> *inode, struct cifs_
+>  	if (f_flags & O_DIRECT)
+>  		create_options |=3D CREATE_NO_BUFFER;
+>=20
+> +retry_open:
+>  	oparms =3D (struct cifs_open_parms) {
+>  		.tcon =3D tcon,
+>  		.cifs_sb =3D cifs_sb,
+> @@ -715,8 +721,16 @@ static int cifs_nt_open(const char *full_path, struc=
+t inode
+> *inode, struct cifs_
+>  	};
+>=20
+>  	rc =3D server->ops->open(xid, &oparms, oplock, buf);
+> -	if (rc)
+> +	if (rc) {
+> +		if (rc =3D=3D -EACCES && rdwr_for_fscache =3D=3D 1) {
+> +			desired_access =3D cifs_convert_flags(f_flags, 0);
+> +			rdwr_for_fscache =3D 2;
+> +			goto retry_open;
+> +		}
+>  		return rc;
+> +	}
+> +	if (rdwr_for_fscache =3D=3D 2)
+> +		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
+>=20
+>  	/* TODO: Add support for calling posix query info but with passing in f=
+id */
+>  	if (tcon->unix_ext)
+> @@ -1149,11 +1163,14 @@ int cifs_open(struct inode *inode, struct file *f=
+ile)
+>  use_cache:
+>  	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
+>  			   file->f_mode & FMODE_WRITE);
+> -	if (file->f_flags & O_DIRECT &&
+> -	    (!((file->f_flags & O_ACCMODE) !=3D O_RDONLY) ||
+> -	     file->f_flags & O_APPEND))
+> -		cifs_invalidate_cache(file_inode(file),
+> -				      FSCACHE_INVAL_DIO_WRITE);
+> +	//if ((file->f_flags & O_ACCMODE) =3D=3D O_WRONLY)
+> +	//	goto inval;
 
-Any thoughts on ksmbd or Samba support for FILE_ID_INFORMATION query?
+Why to keep unused code?
 
-See attached work in progress patch
-
--- 
 Thanks,
+Naveen
 
-Steve
+> +	if (!(file->f_flags & O_DIRECT))
+> +		goto out;
+> +	if ((file->f_flags & (O_ACCMODE | O_APPEND)) =3D=3D O_RDONLY)
+> +		goto out;
+> +//inval:
+> +	cifs_invalidate_cache(file_inode(file), FSCACHE_INVAL_DIO_WRITE);
+>=20
+>  out:
+>  	free_dentry_path(page);
+> @@ -1218,6 +1235,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool
+> can_flush)
+>  	int disposition =3D FILE_OPEN;
+>  	int create_options =3D CREATE_NOT_DIR;
+>  	struct cifs_open_parms oparms;
+> +	int rdwr_for_fscache =3D 0;
+>=20
+>  	xid =3D get_xid();
+>  	mutex_lock(&cfile->fh_mutex);
+> @@ -1281,7 +1299,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool
+> can_flush)
+>  	}
+>  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+>=20
+> -	desired_access =3D cifs_convert_flags(cfile->f_flags);
+> +	/* If we're caching, we need to be able to fill in around partial write=
+s. */
+> +	if (cifs_fscache_enabled(inode) && (cfile->f_flags & O_ACCMODE) =3D=3D
+> O_WRONLY)
+> +		rdwr_for_fscache =3D 1;
+> +
+> +	desired_access =3D cifs_convert_flags(cfile->f_flags, rdwr_for_fscache)=
+;
+>=20
+>  	/* O_SYNC also has bit for O_DSYNC so following check picks up either
+> */
+>  	if (cfile->f_flags & O_SYNC)
+> @@ -1293,6 +1315,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool
+> can_flush)
+>  	if (server->ops->get_lease_key)
+>  		server->ops->get_lease_key(inode, &cfile->fid);
+>=20
+> +retry_open:
+>  	oparms =3D (struct cifs_open_parms) {
+>  		.tcon =3D tcon,
+>  		.cifs_sb =3D cifs_sb,
+> @@ -1318,6 +1341,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool
+> can_flush)
+>  		/* indicate that we need to relock the file */
+>  		oparms.reconnect =3D true;
+>  	}
+> +	if (rc =3D=3D -EACCES && rdwr_for_fscache =3D=3D 1) {
+> +		desired_access =3D cifs_convert_flags(cfile->f_flags, 0);
+> +		rdwr_for_fscache =3D 2;
+> +		goto retry_open;
+> +	}
+>=20
+>  	if (rc) {
+>  		mutex_unlock(&cfile->fh_mutex);
+> @@ -1326,6 +1354,9 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool
+> can_flush)
+>  		goto reopen_error_exit;
+>  	}
+>=20
+> +	if (rdwr_for_fscache =3D=3D 2)
+> +		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
+> +
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>  reopen_success:
+>  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */ diff --git
+> a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h index
+> a3d73720914f..1f2ea9f5cc9a 100644
+> --- a/fs/smb/client/fscache.h
+> +++ b/fs/smb/client/fscache.h
+> @@ -109,6 +109,11 @@ static inline void cifs_readahead_to_fscache(struct
+> inode *inode,
+>  		__cifs_readahead_to_fscache(inode, pos, len);  }
+>=20
+> +static inline bool cifs_fscache_enabled(struct inode *inode) {
+> +	return fscache_cookie_enabled(cifs_inode_cookie(inode));
+> +}
+> +
+>  #else /* CONFIG_CIFS_FSCACHE */
+>  static inline
+>  void cifs_fscache_fill_coherency(struct inode *inode, @@ -124,6 +129,7 @=
+@
+> static inline void cifs_fscache_release_inode_cookie(struct inode *inode)=
+ {}  static
+> inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool upd=
+ate) {}
+> static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inod=
+e) { return
+> NULL; }  static inline void cifs_invalidate_cache(struct inode *inode, un=
+signed int
+> flags) {}
+> +static inline bool cifs_fscache_enabled(struct inode *inode) { return
+> +false; }
+>=20
+>  static inline int cifs_fscache_query_occupancy(struct inode *inode,
+>  					       pgoff_t first, unsigned int nr_pages,
+>=20
 
---0000000000002089d50614c6c85c
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-update-sb-uuid-when-full-id-information-availab.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-update-sb-uuid-when-full-id-information-availab.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_luca8ywa0>
-X-Attachment-Id: f_luca8ywa0
-
-RnJvbSBhNWY5MGI0NmIxN2QyMGFmNGNkYmZhZTZhYzQzZGFiYzFlNThlODdlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IEZyaSwgMjkgTWFyIDIwMjQgMDA6MzA6NDkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiB1cGRhdGUgc2IgdXVpZCB3aGVuIGZ1bGwgaWQgaW5mb3JtYXRpb24gYXZhaWxhYmxlCgpT
-b21lIHNlcnZlcnMgbGlrZSBXaW5kb3dzIGFuZCBBenVyZSByZXBvcnQgdGhlIGxhcmdlciAoMTYg
-Ynl0ZSkKdW5pcXVlIHZvbHVtZSBzZXJpYWwgbnVtYmVyLiAgRm9yIHRob3NlIHRoYXQgcmV0dXJu
-IGZ1bGxfaWRfaW5mb3JtYXRpb24KcG9wdWxhdGUgdGhlIHNiLT5zX3V1aWQKClRoaXMgd2lsbCBh
-bHNvIGFsbG93IHRoZSBuZXcgaW9jdGwgRlNfSU9DX0dFVEZTVVVJRCB0byB3b3JrCgpTaWduZWQt
-b2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21i
-L2NsaWVudC9jaWZzZnMuYyAgICB8ICAyICsrCiBmcy9zbWIvY2xpZW50L2NpZnNnbG9iLmggIHwg
-IDEgKwogZnMvc21iL2NsaWVudC9zbWIyb3BzLmMgICB8ICAyICsrCiBmcy9zbWIvY2xpZW50L3Nt
-YjJwZHUuYyAgIHwgMTggKysrKysrKysrKysrKysrKysrCiBmcy9zbWIvY2xpZW50L3NtYjJwcm90
-by5oIHwgIDIgKysKIDUgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdp
-dCBhL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMgYi9mcy9zbWIvY2xpZW50L2NpZnNmcy5jCmluZGV4
-IGFhNmYxZWNiN2MwZS4uYzY0NDVmOTNkOTU0IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2Np
-ZnNmcy5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMKQEAgLTI2OSw2ICsyNjksOCBAQCBj
-aWZzX3JlYWRfc3VwZXIoc3RydWN0IHN1cGVyX2Jsb2NrICpzYikKIAkJZ290byBvdXRfbm9fcm9v
-dDsKIAl9CiAKKwlpZiAodGNvbi0+dm9sX3V1aWQgIT0gMCkKKwkJc3VwZXJfc2V0X3V1aWQoc2Is
-ICh2b2lkICopJnRjb24tPnZvbF91dWlkLCBzaXplb2YodGNvbi0+dm9sX3V1aWQpKTsKICNpZmRl
-ZiBDT05GSUdfQ0lGU19ORlNEX0VYUE9SVAogCWlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAm
-IENJRlNfTU9VTlRfU0VSVkVSX0lOVU0pIHsKIAkJY2lmc19kYmcoRllJLCAiZXhwb3J0IG9wcyBz
-dXBwb3J0ZWRcbiIpOwpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oIGIvZnMv
-c21iL2NsaWVudC9jaWZzZ2xvYi5oCmluZGV4IDdlZDlkMDVmNjg5MC4uZGFlMTExNjZlYjZmIDEw
-MDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2NpZnNnbG9iLmgKKysrIGIvZnMvc21iL2NsaWVudC9j
-aWZzZ2xvYi5oCkBAIC0xMjY0LDYgKzEyNjQsNyBAQCBzdHJ1Y3QgY2lmc190Y29uIHsKIAlfX3Uz
-MiBzaGFyZV9mbGFnczsKIAlfX3UzMiBtYXhpbWFsX2FjY2VzczsKIAlfX3UzMiB2b2xfc2VyaWFs
-X251bWJlcjsKKwlfX3U2NCB2b2xfdXVpZDsgLyogZnVsbCAoNjQgYml0LCB1bmlxdWUpIHNlcmlh
-bCBudW1iZXIgKi8KIAlfX2xlNjQgdm9sX2NyZWF0ZV90aW1lOwogCV9fdTY0IHNuYXBzaG90X3Rp
-bWU7IC8qIGZvciB0aW1ld2FycCB0b2tlbnMgLSB0aW1lc3RhbXAgb2Ygc25hcHNob3QgKi8KIAlf
-X3UzMiBoYW5kbGVfdGltZW91dDsgLyogcGVyc2lzdGVudCBhbmQgZHVyYWJsZSBoYW5kbGUgdGlt
-ZW91dCBpbiBtcyAqLwpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIyb3BzLmMgYi9mcy9z
-bWIvY2xpZW50L3NtYjJvcHMuYwppbmRleCAyZWQ0NTY5NDhmMzQuLjg0ZDJmM2YxYzg5YSAxMDA2
-NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIyb3BzLmMKKysrIGIvZnMvc21iL2NsaWVudC9zbWIy
-b3BzLmMKQEAgLTgzMSw2ICs4MzEsOCBAQCBzbWIzX3Fmc190Y29uKGNvbnN0IHVuc2lnbmVkIGlu
-dCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJaWYgKHJjKQogCQlyZXR1cm47CiAKKwlT
-TUIyX2dldF92b2xfc2VyaWFsX251bSh4aWQsIHRjb24sIGZpZC5wZXJzaXN0ZW50X2ZpZCwgZmlk
-LnZvbGF0aWxlX2ZpZCk7CisKIAlTTUIzX3JlcXVlc3RfaW50ZXJmYWNlcyh4aWQsIHRjb24sIHRy
-dWUgLyogY2FsbGVkIGR1cmluZyAgbW91bnQgKi8pOwogCiAJU01CMl9RRlNfYXR0cih4aWQsIHRj
-b24sIGZpZC5wZXJzaXN0ZW50X2ZpZCwgZmlkLnZvbGF0aWxlX2ZpZCwKZGlmZiAtLWdpdCBhL2Zz
-L3NtYi9jbGllbnQvc21iMnBkdS5jIGIvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKaW5kZXggM2Vh
-Njg4NTU4ZTZjLi5mMjYyYjgyNTFiMmUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnBk
-dS5jCisrKyBiL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jCkBAIC0zOTA4LDYgKzM5MDgsMjQgQEAg
-U01CMl9xdWVyeV9hY2woY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAq
-dGNvbiwKIAkJCSAgU01CMl9NQVhfQlVGRkVSX1NJWkUsIE1JTl9TRUNfREVTQ19MRU4sIGRhdGEs
-IHBsZW4pOwogfQogCitpbnQKK1NNQjJfZ2V0X3ZvbF9zZXJpYWxfbnVtKGNvbnN0IHVuc2lnbmVk
-IGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCisJCQl1NjQgcGVyc2lzdGVudF9maWQs
-IHU2NCB2b2xhdGlsZV9maWQpCit7CisJaW50IHJjOworCXN0cnVjdCBzbWIyX2ZpbGVfaWRfaW5m
-b3JtYXRpb24gdm9sX2luZm87CisKKwlyYyA9IHF1ZXJ5X2luZm8oeGlkLCB0Y29uLCBwZXJzaXN0
-ZW50X2ZpZCwgdm9sYXRpbGVfZmlkLAorCQkJICBGSUxFX0lEX0lORk9STUFUSU9OLCBTTUIyX09f
-SU5GT19GSUxFLCAwLAorCQkJICBzaXplb2Yoc3RydWN0IHNtYjJfZmlsZV9pZF9pbmZvcm1hdGlv
-biksCisJCQkgIHNpemVvZihzdHJ1Y3Qgc21iMl9maWxlX2lkX2luZm9ybWF0aW9uKSwKKwkJCSAg
-KHZvaWQgKiopJnZvbF9pbmZvLCBOVUxMKTsKKwlpZiAoIXJjKQorCQl0Y29uLT52b2xfdXVpZCA9
-IGxlNjRfdG9fY3B1KHZvbF9pbmZvLlZvbHVtZVNlcmlhbE51bWJlcik7CisKKwlyZXR1cm4gcmM7
-Cit9CisKIGludAogU01CMl9nZXRfc3J2X251bShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
-Y3QgY2lmc190Y29uICp0Y29uLAogCQkgdTY0IHBlcnNpc3RlbnRfZmlkLCB1NjQgdm9sYXRpbGVf
-ZmlkLCBfX2xlNjQgKnVuaXF1ZWlkKQpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIycHJv
-dG8uaCBiL2ZzL3NtYi9jbGllbnQvc21iMnByb3RvLmgKaW5kZXggNzMyMTY5ZDhhNjdhLi5iNTE4
-ZjFmZGVkY2YgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnByb3RvLmgKKysrIGIvZnMv
-c21iL2NsaWVudC9zbWIycHJvdG8uaApAQCAtMjA3LDYgKzIwNyw4IEBAIGV4dGVybiB2b2lkIFNN
-QjJfcXVlcnlfaW5mb19mcmVlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCk7CiBleHRlcm4gaW50IFNN
-QjJfcXVlcnlfYWNsKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRj
-b24sCiAJCQkgIHU2NCBwZXJzaXN0ZW50X2ZpbGVfaWQsIHU2NCB2b2xhdGlsZV9maWxlX2lkLAog
-CQkJICB2b2lkICoqZGF0YSwgdW5zaWduZWQgaW50ICpwbGVuLCB1MzIgaW5mbyk7CitleHRlcm4g
-aW50IFNNQjJfZ2V0X3ZvbF9zZXJpYWxfbnVtKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVj
-dCBjaWZzX3Rjb24gKnRjb24sCisJCQkgICAgdTY0IHBlcnNpc3RlbnRfZmlkLCB1NjQgdm9sYXRp
-bGVfZmlkKTsKIGV4dGVybiBpbnQgU01CMl9nZXRfc3J2X251bShjb25zdCB1bnNpZ25lZCBpbnQg
-eGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkJICAgIHU2NCBwZXJzaXN0ZW50X2ZpZCwg
-dTY0IHZvbGF0aWxlX2ZpZCwKIAkJCSAgICBfX2xlNjQgKnVuaXF1ZWlkKTsKLS0gCjIuNDAuMQoK
---0000000000002089d50614c6c85c--
