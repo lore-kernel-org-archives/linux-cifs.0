@@ -1,101 +1,146 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C223585653;
-	Fri, 29 Mar 2024 17:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E518085644
+	for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2024 19:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711731972; cv=none; b=aQFzBTiNhbArOeYD85aRd9eOtsh93pfgSFcizNTIIZik3PfkcFJg5VqnMOBRsYmhJzeZp1sPqb+++0hY8k8MCW47Lnrqce4Hl13qzMZUmJRSsvEbdOokEgofQ1nb7HTSdsuh61LScnv2hW2v6dt4VqSuLX6k4RqQnyjJxN9Y6zY=
+	t=1711739177; cv=none; b=i+56C1B3gjo07zwZamoYyL8VwkS1yaLmLD1ACYreM6GESqiMqGfEW+33few/XvEXZoZesL93Mp7CyPkN1U34ZtFARCmiS2WoGOVvpVo9o6JMGL2ybhErdyELkII9lMp2ilygVezuAj2yJwYsh219V/SsyOXBVBJtuogZkLuN6YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711731972; c=relaxed/simple;
-	bh=emN8HEbkvTibwNLYB6Ii61y7sBtWV3zGH2FxiaLNX+w=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hFe2ZmJR2t2apaoep9G1wj1uWxuaaw425R+jGfEssnWc2vj4pZUJx0mixL0RW65gyqz4q3ZlHOly5VNyk3D62YI9fu7gIbWTv7y3IFQ8zPDhoz5mZEeUQKsye+MkUpiZzmBFqS0bjbK7MO232OvYIWx0b4GCE8IRn4lh12iL2xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NYosX0aM; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1711739177; c=relaxed/simple;
+	bh=J1DnffiH7q17Ljk4EoJuar60KYgEYIZ86jt5q9jFPTs=;
+	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 From:To:Cc:Subject:References:In-Reply-To; b=t2D7c0QWk00DALN0Btx3u8yleC4GcebPaexCtIN8oxF25l5f1l9YUpPRM3fAAfPo6KIZG9vq/oB18ouQ4wEOqABiDLaEnlh870lfTUFw/11t2wvp6S1pKqicUoig3TXNV65QB89x4TxSbQNT77V0uobhcN+ADqrkSdS8NNi4HYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=XMtqpnJl; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYosX0aM"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513d247e3c4so2088392e87.0;
-        Fri, 29 Mar 2024 10:06:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="XMtqpnJl"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e675db6fbaso1312314a34.1
+        for <linux-cifs@vger.kernel.org>; Fri, 29 Mar 2024 12:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711731968; x=1712336768; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=paul-moore.com; s=google; t=1711739173; x=1712343973; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=luX+DmUYYHFgxqblUqu9C7w+57DrptU0k/Sko1xxFeE=;
-        b=NYosX0aMvLmAITV10ldLoqOFAbVYSJbVWmF4BXPu+NrlGkhnC6w4WRjBnyvZqlh5J/
-         /1L4dcAFa9zHQXeM2KzakeycU1/LCylxaOsHQZRexQyGDuKBM8VGu7PBuljIdjDzMIIT
-         o/ZwI3fPbUdUJI0xK20UX4jSdOXDErC9CD15+mbMT/oqYdpT+Pc8uGm5xVi6YIeO+oi7
-         LG+tsGlu78Ro0z3hXU1659TNl84Ll4hyNNfxEB99Fhx4wNjL8cA1jggvVoqm5awhPe4E
-         ry2o5Zeevfhm4LXlLCNl5UQKBpxI9/uFoW4usdKNSl/EbhDtSHqYR1upzCtD9Yj9k6fe
-         mk9A==
+        bh=ngxCoYcD8CKtcpra4a5XtcaeUNLXz+q15qFr+qZs8O0=;
+        b=XMtqpnJlbdM0j+X3obvgo072sm1YNcTIsbgSVToZhIOhXnlDF/qvD9WqnY+fTe/RIA
+         NyyXaoK2kmfPZ2pnxHS0VgDqfTAbfG+lO6VbJzHHBbgPkTRAlsR8TTt1AntK/7v8WKzg
+         dijuzz/oXEKbKBM3FbH8el9QHIxYPUkEkKTbQc9MPPIirJKIEKo8Dq1Z/bqtpdetpzz4
+         FDeO560jDoaulV4l9OjVo2/EFTNhtN/vhnaeKSRE9jDUJMJaQkxT3CT8Ll7lI+BI+yEi
+         yYahCAGFqUFtRrkERAuj2sdpbv56kEU7OV0iRQhqeNgswHXk+UapTtKWp9+2Mp6ElTeI
+         5MnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711731968; x=1712336768;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1711739173; x=1712343973;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=luX+DmUYYHFgxqblUqu9C7w+57DrptU0k/Sko1xxFeE=;
-        b=HWp8wxbw5IyY1chtdenDy5mUPAp8ySfg+Yr0DuWGQOECx4hL2cLYvpqdqyJZ27RTtd
-         gzk7G2c9I17KKIFpTcnV7rDh+KYZ8+txEm2Q+4No/+TWxKkY8RJrwP9Een0tkHiZkH4+
-         aqdnJGsOQnxg8vNjXubtBXJEGvRvFd4opptm4sGgFMWDdsZuzvoVx/9vEd6izscGq6b/
-         OaRIXz/M/UeovK8lnWjO5lSZ/Ghs6iAMtdjosn2FPzrLoIhRMkLUL1K0baH57yP8UzN+
-         rQUSjks7ol8+PjQHnt6+/MG+aSxsD6h4yfD5/P3d+KFRt2YqJ8U8RUJu0ohKOd0xsVQp
-         02sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVof4CEkovgOlCyKMSngW6ri297wE5gMLu0E3A63PV9O/mR730EgEvrUfOREfvXn0g7cfciOxqadldiy6rLrEchIRPAaKJxCyA1cQ==
-X-Gm-Message-State: AOJu0YzYU+EdlqLSw5Hnt/Z+perH2owvoXU8BnmHDZqu7Oq5omhx8QFx
-	ez7WxY5QBjKBs3dUO6CknzisCxBu3r6z3S6b1cOQ/mM6kGymYwR0Ad24wCBPL8a2pmqnJPo9RvR
-	XK2UgwPjSJG2SIhnOh9khVvKHn4aXat4j7VM=
-X-Google-Smtp-Source: AGHT+IFfNKPut6sAyzGL6pv19W8IpT0PI/HXYHvK/mSoTl/Yy2bxpum8EzbinPO0/ZNWjdrRMHaaOrF0K10f93fdHkU=
-X-Received: by 2002:a19:8c48:0:b0:515:c17f:725c with SMTP id
- i8-20020a198c48000000b00515c17f725cmr2087032lfj.2.1711731967585; Fri, 29 Mar
- 2024 10:06:07 -0700 (PDT)
+        bh=ngxCoYcD8CKtcpra4a5XtcaeUNLXz+q15qFr+qZs8O0=;
+        b=NPvoLCBFAsBU5mhOBOF/CujaONAarYPVNxLWUUxeaBEOtba+79AM0iGwH8ypegTFub
+         caLCLPQhGKTbemheUhKAESJQ8sJRrybUckZ7PB3eZ95MQT2X22Xv9tMMDaR5jyfobKls
+         KLLaf1OvhketcRa1Nhwo9RQO+tL4pBEgZZxgxRm/XjCN9XhKp4340axTAb3Br4xKCYRR
+         Ibxtxu9/tUm201/jDK0W5CcoJobQgkFigfc6qTpzTZ7s8fAC81ztzbMhjC9vvfb4bc9O
+         S4QCHrh+Urvwnrx+yyBUpcg4xTxmnb0fCaOD1VsrlGoZjjmCWyQwEgdXACWtdi1ftlDx
+         jXDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHrLXs0hlqNCqmX2YH9wUf9Sw+/EdPG3J/Merlt0coDsd59LdJGyx79KqclG1bvQcjEXfgo7+eaRvmxrwQcujwTOLN+CUbC5NYqA==
+X-Gm-Message-State: AOJu0YzRJX3O3CoOfsa3BJsKqXV2nnQ6AG5XcPIJbFSz+lQWgyOMSzqY
+	+paEGCs+mWTz7baKOzGG3VWiR1FMoUPbwBTRzZxa4rVBYZNrMk8m7mjNF8bHbQ==
+X-Google-Smtp-Source: AGHT+IG+UKRYPfBfwkIx2mRuJVrKfyVM3kzyBoi4KCb9PZ1DSrfPB2oveVG4Zp7kWZLQY+SYaX983Q==
+X-Received: by 2002:a05:6808:1156:b0:3c3:c2b1:173d with SMTP id u22-20020a056808115600b003c3c2b1173dmr2965700oiu.58.1711739172886;
+        Fri, 29 Mar 2024 12:06:12 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id 6-20020ad45ba6000000b00696857c49afsm1880416qvq.67.2024.03.29.12.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Mar 2024 12:06:12 -0700 (PDT)
+Date: Fri, 29 Mar 2024 15:06:12 -0400
+Message-ID: <5ef810071fbdc40451e2b2ea1920da09@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 29 Mar 2024 12:05:55 -0500
-Message-ID: <CAH2r5msjPvJv9-aW016XACLRDQtW2JC9EDnDXbYYMz-wEObWqg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 
+Content-Type: text/plain; charset=utf-8 
+Content-Disposition: inline 
+Content-Transfer-Encoding: 8bit
+From: Paul Moore <paul@paul-moore.com>
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>, zohar@linux.ibm.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, jmorris@namei.org, serge@hallyn.com
+Cc: linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, viro@zeniv.linux.org.uk, pc@manguebit.com, christian@brauner.io, Roberto Sassu <roberto.sassu@huawei.com>, stable@vger.kernel.org, Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 1/2] security: Handle dentries without inode in  security_path_post_mknod()
+References: <20240329105609.1566309-1-roberto.sassu@huaweicloud.com>
+In-Reply-To: <20240329105609.1566309-1-roberto.sassu@huaweicloud.com>
 
-Please pull the following changes since commit
-4cece764965020c22cff7665b18a012006359095:
+On Mar 29, 2024 Roberto Sassu <roberto.sassu@huaweicloud.com> wrote:
+> 
+> Commit 08abce60d63fi ("security: Introduce path_post_mknod hook")
+> introduced security_path_post_mknod(), to replace the IMA-specific call to
+> ima_post_path_mknod().
+> 
+> For symmetry with security_path_mknod(), security_path_post_mknod() is
+> called after a successful mknod operation, for any file type, rather than
+> only for regular files at the time there was the IMA call.
+> 
+> However, as reported by VFS maintainers, successful mknod operation does
+> not mean that the dentry always has an inode attached to it (for example,
+> not for FIFOs on a SAMBA mount).
+> 
+> If that condition happens, the kernel crashes when
+> security_path_post_mknod() attempts to verify if the inode associated to
+> the dentry is private.
+> 
+> Add an extra check to first verify if there is an inode attached to the
+> dentry, before checking if the inode is private. Also add the same check to
+> the current users of the path_post_mknod hook, ima_post_path_mknod() and
+> evm_post_path_mknod().
+> 
+> Finally, use the proper helper, d_backing_inode(), to retrieve the inode
+> from the dentry in ima_post_path_mknod().
+> 
+> Cc: stable@vger.kernel.org # 6.8.x
+> Reported-by: Steve French <smfrench@gmail.com>
+> Closes: https://lore.kernel.org/linux-kernel/CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com/
+> Fixes: 08abce60d63fi ("security: Introduce path_post_mknod hook")
+> Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+> Acked-by: Mimi Zohar <zohar@linux.ibm.com>
+> ---
+>  security/integrity/evm/evm_main.c | 6 ++++--
+>  security/integrity/ima/ima_main.c | 5 +++--
+>  security/security.c               | 4 +++-
+>  3 files changed, 10 insertions(+), 5 deletions(-)
 
-  Linux 6.9-rc1 (2024-03-24 14:10:05 -0700)
+In addition to the stable marking that Mimi already pointed out, I've
+got one small comment below, but otherwise this looks fine to me.
+Also, just to confirm, you're going to send patch 1/2 up to Linus during
+the v6.9-rc1 phase and hold patch 2/2 for the next merge window, right?
 
-are available in the Git repository at:
+Acked-by: Paul Moore <paul@paul-moore.com>
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc1-smb3-client-fixes
+> diff --git a/security/security.c b/security/security.c
+> index 7e118858b545..455f0749e1b0 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -1801,7 +1801,9 @@ EXPORT_SYMBOL(security_path_mknod);
+>   */
+>  void security_path_post_mknod(struct mnt_idmap *idmap, struct dentry *dentry)
+>  {
+> -	if (unlikely(IS_PRIVATE(d_backing_inode(dentry))))
+> +	/* Not all dentries have an inode attached after mknod. */
+> +	if (d_backing_inode(dentry) &&
+> +	    unlikely(IS_PRIVATE(d_backing_inode(dentry))))
+>  		return;
 
-for you to fetch changes up to 8876a37277cb832e1861c35f8c661825179f73f5:
+I don't know how much impact this would have on the compiled code, but
+you could save yourself a call into d_backing_inode() by saving it to
+a local variable:
 
-  cifs: Fix duplicate fscache cookie warnings (2024-03-27 12:04:06 -0500)
+  struct inode *inode = d_backing_inode(dentry);
+  if (inode && unlikely(IS_PRIVATE(inode)))
+    return;
 
-----------------------------------------------------------------
-Two cifs.ko changesets
-- Add missing trace point (noticed when debugging the recent mknod LSM
-regression)
-- fscache fix
+>  	call_void_hook(path_post_mknod, idmap, dentry);
+>  }
+> -- 
+> 2.34.1
 
-The important password change (key rotation) fix is still being worked
-so is not included.
-----------------------------------------------------------------
-David Howells (1):
-      cifs: Fix duplicate fscache cookie warnings
-
-Steve French (1):
-      smb3: add trace event for mknod
-
- fs/smb/client/dir.c     |  7 +++++++
- fs/smb/client/fscache.c | 16 +++++++++++++++-
- fs/smb/client/inode.c   |  2 ++
- fs/smb/client/trace.h   |  4 +++-
- 4 files changed, 27 insertions(+), 2 deletions(-)
-
--- 
-Thanks,
-
-Steve
+--
+paul-moore.com
