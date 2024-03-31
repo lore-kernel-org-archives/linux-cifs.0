@@ -1,226 +1,83 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C2B7F8
-	for <linux-cifs@vger.kernel.org>; Sat, 30 Mar 2024 01:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8E0286AC
+	for <linux-cifs@vger.kernel.org>; Sun, 31 Mar 2024 13:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711760783; cv=none; b=spwdwwnDjlvmkmtsqC5R3fcdIxy4cEH9Xvxb0/A7HMltuGdiX9y7209uYKm6EnUkmUrQRIPHeZelPTvApDYEpuu5I/gxyG7UZP6xbK/3hFGc6cx53sPnKQf6maQlhMKR4SBhw/ScbIW5s7KgyTMMtYjY84A4IgdwWRfH9j6VCm8=
+	t=1711890959; cv=none; b=SsvO+m0yrWF2ZBb591i2RmOyY1bEQY0k6gzMnsJdPGDowkzi+R6oUvKh6LjiKcpMR+T9x9NKibqd5HEEUhqqRTFX/KaK+qV8Jwyq6Xv0UqD9DS7Fqcd8ttK9VVo+0fyZJXj4azLdM5HXYOZoI6U/dyQjGc+vrseoN3JekN0m2CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711760783; c=relaxed/simple;
-	bh=0Tab6a8G72hAdQQTifWJdxmg84+y/tA9VvkWPFI9VQA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X1L0GBShyUfqsn6VvqqPsGVcef0/0+Su3BiDDri8AYSw2Tm6sFPgcsO5B786NS8cdmDPjuer6wtR8AutcMTwPZp4Wd2K6VRRe7ZaUU3BnJP8YPQUtBHNQYSt/yCGns+w71mx60RSjYvdktBv/+0Lzos4yFLliQBn7gOIDp7LcOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VugHsG2Y; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VugHsG2Y"
-Message-ID: <08dd01e3-c45e-47d9-bcde-55f7d1edc480@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711760777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BFgFwDTUylEnErMgQV0Ufr9/Ufnl/0omKSnqywixpVg=;
-	b=VugHsG2Y5vYBP20CvcOMmGaEI/5A/PvLnTsQTtTA0ZebTuac4nORyH8iRZe/CwFs5RLRhJ
-	4Ih/prbwbd8/OSA0Wv9Z9Z9JdeLOJUf8/vLW1xeGCG/2qNeI4CXYcIw3EixotT7o6oviEg
-	ZM4gfY/Y4bUjm5TsY8pyZBWQLZ0Jv74=
-Date: Fri, 29 Mar 2024 18:06:09 -0700
+	s=arc-20240116; t=1711890959; c=relaxed/simple;
+	bh=L7Vi+vmkHsVjFZafkNNAMR+3kGCT2NYbNKE8+JARxO4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pG2r+u1A6NrHFQoEugEWJtb35hhTOXdkMWxs5s48Rvt7G6y/KUSbJRta4p8NDeW5gugIDthXdKzpl+DKW0A7t8Wnn/xKbyFQBQG1O3IrfNtHo0dOOQyNERLi+YmJziTC+mU96Y62QeRJG/QQnPJ3lXQ1004MPfLoAm4549DRf00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6eaf1005fcaso828459b3a.3
+        for <linux-cifs@vger.kernel.org>; Sun, 31 Mar 2024 06:15:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711890957; x=1712495757;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8ZeJ7nzf10aNJzIrt1wR2zBdwW9hfoCqnnSg7ncILNQ=;
+        b=LI6iYxVZz/+U4t6/NDsLyckI/r5ZEDU7wdqGiTYFC/uxIPDtSGm6LRdGRZ91qqbYGz
+         2pMNTBNkftnmsVa2AMy88eP+qaajx3DdHyMt/3BZmfanYqLdKBsEzfNpbyaJiD+IPyZD
+         6S0mv/Nd8w0E8GbQn1Ql8/l6A0tztcJ5fkNYaul3k+f9zxtzEGKf5esfwGTw3WDg7GIg
+         LBJVzwob7blTQJf3CyrQBa7pxmtDjBQQcfn0PQmOmFZPfpcs0WSeTYEP0A+T0pabX2Q4
+         9jRO8+vwiRV54AhjIrAF5kXa5K5OH9+oVCfV9oHiTeeryF0fsUzTxhVnBLbO7P3bj5OX
+         OYvA==
+X-Gm-Message-State: AOJu0YyIKbIXSeT7hNqS5GfMEMeUruHfezYg6YenSlPHk/ot10P/yLRS
+	u/5x6IMlyoTj0MbeQW/ty52Ruh0OZoFjeuxeuN6wSPyuysBxK6Z7OLbeadiM
+X-Google-Smtp-Source: AGHT+IFQHe8J+wSWtxGPpS68IXx9VkdlUJw1VRO7jW9z6PnDoFn0Z0d35kmAzlBJouqkLWyMwcLdaw==
+X-Received: by 2002:a05:6a00:27a2:b0:6e6:9f47:c18c with SMTP id bd34-20020a056a0027a200b006e69f47c18cmr7330755pfb.33.1711890957469;
+        Sun, 31 Mar 2024 06:15:57 -0700 (PDT)
+Received: from localhost.localdomain ([110.14.71.32])
+        by smtp.gmail.com with ESMTPSA id w25-20020aa78599000000b006e6b7124b33sm6008163pfn.209.2024.03.31.06.15.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Mar 2024 06:15:57 -0700 (PDT)
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	atteh.mailbox@gmail.com,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: don't send oplock break if rename fails
+Date: Sun, 31 Mar 2024 22:15:07 +0900
+Message-Id: <20240331131507.3790-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 19/26] netfs: New writeback implementation
-Content-Language: en-US
-To: Naveen Mamindlapalli <naveenm@marvell.com>,
- David Howells <dhowells@redhat.com>, Christian Brauner
- <christian@brauner.io>, Jeff Layton <jlayton@kernel.org>,
- Gao Xiang <hsiangkao@linux.alibaba.com>,
- Dominique Martinet <asmadeus@codewreck.org>
-Cc: Matthew Wilcox <willy@infradead.org>, Steve French <smfrench@gmail.com>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- "netfs@lists.linux.dev" <netfs@lists.linux.dev>,
- "linux-cachefs@redhat.com" <linux-cachefs@redhat.com>,
- "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
- "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
- "v9fs@lists.linux.dev" <v9fs@lists.linux.dev>,
- "linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Christian Schoenebeck <linux_oss@crudebyte.com>
-References: <20240328163424.2781320-1-dhowells@redhat.com>
- <20240328163424.2781320-20-dhowells@redhat.com>
- <SJ2PR18MB5635A86C024316BC5E57B79EA23A2@SJ2PR18MB5635.namprd18.prod.outlook.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <SJ2PR18MB5635A86C024316BC5E57B79EA23A2@SJ2PR18MB5635.namprd18.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 29/03/2024 10:34, Naveen Mamindlapalli wrote:
->> -----Original Message-----
->> From: David Howells <dhowells@redhat.com>
->> Sent: Thursday, March 28, 2024 10:04 PM
->> To: Christian Brauner <christian@brauner.io>; Jeff Layton <jlayton@kernel.org>;
->> Gao Xiang <hsiangkao@linux.alibaba.com>; Dominique Martinet
->> <asmadeus@codewreck.org>
->> Cc: David Howells <dhowells@redhat.com>; Matthew Wilcox
->> <willy@infradead.org>; Steve French <smfrench@gmail.com>; Marc Dionne
->> <marc.dionne@auristor.com>; Paulo Alcantara <pc@manguebit.com>; Shyam
->> Prasad N <sprasad@microsoft.com>; Tom Talpey <tom@talpey.com>; Eric Van
->> Hensbergen <ericvh@kernel.org>; Ilya Dryomov <idryomov@gmail.com>;
->> netfs@lists.linux.dev; linux-cachefs@redhat.com; linux-afs@lists.infradead.org;
->> linux-cifs@vger.kernel.org; linux-nfs@vger.kernel.org; ceph-
->> devel@vger.kernel.org; v9fs@lists.linux.dev; linux-erofs@lists.ozlabs.org; linux-
->> fsdevel@vger.kernel.org; linux-mm@kvack.org; netdev@vger.kernel.org; linux-
->> kernel@vger.kernel.org; Latchesar Ionkov <lucho@ionkov.net>; Christian
->> Schoenebeck <linux_oss@crudebyte.com>
->> Subject: [PATCH 19/26] netfs: New writeback implementation
->>
->> The current netfslib writeback implementation creates writeback requests of
->> contiguous folio data and then separately tiles subrequests over the space
->> twice, once for the server and once for the cache.  This creates a few
->> issues:
->>
->>   (1) Every time there's a discontiguity or a change between writing to only
->>       one destination or writing to both, it must create a new request.
->>       This makes it harder to do vectored writes.
->>
->>   (2) The folios don't have the writeback mark removed until the end of the
->>       request - and a request could be hundreds of megabytes.
->>
->>   (3) In future, I want to support a larger cache granularity, which will
->>       require aggregation of some folios that contain unmodified data (which
->>       only need to go to the cache) and some which contain modifications
->>       (which need to be uploaded and stored to the cache) - but, currently,
->>       these are treated as discontiguous.
->>
->> There's also a move to get everyone to use writeback_iter() to extract
->> writable folios from the pagecache.  That said, currently writeback_iter()
->> has some issues that make it less than ideal:
->>
->>   (1) there's no way to cancel the iteration, even if you find a "temporary"
->>       error that means the current folio and all subsequent folios are going
->>       to fail;
->>
->>   (2) there's no way to filter the folios being written back - something
->>       that will impact Ceph with it's ordered snap system;
->>
->>   (3) and if you get a folio you can't immediately deal with (say you need
->>       to flush the preceding writes), you are left with a folio hanging in
->>       the locked state for the duration, when really we should unlock it and
->>       relock it later.
->>
->> In this new implementation, I use writeback_iter() to pump folios,
->> progressively creating two parallel, but separate streams and cleaning up
->> the finished folios as the subrequests complete.  Either or both streams
->> can contain gaps, and the subrequests in each stream can be of variable
->> size, don't need to align with each other and don't need to align with the
->> folios.
->>
->> Indeed, subrequests can cross folio boundaries, may cover several folios or
->> a folio may be spanned by multiple folios, e.g.:
->>
->>           +---+---+-----+-----+---+----------+
->> Folios:  |   |   |     |     |   |          |
->>           +---+---+-----+-----+---+----------+
->>
->>             +------+------+     +----+----+
->> Upload:    |      |      |.....|    |    |
->>             +------+------+     +----+----+
->>
->>           +------+------+------+------+------+
->> Cache:   |      |      |      |      |      |
->>           +------+------+------+------+------+
->>
->> The progressive subrequest construction permits the algorithm to be
->> preparing both the next upload to the server and the next write to the
->> cache whilst the previous ones are already in progress.  Throttling can be
->> applied to control the rate of production of subrequests - and, in any
->> case, we probably want to write them to the server in ascending order,
->> particularly if the file will be extended.
->>
->> Content crypto can also be prepared at the same time as the subrequests and
->> run asynchronously, with the prepped requests being stalled until the
->> crypto catches up with them.  This might also be useful for transport
->> crypto, but that happens at a lower layer, so probably would be harder to
->> pull off.
->>
->> The algorithm is split into three parts:
->>
->>   (1) The issuer.  This walks through the data, packaging it up, encrypting
->>       it and creating subrequests.  The part of this that generates
->>       subrequests only deals with file positions and spans and so is usable
->>       for DIO/unbuffered writes as well as buffered writes.
->>
->>   (2) The collector. This asynchronously collects completed subrequests,
->>       unlocks folios, frees crypto buffers and performs any retries.  This
->>       runs in a work queue so that the issuer can return to the caller for
->>       writeback (so that the VM can have its kswapd thread back) or async
->>       writes.
->>
->>   (3) The retryer.  This pauses the issuer, waits for all outstanding
->>       subrequests to complete and then goes through the failed subrequests
->>       to reissue them.  This may involve reprepping them (with cifs, the
->>       credits must be renegotiated, and a subrequest may need splitting),
->>       and doing RMW for content crypto if there's a conflicting change on
->>       the server.
->>
->> [!] Note that some of the functions are prefixed with "new_" to avoid
->> clashes with existing functions.  These will be renamed in a later patch
->> that cuts over to the new algorithm.
->>
->> Signed-off-by: David Howells <dhowells@redhat.com>
->> cc: Jeff Layton <jlayton@kernel.org>
->> cc: Eric Van Hensbergen <ericvh@kernel.org>
->> cc: Latchesar Ionkov <lucho@ionkov.net>
->> cc: Dominique Martinet <asmadeus@codewreck.org>
->> cc: Christian Schoenebeck <linux_oss@crudebyte.com>
->> cc: Marc Dionne <marc.dionne@auristor.com>
->> cc: v9fs@lists.linux.dev
->> cc: linux-afs@lists.infradead.org
->> cc: netfs@lists.linux.dev
->> cc: linux-fsdevel@vger.kernel.org
+Don't send oplock break if rename fails. This patch fix
+smb2.oplock.batch20 test.
 
-[..snip..]
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->> +/*
->> + * Begin a write operation for writing through the pagecache.
->> + */
->> +struct netfs_io_request *new_netfs_begin_writethrough(struct kiocb *iocb, size_t
->> len)
->> +{
->> +	struct netfs_io_request *wreq = NULL;
->> +	struct netfs_inode *ictx = netfs_inode(file_inode(iocb->ki_filp));
->> +
->> +	mutex_lock(&ictx->wb_lock);
->> +
->> +	wreq = netfs_create_write_req(iocb->ki_filp->f_mapping, iocb->ki_filp,
->> +				      iocb->ki_pos, NETFS_WRITETHROUGH);
->> +	if (IS_ERR(wreq))
->> +		mutex_unlock(&ictx->wb_lock);
->> +
->> +	wreq->io_streams[0].avail = true;
->> +	trace_netfs_write(wreq, netfs_write_trace_writethrough);
-> 
-> Missing mutex_unlock() before return.
-> 
-
-mutex_unlock() happens in new_netfs_end_writethrough()
-
-> Thanks,
-> Naveen
-> 
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index d478fa0c57ab..5723bbf372d7 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5857,8 +5857,9 @@ static int smb2_rename(struct ksmbd_work *work,
+ 	if (!file_info->ReplaceIfExists)
+ 		flags = RENAME_NOREPLACE;
+ 
+-	smb_break_all_levII_oplock(work, fp, 0);
+ 	rc = ksmbd_vfs_rename(work, &fp->filp->f_path, new_name, flags);
++	if (!rc)
++		smb_break_all_levII_oplock(work, fp, 0);
+ out:
+ 	kfree(new_name);
+ 	return rc;
+-- 
+2.25.1
 
