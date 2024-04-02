@@ -1,61 +1,61 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E78715A4BF
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 19:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B530615B978
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 19:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712086490; cv=pass; b=SWvaiFJPUjZaUr/c6BSzsBNxH5SXiEnMd8Uzb1r6gQplInl5GBopriSe7YHLAkO4c/oFsVt7mjVuoYNP+tbTg3H+pNNbiZPXzNg3+Q+ND3qxUgLcJv6YovUiSYioa9Shf6Uj9xRVeuJERdEgo+i36YUgsRJIsc+zpr/OGW9BZKk=
+	t=1712086492; cv=pass; b=fLDvy/RHZ1X1XxoyoJlaBmTtN22NAvB5+JSx6gCKZC0uYtmMyr6MMGiPQ/ouo0VrfJ6+vqXUlEUJVkiPPZWmdXbK+DTMqQoyv9ttpMobJwxkhUQDOcCC6aqFWyjpKLH2XuiRIXsazY/dMR34ztucycGjxJe01brOlA+27oUDT/k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712086490; c=relaxed/simple;
-	bh=OUoPlpwojIn1vNQdVRW1revNkh+kceML9MeP7IpgZQI=;
+	s=arc-20240116; t=1712086492; c=relaxed/simple;
+	bh=qVRlRETcY8kRwBRnokLQFfdNwHDN84O3xHRcY/8N0Jo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EdWtfRFNZ3f8Z7gXfRYxXNRC1apexTIjyljobCT34SbYTyV+d2QJcryOr47dU2a/tp6zIhxmYpcBVwLm/1JTtwjLXRkWGrSdYhkVODzsYuti9oB61yATrR/y7UudJA9gcPrBTVf1B4u5OLSJYR5A0ovScLBdcE515uTpOyWoXtw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=THHMKVTz; arc=pass smtp.client-ip=167.235.159.17
+	 MIME-Version; b=khEDlgvRgHO5z+chmsKNfVs9GqtBh/tJgR8nPf+Mk3a38FBzZNlo/10Ub2SFEi2iq7sxN+MT4Rva8YhxKZ9+aRa/mX1VZtpKAJ0jFuOwrFjjZO605kitlmz1J6Zk1GysHudr0xtpD2nBQ2b3CRaWnQW9Y2e/xQ+hBxwKjT0cRD0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=ptYOYkW3; arc=pass smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="THHMKVTz"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="ptYOYkW3"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712086487;
+	s=dkim; t=1712086488;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G8LhCD9Y6XSW1yomWSIcKAk3XFngRWAzYK41UbGFhT0=;
-	b=THHMKVTzFHUf4MTaoqMm02ocKakwq9geIf89siGXupBJHRI7KwIyYavdmovYfnzP0LkeYz
-	Cz2tCv1CaxXU4dH7QgvSxW479ydY7hIBPEjzMPIu0SolXVpLok5tcABNe1BzL35QWM7aAj
-	pscasjJ/Ax8UcnN9woXWO7kbPQ3vCZNgF93V0G/foTAStmXlNJsg08JL4Fcd4ogb7pq1Fj
-	nw3f36klDVqKFZ2RRbdu4+iB9PnJEyDpdSTl0fYqXxvG7PThqy36FmyrT38/IUG7zp5Ili
-	TxubnujtBzlq6l1DstcMjsQhw0gT9VUAy7bGUoQInvkz8oN5HQtXBjGxTDbgwg==
+	bh=FtUyWEBuOD6Bqor2G3ZGyuRMG4wxcqhKl97SBKlpZRU=;
+	b=ptYOYkW3NrgYM3MEDDTXd5vaOGklq76GNu/vmPJDNk7gex2F5MXizL1qB31LVzdoaQuihZ
+	k3z9yASQrcDZBVBnr2LPIJIsxA93RybI9DifkzsPQa1EPG0zxW2wPq3JaQWQzO7jGQS6iT
+	3Nex69zHPeenCqJCLDdoeEmJFSehU+iWlXEYF0pT2ZnIjOUNWvarvB0sR1/lZggajUmqhn
+	+a4WAWmorO1BYqKTEkbpTWXz3UQbOldVFPajgyOQq6eFzxUb/goLfEonREMT7gJTxrLE/y
+	6tEPr0N7rbqA2wKh4hQHcC8CDGwOaMB6YNQ38Sr9DqLHWCYj3qqkNEhmGPr3lA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712086487; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1712086488; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G8LhCD9Y6XSW1yomWSIcKAk3XFngRWAzYK41UbGFhT0=;
-	b=WaUinTACKt0fdQfrmEQeYPzdyl5WUsLeWG8xH8s3mcJ/+ERDmn+3ClF1Psqrk5ezq5HJwJ
-	fjwHvRtmvSvNAJRxn/Y+z4BbukmyUYayIOy3Kkz+FMDwpDkWGsS3WFzK/qBlP6fpYbhcF/
-	X95+PvK565THmaEDvD4OOdh/WUwSrjV6HhUGBjT73Pb43DdxkqmScVdK4mGx5YItGViBM9
-	f9JtL6jnRXVwR21w9/SHSRS7kEMFrAutsVBp0n1UmpqihaHYfA6ISaRHu6/Bz1puhkajef
-	c/5JBcX6BEZg/XViUnlJtbZ2zyrk6MjSYWYWIns5DBJcAG1AXXOfwHvTv7ZBUg==
+	bh=FtUyWEBuOD6Bqor2G3ZGyuRMG4wxcqhKl97SBKlpZRU=;
+	b=NRxlfBba18AF3QGrR+23B30jjjVzAWFSUH+XQPiNyIuM2A4Ed3qZGz2Bx3hDQCXjc898r8
+	8OpkrLmIeopqtHb8S+J8oSJsSi/EoPoSKfuBl3zG5ucvi781gyOovWCIb2RTMR97sTMCil
+	2ZSrn6XBsFVJU3Ug4k9O2J6A7IXtvzo8z/pKUMRwPeW/GiXpol5o/peT8ncWZ4mR/J1o39
+	dl3+ZCAmyMlfOM55F3vgglG67AFmBPLBkkun9YSZBuLTo9WV7iiT9cJpKBlamoh4MTgs2s
+	Sn54FE9oYYY0WnHniXCXePz1B9dYEOcjtEEOyb0ukPhwoRvy3zz8kd+c4BD75Q==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712086487; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712086488; a=rsa-sha256;
 	cv=none;
-	b=HuJZ8zgrT+/AIQM59ISxG/QPFPWCag/q3eRNUSvcrnJUZlmpRVpT2hpVYrPKerfHrbUbj7
-	LUJv94CSANpNl4SoWpkrdMtmg2jtUIeEhfC9ZhqaazAgB8OH2y+4p2x6GxgZ2358co2VpY
-	FCj1H37kbmtMyrPTfvIrZ3jsaG4jaaJ8eHpHMx0+W5sNIXtAbYPYkiyYKJfcIsMhiAFmlX
-	8KtBZnH9vNDIMzykMkI7dsMl0pyZf0nDKVJnhyG3lKekYABDzD/V9jWZdlWDKBNSQxLXDQ
-	MmNPVSlN/AxbEmFuwF/HZsuvf+zYY+g+l3WspkYnOajXjHHQ/svesfZm7bhC7A==
+	b=W0xgbttAXTtZE9YOMTeaB+mX9WPSJChkBqnPzjlUpvzMGa9NdOOa2EItGbD/T09YjQ3MQy
+	1vFOvwmxtP3OeT/zV6J9zzXcLPIjICY70kIFFmB9ZCfwKhV/cT/UZqLFSKHxcfUMyx7l+J
+	zKrxvRhCj/BgBLUpV8yjMTb4m7UyScvdxgPpQYx/OxhXeyIrDNvJhvSTWnZ7DqVu5ovQq9
+	3X6EQmvuYQAQ2+YKOMAsORvVkENPydSRrh2tDui3SdUUFsQKrjyK2LdhOXZfx0rJxtd5dP
+	sQ5Kve9r1GPbZ/Vw4n9NW7sJr1lwKpaLL5YOwEQrftmbtmZlfk8XqjYygoOgRA==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 05/12] smb: client: fix potential UAF in smb2_check_message()
-Date: Tue,  2 Apr 2024 16:33:57 -0300
-Message-ID: <20240402193404.236159-5-pc@manguebit.com>
+Subject: [PATCH 06/12] smb: client: fix potential UAF in smb2_is_valid_lease_break()
+Date: Tue,  2 Apr 2024 16:33:58 -0300
+Message-ID: <20240402193404.236159-6-pc@manguebit.com>
 In-Reply-To: <20240402193404.236159-1-pc@manguebit.com>
 References: <20240402193404.236159-1-pc@manguebit.com>
 Precedence: bulk
@@ -71,23 +71,22 @@ avoid UAF.
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/smb2misc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2misc.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index 82b84a4941dd..14d74ef70cc8 100644
+index 14d74ef70cc8..4abbf6545c9c 100644
 --- a/fs/smb/client/smb2misc.c
 +++ b/fs/smb/client/smb2misc.c
-@@ -160,7 +160,8 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
- 		/* decrypt frame now that it is completely read in */
- 		spin_lock(&cifs_tcp_ses_lock);
- 		list_for_each_entry(iter, &pserver->smb_ses_list, smb_ses_list) {
--			if (iter->Suid == le64_to_cpu(thdr->SessionId)) {
-+			if (!cifs_ses_exiting(iter) &&
-+			    iter->Suid == le64_to_cpu(thdr->SessionId)) {
- 				ses = iter;
- 				break;
- 			}
+@@ -623,6 +623,8 @@ smb2_is_valid_lease_break(char *buffer, struct TCP_Server_Info *server)
+ 	/* look up tcon based on tid & uid */
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
++		if (cifs_ses_exiting(ses))
++			continue;
+ 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+ 			spin_lock(&tcon->open_file_lock);
+ 			cifs_stats_inc(
 -- 
 2.44.0
 
