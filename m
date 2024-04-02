@@ -1,110 +1,99 @@
-Received: from frasgout13.his.huawei.com (frasgout13.his.huawei.com [14.137.139.46])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FED0383BD;
-	Tue,  2 Apr 2024 09:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C337B4776F;
+	Tue,  2 Apr 2024 10:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712049696; cv=none; b=Skl9OK4cL2T3MYA4vbgLMhlWbzLJcS49BdojLgTWGpw54Si6FyyEdehUJbEEk91lrQQfljG+nVnnFJpRl36e7++kd9OR+p+OTY5iqfb+K7RfrrtyM1OCzV61/h1DPI2xLW9XJM1D8uaCkRgUsw1oT/nTCBlXf9eUV2hboR4XWtw=
+	t=1712054938; cv=none; b=eeh0HHKLZZQ17dPoeQpQszzUucChVaAMK4aHUj1WtnlbI/V6n9bxLD5s5bEOS5fCjuXkse7+jW79YbDArYe2xq+hSJFmRiKkQdL4tzWU9cfR8hIr5ib+wcDkmQjWfx9ItRINQ2B+2Io+kGFh/imMa3fdgyXq57xOYffIqQ1kGAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712049696; c=relaxed/simple;
-	bh=ZrY+i6Eawe+SZnMjlYCNSaYhAVqh04i7Clug0w902kg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e7l/zR4sMUbZ5pYbxC7Ql1Cd9/mYHQHMHpLyVHoDKbNSXRr0Lde7P3WBFbKOzCUjxxZpqf7BEFoE6prbQiqgP3+gy+lIgLG3AZM/z2WyxLHYt4EPYSFK+8mvRY+DSfRi0mp2tN0CoKRgC0WJA7QpQqPHEMQlKsTljXaHY0pyywk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.186.51])
-	by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4V825q65wwz9xHvc;
-	Tue,  2 Apr 2024 17:05:19 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.27])
-	by mail.maildlp.com (Postfix) with ESMTP id BCF201404A5;
-	Tue,  2 Apr 2024 17:21:22 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.204.63.22])
-	by APP2 (Coremail) with SMTP id GxC2BwDXECUKzgtmLpxrBQ--.39145S2;
-	Tue, 02 Apr 2024 10:21:22 +0100 (CET)
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: torvalds@linux-foundation.org
-Cc: linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
+	s=arc-20240116; t=1712054938; c=relaxed/simple;
+	bh=0o849oaUCS/1to/11XOBsrrHkZ6HnWiwjHhXX1XawsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GDwHJ7XqCP8SICjGWIrNkHKwcgYY8likZYkKfgvTtsD6y9dBFOW0/r+ZmavJnj+muzbMcIM32zhkHSsnM8kiy20Yq4v78EncUpGOFz4gUfj4XHqA8nKON5pj+KCdRBlddNKlC1pE9hTmT3NQnArXv4vMNftcjaxHgyIM4r0CdPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3pKIoou; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3pKIoou"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B1F0C433C7;
+	Tue,  2 Apr 2024 10:48:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712054937;
+	bh=0o849oaUCS/1to/11XOBsrrHkZ6HnWiwjHhXX1XawsY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s3pKIoouIXwXD4lmoPfSlZSDJZnmmtOa1RUJNiFaCXHRyfUJWBCybV99rJXm7gV8y
+	 T7Fjk4lyWWWjVz2Gcq+2fNAoTMJnNX/2F2ImxDn9loGZaAaUiIrrOGUofL9i7svfdk
+	 XAdlme0aallBdCc4GUuODtk5GZtLEzaPI3vng58HDE2HBNIlc4c6Bq3f6hazpMeaEx
+	 Xgj2CoKMoSLbndyirg0YejiKL0ZEAGFUReEzmqbp1wYq+3/s1f3ZCIqrcblHvsWe1U
+	 u/Fu8N++N778FF1N0TJzW8msw8oIsVzOMv/4cCc32kKXWGv+qqR4NqN76QQvHhbwO4
+	 xB4Ir5cVjt1jw==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Roberto Sassu <roberto.sassu@huawei.com>
-Subject: [GIT PULL] security changes for v6.9-rc3
-Date: Tue,  2 Apr 2024 11:21:08 +0200
-Message-Id: <20240402092108.2520373-1-roberto.sassu@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
+	Jeff Layton <jlayton@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Gao Xiang <xiang@kernel.org>
+Subject: Re: [PATCH 00/26] netfs, afs, 9p, cifs: Rework netfs to use ->writepages() to copy to cache
+Date: Tue,  2 Apr 2024 12:48:39 +0200
+Message-ID: <20240402-angezapft-geltung-eedf20c747b6@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240328163424.2781320-1-dhowells@redhat.com>
+References: <20240328163424.2781320-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1071; i=brauner@kernel.org; h=from:subject:message-id; bh=0o849oaUCS/1to/11XOBsrrHkZ6HnWiwjHhXX1XawsY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRxP+pcP3O9duihh7ft/O8vis97k3zynpVeQfGsW8E7b q56dXSyVUcpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEuNwYGTasXTr9sKjU3hPX Ei5oGyxbtVov5EPVyh7dA8dse88LRt5l+M2u8X9Xtd2ZVVnejNGvL9xPN9z30XT+j+sXvgWrTvz jocYCAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:GxC2BwDXECUKzgtmLpxrBQ--.39145S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cry5KFWrGF1rGr43GF4fAFb_yoW8AF17pF
-	sxKF17Gr1rXFyxGF1kAF17uFW8K3y5Gr1UX3Z8Jw18AF98Cr15Xr1vkr1rWryUJry7tr1x
-	tw1jvr15Gw1DAr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyqb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-	z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
-	AF1VAY17CE14v26r126r1DMIIYY7kG6xAYrwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
-	14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20x
-	vaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUgCztUUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQABBF1jj5wDRQAAsv
 
-From: Roberto Sassu <roberto.sassu@huawei.com>
+On Thu, 28 Mar 2024 16:33:52 +0000, David Howells wrote:
+> The primary purpose of these patches is to rework the netfslib writeback
+> implementation such that pages read from the cache are written to the cache
+> through ->writepages(), thereby allowing the fscache page flag to be
+> retired.
+> 
+> The reworking also:
+> 
+> [...]
 
-Hi Linus
+Pulled from netfs-writeback which contains the minor fixes pointed out.
 
-I have a small bug fix for this kernel version. Please pull.
+---
 
-PS: sorry for the email mismatch, @huawei.com emails resent from the
-    mailing list are classified by Gmail as spam, we are working on
-    fixing it.
+Applied to the vfs.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs.netfs branch should appear in linux-next soon.
 
-Thanks
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Roberto
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-The following changes since commit 026e680b0a08a62b1d948e5a8ca78700bfac0e6e:
-
-  Merge tag 'pwm/for-6.9-rc3-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/ukleinek/linux (2024-04-01 14:38:55 -0700)
-
-are available in the Git repository at:
-
-  https://github.com/linux-integrity/linux.git tags/security-mknod-6.9-rc3
-
-for you to fetch changes up to 12d665b7d3fa743ec58160ceda8421d64b63f272:
-
-  security: Handle dentries without inode in security_path_post_mknod() (2024-04-02 10:01:19 +0200)
-
-----------------------------------------------------------------
-Here is a simple follow-up patch for the patch set to move IMA and EVM to
-the LSM infrastructure.
-
-It fixes a kernel panic in the newly introduced function
-security_path_post_mknod(), when trying to check if an inode is private.
-The panic occurs because not all dentries have an inode attached to them.
-
-I'm sending this PR as IMA/EVM co-maintainer, even if the patch also
-touches the LSM infrastructure itself (it is acked by Paul).
-
-Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
-
-----------------------------------------------------------------
-Roberto Sassu (1):
-      security: Handle dentries without inode in security_path_post_mknod()
-
- security/integrity/evm/evm_main.c | 6 ++++--
- security/integrity/ima/ima_main.c | 5 +++--
- security/security.c               | 5 ++++-
- 3 files changed, 11 insertions(+), 5 deletions(-)
-
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.netfs
