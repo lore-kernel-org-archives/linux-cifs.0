@@ -1,303 +1,458 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87022576B
-	for <linux-cifs@vger.kernel.org>; Mon,  1 Apr 2024 18:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711996949; cv=none; b=D6TtzqGGD4qHO0ZzROLO/I5GRmMafNzeS7R4B/33ZSy/0TeA0j1aQVMcyHOX1T0A/Rg8RmFjoPzG83pvPkGfM8fXJq8nyCnrf7I0316qilmqpVF5T9tlld8dEO3//zdDvZwG/zsIhu8wErbQsiwpQufy5fT8rL+1zyKkennOhnU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711996949; c=relaxed/simple;
-	bh=qr4zccKNF8OtnPIfq6dmjq8WrXOxgmnWYV5Hf5WAdgk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VzeipGpKQX4sQk6j3ND/3+IGcIAy/jZFkxRnWGAfNV0a/fS6bdWLw2U4K5iv5bDv0KsbAHNrbpyfJCiRXtpAwFzO6Vm03srZ4B0fB5m9rHwILAzL/o1eYKuWzxmayczRRoWy7+cZxq6H8Bk245b0Zh0488N141YQ0FSBkbrwNoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BVMpmhDE; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9B0945A
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 01:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712022277; cv=pass; b=faqP9ylJ4rU7r3mQM/qSjerA4rNVHCYfGYLgRRL4hKddq4hR8I42CZKPmnGm0pO7Xc5SrYtCNz4uCEKG++ay5kka8k0IaV0TtGObC+vNt1PNVq+25FNApiv8/ORnMzGdAkjJBrQ0Ac/dSQZquiCKH3CfeNI78ZIGI65EWTXY5Bc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712022277; c=relaxed/simple;
+	bh=yFeioWhzqmVIQtTy+/7fTui85gkfo2nWafODwWxMY7o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sualRwoA+9vsIh5eBZOhbEJAzbVkyW3W7XWo2BPEwpe1WqLiRIMhxvhYr0wL+FGei9q1WJiMcH6U3He2eLmFPaZ9MEqZql6Kr5mxo0mpLyG85ZyCTaI8zqqeMaL79tQcn/mHCJmFXjQmY/XA604zUbWvaCmkvZKBH2qId1WBt8c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=AzUOUKpG; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BVMpmhDE"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d6ee81bc87so38522301fa.1
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Apr 2024 11:42:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711996946; x=1712601746; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EMs3OnFs5QNra0270wiAsp82GCtS/TvXo/CMBRsiEuw=;
-        b=BVMpmhDEZ/KE8ujbwf/sI7q/cJCZUnREJ38j/5KZmFPHuEXRCvRlD6QTikS2PPVoVS
-         AHTZ344+h1hpWhPl5p8EcmjH32ZAjoOOSBnoIXz/mS7DExBdfa3IBjpF/fXahgRWHbl1
-         sjJT0iWRCCxkTaGip1wDsZnFQPO3OlMJUYBb6l60HJsYk1LjpeWmDxXXVIiAIL/sFfXH
-         j4ZcZRydAfjo61eCESBQ5AFEWmRwhEMQUFUNXJe5vyOaLdHYo4hO2+c+GP5nKB3ZU8IR
-         Ii0QiV6XkAyGY58e+YZMdNXI6V2xQZAn4ukMtQBMP5pepFj3AAKh0CcPegi3zP+hcv0A
-         Tgtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711996946; x=1712601746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EMs3OnFs5QNra0270wiAsp82GCtS/TvXo/CMBRsiEuw=;
-        b=c75qQEhx+DE0Qf1kdgR4OyQKuImimZpbU96m70SJSwYTKj47nv6NN27+nbK21uPbh4
-         2+p/7G8rfyXg2RvYYhPXMTe9Jap9g2jZejgrII9rnPwPRamoPsVNwjyik9a4vd6T34Ta
-         tLur9dnMSXb+yTFV7GEbY1X27OMj7MZ718g3mJXpx5Q0pDkvA0rkQ0rPwFblAO7v9Npl
-         PXMHX0vf6+ayQYgs66N3C6XcV0gHKUidy8DVdiE3Z8F5Swn3moinoTZ+mI2MXgL8CwpA
-         PiBt9B2OrZY58xI2WUM0Uau1XTQm3cNjMi0cojtOcZj96JSPRgd/EtdAHPj5P9oAhB3X
-         ecgA==
-X-Gm-Message-State: AOJu0YxioZ8fUk8X4X7v55iL0p9dh0wKa3RoRXKMVuBPeTlzMhriKF8K
-	IgEKCHnkYJBMRpaAwjsYefzUHt/eAmOmI8be5FmiBJTrJtacsrGsgkVCK64qkxZTbfIpgeT7hTL
-	VE5MfQdsJU3zcMMm7aDPyz+vKFgjjW3S5
-X-Google-Smtp-Source: AGHT+IEmoGAWQfHUw87ni6QBXo76ngF8g35S8yhGQoESNCfL/noxUj67XS6VkNTc9u6ZjS6K/opZkxQ9YDUrU9+sq3M=
-X-Received: by 2002:a2e:8009:0:b0:2d8:b2e:7c09 with SMTP id
- j9-20020a2e8009000000b002d80b2e7c09mr3767141ljg.1.1711996944866; Mon, 01 Apr
- 2024 11:42:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="AzUOUKpG"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712022270;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DB5GM1Bv4ZnqikFsZsWbzaHlnmM+4rTeweB5ikWXuAk=;
+	b=AzUOUKpGKkbVgxne0R1swKQLf8QaeiPUxM/lnVmG7cRl+1hP+ZXnOinlBKYKc+3zgV385Q
+	pQ/kb01y2fLfkxcJ2VYCgstvfhWTs5MM1ClO3SvdGkFOB8DU8/2FKqyXRoS69YiJ9q5zz7
+	Tf9aAH4IsB5e6JmE3T6XjfXZS+vUiDXe97d8fJ6+wiS9eEn1qDX06f4uy1BAYC6ZRUBxgu
+	D6aUbBD3mDqniU6Ozv+hCOWqtI8RIaFoHH3nzd0OHYGC1/hbNsnQ2KreEWW9pn7V0SUkSH
+	BwjOUiw9ELJ+63ZZg5zzOUr+0YwqXOeSgi0ndKcLQv2gauKQ4mzp9vuaZGBueQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712022270; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=DB5GM1Bv4ZnqikFsZsWbzaHlnmM+4rTeweB5ikWXuAk=;
+	b=rIs/NMYuSLMXFxW4G/DJz9OaBd1gJS6yTyRQBWmEVbEtAWO4ht17K8TQq44ZsbvDnlHDL0
+	uMv9/1XNtyRTBwZxg9sgMGuYcfU7WwtH5dMcW7jXvxOdVM2OSCuhi22xXOS+KnxFilJrcp
+	D++z649tOInqxkkkIXbkTUuMGMDx7/4UmLtKKnKG135IcnsM7DmuZb1VGyB1DXZfeAYD27
+	qmcSvmGU4gcszpkPF6Kp6NlQ7XT7LfIMVs25AZeBI3/dkTphOz/2tHA+O42X5G3WyZqDAM
+	EuXRuDeGkcjA9g+6lGDwP1Pf5EugCDBty7YEKGxI9vki4+fJERgE1AM0mkB3pA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712022270; a=rsa-sha256;
+	cv=none;
+	b=gB5Xk/1Q5zpT6JApCMFpYCdO6eI4JlX12ka6h4MS7nITCwGwV+2r7RolXkax6YbzWF0JpU
+	0yq5o3o1eHoSSrWw9xyEvsXaEhxB5jK7pBrLKaq8qIUF4ooRUeWy6FAxsf/fZ6kFE1y21y
+	QjSCwl812FdJMZ3awLXzYIrTCw6lhNaPpa9Bv92uuqkDMLULPR6BNLmxVIyDfyL65lgoMh
+	lgcgFiwYS8+QSJwUYmE0TCb3B5bx0k4nZjDD/xE9guBSR51v5UaBiQNk6hyLTKFcQEthl8
+	6qyKYQx4fQWGh/ffEVvlOP1K+ChandbYfwSAkdP/RtMgY4/BedrnWTI9cVBF9g==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 1/4] smb: client: guarantee refcounted children from parent session
+Date: Mon,  1 Apr 2024 22:44:06 -0300
+Message-ID: <20240402014409.145562-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240401170044.86991-1-pc@manguebit.com> <20240401171310.88213-1-pc@manguebit.com>
-In-Reply-To: <20240401171310.88213-1-pc@manguebit.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 1 Apr 2024 13:42:13 -0500
-Message-ID: <CAH2r5mtS4azO=qL-v+KVOVDq7CUSCEgzGapw16U0CVv8YUpU8A@mail.gmail.com>
-Subject: Re: [PATCH v2] smb: client: fix UAF in smb2_reconnect_server()
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-tentatively merged into cifs-2.6.git for-next pending additional
-testing and review
+Avoid potential use-after-free bugs when walking DFS referrals,
+mounting and performing DFS failover by ensuring that all children
+from parent @tcon->ses are also refcounted.  They're all needed across
+the entire DFS mount.  Get rid of @tcon->dfs_ses_list while we're at
+it, too.
 
-On Mon, Apr 1, 2024 at 12:13=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
-wrote:
->
-> The UAF bug is due to smb2_reconnect_server() accessing a session that
-> is already being teared down by another thread that is executing
-> __cifs_put_smb_ses().  This can happen when (a) the client has
-> connection to the server but no session or (b) another thread ends up
-> setting @ses->ses_status again to something different than
-> SES_EXITING.
->
-> To fix this, we need to make sure to unconditionally set
-> @ses->ses_status to SES_EXITING and prevent any other threads from
-> setting a new status while we're still tearing it down.
->
-> The following can be reproduced by adding some delay to right after
-> the ipc is freed in __cifs_put_smb_ses() - which will give
-> smb2_reconnect_server() worker a chance to run and then accessing
-> @ses->ipc:
->
-> kinit ...
-> mount.cifs //srv/share /mnt/1 -o sec=3Dkrb5,nohandlecache,echo_interval=
-=3D10
-> [disconnect srv]
-> ls /mnt/1 &>/dev/null
-> sleep 30
-> kdestroy
-> [reconnect srv]
-> sleep 10
-> umount /mnt/1
-> ...
-> CIFS: VFS: Verify user has a krb5 ticket and keyutils is installed
-> CIFS: VFS: \\srv Send error in SessSetup =3D -126
-> CIFS: VFS: Verify user has a krb5 ticket and keyutils is installed
-> CIFS: VFS: \\srv Send error in SessSetup =3D -126
-> general protection fault, probably for non-canonical address
-> 0x6b6b6b6b6b6b6b6b: 0000 [#1] PREEMPT SMP NOPTI
-> CPU: 3 PID: 50 Comm: kworker/3:1 Not tainted 6.9.0-rc2 #1
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-1.fc39
-> 04/01/2014
-> Workqueue: cifsiod smb2_reconnect_server [cifs]
-> RIP: 0010:__list_del_entry_valid_or_report+0x33/0xf0
-> Code: 4f 08 48 85 d2 74 42 48 85 c9 74 59 48 b8 00 01 00 00 00 00 ad
-> de 48 39 c2 74 61 48 b8 22 01 00 00 00 00 74 69 <48> 8b 01 48 39 f8 75
-> 7b 48 8b 72 08 48 39 c6 0f 85 88 00 00 00 b8
-> RSP: 0018:ffffc900001bfd70 EFLAGS: 00010a83
-> RAX: dead000000000122 RBX: ffff88810da53838 RCX: 6b6b6b6b6b6b6b6b
-> RDX: 6b6b6b6b6b6b6b6b RSI: ffffffffc02f6878 RDI: ffff88810da53800
-> RBP: ffff88810da53800 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000001 R12: ffff88810c064000
-> R13: 0000000000000001 R14: ffff88810c064000 R15: ffff8881039cc000
-> FS: 0000000000000000(0000) GS:ffff888157c00000(0000)
-> knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fe3728b1000 CR3: 000000010caa4000 CR4: 0000000000750ef0
-> PKRU: 55555554
-> Call Trace:
->  <TASK>
->  ? die_addr+0x36/0x90
->  ? exc_general_protection+0x1c1/0x3f0
->  ? asm_exc_general_protection+0x26/0x30
->  ? __list_del_entry_valid_or_report+0x33/0xf0
->  __cifs_put_smb_ses+0x1ae/0x500 [cifs]
->  smb2_reconnect_server+0x4ed/0x710 [cifs]
->  process_one_work+0x205/0x6b0
->  worker_thread+0x191/0x360
->  ? __pfx_worker_thread+0x10/0x10
->  kthread+0xe2/0x110
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x34/0x50
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1a/0x30
->  </TASK>
->
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-> ---
-> v1 -> v2: add missing comments in reproducer
->
->  fs/smb/client/connect.c | 87 +++++++++++++++++------------------------
->  1 file changed, 36 insertions(+), 51 deletions(-)
->
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 9b85b5341822..ee29bc57300c 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -232,7 +232,13 @@ cifs_mark_tcp_ses_conns_for_reconnect(struct TCP_Ser=
-ver_Info *server,
->
->         spin_lock(&cifs_tcp_ses_lock);
->         list_for_each_entry_safe(ses, nses, &pserver->smb_ses_list, smb_s=
-es_list) {
-> -               /* check if iface is still active */
-> +               spin_lock(&ses->ses_lock);
-> +               if (ses->ses_status =3D=3D SES_EXITING) {
-> +                       spin_unlock(&ses->ses_lock);
-> +                       continue;
-> +               }
-> +               spin_unlock(&ses->ses_lock);
-> +
->                 spin_lock(&ses->chan_lock);
->                 if (cifs_ses_get_chan_index(ses, server) =3D=3D
->                     CIFS_INVAL_CHAN_INDEX) {
-> @@ -1963,31 +1969,6 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_f=
-s_context *ctx)
->         return rc;
->  }
->
-> -/**
-> - * cifs_free_ipc - helper to release the session IPC tcon
-> - * @ses: smb session to unmount the IPC from
-> - *
-> - * Needs to be called everytime a session is destroyed.
-> - *
-> - * On session close, the IPC is closed and the server must release all t=
-cons of the session.
-> - * No need to send a tree disconnect here.
-> - *
-> - * Besides, it will make the server to not close durable and resilient f=
-iles on session close, as
-> - * specified in MS-SMB2 3.3.5.6 Receiving an SMB2 LOGOFF Request.
-> - */
-> -static int
-> -cifs_free_ipc(struct cifs_ses *ses)
-> -{
-> -       struct cifs_tcon *tcon =3D ses->tcon_ipc;
-> -
-> -       if (tcon =3D=3D NULL)
-> -               return 0;
-> -
-> -       tconInfoFree(tcon);
-> -       ses->tcon_ipc =3D NULL;
-> -       return 0;
-> -}
-> -
->  static struct cifs_ses *
->  cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context=
- *ctx)
->  {
-> @@ -2019,48 +2000,52 @@ cifs_find_smb_ses(struct TCP_Server_Info *server,=
- struct smb3_fs_context *ctx)
->  void __cifs_put_smb_ses(struct cifs_ses *ses)
->  {
->         struct TCP_Server_Info *server =3D ses->server;
-> +       struct cifs_tcon *tcon;
->         unsigned int xid;
->         size_t i;
-> +       bool do_logoff;
->         int rc;
->
-> -       spin_lock(&ses->ses_lock);
-> -       if (ses->ses_status =3D=3D SES_EXITING) {
-> -               spin_unlock(&ses->ses_lock);
-> -               return;
-> -       }
-> -       spin_unlock(&ses->ses_lock);
-> -
-> -       cifs_dbg(FYI, "%s: ses_count=3D%d\n", __func__, ses->ses_count);
-> -       cifs_dbg(FYI,
-> -                "%s: ses ipc: %s\n", __func__, ses->tcon_ipc ? ses->tcon=
-_ipc->tree_name : "NONE");
-> -
->         spin_lock(&cifs_tcp_ses_lock);
-> -       if (--ses->ses_count > 0) {
-> +       spin_lock(&ses->ses_lock);
-> +       cifs_dbg(FYI, "%s: id=3D0x%llx ses_count=3D%d ses_status=3D%u ipc=
-=3D%s\n",
-> +                __func__, ses->Suid, ses->ses_count, ses->ses_status,
-> +                ses->tcon_ipc ? ses->tcon_ipc->tree_name : "none");
-> +       if (ses->ses_status =3D=3D SES_EXITING || --ses->ses_count > 0) {
-> +               spin_unlock(&ses->ses_lock);
->                 spin_unlock(&cifs_tcp_ses_lock);
->                 return;
->         }
-> -       spin_lock(&ses->ses_lock);
-> -       if (ses->ses_status =3D=3D SES_GOOD)
-> -               ses->ses_status =3D SES_EXITING;
-> -       spin_unlock(&ses->ses_lock);
-> -       spin_unlock(&cifs_tcp_ses_lock);
-> -
->         /* ses_count can never go negative */
->         WARN_ON(ses->ses_count < 0);
->
-> -       spin_lock(&ses->ses_lock);
-> -       if (ses->ses_status =3D=3D SES_EXITING && server->ops->logoff) {
-> -               spin_unlock(&ses->ses_lock);
-> -               cifs_free_ipc(ses);
-> +       spin_lock(&ses->chan_lock);
-> +       cifs_chan_clear_need_reconnect(ses, server);
-> +       spin_unlock(&ses->chan_lock);
-> +
-> +       do_logoff =3D ses->ses_status =3D=3D SES_GOOD && server->ops->log=
-off;
-> +       ses->ses_status =3D SES_EXITING;
-> +       tcon =3D ses->tcon_ipc;
-> +       ses->tcon_ipc =3D NULL;
-> +       spin_unlock(&ses->ses_lock);
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +
-> +       /*
-> +        * On session close, the IPC is closed and the server must releas=
-e all
-> +        * tcons of the session.  No need to send a tree disconnect here.
-> +        *
-> +        * Besides, it will make the server to not close durable and resi=
-lient
-> +        * files on session close, as specified in MS-SMB2 3.3.5.6 Receiv=
-ing an
-> +        * SMB2 LOGOFF Request.
-> +        */
-> +       tconInfoFree(tcon);
-> +       if (do_logoff) {
->                 xid =3D get_xid();
->                 rc =3D server->ops->logoff(xid, ses);
->                 if (rc)
->                         cifs_server_dbg(VFS, "%s: Session Logoff failure =
-rc=3D%d\n",
->                                 __func__, rc);
->                 _free_xid(xid);
-> -       } else {
-> -               spin_unlock(&ses->ses_lock);
-> -               cifs_free_ipc(ses);
->         }
->
->         spin_lock(&cifs_tcp_ses_lock);
-> --
-> 2.44.0
->
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/cifsglob.h  |  2 --
+ fs/smb/client/cifsproto.h | 20 +++++++--------
+ fs/smb/client/connect.c   | 25 +++++++++++++++----
+ fs/smb/client/dfs.c       | 51 ++++++++++++++++++---------------------
+ fs/smb/client/dfs.h       | 33 ++++++++++++++++---------
+ fs/smb/client/dfs_cache.c | 11 +--------
+ fs/smb/client/misc.c      |  6 -----
+ 7 files changed, 76 insertions(+), 72 deletions(-)
 
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 7ed9d05f6890..286afbe346be 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1281,7 +1281,6 @@ struct cifs_tcon {
+ 	struct cached_fids *cfids;
+ 	/* BB add field for back pointer to sb struct(s)? */
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	struct list_head dfs_ses_list;
+ 	struct delayed_work dfs_cache_work;
+ #endif
+ 	struct delayed_work	query_interfaces; /* query interfaces workqueue job */
+@@ -1804,7 +1803,6 @@ struct cifs_mount_ctx {
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon;
+-	struct list_head dfs_ses_list;
+ };
+ 
+ static inline void __free_dfs_info_param(struct dfs_info3_param *param)
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 0723e1b57256..8e0a348f1f66 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -725,31 +725,31 @@ struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon);
+ void cifs_put_tcon_super(struct super_block *sb);
+ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry);
+ 
+-/* Put references of @ses and @ses->dfs_root_ses */
++/* Put references of @ses and its children */
+ static inline void cifs_put_smb_ses(struct cifs_ses *ses)
+ {
+-	struct cifs_ses *rses = ses->dfs_root_ses;
++	struct cifs_ses *next;
+ 
+-	__cifs_put_smb_ses(ses);
+-	if (rses)
+-		__cifs_put_smb_ses(rses);
++	do {
++		next = ses->dfs_root_ses;
++		__cifs_put_smb_ses(ses);
++	} while ((ses = next));
+ }
+ 
+-/* Get an active reference of @ses and @ses->dfs_root_ses.
++/* Get an active reference of @ses and its children.
+  *
+  * NOTE: make sure to call this function when incrementing reference count of
+  * @ses to ensure that any DFS root session attached to it (@ses->dfs_root_ses)
+  * will also get its reference count incremented.
+  *
+- * cifs_put_smb_ses() will put both references, so call it when you're done.
++ * cifs_put_smb_ses() will put all references, so call it when you're done.
+  */
+ static inline void cifs_smb_ses_inc_refcount(struct cifs_ses *ses)
+ {
+ 	lockdep_assert_held(&cifs_tcp_ses_lock);
+ 
+-	ses->ses_count++;
+-	if (ses->dfs_root_ses)
+-		ses->dfs_root_ses->ses_count++;
++	for (; ses; ses = ses->dfs_root_ses)
++		ses->ses_count++;
+ }
+ 
+ static inline bool dfs_src_pathname_equal(const char *s1, const char *s2)
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ee29bc57300c..22d152cd24d1 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1866,6 +1866,9 @@ static int match_session(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 	    ctx->sectype != ses->sectype)
+ 		return 0;
+ 
++	if (ctx->dfs_root_ses != ses->dfs_root_ses)
++		return 0;
++
+ 	/*
+ 	 * If an existing session is limited to less channels than
+ 	 * requested, it should not be reused
+@@ -2358,9 +2361,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+ 	 * need to lock before changing something in the session.
+ 	 */
+ 	spin_lock(&cifs_tcp_ses_lock);
++	if (ctx->dfs_root_ses)
++		cifs_smb_ses_inc_refcount(ctx->dfs_root_ses);
+ 	ses->dfs_root_ses = ctx->dfs_root_ses;
+-	if (ses->dfs_root_ses)
+-		ses->dfs_root_ses->ses_count++;
+ 	list_add(&ses->smb_ses_list, &server->smb_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+@@ -3311,6 +3314,9 @@ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx)
+ 		cifs_put_smb_ses(mnt_ctx->ses);
+ 	else if (mnt_ctx->server)
+ 		cifs_put_tcp_session(mnt_ctx->server, 0);
++	mnt_ctx->ses = NULL;
++	mnt_ctx->tcon = NULL;
++	mnt_ctx->server = NULL;
+ 	mnt_ctx->cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_POSIX_PATHS;
+ 	free_xid(mnt_ctx->xid);
+ }
+@@ -3589,8 +3595,6 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	bool isdfs;
+ 	int rc;
+ 
+-	INIT_LIST_HEAD(&mnt_ctx.dfs_ses_list);
+-
+ 	rc = dfs_mount_share(&mnt_ctx, &isdfs);
+ 	if (rc)
+ 		goto error;
+@@ -3621,7 +3625,6 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	return rc;
+ 
+ error:
+-	dfs_put_root_smb_sessions(&mnt_ctx.dfs_ses_list);
+ 	cifs_mount_put_conns(&mnt_ctx);
+ 	return rc;
+ }
+@@ -3636,6 +3639,18 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 		goto error;
+ 
+ 	rc = cifs_mount_get_tcon(&mnt_ctx);
++	if (!rc) {
++		/*
++		 * Prevent superblock from being created with any missing
++		 * connections.
++		 */
++		if (WARN_ON(!mnt_ctx->server))
++			rc = -EHOSTDOWN;
++		else if (WARN_ON(!mnt_ctx->ses))
++			rc = -EACCES;
++		else if (WARN_ON(!mnt_ctx->tcon))
++			rc = -ENOENT;
++	}
+ 	if (rc)
+ 		goto error;
+ 
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index 449c59830039..3ec965547e3d 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -66,33 +66,20 @@ static int get_session(struct cifs_mount_ctx *mnt_ctx, const char *full_path)
+ }
+ 
+ /*
+- * Track individual DFS referral servers used by new DFS mount.
+- *
+- * On success, their lifetime will be shared by final tcon (dfs_ses_list).
+- * Otherwise, they will be put by dfs_put_root_smb_sessions() in cifs_mount().
++ * Get an active reference of @ses so that next call to cifs_put_tcon() won't
++ * release it as any new DFS referrals must go through its IPC tcon.
+  */
+-static int add_root_smb_session(struct cifs_mount_ctx *mnt_ctx)
++static void add_root_smb_session(struct cifs_mount_ctx *mnt_ctx)
+ {
+ 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
+-	struct dfs_root_ses *root_ses;
+ 	struct cifs_ses *ses = mnt_ctx->ses;
+ 
+ 	if (ses) {
+-		root_ses = kmalloc(sizeof(*root_ses), GFP_KERNEL);
+-		if (!root_ses)
+-			return -ENOMEM;
+-
+-		INIT_LIST_HEAD(&root_ses->list);
+-
+ 		spin_lock(&cifs_tcp_ses_lock);
+ 		cifs_smb_ses_inc_refcount(ses);
+ 		spin_unlock(&cifs_tcp_ses_lock);
+-		root_ses->ses = ses;
+-		list_add_tail(&root_ses->list, &mnt_ctx->dfs_ses_list);
+ 	}
+-	/* Select new DFS referral server so that new referrals go through it */
+ 	ctx->dfs_root_ses = ses;
+-	return 0;
+ }
+ 
+ static inline int parse_dfs_target(struct smb3_fs_context *ctx,
+@@ -185,11 +172,8 @@ static int __dfs_referral_walk(struct cifs_mount_ctx *mnt_ctx,
+ 					continue;
+ 			}
+ 
+-			if (is_refsrv) {
+-				rc = add_root_smb_session(mnt_ctx);
+-				if (rc)
+-					goto out;
+-			}
++			if (is_refsrv)
++				add_root_smb_session(mnt_ctx);
+ 
+ 			rc = ref_walk_advance(rw);
+ 			if (!rc) {
+@@ -232,6 +216,7 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+ 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
+ 	struct cifs_tcon *tcon;
+ 	char *origin_fullpath;
++	bool new_tcon = true;
+ 	int rc;
+ 
+ 	origin_fullpath = dfs_get_path(cifs_sb, ctx->source);
+@@ -239,6 +224,18 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+ 		return PTR_ERR(origin_fullpath);
+ 
+ 	rc = dfs_referral_walk(mnt_ctx);
++	if (!rc) {
++		/*
++		 * Prevent superblock from being created with any missing
++		 * connections.
++		 */
++		if (WARN_ON(!mnt_ctx->server))
++			rc = -EHOSTDOWN;
++		else if (WARN_ON(!mnt_ctx->ses))
++			rc = -EACCES;
++		else if (WARN_ON(!mnt_ctx->tcon))
++			rc = -ENOENT;
++	}
+ 	if (rc)
+ 		goto out;
+ 
+@@ -247,15 +244,14 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+ 	if (!tcon->origin_fullpath) {
+ 		tcon->origin_fullpath = origin_fullpath;
+ 		origin_fullpath = NULL;
++	} else {
++		new_tcon = false;
+ 	}
+ 	spin_unlock(&tcon->tc_lock);
+ 
+-	if (list_empty(&tcon->dfs_ses_list)) {
+-		list_replace_init(&mnt_ctx->dfs_ses_list, &tcon->dfs_ses_list);
++	if (new_tcon) {
+ 		queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
+ 				   dfs_cache_get_ttl() * HZ);
+-	} else {
+-		dfs_put_root_smb_sessions(&mnt_ctx->dfs_ses_list);
+ 	}
+ 
+ out:
+@@ -298,7 +294,6 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs)
+ 	if (rc)
+ 		return rc;
+ 
+-	ctx->dfs_root_ses = mnt_ctx->ses;
+ 	/*
+ 	 * If called with 'nodfs' mount option, then skip DFS resolving.  Otherwise unconditionally
+ 	 * try to get an DFS referral (even cached) to determine whether it is an DFS mount.
+@@ -324,7 +319,9 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs)
+ 
+ 	*isdfs = true;
+ 	add_root_smb_session(mnt_ctx);
+-	return __dfs_mount_share(mnt_ctx);
++	rc = __dfs_mount_share(mnt_ctx);
++	dfs_put_root_smb_sessions(mnt_ctx);
++	return rc;
+ }
+ 
+ /* Update dfs referral path of superblock */
+diff --git a/fs/smb/client/dfs.h b/fs/smb/client/dfs.h
+index 875ab7ae57fc..e5c4dcf83750 100644
+--- a/fs/smb/client/dfs.h
++++ b/fs/smb/client/dfs.h
+@@ -7,7 +7,9 @@
+ #define _CIFS_DFS_H
+ 
+ #include "cifsglob.h"
++#include "cifsproto.h"
+ #include "fs_context.h"
++#include "dfs_cache.h"
+ #include "cifs_unicode.h"
+ #include <linux/namei.h>
+ 
+@@ -114,11 +116,6 @@ static inline void ref_walk_set_tgt_hint(struct dfs_ref_walk *rw)
+ 				       ref_walk_tit(rw));
+ }
+ 
+-struct dfs_root_ses {
+-	struct list_head list;
+-	struct cifs_ses *ses;
+-};
+-
+ int dfs_parse_target_referral(const char *full_path, const struct dfs_info3_param *ref,
+ 			      struct smb3_fs_context *ctx);
+ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs);
+@@ -133,20 +130,32 @@ static inline int dfs_get_referral(struct cifs_mount_ctx *mnt_ctx, const char *p
+ {
+ 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
+ 	struct cifs_sb_info *cifs_sb = mnt_ctx->cifs_sb;
++	struct cifs_ses *rses = ctx->dfs_root_ses ?: mnt_ctx->ses;
+ 
+-	return dfs_cache_find(mnt_ctx->xid, ctx->dfs_root_ses, cifs_sb->local_nls,
++	return dfs_cache_find(mnt_ctx->xid, rses, cifs_sb->local_nls,
+ 			      cifs_remap(cifs_sb), path, ref, tl);
+ }
+ 
+-static inline void dfs_put_root_smb_sessions(struct list_head *head)
++/*
++ * cifs_get_smb_ses() already guarantees an active reference of
++ * @ses->dfs_root_ses when a new session is created, so we need to put extra
++ * references of all DFS root sessions that were used across the mount process
++ * in dfs_mount_share().
++ */
++static inline void dfs_put_root_smb_sessions(struct cifs_mount_ctx *mnt_ctx)
+ {
+-	struct dfs_root_ses *root, *tmp;
++	const struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
++	struct cifs_ses *ses = ctx->dfs_root_ses;
++	struct cifs_ses *cur;
+ 
+-	list_for_each_entry_safe(root, tmp, head, list) {
+-		list_del_init(&root->list);
+-		cifs_put_smb_ses(root->ses);
+-		kfree(root);
++	if (!ses)
++		return;
++
++	for (cur = ses; cur; cur = cur->dfs_root_ses) {
++		if (cur->dfs_root_ses)
++			cifs_put_smb_ses(cur->dfs_root_ses);
+ 	}
++	cifs_put_smb_ses(ses);
+ }
+ 
+ #endif /* _CIFS_DFS_H */
+diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+index 508d831fabe3..0552a864ff08 100644
+--- a/fs/smb/client/dfs_cache.c
++++ b/fs/smb/client/dfs_cache.c
+@@ -1278,21 +1278,12 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
+ void dfs_cache_refresh(struct work_struct *work)
+ {
+ 	struct TCP_Server_Info *server;
+-	struct dfs_root_ses *rses;
+ 	struct cifs_tcon *tcon;
+ 	struct cifs_ses *ses;
+ 
+ 	tcon = container_of(work, struct cifs_tcon, dfs_cache_work.work);
+-	ses = tcon->ses;
+-	server = ses->server;
+ 
+-	mutex_lock(&server->refpath_lock);
+-	if (server->leaf_fullpath)
+-		__refresh_tcon(server->leaf_fullpath + 1, ses, false);
+-	mutex_unlock(&server->refpath_lock);
+-
+-	list_for_each_entry(rses, &tcon->dfs_ses_list, list) {
+-		ses = rses->ses;
++	for (ses = tcon->ses; ses; ses = ses->dfs_root_ses) {
+ 		server = ses->server;
+ 		mutex_lock(&server->refpath_lock);
+ 		if (server->leaf_fullpath)
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index c3771fc81328..1ea22b3955a2 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -138,9 +138,6 @@ tcon_info_alloc(bool dir_leases_enabled)
+ 	atomic_set(&ret_buf->num_local_opens, 0);
+ 	atomic_set(&ret_buf->num_remote_opens, 0);
+ 	ret_buf->stats_from_time = ktime_get_real_seconds();
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-	INIT_LIST_HEAD(&ret_buf->dfs_ses_list);
+-#endif
+ 
+ 	return ret_buf;
+ }
+@@ -156,9 +153,6 @@ tconInfoFree(struct cifs_tcon *tcon)
+ 	atomic_dec(&tconInfoAllocCount);
+ 	kfree(tcon->nativeFileSystem);
+ 	kfree_sensitive(tcon->password);
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-	dfs_put_root_smb_sessions(&tcon->dfs_ses_list);
+-#endif
+ 	kfree(tcon->origin_fullpath);
+ 	kfree(tcon);
+ }
+-- 
+2.44.0
 
---=20
-Thanks,
-
-Steve
