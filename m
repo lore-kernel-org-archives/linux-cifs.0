@@ -1,217 +1,165 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from frasgout13.his.huawei.com (frasgout13.his.huawei.com [14.137.139.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A712E648
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 07:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE42338DFC;
+	Tue,  2 Apr 2024 08:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712044360; cv=none; b=IB76HrerF8dnwGOu/KAuHnBFJjQOoUAimOKT43/2FsLfAZQv3eGzab5UVIRGY/eDiWC619axu7ujPtGWgoGdKkWnZ2C57rMspT37uQgE3AqQBxjQnZ2b/qcLDYf3p0ZTNBMpxLWP4p2JGxTDXT5hz/YghL2EPNBkQOtBxD3UnCE=
+	t=1712045931; cv=none; b=fvYhPpm+CUf3d8mOkuDc6+4QrzT/m0NZWQ9QlKI42auZiAGsla55pVoNIqA2iVYQqfwS1pP6huhIwQCZdUKGnVVQc0MCN1iM7EhozVuTEITGYZwpO1AD5LuMtcle6uVhteX+0T60o4ikQSKuwrdmbCT8hCbfOQjW119BPjCv9Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712044360; c=relaxed/simple;
-	bh=sdZoT8RpKDx4YP9JCCIHtV1IM4BYoATQBVIfO8RuogQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=E8BC0Kfw5Mjpv3vUXeg76apelrIULbbxxS39bri8jnVAL6WWzEsF1sfNTLT3y100cvlg5Pf0M0S7wc2tSxKGxRxUeIgmICw80e+sr7ZVk2QZ1PyTzLz4Ict99jA+eO5trZ63zgs+JqsfsspEvdPkN8pVG4jYpiWXZCrfiD6Oyc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dngk2wCG; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dngk2wCG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712044359; x=1743580359;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=sdZoT8RpKDx4YP9JCCIHtV1IM4BYoATQBVIfO8RuogQ=;
-  b=dngk2wCG1IikoK+xTuowN1yjqLoqXEOJX8Uj+veKUu33/NSo4IRp3FLj
-   Cc3YdVktBBBl2eMgnOBpa7dDhqTwr8x5AauZ2lLzgvMoT+RRJt6bCcIjT
-   V/zq43MXQ+BE5iLDrq/kZGsQUYBGuBcmTyG7qY9NixJGC1tJP/yhgAsVQ
-   s3TXwRv1NNH1LNZiGIwb0ErHIQ1f7GPj/RI/dwDhY+tgg0qbKdtt+zGBv
-   QX7qZ9w/k18pWDhd5C4dBrPMydpKIhZg2wNtZ7IYS07g9egpxrcweow0Q
-   hDfTx0UMl5hmrwGqUegnp0/kj6sLiRNeqZR9u7YaLw1YV6XNWhbFXz+EE
-   g==;
-X-CSE-ConnectionGUID: EZ18K3mNTMelBbuiRXXpmA==
-X-CSE-MsgGUID: rK7rmkatTYyfrHYaimfVQQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="11016308"
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="11016308"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 00:52:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="22424968"
-Received: from lkp-server02.sh.intel.com (HELO 90ee3aa53dbd) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 02 Apr 2024 00:52:36 -0700
-Received: from kbuild by 90ee3aa53dbd with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rrYwc-00011L-0H;
-	Tue, 02 Apr 2024 07:52:34 +0000
-Date: Tue, 2 Apr 2024 15:52:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [cifs:for-next 5/6] fs/smb/client/connect.c:4045:35: error: implicit
- declaration of function 'dfs_get_path'
-Message-ID: <202404021516.r2AjLUPG-lkp@intel.com>
+	s=arc-20240116; t=1712045931; c=relaxed/simple;
+	bh=SLsLFlu2RcD+M7Lg/AfoUXyJ6aDUqNOWQceuD8zlcRA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iuf9k6tsTi4Ow2bZvEKyCYlTmDs8UtnT60+muwiPTVbl0m/FgYP8EkPKp8YZM+rv63UirWV6mqgoN38Lrds0erin60Ud80qROoGR9kqCJZZ2Tj6cwJH55eSRFdHpYhCHeZWr+WUMzF8sLbIixmZ2s3pfSFv3spgL6I5Kpvqg3mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.18.186.51])
+	by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4V80jJ44bTz9xGnY;
+	Tue,  2 Apr 2024 16:02:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [7.182.16.27])
+	by mail.maildlp.com (Postfix) with ESMTP id 7735B140429;
+	Tue,  2 Apr 2024 16:18:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.204.63.22])
+	by APP2 (Coremail) with SMTP id GxC2BwCn4CRLvwtm5OBqBQ--.39080S2;
+	Tue, 02 Apr 2024 09:18:33 +0100 (CET)
+From: Roberto Sassu <roberto.sassu@huaweicloud.com>
+To: zohar@linux.ibm.com,
+	dmitry.kasatkin@gmail.com,
+	eric.snowberg@oracle.com,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com
+Cc: linux-integrity@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	pc@manguebit.com,
+	christian@brauner.io,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Steve French <smfrench@gmail.com>
+Subject: [PATCH v2] security: Handle dentries without inode in security_path_post_mknod()
+Date: Tue,  2 Apr 2024 10:18:05 +0200
+Message-Id: <20240402081805.2491789-1-roberto.sassu@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:GxC2BwCn4CRLvwtm5OBqBQ--.39080S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrWrAFWkCw4fAr45JF4xJFb_yoWrXFWxpF
+	4rK3WkJr95XFy8Wr18AFy7u3WrKay5WFWUWan5Wa1ayFnxXr1jqr1Iv34j9rW5Jr4UGryx
+	tw12yrsxua1qyr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
+	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF
+	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0x
+	vE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
+	jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgABBF1jj5gBFwABs5
 
-tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-head:   0bc54e6a9c31ede9508fb81edbd11983494047ee
-commit: 8e09ce8ffd4bdf6f780a54f89301c646526e9d97 [5/6] smb: client: handle DFS tcons in cifs_construct_tcon()
-config: parisc-defconfig (https://download.01.org/0day-ci/archive/20240402/202404021516.r2AjLUPG-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240402/202404021516.r2AjLUPG-lkp@intel.com/reproduce)
+From: Roberto Sassu <roberto.sassu@huawei.com>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404021516.r2AjLUPG-lkp@intel.com/
+Commit 08abce60d63fi ("security: Introduce path_post_mknod hook")
+introduced security_path_post_mknod(), to replace the IMA-specific call to
+ima_post_path_mknod().
 
-All errors (new ones prefixed by >>):
+For symmetry with security_path_mknod(), security_path_post_mknod() is
+called after a successful mknod operation, for any file type, rather than
+only for regular files at the time there was the IMA call.
 
-   In file included from include/linux/bug.h:5,
-                    from include/linux/thread_info.h:13,
-                    from include/asm-generic/preempt.h:5,
-                    from ./arch/parisc/include/generated/asm/preempt.h:1,
-                    from include/linux/preempt.h:79,
-                    from include/linux/spinlock.h:56,
-                    from include/linux/wait.h:9,
-                    from include/linux/wait_bit.h:8,
-                    from include/linux/fs.h:6,
-                    from fs/smb/client/connect.c:8:
-   fs/smb/client/connect.c: In function 'cifs_mount':
-   fs/smb/client/connect.c:3647:37: error: invalid type argument of '->' (have 'struct cifs_mount_ctx')
-    3647 |                 if (WARN_ON(!mnt_ctx->server))
-         |                                     ^~
-   arch/parisc/include/asm/bug.h:86:32: note: in definition of macro 'WARN_ON'
-      86 |         int __ret_warn_on = !!(x);                              \
-         |                                ^
-   fs/smb/client/connect.c:3649:42: error: invalid type argument of '->' (have 'struct cifs_mount_ctx')
-    3649 |                 else if (WARN_ON(!mnt_ctx->ses))
-         |                                          ^~
-   arch/parisc/include/asm/bug.h:86:32: note: in definition of macro 'WARN_ON'
-      86 |         int __ret_warn_on = !!(x);                              \
-         |                                ^
-   fs/smb/client/connect.c:3651:42: error: invalid type argument of '->' (have 'struct cifs_mount_ctx')
-    3651 |                 else if (WARN_ON(!mnt_ctx->tcon))
-         |                                          ^~
-   arch/parisc/include/asm/bug.h:86:32: note: in definition of macro 'WARN_ON'
-      86 |         int __ret_warn_on = !!(x);                              \
-         |                                ^
-   fs/smb/client/connect.c: In function 'cifs_construct_tcon':
->> fs/smb/client/connect.c:4045:35: error: implicit declaration of function 'dfs_get_path' [-Werror=implicit-function-declaration]
-    4045 |                 origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
-         |                                   ^~~~~~~~~~~~
-   fs/smb/client/connect.c:4045:33: warning: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-    4045 |                 origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
-         |                                 ^
->> fs/smb/client/connect.c:4067:36: error: 'dfscache_wq' undeclared (first use in this function); did you mean 'fscache_write'?
-    4067 |                 queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
-         |                                    ^~~~~~~~~~~
-         |                                    fscache_write
-   fs/smb/client/connect.c:4067:36: note: each undeclared identifier is reported only once for each function it appears in
->> fs/smb/client/connect.c:4067:54: error: 'struct cifs_tcon' has no member named 'dfs_cache_work'
-    4067 |                 queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
-         |                                                      ^~
->> fs/smb/client/connect.c:4068:36: error: implicit declaration of function 'dfs_cache_get_ttl'; did you mean 'fscache_get_aux'? [-Werror=implicit-function-declaration]
-    4068 |                                    dfs_cache_get_ttl() * HZ);
-         |                                    ^~~~~~~~~~~~~~~~~
-         |                                    fscache_get_aux
-   cc1: some warnings being treated as errors
+However, as reported by VFS maintainers, successful mknod operation does
+not mean that the dentry always has an inode attached to it (for example,
+not for FIFOs on a SAMBA mount).
 
+If that condition happens, the kernel crashes when
+security_path_post_mknod() attempts to verify if the inode associated to
+the dentry is private.
 
-vim +/dfs_get_path +4045 fs/smb/client/connect.c
+Add an extra check to first verify if there is an inode attached to the
+dentry, before checking if the inode is private. Also add the same check to
+the current users of the path_post_mknod hook, ima_post_path_mknod() and
+evm_post_path_mknod().
 
-  3989	
-  3990	static struct cifs_tcon *
-  3991	cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
-  3992	{
-  3993		int rc;
-  3994		struct cifs_tcon *master_tcon = cifs_sb_master_tcon(cifs_sb);
-  3995		struct cifs_ses *ses;
-  3996		struct cifs_tcon *tcon = NULL;
-  3997		struct smb3_fs_context *ctx;
-  3998		char *origin_fullpath = NULL;
-  3999	
-  4000		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-  4001		if (ctx == NULL)
-  4002			return ERR_PTR(-ENOMEM);
-  4003	
-  4004		ctx->local_nls = cifs_sb->local_nls;
-  4005		ctx->linux_uid = fsuid;
-  4006		ctx->cred_uid = fsuid;
-  4007		ctx->UNC = master_tcon->tree_name;
-  4008		ctx->retry = master_tcon->retry;
-  4009		ctx->nocase = master_tcon->nocase;
-  4010		ctx->nohandlecache = master_tcon->nohandlecache;
-  4011		ctx->local_lease = master_tcon->local_lease;
-  4012		ctx->no_lease = master_tcon->no_lease;
-  4013		ctx->resilient = master_tcon->use_resilient;
-  4014		ctx->persistent = master_tcon->use_persistent;
-  4015		ctx->handle_timeout = master_tcon->handle_timeout;
-  4016		ctx->no_linux_ext = !master_tcon->unix_ext;
-  4017		ctx->linux_ext = master_tcon->posix_extensions;
-  4018		ctx->sectype = master_tcon->ses->sectype;
-  4019		ctx->sign = master_tcon->ses->sign;
-  4020		ctx->seal = master_tcon->seal;
-  4021		ctx->witness = master_tcon->use_witness;
-  4022		ctx->dfs_root_ses = master_tcon->ses->dfs_root_ses;
-  4023	
-  4024		rc = cifs_set_vol_auth(ctx, master_tcon->ses);
-  4025		if (rc) {
-  4026			tcon = ERR_PTR(rc);
-  4027			goto out;
-  4028		}
-  4029	
-  4030		/* get a reference for the same TCP session */
-  4031		spin_lock(&cifs_tcp_ses_lock);
-  4032		++master_tcon->ses->server->srv_count;
-  4033		spin_unlock(&cifs_tcp_ses_lock);
-  4034	
-  4035		ses = cifs_get_smb_ses(master_tcon->ses->server, ctx);
-  4036		if (IS_ERR(ses)) {
-  4037			tcon = (struct cifs_tcon *)ses;
-  4038			cifs_put_tcp_session(master_tcon->ses->server, 0);
-  4039			goto out;
-  4040		}
-  4041	
-  4042		spin_lock(&master_tcon->tc_lock);
-  4043		if (master_tcon->origin_fullpath) {
-  4044			spin_unlock(&master_tcon->tc_lock);
-> 4045			origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
-  4046			if (IS_ERR(origin_fullpath)) {
-  4047				tcon = ERR_CAST(origin_fullpath);
-  4048				origin_fullpath = NULL;
-  4049				cifs_put_smb_ses(ses);
-  4050				goto out;
-  4051			}
-  4052		} else {
-  4053			spin_unlock(&master_tcon->tc_lock);
-  4054		}
-  4055	
-  4056		tcon = cifs_get_tcon(ses, ctx);
-  4057		if (IS_ERR(tcon)) {
-  4058			cifs_put_smb_ses(ses);
-  4059			goto out;
-  4060		}
-  4061	
-  4062		if (origin_fullpath) {
-  4063			spin_lock(&tcon->tc_lock);
-  4064			tcon->origin_fullpath = origin_fullpath;
-  4065			spin_unlock(&tcon->tc_lock);
-  4066			origin_fullpath = NULL;
-> 4067			queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
-> 4068					   dfs_cache_get_ttl() * HZ);
-  4069		}
-  4070	
+Finally, use the proper helper, d_backing_inode(), to retrieve the inode
+from the dentry in ima_post_path_mknod().
 
+Reported-by: Steve French <smfrench@gmail.com>
+Closes: https://lore.kernel.org/linux-kernel/CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com/
+Fixes: 08abce60d63f ("security: Introduce path_post_mknod hook")
+Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+Acked-by: Mimi Zohar <zohar@linux.ibm.com>
+Acked-by: Paul Moore <paul@paul-moore.com>
+---
+ security/integrity/evm/evm_main.c | 6 ++++--
+ security/integrity/ima/ima_main.c | 5 +++--
+ security/security.c               | 5 ++++-
+ 3 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
+index 81dbade5b9b3..ec1659273fcf 100644
+--- a/security/integrity/evm/evm_main.c
++++ b/security/integrity/evm/evm_main.c
+@@ -1037,11 +1037,13 @@ static void evm_file_release(struct file *file)
+ static void evm_post_path_mknod(struct mnt_idmap *idmap, struct dentry *dentry)
+ {
+ 	struct inode *inode = d_backing_inode(dentry);
+-	struct evm_iint_cache *iint = evm_iint_inode(inode);
++	struct evm_iint_cache *iint;
+ 
+-	if (!S_ISREG(inode->i_mode))
++	/* path_post_mknod hook might pass dentries without attached inode. */
++	if (!inode || !S_ISREG(inode->i_mode))
+ 		return;
+ 
++	iint = evm_iint_inode(inode);
+ 	if (iint)
+ 		iint->flags |= EVM_NEW_FILE;
+ }
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index c84e8c55333d..afc883e60cf3 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -719,10 +719,11 @@ static void ima_post_create_tmpfile(struct mnt_idmap *idmap,
+ static void ima_post_path_mknod(struct mnt_idmap *idmap, struct dentry *dentry)
+ {
+ 	struct ima_iint_cache *iint;
+-	struct inode *inode = dentry->d_inode;
++	struct inode *inode = d_backing_inode(dentry);
+ 	int must_appraise;
+ 
+-	if (!ima_policy_flag || !S_ISREG(inode->i_mode))
++	/* path_post_mknod hook might pass dentries without attached inode. */
++	if (!ima_policy_flag || !inode || !S_ISREG(inode->i_mode))
+ 		return;
+ 
+ 	must_appraise = ima_must_appraise(idmap, inode, MAY_ACCESS,
+diff --git a/security/security.c b/security/security.c
+index 7e118858b545..391477687637 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -1801,7 +1801,10 @@ EXPORT_SYMBOL(security_path_mknod);
+  */
+ void security_path_post_mknod(struct mnt_idmap *idmap, struct dentry *dentry)
+ {
+-	if (unlikely(IS_PRIVATE(d_backing_inode(dentry))))
++	struct inode *inode = d_backing_inode(dentry);
++
++	/* Not all dentries have an inode attached after mknod. */
++	if (inode && unlikely(IS_PRIVATE(inode)))
+ 		return;
+ 	call_void_hook(path_post_mknod, idmap, dentry);
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
