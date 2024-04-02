@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513133D38D
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 07:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A712E648
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 07:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712043626; cv=none; b=jDgoF9kSFFU6jQRCvOjksDZDcbJ3pV1zrZxsJoCkXTpN7nuj8KfSls5geYjYtiLoDAKMeGBaDqJ0uD3dZTIS/U3bGYlDLm4RhB61PCbq/h77aXqNyNP7ZV3Vm2ARp5pXYyt9MT8MIFIopsozEm0uIO01OifGOhcdrIKCUg95Hjc=
+	t=1712044360; cv=none; b=IB76HrerF8dnwGOu/KAuHnBFJjQOoUAimOKT43/2FsLfAZQv3eGzab5UVIRGY/eDiWC619axu7ujPtGWgoGdKkWnZ2C57rMspT37uQgE3AqQBxjQnZ2b/qcLDYf3p0ZTNBMpxLWP4p2JGxTDXT5hz/YghL2EPNBkQOtBxD3UnCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712043626; c=relaxed/simple;
-	bh=ef1U0IbHPsMOFu7G0b64A00ItdP6LEWvBXLDK+BYpxU=;
+	s=arc-20240116; t=1712044360; c=relaxed/simple;
+	bh=sdZoT8RpKDx4YP9JCCIHtV1IM4BYoATQBVIfO8RuogQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PU+lz1Xe+sFnbJcC/UmZu4Ora8LAYicQSO1c3gLMqIbRpHv1GC94lIXZT3c2XzyvXFxq15RbdZNI1kooaq1fEVXLKmMAlMxx5FSI+b0QxAN+BcX4Y6omXPdtHYjSCvic3mBvCW0bBOUUTMWCXXZPHTZbju3ghmx2TPYjen/y+lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iU5BYMbA; arc=none smtp.client-ip=192.198.163.12
+	 Content-Disposition; b=E8BC0Kfw5Mjpv3vUXeg76apelrIULbbxxS39bri8jnVAL6WWzEsF1sfNTLT3y100cvlg5Pf0M0S7wc2tSxKGxRxUeIgmICw80e+sr7ZVk2QZ1PyTzLz4Ict99jA+eO5trZ63zgs+JqsfsspEvdPkN8pVG4jYpiWXZCrfiD6Oyc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dngk2wCG; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iU5BYMbA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dngk2wCG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712043623; x=1743579623;
+  t=1712044359; x=1743580359;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=ef1U0IbHPsMOFu7G0b64A00ItdP6LEWvBXLDK+BYpxU=;
-  b=iU5BYMbAkX4HNWdFS8sGUKG5SDMKqh3TY4TtvfK2g1D2OU1mHrDbyorJ
-   YKBXZ3HLFxFdsULqjUBsnYmr9pzIwUS5ZAHcmqq850lUHSEW05Qt1hEp1
-   /ejOgXTbjk2E1D/4X4YPTKwHzBc8yBOgtO+9af3WyO98JtU+LmdN0HSVY
-   5ksJsxeCb1TEUbbDlszVGHqEJP051ZND5OPY/UHQ1sbaV5+LgkJTdv8Rl
-   ui27b9aVR3TapHcDuVT7Tg5AQchysyS+8vDStVVVGekkpYIJteYinJDup
-   GTR7rIO+fOpQmg/0y6KpovgdVKDtgky1AY1RzORTgt3/jRmIR4OO4kG17
-   Q==;
-X-CSE-ConnectionGUID: htDBPKXERRG/ihqiFuFUzg==
-X-CSE-MsgGUID: VYm8pK+yRT+FfS4zTS5cVQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="10982615"
+  bh=sdZoT8RpKDx4YP9JCCIHtV1IM4BYoATQBVIfO8RuogQ=;
+  b=dngk2wCG1IikoK+xTuowN1yjqLoqXEOJX8Uj+veKUu33/NSo4IRp3FLj
+   Cc3YdVktBBBl2eMgnOBpa7dDhqTwr8x5AauZ2lLzgvMoT+RRJt6bCcIjT
+   V/zq43MXQ+BE5iLDrq/kZGsQUYBGuBcmTyG7qY9NixJGC1tJP/yhgAsVQ
+   s3TXwRv1NNH1LNZiGIwb0ErHIQ1f7GPj/RI/dwDhY+tgg0qbKdtt+zGBv
+   QX7qZ9w/k18pWDhd5C4dBrPMydpKIhZg2wNtZ7IYS07g9egpxrcweow0Q
+   hDfTx0UMl5hmrwGqUegnp0/kj6sLiRNeqZR9u7YaLw1YV6XNWhbFXz+EE
+   g==;
+X-CSE-ConnectionGUID: EZ18K3mNTMelBbuiRXXpmA==
+X-CSE-MsgGUID: rK7rmkatTYyfrHYaimfVQQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11031"; a="11016308"
 X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="10982615"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 00:40:23 -0700
+   d="scan'208";a="11016308"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2024 00:52:39 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,174,1708416000"; 
-   d="scan'208";a="55425157"
+   d="scan'208";a="22424968"
 Received: from lkp-server02.sh.intel.com (HELO 90ee3aa53dbd) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 02 Apr 2024 00:40:20 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 02 Apr 2024 00:52:36 -0700
 Received: from kbuild by 90ee3aa53dbd with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1rrYkh-00010z-1e;
-	Tue, 02 Apr 2024 07:40:15 +0000
-Date: Tue, 2 Apr 2024 15:39:56 +0800
+	id 1rrYwc-00011L-0H;
+	Tue, 02 Apr 2024 07:52:34 +0000
+Date: Tue, 2 Apr 2024 15:52:06 +0800
 From: kernel test robot <lkp@intel.com>
 To: Paulo Alcantara <pc@manguebit.com>
 Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
@@ -52,7 +52,7 @@ Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>
 Subject: [cifs:for-next 5/6] fs/smb/client/connect.c:4045:35: error: implicit
  declaration of function 'dfs_get_path'
-Message-ID: <202404021518.3Xu2VU4s-lkp@intel.com>
+Message-ID: <202404021516.r2AjLUPG-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -65,16 +65,16 @@ Content-Disposition: inline
 tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
 head:   0bc54e6a9c31ede9508fb81edbd11983494047ee
 commit: 8e09ce8ffd4bdf6f780a54f89301c646526e9d97 [5/6] smb: client: handle DFS tcons in cifs_construct_tcon()
-config: parisc-defconfig (https://download.01.org/0day-ci/archive/20240402/202404021518.3Xu2VU4s-lkp@intel.com/config)
+config: parisc-defconfig (https://download.01.org/0day-ci/archive/20240402/202404021516.r2AjLUPG-lkp@intel.com/config)
 compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240402/202404021518.3Xu2VU4s-lkp@intel.com/reproduce)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240402/202404021516.r2AjLUPG-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404021518.3Xu2VU4s-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404021516.r2AjLUPG-lkp@intel.com/
 
-All error/warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
    In file included from include/linux/bug.h:5,
                     from include/linux/thread_info.h:13,
@@ -109,7 +109,7 @@ All error/warnings (new ones prefixed by >>):
 >> fs/smb/client/connect.c:4045:35: error: implicit declaration of function 'dfs_get_path' [-Werror=implicit-function-declaration]
     4045 |                 origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
          |                                   ^~~~~~~~~~~~
->> fs/smb/client/connect.c:4045:33: warning: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+   fs/smb/client/connect.c:4045:33: warning: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
     4045 |                 origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
          |                                 ^
 >> fs/smb/client/connect.c:4067:36: error: 'dfscache_wq' undeclared (first use in this function); did you mean 'fscache_write'?
