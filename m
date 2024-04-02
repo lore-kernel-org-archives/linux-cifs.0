@@ -1,61 +1,61 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6E5C8C7
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 01:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F4ED502
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Apr 2024 01:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712022277; cv=pass; b=sFcWhTZtB/SO5bwBOY/L7pvvnb8k69FN5gdJdj6m/9P2yMeD1IPAByZzTfpMRIcABmWKfewoxFrfoP2FDUFqj5R3UYxgOp+J22O5OhZKqD/ovtdLfYY7CLYQsVc056IUX8/7U60v20xGPrhvoF3zBU7eAZiixAnCXWeCCZRhTtI=
+	t=1712022277; cv=pass; b=J9bQAWWiUUp8IRt4b+R83weDtfvhXAW1rA/40PS4yvH319j7/jPmE3bQ0rj2kaGX32REi1w6Jo+6Aw3hxmKyNzP2FUbVl7FGQ50MsAmEDTvdz0495tb1V8lQ1mRURs85Xq2S8aZZEgBBgRwpK52/BhuYtnhohqQD8SJOAkjMjKo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712022277; c=relaxed/simple;
-	bh=QkPuBshoXjA0KjitqAnAIsdnd4VyNFUOEmnUrBsGHeI=;
+	bh=0rCdt7DZVzWFxfUd953SzddvRC4ep9FEVTrBLfiRk6s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dB2gKIvFbNhPRp4b1z0J3upOzrMVBCxxYgBiCNYDT3aTeo4y+ju9QOpjIj+I3EtvKkBvYgn7Krfw2di1A1U25YwdCDEXlsgObGf40JJb3ky6bCW8EKQlua+PMETt+HQXyLXW+X5m8trLc6jc/gNbL7GyUnI60HGxW8PTu+xre8o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=k+JRX36c; arc=pass smtp.client-ip=167.235.159.17
+	 MIME-Version; b=gtkeT/RQCyyFf2lhZWR+g/VQ45Ni0JKRVpaYVMgRlRHeZiHkVzQ8fjc47lUUTXB5jSaAl1cPKd9aNr0A7OB9+bQjo1sRpXYGcPr1uGFqphaiW9yPAIJ0jvjzW8gUAkeSaHWqiwPSs/6vOBGn4gielpzTiF8p0f57WqTs+ezHvvM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=JaymDLu4; arc=pass smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="k+JRX36c"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="JaymDLu4"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712022272;
+	s=dkim; t=1712022274;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RPzfgaYhNq4/iJMnxLD+3a0KEoGBLXpCMiuKPVZW44k=;
-	b=k+JRX36ciJCIFdH3lhxJ3LxDa93ALTpsl1IeGWOpPDdF+irk/uUWdjRYcMJIL7AyJI/7CX
-	gOlaUKLe1Ei2VfWATVzMb+5H/KUZy2zPHsbBO5K/DaRwlKtiLRqnOcEfm0x157p3ksX4YK
-	h8Asgs7/e+hl4DHZV81dACYRw6fmcEDmUAQuKOvuHaYdj4T2FsRq3NUNAVQWbm5et56mWN
-	mgm+ToJ2JlNe2C7xRYznF3v+JaeZfQlXcfIg4IGziwjuIrTmJRrxMK7EMN/6UhmleN6AVC
-	fpsFbLqvX1rBAnrp5zO1i4JTgg+yrRCmDQhdVtCAAnXNDaUGebJ6FXBiKQR99g==
+	bh=qncciZH1DcEr2YlcT/3aCOEe25s2kKeU3mIyDT0kQ54=;
+	b=JaymDLu4YkBr38h9yagocBx5EhZvM/6OIblunclnbM5915f2ffmDgGd4cmOLeXLJ7X+jSL
+	Ig1CLL/v2lG/S3/UCnrLCjn++YXa4Iy6vCad08+CaFxupnORTJMVs4fvdFaSaPPDF9zv0Z
+	sXm5THPDCBhk3gTMLLmfcvRm9uR+wSYHI1ejDtx2HhaFqX7+huUc7+jGrClHinFC56I7MY
+	LOA8JsBXn+RTfn6LLywe8BfOrLgJ1QFi3k1Hq1QHraOnb/DWNdruLHxe+A2zPbIcikGZBH
+	A7Ve28qfwNe+TPWi2wPTXIRoPx8TCUeNuA9evx30RROpma7ri1pRZz7keJeMXw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712022272; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1712022274; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RPzfgaYhNq4/iJMnxLD+3a0KEoGBLXpCMiuKPVZW44k=;
-	b=UTuf94pAkMkmPyfFrKpW3GId6UOhHfuyjDnpnqBqWj19kTlD9KwI1VorgTy+Ewxfsj/sMi
-	OgN7wFxzyTAdQVF9te2YXp7/+rQ/zJttXRPu1QBukv8yRhcIuX6AGxJRhxbM9qn6rJf2f6
-	uri60U/7Xu8M7HJpvstyMy10iPiG8b95pESzvw0CcaKAnYzCdb/ZDX4aka+wyUqkyG3NR1
-	Iv/CWUWIHoeWLYy+yGFLTEF41gnsrUmaGO3tlVloVQdAgHRdg/U2hEfCHOJkynSHS2xCNW
-	KTTsUFxlCAvajw/8dx0rx4GD9qO5NRqLI4TDXLyLbq0w0VFVy7bGaahHJC6/Lg==
+	bh=qncciZH1DcEr2YlcT/3aCOEe25s2kKeU3mIyDT0kQ54=;
+	b=nXNoKa8nETByoF1525KU2cSmOAN3DPfmXWuNsDVaWqghzYAlE3RDc0EPIfVJVurvOItrF0
+	fVBPsfQcAB0xKxBS7U2VRIELRU00gROb0JBdgENYixvOlxzjiZj5d7QnFo8jquTwhl/lXB
+	BRM3cTF8whVHBFWlfMs3aEEn5cFMI/5Vkqm5x3nxzsbf4zHo2hAJ3Rh4wshh4tG7yZ8MsI
+	5lgPT+hhkUAqsrBQexyWkWilrix+awIvjba9GCMq5VObnmH2Q20WG7bwLGkq7fgJW8/tpv
+	RHm1FTK0MHr7VAwGoppPbftPHWfhCdWdXvmW5UQxPuwF/8kJZUmNpKW/ircbQg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712022272; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712022274; a=rsa-sha256;
 	cv=none;
-	b=htNQeeHJys0wUA4kRqLA0iviAuYRS/vG7sK/H35q7dqsPZy9j4Z5WGGbOQa9gyzJiktcUd
-	6SWE9iS71+Qe/P1fyHPApBKkbepCDq203kOWhspUbnVc6cTx/CpPaSd6XxOPMLwh4xwxHJ
-	evAdlZibdrYaThNLyKVaAABpWqomlI5lG161vvbb/Ksh+BF+5D8Eqgz0jA1ALuK0p5vHC1
-	kyjJBjUGwbKNgq94M4aMzmN0C0NIJmxL8Rx2eWRkZvvTT7LeeHW0z1p2O78RRnbDgeeiam
-	AqyQH/jDleCo9dGrLUqBf0gr47w434iLMATan8e40DmGMHH6+HmjwuxWnlqLMA==
+	b=ZOf+OjKPdfMyOBYAqMwgsznX6r3x3PNivHl4/SVJYb1GW+fENsg9rTE9WH0bMV3gsZDrw6
+	BH7ahH9H4QnJRLb2p4v3anWVvs30JebUCnJA+DiaJTaaDI8Lo0CLGym1H5HZW/sY/pSi9u
+	incHzTLYyGHomoW0u+9pB9eCzJjVY/T64QnuWGVG2WG7ZlCpxx+Duhqj7nHqJZ60zBl+Zo
+	7qyRpM59/II2JoYkkUnv6z/u2oTmY0OkiUFetpIPksMOMN5JKai7mmO7iusOcbi3aLMFaY
+	MZzTMvjyWy5ixIb/+VW4SYN4JKOJ/IJQZpKMb0eM4PCE+OCvp1yOxIrCPQv9Xw==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 2/4] smb: client: refresh referral without acquiring refpath_lock
-Date: Mon,  1 Apr 2024 22:44:07 -0300
-Message-ID: <20240402014409.145562-2-pc@manguebit.com>
+Subject: [PATCH 3/4] smb: client: handle DFS tcons in cifs_construct_tcon()
+Date: Mon,  1 Apr 2024 22:44:08 -0300
+Message-ID: <20240402014409.145562-3-pc@manguebit.com>
 In-Reply-To: <20240402014409.145562-1-pc@manguebit.com>
 References: <20240402014409.145562-1-pc@manguebit.com>
 Precedence: bulk
@@ -66,110 +66,80 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Avoid refreshing DFS referral with refpath_lock acquired as the I/O
-could block for a while due to a potentially disconnected or slow DFS
-root server and then making other threads - that use same @server and
-don't require a DFS root server - unable to make any progress.
+The tcons created by cifs_construct_tcon() on multiuser mounts must
+also be able to failover and refresh DFS referrals, so set the
+appropriate fields in order to get a full DFS tcon.  They could be
+shared among different superblocks later, too.
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/dfs_cache.c | 44 +++++++++++++++++++++------------------
- 1 file changed, 24 insertions(+), 20 deletions(-)
+ fs/smb/client/connect.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index 0552a864ff08..11c8efecf7aa 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -1172,8 +1172,8 @@ static bool is_ses_good(struct cifs_ses *ses)
- 	return ret;
- }
- 
--/* Refresh dfs referral of tcon and mark it for reconnect if needed */
--static int __refresh_tcon(const char *path, struct cifs_ses *ses, bool force_refresh)
-+/* Refresh dfs referral of @ses and mark it for reconnect if needed */
-+static void __refresh_ses_referral(struct cifs_ses *ses, bool force_refresh)
- {
- 	struct TCP_Server_Info *server = ses->server;
- 	DFS_CACHE_TGT_LIST(old_tl);
-@@ -1181,10 +1181,21 @@ static int __refresh_tcon(const char *path, struct cifs_ses *ses, bool force_ref
- 	bool needs_refresh = false;
- 	struct cache_entry *ce;
- 	unsigned int xid;
-+	char *path = NULL;
- 	int rc = 0;
- 
- 	xid = get_xid();
- 
-+	mutex_lock(&server->refpath_lock);
-+	if (server->leaf_fullpath) {
-+		path = kstrdup(server->leaf_fullpath + 1, GFP_ATOMIC);
-+		if (!path)
-+			rc = -ENOMEM;
-+	}
-+	mutex_unlock(&server->refpath_lock);
-+	if (!path)
-+		goto out;
-+
- 	down_read(&htable_rw_lock);
- 	ce = lookup_cache_entry(path);
- 	needs_refresh = force_refresh || IS_ERR(ce) || cache_entry_expired(ce);
-@@ -1218,19 +1229,17 @@ static int __refresh_tcon(const char *path, struct cifs_ses *ses, bool force_ref
- 	free_xid(xid);
- 	dfs_cache_free_tgts(&old_tl);
- 	dfs_cache_free_tgts(&new_tl);
--	return rc;
-+	kfree(path);
- }
- 
--static int refresh_tcon(struct cifs_tcon *tcon, bool force_refresh)
-+static inline void refresh_ses_referral(struct cifs_ses *ses)
- {
--	struct TCP_Server_Info *server = tcon->ses->server;
--	struct cifs_ses *ses = tcon->ses;
-+	__refresh_ses_referral(ses, false);
-+}
- 
--	mutex_lock(&server->refpath_lock);
--	if (server->leaf_fullpath)
--		__refresh_tcon(server->leaf_fullpath + 1, ses, force_refresh);
--	mutex_unlock(&server->refpath_lock);
--	return 0;
-+static inline void force_refresh_ses_referral(struct cifs_ses *ses)
-+{
-+	__refresh_ses_referral(ses, true);
- }
- 
- /**
-@@ -1271,25 +1280,20 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
- 	 */
- 	cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_USE_PREFIX_PATH;
- 
--	return refresh_tcon(tcon, true);
-+	force_refresh_ses_referral(tcon->ses);
-+	return 0;
- }
- 
- /* Refresh all DFS referrals related to DFS tcon */
- void dfs_cache_refresh(struct work_struct *work)
- {
--	struct TCP_Server_Info *server;
- 	struct cifs_tcon *tcon;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 22d152cd24d1..cc0568c3f085 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3995,6 +3995,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
  	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon = NULL;
+ 	struct smb3_fs_context *ctx;
++	char *origin_fullpath = NULL;
  
- 	tcon = container_of(work, struct cifs_tcon, dfs_cache_work.work);
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (ctx == NULL)
+@@ -4018,6 +4019,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+ 	ctx->sign = master_tcon->ses->sign;
+ 	ctx->seal = master_tcon->seal;
+ 	ctx->witness = master_tcon->use_witness;
++	ctx->dfs_root_ses = master_tcon->ses->dfs_root_ses;
  
--	for (ses = tcon->ses; ses; ses = ses->dfs_root_ses) {
--		server = ses->server;
--		mutex_lock(&server->refpath_lock);
--		if (server->leaf_fullpath)
--			__refresh_tcon(server->leaf_fullpath + 1, ses, false);
--		mutex_unlock(&server->refpath_lock);
--	}
-+	for (ses = tcon->ses; ses; ses = ses->dfs_root_ses)
-+		refresh_ses_referral(ses);
+ 	rc = cifs_set_vol_auth(ctx, master_tcon->ses);
+ 	if (rc) {
+@@ -4037,12 +4039,35 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+ 		goto out;
+ 	}
  
- 	queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
- 			   atomic_read(&dfs_cache_ttl) * HZ);
++	spin_lock(&master_tcon->tc_lock);
++	if (master_tcon->origin_fullpath) {
++		spin_unlock(&master_tcon->tc_lock);
++		origin_fullpath = dfs_get_path(cifs_sb, cifs_sb->ctx->source);
++		if (IS_ERR(origin_fullpath)) {
++			tcon = ERR_CAST(origin_fullpath);
++			origin_fullpath = NULL;
++			cifs_put_smb_ses(ses);
++			goto out;
++		}
++	} else {
++		spin_unlock(&master_tcon->tc_lock);
++	}
++
+ 	tcon = cifs_get_tcon(ses, ctx);
+ 	if (IS_ERR(tcon)) {
+ 		cifs_put_smb_ses(ses);
+ 		goto out;
+ 	}
+ 
++	if (origin_fullpath) {
++		spin_lock(&tcon->tc_lock);
++		tcon->origin_fullpath = origin_fullpath;
++		spin_unlock(&tcon->tc_lock);
++		origin_fullpath = NULL;
++		queue_delayed_work(dfscache_wq, &tcon->dfs_cache_work,
++				   dfs_cache_get_ttl() * HZ);
++	}
++
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+ 	if (cap_unix(ses))
+ 		reset_cifs_unix_caps(0, tcon, NULL, ctx);
+@@ -4051,6 +4076,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+ out:
+ 	kfree(ctx->username);
+ 	kfree_sensitive(ctx->password);
++	kfree(origin_fullpath);
+ 	kfree(ctx);
+ 
+ 	return tcon;
 -- 
 2.44.0
 
