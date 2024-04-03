@@ -1,82 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93DA745C3;
-	Wed,  3 Apr 2024 09:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A163136676
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Apr 2024 10:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712135489; cv=none; b=ElVEqhtsZNqHLGNZcJVnsGVMnOUpKRphW8meYrusN98X+A52MA/y1pJyiqH+Zbe3uSt8L4/HsRSJUxhPCKWN6JxKlm9fjNuupCTz69g41Cff5CprhJDfMt+uI0EdzO0PMBMCZwugbrTqlHBrhIqg7vX70xQLUVlUrKOy4x1A4aM=
+	t=1712139079; cv=none; b=R4D5dAD4A4k6M3hm/kXgciw0aJyJRPAW8s//N7zR6zRHPGXB4uH7oKtXgOEFuNUBfYa5KIzaOmUGhgdLVeMsSF/qNxo/kyMIhFMsv1EmOtGIZIDhyT+F4/IGUP89ysiVuURwzeVFZYsB6z+LjauLiIj0eDatNYCDocWivHfyAqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712135489; c=relaxed/simple;
-	bh=a4SU9LeyHasQcuTuvnaPAm2576TUr887qz82fyaiNNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=isnBhRbQSNupHqMbm5BeIGXrNa5ajrv2nbleEOV1njF8Yv0U2LdcKZr8BRMnMHCD8V9YIQ2j/q5cc3cqrFKd53bkdMwTqeLnoghswfj7k0jSB+katC4oDCMTEiAXlpIMYSSav8RYHW47xWmOZU5PlYFfINnMd887zAK3bEEdywQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neCZ9zKn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712139079; c=relaxed/simple;
+	bh=q5PvWHwoWD/1a3RxU9EydL5cEmke/jqCAXYn/kIe5KA=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=rptaRdpP6jD8qMohNzZzxrgd53hm71FvcRJjoh8YGIWyrOsvClpARb8arfq/vm4FkIaw0xu1APnybA1i1NgIZNJBvNRFiInj1eOZvJuEl+BoHr4h5zJoMV96KL9FqwSEXz+x1It4pSibLqoIdeA8foTgb6tnLugPvDed8zClLHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NelZDL2D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neCZ9zKn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51E06C433F1;
-	Wed,  3 Apr 2024 09:11:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712135488;
-	bh=a4SU9LeyHasQcuTuvnaPAm2576TUr887qz82fyaiNNw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=neCZ9zKndHI2vjnoV80pGunkUnrmdHulqFhGcSD1hX1jINc24Vr+EzvQxtlEhS8n1
-	 8QU8VuWEwBlHzPWbfLIf1tpIOPLk2s8qgoOebsjWa2Xn7zYCcNB83r2QWk10tGRGUa
-	 yYOqogWUM7jHLmSg4V/lbbVrSid6qCz/6DlefXcOhUh/GFKX6ze6WoDm3xJPkwJcDA
-	 cuzJisg6VdNTd0ujPxjAKAfbTln5l48n1qhTZ3TJdx/UKTa2w4gQl7buVXEqMYoaJ4
-	 0C3S4Vt9VIYBk2Mi2+eunbA73z1AQlcTFM55qCBkxjfMfLdWY/iWS0ONyjqj+7Mj3o
-	 x5B4lBGqW+eBw==
-Date: Wed, 3 Apr 2024 11:11:15 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc: viro@zeniv.linux.org.uk, jack@suse.cz, paul@paul-moore.com, 
-	jmorris@namei.org, serge@hallyn.com, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, pc@manguebit.com, christian@brauner.io, 
-	torvalds@linux-foundation.org, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH v3] security: Place security_path_post_mknod() where the
- original IMA call was
-Message-ID: <20240403-darmentleerung-wehen-b3a655cc50b8@brauner>
-References: <20240403075729.2888084-1-roberto.sassu@huaweicloud.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NelZDL2D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712139076;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q10XbPWbwPAYz3tVe+780L2sWGchjiaH8ntssWQEh20=;
+	b=NelZDL2D6NrJu1Uf7EyIE3S07UKewXjSFatlmERjpKgGlhCop9GMZIZjJCiUZtdJ3Vaof4
+	ozcGhoXocj1yje6eik3q5FysmPyqmUQ2V8lYw2CXnbY0qtC7G4nPtdm/+u8jzK1FrepV9Z
+	hp2ZBOD17cgQfANqRGQ/6Muq28m+AXA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-377-n6tZ6td_NZGxPdmOiGxErA-1; Wed, 03 Apr 2024 06:11:13 -0400
+X-MC-Unique: n6tZ6td_NZGxPdmOiGxErA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD06C185A784;
+	Wed,  3 Apr 2024 10:11:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 51AC140C6CB3;
+	Wed,  3 Apr 2024 10:11:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240403085918.GA1178@lst.de>
+References: <20240403085918.GA1178@lst.de> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-16-dhowells@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/26] mm: Export writeback_iter()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240403075729.2888084-1-roberto.sassu@huaweicloud.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3235933.1712139047.1@warthog.procyon.org.uk>
+Date: Wed, 03 Apr 2024 11:10:47 +0100
+Message-ID: <3235934.1712139047@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Wed, Apr 03, 2024 at 09:57:29AM +0200, Roberto Sassu wrote:
-> From: Roberto Sassu <roberto.sassu@huawei.com>
-> 
-> Commit 08abce60d63f ("security: Introduce path_post_mknod hook")
-> introduced security_path_post_mknod(), to replace the IMA-specific call to
-> ima_post_path_mknod().
-> 
-> For symmetry with security_path_mknod(), security_path_post_mknod() was
-> called after a successful mknod operation, for any file type, rather than
-> only for regular files at the time there was the IMA call.
-> 
-> However, as reported by VFS maintainers, successful mknod operation does
-> not mean that the dentry always has an inode attached to it (for example,
-> not for FIFOs on a SAMBA mount).
-> 
-> If that condition happens, the kernel crashes when
-> security_path_post_mknod() attempts to verify if the inode associated to
-> the dentry is private.
-> 
-> Move security_path_post_mknod() where the ima_post_path_mknod() call was,
-> which is obviously correct from IMA/EVM perspective. IMA/EVM are the only
-> in-kernel users, and only need to inspect regular files.
-> 
-> Reported-by: Steve French <smfrench@gmail.com>
-> Closes: https://lore.kernel.org/linux-kernel/CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com/
-> Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
-> Fixes: 08abce60d63f ("security: Introduce path_post_mknod hook")
-> Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
-> ---
+Christoph Hellwig <hch@lst.de> wrote:
 
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+> On Thu, Mar 28, 2024 at 04:34:07PM +0000, David Howells wrote:
+> > Export writeback_iter() so that it can be used by netfslib as a module.
+> 
+> EXPORT_SYMBOL_GPL, please.
+
+That depends.  You put a comment on write_cache_pages() saying that people
+should use writeback_iter() instead.  w_c_p() is not marked GPL.  Is it your
+intention to get rid of it?
+
+David
+
