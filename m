@@ -1,77 +1,87 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A652BB02
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Apr 2024 21:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6D5156966;
+	Wed,  3 Apr 2024 22:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712178921; cv=none; b=h0R1ZjQ+opGuXL2EylCpj+GwVxbJevYRpJ0VuM3Zu3KuTQXIrqN5jT5XVJgRNygeB6bcmrd+sJjJDGIbT2blOghUZQRauOnRaWoBECyId26CAamsyv1X/aOeyAYLEnStoloVLMhcYUyb5qZjovtBjmNoCJU2W7gGTaxYmg5kjek=
+	t=1712182935; cv=none; b=HFDU8GkEKIcncV1G1y7LmwazkAegep7DaxbwZCIua19hBvhe88v9sxb2jsgGQczDbYUm8ewWLBwTRahpaenhOfT/PGfnAXRalUeI7J5btt46m3bwxuHguDb0AkrKVZtNQPUfz5hEzRDdJ7M1vdhuQJXkhMoh6b2wltmGIXzTMGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712178921; c=relaxed/simple;
-	bh=R5gq2gmY7GfzrBYw8bWw+BivjlGtH7nliFf8+RBOGSs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=CZGmBUFmDwrgqelcqmUejNeJuNpr0m3OutRTgYTmbbyQK3z8zOnV+Pe8K2wZA8xu7OzpvI79bImnHvYNvGOJ9DS534KUc4viKLZyTGa8T5OoW8UTh1V5EFIqzLyM9YpD2VHeYfnuzuQazq5u8A/qrGrnRFdByNR6Ephq+XRgLmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdCE9dA0; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1712182935; c=relaxed/simple;
+	bh=lRXKv8S1N/Sb8QDRVkZH5o2ueko8OCT7uZmrGJAAG6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TL8ketNiAA7eP2oOaYICYbnF/Pgv0nu2/tVDyLxgwRSZWwkWlEYfYWBG0I1PVmHFM2QkWoJ7dKTKNhSCZ0IM0AsKkgpnQOKbvA/DDj9K/MajB0DpS+o7GgiSdMAWKWq5W1RoaqVtbloXJCJ34IAoYzXDcG9L4TQ/m/O3Giojn4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=TKiN3enC; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdCE9dA0"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d4360ab3daso3532051fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 03 Apr 2024 14:15:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712178918; x=1712783718; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jXLySa9ZjE24j5W5IpVSMJvF0Af3YmWqp0iAMH7T89c=;
-        b=fdCE9dA0lXZYPnXldHrP0WEX6S9VB8xpG7PRVV9/ZBW/V4sXKi/MGy86XE0E9dfy7s
-         0BtCtld2vr33pXPY5JNpma4lbdxTC1P1ruI7fK69ZY0HoMnRy8WTT2ax3Bso41KF1/QN
-         QtZaQdlQkCSIkRgn4kuSCSCUJgjc9P0qDgldJY3o7+JB8UiUyYUC7i+ioliAhrF/90I4
-         gWUFyt100WMNIq1WBggv9BRyvZnl9DsIQHw9kXak7tbq8dIbQAFjQMtzy9nh5/4ztIdg
-         H870gvn6RgfZ8LB1tklwTTLEj2RkA2av0Eys0ImJ8q1WY+wqEF3JIe5PwAXRft6yCddL
-         OVkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712178918; x=1712783718;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jXLySa9ZjE24j5W5IpVSMJvF0Af3YmWqp0iAMH7T89c=;
-        b=qwhDrDyjhyIPdCQOSpZDBG13KrfiYEjkFPAPxNCIHAQ2kdHeA8Ne0XdanNlJH9Uv0K
-         VefZqGeQYJVIFq8Qh5CZYvAtQoune/c/dB83yV1V3g7muRRnTi2QOLCuuDvK4PnLXpWm
-         IL5kE7w+ABiCbbxvd/GUixL9nqmX4RtMrWr+R6l2xyR4j0WbuBwGzmC1mQcLG/o5z94k
-         ycHOmPnvtecFGEoMBXRtIJKbRa7X3AyF8eOFRalQkjG7HzFN2Uva7NzwDABQvNPBiesA
-         KCdrsrhvchNIoIvuiJNRyY5vN+PVE/guNFr1x6ChoGxqx7/yxgJhbI2wnyVoSCa8YuWW
-         6YbA==
-X-Gm-Message-State: AOJu0Yz/9/ToZB1a8FMJc0d+nEX1S7PzyaEzJ5yKfSe5OidhxDuC0ZlX
-	GC8uQfPa9b19Se0bpBwDwM6AWaPVKjMotG15G4VkGMARrQnlNIEDHdsQUIjNmMF30RxukI41RHJ
-	b/lLJtg7qL2NszeKPdHLU2EEokGtlCNIzRCg=
-X-Google-Smtp-Source: AGHT+IGwDG44vgovUjPcuJZpTvvTS06F3r/lOJNV22yvxQH9VpuLhslQgJbQ6x67voDvHoPyMr/evh0qIdst90Q+Gns=
-X-Received: by 2002:a05:651c:78e:b0:2d6:a5f6:c8d3 with SMTP id
- g14-20020a05651c078e00b002d6a5f6c8d3mr486469lje.27.1712178917784; Wed, 03 Apr
- 2024 14:15:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="TKiN3enC"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=lKTHvXKGTsV+tX6aUCiyv6Vo691FyZts8/uGP/UQFRw=; b=TKiN3enC1YTFFL4KXPEO/xna/h
+	imGC6S7z1wcjYi8uk29qLdEvzzmZXfcUSOzP+sPiDsrSj07t899F/JRh2xbgy25bjLA1uoLfbDzZL
+	jhXSNbHYfG19fyau62kCf2qCWqvrbJlpdFSTzTTwPv4m+ipZbRP/YAuMf6H8wquNYoUcWyV9rLo5n
+	SckCIHxavTqy94/mN1aRdCDXtqgxCne9Jb0ahuNeDjAIJkuvxmKpqCbG0d+h5VqM6+Ydfhf2JXVFl
+	xjjcbQNL79Kuhlc6ORc4zcz3p61JeoJaJHaI1OuQP4o4+a8HPdaSXnJeIhJT89qZyJAWRNUMZzqY0
+	GnGyILsA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1rs8zO-005Awt-2F;
+	Wed, 03 Apr 2024 22:21:50 +0000
+Date: Wed, 3 Apr 2024 23:21:50 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc: brauner@kernel.org, jack@suse.cz, paul@paul-moore.com,
+	jmorris@namei.org, serge@hallyn.com, zohar@linux.ibm.com,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-integrity@vger.kernel.org, pc@manguebit.com,
+	torvalds@linux-foundation.org,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Steve French <smfrench@gmail.com>
+Subject: Re: [RESEND][PATCH v3] security: Place security_path_post_mknod()
+ where the original IMA call was
+Message-ID: <20240403222150.GL538574@ZenIV>
+References: <20240403090749.2929667-1-roberto.sassu@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 3 Apr 2024 16:15:06 -0500
-Message-ID: <CAH2r5mtcPD8i=pcnqysrdAcag-n_PTdr0Y=h99Ku=Z2u3UVA8A@mail.gmail.com>
-Subject: negative open file count
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: Ritvik Budhiraja <budhirajaritviksmb@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240403090749.2929667-1-roberto.sassu@huaweicloud.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-Ritvik,
-I can can see the negative open file count on running xfstest
-generic/047 followed by generic/048 (to Windows target)
+On Wed, Apr 03, 2024 at 11:07:49AM +0200, Roberto Sassu wrote:
+> From: Roberto Sassu <roberto.sassu@huawei.com>
+> 
+> Commit 08abce60d63f ("security: Introduce path_post_mknod hook")
+> introduced security_path_post_mknod(), to replace the IMA-specific call to
+> ima_post_path_mknod().
+> 
+> For symmetry with security_path_mknod(), security_path_post_mknod() was
+> called after a successful mknod operation, for any file type, rather than
+> only for regular files at the time there was the IMA call.
+> 
+> However, as reported by VFS maintainers, successful mknod operation does
+> not mean that the dentry always has an inode attached to it (for example,
+> not for FIFOs on a SAMBA mount).
+> 
+> If that condition happens, the kernel crashes when
+> security_path_post_mknod() attempts to verify if the inode associated to
+> the dentry is private.
+> 
+> Move security_path_post_mknod() where the ima_post_path_mknod() call was,
+> which is obviously correct from IMA/EVM perspective. IMA/EVM are the only
+> in-kernel users, and only need to inspect regular files.
+> 
+> Reported-by: Steve French <smfrench@gmail.com>
+> Closes: https://lore.kernel.org/linux-kernel/CAH2r5msAVzxCUHHG8VKrMPUKQHmBpE6K9_vjhgDa1uAvwx4ppw@mail.gmail.com/
+> Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+> Fixes: 08abce60d63f ("security: Introduce path_post_mknod hook")
+> Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
 
-Do you also see this? Do you see it without your close retry patch as well?
-
-1) \\win16.vm.test\Scratch
-SMBs: 1795 since 2024-04-03 21:11:08 UTC
-Bytes read: 0  Bytes written: 1235222528
-Open files: 3 total (local), -155 open on server
-
--- 
-Thanks,
-
-Steve
+LGTM...
