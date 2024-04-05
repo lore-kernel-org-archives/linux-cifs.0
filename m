@@ -1,101 +1,59 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4EF134A9;
-	Fri,  5 Apr 2024 03:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8DD286BF;
+	Fri,  5 Apr 2024 06:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712286931; cv=none; b=uWQaNB4qWR8pK5i8Wqse3XT5RIQbWes8gMl3pKaDP90ykm+CljOxPAiSWuuBo8GZMPTOZSGcmX/7ic29uhRhF8Y1MdGEQ+HCHc/goi8EiXJTzGQXfJz1iNlzcZMttS8fPzVNwYaWPmFgRux1764ukss4uS+1a+7VFka8NPspPyA=
+	t=1712300041; cv=none; b=QmBwk1xrsAR7y6cK7Z9pVqEpRdTdmqeVoG21f3vy52asuYQ7t9p4oGjYAKJMy8Yy0Bm5FBQ0D8ASeMfVd3iyWOWDJFwDDoA03zJ3XSNjuhmmXLAnilt96GZACcZOQpcnWfNk60hadd0hjS1AFEvoVhGVTX32IQGaXRwJC1pEwNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712286931; c=relaxed/simple;
-	bh=nAVbPlUqGAsTQ3HFoJUiyqLIjkDI7SXCM1ieLBgGMPs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ci9QvFk1IIZ/FMe/sYiHaEMFt1WjsmYQf2GoKRsVcAMrvZIIKlExk03e3VJTiCniSV/MOzsEhHrYDwSe1iu4ecxQ03Z5bReHdSa0S4zXSjtVvKj+zruv+0b90u+yev7tknQcWa4W5yWoVGeTcYnSrltm2QqdHl42ZOM8+eH8Oo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GwguyhA0; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwguyhA0"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-516cbf3fd3dso1793511e87.2;
-        Thu, 04 Apr 2024 20:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712286928; x=1712891728; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=91czYunPWBLhPDn+zFcXed9eaGbL99qvQu+dhQ8//8w=;
-        b=GwguyhA08bOCvnVBDrXC95JMeLvaxulpe2cqamF71EazJnEkQGSXwRBf8HL/NL10ng
-         1wQjsr0RKKXyuODw3KH5byPH7ItzyLdDgBsClMftqWP7I1Zyw6YHvRADCfTTROEpqlgq
-         HZC1kpmoaZxjlBfQH8N/CtjeF/yRnN0Z2FDRPlrVaYM6f82Xjhjlk6/NSiyPOkMNnV/r
-         2fkYIvTCtBnC+e6JWHITmxsXhtXA4ymY17nf4GG3lWHgcTt9IFIc6MkFVuWpU/VyVjYo
-         aebDtjtPY2OCtDnQftFlC9qwsXpl/7jcUGWMwAPCJLFe9Mpn2Wy2du9s9oT9a6F6EofP
-         aWrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712286928; x=1712891728;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=91czYunPWBLhPDn+zFcXed9eaGbL99qvQu+dhQ8//8w=;
-        b=C5x9PlQ+Thjy1CfEdEPJnxzvsy1NTytBZ9w+Ul+VyEjgvEgwddBkAXNHZqqWSh156+
-         WVXAn3vjQHRneq7Hpic0Iu/pZm79GyTyaj88lALsNQXdWb2LPbGGMGKA2ZZzqQAe3bwp
-         SxYOCmD2nizNnJF0ce4SHotMtRbCukah0aZDEJFQhh7Qbw3+hav62oYprI88h/efO7jf
-         QHc6HjIz29yeYHNvKl0VvVNTBtuSRzgLAMxzIcEvbGcyyzoPG40kbOzJ2zmha1NwH4AZ
-         tV2rGYqvTC8mcwOCbCTnzoAJocDNLqQ55JbR853knzLnqupXIbH8V/ORwcv5bwSLa2lW
-         fidQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkpvMx0x+mzUr1DIiYs1Cd90JNJJthAJBIpVRuLSDeZ+Nl4gMnOwqtNoxgBTANO9dzaL1wqi5Vb7+OkuJ06UAEHeApcDQWcqaq8g==
-X-Gm-Message-State: AOJu0YzGjl299ySoABR2wte385ieARiNiHhMJnIU/bxsG592vPLShJF5
-	KFv3mHKp+6PhaAWF/0q+Do/vqDHEKiHUxZrY0mflr4luHuEfS/UInjzvUW5tJcPsstc+iJXlC0m
-	gQtihhDewGaXQjaRafy70VZEFXdU=
-X-Google-Smtp-Source: AGHT+IGEIAc02Mac6DkbCdONkjMZ0vUx+x5/w5UhzScwv2QpxamdJvCwLId/8vK54e3JC46bhphbg4crXDPY82V5VZk=
-X-Received: by 2002:a05:6512:2387:b0:513:de8d:203c with SMTP id
- c7-20020a056512238700b00513de8d203cmr151803lfv.28.1712286927823; Thu, 04 Apr
- 2024 20:15:27 -0700 (PDT)
+	s=arc-20240116; t=1712300041; c=relaxed/simple;
+	bh=VL+lHBiS+Sf/7qTZy7DcU3HGXsGvFoDFNTJcTa1vnKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4Guz/olj7wcXZqYlUBte46pcd8IZMv0v+Vn4KMfA2L9fQS0+xVT3+J0NfUW5zCfGeBTEkFBhrgQc6oNF/QH3iv2qaGqSbcbTMGy6ExRSgzpvt7nUl7cHH5zRhKYPFRtKQbZ0bXinRWgndEROWxyHnGxMmfMuMQXfluAtB75PTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5D43C68D07; Fri,  5 Apr 2024 08:53:55 +0200 (CEST)
+Date: Fri, 5 Apr 2024 08:53:55 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: David Howells <dhowells@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/26] mm: Export writeback_iter()
+Message-ID: <20240405065355.GA4112@lst.de>
+References: <20240403124124.GA19085@lst.de> <20240403101422.GA7285@lst.de> <20240403085918.GA1178@lst.de> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-16-dhowells@redhat.com> <3235934.1712139047@warthog.procyon.org.uk> <3300438.1712141700@warthog.procyon.org.uk> <3326107.1712149095@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 4 Apr 2024 22:15:16 -0500
-Message-ID: <CAH2r5mtksWKZNn7WmHGT4t9fi6duL_nuTgdMwrx9c2gqw899YQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3326107.1712149095@warthog.procyon.org.uk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Please pull the following changes since commit
-39cd87c4eb2b893354f3b850f916353f2658ae6f:
+On Wed, Apr 03, 2024 at 01:58:15PM +0100, David Howells wrote:
+> Very well, I'll switch that export to GPL.  Christian, if you can amend that
+> patch in your tree?
 
-  Linux 6.9-rc2 (2024-03-31 14:32:39 -0700)
+Thanks!
 
-are available in the Git repository at:
-
-  git://git.samba.org/ksmbd.git tags/6.9-rc2-ksmbd-server-fixes
-
-for you to fetch changes up to 5ed11af19e56f0434ce0959376d136005745a936:
-
-  ksmbd: do not set SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
-(2024-04-02 09:21:25 -0500)
-
-----------------------------------------------------------------
-3 ksmbd changesets, all also for stable
-- encryption fix
-- memory overrun fix
-- oplock break fix
-----------------------------------------------------------------
-Namjae Jeon (3):
-      ksmbd: don't send oplock break if rename fails
-      ksmbd: validate payload size in ipc response
-      ksmbd: do not set SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
-
- fs/smb/server/ksmbd_netlink.h     |  3 ++-
- fs/smb/server/mgmt/share_config.c |  7 ++++++-
- fs/smb/server/smb2ops.c           | 10 +++++-----
- fs/smb/server/smb2pdu.c           |  3 ++-
- fs/smb/server/transport_ipc.c     | 37 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 52 insertions(+), 8 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
