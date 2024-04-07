@@ -1,63 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4832031D;
-	Sat,  6 Apr 2024 16:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4003663A9
+	for <linux-cifs@vger.kernel.org>; Sun,  7 Apr 2024 04:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712420342; cv=none; b=G1evzS+02qIM+0FkShi9sCYBrcmAFzmGA3Iiu6tnwhBMneJuQJBnZnVOxbIjgsFnaS9Nl4HIo9OmS7VZtH3t/SScO2tEp1IvSGATP3tX6CaGz4dFl9VahBGLmxTqZZEuBJ07g/5VwfXsIRlzlcXa7ErAQ28M3r4GGOlEgU2nnSQ=
+	t=1712463928; cv=none; b=jRSdgLbPlUEvg9TnElbX+z+TzFfv0QfjZgIDWGkIyFyYfmr4TGaqgJlZk1hoSDzlWKD+qx9cIxLD1yWuJw6FFmhhQ4+COZCL0dtI4zzNsi57DpWFE+dSGL4tN9nVYguqKA7Txi1R16V82KLt8wyBwFFGdhuboKPux/6k3N3om6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712420342; c=relaxed/simple;
-	bh=luE3wk9Sd7KTXEA/yt5pP2m7e0nBAAoS8yfAt/Q7oN4=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=F26a906dy/mnSLtYfhncmxKnNZpkJvzP8b478UrR4GF9b0atVTMjl0/Kp+TnrDXFxW1RLpXknisNplCoig3kz99LBATMTZ4ZovmWCkl+6gh3NhvrnWXfW151LjK7YkLDNlkDC2BU61ZSj/nlhcwlu4TPqOFvmjCFpuXVjEMerhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IeOZ113w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712463928; c=relaxed/simple;
+	bh=fR0QOO6czCiCPHL7pe9CqGO0fk75QPOlD9OzZbubsPI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IZ5nFAO6tC3XPI+oDCqqqE8GFQhUxzbee9XKoCJGQZvNATyGwHVDzGwQEI/k5jgdtuNTWu9neR5zDJjm3ig0KDsshisrRoiIhrJqI+BAy2XJ0IrmXdkP/mx9IC/iiYG38hvwZcYwtYQVOUKhJeDlT0FVs5zqwUGzJO1bDDx5B5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNXLQtmm; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IeOZ113w"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AC9A9C433F1;
-	Sat,  6 Apr 2024 16:19:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712420341;
-	bh=luE3wk9Sd7KTXEA/yt5pP2m7e0nBAAoS8yfAt/Q7oN4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=IeOZ113wLP1CAE7RQorI1h/qhASatfjnaXJPCbBUdmORCpYMXbj1A4fbmc5jrJ9fw
-	 4fw0WavffLT5jZbq9fS8nIkFPvyoX8gcCdIjr6h/dCYBX5DzYi+Kjd5VrjmEZw4PhO
-	 3H/JckSJnjjxKyCqB6w1Y40ei4JsnalhR8/eH8fpkDZoLhAEfKm1drcC7m2f7OVVBq
-	 oKauVXHZBcZ3pQPRJOgzyZX7adGIa1p3yS0ibOiM0402ytkInr/CEd50v73QOoVm1Y
-	 d+a4W13Jr4ioM2vpbGQ4Xohp7EzcL9ziZHffnWPhLyYtzFhxubNq/c6dj864w42fYT
-	 zRt/e5FgZbEhw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A3A48D8A103;
-	Sat,  6 Apr 2024 16:19:01 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms=TTjN5yoGsnEhrvqioM3pG6ANcTwsC8L1q833EPmMtQ@mail.gmail.com>
-References: <CAH2r5ms=TTjN5yoGsnEhrvqioM3pG6ANcTwsC8L1q833EPmMtQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms=TTjN5yoGsnEhrvqioM3pG6ANcTwsC8L1q833EPmMtQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e0e50401cc3921c9eaf1b0e667db174519ea939f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 119c289409ddb9bca55074388f282ca67da67692
-Message-Id: <171242034166.494.7220690827196807473.pr-tracker-bot@kernel.org>
-Date: Sat, 06 Apr 2024 16:19:01 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNXLQtmm"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-516d3776334so2898125e87.1
+        for <linux-cifs@vger.kernel.org>; Sat, 06 Apr 2024 21:25:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712463925; x=1713068725; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5cptaQLMgkVEbGwtLXInv6sPWJGZ6VTRnGIaTnjxvHI=;
+        b=hNXLQtmmYarv0VF1lPYBpq3ivTtyCUxemUXuN60cqDDvi7ugrQ5GvcVW855Y2zf1+e
+         3V5awO2O/LJ1ZFBO/DPz85+UNCNyjo8CODow28gEcQUvvtycHpyKr2AWrK/1Fy/YB2DW
+         yCBLyonhCk35WSYVXv2tsKWa1tktIIICIvgMKyKPrSVhFdCHER2QBlBWHJs6K9D6W5KF
+         LeR6ZNQiJsixGkhO4yKH9iOmy51iHHu/0gnemZSMW/HgW2T0WuS4z8ZEnPcTZrnsOwZz
+         xI9PAkuf/QKvs7sN11I9phMxn1yg2Axr7O4fnXrSa4d2eL/dFCt+X2qRRRO8/6jDwF4z
+         DJGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712463925; x=1713068725;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5cptaQLMgkVEbGwtLXInv6sPWJGZ6VTRnGIaTnjxvHI=;
+        b=uTiHgn0qh3cDe85knPhjxiRBmYZFtk8rbFZHS/oY6vs6FcvGZO93oOq1chUlKXow1p
+         2TDpurameyno2S9uS4WSdvOIsTknuglzuh+/bWIO29tvxF96SIMz5R27vhCr6K8Sp+Mm
+         N6vz3SApcu+oUaKPnrhTpUgm0AICTJSGWZCwTCDImWtWm2CJCP1NQXizFeWxd4VSEcgd
+         v0p9Dw3OciBIapNijx+OA2CZ1ZkaQ6QAxrQWBBFGHdJiNmzPSCBwNpf7ehIOaGH+jfYa
+         dT3Wu/vRRgARgL/YlRF2LptMqeuYBoTRaXw9KaTUNVoMo8Rm1Y2xJVhA7wx0ikzjKBTr
+         294w==
+X-Gm-Message-State: AOJu0Yw74/TCf4NgIwazOYwBu/vHUm4SMC49YHfY2cC8k7rQotDLk7I9
+	u1zrgyH+LWNEzlP0b2X+E/3J2+jaOgycpQ4UZrvCBf6M+ugjuth2nvNMdeLNw0aAq0G7xc4lblS
+	vnq3upwBni7J75SGdgOBF3ZLe21+5rxTGEww=
+X-Google-Smtp-Source: AGHT+IG8twoRzRfnFXaUG/Kbx/YA7atV/T49RaYvTDN+WRHZML9vtC3VWkD8VfgTuw3omfrKECVdJLSslmbgbOiV1ak=
+X-Received: by 2002:a05:6512:6a:b0:516:c5b0:cc12 with SMTP id
+ i10-20020a056512006a00b00516c5b0cc12mr4098057lfo.14.1712463924659; Sat, 06
+ Apr 2024 21:25:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 6 Apr 2024 23:25:12 -0500
+Message-ID: <CAH2r5muVm6pAbZRrQ2RQddozF0=JdvMbfAJAMYnZA5wkCsUYiQ@mail.gmail.com>
+Subject: 
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, 
+	Ritvik Budhiraja <budhirajaritviksmb@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Sat, 6 Apr 2024 00:08:19 -0500:
+The /proc/fs/cifs/Stats
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc2-smb3-client-fixes
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/119c289409ddb9bca55074388f282ca67da67692
+In smb2_close_cached_fid  we were decrementing the count of open files
+on server twice (e.g. for the case where we were closing cached
+directories so this was more of an issue with mount to servers like
+Windows that support directory leases)
 
-Thank you!
+    Fixes: 8e843bf38f7b ("cifs: return a single-use cfid if we did not
+get a lease")
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
