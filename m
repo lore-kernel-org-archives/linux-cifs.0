@@ -1,308 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B1A13957F;
-	Mon,  8 Apr 2024 13:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780BF1422C6
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Apr 2024 15:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712583567; cv=none; b=Hw2EezqTsPEL1RqdzJ7DcLC2OGxMGfzLjvLXTChxJThU/pUSf1jqdbiHPP18kg0nqXe5OWMwx3pNLoSdR6sIpX4uycFrW0BZE3XEgexFv7PQZOGcxgTaubtgPN8Z9ALniBlyQ/bbMrEDAqgnemLFvnJDkhQ/Hm/K7Am64reBiw0=
+	t=1712591613; cv=none; b=VWlA6m8BlT8dziLbj49RieVSrBS6w4jGe8XUEPTIbu1xWEj9UpQXxDun4OuvxG+V88UChgirpLcUwkfnfAzpN5K/67dcWyiiiB+VPLY7ZetMPG5g3hX6e3NMQJxKWrqRRqbuTgGWlrmG84Z+tVZQ9cPrrZAMjEczvtYXP16HQfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712583567; c=relaxed/simple;
-	bh=EEmbfV3uQpwgGCJO7dnHWa+5UKtHYq3/CeiV/4Cwsf4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ayrolShWi21zcYLIEaxElFxxV8JeJCLAyrXD8674KQj5BnWZUP0BZiVeV6+j28h9MhVW6tDAHZ3v1W7uJBW8g/EZvhmFK3JZ7EES15HH49hGwMhiFpL2u/5oTHOhUu+Bdc3NW3qxORr+wc+HW9u3chc87HpeOvmIUlrbhtf/xpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=TNk0Zb2v; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712591613; c=relaxed/simple;
+	bh=c7hBMA4mXgWP8KpfW/frrWt9OAipSAHQsJKBjgulmnE=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Cdl9lmOVeP2vM6melZz8DMCVZMsKKvwoITz8/9ZA9UP/EJzC7w+3Ivo2aTl5oyp5gIa7yn094rWsQ2f727xY3/KGZyHMyggryQnlxaLjP2sCRDfVwup/b6EkgeFImMgzM9KiHhGhGOrELt1Z64H3SaD5PfZm53QYNJ8hugeDxB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M3pQiY5l; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="TNk0Zb2v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08DDC433C7;
-	Mon,  8 Apr 2024 13:39:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1712583567;
-	bh=EEmbfV3uQpwgGCJO7dnHWa+5UKtHYq3/CeiV/4Cwsf4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TNk0Zb2vg7ccGdLUZGfPmfQRGdLnguA7yDONhYnk69uDKf8G/2VMPL5cb/oX6MeGp
-	 jdkzoasVVCc5ui1f8ADwhHm6sU3nAYaMwXWrsIZ7dDMSk3ndHJseoFxj8bo6kXLzna
-	 hUzQdVVsqpFXaYU9QUxrSk/IoGDVHWI9aLi9oHF8=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 188/252] cifs: Fix caching to try to do open O_WRONLY as rdwr on server
-Date: Mon,  8 Apr 2024 14:58:07 +0200
-Message-ID: <20240408125312.497212281@linuxfoundation.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240408125306.643546457@linuxfoundation.org>
-References: <20240408125306.643546457@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M3pQiY5l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712591610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CFuGX1yyoTN69ecCATsVj4UhORzkDiRUWoktVVAJ3+Q=;
+	b=M3pQiY5lqBUvg/LGShdu13XW38l8ONsKhdxdh35Uw1RJ4HmupW3rKYJQQQtzHVfogfJsZg
+	jN1+dVINASTXemnr+GMMM0vgjrM/Cm1i39jGpulL+JwbQVIyNQ30SYwdjwsR8465a/7k1L
+	yNNvp6exSFMjDPkt8+eZF6zmaIORk88=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-137-HJAhESVFMaKi_61YaghcgA-1; Mon, 08 Apr 2024 11:53:27 -0400
+X-MC-Unique: HJAhESVFMaKi_61YaghcgA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEA2C90ACC7;
+	Mon,  8 Apr 2024 15:53:25 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 084C62033AC1;
+	Mon,  8 Apr 2024 15:53:21 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240328163424.2781320-24-dhowells@redhat.com>
+References: <20240328163424.2781320-24-dhowells@redhat.com> <20240328163424.2781320-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH 23/26] netfs: Cut over to using new writeback code
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <877901.1712591597.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 08 Apr 2024 16:53:17 +0100
+Message-ID: <877902.1712591597@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+David Howells <dhowells@redhat.com> wrote:
 
-------------------
+> +		/* Wait for writeback to complete.  The writeback engine owns
+> +		 * the info in folio->private and may change it until it
+> +		 * removes the WB mark.
+> +		 */
+> +		if (folio_wait_writeback_killable(folio)) {
+> +			ret =3D written ? -EINTR : -ERESTARTSYS;
+> +			goto error_folio_unlock;
+> +		}
+> +
 
-From: David Howells <dhowells@redhat.com>
+It turns out that this really kills performance with fio with as many jobs=
+ as
+cpus.  It's taking up to around 8x longer to complete a pwrite() on averag=
+e
+and perf shows a 30% of the CPU cycles are being spent in contention on th=
+e
+i_rwsem.
 
-[ Upstream commit e9e62243a3e2322cf639f653a0b0a88a76446ce7 ]
+The reason this was added here is that writeback cannot take the folio loc=
+k in
+order to clean up folio->private without risking deadlock vs the truncatio=
+n
+routines (IIRC).
 
-When we're engaged in local caching of a cifs filesystem, we cannot perform
-caching of a partially written cache granule unless we can read the rest of
-the granule.  This can result in unexpected access errors being reported to
-the user.
+I can mitigate this by skipping the wait if folio->private is not set and =
+if
+we're not going to attach anything there (see attached).  Note that if
+writeout is ongoing and there is nothing attached to ->private, then we sh=
+ould
+not be engaging write-streaming mode and attaching a new netfs_folio (and =
+if
+we did, we'd flush the page and wait for it anyway).
 
-Fix this by the following: if a file is opened O_WRONLY locally, but the
-mount was given the "-o fsc" flag, try first opening the remote file with
-GENERIC_READ|GENERIC_WRITE and if that returns -EACCES, try dropping the
-GENERIC_READ and doing the open again.  If that last succeeds, invalidate
-the cache for that file as for O_DIRECT.
+The other possibility is if we have a writeback group to set.  This only
+applies to ceph for the moment and is something that will need dealing wit=
+h
+if/when ceph is made to use this code.
 
-Fixes: 70431bfd825d ("cifs: Support fscache indexing rewrite")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+David
 ---
- fs/smb/client/dir.c     | 15 +++++++++++++
- fs/smb/client/file.c    | 48 ++++++++++++++++++++++++++++++++---------
- fs/smb/client/fscache.h |  6 ++++++
- 3 files changed, 59 insertions(+), 10 deletions(-)
 
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 580a27a3a7e62..855468a32904e 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -189,6 +189,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 	int disposition;
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_open_parms oparms;
-+	int rdwr_for_fscache = 0;
- 
- 	*oplock = 0;
- 	if (tcon->ses->server->oplocks)
-@@ -200,6 +201,10 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 		return PTR_ERR(full_path);
- 	}
- 
-+	/* If we're caching, we need to be able to fill in around partial writes. */
-+	if (cifs_fscache_enabled(inode) && (oflags & O_ACCMODE) == O_WRONLY)
-+		rdwr_for_fscache = 1;
-+
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
- 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
-@@ -276,6 +281,8 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 		desired_access |= GENERIC_READ; /* is this too little? */
- 	if (OPEN_FMODE(oflags) & FMODE_WRITE)
- 		desired_access |= GENERIC_WRITE;
-+	if (rdwr_for_fscache == 1)
-+		desired_access |= GENERIC_READ;
- 
- 	disposition = FILE_OVERWRITE_IF;
- 	if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-@@ -304,6 +311,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
- 		create_options |= CREATE_OPTION_READONLY;
- 
-+retry_open:
- 	oparms = (struct cifs_open_parms) {
- 		.tcon = tcon,
- 		.cifs_sb = cifs_sb,
-@@ -317,8 +325,15 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
- 	rc = server->ops->open(xid, &oparms, oplock, buf);
- 	if (rc) {
- 		cifs_dbg(FYI, "cifs_create returned 0x%x\n", rc);
-+		if (rc == -EACCES && rdwr_for_fscache == 1) {
-+			desired_access &= ~GENERIC_READ;
-+			rdwr_for_fscache = 2;
-+			goto retry_open;
-+		}
- 		goto out;
- 	}
-+	if (rdwr_for_fscache == 2)
-+		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
- 
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	/*
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index c711d5eb2987e..606972a95465b 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -206,12 +206,12 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
- 	 */
- }
- 
--static inline int cifs_convert_flags(unsigned int flags)
-+static inline int cifs_convert_flags(unsigned int flags, int rdwr_for_fscache)
- {
- 	if ((flags & O_ACCMODE) == O_RDONLY)
- 		return GENERIC_READ;
- 	else if ((flags & O_ACCMODE) == O_WRONLY)
--		return GENERIC_WRITE;
-+		return rdwr_for_fscache == 1 ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
- 	else if ((flags & O_ACCMODE) == O_RDWR) {
- 		/* GENERIC_ALL is too much permission to request
- 		   can cause unnecessary access denied on create */
-@@ -348,11 +348,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
- 	int create_options = CREATE_NOT_DIR;
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_open_parms oparms;
-+	int rdwr_for_fscache = 0;
- 
- 	if (!server->ops->open)
- 		return -ENOSYS;
- 
--	desired_access = cifs_convert_flags(f_flags);
-+	/* If we're caching, we need to be able to fill in around partial writes. */
-+	if (cifs_fscache_enabled(inode) && (f_flags & O_ACCMODE) == O_WRONLY)
-+		rdwr_for_fscache = 1;
-+
-+	desired_access = cifs_convert_flags(f_flags, rdwr_for_fscache);
- 
- /*********************************************************************
-  *  open flag mapping table:
-@@ -389,6 +394,7 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
- 	if (f_flags & O_DIRECT)
- 		create_options |= CREATE_NO_BUFFER;
- 
-+retry_open:
- 	oparms = (struct cifs_open_parms) {
- 		.tcon = tcon,
- 		.cifs_sb = cifs_sb,
-@@ -400,8 +406,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
- 	};
- 
- 	rc = server->ops->open(xid, &oparms, oplock, buf);
--	if (rc)
-+	if (rc) {
-+		if (rc == -EACCES && rdwr_for_fscache == 1) {
-+			desired_access = cifs_convert_flags(f_flags, 0);
-+			rdwr_for_fscache = 2;
-+			goto retry_open;
-+		}
- 		return rc;
-+	}
-+	if (rdwr_for_fscache == 2)
-+		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
- 
- 	/* TODO: Add support for calling posix query info but with passing in fid */
- 	if (tcon->unix_ext)
-@@ -834,11 +848,11 @@ int cifs_open(struct inode *inode, struct file *file)
- use_cache:
- 	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
- 			   file->f_mode & FMODE_WRITE);
--	if (file->f_flags & O_DIRECT &&
--	    (!((file->f_flags & O_ACCMODE) != O_RDONLY) ||
--	     file->f_flags & O_APPEND))
--		cifs_invalidate_cache(file_inode(file),
--				      FSCACHE_INVAL_DIO_WRITE);
-+	if (!(file->f_flags & O_DIRECT))
-+		goto out;
-+	if ((file->f_flags & (O_ACCMODE | O_APPEND)) == O_RDONLY)
-+		goto out;
-+	cifs_invalidate_cache(file_inode(file), FSCACHE_INVAL_DIO_WRITE);
- 
- out:
- 	free_dentry_path(page);
-@@ -903,6 +917,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	int disposition = FILE_OPEN;
- 	int create_options = CREATE_NOT_DIR;
- 	struct cifs_open_parms oparms;
-+	int rdwr_for_fscache = 0;
- 
- 	xid = get_xid();
- 	mutex_lock(&cfile->fh_mutex);
-@@ -966,7 +981,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	}
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
- 
--	desired_access = cifs_convert_flags(cfile->f_flags);
-+	/* If we're caching, we need to be able to fill in around partial writes. */
-+	if (cifs_fscache_enabled(inode) && (cfile->f_flags & O_ACCMODE) == O_WRONLY)
-+		rdwr_for_fscache = 1;
-+
-+	desired_access = cifs_convert_flags(cfile->f_flags, rdwr_for_fscache);
- 
- 	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
- 	if (cfile->f_flags & O_SYNC)
-@@ -978,6 +997,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	if (server->ops->get_lease_key)
- 		server->ops->get_lease_key(inode, &cfile->fid);
- 
-+retry_open:
- 	oparms = (struct cifs_open_parms) {
- 		.tcon = tcon,
- 		.cifs_sb = cifs_sb,
-@@ -1003,6 +1023,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		/* indicate that we need to relock the file */
- 		oparms.reconnect = true;
- 	}
-+	if (rc == -EACCES && rdwr_for_fscache == 1) {
-+		desired_access = cifs_convert_flags(cfile->f_flags, 0);
-+		rdwr_for_fscache = 2;
-+		goto retry_open;
-+	}
- 
- 	if (rc) {
- 		mutex_unlock(&cfile->fh_mutex);
-@@ -1011,6 +1036,9 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		goto reopen_error_exit;
- 	}
- 
-+	if (rdwr_for_fscache == 2)
-+		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
-+
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- reopen_success:
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index a3d73720914f8..1f2ea9f5cc9a8 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -109,6 +109,11 @@ static inline void cifs_readahead_to_fscache(struct inode *inode,
- 		__cifs_readahead_to_fscache(inode, pos, len);
- }
- 
-+static inline bool cifs_fscache_enabled(struct inode *inode)
-+{
-+	return fscache_cookie_enabled(cifs_inode_cookie(inode));
-+}
-+
- #else /* CONFIG_CIFS_FSCACHE */
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
-@@ -124,6 +129,7 @@ static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
- static inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update) {}
- static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode) { return NULL; }
- static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags) {}
-+static inline bool cifs_fscache_enabled(struct inode *inode) { return false; }
- 
- static inline int cifs_fscache_query_occupancy(struct inode *inode,
- 					       pgoff_t first, unsigned int nr_pages,
--- 
-2.43.0
-
-
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 1eff9413eb1b..279b296f8014 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -255,7 +255,8 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct=
+ iov_iter *iter,
+ 		 * the info in folio->private and may change it until it
+ 		 * removes the WB mark.
+ 		 */
+-		if (folio_wait_writeback_killable(folio)) {
++		if (folio_get_private(folio) &&
++		    folio_wait_writeback_killable(folio)) {
+ 			ret =3D written ? -EINTR : -ERESTARTSYS;
+ 			goto error_folio_unlock;
+ 		}
 
