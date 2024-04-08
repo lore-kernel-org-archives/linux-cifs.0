@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746D32DF73;
-	Mon,  8 Apr 2024 13:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA8B7A15C;
+	Mon,  8 Apr 2024 13:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712581715; cv=none; b=Ea28KHfUh92MS4cWb7nUGwuBikQg352erffXvd+QmYoJKtpz/sjpe9Fk1U0A7lu1aEZk3Yiq9QtUXbenBzkplIA6zuXiuQ4N+fHHpjRuj3fKv40++oqE/cfIu1oc0QhOUBqLeTGsSw60aOpFT4dSV91HN8rWu8RC4WzmZTgTefM=
+	t=1712582069; cv=none; b=Rt11RtjuqhvpDSia8WPI5h3Atk+ATLZYSBp7YpVmbj5fvvkR/irBIDFBgKQpIFCUb0lQmin7mc8YB8ZR5/C3HQSTJOiOspwi3e+c3E+661x8Bj+Gl1Fjiw5ZuM2JQCC4Kszwxm2rYyjtnib3uZf45IVCzDRkHLdp6HtZbBzy5a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712581715; c=relaxed/simple;
-	bh=V+SQFQ3cbRnsftBKVQRqsHHmc9X4VscONc83K7lIx2Q=;
+	s=arc-20240116; t=1712582069; c=relaxed/simple;
+	bh=KVVH/6mRI716M5uJlDS5Ou9WITiJtYKXES+jHkpQgJQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s+KKyELbM9PooDNB1E8+OJ31tErXoWB+gUXWqVlV5hXxNhafhO0akIZq6AI2F/nOcgMymkQs/VBo3L0vl6WL/E2NBilaunR2dDwixvezGSRMT9FQwdvflIscoVKL1lkUVmbPsIpbAJ1gAeoVgzavCoU92OneRE6tLYyGNw1NrUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UH8FCNQk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TkQsVLQJJyGRZaFbi2E6XyADhMeu7wBQxLtkUyZeDJnOR4JTCsIIbd3kjCkxgc9MhPd0G9woyjRhyoZRYZKcyQcHuYk/bYbQh1Fj3p65HQKhmX+FCmVETE8bCbsNJ90P3NJWi3j8t3LigHdoZTggdDn6ou8cJAT+TrtrK05Wn1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Z0j1ILcB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UH8FCNQk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CF9C43390;
-	Mon,  8 Apr 2024 13:08:34 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Z0j1ILcB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD44BC433C7;
+	Mon,  8 Apr 2024 13:14:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1712581715;
-	bh=V+SQFQ3cbRnsftBKVQRqsHHmc9X4VscONc83K7lIx2Q=;
+	s=korg; t=1712582069;
+	bh=KVVH/6mRI716M5uJlDS5Ou9WITiJtYKXES+jHkpQgJQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UH8FCNQkgt2Ik6pBrqkxYg8rN5bf4eEKSKJFI31ZSahnkWR/eqaUT6F0e2i33ATq6
-	 8wFeXsUCo5OHpYW+R1sR0stYURGEIKqNnVRVsxolIQ7yclmxVIDQwa8gg5Eun/QNGU
-	 tDEVrgbjbEtGYClXj6Xg8MbwHKZxq7WHvgWw/i5w=
+	b=Z0j1ILcBdpNmuveFGh5j2SWEhHmG0fLWvkDTwmtP9obq33LeXC+zylSKD2PWnyQCb
+	 Gtt3D4ilvZWZZnbqo98vWl9cMgH7LvVtF4S6mrR5J9ubIwhjLxsVwTdtwqjPhKg3nr
+	 f03wWlZ3q3Z2eouDLEwpOhZZRt2Wcx3EJPRHJzPI=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-fsdevel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 034/252] cifs: Fix duplicate fscache cookie warnings
-Date: Mon,  8 Apr 2024 14:55:33 +0200
-Message-ID: <20240408125307.702823323@linuxfoundation.org>
+Subject: [PATCH 6.8 044/273] cifs: Fix duplicate fscache cookie warnings
+Date: Mon,  8 Apr 2024 14:55:19 +0200
+Message-ID: <20240408125310.667062546@linuxfoundation.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240408125306.643546457@linuxfoundation.org>
-References: <20240408125306.643546457@linuxfoundation.org>
+In-Reply-To: <20240408125309.280181634@linuxfoundation.org>
+References: <20240408125309.280181634@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.8-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -88,7 +88,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index e5cad149f5a2d..a4ee801b29394 100644
+index c4a3cb736881a..340efce8f0529 100644
 --- a/fs/smb/client/fscache.c
 +++ b/fs/smb/client/fscache.c
 @@ -12,6 +12,16 @@
@@ -130,10 +130,10 @@ index e5cad149f5a2d..a4ee801b29394 100644
  				       i_size_read(&cifsi->netfs.inode));
  	if (cifsi->netfs.cache)
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cb9e719e67ae2..fa6330d586e89 100644
+index 7f28edf4b20f3..4c3dec384f922 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -1390,6 +1390,8 @@ cifs_find_inode(struct inode *inode, void *opaque)
+@@ -1414,6 +1414,8 @@ cifs_find_inode(struct inode *inode, void *opaque)
  {
  	struct cifs_fattr *fattr = opaque;
  
