@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0A670CCB;
-	Mon,  8 Apr 2024 13:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD587F7DB;
+	Mon,  8 Apr 2024 13:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712582375; cv=none; b=LrCskWMf3VIfi4dOM+eM2wOIvvcDxz7BQZKvaS1oulCCcHZKnhKLDjSuugPyGt7mvYc/HC7ohfiJrdOZ6ksUrpDDajprCpi78mdENH71FoIb4G4nlmSDq773yTd5Hl5v2UQe6A3bfADkPuEd3A7usQdsDKibOBoowm9lZs5uq/w=
+	t=1712583439; cv=none; b=JAc0xYy2yfUz5EGeZ8HT4OcJKNKj+he4JDstwbMjh013UCAycS0D6/qzlWEorctgGtsjEnfTF+JvZ+pYm+doogYPagv/9JlpIEdqUs0rezneE4j8THs49qckACDPAq+aMACgr7b2/kg2KEC1t1nPc1CiymdCYR8oKWh97HiS6eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712582375; c=relaxed/simple;
-	bh=NhvtdevDHN9Wq8sUJv73XolrMHEq35fQ58EhfySQfIA=;
+	s=arc-20240116; t=1712583439; c=relaxed/simple;
+	bh=aUpnEhLZkHEK7BjO2NlX1kxJnUSh9ZWUKOZfSqk9s+U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jZEgtd0K7FDvhnqoKRYo+7T/8fVSmTqn7je9ZmZfMFcbVw686l5v+90vKkjUDY3Dley4c62UzS4sZM5yxebfP7O8xk1vcGUzy3crCKJ3rZuCrTzC+Zgj0PWQGpgtsLGyFU06JltnbZRvRPyDGKJgJx4RdhU13vjYsoU0ZzDGF4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=nPpSVLEP; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VSzTrHKG/zRpS1mDkXJ2VFriFdwp68TGISl4ue5gDVTKdvT01+cWGFJ7RR8S0QeYac5MOWNhAsegsiS7EBbLBE6hijot/+yz+3blsu4N/tPxVjMFuCZ2WsPYLHhgTeQ4kHlrwKOeYce3pQIRbLpc2+xFO6w19JhJhYuoxlNrJKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MU4xNdzI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="nPpSVLEP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDBEC433F1;
-	Mon,  8 Apr 2024 13:19:34 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MU4xNdzI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E708C433C7;
+	Mon,  8 Apr 2024 13:37:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1712582375;
-	bh=NhvtdevDHN9Wq8sUJv73XolrMHEq35fQ58EhfySQfIA=;
+	s=korg; t=1712583439;
+	bh=aUpnEhLZkHEK7BjO2NlX1kxJnUSh9ZWUKOZfSqk9s+U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nPpSVLEPuDw2wkkHy76jPryzOg/pfd+pRfNNZO2363jLEG+SqB15qlIHCW52Lv2g5
-	 jchiAtEAcxGA0ToPrVDAZWEj5s5lz7ppfCuOV+XdjWj3gOL3/ijgeSH8Htz/VAb5LU
-	 VNn5akQ7ZRHXGGaLQYS0lRLqRCOnz3pVIoyC2C44=
+	b=MU4xNdzIoABKZOqc/HII/r7gWKST3sdZ2nRAPkX/V1a1wFNn/ieMRZZiMpcU39yHR
+	 xguGwS+Yt8iEu3aVzN1GOfX+slNDkQ0MykWe//MSkPC8T9zzUBO02rg3Dm9AZapLA5
+	 utBUkWfKK2h+MpGWxSsLtOBwfo7tH8cmkG6ZT3fA=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -37,12 +37,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-fsdevel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 100/138] cifs: Fix caching to try to do open O_WRONLY as rdwr on server
-Date: Mon,  8 Apr 2024 14:58:34 +0200
-Message-ID: <20240408125259.342475642@linuxfoundation.org>
+Subject: [PATCH 6.8 179/273] cifs: Fix caching to try to do open O_WRONLY as rdwr on server
+Date: Mon,  8 Apr 2024 14:57:34 +0200
+Message-ID: <20240408125314.831583040@linuxfoundation.org>
 X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240408125256.218368873@linuxfoundation.org>
-References: <20240408125256.218368873@linuxfoundation.org>
+In-Reply-To: <20240408125309.280181634@linuxfoundation.org>
+References: <20240408125309.280181634@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -54,7 +54,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+6.8-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 59 insertions(+), 10 deletions(-)
 
 diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index e382b794acbed..863c7bc3db86f 100644
+index 89333d9bce36e..37897b919dd5a 100644
 --- a/fs/smb/client/dir.c
 +++ b/fs/smb/client/dir.c
-@@ -180,6 +180,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+@@ -189,6 +189,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
  	int disposition;
  	struct TCP_Server_Info *server = tcon->ses->server;
  	struct cifs_open_parms oparms;
@@ -102,7 +102,7 @@ index e382b794acbed..863c7bc3db86f 100644
  
  	*oplock = 0;
  	if (tcon->ses->server->oplocks)
-@@ -191,6 +192,10 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+@@ -200,6 +201,10 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
  		return PTR_ERR(full_path);
  	}
  
@@ -113,7 +113,7 @@ index e382b794acbed..863c7bc3db86f 100644
  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
  	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
  	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
-@@ -267,6 +272,8 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+@@ -276,6 +281,8 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
  		desired_access |= GENERIC_READ; /* is this too little? */
  	if (OPEN_FMODE(oflags) & FMODE_WRITE)
  		desired_access |= GENERIC_WRITE;
@@ -122,7 +122,7 @@ index e382b794acbed..863c7bc3db86f 100644
  
  	disposition = FILE_OVERWRITE_IF;
  	if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-@@ -295,6 +302,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+@@ -304,6 +311,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
  	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
  		create_options |= CREATE_OPTION_READONLY;
  
@@ -130,7 +130,7 @@ index e382b794acbed..863c7bc3db86f 100644
  	oparms = (struct cifs_open_parms) {
  		.tcon = tcon,
  		.cifs_sb = cifs_sb,
-@@ -308,8 +316,15 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+@@ -317,8 +325,15 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
  	rc = server->ops->open(xid, &oparms, oplock, buf);
  	if (rc) {
  		cifs_dbg(FYI, "cifs_create returned 0x%x\n", rc);
@@ -147,10 +147,10 @@ index e382b794acbed..863c7bc3db86f 100644
  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
  	/*
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 0f3405e0f2e48..c240cea7ca349 100644
+index 9d42a39009076..9ec835320f8a7 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -77,12 +77,12 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+@@ -206,12 +206,12 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
  	 */
  }
  
@@ -165,7 +165,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  	else if ((flags & O_ACCMODE) == O_RDWR) {
  		/* GENERIC_ALL is too much permission to request
  		   can cause unnecessary access denied on create */
-@@ -219,11 +219,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
+@@ -348,11 +348,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
  	int create_options = CREATE_NOT_DIR;
  	struct TCP_Server_Info *server = tcon->ses->server;
  	struct cifs_open_parms oparms;
@@ -183,7 +183,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  /*********************************************************************
   *  open flag mapping table:
-@@ -260,6 +265,7 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
+@@ -389,6 +394,7 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
  	if (f_flags & O_DIRECT)
  		create_options |= CREATE_NO_BUFFER;
  
@@ -191,7 +191,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  	oparms = (struct cifs_open_parms) {
  		.tcon = tcon,
  		.cifs_sb = cifs_sb,
-@@ -271,8 +277,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
+@@ -400,8 +406,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
  	};
  
  	rc = server->ops->open(xid, &oparms, oplock, buf);
@@ -209,7 +209,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  	/* TODO: Add support for calling posix query info but with passing in fid */
  	if (tcon->unix_ext)
-@@ -705,11 +719,11 @@ int cifs_open(struct inode *inode, struct file *file)
+@@ -834,11 +848,11 @@ int cifs_open(struct inode *inode, struct file *file)
  use_cache:
  	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
  			   file->f_mode & FMODE_WRITE);
@@ -226,7 +226,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  out:
  	free_dentry_path(page);
-@@ -774,6 +788,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+@@ -903,6 +917,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
  	int disposition = FILE_OPEN;
  	int create_options = CREATE_NOT_DIR;
  	struct cifs_open_parms oparms;
@@ -234,7 +234,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  	xid = get_xid();
  	mutex_lock(&cfile->fh_mutex);
-@@ -837,7 +852,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+@@ -966,7 +981,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
  	}
  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
  
@@ -247,7 +247,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
  	if (cfile->f_flags & O_SYNC)
-@@ -849,6 +868,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+@@ -978,6 +997,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
  	if (server->ops->get_lease_key)
  		server->ops->get_lease_key(inode, &cfile->fid);
  
@@ -255,7 +255,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  	oparms = (struct cifs_open_parms) {
  		.tcon = tcon,
  		.cifs_sb = cifs_sb,
-@@ -874,6 +894,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+@@ -1003,6 +1023,11 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
  		/* indicate that we need to relock the file */
  		oparms.reconnect = true;
  	}
@@ -267,7 +267,7 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  
  	if (rc) {
  		mutex_unlock(&cfile->fh_mutex);
-@@ -882,6 +907,9 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+@@ -1011,6 +1036,9 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
  		goto reopen_error_exit;
  	}
  
@@ -278,11 +278,11 @@ index 0f3405e0f2e48..c240cea7ca349 100644
  reopen_success:
  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
 diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index 67b601041f0a3..c691b98b442a6 100644
+index a3d73720914f8..1f2ea9f5cc9a8 100644
 --- a/fs/smb/client/fscache.h
 +++ b/fs/smb/client/fscache.h
-@@ -108,6 +108,11 @@ static inline void cifs_readpage_to_fscache(struct inode *inode,
- 		__cifs_readpage_to_fscache(inode, page);
+@@ -109,6 +109,11 @@ static inline void cifs_readahead_to_fscache(struct inode *inode,
+ 		__cifs_readahead_to_fscache(inode, pos, len);
  }
  
 +static inline bool cifs_fscache_enabled(struct inode *inode)
@@ -293,7 +293,7 @@ index 67b601041f0a3..c691b98b442a6 100644
  #else /* CONFIG_CIFS_FSCACHE */
  static inline
  void cifs_fscache_fill_coherency(struct inode *inode,
-@@ -123,6 +128,7 @@ static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
+@@ -124,6 +129,7 @@ static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
  static inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update) {}
  static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode) { return NULL; }
  static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags) {}
