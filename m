@@ -1,72 +1,61 @@
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2059.outbound.protection.outlook.com [40.107.104.59])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79828594B;
-	Tue,  9 Apr 2024 11:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB2312FF62
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Apr 2024 14:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712662115; cv=fail; b=uTR8ukDmPlPqEGd98be+jM3bh6XkRMYA+q80itLCsLmvECl+1G204tbIInEQ3l/jlNnJXvLOMZ6Fi0QTxz+mw8juICWKysx+GkaWfjPEgu7Q7YWN8YTsTSaHuZZV+LJhYhc1wIS2zERjEheAip0hKijt7KJ9SuAEO0+jsVa6hWQ=
+	t=1712672950; cv=pass; b=KKMMEBSDHKHiGyuAUETPzOr9+9CR0mE6BegVpwjmEP/rQGoXeHzWI4eYDGPhby95jbBB028y7r1Z3MsRGPJQJ2Tsi7DOIA9VEfv7X6CGyFpnVITCZ1AXt/SqiqthD+31Sf+Os4lw7EGw32SkbXnpdt1GpPPsTeItm4M/3x4EAvs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712662115; c=relaxed/simple;
-	bh=yXpZl4ly39Pl3RIdpY7PymAWGqwILuqkqTLH2SzJy1M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kk8bJqflzDLu2mt43MqT4HRuiQ00e5yvzkqugzx7Xqe90+c1zInuLT0tzdRxD1xasf7IQQbg/lMS9h85yVzo63JZyqFHCkrZQZzkynbROjswmLW54eXy2rDQsVTOjDJb3d3ICrNq10TchvNeiQfVWFdvmzWo/A2aUvRa0pWdQ70=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=A0hiCMyN; arc=fail smtp.client-ip=40.107.104.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+	s=arc-20240116; t=1712672950; c=relaxed/simple;
+	bh=PzSyAR620HXOq297gAooeDDK3W0rlu20e6CMzVBsxnk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hSKWlhgnDX0KCDSlcX/sRn0JCtQkxUPMq8g+f9Skidj3xB880kSZsHgFhkQIFVfVD3jzmWu5SnAuie2w9It1yNsXyNZirGBT7WmwQ0W+jtnbDDE1nO6HclwEnUfGp6K0H1BbOYO04f1UQFCjQVnszqQj7xHIflnPaGI68qyxN+Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=WyGmd5aG; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="A0hiCMyN"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MLc+Khyr7JQAwtrnm/IJ/ngHP+rwm5cfcfOcgNlaIJ7Nj9o46C1BdreYbhbA09AZPctDoTUA/LXKr1mDyo9CcQwFIV2sS5i2Edd7OKab57BfqULyGq3UpPvmOod/rRF6ovhz9jj7cZdLnFe7Gi/OfjCVdAEMFyBCjKr1O3XbCLhEN3krZ4jxdHANFYg3H6Y2FvEwyoQ4tFLinElwbLpYCDMPa9N4mdA9/Vo3oj3Ch+SuWQNWo8B+dnzRPj5jqerkbVN3GhLmH+Pw7s/KPv1i2aZCodS7oYfb9abyW1+9ViPqHZBjWjzNr8y30eVpkkAN6kYpvelzY6FyTGrvGmoflw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LRsOuexl/4ugi6f4C0zbXuU59b/WKBFh4W4iRr7Vk94=;
- b=K9ZGrrTK6JfdyeLmFT5aVZZ+uT4F4/Vvy4zQSda0PrUiyjyOkFdDiwgPWbLsvRt/wtdPYgzChONTPwYS/W+exG3BqU83Q1WGKtlNk4xQVrURRjIxFDlkBaO59cry1HyCwub2O6d42B4dHLAoA9KVW4kjjTgPNSMcwDfrjtEkwsGaESQ5JZEn63KgabK4q0NHcsF47O2BbJxbXSX0OUUg9E4G0kn+UlyA/DfbOH4wKbDba+wGMhoJvqgZ2OIi+fY61Dkt0mNu/WoGMP4JBduVTGpwVX9QV9bl7v4z5LsvWYtVN0p7kb4uGYJ4N6YXRftuI0VGuWwExar0kFdkhuezmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 195.60.68.100) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=axis.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LRsOuexl/4ugi6f4C0zbXuU59b/WKBFh4W4iRr7Vk94=;
- b=A0hiCMyNfsq9EdmB7nbHX2PSq5SnhPLV1nPVVl/sAoBqVTC3XOkSyHQTJSYlNla73YcVQp//IHu0xdPr202VL/LMd9wcLF3QojsNu/8TQOPQyL1IVnQy8/9PtBfTAKKTo8wWIGkYnQnpyLAdQBH0dQHKFRu5hh9SeFRaVSiYLbY=
-Received: from AS4P191CA0036.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:657::18)
- by DB9PR02MB7161.eurprd02.prod.outlook.com (2603:10a6:10:1fc::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.54; Tue, 9 Apr
- 2024 11:28:29 +0000
-Received: from AM3PEPF0000A79A.eurprd04.prod.outlook.com
- (2603:10a6:20b:657:cafe::66) by AS4P191CA0036.outlook.office365.com
- (2603:10a6:20b:657::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.30 via Frontend
- Transport; Tue, 9 Apr 2024 11:28:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=axis.com;
-Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
- 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com; pr=C
-Received: from mail.axis.com (195.60.68.100) by
- AM3PEPF0000A79A.mail.protection.outlook.com (10.167.16.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 11:28:29 +0000
-Received: from pc50632-2232.se.axis.com (10.0.5.60) by se-mail01w.axis.com
- (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 9 Apr
- 2024 13:28:28 +0200
-From: Rickard Andersson <rickaran@axis.com>
-To: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-	<sfrench@samba.org>, <pc@manguebit.com>, <ronniesahlberg@gmail.com>,
-	<sprasad@microsoft.com>, <tom@talpey.com>
-CC: <linux-kernel@vger.kernel.org>, <rickaran@axis.com>,
-	<rickard314.andersson@gmail.com>, <kernel@axis.com>
-Subject: [PATCH v2 1/1] smb: client: Fix hang in smb2_reconnect
-Date: Tue, 9 Apr 2024 13:27:58 +0200
-Message-ID: <20240409112758.467112-2-rickaran@axis.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240409112758.467112-1-rickaran@axis.com>
-References: <20240409112758.467112-1-rickaran@axis.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="WyGmd5aG"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712672946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ADGB5S2QSyr2y5bm7Qi3dPQx7D0Q0NyDbwJxpoAexvU=;
+	b=WyGmd5aGGRwu0h1K2ScDC40/wsdutH7XEXSA/rKYv/TZPwVg0YcdyJQGUL4cheJIMm99wv
+	2WComfowhohhHd/Vs7Jda/xPn87Z9vlfM4sfD7G4tOxoFrhBe/gNOJ1EIOGBwMZi4vtzYc
+	GnjBZHj/6o+pVcjoGETMQrb9vCgPW2n/aXTheQT5akIvH6JOFfIGJ8GZE0lS8PZfhhR27U
+	Y/dFXcvwzoCm8F/XFjnVTeZvasLSr9m1dEMz/edx6gLi3v0FHuFXHD8rip4BEUzadPyab0
+	WagAwAovGUCl7QvPUBFgtFbA09I4/3GB3t/A1y1BXSCXlJdmcCYulkmBhztIEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712672946; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=ADGB5S2QSyr2y5bm7Qi3dPQx7D0Q0NyDbwJxpoAexvU=;
+	b=mbhow2ZQK8V0cG9FqALJ4TveigWmJDndY9exxxrBB+ihG1bFjcu2QwI2FTDezmWAlxFTKI
+	XKXpgG052TRW+2eiOpFdA7sJExRkIEAPqdzgU8tiJlibrTiUJLghfliV/zCKhuIGmpx6P3
+	JlLsPY78nNAz0ioIW7tppoGia0IwJqfGl5fBAVWdqlatMBFWDa7r47dEfVpQNiiTUlrqE9
+	75Nyj+I7yMt2e/ug/wGF6pISmbUByqziw50tadIewBs/QKBCat4MdPtvjBqIzausXN0Ik7
+	+zNxgZXWkeI+k2zvLr9EyBUPt+8/xKSU84JcfQC6AFhbuGMuovuqmG3rvGUDDQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712672946; a=rsa-sha256;
+	cv=none;
+	b=h18v+2lkpa7wrriFd0TUzgyldL2/2iepVQhVWcQFfCpT2z0HJVnIYmwxYuzisdEd12jjUP
+	5yv8Fmle2DfXagpVjSIjGH18rZzRoYakHehjM3aU/nFQudYqGwEjUIS9ubTbl4n+t3wpWP
+	ZEAtJ2ZdJm/uSF2WZiVN+gBVGV04rxsogNIF9j+PWdyjjY2CLHZ6p7lH6U0aTe054UQjj/
+	B18yhV7BbQMZc3SFA3qZIxtCGOizHEJVNg622/tdYGBSzGqJU30SvmKvaTX2Wwgzbcnkwo
+	jdTFn7kVjxY2YBRKmduR8IDDasgW2ArZ7xyzAc2nvPRau1bQxp6cratmfrNkkQ==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	roberto.sassu@huawei.com,
+	viro@zeniv.linux.org.uk,
+	torvalds@linux-foundation.org,
+	Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH] smb: client: instantiate when creating SFU files
+Date: Tue,  9 Apr 2024 11:28:59 -0300
+Message-ID: <20240409142859.789709-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -74,122 +63,145 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
- (10.20.40.7)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF0000A79A:EE_|DB9PR02MB7161:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b119189-2ebb-41f0-cd14-08dc58882e69
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	RBi7hoXLlw6IvBjlPqNb6Q3ogW8t2cOr6G3Ktr4cbPWE4tmilltuuGXkMX72zVsF1UWy6NGvAaxurDEisFn2wXONRY4qCz1FLLTtKQ1rUV+34bZI33xT0TMwwm3evbfzRzYBdK/Imdafj70FhH08w2UwzzLwvuCNrSapgHTp2dYucKasLvSmMPgVTin5vFiDlifZrjfNswJ7sIIV+RZtdlbs6i2nWa21+T7YuqpnT89rz+lhQ0ewY0TXe0YHI8r0yZgyhj9tzjsmVd4i1tT6FpP3ykEpTE1eJz9/rSSPUNm0R+hkVE5+OxdRHncyOdRAmntmK0HXpAFkg5aCBwZi78ub5X8YYuoK/kHvKQFgurzkSrBdf1kdcjvmoikhviNU322qvadt5jlMc35mVTMyWrWkbgoygqMRhQFvpx+qsR6/jdYn9LAZOm3FmXSPSF+q1R0V/4PT1K6yjmBBBZX3yC1E195hGpy/pJCLR70GHljrrqIQgZV47mGvL6WTuXroUzBOf/YerfWyc5fD838cbkok85SlYutgNQkmCaYfWYIhq6/Yqz0k2m5TrFlnIz/x87M2xt/oywZno3YZjjqMbB4svU7rooadb5DESLniQcXwkVwM922b9GSjgVHqljUT3ehEHyLBmHdDvBboA5nQYAksu3yb3PcCIBCIAiB5PgE8ygtyirVQB6LHIwf14ezX7BjeW7cmGk/ZvkHrSCdCVzxktBAnbC8Z8sy6pB28yFuXTt3rXyGSgiIuYl7+IPfp
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(82310400014)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 11:28:29.6937
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b119189-2ebb-41f0-cd14-08dc58882e69
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A79A.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR02MB7161
 
-From: Rickard x Andersson <rickaran@axis.com>
+In cifs_sfu_make_node(), on success, instantiate rather than leave it
+with dentry unhashed negative to support callers that expect mknod(2)
+to always instantiate.
 
-Test case:
-mount -t cifs //192.168.0.1/test y -o
-  port=19999,ro,vers=2.1,sec=none,echo_interval=1
-kill smbd with SIGSTOP
-umount /tmp/y
-
-Gives the following error:
- INFO: task umount:466 blocked for more than 122 seconds.
-       Not tainted 6.8.2-axis9-devel #1
- "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this
- message.
- task:umount state:D stack:0 pid:466 tgid:466 ppid:464 flags:0x00000004
-  __schedule from schedule+0x34/0x108
-  schedule from schedule_preempt_disabled+0x24/0x34
-  schedule_preempt_disabled from __mutex_lock.constprop.0+0x330/0x8b0
-  __mutex_lock.constprop.0 from smb2_reconnect+0x278/0x8fc [cifs]
-  smb2_reconnect [cifs] from SMB2_open_init+0x54/0x9f4 [cifs]
-  SMB2_open_init [cifs] from smb2_query_info_compound+0x1a0/0x500[cifs]
-  smb2_query_info_compound [cifs] from smb2_queryfs+0x64/0x134 [cifs]
-  smb2_queryfs [cifs] from cifs_statfs+0xc8/0x318 [cifs]
-  cifs_statfs [cifs] from statfs_by_dentry+0x60/0x84
-  statfs_by_dentry from fd_statfs+0x30/0x74
-  fd_statfs from sys_fstatfs64+0x40/0x6c
-  sys_fstatfs64 from ret_fast_syscall+0x0/0x54
-
-The umount task is blocked waiting on the session mutex. The reason it
-never gets the session mutex is because 'kworker/0:3' is holding the
-mutex and is waiting for response (see line 1209 in
-fs/smb/client/smb2pdu.c.
-
-Stack trace of 'kworker/0:3' just before calling wait_for_response:
- CPU: 0 PID: 220 Comm: kworker/0:3 Not tainted 6.8.2-axis9-devel #1
- Hardware name: Freescale i.MX6 SoloX (Device Tree)
- Workqueue: cifsiod smb2_reconnect_server [cifs]
-  unwind_backtrace from show_stack+0x18/0x1c
-  show_stack from dump_stack_lvl+0x24/0x2c
-  dump_stack_lvl from compound_send_recv+0x7bc/0xac8 [cifs]
-  compound_send_recv [cifs] from cifs_send_recv+0x34/0x3c [cifs]
-  cifs_send_recv [cifs] from SMB2_negotiate+0x410/0x13dc [cifs]
-  SMB2_negotiate [cifs] from smb2_negotiate+0x4c/0x58 [cifs]
-  smb2_negotiate [cifs] from cifs_negotiate_protocol+0x9c/0x100 [cifs]
-  cifs_negotiate_protocol [cifs] from smb2_reconnect+0x418/0x8fc [cifs]
-  smb2_reconnect [cifs] from smb2_reconnect_server+0x1dc/0x514 [cifs]
-  smb2_reconnect_server [cifs] from process_one_work+0x188/0x3ec
-  process_one_work from worker_thread+0x1fc/0x430
-  worker_thread from kthread+0x110/0x130
-  kthread from ret_from_fork+0x14/0x28
-
-Change-Id: I53439ffb007c9c51d77ce40fb655a34e5ca291ec
-Signed-off-by: Rickard x Andersson <rickaran@axis.com>
+Fixes: 72bc63f5e23a ("smb3: fix creating FIFOs when mounting with "sfu" mount option")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/transport.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ fs/smb/client/smb2ops.c | 94 ++++++++++++++++++++++++-----------------
+ 1 file changed, 55 insertions(+), 39 deletions(-)
 
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 994d70193432..96b8f8757ddc 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -32,6 +32,8 @@
- /* Max number of iovectors we can use off the stack when sending requests. */
- #define CIFS_MAX_IOV_SIZE 8
- 
-+#define RESPONSE_TIMEOUT_SECS 50
-+
- void
- cifs_wake_up_task(struct mid_q_entry *mid)
- {
-@@ -735,13 +737,14 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
- static int
- wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- {
--	int error;
-+	int ret;
-+
-+	ret = wait_event_killable_timeout(server->response_q,
-+					  midQ->mid_state != MID_REQUEST_SUBMITTED &&
-+					  midQ->mid_state != MID_RESPONSE_RECEIVED,
-+					  RESPONSE_TIMEOUT_SECS*HZ);
- 
--	error = wait_event_state(server->response_q,
--				 midQ->mid_state != MID_REQUEST_SUBMITTED &&
--				 midQ->mid_state != MID_RESPONSE_RECEIVED,
--				 (TASK_KILLABLE|TASK_FREEZABLE_UNSAFE));
--	if (error < 0)
-+	if ((ret < 0) || (ret == 0))
- 		return -ERESTARTSYS;
- 
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index b156eefa75d7..78c94d0350fe 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4964,68 +4964,84 @@ static int smb2_next_header(struct TCP_Server_Info *server, char *buf,
  	return 0;
+ }
+ 
+-int cifs_sfu_make_node(unsigned int xid, struct inode *inode,
+-		       struct dentry *dentry, struct cifs_tcon *tcon,
+-		       const char *full_path, umode_t mode, dev_t dev)
++static int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
++				struct dentry *dentry, struct cifs_tcon *tcon,
++				const char *full_path, umode_t mode, dev_t dev)
+ {
+-	struct cifs_open_info_data buf = {};
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms = {};
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifs_fid fid;
+ 	unsigned int bytes_written;
+-	struct win_dev *pdev;
++	struct win_dev pdev = {};
+ 	struct kvec iov[2];
+ 	__u32 oplock = server->oplocks ? REQ_OPLOCK : 0;
+ 	int rc;
+ 
+-	if (!S_ISCHR(mode) && !S_ISBLK(mode) && !S_ISFIFO(mode))
++	switch (mode & S_IFMT) {
++	case S_IFCHR:
++		strscpy(pdev.type, "IntxCHR");
++		pdev.major = cpu_to_le64(MAJOR(dev));
++		pdev.minor = cpu_to_le64(MINOR(dev));
++		break;
++	case S_IFBLK:
++		strscpy(pdev.type, "IntxBLK");
++		pdev.major = cpu_to_le64(MAJOR(dev));
++		pdev.minor = cpu_to_le64(MINOR(dev));
++		break;
++	case S_IFIFO:
++		strscpy(pdev.type, "LnxFIFO");
++		break;
++	default:
+ 		return -EPERM;
++	}
+ 
+-	oparms = (struct cifs_open_parms) {
+-		.tcon = tcon,
+-		.cifs_sb = cifs_sb,
+-		.desired_access = GENERIC_WRITE,
+-		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR |
+-						      CREATE_OPTION_SPECIAL),
+-		.disposition = FILE_CREATE,
+-		.path = full_path,
+-		.fid = &fid,
+-	};
++	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, GENERIC_WRITE,
++			     FILE_CREATE, CREATE_NOT_DIR |
++			     CREATE_OPTION_SPECIAL, ACL_NO_MODE);
++	oparms.fid = &fid;
+ 
+-	rc = server->ops->open(xid, &oparms, &oplock, &buf);
++	rc = server->ops->open(xid, &oparms, &oplock, NULL);
+ 	if (rc)
+ 		return rc;
+ 
+-	/*
+-	 * BB Do not bother to decode buf since no local inode yet to put
+-	 * timestamps in, but we can reuse it safely.
+-	 */
+-	pdev = (struct win_dev *)&buf.fi;
+ 	io_parms.pid = current->tgid;
+ 	io_parms.tcon = tcon;
+-	io_parms.length = sizeof(*pdev);
+-	iov[1].iov_base = pdev;
+-	iov[1].iov_len = sizeof(*pdev);
+-	if (S_ISCHR(mode)) {
+-		memcpy(pdev->type, "IntxCHR", 8);
+-		pdev->major = cpu_to_le64(MAJOR(dev));
+-		pdev->minor = cpu_to_le64(MINOR(dev));
+-	} else if (S_ISBLK(mode)) {
+-		memcpy(pdev->type, "IntxBLK", 8);
+-		pdev->major = cpu_to_le64(MAJOR(dev));
+-		pdev->minor = cpu_to_le64(MINOR(dev));
+-	} else if (S_ISFIFO(mode)) {
+-		memcpy(pdev->type, "LnxFIFO", 8);
+-	}
++	io_parms.length = sizeof(pdev);
++	iov[1].iov_base = &pdev;
++	iov[1].iov_len = sizeof(pdev);
+ 
+ 	rc = server->ops->sync_write(xid, &fid, &io_parms,
+ 				     &bytes_written, iov, 1);
+ 	server->ops->close(xid, tcon, &fid);
+-	d_drop(dentry);
+-	/* FIXME: add code here to set EAs */
+-	cifs_free_open_info(&buf);
++	return rc;
++}
++
++int cifs_sfu_make_node(unsigned int xid, struct inode *inode,
++		       struct dentry *dentry, struct cifs_tcon *tcon,
++		       const char *full_path, umode_t mode, dev_t dev)
++{
++	struct inode *new = NULL;
++	int rc;
++
++	rc = __cifs_sfu_make_node(xid, inode, dentry, tcon,
++				  full_path, mode, dev);
++	if (rc)
++		return rc;
++
++	if (tcon->posix_extensions) {
++		rc = smb311_posix_get_inode_info(&new, full_path, NULL,
++						 inode->i_sb, xid);
++	} else if (tcon->unix_ext) {
++		rc = cifs_get_inode_info_unix(&new, full_path,
++					      inode->i_sb, xid);
++	} else {
++		rc = cifs_get_inode_info(&new, full_path, NULL,
++					 inode->i_sb, xid, NULL);
++	}
++	if (!rc)
++		d_instantiate(dentry, new);
+ 	return rc;
+ }
+ 
 -- 
-2.30.2
+2.44.0
 
