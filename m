@@ -1,187 +1,115 @@
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2047.outbound.protection.outlook.com [40.107.6.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF461773A
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Apr 2024 06:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712644286; cv=none; b=GfIeicFzi12U4dTSzs9GG6UcICcyjJz1vVZvvXyAgu/rQKPYSc2t/uY+zheNbiIt9Xy9/c99+6S9sSkNqmGgB19tUJiNxAL9S/ZJ/Alq4/RTXev3W1veVzMwZ/m94ZYHsq7vG49W5DwUjKBlCFiNwinn2pKw2vG3XKb3ISjQ8NE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712644286; c=relaxed/simple;
-	bh=u0eO/An/k5xG7Hl8P2IAWT5Q46YAZeIHVm+lyUdVzko=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UOXtPbvRIEJdr1RosoCW8533Ac7SSDgPL6Dep4M7MnyFBbNS2Bxyi/iVHNhgMPQFYcCXBkYMad1n27Xo94D6lbExW+BvGdF0mb5hzhwBcRXexfy6v1ditryO7DTHbvTmunPZkx21HY38G/0gr4QdUyP1WAl6niaNkrVNCr1JjUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=APvJMcko; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F56F8594B;
+	Tue,  9 Apr 2024 11:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.6.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712662101; cv=fail; b=elBg/c4gW0SRQij2XcnyLgZ9VPVkVOPtD0QWbUMRxlqd7D+HDWj2WtBm8cWwqwQEVhLe7hHrfBUI+FOdXR0pAUMaZ/8SSeb8xV6R5EqTmk2+RgSAiljrNWDymUFR+oiD2KR8LPbU372vray3zKH1aBJrIVHuy3gIR7Sai0qvB1s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712662101; c=relaxed/simple;
+	bh=xwRgh0FAAWVlWlc8+FfKs7qRxK+7fH1en/N4Rk8n4MU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lN342xHyFlH7ossqD8gJZCmANjmu3UAT7hpM48e86JIAlJXs4O9ED5pxrCCK5YduVo0nYlV42keA1yr1aKCXEs3IsoOrCIYFd8AJglJOv//pFbv52gYKo/6gCdxU8DUG6S01Zb+bhm8Y5jWM6b4EJkG9/XJ/2o3lIZ1v5mM93mI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=oBI1jSGN; arc=fail smtp.client-ip=40.107.6.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="APvJMcko"
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a51d0dda061so267078066b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2024 23:31:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712644283; x=1713249083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=grF/9vcaqd7sXSI10pSv52oh+Ck8WrZyOyKcGgYLZ08=;
-        b=APvJMcko2yA1SeIY2yM7pbU2/ZkmlYiy7KJbeX3YIIwgsLZg5GydJpKJ1HTraVVoza
-         mdPvSN4EqjFeXGjtSGsZ8E8lHIo0SsrOmVLrxlQJMHCvM2Yms5zy6mRpaB2kkG3PpqTU
-         dgf/kXl4/yRyhEyFwio8TNBMOZZ87+tXLeY7OK5KT5gcgf0Qq35/n9lZXC9pW4LEFgkW
-         Wlx0MOpMgmeuAkVV02m6ByPMLvqGIz1X0r4g92EvwFgszCyBliQMhn5iwqGr4zn/OCzR
-         UkGRJNXuX9IPcliv6mT0njKE0+TF2Wm4aZzfMZCi1dg5qnBDzFI1atXox8YxFezUTjBS
-         /LqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712644283; x=1713249083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=grF/9vcaqd7sXSI10pSv52oh+Ck8WrZyOyKcGgYLZ08=;
-        b=hIOMszOzkP1N34Z9jqiRcC2TTu6cvhnEEDMINpkufdEC2xtXWrTso/a0BcccL1qAjQ
-         SGmgm6Pm52MP76hy3Gxcscluuch5N0I0wUlqUTuiK8qcpUqZR/sQ8cBZwJ4m/cK5AxbI
-         v/4rxCkbztzPgnNaLXh/YrJXZfGqg8rQGUfQ+KpuSgxLMXz5LC3DWfQ1lOA3iaMdN/4t
-         C1JRSKB7UIs1pxxeMH61i6qxvTtkPkBAODAstloOtuji+UccNW7vLNBGozrj+Kgjc0a4
-         La/w3F3sxLGLY9LAKQQLTxI34y+cukbb6fuLqE4y6UxoAez+uPUufwYfAd24q0uCfTzc
-         AWVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmJbfAsOXf57VXVrvEWAmPFWleioX3fz8L2HSXr7pvsP6Cr2IT7pqy3n6cz7RDt2baVSGC6NQl6lTJvYAwwgWIa+Mca1fhHJR6ug==
-X-Gm-Message-State: AOJu0Yx41kUNjRM/eb4wTd/wV8/gq9onlEc2YtS/KbpwzPLBYA4XdrJD
-	aW7Lor88RBO80YlLhmTyFirrshsC2d7ut4KdqCWRW4jxzcp3KrtZT1NYUo0niORViRCv7K1RpQf
-	Kh2nn4qBlfR8lqXInidP4YXjqFks=
-X-Google-Smtp-Source: AGHT+IHcDd3euzZ/lP4ybVo4gX0gxSMpDI4VAhXVJKPXXimH44DVuINDLGVtLimXEfMlcg+xPjolniPaEDP51SFX1JA=
-X-Received: by 2002:a17:907:9343:b0:a51:f46a:b000 with SMTP id
- bv3-20020a170907934300b00a51f46ab000mr1152348ejc.20.1712644283357; Mon, 08
- Apr 2024 23:31:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="oBI1jSGN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UMjBLK8vQpkAlZzC1SEhXebz7prS1AaGKhLh0Uo6ccgQBRJY9Ox4PPSiaqZaCfUVcKBbo+nPqrFlUkZ4rVuUPpV1sxwtAyXFvnYj8vN6pcUfRnDBphNjR7dvFMCdmutRL72w4Kry/lmsaRBSlBBmKsFPOwWVUutCI9xbqcVsGFrsNG1OCmIXHcV0f9RuLNhS4akNAdhS3C/ucrMLqsgjryV7xNwkpjt1QAHyByzmRR3p6EUQNuJCJcKUNnIbtnbcz6PUVlfgRd1GiES7GTJgw7uT8PxrjGTrAroE7r9TlCca4jm8MuudFIRdk3u+ImwwuuNJXsqkPiNSE3dg6Qex1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JAoiTJu58YGiL5bszvz0adIiRLBgssFaAX4OsNFB2nk=;
+ b=RWdkkUjvtlRMkcnEpTKQYhz7SZ900nxmpT/9JmUBPFcBHB9QYK2Xi9oRZOVXemZJwectqgXcBvOZqWJEp93On7kcZgTdSLyu3tIWCv2J0hT3Sd9pSWI4jNwPVmqWh/o17Y4Wb0xR0T9oslAeGQGAJMkVZ5GkYwwMfftHzGLaNBFrDyY703BC0M4FsS5YqMtYMIbWtB1C4ba1S0YGLiLpY9eQJf0FJGg2H1aEZLJtWuqvTx80nR/rBrVZv3SHCM/bnPiWsxpOMcik1avz42ypJRY95XBD5TL/vrFXrRE7BJTqJ9xrYExIn1CTiHCyd5dZExJIdJJobMppayrmX2Xppw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=axis.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JAoiTJu58YGiL5bszvz0adIiRLBgssFaAX4OsNFB2nk=;
+ b=oBI1jSGN105u8UJCLq+OlO/IfwXNTozibIRlMe2rjJ5oLhzyaYK/kr5iPfwrf/Pi0xhJwO8Dg3LaPfxtPlZC6N7afoAavR2tvM+lO0Cd+ue9yH49AASo9ccd6rw+PcFF5DP7TQUNQHSQ8MpzBJM69jhY0ImeV3uhytKuRNcm0Ew=
+Received: from AS9PR06CA0413.eurprd06.prod.outlook.com (2603:10a6:20b:461::22)
+ by PAXPR02MB7910.eurprd02.prod.outlook.com (2603:10a6:102:283::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 9 Apr
+ 2024 11:28:15 +0000
+Received: from AMS0EPF000001B7.eurprd05.prod.outlook.com
+ (2603:10a6:20b:461:cafe::ca) by AS9PR06CA0413.outlook.office365.com
+ (2603:10a6:20b:461::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.34 via Frontend
+ Transport; Tue, 9 Apr 2024 11:28:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=axis.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ AMS0EPF000001B7.mail.protection.outlook.com (10.167.16.171) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 11:28:15 +0000
+Received: from pc50632-2232.se.axis.com (10.0.5.60) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 9 Apr
+ 2024 13:28:14 +0200
+From: Rickard Andersson <rickaran@axis.com>
+To: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<sfrench@samba.org>, <pc@manguebit.com>, <ronniesahlberg@gmail.com>,
+	<sprasad@microsoft.com>, <tom@talpey.com>
+CC: <linux-kernel@vger.kernel.org>, <rickaran@axis.com>,
+	<rickard314.andersson@gmail.com>, <kernel@axis.com>
+Subject: [PATCH v2 0/1] smb client hang
+Date: Tue, 9 Apr 2024 13:27:57 +0200
+Message-ID: <20240409112758.467112-1-rickaran@axis.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408213217.241887-1-pc@manguebit.com> <CAH2r5msiCzzP-cHcnzqHuAM23N5a_55TLMg3crt=Z0F=bS=xcA@mail.gmail.com>
-In-Reply-To: <CAH2r5msiCzzP-cHcnzqHuAM23N5a_55TLMg3crt=Z0F=bS=xcA@mail.gmail.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Tue, 9 Apr 2024 12:01:11 +0530
-Message-ID: <CAFTVevUm5_FsMWq5n30zVbApbf5CtHV4Y3tZzr3bBLFV4dmvoQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix NULL ptr deref in cifs_mark_open_handles_for_deleted_file()
-To: Steve French <smfrench@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
+ (10.20.40.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001B7:EE_|PAXPR02MB7910:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7b3d8131-0dc7-46e4-0f2a-08dc588825b2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Hsl/B87IJ+8byIpJ8r7apMGMJ8PzUiDSjSrCXM/1eBjTrhXhZPATZpduT/pWdwmQbipHgt5hu8/0DpJQhL0MaItncHbldezVSR4nfsJEoBCp3pBqe7I/1Dn4J84Opy5QtUpYjBD4eSCrqXCkceGa2ipZHFtT8UOIFnG9ShIY/1JQ2efNozUZqn/R8yU6kjVkkPYTr6qwZSMXCNdAKelIX6xDIy5zhMo9tu1AT2fcB8ljVafSrfYuV1rIH2NuC7ud00pGzWPkp9AyggJ59ENjtzASzcDLsEpr2bsUtAB+Tud6uRWn4ZWgfhlaPIgDO06EO2SDUtybu1bedPTeywqxRNGs8HruBdTZTSS4m2Wn7n2QC7auKqmCO7Ej8f2PzqbK9FSiTMSDgXDseurLGjBd8hfjcqNAsg6Q1V+QJ91qBFyxDGpr58ogrwtsG21Wc+0vLS12F1t2/dNGWAqDf9vWj0b8NU5gep3AHwz02owJ8VU2cDfNEIF/TA2DIP+lMLZW7nlztmqleTaiDZthu+xfRcCZ6HEyI+WDXpxAVMSGeVSsaV3rlTcECYKTbd8aZnnuCV1v3zll9mrNkDfAURz0o4bMnnFTsF/D0GgP6zHSRuSTmawuR9uUOeIMVpt33tTvNlrLlDLkOALuRte8uY/KdYzbXBMS3e7lZUg/4pwa1Vobp33uk1jF3lAX3gt6fQPwAezpid7Od1919yBLXwXj77ztqaYRwCZln0g1oenj7Vh1ilPvYMgBz2kd4zl21H3H
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 11:28:15.0678
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b3d8131-0dc7-46e4-0f2a-08dc588825b2
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001B7.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR02MB7910
 
-Thanks, looks good.
+From: Rickard x Andersson <rickaran@axis.com>
 
-Meetakshi
+When applied to Linx 6.8.2 this patch makes one of our test cases work.
+I sent a first version of this patch for Linux 6.1 in October without
+getting any feedback. I have now tested and the error is still
+existing in the latest kernel versions.
 
-On Tue, Apr 9, 2024 at 3:39=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
-ote:
->
-> merged into cifs-2.6.git for-next
->
-> Good catch
->
->
-> On Mon, Apr 8, 2024 at 4:32=E2=80=AFPM Paulo Alcantara <pc@manguebit.com>=
- wrote:
-> >
-> > cifs_get_fattr() may be called with a NULL inode, so check for a
-> > non-NULL inode before calling
-> > cifs_mark_open_handles_for_deleted_file().
-> >
-> > This fixes the following oops:
-> >
-> >   mount.cifs //srv/share /mnt -o ...,vers=3D3.1.1
-> >   cd /mnt
-> >   touch foo; tail -f foo &
-> >   rm foo
-> >   cat foo
-> >
-> >   BUG: kernel NULL pointer dereference, address: 00000000000005c0
-> >   #PF: supervisor read access in kernel mode
-> >   #PF: error_code(0x0000) - not-present page
-> >   PGD 0 P4D 0
-> >   Oops: 0000 [#1] PREEMPT SMP NOPTI
-> >   CPU: 2 PID: 696 Comm: cat Not tainted 6.9.0-rc2 #1
-> >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-> >   1.16.3-1.fc39 04/01/2014
-> >   RIP: 0010:__lock_acquire+0x5d/0x1c70
-> >   Code: 00 00 44 8b a4 24 a0 00 00 00 45 85 f6 0f 84 bb 06 00 00 8b 2d
-> >   48 e2 95 01 45 89 c3 41 89 d2 45 89 c8 85 ed 0 0 <48> 81 3f 40 7a 76
-> >   83 44 0f 44 d8 83 fe 01 0f 86 1b 03 00 00 31 d2
-> >   RSP: 0018:ffffc90000b37490 EFLAGS: 00010002
-> >   RAX: 0000000000000000 RBX: ffff888110021ec0 RCX: 0000000000000000
-> >   RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000005c0
-> >   RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-> >   R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
-> >   R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000200
-> >   FS: 00007f2a1fa08740(0000) GS:ffff888157a00000(0000)
-> >   knlGS:0000000000000000 CS: 0010 DS: 0000 ES: 0000 CR0:
-> >   0000000080050033
-> >   CR2: 00000000000005c0 CR3: 000000011ac7c000 CR4: 0000000000750ef0
-> >   PKRU: 55555554
-> >   Call Trace:
-> >    <TASK>
-> >    ? __die+0x23/0x70
-> >    ? page_fault_oops+0x180/0x490
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    ? exc_page_fault+0x70/0x230
-> >    ? asm_exc_page_fault+0x26/0x30
-> >    ? __lock_acquire+0x5d/0x1c70
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    lock_acquire+0xc0/0x2d0
-> >    ? cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    ? kmem_cache_alloc+0x2d9/0x370
-> >    _raw_spin_lock+0x34/0x80
-> >    ? cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
-> >    cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
-> >    cifs_get_fattr+0x24c/0x940 [cifs]
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    cifs_get_inode_info+0x96/0x120 [cifs]
-> >    cifs_lookup+0x16e/0x800 [cifs]
-> >    cifs_atomic_open+0xc7/0x5d0 [cifs]
-> >    ? lookup_open.isra.0+0x3ce/0x5f0
-> >    ? __pfx_cifs_atomic_open+0x10/0x10 [cifs]
-> >    lookup_open.isra.0+0x3ce/0x5f0
-> >    path_openat+0x42b/0xc30
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    ? srso_alias_return_thunk+0x5/0xfbef5
-> >    do_filp_open+0xc4/0x170
-> >    do_sys_openat2+0xab/0xe0
-> >    __x64_sys_openat+0x57/0xa0
-> >    do_syscall_64+0xc1/0x1e0
-> >    entry_SYSCALL_64_after_hwframe+0x72/0x7a
-> >
-> > Fixes: ffceb7640cbf ("smb: client: do not defer close open handles to d=
-eleted files")
-> > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-> > ---
-> >  fs/smb/client/inode.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> > index 91b07ef9e25c..60afab5c83d4 100644
-> > --- a/fs/smb/client/inode.c
-> > +++ b/fs/smb/client/inode.c
-> > @@ -1105,7 +1105,8 @@ static int cifs_get_fattr(struct cifs_open_info_d=
-ata *data,
-> >                 } else {
-> >                         cifs_open_info_to_fattr(fattr, data, sb);
-> >                 }
-> > -               if (!rc && fattr->cf_flags & CIFS_FATTR_DELETE_PENDING)
-> > +               if (!rc && *inode &&
-> > +                   (fattr->cf_flags & CIFS_FATTR_DELETE_PENDING))
-> >                         cifs_mark_open_handles_for_deleted_file(*inode,=
- full_path);
-> >                 break;
-> >         case -EREMOTE:
-> > --
-> > 2.44.0
-> >
->
->
-> --
-> Thanks,
->
-> Steve
->
+Rickard x Andersson (1):
+  smb: client: Fix hang in smb2_reconnect
+
+ fs/smb/client/transport.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+-- 
+2.30.2
+
