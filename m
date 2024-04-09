@@ -1,118 +1,119 @@
-Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BE9156C50;
-	Tue,  9 Apr 2024 18:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.70.13.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E191581FA
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Apr 2024 20:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712687265; cv=none; b=OMOOKs/8unFV2P7PX0wDWn84T6ps9p4BisK1QY5LVnq1SfQnlWxgpCP5PPdT5aLH1pPZUCq4N2vVqHs4CkxWCy9bxyew2eo2nu8iqKMYvmPmdbbG97oeZb6718sDlAiguoCi9vU/WbtclxzUHkmSndxGtuDzbmlabvpIE2ROT64=
+	t=1712693699; cv=none; b=rsnxIdJlOC9221FjE06Jt36qmbaisGCEStcWJ1iYcuwQEO4oKrlmS8z1VLGHdxOMj0HNcTQSG7TPru6tAguhjsBDwekyhV6i7PobIoPWBf1Kbjpax5jTInu5tPHqZHoy5Yb6gWCCcHZoYQ+x8xLTHxYvBoYKps8rHSUnSyf3OYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712687265; c=relaxed/simple;
-	bh=+e4o3Key427s9PGCVpm+yJBrEgVTXiMxI86rVYGWrbI=;
-	h=From:To:Cc:References:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type:Subject; b=UbNlBVbQqJgtgtuqFnH7036xygrCII03Li9HfugCyxLbJ3LiwNJJ6C7dIcOsDSJKhQhtS3nXwXgUtcHyHt3iwUT7FrBVCkdSZam9HVxMwafbtzW6Edr1+B9ePoXIr7ez6rAz+z59Ua4GSdA8xcqAHKuJaB+NbNSMNpY62lsyUfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com; spf=pass smtp.mailfrom=xmission.com; arc=none smtp.client-ip=166.70.13.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
-Received: from in02.mta.xmission.com ([166.70.13.52]:38406)
-	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1ruFQF-007Aen-3v; Tue, 09 Apr 2024 11:38:15 -0600
-Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:58962 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1ruFQE-009VSq-7G; Tue, 09 Apr 2024 11:38:14 -0600
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>,  Linus Torvalds
- <torvalds@linux-foundation.org>,  Roberto Sassu
- <roberto.sassu@huaweicloud.com>,  linux-integrity@vger.kernel.org,
-  linux-security-module@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
-  linux-cifs@vger.kernel.org,  linux-kernel@vger.kernel.org,  Roberto Sassu
- <roberto.sassu@huawei.com>
-References: <20240402141145.2685631-1-roberto.sassu@huaweicloud.com>
-	<CAHk-=wgepVMJCYj9s7J50_Tpb5BWq9buBoF0J5HAa1xjet6B8A@mail.gmail.com>
-	<CAHk-=wjjx3oZ55Uyaw9N_kboHdiScLkXAu05CmPF_p_UhQ-tbw@mail.gmail.com>
-	<20240402210035.GI538574@ZenIV>
-	<CAHC9VhSWiQQ3shgczkNr+xYX6G5PX+LgeP3bsMepnM_cp4Gd4g@mail.gmail.com>
-Date: Tue, 09 Apr 2024 12:37:21 -0500
-In-Reply-To: <CAHC9VhSWiQQ3shgczkNr+xYX6G5PX+LgeP3bsMepnM_cp4Gd4g@mail.gmail.com>
-	(Paul Moore's message of "Tue, 2 Apr 2024 17:36:30 -0400")
-Message-ID: <87le5mxwry.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712693699; c=relaxed/simple;
+	bh=2SbgLvgPGkcDv0lCPd1iXo8d7o7QDk5hgPKEFcSWSls=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CTDs1a2eGglfPtn5WENncj0jn/k2nKMUYwP21GmiibX1J++LkbSAUnwXUK+Ojndx+s8PRB2g5b9ne3qO0av5b527AGmQ4PTM5MUKe3cgs4Awr80CqbQcXTKaDbauDu20B3uotyeQ/Z5Tg1wVYCZL1dT+BjDxKUV9pcPDzn/8Mlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=PZtcfELs; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="PZtcfELs"
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dd161eb03afso5365204276.0
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Apr 2024 13:14:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1712693696; x=1713298496; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j0YVQ9djY2M33MWph8FPZMPtyUpc6ybsMtuQAt43J/Y=;
+        b=PZtcfELsz3rwGgDJAZIoMllf//1Z6O7akXXFVcVivFc3oFY0oUs//r3yGCUL1jyLPe
+         pi3Z628Cxz/kqdRFUZRa2QX9cSCgNVGe9wSQMLE/FYv1loD/asr64OhME59V8FzCuDqh
+         UOV1QdeJcF1CI0/+UotCzIDkxGMTx6Difn+iSiFwAOxATq1J834JiWLUiSjcWWXayEBn
+         Ymco/s4fIncJ5Yb5FDkdJ3ifL81/ldft5G/sqTvRfo8TpwhRz4FOsuFyZk4tA44StKzV
+         sQpHSnCT7Jb5iZu2G70tvRBXBRdeB68OEiUXUnMuwatpPcs1GQCwd+9jNDhjmvgzVUah
+         rn1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712693696; x=1713298496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j0YVQ9djY2M33MWph8FPZMPtyUpc6ybsMtuQAt43J/Y=;
+        b=q7ahc/HBUqwunQJ5pa9uxcbCNFa8xUbUhwlu/axGhcOmWwUOc7PxRJrF9pjln2A6Az
+         8G5EE6aLJuxPye4cP9jrulj79legayEYNd8J43e/7otn8EtuwPPuC+r0+/o/x2TYhdo1
+         wKH/x2qieRxnRDt7aq0LdNyQtOTQedJ7zxfZBDkfLThkg5POJhSCuf7lsKn5t4Ix94nW
+         g8slfBV1d34/Y5T44uawh6wKf3WioyV7zK5zDNzi1NeUmlKi8+xBdkYacKnt652QuGmT
+         LgMg6TtAkAbLK9HXbj0IhGlrJKQRXhREvJiKOkOWrRFa7uTla28ZckSNDatkYCQvS6/Z
+         ZCXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVCMULH/1XZVl9SNjX6SiAQjsYfe99c+x/iflLFPbwCvjMCycifaeK4ByHj7cHYq6RSZSLwbJatkn+8nUb9YPt8uin3NFRoEL2d1g==
+X-Gm-Message-State: AOJu0YwMyrnHPoTmRr26+LDUqFu9nxDN63d3IkePq3IQUYCWJcKainoi
+	gEZKBGmSQL8NwQgVaBQNnutl6v+i/H7OyAeXPQJzqZHtXIV2EY2T93iYR/fZ3RGAQc8ZAyJqqhR
+	+h5X1RvuXC/YwCSbfx1l929l5OneDWs9XYCmz
+X-Google-Smtp-Source: AGHT+IHOHfb3Vsx0X6ltkSVRZFRT+zreJyCaHp4J4qYazQG9Rm3OCb+u4xunfbpGxaxtGsfS74W6Ks+5hyL3bJx9lHY=
+X-Received: by 2002:a05:6902:100b:b0:dc7:423c:b8aa with SMTP id
+ w11-20020a056902100b00b00dc7423cb8aamr1106734ybt.12.1712693696380; Tue, 09
+ Apr 2024 13:14:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1ruFQE-009VSq-7G;;;mid=<87le5mxwry.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX19gMkca3jYcuCNyXyTaOnFXicdzcwRWtZ4=
-X-SA-Exim-Connect-IP: 68.227.168.167
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Level: **
-X-Spam-Virus: No
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-	*      [score: 0.4480]
-	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-	*      [sa02 1397; Body=1 Fuz1=1 Fuz2=1]
-	*  1.2 XMSubMetaSxObfu_03 Obfuscated Sexy Noun-People
-	*  0.0 T_TooManySym_01 4+ unique symbols in subject
-	*  1.0 XMSubMetaSx_00 1+ Sexy Words
-	* -0.0 T_SCC_BODY_TEXT_LINE No description available.
-X-Spam-DCC: XMission; sa02 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: **;Paul Moore <paul@paul-moore.com>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 277 ms - load_scoreonly_sql: 0.03 (0.0%),
-	signal_user_changed: 4.1 (1.5%), b_tie_ro: 2.8 (1.0%), parse: 0.71
-	(0.3%), extract_message_metadata: 8 (3.1%), get_uri_detail_list: 0.70
-	(0.3%), tests_pri_-2000: 6 (2.2%), tests_pri_-1000: 1.97 (0.7%),
-	tests_pri_-950: 1.05 (0.4%), tests_pri_-900: 0.80 (0.3%),
-	tests_pri_-90: 59 (21.3%), check_bayes: 57 (20.7%), b_tokenize: 4.6
-	(1.7%), b_tok_get_all: 6 (2.1%), b_comp_prob: 1.51 (0.5%),
-	b_tok_touch_all: 42 (15.1%), b_finish: 0.87 (0.3%), tests_pri_0: 181
-	(65.3%), check_dkim_signature: 0.37 (0.1%), check_dkim_adsp: 7 (2.6%),
-	poll_dns_idle: 0.53 (0.2%), tests_pri_10: 2.7 (1.0%), tests_pri_500: 9
-	(3.1%), rewrite_mail: 0.00 (0.0%)
+References: <20240402141145.2685631-1-roberto.sassu@huaweicloud.com>
+ <CAHk-=wgepVMJCYj9s7J50_Tpb5BWq9buBoF0J5HAa1xjet6B8A@mail.gmail.com>
+ <CAHk-=wjjx3oZ55Uyaw9N_kboHdiScLkXAu05CmPF_p_UhQ-tbw@mail.gmail.com>
+ <20240402210035.GI538574@ZenIV> <CAHC9VhSWiQQ3shgczkNr+xYX6G5PX+LgeP3bsMepnM_cp4Gd4g@mail.gmail.com>
+ <87le5mxwry.fsf@email.froward.int.ebiederm.org>
+In-Reply-To: <87le5mxwry.fsf@email.froward.int.ebiederm.org>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 9 Apr 2024 16:14:45 -0400
+Message-ID: <CAHC9VhTF=-Sh6w4icTPA_=A25-EL55Nt-z=mvyb1-vONoN=5wg@mail.gmail.com>
 Subject: Re: [GIT PULL] security changes for v6.9-rc3
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+To: linux-security-module@vger.kernel.org
+Cc: Al Viro <viro@zeniv.linux.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Roberto Sassu <roberto.sassu@huaweicloud.com>, linux-integrity@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>, 
+	"Eric W. Biederman" <ebiederm@xmission.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Apr 9, 2024 at 1:38=E2=80=AFPM Eric W. Biederman <ebiederm@xmission=
+.com> wrote:
+> Paul Moore <paul@paul-moore.com> writes:
+>
+> > I know it's everyone's favorite hobby to bash the LSM and LSM devs,
+> > but it's important to note that we don't add hooks without working
+> > with the associated subsystem devs to get approval.
+>
+> Hah!!!!
+>
+> > In the cases
+> > where we don't get an explicit ACK, there is an on-list approval, or
+> > several ignored on-list attempts over weeks/months/years.  We want to
+> > be good neighbors.
+>
+> Hah!!!!
+>
+> You merged a LSM hook that is only good for breaking chrome's sandbox,
+> over my expressed objections.  After I tested and verified that
+> is what it does.
+>
+> I asked for testing. None was done.  It was claimed that no
+> security sensitive code would ever fail to check and deal with
+> all return codes, so no testing was necessary.  Then later a
+> whole bunch of security sensitive code that didn't was found.
+>
+> The only redeeming grace has been that no-one ever actually uses
+> that misbegotten security hook.
+>
+> P.S.  Sorry for this off topic rant but sheesh.   At least from
+> my perspective you deserve plenty of bashing.
 
-Paul Moore <paul@paul-moore.com> writes:
+Just in case people are reading this email and don't recall the
+security_create_user_ns() hook discussions from 2022, I would suggest
+reading those old threads and drawing your own conclusions.  A lore
+link is below:
 
-> I know it's everyone's favorite hobby to bash the LSM and LSM devs,
-> but it's important to note that we don't add hooks without working
-> with the associated subsystem devs to get approval.
+https://lore.kernel.org/linux-security-module/?q=3Ds%3Asecurity_create_user=
+_ns
 
-Hah!!!!
-
-> In the cases
-> where we don't get an explicit ACK, there is an on-list approval, or
-> several ignored on-list attempts over weeks/months/years.  We want to
-> be good neighbors.
-
-Hah!!!!
-
-You merged a LSM hook that is only good for breaking chrome's sandbox,
-over my expressed objections.  After I tested and verified that
-is what it does.
-
-I asked for testing. None was done.  It was claimed that no
-security sensitive code would ever fail to check and deal with
-all return codes, so no testing was necessary.  Then later a
-whole bunch of security sensitive code that didn't was found.
-
-The only redeeming grace has been that no-one ever actually uses
-that misbegotten security hook.
-
-P.S.  Sorry for this off topic rant but sheesh.   At least from
-my perspective you deserve plenty of bashing.
-
-Eric
+--=20
+paul-moore.com
