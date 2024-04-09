@@ -1,114 +1,187 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31F654664
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Apr 2024 02:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF461773A
+	for <linux-cifs@vger.kernel.org>; Tue,  9 Apr 2024 06:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712631434; cv=none; b=FCbiL8KS7jUsPilJJ7ldkAO/YUjh7YhrY6ypyXvKKc5fHzKgg3aIesfSDP79u+yLFTb5ZY4xvFo3hweo/qjmzGcMrSvNZIdraYCsspJZI4zHNaOunhnyhD6ZPnBry8Q8326VAwTWXW8AkwPaXFLb5H3ne7kYH0nnTBVAmI1LhPg=
+	t=1712644286; cv=none; b=GfIeicFzi12U4dTSzs9GG6UcICcyjJz1vVZvvXyAgu/rQKPYSc2t/uY+zheNbiIt9Xy9/c99+6S9sSkNqmGgB19tUJiNxAL9S/ZJ/Alq4/RTXev3W1veVzMwZ/m94ZYHsq7vG49W5DwUjKBlCFiNwinn2pKw2vG3XKb3ISjQ8NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712631434; c=relaxed/simple;
-	bh=Pyz55rlmpLa8wA08dhaQZGOdH64rpWlewvTqOS4IbSs=;
+	s=arc-20240116; t=1712644286; c=relaxed/simple;
+	bh=u0eO/An/k5xG7Hl8P2IAWT5Q46YAZeIHVm+lyUdVzko=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=Ro+BRWAt4QVVUG45KsfXdQEVOw1JIOdSy9953sepXTz2938+oaZJnrQZ3M3Ez3hvQrxqNaAkIihLwOD97Twdk8Ylmx9TOdPZJUrmnpiMuA73P086+o0oV/AkSmX2vgSHRXXOIU2oXxp2UCh7PY4ZktLRb6ri54NnZkrswBv/2us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqiXxSXl; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=UOXtPbvRIEJdr1RosoCW8533Ac7SSDgPL6Dep4M7MnyFBbNS2Bxyi/iVHNhgMPQFYcCXBkYMad1n27Xo94D6lbExW+BvGdF0mb5hzhwBcRXexfy6v1ditryO7DTHbvTmunPZkx21HY38G/0gr4QdUyP1WAl6niaNkrVNCr1JjUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=APvJMcko; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqiXxSXl"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-516db2214e6so3489140e87.1
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2024 19:57:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="APvJMcko"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a51d0dda061so267078066b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Apr 2024 23:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712631430; x=1713236230; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=gmail.com; s=20230601; t=1712644283; x=1713249083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wURkXDPItmAbzKhytSn6W+yKeTGtfi25aitI/ZkF7xk=;
-        b=NqiXxSXlzcW/0iACZSIdJ78q7jtXMhfR6VZX330zEgXOhJiDMjKHyig6wK50Zhk+4G
-         JY0LUZi2oYmRF/WcoNEn1dJqFn5x6K754uVLy+t53n6S3mop1ICbnSxa8HTk163bC22Z
-         LXvennmO2njJthkIXgko40l142CLl/rA7UVCty80rlLui7GLhfWNc0lfyoZv9WyGi1g5
-         kAMZcUFbz+5kV5/gQIddIMbzkkUtHsLFSquaRFRoJ/uKiEO4ayiuzcJn/fsHn6WY6WUU
-         haI4nl/OsAUcX0lmCRMR+dB3M05Eky7HSDMey2QE6DhqVumhXmCXT4SK2Pq0n/2DVUKF
-         i5QQ==
+        bh=grF/9vcaqd7sXSI10pSv52oh+Ck8WrZyOyKcGgYLZ08=;
+        b=APvJMcko2yA1SeIY2yM7pbU2/ZkmlYiy7KJbeX3YIIwgsLZg5GydJpKJ1HTraVVoza
+         mdPvSN4EqjFeXGjtSGsZ8E8lHIo0SsrOmVLrxlQJMHCvM2Yms5zy6mRpaB2kkG3PpqTU
+         dgf/kXl4/yRyhEyFwio8TNBMOZZ87+tXLeY7OK5KT5gcgf0Qq35/n9lZXC9pW4LEFgkW
+         Wlx0MOpMgmeuAkVV02m6ByPMLvqGIz1X0r4g92EvwFgszCyBliQMhn5iwqGr4zn/OCzR
+         UkGRJNXuX9IPcliv6mT0njKE0+TF2Wm4aZzfMZCi1dg5qnBDzFI1atXox8YxFezUTjBS
+         /LqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712631430; x=1713236230;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1712644283; x=1713249083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wURkXDPItmAbzKhytSn6W+yKeTGtfi25aitI/ZkF7xk=;
-        b=aZqlD7tupTvPt9A8VQQbH6oCTOxbfJUNGH/+iEghU/H5c/6XFuJ4ZVCbOm1dKoX1tD
-         HHfo3chZc1MuPiu39zOf0JkG3Bjeej2U2QCWW38laUU/SaHKWOk4rSBUt6mW5Nkkdism
-         YScs3stnImCasmja2BFs6Sieu+d1+toF+Q7SiaZ05ikkbFRjAeZQQt6FRWKc3JBwOCts
-         qpwE0vMKuX8SX6TnnJ0NKDwYWT8DtCWGLJtsQKVbCrCNXAz8aBkBkuQ35AWtL37I/31C
-         ZC30xIv8pzeijZV8yKRwjeuQjrAw9tbnc3wOFzWzKfAUT1WCJ5J0TpSMj4BycXRCaWwx
-         V6pg==
-X-Gm-Message-State: AOJu0YyYozMzoHqmlY9MrD/VKuAm8xQnn94FjRYo6Qz78gUBtFxNqPHU
-	FkFnR8hUwGl8Pf6gV4UKi/sVfkbyB2pl4nIp8YnCzbXRLiP8Ghj4yZdiM0abTJ0obmA8/705xOK
-	Pyp8Qvlawm5EkmM2M/8Rx4l/rLisEVzRC
-X-Google-Smtp-Source: AGHT+IEmXmLXaNMcxD1yxm01zvHsEuEEPzV8CRlJyyCYit8CDcUcAZdBThTlAHTqM6ybiyGXMjoNDuqUScMK8zQWNjo=
-X-Received: by 2002:ac2:4c13:0:b0:516:d538:35b2 with SMTP id
- t19-20020ac24c13000000b00516d53835b2mr6868809lfq.23.1712631430180; Mon, 08
- Apr 2024 19:57:10 -0700 (PDT)
+        bh=grF/9vcaqd7sXSI10pSv52oh+Ck8WrZyOyKcGgYLZ08=;
+        b=hIOMszOzkP1N34Z9jqiRcC2TTu6cvhnEEDMINpkufdEC2xtXWrTso/a0BcccL1qAjQ
+         SGmgm6Pm52MP76hy3Gxcscluuch5N0I0wUlqUTuiK8qcpUqZR/sQ8cBZwJ4m/cK5AxbI
+         v/4rxCkbztzPgnNaLXh/YrJXZfGqg8rQGUfQ+KpuSgxLMXz5LC3DWfQ1lOA3iaMdN/4t
+         C1JRSKB7UIs1pxxeMH61i6qxvTtkPkBAODAstloOtuji+UccNW7vLNBGozrj+Kgjc0a4
+         La/w3F3sxLGLY9LAKQQLTxI34y+cukbb6fuLqE4y6UxoAez+uPUufwYfAd24q0uCfTzc
+         AWVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmJbfAsOXf57VXVrvEWAmPFWleioX3fz8L2HSXr7pvsP6Cr2IT7pqy3n6cz7RDt2baVSGC6NQl6lTJvYAwwgWIa+Mca1fhHJR6ug==
+X-Gm-Message-State: AOJu0Yx41kUNjRM/eb4wTd/wV8/gq9onlEc2YtS/KbpwzPLBYA4XdrJD
+	aW7Lor88RBO80YlLhmTyFirrshsC2d7ut4KdqCWRW4jxzcp3KrtZT1NYUo0niORViRCv7K1RpQf
+	Kh2nn4qBlfR8lqXInidP4YXjqFks=
+X-Google-Smtp-Source: AGHT+IHcDd3euzZ/lP4ybVo4gX0gxSMpDI4VAhXVJKPXXimH44DVuINDLGVtLimXEfMlcg+xPjolniPaEDP51SFX1JA=
+X-Received: by 2002:a17:907:9343:b0:a51:f46a:b000 with SMTP id
+ bv3-20020a170907934300b00a51f46ab000mr1152348ejc.20.1712644283357; Mon, 08
+ Apr 2024 23:31:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muOk9hfCqMzRKnKR3sXOOauGdjbvuzms_bKM+U0t5zihA@mail.gmail.com>
-In-Reply-To: <CAH2r5muOk9hfCqMzRKnKR3sXOOauGdjbvuzms_bKM+U0t5zihA@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 8 Apr 2024 21:56:58 -0500
-Message-ID: <CAH2r5mtNZT-zvPjxgqKak5uA6pwyAbvEjOmTB24Vg5O_2-91cw@mail.gmail.com>
-Subject: Re: Hang in xfstest
-To: CIFS <linux-cifs@vger.kernel.org>
+References: <20240408213217.241887-1-pc@manguebit.com> <CAH2r5msiCzzP-cHcnzqHuAM23N5a_55TLMg3crt=Z0F=bS=xcA@mail.gmail.com>
+In-Reply-To: <CAH2r5msiCzzP-cHcnzqHuAM23N5a_55TLMg3crt=Z0F=bS=xcA@mail.gmail.com>
+From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Date: Tue, 9 Apr 2024 12:01:11 +0530
+Message-ID: <CAFTVevUm5_FsMWq5n30zVbApbf5CtHV4Y3tZzr3bBLFV4dmvoQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix NULL ptr deref in cifs_mark_open_handles_for_deleted_file()
+To: Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On a more cheerful note - although we do have a regression to fix
-here, since 6.4 we have fixed A LOT of things, and lots of
-improvements.
+Thanks, looks good.
 
-As some examples: xfstests generic/075, generic/112 and intermittent
-failures in generic/047 and generic/049  which used to fail, now pass,
-and multiple tests have been added to the "buildbot" regression
-testing automation.
+Meetakshi
 
-And in the future it looks like we will catch these earlier.  If
-anyone has regression tests for bugs that have been fixed over the
-past few years (that aren't already covered by xfstests), I would be
-happy to add them to our regression testing bucket of tests we run
-regularly against various server types.
-
-
-On Mon, Apr 8, 2024 at 5:31=E2=80=AFPM Steve French <smfrench@gmail.com> wr=
+On Tue, Apr 9, 2024 at 3:39=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
 ote:
 >
-> I narrowed down (bisected) the cause of the crash in unmount
-> generic/046 (to Windows) which causes the hang on following tests
-> (generic/047 etc).   See
-> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/=
-3/builds/61/steps/73/logs/stdio
-> as an example.
+> merged into cifs-2.6.git for-next
 >
-> The regression started when I add the patch from 6.5-rc1 "cifs: Add a
-> laundromat thread for cached directories"
->
-> The workaround is to simply disable directory caching for that mount -
-> ie "nohandlecache" mount parameter.  This unmount race is only an
-> issue to servers which support directory leases (e.g. Windows).
+> Good catch
 >
 >
+> On Mon, Apr 8, 2024 at 4:32=E2=80=AFPM Paulo Alcantara <pc@manguebit.com>=
+ wrote:
+> >
+> > cifs_get_fattr() may be called with a NULL inode, so check for a
+> > non-NULL inode before calling
+> > cifs_mark_open_handles_for_deleted_file().
+> >
+> > This fixes the following oops:
+> >
+> >   mount.cifs //srv/share /mnt -o ...,vers=3D3.1.1
+> >   cd /mnt
+> >   touch foo; tail -f foo &
+> >   rm foo
+> >   cat foo
+> >
+> >   BUG: kernel NULL pointer dereference, address: 00000000000005c0
+> >   #PF: supervisor read access in kernel mode
+> >   #PF: error_code(0x0000) - not-present page
+> >   PGD 0 P4D 0
+> >   Oops: 0000 [#1] PREEMPT SMP NOPTI
+> >   CPU: 2 PID: 696 Comm: cat Not tainted 6.9.0-rc2 #1
+> >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+> >   1.16.3-1.fc39 04/01/2014
+> >   RIP: 0010:__lock_acquire+0x5d/0x1c70
+> >   Code: 00 00 44 8b a4 24 a0 00 00 00 45 85 f6 0f 84 bb 06 00 00 8b 2d
+> >   48 e2 95 01 45 89 c3 41 89 d2 45 89 c8 85 ed 0 0 <48> 81 3f 40 7a 76
+> >   83 44 0f 44 d8 83 fe 01 0f 86 1b 03 00 00 31 d2
+> >   RSP: 0018:ffffc90000b37490 EFLAGS: 00010002
+> >   RAX: 0000000000000000 RBX: ffff888110021ec0 RCX: 0000000000000000
+> >   RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000005c0
+> >   RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+> >   R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
+> >   R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000200
+> >   FS: 00007f2a1fa08740(0000) GS:ffff888157a00000(0000)
+> >   knlGS:0000000000000000 CS: 0010 DS: 0000 ES: 0000 CR0:
+> >   0000000080050033
+> >   CR2: 00000000000005c0 CR3: 000000011ac7c000 CR4: 0000000000750ef0
+> >   PKRU: 55555554
+> >   Call Trace:
+> >    <TASK>
+> >    ? __die+0x23/0x70
+> >    ? page_fault_oops+0x180/0x490
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    ? exc_page_fault+0x70/0x230
+> >    ? asm_exc_page_fault+0x26/0x30
+> >    ? __lock_acquire+0x5d/0x1c70
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    lock_acquire+0xc0/0x2d0
+> >    ? cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    ? kmem_cache_alloc+0x2d9/0x370
+> >    _raw_spin_lock+0x34/0x80
+> >    ? cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
+> >    cifs_mark_open_handles_for_deleted_file+0x3a/0x100 [cifs]
+> >    cifs_get_fattr+0x24c/0x940 [cifs]
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    cifs_get_inode_info+0x96/0x120 [cifs]
+> >    cifs_lookup+0x16e/0x800 [cifs]
+> >    cifs_atomic_open+0xc7/0x5d0 [cifs]
+> >    ? lookup_open.isra.0+0x3ce/0x5f0
+> >    ? __pfx_cifs_atomic_open+0x10/0x10 [cifs]
+> >    lookup_open.isra.0+0x3ce/0x5f0
+> >    path_openat+0x42b/0xc30
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    ? srso_alias_return_thunk+0x5/0xfbef5
+> >    do_filp_open+0xc4/0x170
+> >    do_sys_openat2+0xab/0xe0
+> >    __x64_sys_openat+0x57/0xa0
+> >    do_syscall_64+0xc1/0x1e0
+> >    entry_SYSCALL_64_after_hwframe+0x72/0x7a
+> >
+> > Fixes: ffceb7640cbf ("smb: client: do not defer close open handles to d=
+eleted files")
+> > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> > ---
+> >  fs/smb/client/inode.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> > index 91b07ef9e25c..60afab5c83d4 100644
+> > --- a/fs/smb/client/inode.c
+> > +++ b/fs/smb/client/inode.c
+> > @@ -1105,7 +1105,8 @@ static int cifs_get_fattr(struct cifs_open_info_d=
+ata *data,
+> >                 } else {
+> >                         cifs_open_info_to_fattr(fattr, data, sb);
+> >                 }
+> > -               if (!rc && fattr->cf_flags & CIFS_FATTR_DELETE_PENDING)
+> > +               if (!rc && *inode &&
+> > +                   (fattr->cf_flags & CIFS_FATTR_DELETE_PENDING))
+> >                         cifs_mark_open_handles_for_deleted_file(*inode,=
+ full_path);
+> >                 break;
+> >         case -EREMOTE:
+> > --
+> > 2.44.0
+> >
 >
 >
 > --
 > Thanks,
 >
 > Steve
-
-
-
---
-Thanks,
-
-Steve
+>
