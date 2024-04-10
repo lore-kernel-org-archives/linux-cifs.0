@@ -1,73 +1,82 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1E722064
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2024 06:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D473FB94
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2024 06:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712731292; cv=none; b=VcSMFiPLoiGeh/xJnYaxKKHzbASir9VMHVZ+6aQu+fhkFStqhOHj2I3vR+F9csp1sz8+ba7TRGDVDAJB6pFUTWPw53BBPFHQNkdEVOIArpg7zI6XMulFrD5+S7uXQaf1nK5Kuq9mOHKsfgJ1ONGAS+KV0nq08XdZp/DAQdQnCwQ=
+	t=1712731523; cv=none; b=AJFhckQbk5eUUYUACOUtV6TVNuelRycwecfLzuS4MaemzwTS9m4L4LR7OKjisoDdj7CkKpIPn4b7JjtMffub3i/vzfUSiNJ8eNWhXKAoRlLx4Fvp9ne0XEdtjgmWbDzwsFPTJhBrsCXujEemBwVHI4CgAYQLwMFiCCS+9mlAhkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712731292; c=relaxed/simple;
-	bh=/VFWz3dELeDxUv2cC0uVHE1hthosvn7Wa6+XfY+pGPw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=VV3Rg8oSU+ufX2z4w59KX3pSFZJtG8X3dnjF8tpoyAQP4YwshU9/Dov87Ul2owmO+SEmSF5M7zGdYgemyptRRX/JV778KUBOCqufc6hNPbDJO/m3brtqS/q5Rv+LskXp2fn+waY+Mof/yZE/cUht+VP6yNDQKTWRPniVU4LDeEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w5nXXHkF; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1712731523; c=relaxed/simple;
+	bh=Z6C7xfYnj44hX5E7OEk7w3b60BWslauaCmNEaNfDncs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 Cc:Content-Type; b=XmTvDpoHl8FHyTzPpak6CErPAm88jUTp/FjdKMbwTeVMn6TCKF2ishkKwnY3QWg96x6nnkiZPdr4LXO5MdHt2uEk8quj2lheDXu3FyCKG3JxFH+EVj11fwQNrOFzimPpNJecgUUBqwf+hCsUFhjhCE2fHUMPOwBD2Mq31LYYsso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3iNKACQW; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w5nXXHkF"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-434ffc2b520so137131cf.0
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Apr 2024 23:41:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3iNKACQW"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-434b5abbb0dso180061cf.0
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Apr 2024 23:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712731288; x=1713336088; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KD23XP0CY7aBAoJc0osnJ5SQSa17woyLYsIFl8xstpU=;
-        b=w5nXXHkFVlY2mBTyiaSNbVMUU5xXa9AC88M0UeS91JIyF6sZWSqMBN7SVg9IbFIzkx
-         8BGSqdcP4qOVHiVPrh9gxoSxB1uw8hzJadM/VDGdH4KFUpu/QD2mkO7s6y1p6PsraTzc
-         kJhz7WooW2Bw71ehKD5dWBIGjqjNtJOBANypfoEx4wcTVsgdahGky/VYTTSr6o9ARhvZ
-         ZwpI8jbH6Wq/7YQp70H8yHl9DNf/l+PbbmvoEnGtWOK7GzrwFijzyCnB6Ujwd6eWZbtf
-         p1bnzhZsCO8PPRyq4CzcIxoGubzpEHL9Rnok8xJKh7cBtVol9no9YYZ0GZpJy3/6Xh8w
-         4jvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712731288; x=1713336088;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=google.com; s=20230601; t=1712731518; x=1713336318; darn=vger.kernel.org;
+        h=cc:subject:message-id:date:from:in-reply-to:references:mime-version
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KD23XP0CY7aBAoJc0osnJ5SQSa17woyLYsIFl8xstpU=;
-        b=opo9qNVvm808xHNi+J+/AN8DAwqPGaLCh110HWKCeLaZvxCmkd6fGgbgfkOUyV6A2Q
-         YTXgbMn2JeOK+WsswuiFwyekoVmMPLfGsvloPiyG5+eFw5I6Hr8sXBlQTc1JtItmXv9Z
-         0c2ODXJFP8G+l6X84G1WBWhD9gcrIXF+07kiNLIW1EbWaf+GHYalP2CG7R7d+tseoIqR
-         HHVKvj+4/FNfUJl7eC0uISobKhEBZQlXo+WLnmrjrmz8d1r2Wm2x/XAMORPtjdaVhYaI
-         6GOcMiS1Bc2l0mbbSl8fexWAoAIOOG2PxVTvS1BQcQxN2AeN3kK3LqKVa3pOkMJtbPrZ
-         +Eyg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2gQKPzR/v7hqO4C+DPQmJ+8bzfmesqM24Ds35ca5IJNZgTxSiH3dCv8quGCVZVNrT6ORg6fr6D7gNxGYCRbobeWKb2RUZEztl7Q==
-X-Gm-Message-State: AOJu0YycrDknDD8YXBaN95TIhvV0Vu6NIJJpnncw+FITJ/FrkH5fZ7HT
-	ullxbZXYzHg3EDSAxqDNjcWawbIIK/rMkbJEu+GecT0i0LKdhxzAvDGg/GvTIygUBjDqot/cLuU
-	4KdlhDD1hBp9bRZDamLWxIrY2IiyxIms2MwB7
-X-Google-Smtp-Source: AGHT+IGvHhEO2qeRZx3Ta5ag6bMjBkRtC0L9j33uiIj/IFqadqefvixaHOp5j2RgAGkbtIz3U6W/V94kSTW3hnfeSGs=
-X-Received: by 2002:a05:622a:1b01:b0:434:7929:93fd with SMTP id
- bb1-20020a05622a1b0100b00434792993fdmr124170qtb.3.1712731287994; Tue, 09 Apr
- 2024 23:41:27 -0700 (PDT)
+        bh=WCCQKrtn9AQBkdSZxiwJzAnXMtSNxXgWFEPwNfCd2FU=;
+        b=3iNKACQWMvLXdQ/Q09rOHH+15ZkdBxrwSQNcJstgE7n95mwolVOI7SNoe133zg2wOF
+         qEdhCrmFQTkIvMC36ZbWAibKxuuQ5lHGasbH2dmYc7Zh04KRhCWJYgbHRl8quFS3oZAw
+         pfMTxWs4VwEf719jrAZfWRlcxlyysP/jhkP4wdKZe1jZKPhk9oX/fvkHeca179XAeoXo
+         wTtpK9yGim0Myf5AL3NSqYpN25GD170K+wot40ihhq+j1MQ+njlr6Xg+0JA38uQgmjao
+         W48y2rMAqgW+Yha1mRf0EvHcni3kig8ivjoXj/UxHjwmfGeLaURb8F0WHmy/U2t0PNW2
+         uqng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712731518; x=1713336318;
+        h=cc:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WCCQKrtn9AQBkdSZxiwJzAnXMtSNxXgWFEPwNfCd2FU=;
+        b=MMMNeA1mOG1ElrsFXW4VlfOmL+ZPUSXSuSskpdwl9lD8v9KmESsSCExw0CE4XzBC+G
+         Vo+UyM0hD5ptW40O5iNDp7iWenAPIquMKzYbpuGTf1Tdh0geJ+gobTYdiI6CC+mcTkDf
+         /mXqAhjWae9gd+u5Etyb54EEPh5Xesp43DTA0q99MCERHhVpGcCoGKP0reBcwnN5cN3o
+         1Gizj4Co4rsKPeS65+znlyU1RyglpX074Rpj3SlRnf+vGUdhs14K3yrUyQrHTz93OpGj
+         4pFlp8mJ2bCxl1DzsZv70ds9sbNXB/jafhO0rUBlSadrEGfkL+u5qkCPTg+BBsa9jV38
+         oXng==
+X-Forwarded-Encrypted: i=1; AJvYcCWJs/rJ43lRsBIz8XKs87l6vuIB+F3YzvUPPE6RetDrCdEAolFDzPKKtqI0CmNULZglzFgnMKILJLBVoxEmLQNw9//Q0qfcx9B4rQ==
+X-Gm-Message-State: AOJu0Yy2vKpa3y/BAg6suFa86ftRKAh+70AT7LeAKXt42rFj8vxT5VrV
+	4pwDpsSlpZGQQJ4E/REJCLqIo2t/lnZ85nBPjqO5+muxTv7rpjOefGvDJdPj3EbN2bDViD7yAMP
+	GNZpbNYRWXZK5Z/3+dY5IR3K8Q+G0/hjN4poy
+X-Received: by 2002:a05:622a:5586:b0:434:ec62:970c with SMTP id
+ fk6-20020a05622a558600b00434ec62970cmt299070qtb.12.1712731518244; Tue, 09 Apr
+ 2024 23:45:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAOdxtTaceuB9fvnEcoTVO6t0V_90UbLM3dyLbE_CK7uRe1bn=Q@mail.gmail.com>
+In-Reply-To: <CAOdxtTaceuB9fvnEcoTVO6t0V_90UbLM3dyLbE_CK7uRe1bn=Q@mail.gmail.com>
 From: Chenglong Tang <chenglongtang@google.com>
-Date: Tue, 9 Apr 2024 23:41:16 -0700
-Message-ID: <CAOdxtTap8UgfS-qBKQUVaSbJCEjrQzTuH4iXb-V3YrPXiU44Tw@mail.gmail.com>
-Subject: kernel panic caused by recent changes in fs/cifs
-To: samba-technical@lists.samba.org
+Date: Tue, 9 Apr 2024 23:45:06 -0700
+Message-ID: <CAOdxtTZfo59ZUxTgbWOybqyL3XHKyiudVthTLaU8jYRhiAqXvA@mail.gmail.com>
+Subject: Fwd: kernel panic caused by recent changes in fs/cifs
 Cc: regressions@lists.linux.dev, pc@manguebit.com, linkinjeon@kernel.org, 
 	dhowells@redhat.com, linux-cifs@vger.kernel.org, 
 	Oleksandr Tymoshenko <ovt@google.com>, Robert Kolchmeyer <rkolchmeyer@google.com>
-Content-Type: multipart/mixed; boundary="00000000000004c6a50615b8546f"
+Content-Type: multipart/mixed; boundary="000000000000bf11e60615b8616e"
 
---00000000000004c6a50615b8546f
-Content-Type: multipart/alternative; boundary="00000000000004c6a30615b8546d"
+--000000000000bf11e60615b8616e
+Content-Type: multipart/alternative; boundary="000000000000bf11e50615b8616c"
 
---00000000000004c6a30615b8546d
+--000000000000bf11e50615b8616c
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+---------- Forwarded message ---------
+From: Chenglong Tang <chenglongtang@google.com>
+Date: Tue, Apr 9, 2024 at 11:43=E2=80=AFPM
+Subject: kernel panic caused by recent changes in fs/cifs
+To: <samba-technical-owner@lists.samba.org>
+
 
 Hi, developers,
 
@@ -98,73 +107,82 @@ Best,
 
 Chenglong
 
---00000000000004c6a30615b8546d
+--000000000000bf11e50615b8616c
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">Hi, developers,<div><br></div><div>This is Chenglong Tang =
-from the Google Container Optimized OS team. We recently received a kernel =
-panic bug from the customers regarding cifs.=C2=A0</div><div><br></div><div=
->This happened since the backport of following changes in cifs(in our kerne=
-l COS-5.10.208 and COS-5.15.146):</div><div><br></div><div>cifs: Fix non-av=
-ailability of dedup breaking generic/304:=C2=A0<a href=3D"https://lore.kern=
-el.org/r/3876191.1701555260@warthog.procyon.org.uk/" target=3D"_blank">http=
-s://lore.kernel.org/r/3876191.1701555260@warthog.procyon.org.uk/</a><br></d=
-iv><div>smb: client: fix potential NULL deref in parse_dfs_referrals(): Ups=
-tream commit 92414333eb375ed64f4ae92d34d579e826936480<br></div><div>ksmbd: =
-fix wrong name of SMB2_CREATE_ALLOCATION_SIZE: Upstream commit=C2=A0=C2=A01=
-3736654481198e519059d4a2e2e3b20fa9fdb3e<br></div><div>smb: client: fix NULL=
- deref in asn1_ber_decoder(): Upstream commit 90d025c2e953c11974e76637977c4=
-73200593a46<br></div><div>smb: a few more smb changes...</div><div><br></di=
-v><div>The=C2=A0line that crashed is line 197 in fs/cifs/dfs_cache.c</div><=
-div>```</div><div><span style=3D"box-sizing:border-box;margin:0px;padding:0=
-px;color:rgb(0,0,136);font-family:&quot;Source Code Pro&quot;,monospace;fon=
-t-size:13.3333px">if</span><span style=3D"box-sizing:border-box;margin:0px;=
-padding:0px;color:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,monosp=
-ace;font-size:13.3333px"> </span><span style=3D"box-sizing:border-box;margi=
-n:0px;padding:0px;color:rgb(102,102,0);font-family:&quot;Source Code Pro&qu=
-ot;,monospace;font-size:13.3333px">(</span><span style=3D"box-sizing:border=
--box;margin:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;Source Code =
-Pro&quot;,monospace;font-size:13.3333px">unlikely</span><span style=3D"box-=
-sizing:border-box;margin:0px;padding:0px;color:rgb(102,102,0);font-family:&=
-quot;Source Code Pro&quot;,monospace;font-size:13.3333px">(</span><span sty=
-le=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(0,0,0);font-fa=
-mily:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">strcmp</spa=
-n><span style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(102=
-,102,0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333=
-px">(</span><span style=3D"box-sizing:border-box;margin:0px;padding:0px;col=
-or:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:1=
-3.3333px">cp</span><span style=3D"box-sizing:border-box;margin:0px;padding:=
-0px;color:rgb(102,102,0);font-family:&quot;Source Code Pro&quot;,monospace;=
-font-size:13.3333px">-&gt;</span><span style=3D"box-sizing:border-box;margi=
-n:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,=
-monospace;font-size:13.3333px">charset</span><span style=3D"box-sizing:bord=
-er-box;margin:0px;padding:0px;color:rgb(102,102,0);font-family:&quot;Source=
- Code Pro&quot;,monospace;font-size:13.3333px">,</span><span style=3D"box-s=
-izing:border-box;margin:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;=
-Source Code Pro&quot;,monospace;font-size:13.3333px"> cache_cp</span><span =
-style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(102,102,0);=
-font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">-&gt=
-;</span><span style=3D"box-sizing:border-box;margin:0px;padding:0px;color:r=
-gb(0,0,0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.33=
-33px">charset</span><span style=3D"box-sizing:border-box;margin:0px;padding=
+<div dir=3D"ltr"><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">---------- Forwarded message ---------<br>From: <strong cla=
+ss=3D"gmail_sendername" dir=3D"auto">Chenglong Tang</strong> <span dir=3D"a=
+uto">&lt;<a href=3D"mailto:chenglongtang@google.com">chenglongtang@google.c=
+om</a>&gt;</span><br>Date: Tue, Apr 9, 2024 at 11:43=E2=80=AFPM<br>Subject:=
+ kernel panic caused by recent changes in fs/cifs<br>To:  &lt;<a href=3D"ma=
+ilto:samba-technical-owner@lists.samba.org">samba-technical-owner@lists.sam=
+ba.org</a>&gt;<br></div><br><br><div dir=3D"ltr">Hi, developers,<div><br></=
+div><div>This is Chenglong Tang from the Google Container Optimized OS team=
+. We recently received a kernel panic bug from the customers regarding cifs=
+.=C2=A0</div><div><br></div><div>This happened since the backport of follow=
+ing changes in cifs(in our kernel COS-5.10.208 and COS-5.15.146):</div><div=
+><br></div><div>cifs: Fix non-availability of dedup breaking generic/304:=
+=C2=A0<a href=3D"https://lore.kernel.org/r/3876191.1701555260@warthog.procy=
+on.org.uk/" target=3D"_blank">https://lore.kernel.org/r/3876191.1701555260@=
+warthog.procyon.org.uk/</a><br></div><div>smb: client: fix potential NULL d=
+eref in parse_dfs_referrals(): Upstream commit 92414333eb375ed64f4ae92d34d5=
+79e826936480<br></div><div>ksmbd: fix wrong name of SMB2_CREATE_ALLOCATION_=
+SIZE: Upstream commit=C2=A0=C2=A013736654481198e519059d4a2e2e3b20fa9fdb3e<b=
+r></div><div>smb: client: fix NULL deref in asn1_ber_decoder(): Upstream co=
+mmit 90d025c2e953c11974e76637977c473200593a46<br></div><div>smb: a few more=
+ smb changes...</div><div><br></div><div>The=C2=A0line that crashed is line=
+ 197 in fs/cifs/dfs_cache.c</div><div>```</div><div><span style=3D"box-sizi=
+ng:border-box;margin:0px;padding:0px;color:rgb(0,0,136);font-family:&quot;S=
+ource Code Pro&quot;,monospace;font-size:13.3333px">if</span><span style=3D=
+"box-sizing:border-box;margin:0px;padding:0px;color:rgb(0,0,0);font-family:=
+&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">=C2=A0</span><sp=
+an style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(102,102,=
+0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">(=
+</span><span style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rg=
+b(0,0,0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.333=
+3px">unlikely</span><span style=3D"box-sizing:border-box;margin:0px;padding=
 :0px;color:rgb(102,102,0);font-family:&quot;Source Code Pro&quot;,monospace=
-;font-size:13.3333px">)))</span><span style=3D"box-sizing:border-box;margin=
-:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,m=
-onospace;font-size:13.3333px"> </span><span style=3D"box-sizing:border-box;=
+;font-size:13.3333px">(</span><span style=3D"box-sizing:border-box;margin:0=
+px;padding:0px;color:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,mon=
+ospace;font-size:13.3333px">strcmp</span><span style=3D"box-sizing:border-b=
+ox;margin:0px;padding:0px;color:rgb(102,102,0);font-family:&quot;Source Cod=
+e Pro&quot;,monospace;font-size:13.3333px">(</span><span style=3D"box-sizin=
+g:border-box;margin:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;Sour=
+ce Code Pro&quot;,monospace;font-size:13.3333px">cp</span><span style=3D"bo=
+x-sizing:border-box;margin:0px;padding:0px;color:rgb(102,102,0);font-family=
+:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">-&gt;</span><sp=
+an style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(0,0,0);f=
+ont-family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">chars=
+et</span><span style=3D"box-sizing:border-box;margin:0px;padding:0px;color:=
+rgb(102,102,0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:=
+13.3333px">,</span><span style=3D"box-sizing:border-box;margin:0px;padding:=
+0px;color:rgb(0,0,0);font-family:&quot;Source Code Pro&quot;,monospace;font=
+-size:13.3333px">=C2=A0cache_cp</span><span style=3D"box-sizing:border-box;=
 margin:0px;padding:0px;color:rgb(102,102,0);font-family:&quot;Source Code P=
-ro&quot;,monospace;font-size:13.3333px">{</span><br></div><div>```<br></div=
-><div>I attached the dmesg and backtrace for debugging purposes. Let me kno=
-w if you need more information.</div><div><br></div><div>Best,</div><div><b=
-r></div><div>Chenglong</div></div>
+ro&quot;,monospace;font-size:13.3333px">-&gt;</span><span style=3D"box-sizi=
+ng:border-box;margin:0px;padding:0px;color:rgb(0,0,0);font-family:&quot;Sou=
+rce Code Pro&quot;,monospace;font-size:13.3333px">charset</span><span style=
+=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(102,102,0);font-=
+family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">)))</span=
+><span style=3D"box-sizing:border-box;margin:0px;padding:0px;color:rgb(0,0,=
+0);font-family:&quot;Source Code Pro&quot;,monospace;font-size:13.3333px">=
+=C2=A0</span><span style=3D"box-sizing:border-box;margin:0px;padding:0px;co=
+lor:rgb(102,102,0);font-family:&quot;Source Code Pro&quot;,monospace;font-s=
+ize:13.3333px">{</span><br></div><div>```<br></div><div>I attached the dmes=
+g and backtrace for debugging purposes. Let me know if you need more inform=
+ation.</div><div><br></div><div>Best,</div><div><br></div><div>Chenglong</d=
+iv></div>
+</div></div>
 
---00000000000004c6a30615b8546d--
---00000000000004c6a50615b8546f
+--000000000000bf11e50615b8616c--
+--000000000000bf11e60615b8616e
 Content-Type: text/plain; charset="US-ASCII"; name="backtrace.txt"
 Content-Disposition: attachment; filename="backtrace.txt"
 Content-Transfer-Encoding: base64
-Content-ID: <f_lutfz9n20>
-X-Attachment-Id: f_lutfz9n20
+Content-ID: <f_lutg26id0>
+X-Attachment-Id: f_lutg26id0
 
 UElEOiA1MjU5NiAgICBUQVNLOiBmZmZmOTkyYzkyZWRjMzAwICBDUFU6IDkgICAgQ09NTUFORDog
 Im1vdW50LmNpZnMiCiAjMCBbZmZmZmIzZGJjMzRmYjk0OF0gbWFjaGluZV9rZXhlYyBhdCBmZmZm
@@ -239,12 +257,12 @@ N2ZmZTkyZDE1ZmYwCiAgICBSMTA6IDAwMDAwMDAwMDAwMDAwMDAgIFIxMTogMDAwMDAwMDAwMDAw
 MDIwMiAgUjEyOiAwMDAwN2ZmZTkyZDE3OGEyCiAgICBSMTM6IDAwMDA1NTc0Yzc2Y2RmNDAgIFIx
 NDogMDAwMDAwMDAwMDAwMDAwYSAgUjE1OiAwMDAwN2Y1NzBkOTRlMDAwCiAgICBPUklHX1JBWDog
 MDAwMDAwMDAwMDAwMDBhNSAgQ1M6IDAwMzMgIFNTOiAwMDJiCg==
---00000000000004c6a50615b8546f
+--000000000000bf11e60615b8616e
 Content-Type: text/plain; charset="US-ASCII"; name="dmesg.txt"
 Content-Disposition: attachment; filename="dmesg.txt"
 Content-Transfer-Encoding: base64
-Content-ID: <f_lutfz9n71>
-X-Attachment-Id: f_lutfz9n71
+Content-ID: <f_lutg26ii1>
+X-Attachment-Id: f_lutg26ii1
 
 WyAgICAwLjAwMDAwMF0gTGludXggdmVyc2lvbiA1LjE1LjE0NisgKGJ1aWxkZXJAbG9jYWxob3N0
 KSAoQ2hyb21pdW0gT1MgMTQuMF9wcmU0NDUwMDJfcDIwMjIwMjE3LXIzIGNsYW5nIHZlcnNpb24g
@@ -1222,4 +1240,4 @@ cDZ0YWJsZV9tYW5nbGUgeHRfbWFyayBiZnEgeHRfbmF0IHh0X01BU1FVRVJBREUgaXB0YWJsZV9u
 YXQgbmZfbmF0IHh0X2FkZHJ0eXBlIGJyX25ldGZpbHRlciB4dF9zdGF0ZSBhZXNuaV9pbnRlbCBj
 cnlwdG9fc2ltZCBjcnlwdGQgdmlydGlvX2JhbGxvb24gZnVzZSBjb25maWdmcwpbICA4ODUuMDE4
 MzUyXSBDUjI6IGZmZmZmZmZmMDAwMDAwMDAK
---00000000000004c6a50615b8546f--
+--000000000000bf11e60615b8616e--
