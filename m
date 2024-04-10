@@ -1,76 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9AA176FB8;
-	Wed, 10 Apr 2024 17:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712770702; cv=none; b=kDIyoroN9dyfrlx5m8dBgr3MJ7Y4FYNWobGkefM6+xQzeUQJFo6hyQfV5GWKXZWlJL+ZvMEf/z46KzVMfbTPfUGAD7ih9BaBLUm6V7h4JyiKHI/fm0a9tVRdTKK7Vbfd3i7nKoFCddzm6p94axZGiTtu1dbvFYCokFBMjZx34xo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712770702; c=relaxed/simple;
-	bh=8bk8QbWwBjxogV8sulrsLmw3J8c/0qzWYceZvwMmUOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZNQX0W25romjm+lFnJA3TvFx09FOCf8ygzLccDcN2TAWuO+sgS5ttBLqEuHDQWQs4OYQCpZ3pTIrzk25+pSFBvhZsRTTu7hmprUcJbr1oSywyaSm+nFV8iqSPFumwRpCWpcwJ/a96qIeCPnb00hUOMNv6jcqHw6oqHC3NeeSAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQ6nQCFO; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA99181322
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2024 19:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712776105; cv=pass; b=oEC4h7Vapnws++EXuLEDLrfacOGiMglyBwuAwpFI7uGl8E25oN1FttMjowOa+NebHqClE8zU/tQeyy7qPgBqBtPztDuyIU1zbAk9t5l1CFz7lK7BsZS0isambJzpIdps4HH6bXwlzix917UbWrubcj+XP+Gs94OU0wZDHrfUB9Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712776105; c=relaxed/simple;
+	bh=BUNIAKF+ILa/YE0caDvgW+IDNcnGDM1aClwgICKpAlo=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=rSXLtbdnndU/RPDGTpKmEW4LL8Z5l0tFsvQ+b6ibqArktlCZ8UfXo3g+M9aCbjImV/z8X0GXL7JdKY0SmisMhql0daFS0b9Eg0d4lizD+dUF/tPkgs8/5zEeB1oeudsnSYQBcOUVX5xap9P6T3IrHAt6U1G2fofOGZOgyYJof0M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=EaJ2g9dT; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQ6nQCFO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 935F7C433C7;
-	Wed, 10 Apr 2024 17:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712770702;
-	bh=8bk8QbWwBjxogV8sulrsLmw3J8c/0qzWYceZvwMmUOk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gQ6nQCFOxjCTOgr5FktkEvhBwT+60FB9SznvO+NovCDxX/VDbZy9GldL1pityvO9m
-	 RzvIh1Yb9KHL+608nk7G0c8nyN1iHLVZTbiHooVXwZyBBl+UVILDZfCaTMA7y7WuGJ
-	 hYRVDbFDPZSh+h3NBoz5DqRO5zF6wap442xwxF/OeoX9BRgHi+LEnorn28rcGC3xL5
-	 SEd2FWO0t3xP65ddc+HvYOG+4apVIy0CsGeoyHyd7KXMBPFy9e3zoe7Gue7qZxTwOn
-	 oFxukrXWAYyHVkIdv86hSbPooOQQs+Swdk8bG+PThkIevqoOd7KST9sX9vZAS3Df02
-	 Dm3soaO/TIdaw==
-Date: Wed, 10 Apr 2024 18:38:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 26/26] netfs, afs: Use writeback retry to deal with
- alternate keys
-Message-ID: <20240410173815.GA514426@kernel.org>
-References: <20240401135351.GD26556@kernel.org>
- <20240328163424.2781320-1-dhowells@redhat.com>
- <20240328163424.2781320-27-dhowells@redhat.com>
- <3002686.1712046757@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="EaJ2g9dT"
+Message-ID: <80e09054c9490c359e8534e07f924897@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712776096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pqly9NXGqsCeqL4gnMpnn+kTJHrl+owTc15/zj6Yt+Q=;
+	b=EaJ2g9dT2jcBskDqXcAq5T60LVHx5j/J0Bxaveds1Yr6lMl6OJQVsykZj4THi8ITSD8dZQ
+	zlAWDkXXdVFaYwLXYSya0xWVZet9Ge5UvNfXvIHleJp9tBZdUlDrGGG6sPpBiU/SXlO/sH
+	MziJE7B+/Q2mQ4sMhYzGb9MUdGH1hnCQKll6rOJln7+QJ+rG5NzcxFZRNXnuLczvh5iVPY
+	ttAhekVJ2R9Jgjnsi5qqwhjQtwLozLNqJJDEd0fiV/dKRuRODndWubzhkawspioYEqA3TP
+	stEhG+rR6JGGZ17U3aCsT6LVg8NXgKPKKxb6hRT9xFktioYqJB8eNwLB4dTK7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1712776096; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pqly9NXGqsCeqL4gnMpnn+kTJHrl+owTc15/zj6Yt+Q=;
+	b=H1wJXYcZK4UBmhfN9DdXMEk9s4x+twCZnWNbooaUR29sSydXkBUb6rG8J+nb/ss2eb1AE5
+	KniYEHiw+mCri5LxoSZxTDzUYvwsEXz4Gjcq1xdHYhKLk5MKmwERCIjGlutWfKjyzFvBYz
+	4QZ6gO22fH8HPXIzPkvfNICE+5DaFwepkTZRMwOZDWxdW0vfoCLzB7GfoZAppn2F0zH323
+	4e8L64e7IShLKpUN9Q4403Bxwx2cvTc38Cpq3uCsvwrm8Du4RKMwoT0OsyheCk3KElJxP8
+	wwtLSdvq4n8Ngn6mrELmusys42MOBxb8URfmXHebty7srbySqoYuOu8OIjEmTA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712776096; a=rsa-sha256;
+	cv=none;
+	b=TalM5FVzn7XEUClEemRWzFXyMktzV25fp/AT2rblJpdKTQiCTgHf7ncRuRuAt888gYOVD0
+	OyILB10H/9a8mvd3yiszZfz9FBe2zZpaKI34JHJMxSCav6Xq2CKMTj3Q7KanT4FDqwu3a0
+	K+7a9+qazCaH70aDAWymaFN84A391+pAJ3+hw4ZboLXYjKFahXrjkXCFa9wrjLxbSkxuei
+	U9pKVyv07TSwh0VoMTYsJHhefxZcp9APpQTkEPHahJrCLkkCWumtVysdnK2C1fUU4DREjb
+	GFZAgkw45DA8gppX+TcxxnHQoZRVZpMO9/TmzuXHAtuSo9fywDZmqyJeiO7jaw==
+From: Paulo Alcantara <pc@manguebit.com>
+To: David Voit <david.voit@gmail.com>, linux-cifs@vger.kernel.org
+Cc: David Voit <david.voit@gmail.com>, Jacob Shivers <jshivers@redhat.com>,
+ Pavel Shilovsky <piastryyy@gmail.com>
+Subject: Re: [PATCH v4 1/1] Implement CLDAP Ping to find the closest site
+In-Reply-To: <20240403052448.4290-2-david.voit@gmail.com>
+References: <20240403052448.4290-1-david.voit@gmail.com>
+ <20240403052448.4290-2-david.voit@gmail.com>
+Date: Wed, 10 Apr 2024 16:08:14 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3002686.1712046757@warthog.procyon.org.uk>
+Content-Type: text/plain
 
-On Tue, Apr 02, 2024 at 09:32:37AM +0100, David Howells wrote:
-> Simon Horman <horms@kernel.org> wrote:
-> 
-> > > +	op->store.size		= len,
-> > 
-> > nit: this is probably more intuitively written using len;
-> 
-> I'm not sure it makes a difference, but switching 'size' to 'len' in kafs is a
-> separate thing that doesn't need to be part of this patchset.
+David Voit <david.voit@gmail.com> writes:
 
-Sorry, I meant, using ';' rather than ',' at the end of the line.
+> For domain based DFS we always need to contact the domain controllers.
+> On setups, which are using bigger AD installations you could get random dc on the other side of the world,
+> if you don't have site support. This can lead to network timeouts and other problems.
+>
+> CLDAP-Ping uses ASN.1 + UDP (CLDAP) and custom-DCE encoding including DName compressions without
+> field separation. Finally after finding the sitename we now need to do a DNS SRV lookups to find
+> the correct IPs to our closest site and fill up the remaining IPs from the global list.
+>
+> Signed-off-by: David Voit <david.voit@gmail.com>
+> ---
+>  Makefile.am    |  15 ++-
+>  cldap_ping.c   | 346 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  cldap_ping.h   |  14 ++
+>  mount.cifs.c   |   5 +-
+>  resolve_host.c | 258 +++++++++++++++++++++++++++++++-----
+>  resolve_host.h |   6 +-
+>  6 files changed, 606 insertions(+), 38 deletions(-)
+>  create mode 100644 cldap_ping.c
+>  create mode 100644 cldap_ping.h
+
+Great work!  I've tested it and found no issues.
+
+Most of the cifs-utils code seems to follow the Linux kernel coding
+style, but I don't see it being mentioned anywhere, so the patch looks
+good.
+
+Thanks!
