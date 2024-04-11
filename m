@@ -1,97 +1,104 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA99181322
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Apr 2024 19:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712776105; cv=pass; b=oEC4h7Vapnws++EXuLEDLrfacOGiMglyBwuAwpFI7uGl8E25oN1FttMjowOa+NebHqClE8zU/tQeyy7qPgBqBtPztDuyIU1zbAk9t5l1CFz7lK7BsZS0isambJzpIdps4HH6bXwlzix917UbWrubcj+XP+Gs94OU0wZDHrfUB9Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712776105; c=relaxed/simple;
-	bh=BUNIAKF+ILa/YE0caDvgW+IDNcnGDM1aClwgICKpAlo=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=rSXLtbdnndU/RPDGTpKmEW4LL8Z5l0tFsvQ+b6ibqArktlCZ8UfXo3g+M9aCbjImV/z8X0GXL7JdKY0SmisMhql0daFS0b9Eg0d4lizD+dUF/tPkgs8/5zEeB1oeudsnSYQBcOUVX5xap9P6T3IrHAt6U1G2fofOGZOgyYJof0M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=EaJ2g9dT; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F17513FD6D
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Apr 2024 07:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712819407; cv=none; b=s2xX173tTq1ehBPRTR8Sxxl/eGzZuobwI+h9R2G49xYvsXvWhP7akz/W9UMTJeM2JPLJQxj43lEIVQZQVgNwQ3c04NZLB6XXTwUu/Ivv1D6jQclon4iVL45N3SOjogAxSQHL3bh10+VKBTTzzMx97UdC0pOuH7lEKPa2degiJKQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712819407; c=relaxed/simple;
+	bh=wH6i3JfODjwBAUH9Z8++yMSzU4HiqQg5BInTQ+RTfj8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fMtWB7zPpSSaOY1omrodICCIcfmUALvW3BbGnG1QUj0jYF/az9XKoisf0RtD5oaizCvTGw1OSWhifzvgkz6IIchBG+jh/MacUFIHKXW7S7fbZ+LRxa4VC/c8y9j4LEND7VZhVuExSsDB+IeOhvWlWV8+DdjhGuATppDuEJ4piug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HwVp1qjf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="EaJ2g9dT"
-Message-ID: <80e09054c9490c359e8534e07f924897@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712776096;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HwVp1qjf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712819405;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pqly9NXGqsCeqL4gnMpnn+kTJHrl+owTc15/zj6Yt+Q=;
-	b=EaJ2g9dT2jcBskDqXcAq5T60LVHx5j/J0Bxaveds1Yr6lMl6OJQVsykZj4THi8ITSD8dZQ
-	zlAWDkXXdVFaYwLXYSya0xWVZet9Ge5UvNfXvIHleJp9tBZdUlDrGGG6sPpBiU/SXlO/sH
-	MziJE7B+/Q2mQ4sMhYzGb9MUdGH1hnCQKll6rOJln7+QJ+rG5NzcxFZRNXnuLczvh5iVPY
-	ttAhekVJ2R9Jgjnsi5qqwhjQtwLozLNqJJDEd0fiV/dKRuRODndWubzhkawspioYEqA3TP
-	stEhG+rR6JGGZ17U3aCsT6LVg8NXgKPKKxb6hRT9xFktioYqJB8eNwLB4dTK7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1712776096; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pqly9NXGqsCeqL4gnMpnn+kTJHrl+owTc15/zj6Yt+Q=;
-	b=H1wJXYcZK4UBmhfN9DdXMEk9s4x+twCZnWNbooaUR29sSydXkBUb6rG8J+nb/ss2eb1AE5
-	KniYEHiw+mCri5LxoSZxTDzUYvwsEXz4Gjcq1xdHYhKLk5MKmwERCIjGlutWfKjyzFvBYz
-	4QZ6gO22fH8HPXIzPkvfNICE+5DaFwepkTZRMwOZDWxdW0vfoCLzB7GfoZAppn2F0zH323
-	4e8L64e7IShLKpUN9Q4403Bxwx2cvTc38Cpq3uCsvwrm8Du4RKMwoT0OsyheCk3KElJxP8
-	wwtLSdvq4n8Ngn6mrELmusys42MOBxb8URfmXHebty7srbySqoYuOu8OIjEmTA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1712776096; a=rsa-sha256;
-	cv=none;
-	b=TalM5FVzn7XEUClEemRWzFXyMktzV25fp/AT2rblJpdKTQiCTgHf7ncRuRuAt888gYOVD0
-	OyILB10H/9a8mvd3yiszZfz9FBe2zZpaKI34JHJMxSCav6Xq2CKMTj3Q7KanT4FDqwu3a0
-	K+7a9+qazCaH70aDAWymaFN84A391+pAJ3+hw4ZboLXYjKFahXrjkXCFa9wrjLxbSkxuei
-	U9pKVyv07TSwh0VoMTYsJHhefxZcp9APpQTkEPHahJrCLkkCWumtVysdnK2C1fUU4DREjb
-	GFZAgkw45DA8gppX+TcxxnHQoZRVZpMO9/TmzuXHAtuSo9fywDZmqyJeiO7jaw==
-From: Paulo Alcantara <pc@manguebit.com>
-To: David Voit <david.voit@gmail.com>, linux-cifs@vger.kernel.org
-Cc: David Voit <david.voit@gmail.com>, Jacob Shivers <jshivers@redhat.com>,
- Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: [PATCH v4 1/1] Implement CLDAP Ping to find the closest site
-In-Reply-To: <20240403052448.4290-2-david.voit@gmail.com>
-References: <20240403052448.4290-1-david.voit@gmail.com>
- <20240403052448.4290-2-david.voit@gmail.com>
-Date: Wed, 10 Apr 2024 16:08:14 -0300
+	bh=5NgjUa+lwKskPLBb4G2miG3MSH6bZPhgAN2v8MXqMrQ=;
+	b=HwVp1qjfm1QCyrLGRjmeh6ZaO70vQ8Z4QhFm+RYy5yAk/WRKa81uwIb7+PpcQ9tJgM00YP
+	CFSMFge5ZZDLe2p+AKzHpdogfoS5Bw1lxrLwM4FSZIWeNJM2riAO6n9HYKubgzho0MoNMW
+	W4+fmDn02klzVDw6Zm/A0qvBCtcw4OA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-Lr1cEV93NVGDpSocSvNLIw-1; Thu, 11 Apr 2024 03:09:56 -0400
+X-MC-Unique: Lr1cEV93NVGDpSocSvNLIw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA3F310499A0;
+	Thu, 11 Apr 2024 07:09:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3F2182166B34;
+	Thu, 11 Apr 2024 07:09:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240410173815.GA514426@kernel.org>
+References: <20240410173815.GA514426@kernel.org> <20240401135351.GD26556@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-27-dhowells@redhat.com> <3002686.1712046757@warthog.procyon.org.uk>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 26/26] netfs, afs: Use writeback retry to deal with alternate keys
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1780363.1712819386.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 11 Apr 2024 08:09:46 +0100
+Message-ID: <1780364.1712819386@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-David Voit <david.voit@gmail.com> writes:
+Simon Horman <horms@kernel.org> wrote:
 
-> For domain based DFS we always need to contact the domain controllers.
-> On setups, which are using bigger AD installations you could get random dc on the other side of the world,
-> if you don't have site support. This can lead to network timeouts and other problems.
->
-> CLDAP-Ping uses ASN.1 + UDP (CLDAP) and custom-DCE encoding including DName compressions without
-> field separation. Finally after finding the sitename we now need to do a DNS SRV lookups to find
-> the correct IPs to our closest site and fill up the remaining IPs from the global list.
->
-> Signed-off-by: David Voit <david.voit@gmail.com>
-> ---
->  Makefile.am    |  15 ++-
->  cldap_ping.c   | 346 +++++++++++++++++++++++++++++++++++++++++++++++++
->  cldap_ping.h   |  14 ++
->  mount.cifs.c   |   5 +-
->  resolve_host.c | 258 +++++++++++++++++++++++++++++++-----
->  resolve_host.h |   6 +-
->  6 files changed, 606 insertions(+), 38 deletions(-)
->  create mode 100644 cldap_ping.c
->  create mode 100644 cldap_ping.h
+> On Tue, Apr 02, 2024 at 09:32:37AM +0100, David Howells wrote:
+> > Simon Horman <horms@kernel.org> wrote:
+> > =
 
-Great work!  I've tested it and found no issues.
+> > > > +	op->store.size		=3D len,
+> > > =
 
-Most of the cifs-utils code seems to follow the Linux kernel coding
-style, but I don't see it being mentioned anywhere, so the patch looks
-good.
+> > > nit: this is probably more intuitively written using len;
+> > =
 
-Thanks!
+> > I'm not sure it makes a difference, but switching 'size' to 'len' in k=
+afs is a
+> > separate thing that doesn't need to be part of this patchset.
+> =
+
+> Sorry, I meant, using ';' rather than ',' at the end of the line.
+
+Ah, yes.  That makes a lot more sense!
+
+David
+
