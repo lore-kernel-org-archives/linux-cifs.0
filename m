@@ -1,63 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B24F3398A;
-	Sat, 13 Apr 2024 17:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713028363; cv=none; b=iGh+1MFXPZUvZyvHrxLB0M5BQCZUhcM/HAlw5BsfRY2wCT6jIApJBG9tkd/EhYe4G9dJWqmZOU0nCnXQZ4lury/pO//ZgOrDolmaqo5ks1Tn9MsPfLtCPtqPOTbOWDnVIlx1lDwfF8hxqttjTU1ZBKczoOBzcjN9nyJc1gnaZag=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713028363; c=relaxed/simple;
-	bh=62lEtTo+NlHmnn2skMS9rgrEZrk0eCcSml0dWLo2qLw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ROQ8Rkp+qF0mVeO9BIKulEcxVng73C2q44n4CCMcKVNvIwVPpK7wsDwhNL4JBzGuu3LZWgY948l2nM8U6niRImbX0cpEAWXUX5iVuFTJDwyY4SOPvh9ZbIy05FyRr/J60kk51k5XWtMQA+crtRvmWgaCAHlLNAxeyP4pZjBafOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PReBAQ8T; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AB47A6F
+	for <linux-cifs@vger.kernel.org>; Sat, 13 Apr 2024 18:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713034750; cv=pass; b=SKl2TuYXnSPa7soYbuf0W0rSto4aGITVNQxqnoLu7gq9YndJiJgjCAM9lY46YRlwJcnsOiDF/5NZZCw7Dt8c5QSiufAHQ67y09SxDnrMJ6m09ppBHfx9DDx5MAO6O/VK9t7JOi9cno+DLTWf7YcYBV23YLbeRsigsvBrLhohMWM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713034750; c=relaxed/simple;
+	bh=EczdKnN6dbq7E8FwjXDcnjXn2SFKDrWcsZZBzEnBB1w=;
+	h=Message-ID:From:To:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=JbuDBLlmnQx8Q6CBF/Jxvn0cmhUs+dVp6ycCAMYgfbEzXnqACZhS5n81Uz3Wi9R24Vd0dYlSyGE5N7w8LJGzwg983C1EbuncMeJAd2zjSn/44XIVBS6GwskDwrDYOgHK5Q0kWEM21ORsVdRbQryrmkNJU4VA0NB4IDSsuhng3qE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=FB2l9ld6; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PReBAQ8T"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0B076C2BD11;
-	Sat, 13 Apr 2024 17:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713028363;
-	bh=62lEtTo+NlHmnn2skMS9rgrEZrk0eCcSml0dWLo2qLw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=PReBAQ8TDG66v5HGxLxtTrTkTu/lmgVBDK/Kb8W6XrYV7Z1nvxApK1GRq8JxxxDZW
-	 kDbN/N+pThzZSxUsMrUyzfuLXvMWQf3eZB2LHv7P57kN/NhFdlX0lymlMEUL2VERTs
-	 3dWo62i2gdrlOoUDGk2YiVvQUxoyz3U6YKGM1mKen89rX+xcdTg4rehxNuyek8b+wK
-	 ch0+rUoCC2/aHg2kjNbANaej97JPOmTv+vInOLsUUTdlyMDV2MznpbPySGzmz2+U84
-	 4nxpqIFv2qVK0vrhAOqarlBH4Z2BBYUnGN8//WgNlafxMgLYlNtN9xy1FYNJBWTAQ/
-	 ZiUWwn8Oz+n/A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 00C3DDF7856;
-	Sat, 13 Apr 2024 17:12:43 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msxJ8sZuc45wo9UYyaRNN1k0-=hgjOzyGxAvM+6OQUx6Q@mail.gmail.com>
-References: <CAH2r5msxJ8sZuc45wo9UYyaRNN1k0-=hgjOzyGxAvM+6OQUx6Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msxJ8sZuc45wo9UYyaRNN1k0-=hgjOzyGxAvM+6OQUx6Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.9-rc3-SMB3-client-fixes
-X-PR-Tracked-Commit-Id: 35f834265e0dc78b003aa0d1af65cafb89666b76
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: fa4022cb73613543512a49ef6ab5a59ff5361159
-Message-Id: <171302836299.7440.515413250809908923.pr-tracker-bot@kernel.org>
-Date: Sat, 13 Apr 2024 17:12:42 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="FB2l9ld6"
+Message-ID: <a59f0e1b5074d3f814135169bac6bb20@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1713034739;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3sfbbukhvlG5VWpQHo68FsVTpCTMaH2JR9fjT/d6asc=;
+	b=FB2l9ld6sYiL/P19I+hfEfNmXQuE+8VGLrXhNIhlr77mH4HfgDxBuVsb8+GzlDS7yImIxT
+	DqHCFT7IYjeNgCGanku37H8gyMe9FzQv9riPNY63CGu4HD5ZHb9EWmZ2C7yQnZ/6hupV5R
+	0mso+ysVRCau1TD0hsJ4ZMQ+Zg6l6CunoZ7gY73//GAddPqQ4ia8pPJainOFEKCFEdgDbh
+	kMFKe8hsIktEsXJx9giSFMVbrfrNElWCrMBizWkx6es14n9Feh/L1TMX16R2rGqpVzTw/F
+	tIY+WLZdgs/RCxJZwIytGwBpMTIqGuHcBoV0dsfXqVzDl35kRudciEKdfwr1Ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1713034739; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3sfbbukhvlG5VWpQHo68FsVTpCTMaH2JR9fjT/d6asc=;
+	b=HE0qQJ7hkops6RbRZ6oRUW+I24kbXWEjTc9Y2FgMyoaJzpSnhqOi8DcSMYFzYc1QeAkeZr
+	668aqBWJO/Gkvc7YWcX3MrFIZrQYRzXZODOC7gEZfTsT7Gep+5gddiBiPhjP9gyEwkvMwm
+	Zt8pghV2Jze+wAgmt/MuByKUjnbQKI8dW/tMBf9RIfva8uyRwL7yeCmA8DA1WmpqoYaUCH
+	XzEjSIlrTiEXZ/1e8tqaNZ9hjVN4DKoOWAcumI9WWH54YGQX1ZbW8s9r4r0zet+F3WlLnu
+	vEdpadgyMiyHuDY31I/4qa9rUM1z+7ZXU9OYuUkQyjhctyTf4slBv0ziMaOPRw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1713034739; a=rsa-sha256;
+	cv=none;
+	b=qOrZ5wY/nh+tCmcN4Sp2D+cvbSkDDZt2EwizMT0aX+Mj0vKyaGOwp7zDlbKvHNpY0dKnSL
+	LXYOTu5oaWb/rdpUGMmx8IRYixRxYlayDNPzzIPIILLMIm8/TBdt482+XkNIjAFbJd9pgD
+	lonK/A+xr0EHwts2838s3xhV/F4f7nwa7QvmZW37cGxF2Vg77hxbXOmB5blYP69edkq8BT
+	VH8JuUfCdmsCd8aK6sk/W+341on3Y4b63z+383q/4odrfQrBsyEORZsx49nMIOpFBtGKwK
+	eNkONkk06Ds7GASzn6mISNCQdLj4JBLLmnonpkrc64TyhY0KqufcsO1NGIga5Q==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Chenglong Tang <chenglongtang@google.com>, linux-cifs@vger.kernel.org
+Subject: Re: kernel panic caused by recent changes in fs/cifs
+In-Reply-To: <CAOdxtTbv9g4tW4RM9N-k_4C2HevQQNW9-2_7gKcFR51cjWbHEg@mail.gmail.com>
+References: <CAOdxtTbv9g4tW4RM9N-k_4C2HevQQNW9-2_7gKcFR51cjWbHEg@mail.gmail.com>
+Date: Sat, 13 Apr 2024 15:58:56 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Sat, 13 Apr 2024 04:18:07 -0500:
+Chenglong Tang <chenglongtang@google.com> writes:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.9-rc3-SMB3-client-fixes
+> bfd18c0 smb: client: fix OOB in SMB2_query_info_init() by Paulo
+> Alcantara =C2=B7 4 months ago
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/fa4022cb73613543512a49ef6ab5a59ff5361159
+Does your kernel have eb3e28c1e89b ("smb3: Replace smb2pdu 1-element
+arrays with flex-arrays")?  If not, then above commit would be a
+potential candidate to have caused the regression [1].
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+[1] https://lore.kernel.org/all/446860c571d0699ed664175262a9e84b@manguebit.=
+com/
