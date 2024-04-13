@@ -1,192 +1,113 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CFE208B6;
-	Sat, 13 Apr 2024 09:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB97F3D544;
+	Sat, 13 Apr 2024 09:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712998951; cv=none; b=V+iSV4wnX2oQlbzmvkBqynmCKAhqoycnk01N+66HmdSPqa8Ascpf0vwy6Df2cGWiiwfgyV/M9A94HnSOJOL2f6K2hWzhqJhuiTOGirYVMtCfd9p/851wDXC+ukQVrePLhD1fg1q/b852v2uqHQtFL8unPdB518sFKe21uJwLObk=
+	t=1712999902; cv=none; b=m+BIaAPkLoun3NHag+/xDY/JLRQ47kzHu4asbejWSqAAMWLFYLllzaYuQY2L7SDCol8C1rSkse+BwYJxHoyKW5dAHTRD2tTCcpfz3gr2L6oimEDo+hmRlY3k+7OR++MchS3cXqEX2hlP29bkWWObmpStfQgbFHtj8GT/kRpBFC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712998951; c=relaxed/simple;
-	bh=XPRehqCoDRDu9KhHYz3crrBqqIS6vn4FnjXgBrmLMmA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nuqFukTJyt/bhem+tD2lVdMKS80ENzqqF03Nzdm7E1gYjSJlhe+f/23jUuiSsgF3T4/ORs6QRikDhx+jIbcaRBYj50Fp9tcCpm10TvLA+7ZbtHS07fWQXbiKSjS+8G/eFhHVgDf4LfuidwLoXz7FMYjYCJGXq+z0vjvT9pd0qZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wqv9b+We; arc=none smtp.client-ip=209.85.208.179
+	s=arc-20240116; t=1712999902; c=relaxed/simple;
+	bh=RVrHx2Tn7E+TdUywb+9mNfZoGlqTXYQ4SMZtjVw2Ev0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=q/rAEy+yh6JvrsuBiRiqernUtAqdxeSALZXEFulNwfLGBn5+T2KkVlKipGSUmEaW2tjf2QpWC4aQZhLLwp79yBv7T01z87E6XgLzD0ufvQaIhVDxFyHR4eVKQg3NOrAxtoti3YuENfNo1JMdHH2eOeHI9Y7is76qhCBtoaO8QTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BTdC3RSm; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wqv9b+We"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d48d75ab70so24168611fa.0;
-        Sat, 13 Apr 2024 02:02:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BTdC3RSm"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d8a2cbe1baso17971511fa.0;
+        Sat, 13 Apr 2024 02:18:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712998947; x=1713603747; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pp0/G7jaP4xfrxL+Nun8zOzJR4cjAehFUaa+BSEMdpo=;
-        b=Wqv9b+Wewe3YOICMKgyxyJvhHgSLliQdYiTZZz1l4a+b5OLZOcNRkd9unc4IVlLXB4
-         ExPLzId+d3eaERVU2VNIBpUzlyB9onkymM132PW14p8JqAAtL2N1gbl1Re7YTuRqb+8d
-         foVS4Nwbrd5tSKmG3VSOwmBOlc2Xz/UNGXj7o7Hu3b0QcubENchpSKrFl14SafhMWywv
-         8ABDHKxzqdrE9o9kzyhetFrg6L2mGNu/U76Vr0oPJxP/a2BY0DgZt6n94Y00WtCzanUD
-         BRqP1WaPFwSZH1HkwyyXwiCxKDhs3qV+ZRgwxWN0r+4cH5biWui6F+vcMCTXez9Vc6ap
-         qR7Q==
+        d=gmail.com; s=20230601; t=1712999899; x=1713604699; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JyDcydGm4xOAby3CAOG5g+X6Tv8De1Ldz9Wnnsymsuk=;
+        b=BTdC3RSmxlmcI+47oVjf23jkk/3eqMrBXkv6E7C85fi/t0CsPQZ6EuPkUrNkkKOTIV
+         Mj3tGppdYZhg5JT6ukb+7IfjJmikQ2ceLj+l9/juIAcV+jTTSqsRaRnGBhNafrmMlSCH
+         ld6p45CzZKxhbFXadSCcQLN2RB9A/1BvjNKCCvzCqSduLO6dG9HUJSpqHDN5pedzDjCJ
+         ZOTLQt2//9yH7gCbJJGMZ/a+vV8hLVaRzKw1xLpBJCnUjJlRmAghzTN+mgCGk83G+2G+
+         WDt6aNRkex25SE6yESv5Xhc+pQluISx/JHTsCsHGF/sSyY86i2RGQW04g6EHIWPL1Er2
+         LeWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712998947; x=1713603747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pp0/G7jaP4xfrxL+Nun8zOzJR4cjAehFUaa+BSEMdpo=;
-        b=tZUw/RQovQuvdzETIe7+VDm7IGIWXmccKWLki8hwiFE8b7+Tm+C9gQ8sbej/jY62gc
-         W52qMq0kkdQp2DFUj5STkPQ2AlgYJmp57k8LSfgiS/st8LPchAsQae+cAFE6iUnSDKgA
-         SVy9SyeJTfQLOWvixi9D3LiQWzgWXNdR5SJ3qsKBx4RIPRFtNOY3Qk84m73Ya68NJCgc
-         mDn+IVZmdedPOvra/plmCakIvKd8tIU/Y0R/hTe14+JHMhZuidpj06s/9dCcosUIW+lg
-         Hf+6QOzywSa6OPd9GVi92dbEkja9xAhiko5Nt5dMiCGCNi060VOH+EAzwASTCMhzDM9H
-         UmTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVT41ZVEchC3EMdw1NZLKWeO5dbWQu47ANlZ4dbZNGnNMS5nNCMEjqIFSx0vp7fWMVG+gQ9B13LZFpdH+4NWvSTu+Hq1OCZ0nDJWX8L
-X-Gm-Message-State: AOJu0YyNkK9b10oAP3jcRlekBx9FlUicDi//F7e4M0ndpIQwUUZbuFZT
-	xFf7N2MAm2qtKjqcwTflk03PhbshoLbBMcPYssSLSWI3m4aPcKdSMr03TTf6rUGrkrgLagU1oUm
-	pv9n4Nut3+mTSIg+mpy2VNXowDHY=
-X-Google-Smtp-Source: AGHT+IHbtoFqqjXX5yyttD1d6EXR2Ucsz/XnNTkzhDCPle8jgk8iv+xWYiUcY861uOmzEGG6a/rKvF6l9YveU6MTRbc=
-X-Received: by 2002:a2e:81c3:0:b0:2d4:9fbe:b5f with SMTP id
- s3-20020a2e81c3000000b002d49fbe0b5fmr2758427ljg.36.1712998947218; Sat, 13 Apr
- 2024 02:02:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712999899; x=1713604699;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JyDcydGm4xOAby3CAOG5g+X6Tv8De1Ldz9Wnnsymsuk=;
+        b=e4gHiyrJy8c8qsvf7TZzyr1vZ1pBjoKIqwrWl6r1PrOpAlZPe2sxcjtxfpCHC4XVJb
+         MpvMKK3pPqKn1qP+eMpYyLFHlJ2t1cVPHttHx/ymjth4/z63VtkfLehyvBu3KF45IyuN
+         X0z896h6uuPbFSP8OFIXsh2FEW/RQCj31RGmE9HVnE5HXWS190Dy7cM3cLHp5JG/eIba
+         ydI14hYlUJYxJE88/8OYJrp63FrKEmEgUct+vhIq598zHetQdk8ruoZfQkzpHtbODUBK
+         F8uLM4jQxLTmVgh84mzTRn87ibrjl1doaI0dbVoqhy/9er3Cq8UYrH5GmPBo0iFkThNm
+         yXgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXnpUkuVGpSv5zvKpl2sk8uXgVJwa008k8DqNdnPDnsW6jaWpG3Vt3Xzt1jCxB+yV9ccxG5yXHUA/Y/bsFY1xIi3s/ApRS03odqeQ==
+X-Gm-Message-State: AOJu0YzSNh6wy6oaSNZXDoKaIEhlY0WehOI0GUJASSF3AzNnj+2DagMs
+	Na86NmRx9fa6sUzsEr8w68+gQE6MH35/KPVyz6UKSht/e/pRxwqFAJeqaNpXBE5hVoX9BdBTQ2Q
+	fPMxM5VVZ5ZM3XYXcvvh4EZ4Q6P0WwDjn
+X-Google-Smtp-Source: AGHT+IF3D/zDZnjVYFWOYOADLurETXOoliEJrkIk5sx9wm9HLXq4sej/FhzBBQlqR/n+TEtE4WaCdmCxbrQHEGAobAI=
+X-Received: by 2002:a2e:91c9:0:b0:2d8:6787:eaed with SMTP id
+ u9-20020a2e91c9000000b002d86787eaedmr4156036ljg.2.1712999898786; Sat, 13 Apr
+ 2024 02:18:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240409112758.467112-1-rickaran@axis.com> <20240409112758.467112-2-rickaran@axis.com>
-In-Reply-To: <20240409112758.467112-2-rickaran@axis.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 13 Apr 2024 04:02:15 -0500
-Message-ID: <CAH2r5msm+xFyMPCJV7Luf6aQ04cHOhevmjJi8J-2Bf711T1ziQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] smb: client: Fix hang in smb2_reconnect
-To: Rickard Andersson <rickaran@axis.com>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, linux-kernel@vger.kernel.org, 
-	rickard314.andersson@gmail.com, kernel@axis.com
+Date: Sat, 13 Apr 2024 04:18:07 -0500
+Message-ID: <CAH2r5msxJ8sZuc45wo9UYyaRNN1k0-=hgjOzyGxAvM+6OQUx6Q@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Shyam and I tried some experiments and there are two cases where the
-patch breaks:
-1) ChangeNotify will time out
-2) Certainly byte range lock calls (they can be allowed to block) will time=
-out
+Please pull the following changes since commit
+fec50db7033ea478773b159e0e2efb135270e3b7:
 
-An obvious alternative would be to not make this change for the
-commands like ChangeNotify and blocking locks but allow it for the
-others.
+  Linux 6.9-rc3 (2024-04-07 13:22:46 -0700)
 
-On Tue, Apr 9, 2024 at 6:29=E2=80=AFAM Rickard Andersson <rickaran@axis.com=
-> wrote:
->
-> From: Rickard x Andersson <rickaran@axis.com>
->
-> Test case:
-> mount -t cifs //192.168.0.1/test y -o
->   port=3D19999,ro,vers=3D2.1,sec=3Dnone,echo_interval=3D1
-> kill smbd with SIGSTOP
-> umount /tmp/y
->
-> Gives the following error:
->  INFO: task umount:466 blocked for more than 122 seconds.
->        Not tainted 6.8.2-axis9-devel #1
->  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this
->  message.
->  task:umount state:D stack:0 pid:466 tgid:466 ppid:464 flags:0x00000004
->   __schedule from schedule+0x34/0x108
->   schedule from schedule_preempt_disabled+0x24/0x34
->   schedule_preempt_disabled from __mutex_lock.constprop.0+0x330/0x8b0
->   __mutex_lock.constprop.0 from smb2_reconnect+0x278/0x8fc [cifs]
->   smb2_reconnect [cifs] from SMB2_open_init+0x54/0x9f4 [cifs]
->   SMB2_open_init [cifs] from smb2_query_info_compound+0x1a0/0x500[cifs]
->   smb2_query_info_compound [cifs] from smb2_queryfs+0x64/0x134 [cifs]
->   smb2_queryfs [cifs] from cifs_statfs+0xc8/0x318 [cifs]
->   cifs_statfs [cifs] from statfs_by_dentry+0x60/0x84
->   statfs_by_dentry from fd_statfs+0x30/0x74
->   fd_statfs from sys_fstatfs64+0x40/0x6c
->   sys_fstatfs64 from ret_fast_syscall+0x0/0x54
->
-> The umount task is blocked waiting on the session mutex. The reason it
-> never gets the session mutex is because 'kworker/0:3' is holding the
-> mutex and is waiting for response (see line 1209 in
-> fs/smb/client/smb2pdu.c.
->
-> Stack trace of 'kworker/0:3' just before calling wait_for_response:
->  CPU: 0 PID: 220 Comm: kworker/0:3 Not tainted 6.8.2-axis9-devel #1
->  Hardware name: Freescale i.MX6 SoloX (Device Tree)
->  Workqueue: cifsiod smb2_reconnect_server [cifs]
->   unwind_backtrace from show_stack+0x18/0x1c
->   show_stack from dump_stack_lvl+0x24/0x2c
->   dump_stack_lvl from compound_send_recv+0x7bc/0xac8 [cifs]
->   compound_send_recv [cifs] from cifs_send_recv+0x34/0x3c [cifs]
->   cifs_send_recv [cifs] from SMB2_negotiate+0x410/0x13dc [cifs]
->   SMB2_negotiate [cifs] from smb2_negotiate+0x4c/0x58 [cifs]
->   smb2_negotiate [cifs] from cifs_negotiate_protocol+0x9c/0x100 [cifs]
->   cifs_negotiate_protocol [cifs] from smb2_reconnect+0x418/0x8fc [cifs]
->   smb2_reconnect [cifs] from smb2_reconnect_server+0x1dc/0x514 [cifs]
->   smb2_reconnect_server [cifs] from process_one_work+0x188/0x3ec
->   process_one_work from worker_thread+0x1fc/0x430
->   worker_thread from kthread+0x110/0x130
->   kthread from ret_from_fork+0x14/0x28
->
-> Change-Id: I53439ffb007c9c51d77ce40fb655a34e5ca291ec
-> Signed-off-by: Rickard x Andersson <rickaran@axis.com>
-> ---
->  fs/smb/client/transport.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> index 994d70193432..96b8f8757ddc 100644
-> --- a/fs/smb/client/transport.c
-> +++ b/fs/smb/client/transport.c
-> @@ -32,6 +32,8 @@
->  /* Max number of iovectors we can use off the stack when sending request=
-s. */
->  #define CIFS_MAX_IOV_SIZE 8
->
-> +#define RESPONSE_TIMEOUT_SECS 50
-> +
->  void
->  cifs_wake_up_task(struct mid_q_entry *mid)
->  {
-> @@ -735,13 +737,14 @@ static int allocate_mid(struct cifs_ses *ses, struc=
-t smb_hdr *in_buf,
->  static int
->  wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *mi=
-dQ)
->  {
-> -       int error;
-> +       int ret;
-> +
-> +       ret =3D wait_event_killable_timeout(server->response_q,
-> +                                         midQ->mid_state !=3D MID_REQUES=
-T_SUBMITTED &&
-> +                                         midQ->mid_state !=3D MID_RESPON=
-SE_RECEIVED,
-> +                                         RESPONSE_TIMEOUT_SECS*HZ);
->
-> -       error =3D wait_event_state(server->response_q,
-> -                                midQ->mid_state !=3D MID_REQUEST_SUBMITT=
-ED &&
-> -                                midQ->mid_state !=3D MID_RESPONSE_RECEIV=
-ED,
-> -                                (TASK_KILLABLE|TASK_FREEZABLE_UNSAFE));
-> -       if (error < 0)
-> +       if ((ret < 0) || (ret =3D=3D 0))
->                 return -ERESTARTSYS;
->
->         return 0;
-> --
-> 2.30.2
->
->
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.9-rc3-SMB3-client-fixes
+
+for you to fetch changes up to 35f834265e0dc78b003aa0d1af65cafb89666b76:
+
+  smb3: fix broken reconnect when password changing on the server by
+allowing password rotation (2024-04-11 16:03:48 -0500)
+
+----------------------------------------------------------------
+Four cifs.ko changesets, most also for stable
+- fix for oops in cifs_get_fattr of deleted files
+- fix for the remote open counter going negative in some directory lease cases
+- fix for mkfifo to instantiate dentry to avoid possible crash
+- important fix to allow handling key rotation for mount and remount
+(ie cases that are becoming more common when password that was used
+for the mount will expire soon but will be replaced by new password)
+----------------------------------------------------------------
+Paulo Alcantara (2):
+      smb: client: fix NULL ptr deref in
+cifs_mark_open_handles_for_deleted_file()
+      smb: client: instantiate when creating SFU files
+
+Steve French (2):
+      smb3: fix Open files on server counter going negative
+      smb3: fix broken reconnect when password changing on the server
+by allowing password rotation
+
+ fs/smb/client/cached_dir.c |  4 +--
+ fs/smb/client/cifsglob.h   |  1 +
+ fs/smb/client/connect.c    |  8 +++++
+ fs/smb/client/fs_context.c | 21 ++++++++++++
+ fs/smb/client/fs_context.h |  2 ++
+ fs/smb/client/inode.c      |  3 +-
+ fs/smb/client/misc.c       |  1 +
+ fs/smb/client/smb2ops.c    | 94
++++++++++++++++++++++++++++++++----------------------
+ fs/smb/client/smb2pdu.c    | 11 +++++++
+ 9 files changed, 103 insertions(+), 42 deletions(-)
 
 
---=20
+-- 
 Thanks,
 
 Steve
