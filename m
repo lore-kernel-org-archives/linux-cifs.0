@@ -1,100 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D5F129A67
-	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 13:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A47071B4B
+	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 13:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713186251; cv=none; b=nVzGSVezx1oonIBJ8K12KwmH1/cBRu6FSQBqxnEHFfr+wT2Nvzi23fYmaqu42DauT/ca+Cgp7hDS6uvA5L2N/uEjUEFgr9rL1xd8aGFZ2KHPfwwqswurmrIHzepziXUKYHoQ/+L7m+S6Rkbok1bvgKXC/TpGK5nY/J6QsrR7iFk=
+	t=1713186811; cv=none; b=gyAMSEv4tA1xkZOsXuVDqNjmvda8ZwCLFywG/UaM+RAAfy7o2N6Y64whbgRxqEItrUW0Beuh8lrpqMi1aSpZ11j68yPLwGGVPfKMPcqi5BZaEZGmFfCxngBpAH+WZC43Nl0cx4KhVDjW7xidY11aoj1m8u4GL34XLMqqGzrT9vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713186251; c=relaxed/simple;
-	bh=9+bMhlfMhCt5MDDi+GnzheGMjkv5c6dD/+ouIDPqjHE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=t0Tf85yOPBCjsymqftG6vMMnEqQCGLjgjsSf8t6i705wb4w+6ThCluTrx/+3QISUCNpevg4hg9h3rfgMtj5MNlYJ4zuTWB6PYWETH8J8sr/hd4xlGpWkluTCPloXpU6cJgq9mTW9OWViAsuugh6IJ85CYotQ5m4vbEAkITkUkbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BGo6Vqh/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1713186811; c=relaxed/simple;
+	bh=IRqU7aEnWTQgD4PWqWv2bfzgmlFYiJYt10aBiZiWwgI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=re6x5upmYfGpX3YeTDwfrE8AsetnkZzhVxDoPz5ztsxqi0AcRIHWl0igXBqOXKPo+MZPZbGR15r5cm9fW1ZN1uGJBKu/kb9XqgXUep/3QvhcqBaHUFDhWiISD8kxP2Jvgh6WVpXBrbSTrWnzYtL4T8ruVYUCrfM/j/1djqcGA74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr; spf=pass smtp.mailfrom=freebox.fr; dkim=pass (2048-bit key) header.d=freebox-fr.20230601.gappssmtp.com header.i=@freebox-fr.20230601.gappssmtp.com header.b=uSYflAHW; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freebox.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freebox.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BGo6Vqh/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713186248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Ptvnzk1WkI8ph1+6mQtrYI+ziVGUn1LcaZGMSp9/x0=;
-	b=BGo6Vqh/EPBz2MVjEwjHMTiPOm4mSa73rUjP4P5pFSbfc4g3mSfgcfNlkcPrUgltfmHO56
-	Y7FWmKanjNJugd1o3FZTddM3G1UpVAp94X995TzHCJncpEZsz1fdaRHwyTk4wupRFqNuQ5
-	WXLegkImII9qFBTgfsah24aAtLAnB5Y=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-438-A9VRT3_LO8mlZjn-t-8k9g-1; Mon,
- 15 Apr 2024 09:04:04 -0400
-X-MC-Unique: A9VRT3_LO8mlZjn-t-8k9g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE6CA2999B20;
-	Mon, 15 Apr 2024 13:04:02 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 367FB492BC7;
-	Mon, 15 Apr 2024 13:03:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <39de1e2ac2ae6a535e23faccd304d7c5459054a2.camel@kernel.org>
-References: <39de1e2ac2ae6a535e23faccd304d7c5459054a2.camel@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-2-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: Re: [PATCH 01/26] cifs: Fix duplicate fscache cookie warnings
+	dkim=pass (2048-bit key) header.d=freebox-fr.20230601.gappssmtp.com header.i=@freebox-fr.20230601.gappssmtp.com header.b="uSYflAHW"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4187731a547so3289415e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 06:13:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=freebox-fr.20230601.gappssmtp.com; s=20230601; t=1713186805; x=1713791605; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dUTLBv7vFXfCalqFQ7tCWodMlG+9YsOcV0PKdvpTKMg=;
+        b=uSYflAHWpb3ZYe7fxTX9K6kiMqWmkQkfSM/Y7ahpsdiq+L0Ku0I88es1rh8Qmwvz/p
+         G4INaMiMcwQQ/D/ERdZ2e/kxg8AVn15Uc8bGN2aKk8M6BQ3yn4h58iMxxpEzrIhcZkPQ
+         fis++s2lNrdDQm5tJcvCuzD4VnPIuVd9U0pvtVq6DC/2SUjpkTzTXM8bYY8pHQwoqR0s
+         WhDDAYjxR8oXj5/wkyLz+bptl8Wu44mkZddchYJ+fhgYj2xYIWwdo9sAhUF3QY+Or2qI
+         CR+zImuk5iKT+iQStPaPhALoHVljCyBwdeb1mvpoJETToxFVSa3hGVBkPHVoCT7tXW4I
+         CHNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713186805; x=1713791605;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dUTLBv7vFXfCalqFQ7tCWodMlG+9YsOcV0PKdvpTKMg=;
+        b=udVYhVjY5AOLSbzPndHgCXMkEXWjtytw5buzzSc/3lujtsWsmpmCo6uHGu+zO9ehqR
+         JhnPn59LGD/DRBsohYiG0EoZnOOflPgu+NegL4duvHhXEif34veHjwr5kwrYWqKMLoCj
+         3ymxE8hzP1ZqOUMmfhx/+GFeOrHKAsvK/6bm9AYEJScrGBtSdKNhrBsW24Hh2ErDNw/Z
+         +T0/vNjdsB9cvIOLjYUxZ4HFumPSGwk1th6ocSU24+Te/a/xAey20QmzInWHQ0iITaP9
+         pcMwQPOOZdy1ZG2jDbMsuQsU6oXTTctBPxm27ht4DObPOUqDhambw54U+MI1Dms8Fq+0
+         ZIvg==
+X-Gm-Message-State: AOJu0Yy35FneiNq/Jfi+u1VoOCEWHYKVmLzi0r5iRoYQkFY0ownj53Vn
+	SNq2vxonVwTEbr59ZLPSjKAerg5EoYp+pdE/QhPEuJ9HYgomoUKOvo+ylS6Pjt4=
+X-Google-Smtp-Source: AGHT+IElLqfICeVJfs66TfES7e8sckKhzB/iGutZFrWaT6RIgLsM3LsFmxL62pm5sTTKvv/MWTHPNg==
+X-Received: by 2002:a05:600c:1553:b0:418:4bec:151f with SMTP id f19-20020a05600c155300b004184bec151fmr3073675wmg.33.1713186804819;
+        Mon, 15 Apr 2024 06:13:24 -0700 (PDT)
+Received: from odysseia.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id q4-20020adff504000000b0034635bd6ba5sm12018389wro.92.2024.04.15.06.13.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 06:13:24 -0700 (PDT)
+From: Marios Makassikis <mmakassikis@freebox.fr>
+To: linkinjeon@kernel.org
+Cc: linux-cifs@vger.kernel.org,
+	mmakassikis@freebox.fr
+Subject: [PATCH v2] ksmbd: clear RENAME_NOREPLACE before calling vfs_rename
+Date: Mon, 15 Apr 2024 15:12:48 +0200
+Message-Id: <20240415131247.2162106-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAKYAXd_8b00geiawuUQ3F4htQvucjH7KGpbOFV1Js7Pwf-JQig@mail.gmail.com>
+References: <CAKYAXd_8b00geiawuUQ3F4htQvucjH7KGpbOFV1Js7Pwf-JQig@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2345943.1713186234.1@warthog.procyon.org.uk>
-Date: Mon, 15 Apr 2024 14:03:54 +0100
-Message-ID: <2345944.1713186234@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
 
-Jeff Layton <jlayton@kernel.org> wrote:
+File overwrite case is explicitly handled, so it is not necessary to
+pass RENAME_NOREPLACE to vfs_rename.
 
-> > +struct cifs_fscache_inode_key {
-> > +
-> > +	__le64  uniqueid;	/* server inode number */
-> > +	__le64  createtime;	/* creation time on server */
-> > +	u8	type;		/* S_IFMT file type */
-> > +} __packed;
-> > +
-> 
-> Interesting. So the uniqueid of the inode is not unique within the fs?
-> Or are the clients are mounting shares that span multiple filesystems?
-> Or, are we looking at a situation where the uniqueid is being quickly
-> reused for new inodes after the original inode is unlinked?
+Clearing the flag fixes rename operations when the share is a ntfs-3g
+mount. The latter uses an older version of fuse with no support for
+flags in the ->rename op.
 
-The problem is that it's not unique over time.  creat(); unlink(); creat();
-may yield a repeat of the uniqueid.  It's like i_ino in that respect.
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+v2 change:
 
-David
+fix checkpatch warning:
+  WARNING: Block comments use a trailing */ on a separate line
+
+ fs/smb/server/vfs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 22f0f3db3ac9..51b1b0bed616 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -754,10 +754,15 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
+ 		goto out4;
+ 	}
+ 
++	/*
++	 * explicitly handle file overwrite case, for compatibility with
++	 * filesystems that may not support rename flags (e.g: fuse)
++	 */
+ 	if ((flags & RENAME_NOREPLACE) && d_is_positive(new_dentry)) {
+ 		err = -EEXIST;
+ 		goto out4;
+ 	}
++	flags &= ~(RENAME_NOREPLACE);
+ 
+ 	if (old_child == trap) {
+ 		err = -EINVAL;
+-- 
+2.34.1
 
