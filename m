@@ -1,173 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8DF84FBC
-	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 12:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D5F129A67
+	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 13:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713185766; cv=none; b=aH54KDeq4gQv+wCVOFiOkuEZf7ZZxl6hhGjLMLSaXmWmeKkKS+Pv3yltpELH7W6/wu0P6KzpnV16LWQ6aPndvfD29UFohy59HQC2vMbkpWD/bDrUtFyrz6BErHIPsgPIe1QQLQceUJBf9BEbPASEkkMo+jNKT9Se+z5IX6W8K20=
+	t=1713186251; cv=none; b=nVzGSVezx1oonIBJ8K12KwmH1/cBRu6FSQBqxnEHFfr+wT2Nvzi23fYmaqu42DauT/ca+Cgp7hDS6uvA5L2N/uEjUEFgr9rL1xd8aGFZ2KHPfwwqswurmrIHzepziXUKYHoQ/+L7m+S6Rkbok1bvgKXC/TpGK5nY/J6QsrR7iFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713185766; c=relaxed/simple;
-	bh=n94TpGfIfb2d3Q8WFMR3nEO5bJDJjugyTBiWTsZtgl0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OYB7/3URM9OV0/uDBUJgmlHoqo0bEbaEtFP3FFBgqQFJ6gcsfRF5qCutsNlmSqxM01VTibcL2bP2qFYJigM2H+NoIv8k1SuZ7KfzqRyUE+fxMkeAr9AHBFiFvrnItoAx+uoxLqDbNreU0D3SxCE5nxYlDZ6/5stD4SN9wG9qXos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urpYL62C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1713186251; c=relaxed/simple;
+	bh=9+bMhlfMhCt5MDDi+GnzheGMjkv5c6dD/+ouIDPqjHE=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=t0Tf85yOPBCjsymqftG6vMMnEqQCGLjgjsSf8t6i705wb4w+6ThCluTrx/+3QISUCNpevg4hg9h3rfgMtj5MNlYJ4zuTWB6PYWETH8J8sr/hd4xlGpWkluTCPloXpU6cJgq9mTW9OWViAsuugh6IJ85CYotQ5m4vbEAkITkUkbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BGo6Vqh/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urpYL62C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32466C113CC
-	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 12:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713185766;
-	bh=n94TpGfIfb2d3Q8WFMR3nEO5bJDJjugyTBiWTsZtgl0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=urpYL62CXnknnVpyC6z9FD4+eAT/xDBhYZvtfXVc4avCw86tNFjaMKwBXemO9Uj7b
-	 ait0Par/FLnzuCmgJVX/HbSdnjUGikI1XmC6kukcnv9bkDbm4UDwFTB9tG1IiAFSJW
-	 77RzKKp24R2VKuiA3AJ7y05ZLvBJvKdJN+jVf4zG6xno3r2dUiGhULWZspPwDnDjR9
-	 fLEUkH88DMMQLcpO06MZw9Bbx9mcyT1Pufd1ysXEm0u6WaO3PVoA21pbxKzwlVRDMQ
-	 W4LcTeW6XgBkgd8kfcZdUOHBxPTOiRMN0INw+CxQ0nNNCjqurUxSfZKEX2MNw093cF
-	 eOcGwHiI1sVQA==
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5aa17c69cf7so2398759eaf.2
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 05:56:06 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxEbN2YDiQ4Dl0wR4ljO99Tbjel9fmr2lHS1ucRBycaYuiXGZiB
-	do9pycrpmdrUPs/C/BLrSUPc3FJiGRqfYyWqf97/JGVUZU6xxM5oxDpj3ADcre7lM7hlav82Ayu
-	+C/RW80tIY+WHpmzoem8hR9VtQys=
-X-Google-Smtp-Source: AGHT+IH4EoxUI+Usny1pM18DLcWXTzhxiDXvKYHP8jqo/waHox/f27S52PyCPP1w+CVegZpv1yK2Gjeqgv6hMJ7u06g=
-X-Received: by 2002:a05:6820:3089:b0:5ac:4372:1d6a with SMTP id
- eu9-20020a056820308900b005ac43721d6amr9032524oob.3.1713185765529; Mon, 15 Apr
- 2024 05:56:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BGo6Vqh/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713186248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+Ptvnzk1WkI8ph1+6mQtrYI+ziVGUn1LcaZGMSp9/x0=;
+	b=BGo6Vqh/EPBz2MVjEwjHMTiPOm4mSa73rUjP4P5pFSbfc4g3mSfgcfNlkcPrUgltfmHO56
+	Y7FWmKanjNJugd1o3FZTddM3G1UpVAp94X995TzHCJncpEZsz1fdaRHwyTk4wupRFqNuQ5
+	WXLegkImII9qFBTgfsah24aAtLAnB5Y=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-438-A9VRT3_LO8mlZjn-t-8k9g-1; Mon,
+ 15 Apr 2024 09:04:04 -0400
+X-MC-Unique: A9VRT3_LO8mlZjn-t-8k9g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE6CA2999B20;
+	Mon, 15 Apr 2024 13:04:02 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.10])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 367FB492BC7;
+	Mon, 15 Apr 2024 13:03:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <39de1e2ac2ae6a535e23faccd304d7c5459054a2.camel@kernel.org>
+References: <39de1e2ac2ae6a535e23faccd304d7c5459054a2.camel@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-2-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+    Shyam Prasad N <nspmangalore@gmail.com>,
+    Rohith Surabattula <rohiths.msft@gmail.com>
+Subject: Re: [PATCH 01/26] cifs: Fix duplicate fscache cookie warnings
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313130708.2915988-1-mmakassikis@freebox.fr>
- <CAF6XXKVNTF2yZK=QdKi-YNZC5N93x-NrN7a=hDGZNNCUfxTAwA@mail.gmail.com>
- <CAKYAXd9o2d0Ky-242+UV3DcHWs1ZMYd+ErP8Ueqn3nvucMQtJA@mail.gmail.com> <CAF6XXKUjE-vo+z5aKrfXEet59EJB+yjy3uh1xhJQRQaFppdWkw@mail.gmail.com>
-In-Reply-To: <CAF6XXKUjE-vo+z5aKrfXEet59EJB+yjy3uh1xhJQRQaFppdWkw@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 15 Apr 2024 21:55:54 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_8b00geiawuUQ3F4htQvucjH7KGpbOFV1Js7Pwf-JQig@mail.gmail.com>
-Message-ID: <CAKYAXd_8b00geiawuUQ3F4htQvucjH7KGpbOFV1Js7Pwf-JQig@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: clear RENAME_NOREPLACE before calling vfs_rename
-To: Marios Makassikis <mmakassikis@freebox.fr>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2345943.1713186234.1@warthog.procyon.org.uk>
+Date: Mon, 15 Apr 2024 14:03:54 +0100
+Message-ID: <2345944.1713186234@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-2024=EB=85=84 4=EC=9B=94 15=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 9:36, M=
-arios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
-=B1:
->
-> On Mon, Apr 15, 2024 at 12:51=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.o=
-rg> wrote:
-> >
-> > 2024=EB=85=84 4=EC=9B=94 15=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 6:0=
-1, Marios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=
-=EC=84=B1:
-> > >
-> > > On Wed, Mar 13, 2024 at 2:07=E2=80=AFPM Marios Makassikis
-> > > <mmakassikis@freebox.fr> wrote:
-> > > >
-> > > > File overwrite case is explicitly handled, so it is not necessary t=
-o
-> > > > pass RENAME_NOREPLACE to vfs_rename.
-> > > >
-> > > > Clearing the flag fixes rename operations when the share is a ntfs-=
-3g
-> > > > mount. The latter uses an older version of fuse with no support for
-> > > > flags in the ->rename op.
-> > > >
-> > > > Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-> > > > ---
-> > > >  fs/smb/server/vfs.c | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >
-> > >
-> > > Bumping this as I haven't received any feedback.
-> > > Are there any issues with the patch ?
-> > Sorry for missing this patch. Please cc me when submitting the patch
-> > to the list next time.
-> > I didn't understand why it is a problem with ntfs-3g yet.
-> > Is it just clean-up patch ? or this flags cause some issue with ntfs-3g=
- ?
-> > Could you please elaborate more ?
-> >
-> > Thanks!
->
-> Until commit 74d7970febf ("ksmbd: fix racy issue from using ->d_parent
-> and ->d_name"),
-> the logic to overwrite a file or fail depending on the ReplaceIfExists
-> flag was open-coded.
-> This is the same as calling vfs_rename() with the RENAME_NOREPLACE flag, =
-so it
-> makes sense to use that instead.
->
-> When using FUSE, the behaviour depends on the userland application implem=
-enting
-> the fs. On the kernel side, this is the function that ends up being calle=
-d:
->
-> fs/fuse/dir.c:
-> static int fuse_rename2(struct mnt_idmap *idmap, struct inode *olddir,
->                         struct dentry *oldent, struct inode *newdir,
->                         struct dentry *newent, unsigned int flags)
-> {
->         struct fuse_conn *fc =3D get_fuse_conn(olddir);
->         int err;
->
->         if (fuse_is_bad(olddir))
->                 return -EIO;
->
->         if (flags & ~(RENAME_NOREPLACE | RENAME_EXCHANGE | RENAME_WHITEOU=
-T))
->                 return -EINVAL;
->
->         if (flags) {
->                 if (fc->no_rename2 || fc->minor < 23)
->                         return -EINVAL;
->
->                 err =3D fuse_rename_common(olddir, oldent, newdir, newent=
-, flags,
->                                          FUSE_RENAME2,
->                                          sizeof(struct fuse_rename2_in));
->                 if (err =3D=3D -ENOSYS) {
->                         fc->no_rename2 =3D 1;
->                         err =3D -EINVAL;
->                 }
->         } else {
->                 err =3D fuse_rename_common(olddir, oldent, newdir, newent=
-, 0,
->                                          FUSE_RENAME,
->                                          sizeof(struct fuse_rename_in));
->         }
->
->         return err;
-> }
->
-> Because ntfs-3g uses an older version of the FUSE API and flags are
-> passed by ksmbd,
-> rename attempts fail because of this bit:
->
->         if (flags) {
->                 if (fc->no_rename2 || fc->minor < 23)
->                         return -EINVAL;
->
-> ksmbd already handles the overwrite case before even calling
-> vfs_rename(). So passing
-> the flag doesn't add much.
-Okay, Thanks for your detailed explanation:)
+Jeff Layton <jlayton@kernel.org> wrote:
 
-Can you fix a warning from checkpatch.pl ?
+> > +struct cifs_fscache_inode_key {
+> > +
+> > +	__le64  uniqueid;	/* server inode number */
+> > +	__le64  createtime;	/* creation time on server */
+> > +	u8	type;		/* S_IFMT file type */
+> > +} __packed;
+> > +
+> 
+> Interesting. So the uniqueid of the inode is not unique within the fs?
+> Or are the clients are mounting shares that span multiple filesystems?
+> Or, are we looking at a situation where the uniqueid is being quickly
+> reused for new inodes after the original inode is unlinked?
 
-WARNING: Block comments use a trailing */ on a separate line
-#123: FILE: fs/smb/server/vfs.c:758:
-+ * filesystems that may not support rename flags (e.g: fuse) */
+The problem is that it's not unique over time.  creat(); unlink(); creat();
+may yield a repeat of the uniqueid.  It's like i_ino in that respect.
 
-total: 0 errors, 1 warnings, 13 lines checked
+David
 
-Thanks.
-
->
-> --
-> Marios
