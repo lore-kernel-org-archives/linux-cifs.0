@@ -1,60 +1,63 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FA51361
-	for <linux-cifs@vger.kernel.org>; Sat, 13 Apr 2024 22:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493022E83F
+	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 07:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713048226; cv=none; b=PC/E5Tu2Q1QktrOVSUiCOMh9AVyqQ4DSasgJTnqeIiiudUiDxzyfdwDhsp0Eb7WehAIEm9f72zeMEfoHFiYlk/ddGHRlnj4aJPxU53UefPJYphc2kjO3Guvm6vrQeCB7AaqHN/jubvpn0zTuGlqqfw6iAO5QR6ss8G0ncmLB1gE=
+	t=1713167278; cv=none; b=pwJgMZ0AdBCh6F+/ZSix6bTdfnKReZSZPc9mwQ5P1cbtoyljVHIVwOTl+gyd6Ji4a84PBEKuoQf5QjwNcWofKZqE4Jg1+ol/wIJLKQ7ACPZb1QCLfWRDq3PQs4vy8EMS6AE96hv77eI42IgLa6ezP2sjTQaz1Q7IKvJRZ/4/AJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713048226; c=relaxed/simple;
-	bh=lGyhwKwVOks7aJNiijsnznGZqs12r0EZr6YnZjfZrHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tArvkpUe3uzXJo1nmusS+fayGLiKFKOZeHTehFQIkCmjokdm7ogbdm5FVu7GryF0yfEeVm/+RphgZmlhgcVtACuWU/YDVbHirMBVJT3AaAoG7yb7StuqHii1Xyy6vkXkS737PrLDyJGzCwGyDhS86PsQn49FmqU9NedeEmuXueU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=draigBrady.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eADqrQll; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=draigBrady.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713167278; c=relaxed/simple;
+	bh=9IatEviYhS2luzBbrGx3L04KVJ7F62NEknoj5G7BurY=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=WKwu5wraCSZiS+w2txD4ZTkKdYoPFIraxpZbuNIZjA/EJnSIwACGF8fcKlYaWOeUXhoO/uuM4C10f5UpaC1DdGJrisdVxFevOiNVHDNr7zzZpkps39n/ttZWdcBpRMlvGh+QuEbBrm03AiW8VSfp7UEDWTbWZgCKOP2x27+TDgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y7HIcyJ/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eADqrQll"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41846b4d5bdso317745e9.1
-        for <linux-cifs@vger.kernel.org>; Sat, 13 Apr 2024 15:43:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713048222; x=1713653022; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=+ZoQiUStW6G0bF6aaFwn0Fjwf/3EPN/NA5Nuh0iD9sU=;
-        b=eADqrQllPIw/TdnIia1evOy2T3qBgyC57qfNTU9CeC72vBwNq+MLqOyNQX+aRLyrnb
-         NkqJdhXABxQwdW0fjheeDen6NM3QRtwTuOnaRA3h2KXb9e0+HoLlT1o80nwNnc87e9gz
-         WdJGCvwZC/CkzIJYA9QkwWtpHswGPfM7V4orjIEjoX1fvPUJI9d52yb4KOzfwCchykl0
-         WImBgACaoKcRjONvdrJTLMyIL5vZf5vOFQ+m6WMYl1Aqxuv2DSk3je5m7y9WjAfL9JQ6
-         hSGoh882nY0DrUMOTdHZZ/9d3qv0nyPlUsH9dMJaT/H1D21ZTMUgJSNjYsBT/miUCb+h
-         OZng==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7HIcyJ/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713167276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1cNSMGKUuSYp4mOn/xs8/bRq/9QYJDWeod7dfRVhzw8=;
+	b=Y7HIcyJ/igVvr6/kzyde6racnu/fjRduU1y63MTGFLqiuwEGPBH+Ey/U8wDQ6Jjo5I8Fwv
+	XkJSUTcocfaf0iWSp5O/6x5ncxQSYDiqbR22rMsKY/3A0phzosNibGg825n9o2NUWZGKko
+	8GbqAIGAaueEtY0BVWKPQpf0OTHC2ME=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-297-5WtRQS6mMj6Y3CKHAGCyWw-1; Mon, 15 Apr 2024 03:47:54 -0400
+X-MC-Unique: 5WtRQS6mMj6Y3CKHAGCyWw-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78ee46449aeso51316985a.2
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 00:47:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713048222; x=1713653022;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+ZoQiUStW6G0bF6aaFwn0Fjwf/3EPN/NA5Nuh0iD9sU=;
-        b=e1GHFb2zzBogJJHQeIq7YlPvi3F6KGmTR7koCwYXdYEqZ8GHzW3jnAlB+dDwXBxJl+
-         xHAzSurypJyX+mInh70jtyRgdigjUWkrGHvCnAfwyGFg19mATrw5RG+bbgtMWf9U6Jz6
-         I3ZBiU9epMK6smvWDYv/up/V+lXkJQb3QwiAVgWZhSHS7zblUMcsxfmLXU7QIRFNuuSj
-         hVQiTjSabwuA6WxPBpd3if9qB280Xx0+uvdl+oYQSQroQs+Ep0ORdXqXL1iIPQu79mfX
-         VxoOVsOTi5zeHz1vVcMWQh5TCurA40m7K5tg0nEudiIKnLTIiVlcKlPV7tiF46BBdi/C
-         vkug==
-X-Gm-Message-State: AOJu0Yzv9h4Qwki+XmlD/HFdTE3LD/mi3o4yQpA5cNeGPf8VRDv+WxEO
-	cSn7aRhmjBoHzmFknTojaelts2uHun1QHatmpAC82K00qiZ22/n/
-X-Google-Smtp-Source: AGHT+IG9NvRrwqPZNWf7eVBmcGTCHwiA6bo2sFV3OEZ6IRz/3nPJjFbgon3jxUq8aU9hFWwvC+IONg==
-X-Received: by 2002:a05:600c:1552:b0:418:3719:61ea with SMTP id f18-20020a05600c155200b00418371961eamr867871wmg.41.1713048221641;
-        Sat, 13 Apr 2024 15:43:41 -0700 (PDT)
-Received: from [192.168.1.53] (86-44-211-146-dynamic.agg2.lod.rsl-rtd.eircom.net. [86.44.211.146])
-        by smtp.googlemail.com with ESMTPSA id f19-20020a05600c4e9300b00417d624cffbsm9982565wmq.6.2024.04.13.15.43.40
+        d=1e100.net; s=20230601; t=1713167274; x=1713772074;
+        h=content-transfer-encoding:cc:to:content-language:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1cNSMGKUuSYp4mOn/xs8/bRq/9QYJDWeod7dfRVhzw8=;
+        b=J10gTOilW/An4+sqZrNMsy8kKVbyq2fPGoNsVxVw6YKweXIlfTdj5J9OSI7SZXj9+t
+         szR7b85uYRYdp9ycS2yFk8zhnmG1HHGTVXUciiKqyCkEIqO3a8bmGQDnbQvW+wSVsaoA
+         /hEmBIVgsqfepbsXw2bDLqBa48kPu1elUmBKN5l8fOeTyOvTgVA5nBUWkXr7m8rJk/r4
+         uxZQIGihJOJH+hJinqemXJ+Is44/Azv9xJQ7siwKej59Ix63BfeuWQwABu3dX/fSqpM/
+         l58xz7mQyXUf3+1/7oOA48eJulaQisRQ7it48RyyX4PIxPKk2wvGjrYad5FEUZxsF1xI
+         J5Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCUj+0jPQvvISwS2drWZVwtdLhvT9Ea/hiv+O2/i2OfhH1ZyRY4DS9jfkAHoLNCV9GUaOo4OQrS5A3Muccm16HrmyFsc9B+1Rp7hSw==
+X-Gm-Message-State: AOJu0YzHtI3PDeA1tfy/TSsuyY2NXP2HuIBqIc7QEAq5N8HgAA9/8uKk
+	e96IFmHC2gEF6rIAUW3XLqH3zScbTs9R6Q2DcBaYP9Dp7yIRYMsiRzuri7diGBI1mSLa3tLBodS
+	bfu20iABouYiCbYPkHeBYacsHoxjYB0N8gBWBuSiujx8MS5eyFUURJg4UGx8=
+X-Received: by 2002:ae9:c207:0:b0:78e:5148:b04f with SMTP id j7-20020ae9c207000000b0078e5148b04fmr10300924qkg.61.1713167273971;
+        Mon, 15 Apr 2024 00:47:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHg5fqW6s8pj1NPtj1wMNWczGTHUNXl8r5Fn3MOkX7UMkVNm2rNWd4KD3xLeAkkFdf0OxsvKw==
+X-Received: by 2002:ae9:c207:0:b0:78e:5148:b04f with SMTP id j7-20020ae9c207000000b0078e5148b04fmr10300911qkg.61.1713167273633;
+        Mon, 15 Apr 2024 00:47:53 -0700 (PDT)
+Received: from [192.168.100.225] ([133.32.172.110])
+        by smtp.gmail.com with ESMTPSA id g24-20020a37e218000000b0078ede0c25b5sm2229775qki.23.2024.04.15.00.47.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Apr 2024 15:43:41 -0700 (PDT)
-Sender: =?UTF-8?Q?P=C3=A1draig_Brady?= <pixelbeat@gmail.com>
-Message-ID: <c71f4bd1-b3b6-7862-d5e3-ee30ae174d45@draigBrady.com>
-Date: Sat, 13 Apr 2024 23:43:40 +0100
+        Mon, 15 Apr 2024 00:47:53 -0700 (PDT)
+Message-ID: <f34949c1-4180-4ede-950d-ddfe2106e640@redhat.com>
+Date: Mon, 15 Apr 2024 16:47:49 +0900
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,103 +65,93 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: bug#70214: 'install' fails to copy regular file to autofs/cifs,
- due to ACL or xattr handling
+From: Takayuki Nagata <tnagata@redhat.com>
+Subject: [PATCH v3] cifs: reinstate original behavior again for
+ forceuid/forcegid
 Content-Language: en-US
-To: Bruno Haible <bruno@clisp.org>, 70214@debbugs.gnu.org
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- Andreas Gruenbacher <andreas.gruenbacher@gmail.com>
-References: <6127852.nNyiNAGI2d@nimes>
- <cdd87faf-a769-35c8-31ce-a1bf016cbe3e@draigBrady.com>
- <7050532.CnaeKSotiK@nimes>
-From: =?UTF-8?Q?P=C3=A1draig_Brady?= <P@draigBrady.com>
-In-Reply-To: <7050532.CnaeKSotiK@nimes>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: sfrench@samba.org
+Cc: pc@cjr.nz, lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ tnagata@redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 13/04/2024 20:29, Bruno Haible wrote:
-> Hi Pádraig,
-> 
-> I wrote:
->>> 5) The same thing with 'cp -a' succeeds:
->>>
->>> $ build-sparc64/src/cp -a /var/tmp/foo3941 $HOME/foo3941; echo $?
->>> 0
->>> $ build-sparc64-no-acl/src/cp -a /var/tmp/foo3941 $HOME/foo3941; echo $?
->>> 0
-> 
-> You wrote:
->> The psuedo code that install(1) uses is:
->>
->> copy_reg()
->>     if (x->set_mode) /* install */
->>       set_acl(dest, x->mode /* 600 */)
->>         ctx->acl = acl_from_mode ( /* 600 */)
->>         acl_set_fd (ctx->acl) /* fails EACCES */
->>         if (! acls_set)
->>            must_chmod = true;
->>         if (must_chmod)
->>           saved_errno = EACCES;
->>           chmod (ctx->mode /* 600 */)
->>           if (save_errno)
->>             return -1;
-> 
-> And, for comparison, what is the pseudo-code that 'cp -a' uses?
-> I would guess that there must be a relevant difference between both.
+forceuid/forcegid should be enabled by default when uid=/gid= options are
+specified, but commit 24e0a1eff9e2 ("cifs: switch to new mount api")
+changed the behavior. Due to the change, a mounted share does not show
+intentional uid/gid for files and directories even though uid=/gid=
+options are specified since forceuid/forcegid are not enabled.
 
-The cp pseudo code is:
+This patch reinstates original behavior that overrides uid/gid with
+specified uid/gid by the options.
 
-copy_reg()
-   if (preserve_xattr)
-     copy_attr()
-       ret = attr_copy_fd()
-       if (ret == -1 && require_preserve_xattr /*false*/)
-         return failure;
-   if (preserve_mode)
-     copy_acl()
-       qcopy_acl()
-         #if USE_XATTR /* true */
-           fchmod() /* chmod before setting ACLs as doing after may reset */
-           return attr_copy_fd() /* successful if no ACLs in source */
-         #endif
+Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Takayuki Nagata <tnagata@redhat.com>
+Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Acked-by: Tom Talpey <tom@talpey.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+V1 -> V2: Revised commit message to clarify "what breaks".
+V2 -> V3: Introduce forceuid_specified and forcegid_specified variables
+          to identify if [no]forceuid/[no]forcegid options are specified,
+          and it is used to allow uid=/gid= options with noforceuid/
+          noforcegid options. In addition, add notify messages that are
+          shown when uid=/gid= options are specified without [no]forceuid/
+          [no]forcegid options.
 
-If however you add ACLs in the source, you induce a similar failure:
+ fs/smb/client/fs_context.c | 12 ++++++++++++
+ fs/smb/client/fs_context.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
-$ setfacl -m u:nobody:r /var/tmp/foo3942
-$ src/cp -a /var/tmp/foo3942 foo3942; echo $?
-src/cp: preserving permissions for ‘foo3942’: Permission denied
-1
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index bdcbe6ff2739..4698667e25a7 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -745,6 +745,16 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+ 	/* set the port that we got earlier */
+ 	cifs_set_port((struct sockaddr *)&ctx->dstaddr, ctx->port);
+ 
++	if (ctx->uid_specified && !ctx->forceuid_specified) {
++		ctx->override_uid = 1;
++		pr_notice("enabling forceuid mount option implicitly because uid= option is specified\n");
++	}
++
++	if (ctx->gid_specified && !ctx->forcegid_specified) {
++		ctx->override_gid = 1;
++		pr_notice("enabling forcegid mount option implicitly because gid= option is specified\n");
++	}
++
+ 	if (ctx->override_uid && !ctx->uid_specified) {
+ 		ctx->override_uid = 0;
+ 		pr_notice("ignoring forceuid mount option specified with no uid= option\n");
+@@ -1014,12 +1024,14 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			ctx->override_uid = 0;
+ 		else
+ 			ctx->override_uid = 1;
++		ctx->forceuid_specified = true;
+ 		break;
+ 	case Opt_forcegid:
+ 		if (result.negated)
+ 			ctx->override_gid = 0;
+ 		else
+ 			ctx->override_gid = 1;
++		ctx->forcegid_specified = true;
+ 		break;
+ 	case Opt_perm:
+ 		if (result.negated)
+diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+index 7863f2248c4d..f559ed252cee 100644
+--- a/fs/smb/client/fs_context.h
++++ b/fs/smb/client/fs_context.h
+@@ -164,6 +164,8 @@ enum cifs_param {
+ };
+ 
+ struct smb3_fs_context {
++	bool forceuid_specified;
++	bool forcegid_specified;
+ 	bool uid_specified;
+ 	bool cruid_specified;
+ 	bool gid_specified;
+-- 
+2.44.0
 
-The corresponding strace is:
-
-fchmod(4, 0100640)                      = 0
-flistxattr(3, NULL, 0)                  = 24
-flistxattr(3, "system.posix_acl_access\0", 24) = 24
-fgetxattr(3, "system.posix_acl_access", NULL, 0) = 44
-fgetxattr(3, "system.posix_acl_access", "\2\0...\4", 44) = 44
-fsetxattr(4, "system.posix_acl_access", "\2\0...\4", 44, 0) = -1 EACCES (Permission denied)
-
-BTW I was wondering about the need for install(1) to set_acl() at all,
-rather than just using chmod.
-The following comment in lib/set-permissions.c may be pertinent:
-
-/* If we can't set an acl which we expect to be able to set, try setting
-    the permissions to ctx->mode. Due to possible inherited permissions,
-    we cannot simply chmod */
-
-BTW this is all under kernel version:
-
-$ uname -r
-6.8.5-gentoo-sparc64
-
-With these cifs options:
-
-$ mount | grep cifs
-//syslog.matoro.tk/guest-pixelbeat on /media/guest-homedirs/pixelbeat type cifs
-(rw,nosuid,relatime,vers=1.0,cache=strict,username=nobody,uid=30017,forceuid,
-gid=30017,forcegid,addr=fd05:0000:0000:0000:0000:0000:0000:0001,
-soft,unix,posixpaths,serverino,mapposix,acl,
-rsize=1048576,wsize=65536,bsize=1048576,retrans=1,echo_interval=60,actimeo=1,closetimeo=1)
-
-cheers,
-Pádraig
