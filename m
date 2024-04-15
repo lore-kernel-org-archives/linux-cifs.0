@@ -1,168 +1,148 @@
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2065.outbound.protection.outlook.com [40.107.21.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6F780BFF;
-	Mon, 15 Apr 2024 14:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713191711; cv=fail; b=HZoeYLzOl2NL1I8lkU9PcEKfhXvQGXqH8mpcKuYsFaW1HNZtQph3F5P5TRAzSPGqjcyudQOMSwN895EBbrSP8T1oilHGDb4ixChQ26+InJwvpFOMYA3cLEJgFD7K6AIxiVxWaNvHetgQqgQOwtO2UFVC20ec93wcAkrd97Ry2fc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713191711; c=relaxed/simple;
-	bh=qYLevbAqQwGB6j3cHbXZp8X5hcl/TrtpvuMaN91B6yE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GAM8it5h6PhA4rmb+ClZEbAb91S/HrOJPGPb6X4akKsADu2wrFCesVICjVmjWms7fcdZBOg9swiRFo6DffnnMWzGFB92nwpI3F8QyPjIHBTcOUvLcRVvmma4d/JdKCL6M6LatXRk+fG6cbUro59a2BIxKoCB0JNnLGAx3ggCq8M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=Jpcw6vCn; arc=fail smtp.client-ip=40.107.21.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1880982897
+	for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 14:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713191860; cv=none; b=B3uQFo7EQ6lyT0zVW2SUtcJFBHbqK1SPgeZaOBE5+D0/1AhFoYJImOVAoaskQZCohRvtjzf8VavP1II+nlHoE6DokDJD+lw2VLFOxcPfdqOqCWWr8mdV5PdTSdc5ZD4i4BWHdT0K1/QnatfXmCdW1xVLfovOSBoEQOKpfkjFedw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713191860; c=relaxed/simple;
+	bh=QpitrI4m4SSpuBQzWmpZincm0RndiUiH+YSB+2tVc84=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rV9HlmciQUgr7I2t4dMLyYfIthuiY/L/R4cnKE+i2EfHiEBRrQX5UUfZd+GJUPK0z7eqyj8A/MVA3ZKjUxIdygUp96sBly2njPqsQ4nCN2W+0h7Cgi1XUA7lAOIFNnQqdJfsEcGXXMzlbnTDt96t2D3jQpu7WX4zo5rAd3KF33w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UoaXBles; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="Jpcw6vCn"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UIBTMxZY58F85Uj30DOiwNh2ZdSGeAKw2zm+5tqKUFFGef40D57uAw3GvtLLwYMX/jg961gDK2RsiMms9HuLNQYoDBkFfhckBdK5S8r5XPOy1FBTAie0QiWG3q+O1omn23DUelaL+nnr73QPaIQ4Cgq9l3xRdiIflDyHNTha3WnE62VX9Y+7eRyyrLRkbq7k2G9FSts70+ibP1lsx865YMqJ2nQlIfkIyb9yFll6E3006B1WZ9CY3z7epuZei1OqEchNLX6XPGvadRykbUBsDQqtOsrNsbwKsGxPpFWrusuBEt5Vd/zP0IL6tbfQ8DuYRSvKHoLKMHcCC1SnbuI/Iw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TU9NmbgS81J6rJKGkiusKy/LJsmgDp6Sjqex00ATqjw=;
- b=j6GN3hprOwhKIQAeSooz2/Rz10dDunJZOVPGsjGzB2qtIJZ9GAhU9Nnzy2LVFaiNErmLxiPuwsVd82ctOuxGxbdn9AiHCYkl/3cM2VgZ+AHJu8mXVdJG/5LtKZaVQEZgBBPctJ4FVViNE6TH/fucROe4e6IpHom1EBDiL7qDcESDV4+6vpw26P4BlToctyThAFlHSk2mBTli5WCwtcdvEb3MkQPux+O2AWbLd//hr98KaAHX5zVdo7IBqLKTKSBG1360D9h4Nto/OLq8ClEAQDkEO7DCHWcRh3p2PvFjGJUqcDzJwurREvTjkW8oWcyC+nlt+gbwUxEu4MBfMxtSSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=axis.com; dmarc=pass action=none header.from=axis.com;
- dkim=pass header.d=axis.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TU9NmbgS81J6rJKGkiusKy/LJsmgDp6Sjqex00ATqjw=;
- b=Jpcw6vCnE/lH0G3yCjnLoq9CSj28OjrqecQUrjL2CmwIOrvqcZXIg1zMZSOxRWoFpgr2KgiEtFKa2CggfCK9LVYgQzWRGhzW/u4JX8a7m+LT15CrPDnl/CWCHkY72LC+J3pAt9NyqmX+krF/NW9Q70435TJQRi5vaqxoSvPozeU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=axis.com;
-Received: from AS8PR02MB9505.eurprd02.prod.outlook.com (2603:10a6:20b:5a4::17)
- by AS8PR02MB9210.eurprd02.prod.outlook.com (2603:10a6:20b:5b0::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Mon, 15 Apr
- 2024 14:35:03 +0000
-Received: from AS8PR02MB9505.eurprd02.prod.outlook.com
- ([fe80::e3f0:db9c:c11:90ff]) by AS8PR02MB9505.eurprd02.prod.outlook.com
- ([fe80::e3f0:db9c:c11:90ff%6]) with mapi id 15.20.7452.049; Mon, 15 Apr 2024
- 14:35:03 +0000
-Message-ID: <258e2dba-da30-795f-6408-85c06e137b61@axis.com>
-Date: Mon, 15 Apr 2024 16:35:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2 1/1] smb: client: Fix hang in smb2_reconnect
-Content-Language: en-US
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, linux-kernel@vger.kernel.org,
- rickard314.andersson@gmail.com, kernel@axis.com
-References: <20240409112758.467112-1-rickaran@axis.com>
- <20240409112758.467112-2-rickaran@axis.com>
- <CAH2r5msm+xFyMPCJV7Luf6aQ04cHOhevmjJi8J-2Bf711T1ziQ@mail.gmail.com>
-From: Rickard x Andersson <rickaran@axis.com>
-In-Reply-To: <CAH2r5msm+xFyMPCJV7Luf6aQ04cHOhevmjJi8J-2Bf711T1ziQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MM0P280CA0102.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:190:9::23) To AS8PR02MB9505.eurprd02.prod.outlook.com
- (2603:10a6:20b:5a4::17)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoaXBles"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-516d2600569so4064600e87.0
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Apr 2024 07:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713191857; x=1713796657; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/wbs9qVkkGGMY81GIgZjIRjXaABmFteXtLrGaTrRO98=;
+        b=UoaXBlesLBrkZfbU7vPVYT5ZNRQOXF3/Iqdf2TO4jM3PpomER7EfxThvCN0UrDkcCl
+         34bytw/ZcPyhBD7WCpbOXSVRtPk+1OYBKXHpFiM7haBHcWR6UUM6egvS5lzog3SIQSAq
+         b5X30DiJw4/l5bEKPvgBS9arhVDMHjXzdfGz+grwZu+2h2FJvx1q8At5GUoN6SHXXr3r
+         RkRtH0vzio9JtCoZbv8Y04v3GrgdrdWbdwGmIOKu0dZ1RCUmc6lZjysZ4LHHRmWwXk1N
+         EpmSdnPQHmXkgdo4W/Pd4TLzG8seZyoqLej4hRe/1c/hzpEYUnHNDbSBQl3GYph84zXM
+         z0/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713191857; x=1713796657;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/wbs9qVkkGGMY81GIgZjIRjXaABmFteXtLrGaTrRO98=;
+        b=M/JxNdWPC+VFVr5ynbxTGDtxxTOANYNw+5ymabSfoR/gnU+d0feM1XPHgFBfzodwAa
+         uRmTG8zFCYZu9L38elmKxolFQuErOpqLpJVnFLsuZlHtSh/AKIpoMZyVjEFNx8eHF2Xy
+         zt0y40yscRdrUbVWvmhVjCwkgVVBy0LakPkIPJz0Refil3lNbNDoO/QWAB9+xJm8r/5z
+         tx7rn2cMSe6/GSHFLH43bj5fXlhJcYm+ZLMR0LMATGqBkjzQicqHwzHQbS7iUxclD9xi
+         Doujflfp8FDKz5jNADddxo9Ux/cDzZtFVupdUhuA6PCNnwMgD0kU16OIHJEbAu5hsQd/
+         BU9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXfOBtcG4paY7oc0w3/dfPRo5lldgHotlhxQF0N7R+oMBfBxrd5cl07Rz5vkgQLAQEw48D0LsGtv/4VpzDsBr4Lt+U3R4/qWdGkrA==
+X-Gm-Message-State: AOJu0Yw9vSPGReJdJhqVA8wd31TE6WqfaUmKuYueoAwclmQfF3YMAixn
+	NnX++LYB0hfZax12MVfQxgLMAH4O6TEyKXON8dWUupeuv68AofbHUr2ztwVbonf8KW24smOvEdC
+	8UdyX9Q7wwkcSQTS7roHIyliqBojh6Uu9
+X-Google-Smtp-Source: AGHT+IHaRGFSrfBAsW0xcksvOEOo/ImscHiqewHwM8xN7Bl2iO+IzkXGmSTAXmHI2n0UOqPy9PLkFdzsw4L3kpoUEzw=
+X-Received: by 2002:a05:6512:2fc:b0:517:8e01:2668 with SMTP id
+ m28-20020a05651202fc00b005178e012668mr6824654lfq.67.1713191856994; Mon, 15
+ Apr 2024 07:37:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR02MB9505:EE_|AS8PR02MB9210:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74f03977-dd08-4fd6-40ad-08dc5d593cf0
-X-LD-Processed: 78703d3c-b907-432f-b066-88f7af9ca3af,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	duhy3qs2HuVTfg4ITYDl0RkOOAaryDYqaKem6lTNOIBEzz7PtGzsu4Ll0wF9+JnLkuYtg2bSn/ecVTm6vAwpzzxQbdKzSXfI+0SdBDiXmkO/bhu44OtdPpp9lrdqG40a4QinXf+IX50dCUI+vyheIIO18wjPA023vcv2mWKvnkj25fHpG8TI3wGIa92GUsKUaLgzx8Q08MjuMx6mK40pJx3PEkolsr/QCOO0bREhVRbfSRbD6i9+r+E59NpVDNWJGappCqb8ir5vboyCla/GcgT5NNBWswfCRSAXndXFD/We7z9IgZ7nEBsPdu0MUxMbmZ0HVjx0TA8V/J9fppjMONZJOdgWmnnoD2Z50vWFXlgq8ghoGKXZz1zpQd2LvJVr7NKGAUU/KBNlNRLsKuI+Zpi04A0VmzoPCXkC5/X+YTq05AU4MfATHA5y7hbZp49H1Gkhm6rkCuzshsCJCgJPGxLWVqRHDnKsygs5t5ara0Qv3bu3vm5CJ2rYLWioCrhW4v4DBne0sh5LoDDvK0Cngu9fMn1wF6iECbFiepF1rIRYtTV3TbJr1dMpXyoqk8UxMW55cZEdt3r8YNSrLTHnUbZ5nzdeXsohyGfn0JosEl8OkB0ih8wZWb2QrGUtLtGBVPMV9VV9sH7z9bj6qU/X3EdgQEgc6obRyvgPnKBgtYs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR02MB9505.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Z0pvcG5ZeUhHZXJCZkRzNVk2RUluZWdpdkJ4ak9pUFpQSVo3NzJxZFUzY25s?=
- =?utf-8?B?RE1wSTY4WmpjazFuRzRYNlRUTjlkRTh1dTZReTBySW1rZWFqSGdpT0ltaWVp?=
- =?utf-8?B?VlVQOEdwMXQzUTlIWWk0LzhlclFGZllVeE8zOUlYRmorZHA3bTRodm80TUF1?=
- =?utf-8?B?UnhGZmhxaVJwd3pRTjhyQW9lN0twUVREUFllNEpGSGR2eGswcW5ZOGRiUWNz?=
- =?utf-8?B?c1V1UW5nVWdiNUJpVGdQZm9pSW9OVSt3Z2dsb1F0VTN1QWtQVFlMTzh4dDdV?=
- =?utf-8?B?cm9FNG8yVHlWaTFoZmtNQ0V6VGNicEw0Q2plSGhhOUxXVUhhRlhMYVRxS0Ry?=
- =?utf-8?B?QnkzN21pUTlUM1YwOEpRV0M5OW1rb2tXY2NVQU9vNm42ZUxOVDlLdEw5N1BF?=
- =?utf-8?B?RUp0d0RQVGtmTE9LdXRMNVNEWVc2clFwRzlOREpoRmhHa3RqVWFkSDNHSTlj?=
- =?utf-8?B?a0VWRStNZ0p5dWhVYkxZY3Mvbm9hcWc2Z2tXci90SlJWWFZuMHZLbXNUc2N6?=
- =?utf-8?B?QmFNOUVCRFdQWjdqZUQwU2ZPalBIN0dUOVVSVktYUEFYR2dLalJ0Mmt3MFY3?=
- =?utf-8?B?b3RENWEyd2lhSXFVZG5udTNhamdzMEJVQXFuUTBIcTBlVTlFTTBBQzJtZkpz?=
- =?utf-8?B?WXR5MDVxUkF3c3RhUS9TWTNBaWNSRWp6KzlUVEtnNDJ6NUJ6czl5d2RvcDZD?=
- =?utf-8?B?TUZWdzN1SFFwNnk1VnpDY1VrUFFidWNTN1NlL3hvdHBOb2lLTEVvMkVneURY?=
- =?utf-8?B?RWZxMmdIa1dDTklqdlhjTHRsZ1MxRkgxL0JzTEhwZU9zVjduYlluQlBSNHQ4?=
- =?utf-8?B?S2FteVJxZkFyUlZzRUJiMUsrdE5qSXhqRXV5NnVFNVlJTXEvZmEyeTZnZG14?=
- =?utf-8?B?eG9qL1RYdWJuaVRnWHNuWFFIVWkyVm5FUU11YmllZ2tHbnNab1k1cEZCakJI?=
- =?utf-8?B?V0g5L3l0OCt3NXo1c01lSWQrcjhSbWJpYTU0bGxuMG81ZlVWaXBmWURDcWNH?=
- =?utf-8?B?L0VPMzFreE8rckhVUGF2MGtWMG15WW1FWGVsRVA4Q21aUnBzSzJpelhVRXUz?=
- =?utf-8?B?Z1htZW15Z3BIS2VjWXFuYjYwUlZHYUJuaElZcDRseWc5d1IyZm9xQkR3UEx4?=
- =?utf-8?B?WEF3ZWNYOUNwYUdoODVHdHhXR281QWg3eHprcGFRcEZHSWYwOWY4SGpIci85?=
- =?utf-8?B?ai9waU5yS1oyWWZvZ2s1VVNPa3hnZWwyc3pxb2p3aDM5N24wbno3VisyVGdp?=
- =?utf-8?B?R3pFNjdkYS9hMThWQjEzQ1FMOWhsVjhzS3lkNW8yTzNIUlJoYzNjUkQ5MjVU?=
- =?utf-8?B?SythcFQ0ajJkVWNZUGlzVHR5dlN6bUNqRTZQMUcrdFE1UkxxcWkyZGVLMHRR?=
- =?utf-8?B?a3JNNmhaVEk5aEV6Zm5yOXd5WkEvUkJSVGgwaWVWRjRUTmVhMzRsc3RXWVZ2?=
- =?utf-8?B?ZGdQRUd4RkowRk1XclFBcnp4ZHVDWkl6UTBUcXBMZVhYaGtzaVFuMlNURTM4?=
- =?utf-8?B?a2pqeFpZTDZldGVCUmNJajQ1a3Jyd05Gam5odlF2ZjJYRCttTmJ2SEJKOVFp?=
- =?utf-8?B?WWdjU1ZyTHI3UkxHbnpXVDA0MGVwaGFCK3NlRDZzbm1ZQ29oaGxjWENpaTRC?=
- =?utf-8?B?bDlURXpvZ1hEZHl6bUxpUUc2aDZ3cGJIM1lNUWl2dHNyY1hLK09wSysvLzJv?=
- =?utf-8?B?dUVUaFBGcit6Z0pqeWVhdVpPYTIxcTAyTU5RWWg0eldWNXRUcXlsOW5ydXMw?=
- =?utf-8?B?b0dUMFdldWhyZkRheFlnbXM3cm4ydGlvMmYvT3JlY2xLM3F0WTl5QnA0Mlor?=
- =?utf-8?B?UW1wU1BaSVo5eUlHSzNRcUpvSkE2T1FlNDVpMllaaVRkUUVrQVo4SEN1NGc2?=
- =?utf-8?B?QUhTS2JkZ2duYndyNjFJM0ZoQ3hvbzczaGpGY1JPZWpKbGN3anFiYXAyMlBn?=
- =?utf-8?B?NkFFR2JZa3dtN3lFNmg3dkE2bjM3dElGOU5qc2QzTzR3MzBuQWg2bld4bGlo?=
- =?utf-8?B?cUp1VWhSQ2p0dHFpSGZyeHdBaGhCS3ExMXN2bEh5NlptOGNQRGpEMmNvbGIz?=
- =?utf-8?B?cEk3Wmc4dEtBWXM5SjBWTGpVNDV1ejZkQWpuMGpuQWNTYVhDVHFESzU2WDNk?=
- =?utf-8?Q?pYUxG7slenJS+zjeSLfSX+K6a?=
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74f03977-dd08-4fd6-40ad-08dc5d593cf0
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB9505.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2024 14:35:03.6912
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: usXjwbChVDLb4sf1vEAYyOZbsfHgr7Fb+Hu9CNTYACo6bMqwMFQpkClR6OZnVGveiHWSI2NUJ6F/ZECZ9Zr/cg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR02MB9210
+References: <6127852.nNyiNAGI2d@nimes> <cdd87faf-a769-35c8-31ce-a1bf016cbe3e@draigBrady.com>
+ <7050532.CnaeKSotiK@nimes> <c71f4bd1-b3b6-7862-d5e3-ee30ae174d45@draigBrady.com>
+In-Reply-To: <c71f4bd1-b3b6-7862-d5e3-ee30ae174d45@draigBrady.com>
+From: =?UTF-8?Q?Andreas_Gr=C3=BCnbacher?= <andreas.gruenbacher@gmail.com>
+Date: Mon, 15 Apr 2024 16:37:25 +0200
+Message-ID: <CAHpGcMJL6rngGunfAfCet9S4eqQ8TE6xgHPwhWx9KA=Ef0aW2w@mail.gmail.com>
+Subject: Re: bug#70214: 'install' fails to copy regular file to autofs/cifs,
+ due to ACL or xattr handling
+To: =?UTF-8?Q?P=C3=A1draig_Brady?= <P@draigbrady.com>
+Cc: Bruno Haible <bruno@clisp.org>, 70214@debbugs.gnu.org, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/13/24 11:02, Steve French wrote:
-> Shyam and I tried some experiments and there are two cases where the
-> patch breaks:
-> 1) ChangeNotify will time out
-> 2) Certainly byte range lock calls (they can be allowed to block) will timeout
-> 
-> An obvious alternative would be to not make this change for the
-> commands like ChangeNotify and blocking locks but allow it for the
-> others.
-> 
+Hello,
 
-Would it make sense to make the patch less intrusive by doing something 
-like the following?:
+Am So., 14. Apr. 2024 um 00:43 Uhr schrieb P=C3=A1draig Brady <P@draigbrady=
+.com>:
+> On 13/04/2024 20:29, Bruno Haible wrote:
+> > Hi P=C3=A1draig,
+> >
+> > I wrote:
+> >>> 5) The same thing with 'cp -a' succeeds:
+> >>>
+> >>> $ build-sparc64/src/cp -a /var/tmp/foo3941 $HOME/foo3941; echo $?
+> >>> 0
+> >>> $ build-sparc64-no-acl/src/cp -a /var/tmp/foo3941 $HOME/foo3941; echo=
+ $?
+> >>> 0
+> >
+> > You wrote:
+> >> The psuedo code that install(1) uses is:
+> >>
+> >> copy_reg()
+> >>     if (x->set_mode) /* install */
+> >>       set_acl(dest, x->mode /* 600 */)
+> >>         ctx->acl =3D acl_from_mode ( /* 600 */)
+> >>         acl_set_fd (ctx->acl) /* fails EACCES */
+> >>         if (! acls_set)
+> >>            must_chmod =3D true;
+> >>         if (must_chmod)
+> >>           saved_errno =3D EACCES;
+> >>           chmod (ctx->mode /* 600 */)
+> >>           if (save_errno)
+> >>             return -1;
+> >
+> > And, for comparison, what is the pseudo-code that 'cp -a' uses?
+> > I would guess that there must be a relevant difference between both.
+>
+> The cp pseudo code is:
+>
+> copy_reg()
+>    if (preserve_xattr)
+>      copy_attr()
+>        ret =3D attr_copy_fd()
+>        if (ret =3D=3D -1 && require_preserve_xattr /*false*/)
+>          return failure;
+>    if (preserve_mode)
+>      copy_acl()
+>        qcopy_acl()
+>          #if USE_XATTR /* true */
+>            fchmod() /* chmod before setting ACLs as doing after may reset=
+ */
+>            return attr_copy_fd() /* successful if no ACLs in source */
+>          #endif
+>
+> If however you add ACLs in the source, you induce a similar failure:
+>
+> $ setfacl -m u:nobody:r /var/tmp/foo3942
+> $ src/cp -a /var/tmp/foo3942 foo3942; echo $?
+> src/cp: preserving permissions for =E2=80=98foo3942=E2=80=99: Permission =
+denied
+> 1
+>
+> The corresponding strace is:
+>
+> fchmod(4, 0100640)                      =3D 0
+> flistxattr(3, NULL, 0)                  =3D 24
+> flistxattr(3, "system.posix_acl_access\0", 24) =3D 24
+> fgetxattr(3, "system.posix_acl_access", NULL, 0) =3D 44
+> fgetxattr(3, "system.posix_acl_access", "\2\0...\4", 44) =3D 44
+> fsetxattr(4, "system.posix_acl_access", "\2\0...\4", 44, 0) =3D -1 EACCES=
+ (Permission denied)
 
-@@ -1209,7 +1216,12 @@ compound_send_recv(const unsigned int xid, struct 
-cifs_ses *ses,
-         spin_unlock(&ses->ses_lock);
+Why does CIFS think EACCES is an appropriate error to return here? The
+fchmod() succeeds, so changing the file permissions via fsetxattr()
+should really succeed as well.
 
-         for (i = 0; i < num_rqst; i++) {
--               rc = wait_for_response(server, midQ[i]);
-+               if (flags == CIFS_NEG_OP) {
-
-+                       rc = wait_for_response(server, midQ[i], 50*1000);
-+               }
-+               else
-+                       rc = wait_for_response(server, midQ[i], -1);
-                 if (rc != 0)
-                         break;
-
-
-
-So, we are just waiting with timeout in the case it is a "CIFS_NEG_OP".
-
-Note that I am not familiar at all with this code base.
-
-Best regards,
-Rickard
+Thanks,
+Andreas
