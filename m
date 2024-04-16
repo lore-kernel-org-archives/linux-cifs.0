@@ -1,56 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A42437719
-	for <linux-cifs@vger.kernel.org>; Tue, 16 Apr 2024 16:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3CA3B185
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Apr 2024 22:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713286734; cv=none; b=nssBWhPrph2jYwpMy474mv9WRhK5icBVJAflykZPIjv6U6MU4HSjmpWyfTJbPdHLjrnczJdr8y6e3ds945rpu/zJRpm/ko/Os7htrA7fBGQzclkVnyClqRuoCgmEo6rccdm0Y9AtYiGGWd0y/QEbG6VckGx5LvAHpwby+1IKsv8=
+	t=1713307255; cv=none; b=FQ3KqHFFIbKs9g8+57DJtbEtHulRq3Tc6HOjBisBtQD4NCqzmocadFjkiBNMf4gXJYmud4GZTLCp+QQy9oWipoLHI2nssocMELoMWN31SrmOCokfzlSvKIwJp/sXCuG5EqIsmuaObiWp2szs+AL4sykOBZP2QY5lXARBa9Agd/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713286734; c=relaxed/simple;
-	bh=opPCA+XHxeV0l/Z0FrPaAC14zh+S8xVA6FNWxr5aA8w=;
+	s=arc-20240116; t=1713307255; c=relaxed/simple;
+	bh=N5nwDmbhe++pDB3bapq0vGCRdzBr3y4GS9c/nfTtZFY=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=DzFhcKcFh9av3hklgIWk2wE7p44KqjTP9RHGqvwzP64RbAa07nD5QYXyOWvuvp+egdOEr58bCppYkM6AWdi6l+UaV+VP0dWT47LkPPRPSzEfNFiHoRSt5a2YSXdhCVBFTCC8C6+BLFfyCeqbV4z/q2v/PLghws8NZXUQ/Iz8jk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIXy075l; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Date:Message-ID; b=s5EyytHEGhi9qkFbnXIQvkpGa5mVTFo7DFex/eekbFHwXNadHjBDCzeZos85Xn0SotoVIr9fzN+EuYYzVgkFe9tm9MYnNMi4sAJV15vaTFXiGjzIZdfRxX1AnFRau7V/umPT6f1iHhN8ALMFehk5leyrVxYA8lideb03l+/y8JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hmM74P3Y; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIXy075l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmM74P3Y"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713286732;
+	s=mimecast20190719; t=1713307252;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ACuK1BwAPedfa6Ho4auLQQiF3JZp7pyLXmhg4dg7VCQ=;
-	b=PIXy075lXq05oo2BlaaFbFgHxXQ04dZ4B8FqCP91kT3NRVMkUl3eZZ8uFQx0wvsVKdq48S
-	gfXnJxQInGopSwLGtukIdQ/EeawsVo7bM3BctXoIwy69KUZsWdXgoXXq0NKhcX2kPzR3tz
-	4qpb4o0itwCCuGgLZwopiFBntBcXzy4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-B2DbH90MP86kOa52DZy_Jg-1; Tue, 16 Apr 2024 12:58:49 -0400
-X-MC-Unique: B2DbH90MP86kOa52DZy_Jg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	bh=N5nwDmbhe++pDB3bapq0vGCRdzBr3y4GS9c/nfTtZFY=;
+	b=hmM74P3Y/OovFx7/GjqIahJ/jdeMdiRD6KUPxU8peL2pEkkX/CFmVVXyoOMD581p0N8LwY
+	SzOyBrShGG811S94XPt+R7TJ3sjBZuEQz5Fn5e8n0Ii7U16311YX2NWSrGlML3v6R76XsZ
+	9kfWxxMt34LwBWWoNgN1IGFuZCQB8Xw=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-282-Ck5vkIIGNTuza5woUV3wRQ-1; Tue,
+ 16 Apr 2024 18:40:49 -0400
+X-MC-Unique: Ck5vkIIGNTuza5woUV3wRQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F11180591B;
-	Tue, 16 Apr 2024 16:58:48 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F39E21C05149;
+	Tue, 16 Apr 2024 22:40:47 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 796A12124E4D;
-	Tue, 16 Apr 2024 16:58:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6583339DCA;
+	Tue, 16 Apr 2024 22:40:44 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <14e66691a65e3d05d3d8d50e74dfb366@manguebit.com>
-References: <14e66691a65e3d05d3d8d50e74dfb366@manguebit.com> <3756406.1712244064@warthog.procyon.org.uk>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix reacquisition of volume cookie on still-live connection
+In-Reply-To: <CAH2r5msFoGAE79pS5bEt5T8a60LU82mdjNdpfe0bG4YpvY8t-g@mail.gmail.com>
+References: <CAH2r5msFoGAE79pS5bEt5T8a60LU82mdjNdpfe0bG4YpvY8t-g@mail.gmail.com> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-2-dhowells@redhat.com> <39de1e2ac2ae6a535e23faccd304d7c5459054a2.camel@kernel.org> <2345944.1713186234@warthog.procyon.org.uk>
+To: Steve French <smfrench@gmail.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <christian@brauner.io>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+    Shyam Prasad N <nspmangalore@gmail.com>,
+    Rohith Surabattula <rohiths.msft@gmail.com>
+Subject: Re: [PATCH 01/26] cifs: Fix duplicate fscache cookie warnings
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,49 +73,17 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2713339.1713286722.1@warthog.procyon.org.uk>
-Date: Tue, 16 Apr 2024 17:58:42 +0100
-Message-ID: <2713340.1713286722@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-ID: <2754965.1713307239.1@warthog.procyon.org.uk>
+Date: Tue, 16 Apr 2024 23:40:39 +0100
+Message-ID: <2754966.1713307239@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-Paulo Alcantara <pc@manguebit.com> wrote:
+Steve French <smfrench@gmail.com> wrote:
 
-> Can't we just move the cookie acquisition to cifs_get_tcon() before it
-> gets added to list @ses->tcon_list.  This way we'll guarantee that the
-> cookie is set only once for the new tcon.
+> Should this be merged independently (and sooner? in rc5?)
 
-cifs_get_tcon() is used from more than one place and I'm not sure the second
-place (__cifs_construct_tcon()) actually wants a cookie.  I'm not sure what
-that path is for.  Could all the (re)setting up being done in
-cifs_mount_get_tcon() be pushed back into cifs_get_tcon()?
-
-> Besides, do we want to share a tcon with two different superblocks that
-> have 'fsc' and 'nofsc', respectively?  If not, it would be better to fix
-> match_tcon() as well to handle such case.
-
-Maybe?  What does a tcon *actually* represent?  I note that in
-cifs_match_super(), it's not the only criterion matched upon - so you can, at
-least in apparent theory, get different superblocks for the same tcon anyway.
-
-This suggests that the tcon might not be the best place for the fscache volume
-cookie as you can have multiple inodes wishing to use the same file cookie if
-there are multiple mounts mounting the same tcon but, say, with different
-mount parameters.
-
-I'm not sure what the right way around this is.  The root of the problem is
-coherency management.  If we make a change to an inode on one mounted
-superblock and this bounces a change notification over to the server that then
-pokes an inode in another mounted superblock on the same machine and causes it
-to be invalidated, you lose your local cache if both inodes refer to the same
-fscache cookie.
-
-Remember: fscache does not do this for you!  It's just a facility by which
-which data can be stored and retrieved.  The netfs is responsible for telling
-it when to invalidate and handling coherency.
-
-That said, it might be possible to time-share a cookie on cifs with leases,
-but the local superblocks would have to know about each other - in which case,
-why are they separate superblocks?
+It's already upstream through the cifs tree and I've dropped it from my
+branch.
 
 David
 
