@@ -1,115 +1,131 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43A213CAB6;
-	Wed, 17 Apr 2024 21:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713389127; cv=pass; b=bCssi+QCtDIjhYuZXR0WmBTVdhOzKPUKLn14pi2UQXtx0d0dlWA+lFrCxAFNEOU/Ib82QdePjdQpfKtOHo/hjFK8FOWmAJJvYLaJHTyYgdyQUAQbGon+oW7m5rJNKxcWPRnRqh8f1M+VVQ54tS01WkxGk4wxDZhRJKhegqBNdJI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713389127; c=relaxed/simple;
-	bh=tC+7yTElOo8NizUeWmwPJc5RgZN4HysQOzBaQtEI1HI=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=YdmjAgdtV4mXujOanFCS8arir7YzL5LVF+oWWN7lOlrOBJkKqmR+uK2c8ol5fI6volC4JwnPWhuMf2kVUC8QtlzRocVtgEo5DAvETcgcIcs6cqf/bBj02DmDmnWCSj/yr3wNr/jafUOoMVDm4mNAMkZXQbc+/F9Q3/9QjyfdS4o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=LtEdEUCl; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF9F657C5;
+	Wed, 17 Apr 2024 21:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713390265; cv=none; b=HpRvlLTIDPaYlE6DvY+Yq6azFyTdaGiIQmrDVcCrmxKQtBS+L+c1Sbx7WmOW2He6OWEWLQ54HfX8wVY2QTacJJAepYaSkTxLxWphF2kTejPWnVfi0AIGLQgbvc8+g0Y+bQgrJyhrl2eXZS1T0raMKlo7z3wwdRidX85hFY5rvW0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713390265; c=relaxed/simple;
+	bh=CKUQsG0mmfIa/QAx1wtwzpQgzNw8NsmVWIrXBKfxecw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AkUPzwaPOR/CaLAIedUFRBuJhjgWiFkj8tK9KoiJjDzIVmJ5D186HaTiQ4IcR02uSFi/DonJLex01hW/kd9c0+VessLHm3PqMirDbxo6B4yLEwt96IqHPWnf0WlNResNuCtMf4MaXdf4zMtiVMzpIy7b61bkuNMb1KTIy00j3O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJGu1HGa; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="LtEdEUCl"
-Message-ID: <59c322dc49c3cc76a4b6a2de35106c61@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1713389123;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jm5lOUCFdHBxZja8AoWQ7jaoK0LEOZ3w0EQ3U0PSlcc=;
-	b=LtEdEUCllSCxadjHzH7qzgI5I1vp7qF+T/pkKGDfZrgaliLaGQ9Kgu70jhRjFZ0jze2QHk
-	Xpmibcjg6fzE70Oo4lYNy1pWeGsE07zDCQ18QDSfWYnIe3ZnStou+X40zhppSX/+cPU51m
-	QGxG2hDmY6MDNVeZxLXFZRBkkIAL1Y+8ZlgTci9jf3ruWLk527QldlpXh5wagP+0K3kiOs
-	Rx9sLSky7VI6YndGtSWoVj/5eLWmI8wzTB5AR5vj3+2Yb0pUpTdbiwT8LUoMKYqkitNOgA
-	raIgPufImkAJF6s4J01znWEtt1POdLIeReRen2BCc1dkxtOveYEFo2swVVW+Zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1713389123; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jm5lOUCFdHBxZja8AoWQ7jaoK0LEOZ3w0EQ3U0PSlcc=;
-	b=bATw+SRqOIkakFXBx/zNj9qOd5J6FaCapDT1Vm/lCVzweKDqWSXfJjc9HRK4pbYWJwrHTS
-	cUHXSjW7XJgPVQgsa78f+MBclCbxmIK5LM6YTVOugaV5Ajdj49PeoRDVDp65N3OmmnLzxM
-	qoWg3gqyyCkZh0XynqtEr84bVBJRj+lfCZVWlIxB5D7guVrcPLjs3p3/vLHlGOJ9YRsGAV
-	X2woe3vH+FmTWT0iXsCPTgPsYmJqyTubI+AFI3iDIH1L1Wg3NXFZHnPdrzcBtPecDF2iGo
-	63N9ffQ82I6j6q0sa4N687iuFXy4QTxFrCqSs1l7ZFICqc5KBL8mDAo4yYOWRA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1713389123; a=rsa-sha256;
-	cv=none;
-	b=jkrBs+1mkPf02RAwTVbNkRU4xl8I6Z7pATP1FjOEITqOTLDyDhHQYKbA5PaZuz7p8NFliy
-	sVUjYZGvigdqUn/JdrNQNHQMA9L+cBkFF3RUpAq/ID1f8E2aLuER5Cj7J8DpsRSYc/6PIL
-	KjV3XQFkuAJ8Po4aSQyiltDVAtlQLaDF1DzwNHG/zS3BLamix96SoX0iZLFzzJbG+JjNa3
-	KMt1OqgqnLrgY8Ld4GH+AqeEPDOmSGniFEWqzfKKIjlCCqPnrWovyjTNJ2z2sslHx/fmEF
-	jbxETy8k+A4lJPgXHGdO7fD/tlKk2U20hKaN0ePrqHhKC3TSc2mbRJ49GBuUuw==
-From: Paulo Alcantara <pc@manguebit.com>
-To: David Howells <dhowells@redhat.com>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>, Shyam Prasad N
- <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix reacquisition of volume cookie on still-live
- connection
-In-Reply-To: <277920.1713364693@warthog.procyon.org.uk>
-References: <1a94a15e6863d3844f0bcb58b7b1e17a@manguebit.com>
- <14e66691a65e3d05d3d8d50e74dfb366@manguebit.com>
- <3756406.1712244064@warthog.procyon.org.uk>
- <2713340.1713286722@warthog.procyon.org.uk>
- <277920.1713364693@warthog.procyon.org.uk>
-Date: Wed, 17 Apr 2024 18:25:19 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJGu1HGa"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a5565291ee7so9573466b.2;
+        Wed, 17 Apr 2024 14:44:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713390262; x=1713995062; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=R/cPwbUkdSnGIuJG3R0hCFpAuz58iZdf0S7zyLL6x1I=;
+        b=iJGu1HGav9qmaXrEAcVAl/hgUJ8Crkm5MOaRky51TrrI2hoDrTFOYJiwapgkKcs9KK
+         AfKB6CJUtV6E4HWsQToJ8OhcEfmLomOUa/KVnxG+Vk2O9bZ79NUowTv2uMDkask6fLyr
+         ZyKghey+JnHjrK6IIQgSvZpGXHugUH3Rel8C0wuToHshGiVQc8wWDMmZszNM/BxOf+dW
+         ihk/kAdQ22TRWVnHHJB401cMhcp1PGmESEfrxOPrfER66oZuRGHDvg1MzC+1v4INuKwA
+         FV3SF/A1XOxlS7f+6EQMTs4qu3VzGMKeP3/oT998pfvbLgPEHyI+ggb+oVWWPkIjVTYT
+         quSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713390262; x=1713995062;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R/cPwbUkdSnGIuJG3R0hCFpAuz58iZdf0S7zyLL6x1I=;
+        b=r71yLT0hANgqgYoHPrCi9lTzGQGDYliKzLnWhujTrCiqID9dXdV1idwSFnlEDJEfzK
+         QS0HlKix0vyshHrY4EOcWxazcfceq8Vq31y/Bsy0dO/19W7ohY1BoLTGejbf/r1EfTrf
+         bnT2aq7BTMFxXm6qcdoIOLRj0CwEYjNcf+dd6TX2ZvXFwPPl/ut/fVMTPTAFgts3Tecb
+         bIZMqjmubAhB51ale43CPUceR9w0XigrGxhALlTwY/cQsqBMo1c1w/9gDYIREIOsX45j
+         offS4ybu5GsvpGH24SC9D/kGfgrzEZK3luKGKpqsQoDEYOnT2ZBJ2/4bnPR2LOwUmaB+
+         n+Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCV52/sTR2UbKw5sz+Wmn19cgyTggfeVFFlu7ic2o+bdklXgvHsiId0RgjoGU/YlLrs2IVUfGZHdWGnCEr8LrrdkS3NZmbqwnu+MFQnQfclGtyP8dCo18eg3vC8lCjFtbVGcFA==
+X-Gm-Message-State: AOJu0YxJZTrGGbLq5c8kWwBAeSDGU4LD4I8+Qq6tHmvxlXBkbbIqJ7uN
+	yxoUzvodAdMElZkob1oKjy1QEmlmqWZMfcqiwp6tzAXrMCsXkENx
+X-Google-Smtp-Source: AGHT+IGhziwNWrUflqmylzgphhuQqIOdmIo9FOUOgVFe3BA/1KzCoiE0xie2CFOhoM7YIWuhY0ETsA==
+X-Received: by 2002:a17:906:6d99:b0:a52:5d42:a542 with SMTP id h25-20020a1709066d9900b00a525d42a542mr416739ejt.63.1713390261177;
+        Wed, 17 Apr 2024 14:44:21 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
+        by smtp.gmail.com with ESMTPSA id p7-20020a17090635c700b00a51e6222200sm66605ejb.156.2024.04.17.14.44.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 14:44:19 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 90DEEBE2EE8; Wed, 17 Apr 2024 23:44:18 +0200 (CEST)
+Date: Wed, 17 Apr 2024 23:44:18 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: regressions@lists.linux.dev, Paulo Alcantara <pc@manguebit.com>,
+	Steve French <stfrench@microsoft.com>
+Cc: gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: [regression 6.1.80+] "CIFS: VFS: directory entry name would overflow
+ frame end of buf" and invisible files under certain conditions and at least
+ with noserverino mount option
+Message-ID: <ZiBCsoc0yf_I8In8@eldamar.lan>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-David Howells <dhowells@redhat.com> writes:
+Hi Paulo, hi all
 
-> Paulo Alcantara <pc@manguebit.com> wrote:
->
->> Consider the following example where a tcon is reused from different
->> CIFS superblocks:
->> 
->>   mount.cifs //srv/share /mnt/1 -o ${opts} # new super, new tcon
->>   mount.cifs //srv/share/dir /mnt/2 -o ${opts} # new super, reused tcon
->> 
->> So, /mnt/1/dir/foo and /mnt/2/foo will lead to different inodes.
->> 
->> The two mounts are accessing the same tcon (\\srv\share) but the new
->> superblock was created because the prefix path "\dir" didn't match in
->> cifs_match_super().  Trust me, that's a very common scenario.
->
-> Why does it need to lead to a different superblock, assuming ${opts} is the
-> same in both cases?  Can we not do as NFS does and share the superblock,
-> walking during the mount process through the directory prefix to the root
-> object?
+In Debian we got two reports of cifs mounts not functioning, hiding
+certain files. The two reports are:
 
-I don't know why it was designed that way, but the reason we have two
-different superblocks with ${opts} being the same is because cifs.ko
-relies on the value of cifs_sb_info::prepath to build paths out of
-dentries.  See build_path_from_dentry().  So, when you access
-/mnt/2/foo, cifs.ko will build a path like '[optional tree name prefix]
-+ cifs_sb_info::prepath + \foo' and then reuse connections
-(server+session+tcon) from first superblock to perform I/O on that file.
+https://bugs.debian.org/1069102
+https://bugs.debian.org/1069092
 
-> In other words, why does:
->
->     mount.cifs //srv/share /mnt/1 -o ${opts}
->     mount.cifs //srv/share/dir /mnt/2 -o ${opts}
->
-> give you a different result to:
->
->     mount.cifs //srv/share /mnt/1 -o ${opts}
->     mount --bind /mnt/1/dir /mnt/2
+On those cases kernel logs error
 
-Honestly, I don't know how bind works at VFS level.  I see that the new
-superblock isn't created and when I access /mnt/2/foo,
-build_path_from_dentry() correctly returns '\dir\foo'.
+[   23.225952] CIFS: VFS: directory entry name would overflow frame end of buf 00000000a44b272c
+
+I do not have yet a minimal reproducing setup, but I was able to
+reproduce the the issue cerating a simple share (done for simplicity
+with ksmbd):
+
+[global]
+	...
+[poc]
+        path = /srv/data
+        valid users = root
+        read only = no
+
+Within /srv/data create an empty file libfoo:
+
+# touch /srv/data/libfoo
+
+The share is mounted with noserverino (the issue is not reproducible
+without at least in my case):
+
+mount -t cifs -o noserverino //server/poc /mnt
+
+On each access of /mnt a new error is logged, while not showing the
+libfoo file:
+
+[   23.225952] CIFS: VFS: directory entry name would overflow frame end of buf 00000000a44b272c
+[  603.494356] CIFS: VFS: directory entry name would overflow frame end of buf 000000001dbf54e1
+[  633.217689] CIFS: VFS: directory entry name would overflow frame end of buf 00000000fb4597c4
+[  642.791862] CIFS: VFS: directory entry name would overflow frame end of buf 0000000023b48528
+
+I have verified that reverting in 6.1.y the commit 0947d0d463d4 ("smb:
+client: set correct d_type for reparse points under DFS mounts") on
+top of 6.1.87 fixes the issue.
+
+#regzbot introduced: 0947d0d463d4
+
+I can try to make a clean environment to reproeduce the issue, but I'm
+not yet there. But the regression is related to 0947d0d463d4 ("smb:
+client: set correct d_type for reparse points under DFS mounts").
+The mentioned commit was as well part of 6.7.7 at least, but I'm not
+able to reproduce the issue from another client running 6.7,9.
+
+Does that ring some bell?
+
+Regards,
+Salvatore
