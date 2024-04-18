@@ -1,124 +1,75 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF4F4438F;
-	Thu, 18 Apr 2024 04:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D12C68C
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Apr 2024 13:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713416296; cv=none; b=CDZr5Mm5tC+VMbGQislnjAWMRVFip5f1+Fj+X0fxb40eYuaLNpD6GyPf+v7vBrDilEN3da2BIOpKijUuKIaYkps88Uc3fX4zrskY7h8dh9O3QW610ds0FFwMKRtNXlm48VNoDLGrIdGg/0cU98VCLrnYvQPLbGK/G0EHaCE7cUI=
+	t=1713447178; cv=none; b=AlVHmaPKL4FoM2J7HUZczamDtSAHDDrfv05BMA0Ys8GZPTGjM8DtXkWHO7N2wiyyseYeHWT5YlS6Rn+1/y0zlTsC/Lva/WyastbgbtiHtctbWrbQlcZxl89hRAe/AshdW5pwahoMBOfHErACKDoCCTP5olJcrhV8CGfHq598PLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713416296; c=relaxed/simple;
-	bh=1GIfnLR14SpISzBtJDNhW/puZNUl+1Lzin0dxK/lgws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EYx+62IoSDYIb8Jiuw+zkokWRRnLUWPY5T9CvuRXPQ4ilSH9cATWAGc24xxOQpIU28ZcCRV7Gx3blZnJAUrxSIjHMNQCpjVNqgR8MFAyPoRR9bTuVzqtmxliAxWVpr+rsJ3dCI8lJEQLsvmMuO9NDn4rLG9wqnq5BRlJF5V8XrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XIQ2q0Hl; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713447178; c=relaxed/simple;
+	bh=TfYtJDHbPf2euigtbi87wfK7vPE3w18UUyGJQIHIFVs=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=sOwmMrCc792uNOMfcQacrxERvbkackakRLDLKyk6WEmEukmiJG900oMXf/a/nWhHzBpVFkUuDDbCatssno4381dPQzMhU0/G9GceEk46gxbfDqhieUuznp6HJfo+bKTMaGqZ3I9aqOFbsNhwC4ignsY/K2ih3aWTrBpIdfrdCvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B1rEpiXj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIQ2q0Hl"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e6a1edecfso559773a12.1;
-        Wed, 17 Apr 2024 21:58:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713416293; x=1714021093; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SL2uiIXH35aGZc0Hh8VLlfK7Ln3jRKiQNAg1SPvfYcs=;
-        b=XIQ2q0HlaGbtjmZ21Re7qDfJ07IUir6HxGMZO8DD/KJMbkvHUUx1FwUEGFLgSTstcW
-         3JruC8Vbj2t50xwTPE/rTHLVJFvTrTmW3TI7AC4wMsvFBhD+Ms3qVPBmP6/0fhRDl00j
-         rr90Psjyr0w2LECN31IRNuJdWz6E0bnob0JBVl/xMCHiLPyYlGzcZ8aYB9sosxIAVxLP
-         PUEidWZfJvLPngn220UT4uqazCOI8bkbOSh0bezS6q8k1enVhMXAJXTfkhTXzLZu/j6v
-         9OTkz+rrDjOmab4LPueY9tdKpFL4Me5DtAw+Lr3Nzbzzmtzt7TEp9MuE2Abls9xknyQG
-         pRLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713416293; x=1714021093;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SL2uiIXH35aGZc0Hh8VLlfK7Ln3jRKiQNAg1SPvfYcs=;
-        b=IIeFfg6WL7z6PtuzlyqvfP66YLIwh1d9iASwsmDM/CTveAdtENixSxV7VkK5vEUONk
-         mhVIQ3DTvhPZy8uwrJ7a4OvH5SGYylI5cC01ld/y01klUer4nZga3cRgP1OvxmzVIYXf
-         6GWnbVz9FkbCMwU+x3xaHfMs1ha/rplrRIaYjIwXrsIY1K6Mzyoj4zXhJTUBjXjamEbU
-         +T8GRQW8/losJWt2kZrsFH1N3l00BAb0E3nvjDEVO2EiJserLAgnb/aWZMC/gWkwcjUS
-         zZSbfsg+AUJV7sh2EkTUIO5jb2mIG4wPYZNI8fJgNmfQbhjW8lAf5spuCh0MqGp7dtkd
-         YXNw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+8fAerK6ZIWZlc2pNp9c4S73UOSl1gUqHIyyyt0rZlUkqMc9zn7lLJm4ZKyL0i4pWfM6J0uQKvH+FxovnLjcHzmeLKElvN0M4X8mg4PsS4xsRX8g2Hd9B/xoQWjkeQmnqag==
-X-Gm-Message-State: AOJu0Yxx5OuAS3s0KfXnM6ugZzhhGZEvSskLz41v9dPXdOtXvPuRLMbg
-	UQxv+MCmiG2Hn76/VdY9sbMRWWeEz1PxIFEZVGFanVIVoPKoanbk
-X-Google-Smtp-Source: AGHT+IHz0IE74OUzjcYa9ALlwnqFMHsbPsP49is02/FUiFH1TdkJ3Fu4Hl774aOUHaxTCJ5ZuqG6xA==
-X-Received: by 2002:a50:d4c2:0:b0:56e:2abd:d00f with SMTP id e2-20020a50d4c2000000b0056e2abdd00fmr1172402edj.18.1713416292503;
-        Wed, 17 Apr 2024 21:58:12 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
-        by smtp.gmail.com with ESMTPSA id d15-20020aa7d68f000000b005701df2ea98sm383140edr.32.2024.04.17.21.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 21:58:11 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 1C0A9BE2EE8; Thu, 18 Apr 2024 06:58:10 +0200 (CEST)
-Date: Thu, 18 Apr 2024 06:58:10 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: regressions@lists.linux.dev, Steve French <stfrench@microsoft.com>,
-	gregkh@linuxfoundation.org, sashal@kernel.org,
-	stable@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [regression 6.1.80+] "CIFS: VFS: directory entry name would
- overflow frame end of buf" and invisible files under certain conditions and
- at least with noserverino mount option
-Message-ID: <ZiCoYjr79HXxiTjr@eldamar.lan>
-References: <ZiBCsoc0yf_I8In8@eldamar.lan>
- <cc3eea56282f4b43d0fe151a9390c512@manguebit.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1rEpiXj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713447176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TfYtJDHbPf2euigtbi87wfK7vPE3w18UUyGJQIHIFVs=;
+	b=B1rEpiXjIr+wrx7cjE+p63Fx7Na7VV4Atqum//XBbLinZnY8sPmnXSetkWkYy/QVrFPxqT
+	rpuY4L9CTC90Jjl29XojvfTsTJO54nwpC303w8BAKNVge+DfZUodcQPCgRiybA9TDwkUJT
+	BTsZymyeeAA02LwroETsbDioPKpChIg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-296-67BLzES1NHGrSehYlCfHCQ-1; Thu, 18 Apr 2024 09:32:52 -0400
+X-MC-Unique: 67BLzES1NHGrSehYlCfHCQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1A848834FB8;
+	Thu, 18 Apr 2024 13:32:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0019A1121312;
+	Thu, 18 Apr 2024 13:32:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <e33d0b65-fc0b-49ab-ba48-7a13327d88aa@talpey.com>
+References: <e33d0b65-fc0b-49ab-ba48-7a13327d88aa@talpey.com> <1a94a15e6863d3844f0bcb58b7b1e17a@manguebit.com> <14e66691a65e3d05d3d8d50e74dfb366@manguebit.com> <3756406.1712244064@warthog.procyon.org.uk> <2713340.1713286722@warthog.procyon.org.uk> <277920.1713364693@warthog.procyon.org.uk>
+To: Tom Talpey <tom@talpey.com>
+Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+    Steve French <sfrench@samba.org>,
+    Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] cifs: Fix reacquisition of volume cookie on still-live connection
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cc3eea56282f4b43d0fe151a9390c512@manguebit.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <554984.1713447170.1@warthog.procyon.org.uk>
+Date: Thu, 18 Apr 2024 14:32:50 +0100
+Message-ID: <554987.1713447170@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi Paulo,
+Tom Talpey <tom@talpey.com> wrote:
 
-Thanks a lot for your time on looking into it.
+> The tcon is a property of the SMB3 session, it's not shared nor is
+> it necessarily created at mount time.
 
-On Wed, Apr 17, 2024 at 07:58:56PM -0300, Paulo Alcantara wrote:
-> Hi Salvatore,
-> 
-> Salvatore Bonaccorso <carnil@debian.org> writes:
-> 
-> > In Debian we got two reports of cifs mounts not functioning, hiding
-> > certain files. The two reports are:
-> >
-> > https://bugs.debian.org/1069102
-> > https://bugs.debian.org/1069092
-> >
-> > On those cases kernel logs error
-> >
-> > [   23.225952] CIFS: VFS: directory entry name would overflow frame end of buf 00000000a44b272c
-> 
-> I couldn't reproduce it.  Does the following fix your issue:
-> 
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index 4c1231496a72..3ee35430595e 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -5083,7 +5083,7 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
->  		info_buf_size = sizeof(struct smb2_posix_info);
->  		break;
->  	case SMB_FIND_FILE_FULL_DIRECTORY_INFO:
-> -		info_buf_size = sizeof(FILE_FULL_DIRECTORY_INFO);
-> +		info_buf_size = sizeof(FILE_FULL_DIRECTORY_INFO) - 1;
->  		break;
->  	default:
->  		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
-> 
-> If not, please provide network trace and verbose logs.
+Trust me, it can be shared between superblocks.
 
-Yes that appears to fix the issue.
+David
 
-But as you say you are not able to reproduce the issue, I guess we
-need to try to get it clearly reproducible first to see we face no
-other fallouts?
-
-Regards,
-Salvatore
