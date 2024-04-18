@@ -1,102 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493D615FD0D
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Apr 2024 13:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713447848; cv=none; b=Q2El73d5LfA6Vu/T956ZUM+LcTmp9luf9xSCdQsDtTf3Qb5pPVaVwbBMBwEH/+dk6Hr1J2gA0sSVNzwBRcsreoZzMzcIVMa5SbWHwToVaP/4sMcJb+TctuuL3abcPvlIVuhIrHmIuQOJdxL0tkyF4e1BhWiOR/xloZjJcZdK95I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713447848; c=relaxed/simple;
-	bh=Iwmm4vK6K8VJ12C1Oel8qG6yhGbv1FUmWa6BqBjk/1c=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=lAUF62CvOzz53ebgav+j7NB9ZN2F7DJqkXS2PzEdcLEyUPtMpszplvwzhQ4TFsLde6etnldM7eQHE3+kGNibHWKz7nMGgaWhZ+BH/2Tne+qMprhTnyuvdxSmK3XcsXdRSHvZxGbfbajC6bovwBx9g+ceZk1+E8VOmX4rB6s2jkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LylhK3+3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830CE15AAB7;
+	Thu, 18 Apr 2024 13:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713448029; cv=pass; b=qVWMezjvp2z5DVdPwtoaqaLcVgK1cZkiteG2cUuuMV29rU20f5GIg4TpRFxeTRo591bi1XcxcXyXaBvh72l78pyhkmOxltIRInYKcgGQ4QUJJ9M6lf4Aene2ug5RBeX9WbHPiYLZHtVigue0psHuv8JWj2NuGEuJT72fBRPtzzA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713448029; c=relaxed/simple;
+	bh=O4NLUl1PjH8QiQoDvqx/qELU67RP3FS7QbuTtQCXt20=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=ZQPcl0UlGIZGPzH0N6q1OFoZOlyby6wRHSb++3ZfO5d+ZZpvgcWOe5xz2iLA+H2ktsSYCtaZ7dhUtYq/nGG1VtIFWVDAirGGjFfkqrUGKU/NGYNH+VGIC3abe+lRRr3y6l6cN7tkJc7OwY4R2v4fZZTNdygPG9JcWkDWfX3eTSA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=UB8HuKZl; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LylhK3+3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713447846;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="UB8HuKZl"
+Message-ID: <29e0cbcab5be560608d1dfbfb0ccbc96@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1713448024;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S0S8YregP25P1OBV5UbC9sms8BvW3U0pJ4XCK6GLxag=;
-	b=LylhK3+39ig1sqarxZ0a8NeTamFEQxzAnyxcuEORd7oTYITPa5Owu6gnJq+3aE2GdzwJdc
-	4jK86zeDAUJa/dB0CWXOztQGHcZ4qbPAt0fZC3rHWmdR2TIZhgEiC/MmrkrxA1HswkE9M+
-	1hWQ/Pcc3+YGHoMAZ4k37Xoum9O4fio=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-257-0B34hqk0Pq6zo_RaertJrg-1; Thu, 18 Apr 2024 09:44:01 -0400
-X-MC-Unique: 0B34hqk0Pq6zo_RaertJrg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 56B1B18B1847;
-	Thu, 18 Apr 2024 13:44:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 36B4E2166B32;
-	Thu, 18 Apr 2024 13:44:00 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <59c322dc49c3cc76a4b6a2de35106c61@manguebit.com>
-References: <59c322dc49c3cc76a4b6a2de35106c61@manguebit.com> <1a94a15e6863d3844f0bcb58b7b1e17a@manguebit.com> <14e66691a65e3d05d3d8d50e74dfb366@manguebit.com> <3756406.1712244064@warthog.procyon.org.uk> <2713340.1713286722@warthog.procyon.org.uk> <277920.1713364693@warthog.procyon.org.uk>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix reacquisition of volume cookie on still-live connection
+	bh=7rU0kOVmyBLX9ndqmurxB34d6Cclj332xnTjEKvm7HA=;
+	b=UB8HuKZlNT0DFaxFELpQyJIHcVKpTxtAd3P8hAyt5sJuunUsJ3b6l4pAsRezCp2MGzu4xI
+	I0/SQyhtEO9HILsKY3b20D8O6ufJ3pxz2uhiPE8c/9+6OBMsfWYohMO4YnYpETMb48JwtG
+	IFNgXoCYWsm8oi59KzT5eRQEz0VX/grQozCt2y7lMFXyubT1avJbMOuy+L5tIAU8sI6VCY
+	hsamDTIMnHHYDMneURyrfvgu/aA9LfRUKkR0s0301vE3A1BYvjMO+Br2mI1VNt6ybin41+
+	2HcDsCdXhX/f1gRqofpzJk5OXGU0qZN26AXj6n8m6OZ2Oi9SfupY6NuhBGncQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1713448024; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7rU0kOVmyBLX9ndqmurxB34d6Cclj332xnTjEKvm7HA=;
+	b=a2Bi8TZD3NAuhNV3ohoMtEBiMtrH+9kRTWj6jKFEVsXQp6N68s5JgLgE5Plocme8zP4T/D
+	CzwC7y8qFBV4g5rGojVB54TjR7u2uujOQjVmf37vLvLi+6bTEOiPWKayQKruAe6pyn0Ggx
+	hoiappzpHfJPRh5rY0233exMp8eIt8WWCwQG+TXLEghJYSh3ibeQU7Gra11FywU3iqBakX
+	BBgTwJGFEDxp2+em5NZrbOQbB0QIOvwOhh0ZB6WERHwd/6hANWtI1QeyAWefGcs8gwO+aM
+	o5CBmt+bJ7aiPwHVcOmUz4qUPGy5zG3IbKsjcxVhpvCFOtU1T1i8YF6TzQqdKA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1713448024; a=rsa-sha256;
+	cv=none;
+	b=kUtYyctEG3LKddBFEQCb7K3qzEgAOzCZ8ZymcGRwUG3IJetAsrrQPH3mLO84p+xuMrgJzp
+	Ne3OKlF47QG0xyUJQy13AOZhhKWKPpSkJOcbPqKzkdDnPjYqdbHsQg9EW7h2U9Is5295Fo
+	eE9qRK/Wdny4Asok8QXSgKxAUgvXOE9yiZPbpLwU+TTteQIHEDYl8wVG/lP6UXZN7KSTie
+	b+FV+bCdS9z+V2ciJkxGzyyLVI3DbNRKGMsTNhdbQbcQrJrjFK5/dumdlWyG/AoAEVpQVd
+	+lKrHgSalUou3Nu2uRbFGtLJrnPIiy1/ou6lW9xilglvW3Y75ezYGl5ARTCdHA==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: regressions@lists.linux.dev, Steve French <stfrench@microsoft.com>,
+ gregkh@linuxfoundation.org, sashal@kernel.org, stable@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+Subject: Re: [regression 6.1.80+] "CIFS: VFS: directory entry name would
+ overflow frame end of buf" and invisible files under certain conditions
+ and at least with noserverino mount option
+In-Reply-To: <ZiCoYjr79HXxiTjr@eldamar.lan>
+References: <ZiBCsoc0yf_I8In8@eldamar.lan>
+ <cc3eea56282f4b43d0fe151a9390c512@manguebit.com>
+ <ZiCoYjr79HXxiTjr@eldamar.lan>
+Date: Thu, 18 Apr 2024 10:47:01 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <564519.1713447839.1@warthog.procyon.org.uk>
-Date: Thu, 18 Apr 2024 14:43:59 +0100
-Message-ID: <564520.1713447839@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain
 
-Paulo Alcantara <pc@manguebit.com> wrote:
+Salvatore Bonaccorso <carnil@debian.org> writes:
 
-> I don't know why it was designed that way, but the reason we have two
-> different superblocks with ${opts} being the same is because cifs.ko
-> relies on the value of cifs_sb_info::prepath to build paths out of
-> dentries.  See build_path_from_dentry().  So, when you access
-> /mnt/2/foo, cifs.ko will build a path like '[optional tree name prefix]
-> + cifs_sb_info::prepath + \foo' and then reuse connections
-> (server+session+tcon) from first superblock to perform I/O on that file.
+> On Wed, Apr 17, 2024 at 07:58:56PM -0300, Paulo Alcantara wrote:
+>> Hi Salvatore,
+>> 
+>> Salvatore Bonaccorso <carnil@debian.org> writes:
+>> 
+>> > In Debian we got two reports of cifs mounts not functioning, hiding
+>> > certain files. The two reports are:
+>> >
+>> > https://bugs.debian.org/1069102
+>> > https://bugs.debian.org/1069092
+>> >
+>> > On those cases kernel logs error
+>> >
+>> > [   23.225952] CIFS: VFS: directory entry name would overflow frame end of buf 00000000a44b272c
+>> 
+>> I couldn't reproduce it.  Does the following fix your issue:
+>> 
+>> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+>> index 4c1231496a72..3ee35430595e 100644
+>> --- a/fs/smb/client/smb2pdu.c
+>> +++ b/fs/smb/client/smb2pdu.c
+>> @@ -5083,7 +5083,7 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+>>  		info_buf_size = sizeof(struct smb2_posix_info);
+>>  		break;
+>>  	case SMB_FIND_FILE_FULL_DIRECTORY_INFO:
+>> -		info_buf_size = sizeof(FILE_FULL_DIRECTORY_INFO);
+>> +		info_buf_size = sizeof(FILE_FULL_DIRECTORY_INFO) - 1;
+>>  		break;
+>>  	default:
+>>  		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+>> 
+>> If not, please provide network trace and verbose logs.
+>
+> Yes that appears to fix the issue.
 
-Yep.  You don't *need* prepath.  You could always build from the sb->s_root
-without a prepath and have mnt->mnt_root offset the place the VFS thinks you
-are:
+Thanks for quickly testing it.  So the above change indicates that we're
+missing 35235e19b393 ("cifs: Replace remaining 1-element arrays") in
+v6.1.y.
 
-	[rootdir]/	<--- s_root points here
-	|
-	v
-	foo/
-	|
-	v
-	bar/		<--- mnt_root points here
-	|
-	v
-	a
+Can you test it now with 35235e19b393 backported without the above
+change?
 
-Without prepath, you build back up the tree { a, bar/, foo/, [rootdir] } with
-prepath you insert the prepath at the end.
+> But as you say you are not able to reproduce the issue, I guess we
+> need to try to get it clearly reproducible first to see we face no
+> other fallouts?
 
-Bind mounts just make the VFS think it's starting midway down, but you build
-up back to s_root.
+I couldn't reproduce it in v6.9-rc4.  Forgot to mention it, sorry.
 
-Think of a mount as just referring to a subtree of the tree inside the
-superblock.  The prepath is just an optimisation - but possibly one that makes
-sense for cifs if you're having to do pathname fabrication a lot.
-
-David
-
+Yes, further testing would be great to make sure we're not missing
+anything else.
