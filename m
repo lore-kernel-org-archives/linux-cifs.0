@@ -1,88 +1,103 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D7D137920
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Apr 2024 16:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA79A13775C
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Apr 2024 17:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713545719; cv=none; b=u+0SUU+rP5lTMhdO0AbDct0TUAEUKIqbATeDEiMxToQueVOb8kgaYSBpZupyURkb6JcJCAMvS44yJlSfxiqYkBjqg6HZtf+OkA2JI7iRsq06Ss2ryR/xpZDzEezzzm68NsRKUCtl9XZMUPKTSoDJOHOUIDO+mWJX5VECI/uCPfA=
+	t=1713546738; cv=none; b=XEON+V1eY8A6kf6SS16+kV7tjlnEMVDlrzKdNMQFmiRl8sWYfakh823SvaJMfvD34w5XJlJXsLbzPEf/J20FBvPjfBcrPIpAVKC3RCJjp+gmlQSgAxJRRErwYqfEpz8jnI0BG/RCkMuFKMXXOeh8XjPOVffDKzyRsoZS2km6sJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713545719; c=relaxed/simple;
-	bh=Qe/EV9/Kqm1qV5Cxnug5Fw4ZZNkZIS115ZGadsREAcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ielJxZAKgzZoR+T/CXtXmGvHyMj6HydWFuyNocx/3d9cKzKcwvjqH/yHXRHr/eKqQVZKR10kHd5YEPPtGviI504cwnFcLlfaqedDoACC3PjXGV40Hpw6GxpcbHEMa1gummyizfySqP4sYXzSha0S7vO1qQLOegeJgcXtVvTPY3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1Gi3dI6L; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1713546738; c=relaxed/simple;
+	bh=4UiNPWmq48O2Kml3xW7QBDJLvWZhd9YbWz5yZZm0oYA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u+ajm+2vllKqy6KfH/NNmCrYX040ncxhXDZI00AWM+escnaGvRp2P3dRTnGIQCnHOkUCNDoNrzH44EQEMj/rcWzwEUUFbWAIi61HPmG+slV+x5RYrVvMqur1pGqohuf4N3Fv/DztxdRyvNoJCwAJOl1dAJGQ3S87j7nsp9xG/RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0DPu6ad; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1Gi3dI6L"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=3Wkhrr08905LBJQuA2p6CC2d4NwSOTYcOSg+PuulNiw=; b=1Gi3dI6LyP8Bj/gxxkUa5b6cZo
-	16pxq2S1m1M/DFjR+dt6aa/U6/LbVIqelYJkVJUzoam6JQYMg+f/cYMsJgaOO50frwMRs6qqM7Kkx
-	sqEM4D3NaNktvyGkzCev1ob6Q5fpTir/ch35tdgWN+odPfKS0aUZu0guRVk26llz6Tbzxtd2txKnp
-	gaCp/og6eK1bObDuZucv9ctRklLAFtVjC4LabIBtoOxUV7TDk25XgFkmwfuAz9QJR8k8xioqHQqbY
-	x7TlwrBEZ0wSiF5XEj5aLfcIiQt6x6hF89Necnm82QPfy/AxKeh8iRIZH0wxfWTXMIY4OL77C7N+f
-	zKvlQ+JXfbN2cjeX5RKJVH4UK9H98dRnPYpVM9rFV9sTexoeTzhc/TKsbvTtw7kJjBNjqcqmrxPyv
-	KrMdu6yo0F7QfhXquEA8b69eySpraaEhwmvsm89pzceeK59G6205QtdDiR2fVGl3wqhygn4gBJZPq
-	eHgjU2KVRmpTiOuWlfVmMOcm;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1rxrW4-007I0L-0K;
-	Fri, 19 Apr 2024 16:55:13 +0000
-Date: Fri, 19 Apr 2024 09:55:09 -0700
-From: Jeremy Allison <jra@samba.org>
-To: Ralph Boehme <slow@samba.org>
-Cc: Steve French <smfrench@gmail.com>,
-	samba-technical <samba-technical@lists.samba.org>,
-	CIFS <linux-cifs@vger.kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: Re: Missing protocol features that could help Linux
-Message-ID: <ZiKh7cYq5/Z7zwNj@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <CAH2r5mstDacz=gvpjFQeB_nc1kBjyzTZw57tF8UNrXARXkV1rQ@mail.gmail.com>
- <e69bad72-9139-4b01-afe5-5d34edc077a1@samba.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0DPu6ad"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51967f75763so2660325e87.2
+        for <linux-cifs@vger.kernel.org>; Fri, 19 Apr 2024 10:12:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713546735; x=1714151535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4UiNPWmq48O2Kml3xW7QBDJLvWZhd9YbWz5yZZm0oYA=;
+        b=m0DPu6adooQB8wyDbFeQiy1Q/LpO2IWwxtv9glu9DF6uawJwgWofKjtlEmXitZvafE
+         iUdWf744zgt2nkLyA/V5MCdtmcZOQHIEBFSW5ebBf5m9NlEfsWdWilxfK2aB/iWFckZ0
+         N8XVlELyYPmrWiUOY72qf7xIJNpFcpikmmeXl0g2VNVJw9skjkFx+k3axF0ZIzYl34xg
+         gDbrLrmWsz8e6xUDQZnf9RW6AeheE+j2tToks10Z+lzwgTI+S4yDFOPjRSOJFG5C7GbJ
+         mrwBRG+GReLKUbTmM2SeDv+X+Bd/sN6IJlvcVdwfz8RION0lU9eNm5nNqZpjdhJPWWF4
+         bvyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713546735; x=1714151535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4UiNPWmq48O2Kml3xW7QBDJLvWZhd9YbWz5yZZm0oYA=;
+        b=MCyTk0073yDBfmlQRjqww5GmQnpaAF3wCDFlp1pNW8xfe39XxtO6vV2T48fdyVMAgf
+         Gb1mqwumkX/LblN+341LFqVWpY+BkbzXMDu6mmxn/jLHOqA4iRFfvee6b1vr+yZff0mX
+         wzEykDFUobOmlOQ+qIwVTNVDlAhuGiv4gknl9Y7vXpH4oJqe++DBkJ5Wy8OFQEOQ3P1X
+         RauXq/Xz9IRmudpH51zn7IVdSM0OGYYf/VR514vdvO7eZf6XYN0kmPRbpBxVQfNxA9KD
+         SXb4ixh3TsJPO9oAW2nL6O9aeXv2BOfNtTipoT5pgR8CKaVK/3I8kenQJNpVcbDyxDbk
+         4m1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWBbtAVt4mk23xQgAUfeDgsldCbzlI9kZAb6km0MQaFeXvDO3CEBSHClu7lc/fayKp+D7nMEK4jjo6wBdR6UqNVcqw8xgUiiqoTcg==
+X-Gm-Message-State: AOJu0YwKUM+GWmjYKpiUMrsfy2MAwvC9yQ9sojYyWLH7ttZoH0vA6HgC
+	pH8ySeOA8qydUaYcgCnniMIo9VFmqEf25BQCfzVGBRj/uC7C4D18YUpW7NF9OfCcqoF4F4acqqj
+	htzJaiv/8WH1ezTm8QafcxlRq3VU=
+X-Google-Smtp-Source: AGHT+IFaNmyXhKvkHaju/fD6czmfU5+0YRmYN0D9kWNR7TF9ngH2WTRU1X52ONsV3cgVzDb8Fk18ptTYJbgoITDIqso=
+X-Received: by 2002:a05:6512:360e:b0:518:755e:4bb4 with SMTP id
+ f14-20020a056512360e00b00518755e4bb4mr1559926lfs.1.1713546734510; Fri, 19 Apr
+ 2024 10:12:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <e69bad72-9139-4b01-afe5-5d34edc077a1@samba.org>
+References: <CAH2r5mstDacz=gvpjFQeB_nc1kBjyzTZw57tF8UNrXARXkV1rQ@mail.gmail.com>
+ <c7d80c1538db3a414636977314feba13871907ef.camel@samba.org> <ZiKT4CursWvT2dhq@jeremy-HP-Z840-Workstation>
+In-Reply-To: <ZiKT4CursWvT2dhq@jeremy-HP-Z840-Workstation>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 19 Apr 2024 12:12:04 -0500
+Message-ID: <CAH2r5mvn0tMB_SoQYGh4bVK-ZRYfOLNn4PgX51_rofPkhwqD4g@mail.gmail.com>
+Subject: Re: Missing protocol features that could help Linux
+To: Jeremy Allison <jra@samba.org>
+Cc: Andrew Bartlett <abartlet@samba.org>, samba-technical <samba-technical@lists.samba.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 06:53:01PM +0200, Ralph Boehme wrote:
->On 4/18/24 22:21, Steve French via samba-technical wrote:
->>Was following up on a recent question about support for Linux features
->>that are missing that could help us pass more xfstests
->>
->>Looking at the standard fstests for Linux (xfstests that are skipped
->>or fail for cifs.ko) to find 'features' that would help, perhaps
->>extending the current POSIX Extensions or adding a couple of SMB3.1.1
->>FSCTLs, I spotted a few obvious ones:
->>
->>  1) renameat2 (RENAME_EXCHANGE) and renameat2(WHITEOUT)  2) FITRIM
->>support 3) trusted namespace (perhaps xattr/EA extension) 4) attr
->>namespace 5) deduplication 6) chattr -i 7) unshare (namespace command)
->>8) delayed allocation 9) dax 10) attr namespace security 11) fstrim
->>12) chattr +s 13) exchange range
->>
->>Any thoughts on which of these which would be 'easy' for samba and/or
->>ksmbd server to implement (e.g. as new fsctls)?
+On Fri, Apr 19, 2024 at 10:55=E2=80=AFAM Jeremy Allison <jra@samba.org> wro=
+te:
 >
->well, I guess none of these will be really "easy".
+> On Fri, Apr 19, 2024 at 01:40:34PM +1200, Andrew Bartlett wrote:
+> >POSIX <-> POSIX locking over SMB is something I have a client trying to
+> >get working with SMB3.
+> >
+> >They have a use case where, as I understand it so far, the mapping of
+> >POSIX fcntl() read and write locks to SMB locks isn't 1-1, because they
+> >expect advisory locks, but SMB locks are mandatory as far as I read
+> >it.
+> >
+> >They use cifs.ko and Samba, so it isn't about working with Windows, it
+> >is about running Libreoffice on LInux against Samba.
 >
->Iirc when I last brough up file attributes, we vetted towards 
->postponing this kind of stuff until we have full support for the core 
->SMB3 POSIX features in Samba. Iirc the only real thing missing there 
->is symlink/reparse point handling and for that we need to settle on 
->which reparse type to use (WSL vs NFS) as discussed yesterday. It 
->would be a *huge* help Steve, if you can pursue this internally, this 
->has been a blocker for the whole project since quite some time...
+> That's not going to work the way LibreOffice on Linux expects,
+> until we fully expose POSIX locking semantics.
+>
+> It's the range semantics that will probably break them.
+>
+> POSIX locks can be split/merged/overlapped. Windows locks
+> must be distinct. Currently over SMB3 we only expose Windows
+> locks.
 
-renameat2 (RENAME_EXCHANGE) and renameat2(WHITEOUT) need to be
-mapped into Windows SMB3 operations. We should not (IMHO) add new
-SMB3 operation semantics into POSIX that overlap existing Windows
-SMB3 operations.
+For a surprising number of Linux apps mounting with "nobrl" (which only
+enforces byte range locks locally, and thus POSIX style not Windows
+style) is fine for SMB3.1.1 mounts.
+
+--=20
+Thanks,
+
+Steve
