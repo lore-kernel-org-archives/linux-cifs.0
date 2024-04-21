@@ -1,130 +1,160 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50539205E36
-	for <linux-cifs@vger.kernel.org>; Sat, 20 Apr 2024 20:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0621B5AA;
+	Sun, 21 Apr 2024 19:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713646569; cv=none; b=YsgJHcPqPer+7O5onhJnpitFtXiSf51KR5RK2K63Z9s3mqjFdY08LUIhn50aJ+1LlkDFItzQLQZZeNXltQ+okC6YPhdDstI8RrtVLOJ9Xez5VFFBCHFg1Pb8iomk/AGksrmZtei+VI0tWbKMSpCQgtGTuKBB7+EUwoFs7jzcnjw=
+	t=1713727642; cv=none; b=BXHSgvFUcniEyqjy9PzwRqJF/9Sv/bDW43U+TGCI/hP668a2yDgOcSgKzI5O3svL3KGY8Y8LYsPwyUxyr4pnQB/9aILPEiqkA4WVVFfUct/qVT6W5igxKZuIBtLCnmgGBj/FJ//rSI6p3EKCMGfBRIe2mJ8meyZJFOzb0QFi+XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713646569; c=relaxed/simple;
-	bh=X9Lg9Dalj9GmOgzcBocU+Ai0hvYxiYQugp0+vV05CLo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F6YcL9bT9ybvBqErJwK/ihjdZ18BgHCA5JlPtN+m2eMOQ1Qlh94Idqgqwesg13INikI/ncyQC91BKuyypzPsng97JtudB9+HkW7JbkoMoa6gq3l6w/tbnJE4gYKzu4+Sr+i6TCgdOuq/CImbu9CIPc/H0Y2QXqfDE6R0IZpQWUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cudMkR6c; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713727642; c=relaxed/simple;
+	bh=GAiQliUylNkiqA3TIwITFNADrEWrsDeL0XHcKwxrq0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B1EJHmnLzr2nNpncKl0Sbf/1XHmUw3rTFyE9yxrhGvOnxZ3TcU8RTg6+fWwRGyaG3wEuAm3k2tG+YNjygbiB5u1+ORfq+rYMEn5dbvKgmkkfwbunVvSkUZcm4DVm9Ltn+4bL7E21LrJqjsVffo81jlZFKEY17QoN4Novq02HHb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=KlLXaYox; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cudMkR6c"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d88a869ce6so43876831fa.3
-        for <linux-cifs@vger.kernel.org>; Sat, 20 Apr 2024 13:56:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713646565; x=1714251365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OeIZwcZ+zB9DFscVyolg1aegOFP1W/I+KQjLIkh6gas=;
-        b=cudMkR6c87p+2TwnXvUPNt1UytpZNtsnQmudUvQ5L+PPOW8eBsF7x7u3Or3LzNmG3K
-         aCYgwVjh2jUlwfUGEvYTm2bItZCDUNN2rgPMzyy0VPV8Hkl36A8TgX2cEVbNQAynqnIB
-         tYcyQGbOy8i4uPpE7N1jOiVqQi9aUdkoX3htCduOF9pAZlFHt6pDTBp3URDwzj2eUQBv
-         wf/K0lVDsPejxXC+10NUBOmAbRj2Rj5V92cOAPYBU+OSwgEzGlMchEFyf7UHmTYZ0tC3
-         R0NHroxKxBF6vJKzHw1MpSbTm29shOE0iPfVdmtupC4cWbPNAnt94x851gErpW1gAURG
-         zOWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713646565; x=1714251365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OeIZwcZ+zB9DFscVyolg1aegOFP1W/I+KQjLIkh6gas=;
-        b=ckygo0n6oS5iijtEaKp3kp8M/5xvxP/+c2A/CbgREJfhTGlonkAnQrfCutvVxpU7wx
-         R7av+oAVdIMGN3zMeMcaTE6ICt6PE2DTGR03T2OzPRRb8AMd4juIC4TBu4OR8GEpAZXv
-         eog9IeZfhEBrN5fQ/n2ivE+YFlTiGvjJ0H5MHg3+n8HZJxij6KGJh7QCId8orukCoPKE
-         PgiJCPiUjoDvfCpH70fqZU9m5qE/PjjEu78G60OsuamHgX2Z0BYhOBlykndnLOJ8xO/5
-         4/0aYXIUUiF6DSjT53vtIuEtnvX6bmZODaz8p7/bhASx0FJ0KiDWevFy/RcoDJyBeNUr
-         XX4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUjuNxWYCzpdA9opMzLsqWrGvJIjYNbe3kn2Qs7WxS2HiJRCj9zddAGwPYgaDKd7W3BSho1qzva+85dt+3lzxzROWxk284ya1Vs4g==
-X-Gm-Message-State: AOJu0YyG3C3G7nbew1asyLvnAtVaYzufapKK0/ZbFo5fgdlIIM+GiSds
-	fcf9REVm9Oisi9yPvKbUDb8wAubA6f39lzdYQBMD+Li1PPDuBm42x/6Z0sttMyzM4vu2cqR+ua9
-	ZfDviLJbzu+uG3r6cee6jC/is0Q==
-X-Google-Smtp-Source: AGHT+IFcRQ9tcdR9GgwlQ2hMVnWXaX7F/Kb8URPfkJsO03Zz4HFmB6bI0CYwGlmgmxJyoUyazYWij7LTwGDFITbwuLs=
-X-Received: by 2002:ac2:55b9:0:b0:51a:dc60:df07 with SMTP id
- y25-20020ac255b9000000b0051adc60df07mr2146282lfg.36.1713646565125; Sat, 20
- Apr 2024 13:56:05 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="KlLXaYox"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=Lg/qlzZwLKwph3NU6upqfUukKASnvxR4/ZL4TRGp+6o=; b=KlLXaYox3G9F3LYbGJTAvFrxGg
+	xBJoadfHfmxcDezhW4BpYBGR9p1Qb6JEHoQIxKPiryqsFy40bGj/1+ul4zmMNygrx8+7/WyLi/JBD
+	5RKN11OZOuP7U9XcPSm6QECnWitsinOgGtpNlT23eWSiVgMUNHoWKU/Lz4/WwRPbHj7bT52kXbVm+
+	CCIlqihXQj8aYs6kHxczweFkySYWCJHf2ulA6uAt+lIxCUxUs2tK2q4pA+CLv84DuAfRMWO9rEzMi
+	foTRb8LxGRFlLehgPvn4Me9vFdwxubEH/H+hCigRqvmTJHxhcQxcJVf2OWAOqYeGajSrO2ba8TYVE
+	1/tfZOcvUIxQHWw/YQGRGJti+sOmmz0xywWxsN09stps18tplAPS6n1ivyB4g/mIvA21TwA4Jx9kn
+	ZtgWaxNLiXJpTNL39KQbZSBTWiB761oZPvJDpK7+dBTWovqunkfet048tPa9BIUUmgwwMCjtwBNFp
+	RU5HH1kgeIfKdpDr5zv7p1nu;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1rycqC-007aLj-0t;
+	Sun, 21 Apr 2024 19:27:08 +0000
+Message-ID: <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+Date: Sun, 21 Apr 2024 21:27:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240403052448.4290-1-david.voit@gmail.com> <20240403052448.4290-2-david.voit@gmail.com>
- <80e09054c9490c359e8534e07f924897@manguebit.com> <CAPmGGo7XogXA8RppeqOtidWsgL84u+J4SUB7-st=A9a2ooPriQ@mail.gmail.com>
-In-Reply-To: <CAPmGGo7XogXA8RppeqOtidWsgL84u+J4SUB7-st=A9a2ooPriQ@mail.gmail.com>
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Date: Sat, 20 Apr 2024 13:55:53 -0700
-Message-ID: <CAKywueRW3PoAJcfwPWANh-oJeop6VP6BXsSMVR1Xq2LcTmXKDg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] Implement CLDAP Ping to find the closest site
-To: David Voit <david.voit@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org, 
-	Jacob Shivers <jshivers@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ Samba Technical <samba-technical@lists.samba.org>
+References: <cover.1710173427.git.lucien.xin@gmail.com>
+ <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
+ <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org>
+ <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+ <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+ <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
+ <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
+ <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-David,
-Thanks for the patch!
-Merged it to https://github.com/piastry/cifs-utils/commit/770e891a8b7ad53d4=
-d700e08cf8d3154028b4588.
-I removed a blank line and a style change around addr->ai_protocol !=3D
-IPPROTO_TCP check in resolve_host.c. Let me know if it is ok with you.
+Am 20.04.24 um 21:32 schrieb Xin Long:
+> On Fri, Apr 19, 2024 at 3:19 PM Xin Long <lucien.xin@gmail.com> wrote:
+>>
+>> On Fri, Apr 19, 2024 at 2:51 PM Stefan Metzmacher <metze@samba.org> wrote:
+>>>
+>>> Hi Xin Long,
+>>>
+>>>>> But I think its unavoidable for the ALPN and SNI fields on
+>>>>> the server side. As every service tries to use udp port 443
+>>>>> and somehow that needs to be shared if multiple services want to
+>>>>> use it.
+>>>>>
+>>>>> I guess on the acceptor side we would need to somehow detach low level
+>>>>> udp struct sock from the logical listen struct sock.
+>>>>>
+>>>>> And quic_do_listen_rcv() would need to find the correct logical listening
+>>>>> socket and call quic_request_sock_enqueue() on the logical socket
+>>>>> not the lowlevel udo socket. The same for all stuff happening after
+>>>>> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+>>>>>
+>>>> The implementation allows one low level UDP sock to serve for multiple
+>>>> QUIC socks.
+>>>>
+>>>> Currently, if your 3 quic applications listen to the same address:port
+>>>> with SO_REUSEPORT socket option set, the incoming connection will choose
+>>>> one of your applications randomly with hash(client_addr+port) vi
+>>>> reuseport_select_sock() in quic_sock_lookup().
+>>>>
+>>>> It should be easy to do a further match with ALPN between these 3 quic
+>>>> socks that listens to the same address:port to get the right quic sock,
+>>>> instead of that randomly choosing.
+>>>
+>>> Ah, that sounds good.
+>>>
+>>>> The problem is to parse the TLS Client_Hello message to get the ALPN in
+>>>> quic_sock_lookup(), which is not a proper thing to do in kernel, and
+>>>> might be rejected by networking maintainers, I need to check with them.
+>>>
+>>> Is the reassembling of CRYPTO frames done in the kernel or
+>>> userspace? Can you point me to the place in the code?
+>> In quic_inq_handshake_tail() in kernel, for Client Initial packet
+>> is processed when calling accept(), this is the path:
+>>
+>> quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
+>> quic_packet_handshake_process() -> quic_frame_process() ->
+>> quic_frame_crypto_process() -> quic_inq_handshake_tail().
+>>
+>> Note that it's with the accept sock, not the listen sock.
+>>
+>>>
+>>> If it's really impossible to do in C code maybe
+>>> registering a bpf function in order to allow a listener
+>>> to check the intial quic packet and decide if it wants to serve
+>>> that connection would be possible as last resort?
+>> That's a smart idea! man.
+>> I think the bpf hook in reuseport_select_sock() is meant to do such
+>> selection.
+>>
+>> For the Client initial packet (the only packet you need to handle),
+>> I double you will need to do the reassembling, as Client Hello TLS message
+>> is always less than 400 byte in my env.
+>>
+>> But I think you need to do the decryption for the Client initial packet
+>> before decoding it then parsing the TLS message from its crypto frame.
+> I created this patch:
+> 
+> https://github.com/lxin/quic/commit/aee0b7c77df3f39941f98bb901c73fdc560befb8
+> 
+> to do this decryption in quic_sock_look() before calling
+> reuseport_select_sock(), so that it provides the bpf selector with
+> a plain-text QUIC initial packet:
+> 
+> https://datatracker.ietf.org/doc/html/rfc9000#section-17.2.2
+> 
+> If it's complex for you to do the decryption for the initial packet in
+> the bpf selector, I will apply this patch. Please let me know.
 
-Jacob, Paulo,
-Thanks for the testing! Let me know if you want me to add
-"Reviewed-and-Tested-by: " tags to the commit.
+I guess in addition to quic_server_handshake(), which is called
+after accept(), there should be quic_server_prepare_listen()
+(and something similar for in kernel servers) that setup the reuseport
+magic for the socket, so that it's not needed in every application.
 
---
-Best regards,
-Pavel Shilovsky
+It seems there is only a single ebpf program possible per
+reuseport group, so there has to be just a single one.
 
-=D0=B2=D1=82, 16 =D0=B0=D0=BF=D1=80. 2024=E2=80=AF=D0=B3. =D0=B2 06:09, Dav=
-id Voit <david.voit@gmail.com>:
->
-> Thanks for all the reviews! Please let me know If you need any changes. I=
- didn't got any other off-list feedback and in my point of view this is now=
- in a ready for merge state.
->
-> Paulo Alcantara <pc@manguebit.com> schrieb am Mi., 10. Apr. 2024, 21:08:
->>
->> David Voit <david.voit@gmail.com> writes:
->>
->> > For domain based DFS we always need to contact the domain controllers.
->> > On setups, which are using bigger AD installations you could get rando=
-m dc on the other side of the world,
->> > if you don't have site support. This can lead to network timeouts and =
-other problems.
->> >
->> > CLDAP-Ping uses ASN.1 + UDP (CLDAP) and custom-DCE encoding including =
-DName compressions without
->> > field separation. Finally after finding the sitename we now need to do=
- a DNS SRV lookups to find
->> > the correct IPs to our closest site and fill up the remaining IPs from=
- the global list.
->> >
->> > Signed-off-by: David Voit <david.voit@gmail.com>
->> > ---
->> >  Makefile.am    |  15 ++-
->> >  cldap_ping.c   | 346 ++++++++++++++++++++++++++++++++++++++++++++++++=
-+
->> >  cldap_ping.h   |  14 ++
->> >  mount.cifs.c   |   5 +-
->> >  resolve_host.c | 258 +++++++++++++++++++++++++++++++-----
->> >  resolve_host.h |   6 +-
->> >  6 files changed, 606 insertions(+), 38 deletions(-)
->> >  create mode 100644 cldap_ping.c
->> >  create mode 100644 cldap_ping.h
->>
->> Great work!  I've tested it and found no issues.
->>
->> Most of the cifs-utils code seems to follow the Linux kernel coding
->> style, but I don't see it being mentioned anywhere, so the patch looks
->> good.
->>
->> Thanks!
+But is it possible for in kernel servers to also register an epbf program?
+
+metze
