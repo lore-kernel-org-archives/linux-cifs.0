@@ -1,105 +1,63 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBF93D556;
-	Mon, 22 Apr 2024 23:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE145BE7;
+	Mon, 22 Apr 2024 23:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713828046; cv=none; b=nK+2re1JKjBzKXcSK7HYb/iSnOpUdUdZf9F/HgU9UbNQbPaad4sy2vkYZB55kHix0bLtNDrinqeCi7BBq3VN6ytg3m8j94dUm7YJtN0Qjhd5ga7yruVrJK6ie0/enu4INIeNSMMOtKw1rjjB4RxIUDEhpfcpAvJIA64yZUiJ38E=
+	t=1713829861; cv=none; b=tvX530wKr+//mKd6Igyjy4+0v2IFzEV/mv28OVs65kYItDZPHj1/rnLRCdhPQC/SsYwwxA5vmgl/xo56okCAlWQx7wBA8ky/zyxeGrI5o8PlgVYnjzdyE1LCVwssLbpRMk4EV2mXY9MLvyM+ae73x1FUe6fIr4RjkTuoQpXogao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713828046; c=relaxed/simple;
-	bh=oj/jDjK3V5yRVW0Ym1lVsrvMUhzgj+h+qucbTcRuJMU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=t+tV202BQWgHjTbUPcGtSh357mvLFL9RX4fEE2J1FMYqx/VysfGfgpAXeJ5gzYbiw9J7Z1sbzd53T/PEjLIZfFmQnB4KSiP9r/p1/WxDeJ3fo2Gv/rLKv0gNUwRkswrloSr0Uo9upI3aU+DaTVi+nZSglX0TLCXMlq7dp0N4ycA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RejDHZEP; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1713829861; c=relaxed/simple;
+	bh=vJSspK42O2Pamp+qaFGJFE9yyvgPgv0uqX4P2q9XpB8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=J5/hsXuTA9Oc7ie/kGpFlMmCxx11uyhEYUsw3mm0cZKHaNu0Rh4UzFLBIv5tu7K9oB4uFGeJdhTq3fJJEhoSwFEkmt7lNLnLXr6tynqNS95og4a7exL9LY52gjD+DcrJSfE4ErtnNIm2eZ+O5+4tUdqhOU84jGkxE3RKBATv7/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=re217s3L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RejDHZEP"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2dd6a7ae2dcso29338141fa.1;
-        Mon, 22 Apr 2024 16:20:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713828043; x=1714432843; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/C4ZKdvHLh97H7STf6xCInhQe9bGeawo6BaxTH4MasM=;
-        b=RejDHZEPhM+fEan6LyKWXAv5GavI5NR8O4Wu2eBUvjG78jSj1kWF3JhSocVKrgXt/i
-         DZAF1rDdkvMPVoID5O84B7NLc8PAn6Av9lf/ERVaAzmkh7ckG9ICBUDZzzY3jP0jsBqC
-         eCDzeQD0Y74Sgc9ybJCpBn4gw2T0nzPTerwQAnBhX612YxCRQtqjOV7V4uxejZZf/8+p
-         eCXtg8qarcbStiG3PCGGGMvXe1Mhs/HEl8Z4SYNvJkxJ7/lOaciCCnEMUjFUfEKClUnY
-         k3S77AzpF/iERlWiGVPS/b3mR9j5fcvuOBVTjZ5WelRIbPZG5D5uzeJHSqDTIJyRRZOn
-         vj7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713828043; x=1714432843;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/C4ZKdvHLh97H7STf6xCInhQe9bGeawo6BaxTH4MasM=;
-        b=ZKC8zcvWSj7RSYV2P60xYIy48yRiL4+6fIp6P5mnMAljF3RXe5k9XqP2lJmba46T2j
-         jOFPohHLbp7184EW71Iu9UDcDfPfRRPvKa0c21DPFr6R0aeIeDU2ZdbMwmgTNLId5iKZ
-         N7nkpD5zfi4HoE7QIxj9tGnjs1VkMdHWs4OxHb0nA6dPC9aDqiLpISA1Finb/sRuOI88
-         kGf1RQ+YZrTv+ZfjiIVhiHPlUl8SiHYkZbZ7sc6HicVDQAQWOLguzqeCNs3k9YLljHO4
-         +HyfK4csu7D2uMfTx0woVCYh5uuhn34YaYekoLyGaXKCiInazAZn1cVnQ7Ob31mDL9Ht
-         iIuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXK5HA2pkjPuVsPfW/4Ve7KpeLuJ0vlik8KD/wVrFPRnNZjKTDyKWxzORJskMu1tWr2HhoLE+J3Cr7/UzsEY7vJ+2zYimZ/FPNGxg==
-X-Gm-Message-State: AOJu0YzP5Rd73xV2xJ5b8v/taUgVlmYWvayU3iChoEA6YFNFoSlwLy9k
-	Z+Ov1ZLV/kfhh31S+9EVGpK1Ze4/os/0oOfNQ+slpnQem710s+nJ/J7sfs+JX/ahOgZtGU8d3Ng
-	a3hpbJXoX3ECQ2X97+ZegPbG2fGGjfGYl
-X-Google-Smtp-Source: AGHT+IGaATWXxm54U52r2l7bs7whal15Jl96TdQJ+uO4Ct9/JAw5VwRxdhOHm+JbWX96oWX+haITAEbREAZIwagvcHs=
-X-Received: by 2002:a2e:a988:0:b0:2d6:c749:17bc with SMTP id
- x8-20020a2ea988000000b002d6c74917bcmr10136033ljq.31.1713828042866; Mon, 22
- Apr 2024 16:20:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="re217s3L"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84081C2BD11;
+	Mon, 22 Apr 2024 23:51:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713829860;
+	bh=vJSspK42O2Pamp+qaFGJFE9yyvgPgv0uqX4P2q9XpB8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=re217s3L1e+o6lwvFJkwIVwsnMMsGRlcw7MxBHuWh2PYlS/7Bm5U0d9LGcHsnWldb
+	 YlwRr+sDGiN9XGtf6q6LvNf1FWq4Y82NlNivDMrjBUgES6w+sEw2xMv8OTkz/MB1TU
+	 vf3+8C0Uft4cc3EzONWIzPzEp2L6Bl7FGo/FKV+3NJtQW54RbUu0uuSeBaO3tOgOyp
+	 aVHhSU23p/fDiPvtbTYB9HyEC7FEzyO8/C3PkWgelNoOc35wFc4DFQvZq1sqwMkNjT
+	 LfvStjLQWT29gHxwdHzNQEbEW48mH8KpQLYJA8bZmawtRLe6oqI00+14uNbuA2OiBD
+	 e2/y5Ae0iXjsQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74600C433A2;
+	Mon, 22 Apr 2024 23:51:00 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mt+jm0-X-zx18QgJ+Q2DX9pCkf+TQH=Cb809xTjVJVGQQ@mail.gmail.com>
+References: <CAH2r5mt+jm0-X-zx18QgJ+Q2DX9pCkf+TQH=Cb809xTjVJVGQQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mt+jm0-X-zx18QgJ+Q2DX9pCkf+TQH=Cb809xTjVJVGQQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.9-rc5-ksmbd-fixes
+X-PR-Tracked-Commit-Id: e9d8c2f95ab8acaf3f4d4a53682a4afa3c263692
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 71b1543c83d65af8215d7558d70fc2ecbee77dcf
+Message-Id: <171382986046.12241.9020510940744853282.pr-tracker-bot@kernel.org>
+Date: Mon, 22 Apr 2024 23:51:00 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 22 Apr 2024 18:20:31 -0500
-Message-ID: <CAH2r5mt+jm0-X-zx18QgJ+Q2DX9pCkf+TQH=Cb809xTjVJVGQQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-0bbac3facb5d6cc0171c45c9873a2dc96bea9680:
+The pull request you sent on Mon, 22 Apr 2024 18:20:31 -0500:
 
-  Linux 6.9-rc4 (2024-04-14 13:38:39 -0700)
+> git://git.samba.org/ksmbd.git tags/6.9-rc5-ksmbd-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/71b1543c83d65af8215d7558d70fc2ecbee77dcf
 
-  git://git.samba.org/ksmbd.git tags/6.9-rc5-ksmbd-fixes
-
-for you to fetch changes up to e9d8c2f95ab8acaf3f4d4a53682a4afa3c263692:
-
-  ksmbd: add continuous availability share parameter (2024-04-19 20:48:47 -0500)
-
-----------------------------------------------------------------
-Five ksmbd server fixes, most also for stable
-- rename fix
-- fix for two potential out of bounds
-- fix for connections from MacOS (padding in close response)
-- fix for when to enable persistent handles
-----------------------------------------------------------------
-Marios Makassikis (1):
-      ksmbd: clear RENAME_NOREPLACE before calling vfs_rename
-
-Namjae Jeon (4):
-      ksmbd: fix slab-out-of-bounds in smb2_allocate_rsp_buf
-      ksmbd: validate request buffer size in smb2_allocate_rsp_buf()
-      ksmbd: common: use struct_group_attr instead of struct_group for
-network_open_info
-      ksmbd: add continuous availability share parameter
-
- fs/smb/common/smb2pdu.h       |  2 +-
- fs/smb/server/ksmbd_netlink.h | 35 ++++++++++++++++++-----------------
- fs/smb/server/server.c        | 13 +++++--------
- fs/smb/server/smb2pdu.c       | 15 +++++++++++++--
- fs/smb/server/vfs.c           |  5 +++++
- 5 files changed, 42 insertions(+), 28 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
