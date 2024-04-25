@@ -1,101 +1,87 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB69314D6F1
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 16:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D8F14D717
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 17:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714064140; cv=none; b=WxiwQgf/yfnwZPeXuUGezXZNhbWvLaUs6lIHDSlWLgQvgqQdtU+J8DpRr4n0Bqe30OtmriaPCQFTZlU1xDtrK01VePhxWGp8VHRIvNCz4sfnn9EWPqQpBn//oZtfdxdk24Oxc19iDWSZd9VEaLM1zN19X9+766Wr1VFQsyaAZEQ=
+	t=1714067068; cv=none; b=fTXjW6zlqAPQo5lyOHYIlZ2rCF+cOrNzBSariZe8vwDn43zaoSqEhns83yQGK6g7/sdtp8X0dKdBzEmcVPhd8EsZzU8h1rUdEnZiq/7QZAqC/aFt+t8IpTAXamogmCXQhb1pg2dYNvP+6WvYZMwG5WIUuaCQsS20NcsKNTH2Z+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714064140; c=relaxed/simple;
-	bh=ddM1XLVS7dfMKPVIhBjVi1t0HNSc0C6sEOh9JsCuHV0=;
+	s=arc-20240116; t=1714067068; c=relaxed/simple;
+	bh=ELbYx9+k1FZ3G+EMZneBvOHnbLbOrQgCNPiuHhoj0yQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UQy1O9ez3aKTcMP8B1xeWs6llCz9a0aNc4W8JnWqNSOYMkFiOc4+bSzqwcx+TcMs7w22GxPtnsC+yV1qezvY4fpzyMMYYoLwklFLwAXAVePQ0L7P+DWqDZPOqNNOlIOHMeO+kyjuBillCyL/vHADvr3Q662YP+yGT22MVGZlD0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=klgjcuKv; arc=none smtp.client-ip=209.85.167.46
+	 To:Cc:Content-Type; b=nljakVVf18xJrS3L/Jku0I9Wwn304wiAPmomg+5jjwM+QWzRVteJ38fP0YHMMcL8YJidPB1caLwuTdyIciuA+j+9KD1njxVRdur5O9EzfO3o5wms9D9v1EU7lLIii0k9gk5IgznxemT4RCfQj1lkeU8LrffdW7KU178kJww1OaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A8Y9Vfl8; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klgjcuKv"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-51bae805c56so1423056e87.0
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 09:55:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8Y9Vfl8"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2dd7e56009cso15955001fa.3
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 10:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714064137; x=1714668937; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714067065; x=1714671865; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zrUMpO79Q1VW6ei2uvDYlSeCoQDW9KDdKO2FljciGMs=;
-        b=klgjcuKvoNgmONJ9i/cp+92gEHZMfwjomhNcCo9A8JRUzKiI0wg10l4UKa+ABsM1O8
-         Z6/d5oSqAYvG9QcvncQAuE6QkHSfUpiNuKF/PlOeYu5PividYa79ZlRmw+FIol4+XJ93
-         xcRcX6rZmLwvLLEyfraK8+829KIqQjXp52JjLvEqUrQQcsJLv8yluv66txhF1w71kB+h
-         anTBCN5x7Sq3VRQ6lzAJXsRwDB9u0GWrJqEi9RBcFH/hyMV0qYKPJwlxvRQkE5nDtodt
-         Lvd2p0sU/v2eQWHVtkZ6/ylTrWvh7Y4rDFVUlMIDrPM0oKKLJqWfEYN+S9sFF7cCO8uN
-         3cQQ==
+        bh=ELbYx9+k1FZ3G+EMZneBvOHnbLbOrQgCNPiuHhoj0yQ=;
+        b=A8Y9Vfl8RMSPfb+V1XHaZJcNew+TMK5CHMBSDZAVZm13hPaHChboE4Ukt2NO2+s8MO
+         SnD7GHNU6o9LmEysivHo77Iud7O38ahF03gKBVDgcH68se2bmrlwdkX4TtWUPyXVYd0A
+         5kJKZr5txynPIPMPh0TIfBjXa0rqdP+w9HSw9MJCTZk+FjjUpwTBTrZvOocXUBl62niB
+         mGpP7FM/mFrhqv3ZB0d08TDBb6QDiLksoJfwFGXVIg1lugyuhYSDS5Wb9SMhynojVRDf
+         lkEPgRpGhg0Z+ac6dIo8Ln9aPLfk/geYUM6ar/eF7KPen2oIaoiJbrBJ9PhI0wFo8MHz
+         vu7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714064137; x=1714668937;
+        d=1e100.net; s=20230601; t=1714067065; x=1714671865;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zrUMpO79Q1VW6ei2uvDYlSeCoQDW9KDdKO2FljciGMs=;
-        b=crBCdqOxdidZEYQgWOonwJa44ntCJX+0FfB5NoIgM9smvldP3b7BPgbISFw6DMUAfD
-         FRyo2NuSajKoPokfHwKG2yJm+eNnBc4p5zNfyTm3Sis0DsOjm/EqPzNIZKzvqw2ZWuuv
-         8pnTseimKlFmAn2tnvFgulmWzL7//B+lb3nXGpIP9nNoWKZjQugslBhf9Sy5aetpNs4u
-         hra4yLEYP0+34OlEfNwsUODhQhXSNZChdsf3EKat+j+2DBhxVsq3A10Z9Z3Y4B0RQWAc
-         AMo3v7eM4tZG3qV26hI0hUhuTsTkBi44/GuWLAxwO6TlB89Rphqgda/qiqsaYKb1eAH2
-         0s4g==
-X-Gm-Message-State: AOJu0YwtcYXrPw4kbSTxn++tUKs622wwseSvHYHNfhXW9gS+432QRHd0
-	vzLrcgELG+L8grJmO05ZslrHa+aZlzqmj+sf3TgaGwYOjjYWjrCq9EUyz33O7jEDvDLqwPJ7onA
-	Sbeaq32R3f7Qh02cBqkrlvh/0w5QxoA==
-X-Google-Smtp-Source: AGHT+IF5FXdQ+S3YqlBd516KFx47zW38RnICYmg/qYDU09TGSaOOHYLJtrOKoAOlwGTElq66PzLSJczcsjHWBAqQu8Q=
-X-Received: by 2002:a19:ca1b:0:b0:518:c959:8be with SMTP id
- a27-20020a19ca1b000000b00518c95908bemr4327645lfg.58.1714064136507; Thu, 25
- Apr 2024 09:55:36 -0700 (PDT)
+        bh=ELbYx9+k1FZ3G+EMZneBvOHnbLbOrQgCNPiuHhoj0yQ=;
+        b=PehNSnR1J6Lf/ZxmOLXVk7HGksfhhsxtWE5NshyBfIXSPaZ+qfhVSyNTasKrS/ig+s
+         cuCHnHF5LvAUqRsyAaSjuzUpcXjo8xKyywDZ/DBWJHn8X9bxC9G82tQEmphz8H5l6zdo
+         f6sH8nI6jpyWcSc0y+1btL3Zzr1Nyln3Nh66zA8WF9lI0fY3eSxR14hXsAIuZXQ70uN2
+         kmqY9jNq9aUwnLZagUV0paMEKT9e+HerWuSCs1aFBqavVbeXZzqBTK/CZtJEsUd+uPLe
+         4lu0vVIkbd6OKczbqtHEtteeS+kEcJs6+vwhQM+ilmKI1+jN4X8JpXJuppRKes8dSBKa
+         IC5Q==
+X-Gm-Message-State: AOJu0Yxt+fWb4qSq+a2Hd0JdrvEy77WK2khKibhh9pQ/I1zPHbNxzzj9
+	ajfPphmJQu6ueKV06qkzRyg3sOHnm3ZytN0mOci3DRGYObAQktDde5+soSD4yLTASD7UfGBUXk+
+	jMsxn2pCFd87m/ZCp9pNZImtObAM=
+X-Google-Smtp-Source: AGHT+IFPvQ0jGG4AVmom1xd20q1XFT80C2J3RsZQb7s+l7gM3Z6Mffwt27Srr5rcAsZF4Gt8h8P8Ds4eLhg/JuA19ok=
+X-Received: by 2002:a2e:b714:0:b0:2dd:b190:241f with SMTP id
+ j20-20020a2eb714000000b002ddb190241fmr32394ljo.39.1714067065278; Thu, 25 Apr
+ 2024 10:44:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5ms2xmxgZ08pecifj+Za=_oWnrhVOUgifjYLnCw+Rz9_kA@mail.gmail.com>
-In-Reply-To: <CAH2r5ms2xmxgZ08pecifj+Za=_oWnrhVOUgifjYLnCw+Rz9_kA@mail.gmail.com>
+References: <CAH2r5mtJuttkzHDQB=-U3o=bBnv5U9r2w+JG-mXg1TPBT1wFog@mail.gmail.com>
+In-Reply-To: <CAH2r5mtJuttkzHDQB=-U3o=bBnv5U9r2w+JG-mXg1TPBT1wFog@mail.gmail.com>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 25 Apr 2024 22:25:24 +0530
-Message-ID: <CANT5p=oZ6xs6zWU_WUYc90LuNHPH88m33iS-vyw2tQSOuSb6OA@mail.gmail.com>
-Subject: Re: [PATCH][SMB3 client] missing lock when picking channel
+Date: Thu, 25 Apr 2024 23:14:12 +0530
+Message-ID: <CANT5p=qE_6xA7qML6f5i+0i7ZpD43QcT6vKsWqm+wdpc8VyoRQ@mail.gmail.com>
+Subject: Re: [PATCH][SMB3 client] fix potential deadlock in cifs_sync_mid_result
 To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Enzo Matsumiya <ematsumiya@suse.de>, 
+	Pavel Shilovsky <piastryyy@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 10:14=E2=80=AFPM Steve French <smfrench@gmail.com> =
-wrote:
+On Wed, Apr 24, 2024 at 9:16=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> Coverity spotted a place where we should have been holding the
-> channel lock when accessing the ses channel index.
+> Coverity spotted that the cifs_sync_mid_result function could deadlock
+> since cifs_server_dbg graps the srv_lock while we are still holding
+> the mid_lock
 >
-> Addresses-Coverity: 1582039 ("Data race condition (MISSING_LOCK)")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->  fs/smb/client/transport.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> "Thread deadlock (ORDER_REVERSAL) lock_order: Calling spin_lock acquires
+> lock TCP_Server_Info.srv_lock while holding lock TCP_Server_Info.mid_lock=
+"
 >
-> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> index 443b4b89431d..fc0ddc75abc9 100644
-> --- a/fs/smb/client/transport.c
-> +++ b/fs/smb/client/transport.c
-> @@ -1059,9 +1059,11 @@ struct TCP_Server_Info
-> *cifs_pick_channel(struct cifs_ses *ses)
->   index =3D (uint)atomic_inc_return(&ses->chan_seq);
->   index %=3D ses->chan_count;
->   }
-> +
-> + server =3D ses->chans[index].server;
->   spin_unlock(&ses->chan_lock);
+> Addresses-Coverity: 1590401 ("Thread deadlock (ORDER_REVERSAL)")
 >
-> - return ses->chans[index].server;
-> + return server;
->  }
+> See attached patch
+>
 >
 > --
 > Thanks,
