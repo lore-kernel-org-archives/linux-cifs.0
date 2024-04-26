@@ -1,99 +1,205 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FB32135A
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 19:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB14D139D1A
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Apr 2024 04:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714073025; cv=none; b=gXcZIehtASQrSbgUVbQznK1W3c7FR2HThp6/5F8TencTD7jyWSAli1DSClQCIfyQzZKZ2wF2lCV/a53KAuTPBZMJgEwngdvYw1AJPuZtpdpxVh53nFb+vehXuhMaLo4dwVH3J2o7jU3xOkJ+YoLyzHYh3rbx+6CpgtaErMPRYrg=
+	t=1714107542; cv=none; b=hBy1bnv2t8ACLSk1xywEl/PCEKcLAZcX3p+mXk//X5KvN3B7UTSt4IuwD8bP7xEIRPdLZX3rLSmMp6/uypDUQoDqzojnXk+TdHWNoNlPx0+tPus6wTCb125cwDQ277v5n04EpvalsjjfR+8H0l03JHLtUzQIPJ6oi25dUQp/9+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714073025; c=relaxed/simple;
-	bh=qcLLS7MtEbDxdB6XJkTXGmgEGB7GTCg2+XThjUJS0gI=;
+	s=arc-20240116; t=1714107542; c=relaxed/simple;
+	bh=d3KmDmp/3dmubANe+l1+bNRnUChLWKM23acflPULoUM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a5u9VJeZbNQwjy+XscQrvRoxAIdAAPzmPnDR3B3xSwlDDSa8lkKQ4STNEsPONDpfl3lzfSJswzrfUjuf5TGV5iFSr6WEdot9JKbAgjMNoh7dg9faH5mM0egq8HIQXo3fIbzLgA3i9Rxr95bP2Ll9rqeWSZuWCbBdcTuVwni5W8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AlpTsP0A; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 In-Reply-To:Content-Type; b=i18jGGN4JQ6nstI5zCCKuEX+C5zfcPGAHqUr4hvYOEdq6zpgvIrDwYSmGESRw+QfoJ0hyEf7ApXpCsZJI4Tkwi+uiPwEL4cYxg08Cxj0JYroVSeRRlreW/fogWMY0sKGeiMGizUgW6vfXo7W1vbTQaTKuKlZ4t3ceeVBFOUMNfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pZLFqUFT; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AlpTsP0A"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-571ba432477so1428507a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 12:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1714073022; x=1714677822; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hrzg94l+b7iS9EDh3KlUi7r/m43so1FdRl9RA1FeHls=;
-        b=AlpTsP0AINU1zD//kjTi6Q07d+pdPU2MPSVj1SD/ygB62XI8RQUObaOldmMCPBjQcw
-         6pBR448sykT7c19jc4ZLLhynuo44UwXAqnVe7ReTHrWa9/FZee/ovpSAhLAfl/dwrPVh
-         wfLfsDKg+s4T8AU2NrGkCeg75vw56zF/8cB9FYhKFTsrqKuVfzVHU9S/73AZLNivKo05
-         qTHSDH11XLs7x1Aa8gpQSe5SIVEPYWHCh5nKgFXB+P74riuHJKaIlSqCBTwsiuC2yxBy
-         WAfS78iYLPOmX9ogP69/1tXrxNqe/5Ua6WVdyneZ6NfYdwhEAzMwUrJsZJzG192kKHQf
-         yHKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714073022; x=1714677822;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hrzg94l+b7iS9EDh3KlUi7r/m43so1FdRl9RA1FeHls=;
-        b=iwrLdhEWCONHd5Y1Z100c68nDgOvICXMEzYl99bGoi2X9UVdNbX1cYZaGNn+H9726Z
-         NZQoFLVi5HbaNQGQMiRjY682fyH42gtz/KpPz1KWnuJ5Yhamz1ICfxYO11RgbfyzpWYl
-         /d9nReyoarma4tOvX1GpdHSflBJY3hr5X69agK5HLeRQ4vVNaISFAMaCKvpoeeC5GCSn
-         WYcn2hGfA4X57pX6J9X18k30MrYHzNfI9I40jk9Mhb6V4V37u6dFaHW9dhNi+Tm1k65Z
-         Q8aI+P0x/agPmpWkNosbnuwYcpmu2LFG5Iexf50bYsSW2Gw08hxxLNNBu9TeZoWoOiIQ
-         iqxA==
-X-Gm-Message-State: AOJu0Yy9q4XDe+UEk5iEnH5le2xOlSA8U59yNFhkbJ6kO9ugWiEHfPTE
-	aV1bu1sxitGlAqsy4AAAFXbhbkDD8lZEHNpJJQx2C9sG6J/g9a8UmYweIvWmyRxPvKa6nn9xHWO
-	V
-X-Google-Smtp-Source: AGHT+IGRvQvMvah8hPRNkxVEt0sXy1QEVWPWNH45REbZjZHQlCH51wQid85V1eK3SDzzdBaHBdNkbQ==
-X-Received: by 2002:a17:906:e17:b0:a52:6bbd:595d with SMTP id l23-20020a1709060e1700b00a526bbd595dmr479314eji.7.1714073021277;
-        Thu, 25 Apr 2024 12:23:41 -0700 (PDT)
-Received: from [172.16.1.175] ([80.95.105.245])
-        by smtp.gmail.com with ESMTPSA id f15-20020a170906c08f00b00a553574ae71sm9802454ejz.7.2024.04.25.12.23.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Apr 2024 12:23:40 -0700 (PDT)
-Message-ID: <f15d2f5f-2e17-42d1-a376-3272b4460e37@suse.com>
-Date: Thu, 25 Apr 2024 13:23:41 -0600
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pZLFqUFT"
+Message-ID: <840ddcb4-acaa-4ce4-ad56-e2d14b447907@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1714107538;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=djOZafUyrrq9V8xkvWbRVjEsaKg7oC8Pb5wsRAwbtL4=;
+	b=pZLFqUFTypSQywrdzl7e4BPh62DtVR8OpL+ZLy1jgs55uNXOAHLhOOqRHVYCps0YlT5G6s
+	Hltj3DqdiU6hnHAUiAwdpZbHIEkw03sqaaLzxx7KRYa0cdHHyjVzGStYymeew9EmcNaaQz
+	vouPRb7v9/HHg9cHjyYXzWZNMj6K9zg=
+Date: Thu, 25 Apr 2024 21:58:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: 128 bit uid/gid (UUID) possible?
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-cifs@vger.kernel.org
-References: <fdb2c85a-3692-4e99-a25b-4b17759071ba@suse.com>
- <54d8dccd-f224-4ad6-875c-774c45f9ba9b@suse.com>
- <CAHk-=wiaWr2fsvMx3EWdXRegQ9Fo5VzhRFn7cmLDErh1jhos9g@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Xin Long <lucien.xin@gmail.com>, Stefan Metzmacher <metze@samba.org>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ Samba Technical <samba-technical@lists.samba.org>, bpf <bpf@vger.kernel.org>
+References: <cover.1710173427.git.lucien.xin@gmail.com>
+ <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
+ <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org>
+ <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+ <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+ <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
+ <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
+ <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
+ <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+ <CADvbK_e7i08GAiOenJNTP_m+-MeYjSf7J-vkF+hgRfYGNCjkwQ@mail.gmail.com>
 Content-Language: en-US
-From: David Mulder <dmulder@suse.com>
-Organization: SUSE
-In-Reply-To: <CAHk-=wiaWr2fsvMx3EWdXRegQ9Fo5VzhRFn7cmLDErh1jhos9g@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CADvbK_e7i08GAiOenJNTP_m+-MeYjSf7J-vkF+hgRfYGNCjkwQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+
+On 4/22/24 1:58 PM, Xin Long wrote:
+> On Sun, Apr 21, 2024 at 3:27 PM Stefan Metzmacher <metze@samba.org> wrote:
+>>
+>> Am 20.04.24 um 21:32 schrieb Xin Long:
+>>> On Fri, Apr 19, 2024 at 3:19 PM Xin Long <lucien.xin@gmail.com> wrote:
+>>>>
+>>>> On Fri, Apr 19, 2024 at 2:51 PM Stefan Metzmacher <metze@samba.org> wrote:
+>>>>>
+>>>>> Hi Xin Long,
+>>>>>
+>>>>>>> But I think its unavoidable for the ALPN and SNI fields on
+>>>>>>> the server side. As every service tries to use udp port 443
+>>>>>>> and somehow that needs to be shared if multiple services want to
+>>>>>>> use it.
+>>>>>>>
+>>>>>>> I guess on the acceptor side we would need to somehow detach low level
+>>>>>>> udp struct sock from the logical listen struct sock.
+>>>>>>>
+>>>>>>> And quic_do_listen_rcv() would need to find the correct logical listening
+>>>>>>> socket and call quic_request_sock_enqueue() on the logical socket
+>>>>>>> not the lowlevel udo socket. The same for all stuff happening after
+>>>>>>> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+>>>>>>>
+>>>>>> The implementation allows one low level UDP sock to serve for multiple
+>>>>>> QUIC socks.
+>>>>>>
+>>>>>> Currently, if your 3 quic applications listen to the same address:port
+>>>>>> with SO_REUSEPORT socket option set, the incoming connection will choose
+>>>>>> one of your applications randomly with hash(client_addr+port) vi
+>>>>>> reuseport_select_sock() in quic_sock_lookup().
+>>>>>>
+>>>>>> It should be easy to do a further match with ALPN between these 3 quic
+>>>>>> socks that listens to the same address:port to get the right quic sock,
+>>>>>> instead of that randomly choosing.
+>>>>>
+>>>>> Ah, that sounds good.
+>>>>>
+>>>>>> The problem is to parse the TLS Client_Hello message to get the ALPN in
+>>>>>> quic_sock_lookup(), which is not a proper thing to do in kernel, and
+>>>>>> might be rejected by networking maintainers, I need to check with them.
+>>>>>
+>>>>> Is the reassembling of CRYPTO frames done in the kernel or
+>>>>> userspace? Can you point me to the place in the code?
+>>>> In quic_inq_handshake_tail() in kernel, for Client Initial packet
+>>>> is processed when calling accept(), this is the path:
+>>>>
+>>>> quic_accept()-> quic_accept_sock_init() -> quic_packet_process() ->
+>>>> quic_packet_handshake_process() -> quic_frame_process() ->
+>>>> quic_frame_crypto_process() -> quic_inq_handshake_tail().
+>>>>
+>>>> Note that it's with the accept sock, not the listen sock.
+>>>>
+>>>>>
+>>>>> If it's really impossible to do in C code maybe
+>>>>> registering a bpf function in order to allow a listener
+>>>>> to check the intial quic packet and decide if it wants to serve
+>>>>> that connection would be possible as last resort?
+>>>> That's a smart idea! man.
+>>>> I think the bpf hook in reuseport_select_sock() is meant to do such
+>>>> selection.
+>>>>
+>>>> For the Client initial packet (the only packet you need to handle),
+>>>> I double you will need to do the reassembling, as Client Hello TLS message
+>>>> is always less than 400 byte in my env.
+>>>>
+>>>> But I think you need to do the decryption for the Client initial packet
+>>>> before decoding it then parsing the TLS message from its crypto frame.
+>>> I created this patch:
+>>>
+>>> https://github.com/lxin/quic/commit/aee0b7c77df3f39941f98bb901c73fdc560befb8
+>>>
+>>> to do this decryption in quic_sock_look() before calling
+>>> reuseport_select_sock(), so that it provides the bpf selector with
+>>> a plain-text QUIC initial packet:
+>>>
+>>> https://datatracker.ietf.org/doc/html/rfc9000#section-17.2.2
+>>>
+>>> If it's complex for you to do the decryption for the initial packet in
+>>> the bpf selector, I will apply this patch. Please let me know.
+>>
+>> I guess in addition to quic_server_handshake(), which is called
+>> after accept(), there should be quic_server_prepare_listen()
+>> (and something similar for in kernel servers) that setup the reuseport
+>> magic for the socket, so that it's not needed in every application.
+> It's done when calling listen(), see quic_inet_listen()->quic_hash()
+> where only listening sockets with its sk_reuseport set will be
+> added into the reuseport group.
+> 
+> It means SO_REUSEPORT sockopt must be set for every socket
+> before calling listen().
+> 
+>>
+>> It seems there is only a single ebpf program possible per
+>> reuseport group, so there has to be just a single one.
+> Yes, a single ebpf program per reuseport group should work.
+> see prepare_sk_fds() in kernel selftests for select_reuseport bfp.
+> 
+>>
+>> But is it possible for in kernel servers to also register an epbf program?
+> Good question. TBH, I don't really know much about epbf programming.
+> I guess the real problem is how you pass the .o file to kernel space?
+> 
+> Another question is, in the selftests:
+> tools/testing/selftests/bpf/prog_tests/s
+> tools/testing/selftests/bpf/progs/test_select_reuseport_kern.c
+> 
+> it created a global reuseport_array, and then added these sockets
+> into this array for the later lookup, but these sockets are all created
+> in the same process.
+> 
+> But your case is that the sockets are created in different processes.
+> I'm not sure if it's possible to add sockets from different processes
+> into the same reuseport_array?
+> 
+> Added Martin who introduced BPF_PROG_TYPE_SK_REUSEPORT,
+> I guess he may know the answers.
+
+I didn't read the patchset, so I don't know what wanted to be done.
+
+ From capturing the questions in this and next email:
+
+the reuseport_array is a bpf map. Like any bpf map, it can be shared across
+different processes. Meaning different processes can add sk to the map.
+
+The bpf prog that selects a sk from the reuseport_array is set by the userspace 
+through setsockopt(SO_ATTACH_REUSEPORT_EBPF). It is the only way right now, iirc.
+
+If you can summarize what want to be done, it could help to see if there
+are ways that work for the use case.
 
 
-On 4/25/24 1:21 PM, Linus Torvalds wrote:
-> On Thu, 25 Apr 2024 at 12:17, David Mulder <dmulder@suse.com> wrote:
->> What is the possibility of increasing the uid/gid size in the kernel from 32bits to 128bits?
-> Nope.
->
-> We don't have user-space interfaces for it (st_uid is 32-bit), and the
-> pain is not worth any theoretical gain.
->
->                  Linus
-Ok, thanks. I'll move forward with id mapping.
-
--- 
-David Mulder
-Labs Software Engineer, Samba
-SUSE
-1221 S Valley Grove Way, Suite 500
-Pleasant Grove, UT 84062
-(P)+1 385.208.2989
-dmulder@suse.com
-http://www.suse.com
+> 
+> Thanks.
+> 
 
