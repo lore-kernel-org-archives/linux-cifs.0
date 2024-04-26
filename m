@@ -1,107 +1,91 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4A013A875
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Apr 2024 06:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D6D13C8FF
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Apr 2024 08:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714113995; cv=none; b=Q1TKov++sOwsKYIvr9gUJP/ftOcDfv/+P0YwwqF+PSe7ughSATDXSun+2v6Myi/vVnxuUckde/peLMW/mLyrPEQqotSNXn0Tcx3DZ6L6HvR6MAvHpSqfsEeAvIdlPPFV0ViWQQ/QBfck5z/dKk64VhPurFuiV6J0ZCBVWkXXHZU=
+	t=1714118443; cv=none; b=KsGQUsr/ug/13gE5QMxtvewg9JJTA85fZ/ybxuNVhTt2mhtT9eyse75Zz8KCLyTozUhSjdFMtgDHP4TCMUckep8g5csBdHcmm4kmzIIxvEp/lOa01AG41Ldjkopl6IbkIlg+xBzTDsU/yLTlw5qrLZ+H1bwiPw184Aowjhj/UTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714113995; c=relaxed/simple;
-	bh=PdJbjXcI5l5uQ68geH7lYdewvq/jPzw0J7cD9VwIX6I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qsaaBJ2QA/d+9li1my4rOVHoCMtA3KiVgAGkeUPre7Xn1r2hggqtrYC7yqBkzd4OSrs3Gc/AofX6ocR9OFlYxXaAjUdwV5prbAsi/bIYjT7/MwnevxmV/ex0R6Uoj9V5nQPYJtmzJKSfZzDyQP6xvjXpD6jSrdYAr7zfg01vU5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jrbMsxDM; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714118443; c=relaxed/simple;
+	bh=8moJHIF915kF9JPZZi2hSy1ahaIWtygA+5VPkH7e8r8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=aWuzMSHhNscN/BDQkNx5RmG0/8wo3Fo10I+/NrIa15mXE0Phmw74AKRbQZq1ysfWapBcEzJZYazp9pmJJEeotKX4sRir5icCcXg8q0ii3D+EoU/JjeJUd5BJYtmMgGaMn4qBTvzzwW81zJ1fiF/uV9OjoJV15bXlgtJBWBmxM/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K9t+9G+a; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrbMsxDM"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-516d2600569so2182609e87.0
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Apr 2024 23:46:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714113991; x=1714718791; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6aNPLFBGr76gCVgR+bUuKhSIf1fCnP5p4dRrl7dMQ1U=;
-        b=jrbMsxDM+HQX+6I343WMwxd/O97dheqmli3Mr210ZG4bpuLJMS3SNta2HJNNgxGMRK
-         ZH5KgVkrlYO/ou2xxn11t5o7M3JmQee7WqRzxl/B1P7znGxuHKT+htUeFrdSc4Jizu/E
-         VtaUW+j7bhdzN+8hH6IloRiqGz/gt965B0NYQqXaaZJPSE0sLEV5pDz7tBYTemd+gLGR
-         HHuECpHAkn8Q7ga5BAs0lpg+YPkbgDcTRRU1xYt3g1GVSvS8jw5HfNTmJ98lDxHstAUn
-         EPLr8cMdFbhZGpETimJSHpcrgKKIb/LRUlSpE2AIIehQlFDIg5DFJiMAErEu26HLMde+
-         lciA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714113991; x=1714718791;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aNPLFBGr76gCVgR+bUuKhSIf1fCnP5p4dRrl7dMQ1U=;
-        b=Z34WLcsZBgFBFN4wtIohGh4tvipDZI+JeT4gYmTkyadQzrshkwixVHikvKE5HvHisB
-         TMHoTwwJTzJ8pKUnWu3xuxna6Okogkw4hI8tlNR/yrrFzF/KwtcaZY2gAQA2PSUz5Qlv
-         zyTu9tF/mBcyEooZ5QIZyXQdg5RXQZ0UBxyv5/t9DpKUyF96pdeLdTqa2S2mf3vaRUVe
-         euD38KMIwavIMRYhNhIBBd0liFCz7wdeJ/TbD7ai09FfQSapn4I7WwgHLTg9FfQVQcB4
-         oNFsuYA9GvXZrhS3byQJZkkcLjF2FoZwmpN1GFrwbB5109oC1E7yr0znPVORsSb4UlTW
-         IL7w==
-X-Gm-Message-State: AOJu0YzlqYWrIBMiJEEtpVVr9j2EYkTOsOTHnD7vNmN/wFPVEsrQNg1N
-	DUQjBXNEFMcDGArmswiX86Xb3ZjLt/ppn2r2A6yHVONNP4bBka+x12zhr2iFTDJC2lny6GGIVjm
-	r2UVi0Ij/arWw4KtWT5F1sY5aKlu9nQ==
-X-Google-Smtp-Source: AGHT+IEnyQI6z6l7UprRSJSnGWw2MZpbE/F9IrqExWC7FJb1Yk3WVk5pyvzTHfcQHmrDvC7bKuJSFpZ4VbukRhB+wS0=
-X-Received: by 2002:a19:5e0f:0:b0:51b:aa42:67bc with SMTP id
- s15-20020a195e0f000000b0051baa4267bcmr955875lfb.57.1714113990776; Thu, 25 Apr
- 2024 23:46:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9t+9G+a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714118441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xIFFxT8ZyW309/4jPgibBUS9mKjAZgteIkx/pxryLuo=;
+	b=K9t+9G+aPTmZZzoQ5tlhaJveJfAzj+Dvd+earc8OJXle0oqywfSGxlVAfhfzV6//8YdWs9
+	D53/QBYZWd+fIDjpGRaTA0dNEIBPWbtVUhR2fGLSvH+uUFsHeysWWsSmi7lxwrgC+WGvS7
+	expAfT1edy4rM7EC5b6JOD7OqcE3DzE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-573-mr3uO8cZOamc3ageCNO_lw-1; Fri,
+ 26 Apr 2024 04:00:37 -0400
+X-MC-Unique: mr3uO8cZOamc3ageCNO_lw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE0893811701;
+	Fri, 26 Apr 2024 08:00:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 16B5016D93;
+	Fri, 26 Apr 2024 08:00:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240425084537.6e406d86@kernel.org>
+References: <20240425084537.6e406d86@kernel.org> <1967121.1714034372@warthog.procyon.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Jeff Layton <jlayton@kernel.org>, Steve French <sfrench@samba.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    netfs@lists.linux.dev, linux-crypto@vger.kernel.org,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] Fix a potential infinite loop in extract_user_to_sg()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5ms2xmxgZ08pecifj+Za=_oWnrhVOUgifjYLnCw+Rz9_kA@mail.gmail.com>
-In-Reply-To: <CAH2r5ms2xmxgZ08pecifj+Za=_oWnrhVOUgifjYLnCw+Rz9_kA@mail.gmail.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Fri, 26 Apr 2024 12:16:19 +0530
-Message-ID: <CAFTVevV=nv2-BDotSu+Y2XNFTRGkdc=rv1QFOuzA6aLorFjPsw@mail.gmail.com>
-Subject: Re: [PATCH][SMB3 client] missing lock when picking channel
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Shyam Prasad N <nspmangalore@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2101063.1714118434.1@warthog.procyon.org.uk>
+Date: Fri, 26 Apr 2024 09:00:34 +0100
+Message-ID: <2101064.1714118434@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Looks good
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Thanks
-Meetakshi
+> On Thu, 25 Apr 2024 09:39:32 +0100 David Howells wrote:
+> > Fix extract_user_to_sg() so that it will break out of the loop if
+> > iov_iter_extract_pages() returns 0 rather than looping around forever.
+> 
+> Is "goto fail" the right way to break out here?
+> My intuition would be "break".
+> 
+> On a quick read it seems like res = 0 may occur if we run out of
+> iterator, is passing maxsize > iter->count illegal?
 
-On Thu, Apr 25, 2024 at 10:14=E2=80=AFPM Steve French <smfrench@gmail.com> =
-wrote:
->
-> Coverity spotted a place where we should have been holding the
-> channel lock when accessing the ses channel index.
->
-> Addresses-Coverity: 1582039 ("Data race condition (MISSING_LOCK)")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->  fs/smb/client/transport.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> index 443b4b89431d..fc0ddc75abc9 100644
-> --- a/fs/smb/client/transport.c
-> +++ b/fs/smb/client/transport.c
-> @@ -1059,9 +1059,11 @@ struct TCP_Server_Info
-> *cifs_pick_channel(struct cifs_ses *ses)
->   index =3D (uint)atomic_inc_return(&ses->chan_seq);
->   index %=3D ses->chan_count;
->   }
-> +
-> + server =3D ses->chans[index].server;
->   spin_unlock(&ses->chan_lock);
->
-> - return ses->chans[index].server;
-> + return server;
->  }
->
-> --
-> Thanks,
->
-> Steve
+I would say that you're not allowed to ask for more than is in the iterator.
+In a number of places this is called, it's a clear failure if you can't get
+that the requested amount out of it - for example, if we're building a cifs
+message and have set all the fields in the header and are trying to encrypt
+the message.
+
+David
+
