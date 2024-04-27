@@ -1,100 +1,63 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C528C11;
-	Sat, 27 Apr 2024 16:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8263D552;
+	Sat, 27 Apr 2024 19:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714236319; cv=none; b=GIE1boE01iTMdaZ09Hb91qtLrBIpj474DZdgqWUH8zjxYgmY8nkGSzXLMpvSIJ6g9jkPqmsyg9eMy45OwDXKiAV2tNNgpyL9nL0iWrehw4FRszWADV+sxy7NoBbq0hiFZnlKWMjHN/cI1pDsT5gsu+i/NjGxyxFjEvO+YqSsF8c=
+	t=1714245428; cv=none; b=LUvaQ/eNp4CS5FejZ5Sq10V2O5bZZYtzJRl03rcUCT+WggLiVGRSsxeOJD9pWj4enD7rWSY+6moRaDSvP57ftrfSZxBhOrg2GRqP3Fs9WiwHs/t5bG/IrOzKsoD1a/bl7SIwiRMKeSTATJYGzUB4o0eYmo8cpzOo5MAmpdK9spw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714236319; c=relaxed/simple;
-	bh=AK8Jk7phL3mTytSw5obD0mYNwkMdEy/HNfhMr8DLIBw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=WIE9cgypUYnfLzgyXsVLbxZAp564f55PELyp5n0JOwWRjcSJ97ue0OHvPX+PfnrRt5ahUDywOdoMuj0VQxTY62Nx+3xuhUZCy0rXowhEC78ql/6makTtmb5DIkZr0TZQHaeMnSEGuAih5mOpf52EdJ/5T0BLz4s44mUEvajvW8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlvXRVdc; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714245428; c=relaxed/simple;
+	bh=DoSKC03hXw9doVnbnH37N6qd0TYJGjLM/1MdYDUddGY=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=MUV3DCHhDgyKtkTkYMLVFzCNKDWgYTAdHQ8VhE2zivwvSakDiLiaFxvR51eXulLqKhNpfuEvMZcF6b6zGlbJD248dwyL0mSNTbjvDEi6IvVyz1NALOgPuFE3zNSKrLMIilsDixEohpgTGTMXxrnONuyORuMa/X1juFqFYp8xSsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CdspbK0E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlvXRVdc"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-516ef30b16eso3589295e87.3;
-        Sat, 27 Apr 2024 09:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714236316; x=1714841116; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JhEfRurz6bxQo7nPFIdFapmeHOyGD4f5KO0BLw+ShI8=;
-        b=AlvXRVdcqKHfF/a29Eijgqc+ZzTFUK2D2kpFrMuhpNa37qJtXCMevupAbKzcXbdJ6X
-         E/1ptftH5pGIVLI7HpNmW+1wJGJAa+P3wihrWBOrib0kLz058+VrmkTpy7jSKfkUtVmd
-         174Sz1PekviTAcsHC7/4OXVChS9aapiQTKK4RJPqdssNrUJU6XchAUiLPA1qR2MrfHBR
-         V6YvzhEL3BRtHf4uar5zzC6o9uYascxDeDk7WFnPuPmBPoh49wTigUwq5lbljYn5cqOV
-         HpX8bRooSX9thXIR/yjlQSQuiUcvNDxjphgD+nSdadzwx+nQh9TBDuGurrWLo6EGnN9o
-         V8Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714236316; x=1714841116;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JhEfRurz6bxQo7nPFIdFapmeHOyGD4f5KO0BLw+ShI8=;
-        b=DJxdgF7RAX+d6jWvYU5np9+l3YZV7RSGvTFS2zIU1YBMu0Bz4s0k1DQ8VKMshmLNq4
-         OvtlMHK3xZBaQ3NzkKuu+q5lKe+HxjfPtuitCn2QCcD5MILbbgAviv4JIr1vRcuFfKZ4
-         LVfBmGvgnPa5wKFHFSSlVlHbWQ6wVVnZqLnoyJugLXtOzwXoKk5H16Uv98qxKqLMnSOV
-         SPO2UVS5hhIiXgVwXVESgzDqylQkUYzBug4PJV0LJ/DhxG/CNfgVwLmfINpS3USMXoEQ
-         4Wfrup1t9rsH5Ra3dO9AFfIWvnjOkkSAG1OXMUBe0eQOi0KodeoM7ytJddrKIouGCZ6e
-         vsOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJz4vX2FCcAzWaccIkcWSyqJeCaIaCPfTuXFuQLAxqVn9wzlbbGuAcRh/EkS/Zg/zNOQiFL5vdKIw1iLohvqmMThrym5R5I+a45Q==
-X-Gm-Message-State: AOJu0YzPi/mpZXmWkQeWlrDiR9EC9hgtrNOUzaAVrfPRsOeadyTAsFnS
-	8HllFpqAwKuLVIQY9X2BSHSAdkAKKo6ckZUpFfnrLHn9d22PnpSRTvVljPDTSaQtwwVtoKPyS7a
-	PcFCxE++OipULdMt48ZeX9mEEL9eBpR3S
-X-Google-Smtp-Source: AGHT+IG1moZlk1t7Lo09tpyc5qg2v89QLmKjBDgtsKQqvNMOG4PVyGOPJJydcZQO8hOE6LUgRLRSZruk7I5t1Z14qTw=
-X-Received: by 2002:a05:6512:3196:b0:51d:3675:6a08 with SMTP id
- i22-20020a056512319600b0051d36756a08mr1180454lfe.66.1714236315799; Sat, 27
- Apr 2024 09:45:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdspbK0E"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6F209C2BD11;
+	Sat, 27 Apr 2024 19:17:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714245427;
+	bh=DoSKC03hXw9doVnbnH37N6qd0TYJGjLM/1MdYDUddGY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=CdspbK0E9wwhP1i4uIDvHEUUWshnPbQyKsUNSMov9AW40IQ+ByGhQMpvz5n1N22QE
+	 qMQl6ChHhGkuyqScKKgLuDnrE7jt1tKcQsS+gBX7yoJXy9/e1efT7Y1kMOFHzRmHNF
+	 d9vVuGlQzcD/QNSXU9kv/O5/M6is/lKrIwG6iuDZedd63eKGARDvtY1P2nfusepMlW
+	 KhZQ+i9graef8Cu0t5MwFswOTrSq7EqBDoiXSaeby6dHF2y9QZQOItvknTDQtMrksP
+	 eQDddY5jgz1YRsC8VVgwqzCbA0yBIfvGVaGEW2KfcK3KhcJ7Y15c2J62fq4t+AH21d
+	 6LwwFEhpwnHug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5DC78C54BAC;
+	Sat, 27 Apr 2024 19:17:07 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muJvf713EeXf81FaVyU9mA9bqLAgXLe036aCHbYKZ3ZCw@mail.gmail.com>
+References: <CAH2r5muJvf713EeXf81FaVyU9mA9bqLAgXLe036aCHbYKZ3ZCw@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muJvf713EeXf81FaVyU9mA9bqLAgXLe036aCHbYKZ3ZCw@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc5-cifs-fixes-part2
+X-PR-Tracked-Commit-Id: 8861fd5180476f45f9e8853db154600469a0284f
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d43df69f3879f32fcc08d92ec47bff86ae0fcfaa
+Message-Id: <171424542738.11751.737453055546020366.pr-tracker-bot@kernel.org>
+Date: Sat, 27 Apr 2024 19:17:07 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 27 Apr 2024 11:45:04 -0500
-Message-ID: <CAH2r5muJvf713EeXf81FaVyU9mA9bqLAgXLe036aCHbYKZ3ZCw@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-9d1ddab261f3e2af7c384dc02238784ce0cf9f98:
+The pull request you sent on Sat, 27 Apr 2024 11:45:04 -0500:
 
-  Merge tag '6.9-rc5-smb-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2024-04-23 09:37:32 -0700)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc5-cifs-fixes-part2
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d43df69f3879f32fcc08d92ec47bff86ae0fcfaa
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.9-rc5-cifs-fixes-part2
-
-for you to fetch changes up to 8861fd5180476f45f9e8853db154600469a0284f:
-
-  smb3: fix lock ordering potential deadlock in cifs_sync_mid_result
-(2024-04-25 12:49:50 -0500)
-
-----------------------------------------------------------------
-Three smb3 client fixes, all also for stable
-- two small locking fixes spotted by Coverity
-- FILE_ALL_INFO and network_open_info packing fix
-
-----------------------------------------------------------------
-Gustavo A. R. Silva (1):
-      smb: client: Fix struct_group() usage in __packed structs
-
-Steve French (2):
-      smb3: missing lock when picking channel
-      smb3: fix lock ordering potential deadlock in cifs_sync_mid_result
-
- fs/smb/client/cifspdu.h   | 4 ++--
- fs/smb/client/smb2pdu.h   | 2 +-
- fs/smb/client/transport.c | 7 ++++++-
- 3 files changed, 9 insertions(+), 4 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
