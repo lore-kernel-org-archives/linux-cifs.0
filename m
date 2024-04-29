@@ -1,118 +1,143 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC51128363;
-	Mon, 29 Apr 2024 15:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B27823B7;
+	Mon, 29 Apr 2024 15:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714403513; cv=none; b=N59gb+T4ikhwaPoca8+LpkuVqgNeWuTNyLfvwFEyAVOPi4Nzy65Jsz1f/XwsMYjPd7kX0pscuX3abHllMiBN345PnY84kweTdiCVxhru9sdT4sRa5omQ/J3SiYkRPQiZ63A4eOm+EtbXMhArqXBHOCUOuw46ajmRsJhdHoJqJr8=
+	t=1714404035; cv=none; b=g7VZv5WxYiaXAZ4j8cQdaK3UIqXDQuTlYIk6lskpCCBnKOsv0VX61Udq1vOgx1fyZP47DvoPPDv/xk402YgeUvWmx1ROqbOK0l6xStG92WKJFOWkqAR9sJC9LZain4ogrixvIsB1F17mPVSS1XtNXOwnlGVP0F/UhOgCaMjhPvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714403513; c=relaxed/simple;
-	bh=2mOGvwx0F2IpPY4iGZ/syNebrU7aiO2c7zkOquYWlm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QViWvkU70SLbhGk9zg6EthnWjeKFvFtlYmIU+kglTDpmwAu5pyW2gUhzTXbjf3nlQ6cITxq2d07e35X0u8eysbloPszCHep4TQtN4V2Ka6pfnQb+IPr+USgFe8eknvsXq7g4OP02pVBhiPyy3fm0ezuXVgOaKg28fWp1Ck2pMOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MtqDRFoz; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1714404035; c=relaxed/simple;
+	bh=PKPAWpRk72Gmqc3xXY6xgd8eKht2/V+7i35EFFUDGpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i++10RNHdPLSxAKV59Brjr6YQ3wsOPwNTgSnAOHG6zk/D5Y/t6Z7uMnTYCErpN/Rk8k5Q67zBjBp70G0p3yBK3HCY3e1BTg4IVj5Zm7ZzKTjBQrRWUz8bPu01pTxSRnrzMukEXUCRU5S3qBIJu1Ns4KYrChGmEvy8tsg+MhWc/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=zpGPjFtn; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtqDRFoz"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5729221ed74so371185a12.0;
-        Mon, 29 Apr 2024 08:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714403510; x=1715008310; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xU/iLoQXl7tXUx6T6JsQIJsicG3iO7GQdCCzHimssM0=;
-        b=MtqDRFozNysbaJT4cpy3/Bf06vxhMOXuyPpPgPTGGAEblUoF2SrMoQB0antoUlQuNT
-         GwX0nOb08P6IgZQLq5S5KV1/i1XPTLLkaEB5rX+O90I0EdaowKv9l4qQDMfTYHi+go6T
-         E+oNVVzKF3GB/+3kfD2TJuhe4+wmPA3cuO0f3L1QvRUJ+YADC/R9QBfOFDGueAmhZeSD
-         HAJsGUFsaJ3Jq5XW7iNXfEed8ZuZ1cBl3xdyrCrDw7TEoaRmEz2oIKVjGATuiO/1ptLk
-         GJsBimfRBN0EYgl36cx9nXvVnQQ6J6X8Qer/X8a4/C8XG8XMaJsBRPyr9eTYFqW3z6kV
-         +83g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714403510; x=1715008310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xU/iLoQXl7tXUx6T6JsQIJsicG3iO7GQdCCzHimssM0=;
-        b=tgIyJgoFO11kJ7n3KMkevDZSSctLBSBW8+Zt9mApEZXXSV7V1LuLsjuVS1xBw9o04I
-         9J4au1FEtnj0ZxzbUlWU9U7CFvtfkhmFMUAhHC86zliU7lCFDv+DYpxw/bpPEWLXomyX
-         X1SwunMTfYJCEEYNXwcHWcO9qNTnNcXSbNMGn+sNnH6+CiKkvp72hw3DeCz1aPRJC3gh
-         0JqRFDrVcg2e7FvqUhvjOKfHN387Jra8npwk8O+Dn1MBDPUI8W+7QzaLnjJYmHE1u8GS
-         PbvK1GMGRl17U3JDL6eE4443BfuNpnlYVTbxujUISp8NnhLxxuUNwePTF4wh5c90XpZY
-         icqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/LR3Qhyyb2Oez9YZ5521o2aBLn/fVKe1O4TGTFLq+FEVV+JUrerTIZx7Wal+mOJzs54HrCovviyRXP0m0ov4afZORza6LC6tZFvALNWvBo5zi1WAMLm8P2Tphdwcz389FHA==
-X-Gm-Message-State: AOJu0YyEOh4H2niotDzptiVSYTuSlJszwzSlBjm/5cVLJRE1tIkeXabm
-	H9qaKzSPn28VuruvXUb8jFWJo9bJqTCwF2QD1kZVJvTJ0Xcy72BO
-X-Google-Smtp-Source: AGHT+IEhEdiaiCJzabxzHgv5ya2RGGdycN3jCTy0tJ1kx0ZZPY/5fGE7WGoJhcAGrpmB7uFA67IDWg==
-X-Received: by 2002:a17:906:e2c3:b0:a54:e183:6248 with SMTP id gr3-20020a170906e2c300b00a54e1836248mr7519853ejb.0.1714403510018;
-        Mon, 29 Apr 2024 08:11:50 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
-        by smtp.gmail.com with ESMTPSA id wt8-20020a170906ee8800b00a55ac292b66sm10253316ejb.219.2024.04.29.08.11.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Apr 2024 08:11:48 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 5F51DBE2EE8; Mon, 29 Apr 2024 17:11:47 +0200 (CEST)
-Date: Mon, 29 Apr 2024 17:11:47 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Paulo Alcantara <pc@manguebit.com>, regressions@lists.linux.dev,
-	Steve French <stfrench@microsoft.com>, sashal@kernel.org,
-	stable@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [regression 6.1.80+] "CIFS: VFS: directory entry name would
- overflow frame end of buf" and invisible files under certain conditions and
- at least with noserverino mount option
-Message-ID: <Zi-4s-7QSFO1OR17@eldamar.lan>
-References: <ZiBCsoc0yf_I8In8@eldamar.lan>
- <cc3eea56282f4b43d0fe151a9390c512@manguebit.com>
- <ZiCoYjr79HXxiTjr@eldamar.lan>
- <29e0cbcab5be560608d1dfbfb0ccbc96@manguebit.com>
- <ZiLQG4x0m1L70ugu@eldamar.lan>
- <adfd2a680e289404140ef917cf0bd0ab@manguebit.com>
- <Zigg4RWtRfQYW1RR@eldamar.lan>
- <2024042912-unloader-slighting-c756@gregkh>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="zpGPjFtn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=A9ktU0Nf4obPdWQwapwO4Fue1aOYnmHa/ofJdgBDRUs=; b=zpGPjFtnZ6GaKQKZXq10ucwhLa
+	VtWqH5hnkxprC+3k6fB9xaso9eMcly2wLESyp0c3jeqr+FDBkGrf4KA826rEe5bgeeAWyHm/1bCaV
+	c3Dbuc9KRF9o6QxxdqZGbz1oxJ5h5iG9JqJT2iHL662kdkfqfQ4qf9LQgZrKaIc5+yGQvMnpXnBnY
+	lx02FXgcCQH0zOCSIFLs0k5MA5RaTZyLkG9Q/9n2WpVTHbHtFMM+ZhWZQzMkUpTvetstaVzQOQFZT
+	8ravFC28+1TzSrjmri3stsdv6t6nOoVdbvqrCJ6b0WyDVkNLfnsXCBsNhBoFCeQ0uZRdhhMlQ7jLX
+	3UE51s8mvFl1xn4CA23bNBN1eYeyhUdME1u3Gymq/elQsggrCstgeG3vX8B8bH1r/HuaBhtaXSbSp
+	chjmGOmRHh0BR7+z3IwE9VswiihPuEgnJ8bmZIk5bUY2mx3GUM4NZNhz9hB7CYFlZqLQK1lrDiXFv
+	qmpIWBbP36Ms89qytcWuukrU;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1s1Snn-008ww2-0f;
+	Mon, 29 Apr 2024 15:20:23 +0000
+Message-ID: <2365b657-bea4-4527-9fce-ad11c690bde3@samba.org>
+Date: Mon, 29 Apr 2024 17:20:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2024042912-unloader-slighting-c756@gregkh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ Samba Technical <samba-technical@lists.samba.org>
+References: <cover.1710173427.git.lucien.xin@gmail.com>
+ <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
+ <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org>
+ <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+ <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+ <95922a2f-07a1-4555-acd2-c745e59bcb8e@samba.org>
+ <CADvbK_eR4++HbR_RncjV9N__M-uTHtmqcC+_Of1RKVw7Uqf9Cw@mail.gmail.com>
+ <CADvbK_dEWNNA_i1maRk4cmAB_uk4G4x0eZfZbrVX=zJ+2H9o_A@mail.gmail.com>
+ <dc3815af-5b46-452b-8bcc-30a0934740a2@samba.org>
+ <CADvbK_e__qpCa44uF+J2Z+2Lhb2suktTNT+CeQayk_uhckVYqQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CADvbK_e__qpCa44uF+J2Z+2Lhb2suktTNT+CeQayk_uhckVYqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi Xin Long,
 
-On Mon, Apr 29, 2024 at 12:50:45PM +0200, Greg KH wrote:
-> On Tue, Apr 23, 2024 at 10:58:09PM +0200, Salvatore Bonaccorso wrote:
-> > Hi Paulo,
-> > 
-> > On Mon, Apr 22, 2024 at 12:08:53PM -0300, Paulo Alcantara wrote:
-> > > Salvatore Bonaccorso <carnil@debian.org> writes:
-> > > 
-> > > > I'm still failing to provide you a recipe with a minimal as possible
-> > > > setup, but with the instance I was able to reproduce the issue the
-> > > > regression seems gone with cherry-picking 35235e19b393 ("cifs: Replace
-> > > > remaining 1-element arrays") .
-> > > 
-> > > It's OK, no problem.  Could you please provide the backport to stable
-> > > team?
-> > 
-> > Sure, here it is. Greg or Sasha is it ok to pick that up for the 6.1.y
-> > queues?
+>>
+> Just confirmed from other ebpf experts, there are no in-kernel interfaces
+> for loading and interacting with BPF maps/programs(other than from BPF itself).
 > 
-> Glad to, for some reason I thought this caused problems, but if it
-> passes your testing, great!  I'll go queue it up now, thanks.
+> It seems that we have to do this match in QUIC stack. In the latest QUIC
+> code, I added quic_packet_get_alpn(), a 59-line function, to parse ALPNs
+> and then it will search for the listen sock with these ALPNs in
+> quic_sock_lookup().
+> 
+> I introduced 'alpn_match' module param, and it can be enabled when loading
+> the module QUIC by:
+> 
+>    # modprobe quic alpn_match=1
+> 
+> You can test it by tests/sample_test in the latest code:
+> 
+>    Start 3 servers:
+> 
+>      # ./sample_test server 0.0.0.0 1234 \
+>          ./keys/server-key.pem ./keys/server-cert.pem smbd
+>      # ./sample_test server 0.0.0.0 1234 \
+>          ./keys/server-key.pem ./keys/server-cert.pem h3
+>      # ./sample_test server 0.0.0.0 1234 \
+>          ./keys/server-key.pem ./keys/server-cert.pem ksmbd
+> 
+>    Try to connect on clients with:
+> 
+>      # ./sample_test client 127.0.0.1 1234 ksmbd
+>      # ./sample_test client 127.0.0.1 1234 smbd
+>      # ./sample_test client 127.0.0.1 1234 h3
+> 
+>    to see if the corresponding server responds.
+> 
+> There might be some concerns but it's also a useful feature that can not
+> be implemented in userland QUICs. The commit is here:
+> 
+> https://github.com/lxin/quic/commit/de82f8135f4e9196b503b4ab5b359d88f2b2097f
+> 
+> Please check if this is enough for SMB applications.
 
-Thanks! Unfortunately I'm not having a good test(case/suite) for this
-myself for such cases. All issues recently forwarded as regressions in
-the 6.1.y series were unfortunately only uncovered by Debian users
-once we did release the version :(. Hopefully this will "calm down"
-now.
+It look great thanks!
 
-Thanks to all of you, for your work!
+> Note as a listen socket is now identified by [address + port + ALPN] when
+> alpn_match=1, this feature does NOT require SO_REUSEPORT socket option to
+> be set, unless one wants multiple sockets to listen to
+> the same [address + port + ALPN].
 
-Regards,
-Salvatore
+I'd argue that this should be the default and be required before listen()
+or maybe before bind(), so that it can return EADDRINUSE. As EADDRINUSE should only
+happen for servers it might be useful to have a QUIC_SOCKOPT_LISTEN_ALPN instead of
+QUIC_SOCKOPT_ALPN. As QUIC_SOCKOPT_ALPN on a client socket should not generate let
+bind() care about the alpn value at all.
+
+For listens on tcp you also need to specify an explicit port (at least in order
+to be useful).
+
+And it would mean that all application would use it and not block other applications
+from using an explicit alpn.
+
+Also an module parameter for this means the administrator would have to take care
+of it, which means it might be unuseable if loaded with it.
+
+I hope to find some time in the next weeks to play with this.
+Should be relatively trivial create a prototype for samba's smbd.
+
+Thanks!
+metze
