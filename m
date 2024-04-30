@@ -1,50 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEE312D745;
-	Tue, 30 Apr 2024 11:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2EE172BAC
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Apr 2024 14:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714476647; cv=none; b=AnpVTlyTV0dHQTfcaPLYXaWb3gJHd6LFP1ptOYW/HYpQ3vzyjDfTvSNmbEo0f59PJxqgJh9P4y1U08kBQNz+C4oYDRraV/Wt7IWtYXuVuFIQzVMhSxdSaWfICWHsfXLvY/gFcoswq38EJcmjuU+Y+WtReuTghI7PdXG5nL3z+AU=
+	t=1714485671; cv=none; b=m1DiS+xMKVOUyfGEA/3jEtw35Zb3ZYPOBB/Ojxkghygmv4A9T1LHjww59Kf/N1up7qXCh7uEJbQqKH9nLx1EgDs3NwoG5KE34IFmSRJC4mo9Bbdv4CRgvJoHNYHz5xHjQBjiUUkn0ZSs2XVtEV+8WFjZZh20z6XNLZwkj0CRfsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714476647; c=relaxed/simple;
-	bh=dgMDMwqwseh0N9fNRLGu/Y6FaiH7UOZxfVDjcdXtYo8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NqYEVrDtzuQzzV5NZvzQPW28d++lCtvx7tICmYvIN7xFnmWfJbIkw+X5gcwjsV+Emp8+L2pQ48z2ywxe+esfeN1DWW73qyY7c6qDM0fh1fskEjTGWLkYypgxBhDAKxP3hUevsSFANnLu4S2G3JZ93k5bDWcXf2twzOn96q6KreQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wgEhj5Ix; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1714485671; c=relaxed/simple;
+	bh=NE+NGnp7qcYNIdSVHXWfKTzGPKGrqOKwMtnL1oSVkp0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IjBnBq0YYQdLGyZIR4fgyNCCxqvXT7VKht5DpAp+w0I6vZNVw5AmX6tRArhbYDyOng9LuasNW1LohfKErYv0DlfoNjDzJfgjd6I6ExTU9ZFc48o/cig6XbP52b0lxSiK+oQhL8ieqdthB6WMdQjyfE6UWQMrXrVo6ysK04SYJFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KZAddHjR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wgEhj5Ix"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC2CC4AF1C;
-	Tue, 30 Apr 2024 11:30:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1714476647;
-	bh=dgMDMwqwseh0N9fNRLGu/Y6FaiH7UOZxfVDjcdXtYo8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=wgEhj5IxKmtHK4VYUgW/GMrEynEUKOxpoG9DRR0CsUFDAQFRknMdvLYgZOd/j6uTp
-	 K1lm9IX7idfx+S5c5xbpBGWvC2X4AC/boGlF5zQkA28aG4pz7/yFtrO/0q+6soEe+7
-	 dXTqrPP93WGUCrUBSGjHhSVc3DlB7YohBEll/WWw=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@cjr.nz>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZAddHjR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714485668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=K3Irydl6Xh7jL+cMJWxpcSfsWrNZFzC5/LPeqTp0XrU=;
+	b=KZAddHjRG780fcaBzs1RBCGNA+ZahF40ltRDDLkt/ta5lOGGXBexN9eH2lJV4h2mHrHOqd
+	ipXrLcqSoV5wrhxjjbTK3FW7j0AYYASnkR6lUMTr9IxPT1jx1g0SAYCwSu26zAGvexw7vf
+	HUy+QlDeX+xxWdkYbiCmvIyp89Ub/HY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-88-lzol3MtxNXm8_iyxwxlWwA-1; Tue, 30 Apr 2024 10:01:04 -0400
+X-MC-Unique: lzol3MtxNXm8_iyxwxlWwA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CD4D8802352;
+	Tue, 30 Apr 2024 14:01:02 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D94C40C140B;
+	Tue, 30 Apr 2024 14:00:59 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steve French <smfrench@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Kees Cook <keescook@chromium.org>,
-	Steve French <stfrench@microsoft.com>,
-	Salvatore Bonaccorso <carnil@debian.org>
-Subject: [PATCH 6.1 059/110] cifs: Replace remaining 1-element arrays
-Date: Tue, 30 Apr 2024 12:40:28 +0200
-Message-ID: <20240430103049.310056798@linuxfoundation.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240430103047.561802595@linuxfoundation.org>
-References: <20240430103047.561802595@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/22] netfs, afs, 9p, cifs: Rework netfs to use ->writepages() to copy to cache
+Date: Tue, 30 Apr 2024 15:00:31 +0100
+Message-ID: <20240430140056.261997-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,533 +74,194 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+Hi Christian, Willy,
 
-------------------
+Here's an updated version of my netfs writeback rewrite.  There haven't
+been any major fixes.  So far...
 
-From: Kees Cook <keescook@chromium.org>
+The primary purpose of these patches is to rework the netfslib writeback
+implementation such that pages read from the cache are written to the cache
+through ->writepages(), thereby allowing the fscache page flag to be
+retired.
 
-commit 35235e19b393b54db0e0d7c424d658ba45f20468 upstream.
+The reworking also:
 
-The kernel is globally removing the ambiguous 0-length and 1-element
-arrays in favor of flexible arrays, so that we can gain both compile-time
-and run-time array bounds checking[1].
+ (1) builds on top of the new writeback_iter() infrastructure;
 
-Replace the trailing 1-element array with a flexible array in the
-following structures:
+ (2) makes it possible to use vectored write RPCs as discontiguous streams
+     of pages can be accommodated;
 
-	struct cifs_spnego_msg
-	struct cifs_quota_data
-	struct get_dfs_referral_rsp
-	struct file_alt_name_info
-	NEGOTIATE_RSP
-	SESSION_SETUP_ANDX
-	TCONX_REQ
-	TCONX_RSP
-	TCONX_RSP_EXT
-	ECHO_REQ
-	ECHO_RSP
-	OPEN_REQ
-	OPENX_REQ
-	LOCK_REQ
-	RENAME_REQ
-	COPY_REQ
-	COPY_RSP
-	NT_RENAME_REQ
-	DELETE_FILE_REQ
-	DELETE_DIRECTORY_REQ
-	CREATE_DIRECTORY_REQ
-	QUERY_INFORMATION_REQ
-	SETATTR_REQ
-	TRANSACT_IOCTL_REQ
-	TRANSACT_CHANGE_NOTIFY_REQ
-	TRANSACTION2_QPI_REQ
-	TRANSACTION2_SPI_REQ
-	TRANSACTION2_FFIRST_REQ
-	TRANSACTION2_GET_DFS_REFER_REQ
-	FILE_UNIX_LINK_INFO
-	FILE_DIRECTORY_INFO
-	FILE_FULL_DIRECTORY_INFO
-	SEARCH_ID_FULL_DIR_INFO
-	FILE_BOTH_DIRECTORY_INFO
-	FIND_FILE_STANDARD_INFO
+ (3) makes it easier to do simultaneous content crypto and stream division.
 
-Replace the trailing 1-element array with a flexible array, but leave
-the existing structure padding:
+ (4) provides support for retrying writes and re-dividing a stream;
 
-	FILE_ALL_INFO
-	FILE_UNIX_INFO
+ (5) replaces the ->launder_folio() op, so that ->writepages() is used
+     instead;
 
-Remove unused structures:
+ (6) uses mempools to allocate the netfs_io_request and netfs_io_subrequest
+     structs to avoid allocation failure in the writeback path.
 
-	struct gea
-	struct gealist
+Some code that uses the fscache page flag is retained for compatibility
+purposes with nfs and ceph.  The code is switched to using the synonymous
+private_2 label instead and marked with deprecation comments.  I have a
+separate set of patches that convert cifs to use this code.
 
-Adjust all related size calculations to match the changes to sizeof().
+-~-
 
-No machine code output differences are produced after these changes.
+In this new implementation, writeback_iter() is used to pump folios,
+progressively creating two parallel, but separate streams.  Either or both
+streams can contain gaps, and the subrequests in each stream can be of
+variable size, don't need to align with each other and don't need to align
+with the folios.  (Note that more streams can be added if we have multiple
+servers to duplicate data to).
 
-[1] For lots of details, see both:
-    https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-    https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+Indeed, subrequests can cross folio boundaries, may cover several folios or
+a folio may be spanned by multiple subrequests, e.g.:
 
-Cc: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@cjr.nz>
-Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[ Salvatore Bonaccorso: Patch does not apply cleanly only due to a
-  whitespace difference in fs/smb/client/cifspdu.h . Fixed up manually. ]
-Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/cifs_spnego.h |    2 
- fs/smb/client/cifspdu.h     |   96 +++++++++++++++++++++-----------------------
- fs/smb/client/readdir.c     |    6 +-
- fs/smb/client/smb2pdu.c     |    4 -
- fs/smb/client/smb2pdu.h     |    2 
- 5 files changed, 53 insertions(+), 57 deletions(-)
+         +---+---+-----+-----+---+----------+
+Folios:  |   |   |     |     |   |          |
+         +---+---+-----+-----+---+----------+
 
---- a/fs/smb/client/cifs_spnego.h
-+++ b/fs/smb/client/cifs_spnego.h
-@@ -24,7 +24,7 @@ struct cifs_spnego_msg {
- 	uint32_t	flags;
- 	uint32_t	sesskey_len;
- 	uint32_t	secblob_len;
--	uint8_t		data[1];
-+	uint8_t		data[];
- };
- 
- #ifdef __KERNEL__
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -562,7 +562,7 @@ typedef union smb_com_session_setup_andx
- 		__u32 Reserved;
- 		__le32 Capabilities;	/* see below */
- 		__le16 ByteCount;
--		unsigned char SecurityBlob[1];	/* followed by */
-+		unsigned char SecurityBlob[];	/* followed by */
- 		/* STRING NativeOS */
- 		/* STRING NativeLanMan */
- 	} __attribute__((packed)) req;	/* NTLM request format (with
-@@ -582,7 +582,7 @@ typedef union smb_com_session_setup_andx
- 		__u32 Reserved;	/* see below */
- 		__le32 Capabilities;
- 		__le16 ByteCount;
--		unsigned char CaseInsensitivePassword[1];     /* followed by: */
-+		unsigned char CaseInsensitivePassword[];     /* followed by: */
- 		/* unsigned char * CaseSensitivePassword; */
- 		/* STRING AccountName */
- 		/* STRING PrimaryDomain */
-@@ -599,7 +599,7 @@ typedef union smb_com_session_setup_andx
- 		__le16 Action;	/* see below */
- 		__le16 SecurityBlobLength;
- 		__u16 ByteCount;
--		unsigned char SecurityBlob[1];	/* followed by */
-+		unsigned char SecurityBlob[];	/* followed by */
- /*      unsigned char  * NativeOS;      */
- /*	unsigned char  * NativeLanMan;  */
- /*      unsigned char  * PrimaryDomain; */
-@@ -618,7 +618,7 @@ typedef union smb_com_session_setup_andx
- 		__le16 PasswordLength;
- 		__u32 Reserved; /* encrypt key len and offset */
- 		__le16 ByteCount;
--		unsigned char AccountPassword[1];	/* followed by */
-+		unsigned char AccountPassword[];	/* followed by */
- 		/* STRING AccountName */
- 		/* STRING PrimaryDomain */
- 		/* STRING NativeOS */
-@@ -632,7 +632,7 @@ typedef union smb_com_session_setup_andx
- 		__le16 AndXOffset;
- 		__le16 Action;	/* see below */
- 		__u16 ByteCount;
--		unsigned char NativeOS[1];	/* followed by */
-+		unsigned char NativeOS[];	/* followed by */
- /*	unsigned char * NativeLanMan; */
- /*      unsigned char * PrimaryDomain; */
- 	} __attribute__((packed)) old_resp; /* pre-NTLM (LANMAN2.1) response */
-@@ -693,7 +693,7 @@ typedef struct smb_com_tconx_req {
- 	__le16 Flags;		/* see below */
- 	__le16 PasswordLength;
- 	__le16 ByteCount;
--	unsigned char Password[1];	/* followed by */
-+	unsigned char Password[];	/* followed by */
- /* STRING Path    *//* \\server\share name */
- 	/* STRING Service */
- } __attribute__((packed)) TCONX_REQ;
-@@ -705,7 +705,7 @@ typedef struct smb_com_tconx_rsp {
- 	__le16 AndXOffset;
- 	__le16 OptionalSupport;	/* see below */
- 	__u16 ByteCount;
--	unsigned char Service[1];	/* always ASCII, not Unicode */
-+	unsigned char Service[];	/* always ASCII, not Unicode */
- 	/* STRING NativeFileSystem */
- } __attribute__((packed)) TCONX_RSP;
- 
-@@ -718,7 +718,7 @@ typedef struct smb_com_tconx_rsp_ext {
- 	__le32 MaximalShareAccessRights;
- 	__le32 GuestMaximalShareAccessRights;
- 	__u16 ByteCount;
--	unsigned char Service[1];	/* always ASCII, not Unicode */
-+	unsigned char Service[];	/* always ASCII, not Unicode */
- 	/* STRING NativeFileSystem */
- } __attribute__((packed)) TCONX_RSP_EXT;
- 
-@@ -755,14 +755,14 @@ typedef struct smb_com_echo_req {
- 	struct	smb_hdr hdr;
- 	__le16	EchoCount;
- 	__le16	ByteCount;
--	char	Data[1];
-+	char	Data[];
- } __attribute__((packed)) ECHO_REQ;
- 
- typedef struct smb_com_echo_rsp {
- 	struct	smb_hdr hdr;
- 	__le16	SequenceNumber;
- 	__le16	ByteCount;
--	char	Data[1];
-+	char	Data[];
- } __attribute__((packed)) ECHO_RSP;
- 
- typedef struct smb_com_logoff_andx_req {
-@@ -862,7 +862,7 @@ typedef struct smb_com_open_req {	/* als
- 	__le32 ImpersonationLevel;
- 	__u8 SecurityFlags;
- 	__le16 ByteCount;
--	char fileName[1];
-+	char fileName[];
- } __attribute__((packed)) OPEN_REQ;
- 
- /* open response: oplock levels */
-@@ -939,7 +939,7 @@ typedef struct smb_com_openx_req {
- 	__le32 Timeout;
- 	__le32 Reserved;
- 	__le16  ByteCount;  /* file name follows */
--	char   fileName[1];
-+	char   fileName[];
- } __attribute__((packed)) OPENX_REQ;
- 
- typedef struct smb_com_openx_rsp {
-@@ -1087,7 +1087,7 @@ typedef struct smb_com_lock_req {
- 	__le16 NumberOfUnlocks;
- 	__le16 NumberOfLocks;
- 	__le16 ByteCount;
--	LOCKING_ANDX_RANGE Locks[1];
-+	LOCKING_ANDX_RANGE Locks[];
- } __attribute__((packed)) LOCK_REQ;
- 
- /* lock type */
-@@ -1116,7 +1116,7 @@ typedef struct smb_com_rename_req {
- 	__le16 SearchAttributes;	/* target file attributes */
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII or Unicode */
--	unsigned char OldFileName[1];
-+	unsigned char OldFileName[];
- 	/* followed by __u8 BufferFormat2 */
- 	/* followed by NewFileName */
- } __attribute__((packed)) RENAME_REQ;
-@@ -1136,7 +1136,7 @@ typedef struct smb_com_copy_req {
- 	__le16 Flags;
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII or Unicode */
--	unsigned char OldFileName[1];
-+	unsigned char OldFileName[];
- 	/* followed by __u8 BufferFormat2 */
- 	/* followed by NewFileName string */
- } __attribute__((packed)) COPY_REQ;
-@@ -1146,7 +1146,7 @@ typedef struct smb_com_copy_rsp {
- 	__le16 CopyCount;    /* number of files copied */
- 	__u16 ByteCount;    /* may be zero */
- 	__u8 BufferFormat;  /* 0x04 - only present if errored file follows */
--	unsigned char ErrorFileName[1]; /* only present if error in copy */
-+	unsigned char ErrorFileName[]; /* only present if error in copy */
- } __attribute__((packed)) COPY_RSP;
- 
- #define CREATE_HARD_LINK		0x103
-@@ -1160,7 +1160,7 @@ typedef struct smb_com_nt_rename_req {	/
- 	__le32 ClusterCount;
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII or Unicode */
--	unsigned char OldFileName[1];
-+	unsigned char OldFileName[];
- 	/* followed by __u8 BufferFormat2 */
- 	/* followed by NewFileName */
- } __attribute__((packed)) NT_RENAME_REQ;
-@@ -1175,7 +1175,7 @@ typedef struct smb_com_delete_file_req {
- 	__le16 SearchAttributes;
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII */
--	unsigned char fileName[1];
-+	unsigned char fileName[];
- } __attribute__((packed)) DELETE_FILE_REQ;
- 
- typedef struct smb_com_delete_file_rsp {
-@@ -1187,7 +1187,7 @@ typedef struct smb_com_delete_directory_
- 	struct smb_hdr hdr;	/* wct = 0 */
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII */
--	unsigned char DirName[1];
-+	unsigned char DirName[];
- } __attribute__((packed)) DELETE_DIRECTORY_REQ;
- 
- typedef struct smb_com_delete_directory_rsp {
-@@ -1199,7 +1199,7 @@ typedef struct smb_com_create_directory_
- 	struct smb_hdr hdr;	/* wct = 0 */
- 	__le16 ByteCount;
- 	__u8 BufferFormat;	/* 4 = ASCII */
--	unsigned char DirName[1];
-+	unsigned char DirName[];
- } __attribute__((packed)) CREATE_DIRECTORY_REQ;
- 
- typedef struct smb_com_create_directory_rsp {
-@@ -1211,7 +1211,7 @@ typedef struct smb_com_query_information
- 	struct smb_hdr hdr;     /* wct = 0 */
- 	__le16 ByteCount;	/* 1 + namelen + 1 */
- 	__u8 BufferFormat;      /* 4 = ASCII */
--	unsigned char FileName[1];
-+	unsigned char FileName[];
- } __attribute__((packed)) QUERY_INFORMATION_REQ;
- 
- typedef struct smb_com_query_information_rsp {
-@@ -1231,7 +1231,7 @@ typedef struct smb_com_setattr_req {
- 	__le16 reserved[5]; /* must be zero */
- 	__u16  ByteCount;
- 	__u8   BufferFormat; /* 4 = ASCII */
--	unsigned char fileName[1];
-+	unsigned char fileName[];
- } __attribute__((packed)) SETATTR_REQ;
- 
- typedef struct smb_com_setattr_rsp {
-@@ -1313,7 +1313,7 @@ typedef struct smb_com_transaction_ioctl
- 	__u8 IsRootFlag; /* 1 = apply command to root of share (must be DFS) */
- 	__le16 ByteCount;
- 	__u8 Pad[3];
--	__u8 Data[1];
-+	__u8 Data[];
- } __attribute__((packed)) TRANSACT_IOCTL_REQ;
- 
- typedef struct smb_com_transaction_compr_ioctl_req {
-@@ -1431,8 +1431,8 @@ typedef struct smb_com_transaction_chang
- 	__u8 WatchTree;  /* 1 = Monitor subdirectories */
- 	__u8 Reserved2;
- 	__le16 ByteCount;
--/* 	__u8 Pad[3];*/
--/*	__u8 Data[1];*/
-+/*	__u8 Pad[3];*/
-+/*	__u8 Data[];*/
- } __attribute__((packed)) TRANSACT_CHANGE_NOTIFY_REQ;
- 
- /* BB eventually change to use generic ntransact rsp struct
-@@ -1521,7 +1521,7 @@ struct cifs_quota_data {
- 	__u64	space_used;
- 	__u64	soft_limit;
- 	__u64	hard_limit;
--	char	sid[1];  /* variable size? */
-+	char	sid[];  /* variable size? */
- } __attribute__((packed));
- 
- /* quota sub commands */
-@@ -1673,7 +1673,7 @@ typedef struct smb_com_transaction2_qpi_
- 	__u8 Pad;
- 	__le16 InformationLevel;
- 	__u32 Reserved4;
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) TRANSACTION2_QPI_REQ;
- 
- typedef struct smb_com_transaction2_qpi_rsp {
-@@ -1706,7 +1706,7 @@ typedef struct smb_com_transaction2_spi_
- 	__u16 Pad1;
- 	__le16 InformationLevel;
- 	__u32 Reserved4;
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) TRANSACTION2_SPI_REQ;
- 
- typedef struct smb_com_transaction2_spi_rsp {
-@@ -1813,7 +1813,7 @@ typedef struct smb_com_transaction2_ffir
- 	__le16 SearchFlags;
- 	__le16 InformationLevel;
- 	__le32 SearchStorageType;
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) TRANSACTION2_FFIRST_REQ;
- 
- typedef struct smb_com_transaction2_ffirst_rsp {
-@@ -2024,7 +2024,7 @@ typedef struct smb_com_transaction2_get_
- 				   perhaps?) followed by one byte pad - doesn't
- 				   seem to matter though */
- 	__le16 MaxReferralLevel;
--	char RequestFileName[1];
-+	char RequestFileName[];
- } __attribute__((packed)) TRANSACTION2_GET_DFS_REFER_REQ;
- 
- #define DFS_VERSION cpu_to_le16(0x0003)
-@@ -2053,7 +2053,7 @@ struct get_dfs_referral_rsp {
- 	__le16 PathConsumed;
- 	__le16 NumberOfReferrals;
- 	__le32 DFSFlags;
--	REFERRAL3 referrals[1];	/* array of level 3 dfs_referral structures */
-+	REFERRAL3 referrals[];	/* array of level 3 dfs_referral structures */
- 	/* followed by the strings pointed to by the referral structures */
- } __packed;
- 
-@@ -2292,7 +2292,10 @@ typedef struct { /* data block encoding
- 	__le32 Mode;
- 	__le32 AlignmentRequirement;
- 	__le32 FileNameLength;
--	char FileName[1];
-+	union {
-+		char __pad;
-+		DECLARE_FLEX_ARRAY(char, FileName);
-+	};
- } __attribute__((packed)) FILE_ALL_INFO;	/* level 0x107 QPathInfo */
- 
- typedef struct {
-@@ -2330,7 +2333,7 @@ typedef struct {
- } __attribute__((packed)) FILE_UNIX_BASIC_INFO;	/* level 0x200 QPathInfo */
- 
- typedef struct {
--	char LinkDest[1];
-+	DECLARE_FLEX_ARRAY(char, LinkDest);
- } __attribute__((packed)) FILE_UNIX_LINK_INFO;	/* level 0x201 QPathInfo */
- 
- /* The following three structures are needed only for
-@@ -2380,7 +2383,7 @@ struct file_end_of_file_info {
- } __attribute__((packed)); /* size info, level 0x104 for set, 0x106 for query */
- 
- struct file_alt_name_info {
--	__u8   alt_name[1];
-+	DECLARE_FLEX_ARRAY(__u8, alt_name);
- } __attribute__((packed));      /* level 0x0108 */
- 
- struct file_stream_info {
-@@ -2490,7 +2493,10 @@ typedef struct {
- 	__le32 NextEntryOffset;
- 	__u32 ResumeKey; /* as with FileIndex - no need to convert */
- 	FILE_UNIX_BASIC_INFO basic;
--	char FileName[1];
-+	union {
-+		char __pad;
-+		DECLARE_FLEX_ARRAY(char, FileName);
-+	};
- } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
- 
- typedef struct {
-@@ -2504,7 +2510,7 @@ typedef struct {
- 	__le64 AllocationSize;
- 	__le32 ExtFileAttributes;
- 	__le32 FileNameLength;
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
- 
- typedef struct {
-@@ -2519,7 +2525,7 @@ typedef struct {
- 	__le32 ExtFileAttributes;
- 	__le32 FileNameLength;
- 	__le32 EaSize; /* length of the xattrs */
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
- 
- typedef struct {
-@@ -2536,7 +2542,7 @@ typedef struct {
- 	__le32 EaSize; /* EA size */
- 	__le32 Reserved;
- 	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
- 
- typedef struct {
-@@ -2554,7 +2560,7 @@ typedef struct {
- 	__u8   ShortNameLength;
- 	__u8   Reserved;
- 	__u8   ShortName[24];
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) FILE_BOTH_DIRECTORY_INFO; /* level 0x104 FFrsp data */
- 
- typedef struct {
-@@ -2569,7 +2575,7 @@ typedef struct {
- 	__le32 AllocationSize;
- 	__le16 Attributes; /* verify not u32 */
- 	__u8   FileNameLength;
--	char FileName[1];
-+	char FileName[];
- } __attribute__((packed)) FIND_FILE_STANDARD_INFO; /* level 0x1 FF resp data */
- 
- 
-@@ -2579,16 +2585,6 @@ struct win_dev {
- 	__le64 minor;
- } __attribute__((packed));
- 
--struct gea {
--	unsigned char name_len;
--	char name[1];
--} __attribute__((packed));
--
--struct gealist {
--	unsigned long list_len;
--	struct gea list[1];
--} __attribute__((packed));
--
- struct fea {
- 	unsigned char EA_flags;
- 	__u8 name_len;
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -497,7 +497,7 @@ static char *nxt_dir_entry(char *old_ent
- 		FIND_FILE_STANDARD_INFO *pfData;
- 		pfData = (FIND_FILE_STANDARD_INFO *)pDirInfo;
- 
--		new_entry = old_entry + sizeof(FIND_FILE_STANDARD_INFO) +
-+		new_entry = old_entry + sizeof(FIND_FILE_STANDARD_INFO) + 1 +
- 				pfData->FileNameLength;
- 	} else {
- 		u32 next_offset = le32_to_cpu(pDirInfo->NextEntryOffset);
-@@ -515,9 +515,9 @@ static char *nxt_dir_entry(char *old_ent
- 			 new_entry, end_of_smb, old_entry);
- 		return NULL;
- 	} else if (((level == SMB_FIND_FILE_INFO_STANDARD) &&
--		    (new_entry + sizeof(FIND_FILE_STANDARD_INFO) > end_of_smb))
-+		    (new_entry + sizeof(FIND_FILE_STANDARD_INFO) + 1 > end_of_smb))
- 		  || ((level != SMB_FIND_FILE_INFO_STANDARD) &&
--		   (new_entry + sizeof(FILE_DIRECTORY_INFO) > end_of_smb)))  {
-+		   (new_entry + sizeof(FILE_DIRECTORY_INFO) + 1 > end_of_smb)))  {
- 		cifs_dbg(VFS, "search entry %p extends after end of SMB %p\n",
- 			 new_entry, end_of_smb);
- 		return NULL;
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5073,10 +5073,10 @@ smb2_parse_query_directory(struct cifs_t
- 
- 	switch (srch_inf->info_level) {
- 	case SMB_FIND_FILE_DIRECTORY_INFO:
--		info_buf_size = sizeof(FILE_DIRECTORY_INFO) - 1;
-+		info_buf_size = sizeof(FILE_DIRECTORY_INFO);
- 		break;
- 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
--		info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
-+		info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO);
- 		break;
- 	case SMB_FIND_FILE_POSIX_INFO:
- 		/* note that posix payload are variable size */
---- a/fs/smb/client/smb2pdu.h
-+++ b/fs/smb/client/smb2pdu.h
-@@ -373,7 +373,7 @@ struct smb2_file_id_extd_directory_info
- 	__le32 EaSize; /* EA size */
- 	__le32 ReparsePointTag; /* valid if FILE_ATTR_REPARSE_POINT set in FileAttributes */
- 	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit */
--	char FileName[1];
-+	char FileName[];
- } __packed; /* level 60 */
- 
- extern char smb2_padding[7];
+           +------+------+     +----+----+
+Upload:    |      |      |.....|    |    |
+           +------+------+     +----+----+
 
+         +------+------+------+------+------+
+Cache:   |      |      |      |      |      |
+         +------+------+------+------+------+
+
+Data that got read from the server that needs copying to the cache is
+stored in folios that are marked dirty and have folio->private set to a
+special value.
+
+The progressive subrequest construction permits the algorithm to be
+preparing both the next upload to the server and the next write to the
+cache whilst the previous ones are already in progress.  Throttling can be
+applied to control the rate of production of subrequests - and, in any
+case, we probably want to write them to the server in ascending order,
+particularly if the file will be extended.
+
+Content crypto can also be prepared at the same time as the subrequests and
+run asynchronously, with the prepped requests being stalled until the
+crypto catches up with them.  This might also be useful for transport
+crypto, but that happens at a lower layer, so probably would be harder to
+pull off.
+
+The algorithm is split into three parts:
+
+ (1) The issuer.  This walks through the data, packaging it up, encrypting
+     it and creating subrequests.  The part of this that generates
+     subrequests only deals with file positions and spans and so is usable
+     for DIO/unbuffered writes as well as buffered writes.
+
+ (2) The collector.  This asynchronously collects completed subrequests,
+     unlocks folios, frees crypto buffers and performs any retries.  This
+     runs in a work queue so that the issuer can return to the caller for
+     writeback (so that the VM can have its kswapd thread back) or async
+     writes.
+
+     Collection is slightly complex as the collector has to work out where
+     discontiguities happen in the folio list so that it doesn't try and
+     collect folios that weren't included in the write out.
+
+ (3) The retryer.  This pauses the issuer, waits for all outstanding
+     subrequests to complete and then goes through the failed subrequests
+     to reissue them.  This may involve reprepping them (with cifs, the
+     credits must be renegotiated and a subrequest may need splitting), and
+     doing RMW for content crypto if there's a conflicting change on the
+     server.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-writeback
+
+David
+
+Link: https://lore.kernel.org/r/20240328163424.2781320-1-dhowells@redhat.com/ # v1
+
+Changes
+=======
+ver #2)
+ - Rebase on v6.9-rc6 to accommodate some fixes that went upstream.
+ - Make netfs_begin_writethrough() actually return an error.
+ - Move the cifs invalidation patch to the cifs-netfs branch.
+ - Mark writeback_iter() EXPORT_SYMBOL_GPL.
+ - In p9_client_write_subreq(), use 'int len' rather than 'size_t len'
+   because of the varargs packet formatter.
+ - In netfs_perform_write(), don't wait for writeback if we don't need to.
+ - Don't do the AFS StoreData RPC inline, but keep doing it from a
+   workqueue.
+ - Remove a couple of redundant checks where the second used to be inside
+   a lock.
+ - Add missing linux/bio.h for BIO_MAX_VECS in cachefiles.
+ - Change a comma ending a statement to a semicolon.
+ - Make filemap_invalidate_inode() take a range.
+ - Make netfs_unbuffered_write_iter() use filemap_invalidate_inode().
+
+David Howells (22):
+  netfs: Update i_blocks when write committed to pagecache
+  netfs: Replace PG_fscache by setting folio->private and marking dirty
+  mm: Remove the PG_fscache alias for PG_private_2
+  netfs: Remove deprecated use of PG_private_2 as a second writeback
+    flag
+  netfs: Make netfs_io_request::subreq_counter an atomic_t
+  netfs: Use subreq_counter to allocate subreq debug_index values
+  mm: Provide a means of invalidation without using launder_folio
+  9p: Use alternative invalidation to using launder_folio
+  afs: Use alternative invalidation to using launder_folio
+  netfs: Remove ->launder_folio() support
+  netfs: Use mempools for allocating requests and subrequests
+  mm: Export writeback_iter()
+  netfs: Switch to using unsigned long long rather than loff_t
+  netfs: New writeback implementation
+  netfs: Add some write-side stats and clean up some stat names
+  netfs, afs: Implement helpers for new write code
+  netfs, 9p: Implement helpers for new write code
+  netfs, cachefiles: Implement helpers for new write code
+  netfs: Cut over to using new writeback code
+  netfs: Remove the old writeback code
+  netfs: Miscellaneous tidy ups
+  netfs, afs: Use writeback retry to deal with alternate keys
+
+ fs/9p/vfs_addr.c             |  60 +--
+ fs/afs/file.c                |   8 +-
+ fs/afs/internal.h            |   6 +-
+ fs/afs/validation.c          |   4 +-
+ fs/afs/write.c               | 189 ++++----
+ fs/cachefiles/io.c           |  76 +++-
+ fs/ceph/addr.c               |  24 +-
+ fs/ceph/inode.c              |   2 +
+ fs/netfs/Makefile            |   3 +-
+ fs/netfs/buffered_read.c     |  40 +-
+ fs/netfs/buffered_write.c    | 825 +++--------------------------------
+ fs/netfs/direct_write.c      |  56 ++-
+ fs/netfs/fscache_io.c        |  14 +-
+ fs/netfs/internal.h          |  55 ++-
+ fs/netfs/io.c                | 155 +------
+ fs/netfs/main.c              |  55 ++-
+ fs/netfs/misc.c              |  10 +-
+ fs/netfs/objects.c           |  81 +++-
+ fs/netfs/output.c            | 478 --------------------
+ fs/netfs/stats.c             |  17 +-
+ fs/netfs/write_collect.c     | 808 ++++++++++++++++++++++++++++++++++
+ fs/netfs/write_issue.c       | 675 ++++++++++++++++++++++++++++
+ fs/nfs/file.c                |   8 +-
+ fs/nfs/fscache.h             |   6 +-
+ fs/nfs/write.c               |   4 +-
+ fs/smb/client/file.c         |  16 +-
+ include/linux/fscache.h      |  22 +-
+ include/linux/netfs.h        | 196 +++++----
+ include/linux/pagemap.h      |   2 +
+ include/net/9p/client.h      |   2 +
+ include/trace/events/netfs.h | 249 ++++++++++-
+ mm/filemap.c                 |  60 ++-
+ mm/page-writeback.c          |   1 +
+ net/9p/Kconfig               |   1 +
+ net/9p/client.c              |  49 +++
+ 35 files changed, 2502 insertions(+), 1755 deletions(-)
+ delete mode 100644 fs/netfs/output.c
+ create mode 100644 fs/netfs/write_collect.c
+ create mode 100644 fs/netfs/write_issue.c
 
