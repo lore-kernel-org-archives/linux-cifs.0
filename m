@@ -1,45 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E811C2304
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Apr 2024 14:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6652A1BF6EE
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Apr 2024 14:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714485790; cv=none; b=eGo0YcX9A9w+vj7XwR0/ps18qCmKiKzNQQntRLt0wR1zRWMQil+5NAWO1hctDDGpmyrBrQo2HLb91h2Pl+VBfV4Xd2TWsxOLU27smz7tQ4xwa17uG4zEiLyDBpfX4iARKexeEDVFzHXdQY2kzLK5duZ8oFG6S5U+EcCoU6Cdw+4=
+	t=1714485791; cv=none; b=AVdkInjZ7z8aDkyS7xKYOwxYHrcve3bdijcfDc7MJNiFTeKK/vXVFqzc0vucgy+BlUdPl7obK6zlo+Z4pyPzOgi+2kzIK7IRMW4My1V3QVfuvFaxWye5BdH2NA4u77wjei6EaKBlXjQ4RpO/6kaMAarcxVBxRTavF9mjkU5+G2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714485790; c=relaxed/simple;
-	bh=wk+uIq/Whs3KGMA/PDY6hckSxP5pAH9XCOYxv3JWN4U=;
+	s=arc-20240116; t=1714485791; c=relaxed/simple;
+	bh=Fs+ByYPRKNYmi2F7ny9ZJLGxANz4TNfi7rvVwKEL1dc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I96bqVxTefPfnkjha7IUczogGp2d2DvtoM4KayKWBAUReADFjateFZ+AVR7rsoaIupkHnuM+wXHisv7ogFG9L0TI+hMP2F3rJ+LxRMTHQZmOQlEAiSAJCLiom7MCqsjdXoLkyz+rdXo07BDV3/cOb2oWOJxyRNgT4B3ZDu+otYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KVwwvLgp; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=BLCDRumf6xoOuvFCm8q7eM1BriI1xk7iKYpqQTvV3h25+Ghzcdd5CiNfMFAXZgGfOECIkxj+vUpkbYOVpmOhc2FSV0nlECOd/zkDrC0ptHoZP6rBfAjvJkGGZ9XTdvdW/hMPtr40/ZkfK3a0yrWow0rU1qUSu3tajhq98vHEqQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NblM76rH; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVwwvLgp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NblM76rH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714485785;
+	s=mimecast20190719; t=1714485786;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z5qkmu9EpyTmHYNw75A+vyiBes4fc8ckryT1zOTs5ak=;
-	b=KVwwvLgp1z+q5Ch5EegBPrIVe1olLuta4cjaluFO53Vpn3wvr8ZADqfHsHzKAOZxJ8+Ixy
-	vSY7Q5/PntJClo69uCvIe/7hTbDBj2SWJUbu56NA7CvlLOEXC9BynJ2EkkLRJI1ek+omDm
-	yW6LjdrG7NJiyxMDUnlwgf2s8QT6Th4=
+	bh=b5EgDjFNrAAafAzZBTKxBCvxuUsmkAdGKL3AYN1EAj4=;
+	b=NblM76rHd4L+sT4rWLhKqiWi2zm+1C9hL6UCy65Gl+Z2ss6Co4Pp4DsTylc1XCbVSBc/WG
+	GR/osjpF3uSjibeNRb9nu0oIO1DTxpC4h3Q/ChxlNNzK1TFf3a6Bt4kyah72rLl5552Mz1
+	0a8rOn5dsHjRfCPp88YBigpyib0hb1c=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-68-G5mAFe4-O-KBx0CRGwI2aA-1; Tue, 30 Apr 2024 10:03:00 -0400
-X-MC-Unique: G5mAFe4-O-KBx0CRGwI2aA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-240-X6AaRPb4Mp-V7xLKIzX4rA-1; Tue, 30 Apr 2024 10:03:02 -0400
+X-MC-Unique: X6AaRPb4Mp-V7xLKIzX4rA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05B038140A0;
-	Tue, 30 Apr 2024 14:02:27 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9766F834FFE;
+	Tue, 30 Apr 2024 14:02:08 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 57FD440ED31;
-	Tue, 30 Apr 2024 14:02:21 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A59F2581CA;
+	Tue, 30 Apr 2024 14:02:05 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Jeff Layton <jlayton@kernel.org>,
@@ -65,12 +65,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: [PATCH v2 19/22] netfs: Cut over to using new writeback code
-Date: Tue, 30 Apr 2024 15:00:50 +0100
-Message-ID: <20240430140056.261997-20-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 15/22] netfs: Add some write-side stats and clean up some stat names
+Date: Tue, 30 Apr 2024 15:00:46 +0100
+Message-ID: <20240430140056.261997-16-dhowells@redhat.com>
 In-Reply-To: <20240430140056.261997-1-dhowells@redhat.com>
 References: <20240430140056.261997-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,521 +78,150 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Cut over to using the new writeback code.  The old code is #ifdef'd out or
-otherwise removed from compilation to avoid conflicts and will be removed
-in a future patch.
+Add some write-side stats to count buffered writes, buffered writethrough,
+and writepages calls.
+
+Whilst we're at it, clean up the naming on some of the existing stats
+counters and organise the output into two sets.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: v9fs@lists.linux.dev
-cc: linux-afs@lists.infradead.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
+ fs/netfs/buffered_read.c  |  2 +-
+ fs/netfs/buffered_write.c |  3 +++
+ fs/netfs/direct_write.c   |  2 +-
+ fs/netfs/internal.h       |  7 +++++--
+ fs/netfs/stats.c          | 17 ++++++++++++-----
+ fs/netfs/write_issue.c    |  1 +
+ 6 files changed, 23 insertions(+), 9 deletions(-)
 
-Notes:
-    Changes
-    =======
-    ver #2)
-     - In netfs_perform_write(), don't wait for writeback if we don't need to.
-
- fs/9p/vfs_addr.c          |  6 ++---
- fs/afs/file.c             |  3 +--
- fs/afs/internal.h         |  1 -
- fs/afs/write.c            |  2 ++
- fs/netfs/Makefile         |  1 -
- fs/netfs/buffered_write.c | 47 ++++++++++++++++++++++-----------------
- fs/netfs/direct_write.c   | 26 ++++++++++++----------
- fs/netfs/internal.h       | 21 +++++------------
- fs/netfs/write_collect.c  |  8 +++----
- fs/netfs/write_issue.c    | 18 +++++++--------
- include/linux/netfs.h     |  9 --------
- 11 files changed, 64 insertions(+), 78 deletions(-)
-
-diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-index 07d03efdd594..4845e655bc39 100644
---- a/fs/9p/vfs_addr.c
-+++ b/fs/9p/vfs_addr.c
-@@ -60,6 +60,7 @@ static void v9fs_issue_write(struct netfs_io_subrequest *subreq)
- 	netfs_write_subrequest_terminated(subreq, len ?: err, false);
- }
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index 47603f08680e..a6bb03bea920 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -282,7 +282,7 @@ int netfs_read_folio(struct file *file, struct folio *folio)
+ 	if (ret == -ENOMEM || ret == -EINTR || ret == -ERESTARTSYS)
+ 		goto discard;
  
-+#if 0 // TODO: Remove
- static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
- {
- 	struct p9_fid *fid = subreq->rreq->netfs_priv;
-@@ -91,6 +92,7 @@ static void v9fs_create_write_requests(struct netfs_io_request *wreq, loff_t sta
- 	if (subreq)
- 		netfs_queue_write_request(subreq);
- }
-+#endif
+-	netfs_stat(&netfs_n_rh_readpage);
++	netfs_stat(&netfs_n_rh_read_folio);
+ 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
  
- /**
-  * v9fs_issue_read - Issue a read from 9P
-@@ -121,18 +123,15 @@ static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
- {
- 	struct p9_fid *fid;
- 	bool writing = (rreq->origin == NETFS_READ_FOR_WRITE ||
--			rreq->origin == NETFS_WRITEBACK ||
- 			rreq->origin == NETFS_WRITETHROUGH ||
- 			rreq->origin == NETFS_UNBUFFERED_WRITE ||
- 			rreq->origin == NETFS_DIO_WRITE);
- 
--#if 0 // TODO: Cut over
- 	if (rreq->origin == NETFS_WRITEBACK)
- 		return 0; /* We don't get the write handle until we find we
- 			   * have actually dirty data and not just
- 			   * copy-to-cache data.
- 			   */
--#endif
- 
- 	if (file) {
- 		fid = file->private_data;
-@@ -179,7 +178,6 @@ const struct netfs_request_ops v9fs_req_ops = {
- 	.issue_read		= v9fs_issue_read,
- 	.begin_writeback	= v9fs_begin_writeback,
- 	.issue_write		= v9fs_issue_write,
--	.create_write_requests	= v9fs_create_write_requests,
- };
- 
- const struct address_space_operations v9fs_addr_operations = {
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index db9ebae84fa2..8f983e3ecae7 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -353,7 +353,7 @@ static int afs_init_request(struct netfs_io_request *rreq, struct file *file)
- 	if (file)
- 		rreq->netfs_priv = key_get(afs_file_key(file));
- 	rreq->rsize = 256 * 1024;
--	rreq->wsize = 256 * 1024;
-+	rreq->wsize = 256 * 1024 * 1024;
- 	return 0;
- }
- 
-@@ -399,7 +399,6 @@ const struct netfs_request_ops afs_req_ops = {
- 	.issue_read		= afs_issue_read,
- 	.update_i_size		= afs_update_i_size,
- 	.invalidate_cache	= afs_netfs_invalidate_cache,
--	.create_write_requests	= afs_create_write_requests,
- 	.begin_writeback	= afs_begin_writeback,
- 	.prepare_write		= afs_prepare_write,
- 	.issue_write		= afs_issue_write,
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index dcf0ae0323d3..887245f9336d 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -1605,7 +1605,6 @@ extern int afs_writepages(struct address_space *, struct writeback_control *);
- extern int afs_fsync(struct file *, loff_t, loff_t, int);
- extern vm_fault_t afs_page_mkwrite(struct vm_fault *vmf);
- extern void afs_prune_wb_keys(struct afs_vnode *);
--void afs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len);
- 
- /*
-  * xattr.c
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index 34595f482718..35db74627563 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -156,6 +156,7 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t
- 	return afs_put_operation(op);
- }
- 
-+#if 0 // TODO: Remove
- static void afs_upload_to_server(struct netfs_io_subrequest *subreq)
- {
- 	struct afs_vnode *vnode = AFS_FS_I(subreq->rreq->inode);
-@@ -193,6 +194,7 @@ void afs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size
- 	if (subreq)
- 		netfs_queue_write_request(subreq);
- }
-+#endif
- 
- /*
-  * Writeback calls this when it finds a folio that needs uploading.  This isn't
-diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index 1eb86e34b5a9..8e6781e0b10b 100644
---- a/fs/netfs/Makefile
-+++ b/fs/netfs/Makefile
-@@ -11,7 +11,6 @@ netfs-y := \
- 	main.o \
- 	misc.o \
- 	objects.o \
--	output.o \
- 	write_collect.o \
- 	write_issue.o
- 
+ 	/* Set up the output buffer */
 diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 33ea4c20e7e7..d4a9a18472b7 100644
+index 84ac95ee4b4d..33ea4c20e7e7 100644
 --- a/fs/netfs/buffered_write.c
 +++ b/fs/netfs/buffered_write.c
-@@ -26,8 +26,6 @@ enum netfs_how_to_modify {
- 	NETFS_FLUSH_CONTENT,		/* Flush incompatible content. */
- };
- 
--static void netfs_cleanup_buffered_write(struct netfs_io_request *wreq);
--
- static void netfs_set_group(struct folio *folio, struct netfs_group *netfs_group)
- {
- 	void *priv = folio_get_private(folio);
-@@ -180,7 +178,7 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 	};
- 	struct netfs_io_request *wreq = NULL;
- 	struct netfs_folio *finfo;
--	struct folio *folio;
-+	struct folio *folio, *writethrough = NULL;
- 	enum netfs_how_to_modify howto;
- 	enum netfs_folio_trace trace;
- 	unsigned int bdp_flags = (iocb->ki_flags & IOCB_SYNC) ? 0: BDP_ASYNC;
-@@ -209,7 +207,6 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 		}
+@@ -210,6 +210,9 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
  		if (!is_sync_kiocb(iocb))
  			wreq->iocb = iocb;
--		wreq->cleanup = netfs_cleanup_buffered_write;
- 		netfs_stat(&netfs_n_wh_writethrough);
- 	} else {
- 		netfs_stat(&netfs_n_wh_buffered_write);
-@@ -253,6 +250,16 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 		offset = pos & (flen - 1);
- 		part = min_t(size_t, flen - offset, part);
- 
-+		/* Wait for writeback to complete.  The writeback engine owns
-+		 * the info in folio->private and may change it until it
-+		 * removes the WB mark.
-+		 */
-+		if (folio_get_private(folio) &&
-+		    folio_wait_writeback_killable(folio)) {
-+			ret = written ? -EINTR : -ERESTARTSYS;
-+			goto error_folio_unlock;
-+		}
-+
- 		if (signal_pending(current)) {
- 			ret = written ? -EINTR : -ERESTARTSYS;
- 			goto error_folio_unlock;
-@@ -327,6 +334,7 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 				maybe_trouble = true;
- 				iov_iter_revert(iter, copied);
- 				copied = 0;
-+				folio_unlock(folio);
- 				goto retry;
- 			}
- 			netfs_set_group(folio, netfs_group);
-@@ -382,23 +390,16 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 
- 		if (likely(!wreq)) {
- 			folio_mark_dirty(folio);
-+			folio_unlock(folio);
- 		} else {
--			if (folio_test_dirty(folio))
--				/* Sigh.  mmap. */
--				folio_clear_dirty_for_io(folio);
--			/* We make multiple writes to the folio... */
--			if (!folio_test_writeback(folio)) {
--				folio_start_writeback(folio);
--				if (wreq->iter.count == 0)
--					trace_netfs_folio(folio, netfs_folio_trace_wthru);
--				else
--					trace_netfs_folio(folio, netfs_folio_trace_wthru_plus);
--			}
--			netfs_advance_writethrough(wreq, copied,
--						   offset + copied == flen);
-+			if (pos > wreq->i_size)
-+				wreq->i_size = pos;
-+			netfs_advance_writethrough(wreq, &wbc, folio, copied,
-+						   offset + copied == flen,
-+						   &writethrough);
-+			/* Folio unlocked */
- 		}
- 	retry:
--		folio_unlock(folio);
- 		folio_put(folio);
- 		folio = NULL;
- 
-@@ -407,7 +408,7 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 
- out:
- 	if (unlikely(wreq)) {
--		ret2 = netfs_end_writethrough(wreq, iocb);
-+		ret2 = netfs_end_writethrough(wreq, &wbc, writethrough);
- 		wbc_detach_inode(&wbc);
- 		if (ret2 == -EIOCBQUEUED)
- 			return ret2;
-@@ -529,11 +530,13 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
- 
- 	sb_start_pagefault(inode->i_sb);
- 
--	if (folio_wait_writeback_killable(folio))
-+	if (folio_lock_killable(folio) < 0)
- 		goto out;
- 
--	if (folio_lock_killable(folio) < 0)
-+	if (folio_wait_writeback_killable(folio)) {
-+		ret = VM_FAULT_LOCKED;
- 		goto out;
-+	}
- 
- 	/* Can we see a streaming write here? */
- 	if (WARN_ON(!folio_test_uptodate(folio))) {
-@@ -573,6 +576,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
- }
- EXPORT_SYMBOL(netfs_page_mkwrite);
- 
-+#if 0 // TODO: Remove
- /*
-  * Kill all the pages in the given range
-  */
-@@ -1199,3 +1203,4 @@ int netfs_writepages(struct address_space *mapping,
- 	return ret;
- }
- EXPORT_SYMBOL(netfs_writepages);
-+#endif
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 36b6db504500..608ba6416919 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -34,6 +34,7 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 	unsigned long long start = iocb->ki_pos;
- 	unsigned long long end = start + iov_iter_count(iter);
- 	ssize_t ret, n;
-+	size_t len = iov_iter_count(iter);
- 	bool async = !is_sync_kiocb(iocb);
- 
- 	_enter("");
-@@ -46,13 +47,17 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 
- 	_debug("uw %llx-%llx", start, end);
- 
--	wreq = netfs_alloc_request(iocb->ki_filp->f_mapping, iocb->ki_filp,
--				   start, end - start,
--				   iocb->ki_flags & IOCB_DIRECT ?
--				   NETFS_DIO_WRITE : NETFS_UNBUFFERED_WRITE);
-+	wreq = netfs_create_write_req(iocb->ki_filp->f_mapping, iocb->ki_filp, start,
-+				      iocb->ki_flags & IOCB_DIRECT ?
-+				      NETFS_DIO_WRITE : NETFS_UNBUFFERED_WRITE);
- 	if (IS_ERR(wreq))
- 		return PTR_ERR(wreq);
- 
-+	wreq->io_streams[0].avail = true;
-+	trace_netfs_write(wreq, (iocb->ki_flags & IOCB_DIRECT ?
-+				 netfs_write_trace_dio_write :
-+				 netfs_write_trace_unbuffered_write));
-+
- 	{
- 		/* If this is an async op and we're not using a bounce buffer,
- 		 * we have to save the source buffer as the iterator is only
-@@ -63,7 +68,7 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 		 * request.
- 		 */
- 		if (async || user_backed_iter(iter)) {
--			n = netfs_extract_user_iter(iter, wreq->len, &wreq->iter, 0);
-+			n = netfs_extract_user_iter(iter, len, &wreq->iter, 0);
- 			if (n < 0) {
- 				ret = n;
- 				goto out;
-@@ -71,7 +76,6 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 			wreq->direct_bv = (struct bio_vec *)wreq->iter.bvec;
- 			wreq->direct_bv_count = n;
- 			wreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
--			wreq->len = iov_iter_count(&wreq->iter);
- 		} else {
- 			wreq->iter = *iter;
- 		}
-@@ -79,6 +83,8 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 		wreq->io_iter = wreq->iter;
+ 		wreq->cleanup = netfs_cleanup_buffered_write;
++		netfs_stat(&netfs_n_wh_writethrough);
++	} else {
++		netfs_stat(&netfs_n_wh_buffered_write);
  	}
  
-+	__set_bit(NETFS_RREQ_USE_IO_ITER, &wreq->flags);
-+
- 	/* Copy the data into the bounce buffer and encrypt it. */
- 	// TODO
+ 	do {
+diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
+index 2b81cd4aae6e..36b6db504500 100644
+--- a/fs/netfs/direct_write.c
++++ b/fs/netfs/direct_write.c
+@@ -145,7 +145,7 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 		return 0;
  
-@@ -87,10 +93,7 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 	if (async)
- 		wreq->iocb = iocb;
- 	wreq->cleanup = netfs_cleanup_dio_write;
--	ret = netfs_begin_write(wreq, is_sync_kiocb(iocb),
--				iocb->ki_flags & IOCB_DIRECT ?
--				netfs_write_trace_dio_write :
--				netfs_write_trace_unbuffered_write);
-+	ret = netfs_unbuffered_write(wreq, is_sync_kiocb(iocb), iov_iter_count(&wreq->io_iter));
- 	if (ret < 0) {
- 		_debug("begin = %zd", ret);
- 		goto out;
-@@ -100,9 +103,8 @@ static ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov
- 		trace_netfs_rreq(wreq, netfs_rreq_trace_wait_ip);
- 		wait_on_bit(&wreq->flags, NETFS_RREQ_IN_PROGRESS,
- 			    TASK_UNINTERRUPTIBLE);
--
-+		smp_rmb(); /* Read error/transferred after RIP flag */
- 		ret = wreq->error;
--		_debug("waited = %zd", ret);
- 		if (ret == 0) {
- 			ret = wreq->transferred;
- 			iocb->ki_pos += ret;
+ 	trace_netfs_write_iter(iocb, from);
+-	netfs_stat(&netfs_n_rh_dio_write);
++	netfs_stat(&netfs_n_wh_dio_write);
+ 
+ 	ret = netfs_start_io_direct(inode);
+ 	if (ret < 0)
 diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 5d3f74a70fa7..95e281a8af78 100644
+index dc11d1f67363..5d3f74a70fa7 100644
 --- a/fs/netfs/internal.h
 +++ b/fs/netfs/internal.h
-@@ -92,15 +92,6 @@ static inline void netfs_see_request(struct netfs_io_request *rreq,
- 	trace_netfs_rreq_ref(rreq->debug_id, refcount_read(&rreq->ref), what);
- }
- 
--/*
-- * output.c
-- */
--int netfs_begin_write(struct netfs_io_request *wreq, bool may_wait,
--		      enum netfs_write_trace what);
--struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len);
--int netfs_advance_writethrough(struct netfs_io_request *wreq, size_t copied, bool to_page_end);
--int netfs_end_writethrough(struct netfs_io_request *wreq, struct kiocb *iocb);
--
- /*
-  * stats.c
+@@ -106,9 +106,8 @@ int netfs_end_writethrough(struct netfs_io_request *wreq, struct kiocb *iocb);
   */
-@@ -172,12 +163,12 @@ void netfs_reissue_write(struct netfs_io_stream *stream,
- int netfs_advance_write(struct netfs_io_request *wreq,
- 			struct netfs_io_stream *stream,
- 			loff_t start, size_t len, bool to_eof);
--struct netfs_io_request *new_netfs_begin_writethrough(struct kiocb *iocb, size_t len);
--int new_netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
--				   struct folio *folio, size_t copied, bool to_page_end,
--				   struct folio **writethrough_cache);
--int new_netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
--			       struct folio *writethrough_cache);
-+struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len);
-+int netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
-+			       struct folio *folio, size_t copied, bool to_page_end,
-+			       struct folio **writethrough_cache);
-+int netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
-+			   struct folio *writethrough_cache);
- int netfs_unbuffered_write(struct netfs_io_request *wreq, bool may_wait, size_t len);
+ #ifdef CONFIG_NETFS_STATS
+ extern atomic_t netfs_n_rh_dio_read;
+-extern atomic_t netfs_n_rh_dio_write;
+ extern atomic_t netfs_n_rh_readahead;
+-extern atomic_t netfs_n_rh_readpage;
++extern atomic_t netfs_n_rh_read_folio;
+ extern atomic_t netfs_n_rh_rreq;
+ extern atomic_t netfs_n_rh_sreq;
+ extern atomic_t netfs_n_rh_download;
+@@ -125,6 +124,10 @@ extern atomic_t netfs_n_rh_write_begin;
+ extern atomic_t netfs_n_rh_write_done;
+ extern atomic_t netfs_n_rh_write_failed;
+ extern atomic_t netfs_n_rh_write_zskip;
++extern atomic_t netfs_n_wh_buffered_write;
++extern atomic_t netfs_n_wh_writethrough;
++extern atomic_t netfs_n_wh_dio_write;
++extern atomic_t netfs_n_wh_writepages;
+ extern atomic_t netfs_n_wh_wstream_conflict;
+ extern atomic_t netfs_n_wh_upload;
+ extern atomic_t netfs_n_wh_upload_done;
+diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
+index deeba9f9dcf5..0892768eea32 100644
+--- a/fs/netfs/stats.c
++++ b/fs/netfs/stats.c
+@@ -10,9 +10,8 @@
+ #include "internal.h"
  
- /*
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index b8c1d3ca724a..f14c08bf605d 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -709,7 +709,7 @@ void netfs_wake_write_collector(struct netfs_io_request *wreq, bool was_async)
- }
+ atomic_t netfs_n_rh_dio_read;
+-atomic_t netfs_n_rh_dio_write;
+ atomic_t netfs_n_rh_readahead;
+-atomic_t netfs_n_rh_readpage;
++atomic_t netfs_n_rh_read_folio;
+ atomic_t netfs_n_rh_rreq;
+ atomic_t netfs_n_rh_sreq;
+ atomic_t netfs_n_rh_download;
+@@ -29,6 +28,10 @@ atomic_t netfs_n_rh_write_begin;
+ atomic_t netfs_n_rh_write_done;
+ atomic_t netfs_n_rh_write_failed;
+ atomic_t netfs_n_rh_write_zskip;
++atomic_t netfs_n_wh_buffered_write;
++atomic_t netfs_n_wh_writethrough;
++atomic_t netfs_n_wh_dio_write;
++atomic_t netfs_n_wh_writepages;
+ atomic_t netfs_n_wh_wstream_conflict;
+ atomic_t netfs_n_wh_upload;
+ atomic_t netfs_n_wh_upload_done;
+@@ -39,13 +42,17 @@ atomic_t netfs_n_wh_write_failed;
  
- /**
-- * new_netfs_write_subrequest_terminated - Note the termination of a write operation.
-+ * netfs_write_subrequest_terminated - Note the termination of a write operation.
-  * @_op: The I/O request that has terminated.
-  * @transferred_or_error: The amount of data transferred or an error code.
-  * @was_async: The termination was asynchronous
-@@ -731,8 +731,8 @@ void netfs_wake_write_collector(struct netfs_io_request *wreq, bool was_async)
-  * Note that %_op is a void* so that the function can be passed to
-  * kiocb::term_func without the need for a casting wrapper.
-  */
--void new_netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error,
--					   bool was_async)
-+void netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error,
-+				       bool was_async)
+ int netfs_stats_show(struct seq_file *m, void *v)
  {
- 	struct netfs_io_subrequest *subreq = _op;
- 	struct netfs_io_request *wreq = subreq->rreq;
-@@ -800,4 +800,4 @@ void new_netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_err
- 
- 	netfs_put_subrequest(subreq, was_async, netfs_sreq_trace_put_terminated);
- }
--EXPORT_SYMBOL(new_netfs_write_subrequest_terminated);
-+EXPORT_SYMBOL(netfs_write_subrequest_terminated);
+-	seq_printf(m, "Netfs  : DR=%u DW=%u RA=%u RP=%u WB=%u WBZ=%u\n",
++	seq_printf(m, "Netfs  : DR=%u RA=%u RF=%u WB=%u WBZ=%u\n",
+ 		   atomic_read(&netfs_n_rh_dio_read),
+-		   atomic_read(&netfs_n_rh_dio_write),
+ 		   atomic_read(&netfs_n_rh_readahead),
+-		   atomic_read(&netfs_n_rh_readpage),
++		   atomic_read(&netfs_n_rh_read_folio),
+ 		   atomic_read(&netfs_n_rh_write_begin),
+ 		   atomic_read(&netfs_n_rh_write_zskip));
++	seq_printf(m, "Netfs  : BW=%u WT=%u DW=%u WP=%u\n",
++		   atomic_read(&netfs_n_wh_buffered_write),
++		   atomic_read(&netfs_n_wh_writethrough),
++		   atomic_read(&netfs_n_wh_dio_write),
++		   atomic_read(&netfs_n_wh_writepages));
+ 	seq_printf(m, "Netfs  : ZR=%u sh=%u sk=%u\n",
+ 		   atomic_read(&netfs_n_rh_zero),
+ 		   atomic_read(&netfs_n_rh_short_read),
 diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 11b62e6f82fa..69c50f4cbf41 100644
+index 0293b714d8ee..11b62e6f82fa 100644
 --- a/fs/netfs/write_issue.c
 +++ b/fs/netfs/write_issue.c
-@@ -485,8 +485,8 @@ static int netfs_write_folio(struct netfs_io_request *wreq,
- /*
-  * Write some of the pending data back to the server
-  */
--int new_netfs_writepages(struct address_space *mapping,
--			 struct writeback_control *wbc)
-+int netfs_writepages(struct address_space *mapping,
-+		     struct writeback_control *wbc)
- {
- 	struct netfs_inode *ictx = netfs_inode(mapping->host);
- 	struct netfs_io_request *wreq = NULL;
-@@ -547,12 +547,12 @@ int new_netfs_writepages(struct address_space *mapping,
- 	_leave(" = %d", error);
- 	return error;
- }
--EXPORT_SYMBOL(new_netfs_writepages);
-+EXPORT_SYMBOL(netfs_writepages);
+@@ -510,6 +510,7 @@ int new_netfs_writepages(struct address_space *mapping,
+ 	}
  
- /*
-  * Begin a write operation for writing through the pagecache.
-  */
--struct netfs_io_request *new_netfs_begin_writethrough(struct kiocb *iocb, size_t len)
-+struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len)
- {
- 	struct netfs_io_request *wreq = NULL;
- 	struct netfs_inode *ictx = netfs_inode(file_inode(iocb->ki_filp));
-@@ -577,9 +577,9 @@ struct netfs_io_request *new_netfs_begin_writethrough(struct kiocb *iocb, size_t
-  * to the request.  If we've added more than wsize then we need to create a new
-  * subrequest.
-  */
--int new_netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
--				   struct folio *folio, size_t copied, bool to_page_end,
--				   struct folio **writethrough_cache)
-+int netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
-+			       struct folio *folio, size_t copied, bool to_page_end,
-+			       struct folio **writethrough_cache)
- {
- 	_enter("R=%x ic=%zu ws=%u cp=%zu tp=%u",
- 	       wreq->debug_id, wreq->iter.count, wreq->wsize, copied, to_page_end);
-@@ -609,8 +609,8 @@ int new_netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeba
- /*
-  * End a write operation used when writing through the pagecache.
-  */
--int new_netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
--			       struct folio *writethrough_cache)
-+int netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
-+			   struct folio *writethrough_cache)
- {
- 	struct netfs_inode *ictx = netfs_inode(wreq->inode);
- 	int ret;
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 42dba05a428b..c2ba364041b0 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -303,8 +303,6 @@ struct netfs_request_ops {
- 	void (*update_i_size)(struct inode *inode, loff_t i_size);
+ 	trace_netfs_write(wreq, netfs_write_trace_writeback);
++	netfs_stat(&netfs_n_wh_writepages);
  
- 	/* Write request handling */
--	void (*create_write_requests)(struct netfs_io_request *wreq,
--				      loff_t start, size_t len);
- 	void (*begin_writeback)(struct netfs_io_request *wreq);
- 	void (*prepare_write)(struct netfs_io_subrequest *subreq);
- 	void (*issue_write)(struct netfs_io_subrequest *subreq);
-@@ -409,8 +407,6 @@ int netfs_write_begin(struct netfs_inode *, struct file *,
- 		      struct folio **, void **fsdata);
- int netfs_writepages(struct address_space *mapping,
- 		     struct writeback_control *wbc);
--int new_netfs_writepages(struct address_space *mapping,
--			struct writeback_control *wbc);
- bool netfs_dirty_folio(struct address_space *mapping, struct folio *folio);
- int netfs_unpin_writeback(struct inode *inode, struct writeback_control *wbc);
- void netfs_clear_inode_writeback(struct inode *inode, const void *aux);
-@@ -431,14 +427,9 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
- 				iov_iter_extraction_t extraction_flags);
- size_t netfs_limit_iter(const struct iov_iter *iter, size_t start_offset,
- 			size_t max_size, size_t max_segs);
--struct netfs_io_subrequest *netfs_create_write_request(
--	struct netfs_io_request *wreq, enum netfs_io_source dest,
--	loff_t start, size_t len, work_func_t worker);
- void netfs_prepare_write_failed(struct netfs_io_subrequest *subreq);
- void netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error,
- 				       bool was_async);
--void new_netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error,
--					   bool was_async);
- void netfs_queue_write_request(struct netfs_io_subrequest *subreq);
- 
- int netfs_start_io_read(struct inode *inode);
+ 	do {
+ 		_debug("wbiter %lx %llx", folio->index, wreq->start + wreq->submitted);
 
