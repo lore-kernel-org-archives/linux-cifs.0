@@ -1,42 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB29712C46D;
-	Tue, 30 Apr 2024 10:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1491D12C487;
+	Tue, 30 Apr 2024 10:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714473931; cv=none; b=kpwMvCat6eLC1gxsKpw78gMuqe9tkKIlU3zHMLdBcjvRRDnv11IsVbCmviNgTqUetUXEWo2K0apCCi2fsgfIrBacId6u+ByIqS/eOO4scxN1iABkS+bK1URxx2oLm83HPqu0VRWgn7KpQfSv8ZMPJu/EZMEk1Lg+I7y54cZ3grg=
+	t=1714474310; cv=none; b=Q9aubPVc4m9Ka/q82CAwJrb86rdcpB4VGDZC5E7hWyGQKtlnRzO6YQw8Zv8rWUXH8jpKYK0hnAzkQ3YzuPUSr7DnmPc6/b3MU7Lbn/CFQhSe4aZ4lIuZRDtwvar3ABHH80dpqprl1ymlqQFq4rPWlllF1CtTNrN4PgGtWHDHqIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714473931; c=relaxed/simple;
-	bh=hC03OIiMJ2E4WTpiCERA8rGnU2TYGA64/c3TJ4UGlt4=;
+	s=arc-20240116; t=1714474310; c=relaxed/simple;
+	bh=EqxWaXJkaKi6EmeJ/uq2stp+6OiNQwCUC8ehr0Ve1Ww=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FN6GjTiW3BadvO6RXxMsJ6E7NvfiJjd5Wl03d1IS5RpeNlyS10SdkU/u5xugvKXs1RssH1cvNWeKjcqpDYJrO3E2aHWKK4nP7ymTiXi+YwBmN7VDQ+92YF4ZlP0ygTX+QpkpY63ssE3mL1rtdjeomDTbKIQx4O6JrD+tSWsp8VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oU9XsoDl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=WAQXgjuOKCZq3Ay/N2oodpK1zKQwvHINYo8VNmcBJvEYrVDC8WYIkUTqT8sSymkVcSIV3C9cjFm7WAYpIXdNR17YfhK/teN+ZvxMjNFKhLUopXYfH61hNDvfSq+L30gzI6gybSESrX9lH5/c3WgPI4wg1n0tdoRU4W+fkzjhok8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oTgqEuHg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oU9XsoDl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6246AC2BBFC;
-	Tue, 30 Apr 2024 10:45:30 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oTgqEuHg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5788EC4AF18;
+	Tue, 30 Apr 2024 10:51:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1714473930;
-	bh=hC03OIiMJ2E4WTpiCERA8rGnU2TYGA64/c3TJ4UGlt4=;
+	s=korg; t=1714474309;
+	bh=EqxWaXJkaKi6EmeJ/uq2stp+6OiNQwCUC8ehr0Ve1Ww=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oU9XsoDlh1RblRLeqiReO+FmlMLHrzABWziPnjGRYojNMD80fTZdRIs028EVzhHeF
-	 gqCHR/3Pt7AXKBP+PlWY50IBKMRPfG9U7nZr2SMX9dUft74ZdYIkcLanJYuYNig1Jr
-	 8C2nqj8Hamt/zRmzV91UIiDdnQie1uPbsTiIrb88=
+	b=oTgqEuHgqQKdUci1Z3du65415M3GJ2TVlGxYZfvpPUKLshBl6qKVOcxYk5o3+hZEe
+	 mWLr+NFj5WD7vWLX3sIjMxcZyd3TmFgb5xbQWVGrpuiABOigLaqyH3dO05hIAki7/a
+	 b0/2sOxS15AAryy15gc/F9THApVMUTySCFlDObTg=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
+	kernel test robot <oliver.sang@intel.com>,
 	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	linux-cifs@vger.kernel.org,
+	Jeffrey Layton <jlayton@kernel.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	netfs@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
+	linux-mm@kvack.org,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.8 001/228] cifs: Fix reacquisition of volume cookie on still-live connection
-Date: Tue, 30 Apr 2024 12:36:19 +0200
-Message-ID: <20240430103103.852592498@linuxfoundation.org>
+Subject: [PATCH 6.8 119/228] netfs: Fix the pre-flush when appending to a file in writethrough mode
+Date: Tue, 30 Apr 2024 12:38:17 +0200
+Message-ID: <20240430103107.242045835@linuxfoundation.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240430103103.806426847@linuxfoundation.org>
 References: <20240430103103.806426847@linuxfoundation.org>
@@ -57,115 +66,88 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit dad80c6bff770d25f67ec25fe011730e4a463008 ]
+[ Upstream commit c97f59e276d4e93480f29a70accbd0d7273cf3f5 ]
 
-During mount, cifs_mount_get_tcon() gets a tcon resource connection record
-and then attaches an fscache volume cookie to it.  However, it does this
-irrespective of whether or not the tcon returned from cifs_get_tcon() is a
-new record or one that's already in use.  This leads to a warning about a
-volume cookie collision and a leaked volume cookie because tcon->fscache
-gets reset.
+In netfs_perform_write(), when the file is marked NETFS_ICTX_WRITETHROUGH
+or O_*SYNC or RWF_*SYNC was specified, write-through caching is performed
+on a buffered file.  When setting up for write-through, we flush any
+conflicting writes in the region and wait for the write to complete,
+failing if there's a write error to return.
 
-Fix this be adding a mutex and a "we've already tried this" flag and only
-doing it once for the lifetime of the tcon.
+The issue arises if we're writing at or above the EOF position because we
+skip the flush and - more importantly - the wait.  This becomes a problem
+if there's a partial folio at the end of the file that is being written out
+and we want to make a write to it too.  Both the already-running write and
+the write we start both want to clear the writeback mark, but whoever is
+second causes a warning looking something like:
 
-[!] Note: Looking at cifs_mount_get_tcon(), a more general solution may
-actually be required.  Reacquiring the volume cookie isn't the only thing
-that function does: it also partially reinitialises the tcon record without
-any locking - which may cause live filesystem ops already using the tcon
-through a previous mount to malfunction.
+    ------------[ cut here ]------------
+    R=00000012: folio 11 is not under writeback
+    WARNING: CPU: 34 PID: 654 at fs/netfs/write_collect.c:105
+    ...
+    CPU: 34 PID: 654 Comm: kworker/u386:27 Tainted: G S ...
+    ...
+    Workqueue: events_unbound netfs_write_collection_worker
+    ...
+    RIP: 0010:netfs_writeback_lookup_folio
 
-This can be reproduced simply by something like:
+Fix this by making the flush-and-wait unconditional.  It will do nothing if
+there are no folios in the pagecache and will return quickly if there are
+no folios in the region specified.
 
-    mount //example.com/test /xfstest.test -o user=shares,pass=xxx,fsc
-    mount //example.com/test /mnt -o user=shares,pass=xxx,fsc
+Further, move the WBC attachment above the flush call as the flush is going
+to attach a WBC and detach it again if it is not present - and since we
+need one anyway we might as well share it.
 
-Fixes: 70431bfd825d ("cifs: Support fscache indexing rewrite")
+Fixes: 41d8e7673a77 ("netfs: Implement a write-through caching option")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202404161031.468b84f-oliver.sang@intel.com
 Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: linux-cifs@vger.kernel.org
+Link: https://lore.kernel.org/r/2150448.1714130115@warthog.procyon.org.uk
+Reviewed-by: Jeffrey Layton <jlayton@kernel.org>
+cc: Eric Van Hensbergen <ericvh@kernel.org>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
+cc: linux-mm@kvack.org
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsglob.h |  2 ++
- fs/smb/client/fscache.c  | 13 +++++++++++++
- fs/smb/client/misc.c     |  3 +++
- 3 files changed, 18 insertions(+)
+ fs/netfs/buffered_write.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 844afda090d05..0c3311de5dc0a 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1261,7 +1261,9 @@ struct cifs_tcon {
- 	__u32 max_cached_dirs;
- #ifdef CONFIG_CIFS_FSCACHE
- 	u64 resource_id;		/* server resource id */
-+	bool fscache_acquired;		/* T if we've tried acquiring a cookie */
- 	struct fscache_volume *fscache;	/* cookie for share */
-+	struct mutex fscache_lock;	/* Prevent regetting a cookie */
- #endif
- 	struct list_head pending_opens;	/* list of incomplete opens */
- 	struct cached_fids *cfids;
-diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index 340efce8f0529..113bde8f1e613 100644
---- a/fs/smb/client/fscache.c
-+++ b/fs/smb/client/fscache.c
-@@ -43,12 +43,23 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 	char *key;
- 	int ret = -ENOMEM;
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 8f13ca8fbc74d..267b622d923b1 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -172,15 +172,14 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
+ 	if (unlikely(test_bit(NETFS_ICTX_WRITETHROUGH, &ctx->flags) ||
+ 		     iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC))
+ 	    ) {
+-		if (pos < i_size_read(inode)) {
+-			ret = filemap_write_and_wait_range(mapping, pos, pos + iter->count);
+-			if (ret < 0) {
+-				goto out;
+-			}
+-		}
+-
+ 		wbc_attach_fdatawrite_inode(&wbc, mapping->host);
  
-+	if (tcon->fscache_acquired)
-+		return 0;
++		ret = filemap_write_and_wait_range(mapping, pos, pos + iter->count);
++		if (ret < 0) {
++			wbc_detach_inode(&wbc);
++			goto out;
++		}
 +
-+	mutex_lock(&tcon->fscache_lock);
-+	if (tcon->fscache_acquired) {
-+		mutex_unlock(&tcon->fscache_lock);
-+		return 0;
-+	}
-+	tcon->fscache_acquired = true;
-+
- 	tcon->fscache = NULL;
- 	switch (sa->sa_family) {
- 	case AF_INET:
- 	case AF_INET6:
- 		break;
- 	default:
-+		mutex_unlock(&tcon->fscache_lock);
- 		cifs_dbg(VFS, "Unknown network family '%d'\n", sa->sa_family);
- 		return -EINVAL;
- 	}
-@@ -57,6 +68,7 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 
- 	sharename = extract_sharename(tcon->tree_name);
- 	if (IS_ERR(sharename)) {
-+		mutex_unlock(&tcon->fscache_lock);
- 		cifs_dbg(FYI, "%s: couldn't extract sharename\n", __func__);
- 		return PTR_ERR(sharename);
- 	}
-@@ -90,6 +102,7 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 	kfree(key);
- out:
- 	kfree(sharename);
-+	mutex_unlock(&tcon->fscache_lock);
- 	return ret;
- }
- 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 74627d647818a..0d13db80e67c9 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -141,6 +141,9 @@ tcon_info_alloc(bool dir_leases_enabled)
- 	atomic_set(&ret_buf->num_local_opens, 0);
- 	atomic_set(&ret_buf->num_remote_opens, 0);
- 	ret_buf->stats_from_time = ktime_get_real_seconds();
-+#ifdef CONFIG_CIFS_FSCACHE
-+	mutex_init(&ret_buf->fscache_lock);
-+#endif
- 
- 	return ret_buf;
- }
+ 		wreq = netfs_begin_writethrough(iocb, iter->count);
+ 		if (IS_ERR(wreq)) {
+ 			wbc_detach_inode(&wbc);
 -- 
 2.43.0
 
