@@ -1,115 +1,57 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC446768EC
-	for <linux-cifs@vger.kernel.org>; Thu,  2 May 2024 12:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7D613C811;
+	Thu,  2 May 2024 14:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714652088; cv=none; b=VRf3/B2OrfLiDbQEXkKNrQOUNTPA2F0XlvQ/1Nn8N2RWJ9pg+/ZmvXHegD8D3cD5Sf/zZNNEMUp+0GGTxIJ1fCqaOR8VuWhEY8Rbp/KwJp/tbK1A2VUj6T4yC8ZtS7ZZW2jb+Bh5m/acoiz35HtR6YIDZUPOhRjZjhrav3QDcXo=
+	t=1714659224; cv=none; b=ivQ6qguK1bhqtIgGBw+oUl49SRtCgweDHUdLm1tCtkkwoX+USkW1rdz1cOYWsskJ7obh2SNMCgzSCc3iTPRydcmx/ydTVg0Con7jwGLs8xo1qbKv3lDyJG5PAw/hmI2l32sWBdUSPMnJnm/LIY3lXC8jsfnSpARXWWXgxvJ8DXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714652088; c=relaxed/simple;
-	bh=5h7sok0m8DjI5YsoFx+jLT1NBD5B2YuhY83DLe+cq6U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p9UOXl/LAYa+AGTBb/huM+0CRNIvaWaxXGIZjW/6c6cIx/o4lLOHjG8Hw+P04HOPUoTszKN4K+7ct8DWIGjH5AcPgVchyaKAIKl26K6foLWKxEaBh+3HAqIYheAl2V7J1Qfcr2s3o1wQBLrs+rpYL+gdSO6X1o14gFlOKrNaKpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ee12766586so1420394b3a.0
-        for <linux-cifs@vger.kernel.org>; Thu, 02 May 2024 05:14:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714652086; x=1715256886;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7sGAoqFrk+6nq0PTf89x/MjVnNXSxxNmJMXohKG6K0g=;
-        b=cXirVq4u2jHqmAYRUjWiKPDeA71mrUIKNaMTk6tVIuAv5m9PN8uYgxNHiTXyuM7P/W
-         RALdynWcUm6B+k7SQAjDpVXECk0kumiTeA4KQyPQg0ZjKIVxYr79s7mt4f0pfHqjjQsf
-         7XUQ9+ikG5htSnisbtVUW5C2cBe05zDr1pdMaeRloyoLOhdDLBd6ECUkEwvr3gaKeRpW
-         M+A8D3p/X4KdhNazleRI1mGrnVv9rm1k4LCIPika/t2KPCm1YUArjxZEQna3qS86r0tn
-         znxkosRDLU1+PgiJYNPP/vSgxuKMXCd4Wbe2m7xn2QrEuUeW0Ni574rHruBC4O6tUYa2
-         LMeg==
-X-Gm-Message-State: AOJu0YzHM+q8QFDnC9tfEM9uGlEfFk0yeO0Lt6ojkHzWsIuFHsFTWl16
-	fJUjJC/xpo80gj9gZs7xaCGEoS4ehjA4f4m/yu+mXufAFI4APwKJCMjdVA==
-X-Google-Smtp-Source: AGHT+IGAupCS20UUrVHvjvFOYQf8S0aD7mpQE+LrEwbAT4VkGEzbcwvhooOJHnbq3DSTZLplQ8LGrg==
-X-Received: by 2002:a05:6a00:2186:b0:6ed:21d5:fbdb with SMTP id h6-20020a056a00218600b006ed21d5fbdbmr3453178pfi.8.1714652085738;
-        Thu, 02 May 2024 05:14:45 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id gx8-20020a056a001e0800b006edec30bbc2sm1069840pfb.49.2024.05.02.05.14.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 05:14:45 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 4/4] ksmbd: do not grant v2 lease if parent lease key and epoch are not set
-Date: Thu,  2 May 2024 21:14:25 +0900
-Message-Id: <20240502121425.5123-4-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240502121425.5123-1-linkinjeon@kernel.org>
-References: <20240502121425.5123-1-linkinjeon@kernel.org>
+	s=arc-20240116; t=1714659224; c=relaxed/simple;
+	bh=1vUXQjL1XIYEiLePPiS1dnxjykzdCGKwKFECXqOOXzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dfijr899So2gKGZhhOFuuXhuDaT+9Je6XSmudKlLU66jl6Sp+qoS5kVTO0d8gW1rO1WI9HoMBflVrvuFg57GuiH32442hiceyjYne54KMNv7L4WJSooLPHoUZynmg0bXsDEx6DhOoz7toUOOVNtYQ6ASMoV5ULoGIDUyvi4fDg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l8xTyZlQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l8xTyZlQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC64C113CC;
+	Thu,  2 May 2024 14:13:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714659224;
+	bh=1vUXQjL1XIYEiLePPiS1dnxjykzdCGKwKFECXqOOXzc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l8xTyZlQzl3HNe7cUjrdAgZ1NKd380t0HFvkjEvsnV+7K5cONejVCpBir2khe4grt
+	 IHE37n0odjwFWjz/dLJui5uXE5zfT9y8I1oyfmFlDdHY7oyIsrTw7Xb15EJyap380V
+	 GMJManJexVkv5kFR40UDgRIsUVtRd40xVghp5dqGaG6CIYeXa1xt7Qzaj4zUSQ8FhV
+	 JsgIQvMoLGc7x+BnQLcd8FPPXmn1PO4F7pMQnOljy2mhEAxQbdQLzvXyu1JGonVQwJ
+	 8dTasmNqJ5lcRe9QZ9Ua3V/Ay4cBLszk1nRUPXCRxvO96/f+LYcCnJs0tbTM9EYqQR
+	 2zqWufBT8RCPw==
+Date: Thu, 2 May 2024 16:13:38 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, 
+	Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, netfs@lists.linux.dev, 
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 00/16] netfs, cifs: Delegate high-level I/O to netfslib
+Message-ID: <20240502-beteuern-vollzeit-54b8237c2809@brauner>
+References: <20240430140930.262762-1-dhowells@redhat.com>
+ <264960.1714488463@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <264960.1714488463@warthog.procyon.org.uk>
 
-This patch fix xfstests generic/070 test with smb2 leases = yes.
+On Tue, Apr 30, 2024 at 03:47:43PM +0100, David Howells wrote:
+> Hi Christian,
+> 
+> With Steve's agreement, could you pick this set of patches up also?
 
-cifs.ko doesn't set parent lease key and epoch in create context v2 lease.
-ksmbd suppose that parent lease and epoch are vaild if data length is
-v2 lease context size and handle directory lease using this values.
-ksmbd should hanle it as v1 lease not v2 lease if parent lease key and
-epoch are not set in create context v2 lease.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/oplock.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index c2abf109010d..b9d9116fc2b3 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1201,7 +1201,9 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 
- 	/* Only v2 leases handle the directory */
- 	if (S_ISDIR(file_inode(fp->filp)->i_mode)) {
--		if (!lctx || lctx->version != 2)
-+		if (!lctx || lctx->version != 2 ||
-+		    (lctx->flags != SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE &&
-+		     !lctx->epoch))
- 			return 0;
- 	}
- 
-@@ -1466,8 +1468,9 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
- 		buf->lcontext.LeaseFlags = lease->flags;
- 		buf->lcontext.Epoch = cpu_to_le16(lease->epoch);
- 		buf->lcontext.LeaseState = lease->state;
--		memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
--		       SMB2_LEASE_KEY_SIZE);
-+		if (lease->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)
-+			memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
-+			       SMB2_LEASE_KEY_SIZE);
- 		buf->ccontext.DataOffset = cpu_to_le16(offsetof
- 				(struct create_lease_v2, lcontext));
- 		buf->ccontext.DataLength = cpu_to_le32(sizeof(struct lease_context_v2));
-@@ -1526,8 +1529,9 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
- 		lreq->flags = lc->lcontext.LeaseFlags;
- 		lreq->epoch = lc->lcontext.Epoch;
- 		lreq->duration = lc->lcontext.LeaseDuration;
--		memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
--				SMB2_LEASE_KEY_SIZE);
-+		if (lreq->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)
-+			memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
-+			       SMB2_LEASE_KEY_SIZE);
- 		lreq->version = 2;
- 	} else {
- 		struct create_lease *lc = (struct create_lease *)cc;
--- 
-2.25.1
-
+Pulled both branches from you. Thank you!
