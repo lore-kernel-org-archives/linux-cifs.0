@@ -1,42 +1,42 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BA07710B
-	for <linux-cifs@vger.kernel.org>; Thu,  2 May 2024 12:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC446768EC
+	for <linux-cifs@vger.kernel.org>; Thu,  2 May 2024 12:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714652085; cv=none; b=KWF/TwqSX7KsDXkG7lY+o2tjDHOZJgnTlpZJoNCXyRNscs6j+b2pFdss/9EJIlbwbRu72WlQXWBBs0KkxDNenbLS9bPuPMldxMnWPJ11L9c+1r5HoFcX4PS76M+bMCGkT8xxFgVW5sMKMF94TUytPlaXpa56WsmaeXZEfwWC/ho=
+	t=1714652088; cv=none; b=VRf3/B2OrfLiDbQEXkKNrQOUNTPA2F0XlvQ/1Nn8N2RWJ9pg+/ZmvXHegD8D3cD5Sf/zZNNEMUp+0GGTxIJ1fCqaOR8VuWhEY8Rbp/KwJp/tbK1A2VUj6T4yC8ZtS7ZZW2jb+Bh5m/acoiz35HtR6YIDZUPOhRjZjhrav3QDcXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714652085; c=relaxed/simple;
-	bh=BYsRo9AMSPuruZg4UQYNc5+Rs0EjN7ZuqD+IEXzJBOA=;
+	s=arc-20240116; t=1714652088; c=relaxed/simple;
+	bh=5h7sok0m8DjI5YsoFx+jLT1NBD5B2YuhY83DLe+cq6U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Qo7BQAt5Jqb3ny3yDAHuWB6vzTtk+AtIqetXRJXmclxmenk0ojC8Il2J4vXlqxiqFFzHFoXaVuP7nDOFX3oZBDXbr7uxYrat5QJ44w6SiEH2KakcjyLEL/fCuHBOfsk+QgeM84NW3JDNAHfSDiMopBiHtOqXpmUSyCdjq9XSVK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version; b=p9UOXl/LAYa+AGTBb/huM+0CRNIvaWaxXGIZjW/6c6cIx/o4lLOHjG8Hw+P04HOPUoTszKN4K+7ct8DWIGjH5AcPgVchyaKAIKl26K6foLWKxEaBh+3HAqIYheAl2V7J1Qfcr2s3o1wQBLrs+rpYL+gdSO6X1o14gFlOKrNaKpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6f074520c8cso7447733b3a.0
-        for <linux-cifs@vger.kernel.org>; Thu, 02 May 2024 05:14:43 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ee12766586so1420394b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 02 May 2024 05:14:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714652083; x=1715256883;
+        d=1e100.net; s=20230601; t=1714652086; x=1715256886;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jK9zvksjofSL4Wy6xphUstkl/TQdaKWKrQe1c/CNYZ8=;
-        b=KusJfYaPhbvmJaWDBS/VmgTJfGIqkBwU7gyFaJHxSINJCcL9j9BPxH2xxK75l1B+RP
-         op6ajnWiNuqF8pkyM6FB5rBYGyaMT6ZlUSXIaU2Zfk3Ru0FptD/YMl1/Iuva9SuEsNya
-         9WwMRii5Kn3NlhJHuQzpEak7lHttBayYpoAwRuhPlPwSA6E0ppbhLLgCElxQ6XmHQXYi
-         yWc1D7vl+MqOxdR0pIzgRQQ2xwOnocotFNryuwTxTo42DjyV2T1E3TEg3fsXnc0Z3lTx
-         cCpdywA+pU2uC5eV3tQOkFO54BYK4AMnCmIxVmI5WOO6uPnWJX3HeWGYku2kfxZTfOA6
-         2Z+A==
-X-Gm-Message-State: AOJu0YzLqB55X/ilglyJNJgF8JcDokJBIrdFJyMDpOApSDAUcjdMaJzL
-	A2VQkT1xY6QHpQjYD6aaNp3IvIWVxOdRi3ARGtgJ887hOOTa1ietd59mAA==
-X-Google-Smtp-Source: AGHT+IFESgSblzHhZ0SJFdcxzjt+hAgR2NxmPTI2YHMuq/2g3NBBJPZpx4vx2IXRXIXz2Na86wKg5w==
-X-Received: by 2002:a05:6a20:9499:b0:1af:5f84:2d87 with SMTP id hs25-20020a056a20949900b001af5f842d87mr1869867pzb.36.1714652083102;
-        Thu, 02 May 2024 05:14:43 -0700 (PDT)
+        bh=7sGAoqFrk+6nq0PTf89x/MjVnNXSxxNmJMXohKG6K0g=;
+        b=cXirVq4u2jHqmAYRUjWiKPDeA71mrUIKNaMTk6tVIuAv5m9PN8uYgxNHiTXyuM7P/W
+         RALdynWcUm6B+k7SQAjDpVXECk0kumiTeA4KQyPQg0ZjKIVxYr79s7mt4f0pfHqjjQsf
+         7XUQ9+ikG5htSnisbtVUW5C2cBe05zDr1pdMaeRloyoLOhdDLBd6ECUkEwvr3gaKeRpW
+         M+A8D3p/X4KdhNazleRI1mGrnVv9rm1k4LCIPika/t2KPCm1YUArjxZEQna3qS86r0tn
+         znxkosRDLU1+PgiJYNPP/vSgxuKMXCd4Wbe2m7xn2QrEuUeW0Ni574rHruBC4O6tUYa2
+         LMeg==
+X-Gm-Message-State: AOJu0YzHM+q8QFDnC9tfEM9uGlEfFk0yeO0Lt6ojkHzWsIuFHsFTWl16
+	fJUjJC/xpo80gj9gZs7xaCGEoS4ehjA4f4m/yu+mXufAFI4APwKJCMjdVA==
+X-Google-Smtp-Source: AGHT+IGAupCS20UUrVHvjvFOYQf8S0aD7mpQE+LrEwbAT4VkGEzbcwvhooOJHnbq3DSTZLplQ8LGrg==
+X-Received: by 2002:a05:6a00:2186:b0:6ed:21d5:fbdb with SMTP id h6-20020a056a00218600b006ed21d5fbdbmr3453178pfi.8.1714652085738;
+        Thu, 02 May 2024 05:14:45 -0700 (PDT)
 Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id gx8-20020a056a001e0800b006edec30bbc2sm1069840pfb.49.2024.05.02.05.14.41
+        by smtp.gmail.com with ESMTPSA id gx8-20020a056a001e0800b006edec30bbc2sm1069840pfb.49.2024.05.02.05.14.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 05:14:42 -0700 (PDT)
+        Thu, 02 May 2024 05:14:45 -0700 (PDT)
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -44,9 +44,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 3/4] ksmbd: use rwsem instead of rwlock for lease break
-Date: Thu,  2 May 2024 21:14:24 +0900
-Message-Id: <20240502121425.5123-3-linkinjeon@kernel.org>
+Subject: [PATCH 4/4] ksmbd: do not grant v2 lease if parent lease key and epoch are not set
+Date: Thu,  2 May 2024 21:14:25 +0900
+Message-Id: <20240502121425.5123-4-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240502121425.5123-1-linkinjeon@kernel.org>
 References: <20240502121425.5123-1-linkinjeon@kernel.org>
@@ -58,278 +58,58 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-lease break wait for lease break acknowledgment.
-rwsem is more suitable than unlock while traversing the list for parent
-lease break in ->m_op_list.
+This patch fix xfstests generic/070 test with smb2 leases = yes.
+
+cifs.ko doesn't set parent lease key and epoch in create context v2 lease.
+ksmbd suppose that parent lease and epoch are vaild if data length is
+v2 lease context size and handle directory lease using this values.
+ksmbd should hanle it as v1 lease not v2 lease if parent lease key and
+epoch are not set in create context v2 lease.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/oplock.c     | 30 +++++++++++-------------------
- fs/smb/server/smb2pdu.c    |  4 ++--
- fs/smb/server/smb_common.c |  4 ++--
- fs/smb/server/vfs_cache.c  | 28 ++++++++++++++--------------
- fs/smb/server/vfs_cache.h  |  2 +-
- 5 files changed, 30 insertions(+), 38 deletions(-)
+ fs/smb/server/oplock.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 6fd8cb7064dc..c2abf109010d 100644
+index c2abf109010d..b9d9116fc2b3 100644
 --- a/fs/smb/server/oplock.c
 +++ b/fs/smb/server/oplock.c
-@@ -207,9 +207,9 @@ static void opinfo_add(struct oplock_info *opinfo)
- {
- 	struct ksmbd_inode *ci = opinfo->o_fp->f_ci;
+@@ -1201,7 +1201,9 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
  
--	write_lock(&ci->m_lock);
-+	down_write(&ci->m_lock);
- 	list_add_rcu(&opinfo->op_entry, &ci->m_op_list);
--	write_unlock(&ci->m_lock);
-+	up_write(&ci->m_lock);
- }
- 
- static void opinfo_del(struct oplock_info *opinfo)
-@@ -221,9 +221,9 @@ static void opinfo_del(struct oplock_info *opinfo)
- 		lease_del_list(opinfo);
- 		write_unlock(&lease_list_lock);
- 	}
--	write_lock(&ci->m_lock);
-+	down_write(&ci->m_lock);
- 	list_del_rcu(&opinfo->op_entry);
--	write_unlock(&ci->m_lock);
-+	up_write(&ci->m_lock);
- }
- 
- static unsigned long opinfo_count(struct ksmbd_file *fp)
-@@ -526,21 +526,18 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 	 * Compare lease key and client_guid to know request from same owner
- 	 * of same client
- 	 */
--	read_lock(&ci->m_lock);
-+	down_read(&ci->m_lock);
- 	list_for_each_entry(opinfo, &ci->m_op_list, op_entry) {
- 		if (!opinfo->is_lease || !opinfo->conn)
- 			continue;
--		read_unlock(&ci->m_lock);
- 		lease = opinfo->o_lease;
- 
- 		ret = compare_guid_key(opinfo, client_guid, lctx->lease_key);
- 		if (ret) {
- 			m_opinfo = opinfo;
- 			/* skip upgrading lease about breaking lease */
--			if (atomic_read(&opinfo->breaking_cnt)) {
--				read_lock(&ci->m_lock);
-+			if (atomic_read(&opinfo->breaking_cnt))
- 				continue;
--			}
- 
- 			/* upgrading lease */
- 			if ((atomic_read(&ci->op_count) +
-@@ -570,9 +567,8 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
- 				lease_none_upgrade(opinfo, lctx->req_state);
- 			}
- 		}
--		read_lock(&ci->m_lock);
- 	}
--	read_unlock(&ci->m_lock);
-+	up_read(&ci->m_lock);
- 
- 	return m_opinfo;
- }
-@@ -1114,7 +1110,7 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 	if (!p_ci)
- 		return;
- 
--	read_lock(&p_ci->m_lock);
-+	down_read(&p_ci->m_lock);
- 	list_for_each_entry(opinfo, &p_ci->m_op_list, op_entry) {
- 		if (opinfo->conn == NULL || !opinfo->is_lease)
- 			continue;
-@@ -1132,13 +1128,11 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 				continue;
- 			}
- 
--			read_unlock(&p_ci->m_lock);
- 			oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE);
- 			opinfo_conn_put(opinfo);
--			read_lock(&p_ci->m_lock);
- 		}
- 	}
--	read_unlock(&p_ci->m_lock);
-+	up_read(&p_ci->m_lock);
- 
- 	ksmbd_inode_put(p_ci);
- }
-@@ -1159,7 +1153,7 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
- 	if (!p_ci)
- 		return;
- 
--	read_lock(&p_ci->m_lock);
-+	down_read(&p_ci->m_lock);
- 	list_for_each_entry(opinfo, &p_ci->m_op_list, op_entry) {
- 		if (opinfo->conn == NULL || !opinfo->is_lease)
- 			continue;
-@@ -1173,13 +1167,11 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
- 				atomic_dec(&opinfo->conn->r_count);
- 				continue;
- 			}
--			read_unlock(&p_ci->m_lock);
- 			oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE);
- 			opinfo_conn_put(opinfo);
--			read_lock(&p_ci->m_lock);
- 		}
- 	}
--	read_unlock(&p_ci->m_lock);
-+	up_read(&p_ci->m_lock);
- 
- 	ksmbd_inode_put(p_ci);
- }
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 30229161b346..b6c5a8ea3887 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3376,9 +3376,9 @@ int smb2_open(struct ksmbd_work *work)
- 	 * after daccess, saccess, attrib_only, and stream are
- 	 * initialized.
- 	 */
--	write_lock(&fp->f_ci->m_lock);
-+	down_write(&fp->f_ci->m_lock);
- 	list_add(&fp->node, &fp->f_ci->m_fp_list);
--	write_unlock(&fp->f_ci->m_lock);
-+	up_write(&fp->f_ci->m_lock);
- 
- 	/* Check delete pending among previous fp before oplock break */
- 	if (ksmbd_inode_pending_delete(fp)) {
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index fcaf373cc008..474dadf6b7b8 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -646,7 +646,7 @@ int ksmbd_smb_check_shared_mode(struct file *filp, struct ksmbd_file *curr_fp)
- 	 * Lookup fp in master fp list, and check desired access and
- 	 * shared mode between previous open and current open.
- 	 */
--	read_lock(&curr_fp->f_ci->m_lock);
-+	down_read(&curr_fp->f_ci->m_lock);
- 	list_for_each_entry(prev_fp, &curr_fp->f_ci->m_fp_list, node) {
- 		if (file_inode(filp) != file_inode(prev_fp->filp))
- 			continue;
-@@ -722,7 +722,7 @@ int ksmbd_smb_check_shared_mode(struct file *filp, struct ksmbd_file *curr_fp)
- 			break;
- 		}
- 	}
--	read_unlock(&curr_fp->f_ci->m_lock);
-+	up_read(&curr_fp->f_ci->m_lock);
- 
- 	return rc;
- }
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 030f70700036..6cb599cd287e 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -165,7 +165,7 @@ static int ksmbd_inode_init(struct ksmbd_inode *ci, struct ksmbd_file *fp)
- 	ci->m_fattr = 0;
- 	INIT_LIST_HEAD(&ci->m_fp_list);
- 	INIT_LIST_HEAD(&ci->m_op_list);
--	rwlock_init(&ci->m_lock);
-+	init_rwsem(&ci->m_lock);
- 	ci->m_de = fp->filp->f_path.dentry;
- 	return 0;
- }
-@@ -261,14 +261,14 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
+ 	/* Only v2 leases handle the directory */
+ 	if (S_ISDIR(file_inode(fp->filp)->i_mode)) {
+-		if (!lctx || lctx->version != 2)
++		if (!lctx || lctx->version != 2 ||
++		    (lctx->flags != SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE &&
++		     !lctx->epoch))
+ 			return 0;
  	}
  
- 	if (atomic_dec_and_test(&ci->m_count)) {
--		write_lock(&ci->m_lock);
-+		down_write(&ci->m_lock);
- 		if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
- 			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
--			write_unlock(&ci->m_lock);
-+			up_write(&ci->m_lock);
- 			ksmbd_vfs_unlink(filp);
--			write_lock(&ci->m_lock);
-+			down_write(&ci->m_lock);
- 		}
--		write_unlock(&ci->m_lock);
-+		up_write(&ci->m_lock);
- 
- 		ksmbd_inode_free(ci);
- 	}
-@@ -289,9 +289,9 @@ static void __ksmbd_remove_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp
- 	if (!has_file_id(fp->volatile_id))
- 		return;
- 
--	write_lock(&fp->f_ci->m_lock);
-+	down_write(&fp->f_ci->m_lock);
- 	list_del_init(&fp->node);
--	write_unlock(&fp->f_ci->m_lock);
-+	up_write(&fp->f_ci->m_lock);
- 
- 	write_lock(&ft->lock);
- 	idr_remove(ft->idr, fp->volatile_id);
-@@ -523,17 +523,17 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry)
- 	if (!ci)
- 		return NULL;
- 
--	read_lock(&ci->m_lock);
-+	down_read(&ci->m_lock);
- 	list_for_each_entry(lfp, &ci->m_fp_list, node) {
- 		if (inode == file_inode(lfp->filp)) {
- 			atomic_dec(&ci->m_count);
- 			lfp = ksmbd_fp_get(lfp);
--			read_unlock(&ci->m_lock);
-+			up_read(&ci->m_lock);
- 			return lfp;
- 		}
- 	}
- 	atomic_dec(&ci->m_count);
--	read_unlock(&ci->m_lock);
-+	up_read(&ci->m_lock);
- 	return NULL;
- }
- 
-@@ -705,13 +705,13 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 
- 	conn = fp->conn;
- 	ci = fp->f_ci;
--	write_lock(&ci->m_lock);
-+	down_write(&ci->m_lock);
- 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
- 		if (op->conn != conn)
- 			continue;
- 		op->conn = NULL;
- 	}
--	write_unlock(&ci->m_lock);
-+	up_write(&ci->m_lock);
- 
- 	fp->conn = NULL;
- 	fp->tcon = NULL;
-@@ -801,13 +801,13 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
- 	fp->tcon = work->tcon;
- 
- 	ci = fp->f_ci;
--	write_lock(&ci->m_lock);
-+	down_write(&ci->m_lock);
- 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
- 		if (op->conn)
- 			continue;
- 		op->conn = fp->conn;
- 	}
--	write_unlock(&ci->m_lock);
-+	up_write(&ci->m_lock);
- 
- 	__open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
- 	if (!has_file_id(fp->volatile_id)) {
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index ed44fb4e18e7..5a225e7055f1 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -47,7 +47,7 @@ struct stream {
- };
- 
- struct ksmbd_inode {
--	rwlock_t			m_lock;
-+	struct rw_semaphore		m_lock;
- 	atomic_t			m_count;
- 	atomic_t			op_count;
- 	/* opinfo count for streams */
+@@ -1466,8 +1468,9 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
+ 		buf->lcontext.LeaseFlags = lease->flags;
+ 		buf->lcontext.Epoch = cpu_to_le16(lease->epoch);
+ 		buf->lcontext.LeaseState = lease->state;
+-		memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
+-		       SMB2_LEASE_KEY_SIZE);
++		if (lease->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)
++			memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
++			       SMB2_LEASE_KEY_SIZE);
+ 		buf->ccontext.DataOffset = cpu_to_le16(offsetof
+ 				(struct create_lease_v2, lcontext));
+ 		buf->ccontext.DataLength = cpu_to_le32(sizeof(struct lease_context_v2));
+@@ -1526,8 +1529,9 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
+ 		lreq->flags = lc->lcontext.LeaseFlags;
+ 		lreq->epoch = lc->lcontext.Epoch;
+ 		lreq->duration = lc->lcontext.LeaseDuration;
+-		memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
+-				SMB2_LEASE_KEY_SIZE);
++		if (lreq->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)
++			memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
++			       SMB2_LEASE_KEY_SIZE);
+ 		lreq->version = 2;
+ 	} else {
+ 		struct create_lease *lc = (struct create_lease *)cc;
 -- 
 2.25.1
 
