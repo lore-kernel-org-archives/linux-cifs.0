@@ -1,99 +1,63 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA1114AB4
-	for <linux-cifs@vger.kernel.org>; Wed, 15 May 2024 13:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672FA3219F;
+	Wed, 15 May 2024 20:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715779722; cv=none; b=W2xOJhWzMpEG9Ofb2PprU+P10qxP0wNFP3Yn8fJ84iZeUWmJ/hlclmGONzBmgsEvim7eVyyKQhtXHbxD8owEqTNQqpr1Qe7NNGJY2CzKiWZXBIPIKNHrIHIRW4NDTHRHx1dtUx0cqQYbU4IlE+eGftu9k/9QrZ65rgM5+QjYUHg=
+	t=1715804995; cv=none; b=iKjvFmd9yLEpEs7OqE9PPjHGaw6eIPhcUyeAp7Z5Q3Tknx5wYIlmDpzTMFcrk5QD3b0FrD5c8lOvUfbv5FdJ7Lik75/V0QyWK+xZwV3dRtqnPoNuw1HvXmgG+AAn8jm7QljKNYmx0d+0KgAkrkJtiS7hi6wltiNOcgyBgTwDKto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715779722; c=relaxed/simple;
-	bh=p5lebHXQksvGthtMMXnQ9T5AwcX+SWEw8glSh4lz2V0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=BE/yn1RIJyTM+RW7e3eNphvi6dIsrrBaeFxKzE2U+LgJtn0wpspZo9mM1dK2E3o3lrndjLP5XFil4MRSNY5Cr18G5FC7Ty2G1IVY+bDpLe48EMUenNmdTYlXF4goPJjbPdLAF+nhbI//MV91iF2v71/us8wkYVzhrIBH6UgC83o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zry.io; spf=pass smtp.mailfrom=zry.io; dkim=pass (2048-bit key) header.d=zry.io header.i=@zry.io header.b=E9DjPfK8; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zry.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zry.io
+	s=arc-20240116; t=1715804995; c=relaxed/simple;
+	bh=k+4qdNRK01UvyY8obfuRLYnnVCh8bMwh4x3yH1nfkv8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=in3zSK3UD8CWFzxP9TV562Osla4q/pCU73q+KxI8SQtyfL/a8oZF6HrhXWMc0CQ9z52G8XLhysx2CJRIAgTSAplGDoMA9rn3+WVkTqeAAukIZqhp6t3xwj0Sks59OCB2qQjLriVyDxA+H6n4zVBrNKZ8vPP8P8olCDjvdDfIjF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAKV+0+V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zry.io header.i=@zry.io header.b="E9DjPfK8"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a59e4136010so174553566b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 15 May 2024 06:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=zry.io; s=mail; t=1715779718; x=1716384518; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YXFJqyc0Y6qLJk5IFdIgJqO5OtD2A4l59rY7UI6yqUo=;
-        b=E9DjPfK81d2eJOJC/UQypfmYOdexfo+yLe+fgGjmdBnYWgPj2tDVHQZZ2XYhaXtHfe
-         /+EapqGcudH1APBzbt+B5LM6YfyRWzaGPd+qGsAuf7sj1S8LWq/oR4SCxXffyo+5QwSz
-         nS4G9FKqHVfHWYlQhAYKghbM4rWM91e/MvCtzhKdAurignjfJ3dUjsonF9v85uCrcQcY
-         4Je0apQFL7nWRw9IT0NrfFv8KeW/Crn3MFy2bB2HIbGxV2t1KtcYuV8JZLIoCVJkcu90
-         A5ZYBfxquATq+1/RtHH3+UZ94AYBdqcvV7ABpFkgUzu3D2gGA0cDfOFRFt8mnEWagQlF
-         Jyyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715779718; x=1716384518;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YXFJqyc0Y6qLJk5IFdIgJqO5OtD2A4l59rY7UI6yqUo=;
-        b=HxNc3MyQJ6yVFqpMIII7qqriZPdKJA7G+mfNU79YNpUSDTTryNwb25U13bX57NvOPr
-         MPpV8SgpaK60AN7Q9LcaQIZhddNci7lMbQzIAaMPeBOVIDdSXaS8cb0R1ZJCuLvQsJDW
-         4PWs5WIxBq9ibY8ENHLXzE8Nt1/mqfvMgVEoHU5OWL0MaI8uijh2N90Jhq9R3ahiBnhq
-         2PJj0HywfAwZmFgr7j/MMXDKE9/dodT/olYiqEq7x5fa/Rqw58hAbinHahODooItyS+b
-         tmEkpanUfpHZzDx74JETcFa/1WGlut4Oh4Pca1GDMnjjGxLNdzRAq2hiSOFbCpvJxsjO
-         NhPg==
-X-Gm-Message-State: AOJu0Yw2m8fIOGPU8Q/PKUZNa0UoHc4NMlnj4GjxZuV4i4j8erErjoDB
-	YBeJTUSJQc9GbLX7n+ampysFsNI1Ppou0hiK/92e8U9LSr1Ot4DD5CqZKX6W0jiPS29U9WAnGB1
-	t50XkbsC/72oCArwIW5U86OOz+0Ne6BgQFlE/SoeWsXcf67KpVQpU5Q==
-X-Google-Smtp-Source: AGHT+IFAT7bEMgw0cVnv0ZK4zvty+BG+WFp6gRDV3dZQx5ucYxNm6jUXs8G03ctCj4yBfUbqqIg4v47VwbyKJiNPtCQ=
-X-Received: by 2002:a17:906:75a:b0:a59:a0f7:7ddc with SMTP id
- a640c23a62f3a-a5a2d53adf9mr961297766b.2.1715779718250; Wed, 15 May 2024
- 06:28:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAKV+0+V"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 31993C116B1;
+	Wed, 15 May 2024 20:29:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715804995;
+	bh=k+4qdNRK01UvyY8obfuRLYnnVCh8bMwh4x3yH1nfkv8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=IAKV+0+VaFEDv9E6LOQSDCuUO7HWSq5fhm13vlftRH6xAt5L6pCfS37nKzWiFPb5o
+	 KD5P6h8GQdvvN3Egr89IJPiqoTcJWG7O/n+f2KJ/uYhCHCuuOQ6yC4zScXaEokDQBA
+	 Tus+11AOrAg44goxiNl7Gz8BDByrTbTe6fnvKSAQEcZdeQngmEubxYyNOYvv1QPpub
+	 YwCEOCkXIKRGZoE8jfeDKAPSEQcqITSsWaQXrKdv7J2/9oGofMxlbO2J4d6GW8ExQz
+	 yRoWpWNakKwl+h2g2GJNWIEvTQOMrKaRkDQogZeae9PiJPgxdqasPtcz+/LlCSJR8X
+	 SNOO87XPmElwg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 294E8C43332;
+	Wed, 15 May 2024 20:29:55 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mv5B8PAWpMq-5L_n9NXjOb_Jw6atrTETWOUi1rUM=8ugw@mail.gmail.com>
+References: <CAH2r5mv5B8PAWpMq-5L_n9NXjOb_Jw6atrTETWOUi1rUM=8ugw@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mv5B8PAWpMq-5L_n9NXjOb_Jw6atrTETWOUi1rUM=8ugw@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.10-rc-smb3-fixes
+X-PR-Tracked-Commit-Id: edfc6481faf896301cab940da776229fe39e9fc9
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1ab1bd2f6a5fd876d1980d6ade74ce5f83807baf
+Message-Id: <171580499516.10831.4679221615351969274.pr-tracker-bot@kernel.org>
+Date: Wed, 15 May 2024 20:29:55 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>, Christian Brauner <brauner@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: zry98 <dev@zry.io>
-Date: Wed, 15 May 2024 15:28:26 +0200
-Message-ID: <CAG-2b+3KYcFuHtRx3LQ8d+_VK_zMvwzPVkQwqfapjDKmfuUZ8Q@mail.gmail.com>
-Subject: [PATCH] cifs-utils: fix error messages missing newline
-To: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Add missing newline characters to two error messages. This commit
-fixes an issue where some error messages were not properly terminated
-with newline characters in mount.cifs (e.g., `mount error(111): could
-not connect to 192.168.1.2Unable to find suitable address.`), it
-improves the readability of stderr outputs.
+The pull request you sent on Wed, 15 May 2024 00:37:46 -0500:
 
-Signed-off-by: zry98 <dev@zry.io>
----
- mount.cifs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.10-rc-smb3-fixes
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 2278995..6e49811 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1517,7 +1517,7 @@ add_mtab(char *devname, char *mountpoint,
-unsigned long flags, const char *fstyp
-        atexit(unlock_mtab);
-        rc = lock_mtab();
-        if (rc) {
--               fprintf(stderr, "cannot lock mtab");
-+               fprintf(stderr, "cannot lock mtab\n");
-                rc = EX_FILEIO;
-                goto add_mtab_exit;
-        }
-@@ -2267,7 +2267,7 @@ mount_retry:
-                case ECONNREFUSED:
-                case EHOSTUNREACH:
-                        if (currentaddress) {
--                               fprintf(stderr, "mount error(%d):
-could not connect to %s",
-+                               fprintf(stderr, "mount error(%d):
-could not connect to %s\n",
-                                        errno, currentaddress);
-                        }
-                        currentaddress = nextaddress;
---
-2.44.0
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1ab1bd2f6a5fd876d1980d6ade74ce5f83807baf
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
