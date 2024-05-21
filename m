@@ -1,112 +1,180 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B2C2BCF9
-	for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 20:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA47058AB9
+	for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 23:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716322162; cv=none; b=tLEiDEMGdRjh7PvrHEf8mVv1lUzmNFmiXFzQHqXVgz2LJD4LoDU3AQCCiO/KquZYbQ/eTrCxfV4Ec7PVSss+M+kUmm3V2QxM1KLtQ37lmDOB3MW9zpTZGC7xVYwd1jMuXp7F0nKgRRLHGwAoeU0B5j0lPvQmu86HtdhWOCBFRVA=
+	t=1716335649; cv=none; b=aVpzm7a1XRrdVJaHC6GNPUcwn+M/vvg0ICD04Nd1nyxSZGMNpLzT691EeGs0X/3ZV+Y6YgZ+uQAKzirvXjlIf8RxSBeS7r4IgMDvUObbzSCghvShXvBn/eDvQ7oKDH5QuOAP0uF55bj8+N+pDO851KaL+Hw6V5EpSkowpsVE6BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716322162; c=relaxed/simple;
-	bh=Ia5u62ZgalmlFXflRn8jvvJ7YquyeyNuoWA9RxmS/I8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ek2DJuz+QhRQLkVoOe+078Me3kSxwwhhqdhdd5Os0xoeMfMg+VhkjZtjYM1Qff2faAvZ92I5+RiCiAULvfAMxQ5eIIemRgMDGvztz1Xt6esa3aKQ106Rvdr5p1CkntpdLQlgMpRsBC2F7TvbHcM44EX+8nNXY4CFoNCGQZZUbw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=urezVFcw; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1716335649; c=relaxed/simple;
+	bh=M1Vmfg1wWfRfwEXpy6hdgnWcFNmNL8Iz6fD0oF+YekY=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=b9HjA3pGmrvV51xYzU27fL8uTqXpxRsFzIpVCnpPSZTy1a7tv8lyJM2/59/ev2MJJRF3eNpTvpqefPIPsKXJEEX3nEIt2oiaAU1tkycuX0M5MLgYi6oWySCvI9jcCbpgSI272oo4Jks2yDam7CiU6CD2LkwLSRfTSxhc/43Yjxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NzWysvau; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="urezVFcw"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-36dd6cbad62so2647315ab.3
-        for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 13:09:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716322159; x=1716926959; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EWrpteYcdBNlx+6493QsXpUMihLRMiYDww87eKY9bg8=;
-        b=urezVFcwAiXBmGxAsFkm97cF+UsuRLuHC0dXkrDQK/jCNIKBo1Yr3nZYS5q80L5Eu7
-         GDyuu7LMQKf2LpA+z8dtn4OmRvdZE7fNN+cIDxjXtsIrDgrUZS4b9hc8nOyH5iLxvts+
-         LXjfDggMZclw0guNwFOJJedhCjUHL3/Lw8FzuQpdD144HIbi/cUZuBH09mDS+kAbydZf
-         NNpADEiNiL0gRuLH7vz0pMWsKBzGLk7NeoqzsUKHN5v8yNcAJyqRpRPVcIsxbCncGg2p
-         EO6qBsC+lCGSHhn8dVfu2KU4QEJLJeQ0H1XPivealkzgHmYh5+hNh6c65K74RDtX5kGF
-         ShYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716322159; x=1716926959;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EWrpteYcdBNlx+6493QsXpUMihLRMiYDww87eKY9bg8=;
-        b=hAbdM0LFggPEFsIb+XDcCvRNWBsHVsgaDimD0bOmS/6TF/Do6ldaaXRsGD15n68k+X
-         2HZS6sS0kI2ekOQdBU/qQEAY4+kbv1eKBXRFwRUFdKUgDB+Mwt8aLVjdmiyFzuVkx2rT
-         Epj5eq+bm7DkC4txq6xsvAmFo/yqivYstAms/EVPNrHpLElc8Njd1oEdIIYMj9z0QIhT
-         flW6Jg6ayH/ClKv7mjnmrjH6mvRj40juvw+4dkicaAFfc1mWe5cmkbSY6SWmnR07/wg6
-         zY8Ca+xrvNnXn1svsJEdRnTs2AUs4OOf75YMCoHxwz8DwZnXfRoezP2qp1xJcvyCnpXZ
-         w2Tw==
-X-Forwarded-Encrypted: i=1; AJvYcCW61X/+8HjNNBx50w4/XNvfdUR1BPvYvp7PzvnUMaly68YCWc67THl7qdqo7v3cJmxfSjHjlbuIu54z203af9zd9nZR/DzDxJnzpA==
-X-Gm-Message-State: AOJu0YzRUK3n7eK86zWYziNBh5f56NmsRpclRJNDBaIxmFe/wK5SnP//
-	rf2D4ra4yKzl77lqYNVDmdGU+VzxTDKFK8J2neXxIcdG30ZgDkIcTbKzvh/TOrXgvxiVLcbBRdf
-	m
-X-Google-Smtp-Source: AGHT+IFmqPzAUfkTViTVSpsDLLwhzPZ48S3LYwKXKDRY2ly4piMizKtsvAivJxLfypb9ZtbG417izA==
-X-Received: by 2002:a05:6e02:13af:b0:369:f53b:6c2 with SMTP id e9e14a558f8ab-371f9405868mr782595ab.1.1716322159199;
-        Tue, 21 May 2024 13:09:19 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893703b15bsm7042659173.54.2024.05.21.13.09.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 May 2024 13:09:18 -0700 (PDT)
-Message-ID: <6c7676ae-f0a3-4a9d-bcfa-f6fa0a03c928@kernel.dk>
-Date: Tue, 21 May 2024 14:09:16 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzWysvau"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716335644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hQuyCgeBxLRpqJ6Rn/8rP8gQiImaeLze6sL+2DgtGrs=;
+	b=NzWysvauaL+hMmO9pWDgU1CfFuFyMo/29tUAHdYNxsSJihDAfOuMT/Ckc32tOeA8QrwixY
+	h4Np4Yy5XhkLICggk35LPY67w4eGaskrmtVi0tRXl7eemRIO0K90ZML5kbMFPN9QctQ7hh
+	kN15U9EvQVX4RDaoSZ2J9U0Ts+l5ywk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-167-DXwtdBVmPX-bXwj14l991A-1; Tue, 21 May 2024 19:54:02 -0400
+X-MC-Unique: DXwtdBVmPX-bXwj14l991A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 415A680118E;
+	Tue, 21 May 2024 23:54:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6669E492BC6;
+	Tue, 21 May 2024 23:54:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>, Jeremy Allison <jra@samba.org>,
+    samba-technical@lists.samba.org
+cc: dhowells@redhat.com, linux-cifs@vger.kernel.org
+Subject: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <stfrench@microsoft.com>, Jeff Layton <jlayton@kernel.org>,
- Enzo Matsumiya <ematsumiya@suse.de>, Matthew Wilcox <willy@infradead.org>,
- Christian Brauner <brauner@kernel.org>, netfs@lists.linux.dev,
- v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <110d2995-f473-4781-9412-30f7f96858dd@kernel.dk>
- <2e73c659-06a3-426c-99c0-eff896eb2323@kernel.dk>
- <316306.1716306586@warthog.procyon.org.uk>
- <316428.1716306899@warthog.procyon.org.uk>
- <322229.1716321947@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <322229.1716321947@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 May 2024 00:53:59 +0100
+Message-ID: <349671.1716335639@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On 5/21/24 2:05 PM, David Howells wrote:
-> Jens Axboe <axboe@kernel.dk> wrote:
-> 
->> On 5/21/24 9:54 AM, David Howells wrote:
->>> Jens Axboe <axboe@kernel.dk> wrote:
->>>
->>>> However, I'll note that BDP_ASYNC is horribly named, it should be
->>>> BDP_NOWAIT instead. But that's a separate thing, fix looks correct
->>>> as-is.
->>>
->>> I thought IOCB_NOWAIT was related to RWF_NOWAIT, but apparently not from the
->>> code.
->>
->> It is, something submitted with RWF_NOWAIT should have IOCB_NOWAIT set.
->> But RWF_NOWAIT isn't the sole user of IOCB_NOWAIT, and no assumptions
->> should be made about whether something is sync or async based on whether
->> or not RWF_NOWAIT is set. Those aren't related other than _some_ proper
->> async IO will have IOCB_NOWAIT set, and others will not.
-> 
-> Are you sure?  RWF_NOWAIT seems to set IOCB_NOIO.
 
-As it should, no-wait should imply not blocking on other IO. This is
-completely orthogonal to whether or not it's async or sync IO.
+I've been debugging a failure in xfstests generic/286 whereby llseek() retu=
+rn
+-EIO and am thinking that the bug is in Samba.  The test can be distilled t=
+o:
 
-I have a distinct feeling we're talking past each other :-)
+	mount //my/share /mnt -ooptions
+	truncate -s 100M /mnt/a
+	for i in $(seq 0 5 100); do xfs_io -c "w ${i}M 1M" /mnt/a; done
+	xfstests-dev/src/seek_copy_test /mnt/a /mnt/b
 
--- 
-Jens Axboe
+This creates a big sparse file, makes 21 1MiB extents at 5MiB intervals and
+then tries to copy them one at a time, using SEEK_DATA/SEEK_HOLE to enumera=
+te
+each extent.
+
+I can see the error in the protocol being returned from the server:
+
+   16 2.353013398  192.168.6.2 =E2=86=92 192.168.6.1  SMB2 206 Ioctl Reques=
+t FSCTL_QUERY_ALLOCATED_RANGES File: a
+   17 2.353220936  192.168.6.1 =E2=86=92 192.168.6.2  SMB2 143 Ioctl Respon=
+se, Error: STATUS_BUFFER_TOO_SMALL
+
+Stracing Samba shows:
+
+    lseek(30, 94371840, SEEK_HOLE)          =3D 95420416
+    lseek(30, 95420416, SEEK_DATA)          =3D 99614720
+    lseek(30, 99614720, SEEK_HOLE)          =3D 100663296
+    lseek(30, 100663296, SEEK_DATA)         =3D 104857600
+    lseek(30, 104857600, SEEK_HOLE)         =3D 105906176
+    sendmsg(35, {msg_name=3DNULL, msg_namelen=3D0, msg_iov=3D[{iov_base=3D"=
+\0\0\0I", iov_len=3D4}, {iov_base=3DNULL, iov_len=3D0}, {iov_base=3D"\376SM=
+B@\0\1\0#\0\0\300\v\0\n\0\1\0\0\0\0\0\0\0\265\2\0\0\0\0\0\0"..., iov_len=3D=
+64}, {iov_base=3D"\t\0\0\0\0\0\0\0", iov_len=3D8}, {iov_base=3D"\0", iov_le=
+n=3D1}], msg_iovlen=3D5, msg_controllen=3D0, msg_flags=3D0}, MSG_DONTWAIT|M=
+SG_NOSIGNAL) =3D 77
+
+You can see the error code in the sendmsg() as "...#\0\0\300...".
+
+Turning debugging on on Samba shows:
+
+    [2024/05/21 23:56:58.727547,  2] ../../source3/smbd/smb2_ioctl_filesys.=
+c:707(fsctl_qar)
+      QAR output len 336 exceeds max 16
+    [2024/05/21 23:56:58.727652,  3] ../../source3/smbd/smb2_server.c:4031(=
+smbd_smb2_request_error_ex)
+      smbd_smb2_request_error_ex: smbd_smb2_request_error_ex: idx[1] status=
+[NT_STATUS_BUFFER_TOO_SMALL] || at ../../source3/smbd/smb2_ioctl.c:353
+
+The "exceeds max 16" indicates the "Max Ioctl Out Size" setting passed in t=
+he
+Ioctl Request frame (which can be seen as 16 in the full packet trace).  336
+is 21 * 16.
+
+This stems from the smb2_llseek() function in the cifs filesystem in the Li=
+nux
+kernel calling:
+
+	rc =3D SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+			cfile->fid.volatile_fid,
+			FSCTL_QUERY_ALLOCATED_RANGES,
+			(char *)&in_data, sizeof(in_data),
+			sizeof(struct file_allocated_range_buffer),
+			(char **)&out_data, &out_data_len);
+
+where the max_out_data_len parameter is sizeof() you can see, allowing for
+just a single element to be returned.  The file_allocated_range_buffer stru=
+ct
+is just:
+
+	struct file_allocated_range_buffer {
+		__le64	file_offset;
+		__le64	length;
+	} __packed;
+
+which is 16 bytes - hence the maximum output data seen by Samba.
+
+
+Now, cifs only wants the next extent.  It fills in the input data with the
+base file position and the EOF:
+
+	in_data.file_offset =3D cpu_to_le64(offset);
+	in_data.length =3D cpu_to_le64(i_size_read(inode));
+
+and asks the server to retrieve the first allocated extent within this rang=
+e.
+
+In Samba, however, fsctl_qar() does not pass in_max_output to
+fsctl_qar_seek_fill() and therefore doesn't limit the amount returned.  The
+fill loop seems only to be limited by the maximum file offset and not the m=
+ax
+buffer size.
+
+The:
+
+	if (out_output->length > in_max_output) {
+		DEBUG(2, ("QAR output len %lu exceeds max %lu\n",
+			  (unsigned long)out_output->length,
+			  (unsigned long)in_max_output));
+		data_blob_free(out_output);
+		return NT_STATUS_BUFFER_TOO_SMALL;
+	}
+
+check at the end of fsctl_qar() generates the complaint.
+
+I think that fsctl_qar() should probably just discard the excess records.
+
+Looking at:
+
+	https://learn.microsoft.com/en-us/windows/win32/api/winioctl/ni-winioctl-f=
+sctl_query_allocated_ranges=20
+
+it's not obvious what should be done if the available records won't fit.
+
+Samba: samba-4.19.6-1.fc39.x86_64
+Linux: 6.10 pre -rc1.
+
+David
 
