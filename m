@@ -1,99 +1,98 @@
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71331B966
-	for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 16:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB673149C4D
+	for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 20:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716307504; cv=none; b=cNvS7prUVmrqrgKHUfoPZUHet7dUi7X/jTwMLCFSLo4PSgA8Nh4zKnATL2gvMi+mNi0Uy7XqZktC4gVVdjoqkWvhoFNlLAEaCjYEBclAHBlu81pUQhb8eMjkhcHL95sS6cY96ISdNI65V4GfbYwWKWTfj9wiW4Fr+JEXTM7Myq4=
+	t=1716321961; cv=none; b=ZHLjmAV/S7O0pnFZ1dJT4zxP2dLEmh00DLswCiiUwP2o5g0yliSkNN7s9GyWxPhSdE1H4/y868KTP9H5VNd2tAdFjGNY29ZHItTg8CvnURNQKPs2SdjJSL6PY6H7GYpLJsOPCNZ0m+q5ZNSVBVBLIL6wh9PVDkhlUVzx0S0PsHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716307504; c=relaxed/simple;
-	bh=bKdqkY8H9wTw5y+8oj6M+om12H9BkqcMweVk8ln1A/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XGLD4pkRk9dcTfn/7YiMixsXwPJISUZSJUFKnF0u1Ft7rq+tXkrZOfN4rk67Z1k5A467XaRRCLsEGrgZeUyf5UFeK2x1jbbRa4JEca9/ONZepk08Vi9ukR47pvnpkS4GQEPBmNp44snm5uwQCtJPAbVFMsuZ4amO4FdDha+5ugc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Db7NzW+E; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1716321961; c=relaxed/simple;
+	bh=n1XYT0f8NZ7GY+qdmS7k5N3aMcsAOCFt6lECER9tD1I=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=tM50pscGjyGKIppaUPzBj+HWXDxdNTvYL21ZEq4ZydTxLxlQu12s2p/MANvVta8aR3WJB7gNcouLEY6+N53lRIlB9RsjD+rA1xI9jKPcoht5mdiDilQaLbKMiC+3IeExFolwvqvgCXK+k1ka9SiCD0Orabt0aB6pq6VUKq37As4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c32Nxvon; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Db7NzW+E"
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3711744c61cso479795ab.1
-        for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 09:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1716307502; x=1716912302; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2nt4NT2eZ7AdGPqZ8UIZ+5/ykmoqBj7Ymiyz5OlxoaQ=;
-        b=Db7NzW+EBXUhuNcDgbMNrT0eqz5RlvT2kO+XlAGZeQ8CNgE6YmV9nXVVBFUF0l2nQ0
-         7LVd6iNvRiDF5d5PkB5C57dAw6cPoYQWZyhafZ2v8H57HMHWmRUlEzhu/QtU5EhgaUOZ
-         fZxkXJVQ11OKQZDKkwQIHk8HH8fFhPUYUU7Enn6/BKUNxm66nKrfSaYaohwAOZiGvtdI
-         vtumnXT1wRh2KNTjhizQpoUuviH3xoqBfWL19ml0+S60lpIJ1saiEuWzNo8DZEJZanHr
-         DeuIwZFUty3mkIib9nEAYcIrfFY4VJXCt+B1/sEgz7IbjaF8Mvz0pC74VGtKWalbduX8
-         Mrrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716307502; x=1716912302;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2nt4NT2eZ7AdGPqZ8UIZ+5/ykmoqBj7Ymiyz5OlxoaQ=;
-        b=veDKJUi10WMK8owM/bg2XlWLWkcJh8FnwIdYYcZZocYVthYkZikrEww83xH/WAthAz
-         21ZXeBEFTA+oHL9WOhb/vWD78dEdTB8iRBc+3SgfNidIqMEPhNsf/c0bi39c9ARAc0Ig
-         m7gPNshhfi2lnSB2+FBUlQGH8Jj2qZeZA4pqXE6bYeLjuTwmM8GZbfzGQkUBdzP0Y3sy
-         Wd6IKT06B4ZYrMtTBn600j6za5hP1fG3mUJlUvNqbcW4cwPm/2X31XJo0YtYm5yJYXao
-         uMxkAdzdGZVtieu7VF03C2gKrttraX3HGaLzFLkNpN5yP8LmcQPq46Z91PwSOSFXyEd9
-         SqiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4wvl5pGeGkD9AYy+vMr+Ko5+BLk16S7LmPH7HA/Bnq5bYRvCwDB1GTD6i61PmPOF6VZbFyntiQ5iBPitilTxG2N0WmofcOsCJ/A==
-X-Gm-Message-State: AOJu0YxbeEcIiWABVgYP5HGBy+vH1GHQqbJAhJrBxQdVwpgewenltWPB
-	b+f86IBBXPavBxSGYaaIryRTo2zYCgZerfPdo5NZy7/slpOB5OPImuTn3rz3HaI=
-X-Google-Smtp-Source: AGHT+IENbxbCIveBfU+56Mh8grD6M5RzWxhN7Hek5IRjzUTl0X8SyhHShX4YeSl1RmBxMd1Vsijtiw==
-X-Received: by 2002:a92:d3d1:0:b0:36c:5440:7454 with SMTP id e9e14a558f8ab-36cc1444bedmr308848125ab.1.1716307501743;
-        Tue, 21 May 2024 09:05:01 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-36cb9d9c943sm64565475ab.49.2024.05.21.09.05.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 May 2024 09:05:01 -0700 (PDT)
-Message-ID: <110d2995-f473-4781-9412-30f7f96858dd@kernel.dk>
-Date: Tue, 21 May 2024 10:04:59 -0600
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c32Nxvon"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716321959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kUcZx+GYvnpd0qagpN08S3w0mckRV0Hazws3JBEBOHw=;
+	b=c32NxvonXxQFWykPb7suqx+rM3E6HLEyDFMiI8Gh1ApbIEy4AjnhMhHQyA4XXzyNYAy5Qs
+	B4MY+PcCKWS9GzWp6J77YiRxx6mRdRp2e6lANrGrG3nA2dKHemk7aI2OmgpmxR3lpYxm87
+	guBEgq8wCG3iKh7hdR8KSTx0fO24Bw8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-g-ZkIjQxPvWuKP4dSTmyWw-1; Tue, 21 May 2024 16:05:52 -0400
+X-MC-Unique: g-ZkIjQxPvWuKP4dSTmyWw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BB112101A52C;
+	Tue, 21 May 2024 20:05:51 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6178A51BF;
+	Tue, 21 May 2024 20:05:48 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <110d2995-f473-4781-9412-30f7f96858dd@kernel.dk>
+References: <110d2995-f473-4781-9412-30f7f96858dd@kernel.dk> <2e73c659-06a3-426c-99c0-eff896eb2323@kernel.dk> <316306.1716306586@warthog.procyon.org.uk> <316428.1716306899@warthog.procyon.org.uk>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: dhowells@redhat.com, Steve French <stfrench@microsoft.com>,
+    Jeff Layton <jlayton@kernel.org>,
+    Enzo Matsumiya <ematsumiya@suse.de>,
+    Matthew Wilcox <willy@infradead.org>,
+    Christian Brauner <brauner@kernel.org>, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <stfrench@microsoft.com>, Jeff Layton <jlayton@kernel.org>,
- Enzo Matsumiya <ematsumiya@suse.de>, Matthew Wilcox <willy@infradead.org>,
- Christian Brauner <brauner@kernel.org>, netfs@lists.linux.dev,
- v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <2e73c659-06a3-426c-99c0-eff896eb2323@kernel.dk>
- <316306.1716306586@warthog.procyon.org.uk>
- <316428.1716306899@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <316428.1716306899@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <322228.1716321947.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 May 2024 21:05:47 +0100
+Message-ID: <322229.1716321947@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 5/21/24 9:54 AM, David Howells wrote:
-> Jens Axboe <axboe@kernel.dk> wrote:
-> 
->> However, I'll note that BDP_ASYNC is horribly named, it should be
->> BDP_NOWAIT instead. But that's a separate thing, fix looks correct
->> as-is.
-> 
-> I thought IOCB_NOWAIT was related to RWF_NOWAIT, but apparently not from the
-> code.
+Jens Axboe <axboe@kernel.dk> wrote:
 
-It is, something submitted with RWF_NOWAIT should have IOCB_NOWAIT set.
-But RWF_NOWAIT isn't the sole user of IOCB_NOWAIT, and no assumptions
-should be made about whether something is sync or async based on whether
-or not RWF_NOWAIT is set. Those aren't related other than _some_ proper
-async IO will have IOCB_NOWAIT set, and others will not.
+> On 5/21/24 9:54 AM, David Howells wrote:
+> > Jens Axboe <axboe@kernel.dk> wrote:
+> > =
 
--- 
-Jens Axboe
+> >> However, I'll note that BDP_ASYNC is horribly named, it should be
+> >> BDP_NOWAIT instead. But that's a separate thing, fix looks correct
+> >> as-is.
+> > =
+
+> > I thought IOCB_NOWAIT was related to RWF_NOWAIT, but apparently not fr=
+om the
+> > code.
+> =
+
+> It is, something submitted with RWF_NOWAIT should have IOCB_NOWAIT set.
+> But RWF_NOWAIT isn't the sole user of IOCB_NOWAIT, and no assumptions
+> should be made about whether something is sync or async based on whether
+> or not RWF_NOWAIT is set. Those aren't related other than _some_ proper
+> async IO will have IOCB_NOWAIT set, and others will not.
+
+Are you sure?  RWF_NOWAIT seems to set IOCB_NOIO.
+
+David
 
