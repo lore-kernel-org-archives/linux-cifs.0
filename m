@@ -1,94 +1,85 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2287711E
-	for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 13:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E621271B48;
+	Tue, 21 May 2024 14:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716299912; cv=none; b=sS0OHaEdLX8IvX+dgv1LYM2OfAnTHkOCAii5e7DmlkS6Ax4KaymObJVvDgPonBozNUq+Hp8TnmOZlwLxamiJqRlG+g22NOS79fVfUgG3fDv5UEIVuoYLdQswXFqVILN//UhBGeOuMXDehoehb5OpShCYoyaazq3k4DQzajneBAs=
+	t=1716300972; cv=none; b=Ob0rv9PASElMpzaOHAWJ6uLmXz4JEFAaEhnLyidTM2BFSbLPUp7u3Fae5xw+mfbWYG5baD/v51kLWd6JOTcByhoK4U7394rjvGX8F9J8KsQ9alnMcmPlNXVgc8XF1erN34Ht9wevBkE1+yi8Ol56yYKkDQfsVSksAG5W8+CNT0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716299912; c=relaxed/simple;
-	bh=x9nY/w2ttPiAkhyV80YsEEzi0i+/uiejYLnCmf0x8Hs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jFnzhGD1vYfhkqPJVXeNNhNuzJDIvguUfi62DkWI40eJdne/2VPHD9RjTaiQSCzOvHsaOBvCgImeG/BRfFeInXwjSoP6uYZ+pkynUKnrbJLudEGW/w8ApNl1Ptkp/++JMNkD1tni2kL0N1G6WlumpA4vglCHJng5WdWwZVWgw7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ee5235f5c9so102847705ad.2
-        for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 06:58:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716299910; x=1716904710;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uyb2YxEatHWljamxV4WC0Gtr3YQ+dShU8UO3MhO8ErI=;
-        b=s2/lY76/X5lWgBZiGPklClDwTCFAsMIoiAiBS3HPileNHEri2BHPeqSq3sxjaMT12z
-         hIapzOvpCmJlPeoq51x4FZtWaYu3s7O64fU8obzqSzYH+vcv+yXFESy7xksLL/QnsoCm
-         Llc9bW+qrF6uO+LeBL6aIWkAsgRpqSYDN0gfx/b7I/dF9KMyPPO3tJ+s6a3cVDUb9aEK
-         kU0UA54fyzNIwuYLcAq4C+x6ymS0J661UYxvQSN7UsB4+wBjLKlS2KRqCOQ9mVpZ/cpv
-         ags3f266PtqgwLliqUeMIe3K0Xv62f1Uc6S/gm7TkpXHmjm3UaH3c6T5ZGXkx/KqBrkW
-         bKGA==
-X-Gm-Message-State: AOJu0YznvjnPhVPwH6iZabMsEut//M9+YZQNOyOKp0fm8iXJWxcch0/8
-	liv7eD4u7soHBmNtZunTepYZV7wjT8X33p0KiWTMhg96eiWagVrCJDqy0w==
-X-Google-Smtp-Source: AGHT+IHtzrV/HcyUrLHyeHq2C5tG8Xe3dGAMcflmowdUImwoF8n6qAuCRxwSopQQ086wF0iX1B6KSg==
-X-Received: by 2002:a17:902:bb8b:b0:1eb:7aeb:54f3 with SMTP id d9443c01a7336-1ef43e24993mr280799745ad.36.1716299909969;
-        Tue, 21 May 2024 06:58:29 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f30358e6d2sm34204015ad.93.2024.05.21.06.58.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 May 2024 06:58:29 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Nandor Kracser <bonifaido@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 2/2] ksmbd: ignore trailing slashes in share paths
-Date: Tue, 21 May 2024 22:57:53 +0900
-Message-Id: <20240521135753.5108-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240521135753.5108-1-linkinjeon@kernel.org>
-References: <20240521135753.5108-1-linkinjeon@kernel.org>
+	s=arc-20240116; t=1716300972; c=relaxed/simple;
+	bh=QzfF+EFnCDCxFr4kbXOmJ2u12v1wZA/7KB6nqUZ27qc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ahQtoKfnFW0fu7xaI/56v+CxTX+74hFhe45lu4p325yMyxSRc45fElxdyvGoHIDOwPvSOeXNDxPWeTLh/QSsSvUdxsb++2rFqg8UjeBHDCcclQlIeV6rQUInFkLZLdcrzRcY2tNoMlnNSFA2yqyI5mslnk1h06nV03HT9KMFT68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouUbzHOi; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouUbzHOi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A19CC2BD11;
+	Tue, 21 May 2024 14:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716300971;
+	bh=QzfF+EFnCDCxFr4kbXOmJ2u12v1wZA/7KB6nqUZ27qc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ouUbzHOiGuwDb7dxQAPrA0+vH+s2nu6ziinxfrQwSpKu/ViJUOJ7AmC1QKr6FlCzS
+	 cODYGRQLPduIqIox2nNxLvgLpKcuWHFUIBQNTpBG2ImM0SdxQ2iHWvgNkWdTC2PDTI
+	 8iLCRm81GUvbxilTftjxKr86rFugqE5hQqQtWK7AAvqZuUYy5QLfc1CyB7Lp+ruVqi
+	 Rf9TvORajynsPXbNAS6bubeL7C4/QPXJg6mHdOEeCbXqitr160MZgZPrDLks6BVt33
+	 IP4UhT9Ah/J6yi181U8/scaP3MnVsEPapipX4EkqFA0wppUmYD32e3mttlupgMHzFi
+	 GjPXrYD/0nDKQ==
+From: Christian Brauner <brauner@kernel.org>
+To: Steve French <stfrench@microsoft.com>,
+	David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
+	netfs@lists.linux.dev,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfs: Fix io_uring based write-through
+Date: Tue, 21 May 2024 16:15:59 +0200
+Message-ID: <20240521-teigwaren-gehindert-316a25d666fb@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <295086.1716298663@warthog.procyon.org.uk>
+References: <295086.1716298663@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1116; i=brauner@kernel.org; h=from:subject:message-id; bh=QzfF+EFnCDCxFr4kbXOmJ2u12v1wZA/7KB6nqUZ27qc=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaT5rFnE4m8x45/62gSOdNld15xUDxTflL8eOu/uQo9J0 5keLp97tKOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiWQ4Mv5jPHN/z8/PNp+9n lJ/faN5zQWrViSXb43a4nuZvWGqi9TKV4Z9uXuCTO+9PdT/K4b4vxXPkQpXOo5THz5254pYn6QV OXcwHAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-From: Nandor Kracser <bonifaido@gmail.com>
+On Tue, 21 May 2024 14:37:43 +0100, David Howells wrote:
+> This can be triggered by mounting a cifs filesystem with a cache=strict
+> mount option and then, using the fsx program from xfstests, doing:
+> 
+>         ltp/fsx -A -d -N 1000 -S 11463 -P /tmp /cifs-mount/foo \
+>           --replay-ops=gen112-fsxops
+> 
+> Where gen112-fsxops holds:
+> 
+> [...]
 
-Trailing slashes in share paths (like: /home/me/Share/) caused permission
-issues with shares for clients on iOS and on Android TV for me,
-but otherwise they work fine with plain old Samba.
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-Signed-off-by: Nandor Kracser <bonifaido@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/mgmt/share_config.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-diff --git a/fs/smb/server/mgmt/share_config.c b/fs/smb/server/mgmt/share_config.c
-index a2f0a2edceb8..e0a6b758094f 100644
---- a/fs/smb/server/mgmt/share_config.c
-+++ b/fs/smb/server/mgmt/share_config.c
-@@ -165,8 +165,12 @@ static struct ksmbd_share_config *share_config_request(struct unicode_map *um,
- 
- 		share->path = kstrndup(ksmbd_share_config_path(resp), path_len,
- 				      GFP_KERNEL);
--		if (share->path)
-+		if (share->path) {
- 			share->path_sz = strlen(share->path);
-+			while (share->path_sz > 1 &&
-+			       share->path[share->path_sz - 1] == '/')
-+				share->path[--share->path_sz] = '\0';
-+		}
- 		share->create_mask = resp->create_mask;
- 		share->directory_mask = resp->directory_mask;
- 		share->force_create_mode = resp->force_create_mode;
--- 
-2.25.1
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] netfs: Fix io_uring based write-through
+      https://git.kernel.org/vfs/vfs/c/c51124cbc622
