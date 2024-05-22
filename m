@@ -1,88 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD47D7BAF7;
-	Wed, 22 May 2024 07:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689762262B
+	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 08:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716362072; cv=none; b=OtynCIumofW9ft4nVC+2Zv8t+gBnAsSErWvhhP4Z1Wk39znpjNAhfYbMw0uJUFo8/tHvOSajaFzFde3Bp4qxJAdjquI1qK+2mHbL4TRXjSnbgYyd76jw+f9CXqKXiHWIyUCmXixjowAaLX/UjF/jWcmThd4TiB68BlCu9VjdU6c=
+	t=1716367138; cv=none; b=pxY/LP1DIosJXm7X2m0gj3hQu/9h/eBCMRQ5oLD89tTkU1O6f0oIjU6uoJe170nvGfhXGJT5S2/8ENocXQkcyqzskh+xUZKqKvbAJV+xLPxcWYsyJYQwBW76eSsR6GQ1kMHJMskCy4x0lkhWOWfkrpmLssE+QI1k+giUTmk353I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716362072; c=relaxed/simple;
-	bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h1O/f4ypO85NuEnv9Q6up9NtvMkJ1HkNgqo+WbDIBHyo7FoU1u6QnN9XGupjfsdi3UXw4537iE9SEn6LRxUfMIe4i1F5TDQlcNhHLU7jeHRJKMhsctgtyRYMfEUEVMrbWYoS7HQdA89hm3YT9OMPoiRK/jlDOAju4G8/WJyEf9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxUDh4A7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716367138; c=relaxed/simple;
+	bh=/RnVnFs+KBCUyJM9I5ehIQyQQbahNe1uMoXF8W9mSLQ=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=juwtrjJ2pQmZ/5aiDzvnvXKKUvCPR23aTBY7exQzwjE4o0EHv+TdJtkaToU3U5+9YYslsIJpEGNNbXGdA7/moScH7kwdxXFygM0GEmx263rwxjM4rb0PpL8S4w9vt4libGdVKKfL1WvVvGOrnxyJEctBr+EmnNA4lAAHDqvffhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RRJ8dHUr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxUDh4A7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8693DC2BD11;
-	Wed, 22 May 2024 07:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716362071;
-	bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KxUDh4A73NHTC6Uo8h5Ypzmu20FS3YX6acckvMWdiTXlPRBjHCRk0EBbJl9S64aw7
-	 fvi2zjqqoHjbD8jQyI1RMGX+yQx0yPJAEnWSLlpK9yTT0aatU/SRonCaKuyKmVGbNH
-	 3HqrddQuCxvyfWafJoMknIMWKMebVIPmr5pz3n4sa9urXda/xmbnk9J8jWy3L7ypdD
-	 V1UvaZyoATvDw+yBeJObfOx70Af9oi6mTC5NVQw+byDXa4FRe2gG5/Hu+oF/RQiMBr
-	 aYar/GPGVKNDfbmSkaX4NWa83bKOiAMWu4xVSJI4C1GotroqgvH+ILaWPJpAEHlyM1
-	 es738P4O+j5QQ==
-From: Christian Brauner <brauner@kernel.org>
-To: Steve French <stfrench@microsoft.com>,
-	David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Matthew Wilcox <willy@infradead.org>,
-	netfs@lists.linux.dev,
-	v9fs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
-Date: Wed, 22 May 2024 09:14:20 +0200
-Message-ID: <20240522-weltmeere-rammt-70f03e24b8b4@brauner>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <316306.1716306586@warthog.procyon.org.uk>
-References: <316306.1716306586@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRJ8dHUr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716367135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=yQwhx3neX6nMoV4M7dECoGraKOSt02xj+EKmgIl1zZ4=;
+	b=RRJ8dHUrSEpnEuDi1h+4sD/zDB69TgocZ3p4x46UABflA4SPACvMcxk17skwDwOCI54Flp
+	4fNd+gzyCBgtBPDD/q1fWFYzfwZKoUVrWQWMYD5UKYq6OxtvkG5V2+IeaDrnjLzquDbirw
+	vikS+cCoc2zdN7TKDgtVfq+96E8FxI4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-311-hqowDmYNMsW252bSaIgkLQ-1; Wed, 22 May 2024 04:38:51 -0400
+X-MC-Unique: hqowDmYNMsW252bSaIgkLQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07227101A52C;
+	Wed, 22 May 2024 08:38:51 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 419C3200A35C;
+	Wed, 22 May 2024 08:38:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
+    Rohith Surabattula <rohiths.msft@gmail.com>,
+    Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <brauner@kernel.org>, linux-cifs@vger.kernel.org,
+    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix smb3_insert_range() to move the zero_point
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1256; i=brauner@kernel.org; h=from:subject:message-id; bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaT5zvZ/VJrSsYxv51y3TfmcQte5fa4UZafWckj9j9mw2 PJaYfO/jlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIlUrWD4n5pi88L397Z6Xbv2 O1r3t/Z9dXA+H9T4a6/78o9nxIPZgxkZWj89LFFMex2/tuIsx+tL+ZE/tl/mFI60cZxvEvT/lTY 7AwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <367855.1716367128.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 May 2024 09:38:48 +0100
+Message-ID: <367856.1716367128@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Tue, 21 May 2024 16:49:46 +0100, David Howells wrote:
-> Fix netfs_perform_write() to set BDP_ASYNC if IOCB_NOWAIT is set rather
-> than if IOCB_SYNC is not set.  It reflects asynchronicity in the sense of
-> not waiting rather than synchronicity in the sense of not returning until
-> the op is complete.
-> 
-> Without this, generic/590 fails on cifs in strict caching mode with a
-> complaint that one of the writes fails with EAGAIN.  The test can be
-> distilled down to:
-> 
-> [...]
+Fix smb3_insert_range() to move the zero_point over to the new EOF.
+Without this, generic/147 fails as reads of data beyond the old EOF point
+return zeroes.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+---
+ fs/smb/client/smb2ops.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index ef18cd30f66c..b87b70edd0be 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3636,6 +3636,7 @@ static long smb3_insert_range(struct file *file, str=
+uct cifs_tcon *tcon,
+ 	rc =3D smb2_copychunk_range(xid, cfile, cfile, off, count, off + len);
+ 	if (rc < 0)
+ 		goto out_2;
++	cifsi->netfs.zero_point =3D new_eof;
+ =
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+ 	rc =3D smb3_zero_data(file, tcon, off, len, xid);
+ 	if (rc < 0)
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[1/1] netfs: Fix setting of BDP_ASYNC from iocb flags
-      https://git.kernel.org/vfs/vfs/c/33c9d7477ef1
