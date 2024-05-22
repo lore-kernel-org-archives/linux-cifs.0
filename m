@@ -1,136 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9D22086
-	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 05:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD47D7BAF7;
+	Wed, 22 May 2024 07:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716354830; cv=none; b=WxZFNpqBmwyc14bBot6IB6JAwmy2vhltCwgf/f9LllWfsz4wjLKxZE7ccgH9XdfcGjVbK6Hwy8I+kRK9cLRiIWq1lZV3IwWjzGi1wCr7xWrSUvE1gjtUNR7OjkkINhSY7DkGFwTlWgGCxcGUSJlRC2/huqc1t1Vufowx8fAzOG4=
+	t=1716362072; cv=none; b=OtynCIumofW9ft4nVC+2Zv8t+gBnAsSErWvhhP4Z1Wk39znpjNAhfYbMw0uJUFo8/tHvOSajaFzFde3Bp4qxJAdjquI1qK+2mHbL4TRXjSnbgYyd76jw+f9CXqKXiHWIyUCmXixjowAaLX/UjF/jWcmThd4TiB68BlCu9VjdU6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716354830; c=relaxed/simple;
-	bh=RebkF30i6qikjvKm0BWWXOLqUQ6I2CDKexDO4uDVMdI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qzhUUpo7QimPtI6iRSveaSiy8YwexVYLmrrcSkWEk9s5HodRyOKZdcXVUm9gk61K36+HmWNChyEjZkWVEK8Y9zTYhWzOxLclOt210hzoad/TTg6UXB7VEXxp0e3MogO/T3eszrGfbl/fDF2aOuWUZ/xLsLEA01KXtRCwLyZ5CzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6wR5/sJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716362072; c=relaxed/simple;
+	bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h1O/f4ypO85NuEnv9Q6up9NtvMkJ1HkNgqo+WbDIBHyo7FoU1u6QnN9XGupjfsdi3UXw4537iE9SEn6LRxUfMIe4i1F5TDQlcNhHLU7jeHRJKMhsctgtyRYMfEUEVMrbWYoS7HQdA89hm3YT9OMPoiRK/jlDOAju4G8/WJyEf9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxUDh4A7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6wR5/sJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F1FEC32781
-	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 05:13:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxUDh4A7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8693DC2BD11;
+	Wed, 22 May 2024 07:14:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716354829;
-	bh=RebkF30i6qikjvKm0BWWXOLqUQ6I2CDKexDO4uDVMdI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=J6wR5/sJ3FFzCvNxmlwdxtFx64X5/HTfxyRf2QodEEHH9sJNLcaN2RmUEmLRqHXJm
-	 29ViMbsGZiVRY+nVOL3vsmidXzzne+U5yJZ1z8wBOlxVndqi5oW0HNM2YRpli5x2XB
-	 vlpejSwO4Ts4sNDmYy6+nxIgb1pQEeWqR+z2mr7poufAlXT11dBvCQlbRELZlcCZPV
-	 6wTS8yk/Wv838A/ahIBmhVDohwjZ3c3+CUS0gqd/4Ia0JwtwuRp05F1X9Aa2BsZMIB
-	 sAnb0lhrd2EqiUj/CS5T9IpYcoxOYxyrVFv+lLRbKsR86Zu+wqpOBtsASMF4jxiAyv
-	 MKmHeiofPVgGg==
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6f10092c8c7so3072105a34.1
-        for <linux-cifs@vger.kernel.org>; Tue, 21 May 2024 22:13:49 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxMuhZN3m0hcatEHRrxIGBHpQw5mv+me2cY2X7xpRv4m5dOFbO0
-	NWeSyJn1BsV+d2lN20IP0AT8Iy3jHLUSt4AESEWMcAA3ONdJd+z0mpDk5/5xjgNzSsawcKiRyil
-	05NPaAtVNKVPSCrsKIBuWGL0sJik=
-X-Google-Smtp-Source: AGHT+IFXh0WNqwXngPgTdnV+y2eQzuvfHXeWebguegevXqVkYJGG7t98/a7HUrdrEufukgH7chW1wJWgdQjZZkCJbr0=
-X-Received: by 2002:a05:6830:1490:b0:6ef:9156:c814 with SMTP id
- 46e09a7af769-6f66a59e3f3mr1475194a34.32.1716354828578; Tue, 21 May 2024
- 22:13:48 -0700 (PDT)
+	s=k20201202; t=1716362071;
+	bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KxUDh4A73NHTC6Uo8h5Ypzmu20FS3YX6acckvMWdiTXlPRBjHCRk0EBbJl9S64aw7
+	 fvi2zjqqoHjbD8jQyI1RMGX+yQx0yPJAEnWSLlpK9yTT0aatU/SRonCaKuyKmVGbNH
+	 3HqrddQuCxvyfWafJoMknIMWKMebVIPmr5pz3n4sa9urXda/xmbnk9J8jWy3L7ypdD
+	 V1UvaZyoATvDw+yBeJObfOx70Af9oi6mTC5NVQw+byDXa4FRe2gG5/Hu+oF/RQiMBr
+	 aYar/GPGVKNDfbmSkaX4NWa83bKOiAMWu4xVSJI4C1GotroqgvH+ILaWPJpAEHlyM1
+	 es738P4O+j5QQ==
+From: Christian Brauner <brauner@kernel.org>
+To: Steve French <stfrench@microsoft.com>,
+	David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
+Date: Wed, 22 May 2024 09:14:20 +0200
+Message-ID: <20240522-weltmeere-rammt-70f03e24b8b4@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <316306.1716306586@warthog.procyon.org.uk>
+References: <316306.1716306586@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240521135753.5108-1-linkinjeon@kernel.org> <c67c96ed-c9e6-4689-8f68-d56ddab71708@talpey.com>
-In-Reply-To: <c67c96ed-c9e6-4689-8f68-d56ddab71708@talpey.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 22 May 2024 14:13:37 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9iXrmh17gutKYPFGs31vBwN94HOGd-fvVCo66RQnazUw@mail.gmail.com>
-Message-ID: <CAKYAXd9iXrmh17gutKYPFGs31vBwN94HOGd-fvVCo66RQnazUw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] ksmbd: avoid reclaiming expired durable opens by the client
-To: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
-	atteh.mailbox@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1256; i=brauner@kernel.org; h=from:subject:message-id; bh=o7FelwEYe06bUj5gigSKOWEN1hyHxbXUGTMgm7PhL9Q=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaT5zvZ/VJrSsYxv51y3TfmcQte5fa4UZafWckj9j9mw2 PJaYfO/jlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIlUrWD4n5pi88L397Z6Xbv2 O1r3t/Z9dXA+H9T4a6/78o9nxIPZgxkZWj89LFFMex2/tuIsx+tL+ZE/tl/mFI60cZxvEvT/lTY 7AwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-2024=EB=85=84 5=EC=9B=94 22=EC=9D=BC (=EC=88=98) =EC=98=A4=EC=A0=84 12:10, =
-Tom Talpey <tom@talpey.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> On 5/21/2024 9:57 AM, Namjae Jeon wrote:
-> > The expired durable opens should not be reclaimed by client.
-> > This patch add ->durable_scavenger_timeout to fp and check it in
-> > ksmbd_lookup_durable_fd().
-> >
-> > Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> > ---
-> >   fs/smb/server/vfs_cache.c | 9 ++++++++-
-> >   fs/smb/server/vfs_cache.h | 1 +
-> >   2 files changed, 9 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-> > index 6cb599cd287e..a6804545db28 100644
-> > --- a/fs/smb/server/vfs_cache.c
-> > +++ b/fs/smb/server/vfs_cache.c
-> > @@ -476,7 +476,10 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigne=
-d long long id)
-> >       struct ksmbd_file *fp;
-> >
-> >       fp =3D __ksmbd_lookup_fd(&global_ft, id);
-> > -     if (fp && fp->conn) {
-> > +     if (fp && (fp->conn ||
-> > +                (fp->durable_scavenger_timeout &&
-> > +                 (fp->durable_scavenger_timeout <
-> > +                  jiffies_to_msecs(jiffies))))) {
->
-> Do I understand correctly that this case means the fd is valid,
-> and only the durable timeout has been exceeded?
-Yes.
->
-> If so, I believe it is overly strict behavior. MS-SMB2 specifically
-> states that the timer is a lower bound:
->
-> > 3.3.2.2 Durable Open Scavenger Timer This timer controls the amount
-> > of time the server keeps a durable handle active after the
-> > underlying transport connection to the client is lost.<210> The
-> > server MUST keep the durable handle active for at least this amount
-> > of time, except in the cases of an oplock break indicated by the
-> > object store as specified in section 3.3.4.6, administrative actions,
-> > or resource constraints.
-> What defect does this patch fix?
-Durable open scavenger timer has not been added yet.
-I will be adding this timer with this next patch. Nonetheless, this
-patch is needed.
-i.e. we need both ones.
-Thanks!
->
-> Tom.
->
->
-> >               ksmbd_put_durable_fd(fp);
-> >               fp =3D NULL;
-> >       }
-> > @@ -717,6 +720,10 @@ static bool session_fd_check(struct ksmbd_tree_con=
-nect *tcon,
-> >       fp->tcon =3D NULL;
-> >       fp->volatile_id =3D KSMBD_NO_FID;
-> >
-> > +     if (fp->durable_timeout)
-> > +             fp->durable_scavenger_timeout =3D
-> > +                     jiffies_to_msecs(jiffies) + fp->durable_timeout;
-> > +
-> >       return true;
-> >   }
-> >
-> > diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-> > index 5a225e7055f1..f2ab1514e81a 100644
-> > --- a/fs/smb/server/vfs_cache.h
-> > +++ b/fs/smb/server/vfs_cache.h
-> > @@ -101,6 +101,7 @@ struct ksmbd_file {
-> >       struct list_head                lock_list;
-> >
-> >       int                             durable_timeout;
-> > +     int                             durable_scavenger_timeout;
-> >
-> >       /* if ls is happening on directory, below is valid*/
-> >       struct ksmbd_readdir_data       readdir_data;
+On Tue, 21 May 2024 16:49:46 +0100, David Howells wrote:
+> Fix netfs_perform_write() to set BDP_ASYNC if IOCB_NOWAIT is set rather
+> than if IOCB_SYNC is not set.  It reflects asynchronicity in the sense of
+> not waiting rather than synchronicity in the sense of not returning until
+> the op is complete.
+> 
+> Without this, generic/590 fails on cifs in strict caching mode with a
+> complaint that one of the writes fails with EAGAIN.  The test can be
+> distilled down to:
+> 
+> [...]
+
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] netfs: Fix setting of BDP_ASYNC from iocb flags
+      https://git.kernel.org/vfs/vfs/c/33c9d7477ef1
