@@ -1,131 +1,156 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250D21494AE
-	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 22:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D297D3E6
+	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 23:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716418750; cv=none; b=h+W/P+og8J4LAC7VEuY3H2EQlG0A8f6m3giiLIDac6nx7jGkJj3aiIIVTCURDJQM69tq53RI2TYJ2q70eUZWlYNQJ7NfToNfllViX2gsvceOB9b0kIWFz3EEDNbQMslOZ38bLf68ePpkBUP+eNpHupb6XPjZQngdAyWwzhXOmMw=
+	t=1716420706; cv=none; b=Glo/BkpdvSts+zdlZ0ldllhL7rS8UI6QhZe/Zgl1CGNbl2i3vBZ4zUHSSnYUDrS1arc4d0vkGvRDp3uvCGbK9iJv9TCRlVJqJIYvwAMt1mDDLwKCAdMjoXnFy9NLidW3QdL9YfTp+PoI8O46NDWm7oZgG5wkD8HMNksBlTSmgp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716418750; c=relaxed/simple;
-	bh=lUyseyhrTphGdKiHxqU49ao7Ry2K6n4epBhRL331XWI=;
-	h=To:cc:Subject:MIME-Version:Content-Type:From:Date:Message-ID; b=tltsFUjgX8RM9vrCjJeOGlbu4VBjlq++maO9CR4k8Vgi+/zQwMMGqJ11s8z92C8h3s2fqA05jB6PgIPOKGUeJcwgcYxI2mQ+tl4JB5sg5Zh8LwTGF4QMiQ5cRUbGzaWUbAusdOcdy7nvCzp84XbS6lN4PoQLFfT4pNTvbc1LQgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OH76cNwF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1716420706; c=relaxed/simple;
+	bh=I7yXoy7FNFwE95n+b88qrZJWiJpFu9NE5aLgbAYdpeE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jg73n2JGe8eRopqwV6D4i+2M7lB93+g4BrLH2eFLfXMEuqfWO8bhOhXLWY3QGy/n7Kf5KWWAV6oXYHdT6chhlcTWJNfoQbB3QcdacSseGaqkt4zrUgzTLkncchAu2UF+doIPNXeR1Qd8DXoX2wmpdahKE4LSf5mb5KfLex4NWq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXduSAHq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OH76cNwF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716418748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aLGhBNxsqVskXvt4vSfXPq+TZr8BC8vuqNTuesM2U10=;
-	b=OH76cNwFyNEIDxT12ZdxcqrnOjiVWS+fb0w6uihUwL+jRVwNwnp7mx1zY3vz3ZjVMCC5SY
-	Knc4naw6zzeWx4bZjw33oXWgz+nG66POhEUPYEMni4V87zD1ixnNNYufxKxJo8TMwCjyAl
-	GmA0SnNte9Wi5Wazl1Ds8p3/rsX67hQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-N82oH1LtPryF20wyqw928w-1; Wed, 22 May 2024 18:59:04 -0400
-X-MC-Unique: N82oH1LtPryF20wyqw928w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E4BA800169;
-	Wed, 22 May 2024 22:59:04 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0871C561A;
-	Wed, 22 May 2024 22:59:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>
-cc: dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] cifs: Fix credit handling in cifs_io_subrequest cleanup
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXduSAHq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D430C2BBFC
+	for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 23:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716420705;
+	bh=I7yXoy7FNFwE95n+b88qrZJWiJpFu9NE5aLgbAYdpeE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oXduSAHqS6LgyQdoRWxY5D2kj3UiuHJNRBuNtgSfTlC0oP/RZbe6/Han3EFRqe7/P
+	 7HaNlMRWAqdbnww3kvrDoAfgSncZ6waVvRDA1VoX39etq64JNFqJEwK1RwKwR7LZ0K
+	 9LOof+MLoq6waCU352GPSDDtWPqYSZd0vu/Ni/Q29sGEjKn+DU8eRoA4S4oQp7gr5/
+	 K/B3BSnpAOyusi4HjXxcdc2yQhNGTwApng3lQxltMS6/T2dKIvdDXvzeDnFqUXkfoq
+	 kMXQDDr3CCndGUKazARHPFKs26unvIrdStEsanSJFNkj6/cjfqtyK9QXGLseYPDigD
+	 aEroSI2pVZl6g==
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5b277e17e15so4219503eaf.2
+        for <linux-cifs@vger.kernel.org>; Wed, 22 May 2024 16:31:45 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzpXWblH7vLB7dqdVMZHA0raJxWzcakLNTgfnRiIehBGL+MZtOs
+	8zW42s/amWMv8NkG6WseuTSomK5LDMjPjz3rDc4Juhw6ohl/0/Lh/r0GOzmFU3/C58zS8qT1U5x
+	WTFCrEGXISglFFlQJ7d0b3UBFmFI=
+X-Google-Smtp-Source: AGHT+IF4aMvSBr+R1aJmzWlOR1pN8Pp+YJHI+EOE8s7aAOwNZLw1umCYGMQG1/J0l1XmypSV9phzt1I00H9zZvKUBZo=
+X-Received: by 2002:a05:6820:151a:b0:5a9:cef4:fcea with SMTP id
+ 006d021491bc7-5b6a0e083d2mr3612229eaf.1.1716420704873; Wed, 22 May 2024
+ 16:31:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <469429.1716418699.1@warthog.procyon.org.uk>
+References: <20240521135753.5108-1-linkinjeon@kernel.org> <c67c96ed-c9e6-4689-8f68-d56ddab71708@talpey.com>
+ <CAKYAXd9iXrmh17gutKYPFGs31vBwN94HOGd-fvVCo66RQnazUw@mail.gmail.com> <14fa6bf0-00e4-4716-8569-a85e411228eb@talpey.com>
+In-Reply-To: <14fa6bf0-00e4-4716-8569-a85e411228eb@talpey.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 23 May 2024 08:31:33 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_NBDSmirpO45T0tgu9XCGr4MSK+DW=NCqGFLSe8uY06A@mail.gmail.com>
+Message-ID: <CAKYAXd_NBDSmirpO45T0tgu9XCGr4MSK+DW=NCqGFLSe8uY06A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ksmbd: avoid reclaiming expired durable opens by the client
+To: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
+	atteh.mailbox@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: David Howells <dhowells@redhat.com>
-Date: Wed, 22 May 2024 23:59:02 +0100
-Message-ID: <469451.1716418742@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-    =
+2024=EB=85=84 5=EC=9B=94 23=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 4:47, T=
+om Talpey <tom@talpey.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> On 5/22/2024 1:13 AM, Namjae Jeon wrote:
+> > 2024=EB=85=84 5=EC=9B=94 22=EC=9D=BC (=EC=88=98) =EC=98=A4=EC=A0=84 12:=
+10, Tom Talpey <tom@talpey.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+> >>
+> >> On 5/21/2024 9:57 AM, Namjae Jeon wrote:
+> >>> The expired durable opens should not be reclaimed by client.
+> >>> This patch add ->durable_scavenger_timeout to fp and check it in
+> >>> ksmbd_lookup_durable_fd().
+> >>>
+> >>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> >>> ---
+> >>>    fs/smb/server/vfs_cache.c | 9 ++++++++-
+> >>>    fs/smb/server/vfs_cache.h | 1 +
+> >>>    2 files changed, 9 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+> >>> index 6cb599cd287e..a6804545db28 100644
+> >>> --- a/fs/smb/server/vfs_cache.c
+> >>> +++ b/fs/smb/server/vfs_cache.c
+> >>> @@ -476,7 +476,10 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsig=
+ned long long id)
+> >>>        struct ksmbd_file *fp;
+> >>>
+> >>>        fp =3D __ksmbd_lookup_fd(&global_ft, id);
+> >>> -     if (fp && fp->conn) {
+> >>> +     if (fp && (fp->conn ||
+> >>> +                (fp->durable_scavenger_timeout &&
+> >>> +                 (fp->durable_scavenger_timeout <
+> >>> +                  jiffies_to_msecs(jiffies))))) {
+> >>
+> >> Do I understand correctly that this case means the fd is valid,
+> >> and only the durable timeout has been exceeded?
+> > Yes.
+> >>
+> >> If so, I believe it is overly strict behavior. MS-SMB2 specifically
+> >> states that the timer is a lower bound:
+> >>
+> >>> 3.3.2.2 Durable Open Scavenger Timer This timer controls the amount
+> >>> of time the server keeps a durable handle active after the
+> >>> underlying transport connection to the client is lost.<210> The
+> >>> server MUST keep the durable handle active for at least this amount
+> >>> of time, except in the cases of an oplock break indicated by the
+> >>> object store as specified in section 3.3.4.6, administrative actions,
+> >>> or resource constraints.
+> >> What defect does this patch fix?
+> > Durable open scavenger timer has not been added yet.
+> > I will be adding this timer with this next patch. Nonetheless, this
+> > patch is needed.
+> > i.e. we need both ones.
+>
+> So this code has no effect until then? And presumably, the scavenger
+> will be closing the fd, so it won't have any effect later, either.
+Not at all. We can first take steps to prevent the timeout of durable v2
+open from being used. There is absolutely no harm in this.
 
-When a cifs_io_subrequest (wrapping a netfs_io_subrequest) is cleaned up i=
-n
-cifs_free_subrequest(), it releases any credits that are left in
-rdata->credits.  However, this is a problem because smb2_writev_callback()
-calls add_credits() to add the new credits from the response header
-CreditRequest to the available pool.
-
-This can cause a warning to be emitted in smb2_add_credits() as
-server->in_flight gets doubly decremented and a later operation sees it
-having prematurely reached 0.
-
-Fix this by clearing the credit count after actually issuing the request o=
-n
-the assumption that we've given the credits back to the server (it will
-give us new credits in the reply).
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/file.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 9d5c2440abfc..73e2765c4d2f 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -110,6 +110,7 @@ static void cifs_issue_write(struct netfs_io_subreques=
-t *subreq)
- 		goto fail;
- =
-
- 	wdata->server->ops->async_writev(wdata);
-+	wdata->credits.value =3D 0;
- out:
- 	return;
- =
-
-@@ -205,10 +206,12 @@ static void cifs_req_issue_read(struct netfs_io_subr=
-equest *subreq)
- =
-
- 	rc =3D adjust_credits(rdata->server, &rdata->credits, rdata->subreq.len)=
+Thanks.
+>
+> The patch should not be applied at this time, and the full change
+> should be reviewed when it's ready.
+>
+> Tom.
+>
+> > Thanks!
+> >>
+> >> Tom.
+> >>
+> >>
+> >>>                ksmbd_put_durable_fd(fp);
+> >>>                fp =3D NULL;
+> >>>        }
+> >>> @@ -717,6 +720,10 @@ static bool session_fd_check(struct ksmbd_tree_c=
+onnect *tcon,
+> >>>        fp->tcon =3D NULL;
+> >>>        fp->volatile_id =3D KSMBD_NO_FID;
+> >>>
+> >>> +     if (fp->durable_timeout)
+> >>> +             fp->durable_scavenger_timeout =3D
+> >>> +                     jiffies_to_msecs(jiffies) + fp->durable_timeout=
 ;
- 	if (!rc) {
--		if (rdata->req->cfile->invalidHandle)
-+		if (rdata->req->cfile->invalidHandle) {
- 			rc =3D -EAGAIN;
--		else
-+		} else {
- 			rc =3D rdata->server->ops->async_readv(rdata);
-+			rdata->credits.value =3D 0;
-+		}
- 	}
- =
-
- out:
-
+> >>> +
+> >>>        return true;
+> >>>    }
+> >>>
+> >>> diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
+> >>> index 5a225e7055f1..f2ab1514e81a 100644
+> >>> --- a/fs/smb/server/vfs_cache.h
+> >>> +++ b/fs/smb/server/vfs_cache.h
+> >>> @@ -101,6 +101,7 @@ struct ksmbd_file {
+> >>>        struct list_head                lock_list;
+> >>>
+> >>>        int                             durable_timeout;
+> >>> +     int                             durable_scavenger_timeout;
+> >>>
+> >>>        /* if ls is happening on directory, below is valid*/
+> >>>        struct ksmbd_readdir_data       readdir_data;
+> >
