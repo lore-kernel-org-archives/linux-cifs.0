@@ -1,58 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D040C2D05E
-	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 06:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C1A13CA9C
+	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 07:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716446218; cv=none; b=IbjyBgR6q8AGK9pUH/y2Ak7WIywpWv5WCfuobWDnmhBHTcUewT/ehdEh4KauPbXXXmPvjJpilRbOOpkmSc0ow9jUu3U4bf58dhcRiJcCrfoxPye2AENlVmjNlqV+Y/SiKRUClro2oi4PhML9RFtmtYj+4DKVTm/KPIW1CRGLEEQ=
+	t=1716450270; cv=none; b=iwm9gLaHI96nqoV0qGOGE9Ta5PlLa6SPvWTUS9ImAK1K/49XgKoszAYuBxU/ZeJ8rQzznO7jcAok8xPWRQauWZBC7dj6I8PgAZtMKnPAwp04/gwhqKCLT3Vm7yIBYfCUyYY1kEgOCmboAIL3uVilDw6G11RlPf5cMnSvZZxeJ6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716446218; c=relaxed/simple;
-	bh=+jFHf/SHm34pgbj6y9PIQfO2eIqUYyLBFj3V/fPXwzE=;
+	s=arc-20240116; t=1716450270; c=relaxed/simple;
+	bh=lnjUifyPSPVB7tejsJYdTy3kJITVOSvFjQFhkzP75y4=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=UdOgzT4BA/0rTtK8r3FvzkXXHxxZI+Lpex1/jnzc+pjFreFfSGibTcfM0Xr0ZtbnY/0hFPMANpOCacN4RsVfJW0unn3NhxZHH+wWLo27UdPt28hu8QlWlokOgpJYSYJdI021hoVmIJ6VkxqeekYdY2PrkouBN9F7T/K/bPBlIMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hR1JqRAq; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Date:Message-ID; b=YdT0ATCA4yX+je1KdPHJpo7bYdl0LjvDLbMQmckv+8P6FzWq7ZhhZCtI/ZYrd8IrC3Tf5uOVjqzLpQS7y/5mw4oPXqseMr2ZHtwKPdPbm0wwbBsC1ZA49FE0a2nxnUuhjA7WUsGCs186an83Miiw4Q/BiVyJ4IDx+ae6VdmNN+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c+nOSAGB; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hR1JqRAq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+nOSAGB"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716446215;
+	s=mimecast20190719; t=1716450267;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xMLnNxFTnCaK5JR2bSI2SHt3ZvEw03w9pPGa7xZnUmo=;
-	b=hR1JqRAqi/jq/AlOmJf9vEidHdjy/lMxNpgilg6LxtWBExSfN9NpVih5JkgbIrWX5NlQ9a
-	fyxRN0XmLSoOAFZ022SHrBG00iSVXlNwfwB1jCQBMe0+az0zihBtQh63ceHK9be0Ffmwfx
-	Fq/JS+izSAsp/rhtkKlQTpQ96CeGZNU=
+	bh=kLhXmfF9Sj87o1Kh7Mk5PB3h8im3PzkGpLpb1UjE6M4=;
+	b=c+nOSAGBt0MLqJtP7OouZjBehHBfm4KJp6Mnu6V5GoOxknQnYYLg6fFpskTX+jIquBEZP1
+	JtOQ/X+gt8UE7QfukyU8SB9m2KYGhHUXMnSOTq6EENFTVls4JKYD1AfzDj7b9xEHauh+rI
+	1dFUNdoifnhmX45O9Qg6uaZYOD7SNaY=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-Qh2tz4yBPKikznTeAPwIyA-1; Thu, 23 May 2024 02:36:50 -0400
-X-MC-Unique: Qh2tz4yBPKikznTeAPwIyA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-211-xEhMxZGhNqmZTQdYoGCbdQ-1; Thu, 23 May 2024 03:44:21 -0400
+X-MC-Unique: xEhMxZGhNqmZTQdYoGCbdQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B582585A58C;
-	Thu, 23 May 2024 06:36:49 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0EA881227E;
+	Thu, 23 May 2024 07:44:20 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D13C440004D;
-	Thu, 23 May 2024 06:36:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6EA96C15BED;
+	Thu, 23 May 2024 07:44:18 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com>
-References: <CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com> <20240522185305.69e04dab@echidna> <349671.1716335639@warthog.procyon.org.uk> <370800.1716374185@warthog.procyon.org.uk> <20240523145420.5bf49110@echidna> <CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com> <476489.1716445261@warthog.procyon.org.uk>
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc: dhowells@redhat.com, David Disseldorp <ddiss@samba.org>,
-    David Howells via samba-technical <samba-technical@lists.samba.org>,
-    Steve French <sfrench@samba.org>, Jeremy Allison <jra@samba.org>,
-    linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
-Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
+In-Reply-To: <Zj0ErxVBE3DYT2Ea@gpd>
+References: <Zj0ErxVBE3DYT2Ea@gpd> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-41-dhowells@redhat.com>
+To: Andrea Righi <andrea.righi@canonical.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Christian Brauner <christian@brauner.io>,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,40 +68,211 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <477166.1716446208.1@warthog.procyon.org.uk>
+Content-ID: <531993.1716450257.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 May 2024 07:36:48 +0100
-Message-ID: <477167.1716446208@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Date: Thu, 23 May 2024 08:44:17 +0100
+Message-ID: <531994.1716450257@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
+Hi Andrea,
 
-> > The problem is that it essentially renders SEEK_DATA/SEEK_HOLE unusabl=
-e for
-> > applications on cifs.  If there's more than one extent above the start=
-ing
-> > position, they'll fail with EIO.  The only way to do it is to provide =
-for a
-> > sufficiently large buffer to accommodate however many extents that the=
-re are
-> > (and there could be millions, in theory) in order to get just the firs=
-t one.
-> =
+Note that there are changes to the netfslib write-side upstream and you mi=
+ght
+also want to apply the attached.
 
-> Wait, I didn't read all the text in the initial posts correctly.
-> Do you mean if you ask for "max x bytes of response, enough for n
-> entries" then if there
-> are > n entries on the server you get nothing back?
-> =
+In https://bugs.launchpad.net/ubuntu/+source/autopkgtest/+bug/2056461 you =
+say:
 
-> I am pretty sure Windows will return as many entries as fits in the
-> reponse out-data-size
-> nad some error code.
-> But you are saying that instead of returning a truncated out-blob that
-> samba will return nothing?
+| It seems that kernel 6.8 introduced a regression in the 9pfs related to
+| caching and netfslib, that can cause some user-space apps to read conten=
+t
+| from files that is not up-to-date (when they are used in a producer/cons=
+umer
+| fashion).
 
-It returns a STATUS_BUFFER_TOO_SMALL error if there's more than one extent
-record to return.
+Can you clarify how these files are being used?
 
 David
+---
+commit 39302c160390441ed5b4f4f7ad480c44eddf0962
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed May 22 17:30:22 2024 +0100
+
+    netfs, 9p: Fix race between umount and async request completion
+    =
+
+    There's a problem in 9p's interaction with netfslib whereby a crash oc=
+curs
+    because the 9p_fid structs get forcibly destroyed during client teardo=
+wn
+    (without paying attention to their refcounts) before netfslib has fini=
+shed
+    with them.  However, it's not a simple case of deferring the clunking =
+that
+    p9_fid_put() does as that requires the client.
+    =
+
+    The problem is that netfslib has to unlock pages and clear the IN_PROG=
+RESS
+    flag before destroying the objects involved - including the pid - and,=
+ in
+    any case, nothing checks to see if writeback completed barring looking=
+ at
+    the page flags.
+    =
+
+    Fix this by keeping a count of outstanding I/O requests (of any type) =
+and
+    waiting for it to quiesce during inode eviction.
+    =
+
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    cc: Eric Van Hensbergen <ericvh@kernel.org>
+    cc: Latchesar Ionkov <lucho@ionkov.net>
+    cc: Dominique Martinet <asmadeus@codewreck.org>
+    cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+    cc: Jeff Layton <jlayton@kernel.org>
+    cc: Steve French <sfrench@samba.org>
+    cc: v9fs@lists.linux.dev
+    cc: linux-afs@lists.infradead.org
+    cc: linux-cifs@vger.kernel.org
+    cc: netfs@lists.linux.dev
+    cc: linux-fsdevel@vger.kernel.org
+
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index 8c9a896d691e..57cfa9f65046 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -354,6 +354,7 @@ void v9fs_evict_inode(struct inode *inode)
+ 		version =3D cpu_to_le32(v9inode->qid.version);
+ 		netfs_clear_inode_writeback(inode, &version);
+ =
+
++		netfs_wait_for_outstanding_io(inode);
+ 		clear_inode(inode);
+ 		filemap_fdatawrite(&inode->i_data);
+ =
+
+@@ -361,8 +362,10 @@ void v9fs_evict_inode(struct inode *inode)
+ 		if (v9fs_inode_cookie(v9inode))
+ 			fscache_relinquish_cookie(v9fs_inode_cookie(v9inode), false);
+ #endif
+-	} else
++	} else {
++		netfs_wait_for_outstanding_io(inode);
+ 		clear_inode(inode);
++	}
+ }
+ =
+
+ struct inode *
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index 94fc049aff58..c831e711a4ac 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -652,6 +652,7 @@ void afs_evict_inode(struct inode *inode)
+ =
+
+ 	afs_set_cache_aux(vnode, &aux);
+ 	netfs_clear_inode_writeback(inode, &aux);
++	netfs_wait_for_outstanding_io(inode);
+ 	clear_inode(inode);
+ =
+
+ 	while (!list_empty(&vnode->wb_keys)) {
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index c90d482b1650..f4a642727479 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -72,6 +72,7 @@ struct netfs_io_request *netfs_alloc_request(struct addr=
+ess_space *mapping,
+ 		}
+ 	}
+ =
+
++	atomic_inc(&ctx->io_count);
+ 	trace_netfs_rreq_ref(rreq->debug_id, 1, netfs_rreq_trace_new);
+ 	netfs_proc_add_rreq(rreq);
+ 	netfs_stat(&netfs_n_rh_rreq);
+@@ -124,6 +125,7 @@ static void netfs_free_request(struct work_struct *wor=
+k)
+ {
+ 	struct netfs_io_request *rreq =3D
+ 		container_of(work, struct netfs_io_request, work);
++	struct netfs_inode *ictx =3D netfs_inode(rreq->inode);
+ 	unsigned int i;
+ =
+
+ 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+@@ -142,6 +144,9 @@ static void netfs_free_request(struct work_struct *wor=
+k)
+ 		}
+ 		kvfree(rreq->direct_bv);
+ 	}
++
++	if (atomic_dec_and_test(&ictx->io_count))
++		wake_up_var(&ictx->io_count);
+ 	call_rcu(&rreq->rcu, netfs_free_request_rcu);
+ }
+ =
+
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index ec5b639f421a..21c9e173ea9a 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -435,6 +435,7 @@ cifs_evict_inode(struct inode *inode)
+ 	if (inode->i_state & I_PINNING_NETFS_WB)
+ 		cifs_fscache_unuse_inode_cookie(inode, true);
+ 	cifs_fscache_release_inode_cookie(inode);
++	netfs_wait_for_outstanding_io(inode);
+ 	clear_inode(inode);
+ }
+ =
+
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index d2d291a9cdad..3ca3906bb8da 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -68,6 +68,7 @@ struct netfs_inode {
+ 	loff_t			remote_i_size;	/* Size of the remote file */
+ 	loff_t			zero_point;	/* Size after which we assume there's no data
+ 						 * on the server */
++	atomic_t		io_count;	/* Number of outstanding reqs */
+ 	unsigned long		flags;
+ #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
+ #define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
+@@ -474,6 +475,7 @@ static inline void netfs_inode_init(struct netfs_inode=
+ *ctx,
+ 	ctx->remote_i_size =3D i_size_read(&ctx->inode);
+ 	ctx->zero_point =3D LLONG_MAX;
+ 	ctx->flags =3D 0;
++	atomic_set(&ctx->io_count, 0);
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	ctx->cache =3D NULL;
+ #endif
+@@ -517,4 +519,20 @@ static inline struct fscache_cookie *netfs_i_cookie(s=
+truct netfs_inode *ctx)
+ #endif
+ }
+ =
+
++/**
++ * netfs_wait_for_outstanding_io - Wait for outstanding I/O to complete
++ * @ctx: The netfs inode to wait on
++ *
++ * Wait for outstanding I/O requests of any type to complete.  This is in=
+tended
++ * to be called from inode eviction routines.  This makes sure that any
++ * resources held by those requests are cleaned up before we let the inod=
+e get
++ * cleaned up.
++ */
++static inline void netfs_wait_for_outstanding_io(struct inode *inode)
++{
++	struct netfs_inode *ictx =3D netfs_inode(inode);
++
++	wait_var_event(&ictx->io_count, atomic_read(&ictx->io_count) =3D=3D 0);
++}
++
+ #endif /* _LINUX_NETFS_H */
 
