@@ -1,570 +1,262 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2097.outbound.protection.outlook.com [40.107.236.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BADA13BAC3;
-	Thu, 23 May 2024 13:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716470749; cv=none; b=PBhbjdLmGgmHR4WcE9KG3t1i1kx94xCv7s+Tll3YvEQQ4ItaZSaHlrn7WpurLIZzXjpFlGtXVVO2ZDdDG49Sr+rnp1eAdO3efnFhXLwT/ZS8FWYWz9lKdK5vrTg5zvxBz0O5rQyuPKZWpkzvM2cR1DIXTa/KyQ+WQ7hCux0m8rE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716470749; c=relaxed/simple;
-	bh=0FRpWfVPv5aSGN8BsnsHItoPdJGXZ8hqaSOeflOTljs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y+d5q1SA8JLoMMICH6gdUbu+Wwq1eqxPQ2I0QQ0vkcdX1QzcmhCH5yxgRU0m4XStY+DsIJZdv08SYbvjC51MagsFkDlXTArDwJ4o22/vARVZpGvrSRKV+BIcKTG8ckO9XFNfiS5rcP1DUlcql5VtEAx55B35ECZizLO5xrZ8tMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=W0vQalV2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="W0vQalV2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D326DC32782;
-	Thu, 23 May 2024 13:25:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716470749;
-	bh=0FRpWfVPv5aSGN8BsnsHItoPdJGXZ8hqaSOeflOTljs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W0vQalV2a8fSGzGPsusj4UBYVv0dmOmyWsuf3IxQCq7lnQX2C3QWiZ1MfleC8+EDC
-	 k5RXzoHZs2udOHmFqLyW7ZEGfGi/I5gcZqBAyEFVd/kvNfAPKyAsYRRmRl7TedDfWl
-	 Sg9PS5OK8A+POo/qmTmRxwG24AGyRfspub69fIws=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 074/102] cifs: Add tracing for the cifs_tcon struct refcounting
-Date: Thu, 23 May 2024 15:13:39 +0200
-Message-ID: <20240523130345.257483114@linuxfoundation.org>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240523130342.462912131@linuxfoundation.org>
-References: <20240523130342.462912131@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BD514A60D
+	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 13:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.97
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716471360; cv=fail; b=TOI01T0AUW0cgOq3Yzf6uNZkS31Bk+msOBoTpJUjfJ4hf1NNywAOTmIOgpH/fGwQ0KQpA/seUdX800IlBlV2S+AbTfaBqXksZrUz5S2uhUogpjnsew2IV0fIdFQ6v9I2McOuQMOzjF5iuKEEPqhmLqrWwnBIlj7JOcYkKXuZA0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716471360; c=relaxed/simple;
+	bh=WnpC2qTDinBuHmM9UCPRUz6URnxtyrpfD2sgKJyO+tI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=D/rPTcMV0FZNlPGID8V42gLMo2dyLSO2yCthW7UMK1Kh5JkqF4Tlq1blCeYFqacAmQF4QbLWDMbb0kkghknaP7FHHIn1SzUyVWo8d+AuIPjoM5lHfocNCWfEcBjSSBxtAEOc+JAUem9tdYNMptd2kVdPlhR4e6Gc8+c3nPhU88I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.236.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fK8koKWDZT4CwkKThxdD8k4pHiOxJ/tiCQVmHuHXUmjHoilwAJMKoXGjmD4bmnKi634HJhRITwpMgc9a6O9lDALPUVMlcbPxM1C/4ibA18LBbqWVTMXC3AxG1XxwPXof7WSLbzRO14tUhCxb8xhQZXonQ+mwcREuKoV/nycOBJsP296ZMNrB80gtIU0Sk0m3yf9FjsmBQq0YIa++GVjauSrV4qFcPmi2rurgtK8pW/TDYaehUn4rmQ9dKfZ1+TMZ26aNHGRWtkRhrkTvFqi8lyHVSgwkSTZS1SRIPOmr7U30QKOylXcnyI3yfoTkdlmPOVgoDvkeQUUhPiFd3d3r4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PdagyqrO97yFMWUp51gJ4PsrMetNjj4L0CHU9OknUq0=;
+ b=SRPZ9jinpCnlUcMLvlBn9aKOxVMDRh9cZajq49m9y7ZzboUHBVVKZCNzuEbqsMcbQwzcBuu4CjVTD7iYE327kpKnBVb3amXarTETAG63ahz5r/t5enAw4mrcSoShsaDv7rhU/sS3jKgt8/I06/557gXT7gXhVzPjaHta9w/1M7RTeJwVxEUvrJD8thHlffOPoFi08FEcV4HHMEhwCMuYj48iRqvZj26Z/Zy8YzgyKGuyG+welmWIyut3x9/ugYEPj2KhRPUQGTJ6n/CgldZg8MVW6OcqSzcASqMNgIQSALBfT3rPsHw2ku5Tc4XuTtbXHksY1ztGVeUcEKgil1m/VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from CH0PR01MB7170.prod.exchangelabs.com (2603:10b6:610:f8::12) by
+ SA3PR01MB8038.prod.exchangelabs.com (2603:10b6:806:312::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7587.27; Thu, 23 May 2024 13:35:54 +0000
+Received: from CH0PR01MB7170.prod.exchangelabs.com
+ ([fe80::97c:561d:465f:8511]) by CH0PR01MB7170.prod.exchangelabs.com
+ ([fe80::97c:561d:465f:8511%4]) with mapi id 15.20.7611.016; Thu, 23 May 2024
+ 13:35:54 +0000
+Message-ID: <dd393a75-667e-4c5e-8f00-060b8a78da69@talpey.com>
+Date: Thu, 23 May 2024 09:35:52 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] ksmbd: avoid reclaiming expired durable opens by the
+ client
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org,
+ atteh.mailbox@gmail.com
+References: <20240521135753.5108-1-linkinjeon@kernel.org>
+ <c67c96ed-c9e6-4689-8f68-d56ddab71708@talpey.com>
+ <CAKYAXd9iXrmh17gutKYPFGs31vBwN94HOGd-fvVCo66RQnazUw@mail.gmail.com>
+ <14fa6bf0-00e4-4716-8569-a85e411228eb@talpey.com>
+ <CAKYAXd_NBDSmirpO45T0tgu9XCGr4MSK+DW=NCqGFLSe8uY06A@mail.gmail.com>
+Content-Language: en-US
+From: Tom Talpey <tom@talpey.com>
+In-Reply-To: <CAKYAXd_NBDSmirpO45T0tgu9XCGr4MSK+DW=NCqGFLSe8uY06A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR05CA0043.namprd05.prod.outlook.com
+ (2603:10b6:208:236::12) To CH0PR01MB7170.prod.exchangelabs.com
+ (2603:10b6:610:f8::12)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR01MB7170:EE_|SA3PR01MB8038:EE_
+X-MS-Office365-Filtering-Correlation-Id: e36062cd-3763-4841-867a-08dc7b2d44e2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?dVhnZGxJZG9rZGh1MSs3WmgxdlJqTWJpWm1aWWtlTVYrY3pEektWSUs5V3lO?=
+ =?utf-8?B?SGZlcjlIRiswQ0FJU3lTMVdYS1RTakk2ME4wbW9manZiS0dyRVllNndxMXVq?=
+ =?utf-8?B?UVdMZEZMWG5wb2tjcmIvTkE2WS91eitQRW5ydktDT0p0a2ZEdFFVSVFYUEkw?=
+ =?utf-8?B?eWI1T0pwdFF6WGZLT3UxRnc5VlhYMkd4a0tIbzR4TEl3REo3YkUrMnhyOHZN?=
+ =?utf-8?B?b3d4NXhUc3daN2N4RlY1L0huMWdUZ00xaVBlU0dNYlhZTy9uZGcwTnRwOFFL?=
+ =?utf-8?B?a0dJblo4UGRZQWNXVkNrWGR1TklqTElDd05JOW9uMTZoM056UzBXZUFuUnc1?=
+ =?utf-8?B?QWQ3QTFISCtEOVJJN0VLNE5HVHd2RkdSUXNFcnpiT01GRTlsVUUyM3dKS25a?=
+ =?utf-8?B?NFBOeHV5cHVDUHhENWMxd1BaSkduc3Z1MXdBS3g2RFNRSlNJZUFMbTRrSHU4?=
+ =?utf-8?B?RmFzOFJWNjdsMDl2TVRMUWlxQlVjZUxCUUlnQkZyQXFxM0gzMDdKditEQ0ZS?=
+ =?utf-8?B?TVd2T1BqajU2VXZwSXlKWEJIMkt3eHN6STFzWXBHOUFTUzNMRGJYU0x3aUFs?=
+ =?utf-8?B?c2kzQU9FelpmQVhLbGpkUUdCWnVMNW1ic1d4Sy9IZG9EK0Jrd0ZUckVpblp0?=
+ =?utf-8?B?YkJVT3p0V1pZVFlRSlRLZ3VxRkJjakErdDFsN0lWTXpIL1JCU0lRMjR4SDJB?=
+ =?utf-8?B?M2phVVdPSVMzWnRObnFpeEw0WHNJUGFuSjFuaVNwenRJMUFkNHlLcDlISnA1?=
+ =?utf-8?B?ck81dTJlRTZvOTV0SFRwMXFFcjBRTnptdW1XSGZwTFJ4YXRCZkluZG4rVkV4?=
+ =?utf-8?B?MCtjWHd6QnFBblgxOFNYai95NEtIOU1QZ2RvWUo1dWNyTjB0N0txMnRGWWV4?=
+ =?utf-8?B?NUR3NzJZNm1qZTJhT0JHa3BsSE9JTUcwSmsvY045OWtPSVBDMis0NFB0Vm5L?=
+ =?utf-8?B?OFJqaUZFSHNEUk9WdmJ6dFZidWRIblYxSkdkbWxhZThVUGVDK1Y3UlcydkNm?=
+ =?utf-8?B?a0c4Z0FUSFRpaGVqZGg0OWY5aTFlZzR4dThSNlVLRVNJNHgzVmgyZnhFVDlH?=
+ =?utf-8?B?MGI1VEg1RU5aLytvMHRFNVd6LzVwQjU3Z1UrUEhNc09XUXp6VU1CWFNJdUZB?=
+ =?utf-8?B?cnhKMHJWQzRBdmgvZkp3NjZ4ZVl3TEdZcURoamdxOVlVMWtOQmtkam55MkFl?=
+ =?utf-8?B?a0xIODM4RWVlV3ZhbFFWbjdTb2VlZDhDeno1bldvMVJMQUJLTVdscDVKS0RY?=
+ =?utf-8?B?WC9pVWIzcjFkd1lJZWl4VldweTJLLzg2ZEkya0JLNVh6VFRGODRyTVNhZ1JR?=
+ =?utf-8?B?UmZQWUlNSEJFcStjaDY2N3o5aUg2SnFhQkxGckFuMy9pdmwxMlNGZ282V3Mr?=
+ =?utf-8?B?cFR5Z2VuZm1BamMvZlAwa3NITkZLSzd2SC9zcEJFbUlGVWdxZzFSODlKN01C?=
+ =?utf-8?B?aHg1MEdHRTBKcVAySFJWRWRRckk4bk9acUpYZHYzbGJTV1BRTlo5UVY3eDJJ?=
+ =?utf-8?B?WFRodlEzMGdUY09aejlWaHVTQUcwWklWTXJCVDRibUI1RW81WVJESXNINlhL?=
+ =?utf-8?B?d0t4YUhZYit3YVdRT1AwNXUxYnp0cVVrdGdKRHl6Q1dqYVc2dU43VEtGY25Y?=
+ =?utf-8?B?bC9PYXdxTW01a3kyMDBUbkVBWWpQcktLTmhZWmRranQweFM4QjU5MXBocHpP?=
+ =?utf-8?B?LzFhQlpka0hYSHA4STlUQ0pRb3BuK1daWWV3dVhsVjZpYUp4MHViVXdRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR01MB7170.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UG8rbG1hOFpXWnB3NmZuRk13K29IYmhrMUJ1RGRuWEFyMDRpWFhYcUsvc0Uw?=
+ =?utf-8?B?dEF6emNGakc4d3dqSXpwbFdsSi8xbVVXMmZsZ05qRUJkN0xITzN0SElpRWVV?=
+ =?utf-8?B?d0FGUHJMVk1ja3BpWnhSS0NhL3RmTXcyV0dqcjFxRlBiNGtSQjBtMDg2UlVJ?=
+ =?utf-8?B?UXZNdXUzSlNNUWc0Zk9BQVdkM3J6cnkxSGREd2piVnc3cnk4bGJSNXR6ekxl?=
+ =?utf-8?B?WWd2NjljTmFFdkR5QWc3RlovMGUzcjlBaDRwWFh0OXB1V05rS1kyd1pnWnZa?=
+ =?utf-8?B?TlVsU1NFakZYazd0QTZuMTY3d2VRbGppa3Z0SkhDN0NLQjIwczJmaHBmRnNJ?=
+ =?utf-8?B?L3d1MUFZMlZIdmdvUU5CaGFqaVB3YktWLzJJQTR1WWZRVFR2YUkyYlczYXlS?=
+ =?utf-8?B?YWVQU2VTM3MwUWluOHR6MkFOYkRnL3dDZVZNOE4vNUIzY0QyMmFRdFZIazVM?=
+ =?utf-8?B?WVVMOTQrMndhYU1vcjZFQ29sMnB6SmFHRHVpYjJPRmtpNWlZODZBWlNJaHVy?=
+ =?utf-8?B?bjhmdHUyRjh4L093WFNlanNmVmtJMUVwWDhacGF6OE9HQXNTTFRpL3M2WERZ?=
+ =?utf-8?B?SXFWRE5qaDBNUndiZVdxNXphYjNubFlJRVhtTkY5WTdnTHlJNHdkanhhdEVH?=
+ =?utf-8?B?bEptOWNpdXR3MDc1UGlHbXFyZGE2RzRWTGJIZTRKOUhiSEF5Q1M2OHY0MEo0?=
+ =?utf-8?B?S0JjbGxzaHpoSUZGUHdVeEhwVkh5VU5FUGV1WVM5UEp6MHgrWjZzTmV3YldV?=
+ =?utf-8?B?ejdLZVVMbVppeGZvK0NZZDQ2RXMwVUkyZTVkTjloeFJRM3B6M3ZkaGNjT212?=
+ =?utf-8?B?UEtrSU84QTY3ZkdEc3JIYk5iU2ZXNEdzWW1RQks0Uk9xZnlRdHBTanIxUHQy?=
+ =?utf-8?B?ekZvWHpIWDNuM29mYkRwVFhPK2gyTWVzdEtwbG1UT3BFbkh2bmI4VzNtK0lC?=
+ =?utf-8?B?SWVRU2JFQ3hsaktpRWdDUjd4cGVZV2x1U05vYUF4YlkzbkJUaGx2VTJMVE1T?=
+ =?utf-8?B?ZnJ2eEk2cGJaNEw4Vnh1QXZwMjRzbGJ2cFZFZnByaXJySEY4b3hoQVkxZ21p?=
+ =?utf-8?B?TWRmbUgyNkFuSkw5dEttVzRlZkJ4TnFYTCs5dy9yUTN6WTBjbkJzWXN0cFBU?=
+ =?utf-8?B?amtGT0RHU0N4dmtZM1pDSE9vazBESjVNeFEzNm9QSUthOUp3bytUMnBXRnBV?=
+ =?utf-8?B?Z1owcURNMFgvbSt6aVZUTFB4Q0xlckhaVnNwS05UZkg4a1dMdDZaVWZNdzFa?=
+ =?utf-8?B?YVlRSElUaldabjF6RzN5MlE1VU9Ta0FQSHJmVGRMcjRWcjZTbUNINWdpdk5P?=
+ =?utf-8?B?UEhyN3FSR1BTK01aanFCbFltRkhXV0g2T2J3dk5GQVY3czNvTmw2NmF5M0Mx?=
+ =?utf-8?B?VHJHZE9EZ0VIeEpJZlhkaUhkWmZmMWRENTBTTDRqZFFWSzhDY1JOd3h4MlRR?=
+ =?utf-8?B?WG1yRVltL0FFRytHcEVaNUx1SVZSbmEyOXpZdDRXWFg3YzlBdEl2Ylk1THhU?=
+ =?utf-8?B?WWtjZEpnMFl3MWZDeFNwRjUrY2tzeXp2akQ3dGZqNUwwa3A0MDA3cGNHMTc1?=
+ =?utf-8?B?N1diZzN2RHkybjkxclhnL20rVEdTMU1sSExNSjJlQnZEbGJnQ1IxUUJRWVAx?=
+ =?utf-8?B?RWZTOXZFOXZQeEg1RGtXNmI0aW9kZWEzdUcvbW11SG1adm9ObjlSNnpqZlc1?=
+ =?utf-8?B?a0NFL0hpTTRXRFl0VGp1bllyUCtoSkpLb2dma2tkRGh4VUpMcGcweUFlbHUw?=
+ =?utf-8?B?eUM0RlFCV3NxRXM5cDlWRjdsNG5HRVIrSmxyV1Q5SkFQNTNZNkp5MUI2YTcy?=
+ =?utf-8?B?eVg5L0tkWkVuTG5sQVlOcnQ5RTRWaWx6SE12MEZXc092ckI1RlRyckwzZXVZ?=
+ =?utf-8?B?T2FuaE85NFFEQS9OK1NzcU5EZ0FxbEszMjBxNGhqQjhvSThWWGtKUEs4bEJ4?=
+ =?utf-8?B?NHN3bjBKWGZ2USt2VG1sYU1zMFUrWURYdGRORlYvK2pyaWlJZkdSRWFWZzlo?=
+ =?utf-8?B?cHEyMHV2RU9KcUhxZXNFSnJ0RmN1TWdNU29ZSHZMK1RPUmE2Uk9rM3hvQjA2?=
+ =?utf-8?B?Z3BQWjZrbExWOEMwdE8wek92Ly8rNmdGT1ZOcTd4OEZ1UU5yNzRCNWhjejU2?=
+ =?utf-8?Q?tUU1NqsDE//1XLt0KIYnHCm9m?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e36062cd-3763-4841-867a-08dc7b2d44e2
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR01MB7170.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2024 13:35:54.0613
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h1JSMdG67wEAuLlG81e19epjux4NqSAzp15y7Z0BnIYX5CIgKt8CYZhRHVeLsr+S
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR01MB8038
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+On 5/22/2024 7:31 PM, Namjae Jeon wrote:
+> 2024년 5월 23일 (목) 오전 4:47, Tom Talpey <tom@talpey.com>님이 작성:
+>>
+>> On 5/22/2024 1:13 AM, Namjae Jeon wrote:
+>>> 2024년 5월 22일 (수) 오전 12:10, Tom Talpey <tom@talpey.com>님이 작성:
+>>>>
+>>>> On 5/21/2024 9:57 AM, Namjae Jeon wrote:
+>>>>> The expired durable opens should not be reclaimed by client.
+>>>>> This patch add ->durable_scavenger_timeout to fp and check it in
+>>>>> ksmbd_lookup_durable_fd().
+>>>>>
+>>>>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+>>>>> ---
+>>>>>     fs/smb/server/vfs_cache.c | 9 ++++++++-
+>>>>>     fs/smb/server/vfs_cache.h | 1 +
+>>>>>     2 files changed, 9 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+>>>>> index 6cb599cd287e..a6804545db28 100644
+>>>>> --- a/fs/smb/server/vfs_cache.c
+>>>>> +++ b/fs/smb/server/vfs_cache.c
+>>>>> @@ -476,7 +476,10 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id)
+>>>>>         struct ksmbd_file *fp;
+>>>>>
+>>>>>         fp = __ksmbd_lookup_fd(&global_ft, id);
+>>>>> -     if (fp && fp->conn) {
+>>>>> +     if (fp && (fp->conn ||
+>>>>> +                (fp->durable_scavenger_timeout &&
+>>>>> +                 (fp->durable_scavenger_timeout <
+>>>>> +                  jiffies_to_msecs(jiffies))))) {
+>>>>
+>>>> Do I understand correctly that this case means the fd is valid,
+>>>> and only the durable timeout has been exceeded?
+>>> Yes.
+>>>>
+>>>> If so, I believe it is overly strict behavior. MS-SMB2 specifically
+>>>> states that the timer is a lower bound:
+>>>>
+>>>>> 3.3.2.2 Durable Open Scavenger Timer This timer controls the amount
+>>>>> of time the server keeps a durable handle active after the
+>>>>> underlying transport connection to the client is lost.<210> The
+>>>>> server MUST keep the durable handle active for at least this amount
+>>>>> of time, except in the cases of an oplock break indicated by the
+>>>>> object store as specified in section 3.3.4.6, administrative actions,
+>>>>> or resource constraints.
+>>>> What defect does this patch fix?
+>>> Durable open scavenger timer has not been added yet.
+>>> I will be adding this timer with this next patch. Nonetheless, this
+>>> patch is needed.
+>>> i.e. we need both ones.
+>>
+>> So this code has no effect until then? And presumably, the scavenger
+>> will be closing the fd, so it won't have any effect later, either.
+> Not at all. We can first take steps to prevent the timeout of durable v2
+> open from being used. There is absolutely no harm in this.
 
-------------------
+I disagree with "no harm".
 
-From: David Howells <dhowells@redhat.com>
+As I said, the new behavior is more strict than MS-SMB2, and therefore
+also stricter than Windows behavior.
 
-[ Upstream commit afc23febd51c7e24361e3a9c09f3e892eb0a41ea ]
+Additionally, in the absence of a yet-to-be-written scavenger, this
+means that fd's will remain cached and unclosed by ksmbd. The client,
+in turn, will reopen the file, which seems like a source of sharing
+violations, which become unrecallable in fact.
 
-Add tracing for the refcounting/lifecycle of the cifs_tcon struct, marking
-different events with different labels and giving each tcon its own debug
-ID so that the tracelines corresponding to individual tcons can be
-distinguished.  This can be enabled with:
+Finally, from a code standpoint, I still don't see why it's being
+added before the scavenger functionality is even ready to review.
 
-	echo 1 >/sys/kernel/debug/tracing/events/cifs/smb3_tcon_ref/enable
+Tom.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifsfs.c        |  2 +
- fs/smb/client/cifsglob.h      |  1 +
- fs/smb/client/cifsproto.h     |  9 ++--
- fs/smb/client/connect.c       | 21 ++++----
- fs/smb/client/fscache.c       |  7 +++
- fs/smb/client/misc.c          | 10 ++--
- fs/smb/client/smb2misc.c      | 10 ++--
- fs/smb/client/smb2ops.c       |  7 ++-
- fs/smb/client/smb2pdu.c       |  8 +--
- fs/smb/client/smb2transport.c |  2 +
- fs/smb/client/trace.h         | 92 ++++++++++++++++++++++++++++++++++-
- 11 files changed, 143 insertions(+), 26 deletions(-)
-
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 539ac9774de1b..f1dcb86ab9894 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -739,6 +739,8 @@ static void cifs_umount_begin(struct super_block *sb)
- 
- 	spin_lock(&cifs_tcp_ses_lock);
- 	spin_lock(&tcon->tc_lock);
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_see_umount);
- 	if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
- 		/* we have other mounts to same share or we have
- 		   already tried to umount this and woken up
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 9597887280ff3..c146f83eba9b4 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1190,6 +1190,7 @@ struct cifs_fattr {
-  */
- struct cifs_tcon {
- 	struct list_head tcon_list;
-+	int debug_id;		/* Debugging for tracing */
- 	int tc_count;
- 	struct list_head rlist; /* reconnect list */
- 	spinlock_t tc_lock;  /* protect anything here that is not protected */
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 8e0a348f1f660..fbc358c09da3b 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -303,7 +303,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 		     struct TCP_Server_Info *primary_server);
- extern void cifs_put_tcp_session(struct TCP_Server_Info *server,
- 				 int from_reconnect);
--extern void cifs_put_tcon(struct cifs_tcon *tcon);
-+extern void cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
- 
- extern void cifs_release_automount_timer(void);
- 
-@@ -530,8 +530,9 @@ extern int CIFSSMBLogoff(const unsigned int xid, struct cifs_ses *ses);
- 
- extern struct cifs_ses *sesInfoAlloc(void);
- extern void sesInfoFree(struct cifs_ses *);
--extern struct cifs_tcon *tcon_info_alloc(bool dir_leases_enabled);
--extern void tconInfoFree(struct cifs_tcon *);
-+extern struct cifs_tcon *tcon_info_alloc(bool dir_leases_enabled,
-+					 enum smb3_tcon_ref_trace trace);
-+extern void tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
- 
- extern int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 		   __u32 *pexpected_response_sequence_number);
-@@ -721,8 +722,6 @@ static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
- 		return options;
- }
- 
--struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon);
--void cifs_put_tcon_super(struct super_block *sb);
- int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry);
- 
- /* Put references of @ses and its children */
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 4e35970681bf0..7a16e12f5da87 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1943,7 +1943,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	}
- 
- 	/* no need to setup directory caching on IPC share, so pass in false */
--	tcon = tcon_info_alloc(false);
-+	tcon = tcon_info_alloc(false, netfs_trace_tcon_ref_new_ipc);
- 	if (tcon == NULL)
- 		return -ENOMEM;
- 
-@@ -1960,7 +1960,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 
- 	if (rc) {
- 		cifs_server_dbg(VFS, "failed to connect to IPC (rc=%d)\n", rc);
--		tconInfoFree(tcon);
-+		tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc_fail);
- 		goto out;
- 	}
- 
-@@ -2043,7 +2043,7 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
- 	 * files on session close, as specified in MS-SMB2 3.3.5.6 Receiving an
- 	 * SMB2 LOGOFF Request.
- 	 */
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc);
- 	if (do_logoff) {
- 		xid = get_xid();
- 		rc = server->ops->logoff(xid, ses);
-@@ -2432,6 +2432,8 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 			continue;
- 		}
- 		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_find);
- 		spin_unlock(&tcon->tc_lock);
- 		spin_unlock(&cifs_tcp_ses_lock);
- 		return tcon;
-@@ -2441,7 +2443,7 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- }
- 
- void
--cifs_put_tcon(struct cifs_tcon *tcon)
-+cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- {
- 	unsigned int xid;
- 	struct cifs_ses *ses;
-@@ -2457,6 +2459,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
- 	spin_lock(&cifs_tcp_ses_lock);
- 	spin_lock(&tcon->tc_lock);
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count - 1, trace);
- 	if (--tcon->tc_count > 0) {
- 		spin_unlock(&tcon->tc_lock);
- 		spin_unlock(&cifs_tcp_ses_lock);
-@@ -2493,7 +2496,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	_free_xid(xid);
- 
- 	cifs_fscache_release_super_cookie(tcon);
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free);
- 	cifs_put_smb_ses(ses);
- }
- 
-@@ -2547,7 +2550,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 		nohandlecache = ctx->nohandlecache;
- 	else
- 		nohandlecache = true;
--	tcon = tcon_info_alloc(!nohandlecache);
-+	tcon = tcon_info_alloc(!nohandlecache, netfs_trace_tcon_ref_new);
- 	if (tcon == NULL) {
- 		rc = -ENOMEM;
- 		goto out_fail;
-@@ -2737,7 +2740,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	return tcon;
- 
- out_fail:
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_fail);
- 	return ERR_PTR(rc);
- }
- 
-@@ -2754,7 +2757,7 @@ cifs_put_tlink(struct tcon_link *tlink)
- 	}
- 
- 	if (!IS_ERR(tlink_tcon(tlink)))
--		cifs_put_tcon(tlink_tcon(tlink));
-+		cifs_put_tcon(tlink_tcon(tlink), netfs_trace_tcon_ref_put_tlink);
- 	kfree(tlink);
- }
- 
-@@ -3319,7 +3322,7 @@ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx)
- 	int rc = 0;
- 
- 	if (mnt_ctx->tcon)
--		cifs_put_tcon(mnt_ctx->tcon);
-+		cifs_put_tcon(mnt_ctx->tcon, netfs_trace_tcon_ref_put_mnt_ctx);
- 	else if (mnt_ctx->ses)
- 		cifs_put_smb_ses(mnt_ctx->ses);
- 	else if (mnt_ctx->server)
-diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index ecabc4b400535..98c5eebdc7b2f 100644
---- a/fs/smb/client/fscache.c
-+++ b/fs/smb/client/fscache.c
-@@ -94,6 +94,11 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 		}
- 		pr_err("Cache volume key already in use (%s)\n", key);
- 		vcookie = NULL;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_fscache_collision);
-+	} else {
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_fscache_okay);
- 	}
- 
- 	tcon->fscache = vcookie;
-@@ -115,6 +120,8 @@ void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon)
- 	cifs_fscache_fill_volume_coherency(tcon, &cd);
- 	fscache_relinquish_volume(tcon->fscache, &cd, false);
- 	tcon->fscache = NULL;
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_see_fscache_relinq);
- }
- 
- void cifs_fscache_get_inode_cookie(struct inode *inode)
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index ad44f8d66b377..07c468ddb88a8 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -111,9 +111,10 @@ sesInfoFree(struct cifs_ses *buf_to_free)
- }
- 
- struct cifs_tcon *
--tcon_info_alloc(bool dir_leases_enabled)
-+tcon_info_alloc(bool dir_leases_enabled, enum smb3_tcon_ref_trace trace)
- {
- 	struct cifs_tcon *ret_buf;
-+	static atomic_t tcon_debug_id;
- 
- 	ret_buf = kzalloc(sizeof(*ret_buf), GFP_KERNEL);
- 	if (!ret_buf)
-@@ -130,7 +131,8 @@ tcon_info_alloc(bool dir_leases_enabled)
- 
- 	atomic_inc(&tconInfoAllocCount);
- 	ret_buf->status = TID_NEW;
--	++ret_buf->tc_count;
-+	ret_buf->debug_id = atomic_inc_return(&tcon_debug_id);
-+	ret_buf->tc_count = 1;
- 	spin_lock_init(&ret_buf->tc_lock);
- 	INIT_LIST_HEAD(&ret_buf->openFileList);
- 	INIT_LIST_HEAD(&ret_buf->tcon_list);
-@@ -142,17 +144,19 @@ tcon_info_alloc(bool dir_leases_enabled)
- #ifdef CONFIG_CIFS_FSCACHE
- 	mutex_init(&ret_buf->fscache_lock);
- #endif
-+	trace_smb3_tcon_ref(ret_buf->debug_id, ret_buf->tc_count, trace);
- 
- 	return ret_buf;
- }
- 
- void
--tconInfoFree(struct cifs_tcon *tcon)
-+tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- {
- 	if (tcon == NULL) {
- 		cifs_dbg(FYI, "Null buffer passed to tconInfoFree\n");
- 		return;
- 	}
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count, trace);
- 	free_cached_dirs(tcon->cfids);
- 	atomic_dec(&tconInfoAllocCount);
- 	kfree(tcon->nativeFileSystem);
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index cc72be5a93a93..677ef6f99a5be 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -767,7 +767,7 @@ smb2_cancelled_close_fid(struct work_struct *work)
- 	if (rc)
- 		cifs_tcon_dbg(VFS, "Close cancelled mid failed rc:%d\n", rc);
- 
--	cifs_put_tcon(tcon);
-+	cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_close_fid);
- 	kfree(cancelled);
- }
- 
-@@ -811,6 +811,8 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 	if (tcon->tc_count <= 0) {
- 		struct TCP_Server_Info *server = NULL;
- 
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_cancelled_close);
- 		WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative");
- 		spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -823,12 +825,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 		return 0;
- 	}
- 	tcon->tc_count++;
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_get_cancelled_close);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	rc = __smb2_handle_cancelled_cmd(tcon, SMB2_CLOSE_HE, 0,
- 					 persistent_fid, volatile_fid);
- 	if (rc)
--		cifs_put_tcon(tcon);
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_close);
- 
- 	return rc;
- }
-@@ -856,7 +860,7 @@ smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *serve
- 					 rsp->PersistentFileId,
- 					 rsp->VolatileFileId);
- 	if (rc)
--		cifs_put_tcon(tcon);
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_mid);
- 
- 	return rc;
- }
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index df6c6d31236ad..66cfce456263b 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2915,8 +2915,11 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 		tcon = list_first_entry_or_null(&ses->tcon_list,
- 						struct cifs_tcon,
- 						tcon_list);
--		if (tcon)
-+		if (tcon) {
- 			tcon->tc_count++;
-+			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+					    netfs_trace_tcon_ref_get_dfs_refer);
-+		}
- 		spin_unlock(&cifs_tcp_ses_lock);
- 	}
- 
-@@ -2980,6 +2983,8 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 		/* ipc tcons are not refcounted */
- 		spin_lock(&cifs_tcp_ses_lock);
- 		tcon->tc_count--;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_dec_dfs_refer);
- 		/* tc_count can never go negative */
- 		WARN_ON(tcon->tc_count < 0);
- 		spin_unlock(&cifs_tcp_ses_lock);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 86c647a947ccd..a5efce03cb58e 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4138,6 +4138,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 			if (tcon->need_reconnect || tcon->need_reopen_files) {
- 				tcon->tc_count++;
-+				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+						    netfs_trace_tcon_ref_get_reconnect_server);
- 				list_add_tail(&tcon->rlist, &tmp_list);
- 				tcon_selected = true;
- 			}
-@@ -4176,14 +4178,14 @@ void smb2_reconnect_server(struct work_struct *work)
- 		if (tcon->ipc)
- 			cifs_put_smb_ses(tcon->ses);
- 		else
--			cifs_put_tcon(tcon);
-+			cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_reconnect_server);
- 	}
- 
- 	if (!ses_exist)
- 		goto done;
- 
- 	/* allocate a dummy tcon struct used for reconnect */
--	tcon = tcon_info_alloc(false);
-+	tcon = tcon_info_alloc(false, netfs_trace_tcon_ref_new_reconnect_server);
- 	if (!tcon) {
- 		resched = true;
- 		list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
-@@ -4206,7 +4208,7 @@ void smb2_reconnect_server(struct work_struct *work)
- 		list_del_init(&ses->rlist);
- 		cifs_put_smb_ses(ses);
- 	}
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_reconnect_server);
- 
- done:
- 	cifs_dbg(FYI, "Reconnecting tcons and channels finished\n");
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 5a3ca62d2f07f..8f346aafc4cf8 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -189,6 +189,8 @@ smb2_find_smb_sess_tcon_unlocked(struct cifs_ses *ses, __u32  tid)
- 		if (tcon->tid != tid)
- 			continue;
- 		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_find_sess_tcon);
- 		return tcon;
- 	}
- 
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 5e83cb9da9028..604e52876cd2d 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -3,6 +3,9 @@
-  *   Copyright (C) 2018, Microsoft Corporation.
-  *
-  *   Author(s): Steve French <stfrench@microsoft.com>
-+ *
-+ * Please use this 3-part article as a reference for writing new tracepoints:
-+ * https://lwn.net/Articles/379903/
-  */
- #undef TRACE_SYSTEM
- #define TRACE_SYSTEM cifs
-@@ -15,9 +18,70 @@
- #include <linux/inet.h>
- 
- /*
-- * Please use this 3-part article as a reference for writing new tracepoints:
-- * https://lwn.net/Articles/379903/
-+ * Specify enums for tracing information.
-+ */
-+#define smb3_tcon_ref_traces					      \
-+	EM(netfs_trace_tcon_ref_dec_dfs_refer,		"DEC DfsRef") \
-+	EM(netfs_trace_tcon_ref_free,			"FRE       ") \
-+	EM(netfs_trace_tcon_ref_free_fail,		"FRE Fail  ") \
-+	EM(netfs_trace_tcon_ref_free_ipc,		"FRE Ipc   ") \
-+	EM(netfs_trace_tcon_ref_free_ipc_fail,		"FRE Ipc-F ") \
-+	EM(netfs_trace_tcon_ref_free_reconnect_server,	"FRE Reconn") \
-+	EM(netfs_trace_tcon_ref_get_cancelled_close,	"GET Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_get_dfs_refer,		"GET DfsRef") \
-+	EM(netfs_trace_tcon_ref_get_find,		"GET Find  ") \
-+	EM(netfs_trace_tcon_ref_get_find_sess_tcon,	"GET FndSes") \
-+	EM(netfs_trace_tcon_ref_get_reconnect_server,	"GET Reconn") \
-+	EM(netfs_trace_tcon_ref_new,			"NEW       ") \
-+	EM(netfs_trace_tcon_ref_new_ipc,		"NEW Ipc   ") \
-+	EM(netfs_trace_tcon_ref_new_reconnect_server,	"NEW Reconn") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_close,	"PUT Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
-+	EM(netfs_trace_tcon_ref_put_mnt_ctx,		"PUT MntCtx") \
-+	EM(netfs_trace_tcon_ref_put_reconnect_server,	"PUT Reconn") \
-+	EM(netfs_trace_tcon_ref_put_tlink,		"PUT Tlink ") \
-+	EM(netfs_trace_tcon_ref_see_cancelled_close,	"SEE Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_see_fscache_collision,	"SEE FV-CO!") \
-+	EM(netfs_trace_tcon_ref_see_fscache_okay,	"SEE FV-Ok ") \
-+	EM(netfs_trace_tcon_ref_see_fscache_relinq,	"SEE FV-Rlq") \
-+	E_(netfs_trace_tcon_ref_see_umount,		"SEE Umount")
-+
-+#undef EM
-+#undef E_
-+
-+/*
-+ * Define those tracing enums.
-+ */
-+#ifndef __SMB3_DECLARE_TRACE_ENUMS_ONCE_ONLY
-+#define __SMB3_DECLARE_TRACE_ENUMS_ONCE_ONLY
-+
-+#define EM(a, b) a,
-+#define E_(a, b) a
-+
-+enum smb3_tcon_ref_trace { smb3_tcon_ref_traces } __mode(byte);
-+
-+#undef EM
-+#undef E_
-+#endif
-+
-+/*
-+ * Export enum symbols via userspace.
-+ */
-+#define EM(a, b) TRACE_DEFINE_ENUM(a);
-+#define E_(a, b) TRACE_DEFINE_ENUM(a);
-+
-+smb3_tcon_ref_traces;
-+
-+#undef EM
-+#undef E_
-+
-+/*
-+ * Now redefine the EM() and E_() macros to map the enums to the strings that
-+ * will be printed in the output.
-  */
-+#define EM(a, b)	{ a, b },
-+#define E_(a, b)	{ a, b }
- 
- /* For logging errors in read or write */
- DECLARE_EVENT_CLASS(smb3_rw_err_class,
-@@ -1125,6 +1189,30 @@ DEFINE_SMB3_CREDIT_EVENT(waitff_credits);
- DEFINE_SMB3_CREDIT_EVENT(overflow_credits);
- DEFINE_SMB3_CREDIT_EVENT(set_credits);
- 
-+
-+TRACE_EVENT(smb3_tcon_ref,
-+	    TP_PROTO(unsigned int tcon_debug_id, int ref,
-+		     enum smb3_tcon_ref_trace trace),
-+	    TP_ARGS(tcon_debug_id, ref, trace),
-+	    TP_STRUCT__entry(
-+		    __field(unsigned int,		tcon)
-+		    __field(int,			ref)
-+		    __field(enum smb3_tcon_ref_trace,	trace)
-+			     ),
-+	    TP_fast_assign(
-+		    __entry->tcon	= tcon_debug_id;
-+		    __entry->ref	= ref;
-+		    __entry->trace	= trace;
-+			   ),
-+	    TP_printk("TC=%08x %s r=%u",
-+		      __entry->tcon,
-+		      __print_symbolic(__entry->trace, smb3_tcon_ref_traces),
-+		      __entry->ref)
-+	    );
-+
-+
-+#undef EM
-+#undef E_
- #endif /* _CIFS_TRACE_H */
- 
- #undef TRACE_INCLUDE_PATH
--- 
-2.43.0
-
-
-
+> Thanks.
+>>
+>> The patch should not be applied at this time, and the full change
+>> should be reviewed when it's ready.
+>>
+>> Tom.
+>>
+>>> Thanks!
+>>>>
+>>>> Tom.
+>>>>
+>>>>
+>>>>>                 ksmbd_put_durable_fd(fp);
+>>>>>                 fp = NULL;
+>>>>>         }
+>>>>> @@ -717,6 +720,10 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
+>>>>>         fp->tcon = NULL;
+>>>>>         fp->volatile_id = KSMBD_NO_FID;
+>>>>>
+>>>>> +     if (fp->durable_timeout)
+>>>>> +             fp->durable_scavenger_timeout =
+>>>>> +                     jiffies_to_msecs(jiffies) + fp->durable_timeout;
+>>>>> +
+>>>>>         return true;
+>>>>>     }
+>>>>>
+>>>>> diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
+>>>>> index 5a225e7055f1..f2ab1514e81a 100644
+>>>>> --- a/fs/smb/server/vfs_cache.h
+>>>>> +++ b/fs/smb/server/vfs_cache.h
+>>>>> @@ -101,6 +101,7 @@ struct ksmbd_file {
+>>>>>         struct list_head                lock_list;
+>>>>>
+>>>>>         int                             durable_timeout;
+>>>>> +     int                             durable_scavenger_timeout;
+>>>>>
+>>>>>         /* if ls is happening on directory, below is valid*/
+>>>>>         struct ksmbd_readdir_data       readdir_data;
+>>>
+> 
