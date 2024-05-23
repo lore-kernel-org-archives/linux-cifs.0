@@ -1,193 +1,244 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2130.outbound.protection.outlook.com [40.107.92.130])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E19B645;
-	Thu, 23 May 2024 15:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.130
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476450; cv=fail; b=AFmgp9ZaOxtxZI4GD9gbQ5x9CCEGCgVbOBH8/kpaThsa/gHQptjowLPs590/p5R7xbh19KYmCC4AU5Wxuk/x1pWKZpYFszayjmzZdzOnTkI6ZfZ3jeq2lEGCGcP+dyibcIgkAS7bow28HHlbq8v+oVfuzhj5rszXzruf4KbdiJU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476450; c=relaxed/simple;
-	bh=scs7kERhFIvKyKTZj/mmkY4UBNau8RrNbyOCZDQkeWU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GfaY2E33WtLyZGkv1A5e8En661Mvx00CQ4HxGcfSLINb0prXRRZ9AWjC/TUnBxaPjgT/jyOtVQkT0xpd+5l/HpAVVCntIqMoH5Buzq8JXRq96NIHnaPJEkprJKteSwnBMEBgeVQpwL1sLSAbBGJa0vyhjoHcmZr5/014iCrVwCE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.92.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JKIgPMo8fY4rBziWKmAsxbwAb/adU4KXD9U9HbcLJxBKfcpnGq52csvq4X/wlkPHvuTWvMBwrm1DbGqVCVUlqeLgg1uDa3ceLbfhTqL9sX1DqOdIgB8cM4ocxohl8yfHYfVUMjQ71lohi0/3/7uIuLbDEqUOQ8vQcoSjqhbwaJxiE8g9gFrBWWztUj0Bc90B0w15jz8UDVjaEdWWUEDawru/D2FztQxEJF3RoA83woCwYeE/Z/PGOD9N4G9vtsFqItmoIcSxokPOdh+FUHe/35/aPanxsJkHjEBw+EsQIn5KiUoxKo6pEN/qNkjxzBLP8IdvKUp8FWChBfa3Siis0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lTxQSjTX2oirq1SG4X9otd894ft78cRklL/6OlMCAUQ=;
- b=Xcfqr9LkcG56DVRHsLBjuvGrc2WEJO+coyJEbQaa8UK6l+yeR1cgHX1SrZjHOZMAyRhLBJrFqWfaw1F94OZ+0Z3/LvWu/auQYp+8g4sa10ZTZlSoYiY5ytzddZcmYpWF/n3NYOzmxg5oGrs8UoJ8TG206/ybSa74av6HdWtKLGI7cuNi4+uU8zfVcdXG3ZJU3x/QUU0ZB+dsYdWTJfr3csTvbfuhEsXi1HEsrlpveP09iZigt3kx1Xu44MeB/IUtk59ELHJSILzZ2X/VeO8mo4Ad6wVBegvQ6e3vg24DOEYVvMlMiuxTbB3ibBgbSieOp/2e8BhikM/ODqUw7qnlTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from CH0PR01MB7170.prod.exchangelabs.com (2603:10b6:610:f8::12) by
- DM4PR01MB7548.prod.exchangelabs.com (2603:10b6:8:5f::17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7587.35; Thu, 23 May 2024 15:00:43 +0000
-Received: from CH0PR01MB7170.prod.exchangelabs.com
- ([fe80::97c:561d:465f:8511]) by CH0PR01MB7170.prod.exchangelabs.com
- ([fe80::97c:561d:465f:8511%4]) with mapi id 15.20.7611.016; Thu, 23 May 2024
- 15:00:43 +0000
-Message-ID: <28473e0b-bc3e-410a-a502-184595ae6f6c@talpey.com>
-Date: Thu, 23 May 2024 11:00:40 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] cifs: Fix credit handling in cifs_io_subrequest
- cleanup
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <nspmangalore@gmail.com>,
- Rohith Surabattula <rohiths.msft@gmail.com>, Jeff Layton
- <jlayton@kernel.org>, linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <536b0f03-db96-49a3-93de-d9ea835e8785@talpey.com>
- <469451.1716418742@warthog.procyon.org.uk>
- <581217.1716475935@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Tom Talpey <tom@talpey.com>
-In-Reply-To: <581217.1716475935@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BLAPR03CA0162.namprd03.prod.outlook.com
- (2603:10b6:208:32f::22) To CH0PR01MB7170.prod.exchangelabs.com
- (2603:10b6:610:f8::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D1F107B3
+	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 15:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716477962; cv=none; b=eeIX4kzwg6qOyOhjl/M98HCE9/Jgbr8YIS7Zt2yQLbyesg+lXZICLxP9StmMblAx6CqYwOiltRho9ICWeoob+Q8iUUqL9ZW/KUjrqvLWqaQ5eYn+jv9ZWYwMO6lqDEI8QdEJw0BpmJyzqnimL+DlcELzADboDHPjBcQKEqWyaxI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716477962; c=relaxed/simple;
+	bh=l2GJNPvnOuBY0p+8cAyKo5yFrNiYcC1jXCZMzu2RQfI=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=M+Pyb2+7iwILuIq8KYdCOxG/uQKBAJ5bW3G17k7k7ont1opGtcq5d2oH97gRjmcctD/Y2fufeNEE2H6uX7VZz00abPHVoy5Kwh/NaTL/nayXIsMsSGam9PoUGhRsTbiul3dyRdkRdyx3z3bsOiIcqAH7fVWKGj5Ffbj6wZDnbVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QB8/88LK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QB8/88LK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716477959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sevltQuqimnyvzsibw9S0f0mhjPzGyH5ydA1n7QiXJA=;
+	b=QB8/88LKjJmXhOt718A2lrdnZOvG4HV0au+jcHdEbp5jJt1jclbYsyd9ZEtgJrFCOouzhz
+	HPaxESHc4/uFAPGFQ1jNmTfPHMdwZ4mLR/Q5243AyFFzFyHzqAF4NyJ7CnTEIBXXyDn8At
+	Q2TuBfm16sbfSNJsooso0SNrL2cI3Qg=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-539-5DoKTXW-PvG1h34seVV_Mw-1; Thu,
+ 23 May 2024 11:25:56 -0400
+X-MC-Unique: 5DoKTXW-PvG1h34seVV_Mw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 34BA03C025B9;
+	Thu, 23 May 2024 15:25:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DCF3A7412;
+	Thu, 23 May 2024 15:25:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Dominique Martinet <asmadeus@codewreck.org>
+cc: dhowells@redhat.com,
+    syzbot+df038d463cca332e8414@syzkaller.appspotmail.com,
+    syzbot+d7c7a495a5e466c031b6@syzkaller.appspotmail.com,
+    syzbot+1527696d41a634cc1819@syzkaller.appspotmail.com,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Latchesar Ionkov <lucho@ionkov.net>,
+    Christian Schoenebeck <linux_oss@crudebyte.com>,
+    Jeff Layton <jlayton@kernel.org>, Steve French <sfrench@samba.org>,
+    Hillf Danton <hdanton@sina.com>,
+    Christian Brauner <brauner@kernel.org>, v9fs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH v2] netfs, 9p: Fix race between umount and async request completion 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR01MB7170:EE_|DM4PR01MB7548:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf2a413b-dd0c-4422-9ff3-08dc7b391e32
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|366007|376005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WFFEbVlvckl4SGhhZGx2QWJYdVFKVFA2TU54eGVpajRORzEreVVVUGREd2tm?=
- =?utf-8?B?M1hhQzVyYTZJMk1FOHpJNXdjUkNYZVJjNEJPZndhQ0RieVBjaExwdG1OWlVD?=
- =?utf-8?B?Q0x6ZXRQMjNUSmhDZWFDbjY4MGVXVTNmYjlDdUJZYTYwMlBWNHFnOXhvTEM2?=
- =?utf-8?B?NFMxMW5uUVM3aCtScWVvdkpjUnFLT2JNdjJFazFwdFFkNDVBa1ZRYXJYd2lY?=
- =?utf-8?B?K0YxUTF4bnIycCt1Uy9wL0VHL1M0T3NjMVJIcWN5RFBZOEhTb1RWUWwydEhQ?=
- =?utf-8?B?WkhTRzBaVDR3cXBjUkl1S05QVG95K0VhaXR2Ri9YOFU2d2h2WU12WUtKdjZ6?=
- =?utf-8?B?WXNxZ3FoVWg2bENTMFhGZmRwbVEyVzhRVWphNmVQeG1pYXdDbHZaSm8yd255?=
- =?utf-8?B?b24xY0ZHYWVVcEhFTGNZNmNabjcwRkVhZGNEWEl3emMyb00xZlI4WGxjK240?=
- =?utf-8?B?NW42c2FFblQ0Vk5wamRiQUduSmRlZk1JOCtFdkQ3RWRiNHkxc1VJc1NJTzhN?=
- =?utf-8?B?VTBBOFo0Y2tCTGZWUzRoM1k0NEJIWHF5dHV5KzMxcDlKY3p2QTIybXFaNEMy?=
- =?utf-8?B?dEdVR0gyYitjaXRIR2FSOWlLbGUrQThSSDFXbG11amNBVzBUcHJoNGhiQ29W?=
- =?utf-8?B?Tzk5b1ZwWFkxeTVLZFhwdFk4Y2NNR0kweXZ1L2RPRTcvYithQVI1TFYwcVh6?=
- =?utf-8?B?bG9HNlA1Y0xZWm9Bd0JkL1pjYnpoWm5CRGFFQXZ3QnFFM3drbTJvWDQrS1NQ?=
- =?utf-8?B?Wkl3ckxoc0pBUVJDai8xRWl6WnFBODVueHRLamJGc0FXOFoxLzljUkxvR1hG?=
- =?utf-8?B?aDJZQ0VjaGh3WEtzWUU0OE4yQXpVdnZFV2p6bXlDMGlJNnFyRFZaMnFXVGFp?=
- =?utf-8?B?aWlmSjRCUEhzT1c4eEtQMjVXQ3ZDdU1UY1hVMzNoZ1E5b2VGVW91cEZaYU9q?=
- =?utf-8?B?R25nTm5NYjhuVk16VzBhS0l1VXpLUWQwYlhJdEt4ZmNYcnFIeUFmOGFVbkxn?=
- =?utf-8?B?VVZLUjlBYjk4VVdSazQ2ejREU3A4UTh3dnBWOVV5b1BXMVYyRG1QZVU5RUpa?=
- =?utf-8?B?cXFtb1hZL01PRysrOU5vakpzQlZ0ekY4OFRjQy9RdmJ1M3p0NkdMVUVOTmgy?=
- =?utf-8?B?L1lmMlZwS1BTWjk3dHVBYlBmclk4d3VBRVhzQXRkeGxpWlN5VG1jbm1URm5i?=
- =?utf-8?B?bGdsbzNrOUhyNmpwZmFlU2dlS2dPcEV5ZmFZZ3FrNllNTlIza3g4VWRremoy?=
- =?utf-8?B?QWZOVFB2TXBNNVZZWjFoamJvZTJwUjY4WFJvZnFRQVZ4c2x2TmRxa0k4VTdq?=
- =?utf-8?B?SWYzczBhTFVNbGxhSi80RVVVeHdHa20wdm9mV0QyUS8xdUNCc3Y3MzBpb05u?=
- =?utf-8?B?a2Z3RWc0aGZISjVnZEVWeXptWmdtbGtDSXhodC9ZbFFVNm11VFY3c0hiclFz?=
- =?utf-8?B?TGo3UTZlODYrKytlbTQ5MHZ2M1Q3Zm5RYVJ6RXNjd1FzNEZRVU0zckZxMzA0?=
- =?utf-8?B?Yk5EblpvTzJiOEM4NXNWM0RoKzE3WVExb3JPekRmR2FXK0xVTXAyc0J6ekZi?=
- =?utf-8?B?NTJ4bkhkbTNqQVFaREZ6QllZWFVQRWp0Y1pCSXRKc3l6MUIzaXA0ZE5ReWRD?=
- =?utf-8?B?WnJwRTcwdFF0VVkweTRpU1dqVmlUWlExNk5uL2UyeUNveUFyM1cyUWZOc3Nz?=
- =?utf-8?B?cVIwQ1c1QkxPTnUyZmRiSzBVR0xWNmxHSTUvLzVwR0dnUzhjTUNEUDlBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR01MB7170.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(376005)(1800799015);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TGZrc1RHcHpPWmh3VlpsaDFxYWVYaEVtZ2VrNEF1ZWFDbUxnc1ZuTmhLN1px?=
- =?utf-8?B?VnhRZXNJYWttNWdiTmNSNlQ0TCt3UnEybVJwMWJFcDZ2TG5BTm5UaDBDQklz?=
- =?utf-8?B?VGhVMzhTZGppam40c0N0UGcwaHpSSlkvekJ5eGNhWFJETnZVd01PVGlWdm1y?=
- =?utf-8?B?NktyRzZNVUpwZHE3dHhDbDN0N1hkVnlvZW8zbVZnVjkvb0NJYVR4UXVxR3lC?=
- =?utf-8?B?SmRicW1GVmU5bVpTc0NGbDZFWVZoK1MxVmd1cXMweDcvNlh2SU51eXlKZC8z?=
- =?utf-8?B?WnZsK3JjYU1UeDdReUVmYVl2L09jaUVzTmVmN29MM00yUXM1dWZMeXd2bG05?=
- =?utf-8?B?WDRhYmNNWkQ4OGhFU2F6T2h5bDU2UUplY1FieDVQUTA0Ymx4UVlPcExyMjVl?=
- =?utf-8?B?VDJSeThKa0luR0I0MzVsM2JOeHlzNjdSNjdVN1RtUHpWbk5wRDNnRTNvbXBE?=
- =?utf-8?B?MnNhNXRBOUVvZ1BUQnhHT1hiblIyQkpRV3QxdVA3Ym1hY0ZGdUJxdEtHazB0?=
- =?utf-8?B?Q3NOaHlndENveHpKMjFaa2x2NkhmMTdHd3hab3U4STlnd0piQVBGaTNZM2Mw?=
- =?utf-8?B?S0FtTXFiSDZFK3lhUFBRRlMxUGRYM3EydVhoaWtCYjZ0c3ZJbFd2M01Scy9S?=
- =?utf-8?B?cE9rSFRJQklnRWNhVFU2ZUxuaDN3QjdneS9QQVJZenZYcWFLU1l5Yy96L0VM?=
- =?utf-8?B?SnJJS2ZzWk83UXBvZFBKNjc2WVlUWDhnMks3cldBQURacmVodzJUdm5wbTVw?=
- =?utf-8?B?cTlQcVR0SGkxRmowdlFmbDBQZjUvSXdKT1lNdWxxSHpDZGtLUnI1cUJKakdU?=
- =?utf-8?B?QXhsL0c1VGJlY29jM0tGalpVK1FEVWVSL2dGZ2ozRWdMU3lFUVZFMmIwcXlL?=
- =?utf-8?B?dVVnZTd4QlZmOVRGcmxDdnlFSEdaYXllUVZwR3ZGdk1ZTDk1MVYrQ21IVERV?=
- =?utf-8?B?cjdnbVBhTUVpNEVIRlRsUUhSUmp4bGwrN3pUUDhBR3NONDd1MTIveUdkY29a?=
- =?utf-8?B?NlVQOUNsSUdlVG84RzdzUXVxMTdKNTJaK0dieXZDdDhqNmgzcGFCY01GQlpp?=
- =?utf-8?B?bklVTktpcFpuK3paL3FvZGduMWdNdlNLR3pPWHhlNTBNeElrd1M2QjFRTklt?=
- =?utf-8?B?L1R6Tm0wU05OOHo1SDgxdndpa2I5KzF6TU9DYUNjc0dDcUg3QklZaUpNMXhT?=
- =?utf-8?B?dzc1UWxmVThxTFBaeFdWZWNpQzR5ZEhsazJheUdwUVltSkI4UEkwRU0xOGFB?=
- =?utf-8?B?bFJWcDZvZExkYUI5S3ptTmRNaEFmQitsYjdPNWpveVNKUVBwZVFsUHZmNVVu?=
- =?utf-8?B?aVBDQms5bmJyVGdBYlVEdXNCVTNhdW8xK3pmbUpNUWVkWGt2UENBVkxJN25P?=
- =?utf-8?B?ZHpqckZCRjd6ck5xYXR2QlJ5Z2N4eVA1d2FvNGg4SGJvT3JLZWtGeG1OTWdU?=
- =?utf-8?B?QkYyYVU1Y0N2TTlzM3B1b3FaNkZ1Q0U2UVplUzJwcjlhak1hWDFsQkxhU3B6?=
- =?utf-8?B?d0dpMS8wekFVUXhqUlhrMWgxNWZlNzhOK1NxRHNSU09Fd2NvU1BQNXNBYlVF?=
- =?utf-8?B?czBhN1BCRUN0ZmZpN0tBVmF4SjdIc0JPL2RSMEtQdmlVUG53dGxuS0JTaWVo?=
- =?utf-8?B?V2luY05DVVJoZDFrNHBMWHlJZnhmYXo1Y045Z0tYVGU5Qk1hT2NZS3F1ZG5J?=
- =?utf-8?B?QWhKMjdiK1krMU5qL3daNlN2VFgyTi9lcFprbVBvaWJmQ3YwUUR3ckNMTGR5?=
- =?utf-8?B?Y2tSRW1oTXE3R2R5eFdLSTlwcCtKaDRRYXJGc2U4RDlqRWFLcWhxTmFBZDUv?=
- =?utf-8?B?bVFHbm8xcW5zR3RtQ1BzL0l4MTRuZTRZRmlSNkV5dkg4aHpRL2tpalV1NnNE?=
- =?utf-8?B?b0FvV0hhQ3R4Zm5jMEpJM0toeTNzOVdpN001N0crMy9ySjkveVZQR1dBV09Z?=
- =?utf-8?B?WFNPYnZXV0ptb1NSUlp2U2NoQndTTEpUR1VVMFNBUVZLcVRBV3pTRUVndGhU?=
- =?utf-8?B?d3pxZ204OWJ2WEdmdzFpOG1pZ2xzekE5Y3JZbWp0UFNNZnZKSm5xZUhqcnJh?=
- =?utf-8?B?ZzZsUm9wWGkyWDY4MUhaMVZvYk9zWHJTTjJTY3V0cVdJVitSZ2FkR3phQXBH?=
- =?utf-8?Q?MeQDBQYte9ZPzVWElQQ4PmaHG?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf2a413b-dd0c-4422-9ff3-08dc7b391e32
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR01MB7170.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2024 15:00:43.2584
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q0XQ4XQz2CzLP779s2Cg2L/cd5G4zDLNlyuWxj8nY8iDdvpTYDjW0ksinOD9MYmz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR01MB7548
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <582730.1716477949.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 May 2024 16:25:49 +0100
+Message-ID: <582731.1716477949@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On 5/23/2024 10:52 AM, David Howells wrote:
-> Tom Talpey <tom@talpey.com> wrote:
-> 
->>  From a protocol standpoint it's correct to reserve the credits while the
->> operation is in flight. But from a code standpoint it seems risky to
->> stop accounting for them. What if the operation is canceled, or times
->> out?
-> 
-> No idea, TBH - SMB credits wrangling isn't my area of expertise.  Note the
-> patch is superfluous as smb2_readv/writev_callback() clear the credits at the
-> end; worse, it's actually wrong as we're not allowed to touch [rw]data after
-> calling ->async_readv()/->async_writev().
-> 
->> I'd quibble with the assertion that the server will "give us new credits
->> in the response". The number of granted credits is always the server's
->> decision, not guaranteed by the protocol (except for certain edge
->> conditions).
-> 
-> It does give us new credits in the response, doesn't it?  In
-> hdr.CreditRequest - though I suppose this could be zero.
+There's a problem in 9p's interaction with netfslib whereby a crash occurs
+because the 9p_fid structs get forcibly destroyed during client teardown
+(without paying attention to their refcounts) before netfslib has finished
+with them.  However, it's not a simple case of deferring the clunking that
+p9_fid_put() does as that requires the client.
 
-Yes, credits are consumed by requests and replenished in responses. One
-credit is needed for any request or response, plus one credit per 64KB
-chunk of payload (read, write, etc).
+The problem is that netfslib has to unlock pages and clear the IN_PROGRESS
+flag before destroying the objects involved - including the pid - and, in
+any case, nothing checks to see if writeback completed barring looking at
+the page flags.
 
-The value in hdr.CreditRequest is a hint when sent in a request, and
-a small-ish integer, very possibly zero, in a response. Often, it
-replenishes the credits consumed by the request it matches, but it can
-be higher or lower at the server's choice. And it can be sent in any
-response, before or after the one you might expect.
+Fix this by keeping a count of outstanding I/O requests (of any type) and
+waiting for it to quiesce during inode eviction.
 
-Tom.
+Reported-by: syzbot+df038d463cca332e8414@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/0000000000005be0aa061846f8d6@google.com/
+Reported-by: syzbot+d7c7a495a5e466c031b6@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/000000000000b86c5e06130da9c6@google.com/
+Reported-by: syzbot+1527696d41a634cc1819@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/000000000000041f960618206d7e@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+Tested-by: syzbot+d7c7a495a5e466c031b6@syzkaller.appspotmail.com
+cc: Eric Van Hensbergen <ericvh@kernel.org>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Hillf Danton <hdanton@sina.com>
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+    Changes
+    =3D=3D=3D=3D=3D=3D=3D
+    ver #2)
+     - Wait for outstanding I/O before clobbering the pagecache.
 
->> I guess I'd suggest a deeper review by someone familiar with the
->> mechanics of fs/smb/client credit accounting. It might be ok!
-> 
-> I've given Steve a patch to try and find where the double add occurs.
-> 
-> David
-> 
-> 
+ fs/9p/vfs_inode.c      |    1 +
+ fs/afs/inode.c         |    1 +
+ fs/netfs/objects.c     |    5 +++++
+ fs/smb/client/cifsfs.c |    1 +
+ include/linux/netfs.h  |   18 ++++++++++++++++++
+ 5 files changed, 26 insertions(+)
+
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index 8c9a896d691e..effb3aa1f3ed 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -349,6 +349,7 @@ void v9fs_evict_inode(struct inode *inode)
+ 	__le32 __maybe_unused version;
+ =
+
+ 	if (!is_bad_inode(inode)) {
++		netfs_wait_for_outstanding_io(inode);
+ 		truncate_inode_pages_final(&inode->i_data);
+ =
+
+ 		version =3D cpu_to_le32(v9inode->qid.version);
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index 94fc049aff58..15bb7989c387 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -648,6 +648,7 @@ void afs_evict_inode(struct inode *inode)
+ =
+
+ 	ASSERTCMP(inode->i_ino, =3D=3D, vnode->fid.vnode);
+ =
+
++	netfs_wait_for_outstanding_io(inode);
+ 	truncate_inode_pages_final(&inode->i_data);
+ =
+
+ 	afs_set_cache_aux(vnode, &aux);
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index c90d482b1650..f4a642727479 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -72,6 +72,7 @@ struct netfs_io_request *netfs_alloc_request(struct addr=
+ess_space *mapping,
+ 		}
+ 	}
+ =
+
++	atomic_inc(&ctx->io_count);
+ 	trace_netfs_rreq_ref(rreq->debug_id, 1, netfs_rreq_trace_new);
+ 	netfs_proc_add_rreq(rreq);
+ 	netfs_stat(&netfs_n_rh_rreq);
+@@ -124,6 +125,7 @@ static void netfs_free_request(struct work_struct *wor=
+k)
+ {
+ 	struct netfs_io_request *rreq =3D
+ 		container_of(work, struct netfs_io_request, work);
++	struct netfs_inode *ictx =3D netfs_inode(rreq->inode);
+ 	unsigned int i;
+ =
+
+ 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+@@ -142,6 +144,9 @@ static void netfs_free_request(struct work_struct *wor=
+k)
+ 		}
+ 		kvfree(rreq->direct_bv);
+ 	}
++
++	if (atomic_dec_and_test(&ictx->io_count))
++		wake_up_var(&ictx->io_count);
+ 	call_rcu(&rreq->rcu, netfs_free_request_rcu);
+ }
+ =
+
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index ec5b639f421a..14810ffd15c8 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -431,6 +431,7 @@ cifs_free_inode(struct inode *inode)
+ static void
+ cifs_evict_inode(struct inode *inode)
+ {
++	netfs_wait_for_outstanding_io(inode);
+ 	truncate_inode_pages_final(&inode->i_data);
+ 	if (inode->i_state & I_PINNING_NETFS_WB)
+ 		cifs_fscache_unuse_inode_cookie(inode, true);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index d2d291a9cdad..3ca3906bb8da 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -68,6 +68,7 @@ struct netfs_inode {
+ 	loff_t			remote_i_size;	/* Size of the remote file */
+ 	loff_t			zero_point;	/* Size after which we assume there's no data
+ 						 * on the server */
++	atomic_t		io_count;	/* Number of outstanding reqs */
+ 	unsigned long		flags;
+ #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
+ #define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
+@@ -474,6 +475,7 @@ static inline void netfs_inode_init(struct netfs_inode=
+ *ctx,
+ 	ctx->remote_i_size =3D i_size_read(&ctx->inode);
+ 	ctx->zero_point =3D LLONG_MAX;
+ 	ctx->flags =3D 0;
++	atomic_set(&ctx->io_count, 0);
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	ctx->cache =3D NULL;
+ #endif
+@@ -517,4 +519,20 @@ static inline struct fscache_cookie *netfs_i_cookie(s=
+truct netfs_inode *ctx)
+ #endif
+ }
+ =
+
++/**
++ * netfs_wait_for_outstanding_io - Wait for outstanding I/O to complete
++ * @ctx: The netfs inode to wait on
++ *
++ * Wait for outstanding I/O requests of any type to complete.  This is in=
+tended
++ * to be called from inode eviction routines.  This makes sure that any
++ * resources held by those requests are cleaned up before we let the inod=
+e get
++ * cleaned up.
++ */
++static inline void netfs_wait_for_outstanding_io(struct inode *inode)
++{
++	struct netfs_inode *ictx =3D netfs_inode(inode);
++
++	wait_var_event(&ictx->io_count, atomic_read(&ictx->io_count) =3D=3D 0);
++}
++
+ #endif /* _LINUX_NETFS_H */
+
