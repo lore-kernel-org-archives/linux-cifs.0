@@ -1,154 +1,100 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F388F9D4
-	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 16:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38449AD2C
+	for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 22:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716480764; cv=none; b=UwsVpkimqMkCBUmOdvJaZfRJTRSwCRJzRaimZUmw/Ue3Dkk5v/CSHrKcsdOb3zd8SrbsRLuasFdmRcMmkbPBWHSiAk+gNAYwVZusifLJ5wM9ISGEHol9Bbo+b4LPkscBXvFLPq8VLVyyeVw7TD0QFO8doHM8D9XfOuoTAExiuWs=
+	t=1716504614; cv=none; b=ZkXlJlGdTxX+zrZYf8zjAZyI6l+cEkb/7QIMjgXrVYW4P5fXY8fDhpE31+kxDDRoHXRcB3FDcjY56+vPiOyEdkWn9ueLt9g0RdGg6K49TsXGjUJrdSnxmL1E6OLb/Q7t5Ut9D9ANXYmVHFNOgAYkzJkBOqt+jljKqcFyvOmIqLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716480764; c=relaxed/simple;
-	bh=4EBGsaHnejMlpe7FXkOoU9mKY7SVzdOnepvOdTiWR9c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YVGNiAzHXY96ACSlgSau8D3t488X4r/cyCbcXrqM0nR4XvTAxECsL73T9sU3tvkQ2UiN/ruBsZR3DPB4AQtz7HRaZIEv/jaaPwPeH2MzEwbB5/Z984TgDCH9KCcRGwaO6gV0eAq4LwPHmdD7pKytQlT8UDVKv+6smKI31wmbOLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qs63dWbT; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716504614; c=relaxed/simple;
+	bh=rfPqPY8wzQGwSkFW+01xBYtwYUqJ5QwdjClUOqTb3CA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Or2bncn96qCefUa9Mw+9muXMMlCupOUSyiKYrQ/Dk1cFNFsmmqOXGH/B6zmfw5dhCDtZdm2S5u70kf1Y+gHqzjba3LDuiKKYLt2YKCODSJdAhy8XrQZUvE0VcSTInvMDx7IP3BIMt0CW3WEdWEBk8HaKqzKn3j8/bsaOT82fI8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Z5wOlQyX; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qs63dWbT"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51f71e4970bso9791703e87.2
-        for <linux-cifs@vger.kernel.org>; Thu, 23 May 2024 09:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716480760; x=1717085560; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rIkC1tFrlubZTsOngwWMsHIUA6wsZSumHtDveHKeM/k=;
-        b=Qs63dWbTywwb1fauZnDoOIFcWvs3lFn/UFowPBc5PlAX7FIeryXjiEswrTNj/DnM5j
-         TCDZ/xCzGu3i6BLpmLaER+ds9Bgd2uZxeYW8LOSymZdMzITdy1iLyewabijjclCPfaWD
-         pE1rch08Ei7LsuvLD3zmyK+Epu54OpFp2g0Q2IFz8GitzkuSKhBRHLDdIziVTpkKkYvy
-         d0MI0Thd6VKqGU8X1mZ8I1+YqC/m0BO5lQrh12HsYJu+wn1920nPDr8rEL23cJ1RkvAG
-         kXGedXIbK+s5W+jI4eATRO9uPJz0zhYll+GbLXxpBFn48GNU5BMZmmzR4VRSnIWqW7nQ
-         zOUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716480760; x=1717085560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rIkC1tFrlubZTsOngwWMsHIUA6wsZSumHtDveHKeM/k=;
-        b=keviAR0xKMVc0lLEnNUmVXsg/4gkT2gm7BZrOyzyelflKxLMS/sKUcrlWfCN5x6Moz
-         wNz3QEGNCA0Q55NFkELlz8MROG3TXdFSnnZpQZCetNfvW8uMuB9MfvauOYqxsdSNFy1S
-         gR4tyD8nvip7pJqz3+/Z2/3ryPuEPTB7ejepgttyfdjtKMeB3we0880rSwU7Jw7dBFFI
-         BZAqwf+xDhRRyHRMDThSkyDt4cMH82tPlFEEV5bpascVfCfHsDU1rFX5w3NPpZNQF3Sj
-         DboEPzD1hBA+XRq23lIOkZqX8NKc8pUQrimstsvSMm8Y0Z4acEM1P3Ca0dNjlETEGSse
-         g3Zw==
-X-Gm-Message-State: AOJu0YzThjbJBTL1xMC4YsouSEzXjBWYMv0+XyF0jxNof0ab5zXeSFRU
-	fejqjYDmcdK6KzSx7VAs68e7708jXpIX6wsI0ZJzSXjMNcCXTpHM7/JPIvLabwWCyL+HdlOy6G0
-	dGj73pGXyn3GFbtJxAx/dicIarxw=
-X-Google-Smtp-Source: AGHT+IHAmTrtnsBX5wdx90ZqzGCTl9WKvThjMY5M7bXOH51WQzYELrycwt7d9YstPO5m+rzDeDnOiRXbLqsh887TkQg=
-X-Received: by 2002:a05:6512:1586:b0:51b:539f:d1c2 with SMTP id
- 2adb3069b0e04-526bf82dbdcmr6102743e87.33.1716480760124; Thu, 23 May 2024
- 09:12:40 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Z5wOlQyX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Cc:To:From:Date;
+	bh=jgLiZwgqHMSCIjnuUjkSdN8ATR1To460rOqPAkvpqjc=; b=Z5wOlQyXPeMLx7Z4LJcsTQoSai
+	4JVB5w3Xeqs3EuLI4GDETPu9FYBkujOvPrRQG1zPrTZt9P1i1HtS/b25qTQMPOM3rQQdkgllaJN0N
+	GZLglMk6DYKZxQ/YPjd7jn4vUrX/coXZ/ZDPAAexqBZ+sOQ7Xc3yDHiLW9xENTMcqyjYqk4aoZyeR
+	b2gYlNI9vi2IQlmIMZoMiMCv5vDF9Z8VsUUpyPYalCdeDH9GcOVit1U5GG7y1p/njWTLkyECxQACy
+	ksAWDmNFfcJp6jux9eS+cx9UDZ0HH68z2WsBMjdEUx3x3w4GqTLz/0iAZ3vFn1fFdM4jalRs6u0wJ
+	1d0mTFgVNJoKs2D1L529XKo9+PIFDLRpclpO13piEFmbVQUJ2qexGPneU6bZBOnUBC11/dOzbd76U
+	OuihhlFdVNVMI3bufCgJfhSPrBMP7KBqWO9ltilZ/Bh3AWwqutbMmH8AWOLMzoRbOwXbrCsY/X0zH
+	cgBzdks0xDbKvIfna1zd3w2k;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1sAHG2-00CsRT-2l;
+	Thu, 23 May 2024 22:49:59 +0000
+Date: Thu, 23 May 2024 15:49:51 -0700
+From: Jeremy Allison <jra@samba.org>
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: Tom Talpey <tom@talpey.com>, David Howells <dhowells@redhat.com>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	David Disseldorp <ddiss@samba.org>,
+	David Howells via samba-technical <samba-technical@lists.samba.org>,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	jra@samba.org
+Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
+Message-ID: <Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com>
+ <20240522185305.69e04dab@echidna>
+ <349671.1716335639@warthog.procyon.org.uk>
+ <370800.1716374185@warthog.procyon.org.uk>
+ <20240523145420.5bf49110@echidna>
+ <CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com>
+ <476489.1716445261@warthog.procyon.org.uk>
+ <477167.1716446208@warthog.procyon.org.uk>
+ <6ea739f6-640a-4f13-a9a9-d41538be9111@talpey.com>
+ <af49124840aa5960107772673f807f88@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5659539.ZASKD2KPVS@wintermute>
-In-Reply-To: <5659539.ZASKD2KPVS@wintermute>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 May 2024 11:12:27 -0500
-Message-ID: <CAH2r5mtzzgG9-peAakYhBNdpahQ=R8wkhJxUQJ+oZtzEvuNjSg@mail.gmail.com>
-Subject: Re: Different behavior of POSIX file locks depending on cache mode
-To: Kevin Ottens <kevin.ottens@enioka.com>
-Cc: linux-cifs@vger.kernel.org, abartlet@samba.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <af49124840aa5960107772673f807f88@manguebit.com>
 
-What is the behavior with "nobrl" mount option? and what is the
-behavior when running with the POSIX extensions enabled (e.g. to
-current Samba or ksmbd adding "posix" to the mount options)
+On Thu, May 23, 2024 at 12:28:35PM -0300, Paulo Alcantara wrote:
+>Tom Talpey <tom@talpey.com> writes:
+>
+>> Yeah, I think this is a Samba server issue. Ronnie is right that it
+>> should return a partial response and a STATUS_BUFFER_OVERFLOW error
+>> indicating that it's partial. It's not supposed to return
+>> STATUS_BUFFER_TOO_SMALL unless the entire buffer is less than one
+>> entry.
+>>
+>> MS-FSA section 2.5.10.22
+>>
+>> https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/385dec98-90fe-477f-9789-20a47a7b8467
+>
+>Yes.  I've just tested it against Windows Server 2022 and it correctly
+>returns STATUS_BUFFER_OVERFLOW.
 
-On Thu, May 23, 2024 at 11:08=E2=80=AFAM Kevin Ottens <kevin.ottens@enioka.=
-com> wrote:
->
-> Hello,
->
-> I've been hunting down a bug exhibited by Libreoffice regarding POSIX fil=
-e
-> locks in conjunction with CIFS mounts. In short: just before saving, it
-> reopens a file on which it already holds a file lock (via another file
-> descriptor in the same process) in order to read from it to create a back=
-up
-> copy... but the read call fails.
->
-> I've been in discussion with Andrew Bartlett for a little while regarding=
- this
-> issue and, after exploring several venues, he advised me to send an email=
- to
-> this list in order to get more opinions about it.
->
-> The latest discovery we did was that the cache option on the mountpoint s=
-eems
-> to impact the behavior of the POSIX file locks. I made a minimal test
-> application (attached to this email) which basically does the following:
->  * open a file for read/write
->  * set a POSIX write lock on the whole file
->  * open the file a second time and try to read from it
->  * open the file a third time and try to write to it
->
-> It assumes there is already some text in the file. Also, as it goes it ou=
-tputs
-> information about the calls.
->
-> The output I get is the following with cache=3Dstrict on the mount:
-> ---
-> Testing with /mnt/foo
-> Got new file descriptor 3
-> Lock set: 1
-> Second file descriptor 4
-> Read from second fd: x count: -1
-> Third file descriptor 5
-> Wrote to third fd: -1
-> ---
->
-> If I'm using cache=3Dnone:
-> ---
-> Testing with /mnt/foo
-> Got new file descriptor 3
-> Lock set: 1
-> Second file descriptor 4
-> Read from second fd: b count: 1
-> Third file descriptor 5
-> Wrote to third fd: 1
-> ---
->
-> That's the surprising behavior which prompted the email on this list. Is =
-it
-> somehow intended that the cache option would impact the semantic of the f=
-ile
-> locks? At least it caught me by surprise and I wouldn't expect such a
-> difference in behavior.
->
-> Now, since the POSIX locks are process wide, I would have expected to hav=
-e the
-> output I'm getting for the "cache=3Dnone" case to be also the one I'm get=
-ting
-> for the "cache=3Dstrict" case.
->
-> I'm looking forward to feedback on this one. I really wonder if we missed
-> something obvious or if there is some kind of bug in the cifs driver.
->
-> Regards.
-> --
-> K=C3=A9vin Ottens
-> kevin.ottens@enioka.com
-> +33 7 57 08 95 13
+Bug is in fsctl_qar():
 
+         ndr_ret = ndr_push_struct_blob(out_output, mem_ctx, &qar_rsp,
+                 (ndr_push_flags_fn_t)ndr_push_fsctl_query_alloced_ranges_rsp);
+         if (ndr_ret != NDR_ERR_SUCCESS) {
+                 DEBUG(0, ("failed to marshall QAR rsp\n"));
+                 return NT_STATUS_INVALID_PARAMETER;
+         }
 
+         if (out_output->length > in_max_output) {
+                 DEBUG(2, ("QAR output len %lu exceeds max %lu\n",
+                           (unsigned long)out_output->length,
+                           (unsigned long)in_max_output));
+                 data_blob_free(out_output);
+                 return NT_STATUS_BUFFER_TOO_SMALL;
+         }
 
---=20
-Thanks,
-
-Steve
+I'm guessing in this case we need to just truncate out_output->length
+to in_max_output and return STATUS_BUFFER_OVERFLOW.
