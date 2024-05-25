@@ -1,116 +1,96 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86F31EA80;
-	Fri, 24 May 2024 15:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9291362;
+	Sat, 25 May 2024 03:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716564826; cv=none; b=Nhbg4/9EkE68Ix81dr+x0h1RapsO4ozmWUxSYbq6VCqhj0owywA4Ut2QL7mfG2siAVX0FVPcLzxN0uDvry31QngnDoz3+b6TEmoEF4r6jyWMh9/UykoPVWkTOb2vvyZ0c5Wi5uWk67r9dp/+cCzKFOcHv3yYdFyurVpwPaFIxuM=
+	t=1716607031; cv=none; b=Nxi4TGpUHZnbZ3YFQdjfDBIdMBejCU7eRsLonts1I1HSeZOXnL7QlzUbSZuubXwnlSIieR40WKlE9XlrNLQcwy7fOCMPdgYSjV+u8/7o4vR8K4QP+iyCJpApz550QdcJtw6YH339WiSrKYhjK1xpHg0jhiKcEaxgiFt2fZY8SeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716564826; c=relaxed/simple;
-	bh=7I+MlrFIcsAFr6aFArGk9/6RkVyXb9ZMH8J1XJK4E5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nn9gFszrrYRZ/O+0ulYK020yEWkXBvGosWdBHwZCZO650wDh9TsxQAJed0+Qy0Dskvi1mO+AghBBq+vviUFwnxbtuH+2JtS7liHk982Nhn0bbXTkyH8pXO1qgn10S3PL0+wjedr0LgWylANdwJXjXNaqQ0R6u003NLgF3NiUHDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPzh8gYs; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1716607031; c=relaxed/simple;
+	bh=079klw2gKtfb7nK1gRrC9I40T1GTydSOUAvHTEeIVPk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=CosIOA4/BmpkAvCMReUoNZXKYa8//JiedhTct3Slhsgj+WRxsdozw+BasboeuhtAdYBkGKyOqsUvystMJiAgN+iHffMOCPDwz7KXAPOQj0aT0JQgnLdaXUAvzv4Tn4PNbymgPRdCCPfwqawOLakT1kqSWv6QmbvBowgFMost5D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXmcMAxP; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPzh8gYs"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51fcb7dc722so3116185e87.1;
-        Fri, 24 May 2024 08:33:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXmcMAxP"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2e95a883101so18218621fa.3;
+        Fri, 24 May 2024 20:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716564823; x=1717169623; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ptPH/gKMj44mK+DBZPwcDgch/F6jOYOlhSFCQQooJI=;
-        b=WPzh8gYsnBy5ouBlo23jem7S8OBcC8h/JTC/WCYwVkEXQhp7opsDCFmjHXXrYmrN0w
-         ClTJL0X7838GY6TZLjdwUY2fKlU7sBWJh4r1VmSftEi8Kf/hC2Y2rLfed8wROoZXTRa4
-         Ax2amyQBSGjm7BvDpqItT78OBOEEYaATxi+llC1Py4DCRnFFEs0du8XmL29+saqBA/mB
-         fDBwizbnUGJwgqF2MXYBV/W159tAAIXWDi3g8hkeLDhST2LSsd+9j8eTJq7d9XHDKR9A
-         ZL3JaxiVOGCLUa/9batPitQa1STEE5vPGM16wDFjz9jEvJnPpMiB1tpbzLkJHBZl1dUu
-         I9ag==
+        d=gmail.com; s=20230601; t=1716607028; x=1717211828; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1PWMx3tpZZZibSMN1DWA1me1vnkm3QjzaG0mSt/LkqA=;
+        b=WXmcMAxPQ+hm7rka+RAb+vsTCxlDCt8bIOcEAuqh5Sx6KBtwdjYv7Oz6Jxs3PHN5pD
+         xyPSqYf8AQgv/vBFzGFwrQ5akR21/GaNqEU+L0m5sVImyAWCEiMobtZMolVtay73FKvp
+         CUOka0t0Xa71A8lTq8ata8z+pInjNcG8Z2gWTnhfedCw2s2XoeenlLE6WFab0urvvOqs
+         K2TVx0xR0+sfNoHuXfOVEE16fVjwqLBkG1xUR2nIA89VfdAPgCrIgPxuLH8pkw11uDLQ
+         x9++3czvhUUqF3+xzmYzyB+6zBgTzauXkx/1ME8quraAObQV4Mc/NiGEF/xpTicuvWrX
+         4ILw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716564823; x=1717169623;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9ptPH/gKMj44mK+DBZPwcDgch/F6jOYOlhSFCQQooJI=;
-        b=dE/oVJi6PAsV1KlbCCChNRoP/PrR8S9tyibPxYda0KuZaUe21VsBZfb74YVj53KdNo
-         5WhA52KvW0e2I4R+bHnwZC20DbydG+eVy9sLI8oOLgNUmAOSdnrwRS3itMGR6sjL/Pwe
-         4EAtTOdKk2IAh9xvrdBxc0+c1a9lBeJIZLaeb8USC+rDDVKNRBB7pFW4YVkOrKsJXAfR
-         m1JQtuQA1GOYQ8pgaxRTq87FAHfvYW03HKGfDtauYV4tis7zdOMgjJ3Wq2iNGuQ3kC9F
-         b+z7FPwNowiffkPusRRrWIWGUJObO05BMcYo3pvE+w570orXW2nfG/gWOZEZbfEaGEk2
-         YRfw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcSqczi/cPlwGV/U2lQ2Ne+m1h5id2xNtZsUjH4Gsi/yEs97hFb0gEot8jGlXFXAKKVhzgdyhY4KppE/msQpWEE++U1Rkaybl7KDyTyYRrM4QN7LpRwCY94qjY0gu3RMaBVBVDHHDhmSaq3ddatVKOEOlLsjbGBPn4uoi1BIrJd8IR5cjuhAQ=
-X-Gm-Message-State: AOJu0YzUt09m0eqDTZfOb+G98a6eGjLHcLLLVjDD3/V3FdtfWS7YfTu/
-	pnT7leuPUEqMZDCKRLqxKYblQAXmPGm7H7oBiSnvg2twVvRR7IIjqNyxpICH5lOT1AIim3yWlEE
-	TQ0YcEwgDci1lAz+B+GVi/AoPaew=
-X-Google-Smtp-Source: AGHT+IGO93Mz5Yrq+Ung6+leuBDTr4dzk2/EKk5O5ykcgv0u3qZGH81F4jSxktWUki8wPKCwF3dvIKKj5fHssSz6q3E=
-X-Received: by 2002:a05:6512:3e1f:b0:529:a161:4781 with SMTP id
- 2adb3069b0e04-529a16149a0mr734837e87.7.1716564823004; Fri, 24 May 2024
- 08:33:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716607028; x=1717211828;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1PWMx3tpZZZibSMN1DWA1me1vnkm3QjzaG0mSt/LkqA=;
+        b=h4Ym8IZhGJozlLMTH70L6d/offWcHiQbc+pdKMT4weUTHRbXKDBRAJfQZG3vzRMCaI
+         cKq2Vmtm2OkLAgyNIFijCUMi7rZKFHjh9dnV8agtwS9NnHE+b2HsUyRVMwlFzrR4GmAp
+         YgLh1wi18sM69LEDrBUt5QR63ALnvcbP4fRlLKxcKrQwRRc2ZbFbqHN2DZz5eynz/+lL
+         Klrxthu2L2QG4ldxjPm6vmOaxUjl+nTyjEaTI9XN1kj8csclezfXBpsQOSgzorDSlfHl
+         F7bvzR96wW4U1cv25ga3yAs/F8W4I5sxhs2bn2KzZfyXhRvenGDJFzIgubmKRF+TTRZn
+         humw==
+X-Forwarded-Encrypted: i=1; AJvYcCWchGAz1P65mUW8EQFMgcx4jui6f1KwesXrMcoIZJMnLpOlmz/rFreShj+kqh67BPlO3HtLw8EJyfpGP875cPj3W6sqLBaWIMN93YgK
+X-Gm-Message-State: AOJu0Yy5Zv3XOVOG8m9PfePdIrcHQZU29yLvoso9R2U7ybseGvyhuYnx
+	NWre7WFCb3PlZXsqntB214w9v45lMb/OJjwPj10tsy17fVXdwfND3sQKj/rcvkl9a7z/hLToDfL
+	rhLzr7A1z7AVskw1Ruzq+6BlBm9wFRdqH
+X-Google-Smtp-Source: AGHT+IHgWyQyXwrJSKsHmor9QF7NQ5zL2MozPMpJVWXz3mNr9RMWG4ovM4QfJ1bd+GEgVpc+y1lujgAv1COh4FX8rag=
+X-Received: by 2002:a2e:a783:0:b0:2e9:5ad5:2bb6 with SMTP id
+ 38308e7fff4ca-2e95b27f04fmr28144881fa.47.1716607027781; Fri, 24 May 2024
+ 20:17:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <316306.1716306586@warthog.procyon.org.uk> <20240522-weltmeere-rammt-70f03e24b8b4@brauner>
-In-Reply-To: <20240522-weltmeere-rammt-70f03e24b8b4@brauner>
 From: Steve French <smfrench@gmail.com>
-Date: Fri, 24 May 2024 10:33:31 -0500
-Message-ID: <CAH2r5mv0x=PT-nfWbybkC5HiKHKN+-KS+Quk81_MEpnY4dpsVQ@mail.gmail.com>
-Subject: Re: [PATCH] netfs: Fix setting of BDP_ASYNC from iocb flags
-To: Christian Brauner <brauner@kernel.org>
-Cc: Steve French <stfrench@microsoft.com>, David Howells <dhowells@redhat.com>, 
-	Jeff Layton <jlayton@kernel.org>, Enzo Matsumiya <ematsumiya@suse.de>, Jens Axboe <axboe@kernel.dk>, 
-	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, v9fs@lists.linux.dev, 
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Fri, 24 May 2024 22:16:56 -0500
+Message-ID: <CAH2r5mvL-bvRPsbj6qhNwguxu_7wtkfYOAN5vdizG26rfcMKKQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-You can add my Tested-by if you would like
+Please pull the following changes since commit
+a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6:
 
-On Wed, May 22, 2024 at 2:14=E2=80=AFAM Christian Brauner <brauner@kernel.o=
-rg> wrote:
->
-> On Tue, 21 May 2024 16:49:46 +0100, David Howells wrote:
-> > Fix netfs_perform_write() to set BDP_ASYNC if IOCB_NOWAIT is set rather
-> > than if IOCB_SYNC is not set.  It reflects asynchronicity in the sense =
-of
-> > not waiting rather than synchronicity in the sense of not returning unt=
-il
-> > the op is complete.
-> >
-> > Without this, generic/590 fails on cifs in strict caching mode with a
-> > complaint that one of the writes fails with EAGAIN.  The test can be
-> > distilled down to:
-> >
-> > [...]
->
-> Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-> Patches in the vfs.fixes branch should appear in linux-next soon.
->
-> Please report any outstanding bugs that were missed during review in a
-> new review to the original patch series allowing us to drop it.
->
-> It's encouraged to provide Acked-bys and Reviewed-bys even though the
-> patch has now been applied. If possible patch trailers will be updated.
->
-> Note that commit hashes shown below are subject to change due to rebase,
-> trailer updates or similar. If in doubt, please check the listed branch.
->
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-> branch: vfs.fixes
->
-> [1/1] netfs: Fix setting of BDP_ASYNC from iocb flags
->       https://git.kernel.org/vfs/vfs/c/33c9d7477ef1
->
+  Linux 6.9 (2024-05-12 14:12:29 -0700)
 
+are available in the Git repository at:
 
---=20
+  git://git.samba.org/ksmbd.git tags/6.10-rc-ksmbd-server-fixes
+
+for you to fetch changes up to 405ee4097c4bc3e70556520aed5ba52a511c2266:
+
+  ksmbd: ignore trailing slashes in share paths (2024-05-22 18:26:29 -0500)
+
+----------------------------------------------------------------
+two ksmbd server fixes, both for stable
+- fix oplock problem noticed with test generic/011
+- fix trailing slash issue with iOS and Android clients
+
+----------------------------------------------------------------
+Namjae Jeon (1):
+      ksmbd: avoid to send duplicate oplock break notifications
+
+Nandor Kracser (1):
+      ksmbd: ignore trailing slashes in share paths
+
+ fs/smb/server/mgmt/share_config.c |  6 +++++-
+ fs/smb/server/oplock.c            | 21 +++++++++++++--------
+ 2 files changed, 18 insertions(+), 9 deletions(-)
+
+-- 
 Thanks,
 
 Steve
