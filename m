@@ -1,122 +1,93 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C37812FF7D
-	for <linux-cifs@vger.kernel.org>; Sun, 26 May 2024 19:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F7C249FF;
+	Mon, 27 May 2024 11:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716752661; cv=none; b=ts8QqNQ4ISnDvUVnefaJC5JKYsQnI0OjIXgtLIQQrnmTR/5FMbQXPMWIeDGHwtsBh/jF/Ypn8+3qwzPFl66bXXUgfV/D+gkujT8/pqwj5wcpPd9vhktO90tcFFAtLxed7bpT+iy/D4If4JJWiwns03DkQhvKwWMuEf4Yht1ozIM=
+	t=1716808153; cv=none; b=gVlWuUNlmXceAMZsa7lJX5JRFZpecp7ucvAjogpKkb11MLIHAYb4aoRG35tEWq7RlhsGnjPb7TX955n6PXXbRwxSOi9Rn85B0EgKRXGId5yMuPk0zJjjlEnAF143+ZPDK1uctcq8eNqYUzLxZcryEoAucaayqPFPdiEl5d2V0BU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716752661; c=relaxed/simple;
-	bh=+rvzid5RK/7yzUJbPGGoP8Y1M1EYCTavl7OVIGgg5H8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ig60CoGr3+ZjR8pUIzqoMJJMhzx4hyalsf86Q96loZrc7uLvgV4LsSqKwA/ft2aa39Y+XAOI7OnlOLAHexTyGbwwubV5nkTV1XesJmQh7hTulg+aY2ZVYzMvN6N9YLbgtnztoHjba+gVDAN96nJZSMUzlJu0x3/GUjR/Y+ZKb2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTmdBd0I; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716808153; c=relaxed/simple;
+	bh=62hMWxUD6NFUz/J34q8tsRJOtZmuEttxuaWbk0zbTEE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p7DTZJw7GtVaSI9fmCX8+AMInk9QPN6dzvcjl7PEj+l+XzW8/W6OybGYnL0YY3pg2sEHXu9tgSiJsL/wP0c1s2yrbIEbuju+A1cGqT79gg+50TppjlUJOle+rl0HK4K/iZgPMSkLIMG9FJQaiLt9o9qIbFRnwyrK+WwXWXj+DUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJxRuRSy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTmdBd0I"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-529644ec0ebso3371202e87.3
-        for <linux-cifs@vger.kernel.org>; Sun, 26 May 2024 12:44:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716752658; x=1717357458; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q46fOTZC0iOjPnPO+2DYrZR4InZbX2Nx2+iX8WULlng=;
-        b=VTmdBd0IfUuKEXsfl3s4l4BYHyx5ENDk+P4+Cy7bfvvp1FycA8EFA7eYaEVGCB56cV
-         bpGmPBL7s2WTKVTaJyLlVQ69SZzOt25JbEgbvzCpTglEfW/IrYfkInlFAeCZcGoTejPy
-         wY0GXc6k0sQMn552WheQ/2XqBJCUlyOFV9Um0Vk+yzfEFqY5ld0JS7QGv1ntxoQv1Z1M
-         zU5sV0+SctDVCmwiDyjkvvTcVXOyPHRsYbbuhVfyj/m9xIzxxpftzfOsNZtcszrq8BP+
-         +uYvNTPY3qLZu1JKGSpCpf55Nt+IzNU5Pmq3MvkPuiKafvBezPzarkOBbMbMs2/xD7mV
-         +0WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716752658; x=1717357458;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q46fOTZC0iOjPnPO+2DYrZR4InZbX2Nx2+iX8WULlng=;
-        b=RHrAaioPLa2Lll42xdjBEuQfQCL6cuAxNmriZ1g7DASacUj+HCrFWM8tHAEf9ksUdU
-         lxPnYwD79foICv99Bb66Y2ZMNrlYHaTz8YHvx0Sl0VsTpm+mIgar2YQew8WePEq2RrN0
-         kSV5bpvEMNBHk8pxWzr11lLl5snDuhCrOwR+SxuDJY438RRCXlHo30mVWK/8weal0Ouf
-         xwJJaXNRfYyLPWFZasvDqnxtUdK+tIwpvLNMuwviygYrZcxxH9FxY5dNehwn/c7T+PAB
-         CM1+ytphqaYn1HZHtK0oaZjq/Itp4RSgpT0L47+ypZg6SqzK6Nvto2pxZw9DsZI4tVWz
-         fK4Q==
-X-Gm-Message-State: AOJu0YxOivIywoen2nqxUt9UIpZzdytJSyd4d6VQ6K09isw9IU1E1Oi7
-	bkIA6LBZL6fsaBcLtwNWgCfBgspLRQ/IRRUoFuIvCFXO3Ju3v5Wk+owganohc6enMEwD/ETkQgh
-	tLG4Dhn6CigvIA3vWpHkOMznu1Ks=
-X-Google-Smtp-Source: AGHT+IF+s4plEJnVu3aRDwbKMAWLTLXVD0HgHzNkMP4UolasJ8tRbC1GxLAyB3jJWgj09FEAEY8vin7NgaXen9H1WJM=
-X-Received: by 2002:ac2:5290:0:b0:51c:d1ac:c450 with SMTP id
- 2adb3069b0e04-5296529060dmr6474996e87.10.1716752657530; Sun, 26 May 2024
- 12:44:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJxRuRSy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F31AC2BBFC;
+	Mon, 27 May 2024 11:09:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716808152;
+	bh=62hMWxUD6NFUz/J34q8tsRJOtZmuEttxuaWbk0zbTEE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sJxRuRSyF8aZl6lcHv4GNNbUtVqSVlKp+Xe/+i+D6yW1/oO/ot6EalwOzSHtrCo4K
+	 s0dQbDVSkXR6WepDxxDij1Q54BKKBWWhdmNiSj8TTkMqt9MTvIiiPdh49TRPO6Pj86
+	 rWP0aK1OzS00I+zfo7KiYPoyReQVkRqVHKqOwaqlnSGP7f2HTBJ/5G1FScQj0Q9Dz8
+	 keqj6K/C1AuubkdWkfcykho2TfTj7Ukds7jbRtwZZjliN36IBWlvehAG7mXvXGjSMy
+	 UG9U+OMvUnqNU5ZqRlchB7sVZE4/zAiYA1s8HL5QllUGwa5ynmsu52/Nml3RMEB9vg
+	 dGhHN3oDTUPBA==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	syzbot+df038d463cca332e8414@syzkaller.appspotmail.com,
+	syzbot+d7c7a495a5e466c031b6@syzkaller.appspotmail.com,
+	syzbot+1527696d41a634cc1819@syzkaller.appspotmail.com,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Hillf Danton <hdanton@sina.com>,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dominique Martinet <asmadeus@codewreck.org>
+Subject: Re: [PATCH v3] netfs, 9p: Fix race between umount and async request completion
+Date: Mon, 27 May 2024 13:09:00 +0200
+Message-ID: <20240527-losgefahren-albern-a9b1d8be3835@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <755891.1716560771@warthog.procyon.org.uk>
+References: <755891.1716560771@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240526-md-fs-smb-common-v1-1-564a0036abe9@quicinc.com>
-In-Reply-To: <20240526-md-fs-smb-common-v1-1-564a0036abe9@quicinc.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 26 May 2024 14:44:06 -0500
-Message-ID: <CAH2r5msb7G8Gh6mMXiMpS3ykC73WdTwRo9Zj662JaxU5Xq2H0A@mail.gmail.com>
-Subject: Re: [PATCH] fs: smb: common: add missing MODULE_DESCRIPTION() macros
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1313; i=brauner@kernel.org; h=from:subject:message-id; bh=62hMWxUD6NFUz/J34q8tsRJOtZmuEttxuaWbk0zbTEE=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSFZJ7zelnJM7U+5vs16+iDzU/eHak22+8zK2h3/Nxtx kt0hJJkO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbiZ8/wP5lhXd2tnn2lDrHe S064NiWHCmp8PyXfyLxJ4KB6Y7f0U0aGtffmxsec3rSGNywtN+FVmNpSSVFb/R/TPYJj8uSzQl6 wAwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-merged into cifs-2.6.git for-next
+On Fri, 24 May 2024 15:26:11 +0100, David Howells wrote:
+> netfs, 9p: Fix race between umount and async request completion
+> 
+> There's a problem in 9p's interaction with netfslib whereby a crash occurs
+> because the 9p_fid structs get forcibly destroyed during client teardown
+> (without paying attention to their refcounts) before netfslib has finished
+> with them.  However, it's not a simple case of deferring the clunking that
+> p9_fid_put() does as that requires the p9_client record to still be
+> present.
+> 
+> [...]
 
-On Sun, May 26, 2024 at 11:53=E2=80=AFAM Jeff Johnson <quic_jjohnson@quicin=
-c.com> wrote:
->
-> Fix the 'make W=3D1' warnings:
-> WARNING: modpost: missing MODULE_DESCRIPTION() in fs/smb/common/cifs_arc4=
-.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in fs/smb/common/cifs_md4.=
-o
->
-> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
-> ---
->  fs/smb/common/cifs_arc4.c | 1 +
->  fs/smb/common/cifs_md4.c  | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/fs/smb/common/cifs_arc4.c b/fs/smb/common/cifs_arc4.c
-> index 043e4cb839fa..df360ca47826 100644
-> --- a/fs/smb/common/cifs_arc4.c
-> +++ b/fs/smb/common/cifs_arc4.c
-> @@ -10,6 +10,7 @@
->  #include <linux/module.h>
->  #include "arc4.h"
->
-> +MODULE_DESCRIPTION("ARC4 Cipher Algorithm");
->  MODULE_LICENSE("GPL");
->
->  int cifs_arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned in=
-t key_len)
-> diff --git a/fs/smb/common/cifs_md4.c b/fs/smb/common/cifs_md4.c
-> index 50f78cfc6ce9..7ee7f4dad90c 100644
-> --- a/fs/smb/common/cifs_md4.c
-> +++ b/fs/smb/common/cifs_md4.c
-> @@ -24,6 +24,7 @@
->  #include <asm/byteorder.h>
->  #include "md4.h"
->
-> +MODULE_DESCRIPTION("MD4 Message Digest Algorithm (RFC1320)");
->  MODULE_LICENSE("GPL");
->
->  static inline u32 lshift(u32 x, unsigned int s)
->
-> ---
-> base-commit: 416ff45264d50a983c3c0b99f0da6ee59f9acd68
-> change-id: 20240526-md-fs-smb-common-e92031f7d8cf
->
->
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
---=20
-Thanks,
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Steve
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] netfs, 9p: Fix race between umount and async request completion
+      https://git.kernel.org/vfs/vfs/c/e20fe12bfb0b
