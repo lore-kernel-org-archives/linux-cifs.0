@@ -1,148 +1,99 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9CA2F873
-	for <linux-cifs@vger.kernel.org>; Sat,  1 Jun 2024 11:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60EF1CD23;
+	Sat,  1 Jun 2024 21:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717242651; cv=none; b=krwULif3j/6SUdK1+ln/WKZzbulVCuvg2f33IaCj6kGK2YYuZhvlri0IZ/Os16IzEMmZ5YcBK2aDv5bnZ3QVGnQJYGOHBvkU8VYXa7rLFo0XrnNpv1F5cvWUK5SikPTDmf6tIw3yFUXCmJedo/hFUZCi+2nipRSzrwKDbv+m0M8=
+	t=1717276455; cv=none; b=RJ/YZi+MLcucv+5llRvi07+rSeIKo2pb9z6D+MzuNny2Dccx/3l/Xdx/DuSQjf7Jd53Qv1kaGAf6oPu1rioTuBAK6Sguy8AatoWbwSxZ9o5dwq7gAinWvaa4PYw+lONgBYRttTYXJjO59mSstb9k+67h7c3zmsUmtg1xw+ozUOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717242651; c=relaxed/simple;
-	bh=yYXyiA14ao049FQ7flJ+HIxg6pDJqOqUvO3LBVIYlD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=j5wWZ8vk663RkVkLsf4Ypa2rjv2+dQGHlFg2f/1/u3B9a6brUcRZTwuhHiotBoX3QVWQnohcrhczxqW1eFWm54mHsHNoW0DywgXQ9nJoLGJRS1euNan2Tsw0rphSphqmT21FaDj6tKRzf0Ed3O0fMljNtSSaEWf8nvfZLt3GTnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Vryqt0bCZzmX4k;
-	Sat,  1 Jun 2024 19:46:18 +0800 (CST)
-Received: from dggpemd200001.china.huawei.com (unknown [7.185.36.224])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4BB2818006C;
-	Sat,  1 Jun 2024 19:50:45 +0800 (CST)
-Received: from [10.174.178.209] (10.174.178.209) by
- dggpemd200001.china.huawei.com (7.185.36.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sat, 1 Jun 2024 19:50:44 +0800
-Message-ID: <60fcd1b4-c9d3-c072-a5d1-64a8b3d7cc1d@huawei.com>
-Date: Sat, 1 Jun 2024 19:50:44 +0800
+	s=arc-20240116; t=1717276455; c=relaxed/simple;
+	bh=qCQm7c8rkAYNOeNDGO+QtgYo39jEifLfdZ5r2gy+biw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kQ5QKNCMPQwKZosvnIoQOFAcOKs1w4pQDgiaGZnxheK6p0XJCvkscuzduZE1WDu90tcGfl/1+fQo700svkNVSpI9tIl5g+3oWODGdDVpwQk4cy93Vs4nYHA7dz/zO9lmEOAjO4pVBQWOIMVynbmbPCHDvmcfT8a9Br4AjvPPDP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSoAARe2; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSoAARe2"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52b91f655d1so533102e87.1;
+        Sat, 01 Jun 2024 14:14:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717276452; x=1717881252; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jof1YoOQbALrNF0HmF8zO+AXFV4ZYQLjGir3yALDwfs=;
+        b=mSoAARe2IXTkvxAHpbj7mhg2fCY/GdoCnitpvTHT/9p/8ai+GT0xNdWO1xzoPuvWl+
+         WjXIN/t+y6RWbkZ5+VLhXaVVnMpJJJRoOR7qdCOMBbmFP4bXXJtLpqGbunMGkscvgU+B
+         lmkhSN/9Gztx19J0RxgFrj9Yotnhrbw7e3sAlC7jS/nl8s4HNG1V8IY+F/ZzmRMlefPQ
+         0jlcLV/nQFHNnoi6D78cRyxn/je03hzwx67vcFmX9Y6B6q/sP04gGk9FDzc1cwItL6bM
+         g7aKp+WATOTX6EhhbaIBBTfmGr4zKslq26QwWrO/T9UpN2bJVUtOoyswGew1ZSOTQ3l0
+         EhxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717276452; x=1717881252;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jof1YoOQbALrNF0HmF8zO+AXFV4ZYQLjGir3yALDwfs=;
+        b=B//WH5ZsfJN9E5POxFAhwZ4whIut6I6WN6d/uv9Neakp0sinfutSvrdUpDk6FeSRre
+         CTcUfMuNyKJbHdj7LohGO9i7aIV4Jmow2l3+VaM1QDLskVfKxdlQ3VwpOInnBEzMmXRC
+         H1WGuQN3ztLNHulKZtuAKY8BpAC0NK4EmOQbJlT25BrozpWfK4GV0W/VFWnsIhhpeYEg
+         PUiSixIAl9zii1gWjQkn0Xq1gE8wzfQaT+J0xAsYtj+InKbCfddOtr83yB+Mq7uW3jjy
+         Xw6mNUFCQUjmaZgMtmh1DhH0jpNWM8J7K5OwbNfUq1bDi+kTxUgKKrIPRx4nEdpqZ3H2
+         Tsww==
+X-Forwarded-Encrypted: i=1; AJvYcCXCs5dLLZmrc2mktPBdXcNowh+vgmQv0dqbibjh6bnQLAEqR8rCX3lqjkK4KPVm0sKwT/FfjeetwcYvVTQkqxswZ/oreqAMi8l0VA==
+X-Gm-Message-State: AOJu0YzflyX7B++WBC20JcXeq1lrPqkRp6wKXCsg7apUT+wzKuDr+8B8
+	nhCIz9vtAA1UF1nB6ShVwx2tqcawRXJZMXLBQYiIUtXNzN0zRZ7ZQNelWdI5FGmgQkMrrQBaDSC
+	S6rE1G8/f6EQeh47HLdbUbHZm06gPs83V
+X-Google-Smtp-Source: AGHT+IHu7mzrFwMJ0oB5zAbkpUqinwwAWnmn4tlEiH/AUz1SDdi3nznnwWqX+lhFfSaQAzgtjenLckJnnrg2umnP0IA=
+X-Received: by 2002:a05:6512:3e7:b0:52b:8409:ffb2 with SMTP id
+ 2adb3069b0e04-52b840a0076mr1643262e87.29.1717276451595; Sat, 01 Jun 2024
+ 14:14:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH 2/4] smb: client: fix use-after-free bug in
- cifs_debug_data_proc_show()
-To: Paulo Alcantara <pc@manguebit.com>, <smfrench@gmail.com>
-CC: <linux-cifs@vger.kernel.org>, Frank Sorenson <sorenson@redhat.com>
-References: <20231030201956.2660-1-pc@manguebit.com>
- <20231030201956.2660-2-pc@manguebit.com>
-From: Wang Zhaolong <wangzhaolong1@huawei.com>
-In-Reply-To: <20231030201956.2660-2-pc@manguebit.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemd200001.china.huawei.com (7.185.36.224)
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 1 Jun 2024 16:14:00 -0500
+Message-ID: <CAH2r5mstfGRS6XazUAM7uX=FkpJ+da7jesa1_8BcOvZgLx1RYQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
+Please pull the following changes since commit
+1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
 
-Hello,
+  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
 
-I encountered some confusion while reviewing the source code related to
-CVE-2023-52752.
+are available in the Git repository at:
 
-I was able to reproduce the issue, and the original problem seems to be:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.10-rc1-smb3-client-fixes
 
----
-process 1                   process 2(read /proc/fs/cifs/DebugData)
+for you to fetch changes up to 518549c120e671c4906f77d1802b97e9b23f673a:
 
-cifs_umount
-cifs_put_tlink
-cifs_put_tcon
-cifs_put_smb_ses                cifs_debug_data_proc_show
-   spin_unlock(&cifs_tcp_ses_lock)
-                                   spin_lock(&cifs_tcp_ses_lock);
-                                   list_for_each...(ses,server->smb_ses_list,...)
-   cifs_free_ipc
-     tconInfoFree(tcon)
-                                   if (ses->tcon_ipc)
-                                    cifs_debug_tcon(m,ses->tcon_ipc)
-                                      // UAF
-     ses->tcon_ipc = NULLl
-                                   spin_unlock(&cifs_tcp_ses_lock);
+  cifs: fix creating sockets when using sfu mount options (2024-05-31
+10:55:15 -0500)
 
-   spin_lock(&cifs_tcp_ses_lock)
-   list_del_init(&ses->smb_ses_list)
-   spin_unlock(&cifs_tcp_ses_lock)
----
+----------------------------------------------------------------
+2 small smb3 fixes
+- Fix make socket with sfu mount option (spotted by test generic/423)
+- Minor cleanup: fix missing description in two files
+----------------------------------------------------------------
+Jeff Johnson (1):
+      fs: smb: common: add missing MODULE_DESCRIPTION() macros
 
-In commit ff7d80a9f271 ("cifs: fix session state transition to avoid use-after-free
-issue"), setting ses_status to SES_EXITING was moved under the protection of
-cifs_tcp_ses_lock.
+Steve French (1):
+      cifs: fix creating sockets when using sfu mount options
 
-In cifs_debug_data_proc_show(), the logic that checks ses->ses_status == SES_EXITING
-already seems sufficient to avoid this issue. Therefore, it appears that ses->ses_lock
-might not be necessary. Additionally, I am curious why ses->ses_lock needs to cover
-such a large scope.
+ fs/smb/client/cifspdu.h   | 2 +-
+ fs/smb/client/inode.c     | 4 ++++
+ fs/smb/client/smb2ops.c   | 3 +++
+ fs/smb/common/cifs_arc4.c | 1 +
+ fs/smb/common/cifs_md4.c  | 1 +
+ 5 files changed, 10 insertions(+), 1 deletion(-)
 
+-- 
+Thanks,
 
-> diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-> index 76922fcc4bc6..9a0ccd87468e 100644
-> --- a/fs/smb/client/cifs_debug.c
-> +++ b/fs/smb/client/cifs_debug.c
-> @@ -452,6 +452,11 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->   		seq_printf(m, "\n\n\tSessions: ");
->   		i = 0;
->   		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-> +			spin_lock(&ses->ses_lock);
-> +			if (ses->ses_status == SES_EXITING) {
-> +				spin_unlock(&ses->ses_lock);
-> +				continue;
-> +			}
->   			i++;
->   			if ((ses->serverDomain == NULL) ||
->   				(ses->serverOS == NULL) ||
-> @@ -472,6 +477,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->   				ses->ses_count, ses->serverOS, ses->serverNOS,
->   				ses->capabilities, ses->ses_status);
->   			}
-> +			spin_unlock(&ses->ses_lock);
->   
->   			seq_printf(m, "\n\tSecurity type: %s ",
->   				get_security_type_str(server->ops->select_sectype(server, ses->sectype)));
-
-I believe in the latest mainline, this could potentially be modified to:
-
-```
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index c71ae5c04306..2d9e83b71643 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -485,11 +485,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-  		seq_printf(m, "\n\n\tSessions: ");
-  		i = 0;
-  		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			spin_lock(&ses->ses_lock);
--			if (ses->ses_status == SES_EXITING) {
--				spin_unlock(&ses->ses_lock);
-+			if (cifs_ses_exiting(ses))
-  				continue;
--			}
-  			i++;
-  			if ((ses->serverDomain == NULL) ||
-  				(ses->serverOS == NULL) ||
-@@ -512,7 +509,6 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-  			}
-  			if (ses->expired_pwd)
-  				seq_puts(m, "password no longer valid ");
--			spin_unlock(&ses->ses_lock);
-  
-  			seq_printf(m, "\n\tSecurity type: %s ",
-  				get_security_type_str(server->ops->select_sectype(server, ses->sectype)));
-
-```
-
-Best regards,
-Wang Zhaolong
+Steve
