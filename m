@@ -1,136 +1,78 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D790919A2A7
-	for <linux-cifs@vger.kernel.org>; Thu,  6 Jun 2024 16:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690449; cv=none; b=msGKw7Iq+uL49BI2k96Lq0WpGTxHhgYdoAJFVR4X+aJlYQHBMWayX/0+NbceLtX4t16AETVWfaWIiQBBRVk1w6Fb+JTpyRe/9gld5Ob81E8jTnjNK9bXaUG7Qc9rFLROsDdgsLXEr1rcA4RriqV5WwMElvV01zEplaONMAnlgqg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690449; c=relaxed/simple;
-	bh=0RulEnq9guJU7+LtzS2kXmHpsCN6HC+dXbm2Sy8oZIE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JocPSl4/CXsYmEC7QOJU1Kmk0GuQtw7wMhzUBWzHJ2l7lFVwGKtYCfQNMhsM5StT64h/pRhkPeqjaluFRk6Rg0l5WYGjJzNpG/rIT92Am1v0cw93zdfSwNjtmkDN7ivtGexPz2L/1NRZScPxZOZaP+gHsa1xU0z+uvHL4m8v8ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nkWpYPQC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y8Ox3RZo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nkWpYPQC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Y8Ox3RZo; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBEB195F25
+	for <linux-cifs@vger.kernel.org>; Thu,  6 Jun 2024 16:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717692810; cv=pass; b=uwKjsEOVLK8lUEbkeuSOZlTsnJxi1c8jm+q4x6yUeShWR4ucp5AbR4Ayn/Ph8IbrUfuhMwRAm2kJMebgqzKE6isP3xQqleDdRz1BSzZt8qVcQWG9dQO7HNQol1bbqTlUdZe0/EkXaU9n8DdVRUUal99/nWoO2TgbPq1hfvsYeeA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717692810; c=relaxed/simple;
+	bh=gRjgEHjnnYyrKCZFzoBcO2hndTZgMv5/h8b74GMb/Qk=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=lxsQdE8j8bNAnfwJFd5ihiIk9O062ykNK99E0lQjdKwmOBBRSDAj90Mjpf81jkZqH0W/fGa5zDpEUjjyHymvq+hd4WBZ4GS6jCgS7w8bWIe+UtUeISI+6wYRHhZR3JDctX5AVqOXwTNi073rr34ZTe9ifpNXCgaHfQufX8d47dE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=f/glNzk/; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nkWpYPQC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y8Ox3RZo";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nkWpYPQC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Y8Ox3RZo"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 0E3181FB3C;
-	Thu,  6 Jun 2024 16:14:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717690446; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=2EzfZ+/QKwMjiDV96fyfQhG5Lx7Dly0FsbaPIe81zdY=;
-	b=nkWpYPQCBYfI2lH407CRH22lVK1gSmU3p3ELyxPZu3irBq6nrCCDthPBsUc8xtFUJquQYB
-	djJtjt3Zq/k98oWmvwKi/pVhIyelhyoRA1icNuzNzYwzpTjEhCfbkqoxTC89vGZj8ncYkc
-	jmfL2alVEQrKn0HXPDQR6/lIx3wg9PY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717690446;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=2EzfZ+/QKwMjiDV96fyfQhG5Lx7Dly0FsbaPIe81zdY=;
-	b=Y8Ox3RZo22vnr0GoinoO2yR/pUl3LIHQ8AxKWUdUM4luwpp0Bdg9YXmaVHB8VIk6vpLpUf
-	TSUvKooY7bPmGECg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1717690446; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=2EzfZ+/QKwMjiDV96fyfQhG5Lx7Dly0FsbaPIe81zdY=;
-	b=nkWpYPQCBYfI2lH407CRH22lVK1gSmU3p3ELyxPZu3irBq6nrCCDthPBsUc8xtFUJquQYB
-	djJtjt3Zq/k98oWmvwKi/pVhIyelhyoRA1icNuzNzYwzpTjEhCfbkqoxTC89vGZj8ncYkc
-	jmfL2alVEQrKn0HXPDQR6/lIx3wg9PY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1717690446;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=2EzfZ+/QKwMjiDV96fyfQhG5Lx7Dly0FsbaPIe81zdY=;
-	b=Y8Ox3RZo22vnr0GoinoO2yR/pUl3LIHQ8AxKWUdUM4luwpp0Bdg9YXmaVHB8VIk6vpLpUf
-	TSUvKooY7bPmGECg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9116E13A1E;
-	Thu,  6 Jun 2024 16:14:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IRN4Fk3gYWYdfwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Thu, 06 Jun 2024 16:14:05 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com
-Subject: [PATCH] smb: client: fix deadlock in smb2_find_smb_tcon()
-Date: Thu,  6 Jun 2024 13:13:13 -0300
-Message-ID: <20240606161313.25521-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.45.1
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="f/glNzk/"
+Message-ID: <d4d9d47b3af340879126b907cfe73441@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1717692800;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SxntQoAqrjpFWmiW3MHEyuESs+8PrANr8exR4Rz+LGo=;
+	b=f/glNzk/bzPRREyyWi2YXmxhF+3dpEKBTCnssdlt3DveSvdCu13uj5ObJBOkRsqrj8wKoN
+	beTizq+t00b6kyDqHpVUTwi2zMBmRGClAPH80d4PRhWEEU6IUGdTCu0YosWU68YYf8Zmkm
+	DqBVNTbNB/wkW0agsgYhdSwr128B/5sKb1pL6vWEjbrSFh3dKQ6n8aYOdTUmF88TQttp7r
+	np6f4mDAC8+re7GHdcQfmPGxnRnG3gIfayS5yAB+jrPz8aQSMh/8xkSLAYZtcbsnBAvUIj
+	qwZxG4DZvxdxczzhRpMJNPK9jtpCvmk6QvjM5Yyst1bPCFRHcmrKljp4FePE1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1717692800; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SxntQoAqrjpFWmiW3MHEyuESs+8PrANr8exR4Rz+LGo=;
+	b=aabGpqfsmC9B0A8YOmdi/7gf31CvhzbTg4A30Z9Y0CpoLtI35x2AXTPQD44uNeBPMQBlUL
+	O+22U4TFaHnBKkADiqQXr3qBg8NR3BVi+LEsg1enEuOiNsdoCB+rtTzkwMG5GndM07AUNX
+	m+AIBxaCriDrtpXblupBNINiS/k4m0vfAOHWqBqO74r6yhN24R0EduXlhsY1MsvkGvuTcC
+	YfH4noLXvto2tvypJeVAzRxgkt7YOYaIdVQS4aV5muRsVJV+37AOGlqhPmHUXEVpMGnFWg
+	zmcayrEvQb/6xNt8Jg7ShpCW76m8r1JaIPdNIe3pgv5nu2Wiqr5KlW8PwaK6/g==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1717692800; a=rsa-sha256;
+	cv=none;
+	b=BO3FFB/Sk1kYi6oeEOw0jhbNAhN/+gFQCP0pglr4C4St7pSSIf3mTV+wgo/KGroFQx9cw1
+	/SaGf5YjxsXGGWH2KKoTI0HYUFkpWfxtkytZ66/ejd+keNgdey/MsjHe26iSqrPMJz7YWq
+	qaYOgMMPizOVA3yg5/+rWfTDPtKLOidftTs9K3WLk2tZqkE/oRJFH0txTQWFmaqFDLZspM
+	1OWfpTqHxaIIpn9Azu9FVkwdggtHu5T9imnmnSxWnumKRZHv7fAYIkzzFIi5J1NDGk+8vd
+	PAPNAeMJSrDe8jQDyzwR9zUhykjI+/2hICevGFqKrn9x1hWWRQAUSQ2NdIV8Ew==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com
+Subject: Re: [PATCH] smb: client: fix deadlock in smb2_find_smb_tcon()
+In-Reply-To: <20240606161313.25521-1-ematsumiya@suse.de>
+References: <20240606161313.25521-1-ematsumiya@suse.de>
+Date: Thu, 06 Jun 2024 13:53:16 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -2.09
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.09 / 50.00];
-	BAYES_HAM(-2.29)[96.68%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_NONE(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+Content-Type: text/plain
 
-Unlock cifs_tcp_ses_lock before calling cifs_put_smb_ses() to avoid such
-deadlock.
+Enzo Matsumiya <ematsumiya@suse.de> writes:
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/client/smb2transport.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Unlock cifs_tcp_ses_lock before calling cifs_put_smb_ses() to avoid such
+> deadlock.
+>
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>  fs/smb/client/smb2transport.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 02135a605305..1476c445cadc 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -216,8 +216,8 @@ smb2_find_smb_tcon(struct TCP_Server_Info *server, __u64 ses_id, __u32  tid)
- 	}
- 	tcon = smb2_find_smb_sess_tcon_unlocked(ses, tid);
- 	if (!tcon) {
--		cifs_put_smb_ses(ses);
- 		spin_unlock(&cifs_tcp_ses_lock);
-+		cifs_put_smb_ses(ses);
- 		return NULL;
- 	}
- 	spin_unlock(&cifs_tcp_ses_lock);
--- 
-2.45.1
-
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
