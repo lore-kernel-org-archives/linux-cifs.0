@@ -1,110 +1,133 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA4C17545
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C916F30A
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 20:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718052619; cv=none; b=JRmTiA+ZRXw6C+J6Hg5M1yAAuP/AmGoYKusKNYDUFN5SZzkdGtRwwilAAne9wCfyO8iHzH8eFF9UBREfltvRk5bdN4XxZu0CxyHNcsboWbIFTrKnlNMsXUraT1bJTZwpB/wyyvIDTKr5gEWJuXds2I7p+crH3RXkyyW/kTuS0u8=
+	t=1718052806; cv=none; b=ukCVGoBMFZ2C4b+WPTB+O4eI1EgGdPRSAQ5a03zuGnebniM8pHcqeBaiOtqHxVlqN73rS11m0oTIOKz24DQcRMO122J1IpC88s6xq6PrIQP49qqiBKSbmKoWRM1POJM0wLGbVtfJQoGBDn9eoWNtDrpqYVW6N2yJcKxLw3FPumY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718052619; c=relaxed/simple;
-	bh=BPHmUU812z5hvP/Jue70bl5PHwQ06hM5ym/Met4Xnm0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WhLGbGaFCPtmRCKYHDjy/505E+KdjS96hBxR2D1LleExoevOWZKkFqgiWVI6caShPctKw0FDF6mJcxEieyhjcMRzEmFh3TOpHUTFdqFVnfOBNBq/SV2yuoxOj8QbrubUYoNH7Cl3vJxm/vCWPgSTz/IRareq0yjImxaTSGKBm7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=qcex7TUn; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1718052806; c=relaxed/simple;
+	bh=MxTK7lKE5gYFyjUWqpy/ittJ9GvBj4piaWBTG2RFbU8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ndM1geO8rG4RaytpP6L/zluNByM0QwCsonmgBDsbVqxNavowVkFESl7Qrp+MmJz4rfOXsSAznkapgMnT3ylsOAS1eAxh0E3cvBJoQ0aol4DawETtZmNbnyYoGJjG2EVKD3+/gf1Z78wSj1PZv+uMB8I1yHm+jnmR4hVLwxs3QOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/cGVEoB; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="qcex7TUn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Date:Cc:To:From:Message-ID;
-	bh=aGOlZJ3sP/csZ7Df/EmbK5Qh+kvT1fQWBxD7RggzQus=; b=qcex7TUnihhdXOElvDOSmq1sxd
-	8L3FNV5eVQ99+J6byU8ved13mgJcXVySdF0FKO2H555hEMxha+/4bjGJaXjbd4/vfl7V0qyu9ArBY
-	tNCKdZyhEvydV7l52KVCpU3JTzdutpwjjrf/8RjQJymUaigii9gWCH9W05i8tnVTF7nKfq/4bjB/+
-	No/nc9DVMkbRcrqqiOT1MihFIhdgqAkKbuxofi5uXMGFsVmDxybMx+q48jUwMlJkdjTnLivoWLSMG
-	tW46eFUJKJB77pYVVGdeaKq06dNKrBD423EA5voMEdw7DVcqoLEeUD88GFdtKQw/r4iDWnf0BoxyM
-	6Vylcq0XeV8n+3hcrApvMUGpzdXWnWnNbmHZbhoXDh0QOw81wwJM46VndUyH/GIWjwC+ljWaUmwh+
-	WlZsSnhVW7BsUiYQIlL56t9ugedOJ771s5k2JQaut70ec9Our6kd1xzb5K6ropL7Qv9VdYXKlCYo/
-	jPOj2noAMsnp/y7CTT9FqMf8;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1sGly2-00G1UT-1d;
-	Mon, 10 Jun 2024 20:50:15 +0000
-Message-ID: <cc83f0cbd1409492bdfa17fd2c2f6afb5fa5ee8c.camel@samba.org>
-Subject: Re: Different behavior of POSIX file locks depending on cache mode
-From: Andrew Bartlett <abartlet@samba.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Kevin Ottens <kevin.ottens@enioka.com>, linux-cifs@vger.kernel.org
-Date: Tue, 11 Jun 2024 08:50:11 +1200
-In-Reply-To: <CAH2r5mu_5V1OXwiOa2csH9n_J+ZPDYNhiuYBDoONYBqewNaNkQ@mail.gmail.com>
-References: <5659539.ZASKD2KPVS@wintermute>
-	 <CAH2r5mtzzgG9-peAakYhBNdpahQ=R8wkhJxUQJ+oZtzEvuNjSg@mail.gmail.com>
-	 <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
-	 <CAH2r5mu_5V1OXwiOa2csH9n_J+ZPDYNhiuYBDoONYBqewNaNkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/cGVEoB"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52bc035a7ccso436653e87.2
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 13:53:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718052803; x=1718657603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RGkZNBMe+tUz7Boa++OVQu93eM/tUXmlbnG7GS0256k=;
+        b=C/cGVEoB+wNy0D60CSxtq0NTlBRVq0zKTIYJ2i0QxFicyV0TkCB9eCUHchJHLfaxLU
+         1nzARtrpMoh1P4ock3FgckbUPnGrFX0PxWy0V9bGi7ifhYJbiX5f2fA6hD2JYrTD4lrk
+         tIsVgDFkStFbiCjlnFc+gJeArXmBFRjCvsQzQ19g8MRg2aAmdfXkTiVJNCqKxkXw/RrR
+         mEbvqFbNvlQvW40DYnsq3lpLOQz3gZ6YQpAt/wrv0CXjKVRm4YFx1kx5IDiHmoETDE2k
+         v8YGW6ghRLjmEw0l/yx6sgTsD0oSfywrv0+7dh0WitRZx4snPXacl1mnEgjawP0o9uYr
+         NraA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718052803; x=1718657603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RGkZNBMe+tUz7Boa++OVQu93eM/tUXmlbnG7GS0256k=;
+        b=NzZyBBYkHQHQPT1gXP1fi4pmYS6Z66F6BxCERMh01frMgj/UgA4VEPn7Z1BYJEILtt
+         kW2K1lPq7hv6JOH4OMELyr2gqGMeurtor3NTgmhzPyVX1OGdMU6lGvi1ewyGxzUYLGde
+         zx1v7U79g2B66shuDCEYyJTUx/7ph152gCp0n4ZUDxkyDRFqXEMZqqomyPE9QkHErnYB
+         f931jRMsollFL6Kp1rnHK9o55pJVxFE1+TnKJ8dsbarf2wY1NZZTKBUa7xy7N48hr6W4
+         +x25hjgRI2QfbmaZWNglbWImRlQe5Ngc8Wfb9oYhyEg+jrnufNkXyJ7pXYB5l1yPypgg
+         yMmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXR/zvCo8TMMKfuUBEQeRglx7KnOKMSTdfnWTP4bc8MwQKjyBmzGN9Y0fqALl8aiDhw13+00ld5OVs47m1FZhyerya1Ho4eta6r2A==
+X-Gm-Message-State: AOJu0Yy7MSOMJUA9FmlBhDpN7s+nodqGd09i3obXWvQgB2n/pn1/eSCI
+	7AgtoF4FHggg0F+xMkmSbXC2H+pYhVq2i2U71BmRmkKgSX9fu66RwnCT2UPdN0M5Ldfk50f3DDk
+	3EitcQpWl6KxubdLHardujWTDdPw=
+X-Google-Smtp-Source: AGHT+IF7D8/6x/ISnTId0dUyW4x2NQA83TsWbu7MzL/74d9rq02JBSLg+EabBpz3rp3A3dV6qYTVYQy5Vf27MZ7UVIM=
+X-Received: by 2002:ac2:44cc:0:b0:52c:89b6:6b82 with SMTP id
+ 2adb3069b0e04-52c89b66c37mr2424359e87.27.1718052802802; Mon, 10 Jun 2024
+ 13:53:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <5659539.ZASKD2KPVS@wintermute> <CAH2r5mtzzgG9-peAakYhBNdpahQ=R8wkhJxUQJ+oZtzEvuNjSg@mail.gmail.com>
+ <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
+ <CAH2r5mu_5V1OXwiOa2csH9n_J+ZPDYNhiuYBDoONYBqewNaNkQ@mail.gmail.com> <c6da3de7c205d40a41907874a0e6d26b6c8132fe.camel@samba.org>
+In-Reply-To: <c6da3de7c205d40a41907874a0e6d26b6c8132fe.camel@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 10 Jun 2024 15:53:11 -0500
+Message-ID: <CAH2r5mt-mGSzzMHuGvbvsN+N294RUHzVfLADgg1=CZ52p=ntpw@mail.gmail.com>
+Subject: Re: Different behavior of POSIX file locks depending on cache mode
+To: Andrew Bartlett <abartlet@samba.org>
+Cc: Kevin Ottens <kevin.ottens@enioka.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-(again, resend without HTML)
-
-On Mon, 2024-06-10 at 15:05 -0500, Steve French wrote:
+On Mon, Jun 10, 2024 at 3:48=E2=80=AFPM Andrew Bartlett <abartlet@samba.org=
+> wrote:
+>
+> On Mon, 2024-06-10 at 15:05 -0500, Steve French wrote:
+>
 > Yes - the reproducer helps.  The bug is easy to reproduce.
-> 
+>
+>
 > I wanted to verify that the succeeding cases are the same that I see:
-> - works with "cache=none"
+>
+> - works with "cache=3Dnone"
+>
 > and
+>
 > - works with "nobrl"
+>
 > and
-> - works with "vers=1.0"
-> 
+>
+> - works with "vers=3D1.0"
+>
+>
 > All other combinations fail ...
-> 
+>
+>
 > Should be straightforward to fix in cifs.ko.  Will look at a fix for
+>
 > this later today.
-
-Awesome, thanks. 
-
+>
+>
+> Awesome, thanks.
+>
+>
 > Note that the problem with SMB3.1.1 POSIX extensions is a Samba bug -
+>
 > a serious regression in the server (but trivial fix).  We are waiting
-> on someone to merge the oneline fix to the server (which we tested
-> out
+>
+> on someone to merge the oneline fix to the server (which we tested out
+>
 > ok) from David.
+>
+>
+> Is there an MR for this?  I couldn't find it.
 
-Is there an MR for this?  I couldn't find it.
+I was puzzled why there wasn't a fix immediately applied since it was
+tested (and could add my Reviewed-by if that helped), and obvious
+server bug (regression), but I think David (who wrote the fix) was
+busy with other tasks.  I would have done one but I am out of date
+with the Samba merge process.
 
-Andrew Bartlett
+There are two other fairly simple problems (with basic SMB3.1.1
+behavior), e.g. ctime not being updated in a few obvious cases (which
+is not really a POSIX only issue, as it also affects default mounts
+from Windows to Samba)  which we hit in SMB3.1.1 POSIX - that I would
+love to see fixes for so we could restart our regular test automation
+to Samba from Linux (cifs.ko SMB3.1.1 POSIX mounts)
 
--- 
 
-Andrew Bartlett (he/him)       https://samba.org/~abartlet/
-Samba Team Member (since 2001) https://samba.org
-Samba Team Lead                https://catalyst.net.nz/services/samba
-Catalyst.Net Ltd
 
-Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
-company
+--=20
+Thanks,
 
-Samba Development and Support: https://catalyst.net.nz/services/samba
-
-Catalyst IT - Expert Open Source Solutions
-
--- 
-Andrew Bartlett (he/him)       https://samba.org/~abartlet/
-Samba Team Member (since 2001) https://samba.org
-Samba Team Lead                https://catalyst.net.nz/services/samba
-Catalyst.Net Ltd
-
-Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
-company
-
-Samba Development and Support: https://catalyst.net.nz/services/samba
-
-Catalyst IT - Expert Open Source Solutions
-
+Steve
