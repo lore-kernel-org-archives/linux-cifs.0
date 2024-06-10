@@ -1,438 +1,307 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7663142E62
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 15:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13191B812
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 20:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718033460; cv=none; b=sarNzoffnRf6A9Ub5Ey9UyKTDRR16G4QBvsohjeEVUEls2wXEhVkJacLyQXNWv4ITZptzl6Hu/f0tNI4WLAEMFCICwg0KNksSYK8EJwlAWNNpm6aYCYnd9zsqwIWGz/Q0vaWXHDvXQpHWaXEczqPW23gxiByecga4yhECQ5vnfM=
+	t=1718049926; cv=none; b=Th4j2oNcXCIhXYqbGHlJLnmr6EY4yZGVDXpT4Gxs+tS3I3VzkG9E6+JKk9K723w+82lKrq2nA2qwazAROtKkA6+28jmOBlQpdbzJ6JrTNM2gcH1qhoReIblEzsqTa+R8Y5LPZw9cGjYHKVdlu+1x/aUPtOphAwMkDDGYb73Xbsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718033460; c=relaxed/simple;
-	bh=yjECLl1FgXCMba3JnGjcAmt82Oh1bxRIlCgKMX4yLNM=;
+	s=arc-20240116; t=1718049926; c=relaxed/simple;
+	bh=yJNmEoenUWrw8vyhgqrskSHIM6AFpbBf9D3l557usME=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DaQrAUJTRjVS/0igP/KPulvy4Op6kidBn5nJAvwR6WEryiwCRe08Q86awcfwlNLfil5edy5tUwEG5pLa4JrkXDSt8d2a88wSDp7zgWqwLGVBGtdoNsTO9IuZR3MXO5Uncj3bChOvicODeLKMIB5XA6qCefuovqSnJxB0sMwL53g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8EnKlYB; arc=none smtp.client-ip=209.85.167.44
+	 To:Cc:Content-Type; b=hTXJvMThBHKloqG9H3m68VUABFsSNQ9zjxRp8imhuwSoM7+bXkVxMQGp3+j4bgryX7UVfCGCW9IIySFmetcH5SX0ofs1cflXm1Biid1KmFAXfaAK5FqgH2oeHpmyMhzEF4yapCSmpILxABnkR9DuRMYm0xgcydqDglt84ot+SRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDf/Dn5n; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8EnKlYB"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5295eb47b48so5336946e87.1
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 08:30:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDf/Dn5n"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52bc335e49aso455992e87.3
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Jun 2024 13:05:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718033457; x=1718638257; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718049923; x=1718654723; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DH18BJmYnDFjdU11yNijKpNf1f9t4pI1Gv91O6NkAd0=;
-        b=a8EnKlYB2I2CXmd36iqJ+xYqS20Mg+oY6rbnwJV4qjOAX4WYbmdpBZfabEynBWJBdV
-         l3ncF7o5WtnAXFbknsx5BRPByEZP+rZOubQvq8lT2pP5OuEDrlRhMNVzvb8+tlQQ0kNB
-         38UJIN2v+JKyc74emKOXPlcPPVfHk8oVZRHzsSXGkyyM2rUpd719XCdR2Okx113xN9A9
-         8/qO9CXh2UrrJNIooR4uy/NB+AwkbEaU3fBKf/pnya3FFCd3ULvMf6Qlvk4ZeI+7vWho
-         iWXRgCQ4C2SuJGNDMKrGfkGgzxnS1VE4OTGKD/uqd3ATpXnTs+pqnRKaE3qr1KqDk2YQ
-         6ctA==
+        bh=4dvSvY6Nl0S99MPKBQPNt0oPHjcs6hYqvsv4wixiCtI=;
+        b=iDf/Dn5nNCyGJBKRlRTdesljLWa5cM4Ky/4pr2yn79BiqIQnFMXVTbNk68QX0AybtZ
+         mHUxhjthAPN8A5ZGFcfL31FUu8AJWRxN6jwRqMk8kev8RTS7nQW7IysaD7TfUBkqS5jL
+         JwYgBFXXlLMBoF+0aLOZJiNFg4QrF3Uz3nJf51Lpenaq9eu3b4MTOOgB6t6A+cGRbLlu
+         /kgoXdcbhb5UjPosQaFSEmtGFb5F3eZzSpjti3FQajOkefsJqGmzszyics2EzC9bLNxE
+         kghCkaspgt84Zr4lIlz/v7Z9SkAjz221PqXv7yhczLqI4O7IsZDJ9aloPa1GScV4m0CA
+         JbXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718033457; x=1718638257;
+        d=1e100.net; s=20230601; t=1718049923; x=1718654723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DH18BJmYnDFjdU11yNijKpNf1f9t4pI1Gv91O6NkAd0=;
-        b=bc12HRconWafnX6hLC+HEOYOWoFx7CjEYEBbKIE9F1JNT1fpQtxzLbLG47yETuhF06
-         7swoRdbUE2vbsGZzbpOAQRdRcE3ZNqYW5QPXTvg1NiWRpok5KI+0IJW02/g458l6Qv/D
-         5o0ER6orhLADlecy57oTr2K/qA3k1F+E6iwVi5nRmaNoFUwztV4dodEXYQBYqKxhuZ/R
-         8sh70qla4NnZ1kEo1zdqX8b1cEqIVOmpZ1oj0/LEZ2rEVMKHoBBsqa2s3o3e7qmqebyp
-         VAJM4mvIfoanfTK13ENJP3n0aiI0Dx3/mb5GUFH1dkpxhCez3FnggyWfdGwJVkFdHLcj
-         Ca2w==
-X-Gm-Message-State: AOJu0YxN6pCBjUglDP+5/QjCIDymDyjNUgTjzN+FOlevwud943GCmlwJ
-	kUBblG3aYG9bNGwYkbFDb35lwRoaBHSeYEUZiemmKoCjR4ICGUewVfp4CHhH10HN2IUovb+Buz/
-	/TY/eYRDD/CBBmyFq/4D8h16Uafo=
-X-Google-Smtp-Source: AGHT+IGJxB2EcfvJDUr65D+bsVPqYIEolyb1AXBVu6U1zUf2sA0mjDiNeSbIMLFxqaxvT/uBkyIkVV3hAm3BjSmG4oE=
-X-Received: by 2002:a05:6512:3ca1:b0:52c:859f:9f77 with SMTP id
- 2adb3069b0e04-52c859fa036mr2912752e87.19.1718033456504; Mon, 10 Jun 2024
- 08:30:56 -0700 (PDT)
+        bh=4dvSvY6Nl0S99MPKBQPNt0oPHjcs6hYqvsv4wixiCtI=;
+        b=WkpAOtlID4v7WxvY5QthYNg+q/cTGCnJJIxx93Nrt4hol77NQK2NRgRWh6hAC0pe1i
+         erJKhNk63DLCONxKgFXrkIxwrOn5KiT0sM7FqtqPwuh7w+7CaNo+lWgY8xvgRdJD1qKo
+         CaOrMNU10HumG+CDdGCgwotnM+klWckgFnebrKrkpnjI+vWihKBJCjMtYMTkjDf9anfU
+         3FDHVN4+pXYNjmK+OCVH6+KShTOMusQ+Cga45rRzOQjgdSmF+wEVbeRzbYpTF/wpqLJr
+         Vnz7GdqDOL6v15Srzy+LifLW/vY28Joq4NJLUeL9qJOLMN2Z7He9+gKBSrhutp1OV72Y
+         k/xg==
+X-Forwarded-Encrypted: i=1; AJvYcCV07M41oSdrVJVLVYZgdSxMx+hY5QIKOdpPafIEdW0EfODb21NuW5NFbfNvZKTriOBZYiT+raChM0/qKPsNnDub4n3wwd2Wxu2N+w==
+X-Gm-Message-State: AOJu0YyMa35LYClF47nzr8GSe0ajuKzAc44xyTOm895gDkjL/n98P+Ic
+	c1A3tE2lVIH6OkKiKHuAHHzMTrowQp79BnycfprcZe3p4SfX1ORKBgxEGxJ6+XtWa3azdWmJB0y
+	DYNawg8r2oiYetSB7YmvAH4qVHbwult87
+X-Google-Smtp-Source: AGHT+IFPCB15Rl5ZqH+oYsl+xfa+un4/ahwk1e7E+anjCi2ryWPfWI6E2appDfQ+XQu6je+wWyixQD3/bt4waLogNw0=
+X-Received: by 2002:a05:6512:252b:b0:52c:47fa:e7d3 with SMTP id
+ 2adb3069b0e04-52c47faea94mr4529281e87.41.1718049922403; Mon, 10 Jun 2024
+ 13:05:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240610141416.8039-1-linkinjeon@kernel.org> <20240610141416.8039-2-linkinjeon@kernel.org>
-In-Reply-To: <20240610141416.8039-2-linkinjeon@kernel.org>
+References: <5659539.ZASKD2KPVS@wintermute> <CAH2r5mtzzgG9-peAakYhBNdpahQ=R8wkhJxUQJ+oZtzEvuNjSg@mail.gmail.com>
+ <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
+In-Reply-To: <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 10 Jun 2024 10:30:45 -0500
-Message-ID: <CAH2r5mu_Lyw=jTUegNHAQwqFhAz1=5RmPfdTrVVviFOAQzWYsw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] ksmbd: add durable scavenger timer
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, senozhatsky@chromium.org, tom@talpey.com, 
-	atteh.mailbox@gmail.com
+Date: Mon, 10 Jun 2024 15:05:10 -0500
+Message-ID: <CAH2r5mu_5V1OXwiOa2csH9n_J+ZPDYNhiuYBDoONYBqewNaNkQ@mail.gmail.com>
+Subject: Re: Different behavior of POSIX file locks depending on cache mode
+To: Andrew Bartlett <abartlet@samba.org>
+Cc: Kevin Ottens <kevin.ottens@enioka.com>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Minor compile warning was generated by this:
+Yes - the reproducer helps.  The bug is easy to reproduce.
 
-/home/smfrench/smb3-kernel/fs/smb/server/vfs_cache.c:39:19: warning:
-symbol 'dh_task' was not declared. Should it be static?
-/home/smfrench/smb3-kernel/fs/smb/server/vfs_cache.c:40:19: warning:
-symbol 'dh_wq' was not declared. Should it be static?
+I wanted to verify that the succeeding cases are the same that I see:
+- works with "cache=3Dnone"
+and
+- works with "nobrl"
+and
+- works with "vers=3D1.0"
 
-On Mon, Jun 10, 2024 at 9:14=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
- wrote:
+All other combinations fail ...
+
+Should be straightforward to fix in cifs.ko.  Will look at a fix for
+this later today.
+
+Note that the problem with SMB3.1.1 POSIX extensions is a Samba bug -
+a serious regression in the server (but trivial fix).  We are waiting
+on someone to merge the oneline fix to the server (which we tested out
+ok) from David.
+
+diff --git a/source3/smbd/smb2_trans2.c b/source3/smbd/smb2_trans2.c
+index b43f8f6330a..d03250a8912 100644
+--- a/source3/smbd/smb2_trans2.c
++++ b/source3/smbd/smb2_trans2.c
+@@ -1992,7 +1992,7 @@ static bool
+fsinfo_unix_valid_level(connection_struct *conn,
+                                    uint16_t info_level)
+ {
+        if (conn_using_smb2(conn->sconn) &&
+-           fsp->posix_flags =3D=3D FSP_POSIX_FLAGS_OPEN &&
++           (fsp->posix_flags & FSP_POSIX_FLAGS_OPEN) &&
+            info_level =3D=3D SMB2_FS_POSIX_INFORMATION_INTERNAL)
+        {
+                return true;
+
+
+
+
+
+On Sun, Jun 9, 2024 at 11:41=E2=80=AFPM Andrew Bartlett <abartlet@samba.org=
+> wrote:
 >
-> Launch ksmbd-durable-scavenger kernel thread to scan durable fps that
-> have not been reclaimed by a client within the configured time.
+> (resend due spam rules on list)
 >
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->  fs/smb/server/mgmt/user_session.c |   2 +
->  fs/smb/server/server.c            |   1 +
->  fs/smb/server/server.h            |   1 +
->  fs/smb/server/smb2pdu.c           |   2 +-
->  fs/smb/server/smb2pdu.h           |   2 +
->  fs/smb/server/vfs_cache.c         | 165 +++++++++++++++++++++++++++++-
->  fs/smb/server/vfs_cache.h         |   2 +
->  7 files changed, 169 insertions(+), 6 deletions(-)
+> Kia Ora Steve,
 >
-> diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_=
-session.c
-> index aec0a7a12405..162a12685d2c 100644
-> --- a/fs/smb/server/mgmt/user_session.c
-> +++ b/fs/smb/server/mgmt/user_session.c
-> @@ -149,6 +149,7 @@ void ksmbd_session_destroy(struct ksmbd_session *sess=
-)
+> I'm working with Kevin on this, and I set up a clean environment with
+> the latest software to make sure this is all still an issue on current
+> software:
 >
->         ksmbd_tree_conn_session_logoff(sess);
->         ksmbd_destroy_file_table(&sess->file_table);
-> +       ksmbd_launch_ksmbd_durable_scavenger();
->         ksmbd_session_rpc_clear_list(sess);
->         free_channel_list(sess);
->         kfree(sess->Preauth_HashValue);
-> @@ -326,6 +327,7 @@ void destroy_previous_session(struct ksmbd_conn *conn=
-,
+> I was hoping to include the old SMB1 unix extensions in this test also,
+> but these seem unsupported in current kernels.  When did they go away?
 >
->         ksmbd_destroy_file_table(&prev_sess->file_table);
->         prev_sess->state =3D SMB2_SESSION_EXPIRED;
-> +       ksmbd_launch_ksmbd_durable_scavenger();
->  out:
->         up_write(&conn->session_lock);
->         up_write(&sessions_table_lock);
-> diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-> index c67fbc8d6683..4d24cc105ef6 100644
-> --- a/fs/smb/server/server.c
-> +++ b/fs/smb/server/server.c
-> @@ -377,6 +377,7 @@ static void server_ctrl_handle_reset(struct server_ct=
-rl_struct *ctrl)
->  {
->         ksmbd_ipc_soft_reset();
->         ksmbd_conn_transport_destroy();
-> +       ksmbd_stop_durable_scavenger();
->         server_conf_free();
->         server_conf_init();
->         WRITE_ONCE(server_conf.state, SERVER_STATE_STARTING_UP);
-> diff --git a/fs/smb/server/server.h b/fs/smb/server/server.h
-> index db7278181760..4fc529335271 100644
-> --- a/fs/smb/server/server.h
-> +++ b/fs/smb/server/server.h
-> @@ -44,6 +44,7 @@ struct ksmbd_server_config {
->         unsigned int            max_connections;
+> Anyway, here is the data.  It certainly looks like an issue with the
+> SMB3 client, as only the client changes with the cache=3Dnone
 >
->         char                    *conf[SERVER_CONF_WORK_GROUP + 1];
-> +       struct task_struct      *dh_task;
->  };
+> Server is Samba 4.20.1 from Debian Sid.  Kernel is
+> Linux debian-sid-cifs-client 6.7.9-amd64 #1 SMP PREEMPT_DYNAMIC Debian
+> 6.7.9-2 (2024-03-13) x86_64 GNU/Linux
 >
->  extern struct ksmbd_server_config server_conf;
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index b6c5a8ea3887..4fb5070d3dc5 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -3519,7 +3519,7 @@ int smb2_open(struct ksmbd_work *work)
->                                         SMB2_CREATE_GUID_SIZE);
->                         if (dh_info.timeout)
->                                 fp->durable_timeout =3D min(dh_info.timeo=
-ut,
-> -                                               300000);
-> +                                               DURABLE_HANDLE_MAX_TIMEOU=
-T);
->                         else
->                                 fp->durable_timeout =3D 60;
->                 }
-> diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-> index 643f5e1cfe35..3be7d5ae65a8 100644
-> --- a/fs/smb/server/smb2pdu.h
-> +++ b/fs/smb/server/smb2pdu.h
-> @@ -72,6 +72,8 @@ struct create_durable_req_v2 {
->         __u8 CreateGuid[16];
->  } __packed;
+> With SMB1 but not unix extensions (seems unsupported):
 >
-> +#define DURABLE_HANDLE_MAX_TIMEOUT     300000
-> +
->  struct create_durable_reconn_req {
->         struct create_context_hdr ccontext;
->         __u8   Name[8];
-> diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-> index a6804545db28..882a87f9e3ab 100644
-> --- a/fs/smb/server/vfs_cache.c
-> +++ b/fs/smb/server/vfs_cache.c
-> @@ -8,6 +8,8 @@
->  #include <linux/filelock.h>
->  #include <linux/slab.h>
->  #include <linux/vmalloc.h>
-> +#include <linux/kthread.h>
-> +#include <linux/freezer.h>
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpass,vers=3D1.0
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: x count: 0
+> Third file descriptor 5
+> Wrote to third fd: 1
 >
->  #include "glob.h"
->  #include "vfs_cache.h"
-> @@ -17,6 +19,7 @@
->  #include "mgmt/tree_connect.h"
->  #include "mgmt/user_session.h"
->  #include "smb_common.h"
-> +#include "server.h"
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: x count: -1
+> Third file descriptor 5
+> Wrote to third fd: -1
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix
 >
->  #define S_DEL_PENDING                  1
->  #define S_DEL_ON_CLS                   2
-> @@ -31,6 +34,11 @@ static struct ksmbd_file_table global_ft;
->  static atomic_long_t fd_limit;
->  static struct kmem_cache *filp_cache;
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix,nobrl
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: o count: 1
+> Third file descriptor 5
+> Wrote to third fd: 1
 >
-> +static bool durable_scavenger_running;
-> +static DEFINE_MUTEX(durable_scavenger_lock);
-> +struct task_struc *dh_task;
-> +wait_queue_head_t dh_wq;
-> +
->  void ksmbd_set_fd_limit(unsigned long limit)
->  {
->         limit =3D min(limit, get_max_files());
-> @@ -279,9 +287,16 @@ static void __ksmbd_remove_durable_fd(struct ksmbd_f=
-ile *fp)
->         if (!has_file_id(fp->persistent_id))
->                 return;
+> And with cache=3Dnone
 >
-> -       write_lock(&global_ft.lock);
->         idr_remove(global_ft.idr, fp->persistent_id);
-> +}
-> +
-> +static void ksmbd_remove_durable_fd(struct ksmbd_file *fp)
-> +{
-> +       write_lock(&global_ft.lock);
-> +       __ksmbd_remove_durable_fd(fp);
->         write_unlock(&global_ft.lock);
-> +       if (waitqueue_active(&dh_wq))
-> +               wake_up(&dh_wq);
->  }
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix,cache=3Dnone
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: o count: 1
+> Third file descriptor 5
+> Wrote to third fd: 1
 >
->  static void __ksmbd_remove_fd(struct ksmbd_file_table *ft, struct ksmbd_=
-file *fp)
-> @@ -304,7 +319,7 @@ static void __ksmbd_close_fd(struct ksmbd_file_table =
-*ft, struct ksmbd_file *fp)
->         struct ksmbd_lock *smb_lock, *tmp_lock;
+> On Thu, 2024-05-23 at 11:12 -0500, Steve French wrote:
+> > What is the behavior with "nobrl" mount option? and what is the
+> > behavior when running with the POSIX extensions enabled (e.g. to
+> > current Samba or ksmbd adding "posix" to the mount options)
+> >
+> > On Thu, May 23, 2024 at 11:08=E2=80=AFAM Kevin Ottens <
+> > kevin.ottens@enioka.com
+> > > wrote:
+> > > Hello,
+> > >
+> > > I've been hunting down a bug exhibited by Libreoffice regarding
+> > > POSIX file
+> > > locks in conjunction with CIFS mounts. In short: just before
+> > > saving, it
+> > > reopens a file on which it already holds a file lock (via another
+> > > file
+> > > descriptor in the same process) in order to read from it to create
+> > > a backup
+> > > copy... but the read call fails.
+> > >
+> > > I've been in discussion with Andrew Bartlett for a little while
+> > > regarding this
+> > > issue and, after exploring several venues, he advised me to send an
+> > > email to
+> > > this list in order to get more opinions about it.
+> > >
+> > > The latest discovery we did was that the cache option on the
+> > > mountpoint seems
+> > > to impact the behavior of the POSIX file locks. I made a minimal
+> > > test
+> > > application (attached to this email) which basically does the
+> > > following:
+> > >  * open a file for read/write
+> > >  * set a POSIX write lock on the whole file
+> > >  * open the file a second time and try to read from it
+> > >  * open the file a third time and try to write to it
+> > >
+> > > It assumes there is already some text in the file. Also, as it goes
+> > > it outputs
+> > > information about the calls.
+> > >
+> > > The output I get is the following with cache=3Dstrict on the mount:
+> > > ---
+> > > Testing with /mnt/foo
+> > > Got new file descriptor 3
+> > > Lock set: 1
+> > > Second file descriptor 4
+> > > Read from second fd: x count: -1
+> > > Third file descriptor 5
+> > > Wrote to third fd: -1
+> > > ---
+> > >
+> > > If I'm using cache=3Dnone:
+> > > ---
+> > > Testing with /mnt/foo
+> > > Got new file descriptor 3
+> > > Lock set: 1
+> > > Second file descriptor 4
+> > > Read from second fd: b count: 1
+> > > Third file descriptor 5
+> > > Wrote to third fd: 1
+> > > ---
+> > >
+> > > That's the surprising behavior which prompted the email on this
+> > > list. Is it
+> > > somehow intended that the cache option would impact the semantic of
+> > > the file
+> > > locks? At least it caught me by surprise and I wouldn't expect such
+> > > a
+> > > difference in behavior.
+> > >
+> > > Now, since the POSIX locks are process wide, I would have expected
+> > > to have the
+> > > output I'm getting for the "cache=3Dnone" case to be also the one I'm
+> > > getting
+> > > for the "cache=3Dstrict" case.
+> > >
+> > > I'm looking forward to feedback on this one. I really wonder if we
+> > > missed
+> > > something obvious or if there is some kind of bug in the cifs
+> > > driver.
+> > >
+> > > Regards.
+> > > --
+> > > K=C3=A9vin Ottens
+> > > kevin.ottens@enioka.com
+> > >
+> > > +33 7 57 08 95 13
+> >
+> >
 >
->         fd_limit_close();
-> -       __ksmbd_remove_durable_fd(fp);
-> +       ksmbd_remove_durable_fd(fp);
->         if (ft)
->                 __ksmbd_remove_fd(ft, fp);
->
-> @@ -696,6 +711,142 @@ static bool tree_conn_fd_check(struct ksmbd_tree_co=
-nnect *tcon,
->         return fp->tcon !=3D tcon;
->  }
->
-> +static bool ksmbd_durable_scavenger_alive(void)
-> +{
-> +       mutex_lock(&durable_scavenger_lock);
-> +       if (!durable_scavenger_running) {
-> +               mutex_unlock(&durable_scavenger_lock);
-> +               return false;
-> +       }
-> +       mutex_unlock(&durable_scavenger_lock);
-> +
-> +       if (kthread_should_stop())
-> +               return false;
-> +
-> +       if (idr_is_empty(global_ft.idr))
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
-> +static void ksmbd_scavenger_dispose_dh(struct list_head *head)
-> +{
-> +       while (!list_empty(head)) {
-> +               struct ksmbd_file *fp;
-> +
-> +               fp =3D list_first_entry(head, struct ksmbd_file, node);
-> +               list_del_init(&fp->node);
-> +               __ksmbd_close_fd(NULL, fp);
-> +       }
-> +}
-> +
-> +static int ksmbd_durable_scavenger(void *dummy)
-> +{
-> +       struct ksmbd_file *fp =3D NULL;
-> +       unsigned int id;
-> +       unsigned int min_timeout =3D 1;
-> +       bool found_fp_timeout;
-> +       LIST_HEAD(scavenger_list);
-> +       unsigned long remaining_jiffies;
-> +
-> +       __module_get(THIS_MODULE);
-> +
-> +       set_freezable();
-> +       while (ksmbd_durable_scavenger_alive()) {
-> +               if (try_to_freeze())
-> +                       continue;
-> +
-> +               found_fp_timeout =3D false;
-> +
-> +               remaining_jiffies =3D wait_event_timeout(dh_wq,
-> +                                  ksmbd_durable_scavenger_alive() =3D=3D=
- false,
-> +                                  __msecs_to_jiffies(min_timeout));
-> +               if (remaining_jiffies)
-> +                       min_timeout =3D jiffies_to_msecs(remaining_jiffie=
-s);
-> +               else
-> +                       min_timeout =3D DURABLE_HANDLE_MAX_TIMEOUT;
-> +
-> +               write_lock(&global_ft.lock);
-> +               idr_for_each_entry(global_ft.idr, fp, id) {
-> +                       if (!fp->durable_timeout)
-> +                               continue;
-> +
-> +                       if (atomic_read(&fp->refcount) > 1 ||
-> +                           fp->conn)
-> +                               continue;
-> +
-> +                       found_fp_timeout =3D true;
-> +                       if (fp->durable_scavenger_timeout <=3D
-> +                           jiffies_to_msecs(jiffies)) {
-> +                               __ksmbd_remove_durable_fd(fp);
-> +                               list_add(&fp->node, &scavenger_list);
-> +                       } else {
-> +                               unsigned long durable_timeout;
-> +
-> +                               durable_timeout =3D
-> +                                       fp->durable_scavenger_timeout -
-> +                                               jiffies_to_msecs(jiffies)=
-;
-> +
-> +                               if (min_timeout > durable_timeout)
-> +                                       min_timeout =3D durable_timeout;
-> +                       }
-> +               }
-> +               write_unlock(&global_ft.lock);
-> +
-> +               ksmbd_scavenger_dispose_dh(&scavenger_list);
-> +
-> +               if (found_fp_timeout =3D=3D false)
-> +                       break;
-> +       }
-> +
-> +       mutex_lock(&durable_scavenger_lock);
-> +       durable_scavenger_running =3D false;
-> +       mutex_unlock(&durable_scavenger_lock);
-> +
-> +       module_put(THIS_MODULE);
-> +
-> +       return 0;
-> +}
-> +
-> +void ksmbd_launch_ksmbd_durable_scavenger(void)
-> +{
-> +       if (!(server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE))
-> +               return;
-> +
-> +       mutex_lock(&durable_scavenger_lock);
-> +       if (durable_scavenger_running =3D=3D true) {
-> +               mutex_unlock(&durable_scavenger_lock);
-> +               return;
-> +       }
-> +
-> +       durable_scavenger_running =3D true;
-> +
-> +       server_conf.dh_task =3D kthread_run(ksmbd_durable_scavenger,
-> +                                    (void *)NULL, "ksmbd-durable-scaveng=
-er");
-> +       if (IS_ERR(server_conf.dh_task))
-> +               pr_err("cannot start conn thread, err : %ld\n",
-> +                      PTR_ERR(server_conf.dh_task));
-> +       mutex_unlock(&durable_scavenger_lock);
-> +}
-> +
-> +void ksmbd_stop_durable_scavenger(void)
-> +{
-> +       if (!(server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE))
-> +               return;
-> +
-> +       mutex_lock(&durable_scavenger_lock);
-> +       if (!durable_scavenger_running) {
-> +               mutex_unlock(&durable_scavenger_lock);
-> +               return;
-> +       }
-> +
-> +       durable_scavenger_running =3D false;
-> +       if (waitqueue_active(&dh_wq))
-> +               wake_up(&dh_wq);
-> +       mutex_unlock(&durable_scavenger_lock);
-> +       kthread_stop(server_conf.dh_task);
-> +}
-> +
->  static bool session_fd_check(struct ksmbd_tree_connect *tcon,
->                              struct ksmbd_file *fp)
->  {
-> @@ -756,11 +907,12 @@ void ksmbd_free_global_file_table(void)
->         unsigned int            id;
->
->         idr_for_each_entry(global_ft.idr, fp, id) {
-> -               __ksmbd_remove_durable_fd(fp);
-> -               kmem_cache_free(filp_cache, fp);
-> +               ksmbd_remove_durable_fd(fp);
-> +               __ksmbd_close_fd(NULL, fp);
->         }
->
-> -       ksmbd_destroy_file_table(&global_ft);
-> +       idr_destroy(global_ft.idr);
-> +       kfree(global_ft.idr);
->  }
->
->  int ksmbd_validate_name_reconnect(struct ksmbd_share_config *share,
-> @@ -816,6 +968,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, =
-struct ksmbd_file *fp)
->         }
->         up_write(&ci->m_lock);
->
-> +       fp->f_state =3D FP_NEW;
->         __open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
->         if (!has_file_id(fp->volatile_id)) {
->                 fp->conn =3D NULL;
-> @@ -855,6 +1008,8 @@ int ksmbd_init_file_cache(void)
->         if (!filp_cache)
->                 goto out;
->
-> +       init_waitqueue_head(&dh_wq);
-> +
->         return 0;
->
->  out:
-> diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-> index f2ab1514e81a..b0f6d0f94cb8 100644
-> --- a/fs/smb/server/vfs_cache.h
-> +++ b/fs/smb/server/vfs_cache.h
-> @@ -153,6 +153,8 @@ struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid)=
-;
->  struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry);
->  unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
->  struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *f=
-ilp);
-> +void ksmbd_launch_ksmbd_durable_scavenger(void);
-> +void ksmbd_stop_durable_scavenger(void);
->  void ksmbd_close_tree_conn_fds(struct ksmbd_work *work);
->  void ksmbd_close_session_fds(struct ksmbd_work *work);
->  int ksmbd_close_inode_fds(struct ksmbd_work *work, struct inode *inode);
 > --
-> 2.25.1
 >
+> Andrew Bartlett (he/him)       https://samba.org/~abartlet/
+> Samba Team Member (since 2001) https://samba.org
+> Samba Team Lead                https://catalyst.net.nz/services/samba
+> Catalyst.Net Ltd
+>
+> Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
+> company
+>
+> Samba Development and Support: https://catalyst.net.nz/services/samba
+>
+> Catalyst IT - Expert Open Source Solutions
+>
+> --
+> Andrew Bartlett (he/him)       https://samba.org/~abartlet/
+> Samba Team Member (since 2001) https://samba.org
+> Samba Team Lead                https://catalyst.net.nz/services/samba
+> Catalyst.Net Ltd
+>
+> Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
+> company
+>
+> Samba Development and Support: https://catalyst.net.nz/services/samba
+>
+> Catalyst IT - Expert Open Source Solutions
 
 
---=20
+
+--
 Thanks,
 
 Steve
