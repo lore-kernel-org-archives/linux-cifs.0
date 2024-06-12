@@ -1,55 +1,35 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9B05336D;
-	Tue, 11 Jun 2024 14:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8729181312;
+	Wed, 12 Jun 2024 15:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718116951; cv=none; b=vESlw8VKDI2xpDqcbRjNecvsV/1Ei2wCJNN6koLHqFZqHhBSflr5p6DzfyhYiSuYSnjy2WYTAOOYNOdFZ4ocyrlqgs4CzYH0EKyKG+DoKoXCsWEexHsW7Tk85wifJ/crd8rptMMQhg2XLQ63iGNMP0/IDPlNWWcM+hvAy4p5Ghc=
+	t=1718207758; cv=none; b=TqXTeEeTAyXVbweCTjoWfBrrGZJUwDrCPyIDjVgVE3FZ26jyM9Z3RPxx6/LeAjEp3TsP95CT+n6UP0CUMsRsB8M3+YQyKDh1oR2OoF1wnWNVpe8KaS7+09BcaDD6vEo2GpIVOIzC3TiLZ1xqA9gNc9zEuyE5KGmvuf/A4EuNMZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718116951; c=relaxed/simple;
-	bh=jboeQ8nuXofiKGnAVVqFgVrGBESzCeHoA1Ouj+vGIOs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XwSvD5Nb6ygoPXP0jMQ+kIjfUB2L9uwwKJeh4YePOkyYcoILp2ZTM9NcoaowwwHm9GuJXgTSiT35vCZgl4i+890yl6dICJQiENfBHhiLTG47DwfsEDYu/Bsq5yS2qSfi2LB+NCB1+GWBrYx1FwUI4PbsHP6t8F2P3Bs23NGd1YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-6c53a315c6eso4301057a12.3;
-        Tue, 11 Jun 2024 07:42:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718116949; x=1718721749;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9KDw44L8SS8YIgF73KlJ2tVSxG5HB3488LWyU9PuNc0=;
-        b=d2bW/Xaxw3H8/gIs+n5ONYYE81+z+/c0hi5bD1pz1K8HEvxZmJIFivVXPRVkpSqrU+
-         Kyvih+H43fd8vRjCc+e2lZr503GIrseCaDA+eLw0C7nvKYvLMEdpRoQk4hiTXRcjyQgo
-         rKqLNPxZpiOJwtnHurg7fJucRTMdngZr9xe/c5c7qh7kzeY+SNtKeNukiOqLEmcCrHWa
-         4wzMsRSkunooMyoo4JGkVzsfGYdUlTkEd6GqBxInr9YD/zxQvPXbQ0qKjIw0hwecIen2
-         7j5W291fkw1H55M8WKoOFNxAcN3fYygAUjayiIBc7/qqERtxWK1erBHkrnigrAE6umqO
-         nu8A==
-X-Forwarded-Encrypted: i=1; AJvYcCV2mKr/0/wIHJFEA8buU5LacdBYMsQwap4RCRbhJzjvZdvPR0R72Am1TUaqUvGQYa+Lm4cdXckTWqfOwHiKqx61586+aP/u
-X-Gm-Message-State: AOJu0Yx3GtHVwMMZT1wSRJmrVDOTXbamy2iu2fJKQb3U6coo0fmQEr8m
-	Y9TW+jh1Xbo2CZgRQXl7bu/wsIo3YdfJ/JOYLq8mKqE4ACjjMKohL73wZA==
-X-Google-Smtp-Source: AGHT+IHK7cBj6XJKH7EDR3Yu8OKQ6czBvrr+yRC2WQyOtdhqUWeL2K65L0YWR04/4toBOj0dXPHOmA==
-X-Received: by 2002:a05:6a21:1518:b0:1af:bd03:3222 with SMTP id adf61e73a8af0-1b2f9c89fd2mr14256522637.45.1718116949331;
-        Tue, 11 Jun 2024 07:42:29 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70598c98443sm3424679b3a.180.2024.06.11.07.42.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 07:42:29 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	stable@vger.kernel.org,
-	Wang Zhaolong <wangzhaolong1@huawei.com>
-Subject: [PATCH] ksmbd: fix missing use of get_write in in smb2_set_ea()
-Date: Tue, 11 Jun 2024 23:41:59 +0900
-Message-Id: <20240611144200.22118-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718207758; c=relaxed/simple;
+	bh=OGohKvk0MjWf9+Q8+mvrBX+1BAlKKRyUXLbfH75xyb4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aVOTTwsJpcctQuUjdTM8dhm19LLOc1Dt6AuwIhKCXrejUHcYcJPE5H4DC9Fzyw6QCAdYqEK0nP0ui81Knrinl0W7LiaUbPTrmLHR1XPSyo1uTsFW2/6YtmNxiP9jkihUCMxy7nnZMPsyNeMQ5f1h0fnSNwiH7kbWlovFqnKdm34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYWVzenO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYWVzenO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7AEC7C4DDE4;
+	Wed, 12 Jun 2024 15:55:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718207757;
+	bh=OGohKvk0MjWf9+Q8+mvrBX+1BAlKKRyUXLbfH75xyb4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kYWVzenO6v46dav7m+6VeeBQvWtkfZ2ijSROLzZNF2xhVox8NT4g6D7nEQ7Yr1CvD
+	 QbMqbzoNwKvtHxN4oOUSJGsdzFSOiqxLCA02gKqMCQ7TCsZzzusBONx5M/RWdCVpV3
+	 EiLccKqgRHfAnZUsG10WiKCsIr5ffuOoIqg1qhcsU6IhDG8FGsX5pkowWNVMy10FlC
+	 cn2EJB/8N7UtSBq02dCqRuSQs3PZ1MDiLAg7XtxdpzyjShLg11I47hWenlonizyvmL
+	 MeVPPNyid+I2VhiIZBpPj5WbK56sRWz78MH6UY8PKtaaCMSFrdgOOixPo+5vEX+bSG
+	 8/iqEXeUVgsUQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61107C43618;
+	Wed, 12 Jun 2024 15:55:57 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -57,120 +37,63 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [f2fs-dev] [PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+From: patchwork-bot+f2fs@kernel.org
+Message-Id: 
+ <171820775738.32393.13116890369510221266.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Jun 2024 15:55:57 +0000
+References: <20240516133454.681ba6a0@rorschach.local.home>
+In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, ath10k@lists.infradead.org,
+ Julia.Lawall@inria.fr, linux-s390@vger.kernel.org, dev@openvswitch.org,
+ linux-cifs@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+ linux-rdma@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ io-uring@vger.kernel.org, torvalds@linux-foundation.org,
+ iommu@lists.linux.dev, ath11k@lists.infradead.org,
+ linux-media@vger.kernel.org, linux-wpan@vger.kernel.org,
+ linux-pm@vger.kernel.org, selinux@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ linux-erofs@lists.ozlabs.org, virtualization@lists.linux.dev,
+ linux-sound@vger.kernel.org, linux-block@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, mathieu.desnoyers@efficios.com,
+ linux-cxl@vger.kernel.org, linux-tegra@vger.kernel.org,
+ intel-xe@lists.freedesktop.org, linux-edac@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+ linuxppc-dev@lists.ozlabs.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+ linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+ ath12k@lists.infradead.org, tipc-discussion@lists.sourceforge.net,
+ mhiramat@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ freedreno@lists.freedesktop.org, linux-nfs@vger.kernel.org,
+ linux-btrfs@vger.kernel.org
 
-Fix an issue where get_write is not used in smb2_set_ea().
+Hello:
 
-Fixes: 6fc0a265e1b9 ("ksmbd: fix potential circular locking issue in smb2_set_ea()")
-Cc: stable@vger.kernel.org
-Reported-by: Wang Zhaolong <wangzhaolong1@huawei.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/smb2pdu.c   |  7 ++++---
- fs/smb/server/vfs.c       | 17 +++++++++++------
- fs/smb/server/vfs.h       |  3 ++-
- fs/smb/server/vfs_cache.c |  3 ++-
- 4 files changed, 19 insertions(+), 11 deletions(-)
+This patch was applied to jaegeuk/f2fs.git (dev)
+by Steven Rostedt (Google) <rostedt@goodmis.org>:
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 8bcede718c21..63a41193f6e6 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2367,7 +2367,8 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
- 			if (rc > 0) {
- 				rc = ksmbd_vfs_remove_xattr(idmap,
- 							    path,
--							    attr_name);
-+							    attr_name,
-+							    get_write);
- 
- 				if (rc < 0) {
- 					ksmbd_debug(SMB,
-@@ -2382,7 +2383,7 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
- 		} else {
- 			rc = ksmbd_vfs_setxattr(idmap, path, attr_name, value,
- 						le16_to_cpu(eabuf->EaValueLength),
--						0, true);
-+						0, get_write);
- 			if (rc < 0) {
- 				ksmbd_debug(SMB,
- 					    "ksmbd_vfs_setxattr is failed(%d)\n",
-@@ -2474,7 +2475,7 @@ static int smb2_remove_smb_xattrs(const struct path *path)
- 		    !strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
- 			     STREAM_PREFIX_LEN)) {
- 			err = ksmbd_vfs_remove_xattr(idmap, path,
--						     name);
-+						     name, true);
- 			if (err)
- 				ksmbd_debug(SMB, "remove xattr failed : %s\n",
- 					    name);
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 51b1b0bed616..9e859ba010cf 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1058,16 +1058,21 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
- }
- 
- int ksmbd_vfs_remove_xattr(struct mnt_idmap *idmap,
--			   const struct path *path, char *attr_name)
-+			   const struct path *path, char *attr_name,
-+			   bool get_write)
- {
- 	int err;
- 
--	err = mnt_want_write(path->mnt);
--	if (err)
--		return err;
-+	if (get_write == true) {
-+		err = mnt_want_write(path->mnt);
-+		if (err)
-+			return err;
-+	}
- 
- 	err = vfs_removexattr(idmap, path->dentry, attr_name);
--	mnt_drop_write(path->mnt);
-+
-+	if (get_write == true)
-+		mnt_drop_write(path->mnt);
- 
- 	return err;
- }
-@@ -1380,7 +1385,7 @@ int ksmbd_vfs_remove_sd_xattrs(struct mnt_idmap *idmap, const struct path *path)
- 		ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
- 
- 		if (!strncmp(name, XATTR_NAME_SD, XATTR_NAME_SD_LEN)) {
--			err = ksmbd_vfs_remove_xattr(idmap, path, name);
-+			err = ksmbd_vfs_remove_xattr(idmap, path, name, true);
- 			if (err)
- 				ksmbd_debug(SMB, "remove xattr failed : %s\n", name);
- 		}
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index cfe1c8092f23..cb76f4b5bafe 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -114,7 +114,8 @@ int ksmbd_vfs_setxattr(struct mnt_idmap *idmap,
- int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
- 				size_t *xattr_stream_name_size, int s_type);
- int ksmbd_vfs_remove_xattr(struct mnt_idmap *idmap,
--			   const struct path *path, char *attr_name);
-+			   const struct path *path, char *attr_name,
-+			   bool get_write);
- int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
- 			       unsigned int flags, struct path *parent_path,
- 			       struct path *path, bool caseless);
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 882a87f9e3ab..3bf1b3fb6ec8 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -262,7 +262,8 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
- 		ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
- 		err = ksmbd_vfs_remove_xattr(file_mnt_idmap(filp),
- 					     &filp->f_path,
--					     fp->stream.name);
-+					     fp->stream.name,
-+					     true);
- 		if (err)
- 			pr_err("remove xattr failed : %s\n",
- 			       fp->stream.name);
+On Thu, 16 May 2024 13:34:54 -0400 you wrote:
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> 
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.10 and submit it then. Hoping
+>    to keep the conflicts that it will cause to a minimum.
+> ]
+> 
+> [...]
+
+Here is the summary with links:
+  - [f2fs-dev] tracing/treewide: Remove second parameter of __assign_str()
+    https://git.kernel.org/jaegeuk/f2fs/c/2c92ca849fcc
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
