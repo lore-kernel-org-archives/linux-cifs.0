@@ -1,81 +1,114 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA031946B9;
-	Fri, 14 Jun 2024 10:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from eproxy.izw-berlin.de (eproxy.izw-berlin.de [62.141.164.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5EB14830B
+	for <linux-cifs@vger.kernel.org>; Fri, 14 Jun 2024 11:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.141.164.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718359417; cv=none; b=G3pGarfBFbN+OEEtZ56qpTS2KfpvJyRo+MqMfows2Z/ejsiikqSGb+6EGpogG2aPeezGtAc5m/1UdJN56JjR8Sfy0MQZjrsuaS1T2szO09N00eA6TB9R4cbLEMLQRg2chJ+tKR4Nz5DNGdUhje7fjZLmP5Xszlwe+TThuBPg6H0=
+	t=1718362936; cv=none; b=Yz2fXIFmtkG9gjmnxe55qm8ySbiZqmxnN/M+6Fg2/WjpDBERGZJeAgNd7zppHcyoveYouH4G/XdRqRgOB1w13tZ+0VZE3IZ6TM7VIQOgf5hd/3qWcqhhHK9GRejJVuWSpydgLYfbWfbwB/oEoECnVxKVLLMvRrTEm+xsEa/euPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718359417; c=relaxed/simple;
-	bh=LrtkEuvKffls++VLZGvU+odWuHFgeu13Obm1nGKPmcw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ebu0+9F0zkfXEhGBEbmXlUBMwId/l+dmZopncEeW5QfwC2naxGbRs+vJpKWeDdA1saacxq+bPxyV8QihumQkFYKIZW+cG83FhGqp9vu5d2J3FwOyOGiGuTbaVN2GMkCTWsEXZpwr2bibAVhskR11XDNteNBo6FWv9urHOqYwgsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wcjp3WhV; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1718362936; c=relaxed/simple;
+	bh=fPZEXXC3yjjlmeiucbJ7tr0D8awAsufBLi899c++uzE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QbaksDp5Yh1m/yyiSJ4rmxwQ6B3pm/8oobPsyoRH7Tifqdn0eW4zXQ2k7didjQy8Y5no0T3epNO38ptcFeB/sg2FcCRE1E9AbbRYNEm/C2WysDOfxs/YhhGibMV9TwauqFpjLPzJfUtupkVy0Np0MlmsLKh1DJs6fwQ9dXeRfn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de; spf=pass smtp.mailfrom=izw-berlin.de; dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b=rAHMevJj; arc=none smtp.client-ip=62.141.164.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=izw-berlin.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wcjp3WhV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=FStQe0rOw4ovI+CUc36E/SQiQptY2BV5r14yvxvD/o8=; b=wcjp3WhVk78M5sPQVxfA8WojUN
-	z48Q4IpxtprJCyho9D71S9CReioWmnl7v2h9kyQHZXyrSHYnjIMFgmLnRFH3uMV+hX3fpZRyZ2f+7
-	kuKBR7gBriGaMAshc60VvfaoIFsrzU70w0OAGIy1V5HHLkuEiKHKa9Z+wlK1WpyNSIQ38b+IWR2Cl
-	QdIG6+n6UgZWfquOXvYUL7xE1zgUToJula4U1pipmEwOhGlHWnHudJ1Y4x5FVuzf6VD9Kt6L8z9NQ
-	oaT1kgD+PPdK5cPbdXJ5UAQjxigbvjCgZEb5Ra6lf16c21CxneLxOfRLBdcUZDdzKQIeaUNrFm9K1
-	FYbNi2uQ==;
-Received: from 2a02-8389-2341-5b80-6543-87c9-27d1-cd7c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:6543:87c9:27d1:cd7c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sI3mQ-00000002Kh1-1Wya;
-	Fri, 14 Jun 2024 10:03:34 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>
-Cc: Steve French <sfrench@samba.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH] nfs: fix nfs_swap_rw for large-folio swap
-Date: Fri, 14 Jun 2024 12:03:25 +0200
-Message-ID: <20240614100329.1203579-2-hch@lst.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240614100329.1203579-1-hch@lst.de>
-References: <20240614100329.1203579-1-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b="rAHMevJj"
+Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by eproxy.izw-berlin.de over TLS secured channel with Microsoft SMTPSVC(10.0.14393.4169);
+	 Fri, 14 Jun 2024 13:02:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; d=izw-berlin.de; s=p2024; c=simple/simple;
+	t=1718362926; h=from:subject:to:date:message-id;
+	bh=fPZEXXC3yjjlmeiucbJ7tr0D8awAsufBLi899c++uzE=;
+	b=rAHMevJjNGSfxa0h5GlBIqKPD/VZVSPKfIqK+1sJ2nf0BhwfQDEW9zWte6FZG6ntwfBW53n+3EZ
+	S8ZMli9aZfaiiS4sjd9DXiQG/dLz9CZ9sBt3gugARq+OnFs0CT0nMuw1zMDgg/mRX0Z9jCbGh7dYO
+	VqVVESJNmfAglYQDwmY=
+Received: from izw-mail-3.izw-berlin.local (192.168.2.11) by
+ izw-mail-3.izw-berlin.local (192.168.2.11) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 14 Jun 2024 13:02:06 +0200
+Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by
+ izw-mail-3.izw-berlin.local ([192.168.2.11]) with mapi id 15.01.2507.039;
+ Fri, 14 Jun 2024 13:02:06 +0200
+From: "Heckmann, Ilja" <heckmann@izw-berlin.de>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+CC: "dhowells@redhat.com" <dhowells@redhat.com>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>
+Subject: Re: Crash when attempting to run executables from a share
+Thread-Topic: Crash when attempting to run executables from a share
+Thread-Index: AQHavkpLSV40U19kGEKeMUGSqVoUAw==
+Date: Fri, 14 Jun 2024 11:02:05 +0000
+Message-ID: <8f407430e3254611bdcd4ddc880bfd1a@izw-berlin.de>
+References: <55a38b4f4da449bb9da403d4f58847c5@izw-berlin.de>,<zfyfkb4zhatmzxcggdhuk2expapwetgqigdlku6ohq72bdtv3i@tx6uzncfj7jn>
+In-Reply-To: <zfyfkb4zhatmzxcggdhuk2expapwetgqigdlku6ohq72bdtv3i@tx6uzncfj7jn>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginalArrivalTime: 14 Jun 2024 11:02:06.0269 (UTC) FILETIME=[4B6616D0:01DABE4A]
 
-As of Linux 6.10-rc the MM can swap out larger than page size chunks.
-NFS has all code ready to handle this, but has a VM_BUG_ON that
-triggers when this happens.  Simply remove the VM_BUG_ON to fix this
-use case.
+Thank you, Enzo, that's promising news! And thank you, David, for the work.
+Compiling and installing a pre-release kernel feels above my skill level, b=
+ut
+I'm looking forward to trying it as soon as I can get the stable version fr=
+om
+the Arch repo and will report back.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/nfs/direct.c | 2 --
- 1 file changed, 2 deletions(-)
+Best wishes,
+Ilja
 
-diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-index bb2f583eb28bf1..90079ca134dd3c 100644
---- a/fs/nfs/direct.c
-+++ b/fs/nfs/direct.c
-@@ -141,8 +141,6 @@ int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
- {
- 	ssize_t ret;
- 
--	VM_BUG_ON(iov_iter_count(iter) != PAGE_SIZE);
--
- 	if (iov_iter_rw(iter) == READ)
- 		ret = nfs_file_direct_read(iocb, iter, true);
- 	else
--- 
-2.43.0
+________________________________________
+Von: Enzo Matsumiya <ematsumiya@suse.de>
+Gesendet: Donnerstag, 13. Juni 2024 19:37:06
+An: Heckmann, Ilja
+Cc: dhowells@redhat.com; linux-cifs@vger.kernel.org
+Betreff: [[ EXT ]] Re: Crash when attempting to run executables from a shar=
+e
 
+Hi,
+
+On 06/13, Heckmann, Ilja wrote:
+> ...
+>This is what the smb.conf looks like, without the (hopefully) irrelevant
+>domain membership and printing settings:
+>---------------------------------
+>[global]
+>case sensitive =3D yes
+>delete readonly =3D yes
+>map acl inherit =3D yes
+>vfs objects =3D acl_xattr
+>oplocks =3D no
+>level2 oplocks =3D no
+>min protocol =3D SMB2
+>
+>[share]
+>path =3D /data/share
+>read only =3D no
+>acl_xattr:ignore system acl =3D yes
+>---------------------------------
+
+Thanks for the reproducer info.
+
+>And here is a crash record from the journal:
+>--------------------------------------------------------------------------=
+------
+>Jun 13 10:08:13 server kernel: ------------[ cut here ]------------
+>Jun 13 10:08:13 server kernel: WARNING: CPU: 121 PID: 3906695 at fs/smb/cl=
+ient/file.c:3341 cifs_limit_bvec_su bset.constprop.0+0xf2/0x130 [cifs]
+> ...
+
+That's not reproducible since v6.10-rc1, probably because of David's netfs =
+work.
+Can you try a kernel >=3D than that one?
+
+
+Cheers,
+
+Enzo
