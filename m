@@ -1,25 +1,45 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB5A5025E;
-	Mon, 17 Jun 2024 10:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kvr.at (smtp.kvr.at [83.65.151.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CA616DC32;
+	Mon, 17 Jun 2024 17:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.65.151.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718620403; cv=none; b=WsORkfk9n0GRovcDe3TbqqT7wlAu4U6z3atDVz/2siFDs1krzwVR0nX/0d9frMr6DY2iKx94EWni+DDva12sZ7ny1RCD9nLd4xQB19VyGK7fgyqjZHueAI8eJ/EP7SBFIQ4pjy5aVs3yGtx5PomRkY6SQN7h7FAMUoEHOJzmbcI=
+	t=1718645190; cv=none; b=B97/DI1faEptk4GNm8qRAYSytVM0kqbZCbjdhhpAQwpNHhQ49mLGjNH//Dzw+lZUl64mDudCCSoX/bpUaIqDrDuueKrQs7UAyvM0Zpk/oVXfNXG/2w4+aoUDQICnO5O5OUIhgulF5WUwexRYSN2uoiom2GWV9kZ+HBTZvnWbfGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718620403; c=relaxed/simple;
-	bh=D7daG2P3zTaLVdDPsBZ0/zrVy1K9o+Z2GL96yr4V6sw=;
+	s=arc-20240116; t=1718645190; c=relaxed/simple;
+	bh=eroIsAP7wOvBXsB8a4Z+fCWgoahxgGvp7mSRwrsG1DM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uO2Dll4gjQ9kj0ZI15eHo3At01XwZTPocNxu/rDjX9ojMeHMttXIAAOZxpGmAkmcX9nXZ9l+qwMuz7hw8PvNla775ytMy4IA1ZswaFmTY/jk6LnWnYiRWoAU9r8ftDH5APeeuiS6IaD1xYtDyWgfUtT8IYH8qmQOFVOcFXHSZzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADC0FDA7;
-	Mon, 17 Jun 2024 03:33:44 -0700 (PDT)
-Received: from [10.57.73.35] (unknown [10.57.73.35])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 202233F6A8;
-	Mon, 17 Jun 2024 03:33:17 -0700 (PDT)
-Message-ID: <d91b3c19-5d62-457a-88e4-6bb6c3c7d6a6@arm.com>
-Date: Mon, 17 Jun 2024 11:33:16 +0100
+	 In-Reply-To:Content-Type; b=Egg3QYuOZj7xPW3jDzeBCK1oPcOdhfgcAVbkG//ZL7H/wBDuRCHo83XJsSeBQGqW3jUq9w/jPvvye0h0jO1qnQd+uyB7mUHq0JUmlQZTjC7/qw5uMTPa8t/rN2TZG6gGWXo6eiVR1XykkZZRXfkqeVHZFQ6Ms8Vy6OfPafuq0qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (4096-bit key) header.d=debian.org header.i=@debian.org header.b=G3Q9mHiQ; arc=none smtp.client-ip=83.65.151.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=debian.org header.i=@debian.org header.b="G3Q9mHiQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=20200417.ckk.user; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:
+	From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eroIsAP7wOvBXsB8a4Z+fCWgoahxgGvp7mSRwrsG1DM=; b=G3Q9mHiQA7hyoCjPxO4ITg3mvy
+	jLmhcIeKAJMMFq4TmBvjfR0asmDuEwTKF92FMLIiHvj88/r9KO+Pc5oqHBspeV6gCO/rjLrcC5YoA
+	oVxP02MWaepETm8JAVEoj8fkd4MOqCSOJj9KHYKD6vuDBc7yP9+bR+KRHupqDmn6hmYlZRkLcBPkG
+	ETWWjNKPVG+72f+z+GKGoL41/iJH1Gzc27FuUPxSmVko2xliUfFL9Wx0dWmdxWz0qq437vQUVCCa7
+	+cm4vz/G6TuiUHLn9zdND5+W0FISCaFyE932jzgBcp0sgTUnR9gyANminHUF3Bs2qaGxDZJeGs/7E
+	avHSdiDvVRTq2lu9PycGcdEQhQX/XhpToO2NdbOFsHjTuOC7R8utV5syBjD98TtudBs1Y9i95vtAO
+	wchqjgKEOFrX4bC75vIgg1UjNFydAMrQ/EfyZJOU7/rOk4fKqoXkx38hzOZ5qg7VDSO1gDmce5i0i
+	DtC77QzVzvKMGApRmI3pQVGg1LqszGbpU9xcWOxq61d8dWuVgo9J6KKI2h+Grd1KcY+fkbRu2evun
+	ix12GQk95O4yu72jkd0WPlHiXv9flF+Qr7nUkL5BYHTpko80qWGJEu4+w0ArgrqkiUfJU9DKNOYX1
+	iWOqv7aANppxW5tbVgM02dQqJJXr6Epu8rwrgsacc=;
+Received: from [192.168.0.7] (port=58816)
+	by smtp.kvr.at with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.97)
+	(envelope-from <ckk@debian.org>)
+	id 1sJFsf-00000006mK8-1MJu;
+	Mon, 17 Jun 2024 19:10:56 +0200
+Message-ID: <57e56ca5-bbbc-495a-926e-54d7e2f5e76c@debian.org>
+Date: Mon, 17 Jun 2024 19:10:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -27,132 +47,74 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfs: fix nfs_swap_rw for large-folio swap
-Content-Language: en-GB
-To: Barry Song <21cnbao@gmail.com>, Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
- Steve French <sfrench@samba.org>, linux-nfs@vger.kernel.org,
- linux-cifs@vger.kernel.org, linux-mm@kvack.org,
- Barry Song <v-songbaohua@oppo.com>
-References: <20240614100329.1203579-1-hch@lst.de>
- <20240614100329.1203579-2-hch@lst.de>
- <20240614112148.cd1961e84b736060c54bdf26@linux-foundation.org>
- <CAGsJ_4wnWzoScqO9_NddHcDPbe_GbAiRFVm4w_H+QDmH=e=Rsw@mail.gmail.com>
- <20240616085436.GA28058@lst.de>
- <CAGsJ_4ytrnXJbfVi=PpTw34iBDqEoAm3b16oZr2VQpVWLmh5zA@mail.gmail.com>
- <9ef638fc-5606-45da-a237-2e09ee05bbeb@arm.com>
- <CAGsJ_4xDkjN0X8ogE9djmu+nDUd_PJcSwr+GVH4vUiUAeJskaQ@mail.gmail.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <CAGsJ_4xDkjN0X8ogE9djmu+nDUd_PJcSwr+GVH4vUiUAeJskaQ@mail.gmail.com>
+Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
+To: David Howells <dhowells@redhat.com>
+Cc: Andrea Righi <andrea.righi@canonical.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Luca Boccassi <bluca@debian.org>,
+ TJ <linux@iam.tj>, Emanuele Rocca <ema@debian.org>
+References: <Zj0ErxVBE3DYT2Ea@gpd>
+ <20231221132400.1601991-1-dhowells@redhat.com>
+ <20231221132400.1601991-41-dhowells@redhat.com>
+ <531994.1716450257@warthog.procyon.org.uk> <ZlnnkzXiPPuEK7EM@ariel.home>
+Content-Language: en-US
+From: Christian Kastner <ckk@debian.org>
+Autocrypt: addr=ckk@debian.org; keydata=
+ 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
+In-Reply-To: <ZlnnkzXiPPuEK7EM@ariel.home>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 17/06/2024 10:40, Barry Song wrote:
-> On Mon, Jun 17, 2024 at 8:03 PM Ryan Roberts <ryan.roberts@arm.com> wrote:
->>
->> On 16/06/2024 11:23, Barry Song wrote:
->>> On Sun, Jun 16, 2024 at 4:54 PM Christoph Hellwig <hch@lst.de> wrote:
->>>>
->>>> On Sun, Jun 16, 2024 at 12:16:10PM +1200, Barry Song wrote:
->>>>> As I understand it, this isn't happening because we don't support
->>>>> mTHP swapping out to a swapfile, whether it's on NFS or any
->>>>> other filesystem.
->>>>
->>>> It does happen.  The reason why I sent this patch is becaue I observed
->>>> the BUG_ON trigger on a trivial swap generation workload (usemem.c from
->>>> xfstests).
->>>
->>> This is quite unusual. Could you share your setup and backtrace? I'd
->>> like to reproduce the issue, as the mm code only supports mTHP
->>> swapout on block devices. What is your swap device or swap file?
->>> Additionally, on what kind of filesystem is the executable file built
->>> from usemem.c located?
->>
->> Yes, I'm also confused by this, since as Barry says, the swap-out changes to
->> support mTHP are only intended to be activated when the swap device is a
->> non-rotating block device - swap files on file systems are explicitly not
->> supported and all swapping should be done page-by-page in that case. This
->> constraint is exactly the same as for the pre-existing PMD-size THP swap-out
->> support. So if you are seeing large folios being written after the mTHP swap-out
->> change, you should also be seeing large folios before this change.
->>
->> Hopefully the stack trace will tell us what's going on here.
-> 
-> Hi Ryan, Christoph,
-> 
-> I am able to reproduce the issue now. I am debugging and will update
-> the root cause
-> with you this week.
+Hi,
 
-Ahh great; for some reason I'm not receiving Chrostoph's mails so didn't see the
-stack trace and instructions until you replied to it. I had a go are repro'ing
-too but am failing to even get the systemd nfs service to start. I'll leave it
-to you.
+On 2024-05-31 17:06, Emanuele Rocca wrote:
+> Meanwhile TJ (in CC) has been doing a lot of further investigation and
+> opened https://bugzilla.kernel.org/show_bug.cgi?id=218916.
 
-> 
-> Initial investigation shows the issue might *not* be related to THP_SWPOUT.
-> 
-> I am even able to reproduce it after disabling thp and mthp, entirely by
-> small folios:
-> 
-> [  215.925069] folio_alloc_swap folio nr:1 anon:1 swapbacked:1
-> [  215.926383] vmscan: shrink_folio_list folio nr:1 anon:1 swapbacked:1
-> [  215.927008] folio_alloc_swap folio nr:1 anon:1 swapbacked:1
-> [  215.929368] ------------[ cut here ]------------
-> [  215.929824] kernel BUG at fs/nfs/direct.c:144!
-> [  215.930403] Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> [  215.931264] Modules linked in:
-> [  215.932328] CPU: 3 PID: 214 Comm: mthp_swpout_tes Not tainted
-> 6.10.0-rc3-ga12328d9fb85-dirty #292
-> [  215.932953] Hardware name: linux,dummy-virt (DT)
-> [  215.933461] pstate: 21400005 (nzCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> [  215.934030] pc : nfs_swap_rw+0x60/0x70
-> [  215.935079] lr : swap_write_unplug+0x64/0xb0
-> [  215.935559] sp : ffff800087363280
-> [  215.935958] x29: ffff800087363280 x28: ffff0000c3241800 x27: fffffdffc323a4c0
-> [  215.937012] x26: fffffdffc323a4c8 x25: ffff0001b4a51500 x24: ffff80008250f670
-> [  215.937893] x23: 0000000000000001 x22: ffff0000c0b2da00 x21: 0000000000020000
-> [  215.938734] x20: ffff0000c46a8bd8 x19: ffff0000c154f800 x18: ffffffffffffffff
-> [  215.939594] x17: 0000000000000000 x16: 0000000000000000 x15: ffff800107363097
-> [  215.940591] x14: 0000000000000000 x13: 313a64656b636162 x12: 7061777320313a6e
-> [  215.941621] x11: 6f6e6120313a726e x10: ffff800083e86318 x9 : ffff8000803e9ad4
-> [  215.942673] x8 : ffff800087363168 x7 : 0000000000000000 x6 : ffff0001adbfa4c6
-> [  215.943674] x5 : 0000000000000002 x4 : 0000000000020000 x3 : 0000000000020000
-> [  215.944673] x2 : ffff8000806015e8 x1 : ffff8000873632a0 x0 : ffff0000c154f800
-> [  215.945568] Call trace:
-> [  215.945906]  nfs_swap_rw+0x60/0x70
-> [  215.946351]  __swap_writepage+0x2e8/0x328
-> [  215.946775]  swap_writepage+0x68/0xd0
-> [  215.947184]  pageout+0xe4/0x430
-> [  215.947587]  shrink_folio_list+0x9bc/0xf60
-> [  215.947992]  reclaim_folio_list+0x8c/0x168
-> [  215.948454]  reclaim_pages+0xfc/0x178
-> [  215.948843]  madvise_cold_or_pageout_pte_range+0x8d8/0xf28
-> [  215.949285]  walk_pgd_range+0x390/0x808
-> [  215.949660]  __walk_page_range+0x1e0/0x1f0
-> [  215.950040]  walk_page_range+0x1f0/0x2c8
-> [  215.950458]  madvise_pageout+0xf8/0x280
-> [  215.950905]  madvise_vma_behavior+0x314/0xa20
-> [  215.951361]  madvise_walk_vmas+0xc0/0x128
-> [  215.951807]  do_madvise.part.0+0x110/0x558
-> [  215.952298]  __arm64_sys_madvise+0x68/0x88
-> [  215.952723]  invoke_syscall+0x50/0x128
-> [  215.953148]  el0_svc_common.constprop.0+0x48/0xf8
-> [  215.953592]  do_el0_svc+0x28/0x40
-> [  215.954036]  el0_svc+0x50/0x150
-> [  215.954610]  el0t_64_sync_handler+0x13c/0x158
-> [  215.955070]  el0t_64_sync+0x1a4/0x1a8
-> [  215.955685] Code: a8c17bfd d50323bf 9a9fd000 d65f03c0 (d4210000)
-> [  215.956510] ---[ end trace 0000000000000000 ]---
-> 
-> 
->>
->> (Sorry for my slow responses/lack of engagement over the last month; its been a
->> combination of paternity leave/lack of sleep/working on other things. I'm hoping
->> to get properly back into this stuff within the next couple of weeks).
->>
->> Thanks,
->> Ryan
->>
+just to loop back to the MLs: in the referenced bug, TJ posted an
+analysis and and added a patch that fixed the issue for multiple testers.
 
+Best,
+Christian
