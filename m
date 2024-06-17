@@ -1,87 +1,125 @@
-Received: from submarine.notk.org (62-210-214-84.rev.poneytelecom.eu [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D16166316;
-	Mon, 17 Jun 2024 21:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4207492;
+	Mon, 17 Jun 2024 22:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718661035; cv=none; b=TEw/RNo7X7pdVmPv1FDETby87MIp8oRzT/qN5sD+B59IlqD0jyA+Xj6MiwVahGY8t4xQTEAxry2thBkphAPD6LikD0Jr2KDQ18VbTO+ATK1YSuY1TfO03glSQDzgOiCHU45LwwYsemG2P+ILWUDhvSt0JaibFnQ5N6tLEEwxjbE=
+	t=1718661811; cv=none; b=aYX/t22e7MWoAahoEhJP2vclDDNsFAhEt5glX47Nu0HQWadYrZ/j1H2UBCCEb8r4EAxFHOLcjHLYsu0cGcNO0/fnc/MtcVshWSL9KeR+x742p3hg9KaoY6AYb8dcJTt5KxjRResuDJ5ISwOZTjhYsS+vZ/LMLyA6gjMvnGKvLGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718661035; c=relaxed/simple;
-	bh=K5996YmuF9Yp/VeUlVnALyukbdeZvYdysz4v9fM3yfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lxlJ0IBcRcgzKfDImu3fOuwqmqERE3Sxz+UdOUL+Xt0madrZp8FyLWP+96XGTFZ4aV4Mw7H6+g6L05XvMeN4/ez8DJIeVxMcsMFDdHFYFQ6wmQlczB9jDKxku0x4W+MJTs/yx/t/M1L1I66BjZ+G6A5V00PyLtFD1LlGm1Q2WUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=gRJsNVcg; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	s=arc-20240116; t=1718661811; c=relaxed/simple;
+	bh=JeRfqVsQjqxDYKThVMdHv+1/FYBdVvbNZXaE7Z6ggS4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GRvwlBMBo1WRssm5oRPAiw/sLOiwF6reCM8Y27Z4oLeXhpYFXyqAvXmfIQ3v3q7Z3ZnOKfQ+G6QppSKkCl0lZs9Cq8SMzwvBqlwZioFClScMVlILKW4YiNTBQkw5LMniU90iNLbGrbGMAQu+Kw/kl3tbsL1ssa/cHACIDqNqbow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HIQeyxAk; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="gRJsNVcg"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 5AC4A14C1E3;
-	Mon, 17 Jun 2024 23:50:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1718661024;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hiIgFPt+sEVlD3kUlLI3/jKRfS5oj8sZw2II+1SmJqE=;
-	b=gRJsNVcgQ9b9/aamX83T1THpiGBoNbun7e2YBuUibZpxVBifs/D/JFC8KwlYEHn17DvvKt
-	D40r91JM2hXgVut6vW+l1LwrB5RyfWk8988PASY9mj80Os7I0ZPoLdfQffBgisSWiMTJWK
-	oifVvqMPeVoOxHDbxnshbKF94wGZlTdYrMog5B5G9U2EfEDMiFpfphTPa0QO8ymtPg0zKD
-	C5l0LH9K0T/xwb4Wtmv1K79gSu4Q/N3zpIHVcOEppgyazxG6yy5TP4bvMUsZKEojerjx2P
-	s48UJ+XD4RKV+iPOAklHilqq6GjZV4zIEMSolexVTwnPBJTvLJbUBgAMqIGogw==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id d3703de6;
-	Mon, 17 Jun 2024 21:50:16 +0000 (UTC)
-Date: Tue, 18 Jun 2024 06:50:01 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Christian Kastner <ckk@debian.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Andrea Righi <andrea.righi@canonical.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Luca Boccassi <bluca@debian.org>, TJ <linux@iam.tj>,
-	Emanuele Rocca <ema@debian.org>
-Subject: Re: [PATCH v5 40/40] 9p: Use netfslib read/write_iter
-Message-ID: <ZnCviUrk5iQGrE4x@codewreck.org>
-References: <Zj0ErxVBE3DYT2Ea@gpd>
- <20231221132400.1601991-1-dhowells@redhat.com>
- <20231221132400.1601991-41-dhowells@redhat.com>
- <531994.1716450257@warthog.procyon.org.uk>
- <ZlnnkzXiPPuEK7EM@ariel.home>
- <57e56ca5-bbbc-495a-926e-54d7e2f5e76c@debian.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIQeyxAk"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7042cb2abc8so3506750b3a.0;
+        Mon, 17 Jun 2024 15:03:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718661809; x=1719266609; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OthT64InZoPSjxn4tC63hXPySB5WxWKH+1+hvHHCkCU=;
+        b=HIQeyxAk+cqWDUVO+OE0FpqswN/W3iuaEBN6qvCddgNuZFKdWt3O5cFpXJFiQRLfNi
+         R4b+akVKFYTRtS05AoVtHJXzbB2q9dthEXqEXNKn6lT78dnmtEVDPoCxucTSSoSOUXbA
+         V2TxQs9+Y6bmhrG+hxxpgLVFu69VS2YBpgCdK4osIBrYDMFgTYMcCDXdyj84i47cBgEE
+         3frofH1Th3K3HuNXIB9GYvrXWXszh/G4toPRl2zRIX0cNWmm97ueW2h6Ahjt5D+BS7NI
+         O/1xGxE1EsrZGDfYDjkizx7N4RoGC5mf0UEX24CGJtrtHFusx0DTUORhsufy6qCrs6o4
+         WXgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718661809; x=1719266609;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OthT64InZoPSjxn4tC63hXPySB5WxWKH+1+hvHHCkCU=;
+        b=TRjy5uNi7yg1uaTS10MIoakYkxn7VY8Vpc1t0XCe/JPcs9bITWJwoU/tpoerm93WAR
+         cEc9M4ldRPtB/mp8uxsxayQtDjeaDm+EkwH7+5yo7eYIDrQCz74YRGYxXcfExvzKNnkt
+         VhKn/wFnI74112qepDkY5SMkMrie2OOw1KPahjEm9UGwXC6k+Ci/fpq0VNSvRpKemkOv
+         gsOhIH3uAxUiDfVQ0/iu+Ll7TllupsfUnXUoDbXo4Id356zGjZ4XUE1RT0sVWx1NJ+i7
+         AEotyCc2FSE4OPQn5hX9vyE4IY+1qF0i3LmIe6gKeBHT7P6+5sBK+g11mcptnqvROrW+
+         KzOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNc1nUO95qiNdYSLTOkzj73Q09FsLEZm9R+Pe7yUrGNxmPbML8Z4szCvj7VvPb4+cQxq/Djsq3xOLd4g2f+AD4ScnasbxF6m/1s0vwWa503VAgzwW1KCbiYGD4fihpsIl8
+X-Gm-Message-State: AOJu0Yzw8g0Xh7aKl3LUEPj6xbv6Dp4hLDzgc7XpstwMiuWYP3l95S8b
+	HB4A1jBFMTnImYSuBaNBTWCENDtLsP9B1/qsjBniAPca4TzvbBEV
+X-Google-Smtp-Source: AGHT+IG9I5vkz7rxNTFokc77oylq1cp4BaWMyV8LYpDzB0f5nXtaQTES9UcpoMyRf5qpPVLsCCExLA==
+X-Received: by 2002:a05:6a21:6da3:b0:1b4:4370:60f with SMTP id adf61e73a8af0-1bae7e1c9e6mr11360428637.1.1718661809341;
+        Mon, 17 Jun 2024 15:03:29 -0700 (PDT)
+Received: from localhost.localdomain ([2407:7000:8942:5500:aaa1:59ff:fe57:eb97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705cc91dc5csm8079864b3a.10.2024.06.17.15.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 15:03:28 -0700 (PDT)
+From: Barry Song <21cnbao@gmail.com>
+To: akpm@linux-foundation.org,
+	linux-mm@kvack.org,
+	linux-nfs@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org,
+	sfrench@samba.org,
+	Barry Song <v-songbaohua@oppo.com>,
+	Christoph Hellwig <hch@lst.de>,
+	NeilBrown <neilb@suse.de>,
+	Anna Schumaker <anna@kernel.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Chuanhua Han <hanchuanhua@oppo.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Chris Li <chrisl@kernel.org>,
+	"Huang, Ying" <ying.huang@intel.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] nfs: fix the incorrect assertion in nfs_swap_rw()
+Date: Tue, 18 Jun 2024 10:01:35 +1200
+Message-Id: <20240617220135.43563-1-21cnbao@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <57e56ca5-bbbc-495a-926e-54d7e2f5e76c@debian.org>
+Content-Transfer-Encoding: 8bit
 
-Christian Kastner wrote on Mon, Jun 17, 2024 at 07:10:56PM +0200:
-> On 2024-05-31 17:06, Emanuele Rocca wrote:
-> > Meanwhile TJ (in CC) has been doing a lot of further investigation and
-> > opened https://bugzilla.kernel.org/show_bug.cgi?id=218916.
-> 
-> just to loop back to the MLs: in the referenced bug, TJ posted an
-> analysis and and added a patch that fixed the issue for multiple testers.
+From: Barry Song <v-songbaohua@oppo.com>
 
-Thanks for the mail, one of these days I'll try to understand how to
-make bugzilla automatically put me in cc of all the 9p bugs..
+Since commit 2282679fb20b ("mm: submit multipage write for SWP_FS_OPS
+swap-space"), we can plug multiple pages then unplug them all together.
+That means iov_iter_count(iter) could be way bigger than PAGE_SIZE, it
+actually equals the size of iov_iter_npages(iter, INT_MAX).
 
-Analysis and tentative fix are of great help! Looks like we now
-understand what's wrong -- if I understand the description correctly we
-know the correct size (files aren't modified in the background, just
-other threads within the VM, right?); and the problem is that the netfs
-IO reverts the size back to an incorrect value when it completes?
+Note this issue has nothing to do with large folios as we don't support
+THP_SWPOUT to non-block devices.
 
-If so then the fix looks odd to me, the problem ought to be fixed at the
-netfs/9p interface level, I don't see why an unbuffered read should
-update the size metadata when it's done...
+Fixes: 2282679fb20b ("mm: submit multipage write for SWP_FS_OPS swap-space")
+Reported-by: Christoph Hellwig <hch@lst.de>
+Closes: https://lore.kernel.org/linux-mm/20240617053201.GA16852@lst.de/
+Cc: NeilBrown <neilb@suse.de>
+Cc: Anna Schumaker <anna@kernel.org>
+Cc: Steve French <sfrench@samba.org>
+Cc: Trond Myklebust <trondmy@kernel.org>
+Cc: Chuanhua Han <hanchuanhua@oppo.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Chris Li <chrisl@kernel.org>
+Cc: "Huang, Ying" <ying.huang@intel.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Barry Song <v-songbaohua@oppo.com>
+---
+ fs/nfs/direct.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-David, what do you think?
-
+diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
+index bb2f583eb28b..a1bfa86f467a 100644
+--- a/fs/nfs/direct.c
++++ b/fs/nfs/direct.c
+@@ -141,7 +141,7 @@ int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
+ {
+ 	ssize_t ret;
+ 
+-	VM_BUG_ON(iov_iter_count(iter) != PAGE_SIZE);
++	VM_WARN_ON(iov_iter_count(iter) != iov_iter_npages(iter, INT_MAX) * PAGE_SIZE);
+ 
+ 	if (iov_iter_rw(iter) == READ)
+ 		ret = nfs_file_direct_read(iocb, iter, true);
 -- 
-Dominique Martinet | Asmadeus
+2.34.1
+
