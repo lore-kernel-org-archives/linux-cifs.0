@@ -1,93 +1,120 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A689D481A3;
-	Sun, 16 Jun 2024 10:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1DC17F5;
+	Mon, 17 Jun 2024 05:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718533413; cv=none; b=LTIK52xpCqAIFCu3Knxo1R3EgG1yPvPefikLooRxYs0jin25qo9WrVkzdJ1YKKQaabuKWhLmfjnzOB71TCXScoyEP0K+oENLjogH5TcO6Cku1hM9B46QaFWnZUwQwE2+Clg7UAJseHD+O5+czYINShifFT6zghfLPlNKy5dnhvo=
+	t=1718602329; cv=none; b=agw/Zt3vLaaItpI93vi8Kj4tfEMsk+4se/xWUItziUHPjSGYq3wUfipaTCFfMaegyU0fxyygLjH0SDPlr7YDd7ZrnpCk48Mvs5CFPwqmSqpMvMQ7JdtbrT7tSIr3yt89gcMskcR/L6rlLaz0abMWqYkHRc7wZpnsLrkOZGWZC1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718533413; c=relaxed/simple;
-	bh=by8ohJEJs6lukJSLMe+E/tLehUWJmbmsLCVuB3MSp7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pTTxTOwoazFsHFWNhFaKXxmfczXwF2QlG0a292wjCujdPHzPkX3Q3RFBjgZAeeznH6JNxpQQeUwnQ6WNlKG2AZJj92KXUubUnEGEXZbBWNL0M5bWiSMB3binkhb8f/xszAaxgK1UiPzyZvR09TGC18RNI6PATiiGh8tTMxytT+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C12PPYTz; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C12PPYTz"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-4ed0abe8580so1104222e0c.2;
-        Sun, 16 Jun 2024 03:23:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718533410; x=1719138210; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MSBxsPczZ+4pot3zvMVUtuvia7JJEO/t9QU4pSIhmLc=;
-        b=C12PPYTz9h/ZJx7CkCEJ1ZhSkF3bp+FMzFdpdIbrs8D2WPVaeN/aKtRWQ3hxMe7ydQ
-         M0mHihYih1NjUvAbkrSHVWqWGFhVy66bvg4oIJNAkjKPu5kTt6Lh8nEqfq+9N4DX6OMY
-         PoTdoNK8rXfOmSemJT1eBMU20xjmeTSA7cWs6Clsd+j2K6PzQ6EfAUpCN5Qk6lmD0B4V
-         GO01lrSrBxyhlhcy5LmKm2eNfjir6o5l6l8Tt2l4ngliaq7+6xp5r3oIXIyA99xj1RDx
-         MHNlY+IiOyKK0UxeJo8J7v7HYm7rznjaz8Fr8Rutwq9PnbJyHqO/F+qAbWlGo5UlHJ5d
-         AMBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718533410; x=1719138210;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MSBxsPczZ+4pot3zvMVUtuvia7JJEO/t9QU4pSIhmLc=;
-        b=H7bkMQEnpuV2hiiyBSanjDm/bFFKpkAHXmxqj6j4RCQ+7NKnNaZyDZuEEZmmxPFL3m
-         s5VIhW2CUSCfBsdo/fgkSgE97KcCiA5Vhfh+1laCEFmT6fFPo0jWTvTn9jIWkwgK/v/6
-         DHSkPoai36Tx8jZRJyYQ1UE+fy4T9g+Pl3I919SOPbTeaoueBtdE8iFepquYARvnJIbW
-         lcavhHmZ3o+Kcbk78JmY0JxGd6cj8aTaT8CrM9RlhE7U1HnKbNcH5YH8pS4r2g7qU6mg
-         QoW5gPYoQJXPKYzGTo8qrDDQG3bC+bVXd1gtZsPkL8qLhgXjLs15aO6JHeY8lTkF5IBv
-         5qoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWmOjVMdbAHDNdl8/hNVBKY7lCEDb50jsV0kkvj8xm7sTQ/k3DEeeriJAk3aaKsSfmJaJMHjWrKWrIbTicb/buJGt5vNS6Ggj1ZzZFyqK3kxvRmX4NDtrxm28rXKYbqgtVS1mkglQ==
-X-Gm-Message-State: AOJu0Yx+1zdl9ufc6zMeB1xdrQK5043uJsx8yKwVD9pwhPuvNSV7QXaW
-	aiFuUgFPiUAxVZIdeGANxHJnRliSI38GLERSR7MXcJ6YIV8fj8jujf57+wbZ50gtV8zq0cfc68O
-	eWJ1ymCRvUe1umyZWVGlCiF7Dc+o=
-X-Google-Smtp-Source: AGHT+IEEl4jPkQqUM+tuvbj8jM0PJmlDwSYA0hEp4W8mWisa+3eruCF0wyklnGyyisWLVfbaOiXpgiyXYE5YuXsglc0=
-X-Received: by 2002:a05:6122:20a5:b0:4eb:5d5b:a894 with SMTP id
- 71dfb90a1353d-4ee3e291ec4mr6496762e0c.6.1718533409829; Sun, 16 Jun 2024
- 03:23:29 -0700 (PDT)
+	s=arc-20240116; t=1718602329; c=relaxed/simple;
+	bh=T4U9en+9FcyxPD5xHghxFc6euoBoQoZJ/4mPh9BTMOs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNpI1SoXcVjRX8m2sFSzX8OBBLa87VV0eDUKTMxRsAU3Mr/PkDg1VRZK1i0TVMcoe/vNRG7FqPcr3rjkdtVeyyR+lXwrk7rfvYbAjqtEm5dXoxZS+WK+krZN445XrZaxezYGIe26pWgbup65fdCUUaqrKwpzFnxCGqotjqitPSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id DBE6F68B05; Mon, 17 Jun 2024 07:32:01 +0200 (CEST)
+Date: Mon, 17 Jun 2024 07:32:01 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org, Barry Song <v-songbaohua@oppo.com>,
+	Ryan Roberts <ryan.roberts@arm.com>
+Subject: Re: [PATCH] nfs: fix nfs_swap_rw for large-folio swap
+Message-ID: <20240617053201.GA16852@lst.de>
+References: <20240614100329.1203579-1-hch@lst.de> <20240614100329.1203579-2-hch@lst.de> <20240614112148.cd1961e84b736060c54bdf26@linux-foundation.org> <CAGsJ_4wnWzoScqO9_NddHcDPbe_GbAiRFVm4w_H+QDmH=e=Rsw@mail.gmail.com> <20240616085436.GA28058@lst.de> <CAGsJ_4ytrnXJbfVi=PpTw34iBDqEoAm3b16oZr2VQpVWLmh5zA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240614100329.1203579-1-hch@lst.de> <20240614100329.1203579-2-hch@lst.de>
- <20240614112148.cd1961e84b736060c54bdf26@linux-foundation.org>
- <CAGsJ_4wnWzoScqO9_NddHcDPbe_GbAiRFVm4w_H+QDmH=e=Rsw@mail.gmail.com> <20240616085436.GA28058@lst.de>
-In-Reply-To: <20240616085436.GA28058@lst.de>
-From: Barry Song <21cnbao@gmail.com>
-Date: Sun, 16 Jun 2024 18:23:16 +0800
-Message-ID: <CAGsJ_4ytrnXJbfVi=PpTw34iBDqEoAm3b16oZr2VQpVWLmh5zA@mail.gmail.com>
-Subject: Re: [PATCH] nfs: fix nfs_swap_rw for large-folio swap
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-mm@kvack.org, 
-	Barry Song <v-songbaohua@oppo.com>, Ryan Roberts <ryan.roberts@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGsJ_4ytrnXJbfVi=PpTw34iBDqEoAm3b16oZr2VQpVWLmh5zA@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Sun, Jun 16, 2024 at 4:54=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> On Sun, Jun 16, 2024 at 12:16:10PM +1200, Barry Song wrote:
-> > As I understand it, this isn't happening because we don't support
-> > mTHP swapping out to a swapfile, whether it's on NFS or any
-> > other filesystem.
->
-> It does happen.  The reason why I sent this patch is becaue I observed
-> the BUG_ON trigger on a trivial swap generation workload (usemem.c from
-> xfstests).
+On Sun, Jun 16, 2024 at 06:23:16PM +0800, Barry Song wrote:
+> This is quite unusual. Could you share your setup and backtrace?
 
-This is quite unusual. Could you share your setup and backtrace? I'd
-like to reproduce the issue, as the mm code only supports mTHP
-swapout on block devices. What is your swap device or swap file?
-Additionally, on what kind of filesystem is the executable file built
-from usemem.c located?
+Do this in an x86 kvm vm with 1G of memory:
 
->
+mkfs.xfs -f /dev/vdb
+
+mount /dev/vdb /mnt/nfs1
+
+# this requires the following line in /etc/exports to actually export the
+# file system: "/mnt/nfs2	localhost(rw,no_root_squash)"
+systemctl restart nfs-kernel-server
+
+mount -t nfs 127.0.0.1:/mnt/nfs1/ /mnt/test/
+
+cd /mnt/test
+dd if=/dev/zero of=swapfile bs=1024 count=524288
+mkswap swapfile
+chmod 0600 swapfile
+swapon swapfile
+
+# xfstests-dev is a checked out and built xfstests repo
+~/xfstests-dev/src/usemem 1024
+
+The backtrace is at the end of the mail.
+
+> I'd
+> like to reproduce the issue, as the mm code only supports mTHP
+> swapout on block devices. What is your swap device or swap file?
+
+The above swap fіle on NFS is the only swap in the system
+
+> Additionally, on what kind of filesystem is the executable file built
+> from usemem.c located?
+
+Doesn't matter.  I've tried xfs, ext4 and nfs itself.
+
+root@testvm:~# ./xfstests-dev/src/usemem 1024
+[   65.065292] ------------[ cut here ]------------
+[   65.065528] kernel BUG at fs/nfs/direct.c:144!
+[   65.065724] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[   65.065988] CPU: 0 PID: 71 Comm: kswapd0 Not tainted 6.10.0-rc3+ #2587
+[   65.066270] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   65.066683] RIP: 0010:nfs_swap_rw+0x3f/0x50
+[   65.066893] Code: 00 00 74 13 e8 e2 fb ff ff 31 d2 48 85 c0 48 0f 4f c2 c3 cc cc cc cc e8 9f f8 ff ff 31 0
+[   65.067698] RSP: 0018:ffffc900001b79c8 EFLAGS: 00010206
+[   65.067949] RAX: ffffffff8162afc0 RBX: ffff88800ca24c00 RCX: 0000000000000004
+[   65.068274] RDX: ffff88800ca24c30 RSI: ffffc900001b79d0 RDI: ffff88800ca24c00
+[   65.068588] RBP: ffff88800dd710e8 R08: 0000000000004000 R09: 0000000000000010
+[   65.068911] R10: 0000000000035a40 R11: 000000000000001d R12: ffffc900001b7a78
+[   65.069225] R13: ffffc900001b7db0 R14: ffffc900001b7a68 R15: ffffea00003f1c40
+[   65.069542] FS:  0000000000000000(0000) GS:ffff88803ec00000(0000) knlGS:0000000000000000
+[   65.069904] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   65.070157] CR2: 00005606ddec4dd0 CR3: 000000000365a003 CR4: 0000000000770ef0
+[   65.070472] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   65.070784] DR3: 0000000000000000 DR6: 00000000ffff07f0 DR7: 0000000000000400
+[   65.071282] PKRU: 55555554
+[   65.071407] Call Trace:
+[   65.071519]  <TASK>
+[   65.071619]  ? die+0x31/0x80
+[   65.071754]  ? do_trap+0xd7/0x100
+[   65.071915]  ? do_error_trap+0x65/0x90
+[   65.072084]  ? nfs_swap_rw+0x3f/0x50
+[   65.072247]  ? exc_invalid_op+0x50/0x70
+[   65.072420]  ? nfs_swap_rw+0x3f/0x50
+[   65.072581]  ? asm_exc_invalid_op+0x1a/0x20
+[   65.072770]  ? __pfx_nfs_swap_rw+0x10/0x10
+[   65.072966]  ? nfs_swap_rw+0x3f/0x50
+[   65.073125]  swap_write_unplug+0x57/0x90
+[   65.073307]  shrink_folio_list+0x3a1/0xed0
+[   65.073500]  ? __mod_zone_page_state+0x61/0xa0
+[   65.073700]  ? isolate_lru_folios+0x2f3/0x400
+[   65.073902]  shrink_lruvec+0x587/0xb60
+[   65.074071]  ? shrink_slab+0x3ad/0x3c0
+[   65.074239]  ? shrink_slab+0x3ad/0x3c0
+[   65.074408]  shrink_node+0x2b7/0x7e0
+[   65.074569]  balance_pgdat+0x291/0x6f0
