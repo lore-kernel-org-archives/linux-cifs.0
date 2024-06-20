@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516C01B3F3B
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Jun 2024 17:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF7F1C8FAB
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Jun 2024 17:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718904800; cv=none; b=SfMsjpGiblBzp87z/60d/YrR/p7ef8cclfjwnNWBbPGbrrXwD+RVDx72dHzxjHjqe95WeAbbpBflJArOkFbyagNrFclJMAl1j0CO4IkZe7TIIGxnsi0GtAayoBTFl87cwSO0bUj8eV1G7Etc9Vlp3OQVI7pfRSa2dC2Di1JL0Aw=
+	t=1718904807; cv=none; b=NfjHf4UTZzW5shj4X+fxRJ+qJgQYJwD/ljeO82rvcbmZiwTIKCHuz/gDcwgXUnP8X997MoBGFb0qNqOBY1uNlKIlQrwaMDhjHtUv8HKYSZemcMW7Z7knWRRMIbfnh1/Nm2G2PDQynBtirFXHcol9nOiWiJKGJsyvOHNF1BXwy6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718904800; c=relaxed/simple;
-	bh=uNQJZwf5yvLmUciK79dFXHBncqmHSHmd+MY40pmnnuA=;
+	s=arc-20240116; t=1718904807; c=relaxed/simple;
+	bh=7q+wJzCww2SNJ3UcaKpzQR7ZAsX6Gi9tg4x7dh6z0Dk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pMJ9eI+U44bqvu0Z52JV7z4OvbDokA85k/0v+5eS4XchQrRBIIagT7eE+6PZTxE02jAVuZDu1umod7Ck0/ug85WEEGJjOb9JfhhL68ULAPIdrFqeTTq2cZIrs885HLSYCOu9oYUVLWHqpNgPfw1DJdRWyx23rrJpsSQr/+Gj6Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UvQWKUzf; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=AwLWhnJV0CetkjN9mJ7U7bta27wWohmsnOiIxx3rXHD+La6piTmc83QYiG65tuz2eojqs1hjbRq5oK4mE5SUBYhH1+gL1xiZoqN721oSji6rOZAakgXkehMPHpXpxIvMtTUZFyFpdfNpuIeykkGgKLo/ZF9/4k7+kA9txvNEak0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B9gh5+1K; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvQWKUzf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9gh5+1K"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718904797;
+	s=mimecast20190719; t=1718904805;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ts5ZCKmEyEPwC8pHpdqPl9OxtkpjpqDkyGOj4sN+myw=;
-	b=UvQWKUzfuQ3IO5MlDBMNI1ap5zxzhO0+jz9b2M3/PdKIJqpi5zTeM84YCjIuiRFtYCwwxe
-	Xos7MTdSFsY9oujJz5K5gcClizDdWQkoVGMVaOqxm1l4uFUlxpF34zjgZMVCe+PNBTtP97
-	ChthCSLesdaYnN6dFPLJnPhsSKRQjMA=
+	bh=uX8xcUkGpuu8sXJI7G0aibuVHEQvl2VRr7qcOSjNkD0=;
+	b=B9gh5+1KU85aaAL6SOrsPKEtFGzAIdGajDHA4wquUcFSbtgdK/EojfSiFPFTtR08ZvG4dR
+	bplsN3dKOgSSQfK1f72YGryp/djA2Ey7UTI39ilBVhlyn1OI7G6EsxXlN6vEaYuI81r7np
+	7sqqhMpGo/17BCvZkO89JMzp9TXt5vs=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-OqI8PTsvNIisGVH6w9IAGQ-1; Thu,
- 20 Jun 2024 13:33:14 -0400
-X-MC-Unique: OqI8PTsvNIisGVH6w9IAGQ-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-231-5gkrIObUOdmWGIEp57IBsQ-1; Thu,
+ 20 Jun 2024 13:33:22 -0400
+X-MC-Unique: 5gkrIObUOdmWGIEp57IBsQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C42B1956056;
-	Thu, 20 Jun 2024 17:33:03 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDA6719560BE;
+	Thu, 20 Jun 2024 17:33:18 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.39.195.156])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 340171955E80;
-	Thu, 20 Jun 2024 17:32:56 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 76B5219560AF;
+	Thu, 20 Jun 2024 17:33:12 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -65,10 +65,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 09/17] cifs: Defer read completion
-Date: Thu, 20 Jun 2024 18:31:27 +0100
-Message-ID: <20240620173137.610345-10-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Steve French <sfrench@samba.org>
+Subject: [PATCH 11/17] cifs: Move the 'pid' from the subreq to the req
+Date: Thu, 20 Jun 2024 18:31:29 +0100
+Message-ID: <20240620173137.610345-12-dhowells@redhat.com>
 In-Reply-To: <20240620173137.610345-1-dhowells@redhat.com>
 References: <20240620173137.610345-1-dhowells@redhat.com>
 Precedence: bulk
@@ -78,72 +79,135 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
+Move the reference pid from the cifs_io_subrequest struct to the
+cifs_io_request struct as it's the same for all subreqs of a particular
+request.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/smb2pdu.c      | 15 ++++++++++++---
- include/trace/events/netfs.h |  7 +++++--
- 2 files changed, 17 insertions(+), 5 deletions(-)
+ fs/smb/client/cifsglob.h |  2 +-
+ fs/smb/client/cifssmb.c  |  8 ++++----
+ fs/smb/client/file.c     | 10 +++-------
+ fs/smb/client/smb2pdu.c  |  4 ++--
+ 4 files changed, 10 insertions(+), 14 deletions(-)
 
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index b48d3f5e8889..bbcc552c07be 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1495,6 +1495,7 @@ struct cifs_io_request {
+ 	struct netfs_io_request		rreq;
+ 	struct cifsFileInfo		*cfile;
+ 	struct TCP_Server_Info		*server;
++	pid_t				pid;
+ };
+ 
+ /* asynchronous read support */
+@@ -1505,7 +1506,6 @@ struct cifs_io_subrequest {
+ 		struct cifs_io_request *req;
+ 	};
+ 	ssize_t				got_bytes;
+-	pid_t				pid;
+ 	unsigned int			xid;
+ 	int				result;
+ 	bool				have_xid;
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 25e9ab947c17..595c4b673707 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -1345,8 +1345,8 @@ cifs_async_readv(struct cifs_io_subrequest *rdata)
+ 	if (rc)
+ 		return rc;
+ 
+-	smb->hdr.Pid = cpu_to_le16((__u16)rdata->pid);
+-	smb->hdr.PidHigh = cpu_to_le16((__u16)(rdata->pid >> 16));
++	smb->hdr.Pid = cpu_to_le16((__u16)rdata->req->pid);
++	smb->hdr.PidHigh = cpu_to_le16((__u16)(rdata->req->pid >> 16));
+ 
+ 	smb->AndXCommand = 0xFF;	/* none */
+ 	smb->Fid = rdata->req->cfile->fid.netfid;
+@@ -1689,8 +1689,8 @@ cifs_async_writev(struct cifs_io_subrequest *wdata)
+ 	if (rc)
+ 		goto async_writev_out;
+ 
+-	smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
+-	smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
++	smb->hdr.Pid = cpu_to_le16((__u16)wdata->req->pid);
++	smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->req->pid >> 16));
+ 
+ 	smb->AndXCommand = 0xFF;	/* none */
+ 	smb->Fid = wdata->req->cfile->fid.netfid;
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 16fa1ac1ed2d..45c860f0e7fd 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -178,14 +178,8 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
+ 	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
+-	pid_t pid;
+ 	int rc = 0;
+ 
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+-		pid = req->cfile->pid;
+-	else
+-		pid = current->tgid; // Ummm...  This may be a workqueue
+-
+ 	cifs_dbg(FYI, "%s: op=%08x[%x] mapping=%p len=%zu/%zu\n",
+ 		 __func__, rreq->debug_id, subreq->debug_index, rreq->mapping,
+ 		 subreq->transferred, subreq->len);
+@@ -199,7 +193,6 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 	}
+ 
+ 	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+-	rdata->pid = pid;
+ 
+ 	rc = rdata->server->ops->async_readv(rdata);
+ out:
+@@ -236,12 +229,15 @@ static int cifs_init_request(struct netfs_io_request *rreq, struct file *file)
+ 
+ 	rreq->rsize = cifs_sb->ctx->rsize;
+ 	rreq->wsize = cifs_sb->ctx->wsize;
++	req->pid = current->tgid; // Ummm...  This may be a workqueue
+ 
+ 	if (file) {
+ 		open_file = file->private_data;
+ 		rreq->netfs_priv = file->private_data;
+ 		req->cfile = cifsFileInfo_get(open_file);
+ 		req->server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++			req->pid = req->cfile->pid;
+ 	} else if (rreq->origin != NETFS_WRITEBACK) {
+ 		WARN_ON_ONCE(1);
+ 		return -EIO;
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 38a06e8a0f90..e213cecd5094 100644
+index e213cecd5094..2ae2dbb6202b 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -4484,6 +4484,16 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	return rc;
- }
+@@ -4621,7 +4621,7 @@ smb2_async_readv(struct cifs_io_subrequest *rdata)
+ 	io_parms.length = rdata->subreq.len;
+ 	io_parms.persistent_fid = rdata->req->cfile->fid.persistent_fid;
+ 	io_parms.volatile_fid = rdata->req->cfile->fid.volatile_fid;
+-	io_parms.pid = rdata->pid;
++	io_parms.pid = rdata->req->pid;
  
-+static void smb2_readv_worker(struct work_struct *work)
-+{
-+	struct cifs_io_subrequest *rdata =
-+		container_of(work, struct cifs_io_subrequest, subreq.work);
-+
-+	netfs_subreq_terminated(&rdata->subreq,
-+				(rdata->result == 0 || rdata->result == -EAGAIN) ?
-+				rdata->got_bytes : rdata->result, true);
-+}
-+
- static void
- smb2_readv_callback(struct mid_q_entry *mid)
- {
-@@ -4578,9 +4588,8 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 			rdata->result = 0;
- 	}
- 	rdata->credits.value = 0;
--	netfs_subreq_terminated(&rdata->subreq,
--				(rdata->result == 0 || rdata->result == -EAGAIN) ?
--				rdata->got_bytes : rdata->result, true);
-+	INIT_WORK(&rdata->subreq.work, smb2_readv_worker);
-+	queue_work(cifsiod_wq, &rdata->subreq.work);
- 	release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index fc5dbd19f120..db603a4e22cd 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -412,6 +412,7 @@ TRACE_EVENT(netfs_folio,
- 		    __field(ino_t,			ino)
- 		    __field(pgoff_t,			index)
- 		    __field(unsigned int,		nr)
-+		    __field(bool,			ra_trigger)
- 		    __field(enum netfs_folio_trace,	why)
- 			     ),
+ 	rc = smb2_new_read_req(
+ 		(void **) &buf, &total_len, &io_parms, rdata, 0, 0);
+@@ -4873,7 +4873,7 @@ smb2_async_writev(struct cifs_io_subrequest *wdata)
+ 		.length = wdata->subreq.len,
+ 		.persistent_fid = wdata->req->cfile->fid.persistent_fid,
+ 		.volatile_fid = wdata->req->cfile->fid.volatile_fid,
+-		.pid = wdata->pid,
++		.pid = wdata->req->pid,
+ 	};
+ 	io_parms = &_io_parms;
  
-@@ -420,11 +421,13 @@ TRACE_EVENT(netfs_folio,
- 		    __entry->why = why;
- 		    __entry->index = folio_index(folio);
- 		    __entry->nr = folio_nr_pages(folio);
-+		    __entry->ra_trigger = folio_test_readahead(folio);
- 			   ),
- 
--	    TP_printk("i=%05lx ix=%05lx-%05lx %s",
-+	    TP_printk("i=%05lx ix=%05lx-%05lx %s%s",
- 		      __entry->ino, __entry->index, __entry->index + __entry->nr - 1,
--		      __print_symbolic(__entry->why, netfs_folio_traces))
-+		      __print_symbolic(__entry->why, netfs_folio_traces),
-+		      __entry->ra_trigger ? " *RA*" : "")
- 	    );
- 
- TRACE_EVENT(netfs_write_iter,
 
