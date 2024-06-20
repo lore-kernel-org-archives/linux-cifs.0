@@ -1,46 +1,46 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D721C0074
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Jun 2024 17:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919B71B5818
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Jun 2024 17:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718904786; cv=none; b=FADShZOCdFndx9GdUa0gA+XtLpNaLJmhoDU+Wu1kkQlbd634t8N+hw5DhuaPHzybWG4r27Vh55Te42UXhpKNSxQ9LGw7Ee3q/hFrdtNjX11B43crjDx4C/G9vBuP0nx2812JX6uEImNnx+IFICXzrzkmIKqbcTgPBWuRseO9J1w=
+	t=1718904799; cv=none; b=eU+Xq5H27WfinLHVLLLpJKa6ZJ1TeysPyWVPT/bIrsd5jtzNuAIAuTgdVJ5jNc+8t4iXnxRUxBVV3e8tqxhk0VTbcjPCwCCppFQQBm1ViBYYfEIPDn46MLVDQFx2OsQ07++Wzf/gJM341FJqvQAv8/zv+tyimlmfR72qd5U7ihA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718904786; c=relaxed/simple;
-	bh=eQA2m+/oh5puIWGDHPkbWIqBNxkv0PR5UIbNP0fwDzs=;
+	s=arc-20240116; t=1718904799; c=relaxed/simple;
+	bh=2p9kWBbTHfnvBQ8i8TFWcwLEKkJ12Z5z63HjOwGkKNc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uwHzl5hcHKK/FwjCm6/Ggg2cln5mokQZ8m03BGK+ctNPlOcywIC5J8Hk50skjknExpay0ySTRbkLf6jO+BaXVKVX36wigqnTIBDTjwimzxVbm6JMJBtYoR3R+2tS+g55ftVLiIO/+fvn5otDqkdODjy/g3Q6BbYpt1MetN0AQYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbQNiwd5; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=W544Fc2CGFkqt2KHqC6usc7EfOXAacOMk0PdfohTb5tlFEoj3rFBHPSzxS1d9gbG8CZLyOUI1xLEODqp+aoF8KsYc5HgwZ2dRbKivsPO/ats39H11zn1+igiWRiX3vsZB1GBN3Gs0KVquV/ZNlamXypVnKbGkV8ZiOEwPIH/TBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S4lXvBAr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbQNiwd5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4lXvBAr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718904784;
+	s=mimecast20190719; t=1718904796;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JsgLdDMxlbFRDEl04HJEi9WqLkbVt68ZbQT1Q/QXXG4=;
-	b=KbQNiwd5O/nmmccATYyft6OIntVmfZQKc18BKGMTPWY9PZIqVpgncC4BnbwF/ss4xYmADk
-	qWaBa7TzFh8SmZt25+zVVhifDdutf+ixvXMQRPn3OThT0B7yzGcN/tlVSRSa53o8gJb2pU
-	4vqVGyGNH36N49Ye+/dxX8WncIkWkVg=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=tcCzhA8XUd6wWPEL49ATAv4+dcrLDrKKLcUOQlZf5aE=;
+	b=S4lXvBArS/VRFaIKpwo3WzODqWgUIKOiT3niUp3CgfKaMG4EDbeakbDHNIsI8XImr8elQk
+	EbRcgqwg/gw3CkIn6/EnMK6O4YUVgd6rM7yuzyOewXrQtA5LalmofAuhEtvOOMG2BnI/cY
+	UQo1QXv8NI3sz7/XkKne1SEYQXhsZzk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-324-4DqBux0nMw2-JdVI-Ia2qg-1; Thu,
- 20 Jun 2024 13:32:58 -0400
-X-MC-Unique: 4DqBux0nMw2-JdVI-Ia2qg-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-dzyJCI2LOGq-cKgSo75gZA-1; Thu,
+ 20 Jun 2024 13:33:14 -0400
+X-MC-Unique: dzyJCI2LOGq-cKgSo75gZA-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D829719560AD;
-	Thu, 20 Jun 2024 17:32:55 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E57F51956087;
+	Thu, 20 Jun 2024 17:33:10 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.39.195.156])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C147319560B0;
-	Thu, 20 Jun 2024 17:32:49 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B52743000602;
+	Thu, 20 Jun 2024 17:33:04 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -65,10 +65,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/17] netfs: Delete some xarray-wangling functions that aren't used
-Date: Thu, 20 Jun 2024 18:31:26 +0100
-Message-ID: <20240620173137.610345-9-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Steve French <sfrench@samba.org>
+Subject: [PATCH 10/17] cifs: Only pick a channel once per read request
+Date: Thu, 20 Jun 2024 18:31:28 +0100
+Message-ID: <20240620173137.610345-11-dhowells@redhat.com>
 In-Reply-To: <20240620173137.610345-1-dhowells@redhat.com>
 References: <20240620173137.610345-1-dhowells@redhat.com>
 Precedence: bulk
@@ -78,132 +79,81 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Delete some xarray-based buffer wangling functions that are intended for
-use with bounce buffering, but aren't used because bounce-buffering got
-deferred to a later patch series.  Now, however, the intention is to use
-something other than an xarray to do this.
+In cifs, only pick a channel when setting up a read request rather than
+doing so individually for every subrequest and instead use that channel for
+all.  This mirrors what the code in v6.9 does.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
 cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/netfs/internal.h |  9 -----
- fs/netfs/misc.c     | 81 ---------------------------------------------
- 2 files changed, 90 deletions(-)
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/file.c     | 14 +++-----------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 42443d99967d..a44d480a0fa2 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -63,15 +63,6 @@ static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq) {}
- /*
-  * misc.c
-  */
--#define NETFS_FLAG_PUT_MARK		BIT(0)
--#define NETFS_FLAG_PAGECACHE_MARK	BIT(1)
--int netfs_xa_store_and_mark(struct xarray *xa, unsigned long index,
--			    struct folio *folio, unsigned int flags,
--			    gfp_t gfp_mask);
--int netfs_add_folios_to_buffer(struct xarray *buffer,
--			       struct address_space *mapping,
--			       pgoff_t index, pgoff_t to, gfp_t gfp_mask);
--void netfs_clear_buffer(struct xarray *buffer);
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 4b00512fb9f9..b48d3f5e8889 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1494,6 +1494,7 @@ struct cifs_aio_ctx {
+ struct cifs_io_request {
+ 	struct netfs_io_request		rreq;
+ 	struct cifsFileInfo		*cfile;
++	struct TCP_Server_Info		*server;
+ };
  
- /*
-  * objects.c
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index bc1fc54fb724..83e644bd518f 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -8,87 +8,6 @@
- #include <linux/swap.h>
- #include "internal.h"
+ /* asynchronous read support */
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 67dd8fcd0e6d..16fa1ac1ed2d 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -134,17 +134,15 @@ static void cifs_issue_write(struct netfs_io_subrequest *subreq)
+ static bool cifs_clamp_length(struct netfs_io_subrequest *subreq)
+ {
+ 	struct netfs_io_request *rreq = subreq->rreq;
+-	struct TCP_Server_Info *server;
+ 	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
+ 	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
++	struct TCP_Server_Info *server = req->server;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
+ 	size_t rsize = 0;
+ 	int rc;
  
--/*
-- * Attach a folio to the buffer and maybe set marks on it to say that we need
-- * to put the folio later and twiddle the pagecache flags.
-- */
--int netfs_xa_store_and_mark(struct xarray *xa, unsigned long index,
--			    struct folio *folio, unsigned int flags,
--			    gfp_t gfp_mask)
--{
--	XA_STATE_ORDER(xas, xa, index, folio_order(folio));
+ 	rdata->xid = get_xid();
+ 	rdata->have_xid = true;
 -
--retry:
--	xas_lock(&xas);
--	for (;;) {
--		xas_store(&xas, folio);
--		if (!xas_error(&xas))
--			break;
--		xas_unlock(&xas);
--		if (!xas_nomem(&xas, gfp_mask))
--			return xas_error(&xas);
--		goto retry;
+-	server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
+ 	rdata->server = server;
+ 
+ 	if (cifs_sb->ctx->rsize == 0)
+@@ -203,14 +201,7 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+ 	rdata->pid = pid;
+ 
+-	rc = adjust_credits(rdata->server, &rdata->credits, rdata->subreq.len);
+-	if (!rc) {
+-		if (rdata->req->cfile->invalidHandle)
+-			rc = -EAGAIN;
+-		else
+-			rc = rdata->server->ops->async_readv(rdata);
 -	}
 -
--	if (flags & NETFS_FLAG_PUT_MARK)
--		xas_set_mark(&xas, NETFS_BUF_PUT_MARK);
--	if (flags & NETFS_FLAG_PAGECACHE_MARK)
--		xas_set_mark(&xas, NETFS_BUF_PAGECACHE_MARK);
--	xas_unlock(&xas);
--	return xas_error(&xas);
--}
--
--/*
-- * Create the specified range of folios in the buffer attached to the read
-- * request.  The folios are marked with NETFS_BUF_PUT_MARK so that we know that
-- * these need freeing later.
-- */
--int netfs_add_folios_to_buffer(struct xarray *buffer,
--			       struct address_space *mapping,
--			       pgoff_t index, pgoff_t to, gfp_t gfp_mask)
--{
--	struct folio *folio;
--	int ret;
--
--	if (to + 1 == index) /* Page range is inclusive */
--		return 0;
--
--	do {
--		/* TODO: Figure out what order folio can be allocated here */
--		folio = filemap_alloc_folio(readahead_gfp_mask(mapping), 0);
--		if (!folio)
--			return -ENOMEM;
--		folio->index = index;
--		ret = netfs_xa_store_and_mark(buffer, index, folio,
--					      NETFS_FLAG_PUT_MARK, gfp_mask);
--		if (ret < 0) {
--			folio_put(folio);
--			return ret;
--		}
--
--		index += folio_nr_pages(folio);
--	} while (index <= to && index != 0);
--
--	return 0;
--}
--
--/*
-- * Clear an xarray buffer, putting a ref on the folios that have
-- * NETFS_BUF_PUT_MARK set.
-- */
--void netfs_clear_buffer(struct xarray *buffer)
--{
--	struct folio *folio;
--	XA_STATE(xas, buffer, 0);
--
--	rcu_read_lock();
--	xas_for_each_marked(&xas, folio, ULONG_MAX, NETFS_BUF_PUT_MARK) {
--		folio_put(folio);
--	}
--	rcu_read_unlock();
--	xa_destroy(buffer);
--}
--
- /**
-  * netfs_dirty_folio - Mark folio dirty and pin a cache object for writeback
-  * @mapping: The mapping the folio belongs to.
++	rc = rdata->server->ops->async_readv(rdata);
+ out:
+ 	if (rc)
+ 		netfs_subreq_terminated(subreq, rc, false);
+@@ -250,6 +241,7 @@ static int cifs_init_request(struct netfs_io_request *rreq, struct file *file)
+ 		open_file = file->private_data;
+ 		rreq->netfs_priv = file->private_data;
+ 		req->cfile = cifsFileInfo_get(open_file);
++		req->server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
+ 	} else if (rreq->origin != NETFS_WRITEBACK) {
+ 		WARN_ON_ONCE(1);
+ 		return -EIO;
 
