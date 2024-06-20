@@ -1,69 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.67.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3826101C8;
-	Thu, 20 Jun 2024 01:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A1014287
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Jun 2024 01:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.67.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718846632; cv=none; b=cm2xsk9QLozFyuXwQYFWudgRBHTvxzrhX3RUA3OzDxSPgXYdooLymo0PTXqJb9UOmwq0UuZERANZBNeLcZRNHylfnS+a5TrkbK+oBi8WHgXQI2xfi3OO2y8DitJpuWlJVr7Fg/mvJi4ykIZK1PMei5iO4IOfXIr0vfA6/pg8zhU=
+	t=1718847879; cv=none; b=JpKN5yCOHFS4mLgrspEYO/8T0r1ere5iI0XycfgJd1vhsoDqebjaaaR2ET6BRe9G4lNo/bUMAFul3FfiA8qbMehjpL6rj3PUAZkYbyLV6q+cEd36ohTsrRZHylhLYBSC0ByDFNmZ8D1RGbsipVjehVA+YJpAT0Zkyw/lWP/1S3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718846632; c=relaxed/simple;
-	bh=I2+H9RSi53aNG43jfhOmbWXcdLE370Sdc8IQ93AUBhk=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=i6z3Cs7MZ4WWbrbV0t4CRT/4fSCEvFzuSdpBdDiNzvMFHQGpZglqlzqqZy2WnLcY2X1JdCNgVYiWWUrVrqxz/BbQGF+qvlE8rGtDgcZBQQvb3LKn9Lt43eKBAMpJUSkiNQrqi9BInRAUubU6cdXNWGmpU8aFTLOSqcNBgm2/ATM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=JcKq7Qtu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="JcKq7Qtu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B6E1C2BBFC;
-	Thu, 20 Jun 2024 01:23:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1718846632;
-	bh=I2+H9RSi53aNG43jfhOmbWXcdLE370Sdc8IQ93AUBhk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JcKq7Qtu3bV2PLRwqibK8oOy9arbeMc5+LKGL1FWktuN4ZbTOFrN0xn8uizpU1+Ma
-	 u2yFb36Q/KDd3jMktC5TCBGrfp7ZmOi2t39uLiH/ERqjShI4PDvUytkQS9P5cU03lH
-	 zNgmZXwnGFpPJeFGMQywI75k0bAB4wet+tHK4/jY=
-Date: Wed, 19 Jun 2024 18:23:50 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Barry Song <21cnbao@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
- linux-mm@kvack.org, sfrench@samba.org, anna@kernel.org, chrisl@kernel.org,
- hanchuanhua@oppo.com, hch@lst.de, jlayton@kernel.org,
- linux-nfs@vger.kernel.org, neilb@suse.de, ryan.roberts@arm.com,
- stable@vger.kernel.org, trondmy@kernel.org, v-songbaohua@oppo.com,
- ying.huang@intel.com, Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
- <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH v2] cifs: drop the incorrect assertion in cifs_swap_rw()
-Message-Id: <20240619182350.f4969d6dbb8549d309a5ae92@linux-foundation.org>
-In-Reply-To: <CAGsJ_4x9A5jHPOPiPhsznsCBnj_T-XRk8YNs86i11P9rmrPG1w@mail.gmail.com>
-References: <20240618072258.33128-1-21cnbao@gmail.com>
-	<CAH2r5mtRHf3bQh=aeVddFykMX_MokqujMyLn3W-4wXo1MO5=iw@mail.gmail.com>
-	<CAGsJ_4x9A5jHPOPiPhsznsCBnj_T-XRk8YNs86i11P9rmrPG1w@mail.gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718847879; c=relaxed/simple;
+	bh=jSbBfnFEVkBHUkb9NCpVaXYf/HDwlV39lAtQS5Vewtw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m5RQ8uMMrTwjoavJm5vJAuVnJY7az4LeB/ObnG8f7bkgEbjcZ1wkZSmb2fuU8jxR7qZ9Gq5N0ZNrv1PQ7WEWkZENmxbpIF4JGsfecfCGAnBkE0Y39jqqdOviiNxR7zS3TbytTQ01pjTuJKObPMgjn2FCzq5qGMC7Birp90cM6gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=114.132.67.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+X-QQ-mid: bizesmtp84t1718847689tomiice7
+X-QQ-Originating-IP: IM73d26sDbCFwrMMCr7FHKDf1VjP0fTxeWun6rBOf4w=
+Received: from [192.168.3.231] ( [116.128.244.171])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 20 Jun 2024 09:41:27 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 8005467843438064961
+Message-ID: <4CBA9B648A28A133+4e64e193-72b9-456b-a399-62abda2ba7fd@chenxiaosong.com>
+Date: Thu, 20 Jun 2024 09:41:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ksmbd: remove duplicate SMB2 Oplock levels definitions
+To: Namjae Jeon <linkinjeon@kernel.org>, sfrench@samba.org
+Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, bharathsm@microsoft.com,
+ samba-technical@lists.samba.org, chenxiaosong@kylinos.cn,
+ liuzhengyuan@kylinos.cn, huhai@kylinos.cn, liuyun01@kylinos.cn
+References: <20240619161753.385508-1-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd-V80sdH2uXoDe+xqf9N-gFYTjqWtERrB+-vH0s0NUMvw@mail.gmail.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd-V80sdH2uXoDe+xqf9N-gFYTjqWtERrB+-vH0s0NUMvw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-On Wed, 19 Jun 2024 16:44:15 +1200 Barry Song <21cnbao@gmail.com> wrote:
+Hi Namjae and Steve:
 
-> On Wed, Jun 19, 2024 at 3:48 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > tentatively merged into cifs-2.6.git for-next pending testing and any additional review
-> 
-> Steve, Thanks! I guess you missed an email from mm-commits.
-> 
-> A couple of hours ago, this was pulled into mm-hotfixes-unstable, likely
-> for the same purpose. Will this cause any conflicts when both changes hit
-> linux-next?
-> 
-> https://lore.kernel.org/mm-commits/20240618195943.EC07BC3277B@smtp.kernel.org/
-> 
-> Will we just keep one?
+By the way, is there any update on the KSMBD Feature Status [1]?
 
-Either is OK, but I suggest a 6.10-rcX merge while retaining the cc:stable.
+Thanks,
+ChenXiaoSong.
+
+[1] 
+https://github.com/torvalds/linux/blob/master/Documentation/filesystems/smb/ksmbd.rst#ksmbd-feature-status
+
+在 2024/6/20 07:32, Namjae Jeon 写道:
+> 2024년 6월 20일 (목) 오전 1:18, <chenxiaosong@chenxiaosong.com>님이 작성:
+>>
+>> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>>
+>> smb/common already have SMB2 Oplock levels definitions, remove duplicate
+>> definitions in server.
+>>
+>> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>> Signed-off-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+> Applied it to #ksmbd-for-next-next.
+> Thanks for your patch!
+> 
+
