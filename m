@@ -1,86 +1,104 @@
-Received: from submarine.notk.org (62-210-214-84.rev.poneytelecom.eu [62.210.214.84])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CA73D3B8;
-	Thu, 20 Jun 2024 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18280182DA;
+	Sun, 23 Jun 2024 06:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718916618; cv=none; b=OcLXR+gDKLZ1vwHCwveoZNxneJAsHnlHaZkoo2r8ERzTFcVeJH2Dmd7HjeVzS36YnAsMPk1I3kJpJsciMCprfYJRbw6xh5kc7mO7nK1D/lmeQ5tUgOXGVdbALe1bjivgImBeqMx8H4XCAT/K9tIKAlwknkROlGoAnT5S5SgUPeM=
+	t=1719125105; cv=none; b=RfJ5QzlOw75q0l4yb//2ZhzIBResdEKqfYjAiflWwP8pAMs/TPh7Wttd8BicOEizDp++1Qp8jNgSnm+jvoN9TfgisQZArfzDOEIzOJhPAl7mKecaBaPm1w6DPV5plm9LVYqXWYv+5s8GVTSPbxs+W2RnQSs/i36iSXzWnaXjsQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718916618; c=relaxed/simple;
-	bh=AvGVFTfgQ8CQv1Ova9G8llKmivCTuZfd3jl734L9bIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TggXoK4Q1dS4G3j/kMm6dHRd116TfXOEA7c3wU2lS8eT7kg3f2NhKJCr1RejTTc1SCpkExX2thyxAYWu/EK/lLsVIbDRI7dnXIONTA4ZHvgwTRbaOOyYGX6454Ge4ysiG3CSI5SENOQycLhjztzZqjiEOGysKknDz5R9nRNeyxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=ALJdfkXV; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	s=arc-20240116; t=1719125105; c=relaxed/simple;
+	bh=zGWK5dgWVWqqWK1Xp2v04GaVCTE3oAOjyF9BijF3mpo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SauSULBjOX6oMhK3lT6YEYA7m7zSRRfbHgb6QQSMYxhe3fUvLYBsw7xuuGq0d60wQExuDCkZlqDb8VfXoeMLVgD38khAuVjHP3jH3/zsa9ika/n6fAXaRvGyqy1qSP4Is1Aq5be655botPBSDIxK7wyS3NVLaPB6ECtDtajhtgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCchBqIn; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="ALJdfkXV"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 8A5F214C2DD;
-	Thu, 20 Jun 2024 22:50:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1718916615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VLVCmMswFYW/yptkreRA4q0clrbQSOEC9H3udI4LuGU=;
-	b=ALJdfkXV4jYbTnxVURz9T/eVwi75e+Jpzd/NnEdNtowVW0EPginJ+UR6WjORHnH38deSjd
-	uJwnIU9Cj7KamD9RuKu8/mGuiDvl4zepXXeiSbVTriN0efe9Ugz46seuDEdUL9p7r7KRLr
-	P7bpbNTjSYBxjIuPaVX1MWKzMKecMwktnyLawuNoID0Mbc/ddEMnIWkpd3XG+6pyYH418a
-	3W/N9t5Qfs/oTZaI9U3i3KvnPFWdkdWReTPrI5Iv2PcSTYiBLmAJf7px1y70cBjtciXJPK
-	i5woghwPVaymjTFrWRyF7a/0NAHSSLe6Bk1rVFeZVi+wKnfbRR0RGgGH6UokHw==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 39921304;
-	Thu, 20 Jun 2024 20:50:04 +0000 (UTC)
-Date: Fri, 21 Jun 2024 05:49:49 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH 06/17] 9p: Enable multipage folios
-Message-ID: <ZnSV7TmLpmucb8el@codewreck.org>
-References: <20240620173137.610345-1-dhowells@redhat.com>
- <20240620173137.610345-7-dhowells@redhat.com>
- <ZnSSaeLo8dY7cu3W@codewreck.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCchBqIn"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52cdc4d221eso1549525e87.3;
+        Sat, 22 Jun 2024 23:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719125102; x=1719729902; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=b0HDme8zwzetpLVLe3ZLYcKIkWDYFkkDDeVg8ad57SE=;
+        b=TCchBqIneki8nldUqHuMXniCmWbFXWeKGN7Lc/u/3JMtl2QSAQd8MqIkT7lsFlK/uL
+         5bRVGJqlzUuxrQfS3tVqGB4n996/cJw2IhG25ev8TJVGqbBgafTLRD1wRB1bfatTB8PG
+         +wKhVaGbi/P5TCTf3BM/ovIhrQwM96VnLNOIa+bj4srvQx+D1FHFeowyr2K6LICJzcp1
+         jOhFfBm1sXKnwUSQb0FgbiS/v1eQ4C8DeXbB+W13yY93ZPBh/qFOoAuPi4AZArvyPMYC
+         5dUNBvtTWjqc7zu/Pp0tWDT/FTisxKPZ9zEbKJiMGZbM8puLy8PjUYulykhhb/UMSJ4t
+         M7pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719125102; x=1719729902;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b0HDme8zwzetpLVLe3ZLYcKIkWDYFkkDDeVg8ad57SE=;
+        b=E47IpPOoZsNV0HeRCBpHLDvWnyBIXbNXdW9a5ZjfBX6xNSNW3ASNzcd1qOuxbYhN1X
+         DZrp3dasZEFe0xvuJRHFw/h7/w5tIyx31/C3t+255l9LUmtcHIZtZXw19mw6uz/vpLdv
+         TzTZKqVlIE6fdfdIZrI05aUzjrY6cjiDX8aSQQAV3vWiJ3MvEW/JoMkl+qgzUkW1gd2f
+         uUKTazgbB5FYRiA3d5yT7PV9UGFIpt/pqGm2DCVmGR0XpU4b4viVw/sWPKg9Pkawiynb
+         62ZKqbTGbbjdqe7/r0RhYSP155V4Y5RAiy+aPZihqC9zs1ny/8ft6yZWl4utW7PGKM+g
+         W+jA==
+X-Forwarded-Encrypted: i=1; AJvYcCVx4/g3BdtlvqtpVp9ChaIkhj/NsgxDILC64Fj+rYDdbpnyfRlLHIkD86XapnVnDNHuqWxy0EkrfBvp06UmF2VoCY/EPYtEvnNKNg==
+X-Gm-Message-State: AOJu0YypUd383f2YZCkKj/T4dfDK7b1TzLavY/QPLXmLjpZI3t17/0u7
+	G1HhueiTH3rK9T/VYOTyal0kSbOWgknCYEgAqYaSg5TiP8taDTXEC7fQckjxSETx/h+Xr3xHI80
+	j91RJ0R695nVgbgv/c4hVC26v7iyDSA==
+X-Google-Smtp-Source: AGHT+IH2oQN3N/6TojRQCylSWvwvfHLcu4jX8oVssZCi8Hzie6yb9ZJCjK8vm/Twz1asOyIBK+W2LmcUv3K6tetyHAI=
+X-Received: by 2002:a19:a417:0:b0:52c:dc26:465b with SMTP id
+ 2adb3069b0e04-52ce183b261mr701460e87.41.1719125101756; Sat, 22 Jun 2024
+ 23:45:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZnSSaeLo8dY7cu3W@codewreck.org>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 23 Jun 2024 01:44:50 -0500
+Message-ID: <CAH2r5muEks4khtNFc_rE=ywU15-6FfACkohXfxNGNvkdZ=0ovQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Dominique Martinet wrote on Fri, Jun 21, 2024 at 05:34:49AM +0900:
-> David Howells wrote on Thu, Jun 20, 2024 at 06:31:24PM +0100:
-> > Enable support for multipage folios on the 9P filesystem.  This is all
-> > handled through netfslib and is already enabled on AFS and CIFS also.
-> 
-> Since this is fairly unrelated to the other patches let's take this
-> through the 9p tree as well - I'll run some quick tests to verify writes
-> go from 4k to something larger
+Please pull the following changes since commit
+6ba59ff4227927d3a8530fc2973b80e94b54d58f:
 
-(huh, my memory is rotten, we were already aggregating writes at some
-point without this. Oh, well, at least it doesn't seem to blow up)
+  Linux 6.10-rc4 (2024-06-16 13:40:16 -0700)
 
-> and it doesn't blow up immediately and push it out for 6.11
+are available in the Git repository at:
 
-Queued for -next.
+  git://git.samba.org/smfrench/cifs-2.6.git 6.10-rc4-smb3-client-fixes
+
+for you to fetch changes up to 3f59138580bf8006fa99641b5803d0f683709f10:
+
+  cifs: Move the 'pid' from the subreq to the req (2024-06-20 15:25:08 -0500)
+
+----------------------------------------------------------------
+Five smb3 client fixes
+- three nets/fiolios cifs fixes
+- fix typo in module parameters description
+- fix incorrect swap warning
+----------------------------------------------------------------
+Barry Song (1):
+      cifs: drop the incorrect assertion in cifs_swap_rw()
+
+David Howells (3):
+      cifs: Defer read completion
+      cifs: Only pick a channel once per read request
+      cifs: Move the 'pid' from the subreq to the req
+
+Steve French (1):
+      cifs: fix typo in module parameter enable_gcm_256
+
+ fs/smb/client/cifsfs.c   |  2 +-
+ fs/smb/client/cifsglob.h |  3 ++-
+ fs/smb/client/cifssmb.c  |  8 ++++----
+ fs/smb/client/file.c     | 27 ++++++---------------------
+ fs/smb/client/smb2pdu.c  | 19 ++++++++++++++-----
+ 5 files changed, 27 insertions(+), 32 deletions(-)
 
 -- 
-Dominique Martinet | Asmadeus
+Thanks,
+
+Steve
