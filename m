@@ -1,53 +1,44 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA0F621
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2024 00:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDFAC8FF;
+	Mon, 24 Jun 2024 04:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719187810; cv=none; b=NviaZDF70JqK6MbUVesNRzsRIcmEK7GPnZZ5HSm0VPJ8p50T3hztlW6QW8Sjl6ryClXtaoKxe4pr/JgVN2Hvs9Jlo96PDnDgyIROuX6Yf8eOWPPWuAnPOIG4iEkoTwVMPc8VRgpR41waLyBk+HO7wuUKM5epm/gu4WjbdGoX2TA=
+	t=1719203375; cv=none; b=tjzp73mEJeml6VNH9/IyR6XDvTojl8BoiWkbN/L4QRVXpmMrCwWS/S9t/DkTVndPmnP5Cz2E0wYFEFcrTsbcxiF9LSB6TLBmHm/SWhdz3qOjca8thJDy7vJzf8FPr3TsaFtTbmwCIPvjfFD2HVEHve3ZqeMJJAlost4IZ5Q6sv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719187810; c=relaxed/simple;
-	bh=uaNWFo0ehpLpjnOr6rygwjH9GAkbHWLb9yMJew/LIcI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PzXdtRZFhYe5oT3Z/aT9iX9QHZTz3JW0UkxpcCvYWA8Jhw/lKFq4PiW1XKM8Y1JKM5ec5LXK9IHoWEnJ6nK9J9R6hVv81MXqUnMUt8HGxWYlVyRzWT0z6CFO4y+dVNItjD6FyGMD1ySz4fnrT++lxS0k3Y2RbJEjtW71xBMXnEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70670188420so739206b3a.2
-        for <linux-cifs@vger.kernel.org>; Sun, 23 Jun 2024 17:10:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719187808; x=1719792608;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JMhRAlSsBmPHd5v7IY6bSIOtuUGx6pZbRux35I0O9mw=;
-        b=Befma8y80r5J2MxaLfYRc4/BXntKtRxHoUqx2ZtLENg2/RSCQyZpZG/YzylutOMeUn
-         cbxHO4KQ1M0WsMtuasuOaNQbyvgt2zur1M7v6P+ffoUdGyKF/96mfA6W+xLID3kpoL0+
-         vJdFT2wNmVewaI1QJmgz0YX0J//2jeJJAyesn74WQXhg8gB2C7Wl/C3Fp26LvuZvJ+CU
-         gaUSiqkrMJ73UeYDL1Y+Yvw1ZYOEJSfy63yXsWUUA6lvH2qZVwgpNJYPC9/YRkIU58Xz
-         yDI9B43QKoag8Q1n/BOH8fXfaWDfld5o0TavStJHwICFkQlsKFPlMM7KA6Kq1of3aWYF
-         ojTQ==
-X-Gm-Message-State: AOJu0YxR0B2gJouuG/acPMNS1LZoX4nfCF8CdXhQWjdr6hACg/GlkMS+
-	uPNlDeX+EpfZewDVNHPu1h5DjM2edoFKjBMflcUuVZQ37iSvzQFceI7Vpw==
-X-Google-Smtp-Source: AGHT+IGFgiaGP2iIXBlh8XHk4rfwodE2MhasjAV/qvMP8HJYSIcTjVzCBB3w54AVrcCTxWFMUKg6lQ==
-X-Received: by 2002:a05:6a20:2105:b0:1bc:feb5:887d with SMTP id adf61e73a8af0-1bcfeb58bb8mr1545096637.25.1719187807947;
-        Sun, 23 Jun 2024 17:10:07 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb2f02e3sm50516295ad.62.2024.06.23.17.10.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jun 2024 17:10:07 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
+	s=arc-20240116; t=1719203375; c=relaxed/simple;
+	bh=TxfqNasjA0T1bjyTc3f87NCLf1eN+E6zofRo71B+ijA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YaVACULdDq+LVerRBLYLLzo8ROArMYPLHchrEjKdKjdIFZ0Ozy6gg30sPCp9NSXsZyQzdnIkjdNjxq3wl0vAj2fEN5rkCP64wLNEdcEY2KfyKd/3yf9I0dKNOvfyhqzFAb+GnKJj8fDgt+5gLt42EwIde7C8UChgTZ3ZQcw3s9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W6w355wk0z4f3jMC;
+	Mon, 24 Jun 2024 12:29:21 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id D06651A0568;
+	Mon, 24 Jun 2024 12:29:28 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP2 (Coremail) with SMTP id Syh0CgAn3oMi9nhm19q2AA--.39098S4;
+	Mon, 24 Jun 2024 12:29:28 +0800 (CST)
+From: Yang Erkun <yangerkun@huawei.com>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
 	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH] ksmbd: return FILE_DEVICE_DISK instead of super magic
-Date: Mon, 24 Jun 2024 09:09:39 +0900
-Message-Id: <20240624000939.3926-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	bharathsm@microsoft.com,
+	dhowells@redhat.com,
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org,
+	stable-commits@vger.kernel.org
+Cc: yangerkun@huawei.com,
+	yangerkun@huaweicloud.com
+Subject: [PATCH 6.6~6.9] cifs: fix pagecache leak when do writepages
+Date: Mon, 24 Jun 2024 12:28:15 +0800
+Message-Id: <20240624042815.2242201-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -55,83 +46,111 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:Syh0CgAn3oMi9nhm19q2AA--.39098S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxCFyxZF4rCFy7JrW5try3twb_yoW5GFWkpr
+	Wakrn8Ar4jyr9ruFnxZayqv3WUt3y8XrW3XFy3Gw17Z3Z8Z3WagFW8K34UKFWfGr9xXFWx
+	KFs0yFWku3WqqaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0aVACjI8F5VA0II8E6IAqYI8I648v4I1l
+	FIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07
+	x20xyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAnYwUUUUU=
+Sender: yangerkun@huaweicloud.com
+X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
 
-MS-SMB2 specification describes setting ->DeviceType to FILE_DEVICE_DISK
-or FILE_DEVICE_CD_ROM. Set FILE_DEVICE_DISK instead of super magic in
-FS_DEVICE_INFORMATION. And Set FILE_READ_ONLY_DEVICE for read-only share.
+After commit f3dc1bdb6b0b("cifs: Fix writeback data corruption"), the
+writepages for cifs will find all folio needed writepage with two phase.
+The first folio will be found in cifs_writepages_begin, and the latter
+various folios will be found in cifs_extend_writeback.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
+All those will first get folio, and for normal case, once we set page
+writeback and after do really write, we should put the reference, folio
+found in cifs_extend_writeback do this with folio_batch_release. But the
+folio found in cifs_writepages_begin never get the chance do it. And
+every writepages call, we will leak a folio(found this problem while do
+xfstests over cifs).
+
+Besides, the exist path seem never handle this folio correctly, fix it too
+with this patch.
+
+The problem does not exist in mainline since writepages path for cifs
+has changed to netfs. It's had to backport all related change, so try fix
+this problem with this single patch.
+
+Fixes: f3dc1bdb6b0b ("cifs: Fix writeback data corruption")
+Signed-off-by: Yang Erkun <yangerkun@huawei.com>
 ---
- fs/smb/common/smb2pdu.h | 34 ++++++++++++++++++++++++++++++++++
- fs/smb/server/smb2pdu.c |  9 +++++++--
- 2 files changed, 41 insertions(+), 2 deletions(-)
+ fs/smb/client/file.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 8d10be1fe18a..c3ee42188d25 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -917,6 +917,40 @@ struct smb2_query_directory_rsp {
- 	__u8   Buffer[];
- } __packed;
- 
-+/* DeviceType Flags */
-+#define FILE_DEVICE_CD_ROM              0x00000002
-+#define FILE_DEVICE_CD_ROM_FILE_SYSTEM  0x00000003
-+#define FILE_DEVICE_DFS                 0x00000006
-+#define FILE_DEVICE_DISK                0x00000007
-+#define FILE_DEVICE_DISK_FILE_SYSTEM    0x00000008
-+#define FILE_DEVICE_FILE_SYSTEM         0x00000009
-+#define FILE_DEVICE_NAMED_PIPE          0x00000011
-+#define FILE_DEVICE_NETWORK             0x00000012
-+#define FILE_DEVICE_NETWORK_FILE_SYSTEM 0x00000014
-+#define FILE_DEVICE_NULL                0x00000015
-+#define FILE_DEVICE_PARALLEL_PORT       0x00000016
-+#define FILE_DEVICE_PRINTER             0x00000018
-+#define FILE_DEVICE_SERIAL_PORT         0x0000001b
-+#define FILE_DEVICE_STREAMS             0x0000001e
-+#define FILE_DEVICE_TAPE                0x0000001f
-+#define FILE_DEVICE_TAPE_FILE_SYSTEM    0x00000020
-+#define FILE_DEVICE_VIRTUAL_DISK        0x00000024
-+#define FILE_DEVICE_NETWORK_REDIRECTOR  0x00000028
-+
-+/* Device Characteristics */
-+#define FILE_REMOVABLE_MEDIA			0x00000001
-+#define FILE_READ_ONLY_DEVICE			0x00000002
-+#define FILE_FLOPPY_DISKETTE			0x00000004
-+#define FILE_WRITE_ONCE_MEDIA			0x00000008
-+#define FILE_REMOTE_DEVICE			0x00000010
-+#define FILE_DEVICE_IS_MOUNTED			0x00000020
-+#define FILE_VIRTUAL_VOLUME			0x00000040
-+#define FILE_DEVICE_SECURE_OPEN			0x00000100
-+#define FILE_CHARACTERISTIC_TS_DEVICE		0x00001000
-+#define FILE_CHARACTERISTIC_WEBDAV_DEVICE	0x00002000
-+#define FILE_PORTABLE_DEVICE			0x00004000
-+#define FILE_DEVICE_ALLOW_APPCONTAINER_TRAVERSAL 0x00020000
-+
- /*
-  * Maximum number of iovs we need for a set-info request.
-  * The largest one is rename/hardlink
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index e7e07891781b..786cd45fe18f 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5314,8 +5314,13 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 
- 		info = (struct filesystem_device_info *)rsp->Buffer;
- 
--		info->DeviceType = cpu_to_le32(stfs.f_type);
--		info->DeviceCharacteristics = cpu_to_le32(0x00000020);
-+		info->DeviceType = cpu_to_le32(FILE_DEVICE_DISK);
-+		info->DeviceCharacteristics =
-+			cpu_to_le32(FILE_DEVICE_IS_MOUNTED);
-+		if (!test_tree_conn_flag(work->tcon,
-+					 KSMBD_TREE_CONN_FLAG_WRITABLE))
-+			info->DeviceCharacteristics |=
-+				cpu_to_le32(FILE_READ_ONLY_DEVICE);
- 		rsp->OutputBufferLength = cpu_to_le32(8);
- 		break;
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 9be37d0fe724..0a48d80b3871 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -2860,17 +2860,21 @@ static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
+ 	rc = cifs_get_writable_file(CIFS_I(inode), FIND_WR_ANY, &cfile);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "No writable handle in writepages rc=%d\n", rc);
++		folio_unlock(folio);
+ 		goto err_xid;
  	}
+ 
+ 	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->wsize,
+ 					   &wsize, credits);
+-	if (rc != 0)
++	if (rc != 0) {
++		folio_unlock(folio);
+ 		goto err_close;
++	}
+ 
+ 	wdata = cifs_writedata_alloc(cifs_writev_complete);
+ 	if (!wdata) {
+ 		rc = -ENOMEM;
++		folio_unlock(folio);
+ 		goto err_uncredit;
+ 	}
+ 
+@@ -3017,17 +3021,22 @@ static ssize_t cifs_writepages_begin(struct address_space *mapping,
+ lock_again:
+ 	if (wbc->sync_mode != WB_SYNC_NONE) {
+ 		ret = folio_lock_killable(folio);
+-		if (ret < 0)
++		if (ret < 0) {
++			folio_put(folio);
+ 			return ret;
++		}
+ 	} else {
+-		if (!folio_trylock(folio))
++		if (!folio_trylock(folio)) {
++			folio_put(folio);
+ 			goto search_again;
++		}
+ 	}
+ 
+ 	if (folio->mapping != mapping ||
+ 	    !folio_test_dirty(folio)) {
+ 		start += folio_size(folio);
+ 		folio_unlock(folio);
++		folio_put(folio);
+ 		goto search_again;
+ 	}
+ 
+@@ -3057,6 +3066,7 @@ static ssize_t cifs_writepages_begin(struct address_space *mapping,
+ out:
+ 	if (ret > 0)
+ 		*_start = start + ret;
++	folio_put(folio);
+ 	return ret;
+ }
+ 
 -- 
-2.25.1
+2.39.2
 
