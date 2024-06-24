@@ -1,156 +1,302 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDFAC8FF;
-	Mon, 24 Jun 2024 04:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87F9DDDC
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Jun 2024 04:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719203375; cv=none; b=tjzp73mEJeml6VNH9/IyR6XDvTojl8BoiWkbN/L4QRVXpmMrCwWS/S9t/DkTVndPmnP5Cz2E0wYFEFcrTsbcxiF9LSB6TLBmHm/SWhdz3qOjca8thJDy7vJzf8FPr3TsaFtTbmwCIPvjfFD2HVEHve3ZqeMJJAlost4IZ5Q6sv4=
+	t=1719204857; cv=none; b=QX5g0vS9WgX0dVYg9BZ2MktzAC++A8fSNVAhzt9tpOzeXfV3EenXuGQXChAiz6Q9oADnBNpAAhyspZ8pdZWM0dMguo1hzGq695EMvziOluwswBUsmDoavUzpfD8nGv3nX1aFlXhNTAU11yED91rRWi4lk5xLM9VW1Pqu9o2dCfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719203375; c=relaxed/simple;
-	bh=TxfqNasjA0T1bjyTc3f87NCLf1eN+E6zofRo71B+ijA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YaVACULdDq+LVerRBLYLLzo8ROArMYPLHchrEjKdKjdIFZ0Ozy6gg30sPCp9NSXsZyQzdnIkjdNjxq3wl0vAj2fEN5rkCP64wLNEdcEY2KfyKd/3yf9I0dKNOvfyhqzFAb+GnKJj8fDgt+5gLt42EwIde7C8UChgTZ3ZQcw3s9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4W6w355wk0z4f3jMC;
-	Mon, 24 Jun 2024 12:29:21 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id D06651A0568;
-	Mon, 24 Jun 2024 12:29:28 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP2 (Coremail) with SMTP id Syh0CgAn3oMi9nhm19q2AA--.39098S4;
-	Mon, 24 Jun 2024 12:29:28 +0800 (CST)
-From: Yang Erkun <yangerkun@huawei.com>
-To: sfrench@samba.org,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	dhowells@redhat.com,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org,
-	stable-commits@vger.kernel.org
-Cc: yangerkun@huawei.com,
-	yangerkun@huaweicloud.com
-Subject: [PATCH 6.6~6.9] cifs: fix pagecache leak when do writepages
-Date: Mon, 24 Jun 2024 12:28:15 +0800
-Message-Id: <20240624042815.2242201-1-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1719204857; c=relaxed/simple;
+	bh=3+fCx3XtKK/JYpTO3u6bGp8DoT+Q2+19e5b6d20yr/4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UPRkFbdzaNnUFBJ+95LfPapyJtArzT+uzeTCtzwHtD/b8rXRkSjD82mxXG3Wqhk5Xzvax96O7rjRsX+szMxAWGAMe3q4t1fKarCZpAEMDQlzLam73OWRhRSrZVqYD+/oKwy/6nctK5jCerPkOPSDBDCo3GFoPgv+lM8ZTGfCkWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0MMEMYm; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0MMEMYm"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5295e488248so4403374e87.2
+        for <linux-cifs@vger.kernel.org>; Sun, 23 Jun 2024 21:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719204853; x=1719809653; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XlJWjPLT7i442pXS3ZXiDMyyq9aj84fm/1i+WjllsH4=;
+        b=L0MMEMYmAenmqrLHDJuLj0keok6smzoutQ/YzwaHBUkhhBamF/xYgjMZg05a7PfcFw
+         OzmWP7xbhL0GByZ9liwQaY07iYwX99bz+ArzTPI6hXETVfsBOhHB915BidejBIAH4NRx
+         BfW6e4NmeEnEeoGnTy/rOZ79fvQg2oE1c+BZdR1Sb+7YOKczPwkhPg9wNEm3DzjsSpQp
+         gPbFdB+MZDq8j4vr6RGulkMASbA+5Eh/6y36+jXFl6c9ySyrC3+8BdsfS2peqQIpzxOn
+         SHatOV6DD9aid7r2BD2EhiAL7urJ3aXidAdM6AQVaxrAbMOmGo5nJE3srg9XjyK+oS5v
+         GIdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719204853; x=1719809653;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XlJWjPLT7i442pXS3ZXiDMyyq9aj84fm/1i+WjllsH4=;
+        b=fIUF7dCFj6YHOv97bQEdEcAZjE3qnzg0QWn4Lrd5nTXH85VDzy37UmZBvYbNId76z1
+         af9jZhVh9hvbDule7vIGVSNXyikVMG9xGkKS1S+WOctSs/dEsoG+f77xAUtKIk+sw7dS
+         tF4N4BeZNPU1qLGL7H++wva0d/31wIVNXzPjUTwyQEbpLyadXFTwT6tlxyJ/g1Tc6gB2
+         7XTBlvrq7QVLlBVmrcBiXkz8uqe7jXvx9p64emGzOa2k0Qa17ScmxMmuB51RirYf1CYU
+         vSgnI8PUDNs1E1bxxrqfIAtbrgcz7syLoahOEGTCeyVLXo9Eip8leLSQVDxG0ml249JG
+         yujQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWw+a30OphUr0OrCjz0nys6ydm78TYqOzbqr2H5zHIG4X6JLxVjSaQTMkQ/RT3tcO00hlU/y7gs002XCeAncXb+egGJLxiuQmWZ4w==
+X-Gm-Message-State: AOJu0YwtUxL0fzXBlp4NNtkEpeAs+mzBpwlYkpD8AZBkHDEj4j4DZCpE
+	h+7U2ge0Wk/pq7ysTex5HMTD5vqzot/lcPKRCAiL5KMe+OqCLUbnsrh9ISgq4PzKoEfiB4b25SK
+	GuDQ9DDkVdVHhOZEaaXXStev4bUE=
+X-Google-Smtp-Source: AGHT+IECFz0xjh7IhZZV63lPBJpYq7h7MoHY7xwCq+1oXHz+sp0VJc/MJA6g6kzbOHIf+ufhyQw2CIPc9RTO6wgb2x0=
+X-Received: by 2002:a05:6512:ea4:b0:52c:d5ac:d50 with SMTP id
+ 2adb3069b0e04-52ce186275fmr2354120e87.57.1719204852365; Sun, 23 Jun 2024
+ 21:54:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgAn3oMi9nhm19q2AA--.39098S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxCFyxZF4rCFy7JrW5try3twb_yoW5GFWkpr
-	Wakrn8Ar4jyr9ruFnxZayqv3WUt3y8XrW3XFy3Gw17Z3Z8Z3WagFW8K34UKFWfGr9xXFWx
-	KFs0yFWku3WqqaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0aVACjI8F5VA0II8E6IAqYI8I648v4I1l
-	FIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07
-	x20xyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAnYwUUUUU=
-Sender: yangerkun@huaweicloud.com
-X-CM-SenderInfo: 51dqwvhunx0q5kxd4v5lfo033gof0z/
+References: <5659539.ZASKD2KPVS@wintermute> <CAH2r5mtzzgG9-peAakYhBNdpahQ=R8wkhJxUQJ+oZtzEvuNjSg@mail.gmail.com>
+ <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
+In-Reply-To: <5fad6c05eab959e06fe3518d9104376b79dcbcb9.camel@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 23 Jun 2024 23:54:00 -0500
+Message-ID: <CAH2r5mvQi6ydn73zZb=psyE1MujC2ovtipT-tWzX2B4q4uc+1g@mail.gmail.com>
+Subject: Re: Different behavior of POSIX file locks depending on cache mode
+To: Andrew Bartlett <abartlet@samba.org>
+Cc: Kevin Ottens <kevin.ottens@enioka.com>, linux-cifs@vger.kernel.org, 
+	Pavel Shilovsky <piastryyy@gmail.com>, Jeff Layton <jlayton@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-After commit f3dc1bdb6b0b("cifs: Fix writeback data corruption"), the
-writepages for cifs will find all folio needed writepage with two phase.
-The first folio will be found in cifs_writepages_begin, and the latter
-various folios will be found in cifs_extend_writeback.
+This was interesting to dig through (and netfs caching changes made it
+a little harder to trace the original code) but it looks fixable. See
+cifs_find_fid_lock_conflict() in fs/smb/client/file.c.   It does not
+look new though - so let me know if you noticed that the behavior in
+earlier kernels was different for the default case (smb3.1.1 mounts
+with caching enabled).
 
-All those will first get folio, and for normal case, once we set page
-writeback and after do really write, we should put the reference, folio
-found in cifs_extend_writeback do this with folio_batch_release. But the
-folio found in cifs_writepages_begin never get the chance do it. And
-every writepages call, we will leak a folio(found this problem while do
-xfstests over cifs).
+The problem seems to be that locking is enforced only in some write
+paths, but these places where we do write vs. byte range locking
+checks (although at first glance may seem logical) obviously do not
+follow POSIX semantics which would allow a write to a locked range
+(even if POSIX behavior is counter-intuitive and different from
+Windows semantics).  Two obvious things to fix that I see so far:
 
-Besides, the exist path seem never handle this folio correctly, fix it too
-with this patch.
+1) It was harder than expected to trace since looks like we don't have
+good dynamic (or static for that matter) tracepoints for the write and
+write error paths (although netfs fortunately has a few) - so
+obviously should add a few tracepoints to make it easier to narrow
+this kind of thing down in the future
+2) We need to make changes to how we check lock conflicts.  See
+cifs_writev() and its call to cifs_find_lock_conflict(). It looks like
+this is the original commit that may have caused the problem:
+commit 85160e03a79e0d7f9082e61f6a784abc6f402701
+Author: Pavel Shilovsky <piastry@etersoft.ru>
+Date:   Sat Oct 22 15:33:29 2011 +0400
 
-The problem does not exist in mainline since writepages path for cifs
-has changed to netfs. It's had to backport all related change, so try fix
-this problem with this single patch.
+    CIFS: Implement caching mechanism for mandatory brlocks
 
-Fixes: f3dc1bdb6b0b ("cifs: Fix writeback data corruption")
-Signed-off-by: Yang Erkun <yangerkun@huawei.com>
----
- fs/smb/client/file.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+    If we have an oplock and negotiate mandatory locking style we handle
+    all brlock requests on the client.
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 9be37d0fe724..0a48d80b3871 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -2860,17 +2860,21 @@ static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
- 	rc = cifs_get_writable_file(CIFS_I(inode), FIND_WR_ANY, &cfile);
- 	if (rc) {
- 		cifs_dbg(VFS, "No writable handle in writepages rc=%d\n", rc);
-+		folio_unlock(folio);
- 		goto err_xid;
- 	}
- 
- 	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->wsize,
- 					   &wsize, credits);
--	if (rc != 0)
-+	if (rc != 0) {
-+		folio_unlock(folio);
- 		goto err_close;
-+	}
- 
- 	wdata = cifs_writedata_alloc(cifs_writev_complete);
- 	if (!wdata) {
- 		rc = -ENOMEM;
-+		folio_unlock(folio);
- 		goto err_uncredit;
- 	}
- 
-@@ -3017,17 +3021,22 @@ static ssize_t cifs_writepages_begin(struct address_space *mapping,
- lock_again:
- 	if (wbc->sync_mode != WB_SYNC_NONE) {
- 		ret = folio_lock_killable(folio);
--		if (ret < 0)
-+		if (ret < 0) {
-+			folio_put(folio);
- 			return ret;
-+		}
- 	} else {
--		if (!folio_trylock(folio))
-+		if (!folio_trylock(folio)) {
-+			folio_put(folio);
- 			goto search_again;
-+		}
- 	}
- 
- 	if (folio->mapping != mapping ||
- 	    !folio_test_dirty(folio)) {
- 		start += folio_size(folio);
- 		folio_unlock(folio);
-+		folio_put(folio);
- 		goto search_again;
- 	}
- 
-@@ -3057,6 +3066,7 @@ static ssize_t cifs_writepages_begin(struct address_space *mapping,
- out:
- 	if (ret > 0)
- 		*_start = start + ret;
-+	folio_put(folio);
- 	return ret;
- }
- 
--- 
-2.39.2
 
+On Sun, Jun 9, 2024 at 11:41=E2=80=AFPM Andrew Bartlett <abartlet@samba.org=
+> wrote:
+>
+> (resend due spam rules on list)
+>
+> Kia Ora Steve,
+>
+> I'm working with Kevin on this, and I set up a clean environment with
+> the latest software to make sure this is all still an issue on current
+> software:
+>
+> I was hoping to include the old SMB1 unix extensions in this test also,
+> but these seem unsupported in current kernels.  When did they go away?
+>
+> Anyway, here is the data.  It certainly looks like an issue with the
+> SMB3 client, as only the client changes with the cache=3Dnone
+>
+> Server is Samba 4.20.1 from Debian Sid.  Kernel is
+> Linux debian-sid-cifs-client 6.7.9-amd64 #1 SMP PREEMPT_DYNAMIC Debian
+> 6.7.9-2 (2024-03-13) x86_64 GNU/Linux
+>
+> With SMB1 but not unix extensions (seems unsupported):
+>
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpass,vers=3D1.0
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: x count: 0
+> Third file descriptor 5
+> Wrote to third fd: 1
+>
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: x count: -1
+> Third file descriptor 5
+> Wrote to third fd: -1
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix
+>
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix,nobrl
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: o count: 1
+> Third file descriptor 5
+> Wrote to third fd: 1
+>
+> And with cache=3Dnone
+>
+> root@debian-sid-cifs-client:~# mount.cifs //192.168.122.234/testuser
+> mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix,cache=3Dnone
+> root@debian-sid-cifs-client:~# cd mnt/
+> root@debian-sid-cifs-client:~/mnt# ../lock_test foo
+> Testing with foo
+> Got new file descriptor 3
+> Lock set: 1
+> Second file descriptor 4
+> Read from second fd: o count: 1
+> Third file descriptor 5
+> Wrote to third fd: 1
+>
+> On Thu, 2024-05-23 at 11:12 -0500, Steve French wrote:
+> > What is the behavior with "nobrl" mount option? and what is the
+> > behavior when running with the POSIX extensions enabled (e.g. to
+> > current Samba or ksmbd adding "posix" to the mount options)
+> >
+> > On Thu, May 23, 2024 at 11:08=E2=80=AFAM Kevin Ottens <
+> > kevin.ottens@enioka.com
+> > > wrote:
+> > > Hello,
+> > >
+> > > I've been hunting down a bug exhibited by Libreoffice regarding
+> > > POSIX file
+> > > locks in conjunction with CIFS mounts. In short: just before
+> > > saving, it
+> > > reopens a file on which it already holds a file lock (via another
+> > > file
+> > > descriptor in the same process) in order to read from it to create
+> > > a backup
+> > > copy... but the read call fails.
+> > >
+> > > I've been in discussion with Andrew Bartlett for a little while
+> > > regarding this
+> > > issue and, after exploring several venues, he advised me to send an
+> > > email to
+> > > this list in order to get more opinions about it.
+> > >
+> > > The latest discovery we did was that the cache option on the
+> > > mountpoint seems
+> > > to impact the behavior of the POSIX file locks. I made a minimal
+> > > test
+> > > application (attached to this email) which basically does the
+> > > following:
+> > >  * open a file for read/write
+> > >  * set a POSIX write lock on the whole file
+> > >  * open the file a second time and try to read from it
+> > >  * open the file a third time and try to write to it
+> > >
+> > > It assumes there is already some text in the file. Also, as it goes
+> > > it outputs
+> > > information about the calls.
+> > >
+> > > The output I get is the following with cache=3Dstrict on the mount:
+> > > ---
+> > > Testing with /mnt/foo
+> > > Got new file descriptor 3
+> > > Lock set: 1
+> > > Second file descriptor 4
+> > > Read from second fd: x count: -1
+> > > Third file descriptor 5
+> > > Wrote to third fd: -1
+> > > ---
+> > >
+> > > If I'm using cache=3Dnone:
+> > > ---
+> > > Testing with /mnt/foo
+> > > Got new file descriptor 3
+> > > Lock set: 1
+> > > Second file descriptor 4
+> > > Read from second fd: b count: 1
+> > > Third file descriptor 5
+> > > Wrote to third fd: 1
+> > > ---
+> > >
+> > > That's the surprising behavior which prompted the email on this
+> > > list. Is it
+> > > somehow intended that the cache option would impact the semantic of
+> > > the file
+> > > locks? At least it caught me by surprise and I wouldn't expect such
+> > > a
+> > > difference in behavior.
+> > >
+> > > Now, since the POSIX locks are process wide, I would have expected
+> > > to have the
+> > > output I'm getting for the "cache=3Dnone" case to be also the one I'm
+> > > getting
+> > > for the "cache=3Dstrict" case.
+> > >
+> > > I'm looking forward to feedback on this one. I really wonder if we
+> > > missed
+> > > something obvious or if there is some kind of bug in the cifs
+> > > driver.
+> > >
+> > > Regards.
+> > > --
+> > > K=C3=A9vin Ottens
+> > > kevin.ottens@enioka.com
+> > >
+> > > +33 7 57 08 95 13
+> >
+> >
+>
+> --
+>
+> Andrew Bartlett (he/him)       https://samba.org/~abartlet/
+> Samba Team Member (since 2001) https://samba.org
+> Samba Team Lead                https://catalyst.net.nz/services/samba
+> Catalyst.Net Ltd
+>
+> Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
+> company
+>
+> Samba Development and Support: https://catalyst.net.nz/services/samba
+>
+> Catalyst IT - Expert Open Source Solutions
+>
+> --
+> Andrew Bartlett (he/him)       https://samba.org/~abartlet/
+> Samba Team Member (since 2001) https://samba.org
+> Samba Team Lead                https://catalyst.net.nz/services/samba
+> Catalyst.Net Ltd
+>
+> Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
+> company
+>
+> Samba Development and Support: https://catalyst.net.nz/services/samba
+>
+> Catalyst IT - Expert Open Source Solutions
+
+
+
+--=20
+Thanks,
+
+Steve
