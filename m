@@ -1,363 +1,272 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF9B146A86
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Jun 2024 07:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1A0148FF5;
+	Tue, 25 Jun 2024 11:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719301313; cv=none; b=UfECLB7sxQi/m21NkIlvOBGWyAbPeezLKXqF83g0f9Kz7Hwy5VP6uFXG5npQ+BEUzKgVN+/BZTShgqIF5TLxSTKCA3hkN/Mro+Wo+GJgFR3HQazVcjXWnUF+cxq3zRrnRF6NGriQDLJCxwdPSIUDOKkajLPA4cvrrKQ+xPnoQTs=
+	t=1719314499; cv=none; b=CXfESifI6waLJJn4rZ0KyZDB90+Ug60CC6/P9R21Q12PCP2IwfF/7+TArkDiL7SlmwdNeq9QpIM3TKPg/1m3LaYpEsfNv47YnPuPkzd7WRmrFm8O8FrQ/QXNH6nnhYexwtMwPE0ivytysdSGy1jCexHgVDDOzBCv+XnOPx0ERVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719301313; c=relaxed/simple;
-	bh=DGVduj+HF7ZyTbZnGkEAtr16n/b15rqbw2R3B7JMOPM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aR0zSf8bxnJpgGrGRJjnQ0jePVqAJg6fV2oeG/jl/ixPlLixjwL+GXLhcUiF3Jtj9O3D01tBCS9bGOxdu5HmCmFKG02NeDf409VJZTSxap86axHBDZIp9NGYTbvcgu15bi5G1P0Vvj4aXCAhWmmO6FyrOtx/XWTsozFyPP9ODF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=enioka.com; spf=pass smtp.mailfrom=enioka.com; dkim=pass (2048-bit key) header.d=enioka.com header.i=@enioka.com header.b=fPiL9pFY; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=enioka.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enioka.com
+	s=arc-20240116; t=1719314499; c=relaxed/simple;
+	bh=oSbhm/dT5MKMXBhgwWCjBGIAGVS63RQDUCW+HqsxQOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cb7lklIsGHFWCyq956Q16/ULetXMnd1n1UeIx+24EccpGvXyKhrSPDxEPJjPoAyRpg27oyOvNGTsIVXmualUTlK46jP1vvu84GsymZdjUvnfxhYNVXzvtNdXpoLZzvzQP/Mp+toeMvG2oyvBFZVnm1Kdr93THHehghdoHU+Gz2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=sh+gnQk6; arc=none smtp.client-ip=212.227.126.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enioka.com header.i=@enioka.com header.b="fPiL9pFY"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9F0131BF207;
-	Tue, 25 Jun 2024 07:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=enioka.com; s=gm1;
-	t=1719301309;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mg3XLV+jWekGDuVIaRCR0Uudy8a6ob9yt7G5j1GI6x4=;
-	b=fPiL9pFYpAn/gk2l9FVW3DoUaDcU3WgOeHmeK9GQhc3zYlXtrJb82pERFiHIoPVanMIVW8
-	PX75TjrSgbA02qM4aISIcMVBn7w0pn+cDu++WffX51y4sxgkvWmMtbFZO/4LZRbbCd0vV5
-	qf6ccR64HZI27tJHaWEy3wvucr1T16z3mPtA8IfAaMRZhV4rZGv7jf3aN0Zf+HwW9KnQW6
-	RoP35kVYdjUXXzfqgqBe47Z+0kXTUQ7osmk3YP1U8mErq0WWaIcrzrbAghSKjO7hDEi5n+
-	6ATEFYoOCGqvqvlXY5BsZbXRUMlnf6VcUemKa90UnFwI+dhETJbQKo4lC5m3aQ==
-From: Kevin Ottens <kevin.ottens@enioka.com>
-To: Steve French <smfrench@gmail.com>, Andrew Bartlett <abartlet@samba.org>
-Cc: linux-cifs@vger.kernel.org, Pavel Shilovsky <piastryyy@gmail.com>,
- Jeff Layton <jlayton@kernel.org>
-Subject: Re: Different behavior of POSIX file locks depending on cache mode
-Date: Tue, 25 Jun 2024 09:41:48 +0200
-Message-ID: <2162098.9o76ZdvQCi@wintermute>
-In-Reply-To: <0ed85d03cfc698093e649394739c1379443ab0c8.camel@samba.org>
-References:
- <5659539.ZASKD2KPVS@wintermute>
- <CAH2r5mvQi6ydn73zZb=psyE1MujC2ovtipT-tWzX2B4q4uc+1g@mail.gmail.com>
- <0ed85d03cfc698093e649394739c1379443ab0c8.camel@samba.org>
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="sh+gnQk6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1719314488; x=1719919288; i=christian@heusel.eu;
+	bh=uMMLgPkSCGHiELtwqegdPywPsAzyqY9AmA8zacbiW8I=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=sh+gnQk6ej4PfuiU+hTwTyMitd6USWq7qBxa7dT8tZU5Rb4x/iPST5KVyNMxIVNm
+	 i3OVPsNJeeHjvbJRI3dI75cYAxYFIGCCx6IzF609CSwErPSis3HI0mJBiph6Nw7yh
+	 hCcgahUUeOw8Lforuu4EP9dmD5+/6SRPE360duse7HFqMa+aO5YvzmDJJJ1TA8D0R
+	 kPy3HukxSMKrN+ktXm35pwZqaMc40sQKBNcOcP6+rONVsXJxBUcIpiqy6+uQMSfJr
+	 DCYOyRgtapZjfupgMMnV4DhrQRaVE+Wkn0aDbN1KQdOtg/yKeU/NcRzBlesLc6Nty
+	 41WPU/5x80cFDcc6WA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([78.42.228.106]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MNKyQ-1rxPdl2yMc-00WPVN; Tue, 25 Jun 2024 13:07:51 +0200
+Date: Tue, 25 Jun 2024 13:07:49 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Andrew Paniakin <apanyaki@amazon.com>
+Cc: pc@cjr.nz, stfrench@microsoft.com, sashal@kernel.org, pc@manguebit.com, 
+	regressions@lists.linux.dev, stable@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	abuehaze@amazon.com, simbarb@amazon.com, benh@amazon.com
+Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
+ stable/linux-6.1.y breaks cifs client failover to another server in DFS
+ namespace
+Message-ID: <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
+References: <ZnMkNzmitQdP9OIC@3c06303d853a.ant.amazon.com>
+ <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jmsggbhoayj3vp5r"
+Content-Disposition: inline
+In-Reply-To: <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
+X-Provags-ID: V03:K1:K2gnCX6y5v0pEX0/67AmSIgOOCUSrjSVvkqkMNLNIcj01PSH4Oj
+ T8aefGcsyDnq5Cg1O+6axHk9E/pe3KkKePQCeBRB/co0elYikkASNMndef5YYfRBT/HkNTM
+ lF1j6+l+Z5WkD7iUx/IZRyuvPvRosANuuUJlKhrIclk8mMuLHEHGcR2+SoKYsMVYU+ouoCk
+ +XMw6vJjld7kNuDGwiWXQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:FpkI5MEtraI=;dN19VhZMalOaYI7c4WLnfolaHVM
+ f4au55iSExDBqAI00wcBkZqZVtFELDzhgHtWTCBnDXMHaS2sB6orsl611Ny57CRAOu8GjSS2M
+ oSxb6IKPBLjGPfo38XHmNqeBtwRC1h+hzpovxrl4LEQF6hAyLdULoHgnGLmIJST88ucDDxNNd
+ Ybl1+ZPxdG7UPGT2oBlf6I2pDsWuwmDtBDZJMLeqVBoUJ8ZVhKOt8c0FTr5M8qS4asqNFqo8D
+ XkkQ5R2gO9eXZvK/52fZboJJqU99Gvdti4YuC2ZfnFIpnDsj73Lf0NDioiYjSxCE9l1vXqaRx
+ czJQMdSlacVN0lUJTLnxqZ5g5p55V67FhY3Fb7bFjw4XqvUVIjNcRMxrmZYxJa0mder6v7uGM
+ vOJIRX6qV3+RACX3WikRhu77sBx9UpIAy376ZhB+ReOF6Ca1BCmOnjET8N/XNzIjOdwO/2eQq
+ aBbNP9XEX+mns4aysRwvEHCY2BG97VkxPxl8XiIkt7Jp1yuafGYZ4Q+JqMgXew/BGhZyexg65
+ IUZMUgrMN8EGk57Hj1981QN6Do6Cyl4gH6ry950CZy1LqUUZ2RwaNV/jwdX2ACOPmOscNBjBV
+ hDgz3aPrLYUapcWkpayfVFwqp1rl3k9DSL5UHPe7NvH8QG39lBXTPWVUZQF5yc4vSuvAULt3q
+ HaoqS/Rrjg1IxS9Qpg2uhdnt4llsKjzIHlc6R+ss2BO+fs8aWnQ+65YQOjL4FTYQY9n6ASEhx
+ Xm1ZlOteUxDv/nE2jR1aXnAPCUetzksz3vZAnwRMSU6R6kW+erLmMg=
+
+
+--jmsggbhoayj3vp5r
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-GND-Sasl: kevin.ottens@enioka.com
 
-Hello,
-
-On Tuesday 25 June 2024 08:00:11 CEST Andrew Bartlett wrote:
-> Thanks so much Steve.
-
-Thanks indeed!
-=20
-> Kevin can give more info, but no, my understanding is that this was
-> "always" problematic, the reason it came up now is LibreOffice changed
-> how it handled file saves, rather than a kernel change.
-
-I confirm. It's been here for a long time AFAIK, but Libreoffice recently=20
-enabled some code path by default (it was previously disabled by default).
-
-> Even if the fix is to be in the direction that 'breaks' LibreOffice,
-> that is OK, I have given Kevin a suggestion on using locks ranges
-> towards the end of the file as a way to regain the desired 'advisory'
-> semantics, but we wanted to be working on solid ground with consistent,
-> reliable semantics that don't depend on cache modes.
-
-Yes, the consistency is important. Once we have a solid and reliable behavi=
-or=20
-we can always get things adjusted higher in the stack.
-
-Regards.
-
-
-> On Sun, 2024-06-23 at 23:54 -0500, Steve French wrote:
-> > This was interesting to dig through (and netfs caching changes made
-> > it
-> > a little harder to trace the original code) but it looks fixable. See
-> > cifs_find_fid_lock_conflict() in fs/smb/client/file.c.   It does not
-> > look new though - so let me know if you noticed that the behavior in
-> > earlier kernels was different for the default case (smb3.1.1 mounts
-> > with caching enabled).
+On 24/06/24 10:59AM, Andrew Paniakin wrote:
+> On 19/06/2024, Andrew Paniakin wrote:
+> > Commit 60e3318e3e900 ("cifs: use fs_context for automounts") was
+> > released in v6.1.54 and broke the failover when one of the servers
+> > inside DFS becomes unavailable. We reproduced the problem on the EC2
+> > instances of different types. Reverting aforementioned commint on top of
+> > the latest stable verison v6.1.94 helps to resolve the problem.
 > >=20
-> > The problem seems to be that locking is enforced only in some write
-> > paths, but these places where we do write vs. byte range locking
-> > checks (although at first glance may seem logical) obviously do not
-> > follow POSIX semantics which would allow a write to a locked range
-> > (even if POSIX behavior is counter-intuitive and different from
-> > Windows semantics).  Two obvious things to fix that I see so far:
+> > Earliest working version is v6.2-rc1. There were two big merges of CIFS=
+ fixes:
+> > [1] and [2]. We would like to ask for the help to investigate this prob=
+lem and
+> > if some of those patches need to be backported. Also, is it safe to jus=
+t revert
+> > problematic commit until proper fixes/backports will be available?
 > >=20
-> > 1) It was harder than expected to trace since looks like we don't
-> > have
-> > good dynamic (or static for that matter) tracepoints for the write
-> > and
-> > write error paths (although netfs fortunately has a few) - so
-> > obviously should add a few tracepoints to make it easier to narrow
-> > this kind of thing down in the future
-> > 2) We need to make changes to how we check lock conflicts.  See
-> > cifs_writev() and its call to cifs_find_lock_conflict(). It looks
-> > like
-> > this is the original commit that may have caused the problem:
-> > commit 85160e03a79e0d7f9082e61f6a784abc6f402701
-> > Author: Pavel Shilovsky <
-> > piastry@etersoft.ru
+> > We will help to do testing and confirm if fix works, but let me also li=
+st the
+> > steps we used to reproduce the problem if it will help to identify the =
+problem:
+> > 1. Create Active Directory domain eg. 'corp.fsxtest.local' in AWS Direc=
+tory
+> > Service with:
+> > - three AWS FSX file systems filesystem1..filesystem3
+> > - three Windows servers; They have DFS installed as per
+> >   https://learn.microsoft.com/en-us/windows-server/storage/dfs-namespac=
+es/dfs-overview:
+> >     - dfs-srv1: EC2AMAZ-2EGTM59
+> >     - dfs-srv2: EC2AMAZ-1N36PRD
+> >     - dfs-srv3: EC2AMAZ-0PAUH2U=20
 > >=20
-> > Date:   Sat Oct 22 15:33:29 2011 +0400
+> >  2. Create DFS namespace eg. 'dfs-namespace' in Windows server 2008 mode
+> >  and three folders targets in it:
+> > - referral-a mapped to filesystem1.corp.local
+> > - referral-b mapped to filesystem2.corp.local
+> > - referral-c mapped to filesystem3.corp.local
+> > - local folders dfs-srv1..dfs-srv3 in C:\DFSRoots\dfs-namespace of every
+> >   Windows server. This helps to quickly define underlying server when
+> >   DFS is mounted.
 > >=20
-> >     CIFS: Implement caching mechanism for mandatory brlocks
-> >    =20
-> >     If we have an oplock and negotiate mandatory locking style we
+> > 3. Enabled cifs debug logs:
+> > ```
+> > echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
+> > echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
+> > echo 7 > /proc/fs/cifs/cifsFYI
+> > ```
 > >=20
-> > handle
+> > 4. Mount DFS namespace on Amazon Linux 2023 instance running any vanilla
+> > kernel v6.1.54+:
+> > ```
+> > dmesg -c &>/dev/null
+> > cd /mnt
+> > mount -t cifs -o cred=3D/mnt/creds,echo_interval=3D5 \
+> >     //corp.fsxtest.local/dfs-namespace \
+> >     ./dfs-namespace
+> > ```
 > >=20
-> >     all brlock requests on the client.
+> > 5. List DFS root, it's also required to avoid recursive mounts that hap=
+pen
+> > during regular 'ls' run:
+> > ```
+> > sh -c 'ls dfs-namespace'
+> > dfs-srv2  referral-a  referral-b
+> > ```
 > >=20
-> > On Sun, Jun 9, 2024 at 11:41=E2=80=AFPM Andrew Bartlett <
-> > abartlet@samba.org
+> > The DFS server is EC2AMAZ-1N36PRD, it's also listed in mount:
+> > ```
+> > [root@ip-172-31-2-82 mnt]# mount | grep dfs
+> > //corp.fsxtest.local/dfs-namespace on /mnt/dfs-namespace type cifs (rw,=
+relatime,vers=3D3.1.1,cache=3Dstrict,username=3DAdmin,domain=3Dcorp.fsxtest=
+=2Elocal,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D172.31.11.26,file_mod=
+e=3D0755,dir_mode=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D41943=
+04,bsize=3D1048576,echo_interval=3D5,actimeo=3D1,closetimeo=3D1)
+> > //EC2AMAZ-1N36PRD.corp.fsxtest.local/dfs-namespace/referral-a on /mnt/d=
+fs-namespace/referral-a type cifs (rw,relatime,vers=3D3.1.1,cache=3Dstrict,=
+username=3DAdmin,domain=3Dcorp.fsxtest.local,uid=3D0,noforceuid,gid=3D0,nof=
+orcegid,addr=3D172.31.12.80,file_mode=3D0755,dir_mode=3D0755,soft,nounix,ma=
+pposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo_interval=3D5,ac=
+timeo=3D1,closetimeo=3D1)
+> > ```
 > >=20
-> > > wrote:
-> > > (resend due spam rules on list)
-> > >=20
-> > > Kia Ora Steve,
-> > >=20
-> > > I'm working with Kevin on this, and I set up a clean environment
-> > > with
-> > > the latest software to make sure this is all still an issue on
-> > > current
-> > > software:
-> > >=20
-> > > I was hoping to include the old SMB1 unix extensions in this test
-> > > also,
-> > > but these seem unsupported in current kernels.  When did they go
-> > > away?
-> > >=20
-> > > Anyway, here is the data.  It certainly looks like an issue with
-> > > the
-> > > SMB3 client, as only the client changes with the cache=3Dnone
-> > >=20
-> > > Server is Samba 4.20.1 from Debian Sid.  Kernel is
-> > > Linux debian-sid-cifs-client 6.7.9-amd64 #1 SMP PREEMPT_DYNAMIC
-> > > Debian
-> > > 6.7.9-2 (2024-03-13) x86_64 GNU/Linux
-> > >=20
-> > > With SMB1 but not unix extensions (seems unsupported):
-> > >=20
-> > > root@debian-sid-cifs-client:~# mount.cifs
-> > > //192.168.122.234/testuser
-> > > mnt -o user=3Dtestuser,pass=3Dpass,vers=3D1.0
-> > > root@debian-sid-cifs-client:~# cd mnt/
-> > > root@debian-sid-cifs-client:~/mnt# ../lock_test foo
-> > > Testing with foo
-> > > Got new file descriptor 3
-> > > Lock set: 1
-> > > Second file descriptor 4
-> > > Read from second fd: x count: 0
-> > > Third file descriptor 5
-> > > Wrote to third fd: 1
-> > >=20
-> > > root@debian-sid-cifs-client:~# mount.cifs
-> > > //192.168.122.234/testuser
-> > > mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix
-> > > root@debian-sid-cifs-client:~# cd mnt/
-> > > root@debian-sid-cifs-client:~/mnt# ../lock_test foo
-> > > Testing with foo
-> > > Got new file descriptor 3
-> > > Lock set: 1
-> > > Second file descriptor 4
-> > > Read from second fd: x count: -1
-> > > Third file descriptor 5
-> > > Wrote to third fd: -1
-> > > root@debian-sid-cifs-client:~# mount.cifs
-> > > //192.168.122.234/testuser
-> > > mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix
-> > >=20
-> > > root@debian-sid-cifs-client:~# mount.cifs
-> > > //192.168.122.234/testuser
-> > > mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,unix,nobrl
-> > > root@debian-sid-cifs-client:~# cd mnt/
-> > > root@debian-sid-cifs-client:~/mnt# ../lock_test foo
-> > > Testing with foo
-> > > Got new file descriptor 3
-> > > Lock set: 1
-> > > Second file descriptor 4
-> > > Read from second fd: o count: 1
-> > > Third file descriptor 5
-> > > Wrote to third fd: 1
-> > >=20
-> > > And with cache=3Dnone
-> > >=20
-> > > root@debian-sid-cifs-client:~# mount.cifs
-> > > //192.168.122.234/testuser
-> > > mnt -o user=3Dtestuser,pass=3Dpenguin12#,vers=3D3.1.1,posix,cache=3Dn=
-one
-> > > root@debian-sid-cifs-client:~# cd mnt/
-> > > root@debian-sid-cifs-client:~/mnt# ../lock_test foo
-> > > Testing with foo
-> > > Got new file descriptor 3
-> > > Lock set: 1
-> > > Second file descriptor 4
-> > > Read from second fd: o count: 1
-> > > Third file descriptor 5
-> > > Wrote to third fd: 1
-> > >=20
-> > > On Thu, 2024-05-23 at 11:12 -0500, Steve French wrote:
-> > > > What is the behavior with "nobrl" mount option? and what is the
-> > > > behavior when running with the POSIX extensions enabled (e.g. to
-> > > > current Samba or ksmbd adding "posix" to the mount options)
-> > > >=20
-> > > > On Thu, May 23, 2024 at 11:08=E2=80=AFAM Kevin Ottens <
-> > > > kevin.ottens@enioka.com
-> > > >=20
-> > > > > wrote:
-> > > > > Hello,
-> > > > >=20
-> > > > > I've been hunting down a bug exhibited by Libreoffice regarding
-> > > > > POSIX file
-> > > > > locks in conjunction with CIFS mounts. In short: just before
-> > > > > saving, it
-> > > > > reopens a file on which it already holds a file lock (via
-> > > > > another
-> > > > > file
-> > > > > descriptor in the same process) in order to read from it to
-> > > > > create
-> > > > > a backup
-> > > > > copy... but the read call fails.
-> > > > >=20
-> > > > > I've been in discussion with Andrew Bartlett for a little while
-> > > > > regarding this
-> > > > > issue and, after exploring several venues, he advised me to
-> > > > > send an
-> > > > > email to
-> > > > > this list in order to get more opinions about it.
-> > > > >=20
-> > > > > The latest discovery we did was that the cache option on the
-> > > > > mountpoint seems
-> > > > > to impact the behavior of the POSIX file locks. I made a
-> > > > > minimal
-> > > > > test
-> > > > > application (attached to this email) which basically does the
-> > > > >=20
-> > > > > following:
-> > > > >  * open a file for read/write
-> > > > >  * set a POSIX write lock on the whole file
-> > > > >  * open the file a second time and try to read from it
-> > > > >  * open the file a third time and try to write to it
-> > > > >=20
-> > > > > It assumes there is already some text in the file. Also, as it
-> > > > > goes
-> > > > > it outputs
-> > > > > information about the calls.
-> > > > >=20
-> > > > > The output I get is the following with cache=3Dstrict on the
-> > > > > mount:
-> > > > > ---
-> > > > > Testing with /mnt/foo
-> > > > > Got new file descriptor 3
-> > > > > Lock set: 1
-> > > > > Second file descriptor 4
-> > > > > Read from second fd: x count: -1
-> > > > > Third file descriptor 5
-> > > > > Wrote to third fd: -1
-> > > > > ---
-> > > > >=20
-> > > > > If I'm using cache=3Dnone:
-> > > > > ---
-> > > > > Testing with /mnt/foo
-> > > > > Got new file descriptor 3
-> > > > > Lock set: 1
-> > > > > Second file descriptor 4
-> > > > > Read from second fd: b count: 1
-> > > > > Third file descriptor 5
-> > > > > Wrote to third fd: 1
-> > > > > ---
-> > > > >=20
-> > > > > That's the surprising behavior which prompted the email on this
-> > > > > list. Is it
-> > > > > somehow intended that the cache option would impact the
-> > > > > semantic of
-> > > > > the file
-> > > > > locks? At least it caught me by surprise and I wouldn't expect
-> > > > > such
-> > > > > a
-> > > > > difference in behavior.
-> > > > >=20
-> > > > > Now, since the POSIX locks are process wide, I would have
-> > > > > expected
-> > > > > to have the
-> > > > > output I'm getting for the "cache=3Dnone" case to be also the one
-> > > > > I'm
-> > > > > getting
-> > > > > for the "cache=3Dstrict" case.
-> > > > >=20
-> > > > > I'm looking forward to feedback on this one. I really wonder if
-> > > > > we
-> > > > > missed
-> > > > > something obvious or if there is some kind of bug in the cifs
-> > > > > driver.
-> > > > >=20
-> > > > > Regards.
-> > > > > --
-> > > > > K=C3=A9vin Ottens
-> > > > > kevin.ottens@enioka.com
-> > > > >=20
-> > > > >=20
-> > > > > +33 7 57 08 95 13
-> > >=20
-> > > --
-> > >=20
-> > > Andrew Bartlett (he/him)
-> > > https://samba.org/~abartlet/
-> > >=20
-> > > Samba Team Member (since 2001)
-> > > https://samba.org
-> > >=20
-> > > Samba Team Lead
-> > > https://catalyst.net.nz/services/samba
-> > >=20
-> > > Catalyst.Net Ltd
-> > >=20
-> > > Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
-> > > company
-> > >=20
-> > > Samba Development and Support:
-> > > https://catalyst.net.nz/services/samba
-> > >=20
-> > >=20
-> > > Catalyst IT - Expert Open Source Solutions
-> > >=20
-> > > --
-> > > Andrew Bartlett (he/him)
-> > > https://samba.org/~abartlet/
-> > >=20
-> > > Samba Team Member (since 2001)
-> > > https://samba.org
-> > >=20
-> > > Samba Team Lead
-> > > https://catalyst.net.nz/services/samba
-> > >=20
-> > > Catalyst.Net Ltd
-> > >=20
-> > > Proudly developing Samba for Catalyst.Net Ltd - a Catalyst IT group
-> > > company
-> > >=20
-> > > Samba Development and Support:
-> > > https://catalyst.net.nz/services/samba
-> > >=20
-> > >=20
-> > > Catalyst IT - Expert Open Source Solutions
+> > List files in first folder:
+> > ```
+> > sh -c 'ls dfs-namespace/referral-a'
+> > filea.txt.txt
+> > ```
+> >=20
+> > 6. Shutdown DFS server-2.
+> > List DFS root again, server changed from dfs-srv2 to dfs-srv1 EC2AMAZ-2=
+EGTM59:
+> > ```
+> > sh -c 'ls dfs-namespace'
+> > dfs-srv1  referral-a  referral-b
+> > ```
+> >=20
+> > 7. Try to list files in another folder, this causes ls to fail with err=
+or:
+> > ```
+> > sh -c 'ls dfs-namespace/referral-b'
+> > ls: cannot access 'dfs-namespace/referral-b': No route to host```
+> >=20
+> > Sometimes it's also 'Operation now in progress' error.
+> >=20
+> > mount shows the same output:
+> > ```
+> > //corp.fsxtest.local/dfs-namespace on /mnt/dfs-namespace type cifs (rw,=
+relatime,vers=3D3.1.1,cache=3Dstrict,username=3DAdmin,domain=3Dcorp.fsxtest=
+=2Elocal,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D172.31.11.26,file_mod=
+e=3D0755,dir_mode=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D41943=
+04,bsize=3D1048576,echo_interval=3D5,actimeo=3D1,closetimeo=3D1)
+> > //EC2AMAZ-1N36PRD.corp.fsxtest.local/dfs-namespace/referral-a on /mnt/d=
+fs-namespace/referral-a type cifs (rw,relatime,vers=3D3.1.1,cache=3Dstrict,=
+username=3DAdmin,domain=3Dcorp.fsxtest.local,uid=3D0,noforceuid,gid=3D0,nof=
+orcegid,addr=3D172.31.12.80,file_mode=3D0755,dir_mode=3D0755,soft,nounix,ma=
+pposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo_interval=3D5,ac=
+timeo=3D1,closetimeo=3D1)
+> > ```
+> >=20
+> > I also attached kernel debug logs from this test.
+> >=20
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
+commit/?id=3D851f657a86421
+> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
+commit/?id=3D0a924817d2ed9
+> >=20
+> > Reported-by: Andrei Paniakin <apanyaki@amazon.com>
+> > Bisected-by: Simba Bonga <simbarb@amazon.com>
+> > ---
+> >=20
+> > #regzbot introduced: v6.1.54..v6.2-rc1
+>=20
+>=20
+> Friendly reminder, did anyone had a chance to look into this report?
+>=20
 
+It seems like so far nobody had a chance to look into this report =F0=9F=A4=
+=94
 
-=2D-=20
-K=C3=A9vin Ottens
-kevin.ottens@enioka.com
-+33 7 57 08 95 13
+If I understand the report correctly the regression is specific for the
+current 6.1.y stable series, so also not much the CIFS devs themselves
+can do. Maybe the stable team missed the report with the plethora of
+mail that they get.. I'll change the subject to make this more prominent
+for them.
 
+I think a good next step would be to bisect to the commit that fixed the
+relevant issue somewhere between v6.1.54..v6.2-rc1 so the stable team
+knows what needs backporting .. You can do that somewhat like so[0]:
 
+  $ git bisect start --term-new=3Dfixed --term-old=3Dunfixed
+  $ git bisect fixed v6.2-rc1
+  $ git bisect unfixed v6.1
+
+Then you just need to carry around the commit that broke the behaviour
+for you (which could be quite some work). Maybe others also have better
+ideas on how to approach that.
+
+A revert may be a bit more complicated as the breaking commit in seems
+to be a dependency for a commit that fixes something:
+
+    efc0b0bcffcba ("smb: propagate error code of extract_sharename()")
+    Fixes: 70431bfd825d ("cifs: Support fscache indexing rewrite")
+
+Cheers,
+chris
+
+[0]: https://stackoverflow.com/a/17153598
+
+#regzbot introduced: 062eacf57ad91b5c272f89dc964fd6dd9715ea7d
+#regzbot summary: cifs: broken failover for server inside DFS
+
+--jmsggbhoayj3vp5r
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmZ6pQUACgkQwEfU8yi1
+JYWSwA/+OPb/TZJmsjikMtPq9++IQcrHwdzJx3MYVtjHfKnPdVSUc7LROrXMdngS
+OEv8Du6IpiYtP91JSu/Dd28tLiwRgqfmUJuv+9bNJRHE9A2yyEyHg0CtgzoX8kQP
+eLthIxpPuqJqClWDy2UPSoCfcrUgUdPCPbSTG3RTe3CIeQhRZ4KwZ+bpb2AS0mOD
+BadNW1ew+qYILEIF/YRdU2BxWdNF+eNCrumMwBPdDgqgAXvRQ7a8V7RZPQFLlUJ8
+oXSnhrH4Y2ESXAXrmVitbX1w0jV+bznHTnA9t6hJnM2SB41CY5j24uM3b10VCDXn
+TGudRwccs29xZaKzlRED6DZ3c9YMz43zOkQ2AmQOtaAHXTn2CVqc0WWtHoUfqWGg
+HdncnOKwHroDxvh0FvWB9bzIYBHmm79pMpLhdCdtm2kcmDPEkyb/QW5QbTDzrmQo
+vb3MRP6s5ko0yFfHouZIG0rwwqAHl9NEw/i8SCzE7JJkRbR4jecV+env1nEAsDw+
+QSR4xD6YUwYbG3/1j5B8GS0etU/UAoGHLw6NBY+zAl6/RRORGxPzGhM8QS68Qaxp
+C0+F53YmCriHjR9fwil6HBD21MSLMhUBHy1W1JOTkvvLJGZLzM9F/75zhENm8ECu
+7qfmbwByPZhPoYgXAdzkic3WUEx9iQbtkwULlMLIqu4VXGXVB1Y=
+=HFX0
+-----END PGP SIGNATURE-----
+
+--jmsggbhoayj3vp5r--
