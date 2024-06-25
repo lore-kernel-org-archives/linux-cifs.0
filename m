@@ -1,272 +1,163 @@
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1A0148FF5;
-	Tue, 25 Jun 2024 11:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6ABF156678
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Jun 2024 12:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719314499; cv=none; b=CXfESifI6waLJJn4rZ0KyZDB90+Ug60CC6/P9R21Q12PCP2IwfF/7+TArkDiL7SlmwdNeq9QpIM3TKPg/1m3LaYpEsfNv47YnPuPkzd7WRmrFm8O8FrQ/QXNH6nnhYexwtMwPE0ivytysdSGy1jCexHgVDDOzBCv+XnOPx0ERVo=
+	t=1719318559; cv=none; b=pGodpNjKauJ7tPj37v8RLxb2sm7twR0qv6ncwGCRKElFboaox/Vd42c+e2mUR94mn87e9a3EiYTISgpmHg7GC+g7aaE1dnHspq8CnmnPOG+juwEZdWYBnDDsl01vcmLxLJ35ZTKrqhIuEOlKeXgWyIfmQF/eS7i5NOnULeX2ryg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719314499; c=relaxed/simple;
-	bh=oSbhm/dT5MKMXBhgwWCjBGIAGVS63RQDUCW+HqsxQOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cb7lklIsGHFWCyq956Q16/ULetXMnd1n1UeIx+24EccpGvXyKhrSPDxEPJjPoAyRpg27oyOvNGTsIVXmualUTlK46jP1vvu84GsymZdjUvnfxhYNVXzvtNdXpoLZzvzQP/Mp+toeMvG2oyvBFZVnm1Kdr93THHehghdoHU+Gz2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=sh+gnQk6; arc=none smtp.client-ip=212.227.126.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+	s=arc-20240116; t=1719318559; c=relaxed/simple;
+	bh=YOq9JrhIvYVPcCNNT4Vfuh45iB7NXBn0c8q168TR63Y=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=MXPV+i9dAda57H+OG3VyJNIDAqqyoJhs8wUWFoj+Svnxn5gMjZr/fB9Pxlgb2/UPIGovf/Me54gGwLUW2dkcoFTKJWUJLM6uJFkI2urxBZiyUFNCQYtauUOMI+7lO5mVkENh+y3NUusvOhn6JQLy4Zm5ZBwmykboZmZ7xug065U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZKfx9hhR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="sh+gnQk6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
-	s=s1-ionos; t=1719314488; x=1719919288; i=christian@heusel.eu;
-	bh=uMMLgPkSCGHiELtwqegdPywPsAzyqY9AmA8zacbiW8I=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:In-Reply-To:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=sh+gnQk6ej4PfuiU+hTwTyMitd6USWq7qBxa7dT8tZU5Rb4x/iPST5KVyNMxIVNm
-	 i3OVPsNJeeHjvbJRI3dI75cYAxYFIGCCx6IzF609CSwErPSis3HI0mJBiph6Nw7yh
-	 hCcgahUUeOw8Lforuu4EP9dmD5+/6SRPE360duse7HFqMa+aO5YvzmDJJJ1TA8D0R
-	 kPy3HukxSMKrN+ktXm35pwZqaMc40sQKBNcOcP6+rONVsXJxBUcIpiqy6+uQMSfJr
-	 DCYOyRgtapZjfupgMMnV4DhrQRaVE+Wkn0aDbN1KQdOtg/yKeU/NcRzBlesLc6Nty
-	 41WPU/5x80cFDcc6WA==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from localhost ([78.42.228.106]) by mrelayeu.kundenserver.de
- (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MNKyQ-1rxPdl2yMc-00WPVN; Tue, 25 Jun 2024 13:07:51 +0200
-Date: Tue, 25 Jun 2024 13:07:49 +0200
-From: Christian Heusel <christian@heusel.eu>
-To: Andrew Paniakin <apanyaki@amazon.com>
-Cc: pc@cjr.nz, stfrench@microsoft.com, sashal@kernel.org, pc@manguebit.com, 
-	regressions@lists.linux.dev, stable@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	abuehaze@amazon.com, simbarb@amazon.com, benh@amazon.com
-Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
- stable/linux-6.1.y breaks cifs client failover to another server in DFS
- namespace
-Message-ID: <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
-References: <ZnMkNzmitQdP9OIC@3c06303d853a.ant.amazon.com>
- <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKfx9hhR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719318556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2kf2p5udqDpsF3HW6ICyyWXNK+Uj/DfC2j20t1IouqU=;
+	b=ZKfx9hhRkXJm/o0lC8/vGBw7Ya87IVTn6mNEwV0yu0pq6XX+EoU2C7mikznaNJqTnR84/A
+	Jehs5FDN/ngs85Uba7rvY51nbIcgrbMT+53oap/jvUU4tVc3f7mNMZcl8XAzHYdEE09F2M
+	GnOLxnQK9jOBeVKOLGzA1HmFA4MzHiY=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-dQ5jPXmyNFuSlLtPhDch-Q-1; Tue,
+ 25 Jun 2024 08:29:13 -0400
+X-MC-Unique: dQ5jPXmyNFuSlLtPhDch-Q-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C96319560B8;
+	Tue, 25 Jun 2024 12:29:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.111])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 466F31956087;
+	Tue, 25 Jun 2024 12:29:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <614257.1719228181@warthog.procyon.org.uk>
+References: <614257.1719228181@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>, netfs@lists.linux.dev,
+    v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] netfs: Fix netfs_page_mkwrite() to check folio->mapping is valid
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jmsggbhoayj3vp5r"
-Content-Disposition: inline
-In-Reply-To: <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
-X-Provags-ID: V03:K1:K2gnCX6y5v0pEX0/67AmSIgOOCUSrjSVvkqkMNLNIcj01PSH4Oj
- T8aefGcsyDnq5Cg1O+6axHk9E/pe3KkKePQCeBRB/co0elYikkASNMndef5YYfRBT/HkNTM
- lF1j6+l+Z5WkD7iUx/IZRyuvPvRosANuuUJlKhrIclk8mMuLHEHGcR2+SoKYsMVYU+ouoCk
- +XMw6vJjld7kNuDGwiWXQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:FpkI5MEtraI=;dN19VhZMalOaYI7c4WLnfolaHVM
- f4au55iSExDBqAI00wcBkZqZVtFELDzhgHtWTCBnDXMHaS2sB6orsl611Ny57CRAOu8GjSS2M
- oSxb6IKPBLjGPfo38XHmNqeBtwRC1h+hzpovxrl4LEQF6hAyLdULoHgnGLmIJST88ucDDxNNd
- Ybl1+ZPxdG7UPGT2oBlf6I2pDsWuwmDtBDZJMLeqVBoUJ8ZVhKOt8c0FTr5M8qS4asqNFqo8D
- XkkQ5R2gO9eXZvK/52fZboJJqU99Gvdti4YuC2ZfnFIpnDsj73Lf0NDioiYjSxCE9l1vXqaRx
- czJQMdSlacVN0lUJTLnxqZ5g5p55V67FhY3Fb7bFjw4XqvUVIjNcRMxrmZYxJa0mder6v7uGM
- vOJIRX6qV3+RACX3WikRhu77sBx9UpIAy376ZhB+ReOF6Ca1BCmOnjET8N/XNzIjOdwO/2eQq
- aBbNP9XEX+mns4aysRwvEHCY2BG97VkxPxl8XiIkt7Jp1yuafGYZ4Q+JqMgXew/BGhZyexg65
- IUZMUgrMN8EGk57Hj1981QN6Do6Cyl4gH6ry950CZy1LqUUZ2RwaNV/jwdX2ACOPmOscNBjBV
- hDgz3aPrLYUapcWkpayfVFwqp1rl3k9DSL5UHPe7NvH8QG39lBXTPWVUZQF5yc4vSuvAULt3q
- HaoqS/Rrjg1IxS9Qpg2uhdnt4llsKjzIHlc6R+ss2BO+fs8aWnQ+65YQOjL4FTYQY9n6ASEhx
- Xm1ZlOteUxDv/nE2jR1aXnAPCUetzksz3vZAnwRMSU6R6kW+erLmMg=
-
-
---jmsggbhoayj3vp5r
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <780210.1719318546.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Jun 2024 13:29:06 +0100
+Message-ID: <780211.1719318546@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 24/06/24 10:59AM, Andrew Paniakin wrote:
-> On 19/06/2024, Andrew Paniakin wrote:
-> > Commit 60e3318e3e900 ("cifs: use fs_context for automounts") was
-> > released in v6.1.54 and broke the failover when one of the servers
-> > inside DFS becomes unavailable. We reproduced the problem on the EC2
-> > instances of different types. Reverting aforementioned commint on top of
-> > the latest stable verison v6.1.94 helps to resolve the problem.
-> >=20
-> > Earliest working version is v6.2-rc1. There were two big merges of CIFS=
- fixes:
-> > [1] and [2]. We would like to ask for the help to investigate this prob=
-lem and
-> > if some of those patches need to be backported. Also, is it safe to jus=
-t revert
-> > problematic commit until proper fixes/backports will be available?
-> >=20
-> > We will help to do testing and confirm if fix works, but let me also li=
-st the
-> > steps we used to reproduce the problem if it will help to identify the =
-problem:
-> > 1. Create Active Directory domain eg. 'corp.fsxtest.local' in AWS Direc=
-tory
-> > Service with:
-> > - three AWS FSX file systems filesystem1..filesystem3
-> > - three Windows servers; They have DFS installed as per
-> >   https://learn.microsoft.com/en-us/windows-server/storage/dfs-namespac=
-es/dfs-overview:
-> >     - dfs-srv1: EC2AMAZ-2EGTM59
-> >     - dfs-srv2: EC2AMAZ-1N36PRD
-> >     - dfs-srv3: EC2AMAZ-0PAUH2U=20
-> >=20
-> >  2. Create DFS namespace eg. 'dfs-namespace' in Windows server 2008 mode
-> >  and three folders targets in it:
-> > - referral-a mapped to filesystem1.corp.local
-> > - referral-b mapped to filesystem2.corp.local
-> > - referral-c mapped to filesystem3.corp.local
-> > - local folders dfs-srv1..dfs-srv3 in C:\DFSRoots\dfs-namespace of every
-> >   Windows server. This helps to quickly define underlying server when
-> >   DFS is mounted.
-> >=20
-> > 3. Enabled cifs debug logs:
-> > ```
-> > echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
-> > echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
-> > echo 7 > /proc/fs/cifs/cifsFYI
-> > ```
-> >=20
-> > 4. Mount DFS namespace on Amazon Linux 2023 instance running any vanilla
-> > kernel v6.1.54+:
-> > ```
-> > dmesg -c &>/dev/null
-> > cd /mnt
-> > mount -t cifs -o cred=3D/mnt/creds,echo_interval=3D5 \
-> >     //corp.fsxtest.local/dfs-namespace \
-> >     ./dfs-namespace
-> > ```
-> >=20
-> > 5. List DFS root, it's also required to avoid recursive mounts that hap=
-pen
-> > during regular 'ls' run:
-> > ```
-> > sh -c 'ls dfs-namespace'
-> > dfs-srv2  referral-a  referral-b
-> > ```
-> >=20
-> > The DFS server is EC2AMAZ-1N36PRD, it's also listed in mount:
-> > ```
-> > [root@ip-172-31-2-82 mnt]# mount | grep dfs
-> > //corp.fsxtest.local/dfs-namespace on /mnt/dfs-namespace type cifs (rw,=
-relatime,vers=3D3.1.1,cache=3Dstrict,username=3DAdmin,domain=3Dcorp.fsxtest=
-=2Elocal,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D172.31.11.26,file_mod=
-e=3D0755,dir_mode=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D41943=
-04,bsize=3D1048576,echo_interval=3D5,actimeo=3D1,closetimeo=3D1)
-> > //EC2AMAZ-1N36PRD.corp.fsxtest.local/dfs-namespace/referral-a on /mnt/d=
-fs-namespace/referral-a type cifs (rw,relatime,vers=3D3.1.1,cache=3Dstrict,=
-username=3DAdmin,domain=3Dcorp.fsxtest.local,uid=3D0,noforceuid,gid=3D0,nof=
-orcegid,addr=3D172.31.12.80,file_mode=3D0755,dir_mode=3D0755,soft,nounix,ma=
-pposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo_interval=3D5,ac=
-timeo=3D1,closetimeo=3D1)
-> > ```
-> >=20
-> > List files in first folder:
-> > ```
-> > sh -c 'ls dfs-namespace/referral-a'
-> > filea.txt.txt
-> > ```
-> >=20
-> > 6. Shutdown DFS server-2.
-> > List DFS root again, server changed from dfs-srv2 to dfs-srv1 EC2AMAZ-2=
-EGTM59:
-> > ```
-> > sh -c 'ls dfs-namespace'
-> > dfs-srv1  referral-a  referral-b
-> > ```
-> >=20
-> > 7. Try to list files in another folder, this causes ls to fail with err=
-or:
-> > ```
-> > sh -c 'ls dfs-namespace/referral-b'
-> > ls: cannot access 'dfs-namespace/referral-b': No route to host```
-> >=20
-> > Sometimes it's also 'Operation now in progress' error.
-> >=20
-> > mount shows the same output:
-> > ```
-> > //corp.fsxtest.local/dfs-namespace on /mnt/dfs-namespace type cifs (rw,=
-relatime,vers=3D3.1.1,cache=3Dstrict,username=3DAdmin,domain=3Dcorp.fsxtest=
-=2Elocal,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D172.31.11.26,file_mod=
-e=3D0755,dir_mode=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D41943=
-04,bsize=3D1048576,echo_interval=3D5,actimeo=3D1,closetimeo=3D1)
-> > //EC2AMAZ-1N36PRD.corp.fsxtest.local/dfs-namespace/referral-a on /mnt/d=
-fs-namespace/referral-a type cifs (rw,relatime,vers=3D3.1.1,cache=3Dstrict,=
-username=3DAdmin,domain=3Dcorp.fsxtest.local,uid=3D0,noforceuid,gid=3D0,nof=
-orcegid,addr=3D172.31.12.80,file_mode=3D0755,dir_mode=3D0755,soft,nounix,ma=
-pposix,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,echo_interval=3D5,ac=
-timeo=3D1,closetimeo=3D1)
-> > ```
-> >=20
-> > I also attached kernel debug logs from this test.
-> >=20
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-commit/?id=3D851f657a86421
-> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-commit/?id=3D0a924817d2ed9
-> >=20
-> > Reported-by: Andrei Paniakin <apanyaki@amazon.com>
-> > Bisected-by: Simba Bonga <simbarb@amazon.com>
-> > ---
-> >=20
-> > #regzbot introduced: v6.1.54..v6.2-rc1
->=20
->=20
-> Friendly reminder, did anyone had a chance to look into this report?
->=20
+    =
 
-It seems like so far nobody had a chance to look into this report =F0=9F=A4=
-=94
+Fix netfs_page_mkwrite() to check that folio->mapping is valid once it has
+taken the folio lock (as filemap_page_mkwrite() does).  Without this,
+generic/247 occasionally oopses with something like the following:
 
-If I understand the report correctly the regression is specific for the
-current 6.1.y stable series, so also not much the CIFS devs themselves
-can do. Maybe the stable team missed the report with the plethora of
-mail that they get.. I'll change the subject to make this more prominent
-for them.
+    BUG: kernel NULL pointer dereference, address: 0000000000000000
+    #PF: supervisor read access in kernel mode
+    #PF: error_code(0x0000) - not-present page
 
-I think a good next step would be to bisect to the commit that fixed the
-relevant issue somewhere between v6.1.54..v6.2-rc1 so the stable team
-knows what needs backporting .. You can do that somewhat like so[0]:
+    RIP: 0010:trace_event_raw_event_netfs_folio+0x61/0xc0
+    ...
+    Call Trace:
+     <TASK>
+     ? __die_body+0x1a/0x60
+     ? page_fault_oops+0x6e/0xa0
+     ? exc_page_fault+0xc2/0xe0
+     ? asm_exc_page_fault+0x22/0x30
+     ? trace_event_raw_event_netfs_folio+0x61/0xc0
+     trace_netfs_folio+0x39/0x40
+     netfs_page_mkwrite+0x14c/0x1d0
+     do_page_mkwrite+0x50/0x90
+     do_pte_missing+0x184/0x200
+     __handle_mm_fault+0x42d/0x500
+     handle_mm_fault+0x121/0x1f0
+     do_user_addr_fault+0x23e/0x3c0
+     exc_page_fault+0xc2/0xe0
+     asm_exc_page_fault+0x22/0x30
 
-  $ git bisect start --term-new=3Dfixed --term-old=3Dunfixed
-  $ git bisect fixed v6.2-rc1
-  $ git bisect unfixed v6.1
+This is due to the invalidate_inode_pages2_range() issued at the end of th=
+e
+DIO write interfering with the mmap'd writes.
 
-Then you just need to carry around the commit that broke the behaviour
-for you (which could be quite some work). Maybe others also have better
-ideas on how to approach that.
+Fixes: 102a7e2c598c ("netfs: Allow buffered shared-writeable mmap through =
+netfs_page_mkwrite()")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: netfs@lists.linux.dev
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-mm@kvack.org
+cc: linux-fsdevel@vger.kernel.org
+---
+Changes
+=3D=3D=3D=3D=3D=3D=3D
+ver #2)
+ - Actually unlock the folio rather than returning VM_FAULT_LOCKED with
+   VM_FAULT_NOPAGE.
 
-A revert may be a bit more complicated as the breaking commit in seems
-to be a dependency for a commit that fixes something:
+ fs/netfs/buffered_write.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-    efc0b0bcffcba ("smb: propagate error code of extract_sharename()")
-    Fixes: 70431bfd825d ("cifs: Support fscache indexing rewrite")
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 07bc1fd43530..270f8ebf8328 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -523,6 +523,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, st=
+ruct netfs_group *netfs_gr
+ 	struct netfs_group *group;
+ 	struct folio *folio =3D page_folio(vmf->page);
+ 	struct file *file =3D vmf->vma->vm_file;
++	struct address_space *mapping =3D file->f_mapping;
+ 	struct inode *inode =3D file_inode(file);
+ 	struct netfs_inode *ictx =3D netfs_inode(inode);
+ 	vm_fault_t ret =3D VM_FAULT_RETRY;
+@@ -534,6 +535,11 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, s=
+truct netfs_group *netfs_gr
+ =
 
-Cheers,
-chris
+ 	if (folio_lock_killable(folio) < 0)
+ 		goto out;
++	if (folio->mapping !=3D mapping) {
++		folio_unlock(folio);
++		ret =3D VM_FAULT_NOPAGE;
++		goto out;
++	}
+ =
 
-[0]: https://stackoverflow.com/a/17153598
+ 	if (folio_wait_writeback_killable(folio)) {
+ 		ret =3D VM_FAULT_LOCKED;
+@@ -549,7 +555,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, st=
+ruct netfs_group *netfs_gr
+ 	group =3D netfs_folio_group(folio);
+ 	if (group !=3D netfs_group && group !=3D NETFS_FOLIO_COPY_TO_CACHE) {
+ 		folio_unlock(folio);
+-		err =3D filemap_fdatawait_range(inode->i_mapping,
++		err =3D filemap_fdatawait_range(mapping,
+ 					      folio_pos(folio),
+ 					      folio_pos(folio) + folio_size(folio));
+ 		switch (err) {
 
-#regzbot introduced: 062eacf57ad91b5c272f89dc964fd6dd9715ea7d
-#regzbot summary: cifs: broken failover for server inside DFS
-
---jmsggbhoayj3vp5r
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmZ6pQUACgkQwEfU8yi1
-JYWSwA/+OPb/TZJmsjikMtPq9++IQcrHwdzJx3MYVtjHfKnPdVSUc7LROrXMdngS
-OEv8Du6IpiYtP91JSu/Dd28tLiwRgqfmUJuv+9bNJRHE9A2yyEyHg0CtgzoX8kQP
-eLthIxpPuqJqClWDy2UPSoCfcrUgUdPCPbSTG3RTe3CIeQhRZ4KwZ+bpb2AS0mOD
-BadNW1ew+qYILEIF/YRdU2BxWdNF+eNCrumMwBPdDgqgAXvRQ7a8V7RZPQFLlUJ8
-oXSnhrH4Y2ESXAXrmVitbX1w0jV+bznHTnA9t6hJnM2SB41CY5j24uM3b10VCDXn
-TGudRwccs29xZaKzlRED6DZ3c9YMz43zOkQ2AmQOtaAHXTn2CVqc0WWtHoUfqWGg
-HdncnOKwHroDxvh0FvWB9bzIYBHmm79pMpLhdCdtm2kcmDPEkyb/QW5QbTDzrmQo
-vb3MRP6s5ko0yFfHouZIG0rwwqAHl9NEw/i8SCzE7JJkRbR4jecV+env1nEAsDw+
-QSR4xD6YUwYbG3/1j5B8GS0etU/UAoGHLw6NBY+zAl6/RRORGxPzGhM8QS68Qaxp
-C0+F53YmCriHjR9fwil6HBD21MSLMhUBHy1W1JOTkvvLJGZLzM9F/75zhENm8ECu
-7qfmbwByPZhPoYgXAdzkic3WUEx9iQbtkwULlMLIqu4VXGXVB1Y=
-=HFX0
------END PGP SIGNATURE-----
-
---jmsggbhoayj3vp5r--
