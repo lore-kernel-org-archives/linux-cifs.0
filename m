@@ -1,152 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E4F170825;
-	Tue, 25 Jun 2024 14:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CE017F51C;
+	Wed, 26 Jun 2024 12:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719327283; cv=none; b=e/R95Rw71x/UgLQgepjqh/hPEOkfaxLg/XrLhJpC0puLUnrSYGd9K/9lEukC92SfouFyi2e6cnX7w2Umc8sN2Yp7U+QFQwXsp7hQByhAj5pXiRO2FfkzPBWZ3lZWPHP62AmcEb0nJ2U9ciGBBJUoyq9IzReYpcDNuSPNH9qWAbI=
+	t=1719404375; cv=none; b=JjdSoyPUzIl7oOhARfRrOQbunN3qwOcw+5HmeNcVqfJZAqEqv/6BJUF/1Ov9aL0q2RXbB49tKZNGAb4xz3OGpsJbH31STZnEB/ClQd4n/tllzXNp831bTyKK29wgl9vU5a9dfWcGWoy+VtC0CyBynvZKsuLF770jtQNbwBW39bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719327283; c=relaxed/simple;
-	bh=OnlecF0L+WuiOOe//vNstn8JovvMxwxc6c0feuDVQJs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YKTIXEZbV+E7TUeRoX/Tcr/FBLzwMJob+2GfIfShuSvOE91W2juIUA7uicOFPMBywyc32tLIUAephVO00T7spF90THHLYUFrktIJsR1c1isfY8lJcodm3DzMAPlYwU4C3YxyIPRVDHzErVZ05Bc3niktjgd+ctY2kqHR64KSsMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJDWR5Eh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719404375; c=relaxed/simple;
+	bh=+a6cKOTvjBqwaDCkw+KkodDw+TAU6VuT99/mNKvMi/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QyUkwDNyOUMuuHTxK5qFzb1Fu84ovanaqJ3CI8g06kK8Dn1sbETPpPlDCK23sNv1ADj/MCiYksShRsYPcWps1XXryWLZ9LyAN9iUEI7ydj997UuYJ6qI/MPQEFLsUw1r44jV6cJvkSW2I4OBpnS5AkS6MSi21mS4pLW1AuMx2ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pri+ihHX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJDWR5Eh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21CDBC32786;
-	Tue, 25 Jun 2024 14:54:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pri+ihHX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA674C2BD10;
+	Wed, 26 Jun 2024 12:19:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719327283;
-	bh=OnlecF0L+WuiOOe//vNstn8JovvMxwxc6c0feuDVQJs=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=gJDWR5EhbVC6GZbZadZAFf7L+GhlVlKDhry5FwnN+wa0K8mmi1Qcuvtz6zbKkZK3i
-	 bF0f/9w9yGTBMz0ii0BiyL6eM9eDIS6sH+eSeN2Zjx65DPLW9qKCKhz0an3vvLkQNq
-	 QTumE9xPp4cAh26FRje2V0IX4r4J6GLzDHYdfs2u5FFR+/AEiTEijIs5nSrFvMgGTs
-	 Jer9upuIHAseZVGwnXJ7rEuwCrs2CH33/dGvrlSm9257uirjGJ634gsSAYSQXU+Kwt
-	 WQJRSGrctibMhPZ0Xlkh6EWDc5PMNIyWx6p0/cyJF8zw9yycJdQWW7craS0UrNhAOC
-	 MhEppcMevufFg==
-Message-ID: <2545edf023b2a364672f73d3ae6d90c702310b3f.camel@kernel.org>
-Subject: Re: [PATCH v2] netfs: Fix netfs_page_mkwrite() to check
- folio->mapping is valid
-From: Jeff Layton <jlayton@kernel.org>
+	s=k20201202; t=1719404374;
+	bh=+a6cKOTvjBqwaDCkw+KkodDw+TAU6VuT99/mNKvMi/o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pri+ihHX6LCjoCWfssh1KMC23/kENbI3RJR/QRgf5v1PH+ivyNER4s3d4Y4Ei9wdZ
+	 R9wpkRQL5fDkRmkGBcetNtjmbny16WrQt51T62EmpyxJ22VicfdS8GNzFwvOFzfO4H
+	 xgn9oLBAzKDwK8EiYEhNUwii6WUaJup+13qLAPWjh8+621zQVTVVK3ga5ofgCNtnvy
+	 AiX14y4WmlQfj2MxHsIKbHQE2Mje7Nhhuu5wG7SJpNGR8njRbHxiJ9hD/BITvLibiR
+	 auK1zl6EfHYXdpsWHYdprFvHnFmoPMqm3iwygWG8LbwMZFWOvkOeVCteF8T6y6GU/0
+	 ypdq2Pr9emrVg==
+From: Christian Brauner <brauner@kernel.org>
 To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>, Matthew Wilcox
- <willy@infradead.org>, netfs@lists.linux.dev, v9fs@lists.linux.dev, 
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-mm@kvack.org,  linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Tue, 25 Jun 2024 10:54:40 -0400
+Cc: Christian Brauner <brauner@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	netfs@lists.linux.dev,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] netfs: Fix netfs_page_mkwrite() to check folio->mapping is valid
+Date: Wed, 26 Jun 2024 14:19:24 +0200
+Message-ID: <20240626-kennen-westseite-0c15ed37b7a5@brauner>
+X-Mailer: git-send-email 2.43.0
 In-Reply-To: <780211.1719318546@warthog.procyon.org.uk>
-References: <614257.1719228181@warthog.procyon.org.uk>
-	 <780211.1719318546@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+References: <614257.1719228181@warthog.procyon.org.uk> <780211.1719318546@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1250; i=brauner@kernel.org; h=from:subject:message-id; bh=+a6cKOTvjBqwaDCkw+KkodDw+TAU6VuT99/mNKvMi/o=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaTVsPsxi/x9Fmk/c4KNgkXyZiG7vkmT1jWVhYnnml4Ki ZBerBPdUcrCIMbFICumyOLQbhIut5ynYrNRpgbMHFYmkCEMXJwCMBHDV4wMh77GvnLqe1bMGLjb +s+3rABXy/7zq4QPtkbkXnk5/bbTZob/5SnPvHyijp+5nbLx9wdRzQPnpbkvfVljY/2vgi8x7mc fGwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2024-06-25 at 13:29 +0100, David Howells wrote:
-> =C2=A0=C2=A0=C2=A0=20
-> Fix netfs_page_mkwrite() to check that folio->mapping is valid once
-> it has
-> taken the folio lock (as filemap_page_mkwrite() does).=C2=A0 Without this=
-,
+On Tue, 25 Jun 2024 13:29:06 +0100, David Howells wrote:
+> 
+> Fix netfs_page_mkwrite() to check that folio->mapping is valid once it has
+> taken the folio lock (as filemap_page_mkwrite() does).  Without this,
 > generic/247 occasionally oopses with something like the following:
->=20
-> =C2=A0=C2=A0=C2=A0 BUG: kernel NULL pointer dereference, address: 0000000=
-000000000
-> =C2=A0=C2=A0=C2=A0 #PF: supervisor read access in kernel mode
-> =C2=A0=C2=A0=C2=A0 #PF: error_code(0x0000) - not-present page
->=20
-> =C2=A0=C2=A0=C2=A0 RIP: 0010:trace_event_raw_event_netfs_folio+0x61/0xc0
-> =C2=A0=C2=A0=C2=A0 ...
-> =C2=A0=C2=A0=C2=A0 Call Trace:
-> =C2=A0=C2=A0=C2=A0=C2=A0 <TASK>
-> =C2=A0=C2=A0=C2=A0=C2=A0 ? __die_body+0x1a/0x60
-> =C2=A0=C2=A0=C2=A0=C2=A0 ? page_fault_oops+0x6e/0xa0
-> =C2=A0=C2=A0=C2=A0=C2=A0 ? exc_page_fault+0xc2/0xe0
-> =C2=A0=C2=A0=C2=A0=C2=A0 ? asm_exc_page_fault+0x22/0x30
-> =C2=A0=C2=A0=C2=A0=C2=A0 ? trace_event_raw_event_netfs_folio+0x61/0xc0
-> =C2=A0=C2=A0=C2=A0=C2=A0 trace_netfs_folio+0x39/0x40
-> =C2=A0=C2=A0=C2=A0=C2=A0 netfs_page_mkwrite+0x14c/0x1d0
-> =C2=A0=C2=A0=C2=A0=C2=A0 do_page_mkwrite+0x50/0x90
-> =C2=A0=C2=A0=C2=A0=C2=A0 do_pte_missing+0x184/0x200
-> =C2=A0=C2=A0=C2=A0=C2=A0 __handle_mm_fault+0x42d/0x500
-> =C2=A0=C2=A0=C2=A0=C2=A0 handle_mm_fault+0x121/0x1f0
-> =C2=A0=C2=A0=C2=A0=C2=A0 do_user_addr_fault+0x23e/0x3c0
-> =C2=A0=C2=A0=C2=A0=C2=A0 exc_page_fault+0xc2/0xe0
-> =C2=A0=C2=A0=C2=A0=C2=A0 asm_exc_page_fault+0x22/0x30
->=20
-> This is due to the invalidate_inode_pages2_range() issued at the end
-> of the
-> DIO write interfering with the mmap'd writes.
->=20
-> Fixes: 102a7e2c598c ("netfs: Allow buffered shared-writeable mmap
-> through netfs_page_mkwrite()")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: netfs@lists.linux.dev
-> cc: v9fs@lists.linux.dev
-> cc: linux-afs@lists.infradead.org
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-mm@kvack.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
-> Changes
-> =3D=3D=3D=3D=3D=3D=3D
-> ver #2)
-> =C2=A0- Actually unlock the folio rather than returning VM_FAULT_LOCKED
-> with
-> =C2=A0=C2=A0 VM_FAULT_NOPAGE.
->=20
-> =C2=A0fs/netfs/buffered_write.c |=C2=A0=C2=A0=C2=A0 8 +++++++-
-> =C2=A01 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-> index 07bc1fd43530..270f8ebf8328 100644
-> --- a/fs/netfs/buffered_write.c
-> +++ b/fs/netfs/buffered_write.c
-> @@ -523,6 +523,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault
-> *vmf, struct netfs_group *netfs_gr
-> =C2=A0	struct netfs_group *group;
-> =C2=A0	struct folio *folio =3D page_folio(vmf->page);
-> =C2=A0	struct file *file =3D vmf->vma->vm_file;
-> +	struct address_space *mapping =3D file->f_mapping;
-> =C2=A0	struct inode *inode =3D file_inode(file);
-> =C2=A0	struct netfs_inode *ictx =3D netfs_inode(inode);
-> =C2=A0	vm_fault_t ret =3D VM_FAULT_RETRY;
-> @@ -534,6 +535,11 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault
-> *vmf, struct netfs_group *netfs_gr
-> =C2=A0
-> =C2=A0	if (folio_lock_killable(folio) < 0)
-> =C2=A0		goto out;
-> +	if (folio->mapping !=3D mapping) {
-> +		folio_unlock(folio);
-> +		ret =3D VM_FAULT_NOPAGE;
-> +		goto out;
-> +	}
-> =C2=A0
-> =C2=A0	if (folio_wait_writeback_killable(folio)) {
-> =C2=A0		ret =3D VM_FAULT_LOCKED;
-> @@ -549,7 +555,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault
-> *vmf, struct netfs_group *netfs_gr
-> =C2=A0	group =3D netfs_folio_group(folio);
-> =C2=A0	if (group !=3D netfs_group && group !=3D
-> NETFS_FOLIO_COPY_TO_CACHE) {
-> =C2=A0		folio_unlock(folio);
-> -		err =3D filemap_fdatawait_range(inode->i_mapping,
-> +		err =3D filemap_fdatawait_range(mapping,
-> =C2=A0					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 folio_pos(folio),
-> =C2=A0					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 folio_pos(folio) +
-> folio_size(folio));
-> =C2=A0		switch (err) {
->=20
->=20
+> 
+>     BUG: kernel NULL pointer dereference, address: 0000000000000000
+>     #PF: supervisor read access in kernel mode
+>     #PF: error_code(0x0000) - not-present page
+> 
+> [...]
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] netfs: Fix netfs_page_mkwrite() to check folio->mapping is valid
+      https://git.kernel.org/vfs/vfs/c/a81c98bfa40c
