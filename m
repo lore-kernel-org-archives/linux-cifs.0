@@ -1,65 +1,64 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DBE6FB6
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Jun 2024 00:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A997E24B29
+	for <linux-cifs@vger.kernel.org>; Fri, 28 Jun 2024 00:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719534390; cv=none; b=k3Of/spC+hViLRSol5iya3BnlIICLomFtlemXpEx/n1OdRw7jDb8ngRgC5DZYpcC69Cb7bMRcfPQ0hH9MYKqzjqyO09uXZ1njMe4VfgDxmb+/xWW7v4afEduALnlGsE5NujVEntqrODtmYl9O2M9nDevMd/+4fKm467h04zMb2w=
+	t=1719535176; cv=none; b=Pj5JM9rjHe+BWVhnxZIem3EPCM1MBEeZP1YRLH9wricc6qVo4LX3J8ezFoBDtlJZ7ZLP1jtJ3DlJR3/I9dZa9xPx2Al4YDg1qmXXk/ZvPJWhZeS/oyhHj062sYep4wupy1dz88XpHRajM93nx0L0dk0qfpXmw9OvhTl+o+7BpUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719534390; c=relaxed/simple;
-	bh=hh11G/iodh5iWE0DKtFfqmVHr22By8Ulh9rirP+ZYcQ=;
+	s=arc-20240116; t=1719535176; c=relaxed/simple;
+	bh=k/GYj49tNHRu9Cr1Jzcr4L9WQKK7GhbiY7wTq6I033E=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nc1BJTIANk9qFQzQYeOIPJQf9VyW/ji+0IjXk/5x5G/tdL6GUhHiEu280j/kzJnOFZ+oz13aPpMMOi2l++Kes3BYYx2iDLN49h955IxkkZWsxlpUDj6xCdPZEzJYJBPYVe7gYn24HD0vt5UAkfrdsRFWcU8Lrq4ra/kHtJs9NrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MqkCs1vE; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=dyF0OhDwqS71CHX0igTj6fxRAu5CcnxnTkeK3mP6kXHvKf6i4sHNyY8Zm2Iefdurp8/mABtgByIR2jf/PLa5oE16xymYy8ncmdTC5/XitlBGiUFhHpu0lS2NrGjda7rB8GgkWQpt1C432GhDnsm5CTlr/Kspv8QwZi+uhSwDc2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BBAMSYpt; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqkCs1vE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBAMSYpt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719534388;
+	s=mimecast20190719; t=1719535173;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=F920R5yaBE3PsuRdteKVNVN6MSLZBpfM90SMj8g8nmA=;
-	b=MqkCs1vELpBXue/wzqbDkxiCkET4JDzLp+A0PCGAJ/eWIUog8Uv9BByus4U8hcydGZewNn
-	J0U+dE/SeBwB8YUnQs2UAOgOPHDTDc3/imI6cm92A0jYtpmCJb/l+nRiXDPeq84G65oA/c
-	Tcush1T+oKaqiX7WYCwwttQgqlqBzRY=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=L6lVI4UdpUrrU7t2THONNRQMSPsMiPCxjmcMgqZQjHI=;
+	b=BBAMSYptzc+5ZhPpEgD3YZaabfh/Lms+FkkNQ8JKR6Lhl6e1KIcndXZOqUh5gGN2v4gUWw
+	U5cS6PIGnuHExEiAHUaD5ReSVZGduqhFHOwOgpfdwPnCD7SPxYpe6ulMXtBZKJqzmXwsjZ
+	n/Ck1Z29AODUKrzQkBQI4i3fMs7i91E=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-HGpKrjkKOka29xCulRgfQQ-1; Thu, 27 Jun 2024 20:26:26 -0400
-X-MC-Unique: HGpKrjkKOka29xCulRgfQQ-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7f3d2fd6ad6so3903139f.1
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Jun 2024 17:26:26 -0700 (PDT)
+ us-mta-145-0p5u3bT7Oxy1xrK8gqHtnw-1; Thu, 27 Jun 2024 20:39:28 -0400
+X-MC-Unique: 0p5u3bT7Oxy1xrK8gqHtnw-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-37623e47362so1281915ab.3
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Jun 2024 17:39:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719534386; x=1720139186;
+        d=1e100.net; s=20230601; t=1719535167; x=1720139967;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F920R5yaBE3PsuRdteKVNVN6MSLZBpfM90SMj8g8nmA=;
-        b=t5X8XgBX+LQ7KXbpBqqYd7MtM5ub9ggeC2tLHRxCUdzYPd2A//drXLEKCN3TTQMv26
-         TWJK82Y0Qf+HDqzKO+YglIIvgkr6zfupzZTlFd0S0PQBbfkk1b/w4t0dnQBPNbkNXQkZ
-         vNRpKKqcR34ikcyJfiiLdxuuQ0ZW/8F4GS6juiZ0HzElxCCnhs2eu1COASuqhPX35kmj
-         d32uUywwV1eY50jJaO/pS0YyCUj7aLevmvlJgcuF4ko+fODBfDAixgytoTA3DY0b0OkN
-         idDosAPgzCh434UYTvdbb92gZlpCtgM86I4oDPboFHSxlfvsspYD+d+RnvzVn1aYS3DT
-         vp7g==
-X-Forwarded-Encrypted: i=1; AJvYcCU9D0+CMRAb6Nm4OfQ8jJwofOWg40pKbaMU2oG0Qu2v7MVwYwhvQbiZ7Xg2gQgDtVzo3UjcHZGuzz+fGPMVPzJkUM4PBVKX541fqw==
-X-Gm-Message-State: AOJu0YyYSnR14XZRF375TOzvqjBD4PQ866074vrJNCMfsUa0vb9+HbTw
-	IM0Bos8wRcXQOu52RZ/uKCADGr2+fLCqA+mffggWXEiR398Y68LxugBwABNLVBD8MiiIkeCQou/
-	P6sHrH7qu/WD7SyFGgt4C4aOh7uFgdymNAgahLdiHBVkZEbm//+77nFfOgu0=
-X-Received: by 2002:a6b:730e:0:b0:7f3:d863:3cf8 with SMTP id ca18e2360f4ac-7f3d8634018mr415330539f.4.1719534385813;
-        Thu, 27 Jun 2024 17:26:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLQ+evTqW23iP2xMhQPr9hw69BKkkeaSh3vRZVLP5nIJpjBkoHrAggDlvkHwnRujUOQkyNmA==
-X-Received: by 2002:a6b:730e:0:b0:7f3:d863:3cf8 with SMTP id ca18e2360f4ac-7f3d8634018mr415329439f.4.1719534385516;
-        Thu, 27 Jun 2024 17:26:25 -0700 (PDT)
+        bh=L6lVI4UdpUrrU7t2THONNRQMSPsMiPCxjmcMgqZQjHI=;
+        b=c6BuC04N6YEUsUgDwbtUJp/raGGaLznQsTT0lMFWSNCZLjaL9pgP/N+3WkQFa0ieu6
+         NQzxbX5us/iAFbrJcPVUqp9C5EAodsYfoxh1FYdOow0cne0xau2Rfukqnhe7r9zy8FeI
+         M2wA0O7BNpE4XOc0d8zPpY+5+iDc6HPD66e2Ql/MPhH8J5EmCiYpzoAr2G1OeCvPeLIP
+         B3YCOBNAyqQsK0BJ4rNua447rcUEm8GbdLmcXH6TQrx4itqTXsYI+5rGPp+JwkPRq2UY
+         HWD8OmS9CyroxsKBUkCBnoula2ISExF+mhJMUpnTQAUzAJ9rla4fP9QPHl6l7w9RBJws
+         Toqg==
+X-Gm-Message-State: AOJu0YyQQwq2fKkFizapppSU6N6CYhkmGXL/6LWfpPfYTAhV5cmekZi7
+	cPi+62uTOUe/29/YmhbbWzRatf/kvIgXqNdft7a2OO4xxGkJn7hhKDGJEtwJJpiXXhg2OjN3EKn
+	UX28r7Oet0Hvos6Q/305PQ2d4XroUGLQOx6v/GewndfMxGoU7zvh8sDvNs7s=
+X-Received: by 2002:a05:6e02:1b08:b0:375:be9e:34da with SMTP id e9e14a558f8ab-3763b0b4a4cmr217561765ab.2.1719535167763;
+        Thu, 27 Jun 2024 17:39:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGUkR/svSoWco43afklhPBsywxkUN6yiEPhjVFS6DjWiJxJqu6iv90RyIE35M2Q0SO3H2GPzA==
+X-Received: by 2002:a05:6e02:1b08:b0:375:be9e:34da with SMTP id e9e14a558f8ab-3763b0b4a4cmr217561645ab.2.1719535167496;
+        Thu, 27 Jun 2024 17:39:27 -0700 (PDT)
 Received: from [10.0.0.71] (sandeen.net. [63.231.237.45])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4bb73dd541dsm219330173.55.2024.06.27.17.26.24
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-37ad29827d6sm1751535ab.32.2024.06.27.17.39.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jun 2024 17:26:25 -0700 (PDT)
-Message-ID: <de859d0a-feb9-473d-a5e2-c195a3d47abb@redhat.com>
-Date: Thu, 27 Jun 2024 19:26:24 -0500
+        Thu, 27 Jun 2024 17:39:27 -0700 (PDT)
+Message-ID: <2543358a-b97e-45ce-8cdc-3de1dd9a782f@redhat.com>
+Date: Thu, 27 Jun 2024 19:39:26 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -67,148 +66,102 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH 01/14] fs_parse: add uid & gid option option parsing helpers
+Subject: [PATCH 12/14] smb: client: Convert to new uid/gid option parsing
+ helpers
 From: Eric Sandeen <sandeen@redhat.com>
 To: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>
-Cc: autofs@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
- linux-efi@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
- linux-ext4@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
- linux-mm@kvack.org, Jan Kara <jack@suse.cz>, ntfs3@lists.linux.dev,
- linux-cifs@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- Hans Caniullan <hcaniull@redhat.com>
+Cc: linux-cifs@vger.kernel.org
 References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
 Content-Language: en-US
 In-Reply-To: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Multiple filesystems take uid and gid as options, and the code to
-create the ID from an integer and validate it is standard boilerplate
-that can be moved into common helper functions, so do that for
-consistency and less cut&paste.
+Convert to new uid/gid option parsing helpers
 
-This also helps avoid the buggy pattern noted by Seth Jenkins at
-https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
-because uid/gid parsing will fail before any assignment in most
-filesystems.
-
-Signed-off-by: Eric Sandeen <sandeen@sandeen.net>
+Signed-off-by: Eric Sandeen <sandeen@redhat.com>
 ---
- Documentation/filesystems/mount_api.rst |  9 +++++--
- fs/fs_parser.c                          | 34 +++++++++++++++++++++++++
- include/linux/fs_parser.h               |  6 ++++-
- 3 files changed, 46 insertions(+), 3 deletions(-)
+ fs/smb/client/fs_context.c | 39 ++++++++++++--------------------------
+ 1 file changed, 12 insertions(+), 27 deletions(-)
 
-diff --git a/Documentation/filesystems/mount_api.rst b/Documentation/filesystems/mount_api.rst
-index 9aaf6ef75eb5..317934c9e8fc 100644
---- a/Documentation/filesystems/mount_api.rst
-+++ b/Documentation/filesystems/mount_api.rst
-@@ -645,6 +645,8 @@ The members are as follows:
- 	fs_param_is_blockdev	Blockdev path		* Needs lookup
- 	fs_param_is_path	Path			* Needs lookup
- 	fs_param_is_fd		File descriptor		result->int_32
-+	fs_param_is_uid		User ID (u32)           result->uid
-+	fs_param_is_gid		Group ID (u32)          result->gid
- 	=======================	=======================	=====================
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 3bbac925d076..bc926ab2555b 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -128,12 +128,14 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_flag("compress", Opt_compress),
+ 	fsparam_flag("witness", Opt_witness),
  
-      Note that if the value is of fs_param_is_bool type, fs_parse() will try
-@@ -678,6 +680,8 @@ The members are as follows:
- 	fsparam_bdev()		fs_param_is_blockdev
- 	fsparam_path()		fs_param_is_path
- 	fsparam_fd()		fs_param_is_fd
-+	fsparam_uid()		fs_param_is_uid
-+	fsparam_gid()		fs_param_is_gid
- 	=======================	===============================================
++	/* Mount options which take uid or gid */
++	fsparam_uid("backupuid", Opt_backupuid),
++	fsparam_gid("backupgid", Opt_backupgid),
++	fsparam_uid("uid", Opt_uid),
++	fsparam_uid("cruid", Opt_cruid),
++	fsparam_gid("gid", Opt_gid),
++
+ 	/* Mount options which take numeric value */
+-	fsparam_u32("backupuid", Opt_backupuid),
+-	fsparam_u32("backupgid", Opt_backupgid),
+-	fsparam_u32("uid", Opt_uid),
+-	fsparam_u32("cruid", Opt_cruid),
+-	fsparam_u32("gid", Opt_gid),
+ 	fsparam_u32("file_mode", Opt_file_mode),
+ 	fsparam_u32("dirmode", Opt_dirmode),
+ 	fsparam_u32("dir_mode", Opt_dirmode),
+@@ -951,8 +953,6 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	int i, opt;
+ 	bool is_smb3 = !strcmp(fc->fs_type->name, "smb3");
+ 	bool skip_parsing = false;
+-	kuid_t uid;
+-	kgid_t gid;
  
-      all of which take two arguments, name string and option number - for
-@@ -784,8 +788,9 @@ process the parameters it is given.
-      option number (which it returns).
+ 	cifs_dbg(FYI, "CIFS: parsing cifs mount option '%s'\n", param->key);
  
-      If successful, and if the parameter type indicates the result is a
--     boolean, integer or enum type, the value is converted by this function and
--     the result stored in result->{boolean,int_32,uint_32,uint_64}.
-+     boolean, integer, enum, uid, or gid type, the value is converted by this
-+     function and the result stored in
-+     result->{boolean,int_32,uint_32,uint_64,uid,gid}.
- 
-      If a match isn't initially made, the key is prefixed with "no" and no
-      value is present then an attempt will be made to look up the key with the
-diff --git a/fs/fs_parser.c b/fs/fs_parser.c
-index a4d6ca0b8971..24727ec34e5a 100644
---- a/fs/fs_parser.c
-+++ b/fs/fs_parser.c
-@@ -308,6 +308,40 @@ int fs_param_is_fd(struct p_log *log, const struct fs_parameter_spec *p,
- }
- EXPORT_SYMBOL(fs_param_is_fd);
- 
-+int fs_param_is_uid(struct p_log *log, const struct fs_parameter_spec *p,
-+		    struct fs_parameter *param, struct fs_parse_result *result)
-+{
-+	kuid_t uid;
-+
-+	if (fs_param_is_u32(log, p, param, result) != 0)
-+		return fs_param_bad_value(log, param);
-+
-+	uid = make_kuid(current_user_ns(), result->uint_32);
-+	if (!uid_valid(uid))
-+		return inval_plog(log, "Invalid uid '%s'", param->string);
-+
-+	result->uid = uid;
-+	return 0;
-+}
-+EXPORT_SYMBOL(fs_param_is_uid);
-+
-+int fs_param_is_gid(struct p_log *log, const struct fs_parameter_spec *p,
-+		    struct fs_parameter *param, struct fs_parse_result *result)
-+{
-+	kgid_t gid;
-+
-+	if (fs_param_is_u32(log, p, param, result) != 0)
-+		return fs_param_bad_value(log, param);
-+
-+	gid = make_kgid(current_user_ns(), result->uint_32);
-+	if (!gid_valid(gid))
-+		return inval_plog(log, "Invalid gid '%s'", param->string);
-+
-+	result->gid = gid;
-+	return 0;
-+}
-+EXPORT_SYMBOL(fs_param_is_gid);
-+
- int fs_param_is_blockdev(struct p_log *log, const struct fs_parameter_spec *p,
- 		  struct fs_parameter *param, struct fs_parse_result *result)
- {
-diff --git a/include/linux/fs_parser.h b/include/linux/fs_parser.h
-index d3350979115f..6cf713a7e6c6 100644
---- a/include/linux/fs_parser.h
-+++ b/include/linux/fs_parser.h
-@@ -28,7 +28,7 @@ typedef int fs_param_type(struct p_log *,
-  */
- fs_param_type fs_param_is_bool, fs_param_is_u32, fs_param_is_s32, fs_param_is_u64,
- 	fs_param_is_enum, fs_param_is_string, fs_param_is_blob, fs_param_is_blockdev,
--	fs_param_is_path, fs_param_is_fd;
-+	fs_param_is_path, fs_param_is_fd, fs_param_is_uid, fs_param_is_gid;
- 
- /*
-  * Specification of the type of value a parameter wants.
-@@ -57,6 +57,8 @@ struct fs_parse_result {
- 		int		int_32;		/* For spec_s32/spec_enum */
- 		unsigned int	uint_32;	/* For spec_u32{,_octal,_hex}/spec_enum */
- 		u64		uint_64;	/* For spec_u64 */
-+		kuid_t		uid;
-+		kgid_t		gid;
- 	};
- };
- 
-@@ -131,6 +133,8 @@ static inline bool fs_validate_description(const char *name,
- #define fsparam_bdev(NAME, OPT)	__fsparam(fs_param_is_blockdev, NAME, OPT, 0, NULL)
- #define fsparam_path(NAME, OPT)	__fsparam(fs_param_is_path, NAME, OPT, 0, NULL)
- #define fsparam_fd(NAME, OPT)	__fsparam(fs_param_is_fd, NAME, OPT, 0, NULL)
-+#define fsparam_uid(NAME, OPT) __fsparam(fs_param_is_uid, NAME, OPT, 0, NULL)
-+#define fsparam_gid(NAME, OPT) __fsparam(fs_param_is_gid, NAME, OPT, 0, NULL)
- 
- /* String parameter that allows empty argument */
- #define fsparam_string_empty(NAME, OPT) \
+@@ -1083,38 +1083,23 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
+ 		break;
+ 	case Opt_uid:
+-		uid = make_kuid(current_user_ns(), result.uint_32);
+-		if (!uid_valid(uid))
+-			goto cifs_parse_mount_err;
+-		ctx->linux_uid = uid;
++		ctx->linux_uid = result.uid;
+ 		ctx->uid_specified = true;
+ 		break;
+ 	case Opt_cruid:
+-		uid = make_kuid(current_user_ns(), result.uint_32);
+-		if (!uid_valid(uid))
+-			goto cifs_parse_mount_err;
+-		ctx->cred_uid = uid;
++		ctx->cred_uid = result.uid;
+ 		ctx->cruid_specified = true;
+ 		break;
+ 	case Opt_backupuid:
+-		uid = make_kuid(current_user_ns(), result.uint_32);
+-		if (!uid_valid(uid))
+-			goto cifs_parse_mount_err;
+-		ctx->backupuid = uid;
++		ctx->backupuid = result.uid;
+ 		ctx->backupuid_specified = true;
+ 		break;
+ 	case Opt_backupgid:
+-		gid = make_kgid(current_user_ns(), result.uint_32);
+-		if (!gid_valid(gid))
+-			goto cifs_parse_mount_err;
+-		ctx->backupgid = gid;
++		ctx->backupgid = result.gid;
+ 		ctx->backupgid_specified = true;
+ 		break;
+ 	case Opt_gid:
+-		gid = make_kgid(current_user_ns(), result.uint_32);
+-		if (!gid_valid(gid))
+-			goto cifs_parse_mount_err;
+-		ctx->linux_gid = gid;
++		ctx->linux_gid = result.gid;
+ 		ctx->gid_specified = true;
+ 		break;
+ 	case Opt_port:
 -- 
 2.45.2
+
 
