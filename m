@@ -1,194 +1,116 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47D56EB5B;
-	Mon,  1 Jul 2024 09:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F7215EFB8;
+	Mon,  1 Jul 2024 13:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719826482; cv=none; b=TYcc5NuqIWdcio3CIgYfSrkGYDvKQenotZ6gk0RehoEfX8VxlYGzmWWSDg6aVhYrSva/tAWC2zP9uMZ6/W594kpdN1EDIIMpdovBtmFcVEi1lMsILseSMY5ApjThkyPp/DXYGrA1porVS63MATEQlypvxCRw/Smi5ICO9fBCsRI=
+	t=1719838900; cv=none; b=oyk6/KUaIfpV7tl/NIISZjjIF7u5HqPJlJIEk5Kd/Zj+5sHMiEuazLmrAfPxaLAd6AOYTIsszJXR8QhkVuIE81MtirLbeQ/pwqadv5h3mF5J136LAphMo90KyTsfyciK60S8dx7nepO6YXCV/Op8RgMaanHNWcytHpdqHXff1O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719826482; c=relaxed/simple;
-	bh=f8A4N+tEl5e0q03GpDKXFyL2ptcO6DWC6XTKDmFJvfo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jJFic4Wk5XKfvukBEJ5Gh0fryVwUNmvs5pSh0KZFwnaS2urq8rU89iKrXOghHq6INT4XOauWiFr8EfwuM4YKu2ssRjcEMlNq0LjJfDzeFoK5IlQrmbzc7y1GDpnMb/skzrIsS/ezsQFdgx1s6ysQQ0aL5mF7LRjpaN5ApTOCjeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NbE49N1w; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=rxylWUg+; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a/p0kXeh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=UOg+M19d; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1719838900; c=relaxed/simple;
+	bh=I5l4BmXzzjYrEFqjls37V5m4ptisjD/c/HozJlF8dEU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=XZ7T48aTV9y6X+Z81mOOnB/BjZ/ymtxZ++GiNTVbRhitzG/ms/SWfMOHK/EVdbHFey5RFt0SfnO6u8AW4verTm1oBc+Ioq3soM1BdB8Zzr19Hr+5y0at2GRiFdYNs6LKlU640DwCyUHeA9Bxow70tqdJKf/jyhHbIRRqGoU1grk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=e7DPe1iS; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NbE49N1w";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="rxylWUg+";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a/p0kXeh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="UOg+M19d"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EE0FD21AE6;
-	Mon,  1 Jul 2024 09:34:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719826479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
-	b=NbE49N1wg6cM3fA5V/gAHBOfJZ3iQ6sNbuWpsuZ4Zp+bn9Z5Umyo3ZIVsTHpUWUPn2enzW
-	tsMj7AFVvfs8oGvA3u0u0q4fHUpLk8ljfoqfa7KBA0sAlgAvwo7GlAk02ifm04KQgEK8+W
-	oPs5DXZdULhit68Q3ZL6j/6brVN45y0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719826479;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
-	b=rxylWUg+p7ebJEM0zMG68ju2VcNhbAxt57fAMc54omZ0LcTD2DD8Ho+V0qlj9iLpi3Z+YY
-	SmqhwNuzV3gVgjCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1719826477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
-	b=a/p0kXehdSYe3JnwY+HlC46fhPrRSpXxMBXGv/2xw9LkSth2INE9N3aQvcU8OPTBNXf0GK
-	pGHA3H2sYuP9fsloNxZQY+e55cDT7gCJpurzfVnq8ETslMJpp110cle3MpclosQ69nvXFd
-	lPF9U2+C59K1awyl3VaCyb0n98PPWyk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1719826477;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
-	b=UOg+M19dnm3PpJnbD1VmxR+FfwdjHAe4yQgxNY1Q9aGxTYVLbOO6OYpafqcZhp4u9ItxH5
-	NnuyFGkeLi7VTnCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD63813800;
-	Mon,  1 Jul 2024 09:34:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ps0FNi14gmb4FwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 01 Jul 2024 09:34:37 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 533E2A088E; Mon,  1 Jul 2024 11:34:37 +0200 (CEST)
-Date: Mon, 1 Jul 2024 11:34:37 +0200
-From: Jan Kara <jack@suse.cz>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, Eric Sandeen <sandeen@redhat.com>,
-	linux-fsdevel@vger.kernel.org, autofs@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>, linux-efi@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>, linux-ext4@vger.kernel.org,
-	Miklos Szeredi <miklos@szeredi.hu>, linux-mm@kvack.org,
-	ntfs3@lists.linux.dev, linux-cifs@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Hans Caniullan <hcaniull@redhat.com>
-Subject: Re: [PATCH 01/14] fs_parse: add uid & gid option option parsing
- helpers
-Message-ID: <20240701093437.d2654yek4nnq2ep6@quack3>
-References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
- <de859d0a-feb9-473d-a5e2-c195a3d47abb@redhat.com>
- <20240628094517.ifs4bp73nlggsnxz@quack3>
- <20240628-fernfahrt-missverstanden-01543e7492b4@brauner>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="e7DPe1iS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1719838880; x=1720443680; i=markus.elfring@web.de;
+	bh=RheuWezdV3dKfPfPXlPzuZw1wJlMe7l1v3xBfQujEMU=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=e7DPe1iSWlAR3vgcYGuyIxX8+4Oj1iGauSSTWqmeCInM+JIoldR/JT0WYLQWM/vA
+	 IwdOoULXtOEi+zd5QnzFuqkPcDGjczE23hH7u6r1waODPFoB0quO7wf8+KOJoEn1O
+	 vjQXcuEEVIm5rsjUixPTYnHYvtT2afrhJ8IuZdthwzBe+gnKBBvW7VNOXfnGuZCkR
+	 xFZ6refvHVzdFk/PzCkOCIlFcennevibKRQiGa/b1+b7msX6ZQRgNgSpdf5e4Pzw+
+	 UByOvECBuOz1UlLkpBCO5CpKAKCLWa8/joPUJuLK9VVgLY+04rfwpSJ3lVaHehFeh
+	 /2ub96fwZV5p/JS98w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MwjK2-1sCezq2isc-014Pjz; Mon, 01
+ Jul 2024 15:01:20 +0200
+Message-ID: <5fecc08a-c3b7-4745-abc9-0f5b4de03c22@web.de>
+Date: Mon, 1 Jul 2024 15:01:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240628-fernfahrt-missverstanden-01543e7492b4@brauner>
-X-Spam-Score: -3.80
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+To: Haoxiang Li <make24@iscas.ac.cn>, samba-technical@lists.samba.org,
+ linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
+ Tom Talpey <tom@talpey.com>
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <20240701064847.84726-1-make24@iscas.ac.cn>
+Subject: Re: [PATCH] fs: smb: client: Add missing check for kstrdup()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240701064847.84726-1-make24@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:WGM+jFjvbr01rKJUJEZYPEiqQkoIMOHon5Q3YwwJMi5/5cPJkXb
+ hWPKRkzf1iYYz3Zl3XNNJvJ6mUz2Y/Q1HjCp8NnX8jVgV0FLyaK+RjuMNieZDeMYsE3WPVm
+ XEB797PD/jaIx0OSp6csgjzik08v9HIfoCL6cT5K8ANNGomp8ska6HAbTE/2JBMhH41BvRA
+ F+wc6w0VU2O4veIVJFDrg==
 X-Spam-Flag: NO
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sandeen.net:email,suse.com:email]
+UI-OutboundReport: notjunk:1;M01:P0:n/hCUtUIstI=;SUHx5PArkiOBs4twGmmXl0aGEFv
+ 5g5IXJUuAVq/FhX+EfKgzJ52yGtoWn6fP4ZZp9m0TAkLfQS3LCwvWXpYvF0MD2D68znERpik8
+ 2wqSP6FJPuJEC8HNrGT7VOOTbGCB45jl2k0TSfx3De8ZtVq/lunJWx6M0uk2NdnfAOfGlb3OD
+ /3GGNxctlAa2C02fNKFN/ojohyayJohKzXOPWoABfISpFbKFZYgHJZbf0xpREMGyTMXThL6sA
+ fXTQHxT1jgfQcFmtl+rPEhTzlWzDYvrwMQzdrk1qUy7KliD4hNl5P10/Ghbi6Kl2f3lUeA4UR
+ maVho+4C4tqZW1MIBcIurKBHv+RjwlrQ6khiU6GFwrUupBYOhSS07NIz+ikqiswVHQA6AlesV
+ FL6JOv0ceG3j+CfY+z43QgFCplTHogtQ6mQFfTuOHcbPL+XQmHozKaABcclim8SHjqhscsfZh
+ iUxBdK0AZ/ZPHiefjicqjovD5dvJYQDr3UZpfnMEon7C0QWuj9LSs0QTcPWQBM7CH6GQKaQYL
+ OOQs8rrtWCHftQ8O0rWX4xsf/ESI+PkzOPRt7RfdzyTRpdFhwuEs3PoDJ1JLztdL7su/Ns5f+
+ Qkzwg5i9gCh7fb9VhkitLeZIIlNiJtcjGfnyT1aXa4nc/3Mgwwt4zGgfB79Vt3F0U0V40pSCd
+ YLBE2vsiysvvN33YYFQGwW3nSgp4TjmIzy0lM0TLZq1gwV1PqbEGde+/uwBtpalaajaTRa+fH
+ b9jL6HlkU31g3me8D1NyZ5gBDojDEs1y4nv8gbKYzxtPyYD/l3QrovSx7aImJC9tIifrZZKxV
+ gfzJTvWKo2stICzv8cCacu1EEQAF+2rmdxGNs9xLGl+64=
 
-On Fri 28-06-24 14:23:35, Christian Brauner wrote:
-> On Fri, Jun 28, 2024 at 11:45:17AM GMT, Jan Kara wrote:
-> > On Thu 27-06-24 19:26:24, Eric Sandeen wrote:
-> > > Multiple filesystems take uid and gid as options, and the code to
-> > > create the ID from an integer and validate it is standard boilerplate
-> > > that can be moved into common helper functions, so do that for
-> > > consistency and less cut&paste.
-> > > 
-> > > This also helps avoid the buggy pattern noted by Seth Jenkins at
-> > > https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
-> > > because uid/gid parsing will fail before any assignment in most
-> > > filesystems.
-> > > 
-> > > Signed-off-by: Eric Sandeen <sandeen@sandeen.net>
-> > 
-> > I like the idea since this seems like a nobrainer but is actually
-> > surprisingly subtle...
-> > 
-> > > diff --git a/fs/fs_parser.c b/fs/fs_parser.c
-> > > index a4d6ca0b8971..24727ec34e5a 100644
-> > > --- a/fs/fs_parser.c
-> > > +++ b/fs/fs_parser.c
-> > > @@ -308,6 +308,40 @@ int fs_param_is_fd(struct p_log *log, const struct fs_parameter_spec *p,
-> > >  }
-> > >  EXPORT_SYMBOL(fs_param_is_fd);
-> > >  
-> > > +int fs_param_is_uid(struct p_log *log, const struct fs_parameter_spec *p,
-> > > +		    struct fs_parameter *param, struct fs_parse_result *result)
-> > > +{
-> > > +	kuid_t uid;
-> > > +
-> > > +	if (fs_param_is_u32(log, p, param, result) != 0)
-> > > +		return fs_param_bad_value(log, param);
-> > > +
-> > > +	uid = make_kuid(current_user_ns(), result->uint_32);
-> > 
-> > But here is the problem: Filesystems mountable in user namespaces need to use
-> > fc->user_ns for resolving uids / gids (e.g. like fuse_parse_param()).
-> > Having helpers that work for some filesystems and are subtly broken for
-> > others is worse than no helpers... Or am I missing something?
-> > 
-> > And the problem with fc->user_ns is that currently __fs_parse() does not
-> > get fs_context as an argument... So that will need some larger work.
-> 
-> Not really. If someone does an fsopen() in a namespace but the process
-> that actually sets mount options is in another namespace then it's
-> completely intransparent what uid/gid this will resolve to if it's
-> resovled according to fsopen().
-> 
-> It's also a bit strange if someone ends up handing off a tmpfs fscontext
-> that was created in the initial namespace to some random namespace and
-> they now can set uid/gid options that aren't mapped according to their
-> namespace but instead are 1:1 resolved according to the intial
-> namespace. So this would hinder delegation.
-> 
-> The expectation is that uid/gid options are resolved in the caller's
-> namespace and that shouldn't be any different for fscontexts for
-> namespace mountable filesystems. The crucial point is to ensure that the
-> resulting kuid/kgid can be resolved in the namespace the filesystem is
-> mounted in at the end. That's what was lacking in e.g., tmpfs in commit
-> 0200679fc795 ("tmpfs: verify {g,u}id mount options correctly")
-> 
-> The fuse conversion is the only inconsistency in that regard.
+> Add check for kstrdup() in smb3_reconfigure in order to guarantee
 
-OK, thanks for explanation!
+      checks?             calls?             ()
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+> the success of allocation.
+
+I suggest to take further patch/code review concerns better into account.
+
+
+=E2=80=A6
+> Signed-off-by: Haoxiang Li <make24@iscas.ac.cn>
+
+Will requirements be reconsidered once more for the Developer's Certificat=
+e of Origin?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.10-rc6#n398
+
+
+How do you think about to use a summary phrase like =E2=80=9CComplete erro=
+r handling
+in smb3_reconfigure()=E2=80=9D?
+
+
+=E2=80=A6
+> +++ b/fs/smb/client/fs_context.c
+> @@ -920,6 +920,8 @@ static int smb3_reconfigure(struct fs_context *fc)
+>  		ses->password =3D kstrdup(ctx->password, GFP_KERNEL);
+>  		kfree_sensitive(ses->password2);
+>  		ses->password2 =3D kstrdup(ctx->password2, GFP_KERNEL);
+> +		if (!ses->password || !ses->password2)
+> +			return ERR_PTR(rc);
+>  	}
+=E2=80=A6
+
+How do you think about to avoid also a memory leak here?
+
+Regards,
+Markus
