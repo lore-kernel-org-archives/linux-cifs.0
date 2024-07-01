@@ -1,132 +1,84 @@
-Received: from sandeen.net (sandeen.net [63.231.237.45])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB66E1E889;
-	Fri, 28 Jun 2024 13:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.231.237.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719582301; cv=none; b=Y4bJR6vNqlfeOzTQOBAGNuj8vlE4p8+9FkbFCfYcTQcJqyn581E487DdQmHrqUCgAFvrOTFuZaYD1jmZHdVXXtv6yyosNL4Rzbu/zAyJFUoKgxTn+ZkzhUF7tJBJq/jvXLooeXrsF6J71RCOHxyb2vkgFk+0WcJ4SbmVPasSTdI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719582301; c=relaxed/simple;
-	bh=77BI7tguWHgEq99xWrc6gnoboZnF1lacf05CuU7G42c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ragWPTPd+fUr5/cI87r0NX7dtEcNcvqO7C1+FmwJyTDXnULo7vSWLyTCIHleKOBWpDjLKq7k413Tw5FVBV9LujgBE2Tfs9Ut1BBqKhMT0s8N9Ep7JgGIsmBmPYY4a7rVPDr2LoygrnQtarbhv8qBooxQPfALsR4kM8Y5DF5mfls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sandeen.net; spf=pass smtp.mailfrom=sandeen.net; dkim=pass (2048-bit key) header.d=sandeen.net header.i=@sandeen.net header.b=qrx9Vpyh; arc=none smtp.client-ip=63.231.237.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sandeen.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandeen.net
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sandeen.net header.i=@sandeen.net header.b="qrx9Vpyh"
-Received: from [10.0.0.71] (usg [10.0.0.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by sandeen.net (Postfix) with ESMTPSA id B8504479AE7;
-	Fri, 28 Jun 2024 08:44:57 -0500 (CDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 sandeen.net B8504479AE7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sandeen.net;
-	s=default; t=1719582297;
-	bh=Wm0ob2liKwaqVbn00ikDKfK69kD3HD4g+HnBrpsBtW0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qrx9Vpyhxcf6Ccxu1nuAmtF93uW/ueFYWzOccKUh54TalNBQ4t63BP5oUyWlboQhC
-	 WX+PUV2Brzf30rbzUiP594AXcjW3QoOLhz3z+XQQQWuRssk79igSO2coEA6/JvL6bf
-	 BTNwcp6VJJqsWJEZ3EbAWEh/xCJlB7Lf/ONSJtCBE97BxFAWjQA9bdLHG1KDnltvdT
-	 0+RFws1BZFMMBR0ickPmjzBuqw4WAT0BG53yvl+IW8OXJCu7NGrVSBWc8pGmx+Y18r
-	 24NKBfo0ZsCxWTtD9jxdMbrx9h+VqakxBVi/gbrwKM/r6xSc6gKvi9JHqtHgszm9vJ
-	 DhHGFwa2Bx1/Q==
-Message-ID: <7c90924d-b023-4fa7-801d-ea0a53a5e5ed@sandeen.net>
-Date: Fri, 28 Jun 2024 08:44:57 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A825914A;
+	Mon,  1 Jul 2024 06:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719816571; cv=none; b=DNcbwkUPzoX1U0MUdhhzIm+fxm+9n2tuCzgxmxGCq9QOPPRuvdo1t599d6sUHbXeImGyM7V7j2mCkArk004UC/Hk45qFojwQ5Es6I66p8oQMacCoOqvC+5dFA1ZU9KSocRaQdOU8S6fppYgnyupf0d6pbQrBJH2Wn6R6L+hyYNg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719816571; c=relaxed/simple;
+	bh=MnfTPdggTUod1+ie5XpcE+FuMfpcCH0I785k9A9P1Wk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dvznuQEB2JwT5vI3B95ONpxCxWTA0fYHoJ17N4go0xt+gvcBuoUNTtv/t+MuX2M7zkI8z9iB/uNY0JKAqccjQRQjoMpHRrsKkgMRDqlhH83gZeZQb1nIniI/Wl/rdIi4BfbUFjUN5aJ1ul3gPsUSDT1b8zpKxStoG6f9Ck+YEnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [36.112.3.229])
+	by APP-03 (Coremail) with SMTP id rQCowAD3_1tRUYJmB2FyEw--.30484S2;
+	Mon, 01 Jul 2024 14:49:04 +0800 (CST)
+From: Haoxiang Li <make24@iscas.ac.cn>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <make24@iscas.ac.cn>
+Subject: [PATCH] fs: smb: client: Add missing check for kstrdup()
+Date: Mon,  1 Jul 2024 14:48:47 +0800
+Message-Id: <20240701064847.84726-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/14] fs_parse: add uid & gid option option parsing
- helpers
-To: Jan Kara <jack@suse.cz>, Eric Sandeen <sandeen@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
- autofs@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
- linux-efi@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
- linux-ext4@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
- linux-mm@kvack.org, ntfs3@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, Hans Caniullan <hcaniull@redhat.com>,
- Alexander Viro <aviro@redhat.com>
-References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
- <de859d0a-feb9-473d-a5e2-c195a3d47abb@redhat.com>
- <20240628094517.ifs4bp73nlggsnxz@quack3>
-Content-Language: en-US
-From: Eric Sandeen <sandeen@sandeen.net>
-In-Reply-To: <20240628094517.ifs4bp73nlggsnxz@quack3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAD3_1tRUYJmB2FyEw--.30484S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xw1UJr1DGrWxtFW7ZrW7XFb_yoWfWFg_AF
+	W7JrWrCrW8JFW29w10yryFvry29w4UArs7Xr4rtr4DtrWak34IqwsxG3s7ZF45W3y5Jr43
+	C39Yk3Z8C3Z2vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JU6yx_UUUUU=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On 6/28/24 4:45 AM, Jan Kara wrote:
-> On Thu 27-06-24 19:26:24, Eric Sandeen wrote:
->> Multiple filesystems take uid and gid as options, and the code to
->> create the ID from an integer and validate it is standard boilerplate
->> that can be moved into common helper functions, so do that for
->> consistency and less cut&paste.
->>
->> This also helps avoid the buggy pattern noted by Seth Jenkins at
->> https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
->> because uid/gid parsing will fail before any assignment in most
->> filesystems.
->>
->> Signed-off-by: Eric Sandeen <sandeen@sandeen.net>
-> 
-> I like the idea since this seems like a nobrainer but is actually
-> surprisingly subtle...
-> 
->> diff --git a/fs/fs_parser.c b/fs/fs_parser.c
->> index a4d6ca0b8971..24727ec34e5a 100644
->> --- a/fs/fs_parser.c
->> +++ b/fs/fs_parser.c
->> @@ -308,6 +308,40 @@ int fs_param_is_fd(struct p_log *log, const struct fs_parameter_spec *p,
->>  }
->>  EXPORT_SYMBOL(fs_param_is_fd);
->>  
->> +int fs_param_is_uid(struct p_log *log, const struct fs_parameter_spec *p,
->> +		    struct fs_parameter *param, struct fs_parse_result *result)
->> +{
->> +	kuid_t uid;
->> +
->> +	if (fs_param_is_u32(log, p, param, result) != 0)
->> +		return fs_param_bad_value(log, param);
->> +
->> +	uid = make_kuid(current_user_ns(), result->uint_32);
-> 
-> But here is the problem: Filesystems mountable in user namespaces need to use
-> fc->user_ns for resolving uids / gids (e.g. like fuse_parse_param()).
-> Having helpers that work for some filesystems and are subtly broken for
-> others is worse than no helpers... Or am I missing something?
+Add check for kstrdup() in smb3_reconfigure in order to guarantee
+the success of allocation.
 
-Yeah, I should have pointed that out. tmpfs still does that check after the
-initial trivial parsing after this change to use the basic helper:
+Fixes: c1eb537bf456 ("cifs: allow changing password during remount")
+Signed-off-by: Haoxiang Li <make24@iscas.ac.cn>
+---
+ fs/smb/client/fs_context.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-        case Opt_uid:
-                kuid = result.uid;
-        
-                /*
-                 * The requested uid must be representable in the
-                 * filesystem's idmapping.
-                 */
-                if (!kuid_has_mapping(fc->user_ns, kuid))
-                        goto bad_value;
-        
-                ctx->uid = kuid;
-                break;
-
-I can see your point about risks of a helper that doesn't cover all cases
-though.
- 
-> And the problem with fc->user_ns is that currently __fs_parse() does not
-> get fs_context as an argument... So that will need some larger work.
-
-Yup, this was discussed a little when I sent this idea as an RFC, and the
-(brief/small) consensus was that it was worth going this far for now.
-
-Getting fc back into __fs_parse looks rather tricky and Al was not keen
-on the idea, for some reason.
-
-Thanks,
--Eric
-> 								Honza
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 3bbac925d076..8253b615b8ce 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -920,6 +920,8 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 		ses->password = kstrdup(ctx->password, GFP_KERNEL);
+ 		kfree_sensitive(ses->password2);
+ 		ses->password2 = kstrdup(ctx->password2, GFP_KERNEL);
++		if (!ses->password || !ses->password2)
++			return ERR_PTR(rc);
+ 	}
+ 	STEAL_STRING(cifs_sb, ctx, domainname);
+ 	STEAL_STRING(cifs_sb, ctx, nodename);
+-- 
+2.25.1
 
