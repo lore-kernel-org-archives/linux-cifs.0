@@ -1,84 +1,194 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A825914A;
-	Mon,  1 Jul 2024 06:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47D56EB5B;
+	Mon,  1 Jul 2024 09:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719816571; cv=none; b=DNcbwkUPzoX1U0MUdhhzIm+fxm+9n2tuCzgxmxGCq9QOPPRuvdo1t599d6sUHbXeImGyM7V7j2mCkArk004UC/Hk45qFojwQ5Es6I66p8oQMacCoOqvC+5dFA1ZU9KSocRaQdOU8S6fppYgnyupf0d6pbQrBJH2Wn6R6L+hyYNg=
+	t=1719826482; cv=none; b=TYcc5NuqIWdcio3CIgYfSrkGYDvKQenotZ6gk0RehoEfX8VxlYGzmWWSDg6aVhYrSva/tAWC2zP9uMZ6/W594kpdN1EDIIMpdovBtmFcVEi1lMsILseSMY5ApjThkyPp/DXYGrA1porVS63MATEQlypvxCRw/Smi5ICO9fBCsRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719816571; c=relaxed/simple;
-	bh=MnfTPdggTUod1+ie5XpcE+FuMfpcCH0I785k9A9P1Wk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dvznuQEB2JwT5vI3B95ONpxCxWTA0fYHoJ17N4go0xt+gvcBuoUNTtv/t+MuX2M7zkI8z9iB/uNY0JKAqccjQRQjoMpHRrsKkgMRDqlhH83gZeZQb1nIniI/Wl/rdIi4BfbUFjUN5aJ1ul3gPsUSDT1b8zpKxStoG6f9Ck+YEnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [36.112.3.229])
-	by APP-03 (Coremail) with SMTP id rQCowAD3_1tRUYJmB2FyEw--.30484S2;
-	Mon, 01 Jul 2024 14:49:04 +0800 (CST)
-From: Haoxiang Li <make24@iscas.ac.cn>
-To: sfrench@samba.org,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <make24@iscas.ac.cn>
-Subject: [PATCH] fs: smb: client: Add missing check for kstrdup()
-Date: Mon,  1 Jul 2024 14:48:47 +0800
-Message-Id: <20240701064847.84726-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1719826482; c=relaxed/simple;
+	bh=f8A4N+tEl5e0q03GpDKXFyL2ptcO6DWC6XTKDmFJvfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jJFic4Wk5XKfvukBEJ5Gh0fryVwUNmvs5pSh0KZFwnaS2urq8rU89iKrXOghHq6INT4XOauWiFr8EfwuM4YKu2ssRjcEMlNq0LjJfDzeFoK5IlQrmbzc7y1GDpnMb/skzrIsS/ezsQFdgx1s6ysQQ0aL5mF7LRjpaN5ApTOCjeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NbE49N1w; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=rxylWUg+; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=a/p0kXeh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=UOg+M19d; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NbE49N1w";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="rxylWUg+";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="a/p0kXeh";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="UOg+M19d"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id EE0FD21AE6;
+	Mon,  1 Jul 2024 09:34:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1719826479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
+	b=NbE49N1wg6cM3fA5V/gAHBOfJZ3iQ6sNbuWpsuZ4Zp+bn9Z5Umyo3ZIVsTHpUWUPn2enzW
+	tsMj7AFVvfs8oGvA3u0u0q4fHUpLk8ljfoqfa7KBA0sAlgAvwo7GlAk02ifm04KQgEK8+W
+	oPs5DXZdULhit68Q3ZL6j/6brVN45y0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1719826479;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
+	b=rxylWUg+p7ebJEM0zMG68ju2VcNhbAxt57fAMc54omZ0LcTD2DD8Ho+V0qlj9iLpi3Z+YY
+	SmqhwNuzV3gVgjCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1719826477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
+	b=a/p0kXehdSYe3JnwY+HlC46fhPrRSpXxMBXGv/2xw9LkSth2INE9N3aQvcU8OPTBNXf0GK
+	pGHA3H2sYuP9fsloNxZQY+e55cDT7gCJpurzfVnq8ETslMJpp110cle3MpclosQ69nvXFd
+	lPF9U2+C59K1awyl3VaCyb0n98PPWyk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1719826477;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FozuB0CgYy31OmZnoj5QofV+vYenuNBwwgLrQA0VLBg=;
+	b=UOg+M19dnm3PpJnbD1VmxR+FfwdjHAe4yQgxNY1Q9aGxTYVLbOO6OYpafqcZhp4u9ItxH5
+	NnuyFGkeLi7VTnCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DD63813800;
+	Mon,  1 Jul 2024 09:34:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ps0FNi14gmb4FwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 01 Jul 2024 09:34:37 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 533E2A088E; Mon,  1 Jul 2024 11:34:37 +0200 (CEST)
+Date: Mon, 1 Jul 2024 11:34:37 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, Eric Sandeen <sandeen@redhat.com>,
+	linux-fsdevel@vger.kernel.org, autofs@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>, linux-efi@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>, linux-ext4@vger.kernel.org,
+	Miklos Szeredi <miklos@szeredi.hu>, linux-mm@kvack.org,
+	ntfs3@lists.linux.dev, linux-cifs@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Hans Caniullan <hcaniull@redhat.com>
+Subject: Re: [PATCH 01/14] fs_parse: add uid & gid option option parsing
+ helpers
+Message-ID: <20240701093437.d2654yek4nnq2ep6@quack3>
+References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
+ <de859d0a-feb9-473d-a5e2-c195a3d47abb@redhat.com>
+ <20240628094517.ifs4bp73nlggsnxz@quack3>
+ <20240628-fernfahrt-missverstanden-01543e7492b4@brauner>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAD3_1tRUYJmB2FyEw--.30484S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw1UJr1DGrWxtFW7ZrW7XFb_yoWfWFg_AF
-	W7JrWrCrW8JFW29w10yryFvry29w4UArs7Xr4rtr4DtrWak34IqwsxG3s7ZF45W3y5Jr43
-	C39Yk3Z8C3Z2vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JU6yx_UUUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240628-fernfahrt-missverstanden-01543e7492b4@brauner>
+X-Spam-Score: -3.80
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sandeen.net:email,suse.com:email]
 
-Add check for kstrdup() in smb3_reconfigure in order to guarantee
-the success of allocation.
+On Fri 28-06-24 14:23:35, Christian Brauner wrote:
+> On Fri, Jun 28, 2024 at 11:45:17AM GMT, Jan Kara wrote:
+> > On Thu 27-06-24 19:26:24, Eric Sandeen wrote:
+> > > Multiple filesystems take uid and gid as options, and the code to
+> > > create the ID from an integer and validate it is standard boilerplate
+> > > that can be moved into common helper functions, so do that for
+> > > consistency and less cut&paste.
+> > > 
+> > > This also helps avoid the buggy pattern noted by Seth Jenkins at
+> > > https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
+> > > because uid/gid parsing will fail before any assignment in most
+> > > filesystems.
+> > > 
+> > > Signed-off-by: Eric Sandeen <sandeen@sandeen.net>
+> > 
+> > I like the idea since this seems like a nobrainer but is actually
+> > surprisingly subtle...
+> > 
+> > > diff --git a/fs/fs_parser.c b/fs/fs_parser.c
+> > > index a4d6ca0b8971..24727ec34e5a 100644
+> > > --- a/fs/fs_parser.c
+> > > +++ b/fs/fs_parser.c
+> > > @@ -308,6 +308,40 @@ int fs_param_is_fd(struct p_log *log, const struct fs_parameter_spec *p,
+> > >  }
+> > >  EXPORT_SYMBOL(fs_param_is_fd);
+> > >  
+> > > +int fs_param_is_uid(struct p_log *log, const struct fs_parameter_spec *p,
+> > > +		    struct fs_parameter *param, struct fs_parse_result *result)
+> > > +{
+> > > +	kuid_t uid;
+> > > +
+> > > +	if (fs_param_is_u32(log, p, param, result) != 0)
+> > > +		return fs_param_bad_value(log, param);
+> > > +
+> > > +	uid = make_kuid(current_user_ns(), result->uint_32);
+> > 
+> > But here is the problem: Filesystems mountable in user namespaces need to use
+> > fc->user_ns for resolving uids / gids (e.g. like fuse_parse_param()).
+> > Having helpers that work for some filesystems and are subtly broken for
+> > others is worse than no helpers... Or am I missing something?
+> > 
+> > And the problem with fc->user_ns is that currently __fs_parse() does not
+> > get fs_context as an argument... So that will need some larger work.
+> 
+> Not really. If someone does an fsopen() in a namespace but the process
+> that actually sets mount options is in another namespace then it's
+> completely intransparent what uid/gid this will resolve to if it's
+> resovled according to fsopen().
+> 
+> It's also a bit strange if someone ends up handing off a tmpfs fscontext
+> that was created in the initial namespace to some random namespace and
+> they now can set uid/gid options that aren't mapped according to their
+> namespace but instead are 1:1 resolved according to the intial
+> namespace. So this would hinder delegation.
+> 
+> The expectation is that uid/gid options are resolved in the caller's
+> namespace and that shouldn't be any different for fscontexts for
+> namespace mountable filesystems. The crucial point is to ensure that the
+> resulting kuid/kgid can be resolved in the namespace the filesystem is
+> mounted in at the end. That's what was lacking in e.g., tmpfs in commit
+> 0200679fc795 ("tmpfs: verify {g,u}id mount options correctly")
+> 
+> The fuse conversion is the only inconsistency in that regard.
 
-Fixes: c1eb537bf456 ("cifs: allow changing password during remount")
-Signed-off-by: Haoxiang Li <make24@iscas.ac.cn>
----
- fs/smb/client/fs_context.c | 2 ++
- 1 file changed, 2 insertions(+)
+OK, thanks for explanation!
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 3bbac925d076..8253b615b8ce 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -920,6 +920,8 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		ses->password = kstrdup(ctx->password, GFP_KERNEL);
- 		kfree_sensitive(ses->password2);
- 		ses->password2 = kstrdup(ctx->password2, GFP_KERNEL);
-+		if (!ses->password || !ses->password2)
-+			return ERR_PTR(rc);
- 	}
- 	STEAL_STRING(cifs_sb, ctx, domainname);
- 	STEAL_STRING(cifs_sb, ctx, nodename);
+								Honza
 -- 
-2.25.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
