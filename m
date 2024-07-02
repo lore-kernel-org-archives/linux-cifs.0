@@ -1,120 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1183F8E2;
-	Tue,  2 Jul 2024 04:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0961E1BA882
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Jul 2024 14:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719894437; cv=none; b=uNxepcjEW8w29a23JyVt6p3qvEpY5Tt1selM2Gyk6VqyMcM+54d9fCfCExXrp1jg1g3WPgrYwLesrz/jY1c455Qv+q11M99MNto8zFLPDPrhXksi0yDB4HZPEzNXdUiq3IRwMfzetZ0ItydV43t/NyTd5mVF2rap0TSqPuewDkc=
+	t=1719931820; cv=none; b=bCwWBc2WaxpFIPy8U7rmiYais64et8MA5GH5e4zzEP2RHFCJoDwTHsa2XovanbntC6MhI4LLVmYqzMbMpQkWOvptbVLTRWQJh4S0h3F0WDX8/pCfZhBz9ZWdwUTtTO7T7QCzVl+mV3nv6w+cgB/EUmHswvuimw4FdmsW254843I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719894437; c=relaxed/simple;
-	bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BHjo1UmSc5jUdZNWi6C4S2G6AXBMcu3yUgWMIWzCZK5ABww3irvjwLUarizT4STM4xEXdRd0ZiLWOtCz4aVDNWYdCxD1LdiEPXSjBnJ3ZIzpXljIzwON3UbV6JgPxru6xIUYzdZWMFo4CiqwT9DwEfioxfs0+cGHR2TSlRZfxrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmThOihg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719931820; c=relaxed/simple;
+	bh=j04qJCMTRC27SFYKj5QHjaBXylUAzvskB/hwKauQY1s=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=GNL1bli8HMpAAwAn5plYv7i1EGYZeANsGb++tOOYTQU+Er7NuLBQMbS6qwGfdD+GQab4036l+3HWTxVjGo2QUNpXLqrpBD4WI+PnbRDrLJLMzTZz4uMU3g5tNQi+oyBPVNu8KFhxCVQZVR3Yq/hIkvifXjhiQpKFcO+JKx7EcSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilrSWacD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmThOihg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B27DDC116B1;
-	Tue,  2 Jul 2024 04:27:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719894437;
-	bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QmThOihg9UGFPaNoDYQyvvbRVQdaQkcab25Xy2SgQMsBgmC3a7qBKgUNdrsX6AoTx
-	 mJhcmZq7U/oVhTFsfpggxVdwg8WRJXrYHREzkqOw34vvGDGgZX7R90e2xCIGko+vvA
-	 qBmWLbhllc4Ea/2SnLbt4k0Kb0R8dMBE1S9D1iXW7Zt27SE0Ya2hVrO11DbQWG+2ri
-	 HqbBH6dAx7D01N9uC0MQBTZvFaqmMw13gj3qDjJVI6mwSkBuY2ATeM1/wpABIqaAhH
-	 8z+HoC0itipm7i+VVUwgjskOl6FhAVgVuLe2pHxeKVLhhG2BoVo9KTzlu0+oEK8oN3
-	 q8sGJHAxqGD8Q==
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org,
-	Eric Sandeen <sandeen@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	autofs@vger.kernel.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	linux-efi@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-ext4@vger.kernel.org,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	linux-mm@kvack.org,
-	Jan Kara <jack@suse.cz>,
-	ntfs3@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Hans Caniullan <hcaniull@redhat.com>
-Subject: Re: (subset) [PATCH 0/14] New uid & gid mount option parsing helpers
-Date: Tue,  2 Jul 2024 06:25:05 +0200
-Message-ID: <20240702-putzig-krater-aea1bf2b652d@brauner>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
-References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilrSWacD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719931818;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uWZifttcEAbyBfObjSbGpm26/PI7fGmjt0k2HweKiRc=;
+	b=ilrSWacDqaHm7ldKyF2NHZpXrQHvuNqrnMIu6iCcGgvI3nO/iJTVuLz5g8oNxLr3QKs5Cq
+	H6l78mY26yCgYJtdABf+IykGyFfuALLgD7NVX+Y3mdbVBCcmNtrBJWl6uNsZoi/8SseX4W
+	AhADihULtHwV02/NXsKMv7c5yLgtFh4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-544-7te1MDSUOmGrLCL5FkfiOg-1; Tue,
+ 02 Jul 2024 10:50:16 -0400
+X-MC-Unique: 7te1MDSUOmGrLCL5FkfiOg-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0252219560B8;
+	Tue,  2 Jul 2024 14:50:14 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.111])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 640C93000221;
+	Tue,  2 Jul 2024 14:50:10 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+    Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>, linux-cifs@vger.kernel.org,
+    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix read-performance regression by dropping readahead expansion
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2869; i=brauner@kernel.org; h=from:subject:message-id; bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQ1N86epaB8O+RGuUfcyR2t/+MibkifPWzJrzm/ojW// bz+7/jIjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIncDGf4p3JIf1/9yu1MzKr3 pz/12149IctCKa9v5339fMP28/emGDIyXF+35fODGL28nUFvD8xImtm5d1dfRe/hRdfiA9seu4Y HcwIA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3042270.1719931809.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 02 Jul 2024 15:50:09 +0100
+Message-ID: <3042271.1719931809@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, 27 Jun 2024 19:24:59 -0500, Eric Sandeen wrote:
-> Multiple filesystems take uid and gid as options, and the code to
-> create the ID from an integer and validate it is standard boilerplate
-> that can be moved into common helper functions, so do that for
-> consistency and less cut&paste.
-> 
-> This also helps avoid the buggy pattern noted by Seth Jenkins at
-> https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
-> because uid/gid parsing will fail before any assignment in most
-> filesystems.
-> 
-> [...]
+cifs_expand_read() is causing a performance regression of around 30% by
+causing extra pagecache to be allocated for an inode in the readahead path
+before we begin actually dispatching RPC requests, thereby delaying the
+actual I/O.  The expansion is sized according to the rsize parameter, whic=
+h
+seems to be 4MiB on my test system; this is a big step up from the first
+requests made by the fio test program.
 
-I've snatched everything but the fuse change as we should do that one in
-two steps.
+Fix this by removing cifs_expand_readahead().  Readahead expansion is
+mostly useful for when we're using the local cache if the local cache has =
+a
+block size greater than PAGE_SIZE, so we can dispense with it when not
+caching.
 
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 ---
+ fs/smb/client/file.c |   30 ------------------------------
+ 1 file changed, 30 deletions(-)
 
-Applied to the vfs.mount.api branch of the vfs/vfs.git tree.
-Patches in the vfs.mount.api branch should appear in linux-next soon.
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index f1f2573bb18d..1374635e89fa 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -245,35 +245,6 @@ static int cifs_init_request(struct netfs_io_request =
+*rreq, struct file *file)
+ 	return 0;
+ }
+ =
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+-/*
+- * Expand the size of a readahead to the size of the rsize, if at least a=
+s
+- * large as a page, allowing for the possibility that rsize is not pow-2
+- * aligned.
+- */
+-static void cifs_expand_readahead(struct netfs_io_request *rreq)
+-{
+-	unsigned int rsize =3D rreq->rsize;
+-	loff_t misalignment, i_size =3D i_size_read(rreq->inode);
+-
+-	if (rsize < PAGE_SIZE)
+-		return;
+-
+-	if (rsize < INT_MAX)
+-		rsize =3D roundup_pow_of_two(rsize);
+-	else
+-		rsize =3D ((unsigned int)INT_MAX + 1) / 2;
+-
+-	misalignment =3D rreq->start & (rsize - 1);
+-	if (misalignment) {
+-		rreq->start -=3D misalignment;
+-		rreq->len +=3D misalignment;
+-	}
+-
+-	rreq->len =3D round_up(rreq->len, rsize);
+-	if (rreq->start < i_size && rreq->len > i_size - rreq->start)
+-		rreq->len =3D i_size - rreq->start;
+-}
+-
+ /*
+  * Completion of a request operation.
+  */
+@@ -329,7 +300,6 @@ const struct netfs_request_ops cifs_req_ops =3D {
+ 	.init_request		=3D cifs_init_request,
+ 	.free_request		=3D cifs_free_request,
+ 	.free_subrequest	=3D cifs_free_subrequest,
+-	.expand_readahead	=3D cifs_expand_readahead,
+ 	.clamp_length		=3D cifs_clamp_length,
+ 	.issue_read		=3D cifs_req_issue_read,
+ 	.done			=3D cifs_rreq_done,
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.mount.api
-
-[01/14] fs_parse: add uid & gid option option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/9f111059e725
-[02/14] autofs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/748cddf13de5
-[03/14] debugfs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/49abee5991e1
-[04/14] efivarfs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/dcffad38c767
-[05/14] exfat: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/ffe1b94d7464
-[06/14] ext4: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/6b5732b5ca4f
-[08/14] hugetlbfs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/eefc13247722
-[09/14] isofs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/6a265845db28
-[10/14] ntfs3: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/c449cb5d1bce
-[11/14] tmpfs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/2ec07010b6a9
-[12/14] smb: client: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/3229e3a5a374
-[13/14] tracefs: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/b548291690d1
-[14/14] vboxsf: Convert to new uid/gid option parsing helpers
-        https://git.kernel.org/vfs/vfs/c/da99d45bd551
