@@ -1,76 +1,120 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DB937708
-	for <linux-cifs@vger.kernel.org>; Mon,  1 Jul 2024 21:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1183F8E2;
+	Tue,  2 Jul 2024 04:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719868575; cv=none; b=uuW7I0/jLAV+ZABSWkt2hUDudcscEcnWoOeUdqOJXq6XPd4zyQjtFK2+isBWiYFDkvuxQy5IxaOqYl+fK1feSylredQftBAhV8FoR1GP5AzOat75zwapjq4g+YbI7UJdrMx40RVEl6vj8fc6MhUppRnC2jxYJ5c7EXghUGnmaYs=
+	t=1719894437; cv=none; b=uNxepcjEW8w29a23JyVt6p3qvEpY5Tt1selM2Gyk6VqyMcM+54d9fCfCExXrp1jg1g3WPgrYwLesrz/jY1c455Qv+q11M99MNto8zFLPDPrhXksi0yDB4HZPEzNXdUiq3IRwMfzetZ0ItydV43t/NyTd5mVF2rap0TSqPuewDkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719868575; c=relaxed/simple;
-	bh=x+R0A6zBkSSAcX1piwgLRxUaLDuz5Q88ryQ2M+z7tnw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=dMAcMwN65hzOs9LU+6kJIYkWldTNRSt/WPjXlRPRs1SWXQhDtetugq9pPVeHUpjW+2Of2Zf5cJcc0GTAewDB5mEehIhS06W5i4WWgDaVLnfvM5ZTt4iStrm7CPoFva/SYcOcOFHkaj8fwm7PeZEK/b1MKMgyDHL0avnGpTXc9lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/VZBkAX; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1719894437; c=relaxed/simple;
+	bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BHjo1UmSc5jUdZNWi6C4S2G6AXBMcu3yUgWMIWzCZK5ABww3irvjwLUarizT4STM4xEXdRd0ZiLWOtCz4aVDNWYdCxD1LdiEPXSjBnJ3ZIzpXljIzwON3UbV6JgPxru6xIUYzdZWMFo4CiqwT9DwEfioxfs0+cGHR2TSlRZfxrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmThOihg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/VZBkAX"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52e8b27f493so1572084e87.2
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Jul 2024 14:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719868572; x=1720473372; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RVVvzEoVYaNI8dJrfbY7PheBV8sKpOTXF1JPSRz+YRA=;
-        b=l/VZBkAXznSaD257/mEiaeULMNER1bNXE9Sb7tegtyicLQYl4wV7BBsRTpavKsZ8+5
-         DOETPesdpjRiD0WO67724GMEPF+WcrLMFNsslwgAaPpV/Ajm3yI7aXk+WynHiipiJqJD
-         To9TkXiLemcGyC/0gua7bqNfhAKMuiwQf9yRZWVn8T43ROWMCku8aLM79VMcdZn2LByS
-         5a8zR/9DbNCGe9FxuR3KRXwIpoOQCul8jOsaE2wY6LjGBVWzNGFu+ub2e/t8QGlmU/38
-         DB5mXtLzPnp6zccK0O3Fyi9HSun8bQ3M+P3/8gy2b1CGuVv2QdV35L+DkBHNnrKKbPP4
-         l4/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719868572; x=1720473372;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RVVvzEoVYaNI8dJrfbY7PheBV8sKpOTXF1JPSRz+YRA=;
-        b=JEQgOwczbWL9c+9DBNM2n7qWg7zI+zV/oDxNYPEiavLvGfHIXNqWe/bUmDK/PQpJzi
-         G4VCh9bx9TWlVwWlM+ez0lXsR9cGnpwgsAtTz1xLYvAYYRIdEV78r5QLTdNdWP5DMBSs
-         RtxIQpNOkgS6Gj8XdE8/8M//cEIlUYReY+F23Y/crRMYZSXVBMjE8dl7VJaT9XYUwfjC
-         uRscF0+xeg0oz5BQ0v+gQ+Be3INtYQ/Cpip5FVjPz4Uu2IeHb4V47Flp8lnw27kD3Ww+
-         YeaxVCYg3mP9OuRyAfAVh7Pvt2enxPiTY8mAZRQiHX/wXNQrQlDknoc9BRfVs4goD5UB
-         N+YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWI/imJE1IRs1Utt4WvVIqrB6qAUqb98xQICkVvST+khTVxj3JqgqBwatiWtvI39YBbwlnuWsP7iVGTauwAKqR21MZBNass6+QPAg==
-X-Gm-Message-State: AOJu0YwNvK53xgpO/hJqsayHg4XoY4TlUCRWn7gcm9BjIe19Jmbjom0W
-	Tb2k3zcE5iItlsQMHjKWuhwzQGGwHVhP6kU1TTu2SCa52GrQ6x/kY0w1bFceU8sa3PxKqBNsXvw
-	vtDdbNA76WZtIjrT64CDZOY4RKdpv4vG0
-X-Google-Smtp-Source: AGHT+IHurx7eIfTqovKKHr+2ht8xPJato21RPg5BaNP3AmPYJ/oBQUidDFXXcZRvMv392v6MQHw6EW8+BJHquc9BfSs=
-X-Received: by 2002:ac2:5dcc:0:b0:52b:c15f:2613 with SMTP id
- 2adb3069b0e04-52e826898d9mr3715903e87.35.1719868571793; Mon, 01 Jul 2024
- 14:16:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmThOihg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B27DDC116B1;
+	Tue,  2 Jul 2024 04:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719894437;
+	bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QmThOihg9UGFPaNoDYQyvvbRVQdaQkcab25Xy2SgQMsBgmC3a7qBKgUNdrsX6AoTx
+	 mJhcmZq7U/oVhTFsfpggxVdwg8WRJXrYHREzkqOw34vvGDGgZX7R90e2xCIGko+vvA
+	 qBmWLbhllc4Ea/2SnLbt4k0Kb0R8dMBE1S9D1iXW7Zt27SE0Ya2hVrO11DbQWG+2ri
+	 HqbBH6dAx7D01N9uC0MQBTZvFaqmMw13gj3qDjJVI6mwSkBuY2ATeM1/wpABIqaAhH
+	 8z+HoC0itipm7i+VVUwgjskOl6FhAVgVuLe2pHxeKVLhhG2BoVo9KTzlu0+oEK8oN3
+	 q8sGJHAxqGD8Q==
+From: Christian Brauner <brauner@kernel.org>
+To: linux-fsdevel@vger.kernel.org,
+	Eric Sandeen <sandeen@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	autofs@vger.kernel.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-efi@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-ext4@vger.kernel.org,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	linux-mm@kvack.org,
+	Jan Kara <jack@suse.cz>,
+	ntfs3@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Hans Caniullan <hcaniull@redhat.com>
+Subject: Re: (subset) [PATCH 0/14] New uid & gid mount option parsing helpers
+Date: Tue,  2 Jul 2024 06:25:05 +0200
+Message-ID: <20240702-putzig-krater-aea1bf2b652d@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
+References: <8dca3c11-99f4-446d-a291-35c50ed2dc14@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 1 Jul 2024 16:16:00 -0500
-Message-ID: <CAH2r5mvQsDJZnVZyPUy0FRK5Hrfv5bEwi73N2zfOfD=tnav4ew@mail.gmail.com>
-Subject: xfstest improvements with recent netfs fixes?
-To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2869; i=brauner@kernel.org; h=from:subject:message-id; bh=Pv0BfDTulESS3H2hspa9V/qPBcr+GryRdQNP1DxU5JY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQ1N86epaB8O+RGuUfcyR2t/+MibkifPWzJrzm/ojW// bz+7/jIjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIncDGf4p3JIf1/9yu1MzKr3 pz/12149IctCKa9v5339fMP28/emGDIyXF+35fODGL28nUFvD8xImtm5d1dfRe/hRdfiA9seu4Y HcwIA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-In comparing the test run with 6.10-rc6 yesterday
-(http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/builds/148),
-vs. mainline today which includes some netfs fixes (see
-http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/builds/149).
-I noticed improvement.   In particular tests generic/198, 207, 208,
-240  and generic/330 now passed.  Do you also see those netfs fixes
-help? And were those expected to fix these tests?
+On Thu, 27 Jun 2024 19:24:59 -0500, Eric Sandeen wrote:
+> Multiple filesystems take uid and gid as options, and the code to
+> create the ID from an integer and validate it is standard boilerplate
+> that can be moved into common helper functions, so do that for
+> consistency and less cut&paste.
+> 
+> This also helps avoid the buggy pattern noted by Seth Jenkins at
+> https://lore.kernel.org/lkml/CALxfFW4BXhEwxR0Q5LSkg-8Vb4r2MONKCcUCVioehXQKr35eHg@mail.gmail.com/
+> because uid/gid parsing will fail before any assignment in most
+> filesystems.
+> 
+> [...]
 
+I've snatched everything but the fuse change as we should do that one in
+two steps.
 
+---
 
--- 
-Thanks,
+Applied to the vfs.mount.api branch of the vfs/vfs.git tree.
+Patches in the vfs.mount.api branch should appear in linux-next soon.
 
-Steve
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.mount.api
+
+[01/14] fs_parse: add uid & gid option option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/9f111059e725
+[02/14] autofs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/748cddf13de5
+[03/14] debugfs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/49abee5991e1
+[04/14] efivarfs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/dcffad38c767
+[05/14] exfat: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/ffe1b94d7464
+[06/14] ext4: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/6b5732b5ca4f
+[08/14] hugetlbfs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/eefc13247722
+[09/14] isofs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/6a265845db28
+[10/14] ntfs3: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/c449cb5d1bce
+[11/14] tmpfs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/2ec07010b6a9
+[12/14] smb: client: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/3229e3a5a374
+[13/14] tracefs: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/b548291690d1
+[14/14] vboxsf: Convert to new uid/gid option parsing helpers
+        https://git.kernel.org/vfs/vfs/c/da99d45bd551
