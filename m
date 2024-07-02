@@ -1,146 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0961E1BA882
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Jul 2024 14:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48ECB1BE22A;
+	Tue,  2 Jul 2024 17:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719931820; cv=none; b=bCwWBc2WaxpFIPy8U7rmiYais64et8MA5GH5e4zzEP2RHFCJoDwTHsa2XovanbntC6MhI4LLVmYqzMbMpQkWOvptbVLTRWQJh4S0h3F0WDX8/pCfZhBz9ZWdwUTtTO7T7QCzVl+mV3nv6w+cgB/EUmHswvuimw4FdmsW254843I=
+	t=1719940682; cv=none; b=fjARMwY5/4JkZ2wDETp5e/OIB8um/zyPU2W8AgRJonendTcI/xjBez1PpqOcKlV2Ww5ZTQiue341u5A7X4oxS3DAFf4QX0n/hO/k8eBbZBP0QC4V/vSPlTxiuGFbJBnr+OTuB/51+InQCJPJ6L5C+t9Q2s0+4aeekeUDQq2m5oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719931820; c=relaxed/simple;
-	bh=j04qJCMTRC27SFYKj5QHjaBXylUAzvskB/hwKauQY1s=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=GNL1bli8HMpAAwAn5plYv7i1EGYZeANsGb++tOOYTQU+Er7NuLBQMbS6qwGfdD+GQab4036l+3HWTxVjGo2QUNpXLqrpBD4WI+PnbRDrLJLMzTZz4uMU3g5tNQi+oyBPVNu8KFhxCVQZVR3Yq/hIkvifXjhiQpKFcO+JKx7EcSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilrSWacD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1719940682; c=relaxed/simple;
+	bh=xYuhDM0qnN8IfxCRnGM/W7DHSuvjwI8r4s+KWI0SZ/0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bMqxa02JXplGJNY0ImD6sb1yMm4TzWsgQUen15u1KcZ/EgrWx/4d0eLN1JUnryYngDOR5Dm3+mqhDGVCKT3LCG+Rh+V7x2DOAjxJHJhUs/6GSwT3hYyk/Ut5tCKnUUpr1w53nhzPiYP/FaM2jaTkTQ36aqBw5cnmJKd6CBry2qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IvCiZ+TA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilrSWacD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719931818;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=uWZifttcEAbyBfObjSbGpm26/PI7fGmjt0k2HweKiRc=;
-	b=ilrSWacDqaHm7ldKyF2NHZpXrQHvuNqrnMIu6iCcGgvI3nO/iJTVuLz5g8oNxLr3QKs5Cq
-	H6l78mY26yCgYJtdABf+IykGyFfuALLgD7NVX+Y3mdbVBCcmNtrBJWl6uNsZoi/8SseX4W
-	AhADihULtHwV02/NXsKMv7c5yLgtFh4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-544-7te1MDSUOmGrLCL5FkfiOg-1; Tue,
- 02 Jul 2024 10:50:16 -0400
-X-MC-Unique: 7te1MDSUOmGrLCL5FkfiOg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0252219560B8;
-	Tue,  2 Jul 2024 14:50:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.111])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 640C93000221;
-	Tue,  2 Jul 2024 14:50:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Christian Brauner <christian@brauner.io>,
-    Matthew Wilcox <willy@infradead.org>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix read-performance regression by dropping readahead expansion
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IvCiZ+TA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A48FC116B1;
+	Tue,  2 Jul 2024 17:18:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1719940682;
+	bh=xYuhDM0qnN8IfxCRnGM/W7DHSuvjwI8r4s+KWI0SZ/0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IvCiZ+TAt9cpZRpRKauh2Acwidr+Q0221ErGsC2Z8KS9lCJshOPpD/BoEOWNnAzyy
+	 eTI55EkDpzLOYEg1NJncYAIx71bJjqgZhmIYlb3S7eCU6iMy2PpAptGQQM+AxQTNtb
+	 D5XGrJrhw/TDIE1zzM7ZOvZ6mpfD3fySyRkoPiAY=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.9 221/222] netfs: Fix netfs_page_mkwrite() to check folio->mapping is valid
+Date: Tue,  2 Jul 2024 19:04:19 +0200
+Message-ID: <20240702170252.435728996@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240702170243.963426416@linuxfoundation.org>
+References: <20240702170243.963426416@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3042270.1719931809.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 02 Jul 2024 15:50:09 +0100
-Message-ID: <3042271.1719931809@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-cifs_expand_read() is causing a performance regression of around 30% by
-causing extra pagecache to be allocated for an inode in the readahead path
-before we begin actually dispatching RPC requests, thereby delaying the
-actual I/O.  The expansion is sized according to the rsize parameter, whic=
-h
-seems to be 4MiB on my test system; this is a big step up from the first
-requests made by the fio test program.
+6.9-stable review patch.  If anyone has any objections, please let me know.
 
-Fix this by removing cifs_expand_readahead().  Readahead expansion is
-mostly useful for when we're using the local cache if the local cache has =
-a
-block size greater than PAGE_SIZE, so we can dispense with it when not
-caching.
+------------------
 
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit a81c98bfa40c11f8ea79b5a9b3f5fda73bfbb4d2 ]
+
+Fix netfs_page_mkwrite() to check that folio->mapping is valid once it has
+taken the folio lock (as filemap_page_mkwrite() does).  Without this,
+generic/247 occasionally oopses with something like the following:
+
+    BUG: kernel NULL pointer dereference, address: 0000000000000000
+    #PF: supervisor read access in kernel mode
+    #PF: error_code(0x0000) - not-present page
+
+    RIP: 0010:trace_event_raw_event_netfs_folio+0x61/0xc0
+    ...
+    Call Trace:
+     <TASK>
+     ? __die_body+0x1a/0x60
+     ? page_fault_oops+0x6e/0xa0
+     ? exc_page_fault+0xc2/0xe0
+     ? asm_exc_page_fault+0x22/0x30
+     ? trace_event_raw_event_netfs_folio+0x61/0xc0
+     trace_netfs_folio+0x39/0x40
+     netfs_page_mkwrite+0x14c/0x1d0
+     do_page_mkwrite+0x50/0x90
+     do_pte_missing+0x184/0x200
+     __handle_mm_fault+0x42d/0x500
+     handle_mm_fault+0x121/0x1f0
+     do_user_addr_fault+0x23e/0x3c0
+     exc_page_fault+0xc2/0xe0
+     asm_exc_page_fault+0x22/0x30
+
+This is due to the invalidate_inode_pages2_range() issued at the end of the
+DIO write interfering with the mmap'd writes.
+
+Fixes: 102a7e2c598c ("netfs: Allow buffered shared-writeable mmap through netfs_page_mkwrite()")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
+Link: https://lore.kernel.org/r/780211.1719318546@warthog.procyon.org.uk
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-cifs@vger.kernel.org
+cc: Jeff Layton <jlayton@kernel.org>
 cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+cc: v9fs@lists.linux.dev
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
 cc: linux-mm@kvack.org
+cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/file.c |   30 ------------------------------
- 1 file changed, 30 deletions(-)
+ fs/netfs/buffered_write.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index f1f2573bb18d..1374635e89fa 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -245,35 +245,6 @@ static int cifs_init_request(struct netfs_io_request =
-*rreq, struct file *file)
- 	return 0;
- }
- =
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 912ad0a1df021..72e4fa233c526 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -507,6 +507,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
+ {
+ 	struct folio *folio = page_folio(vmf->page);
+ 	struct file *file = vmf->vma->vm_file;
++	struct address_space *mapping = file->f_mapping;
+ 	struct inode *inode = file_inode(file);
+ 	vm_fault_t ret = VM_FAULT_RETRY;
+ 	int err;
+@@ -520,6 +521,11 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
+ 
+ 	if (folio_lock_killable(folio) < 0)
+ 		goto out;
++	if (folio->mapping != mapping) {
++		folio_unlock(folio);
++		ret = VM_FAULT_NOPAGE;
++		goto out;
++	}
+ 
+ 	/* Can we see a streaming write here? */
+ 	if (WARN_ON(!folio_test_uptodate(folio))) {
+@@ -529,7 +535,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
+ 
+ 	if (netfs_folio_group(folio) != netfs_group) {
+ 		folio_unlock(folio);
+-		err = filemap_fdatawait_range(inode->i_mapping,
++		err = filemap_fdatawait_range(mapping,
+ 					      folio_pos(folio),
+ 					      folio_pos(folio) + folio_size(folio));
+ 		switch (err) {
+-- 
+2.43.0
 
--/*
-- * Expand the size of a readahead to the size of the rsize, if at least a=
-s
-- * large as a page, allowing for the possibility that rsize is not pow-2
-- * aligned.
-- */
--static void cifs_expand_readahead(struct netfs_io_request *rreq)
--{
--	unsigned int rsize =3D rreq->rsize;
--	loff_t misalignment, i_size =3D i_size_read(rreq->inode);
--
--	if (rsize < PAGE_SIZE)
--		return;
--
--	if (rsize < INT_MAX)
--		rsize =3D roundup_pow_of_two(rsize);
--	else
--		rsize =3D ((unsigned int)INT_MAX + 1) / 2;
--
--	misalignment =3D rreq->start & (rsize - 1);
--	if (misalignment) {
--		rreq->start -=3D misalignment;
--		rreq->len +=3D misalignment;
--	}
--
--	rreq->len =3D round_up(rreq->len, rsize);
--	if (rreq->start < i_size && rreq->len > i_size - rreq->start)
--		rreq->len =3D i_size - rreq->start;
--}
--
- /*
-  * Completion of a request operation.
-  */
-@@ -329,7 +300,6 @@ const struct netfs_request_ops cifs_req_ops =3D {
- 	.init_request		=3D cifs_init_request,
- 	.free_request		=3D cifs_free_request,
- 	.free_subrequest	=3D cifs_free_subrequest,
--	.expand_readahead	=3D cifs_expand_readahead,
- 	.clamp_length		=3D cifs_clamp_length,
- 	.issue_read		=3D cifs_req_issue_read,
- 	.done			=3D cifs_rreq_done,
+
 
