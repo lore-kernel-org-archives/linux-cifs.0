@@ -1,100 +1,117 @@
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9301758B;
-	Sat, 13 Jul 2024 03:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307352E3E4
+	for <linux-cifs@vger.kernel.org>; Sat, 13 Jul 2024 05:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720840942; cv=none; b=r1TGKXG4ioA0kK4UwU3o4eud3vAsNNu1RtYOVkCLUsy9DxUgE0Fyv8aszADgeQNm7fEa5p18rKIOV5ewsNBFzXPr0ggd1ZXAldnIqHICdF3a2ofvuLF3AEBB98GozOqR8jUvW9b0Iic93d7b90lxF6adTtUJm4s23glFZeF+H64=
+	t=1720849741; cv=none; b=ghPLpWooEovgU8iqXSCtPLyPRyWBbLuM6ydzFO7T74Zjd/FWFCn8DWv5PncW/o6Mr+90Gs1k/9gx6GvFlocc0VG8wrKN1XzVDxB3iEhsAgX1pnb0DW8gCWNHR2uoybvJl9hipIcwtlZFLifM+tMs/WzfBCDjNPA9lI305LNfO0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720840942; c=relaxed/simple;
-	bh=XQRK3olFcGYDhpyX/gjVvN4c01L8z83NPrVTYmMOqp8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AQualyjYLuvsSanyOkM2Z12NrMhkjxeaKD8kaaSXyhYq2Voq4RZUgYlwKHcB99SritoQbDzbZFS+1GTKMXY9KJ9Hi374Czlo/7QBNWhcmLlfAob1bcTH3SwcioTp9nJk5BlvuyUY56iOJUxEKeRqQkqO8BZ2t9yQuVdm4OhOnXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mFbEdoaC; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1720849741; c=relaxed/simple;
+	bh=ZzbVMQSmkdo2OELypXOoxhJed0/vFORPlXCSJ2zsFlk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lBvSQSSCHYdV0OOi9miHOdytHZqRxjRKrB0ZL0XWDwznjWSKE20Vi7Yens6L6uZqqSZiuYNGuxYlomePFg1kXBnyw3e4B9wwiBucg8TTKHDklgjJyV9ZO6impMt2/ewYDmMyF//hMK5fQ45Ow5GYCSf7l99JsMhW7Kt1o9dp2xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRrtANEJ; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mFbEdoaC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRrtANEJ"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52ea5dc3c79so3795314e87.1
+        for <linux-cifs@vger.kernel.org>; Fri, 12 Jul 2024 22:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1720840941; x=1752376941;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HFQVoU++qjoMPpjt/cUGGmwpKXJ4P+TR3Qf9WgP35GU=;
-  b=mFbEdoaCTL2Dux5ka9yeOTApCp0oMWv4ITXfAgcQeWCgsEN7X/CVqd1g
-   9OO3uZmrEQMX03gd5wCCO3vrI4/xvxphz8RSdANaLxP9Kn7AXiLu2wQCR
-   swqLcK21fv2wplmv5hjytWRSrj35nN1iLe0TRb0osTkSo0QoQwWBeWOCn
-   A=;
-X-IronPort-AV: E=Sophos;i="6.09,204,1716249600"; 
-   d="scan'208";a="419984667"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2024 03:22:19 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:49511]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.20.30:2525] with esmtp (Farcaster)
- id e4354d46-f591-41c7-a032-eb8684858776; Sat, 13 Jul 2024 03:22:17 +0000 (UTC)
-X-Farcaster-Flow-ID: e4354d46-f591-41c7-a032-eb8684858776
-Received: from EX19D026EUB004.ant.amazon.com (10.252.61.64) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sat, 13 Jul 2024 03:22:17 +0000
-Received: from 3c06303d853a.ant.amazon.com (10.187.170.15) by
- EX19D026EUB004.ant.amazon.com (10.252.61.64) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sat, 13 Jul 2024 03:22:14 +0000
-Date: Fri, 12 Jul 2024 20:22:09 -0700
-From: Andrew Paniakin <apanyaki@amazon.com>
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-CC: Christian Heusel <christian@heusel.eu>, <pc@cjr.nz>,
-	<stfrench@microsoft.com>, <sashal@kernel.org>, <pc@manguebit.com>,
-	<stable@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-	<abuehaze@amazon.com>, <simbarb@amazon.com>, <benh@amazon.com>,
-	<gregkh@linuxfoundation.org>
-Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
- stable/linux-6.1.y breaks cifs client failover to another server in DFS
- namespace
-Message-ID: <ZpHy4V6P-pawTG2f@3c06303d853a.ant.amazon.com>
-References: <ZnMkNzmitQdP9OIC@3c06303d853a.ant.amazon.com>
- <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
- <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
- <ZnyRlEUqgZ_m_pu-@3c06303d853a>
- <a58625e7-8245-4963-b589-ad69621cb48a@heusel.eu>
- <7c8d1ec1-7913-45ff-b7e2-ea58d2f04857@leemhuis.info>
+        d=gmail.com; s=20230601; t=1720849738; x=1721454538; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VAFb9ygn4t+yhC5XAo+LnDHiYZOFZtBcIf6QNmQl3X8=;
+        b=JRrtANEJ2VjiON4GIcfRjibVDw0q5xbk6LPEMIzyiWajnRC48BRWjgVVl8h5Z3dKhr
+         Uq5IDSanzkh80oeAjtlUNl234dgx4ObQ4NUTRIcxoeoksqZALjgSMxxzm+HgKvTVzz49
+         w+xiDoEDfv2F9fRV6cStLvOSUKgHeWoD7ZuvScDmq1nTcKYZaGp6HtNOQQWiv8L7M0U0
+         eBW/9c9zmlFI+kY2zRsv7gp4pIYQUdaowj26bfi04ltWkiEBqk1ypVFHgLSVYR1kwpki
+         mp+6PV3TQoYP6vQ2aTmVbu2BdyvY6QuzVaYO3IOlrB3Th0SasuE1P1Q0WQQwNuYdU/vg
+         g5SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720849738; x=1721454538;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VAFb9ygn4t+yhC5XAo+LnDHiYZOFZtBcIf6QNmQl3X8=;
+        b=KZ2Hb2hanS+Nm7o1dKASgTW+dC3MXrU7CV8WvxZCX6JFE5GJG/9vzc4acX/tSebA/B
+         l3JlOh3wqVQOvSUcJZTaCeB3GUXFWi3usGRA4cJ7FvK/Q//erubjo9h4yb+CJdcaHpAt
+         Z0bmU+tFNRJos0wF3svyk0npepL6wRSZdKzqTJd6rUhLf+wRgYx+Ei9MifBU8bjkLHZq
+         4sYvQdJRJEPt1k7CgkE/UKhBstoA+9NfHzl18sNo+A0Z5R2HSWBCK3nwRoAd2Gp1jr3A
+         xj1jMvaitWAGdM2aCKapmMwAuKFE7Day77HufTvFl3SKoIiIIDuSKWght8eLubvLBt69
+         my3w==
+X-Gm-Message-State: AOJu0YyCuQFv6s2/DaH8S7xq2cz9difY9PdgO3gN3vLi5Wz3wHBBTZ3f
+	jjn6Cy+8q8iJBXcn1z85KeBTQz+qjyo0X9DyYMYakBameNprldE0z9u//dOy3t7M7AGFZrFeNAX
+	yJjH5hOb6VgxvXsZSm2mzx4qBxV4dZQ==
+X-Google-Smtp-Source: AGHT+IGBPFr/6JyyTqHENo/wKQE8Wd2NIWuGjAtCa1AB6CUK42Kq+bHuYgl61IcxzABXofjzfSPIcas3Ohmsn2MD/z0=
+X-Received: by 2002:a05:6512:3088:b0:52e:987f:cfc6 with SMTP id
+ 2adb3069b0e04-52eb99d33f6mr9567162e87.51.1720849738012; Fri, 12 Jul 2024
+ 22:48:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <7c8d1ec1-7913-45ff-b7e2-ea58d2f04857@leemhuis.info>
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D026EUB004.ant.amazon.com (10.252.61.64)
+References: <CAH2r5mv2V3vdupgmR75WsNGrfdbaPo0Mw+6x82KK9vgUYu5AkQ@mail.gmail.com>
+ <CAH2r5msriif9aOTVa57n2PnEjUHYgpimuz7vTG8deS=KOZt3hw@mail.gmail.com>
+In-Reply-To: <CAH2r5msriif9aOTVa57n2PnEjUHYgpimuz7vTG8deS=KOZt3hw@mail.gmail.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Sat, 13 Jul 2024 11:18:47 +0530
+Message-ID: <CANT5p=orFiPMujTrXE2_8kvxgV9fYU+QkXOSzg4eynDJY_Kr6g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix setting SecurityFlags to true
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/07/2024, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 27.06.24 22:16, Christian Heusel wrote:
-> > On 24/06/26 03:09PM, Andrew Paniakin wrote:
-> >> On 25/06/2024, Christian Heusel wrote:
-> >>> On 24/06/24 10:59AM, Andrew Paniakin wrote:
-> >>>> On 19/06/2024, Andrew Paniakin wrote:
-> >>>>> Commit 60e3318e3e900 ("cifs: use fs_context for automounts") was
-
-[snip]
-
-> Hmmm, unless I'm missing something it seems nobody did so. Andrew, could
-> you take care of that to get this properly fixed to prevent others from
-> running into the same problem?
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+On Thu, Jul 11, 2024 at 9:12=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> V2 of patch
+>
+>     If you try to set /proc/fs/cifs/SecurityFlags to 1 it
+>     will set them to CIFSSEC_MUST_NTLMV2 which no longer is
+>     relevant (the less secure ones like lanman have been removed
+>     from cifs.ko) and is also missing some flags (like for
+>     signing and encryption) and can even cause mount to fail,
+>     so change this to set it to Kerberos in this case.
+>
+>     Also change the description of the SecurityFlags to remove mention
+>     of flags which are no longer supported.
+>
+> On Tue, Jul 9, 2024 at 6:45=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+> >
+> > If you try to set /proc/fs/cifs/SecurityFlags to 1 it
+> > will set them to CIFSSEC_MUST_NTLMV2 which is obsolete and no
+> > longer checked, and will cause mount to fail, so change this
+> > to set it to a more understandable default (ie include Kerberos
+> > as well).
+> >
+> > Also change the description of the SecurityFlags to remove mention
+> > of various flags which are no longer supported (due to removal
+> > of weak security such as lanman and ntlmv1).
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
 > --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
-> 
-> #regzbot poke
+> Thanks,
+>
+> Steve
 
-We got the confirmation from requesters that the kernel with this patch
-works properly, our regression tests also passed, so I submitted
-backport request:
-https://lore.kernel.org/stable/20240713031147.20332-1-apanyaki@amazon.com/
+Looks good to me.
+
+--=20
+Regards,
+Shyam
