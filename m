@@ -1,151 +1,93 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC51E14006;
-	Sat, 13 Jul 2024 09:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689F91B28D;
+	Sat, 13 Jul 2024 18:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720863232; cv=none; b=k36fOj9du/nGFTDmnh9JjGgyKHUFOJ824XYvODiA7YbRtHikj70r1lscCGp5DSVOyAf40//umRdtm+XR+IymZP7B0VlcmBc7InIcd5QLANqMSxQ5HfKXvax6C79Kun7oOfnNGNsK/DOjbaxc8fyDcXu1D4iOFpUJpjfxM3ChswU=
+	t=1720896835; cv=none; b=MyvamXqvgGM7A6HHIAPaRTv8OqIH7LY5bGSuqIlG5NN41Pu6l9S68kaYQmchOnDrep319jLwOlEUeMxEh5QvhOwqE6y5J1tXxJmjyrdS0V4PpOW7dFNdqSxiJ22doqiQ8u8PqPuWrIYyR/XHz4A/6gVBoOdZvQYutk7CetvYuFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720863232; c=relaxed/simple;
-	bh=qP+ZWRJw9XdA41KriPewH6eyrYWfvyN3N5xFr5B/tRk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mMNmjc2Vhvz4aD6P8WwukqcItSyZT5VuuhNyh9KhabmkRFwy6xLFhFWo0tdxJZE2NeoLYVBX5I4W+WjpSCBBJe4vkXWGN7A0/BiDfI53Iiu7zYqzIvgDmUvnCRZNXlF0PhlDoxmCqFJtYvqBwGqg+Ec3c/9MYby0ka76IrkGH5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WLjvL2M1hz4f3jcr;
-	Sat, 13 Jul 2024 17:33:34 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 1E1731A0181;
-	Sat, 13 Jul 2024 17:33:46 +0800 (CST)
-Received: from [10.174.179.155] (unknown [10.174.179.155])
-	by APP4 (Coremail) with SMTP id gCh0CgCHazn3SZJmNY0DAA--.2101S3;
-	Sat, 13 Jul 2024 17:33:45 +0800 (CST)
-Message-ID: <afa05166-6def-d3ac-dd22-8b605f5e37d7@huaweicloud.com>
-Date: Sat, 13 Jul 2024 17:33:43 +0800
+	s=arc-20240116; t=1720896835; c=relaxed/simple;
+	bh=MAPCIDnAKoJj9Enx86W8lMyAqDzAwS4mVRe4booRC9I=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=bU4uIY+S18XVovvOA1R9WPUrBAvLlTJioto08wkgnt6FIArRuvF4BDNORcO5QNstHddI+txxd60xn6Gucr8i14hcRoXbBq+4lnyCOO0Siy4eamF/PFHETim/isH6qb7HK4L7OrPSqwL35CW5Tf4ok0gFCvjz8u2Q61S/2OZNA5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IR6JIHOy; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IR6JIHOy"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eea7e2b073so38395871fa.0;
+        Sat, 13 Jul 2024 11:53:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720896831; x=1721501631; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=07kIRSYZhfnTUHZwcptPPbWdw4UOJ51SFHtoh3GmK78=;
+        b=IR6JIHOye6qzQr9dNfxPuRcvxuG6+rNJFcKSTUyd4dkSxCYne0xrf9LegGL8vhp2KO
+         W9lUbF4Mls/p5Rjc4Fgvx1hl6YzZdSJ6WVfBS6Wy+X5UJ5b6Ui1QKoBZVwCsNR4ljJqE
+         Nq/R8EG0jNwfmuDwC1foNQSMSJzvG0QqysVirGudof27qOXwWtYGdDRDx3UEJSyHRsz6
+         BpNI9qeyIt1XOH/wCBqOiHCe6wSRCtZb4vCZqQTVf9TdVmOASdzS69SeRD/VG5+uKEwH
+         RKhLZJnBdu+URByUtyrw4PYiCpDZspMkyzcrbzXXfSR+Xe/ioe097DGLDQnHc7CMNSfe
+         U/KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720896831; x=1721501631;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=07kIRSYZhfnTUHZwcptPPbWdw4UOJ51SFHtoh3GmK78=;
+        b=amoCvNnhVO8dSjNP9vxUGIJbLLTJ5jxOXGxIvDX1ElioUkhZQVnmPzZsnSaMI9JstJ
+         yUCbsMj+Zn2V1P0ZXIa9j5x4R1x4q/5lUEpWc+5zVBFwnRK6RFFHvY4WsaGzVTLNehSf
+         Y7SLu8a3ly8Ad3abvjaAw7yaNfd56LoN1DOtjbsG/MMYszmk1rU4N8qKXRTyupZzd3Jb
+         QWSMDy1n9Pnjg0ZeU4+omv3ZbRNNZ1j/JOFF1jfgD5UqmUTPO4pGFHqmwGaVCjhq4wDK
+         Cvx71C2LyenpFOGidTWooF1eSxVHx3KU5Ejra5BSRAnIUg+LBYrdQjnyRnY8E69pF5MN
+         C2mA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgLyx/BXmn7TZ7cUoG8+ewb/cBNCa8PvCkNQGypufBdCrU1uzc6ZluNd+N4Ble0asTbSdKGX1ZoKVqS3AHyvCboknehUI5F8kB3l8Z
+X-Gm-Message-State: AOJu0YzXybrMwoqmAqzOliAX03hHXy25M/gPPDLw/WXlzZvC8gMC1kSV
+	SFIkDcylsoxaLONb8oNFZS+Rs72XYPNi8apCySvV+Clel9uVSPtRQQr8pn14Gp2wFaaPSCnWy0Z
+	NldtheBVur+0ccbmFZtdfAMAp79oG9xLa
+X-Google-Smtp-Source: AGHT+IES26FJ1dV1mqfoCzLnto8Eq5AyIBOYoQHoRVtKr3dxxelL+vHYUJWE2k8Y1nK4IBUqFk2q2t04GwqnRn6my0I=
+X-Received: by 2002:a2e:9d06:0:b0:2ec:5469:9d57 with SMTP id
+ 38308e7fff4ca-2eeb318275cmr92636421fa.41.1720896831089; Sat, 13 Jul 2024
+ 11:53:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH RFC 2/2] NFSv4: set sb_flags to second superblock
-To: dhowells@redhat.com, marc.dionne@auristor.com, raven@themaw.net,
- gregkh@linuxfoundation.org, rafael@kernel.org, viro@zeniv.linux.org.uk,
- brauner@kernel.org, jack@suse.cz, miklos@szeredi.hu,
- trond.myklebust@hammerspace.com, anna@kernel.org, sfrench@samba.org,
- pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, djwong@kernel.org
-Cc: linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
- autofs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, yi.zhang@huawei.com, yangerkun@huawei.com,
- zhangxiaoxu5@huawei.com, lilingfeng3@huawei.com
-References: <20240604112636.236517-1-lilingfeng@huaweicloud.com>
- <20240604112636.236517-3-lilingfeng@huaweicloud.com>
- <ca71d3c4-0b87-8a1e-a442-236d91674a87@huaweicloud.com>
-From: Li Lingfeng <lilingfeng@huaweicloud.com>
-In-Reply-To: <ca71d3c4-0b87-8a1e-a442-236d91674a87@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCHazn3SZJmNY0DAA--.2101S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw1xuFW5JF15Cr1fKr4kWFg_yoW5KF13pF
-	WxAFyjkrWkJF18Wa10yFZ5Xa4Sv348Za1UJFn3Zas7ZrWUXrn2q3W2grWYgFy8Zr4xur1U
-	XF48tF13uF13AFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9vb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6x
-	kF7I0E14v26r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
-	5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
-	CFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCYjI0S
-	jxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s
-	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU04xRDUUUUU==
-X-CM-SenderInfo: polox0xjih0w46kxt4xhlfz01xgou0bp/
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 13 Jul 2024 13:53:39 -0500
+Message-ID: <CAH2r5ms7Q3p_-wPDttT+XCX9a8GvDmC5EdbV_SguK_iriWE_qA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Friendly ping ...
+Please pull the following changes since commit
+34afb82a3c67f869267a26f593b6f8fc6bf35905:
 
-Thanks
+  Merge tag '6.10-rc6-smb3-server-fixes' of git://git.samba.org/ksmbd
+(2024-07-09 08:16:18 -0700)
 
-在 2024/6/14 11:14, Li Lingfeng 写道:
-> I think this may be a problem, but I'm unable to come up with a 
-> suitable solution. Would you mind providing some suggestions?
->
-> 在 2024/6/4 19:26, Li Lingfeng 写道:
->> From: Li Lingfeng <lilingfeng3@huawei.com>
->>
->> During the process of mounting an NFSv4 client, two superblocks will be
->> created in sequence. The first superblock corresponds to the root
->> directory exported by the server, and the second superblock 
->> corresponds to
->> the directory that will be actually mounted. The first superblock will
->> eventually be destroyed.
->> The flag passed from user mode will only be passed to the first
->> superblock, resulting in the actual used superblock not carrying the 
->> flag
->> passed from user mode(fs_context_for_submount() will set sb_flags as 0).
->>
->> If the 'ro' parameter is used in two consecutive mount commands, only 
->> the
->> first execution will create a new vfsmount, and the kernel will return
->> EBUSY on the second execution. However, if a remount command with the 
->> 'ro'
->> parameter is executed between the two mount commands, both mount 
->> commands
->> will create new vfsmounts.
->>
->> The superblock generated after the first mount command does not have the
->> 'ro' flag, and the read-only status of the file system is implemented by
->> checking the read-only flag of the vfsmount. After executing the remount
->> command, the 'ro' flag will be added to the superblock. When the second
->> mount command is executed, the comparison result between the superblock
->> with the 'ro' flag and the fs_context without the flag in the
->> nfs_compare_mount_options() function will be different, resulting in the
->> creation of a new vfsmount.
->>
->> This problem can be reproduced by performing the following operations:
->> mount -t nfs -o ro,vers=4.0 192.168.240.250:/sdb /mnt/sdb
->> mount -t nfs -o remount,ro,vers=4.0 192.168.240.250:/sdb /mnt/sdb
->> mount -t nfs -o ro,vers=4.0 192.168.240.250:/sdb /mnt/sdb
->> Two vfsmounts are generated:
->> [root@localhost ~]# mount | grep nfs
->> 192.168.240.250:/sdb on /mnt/sdb type nfs4 (ro,relatime,vers=4.0,
->> rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2, 
->>
->> sec=sys,clientaddr=192.168.240.251,local_lock=none,addr=192.168.240.250)
->> 192.168.240.250:/sdb on /mnt/sdb type nfs4 (ro,relatime,vers=4.0,
->> rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=600,retrans=2, 
->>
->> sec=sys,clientaddr=192.168.240.251,local_lock=none,addr=192.168.240.250)
->>
->> Fix this by setting sb_flags to second superblock.
->>
->> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
->> ---
->>   fs/nfs/namespace.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/nfs/namespace.c b/fs/nfs/namespace.c
->> index 887aeacedebd..8b3d75af60d4 100644
->> --- a/fs/nfs/namespace.c
->> +++ b/fs/nfs/namespace.c
->> @@ -158,7 +158,7 @@ struct vfsmount *nfs_d_automount(struct path 
->> *path, unsigned int sb_flags)
->>       /* Open a new filesystem context, transferring parameters from the
->>        * parent superblock, including the network namespace.
->>        */
->> -    fc = fs_context_for_submount(path->mnt->mnt_sb->s_type, 
->> path->dentry, 0);
->> +    fc = fs_context_for_submount(path->mnt->mnt_sb->s_type, 
->> path->dentry, sb_flags);
->>       if (IS_ERR(fc))
->>           return ERR_CAST(fc);
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.10-rc7-smb3-client-fix
+
+for you to fetch changes up to d2346e2836318a227057ed41061114cbebee5d2a:
+
+  cifs: fix setting SecurityFlags to true (2024-07-13 09:24:27 -0500)
+
+----------------------------------------------------------------
+small cifs SecurityFlags fix, also for stable
+
+----------------------------------------------------------------
+Steve French (1):
+      cifs: fix setting SecurityFlags to true
+
+ Documentation/admin-guide/cifs/usage.rst | 36
++++++++++++-------------------------
+ fs/smb/client/cifsglob.h                 |  4 ++--
+ 2 files changed, 13 insertions(+), 27 deletions(-)
+
+-- 
+Thanks,
+
+Steve
