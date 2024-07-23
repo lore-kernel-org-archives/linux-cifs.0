@@ -1,124 +1,230 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51E8155351
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 18:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38B213D503
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 21:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721758922; cv=none; b=lHD2SM72GeDC9eEBbG4jFvzdKfA06lVF3h0Ce0WsjsswuPH65vA+fBPJ+8rfJiaZix+LvUnMjRJgaQbBhttS33UCfXH1U2zvAgsc/WiSHwODcOOBIRj7ioZ8hsFJ/bpIPERGCzDkUjEXB97YToDO+VlJnOSq7KNVNQgEPjNnUOQ=
+	t=1721770316; cv=none; b=Buoy/qaGkLkJELMJU5h/nyex/rPqp+HG1159AD/AM1+F5T5qpcNCEwlnClnLltfAHvANO0yGIBSYqcjvrxyg/ycPFgG2IMdaEWPaaBo3FJO6NwlNAWWSW6g4dNbuEQsS0RWY2NjwOcJIyYCMq++L0xLyvD6QDk2hWFE6/cuZMjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721758922; c=relaxed/simple;
-	bh=W7Ocuv5f9u6PWSR+f1swXfGThreB6aVEOmQ6vGDpg+c=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=sJavuYu3zugVnjSEO8UGu6dvTUCPTX8iKuB0DzGQqzpwHmdEjCVZ7AXfwwB9SkjcJsQQTwOMqfT8fEmm3UNQetX9n3TGMJVLNVqneQ91QSZdl1dsyNjh9QxIclCtzn/nTTMNf1I4m8VcLUUvQR+GCcFpFj/kowhxM/6Ppzkuo2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JsaCZN/F; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721770316; c=relaxed/simple;
+	bh=1u7oyjvLqoXnpGnM2m1Ehn3fmSRIIBJftp2xw3xMKtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=cXsEyfnLORrocZr92K2D3eV0HswBNAOQqL13J2OEmUqq6ozdGhGIHfM6CFnzkxeJO6UjEEr0MCWybHtpsz2Czk67oaJS6XAgrsa9v9uAo1wQvFwhZ+nUI/SS9RkvubvU4azDh28bSFwxSLDsWYrhDuDRKYHfPAvTt5l/SRMxdDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jiRzXMuK; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsaCZN/F"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52efba36802so4220621e87.2
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 11:22:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721758919; x=1722363719; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1XDoX4Al4RHvx68f0zteTAdo2hXftFjzCiJ1b8jFKKs=;
-        b=JsaCZN/Fv43uSfBPFBacBWEd3Cfc5yZhRjPbeeRQq27lmwuAo7AdntPemQxJlaLao2
-         WJhzaehWbOkvul4lLnpVe/03ncUnjSk5eeVd1XddufnlSq32xydwHcPqnGdJpkH8lg30
-         Rm2k3pqtavAQFvaFTYTGD0mwJI8EIA5bdZms69NbkiisjWN1er/VxzUu8jPAEuExp2z5
-         tJ4/2nnz5xHQN8RBSkhfQa+Ylv1Xe90HTCHKq6V8gYn20XPhezykeTx4axOMzMcBX3Vj
-         OiItEcLp4Dv8RnPpjU1e/2dyi6VCt8ygLYlKsCpjaRyuLKb3E3r2A693YUV+p7u3EkUS
-         RRVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721758919; x=1722363719;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1XDoX4Al4RHvx68f0zteTAdo2hXftFjzCiJ1b8jFKKs=;
-        b=g4AunapD6zimr+mYvtx42Wzm673B+mllY1bfwR8ztGp3wi94R6582faABANTywHk7D
-         o+uqC24Ez//JIHHAC/wd5F+2bKXCVqp/DzMn5tzs2xlo457XT4oB9JJeo5UsH17k3K3/
-         yNXLylSPtgnT1dPtGq8fmLQuhs0ufESIa/zPPIrWSvz28/sjbnZhidBxQeUZEqhgzXWE
-         8FuRP6B3HUPaxwiVMAHgUNbD6J6R4rZHhr7AUp2YEb/RkRJB49EtpLhkgRp1VLpqFAnQ
-         Q526Sky/tjBLAgmrl0s3dtFTNC65k7Ve+rNpnGggv8Nsj/jgc/Ab3x0sdy3Ifc7xWq51
-         4CqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXsWhs63gYp/uXZJRhLHERH7Foswk2kd+wzhdh6ark1uczByy5jvKqRhyU1ds2+2qic8hpflKjkUfbZXm/nX4Jp9tHjDC9x/xoTgQ==
-X-Gm-Message-State: AOJu0Yx8XUroaTVa560SSNiwtWvB3oXksBo6PRakno/BZGM4DBeutsTy
-	cxz3PJlEuB3tWTIIP89SKBeFz1RF1A2maY0bwLPG+aMMn5FaigctjP343Ag7WAIQWS8Ym+NKqtt
-	hXZbX4YtZmFkWLRNGfr4TeDxBSao=
-X-Google-Smtp-Source: AGHT+IE//9pP+xUM5Z92LifXTaCHkgutPFZPFbJlPTZPd0lSuB9uG7JM6RyKFz4IyOl1s5Jcmp1CndwtZKmh0qsjyEw=
-X-Received: by 2002:a05:6512:b21:b0:52e:a60e:3a04 with SMTP id
- 2adb3069b0e04-52efb85af78mr6876338e87.59.1721758918723; Tue, 23 Jul 2024
- 11:21:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jiRzXMuK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721770315; x=1753306315;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=1u7oyjvLqoXnpGnM2m1Ehn3fmSRIIBJftp2xw3xMKtI=;
+  b=jiRzXMuKxPUcRvuczoc5Dm+7dyZQ1r7nVqLCXR6Ourq4u3AKJjMIJgXg
+   Tx5vE5SLpNZk+opE5IhYtHe8mIAW5f9RjwJZPQSaF6E3r+/E3HSZ0FOJw
+   ukZXZCGC7K100NtWLfPgAGiq3K/eJ7qRSU6CeOSP2JqkjkdhDw+7gAEj1
+   6xs5Ig84pOyIuyS5hftv3Kt5Bj/mzs8LnkGHJyvDWYVjdhSP6OfY+GJXr
+   n67zEdXUQebncmtgM/sXVXFpXIQuNdO8qMbVHBQPE+CnzAx4FSUk3Mds8
+   VxmQNYf5LycddYk2LEMhuUKKWVECNansjtzviww/FU9pWLv5GKy0xCUiS
+   w==;
+X-CSE-ConnectionGUID: WoHhSc6UR5m9qo2vOo5cvw==
+X-CSE-MsgGUID: bDwMDEyQRva+ttHGFzSb2A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="19034984"
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="19034984"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 14:31:54 -0700
+X-CSE-ConnectionGUID: 1cERApckT7K2c3FB77+a5Q==
+X-CSE-MsgGUID: nL7iex5iRiqRf9eXhcVRUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="57191758"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 23 Jul 2024 14:31:53 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sWN6s-000mN2-1T;
+	Tue, 23 Jul 2024 21:31:50 +0000
+Date: Wed, 24 Jul 2024 05:31:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Steve French <stfrench@microsoft.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [cifs:for-next 2/3] fs/smb/client/connect.c:3822:undefined reference
+ to `reset_cifs_unix_caps'
+Message-ID: <202407240524.z6cV5wBx-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 23 Jul 2024 13:21:45 -0500
-Message-ID: <CAH2r5mvBCuc2tnbLeJnw5zEqqQJ_Qe9eiNiLxHg6eXeAi0n7FA@mail.gmail.com>
-Subject: [PATCH v2][CIFS] mount with "unix" mount option for SMB1 incorrectly handled
-To: samba-technical <samba-technical@lists.samba.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>
-Content-Type: multipart/mixed; boundary="000000000000bd8df9061dee3c22"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---000000000000bd8df9061dee3c22
-Content-Type: text/plain; charset="UTF-8"
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   dde12e91303b6d38322ed69801ce3129aba82ad5
+commit: 2a9b3eb1b0838cc99aafdc50e37138538d4593bb [2/3] cifs: fix reconnect with SMB1 UNIX Extensions
+config: x86_64-randconfig-072-20240723 (https://download.01.org/0day-ci/archive/20240724/202407240524.z6cV5wBx-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240724/202407240524.z6cV5wBx-lkp@intel.com/reproduce)
 
-Lightly updated to include feedback from Paulo and add the reviewed-by
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407240524.z6cV5wBx-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: vmlinux.o: in function `CIFSTCon':
+>> fs/smb/client/connect.c:3822:(.text+0xb9aa7e): undefined reference to `reset_cifs_unix_caps'
 
 
+vim +3822 fs/smb/client/connect.c
+
+  3688	
+  3689	/*
+  3690	 * Issue a TREE_CONNECT request.
+  3691	 */
+  3692	int
+  3693	CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+  3694		 const char *tree, struct cifs_tcon *tcon,
+  3695		 const struct nls_table *nls_codepage)
+  3696	{
+  3697		struct smb_hdr *smb_buffer;
+  3698		struct smb_hdr *smb_buffer_response;
+  3699		TCONX_REQ *pSMB;
+  3700		TCONX_RSP *pSMBr;
+  3701		unsigned char *bcc_ptr;
+  3702		int rc = 0;
+  3703		int length;
+  3704		__u16 bytes_left, count;
+  3705	
+  3706		if (ses == NULL)
+  3707			return -EIO;
+  3708	
+  3709		smb_buffer = cifs_buf_get();
+  3710		if (smb_buffer == NULL)
+  3711			return -ENOMEM;
+  3712	
+  3713		smb_buffer_response = smb_buffer;
+  3714	
+  3715		header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
+  3716				NULL /*no tid */, 4 /*wct */);
+  3717	
+  3718		smb_buffer->Mid = get_next_mid(ses->server);
+  3719		smb_buffer->Uid = ses->Suid;
+  3720		pSMB = (TCONX_REQ *) smb_buffer;
+  3721		pSMBr = (TCONX_RSP *) smb_buffer_response;
+  3722	
+  3723		pSMB->AndXCommand = 0xFF;
+  3724		pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
+  3725		bcc_ptr = &pSMB->Password[0];
+  3726	
+  3727		pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
+  3728		*bcc_ptr = 0; /* password is null byte */
+  3729		bcc_ptr++;              /* skip password */
+  3730		/* already aligned so no need to do it below */
+  3731	
+  3732		if (ses->server->sign)
+  3733			smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+  3734	
+  3735		if (ses->capabilities & CAP_STATUS32)
+  3736			smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
+  3737	
+  3738		if (ses->capabilities & CAP_DFS)
+  3739			smb_buffer->Flags2 |= SMBFLG2_DFS;
+  3740	
+  3741		if (ses->capabilities & CAP_UNICODE) {
+  3742			smb_buffer->Flags2 |= SMBFLG2_UNICODE;
+  3743			length =
+  3744			    cifs_strtoUTF16((__le16 *) bcc_ptr, tree,
+  3745				6 /* max utf8 char length in bytes */ *
+  3746				(/* server len*/ + 256 /* share len */), nls_codepage);
+  3747			bcc_ptr += 2 * length;	/* convert num 16 bit words to bytes */
+  3748			bcc_ptr += 2;	/* skip trailing null */
+  3749		} else {		/* ASCII */
+  3750			strcpy(bcc_ptr, tree);
+  3751			bcc_ptr += strlen(tree) + 1;
+  3752		}
+  3753		strcpy(bcc_ptr, "?????");
+  3754		bcc_ptr += strlen("?????");
+  3755		bcc_ptr += 1;
+  3756		count = bcc_ptr - &pSMB->Password[0];
+  3757		be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
+  3758		pSMB->ByteCount = cpu_to_le16(count);
+  3759	
+  3760		rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
+  3761				 0);
+  3762	
+  3763		/* above now done in SendReceive */
+  3764		if (rc == 0) {
+  3765			bool is_unicode;
+  3766	
+  3767			tcon->tid = smb_buffer_response->Tid;
+  3768			bcc_ptr = pByteArea(smb_buffer_response);
+  3769			bytes_left = get_bcc(smb_buffer_response);
+  3770			length = strnlen(bcc_ptr, bytes_left - 2);
+  3771			if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
+  3772				is_unicode = true;
+  3773			else
+  3774				is_unicode = false;
+  3775	
+  3776	
+  3777			/* skip service field (NB: this field is always ASCII) */
+  3778			if (length == 3) {
+  3779				if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
+  3780				    (bcc_ptr[2] == 'C')) {
+  3781					cifs_dbg(FYI, "IPC connection\n");
+  3782					tcon->ipc = true;
+  3783					tcon->pipe = true;
+  3784				}
+  3785			} else if (length == 2) {
+  3786				if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
+  3787					/* the most common case */
+  3788					cifs_dbg(FYI, "disk share connection\n");
+  3789				}
+  3790			}
+  3791			bcc_ptr += length + 1;
+  3792			bytes_left -= (length + 1);
+  3793			strscpy(tcon->tree_name, tree, sizeof(tcon->tree_name));
+  3794	
+  3795			/* mostly informational -- no need to fail on error here */
+  3796			kfree(tcon->nativeFileSystem);
+  3797			tcon->nativeFileSystem = cifs_strndup_from_utf16(bcc_ptr,
+  3798							      bytes_left, is_unicode,
+  3799							      nls_codepage);
+  3800	
+  3801			cifs_dbg(FYI, "nativeFileSystem=%s\n", tcon->nativeFileSystem);
+  3802	
+  3803			if ((smb_buffer_response->WordCount == 3) ||
+  3804				 (smb_buffer_response->WordCount == 7))
+  3805				/* field is in same location */
+  3806				tcon->Flags = le16_to_cpu(pSMBr->OptionalSupport);
+  3807			else
+  3808				tcon->Flags = 0;
+  3809			cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
+  3810	
+  3811			/*
+  3812			 * reset_cifs_unix_caps calls QFSInfo which requires
+  3813			 * need_reconnect to be false, but we would not need to call
+  3814			 * reset_caps if this were not a reconnect case so must check
+  3815			 * need_reconnect flag here.  The caller will also clear
+  3816			 * need_reconnect when tcon was successful but needed to be
+  3817			 * cleared earlier in the case of unix extensions reconnect
+  3818			 */
+  3819			if (tcon->need_reconnect && tcon->unix_ext) {
+  3820				cifs_dbg(FYI, "resetting caps for %s\n", tcon->tree_name);
+  3821				tcon->need_reconnect = false;
+> 3822				reset_cifs_unix_caps(xid, tcon, NULL, NULL);
+  3823			}
+  3824		}
+  3825		cifs_buf_release(smb_buffer);
+  3826		return rc;
+  3827	}
+  3828	
 
 -- 
-Thanks,
-
-Steve
-
---000000000000bd8df9061dee3c22
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-mount-with-unix-mount-option-for-SMB1-incorrect.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-mount-with-unix-mount-option-for-SMB1-incorrect.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lyyqsmqx0>
-X-Attachment-Id: f_lyyqsmqx0
-
-RnJvbSAzNmEzYWQyNTI4NzM1YzQwMDdhZGU4NTIwYjY1MTQzYjU3NDAwODEyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjMgSnVsIDIwMjQgMDA6NDQ6NDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBtb3VudCB3aXRoICJ1bml4IiBtb3VudCBvcHRpb24gZm9yIFNNQjEgaW5jb3JyZWN0bHkK
-IGhhbmRsZWQKCkFsdGhvdWdoIGJ5IGRlZmF1bHQgd2UgbmVnb3RpYXRlIENJRlMgVW5peCBFeHRl
-bnNpb25zIGZvciBTTUIxIG1vdW50cyB0bwpTYW1iYSAoYW5kIHRoZXkgd29yayBpZiB0aGUgdXNl
-ciBkb2VzIG5vdCBzcGVjaWZ5ICJ1bml4IiBvciAicG9zaXgiIG9yCiJsaW51eCIgb24gbW91bnQp
-LCBhbmQgd2UgZG8gcHJvcGVybHkgaGFuZGxlIHdoZW4gYSB1c2VyIHR1cm5zIHRoZW0gb2ZmCndp
-dGggIm5vdW5peCIgbW91bnQgcGFybS4gIEJ1dCB3aXRoIHRoZSBjaGFuZ2VzIHRvIHRoZSBtb3Vu
-dCBBUEkgd2UKYnJva2UgY2FzZXMgd2hlcmUgdGhlIHVzZXIgZXhwbGljaXRseSBzcGVjaWZpZXMg
-dGhlICJ1bml4IiBvcHRpb24gKG9yCmVxdWl2YWxlbnRseSAibGludXgiIG9yICJwb3NpeCIpIG9u
-IG1vdW50IHdpdGggdmVycz0xLjAgdG8gU2FtYmEgb3Igb3RoZXIKc2VydmVycyB3aGljaCBzdXBw
-b3J0IHRoZSBDSUZTIFVuaXggRXh0ZW5zaW9ucy4KCiAibW91bnQgZXJyb3IoOTUpOiBPcGVyYXRp
-b24gbm90IHN1cHBvcnRlZCIKCmFuZCBsb2dnZWQ6CgogIkNJRlM6IFZGUzogQ2hlY2sgdmVycz0g
-bW91bnQgb3B0aW9uLiBTTUIzLjExIGRpc2FibGVkIGJ1dCByZXF1aXJlZCBmb3IgUE9TSVggZXh0
-ZW5zaW9ucyIKCmV2ZW4gdGhvdWdoIENJRlMgVW5peCBFeHRlbnNpb25zIGFyZSBzdXBwb3J0ZWQg
-Zm9yIHZlcnM9MS4wICBUaGlzIHBhdGNoIGZpeGVzCnRoZSBjYXNlIHdoZXJlIHRoZSB1c2VyIHNw
-ZWNpZmllcyBib3RoICJ1bml4IiAob3IgZXF1aXZhbGVudGx5ICJwb3NpeCIgb3IKImxpbnV4Iikg
-YW5kICJ2ZXJzPTEuMCIgb24gbW91bnQgdG8gYSBzZXJ2ZXIgd2hpY2ggc3VwcG9ydHMgdGhlCkNJ
-RlMgVW5peCBFeHRlbnNpb25zLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKUmV2aWV3ZWQt
-Ynk6IERhdmlkIEhvd2VsbHMgPGRob3dlbGxAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6IFBhdWxv
-IEFsY2FudGFyYSAoUmVkIEhhdCkgPHBjQG1hbmd1ZWJpdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0
-ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xpZW50L2Nv
-bm5lY3QuYyB8IDggKysrKysrKysKIDEgZmlsZSBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKykKCmRp
-ZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2Nvbm5lY3QuYyBiL2ZzL3NtYi9jbGllbnQvY29ubmVj
-dC5jCmluZGV4IGI2NmQ4YjAzYTM4OS4uODAyMjMwMDdiY2U0IDEwMDY0NAotLS0gYS9mcy9zbWIv
-Y2xpZW50L2Nvbm5lY3QuYworKysgYi9mcy9zbWIvY2xpZW50L2Nvbm5lY3QuYwpAQCAtMjYxNCw2
-ICsyNjE0LDE0IEBAIGNpZnNfZ2V0X3Rjb24oc3RydWN0IGNpZnNfc2VzICpzZXMsIHN0cnVjdCBz
-bWIzX2ZzX2NvbnRleHQgKmN0eCkKIAkJCWNpZnNfZGJnKFZGUywgIlNlcnZlciBkb2VzIG5vdCBz
-dXBwb3J0IG1vdW50aW5nIHdpdGggcG9zaXggU01CMy4xMSBleHRlbnNpb25zXG4iKTsKIAkJCXJj
-ID0gLUVPUE5PVFNVUFA7CiAJCQlnb3RvIG91dF9mYWlsOworCQl9IGVsc2UgaWYgKHNlcy0+c2Vy
-dmVyLT52YWxzLT5wcm90b2NvbF9pZCA9PSBTTUIxMF9QUk9UX0lEKQorCQkJaWYgKGNhcF91bml4
-KHNlcykpCisJCQkJY2lmc19kYmcoRllJLCAiVW5peCBFeHRlbnNpb25zIHJlcXVlc3RlZCBvbiBT
-TUIxIG1vdW50XG4iKTsKKwkJCWVsc2UgeworCQkJCWNpZnNfZGJnKFZGUywgIlNNQjEgVW5peCBF
-eHRlbnNpb25zIG5vdCBzdXBwb3J0ZWQgYnkgc2VydmVyOiAlc1xuIiwKKwkJCQkJIHNlcy0+c2Vy
-dmVyLT5ob3N0bmFtZSk7CisJCQkJcmMgPSAtRU9QTk9UU1VQUDsKKwkJCQlnb3RvIG91dF9mYWls
-OwogCQl9IGVsc2UgewogCQkJY2lmc19kYmcoVkZTLAogCQkJCSJDaGVjayB2ZXJzPSBtb3VudCBv
-cHRpb24uIFNNQjMuMTEgZGlzYWJsZWQgYnV0IHJlcXVpcmVkIGZvciBQT1NJWCBleHRlbnNpb25z
-XG4iKTsKLS0gCjIuNDMuMAoK
---000000000000bd8df9061dee3c22--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
