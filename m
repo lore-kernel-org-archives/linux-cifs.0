@@ -1,119 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C1915098E;
-	Tue, 23 Jul 2024 11:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA6B156F5D
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 15:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721735548; cv=none; b=gI2v8UGquXPnaoSFy5unfyp1r7Yo68Te8iGNCNGSVTYlW/VMepaX/G9rNtitHu1VLZH/Z3MNOB52ziv+ireP8pIRuiI42+uDa3W1r+yCQOfuRE0csx8++5Gd+6BqtrMcBIAKk+W/MXwDHtL8B7GJ/h9P9CSK6izOzPraQ95Udbs=
+	t=1721750227; cv=none; b=u9naPwhHDgMSGnBrJKA4NLLZ3I2350usYJNTqLJJDTnNzyISfijgaiHhajRl4KxLEJddR5Q46J8AAhPlKyPeVLRI5oHmtLZBdiMyKnqerqvXNG67jRDSR+ixZaytFdFnQokVzFIXCWabtY1CFq45p2JGGNdLFqnfpW4LShhjX/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721735548; c=relaxed/simple;
-	bh=ZggV/pIb7W5ya1ZlMMtMwfFVM9xCnefWJ/6DE6ScF8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qtUdVTTg5MWmO1X3YvlPDNkJvoldVWBTvVNQuZGdbTZMBOVbyTFtJ8JGVLjB8lVVhWGzPSFHDX2tSnOCzJ28HPD6oyns5bFc4QE0pIHk8mNxWAOp6klZd8xT6lj1qIrOqk5GGA5KAn+3mZ8H8xGAdmUS8TSD+hGqjS7F18NB0cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XpJ7twKF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721750227; c=relaxed/simple;
+	bh=Zpb2jUNp+6n4ia2m1zlAbhH9by5nT1MbWQ1N+pAbhDU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QM6ULHU+xVrwysbMkT3M192wmed59WzQCDeFxDVPhbkwz2phVNy939+zJcFyiaqgLOLDJyf2klKM4b5wmBmoONTHBsvmV1/O8janjqs8f5tcgVZYp1pkohXazvxp8D873OTyveyEseiPW4xeOkV9hGkW4NkPjj9atoqVGWcT25g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PAaM0P34; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XpJ7twKF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 361F0C4AF09;
-	Tue, 23 Jul 2024 11:52:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721735547;
-	bh=ZggV/pIb7W5ya1ZlMMtMwfFVM9xCnefWJ/6DE6ScF8c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XpJ7twKFlTPy0BZ81mBrWN9rcMl6C8BXPy6aoz8xmv6++XMgSO8ZyhquGo22jG0d7
-	 0Ruhbd7B+AvP4ikRT4oZfezw25/o7DdNxhX2lKQFOHcVCAIu3ZKectGdQYGANnckXt
-	 jTqTyzdnMu3Yr/6aHBsUcwVBudpm51c1sIFSrYsk=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Steve French <sfrench@samba.org>,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.10 6/9] cifs: Fix setting of zero_point after DIO write
-Date: Tue, 23 Jul 2024 13:52:00 +0200
-Message-ID: <20240723114047.508715979@linuxfoundation.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240723114047.281580960@linuxfoundation.org>
-References: <20240723114047.281580960@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PAaM0P34"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5c690949977so2912942eaf.1
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 08:57:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721750225; x=1722355025; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zayzyEF0HDNfGexwghwsG3+f51G87k4gmb/Z4N6T6t8=;
+        b=PAaM0P34JxxCHKzqLnnTxMuqMFJP6PSf2bbpuSOMBtnGPygwXXgkf1zQHwKEHP65XM
+         Bm9MAedHhM0agmeotpIOc7aOF/HPcBPpvVk9tR8j9wnlx5BOlETjcFs68nuNI+2Y+xv/
+         rwKCLO2FgCeRs5lWJCwrQDeZsD07fmhrF/fjWId8xQRh3hsbHXECmkZNjB4G/qqQ7pT5
+         Wc4cg6H9hLTj+3+Qi6XdbsFq2fiMo+DNwvx+poRImaiBx8nhAQLqQdBGq0WXcnyHbOxD
+         6fbO2yF1nYt6IXA+RUwn8HbbOLe7HmgGgjqR9H4L/+B1lcVYhq+MKBJniCBzbkepecgS
+         09XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721750225; x=1722355025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zayzyEF0HDNfGexwghwsG3+f51G87k4gmb/Z4N6T6t8=;
+        b=xDVKYnH//z1aduhX4dyF4SjcK+YOvBXhRkfkY1ySaffN11FTCmyN97628BnqXk6+JW
+         N1pLYXUcLFoB8cR6n+ErebnAiI9OM0seL4MTB8ZqI8a5uJsATl75YOY+TXbCFFPo44i1
+         V4jhtOV3d+RRlzxS7VRA4a2gzJ0uaSctxyhM2AFk8Oh6GCXmL9XnE2303+wgafg4UPSP
+         f31Ow+AYo8TDNS2D/+Z6OnsTCyXIi9cyJPNoLqu+UBHk53xh5kX5w4d49gSAdzAyvhYo
+         u/0H7MAe8WqSVLFdpC/k99U9WgxJfXox0rpc5EVQUd7ra88GJ0y8H7+NWKyBR5vcIjh8
+         3/+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWRCdCG6lDSuzwkHuNisXBe5OuNTMmpZOy0GwwkgAdb9eq1k/OloQoghIPJhDbRPIChIvrG1Imzws+qConD8xjvrUG0FbaqTsES+Q==
+X-Gm-Message-State: AOJu0YwPZA9NNy2QTJblVymvxoH/0ujcUhm74yrEP0t+otIx0SgXfUEX
+	VCsvPiSZOzJD/gb6AyEZbLDc9A87faVowhDnxROjg7teqfH3P8h30wmUoR97TbNXeCjOP1VTUbg
+	I+sQ=
+X-Google-Smtp-Source: AGHT+IH9pZ1mahlmw1EqLS18v6BTEB/WObDDL2e294AqtcVG0gnOUIS2mo4PT62Ei2FilkkPhpTmCA==
+X-Received: by 2002:a05:6820:20c:b0:5ce:e851:7355 with SMTP id 006d021491bc7-5d58b705b9cmr4186443eaf.1.1721750225385;
+        Tue, 23 Jul 2024 08:57:05 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:eca3:bb93:d28d:1005])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5d55a832207sm1759764eaf.16.2024.07.23.08.57.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 08:57:05 -0700 (PDT)
+Date: Tue, 23 Jul 2024 10:57:01 -0500
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Ritvik Budhiraja <rbudhiraja@microsoft.com>, linux-cifs@vger.kernel.org
+Subject: Re: [bug report] smb3: retrying on failed server close
+Message-ID: <a2ef267e-906f-4944-84ab-1b9f35f8e7ca@suswa.mountain>
+References: <6487f3bc-102c-40a0-96ec-dd97dc00c49c@stanley.mountain>
+ <CAH2r5muSF5S3D683evO4V6=EANqXbeC_HZ+ywPb_12aUDQ53yg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5muSF5S3D683evO4V6=EANqXbeC_HZ+ywPb_12aUDQ53yg@mail.gmail.com>
 
-6.10-stable review patch.  If anyone has any objections, please let me know.
+On Sun, Jul 21, 2024 at 04:00:57PM -0500, Steve French wrote:
+> This should be the simpler way to fix this, which matches the unwind
+> ladder.   I moved the goto label to the
+> correct place so the frees are in the right order and switched the two
+> gotos which were backwards.
+> 
+> Let me know if any objections or additional cleanup you think is important.
+> 
 
-------------------
+Looks good.  Thanks!
 
-From: David Howells <dhowells@redhat.com>
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-commit 61ea6b3a3104fcd66364282391dd2152bc4c129a upstream.
-
-At the moment, at the end of a DIO write, cifs calls netfs_resize_file() to
-adjust the size of the file if it needs it.  This will reduce the
-zero_point (the point above which we assume a read will just return zeros)
-if it's more than the new i_size, but won't increase it.
-
-With DIO writes, however, we definitely want to increase it as we have
-clobbered the local pagecache and then written some data that's not
-available locally.
-
-Fix cifs to make the zero_point above the end of a DIO or unbuffered write.
-
-This fixes corruption seen occasionally with the generic/708 xfs-test.  In
-that case, the read-back of some of the written data is being
-short-circuited and replaced with zeroes.
-
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
-Cc: stable@vger.kernel.org
-Reported-by: Steve French <sfrench@samba.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/file.c |   13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -2364,13 +2364,18 @@ void cifs_write_subrequest_terminated(st
- 				      bool was_async)
- {
- 	struct netfs_io_request *wreq = wdata->rreq;
--	loff_t new_server_eof;
-+	struct netfs_inode *ictx = netfs_inode(wreq->inode);
-+	loff_t wrend;
- 
- 	if (result > 0) {
--		new_server_eof = wdata->subreq.start + wdata->subreq.transferred + result;
-+		wrend = wdata->subreq.start + wdata->subreq.transferred + result;
- 
--		if (new_server_eof > netfs_inode(wreq->inode)->remote_i_size)
--			netfs_resize_file(netfs_inode(wreq->inode), new_server_eof, true);
-+		if (wrend > ictx->zero_point &&
-+		    (wdata->rreq->origin == NETFS_UNBUFFERED_WRITE ||
-+		     wdata->rreq->origin == NETFS_DIO_WRITE))
-+			ictx->zero_point = wrend;
-+		if (wrend > ictx->remote_i_size)
-+			netfs_resize_file(ictx, wrend, true);
- 	}
- 
- 	netfs_write_subrequest_terminated(&wdata->subreq, result, was_async);
-
+regards,
+dan carpenter
 
