@@ -1,52 +1,51 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B464F139CFE
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 05:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402EF13CFB7
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 05:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721711285; cv=none; b=h8RLvwuBnHc+P54CmXVePHoRRLuC7aP0D1h0kR7yMBISufqZnlDWiM2JjqlsBZuxTAg8xCt9aJYnFq2s4GAYO7DzRUVU40/cWLVmVZtkSVOpK29zxvvC3u1o3xlXVqZb80MxdcRePh+yM0y2HR2VkNo/8/gVMVKyW9yuI4Ax4Qk=
+	t=1721714190; cv=none; b=UYHd3OfjzD2tInDVrF37UJMyNZbMbA1wrANU0cz5YQj6qGNY779xxNROjLVutCyOU71XvkSm3F7WpH3gv6hh/Ua033OIIcSuM72oOrU1/o4ue0HNBOuJwsaeNGmdvqrZo4wbxzzJTH9kdFOCLRvZFHkbEcWMGhDGxRvN0AesvaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721711285; c=relaxed/simple;
-	bh=viy8Xk35DCqbKxDZMZslIj10fmEWJTSUP9wlcEt8rXs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=HrETzroX+AzrotjUkkxc+JTyy0y85TWdBKY3Z2TZdTkq5eewg8DAwqEHCcAZM0OfeG5zsiu7SUBswzTNR7ln/BA1eIFJ5CFabcp4JF6voVy3PPFP9I87Z8xdFvjY+uLFyJXVSJMoaBqQ07v+WKq0l2iX3IlvwhOb0Frjxl2/v9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HG7nrWMX; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1721714190; c=relaxed/simple;
+	bh=9nejVXi2mwNz/4TMQc7mgbuRaDUffHG639Vo4ppv6i0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=fCj5SuXotseiCHeF6gbD1DOy6OFwkoodGzPTFaeo6Y+XKe4Ikan3n+0HDT7MzSIx6Vgl/NMK4eKoiAdrQ3kT2+8LU4+W3FTOyX1I2MQVPqRxinRCy2hGspc/60/t+2mRYElTvUAcAADNUMxOPQA89tObfsD2pYms5lY9qUDe5U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gPR9YRFX; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HG7nrWMX"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52f04c29588so2250375e87.3
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Jul 2024 22:08:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPR9YRFX"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52ed741fe46so5849121e87.0
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Jul 2024 22:56:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721711282; x=1722316082; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721714187; x=1722318987; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=PqpSyzfOqfBgpniyCbv/7Z74nENzVCrnnHH4dQbwPEk=;
-        b=HG7nrWMXMlPnWSkuyTRXPJ6yhg8rDpj873PcY1Dpxa76ThccRCy5OQ3B96qnr06Wuu
-         Vfa466CLW51TTCPoVntJvhrNX5uFfuRxXub5hhd8Gq+s57pFqlPxhjtusO8mNtqNgc+e
-         0D7nFzXetksqK39xy7c896llsoXnogXc6+bnzcjK9dIK4+d8u/6VfjFk5iHXo69gcYzu
-         vF9lDevHPhkPc4HaDc0Ik2pQlc3G4SsBtiJAAp5LA8vwe7aAfcguzVp6BPODMI73YyQz
-         cyoCf6W3BTHGLtFsCgE/I4RR0qeY5jdPnzoNBIrNEL+3/bsIDErAWfM5lfQq0/WqA54V
-         5OGw==
+        bh=Eyg85J8K9ihH82p0hRx+2qtj9MLkxnAavrxsh5Wv+NE=;
+        b=gPR9YRFXt9Qx1LkYvPjkhhUOPImSkqe8Hvwb3KGzSawDcHq34eGJP4fJ33jcpuMOzM
+         8+QG91OWIPDdc28CelBx+eBAVYXtLcuZTcY87X205Z6h2rz79rt3REGI6fGWe+fAojgS
+         F8brKl/yL+tb6izEoHI2JtqddghPmpYnfTqAcafXhXbNJUQKXKKonPmIANfvzKPVddul
+         ZDLXNEMJV5m4DFst3jX5vwC75BNnx+COKMsTo3C6M+1tghNDS/95tyruRDk2odjBWLVY
+         0i78TDByMZLxnb6NiH+YVnkO+UYs4Q6kO8jPJ7W3zFcHMqbpXmdwqlrIFMPc/XlIPHqg
+         WljQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721711282; x=1722316082;
+        d=1e100.net; s=20230601; t=1721714187; x=1722318987;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=PqpSyzfOqfBgpniyCbv/7Z74nENzVCrnnHH4dQbwPEk=;
-        b=wzyumtZp85buIAJkJzGIiEueu3x4Njnc98VHesIZ2zVkJF86hAqIFRAsv/LAMbyoEE
-         dGm8nuoCBrvjxNR6d2VohUwOgyJ8qEsZZfhChKvabqbEEbWApwxMSoNCluAa1A1WJaSy
-         imk3ahxMtLMbyb/IXehajKelfefZ3o7WlypJgWVLPnRvp8gOBkUBgtkV6o4aMhWkY6Mf
-         ywp4b/f+tllYDHhySftJVsN9VSX3Yb+u+02OcPnzQh6MSjbbST2S5Xs+kxhuh9nbEpgY
-         weDFhoEjENp5+M98jnRBiOFhbDIwApqrXfxyGHuSJkRDPW3FeJwMpMvjSG1b/wkNiJMM
-         8DnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVieY5poxVlze8rLUbOcsj40/ZZYx1wlGueWz/VIHVr73mso5j3TS/DvGrSy+NlCKJiobN1S1wYS9KvfScCqYHM2zGcTTvnKGWvig==
-X-Gm-Message-State: AOJu0YyceamcYWnduUdQMCec7Q6C2/3euFPp1qyhRswgemj3R2/yr5JO
-	zvuABd+3dxwUrkuTbWzFnhGliljmvQzsxXWkQ0Oo/MK2y7asp+P8f2VO4ugfpEzfCsaFKzSvNpI
-	RucteK35YCicXFHOF1TBEVWBsNO4tY1QJ
-X-Google-Smtp-Source: AGHT+IGFaeQAFoLrUxTqgAbwSwnExwQvEx8ysZRM+N6jejJsr3AfjoUEc5Fmt5oU6JOXIMqMqOS9LInBiS+YhWPdty4=
+        bh=Eyg85J8K9ihH82p0hRx+2qtj9MLkxnAavrxsh5Wv+NE=;
+        b=rU1a32GeMfQzijDpVAycWFoyWq9kR0b4ViyGcQIYE5W4syVX1I+GEJrc9wbGkmIkZX
+         SRscxpQw7DcljLnPPmuj/ygt7eG3E+5IXlF2/mhHdUJd47ZROOG5kYTSN8k7ls4HiQg/
+         i+kCCUVM6lPyiK5Z3U5QeDDgEOulinYJB7Na1cT3FJH3SmZnPHDQ0MWUAYBLS9Kefvh7
+         cg9TPgJXIpnh3snoMsSR+Qs9QeCub+g1yo6e3+BrvD6hwsmTQXpqqcmIIKkJAn2y4n+M
+         DYxVsaxhiKvk7x5cCvE7vd5rYGJKGr7kdaBwTj9ST+Qy0yrSbhuJx7DDNsrqOdi1TeX1
+         kfHw==
+X-Gm-Message-State: AOJu0YxQQC5V5Bui+TNdvvCozVFg38WGWjsVZbHWUoRxmXfWshVNsAN6
+	PVjtNY4UXaOBRHsLkv+zwQrGpgpjlvgdakFyQEX5RSegOPYtUKgvPnXaCIC/bnfxXDW+2hDLJvf
+	Os5NByJXD6X1sdBjALaSvV3I6Iwy4pERh
+X-Google-Smtp-Source: AGHT+IE7ebaVGF0FCj1gjWT7OgagQGgXPXNxI8yTB+YxqCDVea1beFx94JHCQNlZ3cG/eqoEhJFuvr91vfrvReVtKR8=
 X-Received: by 2002:a05:6512:2209:b0:52e:f2a6:8e1a with SMTP id
- 2adb3069b0e04-52efb7e8103mr6118513e87.29.1721711281502; Mon, 22 Jul 2024
- 22:08:01 -0700 (PDT)
+ 2adb3069b0e04-52efb7e8103mr6190757e87.29.1721714186771; Mon, 22 Jul 2024
+ 22:56:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,76 +53,91 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 23 Jul 2024 00:07:50 -0500
-Message-ID: <CAH2r5mu2LTRDPX7KbM3V_d7FybuPnvCMRd6YV3__H-7mn1N9uA@mail.gmail.com>
-Subject: [PATCH][CIFS] fix reconnect with SMB1 Unix Extensions
-To: Andrew Bartlett <abartlet@samba.org>, samba-technical <samba-technical@lists.samba.org>, 
-	CIFS <linux-cifs@vger.kernel.org>, Kevin Ottens <kevin.ottens@enioka.com>
+Date: Tue, 23 Jul 2024 00:56:15 -0500
+Message-ID: <CAH2r5mse9o8tuS9UM9soq02MwweULT9KnUxOzoBHEirHxB3Gog@mail.gmail.com>
+Subject: [PATCH][CIFS] mount with "unix" mount option for SMB1 incorrectly handled
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>, Andrew Bartlett <abartlet@samba.org>, 
+	Kevin Ottens <kevin.ottens@enioka.com>
 Cc: Paulo Alcantara <pc@manguebit.com>
-Content-Type: multipart/mixed; boundary="000000000000571cef061de3251f"
+Content-Type: multipart/mixed; boundary="00000000000081fa73061de3d20d"
 
---000000000000571cef061de3251f
+--00000000000081fa73061de3d20d
 Content-Type: text/plain; charset="UTF-8"
 
-Andrew had pointed out having problems with SMB1 Unix extensions to
-Samba when investigating an unrelated problem, and when I tried it I
-noticed a serious reconnect issue with the SMB1 Unix Extensions.
+When Andrew Bartlett mentioned problems using the SMB1 Unix Extensions to Samba
+I noticed a couple of client bugs.  This fixes the second problem I noticed.
 
-When mounting with the SMB1 Unix Extensions (e.g. mounts
-to Samba with vers=1.0), cifs.ko reconnects no longer reset the
-Unix Extensions (SetFSInfo SET_FILE_UNIX_BASIC) after tcon so most
-operations (e.g. stat, ls, open, statfs) will fail continuously
-with:
-        "Operation not supported"
-if the connection ever resets (e.g. due to brief network disconnect)
+Although by default we negotiate CIFS Unix Extensions for SMB1 mounts
+to Samba (and they work if the user does not specify "unix" or "posix"
+or "linux" on mount), and we do properly handle when a user turns them
+off with "nounix" mount parm, ... but with the  changes to the mount
+API we broke cases where the user explicitly specified the "unix"
+option (or equivalently "linux" or "posix") on mount with vers=1.0 to
+Samba or other servers which support the CIFS Unix Extensions.
 
-Fix attached
+   "mount error(95): Operation not supported"
 
+and logged:
 
+   "CIFS: VFS: Check vers= mount option. SMB3.11 disabled but required
+for POSIX extensions"
+
+even though CIFS Unix Extensions are supported for vers=1.0  This
+patch fixes the case where the user specifies both "unix" (or
+equivalently "posix" or "linux") and "vers=1.0" on mount to a server
+which supports the CIFS Unix Extensions.
+
+See attached
 
 -- 
 Thanks,
 
 Steve
 
---000000000000571cef061de3251f
+--00000000000081fa73061de3d20d
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-fix-reconnect-with-SMB1-UNIX-Extensions.patch"
+	name="0001-cifs-mount-with-unix-mount-option-for-SMB1-incorrect.patch"
 Content-Disposition: attachment; 
-	filename="0001-cifs-fix-reconnect-with-SMB1-UNIX-Extensions.patch"
+	filename="0001-cifs-mount-with-unix-mount-option-for-SMB1-incorrect.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_lyxyflgw0>
-X-Attachment-Id: f_lyxyflgw0
+Content-ID: <f_lyy03ev00>
+X-Attachment-Id: f_lyy03ev00
 
-RnJvbSAyYTliM2ViMWIwODM4Y2M5OWFhZmRjNTBlMzcxMzg1MzhkNDU5M2JiIE1vbiBTZXAgMTcg
+RnJvbSA2YmUzNmVlMGFjY2VlZjAzYWI2MTk4NTc4NmNhMjM4YTEzMjcyMWU2IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMjIgSnVsIDIwMjQgMjM6NDA6MDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBmaXggcmVjb25uZWN0IHdpdGggU01CMSBVTklYIEV4dGVuc2lvbnMKCldoZW4gbW91bnRp
-bmcgd2l0aCB0aGUgU01CMSBVbml4IEV4dGVuc2lvbnMgKGUuZy4gbW91bnRzCnRvIFNhbWJhIHdp
-dGggdmVycz0xLjApLCByZWNvbm5lY3RzIG5vIGxvbmdlciByZXNldCB0aGUKVW5peCBFeHRlbnNp
-b25zIChTZXRGU0luZm8gU0VUX0ZJTEVfVU5JWF9CQVNJQykgYWZ0ZXIgdGNvbiBzbyBtb3N0Cm9w
-ZXJhdGlvbnMgKGUuZy4gc3RhdCwgbHMsIG9wZW4sIHN0YXRmcykgd2lsbCBmYWlsIGNvbnRpbnVv
-dXNseQp3aXRoOgogICAgICAgICJPcGVyYXRpb24gbm90IHN1cHBvcnRlZCIKaWYgdGhlIGNvbm5l
-Y3Rpb24gZXZlciByZXNldHMgKGUuZy4gZHVlIHRvIGJyaWVmIG5ldHdvcmsgZGlzY29ubmVjdCkK
-CkNjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8
-c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xpZW50L2Nvbm5lY3QuYyB8IDE1
-ICsrKysrKysrKysrKysrLQogMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2Nvbm5lY3QuYyBiL2ZzL3NtYi9j
-bGllbnQvY29ubmVjdC5jCmluZGV4IDdhMTZlMTJmNWRhOC4uYjY2ZDhiMDNhMzg5IDEwMDY0NAot
-LS0gYS9mcy9zbWIvY2xpZW50L2Nvbm5lY3QuYworKysgYi9mcy9zbWIvY2xpZW50L2Nvbm5lY3Qu
-YwpAQCAtMzgwNyw4ICszODA3LDIxIEBAIENJRlNUQ29uKGNvbnN0IHVuc2lnbmVkIGludCB4aWQs
-IHN0cnVjdCBjaWZzX3NlcyAqc2VzLAogCQllbHNlCiAJCQl0Y29uLT5GbGFncyA9IDA7CiAJCWNp
-ZnNfZGJnKEZZSSwgIlRjb24gZmxhZ3M6IDB4JXhcbiIsIHRjb24tPkZsYWdzKTsKLQl9CiAKKwkJ
-LyoKKwkJICogcmVzZXRfY2lmc191bml4X2NhcHMgY2FsbHMgUUZTSW5mbyB3aGljaCByZXF1aXJl
-cworCQkgKiBuZWVkX3JlY29ubmVjdCB0byBiZSBmYWxzZSwgYnV0IHdlIHdvdWxkIG5vdCBuZWVk
-IHRvIGNhbGwKKwkJICogcmVzZXRfY2FwcyBpZiB0aGlzIHdlcmUgbm90IGEgcmVjb25uZWN0IGNh
-c2Ugc28gbXVzdCBjaGVjaworCQkgKiBuZWVkX3JlY29ubmVjdCBmbGFnIGhlcmUuICBUaGUgY2Fs
-bGVyIHdpbGwgYWxzbyBjbGVhcgorCQkgKiBuZWVkX3JlY29ubmVjdCB3aGVuIHRjb24gd2FzIHN1
-Y2Nlc3NmdWwgYnV0IG5lZWRlZCB0byBiZQorCQkgKiBjbGVhcmVkIGVhcmxpZXIgaW4gdGhlIGNh
-c2Ugb2YgdW5peCBleHRlbnNpb25zIHJlY29ubmVjdAorCQkgKi8KKwkJaWYgKHRjb24tPm5lZWRf
-cmVjb25uZWN0ICYmIHRjb24tPnVuaXhfZXh0KSB7CisJCQljaWZzX2RiZyhGWUksICJyZXNldHRp
-bmcgY2FwcyBmb3IgJXNcbiIsIHRjb24tPnRyZWVfbmFtZSk7CisJCQl0Y29uLT5uZWVkX3JlY29u
-bmVjdCA9IGZhbHNlOworCQkJcmVzZXRfY2lmc191bml4X2NhcHMoeGlkLCB0Y29uLCBOVUxMLCBO
-VUxMKTsKKwkJfQorCX0KIAljaWZzX2J1Zl9yZWxlYXNlKHNtYl9idWZmZXIpOwogCXJldHVybiBy
-YzsKIH0KLS0gCjIuNDMuMAoK
---000000000000571cef061de3251f--
+CkRhdGU6IFR1ZSwgMjMgSnVsIDIwMjQgMDA6NDQ6NDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBtb3VudCB3aXRoICJ1bml4IiBtb3VudCBvcHRpb24gZm9yIFNNQjEgaW5jb3JyZWN0bHkK
+IGhhbmRsZWQKCkFsdGhvdWdoIGJ5IGRlZmF1bHQgd2UgbmVnb3RpYXRlIENJRlMgVW5peCBFeHRl
+bnNpb25zIGZvciBTTUIxIG1vdW50cyB0bwpTYW1iYSAoYW5kIHRoZXkgd29yayBpZiB0aGUgdXNl
+ciBkb2VzIG5vdCBzcGVjaWZ5ICJ1bml4IiBvciAicG9zaXgiIG9yCiJsaW51eCIgb24gbW91bnQp
+LCBhbmQgd2UgZG8gcHJvcGVybHkgaGFuZGxlIHdoZW4gYSB1c2VyIHR1cm5zIHRoZW0gb2ZmCndp
+dGggIm5vdW5peCIgbW91bnQgcGFybS4gIEJ1dCB3aXRoIHRoZSBjaGFuZ2VzIHRvIHRoZSBtb3Vu
+dCBBUEkgd2UKYnJva2UgY2FzZXMgd2hlcmUgdGhlIHVzZXIgZXhwbGljaXRseSBzcGVjaWZpZXMg
+dGhlICJ1bml4IiBvcHRpb24gKG9yCmVxdWl2YWxlbnRseSAibGludXgiIG9yICJwb3NpeCIpIG9u
+IG1vdW50IHdpdGggdmVycz0xLjAgdG8gU2FtYmEgb3Igb3RoZXIKc2VydmVycyB3aGljaCBzdXBw
+b3J0IHRoZSBDSUZTIFVuaXggRXh0ZW5zaW9ucy4KCiAibW91bnQgZXJyb3IoOTUpOiBPcGVyYXRp
+b24gbm90IHN1cHBvcnRlZCIKCmFuZCBsb2dnZWQ6CgogIkNJRlM6IFZGUzogQ2hlY2sgdmVycz0g
+bW91bnQgb3B0aW9uLiBTTUIzLjExIGRpc2FibGVkIGJ1dCByZXF1aXJlZCBmb3IgUE9TSVggZXh0
+ZW5zaW9ucyIKCmV2ZW4gdGhvdWdoIENJRlMgVW5peCBFeHRlbnNpb25zIGFyZSBzdXBwb3J0ZWQg
+Zm9yIHZlcnM9MS4wICBUaGlzIHBhdGNoIGZpeGVzCnRoZSBjYXNlIHdoZXJlIHRoZSB1c2VyIHNw
+ZWNpZmllcyBib3RoICJ1bml4IiAob3IgZXF1aXZhbGVudGx5ICJwb3NpeCIgb3IKImxpbnV4Iikg
+YW5kICJ2ZXJzPTEuMCIgb24gbW91bnQgdG8gYSBzZXJ2ZXIgd2hpY2ggc3VwcG9ydHMgdGhlCkNJ
+RlMgVW5peCBFeHRlbnNpb25zLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKU2lnbmVkLW9m
+Zi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9j
+bGllbnQvY29ubmVjdC5jIHwgNyArKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25z
+KCspCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jb25uZWN0LmMgYi9mcy9zbWIvY2xpZW50
+L2Nvbm5lY3QuYwppbmRleCBiNjZkOGIwM2EzODkuLmMzZDhkN2I3YjQ2YSAxMDA2NDQKLS0tIGEv
+ZnMvc21iL2NsaWVudC9jb25uZWN0LmMKKysrIGIvZnMvc21iL2NsaWVudC9jb25uZWN0LmMKQEAg
+LTI2MTQsNiArMjYxNCwxMyBAQCBjaWZzX2dldF90Y29uKHN0cnVjdCBjaWZzX3NlcyAqc2VzLCBz
+dHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpCiAJCQljaWZzX2RiZyhWRlMsICJTZXJ2ZXIgZG9l
+cyBub3Qgc3VwcG9ydCBtb3VudGluZyB3aXRoIHBvc2l4IFNNQjMuMTEgZXh0ZW5zaW9uc1xuIik7
+CiAJCQlyYyA9IC1FT1BOT1RTVVBQOwogCQkJZ290byBvdXRfZmFpbDsKKwkJfSBlbHNlIGlmIChz
+ZXMtPnNlcnZlci0+dmFscy0+cHJvdG9jb2xfaWQgPT0gU01CMTBfUFJPVF9JRCkKKwkJCWlmIChj
+YXBfdW5peChzZXMpKQorCQkJCWNpZnNfZGJnKEZZSSwgIlVuaXggRXh0ZW5zaW9ucyByZXF1ZXN0
+ZWQgb24gU01CMSBtb3VudFxuIik7CisJCQllbHNlIHsKKwkJCQljaWZzX2RiZyhWRlMsICJTTUIx
+IFVuaXggRXh0ZW5zaW9ucyBub3Qgc3VwcG9ydGVkIGJ5IHNlcnZlclxuIik7CisJCQkJcmMgPSAt
+RU9QTk9UU1VQUDsKKwkJCQlnb3RvIG91dF9mYWlsOwogCQl9IGVsc2UgewogCQkJY2lmc19kYmco
+VkZTLAogCQkJCSJDaGVjayB2ZXJzPSBtb3VudCBvcHRpb24uIFNNQjMuMTEgZGlzYWJsZWQgYnV0
+IHJlcXVpcmVkIGZvciBQT1NJWCBleHRlbnNpb25zXG4iKTsKLS0gCjIuNDMuMAoK
+--00000000000081fa73061de3d20d--
