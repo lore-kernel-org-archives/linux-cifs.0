@@ -1,199 +1,153 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7EA28E8
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 22:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8921B28E8
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 22:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721774932; cv=none; b=mJYU/cmMnOHX0d8vdz0ws9LUszbikf22Y1NBMq1RpKz+7/2DjdKqHidcv2r6Pe2tTy32qnQxb+ZnzhuHh8Bk9h9GkYvGsVO/MSWyIt4+8J+qeHGbjBAaK93JcxLnvjmDqABRZP0b3NoSKPxchxfk4yuHguwxwMswohEJcBgtzkM=
+	t=1721775061; cv=none; b=LuEWG3KDGFbk4PrP3sKC6/O/+sd4x75roWJewQ2hDzzovMcNLK4+Zn8cL5s/iyju2vRMEFPlc45CpABxz8t4mwSJEhTgf4Uo/GpegnJ4Wy6Zl/DBsD2vCOoh3Ws9Uzsz9HYUlSVQaV8rD52c/5CkKVNu8Q0YhTgVm7ynlJln2Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721774932; c=relaxed/simple;
-	bh=Lw1ppcXSrPtjCxmEOr6gErZwtgnrMoBXS0ZVsxNdHLg=;
+	s=arc-20240116; t=1721775061; c=relaxed/simple;
+	bh=CtHxEc4E4KZRVlOnxnTfIVbutN9U8o11Fa5y/hdNSzU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lLzOtLaHJCaGefhqwx42RGj8BCR+JvEzACC1mzPikQjjnA60algL8HFmWNI06PVrkIIDRrYObu153dIoG5IOdF8LuAzxh7rXndXdRbIT+dEBUWYszwagZllC5HGQVRk13PLHb3Mc1apswmCzznvJfFwIernAZA0iAmZS++NsTIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WKPsQLfa; arc=none smtp.client-ip=209.85.167.54
+	 To:Cc:Content-Type; b=be+DyxDa9Atz1ENedOcAdUbdu3sLEBCE/lR+dsGcsm1Bveb7CutBYtHmg8SCy+gcDuD7n7L0Q3wn7JSATV1DDqqvNP2Zkl2nKvdXv4PdDNNwrJQxqNg0G0LDIO2YgNPo8+lYS9tsxFp0CRYEc6mWQNcudqQFX6zqEui5tiXK4vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDaq0U04; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WKPsQLfa"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52efef496ccso311294e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 15:48:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDaq0U04"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52efd855adbso4799077e87.2
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jul 2024 15:50:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721774929; x=1722379729; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ezg52eHclr4j0zq4BJBkryPVzNv/N9mlBGgYhA+rqMY=;
-        b=WKPsQLfac/e4bqHoyphbwiXbslMBaEraCd3VObt4g588+EzRKt48t53doT1t26rcQ3
-         ezihSVQdzz/VB/OojMd3dJO5YBROo28fqQkUuEu0GYaM9qHHpmVXnX6aLaTnlLFLV2hh
-         CjT65tITHdBjT3IyW9wTM09nLzgewq15sifEek/QpM9SA2pTP1lhxIOLor4tDbb9zUCo
-         cAoDKn0iodeOMj3KHpR0DBicQlhiiBZzmadEbxBk0lH7fjXr+jtootZwEDfw4qn3BxgW
-         Sg8t48u+douLKTEtt7gh6a42VmK+2G1H1CNG+jrA5re4zipiNhEmN0Atv1o+kmEhVNDJ
-         +n/g==
+        d=gmail.com; s=20230601; t=1721775058; x=1722379858; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ES59BCfEuAfxXID0F6oW+II6SH5dXpK5Bso9en7P/4M=;
+        b=QDaq0U04kKOZP1NIyA2ubQEzFkZdoOvdud+fjZw2CmFc/CW8UP8aVgA9uFgOcsAYYW
+         Sp6A5cp3uwdtEjK43cN6Eh+qhyl4Mifhf4bZ8MdiZ+Qm8uObTC+ODp0BhjsHc5tUfFsW
+         3Ka7F1x7YlLU0QfJdraVNiqqA+SND1zsoLse13fA+PR2MaLDvL/tFKnyh2pIZvZ7tFaY
+         /XuF8ju+FyyXlam8B90qERBWSxNaboKS9shIAIWxHfoYzZTOrphEGnQP1fIBLWq8ooYU
+         o6Bnys40QgJAtOOVYUo/wsiuKpGupw5HGi9+m207A+XIh1crasdx5BhSd9gdrAmRgoR9
+         7M+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721774929; x=1722379729;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ezg52eHclr4j0zq4BJBkryPVzNv/N9mlBGgYhA+rqMY=;
-        b=JPPetJVGhH0r7kFCOsMeHLVVWDJwbW//zQpgBbu+BPC15/44QDVn4maY2Z5nq41EPo
-         duXKyx8dQPvkEBMf0Af3f4wl7dxleCw4WMEq4MxBCRVifMqehnZhWs81zS7iJP8KALG9
-         ImH95uzlTjwBtG9Ul00bB5tx9/Tr8TlW6m4uFlBJRfVvl9pJ8FQJoNbVQxLwZNK636fb
-         BO1YM4J4IwyVksaTM+NrvXtq9r6aW4AjjQPYS8GWwRXJtALdHdqFm1NyfqAEHgc8Idbj
-         u+xxnH9RDWwlVxjM9jquAAuoAdp0crmvLYjrEOdbkZFM0PCqUxBy+nrT01D5rHKB7BQk
-         Sc7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXw4nIlk6nyWIXZd4St0SOkU+KUXQY++CmvEZWwhcfEIlu3IHQ4Si1zye84wAxnjnIEgKrfH8kKl/xwfiabrTEdZ32TwH0idvEeEQ==
-X-Gm-Message-State: AOJu0YxX0zq4UFR0bchJHCPcF6JkijrLELi52/z4bwf6UCXkQgdXzih5
-	n+A3K/DvNU8CohLREN5JCFZB2Rn+0RMvMnqGPcL9dMY5HtPUECG1JKlta2jlrigxtTiWqXln8qh
-	wlaeD0V/0RfDXnBxfK5WYndO9EfA=
-X-Google-Smtp-Source: AGHT+IFAWjl75rvRITC8oU1EWcaQCB9TEMTgIZzmojMWDMCmNyi/UA5XFvmezaW/1vinOlJXFxGZiwOoOEYB+w+nEC8=
-X-Received: by 2002:a05:6512:3044:b0:52e:7f23:5d98 with SMTP id
- 2adb3069b0e04-52fcf8b5068mr17989e87.8.1721774928873; Tue, 23 Jul 2024
- 15:48:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721775058; x=1722379858;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ES59BCfEuAfxXID0F6oW+II6SH5dXpK5Bso9en7P/4M=;
+        b=nTTTtWG8qVLO25UoEYpToCLn8RD8/X5H1U4X9Q8+IYIkXKBhK2K96lVaJhwZXY7DD3
+         ILhYiISaJCZCFJgoO+5Td29n4UczQgqM0V6sOWH+NY2qzS1RGR96Qm5qFUGodCu3bjxH
+         yEh/j4ET75DHhbkblHwMIQyAVre34tukWt0sOEHEa7pinmc5KHcjdALjmUyWa2tSX3pv
+         SKW6nTz4DtucjlySQ22tydFkL7DC0vFBwjdKvfR8fuNOInpVVy8Yb8SIpzDGzvNKxCB0
+         s1YgRdQ1ydBZjuR7x5+Xxv7g80tu3AslHy1ay9NSjdSxQ+KoFIW4rbWott99pyroztOg
+         DBYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOnmWqCe7ZkUtC90K6TG0D4AhqZPMW3ix0h3+yROEm5lKD6L+jqoGbE2z4jcKg1B65BhETIfXLD5qdYqhMlC5k9mKch+oNqWo9dg==
+X-Gm-Message-State: AOJu0YwbhtZ6NNhzNSFwiKhTlQ1btq/pDnkxSFbpSNGGqyWRAHQENls/
+	0XhryvqEHA/4yJ5WUKCAwUKiLjbSPFgBF7QFEnZbPtprKACUBPKLkZ+56HbSEkNFjOpOOuXEVwV
+	RpGaoAumscEoeAknFfBvbsug7DnA=
+X-Google-Smtp-Source: AGHT+IGyoPW8W2ZIVH4om3vY67WuHjE9OA4VsnmQGKnBi270ljt/ok4VRrS7XbofCa0WIsndrUHIvaMkofb4h/tKSmw=
+X-Received: by 2002:a05:6512:2204:b0:52c:dbe7:cfd5 with SMTP id
+ 2adb3069b0e04-52fcf000c42mr177660e87.32.1721775057566; Tue, 23 Jul 2024
+ 15:50:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202407240638.kjmPxwJV-lkp@intel.com>
-In-Reply-To: <202407240638.kjmPxwJV-lkp@intel.com>
+References: <CAH2r5mu2LTRDPX7KbM3V_d7FybuPnvCMRd6YV3__H-7mn1N9uA@mail.gmail.com>
+In-Reply-To: <CAH2r5mu2LTRDPX7KbM3V_d7FybuPnvCMRd6YV3__H-7mn1N9uA@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 23 Jul 2024 17:48:37 -0500
-Message-ID: <CAH2r5mtC6LAFJxvoeWe4DPAKx=01LdYRSO7FE0R_jOC0iVX40A@mail.gmail.com>
-Subject: Re: [cifs:for-next 2/3] ERROR: modpost: "reset_cifs_unix_caps"
- [fs/smb/client/cifs.ko] undefined!
-To: kernel test robot <lkp@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
+Date: Tue, 23 Jul 2024 17:50:46 -0500
+Message-ID: <CAH2r5muHFV8D2+SrDKQiUSkxzDfAG4zJ3rUdQnBXDT12u5D2Ww@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] fix reconnect with SMB1 Unix Extensions
+To: Andrew Bartlett <abartlet@samba.org>, samba-technical <samba-technical@lists.samba.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, Kevin Ottens <kevin.ottens@enioka.com>
+Cc: Paulo Alcantara <pc@manguebit.com>
+Content-Type: multipart/mixed; boundary="000000000000b0bb5a061df1fe34"
+
+--000000000000b0bb5a061df1fe34
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Fixed with this change and repushed to for-next
+updated to add missing #ifdef
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index b66d8b03a389..89d9f86cc29a 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3686,6 +3686,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb,
-struct smb3_fs_context *ctx)
- }
- #endif
 
-+#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- /*
-  * Issue a TREE_CONNECT request.
-  */
-@@ -3825,6 +3826,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses=
-,
-        cifs_buf_release(smb_buffer);
-        return rc;
- }
-+#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-
- static void delayed_free(struct rcu_head *p)
- {
-
-On Tue, Jul 23, 2024 at 5:37=E2=80=AFPM kernel test robot <lkp@intel.com> w=
-rote:
+On Tue, Jul 23, 2024 at 12:07=E2=80=AFAM Steve French <smfrench@gmail.com> =
+wrote:
 >
-> tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-> head:   dde12e91303b6d38322ed69801ce3129aba82ad5
-> commit: 2a9b3eb1b0838cc99aafdc50e37138538d4593bb [2/3] cifs: fix reconnec=
-t with SMB1 UNIX Extensions
-> config: x86_64-randconfig-101-20240723 (https://download.01.org/0day-ci/a=
-rchive/20240724/202407240638.kjmPxwJV-lkp@intel.com/config)
-> compiler: gcc-10 (Ubuntu 10.5.0-1ubuntu1) 10.5.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20240724/202407240638.kjmPxwJV-lkp@intel.com/reproduce)
+> Andrew had pointed out having problems with SMB1 Unix extensions to
+> Samba when investigating an unrelated problem, and when I tried it I
+> noticed a serious reconnect issue with the SMB1 Unix Extensions.
 >
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202407240638.kjmPxwJV-lkp=
-@intel.com/
+> When mounting with the SMB1 Unix Extensions (e.g. mounts
+> to Samba with vers=3D1.0), cifs.ko reconnects no longer reset the
+> Unix Extensions (SetFSInfo SET_FILE_UNIX_BASIC) after tcon so most
+> operations (e.g. stat, ls, open, statfs) will fail continuously
+> with:
+>         "Operation not supported"
+> if the connection ever resets (e.g. due to brief network disconnect)
 >
-> All errors (new ones prefixed by >>, old ones prefixed by <<):
+> Fix attached
 >
-> WARNING: modpost: missing MODULE_DESCRIPTION() in kernel/locking/test-ww_=
-mutex.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in mm/dmapool_test.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in mm/zsmalloc.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in fs/unicode/utf8-selftes=
-t.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/math/rational.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/find_bit_benchmark.=
-o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_dhry.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_firmware.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_sysctl.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_ida.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test-kstrtox.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_min_heap.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_module.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_static_keys.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_static_key_bas=
-e.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_printf.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_scanf.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_bitmap.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_xarray.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_maple_tree.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_kmod.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_memcat_p.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_blackhole_dev.=
-o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_meminit.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_free_pages.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/atomic64_test.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/qcom/hdma.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cxl/core/cxl_co=
-re.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cxl/cxl_pci.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cxl/cxl_mem.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cxl/cxl_pmem.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cxl/cxl_port.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb_=
-debug.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/mxup=
-ort.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/navm=
-an.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/usb-=
-serial-simple.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/serial/symb=
-olserial.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governo=
-r_simpleondemand.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governo=
-r_userspace.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pcmcia/pcmcia_r=
-src.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pcmcia/yenta_so=
-cket.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/bytestrea=
-m-example.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/dma-examp=
-le.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/inttype-e=
-xample.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kfifo/record-ex=
-ample.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kobject/kobject=
--example.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/kobject/kset-ex=
-ample.o
-> >> ERROR: modpost: "reset_cifs_unix_caps" [fs/smb/client/cifs.ko] undefin=
-ed!
+>
 >
 > --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+> Thanks,
 >
+> Steve
+
 
 
 --=20
 Thanks,
 
 Steve
+
+--000000000000b0bb5a061df1fe34
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0002-cifs-fix-reconnect-with-SMB1-UNIX-Extensions.patch"
+Content-Disposition: attachment; 
+	filename="0002-cifs-fix-reconnect-with-SMB1-UNIX-Extensions.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lyz0egn50>
+X-Attachment-Id: f_lyz0egn50
+
+RnJvbSBhMjE0Mzg0Y2UyNmI2MTExZWE4YzhkNThmYTgyYTFjYTYzOTk2YzM4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMjIgSnVsIDIwMjQgMjM6NDA6MDggLTA1MDAKU3ViamVjdDogW1BBVENIIDIv
+M10gY2lmczogZml4IHJlY29ubmVjdCB3aXRoIFNNQjEgVU5JWCBFeHRlbnNpb25zCgpXaGVuIG1v
+dW50aW5nIHdpdGggdGhlIFNNQjEgVW5peCBFeHRlbnNpb25zIChlLmcuIG1vdW50cwp0byBTYW1i
+YSB3aXRoIHZlcnM9MS4wKSwgcmVjb25uZWN0cyBubyBsb25nZXIgcmVzZXQgdGhlClVuaXggRXh0
+ZW5zaW9ucyAoU2V0RlNJbmZvIFNFVF9GSUxFX1VOSVhfQkFTSUMpIGFmdGVyIHRjb24gc28gbW9z
+dApvcGVyYXRpb25zIChlLmcuIHN0YXQsIGxzLCBvcGVuLCBzdGF0ZnMpIHdpbGwgZmFpbCBjb250
+aW51b3VzbHkKd2l0aDoKICAgICAgICAiT3BlcmF0aW9uIG5vdCBzdXBwb3J0ZWQiCmlmIHRoZSBj
+b25uZWN0aW9uIGV2ZXIgcmVzZXRzIChlLmcuIGR1ZSB0byBicmllZiBuZXR3b3JrIGRpc2Nvbm5l
+Y3QpCgpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwpSZXZpZXdlZC1ieTogUGF1bG8gQWxjYW50
+YXJhIChSZWQgSGF0KSA8cGNAbWFuZ3VlYml0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJl
+bmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY29ubmVjdC5j
+IHwgMTcgKysrKysrKysrKysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCsp
+LCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jb25uZWN0LmMgYi9m
+cy9zbWIvY2xpZW50L2Nvbm5lY3QuYwppbmRleCA3YTE2ZTEyZjVkYTguLjg5ZDlmODZjYzI5YSAx
+MDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jb25uZWN0LmMKKysrIGIvZnMvc21iL2NsaWVudC9j
+b25uZWN0LmMKQEAgLTM2ODYsNiArMzY4Niw3IEBAIGludCBjaWZzX21vdW50KHN0cnVjdCBjaWZz
+X3NiX2luZm8gKmNpZnNfc2IsIHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCkKIH0KICNlbmRp
+ZgogCisjaWZkZWYgQ09ORklHX0NJRlNfQUxMT1dfSU5TRUNVUkVfTEVHQUNZCiAvKgogICogSXNz
+dWUgYSBUUkVFX0NPTk5FQ1QgcmVxdWVzdC4KICAqLwpAQCAtMzgwNywxMSArMzgwOCwyNSBAQCBD
+SUZTVENvbihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAkJ
+ZWxzZQogCQkJdGNvbi0+RmxhZ3MgPSAwOwogCQljaWZzX2RiZyhGWUksICJUY29uIGZsYWdzOiAw
+eCV4XG4iLCB0Y29uLT5GbGFncyk7Ci0JfQogCisJCS8qCisJCSAqIHJlc2V0X2NpZnNfdW5peF9j
+YXBzIGNhbGxzIFFGU0luZm8gd2hpY2ggcmVxdWlyZXMKKwkJICogbmVlZF9yZWNvbm5lY3QgdG8g
+YmUgZmFsc2UsIGJ1dCB3ZSB3b3VsZCBub3QgbmVlZCB0byBjYWxsCisJCSAqIHJlc2V0X2NhcHMg
+aWYgdGhpcyB3ZXJlIG5vdCBhIHJlY29ubmVjdCBjYXNlIHNvIG11c3QgY2hlY2sKKwkJICogbmVl
+ZF9yZWNvbm5lY3QgZmxhZyBoZXJlLiAgVGhlIGNhbGxlciB3aWxsIGFsc28gY2xlYXIKKwkJICog
+bmVlZF9yZWNvbm5lY3Qgd2hlbiB0Y29uIHdhcyBzdWNjZXNzZnVsIGJ1dCBuZWVkZWQgdG8gYmUK
+KwkJICogY2xlYXJlZCBlYXJsaWVyIGluIHRoZSBjYXNlIG9mIHVuaXggZXh0ZW5zaW9ucyByZWNv
+bm5lY3QKKwkJICovCisJCWlmICh0Y29uLT5uZWVkX3JlY29ubmVjdCAmJiB0Y29uLT51bml4X2V4
+dCkgeworCQkJY2lmc19kYmcoRllJLCAicmVzZXR0aW5nIGNhcHMgZm9yICVzXG4iLCB0Y29uLT50
+cmVlX25hbWUpOworCQkJdGNvbi0+bmVlZF9yZWNvbm5lY3QgPSBmYWxzZTsKKwkJCXJlc2V0X2Np
+ZnNfdW5peF9jYXBzKHhpZCwgdGNvbiwgTlVMTCwgTlVMTCk7CisJCX0KKwl9CiAJY2lmc19idWZf
+cmVsZWFzZShzbWJfYnVmZmVyKTsKIAlyZXR1cm4gcmM7CiB9CisjZW5kaWYgLyogQ09ORklHX0NJ
+RlNfQUxMT1dfSU5TRUNVUkVfTEVHQUNZICovCiAKIHN0YXRpYyB2b2lkIGRlbGF5ZWRfZnJlZShz
+dHJ1Y3QgcmN1X2hlYWQgKnApCiB7Ci0tIAoyLjQzLjAKCg==
+--000000000000b0bb5a061df1fe34--
