@@ -1,142 +1,89 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76ACEBE
-	for <linux-cifs@vger.kernel.org>; Sun, 28 Jul 2024 00:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BB01877
+	for <linux-cifs@vger.kernel.org>; Sun, 28 Jul 2024 03:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722127183; cv=none; b=LMaFdaBpErFwKGpTCWPyOU14MK2Cf1oM7Bif8Gbh1tDTA6BHdpd1OU36k+wukuWLt5fMFKgho+dcQGUIhTWwqbQyOwtRWFLwG75LAD3YPzCpn3DlsHBf1/HLPDmCRu5/F9dfj2xMNpLfnbJrKcFPjQzzDR+pgRHb00triO7YTgU=
+	t=1722136624; cv=none; b=fopVSw+CRiC/o2mjxXjfbUJQL5pHKS05pnTjUHBPhC0UvmqGCPc5lsnMU0Pgs9yXInNz5WdiXyvOoN8XpfzAXXeFavV7ccnxS5Tps+oFZ2Ws6+Lf68QwE768a8c3MrFDx/lUAD4bNlJQgp8IbRMXsH5lemB72kIVSGsTbLQcPwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722127183; c=relaxed/simple;
-	bh=xWRCLZJ7iHfF8c7yvkxSA1jJDbFWRys2MWJv1K7OYIY=;
+	s=arc-20240116; t=1722136624; c=relaxed/simple;
+	bh=qEo/9Or08UvAowho9Zrgf+1Yho0yllWXoK4yuUDNzfc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RFIHNQwWQA0oSdMHCq0ev2LVpxfixTpEF/JkCRKCbV3C3EVRD2b6Gh0F7Al8dRyl7MYmtveZGxwSL4S2Jr7UU1GT/aRLKr9DUYRRRw7cGk/m6n2ZmFX88Q+VVkbPyYmevH2lkQs1HAFgJNmrOCUCIN/a1WvNTeWiTZq4NXdIWU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OnlPbCm6; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=NM/X5FZONUkpC0mhplRlRTrpf9e16LR93SzAM1m4S9k4T0xm9rBCQDzEC+tLHB7a2vBR1b7fAy9zV+xq46nZwLt5gvsoPMwJIdRdJ4o7Nqy0//UZ4TaLE6ph9n26BXbhdjRtdlMMGc/JXUUvZ2woemQKwspCtS6cW5j/UxDv2n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=LUjuwFRV; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OnlPbCm6"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52f025ab3a7so3660652e87.2
-        for <linux-cifs@vger.kernel.org>; Sat, 27 Jul 2024 17:39:41 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="LUjuwFRV"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ef1c12ae23so29063181fa.0
+        for <linux-cifs@vger.kernel.org>; Sat, 27 Jul 2024 20:17:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722127180; x=1722731980; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2WtLQ0AuJweiHPK220i2nAx1+PX8DFaWeqci7mSxG24=;
-        b=OnlPbCm6z7AoZfOPR3DJyauVU1KvMeyquEry0wpMcC7a+0qSI7yHb2qX4z2w+dkowm
-         Yae4QGhPAeyhfu6qxYSoMlpkcJG6CZVjvgvPfcwui8n+WMNOh2pQsoxIvrUgF3OVjxFR
-         o7x5H2UWKwU1ObNJywWZUVm/u/QppDf+VZGE9Yoaw22rmxL2N5SCGp8Ox3q3myfl3Trv
-         qpYH8LAVTYFUIy68/qv0ZHLgnyw1Hz6JZb8XWruxXJpow8Zh5rmahf174i1KFYPVn9d/
-         SFcgC7oFbw9F9TQ255r4TJ9kMskqAM/z4agM2Zu7o1jShIUtwsGvl9oTsE9ytBqvs3Ia
-         T0pg==
+        d=linux-foundation.org; s=google; t=1722136621; x=1722741421; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=KLxdjUr3nZZ/xXHM7u/PpsffYwjEQJpfVQzmD3d51LU=;
+        b=LUjuwFRVifsR1qSoDn38whwavZjhO3yukhWgqH6Jn5/X+XhZ8USP5xDP4jzeaJQx9J
+         QQdnc92errqf9EakbGO89Zvw4tC/xh24YHlNY2DGk0nGMLXWifKsDILjO7XU1/JiOnpj
+         VA4hckaKx97Tx2WZPlDIC8y6USNLEPgAsnH2g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722127180; x=1722731980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2WtLQ0AuJweiHPK220i2nAx1+PX8DFaWeqci7mSxG24=;
-        b=bwK3elVJrnE4phPr7tSgOYnU7gCOo/Jq9Dk9hBtlxxhNE5key/4gmPfkcMy5GSRC3o
-         0rd09ikZ+a8qovNWbCw6xSc/KUsdiPx1MGg9i3NAnn/Fj/oLZ6CILboeQJkpAU5HMKop
-         bV0xc7x8S42PVa7aauwQVgvfyAKtIZ5ijtiidDSvIssb76hsFr4BcMYerxVi8P27aykn
-         S5yE3uOoHU3cPc26d15QIus6UT574cscH1gTdQSpU0UOnALg/lD1RvxWMeztvkmjS4oD
-         mA4xELeqP+ObLJlaDJxcYZ3SCNq6s7CBUhAB+JCIh/8PTOkTjEsqIxbfysUQ/JY6aMMa
-         ae4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXU2osKwwmymbmNX+4268R+nIt9YxPw7vNUFQqo3USsYANqtk1eGSvU3AHPovMvc8KQirjzulGYD/wmfAe4MFbOUs+BSDggf59OKA==
-X-Gm-Message-State: AOJu0Yygz7VL2puJWzFgOgWWb+zAzrFC7EWRYsszI/sAOG6do3bWawtt
-	TdQPfadAlCRg+xnzNzOEGu8z7HGoQrOMvlb1gZbWVrxjLDd4cFX61uYgVnlYEvc/AHLwCOBZ/A9
-	gjlczwBF1IfEgwcZyPJJfinkwN6Y=
-X-Google-Smtp-Source: AGHT+IG5JQmE65nithUd9gPWobOGx0/wdLHMpZKHL5EDmk/X0iJLRv2GjUeuZ9m3ZtbUUM4Sp8hPEYcHGMBevld2lSc=
-X-Received: by 2002:a05:6512:3414:b0:52f:cb5c:b083 with SMTP id
- 2adb3069b0e04-5309b25a268mr2557766e87.5.1722127179445; Sat, 27 Jul 2024
- 17:39:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722136621; x=1722741421;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KLxdjUr3nZZ/xXHM7u/PpsffYwjEQJpfVQzmD3d51LU=;
+        b=dWqAeVS2vy+KtEhsZIm/DY6X7kV0/w1Cxw1Ixq7KWn4cO/wFWH1ogMLMj24PSE89Lf
+         bQDZVzhrZxmcvFFBBVzWpl48jDnml7bJp7O0mGszcGwbWruxuv4+dTCBuaHXnmvloOvc
+         cP1Xje7dPGRAXW9xCBIW+qCbZLmJ5vOfea2L7IYIfzVC3hDy5sMd0wjS9+3Ja39d2Ems
+         MhgCtBxA8SfWEqdXmuQpU7gwzQ3ab5p03YqXlpqdYG+cmKO1pqkU/f0d8A3aZ7qh9XDv
+         hHEHcFoQzxHRoXhhx4pNYSCzgMaTIV0O4dVBJEmF3udogvyJ2rhnr4rE4CywppLhZcqu
+         tUoA==
+X-Gm-Message-State: AOJu0Yy/v+iCejwxTvGZxFsQqlRzVw4og/ZGINGTyyvE2xb5GhDo1Zvd
+	Rk+z6vPoxSBHennco5It9g/o2qcMiCO+8mTzIHDRiss1vOirfyDel4dzN4SXwNYY9WpuFjkLCD3
+	oAbRJaA==
+X-Google-Smtp-Source: AGHT+IEF8vBnuIvzNZ6LMAL8bPdjxlWb/4H3z2MohpQi/d5Jy98S+02Iu4EwTfASZmV83szy98MbWQ==
+X-Received: by 2002:a2e:9d49:0:b0:2ef:7fef:3b27 with SMTP id 38308e7fff4ca-2f12ee5abb5mr21791991fa.35.1722136620906;
+        Sat, 27 Jul 2024 20:17:00 -0700 (PDT)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f03d07583csm8498871fa.113.2024.07.27.20.17.00
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Jul 2024 20:17:00 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ef2ed59200so29810991fa.3
+        for <linux-cifs@vger.kernel.org>; Sat, 27 Jul 2024 20:17:00 -0700 (PDT)
+X-Received: by 2002:a2e:9bcf:0:b0:2ef:1d79:cae7 with SMTP id
+ 38308e7fff4ca-2f12ee14eb5mr26336921fa.14.1722136619815; Sat, 27 Jul 2024
+ 20:16:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mvMr9YgvLds8_OCMVV6FOzuBUgwn8_X6Pbz3hq_oakSWw@mail.gmail.com>
-In-Reply-To: <CAH2r5mvMr9YgvLds8_OCMVV6FOzuBUgwn8_X6Pbz3hq_oakSWw@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 27 Jul 2024 19:39:28 -0500
-Message-ID: <CAH2r5mt6n3-46_gS2GNVtrLj-CE4mCP60W3D_-y3QdZ6UKsgkg@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] mark compression as CONFIG_EXPERIMENTAL and fix
- missing compression operation
-To: Enzo Matsumiya <ematsumiya@suse.de>, CIFS <linux-cifs@vger.kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>, Anthony Nandaa <profnandaa@gmail.com>, 
-	Jun Ma <junma@microsoft.com>
+References: <CAH2r5msuLY9XywuKvnggezTdjCBQx8HDfYhHNstS-Yijz15sdg@mail.gmail.com>
+In-Reply-To: <CAH2r5msuLY9XywuKvnggezTdjCBQx8HDfYhHNstS-Yijz15sdg@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 27 Jul 2024 20:16:43 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgS+TLGrPpcL4fy+NRRyuXbd-mJed50sXoqsPR0w75Oig@mail.gmail.com>
+Message-ID: <CAHk-=wgS+TLGrPpcL4fy+NRRyuXbd-mJed50sXoqsPR0w75Oig@mail.gmail.com>
+Subject: Re: [GIT PULL] SMB3 client fixes
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Had to add one line due to an error in some configurations pointed out
-by the kernel test robot:
-
-index 0cc9c6abf840..3d0d3eaa8ffb 100644
---- a/fs/smb/client/compress/lz77.h
-+++ b/fs/smb/client/compress/lz77.h
-@@ -9,6 +9,7 @@
- #ifndef _SMB_COMPRESS_LZ77_H
- #define _SMB_COMPRESS_LZ77_H
-
-+#include <linux/uaccess.h>
- #ifdef CONFIG_CIFS_COMPRESSION
- #include <asm/ptrace.h>
- #include <linux/kernel.h>
-
-to address:
-
-   In file included from fs/smb/client/compress/lz77.c:10:
->> fs/smb/client/compress/lz77.h:127:9: error: call to undeclared function =
-'copy_from_kernel_nofault'; ISO C99 and later do not support implicit funct=
-ion declarations [-Wimplicit-function-declaration]
-     127 |         return copy_from_kernel_nofault(dst, src, count);
-         |                ^
-   1 error generated.
-
-
-vim +/copy_from_kernel_nofault +127 fs/smb/client/compress/lz77.h
-
-   124
-   125  static __always_inline long lz77_copy(u8 *dst, const u8 *src,
-size_t count)
-   126  {
- > 127           return copy_from_kernel_nofault(dst, src, count);
-   128  }
-   129  #else /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
-   130  static __always_inline u8 lz77_read8(const void *ptr)
-   131  {
-   132          return get_unaligned((u8 *)ptr);
-   133  }
-   134
-
-On Fri, Jul 26, 2024 at 6:53=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
+On Sat, 27 Jul 2024 at 17:35, Steve French <smfrench@gmail.com> wrote:
 >
-> Since some of Enzo's compression patch series has to be changed due to Da=
-vid Howell's netfs changes to cifs.ko over the past two releases, I split o=
-ut the obvious parts of his patch to implement the client side of SMB3.1.1 =
-compression on write requests (see https://git.exis.tech/linux.git/patch/?i=
-d=3D40414c6a34081b372e45c7ce5060a6d34779f6ba for the original patch of Enzo=
-'s) but left out the final piece of the patch (the calls from the write pat=
-h).
->
-> This moves SMB3.1.1 compression code into experimental config option,
-> and fixes the compress mount option to require that config option.
-> Also implements unchained LZ77 "plain" compression algorithm as per
-> MS-XCA specification section "2.3 Plain LZ77 Compression Algorithm Detail=
-s".
->
-> See attached
->
-> --
-> Thanks,
->
-> Steve
+> Please pull the following changes since commit
+> 33c9de2960d347c06d016c2c07ac4aa855cd75f0:
 
+Hmm. I  got this twice.
 
+After looking closely at the _almost_ identical emails, I assume the
+re-send was because the first one was html and was rejected by the
+lists?
 
---=20
-Thanks,
+But in case there was something else going on, and the second email
+was supposed to be another pull request (perhaps for the server
+side?), please holler.
 
-Steve
+             Linus
