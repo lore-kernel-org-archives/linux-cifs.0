@@ -1,111 +1,142 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD472382;
-	Sun, 28 Jul 2024 00:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76ACEBE
+	for <linux-cifs@vger.kernel.org>; Sun, 28 Jul 2024 00:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722126923; cv=none; b=eyU8i29oJuruJYWE+lcrtxtJUQChgQfkR6hO6Qmwob1TDB5wBRFJxYBNBdSm9LBKEfYTMvlYBaCR8VCh6NXpj1Fyx4qn1ciH33YnxJhGRaRRsYaBvpKOq91dx2XkGPizoeZXJ6UBOYe4O15mwAUPkG+ey3DQ0tyuyAf2ZN5G3IA=
+	t=1722127183; cv=none; b=LMaFdaBpErFwKGpTCWPyOU14MK2Cf1oM7Bif8Gbh1tDTA6BHdpd1OU36k+wukuWLt5fMFKgho+dcQGUIhTWwqbQyOwtRWFLwG75LAD3YPzCpn3DlsHBf1/HLPDmCRu5/F9dfj2xMNpLfnbJrKcFPjQzzDR+pgRHb00triO7YTgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722126923; c=relaxed/simple;
-	bh=aO61I0v/qao+UoDLht3IIF69/kCgfI5KNSjSzGL3zVE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=i4Ab0SUe5aLUBuRbKSSNfyRO+QGBr/mB9DpyxL8kCEznug1wF6cMqHIz7AXUmnJNoqYrD4+5cWJzErAdfRpFSq8CZKw+hXWE6893IU4omySX2X/FdSCfLujKy5Kti7WC21qeP2Pf8nuA484VOUqLHxIYDzA+S0SZjOWPNvtBHeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YSxIt1Fg; arc=none smtp.client-ip=209.85.208.180
+	s=arc-20240116; t=1722127183; c=relaxed/simple;
+	bh=xWRCLZJ7iHfF8c7yvkxSA1jJDbFWRys2MWJv1K7OYIY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RFIHNQwWQA0oSdMHCq0ev2LVpxfixTpEF/JkCRKCbV3C3EVRD2b6Gh0F7Al8dRyl7MYmtveZGxwSL4S2Jr7UU1GT/aRLKr9DUYRRRw7cGk/m6n2ZmFX88Q+VVkbPyYmevH2lkQs1HAFgJNmrOCUCIN/a1WvNTeWiTZq4NXdIWU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OnlPbCm6; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSxIt1Fg"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2f040733086so27005121fa.1;
-        Sat, 27 Jul 2024 17:35:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OnlPbCm6"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52f025ab3a7so3660652e87.2
+        for <linux-cifs@vger.kernel.org>; Sat, 27 Jul 2024 17:39:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722126920; x=1722731720; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vHrFGGQW7WEzTSEJx91bUUFVGQDkOrk8pgkc3hN4gDo=;
-        b=YSxIt1Fg6OGyPsojhcRcdQJ1UyxO5ZdLpmOMuEtoTYffTNjzPgvtcEGXfXkV/hqerx
-         ySnx5LD7PwWgtHfvmg00skvkwzK8rTT2XCTo6cB3iTnvyPXhiLeZI5uY1FcCej+b65Y6
-         B5MwoJVhw8NvwwgXNLEhDAME5hMW3QCmXDcD7r5DRhnCkzhCkfkOO74zy5eQG58WlIR9
-         feJ0dVPjgOT/wieWpVKg66CyUl1JbOAvO6dol2DFeMMOs94mgdghEBBb5KzOo3nFtaJu
-         KuDlc7SFYvKO8x2aH+gKPfo8YwoSj6j7A5yLtkQPWAZ7YZV0K+/Yu0qRoTvtyqLzfYV/
-         SqOg==
+        d=gmail.com; s=20230601; t=1722127180; x=1722731980; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2WtLQ0AuJweiHPK220i2nAx1+PX8DFaWeqci7mSxG24=;
+        b=OnlPbCm6z7AoZfOPR3DJyauVU1KvMeyquEry0wpMcC7a+0qSI7yHb2qX4z2w+dkowm
+         Yae4QGhPAeyhfu6qxYSoMlpkcJG6CZVjvgvPfcwui8n+WMNOh2pQsoxIvrUgF3OVjxFR
+         o7x5H2UWKwU1ObNJywWZUVm/u/QppDf+VZGE9Yoaw22rmxL2N5SCGp8Ox3q3myfl3Trv
+         qpYH8LAVTYFUIy68/qv0ZHLgnyw1Hz6JZb8XWruxXJpow8Zh5rmahf174i1KFYPVn9d/
+         SFcgC7oFbw9F9TQ255r4TJ9kMskqAM/z4agM2Zu7o1jShIUtwsGvl9oTsE9ytBqvs3Ia
+         T0pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722126920; x=1722731720;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vHrFGGQW7WEzTSEJx91bUUFVGQDkOrk8pgkc3hN4gDo=;
-        b=hq336Jaykp1+cagYxGkBkTzkRRMn6v9sPy26MK5Eh7HE/TV1Fks+L9vqWB34Sr/x8M
-         utth5Su6+T/IWZmvVNEebZFXS8vPuRq3lFvPRykHDAoCxS9obAxy8RFJhxMvqEhCiRIr
-         Wftn/F9iJxQtTMa4cIVT2OBkVUDZwUT9CGtm1/Ybrc+bZ8LifFAwh948azTYOabm2fjk
-         M+qgN5T3raPnCLUV38xVU8R69T/+l3HEIwuI2hbxnj4+3R4B9wxxEDp9UjV8eiOMe4TI
-         xyuDx6ONYcsTPQhGaR0lTNdUluNaQbJS+yvu+TpMszOe34yu8z4ZCUG3eNTLZ9ok7tbV
-         G19A==
-X-Forwarded-Encrypted: i=1; AJvYcCUFhT2NBXnuxYzxajR8T/wrz2qDMiWN4FYPezlUv3W3fRJNdgYxbDARwIqQbs/wK0aWAjHkgy4zZ7HLnMPWjWs7wbaF0ay1+im4GnvY
-X-Gm-Message-State: AOJu0YxKj1donXSQsR38VxnSH0I88NbRlRaA3Ayy0Mhk7t56vuG8fSUV
-	81pQuDJ4hutGIDkWHZGpKu8pp+mpvxFnO5pLgP1HgFFOz0GdAqikcgCPIKKDXJ3V3CFOQ3qpcL/
-	h9FaHOXhjQnUI8LpPbeBjW7CTx3ySeLBC
-X-Google-Smtp-Source: AGHT+IE82gkxjoYFy4bOVPvVzjh6TvGugjLGrSDLaYbXJUpwjmRXOPO0mNF2jMhxmdepoA7J7DqZT3PqLq8KBlfRsEA=
-X-Received: by 2002:ac2:4bd1:0:b0:52e:9b92:4999 with SMTP id
- 2adb3069b0e04-5309b269ae5mr3149605e87.2.1722126919483; Sat, 27 Jul 2024
- 17:35:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722127180; x=1722731980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2WtLQ0AuJweiHPK220i2nAx1+PX8DFaWeqci7mSxG24=;
+        b=bwK3elVJrnE4phPr7tSgOYnU7gCOo/Jq9Dk9hBtlxxhNE5key/4gmPfkcMy5GSRC3o
+         0rd09ikZ+a8qovNWbCw6xSc/KUsdiPx1MGg9i3NAnn/Fj/oLZ6CILboeQJkpAU5HMKop
+         bV0xc7x8S42PVa7aauwQVgvfyAKtIZ5ijtiidDSvIssb76hsFr4BcMYerxVi8P27aykn
+         S5yE3uOoHU3cPc26d15QIus6UT574cscH1gTdQSpU0UOnALg/lD1RvxWMeztvkmjS4oD
+         mA4xELeqP+ObLJlaDJxcYZ3SCNq6s7CBUhAB+JCIh/8PTOkTjEsqIxbfysUQ/JY6aMMa
+         ae4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXU2osKwwmymbmNX+4268R+nIt9YxPw7vNUFQqo3USsYANqtk1eGSvU3AHPovMvc8KQirjzulGYD/wmfAe4MFbOUs+BSDggf59OKA==
+X-Gm-Message-State: AOJu0Yygz7VL2puJWzFgOgWWb+zAzrFC7EWRYsszI/sAOG6do3bWawtt
+	TdQPfadAlCRg+xnzNzOEGu8z7HGoQrOMvlb1gZbWVrxjLDd4cFX61uYgVnlYEvc/AHLwCOBZ/A9
+	gjlczwBF1IfEgwcZyPJJfinkwN6Y=
+X-Google-Smtp-Source: AGHT+IG5JQmE65nithUd9gPWobOGx0/wdLHMpZKHL5EDmk/X0iJLRv2GjUeuZ9m3ZtbUUM4Sp8hPEYcHGMBevld2lSc=
+X-Received: by 2002:a05:6512:3414:b0:52f:cb5c:b083 with SMTP id
+ 2adb3069b0e04-5309b25a268mr2557766e87.5.1722127179445; Sat, 27 Jul 2024
+ 17:39:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAH2r5mvMr9YgvLds8_OCMVV6FOzuBUgwn8_X6Pbz3hq_oakSWw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvMr9YgvLds8_OCMVV6FOzuBUgwn8_X6Pbz3hq_oakSWw@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 27 Jul 2024 19:35:08 -0500
-Message-ID: <CAH2r5msuLY9XywuKvnggezTdjCBQx8HDfYhHNstS-Yijz15sdg@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Date: Sat, 27 Jul 2024 19:39:28 -0500
+Message-ID: <CAH2r5mt6n3-46_gS2GNVtrLj-CE4mCP60W3D_-y3QdZ6UKsgkg@mail.gmail.com>
+Subject: Re: [PATCH][SMB3] mark compression as CONFIG_EXPERIMENTAL and fix
+ missing compression operation
+To: Enzo Matsumiya <ematsumiya@suse.de>, CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>, Anthony Nandaa <profnandaa@gmail.com>, 
+	Jun Ma <junma@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-33c9de2960d347c06d016c2c07ac4aa855cd75f0:
+Had to add one line due to an error in some configurations pointed out
+by the kernel test robot:
 
-  Merge tag '6.11-rc-part1-smb3-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2024-07-21 15:23:39 -0700)
+index 0cc9c6abf840..3d0d3eaa8ffb 100644
+--- a/fs/smb/client/compress/lz77.h
++++ b/fs/smb/client/compress/lz77.h
+@@ -9,6 +9,7 @@
+ #ifndef _SMB_COMPRESS_LZ77_H
+ #define _SMB_COMPRESS_LZ77_H
 
-are available in the Git repository at:
++#include <linux/uaccess.h>
+ #ifdef CONFIG_CIFS_COMPRESSION
+ #include <asm/ptrace.h>
+ #include <linux/kernel.h>
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.11-rc-smb-client-fixes-part2
+to address:
 
-for you to fetch changes up to b6f6a7aa689f1c255e06fee3ca13c9f9e5c12780:
+   In file included from fs/smb/client/compress/lz77.c:10:
+>> fs/smb/client/compress/lz77.h:127:9: error: call to undeclared function =
+'copy_from_kernel_nofault'; ISO C99 and later do not support implicit funct=
+ion declarations [-Wimplicit-function-declaration]
+     127 |         return copy_from_kernel_nofault(dst, src, count);
+         |                ^
+   1 error generated.
 
-  smb3: add dynamic trace point for session setup key expired failures
-(2024-07-26 12:34:50 -0500)
 
-----------------------------------------------------------------
-Six smb3 client fixes
-- fix for potential null pointer use in init cifs
-- three additional dynamic trace points to improve debugging of some
-common scenarios
-- two SMB1 fixes (one addressing reconnect with POSIX extensions, one
-a mount parsing error)
+vim +/copy_from_kernel_nofault +127 fs/smb/client/compress/lz77.h
 
-There are some additional patches SMB3.1.1 compression improvements
-and a locking fix that are still being debugged and are not included
-in this P/R
-----------------------------------------------------------------
-Steve French (6):
-      cifs: fix potential null pointer use in destroy_workqueue in
-init_cifs error path
-      cifs: fix reconnect with SMB1 UNIX Extensions
-      cifs: mount with "unix" mount option for SMB1 incorrectly handled
-      smb3: add dynamic tracepoint for reflink errors
-      smb3: add four dynamic tracepoints for copy_file_range and reflink
-      smb3: add dynamic trace point for session setup key expired failures
+   124
+   125  static __always_inline long lz77_copy(u8 *dst, const u8 *src,
+size_t count)
+   126  {
+ > 127           return copy_from_kernel_nofault(dst, src, count);
+   128  }
+   129  #else /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+   130  static __always_inline u8 lz77_read8(const void *ptr)
+   131  {
+   132          return get_unaligned((u8 *)ptr);
+   133  }
+   134
 
- fs/smb/client/cifsfs.c  |   8 +++---
- fs/smb/client/connect.c |  24 ++++++++++++++++-
- fs/smb/client/smb2ops.c |  20 +++++++++++++-
- fs/smb/client/smb2pdu.c |   8 +++++-
- fs/smb/client/trace.h   | 150
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 203 insertions(+), 7 deletions(-)
+On Fri, Jul 26, 2024 at 6:53=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> Since some of Enzo's compression patch series has to be changed due to Da=
+vid Howell's netfs changes to cifs.ko over the past two releases, I split o=
+ut the obvious parts of his patch to implement the client side of SMB3.1.1 =
+compression on write requests (see https://git.exis.tech/linux.git/patch/?i=
+d=3D40414c6a34081b372e45c7ce5060a6d34779f6ba for the original patch of Enzo=
+'s) but left out the final piece of the patch (the calls from the write pat=
+h).
+>
+> This moves SMB3.1.1 compression code into experimental config option,
+> and fixes the compress mount option to require that config option.
+> Also implements unchained LZ77 "plain" compression algorithm as per
+> MS-XCA specification section "2.3 Plain LZ77 Compression Algorithm Detail=
+s".
+>
+> See attached
+>
+> --
+> Thanks,
+>
+> Steve
 
--- 
+
+
+--=20
 Thanks,
 
 Steve
