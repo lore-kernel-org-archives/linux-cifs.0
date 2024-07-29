@@ -1,76 +1,174 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7332838B;
-	Mon, 29 Jul 2024 00:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917512F5A;
+	Mon, 29 Jul 2024 04:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722211289; cv=none; b=BMsfeYbriFY1IWtBjnt5tuHqUpnFtVw759/s6GpxtLCFLfVDEgdxn4I3XhGmNUO3WOA0Fvey6SWDHofjecYRegRwoKgJVoWhZ6vtSIUT2YfrGl98wT1Yvop6A3k720WfhK9DJzs7l8EgpYyeYHik7Jizu3nDttopbu7ss3BBW7I=
+	t=1722226624; cv=none; b=OolbDCxmM57lqnTxTpfRZ3VNBNUGXvOOrNTuy6dzNT0Z0m1bJqgdzue/2g9Mnhkbnqxi4A9SgfM19TP48A8livefM1qh+yuVT7CNWwofKYpneJHxIP3qQU4uAZajjQfuy/2VNx+NQmr2mflym1s1JsLVvQdQSRF89q+MMgKUnc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722211289; c=relaxed/simple;
-	bh=Y17ivoUEZqJMec1bdUlKse1yfK2OEne8uUS4d7z9pdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W44pHBoaG/3Fn/CTm2QkqZHIkQk9PbKQubppobYVo9HOvF93vmhxi9drxApytwbhQ0vWPAtmt7u1MNTsvUVQhIpbSKiRBUdNwDwEyWrWX1wLiMl1kVyu3Oxt0g4cdFzmd6aH+5LSatZiffmNN8xo8hMEiBqt+T9y6exvRCGB6Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=K0Vz2vMk; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1722226624; c=relaxed/simple;
+	bh=RBRXap9AZd8LH2XsGENLNLD3CHvsgScRdJ1v6t+6JhY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O53ojFmiZd4eSbPQVRDKm5DDIDi+l2ATTopgSFGpwyhlslZ/WZiLE0leYFFjjOI/5Qe15WmDzj+HbW6rX2E3nm0gLIE1DTuYpDt9ZROZSBQkw+qHcWN7MbcFXJLTY06lBS2Z0goSacVxITFiea29LJdO52aA/5ZtjwGrhEzgPLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lmQu80WT; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="K0Vz2vMk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=1iJrhw/cvkglGTTLotlyOAN80Woc3csC6LR3rVH+UOA=; b=K0Vz2vMkgB3eYtKojYPQO3NJBf
-	J4CVTPwMpvqdjynwfIWVs8E1pchr11aQTyEZ0cFbrBZkweB0B4ISTeSjZemNXhDkyWAE0YPJZk9PA
-	cPpMRR9tMUXcfO693sQMh2kic2IkXvP7Zh2B5wvl58/r8wjlxjgn/rPap0gDNkv0oMgAOv83FNgF5
-	SAndXyO92NaKsYdhreZxIgk2zZF2REybzGLsUIxqu1HZ+c5rE8B7ONN+ONRligLdqbRsIo919bCxM
-	a6AHetFHrectBW3L6EmLTGPKLbwTpXm7cvtJ735iGP7bwI0ZTuaco2ja1ZjuRdcDbRtAilSIWlvGR
-	D/dFYMWg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sYDpM-00000002ZPg-24By;
-	Mon, 29 Jul 2024 00:01:24 +0000
-Date: Mon, 29 Jul 2024 01:01:24 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Why do very few filesystems have umount helpers
-Message-ID: <20240729000124.GH99483@ZenIV>
-References: <CAH2r5ms+vyNND3XPkBo+HYEj3-YMSwqZJup8BSt2B3LYOgPF+A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lmQu80WT"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ef2fccca2cso37157901fa.1;
+        Sun, 28 Jul 2024 21:17:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722226621; x=1722831421; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QyHOGRmNKmHe8l9zKgDQXc82VPvewqqtTpqW/jtcyNE=;
+        b=lmQu80WTn0ACyDWFgtRvnNYdXRv/WLK9XCZxpvOJVoHPbbM3ffam+SC04GrI3oO222
+         H8LKcG18JMmlGu8Yb0E76BUl5Q4fhYujtyYOr4j/v1swkQeMZztiUBPX0UPNW4055tiI
+         rB8wRfGk39xwq8j59ea8yJqXkULGxmionWZ5y0C4hBCNWgRgQpVwIAFTLlMh4CIA51Uv
+         JCiFZ9HObSuU83QWNWcwWGbLYSXXY6FbRVIM3/8jEECW5rB6pRUKUtEAGkAtKO5lLW2G
+         8Rz0j4MlXWO+Qsc3A2TSkhMegAPn/wfRpMTxrQrqg5qhliQOaY3jIAELGxjVu0SCyJr3
+         6Clw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722226621; x=1722831421;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QyHOGRmNKmHe8l9zKgDQXc82VPvewqqtTpqW/jtcyNE=;
+        b=jqgdzWr8yEUxXCE0wE/8ZS8xl9PUKTs1rXegBtsPk+C6ZV7u14fU/ydFb9P368J1Uk
+         XqKUH8tJf84/BJURO6X8VBVLwUF6DKnUdZTwM3ZYNZWbM8E+298Lr6ptmRPNfr9Iw4/J
+         jDY4g5pRztVJ6CvqqDC7ND8vfoW/E1dtNv3cPSsX2FhBWD5KndQ+GOy1RiQsbX1zGIXq
+         mEGgeqYsw4520hjN5sSoehp9rmnaFEHmZ83/YkTFAIgZX7kIe7m5iuMtl7BpWZlFljhO
+         yIeH8ag0yMCAS8SnuLPRMfNWz2baejLSblIP10GBCRA4OQ+zy8HLobUckVOcNn1WA9Vx
+         5FTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXX/jAanxxiYkLtOKUwgnmvgzVDFT0OSQpH4tlVVFbXJ6mTPwOmxTjs6rttxfK490HI8NvpSRwpSVpcUg33YAI8Z2OzexSPzEj9i8yTMBpnj0OqH+xU8kQgMRh2HQH1zejwQzzsS6V02g==
+X-Gm-Message-State: AOJu0YyDFHreVzsqhgcsmjIPPmQ1nQxOu7MT3sTGAbRztqdiK2GteAyX
+	8841QFbNLl16WAMW+31/GJ8LBnbrRKBD3WDPXfTx1d6KLq9kvw68k5xvdJYnWLO83FRrophc+MP
+	FuAfbwHEtSgsVNC8qWtGMj6604JE=
+X-Google-Smtp-Source: AGHT+IGDKS6BOTrX3Kytbfj4e3mBi2YdisqBuu4gC9PLP86P7Ov80iia63wyJJS0/M/A8vxechiRKrgcGokg2lv22pI=
+X-Received: by 2002:a05:6512:1249:b0:52f:c14e:2533 with SMTP id
+ 2adb3069b0e04-5309b2dfe13mr4495361e87.48.1722226620220; Sun, 28 Jul 2024
+ 21:17:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5ms+vyNND3XPkBo+HYEj3-YMSwqZJup8BSt2B3LYOgPF+A@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+References: <CAH2r5ms+vyNND3XPkBo+HYEj3-YMSwqZJup8BSt2B3LYOgPF+A@mail.gmail.com>
+ <20240729000124.GH99483@ZenIV>
+In-Reply-To: <20240729000124.GH99483@ZenIV>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 28 Jul 2024 23:16:49 -0500
+Message-ID: <CAH2r5mvnpHS7Gs7wMCAYsNZCBte5=jkzvL_bAq84zZoh8-kX5A@mail.gmail.com>
+Subject: Re: Why do very few filesystems have umount helpers
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>, ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 28, 2024 at 02:09:14PM -0500, Steve French wrote:
+On Sun, Jul 28, 2024 at 7:01=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> w=
+rote:
+>
+> On Sun, Jul 28, 2024 at 02:09:14PM -0500, Steve French wrote:
+>
+> > Since umount does not notify the filesystem on unmount until
+> > references are closed (unless you do "umount --force") and therefore
+> > the filesystem is only notified at kill_sb time, an easier approach to
+> > fixing some of the problems where resources are kept around too long
+> > (e.g. cached handles or directory entries etc. or references on the
+> > mount are held) may be to add a mount helper which notifies the fs
+> > (e.g. via fs specific ioctl) when umount has begun.   That may be an
+> > easier solution that adding a VFS call to notify the fs when umount
+> > begins.
+>
+> "references on the mount being held" is not something any userland
+> helpers have a chance to help with.
 
-> Since umount does not notify the filesystem on unmount until
-> references are closed (unless you do "umount --force") and therefore
-> the filesystem is only notified at kill_sb time, an easier approach to
-> fixing some of the problems where resources are kept around too long
-> (e.g. cached handles or directory entries etc. or references on the
-> mount are held) may be to add a mount helper which notifies the fs
-> (e.g. via fs specific ioctl) when umount has begun.   That may be an
-> easier solution that adding a VFS call to notify the fs when umount
-> begins.
+I don't know the exact reasons why at least three filesystems have umount
+helpers but presumably they can issue private ioctls (or equivalent)
+to release resources, but I am very curious if their reasons would
+overlap any common SMB3.1.1 network mount use cases.
 
-Huh?
+> What exactly gets leaked in your tests?  And what would that userland
+> helper do when umount happens due to the last process in given namespace
+> getting killed, for example?  Any unexpected "busy" at umount(2) time
+> would translate into filesystem instances stuck around (already detached
+> from any mount trees) for unspecified time; not a good thing, obviously,
+> and not something a userland helper had a chance to help with...
+>
+> Details, please.
 
-"references on the mount being held" is not something any userland
-helpers have a chance to help with.
+There are three things in particular that got me thinking about how
+other filesystems handle umount (and whether the umount helper
+concept is a bad idea or a good idea for network fs)
 
-What exactly gets leaked in your tests?  And what would that userland
-helper do when umount happens due to the last process in given namespace
-getting killed, for example?  Any unexpected "busy" at umount(2) time
-would translate into filesystem instances stuck around (already detached
-from any mount trees) for unspecified time; not a good thing, obviously,
-and not something a userland helper had a chance to help with...
+1) Better resource usage: network filesystems often have cached
+information due to
+leases (or 'delegations' in NFS terminology) on files or directory
+entries.  Waiting until kill_superblock (rather than when umount began) can
+waste resources.  This cached information is not automatically released
+when the file or directory is closed (note that "deferred close" of files c=
+an
+be a huge performance win for network filesystems which support safe
+caching via leases/delegations) ... but these caches consume
+resources that ideally would be freed when umount starts, but often have to
+wait longer until kill_sb is invoked to be freed.  If "umount_begin"
+were called always e.g. then (assuming this were not multiple mounts
+from the same client that server share) cifs.ko could
+  a) close all deferred network file handles (freeing up some resources)
+  b) stop waiting for any pending network i/o requests
+  c) mark the tree connection (connection to the server share) as "EXITING"
+   so we don't have races sending new i/o operations on that share
 
-Details, please.
+2) fixing races between umount and mount:
+There are some common test scenarios where we can run a series of
+xfstests that will eventually fail (e.g. by the time xfstest runs gets
+to 043 or 044
+(to Samba server on localhost e.g.) they sometimes hit races which
+cause this message:
+
+     QA output created by 043
+    +umount: /mnt-local-xfstest/scratch: target is busy.
+    +mount error(16): Device or resource busy
+
+but it works fine if delay is inserted between these tests.  I will
+try some experiments to
+see if changing xfstests to call force unmount which calls "umount_begin" (=
+or
+adding a umount wrapper to do the same) also avoids the problem. It
+could be that
+references may be being held by cifs.ko briefly that are causing the VFS to
+think that files are open and not calling into cifs.ko to
+kill_superblock. This needs
+more investigation but "umount --force" (or equivalent) may help.
+
+3) races in cleaning up directory cache information.  There was a
+patch introduced for
+periodically cleaning up the directory cache (this is only an issue to
+servers like
+Windows or NetApp etc. that support directory leases so you don't see
+it to Samba
+and various other common servers that don't enable directory leases)
+that can cause
+crashes in unmount (use after free).  I want to try to narrow it down
+soon, but it was a little
+tricky (and the assumption was that force unmount would avoid the
+problem - ie the call to
+"umount_begin").  Looks like this patch causes the intermittent umount
+crash to Windows
+servers:
+
+commit d14de8067e3f9653cdef5a094176d00f3260ab20
+Author: Ronnie Sahlberg <lsahlber@redhat.com>
+Date:   Thu Jul 6 12:32:24 2023 +1000
+
+    cifs: Add a laundromat thread for cached directories
+
+    and drop cached directories after 30 seconds
+
+
+
+Steve
