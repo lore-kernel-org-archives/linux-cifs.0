@@ -1,128 +1,186 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEEDCA6F
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Jul 2024 02:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CD233D5
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Jul 2024 05:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722308094; cv=none; b=l6ZV4zsROe9kjJsZ+g057Uj6iI/7kPyVtRDm5TcCsWFD5spLfurmc5EUlwofesO+agReQfRMCZzIBM06i/kzHWKBxliCRSDh+/QAqZKbKae8FWKE+Q+aZ5wuZecmj8476JV/wEtAreOUqKOTFyzCmrHJumPrEw4FSN2DOL6xkAo=
+	t=1722317671; cv=none; b=kbzdiU6qHhrGNOv7cQ6pf6g6IBFZDIxtWcshLqqiAQ3Dw6O4VNdx5cq5FbmkBNaNaoV+PTMqSM9jJBxGHOe61RGWE+wI82Lfaqsl0gLTkmmZCFg2wCk1txP1Iwbkr+9LOYaQqMwcmlmyk0BimKUptq0oTPvQFS5IUatdAqpb+JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722308094; c=relaxed/simple;
-	bh=4DKXwTOXGRifVehksdP7ASe1iFP8aSGYh9Bi51Nd5fM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uSPEc+dTGp/FFlQyJ/n9hx+5jrCoMfQJ/2XREDWtYMvK9J7SEVKbEdRtNkmuSkw6K0UKIv9Ia6qOiW60CO3tuU5lFKnQsZWBsM7bC4hgX6NbWtRZ89w6lGsipysZz+MTfGzz8bEm2c0aguTV7Fknq+qKBTLI1tilcSO7uwOpA4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=ezwrHA+i; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	s=arc-20240116; t=1722317671; c=relaxed/simple;
+	bh=eECQ5ULEyDbnTHint+4kJiJHno01tnPPBuJkGnQHyyU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=DFRybVSODf/iwJLDHxnG8RBeijddPJFMNTjz3UMxZrUcG76xQX0gmrO6SIfDihSc2gED5evdUgF+LFN7q/jsV2nVq9o333bzYvpPIuzWE9g69hOKu736vdxr5Tw7my9N318aSvpUZbN7QecHX6ycx7FcDsHQIlQJOLOJM2d9ruY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi6MMfHP; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="ezwrHA+i"
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3db22c02a42so2175282b6e.3
-        for <linux-cifs@vger.kernel.org>; Mon, 29 Jul 2024 19:54:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi6MMfHP"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ef2d582e31so51094181fa.2
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Jul 2024 22:34:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1722308092; x=1722912892; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IXhr7QDVqMjze51cc8rGfZkRClby+uSW76McCfxaQHk=;
-        b=ezwrHA+itLq5PN81glR7RtgsdJJjv5IaSEDlPNRyd2opeXIGayhmSYNl1vnQTqQaV7
-         RQ/7NVdX1olGAkuKmgkyCP8gzwXSQIwmW4s203WhZRuIHQwzNw7XJqfK6aO2Fe/OvpuW
-         qGW4xM+ZFzo8WfoXxZqlO2q5JSplkKjLAPzieg2FMlRl8LadEj6M4uRvsKASW39UxD+V
-         /rM1YtT75xd5lamtaUDNQh2edesNjkIAlZUesprUZtM2elndYRs18KgVyWRDkZYYQCAp
-         ZyjmXKI6VpSu0Sb7sih5xXqYLxpabRa55VcqiZlla8pHtWTlsk2vGNa2WTB0usSclC/+
-         z6dg==
+        d=gmail.com; s=20230601; t=1722317667; x=1722922467; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=19YrcVfbExCDN8xnesR19+Kpu0uBX9NNvTzVMFyg3tg=;
+        b=Qi6MMfHP+CMnqcGQqAYBY7QkZVqxMsNGVjm5pjoD5+gCpBHlSONgqAX9cwXKk9DblC
+         lgm1i+9smKn4yukf9IxkFiV+c0ovFXrWztOS19+jDTNCOjnKt7Qs7NB2HyDnmFQXqB9z
+         yPRu+65Zu3+cSdNcq/isfx9Lxxw4R1M9ah1JIMDBlBGgnL5OCcPX8uRNeaQT8UUFoD1D
+         s6SCKJVYoePNl9ryWhficMHEFsjqar1W4fscolLeIASt5d5BStBoD2GlvymrfBYNdtXd
+         yrMOBPF7OFDaTX6pix2mjVXDp62qVFPQomTH7ne03oJYuOL+2t0C2Bm7ycvyQZ8a2uDH
+         DYoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722308092; x=1722912892;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IXhr7QDVqMjze51cc8rGfZkRClby+uSW76McCfxaQHk=;
-        b=tKGYUCZ9K5PYDMsEET1bypz5BivJ37XO06MaU51wzgmGedfUWD1H1obAg+E0FFdhK9
-         AutmwbcGgdAJKB1qbnsUg8Gj11N8ON0eblnrZcuSGVLLocznPzoSwZqyEe78qVMl/FlP
-         UdKCzycvo2sprrWn7gbcXkenJGjmQQOZVKTeOPOpxR8tDNLWolzvXcXty5a1mg+EqCyO
-         /zB4a8vIb+HdP8sCGsrbwB35hTJYIvb5ubgLHPazhlJnmIliO0W6IfaNc5WpeYjmI63o
-         PhI4rO6bbTfIA8WT5u2JD4Kl6XY2igkFUZCTxGHmTZPlVr5vouCQ6jhPj3OFVTdpGcmb
-         biQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqeFs7sHqLlROo+BEkmMcwwA9t/ceBArRdNE66RyE7nCN1cghbuYfNR9SM/aNL1LEt12XwinqEjBtpE2Uqrg9IHsHrcGmnzeMO1Q==
-X-Gm-Message-State: AOJu0YyJ2JkBOMR76GXk3WzBpPie/ogcn4K/1FMleUpwdRhOyymy2yiE
-	NlWnmRhOztTWnmhofQB7L07L2Ul/wly563Vks/yj1P/nrv0roP8zCRMrt8Bnz0U=
-X-Google-Smtp-Source: AGHT+IH+M5TmiJzVtoxVVgF39Iukl8K2trADdgg+a7EhyWKfcrF7/37r10kwrM+Wv4vvT6mqNWV8AA==
-X-Received: by 2002:a05:6808:1495:b0:3d9:21bb:170d with SMTP id 5614622812f47-3db238bd70bmr13582636b6e.16.1722308092301;
-        Mon, 29 Jul 2024 19:54:52 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-47-239.pa.nsw.optusnet.com.au. [49.181.47.239])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9fa49cb6csm7902244a12.77.2024.07.29.19.54.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 19:54:51 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1sYd0i-00GFgA-2a;
-	Tue, 30 Jul 2024 12:54:48 +1000
-Date: Tue, 30 Jul 2024 12:54:48 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Steve French <smfrench@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Why do very few filesystems have umount helpers
-Message-ID: <ZqhV+PvVKESa3UVw@dread.disaster.area>
-References: <CAH2r5ms+vyNND3XPkBo+HYEj3-YMSwqZJup8BSt2B3LYOgPF+A@mail.gmail.com>
- <20240729-abwesend-absondern-e90f3209e666@brauner>
- <CAH2r5muRnhFevDR29k=DkmD_B44xQ5jOXd5RnRqkyH27pKzNDQ@mail.gmail.com>
- <CAH2r5mvTFDShaGeygoykFzB59B7SckxM7u5QHzKOwioP_W6e3w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1722317667; x=1722922467;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=19YrcVfbExCDN8xnesR19+Kpu0uBX9NNvTzVMFyg3tg=;
+        b=OmtyMNci+xk8gg7OJMKB8iolwzqAE59/16D9uPcfYo5gBp/O2mY50pq9+70Y29xjut
+         XIq7H5eR/a+d4fC17yph310QD5nfsb50KGs6iC60K7VdWY6Zg4L4c3oFx5I7SAjmYlcj
+         Xk3J9AbD6azrDn6Wd0qW2fq0m3Hy23g8A286ia7UDae7nXw7Qq+4zOnQsSnPVrJetSvU
+         r5uT0kUnUqv98nH8bLvlW8dOTknKRAZ2vOmwZzHRUCEAZjhJAVRoj95ZS32mf4SY2sid
+         KipmQbcG42zNTbX2h/P8C5AMxZCr2eR7FGzf7B4jlu2lOpXcKQd5PsshhqmzAgCJrNgx
+         +b/g==
+X-Gm-Message-State: AOJu0YwDKJq8yTt1qZkmgdxCfFjwdjMnWFNrqtVB4f+opneqVahJ7y03
+	6ptoKFQcGwAh4lhxXqCUaceqFa+gj0zV1j0NpJsg8PxPVWRQw5l6WuuDaH1oJPkhl+SxW4F9nZJ
+	9/rKtPfspll2CYgh8smYDwzfbc8QxyQYP
+X-Google-Smtp-Source: AGHT+IEmLgsM40YzHW/ueFQ/wlpk+VoNspG4Z6iuBKs0oSRoL/biWXYD41vH5gSAdeMh+KkPKWAO2a6MZIycuhq+lJ4=
+X-Received: by 2002:a2e:9619:0:b0:2ef:2e3f:35da with SMTP id
+ 38308e7fff4ca-2f12ee634famr57909211fa.45.1722317666883; Mon, 29 Jul 2024
+ 22:34:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mvTFDShaGeygoykFzB59B7SckxM7u5QHzKOwioP_W6e3w@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 30 Jul 2024 00:34:15 -0500
+Message-ID: <CAH2r5msodFELeYf5h3h1qqR-tgaE6ZNMMbWvFbFDzCjDjPnqsA@mail.gmail.com>
+Subject: [PATCH][SMB3 client] add dynamic tracepoints for shutdown ioctl
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: Shyam Prasad N <nspmangalore@gmail.com>, Bharath S M <bharathsm@microsoft.com>
+Content-Type: multipart/mixed; boundary="000000000000b9bf00061e7054c9"
 
-On Mon, Jul 29, 2024 at 04:50:27PM -0500, Steve French wrote:
-> On Mon, Jul 29, 2024 at 4:50 AM Christian Brauner <brauner@kernel.org> wrote:
-> On Mon, Jul 29, 2024 at 12:33 PM Steve French <smfrench@gmail.com> wrote:
-> > > The first step should be to identify what exactly keeps your mount busy
-> > > in generic/044 and generic/043.
-> >
-> > That is a little tricky to debug (AFAIK no easy way to tell exactly which
-> > reference is preventing the VFS from proceeding with the umount and
-> > calling kill_sb).  My best guess is something related to deferred close
-> > (cached network file handles) that had a brief refcount on
-> > something being checked by umount, but when I experimented with
-> > deferred close settings that did not seem to affect the problem so
-> > looking for other possible causes.
-> >
-> > I just did a quick experiment by adding a 1 second wait inside umount
-> > and confirmed that that does fix it for those two tests when mounted to Samba,
-> > but not clear why the slight delay in umount helps as there is no pending
-> > network traffic at that point.
-> 
-> I did some more experimentation and it looks like the umount problem
-> with those two xfstests to Samba is related to IOC_SHUTDOWN.
-> If I return EOPNOTSUPP on IOC_SHUTDOWN
-> then the 1 second delay in umount is not necessary - so something that
-> happens after IOC_SHUTDOWN races with umount (thus the 1 second delay
-> that I tried as a quick experiment fixes it indirectly) in this
-> testcase (although
-> apparently this race between IOC_SHUTDOWN and umount is not an issue
-> to some other servers but is reproducible to Samba and ksmbd (at least
-> in some easy to setup configurations)
+--000000000000b9bf00061e7054c9
+Content-Type: text/plain; charset="UTF-8"
 
-So you've likely got a race condition where something takes longer
-when the shutdown flag is set then when the filesystem is operating
-normally. There's not a lot in the CIFS code that pays attention to
-the shutdown flag - almost all of them are aborting front end
-(syscall) operations before they are started.
+For debugging an umount failure in xfstests generic/043 generic/044 in some
+configurations, we needed more information on the shutdown ioctl which
+was suspected of being related to the cause, so tracepoints are added
+in this patch e.g.
 
-The only back end check appears to be in cifs_issue_write(). Perhaps
-that is failing to wake the request queue when it is being failed
-with -EIO on a shutdown, and so it takes some time for something
-else to wake it up and empty it and complete the pending writes
-before the fs can be unmounted...
+  "trace-cmd record -e smb3_shutdown_enter -e smb3_shutdown_done -e
+smb3_shutdown_err"
 
--Dave.
+Sample output:
+  godown-47084   [011] .....  3313.756965: smb3_shutdown_enter:
+flags=0x1 tid=0x733b3e75
+  godown-47084   [011] .....  3313.756968: smb3_shutdown_done:
+flags=0x1 tid=0x733b3e75
+
+See attached
+
+
+
 -- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+
+Steve
+
+--000000000000b9bf00061e7054c9
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-add-dynamic-tracepoints-for-shutdown-ioctl.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-dynamic-tracepoints-for-shutdown-ioctl.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lz7zfnt70>
+X-Attachment-Id: f_lz7zfnt70
+
+RnJvbSAwYWVhZTM0M2RhNjlhZjhjMDUxNmI2NjUwMzEyYmU1MTdkNGZmNmE4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMzAgSnVsIDIwMjQgMDA6MjY6MjEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhZGQgZHluYW1pYyB0cmFjZXBvaW50cyBmb3Igc2h1dGRvd24gaW9jdGwKCkZvciBkZWJ1
+Z2dpbmcgYW4gdW1vdW50IGZhaWx1cmUgaW4geGZzdGVzdHMgZ2VuZXJpYy8wNDMgZ2VuZXJpYy8w
+NDQgaW4gc29tZQpjb25maWd1cmF0aW9ucywgd2UgbmVlZGVkIG1vcmUgaW5mb3JtYXRpb24gb24g
+dGhlIHNodXRkb3duIGlvY3RsIHdoaWNoCndhcyBzdXNwZWN0ZWQgb2YgYmVpbmcgcmVsYXRlZCB0
+byB0aGUgY2F1c2UsIHNvIHRyYWNlcG9pbnRzIGFyZSBhZGRlZAppbiB0aGlzIHBhdGNoIGUuZy4K
+CiAgInRyYWNlLWNtZCByZWNvcmQgLWUgc21iM19zaHV0ZG93bl9lbnRlciAtZSBzbWIzX3NodXRk
+b3duX2RvbmUgLWUgc21iM19zaHV0ZG93bl9lcnIiCgpTYW1wbGUgb3V0cHV0OgogIGdvZG93bi00
+NzA4NCAgIFswMTFdIC4uLi4uICAzMzEzLjc1Njk2NTogc21iM19zaHV0ZG93bl9lbnRlcjogZmxh
+Z3M9MHgxIHRpZD0weDczM2IzZTc1CiAgZ29kb3duLTQ3MDg0ICAgWzAxMV0gLi4uLi4gIDMzMTMu
+NzU2OTY4OiBzbWIzX3NodXRkb3duX2RvbmU6IGZsYWdzPTB4MSB0aWQ9MHg3MzNiM2U3NQoKU2ln
+bmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZz
+L3NtYi9jbGllbnQvaW9jdGwuYyB8IDM4ICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
+CiBmcy9zbWIvY2xpZW50L3RyYWNlLmggfCA1MSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKystCiAyIGZpbGVzIGNoYW5nZWQsIDc5IGluc2VydGlvbnMoKyksIDEwIGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvaW9jdGwuYyBiL2ZzL3NtYi9j
+bGllbnQvaW9jdGwuYwppbmRleCA4NTVhYzVhNjJlZGYuLjkwYmIyYzk4OWFhYiAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NsaWVudC9pb2N0bC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvaW9jdGwuYwpAQCAt
+MTcwLDIyICsxNzAsMzQgQEAgc3RhdGljIGxvbmcgc21iX21udF9nZXRfZnNpbmZvKHVuc2lnbmVk
+IGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiBzdGF0aWMgaW50IGNpZnNfc2h1dGRv
+d24oc3RydWN0IHN1cGVyX2Jsb2NrICpzYiwgdW5zaWduZWQgbG9uZyBhcmcpCiB7CiAJc3RydWN0
+IGNpZnNfc2JfaW5mbyAqc2JpID0gQ0lGU19TQihzYik7CisJc3RydWN0IHRjb25fbGluayAqdGxp
+bms7CisJc3RydWN0IGNpZnNfdGNvbiAqdGNvbjsKIAlfX3UzMiBmbGFnczsKKwlpbnQgcmM7CiAK
+LQlpZiAoIWNhcGFibGUoQ0FQX1NZU19BRE1JTikpCi0JCXJldHVybiAtRVBFUk07CisJaWYgKCFj
+YXBhYmxlKENBUF9TWVNfQURNSU4pKSB7CisJCXJjID0gLUVQRVJNOworCQlnb3RvIHNodXRkb3du
+X291dF9lcnI7CisJfQogCiAJaWYgKGdldF91c2VyKGZsYWdzLCAoX191MzIgX191c2VyICopYXJn
+KSkKIAkJcmV0dXJuIC1FRkFVTFQ7CiAKLQlpZiAoZmxhZ3MgPiBDSUZTX0dPSU5HX0ZMQUdTX05P
+TE9HRkxVU0gpCi0JCXJldHVybiAtRUlOVkFMOworCXRsaW5rID0gY2lmc19zYl90bGluayhzYmkp
+OworCWlmIChJU19FUlIodGxpbmspKQorCQlyZXR1cm4gUFRSX0VSUih0bGluayk7CisJdGNvbiA9
+IHRsaW5rX3Rjb24odGxpbmspOworCisJdHJhY2Vfc21iM19zaHV0ZG93bl9lbnRlcihmbGFncywg
+dGNvbi0+dGlkKTsKKwlpZiAoZmxhZ3MgPiBDSUZTX0dPSU5HX0ZMQUdTX05PTE9HRkxVU0gpIHsK
+KwkJcmMgPSAtRUlOVkFMOworCQlnb3RvIHNodXRkb3duX291dF9lcnI7CisJfQogCiAJaWYgKGNp
+ZnNfZm9yY2VkX3NodXRkb3duKHNiaSkpCi0JCXJldHVybiAwOworCQlnb3RvIHNodXRkb3duX2dv
+b2Q7CiAKIAljaWZzX2RiZyhWRlMsICJzaHV0IGRvd24gcmVxdWVzdGVkICglZCkiLCBmbGFncyk7
+Ci0vKgl0cmFjZV9jaWZzX3NodXRkb3duKHNiLCBmbGFncyk7Ki8KIAogCS8qCiAJICogc2VlOgpA
+QCAtMjAxLDcgKzIxMyw4IEBAIHN0YXRpYyBpbnQgY2lmc19zaHV0ZG93bihzdHJ1Y3Qgc3VwZXJf
+YmxvY2sgKnNiLCB1bnNpZ25lZCBsb25nIGFyZykKIAkgKi8KIAljYXNlIENJRlNfR09JTkdfRkxB
+R1NfREVGQVVMVDoKIAkJY2lmc19kYmcoRllJLCAic2h1dGRvd24gd2l0aCBkZWZhdWx0IGZsYWcg
+bm90IHN1cHBvcnRlZFxuIik7Ci0JCXJldHVybiAtRUlOVkFMOworCQlyYyA9IC1FSU5WQUw7CisJ
+CWdvdG8gc2h1dGRvd25fb3V0X2VycjsKIAkvKgogCSAqIEZMQUdTX0xPR0ZMVVNIIGlzIGVhc3kg
+c2luY2UgaXQgYXNrcyB0byB3cml0ZSBvdXQgbWV0YWRhdGEgKG5vdAogCSAqIGRhdGEpIGJ1dCBt
+ZXRhZGF0YSB3cml0ZXMgYXJlIG5vdCBjYWNoZWQgb24gdGhlIGNsaWVudCwgc28gY2FuIHRyZWF0
+CkBAIC0yMTAsMTEgKzIyMywxOCBAQCBzdGF0aWMgaW50IGNpZnNfc2h1dGRvd24oc3RydWN0IHN1
+cGVyX2Jsb2NrICpzYiwgdW5zaWduZWQgbG9uZyBhcmcpCiAJY2FzZSBDSUZTX0dPSU5HX0ZMQUdT
+X0xPR0ZMVVNIOgogCWNhc2UgQ0lGU19HT0lOR19GTEFHU19OT0xPR0ZMVVNIOgogCQlzYmktPm1u
+dF9jaWZzX2ZsYWdzIHw9IENJRlNfTU9VTlRfU0hVVERPV047Ci0JCXJldHVybiAwOworCQlnb3Rv
+IHNodXRkb3duX2dvb2Q7CiAJZGVmYXVsdDoKLQkJcmV0dXJuIC1FSU5WQUw7CisJCXJjID0gLUVJ
+TlZBTDsKKwkJZ290byBzaHV0ZG93bl9vdXRfZXJyOwogCX0KKworc2h1dGRvd25fZ29vZDoKKwl0
+cmFjZV9zbWIzX3NodXRkb3duX2RvbmUoZmxhZ3MsIHRjb24tPnRpZCk7CiAJcmV0dXJuIDA7Citz
+aHV0ZG93bl9vdXRfZXJyOgorCXRyYWNlX3NtYjNfc2h1dGRvd25fZXJyKHJjLCBmbGFncywgdGNv
+bi0+dGlkKTsKKwlyZXR1cm4gcmM7CiB9CiAKIHN0YXRpYyBpbnQgY2lmc19kdW1wX2Z1bGxfa2V5
+KHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sIHN0cnVjdCBzbWIzX2Z1bGxfa2V5X2RlYnVnX2luZm8g
+X191c2VyICppbikKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvdHJhY2UuaCBiL2ZzL3NtYi9j
+bGllbnQvdHJhY2UuaAppbmRleCA2YjNiZGZiOTcyMTEuLjBmMGMxMGM3YWRhNyAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NsaWVudC90cmFjZS5oCisrKyBiL2ZzL3NtYi9jbGllbnQvdHJhY2UuaApAQCAt
+MTM4OCw3ICsxMzg4LDcgQEAgREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIzX2lvY3RsX2NsYXNzLAog
+CQlfX2VudHJ5LT5jb21tYW5kID0gY29tbWFuZDsKIAkpLAogCVRQX3ByaW50aygieGlkPSV1IGZp
+ZD0weCVsbHggaW9jdGwgY21kPTB4JXgiLAotCQlfX2VudHJ5LT54aWQsIF9fZW50cnktPmZpZCwg
+X19lbnRyeS0+Y29tbWFuZCkKKwkJICBfX2VudHJ5LT54aWQsIF9fZW50cnktPmZpZCwgX19lbnRy
+eS0+Y29tbWFuZCkKICkKIAogI2RlZmluZSBERUZJTkVfU01CM19JT0NUTF9FVkVOVChuYW1lKSAg
+ICAgICAgXApAQCAtMTQwMCw5ICsxNDAwLDU4IEBAIERFRklORV9FVkVOVChzbWIzX2lvY3RsX2Ns
+YXNzLCBzbWIzXyMjbmFtZSwgIFwKIAogREVGSU5FX1NNQjNfSU9DVExfRVZFTlQoaW9jdGwpOwog
+CitERUNMQVJFX0VWRU5UX0NMQVNTKHNtYjNfc2h1dGRvd25fY2xhc3MsCisJVFBfUFJPVE8oX191
+MzIgZmxhZ3MsCisJCV9fdTMyIHRpZCksCisJVFBfQVJHUyhmbGFncywgdGlkKSwKKwlUUF9TVFJV
+Q1RfX2VudHJ5KAorCQlfX2ZpZWxkKF9fdTMyLCBmbGFncykKKwkJX19maWVsZChfX3UzMiwgdGlk
+KQorCSksCisJVFBfZmFzdF9hc3NpZ24oCisJCV9fZW50cnktPmZsYWdzID0gZmxhZ3M7CisJCV9f
+ZW50cnktPnRpZCA9IHRpZDsKKwkpLAorCVRQX3ByaW50aygiZmxhZ3M9MHgleCB0aWQ9MHgleCIs
+CisJCSAgX19lbnRyeS0+ZmxhZ3MsIF9fZW50cnktPnRpZCkKKykKKworI2RlZmluZSBERUZJTkVf
+U01CM19TSFVURE9XTl9FVkVOVChuYW1lKSAgICAgICAgXAorREVGSU5FX0VWRU5UKHNtYjNfc2h1
+dGRvd25fY2xhc3MsIHNtYjNfIyNuYW1lLCAgXAorCVRQX1BST1RPKF9fdTMyIGZsYWdzLAkJICAg
+ICBcCisJCV9fdTMyIHRpZCksCQkgICAgIFwKKwlUUF9BUkdTKGZsYWdzLCB0aWQpKQorCitERUZJ
+TkVfU01CM19TSFVURE9XTl9FVkVOVChzaHV0ZG93bl9lbnRlcik7CitERUZJTkVfU01CM19TSFVU
+RE9XTl9FVkVOVChzaHV0ZG93bl9kb25lKTsKIAorREVDTEFSRV9FVkVOVF9DTEFTUyhzbWIzX3No
+dXRkb3duX2Vycl9jbGFzcywKKwlUUF9QUk9UTyhpbnQgcmMsCisJCV9fdTMyIGZsYWdzLAorCQlf
+X3UzMiB0aWQpLAorCVRQX0FSR1MocmMsIGZsYWdzLCB0aWQpLAorCVRQX1NUUlVDVF9fZW50cnko
+CisJCV9fZmllbGQoaW50LCByYykKKwkJX19maWVsZChfX3UzMiwgZmxhZ3MpCisJCV9fZmllbGQo
+X191MzIsIHRpZCkKKwkpLAorCVRQX2Zhc3RfYXNzaWduKAorCQlfX2VudHJ5LT5yYyA9IHJjOwor
+CQlfX2VudHJ5LT5mbGFncyA9IGZsYWdzOworCQlfX2VudHJ5LT50aWQgPSB0aWQ7CisJKSwKKwlU
+UF9wcmludGsoInJjPSVkIGZsYWdzPTB4JXggdGlkPTB4JXgiLAorCQlfX2VudHJ5LT5yYywgX19l
+bnRyeS0+ZmxhZ3MsIF9fZW50cnktPnRpZCkKKykKIAorI2RlZmluZSBERUZJTkVfU01CM19TSFVU
+RE9XTl9FUlJfRVZFTlQobmFtZSkgICAgICAgIFwKK0RFRklORV9FVkVOVChzbWIzX3NodXRkb3du
+X2Vycl9jbGFzcywgc21iM18jI25hbWUsICBcCisJVFBfUFJPVE8oaW50IHJjLAkJICAgICBcCisJ
+CV9fdTMyIGZsYWdzLAkJICAgICBcCisJCV9fdTMyIHRpZCksCQkgICAgIFwKKwlUUF9BUkdTKHJj
+LCBmbGFncywgdGlkKSkKIAorREVGSU5FX1NNQjNfU0hVVERPV05fRVJSX0VWRU5UKHNodXRkb3du
+X2Vycik7CiAKIERFQ0xBUkVfRVZFTlRfQ0xBU1Moc21iM19jcmVkaXRfY2xhc3MsCiAJVFBfUFJP
+VE8oX191NjQJY3Vycm1pZCwKLS0gCjIuNDMuMAoK
+--000000000000b9bf00061e7054c9--
