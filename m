@@ -1,437 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9397F130E4A;
-	Wed, 31 Jul 2024 19:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE6A1E868
+	for <linux-cifs@vger.kernel.org>; Thu,  1 Aug 2024 03:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722452869; cv=none; b=MGwlBaNG49g1pPAs8grDw6MNEdGN2TQxLJQJ59lFdF60IQBJttdBfz8gKdZP1d6AhXfrT8HKxkBGjb0azq8MgeIUWJ+HKn744lHNE1Lsh0APPqcF1MumjULEVrv6mmbWh1fu2aUvUdPSrkpgYWpl/9a4unha0EzSuCWaHiIKfgI=
+	t=1722481339; cv=none; b=FfYAn62PjpLAwkcGAltt5Kqd6oNXwTVi3+6xGALg7APWl3u7D0lHHfT8iWpp9fzEQbfmr7rF48bBOiz9bYIWxadwFSEuLRxi60cvpk9Z56iRDVY6UOnWrmIGPAuxTPMXGzqLeqqrYMfDgcb3S2Urokxmsh+KfTt6Ihivj5I75bY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722452869; c=relaxed/simple;
-	bh=YTJqim0DwenqHbETPgEIkYE+eKzhmSBxJKna7V14c88=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TSKqhk+jMtprXtx46T9jdcG/Wgq2ljwO5iPW6VcfpNI0cpiPZc46J3nzfqXjPob3LDmYCbFyRqYTYgz3CJKUF2DYXdE7PaewHhkkkGmwAy7BvXwaA92pAtSJCKSpMdOT3QevbVNhfBuYQWuNqtM5OZRaPNa0xRd+hcirLo5aveg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWMZ8XiV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722481339; c=relaxed/simple;
+	bh=O5rXECop1IeduLKINXJAFfTAcxzYyNqv6I5Gq3fYWWc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=FF8xiJUb9B6G4RSpIpA+pxmBaTXqwKUFsU1auxfnY7Ppq4PWFZ/kzLUwnfxMAvpSJcijeKn2HlZ08R6NtM8selwZbJpkBJ7dVir7tKyQXcHMW/bHQbCina44CNAChgUOg+Hi/6Smr+IKYpkjVWqCr3u0VFl00adzOxVoQXRItKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2Tx31MI; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWMZ8XiV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42DDC116B1;
-	Wed, 31 Jul 2024 19:07:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722452869;
-	bh=YTJqim0DwenqHbETPgEIkYE+eKzhmSBxJKna7V14c88=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TWMZ8XiVsdFpB2wB2rnLFXNdQzkrcLVPjXcXwkxgJW8VRcgu6drXc85rGKXng+alJ
-	 T8HZhq2izBGLGuW49uDcyh78ihxbSGGEqZn5oRu8s5iYVea9hwrsuON29lAUlorAc3
-	 1M71dgq6328PB5sEe2ZmEI2j2KCd42n9imIm/b7EXuKDrUEvL4AjI4VzqBg9GqxgZV
-	 UhrxVz0oDS5PMLME2rZyRwLHgymXaCA9slNVPtCYun/a5HZYGjFdT98li/6FJ/6TlI
-	 R+C1r5OuojGmwXfK83JVQjh4H7o7UogSv/axh0xjPI/9QzrS4vl5PUo9S0HPjakyAv
-	 yev7NmQSyuhGw==
-Date: Wed, 31 Jul 2024 20:07:42 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 18/24] netfs: Speed up buffered reading
-Message-ID: <20240731190742.GS1967603@kernel.org>
-References: <20240729162002.3436763-1-dhowells@redhat.com>
- <20240729162002.3436763-19-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2Tx31MI"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f035ae1083so81678111fa.3
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Jul 2024 20:02:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722481335; x=1723086135; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MTY6Q3TpA8ApF+vz+JDsK7ooMbh4M7GW0SttpptJxS4=;
+        b=D2Tx31MID3nZWl1FT/9mdekGnWIWgXfzYQQPUPNhed8MWa/MfsvQVKGN6lNx+4AaNO
+         oywJSuZv5RtzLBVdhx+uKGpsSF4Hh00c94voBuC8IYnGe9QV+5mFEY7BgoAeNBzPGM2A
+         iFaEtDlY80Jjt/SgOvxD7X8rki0cwVyrq6T4PhxStV73e85p+1/sq62bQtISnsX5TTPe
+         MNrX8IQrr9R9WmXyJz4WwnE3sV3Sv0naeEUc5rz6iuctrxGIoewvwW8RaA5vWsdheB7N
+         eg0Edw9pTEPjPmsyPJ4hKvtuiESN43zgguJMpQ8to8/2gogkD5YF6DepxfmW3MWSh7dq
+         b42g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722481335; x=1723086135;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MTY6Q3TpA8ApF+vz+JDsK7ooMbh4M7GW0SttpptJxS4=;
+        b=pbu0VaO5UbkdaKPf/M39i0BJ40EBlXwNydd/TyOgXPqTnpzU06XBb/QB2pgYT08bcj
+         kDds1LN9LyG/fTMHy/ApJT1O1qIJjXS8hkijr9Mlekk8Rq7dcdJpCXJGo3D3fCxFaSmR
+         bb9c2vghiAfPl5FAGgSVKa7D8l/a+2Jy2s+HO0wvQfuyrWPD//70N9EnKHwpoB3DXrA4
+         A2VzTCPzMfjeaGTYZoU03oKECXU+xHkR9cPdWl+GW9mlpYT0e+OGhIFNKDFmLdMKvqnO
+         I75yi+kEvfG53Z7pJ6diy3qb/JeockqTBVv/JLZat9TqSfbKwr7vvijfCFlA22+qaQ0N
+         aNHQ==
+X-Gm-Message-State: AOJu0YweOQPMfJ3LzkjAVYe/NpYhb5NSnmEofgWTlRaA17KOLDzH5xQ8
+	wxOcXFfKBGPA77nH1UAvgZqVzumqqSIa79cvyvP56lyhjYDI0RgFL6ggExJ4LTjnTTg3TQiXq0T
+	swnCxiQIrDansWyJt52DAR0vebDrTKsAQ
+X-Google-Smtp-Source: AGHT+IEEO40IuvVa08R1vAVYWHLn5LWPs6AGMFzDWJ0PpyLT3UgfmZ3S6yDIw2VLshHVBv7Nox0CcT4wz2L1Z7fLffA=
+X-Received: by 2002:a2e:8916:0:b0:2ef:32b9:85f6 with SMTP id
+ 38308e7fff4ca-2f1530edfb0mr6233531fa.11.1722481334988; Wed, 31 Jul 2024
+ 20:02:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240729162002.3436763-19-dhowells@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 31 Jul 2024 22:02:03 -0500
+Message-ID: <CAH2r5mst9GEtdNNhqUiaYrhX8JbNwy5FMcA7crLtHnZo1A4fJw@mail.gmail.com>
+Subject: [PATCH][SMB3 client] fix setting SecurityFlags when encryption is required
+To: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000001acfcd061e967089"
 
-On Mon, Jul 29, 2024 at 05:19:47PM +0100, David Howells wrote:
+--0000000000001acfcd061e967089
+Content-Type: text/plain; charset="UTF-8"
 
-...
+Setting encryption as required in cifs.ko's global security flags was
+broken. For example (to require all mounts to be encrypted by setting):
 
-> diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+  "echo 0x400c5 > /proc/fs/cifs/SecurityFlags"
 
-...
+would return "Invalid argument" and log "Unsupported security flags"
+This patch fixes that (e.g. allowing overriding the default for
+SecurityFlags  0x00c5, including 0x40000 to require seal, ie
+SMB3.1.1 encryption) so now that works and forces encryption
+on subsequent mounts.
 
-> +/*
-> + * Perform a read to the pagecache from a series of sources of different types,
-> + * slicing up the region to be read according to available cache blocks and
-> + * network rsize.
-> + */
-> +static void netfs_read_to_pagecache(struct netfs_io_request *rreq)
-> +{
-> +	struct netfs_inode *ictx = netfs_inode(rreq->inode);
-> +	unsigned long long start = rreq->start;
-> +	ssize_t size = rreq->len;
-> +	int ret = 0;
-> +
-> +	atomic_inc(&rreq->nr_outstanding);
-> +
-> +	do {
-> +		struct netfs_io_subrequest *subreq;
-> +		enum netfs_io_source source = NETFS_DOWNLOAD_FROM_SERVER;
-> +		ssize_t slice;
-> +
-> +		subreq = netfs_alloc_subrequest(rreq);
-> +		if (!subreq) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +
-> +		subreq->start	= start;
-> +		subreq->len	= size;
-> +
-> +		atomic_inc(&rreq->nr_outstanding);
-> +		spin_lock_bh(&rreq->lock);
-> +		list_add_tail(&subreq->rreq_link, &rreq->subrequests);
-> +		subreq->prev_donated = rreq->prev_donated;
-> +		rreq->prev_donated = 0;
-> +		trace_netfs_sreq(subreq, netfs_sreq_trace_added);
-> +		spin_unlock_bh(&rreq->lock);
-> +
-> +		source = netfs_cache_prepare_read(rreq, subreq, rreq->i_size);
-> +		subreq->source = source;
-> +		if (source == NETFS_DOWNLOAD_FROM_SERVER) {
-> +			unsigned long long zp = umin(ictx->zero_point, rreq->i_size);
-> +			size_t len = subreq->len;
-> +
-> +			if (subreq->start >= zp) {
-> +				subreq->source = source = NETFS_FILL_WITH_ZEROES;
-> +				goto fill_with_zeroes;
-> +			}
-> +
-> +			if (len > zp - subreq->start)
-> +				len = zp - subreq->start;
-> +			if (len == 0) {
-> +				pr_err("ZERO-LEN READ: R=%08x[%x] l=%zx/%zx s=%llx z=%llx i=%llx",
-> +				       rreq->debug_id, subreq->debug_index,
-> +				       subreq->len, size,
-> +				       subreq->start, ictx->zero_point, rreq->i_size);
-> +				break;
-> +			}
-> +			subreq->len = len;
-> +
-> +			netfs_stat(&netfs_n_rh_download);
-> +			if (rreq->netfs_ops->prepare_read) {
-> +				ret = rreq->netfs_ops->prepare_read(subreq);
-> +				if (ret < 0) {
-> +					atomic_dec(&rreq->nr_outstanding);
-> +					netfs_put_subrequest(subreq, false,
-> +							     netfs_sreq_trace_put_cancel);
-> +					break;
-> +				}
-> +				trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
-> +			}
-> +
-> +			slice = netfs_prepare_read_iterator(subreq);
-> +			if (slice < 0) {
-> +				atomic_dec(&rreq->nr_outstanding);
-> +				netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_cancel);
-> +				ret = slice;
-> +				break;
-> +			}
-> +
-> +			rreq->netfs_ops->issue_read(subreq);
-> +			goto done;
-> +		}
-> +
-> +	fill_with_zeroes:
-> +		if (source == NETFS_FILL_WITH_ZEROES) {
-> +			subreq->source = NETFS_FILL_WITH_ZEROES;
-> +			trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-> +			netfs_stat(&netfs_n_rh_zero);
-> +			slice = netfs_prepare_read_iterator(subreq);
-> +			__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
-> +			netfs_read_subreq_terminated(subreq, 0, false);
-> +			goto done;
-> +		}
-> +
-> +		if (source == NETFS_READ_FROM_CACHE) {
-> +			trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-> +			slice = netfs_prepare_read_iterator(subreq);
-> +			netfs_read_cache_to_pagecache(rreq, subreq);
-> +			goto done;
-> +		}
-> +
-> +		if (source == NETFS_INVALID_READ)
-> +			break;
+-- 
+Thanks,
 
-Hi David,
+Steve
 
-I feel a sense of deja vu here. So apologies if this was already
-discussed in the past.
+--0000000000001acfcd061e967089
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-fix-setting-SecurityFlags-when-encryption-is-re.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-setting-SecurityFlags-when-encryption-is-re.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lzaowgfv0>
+X-Attachment-Id: f_lzaowgfv0
 
-If the code ever reaches this line, then slice will be used
-uninitialised below.
-
-Flagged by W=1 allmodconfig builds on x86_64 with Clang 18.1.8.
-
-> +
-> +	done:
-> +		size -= slice;
-> +		start += slice;
-> +		cond_resched();
-> +	} while (size > 0);
-> +
-> +	if (atomic_dec_and_test(&rreq->nr_outstanding))
-> +		netfs_rreq_terminated(rreq, false);
-> +
-> +	/* Defer error return as we may need to wait for outstanding I/O. */
-> +	cmpxchg(&rreq->error, 0, ret);
-> +}
-
-...
-
-> +/*
-> + * Unlock any folios that are now completely read.  Returns true if the
-> + * subrequest is removed from the list.
-> + */
-> +static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq, bool was_async)
-> +{
-> +	struct netfs_io_subrequest *prev, *next;
-> +	struct netfs_io_request *rreq = subreq->rreq;
-> +	struct folio_queue *folioq = subreq->curr_folioq;
-> +	size_t avail, prev_donated, next_donated, fsize, part, excess;
-> +	loff_t fpos, start;
-> +	loff_t fend;
-> +	int slot = subreq->curr_folioq_slot;
-> +
-> +	if (WARN(subreq->transferred > subreq->len,
-> +		 "Subreq overread: R%x[%x] %zu > %zu",
-> +		 rreq->debug_id, subreq->debug_index,
-> +		 subreq->transferred, subreq->len))
-> +		subreq->transferred = subreq->len;
-> +
-> +next_folio:
-> +	fsize = PAGE_SIZE << subreq->curr_folio_order;
-> +	fpos = round_down(subreq->start + subreq->consumed, fsize);
-> +	fend = fpos + fsize;
-> +
-> +	if (WARN_ON_ONCE(!folioq) ||
-> +	    WARN_ON_ONCE(!folioq_folio(folioq, slot)) ||
-> +	    WARN_ON_ONCE(folioq_folio(folioq, slot)->index != fpos / PAGE_SIZE)) {
-> +		pr_err("R=%08x[%x] s=%llx-%llx ctl=%zx/%zx/%zx sl=%u\n",
-> +		       rreq->debug_id, subreq->debug_index,
-> +		       subreq->start, subreq->start + subreq->transferred - 1,
-> +		       subreq->consumed, subreq->transferred, subreq->len,
-> +		       slot);
-> +		if (folioq) {
-> +			struct folio *folio = folioq_folio(folioq, slot);
-> +
-> +			pr_err("folioq: %02x%02x%02x%02x\n",
-> +			       folioq->orders[0], folioq->orders[1],
-> +			       folioq->orders[2], folioq->orders[3]);
-> +			if (folio)
-> +				pr_err("folio: %llx-%llx ix=%llx o=%u qo=%u\n",
-> +				       fpos, fend - 1, folio_pos(folio), folio_order(folio),
-> +				       folioq_folio_order(folioq, slot));
-> +		}
-> +	}
-> +
-> +donation_changed:
-> +	/* Try to consume the current folio if we've hit or passed the end of
-> +	 * it.  There's a possibility that this subreq doesn't start at the
-> +	 * beginning of the folio, in which case we need to donate to/from the
-> +	 * preceding subreq.
-> +	 *
-> +	 * We also need to include any potential donation back from the
-> +	 * following subreq.
-> +	 */
-> +	prev_donated = READ_ONCE(subreq->prev_donated);
-> +	next_donated =  READ_ONCE(subreq->next_donated);
-> +	if (prev_donated || next_donated) {
-> +		spin_lock_bh(&rreq->lock);
-> +		prev_donated = subreq->prev_donated;
-> +		next_donated =  subreq->next_donated;
-> +		subreq->start -= prev_donated;
-> +		subreq->len += prev_donated;
-> +		subreq->transferred += prev_donated;
-> +		prev_donated = subreq->prev_donated = 0;
-> +		if (subreq->transferred == subreq->len) {
-> +			subreq->len += next_donated;
-> +			subreq->transferred += next_donated;
-> +			next_donated = subreq->next_donated = 0;
-> +		}
-> +		trace_netfs_sreq(subreq, netfs_sreq_trace_add_donations);
-> +		spin_unlock_bh(&rreq->lock);
-> +	}
-> +
-> +	avail = subreq->transferred;
-> +	if (avail == subreq->len)
-> +		avail += next_donated;
-> +	start = subreq->start;
-> +	if (subreq->consumed == 0) {
-> +		start -= prev_donated;
-> +		avail += prev_donated;
-> +	} else {
-> +		start += subreq->consumed;
-> +		avail -= subreq->consumed;
-> +	}
-> +	part = umin(avail, fsize);
-> +
-> +	trace_netfs_progress(subreq, start, avail, part);
-> +
-> +	if (start + avail >= fend) {
-> +		if (fpos == start) {
-> +			/* Flush, unlock and mark for caching any folio we've just read. */
-> +			subreq->consumed = fend - subreq->start;
-> +			netfs_unlock_read_folio(subreq, rreq, folioq_folio(folioq, slot));
-
-Earlier and later in this function it was assumed that folioq may be NULL.
-But here it appears to be used dereferenced unconditionally
-by folioq_folio().
-
-Flagged by Smatch.
-
-> +			folioq_mark2(folioq, slot);
-> +			if (subreq->consumed >= subreq->len)
-> +				goto remove_subreq;
-> +		} else if (fpos < start) {
-> +			excess = fend - subreq->start;
-> +
-> +			spin_lock_bh(&rreq->lock);
-> +			/* If we complete first on a folio split with the
-> +			 * preceding subreq, donate to that subreq - otherwise
-> +			 * we get the responsibility.
-> +			 */
-> +			if (subreq->prev_donated != prev_donated) {
-> +				spin_unlock_bh(&rreq->lock);
-> +				goto donation_changed;
-> +			}
-> +
-> +			if (list_is_first(&subreq->rreq_link, &rreq->subrequests)) {
-> +				spin_unlock_bh(&rreq->lock);
-> +				pr_err("Can't donate prior to front\n");
-> +				goto bad;
-> +			}
-> +
-> +			prev = list_prev_entry(subreq, rreq_link);
-> +			WRITE_ONCE(prev->next_donated, prev->next_donated + excess);
-> +			subreq->start += excess;
-> +			subreq->len -= excess;
-> +			subreq->transferred -= excess;
-> +			trace_netfs_donate(rreq, subreq, prev, excess,
-> +					   netfs_trace_donate_tail_to_prev);
-> +			trace_netfs_sreq(subreq, netfs_sreq_trace_donate_to_prev);
-> +
-> +			if (subreq->consumed >= subreq->len)
-> +				goto remove_subreq_locked;
-> +			spin_unlock_bh(&rreq->lock);
-> +		} else {
-> +			pr_err("fpos > start\n");
-> +			goto bad;
-> +		}
-> +
-> +		/* Advance the rolling buffer to the next folio. */
-> +		slot++;
-> +		if (slot >= folioq_nr_slots(folioq)) {
-> +			slot = 0;
-> +			folioq = folioq->next;
-> +			subreq->curr_folioq = folioq;
-> +		}
-> +		subreq->curr_folioq_slot = slot;
-> +		if (folioq && folioq_folio(folioq, slot))
-> +			subreq->curr_folio_order = folioq->orders[slot];
-> +		if (!was_async)
-> +			cond_resched();
-> +		goto next_folio;
-> +	}
-> +
-> +	/* Deal with partial progress. */
-> +	if (subreq->transferred < subreq->len)
-> +		return false;
-> +
-> +	/* Donate the remaining downloaded data to one of the neighbouring
-> +	 * subrequests.  Note that we may race with them doing the same thing.
-> +	 */
-> +	spin_lock_bh(&rreq->lock);
-> +
-> +	if (subreq->prev_donated != prev_donated ||
-> +	    subreq->next_donated != next_donated) {
-> +		spin_unlock_bh(&rreq->lock);
-> +		cond_resched();
-> +		goto donation_changed;
-> +	}
-> +
-> +	/* Deal with the trickiest case: that this subreq is in the middle of a
-> +	 * folio, not touching either edge, but finishes first.  In such a
-> +	 * case, we donate to the previous subreq, if there is one, so that the
-> +	 * donation is only handled when that completes - and remove this
-> +	 * subreq from the list.
-> +	 *
-> +	 * If the previous subreq finished first, we will have acquired their
-> +	 * donation and should be able to unlock folios and/or donate nextwards.
-> +	 */
-> +	if (!subreq->consumed &&
-> +	    !prev_donated &&
-> +	    !list_is_first(&subreq->rreq_link, &rreq->subrequests)) {
-> +		prev = list_prev_entry(subreq, rreq_link);
-> +		WRITE_ONCE(prev->next_donated, prev->next_donated + subreq->len);
-> +		subreq->start += subreq->len;
-> +		subreq->len = 0;
-> +		subreq->transferred = 0;
-> +		trace_netfs_donate(rreq, subreq, prev, subreq->len,
-> +				   netfs_trace_donate_to_prev);
-> +		trace_netfs_sreq(subreq, netfs_sreq_trace_donate_to_prev);
-> +		goto remove_subreq_locked;
-> +	}
-> +
-> +	/* If we can't donate down the chain, donate up the chain instead. */
-> +	excess = subreq->len - subreq->consumed + next_donated;
-> +
-> +	if (!subreq->consumed)
-> +		excess += prev_donated;
-> +
-> +	if (list_is_last(&subreq->rreq_link, &rreq->subrequests)) {
-> +		rreq->prev_donated = excess;
-> +		trace_netfs_donate(rreq, subreq, NULL, excess,
-> +				   netfs_trace_donate_to_deferred_next);
-> +	} else {
-> +		next = list_next_entry(subreq, rreq_link);
-> +		WRITE_ONCE(next->prev_donated, excess);
-> +		trace_netfs_donate(rreq, subreq, next, excess,
-> +				   netfs_trace_donate_to_next);
-> +	}
-> +	trace_netfs_sreq(subreq, netfs_sreq_trace_donate_to_next);
-> +	subreq->len = subreq->consumed;
-> +	subreq->transferred = subreq->consumed;
-> +	goto remove_subreq_locked;
-> +
-> +remove_subreq:
-> +	spin_lock_bh(&rreq->lock);
-> +remove_subreq_locked:
-> +	subreq->consumed = subreq->len;
-> +	list_del(&subreq->rreq_link);
-> +	spin_unlock_bh(&rreq->lock);
-> +	netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_consumed);
-> +	return true;
-> +
-> +bad:
-> +	/* Errr... prev and next both donated to us, but insufficient to finish
-> +	 * the folio.
-> +	 */
-> +	printk("R=%08x[%x] s=%llx-%llx %zx/%zx/%zx\n",
-> +	       rreq->debug_id, subreq->debug_index,
-> +	       subreq->start, subreq->start + subreq->transferred - 1,
-> +	       subreq->consumed, subreq->transferred, subreq->len);
-> +	printk("folio: %llx-%llx\n", fpos, fend - 1);
-> +	printk("donated: prev=%zx next=%zx\n", prev_donated, next_donated);
-> +	printk("s=%llx av=%zx part=%zx\n", start, avail, part);
-> +	BUG();
-> +}
-
-...
+RnJvbSA2OGQzMDI5ZWY2OTc1N2E2ODhhMDc4ZDM4MzI4ZDU4MjA4YzU3Nzg1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgMzEgSnVsIDIwMjQgMjE6Mzg6NTAgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggc2V0dGluZyBTZWN1cml0eUZsYWdzIHdoZW4gZW5jcnlwdGlvbiBpcyByZXF1aXJl
+ZAoKU2V0dGluZyBlbmNyeXB0aW9uIGFzIHJlcXVpcmVkIGluIHNlY3VyaXR5IGZsYWdzIHdhcyBi
+cm9rZW4uCkZvciBleGFtcGxlICh0byByZXF1aXJlIGFsbCBtb3VudHMgdG8gYmUgZW5jcnlwdGVk
+IGJ5IHNldHRpbmcpOgoKICAiZWNobyAweDQwMGM1ID4gL3Byb2MvZnMvY2lmcy9TZWN1cml0eUZs
+YWdzIgoKV291bGQgcmV0dXJuICJJbnZhbGlkIGFyZ3VtZW50IiBhbmQgbG9nICJVbnN1cHBvcnRl
+ZCBzZWN1cml0eSBmbGFncyIKVGhpcyBwYXRjaCBmaXhlcyB0aGF0IChlLmcuIGFsbG93aW5nIG92
+ZXJyaWRpbmcgdGhlIGRlZmF1bHQgZm9yClNlY3VyaXR5RmxhZ3MgIDB4MDBjNSwgaW5jbHVkaW5n
+IDB4NDAwMDAgdG8gcmVxdWlyZSBzZWFsLCBpZQpTTUIzLjEuMSBlbmNyeXB0aW9uKSBzbyBub3cg
+dGhhdCB3b3JrcyBhbmQgZm9yY2VzIGVuY3J5cHRpb24Kb24gc3Vic2VxdWVudCBtb3VudHMuCgpT
+aWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQog
+RG9jdW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9jaWZzL3VzYWdlLnJzdCB8IDIgKy0KIGZzL3NtYi9j
+bGllbnQvY2lmc19kZWJ1Zy5jICAgICAgICAgICAgICAgfCAyICstCiBmcy9zbWIvY2xpZW50L2Np
+ZnNnbG9iLmggICAgICAgICAgICAgICAgIHwgNCArKy0tCiBmcy9zbWIvY2xpZW50L3NtYjJwZHUu
+YyAgICAgICAgICAgICAgICAgIHwgMyArKysKIDQgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25z
+KCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vYWRtaW4tZ3Vp
+ZGUvY2lmcy91c2FnZS5yc3QgYi9Eb2N1bWVudGF0aW9uL2FkbWluLWd1aWRlL2NpZnMvdXNhZ2Uu
+cnN0CmluZGV4IGZkNGI1NmMwOTk2Zi4uYzA5Njc0YTc1YTllIDEwMDY0NAotLS0gYS9Eb2N1bWVu
+dGF0aW9uL2FkbWluLWd1aWRlL2NpZnMvdXNhZ2UucnN0CisrKyBiL0RvY3VtZW50YXRpb24vYWRt
+aW4tZ3VpZGUvY2lmcy91c2FnZS5yc3QKQEAgLTc0Miw3ICs3NDIsNyBAQCBTZWN1cml0eUZsYWdz
+CQlGbGFncyB3aGljaCBjb250cm9sIHNlY3VyaXR5IG5lZ290aWF0aW9uIGFuZAogCQkJICBtYXkg
+dXNlIE5UTE1TU1AgICAgICAgICAgICAgICAJCTB4MDAwODAKIAkJCSAgbXVzdCB1c2UgTlRMTVNT
+UCAgICAgICAgICAgCQkJMHg4MDA4MAogCQkJICBzZWFsIChwYWNrZXQgZW5jcnlwdGlvbikJCQkw
+eDAwMDQwCi0JCQkgIG11c3Qgc2VhbCAobm90IGltcGxlbWVudGVkIHlldCkgICAgICAgICAgICAg
+ICAweDQwMDQwCisJCQkgIG11c3Qgc2VhbCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAweDQwMDQwCiAKIGNpZnNGWUkJCQlJZiBzZXQgdG8gbm9uLXplcm8gdmFsdWUsIGFkZGl0
+aW9uYWwgZGVidWcgaW5mb3JtYXRpb24KIAkJCXdpbGwgYmUgbG9nZ2VkIHRvIHRoZSBzeXN0ZW0g
+ZXJyb3IgbG9nLiAgVGhpcyBmaWVsZApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzX2Rl
+YnVnLmMgYi9mcy9zbWIvY2xpZW50L2NpZnNfZGVidWcuYwppbmRleCBjNzFhZTVjMDQzMDYuLjRh
+MjBlOTI0NzRiMiAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzX2RlYnVnLmMKKysrIGIv
+ZnMvc21iL2NsaWVudC9jaWZzX2RlYnVnLmMKQEAgLTEwNzIsNyArMTA3Miw3IEBAIHN0YXRpYyBp
+bnQgY2lmc19zZWN1cml0eV9mbGFnc19wcm9jX29wZW4oc3RydWN0IGlub2RlICppbm9kZSwgc3Ry
+dWN0IGZpbGUgKmZpbGUpCiBzdGF0aWMgdm9pZAogY2lmc19zZWN1cml0eV9mbGFnc19oYW5kbGVf
+bXVzdF9mbGFncyh1bnNpZ25lZCBpbnQgKmZsYWdzKQogewotCXVuc2lnbmVkIGludCBzaWduZmxh
+Z3MgPSAqZmxhZ3MgJiBDSUZTU0VDX01VU1RfU0lHTjsKKwl1bnNpZ25lZCBpbnQgc2lnbmZsYWdz
+ID0gKmZsYWdzICYgKENJRlNTRUNfTVVTVF9TSUdOIHwgQ0lGU1NFQ19NVVNUX1NFQUwpOwogCiAJ
+aWYgKCgqZmxhZ3MgJiBDSUZTU0VDX01VU1RfS1JCNSkgPT0gQ0lGU1NFQ19NVVNUX0tSQjUpCiAJ
+CSpmbGFncyA9IENJRlNTRUNfTVVTVF9LUkI1OwpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9j
+aWZzZ2xvYi5oIGIvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCmluZGV4IGY2ZDFmMDc1OTg3Zi4u
+YmVmZDg0ZjlkZjMwIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2NpZnNnbG9iLmgKKysrIGIv
+ZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCkBAIC0xODkxLDkgKzE4OTEsOSBAQCByZXF1aXJlIHVz
+ZSBvZiB0aGUgc3Ryb25nZXIgcHJvdG9jb2wgKi8KICNkZWZpbmUgICBDSUZTU0VDX01VU1RfTlRM
+TVYyCTB4MDQwMDQKICNkZWZpbmUgICBDSUZTU0VDX01VU1RfS1JCNQkweDA4MDA4CiAjaWZkZWYg
+Q09ORklHX0NJRlNfVVBDQUxMCi0jZGVmaW5lICAgQ0lGU1NFQ19NQVNLICAgICAgICAgIDB4OEYw
+OEYgLyogZmxhZ3Mgc3VwcG9ydGVkIGlmIG5vIHdlYWsgYWxsb3dlZCAqLworI2RlZmluZSAgIENJ
+RlNTRUNfTUFTSyAgICAgICAgICAweENGMENGIC8qIGZsYWdzIHN1cHBvcnRlZCBpZiBubyB3ZWFr
+IGFsbG93ZWQgKi8KICNlbHNlCi0jZGVmaW5lCSAgQ0lGU1NFQ19NQVNLICAgICAgICAgIDB4ODcw
+ODcgLyogZmxhZ3Mgc3VwcG9ydGVkIGlmIG5vIHdlYWsgYWxsb3dlZCAqLworI2RlZmluZQkgIENJ
+RlNTRUNfTUFTSyAgICAgICAgICAweEM3MEM3IC8qIGZsYWdzIHN1cHBvcnRlZCBpZiBubyB3ZWFr
+IGFsbG93ZWQgKi8KICNlbmRpZiAvKiBVUENBTEwgKi8KICNkZWZpbmUgICBDSUZTU0VDX01VU1Rf
+U0VBTAkweDQwMDQwIC8qIG5vdCBzdXBwb3J0ZWQgeWV0ICovCiAjZGVmaW5lICAgQ0lGU1NFQ19N
+VVNUX05UTE1TU1AJMHg4MDA4MCAvKiByYXcgbnRsbXNzcCB3aXRoIG50bG12MiAqLwpkaWZmIC0t
+Z2l0IGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMgYi9mcy9zbWIvY2xpZW50L3NtYjJwZHUuYwpp
+bmRleCA5YTA2YjU1OTQ2NjkuLjgzZmFjYjU0Mjc2YSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVu
+dC9zbWIycGR1LmMKKysrIGIvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKQEAgLTgyLDYgKzgyLDkg
+QEAgaW50IHNtYjNfZW5jcnlwdGlvbl9yZXF1aXJlZChjb25zdCBzdHJ1Y3QgY2lmc190Y29uICp0
+Y29uKQogCWlmICh0Y29uLT5zZWFsICYmCiAJICAgICh0Y29uLT5zZXMtPnNlcnZlci0+Y2FwYWJp
+bGl0aWVzICYgU01CMl9HTE9CQUxfQ0FQX0VOQ1JZUFRJT04pKQogCQlyZXR1cm4gMTsKKwlpZiAo
+KChnbG9iYWxfc2VjZmxhZ3MgJiBDSUZTU0VDX01VU1RfU0VBTCkgPT0gQ0lGU1NFQ19NVVNUX1NF
+QUwpICYmCisJICAgICh0Y29uLT5zZXMtPnNlcnZlci0+Y2FwYWJpbGl0aWVzICYgU01CMl9HTE9C
+QUxfQ0FQX0VOQ1JZUFRJT04pKQorCQlyZXR1cm4gMTsKIAlyZXR1cm4gMDsKIH0KIAotLSAKMi40
+My4wCgo=
+--0000000000001acfcd061e967089--
