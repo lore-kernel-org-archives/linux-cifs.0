@@ -1,207 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A557C143883;
-	Thu,  1 Aug 2024 18:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046491BF311;
+	Fri,  2 Aug 2024 09:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722538406; cv=none; b=CVp67a1uXZDxy8l2rLXvCv5m6m/Lj4NbMjo0x44NKf3/PC7GPzgps8N1F4kzH8TbivK6gN8CvCQ78qPSRXTp8x4ewFdKyuWObuTBoqMJOKMgVFnp5wMlZjEMecrbg+hn4k7JQj7wJGu9MAjrf1FtAcHeiei/h/XZgjzX4V5SlCA=
+	t=1722591870; cv=none; b=K6DTcK9zsf07on41F9JgOeZINpfwQjPrXnDQ3klprO/eNSeBZHjmMLGkaxH3+olZshplgA8OM/EmLx2OudK4TX9AXSu7EkVKoc1W52sx0UEV2JumXLHLJ3RwcKY0sWk56I9RFC5a6cLYohyWzFLHFsX+CfwCpmldNA4hEfabYHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722538406; c=relaxed/simple;
-	bh=8fSyU2sb8kmX3R6gndd/1GgRwRBUKnHGxw9g8uAGMbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lIDcBiqPdu+eiwvsjLl7w1I1wgvy7J/N5pzaxvTnZNdZHXzSi6SzLJ3hZT7N4f/Rxxs7hxG4MZTy0J95XWcYASrgUHbEe167KGsDOrk+26zdgQMDmY2jEC+pq8hi/moIS7XU/s+GeySWWa6Nl0VBdBfalam86X+xDNW5tfZYUTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZaOYwW9B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722591870; c=relaxed/simple;
+	bh=0KsIn/0/DWTpo7S1UBSEjNExMpvPx+YcOvQCaYBrQw0=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=YlaFuV4YpnRDhIHXZYDh9MJoMjUALfGk4jHo0zfvopXDNz85mCiYZkKK1OdSdBNTM8SkMH1D7X/LduG1Vej07CUnsZvWWq/6GzwzuojMsQxMsGcxAVnvEvHG9WhteUdy7vGwTaVSU/IcbsZkfNKGGZjVPRl7zDYqGGZmGamuNTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=w3PLQRUX; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZaOYwW9B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE6AC32786;
-	Thu,  1 Aug 2024 18:53:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722538404;
-	bh=8fSyU2sb8kmX3R6gndd/1GgRwRBUKnHGxw9g8uAGMbo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZaOYwW9BfCu9i44CDKEZGhyyXPNNch8oGDnGletL0Un/ouU/aRaMFsLFkmv3lEuCA
-	 +7ja6mmwZph8X7iGE+xEYRD3mNq6ZdnIoJFT4jomwOyfbEBDmUzTmFTH0mXMMNip/R
-	 +cC7yytW8K1ClqfzSE1o2mXpikLIp+I4oTE0sAjOwIlFrdSp79VYgVL/f2ZMw/6xmz
-	 ILYvtEswuHcHI/Jn94fctSTX7WysarchHqvcFLklSEBcoGtNXCh6wBvvk6VL/1kd1y
-	 km1sHZPziIGOyZai3aJNrYlTlJmtXlDnhKVDU3TwqIXepvzZYzfLSAIko0Ar2py1d8
-	 sdzQc78+tt0PQ==
-Date: Thu, 1 Aug 2024 11:53:21 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Simon Horman <horms@kernel.org>, David Howells <dhowells@redhat.com>,
-	Christian Brauner <christian@brauner.io>
-Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 18/24] netfs: Speed up buffered reading
-Message-ID: <20240801185321.GA2534812@thelio-3990X>
-References: <20240729162002.3436763-1-dhowells@redhat.com>
- <20240729162002.3436763-19-dhowells@redhat.com>
- <20240731190742.GS1967603@kernel.org>
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="w3PLQRUX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:Subject
+	:Reply-To:Cc:To:From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:
+	Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=tYBNKUdLVBT8EAn0QM/7P3VwYTzBHo4it3VetCjlnIA=; t=1722591868;
+	x=1723023868; b=w3PLQRUX70Hpwlo9isDFSw52fHNxRajsdpWeyy9BAoKOzp6soXj0p+sG5j9MZ
+	6IHV4cFx4v3AZZsxzE8kst+B5MdiPcWiAWoQHl61O2dourb+Rk0IeAFtzPIkEHycbsy71w7mWegfQ
+	OP2a1tlumBswb5uH9xoMCghTIZ8tFX/FbMwCmaiq/1TsqWhsoqpLODS9F7pgbdLBHZUpqcTo7Z7qi
+	KbWJswfClCmw6qfH0NYIS8DxaMULki3dw9w/qvIDWklsrnyuHlzeFgSt9IQzn5zKGwIUIfgGatLcl
+	YUYiUnpiCj96y7dhzgtPZFUfBWxbbQMcSFLDvNFl017p3o9rGA==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1sZopf-00078S-Pw; Fri, 02 Aug 2024 11:44:19 +0200
+Message-ID: <c0967665-343d-4ca9-90a0-a072159c1056@leemhuis.info>
+Date: Fri, 2 Aug 2024 11:44:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731190742.GS1967603@kernel.org>
+User-Agent: Mozilla Thunderbird
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ Steve French <sfrench@samba.org>,
+ Gleb Korobeynikov <gkorobeynikov@astralinux.ru>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: [regression] smb: client: - Failure to mount DFS namespaces without
+ ASCII symbols
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1722591868;e7825c62;
+X-HE-SMSGID: 1sZopf-00078S-Pw
 
-On Wed, Jul 31, 2024 at 08:07:42PM +0100, Simon Horman wrote:
-> On Mon, Jul 29, 2024 at 05:19:47PM +0100, David Howells wrote:
-> 
-> ...
-> 
-> > diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-> 
-> ...
-> 
-> > +/*
-> > + * Perform a read to the pagecache from a series of sources of different types,
-> > + * slicing up the region to be read according to available cache blocks and
-> > + * network rsize.
-> > + */
-> > +static void netfs_read_to_pagecache(struct netfs_io_request *rreq)
-> > +{
-> > +	struct netfs_inode *ictx = netfs_inode(rreq->inode);
-> > +	unsigned long long start = rreq->start;
-> > +	ssize_t size = rreq->len;
-> > +	int ret = 0;
-> > +
-> > +	atomic_inc(&rreq->nr_outstanding);
-> > +
-> > +	do {
-> > +		struct netfs_io_subrequest *subreq;
-> > +		enum netfs_io_source source = NETFS_DOWNLOAD_FROM_SERVER;
-> > +		ssize_t slice;
-> > +
-> > +		subreq = netfs_alloc_subrequest(rreq);
-> > +		if (!subreq) {
-> > +			ret = -ENOMEM;
-> > +			break;
-> > +		}
-> > +
-> > +		subreq->start	= start;
-> > +		subreq->len	= size;
-> > +
-> > +		atomic_inc(&rreq->nr_outstanding);
-> > +		spin_lock_bh(&rreq->lock);
-> > +		list_add_tail(&subreq->rreq_link, &rreq->subrequests);
-> > +		subreq->prev_donated = rreq->prev_donated;
-> > +		rreq->prev_donated = 0;
-> > +		trace_netfs_sreq(subreq, netfs_sreq_trace_added);
-> > +		spin_unlock_bh(&rreq->lock);
-> > +
-> > +		source = netfs_cache_prepare_read(rreq, subreq, rreq->i_size);
-> > +		subreq->source = source;
-> > +		if (source == NETFS_DOWNLOAD_FROM_SERVER) {
-> > +			unsigned long long zp = umin(ictx->zero_point, rreq->i_size);
-> > +			size_t len = subreq->len;
-> > +
-> > +			if (subreq->start >= zp) {
-> > +				subreq->source = source = NETFS_FILL_WITH_ZEROES;
-> > +				goto fill_with_zeroes;
-> > +			}
-> > +
-> > +			if (len > zp - subreq->start)
-> > +				len = zp - subreq->start;
-> > +			if (len == 0) {
-> > +				pr_err("ZERO-LEN READ: R=%08x[%x] l=%zx/%zx s=%llx z=%llx i=%llx",
-> > +				       rreq->debug_id, subreq->debug_index,
-> > +				       subreq->len, size,
-> > +				       subreq->start, ictx->zero_point, rreq->i_size);
-> > +				break;
-> > +			}
-> > +			subreq->len = len;
-> > +
-> > +			netfs_stat(&netfs_n_rh_download);
-> > +			if (rreq->netfs_ops->prepare_read) {
-> > +				ret = rreq->netfs_ops->prepare_read(subreq);
-> > +				if (ret < 0) {
-> > +					atomic_dec(&rreq->nr_outstanding);
-> > +					netfs_put_subrequest(subreq, false,
-> > +							     netfs_sreq_trace_put_cancel);
-> > +					break;
-> > +				}
-> > +				trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
-> > +			}
-> > +
-> > +			slice = netfs_prepare_read_iterator(subreq);
-> > +			if (slice < 0) {
-> > +				atomic_dec(&rreq->nr_outstanding);
-> > +				netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_cancel);
-> > +				ret = slice;
-> > +				break;
-> > +			}
-> > +
-> > +			rreq->netfs_ops->issue_read(subreq);
-> > +			goto done;
-> > +		}
-> > +
-> > +	fill_with_zeroes:
-> > +		if (source == NETFS_FILL_WITH_ZEROES) {
-> > +			subreq->source = NETFS_FILL_WITH_ZEROES;
-> > +			trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-> > +			netfs_stat(&netfs_n_rh_zero);
-> > +			slice = netfs_prepare_read_iterator(subreq);
-> > +			__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
-> > +			netfs_read_subreq_terminated(subreq, 0, false);
-> > +			goto done;
-> > +		}
-> > +
-> > +		if (source == NETFS_READ_FROM_CACHE) {
-> > +			trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-> > +			slice = netfs_prepare_read_iterator(subreq);
-> > +			netfs_read_cache_to_pagecache(rreq, subreq);
-> > +			goto done;
-> > +		}
-> > +
-> > +		if (source == NETFS_INVALID_READ)
-> > +			break;
-> 
-> Hi David,
-> 
-> I feel a sense of deja vu here. So apologies if this was already
-> discussed in the past.
-> 
-> If the code ever reaches this line, then slice will be used
-> uninitialised below.
-> 
-> Flagged by W=1 allmodconfig builds on x86_64 with Clang 18.1.8.
+Hi, Thorsten here, the Linux kernel's regression tracker.
 
-which now breaks the build in next-20240801:
+Paulo, I noticed a report about a regression in bugzilla.kernel.org that
+appears to be caused by this change of yours:
 
-  fs/netfs/buffered_read.c:304:7: error: variable 'slice' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
-    304 |                 if (source == NETFS_INVALID_READ)
-        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  fs/netfs/buffered_read.c:308:11: note: uninitialized use occurs here
-    308 |                 size -= slice;
-        |                         ^~~~~
-  fs/netfs/buffered_read.c:304:3: note: remove the 'if' if its condition is always true
-    304 |                 if (source == NETFS_INVALID_READ)
-        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    305 |                         break;
-  fs/netfs/buffered_read.c:221:16: note: initialize the variable 'slice' to silence this warning
-    221 |                 ssize_t slice;
-        |                              ^
-        |                               = 0
-  1 error generated.
+3ae872de410751 ("smb: client: fix shared DFS root mounts with different
+prefixes") [v6.5-rc1]
 
-If source has to be one of these values, perhaps switching to a switch
-statement and having a default with a WARN_ON() or something would
-convey that to the compiler?
+As many (most?) kernel developers don't keep an eye on the bug tracker,
+I decided to write this mail. To quote from
+https://bugzilla.kernel.org/show_bug.cgi?id=219083 :
 
-Cheers,
-Nathan
+>  Gleb Korobeynikov 2024-07-22 10:59:46 UTC
+> 
+> Windows version of SMB host: Windows Server 2022 Standard x64
+> Kernel: 6.3.13(upstream)
+> CONFIG_CIFS_DFS_UPCALL
+> 
+> In the function cifs_inval_name_dfs_link_error(), a check was added for tcon->origin_fullpath (3ae872de410751fe5e629e04da491a632d95201c). I believe it's unnecessary because when mounting a dfs name without ASCII characters, we always fail at this check and exit the function, leading to dfs namespaces not being mounted
+> 
+> Steps to reproduce:
+> 
+> 1. At Windows, create DFS namespace with name containing non-ASCII symbols (for example дфс)
+> 
+> 2. mount -t cifs \\\\<smb_server>\\дфс  /tmp/dfs -o domain=...,user=...,password=...
+> 
+> result:
+> mount error(2): No such file or directory
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and kernel log messages (dmesg)
+> 
+> CIFS debug log:
+> [Mon Jul 22 11:00:24 2024] CIFS: Status code returned 0xc0000033 STATUS_OBJECT_NAME_INVALID
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/smb2maperror.c: Mapping SMB2 status code 0xc0000033 to POSIX err -2
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/dfs_cache.c: dfs_cache_noreq_update_tgthint: path: \test.local\дфс
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses_count=2
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses ipc: \\test.local\IPC$
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: cifs_put_tcon: tc_count=1
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: VFS: in cifs_put_tcon as Xid: 17 with uid: 0
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/smb2pdu.c: Tree Disconnect
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/fscache.c: cifs_fscache_release_super_cookie: (0x0000000000000000)
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses_count=1
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses ipc: \\DC.test.local\IPC$
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: VFS: in __cifs_put_smb_ses as Xid: 18 with uid: 0
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/smb2pdu.c: disconnect session 00000000360c6881
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses_count=1
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: __cifs_put_smb_ses: ses ipc: \\test.local\IPC$
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: VFS: in __cifs_put_smb_ses as Xid: 19 with uid: 0
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/smb2pdu.c: disconnect session 00000000db1ddbb6
+> [Mon Jul 22 11:00:24 2024] CIFS: fs/smb/client/connect.c: VFS: leaving cifs_mount_put_conns (xid = 13) rc = 0
+> [Mon Jul 22 11:00:24 2024] CIFS: VFS: cifs_mount failed w/return code = -2
+
+And
+
+>  Gleb Korobeynikov 2024-07-30 11:03:01 UTC
+> 
+> (In reply to Gleb Korobeynikov from comment #5)
+>> (In reply to The Linux kernel's regression tracker (Thorsten Leemhuis) from
+>> comment #4)
+>> > Please check if 6.10 (or 6.11-rc1 once it's out on Monday) is still
+>> affected
+>> 
+>> Alright, I will definitely check
+> 
+> Checked on 6.11-rc1. The reproduction issue happens identically.
+
+See the ticket for more details.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
+
+[1] because bugzilla.kernel.org tells users upon registration their
+"email address will never be displayed to logged out users"
+
+P.S.: let me use this mail to also add the report to the list of tracked
+regressions to ensure it's doesn't fall through the cracks:
+
+#regzbot introduced: 3ae872de410751fe5e629e04da491a632d95201c
+#regzbot title: smb: client: failure to mount DFS namespaces without
+ASCII symbols
+#regzbot from: Gleb Korobeynikov <gkorobeynikov@astralinux.ru>
+#regzbot duplicate: https://bugzilla.kernel.org/show_bug.cgi?id=219083
+#regzbot ignore-activity
