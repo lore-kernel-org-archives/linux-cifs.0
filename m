@@ -1,171 +1,110 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D50136E09
-	for <linux-cifs@vger.kernel.org>; Sat,  3 Aug 2024 13:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F67014A84;
+	Sat,  3 Aug 2024 23:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722693244; cv=none; b=QJt8ffcNmhGV/0OcUTc2tHNUUYTYC3G9tMfxJEzEJKYpH9XHBNXZmi8rcBzjTzxqRrPca3ox7ONK8pfcHpTfqrTUBWmsDDgrDSQIM+2Ptlj3iJC33p4Lnsv057ljckztF+0Y2x/NSPbKGQy1cFitiVHouxbWajgZjb15/182UT0=
+	t=1722726874; cv=none; b=txy7PesvK1h+Ni7CvSiZLgFN4QM68ZILxSq1Ypc6CqIhIlWBGy5nj8zJYTX/777r90N93+d2GsxO+bhTPN8kIth7dJsA3v+0dVIVwoiqCC467DV82nu8PobwPSnU6bEQfridosR03R6HP1gWQPqc+Orsf7MVk7jdNKf06Hl1LTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722693244; c=relaxed/simple;
-	bh=3du39j/J1e+/JJKFwhAKzAbBTW0THJJs6mQxY+AibJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ON8H2JUGNfUckUVkL/+kGlwyufbkstwcScRNnQiI5ZAo/f/prWD/jLDR3hRNW9P0pRml1AlULWSsx2z4nhdkdFqn+T8q/7Q8D3vkKKcLHSTQd8Q9jTqN8JaHuMz9OpBumU8bwU9CqDpAAW5teqWfsaBi5dEPkvE+Gxr2QY8iGOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jXrqbspj; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1722726874; c=relaxed/simple;
+	bh=B55JkbSlBxpJDiKdSAijLYuz0R5ZzXko95X+7Ef/X8Y=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=EPll+xvWsUce5TS/L/Dy1hlX6RHwcF+0RhfVT8gCV9+9z3KrLW2avCQfBIfhtsYgHkRnqbRyuz1BBr94ITyW1ve0L7KVGlwH8kXbc6LFFF51ncXCbG/JmEYiQYFRaBTKB5chFCOzcQ3w+gJ7YOEZeAZayNSHKjzy1A0CQA7Qq1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cYZ/M3Jj; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jXrqbspj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722693242; x=1754229242;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=3du39j/J1e+/JJKFwhAKzAbBTW0THJJs6mQxY+AibJQ=;
-  b=jXrqbspjR4nBoeD4hFPrrYrYyQSmMsL/RFuOSGtzLAjsMcqXwWp3YflG
-   VMDn4xVxZmjP6zfZLXTPSLewQbZuvJl1NP41Rzj/EXS6huZ7r9kF/uhca
-   rvHLGG2ErKp6BMN9aG5iaAf/OKvJFM79sjC5IOE2nnTjiIXvgsJkuFRRN
-   pC70VLArLQqgW/fw0HYNT4QyAuX9p6NAbiIcXHZ/4mGwUM4bc4++diqq1
-   3bSqX14GbDTLCfQ+WD5B0S8IrW0c/f8YSDxI1T5YCn16HQNsggLUVmdSt
-   1QXaXWW+6yqpq7MBftcW1uz90NsGDy5iwcRhWIrYGJ0AUkhvHwnoytPZz
-   w==;
-X-CSE-ConnectionGUID: 5kTQA0pYQA6TNsOQ87HsWQ==
-X-CSE-MsgGUID: zwIReV5ZQwGFJFTi/6TjUw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11153"; a="20838505"
-X-IronPort-AV: E=Sophos;i="6.09,260,1716274800"; 
-   d="scan'208";a="20838505"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2024 06:54:02 -0700
-X-CSE-ConnectionGUID: V+dnqm8uS9mFA8abtNTq1w==
-X-CSE-MsgGUID: nHfDbQKETkGZRRx8vpke7Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,260,1716274800"; 
-   d="scan'208";a="60720450"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 03 Aug 2024 06:54:00 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1saFCj-0000Us-38;
-	Sat, 03 Aug 2024 13:53:55 +0000
-Date: Sat, 3 Aug 2024 21:52:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Steve French <stfrench@microsoft.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	"Paulo Alcantara (SUSE)" <pc@manguebit.com>
-Subject: [cifs:5.15-backport-8-1-24 579/600] fs/cifs/readdir.c:68:35: error:
- implicit declaration of function 'inode_get_ctime'; did you mean
- 'inode_get_bytes'?
-Message-ID: <202408032149.nYY75Z7B-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYZ/M3Jj"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-52efa16aad9so13137753e87.0;
+        Sat, 03 Aug 2024 16:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722726871; x=1723331671; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=g0kSt5t1uFzH8Xbkla9+TJMSfVA9igCR7XqP1zqBBoE=;
+        b=cYZ/M3JjmKtKJapQNSFTnpF0sdjsQAR6cCYuUSdjCGjlAATduSua8PQnSeSCcyA/VS
+         AxbdCc43VCxCcSDGXS95gvV/vRE091e//E4Fs4TJlafcEAmkTzRRP7e4kgSkzN+sDeOy
+         QvDObVZqQ0j+fWbG1MMoqUgZcInz8Z30v+iFyk1Em2EUvqnycF0A7vaQktPH2ZeMuhDq
+         9U7RRwDYKuNBHm/DcM6ewH0AGfgZ3FQCNsMPFKHoo6IpC4rS763DlaeTpHQ7lr4jNTIq
+         Ge5x0N8lFxqrq/W+wSX2azBdBhtjm1/mwAw8Taa+md8+Zcl8SoxmHNELG2rRzqGJ0kvx
+         bt7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722726871; x=1723331671;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g0kSt5t1uFzH8Xbkla9+TJMSfVA9igCR7XqP1zqBBoE=;
+        b=OLajsKS0QhN9YjEeq60lPbuWTJOrkW7P5yU1SLrAooTRoDY5Hs1KfsMBzrm/l+TjY2
+         /wEsBRysYj6mv+tX64MJu4HTPSDpL+Nw6ljUxF4FzTqt8IIcRkgbLMCuxfbecVuQYJyL
+         bOhdZJ4RFCI+AhDplQrfHp1UkXQlmB0SNYtzJscb8Loe+6fN0sPAaHEsTPgh9E6FO2vI
+         b1Q3lfFVPISq3KJv4U76Ua2ksy0CbO+W+hnCBw9BusBRCRuuN/fqV8GNLb410VHaWNIg
+         hHE+zhLAv3QNqUI10v7EgSbOhCLOafkWlupjLV1ry4DxAr86MR+uvNkyEaQKtBfgfEe+
+         9NgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkNiaSPgO5r/+Pji0WTqa8sMv/zucuBTQHyCSMJiPxjdplQOAn5D1nUj9tJi3xSnbCTn3tqbobj0vjfPn3vLyKNI8LLKzvjrm6MA==
+X-Gm-Message-State: AOJu0YzqsJg5V5BTZd54R3mAXClWqk+lOC1TZdg0Mw5sX+dAJ2GYV4FB
+	x7tKbtnjYYgymO5d0Pik/pXCqGXJamXvWAqnjDf/cQhfuEY+zvhnW+2ktFH1Vlpk7/H0mjxa4Gk
+	IA6/OKYqHASuM/qLBrDAEORJfI0aPiw==
+X-Google-Smtp-Source: AGHT+IEQF5asgqFLsoYXPyRMSH92SG+1wrHXlPA2hXWXM1yLMBvmjwY3KwNbqKWs+ZDCgp7CSFdozpZFCvwDk9bFzCY=
+X-Received: by 2002:ac2:4c48:0:b0:52e:be49:9d32 with SMTP id
+ 2adb3069b0e04-530bb39613fmr4885882e87.47.1722726870745; Sat, 03 Aug 2024
+ 16:14:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 3 Aug 2024 18:14:19 -0500
+Message-ID: <CAH2r5msSfDbF+wrZ6fWaaL7puR+N4MNQ3Vt1AH7K-Lp82nUGug@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-tree:   git://git.samba.org/sfrench/cifs-2.6.git 5.15-backport-8-1-24
-head:   c931999946e12679e0adc129509a1e23a4a64b5d
-commit: dcb1e6f4a287802e0f9e1db6a81ea280481b2d4b [579/600] smb: client: stop revalidating reparse points unnecessarily
-config: i386-randconfig-002-20240803 (https://download.01.org/0day-ci/archive/20240803/202408032149.nYY75Z7B-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240803/202408032149.nYY75Z7B-lkp@intel.com/reproduce)
+Please pull the following changes since commit
+8400291e289ee6b2bf9779ff1c83a291501f017b:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408032149.nYY75Z7B-lkp@intel.com/
+  Linux 6.11-rc1 (2024-07-28 14:19:55 -0700)
 
-All errors (new ones prefixed by >>):
+are available in the Git repository at:
 
-   In file included from fs/cifs/readdir.c:15:
-   fs/cifs/cifspdu.h:512:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-     512 |                 DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
-         |                 ^~~~~~~~~~~~~~~~~~
-   fs/cifs/cifspdu.h:885:9: error: expected specifier-qualifier-list before 'struct_group'
-     885 |         struct_group(common_attributes,
-         |         ^~~~~~~~~~~~
-   fs/cifs/cifspdu.h:2269:9: error: expected specifier-qualifier-list before 'struct_group'
-    2269 |         struct_group(common_attributes,
-         |         ^~~~~~~~~~~~
-   fs/cifs/cifspdu.h:2332:9: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-    2332 |         DECLARE_FLEX_ARRAY(char, LinkDest);
-         |         ^~~~~~~~~~~~~~~~~~
-   fs/cifs/cifspdu.h:2381:9: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-    2381 |         DECLARE_FLEX_ARRAY(__u8, alt_name);
-         |         ^~~~~~~~~~~~~~~~~~
-   fs/cifs/cifspdu.h:2492:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-    2492 |                 DECLARE_FLEX_ARRAY(char, FileName);
-         |                 ^~~~~~~~~~~~~~~~~~
-   In file included from fs/cifs/cifsglob.h:26,
-                    from fs/cifs/readdir.c:16:
-   fs/cifs/../smbfs_common/smb2pdu.h:705:9: error: expected specifier-qualifier-list before 'struct_group'
-     705 |         struct_group(network_open_info,
-         |         ^~~~~~~~~~~~
-   fs/cifs/../smbfs_common/smb2pdu.h:845:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-     845 |                 DECLARE_FLEX_ARRAY(struct smb2_lock_element, locks);
-         |                 ^~~~~~~~~~~~~~~~~~
-   fs/cifs/../smbfs_common/smb2pdu.h:1686:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
-    1686 |                 DECLARE_FLEX_ARRAY(char, FileName);
-         |                 ^~~~~~~~~~~~~~~~~~
-   In file included from fs/cifs/cifsglob.h:27:
-   fs/cifs/smb2pdu.h:322:9: error: expected specifier-qualifier-list before 'struct_group'
-     322 |         struct_group(network_open_info,
-         |         ^~~~~~~~~~~~
-   fs/cifs/cifsglob.h: In function 'move_cifs_info_to_smb2':
-   fs/cifs/cifsglob.h:2182:45: error: 'FILE_ALL_INFO' has no member named 'AccessFlags'
-    2182 |         memcpy(dst, src, (size_t)((u8 *)&src->AccessFlags - (u8 *)src));
-         |                                             ^~
-   fs/cifs/cifsglob.h:2183:31: error: 'FILE_ALL_INFO' has no member named 'AccessFlags'
-    2183 |         dst->AccessFlags = src->AccessFlags;
-         |                               ^~
-   fs/cifs/cifsglob.h:2184:37: error: 'FILE_ALL_INFO' has no member named 'CurrentByteOffset'
-    2184 |         dst->CurrentByteOffset = src->CurrentByteOffset;
-         |                                     ^~
-   fs/cifs/cifsglob.h:2185:24: error: 'FILE_ALL_INFO' has no member named 'Mode'
-    2185 |         dst->Mode = src->Mode;
-         |                        ^~
-   fs/cifs/cifsglob.h:2186:40: error: 'FILE_ALL_INFO' has no member named 'AlignmentRequirement'
-    2186 |         dst->AlignmentRequirement = src->AlignmentRequirement;
-         |                                        ^~
-   fs/cifs/cifsglob.h:2187:34: error: 'FILE_ALL_INFO' has no member named 'FileNameLength'
-    2187 |         dst->FileNameLength = src->FileNameLength;
-         |                                  ^~
-   fs/cifs/readdir.c: In function 'reparse_inode_match':
->> fs/cifs/readdir.c:68:35: error: implicit declaration of function 'inode_get_ctime'; did you mean 'inode_get_bytes'? [-Werror=implicit-function-declaration]
-      68 |         struct timespec64 ctime = inode_get_ctime(inode);
-         |                                   ^~~~~~~~~~~~~~~
-         |                                   inode_get_bytes
->> fs/cifs/readdir.c:68:35: error: invalid initializer
-   fs/cifs/readdir.c: In function 'cifs_fill_dirent_unix':
-   fs/cifs/readdir.c:522:25: error: 'FILE_UNIX_INFO' has no member named 'FileName'
-     522 |         de->name = &info->FileName[0];
-         |                         ^~
-   cc1: some warnings being treated as errors
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.11-rc1-smb-client-fixes
 
+for you to fetch changes up to a91bfa67601c07ff9d31731fd2d624b47b0039f2:
 
-vim +68 fs/cifs/readdir.c
+  cifs: update internal version number (2024-08-02 10:56:14 -0500)
 
-    57	
-    58	/*
-    59	 * Match a reparse point inode if reparse tag and ctime haven't changed.
-    60	 *
-    61	 * Windows Server updates ctime of reparse points when their data have changed.
-    62	 * The server doesn't allow changing reparse tags from existing reparse points,
-    63	 * though it's worth checking.
-    64	 */
-    65	static inline bool reparse_inode_match(struct inode *inode,
-    66					       struct cifs_fattr *fattr)
-    67	{
-  > 68		struct timespec64 ctime = inode_get_ctime(inode);
-    69	
-    70		return (CIFS_I(inode)->cifsAttrs & ATTR_REPARSE) &&
-    71			CIFS_I(inode)->reparse_tag == fattr->cf_cifstag &&
-    72			timespec64_equal(&ctime, &fattr->cf_ctime);
-    73	}
-    74	
+----------------------------------------------------------------
+smb3 client fixes
+- two reparse point fixes
+- minor cleanup
+- additional trace point (to help debug a recent problem)
+----------------------------------------------------------------
+David Howells (1):
+      cifs: Remove cifs_aio_ctx
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Paulo Alcantara (2):
+      smb: client: handle lack of FSCTL_GET_REPARSE_POINT support
+      smb: client: fix FSCTL_GET_REPARSE_POINT against NetApp
+
+Steve French (2):
+      smb3: add dynamic tracepoints for shutdown ioctl
+      cifs: update internal version number
+
+ fs/smb/client/cifsfs.h    |  4 ++--
+ fs/smb/client/cifsglob.h  | 24 -----------------------
+ fs/smb/client/cifsproto.h |  2 --
+ fs/smb/client/inode.c     | 17 ++++++++++++++--
+ fs/smb/client/ioctl.c     | 32 +++++++++++++++++++++++-------
+ fs/smb/client/misc.c      | 54
+---------------------------------------------------
+ fs/smb/client/reparse.c   |  4 ++++
+ fs/smb/client/reparse.h   | 19 ++++++++++++++++--
+ fs/smb/client/smb2inode.c |  8 ++++++--
+ fs/smb/client/trace.h     | 51 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 10 files changed, 119 insertions(+), 96 deletions(-)
+
+--
+Thanks,
+
+Steve
