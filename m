@@ -1,56 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DFD1171C;
-	Fri,  2 Aug 2024 14:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B641E51D
+	for <linux-cifs@vger.kernel.org>; Sat,  3 Aug 2024 05:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722609852; cv=none; b=YTqOhBFEQ97fPvYvP+ogXao6LQrsmHRlS1zklG/i0KCrZeXp8uAj/K/JxvPmN8ZC1eUqnFd4lB9uGBeWVvKcWwYcN/gRkaFSvC4x0EV6Iv7FXaazYx9nFXcbt+bpuvwaRP7kw5CbSUXEb9rNOSZAWHT+W+pthpERDE+jO3plDqA=
+	t=1722662182; cv=none; b=jG7gh1IXVWy+Uqx3D//YqGW+Il8aMdlariPAJkNh6J5aGJwvfXsrDwGoxlBUvTiZNnsmI8j1neGoK/HOK3pZyTQ/a6UxQFwqXpyfc8t6nVG3YcIWduia9fgSLFEgFkFwWgDeSbde+JgtRe+5jtSzpv+RR+7GGBc2VsBG7oYLzys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722609852; c=relaxed/simple;
-	bh=x8gmfjyvWGUc0bCINyn9NBAMXGuzcpTpCIJEd8Maaqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a4BsSTXGghbtJluwou74V6KEfZZqXKooHVZNjZNClxC11h8g4nWDIitjGL/d1DVb/Bt6My39RMobunIY81obv2E7jqxgm9xw6DTGJ4kQTrbUHllxur1vEG+sHHilU7qDq/jjYkgur1SswWGQRrxNZAmFdG9NC3RsoK0W+DNOa+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzIfzPbq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722662182; c=relaxed/simple;
+	bh=gtXf5MljnWlUDdrAGpUZhmR7LLEZvldj9ThqMK9GRb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QSSxk3V7Y2U32StREcCCUlEF9JbnRHQF/Geh+3djJGLnsfrGpVbYPrXFNiMrkJc82vCaOagqeCEb4E0FgXnG/Lb+EJTddFS8St/Cz/+EiczYyZYF3BOPIbvZMjFbmru2qgeLXk4+iUZX4jmJfziNsKwbYiBDGFNrA7qra1voeww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UzY7BaEQ; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzIfzPbq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55967C32782;
-	Fri,  2 Aug 2024 14:44:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722609851;
-	bh=x8gmfjyvWGUc0bCINyn9NBAMXGuzcpTpCIJEd8Maaqg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uzIfzPbqeWDSXjHiBgkEJnEtvR/x00pI80yfMOPspsqu8FySfDHUqzDYaUa33dMPa
-	 9VuWj+8Sla/wxa6LgFUP4mUw5Uqld7oPO/Rc7VTvnZTkP4QUsX0WNIBJRfMKEbOm5E
-	 0O3SbfpH6tCZjpWaiiD1fNODTiZvR3ChGvm1WdEivsVrn36vxh5q5dSLX0Bq7q6TW/
-	 ZIfiaLlaRb/QTv1p8yRpvlyNCDsCx+PAndbRntFM/P58FfzqAwLyMhP9mXUnvR6Pti
-	 auvyf2mCECPYJDUbbakovkI3Q9PN8/kFR339yvIkgqaDOFi20gDtMTllo/pWmelP5F
-	 gBuJs50KKDLcA==
-Date: Fri, 2 Aug 2024 15:44:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 18/24] netfs: Speed up buffered reading
-Message-ID: <20240802144405.GD2504122@kernel.org>
-References: <20240731190742.GS1967603@kernel.org>
- <20240729162002.3436763-1-dhowells@redhat.com>
- <20240729162002.3436763-19-dhowells@redhat.com>
- <117846.1722608282@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UzY7BaEQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722662181; x=1754198181;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=gtXf5MljnWlUDdrAGpUZhmR7LLEZvldj9ThqMK9GRb4=;
+  b=UzY7BaEQWMLfS/fRFzrZgrLj1Py1KZVKpBzzqa+PT6qEJ2jQqw8zS1VN
+   DJt6gmKDTZ3EPjZsxjoibMKnJrymCzOf+g0MyFsJexI539zvJ4/+RueOW
+   WzzYnq96jwhWTHwTiQPIKQYsJLm5JFK7MkAf25qHIBwv2NSiiL+SqpZMH
+   wIQ2mtVBTeQGfgKoLCu44fk1+zdrQyvfzkqjyOG+7YkRYfLPiAU1nYm5W
+   AdH7Spra2GjurGGtrh88DpksM6rx1Q5upDjrEB2YTyGx8ewTBS4B5D72M
+   r8Sd5cP1yLrmVSN+65hBdGKImpICvdSNvrxuSesmh//ih6sLwApcOu8jL
+   A==;
+X-CSE-ConnectionGUID: 9F1QFtmTRTem1m7eCP/a2A==
+X-CSE-MsgGUID: tc3rtoDDRp+HN/aww3t/Fw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11152"; a="20852854"
+X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
+   d="scan'208";a="20852854"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 22:16:20 -0700
+X-CSE-ConnectionGUID: SjHjkmnfQMyey+1j1t6xxw==
+X-CSE-MsgGUID: WEku4IIpTdiNskuN1fka6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
+   d="scan'208";a="55308840"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa006.fm.intel.com with ESMTP; 02 Aug 2024 22:16:19 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sa77f-00006W-2I;
+	Sat, 03 Aug 2024 05:16:11 +0000
+Date: Sat, 3 Aug 2024 13:15:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>,
+	Kees Cook <keescook@chromium.org>,
+	Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [cifs:5.15-backport-8-1-24 226/600] fs/cifs/cifspdu.h:512:17: error:
+ expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
+Message-ID: <202408031336.QdFIpntb-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -59,29 +65,101 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <117846.1722608282@warthog.procyon.org.uk>
 
-On Fri, Aug 02, 2024 at 03:18:02PM +0100, David Howells wrote:
-> Simon Horman <horms@kernel.org> wrote:
-> 
-> > If the code ever reaches this line, then slice will be used
-> > uninitialised below.
-> 
-> It can't actually happen (or, at least, it shouldn't).  There are only three
-> ways of obtaining data: downloading from the server
-> (NETFS_DOWNLOAD_FROM_SERVER), reading from the cache (NETFS_READ_FROM_CACHE)
-> and just clearing space (NETFS_FILL_WITH_ZEROES); each of those has its own
-> if-statement that will set 'slice' or will switch the source to a different
-> type that will set 'slice'.
-> 
-> The problem is that the compiler doesn't know this.
-> 
-> The check for NETFS_INVALID_READ is there just in case.  Possibly:
-> 
-> 		if (source == NETFS_INVALID_READ)
-> 			break;
-> 
-> could be replaced with a WARN_ON_ONCE() and an unconditional break.
+Hi Gustavo,
 
-Thanks, I think that should make the compiler happy without
-significantly altering the flow or readability of the code.
+FYI, the error/warning still remains.
+
+tree:   git://git.samba.org/sfrench/cifs-2.6.git 5.15-backport-8-1-24
+head:   c931999946e12679e0adc129509a1e23a4a64b5d
+commit: cb470770db4ecdaf46a6c4b1703889ba2d6a4b19 [226/600] cifs: Replace a couple of one-element arrays with flexible-array members
+config: i386-randconfig-002-20240803 (https://download.01.org/0day-ci/archive/20240803/202408031336.QdFIpntb-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240803/202408031336.QdFIpntb-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408031336.QdFIpntb-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from fs/cifs/dir.c:17:
+>> fs/cifs/cifspdu.h:512:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
+     512 |                 DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
+         |                 ^~~~~~~~~~~~~~~~~~
+--
+   In file included from fs/cifs/cifsglob.h:100,
+                    from fs/cifs/cached_dir.c:8:
+>> fs/cifs/cifspdu.h:512:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
+     512 |                 DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
+         |                 ^~~~~~~~~~~~~~~~~~
+   fs/cifs/cached_dir.c:415:6: warning: no previous prototype for 'free_cached_dir' [-Wmissing-prototypes]
+     415 | void free_cached_dir(struct cached_fid *cfid)
+         |      ^~~~~~~~~~~~~~~
+--
+   In file included from fs/cifs/ioctl.c:16:
+>> fs/cifs/cifspdu.h:512:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
+     512 |                 DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
+         |                 ^~~~~~~~~~~~~~~~~~
+   fs/cifs/ioctl.c: In function 'cifs_ioctl':
+   fs/cifs/ioctl.c:324:17: warning: variable 'caps' set but not used [-Wunused-but-set-variable]
+     324 |         __u64   caps;
+         |                 ^~~~
+--
+   In file included from fs/cifs/cifssmb.c:26:
+>> fs/cifs/cifspdu.h:512:17: error: expected specifier-qualifier-list before 'DECLARE_FLEX_ARRAY'
+     512 |                 DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
+         |                 ^~~~~~~~~~~~~~~~~~
+   fs/cifs/cifssmb.c: In function 'decode_ext_sec_blob':
+>> fs/cifs/cifssmb.c:381:33: error: 'union <anonymous>' has no member named 'extended_response'
+     381 |         char    *guid = pSMBr->u.extended_response.GUID;
+         |                                 ^
+   fs/cifs/cifssmb.c:405:33: error: 'union <anonymous>' has no member named 'extended_response'
+     405 |                         pSMBr->u.extended_response.SecurityBlob, count, server);
+         |                                 ^
+   fs/cifs/cifssmb.c: In function 'CIFSSMBNegotiate':
+>> fs/cifs/cifssmb.c:516:55: error: 'union <anonymous>' has no member named 'EncryptionKey'
+     516 |                 memcpy(ses->server->cryptkey, pSMBr->u.EncryptionKey,
+         |                                                       ^
+
+
+vim +/DECLARE_FLEX_ARRAY +512 fs/cifs/cifspdu.h
+
+   490	
+   491	#define READ_RAW_ENABLE 1
+   492	#define WRITE_RAW_ENABLE 2
+   493	#define RAW_ENABLE (READ_RAW_ENABLE | WRITE_RAW_ENABLE)
+   494	#define SMB1_CLIENT_GUID_SIZE (16)
+   495	typedef struct negotiate_rsp {
+   496		struct smb_hdr hdr;	/* wct = 17 */
+   497		__le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
+   498		__u8 SecurityMode;
+   499		__le16 MaxMpxCount;
+   500		__le16 MaxNumberVcs;
+   501		__le32 MaxBufferSize;
+   502		__le32 MaxRawSize;
+   503		__le32 SessionKey;
+   504		__le32 Capabilities;	/* see below */
+   505		__le32 SystemTimeLow;
+   506		__le32 SystemTimeHigh;
+   507		__le16 ServerTimeZone;
+   508		__u8 EncryptionKeyLength;
+   509		__u16 ByteCount;
+   510		union {
+   511			/* cap extended security off */
+ > 512			DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
+   513			/* followed by Domain name - if extended security is off */
+   514			/* followed by 16 bytes of server GUID */
+   515			/* then security blob if cap_extended_security negotiated */
+   516			struct {
+   517				unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
+   518				unsigned char SecurityBlob[];
+   519			} __attribute__((packed)) extended_response;
+   520		} __attribute__((packed)) u;
+   521	} __attribute__((packed)) NEGOTIATE_RSP;
+   522	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
