@@ -1,42 +1,37 @@
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 9D8A9156220;
-	Thu,  8 Aug 2024 12:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8DC18C33B;
+	Thu,  8 Aug 2024 14:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723119859; cv=none; b=Ssl2k7tBD6/Ot4tJlIvBcEb3yxrOhanCY/X/MORSyCI0j3wNhbADUIXP9z2udlax6pddw8USIBuFxUiR1OrLVgeb9QAl/VVmr63JsmAKGB/g8B8FeurUEDQEWwA1F0A7LDQ4xcTW1ixd9PkuQysY3p9/FRy/gkYZmBLMzyc4hv8=
+	t=1723125957; cv=none; b=EOgD/SkgbxdPinHSpLbjcdkku3ofQ7Ui6UZPgVKdvIZfTRf9IId2yQny6pmnmh0c1pABhcFpcPS68d2TawcoSi8v34iTvMFajstu7dQ8wZ813bOSx3UQLLpkRQnmKHpxm8rtlXHPtclhI7j5amQdhFmvbMPq8bSTo3MnEzs3aJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723119859; c=relaxed/simple;
-	bh=SXys11+xLoBsHco0MZl/A5tIPMtTS+9EsXL6IR3Hvxk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rieHxcu8WFJ5cQD5DSkuLIe7dwPqlcYeDF+jFDSzLiSITxqu/5bKh3Dk/mFMEbPmBwpZFKUHik+gY7mywcbONNf3t0FO1vLkLDHndNnakSjNjJIlZCOxmAWRgWyGtdRsZhL9P4+viNqHnUO+Ph2zPGsS+ErjfMBGCcRQ3F9yOas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id C603B60C7B26D;
-	Thu,  8 Aug 2024 20:23:45 +0800 (CST)
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
-To: sfrench@samba.org,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	morbo@google.com,
-	justinstitt@google.com
-Cc: Su Hui <suhui@nfschina.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH] smb/client: avoid possible NULL dereference in cifs_free_subrequest()
-Date: Thu,  8 Aug 2024 20:23:32 +0800
-Message-Id: <20240808122331.342473-1-suhui@nfschina.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1723125957; c=relaxed/simple;
+	bh=kyUHaORymwIzOHkL/9H9HnKJbgmkNYjfaKkvTaTc0VE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UvEFr1Yw01/c6FOc/yVjJ3AuKV9tN/yjrYdz2TsqY3qKrLsKXsGqBLliO8VtgTlz8TFzKcnaPGYur6cm3Inu/IypzBK1GpKfGqzdvZCRJdQYoLQHuloSV5PB890s0QTwn6XWHOmDFUJqOlt7RfT2FW5gTern6myqLVBKPJHa3Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WfpgQ10MDz1xty8;
+	Thu,  8 Aug 2024 22:04:02 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id E801E1400D4;
+	Thu,  8 Aug 2024 22:05:50 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 8 Aug
+ 2024 22:05:50 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <sfrench@samba.org>, <pc@manguebit.com>, <ronniesahlberg@gmail.com>,
+	<sprasad@microsoft.com>, <tom@talpey.com>, <bharathsm@microsoft.com>
+CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>
+Subject: [PATCH -next] smb: client: Remove unused extern declarations
+Date: Thu, 8 Aug 2024 22:03:32 +0800
+Message-ID: <20240808140332.2429467-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,52 +39,82 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-Clang static checker (scan-build) warning:
-	cifsglob.h:line 890, column 3
-	Access to field 'ops' results in a dereference of a null pointer.
+There is no caller and implementations in tree.
 
-Commit 519be989717c ("cifs: Add a tracepoint to track credits involved in
-R/W requests") adds a check for 'rdata->server', and let clang throw this
-warning about NULL dereference.
-
-When 'rdata->credits.value != 0 && rdata->server == NULL' happens,
-add_credits_and_wake_if() will call rdata->server->ops->add_credits().
-This will cause NULL dereference problem. Add a check for 'rdata->server'
-to avoid NULL dereference.
-
-Signed-off-by: Su Hui <suhui@nfschina.com>
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
- fs/smb/client/file.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsfs.h    | 1 -
+ fs/smb/client/cifsproto.h | 6 ------
+ fs/smb/client/smb2proto.h | 4 ----
+ 3 files changed, 11 deletions(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index b2405dd4d4d4..45459af5044d 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -315,7 +315,7 @@ static void cifs_free_subrequest(struct netfs_io_subrequest *subreq)
- #endif
- 	}
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index ca2bd204bcc5..61ded59b858f 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -106,7 +106,6 @@ extern int cifs_flush(struct file *, fl_owner_t id);
+ extern int cifs_file_mmap(struct file *file, struct vm_area_struct *vma);
+ extern int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma);
+ extern const struct file_operations cifs_dir_ops;
+-extern int cifs_dir_open(struct inode *inode, struct file *file);
+ extern int cifs_readdir(struct file *file, struct dir_context *ctx);
  
--	if (rdata->credits.value != 0)
-+	if (rdata->credits.value != 0) {
- 		trace_smb3_rw_credits(rdata->rreq->debug_id,
- 				      rdata->subreq.debug_index,
- 				      rdata->credits.value,
-@@ -323,8 +323,12 @@ static void cifs_free_subrequest(struct netfs_io_subrequest *subreq)
- 				      rdata->server ? rdata->server->in_flight : 0,
- 				      -rdata->credits.value,
- 				      cifs_trace_rw_credits_free_subreq);
-+		if (rdata->server)
-+			add_credits_and_wake_if(rdata->server, &rdata->credits, 0);
-+		else
-+			rdata->credits.value = 0;
-+	}
- 
--	add_credits_and_wake_if(rdata->server, &rdata->credits, 0);
- 	if (rdata->have_xid)
- 		free_xid(rdata->xid);
- }
+ /* Functions related to dir entries */
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 497bf3c447bc..91f0584700e8 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -78,7 +78,6 @@ extern char *cifs_build_path_to_root(struct smb3_fs_context *ctx,
+ 				     struct cifs_sb_info *cifs_sb,
+ 				     struct cifs_tcon *tcon,
+ 				     int add_treename);
+-extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
+ char *cifs_build_devname(char *nodename, const char *prepath);
+ extern void delete_mid(struct mid_q_entry *mid);
+ void __release_mid(struct kref *refcount);
+@@ -146,8 +145,6 @@ extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
+ extern bool backup_cred(struct cifs_sb_info *);
+ extern bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 eof,
+ 				   bool from_readdir);
+-extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+-			    unsigned int bytes_written);
+ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t result,
+ 				      bool was_async);
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, int);
+@@ -477,9 +474,6 @@ extern int cifs_query_reparse_point(const unsigned int xid,
+ 				    const char *full_path,
+ 				    u32 *tag, struct kvec *rsp,
+ 				    int *rsp_buftype);
+-extern int CIFSSMBQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
+-			       __u16 fid, char **symlinkinfo,
+-			       const struct nls_table *nls_codepage);
+ extern int CIFSSMB_set_compression(const unsigned int xid,
+ 				   struct cifs_tcon *tcon, __u16 fid);
+ extern int CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms,
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index b208232b12a2..95d8cf93539b 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -47,15 +47,11 @@ extern int smb2_calc_signature(struct smb_rqst *rqst,
+ extern int smb3_calc_signature(struct smb_rqst *rqst,
+ 				struct TCP_Server_Info *server,
+ 				bool allocate_crypto);
+-extern void smb2_echo_request(struct work_struct *work);
+ extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
+ extern bool smb2_is_valid_oplock_break(char *buffer,
+ 				       struct TCP_Server_Info *srv);
+ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+ 				 struct mid_q_entry *mid);
+-extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+-				struct cifs_sb_info *cifs_sb, const char *path,
+-				__u32 *reparse_tag);
+ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 				     struct super_block *sb,
+ 				     const unsigned int xid,
 -- 
-2.30.2
+2.34.1
 
