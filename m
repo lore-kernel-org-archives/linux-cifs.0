@@ -1,106 +1,267 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B62E17E;
-	Sat, 10 Aug 2024 01:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+Received: from submarine.notk.org (62-210-214-84.rev.poneytelecom.eu [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F2C130499;
+	Sat, 10 Aug 2024 03:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723253808; cv=none; b=uVjwtZg5FUbd/PZEISdmUCMtfVzwWC12HKdJiSWxLdmedT3LX8oQSl4MGaMkmX37UgriYKQ9IDyPlz2pKiKl7jER5e6BLkn0U1mUvcdAOi5BNuKTJleNvt3AwgqtQ5wuuciweyOLGB+vNsxCRZ86zQ7jzBGtTYC1Px4sZUN7cCw=
+	t=1723261409; cv=none; b=sJ/ixwM9dBlUIhVFT/oGjlTXU9EUnx09rCzcMYvHpJS+OgxCZgQ63MzFQ3+wIvIo2X8lDz3SQbcr6i974WSWrW2/aiYQYyTtTL8eekNEfTbtF9NVBRG1S/xz/gBYltzXhPP2aE7MLsCbK3MGbAWqADlTqynKzrc19tdevOnfqMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723253808; c=relaxed/simple;
-	bh=ovDSjaWA4UZc2zFo0K9ugf1XYIcTGjplLNNDg8OESZY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=GlvUgxkMm7MAI/BcJ2iiANCgmJugY3l9PnfckytADd0yDcNB3FIIgOXeq0sYpb1AhTYeGiJpkM6+1HThlCVfM5/YwNo08gSsuk3EtoWIb4xiD/Ydj9ks9XSkaYORlq3V5cFZafV+1bAdUk4PVjkaWN36E08Q4boRB1Pxh5fmRu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ULLyWSP+; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1723261409; c=relaxed/simple;
+	bh=Dz5ljV4C748Y92oEca2eVRU5aSIzT2ITH61W5Nh4i/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GFQ4/4KLK3S9x214cPErrkpHQgd6M1AacjecwDcGVK++Gy+zSJ0JnSA9pwmnh1KdA74OEPhuEijUMZQWkKbU/ForafzjNHWxoA7ccwI+3ErcdU36zLt/gtC2mGqSxxnNUtH5pQb/k/K53NwxKQRmYalXMYAH5AiCOncUa4p77W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=WkNdRh3F; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULLyWSP+"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52f01613acbso3965840e87.1;
-        Fri, 09 Aug 2024 18:36:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723253805; x=1723858605; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4ovcxFeZ04U+4eILq+6LEeB0Uyx+NNjKjhdMdT/I8qs=;
-        b=ULLyWSP+/Nv5yPJYFcYdInEf8OrFPK4MbMXPADY0NJPX/qbW5bWbcSOrdCBMnjaiXj
-         ZOaQrnFcXslUx+Iaen4dTfLww7STpTu3z/ArzyuWp9PNEvadfo2orK4AeXJW+g/bIptV
-         MUoA7xyFO+R3ZPu681cXMD/42MQuo4mDAVDY2UFd3hR1DppY2EIU1BEhjOOa+gFvmivE
-         SmC0g/l2wFyrj+qj7O4FNPfXfPk6ROzKwj3UO4huTOCgT4r2zOfjtlvaKd8RSyQZhMk/
-         AEPIgjv/5Bx3U5SEYpwAS1z/83NceRcqMd6h7A/uINkeWhcuSsUu5jn3ohgeG30z6g7K
-         9h/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723253805; x=1723858605;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4ovcxFeZ04U+4eILq+6LEeB0Uyx+NNjKjhdMdT/I8qs=;
-        b=ecSGbmcStAFd2A5ZBRKWkMjylooj9uEo13vZxYxhbvkjZn7crUGrmuL7P1Acu4JPWt
-         pE1RHWbPndFMhAOuEtpE32NU61WKXOFZUd3lG7iLV7x4B0Oqvex9kb1M68UgoVA41MPm
-         6jnGGJLke/plCu8F0S5n+r58l73owtEOfqojOa1dGzWODfIVJgOm5i1X/S+2AriMr8da
-         d6J5n9zR/Uex53iuGtzPVKpzihATn1iLFqRLnmWf6byous3Ajjv6BDRm00xgB4Ywrlm4
-         Ffa+3Gx5L7sIZO+l1HVd3gaPb0daLPRk32jXwkJA9+1y4F6XHRIBQj/Z2kF018PtViYd
-         D3/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWOi2Hc8X/IRmUc7DhT0GKdSNyMY1QQoKGK302at9KN6SM/+F6rIkHrJXZhFTVZCYltEbP7mo0W5RrEuDePvr4jI2RODj30qX6c84FS
-X-Gm-Message-State: AOJu0Yy4A9MKo/tmHxTcklj99QhRvk/L+joWfWPTuppb9CJCfCkr5NKL
-	eAy2KyaKhVIbc/jbnSWap9V50nkpt6Evdz86k3CK6G6DY/PYQEq8GjRP92bXfmc/b5mAbWps0dJ
-	wslG+Xh4HA7KQclYy1g8FTHLBR4KrspJL
-X-Google-Smtp-Source: AGHT+IE41jtPDpv1dnbK9RrtdFpEgZFWEjqrcbIxnNXd643+dUxnMHVjwNgVe4sqPgPAJ+q2bRou7R/+b71hsHpVtZM=
-X-Received: by 2002:a05:6512:31d3:b0:52b:bee8:e987 with SMTP id
- 2adb3069b0e04-530ef5212ecmr990006e87.3.1723253804831; Fri, 09 Aug 2024
- 18:36:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="WkNdRh3F"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id AFD2D14C1E1;
+	Sat, 10 Aug 2024 05:36:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1723261020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hXmz9TkuAk5dB9bidybN3xvJsbLPHMH9nJKkDG6YnBg=;
+	b=WkNdRh3FW+h436ZD2wTCZZcior92lVbGevCb3rRz0k936m8bvJstFVmU4VZF7o9JwI9NAw
+	FPctBPVQbGGS0wly8cI+p8y4LPuoeqZv+2HMro9sAZW8Nc6Od7ogMoRxhPEUkzEmpsXLeh
+	ciryvAC9PLG7ZMsdIovM1qB2WNPnywMqie/hpEceQiSL3HzvXNm+3C4Y+uk3jJGpxcDj6V
+	8utSUf51piAQUGusY6ERcYSrShyvksEzxMGkkybbHuEcPVxCIzosllf7i/ec6ygZcKUzma
+	UYWJ8ldN6E4J2UEG9GFyHn0A08v50UG+tspHpnu3iOG2FnjUM91DKDsXe8JKbQ==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 1dc60f99;
+	Sat, 10 Aug 2024 03:36:53 +0000 (UTC)
+Date: Sat, 10 Aug 2024 12:36:38 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Ilya Dryomov <idryomov@gmail.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Christian Brauner <brauner@kernel.org>, v9fs@lists.linux.dev,
+	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] 9p: Fix DIO read through netfs
+Message-ID: <ZrbgRnXV-snNicjY@codewreck.org>
+References: <1229195.1723211769@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 9 Aug 2024 20:36:33 -0500
-Message-ID: <CAH2r5muBCqScmD8xaiN87Dw3Gab-g4Ym8r9TB+uEq5ukkT=EJA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fxies
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1229195.1723211769@warthog.procyon.org.uk>
 
-Please pull the following changes since commit
-de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed:
+David Howells wrote on Fri, Aug 09, 2024 at 02:56:09PM +0100:
+> From: Dominique Martinet <asmadeus@codewreck.org>
+> 
+> 9p: Fix DIO read through netfs
 
-  Linux 6.11-rc2 (2024-08-04 13:50:53 -0700)
+nitpick: now sure how that ended up here but this is duplicated with the
+subject (the commit message ends up with this line twice)
 
-are available in the Git repository at:
+> If a program is watching a file on a 9p mount, it won't see any change in
+> size if the file being exported by the server is changed directly in the
+> source filesystem, presumably because 9p doesn't have change notifications,
+> and because netfs skips the reads if the file is empty.
+> 
+> Fix this by attempting to read the full size specified when a DIO read is
+> requested (such as when 9p is operating in unbuffered mode) and dealing
+> with a short read if the EOF was less than the expected read.
+> 
+> To make this work, filesystems using netfslib must not set
+> NETFS_SREQ_CLEAR_TAIL if performing a DIO read where that read hit the EOF.
+> I don't want to mandatorily clear this flag in netfslib for DIO because,
+> say, ceph might make a read from an object that is not completely filled,
+> but does not reside at the end of file - and so we need to clear the
+> excess.
+> 
+> This can be tested by watching an empty file over 9p within a VM (such as
+> in the ktest framework):
+> 
+>         while true; do read content; if [ -n "$content" ]; then echo $content; break; fi; done < /host/tmp/foo
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.11-rc2-smb3-client-fixes
+(This is basically the same thing but if one wants to control the read
+timing for more precise/verbose debugging:
+  exec 3< /host/tmp/foo
+  read -u 3 content && echo $content
+  (repeat as appropriate)
+  exec 3>&-
+)
 
-for you to fetch changes up to 36bb22a08a69d9984a8399c07310d18b115eae20:
+> then writing something into the empty file.  The watcher should immediately
+> display the file content and break out of the loop.  Without this fix, it
+> remains in the loop indefinitely.
+> 
+> Fixes: 80105ed2fd27 ("9p: Use netfslib read/write_iter")
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218916
+> Written-by: Dominique Martinet <asmadeus@codewreck.org>
 
-  cifs: cifs_inval_name_dfs_link_error: correct the check for fullpath
-(2024-08-08 20:06:22 -0500)
+Thanks for adding extra comments & fixing other filesystems.
 
-----------------------------------------------------------------
-Three small smb3 client fixes including two for stable
-- DFS fix
-- fix for security flags for requiring encryption
-- minor cleanup
-----------------------------------------------------------------
-Gleb Korobeynikov (1):
-      cifs: cifs_inval_name_dfs_link_error: correct the check for fullpath
+I've checked this covers all cases of setting NETFS_SREQ_CLEAR_TAIL so
+hopefully shouldn't have further side effects, this sounds good to me:
 
-Steve French (1):
-      smb3: fix setting SecurityFlags when encryption is required
+Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
 
-Xiaxi Shen (1):
-      Fix spelling errors in Server Message Block
-
- Documentation/admin-guide/cifs/usage.rst |  2 +-
- fs/smb/client/cifs_debug.c               |  2 +-
- fs/smb/client/cifsglob.h                 | 12 ++++++------
- fs/smb/client/misc.c                     | 11 ++++++-----
- fs/smb/client/smb2pdu.c                  |  3 +++
- fs/smb/client/smbdirect.c                |  8 ++++----
- fs/smb/client/transport.c                |  2 +-
- 7 files changed, 22 insertions(+), 18 deletions(-)
-
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Eric Van Hensbergen <ericvh@kernel.org>
+> cc: Latchesar Ionkov <lucho@ionkov.net>
+> cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: Ilya Dryomov <idryomov@gmail.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Paulo Alcantara <pc@manguebit.com>
+> cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> cc: v9fs@lists.linux.dev
+> cc: linux-afs@lists.infradead.org
+> cc: ceph-devel@vger.kernel.org
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-nfs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/9p/vfs_addr.c     |    3 ++-
+>  fs/afs/file.c        |    3 ++-
+>  fs/ceph/addr.c       |    6 ++++--
+>  fs/netfs/io.c        |   17 +++++++++++------
+>  fs/nfs/fscache.c     |    3 ++-
+>  fs/smb/client/file.c |    3 ++-
+>  6 files changed, 23 insertions(+), 12 deletions(-)
+> 
+> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> index a97ceb105cd8..24fdc74caeba 100644
+> --- a/fs/9p/vfs_addr.c
+> +++ b/fs/9p/vfs_addr.c
+> @@ -75,7 +75,8 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
+>  
+>  	/* if we just extended the file size, any portion not in
+>  	 * cache won't be on server and is zeroes */
+> -	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> +	if (subreq->rreq->origin != NETFS_DIO_READ)
+> +		__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+>  
+>  	netfs_subreq_terminated(subreq, err ?: total, false);
+>  }
+> diff --git a/fs/afs/file.c b/fs/afs/file.c
+> index c3f0c45ae9a9..ec1be0091fdb 100644
+> --- a/fs/afs/file.c
+> +++ b/fs/afs/file.c
+> @@ -242,7 +242,8 @@ static void afs_fetch_data_notify(struct afs_operation *op)
+>  
+>  	req->error = error;
+>  	if (subreq) {
+> -		__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> +		if (subreq->rreq->origin != NETFS_DIO_READ)
+> +			__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+>  		netfs_subreq_terminated(subreq, error ?: req->actual_len, false);
+>  		req->subreq = NULL;
+>  	} else if (req->done) {
+> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+> index cc0a2240de98..c4744a02db75 100644
+> --- a/fs/ceph/addr.c
+> +++ b/fs/ceph/addr.c
+> @@ -246,7 +246,8 @@ static void finish_netfs_read(struct ceph_osd_request *req)
+>  	if (err >= 0) {
+>  		if (sparse && err > 0)
+>  			err = ceph_sparse_ext_map_end(op);
+> -		if (err < subreq->len)
+> +		if (err < subreq->len &&
+> +		    subreq->rreq->origin != NETFS_DIO_READ)
+>  			__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+>  		if (IS_ENCRYPTED(inode) && err > 0) {
+>  			err = ceph_fscrypt_decrypt_extents(inode,
+> @@ -282,7 +283,8 @@ static bool ceph_netfs_issue_op_inline(struct netfs_io_subrequest *subreq)
+>  	size_t len;
+>  	int mode;
+>  
+> -	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> +	if (rreq->origin != NETFS_DIO_READ)
+> +		__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+>  	__clear_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags);
+>  
+>  	if (subreq->start >= inode->i_size)
+> diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+> index c179a1c73fa7..5367caf3fa28 100644
+> --- a/fs/netfs/io.c
+> +++ b/fs/netfs/io.c
+> @@ -530,7 +530,8 @@ void netfs_subreq_terminated(struct netfs_io_subrequest *subreq,
+>  
+>  	if (transferred_or_error == 0) {
+>  		if (__test_and_set_bit(NETFS_SREQ_NO_PROGRESS, &subreq->flags)) {
+> -			subreq->error = -ENODATA;
+> +			if (rreq->origin != NETFS_DIO_READ)
+> +				subreq->error = -ENODATA;
+>  			goto failed;
+>  		}
+>  	} else {
+> @@ -601,9 +602,14 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
+>  			}
+>  			if (subreq->len > ictx->zero_point - subreq->start)
+>  				subreq->len = ictx->zero_point - subreq->start;
+> +
+> +			/* We limit buffered reads to the EOF, but let the
+> +			 * server deal with larger-than-EOF DIO/unbuffered
+> +			 * reads.
+> +			 */
+> +			if (subreq->len > rreq->i_size - subreq->start)
+> +				subreq->len = rreq->i_size - subreq->start;
+>  		}
+> -		if (subreq->len > rreq->i_size - subreq->start)
+> -			subreq->len = rreq->i_size - subreq->start;
+>  		if (rreq->rsize && subreq->len > rreq->rsize)
+>  			subreq->len = rreq->rsize;
+>  
+> @@ -739,11 +745,10 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+>  	do {
+>  		_debug("submit %llx + %llx >= %llx",
+>  		       rreq->start, rreq->submitted, rreq->i_size);
+> -		if (rreq->origin == NETFS_DIO_READ &&
+> -		    rreq->start + rreq->submitted >= rreq->i_size)
+> -			break;
+>  		if (!netfs_rreq_submit_slice(rreq, &io_iter))
+>  			break;
+> +		if (test_bit(NETFS_SREQ_NO_PROGRESS, &rreq->flags))
+> +			break;
+>  		if (test_bit(NETFS_RREQ_BLOCKED, &rreq->flags) &&
+>  		    test_bit(NETFS_RREQ_NONBLOCK, &rreq->flags))
+>  			break;
+> diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+> index bf29a65c5027..7a558dea75c4 100644
+> --- a/fs/nfs/fscache.c
+> +++ b/fs/nfs/fscache.c
+> @@ -363,7 +363,8 @@ void nfs_netfs_read_completion(struct nfs_pgio_header *hdr)
+>  		return;
+>  
+>  	sreq = netfs->sreq;
+> -	if (test_bit(NFS_IOHDR_EOF, &hdr->flags))
+> +	if (test_bit(NFS_IOHDR_EOF, &hdr->flags) &&
+> +	    sreq->rreq->origin != NETFS_DIO_READ)
+>  		__set_bit(NETFS_SREQ_CLEAR_TAIL, &sreq->flags);
+>  
+>  	if (hdr->error)
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index b2405dd4d4d4..3f3842e7b44a 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -217,7 +217,8 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+>  			goto out;
+>  	}
+>  
+> -	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> +	if (subreq->rreq->origin != NETFS_DIO_READ)
+> +		__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+>  
+>  	rc = rdata->server->ops->async_readv(rdata);
+>  out:
+> 
 
 -- 
-Thanks,
-
-Steve
+Dominique Martinet | Asmadeus
