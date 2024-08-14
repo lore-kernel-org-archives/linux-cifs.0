@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6888E1DB452
-	for <linux-cifs@vger.kernel.org>; Wed, 14 Aug 2024 20:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DC61DC49B
+	for <linux-cifs@vger.kernel.org>; Wed, 14 Aug 2024 20:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723668060; cv=none; b=NSXYGQJjnfCCXaOss4htECCIAyi7w6jncB340k9UygObM5LpvGZJ8c2XIbgOrMlxVS/CdlkQpSQM8GpF1tcQy8MTLmqLKIIa7MZ6WfNzSQYmLjpKKM7oeR1jv2uRKs51ujLWaz5Bv/TNX0YOuREOu1pjDA3OTsQkZXTam8gzQGg=
+	t=1723668072; cv=none; b=ZQCF30+nQfKZ1I/2cPBjNnjkB/0NxejltfDxoeQ9LqGewxNhIw0WKpZS/i4QpTcxdyRtLiCNfgACttY4mH00KigdrKOsMw5ajjOLtomqxpGkbJKm8Gb/img9+Gsi1zc+HjVwf2uFdOoEH8MqwrMusesWEylHZERZ4uwMpe+x2UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723668060; c=relaxed/simple;
-	bh=y/uqBvnv7Y+Yg31CdUU1M2u1mm1WF6LOFM72s5FtVRk=;
+	s=arc-20240116; t=1723668072; c=relaxed/simple;
+	bh=rA7Q3ScE2LCp3jy3wxNYV6fI8svKOnzxOnvE2IAegRQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HtZrnRK3DrGP9gKkQSNo2d8n90yd3QKzfjqGL06n+cafzXC7HZysUUZmRc61i3JemjLGzmc/IH9IsbnRh5ghtW4CDes5hqsxImn578I/gKPPOLF491hjm07aIvlnE1O99oHSaRiMa+Osdzf+poC7ORNuuXN7ej6EUQRwmp1A+mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B+an0ACe; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=PIUvJf1dpW/4z6Df4K9tPEQXH8fNsqiMwbixR09molEyuH/rTsxvaVdDqzFPqbakHaGLDN+okfoJd8wZJMVWUZB399HvwPJFtRN0hZpG4AeeDSyYC/USKLDIfxcrlrZ2soFUL0U2sdee9HDOqnJe8JeepjwOErjbt2oQDWX+B5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eV7bEnim; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+an0ACe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eV7bEnim"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723668058;
+	s=mimecast20190719; t=1723668069;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1RZCIFt1nFHOn2K81N2VwRb0JQpc16vDcy/7plWa8pc=;
-	b=B+an0ACelaPOuUCOnPCmlJtoDJSAdiwzw2OL7yfSWpYUFgLFsnUiWwXGHcDscSKwXhADFk
-	vnVm+PtzyAyUmD8pvLMwSGr/AnSyOrGLPvFOSkc3YJtBV7Tvw78PLhYkaCgmL0GEQXVM2q
-	BkSyGTfxoJAX0esSmyeL6nxem/atafw=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/5GudhtF+T887yYtTq2ccnSMC605t1SyQsaR8Y8Wa80=;
+	b=eV7bEnimPr44DR3huxoGX9iPjZ9FH3FSeyxavizzGgFzrFC1rMYQYk8FSvQkzPOPW5yCF3
+	SBWk0N4R8P98qaJUAwhfk6gAi7/a5/z5u6usS6G9aPIUMD9u343A6PGzA0zQ5HqAyz09UX
+	Fhb+/DFLBCX7cEjBlJ0msjAe9HGIjqw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-02X665vNNgu4MYu1Px-cDA-1; Wed,
- 14 Aug 2024 16:40:51 -0400
-X-MC-Unique: 02X665vNNgu4MYu1Px-cDA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-cuSPPapgNmmADvVkpaXVwA-1; Wed,
+ 14 Aug 2024 16:41:05 -0400
+X-MC-Unique: cuSPPapgNmmADvVkpaXVwA-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8BCED1955F65;
-	Wed, 14 Aug 2024 20:40:48 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 837281954B0E;
+	Wed, 14 Aug 2024 20:41:02 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.30])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5F4AD196BE80;
-	Wed, 14 Aug 2024 20:40:42 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3421300019A;
+	Wed, 14 Aug 2024 20:40:56 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -65,12 +65,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH v2 14/25] cifs: Provide the capability to extract from ITER_FOLIOQ to RDMA SGEs
-Date: Wed, 14 Aug 2024 21:38:34 +0100
-Message-ID: <20240814203850.2240469-15-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 16/25] netfs: Provide an iterator-reset function
+Date: Wed, 14 Aug 2024 21:38:36 +0100
+Message-ID: <20240814203850.2240469-17-dhowells@redhat.com>
 In-Reply-To: <20240814203850.2240469-1-dhowells@redhat.com>
 References: <20240814203850.2240469-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,136 +78,102 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Make smb_extract_iter_to_rdma() extract page fragments from an ITER_FOLIOQ
-iterator into RDMA SGEs.
+Provide a function to reset the iterator on a subrequest.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: linux-cifs@vger.kernel.org
+cc: Jeff Layton <jlayton@kernel.org>
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/smbdirect.c | 71 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 3 deletions(-)
+ fs/netfs/internal.h      |  4 +---
+ fs/netfs/misc.c          | 18 ++++++++++++++++++
+ fs/netfs/write_collect.c |  3 +--
+ fs/netfs/write_issue.c   |  6 +++---
+ 4 files changed, 23 insertions(+), 8 deletions(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 7bcc379014ca..c946b38ca825 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -6,6 +6,7 @@
-  */
- #include <linux/module.h>
- #include <linux/highmem.h>
-+#include <linux/folio_queue.h>
- #include "smbdirect.h"
- #include "cifs_debug.h"
- #include "cifsproto.h"
-@@ -2463,6 +2464,8 @@ static ssize_t smb_extract_bvec_to_rdma(struct iov_iter *iter,
- 		start = 0;
- 	}
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index e1149e05a5c8..21a3c7d13585 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -69,6 +69,7 @@ int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio *folio
+ 			      bool needs_put);
+ struct folio_queue *netfs_delete_buffer_head(struct netfs_io_request *wreq);
+ void netfs_clear_buffer(struct netfs_io_request *rreq);
++void netfs_reset_iter(struct netfs_io_subrequest *subreq);
  
-+	if (ret > 0)
-+		iov_iter_advance(iter, ret);
- 	return ret;
+ /*
+  * objects.c
+@@ -161,9 +162,6 @@ struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
+ void netfs_reissue_write(struct netfs_io_stream *stream,
+ 			 struct netfs_io_subrequest *subreq,
+ 			 struct iov_iter *source);
+-int netfs_advance_write(struct netfs_io_request *wreq,
+-			struct netfs_io_stream *stream,
+-			loff_t start, size_t len, bool to_eof);
+ struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len);
+ int netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
+ 			       struct folio *folio, size_t copied, bool to_page_end,
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index e642e5cacb8d..08987765306f 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -84,6 +84,24 @@ void netfs_clear_buffer(struct netfs_io_request *rreq)
+ 	}
  }
  
-@@ -2519,6 +2522,65 @@ static ssize_t smb_extract_kvec_to_rdma(struct iov_iter *iter,
- 		start = 0;
- 	}
- 
-+	if (ret > 0)
-+		iov_iter_advance(iter, ret);
-+	return ret;
++/*
++ * Reset the subrequest iterator to refer just to the region remaining to be
++ * read.  The iterator may or may not have been advanced by socket ops or
++ * extraction ops to an extent that may or may not match the amount actually
++ * read.
++ */
++void netfs_reset_iter(struct netfs_io_subrequest *subreq)
++{
++	struct iov_iter *io_iter = &subreq->io_iter;
++	size_t remain = subreq->len - subreq->transferred;
++
++	if (io_iter->count > remain)
++		iov_iter_advance(io_iter, io_iter->count - remain);
++	else if (io_iter->count < remain)
++		iov_iter_revert(io_iter, remain - io_iter->count);
++	iov_iter_truncate(&subreq->io_iter, remain);
 +}
 +
-+/*
-+ * Extract folio fragments from a FOLIOQ-class iterator and add them to an RDMA
-+ * list.  The folios are not pinned.
-+ */
-+static ssize_t smb_extract_folioq_to_rdma(struct iov_iter *iter,
-+					  struct smb_extract_to_rdma *rdma,
-+					  ssize_t maxsize)
-+{
-+	const struct folio_queue *folioq = iter->folioq;
-+	unsigned int slot = iter->folioq_slot;
-+	ssize_t ret = 0;
-+	size_t offset = iter->iov_offset;
-+
-+	BUG_ON(!folioq);
-+
-+	if (slot >= folioq_nr_slots(folioq)) {
-+		folioq = folioq->next;
-+		if (WARN_ON_ONCE(!folioq))
-+			return -EIO;
-+		slot = 0;
-+	}
-+
-+	do {
-+		struct folio *folio = folioq_folio(folioq, slot);
-+		size_t fsize = folioq_folio_size(folioq, slot);
-+
-+		if (offset < fsize) {
-+			size_t part = umin(maxsize - ret, fsize - offset);
-+
-+			if (!smb_set_sge(rdma, folio_page(folio, 0), offset, part))
-+				return -EIO;
-+
-+			offset += part;
-+			ret += part;
-+		}
-+
-+		if (offset >= fsize) {
-+			offset = 0;
-+			slot++;
-+			if (slot >= folioq_nr_slots(folioq)) {
-+				if (!folioq->next) {
-+					WARN_ON_ONCE(ret < iter->count);
-+					break;
-+				}
-+				folioq = folioq->next;
-+				slot = 0;
-+			}
-+		}
-+	} while (rdma->nr_sge < rdma->max_sge || maxsize > 0);
-+
-+	iter->folioq = folioq;
-+	iter->folioq_slot = slot;
-+	iter->iov_offset = offset;
-+	iter->count -= ret;
- 	return ret;
- }
+ /**
+  * netfs_dirty_folio - Mark folio dirty and pin a cache object for writeback
+  * @mapping: The mapping the folio belongs to.
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index 1521a23077c3..801a130a0ce1 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -219,9 +219,8 @@ static void netfs_retry_write_stream(struct netfs_io_request *wreq,
+ 		/* Determine the set of buffers we're going to use.  Each
+ 		 * subreq gets a subset of a single overall contiguous buffer.
+ 		 */
++		netfs_reset_iter(from);
+ 		source = from->io_iter;
+-		iov_iter_revert(&source, subreq->len - source.count);
+-		iov_iter_advance(&source, from->transferred);
+ 		source.count = len;
  
-@@ -2563,6 +2625,8 @@ static ssize_t smb_extract_xarray_to_rdma(struct iov_iter *iter,
- 	}
- 
- 	rcu_read_unlock();
-+	if (ret > 0)
-+		iov_iter_advance(iter, ret);
- 	return ret;
- }
- 
-@@ -2590,6 +2654,9 @@ static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
- 	case ITER_KVEC:
- 		ret = smb_extract_kvec_to_rdma(iter, rdma, len);
- 		break;
-+	case ITER_FOLIOQ:
-+		ret = smb_extract_folioq_to_rdma(iter, rdma, len);
-+		break;
- 	case ITER_XARRAY:
- 		ret = smb_extract_xarray_to_rdma(iter, rdma, len);
- 		break;
-@@ -2598,9 +2665,7 @@ static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
- 		return -EIO;
- 	}
- 
--	if (ret > 0) {
--		iov_iter_advance(iter, ret);
--	} else if (ret < 0) {
-+	if (ret < 0) {
- 		while (rdma->nr_sge > before) {
- 			struct ib_sge *sge = &rdma->sge[rdma->nr_sge--];
- 
+ 		/* Work through the sublist. */
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index a75b62b202c5..9ead075962f0 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -261,9 +261,9 @@ static void netfs_issue_write(struct netfs_io_request *wreq,
+  * we can avoid overrunning the credits obtained (cifs) and try to parallelise
+  * content-crypto preparation with network writes.
+  */
+-int netfs_advance_write(struct netfs_io_request *wreq,
+-			struct netfs_io_stream *stream,
+-			loff_t start, size_t len, bool to_eof)
++static int netfs_advance_write(struct netfs_io_request *wreq,
++			       struct netfs_io_stream *stream,
++			       loff_t start, size_t len, bool to_eof)
+ {
+ 	struct netfs_io_subrequest *subreq = stream->construct;
+ 	size_t part;
 
