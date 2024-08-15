@@ -1,143 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from matoro.tk (matoro.tk [104.188.251.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9BD1714A8;
-	Thu, 15 Aug 2024 13:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FA015CB
+	for <linux-cifs@vger.kernel.org>; Thu, 15 Aug 2024 18:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.188.251.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723727274; cv=none; b=Y5LtgRdPlYSG4DLjfYUrHbBRfTnlmGFLpv5JRI9bLPL/rK4XX6B8HVHnVyre/oNpQkJo2LA7Ujp/cbJe/EJTR0HDYtlA9uvSNz1BYo8kUkQpnIgzAIMHOso7CzQszsDLH2zU6+i4WF9ElS4Yd3w97AAC+lX7+Xum/3ZbaXiWMYA=
+	t=1723745326; cv=none; b=YKGImjHAGqCwKdHvjGSGf2Is8Gwnu8sx7oaairFKXI7rlUZX14R04DXVOz6CWC28rHvsD7aHI4klKRgjcVDMwof0Pu1ZjQdt5fp/Dxdza+uExRYU5fzodd15cXIhkSa5r7a/F7uW6LWpXu94Jeyx7nD+ZBt8Ip7PgfG2wI/E+8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723727274; c=relaxed/simple;
-	bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sK4OKI0xV2ECB2cAJ29dVLkJy9xmJE9ZqXf5KKAG/AYe+Y7fHV4ehrLrl1ucKaa7pR9/Dl2jk1Vt6wHghZHFyj02mfLerz4sVNvA7GL5O2wA8VqIxdWR/yoeTeJCcmQ+RIS1OynoUBmUgaarZpojtWUc774tFU2hjQYuOL/J7g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWysPbmr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723745326; c=relaxed/simple;
+	bh=9sLw/UGVGBjRIgCVLAN82abdy6zA43C9uNL2TF1FUco=;
+	h=MIME-Version:Date:From:To:Cc:Subject:Message-ID:Content-Type; b=XAAjE/V7BGLrQXxUeUz2lyIPSoZ0HVzzfJJx49dQGiVbp2ctdIkbesKuZddfdNBxlrI92GNZQxN2D219b+CYldtN2IRLOM9JPIiBIszrOLzdDExy14FhhNEFKL+e8t5tz1PQhSMZ6E6rmTPGv9uieIFTc6inoYXW024dVy8a+zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=matoro.tk; spf=pass smtp.mailfrom=matoro.tk; dkim=pass (4096-bit key) header.d=matoro.tk header.i=@matoro.tk header.b=dJ9jNAW8; arc=none smtp.client-ip=104.188.251.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=matoro.tk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matoro.tk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWysPbmr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC276C4AF12;
-	Thu, 15 Aug 2024 13:07:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723727274;
-	bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CWysPbmrhoJPoY6REaRiKM1koRkT1R+xchonrJPpv1x9I+tee+tSfKXPRigLEF1Pp
-	 H0I6xL+kL3jAdP83wrbd95nqrX4gOFtGasClay/ikEcqMAsrRbgUgm8uymaNB2JJyC
-	 s9fAuxND+GVsI3CvvG4maGRFXUv1mrH/QMsPdEHwjeAnn4LLJl1uL87/6fKQvF81e/
-	 gN47e2z5uZcj4pF1aOpUhKbSFnw/JNFL2aRtTdKMtegAQCGM+3alB+E0XbvxVZ0GZx
-	 vSI/1pnVv1gMF6wJ8a7T6crM136WP7rIW/dyqW6P8SmyiDRFQoN0YMbOf3Fz7aHcH8
-	 iawKWeu/fPcSQ==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Gao Xiang <xiang@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v2 00/25] netfs: Read/write improvements
-Date: Thu, 15 Aug 2024 15:07:42 +0200
-Message-ID: <20240815-umzog-irgendein-80514d89315a@brauner>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240814203850.2240469-1-dhowells@redhat.com>
-References: <20240814203850.2240469-1-dhowells@redhat.com>
+	dkim=pass (4096-bit key) header.d=matoro.tk header.i=@matoro.tk header.b="dJ9jNAW8"
+DKIM-Signature: a=rsa-sha256; bh=23WnTESVWirdC0TscroYcaT+etpuRqyCvMh86WGDo+c=;
+ c=relaxed/relaxed; d=matoro.tk;
+ h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:Message-Id:Message-Id:References:Autocrypt:Openpgp;
+ i=@matoro.tk; s=20240626; t=1723744411; v=1; x=1724176411;
+ b=dJ9jNAW8/a6xAc3/tDWgVX8L9NQbHY2drCErAneGSydwJyctWdP1qKjGTYCHGcC6X+SdRrRT
+ M6Qc0gwJBdGfc2q1eXq9Tywn/IxvV5Ej94a7N/Lx0SSxxxS5rvH1u2IuckD4FYzwFKf/zULnFoZ
+ Js6LRgnUtIINOmgruHTb5Q+LVAjdOowFg9FdcQUQgi5c9rjVKeehsyTOr5X+jIc7IhuMLUPnasu
+ ZDvXSYOHSoAShhTAV0kH7MMz6nImql2ju8fhcFIpQE5qHqeQ25wJlpz6Mh9bS6f+Seffrlh1s3y
+ kG22ei04GcBCAaQLO2nPfDKjX7pofm0VsN51tmuGj8n7r9SusVDEvE5fc4b4ZzgyjRjbTQ9IT1u
+ RiPyfAaBhMX7fqOeW7kBveJXcB/BnwrmzvJFakOVOnBVLnhrU0BUTyJIIHOoyr2IHtiLqmB84lO
+ ONoOxGy8niAK701bb5b22s3zkNiew+asg36Q7/Yk0sOcqumm4UV2jlcVQfrJUd9qYscfiyHtPb2
+ 6UNrKFJsZpt24DdOFdzEN5u81loyoRboJgXKM8xJwSurxP7qdRtkcGhfDLSmCrz5eTGxbWwi3L5
+ LwF5gdhGDBTo/Znl+cDN4VuNLbzqrnoU6dc47hJTHvfC41jqlWXLlZQ2Jw93yEiYi5bwUFoaGSC
+ dIhXpmfv3kI=
+Received: by matoro.tk (envelope-sender
+ <matoro_mailinglist_kernel@matoro.tk>) with ESMTPS id be223894; Thu, 15 Aug
+ 2024 13:53:31 -0400
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3763; i=brauner@kernel.org; h=from:subject:message-id; bh=jMFzZlcFi1TkZ5Y4pxf1tYJzK0rbZrrELQbpOJ8RF3U=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaTt/TvfdD5fB2vZ4St+TJxt5mWrLDw33/gjvqHIU/p1x 4z/b++v6yhlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZjI3TKGf7rW+puKJr8xC2Fc +4dN6MQSIQHtD5UCjw3EjTPKG9RWaTEyrOUUX7jY9aVQn42A5tbDjh4fbp/6mSTXO6u8fQdHhII sPwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Date: Thu, 15 Aug 2024 13:53:31 -0400
+From: matoro <matoro_mailinglist_kernel@matoro.tk>
+To: Linux Cifs <linux-cifs@vger.kernel.org>
+Cc: Bruno Haible <bruno@clisp.org>
+Subject: CIFS lockup regression on SMB1 in 6.10
+Message-ID: <cca852e55291d5bb86ea646589b197d5@matoro.tk>
+X-Sender: matoro_mailinglist_kernel@matoro.tk
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Aug 2024 21:38:20 +0100, David Howells wrote:
-> This set of patches includes a couple of fixes:
-> 
->  (1) Revert the removal of waits on PG_private_2 from netfs_release_page()
->      and netfs_invalidate_page().
-> 
->  (2) Make cachefiles take the sb_writers lock around set/removexattr.
-> 
-> [...]
+Hi all, I run a service where user home directories are mounted over SMB1 
+with unix extensions.  After upgrading to kernel 6.10 it was reported to me 
+that users were observing lockups when performing compilations in their home 
+directories.  I investigated and confirmed this to be the case.  It would 
+cause the build processes to get stuck in I/O.  After the lockup triggered 
+then all further reads/writes to the CIFS-mounted directory would get stuck.  
+Even the df(1) command would block indefinitely.  Shutdown was also prevented 
+as the directory could no longer be unmounted.
 
-Applied to the vfs.netfs branch of the vfs/vfs.git tree.
-Patches in the vfs.netfs branch should appear in linux-next soon.
+Triggering the issue is a little bit tricky.  I used compiling cpython as a 
+test case.  Parallel compilation does not seem to be required to trigger it, 
+because in some tests the hang would occur during ./configure phase, but it 
+does seem to provoke it more easily, as the most common point where the 
+lockup was observed was immediately after "make -j4".  However, sometimes it 
+would take 10+ minutes of ongoing compilation before the lockup would 
+trigger.  I never observed a complete successful compilation on kernel 6.10.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+The furthest back I was able to confirm that the lockup is observed was 
+v6.10-rc3.  The furthest forward I was able to confirm is good was v6.9.9 in 
+the stable tree.  Unfortunately, between those two tags there seems to be a 
+wide range of commits where the CIFS functionality is completely broken, and 
+reads/writes return total nonsense results.  For example, any git commands 
+return "git error: bad signature 0x00000000".  So I cannot execute a 
+compilation on commits in this range in order to test whether they observe 
+the lockup issue.  Therefore I wasn't able to test most of the range, and 
+wasn't able to complete a traditional bisect.  I tried adjusting the 
+read/write buffers down to 8192 from the defaults, but this did not help.  I 
+also tried toggling several options that might be related, namely 
+CONFIG_FSCACHE, to no effect.  There are no logs emitted to dmesg when the 
+lockup occurs.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.netfs
-
-[01/25] cachefiles: Fix non-taking of sb_writers around set/removexattr
-        https://git.kernel.org/vfs/vfs/c/4ca422fc1c25
-[02/25] netfs: Adjust labels in /proc/fs/netfs/stats
-        https://git.kernel.org/vfs/vfs/c/2d8e8e0dcfa8
-[03/25] netfs: Record contention stats for writeback lock
-        https://git.kernel.org/vfs/vfs/c/b946f63b34fa
-[04/25] netfs: Reduce number of conditional branches in netfs_perform_write()
-        https://git.kernel.org/vfs/vfs/c/922d33ef048c
-[05/25] netfs, cifs: Move CIFS_INO_MODIFIED_ATTR to netfs_inode
-        https://git.kernel.org/vfs/vfs/c/4c1daf044aed
-[06/25] netfs: Move max_len/max_nr_segs from netfs_io_subrequest to netfs_io_stream
-        https://git.kernel.org/vfs/vfs/c/a479f52b4401
-[07/25] netfs: Reserve netfs_sreq_source 0 as unset/unknown
-        https://git.kernel.org/vfs/vfs/c/e1de76429131
-[08/25] netfs: Remove NETFS_COPY_TO_CACHE
-        https://git.kernel.org/vfs/vfs/c/2a4e83a305ef
-[09/25] netfs: Set the request work function upon allocation
-        https://git.kernel.org/vfs/vfs/c/52c62b5f6dc0
-[10/25] netfs: Use bh-disabling spinlocks for rreq->lock
-        https://git.kernel.org/vfs/vfs/c/45268b70a77d
-[11/25] mm: Define struct folio_queue and ITER_FOLIOQ to handle a sequence of folios
-        https://git.kernel.org/vfs/vfs/c/3e73d92929db
-[12/25] iov_iter: Provide copy_folio_from_iter()
-        https://git.kernel.org/vfs/vfs/c/7a51f5cf0851
-[13/25] cifs: Provide the capability to extract from ITER_FOLIOQ to RDMA SGEs
-        https://git.kernel.org/vfs/vfs/c/97b15fbddd0c
-[14/25] netfs: Use new folio_queue data type and iterator instead of xarray iter
-        https://git.kernel.org/vfs/vfs/c/b33aa21f3b7f
-[15/25] netfs: Provide an iterator-reset function
-        https://git.kernel.org/vfs/vfs/c/7306dffdd871
-[16/25] netfs: Simplify the writeback code
-        https://git.kernel.org/vfs/vfs/c/5fb0299ed8df
-[17/25] afs: Make read subreqs async
-        https://git.kernel.org/vfs/vfs/c/05fd361eb083
-[18/25] netfs: Speed up buffered reading
-        https://git.kernel.org/vfs/vfs/c/6437a28f5de1
-[19/25] netfs: Remove fs/netfs/io.c
-        https://git.kernel.org/vfs/vfs/c/85112b95630c
-[20/25] cachefiles, netfs: Fix write to partial block at EOF
-        https://git.kernel.org/vfs/vfs/c/3b5a6483e8d2
-[21/25] netfs: Cancel dirty folios that have no storage destination
-        https://git.kernel.org/vfs/vfs/c/3cca08a1c4c5
-[22/25] cifs: Use iterate_and_advance*() routines directly for hashing
-        https://git.kernel.org/vfs/vfs/c/c86e6c334311
-[23/25] cifs: Switch crypto buffer to use a folio_queue rather than an xarray
-        https://git.kernel.org/vfs/vfs/c/04c9967360ea
-[24/25] cifs: Don't support ITER_XARRAY
-        https://git.kernel.org/vfs/vfs/c/7d0f7f2d1e8b
+Thanks - please let me know if there is any further information I can 
+provide.  For now I am rolling all hosts back to kernel 6.9.
