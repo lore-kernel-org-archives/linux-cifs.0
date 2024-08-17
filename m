@@ -1,64 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B392F23;
-	Sat, 17 Aug 2024 00:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937921422AD
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Aug 2024 05:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723854655; cv=none; b=Uda6kKSw+Y1TKbR6RvCPNM1KPVT6hW3os+KOsVTGQet0tZwMUMAHNnsaiSrmu9feS53hfUfvne/dfXLW4ioyNeNKxXF6ZkJJZkiGCd8LFElrHEz4m+yRXP412hsfnYlSbi/H2s/AVBbiBxYMOeJ6KLzJZxl17N6eFP0Sbfubhns=
+	t=1723871396; cv=none; b=JT32k4nL9A6WxF/9RsyFPWWE0mnP8Cp1ravARMos1PLa0LOoecL0MbRyiUIkG3mU9+AosAVmbdRaj2FruLNWab/FiBq42ZfuQdwaXUINdzkhV0jIAhU4/QHPIyi2D7alIVpWk9h4fDkz12HLc2VunwKtSomHhcawbTWYbJQUKCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723854655; c=relaxed/simple;
-	bh=F5aspppFrEtEePh9CnIr/vLJ3B5tE+uRZgfVD9WFVBM=;
+	s=arc-20240116; t=1723871396; c=relaxed/simple;
+	bh=JpSY2rRIer4fxBniOBc5Qk9nEk7AOr5sLCX5QfUa1nk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G4oWFpw/LdBzNhLB1lP62d05p1mrJhLsC2wC+yRpBC07FlsWQqUHjuVCJ9UTAhMXgr5lxdAdmehDOiZs9VJL7hjPTlSmZ58a6EDF9nURlkeyveTPcqXgD3sIcuq8jLVWOayO4G1qphJXNyOdnT2b7pAk3gr6fALHg7huzIQ3mqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jYPiW8Nq; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=XfFvRVs/w6Lap+2+WXHg2CMzS2fOHSNayA2Yt984lI32qYnneg3XctHHPkOVJRkO7YCjwBjt6sSZrY/VVyFWzr4AsnoKA8YcxGkew6ne3a6K/zjt9eBDel8LrNXRfzP65eXxwp78tf8y5JNBGBq70Q4mAvZ/doJFcuiNjYmemKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGTUjVmt; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jYPiW8Nq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EECF9C4AF0B;
-	Sat, 17 Aug 2024 00:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723854655;
-	bh=F5aspppFrEtEePh9CnIr/vLJ3B5tE+uRZgfVD9WFVBM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=jYPiW8Nq+BRitUI9AkFnkpClYFna480NX7wsxlmcEjcHWNrr1aB8VMHIFKSL2zXwx
-	 Uo8BN78lpbCzJrYpuHg46IjUW9HtqO0VAezh3MzL06uwt5/g8JJCY2WOjhD91v8qxS
-	 MK93PaCGE9diRFK4ci+FC+jkvz1Xi0czvztZvUc8ldikKeuorcGhQzp0NLx9iVl3lT
-	 WSz7kLj6AVBNTYdNO2RDhp6b5iUIH40dYH4hdHqdV2UMxBQWxCwM0GadtZPkkrZCau
-	 3nb3YJpNrVvQ9UwoGCeRJfCGYzxFT3ig++rhbA2QKGyn3oXqHlneQQDw8zZJzRKWgy
-	 QveOjai0o8FWA==
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3db14930a1aso1707435b6e.3;
-        Fri, 16 Aug 2024 17:30:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWR3yfdFkBzPXje5x13geXuOOkkj6yhBN5D/2HEdlbBcR2Fnxx8NAixjsCGH8RQOgy7yXNtdo22dORF+NXmstGlv5aPC3w9NOZ9LYWjXL47hMaB9zXgr27Du5Qh56FYznbSR+u7c5oLP5DkaYw3/g3vs6YU4xXC/wlPfKLmuTf5SBjC6g==
-X-Gm-Message-State: AOJu0YzKHPYnoiVG8b0LKlfRKSv8+gaOQ8Cabun49ImbqcMo9RpNVvcw
-	RtTTc4PnOjYP1g12Pu9i1JI+5F3khYG0OfDadHx9zRy+PjC8jUL/X7qaIq3VW+GtRInMSSKPVuF
-	9ZRxL5C/r+tfTsVw26RECo/fOdjw=
-X-Google-Smtp-Source: AGHT+IHHRnHezftEcv3s3ZnckNZuMCCVxWJhwhlH67g9+rkY/1D5CiBCtMsyGUTzWWm7MOGnfq7OZTFosvxHhZwoIOM=
-X-Received: by 2002:a05:6870:2183:b0:260:f9e4:1fc with SMTP id
- 586e51a60fabf-2701c3a1c26mr5056307fac.20.1723854654316; Fri, 16 Aug 2024
- 17:30:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGTUjVmt"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52f04b4abdcso3272688e87.2
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Aug 2024 22:09:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723871392; x=1724476192; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vpw4ruIk6m9iYAtQj7A1prh84SlH6kPrgDxN0w+6Ubo=;
+        b=MGTUjVmtmNKi8Y4ZzvJpDAm7E1/9g+wfHASmmf/v7L+HOq9sfb/u9GJ8lLDuKIIjJA
+         X88dYYSitwHPwOtHgBoiICM14R81E6nwE495Qiefhv9xaGnP87lB+rvp0X5YAId07bQx
+         1uPWypi85dBVvDz2eskUPY3r2xExZP/a6m2vKt9Z5Iz7QYGYfJa2bDAVoz9Y8vM0Rqnp
+         ZffkG9yB+ERl1ivBCIt1LVyG+/Vb4fD6PlzZjB7JJD66oJwOjkJino67DoX+8eXzD1RA
+         uXGek8bNEV6743EjZIFJT3adW/DjuFo4pi73LZqtTYMpTuz4WzTJ2u5kHWViud4n9DLC
+         0pYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723871392; x=1724476192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vpw4ruIk6m9iYAtQj7A1prh84SlH6kPrgDxN0w+6Ubo=;
+        b=DR8c6dpEgsHgfozOfByCKvani+nzbW/RmtGfA9hUK2mucTQGyo36dOJguEOM/ySuH4
+         d6hiPy44TNNdCjYKpO7MxQOgFt7gnRXwHNKd4hl6/rDXMWh46b7KIpWNKtWxgL9AGetr
+         jA0YHOgZ5vmtaFJgUc+HSj0bRvvQTFEfiH+ZNRRgRgFCxCZv7lkf7r4LT8EqcoCeH/ui
+         OyPrLqNOnd/35jmDtZ1BppZ11CPXAYqNTNVWh98OprmsyHGxNi1g56kFsA+kT7u68eej
+         KexUeRTMsbzZQQkOOX8OvqCMCQ1HPjCMgfylXrDA/1auWmgqjCuCkEaPoghFHkWlFM7Z
+         +PgQ==
+X-Gm-Message-State: AOJu0YzjoJk0sD9YnvNfJ8Iv36G9nCcrtXlMfbXaTu/X67dwvnvjN7KJ
+	SbYUrMvxLnAPJWwwwXzncfHKv7pO+PCiAb0CJ7/+tqyfw4+5r5ayjN7jjMqBZ6tvXK/sYMBcyaB
+	hzewHZOMoh219O52OGf/kKjZ4OTNhdw==
+X-Google-Smtp-Source: AGHT+IHBZwUGB8VLqTQcg1aadVsu59JH49rKFCK0/SJCUhSIxo5rNaprpp8i2mUPm2CO7OoK5A8JdA9Km0LPAjKCnEc=
+X-Received: by 2002:a05:6512:2386:b0:52e:941d:7039 with SMTP id
+ 2adb3069b0e04-5331c6f3ab3mr3223187e87.59.1723871392106; Fri, 16 Aug 2024
+ 22:09:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240816192452.38211-1-victor@vtimothy.com>
-In-Reply-To: <20240816192452.38211-1-victor@vtimothy.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 17 Aug 2024 09:30:43 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-W=3kgGgWccAOUNS9nwuJ5PErp9jPudJSZzDu83=B9=g@mail.gmail.com>
-Message-ID: <CAKYAXd-W=3kgGgWccAOUNS9nwuJ5PErp9jPudJSZzDu83=B9=g@mail.gmail.com>
-Subject: Re: [PATCH] ksmdb: fix spelling mistakes in documentation
-To: Victor Timofei <victor@vtimothy.com>
-Cc: sfrench@samba.org, corbet@lwn.net, linux-cifs@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org, skhan@linuxfoundation.org
+References: <CAH2r5mtJA0AO+5YGXUKhnb0rtnezrNufZkpMAAuJ5tEKTibgig@mail.gmail.com>
+In-Reply-To: <CAH2r5mtJA0AO+5YGXUKhnb0rtnezrNufZkpMAAuJ5tEKTibgig@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 17 Aug 2024 00:09:41 -0500
+Message-ID: <CAH2r5mt=7PjoDbZYFm8fKN-7YCtMLE4d-fs=U7nc77sxZEmehQ@mail.gmail.com>
+Subject: Re: [PATCH][SMB CLIENT] fix refcount issue that shutdown related
+ xfstests uncovered
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+This does not fix the umount/mount busy errors you see with tests like
+generic/043 and generic/048 but it does fix the rmmod problem.   And
+FYI there is a workaround for fixing the umount/mount issues in those
+tests - by simply adding a 1 second delay in umount.  We need to
+continue to debug the generic/043 and generic/048 umount busy errors
+
+
+On Fri, Aug 16, 2024 at 4:56=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> There are a couple of spelling mistakes in the documentation. This patch
-> fixes them.
+>     smb3: fix problem unloading module due to leaked refcount on shutdown
 >
-> Signed-off-by: Victor Timofei <victor@vtimothy.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+>     The shutdown ioctl can leak a refcount on the tlink which can
+>     prevent rmmod (unloading the cifs.ko) module from working.
+>
+>     Found while debugging xfstest generic/043
+>
+>     Fixes: 69ca1f57555f ("smb3: add dynamic tracepoints for shutdown ioct=
+l")
+>
+> See attached
+>
+> --
+> Thanks,
+>
+> Steve
+
+
+
+--
+Thanks,
+
+Steve
