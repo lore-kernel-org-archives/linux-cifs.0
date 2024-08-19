@@ -1,74 +1,109 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F0315A84A
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Aug 2024 22:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66799158216;
+	Mon, 19 Aug 2024 22:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724105262; cv=none; b=LkSJXgIYu82hEqE3UsryoiCRsRmo5DbpRRuQ0PwKApvilU14+ibJbcOOO4dvAtn5SOVpVudTNaq8wjQsP+WEVUPMwQpKuVnfaDeW4LhzCQk3v95G//LRrant/mrV1qS2a6PyvTYdPAn8INTei1N58FDe9GSeaFv3hL77rAqtrx4=
+	t=1724106977; cv=none; b=b5KpIVbd1I7BRnWvNoukgzE80P6ZE/5m/aQd7YrqffF2ezBAm+uLMbb+AbCBBQNm1Up9vJ3zeGjfNFwY2TD28X2lJIV+MnwmdNILpUq1vyyDmrMqK4LEkVoNa58zpYfoSH4yO2SpXFTUKBZmX+4u/0U2ZTdjPej0AdaAvdgn4LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724105262; c=relaxed/simple;
-	bh=91dSMPu8LGw57t87hPuXZ8dHD1o0PYj4pK18/bG1kI8=;
+	s=arc-20240116; t=1724106977; c=relaxed/simple;
+	bh=1G9aDsJMVAuDJ3cqhNDnd+KzVaMg5MGilUcivSbjYkc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HYDc+PqNHWNY2dS/ucklWfqMC82nAq3Bier4zYDeIQAOFTPPvKZV+00eunUXYYEWpeAzsKyUBmrh3v7b+IEhA5mRCzWigjrUSx/VRNAlBw8pn+ifaLbM8s6UHQjoD/6756RpSarl2x+q4eYp9Fm3C/j1EEeo+vrFGaVGNKPXAsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QEmKgS7p; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=c3Uw7lm0Fu4AJwOkoK73VJJfT2CLDG3F/fw4J9HNioayT9ZNVjuNnR5Sbpd/IUz8Yh77ICTFexapRBL38K8SDrErmwii4q6QIL8giCFX7ehWoS1Z1DzmHXentLqRpxENu9KrnilqkZwXVom1M+iwO7SG3R2PDDEuxKIQuVkVqvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CXaoYmvG; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEmKgS7p"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5314c6dbaa5so6436101e87.2
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Aug 2024 15:07:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CXaoYmvG"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52efa16aad9so6028681e87.0;
+        Mon, 19 Aug 2024 15:36:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724105258; x=1724710058; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724106973; x=1724711773; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g31SD6D0hDh/XssiYepevcf81paVI0B6X6PBwgyTQ6I=;
-        b=QEmKgS7pw/yk7W7DcBKFBCO+N3P8W/1Q1CYmmnJswok5zhRwSh3SIMZUnYdlZ31xKw
-         LCd2DbefmblLGTYjcIvMChTf3dCFrLiFmxbDNrZ82sqDj+bPmKEQ2HHyjlJ61vZVPWQJ
-         cAAM4bFmvcCHVEGS8DwCdIUjFimlN+HqfFVBZOV32zhtsvhjKx4Tm5lLyVyqqGjNgDx1
-         L7xTcsSBKHIrpSxwENNhg0Z79zRuKCg24AU2YhxarOGSvqIZ1Xl9gBTlSi845JgtdZzu
-         Tt9ikwuDYAkbI3Q3LH/lsFOdVcouGFc/Yri/F7uy6M6H87S0/8+K1Wb7sFTW7g7MNHMR
-         sP4w==
+        bh=++VCcm6FrNCS+6UytOZ4cKi7ezoRKCpG0F5c0Jp2cCk=;
+        b=CXaoYmvGCKDjDuzfSLEzPfMVEN2SX4kEN2NNU1dOEtPvUrzIpGcuH77KZvoJ5KW79q
+         bBdlbCv8jEUvNZz/hcGC94Ze2RnTK/R7u+hwVYzsJ/lBSjFoR/vgXbUQMa59Y+40Lodq
+         50J/g5tqEpKPDk9QV8XtN3Y12fm0nG71GoNndc+qvLsd2NDrnXqY86Fn17hMAnHTdnxh
+         9kZ2ldmDNnfO4s3qrBoz3OTgQi14Owr/EuHMovebhJ+AyoxivMkH42kjmJjjZjK4cySl
+         QnxCk92itNGntQaaJ7Tu9CADy11kjSqJ5P6yDeQx064+KlU78v//8F+pChAlz+P6N0ER
+         9OrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724105258; x=1724710058;
+        d=1e100.net; s=20230601; t=1724106973; x=1724711773;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g31SD6D0hDh/XssiYepevcf81paVI0B6X6PBwgyTQ6I=;
-        b=CX7B1Tuyci8OWxax8pMyCk5zc9EFDNQ4/P6McBxUAouayYzoMEPA07tYtKqk/oBHRR
-         xFkLEVYQXzw1RRQvGYV6qJr4hXxs1BO8HyqzQdW3sApGsEKkKAC9YiwtKI2WgM7auQmj
-         whkjY2aG51M9PcmYvuHse4LYhhpIj9oZhdoK/gLYp1qIz0+Z5ddFFRNZMKloxzDq7/74
-         T6YC1sRiiPzLEBhjD+Q9loYpHG7GP/HYRBizFrNbHbxExdE29bcJ6H1WicduL3zaGArN
-         Eo71Drji6+xgWFsGp1mbOwUg2nSZq3yH07MkJTsd/6zR/f3oUOpNxNdLjvJzwCsOKJ4c
-         /4xw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbuFgCfhtzZFf8UvPKxWQWapoff50MKojCjARWov8zrURKEFpxDRBhoUxTiIUr91TVKBGn+wqaTAE7@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjpDsIX83zLVLFEKXSnYCPEgzNJTM8wCoK16dOYFA8sOK7jNrd
-	oPf1HC2GsWk34uuRGmuhKlj6BvKwLxdAgxEf5ymmVrEVmqDUJ7gaMEIlvIk4MqoskRLddgfuw56
-	u/KFkPyW0ZCYu0LiVAGPPAC0Dh/w=
-X-Google-Smtp-Source: AGHT+IFaBCpytklBF4j4HWO0tqyQ1uNL7Q1iDg+BEC+QG4OenN3AmJAKfkUJKn0GYDBiu4qcwuLorYg8d8ZIBUoZ/Xo=
-X-Received: by 2002:a05:6512:2310:b0:52c:adc4:137c with SMTP id
- 2adb3069b0e04-5331c6a20d3mr7831798e87.20.1724105257829; Mon, 19 Aug 2024
- 15:07:37 -0700 (PDT)
+        bh=++VCcm6FrNCS+6UytOZ4cKi7ezoRKCpG0F5c0Jp2cCk=;
+        b=NfG+xi6h6C1tJ929zqCc8PFCDDLbE+o9cQenoHfZhdJlIKlMwJGPPLDfWmLmL3aP1e
+         vN27SCIXLy4u/uvPcwklBTlkVUgutuzZ4dhVJK5nblIlybDjTXv2t05AelSBNweIlfg0
+         VLQ+Uryr2rpLnp7rwRyoVsYqn9HeapzG04/zNTsgBnl79cEuT8JrLvVG58UGptNdUrnB
+         J7eLRYd1U87N3oBR/rhmSblCApmIgzP2AFtKbqHOgbYVWa9kgZlQR9zHe+czI8e6e6r9
+         BQMDnDVleWlm888HJ/hsgpFEFQs9jrqCz3zUHmOCB4mMsDIvQFgkKJ7JuwAoozOlBq0z
+         aiDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEwFjCOmWVZ+7jaKI6ooIQoqkmwm/9oH/Vf//Fp7a/QJBvbVWUSVqbxc15kgDGqvtuV7BtFUsqF7NjNm76MBRRbV0G0jpFAwtX0pyW8LsZZsZT+aB0mVmOAc/ldVLBl57cQ0dpb7GbOL7DoHAa8Q0em7q+3lE+HMRRbiwfxLnMJBx1q9Q+gCw=
+X-Gm-Message-State: AOJu0YzXbFozrCb8LKtddp5nESOlHcxUSANGWNdVzyrbcOj7cvZHdxFA
+	lcpzZGSNnXuvWS4d0QImWmGNz4WT5Je2fs47O71zOFmrNpl2vCbMWcBTdcGEs7T/JmkY5t5L6xB
+	B6YMkpbPlTVqxbB42805GzORQjGM=
+X-Google-Smtp-Source: AGHT+IHfw0kqqwq5xAQSeTY5kw86EWTmZwz1spOhNQCNIm3z486eLKzHsutUH7QtawxGiX6DlMKis98zNcQDoOqo9mI=
+X-Received: by 2002:a05:6512:10c1:b0:533:6f3:9857 with SMTP id
+ 2adb3069b0e04-5331c6904c5mr8137995e87.5.1724106973016; Mon, 19 Aug 2024
+ 15:36:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mv3VKSorLBNZUvUrbiOmTFDFw0YDWkL3iRLjaaRmYVTeA@mail.gmail.com>
- <CAH2r5ms_RiykdukHNefZO2GciuDcLvW6wFhPS37jnrpMtpqYJQ@mail.gmail.com>
-In-Reply-To: <CAH2r5ms_RiykdukHNefZO2GciuDcLvW6wFhPS37jnrpMtpqYJQ@mail.gmail.com>
+References: <1229195.1723211769@warthog.procyon.org.uk> <ZrbgRnXV-snNicjY@codewreck.org>
+In-Reply-To: <ZrbgRnXV-snNicjY@codewreck.org>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 19 Aug 2024 17:07:26 -0500
-Message-ID: <CAH2r5msT+YbMNMd+sUue69CVDkjuJzubkubYXC8HZA-GFW9Wxw@mail.gmail.com>
-Subject: Re: Netfs failure
-To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
-Cc: Dominique Martinet <asmadeus@codewreck.org>
+Date: Mon, 19 Aug 2024 17:36:01 -0500
+Message-ID: <CAH2r5mvXE9kKEFfEpsf3AA0s8oVA8737aLZ2LkOrz1hptujt2A@mail.gmail.com>
+Subject: Re: [PATCH] 9p: Fix DIO read through netfs
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>, 
+	Latchesar Ionkov <lucho@ionkov.net>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	Marc Dionne <marc.dionne@auristor.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Christian Brauner <brauner@kernel.org>, 
+	linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Thorsten Leemhuis <regressions@leemhuis.info>, Thorsten Leemhuis <linux@leemhuis.info>, 
+	Shyam Prasad N <nspmangalore@gmail.com>, Bharath S M <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I was able to repro the generic/210 regression to Samba server as well
+I did some additional testing of this patch after seeing regressions
+starting with 6.11-rc4 with xfstests generic/125 and generic/210 and
+was able to bisect it to this patch which just went in:
+
+commit e3786b29c54cdae3490b07180a54e2461f42144c
+Author: Dominique Martinet <asmadeus@codewreck.org>
+
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index b2405dd4d4d4..3f3842e7b44a 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -217,7 +217,8 @@ static void cifs_req_issue_read(struct
+netfs_io_subrequest *subreq)
+                        goto out;
+        }
+
+-       __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
++       if (subreq->rreq->origin !=3D NETFS_DIO_READ)
++               __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+
+        rc =3D rdata->server->ops->async_readv(rdata);
+ out:
+
+It is very simple to repro.
+I originally noticed it with tests to shares in Azure, but it also
+fails locally to Samba with default cifs.ko mount options.
+
+
+log message is below:
 
 [ 7884.205037] Workqueue: cifsiod smb2_readv_worker [cifs]
 [ 7884.205262] RIP: 0010:netfs_subreq_terminated+0x3f0/0x4b0 [netfs]
@@ -130,94 +165,243 @@ __irq_exit_rcu+0xfe/0x120
 __irq_exit_rcu+0xfe/0x120
 [ 7884.205718] ---[ end trace 0000000000000000 ]---
 
-On Mon, Aug 19, 2024 at 12:15=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
+On Fri, Aug 9, 2024 at 10:43=E2=80=AFPM Dominique Martinet
+<asmadeus@codewreck.org> wrote:
 >
-> Probably regression in rc4 affecting xfstest generic/125
->
-> it also happened with multichannel with current mainline, but doesn't
-> look like it happened with rc3
->
-> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/=
-5/builds/207/steps/57/logs/stdio
->
-> Is it possible it is related to this patch which is in the failing
-> (rc4) branch but not in rc3 (where the test passes)?
->
-> commit e3786b29c54cdae3490b07180a54e2461f42144c
-> Author: Dominique Martinet <asmadeus@codewreck.org>
-> Date:   Thu Aug 8 14:29:38 2024 +0100
->
->     9p: Fix DIO read through netfs
->
->     If a program is watching a file on a 9p mount, it won't see any chang=
-e in
->     size if the file being exported by the server is changed directly in =
-the
->     source filesystem, presumably because 9p doesn't have change notifica=
-tions,
->     and because netfs skips the reads if the file is empty.
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index b2405dd4d4d4..3f3842e7b44a 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -217,7 +217,8 @@ static void cifs_req_issue_read(struct
-> netfs_io_subrequest *subreq)
->                         goto out;
->         }
->
-> -       __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
-> +       if (subreq->rreq->origin !=3D NETFS_DIO_READ)
-> +               __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
->
->         rc =3D rdata->server->ops->async_readv(rdata);
->  out:
-> (END)
->
-> On Sun, Aug 18, 2024 at 7:24=E2=80=AFPM Steve French <smfrench@gmail.com>=
- wrote:
+> David Howells wrote on Fri, Aug 09, 2024 at 02:56:09PM +0100:
+> > From: Dominique Martinet <asmadeus@codewreck.org>
 > >
-> > Do you recognize this netfs failure (generic/125) that I just saw with
-> > current mainline
-> >
-> > http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builder=
-s/9/builds/106/steps/54/logs/stdio
-> >
-> > [Sun Aug 18 18:40:43 2024] <TASK>
-> > [Sun Aug 18 18:40:43 2024] ? __warn+0xa4/0x220
-> > [Sun Aug 18 18:40:43 2024] ? netfs_subreq_terminated+0x3f0/0x4b0 [netfs=
-]
-> > [Sun Aug 18 18:40:43 2024] ? report_bug+0x1d4/0x1e0
-> > [Sun Aug 18 18:40:43 2024] ? handle_bug+0x42/0x80
-> > [Sun Aug 18 18:40:43 2024] ? exc_invalid_op+0x18/0x50
-> > [Sun Aug 18 18:40:43 2024] ? asm_exc_invalid_op+0x1a/0x20
-> > [Sun Aug 18 18:40:43 2024] ? irq_work_claim+0x1e/0x40
-> > [Sun Aug 18 18:40:43 2024] ? netfs_subreq_terminated+0x3f0/0x4b0 [netfs=
-]
-> >
-> > $ git log --oneline -3
-> > b5e99e6c6dcd (HEAD -> for-next, origin/for-next) smb3: fix problem
-> > unloading module due to leaked refcount on shutdown
-> > e4be320eeca8 smb3: fix broken cached reads when posix locks
-> > 47ac09b91bef (tag: v6.11-rc4, origin/master, origin/HEAD,
-> > linus/master, master) Linux 6.11-rc4
-> >
-> >
-> > Ideas?
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
+> > 9p: Fix DIO read through netfs
 >
+> nitpick: now sure how that ended up here but this is duplicated with the
+> subject (the commit message ends up with this line twice)
 >
+> > If a program is watching a file on a 9p mount, it won't see any change =
+in
+> > size if the file being exported by the server is changed directly in th=
+e
+> > source filesystem, presumably because 9p doesn't have change notificati=
+ons,
+> > and because netfs skips the reads if the file is empty.
+> >
+> > Fix this by attempting to read the full size specified when a DIO read =
+is
+> > requested (such as when 9p is operating in unbuffered mode) and dealing
+> > with a short read if the EOF was less than the expected read.
+> >
+> > To make this work, filesystems using netfslib must not set
+> > NETFS_SREQ_CLEAR_TAIL if performing a DIO read where that read hit the =
+EOF.
+> > I don't want to mandatorily clear this flag in netfslib for DIO because=
+,
+> > say, ceph might make a read from an object that is not completely fille=
+d,
+> > but does not reside at the end of file - and so we need to clear the
+> > excess.
+> >
+> > This can be tested by watching an empty file over 9p within a VM (such =
+as
+> > in the ktest framework):
+> >
+> >         while true; do read content; if [ -n "$content" ]; then echo $c=
+ontent; break; fi; done < /host/tmp/foo
+>
+> (This is basically the same thing but if one wants to control the read
+> timing for more precise/verbose debugging:
+>   exec 3< /host/tmp/foo
+>   read -u 3 content && echo $content
+>   (repeat as appropriate)
+>   exec 3>&-
+> )
+>
+> > then writing something into the empty file.  The watcher should immedia=
+tely
+> > display the file content and break out of the loop.  Without this fix, =
+it
+> > remains in the loop indefinitely.
+> >
+> > Fixes: 80105ed2fd27 ("9p: Use netfslib read/write_iter")
+> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D218916
+> > Written-by: Dominique Martinet <asmadeus@codewreck.org>
+>
+> Thanks for adding extra comments & fixing other filesystems.
+>
+> I've checked this covers all cases of setting NETFS_SREQ_CLEAR_TAIL so
+> hopefully shouldn't have further side effects, this sounds good to me:
+>
+> Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
+>
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Eric Van Hensbergen <ericvh@kernel.org>
+> > cc: Latchesar Ionkov <lucho@ionkov.net>
+> > cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+> > cc: Marc Dionne <marc.dionne@auristor.com>
+> > cc: Ilya Dryomov <idryomov@gmail.com>
+> > cc: Steve French <sfrench@samba.org>
+> > cc: Paulo Alcantara <pc@manguebit.com>
+> > cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> > cc: v9fs@lists.linux.dev
+> > cc: linux-afs@lists.infradead.org
+> > cc: ceph-devel@vger.kernel.org
+> > cc: linux-cifs@vger.kernel.org
+> > cc: linux-nfs@vger.kernel.org
+> > cc: netfs@lists.linux.dev
+> > cc: linux-fsdevel@vger.kernel.org
+> > ---
+> >  fs/9p/vfs_addr.c     |    3 ++-
+> >  fs/afs/file.c        |    3 ++-
+> >  fs/ceph/addr.c       |    6 ++++--
+> >  fs/netfs/io.c        |   17 +++++++++++------
+> >  fs/nfs/fscache.c     |    3 ++-
+> >  fs/smb/client/file.c |    3 ++-
+> >  6 files changed, 23 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> > index a97ceb105cd8..24fdc74caeba 100644
+> > --- a/fs/9p/vfs_addr.c
+> > +++ b/fs/9p/vfs_addr.c
+> > @@ -75,7 +75,8 @@ static void v9fs_issue_read(struct netfs_io_subreques=
+t *subreq)
+> >
+> >       /* if we just extended the file size, any portion not in
+> >        * cache won't be on server and is zeroes */
+> > -     __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> > +     if (subreq->rreq->origin !=3D NETFS_DIO_READ)
+> > +             __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> >
+> >       netfs_subreq_terminated(subreq, err ?: total, false);
+> >  }
+> > diff --git a/fs/afs/file.c b/fs/afs/file.c
+> > index c3f0c45ae9a9..ec1be0091fdb 100644
+> > --- a/fs/afs/file.c
+> > +++ b/fs/afs/file.c
+> > @@ -242,7 +242,8 @@ static void afs_fetch_data_notify(struct afs_operat=
+ion *op)
+> >
+> >       req->error =3D error;
+> >       if (subreq) {
+> > -             __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> > +             if (subreq->rreq->origin !=3D NETFS_DIO_READ)
+> > +                     __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> >               netfs_subreq_terminated(subreq, error ?: req->actual_len,=
+ false);
+> >               req->subreq =3D NULL;
+> >       } else if (req->done) {
+> > diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+> > index cc0a2240de98..c4744a02db75 100644
+> > --- a/fs/ceph/addr.c
+> > +++ b/fs/ceph/addr.c
+> > @@ -246,7 +246,8 @@ static void finish_netfs_read(struct ceph_osd_reque=
+st *req)
+> >       if (err >=3D 0) {
+> >               if (sparse && err > 0)
+> >                       err =3D ceph_sparse_ext_map_end(op);
+> > -             if (err < subreq->len)
+> > +             if (err < subreq->len &&
+> > +                 subreq->rreq->origin !=3D NETFS_DIO_READ)
+> >                       __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> >               if (IS_ENCRYPTED(inode) && err > 0) {
+> >                       err =3D ceph_fscrypt_decrypt_extents(inode,
+> > @@ -282,7 +283,8 @@ static bool ceph_netfs_issue_op_inline(struct netfs=
+_io_subrequest *subreq)
+> >       size_t len;
+> >       int mode;
+> >
+> > -     __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> > +     if (rreq->origin !=3D NETFS_DIO_READ)
+> > +             __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> >       __clear_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags);
+> >
+> >       if (subreq->start >=3D inode->i_size)
+> > diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+> > index c179a1c73fa7..5367caf3fa28 100644
+> > --- a/fs/netfs/io.c
+> > +++ b/fs/netfs/io.c
+> > @@ -530,7 +530,8 @@ void netfs_subreq_terminated(struct netfs_io_subreq=
+uest *subreq,
+> >
+> >       if (transferred_or_error =3D=3D 0) {
+> >               if (__test_and_set_bit(NETFS_SREQ_NO_PROGRESS, &subreq->f=
+lags)) {
+> > -                     subreq->error =3D -ENODATA;
+> > +                     if (rreq->origin !=3D NETFS_DIO_READ)
+> > +                             subreq->error =3D -ENODATA;
+> >                       goto failed;
+> >               }
+> >       } else {
+> > @@ -601,9 +602,14 @@ netfs_rreq_prepare_read(struct netfs_io_request *r=
+req,
+> >                       }
+> >                       if (subreq->len > ictx->zero_point - subreq->star=
+t)
+> >                               subreq->len =3D ictx->zero_point - subreq=
+->start;
+> > +
+> > +                     /* We limit buffered reads to the EOF, but let th=
+e
+> > +                      * server deal with larger-than-EOF DIO/unbuffere=
+d
+> > +                      * reads.
+> > +                      */
+> > +                     if (subreq->len > rreq->i_size - subreq->start)
+> > +                             subreq->len =3D rreq->i_size - subreq->st=
+art;
+> >               }
+> > -             if (subreq->len > rreq->i_size - subreq->start)
+> > -                     subreq->len =3D rreq->i_size - subreq->start;
+> >               if (rreq->rsize && subreq->len > rreq->rsize)
+> >                       subreq->len =3D rreq->rsize;
+> >
+> > @@ -739,11 +745,10 @@ int netfs_begin_read(struct netfs_io_request *rre=
+q, bool sync)
+> >       do {
+> >               _debug("submit %llx + %llx >=3D %llx",
+> >                      rreq->start, rreq->submitted, rreq->i_size);
+> > -             if (rreq->origin =3D=3D NETFS_DIO_READ &&
+> > -                 rreq->start + rreq->submitted >=3D rreq->i_size)
+> > -                     break;
+> >               if (!netfs_rreq_submit_slice(rreq, &io_iter))
+> >                       break;
+> > +             if (test_bit(NETFS_SREQ_NO_PROGRESS, &rreq->flags))
+> > +                     break;
+> >               if (test_bit(NETFS_RREQ_BLOCKED, &rreq->flags) &&
+> >                   test_bit(NETFS_RREQ_NONBLOCK, &rreq->flags))
+> >                       break;
+> > diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+> > index bf29a65c5027..7a558dea75c4 100644
+> > --- a/fs/nfs/fscache.c
+> > +++ b/fs/nfs/fscache.c
+> > @@ -363,7 +363,8 @@ void nfs_netfs_read_completion(struct nfs_pgio_head=
+er *hdr)
+> >               return;
+> >
+> >       sreq =3D netfs->sreq;
+> > -     if (test_bit(NFS_IOHDR_EOF, &hdr->flags))
+> > +     if (test_bit(NFS_IOHDR_EOF, &hdr->flags) &&
+> > +         sreq->rreq->origin !=3D NETFS_DIO_READ)
+> >               __set_bit(NETFS_SREQ_CLEAR_TAIL, &sreq->flags);
+> >
+> >       if (hdr->error)
+> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> > index b2405dd4d4d4..3f3842e7b44a 100644
+> > --- a/fs/smb/client/file.c
+> > +++ b/fs/smb/client/file.c
+> > @@ -217,7 +217,8 @@ static void cifs_req_issue_read(struct netfs_io_sub=
+request *subreq)
+> >                       goto out;
+> >       }
+> >
+> > -     __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> > +     if (subreq->rreq->origin !=3D NETFS_DIO_READ)
+> > +             __set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+> >
+> >       rc =3D rdata->server->ops->async_readv(rdata);
+> >  out:
+> >
 >
 > --
-> Thanks,
+> Dominique Martinet | Asmadeus
 >
-> Steve
-
 
 
 --=20
