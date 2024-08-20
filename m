@@ -1,27 +1,27 @@
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.67.179])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA961BD03B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466DA1922EF;
 	Tue, 20 Aug 2024 14:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.67.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724164611; cv=none; b=tnPgYZCxG2vw0XsP8Ud+aFJV+ygYpuDXN/bE/6b31KTGBoc3r0zuwO02a+2EmS0ZsXANeD9xxxgOGjh73RxAzg27p61A2W7J+8QMFWRlHAVscy4KmHMM3vnxH5J1SNJq3lowFsWIGUMDRqbx7c++wx8rwBvuETU8PFpCl1YjorU=
+	t=1724164612; cv=none; b=ngp23P6pIl6gzU/WPbnqFO2i1bOxTTcm6gpaivDItYsovza8ubIv5NLIpfrpscnOPNdn7q55RYv6AWLgV4bdG4ZA1KlfPsMpMfx1Y3qgHrnE8hzbZuTcHOtfwcP0grN+lTrJkNx0OX8OXzsGO5pTyeKDg0wIOKdDxF8/p9G3q1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724164611; c=relaxed/simple;
-	bh=AHsj+lkL4gAcct16Db/0Gq9g/QXByj6CbgSwmJOoKCI=;
+	s=arc-20240116; t=1724164612; c=relaxed/simple;
+	bh=bBvDy7/6KrDhN+z7mAyor5oq4SSHkGap5G5Iw6V1tJ0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JiE0wgjwzSkk46FVbQbVvLobzPWO10hR2KWXKOpz/3DRzzHVXdUp4t3u7BOUjiLkyfrbpdCEPYhjUqKjluxnXGM1aXpj0tP7U3JXrQPvYSmJMQ9UCBKWBcBQM/QxgTkTHbwqI7Vvz3cVDb+b/yM16qdH9ZzOZqJDVvKiPIQf8/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=none smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=114.132.67.179
+	 MIME-Version; b=PImUmXcatBoPgAGeWoQLyuzUQbIs4qM+C8xPl1b9g1yjLHGdl1xo0JquZ3MWYsROIlj+c3eT6Iu+T41ZxTnc529k+dbr9gRAabr80RIj0e6PNFE6pzSwt0B6PGCW8+UvX81LpZZidWZ8xQM507e8nExEJsvhTKMs8F7zapkLUh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: bizesmtpsz13t1724164447tcvmcj
-X-QQ-Originating-IP: Nx1+9CYaiCdQOfphM7sLh8mPjcMR+erolHuc9VjpznE=
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+X-QQ-mid: bizesmtpsz13t1724164437tyf93n
+X-QQ-Originating-IP: yqk3UkeqByQJsO86tVOnVl2RVOLhncNNAmyhXCjlCJc=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 20 Aug 2024 22:34:04 +0800 (CST)
+	id ; Tue, 20 Aug 2024 22:33:42 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3618686590817847333
+X-BIZMAIL-ID: 4272407034101322349
 From: chenxiaosong@chenxiaosong.com
 To: linkinjeon@kernel.org,
 	sfrench@samba.org,
@@ -38,9 +38,9 @@ Cc: chenxiaosong@kylinos.cn,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: [PATCH 3/8] smb/server: remove useless variable assignment in smb2_open()
-Date: Tue, 20 Aug 2024 14:33:14 +0000
-Message-Id: <20240820143319.274033-4-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 1/8] smb/server: fix return value of smb2_open()
+Date: Tue, 20 Aug 2024 14:33:12 +0000
+Message-Id: <20240820143319.274033-2-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com>
 References: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com>
@@ -56,25 +56,29 @@ Feedback-ID: bizesmtpsz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-The variable is already true here.
+In most error cases, error code is not returned in smb2_open(),
+__process_request() will not print error message.
+
+Fix this by returning the correct value at the end of smb2_open().
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 ---
- fs/smb/server/smb2pdu.c | 1 -
- 1 file changed, 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 119c1ba5f255..4e87bbac2662 100644
+index 2df1354288e6..d8a827e0dced 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3100,7 +3100,6 @@ int smb2_open(struct ksmbd_work *work)
- 			goto err_out;
- 		}
+@@ -3710,7 +3710,7 @@ int smb2_open(struct ksmbd_work *work)
+ 	kfree(name);
+ 	kfree(lc);
  
--		file_present = true;
- 		idmap = mnt_idmap(path.mnt);
- 	} else {
- 		if (rc != -ENOENT)
+-	return 0;
++	return rc;
+ }
+ 
+ static int readdir_info_level_struct_sz(int info_level)
 -- 
 2.34.1
 
