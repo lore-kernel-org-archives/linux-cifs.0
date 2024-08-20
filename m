@@ -1,27 +1,27 @@
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DA22745C;
-	Tue, 20 Aug 2024 14:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054541922D5;
+	Tue, 20 Aug 2024 14:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724164628; cv=none; b=mR3ENFe/NnaXRfmQ5jl+QZgtUfsGsRlNYJ/F2M5qQqyz0bQyvlrD9JPPC3t7XO92Hr3ssjzYdH8x3otWph7j1ylIXSUOCPIa2lQwhdG1R+N5kw7AEvgEMiSL4s2H/UUPf1lWLATNljb7x0fD9JA57HiD9YY5rV9v9sOX8wIOXeQ=
+	t=1724164629; cv=none; b=ZeYGFRjbxjIfdPw9+vbqBL/eS3FDUb5qbWYcHfHFx6PnHQGQxI4neghRv3eRwvo1YlqiJQ19IhNzFuTj6TwObGTtZqf2WocHtDwZpYR1cXpFfn8u7jHUezuvO34XXeL0wrmP4w/zlnIVpD/9p1YFbTC4E7fnxmeE1kjUeQDEGxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724164628; c=relaxed/simple;
-	bh=nTWWoVKRbsSB0AVuQsX8tA2drsINtAOwdGXNvlBVxoY=;
+	s=arc-20240116; t=1724164629; c=relaxed/simple;
+	bh=UaTjhsrSU+4YcXulYJz5XJIUWIlRgRVTchGO6dZPxq4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=l6ZmakOO52kB683hOIG8wLkDTCGSXUZNDAxjqQm0JYiWgdriBSaBXy9Hatp/3WdipZWRimqseD3/HHFTiIZM/FDc0IkL2m/gdiHy1D7LVo4/bceqYI8o25EyeMFZ5Y9IB6QURT7/BC8jdYDCX/3TCWvjlRv1/Ze577sqdmX8770=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=none smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.204.34.129
+	 MIME-Version; b=KkqHnPGt/tMFxgbiQD+LAdb3quNSTJztSj8tag3gEi+QOMYvdMcdMlRQGJa9YNkQXScJ6Mg1xUg0D5mv04elZphYAL1h3TXIkQzN+C1r6bZSAkc1VEg8dHAt518w+euXjEkchgw+BHXGrVp/q6wZw7MgqUko4cyTn+Vv1jNR55A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=none smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=43.154.197.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: bizesmtpsz13t1724164466ty8n5v
-X-QQ-Originating-IP: Dnn6QlT/NsFxZ5H8G2EJJyEdyGpisgPla7anQMylyVE=
+X-QQ-mid: bizesmtpsz13t1724164443tqg9yz
+X-QQ-Originating-IP: dPMKYDXMOjPLOaW4z1aia1MK4dITPS1tmcXpU+Dbrig=
 Received: from localhost.localdomain ( [116.128.244.171])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 20 Aug 2024 22:34:23 +0800 (CST)
+	id ; Tue, 20 Aug 2024 22:33:58 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 7950044140691014322
+X-BIZMAIL-ID: 17776703071977044454
 From: chenxiaosong@chenxiaosong.com
 To: linkinjeon@kernel.org,
 	sfrench@samba.org,
@@ -38,9 +38,9 @@ Cc: chenxiaosong@kylinos.cn,
 	huhai@kylinos.cn,
 	liuyun01@kylinos.cn,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: [PATCH 7/8] smb/client: fix typo: STATUS_MCA_OCCURED -> STATUS_MCA_OCCURRED
-Date: Tue, 20 Aug 2024 14:33:18 +0000
-Message-Id: <20240820143319.274033-8-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 2/8] smb/server: fix potential null-ptr-deref of lease_ctx_info in smb2_open()
+Date: Tue, 20 Aug 2024 14:33:13 +0000
+Message-Id: <20240820143319.274033-3-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com>
 References: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com>
@@ -56,41 +56,93 @@ Feedback-ID: bizesmtpsz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Preparation for moving the SMB2 Status code definitions to a common
-header file.
+null-ptr-deref will occur when (req_op_level == SMB2_OPLOCK_LEVEL_LEASE)
+and parse_lease_state() return NULL.
+
+Fix this by returning error pointer on parse_lease_state() and checking
+error.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 ---
- fs/smb/client/smb2maperror.c | 2 +-
- fs/smb/client/smb2status.h   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/server/oplock.c  | 11 +++++++----
+ fs/smb/server/smb2pdu.c | 17 ++++++++++++-----
+ 2 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
-index ac1895358908..3ac17d43bb7d 100644
---- a/fs/smb/client/smb2maperror.c
-+++ b/fs/smb/client/smb2maperror.c
-@@ -1096,7 +1096,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
- 	"STATUS_MOUNT_POINT_NOT_RESOLVED"},
- 	{STATUS_INVALID_DEVICE_OBJECT_PARAMETER, -EIO,
- 	"STATUS_INVALID_DEVICE_OBJECT_PARAMETER"},
--	{STATUS_MCA_OCCURED, -EIO, "STATUS_MCA_OCCURED"},
-+	{STATUS_MCA_OCCURRED, -EIO, "STATUS_MCA_OCCURRED"},
- 	{STATUS_DRIVER_BLOCKED_CRITICAL, -EIO,
- 	"STATUS_DRIVER_BLOCKED_CRITICAL"},
- 	{STATUS_DRIVER_BLOCKED, -EIO, "STATUS_DRIVER_BLOCKED"},
-diff --git a/fs/smb/client/smb2status.h b/fs/smb/client/smb2status.h
-index 9c6d79b0bd49..15364c4328ec 100644
---- a/fs/smb/client/smb2status.h
-+++ b/fs/smb/client/smb2status.h
-@@ -901,7 +901,7 @@ struct ntstatus {
- #define STATUS_DEVICE_ENUMERATION_ERROR cpu_to_le32(0xC0000366)
- #define STATUS_MOUNT_POINT_NOT_RESOLVED cpu_to_le32(0xC0000368)
- #define STATUS_INVALID_DEVICE_OBJECT_PARAMETER cpu_to_le32(0xC0000369)
--#define STATUS_MCA_OCCURED cpu_to_le32(0xC000036A)
-+#define STATUS_MCA_OCCURRED cpu_to_le32(0xC000036A)
- #define STATUS_DRIVER_BLOCKED_CRITICAL cpu_to_le32(0xC000036B)
- #define STATUS_DRIVER_BLOCKED cpu_to_le32(0xC000036C)
- #define STATUS_DRIVER_DATABASE_ERROR cpu_to_le32(0xC000036D)
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index a8f52c4ebbda..e8591686a037 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -1510,7 +1510,8 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
+  * parse_lease_state() - parse lease context containted in file open request
+  * @open_req:	buffer containing smb2 file open(create) request
+  *
+- * Return:  oplock state, -ENOENT if create lease context not found
++ * Return: allocated lease context object on success, otherwise error pointer.
++ * 	   -ENOENT pointer if create lease context not found.
+  */
+ struct lease_ctx_info *parse_lease_state(void *open_req)
+ {
+@@ -1519,12 +1520,14 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
+ 	struct lease_ctx_info *lreq;
+ 
+ 	cc = smb2_find_context_vals(req, SMB2_CREATE_REQUEST_LEASE, 4);
+-	if (IS_ERR_OR_NULL(cc))
+-		return NULL;
++	if (!cc)
++		return ERR_PTR(-ENOENT);
++	if (IS_ERR(cc))
++		return ERR_CAST(cc);
+ 
+ 	lreq = kzalloc(sizeof(struct lease_ctx_info), GFP_KERNEL);
+ 	if (!lreq)
+-		return NULL;
++		return ERR_PTR(-ENOMEM);
+ 
+ 	if (sizeof(struct lease_context_v2) == le32_to_cpu(cc->DataLength)) {
+ 		struct create_lease_v2 *lc = (struct create_lease_v2 *)cc;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index d8a827e0dced..119c1ba5f255 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2767,8 +2767,9 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 				}
+ 			}
+ 
+-			if (((lc && (lc->req_state & SMB2_LEASE_HANDLE_CACHING_LE)) ||
+-			     req_op_level == SMB2_OPLOCK_LEVEL_BATCH)) {
++			if ((!IS_ERR_OR_NULL(lc) > 0 &&
++			     (lc->req_state & SMB2_LEASE_HANDLE_CACHING_LE)) ||
++			    req_op_level == SMB2_OPLOCK_LEVEL_BATCH) {
+ 				dh_info->CreateGuid =
+ 					durable_v2_blob->CreateGuid;
+ 				dh_info->persistent =
+@@ -2788,8 +2789,9 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 				goto out;
+ 			}
+ 
+-			if (((lc && (lc->req_state & SMB2_LEASE_HANDLE_CACHING_LE)) ||
+-			     req_op_level == SMB2_OPLOCK_LEVEL_BATCH)) {
++			if ((!IS_ERR_OR_NULL(lc) &&
++			     (lc->req_state & SMB2_LEASE_HANDLE_CACHING_LE)) ||
++			    req_op_level == SMB2_OPLOCK_LEVEL_BATCH) {
+ 				ksmbd_debug(SMB, "Request for durable open\n");
+ 				dh_info->type = dh_idx;
+ 			}
+@@ -2935,8 +2937,13 @@ int smb2_open(struct ksmbd_work *work)
+ 			ksmbd_put_durable_fd(fp);
+ 			goto reconnected_fp;
+ 		}
+-	} else if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE)
++	} else if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE) {
+ 		lc = parse_lease_state(req);
++		if (IS_ERR(lc)) {
++			rc = PTR_ERR(lc);
++			goto err_out2;
++		}
++	}
+ 
+ 	if (le32_to_cpu(req->ImpersonationLevel) > le32_to_cpu(IL_DELEGATE)) {
+ 		pr_err("Invalid impersonationlevel : 0x%x\n",
 -- 
 2.34.1
 
