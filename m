@@ -1,88 +1,104 @@
-Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442511547D1
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Aug 2024 19:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.167.250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0A31C7B8F
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Aug 2024 23:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724183773; cv=none; b=qi1ACuqge1S39Dla4+Qet+WFDoennPTuFF8bIxCNxAd/s0dedLsAKAcUju7gpbPaCss5AkHDgO9mUk9eYvLOkLtNpZox7kr88RvvpI/iVlzLcmeONZkAS5N5690x1Axnp5Po9La9D6p7ipZlDfk0QeKORWcBMc/x+JbBCMwNTDo=
+	t=1724196083; cv=none; b=j89hLO5j691ThRPtDwLD8IroEPTqwXq+0vb6JS34KG+gG84qaAgXz3UV6ATezFMFidMaUj6bHVzOE2+Ve9yyPDMqH3+l0PmIJ8ceX6kNvpyQnssfkFc0lexfZdmPDpZSpQQ6CK1adu+C+uitAyMbOnWJ9x6yOJVU47KW4jf26gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724183773; c=relaxed/simple;
-	bh=bgxP1K3EHDN+0qetcPDJ8+MzG2NCZziiXQwzHM7KGxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MiO8m5dFtfCBUFyatpAGTiFhOjYFwNpvo749JFgGLKofr64XcXabel7R/GiQPULldGTrcjuOtMVgXQQ4AB8jRV39WdSvXf9XspyI4sGrwa6XQGJRBx4IVwMXLhshMyo6mfBrv/qkN0WQSdXwPgPfrE1zxKjnHq5b1knVBPsLMmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com; spf=pass smtp.mailfrom=moonlit-rail.com; dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=MPQYBEMO; dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=ZLYrX+pz; arc=none smtp.client-ip=45.79.167.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=moonlit-rail.com
+	s=arc-20240116; t=1724196083; c=relaxed/simple;
+	bh=VIiPmwmjpJuuOg36PkDA9EDqjYYvPo2xpfcKotIB4Uc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W5mAU2WtnyU7zoDVpbpHfZPnvcsnJJqPXgZFgH5YZo8VjC2Ml6vPWtTsjkvdDzDTri8A/iVat2Wl6V5/Xy0o1Q/cMWcpNSSojWfMbnpSRKJk4mTDqIrQAS58/oD2rzzgGVq6tluIWkeC3I3UlPoBXBYJT4oi7mac0CtzCaF/cG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4KPVdg4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="MPQYBEMO";
-	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="ZLYrX+pz"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fYz/49UhLPCJC42P3oJF0I1uubIHC+nwlrTBNzmM1Ao=; t=1724182399; x=1726774399; 
-	b=MPQYBEMOknTSO/q/y/OtozbUYLZUcRSzjpLWsLeWxfvDyLaf6/v075LI72m+6oQbmNllGDm/CQf
-	ahgqSBSUutTSBrho2udCqQndNUcqj+cJEMyKS3oEG5SrUpdst90b/6b92saivZvs3D5wTagcglHDR
-	6CLrAJgj3WbfpSq0/Issi8HL+UnRXBrJjG6013cL9XzIb3c5xw2fNRfMWWS54ITNs/ERdLatrRxAK
-	51b4Z59VgbNza3P5SPp9cSOTAC8n1+bqEpco3MNMANxBIPC7ffQNmjIjrW2UsY3ws1BAy1vTIj7GR
-	JPJMumNTnWDv+mQSnnwBtvqQVIP+7fyMyp/w==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fYz/49UhLPCJC42P3oJF0I1uubIHC+nwlrTBNzmM1Ao=; t=1724182399; x=1726774399; 
-	b=ZLYrX+pzal/vt9Ahq4PjDcysu5cUcEBKAo2ZRXr9sU/wUN7uUL+EINIum6ThJud/DF1Z31y02Wb
-	yodVR0oxtDA==;
-Message-ID: <4c563891-973c-46a4-8964-0ef90b1c7e49@moonlit-rail.com>
-Date: Tue, 20 Aug 2024 15:33:18 -0400
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4KPVdg4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724196080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fCjK9t7HkWPXdjZnzcV3YJhj3lK29P+RVZIMnJ9iM+Q=;
+	b=V4KPVdg400KgZ49bZRQ3gGLVjr1rtyweqobR7cPPwoSu8M0SdOPgcgKU+kAjwNO2gAsziv
+	ghXPUFy3Ni2NSlEqw/lDigfwj2s5bgYCbHVzjJMtk8ORr9WSJlSd5bPhBfpoBU42POv+05
+	/9MyEplP1VAD2xlcgeDkeH9aVQPUAUA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-IHAldsebOD2s3EiBWC1CDA-1; Tue,
+ 20 Aug 2024 19:21:16 -0400
+X-MC-Unique: IHAldsebOD2s3EiBWC1CDA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 259D41955F40;
+	Tue, 20 Aug 2024 23:21:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.30])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C53DE19560AA;
+	Tue, 20 Aug 2024 23:21:07 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] mm, netfs, afs: Truncation fixes
+Date: Wed, 21 Aug 2024 00:20:54 +0100
+Message-ID: <20240820232105.3792638-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CIFS lockup regression on SMB1 in 6.10
-To: Steve French <smfrench@gmail.com>,
- matoro <matoro_mailinglist_kernel@matoro.tk>
-Cc: Linux Cifs <linux-cifs@vger.kernel.org>, Bruno Haible <bruno@clisp.org>
-References: <cca852e55291d5bb86ea646589b197d5@matoro.tk>
- <CAH2r5msAXgYs7=5D=YxGa8XohegJwpTn6yasVyZCmPmPt1QA9w@mail.gmail.com>
- <bf5a6d9797f33d256b9fffeb79014242@matoro.tk>
- <CAH2r5mta2N-hE=uJERWxz3w3hzDxwTpvhXsRhEM=sAzGaufsWw@mail.gmail.com>
-Content-Language: en-US, en-GB
-From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-In-Reply-To: <CAH2r5mta2N-hE=uJERWxz3w3hzDxwTpvhXsRhEM=sAzGaufsWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Steve French wrote:
-> What is the simplest repro you have seen - e.g. is there a git tree
-> with very small source that fails with configure that you could share?
+Hi Christian,
 
-Simplest and easiest way to reproduce is:
-   1. Put a bunch of photographs on the server
-   2. rm -rf $HOME/.cache/thumbnails
-   3. mount -t cifs -o vers=1.0 //Server/Photos /mnt
-   4. { geeqie | gwenview | digikam | ...}  /mnt
+Here are some fixes for truncation, netfslib and afs that I discovered whilst
+trying Pankaj Raghav's minimum folio order patchset:
 
-Just the process of generating dozens of thumbnail files in parallel 
-will cause a lockup (for me) in short order.
+ (1) Fix truncate to make it honour AS_RELEASE_ALWAYS in a couple of places
+     that got missed.
 
-I'm new to this thread, just found it because I was curious if anybody 
-else has reported this, or whether I needed to start a new thread.  Glad 
-it's already being worked on.  Don't remember just when this started, 
-maybe around 6.10.3 or 6.10.4?  Can bisect if need be.
+ (2) Fix duplicated editing of a partially invalidated folio in afs's
+     post-setattr edit phase.
 
-Kris
+ (3) Fix netfs_release_folio() to indicate that the folio is busy if the
+     folio is dirty (as does iomap).
 
-PS I'm not on linux-cifs, so CC me if you want me to see it.
+ (4) Fix the trimming of a folio that contain streaming-write data when
+     truncation occurs into or past that folio
 
-PPS Looking for UNIX Extensions in SMB/CIFS vers=2.0+ that are
-     supported by Samba, but I'm starting to lose hope.
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+
+Thanks,
+David
+
+David Howells (4):
+  mm: Fix missing folio invalidation calls during truncation
+  afs: Fix post-setattr file edit to do truncation correctly
+  netfs: Fix netfs_release_folio() to say no if folio dirty
+  netfs: Fix trimming of streaming-write folios in netfs_inval_folio()
+
+ fs/afs/inode.c  | 11 +++++++---
+ fs/netfs/misc.c | 53 +++++++++++++++++++++++++++++++++++--------------
+ mm/truncate.c   |  4 ++--
+ 3 files changed, 48 insertions(+), 20 deletions(-)
 
