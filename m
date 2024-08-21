@@ -1,116 +1,81 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2313C1531F4
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 12:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6543B14F135
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 15:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724242507; cv=none; b=iDe52dMdAt83rpBVhWs9VXFhADnqqBF19JXyWW6vcme9QSDpOefFQ7jwVJ3pY7COggGbkeeg9TOyPSts0FAsXN4b7KIxnbhP6gIc0zhXLumtGMhEpTjbExiD/odEfE6jrJ/PnENtLDI2xeTc4MUQ9nU2qaGN2DkGdLZ7paO7zVo=
+	t=1724255880; cv=none; b=HpMxl84GKHURDy9+oleSZBeRLrFUA+oo6fhS+y2lIZ5NuiUv7RopsMfY93/FWDzKW5RrDuc7Wj7oYswtnD95xdaTV+X3aAwaHYKEGyKl9ZFDjO55mtAJ0aGzCYDbztLwb7CXPVDIcJg15So3mKYLlXR7zO2g2RXRsmj6L/LpMns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724242507; c=relaxed/simple;
-	bh=jK5BjIqpQqsO/cvRq29rjymLsF0TNSsugjheUGqnUgk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jeOE59OOunVKSrbESfqVndZggYMpytYouWfKx1HUqKe2QD44kTZlefsAiK9IlRTpMvKf8FbKOfipJbcD0wAs3knUZsYGofQIUDVppRU1jaAaVfCSeqKfQCyZbsCBFwMR1qXaw8806Y/ZS+7BLqmYJ+UTCeg4p3D3XZWJzb/PgOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLoOnw5f; arc=none smtp.client-ip=209.85.210.53
+	s=arc-20240116; t=1724255880; c=relaxed/simple;
+	bh=BIW4iLJEWe29Eh8K40DCAgzRNV9is+ePhXzNiuVMfyE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=kZZkVvnFpHD5Q3twa0cYIUv6TC/OPCWVU5JzaoB9zKoUygF4J7kieaPcNoTHE2jaJbJ+ZPQYuyTgwwbynzrLFa0H6zqHkoVlF4RExtKCK/pdQOCBJntTF5XLECnpUah5NaoIwKav3je/E3ZvYir4/i6X1Q/aVPjnZrB/ibO0H44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aqQUlA+v; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLoOnw5f"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7093efbade6so4224585a34.2
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 05:15:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aqQUlA+v"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52f04b4abdcso8729960e87.2
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 08:57:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724242505; x=1724847305; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4kc5viHI18gT+Gengg5j5Fct/QoHhm0St/45SexA5c=;
-        b=DLoOnw5fr+8y+14Dt89RQ5pN2+c74c3bUYrAaRz7qep+QsdWgEPinhdYvE0urKmVmH
-         EuCQJIhIurlkJCvvE6v8eZi7Ur2zsCj8epe/PkwrpKt8csUsdmTaE9NLQoDYYMtAUxsO
-         /8gvmr5jct1znlexa7ZCju2Fq5zIKkAIhLmMPbx9L14aHWFrZcXKZADrrnn54Op9pg5p
-         vexAkxwabuQYinX7oeahT1izrxTfnPB8Uj1bFfPPvJCoEWZYLAo51eChC5TO+B8LqpTk
-         P3fkTAbtBAMhGXK0KTG/lZdd/uIJ8mmc/t4WN0HHFs5sbBLhfqLT9C8FbjCP+ebWHHU1
-         q0Sw==
+        d=gmail.com; s=20230601; t=1724255876; x=1724860676; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eGNGO2uvY56vUZH6mFvyOPdmZDbNvIRo3dnZ0pU/ySM=;
+        b=aqQUlA+vMkIoROaI+nWviQ4rJNK6B6yvhPCTzFuFn/H0JQJ7wrniTu+yacumDlBL55
+         0UqMbkSIC874hryALRWFDWRBMI4XWZ2FYP+A0mlFZx9usKcVAzbJkQnT2O9sSloKjzZW
+         KO/+ZRq+KDXm6rnFqN95Yq1nq5M5AMUz8vFARZsMrwzBA7ME/Ux9klynDI6Sl6prNkGx
+         tAlv+m0rfsr8bgep6hNyR3G4RKrIBZcCEOqRe9Y6VCvrLSYy4FgMd1CGsKdUHaS5qMgJ
+         Ivjl27GWMHT9FX4omsKeHnIXX06Gt6VC8uwrIacjavkf7JiV2XuS2iDx4qnfRD4xy7ja
+         UvcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724242505; x=1724847305;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u4kc5viHI18gT+Gengg5j5Fct/QoHhm0St/45SexA5c=;
-        b=LXOhZOhdlKyf6/bVPFajy3YePCYEpOBVRIeCdcI7UWFeKQ9B7qo59kSy4N8jvRso4+
-         xkqXNCZNJk4aedVL914KKP8PgzpiC63bM0SNIlJPCSU6/2Sf1wMt2IKxWoOujO0JtEcw
-         VoZGTo60ZG4llyScb8VXBG+sjRLTLyzo/XU5c+Fs65VZgRVDhjsVccDpg89ahP2qMdwh
-         9mK+wxKjbidWRA1dDv9Sc3qDOCEZBbQrKBXdGOWMNbgVLbwB5HFylPVlwwzauTql/ANI
-         LhasY/JZVd7BrWB69NzBr050QrHq3y3/L5iZZgrAUQ5UqEAbVy9aeotl5xbxAGoKRK/0
-         YxEA==
-X-Gm-Message-State: AOJu0YzeUok9zJ/LDV1sgWGrwQAQhROitUk5pi303ZRQquB/Qt5XRTsF
-	5hcMCiEVgw8uLxR+zGKWEmD8+vBPI/xKBhPnijOlpDdzz/O1wskpOtCv8tGwuoCk5mu7kzfHdJP
-	0Yl4GCtNlBEZR2EzMAAqNwsA+KsqVPS2Ny+U=
-X-Google-Smtp-Source: AGHT+IGoR0dTwbYpBN94+nLQDP+V/e8acYhgRccg/v+CVUPBuoYF/qenFxS0bHZ6dzmIig8Hek/78YQUP86qFFALzfw=
-X-Received: by 2002:a05:6830:4184:b0:709:419f:2ae7 with SMTP id
- 46e09a7af769-70df8a951f7mr2495829a34.29.1724242505060; Wed, 21 Aug 2024
- 05:15:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724255876; x=1724860676;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eGNGO2uvY56vUZH6mFvyOPdmZDbNvIRo3dnZ0pU/ySM=;
+        b=m3QSwLplzDXVqSJpA6TPveQI0t7jaVwEyzJpdL0lUH2yTlZNhKv0AUXdJDeMKlPSa6
+         K2P0dPLO/9bbmDXk4HVUzAzuAS0zouoksb9UTCZYsYLoao9TzBQhIJOFrWTZiZxerfie
+         XXTHPwFd5PBh+rxgymNAZL6A+bvEIl3sPYIBVz+INVBGUMj3UFljsPOGT7rRmu8mVUAz
+         88EwuD1y0cx5pBGPWAau0dFXcjEEg2RMf3UqRjfyhM8KSoOItDid0sB7J8j1mkXTtIWB
+         olkhLhMvncNbdvzCMS1Phxpf5CYkymnnjO+rNtaRWEgCell2ZvZJMQb+l4oWSbC2TbFh
+         angA==
+X-Gm-Message-State: AOJu0YyJY4r4MMrLAOHwYK7d6+6zrGXSViPcgigMmFE77yHPpfQkv0zO
+	ftdOjjAuNe8IMuw4U7+M8xOmKl6YRoloids40iXCNYiaJp2crG80ofGMVf8+PdHZtg6NW3B38gw
+	9q1CHT+c1kMM06dX3HXtrxEJPkwE=
+X-Google-Smtp-Source: AGHT+IF+0hEFmIUeAhcvxa3+ecoDmFJ+ZGPVQR7RCXbLBMk1PmvbmpDXchfmRSTemnKkS9zHDvmQ6JRkqDGDH/za0EQ=
+X-Received: by 2002:a05:6512:2210:b0:52e:f2a9:b21a with SMTP id
+ 2adb3069b0e04-533485545afmr1653090e87.19.1724255876267; Wed, 21 Aug 2024
+ 08:57:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMHwNVv-B+Q6wa0FEXrAuzdchzcJRsPKDDRrNaYZJd6X-+iJzw@mail.gmail.com>
- <54a46d0e05c754fbc5643af2b576e876@manguebit.com>
-In-Reply-To: <54a46d0e05c754fbc5643af2b576e876@manguebit.com>
-From: Marc <1marc1@gmail.com>
-Date: Wed, 21 Aug 2024 22:14:54 +1000
-Message-ID: <CAMHwNVvAT-qeRvJ0jV2+5byHQnwzW9-YFj13ovXFC+M8hAfmyQ@mail.gmail.com>
-Subject: Re: Issue with kernel 6.8.0-40-generic?
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 21 Aug 2024 10:57:45 -0500
+Message-ID: <CAH2r5mtUTOFgaQMbsWwkAD-XDRiVwyAGT=Q7n9i5Sd6Wf=9q+Q@mail.gmail.com>
+Subject: Samba server multichannel session setup regression?
+To: samba-technical <samba-technical@lists.samba.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Shyam Prasad N <nspmangalore@gmail.com>, 
+	Paulo Alcantara <pc@manguebit.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Happy to help and assist where I can, but I have no idea how I would
-try this updated code. I think it involves compiling a kernel and
-applying the patch to it. This is not something I have ever done or
-have an idea on how to go about it.
+Mounting multichannel from Linux to Samba server on localhost
+(even current master Version 4.22.0pre1-GIT-8edb1fd13c1 but I also see
+it failing on Samba 4.21 - but it works fine on Samba 4.19.5 and has
+worked for years)
 
+I see many repeated:
 
-Op wo 21 aug 2024 om 09:45 schreef Paulo Alcantara <pc@manguebit.com>:
->
-> Marc <1marc1@gmail.com> writes:
->
-> > This has been working great for many years. Yesterday, this stopped
-> > working. When I tried mounting the share, I would get the following
-> > error: "mount error(95): Operation not supported". In dmesg I see:
-> > "VFS: parse_reparse_point: unhandled reparse tag: 0x9000601a" and
-> > "VFS: cifs_read_super: get root inode failed".
->
-> Can you try the following changes?  Thanks.
->
-> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> index 689d8a506d45..48c27581ec51 100644
-> --- a/fs/smb/client/reparse.c
-> +++ b/fs/smb/client/reparse.c
-> @@ -378,6 +378,8 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
->                         u32 plen, struct cifs_sb_info *cifs_sb,
->                         bool unicode, struct cifs_open_info_data *data)
->  {
-> +       struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> +
->         data->reparse.buf = buf;
->
->         /* See MS-FSCC 2.1.2 */
-> @@ -394,12 +396,13 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
->         case IO_REPARSE_TAG_LX_FIFO:
->         case IO_REPARSE_TAG_LX_CHR:
->         case IO_REPARSE_TAG_LX_BLK:
-> -               return 0;
-> +               break;
->         default:
-> -               cifs_dbg(VFS, "%s: unhandled reparse tag: 0x%08x\n",
-> -                        __func__, le32_to_cpu(buf->ReparseTag));
-> -               return -EOPNOTSUPP;
-> +               cifs_tcon_dbg(VFS | ONCE, "unhandled reparse tag: 0x%08x\n",
-> +                             le32_to_cpu(buf->ReparseTag));
-> +               break;
->         }
-> +       return 0;
->  }
->
->  int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
+[ 1936.825332] CIFS: Status code returned 0xc000000d STATUS_INVALID_PARAMETER
+[ 1936.825344] CIFS: VFS: \\ Send error in SessSetup = -22
+[ 1936.825353] CIFS: VFS: failed to open extra channel on
+iface:0000:0000:0000:0000:0000:0000:0000:0001 rc=-22
+
+trying to setup additional channels.  Any ideas what changed?
+
+-- 
+Thanks,
+
+Steve
