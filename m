@@ -1,130 +1,100 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AD743AB2
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 16:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442E11B2EE6
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 17:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724258303; cv=none; b=hHZuGVBLJEZEz1G6Ohl7ZjU/Yo6qEZ30CutBH4Cd/D+IPk6pGNEPTkwTBZJwrhLRW/ay/pIt0enRng/HbaTM1MGFmo3vUWo6JId2LiHunxix0DRbNNposdIqwFeJKMycFJD7yfcxbNtK+iDeuXaRjGU1W73gk9so4cgEQ7nSLLU=
+	t=1724261755; cv=none; b=bOgdWeyPrbb0l+e/s8lNAjBbYryqLAN/d3VnVypcfbxgKyDxHVLI0z0JTELqMaag+UsFvtgVE6Q+ZJUQ2y6UbgMpqmwXxoJ7SqATwEXzvbk9Ubb87wtfoN3F3fH1H4pCPM9jUlVClsFTKDG3LfB1Bl86IK+p8tHZM1c3E2/PhUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724258303; c=relaxed/simple;
-	bh=RQowEtLqORhQSTrjlpFQyIHB0C5OpwECFgTHuEbZZbM=;
+	s=arc-20240116; t=1724261755; c=relaxed/simple;
+	bh=PhuTfmbz9z7XR6XarjyeOlpo2Yu76s70LUvF9M3VNmg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=syfDIFVH0Kj/83OZHp30ll6gcp5TuMU7Xwj0d/yzPVW0PzBT9hQ3jULMCPtEpl2+q44SpQTaGdxrqyR55i8XKtwb0hCvpa1TwQEhnoA9bmwqTVydb6a7EDB+brpIV0AOSOX3WD/G8yPllZIsoLi2xMV6Ef5CZgYOT6rZAVoShGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M9q6lG2C; arc=none smtp.client-ip=209.85.161.52
+	 To:Cc:Content-Type; b=qAa2rHR/F6RBrbli3O5UnA+T3SK3HHMrChEQ1z4NHpq36ZIe039qJluQjyNeFPLcuPzDoRuvg94y2CJ6ZCDbL6neZUvSISCzB6cnk5v3y/6OyMJA/kUan0+7Xng/hw29DvhhWF2ichFP03cfvF9uaXEr53HZ6wv1QaNNUrH4sWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MSFJJM09; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M9q6lG2C"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5dcad91e64bso266193eaf.2
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 09:38:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MSFJJM09"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5334879ba28so1247012e87.3
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 10:35:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724258301; x=1724863101; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ux2bSLYi4Lwzuro3wt2W6QOAJogwNq5yskHwfGucrMg=;
-        b=M9q6lG2CG6i82Cr4HSU5e3DwDGT+PjBEzNFAQnuio+N/bibPjmcjpH8wdRLXgu06ml
-         jUB+dJ6XeW6r5WyHkidK7UYIJ7gZnFrzw6crodjZZwLDJjRoworTG1gYj6XF7NISK+Dk
-         9CVE2ubZdIw6If1PAunfH7h7qXG+Yxt2kfTpusHy79ybkDdK1YKBsIkMRhYfRcXwCE+f
-         hetLLu/sdaNGc6Nais90XGBCsh0xLW6k5ICWMElqNRiU7k6ld/bM9qtXL9cWYWs5o2KZ
-         yHlRxWU+7U7Q+Q9pWsEuF2C8f6LQa7EIN+Mk48dO+JTeGf1Er1ccn1WQxa0DPF6Lbvde
-         OQqw==
+        d=gmail.com; s=20230601; t=1724261752; x=1724866552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vwGKPR9dScyEf6RIlTCNqkBAFknVGBL0G4lRztfOGK0=;
+        b=MSFJJM09kH/oy9Cc8/DLc8bRD0+GB96eAkE4hvLdePx8+uBCTx4Zp+o77dcTUMohq7
+         5SRsPFabBRYolzfTsKKGSupDhSmM0/1PvrtXe2H6U3fqWQiOfpTNiv91roZ/7bmAY9+V
+         CUJpi8MCA+h8JQWLGNjuGBEhSiz+DhHK1dx4n1nxLk95B3u6NqUU90kdZS62md3QZn2K
+         A5bK+52t6E1l18dohJRZYf7EvhfWUWjeqIhHOyiQemdcHuNU90cAKkFHyf8o8eGW16Jr
+         JJZLpr15Q6sg9JF4HVnF7OYpbTPSFBVxB1WSCGp3mDOI0aceKH6UW7XqFMC2//zAG+pG
+         xc0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724258301; x=1724863101;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ux2bSLYi4Lwzuro3wt2W6QOAJogwNq5yskHwfGucrMg=;
-        b=V28oe2mqur85cBFtaqPQhU0ZP6UsLJq2PxVAVY7A5i/ONcXMwOaMk8bREkHdJdD8CU
-         kC5sfPnpK1F9/N/lzYCFTAWJa/DiGGB0of7JqqEdSMpjVGhE8hv+6Ou/gSYnGQqKTD9S
-         7gE4A2uRSz9DtD8UKpZH2r13R9yCPVVt4HyiGxOuAhWnnTcwOLgz73Vo4uo53mOxPZKf
-         z2cQdxhftjRrfzulKbFvCyEUElIzCC+mUJc0tSh43zlUFsE9X2PsssAv5QzicUVDxXXu
-         y7my/wfuqLOfKoGILO/Bs2bAICanukZaDhJ0tORkGr026Hfr8RcpxYyU6B14M6T0D2bB
-         ybyg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGt9+mpdIXxNbNW7WpGJ7B6QRgbwYxRx58zCIIXV6jNF7cxEg2L4MhjV/sSdN90K71y7CvQ5IkuwpT@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLCkE9tyQYrD6wCLe/iAS9Hzsjw7Ga6d16uHNYGNUO9NT3BdJ+
-	T238AQiv2Jl0Sq1Oj9YvgOSozcobmM9T27HAsH/DjhiBeVNH49bIFJx6PzSJNyAYDTrJ+dtY9CA
-	57sBPsJQPG3uVnHHYq9gVdNmXOD/8bRPD
-X-Google-Smtp-Source: AGHT+IERLueznaLqeGLmsBiOsIG8vs/UuxVNpWAwPWQciHPKDjXKSbKMkyyq3133EuzOagEnVDbH2WZxY8cKlLjLdpw=
-X-Received: by 2002:a05:6820:178b:b0:5c6:658c:a9f6 with SMTP id
- 006d021491bc7-5dca3c13b7emr3029835eaf.2.1724258300846; Wed, 21 Aug 2024
- 09:38:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724261752; x=1724866552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vwGKPR9dScyEf6RIlTCNqkBAFknVGBL0G4lRztfOGK0=;
+        b=QVjRSlKvAyppjmJKnqlo8STSyLGVThVxtep+kkKbT9j4kzD2Src0FootwZCJcv8KI1
+         7eS2QHeezHCzQKXlywc6JcWsk2FXj1yr4aZ0iloGvU2QyTERNKdc9inTegdFyeb3e2KE
+         Z5PWoCCFf1uAz/lofdJQZOirtLlTN0qJrJF5CIoLEvQb0JRWVk5EK4+JQvssCX/P7HN7
+         dD5wI19NVgpjXEdQWZ6kqq6XTbqjRBkK14sURE6fQvF2ioZUIJnrHjrhevgm1tVVH+70
+         Raq66t9+FkrxXeS7sdlJ4xXAW0gcudX82QrMbH6Lx+QPBfsooV7/vZjSHiWRD6BuaY07
+         Nwrw==
+X-Forwarded-Encrypted: i=1; AJvYcCX17k6QYABmLjirmMuR7r0TxYCXAA5PChv7x3xd+b2/w+1CMSlXNg36Tl6VhGxW1NM5hOc3Ye32QSRD@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPjeXeRnfN4JUbfe1by31DOPCasLnEqplKeLLuaRP/PITBgySB
+	tN+QZUUlb1UwcV1gDBG728VEWcaqCkWSg3x1efPR8CiJqtxzz7MM+Uf3X+ZWHByxdX42nlhwkjV
+	+p6BXmh08reZ2m9Zl4HQ1lTcQmvU=
+X-Google-Smtp-Source: AGHT+IE9XAgPiD6lsAiAE5ZEFlqHmA0fIxRHDUJRB057zPRD7NZpTgiLXjh3OvaSEz1WN1GKPoqf8MG1hKeZ9J4bIrI=
+X-Received: by 2002:a05:6512:2214:b0:52c:8aa6:4e9d with SMTP id
+ 2adb3069b0e04-5334855e05emr2626320e87.29.1724261751977; Wed, 21 Aug 2024
+ 10:35:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMHwNVv-B+Q6wa0FEXrAuzdchzcJRsPKDDRrNaYZJd6X-+iJzw@mail.gmail.com>
- <54a46d0e05c754fbc5643af2b576e876@manguebit.com> <CAMHwNVvAT-qeRvJ0jV2+5byHQnwzW9-YFj13ovXFC+M8hAfmyQ@mail.gmail.com>
-In-Reply-To: <CAMHwNVvAT-qeRvJ0jV2+5byHQnwzW9-YFj13ovXFC+M8hAfmyQ@mail.gmail.com>
-From: Anthony Nandaa <profnandaa@gmail.com>
-Date: Wed, 21 Aug 2024 19:38:09 +0300
-Message-ID: <CAACuyFXv=9WJtVLoTx9xhwUR=WPBbtYM11zEv8LO9biDaU=ZNQ@mail.gmail.com>
-Subject: Re: Issue with kernel 6.8.0-40-generic?
-To: Marc <1marc1@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+References: <CAH2r5mtUTOFgaQMbsWwkAD-XDRiVwyAGT=Q7n9i5Sd6Wf=9q+Q@mail.gmail.com>
+ <f1bc4bde-f1ff-4b52-9cf4-822f94b31a75@samba.org>
+In-Reply-To: <f1bc4bde-f1ff-4b52-9cf4-822f94b31a75@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 21 Aug 2024 12:35:40 -0500
+Message-ID: <CAH2r5muFV2+SXhGmkv5WYawtAyzK0D6y5hFLS4x6542cUwjACg@mail.gmail.com>
+Subject: Re: Samba server multichannel session setup regression?
+To: Ralph Boehme <slow@samba.org>
+Cc: samba-technical <samba-technical@lists.samba.org>, 
+	Shyam Prasad N <nspmangalore@gmail.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sorry my previous reply was with HTML...
+Ugh - I can't reproduce it now.  I added an additional test user
+(smbpasswd -a) and cleaned up a few comments in the smb.conf file and
+interfaces line and it works now.   My best theory is that it was
+triggered due to minor difference in the interfaces line of the newer
+smb.conf
 
-On Wed, 21 Aug 2024 at 15:15, Marc <1marc1@gmail.com> wrote:
+If and when I can reproduce it again, will send you a trace, but when
+I had looked at it before there wasn't anything obvious in the session
+setup on the additional channels that wireshark decoder flaagged.
+
+On Wed, Aug 21, 2024 at 11:11=E2=80=AFAM Ralph Boehme <slow@samba.org> wrot=
+e:
 >
-> Happy to help and assist where I can, but I have no idea how I would
-> try this updated code. I think it involves compiling a kernel and
-> applying the patch to it. This is not something I have ever done or
-> have an idea on how to go about it.
+> Hi Steve,
 >
-I can help with this. Marc, if you can help me with the minimal repro
-steps, is OneDrive needed?
-
+> On 8/21/24 5:57 PM, Steve French wrote:
+> > trying to setup additional channels.  Any ideas what changed?
+> can you show us a network trace please?
 >
-> Op wo 21 aug 2024 om 09:45 schreef Paulo Alcantara <pc@manguebit.com>:
-> >
-> > Marc <1marc1@gmail.com> writes:
-> >
-> > > This has been working great for many years. Yesterday, this stopped
-> > > working. When I tried mounting the share, I would get the following
-> > > error: "mount error(95): Operation not supported". In dmesg I see:
-> > > "VFS: parse_reparse_point: unhandled reparse tag: 0x9000601a" and
-> > > "VFS: cifs_read_super: get root inode failed".
-> >
-> > Can you try the following changes?  Thanks.
-> >
-> > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> > index 689d8a506d45..48c27581ec51 100644
-> > --- a/fs/smb/client/reparse.c
-> > +++ b/fs/smb/client/reparse.c
-> > @@ -378,6 +378,8 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
-> >                         u32 plen, struct cifs_sb_info *cifs_sb,
-> >                         bool unicode, struct cifs_open_info_data *data)
-> >  {
-> > +       struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> > +
-> >         data->reparse.buf = buf;
-> >
-> >         /* See MS-FSCC 2.1.2 */
-> > @@ -394,12 +396,13 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
-> >         case IO_REPARSE_TAG_LX_FIFO:
-> >         case IO_REPARSE_TAG_LX_CHR:
-> >         case IO_REPARSE_TAG_LX_BLK:
-> > -               return 0;
-> > +               break;
-> >         default:
-> > -               cifs_dbg(VFS, "%s: unhandled reparse tag: 0x%08x\n",
-> > -                        __func__, le32_to_cpu(buf->ReparseTag));
-> > -               return -EOPNOTSUPP;
-> > +               cifs_tcon_dbg(VFS | ONCE, "unhandled reparse tag: 0x%08x\n",
-> > +                             le32_to_cpu(buf->ReparseTag));
-> > +               break;
-> >         }
-> > +       return 0;
-> >  }
-> >
-> >  int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
->
+> Thanks!
+> -slow
 
 
--- 
-___
-Nandaa Anthony
+
+--=20
+Thanks,
+
+Steve
