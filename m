@@ -1,59 +1,37 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF0D3C0B
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 03:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724211914; cv=pass; b=QHICqG6XmkTgNzJdj/LLL0IM5iU3Wg5t1MaBnbBv5pa810ZKnJe258lqKb25E0RuC906uVzMA+gT1TlWYllWtAsb44BhdNVsKzGDrup1d3kamDLjIrDtXkUp2wpw9iOhQFyMPRb+FKmGPWikCUkoiV+QFW7a58TXASA5HITsg3I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724211914; c=relaxed/simple;
-	bh=p5c4ArW5QB3tk5afngAqDYJwwZNa/mWK1B3viCNc7iQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bO7HGPGfft2OMS1/70YCShKxh3z75seMbmXwOG7TbvyIzrZddAT4Z8a8jQdQ++hlO2QeT6/0lVm5b2QW/IazISgRzL35aHbRCRrCnXdsY4LwUR+oWCYU0tFVCx1o+x7418tj2kxySOvr7nsAopYeeRmWts+7azPTv1EZBus3024=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=lmfmYvzf; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="lmfmYvzf"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1724211909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=t/IMq/+2dham5KZZerTTUGIhAaKVVOVqsnzXljAaTlw=;
-	b=lmfmYvzf5kBGQCCdxwLPnMq1+s6bPsXPBHh4f1vjrNTUKkpLuFfiCqnkIwOdVR0ngEGMRv
-	2mQczZBujtZXlCZUGiq8+cQSFL3GV9VgzfnPReFhlQ6ULTsmkP0QdlUfjLHGE6x9NKfOx+
-	/aq88W0G51qL/HVyqawNiwotV6s9WKBUo8Xs37LruaNIEKrAorS6Kkbbky2rTZGjvJ4RZ/
-	2VpRosNRGJAk9sN894Mq88StZClTfwhVwcwwNLBs1r3mpbMWbPh3vNzR448J2AKDZzHNc3
-	z/k1TQrdE6agEXn2JTrnrrEajHeYse91NfZt38RhDWK0UfQOzClKBe6R1gTm+w==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1724211909; a=rsa-sha256;
-	cv=none;
-	b=X0GQwigQyOyjtj+wu+abKk5621aRjKX9wrBccEdTEittPpQKQ+TnPAph4zcC6c1+H4od0e
-	krGvWm6GBk1NStKGq8UesKSL6vflLPcnLALfJte/nP29vrOcMy9boF1wMoJ2r/NJuiKFlG
-	u+gyQIvYntEg/7J9Ve4O0s+ltMdho3LiX041QLiVxK7IZ15kYDk2KaI7GqsH2NIhdWNWAi
-	IVmtXEjzG4hUkaZFde/WZcZyi3OYWV1iDTRJvu5hfr7WS1j4BIrTk1dnRn/qLRe216mcfT
-	a8w/siul9GYaTquom3p7j1KXALBIy5e2vqF0VvYYniR3YbOQ3afwE6f7aGpY1g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1724211909; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=t/IMq/+2dham5KZZerTTUGIhAaKVVOVqsnzXljAaTlw=;
-	b=Imp3uWjrRYjlN1tA2BI7CqzLOHxkFWQLZACocQBXbkftjguG1pVCX9OKreUxK6qCpnZDFR
-	IDtI0mCPWena7Xx+Rp6SvZbDoTRslPJVWZ7yhzWOsCv9t5j8BWjMtFOcS+xdBnIIM7ylqa
-	op6Rq1zB1hfEh9qfvoOg4TLbb9IPA5bxZxFNl2Bz7aUtxQZdryxM0B5dML8p59NYAU9vXU
-	dVzs28MHSsKMUSrpVoe7bwVyQ3hA6qsy6dJXxitlZ3LSi5WRy3m4mPF+4xGjvg6518kkEZ
-	ZeskmJ+C4/+TIsMTiCY5PJf5upMt7MBMsjY/9IuMSqCtYPNfY99Qw7xrVBHj8g==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	Marc <1marc1@gmail.com>
-Subject: [PATCH] smb: client: ignore unhandled reparse tags
-Date: Wed, 21 Aug 2024 00:45:03 -0300
-Message-ID: <20240821034503.739532-1-pc@manguebit.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39718186616
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 06:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724222953; cv=none; b=J5yzx2ZjjMn0zTXSvo7vqIHHQert842Sz8WmfNG84k1dEHwCZ6qZVxbVzIRYOGKQdxv5PwqP9mq0XOyTaKSPX0Bn5iyKxujbajiIw+C75sY8KNtXU40Ef3M0Sd4GBXJckSoHHMF1RXmMcCXHH2aKDfxSIB27/oVUyx/Mt0MKKvA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724222953; c=relaxed/simple;
+	bh=YJWqM0aeeaueL08fZdtMD5cu938Xawz7ZIiAHG50QAg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=f4Eus8Lx+PB/vSoDImv4+9sJIc366fZsTBXoZRvP+qbnloG9TGe+Mz2r/BXFTiQHv+xBdqqxHSpQkwNLDAP721VFNQHYf+XES59WLWaS1VaZh+7j5wRjbiuTeeRdsHevMIM9BDrbZYygfvstBdxjTNaIc4GSI2673y16YgmsBbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WpcPX5wxSz1S8Cl;
+	Wed, 21 Aug 2024 14:49:04 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 821371A0188;
+	Wed, 21 Aug 2024 14:49:07 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by dggpeml500022.china.huawei.com
+ (7.185.36.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 21 Aug
+ 2024 14:49:07 +0800
+From: Hongbo Li <lihongbo22@huawei.com>
+To: <sfrench@samba.org>, <pc@manguebit.com>, <ronniesahlberg@gmail.com>,
+	<sprasad@microsoft.com>, <tom@talpey.com>, <bharathsm@microsoft.com>
+CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<lihongbo22@huawei.com>
+Subject: [PATCH -next] smb: use LIST_HEAD() to simplify code
+Date: Wed, 21 Aug 2024 14:56:37 +0800
+Message-ID: <20240821065637.2294496-1-lihongbo22@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -61,49 +39,127 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-Just ignore reparse points that the client can't parse rather than
-bailing out and not opening the file or directory.
+list_head can be initialized automatically with LIST_HEAD()
+instead of calling INIT_LIST_HEAD(). No functional impact.
 
-Reported-by: Marc <1marc1@gmail.com>
-Closes: https://lore.kernel.org/r/CAMHwNVv-B+Q6wa0FEXrAuzdchzcJRsPKDDRrNaYZJd6X-+iJzw@mail.gmail.com
-Fixes: 539aad7f14da ("smb: client: introduce ->parse_reparse_point()")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
 ---
- fs/smb/client/reparse.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ fs/smb/client/connect.c  | 3 +--
+ fs/smb/client/file.c     | 7 ++-----
+ fs/smb/client/misc.c     | 9 +++------
+ fs/smb/client/smb2file.c | 4 +---
+ 4 files changed, 7 insertions(+), 16 deletions(-)
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 689d8a506d45..48c27581ec51 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -378,6 +378,8 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
- 			u32 plen, struct cifs_sb_info *cifs_sb,
- 			bool unicode, struct cifs_open_info_data *data)
- {
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+
- 	data->reparse.buf = buf;
- 
- 	/* See MS-FSCC 2.1.2 */
-@@ -394,12 +396,13 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
- 	case IO_REPARSE_TAG_LX_FIFO:
- 	case IO_REPARSE_TAG_LX_CHR:
- 	case IO_REPARSE_TAG_LX_BLK:
--		return 0;
-+		break;
- 	default:
--		cifs_dbg(VFS, "%s: unhandled reparse tag: 0x%08x\n",
--			 __func__, le32_to_cpu(buf->ReparseTag));
--		return -EOPNOTSUPP;
-+		cifs_tcon_dbg(VFS | ONCE, "unhandled reparse tag: 0x%08x\n",
-+			      le32_to_cpu(buf->ReparseTag));
-+		break;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index d2307162a2de..72092b53e889 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -997,11 +997,10 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
  	}
-+	return 0;
- }
  
- int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
+ 	if (!list_empty(&server->pending_mid_q)) {
+-		struct list_head dispose_list;
+ 		struct mid_q_entry *mid_entry;
+ 		struct list_head *tmp, *tmp2;
++		LIST_HEAD(dispose_list);
+ 
+-		INIT_LIST_HEAD(&dispose_list);
+ 		spin_lock(&server->mid_lock);
+ 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+ 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 1fc66bcf49eb..a5e6c7b63230 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1406,7 +1406,7 @@ void
+ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ {
+ 	struct cifsFileInfo *open_file, *tmp;
+-	struct list_head tmp_list;
++	LIST_HEAD(tmp_list);
+ 
+ 	if (!tcon->use_persistent || !tcon->need_reopen_files)
+ 		return;
+@@ -1414,7 +1414,6 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ 	tcon->need_reopen_files = false;
+ 
+ 	cifs_dbg(FYI, "Reopen persistent handles\n");
+-	INIT_LIST_HEAD(&tmp_list);
+ 
+ 	/* list all files open on tree connection, reopen resilient handles  */
+ 	spin_lock(&tcon->open_file_lock);
+@@ -2097,9 +2096,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+ 	struct cifsInodeInfo *cinode = CIFS_I(d_inode(cfile->dentry));
+ 	struct cifsLockInfo *li, *tmp;
+ 	__u64 length = cifs_flock_len(flock);
+-	struct list_head tmp_llist;
+-
+-	INIT_LIST_HEAD(&tmp_llist);
++	LIST_HEAD(tmp_llist);
+ 
+ 	/*
+ 	 * Accessing maxBuf is racy with cifs_reconnect - need to store value
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index c6f11e6f9eb9..dab526191b07 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -751,12 +751,11 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
+ {
+ 	struct cifsFileInfo *cfile = NULL;
+ 	struct file_list *tmp_list, *tmp_next_list;
+-	struct list_head file_head;
++	LIST_HEAD(file_head);
+ 
+ 	if (cifs_inode == NULL)
+ 		return;
+ 
+-	INIT_LIST_HEAD(&file_head);
+ 	spin_lock(&cifs_inode->open_file_lock);
+ 	list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+@@ -787,9 +786,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ {
+ 	struct cifsFileInfo *cfile;
+ 	struct file_list *tmp_list, *tmp_next_list;
+-	struct list_head file_head;
++	LIST_HEAD(file_head);
+ 
+-	INIT_LIST_HEAD(&file_head);
+ 	spin_lock(&tcon->open_file_lock);
+ 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+@@ -819,11 +817,10 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
+ {
+ 	struct cifsFileInfo *cfile;
+ 	struct file_list *tmp_list, *tmp_next_list;
+-	struct list_head file_head;
+ 	void *page;
+ 	const char *full_path;
++	LIST_HEAD(file_head);
+ 
+-	INIT_LIST_HEAD(&file_head);
+ 	page = alloc_dentry_path();
+ 	spin_lock(&tcon->open_file_lock);
+ 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+index c23478ab1cf8..bc2b838eab6f 100644
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -196,9 +196,7 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+ 	struct cifsInodeInfo *cinode = CIFS_I(d_inode(cfile->dentry));
+ 	struct cifsLockInfo *li, *tmp;
+ 	__u64 length = 1 + flock->fl_end - flock->fl_start;
+-	struct list_head tmp_llist;
+-
+-	INIT_LIST_HEAD(&tmp_llist);
++	LIST_HEAD(tmp_llist);
+ 
+ 	/*
+ 	 * Accessing maxBuf is racy with cifs_reconnect - need to store value
 -- 
-2.46.0
+2.34.1
 
