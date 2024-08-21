@@ -1,176 +1,408 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDE21B2ED8
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 17:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F39171066;
+	Wed, 21 Aug 2024 19:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724263138; cv=none; b=gjDD4AV016bIMiTPQPCnIHiTzyAYIU3Y+BAvwLO0ZmCnngrNsg+CXzJl9/UbFcLkwzbi4HdT2iZeCMZcpty0N9AeEyLAd2fy+fHuB9jdLMHhI6QFFwryB8RNiy9hvU26ZcdDNxJBGOHsZeUgwR3naGKD03AYRzpe4xyxqEMmlfA=
+	t=1724269889; cv=none; b=YRGGoL2Kb/WBMaEbJxSZN86OH5a24yplT+JI8J+CLBGQvEpm1NrpVtjF1jn6yookOrzTgGLGDuHY0J/aqE9iuw71wKUjBwhy8LlKjCmfAk8MaNeRrqVVdFEWNisOUGT9KLl67Lp9sHA4xOHjzEmiXQRYeBHJO53DiMmhzHKQC48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724263138; c=relaxed/simple;
-	bh=zLYVAI0AMx0lOZOwwY6rFfbdy1oZzo2dp9h2GncrmHc=;
+	s=arc-20240116; t=1724269889; c=relaxed/simple;
+	bh=RV79pZyAk89wV7IZyPRZ3c+JwWNAY79LO4tqoiruEt0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rdOb0VLSaKuGTxr43+OJT4UhXOUCvArWrzg7OEyW5lJrXA530ttu+LBcW1zCPFIS72DnzuojjbQMvrnMA1kfkbwE8efkO4zyIdaeybrBq/5mtuRtRFUhA0gSMxox8dqPs4E1F0n4Ga2Sm48l2C3HYjT2pOi9FuI2rfbiGnzI45A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXLCcOfd; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=Yuaa0vVLADIsaq0ue6jm4MG98h4GXQSGhEAT27YQG1j6GwA3sIVoXQlJ2FzjzlupmP0kkpf86V5JQtZAn51FjNYlp/sxpXU4XMmkv9cimm0NRuFMySOoUAcymHS35ggctuPb3d6Zshbdn1G9usqTD2+GP8Qu5HVbcw5ug7CXb2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzkFwFLg; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXLCcOfd"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53349ee42a9so1207190e87.3
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2024 10:58:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzkFwFLg"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-530e062217eso88522e87.1;
+        Wed, 21 Aug 2024 12:51:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724263134; x=1724867934; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724269885; x=1724874685; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kEnl5JpwKoLp7CUhLYM7L9M6fvqY0FjR0W3FS/KZxcw=;
-        b=AXLCcOfdLZPUogcBMDtGVcNQKVOb9QAMNtm6GMZtgoDBNRKRBvaowH4kvZyba6mh45
-         vhEzZG7A9fPd/iDfNgUq7gSGesuF5FpNX8NmwDcdS9JgbtgynD+y/Un/qb9QRuYacJxP
-         WqHC/MGOonl6MlJKftbpBtsjtjCrlYJKTskL7hmbB27Kdt3/4wByU7KEl6koW7GX++OA
-         vqhmE2dhm4gRfpgD5d/nB6Gn/hipIVKLX7TNZqiUCTvuadSLme71Dsr9+ItLywprVUUa
-         syv4A2RsSklarTgQ32S02YqI337XSleI0L31bpFss3zFOkc65RMaXxWIgn7bzL424W9s
-         r8Hg==
+        bh=NLhmbmyjy8hjjCX4hi+KvgP62vWsvB01yymrRQ6wR8U=;
+        b=OzkFwFLgCi9UuNvNF39tKPBx5EvXKilh5DN+QKKQUmV/i+2SwHvF/dmivEOYAeNhRi
+         clxV/mPidhkfp/XpKCfThMbOHz2r4RTN9Sl6BjePTn5BRgVuBkj/jijIy04Mh6W0MEZI
+         3Djy/tJoDuSXwZNfn7y05P954Xfg87F6+NBCdC3gRVINWZTZPw8MpZuiEz4MgoSIhHah
+         1ENZDX+CC9eKuSJQGLAmBk7scDpzjZ1OBJW9llycltaoV1ETzjeTHiQfs0bakVaI9/RN
+         OoiLQZewxb9MoDf86GpqN6bGEGUZzdtn2uY//PhFkO2amg6ZHIn83j+N/de8qbGcZO7p
+         Pidw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724263134; x=1724867934;
+        d=1e100.net; s=20230601; t=1724269885; x=1724874685;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kEnl5JpwKoLp7CUhLYM7L9M6fvqY0FjR0W3FS/KZxcw=;
-        b=Pp6zKfDGMKpdbjUv0xgTNyp6eJpQYV8CTASR77unmFg4Pzxt6b29/35Y28Vlkitu3/
-         /lmUlUKZPc+VB7cIiboSuIyewJ3VfPE02o0LC4248Gotowdj+l7R7Qa6KrLwh4cSg5j4
-         YU/x96/fLwOsjk/wbbTYHWQbcNv19jfl7O8B3Jf6GHmyyAcw64KWUSEufTAaXFoXNcOL
-         n3mxyBCcPHX+j9SH23FRg96xsLnVjHLBV7+HEVO8gnuoW1UrOXsA4BLgHf/2jQaW8FPu
-         6FvsB5otc3mo2s4vYx2UUQxf/B0jmBDWhKWWz+TC1vgHkG9L0GcEmnItM18xGU5cvO87
-         /kQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpOozy54WqY7Yae6b9gHL9CUGYL7qjIEuLVaFWPtoqMeegyPu551nuG4NNPDAJUHWIkCGqPyrd7Ckd@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2ACa8OjE4Ykmp/JaEMSjMXFTkmG10lt5snpMiBeOX4+vI7Uyo
-	qw+BfElZ0SyLQE0NVTq2ygcGgd9JpYYIFSTmuNVnQk6upTLcve3p/EIWIkCzt0JRQL/oYs9G6Xs
-	H8GZoL4K0UAVidWZvhxVN3CT+P0o=
-X-Google-Smtp-Source: AGHT+IEkwMjDXCzSH1Q87waUhKLykt2GWifJoUPj5O7ARGzUiE1UCrG0L3arXHpAG0ekmILzUCONXZWKT0wwL0WZsis=
-X-Received: by 2002:a05:6512:128b:b0:52c:deba:7e6e with SMTP id
- 2adb3069b0e04-533485656ebmr1663383e87.29.1724263134254; Wed, 21 Aug 2024
- 10:58:54 -0700 (PDT)
+        bh=NLhmbmyjy8hjjCX4hi+KvgP62vWsvB01yymrRQ6wR8U=;
+        b=P/kD6OYCu1OY4Qp6Oiq70v/lUC3VIABGLd1ExDE+oysinincqQlrRLZ3sp+ClrMYy7
+         MNPSNGAq8VGSfnH/dFh7JxFgrmAFJTDkY6oy/tbQhS57Npn/O6qqroVBDNWG8DRWZOl/
+         e5Dgv7KXAJiqyZCKqSZSN0SsI+npPi3SBVxgtOIyE3M7AQANtdVF8aMv9UFUAudjyp39
+         /fKsPdUTJnimAHbYdNB7o4tY1v9CV6PU7fBuzfWwv1fcZMZUm9kXIPU0EbwQxwy6pp1M
+         VDQE7zO/wFZ2DnqNMDtsL8scHHNTDFSaoFEN/2VboUGmXZz5baqoICPQJrsZuZNwvBUJ
+         3Yqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBP5B+iqx8xNSlxt2H40HrnvGHTyN2gY7EWFMu3iln5ol6eneHKApoprhxD5HN2rlYE+hVdz2msPA/EExm@vger.kernel.org, AJvYcCXtKyN5LT2ICcDTeFTCGbCHDCuunu+ZX0vaVNgvo+Nr8jWIhOx2ltC4OuPXwxSWZ5hw91r23uTC6TO1@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze3JCy6cbWrRmWCy+rPpD7rHiRp8YiwgP0ZDK3vp5OvxqRreSv
+	CvOA77SgyGP+dztlso8SXVd311XXlwnCdBHpXT+TcYEFNzvFDtxSIrWrc5fBLW7nM6uDASPULPr
+	vy09iHBViPwUrA+BF3WuulcBkLYc=
+X-Google-Smtp-Source: AGHT+IEMrbeSwRdWjgmxAGOa3TjA1C7uJECxwBInD7Fo+ycURP+9D3FjDzGHtsh+R8OBdkZKKO9/5zUY+TqrbeE4d0E=
+X-Received: by 2002:a05:6512:118f:b0:530:b871:eb9a with SMTP id
+ 2adb3069b0e04-533485efb26mr2437461e87.47.1724269885056; Wed, 21 Aug 2024
+ 12:51:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMHwNVv-B+Q6wa0FEXrAuzdchzcJRsPKDDRrNaYZJd6X-+iJzw@mail.gmail.com>
- <54a46d0e05c754fbc5643af2b576e876@manguebit.com> <CAMHwNVvAT-qeRvJ0jV2+5byHQnwzW9-YFj13ovXFC+M8hAfmyQ@mail.gmail.com>
- <CAACuyFU2va16OGn7_i-Ur-TEic7AW7pQj3c3xrPT1P2HJts9bg@mail.gmail.com> <CAACuyFWrejfaYiFU8REzj=uTFg88qi7guL1oQg3zqnDWY-vR_w@mail.gmail.com>
-In-Reply-To: <CAACuyFWrejfaYiFU8REzj=uTFg88qi7guL1oQg3zqnDWY-vR_w@mail.gmail.com>
+References: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com> <20240820143319.274033-7-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20240820143319.274033-7-chenxiaosong@chenxiaosong.com>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 21 Aug 2024 12:58:43 -0500
-Message-ID: <CAH2r5mv-V=H0QF205oZTc0Y3yfUchEyk4Y-QqFvVJgpJhxPWRw@mail.gmail.com>
-Subject: Re: Issue with kernel 6.8.0-40-generic?
-To: Anthony Nandaa <profnandaa@gmail.com>
-Cc: Marc <1marc1@gmail.com>, Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+Date: Wed, 21 Aug 2024 14:51:13 -0500
+Message-ID: <CAH2r5mt37quVDJsjqpKsaFi8PhT0PBeKyjn8x6CMowZr5GvAyA@mail.gmail.com>
+Subject: Re: [PATCH 6/8] smb: move some duplicate definitions to common/smbacl.h
+To: chenxiaosong@chenxiaosong.com
+Cc: linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org, 
+	tom@talpey.com, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
+	bharathsm@microsoft.com, chenxiaosong@kylinos.cn, liuzhengyuan@kylinos.cn, 
+	huhai@kylinos.cn, liuyun01@kylinos.cn
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-thx for testing this.  Have added your tested-by.  Let me know if any
-followon patches or issues.
+merged into cifs-2.6.git for-next-next (target for 6.12-rc1) but fixed
+the typo in author !=3D Signed-off-by
 
-On Wed, Aug 21, 2024 at 12:43=E2=80=AFPM Anthony Nandaa <profnandaa@gmail.c=
-om> wrote:
+On Tue, Aug 20, 2024 at 9:43=E2=80=AFAM <chenxiaosong@chenxiaosong.com> wro=
+te:
 >
-> I have now tested the patch.
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> On Wed, 21 Aug 2024 at 18:55, Anthony Nandaa <profnandaa@gmail.com> wrote=
-:
-> >
-> > I can help with this. Marc, if you can help me with the minimal repro s=
-teps, is OneDrive needed?
-> >
-> >
-> > On Wed, Aug 21, 2024, 15:15 Marc <1marc1@gmail.com> wrote:
-> >>
-> >> Happy to help and assist where I can, but I have no idea how I would
-> >> try this updated code. I think it involves compiling a kernel and
-> >> applying the patch to it. This is not something I have ever done or
-> >> have an idea on how to go about it.
-> >>
-> >>
-> >> Op wo 21 aug 2024 om 09:45 schreef Paulo Alcantara <pc@manguebit.com>:
-> >> >
-> >> > Marc <1marc1@gmail.com> writes:
-> >> >
-> >> > > This has been working great for many years. Yesterday, this stoppe=
-d
-> >> > > working. When I tried mounting the share, I would get the followin=
-g
-> >> > > error: "mount error(95): Operation not supported". In dmesg I see:
-> >> > > "VFS: parse_reparse_point: unhandled reparse tag: 0x9000601a" and
-> >> > > "VFS: cifs_read_super: get root inode failed".
-> >> >
-> >> > Can you try the following changes?  Thanks.
-> >> >
-> I see that the patch is in
-> for-next@80dd92d6ac7d1bc4b95d0a9f4d7730fe5ee42162, so I have just used
-> that to build a new module.
+> In order to maintain the code more easily, move duplicate acl
+> definitions to new common header file.
 >
-> I created a share from one of the directories in my OneDrive:
+> Signed-off-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+> ---
+>  fs/smb/client/cifsacl.h | 58 +--------------------------
+>  fs/smb/common/smbacl.h  | 88 +++++++++++++++++++++++++++++++++++++++++
+>  fs/smb/server/smbacl.h  | 80 +------------------------------------
+>  3 files changed, 91 insertions(+), 135 deletions(-)
+>  create mode 100644 fs/smb/common/smbacl.h
 >
->     sudo mount -t cifs //WIN-31GSG2M9E6N/Users/Usa/OneDrive/Shuttle
-> /mnt/shuttle -o username=3D...,password=3D...
+> diff --git a/fs/smb/client/cifsacl.h b/fs/smb/client/cifsacl.h
+> index ccbfc754bd3c..74cff8a121e5 100644
+> --- a/fs/smb/client/cifsacl.h
+> +++ b/fs/smb/client/cifsacl.h
+> @@ -9,8 +9,7 @@
+>  #ifndef _CIFSACL_H
+>  #define _CIFSACL_H
 >
-> Before the patch, the mounting was failing but after building with the
-> patch, it mounted successfully.
+> -#define NUM_AUTHS (6)  /* number of authority fields */
+> -#define SID_MAX_SUB_AUTHORITIES (15) /* max number of sub authority fiel=
+ds */
+> +#include "../common/smbacl.h"
 >
-> Aug 21 17:25:32 ubuntu-test-2 kernel: CIFS: VFS: parse_reparse_point:
-> unhandled reparse tag: 0x9000601a
-> Aug 21 17:25:32 ubuntu-test-2 kernel: CIFS: VFS: cifs_read_super: get
-> root inode failed <~~~~ FAIL
-> ...
-> Aug 21 17:31:22 ubuntu-test-2 kernel: CIFS: Attempting to mount
-> //WIN-31GSG2M9E6N/Users/Administrator/OneDrive/Shuttle
-> ...
-> Aug 21 17:31:22 ubuntu-test-2 kernel: CIFS: VFS:
-> \\WIN-31GSG2M9E6N\Users unhandled reparse tag: 0x9000601a
-> ^^^ SUCCESS.
+>  #define READ_BIT        0x4
+>  #define WRITE_BIT       0x2
+> @@ -23,12 +22,6 @@
+>  #define UBITSHIFT      6
+>  #define GBITSHIFT      3
 >
-> >> > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> >> > index 689d8a506d45..48c27581ec51 100644
-> >> > --- a/fs/smb/client/reparse.c
-> >> > +++ b/fs/smb/client/reparse.c
-> >> > @@ -378,6 +378,8 @@ int parse_reparse_point(struct reparse_data_buff=
-er *buf,
-> >> >                         u32 plen, struct cifs_sb_info *cifs_sb,
-> >> >                         bool unicode, struct cifs_open_info_data *da=
-ta)
-> >> >  {
-> >> > +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
-> >> > +
-> >> >         data->reparse.buf =3D buf;
-> >> >
-> >> >         /* See MS-FSCC 2.1.2 */
-> >> > @@ -394,12 +396,13 @@ int parse_reparse_point(struct reparse_data_bu=
-ffer *buf,
-> >> >         case IO_REPARSE_TAG_LX_FIFO:
-> >> >         case IO_REPARSE_TAG_LX_CHR:
-> >> >         case IO_REPARSE_TAG_LX_BLK:
-> >> > -               return 0;
-> >> > +               break;
-> >> >         default:
-> >> > -               cifs_dbg(VFS, "%s: unhandled reparse tag: 0x%08x\n",
-> >> > -                        __func__, le32_to_cpu(buf->ReparseTag));
-> >> > -               return -EOPNOTSUPP;
-> >> > +               cifs_tcon_dbg(VFS | ONCE, "unhandled reparse tag: 0x=
-%08x\n",
-> >> > +                             le32_to_cpu(buf->ReparseTag));
-> >> > +               break;
-> >> >         }
-> >> > +       return 0;
-> >> >  }
-> >> >
-> >> >  int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
-> >>
+> -#define ACCESS_ALLOWED 0
+> -#define ACCESS_DENIED  1
+> -
+> -#define SIDOWNER 1
+> -#define SIDGROUP 2
+> -
+>  /*
+>   * Security Descriptor length containing DACL with 3 ACEs (one each for
+>   * owner, group and world).
+> @@ -37,24 +30,6 @@
+>                               sizeof(struct cifs_acl) + \
+>                               (sizeof(struct cifs_ace) * 4))
 >
+> -/*
+> - * Maximum size of a string representation of a SID:
+> - *
+> - * The fields are unsigned values in decimal. So:
+> - *
+> - * u8:  max 3 bytes in decimal
+> - * u32: max 10 bytes in decimal
+> - *
+> - * "S-" + 3 bytes for version field + 15 for authority field + NULL term=
+inator
+> - *
+> - * For authority field, max is when all 6 values are non-zero and it mus=
+t be
+> - * represented in hex. So "-0x" + 12 hex digits.
+> - *
+> - * Add 11 bytes for each subauthority field (10 bytes each + 1 for '-')
+> - */
+> -#define SID_STRING_BASE_SIZE (2 + 3 + 15 + 1)
+> -#define SID_STRING_SUBAUTH_SIZE (11) /* size of a single subauth string =
+*/
+> -
+>  struct cifs_ntsd {
+>         __le16 revision; /* revision level */
+>         __le16 type;
+> @@ -80,37 +55,6 @@ struct cifs_acl {
+>         __le32 num_aces;
+>  } __attribute__((packed));
 >
+> -/* ACE types - see MS-DTYP 2.4.4.1 */
+> -#define ACCESS_ALLOWED_ACE_TYPE        0x00
+> -#define ACCESS_DENIED_ACE_TYPE 0x01
+> -#define SYSTEM_AUDIT_ACE_TYPE  0x02
+> -#define SYSTEM_ALARM_ACE_TYPE  0x03
+> -#define ACCESS_ALLOWED_COMPOUND_ACE_TYPE 0x04
+> -#define ACCESS_ALLOWED_OBJECT_ACE_TYPE 0x05
+> -#define ACCESS_DENIED_OBJECT_ACE_TYPE  0x06
+> -#define SYSTEM_AUDIT_OBJECT_ACE_TYPE   0x07
+> -#define SYSTEM_ALARM_OBJECT_ACE_TYPE   0x08
+> -#define ACCESS_ALLOWED_CALLBACK_ACE_TYPE 0x09
+> -#define ACCESS_DENIED_CALLBACK_ACE_TYPE        0x0A
+> -#define ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE 0x0B
+> -#define ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE  0x0C
+> -#define SYSTEM_AUDIT_CALLBACK_ACE_TYPE 0x0D
+> -#define SYSTEM_ALARM_CALLBACK_ACE_TYPE 0x0E /* Reserved */
+> -#define SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE 0x0F
+> -#define SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE 0x10 /* reserved */
+> -#define SYSTEM_MANDATORY_LABEL_ACE_TYPE        0x11
+> -#define SYSTEM_RESOURCE_ATTRIBUTE_ACE_TYPE 0x12
+> -#define SYSTEM_SCOPED_POLICY_ID_ACE_TYPE 0x13
+> -
+> -/* ACE flags */
+> -#define OBJECT_INHERIT_ACE     0x01
+> -#define CONTAINER_INHERIT_ACE  0x02
+> -#define NO_PROPAGATE_INHERIT_ACE 0x04
+> -#define INHERIT_ONLY_ACE       0x08
+> -#define INHERITED_ACE          0x10
+> -#define SUCCESSFUL_ACCESS_ACE_FLAG 0x40
+> -#define FAILED_ACCESS_ACE_FLAG 0x80
+> -
+>  struct cifs_ace {
+>         __u8 type; /* see above and MS-DTYP 2.4.4.1 */
+>         __u8 flags;
+> diff --git a/fs/smb/common/smbacl.h b/fs/smb/common/smbacl.h
+> new file mode 100644
+> index 000000000000..b46341d56e6a
+> --- /dev/null
+> +++ b/fs/smb/common/smbacl.h
+> @@ -0,0 +1,88 @@
+> +/* SPDX-License-Identifier: LGPL-2.1+ */
+> +/*
+> + *   Copyright (c) International Business Machines  Corp., 2007
+> + *   Author(s): Steve French (sfrench@us.ibm.com)
+> + *   Modified by Namjae Jeon (linkinjeon@kernel.org)
+> + */
+> +
+> +#ifndef _COMMON_SMBACL_H
+> +#define _COMMON_SMBACL_H
+> +
+> +#define NUM_AUTHS (6)  /* number of authority fields */
+> +#define SID_MAX_SUB_AUTHORITIES (15) /* max number of sub authority fiel=
+ds */
+> +
+> +/*
+> + * ACE types - see MS-DTYP 2.4.4.1
+> + */
+> +enum {
+> +       ACCESS_ALLOWED,
+> +       ACCESS_DENIED,
+> +};
+> +
+> +/*
+> + * Security ID types
+> + */
+> +enum {
+> +       SIDOWNER =3D 1,
+> +       SIDGROUP,
+> +       SIDCREATOR_OWNER,
+> +       SIDCREATOR_GROUP,
+> +       SIDUNIX_USER,
+> +       SIDUNIX_GROUP,
+> +       SIDNFS_USER,
+> +       SIDNFS_GROUP,
+> +       SIDNFS_MODE,
+> +};
+> +
+> +/* ACE types - see MS-DTYP 2.4.4.1 */
+> +#define ACCESS_ALLOWED_ACE_TYPE 0x00
+> +#define ACCESS_DENIED_ACE_TYPE  0x01
+> +#define SYSTEM_AUDIT_ACE_TYPE   0x02
+> +#define SYSTEM_ALARM_ACE_TYPE   0x03
+> +#define ACCESS_ALLOWED_COMPOUND_ACE_TYPE 0x04
+> +#define ACCESS_ALLOWED_OBJECT_ACE_TYPE  0x05
+> +#define ACCESS_DENIED_OBJECT_ACE_TYPE   0x06
+> +#define SYSTEM_AUDIT_OBJECT_ACE_TYPE    0x07
+> +#define SYSTEM_ALARM_OBJECT_ACE_TYPE    0x08
+> +#define ACCESS_ALLOWED_CALLBACK_ACE_TYPE 0x09
+> +#define ACCESS_DENIED_CALLBACK_ACE_TYPE 0x0A
+> +#define ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE 0x0B
+> +#define ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE  0x0C
+> +#define SYSTEM_AUDIT_CALLBACK_ACE_TYPE  0x0D
+> +#define SYSTEM_ALARM_CALLBACK_ACE_TYPE  0x0E /* Reserved */
+> +#define SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE 0x0F
+> +#define SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE 0x10 /* reserved */
+> +#define SYSTEM_MANDATORY_LABEL_ACE_TYPE 0x11
+> +#define SYSTEM_RESOURCE_ATTRIBUTE_ACE_TYPE 0x12
+> +#define SYSTEM_SCOPED_POLICY_ID_ACE_TYPE 0x13
+> +
+> +/* ACE flags */
+> +#define OBJECT_INHERIT_ACE             0x01
+> +#define CONTAINER_INHERIT_ACE          0x02
+> +#define NO_PROPAGATE_INHERIT_ACE       0x04
+> +#define INHERIT_ONLY_ACE               0x08
+> +#define INHERITED_ACE                  0x10
+> +#define SUCCESSFUL_ACCESS_ACE_FLAG     0x40
+> +#define FAILED_ACCESS_ACE_FLAG         0x80
+> +
+> +/*
+> + * Maximum size of a string representation of a SID:
+> + *
+> + * The fields are unsigned values in decimal. So:
+> + *
+> + * u8:  max 3 bytes in decimal
+> + * u32: max 10 bytes in decimal
+> + *
+> + * "S-" + 3 bytes for version field + 15 for authority field + NULL term=
+inator
+> + *
+> + * For authority field, max is when all 6 values are non-zero and it mus=
+t be
+> + * represented in hex. So "-0x" + 12 hex digits.
+> + *
+> + * Add 11 bytes for each subauthority field (10 bytes each + 1 for '-')
+> + */
+> +#define SID_STRING_BASE_SIZE (2 + 3 + 15 + 1)
+> +#define SID_STRING_SUBAUTH_SIZE (11) /* size of a single subauth string =
+*/
+> +
+> +#define DOMAIN_USER_RID_LE     cpu_to_le32(513)
+> +
+> +#endif /* _COMMON_SMBACL_H */
+> diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
+> index 2b52861707d8..3e44bb77d6b0 100644
+> --- a/fs/smb/server/smbacl.h
+> +++ b/fs/smb/server/smbacl.h
+> @@ -8,6 +8,7 @@
+>  #ifndef _SMBACL_H
+>  #define _SMBACL_H
+>
+> +#include "../common/smbacl.h"
+>  #include <linux/fs.h>
+>  #include <linux/namei.h>
+>  #include <linux/posix_acl.h>
+> @@ -15,32 +16,6 @@
+>
+>  #include "mgmt/tree_connect.h"
+>
+> -#define NUM_AUTHS (6)  /* number of authority fields */
+> -#define SID_MAX_SUB_AUTHORITIES (15) /* max number of sub authority fiel=
+ds */
+> -
+> -/*
+> - * ACE types - see MS-DTYP 2.4.4.1
+> - */
+> -enum {
+> -       ACCESS_ALLOWED,
+> -       ACCESS_DENIED,
+> -};
+> -
+> -/*
+> - * Security ID types
+> - */
+> -enum {
+> -       SIDOWNER =3D 1,
+> -       SIDGROUP,
+> -       SIDCREATOR_OWNER,
+> -       SIDCREATOR_GROUP,
+> -       SIDUNIX_USER,
+> -       SIDUNIX_GROUP,
+> -       SIDNFS_USER,
+> -       SIDNFS_GROUP,
+> -       SIDNFS_MODE,
+> -};
+> -
+>  /* Revision for ACLs */
+>  #define SD_REVISION    1
+>
+> @@ -62,57 +37,6 @@ enum {
+>  #define RM_CONTROL_VALID       0x4000
+>  #define SELF_RELATIVE          0x8000
+>
+> -/* ACE types - see MS-DTYP 2.4.4.1 */
+> -#define ACCESS_ALLOWED_ACE_TYPE 0x00
+> -#define ACCESS_DENIED_ACE_TYPE  0x01
+> -#define SYSTEM_AUDIT_ACE_TYPE   0x02
+> -#define SYSTEM_ALARM_ACE_TYPE   0x03
+> -#define ACCESS_ALLOWED_COMPOUND_ACE_TYPE 0x04
+> -#define ACCESS_ALLOWED_OBJECT_ACE_TYPE  0x05
+> -#define ACCESS_DENIED_OBJECT_ACE_TYPE   0x06
+> -#define SYSTEM_AUDIT_OBJECT_ACE_TYPE    0x07
+> -#define SYSTEM_ALARM_OBJECT_ACE_TYPE    0x08
+> -#define ACCESS_ALLOWED_CALLBACK_ACE_TYPE 0x09
+> -#define ACCESS_DENIED_CALLBACK_ACE_TYPE 0x0A
+> -#define ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE 0x0B
+> -#define ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE  0x0C
+> -#define SYSTEM_AUDIT_CALLBACK_ACE_TYPE  0x0D
+> -#define SYSTEM_ALARM_CALLBACK_ACE_TYPE  0x0E /* Reserved */
+> -#define SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE 0x0F
+> -#define SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE 0x10 /* reserved */
+> -#define SYSTEM_MANDATORY_LABEL_ACE_TYPE 0x11
+> -#define SYSTEM_RESOURCE_ATTRIBUTE_ACE_TYPE 0x12
+> -#define SYSTEM_SCOPED_POLICY_ID_ACE_TYPE 0x13
+> -
+> -/* ACE flags */
+> -#define OBJECT_INHERIT_ACE             0x01
+> -#define CONTAINER_INHERIT_ACE          0x02
+> -#define NO_PROPAGATE_INHERIT_ACE       0x04
+> -#define INHERIT_ONLY_ACE               0x08
+> -#define INHERITED_ACE                  0x10
+> -#define SUCCESSFUL_ACCESS_ACE_FLAG     0x40
+> -#define FAILED_ACCESS_ACE_FLAG         0x80
+> -
+> -/*
+> - * Maximum size of a string representation of a SID:
+> - *
+> - * The fields are unsigned values in decimal. So:
+> - *
+> - * u8:  max 3 bytes in decimal
+> - * u32: max 10 bytes in decimal
+> - *
+> - * "S-" + 3 bytes for version field + 15 for authority field + NULL term=
+inator
+> - *
+> - * For authority field, max is when all 6 values are non-zero and it mus=
+t be
+> - * represented in hex. So "-0x" + 12 hex digits.
+> - *
+> - * Add 11 bytes for each subauthority field (10 bytes each + 1 for '-')
+> - */
+> -#define SID_STRING_BASE_SIZE (2 + 3 + 15 + 1)
+> -#define SID_STRING_SUBAUTH_SIZE (11) /* size of a single subauth string =
+*/
+> -
+> -#define DOMAIN_USER_RID_LE     cpu_to_le32(513)
+> -
+>  struct ksmbd_conn;
+>
+>  struct smb_ntsd {
+> @@ -131,7 +55,7 @@ struct smb_sid {
+>         __le32 sub_auth[SID_MAX_SUB_AUTHORITIES]; /* sub_auth[num_subauth=
+] */
+>  } __packed;
+>
+> -/* size of a struct cifs_sid, sans sub_auth array */
+> +/* size of a struct smb_sid, sans sub_auth array */
+>  #define CIFS_SID_BASE_SIZE (1 + 1 + NUM_AUTHS)
+>
+>  struct smb_acl {
 > --
-> ___
-> Nandaa Anthony
+> 2.34.1
+>
+>
 >
 
 
