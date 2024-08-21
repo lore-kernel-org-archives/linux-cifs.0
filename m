@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D23316C685;
-	Wed, 21 Aug 2024 23:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E3B1422A8;
+	Wed, 21 Aug 2024 23:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724283652; cv=none; b=sSKL+ZdTuIpzTmLsfpUpeXM6nObu444e2kUW7saobr9mOwZBnP01rKtkFEAmTkavetzbfFUASN9qhRhmp1IsxjB8gFECqwE0GJOehWOlPb2JwwkuSF2x3CBWJhQA6+r0RzRYy5OHDUZjGTndKqZfP5gZE3CmtFarntWFGMAFm4Y=
+	t=1724284115; cv=none; b=tLJr3FR4jOUR4sXUgVgwEI/o95KSKYrw3OEtJ+P0norPFatNO3hgQ2FC7/UBKb2wGHPD/BT0Rk6tHorFayoMpyZl4iIaj+gmQh2ZcWrB1jPByeJU43aHrd7Db+2/Q/8WB51tXLpGPdV0q0aJXfwxXjgGZmZXNZRX9bnYu1ElFXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724283652; c=relaxed/simple;
-	bh=xfOu1APNQvpg4pWUI6tcCCbT79a5zsaUUrty1laMGdE=;
+	s=arc-20240116; t=1724284115; c=relaxed/simple;
+	bh=hXSJ4Mmd9gPQrlu3YE7bd5xMU96bAR9vgU4B86SF1FA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NrPu8vnYagWVUr52dtoBLGJ74lbtxokJd+xUfIZw0TrrjOZ2q6MAhwyo7ylG2q93L74LZmAlnOs2XgTcblfbVNkPM51M69F8bOpeUq379rtEOiOw7L/2PqQLumoC0dasEoEp+9XcxnR06OLxtEw6/suVPbwMbL4ol6yZZnJfFWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/jVneDI; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=c+S1I2PUxQoDrAgTBgNotJMpxRG7PGSFcW1e5PClPOPim8KH5xjLSW5KCZBjR+daonDPG4W2GsHM4rxcxxu/AkK8RAsIU5zoJr4bXaZbjihZt4VJOagcYvex8qXmhL+63C1p9eBQ3MJ6qYlCw3I9gjlGrFheJkJRKd0d5WZeAcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GIsrpYOt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/jVneDI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D2CC4AF12;
-	Wed, 21 Aug 2024 23:40:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GIsrpYOt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF0C9C32781;
+	Wed, 21 Aug 2024 23:48:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724283652;
-	bh=xfOu1APNQvpg4pWUI6tcCCbT79a5zsaUUrty1laMGdE=;
+	s=k20201202; t=1724284115;
+	bh=hXSJ4Mmd9gPQrlu3YE7bd5xMU96bAR9vgU4B86SF1FA=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=F/jVneDIPhuM+1bI5RLUHR9ZARaFJoPl/6IZq/i/GYJ5ftvrWZfyo6YsN/n9wZKQi
-	 iy7eOBazta0o/BW1lxqWbei8Fo2W/agbBzs/npFZdflMfoAX80FZYiLSAXYC/6HXAF
-	 qkuOwAxlkXgrhWOre+y0girkDjlZ4Kk4PzIHaRwrvLqAWjvdW52g/ocNlZeOCDcJ6A
-	 hd3M+Og6FGfmC+rEPCS+F/Ea6K8YZasseYwMgQvAATGus6UkXV+z3eru3+djLrwTCx
-	 npQnOybR4JLZm5HY2N6qYqNzPehKGlcx9lXiPVrftj3XqiGcU6wuvw/rZvqpxSQ67Z
-	 DBJwGuXqr8Udg==
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2700d796019so126125fac.2;
-        Wed, 21 Aug 2024 16:40:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUVaXm0OHSF1qspk3cr9ADdhnx9trPTu1DfxKNzqBOEPNScuuWzR8RtVrrkGnq7ANK0XnlLCeH0Su7dDTaI@vger.kernel.org, AJvYcCUvdUkAqNBSdcHKElrqELe8lRc0lWnCCAmXIVOh2fzq52bfiUpcPB6W44lc4DStx3sRyghFMLW9Ghnh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxztw9foNNFhRrI6OImzUJkem09/2qFJvk1/SCOTqceOGHJ9Caw
-	dJnyEfSrdRes2AMsIL/hHzXnYeQ8IVfe5liypRtVjCdubrEXbDZ96dy25bW3OCY+5SdCggkBucx
-	Z9+A/JHjYzbW10R1lypG9vKMAuus=
-X-Google-Smtp-Source: AGHT+IEq5ojOSmud30JUGoLSL72Hb5cP1FvPYiuW9TxXSafGQu4tpiF9A8jKd4Hil+2NHsYZeG0VLB/D/rpDNhgzXZw=
-X-Received: by 2002:a05:6870:b488:b0:270:2e19:7734 with SMTP id
- 586e51a60fabf-273cfc390d4mr258890fac.12.1724283651458; Wed, 21 Aug 2024
- 16:40:51 -0700 (PDT)
+	b=GIsrpYOtDeCU1G7jUVZrTXaeZ25v3Vf+4IAV15NPYnUAZJSFK2BdBZbMKt/0wyAjO
+	 nhGIyIGqEfMKGKn00zuhtLPwj1627ifCz4ITQDVSKDrKt3UcQtElLoWQwxEIYEjS38
+	 vxQiCbQi3xBkmQKCxI3X7z2a7BhV7qX2JeW2prwhpxP7Ykt4jhyqqPp1rZVcsCVFsT
+	 bHZ3RejFRglQdQc+ehUlKfozBpgTP3RH4dtLELOth0Vwf2/ysbgqUMijyTS8Zs7+nP
+	 3gmNIL23HpueWx8miV7s9n8Rj1uid71Rl+F5VpK+mc8RSpMl8J+sZKbjfan9akDPnw
+	 r4uaoUA7/y6Dw==
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-270298a3b6eso86610fac.3;
+        Wed, 21 Aug 2024 16:48:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUuuM8jOy3EXxfh8ViLaPeZWqzkXDSyeiaLmxQCd3L82A26ozBjyfgrHDeYWEMSNDNFdEXOIil4q+Zf@vger.kernel.org, AJvYcCVuwwnjc+hz4RFnHHhEPIK+s2s24XfancSp1HNg+/KD0f44AaTE4YPhUW8RzH+E/GWxET9JgMSOmog4bIwX@vger.kernel.org
+X-Gm-Message-State: AOJu0YynJcNeaEJUxtSzY7QNVfK7OvhZ8ooJ37fHdu0gSJyt2K4/RQne
+	wXkIc386ilSodxy1KfeO70Mr9ApfN910QcS+IZgKhpHK9ItXX8KTPanKX0uAcTkf4/RR2mkUwSm
+	UumMsWfQ1MmGqgdGTLVX4cLmnECc=
+X-Google-Smtp-Source: AGHT+IGkO0u6+FCMiR6QA14j6GO/MRJsNyrOSex6RyFNb/McI8uR3YJ5IM/x4P8mfsK9ypmuwDrW0vBm6nMnmE8AW6I=
+X-Received: by 2002:a05:6870:2248:b0:261:877:7459 with SMTP id
+ 586e51a60fabf-2738be38e6dmr4145472fac.38.1724284114333; Wed, 21 Aug 2024
+ 16:48:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com> <20240820143319.274033-9-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20240820143319.274033-9-chenxiaosong@chenxiaosong.com>
+References: <20240820143319.274033-1-chenxiaosong@chenxiaosong.com> <20240820143319.274033-7-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20240820143319.274033-7-chenxiaosong@chenxiaosong.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Aug 2024 08:40:40 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8-J+ZjnmQbaX4FLuKxwLMtYF_dj0G+7sv7nRo2knN=fQ@mail.gmail.com>
-Message-ID: <CAKYAXd8-J+ZjnmQbaX4FLuKxwLMtYF_dj0G+7sv7nRo2knN=fQ@mail.gmail.com>
-Subject: Re: [PATCH 8/8] smb: move SMB2 Status code to common header file
+Date: Thu, 22 Aug 2024 08:48:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8mX+2gRuPyEuamg-nCTdyLb7G6bYKw0YiUrGb2GGTaaQ@mail.gmail.com>
+Message-ID: <CAKYAXd8mX+2gRuPyEuamg-nCTdyLb7G6bYKw0YiUrGb2GGTaaQ@mail.gmail.com>
+Subject: Re: [PATCH 6/8] smb: move some duplicate definitions to common/smbacl.h
 To: chenxiaosong@chenxiaosong.com
 Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, pc@manguebit.com, 
@@ -63,18 +63,12 @@ ote:
 >
 > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> There are only 4 different definitions between the client and server:
->
->   - STATUS_SERVER_UNAVAILABLE: from client/smb2status.h
->   - STATUS_FILE_NOT_AVAILABLE: from client/smb2status.h
->   - STATUS_NO_PREAUTH_INTEGRITY_HASH_OVERLAP: from server/smbstatus.h
->   - STATUS_INVALID_LOCK_RANGE: from server/smbstatus.h
->
-> Rename client/smb2status.h to common/smb2status.h, and merge the
-> 2 different definitions of server to common header file.
+> In order to maintain the code more easily, move duplicate acl
+> definitions to new common header file.
 >
 > Signed-off-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Looks good to me:)
+If you rename the prefix of cifs_ntsd, cifs_sid, cifs_acl struct, we
+can move more ones to /common/smbacl.h.
+Looking forward to the next patch.
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-
 Thanks!
