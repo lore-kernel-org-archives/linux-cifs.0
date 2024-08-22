@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6527119E7D8;
-	Thu, 22 Aug 2024 11:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172B91C93C9;
+	Thu, 22 Aug 2024 11:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724327743; cv=none; b=ZPeHhpg4bCrLd0CHcZ+UXMv76MpoSZUkw+jPaRyWO3NA4EQfcoj63rhHrCqEvwuBJk1Hmv4HoAzYBwp1XcN3zlX6jt5EQefKnKQE5xEvp3I1a9di1aDdR7pwe0eeNPAJVI1LvbQscgRzBAHn1C26Iecv49wrUTOJYt/M3uiwneQ=
+	t=1724327831; cv=none; b=Af/KR+Des7mCC70a2IX/Cq/vXaZHLZddFItawj6/xMd2lW3dWCnG3zaKwDcza3pUw2QCC83zDcAwQNEGGISYDr+vZU0bBHK85WNTAI6I+3Igf8IKlqMQbNaTF4iTH3NKM6l1w/Ibu107ELYf/wYFYVM51Fr7cjkQz1Rrvxxis4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724327743; c=relaxed/simple;
-	bh=xyyYSHlpETdxXpgwIpg+3WZM1dT9wVjT8Zwh1foGbqg=;
+	s=arc-20240116; t=1724327831; c=relaxed/simple;
+	bh=eIvJwYWNWLdxSUlyhPRI8/XCAOzbPZ1AflvgFAZEnzY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nDLnhfaMkmsNj2BQDBFKnRefDxsTNj0VzjY/PyVwRmsowp4RhbKf0FIy9jBmrbpwCgCYstk1fY0OJGobB0FcXgnS3xQngF5yJHnQeb1d//3tCMPEK1bKK07tOyd0IxQ4Pr97QV62VTAc7S0oLT8AdQBPxOkkD/bRjEGSr3dBHsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbE8IaIh; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=oOnaQL5WHe4PVXmJ3cyWRzDrv6Djj8nqB9mxpHg7p2qf0TdfsAfXO9BhVIhGVTsapp7nsHkhIsBj8rQMQoF9JXzas5hTAbcl5M15z3+mdu6MVKZSLQRdfg1rLhKSBQINBvOEx5tMMYBmGCmlIf4fAewUMhT0Flsy8zwJPqieBqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxaxJ5AR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbE8IaIh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2CEC4AF13;
-	Thu, 22 Aug 2024 11:55:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxaxJ5AR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB43C4AF10;
+	Thu, 22 Aug 2024 11:57:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724327743;
-	bh=xyyYSHlpETdxXpgwIpg+3WZM1dT9wVjT8Zwh1foGbqg=;
+	s=k20201202; t=1724327830;
+	bh=eIvJwYWNWLdxSUlyhPRI8/XCAOzbPZ1AflvgFAZEnzY=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RbE8IaIh+qFR9m9mAiPJstYgtt1NZV6+n4Jcm/DYWkuj6jDGnv/0x9TiO0zRRqZRN
-	 NQHl4hGFT17ykVyEIyHaGDT3KhFyo9/5erjyDe4C1jDuOsM832eTf72jKTF6S7RRZl
-	 rVvWqI+d/8Ydtb/CKOy5w9Ww+KsLta4VBJP92WeKtRo7PaTAVygJOBr07kYoqRlbZY
-	 92wso2zAsnPvRZ4gsXKzHItGIy6/7ie6Itp8nQ5fvSGH9tPUSCDkiQOYvo4mA6mWZB
-	 nCcfXBF/l5aDryBRY9JTSVy3DmiFzBFYBWhHtzLaJ29MxktVQa53ZfGK4qyo9IOE4t
-	 KhvGILOv99yfw==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5334a8a1b07so1016442e87.1;
-        Thu, 22 Aug 2024 04:55:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVQXkbBLWTBq0TXHYFOFTlxnIhBBLAdYpi35JU7ddzSW611wS2raLRN3V/fAjm33OBY5rFfzaHednQN@vger.kernel.org, AJvYcCVv+hhCfHgez4mwx6rtXXC8MlmR6Gjs3V3dVwMkQ1H7yvReulgLVfSiwbuiIcI9AHZe7ZKuV3cxAbcUa6U8@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhJeAuFJ+cVwfnJPD3VFARmTitdJ893vL8BrZj8aT8dUNeef9A
-	Xih8n6EzetSrlC6RVdq8BcBJS8CJ8CyeUlbBZGsvANKsQM2V1lrFf4EmMKc9FYjzlYvCjrBbVXA
-	4dpUWTxn1ptnCmXIRZLmviAzLpO4=
-X-Google-Smtp-Source: AGHT+IE1gy1iDsFbXQ02n/87I53EUf1zm9XfxU3SKWRARAL0monG66bMYMWqjeqi6UB73LrbwRHcIAQYMivYiiBFuYQ=
-X-Received: by 2002:a05:6512:2244:b0:530:aa09:b6bf with SMTP id
- 2adb3069b0e04-5334fc0027amr1076551e87.24.1724327741295; Thu, 22 Aug 2024
- 04:55:41 -0700 (PDT)
+	b=hxaxJ5ARQhBkkKkvxpsMsFMKRyV0Th6TAIDgb+VpZ2zqz2Tmtu5lAKPDOyoPerhbW
+	 YWf2pU+SUOES1tIa/nbXWAMPbHvc9Y2OnHsfbSue2jecPyWE7yp3mJX+FdOLdGuUj5
+	 4Msd0uwxA8x+Qv/Y9kfT/ZYjeb5VQYMtFkO05F5MsPVpYBR9dE7h5W2yrzL5VpZEyt
+	 BPxQztXFGAa2xvj4itAsM1kHZFItCnkf/iO8JwPRiZ0KwuoSCGv+ey118stzNz+3Nz
+	 0P/MDvLE2Qcf4iSUP+dYBVDvMZhGePD7gLDVKgPDCehA19YPmws/NQKtnXkAkFM3B+
+	 jpvRgw1tYdPrQ==
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2702a00aad4so399853fac.1;
+        Thu, 22 Aug 2024 04:57:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUyP0D5XvYGIzD94BpcqEHaw6nz8nCtEhD6TD3wl40mflhf5wkJel5jkbRgmVWndn6jgVinfvbChNNv@vger.kernel.org, AJvYcCVd0ESqoiT2pkSQHhaaXnVVDJQe/nZTOyCitb5BTAdYyEafJHZJWyBRmF70rpPcv7+TngrHIhDPplGSVjtN@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMCj0WemlyixNAJPl/wO1YI+d8KmQiwW0gqFNg/qGMKtRz8Rsz
+	nnFOe61m9Y5U6UrcK9rM+KcF4waViWkif7icsrp0IcpCOGpMPZkshAMPNusxfKNI1b/eGSicuNn
+	XRU83UCPiOyODDyMfnkwnEtL1O5M=
+X-Google-Smtp-Source: AGHT+IGyf3NGdl2vPrw3MYVNPwFiGVpI83bsESwsu7qk95GyHE6/BKjmHu/B4y6C4/OQzAjYvsDApd38bvTF4K3+lWM=
+X-Received: by 2002:a05:6870:2116:b0:261:1342:26b1 with SMTP id
+ 586e51a60fabf-2738be908e3mr5173419fac.48.1724327829985; Thu, 22 Aug 2024
+ 04:57:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com> <20240822082101.391272-9-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20240822082101.391272-9-chenxiaosong@chenxiaosong.com>
+References: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com> <20240822082101.391272-7-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20240822082101.391272-7-chenxiaosong@chenxiaosong.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Aug 2024 20:55:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8-FmNH9gxGJniVNEXOpTYH8bD8Z0wHTjDN87WBDjYnOQ@mail.gmail.com>
-Message-ID: <CAKYAXd8-FmNH9gxGJniVNEXOpTYH8bD8Z0wHTjDN87WBDjYnOQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/12] smb/client: rename cifs_acl to smb_acl
+Date: Thu, 22 Aug 2024 20:56:58 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-4UwpcqfA0=7bfkDu+0yHcXsPH3or=BNWnfsVDxfPYaA@mail.gmail.com>
+Message-ID: <CAKYAXd-4UwpcqfA0=7bfkDu+0yHcXsPH3or=BNWnfsVDxfPYaA@mail.gmail.com>
+Subject: Re: [PATCH v2 06/12] smb/client: rename cifs_ntsd to smb_ntsd
 To: chenxiaosong@chenxiaosong.com
 Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, pc@manguebit.com, 
@@ -68,7 +68,7 @@ te:
 > Use the following shell command to rename:
 >
 >   find fs/smb/client -type f -exec sed -i \
->     's/struct cifs_acl/struct smb_acl/g' {} +
+>     's/struct cifs_ntsd/struct smb_ntsd/g' {} +
 >
 > Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Looks good to me.
