@@ -1,55 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E644A1C93CF;
-	Thu, 22 Aug 2024 11:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DC01C93DE;
+	Thu, 22 Aug 2024 11:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724327387; cv=none; b=kQt5yj9CpcqNkuxwji0TALHrc5keOCdIf0N3Ewd82ja77y1yAmQoWF0qYJD39W6gmuIn3JKTvvXCcthbt9WbshbMjjnKCTKKsEvLmYzg3kI9c2XmQ/MqSaA5TmeXYd55l+ypsH1YKCkolbQlMUdtvSFuNhoFHJ856oxxi7zo32w=
+	t=1724327406; cv=none; b=t9wrZIcUcfCrHkT2w9hyd3UM9mzW7F1zRG4dOzzdg3wob9A8uR8LcBQVcQ5GcUKz4jH6xA+SqCU2PuZ0b+FWKrGaJFmipx4/1M+uRBImjz/SYhwstYeZBVEf5hILBhjjtB2TKJUv7MQ1+NaUCWzRxSmzSnwLEhiUNrDs844YN9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724327387; c=relaxed/simple;
-	bh=HOjI1j/F8IvocLQ582o5an6TIdQNJ0WAYju0fU/Z3Cw=;
+	s=arc-20240116; t=1724327406; c=relaxed/simple;
+	bh=BRR8cZw/2FBFfSKaA2Okh25hFuvzXlGXcTutxcjQ57g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uL0W+ZmWZBPPypRqIWEJ52oel2M8QTrjLmWc0Kmj885yHMBzSzTXJ0GWdmfuadXQWRci2+O8R0ffZmLB03xFw50u/OvLkcKZrjyvTBgSIvaECCriJ0uv1zgkd83KJ+6RR0hFl8mcS9kLzXgi24kf0aGjkvVtDu3fH2LV6zZ2vQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d/57quzZ; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=QMVJ3dYKxVgZrkLP7720fuQKlsYVpKZ94x17LGXbXktVqLZ23PJeO4hxgi9r+6NZuX1ixOpotNRl38RnXJG4D4MKqHptjJwEMUbqrCpntmQ5rH8pYXSarYTHPCv50M7NypRYvkBnIabeSfcc5fXMI24hEKjioLFhQbdkbsLGynE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PgtsuKD8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d/57quzZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CA0AC4AF09;
-	Thu, 22 Aug 2024 11:49:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PgtsuKD8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 852C9C4AF14;
+	Thu, 22 Aug 2024 11:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724327386;
-	bh=HOjI1j/F8IvocLQ582o5an6TIdQNJ0WAYju0fU/Z3Cw=;
+	s=k20201202; t=1724327405;
+	bh=BRR8cZw/2FBFfSKaA2Okh25hFuvzXlGXcTutxcjQ57g=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=d/57quzZAXaJ7Xk9EWdL09OvCxlPg/Erlst9VSKQ227nB4r+fW9VHSNAhUDyD+0kE
-	 81C4zfl5FV0hFcKwGjFsWsQHiRcPJSlpab/c8A5s5AQVunKq37M7yid1SzNGYh3v+4
-	 4tXkBsvM9UyHTdqw3eoUtKA9m8NqAWeoPQAmPN/RV5h/FH6fX8FElEcbsU6AnREJCk
-	 xmd5sb5b7EG5EEPQc1JJt6eOOs96ung5ZHIxMwApD/Gmncuv+f5mNtpZstQ9b1oChf
-	 CRuMeNP8ln3g8MylahsPnHJRvUJlzHKtXfclR/VHDQwsbS++XLMcOGdmwJMNRuD4S+
-	 0aucmTAMzWKHg==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5334a8a1b07so1008565e87.1;
-        Thu, 22 Aug 2024 04:49:46 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV3jDGiKKo7ughAagBQGYQbKcJzGFAY3JrTIrDy4SmIPT5xlk5+5U0P4FHmizNl+gfru5cUCL5HiX5spmAO@vger.kernel.org, AJvYcCVZTaU/+qJ+wRh/tDLwtCK470+xqm8tnaOs9RGIuSO3915dFMI9QGFV0C6gkEWp/e7Fz+UgyLpgbzg3@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlfoSn+AEg1yjrFXe8PJAOhxGSe0+iDCPOUH+dA+4ocZBAsfgo
-	wL01DtHkb2KYORDo7HtTfF23hg8AdEk1dKoqL0vvJOxR8l/6KaF5G2Gkiwye0Ggz3jZBnu2FZPd
-	BwURehBh/aigL1hO9PaUhCxQ3EAk=
-X-Google-Smtp-Source: AGHT+IGoN1iEwIqMPaAyD6YA5zDMEsIlWdpU4CHx98XfmAg0+A6hCvl3rzlga0Gzh7ipMsLWASuz94vY5Gx0uOO/y+Y=
-X-Received: by 2002:a05:6512:104e:b0:530:dab8:7dde with SMTP id
- 2adb3069b0e04-5334fcf71bfmr1068117e87.34.1724327384933; Thu, 22 Aug 2024
- 04:49:44 -0700 (PDT)
+	b=PgtsuKD8bOMmbySilfmR0rrBYw3wR3F9twvWL+CFPsbg12d3pRufOVnnzFvIFRYWr
+	 tZILs9qj5G4/gne/a/pyRGqs4lgnekqt+YBAlgvLHii8tN3FhiSv0FwRUVzc6+ZZvJ
+	 inJWcJw4PbG71KiO5b9l5yPS7wh3g7vAftKQ+HfdqLS75CaAI6jYcm5YfACg3T+Pw+
+	 SHkfzlXyJUU029LdNKkw5XmeiUMZLLnTr8iJq3DSyfjrFVBvdTr4SfTaynAiV6bf14
+	 cuzL1ydaWTX0LjoKuuuRlMl1mdXagL6A6IJEmlA2ZENRkLRdTeDDOISC2TVz0Smnj1
+	 5VtrVyLhHb+Zw==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52f04b4abdcso854439e87.2;
+        Thu, 22 Aug 2024 04:50:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU2ziUSyTx7Eki9VCA7lNx6ZB5VDJ4ZJYJaO7bmHVAqXh8FG2QvnxsnupfHgIToJuPS+G+Cw76TbXrcULjk@vger.kernel.org, AJvYcCW91AmAQ37vYP+74Q/8aOiFSSQQ59r86FPuH4Ql5fo7c4/DJxW02XviIjQm5YiSluixKTXg9TucumsT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4tKV+oYOPMMp57oyA7PJ6H2y+JdSZ8ij0c8eWBext5jJmzAkk
+	m9IMdoY4+3oaWWEQPA9U5rQNNw2gKK9GBOoBWXKEUT2quZcioU2BRQtDaHt4PC32U/Yw4UFj1mX
+	TZilzhxf1yD/55tXb0qeXKfBHAiU=
+X-Google-Smtp-Source: AGHT+IEqCkKqQOdlMH69y6J1zM2/Rghrx3kBXgfAEdcQWkpHj1VI5bPp8fyp876xka18ETcCIojilHnIzAlRNmls97Q=
+X-Received: by 2002:a05:6512:2811:b0:52c:d80e:55a5 with SMTP id
+ 2adb3069b0e04-5334fd2fd70mr984694e87.41.1724327403908; Thu, 22 Aug 2024
+ 04:50:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com> <20240822082101.391272-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20240822082101.391272-4-chenxiaosong@chenxiaosong.com>
+References: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com> <20240822082101.391272-6-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20240822082101.391272-6-chenxiaosong@chenxiaosong.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 22 Aug 2024 20:49:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9eZOmvG899tJuXAqP4=u_OCmN1MaGWieQsrEtC3NFoGw@mail.gmail.com>
-Message-ID: <CAKYAXd9eZOmvG899tJuXAqP4=u_OCmN1MaGWieQsrEtC3NFoGw@mail.gmail.com>
-Subject: Re: [PATCH v2 03/12] smb/server: remove useless assignment of
- 'file_present' in smb2_open()
+Date: Thu, 22 Aug 2024 20:49:50 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9hXJssgKK2ALkj7H162rAbSzwfydcMqRSC3c7R9bW0Ng@mail.gmail.com>
+Message-ID: <CAKYAXd9hXJssgKK2ALkj7H162rAbSzwfydcMqRSC3c7R9bW0Ng@mail.gmail.com>
+Subject: Re: [PATCH v2 05/12] smb/server: update misguided comment of smb2_allocate_rsp_buf()
 To: chenxiaosong@chenxiaosong.com
 Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, pc@manguebit.com, 
@@ -64,7 +63,7 @@ te:
 >
 > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> The variable is already true here.
+> smb2_allocate_rsp_buf() will return other error code except -ENOMEM.
 >
 > Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > Acked-by: Namjae Jeon <linkinjeon@kernel.org>
