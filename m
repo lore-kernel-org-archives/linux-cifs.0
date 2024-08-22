@@ -1,204 +1,103 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC431D279D
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Aug 2024 22:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEA61684AE
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Aug 2024 22:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724364440; cv=none; b=XyO9pQ1wl7vne/tB6gW3o60zpKyWUSM4qnlb30C8OP3izYkIRjhorv08rTmi3zN1DsuJH+2Tb1v/fXND/VL3XpXusrxQE4+XFrEuCaHekOCGHZParC6fusCado7fFxusvpM5DKRsTwNfJE77bSH+pHs4PDh5fNI0mvvREIukiQ4=
+	t=1724365572; cv=none; b=mC0JOkg0A2eRwxs6IX3odjg48YUkt0JZ+nkOIOiYzqFrlidNWHsAph18KL3Z1SPuLN1bH6TX1WFP+N6bjZcjItlkpbBzJsFKGmafN5ZndvyNvyUkE78U5a7J3wt86WLLMZmjH9yiU3drpsyr6Rz1gcvOjj4Lq6Ge3fx0xxD2Jfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724364440; c=relaxed/simple;
-	bh=BDYrAsd6P1ev6Wpp5VhwprsXS01M0sKadjGZCpGaMhk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kywq96ldS5NDNMPCVhXA0Eyw5qTlFK1BzNaE6DIKChQRbacA+uxCVxrnEY+yrOzV3QDqOVHp4ZK69lkfcUKRyc1H52ahgUg8IZhgbsIC6X6BjsI0KROkAZwb1Fm0xBvvq9AYP1AE0Et9RoSZvsxVvg4ZE04s0MLSnuZxbp+ISS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AB+2Tehb; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1724365572; c=relaxed/simple;
+	bh=ecbDJvUHeP5FFoJYtntbEBhkbNUCDGOwX6Bch9xL+0I=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fycy3EGGO8safoDL0E1IuO+l1rN0mzq+FfHZ+wa2WiT44qMqlSE+bh7iGdX3tCLTpUG7Zn2wU9wUv+aDdpih7pAMt9KAflxh7KdlmSpKvvjjMUP/PJbTxAipKwGMWVlRGss2fwDDsk8Wsqq84TF+D5lZ5eHtt+p1Wpsm85m9Ksk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i2oGOXwG; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AB+2Tehb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2oGOXwG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724364438;
+	s=mimecast20190719; t=1724365569;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K4cMR1cPV7JXYWx72h4PebZI2yNIfo6unToml+bPSHM=;
-	b=AB+2Tehb6f+j/Z7Fsuo/pDBy1r7cmb6raaUNN6ov36XuBr5LUvsy4j31eyQToBfucK1Lwi
-	yVdIg6vtKFQkfKMzlLB0pRUnLIJvSK45+9eb8f1quccnDNuLjIsjzrSv0EnPJ4TvHmHgE3
-	bpt44uFZ/qgCxt94hVKXGoPaL6LzLoU=
+	bh=YoHc0DrXDUx2XRqsKC2VlLahjN/YyNxJ34WemSxbwPs=;
+	b=i2oGOXwGp50NyQ/MDissHkWiVcai6U6gTyIu4nubS3SAapttUmwqNM3E8sQfoCYT2lS7sA
+	aPAZ2u6/CKAixvA4jBouZBMeKe+DgFlyjLDq8QPYKPGARGAYEETXxxI32+ZOSn9mijwp8z
+	sTj+V07T9cQ3xGUqzNpuZ9IvPvNoukE=
 Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-bMIxmBy2PluYI0jC0-NnCQ-1; Thu,
- 22 Aug 2024 18:07:14 -0400
-X-MC-Unique: bMIxmBy2PluYI0jC0-NnCQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-693-TJpQT-S_M0CCfP_wVZAPXA-1; Thu,
+ 22 Aug 2024 18:26:06 -0400
+X-MC-Unique: TJpQT-S_M0CCfP_wVZAPXA-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8AD61955F40;
-	Thu, 22 Aug 2024 22:07:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.30])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F0C2F19560A3;
-	Thu, 22 Aug 2024 22:07:06 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C4591955F45;
+	Thu, 22 Aug 2024 22:26:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.30])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A089300019C;
+	Thu, 22 Aug 2024 22:26:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 2/2] netfs, cifs: Fix handling of short DIO read
-Date: Thu, 22 Aug 2024 23:06:49 +0100
-Message-ID: <20240822220650.318774-3-dhowells@redhat.com>
-In-Reply-To: <20240822220650.318774-1-dhowells@redhat.com>
-References: <20240822220650.318774-1-dhowells@redhat.com>
+In-Reply-To: <Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation>
+References: <Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation> <CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com> <20240522185305.69e04dab@echidna> <349671.1716335639@warthog.procyon.org.uk> <370800.1716374185@warthog.procyon.org.uk> <20240523145420.5bf49110@echidna> <CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com> <476489.1716445261@warthog.procyon.org.uk> <477167.1716446208@warthog.procyon.org.uk> <6ea739f6-640a-4f13-a9a9-d41538be9111@talpey.com> <af49124840aa5960107772673f807f88@manguebit.com>
+To: Jeremy Allison <jra@samba.org>
+Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+    Tom Talpey <tom@talpey.com>,
+    ronnie sahlberg <ronniesahlberg@gmail.com>,
+    David Disseldorp <ddiss@samba.org>,
+    David Howells via samba-technical <samba-technical@lists.samba.org>,
+    Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <319946.1724365560.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Aug 2024 23:26:00 +0100
+Message-ID: <319947.1724365560@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Short DIO reads, particularly in relation to cifs, are not being handled
-correctly by cifs and netfslib.  This can be tested by doing a DIO read of
-a file where the size of read is larger than the size of the file.  When it
-crosses the EOF, it gets a short read and this gets retried, and in the
-case of cifs, the retry read fails, with the failure being translated to
-ENODATA.
+Hi Jeremy,
 
-Fix this by the following means:
+> Bug is in fsctl_qar():
+> =
 
- (1) Add a flag, NETFS_SREQ_HIT_EOF, for the filesystem to set when it
-     detects that the read did hit the EOF.
+>         ndr_ret =3D ndr_push_struct_blob(out_output, mem_ctx, &qar_rsp,
+>                 (ndr_push_flags_fn_t)ndr_push_fsctl_query_alloced_ranges=
+_rsp);
+>         if (ndr_ret !=3D NDR_ERR_SUCCESS) {
+>                 DEBUG(0, ("failed to marshall QAR rsp\n"));
+>                 return NT_STATUS_INVALID_PARAMETER;
+>         }
+> =
 
- (2) Make the netfslib read assessment stop processing subrequests when it
-     encounters one with that flag set.
+>         if (out_output->length > in_max_output) {
+>                 DEBUG(2, ("QAR output len %lu exceeds max %lu\n",
+>                           (unsigned long)out_output->length,
+>                           (unsigned long)in_max_output));
+>                 data_blob_free(out_output);
+>                 return NT_STATUS_BUFFER_TOO_SMALL;
+>         }
+> =
 
- (3) Return rreq->transferred, the accumulated contiguous amount read to
-     that point, to userspace for a DIO read.
+> I'm guessing in this case we need to just truncate out_output->length
+> to in_max_output and return STATUS_BUFFER_OVERFLOW.
 
- (4) Make cifs set the flag and clear the error if the read RPC returned
-     ENODATA and the read-to file position is at or after the remote inode
-     size.
+Do you perchance have a fix for this?  I'm seeing it cause failures in
+xfstests when running against cifs connected to samba.
 
- (5) Make cifs set the flag and clear the error if a short read occurred
-     without error and the read-to file position is now at the remote inode
-     size.
-
-Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/io.c           | 17 +++++++++++------
- fs/smb/client/smb2pdu.c | 15 ++++++++++++++-
- include/linux/netfs.h   |  1 +
- 3 files changed, 26 insertions(+), 7 deletions(-)
-
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index a72bc01b9609..d6510a9385dc 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -367,7 +367,8 @@ static void netfs_rreq_assess_dio(struct netfs_io_request *rreq)
- 		if (subreq->error || subreq->transferred == 0)
- 			break;
- 		transferred += subreq->transferred;
--		if (subreq->transferred < subreq->len)
-+		if (subreq->transferred < subreq->len ||
-+		    test_bit(NETFS_SREQ_HIT_EOF, &subreq->flags))
- 			break;
- 	}
- 
-@@ -502,7 +503,8 @@ void netfs_subreq_terminated(struct netfs_io_subrequest *subreq,
- 
- 	subreq->error = 0;
- 	subreq->transferred += transferred_or_error;
--	if (subreq->transferred < subreq->len)
-+	if (subreq->transferred < subreq->len &&
-+	    !test_bit(NETFS_SREQ_HIT_EOF, &subreq->flags))
- 		goto incomplete;
- 
- complete:
-@@ -781,10 +783,13 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
- 			    TASK_UNINTERRUPTIBLE);
- 
- 		ret = rreq->error;
--		if (ret == 0 && rreq->submitted < rreq->len &&
--		    rreq->origin != NETFS_DIO_READ) {
--			trace_netfs_failure(rreq, NULL, ret, netfs_fail_short_read);
--			ret = -EIO;
-+		if (ret == 0) {
-+			if (rreq->origin == NETFS_DIO_READ) {
-+				ret = rreq->transferred;
-+			} else if (rreq->submitted < rreq->len) {
-+				trace_netfs_failure(rreq, NULL, ret, netfs_fail_short_read);
-+				ret = -EIO;
-+			}
- 		}
- 	} else {
- 		/* If we decrement nr_outstanding to 0, the ref belongs to us. */
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index d80107d1ba9e..e182fdbec887 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4507,6 +4507,7 @@ static void
- smb2_readv_callback(struct mid_q_entry *mid)
- {
- 	struct cifs_io_subrequest *rdata = mid->callback_data;
-+	struct netfs_inode *ictx = netfs_inode(rdata->rreq->inode);
- 	struct cifs_tcon *tcon = tlink_tcon(rdata->req->cfile->tlink);
- 	struct TCP_Server_Info *server = rdata->server;
- 	struct smb2_hdr *shdr =
-@@ -4603,8 +4604,20 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 		/* We may have got an EOF error because fallocate
- 		 * failed to enlarge the file.
- 		 */
--		if (rdata->subreq.start < rdata->subreq.rreq->i_size)
-+		if (rdata->subreq.start + rdata->subreq.transferred < rdata->subreq.rreq->i_size)
- 			rdata->result = 0;
-+		if (rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes >=
-+		    ictx->remote_i_size) {
-+			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
-+			rdata->result = 0;
-+		}
-+	} else {
-+		if (rdata->got_bytes < rdata->actual_len &&
-+		    rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes ==
-+		    ictx->remote_i_size) {
-+			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
-+			rdata->result = 0;
-+		}
- 	}
- 	trace_smb3_rw_credits(rreq_debug_id, subreq_debug_index, rdata->credits.value,
- 			      server->credits, server->in_flight,
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 983816608f15..c47443e7a97e 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -198,6 +198,7 @@ struct netfs_io_subrequest {
- #define NETFS_SREQ_NEED_RETRY		9	/* Set if the filesystem requests a retry */
- #define NETFS_SREQ_RETRYING		10	/* Set if we're retrying */
- #define NETFS_SREQ_FAILED		11	/* Set if the subreq failed unretryably */
-+#define NETFS_SREQ_HIT_EOF		12	/* Set if we hit the EOF */
- };
- 
- enum netfs_io_origin {
+Thanks,
+David
 
