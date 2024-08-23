@@ -1,91 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A496185B70;
-	Fri, 23 Aug 2024 12:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30208185922
+	for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 13:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724416789; cv=none; b=WdFCcEPrcNUQcM8+bsUdx9V4Ye+e2ecGxv2Be8+gXFEb9ZmJFpnYWzXCrJnCoyt8Qym8K6Hm9zSaQwBxaSAqCq9FUKCbEI0GjI/2jqNSE1+xgPV50nnT56SYETGlEiuhb9F3+Bvg/qSuZGbXmlnirEOKe0jhx3rZCQIgpJozVzI=
+	t=1724419278; cv=none; b=aDq4T5jPPHtNNpzToForBzHiteO5T94JUXt96HQWFBcxVh64XYuZjQ0whZWMSEZKHJ1CH5fYZweGYaTUuuxEB3r7KhiUYDFw9Q3PR2gzIbp1qxkzhlu3xkKKrYtqEqRqBkgpZ/x+v8Guop9snQLRdJN5d4BflUsLssR5SuBjTJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724416789; c=relaxed/simple;
-	bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a4Iy58aDqMM5/otSEiZEI+1chBtHNHaq7IgVYtYB7XDVfmH9Hmb0eTajIeAnOVg//CCtHVX4zCFBu8L1+XFRNBXLAS+xREmKB47QjNNM3D++EwrKvsOtJ+g9oN18dx5HGEk5p/oP7v/iv598TEJffhcODImVBuYdvXimKEvzpXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tqr7a4k+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724419278; c=relaxed/simple;
+	bh=kMji99mxnlYVIYYmZlllvfZ4PYLb0gU2oguSU8Y79Eo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s9Okae/aW51B853CKFuiIrTc6yyshx3N9qWUWcn/Fl4wB/dgHn3GFTUShREnuYYBL91upkhxEgbFdcP5YG3otd/PR7ju4nDPmQvvIoGVEM2WzzX/ohL03UU2FZWep+QAulF7D9WL7WNI5cAk2oqmbOdDA+C9uz2UtvM6oEQX8es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1Z0YEVmG; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tqr7a4k+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292C2C32786;
-	Fri, 23 Aug 2024 12:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724416788;
-	bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tqr7a4k+ccRM4DsoOY2ydy+JCEJZDrohUYfQJAvlzdh5t8ixJwsUBY0DES6Rl/oKr
-	 VbmP+9k+07wMjNk+o+6XDCeUoaTgI+jsXsnIn3Y+JR/tF5scYDamudVnGlgnKYE1Zj
-	 B9eyNR1aQwtl8u76hHA5tLSIpbqRml4b4IBNw3J2On5pNEYSKjCjIZVWrKKwFhcMIR
-	 5IgtarUhZ2Zksg/LALvyQdsi9YCec95qCJzNSZySlA/dzymJPqm59ggAOXaNvY7Q9R
-	 cr1VJYKZNJqn/sTSV9L9HnTyWNLdfrm5bUTvSFNM9zUDFDpMCtQLsWpMFM+lFU02tB
-	 ay6weNJME3dSA==
-From: Christian Brauner <brauner@kernel.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1Z0YEVmG"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Cc:To:From:Date;
+	bh=YqubPSbosPV5jgGnAgJ2amswF0hQKABp49RdOjYClVM=; b=1Z0YEVmGV7ty1nYuic+HgOcKqJ
+	je2ZyY/eAc4pCsFRlQtO5rJRIwzpjpK4Xzc1jI42Ontp0XSeS9BKef1WrxThXQDiSxoeT00HrpZpJ
+	070mbzc03+qPWfLNvQ8Qc2lMBKer5jpLdB8tmclj16a+QOgInP63VISi8acmBw6D7orLnASGHQfeR
+	YlSnT/kzc0xxdc/DpbNnynyrbu5QUVu45FjPAZiWY5uRbEmCDyK+aqsWiJW3HuEugOrwvgC+fVtre
+	2/5lbxivK6wCZKMvBO1RRao64lCYM+8OCIuQgIIg2DprxieMl3qi7NylyFpbAlNIWEqFuZOeMUfnH
+	r57eQ1odXUTL8lEQZraLdVP73+O9mqRrbZc0T+7DcdMzm9gqFVUcJCa9+CVd22dAcgzAYC+7EZvgJ
+	L0ayzOHTQ29ha0sbJrgdHIulOtBirMy0pHiksn8Aif0ns+OBPic8Pusi0cHEEXG3FWpVvCbqGrZ69
+	39mYHG2ymGbjJ/Daz6tJ8Qcw;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1shUDw-007ojn-2h;
+	Fri, 23 Aug 2024 13:21:05 +0000
+Date: Fri, 23 Aug 2024 13:20:52 +0000
+From: David Disseldorp <ddiss@samba.org>
 To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] netfs, cifs: DIO read and read-retry fixes
-Date: Fri, 23 Aug 2024 14:39:34 +0200
-Message-ID: <20240823-relation-offiziell-fda6c4626508@brauner>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240822220650.318774-1-dhowells@redhat.com>
-References: <20240822220650.318774-1-dhowells@redhat.com>
+Cc: Jeremy Allison <jra@samba.org>, Paulo Alcantara <pc@manguebit.com>, Tom
+ Talpey <tom@talpey.com>, ronnie sahlberg <ronniesahlberg@gmail.com>, David
+ Howells via samba-technical <samba-technical@lists.samba.org>, Steve French
+ <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
+Message-ID: <20240823132052.3f591f2f.ddiss@samba.org>
+In-Reply-To: <319947.1724365560@warthog.procyon.org.uk>
+References: <Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation>
+	<CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com>
+	<20240522185305.69e04dab@echidna>
+	<349671.1716335639@warthog.procyon.org.uk>
+	<370800.1716374185@warthog.procyon.org.uk>
+	<20240523145420.5bf49110@echidna>
+	<CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com>
+	<476489.1716445261@warthog.procyon.org.uk>
+	<477167.1716446208@warthog.procyon.org.uk>
+	<6ea739f6-640a-4f13-a9a9-d41538be9111@talpey.com>
+	<af49124840aa5960107772673f807f88@manguebit.com>
+	<319947.1724365560@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1333; i=brauner@kernel.org; h=from:subject:message-id; bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSdaOZRKjvtxCkjtZRpcoliflzLrNA9yto3dz9n4D2cN mNb+YKqjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIl8bGFkmKibfHdXY2p8D2P7 gt4dxrZNMYKPfzS8Mpxuoqb24KpAIiPD/M//2mKuxJza36Alxn+QTc3k9y63rq8fDFb8+Hsssus eOwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Aug 2024 23:06:47 +0100, David Howells wrote:
-> Here are a couple of fixes to DIO read handling and the retrying of reads,
-> particularly in relation to cifs.
+Thanks for the follow up ping...
+
+On Thu, 22 Aug 2024 23:26:00 +0100, David Howells wrote:
+
+> >         if (out_output->length > in_max_output) {
+> >                 DEBUG(2, ("QAR output len %lu exceeds max %lu\n",
+> >                           (unsigned long)out_output->length,
+> >                           (unsigned long)in_max_output));
+> >                 data_blob_free(out_output);
+> >                 return NT_STATUS_BUFFER_TOO_SMALL;
+> >         }
+> > 
+> > I'm guessing in this case we need to just truncate out_output->length
+> > to in_max_output and return STATUS_BUFFER_OVERFLOW.  
 > 
->  (1) Fix the missing credit renegotiation in cifs on the retrying of reads.
->      The credits we had ended with the original read (or the last retry)
->      and to perform a new read we need more credits otherwise the server
->      can reject our read with EINVAL.
-> 
-> [...]
+> Do you perchance have a fix for this?  I'm seeing it cause failures in
+> xfstests when running against cifs connected to samba.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+I've proposed a fix via
+https://gitlab.com/samba-team/samba/-/merge_requests/3775
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+If you want to try it yourself...
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+The following changes since commit b0996ed589a931902a304237d6c03efce2b16f6b:
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+  s3:tests: Fix spelling error (2024-08-22 10:38:09 +0000)
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+are available in the Git repository at:
 
-[1/2] cifs: Fix lack of credit renegotiation on read retry
-      https://git.kernel.org/vfs/vfs/c/82d55e76bf2f
-[2/2] netfs, cifs: Fix handling of short DIO read
-      https://git.kernel.org/vfs/vfs/c/942ad91e2956
+  https://gitlab.com/ddiss/samba.git qar_rsp_truncation
+
+for you to fetch changes up to 3c034c4d177ea2367b3131f813381d91c98ab7e1:
+
+  s4:torture/smb2: test FSCTL_QUERY_ALLOCATED_RANGES truncation (2024-08-23 13:06:04 +0000)
+
+----------------------------------------------------------------
+David Disseldorp (2):
+      smb2_ioctl: truncate FSCTL_QUERY_ALLOCATED_RANGES responses
+      s4:torture/smb2: test FSCTL_QUERY_ALLOCATED_RANGES truncation
+
+ source3/smbd/smb2_ioctl.c         |   4 +-
+ source3/smbd/smb2_ioctl_filesys.c |  54 ++++++++------
+ source4/libcli/smb2/ioctl.c       |   3 +-
+ source4/torture/smb2/ioctl.c      | 150 +++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 187 insertions(+), 24 deletions(-)
+
