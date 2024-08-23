@@ -1,99 +1,91 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D78418592B
-	for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 11:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A496185B70;
+	Fri, 23 Aug 2024 12:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724413713; cv=none; b=g6bi/kBa//NSv65bMo6bjtjL8QRTSLN5ClMElqik2SWuiHGwobLBor7tNPWmEAF1rI7Pnj+tlTZsUzSp+sTcIBNVr9Wf5cU6x+HyF3wJtfF6LcVSW1QvrLvX9RqI0uPSRgEFMxUcjxHzgZLkf/Wbv952KsMsuLq27TSdSduEGJA=
+	t=1724416789; cv=none; b=WdFCcEPrcNUQcM8+bsUdx9V4Ye+e2ecGxv2Be8+gXFEb9ZmJFpnYWzXCrJnCoyt8Qym8K6Hm9zSaQwBxaSAqCq9FUKCbEI0GjI/2jqNSE1+xgPV50nnT56SYETGlEiuhb9F3+Bvg/qSuZGbXmlnirEOKe0jhx3rZCQIgpJozVzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724413713; c=relaxed/simple;
-	bh=11ILqV9sSgq0vkEVufLxFfVQ6nYnNN8UZZN3WnBLcD4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vl8WIFbqaMbp+t9sN0IAOWKpaaprBlujCXCrzFWc2jew+k/7tOCmKlLn4PMfIELD4pzK8SJW+qFzE4M0XFLITmA87fvW6za5kXRKRVPORrtVEr5Xysn3u8jJlNCmW86PkvSK2K4aWmdKPtyX52KFEzEQwSSiUcenDK6Hb/Ki2/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=AZKkonMy; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+	s=arc-20240116; t=1724416789; c=relaxed/simple;
+	bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a4Iy58aDqMM5/otSEiZEI+1chBtHNHaq7IgVYtYB7XDVfmH9Hmb0eTajIeAnOVg//CCtHVX4zCFBu8L1+XFRNBXLAS+xREmKB47QjNNM3D++EwrKvsOtJ+g9oN18dx5HGEk5p/oP7v/iv598TEJffhcODImVBuYdvXimKEvzpXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tqr7a4k+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="AZKkonMy"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-371a939dab9so281512f8f.2
-        for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 04:48:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1724413709; x=1725018509; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ygPOJ3kbG5t8D2/jn0UHkCqAj6NFUwKnva9LPsAtkzU=;
-        b=AZKkonMy8i7PFqtuiKOUTjeaJRBrsfID0OJh+zautkDij5nLwE/czWsj4clZxcIvz/
-         35GZqKE3ejs5s7g2o3VVXcU3Mt3/xxShkTuZGCgor9VCci9opqvKD6djTNXxz+6HK9jA
-         nrRkOiYyfhSjWsP6CxgiGywu+AvOitqMVlCpw82H6BBZjqpFhXcY6rt+89eCvSbbPvZx
-         vPUPdrx7YXfV8ddpkM6wx3M6wok1wpxv7uZEFKJrCM76gbsX9ngTT4lZA3xkAbKxlMbW
-         RDZleCG1iZLsBYscwALlgznuNwgfTx7kyZuj6Y8A6hXlxaXn2FLZKcPAddQC5R7yGa1l
-         zRDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724413709; x=1725018509;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ygPOJ3kbG5t8D2/jn0UHkCqAj6NFUwKnva9LPsAtkzU=;
-        b=nZ5Ur83fkRmIR7SPAWXHTW5ltuBPaTVU9pgdqK85Io6N06wQzdW7dzTlA+St4fjq51
-         hdLws0JaIRGrswnmjSGWzS2rpbQIKVs1/fBtMQyWKL9blPQLCTz/sN7sQXdNVawoaU2o
-         vtX0+t9fmDweO4hG77VSggnhRXpQ7Ke/OsaovOtazH9j7Yr2L6e+srGkrNPE6wQUCKNX
-         cJYate7Rbiw6Pi/Xq4KTgZR/vs3sULMX6Lg3jZyjxaq7sShQD3o3IlayxaWGWayxuIoy
-         EoQ2PgDUqSeSJxyn+8jbOJHzBK+Wf71lc9saHb2PckQXttRqLpjRgJaZ9PnF6TmadRof
-         O49A==
-X-Gm-Message-State: AOJu0YyhpZ6niqje/QmPaQT6YcStmUB35eaxqADN9qIwVRwaKY6DMruk
-	gYJYfwQyhrhjQWvuic0JTsQR6SxqJfqwSZ0iRNZqlhe8rKKgwrx3lSgtgzMVG+E=
-X-Google-Smtp-Source: AGHT+IFvhMPt4pZpbccUkBs0Hi2KJQJSJKqluPpvVcpUWiDsTdhGl+ARhILSf+az3WKIMMtfz04o9g==
-X-Received: by 2002:a05:6000:1788:b0:368:5bf:82ab with SMTP id ffacd0b85a97d-3731192c2a5mr558203f8f.10.1724413708910;
-        Fri, 23 Aug 2024 04:48:28 -0700 (PDT)
-Received: from fedora.fritz.box (aftr-82-135-80-228.dynamic.mnet-online.de. [82.135.80.228])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f299d8fsm248894366b.62.2024.08.23.04.48.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 04:48:28 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: linkinjeon@kernel.org,
-	sfrench@samba.org,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	kees@kernel.org,
-	gustavoars@kernel.org
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>
-Subject: [PATCH] smb: Annotate struct xattr_smb_acl with __counted_by()
-Date: Fri, 23 Aug 2024 13:47:05 +0200
-Message-ID: <20240823114704.36967-2-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tqr7a4k+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292C2C32786;
+	Fri, 23 Aug 2024 12:39:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724416788;
+	bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Tqr7a4k+ccRM4DsoOY2ydy+JCEJZDrohUYfQJAvlzdh5t8ixJwsUBY0DES6Rl/oKr
+	 VbmP+9k+07wMjNk+o+6XDCeUoaTgI+jsXsnIn3Y+JR/tF5scYDamudVnGlgnKYE1Zj
+	 B9eyNR1aQwtl8u76hHA5tLSIpbqRml4b4IBNw3J2On5pNEYSKjCjIZVWrKKwFhcMIR
+	 5IgtarUhZ2Zksg/LALvyQdsi9YCec95qCJzNSZySlA/dzymJPqm59ggAOXaNvY7Q9R
+	 cr1VJYKZNJqn/sTSV9L9HnTyWNLdfrm5bUTvSFNM9zUDFDpMCtQLsWpMFM+lFU02tB
+	 ay6weNJME3dSA==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] netfs, cifs: DIO read and read-retry fixes
+Date: Fri, 23 Aug 2024 14:39:34 +0200
+Message-ID: <20240823-relation-offiziell-fda6c4626508@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240822220650.318774-1-dhowells@redhat.com>
+References: <20240822220650.318774-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1333; i=brauner@kernel.org; h=from:subject:message-id; bh=OQN7Mf7HQDUQaFApg1+V9RgbCzXwyxIPK7zuLgztQ10=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSdaOZRKjvtxCkjtZRpcoliflzLrNA9yto3dz9n4D2cN mNb+YKqjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIl8bGFkmKibfHdXY2p8D2P7 gt4dxrZNMYKPfzS8Mpxuoqb24KpAIiPD/M//2mKuxJza36Alxn+QTc3k9y63rq8fDFb8+Hsssus eOwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-Add the __counted_by compiler attribute to the flexible array member
-entries to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-CONFIG_FORTIFY_SOURCE.
+On Thu, 22 Aug 2024 23:06:47 +0100, David Howells wrote:
+> Here are a couple of fixes to DIO read handling and the retrying of reads,
+> particularly in relation to cifs.
+> 
+>  (1) Fix the missing credit renegotiation in cifs on the retrying of reads.
+>      The credits we had ended with the original read (or the last retry)
+>      and to perform a new read we need more credits otherwise the server
+>      can reject our read with EINVAL.
+> 
+> [...]
 
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
----
- fs/smb/server/xattr.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-diff --git a/fs/smb/server/xattr.h b/fs/smb/server/xattr.h
-index 16499ca5c82d..fa3e27d6971b 100644
---- a/fs/smb/server/xattr.h
-+++ b/fs/smb/server/xattr.h
-@@ -76,7 +76,7 @@ struct xattr_acl_entry {
- struct xattr_smb_acl {
- 	int count;
- 	int next;
--	struct xattr_acl_entry entries[];
-+	struct xattr_acl_entry entries[] __counted_by(count);
- };
- 
- /* 64bytes hash in xattr_ntacl is computed with sha256 */
--- 
-2.46.0
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/2] cifs: Fix lack of credit renegotiation on read retry
+      https://git.kernel.org/vfs/vfs/c/82d55e76bf2f
+[2/2] netfs, cifs: Fix handling of short DIO read
+      https://git.kernel.org/vfs/vfs/c/942ad91e2956
