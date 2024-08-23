@@ -1,46 +1,46 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1812118BC2B
-	for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 16:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4904F1946C8
+	for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 16:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724429572; cv=none; b=lLBzk5sISQ6nJFDK6psRXAgnYMav54+wFqSnIC8LXa2hmKUgq1rVbl+cvWg4g9qGfDI2KSQ0vnjBXpljTYI6HV6vC91Opwr8p0cWDft9jwindPpYfJHFO9FHBkOmZwg6tiYBj4fMILBsIuutemGRZmNsGvq0qHG097Ab6b1EvPI=
+	t=1724429581; cv=none; b=TvaAOKB6QU7bSdzbcGbYJLd2vi6wuhS+gznDnhOiiEipo+DNJIem5ehRXB1JS5SIL5uNNJ3bb4rdK7pj7AnVCl1ySfiisHZA8YVVdgS2VztiozyzywZ0sr1hHzKlzsAB0AddI76Hj7OrqLAA9Y2McNx3jQi0lSDsBu7JCer7z1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724429572; c=relaxed/simple;
-	bh=FbX1MxFORvAXV1r6WiurHQFuRWa9an4aaCwoArqvxcA=;
+	s=arc-20240116; t=1724429581; c=relaxed/simple;
+	bh=322L4Js8oYAVjx2uj/9TF8tJ9GbLwzzaYu3CG5Lh98w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fiNZG3I/z3a6LWD9sNUxeXsxeR7mL9yhvleX5CrjEx4zSM2W8Izr0Hv2NbtYAgAY4Fj88fwUBBGtZeEjEe9yG4pYfFV6WJFuVR3RdlKXQG1AzFcvqwmr6O7SEFZaDhckNzNVVQjT06kdGw1fnbKK08C0/S5jox6Jm4QwxiM6pUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QlbZDLVH; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=cIq1MdJzlaBNFEU+q/MKEapye/9IvjFqgOke5OkEq/WEp9z0C6znPFDDcPUqJck0pQ1p43qSwCXeIqHBXd/cBRHIvEVqnqZDuzb+xXrJ9a7M/k9xEyOYPq5fUU11N85Nb6pQyA3+zkZVLHykQsMGZrbsgW7rROWI9AyekmNG/Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZHnVXzTE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlbZDLVH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHnVXzTE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724429569;
+	s=mimecast20190719; t=1724429579;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=C4kdxje9pJwe2F8kxgsN+SQonQ75sAMbOz8YwNBazmI=;
-	b=QlbZDLVHzF9jd2TjNkwNqjqRHIlQNdE7exO58+QkI7X7CmTUbkqnvcDqzAs1I478xcHUvX
-	uVYL6Vnt031D3zXmlbaKJRmJlwfiOQVv2+8/zAkYG5Ieq4QWMTii6lMLdib7EGiVtjBMRz
-	95EJa3ho0scWo+hq5lKdQfCRS6FDgeE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=FBChvUZyQ988u9TYFlpOvF0mis7ud805n023OENZupc=;
+	b=ZHnVXzTEXmZ9yCj2Nv+2k3dRQOeMhqqdUBUpl4/ly8qidDI2BQz3w9qRRqfF0BBpFrTxZV
+	b8XVNR5khkQyKAg9irlAxaMPXyxekqTde5fHy0hOgjT6GWr/vR734S/0i+zcd+0tkqRiz0
+	t2TiyO/zR6OJ0ncJ+moPLLP5lh7ipZA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-tWlcgTiVMRa8lhTgu6q_UA-1; Fri,
- 23 Aug 2024 12:12:44 -0400
-X-MC-Unique: tWlcgTiVMRa8lhTgu6q_UA-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-HzxncWQrPICf3GrzTUMYmQ-1; Fri,
+ 23 Aug 2024 12:12:49 -0400
+X-MC-Unique: HzxncWQrPICf3GrzTUMYmQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFCD01955D47;
-	Fri, 23 Aug 2024 16:12:41 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3CFB61954B02;
+	Fri, 23 Aug 2024 16:12:47 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.30])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9B46D19560A3;
-	Fri, 23 Aug 2024 16:12:37 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 368AE19560A3;
+	Fri, 23 Aug 2024 16:12:43 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -59,9 +59,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 4/5] cifs: Fix short read handling
-Date: Fri, 23 Aug 2024 17:12:05 +0100
-Message-ID: <20240823161209.434705-5-dhowells@redhat.com>
+Subject: [PATCH 5/5] cifs: Fix credit handling
+Date: Fri, 23 Aug 2024 17:12:06 +0100
+Message-ID: <20240823161209.434705-6-dhowells@redhat.com>
 In-Reply-To: <20240823161209.434705-1-dhowells@redhat.com>
 References: <20240823161209.434705-1-dhowells@redhat.com>
 Precedence: bulk
@@ -71,13 +71,22 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Fix smb2_readv_callback() to always take -ENODATA as indicating we hit EOF
-and to always set the NETFS_SREQ_HIT_EOF flag rather than only doing it
-under some circumstances.
+Fix some bits of credit handling:
 
-Fixes: 942ad91e2956 ("netfs, cifs: Fix handling of short DIO read")
+ (1) Use the ->actual_len value rather than the total subrequest length in
+     smb2_adjust_credits() so that we don't trip the error message that we
+     don't have sufficient credits allocated in a retry.
+
+ (2) Set wdata->actual_len in writes as smb2_adjust_credits() now expects to
+     see it set.
+
+ (3) Reset the in_flight_check flag on a retry as we're doing a new read.
+
+ (4) Add a missing credit resubmission trace.
+
+Fixes: 82d55e76bf2f ("cifs: Fix lack of credit renegotiation on read retry")
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
 cc: Paulo Alcantara <pc@manguebit.com>
@@ -86,30 +95,61 @@ cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/smb2pdu.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ fs/smb/client/file.c    | 9 +++++++++
+ fs/smb/client/smb2ops.c | 2 +-
+ fs/smb/client/trace.h   | 1 +
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index e182fdbec887..9829784e8ec5 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4601,16 +4601,8 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 				     rdata->got_bytes);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 493c16e7c4ab..b94802438c62 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -111,6 +111,7 @@ static void cifs_issue_write(struct netfs_io_subrequest *subreq)
+ 		goto fail;
+ 	}
  
- 	if (rdata->result == -ENODATA) {
--		/* We may have got an EOF error because fallocate
--		 * failed to enlarge the file.
--		 */
--		if (rdata->subreq.start + rdata->subreq.transferred < rdata->subreq.rreq->i_size)
--			rdata->result = 0;
--		if (rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes >=
--		    ictx->remote_i_size) {
--			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
--			rdata->result = 0;
--		}
-+		__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
-+		rdata->result = 0;
- 	} else {
- 		if (rdata->got_bytes < rdata->actual_len &&
- 		    rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes ==
++	wdata->actual_len = wdata->subreq.len;
+ 	rc = adjust_credits(wdata->server, wdata, cifs_trace_rw_credits_issue_write_adjust);
+ 	if (rc)
+ 		goto fail;
+@@ -227,6 +228,14 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 						   &rdata->credits);
+ 		if (rc)
+ 			goto out;
++
++		rdata->credits.in_flight_check = 1;
++
++		trace_smb3_rw_credits(rdata->rreq->debug_id,
++				      rdata->subreq.debug_index,
++				      rdata->credits.value,
++				      server->credits, server->in_flight, 0,
++				      cifs_trace_rw_credits_read_resubmit);
+ 	}
+ 
+ 	if (req->cfile->invalidHandle) {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 20e674990760..5090088ba727 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -301,7 +301,7 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+ 		    unsigned int /*enum smb3_rw_credits_trace*/ trace)
+ {
+ 	struct cifs_credits *credits = &subreq->credits;
+-	int new_val = DIV_ROUND_UP(subreq->subreq.len, SMB2_MAX_BUFFER_SIZE);
++	int new_val = DIV_ROUND_UP(subreq->actual_len, SMB2_MAX_BUFFER_SIZE);
+ 	int scredits, in_flight;
+ 
+ 	if (!credits->value || credits->value == new_val)
+diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+index 0f0c10c7ada7..8e9964001e2a 100644
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -30,6 +30,7 @@
+ 	EM(cifs_trace_rw_credits_old_session,		"old-session") \
+ 	EM(cifs_trace_rw_credits_read_response_add,	"rd-resp-add") \
+ 	EM(cifs_trace_rw_credits_read_response_clear,	"rd-resp-clr") \
++	EM(cifs_trace_rw_credits_read_resubmit,		"rd-resubmit") \
+ 	EM(cifs_trace_rw_credits_read_submit,		"rd-submit  ") \
+ 	EM(cifs_trace_rw_credits_write_prepare,		"wr-prepare ") \
+ 	EM(cifs_trace_rw_credits_write_response_add,	"wr-resp-add") \
 
