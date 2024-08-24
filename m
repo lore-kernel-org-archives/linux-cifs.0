@@ -1,68 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12251714CD;
-	Sat, 24 Aug 2024 14:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772FA186A;
+	Sat, 24 Aug 2024 14:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724508700; cv=none; b=uA1qIUC+vUxTlSNGnJ9/bNzrsn70iklrxv9jn3nA6R+1ef1pa2/RElbC7ABXqHIiV5vMQ071/abYHq2ocBtdNa+rJMz1VZGi0IE4xW0FYBKSaOpWyBBavCmmPV3BLMMUYyllJaCxofWQhFNrJ93xK3N7FVW7HzD+/fL6gGPF1TY=
+	t=1724508792; cv=none; b=RNiPCYaDCJYzmma3ylxOyymnW5vUOgcoF1yRwdweq6voOJxp8jVHAV1qb3Rwy9RmqwfBEYkYSR0A85E4q8dzxOYqRBPtosr+zNzhAS8gemagAMiieKQkOlGLjQuBPbJiWxR2nmfHv8z4GWkFYb9hy+tGXypmxkVGzaDh1S0zWtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724508700; c=relaxed/simple;
-	bh=W8M1Zi7aIkrnWh6ARqbPqJasZDK1TBAZj6azA4K8n94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O27XdEZR98/UIXGJHfJZNwMJEmpXJhPLotZHowBppDIFsTqCyqHUxNMxULa8QNQXOyIImLQ+MvS3q+XGCerYiIZfJ/qw9J0TYB8/LWGsUxw+kqeiheV7Sm14xZ8u5XLs9kbNwI0TC9I5lHv0QptaoCqYggPoeHkidX4M8JRlpvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fMnOZsyj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724508792; c=relaxed/simple;
+	bh=1RROgoMoiIURZrgBI0u+sQOi22mVdm5uhe2i5PEaJ7Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cpUhtYmy0EtfIXIVOOPpeNQpvpLG9ECsf0a8eI25Ckxg2XhYseB7e1Om0fs2TISNGbmh5A7e5JNZB79Mdne7XoTKuXvdfLRrOYaAC3sq8Y0ryiL4g5Bl6oZlJJ1SHKCX702vIol854Y5lqXg9TCi3oB86RxHChrDUk+EtBKVG6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSGnLKAX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMnOZsyj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B0BDC4AF14;
-	Sat, 24 Aug 2024 14:11:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSGnLKAX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A59C32781;
+	Sat, 24 Aug 2024 14:13:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724508700;
-	bh=W8M1Zi7aIkrnWh6ARqbPqJasZDK1TBAZj6azA4K8n94=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fMnOZsyjIiSxIULNhEWT/Ul07nlCs8OYwZme5p9C7CQlZiZPz5cpX1tNBJWSGcHfw
-	 j1cjZVi5d21gfqPPUqh0N1uX490iESrbFRaDDK0M/GinI65JezNsj+OekIU7C0Z1ej
-	 qtqcfKDvbldzIOTOMslOhJ5HyRiq8ayb4DnAQAf9XvKYzKhIQHZudCEmchVvh53ORV
-	 SUiBIbYmomaQA/vXcWPmSnTASrXOWNr5GQcdxDsM9H+jVnxH71GPKTHeaStlH5/u/m
-	 AKX/uVWlVHGTzREhQaoUp3NgKkhW0VdQ6sDb74Z4poWEAZT/Yb5Umb401IUuN2+vIl
-	 Vd4Qx/FhAY+vA==
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2700d796019so2027195fac.2;
-        Sat, 24 Aug 2024 07:11:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV7rpzaR8Z/l9wD/UIkNM/BKNIeVDrJhyifsht3uyPLxgEkfH4mj4aCjErDE2BJ5Jb++IG6zo/uTJ3NXc4b@vger.kernel.org, AJvYcCWX85Txa0uZnjFf74yiLVnTm+kRQOsPyM56dV1zEI5A5GronK0gHlWX5WVwxfAHyxMwIQLcnAXKopTt@vger.kernel.org, AJvYcCXrZb/ciIaukeaJHuOYpND1Qvs8LfY1FeEr6JFQnqAggszPyKimAuzghnBJ34WzodxjBQ99VuZJume8miBeryK3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1UmMjC8i6p3GYzutYOU4JIblCMyMXg05U9k0ok6ZTzrFLcqS0
-	t0BDgmOm91DbmD3KJl7gDQwXcwUEDSVvKYFTxELq0Xkc0umviXfYBuCLfEk/Z6T9tu5dX9H7H8c
-	uDFd9s8TjpqpGCPtRyKrudxzGnac=
-X-Google-Smtp-Source: AGHT+IHHjnn/NHqyorxcVuvXZ/XIEXAghoMCVWNt0SCheWsoSq/amxNqcMs9jWYY2l892xnrSusMBO+qGcwQZ044Tr4=
-X-Received: by 2002:a05:6870:4713:b0:260:f75c:c28b with SMTP id
- 586e51a60fabf-273e646d7a8mr5832277fac.8.1724508699291; Sat, 24 Aug 2024
- 07:11:39 -0700 (PDT)
+	s=k20201202; t=1724508792;
+	bh=1RROgoMoiIURZrgBI0u+sQOi22mVdm5uhe2i5PEaJ7Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TSGnLKAXbEucvWAQfLpYFzmykp5QeFdt9IGLO+QBd3M9TQsdDcpmVFe8sIb1ZSi0l
+	 +xUKZvMbaYbGjtogaGv09XTXzAuo3HtUW2ICNSKj9fMMR27DBbK2E1mYlZ8J2gyerm
+	 /1PL8xB02z5ButNd1qgVUbpCElWMbZ1P1wArc2W84/S5cKlHRjHUEhfBiwOjHiEORA
+	 DrUX7VJMPECqiLrCo6LNitskmpC6nLf+zytSgeFiVmlaE/DoS2qzaGEi+wgkLOLxVK
+	 IaO8KNkckCOjIhYKAqG+j4ZySWSAQ7nLPL5KSegXJ7SMcBj+z2/inWTDbW9aFUtA0+
+	 eYCtNddeZ/ciw==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>,
+	Steve French <sfrench@samba.org>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: (subset) [PATCH 0/9] netfs, cifs: Combined repost of fixes for truncation, DIO read and read-retry
+Date: Sat, 24 Aug 2024 16:09:51 +0200
+Message-ID: <20240824-ohrwurm-kernaufgabe-6253ce9cb620@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240823200819.532106-1-dhowells@redhat.com>
+References: <20240823200819.532106-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240823114704.36967-2-thorsten.blum@toblux.com>
-In-Reply-To: <20240823114704.36967-2-thorsten.blum@toblux.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 24 Aug 2024 23:11:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8x0Q1BPPUvL1FD-kYMyubj1pZuF-G6krfsttEKz-4Z6g@mail.gmail.com>
-Message-ID: <CAKYAXd8x0Q1BPPUvL1FD-kYMyubj1pZuF-G6krfsttEKz-4Z6g@mail.gmail.com>
-Subject: Re: [PATCH] smb: Annotate struct xattr_smb_acl with __counted_by()
-To: Thorsten Blum <thorsten.blum@toblux.com>
-Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
-	kees@kernel.org, gustavoars@kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1823; i=brauner@kernel.org; h=from:subject:message-id; bh=1RROgoMoiIURZrgBI0u+sQOi22mVdm5uhe2i5PEaJ7Q=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaSdfJVffXKaT/8Pjqu3GVvfLH2vu2VCaW5K1dO7uq5zj 7TqHFq0s6OUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiD5IZGRo7T3+Ld/D4IPp9 k8KLx7tbnO8x+ez5wfR20v6496lRfS4M/11XbSi+/6B3pnG0bXW1kq909nHuDUFrV6Rdv7zltM8 eB24A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 23, 2024 at 8:48=E2=80=AFPM Thorsten Blum <thorsten.blum@toblux=
-.com> wrote:
->
-> Add the __counted_by compiler attribute to the flexible array member
-> entries to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE.
->
-> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+On Fri, 23 Aug 2024 21:08:08 +0100, David Howells wrote:
+> Firstly, there are some fixes for truncation, netfslib and afs that I
+> discovered whilst trying Pankaj Raghav's minimum folio order patchset:
+> 
+>  (1) Fix truncate to make it honour AS_RELEASE_ALWAYS in a couple of places
+>      that got missed.
+> 
+>  (2) Fix duplicated editing of a partially invalidated folio in afs's
+>      post-setattr edit phase.
+> 
+> [...]
+
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/9] mm: Fix missing folio invalidation calls during truncation
+      https://git.kernel.org/vfs/vfs/c/0aa2e1b2fb7a
+[2/9] afs: Fix post-setattr file edit to do truncation correctly
+      https://git.kernel.org/vfs/vfs/c/a74ee0e878e2
+[3/9] netfs: Fix netfs_release_folio() to say no if folio dirty
+      https://git.kernel.org/vfs/vfs/c/7dfc8f0c6144
+[4/9] netfs: Fix trimming of streaming-write folios in netfs_inval_folio()
+      https://git.kernel.org/vfs/vfs/c/cce6bfa6ca0e
+[5/9] netfs: Fix missing iterator reset on retry of short read
+      https://git.kernel.org/vfs/vfs/c/950b03d0f664
+[10/10] netfs: Fix interaction of streaming writes with zero-point tracker
+        https://git.kernel.org/vfs/vfs/c/e00e99ba6c6b
