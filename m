@@ -1,84 +1,95 @@
-Received: from hua.moonlit-rail.com (hua.moonlit-rail.com [45.79.167.250])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453931922E4
-	for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 20:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.167.250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9496B179AA
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Aug 2024 01:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724446337; cv=none; b=Dn5a+FjXVYhZzKp2V1kYiBaEbDz2KS19Q8eHnZIOd/wgVcrZC5pWOBtkwmayP9TWakDNh0pZQ0YSWpqvxg4C5l/D7OrgS72DA30GVxVWMm8ajzxSQpQRwILHQXwj8JlUNFdPDZ5oqVHYvyFe2RQveWaA+jkyEiX7sniG12NPIXo=
+	t=1724461526; cv=none; b=b+et2oZz01oMbq9MDIyDk1ZX6qd82oEDdYPYFMSJygXaMNqhOECtQKE+M6JtYtoDkvTPsN/VAfTxOo+AKB1v8MaYpJ9dneXWKaQe+MsDBIWi4dgq6MzG47AgJ9DG8EdB3Tv9sk9fx5pQrRkG+9mhBYk53VZ3abA32pDeYKTp5/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724446337; c=relaxed/simple;
-	bh=Wf2pbWV8/FYJt9lnMXYXLqt1x8AnOzua1fNujo1ZyGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NjV5+ZkedPnroNhDi2q6qCJ+LP8Hu5J36BV18a6DwOuOwSPcKozGC+2DPMYfwa5sR5Ehi1Tx+weN7mvGjzRU4T2lFk1OnR01unFSAdERJTlqrBBcJTedGmE2P/7Y7tCLTcNe081jI/sFH/KAHYFqXzpiJbtBPO63bKS1siu01Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com; spf=pass smtp.mailfrom=moonlit-rail.com; dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=EgZMUree; dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=UXcORdFJ; arc=none smtp.client-ip=45.79.167.250
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=moonlit-rail.com
+	s=arc-20240116; t=1724461526; c=relaxed/simple;
+	bh=97Iph8lwt2I6yCVMgT7tF7rIsmOTVTvYekR90FN1vqc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=XoFSETR3yd/3NaVHbH+Yfadeitr8idAbbGNFLkcRXQl/Ni5duRBgP/1GZPeTFFUR3cFlJlwy3X1Gmw6qsC0gZw7CbYWLkOtlMICXbQKzTvGnnHCpxmY+HsB4w/mPFCYq7tnJapmk6S4jfAuox5vBMFNOTgIO8m2rczIBqSXU1Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ncsIlw6d; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="EgZMUree";
-	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="UXcORdFJ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EDVTAYLe3EvjFMupTR3LazR8LBvcxEZHCifv37jvTuI=; t=1724446328; x=1727038328; 
-	b=EgZMUreepTc7i0w2QLWC2giny2YlLaxN1nf2wxQbH13BsCrgRcqepKMBABmTlrFcWfCwXtmfXUY
-	/xnn1RTnszvpdBow3z5qzFqHZGmf3NLA6h5S7JbOnYPTKUNZFzm+SR1zX5fkveXJuPTxTlNxX5Pq+
-	CYz83nzC7fcRzRBqT4WVWeBHvMlYs6isftqI0jkT0k7Mdc/zkLf2+eBG0Ogu5RdtRuVa9lKe4L78K
-	2rcujwShOUXdXA9k99wfp9QCJpyUuvz0SX++AISvLep2/80t/FeWbxVwN5Pr+y4duGIP73CImlukz
-	ni/YuBI4xfAQWJ6OAy+k5Vx6USiOVTW8mhjQ==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EDVTAYLe3EvjFMupTR3LazR8LBvcxEZHCifv37jvTuI=; t=1724446328; x=1727038328; 
-	b=UXcORdFJxOF845ZKoWnx4KRfnpRckMRFipeZcOxp5oFURt6jmxJqsyo2C9aZXQz9E0o1Ya/Lo97
-	qyefndILqDA==;
-Message-ID: <90134f35-acb3-4124-b172-2de6d70dd0b4@moonlit-rail.com>
-Date: Fri, 23 Aug 2024 16:51:59 -0400
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncsIlw6d"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5334fdabefbso2255980e87.1
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 18:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724461523; x=1725066323; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wBBGvY+iZv47XHlSdID4RZTLRUoRXvjbqAgKNvtzcfk=;
+        b=ncsIlw6dTHaLEZqyb3dH3owGkpOboRzOP6K/69HNyiN3NnP0mVLzLRtdUOKP5cd6J7
+         3LNHLysr2Odzsrbtuiowsrc13z+xgKnE9lbwZb3Mq87y/JmUk7pd9rlRCLhYZWcVvcH1
+         nhZ9CDkf5hZhDX8A2UKIzzx67188A+C0p7N9rJwydZimFJxOe7LL1JSJzQg3uImFSDtU
+         bwKy70pqHTD20MY/WwCKcUqz56ynFzbv15iO/cEWAJpw2Km81QvOhn4s4moE0/OFju7n
+         2fvL7FTE87dZnfkZFf+Edpt6bxwbOKHOFOQkXMvveRImUZUNfcRy8xNEjl0iE8boMHgT
+         vbEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724461523; x=1725066323;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wBBGvY+iZv47XHlSdID4RZTLRUoRXvjbqAgKNvtzcfk=;
+        b=PyWrAFyZJ2xb18tAK2XrBBo5L6esc4KxsLrTgfW+LaX/fFvL1EN8b9R2RyAG7zPXnF
+         xT5l41qEEKuUbuz6bknkBBTY5+4ttfoIoVY1xj9Ysu827TvRyyzJzZ5uo991lpYRMmBo
+         cS61k8966+dEcLSWANtW6tCz4iZxXd3iRGho57j2h4Ojc2ci65PdLauDMfBPxu/S0nZ1
+         vDLUgeZiH4SAABmki0TsutJ+c1Qd3Lz8K11NhZqOp01CGPcEpwVOdBL5V3tDQ70kWtkl
+         kDmR6vley0ZAsyQwzxbnGh2lCGm2zKLOi3Vt6twXz398xse2HfBBWX09EibiTsvFac3C
+         hB/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVH5CF/hMVicZRdKfP3lZMsHFDog0b0EaF4GPQMjZ3IbXg57d8sEeZlhWYE4R3VlGOFHUGgpHHbkrJa@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXtEaL0YWv4uC4zPc2OV8CknpAxehl6Zkvlf2nxRyOzWwd5/YB
+	r6GMrwXxyPTgnIlcaW97JzlT1ThyUQVtYOk0j2xGuxfnMbfWsFRjtOk5QsXJAq+5CGq9+UhuK0i
+	es3egWQ/Ll00Xk0kEC7UbVP3mZrsNCV8Z
+X-Google-Smtp-Source: AGHT+IFQHOqz43zYjqnQWZBZlnPCb6afxrSVQGQAsBFInXAG9wbNqyfm3dcA2csTeQO7Ker7W6yWuEBauUq3lRkiX9E=
+X-Received: by 2002:a05:6512:33cb:b0:533:456a:cb33 with SMTP id
+ 2adb3069b0e04-5334cab2319mr2701944e87.20.1724461522288; Fri, 23 Aug 2024
+ 18:05:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CIFS lockup regression on SMB1 in 6.10
-To: Steve French <smfrench@gmail.com>, Linux Cifs <linux-cifs@vger.kernel.org>
-Cc: matoro <matoro_mailinglist_kernel@matoro.tk>,
- Bruno Haible <bruno@clisp.org>
-References: <cca852e55291d5bb86ea646589b197d5@matoro.tk>
- <CAH2r5msAXgYs7=5D=YxGa8XohegJwpTn6yasVyZCmPmPt1QA9w@mail.gmail.com>
- <bf5a6d9797f33d256b9fffeb79014242@matoro.tk>
- <CAH2r5mta2N-hE=uJERWxz3w3hzDxwTpvhXsRhEM=sAzGaufsWw@mail.gmail.com>
- <4c563891-973c-46a4-8964-0ef90b1c7e49@moonlit-rail.com>
- <CAH2r5mugVqy=jd_9x1xKYym6id1F2O-QuSX8C0HKbZPHybgCDQ@mail.gmail.com>
-From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-Content-Language: en-US, en-GB
-In-Reply-To: <CAH2r5mugVqy=jd_9x1xKYym6id1F2O-QuSX8C0HKbZPHybgCDQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 23 Aug 2024 20:05:11 -0500
+Message-ID: <CAH2r5muJabg=dB9EkuZD26+2mnQGRYRbpbQ96UxTk2UF4ZNQ6g@mail.gmail.com>
+Subject: generic/075 and generic/112 regression
+To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Steve French wrote:
-> On Aug 20 Kris Karas wrote:
->> Don't remember just when this started, maybe around
->> 6.10.3 or 6.10.4?  Can bisect if need be.
+We are still getting a failure with the netfs/cifs changes in
+generic/075 and generic/112
 
-I neglected to ask if any of the devs on Linux-CIFS know the culprit and 
-thus what to fix, or whether somebody would like me to bisect?  Happy to 
-do so.  Let me know.
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/9/builds/119
 
-> Smb311 Linux extensions work to ksmbd but for those extensions to samba 
-> there is a server bug with qfsinfo but patch is available for that
+That test included these patches from David's netfs branch:
 
-Super!  I'm glad to hear it.  I've been stubbornly stuck using vers=1.0 
-because I know of no other alternative.  I have heard of unofficial 
-patches to Samba going back at least a couple years, and have been 
-patiently awaiting official blessing; I'm sadly ignorant of the reasons 
-for rebuff.
+404b22e58fa8 (HEAD -> for-next) netfs, cifs: Improve some debugging bits
+e7aef949bd01 cifs: Fix FALLOC_FL_PUNCH_HOLE support
+ba5ed7cb79de netfs, cifs: Fix handling of short DIO read
+499aadc2c674 cifs: Fix lack of credit renegotiation on read retry
+f7b3de950e43 netfs: Fix missing iterator reset on retry of short read
+011be46dae8c netfs: Fix trimming of streaming-write folios in
+netfs_inval_folio()
+ea7079dd3372 netfs: Fix netfs_release_folio() to say no if folio dirty
+2305510606af mm: Fix missing folio invalidation calls during truncation
+11316e31ba23 netfs, ceph: Partially revert "netfs: Replace PG_fscache
+by setting folio->private and marking dirty"
 
-Kris
+In the previous run we had narrowed the regression down to being due
+to one of the following two patches:
+2e4fe7d5fac8 (HEAD -> netfs-fixes, origin/netfs-fixes) netfs, cifs:
+Fix handling of short DIO read
+  or
+18993747be65 netfs: Fix trimming of streaming-write folios in
+netfs_inval_folio()
+
+
+
+-- 
+Thanks,
+
+Steve
