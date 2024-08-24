@@ -1,95 +1,63 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9496B179AA
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Aug 2024 01:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DED1161;
+	Sat, 24 Aug 2024 01:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724461526; cv=none; b=b+et2oZz01oMbq9MDIyDk1ZX6qd82oEDdYPYFMSJygXaMNqhOECtQKE+M6JtYtoDkvTPsN/VAfTxOo+AKB1v8MaYpJ9dneXWKaQe+MsDBIWi4dgq6MzG47AgJ9DG8EdB3Tv9sk9fx5pQrRkG+9mhBYk53VZ3abA32pDeYKTp5/c=
+	t=1724462677; cv=none; b=hiyCZ8Iuslonu8CCzTOswJsuIGIw9EwUuy0CqYSRxXZlT1qZ4SIz/ioIAusDRIAS3suMjqj7ikw1OvvcsgWaQZ3FpAcdN2YD2ofx9TbO3sfvnC2cLiKKoZ1SxS7H7bGt2nA1LJfAHUA5BsNKiTbAn7/3ODEtNmqIw9Fy68pZxIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724461526; c=relaxed/simple;
-	bh=97Iph8lwt2I6yCVMgT7tF7rIsmOTVTvYekR90FN1vqc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=XoFSETR3yd/3NaVHbH+Yfadeitr8idAbbGNFLkcRXQl/Ni5duRBgP/1GZPeTFFUR3cFlJlwy3X1Gmw6qsC0gZw7CbYWLkOtlMICXbQKzTvGnnHCpxmY+HsB4w/mPFCYq7tnJapmk6S4jfAuox5vBMFNOTgIO8m2rczIBqSXU1Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ncsIlw6d; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724462677; c=relaxed/simple;
+	bh=lrb2NREsAdVP7/tjJCs9rDrCo5fWQrYzZbK0wdJkD28=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qmp9FS32VzJBtqrvPjWX6iMsfw8yO0rBwZRnvSWy9BxUOBUrRuIOO1no83yJOEjTHsYRwYoCsnMxhRb4UD8Zp8rJCxIkzMCrWbLZIxVrqh/DLdHr1oajxorftGrQwnPvXC8vm9c7Yqmq2t4AuWtvWbgLdgSk5joVzMCAEZhXQC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hp3BatmK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncsIlw6d"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5334fdabefbso2255980e87.1
-        for <linux-cifs@vger.kernel.org>; Fri, 23 Aug 2024 18:05:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724461523; x=1725066323; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wBBGvY+iZv47XHlSdID4RZTLRUoRXvjbqAgKNvtzcfk=;
-        b=ncsIlw6dTHaLEZqyb3dH3owGkpOboRzOP6K/69HNyiN3NnP0mVLzLRtdUOKP5cd6J7
-         3LNHLysr2Odzsrbtuiowsrc13z+xgKnE9lbwZb3Mq87y/JmUk7pd9rlRCLhYZWcVvcH1
-         nhZ9CDkf5hZhDX8A2UKIzzx67188A+C0p7N9rJwydZimFJxOe7LL1JSJzQg3uImFSDtU
-         bwKy70pqHTD20MY/WwCKcUqz56ynFzbv15iO/cEWAJpw2Km81QvOhn4s4moE0/OFju7n
-         2fvL7FTE87dZnfkZFf+Edpt6bxwbOKHOFOQkXMvveRImUZUNfcRy8xNEjl0iE8boMHgT
-         vbEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724461523; x=1725066323;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wBBGvY+iZv47XHlSdID4RZTLRUoRXvjbqAgKNvtzcfk=;
-        b=PyWrAFyZJ2xb18tAK2XrBBo5L6esc4KxsLrTgfW+LaX/fFvL1EN8b9R2RyAG7zPXnF
-         xT5l41qEEKuUbuz6bknkBBTY5+4ttfoIoVY1xj9Ysu827TvRyyzJzZ5uo991lpYRMmBo
-         cS61k8966+dEcLSWANtW6tCz4iZxXd3iRGho57j2h4Ojc2ci65PdLauDMfBPxu/S0nZ1
-         vDLUgeZiH4SAABmki0TsutJ+c1Qd3Lz8K11NhZqOp01CGPcEpwVOdBL5V3tDQ70kWtkl
-         kDmR6vley0ZAsyQwzxbnGh2lCGm2zKLOi3Vt6twXz398xse2HfBBWX09EibiTsvFac3C
-         hB/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVH5CF/hMVicZRdKfP3lZMsHFDog0b0EaF4GPQMjZ3IbXg57d8sEeZlhWYE4R3VlGOFHUGgpHHbkrJa@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXtEaL0YWv4uC4zPc2OV8CknpAxehl6Zkvlf2nxRyOzWwd5/YB
-	r6GMrwXxyPTgnIlcaW97JzlT1ThyUQVtYOk0j2xGuxfnMbfWsFRjtOk5QsXJAq+5CGq9+UhuK0i
-	es3egWQ/Ll00Xk0kEC7UbVP3mZrsNCV8Z
-X-Google-Smtp-Source: AGHT+IFQHOqz43zYjqnQWZBZlnPCb6afxrSVQGQAsBFInXAG9wbNqyfm3dcA2csTeQO7Ker7W6yWuEBauUq3lRkiX9E=
-X-Received: by 2002:a05:6512:33cb:b0:533:456a:cb33 with SMTP id
- 2adb3069b0e04-5334cab2319mr2701944e87.20.1724461522288; Fri, 23 Aug 2024
- 18:05:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hp3BatmK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34035C32786;
+	Sat, 24 Aug 2024 01:24:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724462677;
+	bh=lrb2NREsAdVP7/tjJCs9rDrCo5fWQrYzZbK0wdJkD28=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=hp3BatmKaBY5NZGiWHZm0oiGbfnYeudDW4jMCYRgQhKSP2MEjt6G9Q0P9Z9QIpd8F
+	 ig5I2x999ApomJxk0Dv/vItOQzpMdPyswwXBzLkEdiLt6NJpMYRsQNeWXHDE8TJl1k
+	 6xQ0khiWHCy9OwJyNmoAF1Nc+94vzeMVYVF63LzEqxe4gCIWnrva7Ttw1G7gtYZ3I0
+	 CuIzIJkLgW52PdfCMzOnb6zHrU4JR0lbO7CPr4nX4rQVSPHFQCIw8g4VtcSvCRoBmG
+	 LNXzrYcFGQXm0Ny4cPWSI2lei3/1b2RyuhE6Mluhp7hJ3QWfJ0MqnwGn0lBXHA0tIO
+	 gOw95fzKXrUAw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342723804C87;
+	Sat, 24 Aug 2024 01:24:38 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muykPAu=GaXaHRsfK2nU0jkREv4Pqd6cM5joLDbT+pZTA@mail.gmail.com>
+References: <CAH2r5muykPAu=GaXaHRsfK2nU0jkREv4Pqd6cM5joLDbT+pZTA@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muykPAu=GaXaHRsfK2nU0jkREv4Pqd6cM5joLDbT+pZTA@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.11-rc4-client-fixes
+X-PR-Tracked-Commit-Id: 5e51224d2afbda57f33f47485871ee5532145e18
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 66ace9a8f9b4dedc44045c1e47accf148c7cb5fa
+Message-Id: <172446267679.3127411.17230524686396238034.pr-tracker-bot@kernel.org>
+Date: Sat, 24 Aug 2024 01:24:36 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 23 Aug 2024 20:05:11 -0500
-Message-ID: <CAH2r5muJabg=dB9EkuZD26+2mnQGRYRbpbQ96UxTk2UF4ZNQ6g@mail.gmail.com>
-Subject: generic/075 and generic/112 regression
-To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-We are still getting a failure with the netfs/cifs changes in
-generic/075 and generic/112
+The pull request you sent on Fri, 23 Aug 2024 10:40:19 -0500:
 
-http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/9/builds/119
+> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.11-rc4-client-fixes
 
-That test included these patches from David's netfs branch:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/66ace9a8f9b4dedc44045c1e47accf148c7cb5fa
 
-404b22e58fa8 (HEAD -> for-next) netfs, cifs: Improve some debugging bits
-e7aef949bd01 cifs: Fix FALLOC_FL_PUNCH_HOLE support
-ba5ed7cb79de netfs, cifs: Fix handling of short DIO read
-499aadc2c674 cifs: Fix lack of credit renegotiation on read retry
-f7b3de950e43 netfs: Fix missing iterator reset on retry of short read
-011be46dae8c netfs: Fix trimming of streaming-write folios in
-netfs_inval_folio()
-ea7079dd3372 netfs: Fix netfs_release_folio() to say no if folio dirty
-2305510606af mm: Fix missing folio invalidation calls during truncation
-11316e31ba23 netfs, ceph: Partially revert "netfs: Replace PG_fscache
-by setting folio->private and marking dirty"
-
-In the previous run we had narrowed the regression down to being due
-to one of the following two patches:
-2e4fe7d5fac8 (HEAD -> netfs-fixes, origin/netfs-fixes) netfs, cifs:
-Fix handling of short DIO read
-  or
-18993747be65 netfs: Fix trimming of streaming-write folios in
-netfs_inval_folio()
-
-
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
