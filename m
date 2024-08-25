@@ -1,127 +1,108 @@
-Received: from d.mail.sonic.net (d.mail.sonic.net [64.142.111.50])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F871C14
-	for <linux-cifs@vger.kernel.org>; Sun, 25 Aug 2024 02:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.142.111.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A06C801;
+	Sun, 25 Aug 2024 20:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724551302; cv=none; b=ln+ZJhWO5qL6Fh2feikqDA4awY/rR+/vQEnNmCPXxvYC7Et/bpwuTf7AD2pzcl3bLr39gPP/0zr32zHMy4WYVp1fTjNt3GG6HUJHFWdH+Zl5p/JJqK1Vc+EBX9h+uzLzP4gKLtnd8eHjJLvaDkQh59NClW52/4VLh6BkmlZX7YA=
+	t=1724617138; cv=none; b=NpydjDQOBRc+A9wEtzThri9mGDyxao0s8jJI3SbGHEl/ZIBnAaMYJmxOKMNIZ/ZYbfsXNBx1v7vJG8c4omou2pbaLvBJypoqxj7sJXGgk6HoUVbcpads8nyPDwDaCy8HpSCtzaeveuLf8k5BkEj6M+09ZcKu3hr/aqcBtsS3df4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724551302; c=relaxed/simple;
-	bh=4xAUDQ5Xa1nBWD0nbczHkPr0m3ym6tcLEMSWnybSeoM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ePJyp5q6GDKr7S26QcmvxqQSelUhfwjo/PlrTKC+YN/bX+SdW7DVpbv4th1V6XBr3CI4OWxnDENFiS76V82kGJ8YqhFsXa003jvKOeJHFBOB1HfyRpxKshK0Mip2DkQVqzoRTd/TNRL5a9d5UyZi6Waf1eYHBcfKD0Y49VAgdGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one; spf=pass smtp.mailfrom=nom.one; arc=none smtp.client-ip=64.142.111.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nom.one
-Received: from 192-184-190-65.static.sonic.net (192-184-190-65.static.sonic.net [192.184.190.65])
-	(authenticated bits=0)
-	by d.mail.sonic.net (8.16.1/8.16.1) with ESMTPA id 47P1oeJg025924;
-	Sat, 24 Aug 2024 18:50:41 -0700
-From: Forest <forestix@nom.one>
-To: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>
-Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        stable@vger.kernel.org, regressions@lists.linux.dev
-Subject: [REGRESSION] cifs: triggers bad flatpak & ostree signatures, corrupts ffmpeg & mkvmerge outputs
-Date: Sat, 24 Aug 2024 18:50:40 -0700
-Message-ID: <pv2lcjhveti4sfua95o0u6r4i73r39srra@sonic.net>
+	s=arc-20240116; t=1724617138; c=relaxed/simple;
+	bh=pQvsKRIzaaFuutRjgT2m6bCC+cy9chyHQSgPUu6BMeE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=jzhafjyEmrylC92IeILcUraCN2khWSISEyrNXBWGhXDGE4B27Ro1LW6uPcFeGtWHZUluvIg206glP9Rufme2FEjDAQ3UTV60jNbThnib7ewk7qh+fydcsA0iL9zg9wsMxyE+0sgTG/rp/INwfu4LCeP5bHnVdhtyNzGFU53qIGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bWQX7wKu; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWQX7wKu"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-533496017f8so4901729e87.0;
+        Sun, 25 Aug 2024 13:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724617135; x=1725221935; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4P7XXm9eSrgZ/kl6du4jTDJpa0x1cOivnQTsm8g2HSM=;
+        b=bWQX7wKu9peW05SMNYyjEyW9oooDwmYXQXy1o1u5Jk5PZuvGh8kWttJ4aolaUId59B
+         FHkWFavLKCJFnJzaZjpYSWbudeBRs3ijA8qoxdjGidscMdLZqORdW62NC4znAQek+RuG
+         j57IO/YpPG5ShwER6i/7ToLe9wIf/zaiVTYVlk6e31ugCu49AKRgR4sXfIJmLjU33pm/
+         a1QV/aT+UtP0rZwh9M5x8uTezPHuqwlO4fYnjrwFKjnfdNEKW1lr0FvKEpxexFhK7dhx
+         Lx7Ijtqo/hEcurM2wmNb6x7SncA0KXsxxOiu19NNC4iGSDNmvaHHSuCmgiG3l2UOkyqk
+         ZB4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724617135; x=1725221935;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4P7XXm9eSrgZ/kl6du4jTDJpa0x1cOivnQTsm8g2HSM=;
+        b=RZNKY58fKnhBkss7vth9D0iChtHB4CwnldfN8s+VG+jQNp841IO7uIBOcX11Zghv1r
+         D+4yaeVyHOroUIbarpesQxXsto35Nfmgbr59mo9rUalhOGZZcfcVhMJrqRpnkEAmfOXf
+         h1y6tiPGoAg0zZLF+ACHsLk+hRK5WQBljpaT6Ru37OkY5XCY8mLNST5UcqZHIf9Hyxzr
+         68DbunHAnv/e9KfRHT4JqpcTzH8iYC1+nmexHO57xgdC71TizkKwKmU6fxdpz1rVUDbQ
+         52hCSm/Hk4lXanSHu7UF6rTJ0sRNIyDk/TtDRBBDq3b4S2046t63pKiFvipWNLE44z4B
+         Xojw==
+X-Gm-Message-State: AOJu0Yy3oIV/B1+ffLjFXfZ3mF1tFbfQpbeaa6r/hndORKgaQOas2cmO
+	QDEaDQ9ksvVBJnON0WGXZgMawxlyuWu0NB2UuONSsP6oW5ugIQ8CIYzgdPt3iHv1hZwvOn+YClf
+	Lc1JUw6fTCchVdjXqvypG9Rnd4ey2fUpg
+X-Google-Smtp-Source: AGHT+IFccCq9i2PBJDvVPN83Iaf58GPmFBLNgdMRedz6h3BxVSGQf4X8gQprHFB2bvMlUCxVVQjNEQ0piO2hTYDaaj0=
+X-Received: by 2002:a05:6512:1248:b0:533:460c:e42f with SMTP id
+ 2adb3069b0e04-5343882d110mr5793542e87.4.1724617134486; Sun, 25 Aug 2024
+ 13:18:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Sonic-CAuth: UmFuZG9tSVbLHoUERX1vtYlwpdseB4XYWtL2dShvfjUov/JNCh945aBnRL4VeQXkDwI4V2nIoHpMTu1rLsWf2EGRvohwCNK8
-X-Sonic-ID: C;pEX8boRi7xGqg65Sr7edkQ== M;NEsRb4Ri7xGqg65Sr7edkQ==
-X-Spam-Flag: No
-X-Sonic-Spam-Details: -0.0/5.0 by cerberusd
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 25 Aug 2024 15:18:43 -0500
+Message-ID: <CAH2r5msDdpEruQXAtDXimonHKF7CVwO8bnghwXwrUX6K3xkFcg@mail.gmail.com>
+Subject: Hang in generic/113 starting in 6.11-rc3 or rc4
+To: linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>, 
+	Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-#regzbot introduced: 3ee1a1fc3981
+I noticed a hung fstest (process hung in a syscall before it gets down
+to the fs) running generic/113 on mounts to Samba (the mount still
+works, but the test hangs) starting after 6.11-rc2 kernel (it fails on
+6.11-rc4 but works on rc2).   It is unlikely to be cifs.ko related
+since it still fails with 6.11-rc2 version of cifs.ko where kernel/VFS
+is rc4 but works if kernel/VFS is rc2 (ie fails even with older
+cifs.ko source built and run on 6.11-rc4 kernel) so is probably
+related to a VFS or netfs change.
 
-Dear maintainers,
+It also doesn't appear to be hung inside cifs.ko, but in the VFS layer:
 
-I think I have found a cifs regression in the 6.10 kernel series, which leads
-certain programs to write corrupt data.
+# cat /proc/fs/cifs/DebugData  | grep "Active VFS Requests"
+Active VFS Requests: 0
 
-After upgrading from kernel 6.9.12 to 6.10.6, flatpak and ostree are now
-writing bad gpg signatures when exporting signed packages or signing their
-repository metadata/summary files, whenever the repository is on a cifs mount.
-Instead of writing the signature data, null bytes are written in its place.
-
-Furthermore, ffmpeg and mkvmerge are now intermittently writing corrupt files
-to cifs mounts.
-
-No error is reported by the applications or the kernel when it happens.
-In the case of flatpak, the problem isn't revealed until something tries to use
-the repository and finds signatures full of null bytes. (Of course, this means
-the affected repositories have been rendered useless.) In the case of ffmpeg
-and mkvmerge, the problem isn't revealed until someone plays the video file and
-reaches a corrupt section.
+it works on 6.11-rc2 but fails (hangs) on 6.11-rc4 in my tests to
+Samba localhost running generic/113
 
 
-A kernel bisect reveals this:
+# cat /proc/fs/cifs/open_files
+# Version:1
+# Format:
+# <tree id> <ses id> <persistent fid> <flags> <count> <pid> <uid> <filename>
+0x4a8de66a 0x2cf91d3e 0x24d0faab 0xc002 1 5678 0 aiostress.5454.3.12
+0x4a8de66a 0x2cf91d3e 0x36a30cae 0xc002 1 5678 0 aiostress.5454.3.14
 
-3ee1a1fc39819906f04d6c62c180e760cd3a689d is the first bad commit
-commit 3ee1a1fc39819906f04d6c62c180e760cd3a689d
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri Oct 6 18:29:59 2023 +0100
-    cifs: Cut over to using netfslib
+# cat /proc/5678/stack
+[<0>] futex_wait_queue+0x66/0xa0
+[<0>] __futex_wait+0x15b/0x1d0
+[<0>] futex_wait+0x73/0x130
+[<0>] do_futex+0x105/0x260
+[<0>] __x64_sys_futex+0x128/0x200
+[<0>] x64_sys_call+0x224c/0x22b0
+[<0>] do_syscall_64+0x7e/0x170
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-I was unable to determine whether 6.11.0-rc4 fixes it, due to another cifs bug
-in that version (which I hope to report soon).
+I also didn't see anything obvious suspicious using trace-cmd tracing
+all cifs.ko tracepoints, but is there a trick to try to narrow down
+the hung syscall (and where) a little more easily?
 
+Any ideas?
 
-An strace of flatpak (which uses libostree) shows it generating correct
-signatures internally, but behaving differently on cifs vs. ext4 when working
-with memory-mapped temp files, in which the signatures are stored before being
-written to their final outputs. Here's where I reported my initial findings to
-those projects:
-https://github.com/flatpak/flatpak/issues/5911
-https://github.com/ostreedev/ostree/issues/3288
+-- 
+Thanks,
 
-Debian Testing and Unstable kernels (6.10.4-1 and 6.10.6-1) are affected:
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1079394
-
-
-The following reproducer script consistently triggers the problem for me. Run
-it with two arguments: a path on a cifs mount where an ostree repo should be
-created, and a GPG key ID with which to sign a commit.
-
-
-#!/bin/sh
-set -e
-
-if [ "$#" -lt 2 ] || [ "$1" = "-h" ] ; then
-    echo "usage: $(basename "$0") <repo-dir> <gpg-key-id>"
-    exit 2
-fi
-
-repo=$1
-keyid=$2
-src="./foo"
-
-echo "creating ostree repo at $repo"
-ostree init --repo="$repo"
-
-echo "creating source file tree at $src"
-mkdir -p "$src"
-echo hi > "$src"/hello
-
-ostree commit --repo="$repo" --branch=foo --gpg-sign="$keyid" "$src"
-
-if ostree show --repo="$repo" foo; then
-    echo ---
-    echo success!
-else
-    echo ---
-    ostree show --repo="$repo" --print-detached-metadata-key=ostree.gpgsigs foo
-    echo failure!
-    echo look for null bytes in the above commit signature
-fi
-
-
+Steve
