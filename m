@@ -1,59 +1,88 @@
-Received: from d.mail.sonic.net (d.mail.sonic.net [64.142.111.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AB9770F1
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Aug 2024 18:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.142.111.50
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07A21D318E;
+	Tue, 27 Aug 2024 19:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724783927; cv=none; b=c4noCmLV1GmN1ljZAbArkys6Tuirzeh3IZ9Pr+ZfKoVq6ZHsxa3+COV2eJ+X89eutLbIKR2hSxYHI2/kTjWaTr4X8HDmG0NqDY7JHrS4OAMPjh82hiK8yGdKFDciQ1aDzY7yNxCQ0l/DGLlTK/3b9JJ/AJXUrniX0ghmD8UOX7E=
+	t=1724788740; cv=none; b=hXWsp3QybEU9PLltyrLDbBC+NoW6WeyrY44rpGN3oi5B/T8IzCZlDvbv53IzQcHCm5FCH9Nzcgznr69qWQGREJZwGxXvYPyn7QPnp/BMaqMVCj+25ATwDxndZBwxDSzMy+fyu6iyI6xm0PYZDCN6nCQ3C4KhLARceY868xRNQfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724783927; c=relaxed/simple;
-	bh=+F/anzSI4Fm5wVv2mzl2/R6RHwj4iXQ42Tr/l3oEugU=;
-	h=From:To:Cc:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=Y+Nr+FxcdyxY8LvlY7kj9M13IYxfTh2ptRXrsRY2yK4Edgkf6fUmD6nKwi8HGYjem0E7x4wNgRU6Bi7h7zFyE5WQH73cGpCqa4+vMXRM9227q9jaxwoR/9CbEcZCeqQI6NNJYtaF7mvfZR79jej7JcRuijo4DEquh0KdhxYf/sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one; spf=pass smtp.mailfrom=nom.one; arc=none smtp.client-ip=64.142.111.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nom.one
-Received: from 192-184-190-79.static.sonic.net (192-184-190-79.static.sonic.net [192.184.190.79])
-	(authenticated bits=0)
-	by d.mail.sonic.net (8.16.1/8.16.1) with ESMTPA id 47RIcc0W004765;
-	Tue, 27 Aug 2024 11:38:38 -0700
-From: Forest <forestix@nom.one>
-To: Forest <forestix@nom.one>
-Cc: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, stable@vger.kernel.org,
-        regressions@lists.linux.dev
-Subject: Re: [REGRESSION] cifs: triggers bad flatpak & ostree signatures, corrupts ffmpeg & mkvmerge outputs
-Date: Tue, 27 Aug 2024 11:38:38 -0700
-Message-ID: <g87scjlif3eaff02i2u2kstullto3erb95@sonic.net>
-References: <pv2lcjhveti4sfua95o0u6r4i73r39srra@sonic.net>
-In-Reply-To: <pv2lcjhveti4sfua95o0u6r4i73r39srra@sonic.net>
+	s=arc-20240116; t=1724788740; c=relaxed/simple;
+	bh=79Wy4990U5+ACAgLZJtukWndwWdUtDEuehTjLakTktA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYPTbkxHjuaNJBrbblH3QqOp19u8Ub7mCxA9D3lc3d5wyq8iWhNvhv1EHkfI2kGyzMzgYw5eeg/7dhuoZppmf8SzmYlc2K0ioyZZ2XZHX20wrBcNFwll0GvR79vHXIgou6TYzrKMTPUovDvN2zDO36McMC+3XZ9EdpJ20gBYXzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=sKZShOio; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="sKZShOio"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 5511514C1E1;
+	Tue, 27 Aug 2024 21:58:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1724788736;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gnImlVYxTHmpkmEFgvN6q4f1eiqqHxJTkuzCyeQ6ZA4=;
+	b=sKZShOioJBhejkG1/gZziebNy9sGtzAqp9mG0hCodcqXWnln8zAhyG+7/vGa8BKIPB/+Sz
+	X7mVhsJmxFg9XFaeU3j9hIHGfNNCHn4UGZhSHmKMtIy00DNzkfQOsOI54Wev7s70XEDdg6
+	vd8cF0iyb4TTIVHXWwwJLA4Pxmm98Oi5FJBSe2GLx2277bJN7b4syiKlgXUI3CMdtSV7GN
+	YrOJ0o6Nn4Aa3d3pj/8wEsKnMYRYV7kyzbtlZL5kaPAro5knSONFN4docvwUkfhIepupT+
+	PnKYilgevshsMeOivp1dO2qnFF8wK0VjDn9J29VibVCYUtZaj23JHbTMPxF9bg==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 591bc950;
+	Tue, 27 Aug 2024 19:58:48 +0000 (UTC)
+Date: Wed, 28 Aug 2024 04:58:33 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Ilya Dryomov <idryomov@gmail.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH 6.10 083/273] 9p: Fix DIO read through netfs
+Message-ID: <Zs4v6aV4-VpIqdfy@codewreck.org>
+References: <20240827143833.371588371@linuxfoundation.org>
+ <20240827143836.571273512@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Sonic-CAuth: UmFuZG9tSVaWlo+voc/tb5rtMHTPlFeVb+Ex/T+O8qBjdZaly11Tri5gdVa32opJXwwx5hukqQtYx/GVNc5a9fKyBck4Lg2k
-X-Sonic-ID: C;cARUk6Nk7xGDt65Sr7edkQ== M;VhFck6Nk7xGDt65Sr7edkQ==
-X-Spam-Flag: No
-X-Sonic-Spam-Details: -0.0/5.0 by cerberusd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240827143836.571273512@linuxfoundation.org>
 
-On Sat, 24 Aug 2024 18:50:40 -0700, Forest wrote:
+Greg Kroah-Hartman wrote on Tue, Aug 27, 2024 at 04:36:47PM +0200:
+> From: Dominique Martinet <asmadeus@codewreck.org>
+> 
+> [ Upstream commit e3786b29c54cdae3490b07180a54e2461f42144c ]
 
->I was unable to determine whether 6.11.0-rc4 fixes it, due to another cifs bug
->in that version (which I hope to report soon).
+As much as I'd like to have this in, it breaks cifs so please hold this
+patch until at least these two patches also get backported (I didn't
+actually test the fix so not sure which is needed, *probably*
+either/both):
+950b03d0f66 ("netfs: Fix missing iterator reset on retry of short read")
+https://lore.kernel.org/r/20240823200819.532106-8-dhowells@redhat.com ("netfs, cifs: Fix handling of short DIO read")
 
-That bug is now reported:
+For some reason the former got in master but the later wasn't despite
+having been sent together, I might have missed some mails and only the
+first might actually be required.. David, Steve please let us know if
+just the first is enough.
 
-https://lore.kernel.org/linux-cifs/37fncjpgsq45becdf2pdju0idf3hj3dtmb@sonic.net/T/#u
+Either way the 9p patch can wait a couple more weeks; stuck debian CI
+(9p) is bad but cifs corruptions are worse.
 
-A pair of patches considered in that bug's discussion allowed me to test
-this regression on 3e9bff3bbe13, which is one commit ahead of v6.11-rc5.
-The mkvmerge output corruption is still present.
+Thanks,
+-- 
+Dominique
