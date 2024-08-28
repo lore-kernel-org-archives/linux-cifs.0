@@ -1,140 +1,150 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24460282E1
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 13:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF76B1A4B9F;
+	Wed, 28 Aug 2024 15:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724852782; cv=none; b=TNxWGiqNFI2aJEJDHRJ7AhSYYrzMNQ8UZRE8ZwS7+aQGxmKIMFldOxTLiQ7hh03hsRWBOUitPaM7JvdzEyP3QDYXyQ7ZFu2V0RqDhVAIzMwYD5yPFsiX8oqv/GZ8Nd9RmAYRkuraGT8F3pDomBVifsSln48Fv878bVZZljAhnLY=
+	t=1724858810; cv=none; b=t/1IRu2P+20QqpvH2k7AKsZ58Y7ZVFbRZkgh/HJPFI5stNyQlBqPjpXAfEkiAXzuV7SHnxrcy9uYtb1od8+4+zCj93ifTDVHzOTJR44JQ6PBDijYqOfJu9owSPYtz+HO3MWz6hCepayrBT2qpok/vP76UJSp7Lcf5Un2K1rvJng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724852782; c=relaxed/simple;
-	bh=UPVsyg9jhE7jrUGJIlaml9jpYvZQwLSCE/+JMVX1JFw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uRPLYXW7UuwI5+aIreJdVhERFUBYW/JsP4Z5DpqBRd3Kpu+3lKW3OIGt9HnSLnb3W32pdzZotsEIyhyyzUvbJOMdBeSjiehke77r1M+LjtkpOnYasL0DLUy0LxMzigxQFBbtFJ3tWdrvMgRr5gBmzSLgoqQvDGd54Kg1RFLuwkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2d3e44b4613so4952225a91.3
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 06:46:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724852780; x=1725457580;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s36Zy5YRuyXRDt6kPoJShU6NQaEWlxS0Y4rAu/BnFZE=;
-        b=uk6rRN5+1g+z0qi1knEfg4LXyhtGL4zl4kkA83YEyl++m4aJUdhTGZiJUHrgMXJoAJ
-         SLoXBtFNKBae2c74AfAKobHNGowmaFN4HEcpxyLT2sztYJf6PTLB+48HoQ6p16TjzFcv
-         MmK3ojJ+EOXJWRFieezplPhe2nn0I2jscBx5MeCKZVSp/HPW1A6zBudfbh6IasEbNd+j
-         Px4BiBrSEvY+7II4iwE/OLqmIoXnmNSKLupOC8R/mC8L5i0BRjkPW7NJkFTODzDccx70
-         a8CwZ750FvMRGLbkGCscmak08p+Q4XF63ZrttVXKeFUveYj30xG8kV3zJu/nKyR5NQQo
-         fqWg==
-X-Gm-Message-State: AOJu0YwrtqLSiRiSUoMfCEZkMG3p1ryTIXDf4VntFguZH6fw2NU4s/fs
-	m8bRcCc2SG7g430kHFdfR4NPBAuu3a+pCN2JDNm9ABGv6c0Tco4vcNnPEA==
-X-Google-Smtp-Source: AGHT+IHas7yGvxTNHuJRXAETeuWbUadASeINO+M9YlJYTI2m5hSUKJPfuNyV1gk66hk0noZuDdXl4g==
-X-Received: by 2002:a17:90a:4a11:b0:2c9:75fd:298a with SMTP id 98e67ed59e1d1-2d646d73335mr15370899a91.42.1724852780073;
-        Wed, 28 Aug 2024 06:46:20 -0700 (PDT)
-Received: from localhost.localdomain ([1.227.206.162])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8446f3949sm1817856a91.48.2024.08.28.06.46.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 06:46:19 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: unset the binding mark of a reused connection
-Date: Wed, 28 Aug 2024 22:45:49 +0900
-Message-Id: <20240828134549.5377-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1724858810; c=relaxed/simple;
+	bh=rxlkV+j+vdfUqHQYjq6CHRf43Bcc0FuNBBYeeRY83yA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZYhMj0scBGl9usfYYTgJNartAIp9GFy6hJ6jnXkyoc1PjwA+tBkXx1m8GAkN2KA8PL0rue/xfwASSs9D/RJVrCq97if2pTUatBjTNADJvF3UVXwp2QhKL0mlgBLOSj8ZVan/C9bAquIWV8WC/Lu8x+FJZMUPDiRuzPUBK/Mf9/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cV8Jjz+a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pUPa7gh3; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cV8Jjz+a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pUPa7gh3; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cV8Jjz+a";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUPa7gh3";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cV8Jjz+a";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUPa7gh3"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0BE1421996;
+	Wed, 28 Aug 2024 15:26:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724858807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
+	b=cV8Jjz+aSrsW3SGsjwExBvTATv5H2kppAa38oeoyFfaSVr7ELWwNcO+h2NUym7XAAQYwdK
+	sMg8+zPVpiJ7O40NGhe1crQp2KwCYwE9xdlYISZbxTnWM4i0nD0NAUYjp9YoDRlTekHBFc
+	3zoTEyW05W1xGj7SuEs6vRQ1POoEa2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724858807;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
+	b=pUPa7gh3H7yi3MuVuHOrXnwoIz5V947U19JEMsYyVPJm+E2VKhFyGezz87hfp/wsDRllT/
+	UlLPShQXkYMPoXCw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1724858807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
+	b=cV8Jjz+aSrsW3SGsjwExBvTATv5H2kppAa38oeoyFfaSVr7ELWwNcO+h2NUym7XAAQYwdK
+	sMg8+zPVpiJ7O40NGhe1crQp2KwCYwE9xdlYISZbxTnWM4i0nD0NAUYjp9YoDRlTekHBFc
+	3zoTEyW05W1xGj7SuEs6vRQ1POoEa2o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1724858807;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
+	b=pUPa7gh3H7yi3MuVuHOrXnwoIz5V947U19JEMsYyVPJm+E2VKhFyGezz87hfp/wsDRllT/
+	UlLPShQXkYMPoXCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 00C20138D2;
+	Wed, 28 Aug 2024 15:26:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Xz8pALdBz2ZFUAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 28 Aug 2024 15:26:47 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id A05DBA0965; Wed, 28 Aug 2024 17:26:38 +0200 (CEST)
+Date: Wed, 28 Aug 2024 17:26:38 +0200
+From: Jan Kara <jack@suse.cz>
+To: David Howells <dhowells@redhat.com>
+Cc: Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
+	Steve French <sfrench@samba.org>, netfs@lists.linux.dev,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: The mapping->invalidate_lock, copy-offload and cifs
+Message-ID: <20240828152638.iv7v5rj23n7mi73h@quack3>
+References: <774275.1724770015@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <774275.1724770015@warthog.procyon.org.uk>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
 
-Steve French reported null pointer dereference error from sha256 lib.
-cifs.ko can send session setup requests on reused connection.
-If reused connection is used for binding session, conn->binding can
-still remain true and generate_preauth_hash() will not set
-sess->Preauth_HashValue and it will be NULL.
-It is used as a material to create an encryption key in
-ksmbd_gen_smb311_encryptionkey. ->Preauth_HashValue cause null pointer
-dereference error from crypto_shash_update().
+Hi David!
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0
-Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 8 PID: 429254 Comm: kworker/8:39
-Hardware name: LENOVO 20MAS08500/20MAS08500, BIOS N2CET69W (1.52 )
-Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
-RIP: 0010:lib_sha256_base_do_update.isra.0+0x11e/0x1d0 [sha256_ssse3]
-<TASK>
-? show_regs+0x6d/0x80
-? __die+0x24/0x80
-? page_fault_oops+0x99/0x1b0
-? do_user_addr_fault+0x2ee/0x6b0
-? exc_page_fault+0x83/0x1b0
-? asm_exc_page_fault+0x27/0x30
-? __pfx_sha256_transform_rorx+0x10/0x10 [sha256_ssse3]
-? lib_sha256_base_do_update.isra.0+0x11e/0x1d0 [sha256_ssse3]
-? __pfx_sha256_transform_rorx+0x10/0x10 [sha256_ssse3]
-? __pfx_sha256_transform_rorx+0x10/0x10 [sha256_ssse3]
-_sha256_update+0x77/0xa0 [sha256_ssse3]
-sha256_avx2_update+0x15/0x30 [sha256_ssse3]
-crypto_shash_update+0x1e/0x40
-hmac_update+0x12/0x20
-crypto_shash_update+0x1e/0x40
-generate_key+0x234/0x380 [ksmbd]
-generate_smb3encryptionkey+0x40/0x1c0 [ksmbd]
-ksmbd_gen_smb311_encryptionkey+0x72/0xa0 [ksmbd]
-ntlm_authenticate.isra.0+0x423/0x5d0 [ksmbd]
-smb2_sess_setup+0x952/0xaa0 [ksmbd]
-__process_request+0xa3/0x1d0 [ksmbd]
-__handle_ksmbd_work+0x1c4/0x2f0 [ksmbd]
-handle_ksmbd_work+0x2d/0xa0 [ksmbd]
-process_one_work+0x16c/0x350
-worker_thread+0x306/0x440
-? __pfx_worker_thread+0x10/0x10
-kthread+0xef/0x120
-? __pfx_kthread+0x10/0x10
-ret_from_fork+0x44/0x70
-? __pfx_kthread+0x10/0x10
-ret_from_fork_asm+0x1b/0x30
-</TASK>
+On Tue 27-08-24 15:46:55, David Howells wrote:
+> I'm looking at trying to fix cifs_file_copychunk_range().  Currently, it
+> invalidates the destination range, apart from a partial folio at either end
+> which will be flushed, and then tries the copy.  But if the copy fails or can
+> only be partially completed (eg. ENOSPC), we lose any data in the destination
+> region, so I think it needs to be flushed and invalidated rather than just
+> being invalidated.
+> 
+> Now, we have filemap_invalidate_inode() which I can use to flush back and
+> invalidate the folios under the invalidate_lock (thereby avoiding the need for
+> launder_folio).  However, that doesn't prevent mmap from reinstating the
+> destination folios with modifications whilst the copy is ongoing the moment
+> the invalidate_lock is dropped.
+> 
+> Question is: would it be reasonable to do the copy offload whilst holding the
+> invalidate_lock for the duration?
 
-Fixes: f5a544e3bab7 ("ksmbd: add support for SMB3 multichannel")
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/smb2pdu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+FWIW yes, I'd expect cifs_file_copychunk_range() to take invalidate_lock on
+the target file to avoid possible races with page faults. We do it this
+already for similar operations such as reflink or various fallocate
+operations...
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 20846a4d3031..8bdc59251418 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1690,6 +1690,8 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 		rc = ksmbd_session_register(conn, sess);
- 		if (rc)
- 			goto out_err;
-+
-+		conn->binding = false;
- 	} else if (conn->dialect >= SMB30_PROT_ID &&
- 		   (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL) &&
- 		   req->Flags & SMB2_SESSION_REQ_FLAG_BINDING) {
-@@ -1768,6 +1770,8 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 			sess = NULL;
- 			goto out_err;
- 		}
-+
-+		conn->binding = false;
- 	}
- 	work->sess = sess;
- 
+								Honza
+
+> 
+> Thanks,
+> David
+> 
 -- 
-2.25.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
