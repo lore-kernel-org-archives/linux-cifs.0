@@ -1,137 +1,98 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B04B16D9BA;
-	Wed, 28 Aug 2024 11:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F3015B12F
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 11:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724845095; cv=none; b=tFGD7awYtbvMvlrquhvJPVXJUuuxXPfZM02s79P6BR63UXn9gHrs7HW/NsDHZwsTP27J0UiVn6XhK49JQ/EmMs28i8eCLhJW3BiEzjnFIScfG+4ODhe5IrohhYhD9kGjV/RUCNiQZ51veVafpDGOWddSyxf87oKBp9iK4v6Z0/I=
+	t=1724845957; cv=none; b=LXehroq9HNnWNA3Lxm6zbHtIlG1d4rnQBjFizUHENS6c46tqpdOpn1bK1i85MztgY5FHu5hM14SDFWlRsyUkLxRidp8oOc5DcEhJBQa96cRRoIHEDAQ5sQrdFwVEvGw3t+uFMb7MIEFSuOFveXaMFW2eGXQ7d/PvLv3+Hd/nfDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724845095; c=relaxed/simple;
-	bh=E31P5Kg44PX5FddtsdpCqwEt5trkfZRkPjofUJ7lGjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RwNQtunbkDsJSQct7g2iHqBIsWT87v+OhsVWRYQQGvXeI2BBybqsMSb4F+HFaMxQHKMNEN2ZIy5Vli8cZqwKOjbGMdMntrXGSi1p1jgHPPpSVtqe02eLV7SLiCgTsRY2GkzreIVZn7OylwnRpGPtjb2NQZvqi2gvcuyb2iNn7yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=mJLhydL7; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
+	s=arc-20240116; t=1724845957; c=relaxed/simple;
+	bh=r/XTHRpAAFzLh4zwb+wQat2/9X4mQV1qUFYphpElkIk=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=spwAJ61/r0YV/3QAASa2rPP4jEVxFRsQTgJIM0kVyxALKTxhQQ+mNMWah524yW/TFhGZWQV9czoSSFZ+aX5Phe0vypqvRrGhcZGiKBPURODmZnsICRp4H+z/wtz/E2jz0JbnVJcJUAAh3NTJk/rdFrioE4BsYMiHkvPmXf6RFCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KoCkSl6t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="mJLhydL7"
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Wv2Tr0lJSz9smc;
-	Wed, 28 Aug 2024 13:38:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
-	s=MBO0001; t=1724845088;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KoCkSl6t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724845953;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M9H3cmWIhxcYHesHqGjL9yLjjaE0Sjuz4VP0wEL0R1w=;
-	b=mJLhydL76GrRuW737D6RbtsIACkQniYpae63FPhyPs9Pee+QHLNrfzj/Dn6gSl2+qVcAck
-	MVhc292Hk0qoYqRGPD9zpnjIJaX8d5O1yrEGSsYMHhB1+EF4LynKehX/Qv4NwsOAORThkP
-	k5bWZcHdv0PyZBZcaqlBvqgtANUpntIsXofOCzDNTvyXHhr67zhJgWGQGo5atd0XckJdjA
-	rR8WlNWo6KNpCx03tSIETgCaJaWlHH6X25OSelFFa9ulW6U63lsK1ZpkkPI1xPEYndn84+
-	YFzGD2FOYgW6xaGMmQg8fuRa8gQKRsMbN/YCojlBlhbfJL6rkfQG9gO0UIpgVg==
-Date: Wed, 28 Aug 2024 11:38:02 +0000
-From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Steve French <sfrench@samba.org>,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Marc Dionne <marc.dionne@auristor.com>
-Subject: Re: [PATCH 1/9] mm: Fix missing folio invalidation calls during
- truncation
-Message-ID: <20240828113802.xw5wzlq2hxrquclb@quentin>
-References: <20240823200819.532106-1-dhowells@redhat.com>
- <20240823200819.532106-2-dhowells@redhat.com>
+	bh=xtcOzYtriZ9WqL8I/lJRoP02TrW8/k207iuQXfWTiV4=;
+	b=KoCkSl6tjwBW2cwqQ5oCO69YIM4rb+Fi9d5xHgI8zweZLCPPa/zTRPb4onM3dQOezQex4p
+	Y/B9/WXm2x/aOoPibPbqTFLPdp3IjTWcpU42oOdTau6Db0VbmIbQbSfxikLGMYvhDTl/NJ
+	CHvC0OFAF0l5yn2nuRrseDRnTHKPt5I=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-hEl6BB3jOnK0z0KaSlZZzA-1; Wed,
+ 28 Aug 2024 07:52:31 -0400
+X-MC-Unique: hEl6BB3jOnK0z0KaSlZZzA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 97C6F1955BF2;
+	Wed, 28 Aug 2024 11:52:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.30])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 058FE1955D56;
+	Wed, 28 Aug 2024 11:52:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240828105536.1e6226df.ddiss@samba.org>
+References: <20240828105536.1e6226df.ddiss@samba.org> <20240823132052.3f591f2f.ddiss@samba.org> <Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation> <CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com> <20240522185305.69e04dab@echidna> <349671.1716335639@warthog.procyon.org.uk> <370800.1716374185@warthog.procyon.org.uk> <20240523145420.5bf49110@echidna> <CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com> <476489.1716445261@warthog.procyon.org.uk> <477167.1716446208@warthog.procyon.org.uk> <6ea739f6-640a-4f13-a9a9-d41538be9111@talpey.com> <af49124840aa5960107772673f807f88@manguebit.com> <319947.1724365560@warthog.procyon.org.uk> <951877.1724840740@warthog.procyon.org.uk>
+To: David Disseldorp <ddiss@samba.org>
+Cc: dhowells@redhat.com, Jeremy Allison <jra@samba.org>,
+    Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+    ronnie sahlberg <ronniesahlberg@gmail.com>,
+    David Howells via samba-technical <samba-technical@lists.samba.org>,
+    Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823200819.532106-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <965292.1724845945.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Aug 2024 12:52:25 +0100
+Message-ID: <965293.1724845945@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Aug 23, 2024 at 09:08:09PM +0100, David Howells wrote:
-> When AS_RELEASE_ALWAYS is set on a mapping, the ->release_folio() and
-> ->invalidate_folio() calls should be invoked even if PG_private and
-> PG_private_2 aren't set.  This is used by netfslib to keep track of the
-Should we update the comment in pagemap? 
+Okay, that fixes the problem.
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 55b254d951da..18dd6174e6cc 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -204,7 +204,8 @@ enum mapping_flags {
-        AS_EXITING      = 4,    /* final truncate in progress */
-        /* writeback related tags are not used */
-        AS_NO_WRITEBACK_TAGS = 5,
--       AS_RELEASE_ALWAYS = 6,  /* Call ->release_folio(), even if no private data */
-+       AS_RELEASE_ALWAYS = 6,  /* Call ->release_folio() and ->invalidate_folio,
-+                                  even if no private data */
-        AS_STABLE_WRITES = 7,   /* must wait for writeback before modifying
-                                   folio contents */
-        AS_INACCESSIBLE = 8,    /* Do not attempt direct R/W access to the mapping */
+For reference, the file can be prepared thusly:
 
-> point above which reads can be skipped in favour of just zeroing pagecache
-> locally.
-> 
-> There are a couple of places in truncation in which invalidation is only
-> called when folio_has_private() is true.  Fix these to check
-> folio_needs_release() instead.
-> 
-> Without this, the generic/075 and generic/112 xfstests (both fsx-based
-> tests) fail with minimum folio size patches applied[1].
-> 
-> Fixes: b4fa966f03b7 ("mm, netfs, fscache: stop read optimisation when folio removed from pagecache")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> cc: Pankaj Raghav <p.raghav@samsung.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: linux-afs@lists.infradead.org
-> cc: netfs@lists.linux.dev
-> cc: linux-mm@kvack.org
-> cc: linux-fsdevel@vger.kernel.org
-> Link: https://lore.kernel.org/r/20240815090849.972355-1-kernel@pankajraghav.com/ [1]
-> ---
->  mm/truncate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/mm/truncate.c b/mm/truncate.c
-> index 4d61fbdd4b2f..0668cd340a46 100644
-> --- a/mm/truncate.c
-> +++ b/mm/truncate.c
-> @@ -157,7 +157,7 @@ static void truncate_cleanup_folio(struct folio *folio)
->  	if (folio_mapped(folio))
->  		unmap_mapping_folio(folio);
->  
-> -	if (folio_has_private(folio))
-> +	if (folio_needs_release(folio))
->  		folio_invalidate(folio, 0, folio_size(folio));
->  
->  	/*
-> @@ -219,7 +219,7 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
->  	if (!mapping_inaccessible(folio->mapping))
->  		folio_zero_range(folio, offset, length);
->  
-> -	if (folio_has_private(folio))
-> +	if (folio_needs_release(folio))
->  		folio_invalidate(folio, offset, length);
->  	if (!folio_test_large(folio))
->  		return true;
-> 
+	xfs_io -c "pwrite 0 16M" -c "fpunch 0 1M" -c "fpunch 2M 1M" -c "fpunch 4M=
+ 1M" -c "fpunch 6M 1M" -c "fpunch 8M 1M" /xfstest.test/foo
 
--- 
-Pankaj Raghav
+and then the test run:
+
+	xfs_io -c "seek -h 1" /xfstest.test/foo
+
+Something like punch-hole is needed to set the sparse flag - otherwise QAR
+isn't used by llseek().
+
+So:
+
+	Tested-by: David Howells <dhowells@redhat.com>
+
+if you need it.
+
+The Fedora samba version I applied this to was:
+
+	samba-4.19.7-1.fc39.x86_64
+
+though I had to drop the testing bits as they didn't build.
+
+David
+
