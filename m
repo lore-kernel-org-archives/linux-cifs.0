@@ -1,92 +1,137 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D8B16B74F
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 10:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B04B16D9BA;
+	Wed, 28 Aug 2024 11:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724842558; cv=none; b=ZK5gpbsTGH/NazvemN4RJzCj4QZgaiv/3UA0NGsq/ifnOVjGH7SX8L9x+CagZARtyG11qRonsk2x2MAKc52UosVSQMT/v6zYX8DtQDUhTtRWpfFrrrXnY2hICbQeW37KqqNxQz3BEv0Dcg4ie6yMEKw5fmmyduA5SBphLTotN7c=
+	t=1724845095; cv=none; b=tFGD7awYtbvMvlrquhvJPVXJUuuxXPfZM02s79P6BR63UXn9gHrs7HW/NsDHZwsTP27J0UiVn6XhK49JQ/EmMs28i8eCLhJW3BiEzjnFIScfG+4ODhe5IrohhYhD9kGjV/RUCNiQZ51veVafpDGOWddSyxf87oKBp9iK4v6Z0/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724842558; c=relaxed/simple;
-	bh=eeJVyFTkDVBc37eWbaJ8sYC29fBaKsXjsnFee8Hn4Vc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VbFKA4R9O2fE2KJjMHHloDW2Qp4PFXuDTJc7wQs/PyXVp5E2zR8YOYb+mVdUrBnxrNehT7vUVuXWpt5m24nId/+6n0iZgwcbUmZmaIE3Tj/OFCJDVEJszy5bnQ4ZRQ6DwXOHxhlS2mBUuGLkokPuZn7kfkM89X1yxPqsXVXGep0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=r3WIZjQn; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1724845095; c=relaxed/simple;
+	bh=E31P5Kg44PX5FddtsdpCqwEt5trkfZRkPjofUJ7lGjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RwNQtunbkDsJSQct7g2iHqBIsWT87v+OhsVWRYQQGvXeI2BBybqsMSb4F+HFaMxQHKMNEN2ZIy5Vli8cZqwKOjbGMdMntrXGSi1p1jgHPPpSVtqe02eLV7SLiCgTsRY2GkzreIVZn7OylwnRpGPtjb2NQZvqi2gvcuyb2iNn7yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com; spf=pass smtp.mailfrom=pankajraghav.com; dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b=mJLhydL7; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pankajraghav.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pankajraghav.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="r3WIZjQn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=viXF4mtCe5yUB1cEJcB012lnBYtOALsGjjhQjsGDepc=; b=r3WIZjQn+RF3TDhQBaqctoDcgy
-	QpjzOsVSn43jKZFH1t3smOj608kmDgclTL/L5Q32qHfWmZrXab0OrmB5P4ARV+3Y7fORihl977Kc2
-	rht5Qb0hqsj9FAA0VR1FqAGxHN2FZEzAlpx8xVSaEJZaU4I56Z3uFZGoPLosLzJjk0Pg253EXUs7q
-	cPNSM2lO0x5na6TUS0/YaPJY2O9yKOkOpcJwJ7JrckxOo4HmaLHY/B2uXAkZ8f3nN2RvaX934XemX
-	h/nXnEs9GmVS1eg+vTUXYWiXOB7yuxVO5+PBEukDDQUmE5VceYDnJ0YtbE9qpUB+YDAxYiJ9E5qni
-	BJ0xdQHzwSLrB9KqURejbCZz30L2lFK6AK9ZPWhzScWYG/T/3L84rfDRg+RJHPU1TK0io6K0T+WqN
-	4fsgb4NXcuviK5UX2c3IxJS1eC/LV5mz36dSEPxmeuDcYKu133d6AXSBbnF5wbaxDJdJaKHyMXJ+0
-	2J/Gbgq6T33pGFaZPi0Qd7Bn;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1sjGL4-008mHu-2G;
-	Wed, 28 Aug 2024 10:55:47 +0000
-Date: Wed, 28 Aug 2024 10:55:36 +0000
-From: David Disseldorp <ddiss@samba.org>
+	dkim=pass (2048-bit key) header.d=pankajraghav.com header.i=@pankajraghav.com header.b="mJLhydL7"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Wv2Tr0lJSz9smc;
+	Wed, 28 Aug 2024 13:38:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pankajraghav.com;
+	s=MBO0001; t=1724845088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M9H3cmWIhxcYHesHqGjL9yLjjaE0Sjuz4VP0wEL0R1w=;
+	b=mJLhydL76GrRuW737D6RbtsIACkQniYpae63FPhyPs9Pee+QHLNrfzj/Dn6gSl2+qVcAck
+	MVhc292Hk0qoYqRGPD9zpnjIJaX8d5O1yrEGSsYMHhB1+EF4LynKehX/Qv4NwsOAORThkP
+	k5bWZcHdv0PyZBZcaqlBvqgtANUpntIsXofOCzDNTvyXHhr67zhJgWGQGo5atd0XckJdjA
+	rR8WlNWo6KNpCx03tSIETgCaJaWlHH6X25OSelFFa9ulW6U63lsK1ZpkkPI1xPEYndn84+
+	YFzGD2FOYgW6xaGMmQg8fuRa8gQKRsMbN/YCojlBlhbfJL6rkfQG9gO0UIpgVg==
+Date: Wed, 28 Aug 2024 11:38:02 +0000
+From: "Pankaj Raghav (Samsung)" <kernel@pankajraghav.com>
 To: David Howells <dhowells@redhat.com>
-Cc: Jeremy Allison <jra@samba.org>, Paulo Alcantara <pc@manguebit.com>, Tom
- Talpey <tom@talpey.com>, ronnie sahlberg <ronniesahlberg@gmail.com>, David
- Howells via samba-technical <samba-technical@lists.samba.org>, Steve French
- <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: Re: Bug in Samba's implementation of FSCTL_QUERY_ALLOCATED_RANGES?
-Message-ID: <20240828105536.1e6226df.ddiss@samba.org>
-In-Reply-To: <951877.1724840740@warthog.procyon.org.uk>
-References: <20240823132052.3f591f2f.ddiss@samba.org>
-	<Zk/ID+Ma3rlbCM1e@jeremy-HP-Z840-Workstation>
-	<CAN05THTB+7B0W8fbe_KPkF0C1eKfi_sPWYyuBVDrjQVbufN8Jg@mail.gmail.com>
-	<20240522185305.69e04dab@echidna>
-	<349671.1716335639@warthog.procyon.org.uk>
-	<370800.1716374185@warthog.procyon.org.uk>
-	<20240523145420.5bf49110@echidna>
-	<CAN05THRuP4_7FvOOrTxHcZXC4dWjjqStRLqS7G_iCAwU5MUNwQ@mail.gmail.com>
-	<476489.1716445261@warthog.procyon.org.uk>
-	<477167.1716446208@warthog.procyon.org.uk>
-	<6ea739f6-640a-4f13-a9a9-d41538be9111@talpey.com>
-	<af49124840aa5960107772673f807f88@manguebit.com>
-	<319947.1724365560@warthog.procyon.org.uk>
-	<951877.1724840740@warthog.procyon.org.uk>
+Cc: Christian Brauner <christian@brauner.io>,
+	Steve French <sfrench@samba.org>,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	Marc Dionne <marc.dionne@auristor.com>
+Subject: Re: [PATCH 1/9] mm: Fix missing folio invalidation calls during
+ truncation
+Message-ID: <20240828113802.xw5wzlq2hxrquclb@quentin>
+References: <20240823200819.532106-1-dhowells@redhat.com>
+ <20240823200819.532106-2-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823200819.532106-2-dhowells@redhat.com>
 
-Hi David,
+On Fri, Aug 23, 2024 at 09:08:09PM +0100, David Howells wrote:
+> When AS_RELEASE_ALWAYS is set on a mapping, the ->release_folio() and
+> ->invalidate_folio() calls should be invoked even if PG_private and
+> PG_private_2 aren't set.  This is used by netfslib to keep track of the
+Should we update the comment in pagemap? 
 
-On Wed, 28 Aug 2024 11:25:40 +0100, David Howells wrote:
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 55b254d951da..18dd6174e6cc 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -204,7 +204,8 @@ enum mapping_flags {
+        AS_EXITING      = 4,    /* final truncate in progress */
+        /* writeback related tags are not used */
+        AS_NO_WRITEBACK_TAGS = 5,
+-       AS_RELEASE_ALWAYS = 6,  /* Call ->release_folio(), even if no private data */
++       AS_RELEASE_ALWAYS = 6,  /* Call ->release_folio() and ->invalidate_folio,
++                                  even if no private data */
+        AS_STABLE_WRITES = 7,   /* must wait for writeback before modifying
+                                   folio contents */
+        AS_INACCESSIBLE = 8,    /* Do not attempt direct R/W access to the mapping */
 
-> Hi David,
+> point above which reads can be skipped in favour of just zeroing pagecache
+> locally.
 > 
-> I tried to apply the patch to the Fedora samba rpm, but I get:
+> There are a couple of places in truncation in which invalidation is only
+> called when folio_has_private() is true.  Fix these to check
+> folio_needs_release() instead.
 > 
-> mold: error: undefined symbol: torture_assert_size_equal
-> >>> referenced by <artificial>
-> >>>               /tmp/ccVA4FUD.ltrans35.ltrans.o:(test_ioctl_sparse_qar_truncated.lto_priv.0)
-> >>> referenced by <artificial>
-> >>>               /tmp/ccVA4FUD.ltrans35.ltrans.o:(test_ioctl_sparse_qar_truncated.lto_priv.0)
-> >>> referenced by <artificial>
-> >>>               /tmp/ccVA4FUD.ltrans35.ltrans.o:(test_ioctl_sparse_qar_truncated.lto_priv.0)  
-> collect2: error: ld returned 1 exit status
+> Without this, the generic/075 and generic/112 xfstests (both fsx-based
+> tests) fail with minimum folio size patches applied[1].
+> 
+> Fixes: b4fa966f03b7 ("mm, netfs, fscache: stop read optimisation when folio removed from pagecache")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+> cc: Pankaj Raghav <p.raghav@samsung.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: linux-afs@lists.infradead.org
+> cc: netfs@lists.linux.dev
+> cc: linux-mm@kvack.org
+> cc: linux-fsdevel@vger.kernel.org
+> Link: https://lore.kernel.org/r/20240815090849.972355-1-kernel@pankajraghav.com/ [1]
+> ---
+>  mm/truncate.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mm/truncate.c b/mm/truncate.c
+> index 4d61fbdd4b2f..0668cd340a46 100644
+> --- a/mm/truncate.c
+> +++ b/mm/truncate.c
+> @@ -157,7 +157,7 @@ static void truncate_cleanup_folio(struct folio *folio)
+>  	if (folio_mapped(folio))
+>  		unmap_mapping_folio(folio);
+>  
+> -	if (folio_has_private(folio))
+> +	if (folio_needs_release(folio))
+>  		folio_invalidate(folio, 0, folio_size(folio));
+>  
+>  	/*
+> @@ -219,7 +219,7 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
+>  	if (!mapping_inaccessible(folio->mapping))
+>  		folio_zero_range(folio, offset, length);
+>  
+> -	if (folio_has_private(folio))
+> +	if (folio_needs_release(folio))
+>  		folio_invalidate(folio, offset, length);
+>  	if (!folio_test_large(folio))
+>  		return true;
+> 
 
-I've no idea which Samba version Fedora ships.
-torture_assert_size_equal() was added to lib/torture/torture.h via
-46f0c2696582 (samba >= 4.20.0).
-
-> Do I actually need the torture test patch?
-
-No, not if you can use your xfstests reproducer. The server fix is now
-in Samba's master branch as commit 5e278a52646 ("smb2_ioctl: fix
-truncated FSCTL_QUERY_ALLOCATED_RANGES responses").
+-- 
+Pankaj Raghav
