@@ -1,150 +1,136 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF76B1A4B9F;
-	Wed, 28 Aug 2024 15:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797791AD3F6
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 21:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724858810; cv=none; b=t/1IRu2P+20QqpvH2k7AKsZ58Y7ZVFbRZkgh/HJPFI5stNyQlBqPjpXAfEkiAXzuV7SHnxrcy9uYtb1od8+4+zCj93ifTDVHzOTJR44JQ6PBDijYqOfJu9owSPYtz+HO3MWz6hCepayrBT2qpok/vP76UJSp7Lcf5Un2K1rvJng=
+	t=1724878993; cv=none; b=afIv7SdCv0TIKXHaOXx9zd616JpvTw2eer9jCOs6bVlsaTc3pTydwtKiXRLqeZtQzOYFgTBIK2il6uKIInoiygOGWSoIgkhszvHxBth0mjzER3y6aslKLWO3h9FPSogNfn7KDNrc8tYElRdA3rx3rvA2nGS7Jka+m9UoUPK0AqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724858810; c=relaxed/simple;
-	bh=rxlkV+j+vdfUqHQYjq6CHRf43Bcc0FuNBBYeeRY83yA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYhMj0scBGl9usfYYTgJNartAIp9GFy6hJ6jnXkyoc1PjwA+tBkXx1m8GAkN2KA8PL0rue/xfwASSs9D/RJVrCq97if2pTUatBjTNADJvF3UVXwp2QhKL0mlgBLOSj8ZVan/C9bAquIWV8WC/Lu8x+FJZMUPDiRuzPUBK/Mf9/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cV8Jjz+a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pUPa7gh3; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cV8Jjz+a; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=pUPa7gh3; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1724878993; c=relaxed/simple;
+	bh=VV17+nS8C1q2KfvL5zDpbmlRmgEDHZV0Gqx+Dv4LhVM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pcnE1FV0JCSyIrhGrg5Zbvu5jAnKx+LuaFgdVnmAK020DPNFVZpbxDcSyDtlUVN3DMwjasmZpPbSxV8rp3DG9dDOpY4mR7IwbhkC/4m6awE041g14sAGr7lX3+LrCNrDbienYxmgu4O051kpqiuhZuMmSDkLdK65gcsaAelzEf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LSXZoM0S; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cV8Jjz+a";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUPa7gh3";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cV8Jjz+a";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="pUPa7gh3"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LSXZoM0S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724878990;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XFobmMcyik8XghRtkh2gK9+MeaxVAEEC6pZ/c4IMu/w=;
+	b=LSXZoM0SX6eXOllGTC4TmahYadUN7gfuTrOqcyKrmgzxeTsdfMpm6iK6hgvocCK7L3+YBH
+	6vANVJVVv7c4+zhgbpuINeT9GImBvN3QNQo0FkEHZQrWNetjhPLAxeEetdfSEwvtXE3+e/
+	C/1P4EgFkgr5nQrHXLymTST2QrAviKo=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-pWU2m7E2O3W_VVpN-j_iRQ-1; Wed,
+ 28 Aug 2024 17:03:04 -0400
+X-MC-Unique: pWU2m7E2O3W_VVpN-j_iRQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0BE1421996;
-	Wed, 28 Aug 2024 15:26:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724858807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
-	b=cV8Jjz+aSrsW3SGsjwExBvTATv5H2kppAa38oeoyFfaSVr7ELWwNcO+h2NUym7XAAQYwdK
-	sMg8+zPVpiJ7O40NGhe1crQp2KwCYwE9xdlYISZbxTnWM4i0nD0NAUYjp9YoDRlTekHBFc
-	3zoTEyW05W1xGj7SuEs6vRQ1POoEa2o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724858807;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
-	b=pUPa7gh3H7yi3MuVuHOrXnwoIz5V947U19JEMsYyVPJm+E2VKhFyGezz87hfp/wsDRllT/
-	UlLPShQXkYMPoXCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1724858807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
-	b=cV8Jjz+aSrsW3SGsjwExBvTATv5H2kppAa38oeoyFfaSVr7ELWwNcO+h2NUym7XAAQYwdK
-	sMg8+zPVpiJ7O40NGhe1crQp2KwCYwE9xdlYISZbxTnWM4i0nD0NAUYjp9YoDRlTekHBFc
-	3zoTEyW05W1xGj7SuEs6vRQ1POoEa2o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1724858807;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7R+jbn/uYuS/hedGxq+PA41+J5CeshsqeGYUde3wyXM=;
-	b=pUPa7gh3H7yi3MuVuHOrXnwoIz5V947U19JEMsYyVPJm+E2VKhFyGezz87hfp/wsDRllT/
-	UlLPShQXkYMPoXCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 00C20138D2;
-	Wed, 28 Aug 2024 15:26:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Xz8pALdBz2ZFUAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 28 Aug 2024 15:26:47 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id A05DBA0965; Wed, 28 Aug 2024 17:26:38 +0200 (CEST)
-Date: Wed, 28 Aug 2024 17:26:38 +0200
-From: Jan Kara <jack@suse.cz>
-To: David Howells <dhowells@redhat.com>
-Cc: Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
-	Steve French <sfrench@samba.org>, netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 413511955D47;
+	Wed, 28 Aug 2024 21:03:00 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.30])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8C48D1955BED;
+	Wed, 28 Aug 2024 21:02:53 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: The mapping->invalidate_lock, copy-offload and cifs
-Message-ID: <20240828152638.iv7v5rj23n7mi73h@quack3>
-References: <774275.1724770015@warthog.procyon.org.uk>
+Subject: [PATCH 0/6] mm, netfs, cifs: Miscellaneous fixes
+Date: Wed, 28 Aug 2024 22:02:41 +0100
+Message-ID: <20240828210249.1078637-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <774275.1724770015@warthog.procyon.org.uk>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Score: -3.80
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi David!
+Hi Christian, Steve,
 
-On Tue 27-08-24 15:46:55, David Howells wrote:
-> I'm looking at trying to fix cifs_file_copychunk_range().  Currently, it
-> invalidates the destination range, apart from a partial folio at either end
-> which will be flushed, and then tries the copy.  But if the copy fails or can
-> only be partially completed (eg. ENOSPC), we lose any data in the destination
-> region, so I think it needs to be flushed and invalidated rather than just
-> being invalidated.
-> 
-> Now, we have filemap_invalidate_inode() which I can use to flush back and
-> invalidate the folios under the invalidate_lock (thereby avoiding the need for
-> launder_folio).  However, that doesn't prevent mmap from reinstating the
-> destination folios with modifications whilst the copy is ongoing the moment
-> the invalidate_lock is dropped.
-> 
-> Question is: would it be reasonable to do the copy offload whilst holding the
-> invalidate_lock for the duration?
+Firstly, here are some fixes to DIO read handling and the retrying of
+reads, particularly in relation to cifs:
 
-FWIW yes, I'd expect cifs_file_copychunk_range() to take invalidate_lock on
-the target file to avoid possible races with page faults. We do it this
-already for similar operations such as reflink or various fallocate
-operations...
+ (1) Fix the missing credit renegotiation in cifs on the retrying of reads.
+     The credits we had ended with the original read (or the last retry)
+     and to perform a new read we need more credits otherwise the server
+     can reject our read with EINVAL.
 
-								Honza
+ (2) Fix the handling of short DIO reads to avoid ENODATA when the read
+     retry tries to access a portion of the file after the EOF.
 
-> 
-> Thanks,
-> David
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Secondly, some patches fixing cifs copy and zero offload:
+
+ (3) Fix cifs_file_copychunk_range() to not try to partially invalidate
+     folios that are only partly covered by the range, but rather flush
+     them back and invalidate them.
+
+ (4) Fix filemap_invalidate_inode() to use the correct invalidation
+     function so that it doesn't leave partially invalidated folios hanging
+     around (which may hide part of the result of an offloaded copy).
+
+ (5) Fix smb3_zero_data() to correctly handle zeroing of data that's
+     buffered locally but not yet written back and with the EOF position on
+     the server short of the local EOF position.
+
+     Note that this will also affect afs and 9p, particularly with regard
+     to direct I/O writes.
+
+And finally, here's an adjustment to debugging statements:
+
+ (6) Adjust three debugging output statements.  Not strictly a fix, so
+     could be dropped.  Including the subreq ID in some extra debug lines
+     helps a bit, though.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+
+Thanks,
+David
+
+David Howells (6):
+  cifs: Fix lack of credit renegotiation on read retry
+  netfs, cifs: Fix handling of short DIO read
+  cifs: Fix copy offload to flush destination region
+  mm: Fix filemap_invalidate_inode() to use
+    invalidate_inode_pages2_range()
+  cifs: Fix FALLOC_FL_ZERO_RANGE to preflush buffered part of target
+    region
+  netfs, cifs: Improve some debugging bits
+
+ fs/netfs/io.c            | 21 +++++++++++++-------
+ fs/smb/client/cifsfs.c   | 21 ++++----------------
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/file.c     | 37 ++++++++++++++++++++++++++++++++----
+ fs/smb/client/smb2ops.c  | 26 +++++++++++++++++++------
+ fs/smb/client/smb2pdu.c  | 41 +++++++++++++++++++++++++---------------
+ fs/smb/client/trace.h    |  1 +
+ include/linux/netfs.h    |  1 +
+ mm/filemap.c             |  2 +-
+ 9 files changed, 101 insertions(+), 50 deletions(-)
+
