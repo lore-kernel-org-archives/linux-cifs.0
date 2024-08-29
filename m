@@ -1,136 +1,162 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB131AED58
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Aug 2024 21:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FB317547;
+	Thu, 29 Aug 2024 02:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724879032; cv=none; b=dnX6xV+Vt4n7TUI2a6b0IMQoW4DfSGtZGkcAhW6awKRCT175rDcbPwq7PhuS271dyAx8k9Dvnqs7RmCKNbweNbCjZSlx3m6VHZ+SN1+GxW7RJCfC5BJV6LiclfR1ITWzhmNAL7y7gs2WqP+g/QESJ0kWQN6v8oKX/JkLERJLKPQ=
+	t=1724899679; cv=none; b=pnL5uFModQRhC2wenvCJ4aEHFiOis32CNfWnksgjAXTG9UAAV6Be+VklzdLlISjkAtP0p8JsSir0RJ6WyLY9So0/ThaytBsfZF+Kuzq4EymuxLlZAuKkoCP397mM6jxZ6lYEVD3uHcYPlDJqb0Kw2fCaC8JEf0QKAe2vhJ8j+9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724879032; c=relaxed/simple;
-	bh=dZLD/JcsA3bm8Cz88EokWnyb6qwNyJsN5B2wjUVoB8s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lB8XJlWSdbCfB/h4VUzf/+hDs9QdTw9cgkbD/cssKRecDgAhhIIFbWqZ0XtBkk+vK5l0RlNCXeCimBqQ75R6YwmaDfYo/QAwQZdNvQhos05KpuO+V97xyjSkTBi33CN/a+TBDGhiwN05jfq/DZH4nW5EAAw1KKCENQfu5Wxw+20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H84WH5+U; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724899679; c=relaxed/simple;
+	bh=yZBj6yB+vdP8EWPB8Ad9fGdRR9EORM7UbpU9Y+Lq7WQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=acGFilNVWQ0uWQ11M9jEl13zbPzu5bd/Glm3GU+TuM+OlkE6ged7HljzojZZV4dfqpSnpaLson/P6dKjm+WQO9bQCx54+lf10tmAiV7oOqJ+UAiQFllDB3bXwMfyugBDQGsQksFHQW1XFuLBqSwj777mp0DiW9tlCexrmLaYjNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNk856kS; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H84WH5+U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724879028;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HnRbucMY226i4IUYHJiuv+7kBNxjZEs05bItUy7sjXs=;
-	b=H84WH5+UL8UxRRVnpf9p0V5mVablrgZRKX406GqAboL5SOin45CuNKCcuFozUU0bEwRyec
-	qjP2uVZ1VVWKany/0WmjH6KWnSDFP0Vlh/VP0Qsa8NxmknjEhinTRBRoZts5gj88ABxVzg
-	8NGDYgEtsEK62SYEr0xLuu+d+w+flSo=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-iAIpNcUkPheyG0CeJjFQ_w-1; Wed,
- 28 Aug 2024 17:03:45 -0400
-X-MC-Unique: iAIpNcUkPheyG0CeJjFQ_w-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 010F11955BF1;
-	Wed, 28 Aug 2024 21:03:43 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.30])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5B35C1955BF2;
-	Wed, 28 Aug 2024 21:03:38 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <sfrench@samba.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] netfs, cifs: Improve some debugging bits
-Date: Wed, 28 Aug 2024 22:02:47 +0100
-Message-ID: <20240828210249.1078637-7-dhowells@redhat.com>
-In-Reply-To: <20240828210249.1078637-1-dhowells@redhat.com>
-References: <20240828210249.1078637-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNk856kS"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-533488ffaf7so195667e87.0;
+        Wed, 28 Aug 2024 19:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724899676; x=1725504476; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j8nW60xbKKK3BMmTEpx1vfAUyDbucJTsTqvhOF4FZ8U=;
+        b=RNk856kSNr0UJNH8EuG4F17C99rG2v2JlTzf+KYLBBIn+UBwjQgo6gkqUgy/dSQMGb
+         qcCD+wRNwUzYbYgONf5aFvvbOAU2gPfWOi5VnVgEcZrzVmtqkvKLF6WmZ8z978CyNEVW
+         vE0ldU8FCz8ncYSM7WCWwFhU+ma6G5+O/GGiIK4FSzVSlz9pGNY7TgCxOnFgQfOe4kQ1
+         aZyQbdims+DyKgWwyr5qFIA6cQFI/58VCo3mAjkGyVIyKM4XXhj3tHYgUwTvIDdGURrg
+         mcaDIZvl2KNE9RJ+29nLr4jYdTAfMsoIIY+F5QT81BsTsEdyBADbPphlVsoGvEc0s/2k
+         QKlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724899676; x=1725504476;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j8nW60xbKKK3BMmTEpx1vfAUyDbucJTsTqvhOF4FZ8U=;
+        b=liUM0NmQ9+yCZtLxuxiz7zab7LfqhopEgXmb3DLhuJcjWL1s1s4G40WytKQDrA9QwT
+         z+xb8+mMvNcJmXzNK7DAldFk01TxKfb5JTM9qPilo8lO6xtkmwz91cJdHTqkmFJ2Xu0b
+         iKN3Wka+/OIxAfPZheexzwrniWpDX2wxnY6N0SahhotiwNbYkBRTL4dGk3BY8uz4B1A3
+         5qFlbCyGqqm2CoFcRYwmVEGVFGqfxKUtvl5MbOPbBrIQLPjpnhBgXoaY+PSr2UvlWpwf
+         u0SCfdRaxTWpb88hHOE36dpB/Ig3eDuu0rqTcrR8dpibO3Nri/e/B1raSzXnEEbYWbvA
+         4Cmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUPIHQdIaHoWNuuq0EPaOwcp/KvXGqoiEoTnY3LD+K/lwpK8ueUQUPd9/ZYiOLwQOIxIHWBdcBkPDW1@vger.kernel.org, AJvYcCUsjjNhO1w/RUHToWno4H3m3l+X2iQsEk4fFjn7w66mSHB9aa++HI+A29r80XjqXu+Ik9hN4juBVOsHUA==@vger.kernel.org, AJvYcCUwP9xfvVf37ySrVxxX2HOSAUPoR7tyvMc9/nkacWLmwKumekrJIM0jSeTjd7TaRkdHz/kvox0F5LOdPMLZ@vger.kernel.org, AJvYcCX1flbjSSdym0P3Fzj4O3hFVIUBh6qyTe/ABm3JAM+JO08lzkGEs0oEAoTtm455dZFmAlNS6QVwC3aB@vger.kernel.org, AJvYcCXswY0/Vi9Jbh9uPAjdJmoXENs/wZY59iYOFWF41xYuwfVVKOgtlbBZCczsXYw/N7mL+JL7Gs7h5EpfLbDEbQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGW0k00L+Rdj1xUhPnKmGVG3OeZk2VaXhAGDSeRHMkRSIDeuvu
+	AP/SWG6gir1wXUKcwMmsyQaHHhLlfIdy0vtWguwFWFUJ1sTV3MoUyAatB3vh3ylIGAz4ImdOBYe
+	E6r9Zey2grnnueePGHNMyMpPMVok=
+X-Google-Smtp-Source: AGHT+IFw6YFPE4uQg6imkFHXMbxtDADWvwTRJd5bZLVgOFxAE0atjLaGwN/Y3Vs2U2TCttK/XyhsIPdmUPLmGEsItEg=
+X-Received: by 2002:a05:6512:1055:b0:52c:db0a:a550 with SMTP id
+ 2adb3069b0e04-5353e5aae01mr710771e87.42.1724899675197; Wed, 28 Aug 2024
+ 19:47:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20240828210249.1078637-1-dhowells@redhat.com>
+In-Reply-To: <20240828210249.1078637-1-dhowells@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 28 Aug 2024 21:47:43 -0500
+Message-ID: <CAH2r5muvO8+Es4Y8d=VtWEp-vcC62TYEZc3W1Y0r+6ro6d9yxQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] mm, netfs, cifs: Miscellaneous fixes
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Jeff Layton <jlayton@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Improve some debugging bits:
+testing is going fine so far with David's series ontop of current mainline
 
- (1) The netfslib _debug() macro doesn't need a newline in its format
-     string.
+(I see one possible intermittent server bug failure - on test
+generic/728 - but no red flags testing so far)
 
- (2) Display the request debug ID and subrequest index in messages emitted
-     in smb2_adjust_credits() to make it easier to reference in traces.
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/=
+builds/207
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/io.c           | 2 +-
- fs/smb/client/smb2ops.c | 8 +++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+On Wed, Aug 28, 2024 at 4:03=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Hi Christian, Steve,
+>
+> Firstly, here are some fixes to DIO read handling and the retrying of
+> reads, particularly in relation to cifs:
+>
+>  (1) Fix the missing credit renegotiation in cifs on the retrying of read=
+s.
+>      The credits we had ended with the original read (or the last retry)
+>      and to perform a new read we need more credits otherwise the server
+>      can reject our read with EINVAL.
+>
+>  (2) Fix the handling of short DIO reads to avoid ENODATA when the read
+>      retry tries to access a portion of the file after the EOF.
+>
+> Secondly, some patches fixing cifs copy and zero offload:
+>
+>  (3) Fix cifs_file_copychunk_range() to not try to partially invalidate
+>      folios that are only partly covered by the range, but rather flush
+>      them back and invalidate them.
+>
+>  (4) Fix filemap_invalidate_inode() to use the correct invalidation
+>      function so that it doesn't leave partially invalidated folios hangi=
+ng
+>      around (which may hide part of the result of an offloaded copy).
+>
+>  (5) Fix smb3_zero_data() to correctly handle zeroing of data that's
+>      buffered locally but not yet written back and with the EOF position =
+on
+>      the server short of the local EOF position.
+>
+>      Note that this will also affect afs and 9p, particularly with regard
+>      to direct I/O writes.
+>
+> And finally, here's an adjustment to debugging statements:
+>
+>  (6) Adjust three debugging output statements.  Not strictly a fix, so
+>      could be dropped.  Including the subreq ID in some extra debug lines
+>      helps a bit, though.
+>
+> The patches can also be found here:
+>
+>         https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs=
+.git/log/?h=3Dnetfs-fixes
+>
+> Thanks,
+> David
+>
+> David Howells (6):
+>   cifs: Fix lack of credit renegotiation on read retry
+>   netfs, cifs: Fix handling of short DIO read
+>   cifs: Fix copy offload to flush destination region
+>   mm: Fix filemap_invalidate_inode() to use
+>     invalidate_inode_pages2_range()
+>   cifs: Fix FALLOC_FL_ZERO_RANGE to preflush buffered part of target
+>     region
+>   netfs, cifs: Improve some debugging bits
+>
+>  fs/netfs/io.c            | 21 +++++++++++++-------
+>  fs/smb/client/cifsfs.c   | 21 ++++----------------
+>  fs/smb/client/cifsglob.h |  1 +
+>  fs/smb/client/file.c     | 37 ++++++++++++++++++++++++++++++++----
+>  fs/smb/client/smb2ops.c  | 26 +++++++++++++++++++------
+>  fs/smb/client/smb2pdu.c  | 41 +++++++++++++++++++++++++---------------
+>  fs/smb/client/trace.h    |  1 +
+>  include/linux/netfs.h    |  1 +
+>  mm/filemap.c             |  2 +-
+>  9 files changed, 101 insertions(+), 50 deletions(-)
+>
+>
 
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index 943128507af5..d6ada4eba744 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -270,7 +270,7 @@ static void netfs_reset_subreq_iter(struct netfs_io_request *rreq,
- 	if (count == remaining)
- 		return;
- 
--	_debug("R=%08x[%u] ITER RESUB-MISMATCH %zx != %zx-%zx-%llx %x\n",
-+	_debug("R=%08x[%u] ITER RESUB-MISMATCH %zx != %zx-%zx-%llx %x",
- 	       rreq->debug_id, subreq->debug_index,
- 	       iov_iter_count(&subreq->io_iter), subreq->transferred,
- 	       subreq->len, rreq->i_size,
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 4df84ebe8dbe..e6540072ffb0 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -316,7 +316,8 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
- 				      cifs_trace_rw_credits_no_adjust_up);
- 		trace_smb3_too_many_credits(server->CurrentMid,
- 				server->conn_id, server->hostname, 0, credits->value - new_val, 0);
--		cifs_server_dbg(VFS, "request has less credits (%d) than required (%d)",
-+		cifs_server_dbg(VFS, "R=%x[%x] request has less credits (%d) than required (%d)",
-+				subreq->rreq->debug_id, subreq->subreq.debug_index,
- 				credits->value, new_val);
- 
- 		return -EOPNOTSUPP;
-@@ -338,8 +339,9 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
- 		trace_smb3_reconnect_detected(server->CurrentMid,
- 			server->conn_id, server->hostname, scredits,
- 			credits->value - new_val, in_flight);
--		cifs_server_dbg(VFS, "trying to return %d credits to old session\n",
--			 credits->value - new_val);
-+		cifs_server_dbg(VFS, "R=%x[%x] trying to return %d credits to old session\n",
-+				subreq->rreq->debug_id, subreq->subreq.debug_index,
-+				credits->value - new_val);
- 		return -EAGAIN;
- 	}
- 
 
+--=20
+Thanks,
+
+Steve
