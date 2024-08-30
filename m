@@ -1,70 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388E420EB;
-	Fri, 30 Aug 2024 00:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35861509BF;
+	Fri, 30 Aug 2024 13:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724977392; cv=none; b=q1EJa1eUFRhRGgzjz7LMpqzIB5b88MDGuSPqPCSt2rAD+oItXx2SeJ6IcmBGdX6NtwpASOL64OSL5mF7tGpebMcmPeL1uMad3IwIPHrsxFEHk++mchHRQNjSwhWE5tUoZxa0Nn9TNfMr1mI3WofJuf/fY7T+MSa/XiFGxxNIZZo=
+	t=1725023545; cv=none; b=tZhIi89nC4kZzkx9UYNeiADPGulmpKVTxzyDFay9iPtJokwS+lq8e2fspG+A9wEGYlbnB6BXuZQmBtIzGSR7r9U88IECc4htqMSO96lF5gGMc6QjCIos2KcxNfoLuuhv28GHM1ge/ueTbdouzr7E9e7b0qjkis3bi3o426LTbjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724977392; c=relaxed/simple;
-	bh=lh7JLnFP5s1aJ5xS8eg+yLx07MrFuSLffVxCf49ZDdA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l2i/wOwPdfUjiFPTbcfOlS1LTqNV0RnOlkYNJjGEohyhXqSPWVlMwgei7LRA4P7eK7a54+dfeKupYF3ieGWWw+YbpwyvmeTeA3p3pwfcoUT9mXYv+oQpMh0B+z9uzmi6Lig2R9wOJSW2T32CS2tMbop1H4Hv8299zyX/Fs+SA2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UgUuwC0F; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725023545; c=relaxed/simple;
+	bh=WndIbO8xrC2aIrGdqBcilJuDXzO/BXzIA8VlzOJWcDo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mc5Ianf6Qbk43jxiIjfMDTV5/OIoagTHVTLJQK/MkOc8h9JP8kO3u5zcEPHYsLPyUhTM93LZPXFS61TADHOHjEa7Ra0SoPwaQWYIYvcngVy3iOI7/Nzp67Ky518HGyaimIOd0q8lcd+EoXiFi6rUfqreFIBcCmPF8yq/FUrp4qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ty5bAm6t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UgUuwC0F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CE0C4CEC5;
-	Fri, 30 Aug 2024 00:23:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ty5bAm6t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2B4C4CEC2;
+	Fri, 30 Aug 2024 13:12:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724977391;
-	bh=lh7JLnFP5s1aJ5xS8eg+yLx07MrFuSLffVxCf49ZDdA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=UgUuwC0F/jwl0XlnE+41/CzyQeeMhrt8Bl0bZHck3USg+o4ZKZYON1GfHiuxOkGki
-	 qEicXvp9dujgeif7ji02FsPdClxBTWMqfMGHqJq8h4i/ytwr8wanzqEmW3uLSxGeq5
-	 OJz5hrFmQ4GV+H9zxVixMpPwCne4wDt9wZ+sTsxvIKRbDCWcC7YUVo+gYxTO5lJ0SQ
-	 mRT271mx5zP5Y75pRIZ1pjeQDSJWTO0lFI0jXalC6FM0MQvrkn9xW2hjHeKTVnOhd2
-	 6i+uTUnp06Hr2cywFhl6p+xqLLUaSBV/p3+T5vcKD9sPEzyeTkRkvdX1XcmqEO8EFg
-	 UTX39C3pY4YTQ==
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-70f670eb827so189606a34.0;
-        Thu, 29 Aug 2024 17:23:11 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUBjj+TG7kpmHOtSxszaLpFIXbi14CX+Kzr2GFQuTGiBctYVVSflZt+Kab86C5ZTxG3GL4W8GxPIOVTAkKV1Gk=@vger.kernel.org, AJvYcCUU3v4i7IDRe0QsZ9DOqjhhHSobjzL9858KLQ6XzBV673ubONaBTkCMavvDVIzhJchAkB7p2yxJgCmSpuDW@vger.kernel.org, AJvYcCXWK0IlLsWJoQMOK/8RtiE3U6IiKazNzXWLHMlfv+Q1+asiENEIR4daHN60KV4ys3aihTumuMRFOnJxxA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK7X67KsQSIAplBfVTnOdALFBH5Jmww9xsFk7DFHDZAVbo69vd
-	Q3kcWbmErCrbqR3ZJ+b4omOGp9iR1zuK5rIuIH27W2O70hGvw4+YaBSVYrc9CLvhsvGujQOLdjW
-	0WsSUVebwn2CnPnU+SzjF1ulMmS0=
-X-Google-Smtp-Source: AGHT+IF1HOIvuR07ISWkm9lOBPvOjH1Fv+cPfeKw7L2knPjRe2Cbni0rIZvQV07RTjTSNXDkJ41oZxVbgwUNcvuSAdo=
-X-Received: by 2002:a05:6830:278a:b0:703:6b11:33a4 with SMTP id
- 46e09a7af769-70f5da97fd4mr1154441a34.9.1724977390911; Thu, 29 Aug 2024
- 17:23:10 -0700 (PDT)
+	s=k20201202; t=1725023543;
+	bh=WndIbO8xrC2aIrGdqBcilJuDXzO/BXzIA8VlzOJWcDo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Ty5bAm6tFv6bg4YA3HAyot4VdLW2RJKGdG1xvdXVogremu8LD3BqEh4VHwGPQbh1p
+	 g5wB6d5xMedceeupVFRBiOJF2X1RQbXR7I/eTH3weokE6ad0t6Ezo6vHjcDKPVbTlB
+	 Z3S4gJVFjrB6hycktKp1ueGv6wungGZ3cKnt0wXInlgTLGxuCAHj3w8ZYHqjF+GFUB
+	 QTyvsjOBPVrVpsZuumcYH8TAjCVp5l1eYu4rXoVRWjPjq8sCLqJLVtHIh6i3fVU/nI
+	 SVYRAvH1Ts46AhfsHIwkNzc0SvAJDkfT/NWnyDPoWUXLCHntm7LX/eW8iyDDIh7MGs
+	 GI0a1819kd2HQ==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	devel@lists.orangefs.org,
+	Steve French <sfrench@samba.org>
+Subject: Re: (subset) [PATCH 4/6] mm: Fix filemap_invalidate_inode() to use invalidate_inode_pages2_range()
+Date: Fri, 30 Aug 2024 15:12:02 +0200
+Message-ID: <20240830-anteil-haarfarbe-d11935ac1017@brauner>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240828210249.1078637-5-dhowells@redhat.com>
+References: <20240828210249.1078637-1-dhowells@redhat.com> <20240828210249.1078637-5-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <89c440a9-27bd-45d9-9d5b-5b4bf51ec950@stanley.mountain>
-In-Reply-To: <89c440a9-27bd-45d9-9d5b-5b4bf51ec950@stanley.mountain>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 30 Aug 2024 09:23:00 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Wdb+Ss1GODQBh8Mxrrx=dWWD1zSiR6JCeMYQyR5h0Fw@mail.gmail.com>
-Message-ID: <CAKYAXd_Wdb+Ss1GODQBh8Mxrrx=dWWD1zSiR6JCeMYQyR5h0Fw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Unlock on in ksmbd_tcp_set_interfaces()
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Namjae Jeon <namjae.jeon@samsung.com>, Steve French <sfrench@samba.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Hyunchul Lee <hyc.lee@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1253; i=brauner@kernel.org; h=from:subject:message-id; bh=WndIbO8xrC2aIrGdqBcilJuDXzO/BXzIA8VlzOJWcDo=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRdPKr76Dezq5ehzM4jKYrG1ftWrXx6vvm+7LaNC7uZV E+srfHd1FHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRR5oM/1T7Tb2YfR5sYXnu FDtjHaviHxfHAmW1+apKn47PLwxJcWBkWDj/YHmXY6+ZxwZFZ420TYu1Jiiw5DG/WmQs9an18sQ 6HgA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 30, 2024 at 4:22=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
-.org> wrote:
->
-> Unlock before returning an error code if this allocation fails.
->
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
-d tranport layers")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Looks good to me.
-Applied it to #ksmbd-for-next-next.
-Thanks!
+On Wed, 28 Aug 2024 22:02:45 +0100, David Howells wrote:
+> Fix filemap_invalidate_inode() to use invalidate_inode_pages2_range()
+> rather than truncate_inode_pages_range().  The latter clears the
+> invalidated bit of a partial pages rather than discarding it entirely.
+> This causes copy_file_range() to fail on cifs because the partial pages at
+> either end of the destination range aren't evicted and reread, but rather
+> just partly cleared.
+> 
+> [...]
+
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[4/6] mm: Fix filemap_invalidate_inode() to use invalidate_inode_pages2_range()
+      https://git.kernel.org/vfs/vfs/c/c26096ee0278
