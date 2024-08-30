@@ -1,100 +1,70 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDA41B86F8
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Aug 2024 19:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388E420EB;
+	Fri, 30 Aug 2024 00:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724959362; cv=none; b=bzFTm1CrmJ1H9BIqgD6mikJ25HYB5Di/0ZeoAzSyu94ND2SVaD20x4/wse1JpVzWIHOa9l3+f1ZDHq2LXJAW3MqxFizrvZnPhZ3FzJgc/80hU2eIXmB7dNUKTXIzVy4kNC6RbocQSzreDTvpsxguNHH0YPIT2rcizHxcESGbfKM=
+	t=1724977392; cv=none; b=q1EJa1eUFRhRGgzjz7LMpqzIB5b88MDGuSPqPCSt2rAD+oItXx2SeJ6IcmBGdX6NtwpASOL64OSL5mF7tGpebMcmPeL1uMad3IwIPHrsxFEHk++mchHRQNjSwhWE5tUoZxa0Nn9TNfMr1mI3WofJuf/fY7T+MSa/XiFGxxNIZZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724959362; c=relaxed/simple;
-	bh=qm19Gvoz82XJIblwayPtkbMrwDBs9ju0c2xYk5h7T9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LW2UEFmMU3T/pbNhec0GJVsnUikMBN9WWCbMRJ59Q/ZkeNcfMIKJBMUOkWG+qQrl9DanbQxcZjuuqMbrQ4SLeqMPuCGARExW/EbuAbSWntP8CRfl1D654igd1AQ19hURT3s+CzFhvxEFh9hWWfa9SsF1VUOMOXb7g3VYLMB2Fh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JsKlCMUy; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1724977392; c=relaxed/simple;
+	bh=lh7JLnFP5s1aJ5xS8eg+yLx07MrFuSLffVxCf49ZDdA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l2i/wOwPdfUjiFPTbcfOlS1LTqNV0RnOlkYNJjGEohyhXqSPWVlMwgei7LRA4P7eK7a54+dfeKupYF3ieGWWw+YbpwyvmeTeA3p3pwfcoUT9mXYv+oQpMh0B+z9uzmi6Lig2R9wOJSW2T32CS2tMbop1H4Hv8299zyX/Fs+SA2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UgUuwC0F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JsKlCMUy"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42bb8cf8a5bso5439625e9.2
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Aug 2024 12:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724959359; x=1725564159; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7hIZjb11n3DqyAA9+P4eJZLp72biRJ3AAbi9kWILsZ0=;
-        b=JsKlCMUyICUC04SoUZs2LyYmTJ7lryHd95jPzMWyQXhaCeWQlVwBDVaPuCNMoixJZU
-         71Ka2Gs9JqMwCTL1T+DhhBFEo5UZAyUNZ8vQAVDwpl7thB6PHlz3gYo1cMW9u6yTq0dQ
-         VngGxCHTmVP2aDr6eM//PLJ2TkIplXhHDv4DFJSrddAWQ8G7Zu7Ej2JzL15+mqAZCl4B
-         GlA8xf0vIaQ3A0IqPQUtTw5S+qbEqcXHRN8xvgAmFzL67eUhJHdE7kMuooq7aHSrqsXS
-         Vwn8vwaZ9vIKHfwifhQhKSLd0sRsohDnuj10aXka6WZACyahQrQtnHs+K/WvKE8MU/1R
-         sWNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724959359; x=1725564159;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7hIZjb11n3DqyAA9+P4eJZLp72biRJ3AAbi9kWILsZ0=;
-        b=mI9MN/LVJcGDtTej9Gwr6BLHu5AZz3a8wJx72ntCM77dliTvIp9dFvnvHhkbcMICB1
-         D4p1v6TRrLY2b5M9FfEaGMSggzaB+AQG1p5YC/MMiyzIUHBkBdkvKqYTCwouGeCodRUt
-         +rrQF6aJIX3cCPsky/H4JVRnnQfGg+1dyKwOrFzVAYF0hsow3v7WuutRq9dR4d4N6BXU
-         CZGzAXi+Z7qemlgpf1xVqVTPm6jx3QSIYNb8jP2VYLD6957csi1j9+dL/u9QNCj/jyMx
-         AdX6yQug1hcCcPW7g8E7gitZdBaowQLSBD8n0pVmj6bsaU3NTEK1eiyVwT6zmhcpHyK+
-         Zlqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXv9GHSrT2c7+Zqf6zgYUHINNNlVyYvNtfC7UTq+nRWoCr2tk9hxPwwekfr3hxI24eX85nwBqpBilcf@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoPWibghcx4ccwc3NrExSpYpFfRix6Y2nKbm8hABNA/oeBveis
-	9owTr9WzKJYf9a2flMKRevy9sXRtsGirNvfnk9rQBxL0NYZnoGlAD2zfI8oILgiX+u8Rwsl9MCS
-	6D9xqmw==
-X-Google-Smtp-Source: AGHT+IGTymteNaS4QWlAktRpMUvs68NdpmgcKtVmjCHiVHP/sCFsHOFzLywZcr2xcxkbNPQRnu+rOg==
-X-Received: by 2002:a05:600c:3596:b0:426:629f:154e with SMTP id 5b1f17b1804b1-42bb02d970dmr25349155e9.30.1724959359098;
-        Thu, 29 Aug 2024 12:22:39 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba642593asm59424265e9.39.2024.08.29.12.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 12:22:38 -0700 (PDT)
-Date: Thu, 29 Aug 2024 22:22:35 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Namjae Jeon <namjae.jeon@samsung.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] ksmbd: Unlock on in ksmbd_tcp_set_interfaces()
-Message-ID: <89c440a9-27bd-45d9-9d5b-5b4bf51ec950@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UgUuwC0F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CE0C4CEC5;
+	Fri, 30 Aug 2024 00:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724977391;
+	bh=lh7JLnFP5s1aJ5xS8eg+yLx07MrFuSLffVxCf49ZDdA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=UgUuwC0F/jwl0XlnE+41/CzyQeeMhrt8Bl0bZHck3USg+o4ZKZYON1GfHiuxOkGki
+	 qEicXvp9dujgeif7ji02FsPdClxBTWMqfMGHqJq8h4i/ytwr8wanzqEmW3uLSxGeq5
+	 OJz5hrFmQ4GV+H9zxVixMpPwCne4wDt9wZ+sTsxvIKRbDCWcC7YUVo+gYxTO5lJ0SQ
+	 mRT271mx5zP5Y75pRIZ1pjeQDSJWTO0lFI0jXalC6FM0MQvrkn9xW2hjHeKTVnOhd2
+	 6i+uTUnp06Hr2cywFhl6p+xqLLUaSBV/p3+T5vcKD9sPEzyeTkRkvdX1XcmqEO8EFg
+	 UTX39C3pY4YTQ==
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-70f670eb827so189606a34.0;
+        Thu, 29 Aug 2024 17:23:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUBjj+TG7kpmHOtSxszaLpFIXbi14CX+Kzr2GFQuTGiBctYVVSflZt+Kab86C5ZTxG3GL4W8GxPIOVTAkKV1Gk=@vger.kernel.org, AJvYcCUU3v4i7IDRe0QsZ9DOqjhhHSobjzL9858KLQ6XzBV673ubONaBTkCMavvDVIzhJchAkB7p2yxJgCmSpuDW@vger.kernel.org, AJvYcCXWK0IlLsWJoQMOK/8RtiE3U6IiKazNzXWLHMlfv+Q1+asiENEIR4daHN60KV4ys3aihTumuMRFOnJxxA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK7X67KsQSIAplBfVTnOdALFBH5Jmww9xsFk7DFHDZAVbo69vd
+	Q3kcWbmErCrbqR3ZJ+b4omOGp9iR1zuK5rIuIH27W2O70hGvw4+YaBSVYrc9CLvhsvGujQOLdjW
+	0WsSUVebwn2CnPnU+SzjF1ulMmS0=
+X-Google-Smtp-Source: AGHT+IF1HOIvuR07ISWkm9lOBPvOjH1Fv+cPfeKw7L2knPjRe2Cbni0rIZvQV07RTjTSNXDkJ41oZxVbgwUNcvuSAdo=
+X-Received: by 2002:a05:6830:278a:b0:703:6b11:33a4 with SMTP id
+ 46e09a7af769-70f5da97fd4mr1154441a34.9.1724977390911; Thu, 29 Aug 2024
+ 17:23:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <89c440a9-27bd-45d9-9d5b-5b4bf51ec950@stanley.mountain>
+In-Reply-To: <89c440a9-27bd-45d9-9d5b-5b4bf51ec950@stanley.mountain>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 30 Aug 2024 09:23:00 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_Wdb+Ss1GODQBh8Mxrrx=dWWD1zSiR6JCeMYQyR5h0Fw@mail.gmail.com>
+Message-ID: <CAKYAXd_Wdb+Ss1GODQBh8Mxrrx=dWWD1zSiR6JCeMYQyR5h0Fw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Unlock on in ksmbd_tcp_set_interfaces()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Namjae Jeon <namjae.jeon@samsung.com>, Steve French <sfrench@samba.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	Hyunchul Lee <hyc.lee@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Unlock before returning an error code if this allocation fails.
-
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/server/transport_tcp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index a84788396daa..aaed9e293b2e 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -624,8 +624,10 @@ int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
- 		for_each_netdev(&init_net, netdev) {
- 			if (netif_is_bridge_port(netdev))
- 				continue;
--			if (!alloc_iface(kstrdup(netdev->name, GFP_KERNEL)))
-+			if (!alloc_iface(kstrdup(netdev->name, GFP_KERNEL))) {
-+				rtnl_unlock();
- 				return -ENOMEM;
-+			}
- 		}
- 		rtnl_unlock();
- 		bind_additional_ifaces = 1;
--- 
-2.45.2
-
+On Fri, Aug 30, 2024 at 4:22=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
+>
+> Unlock before returning an error code if this allocation fails.
+>
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
+d tranport layers")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Looks good to me.
+Applied it to #ksmbd-for-next-next.
+Thanks!
