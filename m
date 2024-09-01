@@ -1,123 +1,127 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101631E517;
-	Sun,  1 Sep 2024 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA81D13AA46;
+	Sun,  1 Sep 2024 23:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725223818; cv=none; b=JFcGX2U43W9jugGOEEhPk6taBTYItT9/8IPLQ0OCUKvLBGtk2Xbepol+oOifNhssb81SAndo3T6UZ8Ob0iF5gkVXwg23uGP0dZi+e5eCU35+fNFonSuhh+2QG3UeoBN4cZZpAqPLsTyLY3oHJEF0ZpM2Hw8ndnLP0MKCWNEZdlQ=
+	t=1725234080; cv=none; b=jn6WDNCRYXQDCnjZhqfh/bkLwHgrXaG/HXeXrbNk8d/uXeGIVS0SwrMaYrH8hMCj5JGtqvSWhIi6dBs5/kiFjQEUv1QG0PUwdUKr+n17cv2k+RjBL8jdvYoNvpLX5hmahkylSmcY7x0rk3Mu7nTfvsHBMJ3oeMiMRAMDHJrdVsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725223818; c=relaxed/simple;
-	bh=krrDibKBxYbpDoeYbKNjC5PPYxNQFs4NRzESdYWoOcc=;
+	s=arc-20240116; t=1725234080; c=relaxed/simple;
+	bh=MOF3+IXawLy9SIlMBfajQDdPJDqrahG9DjBoz/9HRR4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hKbh5ttlWvN1H4yn4t+zj+CK3lG76y6hWBbRxgE1wxuFx/YuuXdtbRLh7G+lExocRVEux2BgCu41jIoWS++z+I5Qik4Pkt2dNTY8Ww+SmAgwv5cRAJFfKnOt1eVHukvLIMqyXY7SiBxFly3RjB1oBDgUx5aKdlnOtZSN9kBdJ40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzNAAnmD; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=gOgZpEBsAM4IP0ekTYYDqkc7c/62Lp7plbe3S2VREwrKcKT65PfFeWLX0eBtSDuwvMWfk13hd10Hkb4jbzPXFNOwTUT86dI8kZjr9qzHOnS526jdsxj/UE/r1DjCSFAzeTbkIIP+O02qLi93mIuxhN+NXbfggYh2Dd8T0DRox8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arzHjtbj; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzNAAnmD"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5333b2fbedaso6162076e87.0;
-        Sun, 01 Sep 2024 13:50:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arzHjtbj"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f406034874so42614521fa.1;
+        Sun, 01 Sep 2024 16:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725223815; x=1725828615; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725234077; x=1725838877; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nmvtuu/nnTTPB5TNvDIzqgJV2raybGXEoThCiuyR1CU=;
-        b=DzNAAnmDXuyB/mz/+Vtlkvx5NAXaHy9DG7+wkJ/KcDD7Luset6cKaEYr1f4yO1EijA
-         NCCvzKe409nLoani5U8T++xg2wDGQAOlIQEDncOb3sq1wh4oJgn6euVKZxzjy9ykgAKd
-         WEBAvZN5iYtWjBn/dGtRYdhF2E3ser3hvDzT5ChAXtSQQmCebC9/DOZP1IryGEvDFHMm
-         SMrxq4uBocfG6XMk8scY78duVT8kLLPulsOG8ZgW7nkxaMPdsklFRw7tYYW86/QsQBUy
-         QKbLGPpS2hEGqC7Z5tFhQN/EA0FxEhqeIljRuGhTQnvVuxh71PcdK1rA2FUIhk2+npR+
-         fkBw==
+        bh=0OptCrhRONfMIpYiriIyIArvvwMoZ9X5KBzqF2jB2C8=;
+        b=arzHjtbjkzNva0NcZZQaRqGAZxNO6Lh3o6l+UU2Arh4H+tVW798SAR2UCOrLI85isa
+         nJwkbpzxGya80LVPj/Nn/0gf/8xN/Uc4hdC+T1Yfonjb2v6RB2L/IhkZKBtaSqCvudMH
+         I+YoR/JGYRcuPaNq/4evVMyRUV7hC4KPH+2S/Jv2JCkJtw+ONHr13uEEi+4KITOmshxk
+         H4QXE4X9dEu/T0tYkaTZju5t86pXcAp5AvISel8G4C5CSB1I0tj75l4KTQvFQqiA1uSY
+         I6K1GNd+InOBTDkFJxniF34q0MIi5a+n/9fHzoowRoPvY/fGUZ2CxKi7CwaYMlH3LPii
+         /Cjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725223815; x=1725828615;
+        d=1e100.net; s=20230601; t=1725234077; x=1725838877;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nmvtuu/nnTTPB5TNvDIzqgJV2raybGXEoThCiuyR1CU=;
-        b=fJ2uY0c/EJFkR9j09EiYnw+e63PdDh30IZrDTgyQLS1r6SvCZGN5XdYm0fZpqpETzx
-         dRkrcMkqoiNXosCmjMh+Da38yLZsXomREfqb7NhgXxqxx/edSkaVKUN38cFpREOiqeJG
-         viDz9UmP+ESIALN4hEWCbE2frx2Z4iki/Sib6tAPX3A/eyNoYcXv4SYUnvT5HsB2wuas
-         vkggfBYyMDhFfeyJxEujX25s5g104Xl5z7U8JRefFwo7k/tsygu0xIm+53B2nanzJRNJ
-         ITVzWpZL3Dvn2xkgrtllWOu5Hn96KpGgVqNhi6zc8B+7G8ZoNE02DgsQcyaHwSzHyFQI
-         ZI3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWb3obd4mZh4BuqSLPIrcpNaqgQi1h+8JnxgZq7Bo61LTXAfuse//wQyAkcis0Wnikp8QUVuUOOWq69@vger.kernel.org, AJvYcCXDItt1Wd0qO52AIvN0X2Qa0kmxRCV30keOp8bfLupJlaUmwrwRxsPlyarN4YJc6w+DWULl06LZyJgEZHfD@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1p12i5N0M18k/+scotPAhnSq3y+m7aHq2V0CUhzeps1TKaTaA
-	wFEr7YWiTJb9RhL2AMyieot9X8iRRtnx1uQZvsXeI2Q+x/ANnBBlUD7qFlyA8AMw5OZ5vsQr8of
-	gQzHFqz48KQGluz3EziUNDgaWe+gHPA+qp5A=
-X-Google-Smtp-Source: AGHT+IG/8AvC2IZQG8jqrB7dUuMYI9EscwxoJgIuyGSjXS7j3FsDwsUJazVMpgHaKq3g1u2kyX2l4lqKO5wzDzEgD9A=
-X-Received: by 2002:a05:6512:1382:b0:530:dab8:7dd6 with SMTP id
- 2adb3069b0e04-53546ba7bffmr5010405e87.50.1725223814609; Sun, 01 Sep 2024
- 13:50:14 -0700 (PDT)
+        bh=0OptCrhRONfMIpYiriIyIArvvwMoZ9X5KBzqF2jB2C8=;
+        b=waznXLgd3mWb0iMtWfRbSWkq87KDjTRhPIQWhw7hN7hIvxvrbEALUkM00o12fTeHNt
+         DMjrLZUc3O3K7A4NaboZoSuwrDPH2aJEJzym5VAu/mk5nrqhbwfBaazrB7T6qgecbefD
+         QmDhLuIKb921BprNEcgkfaGdRdMr5ECRNnXqDCZ2mPzX42mMpUhWtmre1F7KD2kzg6Gh
+         bOSlzNIXr6TcvZqy19FWvhjBZhf4v/F3jl+bwj7Ck/rPWZRezKs3DqWNluhJDDG8IPju
+         /Szy5F5a9iRKNxiPpJJT0zgD09iO4b7q2L7HStrxQPWnR+2UxZT5EbjX1QfJFwBeg3kE
+         xhzw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2WoS4s9Z4Qn4M1KtXSzTcL3Aul4nO6uUodBkWrwJ9bfJaNjChDczkUSqvQ7MZOq/L+k9NySV3uXeg@vger.kernel.org, AJvYcCWjXI0NEP2OMcY8wLX3S7HyHyct+1ZBhBuffBCWDWbPynBNvKiIq+WjpixlDlvRziYHrq2ujiOmtmzEGImS@vger.kernel.org, AJvYcCWneAzEXWcSHYNVC1oQlehYE25R/cdqhtchh27McfWs8iICrJD2yeOswEspqbymTOc+UBx+y2YmucZSWA==@vger.kernel.org, AJvYcCX/5Q7MUN9+OyEOJDOQlnorKI0unzZHhIxfpQBHYD18LEXPl1puaEjHjGFahTAGyneUoiSrfdFao9Y0XJVzCw==@vger.kernel.org, AJvYcCXeNIORl75gm26DiltzaxuA54PZPO3nP+V+vPamDPkGUSyVKEKNsKiBlTHc250qR12Nskb9fZIn7LdZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRN2v1a0ibF37XCS/OmRsosa9pLSsDlRDfTYzN/I88B02/5In8
+	L/dx/yKp/VVYCbC6/4MVFkUc9Id6+IMlTYwMmGdZpcHYEVHdyNN2pAVeEvNqimwyMT+mILpw3Rd
+	IhgFvWmLPuzbtMbkoRTfKpRE77+0=
+X-Google-Smtp-Source: AGHT+IHrpw2kTpvaZiyKJAHMxmQ/fhZpxqRdKI1vFWTY9ydD57nABAkwYo+y3SH1kUAvMU7Md95wbwacKxJ+67IyRxg=
+X-Received: by 2002:a2e:be29:0:b0:2f5:23a:106b with SMTP id
+ 38308e7fff4ca-2f610890868mr90286721fa.34.1725234076595; Sun, 01 Sep 2024
+ 16:41:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240901164002.117305-2-thorsten.blum@toblux.com>
-In-Reply-To: <20240901164002.117305-2-thorsten.blum@toblux.com>
+References: <20240828210249.1078637-1-dhowells@redhat.com> <20240828210249.1078637-5-dhowells@redhat.com>
+ <20240830-anteil-haarfarbe-d11935ac1017@brauner>
+In-Reply-To: <20240830-anteil-haarfarbe-d11935ac1017@brauner>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 1 Sep 2024 15:50:03 -0500
-Message-ID: <CAH2r5msAs9Lm=jzWd=pYnK3r9iANSNRTqHvHxNjzsBucgq9Ktw@mail.gmail.com>
-Subject: Re: [RESEND PATCH] smb3: Use min() to improve _smbd_get_connection()
-To: Thorsten Blum <thorsten.blum@toblux.com>, Shen Lichuan <shenlichuan@vivo.com>
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org
+Date: Sun, 1 Sep 2024 18:41:05 -0500
+Message-ID: <CAH2r5mv8merj9J=UK-U2xsSArL2s9zuRP-bZHnM39jU6Ujx9JQ@mail.gmail.com>
+Subject: Re: (subset) [PATCH 4/6] mm: Fix filemap_invalidate_inode() to use invalidate_inode_pages2_range()
+To: Christian Brauner <brauner@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Jeff Layton <jlayton@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Miklos Szeredi <miklos@szeredi.hu>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, devel@lists.orangefs.org, 
+	Steve French <sfrench@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-There is a similar patch in cifs-2.6.git for-next-next (for 6.12-rc) from
+This looks like an important one as it fixes multiple xfstests see e.g.
+with the patch:
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/=
+builds/213
+vs without
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/=
+builds/212
 
-smfrench@smfrench-ThinkPad-P52:~/cifs-2.6$ git show
-commit a85383ccf515f82ad791f9bfe70b0e6fb5a2117f (HEAD ->
-for-next-next, origin/for-next-next)
-Author: Shen Lichuan <shenlichuan@vivo.com>
-Date:   Tue Aug 27 16:54:20 2024 +0800
+Can add:
+Tested--by: Steve French <stfrench@microsoft.com>
 
-    smb: client: Use min() macro
-
-    Use the min() macro to simplify the function and improve
-    its readability.
-
-    Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
-    Signed-off-by: Steve French <stfrench@microsoft.com>
-
-On Sun, Sep 1, 2024 at 11:40=E2=80=AFAM Thorsten Blum <thorsten.blum@toblux=
-.com> wrote:
+On Fri, Aug 30, 2024 at 8:12=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
 >
-> Use the min() macro to simplify the _smbd_get_connection() function and
-> improve its readability.
+> On Wed, 28 Aug 2024 22:02:45 +0100, David Howells wrote:
+> > Fix filemap_invalidate_inode() to use invalidate_inode_pages2_range()
+> > rather than truncate_inode_pages_range().  The latter clears the
+> > invalidated bit of a partial pages rather than discarding it entirely.
+> > This causes copy_file_range() to fail on cifs because the partial pages=
+ at
+> > either end of the destination range aren't evicted and reread, but rath=
+er
+> > just partly cleared.
+> >
+> > [...]
 >
-> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
-> ---
->  fs/smb/client/smbdirect.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+> Patches in the vfs.fixes branch should appear in linux-next soon.
 >
-> diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-> index 7bcc379014ca..8f782edc3fd7 100644
-> --- a/fs/smb/client/smbdirect.c
-> +++ b/fs/smb/client/smbdirect.c
-> @@ -1585,10 +1585,8 @@ static struct smbd_connection *_smbd_get_connectio=
-n(
->         conn_param.initiator_depth =3D 0;
+> Please report any outstanding bugs that were missed during review in a
+> new review to the original patch series allowing us to drop it.
 >
->         conn_param.responder_resources =3D
-> -               info->id->device->attrs.max_qp_rd_atom
-> -                       < SMBD_CM_RESPONDER_RESOURCES ?
-> -               info->id->device->attrs.max_qp_rd_atom :
-> -               SMBD_CM_RESPONDER_RESOURCES;
-> +               min(info->id->device->attrs.max_qp_rd_atom,
-> +                   SMBD_CM_RESPONDER_RESOURCES);
->         info->responder_resources =3D conn_param.responder_resources;
->         log_rdma_mr(INFO, "responder_resources=3D%d\n",
->                 info->responder_resources);
-> --
-> 2.46.0
+> It's encouraged to provide Acked-bys and Reviewed-bys even though the
+> patch has now been applied. If possible patch trailers will be updated.
 >
+> Note that commit hashes shown below are subject to change due to rebase,
+> trailer updates or similar. If in doubt, please check the listed branch.
+>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> branch: vfs.fixes
+>
+> [4/6] mm: Fix filemap_invalidate_inode() to use invalidate_inode_pages2_r=
+ange()
+>       https://git.kernel.org/vfs/vfs/c/c26096ee0278
 >
 
 
