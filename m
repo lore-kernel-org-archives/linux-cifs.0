@@ -1,163 +1,124 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412741F957
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Sep 2024 20:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101631E517;
+	Sun,  1 Sep 2024 20:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725221736; cv=none; b=lxXra/fTYxM7Pw8T0CONWooS2tKS+eSdlSyi25oOuG8b/LzuoqpjQGFjbsIoqKVMvHQnBpJ/HWcMO20treLrF8UU/KZiYMI19msY4uVaBHSmKDUFRtlEOz3lh3N/BC9bDZHXkYB+3iXtb3KEvr6rzNVB+rxO8hC6xOyvGl8YeD0=
+	t=1725223818; cv=none; b=JFcGX2U43W9jugGOEEhPk6taBTYItT9/8IPLQ0OCUKvLBGtk2Xbepol+oOifNhssb81SAndo3T6UZ8Ob0iF5gkVXwg23uGP0dZi+e5eCU35+fNFonSuhh+2QG3UeoBN4cZZpAqPLsTyLY3oHJEF0ZpM2Hw8ndnLP0MKCWNEZdlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725221736; c=relaxed/simple;
-	bh=ETG0BzaT99Lr9FjhUAJF9adIBkY3pURZYqYnSnXY4lQ=;
+	s=arc-20240116; t=1725223818; c=relaxed/simple;
+	bh=krrDibKBxYbpDoeYbKNjC5PPYxNQFs4NRzESdYWoOcc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pK4iYcbRQFPVk4P43cQ0rJeH+s7VLG1ihwVEeHHnd1fRa4oVVuE29m/OX0RA0Lp1wUkmEG9e9A4PWZGmEd7nN6jdpKUhBB388KwapycraOn8ccZLaZUtAX6jsCI0aOfg1JsdEWZHVIzbUYjn7vDtCEd/gqB+aeVbiJEs1GMxbTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E4g+aY3p; arc=none smtp.client-ip=209.85.167.45
+	 To:Cc:Content-Type; b=hKbh5ttlWvN1H4yn4t+zj+CK3lG76y6hWBbRxgE1wxuFx/YuuXdtbRLh7G+lExocRVEux2BgCu41jIoWS++z+I5Qik4Pkt2dNTY8Ww+SmAgwv5cRAJFfKnOt1eVHukvLIMqyXY7SiBxFly3RjB1oBDgUx5aKdlnOtZSN9kBdJ40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzNAAnmD; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4g+aY3p"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5344ab30508so4350547e87.0
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Sep 2024 13:15:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzNAAnmD"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5333b2fbedaso6162076e87.0;
+        Sun, 01 Sep 2024 13:50:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725221732; x=1725826532; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725223815; x=1725828615; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qxLYTyIyYy++PuaXcAiLYBgL62Mk7EoNo1yaSAPEIGw=;
-        b=E4g+aY3pe7QgUh5GIoXpBSOnhq+JeVYORYinpsVrZp8ulfcfbltMOLZLCTtZapc2pz
-         N3uzFEVzG1+0cekMGDpc1LUOZ2841kmA5eL/txZiENi8sdFKh21vf6FwdCHkKZWxwQiv
-         XFIqLRyeg/FsELSs8/pkuqmYhRCOszpktZ2oEHH0E2Cun0FG1VfkIKyt7AWvjvtnWzEY
-         Ax5IZKmYGq59OlHvRge4TQcdq0srHmB453Ud9Dj8CWfOBtL6z2zsi2+3YcFJ7F01xjGM
-         BSlDnW5IDJHXaeXt4cOdDvAGo9I5Y+25k7UGAC3T2e1/ulD1Ag3+fJmYkwD4Xu0cFfeA
-         +fKA==
+        bh=nmvtuu/nnTTPB5TNvDIzqgJV2raybGXEoThCiuyR1CU=;
+        b=DzNAAnmDXuyB/mz/+Vtlkvx5NAXaHy9DG7+wkJ/KcDD7Luset6cKaEYr1f4yO1EijA
+         NCCvzKe409nLoani5U8T++xg2wDGQAOlIQEDncOb3sq1wh4oJgn6euVKZxzjy9ykgAKd
+         WEBAvZN5iYtWjBn/dGtRYdhF2E3ser3hvDzT5ChAXtSQQmCebC9/DOZP1IryGEvDFHMm
+         SMrxq4uBocfG6XMk8scY78duVT8kLLPulsOG8ZgW7nkxaMPdsklFRw7tYYW86/QsQBUy
+         QKbLGPpS2hEGqC7Z5tFhQN/EA0FxEhqeIljRuGhTQnvVuxh71PcdK1rA2FUIhk2+npR+
+         fkBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725221732; x=1725826532;
+        d=1e100.net; s=20230601; t=1725223815; x=1725828615;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qxLYTyIyYy++PuaXcAiLYBgL62Mk7EoNo1yaSAPEIGw=;
-        b=V3XvospJ67p5DL1KrfCwC8/fARHGXUOWNI9S2hL/I3Mcbh53VIvpcYMUr9Srbax2fo
-         z84hAHqfcrF4tQ4mVmMXfbYyjE+VTu/zoiTfskRxoWsb1mkr0SRtSViPVOtZsFhBQTaV
-         10f29VG2MMbF1i9Zq2ZW8osPX48wqBmNf666WO6gGezLGPPjdEo+dtNIxIoi2PcSuKTU
-         XUMg9i2LfUjbfM3jfMohR2JXNfWzh5XVgopACEhq6QCqI2mHDuUzxiKosi+bc1dZKfkd
-         IKRVfUFHsuGjD5+NufFHe67lzbVcnPSzYZe8+GvMtQ85h28q12po2EioNWwS7WiQnVHm
-         TNXQ==
-X-Gm-Message-State: AOJu0YylenpLppyiXfBJHk/V4lqGXbt13jCPODOAX00N2tLutoyxbvgN
-	gyY4m+IbH0qhYfxIZJxL6/CJ94fRg3MN0P0UQNKVPreg5o2gorTIx2fJMW2tp9Bpna4qEplvp/X
-	w8bSdPhrMbgyq1E/IJH0oTXEQuGipu83Z
-X-Google-Smtp-Source: AGHT+IFm6lTsro+cQiSBzP/y1dXuvRTbxQpvIgIoOY+6TM1oHqFyfipnsG6a1+62yDOWmocjrSkRo3vEuUDBb0hoWxQ=
-X-Received: by 2002:a05:6512:2812:b0:52b:bee8:e987 with SMTP id
- 2adb3069b0e04-535462ee2cemr2985766e87.3.1725221732135; Sun, 01 Sep 2024
- 13:15:32 -0700 (PDT)
+        bh=nmvtuu/nnTTPB5TNvDIzqgJV2raybGXEoThCiuyR1CU=;
+        b=fJ2uY0c/EJFkR9j09EiYnw+e63PdDh30IZrDTgyQLS1r6SvCZGN5XdYm0fZpqpETzx
+         dRkrcMkqoiNXosCmjMh+Da38yLZsXomREfqb7NhgXxqxx/edSkaVKUN38cFpREOiqeJG
+         viDz9UmP+ESIALN4hEWCbE2frx2Z4iki/Sib6tAPX3A/eyNoYcXv4SYUnvT5HsB2wuas
+         vkggfBYyMDhFfeyJxEujX25s5g104Xl5z7U8JRefFwo7k/tsygu0xIm+53B2nanzJRNJ
+         ITVzWpZL3Dvn2xkgrtllWOu5Hn96KpGgVqNhi6zc8B+7G8ZoNE02DgsQcyaHwSzHyFQI
+         ZI3A==
+X-Forwarded-Encrypted: i=1; AJvYcCWb3obd4mZh4BuqSLPIrcpNaqgQi1h+8JnxgZq7Bo61LTXAfuse//wQyAkcis0Wnikp8QUVuUOOWq69@vger.kernel.org, AJvYcCXDItt1Wd0qO52AIvN0X2Qa0kmxRCV30keOp8bfLupJlaUmwrwRxsPlyarN4YJc6w+DWULl06LZyJgEZHfD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1p12i5N0M18k/+scotPAhnSq3y+m7aHq2V0CUhzeps1TKaTaA
+	wFEr7YWiTJb9RhL2AMyieot9X8iRRtnx1uQZvsXeI2Q+x/ANnBBlUD7qFlyA8AMw5OZ5vsQr8of
+	gQzHFqz48KQGluz3EziUNDgaWe+gHPA+qp5A=
+X-Google-Smtp-Source: AGHT+IG/8AvC2IZQG8jqrB7dUuMYI9EscwxoJgIuyGSjXS7j3FsDwsUJazVMpgHaKq3g1u2kyX2l4lqKO5wzDzEgD9A=
+X-Received: by 2002:a05:6512:1382:b0:530:dab8:7dd6 with SMTP id
+ 2adb3069b0e04-53546ba7bffmr5010405e87.50.1725223814609; Sun, 01 Sep 2024
+ 13:50:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240831000937.8103-1-ematsumiya@suse.de> <CAH2r5msJ4HpuRi5mzOKvL5FhaUnxw2ZtaX331Sm2cZ92vCSgTA@mail.gmail.com>
-In-Reply-To: <CAH2r5msJ4HpuRi5mzOKvL5FhaUnxw2ZtaX331Sm2cZ92vCSgTA@mail.gmail.com>
+References: <20240901164002.117305-2-thorsten.blum@toblux.com>
+In-Reply-To: <20240901164002.117305-2-thorsten.blum@toblux.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 1 Sep 2024 15:15:21 -0500
-Message-ID: <CAH2r5mtz5ROx=vfKD=JMVteJ1WCyg8ZiCFGv+AXcV7TcMM-4DQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] smb: client: force dentry revalidation if
- nohandlecache is set
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+Date: Sun, 1 Sep 2024 15:50:03 -0500
+Message-ID: <CAH2r5msAs9Lm=jzWd=pYnK3r9iANSNRTqHvHxNjzsBucgq9Ktw@mail.gmail.com>
+Subject: Re: [RESEND PATCH] smb3: Use min() to improve _smbd_get_connection()
+To: Thorsten Blum <thorsten.blum@toblux.com>, Shen Lichuan <shenlichuan@vivo.com>
+Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This does look wrong since it would affect use of acdirmax/acregmax.
+There is a similar patch in cifs-2.6.git for-next-next (for 6.12-rc) from
 
-Would like to dig deeper into the failure and see if more intuitive
-way to fix it.
+smfrench@smfrench-ThinkPad-P52:~/cifs-2.6$ git show
+commit a85383ccf515f82ad791f9bfe70b0e6fb5a2117f (HEAD ->
+for-next-next, origin/for-next-next)
+Author: Shen Lichuan <shenlichuan@vivo.com>
+Date:   Tue Aug 27 16:54:20 2024 +0800
 
-It also seems like the if ... nohandlecache check applies more to
-whether it is worth calling open_cached_dir_by_dentry ... not to
-whether we should leverage acdirmax/acregmax cached dentries
+    smb: client: Use min() macro
 
-On Sat, Aug 31, 2024 at 11:36=E2=80=AFPM Steve French <smfrench@gmail.com> =
-wrote:
+    Use the min() macro to simplify the function and improve
+    its readability.
+
+    Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+
+On Sun, Sep 1, 2024 at 11:40=E2=80=AFAM Thorsten Blum <thorsten.blum@toblux=
+.com> wrote:
 >
-> tentatively merged to cifs-2.6.git for-next pending testing and
-> additional review
+> Use the min() macro to simplify the _smbd_get_connection() function and
+> improve its readability.
 >
-> On Fri, Aug 30, 2024 at 7:10=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.d=
-e> wrote:
-> >
-> > Some operations return -EEXIST for a non-existing dir/file because of
-> > cached attributes.
-> >
-> > Fix this by forcing dentry revalidation when nohandlecache is set.
-> >
-> > Bug/reproducer:
-> > Azure Files share, attribute caching timeout is 30s (as
-> > suggested by Azure), 2 clients mounting the same share.
-> >
-> > tcon->nohandlecache is set by cifs_get_tcon() because no directory
-> > leasing capability is offered.
-> >
-> >     # client 1 and 2
-> >     $ mount.cifs -o ...,actimeo=3D30 //server/share /mnt
-> >     $ cd /mnt
-> >
-> >     # client 1
-> >     $ mkdir dir1
-> >
-> >     # client 2
-> >     $ ls
-> >     dir1
-> >
-> >     # client 1
-> >     $ mv dir1 dir2
-> >
-> >     # client 2
-> >     $ mkdir dir1
-> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exists
-> >     $ ls
-> >     dir2
-> >     $ mkdir dir1
-> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exists
-> >
-> > "mkdir dir1" eventually works after 30s (when attribute cache
-> > expired).
-> >
-> > The same behaviour can be observed with files if using some
-> > non-overwritting operation (e.g. "rm -i").
-> >
-> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-> > Tested-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> > ---
-> >  fs/smb/client/inode.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> > index dd0afa23734c..5f9c5525385f 100644
-> > --- a/fs/smb/client/inode.c
-> > +++ b/fs/smb/client/inode.c
-> > @@ -2427,6 +2427,9 @@ cifs_dentry_needs_reval(struct dentry *dentry)
-> >         if (!lookupCacheEnabled)
-> >                 return true;
-> >
-> > +       if (tcon->nohandlecache)
-> > +               return true;
-> > +
-> >         if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) =
-{
-> >                 spin_lock(&cfid->fid_lock);
-> >                 if (cfid->time && cifs_i->time > cfid->time) {
-> > --
-> > 2.46.0
-> >
+> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+> ---
+>  fs/smb/client/smbdirect.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 >
+> diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+> index 7bcc379014ca..8f782edc3fd7 100644
+> --- a/fs/smb/client/smbdirect.c
+> +++ b/fs/smb/client/smbdirect.c
+> @@ -1585,10 +1585,8 @@ static struct smbd_connection *_smbd_get_connectio=
+n(
+>         conn_param.initiator_depth =3D 0;
 >
+>         conn_param.responder_resources =3D
+> -               info->id->device->attrs.max_qp_rd_atom
+> -                       < SMBD_CM_RESPONDER_RESOURCES ?
+> -               info->id->device->attrs.max_qp_rd_atom :
+> -               SMBD_CM_RESPONDER_RESOURCES;
+> +               min(info->id->device->attrs.max_qp_rd_atom,
+> +                   SMBD_CM_RESPONDER_RESOURCES);
+>         info->responder_resources =3D conn_param.responder_resources;
+>         log_rdma_mr(INFO, "responder_resources=3D%d\n",
+>                 info->responder_resources);
 > --
-> Thanks,
+> 2.46.0
 >
-> Steve
-
+>
 
 
 --=20
