@@ -1,106 +1,166 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AD8433CE
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Sep 2024 18:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725214606; cv=pass; b=XpqyynLmH7c7g7+iuneKXcG3B4VOVmv4Pd0c1cbHDNXCliFIyNELbFMk4m05TQ4Y32cfnChgQdUp2b9ccoL6a2wayoxw7DeWPmdstC+8Na//HsZWv0OhvF5cdADFJt2nD5DeMHE0E9/S4VpHEV1ny2NamzASF+z61VKfTeUy/f0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725214606; c=relaxed/simple;
-	bh=aYuOm9V2lcofP2AaSNm2TWTDO1ulpHJSZX3wyuL1Y8c=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=SM9HCY7tY99dTtR4CLuA5XteO/a7Z07ta/jC/QQhhoyWz0xenu+Q0xcOm8WjG2YorZ5ytKmazWTw7TjrQos1FLefxzJvAixkvdVnR9z8pZ6S4Z9BxeXj9kamvg76HARAFIoa0FlnhmSjzjd0v/ohjml+xVvKw8Qxa4SaQZJ7Z6M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=j9qoFf85; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412741F957
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Sep 2024 20:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725221736; cv=none; b=lxXra/fTYxM7Pw8T0CONWooS2tKS+eSdlSyi25oOuG8b/LzuoqpjQGFjbsIoqKVMvHQnBpJ/HWcMO20treLrF8UU/KZiYMI19msY4uVaBHSmKDUFRtlEOz3lh3N/BC9bDZHXkYB+3iXtb3KEvr6rzNVB+rxO8hC6xOyvGl8YeD0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725221736; c=relaxed/simple;
+	bh=ETG0BzaT99Lr9FjhUAJF9adIBkY3pURZYqYnSnXY4lQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pK4iYcbRQFPVk4P43cQ0rJeH+s7VLG1ihwVEeHHnd1fRa4oVVuE29m/OX0RA0Lp1wUkmEG9e9A4PWZGmEd7nN6jdpKUhBB388KwapycraOn8ccZLaZUtAX6jsCI0aOfg1JsdEWZHVIzbUYjn7vDtCEd/gqB+aeVbiJEs1GMxbTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E4g+aY3p; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="j9qoFf85"
-Message-ID: <f45ce275e79ec4722ea440af071f93e6@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1725214601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OIQ1iBo5fVfYzusxi2HNUTNKIMXz910dRnl0erjvu2I=;
-	b=j9qoFf85M5XKrrR7zdC9Vgc7SpdKwvTHJoW5sGDHpMkSA57bgDpWBKu9xoBGweOlI6tO6u
-	CKydf5MwgBnHv2uILUdJ3xkMBxv8qUhL2XKvZ4h9Ns0eCrBxbZg2HfplX7KgJv7p6n21is
-	UdHd38j4tJm+Hai5Mm/nZZnWJtPDTqM1BGdZzUC9cF7CiRgrQTnDaeJkZNLNlnsYtmOTRk
-	0hZjP8QZm3e5nyNR1kMvbiUTeAEYhGxrqpqFHMbnW/NY3fEBfOlvDuSm+FnW1Sc9WHQMtk
-	izUEBmzFUpNTnNmai6xXApud1aEImorcjA+AEBHvRx0Q7XRpKuyP3fFh+iHjOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1725214601; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OIQ1iBo5fVfYzusxi2HNUTNKIMXz910dRnl0erjvu2I=;
-	b=eLr+oOgVdcLSdPShH7iFrGqfldpJCwQV2eol7u30dlQNsSdWU9K1bVfeecVXY7DuvA9zwF
-	I3HqQplt0zZ0XKTLK/WRUEJmZoxE2NrIeZYYGAyfTSsh+4a+07dv2OPDuVM6CsqmEvWWB2
-	GiaaOu0797+HQUab6QTwENrA6atxUHTS7a8ixJFEWUi3FbPCuJ3jKWf5luCjzxYSl89hhz
-	kVPHELrmfEYRSLmyfIro/QaSNSu8ITIv9Y3Bc2IwXKk+QxomkGQ4RZm7lzrusIw0vfXIqF
-	5FqTEbPkznPFiyGwUtqHS3br5qByb2NavZnXObukLbD074b9wi1kl/kpjle5JQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1725214601; a=rsa-sha256;
-	cv=none;
-	b=BEUvqVNLu2FM5VzbYPkEhUZbQKpRFFhO9e/U1LPTunUCo4fjyJYbC4qbAIcz5M3FFyhzwo
-	YrwWX7OVyVhHJNPYet3ZUdASZKshYIjf4LPat4qkDNK/RyIpkEzSCNDd7n6DqRREfIRWW8
-	ptJe6zKsk4X+JS5RcCmNAWOJw9uMaqOU3cQfyApT3puUcq+2A5Y5ms7tb+fhlhp2wlXFR5
-	SvozwvW1u+NoAERv5qh6ZryQq56whkuYWQnZ1MKcFHYOXsk6FhMLf4eK4oUF3IFu1Lp7Zq
-	LVk9W7Vz8Zuf7aW6wcLUtXcPrTz4lTHxKaLnxeyDgx+qd7x/9xfPlusTCIeCOg==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Rickard Andersson <rickaran@axis.com>
-Subject: Re: [PATCH] smb: client: fix hang in wait_for_response() for negproto
-In-Reply-To: <CAH2r5mtKKphsebo9Qy4FmOXzAbx=zXdx0otMYE_T5ijqq5KuMg@mail.gmail.com>
-References: <20240901014734.141366-1-pc@manguebit.com>
- <CAH2r5mtKKphsebo9Qy4FmOXzAbx=zXdx0otMYE_T5ijqq5KuMg@mail.gmail.com>
-Date: Sun, 01 Sep 2024 15:16:38 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4g+aY3p"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5344ab30508so4350547e87.0
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Sep 2024 13:15:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725221732; x=1725826532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qxLYTyIyYy++PuaXcAiLYBgL62Mk7EoNo1yaSAPEIGw=;
+        b=E4g+aY3pe7QgUh5GIoXpBSOnhq+JeVYORYinpsVrZp8ulfcfbltMOLZLCTtZapc2pz
+         N3uzFEVzG1+0cekMGDpc1LUOZ2841kmA5eL/txZiENi8sdFKh21vf6FwdCHkKZWxwQiv
+         XFIqLRyeg/FsELSs8/pkuqmYhRCOszpktZ2oEHH0E2Cun0FG1VfkIKyt7AWvjvtnWzEY
+         Ax5IZKmYGq59OlHvRge4TQcdq0srHmB453Ud9Dj8CWfOBtL6z2zsi2+3YcFJ7F01xjGM
+         BSlDnW5IDJHXaeXt4cOdDvAGo9I5Y+25k7UGAC3T2e1/ulD1Ag3+fJmYkwD4Xu0cFfeA
+         +fKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725221732; x=1725826532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qxLYTyIyYy++PuaXcAiLYBgL62Mk7EoNo1yaSAPEIGw=;
+        b=V3XvospJ67p5DL1KrfCwC8/fARHGXUOWNI9S2hL/I3Mcbh53VIvpcYMUr9Srbax2fo
+         z84hAHqfcrF4tQ4mVmMXfbYyjE+VTu/zoiTfskRxoWsb1mkr0SRtSViPVOtZsFhBQTaV
+         10f29VG2MMbF1i9Zq2ZW8osPX48wqBmNf666WO6gGezLGPPjdEo+dtNIxIoi2PcSuKTU
+         XUMg9i2LfUjbfM3jfMohR2JXNfWzh5XVgopACEhq6QCqI2mHDuUzxiKosi+bc1dZKfkd
+         IKRVfUFHsuGjD5+NufFHe67lzbVcnPSzYZe8+GvMtQ85h28q12po2EioNWwS7WiQnVHm
+         TNXQ==
+X-Gm-Message-State: AOJu0YylenpLppyiXfBJHk/V4lqGXbt13jCPODOAX00N2tLutoyxbvgN
+	gyY4m+IbH0qhYfxIZJxL6/CJ94fRg3MN0P0UQNKVPreg5o2gorTIx2fJMW2tp9Bpna4qEplvp/X
+	w8bSdPhrMbgyq1E/IJH0oTXEQuGipu83Z
+X-Google-Smtp-Source: AGHT+IFm6lTsro+cQiSBzP/y1dXuvRTbxQpvIgIoOY+6TM1oHqFyfipnsG6a1+62yDOWmocjrSkRo3vEuUDBb0hoWxQ=
+X-Received: by 2002:a05:6512:2812:b0:52b:bee8:e987 with SMTP id
+ 2adb3069b0e04-535462ee2cemr2985766e87.3.1725221732135; Sun, 01 Sep 2024
+ 13:15:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240831000937.8103-1-ematsumiya@suse.de> <CAH2r5msJ4HpuRi5mzOKvL5FhaUnxw2ZtaX331Sm2cZ92vCSgTA@mail.gmail.com>
+In-Reply-To: <CAH2r5msJ4HpuRi5mzOKvL5FhaUnxw2ZtaX331Sm2cZ92vCSgTA@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 1 Sep 2024 15:15:21 -0500
+Message-ID: <CAH2r5mtz5ROx=vfKD=JMVteJ1WCyg8ZiCFGv+AXcV7TcMM-4DQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] smb: client: force dentry revalidation if
+ nohandlecache is set
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	henrique.carvalho@suse.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Steve French <smfrench@gmail.com> writes:
+This does look wrong since it would affect use of acdirmax/acregmax.
 
-> when I tried this - it took much longer than expected to time out.
+Would like to dig deeper into the failure and see if more intuitive
+way to fix it.
 
-For me the mount process never returns as the server is no longer
-responding to any requests and demultiplex thread is unable to detect
-server's unresponsiviness, therefore leaving the process stuck in
-wait_for_response() by not marking the mid for retry and waking it up.
+It also seems like the if ... nohandlecache check applies more to
+whether it is worth calling open_cached_dir_by_dentry ... not to
+whether we should leverage acdirmax/acregmax cached dentries
 
-# ps -e -o stat,pid,comm,cmd |grep ^D
-D+       726 mount.cifs      mount.cifs //192.168.2.100/scratch /mnt/1 -o vers=3.1.1,username=testuser,password=xyz,echo_interval=5
-# cat /proc/726/stack
-[<0>] wait_for_response+0x147/0x1a0 [cifs]
-[<0>] compound_send_recv+0x6b4/0x1150 [cifs]
-[<0>] cifs_send_recv+0x23/0x30 [cifs]
-[<0>] SMB2_negotiate+0x8b0/0x1c10 [cifs]
-[<0>] smb2_negotiate+0x52/0x70 [cifs]
-[<0>] cifs_negotiate_protocol+0x129/0x1c0 [cifs]
-[<0>] cifs_get_smb_ses+0x807/0x1150 [cifs]
-[<0>] cifs_mount_get_session+0x8a/0x210 [cifs]
-[<0>] dfs_mount_share+0x281/0x1040 [cifs]
-[<0>] cifs_mount+0xbd/0x3d0 [cifs]
-[<0>] cifs_smb3_do_mount+0x1e2/0xc80 [cifs]
-[<0>] smb3_get_tree+0x1bf/0x330 [cifs]
-[<0>] vfs_get_tree+0x4a/0x160
-[<0>] path_mount+0x3c1/0xfb0
-[<0>] __x64_sys_mount+0x1a6/0x1e0
-[<0>] do_syscall_64+0xbb/0x1d0
-[<0>] entry_SYSCALL_64_after_hwframe+0x77/0x7f
+On Sat, Aug 31, 2024 at 11:36=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> tentatively merged to cifs-2.6.git for-next pending testing and
+> additional review
+>
+> On Fri, Aug 30, 2024 at 7:10=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.d=
+e> wrote:
+> >
+> > Some operations return -EEXIST for a non-existing dir/file because of
+> > cached attributes.
+> >
+> > Fix this by forcing dentry revalidation when nohandlecache is set.
+> >
+> > Bug/reproducer:
+> > Azure Files share, attribute caching timeout is 30s (as
+> > suggested by Azure), 2 clients mounting the same share.
+> >
+> > tcon->nohandlecache is set by cifs_get_tcon() because no directory
+> > leasing capability is offered.
+> >
+> >     # client 1 and 2
+> >     $ mount.cifs -o ...,actimeo=3D30 //server/share /mnt
+> >     $ cd /mnt
+> >
+> >     # client 1
+> >     $ mkdir dir1
+> >
+> >     # client 2
+> >     $ ls
+> >     dir1
+> >
+> >     # client 1
+> >     $ mv dir1 dir2
+> >
+> >     # client 2
+> >     $ mkdir dir1
+> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exists
+> >     $ ls
+> >     dir2
+> >     $ mkdir dir1
+> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exists
+> >
+> > "mkdir dir1" eventually works after 30s (when attribute cache
+> > expired).
+> >
+> > The same behaviour can be observed with files if using some
+> > non-overwritting operation (e.g. "rm -i").
+> >
+> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> > Tested-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> > ---
+> >  fs/smb/client/inode.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> > index dd0afa23734c..5f9c5525385f 100644
+> > --- a/fs/smb/client/inode.c
+> > +++ b/fs/smb/client/inode.c
+> > @@ -2427,6 +2427,9 @@ cifs_dentry_needs_reval(struct dentry *dentry)
+> >         if (!lookupCacheEnabled)
+> >                 return true;
+> >
+> > +       if (tcon->nohandlecache)
+> > +               return true;
+> > +
+> >         if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) =
+{
+> >                 spin_lock(&cfid->fid_lock);
+> >                 if (cfid->time && cifs_i->time > cfid->time) {
+> > --
+> > 2.46.0
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-If this happens after mounting the share, either smb2_reconnect_server()
-or any subsequent I/O will end up stuck in smb2_reconnect() under
-cifs_ses::session_mutex attempting to reconnect the session.  Next I/O
-will block indefinitely under cifs_ses::session_mutex as it will need to
-reconnect the session as well.
 
-> How long do you expect mount to hang with your patch?
 
-@echo_interval seconds.
+--=20
+Thanks,
+
+Steve
