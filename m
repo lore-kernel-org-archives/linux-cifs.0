@@ -1,153 +1,114 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4784405
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Aug 2024 00:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725063452; cv=none; b=UJuKShA3ViyFmTEjAzIirJe5bLtoqc/0uu0tLAyslcdeNwUdfteB2vLycD5k1GhlAxZzJzEEb1If9w/E9BlJ5A3FUM5lQjTvYfbNohE1Cu8lz67I6hhY2S8kgdDrDThzPUd1RqWLhCtlF5QuvJrlDosZn5L1Fy27DwSByZ4Km3Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725063452; c=relaxed/simple;
-	bh=+h2NTg/pp4ni0dpNsfK5KnmJ6/O6MexpUBFJ+POe3og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h9mweA0VOJQrd2LSbR+986m6MhIMkAhCfrwZzy0226LK+a3vBb9cO7t/ari7griseFksTYRFfFQI39wut/x/l4lbjGI6JhmDrz4JoFi6Gegy1xXroIUyp8d6d72e8rv674P+1VmDZ+tkISVQqAXDJFAtJfHs33ez8vaADQyEgT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hViG1dKy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gqR3D3kK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=hViG1dKy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gqR3D3kK; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937B51DFF7
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Sep 2024 01:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725155657; cv=pass; b=eTeIZaa1plarTzGe+25UMwyAo8PMpmz/npBMbf90YBimNEcDKklmvt8Gq9OBKe3ZOeiBuoDk3yWp/adVVenoG32eCX8waaVfs4hdMYgvzrmdj1Ic8uNij4swstHLBsAr+1n8qZ4qnfknsYiVSVP7b2VTpVnohG2celeKgBF/3pY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725155657; c=relaxed/simple;
+	bh=TWc/uBAW7m5JD/emjAzoJMVGlWc6ZV2IBNXI0vgyUU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n7AO4+pCNwpKYF7aQynvZs7peGgkHGs3XyvxqZQ1Q8c0rI2O0hLgYJzEDOKNaiJbw1ss+c/86dzu8YJQ0yywF5JPYJqISejEub7M7Okfy881hMJ72MDjv5DevG0QiaycoaZmPuhAOvcWptjpq/OBPX48Qav2rhGWQoA7XHmpXhk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=jqJ0KF1B; arc=pass smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hViG1dKy";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gqR3D3kK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hViG1dKy";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gqR3D3kK"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 43C0B21A0D;
-	Sat, 31 Aug 2024 00:17:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725063448; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVnr7mGqKH2uyff1qdh0tUTnyZuKBRRin+CI7RYNzgE=;
-	b=hViG1dKyNi0z1cOcor5vXDE+Bh02OfSDFANx9HLuIyZBCNMkmK3fzh3b7fLp8fmnTQ2kxA
-	uPPLxa05LgpnectvYWB6a1/o1NT+1+J06jyWXV27M10dujrxzDvG3RTk2yxmA1FaWDaAvW
-	clk7HhohQJQkQd5qE7QXuvbb0VEnI8k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725063448;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVnr7mGqKH2uyff1qdh0tUTnyZuKBRRin+CI7RYNzgE=;
-	b=gqR3D3kK1Ta7HCk+jx8SiWF95WhYMwxxFMlZi4PQ/+iFAzTPIA/nkHJgsZFJwrWf70DOO+
-	F9kmxRjiQL6I4NDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725063448; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVnr7mGqKH2uyff1qdh0tUTnyZuKBRRin+CI7RYNzgE=;
-	b=hViG1dKyNi0z1cOcor5vXDE+Bh02OfSDFANx9HLuIyZBCNMkmK3fzh3b7fLp8fmnTQ2kxA
-	uPPLxa05LgpnectvYWB6a1/o1NT+1+J06jyWXV27M10dujrxzDvG3RTk2yxmA1FaWDaAvW
-	clk7HhohQJQkQd5qE7QXuvbb0VEnI8k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725063448;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NVnr7mGqKH2uyff1qdh0tUTnyZuKBRRin+CI7RYNzgE=;
-	b=gqR3D3kK1Ta7HCk+jx8SiWF95WhYMwxxFMlZi4PQ/+iFAzTPIA/nkHJgsZFJwrWf70DOO+
-	F9kmxRjiQL6I4NDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C16BA13A1F;
-	Sat, 31 Aug 2024 00:17:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MRkLIhdh0mYVBgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Sat, 31 Aug 2024 00:17:27 +0000
-Date: Fri, 30 Aug 2024 21:16:48 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [RFC PATCH] smb: client: force dentry revalidation if
- nohandlecache is set
-Message-ID: <477uxxjmzpi5hnszmxlhtrapo5retotyc2x2gta6rpzak4pjdn@7zvzkoww4624>
-References: <20240831000937.8103-1-ematsumiya@suse.de>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="jqJ0KF1B"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1725155264;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=14sBLQJP0hgzUx8CZqjewTPIl/dbCSF8pLh/5ViqPpM=;
+	b=jqJ0KF1Beb8atXi4DiprpHXgRHUiESY9TIjig3f+0cMcm332gCZkbKI3JhUwO28Qgt9i2W
+	GaQt5uogXx5r5e7WIgvjW4x6bUO77S3T5+DIQiK5ZjHAFs0cnYivuxFSZUXD4qBIQUCx9m
+	kybYWpB47S7F1I+aguc9PeZ+/awinNJ6Kfp595rJHxk+JM6dR6jRiFf62RgH0pfylv3Xbu
+	sxtq8hAnL+KA/l0JYujZeFlWs2gIuPLZ7xj+GCVQeQPEPhIjliIhBi2ujFYs7PiA5frGSK
+	c/zOArbccS6vYo/NeWQQVvMhrmnX+1z13ZWQifmCMRwCGlEMG1fgLuofzFGKGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1725155264; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=14sBLQJP0hgzUx8CZqjewTPIl/dbCSF8pLh/5ViqPpM=;
+	b=bsCttmRd7OQNwawCXu7MssISszV6n90CIHlZeyuUZGV1bt+d7oRWdNC4UEmE/wroqmBF//
+	JMGqCkpRlwe35gYp5H0ibm53wlUpJxC6KoNMwV/bnnWZfiJ1JUFia8jqzlk2qQ5JnClDrA
+	e83U7JAFuiI2NN/3JA5tHnrfquqBeUsz3/asNaIDjrQZtxyXruMKvlfclbHjh/lHiBdplU
+	TK69mugUbHN2r5yRIyz0IdMEQc8bbPFuGqsxbrqdfvWmNu3Bey7UaaDL0sOxKXroZgSgtS
+	NNFZbZukEw0JLwbEOiTznaUx4cALtMgj4Rsi/edVZ/yC7xoo6zUPLnRMIXO6wg==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1725155264; a=rsa-sha256;
+	cv=none;
+	b=RVdIo11b6kWBOcr31lHVme+6bZycHheBRHlGY1fP2wmRmOMknBYkT5nAUu7eN+RAbwP92h
+	uhIs2NEmIemLsJL9lb/t+whCMfaDVZ4P6x1B2Dd9EhcfMVNAUH52ozG5zB3iRPwUZAk+Dg
+	0cfA1Y7CEZwpZmZiLiMwB9DNpYur5FTwsVx/BLcqznFJeNb+Z5erC4ADNFJ4cmHe9gG8XR
+	u+PwNKCQRIlEu7JCO3SRbDD/XSeQQH6c2ov1a47NtgeA7+voUbessYHkaTi4WXTnuAW02T
+	B8Qs6f2/o/6lPBhF6zNsxo82ryNI/B2clp6boCPKMfeujnuxC+1oqp5e6/otkQ==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>,
+	Rickard Andersson <rickaran@axis.com>
+Subject: [PATCH] smb: client: fix hang in wait_for_response() for negproto
+Date: Sat, 31 Aug 2024 22:47:34 -0300
+Message-ID: <20240901014734.141366-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240831000937.8103-1-ematsumiya@suse.de>
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.995];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	MIME_TRACE(0.00)[0:+]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 
-On 08/30, Enzo Matsumiya wrote:
->Some operations return -EEXIST for a non-existing dir/file because of
->cached attributes.
->
->Fix this by forcing dentry revalidation when nohandlecache is set.
-> 
-> ...
-> 
->---
-> fs/smb/client/inode.c | 3 +++
-> 1 file changed, 3 insertions(+)
->
->diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
->index dd0afa23734c..5f9c5525385f 100644
->--- a/fs/smb/client/inode.c
->+++ b/fs/smb/client/inode.c
->@@ -2427,6 +2427,9 @@ cifs_dentry_needs_reval(struct dentry *dentry)
-> 	if (!lookupCacheEnabled)
-> 		return true;
->
->+	if (tcon->nohandlecache)
->+		return true;
->+
-> 	if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
-> 		spin_lock(&cfid->fid_lock);
-> 		if (cfid->time && cifs_i->time > cfid->time) {
+Call cifs_reconnect() to wake up processes waiting on negotiate
+protocol to handle the case where server abruptly shut down and had no
+chance to properly close the socket.
 
-Simplest fix for a bug we hit while debugging something else.
+Simple reproducer:
 
-Sending as RFC because I wasn't sure if/why attributes caching
-shouldn't be in sync with handles caching.
+  ssh 192.168.2.100 pkill -STOP smbd
+  mount.cifs //192.168.2.100/test /mnt -o ... [never returns]
 
-Appreciate any thoughts, corrections, explanations.
+Cc: Rickard Andersson <rickaran@axis.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/connect.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index c1c14274930a..e004b515e321 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -656,6 +656,19 @@ allocate_buffers(struct TCP_Server_Info *server)
+ static bool
+ server_unresponsive(struct TCP_Server_Info *server)
+ {
++	/*
++	 * If we're in the process of mounting a share or reconnecting a session
++	 * and the server abruptly shut down (e.g. socket wasn't closed properly),
++	 * wait for at least an echo interval (+7s from rcvtimeo) when attempting
++	 * to negotiate protocol.
++	 */
++	spin_lock(&server->srv_lock);
++	if (server->tcpStatus == CifsInNegotiate &&
++	    time_after(jiffies, server->lstrp + server->echo_interval)) {
++		spin_unlock(&server->srv_lock);
++		cifs_reconnect(server, false);
++		return true;
++	}
+ 	/*
+ 	 * We need to wait 3 echo intervals to make sure we handle such
+ 	 * situations right:
+@@ -667,7 +680,6 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	 * 65s kernel_recvmsg times out, and we see that we haven't gotten
+ 	 *     a response in >60s.
+ 	 */
+-	spin_lock(&server->srv_lock);
+ 	if ((server->tcpStatus == CifsGood ||
+ 	    server->tcpStatus == CifsNeedNegotiate) &&
+ 	    (!server->ops->can_echo || server->ops->can_echo(server)) &&
+-- 
+2.46.0
 
-Cheers,
-
-Enzo
