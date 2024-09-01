@@ -1,50 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7677F2B9C7;
-	Sun,  1 Sep 2024 16:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0AA17E900
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Sep 2024 16:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725208402; cv=none; b=oHIHIawkXJncxbwoEwve8LGgxKqmCuWoofmVRMw4lUMkWusbF08V3c6Iy5b3OZTBzAoV5nWCCvHeD9Z+1lCvbntc6iFeLjLnSjKngNVIK2DSAIXuhLsvkYsB9NWGIRkORTk2cCtzwY4YX8oS1tIWFZGFwQM+FEv4mLkWPkNhyVg=
+	t=1725208855; cv=none; b=AM61lf+6XV1OaHE2P2UvST4EwQj3R5qEQkSrfXeOux8e0bFo7bg7KOLGrEOi7laZCSV1+Ck3oo8dVLu56awscxa2jaHt4uQINATAhMUXd9nIf8KcEViKtauhkStCOEZqbWANLQoAbD8jGykekzHXRDBHEd0o31GG7ImCu45S4Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725208402; c=relaxed/simple;
-	bh=9o/vd6q79XBRfsxHjr7dha6xQzqmuHh+CV0HjLxjBjU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=leShJS/v5cYxW50Fpby2KDR7zVEVL0MSr8UiWz+KqlpLr8/NBRLWvwEZX7+mpqH2t5dHlmnqVbG03lVVj3kpld1qaBDTdFF4O9fjOI54bygnl391zwLL4ivzyLpgf856y0kJ0y0q8AP9G44+tZGooSFRIGiBKtbRl+BjL99T+aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yU97MFQ+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725208855; c=relaxed/simple;
+	bh=iUpl83bfR0Ipvut4oGsYgDirYKG9fQxE+Ew3JiD6dOg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LmzRYrERGsNr5Tyklv9QkJo1MYYYE32TOMnpThGbDaYVdTF77zt9YlYiMv139AhgnPcF/RyugMpnZKNRaoz2hLJbq6t+VSTTR8TiR4YrfjWG9kwDR1f1GXWjVhtLvK6WPR85R/B18A6ribe/48lKROl+lCQWhSYb4KGJ8JneErE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=AmT+thGX; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yU97MFQ+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF94C4CEC3;
-	Sun,  1 Sep 2024 16:33:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725208402;
-	bh=9o/vd6q79XBRfsxHjr7dha6xQzqmuHh+CV0HjLxjBjU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=yU97MFQ+iXqpcF1J8d+WW8ZZzAQ2pCW4gQAJ8tbbov+pRnuT8XY+gcQ4eHoFaNbeV
-	 LafRnfPBwqqYQXcB9YwGJkCDO4pRmUpys5RJFkOUko95Vw0gi9agJ8Z5z0WIAARhYc
-	 XBBpGLPgfxBEcpJOTMSBYQH7soLHNFzXE7afl600=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.10 072/149] cifs: Fix FALLOC_FL_PUNCH_HOLE support
-Date: Sun,  1 Sep 2024 18:16:23 +0200
-Message-ID: <20240901160820.173540829@linuxfoundation.org>
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="AmT+thGX"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42bb9c04fa5so3853035e9.3
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Sep 2024 09:40:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1725208853; x=1725813653; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VqKffVzCatspkF3hdT8rjFuwjdyFjJBW3hMnTSV2ivA=;
+        b=AmT+thGX8X8BWeqT7QNlNmoj+KykJY+2J01Uilxcx74PpYl5kYmOu/tGhb5aJvzFwY
+         IiQ9eKNnaWWBaVXCsMmlyVmAnnkrq/GgeEN4BZj8Xjpa/CyFVe+lUfR6+sxBtNc/qz3e
+         LDGVI5/DeOEcBwMrJpvQ3l4Pzp5OZIDOVt34k4uF+vEOXmo2pUbB07+05QKDS/olJuJ4
+         f8YmRGJIGjrduVNRDJjSFfkNzNDD16J1QrCYNvPmDxF8F1rBxTV4r6RUoMzyacbOcuDQ
+         cb9cI9+e+XnCxdvkxLRwZK02NpMS6F7IzwvzxlLN4mvA2vFF8Obnk2OL2V9K94abi2z6
+         TFTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725208853; x=1725813653;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VqKffVzCatspkF3hdT8rjFuwjdyFjJBW3hMnTSV2ivA=;
+        b=qdl0oRjKXr4HHqvnS0EkNf4NDW644CYzSjbk0HukEwUtoIdCuSrmG8nsPBT+4eE0fj
+         8Uxt4JGm1posm2dMiM69+Yb/LsCqGw9MxqX+nX9MHZx5d6vzxa9wPGJxhycThyGucfLm
+         QYKTxtn30PtH8+9rduT+Juv7ZWid4rTmWqToeorwVR4Hhxtp2/mvvcBcP9wTroJoS4ld
+         qQg7ChRGIsa+7PhMCwjjsftGtdhIWwivq2V4m86e4mJrlvvD1fS5cOSlcZL0dSg//j4z
+         VkHK9QL4dEz7CrEGEhnQJwKYOS+aO2NFuFudDx5XlUrQ3pPumB2iiVC+36THcnikPZQC
+         xDzg==
+X-Gm-Message-State: AOJu0YymWXkcNUCNUijfv5EIh4BnJTk/iIN0wYvV0dFebCzdY3beLQl/
+	wQTQcVtTqTHARm7uRuwh6E0Gq7PwJdvg6IuiKrxN/xpnhwzlt7TtALbjQWk0HwI=
+X-Google-Smtp-Source: AGHT+IHDHDxYouHkMBLT+9d48IRoCtSbwadnJjfsZAP9i1xo5gy1S3ARpQgQQ985elwg7rOLNUNUnA==
+X-Received: by 2002:a5d:47af:0:b0:362:4aac:8697 with SMTP id ffacd0b85a97d-374a941a7fbmr3372288f8f.0.1725208852763;
+        Sun, 01 Sep 2024 09:40:52 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-82-135-80-228.dynamic.mnet-online.de. [82.135.80.228])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a898919670asm460323566b.140.2024.09.01.09.40.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Sep 2024 09:40:52 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@toblux.com>
+Subject: [RESEND PATCH] smb3: Use min() to improve _smbd_get_connection()
+Date: Sun,  1 Sep 2024 18:40:03 +0200
+Message-ID: <20240901164002.117305-2-thorsten.blum@toblux.com>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240901160817.461957599@linuxfoundation.org>
-References: <20240901160817.461957599@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,109 +72,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.10-stable review patch.  If anyone has any objections, please let me know.
+Use the min() macro to simplify the _smbd_get_connection() function and
+improve its readability.
 
-------------------
-
-From: David Howells <dhowells@redhat.com>
-
-[ Upstream commit 416871f4fb84bc96822562e654941d5625a25bf8 ]
-
-The cifs filesystem doesn't quite emulate FALLOC_FL_PUNCH_HOLE correctly
-(note that due to lack of protocol support, it can't actually implement it
-directly).  Whilst it will (partially) invalidate dirty folios in the
-pagecache, it doesn't write them back first, and so the EOF marker on the
-server may be lower than inode->i_size.
-
-This presents a problem, however, as if the punched hole invalidates the
-tail of the locally cached dirty data, writeback won't know it needs to
-move the EOF over to account for the hole punch (which isn't supposed to
-move the EOF).  We could just write zeroes over the punched out region of
-the pagecache and write that back - but this is supposed to be a
-deallocatory operation.
-
-Fix this by manually moving the EOF over on the server after the operation
-if the hole punched would corrupt it.
-
-Note that the FSCTL_SET_ZERO_DATA RPC and the setting of the EOF should
-probably be compounded to stop a third party interfering (or, at least,
-massively reduce the chance).
-
-This was reproducible occasionally by using fsx with the following script:
-
-	truncate 0x0 0x375e2 0x0
-	punch_hole 0x2f6d3 0x6ab5 0x375e2
-	truncate 0x0 0x3a71f 0x375e2
-	mapread 0xee05 0xcf12 0x3a71f
-	write 0x2078e 0x5604 0x3a71f
-	write 0x3ebdf 0x1421 0x3a71f *
-	punch_hole 0x379d0 0x8630 0x40000 *
-	mapread 0x2aaa2 0x85b 0x40000
-	fallocate 0x1b401 0x9ada 0x40000
-	read 0x15f2 0x7d32 0x40000
-	read 0x32f37 0x7a3b 0x40000 *
-
-The second "write" should extend the EOF to 0x40000, and the "punch_hole"
-should operate inside of that - but that depends on whether the VM gets in
-and writes back the data first.  If it doesn't, the file ends up 0x3a71f in
-size, not 0x40000.
-
-Fixes: 31742c5a3317 ("enable fallocate punch hole ("fallocate -p") for SMB3")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
 ---
- fs/smb/client/smb2ops.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ fs/smb/client/smbdirect.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index cfbca3489ece1..f44f5f2494006 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3287,6 +3287,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 	struct inode *inode = file_inode(file);
- 	struct cifsFileInfo *cfile = file->private_data;
- 	struct file_zero_data_information fsctl_buf;
-+	unsigned long long end = offset + len, i_size, remote_i_size;
- 	long rc;
- 	unsigned int xid;
- 	__u8 set_sparse = 1;
-@@ -3318,6 +3319,27 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 			(char *)&fsctl_buf,
- 			sizeof(struct file_zero_data_information),
- 			CIFSMaxBufSize, NULL, NULL);
-+
-+	if (rc)
-+		goto unlock;
-+
-+	/* If there's dirty data in the buffer that would extend the EOF if it
-+	 * were written, then we need to move the EOF marker over to the lower
-+	 * of the high end of the hole and the proposed EOF.  The problem is
-+	 * that we locally hole-punch the tail of the dirty data, the proposed
-+	 * EOF update will end up in the wrong place.
-+	 */
-+	i_size = i_size_read(inode);
-+	remote_i_size = netfs_inode(inode)->remote_i_size;
-+	if (end > remote_i_size && i_size > remote_i_size) {
-+		unsigned long long extend_to = umin(end, i_size);
-+		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-+				  cfile->fid.volatile_fid, cfile->pid, extend_to);
-+		if (rc >= 0)
-+			netfs_inode(inode)->remote_i_size = extend_to;
-+	}
-+
-+unlock:
- 	filemap_invalidate_unlock(inode->i_mapping);
- out:
- 	inode_unlock(inode);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 7bcc379014ca..8f782edc3fd7 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1585,10 +1585,8 @@ static struct smbd_connection *_smbd_get_connection(
+ 	conn_param.initiator_depth = 0;
+ 
+ 	conn_param.responder_resources =
+-		info->id->device->attrs.max_qp_rd_atom
+-			< SMBD_CM_RESPONDER_RESOURCES ?
+-		info->id->device->attrs.max_qp_rd_atom :
+-		SMBD_CM_RESPONDER_RESOURCES;
++		min(info->id->device->attrs.max_qp_rd_atom,
++		    SMBD_CM_RESPONDER_RESOURCES);
+ 	info->responder_resources = conn_param.responder_resources;
+ 	log_rdma_mr(INFO, "responder_resources=%d\n",
+ 		info->responder_resources);
 -- 
-2.43.0
-
-
+2.46.0
 
