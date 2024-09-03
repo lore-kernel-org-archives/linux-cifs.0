@@ -1,195 +1,306 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B9E1CA6A9
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Sep 2024 13:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725371620; cv=pass; b=EXuXdlPuTL9ju3twW7tAnLlb+FpfAEop5DyXFukadGVGISL+vUdUAbGlZ5f09EUxY4wSE8/zyBhwt25T8m7SSw/m7uFveThhgmf2tA2/a5973K5oQ0So3HnsJZv74N2E+S3bv9axYocd1wQrHJ8Eoi1YetgMSNiP5XM+aII679s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725371620; c=relaxed/simple;
-	bh=fJ1QNGpTaLIP8SX8/AO5BE5SOiCbRVkJAOfCZ4vTod8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=My6s2+e0KvgXoDGrsILw8eYjwTjtAIV2HadR5/hH5J8LZuPZHBA5vxzNXup4zZ/UanLiT3qm1zCSKuRleaXrnYyHISqzNgcByhVg/JaUcBioMYw3U5YlIvV92GpgfoQAYxzE0n8ObXdxXgEaQajnmK8gWW/Jg+RphWQSIelTa1k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=UgMgHT58; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A976F188916
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Sep 2024 15:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725376948; cv=none; b=RVSUT40XI58ai+t/zgaR3BkbC8sbIBkqeAFcaNJ111Zs6lyYmHJgof83gq6n9b9lvHlHKU9ZkAhE4/xjBsC9wUuNiutfFJq3DGhhIBY7Wv10kvOQEeV3soUlV3WmjMqpGuYJZanLZZBphjhM3Ne4BiYQkF7bVkW3IalJKy2Qxrk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725376948; c=relaxed/simple;
+	bh=Q2JPnhUyNctdDaxgm7i8Tx9XsbW2wUNsRhgpc1wQaSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b1ZTirws9o4WsqrfT5zYaGoW8j1dsj8vlSJ7ErqfLzCzJEAiidZ6xX3XgpnW507YOls3Nwj9zS1iqC3RYz7Usx7XYmQW8AA5ozmpvkp+BLVS7B5MWQOFlShNuyqJJtfDVJP6zR0MMtHjs5S0EE/7KAWUo+7Sv4KAssTPdnKXcYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RhNAF2wN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eXrKfK8D; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RhNAF2wN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eXrKfK8D; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="UgMgHT58"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1725371610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RhNAF2wN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eXrKfK8D";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RhNAF2wN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eXrKfK8D"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 94FE61F394;
+	Tue,  3 Sep 2024 15:22:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1725376944; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YtluGDrLppHf4XYTs9meyWwzY76AjPiLPjIW3UNHFv0=;
-	b=UgMgHT58zWgVimJeTWlY5tyo8bXwr3a4b3R9peY9u6Tyx377fC3QKNg3F5qKaGPBexvpq5
-	EbyJu0YRMVfyew/J/ImebCuLqRcHkNkeCLCvUI1VhkW+7MQWZKJJUgSCeYjxVI+CF8/lMU
-	nsio9Dbn9Gq7Pm0DdmMLA3oOGExr47cpsMF3uOD0NW8ZXs9c7wVE5qCpvrPhb8KQQeukRj
-	fuAzEw9J1cIUnrZ7tS5KESR/Qn+0UEEw2QOeLwmZ3omKMWiyQHQ1HFpfx57VQ4gDxVj+Pp
-	N39GPJzEW9tRbICnLFPmU3AgpXv5Fm4BBOYqdIjoaZeH6bPwE5uvVmzaEHLWVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1725371610; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
+	bh=/NpgDL4W88Y598w861WtXT5URUCAPOXHhwgcCyjYtwA=;
+	b=RhNAF2wNmrBN/DgRKC79AwXmjIOoJuqAw4LPH0E9pwCg2OiMP5boX/g5nkr8LgOkZ89TcO
+	/zN5u9OBbb2MD4eoyui+7/I1+VfJ/yys5wQa5Fl9c3BCzVYEog7qEzvYr36U0NjyDoLe3t
+	IhCWQ03euJhqStyeHmE1QBs3/je4rwE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1725376944;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YtluGDrLppHf4XYTs9meyWwzY76AjPiLPjIW3UNHFv0=;
-	b=It7qA162ePl0Ntoz+LQrPW3Ub+EzPRK+wRdt/FU5zc5vEHz67ArTWSORikmt42YibR8N/A
-	8Q1mPPXkg0kG1HM9RFc+fHW1yXS6st1NtzZJL6pcXMDbJjzmeJpG14K7uaW+x2eRWkqdsL
-	UZhWJYsaDtAQtlBCYxRu05xCViPQtsuHHAbYa+Fv0nmXDexTLxpUzNbCnnTgrU0KkjEc/+
-	wJvtnju9hCLZd8q8nyMXYUVE+UqYPkgoQvx3AJ/x13Lj7taVCqmIjqIfSbBfVfriONOMp+
-	zLO6BzQHuSz09hRzhUW9pBoU//5pALTsYOuGTdNef+VMMFc3Em+fYl804Q0Lqg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1725371610; a=rsa-sha256;
-	cv=none;
-	b=sKoFxHbZ5ZefrQQX9sFMn5UuEyyVRQfOOeaPULeLrvQyMO7k3SSmN8wzK4SrAU0SKIb8aG
-	YCobMq07tp1NGjfUKcAEr97mQ5lkeyXECPb8UX8oRcTk7dQDvkIldvGtJAUjLm6mpnomvB
-	OvU/5J6L0/ShuOQQO0Dkgh5UF4Wdj63Xye5fE9ONxi6aJ5PzEyF7nMOKqzK66qnv41XVrA
-	7WcacrFUkt5FVgzf5hNxlXRQ06lHxYDq+Rdnp08JJB/sXGOQpE52lmLOGCvskUUE459MnF
-	6Q532r/MyZv0SNvjaZIQlnMmUz6lJ/BKr70MKbuNEREVqL0IGp/MXZq92OZwYg==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	David Howells <dhowells@redhat.com>
-Subject: [PATCH 2/2] smb: client: fix double put of @cfile in smb2_set_path_size()
-Date: Tue,  3 Sep 2024 10:53:24 -0300
-Message-ID: <20240903135324.887150-2-pc@manguebit.com>
-In-Reply-To: <20240903135324.887150-1-pc@manguebit.com>
-References: <20240903135324.887150-1-pc@manguebit.com>
+	bh=/NpgDL4W88Y598w861WtXT5URUCAPOXHhwgcCyjYtwA=;
+	b=eXrKfK8DaC3SQKZg0ne9h47McOjBe4yE7vViUAml0RWX72voCxYvn9m0/b7T+urfXMEKKp
+	vFJRrpco+OAOW5CA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=RhNAF2wN;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=eXrKfK8D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1725376944; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/NpgDL4W88Y598w861WtXT5URUCAPOXHhwgcCyjYtwA=;
+	b=RhNAF2wNmrBN/DgRKC79AwXmjIOoJuqAw4LPH0E9pwCg2OiMP5boX/g5nkr8LgOkZ89TcO
+	/zN5u9OBbb2MD4eoyui+7/I1+VfJ/yys5wQa5Fl9c3BCzVYEog7qEzvYr36U0NjyDoLe3t
+	IhCWQ03euJhqStyeHmE1QBs3/je4rwE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1725376944;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/NpgDL4W88Y598w861WtXT5URUCAPOXHhwgcCyjYtwA=;
+	b=eXrKfK8DaC3SQKZg0ne9h47McOjBe4yE7vViUAml0RWX72voCxYvn9m0/b7T+urfXMEKKp
+	vFJRrpco+OAOW5CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 21C6C13A80;
+	Tue,  3 Sep 2024 15:22:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CpfmNq8p12bRbAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 03 Sep 2024 15:22:23 +0000
+Date: Tue, 3 Sep 2024 12:21:33 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	henrique.carvalho@suse.com
+Subject: Re: [RFC PATCH] smb: client: force dentry revalidation if
+ nohandlecache is set
+Message-ID: <kmsgk4xxyiyj5ay6dumzyksslw7dwocb46dla55fvwih2qw7pp@kupfqpgemuq4>
+References: <20240831000937.8103-1-ematsumiya@suse.de>
+ <CAH2r5msJ4HpuRi5mzOKvL5FhaUnxw2ZtaX331Sm2cZ92vCSgTA@mail.gmail.com>
+ <CAH2r5mtz5ROx=vfKD=JMVteJ1WCyg8ZiCFGv+AXcV7TcMM-4DQ@mail.gmail.com>
+ <ahdte3act4vozuxoc3vfz7cutyvye44ltqmyu7d2wedcdog6ei@7xgxdvrndmf3>
+ <CAH2r5msOoN0ao0es_-M-LU9Vb04Yjs5gCtGvcd5kgzGvw8sbGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAH2r5msOoN0ao0es_-M-LU9Vb04Yjs5gCtGvcd5kgzGvw8sbGA@mail.gmail.com>
+X-Rspamd-Queue-Id: 94FE61F394
+X-Spam-Level: 
+X-Spamd-Result: default: False [-6.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,manguebit.com,gmail.com,microsoft.com,talpey.com,suse.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -6.01
+X-Spam-Flag: NO
 
-If smb2_compound_op() is called with a valid @cfile and returned
--EINVAL, we need to call cifs_get_writable_path() before retrying it
-as the reference of @cfile was already dropped by previous call.
+On 09/02, Steve French wrote:
+>> So, as per my question in my first follow up reply, it should be
+>possible to not cache handles, but still cache attributes?
+>
+>Yes - there are two types of caching.
+>
+>Safe caching of file attributes (size and mtime e.g.) and existence
+>with file leases (for open files, or files whose close has been
+>deferred) or file or directory existence with directory leases on the
+>parent.
+>
+>"actimeo" attribute caching (less safe): Using actimeo sets all
+>acregmax and acdirmax to the same value. If this option is not
+>specified, the cifs (and similarly for NFS) client uses the defaults.
+>"acregmax" controls how long mtime/size and existence of all are
+>cached, while acdirmax does the same thing for directories (note that
+>for directories, caching their existence can save much time in open of
+>files in deep directory trees, it is less common that apps care about
+>the mtime or ctime of a directory - just that the path is still valid
+>- ie that the directory exists).
+>
+>cifs.ko sets a much lower value for actimeo by default than nfs, but
+>it is still technically "unsafe" so applications that need 100%
+>accuracy on timestamps or size of files being updated by other clients
+>should set acregmax smaller (or to 0) - it is usually safe to keep
+>acdirmax to a higher value.
+>
+>By default even if we do not have a lease - we will cache attributes
+>for a file (so two stats on the same file, less than a second apart,
+>will be benefit from the cached attributes and only require 1/2 as
+>many SMB3.1.1 queryinfo calls to be sent over the wire)
 
-This fixes the following KASAN splat when running fstests generic/013
-against Windows Server 2022:
+Okay, thanks, I get that.
 
-  CIFS: Attempting to mount //w22-fs0/scratch
-  run fstests generic/013 at 2024-09-02 19:48:59
-  ==================================================================
-  BUG: KASAN: slab-use-after-free in detach_if_pending+0xab/0x200
-  Write of size 8 at addr ffff88811f1a3730 by task kworker/3:2/176
+Performance is a reasonable explanation iff the files/dirs exists, which
+is an assumption of cifs here.
 
-  CPU: 3 UID: 0 PID: 176 Comm: kworker/3:2 Not tainted 6.11.0-rc6 #2
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-2.fc40
-  04/01/2014
-  Workqueue: cifsoplockd cifs_oplock_break [cifs]
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x5d/0x80
-   ? detach_if_pending+0xab/0x200
-   print_report+0x156/0x4d9
-   ? detach_if_pending+0xab/0x200
-   ? __virt_addr_valid+0x145/0x300
-   ? __phys_addr+0x46/0x90
-   ? detach_if_pending+0xab/0x200
-   kasan_report+0xda/0x110
-   ? detach_if_pending+0xab/0x200
-   detach_if_pending+0xab/0x200
-   timer_delete+0x96/0xe0
-   ? __pfx_timer_delete+0x10/0x10
-   ? rcu_is_watching+0x20/0x50
-   try_to_grab_pending+0x46/0x3b0
-   __cancel_work+0x89/0x1b0
-   ? __pfx___cancel_work+0x10/0x10
-   ? kasan_save_track+0x14/0x30
-   cifs_close_deferred_file+0x110/0x2c0 [cifs]
-   ? __pfx_cifs_close_deferred_file+0x10/0x10 [cifs]
-   ? __pfx_down_read+0x10/0x10
-   cifs_oplock_break+0x4c1/0xa50 [cifs]
-   ? __pfx_cifs_oplock_break+0x10/0x10 [cifs]
-   ? lock_is_held_type+0x85/0xf0
-   ? mark_held_locks+0x1a/0x90
-   process_one_work+0x4c6/0x9f0
-   ? find_held_lock+0x8a/0xa0
-   ? __pfx_process_one_work+0x10/0x10
-   ? lock_acquired+0x220/0x550
-   ? __list_add_valid_or_report+0x37/0x100
-   worker_thread+0x2e4/0x570
-   ? __kthread_parkme+0xd1/0xf0
-   ? __pfx_worker_thread+0x10/0x10
-   kthread+0x17f/0x1c0
-   ? kthread+0xda/0x1c0
-   ? __pfx_kthread+0x10/0x10
-   ret_from_fork+0x31/0x60
-   ? __pfx_kthread+0x10/0x10
-   ret_from_fork_asm+0x1a/0x30
-   </TASK>
+I'm still researching ideas how to better handle this, but the fact that
+dentry lookups are done by names, so -EEXIST is returned by the mkdir
+syscall way before hitting any cifs code, makes really hard to come
+up with an alternative fix that preserves this behaviour you mention.
 
-  Allocated by task 1118:
-   kasan_save_stack+0x30/0x50
-   kasan_save_track+0x14/0x30
-   __kasan_kmalloc+0xaa/0xb0
-   cifs_new_fileinfo+0xc8/0x9d0 [cifs]
-   cifs_atomic_open+0x467/0x770 [cifs]
-   lookup_open.isra.0+0x665/0x8b0
-   path_openat+0x4c3/0x1380
-   do_filp_open+0x167/0x270
-   do_sys_openat2+0x129/0x160
-   __x64_sys_creat+0xad/0xe0
-   do_syscall_64+0xbb/0x1d0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-  Freed by task 83:
-   kasan_save_stack+0x30/0x50
-   kasan_save_track+0x14/0x30
-   kasan_save_free_info+0x3b/0x70
-   poison_slab_object+0xe9/0x160
-   __kasan_slab_free+0x32/0x50
-   kfree+0xf2/0x300
-   process_one_work+0x4c6/0x9f0
-   worker_thread+0x2e4/0x570
-   kthread+0x17f/0x1c0
-   ret_from_fork+0x31/0x60
-   ret_from_fork_asm+0x1a/0x30
+Cheers,
 
-  Last potentially related work creation:
-   kasan_save_stack+0x30/0x50
-   __kasan_record_aux_stack+0xad/0xc0
-   insert_work+0x29/0xe0
-   __queue_work+0x5ea/0x760
-   queue_work_on+0x6d/0x90
-   _cifsFileInfo_put+0x3f6/0x770 [cifs]
-   smb2_compound_op+0x911/0x3940 [cifs]
-   smb2_set_path_size+0x228/0x270 [cifs]
-   cifs_set_file_size+0x197/0x460 [cifs]
-   cifs_setattr+0xd9c/0x14b0 [cifs]
-   notify_change+0x4e3/0x740
-   do_truncate+0xfa/0x180
-   vfs_truncate+0x195/0x200
-   __x64_sys_truncate+0x109/0x150
-   do_syscall_64+0xbb/0x1d0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 71f15c90e785 ("smb: client: retry compound request without reusing lease")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-Cc: David Howells <dhowells@redhat.com>
----
- fs/smb/client/smb2inode.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index e3117f3fb5b2..11a1c53c64e0 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1151,6 +1151,7 @@ smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
- 			      cfile, NULL, NULL, dentry);
- 	if (rc == -EINVAL) {
- 		cifs_dbg(FYI, "invalid lease key, resending request without lease");
-+		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb,
- 				      full_path, &oparms, &in_iov,
- 				      &(int){SMB2_OP_SET_EOF}, 1,
--- 
-2.46.0
-
+>On Mon, Sep 2, 2024 at 7:12=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
+ wrote:
+>>
+>> On 09/01, Steve French wrote:
+>> >This does look wrong since it would affect use of acdirmax/acregmax.
+>>
+>> So, as per my question in my first follow up reply, it should be
+>> possible to not cache handles, but still cache attributes?
+>>
+>> TBH I agree the fix might be wrong, as it seems the problem is more
+>> fundamental than this -- it was more of a PoC, thus sent as RFC.
+>>
+>> But my understanding is that if we're not getting leases, we shouldn't
+>> be caching anything at all (i.e. neither files/dirs nor their
+>> attributes).
+>>
+>> e.g. something like (handcrafted, untested) in connect.c:cifs_get_tcon():
+>>
+>> -         else
+>> -                 nohandlecache =3D true;
+>> +         else {
+>> +                 nohandlecache =3D true;
+>> +                 ctx->acregmax =3D 0;
+>> +                 ctx->acdirmax =3D 0;
+>> +         }
+>>
+>> This illustrates better what I'm asking (and also a clearer intent of
+>> my original patch).
+>>
+>> >Would like to dig deeper into the failure and see if more intuitive
+>> >way to fix it.
+>> >
+>> >It also seems like the if ... nohandlecache check applies more to
+>> >whether it is worth calling open_cached_dir_by_dentry ... not to
+>> >whether we should leverage acdirmax/acregmax cached dentries
+>> >
+>> >On Sat, Aug 31, 2024 at 11:36=E2=80=AFPM Steve French <smfrench@gmail.c=
+om> wrote:
+>> >>
+>> >> tentatively merged to cifs-2.6.git for-next pending testing and
+>> >> additional review
+>> >>
+>> >> On Fri, Aug 30, 2024 at 7:10=E2=80=AFPM Enzo Matsumiya <ematsumiya@su=
+se.de> wrote:
+>> >> >
+>> >> > Some operations return -EEXIST for a non-existing dir/file because =
+of
+>> >> > cached attributes.
+>> >> >
+>> >> > Fix this by forcing dentry revalidation when nohandlecache is set.
+>> >> >
+>> >> > Bug/reproducer:
+>> >> > Azure Files share, attribute caching timeout is 30s (as
+>> >> > suggested by Azure), 2 clients mounting the same share.
+>> >> >
+>> >> > tcon->nohandlecache is set by cifs_get_tcon() because no directory
+>> >> > leasing capability is offered.
+>> >> >
+>> >> >     # client 1 and 2
+>> >> >     $ mount.cifs -o ...,actimeo=3D30 //server/share /mnt
+>> >> >     $ cd /mnt
+>> >> >
+>> >> >     # client 1
+>> >> >     $ mkdir dir1
+>> >> >
+>> >> >     # client 2
+>> >> >     $ ls
+>> >> >     dir1
+>> >> >
+>> >> >     # client 1
+>> >> >     $ mv dir1 dir2
+>> >> >
+>> >> >     # client 2
+>> >> >     $ mkdir dir1
+>> >> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exi=
+sts
+>> >> >     $ ls
+>> >> >     dir2
+>> >> >     $ mkdir dir1
+>> >> >     mkdir: cannot create directory =E2=80=98dir1=E2=80=99: File exi=
+sts
+>> >> >
+>> >> > "mkdir dir1" eventually works after 30s (when attribute cache
+>> >> > expired).
+>> >> >
+>> >> > The same behaviour can be observed with files if using some
+>> >> > non-overwritting operation (e.g. "rm -i").
+>> >> >
+>> >> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+>> >> > Tested-by: Henrique Carvalho <henrique.carvalho@suse.com>
+>> >> > ---
+>> >> >  fs/smb/client/inode.c | 3 +++
+>> >> >  1 file changed, 3 insertions(+)
+>> >> >
+>> >> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+>> >> > index dd0afa23734c..5f9c5525385f 100644
+>> >> > --- a/fs/smb/client/inode.c
+>> >> > +++ b/fs/smb/client/inode.c
+>> >> > @@ -2427,6 +2427,9 @@ cifs_dentry_needs_reval(struct dentry *dentry)
+>> >> >         if (!lookupCacheEnabled)
+>> >> >                 return true;
+>> >> >
+>> >> > +       if (tcon->nohandlecache)
+>> >> > +               return true;
+>> >> > +
+>> >> >         if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfi=
+d)) {
+>> >> >                 spin_lock(&cfid->fid_lock);
+>> >> >                 if (cfid->time && cifs_i->time > cfid->time) {
+>> >> > --
+>> >> > 2.46.0
+>>
+>>
+>> Cheers,
+>>
+>> Enzo
+>
+>
+>
+>--=20
+>Thanks,
+>
+>Steve
+>
