@@ -1,69 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.astralinux.ru (mx.astralinux.ru [89.232.161.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964161E871
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Sep 2024 14:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6811D383A2;
+	Wed,  4 Sep 2024 14:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.232.161.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725460233; cv=none; b=FCndPGembu1sg8jJZJeyKFoT2U4CcDuWqRWAG+FPzlQ4mokwIV/s5QlPKqU+az6wDK4NQz4uV4fqzL4r8TT8ovfsr5/lPYqk0pySCvDg6ojvOgM3zOkzjkEjrVzLDmgSjoo2TpJ9y+f8dXi8kjPVLnHfN8667DA3BRbUdTPq9R8=
+	t=1725461357; cv=none; b=Se5tgiehKls0hSNpQRPYqo6x/yuNFvkWJMbNK1pwugzm6CtUoDHGuRKmEydIdfyhUR1XBu6rQxm6vWxa4qWK8S6t8iIFb2+BlSoqtFGF+HFHw6SuR7pHmGhKS7fHaqCWRTntJ9qooX6P61TZ6TcDmrN2m4uVii/H4Keek4qVjeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725460233; c=relaxed/simple;
-	bh=Qv3+bWGBOEFD245z2fq08+hC53ZdianQ6Rb24yS/HSk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bdD9vuN5cgJtmPoW9kOxmAVmYwpj064kLt/LWNRXUAgFkiZipedrd4p+8pjLC7XhOttrpIYYm3nNrbnjj+vSXK+i0yrCJZxDdE5TrFgHWbbVu/EA8IhnhedpPgazM+tZB3Bgr4Uegks4NJfq7reCu9jSx/94DhrjwKjpZ3pu8pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7/q+vFr; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7/q+vFr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C87C4CECB
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Sep 2024 14:30:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725460233;
-	bh=Qv3+bWGBOEFD245z2fq08+hC53ZdianQ6Rb24yS/HSk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=m7/q+vFrFDXQvaS3E0w69mu9OFNSpJCeLV7oSaQ2BEyGqQoxPaQY4POuNlp8PKGeZ
-	 bLCCcBnrUf76J6QzoCFAX1oRS+Ea5RG6e/stPaK+WDpnsroPgklXW1c8pV8XgEA8lt
-	 5rYKOs+GujG17l4k0T7ToJrxAwilg/vop1p4M/YG2ALRhTSOfu6FVUfCygbpObDRFf
-	 o53gvlgO5AG4ZRQ8aaxH3OusAopQORDFgigdCVGdraGFco66dW5pPnUmzVt22pUjGJ
-	 e2BNoohV/GrNNHMOr+A51zcIDzg2CXJB+ZiRURc0LiQjg4IY5l16Dj2I35OVoDUDRB
-	 Yln9FqHimU1mw==
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-26ff21d82e4so464546fac.2
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Sep 2024 07:30:32 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz7vUpdIMyluZHXKvw3LFO4Lt5X16Z0LMf8zx16EB5/8bSr6q+Y
-	2qXMoH955823VqTVYxs22zq9JThbddMdPt0NsCRgvJMx1vE6pNxFh+m6NufHt9jUtwUBPxmXyAp
-	MGdG8Loy2BWaiL8z5rQ4R508Cuc0=
-X-Google-Smtp-Source: AGHT+IGIBS4s+p5Wx+1MgafHfQlTpbHcIvfXJ3q5B0U1jURihIIajMmldwUZ8r+QD9rA6srW0B4DOSTaGnolwUL417M=
-X-Received: by 2002:a05:6870:828f:b0:278:3de:c8de with SMTP id
- 586e51a60fabf-27803df0c8amr7645999fac.24.1725460232294; Wed, 04 Sep 2024
- 07:30:32 -0700 (PDT)
+	s=arc-20240116; t=1725461357; c=relaxed/simple;
+	bh=ih32sz16+1Bo8017jKrT+lylx+9UJQKMc0c26/f6B2E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y8aeNIJ8IQO6WyLDqTH6xIhma9UbusjUPvLHDtap71Rds0qNGiHNEmS2vKf4OXR0ksturwtKuJW1AyLDfsWMEB+oFZJRlDAijbzdE2T6rG/y6hmxSsDx6yC6pjHkCIF9Gj13B4FhUA5X5FbMDCXbOdiQjMrCkWLBz+HSPgYSXz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=89.232.161.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+Received: from [10.177.185.108] (helo=new-mail.astralinux.ru)
+	by mx.astralinux.ru with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <adiupina@astralinux.ru>)
+	id 1slrIK-009mJm-3t; Wed, 04 Sep 2024 17:47:40 +0300
+Received: from rbta-msk-lt-302690.astralinux.ru (unknown [10.198.38.84])
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4WzQNW5xtsz1gx6v;
+	Wed,  4 Sep 2024 17:48:43 +0300 (MSK)
+From: Alexandra Diupina <adiupina@astralinux.ru>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Alexandra Diupina <adiupina@astralinux.ru>,
+	Steve French <sfrench@samba.org>,
+	stable@vger.kernel.org,
+	Aurelien Aptel <aaptel@suse.com>,
+	Paulo Alcantara <palcantara@suse.de>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH 5.10] cifs: Fix freeing non heap memory in dup_vol()
+Date: Wed,  4 Sep 2024 17:48:32 +0300
+Message-Id: <20240904144832.28857-1-adiupina@astralinux.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20240904043639epcas1p27080078eed3604d12cff3b01d7636343@epcas1p2.samsung.com>
- <20240904043635.782603-1-hobin.woo@samsung.com>
-In-Reply-To: <20240904043635.782603-1-hobin.woo@samsung.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 4 Sep 2024 23:30:19 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_e+59DgaRepHBwck17nZcA8WwNNWN5xLm5TFAKPVZbgg@mail.gmail.com>
-Message-ID: <CAKYAXd_e+59DgaRepHBwck17nZcA8WwNNWN5xLm5TFAKPVZbgg@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: make __dir_empty() compatible with POSIX
-To: Hobin Woo <hobin.woo@samsung.com>
-Cc: linux-cifs@vger.kernel.org, sfrench@samba.org, senozhatsky@chromium.org, 
-	tom@talpey.com, sj1557.seo@samsung.com, kiras.lee@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-DrWeb-SpamScore: 0
+X-DrWeb-SpamState: legit
+X-DrWeb-SpamDetail: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddgtddvucetufdoteggodetrfcurfhrohhfihhlvgemucfftfghgfeunecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhgvgigrnhgurhgrucffihhuphhinhgruceorgguihhuphhinhgrsegrshhtrhgrlhhinhhugidrrhhuqeenucggtffrrghtthgvrhhnpeduleetfeehffekueeuffektefgudfgffeutdefudfghedvieffheehleeuieehteenucffohhmrghinheplhhinhhugihtvghsthhinhhgrdhorhhgnecukfhppedutddrudelkedrfeekrdekgeenucfrrghrrghmpehhvghloheprhgsthgrqdhmshhkqdhlthdqfedtvdeiledtrdgrshhtrhgrlhhinhhugidrrhhupdhinhgvthepuddtrdduleekrdefkedrkeegmeehkeefuddvpdhmrghilhhfrhhomheprgguihhuphhinhgrsegrshhtrhgrlhhinhhugidrrhhupdhnsggprhgtphhtthhopedutddprhgtphhtthhopehgrhgvghhkhheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopegrughiuhhpihhnrgesrghsthhrrghlihhnuhigrdhruhdprhgtphhtthhopehsfhhrvghntghhsehsrghmsggrrdhorhhgpdhrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprggrphhtvghlse
+ hsuhhsvgdrtghomhdprhgtphhtthhopehprghltggrnhhtrghrrgesshhushgvrdguvgdprhgtphhtthhopehlihhnuhigqdgtihhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsrghmsggrqdhtvggthhhnihgtrghlsehlihhsthhsrdhsrghmsggrrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhvtgdqphhrohhjvggttheslhhinhhugihtvghsthhinhhgrdhorhhgnecuffhrrdghvggsucetnhhtihhsphgrmhemucenucfvrghgshem
+X-DrWeb-SpamVersion: Dr.Web Antispam 1.0.7.202406240#1725456685#02
+X-AntiVirus: Checked by Dr.Web [MailD: 11.1.19.2307031128, SE: 11.1.12.2210241838, Core engine: 7.00.65.05230, Virus records: 12157423, Updated: 2024-Sep-04 13:08:53 UTC]
 
-On Wed, Sep 4, 2024 at 1:36=E2=80=AFPM Hobin Woo <hobin.woo@samsung.com> wr=
-ote:
->
-> Some file systems may not provide dot (.) and dot-dot (..) as they are
-> optional in POSIX. ksmbd can misjudge emptiness of a directory in those
-> file systems, since it assumes there are always at least two entries:
-> dot and dot-dot.
-> Just don't count dot and dot-dot.
->
-> Signed-off-by: Hobin Woo <hobin.woo@samsung.com>
-Applied it to #ksmbd-for-next-next.
-Thanks for your patch!
+Remove kfree(&vi->smb_vol), since &vi->smb_vol
+is a pointer to an area inside the allocated memory.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: 54be1f6c1c37 ("cifs: Add DFS cache routines")
+Signed-off-by: Alexandra Diupina <adiupina@astralinux.ru>
+---
+ fs/cifs/dfs_cache.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index 7b6db272fd0b..da6d775102f2 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -1194,7 +1194,6 @@ static int dup_vol(struct smb_vol *vol, struct smb_vol *new)
+ 	kfree_sensitive(new->password);
+ err_free_username:
+ 	kfree(new->username);
+-	kfree(new);
+ 	return -ENOMEM;
+ }
+ 
+-- 
+2.30.2
+
