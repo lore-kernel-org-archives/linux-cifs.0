@@ -1,63 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from c.mail.sonic.net (c.mail.sonic.net [64.142.111.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6A51E1302;
-	Wed,  4 Sep 2024 16:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAF9142623
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Sep 2024 21:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.142.111.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725468392; cv=none; b=fsKsYEVkF/aZlwZNxmHuJX6Z6nvyU/e6Hz9BsQYkhTFc6pHHqMSCJdXJ/Te071gM37TFmWcOoHOAVdJHmV2R8yGFToyYQFWGGIKmAPzahNM5SlcID5ZCp+WDNSAuOwPszfM0Cfd9HLQzv0f+LfqN6NwD88j0/P1EDg9dH7HJPQU=
+	t=1725484360; cv=none; b=sil3yD8kto9x8W2C0QCmijbCj5gyHtSEyuox723uycuXH0CVX5XfPPGLBrQ+I9K2VFOEL3HF3ueSnoRd9JqElzK842b0thjDo1jzKPIyDsLOsjZct5dyhxnnlOXYfjNlPKhWkw4T4ftDQBpgg9Gis2l6pGELTdH9C2FvVaYhndo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725468392; c=relaxed/simple;
-	bh=UuI/p7JZ5bLBufMFsz/m6CDhPZMgtReWPrdg9633Vg0=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=l3YE+kiCvGm2JIhlgVVRnsH8Y4cydAAQVwJymGbZ8X9hktJJZAJPbuXgajuIniBgn6U5V7a0eK8JNBOcnFQHW4BNyewFr1AkFPlvmtKJxLzhYv9zaf6EgCqsAVd45E0CO62tOlQmaa5oY2IPinUONDQXM27Lhiqt2giFv05OHoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fx/vXrQ7; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fx/vXrQ7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34875C4CEC2;
-	Wed,  4 Sep 2024 16:46:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725468392;
-	bh=UuI/p7JZ5bLBufMFsz/m6CDhPZMgtReWPrdg9633Vg0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Fx/vXrQ71OR0c/7CyYp1HP0OVdeCLclwWbI6pPkEz66ZVdZo+8BCTiEZM7FHfLIX8
-	 Phe7js6Iu75ixvgEn2C5ksq/tJO2IEAX7WM0b9DFhFTwbo6Dp15IrA6jbIm47xqNa3
-	 590k+/flaQnNXntVcSbNmpfBBTKzzal1u8dt4tsSRDTK659ysRpRcU/Ps6Rvsoo7bZ
-	 4sKFWY18hIrHyjwliJyc1yPEelAh+8X3CQbNeijWSMdrjhm6FFOLntL8rGZ5ACuvh4
-	 B+gCDHA38GiwGzqH26carZNbMz5mx/jAwY0SfEQ/7zuAen3k/LONI/pXl311OD/1V+
-	 Gf9mRo3nN/AUQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DB63822D30;
-	Wed,  4 Sep 2024 16:46:34 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msCnFTerrxda-e95d6xb5f9kLtEj8=h63WC7Mccj1_8NQ@mail.gmail.com>
-References: <CAH2r5msCnFTerrxda-e95d6xb5f9kLtEj8=h63WC7Mccj1_8NQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msCnFTerrxda-e95d6xb5f9kLtEj8=h63WC7Mccj1_8NQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.11-rc6-server-fixes
-X-PR-Tracked-Commit-Id: 844436e045ac2ab7895d8b281cb784a24de1d14d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d8abb73f584772eaafa95a447c90f1c02dba0dec
-Message-Id: <172546839283.1094870.628726676988015456.pr-tracker-bot@kernel.org>
-Date: Wed, 04 Sep 2024 16:46:32 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	s=arc-20240116; t=1725484360; c=relaxed/simple;
+	bh=guLfzvzHe/Ar8KjiPmsJlEXy+TxFLF80tnd+JVKmu0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=hZM78U/AfuFZjFQc1VVNaJn+0e67cDwKEaobVmnct5GsLC15Qy53V+poW5v4j6sq8copwtbiqG7PWFM5fZhFttxsqwoN0C0iSL5frE/cPnFbt18vDmUwh8iFPLo35pFwXmfMKo+VVY6bzJKFTdm7fFQRl+n6QzT+QlV6KWAC2jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one; spf=pass smtp.mailfrom=nom.one; arc=none smtp.client-ip=64.142.111.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nom.one
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nom.one
+Received: from 192-184-189-85.static.sonic.net (192-184-189-85.static.sonic.net [192.184.189.85])
+	(authenticated bits=0)
+	by c.mail.sonic.net (8.16.1/8.16.1) with ESMTPA id 484L28aW000373;
+	Wed, 4 Sep 2024 14:02:08 -0700
+From: Forest <forestix@nom.one>
+To: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>
+Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        stable@vger.kernel.org, regressions@lists.linux.dev
+Subject: Re: [REGRESSION] cifs: triggers bad flatpak & ostree signatures, corrupts ffmpeg & mkvmerge outputs
+Date: Wed, 04 Sep 2024 14:02:08 -0700
+Message-ID: <1dihdj9avrsvritngbtie92i5udsf28168@sonic.net>
+References: <pv2lcjhveti4sfua95o0u6r4i73r39srra@sonic.net>
+In-Reply-To: <pv2lcjhveti4sfua95o0u6r4i73r39srra@sonic.net>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Sonic-CAuth: UmFuZG9tSVbf6qhAFZ29YVsyvEy6C+n4FasBrjvR+o3aEgrO/1vOqvbzlOlEcb+NyztygbtXqMYqLA8TJlo1h/NIWayd8fSz
+X-Sonic-ID: C;1leg8gBr7xGvzM+N3bHVhw== M;Igyv8gBr7xGvzM+N3bHVhw==
+X-Spam-Flag: No
+X-Sonic-Spam-Details: -0.0/5.0 by cerberusd
 
-The pull request you sent on Wed, 4 Sep 2024 09:55:21 -0500:
+On Sat, 24 Aug 2024 18:50:40 -0700, Forest wrote:
 
-> git://git.samba.org/ksmbd.git tags/v6.11-rc6-server-fixes
+>I think I have found a cifs regression in the 6.10 kernel series, which leads
+>certain programs to write corrupt data.
+[...]
+>3ee1a1fc39819906f04d6c62c180e760cd3a689d is the first bad commit
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d8abb73f584772eaafa95a447c90f1c02dba0dec
+Write corruption still exists in 6.11.0-rc6.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Bad ostree signatures may be fixed in 6.11.0-rc6. (My reproducer didn't
+trigger it in that version.)
