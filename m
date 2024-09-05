@@ -1,83 +1,101 @@
-Received: from coa.moonlit-rail.com (coa.moonlit-rail.com [38.145.205.58])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B13D19D897
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Sep 2024 16:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=38.145.205.58
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92813198A3E;
+	Thu,  5 Sep 2024 22:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725552112; cv=none; b=JRNOejL6giCu6BsX27it6scOtglw9Y5vbKTjnT6NVG1o4vBJONWUt4aYuR0cTtmE1iycuCdLQvYrUbanOKZATnJH/dlwOfvUyVdF6sGxY31ZmHz9vcYmoYyrRm1BNq592JXHf5Jj8ErlUWIBM+Dl76gcgQJF2DC/khuCL4ZcIGc=
+	t=1725576403; cv=none; b=P3JCpjAInh2V/4mL8pDWB1QRkSz+XAGCivUieF57EKgJSuxE2H+c+IFef0BZO2vHxelD2rn1s7IU1Jschkl2k+Qy31gqlJ+6/s7cSC7/6WXyt/d+SJpD7muTI/8N/6IaVFOAbTgzy9L39VH9gVMh59CJkXftvNzuQ1v1FmnC8wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725552112; c=relaxed/simple;
-	bh=k11DKX5vXDljG1oGhHo/sJWs6SJU//qp6k3szzGWZqo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pZABEZvhpaicVXC/76whu4NYjS2CIofP18XTI8AyA58L2WV2/kK1AQYGevaCYDNqszkaUruPFfxQZSCRs8yo6uLtqCxJbrmLuNOmgf3/pJUy15/2z52u9llYiqv0Gsoq05BJ/ydaadYORl7dWN/TXBVC0c5lkt6HdPXhsSrpp6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com; spf=pass smtp.mailfrom=moonlit-rail.com; dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=Khrdkv7e; dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b=tkqxdrDF; arc=none smtp.client-ip=38.145.205.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=moonlit-rail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=moonlit-rail.com
+	s=arc-20240116; t=1725576403; c=relaxed/simple;
+	bh=m3vTGh+gNA+PlE7s/wgJ9fTL5hDf3JiiHDH8W4KsPKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=k1HuAJUsGTaV1ipNvnsGjHXPr6DGIqoxuxydOVfBy4fe77It85N6uWlEqYuXNP+hlZYim6ql5gDjlCDgaf5vAIHr2NFZ50PsUv230BMmA0qW/h3kOtXQUpXkBkHfZ9JNk0dZ2K6JX40KGG2A4D0MtLHSlufaCtkdmbobB1M9BMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=FK6VtJ4F; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="Khrdkv7e";
-	dkim=permerror (0-bit key) header.d=moonlit-rail.com header.i=@moonlit-rail.com header.b="tkqxdrDF"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=rsa2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AaUHqicgJGG0YRvFPVOk2647TTXo1/9A9ljS8mxYhXc=; t=1725550843; x=1728142843; 
-	b=Khrdkv7eJETMFNcB8dkJ66h201hAyqOKW0fL0LLBIWnwqhDmzrw361vP9Mz28MHKD0vOMSh9tHZ
-	Jx7m6IjveBlmFMnODgXQQufS6t9Wm7rTRs4PKLOeySuzCtYRIrQnagZWW3yi/mjzoDAzBxd0qkrTv
-	wkxcToIc2AX0DRPuMCaWrK0tj691E3JdmOT873Tnz0qx3bm+Xl6QfA9ghugn2j85V/rPj0y2td4j+
-	dSeIkA4lJHXbqfsTPRETWMNaRxlcxDl/t9Z7UgouJt93teNFJ8Qto5uY4Z8gv1OtPxRqBogBQjr8I
-	6ImFCdNO1h8akItCzDoJIqhukJvuIXHm9JMw==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=moonlit-rail.com; s=edd2021a; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AaUHqicgJGG0YRvFPVOk2647TTXo1/9A9ljS8mxYhXc=; t=1725550843; x=1728142843; 
-	b=tkqxdrDFYyi26UzB6UalqKAiBL1xgNZZ51DM53Tf6xxFK1onxqSsnq19NFCbqwbbYNefOF3NCJm
-	8pepuWSHfCA==;
-Message-ID: <97a71be9-d274-4e9e-9928-dce062ba2a22@moonlit-rail.com>
-Date: Thu, 5 Sep 2024 11:40:42 -0400
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="FK6VtJ4F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1725576398;
+	bh=iY0bT5Y0gF/gRtXW2VazxS/yon2401Y8GmxORw1pMBU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=FK6VtJ4FqOJ3N2JLpl0GAA2M0HP/dpz+oIXwhjHMXhMEO5HHmcbA8RUyEpO2QSoPy
+	 PnsEnJYlfQ3rQgscfrYQ3KNc16ugTO6KrN3ONq3LZ84Mp4/Y3/eBxUpF5uS80YJxE1
+	 BHgRwYDvYcCpXBRkBsYemEFwvWDkIM099pnlxVTYVjZmF+MDnWOcX3eHwEY8wdRYt9
+	 mtUftJpJVrGtFJacF3EAofQsWdrF1JQCu+oRYHabf9Lp3ne5G6kDUC7C8gTC1TCwLA
+	 ALKH4ij7UfuJPv4TaK7QFUi58GGZUzQ2wf/cGIsJ0arqE13b6owvqsORXr4/+8Rg64
+	 8788MDaxPdSgw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X0DxV3GLNz4wd0;
+	Fri,  6 Sep 2024 08:46:38 +1000 (AEST)
+Date: Fri, 6 Sep 2024 08:46:37 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Christian Brauner <brauner@kernel.org>, Steve French
+ <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>, Steve French
+ <stfrench@microsoft.com>
+Subject: linux-next: manual merge of the vfs-brauner tree with the cifs tree
+Message-ID: <20240906084637.295241d1@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: CIFS lockup regression on SMB1 in 6.10
-From: "Kris Karas (Bug Reporting)" <bugs-a21@moonlit-rail.com>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: matoro <matoro_mailinglist_kernel@matoro.tk>,
- Bruno Haible <bruno@clisp.org>, Linux Cifs <linux-cifs@vger.kernel.org>
-References: <CAH2r5mtDbD2uNdodE5WsOmzSoswn67eHAqGVjZJPHbX1ipkhSw@mail.gmail.com>
- <cca852e55291d5bb86ea646589b197d5@matoro.tk>
- <CAH2r5msAXgYs7=5D=YxGa8XohegJwpTn6yasVyZCmPmPt1QA9w@mail.gmail.com>
- <bf5a6d9797f33d256b9fffeb79014242@matoro.tk>
- <CAH2r5mta2N-hE=uJERWxz3w3hzDxwTpvhXsRhEM=sAzGaufsWw@mail.gmail.com>
- <4c563891-973c-46a4-8964-0ef90b1c7e49@moonlit-rail.com>
- <CAH2r5mugVqy=jd_9x1xKYym6id1F2O-QuSX8C0HKbZPHybgCDQ@mail.gmail.com>
- <90134f35-acb3-4124-b172-2de6d70dd0b4@moonlit-rail.com>
- <2925a37f946d1b96a7251f7be72ba341@matoro.tk>
- <2322699.1725442054@warthog.procyon.org.uk>
- <c8027078-bd61-449e-8199-908af20b1f10@moonlit-rail.com>
-Content-Language: en-US, en-GB
-In-Reply-To: <c8027078-bd61-449e-8199-908af20b1f10@moonlit-rail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/XeoHHoPEBYMDCrpQzI++K7c";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Kris Karas wrote:
-> David Howells wrote:
->> The attached may help.
-> 
-> Thanks.  Gave it a whirl.  Alas, FTBFS against 6.10.8:
+--Sig_/XeoHHoPEBYMDCrpQzI++K7c
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-OK, I tried this against git master, compiles fine there.
-Success!  The lockup with vers=1.0/unix is gone for me.
+Hi all,
 
-Just need a backport for 6.10.x to fix the missing NETFS_SREQ_HIT_EOF 
-and rdata->actual_len.
+Today's linux-next merge of the vfs-brauner tree got a conflict in:
 
-Thanks!
-Kris
+  fs/smb/client/cifssmb.c
 
+between commit:
+
+  a68c74865f51 ("cifs: Fix SMB1 readv/writev callback in the same way as SM=
+B2/3")
+
+from the cifs tree and commit:
+
+  0fda1f8c6bf8 ("netfs: Speed up buffered reading")
+
+from the vfs-brauner tree.
+
+I fixed it up (I used the former as it is (supposedly) a much newer patch)
+and can carry the fix as necessary. This is now fixed as far as linux-next
+is concerned, but any non trivial conflicts should be mentioned to your
+upstream maintainer when your tree is submitted for merging.  You may
+also want to consider cooperating with the maintainer of the conflicting
+tree to minimise any particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/XeoHHoPEBYMDCrpQzI++K7c
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbaNM0ACgkQAVBC80lX
+0Gw8WQgAnBFPeAjt3pZwNR66oc1+QNgwpd8ehgtjFxlAkqq1NvNFFdMkilKbc9RN
+OoSxUvoQnhnxUdDCkelhsYzgQupJGa/uP/mPG31cOSn6NDEQM7qMjoWexJ6GGpjU
+/xgEDZVE0veK9X0yF0ZfKD5jIJyOE0n46wggryR2lZRega8UAyiHAkttoH+/Dx/k
+yhOukqf7KCeb70qaGvBvqsYNrCBIfchDEAXOEj0j4MDPPGhwb8M36GdfBGmGYozG
+BqDXVVIt9kelEHdDsvVLMSCyoCEHx9mBWyPtwHE/uJQEs5mL0jZm/0GtgDH1WnHv
+uIViAtZePbPPuQAEC9jZKHa7aCWB7g==
+=qPWw
+-----END PGP SIGNATURE-----
+
+--Sig_/XeoHHoPEBYMDCrpQzI++K7c--
