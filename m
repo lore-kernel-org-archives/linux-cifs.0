@@ -1,179 +1,108 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A8B10E0;
-	Fri,  6 Sep 2024 01:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD701B85EA;
+	Fri,  6 Sep 2024 19:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725587295; cv=none; b=ROUWsicdXLn/1HPYXDw5Z//u+gGctVwZFECtJwU5lQzFkaS7MuTnMaMoLAPAJF/Py2UFRYlhDz39WC0evMbuu4a35BoQIIeSLEON63T1t+R7SC3R0B20MThB+ua2MSXNqbd47ljPXoaKBGUGgCFn4mZFte92S/X+Qta2+C9P8UU=
+	t=1725651116; cv=none; b=ssOq77xc8pflcZ5xd4FdKZfFmw1aqJOL+MaAUgKQ9K5Fw6GXOHGtJZLG1cuBY3AuaK/Z7A6Y/k8VXmzELnKGjIQkByxS95roh7PpzpP+RiQOJmohRlUvaYJArKT4zGntjFmpk449Szk1nlv2N4xJ7nnAQV4m0rgkTAckleq/Vyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725587295; c=relaxed/simple;
-	bh=7zCL/F2SegnjDaIDN/6aX2HgHqwrif0ajQVQEgillWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SAvFJnjYbovLpMHiY8l3xdYuT80osMP/s7jUYIJuQ0blFffHGXddj7IP7ZyBIZ6/KTmAg2slWA+MOr5v08Svn1TnSyn2wiK6rphBc8IGel00XBzlfn0gBmsT4AlFhaYNkrIrSV1SfnoEh50C5ACVJ6SO8ke5vQcYWp2yjlRvR7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=MKIj2ttR; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1725651116; c=relaxed/simple;
+	bh=7CqKdMMa2W2u5sWK3EDB8rJvgqNG8GxHeQBQ2YsyL+w=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IrjzXgNwYRa09oZQvhw3i7NYBpQub+rwXKT/SWBUZFng5kfgC+W63wBAWbnvvfkM+tGp8343TSDKgMdbgldkXoQ0Nf3cIHPCSdoj5YXMBZrw9PgPw8pmcJ7/ePFWTJyChDFf6ajg1quFXTt6i8CcD8DYit0RcFfkE2dml0Iq+VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gUl9K7lz; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="MKIj2ttR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1725587290;
-	bh=pdg98YKJnJpUX8y4oKFacGDedcpygu8u2LZ+ChqaW6s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MKIj2ttRnjhW+TU7tGJwsvykwpcdxYilXJy14dhQbxc42pXcSD2VXZ+HVuS8iiXlb
-	 Kf+/fa24Gj5xcfLdV69TV51CgZMaLeat8fuPWfGwcViT+usFYZXkbDgLJ0Faz/Izqh
-	 WYzRSTbb22irCuyIUGYkGDVHq4Nj2k7TzGPJynA5ulceFDJRbxXSohuhQlWp3LzCga
-	 +ZgFvXjV1HQvsN6PqwrYxZBVO5lBqM6V2jLnaL+onotcjpi1mbE7n4geHVaXgTsADE
-	 Uk8X4CGFzGzJy+tqnVUD4qNS4Bex3aLOpJwLscIKaaug/UwMFQCyc2PpdLknw1u69P
-	 AciXmZMTk9mLg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X0Jyx73H9z4wp0;
-	Fri,  6 Sep 2024 11:48:09 +1000 (AEST)
-Date: Fri, 6 Sep 2024 11:48:09 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Christian Brauner <brauner@kernel.org>, Steve French
- <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Steve French
- <stfrench@microsoft.com>
-Subject: Re: linux-next: manual merge of the vfs-brauner tree with the cifs
- tree
-Message-ID: <20240906114809.08a545d9@canb.auug.org.au>
-In-Reply-To: <20240906093821.30c5114e@canb.auug.org.au>
-References: <20240906084637.295241d1@canb.auug.org.au>
-	<20240906093821.30c5114e@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gUl9K7lz"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f75428b9f8so15732641fa.3;
+        Fri, 06 Sep 2024 12:31:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725651113; x=1726255913; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Nuxy+071csmO0ZbB3fQ4CSEEMw+4ZTybAjYB4eqh4EQ=;
+        b=gUl9K7lzuBGYFRDnXP5lL9J0SXKn6ApTlY/vzXLYLHEBXkthHkAFV3YuM/BnjOPvLD
+         AEbK4Y2dnYw4fW4ioGTOY2t8o2TZVIoj74jN8yhiN3fCvwbMOXe4oF3eQ1opQYo9s5mc
+         PbZNkczxMYRBxbzIxxnKjM3ug1sJfHxmnb32dX3ud47oP0VaYUUnrOL1jinxjYgJ7NGy
+         lG37YR/bMIalQTIqRQNDJgDMmoXt2SrVnSumZVawHBGjBV/B40SppGIkY0i6U74e7FzJ
+         I7iT078BKVOeLYSqkFHz5BcyxL28RCS19+m22D4Rm2ev2W3X4osBHCNdO+SpevCxjk3L
+         l3aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725651113; x=1726255913;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nuxy+071csmO0ZbB3fQ4CSEEMw+4ZTybAjYB4eqh4EQ=;
+        b=ItSZrne1A86gP1F7EXkqqiCe6OzUAr9Y4DdJs0BuPYKi0hQ6d4duKO0J6B20BgJ5Ng
+         0SioVNqPfy/4F2pdXF6OYAqiprvK68Bq85+IsvnTNaxAoIWUE0oSst61jDZaf9HZon7j
+         jrcYrdaN1scYQlqClgcAgm2UzuJrFJp+VIGzhd7vSyB3jwMLW7YsDOg05qrOiA4P1e21
+         sE2oeWLiWuHAu6elSdQwm3A3b+VD0aE1iAWzAsyS/EeU35fR2yQjbKF0mH5GZVm0S/Zz
+         oTZ7ScPjeucccnMliR5vM8sC5qoZ3OrqK/QRRcze9zPB/WmapJmelR4dziIjePRVJhk9
+         giOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvwHfZKWEKE9UiN4RiBgaFXMLzacCt7UDXemnjAHVf9tiJhwe42p8g/TPZDkanoshi+YgftG7UpfFBEyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOrsq2vbyVA2OHd/4cUD79AoOu4MQ1gqn+DtsNmCE2y3WE5aHj
+	QSMsZetkEaKwJ57oE4+11XDr89zSm6SzIS9ff/L+oZaT6w1GoU46hQJAXWgoJ4GdK3p3d072Ju5
+	x8xgVwSKO4Vh17OcAFaq4VCDJvaRh4KMJPpA=
+X-Google-Smtp-Source: AGHT+IE/6BUUKGp71wBZs/+LHe4mCzEeMa8JPUeJm+GJQOh5ietNFz4HzW3ihrpLwi0HsuqlMdY8EbaBlFIJMPJ/hJA=
+X-Received: by 2002:a05:6512:3ba4:b0:533:483f:9562 with SMTP id
+ 2adb3069b0e04-536587f87damr2686486e87.42.1725651112908; Fri, 06 Sep 2024
+ 12:31:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/MK_.kF7nY/TSQlrslTd9U3_";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 6 Sep 2024 14:31:41 -0500
+Message-ID: <CAH2r5mu_sd0WC=c=eV-AS90-hH42-ANqyD1-BoJ-52oD-fMuOg@mail.gmail.com>
+Subject: [GIT PULL] smb3/cifs client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/MK_.kF7nY/TSQlrslTd9U3_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Please pull the following changes since commit
+431c1646e1f86b949fa3685efc50b660a364c2b6:
 
-Hi all,
+  Linux 6.11-rc6 (2024-09-01 19:46:02 +1200)
 
-On Fri, 6 Sep 2024 09:38:21 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> On Fri, 6 Sep 2024 08:46:37 +1000 Stephen Rothwell <sfr@canb.auug.org.au>=
- wrote:
-> >
-> > Today's linux-next merge of the vfs-brauner tree got a conflict in:
-> >=20
-> >   fs/smb/client/cifssmb.c
-> >=20
-> > between commit:
-> >=20
-> >   a68c74865f51 ("cifs: Fix SMB1 readv/writev callback in the same way a=
-s SMB2/3")
-> >=20
-> > from the cifs tree and commit:
-> >=20
-> >   0fda1f8c6bf8 ("netfs: Speed up buffered reading")
-> >=20
-> > from the vfs-brauner tree.
-> >=20
-> > I fixed it up (I used the former as it is (supposedly) a much newer pat=
-ch)
-> > and can carry the fix as necessary. This is now fixed as far as linux-n=
-ext
-> > is concerned, but any non trivial conflicts should be mentioned to your
-> > upstream maintainer when your tree is submitted for merging.  You may
-> > also want to consider cooperating with the maintainer of the conflicting
-> > tree to minimise any particularly complex conflicts. =20
->=20
-> The fixup ended up being as below.
->=20
-> --=20
-> Cheers,
-> Stephen Rothwell
->=20
-> diff --cc fs/smb/client/cifssmb.c
-> index cfae2e918209,04f2a5441a89..790b3f5ea64b
-> --- a/fs/smb/client/cifssmb.c
-> +++ b/fs/smb/client/cifssmb.c
-> @@@ -1261,16 -1261,6 +1261,15 @@@ openRetry
->   	return rc;
->   }
->  =20
->  +static void cifs_readv_worker(struct work_struct *work)
->  +{
->  +	struct cifs_io_subrequest *rdata =3D
->  +		container_of(work, struct cifs_io_subrequest, subreq.work);
->  +
-> - 	netfs_subreq_terminated(&rdata->subreq,
-> - 				(rdata->result =3D=3D 0 || rdata->result =3D=3D -EAGAIN) ?
-> - 				rdata->got_bytes : rdata->result, true);
-> ++	rdata->subreq.transferred +=3D rdata->got_bytes;
-> ++	netfs_read_subreq_terminated(&rdata->subreq, rdata->result, true);
->  +}
->  +
->   static void
->   cifs_readv_callback(struct mid_q_entry *mid)
->   {
+are available in the Git repository at:
 
-Also this (which I will roll into the above merge resolution tomorrow):
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.11-rc6-cifs-client-fixes
 
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Fri, 6 Sep 2024 11:39:25 +1000
-Subject: [PATCH] fix up for "netfs: Speed up buffered reading"
+for you to fetch changes up to ab85218910729b95f9b0acfebab55c2cab5f8ee7:
 
-interacting with "cifs: Fix SMB1 readv/writev callback in the same way
-as SMB2/3"
+  netfs, cifs: Improve some debugging bits (2024-09-03 10:17:51 -0500)
 
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/smb/client/cifssmb.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+----------------------------------------------------------------
+Six smb3 client fixes
+- fix potential mount hang
+- fix retry problem in two types of compound operations
+- important netfs integration fix in SMB1 read paths
+- fix potential uninitialized zero point of inode
+- minor patch to improve debugging for potential crediting problems
+----------------------------------------------------------------
+David Howells (3):
+      cifs: Fix zero_point init on inode initialisation
+      cifs: Fix SMB1 readv/writev callback in the same way as SMB2/3
+      netfs, cifs: Improve some debugging bits
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 790b3f5ea64b..76fb2287c17b 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1326,9 +1326,9 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 		rdata->result =3D 0;
- 	} else {
--		if (rdata->got_bytes < rdata->actual_len &&
--		    rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes =
-=3D=3D
--		    ictx->remote_i_size) {
-+		size_t trans =3D rdata->subreq.transferred + rdata->got_bytes;
-+		if (trans < rdata->subreq.len &&
-+		    rdata->subreq.start + trans =3D=3D ictx->remote_i_size) {
- 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 			rdata->result =3D 0;
- 		}
---=20
-2.45.2
+Paulo Alcantara (3):
+      smb: client: fix hang in wait_for_response() for negproto
+      smb: client: fix double put of @cfile in smb2_rename_path()
+      smb: client: fix double put of @cfile in smb2_set_path_size()
 
---=20
-Cheers,
-Stephen Rothwell
+ fs/netfs/io.c             |  2 +-
+ fs/smb/client/cifssmb.c   | 54
+++++++++++++++++++++++++++++++++++++++++++++++--------
+ fs/smb/client/connect.c   | 14 +++++++++++++-
+ fs/smb/client/inode.c     |  2 ++
+ fs/smb/client/smb2inode.c |  3 +++
+ fs/smb/client/smb2ops.c   |  8 +++++---
+ 6 files changed, 70 insertions(+), 13 deletions(-)
 
---Sig_/MK_.kF7nY/TSQlrslTd9U3_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
+-- 
+Thanks,
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbaX1kACgkQAVBC80lX
-0Gz3Agf9GVTl7yTMuYijti1PvQ91bw4HKIGv0EngK3z1zjBo7XQ0YBAYTVVfTFuS
-X/uGLNEyTsPxqSJYR9bknzes4a6L194c9ehZAGOh+kABQnCP3AEfx85KnqRIcJwq
-bcEjgKeT3ohidbmdupg0h9JOkL3ki8syc7vETg4d8GXv5BEF/x3sbWB9df7ZXmfV
-o/gQ20I290uYSmd53h+ar1X7g0bXfp4kLlt9k/Jz0tnsmOHwt4oMhm7rZ7LscJ7x
-LaR+VL41e2xL3NQAZDSavb7dGpMTS9n2CzruXUu7CV69ZM/VijI1QG3HiELODFPI
-G8KN9VLuIfumnaWzSD3eIzHvrK/8KA==
-=qSIV
------END PGP SIGNATURE-----
-
---Sig_/MK_.kF7nY/TSQlrslTd9U3_--
+Steve
