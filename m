@@ -1,144 +1,111 @@
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4576019E83F;
-	Tue, 10 Sep 2024 15:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D29A1B372E;
+	Tue, 10 Sep 2024 17:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725981467; cv=none; b=fjSWw3g9xMdZQjgNr6+9H/Sj4BLxgSBEfrxTQZL3WPSP/b9GVQYCOezRfhUhQR+Usae2dWHOlVhB6cBxe07nRuNKvqEe7NYy+UzDRmm1chY/PNz8z/h4Z+yAd3XntnQ+5lQOMqRri0QUjEe03eytmhLniDCNb8VjcFM3frSyChk=
+	t=1725988970; cv=none; b=f+yv3f9mRdXSLaj5gLYf7rBked+X7vKzHvvmzQ6qcqt/iI18Dbe4RY9a7KUscttqd+i4QBZ5zKgAbVjYyVMLc2ml54If5BTuH0QwPnb6mKI7w61GEbVCILP8bKBty5raw3Mp1RFggYs9xpwa0YUguEJofZBJsm8/OMGH/QQ/KR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725981467; c=relaxed/simple;
-	bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ar/P0CcFNg/cKSxNaTOaw/X+iu1VRF49PuMIAd03JAWBmD7kO+1p6JEyBzaVIc0DHdXgVsO6yT0/Z77+t1r/1eMb/q9SYI+zBlP6/mJvt3QCa1Zii1fOFrRQoZkoE0EQFioZAQnOjhLdIE+yBsKH+I64B06otfNKSADXsK66xuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gc5WUsMx; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725988970; c=relaxed/simple;
+	bh=PeLBCaC4W0vGegOjs1rbN7MoUicwWj/JzycTr/0ekiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YiipgvjGhaUQo5w4PLqMLwvHgRNwgvGs4sXzVnzL9fNgJSpO6xVzt95KzzSV4SU1gHnsM3hCiPxuHeI7HitrM36MO4SbX3x9TkTD7DqIcOe57xTndmjXY7C82Eo2o4sfSck+6Rpi8XxUZMjs2Xb/uuVr9M2MqPsi4Dvn9c2VOjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBCRJG0J; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gc5WUsMx"
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-39fdd5c44d3so25381055ab.3;
-        Tue, 10 Sep 2024 08:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725981464; x=1726586264; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
-        b=gc5WUsMx8pIZ2trVb/RmHuc4fCzgLDygI1ejxjBsCJdIAVhQz/qClgokBd4I2D355X
-         RmagwbokqH1wFxLFyTYh6PtbFIKFeJxnrEZYZZ0nSBfqIdsZrVS+1gZROGH0XTLDePAw
-         r/W2G595/8XjCGpa1KITl4HeqlPtwEdMcV2ubx4w4ECbzcH+9Sh4Iyg1oBZBWTy6zlOi
-         eIW1lFpxmO9WzJPENoVx1t43w3HG8p1bfrWjFhW4DUkc4AhidnV29eS18rBhXobt4n4s
-         Sc3N5OzFPhTx5CTtwJF3dzZ3q3BH5yiKeLG6qeXyDw8gz/y8G34RhnuFwyqFNkfaW0xI
-         iioA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725981464; x=1726586264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
-        b=avQYJx1JjijQ9ASnMA0jMi+B7Lw5lWbuI9BRc+Cv4NBQ/2uPhlTo6CnIaO+5GBYWw6
-         lyuYSGWNHFzIdlqdjLBUSmxofYP6qEOvi/y6xI3aGrqKHJUD+BXeHHX3VkNUdZXSz3Dn
-         rTMdk1tv8PaP6ukvCdGy0RAf2KQMcP5zL2jw2z9T7H66BFPz42i5isEeOGJEB7nwRxsA
-         5fAFdxsf0EIAl88Mb4aFSN5O5fvq2R2Zsy9PH8nQyLVYScPkrSacAm1DJv0u7KtznKq1
-         9KTumsFl2kgk59BnkEiGEdz3iGOx+KWZeFSS5caXpuLz/nLhWrNQ4/SlQ6L26H5fGcic
-         GChw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsxi/l0xEzgdBrU03CA0hNKhkxi+FlcuDVkOupCqBPQ0Y38x9/vi+ubEmMj9eDTac7jh6sR+eCwjtc@vger.kernel.org
-X-Gm-Message-State: AOJu0YxovHTQPO92ww/3DRhE2Yph0nfJN0MhiGhZvV89k5jqt7X+gcvM
-	PzeHBwbkRc3kXPK60igUdDACm+c5SrZrKFKTFrHL050JTGNHWp1q0K+kcnipGtRAooUV9QQMEIu
-	yOs3cmQ6+pEMpDb+rZ+i/KW2NNE4=
-X-Google-Smtp-Source: AGHT+IGMpF8pwgFNdIg0DWIhL+N5THv4d3T4qnz2bC0FRPgKx4X/WAIQJmiEmVJbtYHeJsk3n3iXX5Y5nm4/q6VTn6Y=
-X-Received: by 2002:a05:6e02:1e03:b0:39b:4ec0:645c with SMTP id
- e9e14a558f8ab-3a04f069c70mr186495915ab.4.1725981464021; Tue, 10 Sep 2024
- 08:17:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBCRJG0J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE300C4CECE;
+	Tue, 10 Sep 2024 17:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725988969;
+	bh=PeLBCaC4W0vGegOjs1rbN7MoUicwWj/JzycTr/0ekiw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oBCRJG0JPCdv5YrpgBRwVCybHRErWcFE8TszHVpFDtgJhWgszCmf/VEXBHD0oEXeo
+	 0cg/CAe2g+4KKKmWWaYP+2r7DWH7yJIc31SlqpWGkgf2fJDLgdtjqLv5xl8WjVpR96
+	 8PUskAmm3lHpFBoVup0IYTA+v0XtRCIteafqBon8T7DV06DLrcWwO36WMz3aXUoevv
+	 V9G0LUZv4JZy7YGAjEzOqGEu6wn4BkBN8qqtmeAB/h6HcPp+HAj97IydpszptR9mEz
+	 ObpLV4MgPlotBWk3ousSIcsyN89+Xi0bdEpebJev2sok8Ry3wt7kZpgz+pq97t0o9O
+	 kPLPu0ZBYNS2Q==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.com>,
+	Rickard Andersson <rickaran@axis.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.10 16/18] smb: client: fix hang in wait_for_response() for negproto
+Date: Tue, 10 Sep 2024 13:22:01 -0400
+Message-ID: <20240910172214.2415568-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240910172214.2415568-1-sashal@kernel.org>
+References: <20240910172214.2415568-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1725935420.git.lucien.xin@gmail.com> <263f1674317f7e3b511bde44ae62a4ff32c2e00b.1725935420.git.lucien.xin@gmail.com>
- <98474d13-a5c3-44c3-b847-cac662affe26@linux.alibaba.com>
-In-Reply-To: <98474d13-a5c3-44c3-b847-cac662affe26@linux.alibaba.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 10 Sep 2024 11:17:33 -0400
-Message-ID: <CADvbK_c1ibnyFx-u+Vh2FUy7iMMo4jORrSAz2un8tWsYtKmGHg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] net: implement QUIC protocol code in
- net/quic directory
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: network dev <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
-	kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
-	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.10.9
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 9, 2024 at 11:30=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
-> wrote:
->
->
->
-> On 9/10/24 10:30 AM, Xin Long wrote:
-> > This commit adds the initial implementation of the QUIC protocol code.
-> > The new net/quic directory contains the necessary source files to
-> > handle QUIC functionality within the networking subsystem:
-> >
-> > - protocol.c: module init/exit and family_ops for inet and inet6.
-> > - socket.c: definition of functions within the 'quic_prot' struct.
-> > - connid.c: management of source and dest connection IDs.
-> > - stream.c: bidi/unidirectional stream handling and management.
-> > - cong.c: RTT measurement and congestion control mechanisms.
-> > - timer.c: definition of essential timers including RTX/PROBE/IDLE/ACK.
-> > - packet.c: creation and processing of various of short/long packets.
-> > - frame.c: creation and processing of diverse types of frames.
-> > - crypto.c: key derivation/update and header/payload de/encryption.
-> > - pnspace.c: packet number namespaces and SACK range handling.
-> > - input.c: socket lookup and stream/event frames enqueuing to userspace=
-.
-> > - output.c: frames enqueuing for send/resend as well as acknowledgment.
-> > - path.c: src/dst path management including UDP tunnels and PLPMTUD.
-> > - test/unit_test.c: tests for APIs defined in some of the above files.
-> > - test/sample_test.c: a sample showcasing usage from the kernel space.
-> >
->
-> Hi Xin,
->
-> I was intended to review your implementation, but I didn't know where to
-> start. All your implementations
-> are in one patch, making it quite difficult to review, so I gave up. =F0=
-=9F=99=81
-Hi,
+From: Paulo Alcantara <pc@manguebit.com>
 
-This is a protocol initial, and it's difficult to split it except that
-I already moved these APIs related files, building configuration and
-documentation. Honestly I couldn't think of a nice way to split more
-that could help much for the review.
+[ Upstream commit 7ccc1465465d78e6411b7bd730d06e7435802b5c ]
 
-But you can try https://github.com/lxin/quic/, where you will get more
-information including change history, configurations and all kinds of
-tests running etc, although its first commit for the protocol initial
-is kinda a big patch.
+Call cifs_reconnect() to wake up processes waiting on negotiate
+protocol to handle the case where server abruptly shut down and had no
+chance to properly close the socket.
 
->
-> I think maybe you could consider adding interoperability tests with
-> other variants of QUIC implementations.
-> When we were working on xquic, this helped us discover many
-> implementation issues, and it might be
-> beneficial for you as well.
->
-> You can check it out from https://interop.seemann.io/.
-As you may already see from the cover-letter, the current interoperability
-tests we've done are via curl http3 over linux QUIC to connect different
-http3 servers that use different QUIC implementations, which are mostly
-covering handshakes and some version negotiations.
+Simple reproducer:
 
-For the link shared, it does offer more coverage and it's nice to include
-it in the future.
+  ssh 192.168.2.100 pkill -STOP smbd
+  mount.cifs //192.168.2.100/test /mnt -o ... [never returns]
 
-Thanks for your comment.
+Cc: Rickard Andersson <rickaran@axis.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/connect.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index d2307162a2de..e325e06357ff 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -656,6 +656,19 @@ allocate_buffers(struct TCP_Server_Info *server)
+ static bool
+ server_unresponsive(struct TCP_Server_Info *server)
+ {
++	/*
++	 * If we're in the process of mounting a share or reconnecting a session
++	 * and the server abruptly shut down (e.g. socket wasn't closed, packet
++	 * had been ACK'ed but no SMB response), don't wait longer than 20s to
++	 * negotiate protocol.
++	 */
++	spin_lock(&server->srv_lock);
++	if (server->tcpStatus == CifsInNegotiate &&
++	    time_after(jiffies, server->lstrp + 20 * HZ)) {
++		spin_unlock(&server->srv_lock);
++		cifs_reconnect(server, false);
++		return true;
++	}
+ 	/*
+ 	 * We need to wait 3 echo intervals to make sure we handle such
+ 	 * situations right:
+@@ -667,7 +680,6 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	 * 65s kernel_recvmsg times out, and we see that we haven't gotten
+ 	 *     a response in >60s.
+ 	 */
+-	spin_lock(&server->srv_lock);
+ 	if ((server->tcpStatus == CifsGood ||
+ 	    server->tcpStatus == CifsNeedNegotiate) &&
+ 	    (!server->ops->can_echo || server->ops->can_echo(server)) &&
+-- 
+2.43.0
+
