@@ -1,135 +1,144 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B611922F6
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Sep 2024 15:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4576019E83F;
+	Tue, 10 Sep 2024 15:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725981279; cv=none; b=e3g7yUVqZgMu/8C1XYuij1r3YvqnlYkRo78VmmYYS/POto/ZXma5aeGLuQ+YLN4LuqqkWb1LGKqEocD32S4skL2J92Oa+CNu2XALXhWKp24BRI3pznZLGiybB5dNFM1tfF6wJdDa/PRg1RdlWJ/GhLY/MI9i23CZmGY7bGS1edM=
+	t=1725981467; cv=none; b=fjSWw3g9xMdZQjgNr6+9H/Sj4BLxgSBEfrxTQZL3WPSP/b9GVQYCOezRfhUhQR+Usae2dWHOlVhB6cBxe07nRuNKvqEe7NYy+UzDRmm1chY/PNz8z/h4Z+yAd3XntnQ+5lQOMqRri0QUjEe03eytmhLniDCNb8VjcFM3frSyChk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725981279; c=relaxed/simple;
-	bh=f6SAxokemxKlX7+3rz2BUX7OQ1UNIgehVhJM21NJzrQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i6HXTqH4+HzgeFWIuNRchw1G8Qclro2vCxKEzb6PmkbDBqf2mUDx/vOwcM5vkaqYX+B/5GfR33sBMFJBdE5GJKB306d0MzagT8kIChk0pu/hH0bk5uGx5myBUPVT7LQNAPvfS88pEWt+Vm2FScLoQVZtjIQ5ZtuG+NrTm5rWLVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=2Q2XzOWJ; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1725981467; c=relaxed/simple;
+	bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ar/P0CcFNg/cKSxNaTOaw/X+iu1VRF49PuMIAd03JAWBmD7kO+1p6JEyBzaVIc0DHdXgVsO6yT0/Z77+t1r/1eMb/q9SYI+zBlP6/mJvt3QCa1Zii1fOFrRQoZkoE0EQFioZAQnOjhLdIE+yBsKH+I64B06otfNKSADXsK66xuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gc5WUsMx; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="2Q2XzOWJ"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42cb60aff1eso24157085e9.0
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Sep 2024 08:14:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gc5WUsMx"
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-39fdd5c44d3so25381055ab.3;
+        Tue, 10 Sep 2024 08:17:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1725981273; x=1726586073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cxJKNon3GV+s7VxK5Fx0SaMdamNiUrcs/pVtSkcTB/w=;
-        b=2Q2XzOWJEWTz7z7YbeiZn8BbjPn5VxgL72kHkhmODSTiiZzgeDVhJIpovkVKgJWQAh
-         ZRKXvgZCNyc2zUgxJewmcW7/dp9lYy9i86OQxiorOxMwMAwzOCmEUE51z4Nl4jpKBGVG
-         CF25UG6s+xWtd9mT18+LfATeSBz8OvSzYQlDoNevxNLwtmM6fhEowzA/NhwBd7EWkCRw
-         K5cuIpMFbGhcENqdphKzuZnhF8Sap3NsEo0ckYtKcY/xAi+nFsyDFB8+CLeGFJrPaIiW
-         AjeKEEbKp2ee8tTrCCMX/eD1lzfV85ANZ9gvpJjYdykSaizYfDy0/xNC0YdFDKNjsbdM
-         MKNA==
+        d=gmail.com; s=20230601; t=1725981464; x=1726586264; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
+        b=gc5WUsMx8pIZ2trVb/RmHuc4fCzgLDygI1ejxjBsCJdIAVhQz/qClgokBd4I2D355X
+         RmagwbokqH1wFxLFyTYh6PtbFIKFeJxnrEZYZZ0nSBfqIdsZrVS+1gZROGH0XTLDePAw
+         r/W2G595/8XjCGpa1KITl4HeqlPtwEdMcV2ubx4w4ECbzcH+9Sh4Iyg1oBZBWTy6zlOi
+         eIW1lFpxmO9WzJPENoVx1t43w3HG8p1bfrWjFhW4DUkc4AhidnV29eS18rBhXobt4n4s
+         Sc3N5OzFPhTx5CTtwJF3dzZ3q3BH5yiKeLG6qeXyDw8gz/y8G34RhnuFwyqFNkfaW0xI
+         iioA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725981273; x=1726586073;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cxJKNon3GV+s7VxK5Fx0SaMdamNiUrcs/pVtSkcTB/w=;
-        b=FTULtW4k9dfBZRMOXAarwsSv5GALITxk3SNedHxKjyQQk2YfO289AdaG454gpR6CHo
-         KB/lwkOBEFoX3gdO8b1vTMK3uaa1DqIa4ikPsekGKbJHJNsj6B55bOubbGqjvaSoDZQ2
-         ZePHqxKBcyd8V+g+WZckt5tLByiyaMzhHyE6zkse7F0yELAfB/vIESWqvi0e8b6kiwVq
-         6UPua2RnsRdRSlfgZYxdYH+iM3HCCurl5MNFYEtHP7ZVznXI38Vu2/Vk2TPnKMeyyjD2
-         SxptAiVn1YlkjN/p+HM23kods5EFwzVG+297RAa6mlitl5bl8s5zhTxP3knu54Xd6PAW
-         kusQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVk/WcX1NbA32kP0IpwHpyRRLlxSnx3AQeETMYUVLem4RWJuZOz9gs0M0dm7Ttr0CF7fDngRpR9Vpf@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywn97qKM1cFr7vec8eh4Ze1Fm0MJgbiM9+ybS9qWNa1Zwm61S2C
-	k6W9PZps4pdjb+TmZ9RYO54mLyLZiSFHzHCppE9x/vJvzdojsYiFAo/zePGxRcQ=
-X-Google-Smtp-Source: AGHT+IFGu2aNgbWA2F98/dVIS3+QyMU0k9t43zpJEzpKPedLFkteqcmYg+lg+V/5M6ri1HF4fcuEEg==
-X-Received: by 2002:adf:ee52:0:b0:374:ca43:abff with SMTP id ffacd0b85a97d-378895d5596mr8823358f8f.26.1725981273073;
-        Tue, 10 Sep 2024 08:14:33 -0700 (PDT)
-Received: from localhost (p5dc68d3d.dip0.t-ipconnect.de. [93.198.141.61])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378956d367csm9092679f8f.68.2024.09.10.08.14.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 08:14:32 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Steve French <sfrench@samba.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb3: Fix complilation for gcc9
-Date: Tue, 10 Sep 2024 17:14:17 +0200
-Message-ID: <20240910151418.1233049-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1725981464; x=1726586264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CtVMpbyC+2ZH9jfs2y9m85UM1ZQme9yQTwkbI129uEw=;
+        b=avQYJx1JjijQ9ASnMA0jMi+B7Lw5lWbuI9BRc+Cv4NBQ/2uPhlTo6CnIaO+5GBYWw6
+         lyuYSGWNHFzIdlqdjLBUSmxofYP6qEOvi/y6xI3aGrqKHJUD+BXeHHX3VkNUdZXSz3Dn
+         rTMdk1tv8PaP6ukvCdGy0RAf2KQMcP5zL2jw2z9T7H66BFPz42i5isEeOGJEB7nwRxsA
+         5fAFdxsf0EIAl88Mb4aFSN5O5fvq2R2Zsy9PH8nQyLVYScPkrSacAm1DJv0u7KtznKq1
+         9KTumsFl2kgk59BnkEiGEdz3iGOx+KWZeFSS5caXpuLz/nLhWrNQ4/SlQ6L26H5fGcic
+         GChw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsxi/l0xEzgdBrU03CA0hNKhkxi+FlcuDVkOupCqBPQ0Y38x9/vi+ubEmMj9eDTac7jh6sR+eCwjtc@vger.kernel.org
+X-Gm-Message-State: AOJu0YxovHTQPO92ww/3DRhE2Yph0nfJN0MhiGhZvV89k5jqt7X+gcvM
+	PzeHBwbkRc3kXPK60igUdDACm+c5SrZrKFKTFrHL050JTGNHWp1q0K+kcnipGtRAooUV9QQMEIu
+	yOs3cmQ6+pEMpDb+rZ+i/KW2NNE4=
+X-Google-Smtp-Source: AGHT+IGMpF8pwgFNdIg0DWIhL+N5THv4d3T4qnz2bC0FRPgKx4X/WAIQJmiEmVJbtYHeJsk3n3iXX5Y5nm4/q6VTn6Y=
+X-Received: by 2002:a05:6e02:1e03:b0:39b:4ec0:645c with SMTP id
+ e9e14a558f8ab-3a04f069c70mr186495915ab.4.1725981464021; Tue, 10 Sep 2024
+ 08:17:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2139; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=f6SAxokemxKlX7+3rz2BUX7OQ1UNIgehVhJM21NJzrQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBm4GJKK1+6uO5IX8tg6GiF8DPH0wUEcXWVLmB4n tKdpptnMT2JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZuBiSgAKCRCPgPtYfRL+ TvC0CACQ+BDQyZMWt1pfCvT4HaWBKcX1hJScwaMeNEDbJR/RTMMeID2s/3J74XvFw3Uyvqrx+3q VtIQNtg8se6zEfzjrtjKdnbRdmcmvjjrTZ3HTTymwwNdqwE74pAFEBhCRpClvlHD7rG+YCtl/ZR OcNIDA3AtOBSaH0Kok8bGQDK3SLnClENPwWFBfmHxoxVohZ2IDxNnnQoterAj7C1g8d7WPBb+Ix 10p+XYerzYkE95+s2m0r/GneJt4C+4PuB1u6W3ivbWRCXVbhrhIRXFQhatHCWJ0uxZKYt5PwmqY U8RqhYXDs/B58puS6TRrBBZC6ugDn8s8kmya98CrcfUqud8X
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+References: <cover.1725935420.git.lucien.xin@gmail.com> <263f1674317f7e3b511bde44ae62a4ff32c2e00b.1725935420.git.lucien.xin@gmail.com>
+ <98474d13-a5c3-44c3-b847-cac662affe26@linux.alibaba.com>
+In-Reply-To: <98474d13-a5c3-44c3-b847-cac662affe26@linux.alibaba.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 10 Sep 2024 11:17:33 -0400
+Message-ID: <CADvbK_c1ibnyFx-u+Vh2FUy7iMMo4jORrSAz2un8tWsYtKmGHg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/5] net: implement QUIC protocol code in
+ net/quic directory
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: network dev <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
+	kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
+	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Compiling an x86_64 allmodconfig on Ubuntu 20.04.6 using gcc Ubuntu
-9.4.0-1ubuntu1~20.04.2) 9.4.0 fails as follows:
+On Mon, Sep 9, 2024 at 11:30=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+>
+>
+>
+> On 9/10/24 10:30 AM, Xin Long wrote:
+> > This commit adds the initial implementation of the QUIC protocol code.
+> > The new net/quic directory contains the necessary source files to
+> > handle QUIC functionality within the networking subsystem:
+> >
+> > - protocol.c: module init/exit and family_ops for inet and inet6.
+> > - socket.c: definition of functions within the 'quic_prot' struct.
+> > - connid.c: management of source and dest connection IDs.
+> > - stream.c: bidi/unidirectional stream handling and management.
+> > - cong.c: RTT measurement and congestion control mechanisms.
+> > - timer.c: definition of essential timers including RTX/PROBE/IDLE/ACK.
+> > - packet.c: creation and processing of various of short/long packets.
+> > - frame.c: creation and processing of diverse types of frames.
+> > - crypto.c: key derivation/update and header/payload de/encryption.
+> > - pnspace.c: packet number namespaces and SACK range handling.
+> > - input.c: socket lookup and stream/event frames enqueuing to userspace=
+.
+> > - output.c: frames enqueuing for send/resend as well as acknowledgment.
+> > - path.c: src/dst path management including UDP tunnels and PLPMTUD.
+> > - test/unit_test.c: tests for APIs defined in some of the above files.
+> > - test/sample_test.c: a sample showcasing usage from the kernel space.
+> >
+>
+> Hi Xin,
+>
+> I was intended to review your implementation, but I didn't know where to
+> start. All your implementations
+> are in one patch, making it quite difficult to review, so I gave up. =F0=
+=9F=99=81
+Hi,
 
-	$ make fs/smb/client/compress/lz77.o
-	...
-	  CC [M]  fs/smb/client/compress/lz77.o
-	In file included from fs/smb/client/compress/lz77.c:10:
-	fs/smb/client/compress/lz77.h: In function ‘__count_common_bytes’:
-	fs/smb/client/compress/lz77.h:220:1: error: no return statement in function returning non-void [-Werror=return-type]
-	  220 | }
-	      | ^
-	cc1: all warnings being treated as errors
-	make[5]: *** [scripts/Makefile.build:244: fs/smb/client/compress/lz77.o] Error 1
-	make[4]: *** [scripts/Makefile.build:485: fs/smb/client] Error 2
-	make[3]: *** [scripts/Makefile.build:485: fs/smb] Error 2
-	make[2]: *** [scripts/Makefile.build:485: fs] Error 2
-	make[1]: *** [Makefile:1926: .] Error 2
-	make: *** [Makefile:224: __sub-make] Error 2
+This is a protocol initial, and it's difficult to split it except that
+I already moved these APIs related files, building configuration and
+documentation. Honestly I couldn't think of a nice way to split more
+that could help much for the review.
 
-That compiler seems to know about __has_builtin but not to have
-__builtin_ctzll. In that case fall back to the implementation that is
-also active in the #ifndef __has_builtin case.
+But you can try https://github.com/lxin/quic/, where you will get more
+information including change history, configurations and all kinds of
+tests running etc, although its first commit for the protocol initial
+is kinda a big patch.
 
-Fixes: 0fa8d04ff36d ("smb3: mark compression as CONFIG_EXPERIMENTAL and fix missing compression operation")
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
-Hello,
+>
+> I think maybe you could consider adding interoperability tests with
+> other variants of QUIC implementations.
+> When we were working on xquic, this helped us discover many
+> implementation issues, and it might be
+> beneficial for you as well.
+>
+> You can check it out from https://interop.seemann.io/.
+As you may already see from the cover-letter, the current interoperability
+tests we've done are via curl http3 over linux QUIC to connect different
+http3 servers that use different QUIC implementations, which are mostly
+covering handshakes and some version negotiations.
 
-feel free to squash this into the original commit.
+For the link shared, it does offer more coverage and it's nice to include
+it in the future.
 
-Best regards
-Uwe
-
- fs/smb/client/compress/lz77.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/fs/smb/client/compress/lz77.h b/fs/smb/client/compress/lz77.h
-index 3d0d3eaa8ffb..4fb939296f39 100644
---- a/fs/smb/client/compress/lz77.h
-+++ b/fs/smb/client/compress/lz77.h
-@@ -200,10 +200,8 @@ static __always_inline long lz77_copy(u8 *dst, const u8 *src, size_t count)
- 
- static __always_inline unsigned int __count_common_bytes(const unsigned long diff)
- {
--#ifdef __has_builtin
--#  if __has_builtin(__builtin_ctzll)
-+#if defined(__has_builtin) && __has_builtin(__builtin_ctzll)
- 	return (unsigned int)__builtin_ctzll(diff) >> 3;
--#  endif
- #else
- 	/* count trailing zeroes */
- 	unsigned long bits = 0, i, z = 0;
-
-base-commit: 6708132e80a2ced620bde9b9c36e426183544a23
--- 
-2.45.2
-
+Thanks for your comment.
