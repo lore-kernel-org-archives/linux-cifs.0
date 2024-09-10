@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8080617BEAE;
-	Tue, 10 Sep 2024 09:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F1C196455;
+	Tue, 10 Sep 2024 10:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725962304; cv=none; b=layV1HzaaFqaEgNsSPKfL/NrnylCHngfG8Ep5j6Bbdw5mbwfEmtjQ9lkmmRYJaJAmRz4mmc6n25PcvWKbOI4q5qmQiDw6LIa2f5Fr59dVd9aRVAozIEeFxDbCadhWIYPyNr2tn5CwkOy/3H/hwARL2BuqHG7s1yM6agGeOwLmuA=
+	t=1725962916; cv=none; b=glKJkxiwDwhH7QI6Z/j6xhXlcVEkRUit+nYqrUtFJ7d9iSx7923qK4rtPI45q3/CnpDxC9NGxrvkfKU0ZXoV8p3+mIcPo0mXKbg6WCGI416G9gpt+8A62okOvqbV4nvtaeFKlx/NISjiiZaVF7y5k52iBlosQUWPQSOawXWxPHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725962304; c=relaxed/simple;
-	bh=9Ww1WAp4VlxtTS4UdwlfJGyCK/nU2KHWk2hi7/D/Ckc=;
+	s=arc-20240116; t=1725962916; c=relaxed/simple;
+	bh=tAE2+XoFiNgHteoUTtc7fp/JUHaErHH1wQ23bYs4q3A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u5uMu/mTwK35i5EaK12u6eTrlJuhln57fUmYxwCoE9vhQ8cQI3MnPiWUYagZ1WSrlJr7XSvPM7Fm/hfn/D6eY08km4jwE9t2906HWLNA6FsTr2cDtQ1dJ8sMSELpcgDZZqNf01FKqktspJUhWPSHd2KT016ehV71UPAoqt6iUcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=u2JIBnPw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=nG7B54eLTrGRxmdtiIhpJl+8MGf+wG8lbJevIATbqGdkSLX6B3W7UyLdy0Xnbd0hg1DiQGp3AduS+5cYTFUHWVIiNxxE+dK3f5UqhbHxU0LAoN6qdt0mbt0Sogk3XoAOzZZnv2szlmHcP7lP2543PcCA59BjNIjg1KPZq90YilQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MY/puQK8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="u2JIBnPw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05240C4CEC3;
-	Tue, 10 Sep 2024 09:58:23 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MY/puQK8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B14FDC4CEC3;
+	Tue, 10 Sep 2024 10:08:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725962304;
-	bh=9Ww1WAp4VlxtTS4UdwlfJGyCK/nU2KHWk2hi7/D/Ckc=;
+	s=korg; t=1725962916;
+	bh=tAE2+XoFiNgHteoUTtc7fp/JUHaErHH1wQ23bYs4q3A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=u2JIBnPwYa6RbDChZOw8kewW/k7P78zfHQQ8xf4UBBeiu9OQj6AgDFw3ONh1iZKyP
-	 vNuTtfEY+QP2nQoFu5rkvS5dKRA5ElYJuikkksmKnfu1S5L6lZXnXjszuxjkKo/wsf
-	 dH1E0ng3hZFnRsCYRmXaAVbntzj+h+wV61L5DlSI=
+	b=MY/puQK89+QMB1+LH/TUoH7Dk60iaMaA8Mb70UXcf2I0RW7J6jsDWG9Awune8KooM
+	 dHFiX/xgoy/5exc+/gtnpgR9T2RZ+JWoaFdt3HGUMqX7yXv4kMUgK9XENqR01ADsJO
+	 5KD3xS3tl9YF/WZo9hUCY58BOgGBfH/6kejIJgwk=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
 	David Howells <dhowells@redhat.com>,
 	Steve French <stfrench@microsoft.com>,
+	Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
+	Pavel Shilovsky <pshilov@microsoft.com>,
 	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <nspmangalore@gmail.com>,
+	Rohith Surabattula <rohiths.msft@gmail.com>,
 	Jeff Layton <jlayton@kernel.org>,
 	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.10 364/375] cifs: Fix SMB1 readv/writev callback in the same way as SMB2/3
-Date: Tue, 10 Sep 2024 11:32:41 +0200
-Message-ID: <20240910092634.852621735@linuxfoundation.org>
+Subject: [PATCH 6.1 073/192] cifs: Fix FALLOC_FL_ZERO_RANGE to preflush buffered part of target region
+Date: Tue, 10 Sep 2024 11:31:37 +0200
+Message-ID: <20240910092601.000270539@linuxfoundation.org>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240910092622.245959861@linuxfoundation.org>
-References: <20240910092622.245959861@linuxfoundation.org>
+In-Reply-To: <20240910092557.876094467@linuxfoundation.org>
+References: <20240910092557.876094467@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,147 +55,104 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.10-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit a68c74865f517e26728735aba0ae05055eaff76c ]
+[ Upstream commit 91d1dfae464987aaf6c79ff51d8674880fb3be77 ]
 
-Port a number of SMB2/3 async readv/writev fixes to the SMB1 transport:
+Under certain conditions, the range to be cleared by FALLOC_FL_ZERO_RANGE
+may only be buffered locally and not yet have been flushed to the server.
+For example:
 
-    commit a88d60903696c01de577558080ec4fc738a70475
-    cifs: Don't advance the I/O iterator before terminating subrequest
+	xfs_io -f -t -c "pwrite -S 0x41 0 4k" \
+		     -c "pwrite -S 0x42 4k 4k" \
+		     -c "fzero 0 4k" \
+		     -c "pread -v 0 8k" /xfstest.test/foo
 
-    commit ce5291e56081730ec7d87bc9aa41f3de73ff3256
-    cifs: Defer read completion
+will write two 4KiB blocks of data, which get buffered in the pagecache,
+and then fallocate() is used to clear the first 4KiB block on the server -
+but we don't flush the data first, which means the EOF position on the
+server is wrong, and so the FSCTL_SET_ZERO_DATA RPC fails (and xfs_io
+ignores the error), but then when we try to read it, we see the old data.
 
-    commit 1da29f2c39b67b846b74205c81bf0ccd96d34727
-    netfs, cifs: Fix handling of short DIO read
+Fix this by preflushing any part of the target region that above the
+server's idea of the EOF position to force the server to update its EOF
+position.
 
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Note, however, that we don't want to simply expand the file by moving the
+EOF before doing the FSCTL_SET_ZERO_DATA[*] because someone else might see
+the zeroed region or if the RPC fails we then have to try to clean it up or
+risk getting corruption.
+
+[*] And we have to move the EOF first otherwise FSCTL_SET_ZERO_DATA won't
+do what we want.
+
+This fixes the generic/008 xfstest.
+
+[!] Note: A better way to do this might be to split the operation into two
+parts: we only do FSCTL_SET_ZERO_DATA for the part of the range below the
+server's EOF and then, if that worked, invalidate the buffered pages for the
+part above the range.
+
+Fixes: 6b69040247e1 ("cifs/smb3: Fix data inconsistent when zero file range")
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reported-by: Steve French <stfrench@microsoft.com>
-Reviewed-by: Paulo Alcantara <pc@manguebit.com>
+cc: Steve French <stfrench@microsoft.com>
+cc: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+cc: Pavel Shilovsky <pshilov@microsoft.com>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifssmb.c | 54 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 46 insertions(+), 8 deletions(-)
+ fs/smb/client/smb2ops.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 6dce70f17208..cfae2e918209 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1261,16 +1261,32 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
- 	return rc;
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 2291081653a8..5e9478f31d47 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3443,13 +3443,15 @@ static long smb3_zero_data(struct file *file, struct cifs_tcon *tcon,
  }
  
-+static void cifs_readv_worker(struct work_struct *work)
-+{
-+	struct cifs_io_subrequest *rdata =
-+		container_of(work, struct cifs_io_subrequest, subreq.work);
-+
-+	netfs_subreq_terminated(&rdata->subreq,
-+				(rdata->result == 0 || rdata->result == -EAGAIN) ?
-+				rdata->got_bytes : rdata->result, true);
-+}
-+
- static void
- cifs_readv_callback(struct mid_q_entry *mid)
+ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+-			    loff_t offset, loff_t len, bool keep_size)
++			    unsigned long long offset, unsigned long long len,
++			    bool keep_size)
  {
- 	struct cifs_io_subrequest *rdata = mid->callback_data;
-+	struct netfs_inode *ictx = netfs_inode(rdata->rreq->inode);
- 	struct cifs_tcon *tcon = tlink_tcon(rdata->req->cfile->tlink);
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct smb_rqst rqst = { .rq_iov = rdata->iov,
- 				 .rq_nvec = 2,
- 				 .rq_iter = rdata->subreq.io_iter };
--	struct cifs_credits credits = { .value = 1, .instance = 0 };
-+	struct cifs_credits credits = {
-+		.value = 1,
-+		.instance = 0,
-+		.rreq_debug_id = rdata->rreq->debug_id,
-+		.rreq_debug_index = rdata->subreq.debug_index,
-+	};
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct inode *inode = file_inode(file);
+ 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+ 	struct cifsFileInfo *cfile = file->private_data;
+-	unsigned long long new_size;
++	struct netfs_inode *ictx = netfs_inode(inode);
++	unsigned long long i_size, new_size, remote_size;
+ 	long rc;
+ 	unsigned int xid;
+ 	__le64 eof;
+@@ -3462,6 +3464,16 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	inode_lock(inode);
+ 	filemap_invalidate_lock(inode->i_mapping);
  
- 	cifs_dbg(FYI, "%s: mid=%llu state=%d result=%d bytes=%zu\n",
- 		 __func__, mid->mid, mid->mid_state, rdata->result,
-@@ -1282,6 +1298,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		if (server->sign) {
- 			int rc = 0;
- 
-+			iov_iter_truncate(&rqst.rq_iter, rdata->got_bytes);
- 			rc = cifs_verify_signature(&rqst, server,
- 						  mid->sequence_number);
- 			if (rc)
-@@ -1306,13 +1323,21 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		rdata->result = -EIO;
- 	}
- 
--	if (rdata->result == 0 || rdata->result == -EAGAIN)
--		iov_iter_advance(&rdata->subreq.io_iter, rdata->got_bytes);
-+	if (rdata->result == -ENODATA) {
-+		__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
-+		rdata->result = 0;
-+	} else {
-+		if (rdata->got_bytes < rdata->actual_len &&
-+		    rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes ==
-+		    ictx->remote_i_size) {
-+			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
-+			rdata->result = 0;
-+		}
++	i_size = i_size_read(inode);
++	remote_size = ictx->remote_i_size;
++	if (offset + len >= remote_size && offset < i_size) {
++		unsigned long long top = umin(offset + len, i_size);
++
++		rc = filemap_write_and_wait_range(inode->i_mapping, offset, top - 1);
++		if (rc < 0)
++			goto zero_range_exit;
 +	}
 +
- 	rdata->credits.value = 0;
--	netfs_subreq_terminated(&rdata->subreq,
--				(rdata->result == 0 || rdata->result == -EAGAIN) ?
--				rdata->got_bytes : rdata->result,
--				false);
-+	INIT_WORK(&rdata->subreq.work, cifs_readv_worker);
-+	queue_work(cifsiod_wq, &rdata->subreq.work);
- 	release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
-@@ -1619,9 +1644,15 @@ static void
- cifs_writev_callback(struct mid_q_entry *mid)
- {
- 	struct cifs_io_subrequest *wdata = mid->callback_data;
-+	struct TCP_Server_Info *server = wdata->server;
- 	struct cifs_tcon *tcon = tlink_tcon(wdata->req->cfile->tlink);
- 	WRITE_RSP *smb = (WRITE_RSP *)mid->resp_buf;
--	struct cifs_credits credits = { .value = 1, .instance = 0 };
-+	struct cifs_credits credits = {
-+		.value = 1,
-+		.instance = 0,
-+		.rreq_debug_id = wdata->rreq->debug_id,
-+		.rreq_debug_index = wdata->subreq.debug_index,
-+	};
- 	ssize_t result;
- 	size_t written;
- 
-@@ -1657,9 +1688,16 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 		break;
- 	}
- 
-+	trace_smb3_rw_credits(credits.rreq_debug_id, credits.rreq_debug_index,
-+			      wdata->credits.value,
-+			      server->credits, server->in_flight,
-+			      0, cifs_trace_rw_credits_write_response_clear);
- 	wdata->credits.value = 0;
- 	cifs_write_subrequest_terminated(wdata, result, true);
- 	release_mid(mid);
-+	trace_smb3_rw_credits(credits.rreq_debug_id, credits.rreq_debug_index, 0,
-+			      server->credits, server->in_flight,
-+			      credits.value, cifs_trace_rw_credits_write_response_add);
- 	add_credits(tcon->ses->server, &credits, 0);
- }
- 
+ 	/*
+ 	 * We zero the range through ioctl, so we need remove the page caches
+ 	 * first, otherwise the data may be inconsistent with the server.
 -- 
 2.43.0
 
