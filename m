@@ -1,103 +1,158 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E4D12B143
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Sep 2024 06:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D381CD1F;
+	Tue, 10 Sep 2024 06:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725949918; cv=none; b=oQfqtHhjlcCi/UOncCVWLSvsu+ciwrIBtXVUVsrjWvPvGbM/K9UNmFrifApQOMD2jRybUEN4+YoJIXVBurTacbzg02jXrWeVCsvzM0OG29I3rNwbHamsraHmz9KBcj0B6o7+xn4ceOXCtk7JKAQMgOEXi868TTykFSgr/N0Z0HA=
+	t=1725950229; cv=none; b=qIgobF8o/y/FtrBgwuE/jDT22PdN/rJ0xNOzgpKzhUAsswBM34URTGUOXDEczd2WdYjxNi6zkVQkYniFTFhdwCG/BGzgZyDbiaaACLnTOsW2rNwOQUtsJzqaz1n+L43zuLZunwy64DgaG/hq/qncqTomNP+XvYl8qLQgsCdKVrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725949918; c=relaxed/simple;
-	bh=sX4Ghjrh3CqwRCkbilerQsQukmQeRNQPy01Wb72hb5Y=;
+	s=arc-20240116; t=1725950229; c=relaxed/simple;
+	bh=kINXuvi1wypT2o8VzSOaOSKacPP9/oktyF0CBpZUseQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PPgo9q1naHAtJ7eCZNkgjfkRl4PZuHCTbeu5QX2PfQ9Z9UKkF/Eh5ELzGPKJCzC7kb7xgEkYH/LZBrlj1cVF2616kTkHo4oGh5Sxy1Ing4uP/qROTMWXKt5u+W50Un1Z9/zg+tp2G5+6iyvlVUu4zKwqJtuKdj/hJ/kS8PbqvnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bL1QSJHZ; arc=none smtp.client-ip=209.85.167.45
+	 To:Cc:Content-Type; b=E3ZfL6v424UMyu+jIUFUO03LgT/D84mhsVqJ7boMqBCFzL+46agPjjf6jOqF6QkASCezw+MZRBf6jvhXWLvvPp+R6R3OLyh7GGLIA2EEdXS8d/howLN5j9tjY8uEp5fxu6rVo5fkwDbNincHf8wr2w8xUVwgfzGzSm1pVusA3xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1rezO7k; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bL1QSJHZ"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5365928acd0so4537258e87.2
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Sep 2024 23:31:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1rezO7k"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5366fd6fdf1so305251e87.0;
+        Mon, 09 Sep 2024 23:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725949915; x=1726554715; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725950225; x=1726555025; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QHHDxP8q1G6s76c8erH0zozRAfA5zWrhh1AM5ajLUl4=;
-        b=bL1QSJHZ1l3pKsCzJyaQ4wSuPPNn+3DDI1gv6BdNTGPK26b2+gTUg+G+Gw+qZ25nnu
-         sisGqgl49rBbUn9Y1umoEWbDzbCM29se3IHTMS2YBgdi1/LMEefMOc8Allo4k1RiDudP
-         JKJJck/pHEUPrJ7U562TYEb898OMjF7SGYZOGEd5IdHDKnsJO/FTkisncppKuHEMfds3
-         WGv8wZqkERpRWfFnI7+SsAWlnFtsvtVDxNTZYf90s6ZAlfwF0nQ5l/IpCisdsimSRCoc
-         ghMoRh96zbjYQpN54T4o6a1T5U/HKcp2O8ZIFLFtfOEjrqpddJjaTE1A/qNMHYwNPlqJ
-         FMIA==
+        bh=D2nLBV36l1E+nJwy+AajRSSrY5cr4kLPDW591ReZ6/c=;
+        b=K1rezO7k74ZWQmwfhiQJvvP+k4vtn8CCsIf4FB0qCGErkypJYs2o+FI0NnKsiRgLJe
+         J3iVY5AI088udLGjyujdDOJsmxiOjxEO3csakU+W8VhSx7tZqJdeBgfWtYHSCcQ+JNwj
+         uUe3SJRdOcXwwOeroaG112ol/1l/GLqbLK305C3NXW5JVRiP/4bScpJ4fxCcV1nVMLs3
+         u9WLMGX4LM66s89MgVfBlbF4NDEhrVniaev6QIOyE1NHPs/zO2newM/26Jka2tmfUD59
+         dO2QnfKbvFukfytThQoePN3+9d2Ddef0EPFYBuZW03rkOwXxdt06f07Jb5qzldoAWyjy
+         i/Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725949915; x=1726554715;
+        d=1e100.net; s=20230601; t=1725950225; x=1726555025;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QHHDxP8q1G6s76c8erH0zozRAfA5zWrhh1AM5ajLUl4=;
-        b=SoD6cBdPU5IzZ3pfl+RrXIjUCvfmkarrFf3dMBCj3EiQc26oaCCsLxfMSTUBZVJOTN
-         yGKwyWTqV4idSuvU74gUNpeamrIHOJH5LAt52T4A4x8so24xFCkLIpczsQajDRn8Atq4
-         4FCXo/QR7UdSaCsXsRrLFzFZcRHUMhwS58cwdwdyGPQxhE5MmKrs1CeIzNrtIKa8gRYu
-         MkHDthwzu7dalEmS/LzJwAFDPH2GS45Fvh/9Z21b9JE5aD9zqC6LN5uvgwhA27MmbbxD
-         aXaZLir8/l7eU8sKPJGvmhM61GGjY29OikK7xuZp2P/Tlqtnvzkph8oki1bwDVSxoYWx
-         A95g==
-X-Forwarded-Encrypted: i=1; AJvYcCUxw0RTCVguM97BPAAfqYzIt5U7M3XheEnyUTqvz1zFp1tnJ0elNwd9Cj/pS/RlDOk7GDVpkNWTepD8@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzeOYS6XlgIMtC8hf27h0CJN/rispiUhFyFPhj/saAQMabo5bL
-	u0MGdsHMByFx98e2Dc2A31J32aA5IHUEu4Fvdy3ClpS0prwOfSGjqTDDqHxizbBbWbsU3tOPsK2
-	QigEBS32xGD1wjTsxuV1LuOicDp5Ja8pm
-X-Google-Smtp-Source: AGHT+IH+7EEc+C2nGHJwLNTOiThWrJQIkEF3cND3sycvQdbIm3Qrf4Plp+uRx9QJO0EjbFk8/NH4qpMM4wHQbWeDI/U=
-X-Received: by 2002:a05:6512:1395:b0:52e:764b:b20d with SMTP id
- 2adb3069b0e04-536587b4d0emr7807964e87.28.1725949914702; Mon, 09 Sep 2024
- 23:31:54 -0700 (PDT)
+        bh=D2nLBV36l1E+nJwy+AajRSSrY5cr4kLPDW591ReZ6/c=;
+        b=SY4xdNDJpHg4tqXPDJGanWQmm5dhdPZcFqtvaQRli1qAGrLFBPbzWFr72w9PNssMPX
+         zrHDaG0cDxQlrWFFSyz6yiQbWa/hx/Mo5NOW5F5wjDvadnLuxP2XxnIOZvfpIzghO8Uv
+         sjnHYEEF7BdXPmBoZ1/3hfQQwJlUJlysRyQkMenosjkyBaI2vRTMwnoh7XrVFoasl14W
+         KevO4y+qNYEd9THthqMJm1n6hqgwtIgUctmy9Y/vfEQG8JSniLLdySdFcTD0S6TyHKg2
+         d8kR188hJrv3RVYZHTJ97UA5Ys+w29m476J7FavS+sJ3pWH+olD4yAQQFgwBQFfE2wyo
+         x8Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtihNyecrlDcf0uKGJx8yOgR7mT1/PANrvv9e66uZGhYxJyHTo6PxgoJZMhKc7FgzlYCybbvicFSNl@vger.kernel.org, AJvYcCX42UKoX0UlDW8b3x5tCHnxI3sy0EnHNJxhivJaqtZKAJqnfYOMWqwVyRnYw1wRJV4si2ZA3AUDRxEj2i0e@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8MLGihUv2Cl3OdHyiADdxa0Sxc7nlqqrgmMStgFc7cspovt1K
+	87jUCycQTUjyojga3W10Sk08tBerofvAljs3TGn00d8L2JB1tmDGTesbOmkfhm+It8MwRTycQgZ
+	0YlPaBOtlXLLPc1P7oRpX6pTOA6M=
+X-Google-Smtp-Source: AGHT+IFPZAx9kPYY95dxfLshFcr9d9jwdnZZtlIhHuaooIrQJWH1Yex4S0wumOZrsLKbcz0QWDgtTbo8e48TS3d8y00=
+X-Received: by 2002:a05:6512:6cf:b0:52c:850b:cfc6 with SMTP id
+ 2adb3069b0e04-536587f5c84mr9047301e87.38.1725950225214; Mon, 09 Sep 2024
+ 23:37:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829115241.3204608-1-liyuesong@vivo.com>
-In-Reply-To: <20240829115241.3204608-1-liyuesong@vivo.com>
+References: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20240822082101.391272-1-chenxiaosong@chenxiaosong.com>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 10 Sep 2024 01:31:43 -0500
-Message-ID: <CAH2r5mt4TNMYe73UJCA_VLXMCm+5p48yDL7dEprJc4fgr0+tsA@mail.gmail.com>
-Subject: Re: [PATCH v1] cifs: convert to use ERR_CAST()
-To: Yuesong Li <liyuesong@vivo.com>
-Cc: pc@manguebit.com, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, opensource.kernel@vivo.com
+Date: Tue, 10 Sep 2024 01:36:53 -0500
+Message-ID: <CAH2r5muWoAobVc53LLkifZL_hE7bfxU6ZgPH2CAfAWoe-9jJrA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/12] smb: fix some bugs, move duplicate definitions
+ to common header file, and some small cleanups
+To: chenxiaosong@chenxiaosong.com
+Cc: linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org, 
+	tom@talpey.com, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
+	bharathsm@microsoft.com, chenxiaosong@kylinos.cn, liuzhengyuan@kylinos.cn, 
+	huhai@kylinos.cn, liuyun01@kylinos.cn
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
+The following patches from the series have been added to cifs-2.6.git
+for-next (the other patches in the series were either for fs/smb/server
+rather than the client, or have already been merged).  Let me know
+if any objections or problems seen.
 
-On Thu, Aug 29, 2024 at 6:53=E2=80=AFAM Yuesong Li <liyuesong@vivo.com> wro=
+d837dec2296c smb: add comment to STATUS_MCA_OCCURED
+15dd39d9da2b smb: move SMB2 Status code to common header file
+5ce486228d95 smb: move some duplicate definitions to common/smbacl.h
+1e4b28faf320 smb/client: rename cifs_ace to smb_ace
+664987e5e550 smb/client: rename cifs_acl to smb_acl
+624d2ce94277 smb/client: rename cifs_sid to smb_sid
+8335848d54c1 smb/client: rename cifs_ntsd to smb_ntsd
+
+On Thu, Aug 22, 2024 at 3:25=E2=80=AFAM <chenxiaosong@chenxiaosong.com> wro=
 te:
 >
-> Use ERR_CAST() as it is designed for casting an error pointer to
-> another type.
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> This macro uses the __force and __must_check modifiers, which are used
-> to tell the compiler to check for errors where this macro is used.
+> Fix some bugs in smb2_open() of smb server.
 >
-> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
-> ---
->  fs/smb/client/connect.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> In order to maintain the code more easily, move some duplicate
+> definitions to common header file.
 >
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index c1c14274930a..c51b536aa9ad 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -4069,7 +4069,7 @@ __cifs_construct_tcon(struct cifs_sb_info *cifs_sb,=
- kuid_t fsuid)
+> Additionally, add some small cleanups to the patchset.
 >
->         ses =3D cifs_get_smb_ses(master_tcon->ses->server, ctx);
->         if (IS_ERR(ses)) {
-> -               tcon =3D (struct cifs_tcon *)ses;
-> +               tcon =3D ERR_CAST(ses);
->                 cifs_put_tcp_session(master_tcon->ses->server, 0);
->                 goto out;
->         }
+> v1->v2:
+>   - update patch #2 according to Namjae's suggestions.
+>   - add patch #6~9 to rename 'cifs_ntsd' 'cifs_sid' 'cifs_acl' 'cifs_ace'=
+ according to Namjae's suggestions.
+>   - add patch #12 to explained why the typo 'STATUS_MCA_OCCURED' was not =
+corrected.
+>
+> v1: https://lore.kernel.org/all/20240820143319.274033-1-chenxiaosong@chen=
+xiaosong.com/
+>
+> ChenXiaoSong (12):
+>   smb/server: fix return value of smb2_open()
+>   smb/server: fix potential null-ptr-deref of lease_ctx_info in
+>     smb2_open()
+>   smb/server: remove useless assignment of 'file_present' in smb2_open()
+>   smb/client: fix typo: GlobalMid_Sem -> GlobalMid_Lock
+>   smb/server: update misguided comment of smb2_allocate_rsp_buf()
+>   smb/client: rename cifs_ntsd to smb_ntsd
+>   smb/client: rename cifs_sid to smb_sid
+>   smb/client: rename cifs_acl to smb_acl
+>   smb/client: rename cifs_ace to smb_ace
+>   smb: move some duplicate definitions to common/smbacl.h
+>   smb: move SMB2 Status code to common header file
+>   smb: add comment to STATUS_MCA_OCCURED
+>
+>  fs/smb/client/cifsacl.c                |  224 +--
+>  fs/smb/client/cifsacl.h                |   99 +-
+>  fs/smb/client/cifsfs.c                 |    6 +-
+>  fs/smb/client/cifsglob.h               |   22 +-
+>  fs/smb/client/cifsproto.h              |   18 +-
+>  fs/smb/client/cifssmb.c                |    6 +-
+>  fs/smb/client/smb2file.c               |    2 +-
+>  fs/smb/client/smb2inode.c              |    6 +-
+>  fs/smb/client/smb2maperror.c           |    2 +-
+>  fs/smb/client/smb2misc.c               |    2 +-
+>  fs/smb/client/smb2ops.c                |   16 +-
+>  fs/smb/client/smb2pdu.c                |   14 +-
+>  fs/smb/client/smb2pdu.h                |    8 +-
+>  fs/smb/client/smb2proto.h              |    2 +-
+>  fs/smb/client/smb2transport.c          |    2 +-
+>  fs/smb/client/xattr.c                  |    4 +-
+>  fs/smb/{client =3D> common}/smb2status.h |    6 +
+>  fs/smb/common/smbacl.h                 |  121 ++
+>  fs/smb/server/oplock.c                 |    4 +-
+>  fs/smb/server/server.c                 |    2 +-
+>  fs/smb/server/smb2misc.c               |    2 +-
+>  fs/smb/server/smb2pdu.c                |   17 +-
+>  fs/smb/server/smb_common.c             |    2 +-
+>  fs/smb/server/smbacl.h                 |  111 +-
+>  fs/smb/server/smbstatus.h              | 1822 ------------------------
+>  fs/smb/server/transport_rdma.c         |    2 +-
+>  26 files changed, 314 insertions(+), 2208 deletions(-)
+>  rename fs/smb/{client =3D> common}/smb2status.h (99%)
+>  create mode 100644 fs/smb/common/smbacl.h
+>  delete mode 100644 fs/smb/server/smbstatus.h
+>
 > --
 > 2.34.1
 >
