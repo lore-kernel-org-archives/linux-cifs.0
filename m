@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F1C196455;
-	Tue, 10 Sep 2024 10:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B685318C340;
+	Tue, 10 Sep 2024 10:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725962916; cv=none; b=glKJkxiwDwhH7QI6Z/j6xhXlcVEkRUit+nYqrUtFJ7d9iSx7923qK4rtPI45q3/CnpDxC9NGxrvkfKU0ZXoV8p3+mIcPo0mXKbg6WCGI416G9gpt+8A62okOvqbV4nvtaeFKlx/NISjiiZaVF7y5k52iBlosQUWPQSOawXWxPHc=
+	t=1725964196; cv=none; b=OCC72nOSt1OowSSPDGQnwxyM5BEpI1YWlmBRaYYuCX12J1QuzyutjnMvMOqbOfVAX9dFZrLpwZrvfJPrTp2gg0iJxnFn1Q9PByR/fkOf6fuSoOJVv/0kaehCjAnlsM1T+kE91wddyLLR/Byc3R3mVIQc3suDjSDqUYpxS9zyr00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725962916; c=relaxed/simple;
-	bh=tAE2+XoFiNgHteoUTtc7fp/JUHaErHH1wQ23bYs4q3A=;
+	s=arc-20240116; t=1725964196; c=relaxed/simple;
+	bh=CSPE2hltHc3s9Iley0fLgbkpoaP9tJsDBPRnzMOeqNo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nG7B54eLTrGRxmdtiIhpJl+8MGf+wG8lbJevIATbqGdkSLX6B3W7UyLdy0Xnbd0hg1DiQGp3AduS+5cYTFUHWVIiNxxE+dK3f5UqhbHxU0LAoN6qdt0mbt0Sogk3XoAOzZZnv2szlmHcP7lP2543PcCA59BjNIjg1KPZq90YilQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MY/puQK8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ewPxxD5KOYPQlUnGNT+ShnJ/MaVYChqsOpV47z6VjPdiONvdynV7++eq1eDT+GxgWNtIEk4CuYgUs9fIdyKx7ucwHSCUy/yrYL4OdEek0O6UAVTDl/pTp8VckZ3mgYCn95Buh3c0sy2KBhnQaPhQjqNzeTH9HRY4cOLibDasz/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=SPrkkSXy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MY/puQK8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B14FDC4CEC3;
-	Tue, 10 Sep 2024 10:08:35 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="SPrkkSXy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E6BC4CEC6;
+	Tue, 10 Sep 2024 10:29:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725962916;
-	bh=tAE2+XoFiNgHteoUTtc7fp/JUHaErHH1wQ23bYs4q3A=;
+	s=korg; t=1725964196;
+	bh=CSPE2hltHc3s9Iley0fLgbkpoaP9tJsDBPRnzMOeqNo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MY/puQK89+QMB1+LH/TUoH7Dk60iaMaA8Mb70UXcf2I0RW7J6jsDWG9Awune8KooM
-	 dHFiX/xgoy/5exc+/gtnpgR9T2RZ+JWoaFdt3HGUMqX7yXv4kMUgK9XENqR01ADsJO
-	 5KD3xS3tl9YF/WZo9hUCY58BOgGBfH/6kejIJgwk=
+	b=SPrkkSXyy1if+pU/kg2cSdeg3qROrp0kZyfCg2Td21fl7kJJgY82KkLwndAPJxtrN
+	 JfqUPElHewR/u7DMSIacaiRLhKiOgfnPdDLf1C5S2YutIIw3l67lJdZ4AUVaX26JWk
+	 d3fQR4nb906Ma5vQ+p73ppG/IMMqCmF7Jw09IdQI=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,12 +38,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	linux-mm@kvack.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 073/192] cifs: Fix FALLOC_FL_ZERO_RANGE to preflush buffered part of target region
-Date: Tue, 10 Sep 2024 11:31:37 +0200
-Message-ID: <20240910092601.000270539@linuxfoundation.org>
+Subject: [PATCH 6.6 101/269] cifs: Fix FALLOC_FL_ZERO_RANGE to preflush buffered part of target region
+Date: Tue, 10 Sep 2024 11:31:28 +0200
+Message-ID: <20240910092611.813779531@linuxfoundation.org>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240910092557.876094467@linuxfoundation.org>
-References: <20240910092557.876094467@linuxfoundation.org>
+In-Reply-To: <20240910092608.225137854@linuxfoundation.org>
+References: <20240910092608.225137854@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -115,10 +115,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 2291081653a8..5e9478f31d47 100644
+index 012d6ec12a69..acd5d7d79352 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3443,13 +3443,15 @@ static long smb3_zero_data(struct file *file, struct cifs_tcon *tcon,
+@@ -3186,13 +3186,15 @@ static long smb3_zero_data(struct file *file, struct cifs_tcon *tcon,
  }
  
  static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
@@ -135,8 +135,8 @@ index 2291081653a8..5e9478f31d47 100644
 +	unsigned long long i_size, new_size, remote_size;
  	long rc;
  	unsigned int xid;
- 	__le64 eof;
-@@ -3462,6 +3464,16 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 
+@@ -3204,6 +3206,16 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
  	inode_lock(inode);
  	filemap_invalidate_lock(inode->i_mapping);
  
