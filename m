@@ -1,111 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE7C1BF80D;
-	Tue, 10 Sep 2024 17:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3F23D3B8;
+	Wed, 11 Sep 2024 21:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725989028; cv=none; b=V6j1bq0JucQ+XX/phVZsUSkWwyURpky02rt89sKZAaa7N0p06z9YIqPruSlv/di1hropJibTv5gO6N/0ukeJa0Enhsr+tC8Zz0h9cEgOGcg+JGVeTaFWSAfrhUOJDgsb8MMCTS/2g6hon/AT/JQykjow+iEgg3neCYEYfqi47N4=
+	t=1726090014; cv=none; b=pGfN5+p596PNyrL+vQcICwC4EvKFtbtE2XFY4LsWvMkqoK0qM9IN98wqkLLDfsHX6QwgK88zsrcm2N4kI5bTZaBvxN712pv25hoJybIjHLRqN9bdwdjoECm1N1EUEKnrdaYUpixkJiJH6Bi2pKzAUqxgJSD3PmVUpuNO9MaKUo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725989028; c=relaxed/simple;
-	bh=2HpttHegFA1bFFguN7zA8hJD4HBGeNlLW2d3dWxNu3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eDF/rxsUs7mNlCHHdH6aJRbazRfqcbxayGxCkHm605GZ6ZSZ7zRi9ci/UA8bEB75DM1Mjb937iVu45ogUBh2nM3kPHNj33K+r/PDOqaZF0vOursF1wOglWz7GvjEA+rgY8YiOBytx5PfP/Paufuc5Dvra9W/t4hq9aKiVXcQov0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EznWeSZr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726090014; c=relaxed/simple;
+	bh=qxmwKIKZZVH0IEXWiQwUCTvUGTIMoGFuw3rr4W/Y/I0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qa0ScIVyU+qmxR9SKwdKcHIVUKfTQ6avlFdR744Xya496yJAKqxYj8I7hVxgxb5mta4xD6/TcUp2Cfi+Zhpd0FPy5zZyqQMgG4qF3tKAFAJgqC2wWXpbbLlzdbm8/ebkWUoi4qSPbKhTJmknIAH/mSvFTepUJkwF1qBCpuTSBuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4yGDUrO; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EznWeSZr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B616BC4CECE;
-	Tue, 10 Sep 2024 17:23:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725989028;
-	bh=2HpttHegFA1bFFguN7zA8hJD4HBGeNlLW2d3dWxNu3Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EznWeSZrAG8me+2EPEvTxrjmF88CL0JWmuenYOV7TtVFf4SH8DHPusMnn5tr5jIkS
-	 0bHKrYQ8CypL6ywxZwvAjFq/6+4RFB+4JhhOaxw46Qh0IhFxxQEkg5jEMBr8oALMo+
-	 uh/wQdc8ijo+B6a1MyvWRH73bkKp5fOKk38G/dGxhZWZCtXCrhxWDQKVeZODcOfA2u
-	 hMJZ4KWI9HM2XCLxpuKLWIqlgK76XO0lSbKj/FJgs3ytYR9zdBlTydgmr8n1Oq2eqR
-	 VBPfT68iJP/kVn6QNqQxRh+YUdqD0wCg6GUsIG3TXlZuSUoqGVtEkfPJsmlyO26Gj0
-	 UsIIiaXVbWCKA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.com>,
-	Rickard Andersson <rickaran@axis.com>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 8/8] smb: client: fix hang in wait_for_response() for negproto
-Date: Tue, 10 Sep 2024 13:23:28 -0400
-Message-ID: <20240910172332.2416254-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240910172332.2416254-1-sashal@kernel.org>
-References: <20240910172332.2416254-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4yGDUrO"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-535694d67eeso253803e87.0;
+        Wed, 11 Sep 2024 14:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726090011; x=1726694811; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sqtRh/pJ/kG5Ee3Qg3j3oLtps4VUqaM2CM4az1A8dtU=;
+        b=R4yGDUrORiuusEmgJ892Gtc1j2MrvfpX6WP9FUB7PJQtlDrcYgWgqAvEdBa0RvGeOD
+         HrESLNFEnRbLwzS8zZgUGDyzlFzs6tPR9/AbLpBCpD2ksHtHv0GwPVy0+J8+kA/Gi+/8
+         MFsv1C9j7Xw0HZze/f2w30T3svAAWTVTcTRP79bLmTqWw/koJqZohLizPmSxzZakoJCV
+         03ahKm+xxVrYhG2y05nwz1oUoZb5lFPhKY3C65dv+lzsHaf460oHFs79ZLGYWzcdBBSf
+         9lc8rm4hvRuT/PCU4PDk6ZDP4/EgrMeJGFVhKhB8AHG6HwVgSy8KAKPNTf+QhaNDip0v
+         e2hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726090011; x=1726694811;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sqtRh/pJ/kG5Ee3Qg3j3oLtps4VUqaM2CM4az1A8dtU=;
+        b=SWXLTIaTM1bfbywkg9fDfw4IJyNgn64hQlq7LoQW89GmNRHuTS6Z084uso8ekNkFKR
+         2llWtpqeRh3hqICZPibTdXeovSUywtjgRlG+dvpaCKsJmkfYH6YkBvw/UtxgJAKc/bIS
+         Hmn/NuUyfjscLhjbw7FKOnfLX0CpEglTnjZrsVddfNJQnvjb+X31M6qT+dHowhUQ1rPX
+         puVuC2DilfATpuPpBZH9GZUo3cVAG475NsdkyLMDGnjZfzNFm8ZdLiBFGs3v6fWVg950
+         Z1lGtI3AMc4wlQuUF2x6oAg10iteHFlr9pePFzGP4jrtN4G6HuNFNwR9YuK1dZt9ZzKK
+         EFQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZN11RdrWLYJDk4wVtKOJpR6CAv1WFc3LMqwOX457Is7S8n3jkhn9s9GgUmF8dOwjw/7FyFMuk7fvg5eg5@vger.kernel.org, AJvYcCXzg98YYY7Qz4GLWUIF2dbzeKGT8IgQE5m5krikrdP0sm7D2iK+i5RbwBwJD4xF27IyjsieH9FbouFN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb726cf4/Pte35Tjl2WCMOn7k0c55iqnH1DxvCMHt8osiDx7dL
+	J9oHox9olWnV9hU3dXfjwIUJqGZW6sdoML/m0GqB4eJG1ZJEhkwzbw0SpZuQVxwbwapUjNmVY07
+	hyhS+euHlsm4ou1SCwxQTo5XCgGQOiuGYjBM=
+X-Google-Smtp-Source: AGHT+IFC8+ySnmybQlygTyoRyhYMxq7uAqdH0Tu9Gl/JShGnHyNqwXrbsLhR7L3k9aYMEkxezsOAaYTLJ7OjHjnL66A=
+X-Received: by 2002:a05:6512:12cb:b0:52f:27e:a82e with SMTP id
+ 2adb3069b0e04-5367909dca5mr192274e87.21.1726090010686; Wed, 11 Sep 2024
+ 14:26:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.109
-Content-Transfer-Encoding: 8bit
+References: <20240910151418.1233049-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20240910151418.1233049-2-u.kleine-koenig@baylibre.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 11 Sep 2024 16:26:39 -0500
+Message-ID: <CAH2r5mu_PT+34JqL7O6yqfDua=6NNU+AP4+n56FJSc1X5Rpp3Q@mail.gmail.com>
+Subject: Re: [PATCH] smb3: Fix complilation for gcc9
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Steve French <sfrench@samba.org>, Enzo Matsumiya <ematsumiya@suse.de>, 
+	Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Paulo Alcantara <pc@manguebit.com>
+this looks like it doesn't apply anymore due to changes in "smb:
+client: compress: LZ77 code improvements cleanup"
 
-[ Upstream commit 7ccc1465465d78e6411b7bd730d06e7435802b5c ]
+Let me know if you see any problems building the current for-next
 
-Call cifs_reconnect() to wake up processes waiting on negotiate
-protocol to handle the case where server abruptly shut down and had no
-chance to properly close the socket.
+13b68d44990d (HEAD -> for-next, origin/for-next) smb: client:
+compress: LZ77 code improvements cleanup
+1dcb0b607b9b smb: client: insert compression check/call on write requests
+ee71379301eb smb3: mark compression as CONFIG_EXPERIMENTAL and fix
+missing compression operation
 
-Simple reproducer:
+Enzo,
+Is it easier for you to update patch 1 and 3, to make it smaller so
+you don't have to add code in patch 1 that you remove in patch 3?
+Also let me know if other patches to try?
 
-  ssh 192.168.2.100 pkill -STOP smbd
-  mount.cifs //192.168.2.100/test /mnt -o ... [never returns]
+On Tue, Sep 10, 2024 at 10:14=E2=80=AFAM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@baylibre.com> wrote:
+>
+> Compiling an x86_64 allmodconfig on Ubuntu 20.04.6 using gcc Ubuntu
+> 9.4.0-1ubuntu1~20.04.2) 9.4.0 fails as follows:
+>
+>         $ make fs/smb/client/compress/lz77.o
+>         ...
+>           CC [M]  fs/smb/client/compress/lz77.o
+>         In file included from fs/smb/client/compress/lz77.c:10:
+>         fs/smb/client/compress/lz77.h: In function =E2=80=98__count_commo=
+n_bytes=E2=80=99:
+>         fs/smb/client/compress/lz77.h:220:1: error: no return statement i=
+n function returning non-void [-Werror=3Dreturn-type]
+>           220 | }
+>               | ^
+>         cc1: all warnings being treated as errors
+>         make[5]: *** [scripts/Makefile.build:244: fs/smb/client/compress/=
+lz77.o] Error 1
+>         make[4]: *** [scripts/Makefile.build:485: fs/smb/client] Error 2
+>         make[3]: *** [scripts/Makefile.build:485: fs/smb] Error 2
+>         make[2]: *** [scripts/Makefile.build:485: fs] Error 2
+>         make[1]: *** [Makefile:1926: .] Error 2
+>         make: *** [Makefile:224: __sub-make] Error 2
+>
+> That compiler seems to know about __has_builtin but not to have
+> __builtin_ctzll. In that case fall back to the implementation that is
+> also active in the #ifndef __has_builtin case.
+>
+> Fixes: 0fa8d04ff36d ("smb3: mark compression as CONFIG_EXPERIMENTAL and f=
+ix missing compression operation")
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@baylibre.com>
+> ---
+> Hello,
+>
+> feel free to squash this into the original commit.
+>
+> Best regards
+> Uwe
+>
+>  fs/smb/client/compress/lz77.h | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/compress/lz77.h b/fs/smb/client/compress/lz77.=
+h
+> index 3d0d3eaa8ffb..4fb939296f39 100644
+> --- a/fs/smb/client/compress/lz77.h
+> +++ b/fs/smb/client/compress/lz77.h
+> @@ -200,10 +200,8 @@ static __always_inline long lz77_copy(u8 *dst, const=
+ u8 *src, size_t count)
+>
+>  static __always_inline unsigned int __count_common_bytes(const unsigned =
+long diff)
+>  {
+> -#ifdef __has_builtin
+> -#  if __has_builtin(__builtin_ctzll)
+> +#if defined(__has_builtin) && __has_builtin(__builtin_ctzll)
+>         return (unsigned int)__builtin_ctzll(diff) >> 3;
+> -#  endif
+>  #else
+>         /* count trailing zeroes */
+>         unsigned long bits =3D 0, i, z =3D 0;
+>
+> base-commit: 6708132e80a2ced620bde9b9c36e426183544a23
+> --
+> 2.45.2
+>
+>
 
-Cc: Rickard Andersson <rickaran@axis.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/connect.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 21b344762d0f..87ce71b39b77 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -673,6 +673,19 @@ allocate_buffers(struct TCP_Server_Info *server)
- static bool
- server_unresponsive(struct TCP_Server_Info *server)
- {
-+	/*
-+	 * If we're in the process of mounting a share or reconnecting a session
-+	 * and the server abruptly shut down (e.g. socket wasn't closed, packet
-+	 * had been ACK'ed but no SMB response), don't wait longer than 20s to
-+	 * negotiate protocol.
-+	 */
-+	spin_lock(&server->srv_lock);
-+	if (server->tcpStatus == CifsInNegotiate &&
-+	    time_after(jiffies, server->lstrp + 20 * HZ)) {
-+		spin_unlock(&server->srv_lock);
-+		cifs_reconnect(server, false);
-+		return true;
-+	}
- 	/*
- 	 * We need to wait 3 echo intervals to make sure we handle such
- 	 * situations right:
-@@ -684,7 +697,6 @@ server_unresponsive(struct TCP_Server_Info *server)
- 	 * 65s kernel_recvmsg times out, and we see that we haven't gotten
- 	 *     a response in >60s.
- 	 */
--	spin_lock(&server->srv_lock);
- 	if ((server->tcpStatus == CifsGood ||
- 	    server->tcpStatus == CifsNeedNegotiate) &&
- 	    (!server->ops->can_echo || server->ops->can_echo(server)) &&
--- 
-2.43.0
+--=20
+Thanks,
 
+Steve
