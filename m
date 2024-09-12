@@ -1,154 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4D81A42B3
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Sep 2024 11:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59C91A2622;
+	Thu, 12 Sep 2024 12:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726141818; cv=none; b=dhvgHTg4eyOaTRlVZZlvitnSPGW75VMBuYg3gkGj8aKO9b7TkmkrvzIAIg67UgjMAfJYPfD3S9kxnoAaTa6F5dfJSt3Wic+G//bgf0b3NM3Fx4zzYyjGa22NX2G9vdiLp8ZgSVA4OhOVWATwfeoPqDv9dctyOpfuYzpWmUwmu9Q=
+	t=1726142761; cv=none; b=LOPF50jZzONAwQsuYBVebv3FMTy6r0cbDJrOycQ5PYHUkA8gtor+ldkfi7lJGx5xC28ZxKBJAEDjZ2xS2/vh4yec7bHq3Gl7SAVEbRsiC6sRyJK4/u2PSgH6BjgZjZ4xowbQPGHUhAsNS0DzuCyj/sy+sd1zDS1N1uW5v3yIyMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726141818; c=relaxed/simple;
-	bh=Xl6nNLBK8GTBKxLIKD61vE0uvYByirFE263h76WjaRM=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=mOwxGBBj2zbMb2nE7dzol62XzCjFhh2MbzXA77OI4UtYJ8Wuc2LDcMILG9j+OU541yBAfDYpFPiUu9Wi+XuznCP48YGFzRY+I9dg7Pg8K9vmmDwWYN7ZpqeOQ74l58vDFPnA1NpeQJXtftVP1lILZ496kw79tBYli3Ou6oYIyNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c60cbSQ6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1726142761; c=relaxed/simple;
+	bh=Tvx8ty3Re4/zz/tINhZ29nrFM+JFehh/c4aSeICembc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q1ctZG1ExliZYEl1j9UgbL5fWkBhYzqHPGSa5Fulyvqo5R4YZ3AhKSu51miqxaGMdsLg+9qVtaj4u8vH7dkv2uR6YcFWiRCAIQZMm96FcHStG0pmPerKqeOFvML3buYdO6ODlALCsIDknDcedbM/TV9X+RS9QWLZ09rATSdjcoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJ9tnwPp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c60cbSQ6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726141816;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jLN3U1yZ7TMderZrIcQLdov+Z22mdFuW5sMvjEe338o=;
-	b=c60cbSQ6ECuz5CYf30bQT21XKzAF2vUr3AaRfycsazw8kc1hhv3LjCx63uQua0fynN39ni
-	IKxLHo1+o5sfXjqIl2HP2UQXzkaAurVjauw18Tn2FSNWeUFSAetouxrr0vfACo3Sd1/CMr
-	pOZetFAZcrH3qVJxk5u3rd/F5U8NzFs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-615-FdrR9fltPha0VMOFb_6fTA-1; Thu,
- 12 Sep 2024 07:50:13 -0400
-X-MC-Unique: FdrR9fltPha0VMOFb_6fTA-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F3217197702F;
-	Thu, 12 Sep 2024 11:50:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1FA4519560AA;
-	Thu, 12 Sep 2024 11:50:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>,
-    Steve French <stfrench@microsoft.com>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Stephen Rothwell <sfr@canb.auug.org.au>, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix up netfs-writeback vs cifs fixes merge conflicts
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJ9tnwPp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3D45C4CEC5;
+	Thu, 12 Sep 2024 12:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726142760;
+	bh=Tvx8ty3Re4/zz/tINhZ29nrFM+JFehh/c4aSeICembc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tJ9tnwPpM2G25d3OmnOAmTtGzM5P3l3CSxCTDInOpkBInXcFQUKlmaOv2kBKhBOfF
+	 Zi8APJLcxptc702OSQ9NrnmCGcDuWfyKlAR2YGfWot4QvXPiacXQVkdMqwTeBUJtAg
+	 m0oeE8tEoZjdb9rTng2fWxtBqVcQr918w0nybgi5VmZSEcLD3jH/fPbBvzhloAXEpV
+	 Ca6PQTJJAH2S40ual5jkHraw0ucZwABlmW2s4Ctp3IWQXKDWLx7dRZwEZYRusMCKQm
+	 UKisrwFZltPioNgpc7mNzSPUiDX6CzSq/yq98FTUmProhEIqZ7FMl7cHaSEYtELwtH
+	 DsQOXrasPGfkQ==
+Received: by pali.im (Postfix)
+	id 7FE5CC01; Thu, 12 Sep 2024 14:05:55 +0200 (CEST)
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/7] cifs: Show debug message when SFU Fifo type was detected
+Date: Thu, 12 Sep 2024 14:05:45 +0200
+Message-Id: <20240912120548.15877-5-pali@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240912120548.15877-1-pali@kernel.org>
+References: <20240912120548.15877-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1131387.1726141806.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Sep 2024 12:50:06 +0100
-Message-ID: <1131388.1726141806@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-    =
+For debugging purposes it is a good idea to show detected SFU type also for
+Fifo. Debug message is already print for all other special types.
 
-Fix up the conflicts between the netfslib development patches and cifs fix
-commits due to:
-
-        a68c74865f517e26728735aba0ae05055eaff76c
-        cifs: Fix SMB1 readv/writev callback in the same way as SMB2/3
-
-conflicting with:
-
-        ee4cdf7ba857
-        netfs: Speed up buffered reading"
-
-This will need to be applied if/when Christian's vfs.netfs branch is merge=
-d.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <stfrench@microsoft.com>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifssmb.c |   14 +++++++-------
- fs/smb/client/smb2pdu.c |    2 --
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ fs/smb/client/inode.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 6ad22732c25c..d0df0c17b18f 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1266,9 +1266,7 @@ static void cifs_readv_worker(struct work_struct *wo=
-rk)
- 	struct cifs_io_subrequest *rdata =3D
- 		container_of(work, struct cifs_io_subrequest, subreq.work);
- =
-
--	netfs_subreq_terminated(&rdata->subreq,
--				(rdata->result =3D=3D 0 || rdata->result =3D=3D -EAGAIN) ?
--				rdata->got_bytes : rdata->result, true);
-+	netfs_read_subreq_terminated(&rdata->subreq, rdata->result, false);
- }
- =
-
- static void
-@@ -1327,9 +1325,9 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 		rdata->result =3D 0;
- 	} else {
--		if (rdata->got_bytes < rdata->actual_len &&
--		    rdata->subreq.start + rdata->subreq.transferred + rdata->got_bytes =
-=3D=3D
--		    ictx->remote_i_size) {
-+		size_t trans =3D rdata->subreq.transferred + rdata->got_bytes;
-+		if (trans < rdata->subreq.len &&
-+		    rdata->subreq.start + trans =3D=3D ictx->remote_i_size) {
- 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 			rdata->result =3D 0;
- 		}
-@@ -1337,7 +1335,9 @@ cifs_readv_callback(struct mid_q_entry *mid)
- =
-
- 	rdata->credits.value =3D 0;
- 	rdata->subreq.transferred +=3D rdata->got_bytes;
--	netfs_read_subreq_terminated(&rdata->subreq, rdata->result, false);
-+	trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_progress);
-+	INIT_WORK(&rdata->subreq.work, cifs_readv_worker);
-+	queue_work(cifsiod_wq, &rdata->subreq.work);
- 	release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 95377bb91950..bb8ecbbe78af 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4614,8 +4614,6 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 			      0, cifs_trace_rw_credits_read_response_clear);
- 	rdata->credits.value =3D 0;
- 	rdata->subreq.transferred +=3D rdata->got_bytes;
--	if (rdata->subreq.start + rdata->subreq.transferred >=3D rdata->subreq.r=
-req->i_size)
--		__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 	trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_progress);
- 	INIT_WORK(&rdata->subreq.work, smb2_readv_worker);
- 	queue_work(cifsiod_wq, &rdata->subreq.work);
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index d8c39989840e..70c32b40ede0 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -541,6 +541,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
+ 	fattr->cf_mode &= ~S_IFMT;
+ 
+ 	if (fattr->cf_eof == 0) {
++		cifs_dbg(FYI, "Fifo\n");
+ 		fattr->cf_mode |= S_IFIFO;
+ 		fattr->cf_dtype = DT_FIFO;
+ 		return 0;
+-- 
+2.20.1
 
