@@ -1,110 +1,100 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788693A1DB;
-	Thu, 12 Sep 2024 14:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F191B78FC
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Sep 2024 15:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726153089; cv=none; b=dVY5IPT0TnMRcGgoN0Kc0JkrHDQ6kWrhit8DQ64+y18Mq/vc87OklBR/JaEJNqjYgOYAGBAnnlBoKHIFUfGzouy1nwRi1zEG2CClBAQQcy/RQuTIbLMNlnFvtYNpm2cgpM+Wzici9wzqaf/3HaKOCDM7iT+GT/kijbznZVxeVLI=
+	t=1726156739; cv=none; b=Sc8tipgfZwqaf+5l6IUjc3B919lLaPEDC3vCVxnD5CqgorI9yIa4RiiMgMVv+e4XUPeU1B/RrCWDaEA98JzMUwi990xbVaS+T8O0s6lfkkm++o9yEHZrYKFXLclu7cN3VJ405w94RUhmabRL2M7jFSYDmWki3Pso3LSk530+5PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726153089; c=relaxed/simple;
-	bh=LWN0XQ8R0ISShbSDlS7uR86bs77bzSgfW7KPVHHxvTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Lp/rSwfbtzgeUK6fx3sJdOWmRm9spW/vJ2lvaA3f4S8hvmc68eXgU1p6t5UMNNtPewvTDqdpNyRn4iko0IZVwaRV/xCRbmes7fvoJmBy8RDfeEHiNqwhuZ60kE/80bkv8hgJogy8yKSEmltusdianZbs/yQAt3RVVbavuTbUIH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZFwLaZt; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726156739; c=relaxed/simple;
+	bh=2Ah+UB8jWbF2jpIVo3QtWSvjzROR0a+owJiVel0AMQs=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=rlujuWQF18JoAMUcyVLwfyCNJlgVZNuSORdKO7P2qeb47FBuxpAD1D/PBt81r/PrUls7kYYTt/CtINyecEO6lS/U7SeakxP+bNmZhwj3CWjrMiBytOlUljmYi/mBlUgIrBr/8mnfA38144BPlBbyw8iBQ4jwvNcTQlHgt2NUZxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U16/QnKW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZFwLaZt"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a07b73cf4eso5017905ab.3;
-        Thu, 12 Sep 2024 07:58:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726153087; x=1726757887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EwSYGxGurQ2imcLaO+EzXdvdJa/BCUOpOoCzBs2qpDk=;
-        b=JZFwLaZt9/z8kCnUz/ZrAntqsn3/zU9g41tOz7ce09H9orPv62nXLK17qltiZ9nYat
-         Zh5N2BWfLj746rG6PcSK4X0L/O8a40bS9kyDTvz1w0n1VZPUjye+TLfrWrbwD4Q7rZEx
-         i/qQFNRf++WU2YC8+S1F/3rxJbtFM8qTlAysdZNYApbz9LaQRmyV7jM1M8yawtdw6xDV
-         wkTgiMr59yITr1CdEkBl8vGq9s2X+Z7IsyUUuQDyMzyS8r9xkisMQbwW32zHt4BH8TD6
-         KGSQvb9gyOIvn411V+8L7/bLDjltTOB8iVkF16lUCrF328oPXiVs6/urvW129dZmQhOS
-         gruQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726153087; x=1726757887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EwSYGxGurQ2imcLaO+EzXdvdJa/BCUOpOoCzBs2qpDk=;
-        b=FgzoxTTKkjFS7y6DgKnihk7jN/5y9C25rcsEroQ0XlD4udNGxavrT/nkLN8sA6TfSU
-         6wzv7wm3raDnupBWxOD/e1+rFq2/QmEJUi7QjQkgWjuEtnjUFO+VHjwRL5cYAokP+zZ9
-         IcFJcqNANBgrqWekUy3rpnDJgZX+x7EQ9sQQC6wwaUEFChy941thQfuLYcRx4cBTYmJG
-         dUzKtmGpS0J2Frt3cKXvo6PbkhBlRw7g2sLLpmRTIJRPa15rtrPiKiqVmyLTje8y2jbZ
-         SayjMH48W2Ze/tSrxtg1SfUPJ//fFaWjNskhx6MnXQMkIOn+wV2r6Ve1e6ABzFz0CLsN
-         OhsA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3ktLfCxH7f64E7JV1jW4uC7e4LNMGfWjSxWVNEHJNeP7pFgX/ShSZvtaZ8sj39GM+WxfEHIGLDOT7@vger.kernel.org
-X-Gm-Message-State: AOJu0YzE8IOCmSewCCxxQs5pJmJCO8Wd2t9SFChNhsOU49oJ7qHs9YCv
-	Fbth3wBxORNs5TT2s3iu898W2Agh0ovFZcUN21oFw1C80DELQzf+gPa0ZAxmBnh1psMOoA0Vlr6
-	POYF1Ts1kRPVn7Mov91zsqHfCHwQsM483
-X-Google-Smtp-Source: AGHT+IE1dcFJmRk8rOYMkareqk7kacw/NHqgZiQNqWPZ0okhMBzgiT14nXkJ9dpmaI41l53/EODcOsso9QaC/XpE904=
-X-Received: by 2002:a05:6e02:154a:b0:382:b3f8:9f72 with SMTP id
- e9e14a558f8ab-3a084909691mr33962225ab.15.1726153087339; Thu, 12 Sep 2024
- 07:58:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U16/QnKW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726156736;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YL60uZXjVMA/Ai1HS+Y5Ta5iPB8j6En/OIngcfUhpNs=;
+	b=U16/QnKW6yEh6xKM+Sv8yP+XbIZZA0jBYBrqAxzAtLVqmxT2z4D3BT3tA+SF0jEoGXxcHK
+	J3g53C/4O60nb0V0tPe8Zl046xOM+DoXvQknga2BrK6aUHAk7jY/7QpEapyJWrg76wxO2w
+	Vvc3OiuuxngRsAnye7PUsVGccN4uycg=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-10-Hx4GskIqONK8Mkk5DvRy9g-1; Thu,
+ 12 Sep 2024 11:58:53 -0400
+X-MC-Unique: Hx4GskIqONK8Mkk5DvRy9g-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0FF0B194510D;
+	Thu, 12 Sep 2024 15:58:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 98C241956052;
+	Thu, 12 Sep 2024 15:58:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <nspmangalore@gmail.com>,
+    Rohith Surabattula <rohiths.msft@gmail.com>,
+    Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix signature miscalculation
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1725935420.git.lucien.xin@gmail.com> <887eb7c776b63c613c6ac270442031be95de62f8.1725935420.git.lucien.xin@gmail.com>
- <20240911170048.4f6d5bd9@kernel.org>
-In-Reply-To: <20240911170048.4f6d5bd9@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 12 Sep 2024 10:57:56 -0400
-Message-ID: <CADvbK_eOW2sFcedQMzqkQ7yhm--zasgVD-uNhtaWJJLS21s_aQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] net: integrate QUIC build configuration into
- Kconfig and Makefile
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: network dev <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
-	kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
-	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1197026.1726156728.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2024 16:58:48 +0100
+Message-ID: <1197027.1726156728@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Sep 11, 2024 at 8:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon,  9 Sep 2024 22:30:19 -0400 Xin Long wrote:
-> > This commit introduces build configurations for QUIC within the network=
-ing
-> > subsystem. The Kconfig and Makefile files in the net directory are upda=
-ted
-> > to include options and rules necessary for building QUIC protocol suppo=
-rt.
->
-> Don't split out trivial config changes like this, what's the point.
-> It just make build testing harder.
-I will move this to the Patch 3/5.
+    =
 
->
-> Speaking of which, it doesn't build on 32bit:
->
-> ERROR: modpost: "__udivmoddi4" [net/quic/quic.ko] undefined!
-> ERROR: modpost: "__umoddi3" [net/quic/quic.ko] undefined!
-> ERROR: modpost: "__udivdi3" [net/quic/quic.ko] undefined!
-The tests were done on x86_64, aarch64, s390x and ppc64le.
-Sorry for missing 32bit machines.
+Fix the calculation of packet signatures by adding the offset into a page
+in the read or write data payload when hashing the pages from it.
 
->
-> If you repost before 6.12-rc1 please post as RFC, due to LPC / netconf
-> we won't have enough time to review for 6.12 even if Linus cuts -rc8.
-Copy that.
+Fixes: 39bc58203f04 ("cifs: Add a function to Hash the contents of an iter=
+ator")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/smb/client/cifsencrypt.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index 6322f0f68a17..b0473c2567fe 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -129,7 +129,7 @@ static ssize_t cifs_shash_xarray(const struct iov_iter=
+ *iter, ssize_t maxsize,
+ 			for (j =3D foffset / PAGE_SIZE; j < npages; j++) {
+ 				len =3D min_t(size_t, maxsize, PAGE_SIZE - offset);
+ 				p =3D kmap_local_page(folio_page(folio, j));
+-				ret =3D crypto_shash_update(shash, p, len);
++				ret =3D crypto_shash_update(shash, p + offset, len);
+ 				kunmap_local(p);
+ 				if (ret < 0)
+ 					return ret;
+
