@@ -1,102 +1,73 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2276D1C0DFD;
-	Thu, 12 Sep 2024 22:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CAB173;
+	Fri, 13 Sep 2024 00:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726181991; cv=none; b=trTn8baYTwMMEYhkN33JTxil2uL+iK8iGyDcKmqHVEBJDSY674KmbOtPZG7aDR3EaASaKwUP7XrtwGs5A2Kk8gI95UAl2zuBt0YxUZf/1mouZWJx31WJUWdBm2fwUeeLmGz99I3hytEX4HpkeUR58jxbIemk89QWosAEw3IA5tE=
+	t=1726185747; cv=none; b=QQ66AyTVjU0Eav+yxQ+koG4kPvYg69rA5TdOWJy9JPE7wlRS2plvNb7f2oC/IlCQyXl2CD7CoE7OQq+wdipEr8Lg574K8GWJnTQGyVcCDMT0AAd9I0zc6sfq3xP+AE+M0rzoe3TZE4FME5x6Ed1tqn1ZGTwt3ud7sdKFKX3VhRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726181991; c=relaxed/simple;
-	bh=4siqtKFDz4uzhWubXK426efMpBSn/FJEyytEbnsUcLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=d6jYn9oH9jeW0WXspi4ILppr+Uqa9A8Pnj2GRvZ+3yPDCmEZJ0P9CJELZaAwxiFNpq3fPvqvom5Zecjre9Imgp/cq9PybVh6ZrMlrqg8lcjv+s8qh6aTWBlPal8dsF/J8A5t4w794G+EDJS5fWLLb9MZawmlrUmTFPcJ7OKAcAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=pW3Fbfmx; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1726185747; c=relaxed/simple;
+	bh=To3GrvyKIBX3UYEvwiX7EvVEOXarD/UT+eqRyoj0ne4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qnM3679qBQrwNmovvv0+EkLG+lTBHPt6l5u1zx7awXr+b7CjNfsE6OSgf+o246fuq97qdf8RhQqdfK3lVPld/CDUcCAiyDcVKX1WI5z3Ld0oaVI58iyW5L5djftJ/FZSthJjpLE+/XJWGSq7GIg8MHdnpNTS3HiEw/M7kOEUD0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TuFkx1Sb; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="pW3Fbfmx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1726181986;
-	bh=6AMhea1tG+hxCPWgiWf5i/rSNORvMqktHk50U4TqoLc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=pW3Fbfmxkxs0A15AFTjCgFw6AcV52feNaT5gtYvN+WgbLnVpDqemcrEQ3geQJg6+m
-	 t/KWyjwkKXUstofmJMlYz790rwAUqPx2WH9IeeISj3I5+9FS8oXl9o8abfFd+esFtI
-	 iW7k7KxxmksWT+af9dqKblQOdQp6Kfr7PQJZ0RBaI7GyEePGpH//rlw2rXjvIBRRvb
-	 Pqtpuqp7/KJRg1FZJEEljlr3/Oivuy3YTiKyF1zLNwFNqwDn81t/9UTZsip1nEcATd
-	 Dza9DMXSdJUsaUD6e3nQZN8QI8xojW2N91wX9e+sa0kGU9pWynBw4dP28UdU/viKB6
-	 9An9Wuq5o2Yfg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4XvQ0RTBz4xD9;
-	Fri, 13 Sep 2024 08:59:46 +1000 (AEST)
-Date: Fri, 13 Sep 2024 08:59:45 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Christian Brauner <brauner@kernel.org>, Steve French
- <smfrench@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Steve French
- <stfrench@microsoft.com>
-Subject: linux-next: manual merge of the vfs-brauner tree with the cifs tree
-Message-ID: <20240913085945.40e7accf@canb.auug.org.au>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TuFkx1Sb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=RPHRL
+	nQ6x+m895bVcK5uCZBBPny+jYlt2NTStIDkmjk=; b=TuFkx1Sb5zYXhw+gnPtMv
+	JTYGYGL+FSTdEjQ3XTIHK9fGRBxF2D7D6ik/rmpjnQE+GDEEb+TKRq9X2IaRJlKx
+	4LKWBmtcliiLLaFVhQc7iWP/ED33D3wYeMgP49PyexJ7Ao2oUB0CMWSmsmKpw1y1
+	rshOqP+ey40MFfCQajY/aI=
+Received: from localhost.localdomain (unknown [58.243.42.99])
+	by gzga-smtp-mta-g2-4 (Coremail) with SMTP id _____wD3H1XjgONm44GTBA--.21527S2;
+	Fri, 13 Sep 2024 08:01:40 +0800 (CST)
+From: Qianqiang Liu <qianqiang.liu@163.com>
+To: ematsumiya@suse.de,
+	sfrench@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Qianqiang Liu <qianqiang.liu@163.com>
+Subject: [PATCH] smb: client: compress: fix a potential issue of freeing an invalid pointer
+Date: Fri, 13 Sep 2024 08:00:54 +0800
+Message-Id: <20240913000053.123052-1-qianqiang.liu@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/.1u85ch.izUR01El6xnk4/3";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3H1XjgONm44GTBA--.21527S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKw17WrWxtFyfGr4fXF15twb_yoW3XrX_JF
+	s2grW8ur45Jr1DK3Wvkr1SyF45X3yUXr1xJF1DtFyYyFWDCan0ywsrtws8GF4kWrWfKw4x
+	Wwn2kF98ZFWxCjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjLvKUUUUUU==
+X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiYBBYamV4JNEUBwABs4
 
---Sig_/.1u85ch.izUR01El6xnk4/3
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The dst pointer may not be initialized when calling kvfree(dst)
 
-Hi all,
+Fixes: 13b68d44990d9 ("smb: client: compress: LZ77 code improvements cleanup")
+Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+---
+ fs/smb/client/compress.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Today's linux-next merge of the vfs-brauner tree got a conflict in:
+diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+index 65d3d219e8bc..daf84e39861c 100644
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -318,7 +318,7 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ {
+ 	struct iov_iter iter;
+ 	u32 slen, dlen;
+-	void *src, *dst;
++	void *src, *dst = NULL;
+ 	int ret;
+ 
+ 	if (!server || !rq || !rq->rq_iov || !rq->rq_iov->iov_base)
+-- 
+2.34.1
 
-  fs/smb/client/cifsencrypt.c
-
-between commit:
-
-  192bbbf2bd41 ("cifs: Fix signature miscalculation")
-
-from the cifs tree and commits:
-
-  4aa571d67e81 ("cifs: Don't support ITER_XARRAY")
-
-from the vfs-brauner tree.
-
-I fixed it up (the latter removed the line update by the former, so I just
-use latter version) and can carry the fix as necessary. This is now fixed
-as far as linux-next is concerned, but any non trivial conflicts should
-be mentioned to your upstream maintainer when your tree is submitted for
-merging.  You may also want to consider cooperating with the maintainer
-of the conflicting tree to minimise any particularly complex conflicts.
-
-
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/.1u85ch.izUR01El6xnk4/3
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbjcmEACgkQAVBC80lX
-0GxT1ggAjcas1R4hrpyPah6NiWOL9zVddi5c2hV9X8RYkQULRzdRpcCUbZPvPFKw
-ort05W7GlCY0yR4+eEIgW2DfY6hH/dO1Gy2Y+Gio9FP5DUfM9BfXR74/Ni3NGXiT
-/nIgNA98bBnLhfkdG/ZbMFDWwNQJWiAk+nT9d3l3e+VX42647KJn1d4tuk5yI+j1
-l2P61vNzR6TNNQQLoZZHpTrFFk+rQNt+spIaJeQL5jAYYuEfXl83QjS5eBoXiAuS
-N8Os/37yeYWaXD7eznGqhziJUZNqN82JUfeUN6HIflNNA8C54LaC78SGDhjEDG/K
-mVTcRsbqjEsvTY0a7FvGy1727ZoVfw==
-=kV7v
------END PGP SIGNATURE-----
-
---Sig_/.1u85ch.izUR01El6xnk4/3--
