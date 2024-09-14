@@ -1,47 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145387489;
-	Fri, 13 Sep 2024 22:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04AD1C27;
+	Sat, 14 Sep 2024 01:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726267557; cv=none; b=NysMfcj6TakmlXg4gRaUK/bXMVeurtYjRtr7BnS5AS2zViB4jfuTLEbNkbwtvMPsSZdJw7oZRoSXuwvNqkEuS/Rr4CY7iWnynDbAZmrbPFcH5RvKYliacTVRooc+mgha72lBHCgvWaHV8OxxAd9QygxuH74C7zXfuoCsVUw5mW8=
+	t=1726275945; cv=none; b=p0sdqh4OxsAhwd5mgYDRkl+lztUbQkrBFHjNixigLmfW/CXPs7Aj9dUC7RFVbOeXMTrZbp0oNp+FEvPupFmYY6yiJnmLM/QAfrh6c75O6mGiZHlc8kvtGKGx2lWBCMkh7jFELKZPxkGEvKB0/omy8Q0E3KKbynsq/g1iZ3U192I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726267557; c=relaxed/simple;
-	bh=myl4NhahxrGqZ/mFtRCKp9aHtsE2z+lA/LBN1a+GZGI=;
+	s=arc-20240116; t=1726275945; c=relaxed/simple;
+	bh=9gy7LiB1QQHwZI+Pdhi5cz/26o44zIsBi1OE+6liICY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NJfe3ufzUW1UNOcqAwIf4/Ut/s/FnceU7RidWBSnEG4nhiqw8FMS7+b8sChD6A0DKX9qLl0aiN6twrIi6Y22jAaax68ECr9kt7nTSFNn+CO2XkdC3S4y9VmrKv1UFatepo2kQzS18jgGQoBCJKmMTWzRlCQfuxP4oaJuGG4/YkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sosoVW5i; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=DLccan7ezcv1/NJIVUGQkkijt0qTpuZ8tnSlW7NZN4WzBOw5TTlnnA8vOceroufi2lcBfa71QzF94Q+IOR9uu2OnHR02mvM3L3uaLEkReCalTrwWJoYfYcVXfAc5ykA9gD9scid6JG8qVP4NDnijrPq9Jfz+pMwlwdD/B3igJsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqZJKQHA; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sosoVW5i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94701C4CEC0;
-	Fri, 13 Sep 2024 22:45:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726267556;
-	bh=myl4NhahxrGqZ/mFtRCKp9aHtsE2z+lA/LBN1a+GZGI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sosoVW5i7IOGOxHes+x4sTqpVtVPLW6VgDnlht9z2oMSXzbDvu7QnwVMqRJkVzxFx
-	 dehFVTJEIQTvOIw6uVr/Dj7uwrfF9l+Vn1nRBmQhgeIMZBoR6XAaX1E0jb4/qKxoAI
-	 9hGBJustWWWqPdAtIgvOAuNZYPTZPtNqdZxyJU/Y9aleL/DSqgTTtoWN2nSuE1TrZ/
-	 mnDbq19f1oxkVt5BE2gSj2oZV9ZAvoQN6n30xoOgdWswHxC+Fw/R8KnRu/sQZ5GxFx
-	 7NY9UK1RVWm837qdfGkU6G9fyGmOCVeG2tcij0J897bUV0TJoc6LkUPA5gZg6lOt4I
-	 pgzBWVKFXM6Jg==
-Received: by pali.im (Postfix)
-	id 82402725; Sat, 14 Sep 2024 00:45:51 +0200 (CEST)
-Date: Sat, 14 Sep 2024 00:45:51 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/7] cifs: Fix creating of SFU fifo and socket special
- files
-Message-ID: <20240913224551.xf3tfxohvqwoloy7@pali>
-References: <20240912120548.15877-1-pali@kernel.org>
- <20240912120548.15877-7-pali@kernel.org>
- <20240913200721.7egunkwp76qo5yy7@pali>
- <CAH2r5mvEa8mUrK7mEKFiimkb1asTWA0p7ADz4937yoxM916RAw@mail.gmail.com>
- <CAH2r5mskDvz2-iAYY8mknuBVtPq_C5sQyggYEwDivtGPc83B1g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqZJKQHA"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20551e2f1f8so16828425ad.2;
+        Fri, 13 Sep 2024 18:05:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726275943; x=1726880743; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GkiDsRe4AiGLxd5SW64hD1FIKOllYw7LyinEu6P1pMI=;
+        b=cqZJKQHA8KHvTixK+X+0SsZkIkTC2eK5+Yw1cB7VTD+ziZANLcJ5eIdSzOaor06kr8
+         Z01dRG2yFzsq2flfEzxZvQIz4whvl7/b9JVsAU4xo5WoGPmRlPXhB28Sf6OyFsg7y+xp
+         3U+5GoXC91BOLiH8vTpaKNTBj2ijVErdSdj6palfAtONpOqTpghbzxPbfnANronQWWSq
+         56LoY0BtFi6oYG5mAeVkAbWHoVhdaphKiqKSQmYzUEHl3KwHnSiQqzHuuA0fNBAhrc/F
+         I6YFqgJvK/yQVnku3vRjk+MoPAyXzGsmv48BJjNi465jNpbWZZEL9nknOqmeXPpLhjzI
+         jFdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726275943; x=1726880743;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GkiDsRe4AiGLxd5SW64hD1FIKOllYw7LyinEu6P1pMI=;
+        b=BQaYj0guZVaCxoozdPO/8p4VAeVfcAYJ0Oi0fl4xE841rC0wBT1L/Q1Qn5DrfArsNk
+         nWNu1ns6Z82XOdsMxC8wYY8sQsllK7WQrYojPNsMff4pGQbEY3+X7vI40WF4UwK6oKsc
+         NAhW/Yh3OeKHb0YqQh1+QijLKpatF4u8iQdwCOnKlj5siPvxuBqc6i/ezerlT1wquNVH
+         ABMwXvVyXMQR6wd961PuBH7/1EHwjjV2pe5HJ8ylhjS1QuV5uv7rOXPRoUnrGcP9CsPx
+         +wd7LWKrc0OLZCM3y89NKvhMOHvcMZNSilhAmUcPibn7MUIpFkrWx/sWbgUIwdhq0AIk
+         ytDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWl7nBEsIt2uhFSGlPRcYtB0l5Jh+YAt0Hy6LibxBf5YetX+07aZBDSfen7HAGpm6T9l1UCABNZvKJC@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxHUnGotrkxJfrc067W7p4w+7/dywOstWk0dhKy/PH1HmuhqPP
+	G21vtG59TghM4w/nA8CrUECMPdOsy7zQ/mg4c/ULqfjKLsz2LgW8ier5Hswpfds=
+X-Google-Smtp-Source: AGHT+IFumMGTNCHfWNRCOO+XP+esgYojDUGb/+5tHXyYx7D6FCQQ/vya83X52c7WIjgKSX/L0q8ryA==
+X-Received: by 2002:a17:902:e84a:b0:1fb:57e7:5bb4 with SMTP id d9443c01a7336-20782a69aa5mr67763765ad.37.1726275943018;
+        Fri, 13 Sep 2024 18:05:43 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:97be:e4c7:7fc1:f125])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207947365ddsm1937725ad.283.2024.09.13.18.05.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 18:05:42 -0700 (PDT)
+Date: Fri, 13 Sep 2024 18:05:41 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next 0/5] net: implement the QUIC protocol in linux
+ kernel
+Message-ID: <ZuThZdPILnCKpOmO@pop-os.localdomain>
+References: <cover.1725935420.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,226 +88,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mskDvz2-iAYY8mknuBVtPq_C5sQyggYEwDivtGPc83B1g@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <cover.1725935420.git.lucien.xin@gmail.com>
 
-Yes, but it was enabled also before this patch series.
+On Mon, Sep 09, 2024 at 10:30:15PM -0400, Xin Long wrote:
+> 4. Performance testing via iperf
+> 
+>   The performance testing was conducted using iperf [5] over a 100G
+>   physical NIC, evaluating various packet sizes and MTUs:
+>   
+>   - QUIC vs. kTLS:
+>   
+>     UNIT        size:1024      size:4096      size:16384     size:65536
+>     Gbits/sec   QUIC | kTLS    QUIC | kTLS    QUIC | kTLS    QUIC | kTLS
+>     ────────────────────────────────────────────────────────────────────
+>     mtu:1500    1.67 | 2.16    3.04 | 5.04    3.49 | 7.84    3.83 | 7.95
+>     ────────────────────────────────────────────────────────────────────
+>     mtu:9000    2.17 | 2.41    5.47 | 6.19    6.45 | 8.66    7.48 | 8.90
+>   
+>   - QUIC(disable_1rtt_encryption) vs. TCP:
+>   
+>     UNIT        size:1024      size:4096      size:16384     size:65536
+>     Gbits/sec   QUIC | TCP     QUIC | TCP     QUIC | TCP     QUIC | TCP
+>     ────────────────────────────────────────────────────────────────────
+>     mtu:1500    2.17 | 2.49    3.59 | 8.36    6.09 | 15.1    6.92 | 16.2
+>     ────────────────────────────────────────────────────────────────────
+>     mtu:9000    2.47 | 2.54    7.66 | 7.97    14.7 | 20.3    19.1 | 31.3
+>   
+>   
+>   The performance gap between QUIC and kTLS may be attributed to:
+> 
+>   - The absence of Generic Segmentation Offload (GSO) for QUIC.
+>   - An additional data copy on the transmission (TX) path.
+>   - Extra encryption required for header protection in QUIC.
+>   - A longer header length for the stream data in QUIC.
+> 
 
-Now I have checked that even old Linux 4.19 cifs kernel client detects
-empty file with system attribute as fifo. This functionality is there
-for a long time. Probably since first cifs/sfu version.
+This is not appealing.
 
-On Friday 13 September 2024 17:33:22 Steve French wrote:
-> One other thing which worried me a bit is that I confirmed that an
-> empty file with the system attribute set was matched as a FIFO file
-> type (when you mount with "sfu") - this seems risky.
-> 
-> On Fri, Sep 13, 2024 at 5:14 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > How did you find the format of the FIFO and SOCK file types?  I
-> > couldn't find any references to those so added two new types to allow
-> > current Linux to be able to create these (especially since they are
-> > opaque to the server and thus low risk).
-> >
-> > > +     case S_IFSOCK:
-> > > -             strscpy(pdev.type, "LnxSOCK");
-> > > +             /* SFU socket is system file with one zero byte */
-> > > +             pdev_len = 1;
-> > > +             pdev.type[0] = '\0';
-> > >               break;
-> > >       case S_IFIFO:
-> > > -             strscpy(pdev.type, "LnxFIFO");
-> > > +             /* SFU fifo is system file which is empty */
-> > > +             pdev_len = 0;
-> >
-> > My worry about the suggested change above is that it is possible that
-> > we could accidentally match to an empty file. We intentionally added
-> > the two new dev.type fields for these to avoid collisions with other
-> > things (and since they are Linux specific).  It seems risky to have an
-> > empty file with the system attribute marked as a FIFO, and similarly a
-> > file with one byte null as Socket.   Since this is for only the Linux
-> > client to recognize, I wanted to do something safe for those file
-> > types less likely to be confusing (ie strings for Socket and FIFO that
-> > were similar in length and format to the other special files seemed
-> > intuitive) and "LnxFIFO" and LnxSOCK" were used as the tags in the
-> > file to reduce confusion ie the tags for those two start with "Lnx" -
-> > ie "something used for Linux client" not related to the original
-> > Interix (those begin with "Intx").
-> >
-> > Note that in the long run we hope to use reparse points by default in
-> > more servers to store special files like this but there are a few
-> > cases for unusual workloads that need special file support that would
-> > have to use sfu still.  The newer reparse tags that Windows uses "WSL"
-> > have the advantage that they require fewer roundtrips to query (since
-> > the file type is in the reparse tag).
-> >
-> > Also noticed an interesting problem when mounted with "sfu" -
-> > "smbgetinfo filebasicinfo /mnt/fifo1" will hang (in sys_open).  Is
-> > that expected for a FIFO?
-> >
-> > On Fri, Sep 13, 2024 at 3:07 PM Pali Rohár <pali@kernel.org> wrote:
-> > >
-> > > On Thursday 12 September 2024 14:05:47 Pali Rohár wrote:
-> > > > SFU-style fifo is empty file with system attribute set. This format is used
-> > > > by old Microsoft POSIX subsystem and later also by OpenNT/Interix subsystem
-> > > > (which replaced Microsoft POSIX subsystem and is part of Microsoft SFU).
-> > > >
-> > > > SFU-style socket is file which has system attribute set and file content is
-> > > > one zero byte. This format was introduced in Interix 3.0 subsystem, as part
-> > > > of the Microsoft SFU 3.0 and is used also by all later versions. Previous
-> > > > versions had no UNIX domain socket support.
-> > > >
-> > > > Currently when sfu mount option is specified then CIFS creates fifo and
-> > > > socket special files with some strange LnxSOCK or LnxFIFO content which is
-> > > > not compatible with Microsoft SFU and neither recognized by other SMB
-> > > > implementations which have some SFU support, including older Linux cifs
-> > > > implementations.
-> > > >
-> > > > So when sfu mount option is specified, create all fifo and socket special
-> > > > files compatible with SFU format to achieve SFU interop, as it is expected
-> > > > by sfu mount option.
-> > > >
-> > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > >
-> > > Fixes: 72bc63f5e23a ("smb3: fix creating FIFOs when mounting with "sfu" mount option")
-> > > Fixes: 518549c120e6 ("cifs: fix creating sockets when using sfu mount options")
-> > >
-> > > I located commits which introduced those strange LnxSOCK or LnxFIFO
-> > > types which are not compatible with SFU. I would suggest to add those
-> > > two Fixes: tags into commit message for reference.
-> > >
-> > > > ---
-> > > >  fs/smb/client/cifssmb.c |  8 ++++----
-> > > >  fs/smb/client/smb1ops.c |  2 +-
-> > > >  fs/smb/client/smb2ops.c | 29 +++++++++++++++++++----------
-> > > >  3 files changed, 24 insertions(+), 15 deletions(-)
-> > > >
-> > > > diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> > > > index cfae2e918209..0ffc45aa5e2c 100644
-> > > > --- a/fs/smb/client/cifssmb.c
-> > > > +++ b/fs/smb/client/cifssmb.c
-> > > > @@ -1076,8 +1076,8 @@ SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
-> > > >       pSMB->OpenFlags |= cpu_to_le16(REQ_MORE_INFO);
-> > > >       pSMB->Mode = cpu_to_le16(access_flags_to_smbopen_mode(access_flags));
-> > > >       pSMB->Mode |= cpu_to_le16(0x40); /* deny none */
-> > > > -     /* set file as system file if special file such
-> > > > -        as fifo and server expecting SFU style and
-> > > > +     /* set file as system file if special file such as fifo,
-> > > > +      * socket, char or block and server expecting SFU style and
-> > > >          no Unix extensions */
-> > > >
-> > > >       if (create_options & CREATE_OPTION_SPECIAL)
-> > > > @@ -1193,8 +1193,8 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
-> > > >       req->AllocationSize = 0;
-> > > >
-> > > >       /*
-> > > > -      * Set file as system file if special file such as fifo and server
-> > > > -      * expecting SFU style and no Unix extensions.
-> > > > +      * Set file as system file if special file such as fifo, socket, char
-> > > > +      * or block and server expecting SFU style and no Unix extensions.
-> > > >        */
-> > > >       if (create_options & CREATE_OPTION_SPECIAL)
-> > > >               req->FileAttributes = cpu_to_le32(ATTR_SYSTEM);
-> > > > diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-> > > > index e1f2feb56f45..e03c91a49650 100644
-> > > > --- a/fs/smb/client/smb1ops.c
-> > > > +++ b/fs/smb/client/smb1ops.c
-> > > > @@ -1078,7 +1078,7 @@ cifs_make_node(unsigned int xid, struct inode *inode,
-> > > >       /*
-> > > >        * Check if mounted with mount parm 'sfu' mount parm.
-> > > >        * SFU emulation should work with all servers, but only
-> > > > -      * supports block and char device (no socket & fifo),
-> > > > +      * supports block and char device, socket & fifo,
-> > > >        * and was used by default in earlier versions of Windows
-> > > >        */
-> > > >       if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL))
-> > > > diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> > > > index 9c2d065d3cc4..9e90672caf60 100644
-> > > > --- a/fs/smb/client/smb2ops.c
-> > > > +++ b/fs/smb/client/smb2ops.c
-> > > > @@ -5066,26 +5066,32 @@ static int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-> > > >       struct cifs_fid fid;
-> > > >       unsigned int bytes_written;
-> > > >       struct win_dev pdev = {};
-> > > > +     size_t pdev_len = 0;
-> > > >       struct kvec iov[2];
-> > > >       __u32 oplock = server->oplocks ? REQ_OPLOCK : 0;
-> > > >       int rc;
-> > > >
-> > > >       switch (mode & S_IFMT) {
-> > > >       case S_IFCHR:
-> > > > +             pdev_len = sizeof(pdev);
-> > > >               memcpy(pdev.type, "IntxCHR\0", 8);
-> > > >               pdev.major = cpu_to_le64(MAJOR(dev));
-> > > >               pdev.minor = cpu_to_le64(MINOR(dev));
-> > > >               break;
-> > > >       case S_IFBLK:
-> > > > +             pdev_len = sizeof(pdev);
-> > > >               memcpy(pdev.type, "IntxBLK\0", 8);
-> > > >               pdev.major = cpu_to_le64(MAJOR(dev));
-> > > >               pdev.minor = cpu_to_le64(MINOR(dev));
-> > > >               break;
-> > > >       case S_IFSOCK:
-> > > > -             strscpy(pdev.type, "LnxSOCK");
-> > > > +             /* SFU socket is system file with one zero byte */
-> > > > +             pdev_len = 1;
-> > > > +             pdev.type[0] = '\0';
-> > > >               break;
-> > > >       case S_IFIFO:
-> > > > -             strscpy(pdev.type, "LnxFIFO");
-> > > > +             /* SFU fifo is system file which is empty */
-> > > > +             pdev_len = 0;
-> > > >               break;
-> > > >       default:
-> > > >               return -EPERM;
-> > > > @@ -5100,14 +5106,17 @@ static int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-> > > >       if (rc)
-> > > >               return rc;
-> > > >
-> > > > -     io_parms.pid = current->tgid;
-> > > > -     io_parms.tcon = tcon;
-> > > > -     io_parms.length = sizeof(pdev);
-> > > > -     iov[1].iov_base = &pdev;
-> > > > -     iov[1].iov_len = sizeof(pdev);
-> > > > +     if (pdev_len > 0) {
-> > > > +             io_parms.pid = current->tgid;
-> > > > +             io_parms.tcon = tcon;
-> > > > +             io_parms.length = pdev_len;
-> > > > +             iov[1].iov_base = &pdev;
-> > > > +             iov[1].iov_len = pdev_len;
-> > > > +
-> > > > +             rc = server->ops->sync_write(xid, &fid, &io_parms,
-> > > > +                                          &bytes_written, iov, 1);
-> > > > +     }
-> > > >
-> > > > -     rc = server->ops->sync_write(xid, &fid, &io_parms,
-> > > > -                                  &bytes_written, iov, 1);
-> > > >       server->ops->close(xid, tcon, &fid);
-> > > >       return rc;
-> > > >  }
-> > > > @@ -5149,7 +5158,7 @@ static int smb2_make_node(unsigned int xid, struct inode *inode,
-> > > >       /*
-> > > >        * Check if mounted with mount parm 'sfu' mount parm.
-> > > >        * SFU emulation should work with all servers, but only
-> > > > -      * supports block and char device (no socket & fifo),
-> > > > +      * supports block and char device, socket & fifo,
-> > > >        * and was used by default in earlier versions of Windows
-> > > >        */
-> > > >       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL) {
-> > > > --
-> > > > 2.20.1
-> > > >
-> > >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-> 
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+However, I can offer you one more possible advantage of in-kernel QUIC.
+You can think about adding iouring support for QUIC socket, because that
+could possibly chain the socket fastpath operations together which opens
+the door for more optimization.
+
+Just my two cents.
+
+Thanks!
