@@ -1,213 +1,197 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CDA1D12EE
-	for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 07:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4288B749A;
+	Sat, 14 Sep 2024 08:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726297321; cv=none; b=X3sDCDwNhqbyrGSp8hYTdA3GEK4w0Kvnpmz+2jCmCJBDT2dfIJhuW95qbakDxpqSKhHY/3NnkQuR/BlFPxEcomfM0RH/XNS5sGUNQ/QCdERMd0+XLLPU9FxR6pu7eC8exUKjKgKh6K7DHbrSAuwrYG+536+e25TFZzWBF90EF44=
+	t=1726301869; cv=none; b=n7JF+E5Axp29GMZNkSDWbkgQB4f9MM4e0ZKg2JzAPOmnqWs8NPuJiaTXKU3wMmtfSf0jYqbscaAhztnRznjv4YCd6w48NNAIjfJUGcVQb4cVmwuw1uFy6oTinPdeMwQ2TlNJBVqKhJBNVIus4yyOdSv03kHbIGgDevIysBaupX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726297321; c=relaxed/simple;
-	bh=a4uDUCoNUAvrJ9dXUDnfJS3nTf1DTUlBsIzxbup3qlo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s1rG+XipD/sdoXe7W0cR22MNfVdb5HPlG8rVK7WaJDo6Od+F1BoBDR8DqAfKGfwp/c/QXryztZ9O5GJotYM5lxyoy4jH80r6XPJoJ+qxLlKRaT8Ox+6FMRxJXosNiuF4zxQM5X3+Wmz9KR2216wd2/X/eXat1Kn6/snWNaO7yZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I+wRfB+B; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726301869; c=relaxed/simple;
+	bh=dyfkrsVc2HtRB1v6GvfuG8CIQ8s4h4aWOGeOrjMRZSY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AnIWoVMYfpCj2fBS+2DFKDMPVCzMnTvUU3zConIYeI6Jd2L1CtTPGLDjt14rueV1Z2JiGu2FnIJDrhdUIpOhNTf+c/DMYRWXo150mRPJSa4YQ4cl/Hj8hOpeq1DQGrxwSJAossYNFb0AbWTDq97UkF5CNSgMVa35Gbl26tR8MMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GSObA0mm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+wRfB+B"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c4226a5af8so1595799a12.1
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 00:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726297317; x=1726902117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6l7g0LdQah9o3EhzHA23MPWVKxJxaJ6FUilB71sXpwc=;
-        b=I+wRfB+Bja8XHXjdZ2O4wm+hC1T/PocjS8a0leOCFejAw2LD63CdFkHTOp/c3lghhd
-         ec4hSo99chaJFMOpD3TzdWisMkjEEu7VO09/SLLn7tfv1kOLJa7s+nU+l/wsGTcVMWxp
-         lxrHIrbT0fohTz2tmm9dDFUQpv73eWaoDM2SHRHTLBt1JYYX4NBW67ZQGeja7v97OTPS
-         SmcrCdYDuQNcD0Hw3T8/XXhhWTVG0ntAM7Gyw8nCfKaKN0A1ksiwSO/KcnHRGbmYVeWC
-         xvhtw6/mJkVUSAL9rW5q9Cq2blYvCUtXTc3oeeoPKn6tG/HRDN3LpvMaKLqYsgBkzczj
-         XM2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726297317; x=1726902117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6l7g0LdQah9o3EhzHA23MPWVKxJxaJ6FUilB71sXpwc=;
-        b=H36Rv3GF1S5Zh4Z9NYpY2kuEGs5x5XIBE2GC/BZqHVFCOH7+h6dRa+0M89bSnQ/s8k
-         JkESD3r//OY9EHNeV0OzyWVk8OiWbvlKlSnlUeQT9GkP85cuzkN1xJCGlYmxfJ9J6f/L
-         LIj2M5VjUg+PjJO8aDeZ3+Bi9F5GNwHy+ZPqKjVbBanHYPeOTX6X00SHHkA5sgIKbZ5y
-         WiNT/zZGGeDEMngq9xmTyWn7lUc3qUt5vQgAD3YCMrE4JGYd+MNAjQxyD+wl8kL1jWPV
-         dcApJpY7TAqYSOR5hw9fWrXEPt2D8MJL2nKfuOnbCKj7evpcoNw/XyB9vOG9qzCtV/kF
-         a9Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHTyGagCBw613B/hG8ld2AOYyKZwndVDBBq34d4xu/8MQX0Sv4XtY77/6oWi4j4bS3bHCg7AQlZZuk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9mCvZfva3AHIolZZoeago9q0sGUWO4Rmh8PwuvK+bKhnZ6G0Q
-	vb3xzDAh6fU3TvG0q7MNCTglAZotS8L3rcUEdd0/beJnwhW6d13y3eWRJHDXtAp3KeegjFwVRfN
-	CewF47p/mzjrhBxkGgWx00PmRAlM=
-X-Google-Smtp-Source: AGHT+IEE2saBGygWxDJ3U4apTV+do/bn/X9SwwTbX/oYmeNrknyvfLHSqrYm9iRxqVd9NnVm1UQZGIyATM9OYsfmC5Q=
-X-Received: by 2002:aa7:c483:0:b0:5c2:4bd1:30c3 with SMTP id
- 4fb4d7f45d1cf-5c413e4d024mr6471304a12.27.1726297317207; Sat, 14 Sep 2024
- 00:01:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSObA0mm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64135C4CEC0;
+	Sat, 14 Sep 2024 08:17:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726301868;
+	bh=dyfkrsVc2HtRB1v6GvfuG8CIQ8s4h4aWOGeOrjMRZSY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GSObA0mm3Lp0X3btXTFANk2a0eiBIrP6ReZIM7NBGuepMtgFE/8nVZIp8A3HEtMBx
+	 xSgmoh7Nr3F8RLztjcRwtXYvSQgr+mapcPROqKofWo8GuhYV/miN6PgeS/9nw+wa7C
+	 7eRXUs1b4ygYffr80njs3Kt3aelSXymJmXxxjZKQpCH8IuIx3Py+VraFcij+yUPRNT
+	 oGluFxWUd5m/0ghM3q8B6RCbbAT2/Mc9VoiqcwtPPrsv7NbALoCCDVc5qXbvKh9qGC
+	 MZ7ncU48t8eWiKIgVnJyq3KAOYIDJ0oXjW2dQJOR4YEAbJsALNp1+AfFoXusZQ914c
+	 k19k0KAheP13A==
+Received: by pali.im (Postfix)
+	id 152A7758; Sat, 14 Sep 2024 10:17:43 +0200 (CEST)
+Date: Sat, 14 Sep 2024 10:17:42 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/7] cifs: Fix creating of SFU fifo and socket special
+ files
+Message-ID: <20240914081742.wlldjjlogrmk533i@pali>
+References: <20240912120548.15877-1-pali@kernel.org>
+ <20240912120548.15877-7-pali@kernel.org>
+ <20240913200721.7egunkwp76qo5yy7@pali>
+ <CAH2r5mvEa8mUrK7mEKFiimkb1asTWA0p7ADz4937yoxM916RAw@mail.gmail.com>
+ <20240913224248.k5tn2le3gau2prmo@pali>
+ <CAH2r5mtgV=NkZVChDY-apdqkvM9KFkraRGy_jDCpLmFU6PFMAA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821065637.2294496-1-lihongbo22@huawei.com>
-In-Reply-To: <20240821065637.2294496-1-lihongbo22@huawei.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 14 Sep 2024 02:01:45 -0500
-Message-ID: <CAH2r5mur8ahks54Mn6bHYQL9JkfphkioVF9AZwM7aUKgU6zu2A@mail.gmail.com>
-Subject: Re: [PATCH -next] smb: use LIST_HEAD() to simplify code
-To: Hongbo Li <lihongbo22@huawei.com>
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mtgV=NkZVChDY-apdqkvM9KFkraRGy_jDCpLmFU6PFMAA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-tentatively merged into cifs-2.6.git for-next pending review/testing
+On Saturday 14 September 2024 01:21:17 Steve French wrote:
+> On Fri, Sep 13, 2024 at 5:42 PM Pali Rohár <pali@kernel.org> wrote:
+> >
+> > On Friday 13 September 2024 17:14:22 Steve French wrote:
+> > > How did you find the format of the FIFO and SOCK file types?  I
+> >
+> > For fifo there are multiple sources on internet, but none of them is
+> > normative. Everything is just what people have tried. For example this
+> > old email on samba list:
+> > https://lists.samba.org/archive/linux-cifs-client/2005-May/000856.html
+> >
+> > Format of the socket I have figured out by creating it in Interix
+> > subsystem and then dumped content of the file from Win32 subsystem.
+> > Then I checked that it has also same format over older MS NFS server.
+> > It was easier than trying to search for some documentation (which I have
+> > not found).
+> >
+> > > couldn't find any references to those so added two new types to allow
+> > > current Linux to be able to create these (especially since they are
+> > > opaque to the server and thus low risk).
+> >
+> > I was searching over internet again and now I have found patent
+> > https://patents.google.com/patent/US20090049459 which describe symlink
+> > content:
+> >
+> > #define NFS_SPECFILE_LNK_V1  0x014b4e4c78746e49 /* “IntxLNK” */
+> >
+> > But does not describe other types.
+> >
+> > > > +     case S_IFSOCK:
+> > > > -             strscpy(pdev.type, "LnxSOCK");
+> > > > +             /* SFU socket is system file with one zero byte */
+> > > > +             pdev_len = 1;
+> > > > +             pdev.type[0] = '\0';
+> > > >               break;
+> > > >       case S_IFIFO:
+> > > > -             strscpy(pdev.type, "LnxFIFO");
+> > > > +             /* SFU fifo is system file which is empty */
+> > > > +             pdev_len = 0;
+> > >
+> > > My worry about the suggested change above is that it is possible that
+> > > we could accidentally match to an empty file.
+> >
+> > I fully understand your concerns, but code in this patch is for creating
+> > new fifos. Not recognizing existing fifos.
+> >
+> > Code for recognizing existing fifos (=empty file with system attribute)
+> > was not changed and is in Linux cifs client for a very long time.
+> <>
+> > > We intentionally added
+> > > the two new dev.type fields for these to avoid collisions with other
+> > > things (and since they are Linux specific).  It seems risky to have an
+> > > empty file with the system attribute marked as a FIFO, and similarly a
+> > > file with one byte null as Socket.   Since this is for only the Linux
+> > > client to recognize, I wanted to do something safe for those file
+> > > types less likely to be confusing (ie strings for Socket and FIFO that
+> > > were similar in length and format to the other special files seemed
+> > > intuitive) and "LnxFIFO" and LnxSOCK" were used as the tags in the
+> > > file to reduce confusion ie the tags for those two start with "Lnx" -
+> > > ie "something used for Linux client" not related to the original
+> > > Interix (those begin with "Intx").
+> >
+> > I see. Now I understand what are those types (as I have not seen them
+> > before). It is somehow misleading if such "LnxFIFO" and LnxSOCK"
+> > functionality is provided by SFU option, but is incompatible with MS SFU
+> > and also with MS NFS server. And is also incompatible with older Linux
+> > cifs clients (as they do not understand those Lnx types).
+> 
+> I am not as worried about FIFO and SOCK type being recognized by
+> older servers (since almost every use case for them would be for them
+> to be seen (only) by the client - e.g. for mounts to servers that
+> don't implement reparse points yet), and since they are less
+> common file types I am willing to let them be unrecognized by
+> old clients (we can tag them for stable if older distros don't have
+> them),
 
-On Wed, Aug 21, 2024 at 1:49=E2=80=AFAM Hongbo Li <lihongbo22@huawei.com> w=
-rote:
->
-> list_head can be initialized automatically with LIST_HEAD()
-> instead of calling INIT_LIST_HEAD(). No functional impact.
->
-> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
-> ---
->  fs/smb/client/connect.c  | 3 +--
->  fs/smb/client/file.c     | 7 ++-----
->  fs/smb/client/misc.c     | 9 +++------
->  fs/smb/client/smb2file.c | 4 +---
->  4 files changed, 7 insertions(+), 16 deletions(-)
->
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index d2307162a2de..72092b53e889 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -997,11 +997,10 @@ clean_demultiplex_info(struct TCP_Server_Info *serv=
-er)
->         }
->
->         if (!list_empty(&server->pending_mid_q)) {
-> -               struct list_head dispose_list;
->                 struct mid_q_entry *mid_entry;
->                 struct list_head *tmp, *tmp2;
-> +               LIST_HEAD(dispose_list);
->
-> -               INIT_LIST_HEAD(&dispose_list);
->                 spin_lock(&server->mid_lock);
->                 list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
->                         mid_entry =3D list_entry(tmp, struct mid_q_entry,=
- qhead);
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index 1fc66bcf49eb..a5e6c7b63230 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -1406,7 +1406,7 @@ void
->  cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
->  {
->         struct cifsFileInfo *open_file, *tmp;
-> -       struct list_head tmp_list;
-> +       LIST_HEAD(tmp_list);
->
->         if (!tcon->use_persistent || !tcon->need_reopen_files)
->                 return;
-> @@ -1414,7 +1414,6 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tc=
-on)
->         tcon->need_reopen_files =3D false;
->
->         cifs_dbg(FYI, "Reopen persistent handles\n");
-> -       INIT_LIST_HEAD(&tmp_list);
->
->         /* list all files open on tree connection, reopen resilient handl=
-es  */
->         spin_lock(&tcon->open_file_lock);
-> @@ -2097,9 +2096,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struc=
-t file_lock *flock,
->         struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
->         struct cifsLockInfo *li, *tmp;
->         __u64 length =3D cifs_flock_len(flock);
-> -       struct list_head tmp_llist;
-> -
-> -       INIT_LIST_HEAD(&tmp_llist);
-> +       LIST_HEAD(tmp_llist);
->
->         /*
->          * Accessing maxBuf is racy with cifs_reconnect - need to store v=
-alue
-> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> index c6f11e6f9eb9..dab526191b07 100644
-> --- a/fs/smb/client/misc.c
-> +++ b/fs/smb/client/misc.c
-> @@ -751,12 +751,11 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs=
-_inode)
->  {
->         struct cifsFileInfo *cfile =3D NULL;
->         struct file_list *tmp_list, *tmp_next_list;
-> -       struct list_head file_head;
-> +       LIST_HEAD(file_head);
->
->         if (cifs_inode =3D=3D NULL)
->                 return;
->
-> -       INIT_LIST_HEAD(&file_head);
->         spin_lock(&cifs_inode->open_file_lock);
->         list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
->                 if (delayed_work_pending(&cfile->deferred)) {
-> @@ -787,9 +786,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
->  {
->         struct cifsFileInfo *cfile;
->         struct file_list *tmp_list, *tmp_next_list;
-> -       struct list_head file_head;
-> +       LIST_HEAD(file_head);
->
-> -       INIT_LIST_HEAD(&file_head);
->         spin_lock(&tcon->open_file_lock);
->         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
->                 if (delayed_work_pending(&cfile->deferred)) {
-> @@ -819,11 +817,10 @@ cifs_close_deferred_file_under_dentry(struct cifs_t=
-con *tcon, const char *path)
->  {
->         struct cifsFileInfo *cfile;
->         struct file_list *tmp_list, *tmp_next_list;
-> -       struct list_head file_head;
->         void *page;
->         const char *full_path;
-> +       LIST_HEAD(file_head);
->
-> -       INIT_LIST_HEAD(&file_head);
->         page =3D alloc_dentry_path();
->         spin_lock(&tcon->open_file_lock);
->         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-> index c23478ab1cf8..bc2b838eab6f 100644
-> --- a/fs/smb/client/smb2file.c
-> +++ b/fs/smb/client/smb2file.c
-> @@ -196,9 +196,7 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct =
-file_lock *flock,
->         struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
->         struct cifsLockInfo *li, *tmp;
->         __u64 length =3D 1 + flock->fl_end - flock->fl_start;
-> -       struct list_head tmp_llist;
-> -
-> -       INIT_LIST_HEAD(&tmp_llist);
-> +       LIST_HEAD(tmp_llist);
->
->         /*
->          * Accessing maxBuf is racy with cifs_reconnect - need to store v=
-alue
-> --
-> 2.34.1
->
->
+This is quite pity for old clients, to break existing interoperability.
+At least I see sfu as an compatibility option either for ecosystem with
+old clients, or option where server itself does not support reparse
+points.
 
+> but I am concerned about allowing "current clients" to
+> create empty files for an unusual purpose which could be
+> confusing/non-intuitive.
 
---=20
-Thanks,
+I understand this concern. I thought that this should not be an issue
+because files are created with system attribute which is not common for
+normal/ordinary usage (system attribute could be less confusing) and
+also because this format, at least for fifo is used and understood by
+many SW for about 30 years.
 
-Steve
+> And since this change (at least the one to allow FIFOs to be created with "sfu"
+> has been in mainline for a year and also since it uses a more intuitive tag
+> ("LnxFIFO") than the empty one used by very old Windows) the only
+> clients who would have created these would be already using this newer tag
+> (older Linux clients couldn't have created such files - there seems more
+> risk of regression with reverting the change than with continuing with
+> the Linux client specific tag (at least to the one for FIFOs
+> since that has been in much longer than the socket one which is recent)
+
+This kind of stuff is lot of times used on LTS/stable linux
+distributions and new kernel to these users/admins do not have to be
+delivered yet. Mostly it takes 2-3 years after release. Look for example
+at RHEL cycles.
+
+I'm looking on this from opposite perspective. I see this an regression
+in -o sfu option that after upgrading from previous LTS version to new,
+-o sfu stopped to be compatible with SFU-style fifos.
+
+But your point is valid. But maybe it is not an issue because users
+do not have updated yet to new version?
+
+> Will discuss with others - opinions welcome.
+> 
+> There is an upcoming SMB3.1.1 test event coming up next week (and the annual
+> Storage Developer Conference too) so I can see if others have opinions one
+> way or another on whether to move to empty (or 1 byte) files for
+> creating fifos/sockets
+
+Ok, perfect, let me know then about the result.
+
+> > > Note that in the long run we hope to use reparse points by default in
+> > > more servers to store special files like this but there are a few
+> > > cases for unusual workloads that need special file support that would
+> > > have to use sfu still.  The newer reparse tags that Windows uses "WSL"
+> > > have the advantage that they require fewer roundtrips to query (since
+> > > the file type is in the reparse tag).
+> >
+> > Yes, new WSL tags seems to be better. Also SFU mount option is not
+> > activated by default.
+> >
+> > > Also noticed an interesting problem when mounted with "sfu" -
+> > > "smbgetinfo filebasicinfo /mnt/fifo1" will hang (in sys_open).  Is
+> > > that expected for a FIFO?
+> >
+> > Reading from fifo sleep reading process until some other process write
+> > data to fifo. This is how fifos are working. You can try it on local
+> > filesystem (e.g. ext4 or tmpfs).
+> 
+> makes sense - thx
