@@ -1,135 +1,91 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04AD1C27;
-	Sat, 14 Sep 2024 01:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC61101DE;
+	Sat, 14 Sep 2024 04:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726275945; cv=none; b=p0sdqh4OxsAhwd5mgYDRkl+lztUbQkrBFHjNixigLmfW/CXPs7Aj9dUC7RFVbOeXMTrZbp0oNp+FEvPupFmYY6yiJnmLM/QAfrh6c75O6mGiZHlc8kvtGKGx2lWBCMkh7jFELKZPxkGEvKB0/omy8Q0E3KKbynsq/g1iZ3U192I=
+	t=1726287709; cv=none; b=DhaarM65RALviTwJjn7RYjNIdtlM256a3foLgK0b4ghWnHFYrvxAnoMHQ07GgyWD4BIBft9WmRNwzn4/V5hYcmz9DTcSeaPKXmcJGJ2o8d7d0oKNr3CGa3AKb1vpBMx9jEHoHokSPmYLFbI9bfq3yYIiWb7nX9FsZpwlc2FAlB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726275945; c=relaxed/simple;
-	bh=9gy7LiB1QQHwZI+Pdhi5cz/26o44zIsBi1OE+6liICY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLccan7ezcv1/NJIVUGQkkijt0qTpuZ8tnSlW7NZN4WzBOw5TTlnnA8vOceroufi2lcBfa71QzF94Q+IOR9uu2OnHR02mvM3L3uaLEkReCalTrwWJoYfYcVXfAc5ykA9gD9scid6JG8qVP4NDnijrPq9Jfz+pMwlwdD/B3igJsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqZJKQHA; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1726287709; c=relaxed/simple;
+	bh=o7pU50qUsKwdWjfpB394skTGyPgd6i3JnbcdgCJzgDM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=WX52D0SoQsb1NRX2YNoXP4xrUsLDLA8ZXMTumiMNcIx6Z0NgE77qZLYdbeVboNAC/y/l4iut0/U13NMUSn5NPJC3XNBLu49f9nXeVnIylEp1dZ9DkjpnMJFfgsM6YdfoI/Fcm0kvGYGF4fvEXyVu8DGsEhbOHUP6siBLUukP9Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ik3aqvWi; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqZJKQHA"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20551e2f1f8so16828425ad.2;
-        Fri, 13 Sep 2024 18:05:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ik3aqvWi"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c24ebaa427so5728305a12.1;
+        Fri, 13 Sep 2024 21:21:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726275943; x=1726880743; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GkiDsRe4AiGLxd5SW64hD1FIKOllYw7LyinEu6P1pMI=;
-        b=cqZJKQHA8KHvTixK+X+0SsZkIkTC2eK5+Yw1cB7VTD+ziZANLcJ5eIdSzOaor06kr8
-         Z01dRG2yFzsq2flfEzxZvQIz4whvl7/b9JVsAU4xo5WoGPmRlPXhB28Sf6OyFsg7y+xp
-         3U+5GoXC91BOLiH8vTpaKNTBj2ijVErdSdj6palfAtONpOqTpghbzxPbfnANronQWWSq
-         56LoY0BtFi6oYG5mAeVkAbWHoVhdaphKiqKSQmYzUEHl3KwHnSiQqzHuuA0fNBAhrc/F
-         I6YFqgJvK/yQVnku3vRjk+MoPAyXzGsmv48BJjNi465jNpbWZZEL9nknOqmeXPpLhjzI
-         jFdw==
+        d=gmail.com; s=20230601; t=1726287706; x=1726892506; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0lz3GO7vzO2NCS9fmbQm6YDu2k75zvPDogftxNWVKSA=;
+        b=ik3aqvWiCdHnriXf9obCTJn3S1uvF0K/+kY6Y/470krcHOIl/3f3+hirmBHbvg7dtW
+         9N2qjUovUvd2PYeJLpHp/ulJOa9P07lyXkQN4HysybnXCLprLJkV3/pJec3yIH2aMMqm
+         /00eGKddOMlaOi9pHvXONaNuxrH2nh6TNhHhnnUbJIPwYe4jM3aI3fdrLDDF/zjexTWE
+         qb5f1mSj2ctlR4vBto/9JIv77GOivgQZjRT3p1Mn3Aodn6caDxuApk55Jzzeeagz184i
+         JoVEIWHQTBGbR1HW/7FlxHIWGsAkeb2VM1/ltXW35JqHtzaSfM6JdGQP7dw/bN2d9XJR
+         4Rlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726275943; x=1726880743;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkiDsRe4AiGLxd5SW64hD1FIKOllYw7LyinEu6P1pMI=;
-        b=BQaYj0guZVaCxoozdPO/8p4VAeVfcAYJ0Oi0fl4xE841rC0wBT1L/Q1Qn5DrfArsNk
-         nWNu1ns6Z82XOdsMxC8wYY8sQsllK7WQrYojPNsMff4pGQbEY3+X7vI40WF4UwK6oKsc
-         NAhW/Yh3OeKHb0YqQh1+QijLKpatF4u8iQdwCOnKlj5siPvxuBqc6i/ezerlT1wquNVH
-         ABMwXvVyXMQR6wd961PuBH7/1EHwjjV2pe5HJ8ylhjS1QuV5uv7rOXPRoUnrGcP9CsPx
-         +wd7LWKrc0OLZCM3y89NKvhMOHvcMZNSilhAmUcPibn7MUIpFkrWx/sWbgUIwdhq0AIk
-         ytDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWl7nBEsIt2uhFSGlPRcYtB0l5Jh+YAt0Hy6LibxBf5YetX+07aZBDSfen7HAGpm6T9l1UCABNZvKJC@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxHUnGotrkxJfrc067W7p4w+7/dywOstWk0dhKy/PH1HmuhqPP
-	G21vtG59TghM4w/nA8CrUECMPdOsy7zQ/mg4c/ULqfjKLsz2LgW8ier5Hswpfds=
-X-Google-Smtp-Source: AGHT+IFumMGTNCHfWNRCOO+XP+esgYojDUGb/+5tHXyYx7D6FCQQ/vya83X52c7WIjgKSX/L0q8ryA==
-X-Received: by 2002:a17:902:e84a:b0:1fb:57e7:5bb4 with SMTP id d9443c01a7336-20782a69aa5mr67763765ad.37.1726275943018;
-        Fri, 13 Sep 2024 18:05:43 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:97be:e4c7:7fc1:f125])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207947365ddsm1937725ad.283.2024.09.13.18.05.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 18:05:42 -0700 (PDT)
-Date: Fri, 13 Sep 2024 18:05:41 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Moritz Buhl <mbuhl@openbsd.org>,
-	Tyler Fanelli <tfanelli@redhat.com>,
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
-	Steve French <smfrench@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Stefan Metzmacher <metze@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alexander Aring <aahringo@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Daniel Stenberg <daniel@haxx.se>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH net-next 0/5] net: implement the QUIC protocol in linux
- kernel
-Message-ID: <ZuThZdPILnCKpOmO@pop-os.localdomain>
-References: <cover.1725935420.git.lucien.xin@gmail.com>
+        d=1e100.net; s=20230601; t=1726287706; x=1726892506;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0lz3GO7vzO2NCS9fmbQm6YDu2k75zvPDogftxNWVKSA=;
+        b=DcbbrX3iq4+8UoyeVV55PMVgOc9qNzO2tfGYvcR/tOCHe8Ro2LjHJZW6Syg8bqVlwr
+         skKeM6c4vZC2ggc6mWQq01PNcB2UoXL6lwL0wNB5vLWge59QR6ttKYrD7BhDmCT6Lsls
+         QCosj+N7lpAG/VInRoIugoKEuDjDQtYDw+sET0P19/OlSbGiHiv4jV+UMZsyASHvJ/SP
+         cO756DiYi2RTYyRUhXFT4iaBLNejgULYy+2LhyIqYzEiY5FyRjgm+o0C49Sa0XhQNp54
+         pTJIhIbh51S4K8r0SJdqs23IotJz2+9THltNLIqd1sjsKMu3hPBGvZrnmYSIVcKswa4X
+         6qdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWoBgzZ/D8XPjHH7A/hJnO8jfqRKZjHMs92neGY2OtCuPAP2Spqp/qE8SjUyoOkhrhVhN3Oqv7X6I1c@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQhp2+ioFsW5ed63VGPHhUlw/LD8l1t3KRNJ5a2dGUUVSOKw+b
+	/rOE+5xR4uAAK59l2dnS4M0UaA7iT4GkFdXi04Rro/XefiYz2YjxJ2JwRTDI2hCTfhpmdhu91Y7
+	yUvHUyXf5o8PUm6VQyBxh0TMSUji6MSu6MPY=
+X-Google-Smtp-Source: AGHT+IF5u+pVRBbm+qTLi3RywGR16q3xzP7+gDLAY1XDk0Y+B7Km6TJYXQr27FdGaH+Zh4pAz3gMW8Qd506Ta/tiAss=
+X-Received: by 2002:a50:cbca:0:b0:5c4:aea:5833 with SMTP id
+ 4fb4d7f45d1cf-5c414387621mr6577871a12.18.1726287705619; Fri, 13 Sep 2024
+ 21:21:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cover.1725935420.git.lucien.xin@gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 13 Sep 2024 23:21:33 -0500
+Message-ID: <CAH2r5mvA_0dp2NBd9Q46GxnqyZ43SaDFJp6aSVp4xFHWa4zX+Q@mail.gmail.com>
+Subject: [GIT PULL] smb3 fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Sep 09, 2024 at 10:30:15PM -0400, Xin Long wrote:
-> 4. Performance testing via iperf
-> 
->   The performance testing was conducted using iperf [5] over a 100G
->   physical NIC, evaluating various packet sizes and MTUs:
->   
->   - QUIC vs. kTLS:
->   
->     UNIT        size:1024      size:4096      size:16384     size:65536
->     Gbits/sec   QUIC | kTLS    QUIC | kTLS    QUIC | kTLS    QUIC | kTLS
->     ────────────────────────────────────────────────────────────────────
->     mtu:1500    1.67 | 2.16    3.04 | 5.04    3.49 | 7.84    3.83 | 7.95
->     ────────────────────────────────────────────────────────────────────
->     mtu:9000    2.17 | 2.41    5.47 | 6.19    6.45 | 8.66    7.48 | 8.90
->   
->   - QUIC(disable_1rtt_encryption) vs. TCP:
->   
->     UNIT        size:1024      size:4096      size:16384     size:65536
->     Gbits/sec   QUIC | TCP     QUIC | TCP     QUIC | TCP     QUIC | TCP
->     ────────────────────────────────────────────────────────────────────
->     mtu:1500    2.17 | 2.49    3.59 | 8.36    6.09 | 15.1    6.92 | 16.2
->     ────────────────────────────────────────────────────────────────────
->     mtu:9000    2.47 | 2.54    7.66 | 7.97    14.7 | 20.3    19.1 | 31.3
->   
->   
->   The performance gap between QUIC and kTLS may be attributed to:
-> 
->   - The absence of Generic Segmentation Offload (GSO) for QUIC.
->   - An additional data copy on the transmission (TX) path.
->   - Extra encryption required for header protection in QUIC.
->   - A longer header length for the stream data in QUIC.
-> 
+Please pull the following changes since commit
+da3ea35007d0af457a0afc87e84fddaebc4e0b63:
 
-This is not appealing.
+  Linux 6.11-rc7 (2024-09-08 14:50:28 -0700)
 
-However, I can offer you one more possible advantage of in-kernel QUIC.
-You can think about adding iouring support for QUIC socket, because that
-could possibly chain the socket fastpath operations together which opens
-the door for more optimization.
+are available in the Git repository at:
 
-Just my two cents.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.11-rc7-SMB3-client-fix
 
-Thanks!
+for you to fetch changes up to 5a20b7cb0d8d3ee490a8e088dc2584aa782e3355:
+
+  cifs: Fix signature miscalculation (2024-09-12 19:28:48 -0500)
+
+----------------------------------------------------------------
+Fix a case where many signing check of write failures
+   ("signature verification returned error = -13")
+----------------------------------------------------------------
+David Howells (1):
+      cifs: Fix signature miscalculation
+
+ fs/smb/client/cifsencrypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+
+-- 
+Thanks,
+
+Steve
