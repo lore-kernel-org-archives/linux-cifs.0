@@ -1,106 +1,208 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D865861FFC
-	for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 07:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CDA1D12EE
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 07:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726297235; cv=none; b=kiWu7YyuIU//Qebjk20ffnSTeCZyQEi1wMhPJgV3zUzsOyLsADbkKx3Z91yigPiR8oTzUjG31JjfYqBcjPnJVqloS17px5wMCekaCkUnmVn+DYkAAueOgL8gbwNWTt43+MgwhVmvXQtOCs7+/kG5Wk0Qv0OMiiG3grb/VZBZTc0=
+	t=1726297321; cv=none; b=X3sDCDwNhqbyrGSp8hYTdA3GEK4w0Kvnpmz+2jCmCJBDT2dfIJhuW95qbakDxpqSKhHY/3NnkQuR/BlFPxEcomfM0RH/XNS5sGUNQ/QCdERMd0+XLLPU9FxR6pu7eC8exUKjKgKh6K7DHbrSAuwrYG+536+e25TFZzWBF90EF44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726297235; c=relaxed/simple;
-	bh=fJTRXVkor+19HCZMs6C1NKwlx9yOLUpG5gvHTJr9KHs=;
+	s=arc-20240116; t=1726297321; c=relaxed/simple;
+	bh=a4uDUCoNUAvrJ9dXUDnfJS3nTf1DTUlBsIzxbup3qlo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TLU5wmEhZRHguqDaeQZgx7mnlzLXdlqqWfZHmusuWdBz5AkmDu/aOmqfeag3bqCR5cX/elDoWCJuLdZ5xaXtj+vVHMk3aWdu0qZqUf4Z7pTFe527Hcqy68HszMGrOZhhKrZxsl0CoVq4i15mW0rPGSelA9uUv4hFsSbNzX8iQxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHD4O/LE; arc=none smtp.client-ip=209.85.208.45
+	 To:Cc:Content-Type; b=s1rG+XipD/sdoXe7W0cR22MNfVdb5HPlG8rVK7WaJDo6Od+F1BoBDR8DqAfKGfwp/c/QXryztZ9O5GJotYM5lxyoy4jH80r6XPJoJ+qxLlKRaT8Ox+6FMRxJXosNiuF4zxQM5X3+Wmz9KR2216wd2/X/eXat1Kn6/snWNaO7yZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I+wRfB+B; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHD4O/LE"
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c3d209db94so3266592a12.3
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 00:00:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+wRfB+B"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c4226a5af8so1595799a12.1
+        for <linux-cifs@vger.kernel.org>; Sat, 14 Sep 2024 00:01:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726297232; x=1726902032; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726297317; x=1726902117; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DIKb1Ydx4IscWCfyIBM4d64+iaaXSfV1J2zQfsF6eI0=;
-        b=EHD4O/LEKoh5lQ6NxQoRu0DAi0A5d6eu+VfvGJGIEylHCt7VBPQDiw2SCU9ANptFoA
-         hXL6aXgKPfxcuDrjrl7nK4Et7xbU0uisyCZkx6MIchu0dVtD9qBTK21nzV9QveM6DwEG
-         nD2hHQy2NWBTSJ3omlPQjkxaXLehOvUsfvKF7PTudfQYcbXiqETI60Y1gImaEtyPYmy0
-         KKBZBgUpLsOiaCREd0rL5ImNT8eunhHsq0hkfqNYEDB90j8vNy/dBVRKP/3GwzmwF8gi
-         dPg2hB1hMHIFoR3ivammYLQvRoCeezk+EQSHV/bTAkFSYr6dCaIS1PIOLmxLxh+5X1Rv
-         2veQ==
+        bh=6l7g0LdQah9o3EhzHA23MPWVKxJxaJ6FUilB71sXpwc=;
+        b=I+wRfB+Bja8XHXjdZ2O4wm+hC1T/PocjS8a0leOCFejAw2LD63CdFkHTOp/c3lghhd
+         ec4hSo99chaJFMOpD3TzdWisMkjEEu7VO09/SLLn7tfv1kOLJa7s+nU+l/wsGTcVMWxp
+         lxrHIrbT0fohTz2tmm9dDFUQpv73eWaoDM2SHRHTLBt1JYYX4NBW67ZQGeja7v97OTPS
+         SmcrCdYDuQNcD0Hw3T8/XXhhWTVG0ntAM7Gyw8nCfKaKN0A1ksiwSO/KcnHRGbmYVeWC
+         xvhtw6/mJkVUSAL9rW5q9Cq2blYvCUtXTc3oeeoPKn6tG/HRDN3LpvMaKLqYsgBkzczj
+         XM2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726297232; x=1726902032;
+        d=1e100.net; s=20230601; t=1726297317; x=1726902117;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DIKb1Ydx4IscWCfyIBM4d64+iaaXSfV1J2zQfsF6eI0=;
-        b=Ua4OD1s4w6EwCwTZA5XXjbMOnASo/jRWx/kIhMinXYZdr8R2/pk9PP/znfZxuaa6Rn
-         RxnJ6IzdlVkzNFFV6W2qJUxpRWdkVsdn1SltAMg6kXhT+jFopR+cyl0ZKcXZiBfScHIa
-         YT2LRLxCR7itV/f0aTydWLq19M2yWI76zsVobwj5hi2mcy17IfEEcF+jMGxYb0I+TAQg
-         ZwzWwNm4t67zNDa/ix09LefBRtfk88B073IqE64xAiJaL8MXSRyZvrWRPxb4XQWvLOrh
-         sA5OuuM4jKW/NCEvtnK66YpCUmnX/BVLhNHQgD32U1+08T0RVzy0CPjqt1P9YjwuiDeL
-         e9Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSRRq+f0abUObCuR6pOLFk73Aei1TxlKv34lZVCF99usslavzLqRFIOqQiO89O2zO0XBp/7q4ypagF@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRxztGi0gHVR3FTTCxWUuj5uX50AeagdOvy+4rSPmIrEpUQ99X
-	HsBN6S90Rthbwo6O+Z6lNODJ0CKbliHz9US6RenLmUSRGkf9CJyPkqdH/HbQd7shYAFf3Mtu7S/
-	VEqL5umfyJCWLzgEkrKjXV6I6VlI=
-X-Google-Smtp-Source: AGHT+IHhZ7hzKoGRxLECmu8/o6p6ngS0GyKLDs3INxkradcgbHhzRsOwBplkx0I3h6HjbtrUvfJL/FNvG7auoqtYbiw=
-X-Received: by 2002:a17:907:60d4:b0:a8a:7248:d4c5 with SMTP id
- a640c23a62f3a-a90296202aemr960914566b.42.1726297231746; Sat, 14 Sep 2024
- 00:00:31 -0700 (PDT)
+        bh=6l7g0LdQah9o3EhzHA23MPWVKxJxaJ6FUilB71sXpwc=;
+        b=H36Rv3GF1S5Zh4Z9NYpY2kuEGs5x5XIBE2GC/BZqHVFCOH7+h6dRa+0M89bSnQ/s8k
+         JkESD3r//OY9EHNeV0OzyWVk8OiWbvlKlSnlUeQT9GkP85cuzkN1xJCGlYmxfJ9J6f/L
+         LIj2M5VjUg+PjJO8aDeZ3+Bi9F5GNwHy+ZPqKjVbBanHYPeOTX6X00SHHkA5sgIKbZ5y
+         WiNT/zZGGeDEMngq9xmTyWn7lUc3qUt5vQgAD3YCMrE4JGYd+MNAjQxyD+wl8kL1jWPV
+         dcApJpY7TAqYSOR5hw9fWrXEPt2D8MJL2nKfuOnbCKj7evpcoNw/XyB9vOG9qzCtV/kF
+         a9Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHTyGagCBw613B/hG8ld2AOYyKZwndVDBBq34d4xu/8MQX0Sv4XtY77/6oWi4j4bS3bHCg7AQlZZuk@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9mCvZfva3AHIolZZoeago9q0sGUWO4Rmh8PwuvK+bKhnZ6G0Q
+	vb3xzDAh6fU3TvG0q7MNCTglAZotS8L3rcUEdd0/beJnwhW6d13y3eWRJHDXtAp3KeegjFwVRfN
+	CewF47p/mzjrhBxkGgWx00PmRAlM=
+X-Google-Smtp-Source: AGHT+IEE2saBGygWxDJ3U4apTV+do/bn/X9SwwTbX/oYmeNrknyvfLHSqrYm9iRxqVd9NnVm1UQZGIyATM9OYsfmC5Q=
+X-Received: by 2002:aa7:c483:0:b0:5c2:4bd1:30c3 with SMTP id
+ 4fb4d7f45d1cf-5c413e4d024mr6471304a12.27.1726297317207; Sat, 14 Sep 2024
+ 00:01:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826032803.4017216-1-cuigaosheng1@huawei.com>
-In-Reply-To: <20240826032803.4017216-1-cuigaosheng1@huawei.com>
+References: <20240821065637.2294496-1-lihongbo22@huawei.com>
+In-Reply-To: <20240821065637.2294496-1-lihongbo22@huawei.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 14 Sep 2024 02:00:19 -0500
-Message-ID: <CAH2r5mvnh7KKLceWPkg2WG8J9btcAVp=-NZ24YWHMo8k7okgng@mail.gmail.com>
-Subject: Re: [PATCH -next] cifs: Remove obsoleted declaration for cifs_dir_open
-To: Gaosheng Cui <cuigaosheng1@huawei.com>
+Date: Sat, 14 Sep 2024 02:01:45 -0500
+Message-ID: <CAH2r5mur8ahks54Mn6bHYQL9JkfphkioVF9AZwM7aUKgU6zu2A@mail.gmail.com>
+Subject: Re: [PATCH -next] smb: use LIST_HEAD() to simplify code
+To: Hongbo Li <lihongbo22@huawei.com>
 Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
 	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
+tentatively merged into cifs-2.6.git for-next pending review/testing
 
-thx
-
-On Sun, Aug 25, 2024 at 10:28=E2=80=AFPM Gaosheng Cui <cuigaosheng1@huawei.=
-com> wrote:
+On Wed, Aug 21, 2024 at 1:49=E2=80=AFAM Hongbo Li <lihongbo22@huawei.com> w=
+rote:
 >
-> The cifs_dir_open() have been removed since
-> commit 737b758c965a ("[PATCH] cifs: character mapping of special
-> characters (part 3 of 3)"), and now it is useless, so remove it.
+> list_head can be initialized automatically with LIST_HEAD()
+> instead of calling INIT_LIST_HEAD(). No functional impact.
 >
-> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
 > ---
->  fs/smb/client/cifsfs.h | 1 -
->  1 file changed, 1 deletion(-)
+>  fs/smb/client/connect.c  | 3 +--
+>  fs/smb/client/file.c     | 7 ++-----
+>  fs/smb/client/misc.c     | 9 +++------
+>  fs/smb/client/smb2file.c | 4 +---
+>  4 files changed, 7 insertions(+), 16 deletions(-)
 >
-> diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-> index ca2bd204bcc5..61ded59b858f 100644
-> --- a/fs/smb/client/cifsfs.h
-> +++ b/fs/smb/client/cifsfs.h
-> @@ -106,7 +106,6 @@ extern int cifs_flush(struct file *, fl_owner_t id);
->  extern int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)=
-;
->  extern int cifs_file_strict_mmap(struct file *file, struct vm_area_struc=
-t *vma);
->  extern const struct file_operations cifs_dir_ops;
-> -extern int cifs_dir_open(struct inode *inode, struct file *file);
->  extern int cifs_readdir(struct file *file, struct dir_context *ctx);
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index d2307162a2de..72092b53e889 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -997,11 +997,10 @@ clean_demultiplex_info(struct TCP_Server_Info *serv=
+er)
+>         }
 >
->  /* Functions related to dir entries */
+>         if (!list_empty(&server->pending_mid_q)) {
+> -               struct list_head dispose_list;
+>                 struct mid_q_entry *mid_entry;
+>                 struct list_head *tmp, *tmp2;
+> +               LIST_HEAD(dispose_list);
+>
+> -               INIT_LIST_HEAD(&dispose_list);
+>                 spin_lock(&server->mid_lock);
+>                 list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+>                         mid_entry =3D list_entry(tmp, struct mid_q_entry,=
+ qhead);
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index 1fc66bcf49eb..a5e6c7b63230 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -1406,7 +1406,7 @@ void
+>  cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+>  {
+>         struct cifsFileInfo *open_file, *tmp;
+> -       struct list_head tmp_list;
+> +       LIST_HEAD(tmp_list);
+>
+>         if (!tcon->use_persistent || !tcon->need_reopen_files)
+>                 return;
+> @@ -1414,7 +1414,6 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tc=
+on)
+>         tcon->need_reopen_files =3D false;
+>
+>         cifs_dbg(FYI, "Reopen persistent handles\n");
+> -       INIT_LIST_HEAD(&tmp_list);
+>
+>         /* list all files open on tree connection, reopen resilient handl=
+es  */
+>         spin_lock(&tcon->open_file_lock);
+> @@ -2097,9 +2096,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struc=
+t file_lock *flock,
+>         struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
+>         struct cifsLockInfo *li, *tmp;
+>         __u64 length =3D cifs_flock_len(flock);
+> -       struct list_head tmp_llist;
+> -
+> -       INIT_LIST_HEAD(&tmp_llist);
+> +       LIST_HEAD(tmp_llist);
+>
+>         /*
+>          * Accessing maxBuf is racy with cifs_reconnect - need to store v=
+alue
+> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+> index c6f11e6f9eb9..dab526191b07 100644
+> --- a/fs/smb/client/misc.c
+> +++ b/fs/smb/client/misc.c
+> @@ -751,12 +751,11 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs=
+_inode)
+>  {
+>         struct cifsFileInfo *cfile =3D NULL;
+>         struct file_list *tmp_list, *tmp_next_list;
+> -       struct list_head file_head;
+> +       LIST_HEAD(file_head);
+>
+>         if (cifs_inode =3D=3D NULL)
+>                 return;
+>
+> -       INIT_LIST_HEAD(&file_head);
+>         spin_lock(&cifs_inode->open_file_lock);
+>         list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+>                 if (delayed_work_pending(&cfile->deferred)) {
+> @@ -787,9 +786,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+>  {
+>         struct cifsFileInfo *cfile;
+>         struct file_list *tmp_list, *tmp_next_list;
+> -       struct list_head file_head;
+> +       LIST_HEAD(file_head);
+>
+> -       INIT_LIST_HEAD(&file_head);
+>         spin_lock(&tcon->open_file_lock);
+>         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+>                 if (delayed_work_pending(&cfile->deferred)) {
+> @@ -819,11 +817,10 @@ cifs_close_deferred_file_under_dentry(struct cifs_t=
+con *tcon, const char *path)
+>  {
+>         struct cifsFileInfo *cfile;
+>         struct file_list *tmp_list, *tmp_next_list;
+> -       struct list_head file_head;
+>         void *page;
+>         const char *full_path;
+> +       LIST_HEAD(file_head);
+>
+> -       INIT_LIST_HEAD(&file_head);
+>         page =3D alloc_dentry_path();
+>         spin_lock(&tcon->open_file_lock);
+>         list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+> index c23478ab1cf8..bc2b838eab6f 100644
+> --- a/fs/smb/client/smb2file.c
+> +++ b/fs/smb/client/smb2file.c
+> @@ -196,9 +196,7 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct =
+file_lock *flock,
+>         struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
+>         struct cifsLockInfo *li, *tmp;
+>         __u64 length =3D 1 + flock->fl_end - flock->fl_start;
+> -       struct list_head tmp_llist;
+> -
+> -       INIT_LIST_HEAD(&tmp_llist);
+> +       LIST_HEAD(tmp_llist);
+>
+>         /*
+>          * Accessing maxBuf is racy with cifs_reconnect - need to store v=
+alue
 > --
-> 2.25.1
+> 2.34.1
 >
 >
 
