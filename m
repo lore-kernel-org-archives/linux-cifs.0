@@ -1,352 +1,151 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE5F8288C;
-	Sun, 15 Sep 2024 21:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E9A256D
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Sep 2024 00:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726434925; cv=none; b=rPhdT+6mItu94nuRN3OzGlY1LbQzhlGD1/Uh49w4cyPHjck5ziX1M83o3QwApFWuF32lx375Uh3S2z2hAP0yc8//VkVXTbOnUwwTMw9H+gFtGplhX/T2TexVYpiCXKuT79BgWDgsVaESLb3L5CYSr/BqPGRTb6oFLCjy63p/LzY=
+	t=1726447309; cv=none; b=rUFs9IOHASPLQ4xKC9xVt5CdIBwCaglwOl9/Eq8SerrTjSQxeIH3AKXoq9Ds/gwCxs0EEIuxHUTUmGmuSKFckFivdLEragnJdZ7trWbM7JesyWQnhJmVWaHFMYFjm4m4Dv69da2Vve1VO3LG289hu/oxkCA7im9V82fe8r0JFNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726434925; c=relaxed/simple;
-	bh=vQMtRSs+jpvAfBuzqxe/hvpEUCP4OlVV/oR+iN9ofMU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z5oa/v3IntPpWylLxK/3WIsv8m51N09DuNTHZUNqrnfQv7k1stMKFqqpAgjk9uZgCIadKm5T47gsI4u+iRE2InX8VThg9+BXA4MmP0QE4aZAfgf8j5HTJflNasgasT20oUMvpJaz5XbXt+yfc6iiySLgfr1t/A2Hpmk7QHYTy8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NoOs/4LB; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726447309; c=relaxed/simple;
+	bh=vpdjjGURmUcB3JcEVcqa2oefX11IXxymEkbmxRAUgqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=cWKsvkeEtghyZ6F9XbY8SIVSOirja4Uii18LZFxQpfwQH99lCPWu86qUlsYiAJShv6nmA3Z+8W6eT9rYPgnOg2gKcQqdgeoevlpvtnB2PHjgK/JnLFMVznDS1ht96LwczQOHxhxlSs9lisdKegsWR2Wqu5nHL2iOURI6eFm2tmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PagKTiPR; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NoOs/4LB"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5365d3f9d34so2755434e87.3;
-        Sun, 15 Sep 2024 14:15:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726434921; x=1727039721; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d95oEThEVkujmDQUzsxGtKvqJEre2Z3NGdOos2tHiUY=;
-        b=NoOs/4LBC4S2ohxCU5lTPdQ2k7F+/zfSDPWru2qWynZu7Zbs2PbhR0xQN/7GyhSOj0
-         dFlsermgqjR3flOWMlG5CbAL+htyUGy4Sj02jdJefpTVP+IQpRl+HG8ElNxKMFpMNVkw
-         nsHZ95y73g/ZNQczHye8YTPHOrg0r1YUM2YZLJ8qAet0H8sm9oVrQnz/M8V3EKpPjavY
-         Jc8cHa+tw18BZeX3Te5XhhFpxZqjSnI213RiIWudcGhns3NHOE3pA93V4A+3dC9IqrdC
-         5gqqBPv9AbKwfMj8OYj8lN2B1H23fO/m0DYaRpK6FkmfXg4DVDppRUjf8WjyoPPcGRgw
-         b0Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726434921; x=1727039721;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d95oEThEVkujmDQUzsxGtKvqJEre2Z3NGdOos2tHiUY=;
-        b=O0jsp/iKB4R39LpLebHXeLmuR0EudoylFK0QWZYN47r8h/5xKypuIhOZwryg9t5ul/
-         Km4o+of55lALcS3ix+DDrMfwtY483BQsqEMNU4hBU3qHYClH7AOanfmLPijYATaTQDUU
-         5mUqHo41LSkFSeMvT69kBEj5roE2CH/0A4o3V9XWXB8soP7i0XafPh5nWSib8gTvHT89
-         PvLMxJOJn5XYkDciSO0MDVXZvTxOvqsKc6WA6Lp9i7Iq9r9nClyEasXVtYPGfDzb+1V5
-         aCUIbGaXZE8PZPvtMS85dibMYFr+0mwqWhYMBXbXIKgu7CUBzDiLNx2CB2gkLhVoveRV
-         mVCA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvw6fsPBSI3aZu0+c5mShjkbtchVIBUVYsxn5RwatRDk1eNKoq3SLHP3SQWAP0U3enKc/rziiAOb73AdB6@vger.kernel.org, AJvYcCWrSzf38qpSmtYIAbqfgHFrtdxZ4lhHC/fxqVMS6NIDo273E/WZVMeKx89FkEk9LjhqMEoSH9rORzjZ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx14HSzGKaYqrNKbuFmRlrvL1/GX295BVzRw7MUg8bL+fimxJhy
-	4lJ2jwozo2AiZAX4kAlGTbgmVRDbOly+DaCJVAH/UgF1vYYYEmcc88WWH7gGeLKgsLWIqNQ1sFu
-	ejl0jbW7YjK7iM0rCKXXck3S5ecE=
-X-Google-Smtp-Source: AGHT+IH6Dq7y1FonhesDJ4aStQNF++311mosVMYWshj8vFfQ9m0hRRzvwgrMH6mjzlK2//kODQKKB0QxThwdY+NidI0=
-X-Received: by 2002:a05:6512:124e:b0:534:3cdc:dbfe with SMTP id
- 2adb3069b0e04-5367fee526cmr3547821e87.28.1726434920338; Sun, 15 Sep 2024
- 14:15:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PagKTiPR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726447307; x=1757983307;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=vpdjjGURmUcB3JcEVcqa2oefX11IXxymEkbmxRAUgqg=;
+  b=PagKTiPRKgm3GZfW4MbtWGOhHRz2ZQFq7dduAJ5u4E63BD3jA1yp5F/v
+   YT+NsZq6YfhTHxZvVuOeOeBCRTolaut9Eyr1zbN6fs8ZXPoHPNCm5CGlB
+   8kIT5yBMC7mbCMFUf4ezWwIEEAAnd/K0ekJMBzeNdOXHbTJSTyhAIB23S
+   zJjtCb2kE0Jl2KYuxxo+dkUQbewMideHUsc4PKr2Cn+E2VW6PfNGPpbZ8
+   /oR6u9banyTHRpjB3KoYaxJhan4RZuwW00dYHX2ra+enXt834sRZXtIur
+   LE86G3idOLChrfIQhyee04gS3dbtvBx++5TWtIUWtsttL3F3X2Ag/UEjF
+   w==;
+X-CSE-ConnectionGUID: 0rwY1u4yRpatEzdfsJ0n4Q==
+X-CSE-MsgGUID: 5iM+P9VHT5SrpxD4HwHB+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11196"; a="13537123"
+X-IronPort-AV: E=Sophos;i="6.10,232,1719903600"; 
+   d="scan'208";a="13537123"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2024 17:41:46 -0700
+X-CSE-ConnectionGUID: 5ueF3FvkTFq+jG6u1ZKKZw==
+X-CSE-MsgGUID: H6X7peciTS2Op9zWNBJxKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,232,1719903600"; 
+   d="scan'208";a="92002935"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 15 Sep 2024 17:41:45 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1spzoE-0009A5-2d;
+	Mon, 16 Sep 2024 00:41:42 +0000
+Date: Mon, 16 Sep 2024 08:40:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>
+Subject: [cifs:for-next 12/25] fs/smb/client/transport.c:437:24: error:
+ implicit declaration of function 'smb_compress'; did you mean
+ 'cra_compress'?
+Message-ID: <202409160825.dssj4HmQ-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912120548.15877-7-pali@kernel.org> <20240915194545.14779-1-pali@kernel.org>
- <20240915194545.14779-2-pali@kernel.org>
-In-Reply-To: <20240915194545.14779-2-pali@kernel.org>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 15 Sep 2024 16:15:09 -0500
-Message-ID: <CAH2r5msn4JgezFNPmgfWA6Ti1SzorvfhXXkk747bQ4R4QjNkCQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] cifs: Add support for creating SFU symlinks
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-merged into cifs-2.6.git for-next pending review/testing
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   2716e3ac61b56a9da0072911d96144578c39e750
+commit: f046d71e84e1e94cf23335129a27f5cfe3e8b75f [12/25] smb: client: insert compression check/call on write requests
+config: x86_64-rhel-8.3-bpf (https://download.01.org/0day-ci/archive/20240916/202409160825.dssj4HmQ-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240916/202409160825.dssj4HmQ-lkp@intel.com/reproduce)
 
-On Sun, Sep 15, 2024 at 2:46=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
-rote:
->
-> Linux cifs client can already detect SFU symlinks and reads it content
-> (target location). But currently is not able to create new symlink. So
-> implement this missing support.
->
-> When 'sfu' mount option is specified and 'mfsymlinks' is not specified th=
-en
-> create new symlinks in SFU-style. This will provide full SFU compatibilit=
-y
-> of symlinks when mounting cifs share with 'sfu' option. 'mfsymlinks' opti=
-on
-> override SFU for better Apple compatibility as explained in fs_context.c
-> file in smb3_update_mnt_flags() function.
->
-> Extend __cifs_sfu_make_node() function, which now can handle also S_IFLNK
-> type and refactor structures passed to sync_write() in this function, by
-> splitting SFU type and SFU data from original combined struct win_dev as
-> combined fixed-length struct cannot be used for variable-length symlinks.
->
-> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
-> ---
->  fs/smb/client/cifspdu.h    |  6 ---
->  fs/smb/client/cifsproto.h  |  4 ++
->  fs/smb/client/fs_context.c | 13 ++++---
->  fs/smb/client/link.c       |  3 ++
->  fs/smb/client/smb2ops.c    | 80 +++++++++++++++++++++++++++++---------
->  5 files changed, 77 insertions(+), 29 deletions(-)
->
-> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-> index a2072ab9e586..c3b6263060b0 100644
-> --- a/fs/smb/client/cifspdu.h
-> +++ b/fs/smb/client/cifspdu.h
-> @@ -2573,12 +2573,6 @@ typedef struct {
->  } __attribute__((packed)) FIND_FILE_STANDARD_INFO; /* level 0x1 FF resp =
-data */
->
->
-> -struct win_dev {
-> -       unsigned char type[8]; /* IntxCHR or IntxBLK or LnxFIFO or LnxSOC=
-K */
-> -       __le64 major;
-> -       __le64 minor;
-> -} __attribute__((packed));
-> -
->  struct fea {
->         unsigned char EA_flags;
->         __u8 name_len;
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 497bf3c447bc..791bddac0396 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -676,6 +676,10 @@ char *extract_sharename(const char *unc);
->  int parse_reparse_point(struct reparse_data_buffer *buf,
->                         u32 plen, struct cifs_sb_info *cifs_sb,
->                         bool unicode, struct cifs_open_info_data *data);
-> +int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-> +                        struct dentry *dentry, struct cifs_tcon *tcon,
-> +                        const char *full_path, umode_t mode, dev_t dev,
-> +                        const char *symname);
->  int cifs_sfu_make_node(unsigned int xid, struct inode *inode,
->                        struct dentry *dentry, struct cifs_tcon *tcon,
->                        const char *full_path, umode_t mode, dev_t dev);
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index bc926ab2555b..2f0c3894b0f7 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1896,14 +1896,17 @@ void smb3_update_mnt_flags(struct cifs_sb_info *c=
-ifs_sb)
->         if (ctx->mfsymlinks) {
->                 if (ctx->sfu_emul) {
->                         /*
-> -                        * Our SFU ("Services for Unix" emulation does no=
-t allow
-> -                        * creating symlinks but does allow reading exist=
-ing SFU
-> -                        * symlinks (it does allow both creating and read=
-ing SFU
-> -                        * style mknod and FIFOs though). When "mfsymlink=
-s" and
-> +                        * Our SFU ("Services for Unix") emulation allows=
- now
-> +                        * creating new and reading existing SFU symlinks=
-.
-> +                        * Older Linux kernel versions were not able to n=
-either
-> +                        * read existing nor create new SFU symlinks. But
-> +                        * creating and reading SFU style mknod and FIFOs=
- was
-> +                        * supported for long time. When "mfsymlinks" and
->                          * "sfu" are both enabled at the same time, it al=
-lows
->                          * reading both types of symlinks, but will only =
-create
->                          * them with mfsymlinks format. This allows bette=
-r
-> -                        * Apple compatibility (probably better for Samba=
- too)
-> +                        * Apple compatibility, compatibility with older =
-Linux
-> +                        * kernel clients (probably better for Samba too)
->                          * while still recognizing old Windows style syml=
-inks.
->                          */
->                         cifs_dbg(VFS, "mount options mfsymlinks and sfu b=
-oth enabled\n");
-> diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-> index 80099bbb333b..47ddeb7fa111 100644
-> --- a/fs/smb/client/link.c
-> +++ b/fs/smb/client/link.c
-> @@ -606,6 +606,9 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *i=
-node,
->         /* BB what if DFS and this volume is on different share? BB */
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
->                 rc =3D create_mf_symlink(xid, pTcon, cifs_sb, full_path, =
-symname);
-> +       } else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL) {
-> +               rc =3D __cifs_sfu_make_node(xid, inode, direntry, pTcon,
-> +                                         full_path, S_IFLNK, 0, symname)=
-;
->  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
->         } else if (pTcon->unix_ext) {
->                 rc =3D CIFSUnixCreateSymLink(xid, pTcon, full_path, symna=
-me,
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 9c2d065d3cc4..2c251e9a3a30 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -5055,9 +5055,10 @@ static int smb2_next_header(struct TCP_Server_Info=
- *server, char *buf,
->         return 0;
->  }
->
-> -static int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-> +int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
->                                 struct dentry *dentry, struct cifs_tcon *=
-tcon,
-> -                               const char *full_path, umode_t mode, dev_=
-t dev)
-> +                               const char *full_path, umode_t mode, dev_=
-t dev,
-> +                               const char *symname)
->  {
->         struct TCP_Server_Info *server =3D tcon->ses->server;
->         struct cifs_open_parms oparms;
-> @@ -5065,30 +5066,64 @@ static int __cifs_sfu_make_node(unsigned int xid,=
- struct inode *inode,
->         struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
->         struct cifs_fid fid;
->         unsigned int bytes_written;
-> -       struct win_dev pdev =3D {};
-> -       struct kvec iov[2];
-> +       u8 type[8];
-> +       int type_len =3D 0;
-> +       struct {
-> +               __le64 major;
-> +               __le64 minor;
-> +       } __packed pdev =3D {};
-> +       __le16 *symname_utf16 =3D NULL;
-> +       u8 *data =3D NULL;
-> +       int data_len =3D 0;
-> +       struct kvec iov[3];
->         __u32 oplock =3D server->oplocks ? REQ_OPLOCK : 0;
->         int rc;
->
->         switch (mode & S_IFMT) {
->         case S_IFCHR:
-> -               memcpy(pdev.type, "IntxCHR\0", 8);
-> +               type_len =3D 8;
-> +               memcpy(type, "IntxCHR\0", type_len);
->                 pdev.major =3D cpu_to_le64(MAJOR(dev));
->                 pdev.minor =3D cpu_to_le64(MINOR(dev));
-> +               data =3D (u8 *)&pdev;
-> +               data_len =3D sizeof(pdev);
->                 break;
->         case S_IFBLK:
-> -               memcpy(pdev.type, "IntxBLK\0", 8);
-> +               type_len =3D 8;
-> +               memcpy(type, "IntxBLK\0", type_len);
->                 pdev.major =3D cpu_to_le64(MAJOR(dev));
->                 pdev.minor =3D cpu_to_le64(MINOR(dev));
-> +               data =3D (u8 *)&pdev;
-> +               data_len =3D sizeof(pdev);
-> +               break;
-> +       case S_IFLNK:
-> +               type_len =3D 8;
-> +               memcpy(type, "IntxLNK\1", type_len);
-> +               symname_utf16 =3D cifs_strndup_to_utf16(symname, strlen(s=
-ymname),
-> +                                                     &data_len, cifs_sb-=
->local_nls,
-> +                                                     NO_MAP_UNI_RSVD);
-> +               if (!symname_utf16) {
-> +                       rc =3D -ENOMEM;
-> +                       goto out;
-> +               }
-> +               data_len -=3D 2; /* symlink is without trailing wide-nul =
-*/
-> +               data =3D (u8 *)symname_utf16;
->                 break;
->         case S_IFSOCK:
-> -               strscpy(pdev.type, "LnxSOCK");
-> +               type_len =3D 8;
-> +               strscpy(type, "LnxSOCK");
-> +               data =3D (u8 *)&pdev;
-> +               data_len =3D sizeof(pdev);
->                 break;
->         case S_IFIFO:
-> -               strscpy(pdev.type, "LnxFIFO");
-> +               type_len =3D 8;
-> +               strscpy(type, "LnxFIFO");
-> +               data =3D (u8 *)&pdev;
-> +               data_len =3D sizeof(pdev);
->                 break;
->         default:
-> -               return -EPERM;
-> +               rc =3D -EPERM;
-> +               goto out;
->         }
->
->         oparms =3D CIFS_OPARMS(cifs_sb, tcon, full_path, GENERIC_WRITE,
-> @@ -5098,17 +5133,26 @@ static int __cifs_sfu_make_node(unsigned int xid,=
- struct inode *inode,
->
->         rc =3D server->ops->open(xid, &oparms, &oplock, NULL);
->         if (rc)
-> -               return rc;
-> +               goto out;
->
-> -       io_parms.pid =3D current->tgid;
-> -       io_parms.tcon =3D tcon;
-> -       io_parms.length =3D sizeof(pdev);
-> -       iov[1].iov_base =3D &pdev;
-> -       iov[1].iov_len =3D sizeof(pdev);
-> +       if (type_len + data_len > 0) {
-> +               io_parms.pid =3D current->tgid;
-> +               io_parms.tcon =3D tcon;
-> +               io_parms.length =3D type_len + data_len;
-> +               iov[1].iov_base =3D type;
-> +               iov[1].iov_len =3D type_len;
-> +               iov[2].iov_base =3D data;
-> +               iov[2].iov_len =3D data_len;
-> +
-> +               rc =3D server->ops->sync_write(xid, &fid, &io_parms,
-> +                                            &bytes_written,
-> +                                            iov, ARRAY_SIZE(iov)-1);
-> +       }
->
-> -       rc =3D server->ops->sync_write(xid, &fid, &io_parms,
-> -                                    &bytes_written, iov, 1);
->         server->ops->close(xid, tcon, &fid);
-> +
-> +out:
-> +       kfree(symname_utf16);
->         return rc;
->  }
->
-> @@ -5120,7 +5164,7 @@ int cifs_sfu_make_node(unsigned int xid, struct ino=
-de *inode,
->         int rc;
->
->         rc =3D __cifs_sfu_make_node(xid, inode, dentry, tcon,
-> -                                 full_path, mode, dev);
-> +                                 full_path, mode, dev, NULL);
->         if (rc)
->                 return rc;
->
-> --
-> 2.20.1
->
->
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409160825.dssj4HmQ-lkp@intel.com/
+
+Note: the cifs/for-next HEAD 2716e3ac61b56a9da0072911d96144578c39e750 builds fine.
+      It only hurts bisectability.
+
+All errors (new ones prefixed by >>):
+
+   fs/smb/client/transport.c: In function 'smb_send_rqst':
+>> fs/smb/client/transport.c:437:24: error: implicit declaration of function 'smb_compress'; did you mean 'cra_compress'? [-Werror=implicit-function-declaration]
+     437 |                 return smb_compress(server, &rqst[0], __smb_send_rqst);
+         |                        ^~~~~~~~~~~~
+         |                        cra_compress
+   cc1: some warnings being treated as errors
+--
+   fs/smb/client/smb2pdu.c: In function 'smb2_async_writev':
+>> fs/smb/client/smb2pdu.c:5025:69: error: implicit declaration of function 'should_compress' [-Werror=implicit-function-declaration]
+    5025 |         if (((flags & CIFS_TRANSFORM_REQ) != CIFS_TRANSFORM_REQ) && should_compress(tcon, &rqst))
+         |                                                                     ^~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
 
 
---=20
-Thanks,
+vim +437 fs/smb/client/transport.c
 
-Steve
+   426	
+   427	static int
+   428	smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+   429		      struct smb_rqst *rqst, int flags)
+   430	{
+   431		struct send_req_vars *vars;
+   432		struct smb_rqst *cur_rqst;
+   433		struct kvec *iov;
+   434		int rc;
+   435	
+   436		if (flags & CIFS_COMPRESS_REQ)
+ > 437			return smb_compress(server, &rqst[0], __smb_send_rqst);
+   438	
+   439		if (!(flags & CIFS_TRANSFORM_REQ))
+   440			return __smb_send_rqst(server, num_rqst, rqst);
+   441	
+   442		if (WARN_ON_ONCE(num_rqst > MAX_COMPOUND - 1))
+   443			return -EIO;
+   444	
+   445		if (!server->ops->init_transform_rq) {
+   446			cifs_server_dbg(VFS, "Encryption requested but transform callback is missing\n");
+   447			return -EIO;
+   448		}
+   449	
+   450		vars = kzalloc(sizeof(*vars), GFP_NOFS);
+   451		if (!vars)
+   452			return -ENOMEM;
+   453		cur_rqst = vars->rqst;
+   454		iov = &vars->iov;
+   455	
+   456		iov->iov_base = &vars->tr_hdr;
+   457		iov->iov_len = sizeof(vars->tr_hdr);
+   458		cur_rqst[0].rq_iov = iov;
+   459		cur_rqst[0].rq_nvec = 1;
+   460	
+   461		rc = server->ops->init_transform_rq(server, num_rqst + 1,
+   462						    &cur_rqst[0], rqst);
+   463		if (rc)
+   464			goto out;
+   465	
+   466		rc = __smb_send_rqst(server, num_rqst + 1, &cur_rqst[0]);
+   467		smb3_free_compound_rqst(num_rqst, &cur_rqst[1]);
+   468	out:
+   469		kfree(vars);
+   470		return rc;
+   471	}
+   472	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
