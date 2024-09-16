@@ -1,93 +1,82 @@
-Received: from mail.sernet.de (mail.sernet.de [185.199.217.2])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E621553B7
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Sep 2024 13:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.199.217.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030047BB15
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Sep 2024 13:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726491964; cv=none; b=Omp6U1QkhbBp8cQ0rhmQ4RDpiZilYlfK5rIGCJwAuwhBEs3o3rGIqxcASpNIIP+gaQNbFDs+63w+yyvsKbU6FsOqjw0b52/QiJi5F4HiI5atrSmymV1tLHJ0d37wvahTAGkMG43WbPRK2VIETOYHbYPmdptjHHNxpYudFSZX6oY=
+	t=1726494219; cv=none; b=m1xSDZWFEeGATlXfaF4gk0a3LOWFfXlPlTyCBaNKomg2rqnU3Xeya38k2bHAbO954Nxj5U5cxKREZFIQHc0uz1XG8Amc4jhRoiK7S83a7Ve5c4eX6SqDGHvE9nhaEGTXGQujyYlF5DtNcqRSpAsByhX60uhe08yNv0mqtrFvGfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726491964; c=relaxed/simple;
-	bh=JMB8/IfZwoSdI8FZjHsZ2i4OX9I21AUmJE+1ys9Yx7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C2O6lTrF+dh2ajmMl3LEWJcfxaEZQQSWVBfCnOQlPA9FjQmwo2XPVw0fmD0EIXWnWwjvOwt9E7RjgygvP7jPN66Dunihpedd5OcbzG9NNZBcQmybqLkHouFrxT9VtBQPB/kw4t9nzhddIlJHt4hcAVVkxErElXNJDQEcYG9Q7H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sernet.de; spf=pass smtp.mailfrom=sernet.de; dkim=pass (2048-bit key) header.d=sernet.de header.i=@sernet.de header.b=VHfLt0v2; dkim=permerror (0-bit key) header.d=sernet.de header.i=@sernet.de header.b=QPBpFn71; arc=none smtp.client-ip=185.199.217.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sernet.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sernet.de
+	s=arc-20240116; t=1726494219; c=relaxed/simple;
+	bh=804IJk9+SKcpOk0SBW7w1PBINGjYMRAnV93CFUNESjg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=KtChQOCIOyZtICy8NQeAXg2lWIJdj/vdHaCcwrT1OSQzqUdk83gLwXbpJzQzqBxY+vP5qyuWFboj0tT7qGSuHIHN0N9RtQCsNUBJbJ/kVyCYXHfLaw/p6rxHdhaOgQOhUS154CP7Z6B2uq6DpYwaY1ahMKSd0e9LcQdrfOEyNyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N5lRcGGl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sernet.de header.i=@sernet.de header.b="VHfLt0v2";
-	dkim=permerror (0-bit key) header.d=sernet.de header.i=@sernet.de header.b="QPBpFn71"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sernet.de;
-	s=20210621-rsa; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JMB8/IfZwoSdI8FZjHsZ2i4OX9I21AUmJE+1ys9Yx7s=; b=VHfLt0v2tKP+D4OaTgz/Ac0FML
-	Elzy8JViECVZOWn0GFRHakgGlysb+hRs6Eqn8/SemiGZ35hwHZIO3kPxNBM233ZPzuUi7zPne/0Pi
-	D1T1Kg3lR5rq5D7ZBk15Lw2+7BNmEt6MMfaH9YgI2U3kbiMxZafCS3mGEL/Bgp1ENPoi+xzl9YTcy
-	2L5xCqn+ouHod/FfADPESGj2Ief8TNrSTtYPLrVSk1c5C80+ZX/JvY6lXCMjQyjMMs7kHBMF9K11m
-	PgRjzXkcKn+rQ/UA9c5MjLh/8C2CZhMBt7GN3zU1FZ3UUb5pHfexopGdnRwc2YeUrAoY48rDzNn+O
-	byPHlpMg==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sernet.de; s=20210621-ed25519; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Reply-To:Message-ID:Subject:Cc:To:From:
-	Date:Sender:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JMB8/IfZwoSdI8FZjHsZ2i4OX9I21AUmJE+1ys9Yx7s=; b=QPBpFn71Ag4ERCCLuTp1Zp9Uwk
-	Q2zKNPn1HJC39a5uQIGy0//otoWrdGZw2VaEThk1mvS88TAcmyHhiC3mt0Bw==;
-Date: Mon, 16 Sep 2024 14:51:49 +0200
-From: Volker Lendecke <Volker.Lendecke@sernet.de>
-To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 6/7] cifs: Fix creating of SFU fifo and socket special
- files
-Message-ID: <Zugp5RiYKqFUW_bk@sernet.de>
-Reply-To: Volker.Lendecke@sernet.de
-References: <20240912120548.15877-1-pali@kernel.org>
- <20240912120548.15877-7-pali@kernel.org>
- <20240913200721.7egunkwp76qo5yy7@pali>
- <CAH2r5mvEa8mUrK7mEKFiimkb1asTWA0p7ADz4937yoxM916RAw@mail.gmail.com>
- <20240913224248.k5tn2le3gau2prmo@pali>
- <CAH2r5mtgV=NkZVChDY-apdqkvM9KFkraRGy_jDCpLmFU6PFMAA@mail.gmail.com>
- <20240914081742.wlldjjlogrmk533i@pali>
- <20240915174126.ilxwoxlsfakgnl7d@pali>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5lRcGGl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726494217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type;
+	bh=804IJk9+SKcpOk0SBW7w1PBINGjYMRAnV93CFUNESjg=;
+	b=N5lRcGGlNOZlEY9ck1qwbJCWEN/4+TLPJz+YjUvZokJVxIoUhkyp3oIN+exNQdKXcE0jOm
+	tSxD0sxeLSoULJJhSuQEK6ogy8zHcYPoTBh0HU+Ox5sP8FKxWX+GkDZdnrohrIJTxMMak7
+	NZTyo6eQndbkAceKRk5xwm2m9BhGCS0=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-313-NdYqZPNaPGivuHGR8jIusw-1; Mon, 16 Sep 2024 09:43:35 -0400
+X-MC-Unique: NdYqZPNaPGivuHGR8jIusw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-536800baa8aso2746880e87.2
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Sep 2024 06:43:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726494214; x=1727099014;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=804IJk9+SKcpOk0SBW7w1PBINGjYMRAnV93CFUNESjg=;
+        b=gMDpjKdQii/e0JLftHeIh3tOgpsKqAQKl70q6OnxxrOleGr1zmGX43bLQhLOMvQ8J+
+         7f4d8kuZl0G+2ug6x73bu19YL4HwUEun8Yu047OoyadiQtl0vfpEZH05rYBVMNot79rg
+         GeMNhXkHDfuu+fW3JlSki9vqEZWtg1pVKsJPPVM26rNrca+1qwMxiw6E/rlYOisFOT+3
+         CAFjxI2xs++rlpqykd8K90ViCEF8vVgJ/xGaSD8TxY+1BszWKie3VKEtz3a0q0UXxAgP
+         E4griAtnyO7J1Wdxcb2/EDtixvjtO1Tnh24Xtf/vyWYfSmNdX7WF+o0o9FajxVU4t8NB
+         wPeA==
+X-Gm-Message-State: AOJu0Yw0JbPuN7r8Z+0yEUb2aQlZ1rTDLHrhozU4CcvkOFQDUBURJcQX
+	dC6Wl/PU6yo/UCxkap4pVTTlxdNowQ2zuFmwbBDPqFB+llUbiD+zzTpdNIzlLIt1xCObSf3uijW
+	K1CPqOY6yg0lfZzlfhu4UN/8iIve/at+UO99YZns43CIxgO7shCZZbt0G8ZaShi3w8kKfgYIvc1
+	BhYRtDWpqW6DsbhAHxTSf6UIX9koTsw4I2UUOiaixEBw1U0O8=
+X-Received: by 2002:a05:6512:3e02:b0:536:569b:a59c with SMTP id 2adb3069b0e04-53678fb1ed6mr8202552e87.4.1726494213908;
+        Mon, 16 Sep 2024 06:43:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHJBM0pQf1m28WFGuv1QMv7FpJyfVr5aWggNDLSoqEiRKy8EQ6rMX16HKDFBSzvVqGHnfOy9oWeTBP9/LHP9yM=
+X-Received: by 2002:a05:6512:3e02:b0:536:569b:a59c with SMTP id
+ 2adb3069b0e04-53678fb1ed6mr8202502e87.4.1726494213032; Mon, 16 Sep 2024
+ 06:43:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240915174126.ilxwoxlsfakgnl7d@pali>
+From: Maxim Patlasov <mpatlaso@redhat.com>
+Date: Mon, 16 Sep 2024 15:43:22 +0200
+Message-ID: <CAKRryJZs-gXnWCYUXhbjV__OM7T85xpKp9nvPOprJzcOJGX9=A@mail.gmail.com>
+Subject: rmdir() fails for a dir w/o write perm
+To: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Pali,
+Hi,
 
-Am Sun, Sep 15, 2024 at 07:41:26PM +0200 schrieb Pali Rohár:
-> Now I have figured out that even the latest Windows Server 2022 version
-> provides interoperability of FIFOs in SFU format with Windows NFS 4.1
-> Server. So if you configure on Windows Server 2022 one share which is
-> exported over SMB and also NFS at the same time, and over SMB you create
-> SFU-style fifo, then Windows NFS4.1 server recognize it and properly
-> reports nfs4type as NFS4FIFO for NFSv4.1 client.
+Is this a bug or well-known issue?
 
-it might work in this direction. However, in my tests if you create a
-fifo over NFS you end up with a NFS-style reparse point, which is much
-less prone to misinterpretation. So my suggestion would be to use the
-way that Microsoft properly documented in
+# mount -t cifs -o
+dir_mode=0777,file_mode=0777,username=jane,password=pass,vers=3.1.1,addr=127.0.0.1,uid=0,gid=0,noperm
+//127.0.0.1/share /mnt
 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/ff4df658-7f27-476a-8025-4074c0121eec
+# mkdir /mnt/dir
+# chmod a-w /mnt/dir
+# rmdir /mnt/dir
+rmdir: failed to remove '/mnt/dir': Permission denied
 
-for anything that is newly created on all servers that can do reparse
-points. For servers that don't support reparse points, WSL might be an
-alternative. For me it would be highly confusing to add yet another
-representation of unix special files from new code.
+Thanks,
+Maxim
 
-Reading existing special files -- sure, where strictly required for
-compat reasons. Creating them? No. Too many options make the test
-matrix explode.
-
-Volker
