@@ -1,141 +1,114 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C73374EA;
-	Tue, 17 Sep 2024 21:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A4D34CE5;
+	Tue, 17 Sep 2024 21:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726607964; cv=none; b=oELSN77IySgw66L84OmnaVaVbAmwP5yL/SvgVGTgfzoNMndaG55DSyugVcnQkY1bv0FH5tAb73RmrL15Fz8dtKcT2ArJ4iUXrbmIUtY9rNF1hWdvqo3o8OlLJqoJQtO1vCG0fXqRM7P0sKpd5AJb3j1w+F56+8S45c+IvNatLZE=
+	t=1726608282; cv=none; b=l6Q2+Ve9GbY4mE3baKZvqFnFq/6WZKvZtfI7LhYy7S1DAS6hWdThu8EcO0LFpU3ym6mjYPkJfHHvUlpegixU7UtqEofnBoidynKGjIExQ2pAar0RK3tsK02Xa8peEaGaxK6d6ydTSJCN88QpEHwGv5x/2LT7xnPdXfaYCvwi5xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726607964; c=relaxed/simple;
-	bh=dEbXOV60Wugkdiy4Te8PUdRhJbMDZIXOnYYYzgC++6s=;
+	s=arc-20240116; t=1726608282; c=relaxed/simple;
+	bh=qbzwExx8laMrc91h0RhCesWw10Mfdv3PH8Szj/HZGbo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TQaZxXuuf/ZIGXNPIBW9hCUBGYkqilmccFc3Gek/DrEabWDlQXgfcb1KFtVt/+in/Zc7S21Uvei+EwAixr2+kArsCt32Sp1PqAJX+05nl0wYQqBBIYPB9L+In4AK8F9qfL75PRFjL1XygkoLRLptqTVHY4U4BJX9eVkwQK5hgYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4vOm8MO; arc=none smtp.client-ip=209.85.167.41
+	 To:Cc:Content-Type; b=GOVpII8OOnJDWuGBcFNmefAVJBZVROeRRs0UeoHkH557eHv5ti3PxsbIhDWqMB9Q6YGZ2McSzYJ0HMA0PJLkm/ZcM9SGvjNJxuKWNDNMD+5YmVwx1gsQglgsBDltVnLQsjODJ24Qfh1lCnGAypBNBvapT+hfu5FDR655dh3fGqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fMhqGr/8; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4vOm8MO"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-536584f6c84so7669537e87.0;
-        Tue, 17 Sep 2024 14:19:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMhqGr/8"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5356ab89665so6828064e87.1;
+        Tue, 17 Sep 2024 14:24:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726607961; x=1727212761; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726608278; x=1727213078; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DSFe/iW5o5gwNqC2pwlFf+wzuvo/FkQkHqTQ1qcpT8w=;
-        b=F4vOm8MOlNhvMtO9sojQr4IWC8wXxKvvaGNdhFZfFJO9OlLJtQXtuDtwEJyxS5O6XU
-         NVoMWCBsUqOITB085wB6RFo1hdnWv98mIT/qE3M7dQ0SDAKJeTvaT3wdf7sc2HjxlWk7
-         k6SfuKjvQWxm8LYPzoQvUy0yB9b9pN2t1pVVYZUn5ifdfcOiUJCc1KgK9rucS7QfMSHd
-         LsiptDdshnkEa0UWQW8MXcmqlCEHo0iIMdrBs38L7YAOr7skwr9ORZK47fpk8rSXqLVj
-         1kQHDZB0ZOsXbOGH8HjG+CcwhpJn/ti/jHQnNdJs8FaWnEIhGoGf7g3GczQHxiZvsxlc
-         F0xw==
+        bh=nELtIw4Zh0M13uRB/wUCoEnw1PUF7WXP5SyljJ7urZo=;
+        b=fMhqGr/8URtOGkTBGhuY0bL1sK/Fsc5wIl8Sp3tDG+CRme96UifQiXUmTp9l6IQXaa
+         WZVKHFNLDEX/4ltoA3TRKO44An1S/lOmZdRG9kAuQ/IgYAnT+DYYlZ076WQxCtLzb046
+         pxB4nfIRNNh4T0qpF0Jtp1V14KtYkYZQXI93UvLOpKRCks3TnblgxTmb4dWBziOMQj+h
+         U8Ty2drXSjisusplIRNvGnOFEgG5TSwEOnwVVGMjUH85Sp1LXkdIWLO3QTohhTB2HxAi
+         OqM2xbxDSnCjj8hDy4CaUnkXw6TpcYQnR7TYfRSXQhIlUKs28x144ji0muN+5Iemn8tp
+         xbxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726607961; x=1727212761;
+        d=1e100.net; s=20230601; t=1726608278; x=1727213078;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DSFe/iW5o5gwNqC2pwlFf+wzuvo/FkQkHqTQ1qcpT8w=;
-        b=fWMPHgjDB4IhGHKNB5V0XyiMd2Obqd9u0C49JEny2n5wUYvhqIX3czzpuYg1d0l0Zr
-         i1gha58aIC7JmFeMvGlKBcps5oH/tD86jOTDl2OUXXdHXKhX/gnS6whXkxqjoWWF6GCC
-         MKQR2Rf/s4ccjpx/j1l8P+hHqE7RzLI7Az81bTpaduie4Qg7gvaVIp3f7RZ3Fla9ICUT
-         Ced3oNwJ5RuAso6+wgUqpP7/L+oQN/Y+zMouo1eycafcNYqjWA0KYqS1sO5FeHBjpjO+
-         qecvxlpmzD26IF3LA26nxfpUWsnkx4MJJUlMwHhjyTFPcSThvenXkFPBslzE/LrYcaF1
-         IsYA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7gaceX+VnfZ/rEYVGmxyX/AK0HXywWYBd0BibBrULqG326LqyR/mZUGphp7e5r1TX937Myqrt1z/N@vger.kernel.org, AJvYcCWKEsBAYe38RyKX3DoeUkAZMlUmCwWaOjA+RuWHAFmemC3ZND2PGr4y+ehF6KKqcFsHXUIxuPxSZa/rph7Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YyouIqj68uFMpkwOlFgICzwhRkKTAg0xju9Krmd6X+m2crvPL0H
-	NdZjAeJHQRkiL6hrlIzfMgFAiV+5PtY7eAKyiyGbpUY/KM93/HsdptlDbu+21Chp7FdEI+veuNY
-	6HrqbQNyahp2rDPoIHNkJI07Jewo=
-X-Google-Smtp-Source: AGHT+IH7xCngP7AE4CrasrgiQ/2UegqnHcUeP1pESMscM7CDm7IgYgzxhLNB3gU0xHvvveWcYDp7lu/pC+SfF3Hf2As=
-X-Received: by 2002:ac2:4c48:0:b0:52f:c27b:d572 with SMTP id
- 2adb3069b0e04-53678ff6301mr12432287e87.59.1726607960813; Tue, 17 Sep 2024
- 14:19:20 -0700 (PDT)
+        bh=nELtIw4Zh0M13uRB/wUCoEnw1PUF7WXP5SyljJ7urZo=;
+        b=ll2eyim5Q70R0sncHZ5xbJUIpaUWJmZ9zc7IehqJrJmrlH8sLUkDQ9HHt4vJ2AFvQL
+         FN5m/XejGy3KolMcTE9HJDI5fj69wGTlpFgYPWFopSfTOvYgqllpx0BFUyPeTf60yOE0
+         YdKrKlhbU31lmWqDX1GHVjiknKZlbSsB12zK7qDusiCyXM6yHEffpjNzXk6tzOZyxPAo
+         7mJad2zG8LFhfKWqBVvwTlCz6v3OSDMcSjb2CjwU2Rn43m/tMrHWHcfjYF76PeQ31XWz
+         FaxW0l5bpoDWW8OKcie3drRDwziN/ZLiVNbCU8KO6Zt0ytRsBin/57YsSG+l9rO1Yqn4
+         wxIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQRArVLomZ8auQ3+dlOYWtzIpKqGI7a/VLkhA13nU32m9NMifVBtrJz+mSSNfnpIGxm3OzjUkNdWotRyAE@vger.kernel.org, AJvYcCWUR6C/r+ucTHYt0i9WlfwtAo5zS6xzMISfZQAQFxEOJ1/x5FtiIPcb/gAVnCpClmhM7ECsqepK1U+s@vger.kernel.org, AJvYcCXLoDTIMz6WmPG7rDRq49EQWHC4vmpj6MymLtDOX7LaH7AHyeimVPHr2oZgD7vBuKie+e0b3qjyJ/W7/fJXbg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhqCS8bpASN/+GZHx3MuAbCa9qhxBsv/DIyQ3VdemZMQCVvZGC
+	KOq3AsoBaP6ynshAD44lj9JpFhBo2aosa6zpGde90413d0U2GOxeAu5YEQ87dBHkB/GksesxdW7
+	rAP3s0wwyG9dbhM2EmNdx+d52sK4=
+X-Google-Smtp-Source: AGHT+IHpWygKBqdIpti/xTdN/vHJot0ZFGpOZk871PgTIMb/gjAsmuos+l2tbd/Rrtz8eDF8oHlZxhDKZPQxWoo6z4Q=
+X-Received: by 2002:a05:6512:1384:b0:52c:e1cd:39b7 with SMTP id
+ 2adb3069b0e04-53678fb1e9fmr10522085e87.5.1726608278095; Tue, 17 Sep 2024
+ 14:24:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913200204.10660-1-pali@kernel.org> <20240913201041.cwueaflcxhewnvwj@pali>
- <20240917200600.6smfxhrppkyjuyku@pali> <ZunlTDxPLn4yryW3@jeremy-rocky-laptop.localdomain>
- <20240917202921.ty32zzmhrg33knpy@pali> <ZunnGhOogEQU2Hje@jeremy-rocky-laptop.localdomain>
- <20240917203431.w5dejuwfkmabrewz@pali> <CAN05THTVav8HOCk6V+5eg-BTESZDBx2BuQOF1c=Vn2dFv_UNxw@mail.gmail.com>
-In-Reply-To: <CAN05THTVav8HOCk6V+5eg-BTESZDBx2BuQOF1c=Vn2dFv_UNxw@mail.gmail.com>
+References: <2106017.1726559668@warthog.procyon.org.uk> <4bb2eee39bec0972377931aa8f4c280e@manguebit.com>
+In-Reply-To: <4bb2eee39bec0972377931aa8f4c280e@manguebit.com>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 17 Sep 2024 16:19:08 -0500
-Message-ID: <CAH2r5muUioziUN7mRFUAOV3tGPMLnb949j70GKYnRM2LygAWVQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Fix getting reparse points from server without WSL support
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	Jeremy Allison <jra@samba.org>, Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 17 Sep 2024 16:24:26 -0500
+Message-ID: <CAH2r5mu3TBeMugfWddNYSpPZiYe8Hhv7DYY52rsMb-Zs8BMv4g@mail.gmail.com>
+Subject: Re: [PATCH] netfs, cifs: Fix mtime/ctime update for mmapped writes
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>, 
+	Christian Brauner <brauner@kernel.org>, kernel test robot <oliver.sang@intel.com>, 
+	Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 17, 2024 at 3:45=E2=80=AFPM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> On Wed, 18 Sept 2024 at 06:37, Pali Roh=C3=A1r <pali@kernel.org> wrote:
-> >
-> > On Tuesday 17 September 2024 13:31:22 Jeremy Allison wrote:
-> > > On Tue, Sep 17, 2024 at 10:29:21PM +0200, Pali Roh=C3=A1r wrote:
-> > > > On Tuesday 17 September 2024 13:23:40 Jeremy Allison wrote:
-> > > > > On Tue, Sep 17, 2024 at 10:06:00PM +0200, Pali Roh=C3=A1r wrote:
-> > > > > > And seems that SMB2_OP_QUERY_WSL_EA is useful not only for repa=
-rse
-> > > > > > points, but also for any regular file or directory as it can co=
-ntain
-> > > > > > UNIX mode and UID/GID ownership.
-> > > > >
-> > > > > uid/gid should *never* be exposed over the wire for SMB.
-> > > > >
-> > > > > That way lies madness.
-> > > >
-> > > > Hello Jeremy, if I understood wsl_to_fattr() function correctly the=
-n it
-> > > > is already doing it, it fills uid/gid for stat() from data which we=
-re
-> > > > exposed over the wire for SMB. Could you check that function if it =
-is
-> > > > truth?
-> > >
-> > > I'm sure the Windows implementation is doing it - however, any Linux
-> > > server implementations should not do this (IMHO).
-> > >
-> > > It will break all SID -> uid / gid mapping that servers must
-> > > carefully set up.
-> > >
-> > > On the wire - SIDs must be the only source of identity.
-> >
-> > Ok. But then I do not understand why Linux client parses and uses uid
-> > and gids which are sent over the wire. If you are saying that the SIDs
-> > must be the only source of truth then Linux client should rather ignore
-> > uid and gid values?
->
-> What I think Jeremy is refering to is that mixing uids and sids in the
-> protocol itself is
-> a protocol design mistake.
-> Because this means that some PDUs in the protocol operate on SIDs but
-> others operate on
-> UID/GIDs and this means there is great risk of mistakes and have the
-> sid<->uid mapping return
-> different results depending on the actual PDU.
->
-> Sometimes the sid<->uid mapping happens in the server, at other times
-> the mapping happens in the client
-> and it is very difficult to guarantee that the mapping is consistent
-> across PDUs in the protocol as well as across different clients.
+You can also add "Tested-by: Steve French <stfrench@microsoft.com>"
 
-Yes - agreed.
+On Tue, Sep 17, 2024 at 1:01=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
+>
+> David Howells <dhowells@redhat.com> writes:
+>
+> > The cifs flag CIFS_INO_MODIFIED_ATTR, which indicates that the mtime an=
+d
+> > ctime need to be written back on close, got taken over by netfs as
+> > NETFS_ICTX_MODIFIED_ATTR to avoid the need to call a function pointer t=
+o
+> > set it.
+> >
+> > The flag gets set correctly on buffered writes, but doesn't get set by
+> > netfs_page_mkwrite(), leading to occasional failures in generic/080 and
+> > generic/215.
+> >
+> > Fix this by setting the flag in netfs_page_mkwrite().
+> >
+> > Fixes: 73425800ac94 ("netfs, cifs: Move CIFS_INO_MODIFIED_ATTR to netfs=
+_inode")
+> > Reported-by: kernel test robot <oliver.sang@intel.com>
+> > Closes: https://lore.kernel.org/oe-lkp/202409161629.98887b2-oliver.sang=
+@intel.com
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Jeff Layton <jlayton@kernel.org>
+> > cc: Steve French <sfrench@samba.org>
+> > cc: Paulo Alcantara <pc@manguebit.com>
+> > cc: linux-cifs@vger.kernel.org
+> > cc: netfs@lists.linux.dev
+> > cc: linux-fsdevel@vger.kernel.org
+> > ---
+> >  fs/netfs/buffered_write.c |    1 +
+> >  1 file changed, 1 insertion(+)
+>
+> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+>
 
-SIDs are globally unique and should always be used/sent over the wire
-(never send or use the local uid/gid which is not guaranteed to be
-unique).  Whether retrieving ownership information via
-the SMB ACL or via an SMB3.1.1 POSIX response, the SID is the correct
-thing to send/use in the protocol.  For cases where the client is not
-domain joined, the UID/GID can be encoded in the SID, for cases that
-are domain joined the Linux UIDs/GIDs can be mapped consistently via
-the SID.
 
 --=20
 Thanks,
