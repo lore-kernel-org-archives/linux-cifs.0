@@ -1,106 +1,107 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281CF3A8F7;
-	Tue, 17 Sep 2024 06:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D1F20EB
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Sep 2024 07:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726554225; cv=none; b=EUH10F7aXrHa9XHff9HHG52diLChmqqfzh0ir+Zh9RVXd8ziC0N0cWMrs29lPmxta3ShrMfQVlaq76ATDgNYLyKX52c8FunEEIzqcro/eeApzIpbqHHAIHFr2C6IamGwYtOyEMBDa7I8DSCQBdREE653SpjpT2nPDO5L67ebghE=
+	t=1726559681; cv=none; b=WpQOvJ0DOkDzlYl+nya10PeEAtomNoqEeOhNRzohBqCKwXaG3zT+e0+A/Mm6nCSPjQm4QFL51dnhDdMEznTNZiq5E+OpCG96EUri/72e+hgc8PrqlVQfybBGe7huTxIWZUH2Jb6cbePgnk13vdmaIQDIe3fzj2N+INJUtChVn3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726554225; c=relaxed/simple;
-	bh=0/Z8IpGMnPVF85y9VmcieKJEoBMNXOSKXTdO2gOQbWI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=oiV9G/HzPtowq350Yji4NPd1mxXrY4q8jrf9Vni5w8lUw4TWIYxxtyYloBeKUrday7l3b71TYU7HyPj6jUjkLGkdgCp5Mn9JgbzOtmhwWKlkfn9DUjaPBTFv4WAmNU7DDXdhVMIxSEiPNaklRZeHsyHiYSJ40z2aTB60425qTQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XX1z+fyp; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726559681; c=relaxed/simple;
+	bh=lhFZXlll59tKQPd51vvfW24mGo4UK5xcEDeJAGNp2xM=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=XGzzlpBgSOYuuMBtuX5bKVET2Xoo6RhotOyvIAaI8+FxYbzKv99EJXIs2ZNqy1ICe0ba0ZzM07vBQY7BK4HzL3MdmknHM6G/OQ+c+hv286wKbNFFQoo22IpBpfkHpI7Ry//YwSO7r695qi9MjuRkPnzmyapOzL6IfT1iNPHjZs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g5kjjArb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XX1z+fyp"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-536562739baso4254404e87.1;
-        Mon, 16 Sep 2024 23:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726554222; x=1727159022; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kdXezKVi8wVMNco9JlH4OMJNOoS1t1UfiPgsoBgiquM=;
-        b=XX1z+fypdTi9qyI65bChRTD18uQ5OprwmFK4pez0jgcabAi+lpPvk1ZbIaNcD09ozL
-         8+DHDO/h/pLkm80QwFxBcneChmUcvKlrlqNbFyOhAn0y1xzKQodRf27pYR0oRsODf7E2
-         dpJI7VWwhixz80Pm1lqTlMN3Vxvy94pyv1otXrumRaCUmSju4nDPI2CGtG9ixdtk2Oqf
-         Mkwd+mnI0BR8cIsu3Ec+EtQvRwEWnY+ZuCJse47PUP6Fa44VU4Td4z80O71QcEuB2Ovy
-         Riuy8BqX9TnVnJx5xOeFRObcVVBXIe/N9HNxV/Ayl3iLdklufznX+uD1tw0SZaThWea9
-         WjRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726554222; x=1727159022;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kdXezKVi8wVMNco9JlH4OMJNOoS1t1UfiPgsoBgiquM=;
-        b=aKjAi6gh+vpTnigFKbnHewSoB0Ql+UTGwxvLUFJ+RO0mUi1iKoFQ/Uw//xCPtnJ/EZ
-         pmc1kF3MVYdrECl0d/MDf4YbIdQJWmf+4jy21pMy4ESfJ46CHhiMgbt7ovj+zi5f9ckw
-         Zu0kdbCmV4CRyX1M2IL/wwVSqoJHo6MRDB+vHi4lup3nnMIZE028fDA2Dx1uuJnJRvgN
-         u2T7DE1Qv7UFcR87/4kxDKgS9MawY8RsY4yi9OMBXzXRsfsCftEHVlpTtoUFIs2SQ9H2
-         MZ0HmmcvPGZ4BgJcdBxlx1YioswCU7QTNZCCaVG/oAB4WHhHYJ0st01LKx5ODEqk28Mb
-         3CLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8u2m6YuhRAMT6aLp7WMaJv5sgn97vVOQCFtR9rA/pofH9azS5VsBYfBx9i1vBLdAcUO9bH87lnUuz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1kgwpvigxGDYtC0MSzRKr4UV2UWVSDxvPvsbOAhRinofSZfzE
-	RbfeTPwpcmLNhUPhcV6cjdgdy9uUImsim1ezidK6xb6HMzLbz6mjv6T6ZkpwKs1+SvNPkJnJjaZ
-	kdAHFoAv68OToBjsG7OOmkPYD7FP5W5m5lYs=
-X-Google-Smtp-Source: AGHT+IH+zFP6kEMEy+Z0PJGVt/6mZsuIrGzUHMtHAdEUdh0LHFi/cQ89fHLaonUoJJlPgAh6ER58I+hPJFk4FyC7HFE=
-X-Received: by 2002:a05:6512:1325:b0:535:6aa9:9868 with SMTP id
- 2adb3069b0e04-53678fc23dcmr9602468e87.19.1726554221811; Mon, 16 Sep 2024
- 23:23:41 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5kjjArb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726559677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5b27nr/SPZQcntuLJn+/QlhMwOaGHH4g8fVeuv0vl08=;
+	b=g5kjjArb5+uwSIyJaDUB7QjaX6FDyIf8hx/w/jLB7fpcJwarJ9iMpTkLqNLpAnmucBoINk
+	6mqYGmVG+e0vqWcIxHBxIPwSStHZPPkwUn1wUYxakKT1rpp4tXE6vI4t1wQdauc/TIYclQ
+	WA9XdrkcDOMc4ZYlpqiDA+YmNiE0Pgw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-117-q1suRQZIOkqY5JEvP-PdiQ-1; Tue,
+ 17 Sep 2024 03:54:34 -0400
+X-MC-Unique: q1suRQZIOkqY5JEvP-PdiQ-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7BA61955EB2;
+	Tue, 17 Sep 2024 07:54:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 85D5F1956088;
+	Tue, 17 Sep 2024 07:54:29 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>,
+    Christian Brauner <brauner@kernel.org>
+cc: dhowells@redhat.com, kernel test robot <oliver.sang@intel.com>,
+    Jeff Layton <jlayton@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] netfs, cifs: Fix mtime/ctime update for mmapped writes
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 17 Sep 2024 01:23:30 -0500
-Message-ID: <CAH2r5mtbB4soi6ZYq_ajFy_RaHRm=DdUTfNNbnj0UtfXF5dmEw@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2106016.1726559668.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Sep 2024 08:54:28 +0100
+Message-ID: <2106017.1726559668@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Please pull the following changes since commit
-da3ea35007d0af457a0afc87e84fddaebc4e0b63:
+The cifs flag CIFS_INO_MODIFIED_ATTR, which indicates that the mtime and
+ctime need to be written back on close, got taken over by netfs as
+NETFS_ICTX_MODIFIED_ATTR to avoid the need to call a function pointer to
+set it.
 
-  Linux 6.11-rc7 (2024-09-08 14:50:28 -0700)
+The flag gets set correctly on buffered writes, but doesn't get set by
+netfs_page_mkwrite(), leading to occasional failures in generic/080 and
+generic/215.
 
-are available in the Git repository at:
+Fix this by setting the flag in netfs_page_mkwrite().
 
-  git://git.samba.org/ksmbd.git tags/6.12-rc-ksmbd-server-fixes-part1
+Fixes: 73425800ac94 ("netfs, cifs: Move CIFS_INO_MODIFIED_ATTR to netfs_in=
+ode")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202409161629.98887b2-oliver.sang@in=
+tel.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/netfs/buffered_write.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-for you to fetch changes up to c5a709f08d40b1a082e44ffcde1aea4d2822ddd5:
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index d7eae597e54d..b3910dfcb56d 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -552,6 +552,7 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, st=
+ruct netfs_group *netfs_gr
+ 		trace_netfs_folio(folio, netfs_folio_trace_mkwrite);
+ 	netfs_set_group(folio, netfs_group);
+ 	file_update_time(file);
++	set_bit(NETFS_ICTX_MODIFIED_ATTR, &ictx->flags);
+ 	if (ictx->ops->post_modify)
+ 		ictx->ops->post_modify(inode);
+ 	ret =3D VM_FAULT_LOCKED;
 
-  ksmbd: handle caseless file creation (2024-09-14 00:03:15 -0500)
-
-----------------------------------------------------------------
-Four ksmbd server fixes, three for stable
-- Fix the issue where the directory can't be deleted if the share is
-on a file system that does not provide dot and dotdot entries.
-- Fix file creation failure if the parent name of pathname is case sensitive.
-- Fix write failure with FILE_APPEND_DATA flags.
-- Add reference count to connection struct to protect UAF of oplocks
-on multichannel.
-----------------------------------------------------------------
-Hobin Woo (1):
-      ksmbd: make __dir_empty() compatible with POSIX
-
-Namjae Jeon (3):
-      ksmbd: allow write with FILE_APPEND_DATA
-      ksmbd: add refcnt to ksmbd_conn struct
-      ksmbd: handle caseless file creation
-
- fs/smb/server/connection.c |  4 +++-
- fs/smb/server/connection.h |  1 +
- fs/smb/server/oplock.c     | 55
-++++++++++++++++---------------------------------------
- fs/smb/server/vfs.c        | 19 ++++++++-----------
- fs/smb/server/vfs_cache.c  |  3 +++
- 5 files changed, 31 insertions(+), 51 deletions(-)
-
--- 
-Thanks,
-
-Steve
