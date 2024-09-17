@@ -1,79 +1,143 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30ED818893F;
-	Tue, 17 Sep 2024 21:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726607834; cv=pass; b=sYYMUKaJcZwttoifP4SqgiBAVhkTJADjJplfB6/ZS+1CjH9lMRHDc3CUZog7OgdHTFs7UO4pqqz+JMl/+n3VHQbZSLb+pgFN8KB14UNNWq1Hc3MrDJwp4cBRs8FaTvSDs3JlTNF6faqA8pevwPLSgRw/xCe4QL1q5twNI2H0p5o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726607834; c=relaxed/simple;
-	bh=GrEatGzohiCK8MEXRWd25lZFK+7byL7YaHtLHZUnW30=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=KI67Nw/BQVZAvOtBbkxInpbZvgImOW86HVJDyrIq+2+T3Qhe42Qz9x9rhef8HTNoD2pUm38rhgLcys/QOBpgs31fczasjp1wpuCAhlrcnBlLFKqT43YGjnoCwcGG1QEFLjM+YXEIjRDe8zU0kfxB8VzYrMSIXCDGhg25i7zR3bE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=nYAY4Isb; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C73374EA;
+	Tue, 17 Sep 2024 21:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726607964; cv=none; b=oELSN77IySgw66L84OmnaVaVbAmwP5yL/SvgVGTgfzoNMndaG55DSyugVcnQkY1bv0FH5tAb73RmrL15Fz8dtKcT2ArJ4iUXrbmIUtY9rNF1hWdvqo3o8OlLJqoJQtO1vCG0fXqRM7P0sKpd5AJb3j1w+F56+8S45c+IvNatLZE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726607964; c=relaxed/simple;
+	bh=dEbXOV60Wugkdiy4Te8PUdRhJbMDZIXOnYYYzgC++6s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TQaZxXuuf/ZIGXNPIBW9hCUBGYkqilmccFc3Gek/DrEabWDlQXgfcb1KFtVt/+in/Zc7S21Uvei+EwAixr2+kArsCt32Sp1PqAJX+05nl0wYQqBBIYPB9L+In4AK8F9qfL75PRFjL1XygkoLRLptqTVHY4U4BJX9eVkwQK5hgYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4vOm8MO; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="nYAY4Isb"
-Message-ID: <7f29cbf81602313df348fe6d36bdb0e2@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1726607831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggagET1eJZyltH2WYLd8/L/pzvrZG79a8hMd2Kblfw8=;
-	b=nYAY4IsbcvAsJZA3a2SLtpBc8twWJ7AsREhokcadWXdGmsq2vtc63alVjgBzN/CJsFwOJE
-	ZbIihE1IHTKzHK+QU+eVa/7nc00QwjGk6ZBf8hIK0um0P5CPnIonjNrgjX40eIT10Besfo
-	TKzp1Sq/5upoQVV5Axjx2YKstpJqzpqDzg8oYlWX3P7wxRvRk1vYHibC7KLF4ER2ZblqTx
-	lMVk/63TQm/clD4NyqpoAsD6TmBkZ7vNzL9eGjCvDAnpdtfSu1BDh3KkRPYosLv5Mv12KO
-	9FCRW79fL+t4ye+3JwUOMnu04inErl2Ca2bMEOpFayqGK+GJvAWVokLOyPUQcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1726607831; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ggagET1eJZyltH2WYLd8/L/pzvrZG79a8hMd2Kblfw8=;
-	b=DndteNXoEpemzRZ+505Dcc53U00gsM5mWXoulP/qcoqcAXP1FJzuUW9QFdOg2uZa+QumD8
-	aokYRTtIE2F4KLUJMaJb5mgo8vDlAXOy1Gpg1rJRf+cmm8qIC1Z7GqM6aKKNLPNv2pn4Kj
-	dDlbXP48T5kmBTodS55PDzAqLJSUTM1//72Nl71juwlsCcEGrua7WAw+CqgAV1K7rBkdTN
-	Z/B9YZ5+87lP0No1SUyaKfT4Jw05pURzcSSdOzmj4mWZwBYoD1HSZEp70BLsPhwkdZQI+e
-	Wi9dYWlwfOjBESknEsUCP+WOTe9q+g/u+YYocaMSN0YJLikwbEsSQUnpJx/QoA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1726607831; a=rsa-sha256;
-	cv=none;
-	b=o97GdF70tLt8bZzyCjKXSQjmZXNtOP3/L23fuWPoW32wGtzjQBF8/kl6YhtjWLMn6v5W0e
-	dIk2qp9sTj6zPQdkDQ3P8kk/hU3H40/Toq/rYbdrsW+S8edHbAhnM78zP9NrzMqT8sdCCj
-	Oc6FmMYStz09XKeuLV8+/MmkabhoxCwcHPNda4WYi6iCQXQVf93HS7/JNRS/mQw+5kMLLj
-	h6u2imL3aZA7MiJQNOUSFUhw83AkPIubWqxnJrs3cl5pU3/k2j2pqKCVj8hkeQdaJb84bS
-	zGZW0L3GNfGZw/TKmQYQV9wZ6lvQyaH3GZc+RW6vniiPe3k92JqpTEfHDH9MiA==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix getting reparse points from server without
- WSL support
-In-Reply-To: <20240917210707.4lt4obty7wlmm42j@pali>
-References: <20240913200204.10660-1-pali@kernel.org>
- <20240913201041.cwueaflcxhewnvwj@pali>
- <73552a5120ff0a49a5e046a08c6c57f4@manguebit.com>
- <20240917210707.4lt4obty7wlmm42j@pali>
-Date: Tue, 17 Sep 2024 18:17:08 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4vOm8MO"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-536584f6c84so7669537e87.0;
+        Tue, 17 Sep 2024 14:19:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726607961; x=1727212761; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DSFe/iW5o5gwNqC2pwlFf+wzuvo/FkQkHqTQ1qcpT8w=;
+        b=F4vOm8MOlNhvMtO9sojQr4IWC8wXxKvvaGNdhFZfFJO9OlLJtQXtuDtwEJyxS5O6XU
+         NVoMWCBsUqOITB085wB6RFo1hdnWv98mIT/qE3M7dQ0SDAKJeTvaT3wdf7sc2HjxlWk7
+         k6SfuKjvQWxm8LYPzoQvUy0yB9b9pN2t1pVVYZUn5ifdfcOiUJCc1KgK9rucS7QfMSHd
+         LsiptDdshnkEa0UWQW8MXcmqlCEHo0iIMdrBs38L7YAOr7skwr9ORZK47fpk8rSXqLVj
+         1kQHDZB0ZOsXbOGH8HjG+CcwhpJn/ti/jHQnNdJs8FaWnEIhGoGf7g3GczQHxiZvsxlc
+         F0xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726607961; x=1727212761;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DSFe/iW5o5gwNqC2pwlFf+wzuvo/FkQkHqTQ1qcpT8w=;
+        b=fWMPHgjDB4IhGHKNB5V0XyiMd2Obqd9u0C49JEny2n5wUYvhqIX3czzpuYg1d0l0Zr
+         i1gha58aIC7JmFeMvGlKBcps5oH/tD86jOTDl2OUXXdHXKhX/gnS6whXkxqjoWWF6GCC
+         MKQR2Rf/s4ccjpx/j1l8P+hHqE7RzLI7Az81bTpaduie4Qg7gvaVIp3f7RZ3Fla9ICUT
+         Ced3oNwJ5RuAso6+wgUqpP7/L+oQN/Y+zMouo1eycafcNYqjWA0KYqS1sO5FeHBjpjO+
+         qecvxlpmzD26IF3LA26nxfpUWsnkx4MJJUlMwHhjyTFPcSThvenXkFPBslzE/LrYcaF1
+         IsYA==
+X-Forwarded-Encrypted: i=1; AJvYcCW7gaceX+VnfZ/rEYVGmxyX/AK0HXywWYBd0BibBrULqG326LqyR/mZUGphp7e5r1TX937Myqrt1z/N@vger.kernel.org, AJvYcCWKEsBAYe38RyKX3DoeUkAZMlUmCwWaOjA+RuWHAFmemC3ZND2PGr4y+ehF6KKqcFsHXUIxuPxSZa/rph7Z@vger.kernel.org
+X-Gm-Message-State: AOJu0YyouIqj68uFMpkwOlFgICzwhRkKTAg0xju9Krmd6X+m2crvPL0H
+	NdZjAeJHQRkiL6hrlIzfMgFAiV+5PtY7eAKyiyGbpUY/KM93/HsdptlDbu+21Chp7FdEI+veuNY
+	6HrqbQNyahp2rDPoIHNkJI07Jewo=
+X-Google-Smtp-Source: AGHT+IH7xCngP7AE4CrasrgiQ/2UegqnHcUeP1pESMscM7CDm7IgYgzxhLNB3gU0xHvvveWcYDp7lu/pC+SfF3Hf2As=
+X-Received: by 2002:ac2:4c48:0:b0:52f:c27b:d572 with SMTP id
+ 2adb3069b0e04-53678ff6301mr12432287e87.59.1726607960813; Tue, 17 Sep 2024
+ 14:19:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240913200204.10660-1-pali@kernel.org> <20240913201041.cwueaflcxhewnvwj@pali>
+ <20240917200600.6smfxhrppkyjuyku@pali> <ZunlTDxPLn4yryW3@jeremy-rocky-laptop.localdomain>
+ <20240917202921.ty32zzmhrg33knpy@pali> <ZunnGhOogEQU2Hje@jeremy-rocky-laptop.localdomain>
+ <20240917203431.w5dejuwfkmabrewz@pali> <CAN05THTVav8HOCk6V+5eg-BTESZDBx2BuQOF1c=Vn2dFv_UNxw@mail.gmail.com>
+In-Reply-To: <CAN05THTVav8HOCk6V+5eg-BTESZDBx2BuQOF1c=Vn2dFv_UNxw@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 17 Sep 2024 16:19:08 -0500
+Message-ID: <CAH2r5muUioziUN7mRFUAOV3tGPMLnb949j70GKYnRM2LygAWVQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix getting reparse points from server without WSL support
+To: ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	Jeremy Allison <jra@samba.org>, Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
+On Tue, Sep 17, 2024 at 3:45=E2=80=AFPM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
+>
+> On Wed, 18 Sept 2024 at 06:37, Pali Roh=C3=A1r <pali@kernel.org> wrote:
+> >
+> > On Tuesday 17 September 2024 13:31:22 Jeremy Allison wrote:
+> > > On Tue, Sep 17, 2024 at 10:29:21PM +0200, Pali Roh=C3=A1r wrote:
+> > > > On Tuesday 17 September 2024 13:23:40 Jeremy Allison wrote:
+> > > > > On Tue, Sep 17, 2024 at 10:06:00PM +0200, Pali Roh=C3=A1r wrote:
+> > > > > > And seems that SMB2_OP_QUERY_WSL_EA is useful not only for repa=
+rse
+> > > > > > points, but also for any regular file or directory as it can co=
+ntain
+> > > > > > UNIX mode and UID/GID ownership.
+> > > > >
+> > > > > uid/gid should *never* be exposed over the wire for SMB.
+> > > > >
+> > > > > That way lies madness.
+> > > >
+> > > > Hello Jeremy, if I understood wsl_to_fattr() function correctly the=
+n it
+> > > > is already doing it, it fills uid/gid for stat() from data which we=
+re
+> > > > exposed over the wire for SMB. Could you check that function if it =
+is
+> > > > truth?
+> > >
+> > > I'm sure the Windows implementation is doing it - however, any Linux
+> > > server implementations should not do this (IMHO).
+> > >
+> > > It will break all SID -> uid / gid mapping that servers must
+> > > carefully set up.
+> > >
+> > > On the wire - SIDs must be the only source of identity.
+> >
+> > Ok. But then I do not understand why Linux client parses and uses uid
+> > and gids which are sent over the wire. If you are saying that the SIDs
+> > must be the only source of truth then Linux client should rather ignore
+> > uid and gid values?
+>
+> What I think Jeremy is refering to is that mixing uids and sids in the
+> protocol itself is
+> a protocol design mistake.
+> Because this means that some PDUs in the protocol operate on SIDs but
+> others operate on
+> UID/GIDs and this means there is great risk of mistakes and have the
+> sid<->uid mapping return
+> different results depending on the actual PDU.
+>
+> Sometimes the sid<->uid mapping happens in the server, at other times
+> the mapping happens in the client
+> and it is very difficult to guarantee that the mapping is consistent
+> across PDUs in the protocol as well as across different clients.
 
-> Would you be able to fix the client code to do this?
+Yes - agreed.
 
-Yep.  Will send it to ML soon.
+SIDs are globally unique and should always be used/sent over the wire
+(never send or use the local uid/gid which is not guaranteed to be
+unique).  Whether retrieving ownership information via
+the SMB ACL or via an SMB3.1.1 POSIX response, the SID is the correct
+thing to send/use in the protocol.  For cases where the client is not
+domain joined, the UID/GID can be encoded in the SID, for cases that
+are domain joined the Linux UIDs/GIDs can be mapped consistently via
+the SID.
+
+--=20
+Thanks,
+
+Steve
