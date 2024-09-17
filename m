@@ -1,85 +1,173 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B28155A4E;
-	Tue, 17 Sep 2024 08:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8618B17ADFC
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Sep 2024 17:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726563566; cv=none; b=V/Z9vHZDEDMhJ/6wjOVH4UH49lG+HaE1g7ZG0O8pVqJ62yqVSR24OGSj0FlTqD+/QiS8pATeDQBrhSfoPKEO7WChvzOhHGssSTIRQzRBRNIaBDQCGESojEcz68VNpZHVq3coem6CDMg+skw9R+PrGrh/BNgZ/W3JM/DpFUmXbII=
+	t=1726594267; cv=none; b=TGCWIYZyOsyCnyGff/cxObuz5Pijo+UKaJQyGUUouXlyjV5OMm91x6c2XE71mha0BHvECUrhq7cvVeXmFtrZYJ7a6UM8msK2rwCyMXfy7T2R1TmwU/bvFh1OoAw+jFNnG7HWfOiPax2FFPUSsGUiFrhnO4RwgaCl4LpGv7bqVn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726563566; c=relaxed/simple;
-	bh=NKhckBMgwJKcDCDVH8R0awRFV2BdU7iPgvD+2gL7lgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V9lUlOZEVdCbkez3KlIIHLIuOSrJNqG/ijHdRRUngyGK5jmru+drcm15nOu31EZz5kZY7QtYo951hrdzgnfMUq3SdgSaSpSY2+SMwO/syEq+yxE/hSmvrd6Kj5yr6IgP2CwfH3RsFBiECWYYyz0YvpiLhTyXapQQ0FEGfffgM8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hkDNdmJI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726594267; c=relaxed/simple;
+	bh=tGYWR8/WN0m/AzKpQT7y+opcbunbNdg82+K/XE3Uq8M=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Hfcr3xUquXN2knhX2910vEJIxPlW1JRtehsFSf8etiX0476y/6bJzzpGSAUgcfvoxgfVgohAg87iwB79tfxc13uAVY8plf8zE+ZZyV7dqO13CIxE/rp/k/Ene2lPrykZyiAHrobqE1/q+LFoffNfB9yS4s8+e3I15U8xWCJ1ovU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SbYWNzHW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hkDNdmJI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D740C4CEC5;
-	Tue, 17 Sep 2024 08:59:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726563565;
-	bh=NKhckBMgwJKcDCDVH8R0awRFV2BdU7iPgvD+2gL7lgQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hkDNdmJIqrdgegnNnlNIX+KgWGmbQVXD0wGSGAL40K5YK6/9OiM77zzk8lTJJ/ey+
-	 pSQucHG+KwI3gBYSQQnMjr4N6r8Kxb6oo6opLTyN1j0bJ4zYr+9eRvqNG/oFa1BFVn
-	 0x73yZxa3S8ErYG/OOGjY+olVwnDwH1rUGx1j+dS7NyfDFIv5tJQpNTvgqlyRzEd5S
-	 GxqXgz8kDXz6jp5wuALWXxyaNKBnKagklUvt/wNOgRv+U7so1tOD1KnbykM3Om8IoU
-	 TL7E7p0M0xgIMiBmbUWh4aBopqjaiWmli6y+ndzwnRhx13WBhz6I7/NMJfOZXLLNtl
-	 XkieuQHSDBerQ==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	kernel test robot <oliver.sang@intel.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>
-Subject: Re: [PATCH] netfs, cifs: Fix mtime/ctime update for mmapped writes
-Date: Tue, 17 Sep 2024 10:59:01 +0200
-Message-ID: <20240917-hypen-advokat-2d384f761fde@brauner>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <2106017.1726559668@warthog.procyon.org.uk>
-References: <2106017.1726559668@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbYWNzHW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726594264;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=E+Q1TBMKNjej+bpAWrl6GV0oWbucsyD8OkToLXYmdYQ=;
+	b=SbYWNzHWFQ0O64B0SdHA2FgCSlABB+FzKyqlmM+RqZLtT5a9uB18buMSaNazS76htc1SFr
+	txWhO2e2QJTPhBB22Uz8ZpPowleqr8nIrI4S18GgnomU5cymM/8dXuSfnbIA390sLIJvlu
+	OwpyOFGfrDl6X/1lfq5KUOOnLgyKtCk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-FysxpM_vNkG8aBj0T1ezlA-1; Tue,
+ 17 Sep 2024 13:31:00 -0400
+X-MC-Unique: FysxpM_vNkG8aBj0T1ezlA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CB83E1944AA8;
+	Tue, 17 Sep 2024 17:30:58 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B0B4C1956086;
+	Tue, 17 Sep 2024 17:30:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>,
+    Christian Brauner <brauner@kernel.org>
+cc: dhowells@redhat.com, kernel test robot <oliver.sang@intel.com>,
+    Jeff Layton <jlayton@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix reversion of the iter in cifs_readv_receive().
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1242; i=brauner@kernel.org; h=from:subject:message-id; bh=NKhckBMgwJKcDCDVH8R0awRFV2BdU7iPgvD+2gL7lgQ=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaS9dHkifZuvafk8YU0el0MKa2IWePC8W985wW7OriN/9 2XPu96xrqOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiL94yMjwWaFw0J4T3h9QW b/us1ave1cQcyYt+2Rm32IXvYn5u5lGGf4b8a5pt1jjYmEn4OzLJ2SvwXZvXe0pr2b/I8Buaqhv sGAE=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2280666.1726594254.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Sep 2024 18:30:54 +0100
+Message-ID: <2280667.1726594254@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Tue, 17 Sep 2024 08:54:28 +0100, David Howells wrote:
-> The cifs flag CIFS_INO_MODIFIED_ATTR, which indicates that the mtime and
-> ctime need to be written back on close, got taken over by netfs as
-> NETFS_ICTX_MODIFIED_ATTR to avoid the need to call a function pointer to
-> set it.
-> 
-> The flag gets set correctly on buffered writes, but doesn't get set by
-> netfs_page_mkwrite(), leading to occasional failures in generic/080 and
-> generic/215.
-> 
-> [...]
+cifs_read_iter_from_socket() copies the iterator that's passed in for the
+socket to modify as and if it will, and then advances the original iterato=
+r
+by the amount sent.  However, both callers revert the advancement (althoug=
+h
+receive_encrypted_read() zeros beyond the iterator first).  The problem is=
+,
+though, that cifs_readv_receive() reverts by the original length, not the
+amount transmitted which can cause an oops in iov_iter_revert().
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Fix this by:
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+ (1) Remove the iov_iter_advance() from cifs_read_iter_from_socket().
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+ (2) Remove the iov_iter_revert() from both callers.  This fixes the bug i=
+n
+     cifs_readv_receive().
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+ (3) In receive_encrypted_read(), if we didn't get back as much data as th=
+e
+     buffer will hold, copy the iterator, advance the copy and use the cop=
+y
+     to drive iov_iter_zero().
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
+As a bonus, this gets rid of some unnecessary processing.
 
-[1/1] netfs, cifs: Fix mtime/ctime update for mmapped writes
-      https://git.kernel.org/vfs/vfs/c/edd297c2764c
+This was triggered by generic/074 with the "-o sign" mount option.
+
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/smb/client/connect.c   |    6 +-----
+ fs/smb/client/smb2ops.c   |    9 ++++++---
+ fs/smb/client/transport.c |    3 ---
+ 3 files changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 5375b0c1dfb9..06c16b0ce3e8 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -811,13 +811,9 @@ cifs_read_iter_from_socket(struct TCP_Server_Info *se=
+rver, struct iov_iter *iter
+ 			   unsigned int to_read)
+ {
+ 	struct msghdr smb_msg =3D { .msg_iter =3D *iter };
+-	int ret;
+ =
+
+ 	iov_iter_truncate(&smb_msg.msg_iter, to_read);
+-	ret =3D cifs_readv_from_socket(server, &smb_msg);
+-	if (ret > 0)
+-		iov_iter_advance(iter, ret);
+-	return ret;
++	return cifs_readv_from_socket(server, &smb_msg);
+ }
+ =
+
+ static bool
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 159a063de6dd..5550d5237b22 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4869,9 +4869,12 @@ receive_encrypted_read(struct TCP_Server_Info *serv=
+er, struct mid_q_entry **mid,
+ 		goto discard_data;
+ =
+
+ 	server->total_read +=3D rc;
+-	if (rc < len)
+-		iov_iter_zero(len - rc, &iter);
+-	iov_iter_revert(&iter, len);
++	if (rc < len) {
++		struct iov_iter tmp =3D iter;
++
++		iov_iter_advance(&tmp, rc);
++		iov_iter_zero(len - rc, &tmp);
++	}
+ 	iov_iter_truncate(&iter, dw->len);
+ =
+
+ 	rc =3D cifs_discard_remaining_data(server);
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 6e68aaf5bd20..abf966f6ff0a 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -1813,11 +1813,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, =
+struct mid_q_entry *mid)
+ 		length =3D data_len; /* An RDMA read is already done. */
+ 	else
+ #endif
+-	{
+ 		length =3D cifs_read_iter_from_socket(server, &rdata->subreq.io_iter,
+ 						    data_len);
+-		iov_iter_revert(&rdata->subreq.io_iter, data_len);
+-	}
+ 	if (length > 0)
+ 		rdata->got_bytes +=3D length;
+ 	server->total_read +=3D length;
+
