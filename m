@@ -1,85 +1,97 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAB819D08F
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Sep 2024 11:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A08193432;
+	Thu, 19 Sep 2024 11:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726743979; cv=none; b=rJ5AQfz356QeRNpn+R63pKFjNSF96vB+Gogu21pRZv8P4bWQi0vjQklRgxul7kzKNEXg31Bm04o/t5zqG2yTO2r3NJ8l3L1Z5GQzlYkGxxsQs8SKGzsB9NVOIbMl2U1hw8Veil67TxEqupc28iy2G2gQ9vPmUubEyMDpK765F0c=
+	t=1726746180; cv=none; b=MX50AbZpZgKVOq8IWloxoniUSGu55RWtuHPHhPNGoOHeEM21wfXLwdQqwqK12lXtP5QgchfOeyi01QsUwNsQrf6yxgs8gKWeFwVgrt3dvZBC1EcKEu9ryd5o3r5Or8jdxtjDdNjJ35u7GtYI/hnoehpXBg0cC1RtVXJ5jDRU3po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726743979; c=relaxed/simple;
-	bh=XSP8xJ00zRFpFaJFDidFJU15hZIGJRobVxO6j5KPho0=;
+	s=arc-20240116; t=1726746180; c=relaxed/simple;
+	bh=5TmbLzNY35MPG+6DijuO7RpVRl06QkUdrFsOEJAake8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oozSXSvXL5NxrRdg2h6PcuRyZrDINQ/53H7UrxdjmTfbxPKe5led1qJJDMdTgHl9cEH99VZgRu6bjatJHYRbNcRiJx/e6ajOFPR84/WFqSSALT7JMHt3RGNaIbuV2+vT640KKo+eJwT3VwL3zDsJNwJHpnLUwy5mf/XKnZiEO24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CtKLPYUl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=V2eIgIv93xaU3d1GPsGVkwQglVcBoXfhKS4D3z5ne1kQ+RiL7l4RUKBpswDdzSp+mQMGwJIeymVO/V3fhrW69rEFYx9aKsaXzAJxVAv/AnwjYVJ8qEzzPrqJ19vJl7FBRnxTE2lP+63RKH6h4t3uihfrPttX1pXkNxw/zAon7go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2STDVEp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtKLPYUl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726743976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XSP8xJ00zRFpFaJFDidFJU15hZIGJRobVxO6j5KPho0=;
-	b=CtKLPYUl4j3+fFaUuDGFfWGA02YXOMIECaFCLiM/ucyEq9+YxxQzXJsbdlxqYwwkzNbsbz
-	3t36G7obuI6nEIKZ7Gej27ZJ+WAfR/n8pTiWEQdQALEcKkMbDRvTwiL78rV99vmp55zC9/
-	H5yH5oY4I6L5bBsABvUpNLhquhb1zQY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-544-FPWA4X7GN2mv4keFvV3Z9w-1; Thu, 19 Sep 2024 07:06:15 -0400
-X-MC-Unique: FPWA4X7GN2mv4keFvV3Z9w-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a8ff95023b6so50845966b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Sep 2024 04:06:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726743973; x=1727348773;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XSP8xJ00zRFpFaJFDidFJU15hZIGJRobVxO6j5KPho0=;
-        b=MJggUfVoQtK5jSDGNcDommd8QpJr2QPHV8Jr2SHjlgZQNHN7mAxH47F640fQTHETKh
-         wFmVySp3lSHkuy+AIdybFN5FHrT3ZF4hXViEfmD5S1KDdeBmHbg+aezxOAZEl7G4e0tV
-         2/iKnAe9mGv1VoZwSc91Y1BnnbDezmGFkuhuJhKaErsEGxuuM0jj17FJ+VCafpBJRdPs
-         DjFumrJtZTeiU3RkwMbGbQeSSQ9QAY/EQmswFIejcuAv7DRjdkxMUCSRdUiJGxqPVBL7
-         0vJdwG4q8QN4V4uPC1U3DGyNNlUmRmA5lVbZJ+uzO+AtQfEwLBIR56JehdCVvJphN2Am
-         jS2g==
-X-Gm-Message-State: AOJu0YzD2m5VRWozDU2dYQZoXzObmK7Vx4x1ECuVoRCfb33sXG3AcJdF
-	ef/M+RDfQ1HkFq4QFRo7sY2EoIAkG7BmkBRqtqH3uLY04bqTRbtmVDysp7TY2b5wvXh/ZDEU4xX
-	j9PeVqQYOuKyk+22vrR/GQeGyVktd8QuOgUqSc/90hn6+GIeqYVAJak7TS3sHMxPThjZNu7d9WK
-	Bdj850cDSBBdV+DFNQk5PeJqxutt1OPY6vTMzXojwKWmgEVtE=
-X-Received: by 2002:a17:907:e29f:b0:a86:7b01:7dcc with SMTP id a640c23a62f3a-a9029435ad1mr2390208366b.18.1726743973419;
-        Thu, 19 Sep 2024 04:06:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHIxW9SoaheOZUqE8BDnp74IwserWBz8HuAhBQp0VmLWPEvYkVV5NoKyl32j0XbSla3+kINvRaQ+v5hJao7II=
-X-Received: by 2002:a17:907:e29f:b0:a86:7b01:7dcc with SMTP id
- a640c23a62f3a-a9029435ad1mr2390206866b.18.1726743973021; Thu, 19 Sep 2024
- 04:06:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2STDVEp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16C61C4CEC6;
+	Thu, 19 Sep 2024 11:43:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726746180;
+	bh=5TmbLzNY35MPG+6DijuO7RpVRl06QkUdrFsOEJAake8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Z2STDVEp0SWsdE8cz181USldSfl7tKq0D8q592RkBCuQ8qPctpI4OZSZzXW75KGte
+	 zZAKN1mny/Tj/XToxtfw+HPvLmGqCPDm/H08w49llY0tD4bKVvmDuMKiR/XUpzGHbd
+	 KRPVzn3TAhi8KzfUQQHMyOGdoNBEoK5ulNVjLuy3ZqTyl1eg/p74rFSspnaRx3vD/L
+	 GzBTv5/6EzTo0z0KbWk56Vz3hxhCtL6DkuJGk+c9iB77sHRI9L1uyv2UihF+rWA2pU
+	 urmfJQ5ZkNPJjjpoLP5syXuMmg/fQdtcjbaJCvuH8A+TQIq6epU08QUqCztKRSEfjx
+	 tiUUKZowVtrhw==
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e04a6feef3so368131b6e.3;
+        Thu, 19 Sep 2024 04:43:00 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV6UXwobDd2OOK39h3a7a1kvPBayjJlF7rRB6rKGTiK/lsrGqfdFldcTRqF5+vQ+xie7VhCfKNDGYBegrVQ@vger.kernel.org, AJvYcCX0p3l6jwXzYfAO8V7IkJA7TYvJ0MCyqFZmcVhvaTpzDjXp7FWV+zxYbMP3+wEjXf8q5l7UTvcWyOJ5vlxJT+50@vger.kernel.org, AJvYcCXuoe49sSOiOh8C0Wxf0vjdwOMUzhTE8zClF1zDZKyVwRRrgrv2Og/v9yYjK8uRaDdL/7hzRxKMsooX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlYqvirlla6byXWkNSkVAVBmiGf6mOoN7Occ2AeCyw5V06Jbjl
+	sdOZWeAYajS7WFPSMWhLNxFDR4aJRk8W+lI0dQDmElbsAIA8a2J0UnRaXc0irxSrVt8KZjIlrUz
+	asycnwyFtdGV0GrGwSapP9uqbziw=
+X-Google-Smtp-Source: AGHT+IGMHvj71v4pRxIz9H4t3dZJiQYtGoEasfwol8SunCUXrBGi2TuhnCmQuTnIqrnVRMALjf80YAFRxuBInDLw4Ao=
+X-Received: by 2002:a05:6808:2181:b0:3e0:48e7:7f31 with SMTP id
+ 5614622812f47-3e071a850cbmr17700057b6e.10.1726746179365; Thu, 19 Sep 2024
+ 04:42:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKRryJZs-gXnWCYUXhbjV__OM7T85xpKp9nvPOprJzcOJGX9=A@mail.gmail.com>
- <CAH2r5muNdy1QM5qjfA_G4DamuwqhYi2gGiaBqOhWm7ow7dyvDA@mail.gmail.com>
-In-Reply-To: <CAH2r5muNdy1QM5qjfA_G4DamuwqhYi2gGiaBqOhWm7ow7dyvDA@mail.gmail.com>
-From: Maxim Patlasov <mpatlaso@redhat.com>
-Date: Thu, 19 Sep 2024 13:06:01 +0200
-Message-ID: <CAKRryJZmi9mg5J_Cv76v2D6pCt=MSFvaHpYV_LXVdXXXVb93Fw@mail.gmail.com>
-Subject: Re: rmdir() fails for a dir w/o write perm
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
+References: <20240820191520.100224-2-thorsten.blum@toblux.com>
+ <CAKYAXd_T4JzjOVFqxSt=RQG7w0yzPX62-AihQHUepvS+80BZJQ@mail.gmail.com> <4881D699-9109-47B5-927F-B048479C48B8@toblux.com>
+In-Reply-To: <4881D699-9109-47B5-927F-B048479C48B8@toblux.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 19 Sep 2024 20:42:48 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9u5mxx=QY2Y64DjGNCoguCiqbDq69Xi2g6dpMJx9unCA@mail.gmail.com>
+Message-ID: <CAKYAXd9u5mxx=QY2Y64DjGNCoguCiqbDq69Xi2g6dpMJx9unCA@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: Replace one-element arrays with flexible-array members
+To: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steve,
-
-> It worked fine with me (same local fs or mount) when I just tried. Which server did you use?
-
-I used smbd coming with Fedora 40:
-
-# rpm -qf /usr/sbin/smbd
-samba-4.20.4-1.fc40.x86_64
-
-Regards,
-Maxim
-
+On Thu, Sep 19, 2024 at 6:12=E2=80=AFPM Thorsten Blum <thorsten.blum@toblux=
+.com> wrote:
+>
+> Hi Namjae,
+>
+> On 22. Aug 2024, at 14:01, Namjae Jeon <linkinjeon@kernel.org> wrote:
+> > On Wed, Aug 21, 2024 at 4:15=E2=80=AFAM Thorsten Blum <thorsten.blum@to=
+blux.com> wrote:
+> >>
+> >> Replace the deprecated one-element arrays with flexible-array members
+> >> in the structs copychunk_ioctl_req and smb2_ea_info_req.
+> >>
+> >> There are no binary differences after this conversion.
+> >>
+> >> Link: https://github.com/KSPP/linux/issues/79
+> >> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+> >> ---
+> >> Changes in v2:
+> >> - Use <=3D instead of < and +1 as suggested by Namjae Jeon and Tom Tal=
+pey
+> >> - Link to v1: https://lore.kernel.org/linux-kernel/20240818162136.2683=
+25-2-thorsten.blum@toblux.com/
+> > Applied it to #ksmbd-for-next-next.
+> > Thanks!
+>
+> I just noticed this patch never made it to linux-next and I can't find
+> it anywhere else (also not in #ksmbd-for-next-next).
+>
+> Maybe it got lost because it has the same subject and a very similar
+> commit message as [1] (I submitted both around the same time)?
+Sorry for missing it. I have pushed it to #ksmbd-for-next-next again.
+Thanks for your report:)
+>
+> Thanks,
+> Thorsten
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3D7c525dddbee71880e654ad44f3917787a4f6042c
