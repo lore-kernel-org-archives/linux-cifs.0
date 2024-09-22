@@ -1,269 +1,161 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D1961FCF;
-	Fri, 20 Sep 2024 20:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428DB746E
+	for <linux-cifs@vger.kernel.org>; Sun, 22 Sep 2024 04:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726862892; cv=none; b=tAbJM2MMuQbejfafK00vmYCbf6pjGHImeNLLWoP3dp6KcgaSuW4O38ITx902K8mCtt3ccTjRSAUCzjzfVVvYrwljSCa9g4/+W6RY1O9hHfwqTLJ/LZPInbO8QfCe+z3ZjOpShNFew7PH/0g7d9kXy4nRKfCD1C/swg2H1TrhXsk=
+	t=1726980505; cv=none; b=AjMySOqAY5v6KWdBSIMNp0K8z+uaKKvg+2fh/GqUh99SU+XYUWTzmcWK+DNtzvHqtH7dGVhXBXobs58G3liOjDBNBfb06KZsOukkWpeuwKaV53EGhCHm7vp9W7tYcnOtJZ9HRAiEQHYCBCSJiU+7vHv2SyunG+OTuW5twgEcI+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726862892; c=relaxed/simple;
-	bh=FyCY36yI5w0lTSq34HxZmH4EPDjzQfp2huhYuiHkwRA=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=lClN/U9l9fMJbdRg8xZ9TXe/OplwTHYtNaNlkaTbJMTkGa0KQUIkksT/dcGVI1ClEv+rq2fncQHXd93cnd1bWV81UBh//UrzNnXbYksMSZn7Hg0oVpSG4Mq+LBOfhDQSlcWtDS+oODv3ShyutXOZmBo9IBfdrS4PJtirzP/DlOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LquIpaDo; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1726980505; c=relaxed/simple;
+	bh=oHHMNeRAQu9NLstWzLmSI0EBBLnamsOJ8Fjm6e8kd9s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Pme0GwaeOWeDkthXAH3O0qjiqxdXgAqmdJCNLgYz5XLk4aORNRgYDE2SLIF+GZNDuLchjpIBddUsdi03AunIdVfGrHv+Sum932cVXtRUg5LBScAMksjpCm5p9n47ZMAri9eQLoYJ5gL2toMyTm00XO3wzH2kJ05NT7tdwF8u8ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X01vpx4c; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LquIpaDo"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-718d8d6af8fso1792152b3a.3;
-        Fri, 20 Sep 2024 13:08:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X01vpx4c"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53567b4c3f4so3501752e87.2
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Sep 2024 21:48:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726862890; x=1727467690; darn=vger.kernel.org;
-        h=to:cc:date:message-id:subject:mime-version
-         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jqXxksIhdYu3U6EyI/SaQCdXTyiEORhvEkCurrA15Ic=;
-        b=LquIpaDooPK9WJ+6Fl04RLTvu2Lrn6TbaaSv0SKcvQN7vcIS4NHJGLuHalpYt4qr2I
-         PuOhgI7RjvTI3bjylnl3X/GUVYx2rrdAChrQNU4QLRrrdUmgocysnwd901OkRWIrxiPp
-         9nnpBkSTTsQhjxcWCiUhDfVK5Qonz8dI1yXbAHIFXs0V2xK0IYcT50CZZZ/JVccJ3Y8W
-         Pnn/nShq/dCY8oTPM4jOxcbPTQ1Oem/hchB5wZQ0cnefXWftd9/OdTFBLQDAVIMajKmp
-         dyARWi6sQpPTlyVInVKwHvGgxg8wOLud0CX+SYLHNqGYyS7uOps4C8mA+wJIblsp1oSG
-         7m1A==
+        d=gmail.com; s=20230601; t=1726980502; x=1727585302; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ve7ook3wQD8EIyjnBvFXXYebcWZemVc3sfN/+ms8WjY=;
+        b=X01vpx4cG+5HgFCxkAoYH7kZgwgKjntDQEMpfW9xlH2LGFDgvUOMXkKtCPSEmyDfeP
+         ujM5DTy8y2qmvkSINSYzh2SCVNWiEMolXbgN/O0uGKQuFOotBl+Bqsm/eAYdSTGvAd3K
+         pR64PkY5ALzuJeeINZDON9GKJWsUkHZsICXr+W6XCqd4cgvuiYtuBuMF6DZ28rWAjMYQ
+         aN2YBcwYsDCffAx8mzzyFVL1N/NLVpMwERSWrPFH4uXT1GfosTij3E5fXg9fs8uR9gPl
+         YkCe8zXn/ZQmz8pRe5V+kxirRW7DI0NbJ80P7nrcQOulsFsMs5SSZWD8BZzL5KmUn2aD
+         AzMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726862890; x=1727467690;
-        h=to:cc:date:message-id:subject:mime-version
-         :content-transfer-encoding:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jqXxksIhdYu3U6EyI/SaQCdXTyiEORhvEkCurrA15Ic=;
-        b=vqLlsrzSrtYmEbBXyq/O0zIo/TgXPGSGqzCS5wCM0Mw/N8BIu4dtCmiQg/agMkwG8m
-         nyAMSXZGoLHH7ToXkMjZfGAwKDuxEtGTXOB0qK+lY2Lo7tOAqZBCTrU4RPUBUw7m2tMk
-         s4+7Pf3OM3U3cpU8dGh4f5SWBgrhZHVf1n2EXajuEQzYfw321/swMrV8oFxlzR6J84aj
-         1Uj2n3gVjVqhW1K/giZCnh2XJV/5NbNaBn7/o4acKesqvoBG5wl87wvz7qGF4Dx2d6P8
-         YdNfprdwmOSPbEiKs6oToK+kw5L1FTvUm9d4/WH5xUaUDzhGxas0unktSHpZj/rK2Cm5
-         Q4tw==
-X-Forwarded-Encrypted: i=1; AJvYcCVK1LPJhTKIpa10+2Boy904lODZ6Df7ilD9wOUsgmWSRCtGKmsBRvxnoGCnyNl196W9ttFZcnSyGZSC@vger.kernel.org, AJvYcCVe7pDMJwMjTr3Hw9xyMoHUMj9GmApdyUQBtAfGMdv0VH42C8MjEIj2qowtK++4Nm4mk33fTin5mBTnQRqg@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtfC9offX8Dzfk7mNGFWm9fz4YimPJ9kUUtjbae4P1MGtlNla3
-	NBYilGH/Xxnv9gnfrcH0fFPeMVg2YzBpI5dKRphGHdsKuTO/BTn+
-X-Google-Smtp-Source: AGHT+IFnZTuVUXfi09IMvJbRV9nzRJbWPXCtMyEyTm2x1nnbKFEaAJF7P+WRaiwkpd1Vvtm+qwMHRA==
-X-Received: by 2002:a05:6a20:b68a:b0:1d0:2533:1a42 with SMTP id adf61e73a8af0-1d30a8ecf33mr4553539637.9.1726862890221;
-        Fri, 20 Sep 2024 13:08:10 -0700 (PDT)
-Received: from smtpclient.apple ([2601:645:c600:8760:2cea:7b3a:57f3:3330])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db4998ff14sm11207518a12.66.2024.09.20.13.08.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 20 Sep 2024 13:08:09 -0700 (PDT)
-From: James Young <pronoiac@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20230601; t=1726980502; x=1727585302;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ve7ook3wQD8EIyjnBvFXXYebcWZemVc3sfN/+ms8WjY=;
+        b=sfmVMEEKT9wtCSw+Gd9utWlo+qF29DlNqIyco0opClOhhhCvSxPAWnr9wbvwyisXvB
+         A2rLd8mwnPRWdTDZ2P4+a6jwnaNSKhaD1oq37jJJYo3HY6CC74QOM3yh6xP4J0dISzsc
+         ErettDzevQ+t6Yq5bRJSKWjM4jOFiJ8YtsuCoJgV1QTGGGWPsjaiv0l7QhB6dgqwwrow
+         t4ehn0KO3vbXHQM4zBkR4UGhJ/4Xdty30U2FtkVwowodoP2QvApKS/4yUTypgmZ/i9W3
+         /AtHln9w82juP7w0wHDabEKH6EdB2Uoo5YzyDCL4uwI4QW72SJHMpc7NIq4DDeUr4gLN
+         a3jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeKocILdMLKBfgELWhN+PPVh2srjqVRYPueOhSb3YL5TO8/n2EJP5Zgb8IDt71VMmfKEGhYWCo5b52@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4VJ2UhuN0jFlGjtPVZ9g04xKDjt89J20xLbNbLiX7QQQ7kpRD
+	kK89JbgQiotALilyT0tuUAlALHejRgJc3+Pkb/fYNNdZlNp+9z6P7hk/+lZHSXxoE3cgJ3WDyFl
+	LrGWpqwPCAdaz8OGQE+AnnEU2Z0I=
+X-Google-Smtp-Source: AGHT+IGW7VvHOrZ0um5jX8pkZ8aX3XrxnMGnQixIc2TvGq2fpUwtezzJQ5jZIEAxop253UGnvbRlzH0ff+encly4+Ag=
+X-Received: by 2002:a05:6512:a8e:b0:536:52c4:e45c with SMTP id
+ 2adb3069b0e04-536ac2f54b4mr3143712e87.31.1726980502072; Sat, 21 Sep 2024
+ 21:48:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: [REGRESSION] Corruption on cifs / smb write on ARM, kernels 6.3-6.9
-Message-Id: <DFC1DAC5-5C6C-4DC2-807A-DAF12E4B7882@gmail.com>
-Date: Fri, 20 Sep 2024 13:07:58 -0700
-Cc: stable@vger.kernel.org,
- regressions@lists.linux.dev,
- linux-cifs@vger.kernel.org,
- David Howells <dhowells@redhat.com>,
- linux-kernel@vger.kernel.org,
- Steve French <sfrench@samba.org>
-To: pronoiac+kernel@gmail.com
-X-Mailer: Apple Mail (2.3776.700.51)
+MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 21 Sep 2024 23:48:10 -0500
+Message-ID: <CAH2r5mtoXf3chr5tmH_em7FZBEaczrPNHpo_U7NYmyicJZTHfw@mail.gmail.com>
+Subject: [PATCH][SMB3 client] fix incorrect mode bits reported for stat of
+ directories with read only attribute
+To: Maxim Patlasov <mpatlaso@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.com>
+Content-Type: multipart/mixed; boundary="0000000000005c4f870622adfb45"
 
-I was benchmarking some compressors, piping to and from a network share =
-on a NAS, and some consistently wrote corrupted data.
+--0000000000005c4f870622adfb45
+Content-Type: text/plain; charset="UTF-8"
 
+In investigating a problem that Maxim pointed out (with rmdir when
+file has read only attribute set - which will be fixed with a
+different patch), we noticed a bug with "stat" of directories when
+readonly.  See attached fix.
 
-First, apologies in advance:
-* if I'm not in the right place. I tried to follow the directions from =
-the Regressions guide - =
-https://www.kernel.org/doc/html/latest/admin-guide/reporting-regressions.h=
-tml
-* I know there's a ton of context I don't know
-* I=E2=80=99m trying a different mail app, because the first one looked =
-concussed with plain text. This might be worse.
+Commands like "chmod 0444" mark a file readonly via the attribute flag
+(when mapping of mode bits into the ACL are not set, or POSIX extensions
+are not negotiated), but they were not reported correctly for stat of
+directories (they were reported ok for files and for "ls").  See example
+below:
 
+    root:~# ls /mnt2 -l
+    total 12
+    drwxr-xr-x 2 root root         0 Sep 21 18:03 normaldir
+    -rwxr-xr-x 1 root root         0 Sep 21 23:24 normalfile
+    dr-xr-xr-x 2 root root         0 Sep 21 17:55 readonly-dir
+    -r-xr-xr-x 1 root root 209716224 Sep 21 18:15 readonly-file
+    root:~# stat -c %a /mnt2/readonly-dir
+    755
+    root:~# stat -c %a /mnt2/readonly-file
+    555
 
-The detailed description:
-I was benchmarking some compressors on Debian on a Raspberry Pi, piping =
-to and from a network share on a NAS, and found that some consistently =
-had issues writing to my NAS. Specifically:
-* lzop
-* pigz - parallel gzip
-* pbzip2 - parallel bzip2
+This fixes the stat of directories when ATTR_READONLY is set
+(in cases where the mode can not be obtained other ways). See
+below stat output with patch applied:
 
-This is dependent on kernel version. I've done a survey, below.
+    root:~# stat -c %a /mnt2/readonly-dir
+    555
 
-While I tripped over the issue on a Debian port (Debian 12, bookworm, =
-kernel v6.6), I compiled my own vanilla / mainline kernels for testing =
-and reporting this.
+-- 
+Thanks,
 
+Steve
 
-Even more details:
-The Pi and the Synology NAS are directly connected by Gigabit Ethernet. =
-Both sides are using self-assigned IP addresses. I'll note that at boot, =
-getting the Pi to see the NAS requires some nudging of avahi-autoipd; =
-while I think it's stable before testing, I'm not positive, and =
-reconnection issues might be in play.
+--0000000000005c4f870622adfb45
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-fix-incorrect-mode-displayed-for-read-only-file.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-incorrect-mode-displayed-for-read-only-file.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m1d3jlcq0>
+X-Attachment-Id: f_m1d3jlcq0
 
-The files in question are tars of sparse file systems, about 270 gig, =
-compressing down to 10-30 gig.
-
-Compression seems to work, without complaint; decompression crashes the =
-process, usually within the first gig of the compressed file. The output =
-of the stream doesn't match what ends up written to disk.
-
-Trying decompression during compression gets further along than it does =
-after compression finishes; this might point toward something with =
-writes and caches.
-
-A previous attempt involved rpi-update, which:
-* good: let me install kernels without building myself
-* bad: updated the bootloader and firmware, to bleeding edge, with =
-possible regressions; it definitely muddied the results of my tests
-I started over with a fresh install, and no results involving rpi-update =
-are included in this email.
-
-
-A survey of major branches:
-* 5.15.167, LTS - good
-* 6.1.109, LTS - good
-* 6.2.16 - good
-* 6.3.13 - bad
-* 6.4.16 - bad
-* 6.5.13 - bad
-* 6.6.50, LTS - bad
-* 6.7.12 - bad
-* 6.8.12 - bad
-* 6.9.12 - bad
-* 6.10.9 - good
-* 6.11.0 - good
-
-I tried, but couldn't fully build 4.19.322 or 6.0.19, due to issues with =
-modules.
-
-
-Important commits:
-It looked like both the breakage and the fix came in during rc1 =
-releases.
-
-Breakage, v6.3-rc1:
-I manually bisected commits in fs/smb* and fs/cifs.
-
-3d78fe73fa12 cifs: Build the RDMA SGE list directly from an iterator
-> lzop and pigz worked. last working. test in progress: pbzip2
-
-607aea3cc2a8 cifs: Remove unused code
-> lzop didn't work. first broken
-
-
-Fix, v6.10-rc1:
-I manually bisected commits in fs/smb.
-
-69c3c023af25 cifs: Implement netfslib hooks
-> lzop didn't work. last broken one
-
-3ee1a1fc3981 cifs: Cut over to using netfslib
-> lzop, pigz, pbzip2, all worked. first fixed one
-
-
-To test / reproduce:
-It looks like this, on a mounted network share, with extra pv for =
-progress meters:
-
-cat 1tb-rust-ext4.img.tar.gz | \
-  gzip -d | \
-  lzop -1 > \
-  1tb-rust-ext4.img.tar.lzop
-  # wait 40 minutes
-
-cat 1tb-rust-ext4.img.tar.lzop | \
-  lzop -d | \
-  sha1sum
-  # either it works, and shows the right checksum
-  # or it crashes early, due to a corrupt file, and shows an incorrect =
-checksum
-
-As I re-read this, I realize it might look like the compressor behaves =
-differently. I added a "tee $output | sha1sum; sha1sum $output" and ran =
-it on a broken version. The checksums from the pipe and for the file on =
-disk are different.
-
-
-Assorted info:
-This is a Raspberry Pi 4, with 4 GiB RAM, running Debian 12, bookworm, =
-or a port.
-
-mount.cifs version: 7.0
-
-# cat /proc/sys/kernel/tainted
-1024
-
-# cat /proc/version
-Linux version 6.2.0-3d78fe73f-v8-pronoiac+ (pronoiac@bisect) (gcc =
-(Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40) #21 =
-SMP PREEMPT Thu Sep 19 16:51:22 PDT 2024
-
-
-DebugData:=20
-/proc/fs/cifs/DebugData
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-CIFS Version 2.41
-Features: =
-DFS,FSCACHE,STATS2,DEBUG,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),X=
-ATTR,ACL
-CIFSMaxBufSize: 16384
-Active VFS Requests: 1
-
-Servers:
-1) ConnectionId: 0x1 Hostname: drums.local
-Number of credits: 8062 Dialect 0x300
-TCP status: 1 Instance: 1
-Local Users To Server: 1 SecMode: 0x1 Req On Wire: 2
-In Send: 1 In MaxReq Wait: 0
-
-        Sessions:
-        1) Address: 169.254.132.219 Uses: 1 Capability: 0x300047        =
-Session Status: 1
-        Security type: RawNTLMSSP  SessionId: 0x4969841e
-        User: 1000 Cred User: 0
-
-        Shares:
-        0) IPC: \\drums.local\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: =
-0x0
-        PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
-        Share Capabilities: None        Share Flags: 0x0
-        tid: 0xeb093f0b Maximal Access: 0x1f00a9
-
-        1) \\drums.local\billions Mounts: 1 DevInfo: 0x20 Attributes: =
-0x5007f
-        PathComponentMax: 255 Status: 1 type: DISK Serial Number: =
-0x735a9af5
-        Share Capabilities: None Aligned, Partition Aligned,    Share =
-Flags: 0x0
-        tid: 0x5e6832e6 Optimal sector size: 0x200      Maximal Access: =
-0x1f01ff
-
-
-        MIDs:
-        State: 2 com: 9 pid: 3117 cbdata: 00000000e003293e mid 962892
-
-        State: 2 com: 9 pid: 3117 cbdata: 000000002610602a mid 962956
-
---
-
-
-
-Let me know how I can help.
-The process of iterating can take hours, and it's not automated, so my =
-resources are limited.
-
-#regzbot introduced: 607aea3cc2a8
-#regzbot fix: 3ee1a1fc3981
-
--James
-
+RnJvbSAzODVhODZmYTQ3MDRlYzExZjE5NTY0ZWE0MmVhZjY3N2IyODNlNmNlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMjEgU2VwIDIwMjQgMjM6Mjg6MzIgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggaW5jb3JyZWN0IG1vZGUgZGlzcGxheWVkIGZvciByZWFkLW9ubHkgZmlsZXMKCkNv
+bW1hbmRzIGxpa2UgImNobW9kIDA0NDQiIG1hcmsgYSBmaWxlIHJlYWRvbmx5IHZpYSB0aGUgYXR0
+cmlidXRlIGZsYWcKKHdoZW4gbWFwcGluZyBvZiBtb2RlIGJpdHMgaW50byB0aGUgQUNMIGFyZSBu
+b3Qgc2V0LCBvciBQT1NJWCBleHRlbnNpb25zCmFyZSBub3QgbmVnb3RpYXRlZCksIGJ1dCB0aGV5
+IHdlcmUgbm90IHJlcG9ydGVkIGNvcnJlY3RseSBmb3Igc3RhdCBvZgpkaXJlY3RvcmllcyAodGhl
+eSB3ZXJlIHJlcG9ydGVkIG9rIGZvciBmaWxlcyBhbmQgZm9yICJscyIpLiAgU2VlIGV4YW1wbGUK
+YmVsb3c6CgogICAgcm9vdDp+IyBscyAvbW50MiAtbAogICAgdG90YWwgMTIKICAgIGRyd3hyLXhy
+LXggMiByb290IHJvb3QgICAgICAgICAwIFNlcCAyMSAxODowMyBub3JtYWxkaXIKICAgIC1yd3hy
+LXhyLXggMSByb290IHJvb3QgICAgICAgICAwIFNlcCAyMSAyMzoyNCBub3JtYWxmaWxlCiAgICBk
+ci14ci14ci14IDIgcm9vdCByb290ICAgICAgICAgMCBTZXAgMjEgMTc6NTUgcmVhZG9ubHktZGly
+CiAgICAtci14ci14ci14IDEgcm9vdCByb290IDIwOTcxNjIyNCBTZXAgMjEgMTg6MTUgcmVhZG9u
+bHktZmlsZQogICAgcm9vdDp+IyBzdGF0IC1jICVhIC9tbnQyL3JlYWRvbmx5LWRpcgogICAgNzU1
+CiAgICByb290On4jIHN0YXQgLWMgJWEgL21udDIvcmVhZG9ubHktZmlsZQogICAgNTU1CgpUaGlz
+IGZpeGVzIHRoZSBzdGF0IG9mIGRpcmVjdG9yaWVzIHdoZW4gQVRUUl9SRUFET05MWSBpcyBzZXQK
+KGluIGNhc2VzIHdoZXJlIHRoZSBtb2RlIGNhbiBub3QgYmUgb2J0YWluZWQgb3RoZXIgd2F5cyku
+CgogICAgcm9vdDp+IyBzdGF0IC1jICVhIC9tbnQyL3JlYWRvbmx5LWRpcgogICAgNTU1CgpDYzog
+c3RhYmxlQHZnZXIua2VybmVsLm9yZwpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJl
+bmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9pbm9kZS5jIHwgMTkgKysrKysr
+KysrKystLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDggZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9pbm9kZS5jIGIvZnMvc21iL2NsaWVu
+dC9pbm9kZS5jCmluZGV4IDczZTJlNmMyMzBiNy4uM2NjZjNlNjliZWM2IDEwMDY0NAotLS0gYS9m
+cy9zbWIvY2xpZW50L2lub2RlLmMKKysrIGIvZnMvc21iL2NsaWVudC9pbm9kZS5jCkBAIC04MDAs
+MTAgKzgwMCw2IEBAIHN0YXRpYyB2b2lkIGNpZnNfb3Blbl9pbmZvX3RvX2ZhdHRyKHN0cnVjdCBj
+aWZzX2ZhdHRyICpmYXR0ciwKIAkJZmF0dHItPmNmX21vZGUgPSBTX0lGUkVHIHwgY2lmc19zYi0+
+Y3R4LT5maWxlX21vZGU7CiAJCWZhdHRyLT5jZl9kdHlwZSA9IERUX1JFRzsKIAotCQkvKiBjbGVh
+ciB3cml0ZSBiaXRzIGlmIEFUVFJfUkVBRE9OTFkgaXMgc2V0ICovCi0JCWlmIChmYXR0ci0+Y2Zf
+Y2lmc2F0dHJzICYgQVRUUl9SRUFET05MWSkKLQkJCWZhdHRyLT5jZl9tb2RlICY9IH4oU19JV1VH
+Tyk7Ci0KIAkJLyoKIAkJICogRG9uJ3QgYWNjZXB0IHplcm8gbmxpbmsgZnJvbSBub24tdW5peCBz
+ZXJ2ZXJzIHVubGVzcwogCQkgKiBkZWxldGUgaXMgcGVuZGluZy4gIEluc3RlYWQgbWFyayBpdCBh
+cyB1bmtub3duLgpAQCAtODE2LDYgKzgxMiwxMCBAQCBzdGF0aWMgdm9pZCBjaWZzX29wZW5faW5m
+b190b19mYXR0cihzdHJ1Y3QgY2lmc19mYXR0ciAqZmF0dHIsCiAJCX0KIAl9CiAKKwkvKiBjbGVh
+ciB3cml0ZSBiaXRzIGlmIEFUVFJfUkVBRE9OTFkgaXMgc2V0ICovCisJaWYgKGZhdHRyLT5jZl9j
+aWZzYXR0cnMgJiBBVFRSX1JFQURPTkxZKQorCQlmYXR0ci0+Y2ZfbW9kZSAmPSB+KFNfSVdVR08p
+OworCiBvdXRfcmVwYXJzZToKIAlpZiAoU19JU0xOSyhmYXR0ci0+Y2ZfbW9kZSkpIHsKIAkJaWYg
+KGxpa2VseShkYXRhLT5zeW1saW5rX3RhcmdldCkpCkBAIC0xMjMzLDExICsxMjMzLDE0IEBAIHN0
+YXRpYyBpbnQgY2lmc19nZXRfZmF0dHIoc3RydWN0IGNpZnNfb3Blbl9pbmZvX2RhdGEgKmRhdGEs
+CiAJCQkJIF9fZnVuY19fLCByYyk7CiAJCQlnb3RvIG91dDsKIAkJfQotCX0KLQotCS8qIGZpbGwg
+aW4gcmVtYWluaW5nIGhpZ2ggbW9kZSBiaXRzIGUuZy4gU1VJRCwgVlRYICovCi0JaWYgKGNpZnNf
+c2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9VTlhfRU1VTCkKKwl9IGVsc2UgaWYgKGNp
+ZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9VTlhfRU1VTCkKKwkJLyogZmlsbCBp
+biByZW1haW5pbmcgaGlnaCBtb2RlIGJpdHMgZS5nLiBTVUlELCBWVFggKi8KIAkJY2lmc19zZnVf
+bW9kZShmYXR0ciwgZnVsbF9wYXRoLCBjaWZzX3NiLCB4aWQpOworCWVsc2UgaWYgKCEodGNvbi0+
+cG9zaXhfZXh0ZW5zaW9ucykpCisJCS8qIGNsZWFyIHdyaXRlIGJpdHMgaWYgQVRUUl9SRUFET05M
+WSBpcyBzZXQgKi8KKwkJaWYgKGZhdHRyLT5jZl9jaWZzYXR0cnMgJiBBVFRSX1JFQURPTkxZKQor
+CQkJZmF0dHItPmNmX21vZGUgJj0gfihTX0lXVUdPKTsKKwogCiAJLyogY2hlY2sgZm9yIE1pbnNo
+YWxsK0ZyZW5jaCBzeW1saW5rcyAqLwogCWlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJ
+RlNfTU9VTlRfTUZfU1lNTElOS1MpIHsKLS0gCjIuNDMuMAoK
+--0000000000005c4f870622adfb45--
