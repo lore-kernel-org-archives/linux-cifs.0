@@ -1,211 +1,334 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FE41B85C2;
-	Tue, 24 Sep 2024 02:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727146431; cv=fail; b=f1GJV9VdjUDxHWSyhS1tnHOb3BJ8ctzPle8EAOlobdIelCSeBAmkCToeKO/Pn7q3cC4EqUaIM3TdjU3cNoNNqUMoactr/PdJAFFzs9/5hkMMvqk8vc54Ub+wtLeGDpl3gm+wCbGOBzlOC6cQKZcNKmAVFgreu2aqe2zleM8rGoo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727146431; c=relaxed/simple;
-	bh=RmarMj4gTEnzmnijKvmGM7djWcPetbfwFgv5ncHF8+Q=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=K2S3sE540Dn67EQC49lS1np7DybVtdBKQ0anVK0VthUy0iTHjJA973l6J05YYsxB2gsr8XIT5E+bmdtlmXZigJm/d/8TgrYnX/3ZQoY3C00k8goLSVTsbUi2u+BRL4mEc9jErYWSfgptbrx7QDWNwY57xOAldGBzPPCM+NN6fCY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nuH+nkpW; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24823335A5;
+	Tue, 24 Sep 2024 09:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727171295; cv=none; b=Ohe+4SJ9R4ybfLiTZeukZCXPVssJ2gdAOo/gJsLM8eaPDryeLVsnXfFd61sXWTEkiOk1Q0DGsY0lQ+EHE1E7pHrjb/u82cquRlgzua6G/g9w+3YCYrYtBxNvrVTxcnJmxiZoB9NAEAXUrkxDssC9/TT0Nk6i4LociSxrw0Ew1lU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727171295; c=relaxed/simple;
+	bh=IJb2CY2sQexSIpMJlLAZTjDzjCwF7sXuLr8nOkq3T5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uDQl5yKkMBPM1x598Uw+2zPSySySHf4XUJ2W2CBedSIePBDwvfMjm+335kB9ZWPztlw2eoLYsjTBEBgKLTmotGFWtERbasj4s9xZSYAtGUs+3aK6aTTwBM+J/dRYpxqWVjuZCo5Y8kznPhElIv1yqDFVFXeZiYDCYlt2fCuMAeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ke8RdNqR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nuH+nkpW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727146430; x=1758682430;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=RmarMj4gTEnzmnijKvmGM7djWcPetbfwFgv5ncHF8+Q=;
-  b=nuH+nkpWiFtxCcKDeFCdJ/Pr7jq5KUMdWRaPJBEpV3PL2ntGlKW3Q40P
-   A37/1lekyVlV8wlEezot3tvMRze8vP6IHH+H0dINlGY2RWpj9fhUImZc1
-   aycqAFMDeSc/ojxHnVI/rbLJdDzDF9Tu7cfCtz5sJh9jfhhfy0UUBo5VA
-   AM3SuPSzZbqPMowzm1uooj0Mbwi1eFrvx0w4Wj/gXJts0lWY0pX9xPSwQ
-   FLqxH3YfjNn3DrWB9vdZyCaQ63x3xTVVrFZG1BVhLBgR3b4yit/2kYwsl
-   eUiPvAwkUeNUmU4y5qGA/VOmz1vKofUzkbJnVtKIQnd2SeZ3WjCp2FpM+
-   w==;
-X-CSE-ConnectionGUID: 5XI49FQ2QUiodNOe81XelQ==
-X-CSE-MsgGUID: gywIHZrtSOys81vCDops5w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="26312759"
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="26312759"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2024 19:53:49 -0700
-X-CSE-ConnectionGUID: wxElBCaMRDCiRI2FJV4Ihw==
-X-CSE-MsgGUID: HN9qc4dJR6uav7omDIg8iQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="71585931"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Sep 2024 19:53:49 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 23 Sep 2024 19:53:48 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 23 Sep 2024 19:53:48 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 23 Sep 2024 19:53:48 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G2Iho9SQPR8mPoSs9PhJ/vANgLSIcCtLmCy6gd9XeKyJwgbfOjxaCNlhAr1KDWPARbkh06g0pDeo89VfDuGcUx1HrZGzRPUKzZ5ddiak+MUn+X5g1+rBi7W/9Fq2ofG98e/rrp5bPbPQVcBsnkD9JMfGikl5jfhbgg7c9elMRnAr1XLt1whEzYD03VjhTNR5O8/YJoLmCUzfRiqgiWeGGr8RBBQdHhq5E9OOHM/8EU7KWmREgpTHvu9KmKFVbGVmDTy0QHr0VVecGkuRIjRZUfQxNWFLi5Yben51aIhY0kk1lan3xzKMMMDczE2qurN0y+ebeisTdT2BKsFHE7nAvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5qs9WaIZRnHyI16X/m7sP/mEs8WEnGg6xwxIzrJYHZg=;
- b=yH9Ddd5Wbg5KcW/qbyGWTftT9SY6hP4K0epqpZfTMoTOt4M5CfYml6uIqkT/N2xRe4LA14rQceM5x6izhjiPiS+SRGM/yisnz9+tBI5Nia4hOrWZFm0ZVwI/VnI5RrjE2/y5skb4Cdx2CapljuLHcxyNyeG4jpzX/Tbs/ebUtUP6oTfmUHv6xizb54i38al1d7KzFNvSBY9up7N2ynsXU6S6RWytKMpcOrlNVC1XC9cBfnPved8bFvv3HoNlYvv81X7wKYrCS4Au3N9iYmgBTV8PysFUOkBv+PlD5D8wlN5MggRpOqJCR8wfvpfirVxALUW00HQGy8cq+U3TlleaxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ2PR11MB8587.namprd11.prod.outlook.com (2603:10b6:a03:568::21)
- by MN0PR11MB6302.namprd11.prod.outlook.com (2603:10b6:208:3c2::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.27; Tue, 24 Sep
- 2024 02:53:41 +0000
-Received: from SJ2PR11MB8587.namprd11.prod.outlook.com
- ([fe80::4050:8bc7:b7c9:c125]) by SJ2PR11MB8587.namprd11.prod.outlook.com
- ([fe80::4050:8bc7:b7c9:c125%3]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
- 02:53:41 +0000
-Date: Tue, 24 Sep 2024 10:53:32 +0800
-From: Oliver Sang <oliver.sang@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ke8RdNqR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6F92C4CEC4;
+	Tue, 24 Sep 2024 09:48:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727171294;
+	bh=IJb2CY2sQexSIpMJlLAZTjDzjCwF7sXuLr8nOkq3T5Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ke8RdNqRNrJOuxH3G/Ln6qNlL6QGQ/daYetAAt1sBMZJ0y7LmzxW+cIsoaM+SDRcd
+	 /NWgG9uAVX1OmTbwLZrk4VFMjmveHy1t4tOE37b5Y2dGlELjeIm7+IkM7UBrgbIziL
+	 1QGpr3l1xvgyERkKlbolB+xbud5VGkGTGjU6JIA8yDzMBiKY+W2wzl5OhT5LmV3ZU0
+	 eTUk0TlfWFAObQkz/Ll3WDJbzS8KBoTZ2//YyyX50l+Pw5hXRlPeVVhdVTv6UM9hLz
+	 z8Sl1ai3JtBKE54ANx/ZqRBNkENUlruWITPhgRJV2uTN1PVF26og/aWR0YLlquICkM
+	 l0CYDkm4yULGg==
+Date: Tue, 24 Sep 2024 12:48:09 +0300
+From: Leon Romanovsky <leon@kernel.org>
 To: David Howells <dhowells@redhat.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>, Steve French
-	<stfrench@microsoft.com>, Paulo Alcantara <pc@manguebit.com>, "Christian
- Brauner" <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>,
-	<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-	<oliver.sang@intel.com>
-Subject: Re: [linus:master] [cifs] 43a64bd02f: xfstests.generic.465.fail
-Message-ID: <ZvIprK+p09tqNk7c@xsang-OptiPlex-9020>
-References: <202409221711.b537f7a8-oliver.sang@intel.com>
- <743744.1727075336@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <743744.1727075336@warthog.procyon.org.uk>
-X-ClientProxiedBy: SI2P153CA0027.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::22) To SJ2PR11MB8587.namprd11.prod.outlook.com
- (2603:10b6:a03:568::21)
+Cc: Christian Brauner <christian@brauner.io>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 15/25] netfs: Use new folio_queue data type and
+ iterator instead of xarray iter
+Message-ID: <20240924094809.GA1182241@unreal>
+References: <20240814203850.2240469-1-dhowells@redhat.com>
+ <20240814203850.2240469-16-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB8587:EE_|MN0PR11MB6302:EE_
-X-MS-Office365-Filtering-Correlation-Id: e68a909d-5bd1-4031-0ea7-08dcdc4418cc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?K7SXY9HStriYV9kJJEMDSQL7ERXV5t/Ku6h3wtGVzX0SRHq7T/ZS6ssRGJSG?=
- =?us-ascii?Q?DmcJtuxVNr+PsEQwES1LtSBX6xbXxTKxo2bHEpweRJtfUzGWepVMCcRw8A4Z?=
- =?us-ascii?Q?zKgvxpIl3KcWb44Q3al3rWL/Mx7pvkgOhyGBpiPoM8HFlpPrrHJ3peNFXpbu?=
- =?us-ascii?Q?SA+5EXlx9Pqr0JkaGuzNlJv03oDy4/MHM08eHyHZ1CooLD9hfcWeQeSdxS7x?=
- =?us-ascii?Q?8a0L8DNiUSyXRCncUZMtNn1GNhNl26BqWf0gM05c3tFZ4QE9fEv/xKxYPCZu?=
- =?us-ascii?Q?QMTAW/xn5JQYMR273aJalitp4bQPOm1XweDer7CKz3BqEkIl1oxZC0AKIzDJ?=
- =?us-ascii?Q?aXcQwkV3wcBxdtuUVJPPyClMUOd09EAjun842K93sPC9YT9lHPzxMfj9ApWk?=
- =?us-ascii?Q?c8tvnp7PAexN3i9r7Q/WgohgGMSBifjnI+PHYrLCe9U/+IAZjrYbGpYdF6uw?=
- =?us-ascii?Q?Y020TRzPFLaaVkB9GGoXzBcZ8VpAz08VNujFW/cvZKohc/3IJv6BuC68Y7As?=
- =?us-ascii?Q?oJvoYM5pegiwJ+Oipf2O9kaFM6JvYKadazERpThj5Csf6ub9LPjL5iOYVct7?=
- =?us-ascii?Q?i6GGwsi3VcgS/bQMNeK4tkCSwsG0r0bYtvQOkaAiEeDdNsrBfOLYcnMjFZkQ?=
- =?us-ascii?Q?Kw70GlJHZ16b67wD+P/2F/THT1uTQ8wzWMB12em+95xA0/PirMJQ1Xtc0Ldr?=
- =?us-ascii?Q?O93C7hWdgDvhUL9EuyQtcwDCnwImTX3NtK0PWbMoiUtaHTY6+V6t0Sfj0i2+?=
- =?us-ascii?Q?yUsgxD4zAfDWvkKh3FWtr4qdHGb4GNN0tYHTjvcys/h/RWSPsTha46pF65HT?=
- =?us-ascii?Q?4KV5ZHdYn05NNb7uJmK8N9QgVsPPntBZtJjcwhe2Tnqq8qpUmGXEuZspEr+j?=
- =?us-ascii?Q?6EkD3JVrypE/XRQbXNYSLoXMq60XaNRWqsOYmipxfw2YVYhbtzsoh+01oTrb?=
- =?us-ascii?Q?Yj0VPORV635ss2Z7OBEYK8k0WbwMCL+XSVJTup9HleHqi97owXdj+mMQyiAD?=
- =?us-ascii?Q?qpZW6diSbI0xDhjDKMzSBUi6oLUj7FAcnpvCnq68++ipKD7roZfk90BLG9yX?=
- =?us-ascii?Q?SPpnWOdF2tbGE22L7uvvwiWxwyBzVspr/fCXvOhNHxFccAs3sw/fmzJPpp8p?=
- =?us-ascii?Q?3PdG65EC+FWXt+v/9asgEgU263RaU1yWs4guKth9zTrk6qFxSIfbDGuC3iJ2?=
- =?us-ascii?Q?5EJJTI52kZlZ+cYJVOhBh8k3mINNRyTYKjscvuZRwCZgtbnLrmZ0rSNxd4RD?=
- =?us-ascii?Q?YJM3lKYHPys1GTyqVR4/wlrGQ1BdINdtxQXXOogVP5eGTxmsa6CeGSbiA5ZY?=
- =?us-ascii?Q?XPChweePYgYRVxyvDznnzjMwv1UPmjxTL9sVVZCoqR1llw=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8587.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fwPVr6GXU8WoYCuu4bsSax/hXHjsW6hBmi61RexReUUbTqCcwZkYuoMOLrKp?=
- =?us-ascii?Q?lWRTsGlxuOsKU8OfUkVlkdEIoIY4co8DimGIJvPLqbyZYX7o3CqEEk6T6f7r?=
- =?us-ascii?Q?/Xfgv8O955zKmQJR1Hs4JV7HbBOVeY40Iq0oKAlOJc61iYaB/KY3X80CAk76?=
- =?us-ascii?Q?a+Rg9uPllalYEhUxbHfRa+wXgAHF2kYJ6LWg8/7EhxA3hira6KsVa6Q6NCY2?=
- =?us-ascii?Q?OHX1fbC7rpbvhKDIbZwnZJEJ1G5Kr/s2S/Cw1dPctb4JSjxcAaTQ78ZadCK7?=
- =?us-ascii?Q?foq/y89bcU4+8/SnnEBwVtLM/hnn2btSvfaI2tVMh3eQLob0z6FV7Fd2QEZr?=
- =?us-ascii?Q?s203+h5CUq58ASuFPmGLVl1VcaeN+lvXazTNCEyGA7YrvbKUos9baUNLOjRU?=
- =?us-ascii?Q?ST11XZc3eSFzKadfx89+ZY0i9cL7SIEeTXdH0hHVjLd4wKt4vS2Vg11KfXms?=
- =?us-ascii?Q?iK+GJqtHtMqbu3giN1mxxtnwhaL9/YkA+xoLrVyv5wq3U5wA/MNNUC9Bs99g?=
- =?us-ascii?Q?LD06I37Z+RAXxPNw4Gq14Gw1BaTmxSaE0mVEFgqIlKpbKZAT/4GbbFcNBm77?=
- =?us-ascii?Q?J7ezKzpypIjEYtRk/vtZOIXpxXTEWse6EePFiOYb4tRMS6KH59tvKx2Tr75L?=
- =?us-ascii?Q?QWwyR1TH8iGXUTy31cqGLwO3tdzNS5q4+x4e8HBbDRRamMFCyRyuhdw8Id42?=
- =?us-ascii?Q?+CMHRaXT1RlHSff/XF2tniE1y0ENKHjK+RykUI7EAWOe6U1vOjps4NvtRLbw?=
- =?us-ascii?Q?+c8FsxityiAcDu0r+LqeUWypWpYzq5BrkiO9AFRQHLyXY1EH5lz1qpoQlmOH?=
- =?us-ascii?Q?sJEGCCwAN18uJOTff+9GL+DgHjlKYz2dE5A4m9FX0HWHkjgJK9YYaPwlPRCq?=
- =?us-ascii?Q?Nhlnay4Jm7KTTzxy8Bk1TETrAWfTuAZtiink5SKszD7NtZb1tHDVO8Erl47N?=
- =?us-ascii?Q?LD9+xeoKQFHZFp6m8iFM+2ayM9K4Z2xTdMFcQuZxdAcAcAjxyz+RMW08MWy2?=
- =?us-ascii?Q?7VOyXKNXSR1TlJ7HYCIMo7z2dg2q1u2ffk9RIV6N2gIs4mvCI1avJdUV5QdO?=
- =?us-ascii?Q?ylw/AnM/sdEIa2GwkfaFzzhXALqrUpdIWmXM5dPwDbrCoCVJLdDfa3tTvnsh?=
- =?us-ascii?Q?AdhhVG6yG6MTd+3J6Czln7xIjk8ELJ9DjpzNwjS67TxxAhZs3hW4HKc+mwYV?=
- =?us-ascii?Q?TyszmuXAvZDxtg6bB5TKhBpafKvXf6zzQgQ6vH2XJ3MKXOLvDbhnyZSsWYlL?=
- =?us-ascii?Q?KtnLYTPv1uhXBX6kCXMiVx/4i29rA9gfHMmSjFjXuHbgIe4SaaAU6IacAm9Q?=
- =?us-ascii?Q?ju3musS4rhZtDt58OAr0Xehiu8+i5JnyIYt51FgQ5R1jB+BKSG2+s+tU3t3G?=
- =?us-ascii?Q?Zdqg0dLntdshqYmB/sEmbGOYuLsYs+snPrVBaCx1Y0pEs2QeM05pnpbISqwo?=
- =?us-ascii?Q?ju4IdApY9eYqvGPGlQiEThPkEoRO7if64sulcUzOt7DT9ohe4zFDf2i3soPv?=
- =?us-ascii?Q?GjDoAiZUCVtUNbcSneMimvrnc9vSO9deX8SBck7GyH/fZSGbNhDB4C3delte?=
- =?us-ascii?Q?E1vXfjCvGYi4jLqHuo4Hu4hcr6AswMkZucUuhBMwZwQfmPfj97Hb7YEEtdTU?=
- =?us-ascii?Q?kg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e68a909d-5bd1-4031-0ea7-08dcdc4418cc
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8587.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2024 02:53:41.2558
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yhqh4v9WMPoa+ZeLYHB4GLTEJch7XwzbN19bkZssjQoJsiFhGRXzOBgcuf+8Y5Ts9dJbBMjya/vXzW2jRNPAAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6302
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240814203850.2240469-16-dhowells@redhat.com>
 
-hi, David,
+On Wed, Aug 14, 2024 at 09:38:35PM +0100, David Howells wrote:
+> Make the netfs write-side routines use the new folio_queue struct to hold=
+ a
+> rolling buffer of folios, with the issuer adding folios at the tail and t=
+he
+> collector removing them from the head as they're processed instead of usi=
+ng
+> an xarray.
+>=20
+> This will allow a subsequent patch to simplify the write collector.
+>=20
+> The primary mark (as tested by folioq_is_marked()) is used to note if the
+> corresponding folio needs putting.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/netfs/internal.h          |  9 +++-
+>  fs/netfs/misc.c              | 76 ++++++++++++++++++++++++++++++++
+>  fs/netfs/objects.c           |  1 +
+>  fs/netfs/stats.c             |  4 +-
+>  fs/netfs/write_collect.c     | 84 +++++++++++++++++++-----------------
+>  fs/netfs/write_issue.c       | 28 ++++++------
+>  include/linux/netfs.h        |  8 ++--
+>  include/trace/events/netfs.h |  1 +
+>  8 files changed, 150 insertions(+), 61 deletions(-)
 
-On Mon, Sep 23, 2024 at 08:08:56AM +0100, David Howells wrote:
-> kernel test robot <oliver.sang@intel.com> wrote:
-> 
-> > kernel test robot noticed "xfstests.generic.465.fail" on:
-> 
-> It works fine for me.  Can you grab the contents of /proc/fs/netfs/stats after
-> it has failed?
+According to git bisect, this commit causes to the following kernel
+splat during boot of the system with 9p fs.
 
-as below
+#
+# Caches
+#
+CONFIG_NETFS_SUPPORT=3Dy
+# CONFIG_NETFS_STATS is not set
+# CONFIG_NETFS_DEBUG is not set
+# CONFIG_FSCACHE is not set
+# end of Caches
 
-root@lkp-skl-d05 /tmp# cat /proc/fs/netfs/stats
-Reads  : DR=513 RA=0 RF=0 WB=0 WBZ=0
-Writes : BW=0 WT=0 DW=261 WP=0 2C=0
-ZeroOps: ZR=0 sh=0 sk=0
-DownOps: DL=8208 ds=8208 df=0 di=0
-CaRdOps: RD=0 rs=0 rf=0
-UpldOps: UL=4101 us=4101 uf=0
-CaWrOps: WR=0 ws=0 wf=0
-Objs   : rr=0 sr=0 foq=0 wsc=0
-WbLock : skip=0 wait=0
--- FS-Cache statistics --
-Cookies: n=0 v=0 vcol=0 voom=0
-Acquire: n=0 ok=0 oom=0
-LRU    : n=0 exp=0 rmv=0 drp=0 at=0
-Invals : n=0
-Updates: n=0 rsz=0 rsn=0
-Relinqs: n=0 rtr=0 drop=0
-NoSpace: nwr=0 ncr=0 cull=0
-IO     : rd=0 wr=0 mis=0
+=2E..
+CONFIG_9P_FS=3Dy
+=2E..
 
+[    1.510725][    T1] Run /sbin/init as init process
+[    1.510937][    T1]   with arguments:
+[    1.511060][    T1]     /sbin/init
+[    1.511233][    T1]   with environment:
+[    1.511332][    T1]     HOME=3D/
+[    1.511448][    T1]     TERM=3Dlinux
+[    1.516066][    T1] page: refcount:0 mapcount:0 mapping:0000000000000000=
+ index:0x0 pfn:0x6ce48
+[    1.516920][    T1] flags: 0x4000000000000000(zone=3D1)
+[    1.517112][    T1] raw: 4000000000000000 ffffea0001b39248 ffffea0000158=
+3c8 0000000000000000
+[    1.517374][    T1] raw: 0000000000000000 0000000000000000 00000000fffff=
+fff 0000000000000000
+[    1.517767][    T1] page dumped because: VM_BUG_ON_FOLIO(((unsigned int)=
+ folio_ref_count(folio) + 127u <=3D 127u))
+[    1.518144][    T1] ------------[ cut here ]------------
+[    1.518311][    T1] kernel BUG at include/linux/mm.h:1444!
+[    1.518488][    T1] Oops: invalid opcode: 0000 [#1] SMP DEBUG_PAGEALLOC =
+KASAN
+[    1.518738][    T1] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.1=
+1.0+ #2488
+[    1.518990][    T1] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
+BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[    1.519325][    T1] RIP: 0010:__iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.519540][    T1] Code: 84 f2 fa ff ff 48 89 ef e8 49 28 98 ff e9 e5 f=
+a ff ff 48 8d 48 ff e9 2c fe ff ff 48 c7 c6 20 ee 21 83 48 89 cf e8 7c 2d 8=
+a ff <0f> 0b 48 b8 00 00 00 00 00 fc ff df 4c 8b 74 24 68 44 8b 5c 24 30
+[    1.520110][    T1] RSP: 0000:ffff8880060f6e40 EFLAGS: 00010286
+[    1.520317][    T1] RAX: 000000000000005c RBX: ffffea0001b39234 RCX: 000=
+0000000000000
+[    1.520547][    T1] RDX: 000000000000005c RSI: 0000000000000004 RDI: fff=
+fed1000c1edbb
+[    1.520776][    T1] RBP: dffffc0000000000 R08: 0000000000000000 R09: fff=
+ffbfff0718ce0
+[    1.521027][    T1] R10: 0000000000000003 R11: 0000000000000001 R12: fff=
+f8880065bd7e0                                                              =
+                                                                    12:43:4=
+5 [122/
+[    1.521252][    T1] R13: ffff888006644000 R14: 0000000000000002 R15: 000=
+0000000001000
+[    1.521475][    T1] FS:  0000000000000000(0000) GS:ffff88806ce80000(0000=
+) knlGS:0000000000000000
+[    1.521761][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.521961][    T1] CR2: 0000000000000000 CR3: 0000000003881001 CR4: 000=
+0000000370eb0
+[    1.522200][    T1] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
+0000000000000
+[    1.522418][    T1] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
+0000000000400
+[    1.522636][    T1] Call Trace:
+[    1.522750][    T1]  <TASK>
+[    1.522823][    T1]  ? __die+0x52/0x8f
+[    1.522939][    T1]  ? die+0x2a/0x50
+[    1.523061][    T1]  ? do_trap+0x1d9/0x2c0
+[    1.523163][    T1]  ? __iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.523334][    T1]  ? do_error_trap+0xa3/0x160
+[    1.523465][    T1]  ? __iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.523633][    T1]  ? handle_invalid_op+0x2c/0x30
+[    1.523765][    T1]  ? __iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.523942][    T1]  ? exc_invalid_op+0x29/0x40
+[    1.524087][    T1]  ? asm_exc_invalid_op+0x16/0x20
+[    1.524238][    T1]  ? __iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.524426][    T1]  ? iov_iter_extract_pages+0x1ee0/0x1ee0
+[    1.524575][    T1]  ? radix_tree_node_alloc.constprop.0+0x16a/0x2c0
+[    1.524762][    T1]  ? lock_acquire+0xe2/0x500
+[    1.524916][    T1]  ? mark_lock+0xfc/0x2dc0
+[    1.525071][    T1]  iov_iter_get_pages_alloc2+0x3d/0xe0
+[    1.525208][    T1]  ? print_usage_bug.part.0+0x600/0x600
+[    1.525392][    T1]  p9_get_mapped_pages.part.0.constprop.0+0x3bf/0x6c0
+[    1.525595][    T1]  ? p9pdu_vwritef+0x320/0x1f20
+[    1.525756][    T1]  ? p9_virtio_request+0x550/0x550
+[    1.525918][    T1]  ? pdu_read+0xc0/0xc0
+[    1.526056][    T1]  ? lock_release+0x220/0x780
+[    1.526218][    T1]  ? pdu_read+0xc0/0xc0
+[    1.526341][    T1]  p9_virtio_zc_request+0x728/0x1020
+[    1.526501][    T1]  ? p9pdu_vwritef+0x320/0x1f20
+[    1.526662][    T1]  ? p9_virtio_probe+0xa20/0xa20
+[    1.526824][    T1]  ? netfs_read_to_pagecache+0x601/0xd50
+[    1.526990][    T1]  ? mark_lock+0xfc/0x2dc0
+[    1.527159][    T1]  ? p9pdu_finalize+0xdc/0x1d0
+[    1.527321][    T1]  ? p9_client_prepare_req+0x235/0x360
+[    1.527483][    T1]  ? p9_tag_alloc+0x6e0/0x6e0
+[    1.527644][    T1]  ? lock_release+0x220/0x780
+[    1.527806][    T1]  p9_client_zc_rpc.constprop.0+0x236/0x7d0
+[    1.528013][    T1]  ? __create_object+0x5e/0x80
+[    1.528175][    T1]  ? p9_client_flush.isra.0+0x390/0x390
+[    1.528345][    T1]  ? lockdep_hardirqs_on_prepare+0x268/0x3e0
+[    1.528544][    T1]  ? __call_rcu_common.constprop.0+0x475/0xc80
+[    1.528785][    T1]  ? p9_req_put+0x17a/0x200
+[    1.528944][    T1]  p9_client_read_once+0x343/0x840
+[    1.529114][    T1]  ? p9_client_getlock_dotl+0x3c0/0x3c0
+[    1.529274][    T1]  p9_client_read+0xf1/0x150
+[    1.529440][    T1]  v9fs_issue_read+0x107/0x2c0
+[    1.529608][    T1]  ? v9fs_issue_write+0x140/0x140
+[    1.529736][    T1]  netfs_read_to_pagecache+0x601/0xd50
+[    1.529858][    T1]  netfs_readahead+0x6af/0xbe0
+[    1.530000][    T1]  read_pages+0x17b/0xaf0
+[    1.530136][    T1]  ? lru_move_tail+0x8f0/0x8f0
+[    1.530299][    T1]  ? file_ra_state_init+0xd0/0xd0
+[    1.530479][    T1]  page_cache_ra_unbounded+0x324/0x5f0
+[    1.530638][    T1]  filemap_get_pages+0x597/0x16b0
+[    1.530801][    T1]  ? filemap_add_folio+0x140/0x140
+[    1.530957][    T1]  ? lock_is_held_type+0x81/0xe0
+[    1.531121][    T1]  filemap_read+0x2ec/0xa90
+[    1.531282][    T1]  ? filemap_get_pages+0x16b0/0x16b0
+[    1.531443][    T1]  ? 0xffffffff81000000
+[    1.531565][    T1]  ? find_held_lock+0x2d/0x110
+[    1.531720][    T1]  ? lock_is_held_type+0x81/0xe0
+[    1.531888][    T1]  ? down_read_interruptible+0x1f6/0x490
+[    1.532062][    T1]  ? down_read+0x450/0x450
+[    1.532229][    T1]  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+[    1.532435][    T1]  ? find_held_lock+0x2d/0x110
+[    1.532594][    T1]  netfs_buffered_read_iter+0xe2/0x130
+[    1.532755][    T1]  ? netfs_file_read_iter+0xb2/0x130
+[    1.532904][    T1]  __kernel_read+0x2db/0x8a0
+[    1.533066][    T1]  ? __x64_sys_lseek+0x1d0/0x1d0
+[    1.533221][    T1]  bprm_execve+0x548/0x1410
+[    1.533381][    T1]  ? setup_arg_pages+0xb40/0xb40
+[    1.533534][    T1]  ? __cond_resched+0x17/0x70
+[    1.533684][    T1]  kernel_execve+0x26a/0x2f0
+[    1.533808][    T1]  try_to_run_init_process+0xf/0x30
+[    1.533933][    T1]  ? rest_init+0x1b0/0x1b0
+[    1.534064][    T1]  kernel_init+0xe2/0x140
+[    1.534160][    T1]  ? _raw_spin_unlock_irq+0x24/0x30
+[    1.534285][    T1]  ret_from_fork+0x2d/0x70
+[    1.534415][    T1]  ? rest_init+0x1b0/0x1b0
+[    1.534558][    T1]  ret_from_fork_asm+0x11/0x20
+[    1.534730][    T1]  </TASK>
+[    1.534858][    T1] Modules linked in:
+[    1.535016][    T1] ---[ end trace 0000000000000000 ]---
+[    1.535173][    T1] RIP: 0010:__iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.535385][    T1] Code: 84 f2 fa ff ff 48 89 ef e8 49 28 98 ff e9 e5 f=
+a ff ff 48 8d 48 ff e9 2c fe ff ff 48 c7 c6 20 ee 21 83 48 89 cf e8 7c 2d 8=
+a ff <0f> 0b 48 b8 00 00 00 00 00 fc ff df 4c 8b 74 24 68 44 8b 5c 24 30
+[    1.535967][    T1] RSP: 0000:ffff8880060f6e40 EFLAGS: 00010286
+[    1.536183][    T1] RAX: 000000000000005c RBX: ffffea0001b39234 RCX: 000=
+0000000000000
+[    1.536426][    T1] RDX: 000000000000005c RSI: 0000000000000004 RDI: fff=
+fed1000c1edbb
+[    1.536667][    T1] RBP: dffffc0000000000 R08: 0000000000000000 R09: fff=
+ffbfff0718ce0
+[    1.536914][    T1] R10: 0000000000000003 R11: 0000000000000001 R12: fff=
+f8880065bd7e0
+[    1.537163][    T1] R13: ffff888006644000 R14: 0000000000000002 R15: 000=
+0000000001000
+[    1.537409][    T1] FS:  0000000000000000(0000) GS:ffff88806ce80000(0000=
+) knlGS:0000000000000000
+[    1.537842][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.538035][    T1] CR2: 0000000000000000 CR3: 0000000003881001 CR4: 000=
+0000000370eb0
+[    1.538281][    T1] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
+0000000000000
+[    1.538519][    T1] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
+0000000000400
+[    1.538779][    T1] ------------[ cut here ]------------
+[    1.538904][    T1] WARNING: CPU: 1 PID: 1 at kernel/exit.c:886 do_exit+=
+0x17c4/0x23a0
+[    1.539110][    T1] Modules linked in:
+[    1.539229][    T1] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Tainted: G     =
+ D            6.11.0+ #2488
+[    1.539459][    T1] Tainted: [D]=3DDIE
+[    1.539567][    T1] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
+BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[    1.539860][    T1] RIP: 0010:do_exit+0x17c4/0x23a0
+[    1.540008][    T1] Code: bb 68 04 00 00 31 f6 e8 5a 92 ff ff e9 d6 f8 f=
+f ff 4c 89 fe bf 05 06 00 00 e8 c8 53 02 00 e9 5c ec ff ff 0f 0b e9 b7 e8 f=
+f ff <0f> 0b e9 27 ea ff ff 48 89 df e8 ad 90 ff ff 48 85 c0 49 89 c7 0f
+[    1.540502][    T1] RSP: 0000:ffff8880060f7e68 EFLAGS: 00010286
+[    1.540657][    T1] RAX: dffffc0000000000 RBX: ffff8880060e8000 RCX: 1ff=
+ffffff07aebdf
+[    1.540860][    T1] RDX: 1ffff11000c1d20b RSI: 0000000000000008 RDI: fff=
+f8880060e9058
+[    1.541078][    T1] RBP: ffff8880060e8708 R08: 0000000000000000 R09: fff=
+ffbfff07ae5c1
+[    1.541261][    T1] R10: 0000000000000000 R11: 0000000000000001 R12: fff=
+f888006108000
+[    1.541437][    T1] R13: ffff8880060e8710 R14: ffff888006100000 R15: 000=
+000000000000b
+[    1.541645][    T1] FS:  0000000000000000(0000) GS:ffff88806ce80000(0000=
+) knlGS:0000000000000000
+[    1.541875][    T1] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.542043][    T1] CR2: 0000000000000000 CR3: 0000000003881001 CR4: 000=
+0000000370eb0
+[    1.542237][    T1] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
+0000000000000
+[    1.542432][    T1] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000=
+0000000000400
+[    1.542622][    T1] Call Trace:
+[    1.542733][    T1]  <TASK>
+[    1.542801][    T1]  ? __warn.cold+0x5f/0x1ed
+[    1.542930][    T1]  ? do_exit+0x17c4/0x23a0
+[    1.543063][    T1]  ? report_bug+0x1e6/0x290
+[    1.543190][    T1]  ? handle_bug+0x4f/0x90
+[    1.543290][    T1]  ? exc_invalid_op+0x13/0x40
+[    1.543418][    T1]  ? asm_exc_invalid_op+0x16/0x20
+[    1.543545][    T1]  ? do_exit+0x17c4/0x23a0
+[    1.543676][    T1]  ? do_exit+0x1c2/0x23a0
+[    1.543774][    T1]  ? __cond_resched+0x17/0x70
+[    1.543904][    T1]  ? is_current_pgrp_orphaned+0x90/0x90
+[    1.544040][    T1]  ? kernel_execve+0x26a/0x2f0
+[    1.544169][    T1]  ? __iov_iter_get_pages_alloc+0x16d4/0x2210
+[    1.544329][    T1]  make_task_dead+0xf0/0x110
+[    1.544462][    T1]  rewind_stack_and_make_dead+0x16/0x20
+[    1.544595][    T1] RIP: 0000:0x0
+[    1.544708][    T1] Code: Unable to access opcode bytes at 0xfffffffffff=
+fffd6.
+[    1.544903][    T1] RSP: 0000:0000000000000000 EFLAGS: 00000000 ORIG_RAX=
+: 0000000000000000
+[    1.545098][    T1] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000=
+0000000000000
+[    1.545286][    T1] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000=
+0000000000000
+[    1.545489][    T1] RBP: 0000000000000000 R08: 0000000000000000 R09: 000=
+0000000000000
+[    1.545699][    T1] R10: 0000000000000000 R11: 0000000000000000 R12: 000=
+0000000000000
+[    1.545898][    T1] R13: 0000000000000000 R14: 0000000000000000 R15: 000=
+0000000000000
+[    1.546099][    T1]  </TASK>
+[    1.546198][    T1] Kernel panic - not syncing: kernel: panic_on_warn se=
+t ...
+[    1.546654][    T1] Kernel Offset: disabled
+[    1.546769][    T1] ---[ end Kernel panic - not syncing: kernel: panic_o=
+n_warn set ... ]---
 
-> 
-> David
-> 
-> 
+Thanks
