@@ -1,100 +1,117 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE9F17ADE2
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2024 10:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C0A136330
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2024 13:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727173425; cv=none; b=p+qrbxO1LO31/rABtzGdnils8os+wIXMmE3yLBycSLD0+elqyZMZdhF17Gp+5rRtsic23+w1+31iQ5zyK2kilDlsacjp2adQpBx24Gf5TydAHIZmquyj7+P/nbfT7X5SSwUXkxuYuuWiTwJJm1URgqwfzu/fA+6X67U5kh33B4w=
+	t=1727185724; cv=none; b=WpQNrR22RMToNsOxOXMxY0ytjirofKiodVrjdctMK9XZ2oKw/q/Yx8CfLJKVknQyUBZVRJg9x2J+lVOSXyDbekFlyOAT2KnqTsLsypdzW+12LUh3xghvmeD1ayCQpq4CSMO8V9CU/QY5cNZyg4mVvelP01tL4kjN9hsS48ugpxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727173425; c=relaxed/simple;
-	bh=99zKOLCWuUMnN9DB5g9ScYpxibi+BJ616Z0/z11v098=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEiqzgHjEDaE//0Dgunnc8zOKjWNXxxpBc1YZgCFMWjdtD6o1lMgneLsvKF1L9W2hKG8FJbx9ukJPBrThih3awHei6mWy92eiNWZhJH4omIY6dqz/F+JMQ8nnZcMUPy/Q6PsB/MZDERajm+JfjsN2VAeZOyDYWqS76IvO/46gcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A4pwfpmK; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A4pwfpmK"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727173421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=P/EHYtGClPmz/TRgBbXk5kCLvo/IRFq1tMieEnr4/nE=;
-	b=A4pwfpmKq2U8KhWAB5o1HdkMe0xaT/RF4GMDC0sPZdoW0M8okfGGfGQH1RGY5lqrT7O78P
-	Sur4XINYqJAs4BuHG9sd9OWWEZHFi7qAt75W95PLBEPr0ABVUJ110M4WdLH3nrA60J9h2M
-	BrqNj9G5aENbTiAzZJRNvwxH/uQUoMs=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] ksmbd: Annotate struct copychunk_ioctl_req with __counted_by_le()
-Date: Tue, 24 Sep 2024 12:22:44 +0200
-Message-ID: <20240924102243.239811-2-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1727185724; c=relaxed/simple;
+	bh=vD7fjU+l1bGWYKHGKcpdBildjqsUX+zkofEM0Uw2nL4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Mv+hqaCwnFKiKeKeMz0MMkOijG2rrOMxJQ6S9kC7Fzlc/XgSWtdVdEtFNp72EJ2kHjeXBnnvbVdfQSNLGQBCcqovZzwprO/Nar8EHsnu2Ba6PnMmeyLoDsQftEOQIxdEKbcmZCG0s3mNJeeoCkfW0aEGAu96eYnWySe5ToxXrzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2d873dc644dso4328196a91.3
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2024 06:48:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727185722; x=1727790522;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RkZN19jHe2i6vnXx2Vy02wrubZznFB6Lql7mwsIoVkI=;
+        b=gZAzj53PfCR1cDAdmZ1Pxzn8h+2lxqKr9DVIriPEnGrtKMnf6/61T6+isVG0YN6KXV
+         7fmlNVs1kW93/mgySCLO6NoPk1loEvL3HCgda0+B9Iwh/malWCFxaqhmx8hCqs+pq2CU
+         Sk6xLYqsFqkXn3it5pRqU+hX9pjTOSCaAr4WcirjTbGvYx3pt05QRqNAmRrgnDayFq2D
+         46bFP/1sWOPMtrHU5KmTi2snk4DS24Nkxav8m/0NZyODggEvSnTAgFKe0NxErQB8PNvo
+         P97mM0v5hEleqj8n/30HCkylLUnfOFk1byr1XdHFUMJmgGckA7gmzEbdsfsj9JWkqrlB
+         fd/Q==
+X-Gm-Message-State: AOJu0Yx7HpgfxXwd8BG3HNJC2mSd91zbr67H4d41Hzm3GW+48Em69WA0
+	Czu4Umokmn3pV6Muvv+rTW82gbIjHSMO3Xpqtmqtfr2Xu1e33nGM28zFuw==
+X-Google-Smtp-Source: AGHT+IH9sz79DFxQWp4Zh3ukMf+opJj0lNbVqV2OFOA1iRqZTlU7GHSXkHHGHM2oxYYlmEmOE3cXVQ==
+X-Received: by 2002:a17:90a:5143:b0:2db:ec3c:8a0e with SMTP id 98e67ed59e1d1-2dd7f758735mr17956114a91.35.1727185721835;
+        Tue, 24 Sep 2024 06:48:41 -0700 (PDT)
+Received: from localhost.localdomain ([1.227.206.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e058ee3cd8sm1535532a91.2.2024.09.24.06.48.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 06:48:41 -0700 (PDT)
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	atteh.mailbox@gmail.com,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: fix warning: comparison of distinct pointer types lacks a cast
+Date: Tue, 24 Sep 2024 22:48:16 +0900
+Message-Id: <20240924134818.15552-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Add the __counted_by_le compiler attribute to the flexible array member
-Chunks to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-CONFIG_FORTIFY_SOURCE.
+smb2pdu.c: In function ‘smb2_open’:
+./include/linux/minmax.h:20:28: warning: comparison of distinct
+pointer types lacks a cast
+   20 |  (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+      |                            ^~
+./include/linux/minmax.h:26:4: note: in expansion of macro ‘__typecheck’
+   26 |   (__typecheck(x, y) && __no_side_effects(x, y))
+      |    ^~~~~~~~~~~
+./include/linux/minmax.h:36:24: note: in expansion of macro ‘__safe_cmp’
+   36 |  __builtin_choose_expr(__safe_cmp(x, y), \
+      |                        ^~~~~~~~~~
+./include/linux/minmax.h:45:19: note: in expansion of macro ‘__careful_cmp’
+   45 | #define min(x, y) __careful_cmp(x, y, <)
+      |                   ^~~~~~~~~~~~~
+/home/linkinjeon/git/smbd_work/ksmbd/smb2pdu.c:3713:27: note: in
+expansion of macro ‘min’
+ 3713 |     fp->durable_timeout = min(dh_info.timeout,
 
-Read Chunks[0] after checking that ChunkCount is not 0.
-
-Compile-tested only.
-
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 2 +-
- fs/smb/server/smb2pdu.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/server/smb2pdu.c   | 5 +++--
+ fs/smb/server/vfs_cache.h | 4 ++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 461c4fc682ac..0670bdf3e167 100644
+index e6bdc1b20727..28cd66fa8e05 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -7565,7 +7565,6 @@ static int fsctl_copychunk(struct ksmbd_work *work,
- 	ci_rsp->TotalBytesWritten =
- 		cpu_to_le32(ksmbd_server_side_copy_max_total_size());
+@@ -3531,8 +3531,9 @@ int smb2_open(struct ksmbd_work *work)
+ 			memcpy(fp->create_guid, dh_info.CreateGuid,
+ 					SMB2_CREATE_GUID_SIZE);
+ 			if (dh_info.timeout)
+-				fp->durable_timeout = min(dh_info.timeout,
+-						DURABLE_HANDLE_MAX_TIMEOUT);
++				fp->durable_timeout =
++					min_t(unsigned int, dh_info.timeout,
++					      DURABLE_HANDLE_MAX_TIMEOUT);
+ 			else
+ 				fp->durable_timeout = 60;
+ 		}
+diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
+index b0f6d0f94cb8..5bbb179736c2 100644
+--- a/fs/smb/server/vfs_cache.h
++++ b/fs/smb/server/vfs_cache.h
+@@ -100,8 +100,8 @@ struct ksmbd_file {
+ 	struct list_head		blocked_works;
+ 	struct list_head		lock_list;
  
--	chunks = (struct srv_copychunk *)&ci_req->Chunks[0];
- 	chunk_count = le32_to_cpu(ci_req->ChunkCount);
- 	if (chunk_count == 0)
- 		goto out;
-@@ -7579,6 +7578,7 @@ static int fsctl_copychunk(struct ksmbd_work *work,
- 		return -EINVAL;
- 	}
+-	int				durable_timeout;
+-	int				durable_scavenger_timeout;
++	unsigned int			durable_timeout;
++	unsigned int			durable_scavenger_timeout;
  
-+	chunks = (struct srv_copychunk *)&ci_req->Chunks[0];
- 	for (i = 0; i < chunk_count; i++) {
- 		if (le32_to_cpu(chunks[i].Length) == 0 ||
- 		    le32_to_cpu(chunks[i].Length) > ksmbd_server_side_copy_max_chunk_size())
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 73aff20e22d0..f01121dbf358 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -194,7 +194,7 @@ struct copychunk_ioctl_req {
- 	__le64 ResumeKey[3];
- 	__le32 ChunkCount;
- 	__le32 Reserved;
--	__u8 Chunks[]; /* array of srv_copychunk */
-+	__u8 Chunks[] __counted_by_le(ChunkCount); /* array of srv_copychunk */
- } __packed;
- 
- struct srv_copychunk {
+ 	/* if ls is happening on directory, below is valid*/
+ 	struct ksmbd_readdir_data	readdir_data;
 -- 
-2.46.1
+2.25.1
 
