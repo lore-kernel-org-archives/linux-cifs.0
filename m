@@ -1,89 +1,293 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4603B1B85DD;
-	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0841C7B7C;
+	Wed, 25 Sep 2024 11:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727260283; cv=none; b=nfc4wc6jusYYWSIqxluPaIbY6RXjQWlzjy0hYpcwZpaU9/2xz+KkoodRMcpJ3BsEj/HG+2qasEgbaeMtXeDQxE02u35wZ5W9DiGgvX9zKKvNwcWfuk0wrzl1vv6DGNCc+jGHktgOC7azptWEJX71H6QMkFyRBL2MKa8Sr4d6BSM=
+	t=1727265192; cv=none; b=T/BULcK+iulNt21mC8PPIRh0dFhrcE/v4mNKTa4SSMX5wu/klZQcV77fGGjey+qUfV4yVUlEHuOtGKVzWYMs2F1ZULEtxgXU+ruCvetZ4uJDjVDmZx9lYG56s1pu0fC1vu/zbv7SgXrOvA6+2Lcn/guX1NG7TabxnC7cYP1tCH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727260283; c=relaxed/simple;
-	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vt2AKogIar5jOr1OJCNZXSy/61CZ+eSf7FaDCbOpOXdQFaGgl+HylawSxWryNCzzj/OZv5+pfQTnZRXocpdMpdvezv/0f6aVVhfQJpbDZTlppqcQO9LwzYoGc+E+6jDUccNkpBsyvF20yPeWeWSxIvsJTd2ncMCwDibjWWb7v/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7cRb2uC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727265192; c=relaxed/simple;
+	bh=VYGpEvtL66097ueWXNXmmr54Wzx6kE4lq6+YYEHNcTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VtDD26XOcdQ/PlGGafOtzCX+X0jVyuZtJ4VCYFa9KLqxbTdKBLeKyVKGkmm0IeIQb3b1Lr1XhxcmhVTrFrXlzMmmDHms3ugaob8QrjlytKt7cmkNeE8cexbBWdlqPgTVvjWq3uNvaFvQgoPEDhJjwPhyp6566Ao+cOYqjsRgoK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us1emk2J; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7cRb2uC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D09AC4CEC3;
-	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us1emk2J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD9EC4CECD;
+	Wed, 25 Sep 2024 11:53:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727260282;
-	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U7cRb2uCSSGYlrTYOMEkLkLJVOvOsQCMhJxNZE4VBoyjE7Gq9o6SrUMyXirimlK0E
-	 McSps++Q2aGwn4KdkOIuSMCsy3CbLPaeiyfRhm/l01iDsfhIhlIPhnbfFUZFeYGsKJ
-	 aKZKMFqtRCSipuRw/1WbpImuw9tKxoyA/LAiu+FUsU6K+65c0JDfa5Bwd2UnBcyd5j
-	 3QnFPplvGm09sqRiYq5x5mC5kji/QEtY0ec6n7UoL2uLBp6C8Iy2TEB0wSIVUkMeVP
-	 uy1dTuxxY8VG6XbzT6GVhe1lO/x4nUkht3sJu2EhRJWrPe4wYn0i5oqac34vFn3Rad
-	 ktd405WzhKKSA==
-Date: Wed, 25 Sep 2024 13:31:18 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Eduard Zingerman <eddyz87@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Christian Brauner <brauner@kernel.org>
-Cc: Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
-	ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
-	hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-	netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-	smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	v9fs@lists.linux.dev, willy@infradead.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
-Message-ID: <20240925103118.GE967758@unreal>
-References: <20240923183432.1876750-1-chantr4@gmail.com>
- <20240814203850.2240469-20-dhowells@redhat.com>
- <1279816.1727220013@warthog.procyon.org.uk>
- <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+	s=k20201202; t=1727265192;
+	bh=VYGpEvtL66097ueWXNXmmr54Wzx6kE4lq6+YYEHNcTE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=us1emk2JjiPmTjoH07HO6UVR8aewMkMCkEn1B3lSVQQYJ3VOgo39e08MeksnUSK09
+	 gMnr3d4ow13ptM5SPE0Wu8l9uPVsA5UPgFWIdFKUP02uQBMBahxYfeJ+5pCU9JlV0/
+	 Dl5rsqTrzTTgPjip1WSqa9PiDx16nu/CgM8s5sLWMPrGaKX7xdPO0BiU9kOWgMdI9V
+	 EzQGnoschmEMKtudI1evK49ef2jcqBh/Q5L2pRK7dt0Ny7W6MeOpSEfqXnn+l7Mu64
+	 6gYGqarivvO0IvfLhZGyjQlPKbIKvstNaOHTOOWobcobySUg7sHilm/nNxiAZrrrku
+	 cjOWljfOJTsvA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 231/244] ksmbd: add refcnt to ksmbd_conn struct
+Date: Wed, 25 Sep 2024 07:27:32 -0400
+Message-ID: <20240925113641.1297102-231-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
+References: <20240925113641.1297102-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.11
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 24, 2024 at 05:01:13PM -0700, Eduard Zingerman wrote:
-> On Wed, 2024-09-25 at 00:20 +0100, David Howells wrote:
-> > Could you try the attached?  It may help, though this fixes a bug in the
-> > write-side, not the read-side.
-> >
-> 
-> Hi David,
-> 
-> I tried this patch on top of bpf-next but behaviour seems unchanged,
-> dmesg is at [1].
-> 
-> [1] https://gist.github.com/eddyz87/ce45f90453980af6a5fadeb652e109f3
+From: Namjae Jeon <linkinjeon@kernel.org>
 
+[ Upstream commit ee426bfb9d09b29987369b897fe9b6485ac2be27 ]
 
-BTW, I'm hitting the same issue over Linus's tree now, but unfortunately
-there is no WA in my case as I don't have "cache=mmap" in rootflags.
-https://lore.kernel.org/all/20240924094809.GA1182241@unreal/#t
+When sending an oplock break request, opinfo->conn is used,
+But freed ->conn can be used on multichannel.
+This patch add a reference count to the ksmbd_conn struct
+so that it can be freed when it is no longer used.
 
-It came to Linus with Christian Brauner's pull request.
-https://lore.kernel.org/all/20240913-vfs-netfs-39ef6f974061@brauner/
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/server/connection.c |  4 ++-
+ fs/smb/server/connection.h |  1 +
+ fs/smb/server/oplock.c     | 55 +++++++++++---------------------------
+ fs/smb/server/vfs_cache.c  |  3 +++
+ 4 files changed, 23 insertions(+), 40 deletions(-)
 
-Thanks
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 7889df8112b4e..cac80e7bfefc7 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -39,7 +39,8 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
+ 	xa_destroy(&conn->sessions);
+ 	kvfree(conn->request_buf);
+ 	kfree(conn->preauth_info);
+-	kfree(conn);
++	if (atomic_dec_and_test(&conn->refcnt))
++		kfree(conn);
+ }
+ 
+ /**
+@@ -68,6 +69,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+ 		conn->um = NULL;
+ 	atomic_set(&conn->req_running, 0);
+ 	atomic_set(&conn->r_count, 0);
++	atomic_set(&conn->refcnt, 1);
+ 	conn->total_credits = 1;
+ 	conn->outstanding_credits = 0;
+ 
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index 5b947175c048e..b379ae4fdcdff 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -106,6 +106,7 @@ struct ksmbd_conn {
+ 	bool				signing_negotiated;
+ 	__le16				signing_algorithm;
+ 	bool				binding;
++	atomic_t			refcnt;
+ };
+ 
+ struct ksmbd_conn_ops {
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index e546ffa57b55a..8ee86478287f9 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -51,6 +51,7 @@ static struct oplock_info *alloc_opinfo(struct ksmbd_work *work,
+ 	init_waitqueue_head(&opinfo->oplock_brk);
+ 	atomic_set(&opinfo->refcount, 1);
+ 	atomic_set(&opinfo->breaking_cnt, 0);
++	atomic_inc(&opinfo->conn->refcnt);
+ 
+ 	return opinfo;
+ }
+@@ -124,6 +125,8 @@ static void free_opinfo(struct oplock_info *opinfo)
+ {
+ 	if (opinfo->is_lease)
+ 		free_lease(opinfo);
++	if (opinfo->conn && atomic_dec_and_test(&opinfo->conn->refcnt))
++		kfree(opinfo->conn);
+ 	kfree(opinfo);
+ }
+ 
+@@ -163,9 +166,7 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci)
+ 		    !atomic_inc_not_zero(&opinfo->refcount))
+ 			opinfo = NULL;
+ 		else {
+-			atomic_inc(&opinfo->conn->r_count);
+ 			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				atomic_dec(&opinfo->conn->r_count);
+ 				atomic_dec(&opinfo->refcount);
+ 				opinfo = NULL;
+ 			}
+@@ -177,26 +178,11 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci)
+ 	return opinfo;
+ }
+ 
+-static void opinfo_conn_put(struct oplock_info *opinfo)
++void opinfo_put(struct oplock_info *opinfo)
+ {
+-	struct ksmbd_conn *conn;
+-
+ 	if (!opinfo)
+ 		return;
+ 
+-	conn = opinfo->conn;
+-	/*
+-	 * Checking waitqueue to dropping pending requests on
+-	 * disconnection. waitqueue_active is safe because it
+-	 * uses atomic operation for condition.
+-	 */
+-	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
+-		wake_up(&conn->r_count_q);
+-	opinfo_put(opinfo);
+-}
+-
+-void opinfo_put(struct oplock_info *opinfo)
+-{
+ 	if (!atomic_dec_and_test(&opinfo->refcount))
+ 		return;
+ 
+@@ -1127,14 +1113,11 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
+ 			if (!atomic_inc_not_zero(&opinfo->refcount))
+ 				continue;
+ 
+-			atomic_inc(&opinfo->conn->r_count);
+-			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				atomic_dec(&opinfo->conn->r_count);
++			if (ksmbd_conn_releasing(opinfo->conn))
+ 				continue;
+-			}
+ 
+ 			oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE);
+-			opinfo_conn_put(opinfo);
++			opinfo_put(opinfo);
+ 		}
+ 	}
+ 	up_read(&p_ci->m_lock);
+@@ -1167,13 +1150,10 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
+ 			if (!atomic_inc_not_zero(&opinfo->refcount))
+ 				continue;
+ 
+-			atomic_inc(&opinfo->conn->r_count);
+-			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				atomic_dec(&opinfo->conn->r_count);
++			if (ksmbd_conn_releasing(opinfo->conn))
+ 				continue;
+-			}
+ 			oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE);
+-			opinfo_conn_put(opinfo);
++			opinfo_put(opinfo);
+ 		}
+ 	}
+ 	up_read(&p_ci->m_lock);
+@@ -1252,7 +1232,7 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 	prev_opinfo = opinfo_get_list(ci);
+ 	if (!prev_opinfo ||
+ 	    (prev_opinfo->level == SMB2_OPLOCK_LEVEL_NONE && lctx)) {
+-		opinfo_conn_put(prev_opinfo);
++		opinfo_put(prev_opinfo);
+ 		goto set_lev;
+ 	}
+ 	prev_op_has_lease = prev_opinfo->is_lease;
+@@ -1262,19 +1242,19 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 	if (share_ret < 0 &&
+ 	    prev_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
+ 		err = share_ret;
+-		opinfo_conn_put(prev_opinfo);
++		opinfo_put(prev_opinfo);
+ 		goto err_out;
+ 	}
+ 
+ 	if (prev_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&
+ 	    prev_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
+-		opinfo_conn_put(prev_opinfo);
++		opinfo_put(prev_opinfo);
+ 		goto op_break_not_needed;
+ 	}
+ 
+ 	list_add(&work->interim_entry, &prev_opinfo->interim_list);
+ 	err = oplock_break(prev_opinfo, SMB2_OPLOCK_LEVEL_II);
+-	opinfo_conn_put(prev_opinfo);
++	opinfo_put(prev_opinfo);
+ 	if (err == -ENOENT)
+ 		goto set_lev;
+ 	/* Check all oplock was freed by close */
+@@ -1337,14 +1317,14 @@ static void smb_break_all_write_oplock(struct ksmbd_work *work,
+ 		return;
+ 	if (brk_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&
+ 	    brk_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
+-		opinfo_conn_put(brk_opinfo);
++		opinfo_put(brk_opinfo);
+ 		return;
+ 	}
+ 
+ 	brk_opinfo->open_trunc = is_trunc;
+ 	list_add(&work->interim_entry, &brk_opinfo->interim_list);
+ 	oplock_break(brk_opinfo, SMB2_OPLOCK_LEVEL_II);
+-	opinfo_conn_put(brk_opinfo);
++	opinfo_put(brk_opinfo);
+ }
+ 
+ /**
+@@ -1376,11 +1356,8 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 		if (!atomic_inc_not_zero(&brk_op->refcount))
+ 			continue;
+ 
+-		atomic_inc(&brk_op->conn->r_count);
+-		if (ksmbd_conn_releasing(brk_op->conn)) {
+-			atomic_dec(&brk_op->conn->r_count);
++		if (ksmbd_conn_releasing(brk_op->conn))
+ 			continue;
+-		}
+ 
+ 		rcu_read_unlock();
+ 		if (brk_op->is_lease && (brk_op->o_lease->state &
+@@ -1411,7 +1388,7 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 		brk_op->open_trunc = is_trunc;
+ 		oplock_break(brk_op, SMB2_OPLOCK_LEVEL_NONE);
+ next:
+-		opinfo_conn_put(brk_op);
++		opinfo_put(brk_op);
+ 		rcu_read_lock();
+ 	}
+ 	rcu_read_unlock();
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index 4d4ee696e37cd..a19f4e563c7e5 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -863,6 +863,8 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
+ 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
+ 		if (op->conn != conn)
+ 			continue;
++		if (op->conn && atomic_dec_and_test(&op->conn->refcnt))
++			kfree(op->conn);
+ 		op->conn = NULL;
+ 	}
+ 	up_write(&ci->m_lock);
+@@ -965,6 +967,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
+ 		if (op->conn)
+ 			continue;
+ 		op->conn = fp->conn;
++		atomic_inc(&op->conn->refcnt);
+ 	}
+ 	up_write(&ci->m_lock);
+ 
+-- 
+2.43.0
 
-> 
-> Thanks,
-> Eduard
-> 
-> [...]
-> 
-> 
