@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0841C7B7C;
-	Wed, 25 Sep 2024 11:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3731220C7A7;
+	Wed, 25 Sep 2024 12:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265192; cv=none; b=T/BULcK+iulNt21mC8PPIRh0dFhrcE/v4mNKTa4SSMX5wu/klZQcV77fGGjey+qUfV4yVUlEHuOtGKVzWYMs2F1ZULEtxgXU+ruCvetZ4uJDjVDmZx9lYG56s1pu0fC1vu/zbv7SgXrOvA6+2Lcn/guX1NG7TabxnC7cYP1tCH0=
+	t=1727266139; cv=none; b=ZEo5ZW3AkXFs2XT5PtzIAKZoWjNDhy4ETV4O1Nd3mkbRNsyrvuoldHgkVkxiTocvpLf7VAv5bI22H1uMW3WqMw7x1dAlerTF1qUQzsZah8vsQ/kwmoI51rqKNpuhi0uKbrF4xaTCpJYvfueChlBaeKLimRMWHJqASMt3fmUdorQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265192; c=relaxed/simple;
-	bh=VYGpEvtL66097ueWXNXmmr54Wzx6kE4lq6+YYEHNcTE=;
+	s=arc-20240116; t=1727266139; c=relaxed/simple;
+	bh=wPr6tfZ4IOa8qgId0qYOV5LzYbSrYp9GfoEBRGxbLZw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VtDD26XOcdQ/PlGGafOtzCX+X0jVyuZtJ4VCYFa9KLqxbTdKBLeKyVKGkmm0IeIQb3b1Lr1XhxcmhVTrFrXlzMmmDHms3ugaob8QrjlytKt7cmkNeE8cexbBWdlqPgTVvjWq3uNvaFvQgoPEDhJjwPhyp6566Ao+cOYqjsRgoK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=us1emk2J; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=u11UuJ6jw/CR7Fw03AFu2gJsl19eqojgjG7FWpB9vub+/e9kyMuSV48dRUhYq+bXxubwPmXBqP8M3hJpGymqKU/T+b8xsFBRRPKha+vZe2yNNGFLI9gWhQLPK1afZyXqDIlu7E0cRtfq3BTkiVA+INlrQIKygPYUBIemgmtPsmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRuweP+E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="us1emk2J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD9EC4CECD;
-	Wed, 25 Sep 2024 11:53:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRuweP+E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0ECEC4CED2;
+	Wed, 25 Sep 2024 12:08:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727265192;
-	bh=VYGpEvtL66097ueWXNXmmr54Wzx6kE4lq6+YYEHNcTE=;
+	s=k20201202; t=1727266137;
+	bh=wPr6tfZ4IOa8qgId0qYOV5LzYbSrYp9GfoEBRGxbLZw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=us1emk2JjiPmTjoH07HO6UVR8aewMkMCkEn1B3lSVQQYJ3VOgo39e08MeksnUSK09
-	 gMnr3d4ow13ptM5SPE0Wu8l9uPVsA5UPgFWIdFKUP02uQBMBahxYfeJ+5pCU9JlV0/
-	 Dl5rsqTrzTTgPjip1WSqa9PiDx16nu/CgM8s5sLWMPrGaKX7xdPO0BiU9kOWgMdI9V
-	 EzQGnoschmEMKtudI1evK49ef2jcqBh/Q5L2pRK7dt0Ny7W6MeOpSEfqXnn+l7Mu64
-	 6gYGqarivvO0IvfLhZGyjQlPKbIKvstNaOHTOOWobcobySUg7sHilm/nNxiAZrrrku
-	 cjOWljfOJTsvA==
+	b=QRuweP+EShTdv+AlfIuDdz/ylKMY/rrduNrFjCKvN8Kx6XcECDNHyDlqYH4c47crU
+	 7EWI84diQQ8LjK0+oEAtI7YrUj4jZDntXXcWV5wlMb8sh9LF+ns9uFHfk/uDyqEa1D
+	 i4f5VCKzkS7SprK2h6qvIuuQYEIqFXjnooh7AWKakqOF6BVaBWS9fftJoQIk2gv864
+	 xhnSRBxCTOizgjIB8TENMY69Z0G38bHf/AqS52R1OqlilmTw4NzC+Xp6nL8zZqkWCk
+	 BeQC2mvOoGpvz+9/kOaD4+BKVb93Z9kfnOl7C4H/Ue3q8Egr/vkIFqUt15Ski57mku
+	 XdwlLgX6Ns0CQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 231/244] ksmbd: add refcnt to ksmbd_conn struct
-Date: Wed, 25 Sep 2024 07:27:32 -0400
-Message-ID: <20240925113641.1297102-231-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.10 185/197] ksmbd: add refcnt to ksmbd_conn struct
+Date: Wed, 25 Sep 2024 07:53:24 -0400
+Message-ID: <20240925115823.1303019-185-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
-References: <20240925113641.1297102-1-sashal@kernel.org>
+In-Reply-To: <20240925115823.1303019-1-sashal@kernel.org>
+References: <20240925115823.1303019-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11
+X-stable-base: Linux 6.10.11
 Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
@@ -93,7 +93,7 @@ index 7889df8112b4e..cac80e7bfefc7 100644
  	conn->outstanding_credits = 0;
  
 diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 5b947175c048e..b379ae4fdcdff 100644
+index b93e5437793e0..82343afc8d049 100644
 --- a/fs/smb/server/connection.h
 +++ b/fs/smb/server/connection.h
 @@ -106,6 +106,7 @@ struct ksmbd_conn {
@@ -268,10 +268,10 @@ index e546ffa57b55a..8ee86478287f9 100644
  	}
  	rcu_read_unlock();
 diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 4d4ee696e37cd..a19f4e563c7e5 100644
+index 8b2e37c8716ed..271a23abc82fd 100644
 --- a/fs/smb/server/vfs_cache.c
 +++ b/fs/smb/server/vfs_cache.c
-@@ -863,6 +863,8 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
+@@ -710,6 +710,8 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
  	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
  		if (op->conn != conn)
  			continue;
@@ -280,7 +280,7 @@ index 4d4ee696e37cd..a19f4e563c7e5 100644
  		op->conn = NULL;
  	}
  	up_write(&ci->m_lock);
-@@ -965,6 +967,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
+@@ -807,6 +809,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
  		if (op->conn)
  			continue;
  		op->conn = fp->conn;
