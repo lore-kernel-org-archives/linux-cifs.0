@@ -1,139 +1,89 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59642156222
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Sep 2024 09:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4603B1B85DD;
+	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727255457; cv=none; b=c81DAjaW74O03ys/BhyxZW3IVM5T6ddiBQxxjFxxyhx1xctp5pfGDHTwXrBgkVOuW7IV5TWvULD7PNxnKYGpwjUuKKF85eG+ljdR69yrsKBnATMyI/e/haYtiacyrazkL5aqBFeVfQK2R+1KB7yBxgtBz+GeNgz4Qaid7hFnZDU=
+	t=1727260283; cv=none; b=nfc4wc6jusYYWSIqxluPaIbY6RXjQWlzjy0hYpcwZpaU9/2xz+KkoodRMcpJ3BsEj/HG+2qasEgbaeMtXeDQxE02u35wZ5W9DiGgvX9zKKvNwcWfuk0wrzl1vv6DGNCc+jGHktgOC7azptWEJX71H6QMkFyRBL2MKa8Sr4d6BSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727255457; c=relaxed/simple;
-	bh=qPOG89odr6nDTu/Y0IRoN41sQE1eJDpORZJc6ao2/mM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qpxHIp34D+jpEBQGYtvQ/BjrRGvUoBhNSAc7jYmgLIaQuvYgP762sesuKZomrJZ2UiRj2WgM7WmvwEuxGKMBa11MN1SJ6R6B23u6BxZOox1dRO+Vhy2v/mUTYkyMS4E6rME/UG0Sw0StUXUcenSLZEM8EVcGDHfJNgQjV1JOYro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cLAfyS83; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1727260283; c=relaxed/simple;
+	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vt2AKogIar5jOr1OJCNZXSy/61CZ+eSf7FaDCbOpOXdQFaGgl+HylawSxWryNCzzj/OZv5+pfQTnZRXocpdMpdvezv/0f6aVVhfQJpbDZTlppqcQO9LwzYoGc+E+6jDUccNkpBsyvF20yPeWeWSxIvsJTd2ncMCwDibjWWb7v/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7cRb2uC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cLAfyS83"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727255453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oNcOfjKU7tZbJlgaRWEUdhjUY7VzCvgYazdTewJBeUM=;
-	b=cLAfyS83tgbMVyk6ddVbF2rKh47lmtTJCfz+5gcDdwzjDoHimv3u2jj2SireheVvE7JTHp
-	YcRsPu3P1ZhH9xJWe3kS2Jl7ek9FZEWgVxV+yjmvC8s7Ut9cH0dmhJEu71Bj+MafntYTrR
-	GdzoJTeSCgKbmjKsDDeNcXK9AzmHoHY=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2] ksmbd: Annotate struct copychunk_ioctl_req with __counted_by_le()
-Date: Wed, 25 Sep 2024 11:03:13 +0200
-Message-ID: <20240925090313.22310-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7cRb2uC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D09AC4CEC3;
+	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727260282;
+	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U7cRb2uCSSGYlrTYOMEkLkLJVOvOsQCMhJxNZE4VBoyjE7Gq9o6SrUMyXirimlK0E
+	 McSps++Q2aGwn4KdkOIuSMCsy3CbLPaeiyfRhm/l01iDsfhIhlIPhnbfFUZFeYGsKJ
+	 aKZKMFqtRCSipuRw/1WbpImuw9tKxoyA/LAiu+FUsU6K+65c0JDfa5Bwd2UnBcyd5j
+	 3QnFPplvGm09sqRiYq5x5mC5kji/QEtY0ec6n7UoL2uLBp6C8Iy2TEB0wSIVUkMeVP
+	 uy1dTuxxY8VG6XbzT6GVhe1lO/x4nUkht3sJu2EhRJWrPe4wYn0i5oqac34vFn3Rad
+	 ktd405WzhKKSA==
+Date: Wed, 25 Sep 2024 13:31:18 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Eduard Zingerman <eddyz87@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Christian Brauner <brauner@kernel.org>
+Cc: Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+	ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+	hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+	netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+	smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+Message-ID: <20240925103118.GE967758@unreal>
+References: <20240923183432.1876750-1-chantr4@gmail.com>
+ <20240814203850.2240469-20-dhowells@redhat.com>
+ <1279816.1727220013@warthog.procyon.org.uk>
+ <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
 
-Add the __counted_by_le compiler attribute to the flexible array member
-Chunks to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-CONFIG_FORTIFY_SOURCE.
+On Tue, Sep 24, 2024 at 05:01:13PM -0700, Eduard Zingerman wrote:
+> On Wed, 2024-09-25 at 00:20 +0100, David Howells wrote:
+> > Could you try the attached?  It may help, though this fixes a bug in the
+> > write-side, not the read-side.
+> >
+> 
+> Hi David,
+> 
+> I tried this patch on top of bpf-next but behaviour seems unchanged,
+> dmesg is at [1].
+> 
+> [1] https://gist.github.com/eddyz87/ce45f90453980af6a5fadeb652e109f3
 
-Change the data type of the flexible array member Chunks from __u8[] to
-struct srv_copychunk[] for ChunkCount to match the number of elements in
-the Chunks array. (With __u8[], each srv_copychunk would occupy 24 array
-entries and the __counted_by compiler attribute wouldn't be applicable.)
 
-Use struct_size() to calculate the size of the copychunk_ioctl_req.
+BTW, I'm hitting the same issue over Linus's tree now, but unfortunately
+there is no WA in my case as I don't have "cache=mmap" in rootflags.
+https://lore.kernel.org/all/20240924094809.GA1182241@unreal/#t
 
-Read Chunks[0] after checking that ChunkCount is not 0.
+It came to Linus with Christian Brauner's pull request.
+https://lore.kernel.org/all/20240913-vfs-netfs-39ef6f974061@brauner/
 
-Compile-tested only.
+Thanks
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
-Changes in v2:
-- Change the data type of Chunks from __u8[] to struct srv_copychunk[]
-  as suggested by Tom Talpey
-- Use struct_size()
-- Link to v1: https://lore.kernel.org/linux-kernel/20240924102243.239811-2-thorsten.blum@linux.dev/
----
- fs/smb/server/smb2pdu.c |  5 ++---
- fs/smb/server/smb2pdu.h | 14 +++++++-------
- 2 files changed, 9 insertions(+), 10 deletions(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 7121266daa02..62312c5e790e 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -7566,7 +7566,6 @@ static int fsctl_copychunk(struct ksmbd_work *work,
- 	ci_rsp->TotalBytesWritten =
- 		cpu_to_le32(ksmbd_server_side_copy_max_total_size());
- 
--	chunks = (struct srv_copychunk *)&ci_req->Chunks[0];
- 	chunk_count = le32_to_cpu(ci_req->ChunkCount);
- 	if (chunk_count == 0)
- 		goto out;
-@@ -7574,12 +7573,12 @@ static int fsctl_copychunk(struct ksmbd_work *work,
- 
- 	/* verify the SRV_COPYCHUNK_COPY packet */
- 	if (chunk_count > ksmbd_server_side_copy_max_chunk_count() ||
--	    input_count < offsetof(struct copychunk_ioctl_req, Chunks) +
--	     chunk_count * sizeof(struct srv_copychunk)) {
-+	    input_count < struct_size(ci_req, Chunks, chunk_count)) {
- 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
- 		return -EINVAL;
- 	}
- 
-+	chunks = &ci_req->Chunks[0];
- 	for (i = 0; i < chunk_count; i++) {
- 		if (le32_to_cpu(chunks[i].Length) == 0 ||
- 		    le32_to_cpu(chunks[i].Length) > ksmbd_server_side_copy_max_chunk_size())
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 73aff20e22d0..649dacf7e8c4 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -190,13 +190,6 @@ struct resume_key_ioctl_rsp {
- 	__u8 Context[4]; /* ignored, Windows sets to 4 bytes of zero */
- } __packed;
- 
--struct copychunk_ioctl_req {
--	__le64 ResumeKey[3];
--	__le32 ChunkCount;
--	__le32 Reserved;
--	__u8 Chunks[]; /* array of srv_copychunk */
--} __packed;
--
- struct srv_copychunk {
- 	__le64 SourceOffset;
- 	__le64 TargetOffset;
-@@ -204,6 +197,13 @@ struct srv_copychunk {
- 	__le32 Reserved;
- } __packed;
- 
-+struct copychunk_ioctl_req {
-+	__le64 ResumeKey[3];
-+	__le32 ChunkCount;
-+	__le32 Reserved;
-+	struct srv_copychunk Chunks[] __counted_by_le(ChunkCount);
-+} __packed;
-+
- struct copychunk_ioctl_rsp {
- 	__le32 ChunksWritten;
- 	__le32 ChunkBytesWritten;
--- 
-2.46.1
-
+> 
+> Thanks,
+> Eduard
+> 
+> [...]
+> 
+> 
