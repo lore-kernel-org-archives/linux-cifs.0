@@ -1,64 +1,66 @@
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2074.outbound.protection.outlook.com [40.107.215.74])
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2060.outbound.protection.outlook.com [40.107.255.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31994155333;
-	Wed, 25 Sep 2024 06:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E2114B950;
+	Wed, 25 Sep 2024 07:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727247362; cv=fail; b=myEKedn3hNOjX09IIPB+5BoFoMQw4Gy/mwQhrkyScFsAckvn2TyECSQPiJG5DPo0IT1EgCCDuWm8uN03DnaomANLYNz+DA/qFFpK/RyFN+58FIplLZl0VpNXNq9HOW6d+KpEh7kZ09+O1TUkGNscqo5KkBWW2wu6C6rbpXw9lZE=
+	t=1727250220; cv=fail; b=CgTgjKBnuhkdjGAO1isZDr4k9rwlELinQYHDOuuPSg5ADm/j1ExM5svvXrRzmdDcsT/GQebhCiuQnIjS8C7jX3znE4WUmfmTV4IXPx59JFTKDyp2WHdt3wvGnEc0DG1D+4G9SdrvHj81iSkqCSRJRyPkA0Awl//gnlkpYOzut4c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727247362; c=relaxed/simple;
-	bh=YZtUMpV7Te+S8Strdnj+HF8JXFrVRO76+LD9qo+PZAI=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=ChHwYihPu+skRbKou92zVphEkmHZFY7xoxztcMUsO+3boVVGzbkUOl5i6U58lbd7X6MtIdJ7D6Z5S+XzBxFnwuwjIGsh31c2wnOqujNeZbwgSl9yLs0UEcfw620fV13C8JVVPaDaSFXaPJujqCiKNBtdOzKmLTlrOSITKs6Y9Ic=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=VMhnCGQB; arc=fail smtp.client-ip=40.107.215.74
+	s=arc-20240116; t=1727250220; c=relaxed/simple;
+	bh=BpMl4aQPG3scioFVv+yLj2+gCP8Mjl1P7TMxLxQtlLk=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=YC2iJH0Fe1nMLGTgMRk3cLYuRK+mRVIfa4XNXgftXpCSWBUubEmXqHcUdJtQ54qhm206L7NW78Bc8Eyac1pq6uCs9Ey0105oaUKSS2dH6Aw0bCiwsB0YYBd8Gp9RhMs6olxRA5ab9xNTbM1FOd7Dzhhu/XpyP1NcU8tXf6zYqD0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=dHSvTKDJ; arc=fail smtp.client-ip=40.107.255.60
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="VMhnCGQB"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="dHSvTKDJ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iyhsuXlTTiakPhy8QugVgIR+GICQURVym/aKqzV0hszLD6yt4uZTsWzUvyCOq4IVQGiA0evjqnjl82zq+ZvbiLfDkwdpaWQNwJOK9O+CvNODBmqL/59sJ/mXkig9u9e/x9UJ4nn+FmD+BARb1h3ofuk8JbC45QaUuPYz2xqv4LfQZTMxcmj9PP9dPcojTaTttysS2qMrOEF36d0TL2kHmbsHJB0g15A+qab8vCQpXOl0k3jlfZlS2PLLyHLvYFeUABUQBTf/l33IaZGA8CxbDFI6YZTsUmOdnEFEok8ji08XKJeXeeRYe9RsNUlcgFCkll4CabF2TvHQx9BUy8rZ7A==
+ b=QDYkcatae7fEK6lQ0DxVhxKRlVPATOqRdggQIaoZqawEH/urpRk4Wxw2PtxsGiA/UmAjon3ObjVIGLDap63ehnoJIDjzAJgCiKuoGXuKyi6MnEOTZEQFslwtHJzjInp0iSX0DwKj0g4E5TWJs5kSs5sFOwxPyzI+Jd7UyhRprUwsgIFhUJNVuRtxLQ8fmWlF4ncYXC4wACY1eF5JKR5TtXE1gny9fsCcOk1PYF6DqVh2CqgN6FKlqPvRdsPAkn1r0StAXc5Ce7hd3Lm1bp4cPUEtLu1qOxL+5iExixH0LtKa7zvAAVaqHFFW5QRZE+rrS1nXvY5ixPzWkv/PGRsMDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lplIkh7xTl8X5aRR0NiPCQBEjAOSnckDDSdA5di7/is=;
- b=ObPu4h47SbjFB6g5bnz7l8PqHqFXzxoCjKfJLhzW1rIXgCW97Vu3pfUI6y4BFMFs0DdyVhH88NSGg9PbGy0muxe51ijeV0ti9FmnCaTJEJYDfTnNTee02WSSMOXSHbpDrK69InQvvrx3RIQa00VXtNP6dKDc0ZBHNs4n94pH+fKGSpkNA6f7xsJpTq2YSeHXljmOLrZf2wV9cs5zcMy+hDv6OHOWkqoefQNWORnvqy1TxTrCSIKY60bx1GgnKmvZJYU6VqyfVg+wV4bGV6zJjaFB5N8KxKogNgUcx+SHPFQJV2JlQGkEAVMmUijueK3lLUU7Re/+Kzsp3pNcj2OApA==
+ bh=dMb/Ams0ip0tKt7sLSYRElNsoRy/0T4TpsTXhBOf2RQ=;
+ b=WQ1pmNcG2C65JYbrp6JrLLToTmTgrNzjhxhv0fwEKWrGtHWW+1miIxWgrwk8YqNxLFq3DoPQCQk7fucYaDbs+IBsRPZBjc49XSXlJUUXxsMrtEIMx0J1yAzKAENsLPhCvW7v/OfFrD9aZhDeZAgV2rghcF53W3blVjdJTCi2HNYfftx/KqM+2X/Q9iziGyUe0HYlKDVtzz6Z/Olj7vZVqvYBvGW2VbJJCRQR1Tlb6II5QF+OZh0Nwyv2TOHauNNQg2YaYdvgHkdvxlP9cUSylB3+psdAybpj7LNh+3vPSWObAqRseetNczdkCai9dwbcQvNDTfvQE5J7/4VdXDIyzA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
  dkim=pass header.d=vivo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lplIkh7xTl8X5aRR0NiPCQBEjAOSnckDDSdA5di7/is=;
- b=VMhnCGQB5Hwqybg9x/1Bv7SiWRN8vwCibgwQ4V/pSyOtysmxLKWM34+ohOOz3NoNi6zv7Wq0LZVozPZO8hbCsnu4j0PsXWftVkb5LketZlzImKZPniBPu5daMHFpZBU6qoKgwWHBq8iQfxjAk+HuRLnw5vARmUP3tBlpr0RqOzpPSwEobKQZ96pVeWMOVsGqC8FYDkxiMP2jQ5HQaJb+Qs2e72gYAS9E6lITnkh//ldN7UsN0Keb8ON9WDBvptnxNFcsYZmmkH/6YAtBDpNgpKxFwnj7BuAG5BuXyfjhq+vNSx1d+Ku0Y5QfEg6uio8JI/uOQz/+X9Yp+/JuclPZ0g==
+ bh=dMb/Ams0ip0tKt7sLSYRElNsoRy/0T4TpsTXhBOf2RQ=;
+ b=dHSvTKDJwFeEWwh6YeUfUtdoTBV+j8A+NAXD+KVnR2R6atCOeFrTLDL2wwhPOWedkO/7m91UUsiipOZNcN7SEOggBOUWycIYXBMsrEk8r5Dwl35aMJWflf+vYA+pxLm/IZYm3eGTBAYrmbU4LmowgB9UnJxd/IdnrrV/dtq10IIn9CbZJujkzsusvhx09u5hWUW99XejpK+aUtmdttE7agRss530RQYW/Tun2XwFVsD80LywACC08Db0wqeX7FBjxS9vZSWLVEckqGk/6PeN18pueCpGmUseNfezEkRxrSYpTj0gc5EFrnV4voWZ6Mx+RRXOpwPeAysp8EziyL3uCQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=vivo.com;
 Received: from SEZPR06MB5899.apcprd06.prod.outlook.com (2603:1096:101:e3::16)
- by SI2PR06MB5170.apcprd06.prod.outlook.com (2603:1096:4:1bd::6) with
+ by JH0PR06MB7128.apcprd06.prod.outlook.com (2603:1096:990:8e::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Wed, 25 Sep
- 2024 06:55:55 +0000
+ 2024 07:43:35 +0000
 Received: from SEZPR06MB5899.apcprd06.prod.outlook.com
  ([fe80::8bfc:f1ee:8923:77ce]) by SEZPR06MB5899.apcprd06.prod.outlook.com
  ([fe80::8bfc:f1ee:8923:77ce%3]) with mapi id 15.20.7982.022; Wed, 25 Sep 2024
- 06:55:55 +0000
+ 07:43:35 +0000
 From: Shen Lichuan <shenlichuan@vivo.com>
-To: sfrench@samba.org
-Cc: pc@manguebit.com,
+To: linkinjeon@kernel.org,
+	sfrench@samba.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	pc@manguebit.com,
 	ronniesahlberg@gmail.com,
 	sprasad@microsoft.com,
-	tom@talpey.com,
 	bharathsm@microsoft.com,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org,
 	opensource.kernel@vivo.com,
 	Shen Lichuan <shenlichuan@vivo.com>
-Subject: [PATCH v1] smb: client: Correct typos in multiple comments across various files
-Date: Wed, 25 Sep 2024 14:55:43 +0800
-Message-Id: <20240925065543.7620-1-shenlichuan@vivo.com>
+Subject: [PATCH v1] smb: Correct typos in multiple comments across various files
+Date: Wed, 25 Sep 2024 15:43:23 +0800
+Message-Id: <20240925074323.9823-1-shenlichuan@vivo.com>
 X-Mailer: git-send-email 2.17.1
 Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0008.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::14) To SEZPR06MB5899.apcprd06.prod.outlook.com
+X-ClientProxiedBy: SG2PR04CA0195.apcprd04.prod.outlook.com
+ (2603:1096:4:14::33) To SEZPR06MB5899.apcprd06.prod.outlook.com
  (2603:1096:101:e3::16)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -67,409 +69,223 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB5899:EE_|SI2PR06MB5170:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7cd6fcd7-5ad9-4a6e-e92b-08dcdd2f19cd
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5899:EE_|JH0PR06MB7128:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56818eb3-81c7-437d-125a-08dcdd35c2c0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|376014|1800799024|38350700014;
+	BCL:0;ARA:13230040|1800799024|366016|7416014|52116014|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7fk3dk23KBzatSPEkf+pWWhq8/zb1G2eEkSVsDRZM62SJbzyCbgELIHIGJ4B?=
- =?us-ascii?Q?Kg/fr/4f8kNhex7igzGvlK37VcTsnJuBus/mHSxFb7rQgeOa3cgLEMm4nFYn?=
- =?us-ascii?Q?IHC3I9ahI+xJ55QcHnnJlIv2XmdFaZsH70MuHlDwpvzuWDcOZNZOYw/nKaDZ?=
- =?us-ascii?Q?34UP0DeEw7vs6jYACNnKuW4VA323GRMx1YupV8ykbysIxJ4QxaJoHvGGJAMI?=
- =?us-ascii?Q?D26SRmZ7d0ioM13ljxU4FgckLidAxAL4AB2IrMAY737D4n5EqJsVTe2yvmZi?=
- =?us-ascii?Q?oZJBPstry8drIy3lWYZDVLfg+y5hYtqoHJ0oLJA6hZlE7Y3z/NGyjk6gm4k2?=
- =?us-ascii?Q?OdbrmO96PvMkjMn4Gq+ZEycKHy2NMeiO0DUmjm2D7xKi2LA1lkIBP6TVZ0jl?=
- =?us-ascii?Q?Nz8fKx3OhE1EjXn2ELrSvPCZCaJm8FZVagm/FW22QI4KazmoeFC/p5nan5G2?=
- =?us-ascii?Q?XjqEEJt9i22t0mvmLnNFRozrN9tEWn+KEPvd5cFMQ4jsXdRI2dX39dmXEjkC?=
- =?us-ascii?Q?+mruDKSPm0iJN6pwPI4kt+buool3kUkbNlxkKqEX57IQhHi2ftMtGeeWrF2V?=
- =?us-ascii?Q?q/XtvA75wtIqFAZTJN7cR4DbhUtxLr60bJWJyQIDM2I3BI4HqgjOUVNE7lHB?=
- =?us-ascii?Q?qxBxBG5Ni9Klm3+/tOfGkKZ+ev6TWKSrVNwkhD9Et5/NHOHlDDyu9jMox+89?=
- =?us-ascii?Q?sUBE/gOeamZrT8+ZeFWllwhEX88sioMnSHHiwpiPdqMK/0BIj+fJQnSfSlwS?=
- =?us-ascii?Q?matqBXrnqJ87O5gPKnyn9PYruwbPpRYgBOGxZKWQK5brE6QppKbT1SwUR7wR?=
- =?us-ascii?Q?O4tCZU64kRacTD7+RWWECvi4nWkE7Z/uv6aR+NsCxMxIyfmd8W/HKLGtuh5G?=
- =?us-ascii?Q?pHnQ5kUXlZQdw85yvXHCcj88AUkd7HWzuLnnPUit9idza8AhwLQbRs/0ertg?=
- =?us-ascii?Q?1HrrrRalYvIQCT/hv6rGYvDYgTmYKleR70oS8Whs33AJsWNZwQDghbyythEn?=
- =?us-ascii?Q?vej1wG2kE8Um9TbDDQc1f1enyqMdVxqXEzoaD7HOgYkDFBwDrebolqvhX3dh?=
- =?us-ascii?Q?efWc2J/TaYKD3fh+X1niviaw6yN6dBRj7YxmNDObYsAkZwT9+Lp+SZaxWBth?=
- =?us-ascii?Q?5ld5RbiCQj7gWw6DOXxyE7UykNS9v+2sR3yxVDPl+UhoGjUn0clGf0IYrMZJ?=
- =?us-ascii?Q?6y337Jcpf2t1IGfRkYTEZSDc1DAJv1PQRLZvAef3uNXXRrw1RrB4HVSArZUa?=
- =?us-ascii?Q?Zyofia5Q5SnAH121WPJYYHbPtmXzkOr0MgzuLNCPduLJ77emv5o5+At1d4iA?=
- =?us-ascii?Q?A9b1GbpsJqe/OR5iIXbRQcBnanDG3llAZbhb6CkfyRdb17CM5fJeKcL7z+FQ?=
- =?us-ascii?Q?jq+xsL1D8oZrozG2QSPQB26cCF3TLhT4/MXcls46B8I5mOTmRg=3D=3D?=
+	=?us-ascii?Q?dliF1T5HIkNjxCpHLwpTaRPXx90vWFMjGW6umv5xrzYzipfeW2nO207GHLEM?=
+ =?us-ascii?Q?z9vfbX2OM8y+4S20aayRPeVgyScXhytubs0tLaDkSPXl11zrak2Az3yQYbQh?=
+ =?us-ascii?Q?WmoXa4tZpsB8JcL09YVDq3Ur60rz0oTFGyWfkjK9GusfLJYsqPUbLEGi+T98?=
+ =?us-ascii?Q?3TvVtjwkT0L2kuXaZ7/CX5tC008vMrXXQpJfDHxLjT8E8wzHyNy1RHmQzv8y?=
+ =?us-ascii?Q?IwF83n0TysQDln6/J4cEJRweqjIw6q1H4lrzTKmFx528YB0aTcXkx/wzydQ7?=
+ =?us-ascii?Q?y/YFpbV+PK8fznzhmkvNj97FnWoC/psAOIx/INroKx0Zvp2GWlb2U57rJ52c?=
+ =?us-ascii?Q?LK0ir1e3jrnIjhknTR4HCOFjhDgc064ENMyZN+A0RlBH+Apc6ST6RMay7UvD?=
+ =?us-ascii?Q?rDfDIJzwQe8pVHxsEhYh6j3rGlXZA5pfuUyYSGZByPgiI1lRuBmlCIoSZ6ff?=
+ =?us-ascii?Q?OOqdUvR4G5qHDeaCMmGkiMUkKS+e6BclHabPEs5IBTgk4YFgbtNK73icidJy?=
+ =?us-ascii?Q?3i1caMa0pbEfhM3d9rjYspGjZRQlv/HUGhErvc2wDieu972UMSaVJivrrUZZ?=
+ =?us-ascii?Q?DvwTX8uYlzCIGUGSMeEJk6MLhRp/8bxdJ+DYDmwMKE9KP7EnzEXHAO7v7BnP?=
+ =?us-ascii?Q?dfc1ia84wKww+EIKUJ5GhW5hqLtqvgAtXKRCrtqx6brX3dk0m8wHdA+njKDa?=
+ =?us-ascii?Q?zP6IFwZVi0KyWHBKzkU7WAEsSuXyphPO/M+TopBf8L6JMiI+H9GHQwzHFROV?=
+ =?us-ascii?Q?3HtJu3BU2t7OKL+dbSobmVXZuiGJGySIM45TCKHwU9SE3qa/VyHiDzgZ0inB?=
+ =?us-ascii?Q?2bjsZyQeoKx5ezZNmYCmGOuZeyTvtZhN6sNueLS10qYTzD3CbS6iNwy8c5kK?=
+ =?us-ascii?Q?S27xZQjr+16ZHDkT8rCdvPW42Eng11971zvoQ2r1LtVX99bbHtxQblN5Yu8C?=
+ =?us-ascii?Q?LNFIetgZF/5zSIxuwKylCVtL2+09A0Chfbdy9jM2A6+e//IE2CVdiJqtEbiE?=
+ =?us-ascii?Q?6jyIHsQCNcrItlfyu6ypLQv2embOoFGgIEVxkT6XMISNQ/EU7vHwgy/ZAQfu?=
+ =?us-ascii?Q?chvm4EF7qWpGuHgTZsITIswky4OovoUuniAACmrU4hMTGjmyhbfR6/Rrk63m?=
+ =?us-ascii?Q?8SKvl0/NcCL/oxiJ+V8up3o9bsUCoVEmAMJXQt06UkMp86A+/C53/HKgy/ER?=
+ =?us-ascii?Q?WcvHfR5ZVgX7VcUqBbKjcG18DJVUictD/mmVQDQyAS3wjtCjoaeI8nRxyX/S?=
+ =?us-ascii?Q?ejvD/EhQqdbGdQwTiy1MoSABUvUyTDJarw0VvGCHp3z7JxCEFAriEXw0iaFo?=
+ =?us-ascii?Q?HFck0OgRE/+K19QbGH7FZ/Pb0ltObrmn1Vd5Fsd0TwFluw=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5899.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5899.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?j2X9FEW1tauq/RlKeh1eIG0HwZgLltl8810Tj3oHvTVbSthJ94F44xf6dSoL?=
- =?us-ascii?Q?x19dd041xDHdgLa5LARUodh4nGojZe5uvnddQs1UcyiIbJpLq0nXZSuB1wmj?=
- =?us-ascii?Q?18eXHIai9cgAclQJL77694GgcF8D2tXBfoj7DvqbmGOly3vRaQRM929Itzd4?=
- =?us-ascii?Q?GwpyJ+R12YwBRXAIDWJWVj6y31GQb+GIts5gO7dzE8iupgsfUMMRDLshWxyJ?=
- =?us-ascii?Q?NnECRYZQ5isAf/NuAr3ky8TiZx6i3IYQ1nvmT/Ox6J4PtGt9b1O21Zbsvf3w?=
- =?us-ascii?Q?D2yA393gpbhOeLEHE2mQksAIxp5svCsnu1fePwF1rghPkDm0B2WVDPRF2RDY?=
- =?us-ascii?Q?FjmpwvbF+2F4yDdyUCUU5sGqFLe06eZdTk3dDkaLOisDPYHAwqMjUt85jvoy?=
- =?us-ascii?Q?4sAf1QBn7oT0CCRzzJvx1cqf6zLngkVPn+/ZblDK/owbIh0VgqTVoPySnWHt?=
- =?us-ascii?Q?TyncZN6cXwUJlR3vujqeOUczHKqUvSoseSmUidabhJXZYEbuC5Fttm7rjy5f?=
- =?us-ascii?Q?wUEb+TgSuypWcr7zX5j/dWacw+Io3eBHfPXr7mAAcFYuu8axu6Jw26whzwG6?=
- =?us-ascii?Q?1hnAla4s4xj2eTgmUJLT4BK8UJMyN9C1rtwAZiY7V8DJsW4kxn/7L7B6N3EO?=
- =?us-ascii?Q?brA2vMlKFa1ouz8XhdLuINd1nvhZLQ7dnd6CeAHDwarhryby9UBGn9dqYMmD?=
- =?us-ascii?Q?+KwzEQpjjbrGu5vlJsRPUhLhukSKUwEZlEKHPAMgapIm0LOJTUesjwHB4DLI?=
- =?us-ascii?Q?9G8N4BLUV26wRzleQnuNo9puyHARmyLP9GEEFNQkiP+nkM/4Dt+gNkMwVRb4?=
- =?us-ascii?Q?pSxxRbtnfeyuCpCsLYM46tflJeG7tdy2U9Y3bkw85WZurfHKbPgkXQD+9Y1X?=
- =?us-ascii?Q?Hxh+qrmhf00obDnKlWw9Qt+88GlsB/xKGR8UBtVvP5Un1XFRwtuENHtP+cmd?=
- =?us-ascii?Q?XswM1KQyIpTMbPfjVnK20RlkmX94qHR8c0a2KQn4u4zmpZym/A1lEitg9J56?=
- =?us-ascii?Q?x806be6YUNY6HC1Ze1ByDyAcp9ETSERnzDTu/NGuKvNpGKR34NZ6ugQFwf69?=
- =?us-ascii?Q?vpkLM7zYaGzEE/E56/7UormFQG9iahrHv/neteZ49ZA7jCG2D30ajJfKsheI?=
- =?us-ascii?Q?4zbokv6y0IjWjVJ4SNFnXGleKQ2UKbunAfDymjyHrzHJk+XyY1ZcPhAvQzW+?=
- =?us-ascii?Q?QrunNYpAeiGlm13U8KkOOMZZbcKP5MesGm9rULHcSU4W3rdOSHinCdJz8mRD?=
- =?us-ascii?Q?uS8CeyU3hw3drzGza0oP4SsT+ilKjIbFfONRNFAKt3XJvabtLha7sv/FbQoo?=
- =?us-ascii?Q?7Bk5vdd5ihpj96UAD5nXtyNmUl/s1+TIhorozoTtNZC3aI6hOpz1rORezQcV?=
- =?us-ascii?Q?xpVVoWLxC+x/cqwNFz05tONKEpAUtHu1b9qFp9JNQg1tx6k+b9aP0AwAcR6t?=
- =?us-ascii?Q?aLOBWqbWpOGgFZF3nuRGS48ZalHxwLf47ERvmTHbnY9Gz4Ly0vt+bctu4hfX?=
- =?us-ascii?Q?ShaK2gnOAIPx4ds+e1laoAqvKZo/3lDcgKpcPMCOzYuBE2dihoymzmXZ1+lc?=
- =?us-ascii?Q?aCAo7yxMZ1JsxYrHRxvWZyd3xpUn5JVDqFQ/PrPg?=
+	=?us-ascii?Q?gOxQyMmVh1lkxKyVfp1ADhWmahgB7gpV2ArmVm22XmKRAtjL7dZaYhMGnl7Y?=
+ =?us-ascii?Q?pYMV23cqRSv8D9zI59b+wOFkQ4owLsIcshGorKmjot2aM01iFd7gy+zhGGH9?=
+ =?us-ascii?Q?FfQlnvasM7oKxUklBsxy9T7YN5cqdUv74KkZ6T97I1R9po35oFej/MZ7b+zM?=
+ =?us-ascii?Q?ojgV65bmAURVCHeJYISIxldgY1MVrMGJvEEV+DOHpuOA4xHfy5rz6fbBPTYi?=
+ =?us-ascii?Q?GditiTVYQOeA8JXg9Koh8pslR17UI6HX4idLUX3/Ub05oMPPRhxdNxW8fUoA?=
+ =?us-ascii?Q?nIMQIkBGps/nAAIOc5iO+Ne6VvLuNevoH6kCVsPGdTRCfsQ90H/vyh2E6jRM?=
+ =?us-ascii?Q?p/oK264r0bgpDD0ha7/l6/cPY+hIolGxWS3aeoi6oRWyKnXX2vi4cs9juJyJ?=
+ =?us-ascii?Q?ZWBVHzcifE8+zwehtBtEJl8K5yPuYUeG82M5QH0i4ThbQ5Fjby0s+mXRNSac?=
+ =?us-ascii?Q?CrI8IoUc+jmPE/wOVSIIowq8u35yOtGCqS/xwuHKnZ5Wn/SB9P4yTM6ZXoQq?=
+ =?us-ascii?Q?iIo3IlsC/KFKXSFnZu6dn5R80aqHaiYcRffRFKHuDkXjW/cIlRpzy/znSElc?=
+ =?us-ascii?Q?2RnOIBfOW2W25ocDMSNPmb8o0SScOGtJtIf8jXgAp61etTNQMGba9BFJ89wN?=
+ =?us-ascii?Q?VJojH15qzLbbLsDxLdMfelraNTwDpyYzrUkbKf+urTkli2/AGndJGPq6XQxP?=
+ =?us-ascii?Q?j/gFxs6v15zxmxeQ7m0u10RButpcjvJwxWEOWFTfICI3oPKrM9YXptS8Vj9C?=
+ =?us-ascii?Q?eFGLRLn++h9MqkB1QziHnmLaxMQjCjRMjkOewIZhuQFYgDyz7fmG8ZLMyRmx?=
+ =?us-ascii?Q?XfjfzrClSTYW8w2IHimRI/oQHW/iz+DM5+4U15BKDMaSfzqbbrX8SryYiRHi?=
+ =?us-ascii?Q?eJ0SW/24iHggM7bl1zua+Rgjqn0a+mrfKurOn+1UtX42Hjicm4O4xIWUIAKA?=
+ =?us-ascii?Q?N019MwOFpEeHiFVyPC9bQuQEuXxHbYy5kgfJZiSI3eJU7xjd9lsVhpaW/LR4?=
+ =?us-ascii?Q?KXA4t4CvZhiaQhDw6pPQ6peDlHqCK5NYkSDkit6mBiqADExP67Vs98gMixWX?=
+ =?us-ascii?Q?up6LfPCWaiNQoODC2hz+mCfDogUciPh5dEULkHnMBGTWEDzYjPPvjtuwUvDr?=
+ =?us-ascii?Q?Cnk4ZB9ZosdqbGufIXXY9ouogU9fxgCm8/LqGWm4mczc2I9BhxSA8sVDX5RM?=
+ =?us-ascii?Q?rXGv4nCPMvzwd0oZ/yOd3ub5qUDc6fA/o+KjPguuJdHl14wZtWPjMhn4oLX9?=
+ =?us-ascii?Q?EXO1v2jQSujLoM2M0+UgD9KrGX1SPFl8uXrkZW2HTYVYps6/y3NZY2WOSRP6?=
+ =?us-ascii?Q?rhCqm84LNm8l4Jbwyd25qyxcaDgULDDuRF5/Pf77XmlaBM9fWeajiE9Zcl+/?=
+ =?us-ascii?Q?hGyf50RxYCrzW/Dq9RnVnVNYMESmX6UjexvTWXU1F0h6b5DqB6Oj9EYrU8P7?=
+ =?us-ascii?Q?TN5GDeKE9/QiHxx0JW2UoRt96kB1+u2Zq1JWh97bucKDQd7UC+11VmdVEOtz?=
+ =?us-ascii?Q?7RyjNRh+rrUsOeW8AO3IuJLllis4SqJqj9qnRM1CTu9SegjqRIdPc7pn5Ftg?=
+ =?us-ascii?Q?U+H7E8kSBtbS87KDWE08RA3bgtDzl893JIB2riCw?=
 X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7cd6fcd7-5ad9-4a6e-e92b-08dcdd2f19cd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56818eb3-81c7-437d-125a-08dcdd35c2c0
 X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5899.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 06:55:54.8543
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 07:43:35.1966
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: v2mX+xu2gmnSSeKAUQYCO2vHUBA7ngcUGWFjVZOnispp0uggNcSkXgxNYMIg7VrPkejVaOAwiBx5w3zutwYlDg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR06MB5170
+X-MS-Exchange-CrossTenant-UserPrincipalName: TytZVNn/4ZLaD/ScWnPxiA+awKglG63RJv5kwrGp1ojgl03jOpseWLDyeZGA064U8xwKsDEnHGJIhF8qtrP4YA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB7128
 
 Fixed some confusing typos that were currently identified witch codespell,
 the details are as follows:
 
 -in the code comments:
-fs/smb/client/cifsacl.h:58: inheritence ==> inheritance
-fs/smb/client/cifsencrypt.c:242: origiginal ==> original
-fs/smb/client/cifsfs.c:164: referece ==> reference
-fs/smb/client/cifsfs.c:292: ned ==> need
-fs/smb/client/cifsglob.h:779: initital ==> initial
-fs/smb/client/cifspdu.h:784: altetnative ==> alternative
-fs/smb/client/cifspdu.h:2409: conrol ==> control
-fs/smb/client/cifssmb.c:1218: Expirement ==> Experiment
-fs/smb/client/cifssmb.c:3021: conver ==> convert
-fs/smb/client/cifssmb.c:3998: asterik ==> asterisk
-fs/smb/client/file.c:2505: useable ==> usable
-fs/smb/client/fs_context.h:263: timemout ==> timeout
-fs/smb/client/misc.c:257: responsbility ==> responsibility
-fs/smb/client/netmisc.c:1006: divisable ==> divisible
-fs/smb/client/readdir.c:556: endianess ==> endianness
-fs/smb/client/readdir.c:818: bu ==> by
-fs/smb/client/smb2ops.c:2180: snaphots ==> snapshots
-fs/smb/client/smb2ops.c:3586: otions ==> options
-fs/smb/client/smb2pdu.c:2979: timestaps ==> timestamps
-fs/smb/client/smb2pdu.c:4574: memmory ==> memory
-fs/smb/client/smb2transport.c:699: origiginal ==> original
-fs/smb/client/smbdirect.c:222: happenes ==> happens
-fs/smb/client/smbdirect.c:1347: registartions ==> registrations
-fs/smb/client/smbdirect.h:114: accoutning ==> accounting
+fs/smb/common/smb2pdu.h:9: specfication ==> specification
+fs/smb/common/smb2pdu.h:494: usally ==> usually
+fs/smb/common/smb2pdu.h:1064: Attrubutes ==> Attributes
+fs/smb/server/connection.c:28: cleand ==> cleaned
+fs/smb/server/ksmbd_netlink.h:216: struture ==> structure
+fs/smb/server/oplock.c:799: conains ==> contains
+fs/smb/server/oplock.c:1487: containted ==> contained
+fs/smb/server/server.c:282: proccessing ==> processing
+fs/smb/server/smb_common.c:491: comforms ==> conforms
+fs/smb/server/xattr.h:102: ATTRIBUITE ==> ATTRIBUTE
 
 Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
 ---
- fs/smb/client/cifsacl.h       | 2 +-
- fs/smb/client/cifsencrypt.c   | 2 +-
- fs/smb/client/cifsfs.c        | 4 ++--
- fs/smb/client/cifsglob.h      | 2 +-
- fs/smb/client/cifspdu.h       | 4 ++--
- fs/smb/client/cifssmb.c       | 6 +++---
- fs/smb/client/file.c          | 2 +-
- fs/smb/client/fs_context.h    | 2 +-
- fs/smb/client/misc.c          | 2 +-
- fs/smb/client/netmisc.c       | 2 +-
- fs/smb/client/readdir.c       | 4 ++--
- fs/smb/client/smb2ops.c       | 4 ++--
- fs/smb/client/smb2pdu.c       | 4 ++--
- fs/smb/client/smb2transport.c | 2 +-
- fs/smb/client/smbdirect.c     | 4 ++--
- fs/smb/client/smbdirect.h     | 2 +-
- 16 files changed, 24 insertions(+), 24 deletions(-)
+ fs/smb/common/smb2pdu.h       | 6 +++---
+ fs/smb/server/connection.c    | 2 +-
+ fs/smb/server/ksmbd_netlink.h | 2 +-
+ fs/smb/server/oplock.c        | 4 ++--
+ fs/smb/server/server.c        | 2 +-
+ fs/smb/server/smb_common.c    | 2 +-
+ fs/smb/server/xattr.h         | 2 +-
+ 7 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/fs/smb/client/cifsacl.h b/fs/smb/client/cifsacl.h
-index 6529478b7f48..31b51a8fc256 100644
---- a/fs/smb/client/cifsacl.h
-+++ b/fs/smb/client/cifsacl.h
-@@ -55,7 +55,7 @@ struct smb3_sd {
- #define ACL_CONTROL_SI	0x0800	/* SACL Auto-Inherited */
- #define ACL_CONTROL_DI	0x0400	/* DACL Auto-Inherited */
- #define ACL_CONTROL_SC	0x0200	/* SACL computed through inheritance */
--#define ACL_CONTROL_DC	0x0100	/* DACL computed through inheritence */
-+#define ACL_CONTROL_DC	0x0100	/* DACL computed through inheritance */
- #define ACL_CONTROL_SS	0x0080	/* Create server ACL */
- #define ACL_CONTROL_DT	0x0040	/* DACL provided by trusted source */
- #define ACL_CONTROL_SD	0x0020	/* SACL defaulted */
-diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 7481b21a0489..ba4540bcd7ac 100644
---- a/fs/smb/client/cifsencrypt.c
-+++ b/fs/smb/client/cifsencrypt.c
-@@ -239,7 +239,7 @@ int cifs_verify_signature(struct smb_rqst *rqst,
- 		cifs_dbg(FYI, "dummy signature received for smb command 0x%x\n",
- 			 cifs_pdu->Command);
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index c769f9dbc0b4..9f272cc8f566 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -6,7 +6,7 @@
+  * Note that, due to trying to use names similar to the protocol specifications,
+  * there are many mixed case field names in the structures below.  Although
+  * this does not match typical Linux kernel style, it is necessary to be
+- * able to match against the protocol specfication.
++ * able to match against the protocol specification.
+  *
+  * SMB2 commands
+  * Some commands have minimal (wct=0,bcc=0), or uninteresting, responses
+@@ -491,7 +491,7 @@ struct smb2_encryption_neg_context {
+ 	__le16	ContextType; /* 2 */
+ 	__le16	DataLength;
+ 	__le32	Reserved;
+-	/* CipherCount usally 2, but can be 3 when AES256-GCM enabled */
++	/* CipherCount usually 2, but can be 3 when AES256-GCM enabled */
+ 	__le16	CipherCount; /* AES128-GCM and AES128-CCM by default */
+ 	__le16	Ciphers[];
+ } __packed;
+@@ -1061,7 +1061,7 @@ struct smb2_server_client_notification {
+ #define IL_IMPERSONATION	cpu_to_le32(0x00000002)
+ #define IL_DELEGATE		cpu_to_le32(0x00000003)
  
--	/* save off the origiginal signature so we can modify the smb and check
-+	/* save off the original signature so we can modify the smb and check
- 		its signature against what the server sent */
- 	memcpy(server_response_sig, cifs_pdu->Signature.SecuritySignature, 8);
- 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index c91cf57f337c..6f76432b9159 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -161,7 +161,7 @@ __u32 cifs_lock_secret;
+-/* File Attrubutes */
++/* File Attributes */
+ #define FILE_ATTRIBUTE_READONLY			0x00000001
+ #define FILE_ATTRIBUTE_HIDDEN			0x00000002
+ #define FILE_ATTRIBUTE_SYSTEM			0x00000004
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index cac80e7bfefc..aa2a37a7ce84 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -25,7 +25,7 @@ DECLARE_RWSEM(conn_list_lock);
+ /**
+  * ksmbd_conn_free() - free resources of the connection instance
+  *
+- * @conn:	connection instance to be cleand up
++ * @conn:	connection instance to be cleaned up
+  *
+  * During the thread termination, the corresponding conn instance
+  * resources(sock/memory) are released and finally the conn object is freed.
+diff --git a/fs/smb/server/ksmbd_netlink.h b/fs/smb/server/ksmbd_netlink.h
+index f4e55199938d..38e6fd2da3b8 100644
+--- a/fs/smb/server/ksmbd_netlink.h
++++ b/fs/smb/server/ksmbd_netlink.h
+@@ -213,7 +213,7 @@ struct ksmbd_tree_connect_response {
+ };
  
  /*
-  * Bumps refcount for cifs super block.
-- * Note that it should be only called if a referece to VFS super block is
-+ * Note that it should be only called if a reference to VFS super block is
-  * already held, e.g. in open-type syscalls context. Otherwise it can race with
-  * atomic_dec_and_test in deactivate_locked_super.
+- * IPC Request struture to disconnect tree connection.
++ * IPC Request structure to disconnect tree connection.
   */
-@@ -289,7 +289,7 @@ static void cifs_kill_sb(struct super_block *sb)
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 
- 	/*
--	 * We ned to release all dentries for the cached directories
-+	 * We need to release all dentries for the cached directories
- 	 * before we kill the sb.
- 	 */
- 	if (cifs_sb->root) {
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 15571cf0ba63..6e4bee57baa3 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -776,7 +776,7 @@ struct TCP_Server_Info {
- 	} compression;
- 	__u16	signing_algorithm;
- 	__le16	cipher_type;
--	 /* save initital negprot hash */
-+	 /* save initial negprot hash */
- 	__u8	preauth_sha_hash[SMB2_PREAUTH_HASH_SIZE];
- 	bool	signing_negotiated; /* true if valid signing context rcvd from server */
- 	bool	posix_ext_supported;
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index c3b6263060b0..ff694dca4248 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -781,7 +781,7 @@ typedef struct smb_com_logoff_andx_rsp {
- 	__u16 ByteCount;
- } __attribute__((packed)) LOGOFF_ANDX_RSP;
- 
--typedef union smb_com_tree_disconnect {	/* as an altetnative can use flag on
-+typedef union smb_com_tree_disconnect {	/* as an alternative can use flag on
- 					tree_connect PDU to effect disconnect */
- 					/* tdis is probably simplest SMB PDU */
- 	struct {
-@@ -2406,7 +2406,7 @@ struct cifs_posix_ace { /* access control entry (ACE) */
- 	__le64 cifs_uid; /* or gid */
- } __attribute__((packed));
- 
--struct cifs_posix_acl { /* access conrol list  (ACL) */
-+struct cifs_posix_acl { /* access control list  (ACL) */
- 	__le16	version;
- 	__le16	access_entry_count;  /* access ACL - count of entries */
- 	__le16	default_entry_count; /* default ACL - count of entries */
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 131f20b91c3e..c6f15dbe860a 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1215,7 +1215,7 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
- 	req->CreateDisposition = cpu_to_le32(disposition);
- 	req->CreateOptions = cpu_to_le32(create_options & CREATE_OPTIONS_MASK);
- 
--	/* BB Expirement with various impersonation levels and verify */
-+	/* BB Experiment with various impersonation levels and verify */
- 	req->ImpersonationLevel = cpu_to_le32(SECURITY_IMPERSONATION);
- 	req->SecurityFlags = SECURITY_CONTEXT_TRACKING|SECURITY_EFFECTIVE_ONLY;
- 
-@@ -3018,7 +3018,7 @@ static void cifs_init_ace(struct cifs_posix_ace *cifs_ace,
+ struct ksmbd_tree_disconnect_request {
+ 	__u64	session_id;	/* session id */
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 246cde380dfb..4142c7ad5fa9 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -796,7 +796,7 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
+ /**
+  * smb2_lease_break_noti() - break lease when a new client request
+  *			write lease
+- * @opinfo:		conains lease state information
++ * @opinfo:		contains lease state information
+  *
+  * Return:	0 on success, otherwise error
+  */
+@@ -1484,7 +1484,7 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
+ }
  
  /**
-  * posix_acl_to_cifs - convert ACLs from POSIX ACL to cifs format
-- * @parm_data: ACLs in cifs format to conver to
-+ * @parm_data: ACLs in cifs format to convert to
-  * @acl: ACLs in POSIX ACL format to convert from
-  * @acl_type: the type of POSIX ACLs stored in @acl
+- * parse_lease_state() - parse lease context containted in file open request
++ * parse_lease_state() - parse lease context contained in file open request
+  * @open_req:	buffer containing smb2 file open(create) request
   *
-@@ -3995,7 +3995,7 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
- 		name_len =
- 		    cifsConvertToUTF16((__le16 *) pSMB->FileName, searchName,
- 				       PATH_MAX, nls_codepage, remap);
--		/* We can not add the asterik earlier in case
-+		/* We can not add the asterisk earlier in case
- 		it got remapped to 0xF03A as if it were part of the
- 		directory name instead of a wildcard */
- 		name_len *= 2;
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 78b59c4ef3ce..a58a3333ecc3 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -2502,7 +2502,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, int flags,
- 			}
- 		}
- 	}
--	/* couldn't find useable FH with same pid, try any available */
-+	/* couldn't find usable FH with same pid, try any available */
- 	if (!any_available) {
- 		any_available = true;
- 		goto refind_writable;
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 5135f7b2e8d3..6ea476cd8fd2 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -260,7 +260,7 @@ struct smb3_fs_context {
- 	unsigned int min_offload;
- 	unsigned int retrans;
- 	bool sockopt_tcp_nodelay:1;
--	/* attribute cache timemout for files and directories in jiffies */
-+	/* attribute cache timeout for files and directories in jiffies */
- 	unsigned long acregmax;
- 	unsigned long acdirmax;
- 	/* timeout for deferred close of files in jiffies */
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 054f10ebf65a..4373dd64b66d 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -254,7 +254,7 @@ free_rsp_buf(int resp_buftype, void *rsp)
- }
+  * Return: allocated lease context object on success, otherwise NULL
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index c402d4abe826..231d2d224656 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -279,7 +279,7 @@ static void handle_ksmbd_work(struct work_struct *wk)
  
- /* NB: MID can not be set if treeCon not passed in, in that
--   case it is responsbility of caller to set the mid */
-+   case it is responsibility of caller to set the mid */
- void
- header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
- 		const struct cifs_tcon *treeCon, int word_count
-diff --git a/fs/smb/client/netmisc.c b/fs/smb/client/netmisc.c
-index 1b52e6ac431c..2a8d71221e5e 100644
---- a/fs/smb/client/netmisc.c
-+++ b/fs/smb/client/netmisc.c
-@@ -1003,7 +1003,7 @@ struct timespec64 cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
- 	 year is 2**7, the last year is 1980+127, which means we need only
- 	 consider 2 special case years, ie the years 2000 and 2100, and only
- 	 adjust for the lack of leap year for the year 2100, as 2000 was a
--	 leap year (divisable by 400) */
-+	 leap year (divisible by 400) */
- 	if (year >= 120)  /* the year 2100 */
- 		days = days - 1;  /* do not count leap year for the year 2100 */
+ /**
+  * queue_ksmbd_work() - queue a smb request to worker thread queue
+- *		for proccessing smb command and sending response
++ *		for processing smb command and sending response
+  * @conn:	connection instance
+  *
+  * read remaining data from socket create and submit work.
+diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
+index cc4bb2377cbd..5b8d75e78ffb 100644
+--- a/fs/smb/server/smb_common.c
++++ b/fs/smb/server/smb_common.c
+@@ -488,7 +488,7 @@ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
+  * @shortname:	destination short filename
+  *
+  * Return:	shortname length or 0 when source long name is '.' or '..'
+- * TODO: Though this function comforms the restriction of 8.3 Filename spec,
++ * TODO: Though this function conforms the restriction of 8.3 Filename spec,
+  * but the result is different with Windows 7's one. need to check.
+  */
+ int ksmbd_extract_shortname(struct ksmbd_conn *conn, const char *longname,
+diff --git a/fs/smb/server/xattr.h b/fs/smb/server/xattr.h
+index fa3e27d6971b..505101a8104c 100644
+--- a/fs/smb/server/xattr.h
++++ b/fs/smb/server/xattr.h
+@@ -99,7 +99,7 @@ struct xattr_ntacl {
+ 	__u8	posix_acl_hash[XATTR_SD_HASH_SIZE]; /* 64bytes hash for posix acl */
+ };
  
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index ebe1cb30e18e..b3a8f9c6fcff 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -553,7 +553,7 @@ static void cifs_fill_dirent_std(struct cifs_dirent *de,
- 		const FIND_FILE_STANDARD_INFO *info)
- {
- 	de->name = &info->FileName[0];
--	/* one byte length, no endianess conversion */
-+	/* one byte length, no endianness conversion */
- 	de->namelen = info->FileNameLength;
- 	de->resume_key = info->ResumeKey;
- }
-@@ -815,7 +815,7 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
- 		 * However, this sequence of ->pos values may have holes
- 		 * in it, for example dot-dirs returned from the server
- 		 * are suppressed.
--		 * Handle this bu forcing ctx->pos to be the same as the
-+		 * Handle this by forcing ctx->pos to be the same as the
- 		 * ->pos of the current dirent we emit from the cache.
- 		 * This means that when we emit these entries from the cache
- 		 * we now emit them with the same ->pos value as in the
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 1ee2dd4a1cae..d319cd8839e7 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2177,7 +2177,7 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
- 			NULL, 0 /* no input data */, max_response_size,
- 			(char **)&retbuf,
- 			&ret_data_len);
--	cifs_dbg(FYI, "enum snaphots ioctl returned %d and ret buflen is %d\n",
-+	cifs_dbg(FYI, "enum snapshots ioctl returned %d and ret buflen is %d\n",
- 			rc, ret_data_len);
- 	if (rc)
- 		return rc;
-@@ -3583,7 +3583,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		/*
- 		 * At this point, we are trying to fallocate an internal
- 		 * regions of a sparse file. Since smb2 does not have a
--		 * fallocate command we have two otions on how to emulate this.
-+		 * fallocate command we have two options on how to emulate this.
- 		 * We can either turn the entire file to become non-sparse
- 		 * which we only do if the fallocate is for virtually
- 		 * the whole file,  or we can overwrite the region with zeroes
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index a328b9dd145d..8814be932324 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2976,7 +2976,7 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
- 
- 	SMB2_close(xid, tcon, rsp->PersistentFileId, rsp->VolatileFileId);
- 
--	/* Eventually save off posix specific response info and timestaps */
-+	/* Eventually save off posix specific response info and timestamps */
- 
- err_free_rsp_buf:
- 	free_rsp_buf(resp_buftype, rsp);
-@@ -4571,7 +4571,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 	}
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	/*
--	 * If this rdata has a memmory registered, the MR can be freed
-+	 * If this rdata has a memory registered, the MR can be freed
- 	 * MR needs to be freed as soon as I/O finishes to prevent deadlock
- 	 * because they have limited number and are used for future I/Os
- 	 */
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index c8bf0000f73b..b486b14bb330 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -696,7 +696,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 			 shdr->Command);
- 
- 	/*
--	 * Save off the origiginal signature so we can modify the smb and check
-+	 * Save off the original signature so we can modify the smb and check
- 	 * our calculated signature against what the server sent.
- 	 */
- 	memcpy(server_response_sig, shdr->Signature, SMB2_SIGNATURE_SIZE);
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 0c64b37e2660..b0b7254661e9 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -219,7 +219,7 @@ static int smbd_conn_upcall(
- 
- 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
- 	case RDMA_CM_EVENT_DISCONNECTED:
--		/* This happenes when we fail the negotiation */
-+		/* This happens when we fail the negotiation */
- 		if (info->transport_status == SMBD_NEGOTIATE_FAILED) {
- 			info->transport_status = SMBD_DISCONNECTED;
- 			wake_up(&info->conn_wait);
-@@ -1344,7 +1344,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 	 * are not locked by srv_mutex. It is possible some processes are
- 	 * blocked on transport srv_mutex while holding memory registration.
- 	 * Release the transport srv_mutex to allow them to hit the failure
--	 * path when sending data, and then release memory registartions.
-+	 * path when sending data, and then release memory registrations.
- 	 */
- 	log_rdma_event(INFO, "freeing mr list\n");
- 	wake_up_interruptible_all(&info->wait_mr);
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index 83f239f376f0..c08e3665150d 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -111,7 +111,7 @@ struct smbd_connection {
- 	/* Used by transport to wait until all MRs are returned */
- 	wait_queue_head_t wait_for_mr_cleanup;
- 
--	/* Activity accoutning */
-+	/* Activity accounting */
- 	atomic_t send_pending;
- 	wait_queue_head_t wait_send_pending;
- 	wait_queue_head_t wait_post_send;
+-/* DOS ATTRIBUITE XATTR PREFIX */
++/* DOS ATTRIBUTE XATTR PREFIX */
+ #define DOS_ATTRIBUTE_PREFIX		"DOSATTRIB"
+ #define DOS_ATTRIBUTE_PREFIX_LEN	(sizeof(DOS_ATTRIBUTE_PREFIX) - 1)
+ #define XATTR_NAME_DOS_ATTRIBUTE	(XATTR_USER_PREFIX DOS_ATTRIBUTE_PREFIX)
 -- 
 2.17.1
 
