@@ -1,337 +1,568 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B91E76034
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 13:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007CB43AB9
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 15:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727359131; cv=none; b=Ca+NtGPaS4AHtsvyTdv/878k9oR6dflqIfP9PNGIffFIOWen7n4GiBxqfOTzpnl9GqysdlrGw4MSVKpLqewhfRcyKznRv7eSy35pPThn6D3Eotjd9btZ8leP42vaoyN3VH9tO8nsFBNbwQG/Cmbicl3mW1mYCGk0gZEAcBqEroM=
+	t=1727364467; cv=none; b=ob8v+vI/F/t8BPUge/bpD59WUE4THZw8/wtEceAksa8BUNlrw7sE9ATCkMa7YAi6TNvxNH6aYwt0cglWjm3VYGzX6pFHZ43qlNTXSGZFTedP67eT1jVhytOcsuINBpMsmBzoRrTqnnudlRhw29rK6xq12KI802JXQF/YowcciH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727359131; c=relaxed/simple;
-	bh=BmKsy447qfTZkmqED2io7CsW2wGm9JTCUegBiGXCQQs=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=prrR9EGzOQgA5YrvRSrDHyOmzZpsoHBZgmg/F7CyWRW7vfe0tBm+1W5urLl+IMlE58rt0vECqMHzl8oN1AouV62ZbEMLmWnsgcfYvjG6ExyrisI2cYy8knjbhE6fDLrICWnELeeJpdy2X99crdRAyxANLh07v1R6RDA/+UYoyGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAzUpS4Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1727364467; c=relaxed/simple;
+	bh=O7W9T9ndKftqShKkZptNGhJrOv6hTobEikK/AuncNJ8=;
+	h=MIME-Version:Date:From:To:Message-Id:Subject:Content-Type; b=Rt+DyamgfMA1Y9hbBylTtYdPOMNN0MozMT/BRdHGkzEIhbEz9hL3Gbt30SJn2JSCGsLXt27w/uGEFh1RU0abHVOi+5Lpzmu1BKNX4F1gBShoKf/egnOHsDSsVVt44ZOF1+YsUxO3BE5uDDmf/4ifsgcTCMR4NlKA34f2YHQOa0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=owlfolio.org; spf=pass smtp.mailfrom=owlfolio.org; dkim=pass (2048-bit key) header.d=owlfolio.org header.i=@owlfolio.org header.b=N8mbsixB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MBPIc6U4; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=owlfolio.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=owlfolio.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAzUpS4Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727359128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=o7/kil+xjw4maLZPNLuJn91aeQutoUItV4ovgkzR5wM=;
-	b=DAzUpS4Z1gBL8A8JMsuUtYiblT73HMNHJSJG7y/UOFXcpBbPS9mz/Kh6YmU7Qpyo43UM5S
-	t/oZ9L2wJGXloZQ2z52W9RSe/D1yTF/D6Dy/XDpGJ7w8Vx6wq5fIE0yG8oI1UBLFI9umc7
-	51ltitpDTN6GPpK6qWdbcFedH6I9ilI=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-449-b2RVQBzENZSsUBJUc6OyOg-1; Thu,
- 26 Sep 2024 09:58:44 -0400
-X-MC-Unique: b2RVQBzENZSsUBJUc6OyOg-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 729CF18F379E;
-	Thu, 26 Sep 2024 13:58:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4CAD518B9061;
-	Thu, 26 Sep 2024 13:58:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Steve French <smfrench@gmail.com>
-cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Christian Brauner <brauner@kernel.org>,
-    kernel test robot <oliver.sang@intel.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>,
-    Paulo Alcantara <pc@manguebit.com>, Jeff Layton <jlayton@kernel.org>,
-    v9fs@lists.linux.dev, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH v2] netfs: Fix write oops in generic/346 (9p) and generic/074 (cifs)
+	dkim=pass (2048-bit key) header.d=owlfolio.org header.i=@owlfolio.org header.b="N8mbsixB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MBPIc6U4"
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D669A1140165
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 11:27:42 -0400 (EDT)
+Received: from phl-imap-05 ([10.202.2.95])
+  by phl-compute-04.internal (MEProxy); Thu, 26 Sep 2024 11:27:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=owlfolio.org; h=
+	cc:content-type:content-type:date:date:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to; s=fm1;
+	 t=1727364462; x=1727450862; bh=gJ4kHMLfoITMotHH8GVHebRiPFefv5sP
+	O7k1125Wsr0=; b=N8mbsixB9W7WYVzAgJ+nK7qVV2rjIu3wy05qY9zp9ijJI6AS
+	sbOLsKhOv0colGEvMUwCFx5fhKVzKxqDhhnr5o9tNyBodNskI+uWekpqQCfBGNtO
+	6leBFR9/Y7ATVjWjbRjVIcelvF/r4px4kRn6cqxEO6imIb9dMfkCfBee/uhhOJbA
+	wfVM0teLAglKkc6O2lR7+u8z+qmOd1WdJuPzs8iLIAoxugcyCm9P5vs/IHDvecnj
+	mr+QOBIaDqgg/wiCZRAhSdDQIN7s4bX2ZrCwcHri5sb1U4Y+ZCSJLDkNNqrUMdKw
+	pMMFW87uoC2ngOePxo628oXVbQoL62+aHdwpEg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:message-id
+	:mime-version:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1727364462; x=1727450862; bh=gJ4kHMLfoITMotHH8GVHebRiPFefv5sPO7k
+	1125Wsr0=; b=MBPIc6U4iHZG0NR15P9sYblmeP6G6GnjC45AWyyCOxwP0IYzkLn
+	Kka6isPI/0CL6GeLiMT59A1U76YzWHfvIrSitVmJK4FCcRqYtCKw17ZFSd6VqdSs
+	WUNTFGkMsC4EdXNetPcu9+Tt1RQhynksG/CVcQZRcz6iO3nGsFKlsEDrg8w1Fxor
+	Qr3cteD9RdmKMzt1hTotqXozHGIALHT1kSr2+wkRNnPGK5ysu6GWZ51SWcQLYTXV
+	nzZwhnt4yifzBrtJ2rF8t76RiCDlwV4bfQPMTw6c7nVtGb466wu5t/tmYsUmnmAM
+	KSAnVD4Eff8fvxFiu3qVYbIbFsJYBjyTbSQ==
+X-ME-Sender: <xms:bn31ZskDXJjj_E63fBxR9ec3PpyhnTbYvENE92IezVrPsq50bUPpqA>
+    <xme:bn31Zr1O1p15nEE-vp6AxrhtrxRPO2yNSCel7MsfIJzI5omErEaSP5xPgdQa0udil
+    JcwTTnfIgtqjpE_F_8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddtjedgkeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefoggffhf
+    fvkffutgesmhdtreerredtjeenucfhrhhomhepfdgkrggtkhcuhggvihhnsggvrhhgfdcu
+    oeiirggtkhesohiflhhfohhlihhordhorhhgqeenucggtffrrghtthgvrhhnpeeikeetff
+    ffudffhfejhefhvdeljeeiffejtefgffdvudfgudfhuefhueeludfgudenucffohhmrghi
+    nhepsghorhhgsggrtghkuhhprdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepiigrtghksehofihlfhholhhiohdrohhrghdpnhgspghr
+    tghpthhtohepuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinhhugidqtg
+    hifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:bn31ZqqsmTJQkq-zDiOz0W9ILu3uvGEeQtkMHAqxWwOu79IoVSHkjw>
+    <xmx:bn31ZomsKnpUEkgXYJ2oQGhHXSw3ZTuntxeMhlRg8Mv9B4GxY4r8Bg>
+    <xmx:bn31Zq1QvnMbhkYMo2U9lC0bVXNnVpPTNv14U4Lrpha2YviWaQlljw>
+    <xmx:bn31Zvtj5ip-9g4aewRVmLAjWGtO2lUJ4WtgvpgI7E6FjoQs2eTOag>
+    <xmx:bn31Zv_066rmC3_fHIZ-AR_CmjyXu5yMLA8_rrj_sCehMhEcxxnPlGtu>
+Feedback-ID: i876146a2:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7EF013020080; Thu, 26 Sep 2024 11:27:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2050098.1727359110.1@warthog.procyon.org.uk>
+Date: Thu, 26 Sep 2024 11:24:28 -0400
+From: "Zack Weinberg" <zack@owlfolio.org>
+To: linux-cifs@vger.kernel.org
+Message-Id: <9bca55e4-8e48-48cc-810e-f82e8ec71bf9@app.fastmail.com>
+Subject: Intermittent data corruption probably in Linux 6.6.52 SMB client
+Content-Type: multipart/mixed;
+ boundary=f707bbe107554888bbc11f0547334fd2
+
+--f707bbe107554888bbc11f0547334fd2
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Sep 2024 14:58:30 +0100
-Message-ID: <2050099.1727359110@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In netfslib, a buffered writeback operation has a 'write queue' of folios
-that are being written, held in a linear sequence of folio_queue structs.
-The 'issuer' adds new folio_queues on the leading edge of the queue and
-populates each one progressively; the 'collector' pops them off the
-trailing edge and discards them and the folios they point to as they are
-consumed.
+I have found an intermittent but reliably reproducible data corruption
+bug, most probably in the Linux SMB/CIFS kernel client.  It is triggered
+by repeating this sequence of operations:
 
-The queue is required to always retain at least one folio_queue structure.
-This allows the queue to be accessed without locking and with just a bit o=
-f
-barriering.
+    int fd =3D open("/smb/server/testfile",
+        O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0666);
+    write(fd, buffer1, len1);
+    write(fd, buffer2, len2);
+    write(fd, buffer3, len3);
+    fdatasync(fd);
+    posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+    close(fd);
 
-When a new subrequest is prepared, its ->io_iter iterator is pointed at th=
-e
-current end of the write queue and then the iterator is extended as more
-data is added to the queue until the subrequest is committed.
+where `len1`, `len2`, and `len3` are each at least tens of kilobytes
+and none of them is a multiple of 512.  When the bug happens, a few
+kilobytes of data from the *beginning* of the second write will be
+replaced with binary zeroes.  The run of zeroes consistently *ends*
+at a multiple of 512.
 
-Now, the problem is that the folio_queue at the leading edge of the write
-queue when a subrequest is prepared might have been entirely consumed - bu=
-t
-not yet removed from the queue as it is the only remaining one and is
-preventing the queue from collapsing.
+The bug happens on order of 10% of iterations of the above sequence.
+If the writes are too large *or* too small, it happens less often; the
+sweet spot for maximum reproducibility seems to be a total file size
+of about 1,000,000 bytes.  Omitting the calls to fdatasync and/or
+posix_fadvise also makes the corruption happen less often, but it
+does still happen.
 
-So, what happens is that subreq->io_iter is pointed at the spent
-folio_queue, then a new folio_queue is added, and, at that point, the
-collector is at entirely at liberty to immediately delete the spent
-folio_queue.
+The reproducer sequence may seem a little odd, but it=E2=80=99s cut down
+from the actual behavior of a real application, namely version
+1.4.0 of the =E2=80=9Cborg=E2=80=9D backup utility (<https://www.borgbac=
+kup.org/>).
 
-This leaves the subreq->io_iter pointing at a freed object.  If the system
-is lucky, iterate_folioq() sees ->io_iter, sees the as-yet uncorrupted
-freed object and advances to the next folio_queue in the queue.
+The SMB server I=E2=80=99m testing with runs FreeBSD 13 and Samba 4.15.1=
+3.
+The backing filesystem for the share is ZFS.  Server and client
+machines are on the same network segment.  I have not ruled out
+the possibility of a server-side bug, but the symptoms seem more
+likely to indicate a client bug to me.
 
-In the case seen, however, the freed object gets recycled and put back ont=
-o
-the queue at the tail and filled to the end.  This confuses
-iterate_folioq() and it tries to step ->next, which may be NULL - resultin=
-g
-in an oops.
+I tried enabling debug mode in the SMB client
+(echo 7 > /proc/fs/cifs/cifsFYI) but this produced nothing useful
+in dmesg, only =E2=80=9CCIFS: Status code returned 0x80000006 STATUS_NO_=
+MORE_FILES=E2=80=9D
+from the directory scan done by my reproducer program.
 
-Fix this by the following means:
+A self-contained C program that reproduces the bug is attached to this
+message.  It has options to control the file size, directories used
+for testing, and whether to call fdatasync and posix_fadvise.  When it
+detects the bug it will record the difference between the expected and
+actual contents of each corrupted file. If you want to try it with other
+clients besides the Linux kernel implementation, be advised it does use
+some GNU library extensions (asprintf, argp, dirent type macros).
 
- (1) When preparing a write subrequest, make sure there's a folio_queue
-     struct with space in it at the leading edge of the queue.  A function
-     to make space is split out of the function to append a folio so that
-     it can be called for this purpose.
+I=E2=80=99m happy to do further testing if that would help.  Please note
+however that I use strictly monolithic kernels (CONFIG_MODULES=3Dn)
+with ftrace configured out.  Please cc me directly on any replies,
+I=E2=80=99m not subscribed to linux-cifs.
 
- (2) If the request struct iterator is pointing to a completely spent
-     folio_queue when we make space, then advance the iterator to the newl=
-y
-     allocated folio_queue.  The subrequest's iterator will then be set
-     from this.
+zw
 
-The oops could be triggered using the generic/346 xfstest with a filesyste=
-m
-on9P over TCP with cache=3Dloose.  The oops looked something like:
+# System information
 
- BUG: kernel NULL pointer dereference, address: 0000000000000008
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- ...
- RIP: 0010:_copy_from_iter+0x2db/0x530
- ...
- Call Trace:
-  <TASK>
- ...
-  p9pdu_vwritef+0x3d8/0x5d0
-  p9_client_prepare_req+0xa8/0x140
-  p9_client_rpc+0x81/0x280
-  p9_client_write+0xcf/0x1c0
-  v9fs_issue_write+0x87/0xc0
-  netfs_advance_write+0xa0/0xb0
-  netfs_write_folio.isra.0+0x42d/0x500
-  netfs_writepages+0x15a/0x1f0
-  do_writepages+0xd1/0x220
-  filemap_fdatawrite_wbc+0x5c/0x80
-  v9fs_mmap_vm_close+0x7d/0xb0
-  remove_vma+0x35/0x70
-  vms_complete_munmap_vmas+0x11a/0x170
-  do_vmi_align_munmap+0x17d/0x1c0
-  do_vmi_munmap+0x13e/0x150
-  __vm_munmap+0x92/0xd0
-  __x64_sys_munmap+0x17/0x20
-  do_syscall_64+0x80/0xe0
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
+`uname -rsm`: Linux 6.6.52-gentoo x86_64
 
-This also fixed a similar-looking issue with cifs and generic/074.
+mount.cifs version: 7.0
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202409180928.f20b5a08-oliver.sang@i=
-ntel.com
-Closes: https://lore.kernel.org/oe-lkp/202409131438.3f225fbf-oliver.sang@i=
-ntel.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: kernel test robot <oliver.sang@intel.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: v9fs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- Changes:
- v2)
- - Drop netfs_folioq_alloc() and code what it did directly in the caller.
-   The cleanup can be done in a follow-up patch.
+/proc/mounts options list for the share:
 
- fs/netfs/internal.h    |    1 =
+    rw,nosuid,nodev,relatime,vers=3D3.1.1,cache=3Dstrict,username=3Dstor=
+age,
+    uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D10.0.0.247,file_mode=3D=
+0644,
+    dir_mode=3D0755,soft,nounix,setuids,serverino,mapposix,noperm,
+    reparse=3Dnfs,rsize=3D4194304,wsize=3D4194304,bsize=3D1048576,retran=
+s=3D1,
+    echo_interval=3D60,actimeo=3D1,closetimeo=3D1
 
- fs/netfs/misc.c        |   74 +++++++++++++++++++++++++++++++++++--------=
-------
- fs/netfs/write_issue.c |   12 +++++++
- 3 files changed, 65 insertions(+), 22 deletions(-)
+/proc/fs/cifs/DebugData:
 
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index c7f23dd3556a..3bf370576f89 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -58,6 +58,7 @@ static inline void netfs_proc_del_rreq(struct netfs_io_r=
-equest *rreq) {}
- /*
-  * misc.c
-  */
-+struct folio_queue *netfs_buffer_make_space(struct netfs_io_request *rreq=
-);
- int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
- *folio,
- 			      bool needs_put);
- struct folio_queue *netfs_delete_buffer_head(struct netfs_io_request *wre=
-q);
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index 0ad0982ce0e2..63280791de3b 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -9,34 +9,66 @@
- #include "internal.h"
- =
+CIFS Version 2.45
+Features:,STATS,XATTR,ACL
+CIFSMaxBufSize: 16384
+Active VFS Requests: 0
 
- /*
-- * Append a folio to the rolling queue.
-+ * Make sure there's space in the rolling queue.
-  */
--int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
- *folio,
--			      bool needs_put)
-+struct folio_queue *netfs_buffer_make_space(struct netfs_io_request *rreq=
-)
- {
--	struct folio_queue *tail =3D rreq->buffer_tail;
--	unsigned int slot, order =3D folio_order(folio);
-+	struct folio_queue *tail =3D rreq->buffer_tail, *prev;
-+	unsigned int prev_nr_slots =3D 0;
- =
+Servers:
+1) ConnectionId: 0x1 Hostname: [redacted]
+ClientGUID: [redacted]
+Number of credits: 8190,1,1 Dialect 0x311
+Server capabilities: 0x300047
+TCP status: 1 Instance: 1
+Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026=
+531840
+In Send: 0 In MaxReq Wait: 0
+Compression: disabled on mount
 
- 	if (WARN_ON_ONCE(!rreq->buffer && tail) ||
- 	    WARN_ON_ONCE(rreq->buffer && !tail))
--		return -EIO;
--
--	if (!tail || folioq_full(tail)) {
--		tail =3D kmalloc(sizeof(*tail), GFP_NOFS);
--		if (!tail)
--			return -ENOMEM;
--		netfs_stat(&netfs_n_folioq);
--		folioq_init(tail);
--		tail->prev =3D rreq->buffer_tail;
--		if (tail->prev)
--			tail->prev->next =3D tail;
--		rreq->buffer_tail =3D tail;
--		if (!rreq->buffer) {
--			rreq->buffer =3D tail;
--			iov_iter_folio_queue(&rreq->io_iter, ITER_SOURCE, tail, 0, 0, 0);
-+		return ERR_PTR(-EIO);
-+
-+	prev =3D tail;
-+	if (prev) {
-+		if (!folioq_full(tail))
-+			return tail;
-+		prev_nr_slots =3D folioq_nr_slots(tail);
-+	}
-+
-+	tail =3D kmalloc(sizeof(*tail), GFP_NOFS);
-+	if (!tail)
-+		return ERR_PTR(-ENOMEM);
-+	netfs_stat(&netfs_n_folioq);
-+	folioq_init(tail);
-+	tail->prev =3D prev;
-+	if (prev)
-+		/* [!] NOTE: After we set prev->next, the consumer is entirely
-+		 * at liberty to delete prev.
-+		 */
-+		WRITE_ONCE(prev->next, tail);
-+
-+	rreq->buffer_tail =3D tail;
-+	if (!rreq->buffer) {
-+		rreq->buffer =3D tail;
-+		iov_iter_folio_queue(&rreq->io_iter, ITER_SOURCE, tail, 0, 0, 0);
-+	} else {
-+		/* Make sure we don't leave the master iterator pointing to a
-+		 * block that might get immediately consumed.
-+		 */
-+		if (rreq->io_iter.folioq =3D=3D prev &&
-+		    rreq->io_iter.folioq_slot =3D=3D prev_nr_slots) {
-+			rreq->io_iter.folioq =3D tail;
-+			rreq->io_iter.folioq_slot =3D 0;
- 		}
--		rreq->buffer_tail_slot =3D 0;
- 	}
-+	rreq->buffer_tail_slot =3D 0;
-+	return tail;
-+}
-+
-+/*
-+ * Append a folio to the rolling queue.
-+ */
-+int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
- *folio,
-+			      bool needs_put)
-+{
-+	struct folio_queue *tail;
-+	unsigned int slot, order =3D folio_order(folio);
-+
-+	tail =3D netfs_buffer_make_space(rreq);
-+	if (IS_ERR(tail))
-+		return PTR_ERR(tail);
- =
+    Sessions:
+    1) Address: [redacted] Uses: 1 Capability: 0x300047 Session Status: 1
+    Security type: RawNTLMSSP  SessionId: 0x5aa5ebec
+    User: 0 Cred User: 0
 
- 	rreq->io_iter.count +=3D PAGE_SIZE << order;
- =
+    Shares:
+    0) IPC: \\[redacted]\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+    PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+    Share Capabilities: None    Share Flags: 0x0
+    tid: 0x90dfa700 Maximal Access: 0x1f00a9
 
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 04e66d587f77..0929d9fd4ce7 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -153,12 +153,22 @@ static void netfs_prepare_write(struct netfs_io_requ=
-est *wreq,
- 				loff_t start)
- {
- 	struct netfs_io_subrequest *subreq;
-+	struct iov_iter *wreq_iter =3D &wreq->io_iter;
-+
-+	/* Make sure we don't point the iterator at a used-up folio_queue
-+	 * struct being used as a placeholder to prevent the queue from
-+	 * collapsing.  In such a case, extend the queue.
-+	 */
-+	if (iov_iter_is_folioq(wreq_iter) &&
-+	    wreq_iter->folioq_slot >=3D folioq_nr_slots(wreq_iter->folioq)) {
-+		netfs_buffer_make_space(wreq);
-+	}
- =
+    1) \\[redacted]\backup Mounts: 1 DevInfo: 0x20 Attributes: 0x5002f
+    PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x5e804e9e
+    Share Capabilities: None Aligned, Partition Aligned,    Share Flags:=
+ 0x0
+    tid: 0x693853c0 Optimal sector size: 0x200  Maximal Access: 0x1f01ff
 
- 	subreq =3D netfs_alloc_subrequest(wreq);
- 	subreq->source		=3D stream->source;
- 	subreq->start		=3D start;
- 	subreq->stream_nr	=3D stream->stream_nr;
--	subreq->io_iter		=3D wreq->io_iter;
-+	subreq->io_iter		=3D *wreq_iter;
- =
 
- 	_enter("R=3D%x[%x]", wreq->debug_id, subreq->debug_index);
- =
+    MIDs:
+--
 
+/proc/fs/cifs/Stats after several test cycles:
+
+Resources in use
+CIFS Session: 1
+Share (unique mount targets): 2
+SMB Request/Response Buffer: 1 Pool size: 5
+SMB Small Req/Resp Buffer: 1 Pool size: 30
+Operations (MIDs): 0
+
+0 session 0 share reconnects
+Total vfs operations: 67762 maximum at one time: 31
+
+Max requests in flight: 365
+1) \\[redacted]\backup
+SMBs: 80060 since 2024-09-26 13:43:48 UTC
+Bytes read: 37424899280  Bytes written: 37561813928
+Open files: 0 total (local), 0 open on server
+TreeConnects: 434 total 0 failed
+TreeDisconnects: 0 total 0 failed
+Creates: 8704 total 1 failed
+Closes: 8703 total 0 failed
+Flushes: 1601 total 0 failed
+Reads: 10181 total 0 failed
+Writes: 47345 total 0 failed
+Locks: 0 total 0 failed
+IOCTLs: 1 total 1 failed
+QueryDirectories: 124 total 0 failed
+ChangeNotifies: 0 total 0 failed
+QueryInfos: 2966 total 0 failed
+SetInfos: 1 total 0 failed
+OplockBreaks: 433 sent 0 failed
+--f707bbe107554888bbc11f0547334fd2
+Content-Disposition: attachment; filename="smb-fadvise-bug.c"
+Content-Type: text/x-csrc; name="smb-fadvise-bug.c"
+Content-Transfer-Encoding: base64
+
+LyogU2VsZi1jb250YWluZWQgcmVwcm9kdWNlciBmb3IgYSBTTUIvQ0lGUyBkYXRhIGNvcnJ1
+cHRpb24gYnVnIGFwcGFyZW50bHkKICAgZHVlIHRvIGEgcmFjZSBpbiB0aGUgaGFuZGxpbmcg
+b2YgUE9TSVhfRkFEVl9ET05UTkVFRCBhbmQvb3IgZmRhdGFzeW5jLiAgKi8KCiNkZWZpbmUg
+X0dOVV9TT1VSQ0UgMQoKI2luY2x1ZGUgPGFyZ3AuaD4KI2luY2x1ZGUgPGRpcmVudC5oPgoj
+aW5jbHVkZSA8ZXJybm8uaD4KI2luY2x1ZGUgPGZjbnRsLmg+CiNpbmNsdWRlIDxzdGRib29s
+Lmg+CiNpbmNsdWRlIDxzdGRpbnQuaD4KI2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxz
+dGRsaWIuaD4KI2luY2x1ZGUgPHN0cmluZy5oPgojaW5jbHVkZSA8c3lzL3N0YXQuaD4KI2lu
+Y2x1ZGUgPHN5cy93YWl0Lmg+CiNpbmNsdWRlIDx1bmlzdGQuaD4KCi8qKiBzcGxpdG1peDY0
+IHJhbmRvbSBudW1iZXIgZ2VuZXJhdG9yLgogICBUaGlzIGlzIGEgZml4ZWQtaW5jcmVtZW50
+IHZlcnNpb24gb2YgSmF2YSA4J3MgU3BsaXR0YWJsZVJhbmRvbSBnZW5lcmF0b3IuCiAgIFNl
+ZSBodHRwOi8vZHguZG9pLm9yZy8xMC4xMTQ1LzI3MTQwNjQuMjY2MDE5NSBhbmQKICAgaHR0
+cDovL2RvY3Mub3JhY2xlLmNvbS9qYXZhc2UvOC9kb2NzL2FwaS9qYXZhL3V0aWwvU3BsaXR0
+YWJsZVJhbmRvbS5odG1sCiAgIENvZGUgdGFrZW4gYWxtb3N0IHZlcmJhdGltIGZyb20gaHR0
+cHM6Ly9wcm5nLmRpLnVuaW1pLml0L3NwbGl0bWl4NjQuYwoKICAgVXNlZCBoZXJlIGJlY2F1
+c2UgaXQncyB2ZXJ5IHNtYWxsLCBwcm9kdWNlcyBhY2NlcHRhYmxlIHF1YWxpdHkKICAgcmFu
+ZG9tbmVzcyBmb3IgdGhpcyBhcHBsaWNhdGlvbiwgYW5kIGhhcyBubyBjb25zdHJhaW50cyBv
+biB0aGUKICAgc2VlZCB2YWx1ZS4gICovCgpzdGF0aWMgdWludDY0X3Qgc3BsaXRtaXg2NF9u
+ZXh0KHVpbnQ2NF90ICpzdGF0ZSkKewogICAgdWludDY0X3QgeiA9ICgqc3RhdGUgKz0gMHg5
+ZTM3NzliOTdmNGE3YzE1KTsKICAgIHogPSAoeiBeICh6ID4+IDMwKSkgKiAweGJmNTg0NzZk
+MWNlNGU1Yjk7CiAgICB6ID0gKHogXiAoeiA+PiAyNykpICogMHg5NGQwNDliYjEzMzExMWVi
+OwogICAgcmV0dXJuIHogXiAoeiA+PiAzMSk7Cn0KCi8qKiBGaWxsIHRoZSBidWZmZXIgQlVG
+IChvZiBsZW5ndGggTEVOKSB3aXRoIHJhbmRvbSBieXRlcywgYWxsIG9mIHdoaWNoCiAgICBh
+cmUgZ3VhcmFudGVlZCB0byBiZSBwcmludGFibGUgQVNDSUkuICBTVEFURSBwb2ludHMgdG8g
+YSBzdGF0ZSB2ZWN0b3IKICAgIGZvciB0aGUgcmFuZG9tIG51bWJlciBnZW5lcmF0b3IuICAq
+LwpzdGF0aWMgdm9pZCBmaWxsX2J1ZihjaGFyICpidWYsIHNpemVfdCBsZW4sIHVpbnQ2NF90
+ICpzdGF0ZSkKewogICAgLyogbm90IHF1aXRlIHRoZSB1c3VhbCBiYXNlNjQgYWxwaGFiZXQg
+Ki8KICAgIHN0YXRpYyBjb25zdCBjaGFyIGVuY29kaW5nWzY0XSA9CiAgICAgICAgIlxuLjAx
+MjM0NTY3ODlBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWmFiY2RlZmdoaWprbG1ub3BxcnN0
+dXZ3eHl6IjsKCiAgICAvKiAyNCBieXRlcyBvZiBiaW5hcnkgZGF0YSBtYWtlIDMyIGJ5dGVz
+IG9mIGJhc2U2NCBkYXRhICovCiAgICB1bmlvbiB7CiAgICAgICAgdWludDY0X3QgdmFsdWVz
+WzNdOwogICAgICAgIHVuc2lnbmVkIGNoYXIgYml0c1szICogc2l6ZW9mKHVpbnQ2NF90KV07
+CiAgICB9IGRhdGE7CgogICAgY2hhciAqd3B0ciA9IGJ1ZjsKICAgIGNoYXIgKndsaW1pdCA9
+IGJ1ZiArIGxlbjsKICAgIHVuc2lnbmVkIGNoYXIgKnJwdHI7CiAgICB1bnNpZ25lZCBjaGFy
+ICpybGltaXQgPSBkYXRhLmJpdHMgKyBzaXplb2YgZGF0YS5iaXRzOwogICAgdWludF9sZWFz
+dDMyX3QgdjsKCiAgICB3aGlsZSAod3B0ciA8IHdsaW1pdCkgewogICAgICAgIGRhdGEudmFs
+dWVzWzBdID0gc3BsaXRtaXg2NF9uZXh0KHN0YXRlKTsKICAgICAgICBkYXRhLnZhbHVlc1sx
+XSA9IHNwbGl0bWl4NjRfbmV4dChzdGF0ZSk7CiAgICAgICAgZGF0YS52YWx1ZXNbMl0gPSBz
+cGxpdG1peDY0X25leHQoc3RhdGUpOwoKICAgICAgICBycHRyID0gZGF0YS5iaXRzOwogICAg
+ICAgIHdoaWxlIChycHRyIDwgcmxpbWl0KSB7CiAgICAgICAgICAgIC8qIG9uIGVudHJ5IHRv
+IHRoaXMgbG9vcCB3ZSBhcmUgZ3VhcmFudGVlZCB0aGF0IHRoZXJlIGlzCiAgICAgICAgICAg
+ICAgIGF0IGxlYXN0IG9uZSBieXRlIHJlbWFpbmluZyB0byB3cml0ZSBhbmQgcmxpbWl0IC0g
+cnB0cgogICAgICAgICAgICAgICBpcyBhIG11bHRpcGxlIG9mIHRocmVlICovCiAgICAgICAg
+ICAgIHYgPSAqcnB0cisrOwogICAgICAgICAgICB2ID0gKnJwdHIrKyB8ICh2IDw8IDgpOwog
+ICAgICAgICAgICB2ID0gKnJwdHIrKyB8ICh2IDw8IDgpOwoKICAgICAgICAgICAgKndwdHIr
+KyA9IGVuY29kaW5nW3YgJiAweDNGXTsKICAgICAgICAgICAgdiA+Pj0gNjsKICAgICAgICAg
+ICAgaWYgKHdwdHIgPT0gd2xpbWl0KSBicmVhazsKICAgICAgICAgICAgKndwdHIrKyA9IGVu
+Y29kaW5nW3YgJiAweDNGXTsKICAgICAgICAgICAgdiA+Pj0gNjsKICAgICAgICAgICAgaWYg
+KHdwdHIgPT0gd2xpbWl0KSBicmVhazsKICAgICAgICAgICAgKndwdHIrKyA9IGVuY29kaW5n
+W3YgJiAweDNGXTsKICAgICAgICAgICAgdiA+Pj0gNjsKICAgICAgICAgICAgaWYgKHdwdHIg
+PT0gd2xpbWl0KSBicmVhazsKICAgICAgICAgICAgKndwdHIrKyA9IGVuY29kaW5nW3YgJiAw
+eDNGXTsKICAgICAgICAgICAgdiA+Pj0gNjsKICAgICAgICAgICAgaWYgKHdwdHIgPT0gd2xp
+bWl0KSBicmVhazsKICAgICAgICB9CiAgICB9Cn0KCi8qKiBHZXQgYSBoYW5kbGUgdG8gYSBk
+aXJlY3RvcnkgbmFtZWQgTkFNRSwgY3JlYXRpbmcgaXQgaWYgbmVjZXNzYXJ5LgogICAgRG9l
+cyBub3QgYXR0ZW1wdCB0byBjcmVhdGUgbWlzc2luZyBwYXJlbnQgZGlyZWN0b3JpZXMuICAq
+LwpzdGF0aWMgaW50IG9wZW5fb3JfY3JlYXRlX2Rpcihjb25zdCBjaGFyICpuYW1lKQp7CiAg
+ICBpbnQgZmQgPSBvcGVuKG5hbWUsIE9fUkRPTkxZIHwgT19ESVJFQ1RPUlkgfCBPX0NMT0VY
+RUMpOwogICAgaWYgKGZkID49IDApCiAgICAgICAgcmV0dXJuIGZkOwoKICAgIGlmIChlcnJu
+byAhPSBFTk9FTlQpCiAgICAgICAgZ290byBmYWlsOwoKICAgIC8qIHRyeSBjcmVhdGluZyBp
+dCAqLwogICAgaWYgKG1rZGlyKG5hbWUsIDA3NzcpKQogICAgICAgIGdvdG8gZmFpbDsKCiAg
+ICAvKiBub3cgdHJ5IG9wZW5pbmcgaXQgYWdhaW4gKi8KICAgIGZkID0gb3BlbihuYW1lLCBP
+X1JET05MWSB8IE9fRElSRUNUT1JZIHwgT19DTE9FWEVDKTsKICAgIGlmIChmZCA+PSAwKQog
+ICAgICAgIHJldHVybiBmZDsKCiBmYWlsOgogICAgcGVycm9yKG5hbWUpOwogICAgcmV0dXJu
+IC0xOwp9CgoKLyoqIFdyaXRlIGFsbCBMRU4gYnl0ZXMgb2YgQlVGIHRvIGZpbGUgZGVzY3Jp
+cHRvciBGRC4gICovCnN0YXRpYyBpbnQgd3JpdGVfYWxsKGludCBmZCwgY29uc3QgY2hhciAq
+YnVmLCBzaXplX3QgbGVuKQp7CiAgICB3aGlsZSAobGVuID4gMCkgewogICAgICAgIHNzaXpl
+X3QgbndyaXR0ZW4gPSB3cml0ZShmZCwgYnVmLCBsZW4pOwogICAgICAgIGlmIChud3JpdHRl
+biA9PSAwKQogICAgICAgICAgICBhYm9ydCgpOyAvKiBzaG91bGQgbmV2ZXIgaGFwcGVuIHdo
+ZW4gd3JpdGluZyB0byBhIGZpbGUgKi8KICAgICAgICBpZiAobndyaXR0ZW4gPCAwKQogICAg
+ICAgICAgICByZXR1cm4gLTE7CiAgICAgICAgYnVmICs9IChzaXplX3QpbndyaXR0ZW47CiAg
+ICAgICAgbGVuIC09IChzaXplX3QpbndyaXR0ZW47CiAgICB9CiAgICByZXR1cm4gMDsKfQoK
+LyoqIFJlYWQgZXhhY3RseSBMRU4gYnl0ZXMgZnJvbSBmaWxlIGRlc2NyaXB0b3IgRkQgdG8g
+QlVGLiAgKi8Kc3RhdGljIGludCByZWFkX2FsbChpbnQgZmQsIGNoYXIgKmJ1Ziwgc2l6ZV90
+IGxlbikKewogICAgd2hpbGUgKGxlbiA+IDApIHsKICAgICAgICBzc2l6ZV90IG5yZWFkID0g
+cmVhZChmZCwgYnVmLCBsZW4pOwogICAgICAgIGlmIChucmVhZCA9PSAwKQogICAgICAgICAg
+ICBhYm9ydCgpOyAvKiBzaG91bGQgbmV2ZXIgaGFwcGVuIHdoZW4gcmVhZGluZyBmcm9tIGEg
+ZmlsZSAqLwogICAgICAgIGlmIChucmVhZCA8IDApCiAgICAgICAgICAgIHJldHVybiAtMTsK
+ICAgICAgICBidWYgKz0gKHNpemVfdClucmVhZDsKICAgICAgICBsZW4gLT0gKHNpemVfdClu
+cmVhZDsKICAgIH0KICAgIHJldHVybiAwOwp9CgovKiogV3JpdGUgYSBoZXggZHVtcCBvZiBE
+QVRBIChvZiBsZW5ndGggTEVOKSB0byBhIG5ldyBmaWxlIG5hbWVkCiAgICBOQU1FLCBpbiBk
+aXJlY3RvcnkgREZELiAgKi8Kc3RhdGljIGludCB3cml0ZV9oZXhkdW1wKGludCBkZmQsIGNv
+bnN0IGNoYXIgKm5hbWUsIGNvbnN0IGNoYXIgKmNvbnRlbnRzLAogICAgICAgICAgICAgICAg
+ICAgICAgICAgc2l6ZV90IGxlbikKewogICAgaW50IGZkID0gb3BlbmF0KGRmZCwgbmFtZSwg
+T19XUk9OTFkgfCBPX0NSRUFUIHwgT19FWENMLCAwNjY2KTsKICAgIGlmIChmZCA8IDApIHsK
+ICAgICAgICBmcHJpbnRmKHN0ZGVyciwgImNyZWF0aW5nICVzOiAlc1xuIiwgbmFtZSwgc3Ry
+ZXJyb3IoZXJybm8pKTsKICAgICAgICByZXR1cm4gLTE7CiAgICB9CiAgICBGSUxFICpmcCA9
+IGZkb3BlbihmZCwgInciKTsKICAgIGlmICghZnApIHsKICAgICAgcGVycm9yKCJmZG9wZW4i
+KTsKICAgICAgcmV0dXJuIC0xOwogICAgfQogICAgZm9yIChzaXplX3QgaSA9IDA7IGkgPCBs
+ZW47IGkrKykgewogICAgICAgIGlmIChpICUgMTYgPT0gMCkgewogICAgICAgICAgICBpZiAo
+aSAhPSAwKQogICAgICAgICAgICAgICAgZnB1dGMoJ1xuJywgZnApOwogICAgICAgICAgICBm
+cHJpbnRmKGZwLCAiJTA4eng6ICIsIGkpOwogICAgICAgIH0KICAgICAgICBpZiAoaSAlIDE2
+ID09IDgpCiAgICAgICAgICAgIGZwdXRjKCcgJywgZnApOwogICAgICAgIGZwcmludGYoZnAs
+ICIgJTAyeCIsICh1bnNpZ25lZCBpbnQpKHVuc2lnbmVkIGNoYXIpY29udGVudHNbaV0pOwog
+ICAgfQogICAgZnB1dGMoJ1xuJywgZnApOwogICAgaWYgKGZlcnJvcihmcCkgfHwgZmZsdXNo
+KGZwKSkgewogICAgICAgIGZwcmludGYoc3RkZXJyLCAiJXM6IHdyaXRlIGVycm9yOiAlc1xu
+IiwgbmFtZSwgc3RyZXJyb3IoZXJybm8pKTsKICAgICAgICBmY2xvc2UoZnApOwogICAgICAg
+IHJldHVybiAtMTsKICAgIH0KICAgIGlmIChmY2xvc2UoZnApKSB7CiAgICAgICAgZnByaW50
+ZihzdGRlcnIsICIlczogd3JpdGUgZXJyb3I6ICVzXG4iLCBuYW1lLCBzdHJlcnJvcihlcnJu
+bykpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KICAgIHJldHVybiAwOwp9CgovKiogQ3Jl
+YXRlIGEgZmlsZSBvZiBzaXplIExFTiwgaW4gdGhlIGRpcmVjdG9yeSByZWZlcnJlZCB0byBi
+eSBERkQsCiAgICBjb250YWluaW5nIHJhbmRvbWx5IGNob3NlbiBidXQgcHJlZGljdGFibGUg
+ZGF0YS4gIFRoaXMgaXMgdGhlCiAgICBTRVEndGggZmlsZSB0byBiZSBjcmVhdGVkLiBUaGUg
+c2VlZCBmb3IgdGhlIHJhbmRvbSBudW1iZXIKICAgIGdlbmVyYXRvciBjYW4gYmUgcmVjb3Zl
+cmVkIGZyb20gdGhlIGZpbGUgbmFtZS4gIFdyaXRlIHRoZSBmaWxlJ3MKICAgIGNvbnRlbnRz
+IHVzaW5nIGEgc2VxdWVuY2Ugb2Ygb3BlcmF0aW9ucyB0aGF0IHdhcyBvYnNlcnZlZCB0bwog
+ICAgdHJpZ2dlciBkYXRhIGNvcnJ1cHRpb24gd2hlbiB0aGUgZmlsZSBpcyBzdG9yZWQgb24g
+YSBTTUIvQ0lGUyBmaWxlCiAgICBzeXN0ZW0gKHBvdGVudGlhbGx5IGFsc28gZWxzZXdoZXJl
+KS4gICovCnN0YXRpYyBpbnQgY3JlYXRlX29uZV9maWxlX3Byb3Zva2luZ19idWcoaW50IGRm
+ZCwgdWludDMyX3Qgc2VxLCB1aW50MzJfdCBsZW4sCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgYm9vbCBkb19mZGF0YXN5bmMsIGJvb2wgZG9fZmFkdmlzZSkK
+ewogICAgdWludDY0X3Qgc3RhdGUgPSAoKHVpbnQ2NF90KXNlcSkgPDwgMzIgfCBsZW47Cgog
+ICAgY2hhciAqbmFtZSA9IDA7CiAgICBpZiAoYXNwcmludGYoJm5hbWUsICJzZmFiLSUwOHgt
+JTA4eCIsIHNlcSwgbGVuKSA8IDApIHsKICAgICAgICBwZXJyb3IoIm1hbGxvYyIpOwogICAg
+ICAgIHJldHVybiAtMTsKICAgIH0KICAgIGNoYXIgKmNvbnRlbnRzID0gbWFsbG9jKGxlbik7
+CiAgICBpZiAoIWNvbnRlbnRzKSB7CiAgICAgICAgcGVycm9yKCJtYWxsb2MiKTsKICAgICAg
+ICBmcmVlKG5hbWUpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KCiAgICBmaWxsX2J1Zihj
+b250ZW50cywgbGVuLCAmc3RhdGUpOwoKICAgIC8qIEhlcmUgaXMgdGhlIHRyb3VibGVzb21l
+IHNlcXVlbmNlIG9mIG9wZXJhdGlvbnMuICBXZSBkaXZpZGUgdGhlCiAgICAgICBmaWxlIGlu
+dG8gdGhyZWUgY2h1bmtzLCBjb21wcmlzaW5nIHJvdWdobHkgNDAlLCA1OCUsIGFuZCAyJSBv
+ZgogICAgICAgdGhlIGRhdGEsIHdpdGggYm90aCBzcGxpdCBwb2ludHMgYmVpbmcgc2xpZ2h0
+bHkgYmVmb3JlIGEgNTEyLWJ5dGUKICAgICAgIGJvdW5kYXJ5LiAgRWFjaCBjaHVuayBpcyB3
+cml0dGVuIHNlcGFyYXRlbHkuICBUaGVuIHdlIGNhbGwKICAgICAgIGZkYXRhc3luYygpLCBw
+b3NpeF9mYWR2aXNlKFBPU0lYX0ZBRFZfRE9OVE5FRUQpLCBhbmQgY2xvc2UoKQogICAgICAg
+b24gdGhlIGZpbGUsIGluIHRoYXQgb3JkZXIuICBXaGVuIHRoZSBidWcgdHJpZ2dlcnMsIGFs
+bCBvcGVyYXRpb25zCiAgICAgICByZXBvcnQgc3VjY2VzcyBidXQgc29tZSBvZiB0aGUgZGF0
+YSBmcm9tIHRoZSBiZWdpbm5pbmcgb2YgdGhlCiAgICAgICBzZWNvbmQgd3JpdGUgaXMgcmVw
+bGFjZWQgd2l0aCBiaW5hcnkgemVyb2VzLiAqLwoKICAgIHVpbnQ2NF90IG9mZnNldGJpdHMg
+PSBzcGxpdG1peDY0X25leHQoJnN0YXRlKTsKICAgIHNpemVfdCBjaHVua3NpemVfMSA9IChz
+aXplX3QpKGxlbiAqIDAuNDApICYgfihzaXplX3QpMHgxRkY7CiAgICBzaXplX3QgY2h1bmtz
+aXplXzIgPSAoc2l6ZV90KShsZW4gKiAwLjU4KSAmIH4oc2l6ZV90KTB4MUZGOwoKICAgIGNo
+dW5rc2l6ZV8xIC09IChvZmZzZXRiaXRzID4+IDExKSAmIDB4MUY7CiAgICBjaHVua3NpemVf
+MiAtPSAob2Zmc2V0Yml0cyA+PiAxNykgJiAweDFGOwoKICAgIHNpemVfdCBjaHVua3NpemVf
+MyA9IChzaXplX3QpbGVuIC0gKGNodW5rc2l6ZV8xICsgY2h1bmtzaXplXzIpOwoKICAgIGlm
+IChjaHVua3NpemVfMSA+IChzaXplX3QpbGVuCiAgICAgICAgfHwgY2h1bmtzaXplXzIgPiAo
+c2l6ZV90KWxlbgogICAgICAgIHx8IGNodW5rc2l6ZV8zID4gKHNpemVfdClsZW4pIHsKICAg
+ICAgZnByaW50ZihzdGRlcnIsICJmaWxlIHNpemUgJXUgaXMgdG9vIHNtYWxsIHRvIGJlIHNw
+bGl0IGludG8gY2h1bmtzXG4iLAogICAgICAgICAgICAgIGxlbik7CiAgICAgIGV4aXQoMSk7
+CiAgICB9CgogICAgaW50IGZkID0gb3BlbmF0KGRmZCwgbmFtZSwgT19XUk9OTFkgfCBPX0NS
+RUFUIHwgT19FWENMIHwgT19DTE9FWEVDLCAwNjY2KTsKICAgIGlmIChmZCA8IDApIHsKICAg
+ICAgICBmcHJpbnRmKHN0ZGVyciwgImNyZWF0aW5nICVzOiAlc1xuIiwgbmFtZSwgc3RyZXJy
+b3IoZXJybm8pKTsKICAgICAgICBmcmVlKGNvbnRlbnRzKTsKICAgICAgICBmcmVlKG5hbWUp
+OwogICAgICAgIHJldHVybiAtMTsKICAgIH0KCiAgICBpbnQgZXJyID0gd3JpdGVfYWxsKGZk
+LCBjb250ZW50cywgY2h1bmtzaXplXzEpOwogICAgaWYgKGVycikgZ290byBvdXQ7CiAgICBl
+cnIgPSB3cml0ZV9hbGwoZmQsIGNvbnRlbnRzICsgY2h1bmtzaXplXzEsIGNodW5rc2l6ZV8y
+KTsKICAgIGlmIChlcnIpIGdvdG8gb3V0OwogICAgZXJyID0gd3JpdGVfYWxsKGZkLCBjb250
+ZW50cyArIGNodW5rc2l6ZV8xICsgY2h1bmtzaXplXzIsIGNodW5rc2l6ZV8zKTsKICAgIGlm
+IChlcnIpIGdvdG8gb3V0OwogICAgaWYgKGRvX2ZkYXRhc3luYykgewogICAgICAgIGVyciA9
+IGZkYXRhc3luYyhmZCk7CiAgICAgICAgaWYgKGVycikgZ290byBvdXQ7CiAgICB9CiAgICBp
+ZiAoZG9fZmFkdmlzZSkgewogICAgICAgIGVyciA9IHBvc2l4X2ZhZHZpc2UoZmQsIDAsIDAs
+IFBPU0lYX0ZBRFZfRE9OVE5FRUQpOwogICAgfQogb3V0OjsKICAgIGludCBlcnJjb2RlID0g
+ZXJybm87CiAgICBpZiAoY2xvc2UoZmQpKSB7CiAgICAgICAgZXJyID0gLTE7CiAgICAgICAg
+aWYgKCFlcnJjb2RlKQogICAgICAgICAgICBlcnJjb2RlID0gZXJybm87CiAgICB9CiAgICBp
+ZiAoZXJyID09IC0xKQogICAgICAgIGZwcmludGYoc3RkZXJyLCAiZmlsbGluZyAlczogJXNc
+biIsIG5hbWUsIHN0cmVycm9yKGVycmNvZGUpKTsKICAgIGZyZWUoY29udGVudHMpOwogICAg
+ZnJlZShuYW1lKTsKICAgIHJldHVybiBlcnI7Cn0KCi8qKiBWZXJpZnkgdGhlIGNvbnRlbnRz
+IG9mIGEgZmlsZSBjcmVhdGVkIGJ5IGNyZWF0ZV9vbmVfZmlsZV9wcm92b2tpbmdfYnVnLgog
+ICAgVGhlIHJldHVybiB2YWx1ZSBpcyAwIGlmIHRoZSBmaWxlIGlzIGNvcnJlY3QsIDEgaWYg
+aXQgaXMgdGhlIHdyb25nIHNpemUKICAgIG9yIGhhcyB0aGUgd3JvbmcgY29udGVudHMsIGFu
+ZCAtMSBpZiBhIHN5c3RlbSBlcnJvciBvY2N1cnJlZDsgaW4gYWxsCiAgICBmYWlsdXJlIGNh
+c2VzIGFuIGVycm9yIGlzIHByaW50ZWQuICAqLwpzdGF0aWMgaW50IHZlcmlmeV9vbmVfZmls
+ZShpbnQgZGZkLCBjb25zdCBjaGFyICpuYW1lLCBpbnQgbG9nX2RmZCkKewogICAgaW50IGZk
+ID0gb3BlbmF0KGRmZCwgbmFtZSwgT19SRE9OTFkgfCBPX0NMT0VYRUMpOwogICAgaWYgKGZk
+IDwgMCkgewogICAgICAgIC8qIHRoZSBkX3R5cGUgZmlsdGVyIGluIG1haW4gaXNuJ3QgZ3Vh
+cmFudGVlZCB0byB3b3JrLAogICAgICAgICAgIHdlIG1pZ2h0IGhhdmUgdHJpZWQgdG8gb3Bl
+biBhIGRpcmVjdG9yeSAqLwogICAgICAgIGlmIChlcnJubyA9PSBFSVNESVIpIHsKICAgICAg
+ICAgICAgcmV0dXJuIDA7CiAgICAgICAgfQogICAgICAgIGZwcmludGYoc3RkZXJyLCAicmVv
+cGVuaW5nICVzOiAlc1xuIiwgbmFtZSwgc3RyZXJyb3IoZXJybm8pKTsKICAgICAgICByZXR1
+cm4gLTE7CiAgICB9CgogICAgc3RydWN0IHN0YXQgc3Q7CiAgICBpZiAoZnN0YXQoZmQsICZz
+dCkpIHsKICAgICAgICBwZXJyb3IoImZzdGF0Iik7CiAgICAgICAgY2xvc2UoZmQpOwogICAg
+ICAgIHJldHVybiAtMTsKICAgIH0KICAgIC8qIHRoZSBkX3R5cGUgZmlsdGVyIGluIG1haW4g
+aXNuJ3QgZ3VhcmFudGVlZCB0byB3b3JrLCB3ZSBtaWdodAogICAgICAgaGF2ZSBvcGVuZWQg
+YSBub24tZmlsZSAqLwogICAgaWYgKCFTX0lTUkVHKHN0LnN0X21vZGUpKSB7CiAgICAgICAg
+Y2xvc2UoZmQpOwogICAgICAgIHJldHVybiAwOwogICAgfQoKICAgIC8qIGJ5IGFzc3VtcHRp
+b24gdGhlIG5hbWUgd2FzIGNvbnN0cnVjdGVkIGJ5IHRoaXMgcHJvZ3JhbSwgc28gd2UKICAg
+ICAgIGNhbiBwcm9iYWJseSBnZXQgYXdheSB3aXRoIHVzaW5nIHNzY2FuZiB0byBwYXJzZSB2
+YWx1ZXMgZnJvbSBpdCAqLwogICAgdWludDMyX3Qgc2VxLCBsZW47CiAgICBpZiAoc3NjYW5m
+KG5hbWUsICJzZmFiLSV4LSV4IiwgJnNlcSwgJmxlbikgIT0gMikgewogICAgICAgIGZwcmlu
+dGYoc3RkZXJyLCAiZmFpbGVkIHRvIHBhcnNlIGZpbGVuYW1lICclcydcbiIsIG5hbWUpOwog
+ICAgICAgIHJldHVybiAtMTsKICAgIH0KCiAgICBpZiAoc3Quc3Rfc2l6ZSAhPSAob2ZmX3Qp
+bGVuKSB7CiAgICAgICAgZnByaW50ZihzdGRlcnIsICIlczogdW5leHBlY3RlZCBzaXplICVs
+dSAtIHNob3VsZCBiZSAldVxuIiwKICAgICAgICAgICAgICAgIG5hbWUsIHN0LnN0X3NpemUs
+IGxlbik7CiAgICAgICAgY2xvc2UoZmQpOwogICAgICAgIHJldHVybiAxOyAvKiBjb3JydXB0
+aW9uIGRldGVjdGVkICovCiAgICB9CgogICAgY2hhciAqZXhwX2NvbnRlbnRzID0gbWFsbG9j
+KGxlbik7CiAgICBjaGFyICphY3RfY29udGVudHMgPSBtYWxsb2MobGVuKTsKICAgIGlmICgh
+ZXhwX2NvbnRlbnRzIHx8ICFhY3RfY29udGVudHMpIHsKICAgICAgICBwZXJyb3IoIm1hbGxv
+YyIpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KCiAgICBpZiAocmVhZF9hbGwoZmQsIGFj
+dF9jb250ZW50cywgbGVuKSkgewogICAgICAgIGZwcmludGYoc3RkZXJyLCAicmVhZGluZyAl
+czogJXNcbiIsIG5hbWUsIHN0cmVycm9yKGVycm5vKSk7CiAgICAgICAgY2xvc2UoZmQpOwog
+ICAgICAgIGZyZWUoYWN0X2NvbnRlbnRzKTsKICAgICAgICBmcmVlKGV4cF9jb250ZW50cyk7
+CiAgICAgICAgcmV0dXJuIC0xOwogICAgfQogICAgY2xvc2UoZmQpOwoKICAgIHVpbnQ2NF90
+IHN0YXRlID0gKCh1aW50NjRfdClzZXEpIDw8IDMyIHwgbGVuOwogICAgZmlsbF9idWYoZXhw
+X2NvbnRlbnRzLCBsZW4sICZzdGF0ZSk7CgogICAgaWYgKG1lbWNtcChleHBfY29udGVudHMs
+IGFjdF9jb250ZW50cywgbGVuKSA9PSAwKSB7CiAgICAgICAgZnJlZShhY3RfY29udGVudHMp
+OwogICAgICAgIGZyZWUoZXhwX2NvbnRlbnRzKTsKICAgICAgICByZXR1cm4gMDsKICAgIH0K
+CiAgICBmcHJpbnRmKHN0ZGVyciwgIiVzOiBtaXNtYXRjaCBkZXRlY3RlZFxuIiwgbmFtZSk7
+CgogICAgY2hhciAqYWN0X25hbWU7CiAgICBpZiAoYXNwcmludGYoJmFjdF9uYW1lLCAiJXMu
+YWN0IiwgbmFtZSkgPCAwKSB7CiAgICAgICAgcGVycm9yKCJtYWxsb2MiKTsKICAgICAgICBm
+cmVlKGFjdF9jb250ZW50cyk7CiAgICAgICAgZnJlZShleHBfY29udGVudHMpOwogICAgICAg
+IHJldHVybiAtMTsKICAgIH0KCiAgICBjaGFyICpleHBfbmFtZTsKICAgIGlmIChhc3ByaW50
+ZigmZXhwX25hbWUsICIlcy5leHAiLCBuYW1lKSA8IDApIHsKICAgICAgICBwZXJyb3IoIm1h
+bGxvYyIpOwogICAgICAgIGZyZWUoYWN0X25hbWUpOwogICAgICAgIGZyZWUoYWN0X2NvbnRl
+bnRzKTsKICAgICAgICBmcmVlKGV4cF9jb250ZW50cyk7CiAgICAgICAgcmV0dXJuIC0xOwog
+ICAgfQoKICAgIGNoYXIgKmRpZmZfbmFtZTsKICAgIGlmIChhc3ByaW50ZigmZGlmZl9uYW1l
+LCAiJXMuZGlmZiIsIG5hbWUpIDwgMCkgewogICAgICAgIHBlcnJvcigibWFsbG9jIik7CiAg
+ICAgICAgZnJlZShleHBfbmFtZSk7CiAgICAgICAgZnJlZShhY3RfbmFtZSk7CiAgICAgICAg
+ZnJlZShhY3RfY29udGVudHMpOwogICAgICAgIGZyZWUoZXhwX2NvbnRlbnRzKTsKICAgICAg
+ICByZXR1cm4gLTE7CiAgICB9CgogICAgaWYgKHdyaXRlX2hleGR1bXAobG9nX2RmZCwgZXhw
+X25hbWUsIGV4cF9jb250ZW50cywgbGVuKQogICAgICAgIHx8IHdyaXRlX2hleGR1bXAobG9n
+X2RmZCwgYWN0X25hbWUsIGFjdF9jb250ZW50cywgbGVuKSkgewogICAgICAgIGZyZWUoZGlm
+Zl9uYW1lKTsKICAgICAgICBmcmVlKGFjdF9uYW1lKTsKICAgICAgICBmcmVlKGV4cF9uYW1l
+KTsKICAgICAgICBmcmVlKGFjdF9jb250ZW50cyk7CiAgICAgICAgZnJlZShleHBfY29udGVu
+dHMpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KICAgIGZyZWUoYWN0X2NvbnRlbnRzKTsK
+ICAgIGZyZWUoZXhwX2NvbnRlbnRzKTsKCiAgICBmZmx1c2goMCk7CgogICAgcGlkX3QgY2hp
+bGQgPSBmb3JrKCk7CiAgICBpZiAoY2hpbGQgPT0gLTEpIHsKICAgICAgICBwZXJyb3IoImZv
+cmsiKTsKICAgICAgICBmcmVlKGRpZmZfbmFtZSk7CiAgICAgICAgZnJlZShhY3RfbmFtZSk7
+CiAgICAgICAgZnJlZShleHBfbmFtZSk7CiAgICAgICAgcmV0dXJuIC0xOwogICAgfQogICAg
+aWYgKGNoaWxkID09IDApIHsKICAgICAgICBpZiAoZmNoZGlyKGxvZ19kZmQpKSB7CiAgICAg
+ICAgICAgIHBlcnJvcigiZmNoZGlyIik7CiAgICAgICAgICAgIGZmbHVzaChzdGRlcnIpOwog
+ICAgICAgICAgICBfZXhpdCgxMjYpOwogICAgICAgIH0KCiAgICAgICAgaW50IGRpZmZfZmQg
+PSBvcGVuYXQobG9nX2RmZCwgZGlmZl9uYW1lLAogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIE9fV1JPTkxZIHwgT19DUkVBVCB8IE9fRVhDTCwgMDY2Nik7CiAgICAgICAgaWYgKGRp
+ZmZfZmQgPT0gLTEpIHsKICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJjcmVhdGluZyAl
+czogJXNcbiIsIGRpZmZfbmFtZSwgc3RyZXJyb3IoZXJybm8pKTsKICAgICAgICAgICAgZmZs
+dXNoKHN0ZGVycik7CiAgICAgICAgICAgIF9leGl0KDEyNik7CiAgICAgICAgfQogICAgICAg
+IGR1cDIoZGlmZl9mZCwgMSk7CiAgICAgICAgY2xvc2UoZGlmZl9mZCk7CiAgICAgICAgZXhl
+Y2xwKCJkaWZmIiwgImRpZmYiLCAiLXUiLCBleHBfbmFtZSwgYWN0X25hbWUsIChjaGFyICop
+MCk7CiAgICAgICAgcGVycm9yKCJleGVjIGRpZmYiKTsKICAgICAgICBmZmx1c2goc3RkZXJy
+KTsKICAgICAgICBfZXhpdCgxMjcpOwogICAgfQoKICAgIGZyZWUoZGlmZl9uYW1lKTsKICAg
+IGZyZWUoYWN0X25hbWUpOwogICAgZnJlZShleHBfbmFtZSk7CgogICAgaW50IHN0YXR1czsK
+ICAgIGlmICh3YWl0cGlkKGNoaWxkLCAmc3RhdHVzLCAwKSAhPSBjaGlsZCkgewogICAgICAg
+IHBlcnJvcigid2FpdHBpZCIpOwogICAgICAgIHJldHVybiAtMTsKICAgIH0KICAgIGlmIChX
+SUZTSUdOQUxFRChzdGF0dXMpKSB7CiAgICAgICAgZnByaW50ZihzdGRlcnIsICJkaWZmOiAl
+c1xuIiwgc3Ryc2lnbmFsKFdURVJNU0lHKHN0YXR1cykpKTsKICAgICAgICByZXR1cm4gLTE7
+CiAgICB9CiAgICBpZiAoIVdJRkVYSVRFRChzdGF0dXMpKSB7CiAgICAgICAgZnByaW50Zihz
+dGRlcnIsICJkaWZmOiBiaXphcnJlIHdhaXQgc3RhdHVzICUwNHhcbiIsIHN0YXR1cyk7CiAg
+ICAgICAgcmV0dXJuIC0xOwogICAgfQogICAgLyogYmVjYXVzZSB0aGUgdHdvIGZpbGVzIGFy
+ZSBrbm93biB0byBiZSBkaWZmZXJlbnQsIGRpZmYgc2hvdWxkJ3ZlCiAgICAgICBleGl0ZWQg
+d2l0aCBzdGF0dXMgMSAqLwogICAgaWYgKFdFWElUU1RBVFVTKHN0YXR1cykgIT0gMSkgewog
+ICAgICAgIGZwcmludGYoc3RkZXJyLCAiZGlmZjogdW5leHBlY3RlZCBleGl0IHN0YXR1cyAl
+ZFxuIiwKICAgICAgICAgICAgICAgIFdFWElUU1RBVFVTKHN0YXR1cykpOwogICAgICAgIHJl
+dHVybiAtMTsKICAgIH0KICAgIHJldHVybiAxOyAvKiBjb3JydXB0aW9uIGRldGVjdGVkICov
+Cn0KCnN0cnVjdCBjbWRsaW5lX2FyZ3MKewogICAgY29uc3QgY2hhciAqdGVzdF9kaXI7CiAg
+ICBjb25zdCBjaGFyICpsb2dfZGlyOwogICAgdWludDMyX3Qgbl9ieXRlczsKICAgIHVpbnQz
+Ml90IG5fZmlsZXM7CiAgICBib29sIGRvX2ZkYXRhc3luYzsKICAgIGJvb2wgZG9fZmFkdmlz
+ZTsKfTsKCnN0YXRpYyB1aW50MzJfdCBjbWRsaW5lX3BhcnNlX3UzMihjb25zdCBjaGFyICph
+cmcsIGludCBrZXksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qg
+YXJncF9zdGF0ZSAqc3RhdGUpCnsKICAgIHVuc2lnbmVkIGxvbmcgdmFsOwogICAgY2hhciAq
+ZW5kcDsKICAgIGVycm5vID0gMDsKICAgIHZhbCA9IHN0cnRvdWwoYXJnLCAmZW5kcCwgMTAp
+OwogICAgaWYgKGVuZHAgPT0gYXJnIHx8ICplbmRwICE9ICdcMCcpIHsKICAgICAgICBhcmdw
+X2Vycm9yKAogICAgICAgICAgICBzdGF0ZSwKICAgICAgICAgICAgImludmFsaWQgYXJndW1l
+bnQgdG8gLSVjOiAnJXMnIChtdXN0IGJlIGEgZGVjaW1hbCBpbnRlZ2VyKSIsCiAgICAgICAg
+ICAgIGtleSwKICAgICAgICAgICAgYXJnCiAgICAgICAgKTsKICAgICAgICByZXR1cm4gMDsK
+ICAgIH0KICAgIGlmIChlcnJubyB8fCB2YWwgPiAodW5zaWduZWQgbG9uZylVSU5UMzJfTUFY
+KSB7CiAgICAgICAgYXJncF9lcnJvcigKICAgICAgICAgICAgc3RhdGUsCiAgICAgICAgICAg
+ICJpbnZhbGlkIGFyZ3VtZW50IHRvIC0lYzogJyVzJyAodG9vIGxhcmdlLCAzMiBiaXRzIG1h
+eCkiLAogICAgICAgICAgICBrZXksCiAgICAgICAgICAgIGFyZwogICAgICAgICk7CiAgICAg
+ICAgcmV0dXJuIDA7CiAgICB9CiAgICBpZiAodmFsID09IDApIHsKICAgICAgICBhcmdwX2Vy
+cm9yKAogICAgICAgICAgICBzdGF0ZSwKICAgICAgICAgICAgImludmFsaWQgYXJndW1lbnQg
+dG8gLSVjOiAnJXMnIChtdXN0IGJlIG5vbnplcm8pIiwKICAgICAgICAgICAga2V5LAogICAg
+ICAgICAgICBhcmcKICAgICAgICApOwogICAgICAgIHJldHVybiAwOwogICAgfQogICAgcmV0
+dXJuICh1aW50MzJfdCkgdmFsOwp9CgpzdGF0aWMgZXJyb3JfdCBjbWRsaW5lX3BhcnNlcihp
+bnQga2V5LCBjaGFyICphcmcsIHN0cnVjdCBhcmdwX3N0YXRlICpzdGF0ZSkKewogICAgc3Ry
+dWN0IGNtZGxpbmVfYXJncyAqYXJncyA9IChzdHJ1Y3QgY21kbGluZV9hcmdzICopc3RhdGUt
+PmlucHV0OwogICAgc3dpdGNoIChrZXkpIHsKICAgIGNhc2UgJ3MnOgogICAgICAgIGFyZ3Mt
+Pm5fYnl0ZXMgPSBjbWRsaW5lX3BhcnNlX3UzMihhcmcsIGtleSwgc3RhdGUpOwogICAgICAg
+IHJldHVybiAwOwoKICAgIGNhc2UgJ2MnOgogICAgICAgIGFyZ3MtPm5fZmlsZXMgPSBjbWRs
+aW5lX3BhcnNlX3UzMihhcmcsIGtleSwgc3RhdGUpOwogICAgICAgIHJldHVybiAwOwoKICAg
+IGNhc2UgJ0QnOgogICAgICAgIGFyZ3MtPmRvX2ZkYXRhc3luYyA9IGZhbHNlOwogICAgICAg
+IHJldHVybiAwOwoKICAgIGNhc2UgJ0EnOgogICAgICAgIGFyZ3MtPmRvX2ZhZHZpc2UgPSBm
+YWxzZTsKICAgICAgICByZXR1cm4gMDsKCiAgICBjYXNlIEFSR1BfS0VZX0FSRzoKICAgICAg
+ICBpZiAoc3RhdGUtPmFyZ19udW0gPT0gMCkgewogICAgICAgICAgICBhcmdzLT50ZXN0X2Rp
+ciA9IGFyZzsKICAgICAgICAgICAgcmV0dXJuIDA7CiAgICAgICAgfSBlbHNlIGlmIChzdGF0
+ZS0+YXJnX251bSA9PSAxKSB7CiAgICAgICAgICAgIGFyZ3MtPmxvZ19kaXIgPSBhcmc7CiAg
+ICAgICAgICAgIHJldHVybiAwOwogICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgIGFyZ3Bf
+ZXJyb3Ioc3RhdGUsICJ0b28gbWFueSBwb3NpdGlvbmFsIGFyZ3VtZW50cyIpOwogICAgICAg
+ICAgICByZXR1cm4gQVJHUF9FUlJfVU5LTk9XTjsKICAgICAgICB9CgogICAgY2FzZSBBUkdQ
+X0tFWV9TVUNDRVNTOgogICAgICAgIGlmICghYXJncy0+dGVzdF9kaXIpIHsKICAgICAgICAg
+ICAgYXJncF9lcnJvcihzdGF0ZSwgIlRFU1QtRElSIGFyZ3VtZW50IGlzIHJlcXVpcmVkIik7
+CiAgICAgICAgICAgIHJldHVybiBFSU5WQUw7CiAgICAgICAgfQogICAgICAgIHJldHVybiAw
+OwoKICAgIGRlZmF1bHQ6CiAgICAgICAgcmV0dXJuIEFSR1BfRVJSX1VOS05PV047CiAgICB9
+CiAgICAvKiBub3QgcmVhY2hlZCAqLwp9CgpzdGF0aWMgY29uc3Qgc3RydWN0IGFyZ3Bfb3B0
+aW9uIGNtZGxpbmVfb3B0aW9uc1tdID0gewogICAgeyAic2l6ZSIsICdzJywgIktCWVRFUyIs
+IDAsCiAgICAgICJTaXplIG9mIGVhY2ggdGVzdCBmaWxlIGluIGJ5dGVzIChkZWZhdWx0OiAx
+LDAwMCwwMDApIiwgMSB9LAogICAgeyAiY291bnQiLCAnYycsICJOLUZJTEVTIiwgMCwKICAg
+ICAgIk51bWJlciBvZiB0ZXN0IGZpbGVzIHRvIGNyZWF0ZSAoZGVmYXVsdDogMTAwKSIsIDEg
+fSwKICAgIHsgIm5vLWZkYXRhc3luYyIsICdEJywgMCwgMCwKICAgICAgIkRvbid0IGNhbGwg
+ZmRhdGFzeW5jKCkgb24gZWFjaCB0ZXN0IGZpbGUiLCAyIH0sCiAgICB7ICJuby1mYWR2aXNl
+IiwgJ0EnLCAwLCAwLAogICAgICAiRG9uJ3QgY2FsbCBmYWR2aXNlKERPTlRORUVEKSBvbiBl
+YWNoIHRlc3QgZmlsZSIsIDMgfSwKICAgIHsgMCwgMCwgMCwgMCwgMCwgMCB9LAp9OwoKc3Rh
+dGljIGNvbnN0IHN0cnVjdCBhcmdwIGNtZGxpbmVfYXJncCA9IHsKICAgIGNtZGxpbmVfb3B0
+aW9ucywKICAgIGNtZGxpbmVfcGFyc2VyLAogICAgInRlc3QtZGlyIFtsb2ctZGlyXSIsCiAg
+ICAiQXR0ZW1wdCB0byBwcm92b2tlIGEgZGF0YSBjb3JydXB0aW9uIGJ1ZyBvcmlnaW5hbGx5
+IG9ic2VydmVkIHdpdGggU01CLiIKICAgICJcdiIKICAgICJUZXN0IGZpbGVzIHdpbGwgYmUg
+Y3JlYXRlZCBpbiBURVNULURJUiB1c2luZyBhbiB1bnVzdWFsIHNlcXVlbmNlIG9mIgogICAg
+IiBvcGVyYXRpb25zLiBXaGVuIHRoZSBidWcgaXMgcHJlc2VudCwgc29tZSBvZiB0aGVzZSBm
+aWxlcyB3aWxsIGhhdmUiCiAgICAiIHNvbWUgb2YgdGhlaXIgZGF0YSByZXBsYWNlZCB3aXRo
+IGJpbmFyeSB6ZXJvZXMuIEFuYWx5c2lzIG9mIGVhY2giCiAgICAiIGNvcnJ1cHRlZCBmaWxl
+IHdpbGwgYmUgd3JpdHRlbiB0byBMT0ctRElSLCB3aGljaCBkZWZhdWx0cyB0byB0aGUiCiAg
+ICAiIGN1cnJlbnQgZGlyZWN0b3J5LiBURVNULURJUiBhbmQgTE9HLURJUiBzaG91bGQgZWl0
+aGVyIG5vdCBleGlzdCIKICAgICIgb3IgYmUgZW1wdHkuIFNlZSB0aGUgc291cmNlIGNvZGUg
+Zm9yIG1vcmUgZGV0YWlsLiIsCiAgICAwLCAwLCAwLAp9OwoKaW50IG1haW4oaW50IGFyZ2Ms
+IGNoYXIgKiphcmd2KQp7CiAgICBzdHJ1Y3QgY21kbGluZV9hcmdzIGFyZ3MgPSB7CiAgICAg
+ICAgTlVMTCwgICAgICAgIC8vIG5vIGRlZmF1bHQgZm9yIHRlc3QgZGlyZWN0b3J5CiAgICAg
+ICAgIi4iLCAgICAgICAgIC8vIGxvZ3Mgd3JpdHRlbiB0byBjdXJyZW50IGRpcmVjdG9yeQog
+ICAgICAgIDEwMDAgKiAxMDAwLCAvLyBkZWZhdWx0IGZpbGUgc2l6ZSAxICpkZWNpbWFsKiBN
+QgogICAgICAgIDEwMCwgICAgICAgICAvLyBkZWZhdWx0IGNyZWF0ZSAxMDAgZmlsZXMKICAg
+ICAgICB0cnVlLCAgICAgICAgLy8gZGVmYXVsdCBkbyBjYWxsIGZkYXRhc3luYwogICAgICAg
+IHRydWUsICAgICAgICAvLyBkZWZhdWx0IGRvIGNhbGwgZmFkdmlzZQogICAgfTsKCiAgICBl
+cnJvcl90IGVyciA9IGFyZ3BfcGFyc2UoJmNtZGxpbmVfYXJncCwgYXJnYywgYXJndiwgMCwg
+MCwgJmFyZ3MpOwogICAgaWYgKGVycikgewogICAgICAgIGZwcmludGYoc3RkZXJyLCAiYXJn
+cF9wYXJzZTogJXNcbiIsIHN0cmVycm9yKGVycikpOwogICAgICAgIHJldHVybiAyOwogICAg
+fQoKICAgIGludCB0ZXN0X2RmZCA9IG9wZW5fb3JfY3JlYXRlX2RpcihhcmdzLnRlc3RfZGly
+KTsKICAgIGlmICh0ZXN0X2RmZCA9PSAtMSkKICAgICAgICByZXR1cm4gMjsKCiAgICBpbnQg
+bG9nX2RmZCA9IG9wZW5fb3JfY3JlYXRlX2RpcihhcmdzLmxvZ19kaXIpOwogICAgaWYgKGxv
+Z19kZmQgPT0gLTEpCiAgICAgICAgcmV0dXJuIDI7CgogICAgZm9yICh1bnNpZ25lZCBpbnQg
+ZiA9IDA7IGYgPCBhcmdzLm5fZmlsZXM7IGYrKykgewogICAgICAgIGlmIChjcmVhdGVfb25l
+X2ZpbGVfcHJvdm9raW5nX2J1ZygKICAgICAgICAgICAgdGVzdF9kZmQsCiAgICAgICAgICAg
+IGYsCiAgICAgICAgICAgIGFyZ3Mubl9ieXRlcywKICAgICAgICAgICAgYXJncy5kb19mZGF0
+YXN5bmMsCiAgICAgICAgICAgIGFyZ3MuZG9fZmFkdmlzZQogICAgICAgICkpCiAgICAgICAg
+ICAgIHJldHVybiAyOwogICAgfQoKICAgIERJUiAqZHAgPSBmZG9wZW5kaXIodGVzdF9kZmQp
+OwogICAgc3RydWN0IGRpcmVudCAqZDsKICAgIGludCBhbnlfY29ycnVwdCA9IDA7CiAgICB3
+aGlsZSAoKGQgPSByZWFkZGlyKGRwKSkgIT0gMCkgewojaWYgZGVmaW5lZCBEVF9SRUcgJiYg
+ZGVmaW5lZCBEVF9VTktOT1dOCiAgICAgICAgaWYgKGQtPmRfdHlwZSAhPSBEVF9SRUcgJiYg
+ZC0+ZF90eXBlICE9IERUX1VOS05PV04pCiAgICAgICAgICAgIGNvbnRpbnVlOwojZW5kaWYK
+ICAgICAgICBpZiAoc3RybmNtcCgic2ZhYi0iLCBkLT5kX25hbWUsIHNpemVvZiAic2ZhYi0i
+IC0gMSkpCiAgICAgICAgICAgIGNvbnRpbnVlOwogICAgICAgIGludCB0aGlzX2NvcnJ1cHQg
+PSB2ZXJpZnlfb25lX2ZpbGUodGVzdF9kZmQsIGQtPmRfbmFtZSwgbG9nX2RmZCk7CiAgICAg
+ICAgaWYgKHRoaXNfY29ycnVwdCA9PSAtMSkKICAgICAgICAgICAgcmV0dXJuIDI7CiAgICAg
+ICAgaWYgKHRoaXNfY29ycnVwdCAhPSAwKQogICAgICAgICAgICBhbnlfY29ycnVwdCA9IDE7
+CiAgICB9CiAgICBjbG9zZShsb2dfZGZkKTsKICAgIGNsb3NlZGlyKGRwKTsKICAgIHJldHVy
+biBhbnlfY29ycnVwdDsKfQo=
+
+--f707bbe107554888bbc11f0547334fd2--
