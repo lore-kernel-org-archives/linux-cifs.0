@@ -1,75 +1,139 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FB813A24D
-	for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 18:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1593C15B122
+	for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 18:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727373902; cv=none; b=BilacPTZ0wRd5uY9hQ3P54CI8QIPcHNxW7M7HAbvVo4/5v7RZWeKiBqIjADuop2EWpM5JfVRGs0VFml4EuoZOD9/yPmXtCzgKT1YnTLFLBdJd73cXyF5REEw4GxJUGYYTmcRCwlXCqTl8NuXKcJ9allzjOXYwH9tJPfMQ38/uUY=
+	t=1727374982; cv=none; b=p4SSOSBbX5i77U86d0Y1lhQZLVcZ7q98oAh2GmSLQ6s7qoH1gg+/SWZcXBCkMfYlmXbfFkB88MdjzPTYLK0qVoEJYvN5RRCHJoVgZq2jNjZjTGU/d1vf9ycfTVfMGrMidSOtXA4FQWh+ptCIBXaTodMsT14QYM6ryCUAb9+PuWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727373902; c=relaxed/simple;
-	bh=P90jAMQnEj/JjSSn1UAesaGS/P8Nt1LtqX27I3+ikAY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rIqdTN5crnmG4dj5Am5CLBi07m4Pn7wIBjdrZnJAB1/yNestq2106sWjvi8IgLVkq6uBAwdV57dAbW2jseDqL/8gG9vZRbJT4UkkttdGFZbJZ/+1U6buy2pSj1lW3fL8uZxRvtY2q70MrH8xIIMzyOKgJfgxxi+HN7XXeWYcLvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JeRhJ9Ll; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727374982; c=relaxed/simple;
+	bh=/4WqgRe5s9vgyc5LBSdDIKRUwBTrI0EWw4wHpGcHIvo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tdm/bDInYoADWXB8sQTjMP/CIxovyseDQLKwp0ACcrJlqtW5f8cvtvEJ7kx9w2MRMI5dR46lCbTggDHeyFULLJqw64u2pCFOtRgVrLkBj+OLjiN6DddMb07czxHYilTzVcxEFgKPorHPq8l2KO0HGe6B4ux7RjL5OmEl5ZHFiyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AYTeNpXj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yVc5gq/6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AYTeNpXj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yVc5gq/6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JeRhJ9Ll"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53661ac5ba1so1470528e87.2
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2024 11:04:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727373895; x=1727978695; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bs8IHiR919/FmXobmmAaNiBkTBDzJNr6RBd6L6vrKcA=;
-        b=JeRhJ9LlSkzloF0nYy5hxiEVNOJfpu65vRslbVxAICMXWrDQ1StCc1PB/sha1J6fol
-         w7Wo3UglM6RR7K8c7pz4BAsAagBX6ItSM6O3lZi0ZlEYjjKqqwz/H+ojnSqJdpTpnRib
-         B6TtqtxA8SU3qY6ZiCklqDMFCpkSeydQdrgZoZ1oZz1bk4dnonDuoTus2zrHqcUD0H5A
-         68M2lCjrGng1yE7/uffmdAx/TYJPSYuWlXHE2CWE8lUVted9ZC1ID5ZdZHeRo9pGfZkk
-         tFZl8qulRh3E36drqzTXXLyKXwNoCSk0B5P7KnVVsAceGGC4DQpJA0J4XYoaCUntoadd
-         hZ9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727373895; x=1727978695;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bs8IHiR919/FmXobmmAaNiBkTBDzJNr6RBd6L6vrKcA=;
-        b=YtopliZDwU+qY+D5Ru2eAvDontUvkw12FHSc+PryL4L5VGcHgLgSB+tuwTMuD9WX34
-         Z2TWSb75996jutiWhLlbiFvGWu5fsMS2qM62pYmHGvJ28j9n554wQxAmkp2O+BlPLiFP
-         vav5uTwiHkL8THvdHqW8FkUP0hE1zBBC/1gbvnMZ/7INAjLHf92U30CuLnFv/9f95FIz
-         PZHO/XEI0H8kzktq+kqpnYnI9Yi5JyTs5ezffYviekKWSPHenVYX8uE5d09vawa2IZ6L
-         1fh4sW+zSRi8vufg4FO1xk5YaA/Z+wRkOIzUnyD4vkQzgBXdiRxv/Bl1z7NvtiZLgd9g
-         Ycwg==
-X-Gm-Message-State: AOJu0YwUuOT8DEhT7IjGWxyvjNCXkmvY1Ql1tsnZv9CabyHiWGD3blBe
-	A5aBxLt7D+yl9hCoT2W6PcA8X+WFAakNiVeXGJGd5oa+WOab9MRAbCLzeC5wYuFNfBxE8RwpH+n
-	RnyZ5Fo1WhCdpEmfS01Rt9wmWHu0ILKKI
-X-Google-Smtp-Source: AGHT+IHvcBRmoubQjek5cmVRCLNHBrZR44XAcf1o7WRXnfcJ59CatrzOXmXxidsEzMRNHCL0Fqnk4yFzx9gr9oPOSxo=
-X-Received: by 2002:a05:6512:3d93:b0:538:9eb8:c4a2 with SMTP id
- 2adb3069b0e04-5389fc30edcmr336701e87.6.1727373895122; Thu, 26 Sep 2024
- 11:04:55 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AYTeNpXj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yVc5gq/6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AYTeNpXj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yVc5gq/6"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 46D5021B0F;
+	Thu, 26 Sep 2024 18:22:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727374979; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4WqgRe5s9vgyc5LBSdDIKRUwBTrI0EWw4wHpGcHIvo=;
+	b=AYTeNpXjPET6u9zyCeVvu+KSN0TDX8FuUkAI1EXKwf3VuXJ92JCMvNKWTJa5aKifU5K6vA
+	xCioTIGzaZL7WK4uo0GpOTrVtiihoYrnTaz+p1QeVumfTjhlNLRMWeHoPD1VIzNwbk9tC0
+	q9wT4+IYsMgr9W124xJPDqpWJ3gfWqA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727374979;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4WqgRe5s9vgyc5LBSdDIKRUwBTrI0EWw4wHpGcHIvo=;
+	b=yVc5gq/6FEo9x7+SyESKo0tPjtiouF2vEVTHZzz9pGM91KXto4E8p2lWyBtJnhwoBJdXcb
+	vDFZbnEXFvk9RCDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727374979; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4WqgRe5s9vgyc5LBSdDIKRUwBTrI0EWw4wHpGcHIvo=;
+	b=AYTeNpXjPET6u9zyCeVvu+KSN0TDX8FuUkAI1EXKwf3VuXJ92JCMvNKWTJa5aKifU5K6vA
+	xCioTIGzaZL7WK4uo0GpOTrVtiihoYrnTaz+p1QeVumfTjhlNLRMWeHoPD1VIzNwbk9tC0
+	q9wT4+IYsMgr9W124xJPDqpWJ3gfWqA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727374979;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/4WqgRe5s9vgyc5LBSdDIKRUwBTrI0EWw4wHpGcHIvo=;
+	b=yVc5gq/6FEo9x7+SyESKo0tPjtiouF2vEVTHZzz9pGM91KXto4E8p2lWyBtJnhwoBJdXcb
+	vDFZbnEXFvk9RCDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BAB7313318;
+	Thu, 26 Sep 2024 18:22:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bQ4fIIKm9WbPOgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Thu, 26 Sep 2024 18:22:58 +0000
+Date: Thu, 26 Sep 2024 15:23:12 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
+	Shyam Prasad N <nspmangalore@gmail.com>, Bharath S M <bharathsm@microsoft.com>
+Subject: Re: default value of esize (min_encrypt_offload size)
+Message-ID: <oz3ewqwy6i62pqmaryuo4jyr62cutz3jmym23n5in6uvwbepjy@wfsqs5lufwwq>
+References: <CAH2r5msbBYdqe=2HQqrceJSCYLXhyBRemYwXMjrmXWvq_y9VkA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 26 Sep 2024 13:04:43 -0500
-Message-ID: <CAH2r5msbBYdqe=2HQqrceJSCYLXhyBRemYwXMjrmXWvq_y9VkA@mail.gmail.com>
-Subject: default value of esize (min_encrypt_offload size)
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: Enzo Matsumiya <ematsumiya@suse.de>, Shyam Prasad N <nspmangalore@gmail.com>, 
-	Bharath S M <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msbBYdqe=2HQqrceJSCYLXhyBRemYwXMjrmXWvq_y9VkA@mail.gmail.com>
+X-Spam-Score: -3.75
+X-Spamd-Result: default: False [-3.75 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.15)[-0.748];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,microsoft.com];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Does anyone have perf data on enabling esize (minimum size to
-determine if worth offloading for decryption) and what size (e.g. I
-was thinking 256K or 512K minimum encryption offload size)?
+On 09/26, Steve French wrote:
+>Does anyone have perf data on enabling esize (minimum size to
+>determine if worth offloading for decryption) and what size (e.g. I
+>was thinking 256K or 512K minimum encryption offload size)?
+>
+>Does setting esize help any workloads you have tried - and which ones?
 
-Does setting esize help any workloads you have tried - and which ones?
+On my very shallow tests, with esize=1, offloading decryption has a
+2x perf improvement.
+
+Decryption is (currently?) very costly -- I see an average of 700ms per
+4MiB payload on my test VM (with a high of 900ms!).
+
+IMHO the "inflight > 1" criteria is the best way to determine whether
+to offload decryption.
+
+I don't really have an opinion on esize/min_enc_offload, but if it's so
+hard to determine a default or minimum value to it, imagine leaving that
+choice to the user.
 
 
+My 2c,
 
--- 
-Thanks,
-
-Steve
+Enzo
