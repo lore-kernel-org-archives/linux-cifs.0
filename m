@@ -1,92 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E20188CB7;
-	Fri, 27 Sep 2024 08:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC8D176231;
+	Fri, 27 Sep 2024 10:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727424494; cv=none; b=Px+BW4IHy/7b8vy2AYidIiT2gS9szfsk8SCOkLHr9YqBu/RtmNH2feZ2FrQ+fflUGULxdLYjPzzBxHRtxxoaEmHwBHTpDE07AF4158lqUzeTd5idVjW5NRH33q/MVzXJw/OEHe90olKideTM+L1s4k6fpCHW90hDmnYVEVEjiOw=
+	t=1727434593; cv=none; b=q/qcNuIdQ1GCreaX3Gtn3mrWNayd7r6CsRj4nn20EyY1vNb71RTojDsVHyw1zSiRzd9dZaXDvYGv/sSkuYO7fl1JSHuJFakKqZD6OL6dglE5a/fEQJ6/gYMQbDNQRS3h6ofUTXnmotgKeoWQipuradiV+V95YmTbY10cdsb1c1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727424494; c=relaxed/simple;
-	bh=qrr8F6mhp37/8goTelXVcSv72h5Emk8kpcyLOVTI7nQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A0fgcehOzCbX08qFwbCZgqOR6hShXMABfS6r2jjw1WQ5SJUh4na295JbGoH4piX/OB5u9dQhzCqamOzeGXw8g1A6UFGieziwtQYiwZlqOZUzncG7YbegeS9AP3T5/48+edaDAiS9GMoPwyqgjxmQxyxP4ILiWdN6BrGet/NVCPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Outd2lB0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727434593; c=relaxed/simple;
+	bh=EFuzS/7penP/8DikVwd3I9P1HIGUllWDy+0Pu1nsKC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F+GZl12n3OLhqOOvroI+DfxS9v4TFiGBchJUtnjS+y5dTZzadPmPxUsVUeFg+ZiVc1wt7G6s//eXAYnqhrXFSrOkJBtUaQ6bdG/mkIYP9mEiQrI336ehf8V3F3NF6CVQrS9lvxWINm8ELBkgJjdKqsEPSQMPPL0lI/Z90uPFmyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=VdcNwFqk; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Outd2lB0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1C4DC4CEC4;
-	Fri, 27 Sep 2024 08:08:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727424494;
-	bh=qrr8F6mhp37/8goTelXVcSv72h5Emk8kpcyLOVTI7nQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Outd2lB01VOTLYDOGeswQwueKzlm+EOifqdxlQ4wB/8MrqP6mZtqn6n+rKIoTqc1e
-	 kiisilHVnZCIEJvalKnA3qR2YHOkwk+HzZxQYLedHYLRTpBSFEheAsUMMOVVXFYRgj
-	 oZNhoNHLcUvthQxoFMAThjmuiGgHXqnMfBJJboyDD3j6cY2fyYQxHOwaNlAfY9ESKo
-	 grEtBzrVEHlyEpt136/mYVhFyRdz36/t+JDZSXA5Mge9d5fwWXYM2cDL4KIrNMeMd8
-	 WUGeJbN6K897pM3Cb8O2g8BA94c0wF4P33q9OSZrB7Mfqe5Ls744JoZHQWmwTx2/kE
-	 UOLO55iVty1Fw==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Marc Dionne <marc.dionne@auristor.com>
-Subject: Re: (subset) [PATCH 6/8] afs: Fix the setting of the server responding flag
-Date: Fri, 27 Sep 2024 10:07:59 +0200
-Message-ID: <20240927-inklusive-erfunden-8a9df201244e@brauner>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240923150756.902363-7-dhowells@redhat.com>
-References: <20240923150756.902363-1-dhowells@redhat.com> <20240923150756.902363-7-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="VdcNwFqk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	In-Reply-To:References; bh=XlItckOsmTBXG7EYIPU02ZIPvmvGMSn1RQlpeMUpnPo=;
+	t=1727434591; x=1727866591; b=VdcNwFqkjlnzUJccOR9x55UsJZEfL6vU/ZDb5BLwl8Ed2jZ
+	Xuu8AZ4vOc/g3XEJGVBlhf4xGTkbF3Yl7GpCSGNQd1Y0dWcl1HanI04EBeUpYHkmzeqixDZCwCx8X
+	6WhXRYCDjri9mgrXXIRKAjkZaYV5edgWcVCYVK0VPoMDR3AmqogYnQF8wqO24JpUNK/soJWHAHIHJ
+	jWUUdx9lZUtbSZwsvi4cjGDB49V2AfaSUxxjaaQ9sojJFMTAoDHVhhIDyW6w089VqztmsNW5ja+KY
+	Fj93Rbv1IldrarCZgG0L3mT844zgy+Cs5Lx9QfLk9Y1xJcdExiBqbxPPFx3M31Uw==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1su8e6-0003fO-Da; Fri, 27 Sep 2024 12:56:22 +0200
+Message-ID: <fb4c481d-91ba-46b8-b11a-534597a2b467@leemhuis.info>
+Date: Fri, 27 Sep 2024 12:56:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1300; i=brauner@kernel.org; h=from:subject:message-id; bh=qrr8F6mhp37/8goTelXVcSv72h5Emk8kpcyLOVTI7nQ=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaR9S3928A/vY47APBNFzaQswV4+Pw8Hlu3a9bd+cD9uO Frlc/JtRykLgxgXg6yYIotDu0m43HKeis1GmRowc1iZQIYwcHEKwETyLzMyTNTnfr5xfcZix1xr Tj7JEPepAnKn+FvmbAnf0rfRyop5DsP/gIP2Vf3Nm3a29nDoVNhIl9UaHjpdV197f2eb0M+i678 5AQ==
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
+ stable/linux-6.1.y breaks cifs client failover to another server in DFS
+ namespace
+To: Andrew Paniakin <apanyaki@amazon.com>,
+ Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Christian Heusel <christian@heusel.eu>, pc@cjr.nz,
+ stfrench@microsoft.com, sashal@kernel.org, pc@manguebit.com,
+ stable@vger.kernel.org, linux-cifs@vger.kernel.org, abuehaze@amazon.com,
+ simbarb@amazon.com, benh@amazon.com, gregkh@linuxfoundation.org
+References: <ZnMkNzmitQdP9OIC@3c06303d853a.ant.amazon.com>
+ <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
+ <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
+ <ZnyRlEUqgZ_m_pu-@3c06303d853a>
+ <a58625e7-8245-4963-b589-ad69621cb48a@heusel.eu>
+ <7c8d1ec1-7913-45ff-b7e2-ea58d2f04857@leemhuis.info>
+ <ZpHy4V6P-pawTG2f@3c06303d853a.ant.amazon.com>
+ <Zp7-gl5mMFCb4UWa@3c06303d853a.ant.amazon.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <Zp7-gl5mMFCb4UWa@3c06303d853a.ant.amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1727434591;708cab26;
+X-HE-SMSGID: 1su8e6-0003fO-Da
 
-On Mon, 23 Sep 2024 16:07:50 +0100, David Howells wrote:
-> In afs_wait_for_operation(), we set transcribe the call responded flag to
-> the server record that we used after doing the fileserver iteration loop -
-> but it's possible to exit the loop having had a response from the server
-> that we've discarded (e.g. it returned an abort or we started receiving
-> data, but the call didn't complete).
+On 23.07.24 02:51, Andrew Paniakin wrote:
+> On 12/07/2024, Andrew Paniakin wrote:
+>> On 11/07/2024, Linux regression tracking (Thorsten Leemhuis) wrote:
+>>> On 27.06.24 22:16, Christian Heusel wrote:
+>>>> On 24/06/26 03:09PM, Andrew Paniakin wrote:
+>>>>> On 25/06/2024, Christian Heusel wrote:
+>>>>>> On 24/06/24 10:59AM, Andrew Paniakin wrote:
+>>>>>>> On 19/06/2024, Andrew Paniakin wrote:
+>>>>>>>> Commit 60e3318e3e900 ("cifs: use fs_context for automounts") was
+>>
+>>> Hmmm, unless I'm missing something it seems nobody did so. Andrew, could
+>>> you take care of that to get this properly fixed to prevent others from
+>>> running into the same problem?
+>>
+>> We got the confirmation from requesters that the kernel with this patch
+>> works properly, our regression tests also passed, so I submitted
+>> backport request:
+>> https://lore.kernel.org/stable/20240713031147.20332-1-apanyaki@amazon.com/
 > 
-> This means that op->server might be NULL, but we don't check that before
-> attempting to set the server flag.
-> 
-> [...]
+> There was an issue with backporting the follow-up fix for this patch:
+> https://lore.kernel.org/all/20240716152749.667492414@linuxfoundation.org/
+> I'll work on fixing this issue and send new patches again for the next cycle.
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+Andrew, was there any progress? From here it looks like this fell
+through the cracks, but I might be missing something.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[6/8] afs: Fix the setting of the server responding flag
-      https://git.kernel.org/vfs/vfs/c/830c1b2c1c28
+Ciao, Thorsten
