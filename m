@@ -1,65 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB31B641;
-	Sat, 28 Sep 2024 00:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449BD101E2;
+	Sat, 28 Sep 2024 00:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727484238; cv=none; b=i3sr2CAApeu5gKx7yWGT8Suh6a7v3c7NTrxXe3zCalWAT3ZV9itk+3lCSe9q65tgoRTLCr2IDJLAh3shIggFpBz90OqiFSzX/1OI00wlQspjmH8lKeu45itev4CJ+bJVdK3yNicEp+CY4fbioj843Te9H0NsHS2uMiswqNPMTGU=
+	t=1727484822; cv=none; b=P78q7rjHmDuX4bsnusJvjD6wN82mWGXYpee1wUtPHfXRsCktjJY2OA4xT2Z551bCFw2dWgrkmA1084lf8gu7UPYFiuiM7spO9SgNf3RbjuqdmcGPulRKn+lri43FPxNVXjMRVtIL60aySdom0vLbBEz7qaoCEnCn9B+WYy3AzF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727484238; c=relaxed/simple;
-	bh=1Nkv3/vZsyn0bPP6JMKVOIIvIbroZDhLV82CtZVVTcc=;
+	s=arc-20240116; t=1727484822; c=relaxed/simple;
+	bh=M6RSOZbadviKrK3aTrBAXSlrSJMsJ1jTZQG5Twep6hs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cqaiPmtqN93pug/FCVPLi4ZShXKB2XMjLppilWrRBmK2g6FuWYIK1hLmCBH3uVJxAQPgeWYEfshX3ZYnmwJSsa9JGNAyaGdrhHCZz0vcGligUjd2XzYWOczlcna5Sn2f5ckkGyvasyYNhHKHtGrhYM3Z1E9/CgWnpCJQtI6kU/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3TShJzI; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=eS4On3WVUQxcu+CaPo3UfdQYteezwyYVuKcgllvFVCTy0J1RcFlGhlS15X+13iWfm2VoItOel0JIy/GhKBi+fIeN+iawWU+rRndov0Q5OAAeOg2qJY1c1zvcXxlok4Ob7dbexMVNew/xHP4ayAxt0ckHnIApuJGpVrJqdExJJYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY+O9bdx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3TShJzI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C5A9C4CEC6;
-	Sat, 28 Sep 2024 00:43:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY+O9bdx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFBC1C4AF0B;
+	Sat, 28 Sep 2024 00:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727484237;
-	bh=1Nkv3/vZsyn0bPP6JMKVOIIvIbroZDhLV82CtZVVTcc=;
+	s=k20201202; t=1727484821;
+	bh=M6RSOZbadviKrK3aTrBAXSlrSJMsJ1jTZQG5Twep6hs=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=A3TShJzIPQC3BvdFkGppCuxAETLS/v4HO7bWsyDrqoWhqc7jvTqIVlpLdJZ5GidNj
-	 S5J8AR4/PVja4ok7p6x8Of6e+BKYZCrJCbgIWHtkTebA3hJfc4IaS4EqgPPrjUwjgC
-	 EsiyNSdoJdj+/feZANnLi1BidSL4SFGyz6PO/qkByO7gWS6PWmc75IrO/QmVPiixOw
-	 4VD+ZJsKp1ybYH8qmDrujj0QRZK8k6u4VixGNN1ULdaLoLkTQEUqUM9+7Pr9maa35+
-	 VoRCewgQTiaG4Vi02C0ZD/ZaEQLRli/F/4tLwWj40+nMSSoJts5Io/9tS3Bo4XyNqb
-	 FxionpQk6+/zA==
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5e1baf317c7so1155020eaf.2;
-        Fri, 27 Sep 2024 17:43:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVDkqYfu0wEMy0Ot3Q22noN0d4XTqdhtUbXy8kFjr7Mz9Oc6ubuJa03E4HOjRuJEaYC8nPWvmJ45d7Y@vger.kernel.org, AJvYcCW/0pl5qpp+KcaaLryLXIDGzBkAu1ObIPp71YvSWDGv7StP1wiSpDMS2pMOfYU4cfXOJWz2gEJrQwBQl/1m@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJLUSXxssfOYzcqwVthuo8FfWlYnKCh6+44icDFHulWPOixwsl
-	/HiP3FHUVam3Jk3QblUpZwG4M6SmgmT4fOkQJhIGIiDc8MdVJokF9uk9LeqXCRFQopIfVz2kBd/
-	dTvlC6JpUivL8lB9/d04+bAO6AvI=
-X-Google-Smtp-Source: AGHT+IEPKZbfE2U1eNHim9IuiFMSauP5e22V0EpAgqJZa0n89StUqYHPt88fePg+LI2f1c+r6mjoS3IxbpRNdV2VxwU=
-X-Received: by 2002:a05:6820:81e:b0:5e1:c9d8:38ca with SMTP id
- 006d021491bc7-5e7727637a9mr2766761eaf.4.1727484236969; Fri, 27 Sep 2024
- 17:43:56 -0700 (PDT)
+	b=YY+O9bdxJzxiyNtC7Q/7DtqEB0QYU0dCLkZIATKq/Txg6MQcHUv2IDsJv0D4eW5TI
+	 h4ewlbtT14VUY5UMuG2UreWJPke6cO5LAsgfgTjs3O6Nte9UoKjqh603OY240HJTBE
+	 GCqwU0nrOC9mDbZxAXm2zoGX/6fR8q9WkT4vIb91tQtn/Q2ZTPIaSqcQqBa9BJ2eIM
+	 7k80bFhHBJvj0PcpM51zV/92zc2DXPtQZ8bPH6Tg6Lr4TJT+uf71ymakR1nyw7vZl1
+	 o2Iak3LDfRrxrV3zrbu+VG0YaNzbN2CwClbK8BsATTuO+3CQVJFmMopzGj3rPQ1pb4
+	 nWQ4R9cqbKtIA==
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5e1b6e8720dso1430530eaf.0;
+        Fri, 27 Sep 2024 17:53:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVKMr0O+tmS/fQInbpxA819T2SvzTy5feopZ7B0bwtJBFcdXTa4DjZ6KSZJTQPVv3tk9rg/7RdgkRUwpnZHTQsp@vger.kernel.org, AJvYcCVQ5IjhGxwmyYCHH5Au9QB3zlQK4wSfmUFxul0tXCc0QZKriRTPLEWmS+QUe5Vjw6raRCZWEne5hxqk@vger.kernel.org, AJvYcCVwRL64757q/DBKRKuuY5dCc6ZYl40g5N8VJr0TtRdXAhHauJ5dL1942cL2hHN2oiJBRXXp9yUsr3frmlEV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4+wLM6X+DAgp4ck6I8BFKYgMxFdWduYA+8d32eu8CrLbtMdMw
+	S9i0ixMhdgQ7EbmclDYLuvu5THSOtYErvkH7/vBLlvnOt+gZOYQpseS0s/OOYJ062h3B91+Xi2h
+	ZpvgzFafflGBlTJo/VpV+Xx2357Y=
+X-Google-Smtp-Source: AGHT+IFl8cYWBZ2K1SWBPY0SW+FCHnU5DEv8uBX96Z6/GBq0PQ68fjdRpWs6j5nn797NTMoWB+1+8NY3dBWTtPZBX/E=
+X-Received: by 2002:a05:6820:2208:b0:5e5:7086:ebe8 with SMTP id
+ 006d021491bc7-5e77244736emr3030436eaf.0.1727484821128; Fri, 27 Sep 2024
+ 17:53:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927143642.2086-2-thorsten.blum@linux.dev>
-In-Reply-To: <20240927143642.2086-2-thorsten.blum@linux.dev>
+References: <20240925090313.22310-2-thorsten.blum@linux.dev>
+In-Reply-To: <20240925090313.22310-2-thorsten.blum@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 28 Sep 2024 09:43:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-WoiaJP23fMUCY8Txyo8wG0Rsfge7BkQ2Ub5AseJ41ww@mail.gmail.com>
-Message-ID: <CAKYAXd-WoiaJP23fMUCY8Txyo8wG0Rsfge7BkQ2Ub5AseJ41ww@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Use struct_size() to improve get_file_alternate_info()
+Date: Sat, 28 Sep 2024 09:53:30 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9ihJRoY0yzS9mANHBQGM7zPRsSMzo4784bKLqj0MzGMQ@mail.gmail.com>
+Message-ID: <CAKYAXd9ihJRoY0yzS9mANHBQGM7zPRsSMzo4784bKLqj0MzGMQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: Annotate struct copychunk_ioctl_req with __counted_by_le()
 To: Thorsten Blum <thorsten.blum@linux.dev>
 Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+	Tom Talpey <tom@talpey.com>, Kees Cook <kees@kernel.org>, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 27, 2024 at 11:37=E2=80=AFPM Thorsten Blum <thorsten.blum@linux=
-.dev> wrote:
+On Wed, Sep 25, 2024 at 6:10=E2=80=AFPM Thorsten Blum <thorsten.blum@linux.=
+dev> wrote:
 >
-> Use struct_size() to calculate the output buffer length.
+> Add the __counted_by_le compiler attribute to the flexible array member
+> Chunks to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
+> CONFIG_FORTIFY_SOURCE.
+>
+> Change the data type of the flexible array member Chunks from __u8[] to
+> struct srv_copychunk[] for ChunkCount to match the number of elements in
+> the Chunks array. (With __u8[], each srv_copychunk would occupy 24 array
+> entries and the __counted_by compiler attribute wouldn't be applicable.)
+>
+> Use struct_size() to calculate the size of the copychunk_ioctl_req.
+>
+> Read Chunks[0] after checking that ChunkCount is not 0.
+>
+> Compile-tested only.
 >
 > Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 Applied it to #ksmbd-for-next-next.
-Thanks.
+Thanks!
