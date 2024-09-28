@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C93482488;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2B21448E2;
 	Sat, 28 Sep 2024 22:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727560847; cv=none; b=obcIcLVHrS/ffgvnRbni4vAPM8iPoW+h0E5y4WulSPv+DKi6Xt+5+7ccEhC+2XeiJbIlcE6z0qQK6RTk+0ppQ8u2tv0UDptky2QV6i/TEZDVgg18N7rWJoNzeu6I+w4X0J32wKrewJ/tq2AbRD4rmrbMwX0zY9qp7hV4mYwTFPg=
+	t=1727560847; cv=none; b=ahVqBJOvPKBIccmUF6KZ8QnTxAHONd23kJ2RJYAwCDoc4WtapTj451XDD66oUJYcsOXQhqSFoZ9dxZAufWwLwPF9ZACpj+O2Uo5N0VUyPisZRjcx2q3KnR8EnKzsxE+zk/YpjkUrz6pKr2QZe4+eli1suAvgEbyw2k8QuUGpKbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727560847; c=relaxed/simple;
-	bh=30vYceahhAZ6cpDf6/qon3ZtC2Ak+QBMUSkaa2C2LTQ=;
+	bh=ibU0NV9N4+As9CYwIR1i1p9CSz0pkS/imGG+NsSGISs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RC0U4l9/j3jERoOvk94yasQqap1GN/AmQJo1ynTzB8i/OZe7eMb+CxdN3WafgOh9y8oXlhRZpZFa89S5NsqbSmDdFJezK0aRyjtKPqNJvwteHs98pXoYwsTW6Hg0zkH27h1ZaWGpKxfJzBWKNslk2DTFariXQrWJNdbznadovGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/L1YbNQ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Tp5gh+M7XcHNaFm+3ibqx3QFVpU0LqWcGZ+U7bjJWJ5i7g0fYs4HvAtjWpA4Y3V1VlN4JNpjddyZwCup93S2pmzdsDRXyPIZjHjxWyc+2PHLI4kEPRosGjHZ9EPjOEewORHJuxHp41lBLpmixV419tUY9tnxtY3p5C8kQnNQ0l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aucaODyi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/L1YbNQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 103CDC4CEC5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aucaODyi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16324C4AF0B;
 	Sat, 28 Sep 2024 22:00:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1727560847;
-	bh=30vYceahhAZ6cpDf6/qon3ZtC2Ak+QBMUSkaa2C2LTQ=;
+	bh=ibU0NV9N4+As9CYwIR1i1p9CSz0pkS/imGG+NsSGISs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B/L1YbNQ4eAf5eSMc2BCNwNXBHBlz8kVTzMQ5Z3h0yyUuDPiJd49dzATnPAahPPZi
-	 RLz1Nk/NjcJyh2+8djh8+xRJJhwozlkEMBWGR4SuAN+H5YNzrasVDUU7TtFy4GhnoS
-	 i1sryzAo9BXMzdEpeHLj+NIZkpdavlnt3tiUVyWisP5zH16rxw94Ym5LnNTL96utAQ
-	 Gd1h0sdEL/1WQegu351IdPu1f6v5jlJSYzkET4yr7N5Z9s23yvptGcbD5kHxb5Mzkc
-	 6QXM7mtUvGvdJdFW0zTbPPcCIXcWXw35S1S8eOqeu/2hBBSXpokU7BZ8V7VTQtdahq
-	 Q6gUOWaUrVPQg==
+	b=aucaODyiw5YiE+714jUSi/JtbTY+9MMtXGxUpmNd99cD6wfXLmWa6QtjhMTu/xCdH
+	 Z7L8TfLyZrqcB35EgcLTUhNrPclEFZnScdC9PU5ypTnn/DH9bRJiCF2/L8guUa1pi1
+	 GFF478yGrzNRoIdQtpHELR9NwmY3yixdwRFN4OuBBzJoih5jmtEFk8kFEITFvS6Dkm
+	 bKTX9OFLqeEOE5OULKCNlm7+qIOD75IJGTEUmsyeSFQhuRIQAiMww4DmuLJedkND5I
+	 yBS9C41UkCbf3NpsQnvhhy2o/LHgmbrf+BzOzJYlz0myYIfoNzjOe2UN7fQGSMfqwE
+	 ppYsbMlavpeXg==
 Received: by pali.im (Postfix)
-	id 5F9EF9F7; Sun, 29 Sep 2024 00:00:40 +0200 (CEST)
+	id 9E3A6A4E; Sun, 29 Sep 2024 00:00:40 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/8] smb: Update comments about some reparse point tags
-Date: Sat, 28 Sep 2024 23:59:41 +0200
-Message-Id: <20240928215948.4494-2-pali@kernel.org>
+Subject: [PATCH 2/8] cifs: Remove intermediate object of failed create reparse call
+Date: Sat, 28 Sep 2024 23:59:42 +0200
+Message-Id: <20240928215948.4494-3-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20240928215948.4494-1-pali@kernel.org>
 References: <20240928215948.4494-1-pali@kernel.org>
@@ -49,49 +49,71 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-NFS-style reparse points are recognized only by the Windows NFS server 2012
-and new. Windows 8 does not contain Windows NFS server, so these reparse
-points are not used on Windows 8.
+If CREATE was successful but SMB2_OP_SET_REPARSE failed then remove the
+intermediate object created by CREATE. Otherwise empty object stay on the
+server when reparse call failed.
 
-Reparse points with IO_REPARSE_TAG_AF_UNIX tag were primarily introduced for
-native Win32 AF_UNIX sockets and later were re-used by also by WSL:
-https://devblogs.microsoft.com/commandline/af_unix-comes-to-windows/
-https://devblogs.microsoft.com/commandline/windowswsl-interop-with-af_unix/
+This ensures that if the creating of special files is unsupported by the
+server then no empty file stay on the server as a result of unsupported
+operation.
 
+Fixes: 102466f303ff ("smb: client: allow creating special files via reparse points")
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/common/smbfsctl.h | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/smb/client/smb2inode.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/common/smbfsctl.h b/fs/smb/common/smbfsctl.h
-index a94d658b88e8..4b379e84c46b 100644
---- a/fs/smb/common/smbfsctl.h
-+++ b/fs/smb/common/smbfsctl.h
-@@ -140,20 +140,21 @@
- /* Used by the DFS filter See MS-DFSC */
- #define IO_REPARSE_TAG_DFSR          0x80000012
- #define IO_REPARSE_TAG_FILTER_MANAGER 0x8000000B
--/* See section MS-FSCC 2.1.2.4 */
-+/* Native SMB symlinks since Windows Vista, see MS-FSCC 2.1.2.4 */
- #define IO_REPARSE_TAG_SYMLINK       0xA000000C
- #define IO_REPARSE_TAG_DEDUP         0x80000013
- #define IO_REPARSE_APPXSTREAM	     0xC0000014
--/* NFS symlinks, Win 8/SMB3 and later */
-+/* NFS special files used by Windows NFS server since Windows Server 2012, see MS-FSCC 2.1.2.6 */
- #define IO_REPARSE_TAG_NFS           0x80000014
- /*
-  * AzureFileSync - see
-  * https://docs.microsoft.com/en-us/azure/storage/files/storage-sync-cloud-tiering
-  */
- #define IO_REPARSE_TAG_AZ_FILE_SYNC  0x8000001e
-+/* Native Win32 AF_UNIX sockets since Windows 10 April 2018 Update, used also by WSL */
-+#define IO_REPARSE_TAG_AF_UNIX       0x80000023
- /* WSL reparse tags */
- #define IO_REPARSE_TAG_LX_SYMLINK    0xA000001D
--#define IO_REPARSE_TAG_AF_UNIX	     0x80000023
- #define IO_REPARSE_TAG_LX_FIFO	     0x80000024
- #define IO_REPARSE_TAG_LX_CHR	     0x80000025
- #define IO_REPARSE_TAG_LX_BLK	     0x80000026
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 11a1c53c64e0..af42f44bdcf4 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1205,6 +1205,8 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+ 	struct cifsFileInfo *cfile;
+ 	struct inode *new = NULL;
++	int out_buftype[2] = {};
++	struct kvec out_iov[2];
+ 	struct kvec in_iov[2];
+ 	int cmds[2];
+ 	int rc;
+@@ -1228,7 +1230,7 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 		cmds[1] = SMB2_OP_POSIX_QUERY_INFO;
+ 		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
+ 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
+-				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
++				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
+ 		if (!rc) {
+ 			rc = smb311_posix_get_inode_info(&new, full_path,
+ 							 data, sb, xid);
+@@ -1237,12 +1239,27 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 		cmds[1] = SMB2_OP_QUERY_INFO;
+ 		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
+ 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
+-				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
++				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
+ 		if (!rc) {
+ 			rc = cifs_get_inode_info(&new, full_path,
+ 						 data, sb, xid, NULL);
+ 		}
+ 	}
++
++	if (rc) {
++		/*
++		 * If CREATE was successful but SMB2_OP_SET_REPARSE failed then
++		 * remove the intermediate object created by CREATE. Otherwise
++		 * empty object stay on the server when reparse call failed.
++		 */
++		if (((struct smb2_hdr *)out_iov[0].iov_base)->Status == STATUS_SUCCESS &&
++		    ((struct smb2_hdr *)out_iov[1].iov_base)->Status != STATUS_SUCCESS)
++			smb2_unlink(xid, tcon, full_path, cifs_sb, NULL);
++	}
++
++	free_rsp_buf(out_buftype[0], out_iov[0].iov_base);
++	free_rsp_buf(out_buftype[1], out_iov[1].iov_base);
++
+ 	return rc ? ERR_PTR(rc) : new;
+ }
+ 
 -- 
 2.20.1
 
