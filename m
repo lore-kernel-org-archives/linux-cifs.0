@@ -1,80 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449BD101E2;
-	Sat, 28 Sep 2024 00:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53027494;
+	Sat, 28 Sep 2024 02:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727484822; cv=none; b=P78q7rjHmDuX4bsnusJvjD6wN82mWGXYpee1wUtPHfXRsCktjJY2OA4xT2Z551bCFw2dWgrkmA1084lf8gu7UPYFiuiM7spO9SgNf3RbjuqdmcGPulRKn+lri43FPxNVXjMRVtIL60aySdom0vLbBEz7qaoCEnCn9B+WYy3AzF4=
+	t=1727489156; cv=none; b=ntUPiS+UD6Jqa+T4yrM86tAuhE8RTJzDGc2lS9domjOKmHf1G50lYef9dVVXIOR4uRDuMFTPcC0Zgf3cZ4UD9eS19D7iamlMsbWWehuSzhpbo+muyR/IOr/08RhgrFH47yQMA5VRKrH7MPEjiDM8akCM/eK1a3zTKQmG4RJ39fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727484822; c=relaxed/simple;
-	bh=M6RSOZbadviKrK3aTrBAXSlrSJMsJ1jTZQG5Twep6hs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eS4On3WVUQxcu+CaPo3UfdQYteezwyYVuKcgllvFVCTy0J1RcFlGhlS15X+13iWfm2VoItOel0JIy/GhKBi+fIeN+iawWU+rRndov0Q5OAAeOg2qJY1c1zvcXxlok4Ob7dbexMVNew/xHP4ayAxt0ckHnIApuJGpVrJqdExJJYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY+O9bdx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727489156; c=relaxed/simple;
+	bh=yHeCVcxV974GSM6bSxhu36POnJDRmLlJe+DU46A7luA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZzkZf0BGWDdeZOqZjRoqDPYPdjuz2stX2UMk0WgL/tdIK+IYm/25i0evikZvsTdTB7vrMaAoAHsyI4MD/D1nZiI6u3wCc8B3JVCbc5s7ln8qLtZu/ujE8yPyqj1JOZRlQkaoVwXdWsZiRMidfv74heAipxy9n4SilYc3f3/ggbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvAz3YYl; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY+O9bdx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFBC1C4AF0B;
-	Sat, 28 Sep 2024 00:53:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727484821;
-	bh=M6RSOZbadviKrK3aTrBAXSlrSJMsJ1jTZQG5Twep6hs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=YY+O9bdxJzxiyNtC7Q/7DtqEB0QYU0dCLkZIATKq/Txg6MQcHUv2IDsJv0D4eW5TI
-	 h4ewlbtT14VUY5UMuG2UreWJPke6cO5LAsgfgTjs3O6Nte9UoKjqh603OY240HJTBE
-	 GCqwU0nrOC9mDbZxAXm2zoGX/6fR8q9WkT4vIb91tQtn/Q2ZTPIaSqcQqBa9BJ2eIM
-	 7k80bFhHBJvj0PcpM51zV/92zc2DXPtQZ8bPH6Tg6Lr4TJT+uf71ymakR1nyw7vZl1
-	 o2Iak3LDfRrxrV3zrbu+VG0YaNzbN2CwClbK8BsATTuO+3CQVJFmMopzGj3rPQ1pb4
-	 nWQ4R9cqbKtIA==
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5e1b6e8720dso1430530eaf.0;
-        Fri, 27 Sep 2024 17:53:41 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVKMr0O+tmS/fQInbpxA819T2SvzTy5feopZ7B0bwtJBFcdXTa4DjZ6KSZJTQPVv3tk9rg/7RdgkRUwpnZHTQsp@vger.kernel.org, AJvYcCVQ5IjhGxwmyYCHH5Au9QB3zlQK4wSfmUFxul0tXCc0QZKriRTPLEWmS+QUe5Vjw6raRCZWEne5hxqk@vger.kernel.org, AJvYcCVwRL64757q/DBKRKuuY5dCc6ZYl40g5N8VJr0TtRdXAhHauJ5dL1942cL2hHN2oiJBRXXp9yUsr3frmlEV@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4+wLM6X+DAgp4ck6I8BFKYgMxFdWduYA+8d32eu8CrLbtMdMw
-	S9i0ixMhdgQ7EbmclDYLuvu5THSOtYErvkH7/vBLlvnOt+gZOYQpseS0s/OOYJ062h3B91+Xi2h
-	ZpvgzFafflGBlTJo/VpV+Xx2357Y=
-X-Google-Smtp-Source: AGHT+IFl8cYWBZ2K1SWBPY0SW+FCHnU5DEv8uBX96Z6/GBq0PQ68fjdRpWs6j5nn797NTMoWB+1+8NY3dBWTtPZBX/E=
-X-Received: by 2002:a05:6820:2208:b0:5e5:7086:ebe8 with SMTP id
- 006d021491bc7-5e77244736emr3030436eaf.0.1727484821128; Fri, 27 Sep 2024
- 17:53:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvAz3YYl"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53659867cbdso4349666e87.3;
+        Fri, 27 Sep 2024 19:05:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727489153; x=1728093953; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=73Eq7hQfzJxkknzN+e5tNVZCrxvb8j71k6JFA/AKqE0=;
+        b=lvAz3YYlkO4tGmQJcjFEjkJ1Kpovm77d1USutYPje9a801VV8LQFGgCKRvmj8OwLyJ
+         nwREed59XSzm1w8KP27OLKgvnx7UPNDYLtxTf9LKSvKGt39DM+g+0KgmeDMw5TNbDPxO
+         i8tC1lJjcx+H8+R6vqwUSu7Eyr6xmooQuerM2D2d3NJolz0DDUo05MpqjMc6rv92jblF
+         JZsYFSsbtE0DUbLVBeK0N/ULmhspJdw6FmmFZNISTvfIekSa3inWopJ/6LmOeagyXCBe
+         oe4QUppsGzBubkEPIWhNrkOd5xcUpKMeAET/MittH2+lDAmqfIysYnXY7UBcoAMXuKS3
+         4BCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727489153; x=1728093953;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=73Eq7hQfzJxkknzN+e5tNVZCrxvb8j71k6JFA/AKqE0=;
+        b=A96T2mmWzjHLzLGSWUlyFGbnNcsz57NFmW7IxC822tuyjCISnzwhPQANGhfVWnRJvo
+         6yG8e5N6A3RSv2ebGsAe1cUcROQKG1yAhqLX9k3RrZxa4ggtoH3Kjw+eCs97asLQ3NkW
+         58omn3Z0qoQkdC9FXor1wNOAVt9DWicSju0NGtu1BLGn8WKfh4ZNrMX0HRa8ykr20o8X
+         Y6TLyKlGY+m4HM+AbtibU/0lm1iXiLrXb+AZ+UQFV3yIJGry3o3Swql4ZOeq/K/i6+7T
+         +bDvLIZxc5wOLduThNcZBjpIh1SezrU0bLoegqxt4JNH7BSvGmilZQImNqCalIEvp7m4
+         ZCaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBY6r9UVnQrYdRjtgWGhKL9fJhGfhvmRHDZWSVtSBo/wzDR/HNUjykLGdwr0RhFKYY/RQTYIhyDEcI@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUTfz5Mc/iw4LGKw2nIkjj51zfjfpe5pC4rt66Whb5/Rr1C2ED
+	9FWe17MEQ1xcsrEClRApKoycDuY+SIZxc4iTI53G/TugjiyhkRBfydaolNb02kx1bINJYnxkds1
+	0Vrx1NzFI1BQQERdRHiAKGvTsJlHnuFer
+X-Google-Smtp-Source: AGHT+IEhi/6Kz4ymENdZxVzCtCDzoOXQ3bEUuZTV6LGGnURikQhlzjlztASgj/s6dZ26pt4uWnkI426cMRIZXXTzaYo=
+X-Received: by 2002:a05:6512:3095:b0:536:a5ee:bb75 with SMTP id
+ 2adb3069b0e04-5389fc3f106mr5354615e87.21.1727489152541; Fri, 27 Sep 2024
+ 19:05:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925090313.22310-2-thorsten.blum@linux.dev>
-In-Reply-To: <20240925090313.22310-2-thorsten.blum@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 28 Sep 2024 09:53:30 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9ihJRoY0yzS9mANHBQGM7zPRsSMzo4784bKLqj0MzGMQ@mail.gmail.com>
-Message-ID: <CAKYAXd9ihJRoY0yzS9mANHBQGM7zPRsSMzo4784bKLqj0MzGMQ@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: Annotate struct copychunk_ioctl_req with __counted_by_le()
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 27 Sep 2024 21:05:40 -0500
+Message-ID: <CAH2r5mvoGx=vCTUjHWzU2ywfvFrV5b5+GEvvL9PQDL=ydTzd7A@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 25, 2024 at 6:10=E2=80=AFPM Thorsten Blum <thorsten.blum@linux.=
-dev> wrote:
->
-> Add the __counted_by_le compiler attribute to the flexible array member
-> Chunks to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE.
->
-> Change the data type of the flexible array member Chunks from __u8[] to
-> struct srv_copychunk[] for ChunkCount to match the number of elements in
-> the Chunks array. (With __u8[], each srv_copychunk would occupy 24 array
-> entries and the __counted_by compiler attribute wouldn't be applicable.)
->
-> Use struct_size() to calculate the size of the copychunk_ioctl_req.
->
-> Read Chunks[0] after checking that ChunkCount is not 0.
->
-> Compile-tested only.
->
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Please pull the following changes since commit
+4e0373f1f920811a67fef0c3383f1ad602b3845e:
+
+  Merge tag 'v6.12-rc-smb3-client-fixes-part1' of
+git://git.samba.org/sfrench/cifs-2.6 (2024-09-19 06:53:40 +0200)
+
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/v6.12-rc-ksmbd-server-fixes
+
+for you to fetch changes up to 9e676e571d39eb6189bf6d55a9c401ba2dd13410:
+
+  ksmbd: Correct typos in multiple comments across various files
+(2024-09-25 21:33:22 -0500)
+
+----------------------------------------------------------------
+5 smb3 server fixes:
+- fix querying dentry for char/block special files
+- Four small cleanup patches
+
+----------------------------------------------------------------
+Namjae Jeon (3):
+      ksmbd: fix warning: comparison of distinct pointer types lacks a cast
+      ksmbd: remove unsafe_memcpy use in session setup
+      ksmbd: fix open failure from block and char device file
+
+Shen Lichuan (1):
+      ksmbd: Correct typos in multiple comments across various files
+
+Thorsten Blum (1):
+      ksmbd: Replace one-element arrays with flexible-array members
+
+ fs/smb/common/smb2pdu.h       |  6 +++---
+ fs/smb/server/connection.c    |  2 +-
+ fs/smb/server/ksmbd_netlink.h |  2 +-
+ fs/smb/server/oplock.c        |  4 ++--
+ fs/smb/server/server.c        |  2 +-
+ fs/smb/server/smb2pdu.c       | 35 ++++++++++++++++-------------------
+ fs/smb/server/smb2pdu.h       |  4 ++--
+ fs/smb/server/smb_common.c    |  2 +-
+ fs/smb/server/vfs_cache.h     |  4 ++--
+ fs/smb/server/xattr.h         |  2 +-
+ 10 files changed, 30 insertions(+), 33 deletions(-)
+
+-- 
+Thanks,
+
+Steve
