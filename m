@@ -1,67 +1,67 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14F92B9B7;
-	Sun, 29 Sep 2024 21:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA3C1304B0;
+	Sun, 29 Sep 2024 21:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727644620; cv=none; b=SWAdLi2CgrgNThccck2WrLyPnslH8rqUXx1pap5qMZkPC7cv+KZ6aYKu7BUJfW/5eISfqSfef/g8PKOuKA+TjC2qC0nhmZSz2lPEwTuJBh6pyC5NgIeWnUkFbRTpdhfJQEH9gz1ztMU2vWc5KbvKFY+cHA3wx4FPnwmf++mBHPE=
+	t=1727646483; cv=none; b=aw8tCfn0GoMofHdlgxpp/tc4QjumqYvygjVIhiw09mBqDvthIFV3M/L//0g82aCbgdJpXIL5YI7OBAqRhY/F/AhSDbungCJ2TBRwvevtgDUSz1KX4qFDtS5+z4E44ABU321CDCrtxgu4uQGz9Tk8M0FTt5qAOUht3d7K/J5iFVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727644620; c=relaxed/simple;
-	bh=JuBUTNioYcPLimVNyZOPJ1ABpcfG1Unw0fROrPKHPXQ=;
+	s=arc-20240116; t=1727646483; c=relaxed/simple;
+	bh=vJNw4C0ImdXNyd6MebebYyAzxTn0xdRo1UvGrrFCeHQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=af7V9JkTIRWV4cn4H75KDVkxR3Klv0/XPIie2SGQJhjW3g82QLL3tn+gR62pzOv+foOfcnLLtYR09haAmzTI+oIrX5XskoUna/vLNAQedeF1y9tr9oSFmcgRV42aLdQy5W/sygxrhkwp10Zu2YZL+fGU0J+LQ9pzvx5fwyXxiQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OF7ivdxU; arc=none smtp.client-ip=209.85.208.179
+	 To:Cc:Content-Type; b=C9p9uD6lTminAVFc7gFS21AZKbZcAln6+a012CC+YEaDaxf8SWDE2xaZjXcCDcdpY1WZYIsA71BGsaCaL4t43xncc/znHkNsxiy6xcGfFiO0cdCZJQhJpr/ShZyhtwUSrqMbmqKIcWlvMUVVgEREECQ4gcm4WDvFK5lj3wvg+MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVTkwKxu; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF7ivdxU"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2fad0f66d49so1013421fa.3;
-        Sun, 29 Sep 2024 14:16:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVTkwKxu"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53988c54ec8so2349276e87.0;
+        Sun, 29 Sep 2024 14:48:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727644617; x=1728249417; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727646480; x=1728251280; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rUefBKmsZjXQ/mUhjIMzhcAvL7NFQX6GDQCKTISAmJY=;
-        b=OF7ivdxUvBIp+emyZ4PcssbMI5UvmPVwMU2oFnp4Gx4qqM0bV+8kOZ+WVEf3ylvP8N
-         hoPda7GNqlecgAl0pQE9TWg5P0zf9GZssklMiBUkCDyD4y+De8+JiJnQAAUMos9Sbl6J
-         eW1RG05k3rboMJ1nH0+XI9tS/s8KfsEe09+HcDvpmLpr1KU7I381sc2r1NUY9ZkJIHOg
-         tQBYsw3umDQMcc0OuyonlojzBSw9MiXT0Svc+Lj8c+2mm7IhSjtjGZLiJHPBoy3i0IMZ
-         qYA3JIcE2g8QtGfEXwRFpxio3cyoePeuLgz0Sp7FGjHRdtUpm+8iA39Pie4BZCnK/SNI
-         BCQw==
+        bh=aKcPM+XgnSOCOlXiyAt/x0t4A1hlRxmsWur1NvKdBrw=;
+        b=PVTkwKxuzQdrNRST54PVEcrtHffk2gdxl4vU++EQ64CiwG6yzV3Whwzpz8OyGCtpnZ
+         ZExdzl4bmziJlPIurUZYHd6jTszneks0PChLrMavUkmW21XH66TYtZgscabqPmHPdchA
+         U+PlvGrv1xkS+DTXGMY4LY3iTTYkRNRGYfqbQ5arY/AhIYVBZiSlV/dRQ/QVKDvKvN4Z
+         GOgXhkQGfGiiEd2Y7iPwxSlBRtaHn84l8zG2EXA1gygLTng5jDmQiK9+7/L3CzvlMC7Q
+         i7qn9ndddEq/PsrPKF1tk+E0lWIYRfxc1i8wxJXcr5vvnY7KMrYgblsbzITGT7i1esof
+         bD8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727644617; x=1728249417;
+        d=1e100.net; s=20230601; t=1727646480; x=1728251280;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rUefBKmsZjXQ/mUhjIMzhcAvL7NFQX6GDQCKTISAmJY=;
-        b=tkVIXRAjSYBCzPpdlAkzkpwuEHbgL2LyJliEeY0cnASH8HyoQrBs8DXERbO3C4p0QG
-         Nk34flybjrLjpspfvGReMU56jgKIlT2HJrZEmxQewkP92YPOTt2cKR87glB1hs+QoNXe
-         1v5bI9o0AI7UkxeC5TAXsLaUTVETd0rUxeKpNOzgatxAt1/NVAWBphNPHoRYuuf3xxIw
-         AnYuObIo0se/XXJ+ff3xegmowBS3HpB4G4qawSMFy7CaWXp+LbF/TwNvwFQkX6nnJHVu
-         u/itjExlNFn3DncrkhPuwQ1avnaHjEifVC8g1RDiRcs7sqKAVa68ibQ+Rz8YXYvZeZFF
-         beYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaQkfPoUnWi3E720sTg4SwmJjb+reGKstrKaR1v60qlobrh7fMjrvI18SDojuwF1T5LxF7jpn4RxeZWby/@vger.kernel.org, AJvYcCW3nubOhCeFAgbvKfsDY6F+n8dCv0LWuZgveXan8HESdH5PqxlnItaMXS9dr2UfhBXA6NNCh3fgR321@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1pYzGOTmOB/X2NH0B+iBTg07dpJeuWpsBU5L4KNNU+VAB5Ofd
-	LH3mDAAWz6OpIwarpgtSWaQfk7TuCkDqkHjkGsaNXE0OjGFqRe19BTnGm9ZgE5IGb/MoaXEl6/W
-	kphzCmRtxCNDhTTC66kzmC6Iw3ZY=
-X-Google-Smtp-Source: AGHT+IFhztiBkAoR0MNZ+YeVnE6y7U6FdB1WzwhGAQjxzhSjm+Rh15uzre99U+T6lbNoGuIDfcuIqvDKvXy7nWp3USI=
-X-Received: by 2002:a05:6512:33c5:b0:533:40dc:823e with SMTP id
- 2adb3069b0e04-5389fc64568mr5063065e87.48.1727644616669; Sun, 29 Sep 2024
- 14:16:56 -0700 (PDT)
+        bh=aKcPM+XgnSOCOlXiyAt/x0t4A1hlRxmsWur1NvKdBrw=;
+        b=VLhGWzwreC+wOyueRR/rRBreGD/1t1UFmWKwGocOD39T6GHrPWY+3o3CcMn4H/91BL
+         cSTFWB7CNRLi7ya5W6BDr/XzX0VKzuY+oiUaVRyeG8bU3P0X0qRTTbREyGSH4LdJRt29
+         hStqALD/sRsQmHqb71G+mPUDI32jzOh1VRIj37sCPlwDHvtmGBPlIgo4Jejo8ZevonCv
+         3ENVVIvCtsgu/JC2u7SdcVZmgCmu97iVZO8jaL8Bw+4YGVTILoE0AcUD67ODhV8gXvPQ
+         vugVHsnoQelVkws3lZJqrl680aXTj7l35+1bLoN4ir9l9kb8yrEuqE5mszRhIZrQI9rg
+         l8fg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXBzEUPd407QspJXVB5b41KeWwpmKEjgG/spiPKXROYSirWEyciwYkeans9MTwUTIk/mJ/usJzNInGjVWk@vger.kernel.org, AJvYcCWBlS2T81aYuziWBA0LvhRk9L8mrNLwSq+6bmPBKm+UyyTKcd/vxea6HHmqiE20qPpZ6dOjqMvcJs9Z@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFNcJXNQNBfxdBiypOHAJ6MTQ4gdSRlmr0ERl073ul2UZIA6TH
+	g54fgf81SBvyzjpGaMstzvk4DfjaphnpE131mRSjwfqrHrmmOapXriyDRGPfskb1tSLkTJpZLF8
+	U6X6Z/FR6KmpP7WExT1w0p40h7Rc=
+X-Google-Smtp-Source: AGHT+IEern+aT43RFEJL1z9TGpzvHYgFqhvQWZoVDhAONw6iVnoeJfrFdotkdGUQOgBbgSrlLyXz2gMca3i3nWDT7KA=
+X-Received: by 2002:a05:6512:1293:b0:535:82eb:21d1 with SMTP id
+ 2adb3069b0e04-5389fc8422bmr4976133e87.57.1727646479442; Sun, 29 Sep 2024
+ 14:47:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240929185053.10554-1-pali@kernel.org> <20240929185053.10554-2-pali@kernel.org>
-In-Reply-To: <20240929185053.10554-2-pali@kernel.org>
+References: <20240929185053.10554-1-pali@kernel.org> <20240929185053.10554-6-pali@kernel.org>
+In-Reply-To: <20240929185053.10554-6-pali@kernel.org>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 29 Sep 2024 16:16:44 -0500
-Message-ID: <CAH2r5mt71ybdLj-9X=v_tuzaLbjGtQgPJvmNvcdZqLPzYpOJhA@mail.gmail.com>
-Subject: Re: [PATCH 1/7] cifs: Rename smb2_get_reparse_inode to smb2_create_reparse_inode
+Date: Sun, 29 Sep 2024 16:47:48 -0500
+Message-ID: <CAH2r5mu6Uikd+72DVjKs9A10xn4yy3Db7ZftC_W_9jWTZ_W0SA@mail.gmail.com>
+Subject: Re: [PATCH 5/7] cifs: Fix parsing native symlinks directory/file type
 To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
@@ -69,89 +69,166 @@ Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I lean against minor renames in rc2, better to focus on the bug fixes
-in your patch (the renaming also makes it a bit harder to backport
-fixes, so often better after all the fixes in, if important rename)
+obvious question is ... is there any risk that this could break POSIX
+behavior when creating server side symlinks (ie not using mfsylmlinks,
+but native symlink reparse point) remotely ...?
 
 On Sun, Sep 29, 2024 at 1:51=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
 rote:
 >
-> This function creates a new reparse point, so put "create" into its name.
+> As SMB protocol distinguish between symlink to directory and symlink to
+> file, add some mechanism to disallow resolving incompatible types.
+>
+> When SMB symlink is of the directory type, ensure that its target path en=
+ds
+> with slash. This forces Linux to not allow resolving such symlink to file=
+.
+>
+> And when SMB symlink is of the file type and its target path ends with
+> slash then returns an error as such symlink is unresolvable. Such symlink
+> always points to invalid location as file cannot end with slash.
+>
+> This mimics Windows behavior of native SMB symlinks.
 >
 > Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
 > ---
->  fs/smb/client/reparse.c   | 6 +++---
->  fs/smb/client/smb2inode.c | 2 +-
->  fs/smb/client/smb2proto.h | 2 +-
->  3 files changed, 5 insertions(+), 5 deletions(-)
+>  fs/smb/client/reparse.c   |  4 ++++
+>  fs/smb/client/smb2file.c  | 46 +++++++++++++++++++++++++++++++++++++++
+>  fs/smb/client/smb2inode.c |  4 ++++
+>  fs/smb/client/smb2proto.h |  1 +
+>  4 files changed, 55 insertions(+)
 >
 > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> index a23ea2f78c09..507e17244ed3 100644
+> index d8edb513556f..5a738f65b190 100644
 > --- a/fs/smb/client/reparse.c
 > +++ b/fs/smb/client/reparse.c
-> @@ -68,7 +68,7 @@ int smb2_create_reparse_symlink(const unsigned int xid,=
- struct inode *inode,
->         convert_delimiter(sym, '/');
->         iov.iov_base =3D buf;
->         iov.iov_len =3D len;
-> -       new =3D smb2_get_reparse_inode(&data, inode->i_sb, xid,
-> +       new =3D smb2_create_reparse_inode(&data, inode->i_sb, xid,
->                                      tcon, full_path, &iov, NULL);
->         if (!IS_ERR(new))
->                 d_instantiate(dentry, new);
-> @@ -136,7 +136,7 @@ static int mknod_nfs(unsigned int xid, struct inode *=
-inode,
->                 .reparse =3D { .tag =3D IO_REPARSE_TAG_NFS, .nfs =3D p, }=
-,
->         };
->
-> -       new =3D smb2_get_reparse_inode(&data, inode->i_sb, xid,
-> +       new =3D smb2_create_reparse_inode(&data, inode->i_sb, xid,
->                                      tcon, full_path, &iov, NULL);
->         if (!IS_ERR(new))
->                 d_instantiate(dentry, new);
-> @@ -282,7 +282,7 @@ static int mknod_wsl(unsigned int xid, struct inode *=
-inode,
->         memcpy(data.wsl.eas, &cc->ea, len);
->         data.wsl.eas_len =3D len;
->
-> -       new =3D smb2_get_reparse_inode(&data, inode->i_sb,
-> +       new =3D smb2_create_reparse_inode(&data, inode->i_sb,
->                                      xid, tcon, full_path,
->                                      &reparse_iov, &xattr_iov);
->         if (!IS_ERR(new))
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 6e69a3b98be3..0fc73035d6dc 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -1193,7 +1193,7 @@ smb2_set_file_info(struct inode *inode, const char =
-*full_path,
+> @@ -589,6 +589,10 @@ static int parse_reparse_symlink(struct reparse_syml=
+ink_data_buffer *sym,
+>                                        le32_to_cpu(sym->Flags) & SYMLINK_=
+FLAG_RELATIVE,
+>                                        full_path,
+>                                        cifs_sb);
+> +       if (!rc) {
+> +               bool directory =3D le32_to_cpu(data->fi.Attributes) & ATT=
+R_DIRECTORY;
+> +               rc =3D smb2_fix_symlink_target_type(&data->symlink_target=
+, directory);
+> +       }
 >         return rc;
 >  }
 >
-> -struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-> +struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data=
-,
->                                      struct super_block *sb,
->                                      const unsigned int xid,
->                                      struct cifs_tcon *tcon,
+> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+> index dc52995f5591..8a1a1b2a1c81 100644
+> --- a/fs/smb/client/smb2file.c
+> +++ b/fs/smb/client/smb2file.c
+> @@ -63,6 +63,48 @@ static struct smb2_symlink_err_rsp *symlink_data(const=
+ struct kvec *iov)
+>         return sym;
+>  }
+>
+> +int smb2_fix_symlink_target_type(char **target, bool directory)
+> +{
+> +       char *buf;
+> +       int len =3D strlen(*target);
+> +
+> +       if (!len)
+> +               return -EIO;
+> +
+> +       /*
+> +        * If this is directory symlink and it does not have trailing sla=
+sh then
+> +        * append it. Trailing slash simulates Windows/SMB behavior which=
+ do not
+> +        * allow resolving directory symlink to file.
+> +        */
+> +       if (directory && (*target)[len-1] !=3D '/') {
+> +               buf =3D kzalloc(len+2, GFP_KERNEL);
+> +               if (!buf)
+> +                       return -ENOMEM;
+> +               memcpy(buf, *target, len);
+> +               buf[len] =3D '/';
+> +               kfree(*target);
+> +               *target =3D buf;
+> +       }
+> +
+> +       /*
+> +        * If this is a symlink which points to file name with trailing s=
+lash,
+> +        * or to file named "." or file named ".." then this symlink cann=
+ot be
+> +        * resolved on Linux because Linux does not allow files with such=
+ names.
+> +        * So return an error to prevent resolving this file type symlink=
+ to
+> +        * directory, as it do not point to directory at all.
+> +        */
+> +       if (!directory) {
+> +               const char *basename =3D kbasename(*target);
+> +               int basename_len =3D strlen(basename);
+> +               if (basename_len =3D=3D 0 || /* symname ends with slash *=
+/
+> +                   (basename_len =3D=3D 1 && basename[0] =3D=3D '.') || =
+/* last component is "." */
+> +                   (basename_len =3D=3D 2 && basename[0] =3D=3D '.' && b=
+asename[1] =3D=3D '.')) /* last component is ".." */
+> +                       return -EIO;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const stru=
+ct kvec *iov,
+>                                 const char *full_path, char **path)
+>  {
+> @@ -132,6 +174,10 @@ int smb2_open_file(const unsigned int xid, struct ci=
+fs_open_parms *oparms, __u32
+>                                 rc =3D SMB2_open(xid, oparms, smb2_path, =
+&smb2_oplock, smb2_data,
+>                                                NULL, NULL, NULL);
+>                                 oparms->create_options &=3D ~OPEN_REPARSE=
+_POINT;
+> +                               if (!rc) {
+> +                                       bool directory =3D le32_to_cpu(da=
+ta->fi.Attributes) & ATTR_DIRECTORY;
+> +                                       rc =3D smb2_fix_symlink_target_ty=
+pe(&data->symlink_target, directory);
+> +                               }
+>                         }
+>                 }
+>         }
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index c9cdac7d2d50..faf0a8344faa 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -960,6 +960,10 @@ int smb2_query_path_info(const unsigned int xid,
+>                 rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path,
+>                                       &oparms, in_iov, cmds, num_cmds,
+>                                       cfile, NULL, NULL, NULL);
+> +               if (data->reparse.tag =3D=3D IO_REPARSE_TAG_SYMLINK && !r=
+c) {
+> +                       bool directory =3D le32_to_cpu(data->fi.Attribute=
+s) & ATTR_DIRECTORY;
+> +                       rc =3D smb2_fix_symlink_target_type(&data->symlin=
+k_target, directory);
+> +               }
+>                 break;
+>         case -EREMOTE:
+>                 break;
 > diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-> index b208232b12a2..4ac30d29d5a1 100644
+> index 11cef65fa831..d308f3c2f8df 100644
 > --- a/fs/smb/client/smb2proto.h
 > +++ b/fs/smb/client/smb2proto.h
-> @@ -56,7 +56,7 @@ extern int smb3_handle_read_data(struct TCP_Server_Info=
- *server,
->  extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tc=
-on *tcon,
->                                 struct cifs_sb_info *cifs_sb, const char =
-*path,
->                                 __u32 *reparse_tag);
-> -struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-> +struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data=
-,
->                                      struct super_block *sb,
->                                      const unsigned int xid,
->                                      struct cifs_tcon *tcon,
+> @@ -113,6 +113,7 @@ extern int smb3_query_mf_symlink(unsigned int xid, st=
+ruct cifs_tcon *tcon,
+>                           struct cifs_sb_info *cifs_sb,
+>                           const unsigned char *path, char *pbuf,
+>                           unsigned int *pbytes_read);
+> +int smb2_fix_symlink_target_type(char **target, bool directory);
+>  int smb2_parse_native_symlink(char **target, const char *buf, unsigned i=
+nt len,
+>                               bool unicode, bool relative,
+>                               const char *full_path,
 > --
 > 2.20.1
 >
