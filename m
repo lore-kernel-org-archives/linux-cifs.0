@@ -1,45 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777904F8A0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777C95103F;
 	Sun, 29 Sep 2024 18:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727635864; cv=none; b=rKmoK6klby0ehf1eByb/nVXzDdhOL5zY4Twb083MHTBYlTX14BTivFwhmAZhoIsK6MSBJVpR9fbnGna7loM3jh70U66wnNs3SqLLBk8ybSmGvIdp9fnMkFsRYOru1OHJ7hnGgSxbkr1FK32QnZ+NYfjWguyusr5duVLL5Pv+1lA=
+	t=1727635864; cv=none; b=Euq+8N0Ga3azkMM6dpMTS2tqBxtCrlSjEvWUMRoLr8QBppMtB46IGJmf4R+S5778NWGyzGNC071YdEjM/M/E1mHIalAndtFVafq3KoiyuHmIB5v+e4Icy5oTv40wW7NhMHTKU7RUUt9koZGHkyPJW5AxbJtUqFDXtiI4j5Ki/io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727635864; c=relaxed/simple;
-	bh=cj10ep1gPlsUYj3PVruGSEFXLq/JujQahcOckuQVlpw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jRnw2wg1f98dTR+ScgIZ0NxDq5nP0ezkbjZG3yGmlrs9KBk1vRpoNC5P9teHmfEpipcJ4BsMVklMkUwvxkNVVLLKjuviRtecIWwsQLxkj0L7n7Xh8fce5BmrCtrb7xNgTeB53yWcd5E2FaHMKe4KdDE3gHqFM8FYT8m5HlLpty8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QksgGl/i; arc=none smtp.client-ip=10.30.226.201
+	bh=4pJIvy7H7+SGTbNvEz+/K+2Ko+IMfiFbhdkT5vo0E54=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OmVPEJgfswbY4Jlm9JLuP+mU1klwCG5ct4K78KqPFz3EbluS4yKXPKLKj6Z9jmvXzFmjP3A3hzhDWpf11v8bJ3GWEnnxwsuHceiBQTsaCfZRfRW/HlACs9tp9dLvSlgIra93p5Lrw8G2DBeoHceOb4OBO6J/sHZU8fmTS0lntMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVU1iWMl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QksgGl/i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F420EC4CED0;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVU1iWMl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 005F0C4CED1;
 	Sun, 29 Sep 2024 18:51:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1727635864;
-	bh=cj10ep1gPlsUYj3PVruGSEFXLq/JujQahcOckuQVlpw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QksgGl/i71D23dyiAksfR2sYzImV4SGkQ27vF14eYGx9owQjNJGVsK+3YWlFcgyRK
-	 PbXWixr/C93a+mrwkbWD0dVYgojLpUsl8dKuIvGt5wDMCOxjcIo9Lny5rGEIp3zXxD
-	 TDBbZ4Rzk2G4vwOKCibQZg+WdZxhU9ZUvINMB5cpFhabuLfkr7c5GOS+b58QHzNXND
-	 fic7LWNJLfATSrW084nFmKY5A+gRMS+Ny5uvapmxKTZnHcylXxq+0MgHv8TlfueBXn
-	 0OlEYclcNKwgD3S6u4gM5GQavKcdxkSMYhQVMhpEODHxdYqliraeU8uUEXCaKT6b7y
-	 IlBT52DTK+XQg==
+	bh=4pJIvy7H7+SGTbNvEz+/K+2Ko+IMfiFbhdkT5vo0E54=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TVU1iWMll+VD7b4P4xMErr/lwMiuwBigVpBFZcmkUBUIhMKp2Rw8nURrvY50T+Z13
+	 XvtuxN4VcajJxenr3hR+4MN/+W2NIjb12weHfwNQ3QsgwDR5UUTek0UZS3Gi6p65jj
+	 R09zSjZnxKDbg44O8XfZAE7tP5elCw0onqPMHAYQMtOxnm28o1aVo+ID8Z2o9AA2ek
+	 2LL3oMu1tcoDO47avx8bhrXtPhGF4bllvNkF4sxO+vhHMJHFRclFAH2jTy0qfO40H4
+	 w7v1V1OULzeY7b/TUqiUCu+3EmhpkObokixEvPmcgBsMpmq/TxQhWYaraBW7CeaSYs
+	 HxaaEOSc26XVg==
 Received: by pali.im (Postfix)
-	id EC32092C; Sun, 29 Sep 2024 20:50:56 +0200 (CEST)
+	id CC793872; Sun, 29 Sep 2024 20:50:56 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/7] cifs: Rename smb2_get_reparse_inode to smb2_create_reparse_inode
-Date: Sun, 29 Sep 2024 20:50:47 +0200
-Message-Id: <20240929185053.10554-2-pali@kernel.org>
+Subject: [PATCH 0/7] cifs: Improve support for native SMB symlinks
+Date: Sun, 29 Sep 2024 20:50:46 +0200
+Message-Id: <20240929185053.10554-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20240929185053.10554-1-pali@kernel.org>
-References: <20240929185053.10554-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,72 +46,84 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This function creates a new reparse point, so put "create" into its name.
+This patch series improves interoperability of native SMB symlinks
+(stored in IO_REPARSE_TAG_SYMLINK reparse point) between Linux SMB
+client and Windows SMB server storage (NTFS).
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
- fs/smb/client/reparse.c   | 6 +++---
- fs/smb/client/smb2inode.c | 2 +-
- fs/smb/client/smb2proto.h | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+Fixed test cases by this patch series are:
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index a23ea2f78c09..507e17244ed3 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -68,7 +68,7 @@ int smb2_create_reparse_symlink(const unsigned int xid, struct inode *inode,
- 	convert_delimiter(sym, '/');
- 	iov.iov_base = buf;
- 	iov.iov_len = len;
--	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-+	new = smb2_create_reparse_inode(&data, inode->i_sb, xid,
- 				     tcon, full_path, &iov, NULL);
- 	if (!IS_ERR(new))
- 		d_instantiate(dentry, new);
-@@ -136,7 +136,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- 		.reparse = { .tag = IO_REPARSE_TAG_NFS, .nfs = p, },
- 	};
- 
--	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-+	new = smb2_create_reparse_inode(&data, inode->i_sb, xid,
- 				     tcon, full_path, &iov, NULL);
- 	if (!IS_ERR(new))
- 		d_instantiate(dentry, new);
-@@ -282,7 +282,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 	memcpy(data.wsl.eas, &cc->ea, len);
- 	data.wsl.eas_len = len;
- 
--	new = smb2_get_reparse_inode(&data, inode->i_sb,
-+	new = smb2_create_reparse_inode(&data, inode->i_sb,
- 				     xid, tcon, full_path,
- 				     &reparse_iov, &xattr_iov);
- 	if (!IS_ERR(new))
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 6e69a3b98be3..0fc73035d6dc 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -1193,7 +1193,7 @@ smb2_set_file_info(struct inode *inode, const char *full_path,
- 	return rc;
- }
- 
--struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-+struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
- 				     struct super_block *sb,
- 				     const unsigned int xid,
- 				     struct cifs_tcon *tcon,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index b208232b12a2..4ac30d29d5a1 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -56,7 +56,7 @@ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
- extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
- 				struct cifs_sb_info *cifs_sb, const char *path,
- 				__u32 *reparse_tag);
--struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-+struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
- 				     struct super_block *sb,
- 				     const unsigned int xid,
- 				     struct cifs_tcon *tcon,
+Fixes parsing of symlinks relative to the top of the export which can be
+created on Windows by:
+
+  mklink symlink \relative\path\from\export
+
+
+Fixes parsing of symlinks in absolute form which can be created on
+Windows by:
+
+  mklink symlink C:\absolute\path
+
+
+Fixes creating of symlinks pointing to directory. So Linux commands:
+
+  mkdir dir
+  ln -s dir symlink1
+  ln -s another_dir/ symlink2
+
+creates a symlink which would be now understood also by Windows as
+symlinks to directories.
+
+
+Fixes creating of symlinks pointing to current or parent directory.
+So following commands create valid symlink understood by Windows:
+
+  ln -s . symlink_cur
+  ln -s .. symlink_parent
+
+
+Fixes creating of absolute symlinks. Absolute symlinks on Windows are
+quite complicated due to nature of DOS/Win32 path form used by Windows
+applications and NT path form in which are symlink paths stored. Also
+complication is that NT object paths have different hierarchy than POSIX
+paths generally. Required information about NT object hierarchy used in
+native absolute symlinks are in comments in the last patch from this
+series.
+
+To resolve mentioned problems I chosse way which is used by WSL, its
+-t drvfs has mount option -o symlinkroot= which specify Linux path there
+should point absolute windows drive letter symlinks. This could make
+-t cifs mounts in WSL2 more compatible with symlinks coming from local
+NTFS disks mounted by -t drvfs.
+
+I'm not sure how good are these changes, but I think that they improve
+compatibility of symlinks between Linux and Windows systems. Maybe there
+is some better solution how to handle some of those issues?
+
+
+Pali Rohár (7):
+  cifs: Rename smb2_get_reparse_inode to smb2_create_reparse_inode
+  cifs: Improve creating native symlinks pointing to directory
+  cifs: Fix creating native symlinks pointing to current or parent
+    directory
+  cifs: Fix parsing native symlinks relative to the export
+  cifs: Fix parsing native symlinks directory/file type
+  cifs: Validate content of native symlink
+  cifs: Fix creating and resolving absolute NT-style symlinks
+
+ fs/smb/client/cifs_unicode.c |  17 +-
+ fs/smb/client/cifsglob.h     |   1 +
+ fs/smb/client/cifsproto.h    |   1 +
+ fs/smb/client/fs_context.c   |  22 ++
+ fs/smb/client/fs_context.h   |   2 +
+ fs/smb/client/inode.c        |   1 +
+ fs/smb/client/reparse.c      | 513 ++++++++++++++++++++++++++++++++---
+ fs/smb/client/reparse.h      |   4 +-
+ fs/smb/client/smb1ops.c      |   3 +-
+ fs/smb/client/smb2file.c     |  67 ++++-
+ fs/smb/client/smb2inode.c    |  15 +-
+ fs/smb/client/smb2proto.h    |  13 +-
+ 12 files changed, 602 insertions(+), 57 deletions(-)
+
 -- 
 2.20.1
 
