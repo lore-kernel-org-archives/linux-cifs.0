@@ -1,96 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C4948CDD;
-	Sun, 29 Sep 2024 22:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE094C69;
+	Sun, 29 Sep 2024 22:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727647870; cv=none; b=nMEb4o6MU9lJQqzxF7lPTWsU9U49vj/hmeYltKQI1mm1mGeCeDqTyCNKHv6MgVD9/ad473iXosUscQPGcf+4mW93xONZ615FBjBIvvHh3o4f4xhhdcVwvEj4ON4JzczZ50CNXPQU0TZ+orEwsBt0wZW0K1uhA8leMhYDmjD928I=
+	t=1727648355; cv=none; b=obEptj867vuXFafEeBy9gHtodHAjuSdWSFTd72p0Lza7GJSSVjTuOn1WdXuLs5qpiEcQnKts9w9YpW/vtVz0odKsPp6dnku5li4sbHegSrNRbgm+WQzK9PNXzWvpukV86Hy6Db7BY3ZJlOnFGH0BfgzWrCmaztAiGbQpId1ZSmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727647870; c=relaxed/simple;
-	bh=QZvnrEc1Gx1llNZzCoBg8oyjH8IY/uuCywDKrum0vLA=;
+	s=arc-20240116; t=1727648355; c=relaxed/simple;
+	bh=HI/OkCZ1Hgkt+Bgs7QEULJ4W+ZyNZ95EhUvyGeIIDkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FUzFphrUuIhmdJ6If4kEivahvzZ4JHewcxlF302wfhCJE+CeWx/FWDhu324gcRGrL1x36uHnuoZuB1J8zsFnUOerIzKW7E8HmouaPUlbivbbf/kMcLJr0c6ZjWcs1t/vNy+gGajMqWSCjWDW/EWCZvWtfSLheVxq0ZMme/5v4dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UW/FhEoh; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=pdu6jjsv4P0dnk+p2LcaMGUNmnnOIxBG5Hq+7RAyt4cYpzKtCYgMPhm6IoXf/S0CDYbaQ30O5h4R+DADQjQC8QC1Cz5YYl+QEhLr5lgXtE7NkdrpvLsM9XwPcJEejmbniJfJwRB2I3ajMf2OGdomxr57yGqiawYO+a8bU2nqATA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P86dUwxi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UW/FhEoh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A10EC4CEC5;
-	Sun, 29 Sep 2024 22:11:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P86dUwxi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E702C4CEC7;
+	Sun, 29 Sep 2024 22:19:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727647868;
-	bh=QZvnrEc1Gx1llNZzCoBg8oyjH8IY/uuCywDKrum0vLA=;
+	s=k20201202; t=1727648354;
+	bh=HI/OkCZ1Hgkt+Bgs7QEULJ4W+ZyNZ95EhUvyGeIIDkw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UW/FhEohBlsSgmIwMhq0imcmJTydf23XnQ3bLrRQ1bHkHWT+fdOqI+G+ynDfY/9i8
-	 fg4mtHDiRfff9XffHDeovo32jO/aNSEsJXUAfEsAIEYa0l5Q/LtoM3ErZiO7ktxCK7
-	 isGx10YO50Qv1buGbpjJ+vRBf1nJQpFY4M460aKbuj9MQ2Ycqte6fdCRHulossW3kL
-	 oAOFpHVId+F9nHohkcqqPUPtS5a+nyQnk13YTKvIXerB1R/+yoQk61BsLa2YWxRsp8
-	 CzpOpcek1OBbYMKWy9qFllj96Y+iHyk1fD5vjotRvZxLLQspNKBlxM6l66HzkZT3qi
-	 FoEsn//vPYP7w==
+	b=P86dUwxiWjXyeWC2nCkPNnp1/mB3U50ls7jR8VxUA0B1H+4SlqLiCq0n/1sgB/ksH
+	 BvCwLMU+tMmQMiRRn2w6acSfDbssUs/hsizj7CKImDUo897+jg6chN6D0DLngsVrEl
+	 fRRdOxudSaA8VVTonNubTCARnwXUT6nLmRDgmUWRujZqMcQOaAAjBAWeGqk+FBaR05
+	 fFWVM6DIOl1yTJ93Dsvr2sDyEpQrt+ftl+Qz31YghMCoTIADmhhi389iTACEfcQgor
+	 oNcmC5F3O8Y0GNTFuxuU4PhFxw1c9wwmZYFslUjRBW0gj3kF8YDGuDhJjhRXACMSD6
+	 5DY3MCLA8+ksw==
 Received: by pali.im (Postfix)
-	id 4730F872; Mon, 30 Sep 2024 00:11:03 +0200 (CEST)
-Date: Mon, 30 Sep 2024 00:11:03 +0200
+	id D1D04872; Mon, 30 Sep 2024 00:19:08 +0200 (CEST)
+Date: Mon, 30 Sep 2024 00:19:08 +0200
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <smfrench@gmail.com>
 Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/7] cifs: Improve creating native symlinks pointing to
- directory
-Message-ID: <20240929221103.v4tpbj6pdwt44ld7@pali>
+Subject: Re: [PATCH 6/7] cifs: Validate content of native symlink
+Message-ID: <20240929221908.skkup4ds6ow2s77x@pali>
 References: <20240929185053.10554-1-pali@kernel.org>
- <20240929185053.10554-3-pali@kernel.org>
- <CAH2r5muBtrnwm4YXm_DuncR7bK68xwY3OP2GwV07-LEm-BPWTw@mail.gmail.com>
+ <20240929185053.10554-7-pali@kernel.org>
+ <CAH2r5mtRN04+X-J7C__qHL6S+VzFbWoRGdb=cBDQfDVLGgWwew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAH2r5muBtrnwm4YXm_DuncR7bK68xwY3OP2GwV07-LEm-BPWTw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mtRN04+X-J7C__qHL6S+VzFbWoRGdb=cBDQfDVLGgWwew@mail.gmail.com>
 User-Agent: NeoMutt/20180716
 
-On Sunday 29 September 2024 16:54:20 Steve French wrote:
-> Here is a version of the same patch without the function rename (so
-> presumably easier to backport) and also that fixes to minor checkpatch
-> warnings (and merged this and also patches 3, 4 and 6 into
-> cifs-2.6.git for-next pending additional review and tesitng):
+I think that via pike it could be possible or via windows application
+running locally (to create reparse point manually with prepared buffer
+with such content). I will check it later.
 
-That is fine for me. Just one minor nit suggestion.
+Just a side note: Windows NT kernel allows for object names any
+characters except backslash. For object names is not used nul-term
+string, but rather string with explicit length. So even a null character
+is a valid in a object name. NT NTFS driver has for file names more
+restrictions and null is not valid. But it does not mean that somebody
+can write own filesystem which allows null bytes in file names...
+And this design of explicit lengths is also in SMB, so NT kernel may
+export nul characters in symlink path buffers...
 
-> @@ -69,7 +192,8 @@ int smb2_create_reparse_symlink(const unsigned int xid, struct inode *inode,
->  	iov.iov_base = buf;
->  	iov.iov_len = len;
->  	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-> -				     tcon, full_path, &iov, NULL);
-> +					tcon, full_path, directory,
-> +					&iov, NULL);
-
-After reverting back the original function name, you can indent/align
-arguments for all smb2_get_reparse_inode occurrences.
-
->  	if (!IS_ERR(new))
->  		d_instantiate(dentry, new);
->  	else
-> @@ -137,7 +261,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  	};
->  
->  	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-> -				     tcon, full_path, &iov, NULL);
-> +					tcon, full_path, false, &iov, NULL);
->  	if (!IS_ERR(new))
->  		d_instantiate(dentry, new);
->  	else
-> @@ -283,7 +407,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  	data.wsl.eas_len = len;
->  
->  	new = smb2_get_reparse_inode(&data, inode->i_sb,
-> -				     xid, tcon, full_path,
-> +					xid, tcon, full_path, false,
->  				     &reparse_iov, &xattr_iov);
-
-Here the misaligning on + line is visible too.
-
->  	if (!IS_ERR(new))
->  		d_instantiate(dentry, new);
+On Sunday 29 September 2024 16:48:46 Steve French wrote:
+> Is there any easy way to create such a symlink (with null in it)?
+> 
+> On Sun, Sep 29, 2024 at 1:51 PM Pali Rohár <pali@kernel.org> wrote:
+> >
+> > Check that buffer does not contain UTF-16 null codepoint
+> > because Linux cannot process symlink with null byte.
+> >
+> > Signed-off-by: Pali Rohár <pali@kernel.org>
+> > ---
+> >  fs/smb/client/reparse.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> > index 5a738f65b190..ca4f96c43508 100644
+> > --- a/fs/smb/client/reparse.c
+> > +++ b/fs/smb/client/reparse.c
+> > @@ -509,6 +509,16 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
+> >         int rc;
+> >         int i;
+> >
+> > +       /*
+> > +        * Check that buffer does not contain UTF-16 null codepoint
+> > +        * because Linux cannot process symlink with null byte.
+> > +        */
+> > +       if (unicode && UniStrnlen((wchar_t *)buf, len/2) != len/2) {
+> > +               cifs_dbg(VFS, "srv returned null byte in native symlink target location\n");
+> > +               rc = -EIO;
+> > +               goto out;
+> > +       }
+> > +
+> >         smb_target = cifs_strndup_from_utf16(buf, len, unicode, cifs_sb->local_nls);
+> >         if (!smb_target) {
+> >                 rc = -ENOMEM;
+> > --
+> > 2.20.1
+> >
+> >
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
