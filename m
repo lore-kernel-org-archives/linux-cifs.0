@@ -1,180 +1,142 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCF34D8BC;
-	Sun, 29 Sep 2024 22:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C0448CDD;
+	Sun, 29 Sep 2024 22:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727647426; cv=none; b=CpjAln0aBnPSEsWtHn4zbqjs4tLRdM75sZ2yD4oT3SrXAalAxbRLY0lShMwOlTzggYv8sHFTuA6jrR8EvgzQHHw5hecGab5R1w6Q8BrJeXWokPqXpQUP88sfd/xaLEkKp42EMihLzv7pAduV/vWn/DLNqIQ70YBpj1k+ou2+GVE=
+	t=1727647551; cv=none; b=rHKVCfqtBRr6PrM3I7OcD+yZBjMqGnPMN61d2t4/GPhhRTgtxmiG+SwVwaqw4oI6lH/b6nxIxeVPDny0Xc+1ntp2C9CvKTJksBRnTp0ajPetLUdMAlzJ+GEdq1scXPGR2VuEGkV8ImCh+mcHWVyOxDnBm39SK3ad9xu4BBjBaGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727647426; c=relaxed/simple;
-	bh=gnRVU+XWSdtQw+26C68u18ttuL5GoOOs4A59OpXac30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BTTIX2okdGo5P4cgmePe5gyppGTHwAj++ddWFGkOyq5IatD5PCrkSnD742VIGEaXtvw3WP+b/SgMSBQLL+RQ2cgzMcSxD2co0AIbT2pcdT6MBPEcQH4lSoAPGWiffqiTJj7nJ2kXnZeDBAgCMfYzkUKqKGlLjRhuDdbzEh3JmaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxO72Txb; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727647551; c=relaxed/simple;
+	bh=pL3DVPu+hNJJCWE6wyqLxm2vYTihM1Hsgm9OQN+YJ8Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VHHH1wZGJfjbF5qanxh6dl9Gl3HOmXzgkOJkmnYIQzASPm/X7L31Dr5qzXOPkuqai7qd4RD7wFDWh+eVSCX7IT7A06aO7Yc6AlPJ4BRaf3uVPkwJnIzT8T+96hdAturgHUqWx5Eb4l8jwWNp/daJClqkG8vTaz+HGNGG7WN28kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InLoWnBu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxO72Txb"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5389e24a4d1so3159293e87.3;
-        Sun, 29 Sep 2024 15:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727647423; x=1728252223; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oOKNP9unjnbGz/vC3RNR8i3aY4wvoDtLBu9z/FV6wn0=;
-        b=lxO72TxbmS4+KRsNdPZ2rWICBypCkC2Igw0ycYetQ6KnpOtqOJdQH5WD9xeswmbBhV
-         eYfONkQ3NsMcyCtFKrOcNZd7XGcDhwBYNhBqRG3HKcsdOW66YRKkNKDASwlh8Af9ZPqK
-         mBXL/Kp4j8W6otT93voP6SWbFRqg9o1fAuQQ6z6i18GcAlgGib2Gm+ZF6oKyt5B1jOR0
-         ldz8Ba7TXGH17oRGNCxWEtrvIfTvri82J6sgAGtpyjSjEKK9ryTXWsKKCZ9p6obUrvVp
-         Zayot7UYU0B7gpxEnxlQ6FoYQh8jZadlvyFYWzMLNuGM0kR5185M/Or+x9+v9RLhch8w
-         oSDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727647423; x=1728252223;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oOKNP9unjnbGz/vC3RNR8i3aY4wvoDtLBu9z/FV6wn0=;
-        b=ZuSmbafU4I04cjCYc65rOg0z2KzILcxZNVn9X7d3+hxmYGsGfnLpJ6T2ffItnbpsH/
-         AgNel5vg2ZfH+S2AVq/hBNS7D0PtCoOzPqWIJqggMZ8sBcf7FsCqV3y84TpzGrATlTeZ
-         ikkCHEvchSTTPsHkF4rXsopttxZI86iWzxwjv3cGkVv9cK+olPZw5PbC5vi7w1wEaJt1
-         ryRylHNzeD8D66UDNNBOuWvIebododET4iU2vBC2ROrIJZ1aWTQKqimSXPBdxG9cNjA8
-         9A+ve8BCG5gpY9QgWYWWqZDyI2jG5yXYYcuTgnwrmarF3cNix/a7P6oJ3Ep+wjx6SVSE
-         CMeA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6wzPb3+0Ck1KDtENdiwtqMe3tHxeqfY6y9iwp/HAnnyyPz3zh4ZGN3f5u5Bg3C9N//pZK2/LGMpah@vger.kernel.org, AJvYcCVFiJtWxVDiXS7x23ql/QQVNpb/04y2Nxmn8yLZyreZPyt05SrgFq+JVCkQ7RACjeHODkfj1q1HwVtoPno6@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLvnO8V5IJ12B5kEgAwLmjPiSnCh4pGAe8nzjxB9NX9F5aklup
-	nDd5U4iVkGS6mWLmpVUcLo7DfqIGNjRO8ftxuebfk8VC8ehqRh4Y3MNOfNekgV/tfDdMfuCih3G
-	3Cfdbd2UpbcDy8G4ufo5u5bho5+o=
-X-Google-Smtp-Source: AGHT+IFNc5tJneem8/sh8b5+49MrMDK0yObr0P9ZF4YM2s81/IAdqytBHBeK5wjTet5KJ5F6c8P9hmT7Z8WZ5BwYUHM=
-X-Received: by 2002:a05:6512:3994:b0:535:681d:34a4 with SMTP id
- 2adb3069b0e04-5389fc348d8mr4266404e87.7.1727647422515; Sun, 29 Sep 2024
- 15:03:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InLoWnBu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD30FC4CEC5;
+	Sun, 29 Sep 2024 22:05:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727647551;
+	bh=pL3DVPu+hNJJCWE6wyqLxm2vYTihM1Hsgm9OQN+YJ8Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=InLoWnBubo3JE3jejkrAFtadah6/8oNLDHyuys1XSBX/oFNFSU/EF2B19/0/p7f3P
+	 PbMiM7IqOpnke2t+3rc4BPPjDD3QYD/SMk6LWk3waq979PeY3thI7FeVXvxgHL+DSW
+	 CEx3K6AuF0lU9m8UuRG2YnjAiqJM7Wgj6N5G9WScIk0wYUYSg3/X7K911/aC4uQD0y
+	 HcMXwnEGlU9H4jLwCRcReKiIKhlRhGxW3d26vW+E8+y0Rn6Jk1EJRvnHSROxKooWFv
+	 1nuHbdLo59lNOEs/wu2CENNgskTV+lv+/HEFhFRIV96skhCCu/LfLmpzSPIw5sLEIG
+	 MsBQYoyU9aIPg==
+Received: by pali.im (Postfix)
+	id 0FDB2872; Mon, 30 Sep 2024 00:05:45 +0200 (CEST)
+Date: Mon, 30 Sep 2024 00:05:44 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] cifs: Rename smb2_get_reparse_inode to
+ smb2_create_reparse_inode
+Message-ID: <20240929220544.fquv6h3q4q6rqked@pali>
+References: <20240929185053.10554-1-pali@kernel.org>
+ <20240929185053.10554-2-pali@kernel.org>
+ <CAH2r5mt71ybdLj-9X=v_tuzaLbjGtQgPJvmNvcdZqLPzYpOJhA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240929185053.10554-1-pali@kernel.org>
-In-Reply-To: <20240929185053.10554-1-pali@kernel.org>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 29 Sep 2024 17:03:31 -0500
-Message-ID: <CAH2r5muq4S+w-W-J+YMuJ9RzPJsbmf6zKuGPN0H8DohXe--1uA@mail.gmail.com>
-Subject: Re: [PATCH 0/7] cifs: Improve support for native SMB symlinks
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mt71ybdLj-9X=v_tuzaLbjGtQgPJvmNvcdZqLPzYpOJhA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-Merged patches 2, 3, 4 and 6 from this series into cifs-2.6.git for-next
+That is fine. You can also postpone changes in this patch series for
+next major version if it is needed to more testing. And if you think
+that this rename change cause issues, you can drop it. It is not
+functional change at all.
 
-For patch 1, seems like rename could get in the way of backports, and
-is only a minor improvement (could consider it in the future for
-6.13-rc if part of other cleanup/improvements, but lower priority)
-
-For patch 5 it could be ok - but wanted more opinions on that ...
-since wouldn't want it to break POSIX - e.g. what would happen with
-this patch if a Linux server changed the target of a symlink from a
-file to directory (or the other way around) - is there any risk of
-breaking POSIX symlink semantics in a pure Linux->Linux case with this
-patch?
-
-For patch 7, it is relatively larger fix (and less important for pure
-Linux workloads) so wanted some additional opinions/feedback on this
-from others
-
-On Sun, Sep 29, 2024 at 1:51=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
-rote:
->
-> This patch series improves interoperability of native SMB symlinks
-> (stored in IO_REPARSE_TAG_SYMLINK reparse point) between Linux SMB
-> client and Windows SMB server storage (NTFS).
->
-> Fixed test cases by this patch series are:
->
-> Fixes parsing of symlinks relative to the top of the export which can be
-> created on Windows by:
->
->   mklink symlink \relative\path\from\export
->
->
-> Fixes parsing of symlinks in absolute form which can be created on
-> Windows by:
->
->   mklink symlink C:\absolute\path
->
->
-> Fixes creating of symlinks pointing to directory. So Linux commands:
->
->   mkdir dir
->   ln -s dir symlink1
->   ln -s another_dir/ symlink2
->
-> creates a symlink which would be now understood also by Windows as
-> symlinks to directories.
->
->
-> Fixes creating of symlinks pointing to current or parent directory.
-> So following commands create valid symlink understood by Windows:
->
->   ln -s . symlink_cur
->   ln -s .. symlink_parent
->
->
-> Fixes creating of absolute symlinks. Absolute symlinks on Windows are
-> quite complicated due to nature of DOS/Win32 path form used by Windows
-> applications and NT path form in which are symlink paths stored. Also
-> complication is that NT object paths have different hierarchy than POSIX
-> paths generally. Required information about NT object hierarchy used in
-> native absolute symlinks are in comments in the last patch from this
-> series.
->
-> To resolve mentioned problems I chosse way which is used by WSL, its
-> -t drvfs has mount option -o symlinkroot=3D which specify Linux path ther=
-e
-> should point absolute windows drive letter symlinks. This could make
-> -t cifs mounts in WSL2 more compatible with symlinks coming from local
-> NTFS disks mounted by -t drvfs.
->
-> I'm not sure how good are these changes, but I think that they improve
-> compatibility of symlinks between Linux and Windows systems. Maybe there
-> is some better solution how to handle some of those issues?
->
->
-> Pali Roh=C3=A1r (7):
->   cifs: Rename smb2_get_reparse_inode to smb2_create_reparse_inode
->   cifs: Improve creating native symlinks pointing to directory
->   cifs: Fix creating native symlinks pointing to current or parent
->     directory
->   cifs: Fix parsing native symlinks relative to the export
->   cifs: Fix parsing native symlinks directory/file type
->   cifs: Validate content of native symlink
->   cifs: Fix creating and resolving absolute NT-style symlinks
->
->  fs/smb/client/cifs_unicode.c |  17 +-
->  fs/smb/client/cifsglob.h     |   1 +
->  fs/smb/client/cifsproto.h    |   1 +
->  fs/smb/client/fs_context.c   |  22 ++
->  fs/smb/client/fs_context.h   |   2 +
->  fs/smb/client/inode.c        |   1 +
->  fs/smb/client/reparse.c      | 513 ++++++++++++++++++++++++++++++++---
->  fs/smb/client/reparse.h      |   4 +-
->  fs/smb/client/smb1ops.c      |   3 +-
->  fs/smb/client/smb2file.c     |  67 ++++-
->  fs/smb/client/smb2inode.c    |  15 +-
->  fs/smb/client/smb2proto.h    |  13 +-
->  12 files changed, 602 insertions(+), 57 deletions(-)
->
-> --
-> 2.20.1
->
->
-
-
---=20
-Thanks,
-
-Steve
+On Sunday 29 September 2024 16:16:44 Steve French wrote:
+> I lean against minor renames in rc2, better to focus on the bug fixes
+> in your patch (the renaming also makes it a bit harder to backport
+> fixes, so often better after all the fixes in, if important rename)
+> 
+> On Sun, Sep 29, 2024 at 1:51 PM Pali Rohár <pali@kernel.org> wrote:
+> >
+> > This function creates a new reparse point, so put "create" into its name.
+> >
+> > Signed-off-by: Pali Rohár <pali@kernel.org>
+> > ---
+> >  fs/smb/client/reparse.c   | 6 +++---
+> >  fs/smb/client/smb2inode.c | 2 +-
+> >  fs/smb/client/smb2proto.h | 2 +-
+> >  3 files changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> > index a23ea2f78c09..507e17244ed3 100644
+> > --- a/fs/smb/client/reparse.c
+> > +++ b/fs/smb/client/reparse.c
+> > @@ -68,7 +68,7 @@ int smb2_create_reparse_symlink(const unsigned int xid, struct inode *inode,
+> >         convert_delimiter(sym, '/');
+> >         iov.iov_base = buf;
+> >         iov.iov_len = len;
+> > -       new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
+> > +       new = smb2_create_reparse_inode(&data, inode->i_sb, xid,
+> >                                      tcon, full_path, &iov, NULL);
+> >         if (!IS_ERR(new))
+> >                 d_instantiate(dentry, new);
+> > @@ -136,7 +136,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+> >                 .reparse = { .tag = IO_REPARSE_TAG_NFS, .nfs = p, },
+> >         };
+> >
+> > -       new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
+> > +       new = smb2_create_reparse_inode(&data, inode->i_sb, xid,
+> >                                      tcon, full_path, &iov, NULL);
+> >         if (!IS_ERR(new))
+> >                 d_instantiate(dentry, new);
+> > @@ -282,7 +282,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
+> >         memcpy(data.wsl.eas, &cc->ea, len);
+> >         data.wsl.eas_len = len;
+> >
+> > -       new = smb2_get_reparse_inode(&data, inode->i_sb,
+> > +       new = smb2_create_reparse_inode(&data, inode->i_sb,
+> >                                      xid, tcon, full_path,
+> >                                      &reparse_iov, &xattr_iov);
+> >         if (!IS_ERR(new))
+> > diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> > index 6e69a3b98be3..0fc73035d6dc 100644
+> > --- a/fs/smb/client/smb2inode.c
+> > +++ b/fs/smb/client/smb2inode.c
+> > @@ -1193,7 +1193,7 @@ smb2_set_file_info(struct inode *inode, const char *full_path,
+> >         return rc;
+> >  }
+> >
+> > -struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+> > +struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
+> >                                      struct super_block *sb,
+> >                                      const unsigned int xid,
+> >                                      struct cifs_tcon *tcon,
+> > diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+> > index b208232b12a2..4ac30d29d5a1 100644
+> > --- a/fs/smb/client/smb2proto.h
+> > +++ b/fs/smb/client/smb2proto.h
+> > @@ -56,7 +56,7 @@ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+> >  extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+> >                                 struct cifs_sb_info *cifs_sb, const char *path,
+> >                                 __u32 *reparse_tag);
+> > -struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+> > +struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
+> >                                      struct super_block *sb,
+> >                                      const unsigned int xid,
+> >                                      struct cifs_tcon *tcon,
+> > --
+> > 2.20.1
+> >
+> >
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
