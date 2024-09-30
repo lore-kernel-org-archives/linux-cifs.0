@@ -1,126 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0813841C6A;
-	Mon, 30 Sep 2024 17:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD07199395
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 18:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727716834; cv=none; b=uy6iExTarkmIJXOnENxYeNFYH/sKiG32m3/rgSfFenShrBNI+9GVL1o92AFt1GlExffH3tIY3fWvbCxjMJF074b2zu+Kw75LH8bFgjGvP2wQwggYjf++rbPwZYU/M4jANESSRM7H3ZIcjaWd1dNPd0WmU2qH9ydp1wVdYYkWP1U=
+	t=1727721322; cv=none; b=qWxyZUayRe7sWsloO9Ez/r87soHt+Y8uK0WtaMwSBs5UJzNkq4F1C/LIZXasln2krJlnN41WKgD41/w+jJbuBi0HpHAyjJhh75wjI/Whc06JYqII7W03Y/wKuuHs0ma2+MeBHbEJg2JvkSZnz3EieaT0E+TKbwlGv0SuvfVszCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727716834; c=relaxed/simple;
-	bh=JI4/YEqKLWDif6ESadf2wfzAw0CxyVpEezu9rHiCHQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLNCG7cFzSTs4BCi38MihvPDm4RyE52nP6WhLQO3mo9uhJo4SsRs8T5YTCRhxSYRqN/ENAnQ/ykh2YaT2e944i/h9eFxBtORnODaVu57IBfo7GN2sXdEJZ08pnYXETz1MvHnIrBMA8BAdQIcCHwL9gDA/UtPRhDoNwSN8ywCrIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5xOfX3u; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727721322; c=relaxed/simple;
+	bh=u/r1gsK3d9HgHSLkwy9YD8P0OsrJDIi+1lCKi06YOU0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=QtG3pMZ6mZ3DzlfTvkwiTN+Jwjz/od5QRSvrtNFydF/HHEfLTWjOvov86oh0cSUFlHetjqrH9SIc/9I0SIosGUweHZo+MqvtzfeU6fcJdhdAOeMyC1slpxG9QIbLyBEsEA8UZPBT3qJLCSr+XQnQS3RUmfct23523e2meopBAGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T5EuLnKu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5xOfX3u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B4BC4CEC7;
-	Mon, 30 Sep 2024 17:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727716833;
-	bh=JI4/YEqKLWDif6ESadf2wfzAw0CxyVpEezu9rHiCHQU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a5xOfX3uVyCOUz21b/hAWclrVwN09wZsBbXmSJNFrXgJtWBDnVKSXV+Pg9CiOObr8
-	 I/cGRvHY6I/AQiYdhAC4t5cCDaNbQMDreYwaPBSa4KpK377pTAqJLEXZiX5OwCNSnq
-	 iP08TRGvI6TjWDNbBBaiok5r+pBgc9mYtPbE1huKNj6FjmRbkuSOgysaacjDZI9kdd
-	 bnZgzAjrZccDX9ioZw0iXyJ4LqRGTR+gpPr3u2ky+8+w1f9XknD1CiOX1jgbrZhP8O
-	 TBYWXAGMNN/S6y1OULLvSQ2VmB32FEf3j5yLjoVhuHilJnqRqDyr+qsHyLr0SU8ijx
-	 b8HWRarKfQ0KA==
-Received: by pali.im (Postfix)
-	id E2CC87D0; Mon, 30 Sep 2024 19:20:27 +0200 (CEST)
-Date: Mon, 30 Sep 2024 19:20:27 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: Steve French <sfrench@samba.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] cifs: Remove intermediate object of failed create
- reparse call
-Message-ID: <20240930172027.yt6qijriln4sv5hc@pali>
-References: <20240928215948.4494-1-pali@kernel.org>
- <20240928215948.4494-3-pali@kernel.org>
- <c5914322d267a2ef8ae1f712a293b258@manguebit.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T5EuLnKu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727721320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7X8o4DowsqGONQ/4kasxk3OiTMOAJHVfF5+gN/kqpqg=;
+	b=T5EuLnKuYhyu3rrNnrHeL11z8d3c+UDjDGRAD8wOyPDs3CYi+SN7pszmtHuoRJ3G/dg2dp
+	h1s6BzuMgof+HJIT31Q7behOSS6PPVEfp04Yj/gn3rwt1O+vqGJe0hhALkviglE5Bbm4vf
+	4p0jdYJpEGQmE0P8pXD8VYhl9j1Gl+Y=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-453--d_Kp97WPyK6rMA1zpyZig-1; Mon,
+ 30 Sep 2024 14:35:14 -0400
+X-MC-Unique: -d_Kp97WPyK6rMA1zpyZig-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59638196A10F;
+	Mon, 30 Sep 2024 18:35:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 10E771944CF6;
+	Mon, 30 Sep 2024 18:35:02 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
+References: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com> <2968940.1727700270@warthog.procyon.org.uk> <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com> <2969660.1727700717@warthog.procyon.org.uk>
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: dhowells@redhat.com, Leon Romanovsky <leon@kernel.org>,
+    Christian Brauner <brauner@kernel.org>,
+    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c5914322d267a2ef8ae1f712a293b258@manguebit.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3007427.1727721302.1@warthog.procyon.org.uk>
+Date: Mon, 30 Sep 2024 19:35:02 +0100
+Message-ID: <3007428.1727721302@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Monday 30 September 2024 12:25:27 Paulo Alcantara wrote:
-> Pali Rohár <pali@kernel.org> writes:
-> 
-> > If CREATE was successful but SMB2_OP_SET_REPARSE failed then remove the
-> > intermediate object created by CREATE. Otherwise empty object stay on the
-> > server when reparse call failed.
-> >
-> > This ensures that if the creating of special files is unsupported by the
-> > server then no empty file stay on the server as a result of unsupported
-> > operation.
-> >
-> > Fixes: 102466f303ff ("smb: client: allow creating special files via reparse points")
-> > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > ---
-> >  fs/smb/client/smb2inode.c | 21 +++++++++++++++++++--
-> >  1 file changed, 19 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> > index 11a1c53c64e0..af42f44bdcf4 100644
-> > --- a/fs/smb/client/smb2inode.c
-> > +++ b/fs/smb/client/smb2inode.c
-> > @@ -1205,6 +1205,8 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-> >  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-> >  	struct cifsFileInfo *cfile;
-> >  	struct inode *new = NULL;
-> > +	int out_buftype[2] = {};
-> > +	struct kvec out_iov[2];
-> >  	struct kvec in_iov[2];
-> >  	int cmds[2];
-> >  	int rc;
-> > @@ -1228,7 +1230,7 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-> >  		cmds[1] = SMB2_OP_POSIX_QUERY_INFO;
-> >  		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
-> >  		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
-> > -				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
-> > +				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
-> >  		if (!rc) {
-> >  			rc = smb311_posix_get_inode_info(&new, full_path,
-> >  							 data, sb, xid);
-> > @@ -1237,12 +1239,27 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
-> >  		cmds[1] = SMB2_OP_QUERY_INFO;
-> >  		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
-> >  		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
-> > -				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
-> > +				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
-> >  		if (!rc) {
-> >  			rc = cifs_get_inode_info(&new, full_path,
-> >  						 data, sb, xid, NULL);
-> >  		}
-> >  	}
-> > +
-> > +	if (rc) {
-> > +		/*
-> > +		 * If CREATE was successful but SMB2_OP_SET_REPARSE failed then
-> > +		 * remove the intermediate object created by CREATE. Otherwise
-> > +		 * empty object stay on the server when reparse call failed.
-> > +		 */
-> > +		if (((struct smb2_hdr *)out_iov[0].iov_base)->Status == STATUS_SUCCESS &&
-> > +		    ((struct smb2_hdr *)out_iov[1].iov_base)->Status != STATUS_SUCCESS)
-> > +			smb2_unlink(xid, tcon, full_path, cifs_sb, NULL);
-> > +	}
-> 
-> You should handle the case where ->iov_base is NULL or out_buftype ==
-> CIFS_NO_BUFFER, otherwise you'll end up with a NULL ptr deref.
+Eduard Zingerman <eddyz87@gmail.com> wrote:
 
-Ok, thanks for info! I will send v3 with those checks.
+> Are there any hacks possible to printout tracelog before complete boot
+> somehow?
 
-Anyway, what does it mean if iov_base stay NULL or out_buftype is
-CIFS_NO_BUFFER? Does it mean that the server has not returned reply for
-that command?
+You could try setting CONFIG_NETFS_DEBUG=y.  That'll print some stuff to
+dmesg.
 
-I guess that it should be treated as unsuccessful result.
+David
+
