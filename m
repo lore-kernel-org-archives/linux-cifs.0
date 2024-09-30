@@ -1,142 +1,117 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7789C19006F;
-	Mon, 30 Sep 2024 15:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727709952; cv=pass; b=of8RCioAdkq5KhptYosJxgkbT9z92+0ifmmJSdsNDDTEvlBE4Jr8t3vTq/fymFpiHk3yP1XtmSh68gxwy0e8XLerxHBANTOvxjdxN65S54/ZV8+16A7UPPHYPvBSjVZ9f92t4xwGMSi6EGUvNCr744mvlyXlQpa6TToE/I3aXYU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727709952; c=relaxed/simple;
-	bh=20hfKOAlqmEDqruN2uXHj2fi1xV7GxBSj3qINFXp+gU=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=Wc+bB6qhlLax9Pzfn+p+U7BNBZttn/GKD72HbajIc50HxzE8J+0E1df24cDIxmOXjSuRwS+Q2dlLOVtu92X8NgBTmi7LyxV504QKa8aaQI2YWjHsXusMz0ktIfTsBiuQyGJ1D7OhNFBB1mGrsn1K0U5nRcGatq9rv34DgGf6AlU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=gal2qjXA; arc=pass smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9681946AA;
+	Mon, 30 Sep 2024 16:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727714804; cv=none; b=ik1EqUmQWvcFXq8/m/mn+1syl6nBg0RrWwUJv5KYHq86M5UccLO55ZxVGSDjPaSSSktILhyYNMYVLkCUnJ8JDAhRCPQSUXGk6wTHwbRA6X5AfG2djAyYhiqhi7nh9did/zWUV0oIgC4Jh7N10Svs0ND5XUaKmMIOJzMOm7ZL35g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727714804; c=relaxed/simple;
+	bh=1rGJ3ml+BkufanYBiG4ElBjkODsCW83l25J2SX/Nfmc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZaUPklMNsKYNvD+Mjh4I/wDxnu0iEmmQP00eS6gJ3B8I/VAYDDFspb3GP1Bu7N9nc0m7urHGcn9Z7ZbzgeZDFcUHPncRdaOmtS2Cni4jEb3CQhE3rv8cxO6wWdC8OQgpRhFhzVNGHzFU/2jfIIzo/53seHYuI6KgW2i8AXmE7Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJHYfrs9; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="gal2qjXA"
-Message-ID: <c5914322d267a2ef8ae1f712a293b258@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1727709930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=INLc2tSrcn36QCY27uxhMv9M2y5U3XqU/kdk7BsQoxs=;
-	b=gal2qjXAkD2e/DaqzvJ9Y2gQwhfY3IP7H70nD2EPqbIIBcCYwi/GvitF0k28+qItxF6SjA
-	P8FmXRp9k1Z6vCP/OJam7vkkTHvvUY+egS7QkWCGCRj13YthsCup+h81HTuS9rppTLfWhw
-	e4zMddOJvp+PfC8ZuZLWsHijtohSo7R6y+O7CeHMho3jyJT2mbb336jS9D7P0fexIxT3OY
-	NLM831TuJWY8bZii+d5U8ID6E5OpapX01105/Obzc7sTL6trDlq41OdZIY28ea95rwQc2D
-	1OtrknyihXH+eU25xI2iZnCnCEda4LqfCk/9meRT6/ZLUsMOD5L5h3+Eld2kyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1727709930; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=INLc2tSrcn36QCY27uxhMv9M2y5U3XqU/kdk7BsQoxs=;
-	b=LEBxyWoRYP1HKaMq8FITr2BqZ399TS1UNGly6smKYiJQ8Ow/uqp5Exy909clAwtoWj5Czs
-	dJj9t/G1a5rK94r21a3ZjvpMaFUOlfkSqmpAmrcxGuBLIo00froUOhZisS/iRHBKKGD2Rb
-	LeLWKyEVSUxpQApDZkGIyE5xFImXjLP2e6iUpclxZEJKObc1op+EtEPvr44AqLBIYq6JRd
-	YgnDKH+Vb0UumjaHSbAdGHjDpqtD9mizSFH0nQLF2kUdCiHdDpHRN5wkrhmf6yllREp/Lq
-	6KayNL0XyoZ5/GSvBgyNIpc2acEMq2HU8QhtqnTWcELNxCKbEa9svWhadF8B6w==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1727709930; a=rsa-sha256;
-	cv=none;
-	b=TX1n43wl1/E9QoELkrRdPEFtGtWRQsCACAirFAi0SyKwwnT7ugDf6sJmWcustvhIwRTj4f
-	dk21J+Bo8Z/ya+0EXYuZn3Y6Q0jin4Phk6/VCEIxcZb7OwuZ0v6V6Qs52OIWsxCBbJJDt8
-	YmXg5TJTVwHoz6DGeL/eubGQrDA9zajtvzKoLf6bE7MiC+2UAGkea6e/ihwvNvJa3iI6ij
-	HMGssVxBghXe8Jl/pzjX+l72LfXLbulIivyA9gr4LYNbTc0UI8zkOyOTqBLP8VF9wDWEF7
-	tk9FHGsiRePc1XNH7jDHbmsEABJ+8Ht8LyKuLBI40U5GMBn3jC+95MYcZlp1CQ==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>, Steve French
- <sfrench@samba.org>, Ronnie
- Sahlberg <ronniesahlberg@gmail.com>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/8] cifs: Remove intermediate object of failed create
- reparse call
-In-Reply-To: <20240928215948.4494-3-pali@kernel.org>
-References: <20240928215948.4494-1-pali@kernel.org>
- <20240928215948.4494-3-pali@kernel.org>
-Date: Mon, 30 Sep 2024 12:25:27 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJHYfrs9"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20ba6b39a78so3168215ad.3;
+        Mon, 30 Sep 2024 09:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727714803; x=1728319603; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oFMgdLn7hB0TMtt+qsWxpUh5i8iT0KYc/LM27VmdFOA=;
+        b=YJHYfrs9rpOwz+to2j6Ewri3t9bulRdMja1hdfA+4zSyelhdRwvxLUkdTp82IwFElq
+         BXql3ebOzd+EZ0dI+c/vxh92LxBsv9Uu0qtdFrEU4cdBRdB9vcwMT8j84b2iQr0c/I9A
+         Lk4sv7eUnDmCKfx3B+Zjov7D3gkzu9ix3sdZH0SCEM6ycWlOsEhlpjy3ZMEJcY535nHL
+         YTy+KGU7pGeMAulxfv1eP+Qn1UYOMGlLZQERGvfj3gPXht7XdBVZPUVc+FWh57rV6xFY
+         YtpVY/TNPtuFOqg5RQcoY0VWJdXuriWGMzazx01WzMDFGdPVwV/af2iMJmBFfh1E2LHH
+         nlaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727714803; x=1728319603;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oFMgdLn7hB0TMtt+qsWxpUh5i8iT0KYc/LM27VmdFOA=;
+        b=uwT7KMhsGPy75Myyn0ejoae+y/DdljZCiYXdhyNo1eRQORxrbLAg0zoPc8uukkoMcf
+         lNNI5ZevBVCQeaL5IIJIKkyoyi/HRPVDzr1Ns08t4UZC7lb0iT5/w3Kvs3JDvRRP8VlC
+         7/aHmwbKKV5kkOL/Kv48g59Bh1tvjKqwTDmG3Y88dshYZgk6Vy7u5pU/WVhVFKFHHZRp
+         IbAWtHfJV0CXM62lu2IcWH/bWKJlDghNZOWxutPaoDAbcwGjdKW8njvEYmIj+pZOgx4q
+         e3vfZFUzsl0d928g5ENWK+KsbzJc3Mq2Wb/kpbdbcAxYA7/3cPTZxNRi3hsTpUZgejjA
+         FgAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUurJcBxE+Jf1VdErf8gnsQNhLUa5tet9/FhHqD7rfQRH4uwXWdzJKIbUuj8IAj/dz5Yg1nhGsl1cIX@vger.kernel.org, AJvYcCV3yGyHlJ9hE7W3Y5aXSnhEJgjTMMG+kHRCsHys5Uobv1haaRmLgRyg5fct3ByPWuMBkNchMfy/zOhdXg==@vger.kernel.org, AJvYcCV4sbMorniZ3KfQc0Rih4TZ9ZWlJgcBgpSZqePsWlFe7ubS/caetrCgOeKzGpM0d8Jydpoc50ULZtuwypTt@vger.kernel.org, AJvYcCVb6pIf1TbZjzsiLKYVxRS7TPzolRyG6Vy2elsiHFh45x8RHqahw2Gl3UKV5UDr6j84a3kA+b1Z@vger.kernel.org, AJvYcCXXL5UV8hH0YeVMWh/DvPd0jDv7VgJEHYqfd1T0sQ61PzVZkubiSl1pz9sp+Hg83uPa5nUFH9Su+Qde@vger.kernel.org, AJvYcCXrkyUnt7g+t5QYVU2eJU1ZynbB40QkddROShZ4HQNURiGCf532IpTCrfO3XdxT9LPMgJA72U21Lwu9vQFQrg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJME94YiV0877LQk+iWJrD6qCwVVUJF/LlFnYLHIY6PB22WCxp
+	mO7zjjtLd0Aj4HsCgnFZf1mOTrO71GLznNYhQH0bSZ+s9IXisZiy
+X-Google-Smtp-Source: AGHT+IFZC3EJ0qzaaUHzbstF3Ibe+95zgKik8WWlYGIZbkQX0EKejoD/dNihbdBEqG2pUNucAQRStA==
+X-Received: by 2002:a17:90a:bf03:b0:2e0:a28a:ef88 with SMTP id 98e67ed59e1d1-2e0b8eeebe9mr12068969a91.41.1727714802654;
+        Mon, 30 Sep 2024 09:46:42 -0700 (PDT)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c9d354sm8211290a91.25.2024.09.30.09.46.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 09:46:42 -0700 (PDT)
+Message-ID: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: David Howells <dhowells@redhat.com>, Leon Romanovsky <leon@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, Manu Bretelle
+ <chantr4@gmail.com>,  asmadeus@codewreck.org, ceph-devel@vger.kernel.org,
+ christian@brauner.io,  ericvh@kernel.org, hsiangkao@linux.alibaba.com,
+ idryomov@gmail.com,  jlayton@kernel.org, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
+ linux-fsdevel@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-nfs@vger.kernel.org,  marc.dionne@auristor.com,
+ netdev@vger.kernel.org, netfs@lists.linux.dev,  pc@manguebit.com,
+ smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+ v9fs@lists.linux.dev, willy@infradead.org
+Date: Mon, 30 Sep 2024 09:46:36 -0700
+In-Reply-To: <2969660.1727700717@warthog.procyon.org.uk>
+References: <2968940.1727700270@warthog.procyon.org.uk>
+	 <20240925103118.GE967758@unreal>
+	 <20240923183432.1876750-1-chantr4@gmail.com>
+	 <20240814203850.2240469-20-dhowells@redhat.com>
+	 <1279816.1727220013@warthog.procyon.org.uk>
+	 <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+	 <2969660.1727700717@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
+On Mon, 2024-09-30 at 13:51 +0100, David Howells wrote:
+> David Howells <dhowells@redhat.com> wrote:
+>=20
+> > Okay, let's try something a little more drastic.  See if we can at leas=
+t get
+> > it booting to the point we can read the tracelog.  If you can apply the
+> > attached patch?
+>=20
+> It's also on my branch:
+>=20
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/lo=
+g/?h=3Dnetfs-fixes
+>=20
+> along with another one that clears the folio pointer after unlocking.
 
-> If CREATE was successful but SMB2_OP_SET_REPARSE failed then remove the
-> intermediate object created by CREATE. Otherwise empty object stay on the
-> server when reparse call failed.
->
-> This ensures that if the creating of special files is unsupported by the
-> server then no empty file stay on the server as a result of unsupported
-> operation.
->
-> Fixes: 102466f303ff ("smb: client: allow creating special files via repar=
-se points")
-> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
-> ---
->  fs/smb/client/smb2inode.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 11a1c53c64e0..af42f44bdcf4 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -1205,6 +1205,8 @@ struct inode *smb2_get_reparse_inode(struct cifs_op=
-en_info_data *data,
->  	struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
->  	struct cifsFileInfo *cfile;
->  	struct inode *new =3D NULL;
-> +	int out_buftype[2] =3D {};
-> +	struct kvec out_iov[2];
->  	struct kvec in_iov[2];
->  	int cmds[2];
->  	int rc;
-> @@ -1228,7 +1230,7 @@ struct inode *smb2_get_reparse_inode(struct cifs_op=
-en_info_data *data,
->  		cmds[1] =3D SMB2_OP_POSIX_QUERY_INFO;
->  		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
->  		rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
-> -				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
-> +				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
->  		if (!rc) {
->  			rc =3D smb311_posix_get_inode_info(&new, full_path,
->  							 data, sb, xid);
-> @@ -1237,12 +1239,27 @@ struct inode *smb2_get_reparse_inode(struct cifs_=
-open_info_data *data,
->  		cmds[1] =3D SMB2_OP_QUERY_INFO;
->  		cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
->  		rc =3D smb2_compound_op(xid, tcon, cifs_sb, full_path, &oparms,
-> -				      in_iov, cmds, 2, cfile, NULL, NULL, NULL);
-> +				      in_iov, cmds, 2, cfile, out_iov, out_buftype, NULL);
->  		if (!rc) {
->  			rc =3D cifs_get_inode_info(&new, full_path,
->  						 data, sb, xid, NULL);
->  		}
->  	}
-> +
-> +	if (rc) {
-> +		/*
-> +		 * If CREATE was successful but SMB2_OP_SET_REPARSE failed then
-> +		 * remove the intermediate object created by CREATE. Otherwise
-> +		 * empty object stay on the server when reparse call failed.
-> +		 */
-> +		if (((struct smb2_hdr *)out_iov[0].iov_base)->Status =3D=3D STATUS_SUC=
-CESS &&
-> +		    ((struct smb2_hdr *)out_iov[1].iov_base)->Status !=3D STATUS_SUCCE=
-SS)
-> +			smb2_unlink(xid, tcon, full_path, cifs_sb, NULL);
-> +	}
+Hi David,
 
-You should handle the case where ->iov_base is NULL or out_buftype =3D=3D
-CIFS_NO_BUFFER, otherwise you'll end up with a NULL ptr deref.
+dmesg is here:
+https://gist.github.com/eddyz87/3a5f2a7ae9ba6803fc46f06223a501fc
+
+Used the following commit from your branch:
+ba1659e0f147 ("9p: [DEBUGGING] Don't release pages or folioq structs")
+
+Still does not boot, unfortunately.
+Are there any hacks possible to printout tracelog before complete boot some=
+how?
+
+Thanks,
+Eduard
+
