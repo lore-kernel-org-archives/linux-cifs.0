@@ -1,85 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD07199395
-	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 18:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C3F19993C
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 19:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727721322; cv=none; b=qWxyZUayRe7sWsloO9Ez/r87soHt+Y8uK0WtaMwSBs5UJzNkq4F1C/LIZXasln2krJlnN41WKgD41/w+jJbuBi0HpHAyjJhh75wjI/Whc06JYqII7W03Y/wKuuHs0ma2+MeBHbEJg2JvkSZnz3EieaT0E+TKbwlGv0SuvfVszCk=
+	t=1727722823; cv=none; b=YjHSH+vUWbu0xVcFbdI+KGHy/FRcezExHKWe5+HKwDNT8CJuRSfkmjwZONrM/83gRfyaLT8sA3I19xeJsCaDzejt4VDfZ+t4IBSL1CPkrds8Ajn1Cusijuk9Z0L2Rlx84ns/ufSWP3UaBRjkyEIRf21VCq/VhBLjCpyMkoVxF8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727721322; c=relaxed/simple;
-	bh=u/r1gsK3d9HgHSLkwy9YD8P0OsrJDIi+1lCKi06YOU0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=QtG3pMZ6mZ3DzlfTvkwiTN+Jwjz/od5QRSvrtNFydF/HHEfLTWjOvov86oh0cSUFlHetjqrH9SIc/9I0SIosGUweHZo+MqvtzfeU6fcJdhdAOeMyC1slpxG9QIbLyBEsEA8UZPBT3qJLCSr+XQnQS3RUmfct23523e2meopBAGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T5EuLnKu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1727722823; c=relaxed/simple;
+	bh=UTeuYgMehmLJA/arPzgIQes3j/4SwwxcY8cev10CXXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p+45T/17UUwnDD9n+z6BYwnlhMoF4bmy7W6M+snDu3REzDmakxUSpEX6zVmy4H2q2H2hTVgLX/LzkCBokHF1xdj/aZzj8A+Ux+s+Z6AIH9W7WTrILVGUXMdZEtfJqqneLMXd+vM2FvZv38hCrWra++vQpMwNjmLSI8ZKWqEwDV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com; spf=none smtp.mailfrom=osandov.com; dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b=AD2ZcWHJ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=osandov.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T5EuLnKu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727721320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7X8o4DowsqGONQ/4kasxk3OiTMOAJHVfF5+gN/kqpqg=;
-	b=T5EuLnKuYhyu3rrNnrHeL11z8d3c+UDjDGRAD8wOyPDs3CYi+SN7pszmtHuoRJ3G/dg2dp
-	h1s6BzuMgof+HJIT31Q7behOSS6PPVEfp04Yj/gn3rwt1O+vqGJe0hhALkviglE5Bbm4vf
-	4p0jdYJpEGQmE0P8pXD8VYhl9j1Gl+Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453--d_Kp97WPyK6rMA1zpyZig-1; Mon,
- 30 Sep 2024 14:35:14 -0400
-X-MC-Unique: -d_Kp97WPyK6rMA1zpyZig-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59638196A10F;
-	Mon, 30 Sep 2024 18:35:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 10E771944CF6;
-	Mon, 30 Sep 2024 18:35:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
-References: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com> <2968940.1727700270@warthog.procyon.org.uk> <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com> <2969660.1727700717@warthog.procyon.org.uk>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: dhowells@redhat.com, Leon Romanovsky <leon@kernel.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
-    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
-    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org
+	dkim=pass (2048-bit key) header.d=osandov-com.20230601.gappssmtp.com header.i=@osandov-com.20230601.gappssmtp.com header.b="AD2ZcWHJ"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-718e0421143so672963b3a.0
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 12:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20230601.gappssmtp.com; s=20230601; t=1727722818; x=1728327618; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tK4zHMv9BgdsXfJFkQFkyqT5Q9MVxMalN7pOJK+VYMc=;
+        b=AD2ZcWHJT/Eh8QCoGwtR2mU/72Hn5PXbAqIORnZDyFQ12uCk5B6tgPR0gvJL4FDpmJ
+         ulZzhaj/oQ9sKYNODSjhgVv94UWmTt9EA+rp3AZxM3D7FuMreK9zLBVPVKWu3uh3+yR+
+         vy+EFC32Ma8cvowRGq+XAGeEadeMV+x3qYlOPzmGn6BqAD76WPYrQPop8bkeDhZ4ERpK
+         1UNXgJ0vFc4lVx8afjUXBo0LvvB6Rd4zof4t3Zc6Vy61FsDUmw+QDwS60x7YioxFUGH3
+         CoTsxWXSnHhGL7i7+cVMdkBzfJQ1pVAYBQUJy/0cBhT0hau1JKlewvZ94VVeJ6zOGv4q
+         0Crg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727722818; x=1728327618;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tK4zHMv9BgdsXfJFkQFkyqT5Q9MVxMalN7pOJK+VYMc=;
+        b=JJo8DEQDXytX3odNQ8p9WFXydYQU+8nWNYiWIPCb3ap1YVauaQYxtnB6N1pfKCrQB2
+         XVZ0my80C3bqABY/gfVprB7taCHEer+PENrtLZ5guJLCJFuNRpBYdNtOaAJR3ZW6o6CP
+         HsN/2LORj05M9nvF48wNsFAC3beDZG7YowCnCUtHSS9kUCbfe9iI02WJ3Wy4jcmNXeaC
+         RDGtwkumm+hUUdVsPMA9N2zbzGaWqWI4v5sChLQ9qn96XgTe7JtMLhiJC+HTp4WCNTpT
+         Hf7GPlJEe2blMmjZCJmC9EOOa18swU/QYrSlITuZs4gWnFygkhihuGEZD1gLq7iioag3
+         XWHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTcxrdcdT5h51mCPKXHp0ybOKtEgMbyOPOcbHNUm01SWvuHjWZ2zZQlHoMkpTQNDMiyCsW2f51R29i@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1s88jH/1Cin1VpTegfzOaJWM+5xXpgxLuf5kUqsU/YjKxmcSD
+	P+kjBkfQ/pSRJmUtdSdJIjfvRfemrkpB0NT+fB3iOOQC58eJTvFpSwVg511FFno=
+X-Google-Smtp-Source: AGHT+IHr3t4octArrJkwK4KlggdiRYNEixY4E7CvOHzMJxxuBtEfGjyLTrjjT9DROP00qxEU234jog==
+X-Received: by 2002:a05:6a00:2392:b0:718:e49f:246e with SMTP id d2e1a72fcca58-71b260a8a3fmr8397735b3a.6.1727722818090;
+        Mon, 30 Sep 2024 12:00:18 -0700 (PDT)
+Received: from telecaster.dhcp.thefacebook.com ([2620:10d:c090:500::6:e49b])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b2652a622sm6544654b3a.164.2024.09.30.12.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 12:00:17 -0700 (PDT)
+Date: Mon, 30 Sep 2024 12:00:13 -0700
+From: Omar Sandoval <osandov@osandov.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, Leon Romanovsky <leon@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+	ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+	hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+	netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+	smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	v9fs@lists.linux.dev, willy@infradead.org
 Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+Message-ID: <Zvr1PVRpC33aaUdt@telecaster.dhcp.thefacebook.com>
+References: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
+ <2968940.1727700270@warthog.procyon.org.uk>
+ <20240925103118.GE967758@unreal>
+ <20240923183432.1876750-1-chantr4@gmail.com>
+ <20240814203850.2240469-20-dhowells@redhat.com>
+ <1279816.1727220013@warthog.procyon.org.uk>
+ <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+ <2969660.1727700717@warthog.procyon.org.uk>
+ <3007428.1727721302@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3007427.1727721302.1@warthog.procyon.org.uk>
-Date: Mon, 30 Sep 2024 19:35:02 +0100
-Message-ID: <3007428.1727721302@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3007428.1727721302@warthog.procyon.org.uk>
 
-Eduard Zingerman <eddyz87@gmail.com> wrote:
+On Mon, Sep 30, 2024 at 07:35:02PM +0100, David Howells wrote:
+> Eduard Zingerman <eddyz87@gmail.com> wrote:
+> 
+> > Are there any hacks possible to printout tracelog before complete boot
+> > somehow?
+> 
+> You could try setting CONFIG_NETFS_DEBUG=y.  That'll print some stuff to
+> dmesg.
+> 
+> David
 
-> Are there any hacks possible to printout tracelog before complete boot
-> somehow?
+I hit this in drgn's VM test setup, too, and just sent a patch that
+fixed it for me and Manu:
+https://lore.kernel.org/linux-fsdevel/cbaf141ba6c0e2e209717d02746584072844841a.1727722269.git.osandov@fb.com/
 
-You could try setting CONFIG_NETFS_DEBUG=y.  That'll print some stuff to
-dmesg.
-
-David
-
+Thanks,
+Omar
