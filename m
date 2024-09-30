@@ -1,53 +1,54 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DA01F5EA
-	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 03:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11F41C65
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 04:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727668799; cv=none; b=C6VHla8pOC3jhH8WlZUefABj1Q5MyE6Xman9AKZYae+zWi4T20viD+EtvcpXz4eaNDaHm6R0IC2zv16msf0Eb16ALNzW2TppWY7+dBsX9ybx5a+v12d4mKiuLwGid8e97QSyijAbGpHkAPzSw8EdIO85UcdVzrinECDIrdNlrhI=
+	t=1727670162; cv=none; b=glk9ekcTgxOL8m5+AM8B1JJynuC1+9mg/U8hMQ0qLtgS0+x3Ga+NMENuVq/r00JiZTTTbDexkuYTJcy4Qut4DJWD4EoDKmBrhxoY9LQNhpgc/Go5TXGDihsjCAh5Miwt3CzNBIVdFa9TK+5YDdxWYMrg836Oas3exrrJ3pkGfvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727668799; c=relaxed/simple;
-	bh=iVoWxPAgyhMzJlVrgvLz8qA1uTvEYV+nC6NHUb3k15g=;
+	s=arc-20240116; t=1727670162; c=relaxed/simple;
+	bh=0zMdvOX1v5L3zJs6h8lGoDvWCKWj6QRynB0vfo4xPSM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ViP8mxjBiuhVoUIPtPD4IlXx9rTD1NUfGEu293B6q6zUkVT4mingTtgej29wILUaTwJ57aa0nPWNs8M3vncK7GX6igNHaeZ2/Mjv+7VOdzZmfWGHTun61TfC0cMbCukdbB1/1kQlVqvPEzy7r/NS8Bqi0J42dCzonY13CyQyoCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XMoqQLYi; arc=none smtp.client-ip=209.85.219.49
+	 To:Cc:Content-Type; b=E1pFNDT8TkXRK9aQA9s2cHjI+U++zc43qKWV7MN5Q1/jcYbhu8Jzksg29eUovOnLUiydaf3Hivvr65eGxOIm/LxzEYCI3l/u2/74sdJmZ8Uj7lwwRtkCKk4S1L1JBlIgc5luAveBZeOQJeg38nDTbbqtaKcQCVdWPv9fdTEaMNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ITsu2H0Y; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XMoqQLYi"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6cb3bbb9cf5so29339066d6.1
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Sep 2024 20:59:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ITsu2H0Y"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2faccada15bso4815401fa.3
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Sep 2024 21:22:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727668797; x=1728273597; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rPSl/+D4AW6CRz9BgTNpBZmzGi/+7pcJAjQk6puNu3U=;
-        b=XMoqQLYinqs5JKEchbMh9AnXLrr62tyLrzsE/7fLfaxxlOUJIYy8M5sd7RnKpJmJZh
-         nJtsIz28IzdrDxwjXpX6PX5wzznLO1w4xfnOm66WBthRvgzxO4Xmc9KJiDHHzTnktMrz
-         zlQbD84SaaAFQg0N+v+CX/zEff866Tt1VtLg8KOBVyd+khGD8tIweZV7fNd+BV5FxYLi
-         Bkuq/vDoZRa+TAHTKILZGQW0enOs7O6QnGePqw6ZZ3ETcyFUfvczxPwpon/j3EC70afy
-         ydnrn6389fqEUU9DwFgxEuzTiZIKPG6z10Wz9weH2YXrAi40bWAdVFZaAEpU9iWZsVBz
-         C2sw==
+        d=gmail.com; s=20230601; t=1727670159; x=1728274959; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KlWJAa2wpeqWSyxOAqnjajE81At3dJ2FAnqUtDTKo2I=;
+        b=ITsu2H0Y7xSawr3Y0qx1188CB2bcKw2xcb2Fg+cFLzW9ArpBXoXVPdF/7fK7yfLsjt
+         tOiYbC5glXd/AUHrvqEi7IicHeuksu6XEmmghLBPXxAnTcBI2JGaN2qD6lI0MzURsM18
+         CHgS3CF682GJEO5a279Sm3NBT9xduNpE/Jtxo6qhBDwQHVdwv7xErLNasRHiaaBIfEUc
+         /btgknFjkeM9paUEx/83zLxGpW3xpKjDa4eoqbbMR4/90KsV0QMQG9fW/te8UjKdWL/H
+         5CuR+f1bfRdVuFT2rEHMT2Jq9n+sZuWa8L0m7P7oNYweyKOnKiNOB8X08Ft6KR0ZTNbS
+         qc+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727668797; x=1728273597;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rPSl/+D4AW6CRz9BgTNpBZmzGi/+7pcJAjQk6puNu3U=;
-        b=AxYEAPRgpRrww+MaYOf5A7u+ciF3XUAguC+4Io1c+S5JIsIaGsB7jKUJ8tE3qvGbd9
-         nc24z1jzcJUMM4YipYQaiTikkdvU7X7y/8gdiIcgICpX6MMKrr2T/ui65mGjOmPeLU/4
-         m+5GpzPDQ4ZjaX8uL3b+UzTtoIfC7mB2rVZvHAu/RMOWS85rJYlfuGliBHjM2F7xb+Ks
-         Tj5ITGj+QzO482lLRcF8NY0eDYrVhJZvZq8yPhX+ceZ+yjE147Ff7pIGnDjUZJYa8Icy
-         q6i054LKJU6N71rVjQCRwoktffRJXVUbu4n0tRJvmoGUFXF+fcrnIxnp8kfSyApEB55E
-         EHNA==
-X-Gm-Message-State: AOJu0Yyz8/jYJCF2Zb+NKtjxbZ/y/35ZQqoIOEDliqmFGXWbUAOlifPW
-	zsL+8jVxz254ltbet8LOPKMoSbhYtHo4gY4vRbU8oJKe5W4XcIhWNxz5Vb1VodNIAMm8A8eMGu0
-	UM9pZyDy6kYoiyG27E1FwIUBBI5eiPLOYaQs=
-X-Google-Smtp-Source: AGHT+IHUwiOqxWwt51uZVVepFe6yAzE0ZUNgbgrDVGe4BInGEUB059x9Ho80uFF9lk0GtH+Ovr7PZPjVZaMarY8eC74=
-X-Received: by 2002:a05:6214:4613:b0:6cb:2242:df32 with SMTP id
- 6a1803df08f44-6cb3b5ee4a8mr181102976d6.20.1727668796702; Sun, 29 Sep 2024
- 20:59:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727670159; x=1728274959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KlWJAa2wpeqWSyxOAqnjajE81At3dJ2FAnqUtDTKo2I=;
+        b=XO0ykpjw/RRBktfuQRI3/wG1j6eZaQwij04vcHb6bHpbbRw/sGICTqmpvz79BnKKpz
+         fsU4EUQ/L0JEEhRoXSF5sptpyLDdQF7SEUYm4Jygg2FvdXAzuQmVEax0ym9y1cBQhobA
+         o5SS5m52kZ6N2/ZIB/ZH6tn49IBPnCXluag0j2mUjaXSqSt7o7+foMLdflCPu9ADSOLJ
+         JRP83AhZnq79ds7AbLkkxB2SXKWD1uz2rbLjKyW5DgHGq/7/3GKP4qimyf4SXPi2Q/Y4
+         3uZOR0TM/YvQ++s+4+rVjZFp9qLQZTXvUcTEQ07drirMsvqHe3vkKUUeFHMiJsfljixS
+         sIkg==
+X-Gm-Message-State: AOJu0YwO/L+I4gUDjoPYeti+OOCjO5aYVhIuZ4vvX9W6h0SVtSrHYnzD
+	piFjykLxntgrCPf5s7EzOyXYqlrAolsysxZ4Nxs9NUBlTPPj9OmT/T21tPD8JRUF5jx2S4OeDPF
+	Gg7zLEwtr9q8JhzuezJCENwUBOoQ=
+X-Google-Smtp-Source: AGHT+IH07JAUSu8aiU+pmumPRjKP9EhaFGJLy6x8XboYuMiX2Fs+ydzP2zI/KlI5nGnJmndbHvRh+lTLjsz6tpiCtts=
+X-Received: by 2002:a05:6512:3a96:b0:535:6aa9:9868 with SMTP id
+ 2adb3069b0e04-5389fc3c27fmr5758146e87.19.1727670158431; Sun, 29 Sep 2024
+ 21:22:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -55,38 +56,68 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <CAH2r5mtp0SNG1yvDq8rDUWOYQrZh9_OtFFKWCEmOXeD=Ou5i4Q@mail.gmail.com>
-In-Reply-To: <CAH2r5mtp0SNG1yvDq8rDUWOYQrZh9_OtFFKWCEmOXeD=Ou5i4Q@mail.gmail.com>
-From: Anthony Nandaa <profnandaa@gmail.com>
-Date: Mon, 30 Sep 2024 06:59:44 +0300
-Message-ID: <CAACuyFX7J9Ht2RdbarBFp+VvF9Y8800mezYMFVmQApaAzOKxYQ@mail.gmail.com>
+ <CAACuyFX7J9Ht2RdbarBFp+VvF9Y8800mezYMFVmQApaAzOKxYQ@mail.gmail.com>
+In-Reply-To: <CAACuyFX7J9Ht2RdbarBFp+VvF9Y8800mezYMFVmQApaAzOKxYQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 29 Sep 2024 23:22:26 -0500
+Message-ID: <CAH2r5mt-Ui4_R0HMh9hDK-Xe5OhcZ2HJZMDCRffMOv8XsO=4cA@mail.gmail.com>
 Subject: Re: xfstests generic/089
-To: Steve French <smfrench@gmail.com>
+To: Anthony Nandaa <profnandaa@gmail.com>
 Cc: CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steve --
-
-On Sun, 29 Sept 2024 at 18:32, Steve French <smfrench@gmail.com> wrote:
+On Sun, Sep 29, 2024 at 10:59=E2=80=AFPM Anthony Nandaa <profnandaa@gmail.c=
+om> wrote:
 >
-> Has anyone seen xfstest generic/089 going forever (sending compounded
-> open/close then open then close forever)?  This was with current
-> for-next, running to current Samba master (localhost) with "linux"
-> mount option
-
-Getting the same, tests gets into an endless loop even in the
-for-next@f9494b6b6dcadd3ee1d70d27d1419d1084e98ff6 (Aug 20).
-
-Could you please remind me how to get more verbose logs, or
-an approach I can take to help debug this?
-
+> Hi Steve --
 >
-> --
-> Thanks,
+> On Sun, 29 Sept 2024 at 18:32, Steve French <smfrench@gmail.com> wrote:
+> >
+> > Has anyone seen xfstest generic/089 going forever (sending compounded
+> > open/close then open then close forever)?  This was with current
+> > for-next, running to current Samba master (localhost) with "linux"
+> > mount option
 >
-> Steve
+> Getting the same, tests gets into an endless loop even in the
+> for-next@f9494b6b6dcadd3ee1d70d27d1419d1084e98ff6 (Aug 20).
 >
+> Could you please remind me how to get more verbose logs, or
+> an approach I can take to help debug this?
+
+Take a look at the "Enabling Debugging" section of:
+
+https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+
+As an alternative, I usually use dynamic tracing.  To start with, as the
+problem repros:
+
+"trace-cmd record -e cifs"
+and then in another window
+"trace-cmd show"
+
+You can more narrowly trace one certain functions by selecting from
+among those e.g. in
+
+/sys/kernel/tracing/events/cifs/ and /sys/kernel/tracing/events/syscalls e.=
+g.
+
+"trace-cmd record -e smb3_open_* -e smb3_close_err -e smb3_reconnect*"
+
+You can also can get an idea of what commands are being sent by looking at:
+/proc/fs/cifs/Stats and see number of requests by command (and
+checking to see what changes)
+You can also look at what process is doing activity on the share by looking=
+ at:
+/proc/fs/cifs/open_files  and also seeing the requests in flight
+("mids") by periodically looking at the bottom of
+/proc/fs/cifs/DebugData
+
+Also the additional Debugging section has an example of getting a call
+graph if you can narrow it down more.
 
 
--- 
-___
-Nandaa Anthony
+--=20
+Thanks,
+
+Steve
