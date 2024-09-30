@@ -1,123 +1,138 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB11F41C65
-	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 04:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F67A18EFD0
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2024 12:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727670162; cv=none; b=glk9ekcTgxOL8m5+AM8B1JJynuC1+9mg/U8hMQ0qLtgS0+x3Ga+NMENuVq/r00JiZTTTbDexkuYTJcy4Qut4DJWD4EoDKmBrhxoY9LQNhpgc/Go5TXGDihsjCAh5Miwt3CzNBIVdFa9TK+5YDdxWYMrg836Oas3exrrJ3pkGfvI=
+	t=1727700285; cv=none; b=hkzl+n7c5GGdeXDGDyIyTMqeppJr5RNwHgXimTJ13wHOjoCgnEBPEBf8adm1Qo+eafs0vUcqSLv7RP8T//eEyMM/EZHWrzDGrwpB6RcEhIQopbaRKhwmlng5nNrmkYvWYWli9Zvas78RIAZzS9+opg0/dtZIZ3e0UAhEoy467ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727670162; c=relaxed/simple;
-	bh=0zMdvOX1v5L3zJs6h8lGoDvWCKWj6QRynB0vfo4xPSM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E1pFNDT8TkXRK9aQA9s2cHjI+U++zc43qKWV7MN5Q1/jcYbhu8Jzksg29eUovOnLUiydaf3Hivvr65eGxOIm/LxzEYCI3l/u2/74sdJmZ8Uj7lwwRtkCKk4S1L1JBlIgc5luAveBZeOQJeg38nDTbbqtaKcQCVdWPv9fdTEaMNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ITsu2H0Y; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727700285; c=relaxed/simple;
+	bh=6vUuZ2dmjzVrkKIoa9FfLBuOBd8yL0AJKjCVHkJVKs0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Rxcue5s3hUCRt0w5mi2CfKpxAlAhOh/CnlRtqUcOIpc9T4JdS+w4e4Nj+629FdtgoyW5scTcSdvCEOutG9VQFjx4yoMlw3u/8UtOxDf3dPJx9vx38F3Cdnpr2eeuTiKNw1/UZgJ0WGAKDFMRkeG66eho56VHzXW7Ml11uWCJKUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ESp4XrK8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ITsu2H0Y"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2faccada15bso4815401fa.3
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Sep 2024 21:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727670159; x=1728274959; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KlWJAa2wpeqWSyxOAqnjajE81At3dJ2FAnqUtDTKo2I=;
-        b=ITsu2H0Y7xSawr3Y0qx1188CB2bcKw2xcb2Fg+cFLzW9ArpBXoXVPdF/7fK7yfLsjt
-         tOiYbC5glXd/AUHrvqEi7IicHeuksu6XEmmghLBPXxAnTcBI2JGaN2qD6lI0MzURsM18
-         CHgS3CF682GJEO5a279Sm3NBT9xduNpE/Jtxo6qhBDwQHVdwv7xErLNasRHiaaBIfEUc
-         /btgknFjkeM9paUEx/83zLxGpW3xpKjDa4eoqbbMR4/90KsV0QMQG9fW/te8UjKdWL/H
-         5CuR+f1bfRdVuFT2rEHMT2Jq9n+sZuWa8L0m7P7oNYweyKOnKiNOB8X08Ft6KR0ZTNbS
-         qc+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727670159; x=1728274959;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KlWJAa2wpeqWSyxOAqnjajE81At3dJ2FAnqUtDTKo2I=;
-        b=XO0ykpjw/RRBktfuQRI3/wG1j6eZaQwij04vcHb6bHpbbRw/sGICTqmpvz79BnKKpz
-         fsU4EUQ/L0JEEhRoXSF5sptpyLDdQF7SEUYm4Jygg2FvdXAzuQmVEax0ym9y1cBQhobA
-         o5SS5m52kZ6N2/ZIB/ZH6tn49IBPnCXluag0j2mUjaXSqSt7o7+foMLdflCPu9ADSOLJ
-         JRP83AhZnq79ds7AbLkkxB2SXKWD1uz2rbLjKyW5DgHGq/7/3GKP4qimyf4SXPi2Q/Y4
-         3uZOR0TM/YvQ++s+4+rVjZFp9qLQZTXvUcTEQ07drirMsvqHe3vkKUUeFHMiJsfljixS
-         sIkg==
-X-Gm-Message-State: AOJu0YwO/L+I4gUDjoPYeti+OOCjO5aYVhIuZ4vvX9W6h0SVtSrHYnzD
-	piFjykLxntgrCPf5s7EzOyXYqlrAolsysxZ4Nxs9NUBlTPPj9OmT/T21tPD8JRUF5jx2S4OeDPF
-	Gg7zLEwtr9q8JhzuezJCENwUBOoQ=
-X-Google-Smtp-Source: AGHT+IH07JAUSu8aiU+pmumPRjKP9EhaFGJLy6x8XboYuMiX2Fs+ydzP2zI/KlI5nGnJmndbHvRh+lTLjsz6tpiCtts=
-X-Received: by 2002:a05:6512:3a96:b0:535:6aa9:9868 with SMTP id
- 2adb3069b0e04-5389fc3c27fmr5758146e87.19.1727670158431; Sun, 29 Sep 2024
- 21:22:38 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ESp4XrK8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727700283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bVDH90pWvwnLUcopy8GzWW9f5uyvFXFYBMlGFlIsT8=;
+	b=ESp4XrK8ugs1enaSltg3WyLRmon32/oqcDhvwu8jo31FLvkUhCB3tq91sJyPn9EpCurq5S
+	rw/VXtnMLOv9Xz/b+DnSFB/tUpnyRsGn4aEGf1K1ocKqv1FNRRaiUiSDcM3RXJpN7S4OQ9
+	XkV+gjlXmWr9xJZ1ME3JX/iAyJyXwR8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-q9x6f1A7NQmqo91dzCKIUg-1; Mon,
+ 30 Sep 2024 08:44:41 -0400
+X-MC-Unique: q9x6f1A7NQmqo91dzCKIUg-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 722E31944DDB;
+	Mon, 30 Sep 2024 12:44:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3243E1979060;
+	Mon, 30 Sep 2024 12:44:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240925103118.GE967758@unreal>
+References: <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: dhowells@redhat.com, Eduard Zingerman <eddyz87@gmail.com>,
+    Christian Brauner <brauner@kernel.org>,
+    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5mtp0SNG1yvDq8rDUWOYQrZh9_OtFFKWCEmOXeD=Ou5i4Q@mail.gmail.com>
- <CAACuyFX7J9Ht2RdbarBFp+VvF9Y8800mezYMFVmQApaAzOKxYQ@mail.gmail.com>
-In-Reply-To: <CAACuyFX7J9Ht2RdbarBFp+VvF9Y8800mezYMFVmQApaAzOKxYQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 29 Sep 2024 23:22:26 -0500
-Message-ID: <CAH2r5mt-Ui4_R0HMh9hDK-Xe5OhcZ2HJZMDCRffMOv8XsO=4cA@mail.gmail.com>
-Subject: Re: xfstests generic/089
-To: Anthony Nandaa <profnandaa@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2968939.1727700270.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 30 Sep 2024 13:44:30 +0100
+Message-ID: <2968940.1727700270@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Sun, Sep 29, 2024 at 10:59=E2=80=AFPM Anthony Nandaa <profnandaa@gmail.c=
-om> wrote:
->
-> Hi Steve --
->
-> On Sun, 29 Sept 2024 at 18:32, Steve French <smfrench@gmail.com> wrote:
-> >
-> > Has anyone seen xfstest generic/089 going forever (sending compounded
-> > open/close then open then close forever)?  This was with current
-> > for-next, running to current Samba master (localhost) with "linux"
-> > mount option
->
-> Getting the same, tests gets into an endless loop even in the
-> for-next@f9494b6b6dcadd3ee1d70d27d1419d1084e98ff6 (Aug 20).
->
-> Could you please remind me how to get more verbose logs, or
-> an approach I can take to help debug this?
+Okay, let's try something a little more drastic.  See if we can at least g=
+et
+it booting to the point we can read the tracelog.  If you can apply the
+attached patch?  It won't release any folio_queue struct or put the refs o=
+n
+any pages, so it will quickly run out of memory - but if you have sufficie=
+nt
+menory, it might be enough to boot.
 
-Take a look at the "Enabling Debugging" section of:
+David
+---
+9p: [DEBUGGING] Don't release pages or folioq structs
 
-https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index af46a598f4d7..702286484176 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -84,8 +84,8 @@ static size_t netfs_load_buffer_from_ra(struct netfs_io_=
+request *rreq,
+ 		folioq->orders[i] =3D order;
+ 		size +=3D PAGE_SIZE << order;
+ =
 
-As an alternative, I usually use dynamic tracing.  To start with, as the
-problem repros:
+-		if (!folio_batch_add(put_batch, folio))
+-			folio_batch_release(put_batch);
++		//if (!folio_batch_add(put_batch, folio))
++		//	folio_batch_release(put_batch);
+ 	}
+ =
 
-"trace-cmd record -e cifs"
-and then in another window
-"trace-cmd show"
+ 	for (int i =3D nr; i < folioq_nr_slots(folioq); i++)
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index 63280791de3b..cec55b7eb5bc 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -88,7 +88,7 @@ struct folio_queue *netfs_delete_buffer_head(struct netf=
+s_io_request *wreq)
+ 	if (next)
+ 		next->prev =3D NULL;
+ 	netfs_stat_d(&netfs_n_folioq);
+-	kfree(head);
++	//kfree(head);
+ 	wreq->buffer =3D next;
+ 	return next;
+ }
+@@ -108,11 +108,11 @@ void netfs_clear_buffer(struct netfs_io_request *rre=
+q)
+ 				continue;
+ 			if (folioq_is_marked(p, slot)) {
+ 				trace_netfs_folio(folio, netfs_folio_trace_put);
+-				folio_put(folio);
++				//folio_put(folio);
+ 			}
+ 		}
+ 		netfs_stat_d(&netfs_n_folioq);
+-		kfree(p);
++		//kfree(p);
+ 	}
+ }
+ =
 
-You can more narrowly trace one certain functions by selecting from
-among those e.g. in
-
-/sys/kernel/tracing/events/cifs/ and /sys/kernel/tracing/events/syscalls e.=
-g.
-
-"trace-cmd record -e smb3_open_* -e smb3_close_err -e smb3_reconnect*"
-
-You can also can get an idea of what commands are being sent by looking at:
-/proc/fs/cifs/Stats and see number of requests by command (and
-checking to see what changes)
-You can also look at what process is doing activity on the share by looking=
- at:
-/proc/fs/cifs/open_files  and also seeing the requests in flight
-("mids") by periodically looking at the bottom of
-/proc/fs/cifs/DebugData
-
-Also the additional Debugging section has an example of getting a call
-graph if you can narrow it down more.
-
-
---=20
-Thanks,
-
-Steve
