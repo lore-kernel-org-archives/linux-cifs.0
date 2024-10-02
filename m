@@ -1,106 +1,68 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9BC1CFEA3
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Oct 2024 15:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F888F5B
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Oct 2024 18:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727881808; cv=none; b=GR7V7Uyf+wTXec6sPvG8TXcm0cqOsjgF22KgRdKOL6Z9NL9yqiRjRYHzEPiAeeh/1GsncLlllQYeJFkghuqxYaTVQnnWKiyKzcaIrvl+d9blaqtO2beYttqDwueAEVo6PTQ154w8LVe9EOJ4yA1RXC7dr5IueeKrQj7hZ4BsQQo=
+	t=1727894370; cv=none; b=uO/Z3rhEShoLnh7V+WTdd5JyUEJScFlRd2/im14TKA9eZkDDYdz/HUentNkTRZfAAJhq2bO+zk1naUEx8bHmPi7QdQvbmPP1wL8fr3qDQLFWtW9rWRj65eRr2SRw/KORTLua6Ul5GbBF5obMqehOjCIP3FUr00BOTDvbChvNnEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727881808; c=relaxed/simple;
-	bh=Hk5OYaxaWRuhR5nw+kRE68G7TNvk4dA7wA88RZTUSmU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u8HsygAbnuqXgdEK5dSJorKtpa4ruVgh6RXdDk3bZpJP3Rekk/Yz9UKRyAXGPA+RmGn9uahOqxl4EeN//f5uRwm3wcQOuX2vtfYUZKnoqwSLmxDqLBDLDag9vEGQYE5LWmRnmYgsjS44uKr23bItOkmRDgKWin5ElnZzT+A/nEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AO1JD8il; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727894370; c=relaxed/simple;
+	bh=DdphyFpivaktk5qpHCv0fHTpTcwElSNvFeR3814KHig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EL69hW1KKDIVENWTBsV9A4c3BANrkCkMAtnnJ3kiIZynlzz9VQhVnyNJ66xQ9P3pC7PEmZAP1IIXtL/vlh7u1tDJs8peA2W2a0ni4PS1bpX/3lbM044mDKADMXcH1HHFh5EcjF1Rua87E4owUHxob5gi3QjK8Q2fV0tOJjK+sKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9Xr/XWw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AO1JD8il"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c8a2579d94so2912849a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Oct 2024 08:10:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727881805; x=1728486605; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=azwKkhgvzCiAQTAqS/hXT3XksVObLdREOz6kK45ko1I=;
-        b=AO1JD8ilCF1MrQB9gtZDnCLK4BPXjJd2qeiaa09GKiu7JiX0ZCeAJj8QKGsWNQeghI
-         6jBxxPq+cxs17HBl9xggw93+WvDR7on+wlrYdt1JEKy27zsK+h/XdApHsViL0wotvNQv
-         w+Hb/85/wT9ceDkfgVW+G6IYGTbb5fsJ8o9fGyPLDTIRNzBRO1ugYxZ5MNdbuvW9hPeV
-         igg3lfDZRsZ0gAOIuUytCip5T+by0dtLChHGMRYd+A0i8f3NiZbswoHf2me/rArAmgdP
-         /Tllid7uvOaNY+ds1QL5sZbGaV1K60e+WTqdB/vtcrYLLW229WXSGcoxOk7Efd3FnxrF
-         YoIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727881805; x=1728486605;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=azwKkhgvzCiAQTAqS/hXT3XksVObLdREOz6kK45ko1I=;
-        b=SQxYNyxlx4OqPItSb43H3xz617C3jLkfDDlnmGBxhv6lIDrsHwNC11bh4OUzDnkz53
-         Y/lU79IHWOctg3iUcq0omLz9/RCb03ZjD6vxUmBRlXrsBGhFdP5hVH/XeIbzHAywT+3T
-         VNb3lnJQZz2xip8akLRy7s4OeRuCCsABFm7WvHZDBNuzrnWidRVIk/FR+//+rlb2NbI7
-         pkUJpIMJlgtWFwCfNDL2mxax8Rtd+1R0A3GtnQGmYbpHsqWx2gx1pDUczWTd5AaS+1I0
-         LCIjetDOFmIUyAEMUU0Tz2RWZcfVL4y4zZFnF8f4xdZ6V6tIJaLs5/8pGpyz2cTBvNnM
-         B0Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVM0Mc6xscn8mo3OkGsPLbZSJGtWDgg69HbHXysEuIS0KI28xDImfJMEF7SVwXOGCt5Lrd89aDK6kYc@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQtpqob5+iKW5giVvVPVelpblwN1DQzhOGSZPUaIEu8TyZIBxI
-	helnTJjRCqPls09s+h74pjebXPK/7jefpodn7XxPMmfxrS68zSZe
-X-Google-Smtp-Source: AGHT+IFYZNtII4Chdcg+PrrwFFfXzZ+rUTW9M2KRyLebnWgrEUov3BXNdi9oEtGqmFzsvNbryvk0ag==
-X-Received: by 2002:a05:6402:5113:b0:5c8:79fa:2e35 with SMTP id 4fb4d7f45d1cf-5c8b1b8b359mr2408783a12.32.1727881805233;
-        Wed, 02 Oct 2024 08:10:05 -0700 (PDT)
-Received: from azathoth.prg2.suse.org ([45.250.247.85])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5c88245e737sm7709533a12.56.2024.10.02.08.10.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 08:10:05 -0700 (PDT)
-From: Brahmajit Das <brahmajit.xyz@gmail.com>
-To: linkinjeon@kernel.org
-Cc: ematsumiya@suse.de,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH 1/1] fs: smb: server: Fix building with GCC 15
-Date: Wed,  2 Oct 2024 20:39:39 +0530
-Message-ID: <20241002150939.1425455-1-brahmajit.xyz@gmail.com>
-X-Mailer: git-send-email 2.46.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Xr/XWw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A51FC4CEC2;
+	Wed,  2 Oct 2024 18:39:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727894369;
+	bh=DdphyFpivaktk5qpHCv0fHTpTcwElSNvFeR3814KHig=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b9Xr/XWwpE0Zb/bf5ABAWHQiGpZOqb7tJfrjwMd5w0xVjbQRe8MHDzJAYy21CedMX
+	 CUpnv2bZUxGPPfT9uYQWKxbwpLjec6JoCaHhyrFoPNQtb7KFt7vtDPg0Ek171r8qa0
+	 ccKDMC1V5N/EZFN82rc6xg9PW1b+viX49QaAOKBiWNqmb/EqmtY7FiLP7QZICog5zo
+	 2yRoLebRyqtsEvU7bqbB9+Ul75GjBpIM4/5moAkoP59mhznQatIeHPXb4RWXeFtGFg
+	 xHh8kxlxUthjqRDtR0I7PIRNIRlfjsxBPL4UFF7BeEYwKzxnvgQOKlRFmwRqPwElOb
+	 EKwWZhKNvsD7Q==
+Received: by pali.im (Postfix)
+	id 97C61708; Wed,  2 Oct 2024 20:39:23 +0200 (CEST)
+Date: Wed, 2 Oct 2024 20:39:23 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Ralph Boehme <slow@samba.org>
+Cc: samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
+Subject: Re: SMB POSIX Extensions specification
+Message-ID: <20241002183923.mgk35xzp3rar4oxi@pali>
+References: <20241002073519.2fee66fwopzy3dpp@pali>
+ <56ac8ed5-781d-4ca9-95e6-75a6e52c34e3@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <56ac8ed5-781d-4ca9-95e6-75a6e52c34e3@samba.org>
+User-Agent: NeoMutt/20180716
 
-GCC 15 introduces -Werror=unterminated-string-initialization by default,
-this results in the following build error
+On Wednesday 02 October 2024 09:44:12 Ralph Boehme wrote:
+> On 10/2/24 9:35 AM, Pali Rohár wrote:
+> > Hello, I would like to ask, is there any normative specification of
+> > SMB POSIX Extensions? Because I was not able to find anything in
+> > MS-SMB2 and neither in other related documents.
+> 
+> this is still very much WIP.
+> 
+> https://gitlab.com/samba-team/smb3-posix-spec
+> https://gitlab.com/samba-team/smb3-posix-spec/-/releases
+> 
+> I'm hosting WIP html versions here:
+> 
+> https://www.samba.org/~slow/SMB3_POSIX/
+> 
+> -slow
 
-fs/smb/server/smb_common.c:21:35: error: initializer-string for array of 'char' is too long [-Werror=unterminated-string-ini
-tialization]
-   21 | static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-
-To this we are replacing char basechars[43] with a character pointer
-and then using strlen to get the length.
-
-Signed-off-by: Brahmajit Das <brahmajit.xyz@gmail.com>
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/server/smb_common.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 5b8d75e78ffb..2b512f65df0c 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -18,8 +18,9 @@
- #include "mgmt/share_config.h"
- 
- /*for shortname implementation */
--static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
--#define MANGLE_BASE (sizeof(basechars) / sizeof(char) - 1)
-+static const char *basechars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-+#define BASE_LEN (strlen(basechars))
-+#define MANGLE_BASE (BASE_LEN - 1)
- #define MAGIC_CHAR '~'
- #define PERIOD '.'
- #define mangle(V) ((char)(basechars[(V) % MANGLE_BASE]))
--- 
-2.46.2
-
+Thank you! I see that most of the information is still missing.
