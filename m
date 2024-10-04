@@ -1,63 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1061D9A79;
-	Fri,  4 Oct 2024 17:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6BC823DF
+	for <linux-cifs@vger.kernel.org>; Fri,  4 Oct 2024 18:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728064204; cv=none; b=GUMblJt4IFGaoKAhODojA/0c7jXF4IdXRYNE3aboK4PIGfVc2rvNa3Bx0hS+U8vKlS4Pp0CXYi1oVzTAmKJvWMKyC8K3o2opdJrZV75qb4wlMJ1nZ1w5kARAALKLPV7AwTStQ2I2eyMizxJ+dx00AAQA1S+DtdmLDP8hUgtTmC4=
+	t=1728064821; cv=none; b=ssY8ONjQgMK0LMEMdnw666kqrr7FtQo/MRuUJNaAMds5+SwV/k1nLZ6mMszP/OK/CjjklsVehifuhD8Mq4B87ImrNQnlHLxrAsn2mAWW14QxZMKP84eYwwBnnk7TCWeJh25x/TfYVqqN+m6B/mOcf2nRV6prF3IkRndjwlMk2Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728064204; c=relaxed/simple;
-	bh=qK3Swpueuuru2GuaX4ypEESZFU6fbikFCmKiOGi7MYI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OyYZbrTs6IThe8S7y6vbR6FA20W7oS//kETOD1uaiCYbyrY2abRtTx+3ToOMJ1BQQUi4TIOvMR7AOkBPm2LaNslsAWVdH3wgmKlEm6+ywdV3SsivANsept8gankXc2jIuN0RwrS7ASHHbaFo0AkCRcyLRapw/aXhHNc7HZFtoHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsCKN98o; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728064821; c=relaxed/simple;
+	bh=AKgWleQXsqUtRgxRq8FQGbytk/DBw8m+PGBDZzP2I8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d+8/EyD95nyF+Tdo8y0AjaKUyPRlUZUqAbIgYSFfjE+bETsylDvkIraiId5xRLEIJaqDYmUOZrZlRWpBTUMCL2uCAo/Vuem8bXBK6H0uE3Ott/IJPiDj6HGRMUNbIP3HO7DA9c5F8Ef7fqp6m/ZaiRiYqknKZaUdWBJJLR4hMFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JSGu+z+q; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsCKN98o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ED4FC4CECD;
-	Fri,  4 Oct 2024 17:50:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728064204;
-	bh=qK3Swpueuuru2GuaX4ypEESZFU6fbikFCmKiOGi7MYI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=bsCKN98orwKwJcoaFDa52cyYXKRmdgiLN5iZOpUn0oTqAn6K0OreHMh8PTlYySY1K
-	 FwArXXHZWJ3CARgMAoqRBZpibnBaKdx3H1/8nAxw4ji3lEjDHyMI1DWuxw4rvc0+b1
-	 r3KAypz0xCe4fkMajQpJOPHT7DxHvwnP5htGur4Pu/jIQ0urd4MLt7UHgYouGuWoqH
-	 bzKgyCGY3zvBrblm8PI0lf9J6K05V6folMIj/LINGbCd0AF2uUlhEQOw0XjicQLY0V
-	 Z/6zwsRhA+vGqOslzcW5eM3uqpBY1Zn7haWVeTbLdbriMQFAhFglJb6pTpL7I/eQoo
-	 Tc2c54EMeFhxA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F37F53ACF641;
-	Fri,  4 Oct 2024 17:50:08 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtkbzY5hRNZQH4TzLV8gP90ni=Zk-DsSpEC4_uEWT6_Bw@mail.gmail.com>
-References: <CAH2r5mtkbzY5hRNZQH4TzLV8gP90ni=Zk-DsSpEC4_uEWT6_Bw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtkbzY5hRNZQH4TzLV8gP90ni=Zk-DsSpEC4_uEWT6_Bw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.12-rc1-smb3-client-fixes
-X-PR-Tracked-Commit-Id: d3a49f60917323228f8fdeee313260ef14f94df7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b7a838ee7e8904c14e5d6ca2d0029bbad70fb761
-Message-Id: <172806420790.2676326.17689044083270518167.pr-tracker-bot@kernel.org>
-Date: Fri, 04 Oct 2024 17:50:07 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JSGu+z+q"
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-8323b555a68so125931839f.2
+        for <linux-cifs@vger.kernel.org>; Fri, 04 Oct 2024 11:00:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1728064819; x=1728669619; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vQ85Gcszgmm6jvoSXWqfFY4Qb9EJuVBgdczRX/KgxR8=;
+        b=JSGu+z+qozOGY0gla2tHCeHCXz6evyAVQcMmXO2oJ9cHnv60++IBmI0IvK6sfYlE4E
+         t58RL6OzBPQLH3nJZn3IqGRzJRJ3Tva7CadnYZ2w192esOQJTdrBp8FOTSRNFuxifRvI
+         FwUXrxgPEdbOX6x0XZFaYEhrSCmiQ+3UdGVfA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728064819; x=1728669619;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vQ85Gcszgmm6jvoSXWqfFY4Qb9EJuVBgdczRX/KgxR8=;
+        b=uXXeeSrbziJLdvHjt5yp3OejZxg7BnYh2VyMonSGjbMPY5KXDG7tkAFQ3pDW0fTlFX
+         k82eJKdMuYw4XMOWeH+0cfoxiZWRWsU8acZgnxy7NUF8jHzCzvFEN8eo6UTtJR7QcUBN
+         8/zzUCE22K7GM/6P9UVjpS0U8GOCgNEQMfH8y8icz7AooAJ4qx0zbiIDBdHxUyNxGREG
+         VVExnolIdot98ZEk0cpb1PV6sfQqfa8pCwH+I341XHA6KBTVOYIB3r7csJuhV9vdwE8D
+         ZoBrnDaNsc6TjSUGQmWlcTx9a/UigivuBoN64N7NeVOVPu8KtpYWWTqlktcKWcLlEVqD
+         B/wQ==
+X-Gm-Message-State: AOJu0Yxs8xcVgjVHCuE/RyLS/uaDxgUQQxNrOzDU8Wk1X1txc+bRkd6v
+	0znMJDU/k4ce5M1a/3hthRL7pQ/TE/DY+8KfH/YDAt0sokgKO8tG50yuJdhmPSc=
+X-Google-Smtp-Source: AGHT+IF2I4rItE9aUfPspe/FBeg94Anm12YHdLMAp6Y6QRvIm89/uCoRoCskO+t/z4jJ4yH9Sji3/w==
+X-Received: by 2002:a05:6602:1689:b0:82d:79b:ee8d with SMTP id ca18e2360f4ac-834f7c64115mr351778639f.4.1728064819044;
+        Fri, 04 Oct 2024 11:00:19 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-83503b15397sm5390639f.39.2024.10.04.11.00.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 11:00:18 -0700 (PDT)
+Message-ID: <b04634a4-1301-4f73-a6eb-05ef79954aee@linuxfoundation.org>
+Date: Fri, 4 Oct 2024 12:00:14 -0600
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Fix logically dead code
+To: Advait Dhamorikar <advaitdhamorikar@gmail.com>,
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, David Howells <dhowells@redhat.com>,
+ Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, anupnewsmail@gmail.com,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20241004103051.43862-1-advaitdhamorikar@gmail.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20241004103051.43862-1-advaitdhamorikar@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 3 Oct 2024 20:36:17 -0500:
+On 10/4/24 04:30, Advait Dhamorikar wrote:
+> The if condition in collect_sample: can never be satisfied
+> because of a logical contradiction.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.12-rc1-smb3-client-fixes
+Add a better change log explaining how you found the problem.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b7a838ee7e8904c14e5d6ca2d0029bbad70fb761
+Also your short log is missing subsystem information.
+Check submitting patches document for details on how
+to write shot logs and change logs.
 
-Thank you!
+> 
+> Fixes: 94ae8c3fee94 ("smb: client: compress: LZ77 code improvements cleanup")
+> Signed-off-by: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+> ---
+>   fs/smb/client/compress.c | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
+> diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+> index 63b5a55b7a57..766b4de13da7 100644
+> --- a/fs/smb/client/compress.c
+> +++ b/fs/smb/client/compress.c
+> @@ -166,7 +166,6 @@ static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *sample)
+>   	loff_t start = iter->xarray_start + iter->iov_offset;
+>   	pgoff_t last, index = start / PAGE_SIZE;
+>   	size_t len, off, foff;
+> -	ssize_t ret = 0;
+>   	void *p;
+>   	int s = 0;
+>   
+> @@ -193,9 +192,6 @@ static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *sample)
+>   				memcpy(&sample[s], p, len2);
+>   				kunmap_local(p);
+>   
+> -				if (ret < 0)
+> -					return ret;
+> -
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+The change itself looks good to me - unless the intent is to
+check the return from kunmap_local() and take action based on
+it instead of removing the conditional that checks the ret value.
+
+>   				s += len2;
+>   
+>   				if (len2 < SZ_2K || s >= max - SZ_2K)
+
+thanks,
+-- Shuah
