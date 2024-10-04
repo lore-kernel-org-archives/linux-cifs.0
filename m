@@ -1,138 +1,113 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324A2D2F5;
-	Fri,  4 Oct 2024 01:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C07714884D;
+	Fri,  4 Oct 2024 10:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728005794; cv=none; b=q7o+85J6px6rZYK6t8KFBRXbTaJr4La0lIP07UOKjvPYUC8+QZOSQLe2ULN6ZE7uKy29Gjtzj71eSqJdpRuTi+t2nVJZHIZU6elba7ujNzpzULx7u7sjo/mNK98nhvX2jB+qIEtQkrUyRjIND0IHTrSteyUCfq1SqeNbuXPZQ5k=
+	t=1728037874; cv=none; b=o1JDBELUPb7MdqT1HAxyjSiHvN2ZPN+F0woD2vAcDKVs5DVMDsLOSefhN1bWHRdt2ZXQF5RCZedq/N1FeyzGacWO+jyJTOsQUEuSuAdvm1N+JbLKWU2fe6FoLNCUFDde7SSG9BdhXi1ewmwvmEwe1U2x3L7l6aKYZRUYVB4Y78s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728005794; c=relaxed/simple;
-	bh=qSo80J7TlDCZvmbSSFHYTyT3W/AxKAGKJC/+QLgQ2Ac=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=BeHRTZqq5KLCzN8NwCV5Il22byA1IlLa8oogvWQgKg7lGaywPPtG/y5Jiq+HWphqTSsYs1RSXKWOw85hE79BUSqUlJuxQSVTT1083ekpkKcN19gWMXtJusz3rfmDSEQW50nYUNpJLCnjAIuwj5sU7dKrgX0M7dJvoKpyQDi2JVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hOkzPnew; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1728037874; c=relaxed/simple;
+	bh=divJE67Ubr8PC2NRoBfkagwgqttequOKzDKDErTfwcA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u6NHSNYsJM7118CvpzwpjCt/2gtrJIF34uQl0gBIzNAq9dsKDGoUZ2XR4RKccbt2R3I3IKbTEm/GW8TbmboEfjWNTHUA6YNRO7X6G3HH5zzUIV2aM8jop5QsQ/gUpzTjP6In0Wmx+hG0aOi8BAMVQceRLsSHbbpg/ajBE+zE6YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hh2qXfBo; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hOkzPnew"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fac3f1287bso19256181fa.1;
-        Thu, 03 Oct 2024 18:36:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hh2qXfBo"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71dd2b6cbe6so1632945b3a.1;
+        Fri, 04 Oct 2024 03:31:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728005790; x=1728610590; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lc5bRE+8ZfDxh1AbrZNl0WsQ7RF/kO5yAB83il12D2Q=;
-        b=hOkzPnewAJOdoTXG6STkPPLLC9ICLyr2IyDpJ4eiZ9KpGa1wvyZnZvlyR3+ev7qaT4
-         NFnaS8/Ot4KIAcSzmC5ziLL2eYX+mLlbY2+2/ch7wdAtDVzCHFfNBuslZvykp20M/pnU
-         cJ4WpI5rAzSDpDwmZdPAYaP/SWEiKiVpikMzXgZo+1HHO+FlOKi2Zc9DVcb5S0rhrfid
-         T9bugPScNgDnkl7C52cJfdCefLZfhwRWxBKgUdKxQSQoAtDOaXDMisdTPvl0rby7zkAG
-         Uc9mBFbbwzMv4SWlPa+rP9pd+uw2lMkHaG8Oz3Jllp4CctE1SkziVkEOgaJyCVul/jiK
-         dz7g==
+        d=gmail.com; s=20230601; t=1728037873; x=1728642673; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y9YF4Qs0IPa4oKPvVx7Hv7ooYcAeECqPtJ8bxat5WgY=;
+        b=hh2qXfBoWzfrNz+QS/bjH0LWdcqpMreGJwaaTctL3qipsFr/DMcuYNOdJF/Xp8jJS5
+         t8KKfTKJR1Wh3PkeO5bN9DhoZpUWSaNYjcDRXzEbaQaTlTXFbiJPgaiBpcLDIiAN0dPV
+         bntkA2zg1ghti3J6TNzvhfvPHonNEKo9QOaXS4EdII/ks2C0+0lNLibuRj7V8YZQWF73
+         lxZJLulj7Mb2bnJI28qOw4dmLpfhB04II3o5UdMRzJ3Kc5Lm4H+D/1E0WHu79R8vH5EB
+         rofbW35ih9aQiQcy7yTR0yAX1NHY8niRaphiaTVCZhr3mE+aNj3rgdv6/Aef5A/+GaQi
+         flbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728005790; x=1728610590;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1728037873; x=1728642673;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Lc5bRE+8ZfDxh1AbrZNl0WsQ7RF/kO5yAB83il12D2Q=;
-        b=CAB3ic9ebqAwZmm027wlPofKiuYqQKNGxb8pS55z4t8ycTyPHGusYAR60ojdel7JfZ
-         5YE9YLx4wa1lPqjfY5jqma3i89p8yd+6XwClUncQsN9bPctS5JUtUI8Vo/Rsp/5p/fuT
-         sQ28jCAZCzsGUL/c7refsgcNsmMSCkKql0yyAwpTuIa/sdNjVcs7F1Xz6wIaUtRpzGc4
-         6Qk9u5nQurQD4jEBDX6SRIbJI6B33KmY5EBsG+fW0BrVGO+dkbJMSeiZdLxZxx0l2n0P
-         lMbLjr+KIdIY/7uo8dZRwSg8j7XZhzGHhdVMuwrlKVD7/k54aI4XPV3hDE14RRtclIbq
-         q6qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVG1Yz1Jbvls5usOVijDrKwzDgSlp0XGAGxoUZZFJIL7YbYOBILOGy2G5T2FRjEkkA/LD1QgdVIbI4N@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaAM3q44YoW8oi7g8I889aWz2Am8+8O5k8AvcroPvaFAjxOJxP
-	BJfXRnUM1GmPIDKfsD1KKPg8RFruBqsr/SakH9GllBxBT0D1lQUv8Q235hV/exnYZ2ow9r0vG+O
-	wTm35SmWZYvSqKyTa+UgY8KKfX8fMFqBB
-X-Google-Smtp-Source: AGHT+IG8iRp2C798gEnpRgyB3/Rpdk8zefYoG9SGWF0LJIjO3vi6LYKtVx3836EcFvoxEAkCixd24M9yJ82BkNsahrQ=
-X-Received: by 2002:a2e:4e19:0:b0:2f1:5561:4b66 with SMTP id
- 38308e7fff4ca-2faf3d7a84fmr4175191fa.44.1728005789890; Thu, 03 Oct 2024
- 18:36:29 -0700 (PDT)
+        bh=y9YF4Qs0IPa4oKPvVx7Hv7ooYcAeECqPtJ8bxat5WgY=;
+        b=G/ykPY4xorSBClKdumqfhELSgzFZI+kE98jpCZxagI8svi1yGxarBZux0QPkRTajef
+         wgII1B+GcToltVaIYagN0u5gY8YlWllaxfYNm1nHDGdLggN1eNUN9rP3A31qKGVmanzN
+         dYlnBQD7Sn0G+OgRzpwstYrvWyQuP+s7cIpD1vGg99J9n//h21dg7b/Ew1tzaw88a54z
+         ugmF/oxD8EYRQMwLUMLGi0PHqaqbKhzxXuUnPc0AgPfsdAFeUKD6umVT92Zybkb0Kfiy
+         V7ANxQKH0Bup5LMy6z8TrsdrArGasSFCL0aG7ELX2aYihuuacSXTily7lvjLHnPtQVIm
+         bjdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKxfRIf54vxH0bCAOt3Ji3rZ4cYhBS10NjkiKwLylIoCAfcB+/ZU/A2+DbJvCzyA6QRxrAowZHstpV8Xw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykavbyPlz/6glQgl/eel/yt70ayEjApl6qVVLw5wYOIrTjWXOr
+	Y2LTHzh/QRKT2dhkgF7/7vbjP7b9E+UWnBbo9xKfuXI8f4ZTcqrqP/NBw0Zk
+X-Google-Smtp-Source: AGHT+IEV84KXrWKzPAXE9oR9QWAIhciy20oY421EqGnBkA/QJsb2O47VOOySsWCh5mbkrE4POsAQ+g==
+X-Received: by 2002:a05:6a20:c68e:b0:1d3:b30:44a2 with SMTP id adf61e73a8af0-1d6dfa25a50mr4320240637.7.1728037872752;
+        Fri, 04 Oct 2024 03:31:12 -0700 (PDT)
+Received: from advait-kdeneon.. ([2405:201:1e:f1d5:9681:ce03:a7e1:2f99])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9df0b50sm2972570b3a.171.2024.10.04.03.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 03:31:12 -0700 (PDT)
+From: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	David Howells <dhowells@redhat.com>,
+	Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	anupnewsmail@gmail.com,
+	Advait Dhamorikar <advaitdhamorikar@gmail.com>
+Subject: [PATCH] Fix logically dead code
+Date: Fri,  4 Oct 2024 16:00:51 +0530
+Message-Id: <20241004103051.43862-1-advaitdhamorikar@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 3 Oct 2024 20:36:17 -0500
-Message-ID: <CAH2r5mtkbzY5hRNZQH4TzLV8gP90ni=Zk-DsSpEC4_uEWT6_Bw@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-9852d85ec9d492ebef56dc5f229416c925758edc:
+The if condition in collect_sample: can never be satisfied
+because of a logical contradiction.
 
-  Linux 6.12-rc1 (2024-09-29 15:06:19 -0700)
+Fixes: 94ae8c3fee94 ("smb: client: compress: LZ77 code improvements cleanup")
+Signed-off-by: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+---
+ fs/smb/client/compress.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-are available in the Git repository at:
+diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+index 63b5a55b7a57..766b4de13da7 100644
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -166,7 +166,6 @@ static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *sample)
+ 	loff_t start = iter->xarray_start + iter->iov_offset;
+ 	pgoff_t last, index = start / PAGE_SIZE;
+ 	size_t len, off, foff;
+-	ssize_t ret = 0;
+ 	void *p;
+ 	int s = 0;
+ 
+@@ -193,9 +192,6 @@ static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *sample)
+ 				memcpy(&sample[s], p, len2);
+ 				kunmap_local(p);
+ 
+-				if (ret < 0)
+-					return ret;
+-
+ 				s += len2;
+ 
+ 				if (len2 < SZ_2K || s >= max - SZ_2K)
+-- 
+2.34.1
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.12-rc1-smb3-client-fixes
-
-for you to fetch changes up to d3a49f60917323228f8fdeee313260ef14f94df7:
-
-  cifs: Do not convert delimiter when parsing NFS-style symlinks
-(2024-10-03 12:06:36 -0500)
-
-----------------------------------------------------------------
-Ten smb3 client fixes
-- statfs fix (e.g. when limited access to root directory of share)
-- Six special file handling fixes: two to fix packet validation to
-avoid buffer overflow for reparse points, two fixes for symlink path
-parsing (one for reparse points, and one for SFU use case),
-and fix for cleanup after failed SET_REPARSE operation.
-- Fix for SMB2.1 signing bug introduced by recent patch
-NFS symlink path, 2 NFS reparse point validation
-- Two comment cleanup patches
-----------------------------------------------------------------
-Pali Roh=C3=A1r (6):
-      cifs: Check for UTF-16 null codepoint in SFU symlink target location
-      smb: Update comments about some reparse point tags
-      cifs: Remove intermediate object of failed create reparse call
-      cifs: Fix buffer overflow when parsing NFS reparse points
-      cifs: Validate content of NFS reparse point buffer
-      cifs: Do not convert delimiter when parsing NFS-style symlinks
-
-Shen Lichuan (1):
-      smb: client: Correct typos in multiple comments across various files
-
-Steve French (1):
-      Revert "smb: client: make SHA-512 TFM ephemeral"
-
-wangrong (1):
-      smb: client: use actual path when queryfs
-
- fs/smb/client/cifsacl.h       |  2 +-
- fs/smb/client/cifsencrypt.c   |  3 ++-
- fs/smb/client/cifsfs.c        | 17 ++++++++++++++---
- fs/smb/client/cifsglob.h      |  5 +++--
- fs/smb/client/cifspdu.h       |  4 ++--
- fs/smb/client/cifssmb.c       |  6 +++---
- fs/smb/client/file.c          |  2 +-
- fs/smb/client/fs_context.h    |  2 +-
- fs/smb/client/inode.c         |  8 +++++++-
- fs/smb/client/misc.c          |  2 +-
- fs/smb/client/netmisc.c       |  2 +-
- fs/smb/client/readdir.c       |  4 ++--
- fs/smb/client/reparse.c       | 39 +++++++++++++++++++++++++++++++++++++--
- fs/smb/client/sess.c          |  2 +-
- fs/smb/client/smb1ops.c       |  2 +-
- fs/smb/client/smb2inode.c     | 24 ++++++++++++++++++++++--
- fs/smb/client/smb2misc.c      | 28 ++++++++++++++--------------
- fs/smb/client/smb2ops.c       | 23 ++++++++++++++---------
- fs/smb/client/smb2pdu.c       |  4 ++--
- fs/smb/client/smb2proto.h     |  2 +-
- fs/smb/client/smb2transport.c | 32 ++++++++++++++++++++++++++++++--
- fs/smb/client/smbdirect.c     |  4 ++--
- fs/smb/client/smbdirect.h     |  2 +-
- fs/smb/common/smbfsctl.h      |  7 ++++---
- 24 files changed, 167 insertions(+), 59 deletions(-)
-
-
---=20
-Thanks,
-
-Steve
