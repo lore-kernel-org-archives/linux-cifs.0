@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D7D1FEFD0;
-	Fri,  4 Oct 2024 18:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C79720C488;
+	Fri,  4 Oct 2024 18:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728066268; cv=none; b=F2t5gT+0K9C67nxlPEUx6u/fymM3lZ3BkD5vPp1Wrl0+4b2dt0zGhxZMkP1yx2IWpopkmJOpNr8zGLkc9C44/PCbMj34h2cxCMOIu5xIypX0Ztke0fNHG5TF+/fl0tB0LetmxloS1n33M2aEqaOw/3MMR7j7l33B3hamh/KC+FE=
+	t=1728066410; cv=none; b=rHGHh1eBM9bi2KrNWY+aAs5gtCRUkObFps4Rx5HKvMAoCPTfRO4lhbHg5wTdRHEvsFcKk79dKoSDcDYR4ujz1QnbQE75cnbOx3wtm3netuRcp/VqiiKi7WFy/YayWPzfXx9pn316jpwlCGyc+kQs1lofuWZQWPRIjY7HcF+1GOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728066268; c=relaxed/simple;
-	bh=QG1fWM9aIkSn4i2FD2XXkg/HO9MOmR128gXj7olPGcQ=;
+	s=arc-20240116; t=1728066410; c=relaxed/simple;
+	bh=fwUZgyzRHOkGmQMMBRtR97BnEltIXbPZnyjGFgL6SHM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FsripT99KUnaouyL/FuTTnMahn1AVjQWNkMMkZHj9OpadkIAC8pgcEJ9lyYS2nFX6ObrZbR4Ui0Ss1MezLzy4mvlpFwXrn02m6KHGs/9s5IPiWgpL3fu3rv2qjwnA0wt/vynQvveT6OKm/vGtYD3QfVhbaoJaYg93tdDpancpS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qM4mf3oT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=XgIo7ReUMBfNyth9vz9X1i+Bvo//+PaKcKfN6tFwzd8VlkZX/6GpjOo7nOEUTbIwpdnyMNZVfQNSRdK4XdZsht3PFPO+nCLJctxZqf7E/+zYjfEguZG8yn+5xu84vWnQKOigEcTeog5VXsfoRRrgdTj04UoY6hqCPMCBjTm5Y88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbUZ7pQa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qM4mf3oT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADCFC4CECE;
-	Fri,  4 Oct 2024 18:24:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbUZ7pQa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79570C4CECD;
+	Fri,  4 Oct 2024 18:26:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728066267;
-	bh=QG1fWM9aIkSn4i2FD2XXkg/HO9MOmR128gXj7olPGcQ=;
+	s=k20201202; t=1728066410;
+	bh=fwUZgyzRHOkGmQMMBRtR97BnEltIXbPZnyjGFgL6SHM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qM4mf3oTOy37wPtNwWVsNp83FQOdXHWzmAvenEx2WJeIOSLhZM6ScBocB57zPxE+g
-	 tugC5peu4o3yQhDMd8GAYcWmslf2T1zo91DLfOehZP+GE5/7q1ovJLDd96fscel5uN
-	 /uhp1Gnyh9Sbfny+5PZ2/aHgSCJ7tVWxKtReZGmqdXSwz+KuzzCQTkDbjSWWIgFV+R
-	 eQGakd0s6kDvHCrdMx81XTacoRW46lMX0IQdKczXBuHV0pS0C4/TfmiX1AdEq1EMgJ
-	 XnY5bk1BqtgNLdN1u+PmaIYs/I07OWQCqaehjykLoy6veuEq0LzQAeK8sJYAsie4T2
-	 Ms1GFOUINkxCQ==
+	b=sbUZ7pQa+Ty7WzqCAvlvmHUj432Okj7w5xApRqulbSPz3ipVX+1y1tskZ467wzLg+
+	 rubmK+YqCXoQp6BBDqJ0Yu0dl1QEw6v0I88CfDF4euLOPmcSuw0nJvmWxYdoPIVNjM
+	 cxX0Q15YKl9pT+n8Hopt4Nm/pvWJrKSSj+NHZE/89IdHNVf0duk+FBnrg97X23zwgU
+	 zvjpJHZIFceCx36OLI/7+5Du8x7WvbGkYqQH1yAHNk0K2fWUgKYPsjOZNbLk9RoyS2
+	 fh5lxgKC26lWSOMOWhVgtTt+59rb5AyUodvz0wEKgOIt6yhbS95NIyKmmhFXEAgJ5V
+	 F9dc42kMuonFg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Enzo Matsumiya <ematsumiya@suse.de>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.10 69/70] smb: client: fix UAF in async decryption
-Date: Fri,  4 Oct 2024 14:21:07 -0400
-Message-ID: <20241004182200.3670903-69-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 57/58] smb: client: fix UAF in async decryption
+Date: Fri,  4 Oct 2024 14:24:30 -0400
+Message-ID: <20241004182503.3672477-57-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241004182200.3670903-1-sashal@kernel.org>
-References: <20241004182200.3670903-1-sashal@kernel.org>
+In-Reply-To: <20241004182503.3672477-1-sashal@kernel.org>
+References: <20241004182503.3672477-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.10.13
+X-stable-base: Linux 6.6.54
 Content-Transfer-Encoding: 8bit
 
 From: Enzo Matsumiya <ematsumiya@suse.de>
@@ -117,10 +117,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 34 insertions(+), 19 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 1d6e8eacdd742..a8ebf3333c6cc 100644
+index acd5d7d793525..a484bbe9e9de8 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -4287,7 +4287,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
+@@ -4245,7 +4245,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
   */
  static int
  crypt_message(struct TCP_Server_Info *server, int num_rqst,
@@ -129,7 +129,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  {
  	struct smb2_transform_hdr *tr_hdr =
  		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
-@@ -4298,8 +4298,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+@@ -4256,8 +4256,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
  	u8 key[SMB3_ENC_DEC_KEY_SIZE];
  	struct aead_request *req;
  	u8 *iv;
@@ -138,7 +138,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
  	void *creq;
  	size_t sensitive_size;
-@@ -4311,14 +4309,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+@@ -4269,14 +4267,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
  		return rc;
  	}
  
@@ -153,7 +153,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
  		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
  		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
-@@ -4358,11 +4348,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+@@ -4316,11 +4306,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
  	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
  	aead_request_set_ad(req, assoc_data_len);
  
@@ -166,7 +166,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  
  	if (!rc && enc)
  		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
-@@ -4468,7 +4454,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+@@ -4427,7 +4413,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
  	/* fill the 1st iov with a transform header */
  	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
  
@@ -175,7 +175,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  	cifs_dbg(FYI, "Encrypt message returned %d\n", rc);
  	if (rc)
  		goto err_free;
-@@ -4493,8 +4479,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+@@ -4452,8 +4438,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
  		 unsigned int buf_data_size, struct iov_iter *iter,
  		 bool is_offloaded)
  {
@@ -186,7 +186,7 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  	size_t iter_size = 0;
  	int rc;
  
-@@ -4510,9 +4497,31 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+@@ -4470,9 +4457,31 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
  		iter_size = iov_iter_count(iter);
  	}
  
@@ -220,10 +220,10 @@ index 1d6e8eacdd742..a8ebf3333c6cc 100644
  		return rc;
  
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 8e02e9f45e0e1..3a4ac6694161e 100644
+index bf45b8652e580..83a03201bb862 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -1265,6 +1265,12 @@ SMB2_negotiate(const unsigned int xid,
+@@ -1263,6 +1263,12 @@ SMB2_negotiate(const unsigned int xid,
  		else
  			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
  	}
