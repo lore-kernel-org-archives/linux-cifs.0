@@ -1,46 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FE21804E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FB417BD3;
 	Sat,  5 Oct 2024 14:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728137029; cv=none; b=Q4bVVJTX0XHy6c0z0FOlXDbl+WmF4xXpZkrFlC6LUl800s09Jz0bUiBLNzGbX/A45pL9Ds0Zo3qFkkWBfV2XlDiBF7uidKLdCiaBVTv1OisEpauR6yTywFmU9J+iLL/hcPB3oUV043G98JyrwpAUxkLsgzxAfI7EQRUHveJRdyY=
+	t=1728137029; cv=none; b=FuQQeaBr9BnEyC5pscvFB/rCI7p653iCQ1tYfji7OlcYfscSm2shg+fDQc8KVrfNbxpwnqqZOQC45cBW4MN/3lrB+i+EzgzyVqFvdhewzupOnnqaRfboO3zYlnO5ezVv5lX/CumLSLsk1gGSdX4jqphzD+QR1Jo6QQj0VSiXZBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728137029; c=relaxed/simple;
-	bh=hDQvcu8Vv8Wg91smOeEWxvTb4XmEDvotaoUWgxTSX/w=;
+	bh=bNDQjtf3SaC9U3DetMKfO465iHp2XJiQrQYud2beBps=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Djbs8Qms/MEkfWkpcZfgSW519hPI4t3Yi4wRhbO3Hlg2wbu1dADlFsKC1Jo82CrY6WSsEPpMZCXNHvAKz3oLlBNfnphSPmRkDUftiFl++qs2KTr+Tc4Gptdw0ovBoeM61KCWFzVyrhtFpTZBvYQgvZaHS/qs4Ix6dR3/gsAfQGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBlJgYFp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=JVEYdeliqc+BAhuC+9WUAv3QUimGYQwJrnCFlEvr0xmO+CAT1UBBlsZw4H6cD+qLZhIuX6HGNWFX/oUNbLlU3m9BLhsdCYq5kiwYVucee5mKy2vW4I9r8GFot7OwPLbq0C/+TAQaUWyC0AjzNuJ/RHckuAA/BVKUJTAirxTiocc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0yVwwnj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBlJgYFp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FB39C4CECD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0yVwwnj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13714C4CEC2;
 	Sat,  5 Oct 2024 14:03:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728137029;
-	bh=hDQvcu8Vv8Wg91smOeEWxvTb4XmEDvotaoUWgxTSX/w=;
+	bh=bNDQjtf3SaC9U3DetMKfO465iHp2XJiQrQYud2beBps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QBlJgYFpEbOIGLtmHDB/defiNklHrvvwThnhUMa9ZToetGA+MESt6BRF/8P0sqXRT
-	 1C8ayD4yOEFpx1JCimbF9er21qiprU7c4QByfSTTbZxVQLiZS77bz1JDGrzQXXM50P
-	 x+cjS2iNkvuwN09SVwWJUHMotfGWeWitsb27HoiVSBkIN6QloJt00gMas0037IhdZF
-	 1YR3yHPPBuI6Ipo/rC7NJdkCjPaY3z+RAakZIA9Nem6di+TMzO//ujaRmznM+VkVLX
-	 emop2Uy4/9+4ns8PUWoO/3Crx0DkyUHo4jvDrPUI/kPxhfV2q3RrpP9CVX26HBZNgB
-	 Jd455QMzCdOig==
+	b=L0yVwwnjfXiiksRGhbUI3U4fhBk4yFJRhBx38i3eLcb6UbcXOOzrIJHx9zT6+rOTc
+	 wKPK4TlHm7hHSgLaqOcdzIIjNkU1uBWtCDSZmDSIqWGYpZ/trbdgv4H6G6KM7ozKVn
+	 5QOWHxi1vtzaUcgtS2i3MvpGiy6M2Bm4dJsBvvquJ2IVse3Vc10sscrAhhgl0c3q3h
+	 p03EPyMiJ+DJ11tXhUeyDmjRShmgjfCLgw+/H1mmZb+1t9pecuGyX/SHlDNCEV4XRU
+	 MKoGBanIrfETfhMRJgkyaMZxLNdhpmM3YO6Zq9DngkXa2y/PvOp8UFA+MWxXawyIV5
+	 Uc/dqX9HdWlpw==
 Received: by pali.im (Postfix)
-	id D135A9F7; Sat,  5 Oct 2024 16:03:42 +0200 (CEST)
+	id 7E87C648; Sat,  5 Oct 2024 16:03:42 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/6] cifs: Fix creating native symlinks pointing to current or parent directory
-Date: Sat,  5 Oct 2024 16:02:56 +0200
-Message-Id: <20241005140300.19416-3-pali@kernel.org>
+Subject: [PATCH v2 0/6] cifs: Improve support for native SMB symlinks
+Date: Sat,  5 Oct 2024 16:02:54 +0200
+Message-Id: <20241005140300.19416-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241005140300.19416-1-pali@kernel.org>
+In-Reply-To: <20240929185053.10554-1-pali@kernel.org>
 References: <20240929185053.10554-1-pali@kernel.org>
- <20241005140300.19416-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,57 +49,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Calling 'ln -s . symlink' or 'ln -s .. symlink' creates symlink pointing to
-some object name which ends with U+F029 unicode codepoint. This is because
-trailing dot in the object name is replaced by non-ASCII unicode codepoint.
+This is second version of patch series which improves support for native
+SMB symlinks.
 
-So Linux SMB client currently is not able to create native symlink pointing
-to current or parent directory on Windows SMB server which can be read by
-either on local Windows server or by any other SMB client which does not
-implement compatible-reverse character replacement.
+Changes since v1:
+- Patch which renames function was dropped
+- Patch "Improve creating native symlinks pointing to directory" address
+  issues pointed by Paulo Alcantara
+- Patch "Fix parsing native symlinks directory/file type" was changed to
+  apply fixups only for non-POSIX servers (Windows SMB/NT)
+- Patch "Validate content of native symlink" was improved to check also
+  UTF-16 buffer length of symlink
 
-Fix this problem in cifsConvertToUTF16() function which is doing that
-character replacement. Function comment already says that it does not need
-to handle special cases '.' and '..', but after introduction of native
-symlinks in reparse point form, this handling is needed.
+Pali Rohár (6):
+  cifs: Improve creating native symlinks pointing to directory
+  cifs: Fix creating native symlinks pointing to current or parent
+    directory
+  cifs: Fix parsing native symlinks relative to the export
+  cifs: Fix parsing native symlinks directory/file type
+  cifs: Validate content of native symlink
+  cifs: Fix creating and resolving absolute NT-style symlinks
 
-Note that this change depends on the previous change
-"cifs: Improve creating native symlinks pointing to directory".
+ fs/smb/client/cifs_unicode.c |  17 +-
+ fs/smb/client/cifsglob.h     |   1 +
+ fs/smb/client/cifsproto.h    |   1 +
+ fs/smb/client/fs_context.c   |  22 ++
+ fs/smb/client/fs_context.h   |   2 +
+ fs/smb/client/inode.c        |   6 +
+ fs/smb/client/reparse.c      | 538 ++++++++++++++++++++++++++++++++---
+ fs/smb/client/reparse.h      |   4 +-
+ fs/smb/client/smb1ops.c      |   3 +-
+ fs/smb/client/smb2file.c     |  76 ++++-
+ fs/smb/client/smb2inode.c    |  13 +-
+ fs/smb/client/smb2proto.h    |  11 +-
+ 12 files changed, 642 insertions(+), 52 deletions(-)
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
- fs/smb/client/cifs_unicode.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
-index 79d99a913944..4cc6e0896fad 100644
---- a/fs/smb/client/cifs_unicode.c
-+++ b/fs/smb/client/cifs_unicode.c
-@@ -484,10 +484,21 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
- 			/**
- 			 * Remap spaces and periods found at the end of every
- 			 * component of the path. The special cases of '.' and
--			 * '..' do not need to be dealt with explicitly because
--			 * they are addressed in namei.c:link_path_walk().
-+			 * '..' are need to be handled because of symlinks.
-+			 * They are treated as non-end-of-string to avoid
-+			 * remapping and breaking symlinks pointing to . or ..
- 			 **/
--			if ((i == srclen - 1) || (source[i+1] == '\\'))
-+			if ((i == 0 || source[i-1] == '\\') &&
-+			    source[i] == '.' &&
-+			    (i == srclen-1 || source[i+1] == '\\'))
-+				end_of_string = false; /* "." case */
-+			else if (i >= 1 &&
-+				 (i == 1 || source[i-2] == '\\') &&
-+				 source[i-1] == '.' &&
-+				 source[i] == '.' &&
-+				 (i == srclen-1 || source[i+1] == '\\'))
-+				end_of_string = false; /* ".." case */
-+			else if ((i == srclen - 1) || (source[i+1] == '\\'))
- 				end_of_string = true;
- 			else
- 				end_of_string = false;
 -- 
 2.20.1
 
