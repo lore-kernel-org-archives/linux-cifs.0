@@ -1,125 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5E815E5BB;
-	Sat,  5 Oct 2024 18:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D4B231CA7
+	for <linux-cifs@vger.kernel.org>; Sat,  5 Oct 2024 20:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728153899; cv=none; b=nZIvqmwonT2lx7oltxMO18QNhdoBDLj+xlacsqTzoDjjzhmSNULTBc9gDr8LfmXBua6EBNHXyXFitaS88vtBsN6+MUP0h3Poz5Nu6KC5Y8NK9s7UPgsNjhip5uAxOeK1oAN/xL8Yy2qe/E+o0nOMztlsTBBlMzp/dS27RB+A5mg=
+	t=1728159568; cv=none; b=dY/PWpX7gnbk15SR4OpxWWOrBOeK50YLtZMP48HqjUNWMF1QcvH1w9DIeEYPRSEiVRAEv29LZgKeomorL/3f1sJ0VDQCx8hIG58C+TUcacttEA/mnrMH6fLmZTyXnFg9IMzD3HJNHMeNZJ7FQWvCYuXfT+DEicV1QqtAhQj2yF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728153899; c=relaxed/simple;
-	bh=O08h0MQkQkfaEZE7snAM38xE8jLrilzjQ8oxK/yHxsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G5U83D93hlY5pWFbDBvKL8WFYIwuCRVL5DXAutL9eUtrQNlNbW7iKnZ1dQlbu0KgF331Y1BEJZ8G6cCDqlhbjGmetKAmbXaBRdbsslWLUtL/neRMehCdslcf9mZMQ0k2RT1aX9rjPeUZq8NO83GD8BXISgUX/fqBRq3FPvFVq6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0NJt6n9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728159568; c=relaxed/simple;
+	bh=t0NDO9VgiNPZ24RdkXQ8lWvfSvJhLvVvsvgtuUVQfmI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=e6PTWZ8WbY/cMKY3lkkGMlmttJrBlp2wDffBbVqYOAASmAxnb9h+icIpcjgV+iGWx2QUHTpZ2Yg3up8bPf5oNb0ILfpQ+fQCOZ6qaGdd5e+E/8/0QJRgKOrl5l9RHhyi8KUr/mBAgEMaF5xklXq0oQSjyarOPM/Zg81yboSaUmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gqhzIVTp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0NJt6n9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B401C4CEC2;
-	Sat,  5 Oct 2024 18:44:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728153899;
-	bh=O08h0MQkQkfaEZE7snAM38xE8jLrilzjQ8oxK/yHxsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a0NJt6n93NUVGykU6lMKRzqSFKFD+aQIJK95/CSP3P8blFqO6GzY5zTG76iRwf29Z
-	 naJ6hs6I6UKATwDYHFseji21QTDMI3y68sY0LWQloYf3u2m94eGj02mfnEbLmGScox
-	 y5Qcov1BwazV1arMbDtL/c/yxqWvXzqwESxAUMI/JCaOid+Z5QW8Hu3WqlEnQfCGOK
-	 Fsf/hV98sfHI1JROJMz+0vobX9oIy2T5qLdtyz4GBJfmjc/3DQr/qy+M0a/OmdR5tP
-	 +iVBgHNT+waWoy+D9dnI3kSqmE1WqpSG8Z5c6M/H/8dcANlA901XCwJ3MEVGxqGXjw
-	 4c5X9VHzY3Gag==
-Received: by pali.im (Postfix)
-	id 2AE5D648; Sat,  5 Oct 2024 20:44:53 +0200 (CEST)
-Date: Sat, 5 Oct 2024 20:44:53 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] cifs: Improve access without FILE_READ_ATTRIBUTES
- permission
-Message-ID: <20241005184453.rdxetlsoszxzfqnt@pali>
-References: <20241005160826.20825-1-pali@kernel.org>
- <CAH2r5mtvp74nnU7ueqiyVrNLurM3ubQmBSTP=HcFqti=ZsWaNQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqhzIVTp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728159566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wVzDdN5Z7OcoeNqeUSnflKTOF7ZiYV9hEqk8inqht1Q=;
+	b=gqhzIVTpAHiWD6UBQ1YcfjVcHOQj3Aa+vqdYRiwPv4nCKp86DFtImxSwCZ0QhILDZEVxaZ
+	LLdQkWVBgo5E86TD673m0Hlw6LUkNalB+kCeIUX7vhFXAVC5hzR2LI2deHlZHAPLomid+A
+	HWcBljIXeNVYDPTD4sKmRIZMHDZugtU=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-262-NDcjYh1vO8mWhfdSGL7PFA-1; Sat,
+ 05 Oct 2024 16:19:23 -0400
+X-MC-Unique: NDcjYh1vO8mWhfdSGL7PFA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 550C4197904D;
+	Sat,  5 Oct 2024 20:19:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AE1A41955F30;
+	Sat,  5 Oct 2024 20:19:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20241004103051.43862-1-advaitdhamorikar@gmail.com>
+References: <20241004103051.43862-1-advaitdhamorikar@gmail.com>
+To: Advait Dhamorikar <advaitdhamorikar@gmail.com>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Bharath SM <bharathsm@microsoft.com>,
+    Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org,
+    samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+    skhan@linuxfoundation.org, anupnewsmail@gmail.com
+Subject: Re: [PATCH] Fix logically dead code
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mtvp74nnU7ueqiyVrNLurM3ubQmBSTP=HcFqti=ZsWaNQ@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3912622.1728159551.1@warthog.procyon.org.uk>
+Date: Sat, 05 Oct 2024 21:19:11 +0100
+Message-ID: <3912623.1728159551@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Saturday 05 October 2024 13:32:12 Steve French wrote:
-> The obvious question to check is whether this would lead to any issues
-> if desired_access is not passed in in oparms in any cases (ie if it
-> ends up 0),
+Can you tag your subject with some sort of subsystem ID so that we know what
+it affects?  Something like "cifs:" or "smb:" in this case.
 
-This is good point. IIRC if zero value is in OPEN/CREATE desired_access
-request then SMB server returns STATUS_ACCESS_DENIED.
+Thanks,
+David
 
-So it needs to be checked that desired_access is filled in all usage
-correctly.
-
-> and also that this would not hurt any cases where we want
-> to keep the handle cached (deferred close) but don't have sufficient
-> permission for it to be usable by the subsequent operation (e.g.
-> revalidate or stat)
-
-I see, so the code needs to be properly checked or tested that all these
-conditions are handled.
-
-> On Sat, Oct 5, 2024 at 11:10 AM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > Linux SMB client currently is not able to access files for which do not
-> > have FILE_READ_ATTRIBUTES permission.
-> >
-> > For example it is not able to write data into file on SMB server to
-> > which has only write access (no read or read attributes access). And
-> > applications are not able to get result of stat() syscall on such file.
-> >
-> > Test case against Windows SMB server:
-> >
-> > 1) On SMB server prepare file with only GENERIC_WRITE access for Everyone:
-> >    ACL:S-1-1-0:ALLOWED/0x0/0x40000000
-> >
-> > 2) On SMB server remove all access for file's parent directory
-> >
-> > 3) Mount share by Linux SMB client and try to append data to that file:
-> >    echo test >> /mnt/share/dir/file
-> >
-> > 4) Try to call: stat /mnt/share/dir/file
-> >
-> > Without this change the write test fails because Linux SMB client is trying
-> > to open SMB path "\dir\file" with GENERIC_WRITE|FILE_READ_ATTRIBUTES. With
-> > this change the test pass as Linux SMB client is not opening file with
-> > FILE_READ_ATTRIBUTES access anymore.
-> >
-> > Similarly without this change the stat test always fails as Linux SMB
-> > client is trying to read attributes via SMB2_OP_QUERY_INFO. With this
-> > change, if SMB2_OP_QUERY_INFO fails then Linux SMB client fallbacks for
-> > reading stat attributes via OPEN with MAXIMUM_ALLOWED access (which will
-> > pass if there is some permission) and OPEN reply will contain attributes
-> > required for stat().
-> >
-> > Pali Rohár (2):
-> >   cifs: Do not issue SMB2 CREATE always with FILE_READ_ATTRIBUTES
-> >   cifs: Improve stat() to work also without FILE_READ_ATTRIBUTES
-> >
-> >  fs/smb/client/cifspdu.h   |  1 +
-> >  fs/smb/client/smb2file.c  |  1 -
-> >  fs/smb/client/smb2glob.h  |  1 +
-> >  fs/smb/client/smb2inode.c | 71 ++++++++++++++++++++++++++++++++++++++-
-> >  4 files changed, 72 insertions(+), 2 deletions(-)
-> >
-> > --
-> > 2.20.1
-> >
-> >
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
