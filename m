@@ -1,42 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2D1175D5C;
-	Sun,  6 Oct 2024 10:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0798B176252;
+	Sun,  6 Oct 2024 10:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728208871; cv=none; b=r2psmbgKjxS+FfF/WkGviwTeKH6lIeR+afrRWE0QBn/tC8OXRaDkK+xIYTKkzRvAzlOOHj3Tz5QN1DMGBoHSf0lGL+2uIivgdSAotF9lVwSCWYBsMVCzWM2vO9izBM91JLVnCizWsIJy/gOI8oZVD5zdzoqVekKiv1au/zmisw0=
+	t=1728208872; cv=none; b=LMrOBPR8muCTmqWx/wRyckIzSAOtOMJ6uIk0jgsQxTW6h6PSv6wofA1gIv+ECwTP+2xs0C6X4Y9M+LJvd70GzQbGNzOomWlgEj3hPSxWsmvb98/1gdY/hf3WowfUNTmRLYZQhCClyjXQSvR2JNGi32h92Hhj3DN2Nh10ahGVBxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728208871; c=relaxed/simple;
-	bh=nDcqMOmHhs7STNbH0Ot5sUT4vs+zoNhL3T3tE+/I+JA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=aXwPYZWgJjjulIP3DZpCCZ4NhFbCR4enibOlX01n1qI09DzscOVjlOINJhCMyAYBC01eJ2+l4/KESZb4jr777xleiKA8vfI7QJFJxPxQP6sj1/71wqd6mNX4LXJjSEnhUqcqmFqlbSpckuEwfnY/yagtFV9FXNP/mlk0pmZLXqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaBIQk+m; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728208872; c=relaxed/simple;
+	bh=PIF7Qur/PKKm4DYKUr+wEds9pKd7tP/IVUfLASXkER8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LPWw8g/N4VH9M+wH5XKdzTwfZChpXPqEhByeyaQU34LSIoGLgJ2vNpDd1WJx0NyeD/M9jxWmo+FYXoT2zT5el8bHRFCBr/jtaO07+swZ02kNuQHCamKMDQYujVRZJ/WySYWahPRfF1AP6Cqrm9PVtOxRZ62ikqzE6iJLPtpzHT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RI0WFRem; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaBIQk+m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E282AC4CECF;
-	Sun,  6 Oct 2024 10:01:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RI0WFRem"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9E04C4CEC5;
+	Sun,  6 Oct 2024 10:01:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728208871;
-	bh=nDcqMOmHhs7STNbH0Ot5sUT4vs+zoNhL3T3tE+/I+JA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PaBIQk+m9qCRhv6wm/h55UfuuZKI3SIkZ43/NFKcwWt3Y5+YEOmLEk+cwqd4gsZmN
-	 Hm8GJMc5GzXSC7C+vGpSF4l3ZhBttHYI9kg+sgdCW55ipraX1H13BkpzV32uH1SIAA
-	 ITjVTVyLOx4b2TlhDH6vn67Iqei5O44QKziWIpHIS+yNlbWn2Z42TInoGK27op1Wwj
-	 24zCP4TkoG6xtRPvszPfLIYPUYSmhePUC2gtmplsnZgKZSBkEi8WJX7EvelPXv90B2
-	 Ixx4kGHdKSG9IPJPT6KUzVL9+PrkLS0KV+bQOPLSAbdv6Nc1JKv5wzGGpkjyJhlLWZ
-	 sMxRaJh4LAAuw==
+	bh=PIF7Qur/PKKm4DYKUr+wEds9pKd7tP/IVUfLASXkER8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=RI0WFRem1EE08HV/1Ez5hRPtdS6SoTzM3ACcespjztSYwh+BJop/JgwZ4ntF7RJ5u
+	 hA5qV7i2dP4vysQ3JMOojrB35G6JDTJWSF5EqdAVh6g3Y9KtrqY3nvfAwRz/YXCUp2
+	 ML5TatWk2pJQi5V6ZZKG1+ZscXhkdwjYlqYRt1duXz3gS9ll0WW9yhGYvmcKerqsnf
+	 o8BThlokuw5OG3aaStENxHL1VhWavwItFd9t3n2RXRanx5ABoWX0FWxUxG7CEVUDVP
+	 C3aLgUAYT0O9wCpRSqqTXkpFgGzAUKbyj/INMNPsaNjiJa6m/BaPxXCYCLJeGp/ZHA
+	 T57MntVfRVJiQ==
 Received: by pali.im (Postfix)
-	id F119C81A; Sun,  6 Oct 2024 12:01:01 +0200 (CEST)
+	id 9FBA5DE8; Sun,  6 Oct 2024 12:01:03 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/7] cifs: Improve mount option -o reparse and support for native Windows sockets
-Date: Sun,  6 Oct 2024 12:00:39 +0200
-Message-Id: <20241006100046.30772-1-pali@kernel.org>
+Subject: [PATCH 7/7] cifs: Validate content of WSL reparse point buffers
+Date: Sun,  6 Oct 2024 12:00:46 +0200
+Message-Id: <20241006100046.30772-8-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241006100046.30772-1-pali@kernel.org>
+References: <20241006100046.30772-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,67 +49,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch series improves choosing reparse format when creating new
-special files.
+WSL socket, fifo, char and block devices have empty reparse buffer.
+Validate the length of the reparse buffer.
 
-In following table is behavior of creating new special files before
-this patch series. In columns are mount options, in rows are file types
-and in each cell is reparse format which is created.
+Signed-off-by: Pali Rohár <pali@kernel.org>
+---
+ fs/smb/client/reparse.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-          -o reparse=default  -o reparse=nfs  -o reparse=wsl
-symlink      native              native          native
-socket       nfs                 nfs             wsl
-fifo         nfs                 nfs             wsl
-block        nfs                 nfs             wsl
-char         nfs                 nfs             wsl
-
-
-After this patch series the table looks like:
-
-          -o reparse=default  -o reparse=nfs  -o reparse=wsl  -o reparse=native+nfs  -o reparse=native+wsl  -o reparse=native  -o reparse=none
-symlink      native              nfs             wsl             native                 native                 native             -disallowed-
-socket       native              nfs             wsl             native                 native                 native             -disallowed-
-fifo         nfs                 nfs             wsl             nfs                    wsl                    -disallowed-       -disallowed-
-block        nfs                 nfs             wsl             nfs                    wsl                    -disallowed-       -disallowed-
-char         nfs                 nfs             wsl             nfs                    wsl                    -disallowed-       -disallowed-
-
-
-The default behavior when no option is specified (which is same as
--o reparse=default) changes only for creating new sockets which are
-now created in its native NTFS form with IO_REPARSE_TAG_AF_UNIX reparse
-tag.
-
-The nfs and wsl behavior is changed to always create new special files
-in its own formats.
-
-There are new options native+nfs and native+wsl which creates by default
-in native form (symlinks + sockets) and fallbacks to nfs/wsl for other
-types (fifo, char, block). This is probably the most useful for
-interoperability. Mount option -o reparse=default is now same as
--o reparse=native+nfs
-
-For completeness there are also new options -o reparse=native which
-allows to creating only native types used by Windows applications
-(symlinks and sockets) and option -o reparse=none to completely disable
-creating new reparse points.
-
-
-Pali Rohár (7):
-  cifs: Add mount option -o reparse=native
-  cifs: Add mount option -o reparse=none
-  cifs: Add support for creating native Windows sockets
-  cifs: Add support for creating NFS-style symlinks
-  cifs: Improve guard for excluding $LXDEV xattr
-  cifs: Add support for creating WSL-style symlinks
-  cifs: Validate content of WSL reparse point buffers
-
- fs/smb/client/cifsglob.h   |  18 +++-
- fs/smb/client/fs_context.c |  16 +++
- fs/smb/client/fs_context.h |   4 +
- fs/smb/client/reparse.c    | 211 +++++++++++++++++++++++++++++++------
- fs/smb/client/reparse.h    |   2 +
- 5 files changed, 218 insertions(+), 33 deletions(-)
-
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 6606c40487ae..c0d9ba14a60d 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -1093,6 +1093,11 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
+ 	case IO_REPARSE_TAG_LX_FIFO:
+ 	case IO_REPARSE_TAG_LX_CHR:
+ 	case IO_REPARSE_TAG_LX_BLK:
++		if (le16_to_cpu(buf->ReparseDataLength) != 0) {
++			cifs_dbg(VFS, "srv returned malformed buffer for reparse point: 0x%08x\n",
++				 le32_to_cpu(buf->ReparseTag));
++			return -EIO;
++		}
+ 		break;
+ 	default:
+ 		cifs_tcon_dbg(VFS | ONCE, "unhandled reparse tag: 0x%08x\n",
 -- 
 2.20.1
 
