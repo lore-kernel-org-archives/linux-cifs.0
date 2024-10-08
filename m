@@ -1,86 +1,91 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B76C144D21
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Oct 2024 15:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE3E7DA6C
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Oct 2024 18:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728400608; cv=none; b=ZwROu/AE//s3CPf830sP4OuM3VgSYGw6kffvVdox0B2E/ne1+esPdgWAVQzSyGyasSJnk5IVmLDkC1hdjhnhlz7BHxi3BzJd5T58/zuCFu4OQjWl5dmfyZaZhZvS23FH+jFu/z/GGErB9gJUU9EKr9xv9cb21soUwd8wx8mfqxQ=
+	t=1728411516; cv=none; b=CkvJBKDmNa2jp9TbTcFH9+79X954lRewbkEB/8buU4j/Ni3B8xQESRo2nnYgSHcYBjGSrG2kQdjg11IktjHppPErg36LTiYFtliw63hMcab20rtbIiJHcUKmSoCVE/Wu5ARO0Z6/qeTOCEpbzCdMeE7o2XfyVP4BEmvCHah4uhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728400608; c=relaxed/simple;
-	bh=EfcEh7j3NXmVgH2RD5ed2vXLeQEMwoOnDs+PMm/nGE8=;
+	s=arc-20240116; t=1728411516; c=relaxed/simple;
+	bh=qp5doVra2RZS9kcEUodfdEzvMDgAgH2182lIdAPv6bs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YnXbidzeWhFIKhmF3ekQRLOJujiFrjFqkPyU6TptuU5MR1fw/pQQWsliuOnTv7YjymL8ZNjmDMpYM9gS4uB0KQNOfVdtmS0BHZzw96uHB6qZ2t1JgllD8pyIXkfruLdlbWVc3n0V1d4WESShdeInPK1+9eMcGIzYi+DnpRGq+Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=2GKrd0kI; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=gbIwfqk6LR9Gmgl0P/AlrygyKV/9wOM5hEi2zT+EQNDW+6XhVKgwQ7LnSp00Qz7ecl0SRqPLFZIPtRtECRKh/lEAS8UBCQG9NZX/eVZapyjYXsiym5f4QUhZyO0uvKLZM+uTAOvt6ydbMeyu795cgvUPiblzoqGSSBYA97I6JtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPyq1r7F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="2GKrd0kI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=e32O0NXV/VjU0tZcqVjHSltKqE5C0YTzWJ8kYHFbhD8=; b=2GKrd0kIC6b+ODicSpGDDrqgfb
-	8Y2TzqPAFBFI3Fb7UQUaBuFWOrIAYtqflqZepdkEFHSWv+J/nd4Kh0ivZcF1cxdFQ6UM0KduW1Hz/
-	zUiM8GZICWClPcMX6yhWGJEHF673sxnCWBoXzEhTTnRLM/ECP2RDgcszHUTMQ9ii2Rj0VpIe811NX
-	0X2ysdupFsN5RMFCCpJwfAQaPyKph5bKgAxMkDFCrxlt8azfFFYvz75kV+jVS8uwV8hhsSc8TomiW
-	8zh4GMyCuqDkG8PN7oGMC/NxaK54TTo1ZGgA5MGgw0EJmTM6l6Jdf1KHXKLRvNVbQr/Pq+GLgiXbB
-	kQwKi2Qjxmws9EO9pC0q/Y0T9oNt4dF8X5CuLdKfxnyvHxsLiMShTl7n8P9E4I7RH+8FUs6TOaHI5
-	u6jpg4ivDqoCwGBs+JQN9nHjHgcRssPYZ1nYDRc61cut8ly8HcVDWicLjzAnBGPtpD2yfBf4XmjH4
-	G5VodV8eCBxWXv+UFkeLB9VH;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1syBx4-003vvF-2F;
-	Tue, 08 Oct 2024 15:16:43 +0000
-Date: Tue, 8 Oct 2024 08:16:39 -0700
-From: Jeremy Allison <jra@samba.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPyq1r7F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D618FC4CEC7;
+	Tue,  8 Oct 2024 18:18:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728411515;
+	bh=qp5doVra2RZS9kcEUodfdEzvMDgAgH2182lIdAPv6bs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TPyq1r7FEDq6SixpMOZwwDSR41kojEEccMs363RhfgOgaGoHPM8yYD33955jYjFdS
+	 j8n/0AiRc+OlMZnorYafhlBxN/IJc7/DSC0LFQaEKNyZbFX/8esNid9Qeubip2VNj/
+	 hoZjJulnAVv267bd4uXo+CbknVabkQscGwaDxXZjkf38sCBUP3NvllFwkJ/Uw1Me5N
+	 cJ9STHMLdIoBIafozqR2IX5bss2JzQu70cPqyLv7APXLGkN+1r+1LPs/gprdDf5XtM
+	 b74gaPuaqkJ64uTph/l2+xFdVvMZk/218wdRmmdhP2maXBKoJxiMh9K2PIuMKQAeDu
+	 kNrTFdIyntjTQ==
+Received: by pali.im (Postfix)
+	id 80AD882D; Tue,  8 Oct 2024 20:18:27 +0200 (CEST)
+Date: Tue, 8 Oct 2024 20:18:27 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Ralph Boehme <slow@samba.org>
-Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>
-Subject: Re: Current Samba master incorrectly returns STATUS_INVALID_HANDLE
- on copy_chunk
-Message-ID: <ZwVM1-C0kBfJzNfM@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <CAH2r5mt7cE8Cc2K5K8nRM2RL=R-rwuAR9h6SSyEqtApuochtuQ@mail.gmail.com>
- <e12d7594-02df-4cbb-80fc-276d907afd90@samba.org>
- <CAH2r5muqSmNy+3SViFKNJ=5Sm61u8r9ej9Wy8JLUDeC2XHwccA@mail.gmail.com>
- <77aff6ef-291d-4840-82e2-b02646949541@samba.org>
- <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
- <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
+Subject: Re: SMB2 DELETE vs UNLINK
+Message-ID: <20241008181827.cgytk5sssatv6gvl@pali>
+References: <20241006103127.4f3mix7lhbgqgutg@pali>
+ <01f5a207-7dfe-41f4-b2bf-bc38d48053b7@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
+In-Reply-To: <01f5a207-7dfe-41f4-b2bf-bc38d48053b7@samba.org>
+User-Agent: NeoMutt/20180716
 
-On Tue, Oct 08, 2024 at 11:35:16AM +0200, Ralph Boehme via samba-technical wrote:
->On 10/8/24 10:45 AM, Ralph Boehme wrote:
->>On 10/8/24 10:41 AM, Ralph Boehme via samba-technical wrote:
->>>The problem is the O_APPEND on the destination file handle.
->>>
->>>We pass that flag if
->>>
->>>         if (posix_open && (access_mask & FILE_APPEND_DATA)) {
->>>                 flags |= O_APPEND;
->>>         }
->>>
->>>Is this on a posix mount? Otherwise it seems to be the clients 
->>>fault passing FILE_APPEND_DATA.
->>
->>gah, it's an "&&", not an "||", so it's your client I would say.
->
->thinking about it, I wonder whether that condition is actually useful 
->or if we should remove it.
->
->@Jeremy (or others): mapping from FILE_APPEND_DATA access mask to open 
->flag O_APPEND seems wrong imho. Do you remember why you added it? Or 
->anyone else?
+On Tuesday 08 October 2024 11:40:06 Ralph Boehme wrote:
+> On 10/6/24 12:31 PM, Pali RohÃ¡r wrote:
+> > But starting with Windows 10, version 1709, there is support also
+> > for UNLINK operation, via class 64 (FileDispositionInformationEx)
+> > [1] where is FILE_DISPOSITION_POSIX_SEMANTICS flag [2] which does
+> > UNLINK after CLOSE and let file content usable for all other
+> > processes. Internally Windows NT kernel moves this file on NTFS from
+> > its directory into some hidden are. Which is de-facto same as what
+> > is POSIX unlink. There is also class 65 (FileRenameInformationEx)
+> > which is allows to issue POSIX rename (unlink the target if it
+> > exists).
+> 
+> interesting. Thanks for pointing these out!
+> 
+> > What do you think about using & implementing this functionality for
+> > the Linux unlink operation? As the class numbers are already
+> > reserved and documented, I think that it could make sense to use
+> > them also over SMB on POSIX systems.
+> 
+> for SMB3 POSIX this will be the behaviour on POSIX handles so we don't
+> need an on the wire change. This is part of what will become POSIX-FSA.
+> 
+> > Also there is another flag
+> > FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE which can be useful for
+> > unlink. It allows to unlink also file which has read-only attribute
+> > set. So no need to do that racy (unset-readonly, set-delete-pending,
+> > set-read-only) compound on files with more file hardlinks.
+> > 
+> > I think that this is something which SMB3 POSIX extensions can use
+> > and do not have to invent new extensions for the same functionality.
+> 
+> same here (taking note to remember to add this to the POSIX-FSA and
+> check Samba behaviour).
+> 
+> -slow
 
-It was done as part of the SMB1 extensions - trying to "pass-through" all
-possible POSIX open flags.
-
-Just remove it.
+So the behavior when the POSIX extension is active would be same as if
+every DELETE_ON_CLOSE and every DELETE_PENDING=true requests would set
+those new NT flags FILE_DISPOSITION_POSIX_SEMANTICS and
+FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE?
