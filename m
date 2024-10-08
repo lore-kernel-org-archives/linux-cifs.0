@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1BA158205
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Oct 2024 09:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046BA18C352
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Oct 2024 09:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728380122; cv=none; b=GzTAntgfTjUAIJbEJM8WZxkUU7isQ8RNmlwuQUDkfwxO4lbKlTchjH5OS0QY1qMPYfd8qDNfsssHVZr8slcUCu8HatELbWU9gvOE8fD+9Mo+MELIR2vR7TUI+lqy2e+z4mwbg18U3xlJScqmiTbVpVXqWxTnqgSnnk2Nxid7Spk=
+	t=1728380413; cv=none; b=SiaxpL073gwcydAaKWNTfla3TJGnUn2mMojG3/w+wqJE1w5CKRMeGyWzcizZF/4sfrW7TnA52LjODDqZV3+Bnqrsm3PduUMSips2JIDOprtBxxo4DuQglvX8HB6V4yrq4pGOSxK/JgnIsERqjY1TtLIv6KWCNENDG4kLTH7WHj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728380122; c=relaxed/simple;
-	bh=H+2thn8Qa0/kERp/SGnXihj91qwwvRvZOlWlpdbb5/4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=r9JZptL7te0UGfsLXjq1w9fwW3JNFA9qhM76RAZ5BTT3GPV1CtzBDw4O14s41YGtBszk59Bj8pPYAVJ1IrB/Y3H0y5Z34BZwWzP2dnrc7k2hqc7UmshKOQHCl+6TuEkB7pb+fWn878CLPe6n77CoUpA/kprZMw4s5vBxDgGcMYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=yN+GWnpt; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1728380413; c=relaxed/simple;
+	bh=yIwHB+yWsTEqPRI9wGG6v8F6GigvQecjAb2sz2fv524=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pmNRxks2YN6TlrB6CtVc52QYfwc44DSRxyvnONFpAa/6TIcI0ykZfLJiMyBek381oBY6VyaY9c0NvlhmSScqRT7E5PFDSCed9YHHXkDOe0y/3+FrRs2J/0oqWb3lUlugSpGsSGxz6vQbG/D0s7UMZ2mTGTyqdJr3KUl/Z8xHL1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=USq9Ok6Z; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="yN+GWnpt"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="USq9Ok6Z"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=H+2thn8Qa0/kERp/SGnXihj91qwwvRvZOlWlpdbb5/4=; b=yN+GWnptPr9fWl85qVlf/edgu1
-	a/1TxJVh136eZCqdhVeXOLZsNSEKvVSgFDa49DhA9bZHvfhxY3pCOBTuKfr7VxuAiuPcjKd8AwpE0
-	YQq9ntWukQIPR1T84mCniSYW4OyrCuxghu9kEsQ0DNg8oSZ71g6ree/vjIEVDnCOxtZ93pJtCVHr/
-	ex9CnswwyjS0oyfvSZjWDPqPx79MKLvAlTkNQfXWFbw+uDYGkGGXmC7gzw604O0mB1wk2THcrLXTJ
-	3ZxDIeBmjJhW+2Sx2BswGfZmD4SHN9LjD0DhwYZQHK4r6xpcVaHab8ibVCY/fcmEyBRDENnuO3l90
-	HO2TGno8SuhUnwO0RyI5BnjKIhrR3qu/YRzb1Ky/Zs9aMW8JdR6jEOiubCnShQacCCN0EV4OoTH8Y
-	hqDJjgNOwFbUj9zveENOWLA/MlLzH3PopgP4DqfDkg32QFglkQAnNs/uSZi8yKJ8Cc6BiRf2E4rDV
-	r2J36lNek1E8Sn++VP7zFOL7;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=yIwHB+yWsTEqPRI9wGG6v8F6GigvQecjAb2sz2fv524=; b=USq9Ok6ZDa9CjguFXCfU3tjW5r
+	NdlwcXP7ZUQc6+gmD9FYLFlm0sgalowx2M/xsPanEdQTgJ0+CaLDFHVlRqkCF0BZ4gs1IaW0MNZTN
+	VtHLKOY8ty7NahlJjYDLWiefdxmo+WA4X6AavZ6mG0uebzllH/ZReBzadVuqmWnzdDjutJnTPKS/R
+	deyd2o+NFlJq8C/oIWNRqya0bXItgDE0xfb7o/QJ/Yj2R9lq1DzNGUsvLUwZi8mfu1HH9KmCUUHrj
+	hv2gTq/n/1DitScNciGSvSr8hrLG8JoUN7JDWdyWS4SEjtaZM08uvH1ZIHTL5uh1MbolEHA8AwH1R
+	8gd0ymsgmb1cBRECTawxuCt5ENoK7mpwtWDyyARpYP+NK3ekzqvd9t7Wc+dvDTscc2cq4IYi3JwmD
+	F3VZm6l03avG7tyKjVmycwPMmIfI+2SLGM79TyBRK3AVNzM+AqIMnCpoATfSqJ5DXD5TzX/msP380
+	uxKJqskeXsACRd477WedBoyT;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1sy6cg-003tmr-0W;
-	Tue, 08 Oct 2024 09:35:18 +0000
-Message-ID: <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
-Date: Tue, 8 Oct 2024 11:35:16 +0200
+	id 1sy6hL-003tqz-1B;
+	Tue, 08 Oct 2024 09:40:07 +0000
+Message-ID: <01f5a207-7dfe-41f4-b2bf-bc38d48053b7@samba.org>
+Date: Tue, 8 Oct 2024 11:40:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,18 +40,14 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Current Samba master incorrectly returns STATUS_INVALID_HANDLE on
- copy_chunk
-From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>
-References: <CAH2r5mt7cE8Cc2K5K8nRM2RL=R-rwuAR9h6SSyEqtApuochtuQ@mail.gmail.com>
- <e12d7594-02df-4cbb-80fc-276d907afd90@samba.org>
- <CAH2r5muqSmNy+3SViFKNJ=5Sm61u8r9ej9Wy8JLUDeC2XHwccA@mail.gmail.com>
- <77aff6ef-291d-4840-82e2-b02646949541@samba.org>
- <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
+Subject: Re: SMB2 DELETE vs UNLINK
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+ Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+References: <20241006103127.4f3mix7lhbgqgutg@pali>
 Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
 Autocrypt: addr=slow@samba.org; keydata=
  xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
  eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
@@ -96,71 +92,81 @@ Autocrypt: addr=slow@samba.org; keydata=
  Bermm52f/BRm7Gl3ug8lfcuxselVCV68Qam6Q1IGwcr5XvLowbY1P/FrW+fj1b4J9IfES+a4
  /AC+Dps65h2qebPL72KNjf9vFilTzNNpng4Z4O72Yve5XT0hr2ISwHKGmkuKuK+iS9k7QfXD
  R3NApzHw2ZqQDtSdciR9og==
-In-Reply-To: <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
+In-Reply-To: <20241006103127.4f3mix7lhbgqgutg@pali>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------U0l1VdpmMJBkJnrDL04knix1"
+ boundary="------------dpTt3bGIXj0ufLrwZkYJ1BPp"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------U0l1VdpmMJBkJnrDL04knix1
-Content-Type: multipart/mixed; boundary="------------FXWN0tib6Tl0CirrI1D5qxvO";
+--------------dpTt3bGIXj0ufLrwZkYJ1BPp
+Content-Type: multipart/mixed; boundary="------------i95u50lRC8CQNS0Ol7YQs0dm";
  protected-headers="v1"
 From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>
-Message-ID: <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
-Subject: Re: Current Samba master incorrectly returns STATUS_INVALID_HANDLE on
- copy_chunk
-References: <CAH2r5mt7cE8Cc2K5K8nRM2RL=R-rwuAR9h6SSyEqtApuochtuQ@mail.gmail.com>
- <e12d7594-02df-4cbb-80fc-276d907afd90@samba.org>
- <CAH2r5muqSmNy+3SViFKNJ=5Sm61u8r9ej9Wy8JLUDeC2XHwccA@mail.gmail.com>
- <77aff6ef-291d-4840-82e2-b02646949541@samba.org>
- <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
-In-Reply-To: <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+ Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Message-ID: <01f5a207-7dfe-41f4-b2bf-bc38d48053b7@samba.org>
+Subject: Re: SMB2 DELETE vs UNLINK
+References: <20241006103127.4f3mix7lhbgqgutg@pali>
+In-Reply-To: <20241006103127.4f3mix7lhbgqgutg@pali>
 
---------------FXWN0tib6Tl0CirrI1D5qxvO
+--------------i95u50lRC8CQNS0Ol7YQs0dm
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gMTAvOC8yNCAxMDo0NSBBTSwgUmFscGggQm9laG1lIHdyb3RlOg0KPiBPbiAxMC84LzI0
-IDEwOjQxIEFNLCBSYWxwaCBCb2VobWUgdmlhIHNhbWJhLXRlY2huaWNhbCB3cm90ZToNCj4+
-IFRoZSBwcm9ibGVtIGlzIHRoZSBPX0FQUEVORCBvbiB0aGUgZGVzdGluYXRpb24gZmlsZSBo
-YW5kbGUuDQo+Pg0KPj4gV2UgcGFzcyB0aGF0IGZsYWcgaWYNCj4+DQo+PiDCoMKgwqDCoMKg
-wqDCoMKgIGlmIChwb3NpeF9vcGVuICYmIChhY2Nlc3NfbWFzayAmIEZJTEVfQVBQRU5EX0RB
-VEEpKSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmbGFncyB8PSBP
-X0FQUEVORDsNCj4+IMKgwqDCoMKgwqDCoMKgwqAgfQ0KPj4NCj4+IElzIHRoaXMgb24gYSBw
-b3NpeCBtb3VudD8gT3RoZXJ3aXNlIGl0IHNlZW1zIHRvIGJlIHRoZSBjbGllbnRzIGZhdWx0
-IA0KPj4gcGFzc2luZyBGSUxFX0FQUEVORF9EQVRBLg0KPiANCj4gZ2FoLCBpdCdzIGFuICIm
-JiIsIG5vdCBhbiAifHwiLCBzbyBpdCdzIHlvdXIgY2xpZW50IEkgd291bGQgc2F5Lg0KDQp0
-aGlua2luZyBhYm91dCBpdCwgSSB3b25kZXIgd2hldGhlciB0aGF0IGNvbmRpdGlvbiBpcyBh
-Y3R1YWxseSB1c2VmdWwgb3IgDQppZiB3ZSBzaG91bGQgcmVtb3ZlIGl0Lg0KDQpASmVyZW15
-IChvciBvdGhlcnMpOiBtYXBwaW5nIGZyb20gRklMRV9BUFBFTkRfREFUQSBhY2Nlc3MgbWFz
-ayB0byBvcGVuIA0KZmxhZyBPX0FQUEVORCBzZWVtcyB3cm9uZyBpbWhvLiBEbyB5b3UgcmVt
-ZW1iZXIgd2h5IHlvdSBhZGRlZCBpdD8gT3IgDQphbnlvbmUgZWxzZT8NCg0KLXNsb3cNCg==
+T24gMTAvNi8yNCAxMjozMSBQTSwgUGFsaSBSb2jDoXIgd3JvdGU6DQo+IEJ1dCBzdGFydGlu
+ZyB3aXRoIFdpbmRvd3MgMTAsIHZlcnNpb24gMTcwOSwgdGhlcmUgaXMgc3VwcG9ydCBhbHNv
+DQo+IGZvciBVTkxJTksgb3BlcmF0aW9uLCB2aWEgY2xhc3MgNjQgKEZpbGVEaXNwb3NpdGlv
+bkluZm9ybWF0aW9uRXgpDQo+IFsxXSB3aGVyZSBpcyBGSUxFX0RJU1BPU0lUSU9OX1BPU0lY
+X1NFTUFOVElDUyBmbGFnIFsyXSB3aGljaCBkb2VzDQo+IFVOTElOSyBhZnRlciBDTE9TRSBh
+bmQgbGV0IGZpbGUgY29udGVudCB1c2FibGUgZm9yIGFsbCBvdGhlcg0KPiBwcm9jZXNzZXMu
+IEludGVybmFsbHkgV2luZG93cyBOVCBrZXJuZWwgbW92ZXMgdGhpcyBmaWxlIG9uIE5URlMg
+ZnJvbQ0KPiBpdHMgZGlyZWN0b3J5IGludG8gc29tZSBoaWRkZW4gYXJlLiBXaGljaCBpcyBk
+ZS1mYWN0byBzYW1lIGFzIHdoYXQNCj4gaXMgUE9TSVggdW5saW5rLiBUaGVyZSBpcyBhbHNv
+IGNsYXNzIDY1IChGaWxlUmVuYW1lSW5mb3JtYXRpb25FeCkNCj4gd2hpY2ggaXMgYWxsb3dz
+IHRvIGlzc3VlIFBPU0lYIHJlbmFtZSAodW5saW5rIHRoZSB0YXJnZXQgaWYgaXQNCj4gZXhp
+c3RzKS4NCg0KaW50ZXJlc3RpbmcuIFRoYW5rcyBmb3IgcG9pbnRpbmcgdGhlc2Ugb3V0IQ0K
+DQo+IFdoYXQgZG8geW91IHRoaW5rIGFib3V0IHVzaW5nICYgaW1wbGVtZW50aW5nIHRoaXMg
+ZnVuY3Rpb25hbGl0eSBmb3INCj4gdGhlIExpbnV4IHVubGluayBvcGVyYXRpb24/IEFzIHRo
+ZSBjbGFzcyBudW1iZXJzIGFyZSBhbHJlYWR5DQo+IHJlc2VydmVkIGFuZCBkb2N1bWVudGVk
+LCBJIHRoaW5rIHRoYXQgaXQgY291bGQgbWFrZSBzZW5zZSB0byB1c2UNCj4gdGhlbSBhbHNv
+IG92ZXIgU01CIG9uIFBPU0lYIHN5c3RlbXMuDQoNCmZvciBTTUIzIFBPU0lYIHRoaXMgd2ls
+bCBiZSB0aGUgYmVoYXZpb3VyIG9uIFBPU0lYIGhhbmRsZXMgc28gd2UgZG9uJ3QNCm5lZWQg
+YW4gb24gdGhlIHdpcmUgY2hhbmdlLiBUaGlzIGlzIHBhcnQgb2Ygd2hhdCB3aWxsIGJlY29t
+ZSBQT1NJWC1GU0EuDQoNCj4gQWxzbyB0aGVyZSBpcyBhbm90aGVyIGZsYWcNCj4gRklMRV9E
+SVNQT1NJVElPTl9JR05PUkVfUkVBRE9OTFlfQVRUUklCVVRFIHdoaWNoIGNhbiBiZSB1c2Vm
+dWwgZm9yDQo+IHVubGluay4gSXQgYWxsb3dzIHRvIHVubGluayBhbHNvIGZpbGUgd2hpY2gg
+aGFzIHJlYWQtb25seSBhdHRyaWJ1dGUNCj4gc2V0LiBTbyBubyBuZWVkIHRvIGRvIHRoYXQg
+cmFjeSAodW5zZXQtcmVhZG9ubHksIHNldC1kZWxldGUtcGVuZGluZywNCj4gc2V0LXJlYWQt
+b25seSkgY29tcG91bmQgb24gZmlsZXMgd2l0aCBtb3JlIGZpbGUgaGFyZGxpbmtzLg0KPiAN
+Cj4gSSB0aGluayB0aGF0IHRoaXMgaXMgc29tZXRoaW5nIHdoaWNoIFNNQjMgUE9TSVggZXh0
+ZW5zaW9ucyBjYW4gdXNlDQo+IGFuZCBkbyBub3QgaGF2ZSB0byBpbnZlbnQgbmV3IGV4dGVu
+c2lvbnMgZm9yIHRoZSBzYW1lIGZ1bmN0aW9uYWxpdHkuDQoNCnNhbWUgaGVyZSAodGFraW5n
+IG5vdGUgdG8gcmVtZW1iZXIgdG8gYWRkIHRoaXMgdG8gdGhlIFBPU0lYLUZTQSBhbmQNCmNo
+ZWNrIFNhbWJhIGJlaGF2aW91cikuDQoNCi1zbG93DQo=
 
+--------------i95u50lRC8CQNS0Ol7YQs0dm--
 
---------------FXWN0tib6Tl0CirrI1D5qxvO--
-
---------------U0l1VdpmMJBkJnrDL04knix1
+--------------dpTt3bGIXj0ufLrwZkYJ1BPp
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmcE/NUFAwAAAAAACgkQqh6bcSY5nkYn
-LA//cSR1+6tniebT5gGBrxdIkQDf24gtyA3CrVY3r+WcnZh7xvri4uT20L0VifC+5A9tE2Bg89H7
-Dc6h51/Hbz0yNlhzow1Rm4J7lw0/ycAEEUp/4WenaLrrAs4WBlTg5/5JSu3lLnUVZi5H8lgH2Fj6
-wwxU5CCTgNqoxWPTQTbenmFm26vhT5McxDHiVN3fephHWMVEW5xCDc2u32iE7NmSg8iJS2XfFWiW
-wdY0q5+ckDQsF/NFtNb/UsRW5W+MSx+GM4y9N7eGBw4KRngVohIScE1IjukoMY36Me1+zhPTPW0P
-XK6ShdYys6Hw3o2TqAsQi17mD4m0Y2F38FoNF4Z3hIDU+xCYIOKW7AGFap8YgTr5UsFu/PtUAjVZ
-ftKyHR+lq6nDpffldi7GmZxHjkiTz5jTVl3zIe3oQDPwJB3/3oGfiHVfLpGejN6u49Ruz5En5xQA
-uYq8jHYgEusenlnk6pBAmcd87rTg8yEMyvVMHGFpqtOr4t6FUoNQhMLesODsJcc/SxiEqn4IvLvG
-4+w9jrJTOPKJwyl9ucUZt/54mSupm5jEJ5lDq3+ZhC2lruae0VoJUIHh6rfmWIaIHC1MRbbOtfEC
-Yrvt5Ubp5P5IDPdiRoLutQEP/lrT0XnN9QUcABOkqM3+3oJavAd9p8YR1uXzjSRW914WGv9KqZbT
-Spk=
-=1OG3
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmcE/fYFAwAAAAAACgkQqh6bcSY5nkah
+lQ//VImRotczqZDOQzOPvOp7YVcUOmAGk+7xtbB7DYTjIvGwgIUbwaWPCjV/5NrYz+U5/2Qp2Fo8
+g7BqmGIB78OFHjulO8ncjdcf5PSDfHhGlqGrYE7RZVURzcKwOVb+df8fZbXn3N2R4jN+FGPUxcMM
+NYUtma3ls0Ra27LnYXcXgWZvLzey+wYjYw7UfRyWMKGLxpZ2mJFeUNAcpZ3d8GjW6jFsC145+G+2
+BqCjJetw4ekRIXoTmcP9Ta4L11HhPnSOQs8sC1ft5MiiuuMqpfyj6erRespYPzPIhqbLTw92RvNO
+2A0GKdAxhZgjNBQ9mmIwxbCftNzhv4mxtYvXYJKpivNZnIA9arVtPOJ0md6SKkb3Z5wEigBRigYn
+42aQk/tt8cPrr179kvonhwk1mlUcEmb10HQNE9Eotc6DbY9e3E/u1KfHYekJA/jOTEgCYWc/b4wC
+sp3CI9K1sPmvIpPdMCRRtLf/QFMPT1FigosCiZNDoXoaGxkJmiVtGMkWQLuT5+7RlaqBCzvjKtiL
+3Qlrvx1woMy1Z/gRMrRpa958MJWASf7uaj4A/4akN/gWyFl0r6J7KRMEzwYYC6BqTzoQZkY/zNTL
+XflB4Ft0N4CO4funY8fL0IhM7xudnobmr5H6dDDPefQJt9Y8S2CdZtmXh+XKCTfDLyB3KK/FwBjC
+5i0=
+=79xo
 -----END PGP SIGNATURE-----
 
---------------U0l1VdpmMJBkJnrDL04knix1--
+--------------dpTt3bGIXj0ufLrwZkYJ1BPp--
