@@ -1,194 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1861CDFD4;
-	Thu, 10 Oct 2024 21:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B702B1E2839;
+	Thu, 10 Oct 2024 22:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728597041; cv=none; b=QxpYQzQv1FLD0ShIK/ORzXoEtYcbPPw3+3IK4+YU1uTz2gIr9WCbJW8T2pI8W/WGMa4uEkV4DmE5/jtYmfWeVwNI2cWv6Ie6NYK348GGCvYHDQDjgkd5/V/+ilYF1Gao3MG9jd3oJS+Fpt4s3kRwv1eVO4A3daKVysWJu9fA0eo=
+	t=1728598934; cv=none; b=k3LLiIKwEVsGETShnnzyRAFtLgMSkPjMDka5XhyyLYaSO2Q/cPNe8uPjrYFptuw2JKgld4SHIUMxwJzu2XIvH84wtUqtsI0SsPeGujR1tzdI7HSR5vZ8t6iMZ5VB4+ebk8UURd23oYnMukUjGIHe3d/VY/VFGXcBEjg3o+Onryk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728597041; c=relaxed/simple;
-	bh=bPTxm2yrPYRAOVe6pD9tpiUS8n5ZOExNrPgwDxaq87w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i0BrwGyaa15ZJEwn488qBJkEbBAH5CJ8OBr9oxG71H51xGHsOOJeFmJHHvINUzi9Hq1jEj96LYvQMvQEQg9U7+LPWL68HTvz8K4tY0HzbnIQYlp5WN10bhV9CWmq8Nr216Z2Gnnma+AR1kv87TXsVXSBu/LoeMqsF+PoU42AIi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jeLjOfWc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728598934; c=relaxed/simple;
+	bh=4aSNyHFj2a3sv9HTlB5j0icOpCkpze2gdgEUsrKowIc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TwVrTjdzLoY/wcdZo1LJoierG8LqVMYORzcy74/HqA0nrK8m274gaySKXCUSs/z8B179z3oMix8iL9muklVWCtGe8GXldkwigj2r/4FRUX/GBQsPZov2Ty6l/mkVmFfmYI0wnC63F9v6QRuobCvoa1lOYiB1xaS/MzREMXnVp1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZILr9lCX; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jeLjOfWc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A437AC4CEC5;
-	Thu, 10 Oct 2024 21:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728597041;
-	bh=bPTxm2yrPYRAOVe6pD9tpiUS8n5ZOExNrPgwDxaq87w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jeLjOfWcxod7GqvCTIiEQ9mo8qa4gai2frxnNIwRgfCAPp15Si+/nZVVUjAPMPh5K
-	 FJkRixuq0G5ifng2aL5hwi5cFE7863Sa7V0HkAPnugS7Bg7AWub+7rJu2HddCh1Q0x
-	 2V+D9hAcDY2eutJWE7xQWhCy4FKez+OAd3tHFDhI5djcA1JcTiuUeDM9LFnNnqnrLP
-	 Vx5LEphCIUhmiC6gAEQ52AzIHIdgXip55XOC1Q4vgbctlpfs3PiafeFudqzveNACY7
-	 f+cqg25XW/8dtW+wn8iam+OeHq2f5GRGFTUeiVBTpKAAkPmdyqRHw1u0WJPhkHXfN9
-	 O/K9MuiyMSHWQ==
-Received: by pali.im (Postfix)
-	id D2C8381B; Thu, 10 Oct 2024 23:50:34 +0200 (CEST)
-Date: Thu, 10 Oct 2024 23:50:34 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/7] cifs: Add support for creating WSL-style symlinks
-Message-ID: <20241010215034.pai6w6khigohip3g@pali>
-References: <20241006100046.30772-1-pali@kernel.org>
- <20241006100046.30772-7-pali@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZILr9lCX"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5398e4ae9efso1930655e87.1;
+        Thu, 10 Oct 2024 15:22:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728598931; x=1729203731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GcS15oGBg5Qp9pUdUup2rJKA6lsBI4Jc2zF6G9+B4U=;
+        b=ZILr9lCXuiExekZuOviK45xqwyR5j8p9qaDv6343kKnZVdRIkdPoMhqukhM0rvJ+RI
+         qFzb4CFfRJJUKUZXQINzc5t1Yk4IIfCLxdHPnvlIJg0552i2IZXluPL6vhyX0cSYN5yk
+         lOAKNc3RFTDVfato5cHOe5CSj4LGP8Ttndd5qwRleYVzBQ9xLLWA4+pTnqMVFMavFV1A
+         q6DsVpbI0Z14+BSPsUiKViXYHxXbFu1x/GuyoaWPdPe488ehOTxNECLyoWme5EyeMzSW
+         YX7NKL2MMz2eglY77i4kRWQ85vcrZNrpW4zlL4Dyp6Ns68zwaEBiivOEvFODyNWGGP8W
+         5Ygg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728598931; x=1729203731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6GcS15oGBg5Qp9pUdUup2rJKA6lsBI4Jc2zF6G9+B4U=;
+        b=AjhOIsbwsHYyCR0qV0AlfVlE4SD0eaYi+Nisd9RnxjMkbpEaDwPQsFPm44B+45BFZs
+         vBwV9bP0t1uewVGZUVl7jrDBC8BXRz3V+Bi2Q6HXuCN5zr5G1jvK3omj9Kxd3xPwmbXe
+         uvFNLQT/6a8j2p8bRt1B6Aop2Uusoz6hjxjvajuUch9k5+/uP1ZhS0BZX63wNrG+Wtxd
+         BAQ7/wnRb2Ko+uZrLxts+58egHBj8QvCugtEiNdQ3rzsfHnbSNufDJkVSuv7osSBUYcm
+         ymTdbUQQsY794/FvxIvLFKvsgq73Wbpg4dXaJQhyxWsbuG150ddDMCKJzN8r1wxcwRp8
+         0YGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlILDpWxtDXTNTunNFXm/+rIljdn2QqzMRRclQAwBgdDHn9QKQGAMYObAQncpgHRBvzW27YoQ/cllh@vger.kernel.org, AJvYcCVQAzYYwoDfEVkrZ7xwqPCHe8ymbei0p2jnhbQLG+x0xvkfqhcbjyseTd8rB4d9o8asKopa7i2aZFMSaDqx@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnyzQSfSezVc+dsDTMUiElIcuyReYNzi2dGsQEzZo1wmgKMI6g
+	D7ktrKMZfgqAjIbn2F6xF3RnSXxAxjimnjLAAn7U1emCxFcJnoZXBAkzZxVOE4gxL2Z2vqgn5EV
+	SFzuHhXBwmsQrypNF3+NuZidKlh4=
+X-Google-Smtp-Source: AGHT+IE4fUe3SiO9Y0v1hJGDJi7hWD4hFZrFysXnzTwZskfQTvym0jrGbAzNdGISFAQGxTv7qeDgYao8QxFqTZg2FDI=
+X-Received: by 2002:a05:6512:2345:b0:52d:b226:9428 with SMTP id
+ 2adb3069b0e04-539da3b6d1dmr183343e87.6.1728598930663; Thu, 10 Oct 2024
+ 15:22:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241006100046.30772-7-pali@kernel.org>
-User-Agent: NeoMutt/20180716
+References: <20241006100046.30772-1-pali@kernel.org> <20241006100046.30772-2-pali@kernel.org>
+ <CAH2r5muLa_0L5LL4ipQkzEHOUdtYtJVAD29AAjQOaun9dWmK0g@mail.gmail.com>
+ <20241007183650.aw3skuztljpgk2bs@pali> <CAH2r5mttO-aDq94QrLQm10xJRGLg=PULqX9fcfoykAweVVO+uQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mttO-aDq94QrLQm10xJRGLg=PULqX9fcfoykAweVVO+uQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 10 Oct 2024 17:21:59 -0500
+Message-ID: <CAH2r5mvV7WzB62hWt4K6oF_xyrQH1EF75zc0JdfjsjFEV4SQKQ@mail.gmail.com>
+Subject: Re: [PATCH 1/7] cifs: Add mount option -o reparse=native
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sunday 06 October 2024 12:00:45 Pali Rohár wrote:
-> This change implements support for creating new symlink in WSL-style by
-> Linux cifs client when -o reparse=wsl mount option is specified. WSL-style
-> symlink uses reparse point with tag IO_REPARSE_TAG_LX_SYMLINK and symlink
-> target location is stored in reparse buffer in UTF-8 encoding prefixed by
-> 32-bit flags. Flags bits are unknown, but it was observed that WSL always
-> sets flags to value 0x02000000. Do same in Linux cifs client.
-> 
-> New symlinks would be created in WSL-style only in case the mount option
-> -o reparse=wsl is specified, which is not by default. So default CIFS
-> mounts are not affected by this change.
-> 
-> Signed-off-by: Pali Rohár <pali@kernel.org>
-> ---
->  fs/smb/client/reparse.c | 65 +++++++++++++++++++++++++++++++++--------
->  1 file changed, 53 insertions(+), 12 deletions(-)
-> 
-> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> index 402eb568f466..6606c40487ae 100644
-> --- a/fs/smb/client/reparse.c
-> +++ b/fs/smb/client/reparse.c
-> @@ -506,9 +506,17 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  	return rc;
->  }
->  
-> -static int wsl_set_reparse_buf(struct reparse_data_buffer *buf,
-> -			       mode_t mode, struct kvec *iov)
-> +static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
-> +			       mode_t mode, const char *symname,
-> +			       struct cifs_sb_info *cifs_sb,
-> +			       struct kvec *iov)
->  {
-> +	struct reparse_wsl_symlink_data_buffer *symlink_buf;
-> +	__le16 *symname_utf16;
-> +	int symname_utf16_len;
-> +	int symname_utf8_maxlen;
-> +	int symname_utf8_len;
-> +	size_t buf_len;
->  	u32 tag;
->  
->  	switch ((tag = reparse_mode_wsl_tag(mode))) {
-> @@ -516,17 +524,45 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer *buf,
->  	case IO_REPARSE_TAG_LX_CHR:
->  	case IO_REPARSE_TAG_LX_FIFO:
->  	case IO_REPARSE_TAG_AF_UNIX:
-> +		buf_len = sizeof(struct reparse_data_buffer);
-> +		*buf = kzalloc(buf_len, GFP_KERNEL);
-> +		if (!*buf)
-> +			return -ENOMEM;
-> +		break;
-> +	case IO_REPARSE_TAG_LX_SYMLINK:
-> +		symname_utf16 = cifs_strndup_to_utf16(symname, strlen(symname),
-> +						      &symname_utf16_len,
-> +						      cifs_sb->local_nls,
-> +						      NO_MAP_UNI_RSVD);
-> +		if (!symname_utf16)
-> +			return -ENOMEM;
-> +		symname_utf8_maxlen = symname_utf16_len/2*3;
-> +		symlink_buf = kzalloc(sizeof(struct reparse_wsl_symlink_data_buffer) +
-> +				      symname_utf8_maxlen, GFP_KERNEL);
-> +		if (!symlink_buf) {
-> +			kfree(symname_utf16);
-> +			return -ENOMEM;
-> +		}
-> +		/* Flag 0x02000000 is unknown, but all wsl symlinks have this value */
-> +		symlink_buf->Flags = cpu_to_le32(0x02000000);
-> +		/* PathBuffer is in UTF-8 but without trailing null-term byte */
-> +		symname_utf8_len = utf16s_to_utf8s(symname_utf16, symname_utf16_len/2,
-> +						   UTF16_LITTLE_ENDIAN,
-> +						   symlink_buf->PathBuffer,
-> +						   symname_utf8_maxlen);
-> +		*buf = (struct reparse_data_buffer *)symlink_buf;
-> +		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
-> +		kfree(symname_utf16);
->  		break;
-> -	case IO_REPARSE_TAG_LX_SYMLINK: /* TODO: add support for WSL symlinks */
->  	default:
->  		return -EOPNOTSUPP;
->  	}
->  
-> -	buf->ReparseTag = cpu_to_le32(tag);
-> -	buf->Reserved = 0;
-> -	buf->ReparseDataLength = 0;
-> -	iov->iov_base = buf;
-> -	iov->iov_len = sizeof(*buf);
-> +	(*buf)->ReparseTag = cpu_to_le32(tag);
-> +	(*buf)->Reserved = 0;
-> +	(*buf)->ReparseDataLength = buf_len - sizeof(struct reparse_data_buffer);
+On Thu, Oct 10, 2024 at 5:17=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+>
+>
+> On Mon, Oct 7, 2024 at 1:36=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> =
+wrote:
+>>
+>> Currently choosing how new symlinks are created is quite complicated.
+>>
+>> Without these patch series, by default new symlinks are created via
+>> native reparse points, even when reparse=3Dnfs or reparse=3Dwsl is
+>> specified. There is no possibility to create a NFS-style or WSL-style
+>> symlink yet, and this patch series address this missing functionality.
+>> When option -o sfu is specified then all new symlinks are created in
+>> SFU-style, independently of -o reparse option. And when -o mfsymlinks is
+>> specified then all new symlinks are created in mf style, independently
+>> of -o reparse and -o sfu options.
+>>
+>> This patch series does not change -o sfu and -o mfsymlinks overrides, it
+>> just changes the way how -o reparse is handled.
+>>
 
-ReparseDataLength is in little endian, so it should be:
+I lean toward something similar, and more intuitive - do not have
+"reparse=3D" control symlink creation - but instead use another mount
+parm (e.g. "symlink=3D") for that.  It would be rarely used - only if
+you don't want the default (windows default format too) for server
+symlinks or "mfsymlinks" (for client only symlinks):
 
-  (*buf)->ReparseDataLength = cpu_to_le16(buf_len - sizeof(struct reparse_data_buffer));
+1) "symlink=3D" if specified can be set to one of five formats (with the
+default being the windows format)
+  a) "mfsymlinks" (Mac style which is safer for many use cases since
+they are "client only" symlinks which the server will never use)
+     Setting "symlink=3Dmfsymlinks" will have the same effect as just
+specifying "mfsymlinks" so won't break anything
+  b) "default" (or "windows") which uses the default symlink format
+when trying to create a new symlink
+  c) "nfs"
+  d) "wsl"
+  e) "sfu"
+2) "reparse=3D" will still control how special files are created (char,
+block, fifo, socket) and can be set to:
+   a) "nfs" (default)
+   b) or "wsl"
+   c) If "sfu" set on mount will cause special files to be created
+with "sfu" format instead of using reparse points to create
+3) reading reparse points will always be supported (unless you want to
+add a new parameter "reparse=3Dnone" to treat all reparse points as
+empty directories)
+4) reading special files via the old "sfu" will only be supported if
+you mount with "sfu"
 
-> +	iov->iov_base = *buf;
-> +	iov->iov_len = buf_len;
->  	return 0;
->  }
->  
-> @@ -618,25 +654,29 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  		     const char *full_path, umode_t mode, dev_t dev,
->  		     const char *symname)
->  {
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifs_open_info_data data;
-> -	struct reparse_data_buffer buf;
-> +	struct reparse_data_buffer *buf;
->  	struct smb2_create_ea_ctx *cc;
->  	struct inode *new;
->  	unsigned int len;
->  	struct kvec reparse_iov, xattr_iov;
->  	int rc;
->  
-> -	rc = wsl_set_reparse_buf(&buf, mode, &reparse_iov);
-> +	rc = wsl_set_reparse_buf(&buf, mode, symname, cifs_sb, &reparse_iov);
->  	if (rc)
->  		return rc;
->  
->  	rc = wsl_set_xattrs(inode, mode, dev, &xattr_iov);
-> -	if (rc)
-> +	if (rc) {
-> +		kfree(buf);
->  		return rc;
-> +	}
->  
->  	data = (struct cifs_open_info_data) {
->  		.reparse_point = true,
-> -		.reparse = { .tag = le32_to_cpu(buf.ReparseTag), .buf = &buf, },
-> +		.reparse = { .tag = le32_to_cpu(buf->ReparseTag), .buf = buf, },
-> +		.symlink_target = kstrdup(symname, GFP_KERNEL),
->  	};
->  
->  	cc = xattr_iov.iov_base;
-> @@ -653,6 +693,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  		rc = PTR_ERR(new);
->  	cifs_free_open_info(&data);
->  	kfree(xattr_iov.iov_base);
-> +	kfree(buf);
->  	return rc;
->  }
->  
-> -- 
-> 2.20.1
-> 
+
+
+
+--=20
+Thanks,
+
+Steve
