@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C18145B0F;
-	Sat, 12 Oct 2024 08:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C953145B0F;
+	Sat, 12 Oct 2024 08:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728723369; cv=none; b=thxLh0XFHLFyzE5u6vHqnUMECl9Dk1yvH3RZp3Vyoc6de9xwWg4ATRmMqi3JcX4Lw1jHDWOvRM8ZG4/1JTqM/duEwq8OSQ92Baf6iufD5Rt/Xh4YYB7b79R4CJSe4JHlsafGKryHVkc8Q//grindgkOe2tuL2NjfsEBjg3+ghRg=
+	t=1728723375; cv=none; b=de+MPy0Hvm3xIqDa9ew4OYA1/a+oc6EtTrC8mEBGqHzm75VE8pqgefPELD9dYB8MZxRmWL0I2Rae21VG5p6Hw0v3egPfhxp8i4xAnkFHM0ulTGNQIzTTE8OwUQMmXFrlkZyJllbxr9HCszZUELipXuDBrnThlsFzW6gVsr9GPKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728723369; c=relaxed/simple;
-	bh=vATFG8shnKFunaoRDxD/P8NZHqYAHDJ9fb/RllpA1AM=;
+	s=arc-20240116; t=1728723375; c=relaxed/simple;
+	bh=4Mvi152HGg7NjVSCBeQbBdl7JzN17DrdnTby1FxDoXA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pA/9Ha4KEgmnyXDZ7VsiLUta5oxv8qPd24wPSe42qUhGBLMBPb2w9ZRvYV9WkOXOPjpyCi7j8eRJvvcNqsdiAgRwX9vqK3km2cien5DAouSxRnzXz6Xjdkejq+/eSPZL913ylNKML1MWWknBmF3Bw1CkXrG+VCnvCyx0V/Py9+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGM7KrL4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=jK7p3FiL4MtmckAlH+1nx6qXuxBsrWd/jP3oSyF1GYrm9T8pJhgiTvha/xLe4J9yk2rh4QwjutcpHnpYU2yiDNzMWrPym9Jidg5FxG8thY4eQyiOXXkO+ebC/ZZynKDzP6FigZbQTqUHIU/QFax1QoZP7tamwoeZ8oDFTRnU+tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oedPwe3N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGM7KrL4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E2BC4CEC6;
-	Sat, 12 Oct 2024 08:56:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oedPwe3N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70F18C4CEC6;
+	Sat, 12 Oct 2024 08:56:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728723368;
-	bh=vATFG8shnKFunaoRDxD/P8NZHqYAHDJ9fb/RllpA1AM=;
+	s=k20201202; t=1728723374;
+	bh=4Mvi152HGg7NjVSCBeQbBdl7JzN17DrdnTby1FxDoXA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XGM7KrL4N5/OP7emMj86K2M/s1JgawQo7tZrreEC8AnsusjkN7fKEKtEbBjy+L6Px
-	 MmfLM2+1v/fmuFd1ulfeJw6ws8RdwQDdiblm8liSrfPlT6KH4eYaMXSrZjCCtSt67P
-	 cB3NVxV/V/aI8P9Se2uXVFvUZiQYxjVMdmHEIFqrU/xiZlZ+HP1ZAFfqfRHEkARfOP
-	 gTnSc08UJ7ZYcydAkj4ajgVtBMAYGzkRRbX1O3KQXnBhalDheAVyjXhsgqiVn/qpwN
-	 BaEWJ8w4bDgZc3DX7fF/3RSSd9NVkdext6MnSmqj47b1rHrsdDQtuwzffcGn46Tfb6
-	 BNJC36DxUurqw==
+	b=oedPwe3NbnLszqO/KBqHdCveHn+FqCn3Aj8HlPuRxTiK43HgQTshHi/aA0CtnuKRB
+	 XUjKfTIgzycBC1PyrsEE1HdXvL9zFS6+mGEDM96mc6G1OIBpxDrDtRV9FhVbHLzaJq
+	 C0e13BfuOgzVHm4r6QfbqgcUF6slnQ7hqAjCYsuYuRiVNte3liwj1m2d5YJFz9o2wq
+	 gw7CJduUcv8W/09rFBdn1R0ejBuf4/3aKbYR5zzOy3yjCDAVm8T1x/EAoihH1GGz1D
+	 oKlGD986jO/o4ptOsAnwWdq1MzFAOM8wYQPlCTFX1vpePZ8tPhoO83gyDom9tMcBXa
+	 PI+0HUMzmzATQ==
 Received: by pali.im (Postfix)
-	id 0AA2F7BD; Sat, 12 Oct 2024 10:56:03 +0200 (CEST)
+	id 2ABD97BD; Sat, 12 Oct 2024 10:56:09 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/7] cifs: Add support for creating NFS-style symlinks
-Date: Sat, 12 Oct 2024 10:56:01 +0200
-Message-Id: <20241012085601.694-1-pali@kernel.org>
+Subject: [PATCH v2 5/7] cifs: Improve guard for excluding $LXDEV xattr
+Date: Sat, 12 Oct 2024 10:56:08 +0200
+Message-Id: <20241012085608.712-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241012085252.560-1-pali@kernel.org>
 References: <20241012085252.560-1-pali@kernel.org>
@@ -49,123 +49,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-CIFS client is currently able to parse NFS-style symlinks, but is not able
-to create them. This functionality is useful when the mounted SMB share is
-used also by Windows NFS server (on Windows Server 2012 or new). It allows
-interop of symlinks between SMB share mounted by Linux CIFS client and same
-export from Windows NFS server mounted by some NFS client.
-
-New symlinks would be created in NFS-style only in case the mount option
--o reparse=nfs is specified, which is not by default. So default CIFS
-mounts are not affected by this change.
+$LXDEV xattr is for storing block/char device's major and minor number.
+Change guard which excludes storing $LXDEV xattr to explicitly filter
+everything except block and char device. Current guard is opposite, which
+is currently correct but is less-safe. This change is required for adding
+support for creating WSL-style symlinks as symlinks also do not use
+device's major and minor numbers.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/reparse.c | 47 ++++++++++++++++++++++++++++++++++-------
- 1 file changed, 39 insertions(+), 8 deletions(-)
+ fs/smb/client/reparse.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 57320a4c4d79..cd12704cae0c 100644
+index cd12704cae0c..50048dccc5ff 100644
 --- a/fs/smb/client/reparse.c
 +++ b/fs/smb/client/reparse.c
-@@ -406,6 +406,8 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+@@ -574,8 +574,8 @@ static int wsl_set_xattrs(struct inode *inode, umode_t _mode,
  
- static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
- 			       mode_t mode, dev_t dev,
-+			       __le16 *symname_utf16,
-+			       int symname_utf16_len,
- 			       struct kvec *iov)
- {
- 	u64 type;
-@@ -416,13 +418,18 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
- 	switch ((type = reparse_mode_nfs_type(mode))) {
- 	case NFS_SPECFILE_BLK:
- 	case NFS_SPECFILE_CHR:
--		dlen = sizeof(__le64);
-+		dlen = 2 * sizeof(__le32);
-+		((__le32 *)buf->DataBuffer)[0] = MAJOR(dev);
-+		((__le32 *)buf->DataBuffer)[1] = MINOR(dev);
-+		break;
-+	case NFS_SPECFILE_LNK:
-+		dlen = symname_utf16_len;
-+		memcpy(buf->DataBuffer, symname_utf16, symname_utf16_len);
- 		break;
- 	case NFS_SPECFILE_FIFO:
- 	case NFS_SPECFILE_SOCK:
- 		dlen = 0;
- 		break;
--	case NFS_SPECFILE_LNK: /* TODO: add support for NFS symlinks */
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -432,8 +439,6 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
- 	buf->InodeType = cpu_to_le64(type);
- 	buf->ReparseDataLength = cpu_to_le16(len + dlen -
- 					     sizeof(struct reparse_data_buffer));
--	*(__le64 *)buf->DataBuffer = cpu_to_le64(((u64)MINOR(dev) << 32) |
--						 MAJOR(dev));
- 	iov->iov_base = buf;
- 	iov->iov_len = len + dlen;
- 	return 0;
-@@ -444,21 +449,42 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- 		     const char *full_path, umode_t mode, dev_t dev,
- 		     const char *symname)
- {
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifs_open_info_data data;
--	struct reparse_posix_data *p;
-+	struct reparse_posix_data *p = NULL;
-+	__le16 *symname_utf16 = NULL;
-+	int symname_utf16_len = 0;
- 	struct inode *new;
- 	struct kvec iov;
- 	__u8 buf[sizeof(*p) + sizeof(__le64)];
- 	int rc;
+ 	memset(iov, 0, sizeof(*iov));
  
--	p = (struct reparse_posix_data *)buf;
--	rc = nfs_set_reparse_buf(p, mode, dev, &iov);
-+	if (S_ISLNK(mode)) {
-+		symname_utf16 = cifs_strndup_to_utf16(symname, strlen(symname),
-+						      &symname_utf16_len,
-+						      cifs_sb->local_nls,
-+						      NO_MAP_UNI_RSVD);
-+		if (!symname_utf16) {
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+		symname_utf16_len -= 2; /* symlink is without trailing wide-nul */
-+		p = kzalloc(sizeof(*p) + symname_utf16_len, GFP_KERNEL);
-+		if (!p) {
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+	} else {
-+		p = (struct reparse_posix_data *)buf;
-+	}
-+	rc = nfs_set_reparse_buf(p, mode, dev, symname_utf16, symname_utf16_len, &iov);
- 	if (rc)
--		return rc;
-+		goto out;
- 
- 	data = (struct cifs_open_info_data) {
- 		.reparse_point = true,
- 		.reparse = { .tag = IO_REPARSE_TAG_NFS, .posix = p, },
-+		.symlink_target = kstrdup(symname, GFP_KERNEL),
- 	};
- 
- 	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-@@ -468,6 +494,11 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+-	/* Exclude $LXDEV xattr for sockets and fifos */
+-	if (S_ISSOCK(_mode) || S_ISFIFO(_mode))
++	/* Exclude $LXDEV xattr for non-device files */
++	if (!S_ISBLK(_mode) && !S_ISCHR(_mode))
+ 		num_xattrs = ARRAY_SIZE(xattrs) - 1;
  	else
- 		rc = PTR_ERR(new);
- 	cifs_free_open_info(&data);
-+out:
-+	if (S_ISLNK(mode)) {
-+		kfree(symname_utf16);
-+		kfree(p);
-+	}
- 	return rc;
- }
- 
+ 		num_xattrs = ARRAY_SIZE(xattrs);
 -- 
 2.20.1
 
