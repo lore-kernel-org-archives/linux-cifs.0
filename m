@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AD1D517;
-	Sat, 12 Oct 2024 08:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C18145B0F;
+	Sat, 12 Oct 2024 08:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728723356; cv=none; b=YsXNsoXyLImBsq3pk5RIo8HwlDwPvmy4IUFKi75yGSHuJtFKsQxzWdZ2dj5U1jdP492CrPcq/OIgpiDFvp+VyiGIJmBRgE2a2AJkxqzth9bzq+A4MuvpX3cbR34phkQZU4wE3UQgK0vPBTLxWY5dI6DJE+ENo3bvGdQoNUYcGRk=
+	t=1728723369; cv=none; b=thxLh0XFHLFyzE5u6vHqnUMECl9Dk1yvH3RZp3Vyoc6de9xwWg4ATRmMqi3JcX4Lw1jHDWOvRM8ZG4/1JTqM/duEwq8OSQ92Baf6iufD5Rt/Xh4YYB7b79R4CJSe4JHlsafGKryHVkc8Q//grindgkOe2tuL2NjfsEBjg3+ghRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728723356; c=relaxed/simple;
-	bh=aXcWnBwn8eWzEpq2xCZrD9ltkMngFQdpO2DxXG4OBig=;
+	s=arc-20240116; t=1728723369; c=relaxed/simple;
+	bh=vATFG8shnKFunaoRDxD/P8NZHqYAHDJ9fb/RllpA1AM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BZsA0Q0dMSaLl+g9VJvzMU8crbBPATBxegiT7tR+ZN79fPfjJJ4ybYk3P3M/llhQt6jtH7LSNB1008XDm6dfqrPkErLuYeWmIdM5jPJZEU2HkpZBo8SqdHAzSA5YD/EeG7onERKNzEZ3fvCtqc53dl1IGkLs2Ux+RHoB6GJFhz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXFFlkWG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=pA/9Ha4KEgmnyXDZ7VsiLUta5oxv8qPd24wPSe42qUhGBLMBPb2w9ZRvYV9WkOXOPjpyCi7j8eRJvvcNqsdiAgRwX9vqK3km2cien5DAouSxRnzXz6Xjdkejq+/eSPZL913ylNKML1MWWknBmF3Bw1CkXrG+VCnvCyx0V/Py9+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XGM7KrL4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXFFlkWG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D9AC4CEC6;
-	Sat, 12 Oct 2024 08:55:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XGM7KrL4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E2BC4CEC6;
+	Sat, 12 Oct 2024 08:56:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728723356;
-	bh=aXcWnBwn8eWzEpq2xCZrD9ltkMngFQdpO2DxXG4OBig=;
+	s=k20201202; t=1728723368;
+	bh=vATFG8shnKFunaoRDxD/P8NZHqYAHDJ9fb/RllpA1AM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PXFFlkWG2xALIxw6MpT+bonBCEp14z0bIenks0ExMq0uJmKp6CkgcMs0YTQ4mhvVq
-	 Av0rY+rOJ9YCC7cosx/ul8OhuFcnYiZR9CzsSXF244j/ux+fYFjk07RTLSiLUIJYiN
-	 W51TPLNda/X9CR1A7eljOBVVGoPmu3/LVEtIeG4d80fnSVl1nZpfwS0rlJHmADcptR
-	 wGO4l72XAZgmUngmqaAn8DZACdir3rP6juSWtNPTz96eOHZLp10uRvnFs0BaYimdgL
-	 RgimmlIfzRXUU/5cC8G7GuDZfL88qAzGs69EgWCH6Xy24k+8sDoN8wAl7KIIRwremZ
-	 6V7p9orQy2E5w==
+	b=XGM7KrL4N5/OP7emMj86K2M/s1JgawQo7tZrreEC8AnsusjkN7fKEKtEbBjy+L6Px
+	 MmfLM2+1v/fmuFd1ulfeJw6ws8RdwQDdiblm8liSrfPlT6KH4eYaMXSrZjCCtSt67P
+	 cB3NVxV/V/aI8P9Se2uXVFvUZiQYxjVMdmHEIFqrU/xiZlZ+HP1ZAFfqfRHEkARfOP
+	 gTnSc08UJ7ZYcydAkj4ajgVtBMAYGzkRRbX1O3KQXnBhalDheAVyjXhsgqiVn/qpwN
+	 BaEWJ8w4bDgZc3DX7fF/3RSSd9NVkdext6MnSmqj47b1rHrsdDQtuwzffcGn46Tfb6
+	 BNJC36DxUurqw==
 Received: by pali.im (Postfix)
-	id E8F647BD; Sat, 12 Oct 2024 10:55:50 +0200 (CEST)
+	id 0AA2F7BD; Sat, 12 Oct 2024 10:56:03 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/7] cifs: Add support for creating native Windows sockets
-Date: Sat, 12 Oct 2024 10:55:49 +0200
-Message-Id: <20241012085549.670-1-pali@kernel.org>
+Subject: [PATCH v2 4/7] cifs: Add support for creating NFS-style symlinks
+Date: Sat, 12 Oct 2024 10:56:01 +0200
+Message-Id: <20241012085601.694-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241012085252.560-1-pali@kernel.org>
 References: <20241012085252.560-1-pali@kernel.org>
@@ -49,152 +49,123 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Native Windows sockets created by WinSock on Windows 10 April 2018 Update
-(version 1803) or Windows Server 2019 (version 1809) or later versions is
-reparse point with IO_REPARSE_TAG_AF_UNIX tag, with empty reparse point
-data buffer and without any EAs.
+CIFS client is currently able to parse NFS-style symlinks, but is not able
+to create them. This functionality is useful when the mounted SMB share is
+used also by Windows NFS server (on Windows Server 2012 or new). It allows
+interop of symlinks between SMB share mounted by Linux CIFS client and same
+export from Windows NFS server mounted by some NFS client.
 
-Create AF_UNIX sockets in this native format if -o nonativesocket was not
-specified.
-
-This change makes AF_UNIX sockets created by Linux CIFS client compatible
-with AF_UNIX sockets created by Windows applications on NTFS volumes.
+New symlinks would be created in NFS-style only in case the mount option
+-o reparse=nfs is specified, which is not by default. So default CIFS
+mounts are not affected by this change.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsfs.c     |  2 ++
- fs/smb/client/connect.c    |  2 ++
- fs/smb/client/fs_context.c |  5 +++++
- fs/smb/client/fs_context.h |  2 ++
- fs/smb/client/reparse.c    | 32 ++++++++++++++++++++++++++++++++
- 5 files changed, 43 insertions(+)
+ fs/smb/client/reparse.c | 47 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 39 insertions(+), 8 deletions(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 39ec67d9808e..eb279d5c6bd3 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -689,6 +689,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 					    cifs_sb->ctx->backupgid));
- 	seq_show_option(s, "reparse",
- 			cifs_reparse_type_str(cifs_sb->ctx->reparse_type));
-+	if (cifs_sb->ctx->nonativesocket)
-+		seq_puts(s, ",nonativesocket");
- 	seq_show_option(s, "symlink",
- 			cifs_symlink_type_str(get_cifs_symlink_type(cifs_sb)));
- 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index bc5b5100ac09..3db39f2ef5a8 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2831,6 +2831,8 @@ compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
- 		return 0;
- 	if (old->ctx->reparse_type != new->ctx->reparse_type)
- 		return 0;
-+	if (old->ctx->nonativesocket != new->ctx->nonativesocket)
-+		return 0;
- 	if (old->ctx->symlink_type != new->ctx->symlink_type)
- 		return 0;
- 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index d68db6ac5f73..7f21630885cb 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -178,6 +178,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_string("sec", Opt_sec),
- 	fsparam_string("cache", Opt_cache),
- 	fsparam_string("reparse", Opt_reparse),
-+	fsparam_string("nativesocket", Opt_nativesocket),
- 	fsparam_string("symlink", Opt_symlink),
- 	fsparam_string("symlinkroot", Opt_symlinkroot),
- 
-@@ -1674,6 +1675,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		if (parse_reparse_flavor(fc, param->string, ctx))
- 			goto cifs_parse_mount_err;
- 		break;
-+	case Opt_nativesocket:
-+		ctx->nonativesocket = result.negated;
-+		break;
- 	case Opt_symlink:
- 		if (parse_symlink_flavor(fc, param->string, ctx))
- 			goto cifs_parse_mount_err;
-@@ -1803,6 +1807,7 @@ int smb3_init_fs_context(struct fs_context *fc)
- 	ctx->retrans = 1;
- 	ctx->reparse_type = CIFS_REPARSE_TYPE_DEFAULT;
- 	ctx->symlink_type = CIFS_SYMLINK_TYPE_DEFAULT;
-+	ctx->nonativesocket = 0;
- 
- /*
-  *	short int override_uid = -1;
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 5f306f581fd1..18d39d457145 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -170,6 +170,7 @@ enum cifs_param {
- 	Opt_sec,
- 	Opt_cache,
- 	Opt_reparse,
-+	Opt_nativesocket,
- 	Opt_symlink,
- 	Opt_symlinkroot,
- 
-@@ -300,6 +301,7 @@ struct smb3_fs_context {
- 	bool dfs_automount:1; /* set for dfs automount only */
- 	enum cifs_reparse_type reparse_type;
- 	enum cifs_symlink_type symlink_type;
-+	bool nonativesocket:1;
- 	bool dfs_conn:1; /* set for dfs mounts */
- 	char *symlinkroot; /* top level directory for native SMB symlinks in absolute format */
- };
 diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index d950c60323e8..57320a4c4d79 100644
+index 57320a4c4d79..cd12704cae0c 100644
 --- a/fs/smb/client/reparse.c
 +++ b/fs/smb/client/reparse.c
-@@ -375,6 +375,35 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
- 	return 0;
- }
+@@ -406,6 +406,8 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
  
-+static int create_native_socket(const unsigned int xid, struct inode *inode,
-+				struct dentry *dentry, struct cifs_tcon *tcon,
-+				const char *full_path)
-+{
-+	struct cifs_open_info_data data = {
-+		.reparse_point = true,
-+		.reparse = { .tag = IO_REPARSE_TAG_AF_UNIX, },
-+	};
-+	struct reparse_data_buffer buf = {
-+		.ReparseTag = cpu_to_le32(IO_REPARSE_TAG_AF_UNIX),
-+		.ReparseDataLength = cpu_to_le16(0),
-+	};
-+	struct kvec iov = {
-+		.iov_base = &buf,
-+		.iov_len = sizeof(buf),
-+	};
-+	struct inode *new;
-+	int rc = 0;
-+
-+	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-+				     tcon, full_path, false, &iov, NULL);
-+	if (!IS_ERR(new))
-+		d_instantiate(dentry, new);
-+	else
-+		rc = PTR_ERR(new);
-+	cifs_free_open_info(&data);
-+	return rc;
-+}
-+
  static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
  			       mode_t mode, dev_t dev,
++			       __le16 *symname_utf16,
++			       int symname_utf16_len,
  			       struct kvec *iov)
-@@ -598,6 +627,9 @@ int smb2_mknod_reparse(unsigned int xid, struct inode *inode,
  {
- 	struct smb3_fs_context *ctx = CIFS_SB(inode->i_sb)->ctx;
+ 	u64 type;
+@@ -416,13 +418,18 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
+ 	switch ((type = reparse_mode_nfs_type(mode))) {
+ 	case NFS_SPECFILE_BLK:
+ 	case NFS_SPECFILE_CHR:
+-		dlen = sizeof(__le64);
++		dlen = 2 * sizeof(__le32);
++		((__le32 *)buf->DataBuffer)[0] = MAJOR(dev);
++		((__le32 *)buf->DataBuffer)[1] = MINOR(dev);
++		break;
++	case NFS_SPECFILE_LNK:
++		dlen = symname_utf16_len;
++		memcpy(buf->DataBuffer, symname_utf16, symname_utf16_len);
+ 		break;
+ 	case NFS_SPECFILE_FIFO:
+ 	case NFS_SPECFILE_SOCK:
+ 		dlen = 0;
+ 		break;
+-	case NFS_SPECFILE_LNK: /* TODO: add support for NFS symlinks */
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -432,8 +439,6 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
+ 	buf->InodeType = cpu_to_le64(type);
+ 	buf->ReparseDataLength = cpu_to_le16(len + dlen -
+ 					     sizeof(struct reparse_data_buffer));
+-	*(__le64 *)buf->DataBuffer = cpu_to_le64(((u64)MINOR(dev) << 32) |
+-						 MAJOR(dev));
+ 	iov->iov_base = buf;
+ 	iov->iov_len = len + dlen;
+ 	return 0;
+@@ -444,21 +449,42 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+ 		     const char *full_path, umode_t mode, dev_t dev,
+ 		     const char *symname)
+ {
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifs_open_info_data data;
+-	struct reparse_posix_data *p;
++	struct reparse_posix_data *p = NULL;
++	__le16 *symname_utf16 = NULL;
++	int symname_utf16_len = 0;
+ 	struct inode *new;
+ 	struct kvec iov;
+ 	__u8 buf[sizeof(*p) + sizeof(__le64)];
+ 	int rc;
  
-+	if (S_ISSOCK(mode) && !ctx->nonativesocket && ctx->reparse_type != CIFS_REPARSE_TYPE_NONE)
-+		return create_native_socket(xid, inode, dentry, tcon, full_path);
-+
- 	switch (ctx->reparse_type) {
- 	case CIFS_REPARSE_TYPE_NFS:
- 		return mknod_nfs(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
+-	p = (struct reparse_posix_data *)buf;
+-	rc = nfs_set_reparse_buf(p, mode, dev, &iov);
++	if (S_ISLNK(mode)) {
++		symname_utf16 = cifs_strndup_to_utf16(symname, strlen(symname),
++						      &symname_utf16_len,
++						      cifs_sb->local_nls,
++						      NO_MAP_UNI_RSVD);
++		if (!symname_utf16) {
++			rc = -ENOMEM;
++			goto out;
++		}
++		symname_utf16_len -= 2; /* symlink is without trailing wide-nul */
++		p = kzalloc(sizeof(*p) + symname_utf16_len, GFP_KERNEL);
++		if (!p) {
++			rc = -ENOMEM;
++			goto out;
++		}
++	} else {
++		p = (struct reparse_posix_data *)buf;
++	}
++	rc = nfs_set_reparse_buf(p, mode, dev, symname_utf16, symname_utf16_len, &iov);
+ 	if (rc)
+-		return rc;
++		goto out;
+ 
+ 	data = (struct cifs_open_info_data) {
+ 		.reparse_point = true,
+ 		.reparse = { .tag = IO_REPARSE_TAG_NFS, .posix = p, },
++		.symlink_target = kstrdup(symname, GFP_KERNEL),
+ 	};
+ 
+ 	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
+@@ -468,6 +494,11 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+ 	else
+ 		rc = PTR_ERR(new);
+ 	cifs_free_open_info(&data);
++out:
++	if (S_ISLNK(mode)) {
++		kfree(symname_utf16);
++		kfree(p);
++	}
+ 	return rc;
+ }
+ 
 -- 
 2.20.1
 
