@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF4F42AA5;
-	Sun, 13 Oct 2024 08:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C29636B;
+	Sun, 13 Oct 2024 13:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728809964; cv=none; b=h7zTpr4B/lsblD+c4hXa/4aT4ntyRZIjehov6cW5+JXaxbMyzYasSH/khgMUQTHpZNTGvZK2UwoTProUc6UrJCzT/hRGHtyvyIWf8qtIfQNhxgHGmFSN3CXZoUFYpYlYSvS0xf6TGJXnfS4z+KjUsx9V5u+aGbV3gXTBOPIB08c=
+	t=1728826715; cv=none; b=aKLlLIm/QKxa3iSdFd1n+hWGZVZDmrMpmaIb6+5JnJB7Gx3TQ/eBTm5KAcq6AVnZWs2wjAdmEYYyXWEL7NoA0jEIvEP/9yH8KuGc9FRKN9NCWqLcnD2/EdyZhaAtTo8DXfo9jzWU0pHlo48HO3Wd7YjgQdz0o28aUWpbDdtsTYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728809964; c=relaxed/simple;
-	bh=MGPp+p+dxUmjH0cnQhkoeaR5EG/K95IWnJ4xLOSAOqQ=;
+	s=arc-20240116; t=1728826715; c=relaxed/simple;
+	bh=NluLoHfX6JeLFpsX9MCWqSmrkJEpBuoc5uhCKz+6CCw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSV8uUYKHCokSXy0R9DfJo/XFMWV3Xnz8l1GUGLx8tVW7KVha3zwK8boH2LQGffxdfwPCmeN6/HOFzQbcF/aOCisA38RFIpVyFu1jSclAlg9zfDD9AE5gq6lwSzeQcDhvNRpec2p2Eq+qW2j471V6AEfVBZNd47B2fN0gx6pb5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5YJWuD6; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=bxKDLjnDpEyYDYfpGD3IelArNMhsyIUDIXJFA/h6VL0IdjRau4npP6EiLOZNUzI2RbUIrtmJ33NKVbhnhAHT68TJAas+Xqukz0Z/LHPUJodwdHotuTV4D2/0hcIxUdpqrQ5SLBxaN++3yof+1MLGknorbW/J1iGTPUSJIZ2FK6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpCoFTmz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5YJWuD6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73E19C4CEC5;
-	Sun, 13 Oct 2024 08:59:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpCoFTmz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A29BAC4CEC5;
+	Sun, 13 Oct 2024 13:38:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728809963;
-	bh=MGPp+p+dxUmjH0cnQhkoeaR5EG/K95IWnJ4xLOSAOqQ=;
+	s=k20201202; t=1728826714;
+	bh=NluLoHfX6JeLFpsX9MCWqSmrkJEpBuoc5uhCKz+6CCw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t5YJWuD6Aoics6ECGmsTwbHwSqToeSi/1LZB5VZbIwzy8V4l3Z/yu2VAZsAwYJDuI
-	 YCPPvUgM5FjLOUVz33dYAPvTUtl4Xrk2HXstq9GKJbxLZlmX+oOAFFKjn8YnpYI1xJ
-	 ezJeyVQ/ZPFFu6sSyk0fiulS9bp94WxUOukLIuyFjv5RUIra6wuXNuQ7FXISfky/Uv
-	 Ew3Vx4y8cF/aSm9ceFwBo3iX7GAEjjR6zsRBAANuPUnPGk5EZw9XAMNllz+0+GpQyP
-	 Ril9VZcfnzG9py9nUe5LE8u5izFspdFemZLtkPNMRYY/FWE8dAhCZPtVdfbrqQdUWM
-	 uhTFeoUFEilgQ==
+	b=OpCoFTmzL6TGDqETUTyd7fG4HAorHZtsNSmoIJzO788jQhzzgSQOiQNPS4E8eeH+Q
+	 2IqQlnY1FTzbXJNoYHt6ekS6Dxiujs3XeH2h54o1r9YPk3npzXoRmDo8oSh3cLWdis
+	 Wo5vPuW2t1rCedvaJ6GSLBdFLNSYR5XStAx/aRXrU8YLi4UiPTPaWejL3wD70rX2Xv
+	 lm+Q2/NevsXEtPLF7HrK2F64z85kd8tVLWtcb2F8yDf+lExW9fyAeUUQt4hbKWiPbX
+	 lFqmADiL1ZJlirqkaybobaWpHYjKcU1DDX/+u1FWEJ5fgEShTeE9NBYnMs0pWCOgBJ
+	 RICHyTGYaUOGg==
 Received: by pali.im (Postfix)
-	id 7E08A5F9; Sun, 13 Oct 2024 10:59:16 +0200 (CEST)
-Date: Sun, 13 Oct 2024 10:59:16 +0200
+	id 53B0B5F9; Sun, 13 Oct 2024 15:38:27 +0200 (CEST)
+Date: Sun, 13 Oct 2024 15:38:27 +0200
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <smfrench@gmail.com>
 Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 0/7] Allow to choose symlink and socket type
-Message-ID: <20241013085916.tcpz6oclalqv6aan@pali>
+Message-ID: <20241013133827.lodho6ep2uspbzpk@pali>
 References: <20241006100046.30772-1-pali@kernel.org>
  <20241012085252.560-1-pali@kernel.org>
  <CAH2r5mtGqqM35Cy5k9NN=X05rTZPk-adhb7LgoV8PGNVL9P6FQ@mail.gmail.com>
@@ -51,9 +51,8 @@ Content-Transfer-Encoding: 8bit
 In-Reply-To: <CAH2r5mtGqqM35Cy5k9NN=X05rTZPk-adhb7LgoV8PGNVL9P6FQ@mail.gmail.com>
 User-Agent: NeoMutt/20180716
 
-Well, if server explicitly disallow user to create symlink due to
-missing permissions, I am not sure if it is a good idea to obey it by
-creating symlink in format unsupported by the server...
+Anyway, I think that the create symlink privilege is needed to create
+any reparse point, so fallback to NFS reparse point would not help.
 
 On Saturday 12 October 2024 23:18:13 Steve French wrote:
 > after doing more experiments with native windows symlinks (and how
