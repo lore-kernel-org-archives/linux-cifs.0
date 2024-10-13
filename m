@@ -1,119 +1,134 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE04335C7;
-	Sun, 13 Oct 2024 04:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E261DDEA;
+	Sun, 13 Oct 2024 04:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728793175; cv=none; b=CiUz1i6z1oh9xaM8u1gVZXljg3kbOBZQ+wB2sNpVQF7yzjcdxcTJj5qP/JUkJ8C+5KKbd7lEZFSU6/StqkX+ofLJR1/LjsoL6He9pLytqBje/xuqBVWiZAfH+NkhLNcEdiz9TDFWB7Mlo+kZQl3m0XXsDu+wjocsg0B9DHt22UY=
+	t=1728793318; cv=none; b=HsVwoogp0mq//oEP4czALRtOFOcvgq4xBVWB5C/Oe9uZAzmVh4lE9jKJ3JAu5oWnOxX6NhBU6vM6iU4wDiLjnOv8nihNuIiSLvwi4PWHT7HBJxFZrbocUEcYMvm/cDsFvjRH59iv8zo8TpdLP/3S0cT24b5MXqedOCqb/BmxzHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728793175; c=relaxed/simple;
-	bh=lJ/pdzzaJd7nzI/dQFhdCrhA3QULXioVeUL2d85v8S4=;
+	s=arc-20240116; t=1728793318; c=relaxed/simple;
+	bh=bD1eLSIVukcJcwfwsJc2icHacnOl1L4dGQapo9oefJM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=B4bS1gdFDJLEWxFOzID2lMaXbsQxeHpar+vJBmpNQjp2LHSS5pvyua3d+QqgVyqaMnjX822OI/+hROry5j88fd3n4lYQ0FQWXD4VaRwKjjcDISZ1zlqgz5V/t8fmnY7qbHeEDJN6hRertDrfWHRCEcbGb39tHl4fq6mvpXVXfY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYRYGzkg; arc=none smtp.client-ip=209.85.167.52
+	 To:Cc:Content-Type; b=uFzTLIpQRN4CuX2nb6R5lSUbLkGF8m3ib3dp66+AN0pqQPOi4JzQPnSCDjR/xcR4fihzaQV8TvaftIfNsk28vEHpp/2zE//6Ccg8dtfXqIOXF8poCpWiH4Tzkd/xqzZKckkhldQqPrEOrsL+/ZZRj0oY4iBtJ+ymaIftvGmYshE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VKrtxWJP; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYRYGzkg"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539e4b7409fso1094238e87.0;
-        Sat, 12 Oct 2024 21:19:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VKrtxWJP"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-539e3f35268so1396021e87.3;
+        Sat, 12 Oct 2024 21:21:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728793172; x=1729397972; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=gmail.com; s=20230601; t=1728793315; x=1729398115; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W4qX6guBUxX0eDbVHHu2pg2WZSE/f8L/1AN8b8sMbkM=;
-        b=FYRYGzkgRM81orAGsURgL6y+9btsu9RdKHucikHku5NM4JBySSKayoSUKaXexiLlsd
-         OczcH9UfquhqYDlmHEObj/9/zznWfPhzlZKfG7UTx8pcOHbBqU3L51X5HyeyTS3DNugZ
-         +qDTzCRCkiAFgDgbWNcdMZiCaWwWa+V5FKRlE1Yygh3y8tp13a/7hS4zg5HG10w62vPW
-         ARjBe1XR+82vz7NlWUSPCq3L/2rRAFAYzrEHx/E1f36zWP18QQVm9uCElDZhlXzxeCnd
-         KxbBLQSUwsWOAUo0pN7uxeY6ryi9izEu4HO3Q/GIsMCOo7vLamOwS/KGGIZmRDcpBsrG
-         b1KA==
+        bh=M/bRRHZm3GLFkoKbSFP1GJS5S+v+JAWce8/1jXmXB6U=;
+        b=VKrtxWJPLyUyHCky+D2h4bJBJAD9tkmtlIhBVPfxzYmRBZ90UaoUysIaOmUURJkDze
+         DCZSVcNi1V8M69xXGjPB61fjBKh3ZFBd9bA6lTAjf70A6sCkNNH06NihGZ5zpbFh6w5P
+         UxXXG2gseBSU89LEMoQhqzRrVkP8nw1UnOjeY/iBcdZ//iEtMk9+sGGEtg/7A/B6mAGk
+         clAmO/ZzDvleij72TLqlZxi3VcX1xw711MlYlDZf/Cu0UZFTW/EyCIkNsFgUn96k/gWp
+         aJ4Dhr4uzCOojdUeLf8uZjEIix3YFObaO6HzZMjPZO9nEBT/rC+k9L9pAHnWoVYA5vdh
+         ubCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728793172; x=1729397972;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1728793315; x=1729398115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=W4qX6guBUxX0eDbVHHu2pg2WZSE/f8L/1AN8b8sMbkM=;
-        b=UbBgPw7HDPY8M/phRDf6fgIZsshX6P/viNoWNiFHMdulO8a934hxa4kYL+q17P8mlM
-         BwaJifBh1xIYR+9JV2Jf0vXmi6f8yW4Aohg+ro5M00H02qJMd3WFse/yrCQoUrRot8Cr
-         J1FIjWKW70UM2OvN8VXlVNfYn6AW7BcHoN1tmomXpSZNO20K6KN/zS/EYS69ovKj44iO
-         zRU4Np7HkQL6OHD2xV3sFFojByvSraIPz8V6TtxEsxW4LCM4UYCM7t+YOqX1/KbimK+R
-         KfhpRGyALh014oEf2watguhV1Haj0IDpk1e6dQR+7f3RyV8w7+3wTMN26b9EJSvXObZQ
-         syIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqvdqkJ5vFZjem9vuXy/Qf5Lm4HH0yXujq3OfDw4nYA49ko9sLka7I7psyDknaoyftGv1qw7B36dVf9VI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5n43AxUICJq88QsqK/O501WlLqxnZCspAPjY4tVKsaYsQGbA+
-	GGx8ahg2Pt85WyA9vWzJGahj2fH27efRJXGprI6uy5G7SAJtzB6QddFteDGLNyoAyLS8BeA//lf
-	DzQd6CRU6/EycaqMJpkr8GFfBqcl63Mx/
-X-Google-Smtp-Source: AGHT+IHdgEXzzETpJc938v7XDUrgtfz7RKqP+vYOIdVL7NoJQNihz6bvoyv9AzuVyVuLucieza4KV6lA/HAxrhUvRmU=
-X-Received: by 2002:a05:6512:3d87:b0:539:eec0:20de with SMTP id
- 2adb3069b0e04-539eec02255mr258674e87.10.1728793171609; Sat, 12 Oct 2024
- 21:19:31 -0700 (PDT)
+        bh=M/bRRHZm3GLFkoKbSFP1GJS5S+v+JAWce8/1jXmXB6U=;
+        b=R+eyTQD1+cJLSJq2TMehfnHy9AipK1bHTdPIsKlvTiP1Si/vBcr+vaKPqoRWUUNM5i
+         mb0UBPMXXUknPg1k6cXvsrMyChInYOR9yY13/4TiUPcynKK5EvTsSJtiPo1Ue7fVCfXw
+         anGGD9YHegHxCHao+4oRxARaEQ6zTmNy5x5CDfXuP68ZVhf6SMilAvYyvvDFXUrNFm6u
+         sXSkJvUO9Z9dJfGCp5BT0f7GzWErFY/1CFLw98ztXeihiZLheFDg7Ecr3Gt7F73aNs6m
+         kNZwpRw+7oz8xpaw8E9KJnWy6EIcv0pS2bKKkFLkwkiqdRZhWqfz7hXJLCID0zMzqrbC
+         xCTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZqF4/+BzzZN0N1lEOzGcasKa8uE8jtWbef2/lAPRrce/v2E60OgjOHgWquncY5ObnncERrpBoFCVV@vger.kernel.org, AJvYcCXiqO2Xg+80UUQku6mSily9Zp5SFNYTEpVcC97rqiADFKo5AkIkBUoUBr7caOyzSp7Ne6Z0ExSAkrxBZLaG@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKEDK5/3x2Pa0lJI2CUape/fGvMU+8QwpGXVGUKTgpSBTIdef7
+	3iA2gY2tJjTrqCoEstFL4mhucXWLNgdMsNC/0yQR8h3HQfchi4mXdbqtQUvcNRf4EAycMFatHfU
+	Ytzwzkoo8gIGrQmSojQ3aRTA8HDs=
+X-Google-Smtp-Source: AGHT+IFddTclpR+HtKSYtUuTNSf8V9VXsH9cRCk406tm3DjOxyH/PfpUNlBe5mwjs4qFejjmjKr0Nt55R70gWpt3b2I=
+X-Received: by 2002:a05:6512:23a9:b0:539:9594:b226 with SMTP id
+ 2adb3069b0e04-539e5620d75mr1401220e87.34.1728793314765; Sat, 12 Oct 2024
+ 21:21:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241006100046.30772-1-pali@kernel.org> <20241012085252.560-1-pali@kernel.org>
- <CAH2r5mtGqqM35Cy5k9NN=X05rTZPk-adhb7LgoV8PGNVL9P6FQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mtGqqM35Cy5k9NN=X05rTZPk-adhb7LgoV8PGNVL9P6FQ@mail.gmail.com>
+References: <20240929185053.10554-1-pali@kernel.org> <20241005140300.19416-1-pali@kernel.org>
+ <20241005140300.19416-6-pali@kernel.org>
+In-Reply-To: <20241005140300.19416-6-pali@kernel.org>
 From: Steve French <smfrench@gmail.com>
-Date: Sat, 12 Oct 2024 23:19:20 -0500
-Message-ID: <CAH2r5msVd0+E-Uwjnx9E6KctfNKEpQvUtyeN0_MkSH1tcS+hWg@mail.gmail.com>
-Subject: Fwd: [PATCH v2 0/7] Allow to choose symlink and socket type
-To: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Date: Sat, 12 Oct 2024 23:21:43 -0500
+Message-ID: <CAH2r5mswCDw+rk-f5Tcd1niTz2prPNxbOfwyG_XSL5xRwRsbeg@mail.gmail.com>
+Subject: Re: [PATCH v2 5/6] cifs: Validate content of native symlink
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-after doing more experiments with native windows symlinks (and how
-difficult it is to get permission to set them over the wire to
-Windows), was wondering if we should allow fall back strategy if
-creating windows style symlinks fails with STATUS_PRIVILEGE_NOT_HELD
-then we should try NFS reparse point symlink.  Any opinions?
+This looks like one of the more important of the fixes of this series
+- let me know if any thoughts or Reviewed-by/Acked-by on it.  I may
+try to send this earlier than the others
 
-On Sat, Oct 12, 2024 at 3:53=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> w=
-rote:
+Pali,
+Let me know if I missed dependencies that this patch depends on
+
+On Sat, Oct 5, 2024 at 9:03=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> wr=
+ote:
 >
-> This patch series improves choosing reparse format when creating new
-> special files.
+> Check that path buffer has correct length (it is non-zero and in UNICODE
+> mode it has even number of bytes) and check that buffer does not contain
+> null character (UTF-16 null codepoint in UNICODE mode or null byte in
+> non-unicode mode) because Linux cannot process symlink with null byte.
 >
-> Changes since v1:
-> * Instead of new -o reparse=3D mount option is now a new -o symlink=3D mo=
-unt
->   option for choosing symlink type during creation, and new option
->   -o nonativesocket for choosing socket type
+> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+> ---
+>  fs/smb/client/reparse.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 >
-> Pali Roh=C3=A1r (7):
->   cifs: Add mount option -o symlink=3D for choosing symlink create type
->   cifs: Add mount option -o reparse=3Dnone
->   cifs: Add support for creating native Windows sockets
->   cifs: Add support for creating NFS-style symlinks
->   cifs: Improve guard for excluding $LXDEV xattr
->   cifs: Add support for creating WSL-style symlinks
->   cifs: Validate content of WSL reparse point buffers
+> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> index 0d1cea64ab6e..fb1d16b17f38 100644
+> --- a/fs/smb/client/reparse.c
+> +++ b/fs/smb/client/reparse.c
+> @@ -544,6 +544,25 @@ int smb2_parse_native_symlink(char **target, const c=
+har *buf, unsigned int len,
+>         int rc;
+>         int i;
 >
->  fs/smb/client/cifsfs.c     |   4 +
->  fs/smb/client/cifsglob.h   |  36 +++++++
->  fs/smb/client/connect.c    |   4 +
->  fs/smb/client/fs_context.c |  82 +++++++++++++++
->  fs/smb/client/fs_context.h |  19 ++++
->  fs/smb/client/link.c       |  60 ++++++++---
->  fs/smb/client/reparse.c    | 201 +++++++++++++++++++++++++++++++------
->  fs/smb/client/reparse.h    |   2 +
->  8 files changed, 364 insertions(+), 44 deletions(-)
->
+> +       /* Check that length it valid for unicode/non-unicode mode */
+> +       if (!len || (unicode && (len % 2))) {
+> +               cifs_dbg(VFS, "srv returned malformed symlink buffer\n");
+> +               rc =3D -EIO;
+> +               goto out;
+> +       }
+> +
+> +       /*
+> +        * Check that buffer does not contain UTF-16 null codepoint in un=
+icode
+> +        * mode or null byte in non-unicode mode because Linux cannot pro=
+cess
+> +        * symlink with null byte.
+> +        */
+> +       if ((unicode && UniStrnlen((wchar_t *)buf, len/2) !=3D len/2) ||
+> +           (!unicode && strnlen(buf, len) !=3D len)) {
+> +               cifs_dbg(VFS, "srv returned null byte in native symlink t=
+arget location\n");
+> +               rc =3D -EIO;
+> +               goto out;
+> +       }
+> +
+>         smb_target =3D cifs_strndup_from_utf16(buf, len, unicode, cifs_sb=
+->local_nls);
+>         if (!smb_target) {
+>                 rc =3D -ENOMEM;
 > --
 > 2.20.1
 >
 >
-
-
---=20
-Thanks,
-
-Steve
 
 
 --=20
