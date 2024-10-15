@@ -1,192 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13811C07D5;
-	Tue, 15 Oct 2024 14:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729002775; cv=none; b=SEMBQjfezO5lPpmohXJpFPoWTRg4Al+MwMzzW3F1fxIoVkSySKjZaKp/zhSMBXhcpj4kDiGSxoX3zwtcBoIFpLY+IItp1C1ESwaJDSubPj/6ost2YRffyio02izEchGCJKV0n6uK7d5B1n7tD6A4fNXV7Gt9xqROtiLtSZNOFxU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729002775; c=relaxed/simple;
-	bh=4hPyx84sqeP0w3qqjsq0CThSwEoBq4IyT4MO1kC5hCk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=indhbKY7vVadram2WmXzkNQSI+mrVTchqISpnfqkf4YbPyhNA8/2v7gFAcWYeEiAfx4pac7iKJyALaans9lw1cq00WhtZgKtuiwX/i4n9F1pV4juMmLjvu4P8s7dVHUnyHp3f/GlMhpn2DtViBWpZbwTgWI2LW6c7egAYt7l0iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcfsMWz/; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0941F5843
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Oct 2024 18:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729017405; cv=fail; b=Oxa0SmyXTgpMqG+SkdELd6Gxji+vpKlX6MJTFiEEQfSdfEkcwbPG2TbJ1pHLjy7GTCgdYpr//VFeSCn4ckclEBjeMG7VYMjJSmc7lr7U3bQypknWEzMULmDg1h2Y/s0Y8RhmlgdxodFpm36Z29/7jEBWqwR0nvfs+VhtarNP40A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729017405; c=relaxed/simple;
+	bh=IIbYmhoByUq7Z2s93HypcWpjr+2Lt4Pd6gqAjR9nqtk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g7NkN5sUnBPLO8MLz4DtsQSYfsL6nAH+lRq3WD9L+FI99WUDBd5yUrp1GmuM8JUinMDZjbgcaFaA8rJmki3mWqVAOmHpDYByju8zIFJZBXPl08Csl1kGCiqPBG97uc8bD/ACgiRg6Ch4/1CdjB4Pwx24Lct5SbbazHPDOX0NdPM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=Op9vffE/; arc=fail smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcfsMWz/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F1EC4CECE;
-	Tue, 15 Oct 2024 14:32:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729002775;
-	bh=4hPyx84sqeP0w3qqjsq0CThSwEoBq4IyT4MO1kC5hCk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bcfsMWz/HhOgrw/haMDGYKRQGfwIcdJZbwakhFplKlM2LwZYuo8rXaqIqt2Yn4RFT
-	 pbryoBnuOAltEbprCLfDLru1YYeuVoFAgJ8kS0wBOxVCPrSZF3BxHXgtseABhvj62b
-	 +StBqZ2vuf0SatQHq9ALIQyEznEOAu/CFoWu+KuZLM5UE668saiia0FBWgTOe6JFLd
-	 gdjAh122pgsj74htxrq5wJ7NIJph8kpnTXQSlj59/8UiOMi0F89Wz3yTMR4czS08r5
-	 FtI9DFykgaULhDd12msoaRB9JUbR90ZFPape5OqpEKzGzB/83dHzd2Yac2L5UOgbKd
-	 OWVieYel2bUdg==
-Received: by pali.im (Postfix)
-	id 4B8CC79D; Tue, 15 Oct 2024 16:32:48 +0200 (CEST)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="Op9vffE/"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1729017396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4RYNpEjK0x3l6zPp/unbAF1do3e2FBPT6v4+XZR9xA4=;
+	b=Op9vffE/TMjN3g+nFRsCJztPcQ7kYyXRj4rzKrkzdGUgZXksBSLaa1uElDkr4f2MLpObli
+	+jpeODmQ+iU1N9NDLBB8Fvs+cgT/E/AFVhQMRDA3eTSE+fPYxaUCLZP3wr7qMO91luQD4D
+	Ht/SxXes3usMse8qOMzERrDfUBhuA45YOGjW1jjUsTvYA1nZeRVdD14irOTTFavxEcHbYN
+	gkQjnznaJEzogX03ff/PBaBDEKVKUvWDYy1v7bnIk8HP7Tso2u6uhu1SyDRPwkrVqdpljI
+	UZxbO1Aw4TX1dtceKUN39oB9nRD5+Mboxr/f8GJ6oyUKr2vK6ty6XZXqntjpWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1729017396; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=4RYNpEjK0x3l6zPp/unbAF1do3e2FBPT6v4+XZR9xA4=;
+	b=j17QG37l43Jj1PGht6N+zGHNLEsaTLdnJQSw6nkx3LS5558/Vs+j6hqgISCE7Ghg9B3FWe
+	tCpplbFejSIDNbM/1j1MK28YVEuTbBZbETbuWiIIx1EUgqEcjCPYc9RFilG9bqFEikEAnD
+	C/fOjw59u7s8SdLa02phmynN/8p/mGYPnGAkhmxPbpWQ8EXZnK9iHU63Ce7Mq/oQ+sPFTg
+	mzrho1D5qYC5iEdCwR8rRpbHsLUaEQIf743ANDMrrXviIpB/OwKgi/sOZt3VH3zyvgW0VN
+	8STlDiYhw+v15IRJeeQKhVc1wf9BhLR41YV14TgKT6uXtBt5YiJWKghwlJARGQ==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1729017396; a=rsa-sha256;
+	cv=none;
+	b=X6saslGBlvOC9zxm8g1rrEwunvCgbp3zuSWODGiaXUNlPmMGDGs4yeI+Zn26ZuvxV8F6NX
+	AE2GpAv+EYKnj9sTPDFnk1xRxyi7p4hUiZTr3URhw060XCvir2PdG5UffibJ9CVL1n0oVp
+	VepoIax2d50j/gm375LGWN5d4/MrvGDoCSQ19dQCtciD6sygi6BvPDWDND7RzvM/e5w4Zl
+	7ICKiOBwCXpOP3R/fEK5MTeWX0agMKlJaqC/SQo7CMJuow5Rk1ALlzLNJTZlmsYd8xjFFk
+	PX62C+IRSZfElw7L2lwoUAknV0x1AXRm5wVauc1zrXsQe8mavAGzB1d9y3iWYw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.mailfrom=pc@manguebit.com
+To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] cifs: Fix parsing native symlinks directory/file type
-Date: Tue, 15 Oct 2024 16:30:41 +0200
-Message-Id: <20241015143041.23721-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241005140300.19416-5-pali@kernel.org>
-References: <20241005140300.19416-5-pali@kernel.org>
+	Paulo Alcantara <pc@manguebit.com>,
+	David Howells <dhowells@redhat.com>
+Subject: [PATCH] smb: client: fix OOBs when building SMB2_IOCTL request
+Date: Tue, 15 Oct 2024 15:36:24 -0300
+Message-ID: <20241015183624.465132-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-As SMB protocol distinguish between symlink to directory and symlink to
-file, add some mechanism to disallow resolving incompatible types.
+When using encryption, either enforced by the server or when using
+'seal' mount option, the client will squash all compound request buffers
+down for encryption into a single iov in smb2_set_next_command().
 
-When SMB symlink is of the directory type, ensure that its target path ends
-with slash. This forces Linux to not allow resolving such symlink to file.
+SMB2_ioctl_init() allocates a small buffer (448 bytes) to hold the
+SMB2_IOCTL request in the first iov, and if the user passes an input
+buffer that is greater than 328 bytes, smb2_set_next_command() will
+end up writing off the end of @rqst->iov[0].iov_base as shown below:
 
-And when SMB symlink is of the file type and its target path ends with
-slash then returns an error as such symlink is unresolvable. Such symlink
-always points to invalid location as file cannot end with slash.
+  mount.cifs //srv/share /mnt -o ...,seal
+  ln -s $(perl -e "print('a')for 1..1024") /mnt/link
 
-As POSIX server does not distinguish between symlinks to file and symlink
-directory, do not apply this change for symlinks from POSIX SMB server. For
-POSIX SMB servers, this change does nothing.
+  BUG: KASAN: slab-out-of-bounds in
+  smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+  Write of size 4116 at addr ffff8881148fcab8 by task ln/859
 
-This mimics Windows behavior of native SMB symlinks.
+  CPU: 1 UID: 0 PID: 859 Comm: ln Not tainted 6.12.0-rc3 #1
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+  1.16.3-2.fc40 04/01/2014
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x5d/0x80
+   ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+   print_report+0x156/0x4d9
+   ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+   ? __virt_addr_valid+0x145/0x310
+   ? __phys_addr+0x46/0x90
+   ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+   kasan_report+0xda/0x110
+   ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+   kasan_check_range+0x10f/0x1f0
+   __asan_memcpy+0x3c/0x60
+   smb2_set_next_command.cold+0x1d6/0x24c [cifs]
+   smb2_compound_op+0x238c/0x3840 [cifs]
+   ? kasan_save_track+0x14/0x30
+   ? kasan_save_free_info+0x3b/0x70
+   ? vfs_symlink+0x1a1/0x2c0
+   ? do_symlinkat+0x108/0x1c0
+   ? __pfx_smb2_compound_op+0x10/0x10 [cifs]
+   ? kmem_cache_free+0x118/0x3e0
+   ? cifs_get_writable_path+0xeb/0x1a0 [cifs]
+   smb2_get_reparse_inode+0x423/0x540 [cifs]
+   ? __pfx_smb2_get_reparse_inode+0x10/0x10 [cifs]
+   ? rcu_is_watching+0x20/0x50
+   ? __kmalloc_noprof+0x37c/0x480
+   ? smb2_create_reparse_symlink+0x257/0x490 [cifs]
+   ? smb2_create_reparse_symlink+0x38f/0x490 [cifs]
+   smb2_create_reparse_symlink+0x38f/0x490 [cifs]
+   ? __pfx_smb2_create_reparse_symlink+0x10/0x10 [cifs]
+   ? find_held_lock+0x8a/0xa0
+   ? hlock_class+0x32/0xb0
+   ? __build_path_from_dentry_optional_prefix+0x19d/0x2e0 [cifs]
+   cifs_symlink+0x24f/0x960 [cifs]
+   ? __pfx_make_vfsuid+0x10/0x10
+   ? __pfx_cifs_symlink+0x10/0x10 [cifs]
+   ? make_vfsgid+0x6b/0xc0
+   ? generic_permission+0x96/0x2d0
+   vfs_symlink+0x1a1/0x2c0
+   do_symlinkat+0x108/0x1c0
+   ? __pfx_do_symlinkat+0x10/0x10
+   ? strncpy_from_user+0xaa/0x160
+   __x64_sys_symlinkat+0xb9/0xf0
+   do_syscall_64+0xbb/0x1d0
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  RIP: 0033:0x7f08d75c13bb
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
+Reported-by: David Howells <dhowells@redhat.com>
+Fixes: e77fe73c7e38 ("cifs: we can not use small padding iovs together with encryption")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
-Changes in v3:
-* Relax non-directory case condition in smb2_fix_symlink_target_type()
-  for compatibility with older Linux clients.
-* Use krealloc() instead of kzalloc()+memcpy()
----
- fs/smb/client/inode.c     |  5 ++++
- fs/smb/client/smb2file.c  | 48 +++++++++++++++++++++++++++++++++++++++
- fs/smb/client/smb2inode.c |  4 ++++
- fs/smb/client/smb2proto.h |  1 +
- 4 files changed, 58 insertions(+)
+ fs/smb/client/smb2pdu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 2ac9cc8d327d..3fd625b356bd 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1140,6 +1140,11 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 							      full_path,
- 							      iov, data);
- 		}
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index b2f16a7b696d..2384e00203ae 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3313,6 +3313,15 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 		return rc;
+ 
+ 	if (indatalen) {
++		unsigned int len;
 +
-+		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
-+			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
-+			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
++		if (WARN_ON_ONCE(smb3_encryption_required(tcon) &&
++				 (check_add_overflow(total_len - 1,
++						     indatalen, &len) ||
++				  ALIGN(len, 8) > MAX_CIFS_SMALL_BUFFER_SIZE))) {
++			cifs_small_buf_release(req);
++			return -EIO;
 +		}
- 		break;
- 	}
- 
-diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index e836bc2193dd..4b07274e824a 100644
---- a/fs/smb/client/smb2file.c
-+++ b/fs/smb/client/smb2file.c
-@@ -63,6 +63,49 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
- 	return sym;
- }
- 
-+int smb2_fix_symlink_target_type(char **target, bool directory, struct cifs_sb_info *cifs_sb)
-+{
-+	char *buf;
-+	int len;
-+
-+	/*
-+	 * POSIX server does not distinguish between symlinks to file and
-+	 * symlink directory. So nothing is needed to fix on the client side.
-+	 */
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
-+		return 0;
-+
-+	len = strlen(*target);
-+	if (!len)
-+		return -EIO;
-+
-+	/*
-+	 * If this is directory symlink and it does not have trailing slash then
-+	 * append it. Trailing slash simulates Windows/SMB behavior which do not
-+	 * allow resolving directory symlink to file.
-+	 */
-+	if (directory && (*target)[len-1] != '/') {
-+		buf = krealloc(*target, len+2, GFP_KERNEL);
-+		if (!buf)
-+			return -ENOMEM;
-+		buf[len] = '/';
-+		buf[len+1] = '\0';
-+		*target = buf;
-+		len++;
-+	}
-+
-+	/*
-+	 * If this is a file (non-directory) symlink and it points to path name
-+	 * with trailing slash then this is an invalid symlink because file name
-+	 * cannot contain slash character. File name with slash is invalid on
-+	 * both Windows and Linux systems. So return an error for such symlink.
-+	 */
-+	if (!directory && (*target)[len-1] == '/')
-+		return -EIO;
-+
-+	return 0;
-+}
-+
- int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const struct kvec *iov,
- 				const char *full_path, char **path)
- {
-@@ -133,6 +176,11 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
- 					       NULL, NULL, NULL);
- 				oparms->create_options &= ~OPEN_REPARSE_POINT;
- 			}
-+			if (!rc) {
-+				bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
-+				rc = smb2_fix_symlink_target_type(&data->symlink_target,
-+								  directory, oparms->cifs_sb);
-+			}
- 		}
- 	}
- 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index a188908914fe..b8ccc8fd88f2 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -960,6 +960,10 @@ int smb2_query_path_info(const unsigned int xid,
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      &oparms, in_iov, cmds, num_cmds,
- 				      cfile, NULL, NULL, NULL);
-+		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
-+			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
-+			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
-+		}
- 		break;
- 	case -EREMOTE:
- 		break;
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index db93447f0f5a..5390d5a61039 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -113,6 +113,7 @@ extern int smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 			  struct cifs_sb_info *cifs_sb,
- 			  const unsigned char *path, char *pbuf,
- 			  unsigned int *pbytes_read);
-+int smb2_fix_symlink_target_type(char **target, bool directory, struct cifs_sb_info *cifs_sb);
- int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
- 			      bool unicode, bool relative,
- 			      const char *full_path,
+ 		/*
+ 		 * indatalen is usually small at a couple of bytes max, so
+ 		 * just allocate through generic pool
 -- 
-2.20.1
+2.47.0
 
