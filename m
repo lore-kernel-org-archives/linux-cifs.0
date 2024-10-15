@@ -1,49 +1,49 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD031B0F01
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Oct 2024 21:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A2038DE9
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Oct 2024 22:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729029382; cv=fail; b=pusv5NCUR2WG9tI7aqCjIsTQbeVQbAjuAuPBAiYItSL6dgIoorlLXoP5Uhq99Hk63KLXpHQSeKCbQFZdSTX5xBWnNoz0oFTDjvrcvqWkUyJONWGqoplAUZhNRWi0NsosJ2XdqCmcAChF7GLirhFpIs3PkLzhRgWAE8QovJPUORU=
+	t=1729029853; cv=fail; b=AVIS+16spDe9cP6K/k3R9ok4yA7sYrMeVik3T2vl1Xcjn2oCzOrnlgceExCv+9hvbQ1RZO+v1Swox//Q/RgvqZVIddzMJIrMPuW6yA+7rk8WzaXtBWMZG2GwyCUPkKwJggA9gD9k9edy1QIu3jpPqicAfxAOF0iFD5FX8Eq5LWo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729029382; c=relaxed/simple;
-	bh=jZ0MpISUUgXr4CypcHEk8wGU84dtYmZ3jq+E3CeBOyw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EItCUbCRUNoxMpSAELrM+bszMqbq3ySw+niGj4uYWi+3csnvjeKAQozWF6OG4TTul/Re8yJ+iRVXnYgOELIiUepWG8/6DBQ+B7yODCckDIfENH6RyNUtmcsplleoWLtNGOWcgC9RwNlbuZS2XicBMTznZV3OFuBCaCM9QkBQ+Fs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=a6aPUcnb; arc=fail smtp.client-ip=167.235.159.17
+	s=arc-20240116; t=1729029853; c=relaxed/simple;
+	bh=Xpkyxwu4AqZMvkIoQUp6WLA4WQJr5pxRcNFEdookoP0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YEEtKSYr0YtbZ0eK7AIzUs5ABC60BAkMJ+KJa/rUb+TJ6+hQOaVUMsPxkeDng1l+gYnhtI8kFpaDeLYPRwCrAQGOmUyAN9KPaEpNlOqugEGT1tuPBTOd7rjKTvP8tuWiGFFCfpCWIFG+MJtTmKx5W6r68d+vPT8X85SW0P4uQNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=o9/Vo+25; arc=fail smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="a6aPUcnb"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="o9/Vo+25"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1729029379; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	s=dkim; t=1729029849; h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=h5vekCADfEDr3dKh+PMdqIFqyu1aH0hyK1+qJy3kIBE=;
-	b=a6aPUcnbcXciuFlZueEbibBdFR0UFbqzeTVIrUtA3GrAPj73ofkvCAsO+Tq59KEuVduKOy
-	1gePBc3VoWboP6VomRPBn8PTGg93v4EE0L1A8+nKD8Pao+nXLDMMXDO3KhgWacuG/s4v46
-	JOgHAm6h08RXjehyOY7tYAX2AkeM2lydffBa2j0its48q2fWgYGCvd7Lt8arpVlJPrZUbC
-	GLUG9Vj1jwtdnn4JfSlfNtOq7HgfPBpj4xaU+2jvw+JyGtXeU6jB0DDoYgrsBHHutXjLUs
-	ihxC+AIR1I9lYEdyehkPWoWAo5KyCXoaksMQmzBkY9jUBSYQZaKeO6RfkecNiA==
+	bh=fCe0sF8CmTlALkwIHde792oUKc9wnU+e+AVhLAbV8Nc=;
+	b=o9/Vo+25jPERQWg0f+Er3tDZ/ghpBDrbHre3O6XounOD/QHDksqAlFqpNVJIV8SvH0Ajju
+	r/3DriUAk/zqJcxx5Q1rrHavIiwrf664O8XAv4bSwhUjd436DX8AKoHfiu5Bh3F84SXd9v
+	FBx9T04eDSRv+dtn+rnNiQAi4oySJUu2NjaBVbbgA8t+BKL2dVoGMVvQz+4OsNQvJyPdUy
+	zYxMDdGUhNfWFxlrD3aODRXWhwS8kmt4GP+LU6h9WDrsJwrb9NvlN2PiWivUcRkzK/A9kd
+	K4pf6rtQp9P0Z0ay3/Lgom4fgsyMxUT4DceMf4IcWiVR5JUtJFc2LU8Nyii3VA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1729029379;
+	s=dkim; t=1729029849;
 	h=from:from:sender:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=h5vekCADfEDr3dKh+PMdqIFqyu1aH0hyK1+qJy3kIBE=;
-	b=bOnDIXmRGFG+a/c0nCOJPbp6ybetb6rosyEli81po017qHwPm9ol++anBQcamKfeyNFV/T
-	1+zPPZbZXFCbpcwcVe5+6BUapaBWjoQpObgG1GlU7DzaDo+5Cu5/kTR/fPT5VLAw8kwibT
-	qivY2ltC3M+VWAYlsBfgo0MqwX49Vu5dzOTUV93iLidEP79WjJ1oD7+Vzm+02YS0umI1fo
-	r1FSvebfSrFfxqkMid00mwFCB+J/vl1GzceVtwZGL4srGX9k6hzSZF5RfnCMmkumjNzl2s
-	LAOK0LsaXwxCHEWQtlBJVmn4QOoK7jhV6REGFVEtfu1MmqYw2S11i2KCNkwqtw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1729029379; a=rsa-sha256;
+	 in-reply-to:references; bh=fCe0sF8CmTlALkwIHde792oUKc9wnU+e+AVhLAbV8Nc=;
+	b=dRo0qxjPFQilUKkqBS+zhOxRlD9PazLfpB1NBj+I2AZ6cj3aTQ0EFd5UlsF7EzJn4qJKAt
+	p24HudEPeLJmv+plwK2xQ/SpiQxv6wv3XWD/XLCWG13KQYI+/6WOHxcCU7MVikVY6isynG
+	+Ms4Q/1IrCTcILuCS0pNe2I4VWOuoWQ4SJbuy8fb9+LvI7K1YAerJ7nB1GcdESayjr4Nai
+	iSbYmFpkz/K7EIVoLyTQZU+faRRpT5hytZ4wfpfgsPUdklMyh3tIL/cEyUXzbSDbNQNdJx
+	vxDDx9rjZq4STadhqu/a9PXo7NfWIzSpxtkoaKJIg0w9BfEeMHCtKMBLHcr/LQ==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1729029849; a=rsa-sha256;
 	cv=none;
-	b=YEG7i6r6r7d2CKmYWKfLZrOOi/QNp+Sz3dNWCFq3cNPLb8gCysXcMeg9ndOSau7HP42o8+
-	vkH4xrLerc97vA4JdTq5O3TKmUeYnsldEWjRYV929Epfl1gOIIdavO0XparOtnMnBze1nz
-	ZAd8q4GC79A1xn/9KJiwnkWRXbs+bszjdZlxxmX999xa7SPwj/HxPsVDtMhtgcIjql1Arj
-	nbgwHS0wRbyWnVBi5yLJnNujWH18VR1eAxPxTNKXoRyJyszekZseM0IDz1fH6RbbJbiKyF
-	P1wBHPAcscyI/mMkMWf1Hzd3jpKfoK6wMvfWUlXt7VIIWlR2mCJoljeCgKWgQw==
+	b=erGwFhqYX9YptNtbyLW8iae0vFT9CNRtVnbGPqGUcTa19Bgz0ig5c69/EviVrHDDdQ3f7k
+	ayShTpatIf9t0Y+py5Sr9PWStgOr3/Qu2JAKHpfA+3ZyJ3NZ/vU9uFfayu2xzxTDNcEi9+
+	t8os89dxdCGnwUOlTLj4GQgx4leYdhZTjicORB8FXjI9hFVF7zPDGykPwGN1T45nwEgv/Q
+	EOIxvvj7w9mEz+Qwo4UeMzlW0KDYXpBHo04E23zZGzJJL5WNveppisQydCx+lvDs8+cYed
+	hYPHblfOBtvgquo9Ui4uswsIBmt7Jmw/ocMpudKNWqXx0r0/TcdrqQIifnJDtw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
@@ -51,9 +51,9 @@ To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>,
 	David Howells <dhowells@redhat.com>
-Subject: [PATCH v2] smb: client: fix OOBs when building SMB2_IOCTL request
-Date: Tue, 15 Oct 2024 18:56:11 -0300
-Message-ID: <20241015215611.502354-1-pc@manguebit.com>
+Subject: [PATCH v3] smb: client: fix OOBs when building SMB2_IOCTL request
+Date: Tue, 15 Oct 2024 19:04:04 -0300
+Message-ID: <20241015220404.503324-1-pc@manguebit.com>
 Reply-To: id:20241015183624.465132-1-pc@manguebit.com
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -133,20 +133,22 @@ Reported-by: David Howells <dhowells@redhat.com>
 Fixes: e77fe73c7e38 ("cifs: we can not use small padding iovs together with encryption")
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/smb2pdu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+v1 -> v2: fix ALIGN() usage
+v2 -> v3: remove pr_err() used for debugging
+
+ fs/smb/client/smb2pdu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index b2f16a7b696d..069bbfdc9750 100644
+index b2f16a7b696d..6584b5cddc28 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -3313,6 +3313,16 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+@@ -3313,6 +3313,15 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
  		return rc;
  
  	if (indatalen) {
 +		unsigned int len;
 +
-+		pr_err("XXX %s: total_len=%u\n", __func__, total_len - 1);
 +		if (WARN_ON_ONCE(smb3_encryption_required(tcon) &&
 +				 (check_add_overflow(total_len - 1,
 +						     ALIGN(indatalen, 8), &len) ||
