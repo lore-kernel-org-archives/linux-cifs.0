@@ -1,56 +1,68 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2215020F5CD
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Oct 2024 16:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B304409;
+	Wed, 16 Oct 2024 20:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729096124; cv=none; b=M3GZ2Xrv0EO5gLbek5v4GIO7VVSO2FCB3Pb2mi8ecsTKjZe25B7JpZOE9Cy1aYiTURYvF+qFGirXdnER1LkE+ImYJ0jlJFw0Q0Y+qA3SK3IHwvHZ+qVIrpQihev4NH2PkWyV3V7+h1e0glHX4p/hZLty8+zTS7Fv1FzO3G4/TPk=
+	t=1729111793; cv=none; b=MCuQcnyCa3lywKXoZsfobMJObCt3FdYJZkrDd7fZQsVPsBY6VQoDgARaGI9EWz+wVawvtINhXXsVx0huvNiZp9eVOhxq9YwtHQBo9+n5sF/q3ilbDCRJ+mTklhqVJorUGVIOddny8XUWlgpmNvpzyuhTdnFOlBw1RYvUr1WLcV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729096124; c=relaxed/simple;
-	bh=l8A3AThTq+ezAyEa6ZdEacg08ACdKh98w19rNnepIiU=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=YpvB7ke5F9g5PO+zhzJQfFJYGywmXWyEOcY07bKbo5jgHZGrtrfFIUFsvfeB+kH9t00P5EKtCKmK2hg7Q+DTjKCENgov3ucUjak6VQSm43zJNInVxxvQ1FfCE0cQmovdDKQFCjIuChDIj+SH2sjNo/XWbQTx5IWf1mA+G2sZL2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RX2G9AaP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729111793; c=relaxed/simple;
+	bh=wyviNS/O87hNqvd7UTSnAIcEJ6WvYGkBX9tYawnrCik=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AHib+lMJrYpRslec0UaNOsOqfoGOgW1u5tsoDcpQMvN/4P3j9Z5NaNfuAHI/mPgkNyQZKw6vdHC8HT95hhHgA2n84pl5Y2T2UZwaGjCe1os+KW0Jf6h/8GBYUeFnmKOKIQl9Q+2yVb59eIqrR6FE4bzyhBtsBQcutDaLVrmJaPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=d0KZ5eIP; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RX2G9AaP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729096122;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=73sRhC/MVUgLr8wQOAXRbG/9ryOP4YoRdbzww8lNz4M=;
-	b=RX2G9AaP3lA/+lLaP0MSAesWjNzVzi9TNY7UQEebiyBlf72Kzz/Oprcz6CM47irMzQdjMv
-	YlF4lxUqqyhlNyatqBxHbO6mowr1zSdPEiQN2Px0KnNlIbe08JMhVnW6OCOcBrG256tffT
-	gacpLXQjWwCw0rO2oA6G3GXOh3xcjmk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-acA3QZC1NvWB9lBdONbJig-1; Wed,
- 16 Oct 2024 12:28:39 -0400
-X-MC-Unique: acA3QZC1NvWB9lBdONbJig-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C0BC619560A1;
-	Wed, 16 Oct 2024 16:28:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.218])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 02B621956086;
-	Wed, 16 Oct 2024 16:28:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>,
-    Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
-    Trond Myklebust <trondmy@kernel.org>,
-    Jeff Layton <jlayton@kernel.org>, netfs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Downgrade i_rwsem for a buffered write
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="d0KZ5eIP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1729111792; x=1760647792;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ICjUl4q8K/hAIxqwCsJkPss/Rcd78MNXDfdL8em+YUo=;
+  b=d0KZ5eIPcUhrxbF7drELaM4c4EIJXLaSOn1WGG45NC4cMLRTJSRUWq9n
+   QB9MP/4aeKbyOks5fSCfPBhgBMdrvlw7rv1uwHfdahBq9tKONeocklxcW
+   vd/hJYYtzhE0mCB1f6tL+kAKTwha94Ksj3YG+DnDe49aFSRXHEi4ebaJq
+   s=;
+X-IronPort-AV: E=Sophos;i="6.11,209,1725321600"; 
+   d="scan'208";a="432058913"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 20:49:47 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:44050]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.150:2525] with esmtp (Farcaster)
+ id 91a88051-116e-4f95-a9e3-50e85f98db01; Wed, 16 Oct 2024 20:49:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 91a88051-116e-4f95-a9e3-50e85f98db01
+Received: from EX19D026EUB004.ant.amazon.com (10.252.61.64) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 16 Oct 2024 20:49:46 +0000
+Received: from 3c06303d853a.ant.amazon.com (10.187.171.15) by
+ EX19D026EUB004.ant.amazon.com (10.252.61.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 16 Oct 2024 20:49:43 +0000
+Date: Wed, 16 Oct 2024 13:49:38 -0700
+From: Andrew Paniakin <apanyaki@amazon.com>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+CC: Christian Heusel <christian@heusel.eu>, <pc@cjr.nz>,
+	<stfrench@microsoft.com>, <sashal@kernel.org>, <pc@manguebit.com>,
+	<stable@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+	<abuehaze@amazon.com>, <simbarb@amazon.com>, <benh@amazon.com>,
+	<gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
+ stable/linux-6.1.y breaks cifs client failover to another server in DFS
+ namespace
+Message-ID: <ZxAm4rvmWp2MMt4b@3c06303d853a.ant.amazon.com>
+References: <ZnMkNzmitQdP9OIC@3c06303d853a.ant.amazon.com>
+ <Znmz-Pzi4UrZxlR0@3c06303d853a.ant.amazon.com>
+ <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
+ <ZnyRlEUqgZ_m_pu-@3c06303d853a>
+ <a58625e7-8245-4963-b589-ad69621cb48a@heusel.eu>
+ <7c8d1ec1-7913-45ff-b7e2-ea58d2f04857@leemhuis.info>
+ <ZpHy4V6P-pawTG2f@3c06303d853a.ant.amazon.com>
+ <Zp7-gl5mMFCb4UWa@3c06303d853a.ant.amazon.com>
+ <fb4c481d-91ba-46b8-b11a-534597a2b467@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,57 +70,49 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1317957.1729096113.1@warthog.procyon.org.uk>
-Date: Wed, 16 Oct 2024 17:28:33 +0100
-Message-ID: <1317958.1729096113@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Disposition: inline
+In-Reply-To: <fb4c481d-91ba-46b8-b11a-534597a2b467@leemhuis.info>
+X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
+ EX19D026EUB004.ant.amazon.com (10.252.61.64)
 
-In the I/O locking code borrowed from NFS into netfslib, i_rwsem is held
-locked across a buffered write - but this causes a performance regression
-in cifs as it excludes buffered reads for the duration (cifs didn't use any
-locking for buffered reads).
+On 27/09/2024, Linux regression tracking (Thorsten Leemhuis) wrote:
+> On 23.07.24 02:51, Andrew Paniakin wrote:
+> > On 12/07/2024, Andrew Paniakin wrote:
+> >> On 11/07/2024, Linux regression tracking (Thorsten Leemhuis) wrote:
+> >>> On 27.06.24 22:16, Christian Heusel wrote:
+> >>>> On 24/06/26 03:09PM, Andrew Paniakin wrote:
+> >>>>> On 25/06/2024, Christian Heusel wrote:
+> >>>>>> On 24/06/24 10:59AM, Andrew Paniakin wrote:
+> >>>>>>> On 19/06/2024, Andrew Paniakin wrote:
+> >>>>>>>> Commit 60e3318e3e900 ("cifs: use fs_context for automounts") was
+> >>
+> >>> Hmmm, unless I'm missing something it seems nobody did so. Andrew, could
+> >>> you take care of that to get this properly fixed to prevent others from
+> >>> running into the same problem?
+> >>
+> >> We got the confirmation from requesters that the kernel with this patch
+> >> works properly, our regression tests also passed, so I submitted
+> >> backport request:
+> >> https://lore.kernel.org/stable/20240713031147.20332-1-apanyaki@amazon.com/
+> >
+> > There was an issue with backporting the follow-up fix for this patch:
+> > https://lore.kernel.org/all/20240716152749.667492414@linuxfoundation.org/
+> > I'll work on fixing this issue and send new patches again for the next cycle.
+> 
+> Andrew, was there any progress? From here it looks like this fell
+> through the cracks, but I might be missing something.
+> 
+> Ciao, Thorsten
 
-Mitigate this somewhat by downgrading the i_rwsem to a read lock across the
-buffered write.  This at least allows parallel reads to occur whilst
-excluding other writes, DIO, truncate and setattr.
+Hi Thorsten, sorry for delay in reply.
+I had to do one step back and update my development setup, in order to
+prevent rebase process breaking: created script to use crosstool [1] to
+test my future backports on all platforms and make sure to search
+follow-up fixes for the patch I'm porting, found kernel.dance [2] for
+it. Now I'm trying to reproduce issue mentioned in follow-up fix [3] to
+have clear red/green test results. I think I should be able to send
+tested fixes in next 2 weeks.
 
-Note that this shouldn't be a problem for a buffered write as a read
-through an mmap can circumvent i_rwsem anyway.
-
-Also note that we might want to make this change in NFS also.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Trond Myklebust <trondmy@kernel.org>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/locking.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/netfs/locking.c b/fs/netfs/locking.c
-index 21eab56ee2f9..2249ecd09d0a 100644
---- a/fs/netfs/locking.c
-+++ b/fs/netfs/locking.c
-@@ -109,6 +109,7 @@ int netfs_start_io_write(struct inode *inode)
- 		up_write(&inode->i_rwsem);
- 		return -ERESTARTSYS;
- 	}
-+	downgrade_write(&inode->i_rwsem);
- 	return 0;
- }
- EXPORT_SYMBOL(netfs_start_io_write);
-@@ -123,7 +124,7 @@ EXPORT_SYMBOL(netfs_start_io_write);
- void netfs_end_io_write(struct inode *inode)
- 	__releases(inode->i_rwsem)
- {
--	up_write(&inode->i_rwsem);
-+	up_read(&inode->i_rwsem);
- }
- EXPORT_SYMBOL(netfs_end_io_write);
- 
-
+[1] https://cdn.kernel.org/pub/tools/crosstool/
+[2] https://kernel.dance/
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d5a863a153e90996ab2aef6b9e08d509f4d5662b
