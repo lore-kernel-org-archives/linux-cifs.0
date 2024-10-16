@@ -1,179 +1,114 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0C018800D
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Oct 2024 04:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C83D21E3A4;
+	Wed, 16 Oct 2024 05:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729052836; cv=none; b=aDL8/LQK8BLzabsifBw62TjdIdiKVps8mIRw+hVakgiuCpYZuXWzxhqeeA/usEuDEQsM59tedGOvA/sN5xSJ27bTLmHSd34/uUcMFK9pGFXSkEICnQfET2su1jUb8k4Kykmf7xRpLIvr1pJVfzkwf3ZnH/XJBjDYjrKR7UknKkg=
+	t=1729056972; cv=none; b=ox2aQyw9aa8tQVR0tmAcYJnjoLOUrywRI6XJV4YGhmVvErzRVXxoNUUrvq0GbXQje6ANIY48560X9PvFF+tVigpOZM+9Lc4D/yK4dCBm4toJ10AHN0RytlZxeZlGEvXRqX03RdjDTaX4dyZRgg9Bql6za+PH8B8yDpyzwuFiIRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729052836; c=relaxed/simple;
-	bh=DpGl/W0UdihzD2eakHBf4MC8TgE/brzFWHiGTe5HJtk=;
+	s=arc-20240116; t=1729056972; c=relaxed/simple;
+	bh=AkFlicyemJIypTbpaoNWqMseVAcg9/xRYW9x0I/QujU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 Cc:Content-Type; b=jVWtBPGUKifha5rOW9TrdocRZUnB82VQ6b68f/1V0yNpEnN8yKg3rSHFNru5WctWfvlyTGv8EpjIMuPjwTRGK6HLUJhaNAVswzmC/yxYW38JF6UHbDJ0ayfU4+yXemT3JBhWDMupLb3dgfnZ96BzK/fwbXRoz/0gxaNJR+zrjAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQCUe1M6; arc=none smtp.client-ip=209.85.167.44
+	 To:Cc:Content-Type; b=FRnL2YNYWH5V8B/GBUhGUCMUHcLUfOOlVhlwshtSl/8tbc1c6BSGzEcDOYX4GxqzyMlhTiCgJM3pJXl8dSb/CC9emcztuwh+Ok3k7mDDuV9wLHSwI3CcTzsGuvhRBih9jzw/OEvt/p7I3ZEdcmmN/hfNyJEUHMFtuXEdFbS/1xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpOf2n+v; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQCUe1M6"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so3077372e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Oct 2024 21:27:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpOf2n+v"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e6c754bdso3383966e87.2;
+        Tue, 15 Oct 2024 22:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729052832; x=1729657632; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
+        d=gmail.com; s=20230601; t=1729056968; x=1729661768; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NX2ox2unX/X4K/ImOYj4APWMNk0OjSh8u5EO31O+PgU=;
-        b=TQCUe1M6Rh/AnZJflfVyM91AeFNz6ZSt376Kl0fqFUPOZlHH9+sxmMCuMwH3KdfxvG
-         Z/CBpSLj7WX1DCDJiC1xneX7YgvttFCPArsZor83JKm5xidL9tXgFBJOtXB1n1uLng1N
-         F4ks3/uabIaOLVM7PzHxrxo0dT73BZZIgKb9JeNqUs66Zw2qHxZC98YgirMSX9RPCdN1
-         afWc87umHtG+qCPtBa/0Sv+FiY/bDl61ELEsETTyc19idXUigNzwDr2RoNKk+m12y790
-         FFiORwbJ3cjEDyviXM0El+JyzF/csfE8713HwTLW+6qEtbJBeGK342eM0ZkcPB6wD7Je
-         21yg==
+        bh=FpFzgW48v/2WJ52rpa7W+YR88yLyOSmQvacK2YcE0vs=;
+        b=CpOf2n+vo0pa82tUjxQEBWLMvOkqHtw3qpB8Xr469Cvjxb8200tSARbOUmxQ5M+u0N
+         aByhHnotzDZrf474lTMVZZzlJwYMkxkPvWGlcBOKWP0VufiizH5dm57U89nHZUIR9Xh3
+         F5Gw9Ix3VIlO33KESKE785l2Vnmnq54OdsZ2onfzgvNKbIexK8uRUfCrYJUdwW7LCjvm
+         4wCTwUClxR+b4yN32KgqtXB0okRsXni8eLHd6B6sPn/IAE4IxEKWeUb5LJGE80wlJE1p
+         TUbgiGwU+vaSdWEblJVeIIIco2KLSorNwXrpCBXqLImak33kBVSj/07SdOlp01kuad5O
+         +4BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729052832; x=1729657632;
-        h=content-transfer-encoding:cc:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1729056968; x=1729661768;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NX2ox2unX/X4K/ImOYj4APWMNk0OjSh8u5EO31O+PgU=;
-        b=ZmwhN0IgvuJvUzA6fr8ct17jOtgBop5IaPrxN+6m0o6Vr6fxxCZ2U8R4pOzkng8Krm
-         v7G22KTMAxRFCgporNKZ6HWSE84TRpWYfWaclPC5W+DcXCqUQLdayayu+/tT/1cRctnf
-         ZBjqZ6Mp0YBFYBQTur5f4X6pZdwFMFRAySNaQm1bGNFy/JVfBGrfOP3RAz0CHPqPzXTN
-         apdpfC6q9R/QcGCbJUlmLu4Ie4fk42yE4mXUppQ7YQJbWb1YZUPBv3CbG+stzitTUpEx
-         dEcJVhXEE5OQW5rui9s0CjtdyU/AXSPiOMINg/kGO9ROlBlCLg9zGieaEtBvO/uTIuHK
-         hQtA==
-X-Gm-Message-State: AOJu0YzwBRA+GSRYQAdE+xn9aX+/yX34Ka/OrPsGskdlUexfF7fx5qqe
-	ZJKi+19xn0X/m9Hs/7wheGrujtoeMKYskpGnEnurzi4Ga2KjEytGFXCwNx5PV+TPE4u/PZaDFYt
-	/aMBjqxZnakhjgc13cn2Er8JSrQEJ4D3u
-X-Received: by 2002:a05:6512:2808:b0:539:f961:f485 with SMTP id
- 2adb3069b0e04-539f961fae2mt4575272e87.29.1729052832150; Tue, 15 Oct 2024
- 21:27:12 -0700 (PDT)
+        bh=FpFzgW48v/2WJ52rpa7W+YR88yLyOSmQvacK2YcE0vs=;
+        b=EaYQFZOkSCyfZgYEXYTaeBZR7MKLRyENSpUgzhclVCO7kSMsKbSQPI+27Y7pjfdvGs
+         Y/uUhCgCI4IKL7/oU5b6oA5rh7XFCR0o/BDvfWni09vm8na80OCw0t3w8IKevmA7tS+A
+         OPP+sdCDJgt9K+jBvYDyL7B4VRTZtR8MmLzeQBDk0XYQAluI2WQDRSZW0wY1Ww4Q+Y7q
+         0LmKHL9i+44j2USgBeMs0TLwuifPiAhpUrJ/sHBEjLdGlPH5jR9lhrohZNSvvFqhB02W
+         UvLbDuTRygIX7XcFPp/zF4eUZ2cBsTb6Px0l+m77pT5/UMpw6WClt8M7zuW9Misur8U+
+         1AHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUoSqsJ2/bIbwMbQbjjhrzoggaCOfEdMBYg11YfvMQ64yWm19ofCoS8OADscT2talMCcxGBhLpjb7VdUa1y@vger.kernel.org, AJvYcCXBscylOEf3agxzmfCAUMiEohzD6eS3ud9hMHK4eWmYvfaGbSaMkErFC6/q+M0yIc6fukdSlhcf8ABTYg==@vger.kernel.org, AJvYcCXLJ3LH0DGiSTNxL843vmDLOImNZlgZUZ93Fo2RKd1/V+VptPEvvVwf3J//fOlEn+TOmy9JkxZP7wmmQruXGqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxtzezgPvB8b5UdSGoJ9LC1uWXwwwYHH0nhvLOtdZtoH8c5wUK
+	djd7u3S9/VuG+Tvr9ZkJXhTGaNLOgWrGeu9wQyKodSX1WGQUbUxRTgIqWpJ3erSRBwjp4lAux3+
+	6i/+CXeMAOUAq0cYXt/CCwyTHvaVzgAwA
+X-Google-Smtp-Source: AGHT+IHndmCm/EMXJXuOFINZjOEoWro6KrtmVvkmaBHgAUiFCfIOV+zT26SggvV9rS71zmBuYVLfzcWnox5WdYRK8qs=
+X-Received: by 2002:a05:6512:3f29:b0:539:ee04:2321 with SMTP id
+ 2adb3069b0e04-539ee0424e1mr5151271e87.33.1729056967486; Tue, 15 Oct 2024
+ 22:36:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241015220404.503324-1-pc@manguebit.com>
-In-Reply-To: <20241015220404.503324-1-pc@manguebit.com>
+References: <20241015102036.2882322-1-suhui@nfschina.com> <c0afa02b-991c-4601-bacb-13ace9cb96f2@stanley.mountain>
+In-Reply-To: <c0afa02b-991c-4601-bacb-13ace9cb96f2@stanley.mountain>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 15 Oct 2024 23:27:00 -0500
-Message-ID: <CAH2r5ms-NQ9Vs4NqaZOs2zOAjCRozbdYsv3WT09U6znYOEF1SQ@mail.gmail.com>
-Subject: Re: [PATCH v3] smb: client: fix OOBs when building SMB2_IOCTL request
-Cc: linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>, 
-	David Howells <dhowells@redhat.com>
+Date: Wed, 16 Oct 2024 00:35:56 -0500
+Message-ID: <CAH2r5msLmsCn_uHqyzFy8CXy6uCheOECNSXLReJdS4u1C4aN0w@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: client: fix possible double free in smb2_set_ea()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Su Hui <suhui@nfschina.com>, sfrench@samba.org, pc@manguebit.com, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, stfrench@microsoft.com, 
+	tom@talpey.com, bharathsm@microsoft.com, nathan@kernel.org, 
+	ndesaulniers@google.com, morbo@google.com, justinstitt@google.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
+	kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next pending additional testing and review
+merged into cifs-2.6.git for-next pending additional testing
 
-(running buildbot on it now)
-
-On Tue, Oct 15, 2024 at 5:04=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
-wrote:
+On Tue, Oct 15, 2024 at 5:45=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
 >
-> When using encryption, either enforced by the server or when using
-> 'seal' mount option, the client will squash all compound request buffers
-> down for encryption into a single iov in smb2_set_next_command().
+> On Tue, Oct 15, 2024 at 06:20:37PM +0800, Su Hui wrote:
+> > Clang static checker(scan-build) warning=EF=BC=9A
+> > fs/smb/client/smb2ops.c:1304:2: Attempt to free released memory.
+> >  1304 |         kfree(ea);
+> >       |         ^~~~~~~~~
+> >
+> > There is a double free in such case:
+> > 'ea is initialized to NULL' -> 'first successful memory allocation for
+> > ea' -> 'something failed, goto sea_exit' -> 'first memory release for e=
+a'
+> > -> 'goto replay_again' -> 'second goto sea_exit before allocate memory
+> > for ea' -> 'second memory release for ea resulted in double free'.
+> >
+> > Re-initialie 'ea' to NULL near to the replay_again label, it can fix th=
+is
+> > double free problem.
+> >
+> > Fixes: 4f1fffa23769 ("cifs: commands that are retried should have repla=
+y flag set")
+> > Signed-off-by: Su Hui <suhui@nfschina.com>
+> > ---
+> > v2:
+> > - Move 'ea =3D NULL' near to the replay_again label.(Dan's suggestion)
 >
-> SMB2_ioctl_init() allocates a small buffer (448 bytes) to hold the
-> SMB2_IOCTL request in the first iov, and if the user passes an input
-> buffer that is greater than 328 bytes, smb2_set_next_command() will
-> end up writing off the end of @rqst->iov[0].iov_base as shown below:
+> Thanks!
 >
->   mount.cifs //srv/share /mnt -o ...,seal
->   ln -s $(perl -e "print('a')for 1..1024") /mnt/link
+> Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
 >
->   BUG: KASAN: slab-out-of-bounds in
->   smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->   Write of size 4116 at addr ffff8881148fcab8 by task ln/859
+> regards,
+> dan carpenter
 >
->   CPU: 1 UID: 0 PID: 859 Comm: ln Not tainted 6.12.0-rc3 #1
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
->   1.16.3-2.fc40 04/01/2014
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x5d/0x80
->    ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->    print_report+0x156/0x4d9
->    ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->    ? __virt_addr_valid+0x145/0x310
->    ? __phys_addr+0x46/0x90
->    ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->    kasan_report+0xda/0x110
->    ? smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->    kasan_check_range+0x10f/0x1f0
->    __asan_memcpy+0x3c/0x60
->    smb2_set_next_command.cold+0x1d6/0x24c [cifs]
->    smb2_compound_op+0x238c/0x3840 [cifs]
->    ? kasan_save_track+0x14/0x30
->    ? kasan_save_free_info+0x3b/0x70
->    ? vfs_symlink+0x1a1/0x2c0
->    ? do_symlinkat+0x108/0x1c0
->    ? __pfx_smb2_compound_op+0x10/0x10 [cifs]
->    ? kmem_cache_free+0x118/0x3e0
->    ? cifs_get_writable_path+0xeb/0x1a0 [cifs]
->    smb2_get_reparse_inode+0x423/0x540 [cifs]
->    ? __pfx_smb2_get_reparse_inode+0x10/0x10 [cifs]
->    ? rcu_is_watching+0x20/0x50
->    ? __kmalloc_noprof+0x37c/0x480
->    ? smb2_create_reparse_symlink+0x257/0x490 [cifs]
->    ? smb2_create_reparse_symlink+0x38f/0x490 [cifs]
->    smb2_create_reparse_symlink+0x38f/0x490 [cifs]
->    ? __pfx_smb2_create_reparse_symlink+0x10/0x10 [cifs]
->    ? find_held_lock+0x8a/0xa0
->    ? hlock_class+0x32/0xb0
->    ? __build_path_from_dentry_optional_prefix+0x19d/0x2e0 [cifs]
->    cifs_symlink+0x24f/0x960 [cifs]
->    ? __pfx_make_vfsuid+0x10/0x10
->    ? __pfx_cifs_symlink+0x10/0x10 [cifs]
->    ? make_vfsgid+0x6b/0xc0
->    ? generic_permission+0x96/0x2d0
->    vfs_symlink+0x1a1/0x2c0
->    do_symlinkat+0x108/0x1c0
->    ? __pfx_do_symlinkat+0x10/0x10
->    ? strncpy_from_user+0xaa/0x160
->    __x64_sys_symlinkat+0xb9/0xf0
->    do_syscall_64+0xbb/0x1d0
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
->   RIP: 0033:0x7f08d75c13bb
->
-> Reported-by: David Howells <dhowells@redhat.com>
-> Fixes: e77fe73c7e38 ("cifs: we can not use small padding iovs together wi=
-th encryption")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-> ---
-> v1 -> v2: fix ALIGN() usage
-> v2 -> v3: remove pr_err() used for debugging
->
->  fs/smb/client/smb2pdu.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index b2f16a7b696d..6584b5cddc28 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -3313,6 +3313,15 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP=
-_Server_Info *server,
->                 return rc;
->
->         if (indatalen) {
-> +               unsigned int len;
-> +
-> +               if (WARN_ON_ONCE(smb3_encryption_required(tcon) &&
-> +                                (check_add_overflow(total_len - 1,
-> +                                                    ALIGN(indatalen, 8),=
- &len) ||
-> +                                 len > MAX_CIFS_SMALL_BUFFER_SIZE))) {
-> +                       cifs_small_buf_release(req);
-> +                       return -EIO;
-> +               }
->                 /*
->                  * indatalen is usually small at a couple of bytes max, s=
-o
->                  * just allocate through generic pool
-> --
-> 2.47.0
 >
 
 
