@@ -1,63 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D41185B48;
-	Fri, 18 Oct 2024 18:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A203C24;
+	Sat, 19 Oct 2024 11:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729278000; cv=none; b=WF22plURSBtd9Ol7GuQ63geJOtSBqm3ebcJbXKuHrTAFxM+Z0J6HE3LSTORq0y5AEHPGw6iwQOQRCNO8sn1U2uEYh49yMYQQH+ITuFLJyZxDWEauUZs/cxdO2rLw75taxx3ECro4kTE49wC2cxgk17hbCZh3QxBCtYdxTiJ3HCk=
+	t=1729335942; cv=none; b=EMoPc/ilZhhwiXO0V1UBHix46BtNfWd/rQEte5LFsQQrlOkEjzBPrmkjIcb+i4z6dzjK7pMKXCMKOTZDizEDq1cd0j2nsnN7VLZjmQUgxPOOOFzrzNtQcRgxBx3xKIVTAERNRVMtaOV+5FmgvgQ1V5t+5Zv480P0tGf0lABw2mY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729278000; c=relaxed/simple;
-	bh=0aG0Vdh39Bpjw/ze8sXOJQx0EwB/LjnoHP4xrp3JZhU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=PAaRj7VrSuVIb0pa3w4ZxmhH1gp7FhBBxwm0uM0UfwFtK17WSgGF00dXTIlsr9LqaLfFa9ZhID8nqIAO8e/0e82ke2Zv/Mck69gVP1pFrQIe2kOhP2bkh+NxjaNpGRDAcnWjbMt0qPltXcKXJM7NeDivWQfYAIOFqcIkNzFC5gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gL5Ahir1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729335942; c=relaxed/simple;
+	bh=Cj5+uaoHmtPcyWshBNnd7LulA0+Fu3kBIMPfVtiCJvQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=a1ScZigZhkBAuflPZHejzrvSu2r7ogrNaWiFgH8WZOnSquwedc9ra/unASVFkgBoQTbktVIzazMaLkEJ6SOgw0QLEr98sL1XlcHedz7aOG80PX2zjvSZVr+bRj1r40oYG88p0SYpbKBVQLsmPaKoafJRQBuSJmkQqaHew2MRsTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rl8m1Aid; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gL5Ahir1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE50C4CEC3;
-	Fri, 18 Oct 2024 18:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729277999;
-	bh=0aG0Vdh39Bpjw/ze8sXOJQx0EwB/LjnoHP4xrp3JZhU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=gL5Ahir1sygyksLSTK1EuP9rkBRkzXNbn+1lW4Fu1ZbxJ+vBZq4cHIdBGfVsBaMnb
-	 19Gg/0uTnydWxAusz24odNb5ClA7D2Zbxl868T7qzTMtsjWtmcNsSRaT9U2yIIgp7/
-	 x5znB9J//e0nsf4eucgylRiRDSN8Pbjj5DXOc5HMyima3v8GGoTb8eVrEMYSlbww8N
-	 tkoezADhK4Faj5Iqm25zbfkPCVy4PxWL6XQWjL7gifyC0mwWbMm1avy0XGRPKNp3h0
-	 giUJfMsKtnLaydGd5YpAcTjEEgIdI1M9ostEDNjuawJOkIOYp9d7A1psSP6kAPsB1i
-	 tQkUXBJvF5qtg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB8973805CC0;
-	Fri, 18 Oct 2024 19:00:05 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvOjw1o6RcYu8OHCANy+Z2+9ONS+tYjRFbX_o3QgT95Kg@mail.gmail.com>
-References: <CAH2r5mvOjw1o6RcYu8OHCANy+Z2+9ONS+tYjRFbX_o3QgT95Kg@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvOjw1o6RcYu8OHCANy+Z2+9ONS+tYjRFbX_o3QgT95Kg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.12-rc3-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 6aca91c416f626fc0c5146cc4450ea86b831f3dd
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b04ae0f45168973edb658ac2385045ac13c5aca7
-Message-Id: <172927800438.3206390.2616348466005175783.pr-tracker-bot@kernel.org>
-Date: Fri, 18 Oct 2024 19:00:04 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rl8m1Aid"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2fb5014e2daso31513101fa.0;
+        Sat, 19 Oct 2024 04:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729335938; x=1729940738; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=n4n5r0LyLlOyMlw+3WC3gnLFscPyNXGSjKBBFINYcMg=;
+        b=Rl8m1AidgvxTxpmAuaZdb0jRv7+vl/5OeFqj/WC169JUs1SquN4Nut9SmWmWrF9dJK
+         6gVR3FBzNucwc/Z4GuK3dYhcpgHbk+4q4DekngYk06CoGFK1HbRXwFdr+7Du0b9EsZCV
+         PJdUkWNRm715K6Tt/FSFNRXwFhuiNNYekwvx17hy5ycOsf0MekQwAEbMoNIPbPpJXGgX
+         SDEahEQBYZ3WT5u/v9xlEak6MxaiN+YKSdB1HTRHZegpWuV2QTlwsOWPKtnrkrpnXKXU
+         vX8lkFK7mXrt+/pPnSKG3CORA3gjrCkYh326Rt8Lr8oDKJd4iAf/WdKPjfiUDHqCIi5O
+         CCKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729335938; x=1729940738;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n4n5r0LyLlOyMlw+3WC3gnLFscPyNXGSjKBBFINYcMg=;
+        b=LDfABzaI98tyU4HKb/6c8w/XgX9A3aB8DJdBGEiXoZQhvPXPxajYxlAaaQxB6s6jt3
+         LagfuEhwRmQb2TBUXXkaddiclq4IJuWqW8u+opHhIL1OQvWZtETZjPoVYlSvgYP1SxWV
+         Vrv59a7tGcNtkWfMgHw/185KkIhNuynuBkpG+YSHPaXjX6J2HYfwTf2w8nPdQ1E/0N/4
+         n2VDtnIT9Clmp/toPLdlupftHc3vhgkTaJjai1CU+A6EXlio/2IC8RZwbXPernBYpz9H
+         oBI6Ajd/cePYK39tUqKdixycZx7Fi9pIMB+jddFQpidwLbYO7xOUaSseh9zzjUk+/hoZ
+         KH2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVRiobVxqEr9RW/LBUFALZi/LJDp8m5ExRzsCaM8fuTi9/fqo2Z1CatOB9qLc98Tm7ASUe6PXQufArv@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaGrVTOGcSLgKnFKXVFMMfIO7fdZK+kPx3EnucoeLpaMTxU1sL
+	HeKNl8NiNSY3w7+A5zDHsXkEndgpyO5Xde6Reo9vaGBX8y0UkcOWhxVhXD0pUIYt4NAGtRpcxh4
+	sK14/mIY5GWEEZR9+DyzHPCTwyeM=
+X-Google-Smtp-Source: AGHT+IFYMrRl9zSNJF7JhS0i9XBRuobDzfM5qdN/j6xW6aOA8m7+3JUwtMJmQJQ3yWKSUULKmSoF80VSk38sFFPdlAY=
+X-Received: by 2002:a05:6512:1290:b0:539:918c:5124 with SMTP id
+ 2adb3069b0e04-53a154b123amr3250752e87.31.1729335938067; Sat, 19 Oct 2024
+ 04:05:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Sat, 19 Oct 2024 16:35:26 +0530
+Message-ID: <CANT5p=qXE3JeX-iaye1UeFvXGkvJwEoSw_pzz5Crq=uTFdVniA@mail.gmail.com>
+Subject: Keyrings and namespaces
+To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>, brauner@kernel.org
+Cc: keyrings@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>, 
+	Ritvik Budhiraja <budhirajaritviksmb@gmail.com>, Bharath SM <bharathsm.hsk@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Fri, 18 Oct 2024 10:00:27 -0500:
+Hi David,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.12-rc3-smb3-client-fixes
+On the Linux SMB client, we've recently been dealing with some issues
+relating to namespaces for containers that access the cifs mounts. For
+several upcalls that we use, we allocate a seperate thread keyring,
+prepare_kernel_cred to create a new cred, and temporarily override the
+cred for the current process before we call request_key (which
+eventually can upcall into userspace).
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b04ae0f45168973edb658ac2385045ac13c5aca7
+However, with the current design, we always upcall into the host
+namespace. We then have to perform any namespace switch in the
+userspace (which we do today for some type of upcalls). However, this
+does not seem ideal.
 
-Thank you!
+From the man page references, it sounds like each user namespace has
+it's own set of keyrings. So it only sounds logical that we use the
+keyring belonging to the correct user namespace.
+
+We ran some experiments by using the right cred->user_ns for our
+upcalls, and it seems like we still always upcall to the host user
+namespace. After reading the request_key code in more detail, it looks
+like we use the cred->user_ns field only if the dest keyring is a user
+or user-session keyring. I wanted to understand more why all keyring
+types cannot make use of user_ns too?
+
+Also, why do creds only contain the user_ns as a field? What about the
+rest of the namespace types?
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Regards,
+Shyam
