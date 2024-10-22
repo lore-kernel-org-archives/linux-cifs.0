@@ -1,78 +1,76 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC4C4438B
-	for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2024 17:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994F01BC07B
+	for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2024 18:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729617459; cv=none; b=M7rAbwwZXSnPPycyc8QdpEMPx0tjNHwTCuywoET7TMg9ST6RXUJv+5+iyAjQkG+mxPrUO74rn3vFhuzVBxuKS5e6rm58kWdmfRJEcaHd5+Lw6I5yJ/ZJpEckhLh2ycFMHO7eiQpgDdoEmT+MkhQKNZm/J3dId4dRPsaW1ZOIL7U=
+	t=1729621333; cv=none; b=QqMbk1f2NbQA/sRQ67rL+s/Wc9cCfyzoKYeqhpr6B1g97HPVqfWvYG+KQIxH3g9DivWFqk2+0F0Yex20B+mAfu81P2KAR8VzzZVygq/3xZBx2AMUAfcnRhEDQ6lYNBcQURddxHaq/D93SoHNyBtLYM9M9k9xU0DQHiQrdqWLuRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729617459; c=relaxed/simple;
-	bh=4f40dfBoHxEpPr6RULcDzDS5/7/zM+/MBm/SCblIAUQ=;
+	s=arc-20240116; t=1729621333; c=relaxed/simple;
+	bh=N2JpDDwqsAmK0n3ZoN9yOGqFxkzAakjEVOW2ZjtinHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZBK62559ARa4nFMQbExN+SUehQ7kPbkoXcayvCxkmcy/2YR/ogJM5gXdHZW8uxbczTcdOB+ZsqlAMBtr1afoHSV5hWJfWk8RXqKcihgt5df6NTYBK7T+NSNi74dKfaQeaabWK8HuWUI9vURZ1Z1mVfntzEx0s0GHDvfITyUWRYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Q1kmPONG; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=suFIz5jm7qC+P6qJL8VScy5uV8wCmuNX9XNTYbLBCu56k1VfM5+dayvlnJisd5NtOLETRuvfEcziPwkfpQ45TjYAkR7UAryWSlSomsqiDlUXHXkOcaj6GR2ZiyousZdOEENC1QNsI/WpA4vMvj65HzZ+Y6V+dOvjQ7NF8NSVcII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AVSbiIAx; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Q1kmPONG"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-37d4c1b1455so3906693f8f.3
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2024 10:17:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AVSbiIAx"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso58079321fa.0
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2024 11:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1729617455; x=1730222255; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1729621329; x=1730226129; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bnlqVZ4BO/KcWRbWj4X5jgmlgSPyqQsEw0oozV3PjCg=;
-        b=Q1kmPONGUltIFv5UnUQSPTJGSMqyWAEQXqocG5vXrPPdK3IR3u94L8cerM1wILwHds
-         0X3NcrdMvFY2JShFYBrh0fwVNX10ZuPYF/y30Xpy6fwJgfPnTaj6xdigYPUONqnICTf/
-         Gmml5DoTninZ/irJTm1vyq/mrICSx0RDrcsDIiYeyFjvOjB1Mbaz9n7p/gRJvcpbYIL6
-         0FVoQl1F5zVbLyjdGbN7Yhf8Gxolq6vaTVQwn0SoDabCN1FygKhu9unPk+dxmF5jeD2G
-         LAc8PSpSbH281M6QsyJT5c2sZRZfOAQiTAwmKQ113EWosoQvtWWEpA8NYj4vybrHCEbN
-         opoA==
+        bh=Llq4ObyVqZHpjTz8PNUBA4p8/Ji5HWWZgjci9ju2zy4=;
+        b=AVSbiIAxAf4OEtxjjGm2AtzsrrL3O3La8DI7yHtUIbTBf99iVILMGQXzFebriBJ1Ef
+         axvuVZWNElG2oGOBwxLsM8fe5MFNgYUc4Wlrb0FK4au2zZadvbbZBafJhX6LdGjYCC2d
+         pH9nVYA2wncnFlNQSwflss67bPpDwQgQ0KWvlXCx9qqlp4xOznjQ6hqWJuChiDs0ZYYf
+         oHl8lw0EugM4wdX8hcwY8yWGhVKmZs5ptFwgke6/IWtC33AOlyvo6I1baeBW9mJrCpuK
+         a/UDIBw74v4djv6W7Xmjq4mfa9YW36xNbgYnlfYW9Lu8ENTwEVYRgCS88eXakdu0QqB5
+         ZRNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729617455; x=1730222255;
+        d=1e100.net; s=20230601; t=1729621329; x=1730226129;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bnlqVZ4BO/KcWRbWj4X5jgmlgSPyqQsEw0oozV3PjCg=;
-        b=dRpYr1uJqAFiOapwlHflIMewrfJacRmCvX3i4F/M8mLlO9VOKXj80zV6iNY5Az/35V
-         vvUl7eUO9Ey63yJnbCCARJTniIXL0KHMEVX9oj8ERG0vfsn5lIWqvwpw4dzm4Z99d4iS
-         YjI3vQKw1uJpD7RieNx9/XDuMNvZvhlPD1t312RjLo9El4r/wYD4Yx0hmneyWF1yvpPE
-         g4UU1z8nQoVB1G6Re5iSwezhw4gsMDMqYxyV4HSrYOBEIBNE/U/4vN21AFmCvCuiF0LX
-         sxkxx+mswMwTjd6kVo4pv9snkwzYha3422jB1OkC0jyiwPSDjv13bp6W7gNfi4qNxFH8
-         VZ/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVOknkcRb3QVMSG8gUIwasd6YsZOVK/zQOwGNUEQdFhAVBx9IuDrRkw37K2JNvJU6xHLuEdVSqeA2Wb@vger.kernel.org
-X-Gm-Message-State: AOJu0YwupSeEDTg7YfNrrJBG7bNbWjOef3KIAHqaBKFfWQ69s9reObIr
-	ub6KF9wVuHBjxjYUz15gcX8/YQvlzaUGAD1dGQoYI9rcoezLPP7seaNciJHcALk=
-X-Google-Smtp-Source: AGHT+IFPUocm/4nviahA9kVMkkKDFQ5l6iajdVlX1sr2xtvR0ubt2qGXvimvsdW1+ViSPBkb4GzA0Q==
-X-Received: by 2002:adf:fa45:0:b0:377:6073:48df with SMTP id ffacd0b85a97d-37ef0c05405mr2619872f8f.58.1729617455376;
-        Tue, 22 Oct 2024 10:17:35 -0700 (PDT)
+        bh=Llq4ObyVqZHpjTz8PNUBA4p8/Ji5HWWZgjci9ju2zy4=;
+        b=wtPCMJG4QIl/Edjs82OQxpK0ipkJoh08UXCF4fCbZh8DveyYePPz+totm+JSjzUpQ4
+         AQwRU8HCo/Og93Zom/Vb6mBRfAuaKn2t5wwnUgewTKxz1twOqPHOKTpnlL3Kc+jwGSUr
+         ZDKxAwBbJacydIYexvvglOHpvrSTGmPhkVw5jwP8R4HJvEMe7+tDrE7ghCdzlhl5RPWM
+         Ris0qem+Arj8uxeWy4KpKVrv0ssnfeb7PKYMqqT5ae757Fp3PHJMAeGcxIkYr6SQDNlO
+         AkpQqWdzuvW4gvthaI1WakFkpSwZBNqXX7rfqRTh9RixOC1PiY71fxyYC6o5BuoHMfqg
+         /kAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjn88grAZ4Eh4Daba6tXDCTa0x3J8oqCIeF0o9GXBtd3rUCAyzycAMqtrSuUCqWI9hMUGlmAM35g2H@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywsjzw3brseQBQs5rz0QBjhpiRGyncUIj25w+qHx+xqg4L3CQ5x
+	YYjIvE+SzNDWHeR6JmwOzRBPiQWPSQDKTmM43rgO1Q1ZzmA3Fqq0EX7ZuZ7wJfs=
+X-Google-Smtp-Source: AGHT+IG1ncJ+dEzCqbmzr2Fqx9p+8N+YWNVOyCm+b+ePNWJlteVWxDGEfhm5gNRH/vmk4ryD2OWPsg==
+X-Received: by 2002:a05:651c:1546:b0:2fa:e52f:4470 with SMTP id 38308e7fff4ca-2fc932e4026mr16678881fa.9.1729621328759;
+        Tue, 22 Oct 2024 11:22:08 -0700 (PDT)
 Received: from localhost.localdomain ([2804:7f0:bc02:9a54:2a00:afff:fe18:d85c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec1407f4asm4944538b3a.207.2024.10.22.10.17.31
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71ec13ea0e8sm5191209b3a.145.2024.10.22.11.22.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 10:17:34 -0700 (PDT)
+        Tue, 22 Oct 2024 11:22:08 -0700 (PDT)
 From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: markus.elfring@web.de
+To: sfrench@samba.org
 Cc: bharathsm@microsoft.com,
+	ematsumiya@suse.de,
 	kernel-janitors@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
 	make24@iscas.ac.cn,
+	markus.elfring@web.de,
 	pc@manguebit.com,
 	ronniesahlberg@gmail.com,
-	samba-technical@lists.samba.org,
-	sfrench@samba.org,
 	sprasad@microsoft.com,
 	tom@talpey.com,
-	ematsumiya@suse.de,
 	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH v2] fs_context.c: smb3_reconfigure: Handle kstrdup failures for passwords
-Date: Tue, 22 Oct 2024 14:15:15 -0300
-Message-ID: <20241022171515.3330183-1-henrique.carvalho@suse.com>
+Subject: [PATCH v3] smb: client: Handle kstrdup failures for passwords
+Date: Tue, 22 Oct 2024 15:21:26 -0300
+Message-ID: <20241022182126.3353440-1-henrique.carvalho@suse.com>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <5fecc08a-c3b7-4745-abc9-0f5b4de03c22@web.de>
-References: <5fecc08a-c3b7-4745-abc9-0f5b4de03c22@web.de>
+In-Reply-To: <20241022171515.3330183-1-henrique.carvalho@suse.com>
+References: <20241022171515.3330183-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -93,6 +91,7 @@ Fixes: c1eb537bf456 ("cifs: allow changing password during remount")
 Signed-off-by: Haoxiang Li <make24@iscas.ac.cn>
 Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
+V2 -> V3: Adjust commit subject.
 V1 -> V2: Decoupled checks for ses->password and ses->password2. Ensured
 ses->password is freed and set to NULL if ses->password2 allocation
 fails. Corrected return value. Improved commit message.
