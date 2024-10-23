@@ -1,128 +1,109 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E981527B1;
-	Tue, 22 Oct 2024 22:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DD51804E
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2024 01:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729635703; cv=none; b=q/SU1V27wJerWYINqbrCmeU4OYcJjbnfXJOp6/yGCBk3573sXZBAzretIAcvK1kSuQqfrBhjhvYqXvtboQCgCpo/Bm4vOqZ/kCmD8b7GzyoHrj92iNTIfwUMN3BDd3+FleCM1wuwPSuNLuCHPZzkxaEDxly9f7r3bVrvn+kyrQ0=
+	t=1729646677; cv=none; b=UW3APETN4CsnzPP8v4TK7etjH77NIPQcXAwTHECP8S9IFevYNxwVUsUCMgvCt7hNw/qViUCbt6iv/CEMLN7pWUM1wAqOjf0hEBoVikcp4gFUZFtDoGierJa+LiLiu+tGePrXDJ6J898SxNsw4eTnK50Ok59cfQ3jREmg+VfodxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729635703; c=relaxed/simple;
-	bh=JFE08dluIaiarxL21dzPDO6HbXbk9HvWUlkanoq8sYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cCqyLJrGcb/ykduEV0gJLJXjhyaQbXVH/BqBB0ix/zZi7llNKL0aQ3+HKPy7HyVQWRvJwqAine7+a+jEqwAszHL+EYc16/V1PFUj2zjs6OdYKKBohjUje2cnmbbp3RphRaDOm+MUK0tEFhOSVhNUe3a/N+0WT+bHvboLWIhbXV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZ0nYv0w; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZ0nYv0w"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539e63c8678so7500523e87.0;
-        Tue, 22 Oct 2024 15:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729635699; x=1730240499; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9kgBh57DSw/h+OTaq/JFTaRyo9BI9dYA6G3zBw7DQ+M=;
-        b=FZ0nYv0w0OfGVKM4pj6Cn5W3zUxIdfOijLzWLJhGNEdPl9XIEs+DJr8R3MBB2wjY/K
-         lyMQmbBQYDQmVMBECZ5+UNlEgANCRPSxHJzatxGCw+pf6ZkYO/WroHacO/vF3AibhKfO
-         2feqvTb/w2bQlwTpisaw2J3uuF26UjO9rc7v5JURiI8TNOborqOco7+6TVTIS058G0q9
-         EYl0sORRZl6XNpQsOUbXm/gd8uomyKz1x7pTcvuDUU0bCAK8YkDc2xQlMIcihJJf9n/T
-         lkHTxQNprJuLMYvhwAnNYbugeQyE5wFzJDnmyTwwhGO/N0hciT3q+kF89AYb1Ue0wzeT
-         6E2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729635699; x=1730240499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9kgBh57DSw/h+OTaq/JFTaRyo9BI9dYA6G3zBw7DQ+M=;
-        b=vJk0oy+Odtbt/qAqhelq4lKftGVlPQ7guDarNst83IzQipYc55URos8Ip3yaqvTiwP
-         feM/cjAAJ0YiMcQkgdP8KR9ekFcsETIhe6/mqmzxt7Yy9yWvRpLD7xx72VxJ+B0tZ6R1
-         9fJL9fs4hO52CPTMskrjbByr8w7cJo27Lm8dh/Te4pUsRDp6+Scv/abifK6/NlPfqMbM
-         2mFzf5A4TEOsVN5t21Zs1Pa9xw8wIrtbUYiLfHQYgClTrjrTWMx5JpQj7LjRiTXX7j7V
-         i+KdqDpP71PgODaxC2TLf7AkvbvyZt0vvck9pz97A8qvT3Hqr7yaHEG+RNo23KPvot73
-         VyvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFKt4B1yQ+wn/WbdDuNv0qIkIvQk7HQYBojhusVMmeGls8TDmA47ZuBoZncsWGykf4mD6zbhfS7SErig==@vger.kernel.org, AJvYcCWBXfM5zhMn2U1FBQ1QASkAQmKFqG9dLq7t+WvioxkxKKX3DB4XEd24Eg1ercSSZuY3OReZB2/nRbVkCQy9IsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7wkSTEwntP0bO8I6wkmDFFBNLAGwgU0KxV4IXc5/r81AcnMPb
-	xDzzJgGWijoWzcW+ln5I72y3qpCV+XZxJJC/Jk6fCyt88zD/OhfetvRHGTGzzgdMYanlwERH8Q1
-	+IFjjTB//QnNlHDEABxa93RBdV/4=
-X-Google-Smtp-Source: AGHT+IE8lJvrh9YOTJ10anJKfHxrcIxLlvMcvR97sr2y6uBbugwAOCpM3iaIuIM+6ijv7YXCjo6Mf0kfgiOWCdBIxsM=
-X-Received: by 2002:a05:6512:2393:b0:536:a564:fd48 with SMTP id
- 2adb3069b0e04-53b1a2f4d0cmr216189e87.3.1729635699166; Tue, 22 Oct 2024
- 15:21:39 -0700 (PDT)
+	s=arc-20240116; t=1729646677; c=relaxed/simple;
+	bh=DFr8m+7xEcO2dsrBBtQG+LrjO07LMkEIxEFZanEzFRk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e0uEp/VTCpHs7XBb/g8GZwhrW7X8XQMHzybLuJB2Hx61wLHqs7IAIrM493AIlxARsQuOjyMuHI51Aqj9pHvwvQAgIiUQ4jxj4L0WV8TQZpiuDQtcQyx/fMJWH6TfMGRaxkGbM/FtRGGQQReIrYvCczcdp8ijXUJN9j2+7fj5rcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XYBCf3lBjz4f3jdm
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2024 09:24:14 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id E9C341A0568
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2024 09:24:31 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.101.107])
+	by APP4 (Coremail) with SMTP id gCh0CgDHR8ROUBhnZQVtEw--.15370S4;
+	Wed, 23 Oct 2024 09:24:31 +0800 (CST)
+From: Ye Bin <yebin@huaweicloud.com>
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	tom@talpey.com,
+	bharathsm@microsoft.com
+Cc: samba-technical@lists.samba.org,
+	yebin@huaweicloud.com,
+	zhangxiaoxu5@huawei.com
+Subject: [PATCH] cifs: fix warning when destroy 'cifs_io_request_pool'
+Date: Wed, 23 Oct 2024 09:24:30 +0800
+Message-Id: <20241023012430.67183-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022171515.3330183-1-henrique.carvalho@suse.com> <20241022182126.3353440-1-henrique.carvalho@suse.com>
-In-Reply-To: <20241022182126.3353440-1-henrique.carvalho@suse.com>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 22 Oct 2024 17:21:27 -0500
-Message-ID: <CAH2r5mv+qUw=zJY85S4gQitafHXY6RaVPOqY5ZR_RXpF_Zqf3w@mail.gmail.com>
-Subject: Re: [PATCH v3] smb: client: Handle kstrdup failures for passwords
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, bharathsm@microsoft.com, ematsumiya@suse.de, 
-	kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	make24@iscas.ac.cn, markus.elfring@web.de, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDHR8ROUBhnZQVtEw--.15370S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr4UAw4Utr1kZF4UurW3ZFb_yoW8Xr43pr
+	WxK3s0krs5XwnxCw4vqa1Uu34kCFWv9F1avF4xKr13Z3Wqy3ykK3Wvy3s8KryIkrW8Aa1r
+	WF1qvws0q3W5ZF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUZYFZUUUUU=
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 
-tentatively merged into cifs-2.6.git for-next pending review and more testi=
-ng
+From: Ye Bin <yebin10@huawei.com>
 
-On Tue, Oct 22, 2024 at 1:22=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
->
-> In smb3_reconfigure(), after duplicating ctx->password and
-> ctx->password2 with kstrdup(), we need to check for allocation
-> failures.
->
-> If ses->password allocation fails, return -ENOMEM.
-> If ses->password2 allocation fails, free ses->password, set it
-> to NULL, and return -ENOMEM.
->
-> Fixes: c1eb537bf456 ("cifs: allow changing password during remount")
-> Signed-off-by: Haoxiang Li <make24@iscas.ac.cn>
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
-> V2 -> V3: Adjust commit subject.
-> V1 -> V2: Decoupled checks for ses->password and ses->password2. Ensured
-> ses->password is freed and set to NULL if ses->password2 allocation
-> fails. Corrected return value. Improved commit message.
->
->  fs/smb/client/fs_context.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 28c4e576d460a..5c5a52019efad 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -920,8 +920,15 @@ static int smb3_reconfigure(struct fs_context *fc)
->         else  {
->                 kfree_sensitive(ses->password);
->                 ses->password =3D kstrdup(ctx->password, GFP_KERNEL);
-> +               if (!ses->password)
-> +                       return -ENOMEM;
->                 kfree_sensitive(ses->password2);
->                 ses->password2 =3D kstrdup(ctx->password2, GFP_KERNEL);
-> +               if (!ses->password2) {
-> +                       kfree_sensitive(ses->password);
-> +                       ses->password =3D NULL;
-> +                       return -ENOMEM;
-> +               }
->         }
->         STEAL_STRING(cifs_sb, ctx, domainname);
->         STEAL_STRING(cifs_sb, ctx, nodename);
-> --
-> 2.46.0
->
->
+There's a issue as follows:
+WARNING: CPU: 1 PID: 27826 at mm/slub.c:4698 free_large_kmalloc+0xac/0xe0
+RIP: 0010:free_large_kmalloc+0xac/0xe0
+Call Trace:
+ <TASK>
+ ? __warn+0xea/0x330
+ mempool_destroy+0x13f/0x1d0
+ init_cifs+0xa50/0xff0 [cifs]
+ do_one_initcall+0xdc/0x550
+ do_init_module+0x22d/0x6b0
+ load_module+0x4e96/0x5ff0
+ init_module_from_file+0xcd/0x130
+ idempotent_init_module+0x330/0x620
+ __x64_sys_finit_module+0xb3/0x110
+ do_syscall_64+0xc1/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Obviously, 'cifs_io_request_pool' is not created by mempool_create().
+So just use mempool_exit() to revert 'cifs_io_request_pool'.
 
---=20
-Thanks,
+Fixes: edea94a69730 ("cifs: Add mempools for cifs_io_request and cifs_io_subrequest structs")
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ fs/smb/client/cifsfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Steve
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 000e1ef3beea..20cafdff5081 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1780,7 +1780,7 @@ static int cifs_init_netfs(void)
+ nomem_subreqpool:
+ 	kmem_cache_destroy(cifs_io_subrequest_cachep);
+ nomem_subreq:
+-	mempool_destroy(&cifs_io_request_pool);
++	mempool_exit(&cifs_io_request_pool);
+ nomem_reqpool:
+ 	kmem_cache_destroy(cifs_io_request_cachep);
+ nomem_req:
+-- 
+2.34.1
+
