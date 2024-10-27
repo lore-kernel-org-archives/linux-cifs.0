@@ -1,69 +1,115 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0682CB641
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Oct 2024 13:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD941C2E0
+	for <linux-cifs@vger.kernel.org>; Sun, 27 Oct 2024 03:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729949115; cv=none; b=Jk60f+KxU8GKWJFIR8vbJy2ZK6hCf4le5EzRvKGdcEWmIpFFTXx16i56ORCC3MTyCaZhbpS4hFlBPEaG2QTAtUn4cS4pSMa2HKe3t8xbW4dTcqSj/SlR/CSth/zlAcUmXjd0FJ1aeIVKwHXJQVc/I7iP+tJdB7YNr6hSf83tNtM=
+	t=1729999483; cv=none; b=vCNppUGQUn9Fzn/0AP7vYmK037bhtHqa/1R2vx0M+2rTQ8Bw326Xg+vQZxyt7gfBiVVtT/PXAhtw76uf44DjpfpT1el6S/gJ9SmSrxD6fXIdbfojqf5b+fAd2QInukNiiBLP2OoFimOpsCqfy1mYuxbE1Np2jU2DOWeRSFucIGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729949115; c=relaxed/simple;
-	bh=EVH5AmLyIJTUAQi/DtTAVyPZL9dwmXNAwzDFZjhuo5g=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=gjVwGHAG3WGqBdK4tnoPJ4AAz+zcckCG/BUHst7jO8//GOuUFhm8LmYWX/+XO2TaIEQ0sP2cSiLoPpd+1fCHKsiBxD5wLgkmqLQwSaC5myBRdJHYPrBHfh9SUYkvRtNsoUR9vGSAYZBNXu/0a5oEz27gmtWAmTe6ThK0xYobcSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=RG7QdKnX; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1729999483; c=relaxed/simple;
+	bh=4hfxqfZzPom0z8VkpT00EAC3qOZBM4Ecgs90XQv4GJQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j8Iuu+fI6bJ+iVD40xAg7+0fuBXg5esG528GWUAJ1uBeOvhtG+o6HJaj9CIVu05G6Iu8Zw8HUqWBxjhTe9BgnvkNylodsYSy7foeFXefID0aAnOkzocEYDyZ5f1l2owVIxQN+Hd8TCrbgZR6FZkDGCRnQn5/Er2zQUJKi2Pn90E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrwVaPQe; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="RG7QdKnX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:To:Date:Message-ID:CC;
-	bh=SuQzAOrY5jU0EqOoLvyx9X/jgsK8525Z4lV5tmIKX9Q=; b=RG7QdKnXekUm2f70RwnUQFZfEt
-	MdqRNcxN5xJyo6fC0Hoes7uT1agPKD6L8ac1LT5exMNLiPCjTb+T09iXIREzWHwEBBi25YNfGvKcN
-	FAEzu88fGeCpSLnilkrTnUK76d/nHZg6ixDamx4FjwBShrBFVOpyjkYW7xrOjxj79awYCedRAodwd
-	PPxRc+J7FWzi+s8GDdcUEEwejHPIOlKzbPrKVX0pFI0XqDELPyrc4KEJgkch/SZmcq/GKWDShjd87
-	YzkbuVCD8MSxCZ2bL3GJVNzsV3Up4XPtsNxCfUyvdocAJ6d3ByXT6xBHA5unWl4t/QYB9eE/HOzFq
-	TohVouD5OGJFdNL+EDnW63p1YOqvJs29K1Iaj0AC9qXexX9MLG69u4XxJBZKpnMqlXx8Wga3NmeBq
-	AeML+wMle8dEkMVqFo6U82K9QJuJMdPFxKDjansQ/7V/gqFs9TBJyv2rMRvO4/6uom7cr+WzmoqCe
-	8ul79pz+KVjNX8X+nfYTyMO0;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1t4gc3-006ilP-23
-	for linux-cifs@vger.kernel.org;
-	Sat, 26 Oct 2024 13:13:51 +0000
-Message-ID: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
-Date: Sat, 26 Oct 2024 15:13:50 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrwVaPQe"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539eb97f26aso3267596e87.2
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Oct 2024 20:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729999480; x=1730604280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gcxzuUQ2Whwp/4RYp19EQFLTrhS+rHwigWQtmK3AKc4=;
+        b=nrwVaPQeGqrKAOipBtrLcunwqkCpSeW6K5OwlQg7Mt+KAZs5skHVXLpewKK8WJfZ1q
+         2VKya7iv9X0fBup8dCU7vOYcVKtfIOt18BsqW2UrFWSEuM+YclolR2laiNl0Zx5qUZH3
+         zJlQkFLeUUf7M+AtoGnbqNZB5m3gWz5a//DF9q8AhoHx8BH9aOa3bKs4IAgeoK34c7iP
+         ErBjfcuCqt8Jeh8nVONImlvg2JnFkGEm0ixHRmHTiKxpG+/6mMOR6IeHCCv3iyBnsnaT
+         mKfFrhcMVdiNPeTDtftl8KqxSs2cuqz5JphMaTAMGmR5K35XhPSsVz5S51fwM9Y3VFr9
+         pKZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729999480; x=1730604280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gcxzuUQ2Whwp/4RYp19EQFLTrhS+rHwigWQtmK3AKc4=;
+        b=UwdFElTOt+F5HmAQfErgRdeSbI70zhUCVN1ywDwS/L7861U5oYof5j0IGNMcSDGhPh
+         MnLwHi/IKc9liTK+Lwi166M3qTT62iS9GX3RcIPIpwzXQWwCnIWCKRfrbVKstrdFt6Zx
+         n04kG/ZdHOfMuwRv2eTyV5jR9udoh+8BEk1T28VIESSXhac7I+dg2sIZoS5DdeBynY8n
+         bDVKPdekzeA/ZGCXuo3aBYbBu0mrHqHK8sO/8FaDlMS7viPE5rNr7O07Hd7faspcVvG+
+         q9uY7SWrfxvjmGLfNGIHDjauafRSVbuqQQFQQIbZurswdfacLbWKKW6zbKNzAB6LcqAB
+         ZFwA==
+X-Gm-Message-State: AOJu0YxNCwWHmCBPn8ELs/dZH176KAURJ6j4Sk6CPNO4mVKB8K2N5rkh
+	/5AaMNLGFk2/86aqhqQmoZ9VgsFNdZQ9n2mbq/fqtqK52pY1rwB4GjYjSNuPxVYSXDHUYi7rAhL
+	j0Nxhqp0jC51w+R0xqra61POJpok=
+X-Google-Smtp-Source: AGHT+IEQCxsr7vH4LrZqaxmi9jFdbp1NTOSM43C9nBlq2Xjq38TM6WkNVN6q4pIw8eNjFvDBISHv3lGgePl0S98Vrm0=
+X-Received: by 2002:a05:6512:2346:b0:539:ebc8:e4ca with SMTP id
+ 2adb3069b0e04-53b348b9d78mr1841533e87.10.1729999479331; Sat, 26 Oct 2024
+ 20:24:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US, de-DE
-To: linux-cifs@vger.kernel.org
-From: Ralph Boehme <slow@samba.org>
-Subject: Directory Leases
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
+In-Reply-To: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 26 Oct 2024 22:24:27 -0500
+Message-ID: <CAH2r5muwuKvifnG0XK3wShCtpR6EZOEozn=H95qx9ewHDO5jdA@mail.gmail.com>
+Subject: Re: Directory Leases
+To: Ralph Boehme <slow@samba.org>
+Cc: linux-cifs@vger.kernel.org, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi!
+I built and installed Samba with your recent directory lease series
+and tried some experiments with cifs.ko to it and I do see directory
+lease requested by the client and held for 30 seconds for the
+directory (or directories) that I do ls on, but I don't see cifs.ko
+using the cached directory contents when multiple ls on the same
+directory are attempted within 30 seconds of one another.   One theory
+is that this has to do with some compounding changes a few months ago
+- but I want to investigate more - will try some experiments (repeated
+ls, looking to see how directory cached contents are being used) to
+Windows from cifs.ko as well.
 
-I have implemented Directory Leases in Samba and wanted to do a few test 
-with real world clients.
+From the debugging and traces I looked at tonight it does look
+possible that the client has a perf regression in not reusing cached
+directory contents when we have a directory lease.  Will update when I
+narrow it down more.
 
-Mounting with
+On Sat, Oct 26, 2024 at 8:25=E2=80=AFAM Ralph Boehme <slow@samba.org> wrote=
+:
+>
+> Hi!
+>
+> I have implemented Directory Leases in Samba and wanted to do a few test
+> with real world clients.
+>
+> Mounting with
+>
+> # mount.cifs //localhost/test /mnt/test/ -o
+> username=3Dslow,password=3Dx,handlecache
+>
+> (no idea if "handlecache" is needed, found it by skimming the code)
+>
+> I don't see any usage of Directory Leases on the wire when I do an ls.
+>
+> Do I need to pass any additional mount options? Anything else?
+>
+> Kernel version is 6.11.3-200.fc40.x86_64.
+>
+> Thanks!
+> -slow
+>
 
-# mount.cifs //localhost/test /mnt/test/ -o 
-username=slow,password=x,handlecache
 
-(no idea if "handlecache" is needed, found it by skimming the code)
+--=20
+Thanks,
 
-I don't see any usage of Directory Leases on the wire when I do an ls.
-
-Do I need to pass any additional mount options? Anything else?
-
-Kernel version is 6.11.3-200.fc40.x86_64.
-
-Thanks!
--slow
+Steve
