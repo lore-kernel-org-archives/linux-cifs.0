@@ -1,119 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759181CF2AB;
-	Mon, 28 Oct 2024 10:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295C21D5CFA;
+	Mon, 28 Oct 2024 10:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730110231; cv=none; b=YLZ1jwb3E0UIbOmD2yMgHF2J6QxoX5wMWaNvnyl6viQprbmPDwlUIQth4EqODSbDy8VfAIQ0Ru1gBN1NfE6r1ogy1VtqGOTP6/vPCt92LsDlRQuzHxLYP2F9v3LI408syVB479xd/7d1gp/mZIRvtCWkSxGol/4QfKfqDNa1KCY=
+	t=1730110395; cv=none; b=Era9zVzSyR7MDpqWEIFfNVmIJeUgZ14Wo19Fu5ZI0HalGsP8xzgckayNV9ZXPKWkCbOKRJrrhOQACvHhBHZeTWe2kr6bQ4zq8xJyLj7bvBrx4yRSvdalmclicBZscHp8aUMOstXr3IMYg5NAwAnRITVH8s2yNc9SKiU1PQNYZ2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730110231; c=relaxed/simple;
-	bh=D2OIUOHMjnw/6oBtePX97KgzryCvG2LA0jsLNZFqlBI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O8O1GHy1fEiGkOIEdtWTw3iL21R+LMOzc2v1h9apEInQrb0i2jmSnR3gajbcV3eazp62HdEntETFQDozZic69Ih0gFdP7SLPSwy+luBr58juTtmUcsPEmNaPuMxq78rDsEX4cpZ4pIGBbv8XEnmKRSG6N53iuOQFkSGE1XFEDpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tKEaLMwE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730110395; c=relaxed/simple;
+	bh=7KsvxSW61uQXonMB89EN9dZ0RmwQxvzG3blD9ztYLGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QXDWY/1gDEtc2W0+7Ul8wWsWpbH1FxhyW26jszJHGOsHXGGlH/UZ+ne+uS/v924lVAO+rghHBMChnY4hycxbO7UMa3jDrt8Wufbg4Kk+X2lAmOWv+c3WRfTWlPI9qv5qY1xkz1sLBaXPqseYb4nMKWaMdlhOeq8/mQh6aPL3/84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H1RJ0+9o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKEaLMwE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1362C4CEC3;
-	Mon, 28 Oct 2024 10:10:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H1RJ0+9o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52402C4CEE7;
+	Mon, 28 Oct 2024 10:13:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730110231;
-	bh=D2OIUOHMjnw/6oBtePX97KgzryCvG2LA0jsLNZFqlBI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tKEaLMwEmFBMu7eT72xwZZj+CisxX3RLZmC37iopZhGi9/kDK68HkQIH/FIlLVpcA
-	 WTfALVFTTRjWPPzTcZ6/mUiBj1nRVuzrR1i/JdRT1PUtvHEtFaUyKaIOFqwQri/Jj0
-	 LdxzSIBrT+8TaG5GvV+40xYmWJS1WUmxREO2Bvb4F/MqZe1Eu/23Q//pmRsY4k2OV0
-	 ptmzxTZdMMqdahPSzCm9Dn8pKpCyAOdkc8r1TbauDKuigqleQkKQJqMHvMCDHV8z4y
-	 IkYScpFDUynWSyEca3tqTcVpx8paDN1eFd2tba7f1rT7b8brWZxCQFfuWawWNYpFWm
-	 L/3szVw0crD4g==
+	s=k20201202; t=1730110394;
+	bh=7KsvxSW61uQXonMB89EN9dZ0RmwQxvzG3blD9ztYLGQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H1RJ0+9ok5hGCX2SIgJq1YQA43g8Ak0DnLjrU3LfONI9aXLSU2qCtOesAJCLBrFuU
+	 1EPAkn1558RKuqpDnyUKmXTT9dNAKf81JFAfGmUjcKVfXL2t4rcfTm3KTn41/ddBCc
+	 qM8SZv9eUVrK4/ppwIL8C71MHMk0tla9GwC+/rdljCn/ynM3wAqF0IhSJ7XFofwONq
+	 XsEkQHRmfqMxFI5Wtoe535AhZ85wEbodKn5Xoldye20Nw0efbGycIvGRpCzhZpajrS
+	 IvjqcpsNYhfaw3t7OuWXbnX7ALkxvaBmFj94YjXuO2cYSgwBPNol5l0HUm+QK4W2bD
+	 L8cubPCBNA9qQ==
 Received: by pali.im (Postfix)
-	id AB6DBA58; Mon, 28 Oct 2024 11:10:23 +0100 (CET)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
+	id 34EECA58; Mon, 28 Oct 2024 11:13:07 +0100 (CET)
+Date: Mon, 28 Oct 2024 11:13:07 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] cifs: Recognize SFU char/block devices created by Windows NFS server on Windows Server <<2012
-Date: Mon, 28 Oct 2024 11:10:07 +0100
-Message-Id: <20241028101007.29306-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241005145445.19850-1-pali@kernel.org>
-References: <20241005145445.19850-1-pali@kernel.org>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] Allow to choose symlink and socket type
+Message-ID: <20241028101307.nestealisxlusehw@pali>
+References: <20241006100046.30772-1-pali@kernel.org>
+ <20241012085252.560-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241012085252.560-1-pali@kernel.org>
+User-Agent: NeoMutt/20180716
 
-Windows NFS server versions on Windows Server older than 2012 release use
-for storing char and block devices modified SFU format, not compatible with
-the original SFU. Windows NFS server on Windows Server 2012 and new
-versions use different format (reparse points), not related to SFU-style.
+Any opinion about this v2? Is it better now?
 
-SFU / SUA / Interix subsystem stores the major and major numbers as pair of
-64-bit integer, but Windows NFS server stores as pair of 32-bit integers.
-
-Which makes char and block devices between Windows NFS server <<2012 and
-Windows SFU/SUA/Interix subsytem incompatible.
-
-So improve Linux SMB client.
-
-When SFU mode is enabled (mount option -o sfu is specified) then recognize
-also these kind of char and block devices and its major and minor numbers,
-which are used by Windows Server versions older than 2012.
-
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
-Changes in v2:
-* Rebased on top of v6.12-rc5
----
- fs/smb/client/inode.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index eff3f57235ee..b6213d595e71 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -598,6 +598,17 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- 				mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
- 				mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
- 				fattr->cf_rdev = MKDEV(mjr, mnr);
-+			} else if (bytes_read == 16) {
-+				/*
-+				 * Windows NFS server before Windows Server 2012
-+				 * stores major and minor number in SFU-modified
-+				 * style, just as 32-bit numbers. Recognize it.
-+				 */
-+				__u32 mjr; /* major */
-+				__u32 mnr; /* minor */
-+				mjr = le32_to_cpu(*(__le32 *)(pbuf+8));
-+				mnr = le32_to_cpu(*(__le32 *)(pbuf+12));
-+				fattr->cf_rdev = MKDEV(mjr, mnr);
- 			}
- 		} else if (memcmp("IntxCHR\0", pbuf, 8) == 0) {
- 			cifs_dbg(FYI, "Char device\n");
-@@ -610,6 +621,17 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
- 				mjr = le64_to_cpu(*(__le64 *)(pbuf+8));
- 				mnr = le64_to_cpu(*(__le64 *)(pbuf+16));
- 				fattr->cf_rdev = MKDEV(mjr, mnr);
-+			} else if (bytes_read == 16) {
-+				/*
-+				 * Windows NFS server before Windows Server 2012
-+				 * stores major and minor number in SFU-modified
-+				 * style, just as 32-bit numbers. Recognize it.
-+				 */
-+				__u32 mjr; /* major */
-+				__u32 mnr; /* minor */
-+				mjr = le32_to_cpu(*(__le32 *)(pbuf+8));
-+				mnr = le32_to_cpu(*(__le32 *)(pbuf+12));
-+				fattr->cf_rdev = MKDEV(mjr, mnr);
- 			}
- 		} else if (memcmp("LnxSOCK", pbuf, 8) == 0) {
- 			cifs_dbg(FYI, "Socket\n");
--- 
-2.20.1
-
+On Saturday 12 October 2024 10:52:45 Pali Rohár wrote:
+> This patch series improves choosing reparse format when creating new
+> special files.
+> 
+> Changes since v1:
+> * Instead of new -o reparse= mount option is now a new -o symlink= mount
+>   option for choosing symlink type during creation, and new option
+>   -o nonativesocket for choosing socket type
+> 
+> Pali Rohár (7):
+>   cifs: Add mount option -o symlink= for choosing symlink create type
+>   cifs: Add mount option -o reparse=none
+>   cifs: Add support for creating native Windows sockets
+>   cifs: Add support for creating NFS-style symlinks
+>   cifs: Improve guard for excluding $LXDEV xattr
+>   cifs: Add support for creating WSL-style symlinks
+>   cifs: Validate content of WSL reparse point buffers
+> 
+>  fs/smb/client/cifsfs.c     |   4 +
+>  fs/smb/client/cifsglob.h   |  36 +++++++
+>  fs/smb/client/connect.c    |   4 +
+>  fs/smb/client/fs_context.c |  82 +++++++++++++++
+>  fs/smb/client/fs_context.h |  19 ++++
+>  fs/smb/client/link.c       |  60 ++++++++---
+>  fs/smb/client/reparse.c    | 201 +++++++++++++++++++++++++++++++------
+>  fs/smb/client/reparse.h    |   2 +
+>  8 files changed, 364 insertions(+), 44 deletions(-)
+> 
+> -- 
+> 2.20.1
+> 
