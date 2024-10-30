@@ -1,87 +1,96 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4FA187FE0
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Oct 2024 10:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B371CF7CF;
+	Wed, 30 Oct 2024 05:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730196347; cv=none; b=VFRnBK9lR4bdFGWOxFg8fpyMHCiCGVgQ03W742H0BvtU5SdsWAKCSi3mU27KNkSXrsOPkXGX+bKCxhIXcI7pwLm870AoievgUdRo6aoS8swY9Wcid8AC+FILeM/o0dV24kx0A3cJQkkEwU0foDKopFoS34dOj8tTdv8jpN4bMT8=
+	t=1730266604; cv=none; b=FcZIF7JkFRNLGL3uj3MBQdc6KkXMeQmkGmXgyIowZ3/Uv3xnNI10r6Ir6xr2zjSNaLsbi0I69921QHbdnw6CAdDuLWQ66SQgJa0IOHveJ+qXOYByCauc6Y8aX/uDeEL8eAad63PC8Ic3gjypK2FzGjr/JO7FqAe2Y+NSkRwNZs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730196347; c=relaxed/simple;
-	bh=i2s2dl3R2VlS3w/KNS0Fk3o80A4ySs6WINPBFPRe4Lg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SR1l2v7G4XvJFoBwoK+BQuf5Eml9O+rLQIQ3JLpx9iXxOE66vgGACJa26yvNkrsk/F+rLSXLfKRCvCsKI+5swW4RkDf/F5GpI/N3kBvLZQg9sqFglDh8DQloMOJbm7EIQ4ijhDC28woStGVAwSIFrnThAe5R5EgdhlH3I3xlF0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ukqDiKsV; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1730266604; c=relaxed/simple;
+	bh=KeESUc5K0y6lVscZ7yRQDwbqZ25f4QAcmJfnW/JLiYw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z191IfnUg6hKt5h00HV2LbChhFndrTOHyxrimmOmMjfAd+U1KX7DfPPyWkXCpxv6E779ekbEG/u1n2W0+Q6UeY9jQ/cPZuhcupFZlPGZNYLqlPWTZvAMC/X5gq87oru7hYWOEo4jPAXJpjmoZTSapuzg0vvC9tGidWIutOUIFrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G6r6ZAax; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ukqDiKsV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=84rDE6TsX4yZfxEu/amACybLOucaBQ1dH+ahRIQ11Wg=; b=ukqDiKsVRvcRVLleUEdL2/0lMM
-	7fJaMbSGeZb2QQIxYuekIMxluexjpuAwIyW66ebRhdF+qvZpt9jzHZxYHWkEWNFSSlI6sH9h+SVPf
-	50DryZ4uQOcIGoFRCMF5oE6L6LyLzVyJAApzoN9cG6nAD+rWZql96ZNMSiwTUf9XA14vvyxBNhHed
-	wUUsRW06CtvtD8bEWKPArV67FGhmMVDwAP86XdQ7nOMpCs7dP5m8KC5k+mHQpNLgtYYJahfNeL/Mo
-	7X8aAqdFsnO8gCLEQLzCAK07NPG4WAXYUVJc74t8hjECuhgpzfsZxkwV/w91/lSg+o8ih/XMKrObC
-	rC7vC7w9eT+6HvjKNz7d5oqM7NjwiSzQVY3ovubsvRIXzHVoUMuilQM5s1Qm80TXI4lT7DdbvepSA
-	tRc1fS8K7mp/17o41NCSgEcBq+iKwIP4NQyzPVV9IouCOfKyKfKmK/PA/p716KQlMMdbPmIYxzLXD
-	n4ekEGEKbv/i2FagIuYQCeub;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1t5j6V-0076my-1e;
-	Tue, 29 Oct 2024 10:05:35 +0000
-Message-ID: <6e38eeba-9a82-48f4-bfcd-a4f2ce718782@samba.org>
-Date: Tue, 29 Oct 2024 11:05:34 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6r6ZAax"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6e38ebcc0abso73834907b3.2;
+        Tue, 29 Oct 2024 22:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730266601; x=1730871401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KeESUc5K0y6lVscZ7yRQDwbqZ25f4QAcmJfnW/JLiYw=;
+        b=G6r6ZAaxKJU/PaX37imaRdQWX/Ldv+Iwmoyr9Ly3GpnO8qS1mycEpUmHaMw01nXxRm
+         gMFTvioU0JQkNyoR0fpmuntPh9TTXsfXKVtD3qTQ3RTyUjf6TcQTIqSZvqrtM8eq5E48
+         BJTs3b5NhiHkcW5EzCiHy9eGnmcx14IPXMKlpwRw6r5KDz8ALTZZkyVmof4ko4eIRudh
+         WKIo2KkaRlCCxRRU8WykGaI7Hvp7Q8KLpSFJa0/dEX/Q3PcpdXJ+8FE70ZD1N/ru5rvL
+         5OccT7rv64tWYuZ7W9OqUSl5S1MtHg3bbLi5zMkB4InmfQ8V4WXl4Jc9bkBbMnayIjCR
+         7gpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730266601; x=1730871401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KeESUc5K0y6lVscZ7yRQDwbqZ25f4QAcmJfnW/JLiYw=;
+        b=k7WJrNUjweFgtHVsOULYE7y+5OSEPTzS9SnwvyR5TScUUmSgfoPP5Avd2tj8KjXeK3
+         Mb4MHZy3ng2RdjHZvS7buiRVby9Nw8T2lAlp7XjnOu7HhyByC/du/k5QkNhQyBCvcghL
+         /w2ZiUl5PEHvod/o4cUChwP1+yt4xIyaI53X0k/qRp8HNOeBJGQboJO7vdYUf4FJQ+Yf
+         5C77T+hEJKJs1dCSyqkgZL3liAesvTl1BqDK6acV8yof3Sbg47WhcW4387oW9c2Np4xT
+         ovGnVcSsCsk56KDb+IMGAkNUSuaABTVk9K8qBNP4q7XQoz2KngIS6PS9FctIPIHWOmbI
+         NlMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdfZD3LU8GpejHjiq2xRBRWr1d8FT51eD3TeCK8vHJ0KJiLazl6SalgNZ1ghq3wMKqgKyRaopSxqka0tAn@vger.kernel.org, AJvYcCXB6UVuo660P2FYkOstBLBkTD3YiHyld/UA2c056S98CDxd2jRlCYuQsCVgi/u6UAINembrRES6IR6b@vger.kernel.org
+X-Gm-Message-State: AOJu0YybKeDXL91Wbe/Lcb/Qzoj3cGf1RiwVMMiucp+vCx8r0iy8EY3Z
+	/NvOAAu2uP0+VIBFF7pbf5Dy/Mj9yku6CWAa3CODnul3iWc/QuL7thlZOrFaqXc1e5i1tOmvH9g
+	2ylknLH3Ldz2W6Nfh1p6c5JylaW+P6w==
+X-Google-Smtp-Source: AGHT+IEC1vApiz0SeWbm0I8kDNI3alH1leHE5c61sHrb8sBNGAjf7q3LhzxWWsPcy6W4djptJm1sZ0P1WEy6hmanZVk=
+X-Received: by 2002:a05:690c:10c:b0:6e7:de90:315f with SMTP id
+ 00721157ae682-6e9d8aa57d6mr115380287b3.28.1730266601457; Tue, 29 Oct 2024
+ 22:36:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Directory Leases
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org,
- Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
- ronnie sahlberg <ronniesahlberg@gmail.com>
-References: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
- <CAH2r5muwuKvifnG0XK3wShCtpR6EZOEozn=H95qx9ewHDO5jdA@mail.gmail.com>
- <42c8b091-a57a-4d4e-aebf-aee57dabf5d4@samba.org>
- <CAH2r5mtr0SJHzG4tNeRA=1H1gEswQUywj0G5kR+wuoPk1r1YVA@mail.gmail.com>
-Content-Language: en-US, de-DE
-From: Ralph Boehme <slow@samba.org>
-In-Reply-To: <CAH2r5mtr0SJHzG4tNeRA=1H1gEswQUywj0G5kR+wuoPk1r1YVA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241005154817.20676-1-pali@kernel.org> <20241028104229.29736-1-pali@kernel.org>
+In-Reply-To: <20241028104229.29736-1-pali@kernel.org>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Wed, 30 Oct 2024 11:06:30 +0530
+Message-ID: <CAGypqWxRv+3q3gXqGtKH+5rb+pPwNrCz-933xOk29eku38qosg@mail.gmail.com>
+Subject: Re: [PATCH v2] cifs: Change translation of STATUS_DELETE_PENDING to -EBUSY
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steve,
+On Mon, Oct 28, 2024 at 4:12=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
+rote:
+>
+> STATUS_DELETE_PENDING error is returned when trying to open a file which =
+is
+> in delete pending state. Linux SMB client currently translates this error
+> to -ENOENT. So Linux application trying to open a file which still exists
+> will receive -ENOENT error. This is confusing as -ENONET means that
+> directory entry does not exist.
+>
+> File on SMB server can be in delete pending state for an indefinite long
+> period. Moreover it does not have to final state before the real deleting=
+,
+> as any SMB client who still have opened handle to such file can revert fi=
+le
+> from delete pending state back to normal state. And therefore client can
+> cancel any scheduled file removal.
+>
+> So change translation of STATUS_DELETE_PENDING error to -EBUSY. -EBUSY is
+> used also for STATUS_SHARING_VIOLATION error which is similar case, when
+> opening a file was disallowed by server due to concurrent usage.
+>
 
-On 10/28/24 10:11 PM, Steve French wrote:
-> Doing some additional experiments to Windows and also to the updated
-> Samba branch from Ralph, I see the directory lease request, and
-> I see that after ls (which will cache the directory contents for about
-> 30 second) we do get a big benefit from the metadata of the directory
-> entries being cached e.g. "ls /mnt ; sleep 10; stat /mnt/file ; sleep
-> 15 stat /mnt/file2 ; sleep 10 /mnt/file"  - we only get the roundtrips
-> for the initial ls - the stat calls don't cause any network traffic
-> since the directory is cached.
-indeed, I can confirm that some cache is used for stat. Unfortunately it 
-isn't used for readddir.
-
-Also, coming back on the issue that the client is deferring a close on 
-the directory with having a H lease:
-
-In my understanding that's at least going to cause problems if other 
-clients want to do anything on the server that is not allowed if there 
-are conflicting opens like renaming a directory (which is not allowed if 
-there are any opens below recursively). Unlinks will also be deferred as 
-long as the client sticks to its handle.
-
-The client should acquire a RH lease on directories if it wants to cache 
-the handle and that's a prerequisite in order to cache readdir.
-
-Afair the kernel is currently caching for 30 seconds. Increasing this 
-time should not be done without also having a H lease.
-
--slow
+My worry is that, change in error code mapping might break some
+applications compatibility.
