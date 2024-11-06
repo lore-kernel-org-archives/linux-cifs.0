@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499501DFE35
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Nov 2024 12:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B511E049B
+	for <linux-cifs@vger.kernel.org>; Wed,  6 Nov 2024 12:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730896590; cv=none; b=UBqjDA8padjRKSRKWokMTCSA4isfwK4/OQiLY7meJ5630Pq78L4oLA2egeOkSxjJ0c7y/kRivlwTrQzkUWPnUY24c+TQr5i6FboewM+d/2GMhPJZ6tZHHX6doHzsPnLBZZnoUhXVDgGBiNLrhm9rtdufjR56yD2aDtly4WyMR2M=
+	t=1730896600; cv=none; b=oGrGRlG/W0rHP3UguVJHp5qOCEWscMmRDP1XrrX0qnTuQEmW7J06CBGsZ8vDQKHdH3frpQ/bCUXW1JzkEz34dp4C5UgJpt9NpMsdTtbeUFH1m0j5Uv6+7V2QvRecHBQdpSgZcrVvYorzetgvkf5RUlZE6jP75Qt8+F4lQvVigWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730896590; c=relaxed/simple;
-	bh=TCORsvgxEZsnnFjuTyK84xCEQqwdy4pROgfsDRybzPs=;
+	s=arc-20240116; t=1730896600; c=relaxed/simple;
+	bh=PkZy5Bm2Mgnujb/0DqtZnvhh4LaJYhfynDFVUZ+zO5s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q66j2tm01Nyl6UtpMXv75aNUJ+bOrzgMv1X/ssUboLCE3IA5HGhtM9xfUVD02agISjpj4L6uq09Ta+VcuiFi5+iEzrTzeG+ceeM5ISRZa6mXswTKjg+kM0SC1IXwM0PhXyatlDLVl1LbZO4Jn//7s5fcZ4OJ1kccuuL3fivq6sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ql962YzM; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=WH+UXg7yhklARLtz07H2yqplV0zuA2Bj4mX4IP1UoueF4B79JtutSPV6ThcD6A6qCLs7xxxXhQrWm6xfkSABBaNo6d3G6V7ukBALwuweNY5kVTaaQw4+G88m7YPcbsBvXiiZ82CWDoaI7MFqBF4eFrJ9qQsCR9jYZdl80CYWT7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g69qMMoX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ql962YzM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g69qMMoX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730896588;
+	s=mimecast20190719; t=1730896598;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zFfHFGyfFLnfH39ds9xcldOHx5zC/fcdWITNBPuGcyY=;
-	b=Ql962YzMipGnoBTjN+4Z3+Tz1pb7934xEZJcjV1GDyKpSPNZdR3LiNJtbvWdZMHCDnVHGd
-	2qTyGqrNMsNkq+j1qj5TxxlAM1ApoTqw+SVO/lHnw327hOKFIZ5d3txNey5M+TsgY7e3uc
-	CPVm10G9KVDvdrwM8IXev43rR1wRzmY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=SueMPOdHep9t3PCuklU6bVWhougpE6WyFc4wdjmYJYc=;
+	b=g69qMMoXin7D8ig51MiJEZ0cxDvNM32LQIelVcPlc26eBeuXgOAthFJfyBuDkD/4Verly5
+	IWDiKQnfZmeZRD/6cITr7c1ZcHz8AAMs+EOlJP8T8Uu6Y8IUT32+YCdjerDEsrYRLn+KVQ
+	Tmd3hu4RpFdzuO4DKTJr7nAMYgqtrks=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-DlDFzTqENQa4a16Ac1LvYQ-1; Wed,
- 06 Nov 2024 07:36:25 -0500
-X-MC-Unique: DlDFzTqENQa4a16Ac1LvYQ-1
-X-Mimecast-MFC-AGG-ID: DlDFzTqENQa4a16Ac1LvYQ
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-0fAV0xeSNeenkY30paF-Ug-1; Wed,
+ 06 Nov 2024 07:36:32 -0500
+X-MC-Unique: 0fAV0xeSNeenkY30paF-Ug-1
+X-Mimecast-MFC-AGG-ID: 0fAV0xeSNeenkY30paF-Ug
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 011F91956064;
-	Wed,  6 Nov 2024 12:36:21 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 055B6195608F;
+	Wed,  6 Nov 2024 12:36:29 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BCCF619560AA;
-	Wed,  6 Nov 2024 12:36:13 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C865195607C;
+	Wed,  6 Nov 2024 12:36:22 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <smfrench@gmail.com>,
@@ -67,10 +67,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v3 01/33] kheaders: Ignore silly-rename files
-Date: Wed,  6 Nov 2024 12:35:25 +0000
-Message-ID: <20241106123559.724888-2-dhowells@redhat.com>
+	Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v3 02/33] netfs: Remove call to folio_index()
+Date: Wed,  6 Nov 2024 12:35:26 +0000
+Message-ID: <20241106123559.724888-3-dhowells@redhat.com>
 In-Reply-To: <20241106123559.724888-1-dhowells@redhat.com>
 References: <20241106123559.724888-1-dhowells@redhat.com>
 Precedence: bulk
@@ -80,51 +80,31 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Tell tar to ignore silly-rename files (".__afs*" and ".nfs*") when building
-the header archive.  These occur when a file that is open is unlinked
-locally, but hasn't yet been closed.  Such files are visible to the user
-via the getdents() syscall and so programs may want to do things with them.
+From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 
-During the kernel build, such files may be made during the processing of
-header files and the cleanup may get deferred by fput() which may result in
-tar seeing these files when it reads the directory, but they may have
-disappeared by the time it tries to open them, causing tar to fail with an
-error.  Further, we don't want to include them in the tarball if they still
-exist.
+Calling folio_index() is pointless overhead; directly dereferencing
+folio->index is fine.
 
-With CONFIG_HEADERS_INSTALL=y, something like the following may be seen:
-
-   find: './kernel/.tmp_cpio_dir/include/dt-bindings/reset/.__afs2080': No such file or directory
-   tar: ./include/linux/greybus/.__afs3C95: File removed before we read it
-
-The find warning doesn't seem to cause a problem.
-
-Fix this by telling tar when called from in gen_kheaders.sh to exclude such
-files.  This only affects afs and nfs; cifs uses the Windows Hidden
-attribute to prevent the file from being seen.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Masahiro Yamada <masahiroy@kernel.org>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Link: https://lore.kernel.org/r/20241005182307.3190401-2-willy@infradead.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
 ---
- kernel/gen_kheaders.sh | 1 +
- 1 file changed, 1 insertion(+)
+ include/trace/events/netfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/gen_kheaders.sh b/kernel/gen_kheaders.sh
-index 383fd43ac612..7e1340da5aca 100755
---- a/kernel/gen_kheaders.sh
-+++ b/kernel/gen_kheaders.sh
-@@ -89,6 +89,7 @@ find $cpio_dir -type f -print0 |
- 
- # Create archive and try to normalize metadata for reproducibility.
- tar "${KBUILD_BUILD_TIMESTAMP:+--mtime=$KBUILD_BUILD_TIMESTAMP}" \
-+    --exclude=".__afs*" --exclude=".nfs*" \
-     --owner=0 --group=0 --sort=name --numeric-owner --mode=u=rw,go=r,a+X \
-     -I $XZ -cf $tarfile -C $cpio_dir/ . > /dev/null
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index 69975c9c6823..bf511bca896e 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -450,7 +450,7 @@ TRACE_EVENT(netfs_folio,
+ 		    struct address_space *__m = READ_ONCE(folio->mapping);
+ 		    __entry->ino = __m ? __m->host->i_ino : 0;
+ 		    __entry->why = why;
+-		    __entry->index = folio_index(folio);
++		    __entry->index = folio->index;
+ 		    __entry->nr = folio_nr_pages(folio);
+ 			   ),
  
 
