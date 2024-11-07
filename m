@@ -1,51 +1,51 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4F42170DA
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Nov 2024 18:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15120217F50
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Nov 2024 19:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004902; cv=fail; b=QmpSJC5Asfoh8FHiMOLPiT/A0nldOnYKW9KgOV8ByoCukSfJkP3GUm6qlOSoN8fZOWKkpOjqOnDsJDHbMftwVie1wE9VeyNehwmpTHPhlUUhfJksLM3XRCtldAirUo1Axp0X1QwUbOTFayRAyrrfeAMK5SkiVbXqzU9a1Y4ISYE=
+	t=1731006346; cv=fail; b=YPJURtSGjpqrCd0pLCLImggowBfW+4I93FWyKJ+J1R+AtUlYBiGOJfyYnZl2wnqCGq6UBlgqrcjMpi1UvPP/UKbEhMfq06C1tWvZaGr7BycN59BdCbUMA/0CW3z2jsj3LoTFv5GD6XAm8uaeBwBELA6UjEZYASiuwGXr1DKEFZc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004902; c=relaxed/simple;
-	bh=ir9ExKYJIguJJdyzwhqSRSsVJHULItQZXm1zXZz2+tk=;
+	s=arc-20240116; t=1731006346; c=relaxed/simple;
+	bh=HPKTzU/tzVrgflh0oNlcwPfudANujppa/qCHdOD9DXE=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=FZME2CeTTsjJx4+WUteV1TXp7bYO3O1EDkAwaSA+rdGbBSkQS6gbPMK4SKF+q6ibP6FK6jncCsGERpRJ8FXFsyxVrUEzxxDU2YqwAZtNnB2zzd+9Qjs81UjRNjU2ej5sbx44VAkg948uy9NlcrQ0pdlQH+a8nINN5Pb4iEwaEn0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=Br8I+hp+; arc=fail smtp.client-ip=167.235.159.17
+	 MIME-Version:Content-Type; b=sQlV1EDafUzDaMC99W3b8DdCTaZorlqFhMvV75tgg/iPdcsSagQa4YKEaz0/mHTiYWD/WAmdv5XUjzrPvYRY0ujVwiODclwHonp/MGVNUxXYnfwOYTlHfo8YHjQZUrWXqUj2W/ONeRWsfNAv/FPh8h7UOMKU+TJTCJ+bQa1oLCc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=qLygH2aN; arc=fail smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="Br8I+hp+"
-Message-ID: <1f8a225b0d16fdfa05c417e0f6602489@manguebit.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="qLygH2aN"
+Message-ID: <0282479bc2f446bcb34c53a30bb53bda@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731004301;
+	s=dkim; t=1731006343;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kxUGI8wnmJkImFv4kT4TRG0/HFHFHPYOBhj48GK9Xc0=;
-	b=Br8I+hp+KYvlWIAUXYyaBe/+nzV+g5CGWonmcyz6iA+mXpAX+zagMaPqHZMyH+WcJ1GBcb
-	8EB1Cafel+HEPgyG7dkcLtfN7tUsM6sDQzPrfdgYKokgUWx8wHKZXNUg2VITpWdl0/ntyW
-	MRBrP7T+nGzUZZGyFDJSuffEvYtr/QbiIe3s+3Ak1UIwUYJsLOfUQLOF4V+te2Kka3XpcH
-	i8GUAMC415XugxZuTz6/V7iDYDhyd3BmGZY8rgRcXtnfkm5hLuFp/IQQEWdhn7qhU+wKrt
-	OyNziiMVI9gRmJWPGbJjy/EucbDb73cbJxlixkQ50XLDCqvTieleqntDySnsuw==
+	bh=Gjkoh1ve14eQlYzW025BtfwFqgem2MNKxhWAvUgpeyE=;
+	b=qLygH2aNZEX3iVDwgfryshji8VTQYFuOAsZhZ8keKOYzUy6i1IZIVl7oTYS/okrw2OVLOd
+	u7uWG+vVlVF4WSOgGMK67+CvGRpG31hH146jo7mLo6DH0YZsAQ1PDNS5cIsBJe8Cb8RYEb
+	qomRd5Xc3tbrzsO3CncopyJpEmy+HxI7z290/DJooVblcF/yOydMa2yUp4AbYwRU6AzB7k
+	jRxNKHOh+aI//rj20aaVffrthyGSfb+M/HiACdRw07CvbJ7NoB2ug1DO35PJH7Fks3JDg/
+	d/KIj8OU8MgKRxT87bqlLatNqACaZfEwW+cq4yzLlL/2bS2+o0enzot0OFwwoQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731004301; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1731006343; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kxUGI8wnmJkImFv4kT4TRG0/HFHFHPYOBhj48GK9Xc0=;
-	b=nIjrUrc8ZJscFalTeynixczhr/V1jozETb6Iolo2my1U59pj2m1ApuJABLAyPmTdBguefc
-	z1KEm9FTDNl4vDSaBMrJF240+YhgPmrBPldoLWIQ4/s5LlqmQHE6p9AaTfWicf01aCcM4o
-	0ZsklV3WHh0HCEZ5o+bqam+J29gx/luxAk9s+/F0pUoXuM8MTFdUPyv3bOVoOIDY3x5n9u
-	l8pHbgDKTJrPr1fnuAhbvdC3Phuj05xNManI6G3fEFXD95ZTqKF823aOJY8Z2J/puhVUMQ
-	yn6mtAIGehsNlj6+8SzXOoPygzVc4+Bo6eRVtykdV6b+jRP7ZFYnPex9S0uw2w==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731004301; a=rsa-sha256;
+	bh=Gjkoh1ve14eQlYzW025BtfwFqgem2MNKxhWAvUgpeyE=;
+	b=KCroxt8c0r4yL06ja9O/g5yU7vN45ld5Ne3tIXcFW3eQCJ/VxgWkyltBHsJwMWmGGrTtKJ
+	5sGkyO7P71k/vnvBYXwBNGFk/cH0WfWE5tLLEAhhaljt+bIGDcJU1LFPt1KZ6Xl3WxBTci
+	tsRIS32N2/OAuUx6gxm/oFG8ojLQ8xQaGghpwOioB6eA1wJ2XsoKzNx0d3fUwd2GjEWf5r
+	0JfWzgd90Dwdhn1QZasXVA2q2OJy79rYyleov38n2layiLXNo2f9XgKUehUym7eiV4YRkM
+	v/lHDMZ46G8/RZNVf/KlzxtlIQdPm0Y489+2Qx7dCFkqPm7UfvvX9tlS5RzSzg==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731006343; a=rsa-sha256;
 	cv=none;
-	b=q/r/onC7Dt1AgkGOUAbEiwmzjUpK11FJOQ2wh1jYDucEQ7JGpTAQ49tg2pOs3yZ36OAQ8a
-	rj87ccZgzhrkIjNY5XzbaumXLwTh53p/HN/P2JN2pHzXJL8dIuH3vDxtMdJVls6Yk1tYSy
-	N+1UH4AJt2/v4SpSTYtb6QPaTlZ7G7b+LC4FT9T2iCkqcPfEjn1f0Fzh/34EABuTzPUxV+
-	iDaSLgMNCDl1j0HwrlwqV+3p2k8fNjz3Uruj6P/Cj4yqFWjg7sGDVy+e3fZxFewhFq3d9+
-	jFpFFYcOO5+emO7lqTqDBKnv6M0JYeXfyPS8pKwDRa2acZEpsBspjN/X56jInA==
+	b=PSvdNVF/UOUynRd5NfZ+3wLPjpaGsA+O5jNobtGxmNSyPUTVESP8f4A84D9r+dc33v9/hw
+	fJ3tUGJ0mZhgcb/OUQDxemN/Xd102kqSSj+pkP5OQOW+acCQrWTyc26EUxlU9hwDLfUcyg
+	VMQ6iJBKA863dRDJOw5VgTvljADaBMApDu3TMiv/zwM7RCa7DkI5isbiq4fmQGua/36CaB
+	PH3fu/m5tRT/HufXNlgrqXhqsiP2nfn+0jxDJ9kXkjy43QTxDPAeQNlin5+/Kz5ccEAMyY
+	PLgS6GH3DpF+aLurLS0x1plulTScNSNs8qOqL8GUBMSxBHmvYBPlDL7h4ebSFQ==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
@@ -55,10 +55,12 @@ To: meetakshisetiyaoss@gmail.com, smfrench@gmail.com, sfrench@samba.org,
  linux-cifs@vger.kernel.org, nspmangalore@gmail.com,
  bharathsm.hsk@gmail.com
 Cc: Meetakshi Setiya <msetiya@microsoft.com>
-Subject: Re: [PATCH 1/2] cifs: during remount, make sure passwords are in sync
-In-Reply-To: <20241030142829.234828-1-meetakshisetiyaoss@gmail.com>
+Subject: Re: [PATCH 2/2] cifs: support mounting with alternate password to
+ allow password rotation
+In-Reply-To: <20241030142829.234828-2-meetakshisetiyaoss@gmail.com>
 References: <20241030142829.234828-1-meetakshisetiyaoss@gmail.com>
-Date: Thu, 07 Nov 2024 15:31:38 -0300
+ <20241030142829.234828-2-meetakshisetiyaoss@gmail.com>
+Date: Thu, 07 Nov 2024 16:05:40 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -69,143 +71,72 @@ Content-Type: text/plain
 
 meetakshisetiyaoss@gmail.com writes:
 
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> We recently introduced a password2 field in both ses and ctx structs.
-> This was done so as to allow the client to rotate passwords for a mount
-> without any downtime. However, when the client transparently handles
-> password rotation, it can swap the values of the two password fields
-> in the ses struct, but not in smb3_fs_context struct that hangs off
-> cifs_sb. This can lead to a situation where a remount unintentionally
-> overwrites a working password in the ses struct.
-
-I don't see password rotation being handled for SMB1.  I mounted a share
-with 'vers=1.0,password=foo,password2=bar' and didn't get any warnings
-or errors about it being usupported.  I think users would like to have
-that.
-
-What about SMB sessions from cifs_tcon::dfs_ses_list?  I don't see their
-password getting updated over remount.
-
-If you don't plan to support any of the above, then don't allow users to
-mount/remount when password rotation can't be handled.
-
-> In order to fix this, we first get the passwords in ctx struct
-> in-sync with ses struct, before replacing them with what the passwords
-> that could be passed as a part of remount.
->
-> Also, in order to avoid race condition between smb2_reconnect and
-> smb3_reconfigure, we make sure to lock session_mutex before changing
-> password and password2 fields of the ses structure.
->
-> Fixes: 35f834265e0d ("smb3: fix broken reconnect when password changing on the server by allowing password rotation")
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> ---
->  fs/smb/client/fs_context.c | 69 +++++++++++++++++++++++++++++++++-----
->  1 file changed, 60 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 5c5a52019efa..73610e66c8d9 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -896,6 +896,7 @@ static int smb3_reconfigure(struct fs_context *fc)
->  	struct dentry *root = fc->root;
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
->  	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
-> +	char *new_password = NULL, *new_password2 = NULL;
->  	bool need_recon = false;
->  	int rc;
+> @@ -2245,6 +2269,7 @@ struct cifs_ses *
+>  cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+>  {
+>  	int rc = 0;
+> +	int retries = 0;
+>  	unsigned int xid;
+>  	struct cifs_ses *ses;
+>  	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
+> @@ -2263,6 +2288,8 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+>  			cifs_dbg(FYI, "Session needs reconnect\n");
 >  
-> @@ -915,21 +916,71 @@ static int smb3_reconfigure(struct fs_context *fc)
->  	STEAL_STRING(cifs_sb, ctx, UNC);
->  	STEAL_STRING(cifs_sb, ctx, source);
->  	STEAL_STRING(cifs_sb, ctx, username);
+>  			mutex_lock(&ses->session_mutex);
 > +
->  	if (need_recon == false)
->  		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
->  	else  {
-> -		kfree_sensitive(ses->password);
-> -		ses->password = kstrdup(ctx->password, GFP_KERNEL);
-> -		if (!ses->password)
-> -			return -ENOMEM;
-> -		kfree_sensitive(ses->password2);
-> -		ses->password2 = kstrdup(ctx->password2, GFP_KERNEL);
-> -		if (!ses->password2) {
-> -			kfree_sensitive(ses->password);
-> -			ses->password = NULL;
-> +		if (ctx->password) {
-> +			new_password = kstrdup(ctx->password, GFP_KERNEL);
-> +			if (!new_password)
-> +				return -ENOMEM;
-> +		} else
-> +			STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
-> +	}
-> +
-> +	/*
-> +	 * if a new password2 has been specified, then reset it's value
-> +	 * inside the ses struct
-> +	 */
-> +	if (ctx->password2) {
-> +		new_password2 = kstrdup(ctx->password2, GFP_KERNEL);
-> +		if (!new_password2) {
-> +			if (new_password)
+> +retry_old_session:
+>  			rc = cifs_negotiate_protocol(xid, ses, server);
+>  			if (rc) {
+>  				mutex_unlock(&ses->session_mutex);
+> @@ -2275,6 +2302,13 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+>  			rc = cifs_setup_session(xid, ses, server,
+>  						ctx->local_nls);
+>  			if (rc) {
+> +				if (((rc == -EACCES) || (rc == -EKEYEXPIRED) ||
+> +					(rc == -EKEYREVOKED)) && !retries && ses->password2) {
+> +					retries++;
+> +					cifs_info("Session reconnect failed, retrying with alternate password\n");
 
-Useless non-NULL check as kfree_sensitive() already handles it.
+Please don't add more noisy messages over reconnect.  Remember that if
+SMB session doesn't get re-established, there will be flood enough on
+dmesg with "Send error in SessSetup = ..." messages on every 2s that
+already pisses off users and customers.
 
-> +				kfree_sensitive(new_password);
->  			return -ENOMEM;
->  		}
-> +	} else
-> +		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
-> +
-> +	/*
-> +	 * we may update the passwords in the ses struct below. Make sure we do
-> +	 * not race with smb2_reconnect
-> +	 */
-> +	mutex_lock(&ses->session_mutex);
-> +
-> +	/*
-> +	 * smb2_reconnect may swap password and password2 in case session setup
-> +	 * failed. First get ctx passwords in sync with ses passwords. It should
-> +	 * be okay to do this even if this function were to return an error at a
-> +	 * later stage
-> +	 */
-> +	if (ses->password &&
-> +	    cifs_sb->ctx->password &&
-> +	    strcmp(ses->password, cifs_sb->ctx->password)) {
-> +		kfree_sensitive(cifs_sb->ctx->password);
-> +		cifs_sb->ctx->password = kstrdup(ses->password, GFP_KERNEL);
-
-Missing allocation failure check.
-
-> +	}
-> +	if (ses->password2 &&
-> +	    cifs_sb->ctx->password2 &&
-> +	    strcmp(ses->password2, cifs_sb->ctx->password2)) {
-> +		kfree_sensitive(cifs_sb->ctx->password2);
-> +		cifs_sb->ctx->password2 = kstrdup(ses->password2, GFP_KERNEL);
+> +					swap(ses->password, ses->password2);
+> +					goto retry_old_session;
+> +				}
+>  				mutex_unlock(&ses->session_mutex);
+>  				/* problem -- put our reference */
+>  				cifs_put_smb_ses(ses);
+> @@ -2350,6 +2384,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+>  	ses->chans_need_reconnect = 1;
+>  	spin_unlock(&ses->chan_lock);
+>  
+> +retry_new_session:
+>  	mutex_lock(&ses->session_mutex);
+>  	rc = cifs_negotiate_protocol(xid, ses, server);
+>  	if (!rc)
+> @@ -2362,8 +2397,16 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+>  	       sizeof(ses->smb3signingkey));
+>  	spin_unlock(&ses->chan_lock);
+>  
+> -	if (rc)
+> -		goto get_ses_fail;
+> +	if (rc) {
+> +		if (((rc == -EACCES) || (rc == -EKEYEXPIRED) ||
+> +			(rc == -EKEYREVOKED)) && !retries && ses->password2) {
+> +			retries++;
+> +			cifs_info("Session setup failed, retrying with alternate password\n");
 
 Ditto.
 
+> +			swap(ses->password, ses->password2);
+> +			goto retry_new_session;
+> +		} else
+> +			goto get_ses_fail;
 > +	}
-> +
-> +	/*
-> +	 * now that allocations for passwords are done, commit them
-> +	 */
-> +	if (new_password) {
-> +		kfree_sensitive(ses->password);
-> +		ses->password = new_password;
-> +	}
-> +	if (new_password2) {
-> +		kfree_sensitive(ses->password2);
-> +		ses->password2 = new_password2;
->  	}
-> +
-> +	mutex_unlock(&ses->session_mutex);
-> +
->  	STEAL_STRING(cifs_sb, ctx, domainname);
->  	STEAL_STRING(cifs_sb, ctx, nodename);
->  	STEAL_STRING(cifs_sb, ctx, iocharset);
+>  
+>  	/*
+>  	 * success, put it on the list and add it as first channel
 > -- 
 > 2.46.0.46.g406f326d27
