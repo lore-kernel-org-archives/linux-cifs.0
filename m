@@ -1,174 +1,107 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83636218335;
-	Thu,  7 Nov 2024 21:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF18D21894F;
+	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731013514; cv=none; b=Gv3GL4omTOFCSi3yhvyhEToumJBD1BK3B68qfOyuAOfOAZua1RiRnD1vbAasc6Gsxsm+8dlg60VSfX785S6d1rglVqSfUe8S0rWOXkFLiWeYNHvAmBdzqjmPazPo1Lvz6Psu9xJszImj7DX0Wh1vXEAVb3gXCqzfeW2NE27B4mg=
+	t=1731022853; cv=none; b=ZVgims8g1X8AiOjKLc5FLIApDDq2KFtgvDfkoTR3G/EgrCNCdWCFIT2za0GcmunWdbxZ81KIGtuIuAysxRDmyGHql7uiH2Jwjsnu0ympbuW7tNJMgV559csZOdbVDoAuCphObJ417qjPZd+dnu6uA5gonq0LSog56xwkFoTF71w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731013514; c=relaxed/simple;
-	bh=kj0DUPMYW2MkLAXHZIxssHCEzzzJuey3RIycZwaUHbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T0QqfNnaBvhAwuU09pZg47hMHXzoU6NTNx7mUJzBhZGZp14f+0/3ZFFyEdaUObSsTBt2ki0roUjc2tuSV9FjeOX3eQpVNgsBUa2CUbLDz8LEj3dDqPT5kRWMzaMof7xAufKtuGZALDxTilkroU+TGaUVF66uK23TN10jreFrr+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=H6YGGAU3; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1731022853; c=relaxed/simple;
+	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uBqfRP+Onv15LR+UnmDNph9UTw7mI7WZ7KSACjwvtIoU/NSPEVRfXxnaP73rSMIPC7drYEdTK5z6LBybSbu9Xrhcg2KXclIxr0IsCXc6W5KeCRc9vg3Tj9UyQtekEMCO+b1jUGxxO7dW0P9rwfBrXhdaaFKizDW64LZFYnZ2zL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFztN0vO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="H6YGGAU3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=H5HDAbBQ5g60S5FukD3N5qJpZ+YuoumqSFdStqHeqUQ=; b=H6YGGAU3to2XVeuC
-	4RRnpZKKgsG5Evaikol5RGv5YXG4KFxTEQ+ATNGeeLlLQEM7+b6O0y2RNlrdoRfDkzIZDrdT8oWj0
-	ffsWx+GtfrxrAjb4oUcm+no5T+q4xTAR+yCfUPGL7AOplTVW3DaxfupAC3QfVRMDL+N1tge3a0D6+
-	YrkqVaRqL+DEQt9kR4rA5LOPe5xONk2GLccnQFn9tnwdar3o8kwSBUMvQJNIrLhVGfmLZgVnHoqH3
-	5a2GOKkMvTbGNVOBZcIjv2zjPOsjHWoPPchspe/vw7r5k9YM8ew7rmTeO12n5YPo2+870YI4qy7qn
-	hpaf0VuDhnR98OmtgQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1t99gW-00G7tn-0C;
-	Thu, 07 Nov 2024 21:04:56 +0000
-Date: Thu, 7 Nov 2024 21:04:56 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com,
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Remove pre-historic unused CIFSSMBCopy
-Message-ID: <Zy0reBfykkwXA47d@gallifrey>
-References: <20241007210214.102568-1-linux@treblig.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFztN0vO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520CDC4CED3;
+	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731022852;
+	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ZFztN0vOaOSU/SRUgi3fmXi2XcjiJt33UXKGf1eFQb4o2O6sLIrkS6+1zAzeOKTnz
+	 JvEx3K2Xvd5mgw0vfFxYXx5ZVVpgZpk5VLkQ86MItoDv06AGZB4/JWrBaC50yJ4YW9
+	 CTH5kHW/ST2rdbVPvBtYrBPg3dxcyy3IeOAsDKYXk825LdAHcj0waE2JRY+Fopplf5
+	 upLUrak1OYR3irbS5sQMtNvaW/+5eynFwQDM6dN14yDjyiU2mXKoU8F+9mtEv/jdeT
+	 AjGuEE0BD0ErwoSrkWgUyszCsMsdy3XxLexKeuknhV/vT4Q9G3VSMXtO3gNlYVS4CG
+	 Y8mux/1O1KbIg==
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7181b86a749so856635a34.3;
+        Thu, 07 Nov 2024 15:40:52 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVc20CmDnCCymDNcuZ2/pNHxvkW6tLiVQbBPi6gmMccxU1+iWm90Btb0J4vIl6hu9M+SfQe+t46@vger.kernel.org, AJvYcCVkVxuSJcpcl6wr+s+lA5vDUQJfv3cif43lx2pWbuxz1bXp+erQ9MdjFgRRw5CL8KADFl0UDK1ps405kw==@vger.kernel.org, AJvYcCWmg46jAsWBCyqKpEtyx2/BNLt7A9WFOsaouH7KaLWWtgbz7G1FZvfxAe/ocrYJAsBT1g6/KIQtn5m4@vger.kernel.org, AJvYcCXy0iWVMcfGXKn3LTB9U5p9UDM1pXYYwXM/dxXaaaoVSAbtw53xnNOSO5pPRz3CMgfqwbjeqrWdF/OXmg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKVsjOOi7TiwxGPjpDn2QaZf7g1Zl6oSOO/yXfCcV8oSClUO9g
+	36KoXH4FQgFhykHY9Lbzzi+FEWO7/Cw4teDzbg5j8I9DNsdqv0ftiYn2SrPaercM03tfZsPiapl
+	7cpHfu1XnqICV5PMamyhb+Hi2UxI=
+X-Google-Smtp-Source: AGHT+IHKWuBlWup528YXRtoYDX3ha+KeikwAxO/glZHcWGp2+SJF85FWw3Rbw60HdVZKTtvogILp9/cn0Dmbxxn3nHo=
+X-Received: by 2002:a05:6870:96a4:b0:286:f74a:93cc with SMTP id
+ 586e51a60fabf-295600990eamr909683fac.2.1731022851213; Thu, 07 Nov 2024
+ 15:40:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20241007210214.102568-1-linux@treblig.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 21:04:39 up 183 days,  8:18,  1 user,  load average: 0.14, 0.07,
- 0.01
-User-Agent: Mutt/2.2.12 (2023-09-09)
+References: <20241025072356.56093-1-wenjia@linux.ibm.com> <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com> <20241105112313.GE311159@unreal>
+ <20241106102439.4ca5effc.pasic@linux.ibm.com> <20241106135910.GF5006@unreal> <20241107125643.04f97394.pasic@linux.ibm.com>
+In-Reply-To: <20241107125643.04f97394.pasic@linux.ibm.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 8 Nov 2024 08:40:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
+Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>, 
+	Alexandra Winter <wintera@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>, 
+	Niklas Schnell <schnelle@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>, 
+	Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>, 
+	Aswin K <aswin@linux.ibm.com>, linux-cifs@vger.kernel.org, 
+	Kangjing Huang <huangkangjing@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-* linux@treblig.org (linux@treblig.org) wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> CIFSSMBCopy() is unused, remove it.
-> 
-> It seems to have been that way pre-git; looking in a historic
-> archive, I think it landed around May 2004 in Linus'
-> BKrev: 40ab7591J_OgkpHW-qhzZukvAUAw9g
-> and was unused back then.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+On Thu, Nov 7, 2024 at 9:00=E2=80=AFPM Halil Pasic <pasic@linux.ibm.com> wr=
+ote:
+>
+> On Wed, 6 Nov 2024 15:59:10 +0200
+> Leon Romanovsky <leon@kernel.org> wrote:
+>
+> > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core c=
+ode?
+> >
+> > RDMA core code is drivers/infiniband/core/*.
+>
+> Understood. So this is a violation of the no direct access to the
+> callbacks rule.
+>
+> >
+> > > I would guess it is not, and I would not actually mind sending a patc=
+h
+> > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
+> > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
+> > > ksmbd_rdma_capable_netdev()").
+> >
+> > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
+> > GID, netdev and fabric complexity.
+>
+> I'm not familiar enough with either of the subsystems. Based on your
+> answer my guess is that it ain't outright bugous but still a layering
+> violation. Copying linux-cifs@vger.kernel.org so that
+> the smb are aware.
+Could you please elaborate what the violation is ?
+I would also appreciate it if you could suggest to me how to fix this.
 
-Ping?
-
-Dave
-
-> ---
->  fs/smb/client/cifsproto.h |  7 -----
->  fs/smb/client/cifssmb.c   | 63 ---------------------------------------
->  2 files changed, 70 deletions(-)
-> 
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 1d3470bca45e..8235b5a0aa2b 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -549,13 +549,6 @@ extern int generate_smb311signingkey(struct cifs_ses *ses,
->  				     struct TCP_Server_Info *server);
->  
->  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
-> -extern int CIFSSMBCopy(unsigned int xid,
-> -			struct cifs_tcon *source_tcon,
-> -			const char *fromName,
-> -			const __u16 target_tid,
-> -			const char *toName, const int flags,
-> -			const struct nls_table *nls_codepage,
-> -			int remap_special_chars);
->  extern ssize_t CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
->  			const unsigned char *searchName,
->  			const unsigned char *ea_name, char *EAData,
-> diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> index c6f15dbe860a..ca50ac652e02 100644
-> --- a/fs/smb/client/cifssmb.c
-> +++ b/fs/smb/client/cifssmb.c
-> @@ -2339,69 +2339,6 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *pTcon,
->  	return rc;
->  }
->  
-> -int
-> -CIFSSMBCopy(const unsigned int xid, struct cifs_tcon *tcon,
-> -	    const char *fromName, const __u16 target_tid, const char *toName,
-> -	    const int flags, const struct nls_table *nls_codepage, int remap)
-> -{
-> -	int rc = 0;
-> -	COPY_REQ *pSMB = NULL;
-> -	COPY_RSP *pSMBr = NULL;
-> -	int bytes_returned;
-> -	int name_len, name_len2;
-> -	__u16 count;
-> -
-> -	cifs_dbg(FYI, "In CIFSSMBCopy\n");
-> -copyRetry:
-> -	rc = smb_init(SMB_COM_COPY, 1, tcon, (void **) &pSMB,
-> -			(void **) &pSMBr);
-> -	if (rc)
-> -		return rc;
-> -
-> -	pSMB->BufferFormat = 0x04;
-> -	pSMB->Tid2 = target_tid;
-> -
-> -	pSMB->Flags = cpu_to_le16(flags & COPY_TREE);
-> -
-> -	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
-> -		name_len = cifsConvertToUTF16((__le16 *) pSMB->OldFileName,
-> -					      fromName, PATH_MAX, nls_codepage,
-> -					      remap);
-> -		name_len++;     /* trailing null */
-> -		name_len *= 2;
-> -		pSMB->OldFileName[name_len] = 0x04;     /* pad */
-> -		/* protocol requires ASCII signature byte on Unicode string */
-> -		pSMB->OldFileName[name_len + 1] = 0x00;
-> -		name_len2 =
-> -		    cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_len+2],
-> -				       toName, PATH_MAX, nls_codepage, remap);
-> -		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
-> -		name_len2 *= 2; /* convert to bytes */
-> -	} else {
-> -		name_len = copy_path_name(pSMB->OldFileName, fromName);
-> -		pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
-> -		name_len2 = copy_path_name(pSMB->OldFileName+name_len+1, toName);
-> -		name_len2++;    /* signature byte */
-> -	}
-> -
-> -	count = 1 /* 1st signature byte */  + name_len + name_len2;
-> -	inc_rfc1001_len(pSMB, count);
-> -	pSMB->ByteCount = cpu_to_le16(count);
-> -
-> -	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
-> -		(struct smb_hdr *) pSMBr, &bytes_returned, 0);
-> -	if (rc) {
-> -		cifs_dbg(FYI, "Send error in copy = %d with %d files copied\n",
-> -			 rc, le16_to_cpu(pSMBr->CopyCount));
-> -	}
-> -	cifs_buf_release(pSMB);
-> -
-> -	if (rc == -EAGAIN)
-> -		goto copyRetry;
-> -
-> -	return rc;
-> -}
-> -
->  int
->  CIFSUnixCreateSymLink(const unsigned int xid, struct cifs_tcon *tcon,
->  		      const char *fromName, const char *toName,
-> -- 
-> 2.46.2
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Thanks.
+>
+> Thank you very much for all the explanations!
+>
+> Regards,
+> Halil
+>
