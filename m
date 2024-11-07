@@ -1,103 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFB41EF0A2;
-	Thu,  7 Nov 2024 12:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4A28BEC
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Nov 2024 16:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730981595; cv=none; b=HW850hWDEcO0542RYWuoS34mDktNXeBIW0EALFAq9VCy1Pp/7W456Sln8f6HngWG+Bb5pt4Vi/85/VprURjaQNnC9fyW79JRNSJDxWMX95HlW8i7xJ9SPlZB6ZbsUR2hv/WG60urBaf3J56DtEZk3nNE3/fG9vxYGjJJvt+WHm4=
+	t=1730997677; cv=none; b=AjKOiZg0Hh+NbkN0XY/AvNs82QUbZRZFhoHNv/NtXbfzOD4980ShGMLOcqTqAUbQQk8V+TreV5SRwxCPDUuRN6f3wLlBNVVZNbJco6ftRfipDwSB8B+J5j5idfbFv3NZrFt55/5PXj1p+LsWgyxe0hibdRE0mmx3gUuon+4B0Mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730981595; c=relaxed/simple;
-	bh=wA6HaF5jWhqC7PHRHi/nW4wj5K9TmEPJwgmIrA6Ht2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tvv8YG/RL815FFlbymguZ2HGoSqXm2dbuYUN7Im66ARrWBq+cH7QG4ENp6+Bo6JDVOxeNTztDQ92WYbmNgIRc+bxYZ2iWLZAQuMb1vfxEaRFOc2VkSJPXKR3nOR0tN6IKXW40uhd/MrhKPSLqmsEmqKE8UB+rGAlpV2RP5xycUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0TLjSo+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730997677; c=relaxed/simple;
+	bh=vbDyQFue2yyFOCzOW/IZVUp2LT5iN0pJbov8sjMKBWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sbl6yduln6EZ7k5+ycSdIsiiCA55TMm+ip5fGuqmSb5DLCy2TDD23KfPL4mqRPszazdrz/469B8KJtFKSeO9YVo3xfjT0AjlZLR3sP8jMA7hgLf69zK/U4MAaab8ukc4PrhV5zDemCtLDH+4/IHZpGBDqKcdbMRMLaGeUTZ5Kzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=f+EXykch; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0TLjSo+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CFDDC4CECC;
-	Thu,  7 Nov 2024 12:13:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730981594;
-	bh=wA6HaF5jWhqC7PHRHi/nW4wj5K9TmEPJwgmIrA6Ht2A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I0TLjSo+i59L8NKIbuMoYlUM/IhFCjq6dim4A6lnqJQ+86SbWy7/920OCxxG5828a
-	 eGFm8YGTVAkJ65mW/hL7d5ykmag5DOUQyK76Vv5zwkShDHC4k/1bbLpfn2xiKjhdEE
-	 AhwdGOpDpA3zwdbQ/NWAZLybgcXSECc9iwoqysidkD8OLDlT9bbFxIfmLcXSRzFr3G
-	 6mvWH0AWkuHgClh/cFDSqQz9ZTtFU8AnOybjF0kt7rpIDmE9qAAMeGx5rYmHJFmvdL
-	 tm/44D1xtPxEh3tSn15ZFfy8mjAGJ3Kp+PUmVN2MzwnJy3EuhC86c5YAQP2HtDXTns
-	 cX9idrzvy4S1Q==
-Date: Thu, 7 Nov 2024 14:13:07 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Nils Hoppmann <niho@linux.ibm.com>,
-	Niklas Schnell <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>,
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-Message-ID: <20241107121307.GN5006@unreal>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
- <20241027201857.GA1615717@unreal>
- <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
- <20241105112313.GE311159@unreal>
- <20241106102439.4ca5effc.pasic@linux.ibm.com>
- <20241106135910.GF5006@unreal>
- <20241107125643.04f97394.pasic@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="f+EXykch"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d3ecad390so1364193f8f.1
+        for <linux-cifs@vger.kernel.org>; Thu, 07 Nov 2024 08:41:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1730997672; x=1731602472; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X48QXGikYauDYbQBJX1TarjLO3xffqcYgo4rqKOZxuM=;
+        b=f+EXykchUBznB1QtWeh2Cu2By2KloP4F2Msr7fj098kmIxpNeugFt6SWufbQ2h8pr3
+         ijJ/A2hSiiQ+YWOiKB05Dj821LKMJK5B9RSiX7lJTx8Xp9TsSNUjPfmduWbbQp9zuqVX
+         yN2q+mMxE4tTCPQTM7HJCFWnNGo5I4VItW3WWNyOn9GkeZMXucxbNegZLPFKGejgnA6g
+         9d8ahWDJlTLmCWKRtSXlxkkzs7AcsOysLl1lGZ/UT0j5whoH6UVnQ3O6d2AJCjsXfTjd
+         zWajmREtJLgEm/eT6Fkkt98vheYK0gczlRnfslRa0qz+VbVloDFsrASkfpzTw1Fg/9i5
+         OoYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730997672; x=1731602472;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X48QXGikYauDYbQBJX1TarjLO3xffqcYgo4rqKOZxuM=;
+        b=Es/v35w5FPXHaYCyte0NB0hBdcleuitFKgUo6FD1m4Jd8gIsDdTqvcvjVXdHfxrK47
+         vz8c2bnIsIbOROq73JViWVyCKG6PQLWtvbWtl6OTGBsJAf7y8NBkppHeEOUsL843Ru7s
+         Pp5sAkn5edAYZEcMB1bBVAqvlepX0ZuX3NWCjGT362CExpxSdfngl6zQk8cuBCdVwZ8p
+         4SBFE1WEU7ycjuaRstvItrmQ6qKoQGIzS6LpSnkebztf4YeMSw3DxmlT9co8LlCALBsA
+         Mu0zriQX0K3qW59bQMYeFLDXuTkgvUUrMcIpp1ka1PsH9+kfvH0bTAJELav+AG2P8uOX
+         AVyQ==
+X-Gm-Message-State: AOJu0YziHEitjNExq6UZZ23TAi+G+VRY0YAj83D35qm4TW+mV/7ghyJJ
+	oJ/Z+FBB0fdh190TTce3/obczBTz1a7Y1xGVeFaAsh0OnfLXZ41nVNPuK+my/NieL8PBuvPKtc1
+	QYC4=
+X-Google-Smtp-Source: AGHT+IFIFCoo6SLSGxNzV6kWD94Xsro0/00zWVpA5rhtezcwp3EdqVVLpcefcuFXcQZljoC9Bfqoww==
+X-Received: by 2002:a5d:6c66:0:b0:381:d133:d541 with SMTP id ffacd0b85a97d-381f0f58573mr168975f8f.11.1730997671790;
+        Thu, 07 Nov 2024 08:41:11 -0800 (PST)
+Received: from localhost.prg2.suse.org ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381eda05ce0sm2124729f8f.103.2024.11.07.08.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 08:41:11 -0800 (PST)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com,
+	ematsumiya@suse.com,
+	Marco Crivellari <marco.crivellari@suse.com>
+Subject: [PATCH] Update misleading comment in cifs_chan_update_iface
+Date: Thu,  7 Nov 2024 17:40:29 +0100
+Message-ID: <20241107164029.322205-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241107125643.04f97394.pasic@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 07, 2024 at 12:56:43PM +0100, Halil Pasic wrote:
-> On Wed, 6 Nov 2024 15:59:10 +0200
-> Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core code?  
-> > 
-> > RDMA core code is drivers/infiniband/core/*.
-> 
-> Understood. So this is a violation of the no direct access to the
-> callbacks rule.
+Since commit 8da33fd11c05 ("cifs: avoid deadlocks while updating iface")
+cifs_chan_update_iface now takes the chan_lock itself, so update the
+comment accordingly.
 
-It is not rule, but more common sense. Callbacks don't provide any
-module reference counting, module autoload e.t.c
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+---
+ fs/smb/client/sess.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-It is very rare situation where you call device callbacks from one subsystem
-in another. I'm not familiar with such situations.
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 3216f786908f..51614a36a100 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -359,10 +359,7 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
+ 	spin_unlock(&ses->chan_lock);
+ }
+ 
+-/*
+- * update the iface for the channel if necessary.
+- * Must be called with chan_lock held.
+- */
++/* update the iface for the channel if necessary. */
+ void
+ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ {
+-- 
+2.47.0
 
-> 
-> > 
-> > > I would guess it is not, and I would not actually mind sending a patch
-> > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
-> > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
-> > > ksmbd_rdma_capable_netdev()").  
-> > 
-> > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
-> > GID, netdev and fabric complexity.
-> 
-> I'm not familiar enough with either of the subsystems. Based on your
-> answer my guess is that it ain't outright bugous but still a layering 
-> violation. Copying linux-cifs@vger.kernel.org so that 
-> the smb are aware.
-> 
-> Thank you very much for all the explanations!
-> 
-> Regards,
-> Halil 
