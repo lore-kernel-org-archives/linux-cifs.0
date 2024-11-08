@@ -1,148 +1,237 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF1E20126C
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Nov 2024 15:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731079262; cv=fail; b=ZxF/dXmNzeL3puEeRAGaFUYRGw0HRv5wm+oyy14wrcg6dYHz8nlD1+yqg065R88pQmOZy9+XZJZ02CHWSEzqfUD+Ny9JxBee/sKYcYVW0flyMTsqKXC7n1hB6dxhrUJBKDu73LA2sU9xjBe2Xy6vRVg0UMj43ayXTIJzH//LIdw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731079262; c=relaxed/simple;
-	bh=bu7O9Sx69QSr3/GQGEzzI9rbtBGaP0kXXRuMdkxq4pk=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=RaUBejEwrOCxsqAcYhMP3xTzpuL+nmMKCT89UDlpspzfaQS3lxMXsxe17RXuan1Apqf1zIWexm1H4+qhmlzi7L48HgMQBrTNS7HtIKgWk/IcCkcF1zoX+WnDlzKGzwv5MRnOqAsJ3trUgxlWYZs9Smp2rKdKF44GaOLSneubJgU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=sbQxbx9w; arc=fail smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4723B1993B7
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Nov 2024 17:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731085423; cv=none; b=FdIA0mD08e7KN4l56KJ3Cwm5CXizakeORjt+CXiR4/relkSwIiMYgamGRylAZKQEc5p44sUnor2Mw1vWJHs49OxbwjjPVxbQ4cMNfjlZur7FASyVzcUPwAI2k+0Xyf1M6Z2o6MitmEHAVwNyY7R6if+M0sp2v+PsXzZ4aeEj/98=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731085423; c=relaxed/simple;
+	bh=DkLkcpSACAPOkdSqpA50/En10RaBzQkMrlzGe67Uqfk=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=WmltL1EMZAq6eG2A5Fq4P2TtAJxB40Gah4yPMhDMWmAvHYIEYbsH11vchd4gxC91M6BNR67ijRlj8wHHRgXAgloaQx2EhJE9jsacICS10ONx6b4MjjQkIOoQ/EO9xZfKQyAhLvk8q678xjKG/NvOcL7CJs7CawpkaIWdHnniFa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T6qgXWuX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="sbQxbx9w"
-Message-ID: <cc06137a94a01901ff5cd9de6a223675@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731079258;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6qgXWuX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731085419;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tONUFKxJF+dCjmAV+rDz2KJ3/3gZ2Fn37DrUjvVW9Z0=;
-	b=sbQxbx9w+ZVuL/dU9wvYDUHdHhSs2EnirshbLTYDeUbQg4QR19oeg/fb/Ivd9aYBobW1C/
-	5aPVZlABhAAIXnNUj1m/+bvz3BVgqHwSHthJ/xabDpU2+CGb9fs2yXpJ5bFuhjD27Dknd8
-	s2vX/mptgGDKoXgvGs2z2oF+LKPWgWCDlFfVdQCRM2spD6nHzbClKFp5LlZe7/eBcdh1qF
-	K5sQKminbyye4AXhAzAVwKLX/jdQs+3Fw/hlMDCMtS/0dfi2pJt6/e1r+jwgRxaplC849d
-	d5xS81MPaZfAlvzb/EZf8ky7E1VuCVdh9N8PX6rHTpU1DAK1DmbjIhiwkQ4bIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731079258; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tONUFKxJF+dCjmAV+rDz2KJ3/3gZ2Fn37DrUjvVW9Z0=;
-	b=DnWDxnqWjNkFi2ZahpfEYTQ+lQN0qMdIOBHa9fTIQStqLcDNs1umI6nDjt+O7MTs6Jp8GA
-	LsRi0k2ugkYtiwC2QTSrUNOZ4FiCQ+9fw0BwsWxYuk71wbfAC6Rnr60zeTVIpuVE0Eiv74
-	dLNQm7ICqtKDVX20uoNGZHfkiWUhGMR+tRPfMG4qbRRvD26Y1xOcHwlUOCrjx6HzbUiAA4
-	DUJNxid9mohktow2jMF5K7FD2u+dC1CDPuSh/02YkU6nBk+CGfsETQX2YoWAP19+ZLJEdA
-	oA25k2c8x0VWj8zsrM5zyMpNBhYsRFLVZPvPYzLz7J0sUEZkIMHRCxOQHBniuw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731079258; a=rsa-sha256;
-	cv=none;
-	b=gO6yyqctncbhYxv1vy2nT+NBnzr6Eui82sVO6TAqq8aWy+OvmMEmlgpoHnYm2ITlDGyLNb
-	uHK39a/mKQTgHUnVGWPC4zReKhK8TqCyukrvCUMsT3A+gur6ovCY0LiaqVOiNe7ppsKUBC
-	YYrzdGalTowpesFItSboqFWItfdTfEsLH1EmBgI8CJJk2qrdn7f9tn923yZ0UrOEY08NkZ
-	nnczs6U9BsUG9LyUqB+xe6YAOM532i2ffdzlan9g0aujDP7a1t1kL3Ahd9CeLtaCeLvUP3
-	D+2LKeDrJCA3TfWaeI7rugc5ePKnHy9Ktu9KQslLqeDc4f9y8K/hVRcQWKmPmg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-From: Paulo Alcantara <pc@manguebit.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: meetakshisetiyaoss@gmail.com, smfrench@gmail.com, sfrench@samba.org,
- lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
- linux-cifs@vger.kernel.org, bharathsm.hsk@gmail.com, Meetakshi Setiya
- <msetiya@microsoft.com>
-Subject: Re: [PATCH 2/2] cifs: support mounting with alternate password to
- allow password rotation
-In-Reply-To: <CANT5p=qJ+zAU_0bMx=5uhsD1a5BR4Nj8Uv0KvNPOBNt9AtPs6w@mail.gmail.com>
-References: <20241030142829.234828-1-meetakshisetiyaoss@gmail.com>
- <20241030142829.234828-2-meetakshisetiyaoss@gmail.com>
- <0282479bc2f446bcb34c53a30bb53bda@manguebit.com>
- <CANT5p=qJ+zAU_0bMx=5uhsD1a5BR4Nj8Uv0KvNPOBNt9AtPs6w@mail.gmail.com>
-Date: Fri, 08 Nov 2024 12:20:53 -0300
+	bh=kTE7HN+soO/Za76tq6046j/ukmrXopkun1LVu89YTbU=;
+	b=T6qgXWuXIaXxnI2eW9WKV/AmKfOKS2YBliK/5XAu/N5yENxsHnR8Q1OD66feCJ7afKNNQ0
+	DHcbC6T2trSZVIP6SVywfNpWs9Gb3GjVtaKt31lrtK5teI+zww8NR4iMfFiXyI9VkA82Vv
+	bjYt2GOlUghFOa9Z6Whot8YmBwm3EJc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-d2vfCBO4PnGWgeJI8QflhA-1; Fri,
+ 08 Nov 2024 12:03:36 -0500
+X-MC-Unique: d2vfCBO4PnGWgeJI8QflhA-1
+X-Mimecast-MFC-AGG-ID: d2vfCBO4PnGWgeJI8QflhA
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE2041955EA1;
+	Fri,  8 Nov 2024 17:03:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.231])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 03B2C1953880;
+	Fri,  8 Nov 2024 17:03:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20241106123559.724888-29-dhowells@redhat.com>
+References: <20241106123559.724888-29-dhowells@redhat.com> <20241106123559.724888-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 28/33] netfs: Change the read result collector to only use one work item
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1321311.1731085403.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Nov 2024 17:03:23 +0000
+Message-ID: <1321312.1731085403@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+This patch needs the attached adjustment folding in.
 
-> On Fri, Nov 8, 2024 at 12:35=E2=80=AFAM Paulo Alcantara <pc@manguebit.com=
-> wrote:
->>
->> meetakshisetiyaoss@gmail.com writes:
->>
->> > @@ -2245,6 +2269,7 @@ struct cifs_ses *
->> >  cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_conte=
-xt *ctx)
->> >  {
->> >       int rc =3D 0;
->> > +     int retries =3D 0;
->> >       unsigned int xid;
->> >       struct cifs_ses *ses;
->> >       struct sockaddr_in *addr =3D (struct sockaddr_in *)&server->dsta=
-ddr;
->> > @@ -2263,6 +2288,8 @@ cifs_get_smb_ses(struct TCP_Server_Info *server,=
- struct smb3_fs_context *ctx)
->> >                       cifs_dbg(FYI, "Session needs reconnect\n");
->> >
->> >                       mutex_lock(&ses->session_mutex);
->> > +
->> > +retry_old_session:
->> >                       rc =3D cifs_negotiate_protocol(xid, ses, server);
->> >                       if (rc) {
->> >                               mutex_unlock(&ses->session_mutex);
->> > @@ -2275,6 +2302,13 @@ cifs_get_smb_ses(struct TCP_Server_Info *server=
-, struct smb3_fs_context *ctx)
->> >                       rc =3D cifs_setup_session(xid, ses, server,
->> >                                               ctx->local_nls);
->> >                       if (rc) {
->> > +                             if (((rc =3D=3D -EACCES) || (rc =3D=3D -=
-EKEYEXPIRED) ||
->> > +                                     (rc =3D=3D -EKEYREVOKED)) && !re=
-tries && ses->password2) {
->> > +                                     retries++;
->> > +                                     cifs_info("Session reconnect fai=
-led, retrying with alternate password\n");
->>
->> Please don't add more noisy messages over reconnect.  Remember that if
->> SMB session doesn't get re-established, there will be flood enough on
->> dmesg with "Send error in SessSetup =3D ..." messages on every 2s that
->> already pisses off users and customers.
->>
-> Perhaps we could do a cifs_dbg instead of cifs_info.
+David
+---
+commit 2c0cccc7b29a051fadb6816d31f526e4dd45ddf5
+Author: David Howells <dhowells@redhat.com>
+Date:   Thu Nov 7 22:22:49 2024 +0000
 
-Yep, with FYI.
+    netfs: Fix folio abandonment
+    =
 
-> But Paulo, the problem here is that we retry every 2s. I think we
-> should address that instead.
-> One way is to do an exponential backoff every time we retry.
+    The mechanism to handle the abandonment of a folio being read due to a=
+n
+    error occurring in a subrequest (such as if a signal occurs) will corr=
+ectly
+    abandon folios if they're entirely processed in one go; but if the
+    constituent subrequests aren't processed in the same scheduled work it=
+em,
+    the note that the first one failed will get lost if no folios are proc=
+essed
+    (the ABANDON_SREQ note isn't transferred to the NETFS_RREQ_FOLIO_ABAND=
+ON
+    flag unless we process a folio).
+    =
 
-Agreed, but that doesn't mean we should add more noisy messages.
+    Fix this by simplifying the way the mechanism works.  Replace the flag=
+ with
+    a variable that records the file position to which we should abandon
+    folios.  Any folio that overlaps this region at the time of unlocking =
+must
+    be abandoned (and reread).
+    =
 
-> I'd also want to understand why we need the reconnect work?
+    This works because subrequests are processed in order of file position=
+ and
+    each folio is processed as soon as enough subrequest transference is
+    available to cover it - so when the abandonment point is moved, it cov=
+ers
+    only folios that draw data from the dodgy region.
+    =
 
-I see it as an optimisation to allow next IOs to not take longer because
-it needs to reconnect SMB session.  If there was no prior filesystem
-activity, why don't allow the client itself to reconnect the session?
+    Also make sure that NETFS_SREQ_FAILED is set on failure and that
+    stream->failed is set when we cut the stream short.
+    =
 
-Besides, SMB2_IOCTL currently doesn't call smb2_reconnect(), so
-reconnect worker would be required to reconnect the session and then
-allow SMB2_IOCTL to work.  We'd need to change that because with recent
-special file support, we need to avoid failures when creating or parsing
-reparse points because the SMB session isn't re-established yet.
+    Signed-off: David Howells <dhowells@redhat.com>
+    cc: Jeff Layton <jlayton@kernel.org>
+    cc: netfs@lists.linux.dev
+    cc: linux-fsdevel@vger.kernel.org
 
-> Why not always do smb2_reconnect when someone does filesystem calls on
-> the mount point?
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index 73f51039c2fe..7f3a3c056c6e 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -46,7 +46,7 @@ static void netfs_unlock_read_folio(struct netfs_io_requ=
+est *rreq,
+ 	struct netfs_folio *finfo;
+ 	struct folio *folio =3D folioq_folio(folioq, slot);
+ =
 
-We already do for most operations.  SMB2_IOCTL and SMB2_TREE_CONNECT,
-for instance, can't call smb2_reconnect() as they would deadlock.
+-	if (unlikely(test_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags))) {
++	if (unlikely(folio_pos(folio) < rreq->abandon_to)) {
+ 		trace_netfs_folio(folio, netfs_folio_trace_abandon);
+ 		goto just_unlock;
+ 	}
+@@ -126,8 +126,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
+equest *rreq,
+ =
+
+ 		if (*notes & COPY_TO_CACHE)
+ 			set_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
+-		if (*notes & ABANDON_SREQ)
+-			set_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
+ =
+
+ 		folio =3D folioq_folio(folioq, slot);
+ 		if (WARN_ONCE(!folio_test_locked(folio),
+@@ -152,7 +150,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
+equest *rreq,
+ 		*notes |=3D MADE_PROGRESS;
+ =
+
+ 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
+-		clear_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
+ =
+
+ 		/* Clean up the head folioq.  If we clear an entire folioq, then
+ 		 * we can get rid of it provided it's not also the tail folioq
+@@ -251,6 +248,12 @@ static void netfs_collect_read_results(struct netfs_i=
+o_request *rreq)
+ 			if (test_bit(NETFS_SREQ_COPY_TO_CACHE, &front->flags))
+ 				notes |=3D COPY_TO_CACHE;
+ =
+
++			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
++				rreq->abandon_to =3D front->start + front->len;
++				front->transferred =3D front->len;
++				transferred =3D front->len;
++				trace_netfs_rreq(rreq, netfs_rreq_trace_set_abandon);
++			}
+ 			if (front->start + transferred >=3D rreq->cleaned_to + fsize ||
+ 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
+ 				netfs_read_unlock_folios(rreq, &notes);
+@@ -268,6 +271,7 @@ static void netfs_collect_read_results(struct netfs_io=
+_request *rreq)
+ 				stream->error =3D front->error;
+ 				rreq->error =3D front->error;
+ 				set_bit(NETFS_RREQ_FAILED, &rreq->flags);
++				stream->failed =3D true;
+ 			}
+ 			notes |=3D MADE_PROGRESS | ABANDON_SREQ;
+ 		} else if (test_bit(NETFS_SREQ_NEED_RETRY, &front->flags)) {
+@@ -566,6 +570,7 @@ void netfs_read_subreq_terminated(struct netfs_io_subr=
+equest *subreq)
+ 			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+ 		} else {
+ 			netfs_stat(&netfs_n_rh_download_failed);
++			__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 		}
+ 		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
+ 		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index c00cffa1da13..4af7208e1360 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -260,6 +260,7 @@ struct netfs_io_request {
+ 	atomic64_t		issued_to;	/* Write issuer folio cursor */
+ 	unsigned long long	collected_to;	/* Point we've collected to */
+ 	unsigned long long	cleaned_to;	/* Position we've cleaned folios to */
++	unsigned long long	abandon_to;	/* Position to abandon folios to */
+ 	pgoff_t			no_unlock_folio; /* Don't unlock this folio after read */
+ 	unsigned char		front_folio_order; /* Order (size) of front folio */
+ 	refcount_t		ref;
+@@ -271,7 +272,6 @@ struct netfs_io_request {
+ #define NETFS_RREQ_FAILED		4	/* The request failed */
+ #define NETFS_RREQ_IN_PROGRESS		5	/* Unlocked when the request completes =
+*/
+ #define NETFS_RREQ_FOLIO_COPY_TO_CACHE	6	/* Copy current folio to cache f=
+rom read */
+-#define NETFS_RREQ_FOLIO_ABANDON	7	/* Abandon failed folio from read */
+ #define NETFS_RREQ_UPLOAD_TO_SERVER	8	/* Need to write to the server */
+ #define NETFS_RREQ_NONBLOCK		9	/* Don't block if possible (O_NONBLOCK) */
+ #define NETFS_RREQ_BLOCKED		10	/* We blocked */
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index cf14545ca2bd..22eb77b1f5e6 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -56,6 +56,7 @@
+ 	EM(netfs_rreq_trace_free,		"FREE   ")	\
+ 	EM(netfs_rreq_trace_redirty,		"REDIRTY")	\
+ 	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
++	EM(netfs_rreq_trace_set_abandon,	"S-ABNDN")	\
+ 	EM(netfs_rreq_trace_set_pause,		"PAUSE  ")	\
+ 	EM(netfs_rreq_trace_unlock,		"UNLOCK ")	\
+ 	EM(netfs_rreq_trace_unlock_pgpriv2,	"UNLCK-2")	\
+
