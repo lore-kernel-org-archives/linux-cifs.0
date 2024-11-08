@@ -1,104 +1,137 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A941AA1F1;
-	Fri,  8 Nov 2024 22:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3E01A9B5C
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Nov 2024 22:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731105014; cv=none; b=E56PoqYVgR1qp7sdQ7ExBBtYxSMMBlCygvZywvXOUk8PDPA+L2KcFK7Qn93FxFi/pIeMRmNkvpgAMNjIxB1feiDTFBMKLl9TISYXSWw1Ye1c037Hr2uaf8RvZ+/H+P89aMrbUGgUJiLV4/T1Gh4A1y6rnDf83oS+xUxpmtieZio=
+	t=1731105224; cv=none; b=mMP3MsA8Toyhxz+uuDBNKZWu+o3a8oI+ffuiKnowJUnSdwLt+PzQLRqYjMawjFWAdABBYLUEa2/v+0/wJkf0QM0czfg6q72gPEK3+BrqbC/vQa2r5HALdfysj/9N4mcVuQcxDwYqmYmo8oFWbfrTLkP6UpbGbPQGbFI2yloBHX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731105014; c=relaxed/simple;
-	bh=9ZtlgWcb8duhNVqPDAn5hIYaU83Rr15xcO+2oQoFQmg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sRh6Ikhb2x7KhVGC4fKhq+xbmoupIncn+GYU/frtlXmYf/8Dy3tBF3R5IFSOZzlaaHMAMJ8a5ETVoJC0Xi31xwBAsx809GAJhYwfv+3UzvJKMtGyN8ve9lszyLrxEnbtPXMu56E45jeedACHT7YAicu3kXHEu6Ki5ojlymSFcvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bStwo8Y5; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1731105224; c=relaxed/simple;
+	bh=uFSTc6SxT2Vo+1CHNP4iUCsYg8Ujz80chMYqrgo0694=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WuDWLF1A6rL4oBtw0yfPNoSDUpWmSgD2E8eIexf9eycEAwQw9Khjtko4IvVUhsxUjObnknyZWDVSZEhkq7Wawp+r+cUf5HBY0Qu2fQAjABQP7+3okrF3XojPUyl9HmhkhOKgGoFvIfxeGg41gqi46Yk/bQs21ECS/RP/cmsvpHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8DVtmeX; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bStwo8Y5"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-539f6e1f756so3190057e87.0;
-        Fri, 08 Nov 2024 14:30:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8DVtmeX"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539f2b95775so3712237e87.1
+        for <linux-cifs@vger.kernel.org>; Fri, 08 Nov 2024 14:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731105010; x=1731709810; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ntDc+E2Dx+rmuw80lGROxVvsemnHwiBssXUslPLnRYQ=;
-        b=bStwo8Y521BMUXe6O0AIDEH2bijEN1vRjc20O5hWbzfhSwa6WEkjJ8wQKhe2gVGO4/
-         XKJa2oxAuSjLY3e+kmSdWfYUy8XS3HA0/SYJQhVeXZtNu2GyViwpubaf9YoadFQoKn1h
-         OF2JsBRzfAuOQeVOj6RfNb7v+6Uj2S7Puuft1syj91u2fC72H3w7s96YQZjKxc9G5HcD
-         dfuC5BFnrFNitWN6hZxm7SG7s4WClEzF5CR1SuZXYt6dRwsQaLPhprU+POP+RkaFYs/l
-         0GRWDCh+JEk2+Mgo60NNgwxtgRXsLO/+ga7s/STWduaJMlw1Vc/AAjOCs/E+Hfmy+tLm
-         Z9+g==
+        d=gmail.com; s=20230601; t=1731105221; x=1731710021; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pB2Whn/pgSg1DR8MyTstwu36l7nhUeSXY8ZZHDepHzA=;
+        b=e8DVtmeXXxZ7cddX42upE8FFlk7F58xr6WjKDG4iaZFLvQj3ukYNMUz46oM9MRS9ll
+         7hUnXegCuA16vZcnKKoZD/pJiAae+3KoUccx7VTj7t3RAx1KVbAKh+bIO5iT5g/UXkEB
+         3Ik/yid09Zo0QGN3qrxlei2LKMvd4aXjg7Lqbf8HsqjwWtGRGxtMpt/rHZNJweo0zFN3
+         uInYBv/kgFoCJeMeyGS6bl7pGAZtDckwlD2F6AmJjQAqN8d8TWgTjEJPbSIxigXpm9bU
+         Tj+0oy4LFOrFCdB4mPs8rlm9fkUWPTadNKkVsTIlqKKEvDUKiUIOSKgsQ9t/cjwy6osX
+         /1Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731105010; x=1731709810;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ntDc+E2Dx+rmuw80lGROxVvsemnHwiBssXUslPLnRYQ=;
-        b=TIzs8S0rlUm/A3RdSYBFgKda2W6KqSaUZh1FY3+qAm001cDiON4tK4ub7+N8o8ngD3
-         rTIlK+IiLJPZZjNYRg3Dxbo5qQjRqurBNocTK3Q8vJ+t/ZHEMFINshWtUtJ/tzMS4Eo7
-         B1VMwk6ErH6eRWF8j45Yq95qiH8pSd56XBgJ4OAc/M674ISl27B/m03yv2BKeNNxnieD
-         YEreLnEWvvLTWslE7rWury/dtE18CGmp9g3o3Q4FASFS3gBPsgUUoAq8M+LlA+X3ZQaf
-         fCMZHzrqrJGfpVPIh/YxOds5z9OMJXX5cdEToH6q2slLzVGLAn+L7E4AW5HL/Zw9o7h9
-         PqRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCxE+8zhwDNUwMtSG1uUty6KqL6uZ6KtMhxJ3TlWlBmu2Vt9z5v6WLH46rX1+y2s+XGOMesgBTSKew3rcO@vger.kernel.org, AJvYcCVr9ll2UdtH8b36SAxhgwuW9cko8kRRuhdl8daZJNrK8UvqFSBQ+YAJe1n06mjje1YYF5Qe8KQR/gf5@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeDH6j+q1oAwT5i1uSNa99Z3zlEljzsp+0r25zqjEz8nSftgUy
-	8aAGV09wOaanlt66LglKhL52T/Cg2vRdmkjda+h5eKyrNooaDU3Jz4d7pkW/oOmF3jrdzCg4vGk
-	3EIoFRPgWQGczlukNpY0CtsXu4i8=
-X-Google-Smtp-Source: AGHT+IHIxtFntdiAEdNB/zI5le+OJOQGaLItdQu1V7tD6VQauamRkwfCYrsvhzoidJUK+BCHm7KG3uJNe0DkqtWlwzo=
-X-Received: by 2002:a05:6512:33c6:b0:539:e88f:2398 with SMTP id
- 2adb3069b0e04-53d862ee21emr2239992e87.39.1731105010176; Fri, 08 Nov 2024
- 14:30:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731105221; x=1731710021;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pB2Whn/pgSg1DR8MyTstwu36l7nhUeSXY8ZZHDepHzA=;
+        b=Va0dkUEfBuhndnvRyRTgjp6UI6fjJJ4606Bd1SLpWiPbIpZmsKytTWkhZ006A8O27J
+         QsPhnlE3O4A/YTVF+csJ9sWZcne3GMjopQ8xjqcIDxAw6uewFXqFrCrgvw90C+znCh76
+         YCyX+sD8yzXql0S6P1D0qrzsNzeVkzok2d1rQcvx4P5Ui/0Vse8O/zzzn3wDOWLHh9PC
+         iOmNqhJ0FM6N/GCoOTv8QezssxUbiR9VD7DIutvBZ9BLo32U148wCEguMFGSTCJusXVN
+         +iOVaS/PUU4W0lhMGjoBrKTzWj8iSA0+7BWy6DudCZUCAufy27FpwEHwr5PhFRGAlhpZ
+         T8WA==
+X-Gm-Message-State: AOJu0YxecSrKZ2EcZtfc6nkdTXDq/3sAYbfmXG/od/gXx3RAlPVqjSjo
+	7s+IicrtmwlXgQsJ/qSaZUo6AiVg5+i9sahABRVZVYzbz/ktMN8vvNvXKBBO2S1jqaSK4CdeqN0
+	5xJy+dXea541K7GthENdtCHE2ODTHug==
+X-Google-Smtp-Source: AGHT+IEw+EfBgYV0aRyetLM0OKdom/5Scl/QxZ6C8POgMadRtmg34MzNR1G3Pypj/Uwmd/jh7/nGoXh2z6b6jdcTyYY=
+X-Received: by 2002:a05:6512:6d6:b0:536:54ff:51c8 with SMTP id
+ 2adb3069b0e04-53d862c6fa8mr3661130e87.17.1731105220496; Fri, 08 Nov 2024
+ 14:33:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20241108222906.3257172-1-paul@darkrain42.org> <20241108222906.3257172-6-paul@darkrain42.org>
+In-Reply-To: <20241108222906.3257172-6-paul@darkrain42.org>
 From: Steve French <smfrench@gmail.com>
-Date: Fri, 8 Nov 2024 16:29:59 -0600
-Message-ID: <CAH2r5mu+pJMkChJBwgZ9mHjf6s8JxDAtfTU5fFcqir1rdqNXtw@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+Date: Fri, 8 Nov 2024 16:33:29 -0600
+Message-ID: <CAH2r5muH2W6GZPd-eE6q4vrOoituZsMyM17dKyppqcoCkVosbw@mail.gmail.com>
+Subject: Re: [PATCH 5/5] smb: During umount, flush any pending lease breaks
+ for cached dirs
+To: Paul Aurich <paul@darkrain42.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-81983758430957d9a5cb3333fe324fd70cf63e7e:
+Aah - thanks for this, I will try to test it out as well, and could be
+very important if it also addresses a problem with the laundromat
+cleanup race (with directory lease freeing) that I have also seen on
+umount to Windows server.
 
-  Linux 6.12-rc5 (2024-10-27 12:52:02 -1000)
+Are there other patches in the series you want us to look at and/or
+test (your email said patch 5/5)?
 
-are available in the Git repository at:
 
-  git://git.samba.org/ksmbd.git tags/v6.12-rc6-ksmbd-fixes
+On Fri, Nov 8, 2024 at 4:29=E2=80=AFPM Paul Aurich <paul@darkrain42.org> wr=
+ote:
+>
+> *** WORK IN PROGRESS ***
+>
+> If a lease break is received right as a filesystem is being unmounted,
+> it's possible for cifs_kill_sb() to race with a queued
+> smb2_cached_lease_break(). Since the cfid is no longer on the
+> cfids->entries list, close_all_cached_dirs() cannot drop the dentry,
+> leading to the unmount to report these BUGs:
+>
+> BUG: Dentry ffff88814f37e358{i=3D1000000000080,n=3D/}  still in use (2) [=
+unmount of cifs cifs]
+> VFS: Busy inodes after unmount of cifs (cifs)
+> ------------[ cut here ]------------
+> kernel BUG at fs/super.c:661!
+>
+> Flush anything in the cifsiod_wq workqueue in close_all_cached_dirs.
+>
+> Fixes: ebe98f1447bb ("cifs: enable caching of directories for which a lea=
+se is held")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paul Aurich <paul@darkrain42.org>
+> ---
+>  fs/smb/client/cached_dir.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+> index de1e41abdaf2..931108b3bb4a 100644
+> --- a/fs/smb/client/cached_dir.c
+> +++ b/fs/smb/client/cached_dir.c
+> @@ -482,10 +482,13 @@ void close_all_cached_dirs(struct cifs_sb_info *cif=
+s_sb)
+>                 list_for_each_entry(cfid, &cfids->entries, entry) {
+>                         dput(cfid->dentry);
+>                         cfid->dentry =3D NULL;
+>                 }
+>         }
+> +
+> +       /* Flush any pending lease breaks */
+> +       flush_workqueue(cifsiod_wq);
+>  }
+>
+>  /*
+>   * Invalidate all cached dirs when a TCON has been reset
+>   * due to a session loss.
+> --
+> 2.45.2
+>
+>
 
-for you to fetch changes up to 0a77d947f599b1f39065015bec99390d0c0022ee:
 
-  ksmbd: check outstanding simultaneous SMB operations (2024-11-05
-09:26:38 +0900)
-
-----------------------------------------------------------------
-four fixes, also for stable
-- fix two potential use after free issues
-- fix OOM issue with many simultaneous requests
-- fix missing error check in RPC pipe handling
-----------------------------------------------------------------
-Jinjie Ruan (1):
-      ksmbd: Fix the missing xa_store error check
-
-Namjae Jeon (3):
-      ksmbd: fix slab-use-after-free in ksmbd_smb2_session_create
-      ksmbd: fix slab-use-after-free in smb3_preauth_hash_rsp
-      ksmbd: check outstanding simultaneous SMB operations
-
- fs/smb/server/connection.c        |  1 +
- fs/smb/server/connection.h        |  1 +
- fs/smb/server/mgmt/user_session.c | 15 ++++++++++-----
- fs/smb/server/server.c            | 20 ++++++++++++--------
- fs/smb/server/smb_common.c        | 10 +++++++---
- fs/smb/server/smb_common.h        |  2 +-
- 6 files changed, 32 insertions(+), 17 deletions(-)
-
--- 
+--
 Thanks,
 
 Steve
