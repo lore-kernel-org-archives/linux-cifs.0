@@ -1,148 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C90E2309FD
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Nov 2024 17:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B247233D67;
+	Fri,  8 Nov 2024 17:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731087416; cv=none; b=JuSbwr/wMYd2q3sKntgKDgbtz1sfTJQRZ22wgwdah+18Fcdm91ytvMyo4tuA63xeKE8YMWTwZ/ZEmawh4v1lwOz7W2OlVpKxBQob8Fo60Q5Bki3dhuXxTipRALgh7xeTX3jbRUXmihPXWV/efNtvKSV3QzFHbgfEFMkE/GpjE2Y=
+	t=1731088753; cv=none; b=Xuxx5jn/+VLZkqsnlZFymsvCFlLFmvXqlOfT+UVoi37YtV/RbhR/IQAF4Mm+Fr8u7D81vOPoOgRgLeOefmp/zDvsQDGaFUaSxdXrgNiitHkCjg3s+xuIY6lessj5VtHDXM78GikhkKz5jcpNOzCXclbPktY+CW9YEGr92EGCN24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731087416; c=relaxed/simple;
-	bh=Py06Ff5m2c85n2uHi5fEm6kPZKCWzBfcFnAIEcZ8I5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nhadm3o6p2Kjl7PwPJpDh98KLDc9TOb5JDEBrnWi9M/d5yDyAEp76dZyUKaUZDJIWq1D/d5K6FHu7+6rOyfbsSkUF65YxBiAHxsBWxc8LGPdM6cB+RzjQLBNpsWZg3Xg3EmXOSGdSPbGLXafKz7ObS2KIswMgqzJE10YW878+1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V/scgHLs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1731088753; c=relaxed/simple;
+	bh=njRHL3LaliikKZctNZcbQmlhWG5PDd/sxP2CVB4KNl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FFUjp1ajSdus5ed4RSbm/X1QpJSHp/mJbYNQN1RJtM9O3o4EpVpNSV9GM7UEbi90sOzTI0kexluoWmpNqys/ogmeb3QhjLzBwDYWgEhZrJs6CuJkFJAw1GEXgyd/I2+Llm5K9FtEf1WvbL+kJ0GxvaYemXMX0bHigwzZZ56qAtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9xbZGPU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V/scgHLs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731087410;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QCDL9BqA4pDDX31tPDuoaoWVDY2hJyHDwXlxpfOucp0=;
-	b=V/scgHLs2bAVKOQo7/2UK/ukxlI5qyeIefm0mn+N51APVEaJ4FY9dImnc2phF6l8mvZ/eY
-	FISaLTJJktbMTT+fpiape0hH9gxsEl+eIwR6/OWTOZbXZQxtBqZCeadwMzrG9bOWL7OQyw
-	dINnTMzA3BTtLVilpdcLBxRtoJ2Y/7E=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-222-bt92h9XNNfuuPtpTLYdiAw-1; Fri,
- 08 Nov 2024 12:36:44 -0500
-X-MC-Unique: bt92h9XNNfuuPtpTLYdiAw-1
-X-Mimecast-MFC-AGG-ID: bt92h9XNNfuuPtpTLYdiAw
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A6A8195609F;
-	Fri,  8 Nov 2024 17:36:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BF7EA1953880;
-	Fri,  8 Nov 2024 17:36:30 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9xbZGPU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CCAC4CECD;
+	Fri,  8 Nov 2024 17:59:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731088752;
+	bh=njRHL3LaliikKZctNZcbQmlhWG5PDd/sxP2CVB4KNl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o9xbZGPUoEDjcljiuA04F7V2sPGjbnBqOHkxiJIqWEC8kQP3ScBiINGTeelI13nDE
+	 rOgX8Cb9wPFHBVq+tppbBl26ZQbrPs2+9XOZu+CpobBs0CSB7tCdCypWqxo4BfpqUj
+	 IGbdma8WYKUwdtwXoeIGIKFbR6/1CGUXlVfF5wrBL6Svn1aHNBonQosJgHbJVwcF9H
+	 32xT46rGOfSJs4enLRTS45FOOYLrl/yZRNmh88IRyc2UVezJR5thxLc93qXT+MbLbZ
+	 +c1i2XO4EDDewVeqxdYV6k35H+6ewPFbMJChCPBEbMvJM0IyWenSY0tsmNvF61w4ej
+	 LggrNLE0sJ5NQ==
+Date: Fri, 8 Nov 2024 19:59:06 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Nils Hoppmann <niho@linux.ibm.com>,
+	Niklas Schnell <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>,
 	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 32/33] afs: Add a tracepoint for afs_read_receive()
-Date: Fri,  8 Nov 2024 17:32:33 +0000
-Message-ID: <20241108173236.1382366-33-dhowells@redhat.com>
-In-Reply-To: <20241108173236.1382366-1-dhowells@redhat.com>
-References: <20241108173236.1382366-1-dhowells@redhat.com>
+	Kangjing Huang <huangkangjing@gmail.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+Message-ID: <20241108175906.GB189042@unreal>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+ <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+ <20241105112313.GE311159@unreal>
+ <20241106102439.4ca5effc.pasic@linux.ibm.com>
+ <20241106135910.GF5006@unreal>
+ <20241107125643.04f97394.pasic@linux.ibm.com>
+ <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
 
-Add a tracepoint for afs_read_receive() to allow potential missed wakeups
-to be debugged.
+On Fri, Nov 08, 2024 at 08:40:40AM +0900, Namjae Jeon wrote:
+> On Thu, Nov 7, 2024 at 9:00 PM Halil Pasic <pasic@linux.ibm.com> wrote:
+> >
+> > On Wed, 6 Nov 2024 15:59:10 +0200
+> > Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core code?
+> > >
+> > > RDMA core code is drivers/infiniband/core/*.
+> >
+> > Understood. So this is a violation of the no direct access to the
+> > callbacks rule.
+> >
+> > >
+> > > > I would guess it is not, and I would not actually mind sending a patch
+> > > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
+> > > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
+> > > > ksmbd_rdma_capable_netdev()").
+> > >
+> > > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
+> > > GID, netdev and fabric complexity.
+> >
+> > I'm not familiar enough with either of the subsystems. Based on your
+> > answer my guess is that it ain't outright bugous but still a layering
+> > violation. Copying linux-cifs@vger.kernel.org so that
+> > the smb are aware.
+> Could you please elaborate what the violation is ?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: linux-afs@lists.infradead.org
----
- fs/afs/file.c              |  1 +
- include/trace/events/afs.h | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+There are many, but the most screaming is that ksmbd has logic to
+differentiate IPoIB devices. These devices are pure netdev devices
+and should be treated like that. ULPs should treat them exactly
+as they treat netdev devices.
 
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index c296efebb491..fc15497608c6 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -274,6 +274,7 @@ static void afs_read_receive(struct afs_call *call)
- 	state = READ_ONCE(call->state);
- 	if (state == AFS_CALL_COMPLETE)
- 		return;
-+	trace_afs_read_recv(op, call);
- 
- 	while (state < AFS_CALL_COMPLETE && READ_ONCE(call->need_attention)) {
- 		WRITE_ONCE(call->need_attention, false);
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index c52fd83ca9b7..2e92487f3f34 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -1775,6 +1775,36 @@ TRACE_EVENT(afs_make_call,
- 		      __entry->fid.unique)
- 	    );
- 
-+TRACE_EVENT(afs_read_recv,
-+	    TP_PROTO(const struct afs_operation *op, const struct afs_call *call),
-+
-+	    TP_ARGS(op, call),
-+
-+	    TP_STRUCT__entry(
-+		    __field(unsigned int,		rreq)
-+		    __field(unsigned int,		sreq)
-+		    __field(unsigned int,		op)
-+		    __field(unsigned int,		op_flags)
-+		    __field(unsigned int,		call)
-+		    __field(enum afs_call_state,	call_state)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->op = op->debug_id;
-+		    __entry->sreq = op->fetch.subreq->debug_index;
-+		    __entry->rreq = op->fetch.subreq->rreq->debug_id;
-+		    __entry->op_flags = op->flags;
-+		    __entry->call = call->debug_id;
-+		    __entry->call_state = call->state;
-+			   ),
-+
-+	    TP_printk("R=%08x[%x] OP=%08x c=%08x cs=%x of=%x",
-+		      __entry->rreq, __entry->sreq,
-+		      __entry->op,
-+		      __entry->call, __entry->call_state,
-+		      __entry->op_flags)
-+	    );
-+
- #endif /* _TRACE_AFS_H */
- 
- /* This part must be outside protection */
-
+> I would also appreciate it if you could suggest to me how to fix this.
+> 
+> Thanks.
+> >
+> > Thank you very much for all the explanations!
+> >
+> > Regards,
+> > Halil
+> >
