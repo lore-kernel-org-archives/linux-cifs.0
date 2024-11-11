@@ -1,106 +1,217 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C5615666B
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Nov 2024 12:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F5019D078
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Nov 2024 13:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731326649; cv=fail; b=icU8cgRge5DhQOhCfPS775CIB9EZLQlYq+PbtRrYdxLhaMcvA8vA26Teg0z552/cQG1+x3LjlIrP7c/kkNcCn75ajVNHoIGo6lygYrxlM5gTuDegqkQjK6aa0PqxZEN4jUZMI3bf0axlGpUzADIqeoXT4zIso/QDDJHU7X0Kwbk=
+	t=1731332475; cv=fail; b=UZmFrunCRqkoDQHQB9OxpLx4Yx+H1znCjtSU11zhoR0Z+0rIFOWLGVQrRtEUFSJ+2QwRongtJn/gKAeFF8rB6vD5mhX54F4L+EpuDbue1cPI6sSRthp9Mg0NDXJCO8siAUAaD0S8r+mcdoiZqgQOilbGboL9ewLsfgmt/TrwM/E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731326649; c=relaxed/simple;
-	bh=kvoFiBBs8gXmjAPxqGuQK4zVGm29Jt+7gTMTKf6ctPo=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=JVDZoscdhhBITrLNaRQ7oHyjfmiPE4UFTxW9hB0PfJTDY4oMovcUQc4UhZ0PJH9zyYYHePMZjUvOC2/5Vp7NNYB2+MUVFVzXGkrbwUYNOyQmVe+aY6d+DKmYRQbqqgMLgIbr6GlAF8Woda7slfFOSpZyh8ZqQ9UCF5ODrui14Q4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=gExsD9+u; arc=fail smtp.client-ip=167.235.159.17
+	s=arc-20240116; t=1731332475; c=relaxed/simple;
+	bh=XtPh3A6GY7tGq7IiW+ISg02szZ0LKbHlsMSrsKqgKQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mkvl0czG8owAJKDLImc/pGAKEYOHkw5MZZ4st5HROFFczS2/s4WTCgYBfwxRQhBVKamU0WdD+7EqsMsK3swvYXGB1vpKNMaJFQgjAtUouZEV6mG0jjrZ3Oqx2NqHhlAurUSfKvbet+VjHc1aZuew3aTam1Hi8BY0Xzii1O0LH4E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=aKyHvG3m; arc=fail smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="gExsD9+u"
-Message-ID: <b8164b0a49ad6d4cd60142fa55ad3566@manguebit.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="aKyHvG3m"
+From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731326640;
+	s=dkim; t=1731332471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bk7UH2kuN9dzwDFVDSivvcjE08Fbv7fH9vSTXGdc9tc=;
-	b=gExsD9+uVc+OXSR80n1g6fT9/xdfYxOP2S66e9U/qcN4U1YWyOYkNpOv3fk0aG8fYEzC5W
-	+tLIl+Lupe6/dDSgm0PTZK1QP0ykhtlf5OiQEvglf6N0aXAqzaQFEmbjUOQIT0fmDyIyge
-	ynY4a+sqjK3yWyrLKUU9oV4TQ+PqRzY1l3LsVyCkZctij8LAWo1NEW6iLUElqGB12CldI6
-	XJLTuTGO7WlafsXmPcvlXT16y84v8dMRVRsBrVJVSp27zIExCRIpyL4ZlR3Okp421ZeIFv
-	ccBpBFsv8U9dOJTLBCdYpyGwGdIVg8/W/qnVGhOsWUI8Yo4+NDPkzVcUCXkdpw==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nk1zr3IOKgZkalXZrKJKIHqUk7AWBPllVW3rnGiSq20=;
+	b=aKyHvG3mwWoWYWG9FyApczdZLJHkJcaEWWTCfFfB2sEEbYMuE1QBIfZLoxfOn5ggyIdk4v
+	aC9Livw2erIzvSthWGHBdfFWEKbpk7Aw0xyCeGZvH7zrB6NHrVmO0lf/03eoEJfcEFGRcx
+	iKCLGmDe4i7+ROxUwXrLzlIZ4k/Kf1JMiDZWKZj4ke5uzLEbEsRMXaLssZkcugqpX2EH0n
+	kds4YP9+PAVr3bBHEkae+VC5j//ptAs89CU+K80tvJxEukBist7DJpSC8XUI9gVJykOk13
+	AfVdMUgzLQgt4wyG2eupbBBnsPwYpEkKPeX/C7LVxmYUye5/BuRMMBoQQHIevQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731326640; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1731332471; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bk7UH2kuN9dzwDFVDSivvcjE08Fbv7fH9vSTXGdc9tc=;
-	b=OO2rCIdDgiegq9TM8Z307DSkRtXGvGvh51yytK5W4XD9FnLFROsCIf4G9IpvnbWkiCpSQd
-	EyQRcesYHAZnG34G0RW9GJbZF4QEdiVA61HXSlw5Grgu5fh0wJuz/9mhIMjlemGitXTMcB
-	RCSqpn6a3YxWfTcj+trQFgaWPJ8mcHnmCz9cYb8q7Hu9ZDy3jImrWrOMJ836CRVcxvwtq2
-	npGpknx97u6oqEYwHQ3TY23aQHKVTzxxXj74GfK7StmShJI8wUNHuCgxKcEuLUj68+ifRT
-	g9Nrq+8C2JRfV7HvWwwArXmibah3jwyu7pM4PHWLdhv53LXaVfg68+Fpkk4+Gw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731326640; a=rsa-sha256;
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=Nk1zr3IOKgZkalXZrKJKIHqUk7AWBPllVW3rnGiSq20=;
+	b=Q1s1g0Xlr5a0Zzjqfc7KoiO/fFeINLltKBHqYp98fC6r5NV0MSf3ccgoSjN9A7+93Nawa/
+	lyosIkFVFOxBfgIQRXrHkKT6Ewei5TyyuTjaPlD2vxVAL9q9qV8yP25iJ/slaDU/Adm4X9
+	I1VaTyEhC9mEHB09wdgFXj6okcsO0QyBzYHw0oZ0A8cUiYV9Ylec/w0tlnd6y458BajnEd
+	Jgp28AESUQFnJa71cx/dTUVDapDUmiVFFDu5czbv5V1xvkKOomM62xrYA06OMSNrptHLQE
+	LROx6FeeYhz/scmL0IzOh9qHCv26OK6chUg39DNIxyd3KxAy3y9wpOtZwFHtYw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731332471; a=rsa-sha256;
 	cv=none;
-	b=gjvEAc2yFz3kpeF0mGdnKKdfe5hmCDm5c13WrP8Mink1GF+Hp6ueOBg4LN2To4FE/+pZwl
-	3uoz6/xhDjhhfL/Y6X6Szn6w763M1UZEyxZlniiZ/uBUlM1pFV/ZBp2arbUKu3gDWoK5+i
-	UnaVAEhkQjCUgYKzyW1lq0WlRBEnLk/Q/TpQTOQOGch80mp8JZXLJDFvoLqt8IUW9a2Qp1
-	zqH3CiV6ix2aciSRXiqImYjswT0iRclMZGUvnkxJrGbao9wD+GwSkvMKBNvpOHacZiJDG1
-	lBIOzh2hzlj3a9a/PBQS+DAtqNKOWnG6/vbaGkO2vAW0kIu0mnUdF6rq6DB8Gw==
+	b=h+GVeXOJG2ESmynOHW9keDNtDTNluAHmBOGFzVIC/9SLHJWMiWZeXYUvaXtZ+mZ5eb0RJm
+	+hlZ+oRyleb00xsdEj3fuilynVC7WC+GMC1vyPjTcTpzW9pkWl26b0ZWbGu3OaMUAH8+Yr
+	ZqMlcbKOUBSW6dzhR7qwRfLOYGanLFGnRKRQ7oStYDPtaWWASa4fDxXTgNTAvHk46D+qvP
+	Ompkhod6JPUn/vjgGIL6kPWGjQzJI5moavkYhhFI8Wl8qWjaOAtqCO/xmkqa+qlXD2VzHr
+	StQ1d0Ex4KEKLjI+mY3vvyK3C88VEyde48f+MlC7Ng/lC+Gp14EkgG3NtRiqrA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.mailfrom=pc@manguebit.com
-From: Paulo Alcantara <pc@manguebit.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: meetakshisetiyaoss@gmail.com, smfrench@gmail.com, sfrench@samba.org,
- sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
- bharathsm.hsk@gmail.com, Meetakshi Setiya <msetiya@microsoft.com>
-Subject: Re: [PATCH 1/2] cifs: during remount, make sure passwords are in sync
-In-Reply-To: <CANT5p=pFCbi1H-JzRLx5XqL4Qwy-YbOWAX6XmoWXezSn2i__mQ@mail.gmail.com>
-References: <20241030142829.234828-1-meetakshisetiyaoss@gmail.com>
- <1f8a225b0d16fdfa05c417e0f6602489@manguebit.com>
- <CANT5p=rm90eHDeA669yRNdKvT=GL+NE1PVTJVS-htQ8pbfiwUA@mail.gmail.com>
- <CANT5p=pFCbi1H-JzRLx5XqL4Qwy-YbOWAX6XmoWXezSn2i__mQ@mail.gmail.com>
-Date: Mon, 11 Nov 2024 09:03:56 -0300
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>,
+	Jay Shin <jaeshin@redhat.com>
+Subject: [PATCH] smb: client: fix use-after-free of signing key
+Date: Mon, 11 Nov 2024 10:40:55 -0300
+Message-ID: <20241111134055.66981-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+Customers have reported use-after-free in @ses->auth_key.response with
+SMB2.1 + sign mounts which occurs due to following race:
 
-> On Fri, Nov 8, 2024 at 5:47=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail=
-.com> wrote:
->> > What about SMB sessions from cifs_tcon::dfs_ses_list?  I don't see the=
-ir
->> > password getting updated over remount.
->>
->> This is in our to-do list as well.
->
-> I did some code reading around how DFS automount works.
-> @Paulo Alcantara Correct me if I'm wrong, but it sounds like we make
-> an assumption that when a DFS namespace has a junction to another
-> share, the same credentials are to be used to perform the mount of
-> that share. Is that always the case?
+task A                         task B
+cifs_mount()
+ dfs_mount_share()
+  get_session()
+   cifs_mount_get_session()    cifs_send_recv()
+    cifs_get_smb_ses()          compound_send_recv()
+     cifs_setup_session()        smb2_setup_request()
+      kfree_sensitive()           smb2_calc_signature()
+                                   crypto_shash_setkey() *UAF*
 
-Yes, it inherits fs_context from the parent mount.  For multiuser
-mounts, when uid/gid/cruid are unspecified, we need to update its values
-to match real uid/gid from the calling process.
+Fix this by ensuring that we have a valid @ses->auth_key.response by
+checking whether @ses->ses_status is SES_GOOD or SES_EXITING with
+@ses->ses_lock held.  After commit 24a9799aa8ef ("smb: client: fix UAF
+in smb2_reconnect_server()"), we made sure to call ->logoff() only
+when @ses was known to be good (e.g. valid ->auth_key.response), so
+it's safe to access signing key when @ses->ses_status == SES_EXITING.
 
-> If we go by that assumption, for password2 to work with DFS mounts, we
-> only need to make sure that in cifs_do_automount, cur_ctx passwords
-> are synced up to the current ses passwords. That should be quite easy.
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/smb2proto.h     |  2 --
+ fs/smb/client/smb2transport.c | 56 +++++++++++++++++++++++++----------
+ 2 files changed, 40 insertions(+), 18 deletions(-)
 
-Correct.  The fs_context for the automount is dup'ed from the parent
-mount.  smb3_fs_context_dup() already dups password2, so it should work.
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 6f9885e4f66c..71504b30909e 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -37,8 +37,6 @@ extern struct mid_q_entry *smb2_setup_request(struct cifs_ses *ses,
+ 					      struct smb_rqst *rqst);
+ extern struct mid_q_entry *smb2_setup_async_request(
+ 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
+-extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Server_Info *server,
+-					   __u64 ses_id);
+ extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *server,
+ 						__u64 ses_id, __u32  tid);
+ extern int smb2_calc_signature(struct smb_rqst *rqst,
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index b486b14bb330..475b36c27f65 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -74,7 +74,7 @@ smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 
+ 
+ static
+-int smb2_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
++int smb3_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
+ {
+ 	struct cifs_chan *chan;
+ 	struct TCP_Server_Info *pserver;
+@@ -168,16 +168,41 @@ smb2_find_smb_ses_unlocked(struct TCP_Server_Info *server, __u64 ses_id)
+ 	return NULL;
+ }
+ 
+-struct cifs_ses *
+-smb2_find_smb_ses(struct TCP_Server_Info *server, __u64 ses_id)
++static int smb2_get_sign_key(struct TCP_Server_Info *server,
++			     __u64 ses_id, u8 *key)
+ {
+ 	struct cifs_ses *ses;
++	int rc = -ENOENT;
++
++	if (SERVER_IS_CHAN(server))
++		server = server->primary_server;
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+-	ses = smb2_find_smb_ses_unlocked(server, ses_id);
++	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++		if (ses->Suid != ses_id)
++			continue;
++
++		rc = 0;
++		spin_lock(&ses->ses_lock);
++		switch (ses->ses_status) {
++		case SES_EXITING: /* SMB2_LOGOFF */
++		case SES_GOOD:
++			if (likely(ses->auth_key.response)) {
++				memcpy(key, ses->auth_key.response,
++				       SMB2_NTLMV2_SESSKEY_SIZE);
++			} else {
++				rc = -EIO;
++			}
++			break;
++		default:
++			rc = -EAGAIN;
++			break;
++		}
++		spin_unlock(&ses->ses_lock);
++		break;
++	}
+ 	spin_unlock(&cifs_tcp_ses_lock);
+-
+-	return ses;
++	return rc;
+ }
+ 
+ static struct cifs_tcon *
+@@ -236,14 +261,16 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 	unsigned char *sigptr = smb2_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct cifs_ses *ses;
+ 	struct shash_desc *shash = NULL;
+ 	struct smb_rqst drqst;
++	__u64 sid = le64_to_cpu(shdr->SessionId);
++	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
+ 
+-	ses = smb2_find_smb_ses(server, le64_to_cpu(shdr->SessionId));
+-	if (unlikely(!ses)) {
+-		cifs_server_dbg(FYI, "%s: Could not find session\n", __func__);
+-		return -ENOENT;
++	rc = smb2_get_sign_key(server, sid, key);
++	if (unlikely(rc)) {
++		cifs_server_dbg(FYI, "%s: [sesid=0x%llx] couldn't find signing key: %d\n",
++				__func__, sid, rc);
++		return rc;
+ 	}
+ 
+ 	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
+@@ -260,8 +287,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 		shash = server->secmech.hmacsha256;
+ 	}
+ 
+-	rc = crypto_shash_setkey(shash->tfm, ses->auth_key.response,
+-			SMB2_NTLMV2_SESSKEY_SIZE);
++	rc = crypto_shash_setkey(shash->tfm, key, sizeof(key));
+ 	if (rc) {
+ 		cifs_server_dbg(VFS,
+ 				"%s: Could not update with response\n",
+@@ -303,8 +329,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ out:
+ 	if (allocate_crypto)
+ 		cifs_free_hash(&shash);
+-	if (ses)
+-		cifs_put_smb_ses(ses);
+ 	return rc;
+ }
+ 
+@@ -570,7 +594,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 	struct smb_rqst drqst;
+ 	u8 key[SMB3_SIGN_KEY_SIZE];
+ 
+-	rc = smb2_get_sign_key(le64_to_cpu(shdr->SessionId), server, key);
++	rc = smb3_get_sign_key(le64_to_cpu(shdr->SessionId), server, key);
+ 	if (unlikely(rc)) {
+ 		cifs_server_dbg(FYI, "%s: Could not get signing key\n", __func__);
+ 		return rc;
+-- 
+2.47.0
 
-The 'remount' case isn't still handled, that's why I mentioned it above.
-You'd need to set password2 for all sessios in @tcon->dfs_ses_list.
-
-I think we need to update password2 for the multiuser sessions as well
-and not only for session from master tcon.
