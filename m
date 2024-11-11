@@ -1,55 +1,54 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB97AD58;
-	Mon, 11 Nov 2024 01:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A217D8468;
+	Mon, 11 Nov 2024 06:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731288336; cv=none; b=prX/pcqg5+3EzY+7ocRtQy77BdN4CGtN+Yg4DUX4kAolGGWbz3pXZ85DOcxyeUlOZEJgi3qYUnVfwZw05VprlPKH+2TJQgFOfcdecb0zQZlfOtfHC3fEgwK1ww93GaTEH+EkErxThVkR1Ig6Rpo/tonyoqMdowTZ5YVar8WbQbw=
+	t=1731306701; cv=none; b=kz+/r/vy73OE/z9sCo7t/3KV/WfDQnf7NMUdegs9hHHIZXTnvQ+UhFXH9tIK8KzePqGp21LmfvsFv+sR28S0XHxPeGh580KC+R2iA1FsYiOF/lnQkru27M+wkFEs063gOEjuesUB17SrP3wNQa4ElxRzWPYsLkKm1tbFYfWRoJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731288336; c=relaxed/simple;
-	bh=QHVR0GGGN1Y3Qe57p9sktkTdO/4KfFP/Xl52rcTgU0U=;
+	s=arc-20240116; t=1731306701; c=relaxed/simple;
+	bh=Z4c521/2axtqq3BARK8Mz9YTcm5ccQXhEiB28VSaRTg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jWKlyPN3yTVlJ9HjBcIND/WybhglvmUpgucgmyB/Z9XBRJVFg39AbmIlfLJfLJ+hwNkScWAWFRuplPdRe6diClLJntry0vzFhaxb20OZIi11MK74oUkEXJcFDeaqi1ey69juzqDFj0Cmx5ZwQCUZ66Bs45Us/CEvYAs6ZAyJgms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ClNZg+U1; arc=none smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=XlkWTzLHnKvWqc1Ha6zY2ywyTOOtizOg9LwhG9GrW/ImS6Zyedh1P3R4FsQPYZyj9Eu/OxThvtoSslqlMmN/2f8cw8mrZl0FllhIehNs24XhaOynyMUE/Hq73v/4SakpA7k8xia1jEZ76d3GTLOjrwV5apC7ytqd+v3MrcM922E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvfCofz7; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ClNZg+U1"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so4977171e87.0;
-        Sun, 10 Nov 2024 17:25:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvfCofz7"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7ee6edc47abso2773841a12.3;
+        Sun, 10 Nov 2024 22:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731288333; x=1731893133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hjbh6lLUqnJxi3HSXhOyrGpP22ujh50AM4aiBwHCyh8=;
-        b=ClNZg+U1+Md9g/xfbWngChvSlzHG3TRxFTO73+OMAumMhn/Tv/p1g3ycFefrrt1UCS
-         pROI28tf0EQGYolwFxQyKv6WhCtbUaDCXPzcks0b2lzte1pXkrR2KiJxOueQwbQEmWAu
-         JH6hXiPEhGj8Mv1zYfE/cDJMaDt35/6CWA2kaE5DqR6p6a1Phj4pphsjtCy5PVHaiAIn
-         bCpxyAwEEPIwLptTv2mc6o8BfR8K5QgN2M8tdZs0K/ik55hcC2ooNRh3j0A1VfBvwjDG
-         llMQchTv59aED6Ful+2ezSeOfb1RNQYLkwy+CzvqVwD1pO9XxJIOuF6d0QDpVvpGO+W7
-         xMGg==
+        d=gmail.com; s=20230601; t=1731306698; x=1731911498; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WXpWvz0Qv6z1AewP6mYc3kyZfjZbPBjaNa56qfUEE8o=;
+        b=LvfCofz7rGkTGF+eRvU8vMl1dcWth76falsansSoSZzGLGwJE3gcTBW1uKdy17bZD3
+         VAWxXsS3ZNvkED0DCQqv4wR4M44DErWiRLaD9INFtiADwRkzmzQZs0NHtSpaM6AzekDC
+         j7JbmfdhgxmfwDX1d068p3scYhTNEuUCo/tNx+AkcFTSyBoY2HTPl/a6FFWKVLM7UuwP
+         LnHgyTE3GIMJnMFDuzqld6o1QceDrspoFQHsI13BU4tJ5qGFBxZOYkDlNNAucEH0CRqg
+         OlQ8UERIkGn5ufGHPAW7YqICSLPwwPzOKOVzOytATSEpIvVEzbC7kleV5tCfz8+/WUyY
+         epQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731288333; x=1731893133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hjbh6lLUqnJxi3HSXhOyrGpP22ujh50AM4aiBwHCyh8=;
-        b=HenPX32ulbI5oY9LQWpVQttAA7yWqdXKT/nC8vIc+cl+9WrZTwpQCmrdPSzrqzEMwD
-         bYb8mHVly+HcKBTl7AEArdEoMYYO4uN/42ctcukyvtr7HLY3g5RXlZ8Jj7EObWFSTcTP
-         dp1g6HK+jwMpP8Ol6Xq27SdW0brF4wyg/SnUXboHOQLkgZA9qDjYEolqAY+MI8vTrgxM
-         YtWoNiLXPkYKIzk2Lg6sBcf4sA2lxuY2PvM/GKOG7Upj2c6tNsNjDk7N7r4zPqHjnXs0
-         spygzBYCiJ+s2XYaQNXN95Wt1nifFUbnFq2kSqRJhfwCsj0CCNXlwo2L3X+T6+dm7zP3
-         u1HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWc8uydZ8SagmMR1PIh8honCijMFd1qHU24q18UHw3/mBQOts2iBCViVQlDm4925TGs871ATOYk5z7TTi+8@vger.kernel.org, AJvYcCX9Jl+CLCRRHyvhDA5NOvkyc3/r5YGteEEciMwvgzaYHKODejlhegNEFEKkNoRFsYl9QyTQKeUzWcnw@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEp8nxcLNvEQR3fXFo7VXeinaWG84qdhhAFwEC5vdBHyzbq1uj
-	a3XPQfSGdQA4+AqdaENd31SQryFE9ipRNSuunb6Ewh2L5BiRqEedk5UuzYIMO2Ws+w+FrCnYL+d
-	6uOsUYCL2ZFa9Vk+tuT3vu3K95Hw=
-X-Google-Smtp-Source: AGHT+IGM3TTaW39blKH6IzIldaKyw7LDF83ZaE9I6qYRNEv42LlXzuX3QmlZFITFjrJVPXuF8B3ilP7N9GcJ1LTabq4=
-X-Received: by 2002:a05:6512:3e15:b0:539:8fcd:524 with SMTP id
- 2adb3069b0e04-53d8623fa76mr4343924e87.30.1731288332835; Sun, 10 Nov 2024
- 17:25:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731306698; x=1731911498;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WXpWvz0Qv6z1AewP6mYc3kyZfjZbPBjaNa56qfUEE8o=;
+        b=pfQC3swHu64o6vRQtc3CTySObhE2hWQ8jccCNUPueLAWIlGtHrte44AZlh4wsAsddT
+         pGN7b2e30EZYpuM0qGaBWdFxFHaCAP4m1DiWovaj3lQmswv4lZsD/bczs+IZ/eq21ggK
+         AXUdRvbNMUnGqdLImxXsSM8J+o2WPw7CTvyqM4FQqN6/tHF33dLiZwndflKHEKHEH1aD
+         qZoyvscKKzzKSl07UxXrEwRRwdm+w6kgIXETW0ketqWvGJt6AFsrKli7SfT68ANaXs5d
+         FrzDS/o7pqoX4O5aI/uD3B8jR/alVvAXaDykV+P7z/sA8n+yQePS2uZp6qnpsSF/ZhsR
+         +7Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7KAiGlKjXa34GRz+vDyrqSn9d7hs7jCcaKDs8DILu0Wne2EAwE/dIWlakKv83ySatVqgFqN968LU6@vger.kernel.org, AJvYcCWlTe9YtZ7Pl0Q/NiCz6Eauzw2Q394ZyXx1Q2Rz/iTU7nmXg12XfKkjWYyr5O514OWS3wWAj7/V7vCuof/a@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+YTEVFd+dYhzLdx6IEIPy+TAOlwzksw0055zfsx9khKPYdYJS
+	fl45TTv3b+DbFLP5BxmvBb23PDYCnZ8a9QvqebaqKhyB3FEr7OPAWh03xABtKsaMUJJX1TTkTtd
+	PGVJfcBJ0+jWYDZy2JroEfaJr/tgOa6CMytM=
+X-Google-Smtp-Source: AGHT+IEzhxaGaGl/GBxq3P6afyCic6It5guwLyOkDVy40lR2gGXznKUwHu5IgUmo7o72wwokDXZ+A/AAEwnXGUdFwHY=
+X-Received: by 2002:a17:90b:53c6:b0:2e2:cf5c:8edf with SMTP id
+ 98e67ed59e1d1-2e9b170eaf9mr15710113a91.9.1731306697869; Sun, 10 Nov 2024
+ 22:31:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,37 +61,24 @@ References: <20241007210214.102568-1-linux@treblig.org> <Zy0reBfykkwXA47d@gallif
  <ZzEOuqDwagwoGCMf@jeremy-HP-Z840-Workstation> <CAN05THTgj+_78kG3LFnpU9zsjEEBAsyDZ0P20YL3-DP94r3KUA@mail.gmail.com>
  <ZzFaSf20nIbppt8w@jeremy-HP-Z840-Workstation>
 In-Reply-To: <ZzFaSf20nIbppt8w@jeremy-HP-Z840-Workstation>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 10 Nov 2024 19:25:21 -0600
-Message-ID: <CAH2r5muJ_+d5zemgPUG8y6stiCmw4nnR=iyK683N1Gii4134TA@mail.gmail.com>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Mon, 11 Nov 2024 16:31:26 +1000
+Message-ID: <CAN05THQXYNgG=Rji7r7xU9UF6ZBH3SP405o=D_F3nbbs9XYChQ@mail.gmail.com>
 Subject: Re: [PATCH] cifs: Remove pre-historic unused CIFSSMBCopy
 To: Jeremy Allison <jra@samba.org>
-Cc: ronnie sahlberg <ronniesahlberg@gmail.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
+Cc: Steve French <smfrench@gmail.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
 	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
 	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
 	Bharath S M <bharathsm@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>, 
 	LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-SMB1/SMB2.0 can be disabled fairly easily in the Linux client build,
-but there are occasional requests for it due to SMB1/CIFS still being
-used to access some old devices. Also some of the SMB1 code was moved
-to SMB1 specific files to make that clearer, and to make the module
-smaller when SMB1/SMB2.0 is not enabled. Even when SMB1/SMB2.0 is
-configured in the build, in the future it may be useful to not load
-the SMB1 specific files (put them in a helper module that contains all
-of the SMB1 specific code, rather in the main filesystem module)
-unless the user specifies "vers=3D1.0" on mount.
-
-On Sun, Nov 10, 2024 at 7:13=E2=80=AFPM Jeremy Allison <jra@samba.org> wrot=
-e:
+On Mon, 11 Nov 2024 at 11:13, Jeremy Allison <jra@samba.org> wrote:
 >
 > On Mon, Nov 11, 2024 at 09:02:03AM +1000, ronnie sahlberg wrote:
 > >All of SMB1 should be removed.  Not just disabled but deleted.
 > >
-> >What are the plans in samba? Any timeline to literally delete the smb1 c=
-ode?
+> >What are the plans in samba? Any timeline to literally delete the smb1 code?
 >
 > It can already be compiled out of any build,
 > so it's an option for any distro or user of
@@ -103,9 +89,10 @@ ode?
 > (there are still commercial uses of OS/2
 > out there for example).
 
+There are still costs to maintain it. Especially since weird protocol
+quirks keep being exposed and affecting semantics much higher up in
+the stack.
 
-
---=20
-Thanks,
-
-Steve
+There are probably still someone that runs 3Mbit Ethernet with 16-bit
+MAC addresses.  But we don't support that with modern ethernet
+drivers.
