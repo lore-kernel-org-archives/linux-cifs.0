@@ -1,217 +1,202 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F5019D078
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Nov 2024 13:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731332475; cv=fail; b=UZmFrunCRqkoDQHQB9OxpLx4Yx+H1znCjtSU11zhoR0Z+0rIFOWLGVQrRtEUFSJ+2QwRongtJn/gKAeFF8rB6vD5mhX54F4L+EpuDbue1cPI6sSRthp9Mg0NDXJCO8siAUAaD0S8r+mcdoiZqgQOilbGboL9ewLsfgmt/TrwM/E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731332475; c=relaxed/simple;
-	bh=XtPh3A6GY7tGq7IiW+ISg02szZ0LKbHlsMSrsKqgKQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mkvl0czG8owAJKDLImc/pGAKEYOHkw5MZZ4st5HROFFczS2/s4WTCgYBfwxRQhBVKamU0WdD+7EqsMsK3swvYXGB1vpKNMaJFQgjAtUouZEV6mG0jjrZ3Oqx2NqHhlAurUSfKvbet+VjHc1aZuew3aTam1Hi8BY0Xzii1O0LH4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=aKyHvG3m; arc=fail smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E0715A84E
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Nov 2024 14:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731335490; cv=none; b=BCWShP6PnlRSaq5GqwWV5dDKgQ4x2jfbnwJJsGn7Zm5sr6D9OcAtFXxXJM9vMsiom8plaLucb7O/KgjYHcShowf1f3OG2HbvAnOzMaY5zWDbkij1LBeWliqZ4aiX2Kf/sUWdxkFCF4m2By8wVktAtKYkE9XVgBCHwpp64ZA2Ce0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731335490; c=relaxed/simple;
+	bh=4GUlfCMxQKnfsAfjR39tVWKQ8fYrxUAQD6kjwrMtjLM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GD5edYWl814LODsEvJTGyexm0MFN7vRm0erupAaZRfWK/JX8QiM6u6/iq7yvS8tfVGJzF13NAYJiZiBsulsX0ZP1o4mNUz8YnZEWP8B9/ygXymVGacNFIFQ515c6K3ExMR4J5MjgWlnVPKgFntmTeziw6V3KzleiWDkOvIf1sgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=bVrks/JI; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="aKyHvG3m"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731332471;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Nk1zr3IOKgZkalXZrKJKIHqUk7AWBPllVW3rnGiSq20=;
-	b=aKyHvG3mwWoWYWG9FyApczdZLJHkJcaEWWTCfFfB2sEEbYMuE1QBIfZLoxfOn5ggyIdk4v
-	aC9Livw2erIzvSthWGHBdfFWEKbpk7Aw0xyCeGZvH7zrB6NHrVmO0lf/03eoEJfcEFGRcx
-	iKCLGmDe4i7+ROxUwXrLzlIZ4k/Kf1JMiDZWKZj4ke5uzLEbEsRMXaLssZkcugqpX2EH0n
-	kds4YP9+PAVr3bBHEkae+VC5j//ptAs89CU+K80tvJxEukBist7DJpSC8XUI9gVJykOk13
-	AfVdMUgzLQgt4wyG2eupbBBnsPwYpEkKPeX/C7LVxmYUye5/BuRMMBoQQHIevQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731332471; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=Nk1zr3IOKgZkalXZrKJKIHqUk7AWBPllVW3rnGiSq20=;
-	b=Q1s1g0Xlr5a0Zzjqfc7KoiO/fFeINLltKBHqYp98fC6r5NV0MSf3ccgoSjN9A7+93Nawa/
-	lyosIkFVFOxBfgIQRXrHkKT6Ewei5TyyuTjaPlD2vxVAL9q9qV8yP25iJ/slaDU/Adm4X9
-	I1VaTyEhC9mEHB09wdgFXj6okcsO0QyBzYHw0oZ0A8cUiYV9Ylec/w0tlnd6y458BajnEd
-	Jgp28AESUQFnJa71cx/dTUVDapDUmiVFFDu5czbv5V1xvkKOomM62xrYA06OMSNrptHLQE
-	LROx6FeeYhz/scmL0IzOh9qHCv26OK6chUg39DNIxyd3KxAy3y9wpOtZwFHtYw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731332471; a=rsa-sha256;
-	cv=none;
-	b=h+GVeXOJG2ESmynOHW9keDNtDTNluAHmBOGFzVIC/9SLHJWMiWZeXYUvaXtZ+mZ5eb0RJm
-	+hlZ+oRyleb00xsdEj3fuilynVC7WC+GMC1vyPjTcTpzW9pkWl26b0ZWbGu3OaMUAH8+Yr
-	ZqMlcbKOUBSW6dzhR7qwRfLOYGanLFGnRKRQ7oStYDPtaWWASa4fDxXTgNTAvHk46D+qvP
-	Ompkhod6JPUn/vjgGIL6kPWGjQzJI5moavkYhhFI8Wl8qWjaOAtqCO/xmkqa+qlXD2VzHr
-	StQ1d0Ex4KEKLjI+mY3vvyK3C88VEyde48f+MlC7Ng/lC+Gp14EkgG3NtRiqrA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	Jay Shin <jaeshin@redhat.com>
-Subject: [PATCH] smb: client: fix use-after-free of signing key
-Date: Mon, 11 Nov 2024 10:40:55 -0300
-Message-ID: <20241111134055.66981-1-pc@manguebit.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="bVrks/JI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=4GUlfCMxQKnfsAfjR39tVWKQ8fYrxUAQD6kjwrMtjLM=; b=bVrks/JITS88Dk/viO1UPAUBpK
+	aanUi3WpoDLkhXOSXDztSTJYP+aK87OYeL3BIRFWH0VDSyO+qG84kqo9NqEztz9Fqdx8wjnlgjUJF
+	W7F6R+uX+ipE0DCbdpmaEhoF32yeU6u9lwiPNV1A7pVJZq+dlwh4M2HI9jvWkhYKOqSWgX64UCtMN
+	pTqFBIhtzLew3FFE+dCRpOYDqFE88rQlNx9matZgCNW4OY9APqKDIDulfDJC5d0Setiiwn/O9gp8/
+	wdtfmdgHgNIsjl0sLPsw+pl7nqcaq5VJI+LXGYCxYqzlfCm2yb8oL81p2CAokdTHSTn6I1se+nnCM
+	6T7K73CzStt6IkNk2VUY+h+bIO2bt/fXjdMTS6/k5egE8voAL22vhk9zIAmwJ/5fGv+rmESYIXM+l
+	bD8Opjr2UWFlzINRzk5EWuJ1tKLzAQUrODYvGDCZV57Nf8JrOKt7aBeis8RQxM9twO5XDbxJRrAt1
+	WtZCkwpU/hOFB1X3UGjsLiXK;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tAVRt-00A3q3-1S;
+	Mon, 11 Nov 2024 14:31:25 +0000
+Message-ID: <a5b250c9-8f69-4a48-86cb-f5347dfc4a2e@samba.org>
+Date: Mon, 11 Nov 2024 15:31:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: Current Samba master incorrectly returns STATUS_INVALID_HANDLE on
+ copy_chunk
+From: Ralph Boehme <slow@samba.org>
+To: CIFS <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
+Cc: Jeremy Allison <jra@samba.org>,
+ Volker Lendecke <Volker.Lendecke@SerNet.DE>
+References: <CAH2r5mt7cE8Cc2K5K8nRM2RL=R-rwuAR9h6SSyEqtApuochtuQ@mail.gmail.com>
+ <e12d7594-02df-4cbb-80fc-276d907afd90@samba.org>
+ <CAH2r5muqSmNy+3SViFKNJ=5Sm61u8r9ej9Wy8JLUDeC2XHwccA@mail.gmail.com>
+ <77aff6ef-291d-4840-82e2-b02646949541@samba.org>
+ <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
+ <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
+ <ZwVM1-C0kBfJzNfM@jeremy-HP-Z840-Workstation>
+ <569625f6-e0d2-43db-88cf-eb0fff6eb70e@samba.org>
+ <ZwbczZYBsTU03Ycv@jeremy-HP-Z840-Workstation>
+ <c146a052-40e2-4d90-9a8e-9236a0b2dc20@samba.org>
+ <2eb2e4fa-1e74-46d4-a399-0200dd08e348@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <2eb2e4fa-1e74-46d4-a399-0200dd08e348@samba.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------0ozO4QW0RhLvr5txCpT9QreH"
 
-Customers have reported use-after-free in @ses->auth_key.response with
-SMB2.1 + sign mounts which occurs due to following race:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------0ozO4QW0RhLvr5txCpT9QreH
+Content-Type: multipart/mixed; boundary="------------UBshE0RYAoyBn22aQQ6nh0vv";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: CIFS <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
+Cc: Jeremy Allison <jra@samba.org>,
+ Volker Lendecke <Volker.Lendecke@SerNet.DE>
+Message-ID: <a5b250c9-8f69-4a48-86cb-f5347dfc4a2e@samba.org>
+Subject: Re: Current Samba master incorrectly returns STATUS_INVALID_HANDLE on
+ copy_chunk
+References: <CAH2r5mt7cE8Cc2K5K8nRM2RL=R-rwuAR9h6SSyEqtApuochtuQ@mail.gmail.com>
+ <e12d7594-02df-4cbb-80fc-276d907afd90@samba.org>
+ <CAH2r5muqSmNy+3SViFKNJ=5Sm61u8r9ej9Wy8JLUDeC2XHwccA@mail.gmail.com>
+ <77aff6ef-291d-4840-82e2-b02646949541@samba.org>
+ <d84732db-dea1-4fbd-9fc9-105c115c9ca0@samba.org>
+ <990b4f16-2f5a-49ab-8a14-8b1f3cee94dc@samba.org>
+ <ZwVM1-C0kBfJzNfM@jeremy-HP-Z840-Workstation>
+ <569625f6-e0d2-43db-88cf-eb0fff6eb70e@samba.org>
+ <ZwbczZYBsTU03Ycv@jeremy-HP-Z840-Workstation>
+ <c146a052-40e2-4d90-9a8e-9236a0b2dc20@samba.org>
+ <2eb2e4fa-1e74-46d4-a399-0200dd08e348@samba.org>
+In-Reply-To: <2eb2e4fa-1e74-46d4-a399-0200dd08e348@samba.org>
+Autocrypt-Gossip: addr=jra@samba.org; keydata=
+ xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
+ 97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
+ forHV13gB3B6S/ZWHpf/owKnJMwu8ozQpjnMnqOiVwCg8QnSX2AFCMd3HLQsqVaMdlO+jBEE
+ AKrMu2Pavmyc/eoNfrjgeRoNRkwHCINWO5u93o92dngWK/hN1QOOCQfAzqZ1JwS5Q+E2gGug
+ 4OVaZI1vZGsAzb06TSnS4fmrOfwHqltSDsCHhwd+pyWkIvi96Swx00e1NEwNExEBo5NrGunf
+ fONGlfRc+WhMLIk0u2e2V14R+ebDA/42T+cQZtUR6EdBReHVpmckQXXcE8cIqsu6UpZCsdEP
+ N6YjxQKgTKWQWoxE2k4lYl9KsDK1BaF6rLNz/yt2RAVb1qZVaOqpITZWwzykzH60dMaX/G1S
+ GWuN28by9ghI2LIsxcXHiDhG2CZxyfogBDDXoTPXlVMdk55IwAJny8Wj4s0eSmVyZW15IEFs
+ bGlzb24gPGpyYUBzYW1iYS5vcmc+wlcEExECABcFAjxEcLsFCwcKAwQDFQMCAxYCAQIXgAAK
+ CRCl3XhJ1sA2rDHZAKDwxfxpGuCOAuDHaN3ULDrIzKw9DQCdHb3Sq5WKfeqeaY2ZKXT3AmXl
+ Fq7OwE0EPERwvhAEAIY1K5TICtxmFOeoRMW39jtF8DNSXl/se6HBe3Wy5Cz43lMZ6NvjDATa
+ 1w3JlkmjUyIDP29ApqmMu78Tv4UUxAh1PhyTttX1/aorTlIdVYFjey/yW4mSDXUBhPvMpq52
+ TncLRmK9HC6mIxJqS0vi6W9IqGOqDRZph3GzVzJN7WvLAAMGA/sGAyg2rVsBzs77WH0jPO+A
+ QZDj+Hf/RFHOwmcyG7/XgmV6LOcQP4HfQHH3DGYihu5cZj3BeWKPDJnjOjB2qmr+FTjYEsjw
+ LDBNG7rjRye412rUbNwmEtcD2/dw4xNyu5h2u+1++KVBPf4SqG/a10gDqGJXDHA1Os5MmnQl
+ 3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
+ AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
 
-task A                         task B
-cifs_mount()
- dfs_mount_share()
-  get_session()
-   cifs_mount_get_session()    cifs_send_recv()
-    cifs_get_smb_ses()          compound_send_recv()
-     cifs_setup_session()        smb2_setup_request()
-      kfree_sensitive()           smb2_calc_signature()
-                                   crypto_shash_setkey() *UAF*
+--------------UBshE0RYAoyBn22aQQ6nh0vv
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Fix this by ensuring that we have a valid @ses->auth_key.response by
-checking whether @ses->ses_status is SES_GOOD or SES_EXITING with
-@ses->ses_lock held.  After commit 24a9799aa8ef ("smb: client: fix UAF
-in smb2_reconnect_server()"), we made sure to call ->logoff() only
-when @ses was known to be good (e.g. valid ->auth_key.response), so
-it's safe to access signing key when @ses->ses_status == SES_EXITING.
+T24gMTEvOS8yNCA1OjE4IFBNLCBSYWxwaCBCb2VobWUgd3JvdGU6DQo+IE9uIDExLzkvMjQg
+NDoyNiBQTSwgUmFscGggQm9laG1lIHdyb3RlOg0KPj4gT24gMTAvOS8yNCA5OjQzIFBNLCBK
+ZXJlbXkgQWxsaXNvbiB3cm90ZToNCj4+PiBDYW4gd2UganVzdCBtYXAgKGFjY2Vzc19tYXNr
+IChGSUxFX0FQUEVORF9EQVRBfFNZTkNIUk9OSVpFKSkgPT0gDQo+Pj4gKEZJTEVfQVBQRU5E
+X0RBVEF8U1lOQ0hST05JWkUpKQ0KPj4+IHRvIE9fQVBQRU5ELCByZWdhcmRsZXNzIG9mIFBP
+U0lYIG1vZGUgPw0KPj4NCj4+IHRoaW5raW5nIGFib3V0IHRoaXMgYSBiaXQgbW9yZSwgdGhp
+cyBzZWVtcyBkb2FibGUsIGFsYmVpdCBvbmx5IGZvciANCj4+IFBPU0lYIG1vZGUuIEZvciBu
+b24tUE9TSVggbW9kZSB3ZSBjb3VsZCBwb3RlbnRpYWxseSBicmVhayBXSW5kb3dzIA0KPj4g
+YXBwbGljYXRpb24gdGhhdCBvcGVuIG9ubHkgd2l0aCBGSUxFX0FQUEVORF9EQVRBOiBJIGNo
+ZWNrZWQgd2l0aCBhIA0KPj4gdG9ydHVyZSB0ZXN0IHRoYXQgV2luZG93cyBkb2Vzbid0IGVu
+Zm9yY2UgYXBwZW5kIGJlaGF2aW91ciBmb3IgDQo+PiBGSUxFX0FQUEVORF9EQVRBfFNZTkNI
+Uk9OSVpFLg0KPj4NCj4+IEZvciBQT1NJWCBvcGVucyB3ZSBzaG91bGQgYWxzbyBhbGxvdyBj
+b21iaW5hdGlvbnMgbGlrZSANCj4+IEZJTEVfUkVBRF9BVFRSSUJVVEVTfEZJTEVfQVBQRU5E
+X0RBVEEgdG8gbWFwIHRvIE9fQVBQRU5ELCBzbyBjbGllbnRzIA0KPj4gY2FuIHdyaXRlIGlu
+IGFwcGVuZCBtb2RlIHRvIHRoZSBoYW5kbGUgYW5kIHN0aWxsIGFyZSBhYmxlIHRvIGZzdGF0
+KCkgaXQuDQo+Pg0KPj4gaHR0cHM6Ly9naXRsYWIuY29tL3NhbWJhLXRlYW0vc2FtYmEvLS9t
+ZXJnZV9yZXF1ZXN0cy8zODYzDQo+IA0KPiBvaCwgZm9yZ290IHRvIG1lbnRpb24gdGhhdCB0
+aGlzIGZpeGVzIHRoZSBmYWlsaW5nIGNvcHlfY2h1bmsgY29weSBmcm9tIA0KPiB0aGUgTGlu
+dXgga2VybmVsIGNsaWVudCBpbiBwb3NpeCBtb2RlLg0KDQphbHNvIGFkZGVkIGEgdGVzdCBm
+b3IgdGhhdC4NCg0KLXNsb3cNCg==
 
-Reported-by: Jay Shin <jaeshin@redhat.com>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
----
- fs/smb/client/smb2proto.h     |  2 --
- fs/smb/client/smb2transport.c | 56 +++++++++++++++++++++++++----------
- 2 files changed, 40 insertions(+), 18 deletions(-)
+--------------UBshE0RYAoyBn22aQQ6nh0vv--
 
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 6f9885e4f66c..71504b30909e 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -37,8 +37,6 @@ extern struct mid_q_entry *smb2_setup_request(struct cifs_ses *ses,
- 					      struct smb_rqst *rqst);
- extern struct mid_q_entry *smb2_setup_async_request(
- 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
--extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Server_Info *server,
--					   __u64 ses_id);
- extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *server,
- 						__u64 ses_id, __u32  tid);
- extern int smb2_calc_signature(struct smb_rqst *rqst,
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index b486b14bb330..475b36c27f65 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -74,7 +74,7 @@ smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
- 
- 
- static
--int smb2_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
-+int smb3_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
- {
- 	struct cifs_chan *chan;
- 	struct TCP_Server_Info *pserver;
-@@ -168,16 +168,41 @@ smb2_find_smb_ses_unlocked(struct TCP_Server_Info *server, __u64 ses_id)
- 	return NULL;
- }
- 
--struct cifs_ses *
--smb2_find_smb_ses(struct TCP_Server_Info *server, __u64 ses_id)
-+static int smb2_get_sign_key(struct TCP_Server_Info *server,
-+			     __u64 ses_id, u8 *key)
- {
- 	struct cifs_ses *ses;
-+	int rc = -ENOENT;
-+
-+	if (SERVER_IS_CHAN(server))
-+		server = server->primary_server;
- 
- 	spin_lock(&cifs_tcp_ses_lock);
--	ses = smb2_find_smb_ses_unlocked(server, ses_id);
-+	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+		if (ses->Suid != ses_id)
-+			continue;
-+
-+		rc = 0;
-+		spin_lock(&ses->ses_lock);
-+		switch (ses->ses_status) {
-+		case SES_EXITING: /* SMB2_LOGOFF */
-+		case SES_GOOD:
-+			if (likely(ses->auth_key.response)) {
-+				memcpy(key, ses->auth_key.response,
-+				       SMB2_NTLMV2_SESSKEY_SIZE);
-+			} else {
-+				rc = -EIO;
-+			}
-+			break;
-+		default:
-+			rc = -EAGAIN;
-+			break;
-+		}
-+		spin_unlock(&ses->ses_lock);
-+		break;
-+	}
- 	spin_unlock(&cifs_tcp_ses_lock);
--
--	return ses;
-+	return rc;
- }
- 
- static struct cifs_tcon *
-@@ -236,14 +261,16 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 	unsigned char *sigptr = smb2_signature;
- 	struct kvec *iov = rqst->rq_iov;
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
--	struct cifs_ses *ses;
- 	struct shash_desc *shash = NULL;
- 	struct smb_rqst drqst;
-+	__u64 sid = le64_to_cpu(shdr->SessionId);
-+	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
- 
--	ses = smb2_find_smb_ses(server, le64_to_cpu(shdr->SessionId));
--	if (unlikely(!ses)) {
--		cifs_server_dbg(FYI, "%s: Could not find session\n", __func__);
--		return -ENOENT;
-+	rc = smb2_get_sign_key(server, sid, key);
-+	if (unlikely(rc)) {
-+		cifs_server_dbg(FYI, "%s: [sesid=0x%llx] couldn't find signing key: %d\n",
-+				__func__, sid, rc);
-+		return rc;
- 	}
- 
- 	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
-@@ -260,8 +287,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 		shash = server->secmech.hmacsha256;
- 	}
- 
--	rc = crypto_shash_setkey(shash->tfm, ses->auth_key.response,
--			SMB2_NTLMV2_SESSKEY_SIZE);
-+	rc = crypto_shash_setkey(shash->tfm, key, sizeof(key));
- 	if (rc) {
- 		cifs_server_dbg(VFS,
- 				"%s: Could not update with response\n",
-@@ -303,8 +329,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- out:
- 	if (allocate_crypto)
- 		cifs_free_hash(&shash);
--	if (ses)
--		cifs_put_smb_ses(ses);
- 	return rc;
- }
- 
-@@ -570,7 +594,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 	struct smb_rqst drqst;
- 	u8 key[SMB3_SIGN_KEY_SIZE];
- 
--	rc = smb2_get_sign_key(le64_to_cpu(shdr->SessionId), server, key);
-+	rc = smb3_get_sign_key(le64_to_cpu(shdr->SessionId), server, key);
- 	if (unlikely(rc)) {
- 		cifs_server_dbg(FYI, "%s: Could not get signing key\n", __func__);
- 		return rc;
--- 
-2.47.0
+--------------0ozO4QW0RhLvr5txCpT9QreH
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmcyFTwFAwAAAAAACgkQqh6bcSY5nkYi
+cg//ZmjO9kRk4x5b/LQOeyquasW0WyySe+NdGb7vKEj84yn8FZwuy6SDFailEu+4G9mUFC3m6nQk
+uiVG4xV/nBIFi6gQd0Dqd3N1e64XHCJde6rMaqT8LGGWAnkTAIpd3JGddHEWf1Mt2jN4ia1N3WdI
+2E6NiioLFqn7B1E8WjyRqz0mtEksnRChoPSuhWqfg14OosaT6RKvpPUNfiDvGqad6jl9gqiPTIyh
+nWNyh8RY9Fu/KCT8Sx9585pv713l8p49XZmB33FTMgNeZC0HDSJxdqdCU1qWooMnS8aVJiVJran4
+ftlayfNi4qK5CVxr3DP4mloA6wpMOjYe9bnSfEPL994NLbE9Rvog9jhBSNiLagoq0cooAW91PyaP
+P1TDhLfny+wJ9PU28EfXSPR+WuO3EaAAqNng+If/CClg75BnnL7OCIRViYMWc65yXNTdkGdycJZD
+xj1fTPSi6SskO1QdCdMScZ20LX31BITTqlmyDOR4D76fG1XY4JjDqlkKTNeXQaCBT8558JNr7X2t
+4xs+mN4/5U/+8cyb9CdptPH9l6VJ6ykSBjZml3Z93th2HsJ45bZBYrYtMlfbOsLT9qCTSCD0u2xU
+/Fjg3Dt5Gwek1dBijJh6B/EyAcbnVIjLaCPOwaXy4G2iyJOgRUWWtzIgBwTj3b3lGeQmYd4fnwx/
+v7g=
+=K+Rz
+-----END PGP SIGNATURE-----
+
+--------------0ozO4QW0RhLvr5txCpT9QreH--
