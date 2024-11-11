@@ -1,98 +1,162 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A217D8468;
-	Mon, 11 Nov 2024 06:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F011016A959;
+	Mon, 11 Nov 2024 09:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731306701; cv=none; b=kz+/r/vy73OE/z9sCo7t/3KV/WfDQnf7NMUdegs9hHHIZXTnvQ+UhFXH9tIK8KzePqGp21LmfvsFv+sR28S0XHxPeGh580KC+R2iA1FsYiOF/lnQkru27M+wkFEs063gOEjuesUB17SrP3wNQa4ElxRzWPYsLkKm1tbFYfWRoJ8=
+	t=1731316379; cv=none; b=hb4dNgDtEt1pzeC+FsijQ8uLvQsRo7zkF1/dQcTIDGdj3MbXr6A+HfcEnxqnfp7osEgZqDaidC7wvpGo+WDXgMSl5pGJH1oJz/qiEB4ybcaRSs7anMyWS5qrklr4JPBWqT7jrY78nsbRrg/1H9EgCo9S33Mfs/mN0YdPsuPKTHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731306701; c=relaxed/simple;
-	bh=Z4c521/2axtqq3BARK8Mz9YTcm5ccQXhEiB28VSaRTg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XlkWTzLHnKvWqc1Ha6zY2ywyTOOtizOg9LwhG9GrW/ImS6Zyedh1P3R4FsQPYZyj9Eu/OxThvtoSslqlMmN/2f8cw8mrZl0FllhIehNs24XhaOynyMUE/Hq73v/4SakpA7k8xia1jEZ76d3GTLOjrwV5apC7ytqd+v3MrcM922E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvfCofz7; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731316379; c=relaxed/simple;
+	bh=eLegIPzm6kl+o1xbtiBt0w/Vn129KLVaIrdkjfKYWaA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ACjyU5n7k2nOg9QueFtI6LYwdN8HtxLJhGJjoYSxR6XO6idLkWoAYYnD1pP5q1+TDcMLhkkC4pr+HZqBxd36ceJWFY3zkxwvCB2X9lZ8RRmozU3leoSy2J//PSIEdWT7pkSzGYxv7uYsKW0/4gj9jpk5fkiY/xxhRG38nOa912E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fgPSPhwK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvfCofz7"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7ee6edc47abso2773841a12.3;
-        Sun, 10 Nov 2024 22:31:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731306698; x=1731911498; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WXpWvz0Qv6z1AewP6mYc3kyZfjZbPBjaNa56qfUEE8o=;
-        b=LvfCofz7rGkTGF+eRvU8vMl1dcWth76falsansSoSZzGLGwJE3gcTBW1uKdy17bZD3
-         VAWxXsS3ZNvkED0DCQqv4wR4M44DErWiRLaD9INFtiADwRkzmzQZs0NHtSpaM6AzekDC
-         j7JbmfdhgxmfwDX1d068p3scYhTNEuUCo/tNx+AkcFTSyBoY2HTPl/a6FFWKVLM7UuwP
-         LnHgyTE3GIMJnMFDuzqld6o1QceDrspoFQHsI13BU4tJ5qGFBxZOYkDlNNAucEH0CRqg
-         OlQ8UERIkGn5ufGHPAW7YqICSLPwwPzOKOVzOytATSEpIvVEzbC7kleV5tCfz8+/WUyY
-         epQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731306698; x=1731911498;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WXpWvz0Qv6z1AewP6mYc3kyZfjZbPBjaNa56qfUEE8o=;
-        b=pfQC3swHu64o6vRQtc3CTySObhE2hWQ8jccCNUPueLAWIlGtHrte44AZlh4wsAsddT
-         pGN7b2e30EZYpuM0qGaBWdFxFHaCAP4m1DiWovaj3lQmswv4lZsD/bczs+IZ/eq21ggK
-         AXUdRvbNMUnGqdLImxXsSM8J+o2WPw7CTvyqM4FQqN6/tHF33dLiZwndflKHEKHEH1aD
-         qZoyvscKKzzKSl07UxXrEwRRwdm+w6kgIXETW0ketqWvGJt6AFsrKli7SfT68ANaXs5d
-         FrzDS/o7pqoX4O5aI/uD3B8jR/alVvAXaDykV+P7z/sA8n+yQePS2uZp6qnpsSF/ZhsR
-         +7Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCV7KAiGlKjXa34GRz+vDyrqSn9d7hs7jCcaKDs8DILu0Wne2EAwE/dIWlakKv83ySatVqgFqN968LU6@vger.kernel.org, AJvYcCWlTe9YtZ7Pl0Q/NiCz6Eauzw2Q394ZyXx1Q2Rz/iTU7nmXg12XfKkjWYyr5O514OWS3wWAj7/V7vCuof/a@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+YTEVFd+dYhzLdx6IEIPy+TAOlwzksw0055zfsx9khKPYdYJS
-	fl45TTv3b+DbFLP5BxmvBb23PDYCnZ8a9QvqebaqKhyB3FEr7OPAWh03xABtKsaMUJJX1TTkTtd
-	PGVJfcBJ0+jWYDZy2JroEfaJr/tgOa6CMytM=
-X-Google-Smtp-Source: AGHT+IEzhxaGaGl/GBxq3P6afyCic6It5guwLyOkDVy40lR2gGXznKUwHu5IgUmo7o72wwokDXZ+A/AAEwnXGUdFwHY=
-X-Received: by 2002:a17:90b:53c6:b0:2e2:cf5c:8edf with SMTP id
- 98e67ed59e1d1-2e9b170eaf9mr15710113a91.9.1731306697869; Sun, 10 Nov 2024
- 22:31:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fgPSPhwK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D85C4CED0;
+	Mon, 11 Nov 2024 09:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731316378;
+	bh=eLegIPzm6kl+o1xbtiBt0w/Vn129KLVaIrdkjfKYWaA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fgPSPhwKVCoHhP5ZUhqFPaUA3BckikO442jgj8GZjtPjAiQvZy2Zt8UJaqx4sZ4cn
+	 tLQLnuNp8PDWRuevwPEyIHOAmeXYlFpVSIX3s7ozITJY1rKstBsCZlFlksJ0gw6tmS
+	 kdvvTwHsIdFewza2NlXVyqYUKM9MykIn/gCPy6V7rfKaE5bePR/WM3+hqBWYTt+baE
+	 ElCEQ+0slDPOh3YKguR0LIEL0eNaL2YyYEX/vSMtnmZZUKcDhQynA4VIMn0yTrjVZ3
+	 fE5fwQWPiTHePSimVwb1JplWrql7brpCmIVXRpE7c1XmVUtvAeONSspLa67X4zbXJl
+	 sD6sd7jx8WGRQ==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gao Xiang <xiang@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v4 00/33] netfs: Read performance improvements and "single-blob" support
+Date: Mon, 11 Nov 2024 10:12:33 +0100
+Message-ID: <20241111-kochkunst-kroll-f8386db7f273@brauner>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241108173236.1382366-1-dhowells@redhat.com>
+References: <20241108173236.1382366-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007210214.102568-1-linux@treblig.org> <Zy0reBfykkwXA47d@gallifrey>
- <CAH2r5mvL+xXH_nnoKKKnVPFo_xtOb=8mPSqrG28Dgngx6Aab7Q@mail.gmail.com>
- <CAH2r5ms1y3XsGmA2kU6Vdvdmg_jnVyd2w7mQPRyX9oh9rFD2tA@mail.gmail.com>
- <ZzEOuqDwagwoGCMf@jeremy-HP-Z840-Workstation> <CAN05THTgj+_78kG3LFnpU9zsjEEBAsyDZ0P20YL3-DP94r3KUA@mail.gmail.com>
- <ZzFaSf20nIbppt8w@jeremy-HP-Z840-Workstation>
-In-Reply-To: <ZzFaSf20nIbppt8w@jeremy-HP-Z840-Workstation>
-From: ronnie sahlberg <ronniesahlberg@gmail.com>
-Date: Mon, 11 Nov 2024 16:31:26 +1000
-Message-ID: <CAN05THQXYNgG=Rji7r7xU9UF6ZBH3SP405o=D_F3nbbs9XYChQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Remove pre-historic unused CIFSSMBCopy
-To: Jeremy Allison <jra@samba.org>
-Cc: Steve French <smfrench@gmail.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath S M <bharathsm@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4915; i=brauner@kernel.org; h=from:subject:message-id; bh=eLegIPzm6kl+o1xbtiBt0w/Vn129KLVaIrdkjfKYWaA=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQbnuoTcJer1I9iZPy/KXnXkR3yzUvPeSUdKhatyKkPP 1/h4qTTUcrCIMbFICumyOLQbhIut5ynYrNRpgbMHFYmkCEMXJwCMJHXyowMJ73NZvvz71XzWu/R kX/O6mpbvrbzAbX0naeF5dI9IzTqGRmeOOw/3D7HYsVKm7tHJ/g+THnPZ3IgVWj+mYxQHlHHyPM MAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Mon, 11 Nov 2024 at 11:13, Jeremy Allison <jra@samba.org> wrote:
->
-> On Mon, Nov 11, 2024 at 09:02:03AM +1000, ronnie sahlberg wrote:
-> >All of SMB1 should be removed.  Not just disabled but deleted.
-> >
-> >What are the plans in samba? Any timeline to literally delete the smb1 code?
->
-> It can already be compiled out of any build,
-> so it's an option for any distro or user of
-> Samba.
->
-> I'm not sure deleting the code is needed at
-> this point, as it still has legacy uses
-> (there are still commercial uses of OS/2
-> out there for example).
+On Fri, 08 Nov 2024 17:32:01 +0000, David Howells wrote:
+> This set of patches is primarily about two things: improving read
+> performance and supporting monolithic single-blob objects that have to be
+> read/written as such (e.g. AFS directory contents).  The implementation of
+> the two parts is interwoven as each makes the other possible.
+> 
+> READ PERFORMANCE
+> ================
+> 
+> [...]
 
-There are still costs to maintain it. Especially since weird protocol
-quirks keep being exposed and affecting semantics much higher up in
-the stack.
+Applied to the vfs-6.14.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs-6.14.netfs branch should appear in linux-next soon.
 
-There are probably still someone that runs 3Mbit Ethernet with 16-bit
-MAC addresses.  But we don't support that with modern ethernet
-drivers.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.14.netfs
+
+[01/33] kheaders: Ignore silly-rename files
+        https://git.kernel.org/vfs/vfs/c/3033d243b97c
+[02/33] netfs: Remove call to folio_index()
+        https://git.kernel.org/vfs/vfs/c/f709cec9dc52
+[03/33] netfs: Fix a few minor bugs in netfs_page_mkwrite()
+        https://git.kernel.org/vfs/vfs/c/07a80742a52b
+[04/33] netfs: Remove unnecessary references to pages
+        https://git.kernel.org/vfs/vfs/c/53f5f31a1549
+[05/33] netfs: Use a folio_queue allocation and free functions
+        https://git.kernel.org/vfs/vfs/c/1d044b4cb3e9
+[06/33] netfs: Add a tracepoint to log the lifespan of folio_queue structs
+        https://git.kernel.org/vfs/vfs/c/7583f643f714
+[07/33] netfs: Abstract out a rolling folio buffer implementation
+        https://git.kernel.org/vfs/vfs/c/2029a747a14d
+[08/33] netfs: Make netfs_advance_write() return size_t
+        https://git.kernel.org/vfs/vfs/c/34961bbe07a5
+[09/33] netfs: Split retry code out of fs/netfs/write_collect.c
+        https://git.kernel.org/vfs/vfs/c/8816207a3e26
+[10/33] netfs: Drop the error arg from netfs_read_subreq_terminated()
+        https://git.kernel.org/vfs/vfs/c/44c5114bb155
+[11/33] netfs: Drop the was_async arg from netfs_read_subreq_terminated()
+        https://git.kernel.org/vfs/vfs/c/3c8a83f74e0e
+[12/33] netfs: Don't use bh spinlock
+        https://git.kernel.org/vfs/vfs/c/5c962f9982cd
+[13/33] afs: Don't use mutex for I/O operation lock
+        https://git.kernel.org/vfs/vfs/c/244059f6472c
+[14/33] afs: Fix EEXIST error returned from afs_rmdir() to be ENOTEMPTY
+        https://git.kernel.org/vfs/vfs/c/10e890507ed5
+[15/33] afs: Fix directory format encoding struct
+        https://git.kernel.org/vfs/vfs/c/c8f34615191c
+[16/33] netfs: Remove some extraneous directory invalidations
+        https://git.kernel.org/vfs/vfs/c/ab143ef48b3b
+[17/33] cachefiles: Add some subrequest tracepoints
+        https://git.kernel.org/vfs/vfs/c/46599823a281
+[18/33] cachefiles: Add auxiliary data trace
+        https://git.kernel.org/vfs/vfs/c/499c9d489d7b
+[19/33] afs: Add more tracepoints to do with tracking validity
+        https://git.kernel.org/vfs/vfs/c/606d920396fd
+[20/33] netfs: Add functions to build/clean a buffer in a folio_queue
+        https://git.kernel.org/vfs/vfs/c/823f8d570db5
+[21/33] netfs: Add support for caching single monolithic objects such as AFS dirs
+        https://git.kernel.org/vfs/vfs/c/5ae8e69c119a
+[22/33] afs: Make afs_init_request() get a key if not given a file
+        https://git.kernel.org/vfs/vfs/c/bfeb953ddf0b
+[23/33] afs: Use netfslib for directories
+        https://git.kernel.org/vfs/vfs/c/2b6bae4ca558
+[24/33] afs: Use netfslib for symlinks, allowing them to be cached
+        https://git.kernel.org/vfs/vfs/c/a16c68c66f52
+[25/33] afs: Eliminate afs_read
+        https://git.kernel.org/vfs/vfs/c/b84e275b6da2
+[26/33] afs: Fix cleanup of immediately failed async calls
+        https://git.kernel.org/vfs/vfs/c/355d07737082
+[27/33] afs: Make {Y,}FS.FetchData an asynchronous operation
+        https://git.kernel.org/vfs/vfs/c/e31fb01515da
+[28/33] netfs: Change the read result collector to only use one work item
+        https://git.kernel.org/vfs/vfs/c/1bd9011ee163
+[29/33] afs: Make afs_mkdir() locally initialise a new directory's content
+        https://git.kernel.org/vfs/vfs/c/4e93a341aec1
+[30/33] afs: Use the contained hashtable to search a directory
+        https://git.kernel.org/vfs/vfs/c/08890740b1d7
+[31/33] afs: Locally initialise the contents of a new symlink on creation
+        https://git.kernel.org/vfs/vfs/c/d4f4a6bde676
+[32/33] afs: Add a tracepoint for afs_read_receive()
+        https://git.kernel.org/vfs/vfs/c/f06ba511d8d5
+[33/33] netfs: Report on NULL folioq in netfs_writeback_unlock_folios()
+        https://git.kernel.org/vfs/vfs/c/19375843912f
