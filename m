@@ -1,128 +1,201 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E2A13D2B2;
-	Wed, 13 Nov 2024 17:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C7913D2B2;
+	Wed, 13 Nov 2024 17:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731517559; cv=none; b=oHrtmk5MlRbc07pAI5HUgrldA/EcVnTaEbBXGC+y81vPv9C2z1MLVlt+3wjCIweWEtMO8KulMct2xqnZwiw6yCKn3PttOlJIh7qBAzycl7Cz1+zMebl7xhX70dbczd7oMWOgeK0t0t5kssKmmbWCxW8bVDvvdy/W7S4zRll7yc8=
+	t=1731517765; cv=none; b=aCgL88HTSTTqOoW9OtW3xNLUTgTPrHg0GlaG+TuxJsOWZwFiaScEA8SL6H+ipTNdV9mKCPPOPWV13rwj3BScP03N8F2uDoz4cMr58FRfnlJK07e/FwezHI8dT6WDRt7xY0UKd8D03NrD+ErLRnFhdtMhyHY5aMFpHeDhuVY8F0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731517559; c=relaxed/simple;
-	bh=vBDKgjR6V/zTWckWegrqEoc7IBGfIW4eBSJb7A4Bosw=;
+	s=arc-20240116; t=1731517765; c=relaxed/simple;
+	bh=cBHQbCzGz3rUEXpTSv8dbThEFcHNSstMSfFNbQisk1M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QYTk8jYZFPI0Vqoclv3sfpcNYXiFm4s9pedxNMy4ZnFwPhycFIushH3rvgduiqJCWphHYz16jvp8A3P5ij/GS5P26+IBIHT0e6OV9jm2AIlYEYXx8gYUuU02poF7M8TsC5uRAxuKZvkaTsvdwOcwR4WeBDxMoeHHqVl3NfG+9y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FaRJneDI; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=ULVtmV6n5KheqT+h/JVNkTBc5tqt2qG0uKinsl8z5Vlj0+95b5OTfSWk5RE0cWCUD8sOaqp3LwMTI7fV0JNjSgMtvnSG39HpM3h8SBmGmvpP5cKdbd1fcWcP98lYAcM+p/6hrIwxKsMuyEE7ZMld3wi6n1IQS3h4ZMxePj9ThmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtuYg9cL; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FaRJneDI"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53d8c08cfc4so4565916e87.3;
-        Wed, 13 Nov 2024 09:05:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtuYg9cL"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539d9fffea1so7142337e87.2;
+        Wed, 13 Nov 2024 09:09:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731517556; x=1732122356; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731517761; x=1732122561; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zEep/OMfJyldzNvkNFDVhhiUsnQA3+XUm5BPLdUV5Uo=;
-        b=FaRJneDI11zoQZcjBCvrAIMww6gUFRe6SDbEjs1y8Q21P/Jq0hy8dZcpOLpBTJeNGF
-         XW/sgJ6YwitYOCQxFMrioCOIu2lcKrfHTWjV5cronRAOed9zn47HKPvMxnRx2ien54JS
-         ZLYcnW6JByw2UalcYRWgHRSyDLGFyIzg+aEtGfWD+Fy2oyrcFFKEq2pjIc7L85FWmyE9
-         HF6U8O9P8eimPAlTKFsSnb/w85iM2g5hPxJFHfxGt3LynSkCNUuMAOLoknNrLEuKzIhi
-         3W7e6NtFbGrPeHBFuI/VWTA6Iscpaoh5hZBqMubq/Rqbc5ud7jtGRLcK86r1lUOa7q9r
-         KKOw==
+        bh=jadf3pMq6CbgWyqAcchpAE7uOT3rAXGBeVpVpylqHIU=;
+        b=ZtuYg9cLmJMSWH3L2Pj4hWuiJfANfFOeyoi5i9xVn2DvTYEKD78CnAGPwWWVmPiv9l
+         9vVT/yTxBYrHvdmkfWr/vR84C/vwnbH5OVnleYm5s5wEIyrN3fVqSjJ5U4dd/7GHtdp4
+         tkHZT5Jng0ARWB83EnLgRElPQDAG9B91hJ835AkLQZ1K3SrU1MyCkTtm1LiB6ajdRF3v
+         kMy3LzkmzuK9Kp/+aDbEPHC/39ZqymF9C6rS5sdWtXRtjZmmvZtfh2hEk9p29XY75DZH
+         ZFMjrWjAXAuUlMeQ9X3et5UvqCvxooYfRANvhE4RecBYQnMVceajHzv/M6AB/aSjTdZv
+         MUuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731517556; x=1732122356;
+        d=1e100.net; s=20230601; t=1731517761; x=1732122561;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zEep/OMfJyldzNvkNFDVhhiUsnQA3+XUm5BPLdUV5Uo=;
-        b=VJ8yrVUf3eyu9gl2Wdv/9A0NLwM0D7o9dSqoEU1Rj8gYuWdG8PIdbOxjdcGc3wVO7N
-         8VUkAAIGynPuFNflSOnBQgyzvB1fEs61mF8Zb607pz8WfxNq+YQZGX3epq/7h+L8SQ7+
-         6852Oq29rgpBMqwn56m7TFgIqXrEGQ4U4rTUOAdq7pOBOxAodzJmou1QLhlEEiFx7qnM
-         MpQL/7jk4FCK3R9EFR1X5aYc2g6HowDmxCC2QykJy6LfQXiX7HTsYnozc9HIDLz10r1I
-         Ym99dAc2VVvEAzMxtcVWteqiJ+/DeFu+G1joTu6z8Swq//Io3aMMR1kb/jgFktP4zsry
-         m6Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEbxcw8Awg5Kg+SwkzbNKj947k5OX8O1EqExHSIYFP3iLa3GURnmsohmQ+H7Gx9J8L37RAZnuGRR88@vger.kernel.org, AJvYcCVADrGg0ISDhidEcr6sFQmNCzO3dW780h17Rja3vp4r7/5WJbu4kRlmQxCXUVLG8o4c1bl4NozFr5RE4DLT@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9suTTKMgsVSzvHgmlWuQ6WFecBnNdWeIewRpK5EHwPsDPb0zu
-	cJkGmyz4MWrKA9ToIDciBtfz5VHwEsuMRiPY1t4RkdUgOvmRVRa+/UpHKLSZNhknzWOeQlsdz+m
-	jBmkIEzf1PEg0/izz+iMZz9gmITA=
-X-Google-Smtp-Source: AGHT+IHklTE9+daZ5V6N7lYW+6/IbHQcQEhMqhqVGJ7scdARVw98D3T0fBcxFBULN/mfvPbKatFu8XWI1hgeC9KqiEw=
-X-Received: by 2002:ac2:4e13:0:b0:535:82eb:21d1 with SMTP id
- 2adb3069b0e04-53d8630341bmr9311605e87.57.1731517555466; Wed, 13 Nov 2024
- 09:05:55 -0800 (PST)
+        bh=jadf3pMq6CbgWyqAcchpAE7uOT3rAXGBeVpVpylqHIU=;
+        b=r/CNWJzP0kLDnTKXPY+I37lV1OJWEHezvZ9ylGHpH1qko1pdR4mXlBxGMtKxH69Evl
+         2/tZ2m88tXh3v19ln5D294mOaE/IEKDjd/VyktHZGscnPeDWHMvCWU2BD1011pH32hO1
+         TCRRduK3jS1MaC7qLkk2ynl4df/S7o56ep0QfIa2e/J/Gvv1OLuQ1X8FU2RoeTOy0k1p
+         PjxXizUKLgZnvgJEDmM75i1Up0CCEu45rMJEtljdS3rwDI3NVGBxRgipJf+QqqcYnV7S
+         o3zXapdAXItLMCP6bGpfxP+/nFyI31nikf6fyuhsf1q2WqEJ8FocD0zhHvfyu2ZuNsN0
+         MNFg==
+X-Forwarded-Encrypted: i=1; AJvYcCW5roXcI1SLGItXpZyMUwIrvupN8jeuKybrV1ZbprPMyWalzmU135PDGKsKRCYZF8LqNp86nrJ9CZxg++V+@vger.kernel.org, AJvYcCXtGoa02lsVset9Gbbsx7B5f/iI5mQsSdm5kKpXyrohOA1bDXTFitZFOcZmTF4RmyFvyfEouVJ0Vt9v@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzn8gpR8N/ebwcAxIm+pMeEvo2UcxnEA+/XeqAl43OqZc2Dd2N
+	dK+jhr3bgGTLAW7Z0V2AGIODr839kAPhtA9QGHHYuJ8kbLvBhxSkrRHePkhFlX7GVYB1RhSr/ce
+	omzRQg1IZXukDaEO1oc9CfkHnO/g=
+X-Google-Smtp-Source: AGHT+IFq3N+nFrlBubyKiRS2dmCyiRc5NNRD3+kpAaB8nxWmiyEoSJPdUUIz88JUno2fPKzUp4W1hWS5DyMJmyb4vw0=
+X-Received: by 2002:a05:6512:e99:b0:53d:a283:f298 with SMTP id
+ 2adb3069b0e04-53da283f5a2mr1610493e87.17.1731517761277; Wed, 13 Nov 2024
+ 09:09:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241112105837.166575-2-thorsten.blum@linux.dev>
-In-Reply-To: <20241112105837.166575-2-thorsten.blum@linux.dev>
+References: <20241007210214.102568-1-linux@treblig.org>
+In-Reply-To: <20241007210214.102568-1-linux@treblig.org>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 13 Nov 2024 11:05:44 -0600
-Message-ID: <CAH2r5mvUNiXVAVVmvt=W_RAVMCm5Fgs_=Etcme3uBZ8gKFK30w@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: Use str_yes_no() helper function
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Date: Wed, 13 Nov 2024 11:09:10 -0600
+Message-ID: <CAH2r5msrcCqvJwvS3w5HzoO16fHNeoj=QNxd+Rs6d04aFPURiw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Remove pre-historic unused CIFSSMBCopy
+To: linux@treblig.org
+Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-tentatively merged into cifs-2.6.git for-next pending testing and
-additional review
+merged into cifs-2.6.git for-next
 
-On Tue, Nov 12, 2024 at 5:33=E2=80=AFAM Thorsten Blum <thorsten.blum@linux.=
-dev> wrote:
+On Mon, Oct 7, 2024 at 4:02=E2=80=AFPM <linux@treblig.org> wrote:
 >
-> Remove hard-coded strings by using the str_yes_no() helper function.
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 >
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> CIFSSMBCopy() is unused, remove it.
+>
+> It seems to have been that way pre-git; looking in a historic
+> archive, I think it landed around May 2004 in Linus'
+> BKrev: 40ab7591J_OgkpHW-qhzZukvAUAw9g
+> and was unused back then.
+>
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 > ---
->  fs/smb/client/dfs_cache.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  fs/smb/client/cifsproto.h |  7 -----
+>  fs/smb/client/cifssmb.c   | 63 ---------------------------------------
+>  2 files changed, 70 deletions(-)
 >
-> diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-> index 110f03df012a..00820f57b434 100644
-> --- a/fs/smb/client/dfs_cache.c
-> +++ b/fs/smb/client/dfs_cache.c
-> @@ -173,8 +173,8 @@ static int dfscache_proc_show(struct seq_file *m, voi=
-d *v)
->                                    "cache entry: path=3D%s,type=3D%s,ttl=
-=3D%d,etime=3D%ld,hdr_flags=3D0x%x,ref_flags=3D0x%x,interlink=3D%s,path_con=
-sumed=3D%d,expired=3D%s\n",
->                                    ce->path, ce->srvtype =3D=3D DFS_TYPE_=
-ROOT ? "root" : "link",
->                                    ce->ttl, ce->etime.tv_nsec, ce->hdr_fl=
-ags, ce->ref_flags,
-> -                                  DFS_INTERLINK(ce->hdr_flags) ? "yes" :=
- "no",
-> -                                  ce->path_consumed, cache_entry_expired=
-(ce) ? "yes" : "no");
-> +                                  str_yes_no(DFS_INTERLINK(ce->hdr_flags=
-)),
-> +                                  ce->path_consumed, str_yes_no(cache_en=
-try_expired(ce)));
+> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+> index 1d3470bca45e..8235b5a0aa2b 100644
+> --- a/fs/smb/client/cifsproto.h
+> +++ b/fs/smb/client/cifsproto.h
+> @@ -549,13 +549,6 @@ extern int generate_smb311signingkey(struct cifs_ses=
+ *ses,
+>                                      struct TCP_Server_Info *server);
 >
->                         list_for_each_entry(t, &ce->tlist, list) {
->                                 seq_printf(m, "  %s%s\n",
-> @@ -242,9 +242,9 @@ static inline void dump_ce(const struct cache_entry *=
-ce)
->                  ce->srvtype =3D=3D DFS_TYPE_ROOT ? "root" : "link", ce->=
-ttl,
->                  ce->etime.tv_nsec,
->                  ce->hdr_flags, ce->ref_flags,
-> -                DFS_INTERLINK(ce->hdr_flags) ? "yes" : "no",
-> +                str_yes_no(DFS_INTERLINK(ce->hdr_flags)),
->                  ce->path_consumed,
-> -                cache_entry_expired(ce) ? "yes" : "no");
-> +                str_yes_no(cache_entry_expired(ce)));
->         dump_tgts(ce);
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+> -extern int CIFSSMBCopy(unsigned int xid,
+> -                       struct cifs_tcon *source_tcon,
+> -                       const char *fromName,
+> -                       const __u16 target_tid,
+> -                       const char *toName, const int flags,
+> -                       const struct nls_table *nls_codepage,
+> -                       int remap_special_chars);
+>  extern ssize_t CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *=
+tcon,
+>                         const unsigned char *searchName,
+>                         const unsigned char *ea_name, char *EAData,
+> diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+> index c6f15dbe860a..ca50ac652e02 100644
+> --- a/fs/smb/client/cifssmb.c
+> +++ b/fs/smb/client/cifssmb.c
+> @@ -2339,69 +2339,6 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, =
+struct cifs_tcon *pTcon,
+>         return rc;
 >  }
 >
+> -int
+> -CIFSSMBCopy(const unsigned int xid, struct cifs_tcon *tcon,
+> -           const char *fromName, const __u16 target_tid, const char *toN=
+ame,
+> -           const int flags, const struct nls_table *nls_codepage, int re=
+map)
+> -{
+> -       int rc =3D 0;
+> -       COPY_REQ *pSMB =3D NULL;
+> -       COPY_RSP *pSMBr =3D NULL;
+> -       int bytes_returned;
+> -       int name_len, name_len2;
+> -       __u16 count;
+> -
+> -       cifs_dbg(FYI, "In CIFSSMBCopy\n");
+> -copyRetry:
+> -       rc =3D smb_init(SMB_COM_COPY, 1, tcon, (void **) &pSMB,
+> -                       (void **) &pSMBr);
+> -       if (rc)
+> -               return rc;
+> -
+> -       pSMB->BufferFormat =3D 0x04;
+> -       pSMB->Tid2 =3D target_tid;
+> -
+> -       pSMB->Flags =3D cpu_to_le16(flags & COPY_TREE);
+> -
+> -       if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+> -               name_len =3D cifsConvertToUTF16((__le16 *) pSMB->OldFileN=
+ame,
+> -                                             fromName, PATH_MAX, nls_cod=
+epage,
+> -                                             remap);
+> -               name_len++;     /* trailing null */
+> -               name_len *=3D 2;
+> -               pSMB->OldFileName[name_len] =3D 0x04;     /* pad */
+> -               /* protocol requires ASCII signature byte on Unicode stri=
+ng */
+> -               pSMB->OldFileName[name_len + 1] =3D 0x00;
+> -               name_len2 =3D
+> -                   cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_=
+len+2],
+> -                                      toName, PATH_MAX, nls_codepage, re=
+map);
+> -               name_len2 +=3D 1 /* trailing null */  + 1 /* Signature wo=
+rd */ ;
+> -               name_len2 *=3D 2; /* convert to bytes */
+> -       } else {
+> -               name_len =3D copy_path_name(pSMB->OldFileName, fromName);
+> -               pSMB->OldFileName[name_len] =3D 0x04;  /* 2nd buffer form=
+at */
+> -               name_len2 =3D copy_path_name(pSMB->OldFileName+name_len+1=
+, toName);
+> -               name_len2++;    /* signature byte */
+> -       }
+> -
+> -       count =3D 1 /* 1st signature byte */  + name_len + name_len2;
+> -       inc_rfc1001_len(pSMB, count);
+> -       pSMB->ByteCount =3D cpu_to_le16(count);
+> -
+> -       rc =3D SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+> -               (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+> -       if (rc) {
+> -               cifs_dbg(FYI, "Send error in copy =3D %d with %d files co=
+pied\n",
+> -                        rc, le16_to_cpu(pSMBr->CopyCount));
+> -       }
+> -       cifs_buf_release(pSMB);
+> -
+> -       if (rc =3D=3D -EAGAIN)
+> -               goto copyRetry;
+> -
+> -       return rc;
+> -}
+> -
+>  int
+>  CIFSUnixCreateSymLink(const unsigned int xid, struct cifs_tcon *tcon,
+>                       const char *fromName, const char *toName,
 > --
-> 2.47.0
+> 2.46.2
 >
 >
 
