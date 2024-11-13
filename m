@@ -1,54 +1,54 @@
 Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7571FF5EA
-	for <linux-cifs@vger.kernel.org>; Wed, 13 Nov 2024 11:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCCA2003DF
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Nov 2024 11:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731498209; cv=none; b=rfXjsLtoQEcfnONNYdDxQkKe7qeks2puZ2k2U5Rd56stozlZ+pSOSUMKXM9QA72TmZXKk+CeBgmus0kaZVD8BDekdeAER9oQRAIEGbPA6mBGIAbDm9skjPsYXFbjWFd3AxvD6Rv7RUGXKT+hU09pYkqSec7RCQpROpcNfArC55Y=
+	t=1731498496; cv=none; b=gtz/58RgMSBrZ+17aY3WkrkHXNbK8/SnXc4mcteplH5tFpueAcDchiPnnXcd5l/p2Q1eFYg+dX/H36CFJDWjV2B64Y+PhMSC8JPtFXqTwemWfR5+CafFBXoDqBY3xIIPZk5Wg/ymfrjJSDlGEwePp84qLvJf66h/OZBuHAh6kVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731498209; c=relaxed/simple;
-	bh=VTT+vBl8cPVjLjBb2XRgztHd8v1LyZCzbo/7pEqvwgU=;
+	s=arc-20240116; t=1731498496; c=relaxed/simple;
+	bh=spbpJNivx4N5/MtMhq5jTHND/nOpCzU1jm7Ihk6f7PU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qwnHkqkCCvSYVcpaiIfF8T5By43yxB/jSIUn9kzTFwRRc3k9mIuO0LuDDwQYpgy3EC08HA96zKNOEt0QDWhhb0l6boTeYtDmsblL3O9eMsVWZM//AOyGtlfdiatJ6GrjEE+jWG6F8Pc94f8ngEGmRiFdrzwFx6lafE5g/Y+eEWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RodHBuX+; arc=none smtp.client-ip=209.85.208.48
+	 To:Cc:Content-Type; b=NYOwRlpIEhmF7AUYlkanXOttq1sRdiORCFQ8Wa7jEFK4hDlY1YFdqWR4fxJYfo5R20Tb2YDT/aGLgWTHmags8MjcHKoVMWe+K+rJNTGCaxQgNlzUt3El0Y7GbYr3HmjPn5OliajPz2iMEYP5LMuKTlU6i4lAqgl7iTIVmWTEt4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3DZ9Wx9; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RodHBuX+"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so8245788a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Nov 2024 03:43:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3DZ9Wx9"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5ceb03aaddeso8044353a12.2
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Nov 2024 03:48:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731498206; x=1732103006; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731498493; x=1732103293; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3f2oX5M69z9/q+G+sWc5llcJtaKWjfTiI/4KtQkcw8c=;
-        b=RodHBuX+TDoqJwGVBAw5X0bYO1pC2dbNrRXUdQO/+ascljZvmOXZgmWPzdwFbqLgtv
-         QQftxwDc3WzHHRT1mxcuSaOZna1TP7tolMfMbENZjyS2twgozL1lWVi4F4e92GxYaPPh
-         0gl5VIVzclO5Y412UuyvgpemHdes0HxhYc/kpBA0Wdpii384F8udgtQ58YXwjTVf/OK5
-         lmXkQhBZ9wL3tCeLrNasthttactTd5Murf2VjfvC7dapTZHStqVrRQJ9VFnDQCDfJrkT
-         eC+JZZKt8dCh8bybsEwdo2pM2P+qbuzDGJ+6Q43XGHCql8Smjoj5v7ziln4+wXERxekI
-         Pabw==
+        bh=9vMqdfLSVxOND9dPev47/U5o//iZ47Aeg6YEl/9pwRg=;
+        b=C3DZ9Wx9D++chniPWfk1Xaet1+l7mf6E+oKw67bOqSMjpiwizh0YHsGJP62+iiXkCu
+         49MzbU1b+ZLxz4lnComP2RHXjba7MSvdK5LtRB4vkvV9l+vyEt+0FigBZKsQq//MT42W
+         qkJFa/sSUu/I6METgg26iKvNKrcU38xmT5SY1yuv713eTeTFPU2RQmQuu47YLPgSILzL
+         SXqW6I/NADn2lmZdWSHpa1C9xR+ycjZCT8yRvQbbicT8aSyBCHCx66cptRD500QxEkGp
+         7bYVFQaEYpkGBrdAnwTBFSJuIIenJDm4wzQWD5VB+rLEMnWX8827QkQx910TErXhSZue
+         rcXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731498206; x=1732103006;
+        d=1e100.net; s=20230601; t=1731498493; x=1732103293;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3f2oX5M69z9/q+G+sWc5llcJtaKWjfTiI/4KtQkcw8c=;
-        b=Cvt3jrxRNh9MObNlK3ziZBfRw9ZjgggQ4UNwANqzwn7vvKgxxzwU2ufjPFLbB1niob
-         +e3HYct63VrvYxh3Y8BegoFm+Wj8ejIj4b8552OlDcfQgzcWNtSUDYmFquuGea+yaZXj
-         Fpeq1qrv/zg6fAS8s7PUTUEHJijGlZgjbQYbtn18xzDzBcbsu2AxbHLFoQMpFSQV/Kxi
-         peXu3f1MuvK/+aan+RBZWtnkiy2o5BtCYqfkH/RJgUc+GFi1VBHS6RptpRUfDw3mL7nM
-         ZYY5252Rkc4zTICh3+h0Es/QN4ijR6F3C5y3ZSXoGgQ8ZGAy4G8JoXFd6R9hlGHeyEms
-         64HA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTitfIlyc5BOZkzMOstmEQZtg+0+/ueD7ndMNc7VfI23DwnatecW5F9VXxnw/i0VHt7yDOrCabE+0w@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8J7VR4Bv7atjtA09AlRaKIWGYnIPkHSSHLku+vz0f3xP++WAX
-	/Wgyw8D4Em+BAMbruHd5CLTHZClr7tXT1EFChFSNfGYqwjTLlGJ1nbFSt2/VDQnrUz83qTYJCDF
-	PCgFqfePVd2pctavoa2JawCm0P6pB+Q==
-X-Google-Smtp-Source: AGHT+IH7LvZT3YwJE2Cgw53eiL+vMfCm5FLkZwFKLiZuMnmQvtvlTtxQmrsG+zOAml6kECW9Gn7kld9fpm7Glurb9Vc=
-X-Received: by 2002:a05:6402:5241:b0:5ce:dea8:8eb with SMTP id
- 4fb4d7f45d1cf-5cf0a26e1d9mr14653616a12.0.1731498205693; Wed, 13 Nov 2024
- 03:43:25 -0800 (PST)
+        bh=9vMqdfLSVxOND9dPev47/U5o//iZ47Aeg6YEl/9pwRg=;
+        b=n50WEwYbwfmuoG6ws7mDHU14PLeY8QyU0GsgLcWDtqixXgbWqnGtFDKMg8EaLpMEzi
+         SE6iiOz8sHT2LRNENO/JzVBcEBOuq/mZyRdmpsQhYVpf/5PlQIQZGNEuwWFZmm7TLiqN
+         8KdC2GqbMxG7IJaWz4zz5YFLN8v+GocNhuvG1eIKkCPe71/f+1dTadj4bdhuoASJ8yAg
+         LLzaUEDn8Lfa37hqTUoYr+MVAe17RGTu1q716FvgP0OwN9ezlrah3mGIG3yGy0Pew+jB
+         TkZTZaQRlRi03Kbv0j9JgqfE+ONwYjd7+zybZg479mVPdim4oUETAeCF2irVPF6Bx1Q0
+         XKCg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLQc0mWKVhkPSy0L8EHrteXDVZwY1pk+fdipwcy60X68G3zJdLrKFaa/PgY8+NXJKTapVKXsDn4dhg@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpMT9RgFdzYlBLlNcvxSWbJ/cISijb5TjENtvZKqPVsNELKk1E
+	jzXG9OD+YGeuQp5d0vAqWYN+9LkqaT/vHyHW/fe1a8lAViV/L9xEP9OAh3zLxK2hFMisf6elDeA
+	daKQ0sSfYgGZlI9YCqyKkkuLXGbgyVw==
+X-Google-Smtp-Source: AGHT+IHdke5cjJounr4vv/AITbK85cGLbkXput4n4TFdVu8TTNmJrhA9WJu5jst2/qtOX0KBfvsjM8LIhepOgQvxgF0=
+X-Received: by 2002:a05:6402:350f:b0:5cf:451e:a5bb with SMTP id
+ 4fb4d7f45d1cf-5cf451ea6b7mr8057511a12.13.1731498492776; Wed, 13 Nov 2024
+ 03:48:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -56,202 +56,232 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20241030142829.234828-1-meetakshisetiyaoss@gmail.com>
- <20241030142829.234828-2-meetakshisetiyaoss@gmail.com> <0282479bc2f446bcb34c53a30bb53bda@manguebit.com>
- <CANT5p=qJ+zAU_0bMx=5uhsD1a5BR4Nj8Uv0KvNPOBNt9AtPs6w@mail.gmail.com> <cc06137a94a01901ff5cd9de6a223675@manguebit.com>
-In-Reply-To: <cc06137a94a01901ff5cd9de6a223675@manguebit.com>
+ <1f8a225b0d16fdfa05c417e0f6602489@manguebit.com> <CANT5p=rm90eHDeA669yRNdKvT=GL+NE1PVTJVS-htQ8pbfiwUA@mail.gmail.com>
+ <CANT5p=pFCbi1H-JzRLx5XqL4Qwy-YbOWAX6XmoWXezSn2i__mQ@mail.gmail.com>
+ <b8164b0a49ad6d4cd60142fa55ad3566@manguebit.com> <CAFTVevVGMfkgsr31nN35-p+2nQZEXhHK8hPPF1EhfLmdtKdw+A@mail.gmail.com>
+ <CAFTVevVa81C3u5Wdc+egz8ZbSrNKF7uy6m=6Nd5YnKfeMfo1sA@mail.gmail.com>
+In-Reply-To: <CAFTVevVa81C3u5Wdc+egz8ZbSrNKF7uy6m=6Nd5YnKfeMfo1sA@mail.gmail.com>
 From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Wed, 13 Nov 2024 17:13:13 +0530
-Message-ID: <CAFTVevWw0R+=DV76gecOvRtEqAX-htDwikt2DgPiMjwKo2HLhg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: support mounting with alternate password to
- allow password rotation
+Date: Wed, 13 Nov 2024 17:18:00 +0530
+Message-ID: <CAFTVevWUNFJg0S_XtJmGx+1v0FPYnxkdYDED_NvR8V5cRWHhDQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] cifs: during remount, make sure passwords are in sync
 To: Paulo Alcantara <pc@manguebit.com>
 Cc: Shyam Prasad N <nspmangalore@gmail.com>, smfrench@gmail.com, sfrench@samba.org, 
-	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, bharathsm.hsk@gmail.com, 
-	Meetakshi Setiya <msetiya@microsoft.com>
-Content-Type: multipart/mixed; boundary="0000000000007ae7160626c9d7f5"
+	sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org, 
+	bharathsm.hsk@gmail.com, Meetakshi Setiya <msetiya@microsoft.com>
+Content-Type: multipart/mixed; boundary="0000000000009779050626c9e8fc"
 
---0000000000007ae7160626c9d7f5
+--0000000000009779050626c9e8fc
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Thanks for the review Paulo, here is the updated patch that uses
-cifs_dbg (FYI) instead of cifs_info.
+Thanks for the review, Paulo. I have attached the updated patch.
+I will send the password rotation changes for DFS, SMB1 (and multiuser) lat=
+er,
+separately.
 
 Best
 Meetakshi
 
-On Fri, Nov 8, 2024 at 8:50=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> w=
-rote:
+On Wed, Nov 13, 2024 at 3:30=E2=80=AFPM Meetakshi Setiya
+<meetakshisetiyaoss@gmail.com> wrote:
 >
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
+> Typo: password rotation for SMB1.0 is NOT supported for reconnects. It wo=
+rks for fresh
+> mounts and remounts.
+> Should I add support for reconnect or remove it completely?
 >
-> > On Fri, Nov 8, 2024 at 12:35=E2=80=AFAM Paulo Alcantara <pc@manguebit.c=
-om> wrote:
-> >>
-> >> meetakshisetiyaoss@gmail.com writes:
-> >>
-> >> > @@ -2245,6 +2269,7 @@ struct cifs_ses *
-> >> >  cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_con=
-text *ctx)
-> >> >  {
-> >> >       int rc =3D 0;
-> >> > +     int retries =3D 0;
-> >> >       unsigned int xid;
-> >> >       struct cifs_ses *ses;
-> >> >       struct sockaddr_in *addr =3D (struct sockaddr_in *)&server->ds=
-taddr;
-> >> > @@ -2263,6 +2288,8 @@ cifs_get_smb_ses(struct TCP_Server_Info *serve=
-r, struct smb3_fs_context *ctx)
-> >> >                       cifs_dbg(FYI, "Session needs reconnect\n");
-> >> >
-> >> >                       mutex_lock(&ses->session_mutex);
-> >> > +
-> >> > +retry_old_session:
-> >> >                       rc =3D cifs_negotiate_protocol(xid, ses, serve=
-r);
-> >> >                       if (rc) {
-> >> >                               mutex_unlock(&ses->session_mutex);
-> >> > @@ -2275,6 +2302,13 @@ cifs_get_smb_ses(struct TCP_Server_Info *serv=
-er, struct smb3_fs_context *ctx)
-> >> >                       rc =3D cifs_setup_session(xid, ses, server,
-> >> >                                               ctx->local_nls);
-> >> >                       if (rc) {
-> >> > +                             if (((rc =3D=3D -EACCES) || (rc =3D=3D=
- -EKEYEXPIRED) ||
-> >> > +                                     (rc =3D=3D -EKEYREVOKED)) && !=
-retries && ses->password2) {
-> >> > +                                     retries++;
-> >> > +                                     cifs_info("Session reconnect f=
-ailed, retrying with alternate password\n");
-> >>
-> >> Please don't add more noisy messages over reconnect.  Remember that if
-> >> SMB session doesn't get re-established, there will be flood enough on
-> >> dmesg with "Send error in SessSetup =3D ..." messages on every 2s that
-> >> already pisses off users and customers.
-> >>
-> > Perhaps we could do a cifs_dbg instead of cifs_info.
+> On Wed, Nov 13, 2024 at 3:20=E2=80=AFPM Meetakshi Setiya <meetakshisetiya=
+oss@gmail.com> wrote:
+>>
+>> Hi Paulo,
+>>
+>> Given your and Shyam's comments, I am thinking of making the
+>> following changes to the code to support password rotation for DFS:
+>>
+>> 1. For a fresh mount:
+>>     - In cifs_do_automount, bring the passwords in fs_context in sync wi=
+th
+>>     the passwords in the session object before sending the context to th=
+e
+>>     child/submount.
+>>
+>> 2. For a remount (of the root only):
+>>     - In smb3_reconfigure, bring the passwords in the fs_context of the =
+master
+>>     tcon in sync with its session object passwords. After this is done, =
+a new
+>>     function will be called to iterate over the dfs_ses_list held in thi=
+s tcon
+>>     and sync their session passwords with the updated root session passw=
+ord
+>>     and password2.
+>>
+>> Password rotation for multiuser mounts is out of scope for this patch an=
+d I will
+>> address it later.
+>>
+>> Please let me know if you have any comments or suggestions on this appro=
+ach.
+>>
+>> Also, we share the mount code path (cifs_mount) for all SMB versions. So=
+, password
+>> rotation for SMB1.0 is currently supported ONLY on mounts. Password rota=
+tion on
+>> remount, however, is not. Should I remove the support completely for SMB=
+1.0
+>> (print a warning message), leave it be, or add remount support?
 >
-> Yep, with FYI.
 >
-> > But Paulo, the problem here is that we retry every 2s. I think we
-> > should address that instead.
-> > One way is to do an exponential backoff every time we retry.
+> reconnect, not remount.
 >
-> Agreed, but that doesn't mean we should add more noisy messages.
->
-> > I'd also want to understand why we need the reconnect work?
->
-> I see it as an optimisation to allow next IOs to not take longer because
-> it needs to reconnect SMB session.  If there was no prior filesystem
-> activity, why don't allow the client itself to reconnect the session?
->
-> Besides, SMB2_IOCTL currently doesn't call smb2_reconnect(), so
-> reconnect worker would be required to reconnect the session and then
-> allow SMB2_IOCTL to work.  We'd need to change that because with recent
-> special file support, we need to avoid failures when creating or parsing
-> reparse points because the SMB session isn't re-established yet.
->
-> > Why not always do smb2_reconnect when someone does filesystem calls on
-> > the mount point?
->
-> We already do for most operations.  SMB2_IOCTL and SMB2_TREE_CONNECT,
-> for instance, can't call smb2_reconnect() as they would deadlock.
+>>
+>> Thanks
+>> Meetakshi
+>>
+>> On Mon, Nov 11, 2024 at 5:34=E2=80=AFPM Paulo Alcantara <pc@manguebit.co=
+m> wrote:
+>>>
+>>> Shyam Prasad N <nspmangalore@gmail.com> writes:
+>>>
+>>> > On Fri, Nov 8, 2024 at 5:47=E2=80=AFPM Shyam Prasad N <nspmangalore@g=
+mail.com> wrote:
+>>> >> > What about SMB sessions from cifs_tcon::dfs_ses_list?  I don't see=
+ their
+>>> >> > password getting updated over remount.
+>>> >>
+>>> >> This is in our to-do list as well.
+>>> >
+>>> > I did some code reading around how DFS automount works.
+>>> > @Paulo Alcantara Correct me if I'm wrong, but it sounds like we make
+>>> > an assumption that when a DFS namespace has a junction to another
+>>> > share, the same credentials are to be used to perform the mount of
+>>> > that share. Is that always the case?
+>>>
+>>> Yes, it inherits fs_context from the parent mount.  For multiuser
+>>> mounts, when uid/gid/cruid are unspecified, we need to update its value=
+s
+>>> to match real uid/gid from the calling process.
+>>>
+>>> > If we go by that assumption, for password2 to work with DFS mounts, w=
+e
+>>> > only need to make sure that in cifs_do_automount, cur_ctx passwords
+>>> > are synced up to the current ses passwords. That should be quite easy=
+.
+>>>
+>>> Correct.  The fs_context for the automount is dup'ed from the parent
+>>> mount.  smb3_fs_context_dup() already dups password2, so it should work=
+.
+>>>
+>>> The 'remount' case isn't still handled, that's why I mentioned it above=
+.
+>>> You'd need to set password2 for all sessios in @tcon->dfs_ses_list.
+>>>
+>>> I think we need to update password2 for the multiuser sessions as well
+>>> and not only for session from master tcon.
 
---0000000000007ae7160626c9d7f5
+--0000000000009779050626c9e8fc
 Content-Type: application/octet-stream; 
-	name="0002-cifs-support-mounting-with-alternate-password-to-all.patch"
+	name="0001-cifs-during-remount-make-sure-passwords-are-in-sync.patch"
 Content-Disposition: attachment; 
-	filename="0002-cifs-support-mounting-with-alternate-password-to-all.patch"
+	filename="0001-cifs-during-remount-make-sure-passwords-are-in-sync.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_m3ft9sur0>
-X-Attachment-Id: f_m3ft9sur0
+Content-ID: <f_m3ftg5800>
+X-Attachment-Id: f_m3ftg5800
 
-RnJvbSAzMmY2ZTI5M2Y4ZjQ5ZjY2ZmE0ZGYxN2MyYWE4MTU2OWM3ZDc3NTJlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNZWV0YWtzaGkgU2V0aXlhIDxtc2V0aXlhQG1pY3Jvc29mdC5j
-b20+CkRhdGU6IFdlZCwgMzAgT2N0IDIwMjQgMDU6Mzc6MjEgLTA0MDAKU3ViamVjdDogW1BBVENI
-IDIvMl0gY2lmczogc3VwcG9ydCBtb3VudGluZyB3aXRoIGFsdGVybmF0ZSBwYXNzd29yZCB0byBh
-bGxvdwogcGFzc3dvcmQgcm90YXRpb24KClRoaXMgcGF0Y2ggaW50cm9kdWNlcyB0aGUgZm9sbG93
-aW5nIGNoYW5nZXMgdG8gc3VwcG9ydCBwYXNzd29yZCByb3RhdGlvbiBvbgptb3VudDoKCjEuIElm
-IGFuIGV4aXN0aW5nIHNlc3Npb24gaXMgbm90IGZvdW5kIGFuZCB0aGUgbmV3IHNlc3Npb24gc2V0
-dXAgcmVzdWx0cyBpbgpFQUNDRVMsIEVLRVlFWFBJUkVEIG9yIEVLRVlSRVZPS0VELCBzd2FwIHBh
-c3N3b3JkIGFuZCBwYXNzd29yZDIgKGlmCmF2YWlsYWJsZSksIGFuZCByZXRyeSB0aGUgbW91bnQu
-CgoyLiBUbyBtYXRjaCB0aGUgbmV3IG1vdW50IHdpdGggYW4gZXhpc3Rpbmcgc2Vzc2lvbiwgYWRk
-IGNvbmRpdGlvbnMgdG8gY2hlY2sKaWYgYSkgcGFzc3dvcmQgYW5kIHBhc3N3b3JkMiBvZiB0aGUg
-bmV3IG1vdW50IGFuZCB0aGUgZXhpc3Rpbmcgc2Vzc2lvbiBhcmUKdGhlIHNhbWUsIG9yIGIpIHBh
-c3N3b3JkIG9mIHRoZSBuZXcgbW91bnQgaXMgdGhlIHNhbWUgYXMgdGhlIHBhc3N3b3JkMiBvZgp0
-aGUgZXhpc3Rpbmcgc2Vzc2lvbiwgYW5kIHBhc3N3b3JkMiBvZiB0aGUgbmV3IG1vdW50IGlzIHRo
-ZSBzYW1lIGFzIHRoZQpwYXNzd29yZCBvZiB0aGUgZXhpc3Rpbmcgc2Vzc2lvbi4KCjMuIElmIGFu
-IGV4aXN0aW5nIHNlc3Npb24gaXMgZm91bmQsIGJ1dCBuZWVkcyByZWNvbm5lY3QsIHJldHJ5IHRo
-ZSBzZXNzaW9uCnNldHVwIGFmdGVyIHN3YXBwaW5nIHBhc3N3b3JkIGFuZCBwYXNzd29yZDIgKGlm
-IGF2YWlsYWJsZSksIGluIGNhc2UgdGhlCnByZXZpb3VzIGF0dGVtcHQgcmVzdWx0cyBpbiBFQUND
-RVMsIEVLRVlFWFBJUkVEIG9yIEVLRVlSRVZPS0VELgoKU2lnbmVkLW9mZi1ieTogTWVldGFrc2hp
-IFNldGl5YSA8bXNldGl5YUBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY29ubmVj
-dC5jIHwgNTcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0KIDEgZmls
-ZSBjaGFuZ2VkLCA1MCBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
-L2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jIGIvZnMvc21iL2NsaWVudC9jb25uZWN0LmMKaW5kZXgg
-MTVkOTRhYzQwOTVlLi4wMjlkZGIzNThiZTAgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY29u
-bmVjdC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jCkBAIC0xODk4LDExICsxODk4LDM1
-IEBAIHN0YXRpYyBpbnQgbWF0Y2hfc2Vzc2lvbihzdHJ1Y3QgY2lmc19zZXMgKnNlcywKIAkJCSAg
-ICBDSUZTX01BWF9VU0VSTkFNRV9MRU4pKQogCQkJcmV0dXJuIDA7CiAJCWlmICgoY3R4LT51c2Vy
-bmFtZSAmJiBzdHJsZW4oY3R4LT51c2VybmFtZSkgIT0gMCkgJiYKLQkJICAgIHNlcy0+cGFzc3dv
-cmQgIT0gTlVMTCAmJgotCQkgICAgc3RybmNtcChzZXMtPnBhc3N3b3JkLAotCQkJICAgIGN0eC0+
-cGFzc3dvcmQgPyBjdHgtPnBhc3N3b3JkIDogIiIsCi0JCQkgICAgQ0lGU19NQVhfUEFTU1dPUkRf
-TEVOKSkKLQkJCXJldHVybiAwOworCQkgICAgc2VzLT5wYXNzd29yZCAhPSBOVUxMKSB7CisKKwkJ
-CS8qIE5ldyBtb3VudCBjYW4gb25seSBzaGFyZSBzZXNzaW9ucyB3aXRoIGFuIGV4aXN0aW5nIG1v
-dW50IGlmOgorCQkJICogMS4gQm90aCBwYXNzd29yZCBhbmQgcGFzc3dvcmQyIG1hdGNoLCBvcgor
-CQkJICogMi4gcGFzc3dvcmQyIG9mIHRoZSBvbGQgbW91bnQgbWF0Y2hlcyBwYXNzd29yZCBvZiB0
-aGUgbmV3IG1vdW50CisJCQkgKiAgICBhbmQgcGFzc3dvcmQgb2YgdGhlIG9sZCBtb3VudCBtYXRj
-aGVzIHBhc3N3b3JkMiBvZiB0aGUgbmV3CisJCQkgKgkgIG1vdW50CisJCQkgKi8KKwkJCWlmIChz
-ZXMtPnBhc3N3b3JkMiAhPSBOVUxMICYmIGN0eC0+cGFzc3dvcmQyICE9IE5VTEwpIHsKKwkJCQlp
-ZiAoISgoc3RybmNtcChzZXMtPnBhc3N3b3JkLCBjdHgtPnBhc3N3b3JkID8KKwkJCQkJY3R4LT5w
-YXNzd29yZCA6ICIiLCBDSUZTX01BWF9QQVNTV09SRF9MRU4pID09IDAgJiYKKwkJCQkJc3RybmNt
-cChzZXMtPnBhc3N3b3JkMiwgY3R4LT5wYXNzd29yZDIsCisJCQkJCUNJRlNfTUFYX1BBU1NXT1JE
-X0xFTikgPT0gMCkgfHwKKwkJCQkJKHN0cm5jbXAoc2VzLT5wYXNzd29yZCwgY3R4LT5wYXNzd29y
-ZDIsCisJCQkJCUNJRlNfTUFYX1BBU1NXT1JEX0xFTikgPT0gMCAmJgorCQkJCQlzdHJuY21wKHNl
-cy0+cGFzc3dvcmQyLCBjdHgtPnBhc3N3b3JkID8KKwkJCQkJY3R4LT5wYXNzd29yZCA6ICIiLCBD
-SUZTX01BWF9QQVNTV09SRF9MRU4pID09IDApKSkKKwkJCQkJcmV0dXJuIDA7CisKKwkJCX0gZWxz
-ZSBpZiAoKHNlcy0+cGFzc3dvcmQyID09IE5VTEwgJiYgY3R4LT5wYXNzd29yZDIgIT0gTlVMTCkg
-fHwKKwkJCQkoc2VzLT5wYXNzd29yZDIgIT0gTlVMTCAmJiBjdHgtPnBhc3N3b3JkMiA9PSBOVUxM
-KSkgeworCQkJCXJldHVybiAwOworCisJCQl9IGVsc2UgeworCQkJCWlmIChzdHJuY21wKHNlcy0+
-cGFzc3dvcmQsIGN0eC0+cGFzc3dvcmQgPworCQkJCQljdHgtPnBhc3N3b3JkIDogIiIsIENJRlNf
-TUFYX1BBU1NXT1JEX0xFTikpCisJCQkJCXJldHVybiAwOworCQkJfQorCQl9CiAJfQogCiAJaWYg
-KHN0cmNtcChjdHgtPmxvY2FsX25scy0+Y2hhcnNldCwgc2VzLT5sb2NhbF9ubHMtPmNoYXJzZXQp
-KQpAQCAtMjI0NSw2ICsyMjY5LDcgQEAgc3RydWN0IGNpZnNfc2VzICoKIGNpZnNfZ2V0X3NtYl9z
-ZXMoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0
-ICpjdHgpCiB7CiAJaW50IHJjID0gMDsKKwlpbnQgcmV0cmllcyA9IDA7CiAJdW5zaWduZWQgaW50
-IHhpZDsKIAlzdHJ1Y3QgY2lmc19zZXMgKnNlczsKIAlzdHJ1Y3Qgc29ja2FkZHJfaW4gKmFkZHIg
-PSAoc3RydWN0IHNvY2thZGRyX2luICopJnNlcnZlci0+ZHN0YWRkcjsKQEAgLTIyNjMsNiArMjI4
-OCw4IEBAIGNpZnNfZ2V0X3NtYl9zZXMoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBz
-dHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpCiAJCQljaWZzX2RiZyhGWUksICJTZXNzaW9uIG5l
-ZWRzIHJlY29ubmVjdFxuIik7CiAKIAkJCW11dGV4X2xvY2soJnNlcy0+c2Vzc2lvbl9tdXRleCk7
-CisKK3JldHJ5X29sZF9zZXNzaW9uOgogCQkJcmMgPSBjaWZzX25lZ290aWF0ZV9wcm90b2NvbCh4
-aWQsIHNlcywgc2VydmVyKTsKIAkJCWlmIChyYykgewogCQkJCW11dGV4X3VubG9jaygmc2VzLT5z
-ZXNzaW9uX211dGV4KTsKQEAgLTIyNzUsNiArMjMwMiwxMyBAQCBjaWZzX2dldF9zbWJfc2VzKHN0
-cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IHNtYjNfZnNfY29udGV4dCAqY3R4
-KQogCQkJcmMgPSBjaWZzX3NldHVwX3Nlc3Npb24oeGlkLCBzZXMsIHNlcnZlciwKIAkJCQkJCWN0
-eC0+bG9jYWxfbmxzKTsKIAkJCWlmIChyYykgeworCQkJCWlmICgoKHJjID09IC1FQUNDRVMpIHx8
-IChyYyA9PSAtRUtFWUVYUElSRUQpIHx8CisJCQkJCShyYyA9PSAtRUtFWVJFVk9LRUQpKSAmJiAh
-cmV0cmllcyAmJiBzZXMtPnBhc3N3b3JkMikgeworCQkJCQlyZXRyaWVzKys7CisJCQkJCWNpZnNf
-ZGJnKEZZSSwgIlNlc3Npb24gcmVjb25uZWN0IGZhaWxlZCwgcmV0cnlpbmcgd2l0aCBhbHRlcm5h
-dGUgcGFzc3dvcmRcbiIpOworCQkJCQlzd2FwKHNlcy0+cGFzc3dvcmQsIHNlcy0+cGFzc3dvcmQy
-KTsKKwkJCQkJZ290byByZXRyeV9vbGRfc2Vzc2lvbjsKKwkJCQl9CiAJCQkJbXV0ZXhfdW5sb2Nr
-KCZzZXMtPnNlc3Npb25fbXV0ZXgpOwogCQkJCS8qIHByb2JsZW0gLS0gcHV0IG91ciByZWZlcmVu
-Y2UgKi8KIAkJCQljaWZzX3B1dF9zbWJfc2VzKHNlcyk7CkBAIC0yMzUwLDYgKzIzODQsNyBAQCBj
-aWZzX2dldF9zbWJfc2VzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IHNt
-YjNfZnNfY29udGV4dCAqY3R4KQogCXNlcy0+Y2hhbnNfbmVlZF9yZWNvbm5lY3QgPSAxOwogCXNw
-aW5fdW5sb2NrKCZzZXMtPmNoYW5fbG9jayk7CiAKK3JldHJ5X25ld19zZXNzaW9uOgogCW11dGV4
-X2xvY2soJnNlcy0+c2Vzc2lvbl9tdXRleCk7CiAJcmMgPSBjaWZzX25lZ290aWF0ZV9wcm90b2Nv
-bCh4aWQsIHNlcywgc2VydmVyKTsKIAlpZiAoIXJjKQpAQCAtMjM2Miw4ICsyMzk3LDE2IEBAIGNp
-ZnNfZ2V0X3NtYl9zZXMoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3Qgc21i
-M19mc19jb250ZXh0ICpjdHgpCiAJICAgICAgIHNpemVvZihzZXMtPnNtYjNzaWduaW5na2V5KSk7
-CiAJc3Bpbl91bmxvY2soJnNlcy0+Y2hhbl9sb2NrKTsKIAotCWlmIChyYykKLQkJZ290byBnZXRf
-c2VzX2ZhaWw7CisJaWYgKHJjKSB7CisJCWlmICgoKHJjID09IC1FQUNDRVMpIHx8IChyYyA9PSAt
-RUtFWUVYUElSRUQpIHx8CisJCQkocmMgPT0gLUVLRVlSRVZPS0VEKSkgJiYgIXJldHJpZXMgJiYg
-c2VzLT5wYXNzd29yZDIpIHsKKwkJCXJldHJpZXMrKzsKKwkJCWNpZnNfZGJnKEZZSSwgIlNlc3Np
-b24gc2V0dXAgZmFpbGVkLCByZXRyeWluZyB3aXRoIGFsdGVybmF0ZSBwYXNzd29yZFxuIik7CisJ
-CQlzd2FwKHNlcy0+cGFzc3dvcmQsIHNlcy0+cGFzc3dvcmQyKTsKKwkJCWdvdG8gcmV0cnlfbmV3
-X3Nlc3Npb247CisJCX0gZWxzZQorCQkJZ290byBnZXRfc2VzX2ZhaWw7CisJfQogCiAJLyoKIAkg
-KiBzdWNjZXNzLCBwdXQgaXQgb24gdGhlIGxpc3QgYW5kIGFkZCBpdCBhcyBmaXJzdCBjaGFubmVs
-Ci0tIAoyLjQ2LjAuNDYuZzQwNmYzMjZkMjcKCg==
---0000000000007ae7160626c9d7f5--
+RnJvbSAyNWY4YmQ1Zjc0NDdjMjU5NGIzMjAyNGNiZTE2ZTIxMWQxZGIxZGJiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBXZWQsIDMwIE9jdCAyMDI0IDA2OjQ1OjUwICswMDAwClN1YmplY3Q6IFtQQVRDSCAx
+LzJdIGNpZnM6IGR1cmluZyByZW1vdW50LCBtYWtlIHN1cmUgcGFzc3dvcmRzIGFyZSBpbiBzeW5j
+CgpXZSByZWNlbnRseSBpbnRyb2R1Y2VkIGEgcGFzc3dvcmQyIGZpZWxkIGluIGJvdGggc2VzIGFu
+ZCBjdHggc3RydWN0cy4KVGhpcyB3YXMgZG9uZSBzbyBhcyB0byBhbGxvdyB0aGUgY2xpZW50IHRv
+IHJvdGF0ZSBwYXNzd29yZHMgZm9yIGEgbW91bnQKd2l0aG91dCBhbnkgZG93bnRpbWUuIEhvd2V2
+ZXIsIHdoZW4gdGhlIGNsaWVudCB0cmFuc3BhcmVudGx5IGhhbmRsZXMKcGFzc3dvcmQgcm90YXRp
+b24sIGl0IGNhbiBzd2FwIHRoZSB2YWx1ZXMgb2YgdGhlIHR3byBwYXNzd29yZCBmaWVsZHMKaW4g
+dGhlIHNlcyBzdHJ1Y3QsIGJ1dCBub3QgaW4gc21iM19mc19jb250ZXh0IHN0cnVjdCB0aGF0IGhh
+bmdzIG9mZgpjaWZzX3NiLiBUaGlzIGNhbiBsZWFkIHRvIGEgc2l0dWF0aW9uIHdoZXJlIGEgcmVt
+b3VudCB1bmludGVudGlvbmFsbHkKb3ZlcndyaXRlcyBhIHdvcmtpbmcgcGFzc3dvcmQgaW4gdGhl
+IHNlcyBzdHJ1Y3QuCgpJbiBvcmRlciB0byBmaXggdGhpcywgd2UgZmlyc3QgZ2V0IHRoZSBwYXNz
+d29yZHMgaW4gY3R4IHN0cnVjdAppbi1zeW5jIHdpdGggc2VzIHN0cnVjdCwgYmVmb3JlIHJlcGxh
+Y2luZyB0aGVtIHdpdGggd2hhdCB0aGUgcGFzc3dvcmRzCnRoYXQgY291bGQgYmUgcGFzc2VkIGFz
+IGEgcGFydCBvZiByZW1vdW50LgoKQWxzbywgaW4gb3JkZXIgdG8gYXZvaWQgcmFjZSBjb25kaXRp
+b24gYmV0d2VlbiBzbWIyX3JlY29ubmVjdCBhbmQKc21iM19yZWNvbmZpZ3VyZSwgd2UgbWFrZSBz
+dXJlIHRvIGxvY2sgc2Vzc2lvbl9tdXRleCBiZWZvcmUgY2hhbmdpbmcKcGFzc3dvcmQgYW5kIHBh
+c3N3b3JkMiBmaWVsZHMgb2YgdGhlIHNlcyBzdHJ1Y3R1cmUuCgpGaXhlczogMzVmODM0MjY1ZTBk
+ICgic21iMzogZml4IGJyb2tlbiByZWNvbm5lY3Qgd2hlbiBwYXNzd29yZCBjaGFuZ2luZyBvbiB0
+aGUgc2VydmVyIGJ5IGFsbG93aW5nIHBhc3N3b3JkIHJvdGF0aW9uIikKU2lnbmVkLW9mZi1ieTog
+U2h5YW0gUHJhc2FkIE4gPHNwcmFzYWRAbWljcm9zb2Z0LmNvbT4KU2lnbmVkLW9mZi1ieTogTWVl
+dGFrc2hpIFNldGl5YSA8bXNldGl5YUBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQv
+ZnNfY29udGV4dC5jIHwgODMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0K
+IGZzL3NtYi9jbGllbnQvZnNfY29udGV4dC5oIHwgIDEgKwogMiBmaWxlcyBjaGFuZ2VkLCA3NSBp
+bnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
+ZnNfY29udGV4dC5jIGIvZnMvc21iL2NsaWVudC9mc19jb250ZXh0LmMKaW5kZXggNWM1YTUyMDE5
+ZWZhLi5iYzY4ZTZlYmI5OWIgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvZnNfY29udGV4dC5j
+CisrKyBiL2ZzL3NtYi9jbGllbnQvZnNfY29udGV4dC5jCkBAIC04OTAsMTIgKzg5MCwzNyBAQCBk
+byB7CQkJCQkJCQkJXAogCWNpZnNfc2ItPmN0eC0+ZmllbGQgPSBOVUxMOwkJCQkJXAogfSB3aGls
+ZSAoMCkKIAoraW50IHNtYl9zeW5jX3Nlc3Npb25fY3R4X3Bhc3N3b3JkcyhzdHJ1Y3QgY2lmc19z
+Yl9pbmZvIGNpZnNfc2IsIHN0cnVjdCBjaWZzX3NlcyBzZXMpCit7CisJaWYgKHNlcy0+cGFzc3dv
+cmQgJiYKKwkgICAgY2lmc19zYi0+Y3R4LT5wYXNzd29yZCAmJgorCSAgICBzdHJjbXAoc2VzLT5w
+YXNzd29yZCwgY2lmc19zYi0+Y3R4LT5wYXNzd29yZCkpIHsKKwkJa2ZyZWVfc2Vuc2l0aXZlKGNp
+ZnNfc2ItPmN0eC0+cGFzc3dvcmQpOworCQljaWZzX3NiLT5jdHgtPnBhc3N3b3JkID0ga3N0cmR1
+cChzZXMtPnBhc3N3b3JkLCBHRlBfS0VSTkVMKTsKKwkJaWYgKCFjaWZzX3NiLT5jdHgtPnBhc3N3
+b3JkKQorCQkJcmV0dXJuIC1FTk9NRU07CisJfQorCWlmIChzZXMtPnBhc3N3b3JkMiAmJgorCSAg
+ICBjaWZzX3NiLT5jdHgtPnBhc3N3b3JkMiAmJgorCSAgICBzdHJjbXAoc2VzLT5wYXNzd29yZDIs
+IGNpZnNfc2ItPmN0eC0+cGFzc3dvcmQyKSkgeworCQlrZnJlZV9zZW5zaXRpdmUoY2lmc19zYi0+
+Y3R4LT5wYXNzd29yZDIpOworCQljaWZzX3NiLT5jdHgtPnBhc3N3b3JkMiA9IGtzdHJkdXAoc2Vz
+LT5wYXNzd29yZDIsIEdGUF9LRVJORUwpOworCQlpZiAoIWNpZnNfc2ItPmN0eC0+cGFzc3dvcmQy
+KSB7CisJCQlrZnJlZV9zZW5zaXRpdmUoY2lmc19zYi0+Y3R4LT5wYXNzd29yZCk7CisJCQljaWZz
+X3NiLT5jdHgtPnBhc3N3b3JkID0gTlVMTDsKKwkJCXJldHVybiAtRU5PTUVNOworCQl9CisJfQor
+CXJldHVybiAwOworfQorCiBzdGF0aWMgaW50IHNtYjNfcmVjb25maWd1cmUoc3RydWN0IGZzX2Nv
+bnRleHQgKmZjKQogewogCXN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCA9IHNtYjNfZmMyY29u
+dGV4dChmYyk7CiAJc3RydWN0IGRlbnRyeSAqcm9vdCA9IGZjLT5yb290OwogCXN0cnVjdCBjaWZz
+X3NiX2luZm8gKmNpZnNfc2IgPSBDSUZTX1NCKHJvb3QtPmRfc2IpOwogCXN0cnVjdCBjaWZzX3Nl
+cyAqc2VzID0gY2lmc19zYl9tYXN0ZXJfdGNvbihjaWZzX3NiKS0+c2VzOworCWNoYXIgKm5ld19w
+YXNzd29yZCA9IE5VTEwsICpuZXdfcGFzc3dvcmQyID0gTlVMTDsKIAlib29sIG5lZWRfcmVjb24g
+PSBmYWxzZTsKIAlpbnQgcmM7CiAKQEAgLTkxNSwyMSArOTQwLDYxIEBAIHN0YXRpYyBpbnQgc21i
+M19yZWNvbmZpZ3VyZShzdHJ1Y3QgZnNfY29udGV4dCAqZmMpCiAJU1RFQUxfU1RSSU5HKGNpZnNf
+c2IsIGN0eCwgVU5DKTsKIAlTVEVBTF9TVFJJTkcoY2lmc19zYiwgY3R4LCBzb3VyY2UpOwogCVNU
+RUFMX1NUUklORyhjaWZzX3NiLCBjdHgsIHVzZXJuYW1lKTsKKwogCWlmIChuZWVkX3JlY29uID09
+IGZhbHNlKQogCQlTVEVBTF9TVFJJTkdfU0VOU0lUSVZFKGNpZnNfc2IsIGN0eCwgcGFzc3dvcmQp
+OwogCWVsc2UgIHsKLQkJa2ZyZWVfc2Vuc2l0aXZlKHNlcy0+cGFzc3dvcmQpOwotCQlzZXMtPnBh
+c3N3b3JkID0ga3N0cmR1cChjdHgtPnBhc3N3b3JkLCBHRlBfS0VSTkVMKTsKLQkJaWYgKCFzZXMt
+PnBhc3N3b3JkKQotCQkJcmV0dXJuIC1FTk9NRU07Ci0JCWtmcmVlX3NlbnNpdGl2ZShzZXMtPnBh
+c3N3b3JkMik7Ci0JCXNlcy0+cGFzc3dvcmQyID0ga3N0cmR1cChjdHgtPnBhc3N3b3JkMiwgR0ZQ
+X0tFUk5FTCk7Ci0JCWlmICghc2VzLT5wYXNzd29yZDIpIHsKLQkJCWtmcmVlX3NlbnNpdGl2ZShz
+ZXMtPnBhc3N3b3JkKTsKLQkJCXNlcy0+cGFzc3dvcmQgPSBOVUxMOworCQlpZiAoY3R4LT5wYXNz
+d29yZCkgeworCQkJbmV3X3Bhc3N3b3JkID0ga3N0cmR1cChjdHgtPnBhc3N3b3JkLCBHRlBfS0VS
+TkVMKTsKKwkJCWlmICghbmV3X3Bhc3N3b3JkKQorCQkJCXJldHVybiAtRU5PTUVNOworCQl9IGVs
+c2UKKwkJCVNURUFMX1NUUklOR19TRU5TSVRJVkUoY2lmc19zYiwgY3R4LCBwYXNzd29yZCk7CisJ
+fQorCisJLyoKKwkgKiBpZiBhIG5ldyBwYXNzd29yZDIgaGFzIGJlZW4gc3BlY2lmaWVkLCB0aGVu
+IHJlc2V0IGl0J3MgdmFsdWUKKwkgKiBpbnNpZGUgdGhlIHNlcyBzdHJ1Y3QKKwkgKi8KKwlpZiAo
+Y3R4LT5wYXNzd29yZDIpIHsKKwkJbmV3X3Bhc3N3b3JkMiA9IGtzdHJkdXAoY3R4LT5wYXNzd29y
+ZDIsIEdGUF9LRVJORUwpOworCQlpZiAoIW5ld19wYXNzd29yZDIpIHsKKwkJCWtmcmVlX3NlbnNp
+dGl2ZShuZXdfcGFzc3dvcmQpOwogCQkJcmV0dXJuIC1FTk9NRU07CiAJCX0KKwl9IGVsc2UKKwkJ
+U1RFQUxfU1RSSU5HX1NFTlNJVElWRShjaWZzX3NiLCBjdHgsIHBhc3N3b3JkMik7CisKKwkvKgor
+CSAqIHdlIG1heSB1cGRhdGUgdGhlIHBhc3N3b3JkcyBpbiB0aGUgc2VzIHN0cnVjdCBiZWxvdy4g
+TWFrZSBzdXJlIHdlIGRvCisJICogbm90IHJhY2Ugd2l0aCBzbWIyX3JlY29ubmVjdAorCSAqLwor
+CW11dGV4X2xvY2soJnNlcy0+c2Vzc2lvbl9tdXRleCk7CisKKwkvKgorCSAqIHNtYjJfcmVjb25u
+ZWN0IG1heSBzd2FwIHBhc3N3b3JkIGFuZCBwYXNzd29yZDIgaW4gY2FzZSBzZXNzaW9uIHNldHVw
+CisJICogZmFpbGVkLiBGaXJzdCBnZXQgY3R4IHBhc3N3b3JkcyBpbiBzeW5jIHdpdGggc2VzIHBh
+c3N3b3Jkcy4gSXQgc2hvdWxkCisJICogYmUgb2theSB0byBkbyB0aGlzIGV2ZW4gaWYgdGhpcyBm
+dW5jdGlvbiB3ZXJlIHRvIHJldHVybiBhbiBlcnJvciBhdCBhCisJICogbGF0ZXIgc3RhZ2UKKwkg
+Ki8KKwlyYyA9IHNtYl9zeW5jX3Nlc3Npb25fY3R4X3Bhc3N3b3JkcyhjaWZzX3NiLCBzZXMpOwor
+CWlmIChyYykKKwkJcmV0dXJuIHJjOworCisJLyoKKwkgKiBub3cgdGhhdCBhbGxvY2F0aW9ucyBm
+b3IgcGFzc3dvcmRzIGFyZSBkb25lLCBjb21taXQgdGhlbQorCSAqLworCWlmIChuZXdfcGFzc3dv
+cmQpIHsKKwkJa2ZyZWVfc2Vuc2l0aXZlKHNlcy0+cGFzc3dvcmQpOworCQlzZXMtPnBhc3N3b3Jk
+ID0gbmV3X3Bhc3N3b3JkOwogCX0KKwlpZiAobmV3X3Bhc3N3b3JkMikgeworCQlrZnJlZV9zZW5z
+aXRpdmUoc2VzLT5wYXNzd29yZDIpOworCQlzZXMtPnBhc3N3b3JkMiA9IG5ld19wYXNzd29yZDI7
+CisJfQorCisJbXV0ZXhfdW5sb2NrKCZzZXMtPnNlc3Npb25fbXV0ZXgpOworCiAJU1RFQUxfU1RS
+SU5HKGNpZnNfc2IsIGN0eCwgZG9tYWlubmFtZSk7CiAJU1RFQUxfU1RSSU5HKGNpZnNfc2IsIGN0
+eCwgbm9kZW5hbWUpOwogCVNURUFMX1NUUklORyhjaWZzX3NiLCBjdHgsIGlvY2hhcnNldCk7CmRp
+ZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2ZzX2NvbnRleHQuaCBiL2ZzL3NtYi9jbGllbnQvZnNf
+Y29udGV4dC5oCmluZGV4IDg5MGQ2ZDlkNGE1OS4uNTAzYWJiOGYwYjU1IDEwMDY0NAotLS0gYS9m
+cy9zbWIvY2xpZW50L2ZzX2NvbnRleHQuaAorKysgYi9mcy9zbWIvY2xpZW50L2ZzX2NvbnRleHQu
+aApAQCAtMjk5LDYgKzI5OSw3IEBAIHN0YXRpYyBpbmxpbmUgc3RydWN0IHNtYjNfZnNfY29udGV4
+dCAqc21iM19mYzJjb250ZXh0KGNvbnN0IHN0cnVjdCBmc19jb250ZXh0ICpmCiB9CiAKIGV4dGVy
+biBpbnQgc21iM19mc19jb250ZXh0X2R1cChzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpuZXdfY3R4
+LCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpOworZXh0ZXJuIGludCBzbWJfc3luY19zZXNz
+aW9uX2N0eF9wYXNzd29yZHMoc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19zYiwgc3RydWN0IGNp
+ZnNfc2VzICpzZXMpOwogZXh0ZXJuIHZvaWQgc21iM191cGRhdGVfbW50X2ZsYWdzKHN0cnVjdCBj
+aWZzX3NiX2luZm8gKmNpZnNfc2IpOwogCiAvKgotLSAKMi40Ni4wLjQ2Lmc0MDZmMzI2ZDI3Cgo=
+--0000000000009779050626c9e8fc--
