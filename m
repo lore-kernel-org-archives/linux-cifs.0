@@ -1,412 +1,349 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F267DA6D;
-	Thu, 14 Nov 2024 16:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27941487CD
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Nov 2024 19:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731602374; cv=none; b=L6sF162VoNTRmmFAaYNvd+IQMgd5thRrIdvtpdC+R9xDm2cjw1II3Pv/NNfeskOF6zWKPa8ZUAV4JcS9adzUivJdbeFHQVrWVWaCdnGJSYsIDU7weRFQq/j9qJd9+WFcvLcNCl4On59GHhTAWXZ+cQnEJBnnXH8Uuy0ZFfLTi8g=
+	t=1731611182; cv=none; b=FOicH4BAP7TkGl3MloQ/yiShdO6bxYIAiVefTh3DqeNybWUoTrTO8dYh53gYbViccCzj0+GMf5dDdqtv1PfyqslPcsCGfvoqtlSVOjXAvUGEaP9Hl6MZX4wBKQpKqT8J24xh0H1nZpOKmTe9DHAdG1UDzBjgc0jx/Bms4O+ye2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731602374; c=relaxed/simple;
-	bh=SUgKw9P+o1HnS6FND7Lta07yLNLbdsT2InWIXPbLQT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QjyjCgY+xFvxwzofj1UifN2foVv5PqoWQEQSAZscMVX5LHwnB9xhhmuh4DbGJoQbRafZ8IMjPl7ONtDToy8uuArNwDEX9dibhpXzREjAIOC2NAPQPL/MgUvhM+jsWQRZzpPAWwqT32lWGh9J+cn5C4QNUCSPfa8GjzKmhB2sr/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nN1NXCIg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731611182; c=relaxed/simple;
+	bh=Q+BjSzmLW1SOG1o5ZwD7E7htx3cG5RGsg99xRBb3jjw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XYLcO18NboxsZHzGDm7zNoTZnreiwftJGAhuw6D1nhHuykomnQhOURi9eLhh0wpsCdRIYqBxsQMMkxu+hJNoagie7SwM2xhY3AhZT9VUeUJyagXDHUdhPPVA7Nge4jQEepufzh9aeOVeE+R/4wdu65kopeU8X6J07tpPFeV06sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NxbfP8wo; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nN1NXCIg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF3DC4CED0;
-	Thu, 14 Nov 2024 16:39:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731602374;
-	bh=SUgKw9P+o1HnS6FND7Lta07yLNLbdsT2InWIXPbLQT8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nN1NXCIgrxJ4wk4bcHMhmOuYrCKibErARAw+zOQjDHHFuOK18Brb1h1CQ5hmnTp8V
-	 KAyuHnkpDtG87QBRy9XwJlthDqNWBY202bxVt1qqw99Wzobz5thZ096hR0glKhIjII
-	 /ZA3UnhDf+X4rBLnCVp0MRl2Leq42RY0Kcie0wqnm4FzsG4U61FM3ZRq+0+x7gknv3
-	 FzZKNTgibcdo9cf0/5GAfT8k1ONMZ9XozEApa5Sh4ftMjfeOgROuZcus0jAnRg5D/A
-	 kaXLd5qcq5VRrPOpsLSKYA5EOUNKK0ercajIivXck4U0VWWp1wDJfnDoM1SgBdANjJ
-	 cZ6W8T227w59w==
-Date: Thu, 14 Nov 2024 09:39:31 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: David Howells <dhowells@redhat.com>,
-	Christian Brauner <brauner@kernel.org>
-Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 28/33] netfs: Change the read result collector to only
- use one work item
-Message-ID: <20241114163931.GA1928968@thelio-3990X>
-References: <20241108173236.1382366-1-dhowells@redhat.com>
- <20241108173236.1382366-29-dhowells@redhat.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NxbfP8wo"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=Q+BjSzmLW1SOG1o5ZwD7E7htx3cG5RGsg99xRBb3jjw=; b=NxbfP8wodnj1zHq4tS39Anqy7v
+	o4JiQvex1Uy36UHKvL6zU5gshOaduL4CaTWZwCXa04mqgODURd90ggn9ZI1sP/D1sl7/mmIBp/QU+
+	diNYu+feDUd6Yjoa8ndG4cO1PNNZMOy+U3TMOjNVVojlYPvb/Mf5fdEOXDE9+KYW34xo6CRYtW8am
+	STnQ+6i53s6HEMX489HzQGniDrGTLI9JSn5R+EuSfpAPgp8i3JuWKhbGTpuJzHMPmdm/RJ56eytsu
+	InvcxdHzI2vpxDpogwm9VMPUw4n3mDn6TonM7etYeJRZ2XVcp9Kx+xxmPZ05492TQseijFct99rGD
+	LJkqM/p4hN+Dy2WZbgTsKppor6DsrgxamzIZkXX1vIBgESEpQ3E9GnpFxzhltQCPpCc0ERFBrke0K
+	A+nkT7zsL5zXRcB1yp1F+7kdxhgIVge/0P6YfqL0AFlw41VXW5vaCeoXA056A4SizwLroq3kjysxB
+	4SEsjd2EwOulDK5Zgot62U29;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tBfAR-00AanV-0O;
+	Thu, 14 Nov 2024 19:06:11 +0000
+Message-ID: <7aa86848-b1eb-4bd1-ab7b-20c4f71512ca@samba.org>
+Date: Thu, 14 Nov 2024 20:06:09 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241108173236.1382366-29-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: chmod
+From: Ralph Boehme <slow@samba.org>
+To: Jeremy Allison <jra@samba.org>, ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.com>,
+ Steven French <Steven.French@microsoft.com>,
+ CIFS <linux-cifs@vger.kernel.org>, Samuel Cabrero <scabrero@suse.de>
+References: <8b57433e-a203-465c-b791-07471439ce86@samba.org>
+ <ba86c7247ca08bc1553f6bece0987ca0@manguebit.com>
+ <1f6416d3-5579-4a6e-aa75-351158a35e86@samba.org>
+ <0447a472-9b60-478a-98e4-9f07a058380b@samba.org>
+ <CAN05THQ=fx5hfp=FFRw4D5hCHvcoU8bs6cbeZT2X4o5i=QZkGg@mail.gmail.com>
+ <ZzUe-xBC9NLcDSQi@jeremy-HP-Z840-Workstation>
+ <dad391b1-ce81-4cd0-8220-8b8374a0586e@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <dad391b1-ce81-4cd0-8220-8b8374a0586e@samba.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------NIt2IveTSl4l7LKtGG0txVqI"
 
-Hi David,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------NIt2IveTSl4l7LKtGG0txVqI
+Content-Type: multipart/mixed; boundary="------------XjyBLEOt4kLZVUPDrqVC6vti";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Jeremy Allison <jra@samba.org>, ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.com>,
+ Steven French <Steven.French@microsoft.com>,
+ CIFS <linux-cifs@vger.kernel.org>, Samuel Cabrero <scabrero@suse.de>
+Message-ID: <7aa86848-b1eb-4bd1-ab7b-20c4f71512ca@samba.org>
+Subject: Re: chmod
+References: <8b57433e-a203-465c-b791-07471439ce86@samba.org>
+ <ba86c7247ca08bc1553f6bece0987ca0@manguebit.com>
+ <1f6416d3-5579-4a6e-aa75-351158a35e86@samba.org>
+ <0447a472-9b60-478a-98e4-9f07a058380b@samba.org>
+ <CAN05THQ=fx5hfp=FFRw4D5hCHvcoU8bs6cbeZT2X4o5i=QZkGg@mail.gmail.com>
+ <ZzUe-xBC9NLcDSQi@jeremy-HP-Z840-Workstation>
+ <dad391b1-ce81-4cd0-8220-8b8374a0586e@samba.org>
+In-Reply-To: <dad391b1-ce81-4cd0-8220-8b8374a0586e@samba.org>
+Autocrypt-Gossip: addr=jra@samba.org; keydata=
+ xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
+ 97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
+ forHV13gB3B6S/ZWHpf/owKnJMwu8ozQpjnMnqOiVwCg8QnSX2AFCMd3HLQsqVaMdlO+jBEE
+ AKrMu2Pavmyc/eoNfrjgeRoNRkwHCINWO5u93o92dngWK/hN1QOOCQfAzqZ1JwS5Q+E2gGug
+ 4OVaZI1vZGsAzb06TSnS4fmrOfwHqltSDsCHhwd+pyWkIvi96Swx00e1NEwNExEBo5NrGunf
+ fONGlfRc+WhMLIk0u2e2V14R+ebDA/42T+cQZtUR6EdBReHVpmckQXXcE8cIqsu6UpZCsdEP
+ N6YjxQKgTKWQWoxE2k4lYl9KsDK1BaF6rLNz/yt2RAVb1qZVaOqpITZWwzykzH60dMaX/G1S
+ GWuN28by9ghI2LIsxcXHiDhG2CZxyfogBDDXoTPXlVMdk55IwAJny8Wj4s0eSmVyZW15IEFs
+ bGlzb24gPGpyYUBzYW1iYS5vcmc+wlcEExECABcFAjxEcLsFCwcKAwQDFQMCAxYCAQIXgAAK
+ CRCl3XhJ1sA2rDHZAKDwxfxpGuCOAuDHaN3ULDrIzKw9DQCdHb3Sq5WKfeqeaY2ZKXT3AmXl
+ Fq7OwE0EPERwvhAEAIY1K5TICtxmFOeoRMW39jtF8DNSXl/se6HBe3Wy5Cz43lMZ6NvjDATa
+ 1w3JlkmjUyIDP29ApqmMu78Tv4UUxAh1PhyTttX1/aorTlIdVYFjey/yW4mSDXUBhPvMpq52
+ TncLRmK9HC6mIxJqS0vi6W9IqGOqDRZph3GzVzJN7WvLAAMGA/sGAyg2rVsBzs77WH0jPO+A
+ QZDj+Hf/RFHOwmcyG7/XgmV6LOcQP4HfQHH3DGYihu5cZj3BeWKPDJnjOjB2qmr+FTjYEsjw
+ LDBNG7rjRye412rUbNwmEtcD2/dw4xNyu5h2u+1++KVBPf4SqG/a10gDqGJXDHA1Os5MmnQl
+ 3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
+ AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
 
-On Fri, Nov 08, 2024 at 05:32:29PM +0000, David Howells wrote:
-...
-> diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-> index 264f3cb6a7dc..8ca0558570c1 100644
-> --- a/fs/netfs/read_retry.c
-> +++ b/fs/netfs/read_retry.c
-> @@ -12,15 +12,8 @@
->  static void netfs_reissue_read(struct netfs_io_request *rreq,
->  			       struct netfs_io_subrequest *subreq)
->  {
-> -	struct iov_iter *io_iter = &subreq->io_iter;
-> -
-> -	if (iov_iter_is_folioq(io_iter)) {
-> -		subreq->curr_folioq = (struct folio_queue *)io_iter->folioq;
-> -		subreq->curr_folioq_slot = io_iter->folioq_slot;
-> -		subreq->curr_folio_order = subreq->curr_folioq->orders[subreq->curr_folioq_slot];
-> -	}
-> -
-> -	atomic_inc(&rreq->nr_outstanding);
-> +	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
-> +	__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
->  	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
->  	netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
->  	subreq->rreq->netfs_ops->issue_read(subreq);
-> @@ -33,13 +26,12 @@ static void netfs_reissue_read(struct netfs_io_request *rreq,
->  static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->  {
->  	struct netfs_io_subrequest *subreq;
-> -	struct netfs_io_stream *stream0 = &rreq->io_streams[0];
-> -	LIST_HEAD(sublist);
-> -	LIST_HEAD(queue);
-> +	struct netfs_io_stream *stream = &rreq->io_streams[0];
-> +	struct list_head *next;
->  
->  	_enter("R=%x", rreq->debug_id);
->  
-> -	if (list_empty(&rreq->subrequests))
-> +	if (list_empty(&stream->subrequests))
->  		return;
->  
->  	if (rreq->netfs_ops->retry_request)
-> @@ -52,7 +44,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->  	    !test_bit(NETFS_RREQ_COPY_TO_CACHE, &rreq->flags)) {
->  		struct netfs_io_subrequest *subreq;
->  
-> -		list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-> +		list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
->  			if (test_bit(NETFS_SREQ_FAILED, &subreq->flags))
->  				break;
->  			if (__test_and_clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
-> @@ -73,48 +65,44 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->  	 * populating with smaller subrequests.  In the event that the subreq
->  	 * we just launched finishes before we insert the next subreq, it'll
->  	 * fill in rreq->prev_donated instead.
-> -
-> +	 *
->  	 * Note: Alternatively, we could split the tail subrequest right before
->  	 * we reissue it and fix up the donations under lock.
->  	 */
-> -	list_splice_init(&rreq->subrequests, &queue);
-> +	next = stream->subrequests.next;
->  
->  	do {
-> -		struct netfs_io_subrequest *from;
-> +		struct netfs_io_subrequest *subreq = NULL, *from, *to, *tmp;
->  		struct iov_iter source;
->  		unsigned long long start, len;
-> -		size_t part, deferred_next_donated = 0;
-> +		size_t part;
->  		bool boundary = false;
->  
->  		/* Go through the subreqs and find the next span of contiguous
->  		 * buffer that we then rejig (cifs, for example, needs the
->  		 * rsize renegotiating) and reissue.
->  		 */
-> -		from = list_first_entry(&queue, struct netfs_io_subrequest, rreq_link);
-> -		list_move_tail(&from->rreq_link, &sublist);
-> +		from = list_entry(next, struct netfs_io_subrequest, rreq_link);
-> +		to = from;
->  		start = from->start + from->transferred;
->  		len   = from->len   - from->transferred;
->  
-> -		_debug("from R=%08x[%x] s=%llx ctl=%zx/%zx/%zx",
-> +		_debug("from R=%08x[%x] s=%llx ctl=%zx/%zx",
->  		       rreq->debug_id, from->debug_index,
-> -		       from->start, from->consumed, from->transferred, from->len);
-> +		       from->start, from->transferred, from->len);
->  
->  		if (test_bit(NETFS_SREQ_FAILED, &from->flags) ||
->  		    !test_bit(NETFS_SREQ_NEED_RETRY, &from->flags))
->  			goto abandon;
->  
-> -		deferred_next_donated = from->next_donated;
-> -		while ((subreq = list_first_entry_or_null(
-> -				&queue, struct netfs_io_subrequest, rreq_link))) {
-> -			if (subreq->start != start + len ||
-> -			    subreq->transferred > 0 ||
-> +		list_for_each_continue(next, &stream->subrequests) {
-> +			subreq = list_entry(next, struct netfs_io_subrequest, rreq_link);
-> +			if (subreq->start + subreq->transferred != start + len ||
-> +			    test_bit(NETFS_SREQ_BOUNDARY, &subreq->flags) ||
->  			    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
->  				break;
-> -			list_move_tail(&subreq->rreq_link, &sublist);
-> -			len += subreq->len;
-> -			deferred_next_donated = subreq->next_donated;
-> -			if (test_bit(NETFS_SREQ_BOUNDARY, &subreq->flags))
-> -				break;
-> +			to = subreq;
-> +			len += to->len;
->  		}
->  
->  		_debug(" - range: %llx-%llx %llx", start, start + len - 1, len);
-> @@ -127,36 +115,28 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->  		source.count = len;
->  
->  		/* Work through the sublist. */
-> -		while ((subreq = list_first_entry_or_null(
-> -				&sublist, struct netfs_io_subrequest, rreq_link))) {
-> -			list_del(&subreq->rreq_link);
-> -
-> +		subreq = from;
-> +		list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
-> +			if (!len)
-> +				break;
->  			subreq->source	= NETFS_DOWNLOAD_FROM_SERVER;
->  			subreq->start	= start - subreq->transferred;
->  			subreq->len	= len   + subreq->transferred;
-> -			stream0->sreq_max_len = subreq->len;
-> -
->  			__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
->  			__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
-> -
-> -			spin_lock(&rreq->lock);
-> -			list_add_tail(&subreq->rreq_link, &rreq->subrequests);
-> -			subreq->prev_donated += rreq->prev_donated;
-> -			rreq->prev_donated = 0;
->  			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
-> -			spin_unlock(&rreq->lock);
-> -
-> -			BUG_ON(!len);
->  
->  			/* Renegotiate max_len (rsize) */
-> +			stream->sreq_max_len = subreq->len;
->  			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
->  				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
->  				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
-> +				goto abandon;
->  			}
->  
-> -			part = umin(len, stream0->sreq_max_len);
-> -			if (unlikely(rreq->io_streams[0].sreq_max_segs))
-> -				part = netfs_limit_iter(&source, 0, part, stream0->sreq_max_segs);
-> +			part = umin(len, stream->sreq_max_len);
-> +			if (unlikely(stream->sreq_max_segs))
-> +				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
->  			subreq->len = subreq->transferred + part;
->  			subreq->io_iter = source;
->  			iov_iter_truncate(&subreq->io_iter, part);
-> @@ -166,58 +146,106 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->  			if (!len) {
->  				if (boundary)
->  					__set_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
-> -				subreq->next_donated = deferred_next_donated;
->  			} else {
->  				__clear_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
-> -				subreq->next_donated = 0;
->  			}
->  
-> +			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
->  			netfs_reissue_read(rreq, subreq);
-> -			if (!len)
-> +			if (subreq == to)
->  				break;
-> -
-> -			/* If we ran out of subrequests, allocate another. */
-> -			if (list_empty(&sublist)) {
-> -				subreq = netfs_alloc_subrequest(rreq);
-> -				if (!subreq)
-> -					goto abandon;
-> -				subreq->source = NETFS_DOWNLOAD_FROM_SERVER;
-> -				subreq->start = start;
-> -
-> -				/* We get two refs, but need just one. */
-> -				netfs_put_subrequest(subreq, false, netfs_sreq_trace_new);
-> -				trace_netfs_sreq(subreq, netfs_sreq_trace_split);
-> -				list_add_tail(&subreq->rreq_link, &sublist);
-> -			}
->  		}
->  
->  		/* If we managed to use fewer subreqs, we can discard the
-> -		 * excess.
-> +		 * excess; if we used the same number, then we're done.
->  		 */
-> -		while ((subreq = list_first_entry_or_null(
-> -				&sublist, struct netfs_io_subrequest, rreq_link))) {
-> -			trace_netfs_sreq(subreq, netfs_sreq_trace_discard);
-> -			list_del(&subreq->rreq_link);
-> -			netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_done);
-> +		if (!len) {
-> +			if (subreq == to)
-> +				continue;
-> +			list_for_each_entry_safe_from(subreq, tmp,
-> +						      &stream->subrequests, rreq_link) {
-> +				trace_netfs_sreq(subreq, netfs_sreq_trace_discard);
-> +				list_del(&subreq->rreq_link);
-> +				netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_done);
-> +				if (subreq == to)
-> +					break;
-> +			}
-> +			continue;
->  		}
->  
-> -	} while (!list_empty(&queue));
-> +		/* We ran out of subrequests, so we need to allocate some more
-> +		 * and insert them after.
-> +		 */
-> +		do {
-> +			subreq = netfs_alloc_subrequest(rreq);
-> +			if (!subreq) {
-> +				subreq = to;
-> +				goto abandon_after;
-> +			}
-> +			subreq->source		= NETFS_DOWNLOAD_FROM_SERVER;
-> +			subreq->start		= start;
-> +			subreq->len		= len;
-> +			subreq->debug_index	= atomic_inc_return(&rreq->subreq_counter);
-> +			subreq->stream_nr	= stream->stream_nr;
-> +			__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
-> +
-> +			trace_netfs_sreq_ref(rreq->debug_id, subreq->debug_index,
-> +					     refcount_read(&subreq->ref),
-> +					     netfs_sreq_trace_new);
-> +			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
-> +
-> +			list_add(&subreq->rreq_link, &to->rreq_link);
-> +			to = list_next_entry(to, rreq_link);
-> +			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
-> +
-> +			stream->sreq_max_len	= umin(len, rreq->rsize);
-> +			stream->sreq_max_segs	= 0;
-> +			if (unlikely(stream->sreq_max_segs))
-> +				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
-> +
-> +			netfs_stat(&netfs_n_rh_download);
-> +			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
-> +				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
-> +				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
-> +				goto abandon;
-> +			}
-> +
-> +			part = umin(len, stream->sreq_max_len);
-> +			subreq->len = subreq->transferred + part;
-> +			subreq->io_iter = source;
-> +			iov_iter_truncate(&subreq->io_iter, part);
-> +			iov_iter_advance(&source, part);
-> +
-> +			len -= part;
-> +			start += part;
-> +			if (!len && boundary) {
-> +				__set_bit(NETFS_SREQ_BOUNDARY, &to->flags);
-> +				boundary = false;
-> +			}
-> +
-> +			netfs_reissue_read(rreq, subreq);
-> +		} while (len);
-> +
-> +	} while (!list_is_head(next, &stream->subrequests));
->  
->  	return;
->  
-> -	/* If we hit ENOMEM, fail all remaining subrequests */
-> +	/* If we hit an error, fail all remaining incomplete subrequests */
-> +abandon_after:
-> +	if (list_is_last(&subreq->rreq_link, &stream->subrequests))
-> +		return;
+--------------XjyBLEOt4kLZVUPDrqVC6vti
+Content-Type: multipart/mixed; boundary="------------lSyX0pNSZOX3rAVThyhjiGYf"
 
-This change as commit 1bd9011ee163 ("netfs: Change the read result
-collector to only use one work item") in next-20241114 causes a clang
-warning:
+--------------lSyX0pNSZOX3rAVThyhjiGYf
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-  fs/netfs/read_retry.c:235:20: error: variable 'subreq' is uninitialized when used here [-Werror,-Wuninitialized]
-    235 |         if (list_is_last(&subreq->rreq_link, &stream->subrequests))
-        |                           ^~~~~~
-  fs/netfs/read_retry.c:28:36: note: initialize the variable 'subreq' to silence this warning
-     28 |         struct netfs_io_subrequest *subreq;
-        |                                           ^
-        |                                            = NULL
+T24gMTEvMTQvMjQgMTI6MDcgUE0sIFJhbHBoIEJvZWhtZSB3cm90ZToNCj4gSSd2ZSBpbXBs
+ZW1lbnRlZCBhIHF1aWNrIGZpeCBhbmQgYW0gY3VycmVudGx5IHRlc3RpbmcgaXQuDQp0aGlz
+IHdvcmtzLg0KDQpSZXZpZXcgYXBwcmVjaWF0ZWQhDQoNClRoYW5rcyENCi1zbG93DQo=
+--------------lSyX0pNSZOX3rAVThyhjiGYf
+Content-Type: text/x-patch; charset=UTF-8; name="chmod-smb3-posix.patch"
+Content-Disposition: attachment; filename="chmod-smb3-posix.patch"
+Content-Transfer-Encoding: base64
 
-May be a shadowing issue, as adding KCFLAGS=-Wshadow shows:
+RnJvbSAyZmEyODM4ZWZjZmZiY2E1Y2RkMmQ3Y2U3NDQ5ZTM2YzUxODMwZWU0IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBSYWxwaCBCb2VobWUgPHNsb3dAc2FtYmEub3JnPgpE
+YXRlOiBUaHUsIDE0IE5vdiAyMDI0IDExOjA1OjEzICswMTAwClN1YmplY3Q6IFtQQVRDSF0g
+ZnMvc21iL2NsaWVudDogaW1wbGVtZW50IGNobW9kKCkgZm9yIFNNQjMgUE9TSVggRXh0ZW5z
+aW9ucwoKVGhlIE5UIEFDTCBmb3JtYXQgZm9yIGFuIFNNQjMgUE9TSVggRXh0ZW5zaW9ucyBj
+aG1vZCgpIGlzIGEgc2luZ2xlIEFDRSB3aXRoIHRoZQptYWdpYyBTLTEtNS04OC0zLW1vZGUg
+U0lEOgoKICBOVCBTZWN1cml0eSBEZXNjcmlwdG9yCiAgICAgIFJldmlzaW9uOiAxCiAgICAg
+IFR5cGU6IDB4ODAwNCwgU2VsZiBSZWxhdGl2ZSwgREFDTCBQcmVzZW50CiAgICAgIE9mZnNl
+dCB0byBvd25lciBTSUQ6IDU2CiAgICAgIE9mZnNldCB0byBncm91cCBTSUQ6IDEyNAogICAg
+ICBPZmZzZXQgdG8gU0FDTDogMAogICAgICBPZmZzZXQgdG8gREFDTDogMjAKICAgICAgT3du
+ZXI6IFMtMS01LTIxLTMxNzc4Mzg5OTktMzg5MzY1NzQxNS0xMDM3NjczMzg0LTEwMDAKICAg
+ICAgR3JvdXA6IFMtMS0yMi0yLTEwMDAKICAgICAgTlQgVXNlciAoREFDTCkgQUNMCiAgICAg
+ICAgICBSZXZpc2lvbjogTlQ0ICgyKQogICAgICAgICAgU2l6ZTogMzYKICAgICAgICAgIE51
+bSBBQ0VzOiAxCiAgICAgICAgICBOVCBBQ0U6IFMtMS01LTg4LTMtNDM4LCBmbGFncyAweDAw
+LCBBY2Nlc3MgQWxsb3dlZCwgbWFzayAweDAwMDAwMDAwCiAgICAgICAgICAgICAgVHlwZTog
+QWNjZXNzIEFsbG93ZWQKICAgICAgICAgICAgICBOVCBBQ0UgRmxhZ3M6IDB4MDAKICAgICAg
+ICAgICAgICBTaXplOiAyOAogICAgICAgICAgICAgIEFjY2VzcyByZXF1aXJlZDogMHgwMDAw
+MDAwMAogICAgICAgICAgICAgIFNJRDogUy0xLTUtODgtMy00MzgKCk93bmVyIGFuZCBHcm91
+cCBzaG91bGQgYmUgTlVMTCwgYnV0IHRoZSBzZXJ2ZXIgaXMgbm90IHJlcXVpcmVkIHRvIGZh
+aWwgdGhlCnJlcXVlc3QgaWYgdGhleSBhcmUgcHJlc2VudC4KClNpZ25lZC1vZmYtYnk6IFJh
+bHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+Ci0tLQogZnMvc21iL2NsaWVudC9jaWZzYWNs
+LmMgICB8IDUwICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLQogZnMv
+c21iL2NsaWVudC9jaWZzcHJvdG8uaCB8ICA0ICsrKy0KIGZzL3NtYi9jbGllbnQvaW5vZGUu
+YyAgICAgfCAgNCArKystCiBmcy9zbWIvY2xpZW50L3NtYjJwZHUuYyAgIHwgIDIgKy0KIDQg
+ZmlsZXMgY2hhbmdlZCwgMzcgaW5zZXJ0aW9ucygrKSwgMjMgZGVsZXRpb25zKC0pCgpkaWZm
+IC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzYWNsLmMgYi9mcy9zbWIvY2xpZW50L2NpZnNh
+Y2wuYwppbmRleCAxZDI5NGQ1M2Y2NjIuLmM2OGFkNTI2YTRkZSAxMDA2NDQKLS0tIGEvZnMv
+c21iL2NsaWVudC9jaWZzYWNsLmMKKysrIGIvZnMvc21iL2NsaWVudC9jaWZzYWNsLmMKQEAg
+LTg4NSwxMiArODg1LDE3IEBAIHVuc2lnbmVkIGludCBzZXR1cF9hdXRodXNlcnNfQUNFKHN0
+cnVjdCBzbWJfYWNlICpwbnRhY2UpCiAgKiBGaWxsIGluIHRoZSBzcGVjaWFsIFNJRCBiYXNl
+ZCBvbiB0aGUgbW9kZS4gU2VlCiAgKiBodHRwczovL3RlY2huZXQubWljcm9zb2Z0LmNvbS9l
+bi11cy9saWJyYXJ5L2hoNTA5MDE3KHY9d3MuMTApLmFzcHgKICAqLwotdW5zaWduZWQgaW50
+IHNldHVwX3NwZWNpYWxfbW9kZV9BQ0Uoc3RydWN0IHNtYl9hY2UgKnBudGFjZSwgX191NjQg
+bm1vZGUpCit1bnNpZ25lZCBpbnQgc2V0dXBfc3BlY2lhbF9tb2RlX0FDRShzdHJ1Y3Qgc21i
+X2FjZSAqcG50YWNlLAorCQkJCSAgICBib29sIHBvc2l4LAorCQkJCSAgICBfX3U2NCBubW9k
+ZSkKIHsKIAlpbnQgaTsKIAl1bnNpZ25lZCBpbnQgYWNlX3NpemUgPSAyODsKIAotCXBudGFj
+ZS0+dHlwZSA9IEFDQ0VTU19ERU5JRURfQUNFX1RZUEU7CisJaWYgKHBvc2l4KQorCQlwbnRh
+Y2UtPnR5cGUgPSBBQ0NFU1NfQUxMT1dFRF9BQ0VfVFlQRTsKKwllbHNlCisJCXBudGFjZS0+
+dHlwZSA9IEFDQ0VTU19ERU5JRURfQUNFX1RZUEU7CiAJcG50YWNlLT5mbGFncyA9IDB4MDsK
+IAlwbnRhY2UtPmFjY2Vzc19yZXEgPSAwOwogCXBudGFjZS0+c2lkLm51bV9zdWJhdXRoID0g
+MzsKQEAgLTkzMyw3ICs5MzgsOCBAQCBzdGF0aWMgdm9pZCBwb3B1bGF0ZV9uZXdfYWNlcyhj
+aGFyICpuYWNsX2Jhc2UsCiAJCXN0cnVjdCBzbWJfc2lkICpwb3duZXJzaWQsCiAJCXN0cnVj
+dCBzbWJfc2lkICpwZ3Jwc2lkLAogCQlfX3U2NCAqcG5tb2RlLCB1MzIgKnBudW1fYWNlcywg
+dTE2ICpwbnNpemUsCi0JCWJvb2wgbW9kZWZyb21zaWQpCisJCWJvb2wgbW9kZWZyb21zaWQs
+CisJCWJvb2wgcG9zaXgpCiB7CiAJX191NjQgbm1vZGU7CiAJdTMyIG51bV9hY2VzID0gMDsK
+QEAgLTk1MCwxMyArOTU2LDE1IEBAIHN0YXRpYyB2b2lkIHBvcHVsYXRlX25ld19hY2VzKGNo
+YXIgKm5hY2xfYmFzZSwKIAludW1fYWNlcyA9ICpwbnVtX2FjZXM7CiAJbnNpemUgPSAqcG5z
+aXplOwogCi0JaWYgKG1vZGVmcm9tc2lkKSB7Ci0JCXBubnRhY2UgPSAoc3RydWN0IHNtYl9h
+Y2UgKikgKG5hY2xfYmFzZSArIG5zaXplKTsKLQkJbnNpemUgKz0gc2V0dXBfc3BlY2lhbF9t
+b2RlX0FDRShwbm50YWNlLCBubW9kZSk7Ci0JCW51bV9hY2VzKys7CisJaWYgKG1vZGVmcm9t
+c2lkIHx8IHBvc2l4KSB7CiAJCXBubnRhY2UgPSAoc3RydWN0IHNtYl9hY2UgKikgKG5hY2xf
+YmFzZSArIG5zaXplKTsKLQkJbnNpemUgKz0gc2V0dXBfYXV0aHVzZXJzX0FDRShwbm50YWNl
+KTsKKwkJbnNpemUgKz0gc2V0dXBfc3BlY2lhbF9tb2RlX0FDRShwbm50YWNlLCBwb3NpeCwg
+bm1vZGUpOwogCQludW1fYWNlcysrOworCQlpZiAobW9kZWZyb21zaWQpIHsKKwkJCXBubnRh
+Y2UgPSAoc3RydWN0IHNtYl9hY2UgKikgKG5hY2xfYmFzZSArIG5zaXplKTsKKwkJCW5zaXpl
+ICs9IHNldHVwX2F1dGh1c2Vyc19BQ0UocG5udGFjZSk7CisJCQludW1fYWNlcysrOworCQl9
+CiAJCWdvdG8gc2V0X3NpemU7CiAJfQogCkBAIC0xMDc2LDcgKzEwODQsNyBAQCBzdGF0aWMg
+X191MTYgcmVwbGFjZV9zaWRzX2FuZF9jb3B5X2FjZXMoc3RydWN0IHNtYl9hY2wgKnBkYWNs
+LCBzdHJ1Y3Qgc21iX2FjbCAqcAogCiBzdGF0aWMgaW50IHNldF9jaG1vZF9kYWNsKHN0cnVj
+dCBzbWJfYWNsICpwZGFjbCwgc3RydWN0IHNtYl9hY2wgKnBuZGFjbCwKIAkJc3RydWN0IHNt
+Yl9zaWQgKnBvd25lcnNpZCwJc3RydWN0IHNtYl9zaWQgKnBncnBzaWQsCi0JCV9fdTY0ICpw
+bm1vZGUsIGJvb2wgbW9kZV9mcm9tX3NpZCkKKwkJX191NjQgKnBubW9kZSwgYm9vbCBtb2Rl
+X2Zyb21fc2lkLCBib29sIHBvc2l4KQogewogCWludCBpOwogCXUxNiBzaXplID0gMDsKQEAg
+LTEwOTQsMTEgKzExMDIsMTEgQEAgc3RhdGljIGludCBzZXRfY2htb2RfZGFjbChzdHJ1Y3Qg
+c21iX2FjbCAqcGRhY2wsIHN0cnVjdCBzbWJfYWNsICpwbmRhY2wsCiAJbnNpemUgPSBzaXpl
+b2Yoc3RydWN0IHNtYl9hY2wpOwogCiAJLyogSWYgcGRhY2wgaXMgTlVMTCwgd2UgZG9uJ3Qg
+aGF2ZSBhIHNyYy4gU2ltcGx5IHBvcHVsYXRlIG5ldyBBQ0wuICovCi0JaWYgKCFwZGFjbCkg
+eworCWlmICghcGRhY2wgfHwgcG9zaXgpIHsKIAkJcG9wdWxhdGVfbmV3X2FjZXMobmFjbF9i
+YXNlLAogCQkJCXBvd25lcnNpZCwgcGdycHNpZCwKIAkJCQlwbm1vZGUsICZudW1fYWNlcywg
+Jm5zaXplLAotCQkJCW1vZGVfZnJvbV9zaWQpOworCQkJCW1vZGVfZnJvbV9zaWQsIHBvc2l4
+KTsKIAkJZ290byBmaW5hbGl6ZV9kYWNsOwogCX0KIApAQCAtMTExNSw3ICsxMTIzLDcgQEAg
+c3RhdGljIGludCBzZXRfY2htb2RfZGFjbChzdHJ1Y3Qgc21iX2FjbCAqcGRhY2wsIHN0cnVj
+dCBzbWJfYWNsICpwbmRhY2wsCiAJCQlwb3B1bGF0ZV9uZXdfYWNlcyhuYWNsX2Jhc2UsCiAJ
+CQkJCXBvd25lcnNpZCwgcGdycHNpZCwKIAkJCQkJcG5tb2RlLCAmbnVtX2FjZXMsICZuc2l6
+ZSwKLQkJCQkJbW9kZV9mcm9tX3NpZCk7CisJCQkJCW1vZGVfZnJvbV9zaWQsIHBvc2l4KTsK
+IAogCQkJbmV3X2FjZXNfc2V0ID0gdHJ1ZTsKIAkJfQpAQCAtMTE0NCw3ICsxMTUyLDcgQEAg
+c3RhdGljIGludCBzZXRfY2htb2RfZGFjbChzdHJ1Y3Qgc21iX2FjbCAqcGRhY2wsIHN0cnVj
+dCBzbWJfYWNsICpwbmRhY2wsCiAJCXBvcHVsYXRlX25ld19hY2VzKG5hY2xfYmFzZSwKIAkJ
+CQlwb3duZXJzaWQsIHBncnBzaWQsCiAJCQkJcG5tb2RlLCAmbnVtX2FjZXMsICZuc2l6ZSwK
+LQkJCQltb2RlX2Zyb21fc2lkKTsKKwkJCQltb2RlX2Zyb21fc2lkLCBwb3NpeCk7CiAKIAkJ
+bmV3X2FjZXNfc2V0ID0gdHJ1ZTsKIAl9CkBAIC0xMjUxLDcgKzEyNTksNyBAQCBzdGF0aWMg
+aW50IHBhcnNlX3NlY19kZXNjKHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsCiAvKiBD
+b252ZXJ0IHBlcm1pc3Npb24gYml0cyBmcm9tIG1vZGUgdG8gZXF1aXZhbGVudCBDSUZTIEFD
+TCAqLwogc3RhdGljIGludCBidWlsZF9zZWNfZGVzYyhzdHJ1Y3Qgc21iX250c2QgKnBudHNk
+LCBzdHJ1Y3Qgc21iX250c2QgKnBubnRzZCwKIAlfX3UzMiBzZWNkZXNjbGVuLCBfX3UzMiAq
+cG5zZWNkZXNjbGVuLCBfX3U2NCAqcG5tb2RlLCBrdWlkX3QgdWlkLCBrZ2lkX3QgZ2lkLAot
+CWJvb2wgbW9kZV9mcm9tX3NpZCwgYm9vbCBpZF9mcm9tX3NpZCwgaW50ICphY2xmbGFnKQor
+CWJvb2wgbW9kZV9mcm9tX3NpZCwgYm9vbCBpZF9mcm9tX3NpZCwgYm9vbCBwb3NpeCwgaW50
+ICphY2xmbGFnKQogewogCWludCByYyA9IDA7CiAJX191MzIgZGFjbG9mZnNldDsKQEAgLTEy
+ODgsNyArMTI5Niw3IEBAIHN0YXRpYyBpbnQgYnVpbGRfc2VjX2Rlc2Moc3RydWN0IHNtYl9u
+dHNkICpwbnRzZCwgc3RydWN0IHNtYl9udHNkICpwbm50c2QsCiAJCW5kYWNsX3B0ci0+bnVt
+X2FjZXMgPSBjcHVfdG9fbGUzMigwKTsKIAogCQlyYyA9IHNldF9jaG1vZF9kYWNsKGRhY2xf
+cHRyLCBuZGFjbF9wdHIsIG93bmVyX3NpZF9wdHIsIGdyb3VwX3NpZF9wdHIsCi0JCQkJICAg
+IHBubW9kZSwgbW9kZV9mcm9tX3NpZCk7CisJCQkJICAgIHBubW9kZSwgbW9kZV9mcm9tX3Np
+ZCwgcG9zaXgpOwogCiAJCXNpZHNvZmZzZXQgPSBuZGFjbG9mZnNldCArIGxlMTZfdG9fY3B1
+KG5kYWNsX3B0ci0+c2l6ZSk7CiAJCS8qIGNvcHkgdGhlIG5vbi1kYWNsIHBvcnRpb24gb2Yg
+c2VjZGVzYyAqLwpAQCAtMTU4Nyw2ICsxNTk1LDcgQEAgaWRfbW9kZV90b19jaWZzX2FjbChz
+dHJ1Y3QgaW5vZGUgKmlub2RlLCBjb25zdCBjaGFyICpwYXRoLCBfX3U2NCAqcG5tb2RlLAog
+CXN0cnVjdCB0Y29uX2xpbmsgKnRsaW5rID0gY2lmc19zYl90bGluayhjaWZzX3NiKTsKIAlz
+dHJ1Y3Qgc21iX3ZlcnNpb25fb3BlcmF0aW9ucyAqb3BzOwogCWJvb2wgbW9kZV9mcm9tX3Np
+ZCwgaWRfZnJvbV9zaWQ7CisJYm9vbCBwb3NpeCA9IHRsaW5rX3Rjb24odGxpbmspLT5wb3Np
+eF9leHRlbnNpb25zOwogCWNvbnN0IHUzMiBpbmZvID0gMDsKIAogCWlmIChJU19FUlIodGxp
+bmspKQpAQCAtMTYyMiwxMiArMTYzMSwxMyBAQCBpZF9tb2RlX3RvX2NpZnNfYWNsKHN0cnVj
+dCBpbm9kZSAqaW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgsIF9fdTY0ICpwbm1vZGUsCiAJCWlk
+X2Zyb21fc2lkID0gZmFsc2U7CiAKIAkvKiBQb3RlbnRpYWxseSwgZml2ZSBuZXcgQUNFcyBj
+YW4gYmUgYWRkZWQgdG8gdGhlIEFDTCBmb3IgVSxHLE8gbWFwcGluZyAqLwotCW5zZWNkZXNj
+bGVuID0gc2VjZGVzY2xlbjsKIAlpZiAocG5tb2RlICYmICpwbm1vZGUgIT0gTk9fQ0hBTkdF
+XzY0KSB7IC8qIGNobW9kICovCi0JCWlmIChtb2RlX2Zyb21fc2lkKQotCQkJbnNlY2Rlc2Ns
+ZW4gKz0gMiAqIHNpemVvZihzdHJ1Y3Qgc21iX2FjZSk7CisJCWlmIChwb3NpeCkKKwkJCW5z
+ZWNkZXNjbGVuID0gMSAqIHNpemVvZihzdHJ1Y3Qgc21iX2FjZSk7CisJCWVsc2UgaWYgKG1v
+ZGVfZnJvbV9zaWQpCisJCQluc2VjZGVzY2xlbiA9IHNlY2Rlc2NsZW4gKyAoMiAqIHNpemVv
+ZihzdHJ1Y3Qgc21iX2FjZSkpOwogCQllbHNlIC8qIGNpZnNhY2wgKi8KLQkJCW5zZWNkZXNj
+bGVuICs9IDUgKiBzaXplb2Yoc3RydWN0IHNtYl9hY2UpOworCQkJbnNlY2Rlc2NsZW4gPSBz
+ZWNkZXNjbGVuICsgKDUgKiBzaXplb2Yoc3RydWN0IHNtYl9hY2UpKTsKIAl9IGVsc2UgeyAv
+KiBjaG93biAqLwogCQkvKiBXaGVuIG93bmVyc2hpcCBjaGFuZ2VzLCBjaGFuZ2VzIG5ldyBv
+d25lciBzaWQgbGVuZ3RoIGNvdWxkIGJlIGRpZmZlcmVudCAqLwogCQluc2VjZGVzY2xlbiA9
+IHNpemVvZihzdHJ1Y3Qgc21iX250c2QpICsgKHNpemVvZihzdHJ1Y3Qgc21iX3NpZCkgKiAy
+KTsKQEAgLTE2NTcsNyArMTY2Nyw3IEBAIGlkX21vZGVfdG9fY2lmc19hY2woc3RydWN0IGlu
+b2RlICppbm9kZSwgY29uc3QgY2hhciAqcGF0aCwgX191NjQgKnBubW9kZSwKIAl9CiAKIAly
+YyA9IGJ1aWxkX3NlY19kZXNjKHBudHNkLCBwbm50c2QsIHNlY2Rlc2NsZW4sICZuc2VjZGVz
+Y2xlbiwgcG5tb2RlLCB1aWQsIGdpZCwKLQkJCSAgICBtb2RlX2Zyb21fc2lkLCBpZF9mcm9t
+X3NpZCwgJmFjbGZsYWcpOworCQkJICAgIG1vZGVfZnJvbV9zaWQsIGlkX2Zyb21fc2lkLCBw
+b3NpeCwgJmFjbGZsYWcpOwogCiAJY2lmc19kYmcoTk9JU1ksICJidWlsZF9zZWNfZGVzYyBy
+YzogJWRcbiIsIHJjKTsKIApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzcHJvdG8u
+aCBiL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKaW5kZXggMWQzNDcwYmNhNDVlLi5kMzEy
+ZWE5Nzc2Y2UgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKKysrIGIv
+ZnMvc21iL2NsaWVudC9jaWZzcHJvdG8uaApAQCAtMjQ0LDcgKzI0NCw5IEBAIGV4dGVybiBp
+bnQgY2lmc19zZXRfYWNsKHN0cnVjdCBtbnRfaWRtYXAgKmlkbWFwLAogZXh0ZXJuIGludCBz
+ZXRfY2lmc19hY2woc3RydWN0IHNtYl9udHNkICpwbnRzZCwgX191MzIgbGVuLCBzdHJ1Y3Qg
+aW5vZGUgKmlubywKIAkJCQljb25zdCBjaGFyICpwYXRoLCBpbnQgZmxhZyk7CiBleHRlcm4g
+dW5zaWduZWQgaW50IHNldHVwX2F1dGh1c2Vyc19BQ0Uoc3RydWN0IHNtYl9hY2UgKnBhY2Up
+OwotZXh0ZXJuIHVuc2lnbmVkIGludCBzZXR1cF9zcGVjaWFsX21vZGVfQUNFKHN0cnVjdCBz
+bWJfYWNlICpwYWNlLCBfX3U2NCBubW9kZSk7CitleHRlcm4gdW5zaWduZWQgaW50IHNldHVw
+X3NwZWNpYWxfbW9kZV9BQ0Uoc3RydWN0IHNtYl9hY2UgKnBhY2UsCisJCQkJCSAgIGJvb2wg
+cG9zaXgsCisJCQkJCSAgIF9fdTY0IG5tb2RlKTsKIGV4dGVybiB1bnNpZ25lZCBpbnQgc2V0
+dXBfc3BlY2lhbF91c2VyX293bmVyX0FDRShzdHJ1Y3Qgc21iX2FjZSAqcGFjZSk7CiAKIGV4
+dGVybiB2b2lkIGRlcXVldWVfbWlkKHN0cnVjdCBtaWRfcV9lbnRyeSAqbWlkLCBib29sIG1h
+bGZvcm1lZCk7CmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lub2RlLmMgYi9mcy9zbWIv
+Y2xpZW50L2lub2RlLmMKaW5kZXggZWZmM2Y1NzIzNWVlLi43MmViZDcyZGQwMmIgMTAwNjQ0
+Ci0tLSBhL2ZzL3NtYi9jbGllbnQvaW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50L2lub2Rl
+LmMKQEAgLTMwNjIsNiArMzA2Miw3IEBAIGNpZnNfc2V0YXR0cl9ub3VuaXgoc3RydWN0IGRl
+bnRyeSAqZGlyZW50cnksIHN0cnVjdCBpYXR0ciAqYXR0cnMpCiAJaW50IHJjID0gLUVBQ0NF
+UzsKIAlfX3UzMiBkb3NhdHRyID0gMDsKIAlfX3U2NCBtb2RlID0gTk9fQ0hBTkdFXzY0Owor
+CWJvb2wgcG9zaXggPSBjaWZzX3NiX21hc3Rlcl90Y29uKGNpZnNfc2IpLT5wb3NpeF9leHRl
+bnNpb25zOwogCiAJeGlkID0gZ2V0X3hpZCgpOwogCkBAIC0zMTUyLDcgKzMxNTMsOCBAQCBj
+aWZzX3NldGF0dHJfbm91bml4KHN0cnVjdCBkZW50cnkgKmRpcmVudHJ5LCBzdHJ1Y3QgaWF0
+dHIgKmF0dHJzKQogCQltb2RlID0gYXR0cnMtPmlhX21vZGU7CiAJCXJjID0gMDsKIAkJaWYg
+KChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfQ0lGU19BQ0wpIHx8Ci0J
+CSAgICAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX01PREVfRlJPTV9T
+SUQpKSB7CisJCSAgICAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX01P
+REVfRlJPTV9TSUQpIHx8CisJCSAgICBwb3NpeCkgewogCQkJcmMgPSBpZF9tb2RlX3RvX2Np
+ZnNfYWNsKGlub2RlLCBmdWxsX3BhdGgsICZtb2RlLAogCQkJCQkJSU5WQUxJRF9VSUQsIElO
+VkFMSURfR0lEKTsKIAkJCWlmIChyYykgewpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9z
+bWIycGR1LmMgYi9mcy9zbWIvY2xpZW50L3NtYjJwZHUuYwppbmRleCA2NTg0YjVjZGRjMjgu
+LmFiM2EyY2E2NmJlMyAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKKysr
+IGIvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKQEAgLTI2ODMsNyArMjY4Myw3IEBAIGNyZWF0
+ZV9zZF9idWYodW1vZGVfdCBtb2RlLCBib29sIHNldF9vd25lciwgdW5zaWduZWQgaW50ICps
+ZW4pCiAJcHRyICs9IHNpemVvZihzdHJ1Y3Qgc21iM19hY2wpOwogCiAJLyogY3JlYXRlIG9u
+ZSBBQ0UgdG8gaG9sZCB0aGUgbW9kZSBlbWJlZGRlZCBpbiByZXNlcnZlZCBzcGVjaWFsIFNJ
+RCAqLwotCWFjZWxlbiA9IHNldHVwX3NwZWNpYWxfbW9kZV9BQ0UoKHN0cnVjdCBzbWJfYWNl
+ICopcHRyLCAoX191NjQpbW9kZSk7CisJYWNlbGVuID0gc2V0dXBfc3BlY2lhbF9tb2RlX0FD
+RSgoc3RydWN0IHNtYl9hY2UgKilwdHIsIGZhbHNlLCAoX191NjQpbW9kZSk7CiAJcHRyICs9
+IGFjZWxlbjsKIAlhY2xfc2l6ZSA9IGFjZWxlbiArIHNpemVvZihzdHJ1Y3Qgc21iM19hY2wp
+OwogCWFjZV9jb3VudCA9IDE7Ci0tIAoyLjQ3LjAKCg==
 
-  fs/netfs/read_retry.c:75:31: error: declaration shadows a local variable [-Werror,-Wshadow]
-     75 |                 struct netfs_io_subrequest *subreq = NULL, *from, *to, *tmp;
-        |                                             ^
-  fs/netfs/read_retry.c:28:30: note: previous declaration is here
-     28 |         struct netfs_io_subrequest *subreq;
-        |                                     ^
+--------------lSyX0pNSZOX3rAVThyhjiGYf--
 
-Cheers,
-Nathan
+--------------XjyBLEOt4kLZVUPDrqVC6vti--
 
-> +	subreq = list_next_entry(subreq, rreq_link);
->  abandon:
-> -	list_splice_init(&sublist, &queue);
-> -	list_for_each_entry(subreq, &queue, rreq_link) {
-> -		if (!subreq->error)
-> -			subreq->error = -ENOMEM;
-> -		__clear_bit(NETFS_SREQ_FAILED, &subreq->flags);
-> +	list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
-> +		if (!subreq->error &&
-> +		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
-> +		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
-> +			continue;
-> +		subreq->error = -ENOMEM;
-> +		__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
->  		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
->  		__clear_bit(NETFS_SREQ_RETRYING, &subreq->flags);
->  	}
-> -	spin_lock(&rreq->lock);
-> -	list_splice_tail_init(&queue, &rreq->subrequests);
-> -	spin_unlock(&rreq->lock);
->  }
->  
->  /*
-> @@ -225,14 +253,19 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
->   */
->  void netfs_retry_reads(struct netfs_io_request *rreq)
->  {
-> -	trace_netfs_rreq(rreq, netfs_rreq_trace_resubmit);
-> +	struct netfs_io_subrequest *subreq;
-> +	struct netfs_io_stream *stream = &rreq->io_streams[0];
->  
-> -	atomic_inc(&rreq->nr_outstanding);
-> +	/* Wait for all outstanding I/O to quiesce before performing retries as
-> +	 * we may need to renegotiate the I/O sizes.
-> +	 */
-> +	list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
-> +		wait_on_bit(&subreq->flags, NETFS_SREQ_IN_PROGRESS,
-> +			    TASK_UNINTERRUPTIBLE);
-> +	}
->  
-> +	trace_netfs_rreq(rreq, netfs_rreq_trace_resubmit);
->  	netfs_retry_read_subrequests(rreq);
-> -
-> -	if (atomic_dec_and_test(&rreq->nr_outstanding))
-> -		netfs_rreq_terminated(rreq);
->  }
->  
->  /*
+--------------NIt2IveTSl4l7LKtGG0txVqI
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmc2SiIFAwAAAAAACgkQqh6bcSY5nkY8
+vQ//TBL7V1NZvPsqcNG0ALi2y+AyTSKC/rLesVZ+MOJKCm+7aKXJHaZfsR3dNfIEb54ehkEwpD1K
+pbP45Ff6JImBwDhkDuI68bnwL0dp+z0DvsceHxN+Qdoz7eEWkULXHz4oPrFrdjQ9kkgvl9XEuo+7
+3ZxVBNsx+J90k5CUOJ8D/LLFQuhjOZiI4o7Qny5En07bwD+EkuWsGmR3gB0obYN+rqtcgp9uGJS8
+9q2+b9uV1I+YsJplhnhq3F+umf1LP+ze7sADd7tLdcep9apvPMgRw3oheGe7dNoWepxtq7auYi3l
+WF7TqzUiQM29D3DHNZyGlKNvZ6ms3wsaVjXlk7XAHJ1Bi/A5ZnntrAp3a32Y/rNYsh2MznrFMRPQ
+1zwwVJ2XPibNOA1e+tnY71i59ZmWgp/V9vxi96xzy3QbNnocD78+CNh85IfJ2SRz7zdCBu+X0uyW
+Ioyc/LP9DOlCxRQnEbIphCPPOycixucpvAZckU0SKqJXLunTu/j/+hq6Xqxtqio7tkzQMia3/WZO
+/ShhthwoYGpRHUIwLnUOc4EKWs/ETSWDNGXU4ujUFE4c1n+sccLKQds5ma3Qvc+VY0YNPA42Qgtp
+lMomWp+S1q3oOo/u2h5e4pUzCQ5WGPYuulGx5v3FQVTPpZaJ5ZofQsSmzzhpvB2C2dUPSmG6c5N1
+VjQ=
+=DRxZ
+-----END PGP SIGNATURE-----
+
+--------------NIt2IveTSl4l7LKtGG0txVqI--
