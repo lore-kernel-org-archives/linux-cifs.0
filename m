@@ -1,188 +1,412 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15021F892A;
-	Thu, 14 Nov 2024 13:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F267DA6D;
+	Thu, 14 Nov 2024 16:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731590290; cv=none; b=fTSHGNb80i5v/gisHaCv6ouYQUPWRCyCAPp2y0e/3XLiq+4wACGUNoXAQWiVY7ZbKu3fGzyx5lj4mLifsKey6ZQb8uWIVFo15JX+14m5m97u4WpLY1XLCFu5iTpySV7tKKEqeuhlOc2NYlG0jSDgL/9HuNgaJquu4ujf9+8Z8w8=
+	t=1731602374; cv=none; b=L6sF162VoNTRmmFAaYNvd+IQMgd5thRrIdvtpdC+R9xDm2cjw1II3Pv/NNfeskOF6zWKPa8ZUAV4JcS9adzUivJdbeFHQVrWVWaCdnGJSYsIDU7weRFQq/j9qJd9+WFcvLcNCl4On59GHhTAWXZ+cQnEJBnnXH8Uuy0ZFfLTi8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731590290; c=relaxed/simple;
-	bh=bdXAW1qoO5i13eOISh1fGuoW7nh89fmmX4EaJzgyNv4=;
+	s=arc-20240116; t=1731602374; c=relaxed/simple;
+	bh=SUgKw9P+o1HnS6FND7Lta07yLNLbdsT2InWIXPbLQT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFHPmdloKwY4Hzcxd0queZ4r0U/VaJ2GvfddKCPMEFWzihysudirc/LFmCUlgk1YPSDvdk3KU8LjRojObGm15XBtBKT/aZX6ZqHi1Bhu0zx/UmmqeCR0j2mkXm+xmdflPX5i6Zw8j/hcRAlOPaupCezQyVaEiY/AlE3Z3m5D9lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Qw5iBgU6; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=QjyjCgY+xFvxwzofj1UifN2foVv5PqoWQEQSAZscMVX5LHwnB9xhhmuh4DbGJoQbRafZ8IMjPl7ONtDToy8uuArNwDEX9dibhpXzREjAIOC2NAPQPL/MgUvhM+jsWQRZzpPAWwqT32lWGh9J+cn5C4QNUCSPfa8GjzKmhB2sr/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nN1NXCIg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Qw5iBgU6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=VgGN9Yfoon4a0vGfFoK4KPYYABm8zMwLxlPXHt03FRM=; b=Qw5iBgU651d4p9hR
-	WrNDzZeup5w4ruUzT7GmTYwlvUL0WSchw6IZ+nCWAqyDEIz5jHrl2JNJPPJKZvg1P7MKjK8iv0J7O
-	U0z5ofybNugtXXyDC5EzDG8zNFASukZNUKSNYTG6E+A2JuEMEeHZsGxwwdWFmDP2OBiCRxJ1UAZC8
-	HBVgSrxDsAcVpd696aw/9wk043ab+ypOZYf2D42qwXF9WAZS8fq4Sy26AH30Knjc23E8A9IISrAKn
-	Rr1EZjXqSgqyF+6ZQ0A1LiTJ6Y7CrEsPa4SLsWttKHWOqnAhR4PwulSkx5JArPcZzZVS34o1seLa9
-	C76Zv2hn45cOPTNWew==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tBZjN-00HW9p-2P;
-	Thu, 14 Nov 2024 13:17:53 +0000
-Date: Thu, 14 Nov 2024 13:17:53 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Steve French <smfrench@gmail.com>
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com,
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Remove pre-historic unused CIFSSMBCopy
-Message-ID: <ZzX4gbM-W7EL3I2G@gallifrey>
-References: <20241007210214.102568-1-linux@treblig.org>
- <CAH2r5msrcCqvJwvS3w5HzoO16fHNeoj=QNxd+Rs6d04aFPURiw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nN1NXCIg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF3DC4CED0;
+	Thu, 14 Nov 2024 16:39:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731602374;
+	bh=SUgKw9P+o1HnS6FND7Lta07yLNLbdsT2InWIXPbLQT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nN1NXCIgrxJ4wk4bcHMhmOuYrCKibErARAw+zOQjDHHFuOK18Brb1h1CQ5hmnTp8V
+	 KAyuHnkpDtG87QBRy9XwJlthDqNWBY202bxVt1qqw99Wzobz5thZ096hR0glKhIjII
+	 /ZA3UnhDf+X4rBLnCVp0MRl2Leq42RY0Kcie0wqnm4FzsG4U61FM3ZRq+0+x7gknv3
+	 FzZKNTgibcdo9cf0/5GAfT8k1ONMZ9XozEApa5Sh4ftMjfeOgROuZcus0jAnRg5D/A
+	 kaXLd5qcq5VRrPOpsLSKYA5EOUNKK0ercajIivXck4U0VWWp1wDJfnDoM1SgBdANjJ
+	 cZ6W8T227w59w==
+Date: Thu, 14 Nov 2024 09:39:31 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: David Howells <dhowells@redhat.com>,
+	Christian Brauner <brauner@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 28/33] netfs: Change the read result collector to only
+ use one work item
+Message-ID: <20241114163931.GA1928968@thelio-3990X>
+References: <20241108173236.1382366-1-dhowells@redhat.com>
+ <20241108173236.1382366-29-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5msrcCqvJwvS3w5HzoO16fHNeoj=QNxd+Rs6d04aFPURiw@mail.gmail.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 13:17:44 up 190 days, 31 min,  1 user,  load average: 0.04, 0.03,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <20241108173236.1382366-29-dhowells@redhat.com>
 
-* Steve French (smfrench@gmail.com) wrote:
-> merged into cifs-2.6.git for-next
+Hi David,
 
-Thanks!
+On Fri, Nov 08, 2024 at 05:32:29PM +0000, David Howells wrote:
+...
+> diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+> index 264f3cb6a7dc..8ca0558570c1 100644
+> --- a/fs/netfs/read_retry.c
+> +++ b/fs/netfs/read_retry.c
+> @@ -12,15 +12,8 @@
+>  static void netfs_reissue_read(struct netfs_io_request *rreq,
+>  			       struct netfs_io_subrequest *subreq)
+>  {
+> -	struct iov_iter *io_iter = &subreq->io_iter;
+> -
+> -	if (iov_iter_is_folioq(io_iter)) {
+> -		subreq->curr_folioq = (struct folio_queue *)io_iter->folioq;
+> -		subreq->curr_folioq_slot = io_iter->folioq_slot;
+> -		subreq->curr_folio_order = subreq->curr_folioq->orders[subreq->curr_folioq_slot];
+> -	}
+> -
+> -	atomic_inc(&rreq->nr_outstanding);
+> +	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
+> +	__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
+>  	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
+>  	netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
+>  	subreq->rreq->netfs_ops->issue_read(subreq);
+> @@ -33,13 +26,12 @@ static void netfs_reissue_read(struct netfs_io_request *rreq,
+>  static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>  {
+>  	struct netfs_io_subrequest *subreq;
+> -	struct netfs_io_stream *stream0 = &rreq->io_streams[0];
+> -	LIST_HEAD(sublist);
+> -	LIST_HEAD(queue);
+> +	struct netfs_io_stream *stream = &rreq->io_streams[0];
+> +	struct list_head *next;
+>  
+>  	_enter("R=%x", rreq->debug_id);
+>  
+> -	if (list_empty(&rreq->subrequests))
+> +	if (list_empty(&stream->subrequests))
+>  		return;
+>  
+>  	if (rreq->netfs_ops->retry_request)
+> @@ -52,7 +44,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>  	    !test_bit(NETFS_RREQ_COPY_TO_CACHE, &rreq->flags)) {
+>  		struct netfs_io_subrequest *subreq;
+>  
+> -		list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
+> +		list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
+>  			if (test_bit(NETFS_SREQ_FAILED, &subreq->flags))
+>  				break;
+>  			if (__test_and_clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags)) {
+> @@ -73,48 +65,44 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>  	 * populating with smaller subrequests.  In the event that the subreq
+>  	 * we just launched finishes before we insert the next subreq, it'll
+>  	 * fill in rreq->prev_donated instead.
+> -
+> +	 *
+>  	 * Note: Alternatively, we could split the tail subrequest right before
+>  	 * we reissue it and fix up the donations under lock.
+>  	 */
+> -	list_splice_init(&rreq->subrequests, &queue);
+> +	next = stream->subrequests.next;
+>  
+>  	do {
+> -		struct netfs_io_subrequest *from;
+> +		struct netfs_io_subrequest *subreq = NULL, *from, *to, *tmp;
+>  		struct iov_iter source;
+>  		unsigned long long start, len;
+> -		size_t part, deferred_next_donated = 0;
+> +		size_t part;
+>  		bool boundary = false;
+>  
+>  		/* Go through the subreqs and find the next span of contiguous
+>  		 * buffer that we then rejig (cifs, for example, needs the
+>  		 * rsize renegotiating) and reissue.
+>  		 */
+> -		from = list_first_entry(&queue, struct netfs_io_subrequest, rreq_link);
+> -		list_move_tail(&from->rreq_link, &sublist);
+> +		from = list_entry(next, struct netfs_io_subrequest, rreq_link);
+> +		to = from;
+>  		start = from->start + from->transferred;
+>  		len   = from->len   - from->transferred;
+>  
+> -		_debug("from R=%08x[%x] s=%llx ctl=%zx/%zx/%zx",
+> +		_debug("from R=%08x[%x] s=%llx ctl=%zx/%zx",
+>  		       rreq->debug_id, from->debug_index,
+> -		       from->start, from->consumed, from->transferred, from->len);
+> +		       from->start, from->transferred, from->len);
+>  
+>  		if (test_bit(NETFS_SREQ_FAILED, &from->flags) ||
+>  		    !test_bit(NETFS_SREQ_NEED_RETRY, &from->flags))
+>  			goto abandon;
+>  
+> -		deferred_next_donated = from->next_donated;
+> -		while ((subreq = list_first_entry_or_null(
+> -				&queue, struct netfs_io_subrequest, rreq_link))) {
+> -			if (subreq->start != start + len ||
+> -			    subreq->transferred > 0 ||
+> +		list_for_each_continue(next, &stream->subrequests) {
+> +			subreq = list_entry(next, struct netfs_io_subrequest, rreq_link);
+> +			if (subreq->start + subreq->transferred != start + len ||
+> +			    test_bit(NETFS_SREQ_BOUNDARY, &subreq->flags) ||
+>  			    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
+>  				break;
+> -			list_move_tail(&subreq->rreq_link, &sublist);
+> -			len += subreq->len;
+> -			deferred_next_donated = subreq->next_donated;
+> -			if (test_bit(NETFS_SREQ_BOUNDARY, &subreq->flags))
+> -				break;
+> +			to = subreq;
+> +			len += to->len;
+>  		}
+>  
+>  		_debug(" - range: %llx-%llx %llx", start, start + len - 1, len);
+> @@ -127,36 +115,28 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>  		source.count = len;
+>  
+>  		/* Work through the sublist. */
+> -		while ((subreq = list_first_entry_or_null(
+> -				&sublist, struct netfs_io_subrequest, rreq_link))) {
+> -			list_del(&subreq->rreq_link);
+> -
+> +		subreq = from;
+> +		list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
+> +			if (!len)
+> +				break;
+>  			subreq->source	= NETFS_DOWNLOAD_FROM_SERVER;
+>  			subreq->start	= start - subreq->transferred;
+>  			subreq->len	= len   + subreq->transferred;
+> -			stream0->sreq_max_len = subreq->len;
+> -
+>  			__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+>  			__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
+> -
+> -			spin_lock(&rreq->lock);
+> -			list_add_tail(&subreq->rreq_link, &rreq->subrequests);
+> -			subreq->prev_donated += rreq->prev_donated;
+> -			rreq->prev_donated = 0;
+>  			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
+> -			spin_unlock(&rreq->lock);
+> -
+> -			BUG_ON(!len);
+>  
+>  			/* Renegotiate max_len (rsize) */
+> +			stream->sreq_max_len = subreq->len;
+>  			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
+>  				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
+>  				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+> +				goto abandon;
+>  			}
+>  
+> -			part = umin(len, stream0->sreq_max_len);
+> -			if (unlikely(rreq->io_streams[0].sreq_max_segs))
+> -				part = netfs_limit_iter(&source, 0, part, stream0->sreq_max_segs);
+> +			part = umin(len, stream->sreq_max_len);
+> +			if (unlikely(stream->sreq_max_segs))
+> +				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
+>  			subreq->len = subreq->transferred + part;
+>  			subreq->io_iter = source;
+>  			iov_iter_truncate(&subreq->io_iter, part);
+> @@ -166,58 +146,106 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>  			if (!len) {
+>  				if (boundary)
+>  					__set_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
+> -				subreq->next_donated = deferred_next_donated;
+>  			} else {
+>  				__clear_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
+> -				subreq->next_donated = 0;
+>  			}
+>  
+> +			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
+>  			netfs_reissue_read(rreq, subreq);
+> -			if (!len)
+> +			if (subreq == to)
+>  				break;
+> -
+> -			/* If we ran out of subrequests, allocate another. */
+> -			if (list_empty(&sublist)) {
+> -				subreq = netfs_alloc_subrequest(rreq);
+> -				if (!subreq)
+> -					goto abandon;
+> -				subreq->source = NETFS_DOWNLOAD_FROM_SERVER;
+> -				subreq->start = start;
+> -
+> -				/* We get two refs, but need just one. */
+> -				netfs_put_subrequest(subreq, false, netfs_sreq_trace_new);
+> -				trace_netfs_sreq(subreq, netfs_sreq_trace_split);
+> -				list_add_tail(&subreq->rreq_link, &sublist);
+> -			}
+>  		}
+>  
+>  		/* If we managed to use fewer subreqs, we can discard the
+> -		 * excess.
+> +		 * excess; if we used the same number, then we're done.
+>  		 */
+> -		while ((subreq = list_first_entry_or_null(
+> -				&sublist, struct netfs_io_subrequest, rreq_link))) {
+> -			trace_netfs_sreq(subreq, netfs_sreq_trace_discard);
+> -			list_del(&subreq->rreq_link);
+> -			netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_done);
+> +		if (!len) {
+> +			if (subreq == to)
+> +				continue;
+> +			list_for_each_entry_safe_from(subreq, tmp,
+> +						      &stream->subrequests, rreq_link) {
+> +				trace_netfs_sreq(subreq, netfs_sreq_trace_discard);
+> +				list_del(&subreq->rreq_link);
+> +				netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_done);
+> +				if (subreq == to)
+> +					break;
+> +			}
+> +			continue;
+>  		}
+>  
+> -	} while (!list_empty(&queue));
+> +		/* We ran out of subrequests, so we need to allocate some more
+> +		 * and insert them after.
+> +		 */
+> +		do {
+> +			subreq = netfs_alloc_subrequest(rreq);
+> +			if (!subreq) {
+> +				subreq = to;
+> +				goto abandon_after;
+> +			}
+> +			subreq->source		= NETFS_DOWNLOAD_FROM_SERVER;
+> +			subreq->start		= start;
+> +			subreq->len		= len;
+> +			subreq->debug_index	= atomic_inc_return(&rreq->subreq_counter);
+> +			subreq->stream_nr	= stream->stream_nr;
+> +			__set_bit(NETFS_SREQ_RETRYING, &subreq->flags);
+> +
+> +			trace_netfs_sreq_ref(rreq->debug_id, subreq->debug_index,
+> +					     refcount_read(&subreq->ref),
+> +					     netfs_sreq_trace_new);
+> +			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
+> +
+> +			list_add(&subreq->rreq_link, &to->rreq_link);
+> +			to = list_next_entry(to, rreq_link);
+> +			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
+> +
+> +			stream->sreq_max_len	= umin(len, rreq->rsize);
+> +			stream->sreq_max_segs	= 0;
+> +			if (unlikely(stream->sreq_max_segs))
+> +				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
+> +
+> +			netfs_stat(&netfs_n_rh_download);
+> +			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
+> +				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
+> +				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+> +				goto abandon;
+> +			}
+> +
+> +			part = umin(len, stream->sreq_max_len);
+> +			subreq->len = subreq->transferred + part;
+> +			subreq->io_iter = source;
+> +			iov_iter_truncate(&subreq->io_iter, part);
+> +			iov_iter_advance(&source, part);
+> +
+> +			len -= part;
+> +			start += part;
+> +			if (!len && boundary) {
+> +				__set_bit(NETFS_SREQ_BOUNDARY, &to->flags);
+> +				boundary = false;
+> +			}
+> +
+> +			netfs_reissue_read(rreq, subreq);
+> +		} while (len);
+> +
+> +	} while (!list_is_head(next, &stream->subrequests));
+>  
+>  	return;
+>  
+> -	/* If we hit ENOMEM, fail all remaining subrequests */
+> +	/* If we hit an error, fail all remaining incomplete subrequests */
+> +abandon_after:
+> +	if (list_is_last(&subreq->rreq_link, &stream->subrequests))
+> +		return;
 
-Dave
+This change as commit 1bd9011ee163 ("netfs: Change the read result
+collector to only use one work item") in next-20241114 causes a clang
+warning:
 
-> On Mon, Oct 7, 2024 at 4:02 PM <linux@treblig.org> wrote:
-> >
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> >
-> > CIFSSMBCopy() is unused, remove it.
-> >
-> > It seems to have been that way pre-git; looking in a historic
-> > archive, I think it landed around May 2004 in Linus'
-> > BKrev: 40ab7591J_OgkpHW-qhzZukvAUAw9g
-> > and was unused back then.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > ---
-> >  fs/smb/client/cifsproto.h |  7 -----
-> >  fs/smb/client/cifssmb.c   | 63 ---------------------------------------
-> >  2 files changed, 70 deletions(-)
-> >
-> > diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> > index 1d3470bca45e..8235b5a0aa2b 100644
-> > --- a/fs/smb/client/cifsproto.h
-> > +++ b/fs/smb/client/cifsproto.h
-> > @@ -549,13 +549,6 @@ extern int generate_smb311signingkey(struct cifs_ses *ses,
-> >                                      struct TCP_Server_Info *server);
-> >
-> >  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
-> > -extern int CIFSSMBCopy(unsigned int xid,
-> > -                       struct cifs_tcon *source_tcon,
-> > -                       const char *fromName,
-> > -                       const __u16 target_tid,
-> > -                       const char *toName, const int flags,
-> > -                       const struct nls_table *nls_codepage,
-> > -                       int remap_special_chars);
-> >  extern ssize_t CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
-> >                         const unsigned char *searchName,
-> >                         const unsigned char *ea_name, char *EAData,
-> > diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> > index c6f15dbe860a..ca50ac652e02 100644
-> > --- a/fs/smb/client/cifssmb.c
-> > +++ b/fs/smb/client/cifssmb.c
-> > @@ -2339,69 +2339,6 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *pTcon,
-> >         return rc;
-> >  }
-> >
-> > -int
-> > -CIFSSMBCopy(const unsigned int xid, struct cifs_tcon *tcon,
-> > -           const char *fromName, const __u16 target_tid, const char *toName,
-> > -           const int flags, const struct nls_table *nls_codepage, int remap)
-> > -{
-> > -       int rc = 0;
-> > -       COPY_REQ *pSMB = NULL;
-> > -       COPY_RSP *pSMBr = NULL;
-> > -       int bytes_returned;
-> > -       int name_len, name_len2;
-> > -       __u16 count;
-> > -
-> > -       cifs_dbg(FYI, "In CIFSSMBCopy\n");
-> > -copyRetry:
-> > -       rc = smb_init(SMB_COM_COPY, 1, tcon, (void **) &pSMB,
-> > -                       (void **) &pSMBr);
-> > -       if (rc)
-> > -               return rc;
-> > -
-> > -       pSMB->BufferFormat = 0x04;
-> > -       pSMB->Tid2 = target_tid;
-> > -
-> > -       pSMB->Flags = cpu_to_le16(flags & COPY_TREE);
-> > -
-> > -       if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
-> > -               name_len = cifsConvertToUTF16((__le16 *) pSMB->OldFileName,
-> > -                                             fromName, PATH_MAX, nls_codepage,
-> > -                                             remap);
-> > -               name_len++;     /* trailing null */
-> > -               name_len *= 2;
-> > -               pSMB->OldFileName[name_len] = 0x04;     /* pad */
-> > -               /* protocol requires ASCII signature byte on Unicode string */
-> > -               pSMB->OldFileName[name_len + 1] = 0x00;
-> > -               name_len2 =
-> > -                   cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_len+2],
-> > -                                      toName, PATH_MAX, nls_codepage, remap);
-> > -               name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
-> > -               name_len2 *= 2; /* convert to bytes */
-> > -       } else {
-> > -               name_len = copy_path_name(pSMB->OldFileName, fromName);
-> > -               pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
-> > -               name_len2 = copy_path_name(pSMB->OldFileName+name_len+1, toName);
-> > -               name_len2++;    /* signature byte */
-> > -       }
-> > -
-> > -       count = 1 /* 1st signature byte */  + name_len + name_len2;
-> > -       inc_rfc1001_len(pSMB, count);
-> > -       pSMB->ByteCount = cpu_to_le16(count);
-> > -
-> > -       rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
-> > -               (struct smb_hdr *) pSMBr, &bytes_returned, 0);
-> > -       if (rc) {
-> > -               cifs_dbg(FYI, "Send error in copy = %d with %d files copied\n",
-> > -                        rc, le16_to_cpu(pSMBr->CopyCount));
-> > -       }
-> > -       cifs_buf_release(pSMB);
-> > -
-> > -       if (rc == -EAGAIN)
-> > -               goto copyRetry;
-> > -
-> > -       return rc;
-> > -}
-> > -
-> >  int
-> >  CIFSUnixCreateSymLink(const unsigned int xid, struct cifs_tcon *tcon,
-> >                       const char *fromName, const char *toName,
-> > --
-> > 2.46.2
-> >
-> >
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+  fs/netfs/read_retry.c:235:20: error: variable 'subreq' is uninitialized when used here [-Werror,-Wuninitialized]
+    235 |         if (list_is_last(&subreq->rreq_link, &stream->subrequests))
+        |                           ^~~~~~
+  fs/netfs/read_retry.c:28:36: note: initialize the variable 'subreq' to silence this warning
+     28 |         struct netfs_io_subrequest *subreq;
+        |                                           ^
+        |                                            = NULL
+
+May be a shadowing issue, as adding KCFLAGS=-Wshadow shows:
+
+  fs/netfs/read_retry.c:75:31: error: declaration shadows a local variable [-Werror,-Wshadow]
+     75 |                 struct netfs_io_subrequest *subreq = NULL, *from, *to, *tmp;
+        |                                             ^
+  fs/netfs/read_retry.c:28:30: note: previous declaration is here
+     28 |         struct netfs_io_subrequest *subreq;
+        |                                     ^
+
+Cheers,
+Nathan
+
+> +	subreq = list_next_entry(subreq, rreq_link);
+>  abandon:
+> -	list_splice_init(&sublist, &queue);
+> -	list_for_each_entry(subreq, &queue, rreq_link) {
+> -		if (!subreq->error)
+> -			subreq->error = -ENOMEM;
+> -		__clear_bit(NETFS_SREQ_FAILED, &subreq->flags);
+> +	list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
+> +		if (!subreq->error &&
+> +		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
+> +		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
+> +			continue;
+> +		subreq->error = -ENOMEM;
+> +		__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+>  		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+>  		__clear_bit(NETFS_SREQ_RETRYING, &subreq->flags);
+>  	}
+> -	spin_lock(&rreq->lock);
+> -	list_splice_tail_init(&queue, &rreq->subrequests);
+> -	spin_unlock(&rreq->lock);
+>  }
+>  
+>  /*
+> @@ -225,14 +253,19 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+>   */
+>  void netfs_retry_reads(struct netfs_io_request *rreq)
+>  {
+> -	trace_netfs_rreq(rreq, netfs_rreq_trace_resubmit);
+> +	struct netfs_io_subrequest *subreq;
+> +	struct netfs_io_stream *stream = &rreq->io_streams[0];
+>  
+> -	atomic_inc(&rreq->nr_outstanding);
+> +	/* Wait for all outstanding I/O to quiesce before performing retries as
+> +	 * we may need to renegotiate the I/O sizes.
+> +	 */
+> +	list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
+> +		wait_on_bit(&subreq->flags, NETFS_SREQ_IN_PROGRESS,
+> +			    TASK_UNINTERRUPTIBLE);
+> +	}
+>  
+> +	trace_netfs_rreq(rreq, netfs_rreq_trace_resubmit);
+>  	netfs_retry_read_subrequests(rreq);
+> -
+> -	if (atomic_dec_and_test(&rreq->nr_outstanding))
+> -		netfs_rreq_terminated(rreq);
+>  }
+>  
+>  /*
