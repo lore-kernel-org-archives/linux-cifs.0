@@ -1,52 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B20185924;
-	Fri, 15 Nov 2024 06:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64ED18BC36
+	for <linux-cifs@vger.kernel.org>; Fri, 15 Nov 2024 08:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731653289; cv=none; b=tLbMG9DFd9ITTVANdEGLaAnUJEbCSQKCPwLZCJV1465W+/V8C0c+qqJ8S6nn3K4uUOfu6cwn3ykECrPIa5Y3fWx3QGFhSZ6bbLzdOzzAbWj4Bjik2xy6pjh59wOLOd60bUcKkiWIklDM60RER0Pmcg20PT9op/voUa2RlJrPClw=
+	t=1731659570; cv=none; b=HMu+XjcgmpmAlT8HHJeDTBlu7jrvjhdVHio58ybULMZQ7AboBCbPr1mgDJRpUNmg7THx141N8hlaYwHUQ6Ucu2FFY8LDyGm8haYybRlwPateDqTj/Xe+Uod54mVIhV//xL1TzubSFShnzuDR/NgdFsLc8glKsTbrLwlLFnm2zh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731653289; c=relaxed/simple;
-	bh=zakHiXayz7SY1jBhcUhQzU+JONzAKDRAo+HlUYF2IG4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KWpRt1p19H2ZBgpCW/AgsSQ63dM+hMT0dYOO7aoctqFSEvNrPR1fvaodXkMuiA5PJ7hu4M4ON8bSET5AVFkVcqpkd0l4Ay+sIu+HZEt6CELZwnOl+87eZmcLfDun6X3QvnCLc8xh0Vgx9ld9LA6H/hzkThp1Px7eVHBnfkD0jdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KakwhxgE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731659570; c=relaxed/simple;
+	bh=bwKXMZ/CqyKVXHRWjad7VNJ99PRPhanXO2k0v/9eehs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ocFthOY2tBHzCt5LmQeUamIAi/BWhChB0xGbxfRy4ZbN7ojhGfNybg0awDJhf6UHMBQmL2ygolqno8Z4oB4e/mbHP0RxUNM3JMez3Ppf0+/NfojkEmDEkM7gOCqNbVphnaznVJ9M5y4h6D3jtbtUS+g7LkCrwR9m52ENonUHNXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GTtEJuxQ; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KakwhxgE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2930C4CECF;
-	Fri, 15 Nov 2024 06:48:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1731653289;
-	bh=zakHiXayz7SY1jBhcUhQzU+JONzAKDRAo+HlUYF2IG4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KakwhxgEMiiEj8EoCeF2MovKQ2iMqLxkH7LfuwYoHDFWFGkYU8BSmQhq8gFwVs+tQ
-	 stcsqn/E3dHjgKMjhRvmvSbk7u44zDuJsxyBhMYRdExaylL8ahs0qJl6ilZnWTTFeE
-	 4df1ZD6KSPqvkkGZzekrLZcjYJedkyrlNTVm5+FM=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	netfs@lists.linux.dev,
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GTtEJuxQ"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4609d8874b1so3448821cf.3
+        for <linux-cifs@vger.kernel.org>; Fri, 15 Nov 2024 00:32:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1731659567; x=1732264367; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+oyM45fO7kqXMoRRUsCsV2dgNjzQvpxBqm/zmpiRHXg=;
+        b=GTtEJuxQtRSaBvciE0/O4V34pZ7STyPdVt2dMCpwWrN1Bp+jAL6Dm048ct+xkbpfB+
+         1XDNUdpqYfz4eS6KwONDWy2BhpftlINR4rF1NLU7vnKuFWydHUZ0UYh6Yk20CAhcRSmO
+         L3XpjPMfAI39c9Y+JI34YvXxEpzPU3/A9TnfQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731659567; x=1732264367;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+oyM45fO7kqXMoRRUsCsV2dgNjzQvpxBqm/zmpiRHXg=;
+        b=EMkQDnYl1ceTPPzYu1KuQKZyxDgMLsWHPi4r/JapdjPYTiVvd8xaTKL2Ka5abMREjv
+         Qlui4bvoc8o8kyY5LYk8q72tfa9GdaIry/5SPsMIFswyrMr0jw1z9/WZW4NC+2XmcrsG
+         I2JOut4IicL+s1CVAuHGCtc+eW+3F/xxwy+f0XvpDhQqreYOEED/IM2evpOGZzUQnHB1
+         MRQ5aHzHzNrNYlRUCUSVLuE9vAvlSPhL1FpjjFB4EJQQ41Poh8Z2uhVIdFR6bjjMO+2R
+         gfZYh4Tm+RT91ZvzhKxbUSCuMMLVFbI8qXcNifOa4gnRgIEgiX56oInet1bpXYRMGFYq
+         5TCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUW/PYhRUXm5IYKrD6/+Vi7n0OPPpofrHxDs6lpq+EfOvHrbBnRnc0ZgAr9+sLw0/VBQQRUmGmv/H0D@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMfEpgxD82h0mlWzb5Hca6zXfe336crTGYUilmEue4gsm80NCA
+	TdqXufYpc0nzH3Azw9dZIYxPsx8e2sOfvy1FHOQ82uvarA88B0NSIB4ykxOnF7QAbxR4UvvDHc1
+	s8A==
+X-Google-Smtp-Source: AGHT+IEIC73NXLt7bHwh/TMQ6UkI0zrz/RHhFfkxb8RIMOzTdzyOAiIAIfCgAfuhcrXgqjJXvnY2dQ==
+X-Received: by 2002:a05:622a:5187:b0:460:9ac7:8fcd with SMTP id d75a77b69052e-46363de864bmr26095761cf.1.1731659567548;
+        Fri, 15 Nov 2024 00:32:47 -0800 (PST)
+Received: from vb004028-vm1.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635aa37c54sm16584231cf.53.2024.11.15.00.32.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 00:32:47 -0800 (PST)
+From: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: yuxuanzhe@outlook.com,
+	linkinjeon@kernel.org,
+	stfrench@microsoft.com,
+	sashal@kernel.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
 	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.11 43/63] netfs: Downgrade i_rwsem for a buffered write
-Date: Fri, 15 Nov 2024 07:38:06 +0100
-Message-ID: <20241115063727.469260672@linuxfoundation.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241115063725.892410236@linuxfoundation.org>
-References: <20241115063725.892410236@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
+Subject: [PATCH v6.1 0/2] ksmbd: fix potencial out-of-bounds when buffer offset is invalid
+Date: Fri, 15 Nov 2024 08:32:38 +0000
+Message-Id: <20241115083240.230361-1-vamsi-krishna.brahmajosyula@broadcom.com>
+X-Mailer: git-send-email 2.39.4
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -55,67 +75,17 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.11-stable review patch.  If anyone has any objections, please let me know.
+The dependent patch (slab-out-of-bounds) is backported from 6.7 instead of 6.6.
+In the 6.6 commit (9e4937cbc150f), the upstream commit id points to an incorrect one.
 
-------------------
+Namjae Jeon (2):
+  ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
+  ksmbd: fix potencial out-of-bounds when buffer offset is invalid
 
-From: David Howells <dhowells@redhat.com>
+ fs/smb/server/smb2misc.c | 26 ++++++++++++++++------
+ fs/smb/server/smb2pdu.c  | 48 ++++++++++++++++++++++------------------
+ 2 files changed, 45 insertions(+), 29 deletions(-)
 
-[ Upstream commit d6a77668a708f0b5ca6713b39c178c9d9563c35b ]
-
-In the I/O locking code borrowed from NFS into netfslib, i_rwsem is held
-locked across a buffered write - but this causes a performance regression
-in cifs as it excludes buffered reads for the duration (cifs didn't use any
-locking for buffered reads).
-
-Mitigate this somewhat by downgrading the i_rwsem to a read lock across the
-buffered write.  This at least allows parallel reads to occur whilst
-excluding other writes, DIO, truncate and setattr.
-
-Note that this shouldn't be a problem for a buffered write as a read
-through an mmap can circumvent i_rwsem anyway.
-
-Also note that we might want to make this change in NFS also.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/1317958.1729096113@warthog.procyon.org.uk
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Trond Myklebust <trondmy@kernel.org>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/netfs/locking.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/netfs/locking.c b/fs/netfs/locking.c
-index 75dc52a49b3a4..709a6aa101028 100644
---- a/fs/netfs/locking.c
-+++ b/fs/netfs/locking.c
-@@ -121,6 +121,7 @@ int netfs_start_io_write(struct inode *inode)
- 		up_write(&inode->i_rwsem);
- 		return -ERESTARTSYS;
- 	}
-+	downgrade_write(&inode->i_rwsem);
- 	return 0;
- }
- EXPORT_SYMBOL(netfs_start_io_write);
-@@ -135,7 +136,7 @@ EXPORT_SYMBOL(netfs_start_io_write);
- void netfs_end_io_write(struct inode *inode)
- 	__releases(inode->i_rwsem)
- {
--	up_write(&inode->i_rwsem);
-+	up_read(&inode->i_rwsem);
- }
- EXPORT_SYMBOL(netfs_end_io_write);
- 
 -- 
-2.43.0
-
-
+2.39.4
 
