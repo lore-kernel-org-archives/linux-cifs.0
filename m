@@ -1,146 +1,82 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B76A1D89E5;
-	Sun, 17 Nov 2024 23:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E982907;
+	Mon, 18 Nov 2024 02:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731884909; cv=none; b=rszqueViOgS6w7RMAw4bbF3UxOXbYmaKwwdN3e9R0gsxqWmo6zqCWQMu3217u+53iokKDNvkS8t8DOGmyOH0gHZRdK+kmZSsVA07x/VmNxJMKe7smAGrwncGzbPosBylOqn7F1EiSSmu9TNpXoP8TD1XG6ZZqqUBUFf137PPl+k=
+	t=1731896285; cv=none; b=bLb/vb+PDjAdde0sqigm1zr5KdxD40wxvFF+fsLxmdCczPX7rp3OPKxLR0YsqcYeyJFvjJkvNRZ43snUI9WIiKhltvODSANX4sRi1Bo7tk5VQd1wcbCaFTlPsyoDNVzUkz2IQET+XCEThuz00zKEoHIjPS5OWdIokchtU+8j5nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731884909; c=relaxed/simple;
-	bh=qc//Rp6FgcU/OzykKOBKbEI0fB9iPhKctaTJW5N31Mg=;
+	s=arc-20240116; t=1731896285; c=relaxed/simple;
+	bh=bup4rUewPp03t4U8vjVhWSVu/1bFX3dKG/XZG/QXuIU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pML2QmJnO/kFAEa4Gd2T4we15zWHJeXcw3EiAfqBSaSggekZUGsTWzXbvDVrH38V9SnP3FuAI0Uw3tgXuzXha+ARi3NkqO8wR3LjUbalwRxNDcICTtfLx3pu8ENzUX8ENgPMwxiCENY6+RfVPwDlHDVcMZdgLH7SyqaVukHoX+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHK6hhMu; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=ZFcvVwtkv/iSiE1QTZbPivrOXJkidbvxCW9YMIxKF0E51mhVOjJz/WDt9/jI4JwLlu/UkDBPYNnBRMwYhXM4MTvHI+MCh8zX+hKMzsY8+ZQmIwPaeyJkduz4hnCSLjpQiyiPW3SeFygfJzGRwm7UUUMeomVZ0pLX8nDMJAeRZHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2rEQ2/j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHK6hhMu"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-53b34ed38easo3591120e87.0;
-        Sun, 17 Nov 2024 15:08:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731884906; x=1732489706; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MNN7ziIzHnkd18GYio7H3EiJ5Cg8s0kx1zTc8dpUr6c=;
-        b=eHK6hhMutEUnhXkbiJqwd3lYmt3Clrzs5DrfD+pCo1YbMxAAHAIJwVKB9GBD1NVTkg
-         ZWExkwWPCE5FNjvybQhbIEP126Kvnx3NAQtazuIVhN5xbqqmRGC0ATyNz8x2FDogAATi
-         rDvQBuNymvxafMzAdhI5Kn/Ih+naJGnM+JXE4x3aLAwRL3TB1GotmYrUSA0WrtepT9LJ
-         9V555bJpqFySjjx7N/WAW2uicj8kFbL1tdpZFJT5TcLX9FRd/BxrqAiOxlb/7w05ejAT
-         WT0enUo3QgS7ACD9LRdRIzxkmdE86WLqdOndGYwL5HmTleXYlwAhLRyRmq/KNdBBFoPZ
-         yqxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731884906; x=1732489706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MNN7ziIzHnkd18GYio7H3EiJ5Cg8s0kx1zTc8dpUr6c=;
-        b=L/DYOB1Zbuls1z+3Zf2T9BHZ5TsB+C3myHdt5yTCHydgdmn4Vc/3pzuE1HQLpw/Rza
-         EeWdVzr1vlGtt/rcf/+8vj7AxX9wpoTiuCvSxNnjaTF4j5tt8Lyb7g4JTB2qcauRANrB
-         nGRSl1btusc3htRJGx8x1S/ylsbvqgFrSqUGrqsyqQQyehVOLmuDvYY8HLO7CiMMwowy
-         DJcnit7KLg5AgPjy216z4KlqGtwveML12+XJxw0kGoWFdOXU1t/v3i05yQuZpadRttiw
-         6Ux5ygghbC4RMfucOJHBoBpgJvtdqD5G4PTJgKQRm0TqeJBFLL3KXlowpCAP37F4cesN
-         QY8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUuFs/g67o38gkHDmYotLYciSpd0AjLNnJd02TRHG18BYHEvlnQEgxFPdtgoI7yf5DHlVDgFk/s7v+tYLYyqj3B@vger.kernel.org, AJvYcCVJ2kIlbK/UZI74Nf0uP8ElWTj99JFA4Oqbmvd0tjnsA7wDzm58/RkTk3ZlSN5tzl6V3VXkMueiFt+V@vger.kernel.org, AJvYcCX8JNEYnxVjSRLRIM1Qeu3G6TaxeR94SlkNeOEevWbiEyYOtqDmsVwMmtxiGZRhdfwKlf5aUBaVXJIeHX5w@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeZBLmw9iiFlMV4x3HUB78WScobf9t6XfUYlS8eI3yK2M5D6ch
-	hdDuD5Xfoez0cw1ukZCju77dJAZw9oD/JejGSwLgAlwa5L9koJLrEjBQNuyu1N5+l+Yg+MCxFGL
-	QqcQvgVvFyMBDVyeo4XfkWzpBFS0=
-X-Google-Smtp-Source: AGHT+IG/Q4t9zlJxo0SzEiq1OWyQAiH8D9mhKsLHtjK5w2rEQERHHK17Ean2SepEZ7MUtCVHaZhXmMnoKX3qNPyE0Gk=
-X-Received: by 2002:a05:6512:b83:b0:539:f9b9:e6d2 with SMTP id
- 2adb3069b0e04-53dab3b126amr4424699e87.35.1731884905418; Sun, 17 Nov 2024
- 15:08:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2rEQ2/j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40709C4CED8;
+	Mon, 18 Nov 2024 02:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731896285;
+	bh=bup4rUewPp03t4U8vjVhWSVu/1bFX3dKG/XZG/QXuIU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=u2rEQ2/jAXp+XURt0u3TA4By7SrBimi8OBpG434o/ivR6W2IZlI1WH6P18rJOuxjT
+	 a+2blm7kv3VeSEl/Mgw0SJWUB6CaIqx71xzqdmf9ppQboQYN/Vg0eRUK5/yJvsZ7ur
+	 84hUitT4p5h+FhfntlrQ6nnkRiiXtGUqBBhiMOqqm4hNquNmqbyrEI8qipByYal7UJ
+	 xk3sUHv2iIr8VLKVCQGFKqnvTNbPDR4jt+ifQlD2Jom3L1O+nefr8MweJcL2Eg8xvY
+	 YGg0f0BAXwaW2saVnB4dyIDEFwyXvTCuXns4sW3NJYfAy2Uubhcp63ddKLgE1s0Ola
+	 w2N15ci6w6gjQ==
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e5fbc40239so459037b6e.3;
+        Sun, 17 Nov 2024 18:18:05 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVv56wDi0qGxqR/TgwHD2wcCo3bjO8f5eax91O8j3ucF11uzY42ZdXCBHVY8OS6SgwuHNkOqenlSOp9@vger.kernel.org, AJvYcCWr3cCvTs9+Qfct720TlYeV+iAZw8EgDpoNQJ7t8TC2yl6GhB1lBmrflsEqp2Bb6k9N0zLX+hEv/gKETlRk@vger.kernel.org
+X-Gm-Message-State: AOJu0YyABQCXuW5QLqtyzVUW1UDlmTBNNOo4+5QgrdfU1JgVF2o4y6du
+	liGvTE4zzG7rFZ/YXQj4CiEu9D1TD+H0YTIFcjQpBKo0CO2uVGY8FjB8z9MOR/HSulaAdUX1FnC
+	3QxBIURiTy0ENXH+Wg7u+lYPcV74=
+X-Google-Smtp-Source: AGHT+IFQlhJVEGO188jp6Uyc1QT8eEFtfELf30pohcInWrKUP0IAFJLg/sq0Jtu5VDga+1vna/t3VWHsCOPlW+PPPyA=
+X-Received: by 2002:a05:6808:189c:b0:3e7:b9be:5480 with SMTP id
+ 5614622812f47-3e7bc7b1d61mr8158067b6e.7.1731896284500; Sun, 17 Nov 2024
+ 18:18:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241117113204.work.419-kees@kernel.org> <bcd4fb0f-47ee-4676-8e71-6b06973e9b65@embeddedor.com>
-In-Reply-To: <bcd4fb0f-47ee-4676-8e71-6b06973e9b65@embeddedor.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 17 Nov 2024 17:08:14 -0600
-Message-ID: <CAH2r5msDZjC_iktAhCn6jxhUVQZ2sXrD8KpbCs-woDriZNDmXw@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: memcpy() with surrounding object base address
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: Kees Cook <kees@kernel.org>, Steve French <sfrench@samba.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
+References: <20241115083240.230361-1-vamsi-krishna.brahmajosyula@broadcom.com>
+In-Reply-To: <20241115083240.230361-1-vamsi-krishna.brahmajosyula@broadcom.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 18 Nov 2024 11:17:53 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8pWn+fY=kAX_inrAS3TxmSB+qrjDSr7gZq9dn2P5Nfcg@mail.gmail.com>
+Message-ID: <CAKYAXd8pWn+fY=kAX_inrAS3TxmSB+qrjDSr7gZq9dn2P5Nfcg@mail.gmail.com>
+Subject: Re: [PATCH v6.1 0/2] ksmbd: fix potencial out-of-bounds when buffer
+ offset is invalid
+To: Vamsi Krishna Brahmajosyula <vamsi-krishna.brahmajosyula@broadcom.com>
+Cc: stable@vger.kernel.org, gregkh@linuxfoundation.org, yuxuanzhe@outlook.com, 
+	stfrench@microsoft.com, sashal@kernel.org, senozhatsky@chromium.org, 
+	tom@talpey.com, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ajay.kaher@broadcom.com, alexey.makhalov@broadcom.com, 
+	vasavi.sirnapalli@broadcom.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
-
-On Sun, Nov 17, 2024 at 1:15=E2=80=AFPM Gustavo A. R. Silva
-<gustavo@embeddedor.com> wrote:
+On Fri, Nov 15, 2024 at 5:32=E2=80=AFPM Vamsi Krishna Brahmajosyula
+<vamsi-krishna.brahmajosyula@broadcom.com> wrote:
 >
+> The dependent patch (slab-out-of-bounds) is backported from 6.7 instead o=
+f 6.6.
+> In the 6.6 commit (9e4937cbc150f), the upstream commit id points to an in=
+correct one.
+Looks good to me:)
+Thanks for backporting ksmbd's fixes to stable 6.1 kernel.
 >
+> Namjae Jeon (2):
+>   ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
+>   ksmbd: fix potencial out-of-bounds when buffer offset is invalid
 >
-> On 17/11/24 05:32, Kees Cook wrote:
-> > Like commit f1f047bd7ce0 ("smb: client: Fix -Wstringop-overflow issues"=
-),
-> > adjust the memcpy() destination address to be based off the surrounding
-> > object rather than based off the 4-byte "Protocol" member. This avoids =
-a
-> > build-time warning when compiling under CONFIG_FORTIFY_SOURCE with GCC =
-15:
-> >
-> > In function 'fortify_memcpy_chk',
-> >      inlined from 'CIFSSMBSetPathInfo' at ../fs/smb/client/cifssmb.c:53=
-58:2:
-> > ../include/linux/fortify-string.h:571:25: error: call to '__write_overf=
-low_field' declared with attribute warning: detected write beyond size of f=
-ield (1st parameter); maybe use struct_group()? [-Werror=3Dattribute-warnin=
-g]
-> >    571 |                         __write_overflow_field(p_size_field, s=
-ize);
-> >        |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
-> >
-> > Signed-off-by: Kees Cook <kees@kernel.org>
+>  fs/smb/server/smb2misc.c | 26 ++++++++++++++++------
+>  fs/smb/server/smb2pdu.c  | 48 ++++++++++++++++++++++------------------
+>  2 files changed, 45 insertions(+), 29 deletions(-)
 >
-> Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> --
+> 2.39.4
 >
-> Thanks!
-> -Gustavo
->
-> > ---
-> > Cc: Steve French <sfrench@samba.org>
-> > Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-> > Cc: Paulo Alcantara <pc@manguebit.com>
-> > Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> > Cc: Shyam Prasad N <sprasad@microsoft.com>
-> > Cc: Tom Talpey <tom@talpey.com>
-> > Cc: Bharath SM <bharathsm@microsoft.com>
-> > Cc: linux-cifs@vger.kernel.org
-> > Cc: samba-technical@lists.samba.org
-> > ---
-> >   fs/smb/client/cifssmb.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> > index b96ca9be5352..026d6b5f23a9 100644
-> > --- a/fs/smb/client/cifssmb.c
-> > +++ b/fs/smb/client/cifssmb.c
-> > @@ -5337,7 +5337,7 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct=
- cifs_tcon *tcon,
-> >       param_offset =3D offsetof(struct smb_com_transaction2_spi_req,
-> >                               InformationLevel) - 4;
-> >       offset =3D param_offset + params;
-> > -     data_offset =3D (char *) (&pSMB->hdr.Protocol) + offset;
-> > +     data_offset =3D (char *)pSMB + offsetof(typeof(*pSMB), hdr.Protoc=
-ol) + offset;
-> >       pSMB->ParameterOffset =3D cpu_to_le16(param_offset);
-> >       pSMB->DataOffset =3D cpu_to_le16(offset);
-> >       pSMB->SetupCount =3D 1;
->
->
-
-
---=20
-Thanks,
-
-Steve
