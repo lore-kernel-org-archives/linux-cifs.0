@@ -1,81 +1,95 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281F1E130F
-	for <linux-cifs@vger.kernel.org>; Mon, 18 Nov 2024 18:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731956368; cv=fail; b=ek5K9JyoJeYrBQMujYSMqMPcHHFsVoYJ3UB13hKMx9UH/Ib5J9MWXH9wfiJxzqAUIiagCWIc94I1HAaZ6TGlw/gliVilWxnCfBt+/Orea0gCb9uruibnLje1ZTEPUbfnFjVE3n6Exed805Mhsu9Kz99Tfved29pPEYb41iF4V+U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731956368; c=relaxed/simple;
-	bh=e/D4dGGzmmnbaSkf/OE3ObWSW7ztdaJ4tQtln53Xhhg=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=Qn9W5G5jQLJlVwLjRgVo1P3417cle8kK3qCDla0e37Xz7qH2u/ddwWjLajzqbTaQGuPBcrkBHA+Fx//q6Fc31A7dv1Uz0Y0koLYQGJMluH6gsvdFy0xWvBOAcljJIWxBNZUuaVOH56ciY+wMBDkYBwRZN1kSaOyOpufmjZYG5L4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=DEA729iI; arc=fail smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C3A1C07C4
+	for <linux-cifs@vger.kernel.org>; Mon, 18 Nov 2024 21:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731966641; cv=none; b=lqwcVhx8WZufQiAC/u0C/AT7IK9fluTmZPSfNOA59wD8ge9B7WQiHcGiGKpHN6CgYAM88nl7VO+7jfD7kPP93fcRSYl4BNKzW0AhpE8BGLb0QI4nPyXvnmptacC0LxzfStqywQyfuSLwJPbO02cxenXS+ACic08tymPWChCgCxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731966641; c=relaxed/simple;
+	bh=/yD78hB77bBOfeAbWiSXOxm0RR53Z14u59VoVYRcqfw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qIq/hSu0Pgj7L/huv1m1Ji5um04IAif5CK46z9XjBR1U+u/NA6VfN7QCgxEzZhdwmD+ylf8OprVJdJbUMfMhZWe8tXT4kWup+3y8YiY5YquvOQoScAhT4StzgV1ePqfiUxA56BLg+bOh0ziH30wZYBoGpj28r51U+gGzcwAGxno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=oEIAxeWa; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=YxDZJWJP; arc=none smtp.client-ip=74.207.241.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="DEA729iI"
-Message-ID: <3d10dd5c3a7f190533474e4ec48f07e4@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731956364;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWvezka22UZIjUIHSe1lhBbCoQ0GczC6qfffqKBxOVY=;
-	b=DEA729iIShZmbTc57x3QodgrUmj/k/+p6YNIm8gyphHJ3MtuvlOrSDMTxieEqC4KfrsMsu
-	9CHFOklU9dHn/1eCgSQcogIcvfZDsqNhkYyrq1VqIijUo6Xn5KESAC3BdTLQOoqVZy497Y
-	ascuxe+G2tXbqynf5sYx2H6CLnQdr+w04PQaMuFpQwUGO8knPpthN2a7QzYRIoPCysNhuL
-	QFO7d7/Rfzj8nad0N0dEQp/qAZcYViNaXK63xOlbkGBoUl/JphuMyFxEnITLCtt17F6cDJ
-	WymnYhhFgEvgcd8mUFRDl+lruJMlOItJCH92ETQ08/DzTTKegg4cswBWFiz8kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1731956364; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWvezka22UZIjUIHSe1lhBbCoQ0GczC6qfffqKBxOVY=;
-	b=aHIv/HNlOW+5N7Qmr0PSQHmzcWJhtFobO5Q+0Vcm1o3tUCgGKWre55nkkr29GIEv9s3UMD
-	p3SR0U/N8lZzJVjNMLDZ8A1JG0WPITC2az4oeV+HmrO63AqtvGimEcDlas8iiREQmjkwhD
-	hMBsfUKMXPn266JrO1bRxg9295SI1vfgGmwV/DqkpVANbvMUkasTRt52B9XZmSel+Kz6eT
-	lS/jkM9HAPhk41Yvt8FWSBFmqTpIRSnqw3UhmYavNm5BeJzluFil/iXiG3KClMhByvrpE9
-	SlywyNvWpBulG/9lJAW8YHc8tw5gRPWaysvKmsDiQGNdwbzya/UO7RXcI1AoSw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1731956364; a=rsa-sha256;
-	cv=none;
-	b=gFuVnNlyidkYtU4iKnC44w/nfbl/yfhhjD1ofATfezbKqXHbDjtZ5ELHJLrnTCWKywW5Kx
-	1atg3mXqTtpN/JREQiI8rmypR3KReVd5XS+yFdxGDveEmNH01WTy2lym2KMBzzLEQ4jpL+
-	bN/0NWChZQz8r6pBiBDIoD8e6Mp83tJPBqcFi3LaAmvjukVm66KJnhoYY1VCSN8QDSXnuD
-	74uuHWiFloAqTuRFQmP3mfJsWSMMHfHTKJR6iLwQb8Awby6GwmbFZiEue3NBxYvIQPlymd
-	LthwEvKl6I/IuTm4MnWc61fw3PBhDv49x9I1/GvCwA/LbVwPDPNxeJ/nYfb9fQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-From: Paulo Alcantara <pc@manguebit.com>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 3/3] smb: client: handle max length for SMB symlinks
-In-Reply-To: <CAH2r5mueythTtWNcgaduN1=CW3gt+xQc2mY=naYEn_mmKY2vMg@mail.gmail.com>
-References: <20241118153516.48676-1-pc@manguebit.com>
- <20241118153516.48676-3-pc@manguebit.com>
- <CAH2r5mueythTtWNcgaduN1=CW3gt+xQc2mY=naYEn_mmKY2vMg@mail.gmail.com>
-Date: Mon, 18 Nov 2024 15:59:20 -0300
+	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="oEIAxeWa";
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="YxDZJWJP"
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+ d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
+ t=1731966633; h=from : to : cc : subject : date : message-id :
+ in-reply-to : references : mime-version : content-transfer-encoding :
+ from; bh=joibekbaBl8hAo29wZ3AXThwiTfyTHXyMEsSRMa6ttE=;
+ b=oEIAxeWaea/eOKQ9ffxkBICguxIt1QEktYxTBW454fUNSwdzLEqSMTEog25GDmId5jlGn
+ NNXsIWlXT5oRK2EBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
+ i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1731966633; h=from : to
+ : cc : subject : date : message-id : in-reply-to : references :
+ mime-version : content-transfer-encoding : from;
+ bh=joibekbaBl8hAo29wZ3AXThwiTfyTHXyMEsSRMa6ttE=;
+ b=YxDZJWJPQeD31VRJtHiqrEkRGa0iPI4F+8+2rySpjJIBgpROMqOTSXnJRQKs7px4RDZcV
+ qMy0sy4t5VlYaFtRjAqw91Z6iyJJP/s696mlEJNV8ht40vjM9/YmjAkOxTVz9lWgUIvPjCR
+ 1agPfDw9oLB+4rzpIFaewoNmkkc9x2IrbD7N+AKLghNAqcfQcW87qxImwfjwLYpzsj9FGqh
+ F39gZu534KIJZ+9Ca9CrTMdqlk0VNThhArW6T6q0XHbQevybJhiheiAYtqtLJHoAqno8SxF
+ DJelxGDp9Qlyyq2hWTq6oAGTSjQzc0IVlqz9CFfFQj4WgbW9NUGsjmiURIPg==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by o-chul.darkrain42.org (Postfix) with ESMTPSA id 3C7C583B6;
+	Mon, 18 Nov 2024 13:50:33 -0800 (PST)
+From: Paul Aurich <paul@darkrain42.org>
+To: linux-cifs@vger.kernel.org,
+	Steve French <sfrench@samba.org>
+Cc: paul@darkrain42.org,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH v2 1/4] smb: cached directories can be more than root file handle
+Date: Mon, 18 Nov 2024 13:50:25 -0800
+Message-ID: <20241118215028.1066662-2-paul@darkrain42.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241118215028.1066662-1-paul@darkrain42.org>
+References: <20241118215028.1066662-1-paul@darkrain42.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Steve French <smfrench@gmail.com> writes:
+Update this log message since cached fids may represent things other
+than the root of a mount.
 
-> Presumably a symlink could be up to PATH_MAX (4096), is there any
-> reason not to fix the client side to be able to handle at least 4096?
+Fixes: e4029e072673 ("cifs: find and use the dentry for cached non-root directories also")
+Signed-off-by: Paul Aurich <paul@darkrain42.org>
+---
+ fs/smb/client/cached_dir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Even if we fix client to handle larger responses, Windows Server will
-not allow more than 4091 characters due to MS-FSA 2.1.5.10.37.  It's
-even worst with encryption that we only support parsing large responses
-with SMB2_READ.
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 0ff2491c311d..585e1dc72432 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -399,11 +399,12 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ 		return -ENOENT;
+ 
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry(cfid, &cfids->entries, entry) {
+ 		if (dentry && cfid->dentry == dentry) {
+-			cifs_dbg(FYI, "found a cached root file handle by dentry\n");
++			cifs_dbg(FYI, "found a cached file handle by dentry for %pd\n",
++				 dentry);
+ 			kref_get(&cfid->refcount);
+ 			*ret_cfid = cfid;
+ 			spin_unlock(&cfids->cfid_list_lock);
+ 			return 0;
+ 		}
+-- 
+2.45.2
 
-Yes, we could fix the client to support up to 4091 chars, but that is
-out of scope for this series.  This patch is for allowing users to
-create SMB symlinks and read them back with and without encryption.
