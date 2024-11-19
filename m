@@ -1,158 +1,205 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D0F27735
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Nov 2024 02:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F08F155C8A
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Nov 2024 06:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731984708; cv=none; b=OUE5aMscBRDfePlY1xnI0qIDbLbyYL0gME0HNV6/5zPCUk2IT0okxOeVplQJxVoFT6Eny5lzv4tXI8IRung10h6oE32IcFMBAhl5XTIwHbAW8U3juCI5KZmZJyW/WpqSCMuMqmv4YyBqBcJEmnm8dQK3jtAQ7/iR/NYsDatBqAk=
+	t=1731996532; cv=none; b=cXb0wSj5U+Cxym4ofRpQFC7XXWiY2GSlVVw3SufdwswtX2ljMbTWZIK0k82TIXaBPpCdLSIhj3CVf2eEY1qLrOrMXpa+jJzAoWCVdwueRq9Pig8HFbx74zlE4UZu7f96OWw8VUklHTHVY5D3IfBj0jrww2UwlGM9hZxMunN/j8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731984708; c=relaxed/simple;
-	bh=y35UV0cuK6FwjgUaTebgKgiLFDnrYNixnk3DmwylJE8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qre1+GQZxAubR/fGVgUQhlxjwy07oMrz8CexHoYrpiZeszF8fpyxrCJZvx2ekWdBwIvu2CPlWxTuaXiXbcyDqd9k2PrFyIvAnBGMbwluJHXIdNbtui0uUMI0ivvEt5/6OjNRKix3FvrOZyUH/iF6Td/KpjO936L4TcePJpyHr2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMbOAbBn; arc=none smtp.client-ip=209.85.208.170
+	s=arc-20240116; t=1731996532; c=relaxed/simple;
+	bh=Qy7Row9Q1xQwndfUeqkhrcHJb4CRdOrQbU+L8XpGWbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lSRspql9YvFoKX6AjK7PR6VKpRa+NvRbal78bckmXtsDlOyo4cAx66Uo/7rH4tH7fEleunbaCePivovFJ3ipeUVvMcWxspme9JTqj95CM0UEsyCGSy7Lv1f1vBohs5kzAlrhTokjOdvNUonL/Ca7wVGaCNLLVqnHcABk2WtCTL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rsk1FkkX; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMbOAbBn"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2fb5fa911aaso36007771fa.2
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Nov 2024 18:51:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rsk1FkkX"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7eab7622b61so372357a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Nov 2024 22:08:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731984705; x=1732589505; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WYLRZxurmyKbuKnEbc7UpIdgi3ScMIe+s7ynUr9tekw=;
-        b=AMbOAbBn0R7hJFguU92WxM6oWLkKXahgPukupbUi8WMkp5P7bOfNdjCu1skammDhnk
-         egCxyDhncv15LW7x1/qYUQu8VquD0qmHfWY9z9nTAUr4T8D0rs4O4V6CFNFsXz5oOj+v
-         CvStgq3q6RbgH5cg/D5xkHxKKiJI0A4dRS7nuQx4A69xVMG+AC35GHBlScHLg6FKDQHH
-         OIpm+z2AAzxRn6hRCadLhUOs40Xh4WyttBRdgTPFRzf04bk8eRqFpP/78J0R2/Iko4JY
-         m1UZIUkPRvFDySpZr05SYt6jOGXPGUt7/Ab4GzAx7GH0azVMqDPMk9Bd/NCHOnTuPUrs
-         dX9g==
+        d=gmail.com; s=20230601; t=1731996530; x=1732601330; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=opQIo/UDex7F0GgDQYPwbV3A+5hkpDYxUE4ItcEBt0Y=;
+        b=Rsk1FkkXsosNlJoxxLlv43ReaU3VWnRYdT1CdRdDAOfW5jNVD6iQqfOTBqA4CJb73p
+         psyW8dDfCjlHnFe4trmAG/Q8TReAZrWAJ92kEVFJosZuQAe39vqvHqtFfIdOKsQOULkb
+         vqFy6QVYuBGd5vBo1VNO2SdrT4tz2TSXhnpBf7oK7MoMY4xkFmziT/mYhkaPZXVLLSIS
+         faDmVhfoqnh7F4o6D8hfyOVHNJ8BUPUG90xgEa/5pomqtoEG2Fhg3dnu57ZUF4grNz5S
+         fWn/shv3VWrG1mAw+JxXmN/gydWxq8xEjE8Sd5BdsTjj5YF3tkvTeijYte6r6XZKhvEW
+         9O2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731984705; x=1732589505;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1731996530; x=1732601330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WYLRZxurmyKbuKnEbc7UpIdgi3ScMIe+s7ynUr9tekw=;
-        b=n+tztEwTSE9smI2fBsHibOMkF1I4/X3/Sve9pEHHECqq2kzwNMPZTP0+I3zlFDo1I2
-         MzBTwBrYD8n9etgHQ9Evw1c5qLuQ9KkmlkL2R48K1yomB1I9wc4ahIHPTYDX6qCNMlzl
-         C+m5Oez3XGTDNoYnFsdaTty/552ekT1oG/UQNr94bzl9y4YuO+2V8mMIBwVqZ4ECZj6H
-         ygwV3O2iErMr8EyGIJqiCwpEeXwQNuaQ4zX20iqhENJripo9d0C93kb+6UyLEoECccfo
-         pB4Nzg0Ry8R2dtX6uNzIdv/EjfFkJSXXuGZ3Lz99N7I/v8yvKSGYFvINoEMD8JOc1YW8
-         doQw==
-X-Gm-Message-State: AOJu0YwyWfpEFce920sZ/IBv2dF7GlWWVHTTIctQKG1tVCCc5fDTxuG6
-	4rrw2+OWEiirAvIBR3Xk/0kYsRoz927uPFLJYJ8hOuFs7CRz/5vYZLcWc5XscWnWGRkJUBgrUPE
-	tDIMGUseLZtueEvG2V6iUSPFbJ38=
-X-Google-Smtp-Source: AGHT+IH1awMl0Ktbxi5k2oYi6WDO7B5ue3pc3Fz4MZ5LCpRT9rfAEAUyNeKRlMFg7+HBtOXxiO0poKhI6jNnZUHyhZU=
-X-Received: by 2002:a2e:b8c6:0:b0:2fb:2a96:37fd with SMTP id
- 38308e7fff4ca-2ff606dbc79mr105283611fa.29.1731984704581; Mon, 18 Nov 2024
- 18:51:44 -0800 (PST)
+        bh=opQIo/UDex7F0GgDQYPwbV3A+5hkpDYxUE4ItcEBt0Y=;
+        b=aMQ8TwXLR5uembBGi2mFdygZWNIw/sBbcZ591OMOeCPm6kNJaX0xYoPntkQ095CliE
+         1kbVfU13EQeWb+YDRVnLPLsdJduNpxUP4wl1KWnHwaiM9ByW+0AEVuc56WT/1Cy8u2CW
+         CoXMj2Q7krcYJnyrThMcnKyZ4ADZ/O4b0mUkK23h6pe4o/oRtO6YP1jWSp8202g0GRa5
+         v7z8FV9S0ZJEuf87fQD7SD0oexTwh/m5DSJoLWB4RHkS53gcFpl4PlMDH1faCHW8z8kR
+         jNiDSctzOxCJWCQlX6TCzaIoYotw5AjsQ1mRfazXFVtsJ4pcSxE6J3BvuLlcXzZ573iZ
+         bRIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrlKmIJHR0S6CWXQTa+WwJZfb5TLFwIUJ6QEwq3d95POSVee87ViNo7U1KsQOw6YxJUtjcFw9ml2FB@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ8+pgmlYa9R8VRCiimdkscmoZbMB3fy0KKSv/smtHR4NYdUMx
+	eRbjW5T1F1IvFoax3w9EnUey7sojod/PbsZ12K7cnOrWpmXreWB/MSTqlA==
+X-Google-Smtp-Source: AGHT+IEfHUiQI6usz/n2/+Yp+y7Gui1hJeLSyHkhjbwnnVv98/4OVzbKmF/xkVUnp2Le0R3ar2Hwcg==
+X-Received: by 2002:a05:6a20:3d8d:b0:1db:ef91:2e51 with SMTP id adf61e73a8af0-1dc90baa5a4mr24016748637.28.1731996529867;
+        Mon, 18 Nov 2024 22:08:49 -0800 (PST)
+Received: from localhost ([74.225.236.108])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724771bfdfdsm7526723b3a.129.2024.11.18.22.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 22:08:49 -0800 (PST)
+From: budhirajaritviksmb@gmail.com
+To: pc@manguebit.com,
+	dhowells@redhat.com,
+	jlayton@kernel.org,
+	smfrench@gmail.com,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	nspmangalore@gmail.com,
+	bharathsm.hsk@gmail.com,
+	lsahlber@redhat.com
+Cc: Ritvik Budhiraja <rbudhiraja@microsoft.com>
+Subject: [PATCH] CIFS.upcall to accomodate new namespace mount opt
+Date: Tue, 19 Nov 2024 06:07:58 +0000
+Message-ID: <20241119060758.273090-1-budhirajaritviksmb@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
- <CAH2r5muwuKvifnG0XK3wShCtpR6EZOEozn=H95qx9ewHDO5jdA@mail.gmail.com>
- <42c8b091-a57a-4d4e-aebf-aee57dabf5d4@samba.org> <CAH2r5mtr0SJHzG4tNeRA=1H1gEswQUywj0G5kR+wuoPk1r1YVA@mail.gmail.com>
- <6e38eeba-9a82-48f4-bfcd-a4f2ce718782@samba.org>
-In-Reply-To: <6e38eeba-9a82-48f4-bfcd-a4f2ce718782@samba.org>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 18 Nov 2024 20:51:33 -0600
-Message-ID: <CAH2r5mtGx9w+=qcY9zVwaJXWDC=4w1nFn4WNx1DC6vnjvDV3UA@mail.gmail.com>
-Subject: Re: Directory Leases
-To: Ralph Boehme <slow@samba.org>
-Cc: linux-cifs@vger.kernel.org, 
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: multipart/mixed; boundary="00000000000012f2e206273b1dbf"
+Content-Transfer-Encoding: 8bit
 
---00000000000012f2e206273b1dbf
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Ritvik Budhiraja <rbudhiraja@microsoft.com>
 
-Here is a one line patch to make sure we request HANDLE leases on
-cached directories.
-I also want to make sure (in followon patch) that we check in the open
-response (ie the lease
-state granted) that we don't defer close of directory if we don't get
-both HANDLE and READ
-in response.
+NOTE: This patch is dependent on one of the previously sent patches:
+[PATCH] CIFS: New mount option for cifs.upcall namespace resolution
+which introduces a new mount option called upcall_target, to
+customise the upcall behaviour.
+ 
+Building upon the above patch, the following patch adds functionality
+to handle upcall_target as a mount option in cifs.upcall. It can have 2 values -
+mount, app. 
+Having this new mount option allows the mount command to specify where the
+upcall should happen: 'mount' for resolving the upcall to the host
+namespace, and 'app' for resolving the upcall to the ns of the calling
+thread. This will enable both the scenarios where the Kerberos credentials
+can be found on the application namespace or the host namespace to which
+just the mount operation is "delegated".
+This aids use cases like Kubernetes where the mount
+happens on behalf of the application in another container altogether.
 
+Signed-off-by: Ritvik Budhiraja <rbudhiraja@microsoft.com>
+---
+ cifs.upcall.c | 55 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 47 insertions(+), 8 deletions(-)
 
-On Tue, Oct 29, 2024 at 5:05=E2=80=AFAM Ralph Boehme <slow@samba.org> wrote=
-:
->
-> Hi Steve,
->
-> On 10/28/24 10:11 PM, Steve French wrote:
-> > Doing some additional experiments to Windows and also to the updated
-> > Samba branch from Ralph, I see the directory lease request, and
-> > I see that after ls (which will cache the directory contents for about
-> > 30 second) we do get a big benefit from the metadata of the directory
-> > entries being cached e.g. "ls /mnt ; sleep 10; stat /mnt/file ; sleep
-> > 15 stat /mnt/file2 ; sleep 10 /mnt/file"  - we only get the roundtrips
-> > for the initial ls - the stat calls don't cause any network traffic
-> > since the directory is cached.
-> indeed, I can confirm that some cache is used for stat. Unfortunately it
-> isn't used for readddir.
->
-> Also, coming back on the issue that the client is deferring a close on
-> the directory with having a H lease:
->
-> In my understanding that's at least going to cause problems if other
-> clients want to do anything on the server that is not allowed if there
-> are conflicting opens like renaming a directory (which is not allowed if
-> there are any opens below recursively). Unlinks will also be deferred as
-> long as the client sticks to its handle.
->
-> The client should acquire a RH lease on directories if it wants to cache
-> the handle and that's a prerequisite in order to cache readdir.
->
-> Afair the kernel is currently caching for 30 seconds. Increasing this
-> time should not be done without also having a H lease.
->
-> -slow
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index ff6f2bd..a790aca 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -954,6 +954,13 @@ struct decoded_args {
+ #define MAX_USERNAME_SIZE 256
+ 	char username[MAX_USERNAME_SIZE + 1];
+ 
++#define MAX_UPCALL_STRING_LEN 6 /* "mount\0" */
++	enum upcall_target_enum {
++		UPTARGET_UNSPECIFIED, /* not specified, defaults to app */
++		UPTARGET_MOUNT, /* upcall to the mount namespace */
++		UPTARGET_APP, /* upcall to the application namespace which did the mount */
++	} upcall_target;
++
+ 	uid_t uid;
+ 	uid_t creduid;
+ 	pid_t pid;
+@@ -970,6 +977,7 @@ struct decoded_args {
+ #define DKD_HAVE_PID		0x20
+ #define DKD_HAVE_CREDUID	0x40
+ #define DKD_HAVE_USERNAME	0x80
++#define DKD_HAVE_UPCALL_TARGET	0x100
+ #define DKD_MUSTHAVE_SET (DKD_HAVE_HOSTNAME|DKD_HAVE_VERSION|DKD_HAVE_SEC)
+ 	int have;
+ };
+@@ -980,6 +988,7 @@ __decode_key_description(const char *desc, struct decoded_args *arg)
+ 	size_t len;
+ 	char *pos;
+ 	const char *tkn = desc;
++	arg->upcall_target = UPTARGET_UNSPECIFIED;
+ 
+ 	do {
+ 		pos = index(tkn, ';');
+@@ -1078,6 +1087,31 @@ __decode_key_description(const char *desc, struct decoded_args *arg)
+ 			}
+ 			arg->have |= DKD_HAVE_VERSION;
+ 			syslog(LOG_DEBUG, "ver=%d", arg->ver);
++		} else if (strncmp(tkn, "upcall_target=", 14) == 0) {
++			if (pos == NULL)
++				len = strlen(tkn);
++			else
++				len = pos - tkn;
++
++			len -= 14;
++			if (len > MAX_UPCALL_STRING_LEN) {
++				syslog(LOG_ERR, "upcall_target= value too long for buffer");
++				return 1;
++			}
++			if (strncmp(tkn + 14, "mount", 5) == 0) {
++				arg->upcall_target = UPTARGET_MOUNT;
++				syslog(LOG_DEBUG, "upcall_target=mount");
++			} else if (strncmp(tkn + 14, "app", 3) == 0) {
++				arg->upcall_target = UPTARGET_APP;
++				syslog(LOG_DEBUG, "upcall_target=app");
++			} else {
++				// Should never happen
++				syslog(LOG_ERR, "Invalid upcall_target value: %s, defaulting to app",
++				       tkn + 14);
++				arg->upcall_target = UPTARGET_APP;
++				syslog(LOG_DEBUG, "upcall_target=app");
++			}
++			arg->have |= DKD_HAVE_UPCALL_TARGET;
+ 		}
+ 		if (pos == NULL)
+ 			break;
+@@ -1441,15 +1475,20 @@ int main(const int argc, char *const argv[])
+ 	 * acceptably in containers, because we'll be looking at the correct
+ 	 * filesystem and have the correct network configuration.
+ 	 */
+-	rc = switch_to_process_ns(arg->pid);
+-	if (rc == -1) {
+-		syslog(LOG_ERR, "unable to switch to process namespace: %s", strerror(errno));
+-		rc = 1;
+-		goto out;
++	if (arg->upcall_target == UPTARGET_APP || arg->upcall_target == UPTARGET_UNSPECIFIED) {
++		syslog(LOG_INFO, "upcall_target=app, switching namespaces to application thread");
++		rc = switch_to_process_ns(arg->pid);
++		if (rc == -1) {
++			syslog(LOG_ERR, "unable to switch to process namespace: %s", strerror(errno));
++			rc = 1;
++			goto out;
++		}
++		if (trim_capabilities(env_probe))
++			goto out;
++	} else {
++		syslog(LOG_INFO, "upcall_target=mount, not switching namespaces to application thread");
+ 	}
+ 
+-	if (trim_capabilities(env_probe))
+-		goto out;
+ 
+ 	/*
+ 	 * The kernel doesn't pass down the gid, so we resort here to scraping
+@@ -1496,7 +1535,7 @@ int main(const int argc, char *const argv[])
+ 	 * look at the environ file.
+ 	 */
+ 	env_cachename =
+-		get_cachename_from_process_env(env_probe ? arg->pid : 0);
++		get_cachename_from_process_env((env_probe && (arg->upcall_target == UPTARGET_APP)) ? arg->pid : 0);
+ 
+ 	rc = setuid(uid);
+ 	if (rc == -1) {
+-- 
+2.43.0
 
-
-
---
-Thanks,
-
-Steve
-
---00000000000012f2e206273b1dbf
-Content-Type: application/x-patch; 
-	name="0001-smb3-request-handle-caching-when-caching-directories.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-request-handle-caching-when-caching-directories.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m3nczq0z0>
-X-Attachment-Id: f_m3nczq0z0
-
-RnJvbSBmZWMxNDEyOGVmM2E4OTFlMTk0MDY2ZmVkYmU0NWUyZDIzZjMyM2Q5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMTggTm92IDIwMjQgMTI6MTk6NDYgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiByZXF1ZXN0IGhhbmRsZSBjYWNoaW5nIHdoZW4gY2FjaGluZyBkaXJlY3RvcmllcwoKVGhp
-cyBjbGllbnQgd2FzIG9ubHkgcmVxdWVzdGluZyBSRUFEIGNhY2hpbmcsIG5vdCBSRUFEIGFuZCBI
-QU5ETEUgY2FjaGluZwppbiB0aGUgTGVhc2VTdGF0ZSBvbiB0aGUgb3BlbiByZXF1ZXN0cyB3ZSBz
-ZW5kIGZvciBkaXJlY3Rvcmllcy4gIFRvCmRlbGF5IGNsb3NpbmcgYSBoYW5kbGUgKGUuZy4gZm9y
-IGNhY2hpbmcgZGlyZWN0b3J5IGNvbnRlbnRzKSB3ZSBzaG91bGQKYmUgcmVxdWVzdGluZyBIQU5E
-TEUgYXMgd2VsbCBhcyBSRUFEIChhcyB3ZSBhbHJlYWR5IGRvIGZvciBkZWZlcnJlZApjbG9zZSBv
-ZiBmaWxlcykuICAgU2VlIE1TLVNNQjIgMy4zLjEuNCBlLmcuCgpDYzogc3RhYmxlQHZnZXIua2Vy
-bmVsLm9yZwpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
-b20+Ci0tLQogZnMvc21iL2NsaWVudC9zbWIyb3BzLmMgfCAyICstCiAxIGZpbGUgY2hhbmdlZCwg
-MSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50
-L3NtYjJvcHMuYyBiL2ZzL3NtYi9jbGllbnQvc21iMm9wcy5jCmluZGV4IDZjNGE3MzM1YThhMi4u
-ZmE5NmViZWQ4MzEwIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYworKysgYi9m
-cy9zbWIvY2xpZW50L3NtYjJvcHMuYwpAQCAtNDA0OSw3ICs0MDQ5LDcgQEAgbWFwX29wbG9ja190
-b19sZWFzZSh1OCBvcGxvY2spCiAJaWYgKG9wbG9jayA9PSBTTUIyX09QTE9DS19MRVZFTF9FWENM
-VVNJVkUpCiAJCXJldHVybiBTTUIyX0xFQVNFX1dSSVRFX0NBQ0hJTkdfTEUgfCBTTUIyX0xFQVNF
-X1JFQURfQ0FDSElOR19MRTsKIAllbHNlIGlmIChvcGxvY2sgPT0gU01CMl9PUExPQ0tfTEVWRUxf
-SUkpCi0JCXJldHVybiBTTUIyX0xFQVNFX1JFQURfQ0FDSElOR19MRTsKKwkJcmV0dXJuIFNNQjJf
-TEVBU0VfUkVBRF9DQUNISU5HX0xFIHwgU01CMl9MRUFTRV9IQU5ETEVfQ0FDSElOR19MRTsKIAll
-bHNlIGlmIChvcGxvY2sgPT0gU01CMl9PUExPQ0tfTEVWRUxfQkFUQ0gpCiAJCXJldHVybiBTTUIy
-X0xFQVNFX0hBTkRMRV9DQUNISU5HX0xFIHwgU01CMl9MRUFTRV9SRUFEX0NBQ0hJTkdfTEUgfAog
-CQkgICAgICAgU01CMl9MRUFTRV9XUklURV9DQUNISU5HX0xFOwotLSAKMi40My4wCgo=
---00000000000012f2e206273b1dbf--
