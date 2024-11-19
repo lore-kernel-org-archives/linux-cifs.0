@@ -1,155 +1,158 @@
-Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5856C2C9
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Nov 2024 02:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D0F27735
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Nov 2024 02:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731983378; cv=none; b=io7Hx9Yl3eH5/xTpKvFr4l2NzbLVqRKpVV5JnrO7dZbpzMLXkcFgBtDONfFs8gaK/Q51bpdJYkPBv3l4cs7xXvoMjmSKCMvq2N+2wF4+jbvezhff9DBo7N8n6AZklTIMo9CyACRFJfbH3uGYP4N8J9rfdd2QOCN4+q5hDAc6mvc=
+	t=1731984708; cv=none; b=OUE5aMscBRDfePlY1xnI0qIDbLbyYL0gME0HNV6/5zPCUk2IT0okxOeVplQJxVoFT6Eny5lzv4tXI8IRung10h6oE32IcFMBAhl5XTIwHbAW8U3juCI5KZmZJyW/WpqSCMuMqmv4YyBqBcJEmnm8dQK3jtAQ7/iR/NYsDatBqAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731983378; c=relaxed/simple;
-	bh=dP9h4yI17n6JF4wN1AXEDm75lZRloo0SEgFyNfCS3yU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TNcLFQ5mZCbE2gYG7vgh2HAGaVqs2Uio5hGm8HveEKHogBsfuBhMNdzTT4/jRJAUiAcqf6vsaBxHBCSU14SGvl77ZJqTA0u4s7Z4O+d8AdbPmEApoM98qnc2XTNaTXmXMaRBoghKLt1Ke1BAdJcgXyiUgtnkzqOxUtbQmW0iU0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=wIwKaWea; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=c6Q1QI/v; arc=none smtp.client-ip=74.207.241.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
+	s=arc-20240116; t=1731984708; c=relaxed/simple;
+	bh=y35UV0cuK6FwjgUaTebgKgiLFDnrYNixnk3DmwylJE8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qre1+GQZxAubR/fGVgUQhlxjwy07oMrz8CexHoYrpiZeszF8fpyxrCJZvx2ekWdBwIvu2CPlWxTuaXiXbcyDqd9k2PrFyIvAnBGMbwluJHXIdNbtui0uUMI0ivvEt5/6OjNRKix3FvrOZyUH/iF6Td/KpjO936L4TcePJpyHr2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMbOAbBn; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="wIwKaWea";
-	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="c6Q1QI/v"
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
- d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
- t=1731983376; h=date : from : to : cc : subject : message-id :
- references : mime-version : content-type : content-transfer-encoding :
- in-reply-to : from; bh=BT8AtMEOmLT/3StiIE5y0K4yO4g3AvehHq0UsEiJ9U4=;
- b=wIwKaWeaxYo4/yudRlvPJw92CP5MkuhQrSF9TLytJo2fQYhny4a5VPJTziZ+k4jJuH/vc
- Ph3UEuMK0yzR848Aw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
- i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1731983376; h=date :
- from : to : cc : subject : message-id : references : mime-version :
- content-type : content-transfer-encoding : in-reply-to : from;
- bh=BT8AtMEOmLT/3StiIE5y0K4yO4g3AvehHq0UsEiJ9U4=;
- b=c6Q1QI/v4crvqPnz6xS+fCMJ4BVQYk6WOtPYaXjaYbRNtiv0VKw6G0uC6xh+gQb+ysMPI
- b2+lQLX3lqalCZMSI6ZbK4noFX3CW+LI5Af7oVzzZVwtsdMR1xmK7PuB/2WBTQ01KPIVOWU
- VBMtA9/DBZ77ix7c4mftdKh4JrIL+E/GrV+iXpViBErspDnXsBPcZ3qcnzKmoVZph7e1Ptt
- 41r12XYyyGzuu7177VuS0s6HHncKl8mIWzZH4Eq1aK5WH3W6qKzCd674MYaI9lr1M5UiovK
- /7nRacLwsJnYW4g7eMjG3aUVitmwXSLJXrWOz/lyOcF3NqB6xJgFr7RS4oyw==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
-	 client-signature ED25519)
-	(Client CN "otters", Issuer "otters" (not verified))
-	by o-chul.darkrain42.org (Postfix) with ESMTPS id 0116B8379;
-	Mon, 18 Nov 2024 18:29:35 -0800 (PST)
-Received: by vaarsuvius.home.arpa (Postfix, from userid 1000)
-	id 912CB8C1479; Mon, 18 Nov 2024 18:29:35 -0800 (PST)
-Date: Mon, 18 Nov 2024 18:29:35 -0800
-From: Paul Aurich <paul@darkrain42.org>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH v2 0/4] SMB cached directory fixes around
- reconnection/unmounting
-Message-ID: <Zzv4DyaTrdQLgtIE@vaarsuvius.home.arpa>
-Mail-Followup-To: Steve French <smfrench@gmail.com>,
-	linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-References: <20241118215028.1066662-1-paul@darkrain42.org>
- <CAH2r5msFodKYc5EMtvQF-hC94qH=GrMhSixmwB7RbkGP-Q48UQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMbOAbBn"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2fb5fa911aaso36007771fa.2
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Nov 2024 18:51:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731984705; x=1732589505; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYLRZxurmyKbuKnEbc7UpIdgi3ScMIe+s7ynUr9tekw=;
+        b=AMbOAbBn0R7hJFguU92WxM6oWLkKXahgPukupbUi8WMkp5P7bOfNdjCu1skammDhnk
+         egCxyDhncv15LW7x1/qYUQu8VquD0qmHfWY9z9nTAUr4T8D0rs4O4V6CFNFsXz5oOj+v
+         CvStgq3q6RbgH5cg/D5xkHxKKiJI0A4dRS7nuQx4A69xVMG+AC35GHBlScHLg6FKDQHH
+         OIpm+z2AAzxRn6hRCadLhUOs40Xh4WyttBRdgTPFRzf04bk8eRqFpP/78J0R2/Iko4JY
+         m1UZIUkPRvFDySpZr05SYt6jOGXPGUt7/Ab4GzAx7GH0azVMqDPMk9Bd/NCHOnTuPUrs
+         dX9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731984705; x=1732589505;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WYLRZxurmyKbuKnEbc7UpIdgi3ScMIe+s7ynUr9tekw=;
+        b=n+tztEwTSE9smI2fBsHibOMkF1I4/X3/Sve9pEHHECqq2kzwNMPZTP0+I3zlFDo1I2
+         MzBTwBrYD8n9etgHQ9Evw1c5qLuQ9KkmlkL2R48K1yomB1I9wc4ahIHPTYDX6qCNMlzl
+         C+m5Oez3XGTDNoYnFsdaTty/552ekT1oG/UQNr94bzl9y4YuO+2V8mMIBwVqZ4ECZj6H
+         ygwV3O2iErMr8EyGIJqiCwpEeXwQNuaQ4zX20iqhENJripo9d0C93kb+6UyLEoECccfo
+         pB4Nzg0Ry8R2dtX6uNzIdv/EjfFkJSXXuGZ3Lz99N7I/v8yvKSGYFvINoEMD8JOc1YW8
+         doQw==
+X-Gm-Message-State: AOJu0YwyWfpEFce920sZ/IBv2dF7GlWWVHTTIctQKG1tVCCc5fDTxuG6
+	4rrw2+OWEiirAvIBR3Xk/0kYsRoz927uPFLJYJ8hOuFs7CRz/5vYZLcWc5XscWnWGRkJUBgrUPE
+	tDIMGUseLZtueEvG2V6iUSPFbJ38=
+X-Google-Smtp-Source: AGHT+IH1awMl0Ktbxi5k2oYi6WDO7B5ue3pc3Fz4MZ5LCpRT9rfAEAUyNeKRlMFg7+HBtOXxiO0poKhI6jNnZUHyhZU=
+X-Received: by 2002:a2e:b8c6:0:b0:2fb:2a96:37fd with SMTP id
+ 38308e7fff4ca-2ff606dbc79mr105283611fa.29.1731984704581; Mon, 18 Nov 2024
+ 18:51:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5msFodKYc5EMtvQF-hC94qH=GrMhSixmwB7RbkGP-Q48UQ@mail.gmail.com>
+References: <113d44d8-35a4-452e-9931-aca00c2237d0@samba.org>
+ <CAH2r5muwuKvifnG0XK3wShCtpR6EZOEozn=H95qx9ewHDO5jdA@mail.gmail.com>
+ <42c8b091-a57a-4d4e-aebf-aee57dabf5d4@samba.org> <CAH2r5mtr0SJHzG4tNeRA=1H1gEswQUywj0G5kR+wuoPk1r1YVA@mail.gmail.com>
+ <6e38eeba-9a82-48f4-bfcd-a4f2ce718782@samba.org>
+In-Reply-To: <6e38eeba-9a82-48f4-bfcd-a4f2ce718782@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 18 Nov 2024 20:51:33 -0600
+Message-ID: <CAH2r5mtGx9w+=qcY9zVwaJXWDC=4w1nFn4WNx1DC6vnjvDV3UA@mail.gmail.com>
+Subject: Re: Directory Leases
+To: Ralph Boehme <slow@samba.org>
+Cc: linux-cifs@vger.kernel.org, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000012f2e206273b1dbf"
 
-On 2024-11-18 18:55:23 -0600, Steve French wrote:
->Looks like you dropped the patch:
->"smb: No need to wait for work when cleaning up cached directories"
->
->Otherwise for the four remaining patches, looks like the first patch
->stayed the same (trivial comment change).
->
->Can you remind me which of these three changed:
->
->  smb: Don't leak cfid when reconnect races with open_cached_dir
->  smb: prevent use-after-free due to open_cached_dir error paths
->  smb: During unmount, ensure all cached dir instances drop their dentry
+--00000000000012f2e206273b1dbf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-All the substantive changes are in the last patch.  I should have clarified, 
-but I just folded the changes from "smb: No need to wait for work when 
-cleaning up cached directories" into that patch, as well.
+Here is a one line patch to make sure we request HANDLE leases on
+cached directories.
+I also want to make sure (in followon patch) that we check in the open
+response (ie the lease
+state granted) that we don't defer close of directory if we don't get
+both HANDLE and READ
+in response.
 
->On Mon, Nov 18, 2024 at 3:53 PM Paul Aurich <paul@darkrain42.org> wrote:
->>
->> v2:
->> - Added locking in closed_all_cached_dirs()
->> - Replaced use of the cifsiod_wq with a new workqueue used for dropping cached
->>   dir dentries, and split out the "drop dentry" work from "potential
->>   SMB2_close + cleanup" work so that close_all_cached_dirs() doesn't block on
->>   server traffic, but can ensure all "drop dentry" work has run.
->> - Repurposed the (essentially unused) cfid->fid_lock to protect cfid->dentry
->>
->>
->> The SMB client cached directory functionality can either leak a cfid if
->> open_cached_dir() races with a reconnect, or can have races between the
->> unmount process and cached dir cleanup/lease breaks that all lead to
->> a cached_dir instance not dropping its dentry ref in close_all_cached_dirs().
->> These all manifest as a pair of BUGs when unmounting:
->>
->>     [18645.013550] BUG: Dentry ffff888140590ba0{i=1000000000080,n=/}  still in use (2) [unmount of cifs cifs]
->>     [18645.789274] VFS: Busy inodes after unmount of cifs (cifs)
->>
->> These issues started with the lease directory cache handling introduced in
->> commit ebe98f1447bb ("cifs: enable caching of directories for which a lease is
->> held"), and go away if I mount with 'nohandlecache'.
->>
->> I'm able to reproduce the "Dentry still in use" errors by connecting to an
->> actively-used SMB share (the server organically generates lease breaks) and
->> leaving these running for 'a while':
->>
->> - while true; do cd ~; sleep 1; for i in {1..3}; do cd /mnt/test/subdir; echo $PWD; sleep 1; cd ..; echo $PWD; sleep 1; done; echo ...; done
->> - while true; do iptables -F OUTPUT; mount -t cifs -a; for _ in {0..2}; do ls /mnt/test/subdir/ | wc -l; done; iptables -I OUTPUT -p tcp --dport 445 -j DROP; sleep 10; echo "unmounting"; umount -l -t cifs -a; echo "done unmounting"; sleep 20; echo "recovering"; iptables -F OUTPUT; sleep 10; done
->>
->> ('a while' is anywhere from 10 minutes to overnight. Also, it's not the
->> cleanest reproducer, but I stopped iterating once I had something that was
->> even remotely reliable for me...)
->>
->> This series attempts to fix these, as well as a use-after-free that could
->> occur because open_cached_dir() explicitly frees the cached_fid, rather than
->> relying on reference counting.
->> Paul Aurich (4):
->>   smb: cached directories can be more than root file handle
->>   smb: Don't leak cfid when reconnect races with open_cached_dir
->>   smb: prevent use-after-free due to open_cached_dir error paths
->>   smb: During unmount, ensure all cached dir instances drop their dentry
->>
->>  fs/smb/client/cached_dir.c | 228 +++++++++++++++++++++++++------------
->>  fs/smb/client/cached_dir.h |   6 +-
->>  fs/smb/client/cifsfs.c     |  14 ++-
->>  fs/smb/client/cifsglob.h   |   3 +-
->>  fs/smb/client/inode.c      |   3 -
->>  fs/smb/client/trace.h      |   3 +
->>  6 files changed, 179 insertions(+), 78 deletions(-)
->>
->> --
->> 2.45.2
->>
->>
->
->
->-- 
->Thanks,
->
->Steve
 
+On Tue, Oct 29, 2024 at 5:05=E2=80=AFAM Ralph Boehme <slow@samba.org> wrote=
+:
+>
+> Hi Steve,
+>
+> On 10/28/24 10:11 PM, Steve French wrote:
+> > Doing some additional experiments to Windows and also to the updated
+> > Samba branch from Ralph, I see the directory lease request, and
+> > I see that after ls (which will cache the directory contents for about
+> > 30 second) we do get a big benefit from the metadata of the directory
+> > entries being cached e.g. "ls /mnt ; sleep 10; stat /mnt/file ; sleep
+> > 15 stat /mnt/file2 ; sleep 10 /mnt/file"  - we only get the roundtrips
+> > for the initial ls - the stat calls don't cause any network traffic
+> > since the directory is cached.
+> indeed, I can confirm that some cache is used for stat. Unfortunately it
+> isn't used for readddir.
+>
+> Also, coming back on the issue that the client is deferring a close on
+> the directory with having a H lease:
+>
+> In my understanding that's at least going to cause problems if other
+> clients want to do anything on the server that is not allowed if there
+> are conflicting opens like renaming a directory (which is not allowed if
+> there are any opens below recursively). Unlinks will also be deferred as
+> long as the client sticks to its handle.
+>
+> The client should acquire a RH lease on directories if it wants to cache
+> the handle and that's a prerequisite in order to cache readdir.
+>
+> Afair the kernel is currently caching for 30 seconds. Increasing this
+> time should not be done without also having a H lease.
+>
+> -slow
+
+
+
+--
+Thanks,
+
+Steve
+
+--00000000000012f2e206273b1dbf
+Content-Type: application/x-patch; 
+	name="0001-smb3-request-handle-caching-when-caching-directories.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-request-handle-caching-when-caching-directories.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m3nczq0z0>
+X-Attachment-Id: f_m3nczq0z0
+
+RnJvbSBmZWMxNDEyOGVmM2E4OTFlMTk0MDY2ZmVkYmU0NWUyZDIzZjMyM2Q5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMTggTm92IDIwMjQgMTI6MTk6NDYgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiByZXF1ZXN0IGhhbmRsZSBjYWNoaW5nIHdoZW4gY2FjaGluZyBkaXJlY3RvcmllcwoKVGhp
+cyBjbGllbnQgd2FzIG9ubHkgcmVxdWVzdGluZyBSRUFEIGNhY2hpbmcsIG5vdCBSRUFEIGFuZCBI
+QU5ETEUgY2FjaGluZwppbiB0aGUgTGVhc2VTdGF0ZSBvbiB0aGUgb3BlbiByZXF1ZXN0cyB3ZSBz
+ZW5kIGZvciBkaXJlY3Rvcmllcy4gIFRvCmRlbGF5IGNsb3NpbmcgYSBoYW5kbGUgKGUuZy4gZm9y
+IGNhY2hpbmcgZGlyZWN0b3J5IGNvbnRlbnRzKSB3ZSBzaG91bGQKYmUgcmVxdWVzdGluZyBIQU5E
+TEUgYXMgd2VsbCBhcyBSRUFEIChhcyB3ZSBhbHJlYWR5IGRvIGZvciBkZWZlcnJlZApjbG9zZSBv
+ZiBmaWxlcykuICAgU2VlIE1TLVNNQjIgMy4zLjEuNCBlLmcuCgpDYzogc3RhYmxlQHZnZXIua2Vy
+bmVsLm9yZwpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
+b20+Ci0tLQogZnMvc21iL2NsaWVudC9zbWIyb3BzLmMgfCAyICstCiAxIGZpbGUgY2hhbmdlZCwg
+MSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50
+L3NtYjJvcHMuYyBiL2ZzL3NtYi9jbGllbnQvc21iMm9wcy5jCmluZGV4IDZjNGE3MzM1YThhMi4u
+ZmE5NmViZWQ4MzEwIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYworKysgYi9m
+cy9zbWIvY2xpZW50L3NtYjJvcHMuYwpAQCAtNDA0OSw3ICs0MDQ5LDcgQEAgbWFwX29wbG9ja190
+b19sZWFzZSh1OCBvcGxvY2spCiAJaWYgKG9wbG9jayA9PSBTTUIyX09QTE9DS19MRVZFTF9FWENM
+VVNJVkUpCiAJCXJldHVybiBTTUIyX0xFQVNFX1dSSVRFX0NBQ0hJTkdfTEUgfCBTTUIyX0xFQVNF
+X1JFQURfQ0FDSElOR19MRTsKIAllbHNlIGlmIChvcGxvY2sgPT0gU01CMl9PUExPQ0tfTEVWRUxf
+SUkpCi0JCXJldHVybiBTTUIyX0xFQVNFX1JFQURfQ0FDSElOR19MRTsKKwkJcmV0dXJuIFNNQjJf
+TEVBU0VfUkVBRF9DQUNISU5HX0xFIHwgU01CMl9MRUFTRV9IQU5ETEVfQ0FDSElOR19MRTsKIAll
+bHNlIGlmIChvcGxvY2sgPT0gU01CMl9PUExPQ0tfTEVWRUxfQkFUQ0gpCiAJCXJldHVybiBTTUIy
+X0xFQVNFX0hBTkRMRV9DQUNISU5HX0xFIHwgU01CMl9MRUFTRV9SRUFEX0NBQ0hJTkdfTEUgfAog
+CQkgICAgICAgU01CMl9MRUFTRV9XUklURV9DQUNISU5HX0xFOwotLSAKMi40My4wCgo=
+--00000000000012f2e206273b1dbf--
