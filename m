@@ -1,121 +1,122 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3F67082F
-	for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 02:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732241166; cv=fail; b=HpR4FPDN1hI1UyhxLxJwJgF+UzeG2A6hxHACJc6tQ3KJ/nUruy1jf1JRqf6ioCx52rdyqdzvD7b+ugPUQMxLimduyU7SrsE5CYcb0mfbEr4QO0qV4oaZeh/f7xUGse8UFhxMaB0c0uHu6AqZUnq8+c6JbcHj4Q2DOTDhVu3wAMQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732241166; c=relaxed/simple;
-	bh=7CodY4bt+MqwW1LbjN5bwZUdHp3KYuM72ja2TK4e/GU=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=QBLZtGwDDc0hDTe+ljX4ZhfgZ9WoJhjKXFsBUfbSqlgDzyDmT2tCNhMEhwsSbcLRynFiJ/ytVTt+lWWWbmqSNIZmTTozveV4fSyD6LJzVlf7I2Q6BPkLS7Gru0ghpIiH9X1hQF5HLBwHmpRx8oIrUa/T2iojGGXv4up5/244yqA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=dbU7wOr9; arc=fail smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939AE111A8;
+	Fri, 22 Nov 2024 13:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732283150; cv=none; b=d+rPyZZtf426YheZDi/RtgQFl7LBHuKfSkYBFPEpIOBPN76RoBo8hUo0OHvltd2C4rPrS2ZaM7y0QT+VrEm/E/UDFbu+RytfNgv8VA6Kc9bq5pU6iLTt597DE1Z57v1Kci/8qc/kJp5vfBIMzl5yQClpHZtVJcjEhIbqBZh5ahM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732283150; c=relaxed/simple;
+	bh=kVpFUw6KeqcfmPYVy+7qxqMon3nw6htHv56/6qvCofo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UwW3+UUIYpl8cYZhpOf4wAgAT3Gjq/vcQipXphlRgIt/qT7EMw3SHHk7xmlDlFVF6n3gYYULbhyhgqLchVa8dQV+JEF47wh5X/xPpxDKMchtRsMFpa0uayH1WzM2DJKIczO342k+5QKbswVFbcMfw7RbvjWLAzF/VHWZgKc+DYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A1MXhXFy; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="dbU7wOr9"
-Message-ID: <2a818d91e9f3c392b2739a4c2a018085@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732241155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0n2d7GX/Zcabij+uGj6W6f8qQlSC0BPL3/FBID84Qdo=;
-	b=dbU7wOr9WirIAxZ/xmTXSoBorT5g0OML4P6Ol2DwI+u+j2FsDW9VwGS8A5J5U6Aai6WTnn
-	8Rp6kCJcZFTOGA4vIB1vOC0Ss3qDO1sLd8BQYnM4Bm2a3d+Iv5zShIGgNe4G9Kf1fDL3d0
-	av0c8JNjb9Hjic2R+/hKJKJWVtpI35yBeA2HgS5+nRUq7P+2WRI++jKlAjKI4YZqyO305X
-	S6SwmPeLpDYV2NgUG4oFlU3W48dUE0kRJDRwUCeRIxeFxTpyBDCCpJ0Dr7Vij45x8Es39E
-	eZbUOGKGSDyDMGcV49gDbu50N88gO3AGipGIhaWfxV7aNX+tOaiuD3+I2JC6Lg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1732241155; a=rsa-sha256;
-	cv=none;
-	b=jDCQvTTWyfFeIASByC3R2YjzgsFn9EsGWGncbe7uLhdY9NnFCV26G4H2tfGHKFn6k4RUQX
-	Rd5kET+CBopr7urXcKYmCS7Qw9AC0qtj54vUPL9jCeL87s5qf+rOVU4JIxpsEk5a/Vl4Dp
-	hm9opA982Ox3lwq4b9ul4l1BQ0u/NpCrNh4CMmD6TsmWBpg2Co3mzquoyFFTxGlTtRtErW
-	9fATbzMioRNCiQAjjSOTfm1ZgM2yWjeIEEPTVJNChHL9KhtC6/bpS4fVGwxirUiLdSE3Oy
-	HJDU+vuJPLR0jOzJnZ4HW93w7a9uxQFUPyu6PvPWKfwWJ3TGJAkbYAUcBISOnQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732241155; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0n2d7GX/Zcabij+uGj6W6f8qQlSC0BPL3/FBID84Qdo=;
-	b=Y9YK9Q/PhDof5zK6NjbjtJCrzMtRS6OQ5PeZLrdYNWfQy9uYVFLNe74vAHHVrz7Kjb8EcA
-	Q2x6z+ICuCgtZILdmb5/m2q5lMrYqoYN68D4aKUuwyRPqhAqRkt0dPjVfVZkPZflt2Z3Qj
-	5ZXI9h9Hg09rLPFlCLKiOqFCtvWTJZy4h/37fQYYc3M5Mgd8AIRqFOxk8XSdT0yp6AxXU7
-	O2kR05UoMTsgzLfIDDRnsfkoXvKz3Cq1AeUi/P3H7aSWmpjHuyDoYUexygm83jQCkpLg/F
-	ZDnZPYF4TZ+z4Ka5XrbqCDM+W5uliI2bg7miAs34+Y1M8ah15cPncKDrB+5EfQ==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Paul Aurich <paul@darkrain42.org>, linux-cifs@vger.kernel.org, Steve
- French <sfrench@samba.org>
-Cc: paul@darkrain42.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>
-Subject: Re: [PATCH v2 4/4] smb: During unmount, ensure all cached dir
- instances drop their dentry
-In-Reply-To: <20241118215028.1066662-5-paul@darkrain42.org>
-References: <20241118215028.1066662-1-paul@darkrain42.org>
- <20241118215028.1066662-5-paul@darkrain42.org>
-Date: Thu, 21 Nov 2024 23:05:51 -0300
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A1MXhXFy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1732283149; x=1763819149;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fyRPteTtuIqO8RufMBd/o0y8qtgzhVZbNPraZqKm98A=;
+  b=A1MXhXFyM3KGWCVRKzwgOk/pdJmkDrZ4ikl584qagTX0FfK+6ttabKb3
+   Ct6yFcfbueQ3Jr0YNTPgrhWT3IyQDvR+zO+HPRmJyC2/s9sTfcKl7Olor
+   E3Wy/yLwxO9edu53x9/Vr0yVujWDWf8KR/DB/HF2sos/5Ai9eMXJGOoXu
+   4=;
+X-IronPort-AV: E=Sophos;i="6.12,175,1728950400"; 
+   d="scan'208";a="675847250"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 13:45:46 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:65313]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.230:2525] with esmtp (Farcaster)
+ id 86c97e87-f85a-4479-878f-b803a8007714; Fri, 22 Nov 2024 13:45:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 86c97e87-f85a-4479-878f-b803a8007714
+Received: from EX19EXOUWA001.ant.amazon.com (10.250.64.209) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 22 Nov 2024 13:45:44 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (10.250.64.202) by
+ EX19EXOUWA001.ant.amazon.com (10.250.64.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 22 Nov 2024 13:45:44 +0000
+Received: from email-imr-corp-prod-pdx-all-2b-a57195ef.us-west-2.amazon.com
+ (10.25.36.210) by mail-relay.amazon.com (10.250.64.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Fri, 22 Nov 2024 13:45:44 +0000
+Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com [10.15.1.225])
+	by email-imr-corp-prod-pdx-all-2b-a57195ef.us-west-2.amazon.com (Postfix) with ESMTP id 4E2DEA06EA;
+	Fri, 22 Nov 2024 13:45:44 +0000 (UTC)
+Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
+	id D4BEB23F5; Fri, 22 Nov 2024 14:45:43 +0100 (CET)
+From: Mahmoud Adam <mngyadam@amazon.com>
+To: <gregkh@linuxfoundation.org>
+CC: <stfrench@microsoft.com>, <pali@kernel.org>, <stable@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>
+Subject: [PATCH] cifs: Fix buffer overflow when parsing NFS reparse points
+Date: Fri, 22 Nov 2024 14:44:10 +0100
+Message-ID: <20241122134410.124563-1-mngyadam@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Paul,
+From: Pali Rohár <pali@kernel.org>
 
-Thanks for looking into this!  Really appreciate it.
+upstream e2a8910af01653c1c268984855629d71fb81f404 commit.
 
-Paul Aurich <paul@darkrain42.org> writes:
+ReparseDataLength is sum of the InodeType size and DataBuffer size.
+So to get DataBuffer size it is needed to subtract InodeType's size from
+ReparseDataLength.
 
-> The unmount process (cifs_kill_sb() calling close_all_cached_dirs()) can
-> race with various cached directory operations, which ultimately results
-> in dentries not being dropped and these kernel BUGs:
->
-> BUG: Dentry ffff88814f37e358{i=1000000000080,n=/}  still in use (2) [unmount of cifs cifs]
-> VFS: Busy inodes after unmount of cifs (cifs)
-> ------------[ cut here ]------------
-> kernel BUG at fs/super.c:661!
->
-> This happens when a cfid is in the process of being cleaned up when, and
-> has been removed from the cfids->entries list, including:
->
-> - Receiving a lease break from the server
-> - Server reconnection triggers invalidate_all_cached_dirs(), which
->   removes all the cfids from the list
-> - The laundromat thread decides to expire an old cfid.
->
-> To solve these problems, dropping the dentry is done in queued work done
-> in a newly-added cfid_put_wq workqueue, and close_all_cached_dirs()
-> flushes that workqueue after it drops all the dentries of which it's
-> aware. This is a global workqueue (rather than scoped to a mount), but
-> the queued work is minimal.
+Function cifs_strndup_from_utf16() is currentlly accessing buf->DataBuffer
+at position after the end of the buffer because it does not subtract
+InodeType size from the length. Fix this problem and correctly subtract
+variable len.
 
-Why does it need to be a global workqueue?  Can't you make it per tcon?
+Member InodeType is present only when reparse buffer is large enough. Check
+for ReparseDataLength before accessing InodeType to prevent another invalid
+memory access.
 
-> The final cleanup work for cleaning up a cfid is performed via work
-> queued in the serverclose_wq workqueue; this is done separate from
-> dropping the dentries so that close_all_cached_dirs() doesn't block on
-> any server operations.
->
-> Both of these queued works expect to invoked with a cfid reference and
-> a tcon reference to avoid those objects from being freed while the work
-> is ongoing.
+Major and minor rdev values are present also only when reparse buffer is
+large enough. Check for reparse buffer size before calling reparse_mkdev().
 
-Why do you need to take a tcon reference?  Can't you drop the dentries
-when tearing down tcon in cifs_put_tcon()?  No concurrent mounts would
-be able to access or free it.
+Fixes: d5ecebc4900d ("smb3: Allow query of symlinks stored as reparse points")
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[use variable name symlink_buf, the other buf->InodeType accesses are
+not used in current version so skip]
+Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
+---
+This fixes CVE-2024-49996, and applies cleanly on 5.4->6.1, 6.6 and
+later already has the fix.
+ fs/smb/client/smb2ops.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-After running xfstests I've seen a leaked tcon in
-/proc/fs/cifs/DebugData with no CIFS superblocks, which might be related
-to this.
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index d1e5ff9a3cd39..fcfbc096924a8 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2897,6 +2897,12 @@ parse_reparse_posix(struct reparse_posix_data *symlink_buf,
+ 
+ 	/* See MS-FSCC 2.1.2.6 for the 'NFS' style reparse tags */
+ 	len = le16_to_cpu(symlink_buf->ReparseDataLength);
++	if (len < sizeof(symlink_buf->InodeType)) {
++		cifs_dbg(VFS, "srv returned malformed nfs buffer\n");
++		return -EIO;
++	}
++
++	len -= sizeof(symlink_buf->InodeType);
+ 
+ 	if (le64_to_cpu(symlink_buf->InodeType) != NFS_SPECFILE_LNK) {
+ 		cifs_dbg(VFS, "%lld not a supported symlink type\n",
+-- 
+2.40.1
 
-Could you please check if there is any leaked connection in
-/proc/fs/cifs/DebugData after running your tests?
