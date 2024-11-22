@@ -1,117 +1,208 @@
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC5534CF5;
-	Fri, 22 Nov 2024 15:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B6717B428
+	for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 20:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732289501; cv=none; b=HXIUwSEOqXVP35QZtkJ4J6b4ayTa5n2sK/MmFZx61FPQnnK59t+Esg+v4/VYXX88rlzWm2bV/lZkDAmq5gH3FyOqVb7q6Yxqw0GIoyAEM6hObHR3D6EkUK2L1i28FQD39pGf9b8ilfEIlfdzVuz9srwebDk2/r2QM0KrjEthEI0=
+	t=1732308029; cv=none; b=EJ9i2sSRU3J880bQjHKddhlKF5tMQlV04onHI5aQzTMIgZk4vddfHdiQUAgsH8LIUpZL6lX89THJmwwiDQP7CnEC2qlke20JKbqVu8U7qrjkHBxx6dKb5Zl6KvMVq3XkdhgDiyYH6ueOvYOSupuYixGAY+5W6DMsIZEZgERzLLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732289501; c=relaxed/simple;
-	bh=hCFHgMLo7sNYwDywbs1fYqLz3c9Z/HbwJFsp1ejUIp4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AxQnoH3B15BjgeNF9hFlYLjedpxO2WwRpbelF1HKT4YRhKAqgXXY7ji4fCuWyCOyzwNXpzPAHh6EBfUG/Lzi974afcYZgOoBjkvlxiTVDiZ60KjI337mpil0Phgv4DohfhutaaoniSiz8H4MoUpS/TtJmszPEc1tV27pzVQMB6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HA/B51wb; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1732308029; c=relaxed/simple;
+	bh=0PwJN3P6MSeos9IsDuxhVPjeVqsSGd7ZpcCxzxQM7q0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iJCJ8aFbzUiMOIMlE332HzseM7MUomn983BbbwUB15nH61hKHVhpf1MBNx7v/W3cnksz1E5UsLsPfZ5Dmot7unOqyLvLioQJRuL5XKjYdx8BWk/i3TzEqt0nndeMnaIM4zypdWEP6SGUF+jwAp40VhO4qYuamdFKq73M+mIe048=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gddzncbG; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HA/B51wb"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gddzncbG"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-432d86a3085so22490165e9.2
+        for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 12:40:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732289499; x=1763825499;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Tsn9RFmGQbXdrr+mw0qy7JKc6sqBehJRetVocjosvZY=;
-  b=HA/B51wbNjOUZb1IyY9T9l67q7M6bNpIa+rhBeWFjiJ3L/YDMGCslaOA
-   uNjafCgHmYJbPybpJcC1eSyYK7mL0wMBKEGG6ZnkYqhUPDUsfud4AUty0
-   IAa67CPq7hwwiKo8uea1vWB6/IQJkvPwNTX+et6rbvPjiDUYmPx93U0Zb
-   U=;
-X-IronPort-AV: E=Sophos;i="6.12,176,1728950400"; 
-   d="scan'208";a="445178229"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:31:34 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:58234]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.101:2525] with esmtp (Farcaster)
- id c2b526e1-9df4-4ab2-9649-033129729f2e; Fri, 22 Nov 2024 15:31:34 +0000 (UTC)
-X-Farcaster-Flow-ID: c2b526e1-9df4-4ab2-9649-033129729f2e
-Received: from EX19MTAUWC002.ant.amazon.com (10.250.64.143) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 22 Nov 2024 15:31:34 +0000
-Received: from email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com
- (10.25.36.210) by mail-relay.amazon.com (10.250.64.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Fri, 22 Nov 2024 15:31:34 +0000
-Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com [10.15.1.225])
-	by email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com (Postfix) with ESMTP id 9F6C740DC6;
-	Fri, 22 Nov 2024 15:31:33 +0000 (UTC)
-Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
-	id 5DB702404; Fri, 22 Nov 2024 16:31:33 +0100 (CET)
-From: Mahmoud Adam <mngyadam@amazon.com>
-To: <gregkh@linuxfoundation.org>
-CC: <stfrench@microsoft.com>, <pali@kernel.org>, <stable@vger.kernel.org>,
-	<linux-cifs@vger.kernel.org>
-Subject: [PATCH 5.4/5.10/5.15] cifs: Fix buffer overflow when parsing NFS reparse points
-Date: Fri, 22 Nov 2024 16:29:43 +0100
-Message-ID: <20241122152943.76044-1-mngyadam@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=suse.com; s=google; t=1732308025; x=1732912825; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YnHKWcRlA0I2oh1wz02JZjMuVoTlgYEwJJfYf772VaM=;
+        b=gddzncbGPthjPiC9boYK491rk3qx4ouubdU1iXRLN2t9QmimeHb2fY+oAox4nvY4Aj
+         iMg7SDcxT+LEBO7yGFOPhL1bJ6uUSceIj7wqwUCp9Ha6Xm9doGGN47NYO6PJMxwL04X+
+         lE0UW4Mrgq6UdctbnsxRQNSseFfKuz/wPHHergm3u9Ykz8ggef99UXiXp9j9gZKLJO5X
+         mEhUukdxul1EwtrsWY4MC1q2nl2UkpRCrjft1XtxozbHuoUJS6sAj11ITLx690fIg7j/
+         s52ibBCEW2JMjZseaQs/lWZt4Id4BfxrOSf2AJukaydxQST1V3nly8KKZwTtgtXvojoW
+         oVMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732308025; x=1732912825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YnHKWcRlA0I2oh1wz02JZjMuVoTlgYEwJJfYf772VaM=;
+        b=wdWZpAhQ+qmnM2z1Jmp4WjwpX8gq85LXvmFyePMsWZLgmplyylI2PKD1Xj4ncAxwzH
+         UAQp+ZXNNrGGIh4zmj/P38LcUzsI+eJumFoziCmktUp2ql7/CgQYn0IkxWWD3h3F03nb
+         F1K1YnuiiKvxvkGvJC/661ukDIG5IywiaRvvG4bhFN+3HfNtgdSTPitgSye8WpKVfwEK
+         /SShDxVp6VSrUmHJATKBnTelqqeIWIrgs46IJibr4lOhx8qmJJY08+rYsUADExGxeXg5
+         7To3rg0Z+mOPoMMOc4HkBdAEX9IxJeRJmxKPQZ6UDisSO6J7gkjsqZooSSMiQWFhphX0
+         m3yA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuQR46fevoLKZVHTwuJetvS2TxnJ4B4SzwEzEgUIk2a7Hfvf8mG5V5k8H3T8isZJUuQFVoaXbfs/Db@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKJT2fNbUfOoHv0GIVprH8FCQdzAo/iUmcey3nqpynohfkrHjd
+	FkUZasIJUzJVN4MO5rbaZp7faqv0Ys7ItyvwmPchPfFtO7OVSYmmyb5fCrqRsZk=
+X-Gm-Gg: ASbGncuMJsoItS4ZRAXXnewp/i/npEwmdfoOKDboVSyvf9og+Y93Bs/vJuv10ycKINI
+	VyuWpZq5e7BpkX56JMYmsQNZNSMvxK9OZ6eWhdRcM6Nl9ZIba/7WobmszsaOzidxjv5dXY0a0Re
+	oQliKTR6Rt1WR/TrhjFJqN+3EF9v9tWk+vRCM2qtKtmVpl2NLPvPi5D0VIP61MmebfzrIXmQlFo
+	D4UXHlstH6R5SkzwevPEUWIMSM5aK9Zb2hrByodlG7pYJxKspGGoibNilG3cbDt9fhcSg==
+X-Google-Smtp-Source: AGHT+IFHHBkYnA5nnrnO5MCxjX9DohUXcN8wRaS79IdTXulXBEJPliM+Cog8Hr2G1XQNNfXDGCtPCw==
+X-Received: by 2002:a05:6000:156b:b0:37d:461d:b1ea with SMTP id ffacd0b85a97d-38260be3c89mr4072336f8f.48.1732308025166;
+        Fri, 22 Nov 2024 12:40:25 -0800 (PST)
+Received: from localhost.localdomain ([2800:810:5e9:f3c:e019:b39:5a90:cfe])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724de57a3d1sm2053423b3a.194.2024.11.22.12.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 12:40:24 -0800 (PST)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: sfrench@samba.org
+Cc: ematsumiya@suse.de,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH 1/2] smb: client: disable directory caching when dir_cache_timeout is zero
+Date: Fri, 22 Nov 2024 17:39:00 -0300
+Message-ID: <20241122203901.283703-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 
-From: Pali Rohár <pali@kernel.org>
+According to the dir_cache_timeout description, setting it to zero
+should disable the caching of directory contents. However, even when
+dir_cache_timeout is zero, some caching related functions are still
+invoked, and the worker thread is initiated, which is unintended
+behavior.
 
-upstream e2a8910af01653c1c268984855629d71fb81f404 commit.
+Fix the issue by setting tcon->nohandlecache to true when
+dir_cache_timeout is zero, ensuring that directory handle caching
+is properly disabled.
 
-ReparseDataLength is sum of the InodeType size and DataBuffer size.
-So to get DataBuffer size it is needed to subtract InodeType's size from
-ReparseDataLength.
+Clean up the code to reflect this change, to improve consistency,
+and to remove other unnecessary checks.
 
-Function cifs_strndup_from_utf16() is currentlly accessing buf->DataBuffer
-at position after the end of the buffer because it does not subtract
-InodeType size from the length. Fix this problem and correctly subtract
-variable len.
+is_smb1_server() check inside open_cached_dir() can be removed because
+dir caching is only enabled for SMB versions >= 2.0.
 
-Member InodeType is present only when reparse buffer is large enough. Check
-for ReparseDataLength before accessing InodeType to prevent another invalid
-memory access.
-
-Major and minor rdev values are present also only when reparse buffer is
-large enough. Check for reparse buffer size before calling reparse_mkdev().
-
-Fixes: d5ecebc4900d ("smb3: Allow query of symlinks stored as reparse points")
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-Signed-off-by: Pali Rohár <pali@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[use variable name symlink_buf, the other buf->InodeType accesses are
-not used in current version so skip]
-Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
 ---
-This fixes CVE-2024-49996.
- fs/cifs/smb2ops.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/smb/client/cached_dir.c | 12 +++++++-----
+ fs/smb/client/cifsproto.h  |  2 +-
+ fs/smb/client/connect.c    | 10 +++++-----
+ fs/smb/client/misc.c       |  4 ++--
+ 4 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 6c30fff8a029e..ee9a1e6550e3c 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2971,6 +2971,12 @@ parse_reparse_posix(struct reparse_posix_data *symlink_buf,
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 8b510c858f4ff..d8b1cf1043c35 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -162,15 +162,17 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	const char *npath;
+ 	int retries = 0, cur_sleep = 1;
  
- 	/* See MS-FSCC 2.1.2.6 for the 'NFS' style reparse tags */
- 	len = le16_to_cpu(symlink_buf->ReparseDataLength);
-+	if (len < sizeof(symlink_buf->InodeType)) {
-+		cifs_dbg(VFS, "srv returned malformed nfs buffer\n");
-+		return -EIO;
-+	}
+-	if (tcon == NULL || tcon->cfids == NULL || tcon->nohandlecache ||
+-	    is_smb1_server(tcon->ses->server) || (dir_cache_timeout == 0))
++	if (cifs_sb->root == NULL)
++		return -ENOENT;
 +
-+	len -= sizeof(symlink_buf->InodeType);
++	if (tcon == NULL)
+ 		return -EOPNOTSUPP;
  
- 	if (le64_to_cpu(symlink_buf->InodeType) != NFS_SPECFILE_LNK) {
- 		cifs_dbg(VFS, "%lld not a supported symlink type\n",
+ 	ses = tcon->ses;
+ 	cfids = tcon->cfids;
+ 
+-	if (cifs_sb->root == NULL)
+-		return -ENOENT;
++	if (cfids == NULL)
++		return -EOPNOTSUPP;
+ 
+ replay_again:
+ 	/* reinitialize for possible replay */
+@@ -394,7 +396,7 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ 	struct cached_fids *cfids = tcon->cfids;
+ 
+ 	if (cfids == NULL)
+-		return -ENOENT;
++		return -EOPNOTSUPP;
+ 
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry(cfid, &cfids->entries, entry) {
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 075985bfb13a8..d89d31b6dd97a 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -530,7 +530,7 @@ extern int CIFSSMBLogoff(const unsigned int xid, struct cifs_ses *ses);
+ 
+ extern struct cifs_ses *sesInfoAlloc(void);
+ extern void sesInfoFree(struct cifs_ses *);
+-extern struct cifs_tcon *tcon_info_alloc(bool dir_leases_enabled,
++extern struct cifs_tcon *tcon_info_alloc(bool enable_dir_cache,
+ 					 enum smb3_tcon_ref_trace trace);
+ extern void tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
+ 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index b227d61a6f205..f74e0b94f848c 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -2593,7 +2593,7 @@ static struct cifs_tcon *
+ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ {
+ 	struct cifs_tcon *tcon;
+-	bool nohandlecache;
++	bool enable_dir_cache;
+ 	int rc, xid;
+ 
+ 	tcon = cifs_find_tcon(ses, ctx);
+@@ -2614,15 +2614,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 
+ 	if (ses->server->dialect >= SMB20_PROT_ID &&
+ 	    (ses->server->capabilities & SMB2_GLOBAL_CAP_DIRECTORY_LEASING))
+-		nohandlecache = ctx->nohandlecache;
++		enable_dir_cache = !ctx->nohandlecache && (dir_cache_timeout != 0);
+ 	else
+-		nohandlecache = true;
+-	tcon = tcon_info_alloc(!nohandlecache, netfs_trace_tcon_ref_new);
++		enable_dir_cache = false;
++	tcon = tcon_info_alloc(enable_dir_cache, netfs_trace_tcon_ref_new);
+ 	if (tcon == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out_fail;
+ 	}
+-	tcon->nohandlecache = nohandlecache;
++	tcon->nohandlecache = !enable_dir_cache;
+ 
+ 	if (ctx->snapshot_time) {
+ 		if (ses->server->vals->protocol_id == 0) {
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 4373dd64b66d4..60f35d827382c 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -111,7 +111,7 @@ sesInfoFree(struct cifs_ses *buf_to_free)
+ }
+ 
+ struct cifs_tcon *
+-tcon_info_alloc(bool dir_leases_enabled, enum smb3_tcon_ref_trace trace)
++tcon_info_alloc(bool enable_dir_cache, enum smb3_tcon_ref_trace trace)
+ {
+ 	struct cifs_tcon *ret_buf;
+ 	static atomic_t tcon_debug_id;
+@@ -120,7 +120,7 @@ tcon_info_alloc(bool dir_leases_enabled, enum smb3_tcon_ref_trace trace)
+ 	if (!ret_buf)
+ 		return NULL;
+ 
+-	if (dir_leases_enabled == true) {
++	if (enable_dir_cache) {
+ 		ret_buf->cfids = init_cached_dirs();
+ 		if (!ret_buf->cfids) {
+ 			kfree(ret_buf);
 -- 
-2.40.1
+2.46.0
 
