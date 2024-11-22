@@ -1,117 +1,161 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0DC18A6A0
-	for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 22:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=167.235.159.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732313235; cv=fail; b=nroPmOn0is9U6QIlugZkYIn5igdgnBWgKYS48/wzPFNhsnqhnk8bfn6J/u0HxSfNlw7c+EX313lPQw+T61YxmX4Vre+/pHw9/i//2EK9exNWPNgoXmLeIlZRXxUODMdJyyacwtHeekNVxGipRlZiWfEOgaJTMwGj3n/A3jGKdTw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732313235; c=relaxed/simple;
-	bh=YmVWGjOr+pNAcR7FEQl/V+OkZ0p/8yyE80U7pVE+YfI=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=OoAxbp8mm9dbH80ZND2fpkOT5sZyS5ONoaUskEZenuCsXwJTZk/6rqSXHWtGmBEbk5ST9+zHhrCEeGsdylc1te1eegH4TL9O8qxW6nsAYxwbK0JL/IJuYWEL8m3ThUZEkzJHoaqRbxFSrXsd8qgi5IoRF+MGymdeCntPCZFzNiY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=VSivrKi4; arc=fail smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F50D1AC426;
+	Fri, 22 Nov 2024 22:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732313677; cv=none; b=qBEbMYzbmQVPSkOL1bVps1WHYRut4so4i12GTQOYGi3owPSVUd0mQXGSGDhplCmvEeI5fig8DFopfrTaszyrhHNayriN3cKtORKH6VHWP2YxqRkyCSDO8FmwNEYZrUy6amoQKEBezh0sD+mFnX6FqTq5LjQfin+n4KGNNIT/pYI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732313677; c=relaxed/simple;
+	bh=nAxY3sebuEX1uLz0DVN9IR1ICZkSCuZzKQZYYcFhHhk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=mLg11/G2kTfnbxTwVJeT6knj5vT6MckFxNLhV8+iznL8Kd4uiE5KUFToWW9dGNoOi6hon2O02RQ5UvrS2gRo9Wd9R+32bRtJxVe1WYv+X2V646UGenbCXM2Uh538vd0VCIa968snz5hnkMv51aozZEIE+SRHAxX9jE+VTX1mq0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZ++Eu7T; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="VSivrKi4"
-Message-ID: <7e76e6d3a5a194b87ae98e13c354a4f8@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732313231;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6dySEz3mM+2ePBL3SjdJ0K7c9veOTGK9y9wSrPI4qsk=;
-	b=VSivrKi4UOcFoAyNxbFVYHtCViHPkoCqtMfoxtYt+ZH+oARoEZRyJxHCN5FmVsblCyh0nh
-	5UXcsA3dxuKbDINwMT5r0TOsi/ORHy/XHWXYfwCgmElD7lGG0bkP5YhRuli5Acb8mbTsfO
-	5XFir6Ep3ZC3GPKXxln4+TzDiUKUUJw08IK/iorkkiHU4RouRNjmttI2cqvzqM1iS8skgg
-	j8ONsvTr639RV9N2vBuzY6ZvQNiQxLSLhIH9DPrVqslY1ceJXPSUKdFHH6URsmmf7uyXpa
-	LdXgB5xhHNooW92sGUFopsDLVWA/frxz+9BbB+ItjEC86CXkzbZSa0Lw1/+ilw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1732313231; a=rsa-sha256;
-	cv=none;
-	b=FK4gxnTKo7xkmTh/5tksxnm+yMaRD4wWWQCKYzdky6fzaondOEtph0EJiPrDUTuz2oRGeu
-	+AwlyBqeDhuJv3kKif8/eoGPoWGXucffGbf7M0wr3eihaKB5C8n1h2LkBzPbuuKZ3Z+Bt5
-	cnMsxzRLvCxVIgm2ptXbzRSfeXByNgMgaUisW4vQe3jumUIG53jJ8Nuf4B5jw1UenLLiIx
-	Ggw4kCw28tq6sS6CPeVXt6UZD5B+G5pADHLmvzGZrKnyu3IZAbmJaQdC4TxD0ygeqjYvuD
-	RTW2KWQpeaD4hf1LjilVO4Wu1fNpgABLBUEX6yNjOLCMwSyBrF/dF2J8GGidng==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732313231; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6dySEz3mM+2ePBL3SjdJ0K7c9veOTGK9y9wSrPI4qsk=;
-	b=sbBGVClUgwiXq2bGrHWn5Q81aum0YakYWGAJALL7dHAw+lXQfQPmIbvxFfoETvGnyim/cC
-	YNHSB+SCvi5efoZjkQcQbyYNQ1H75PVq10FcjKE6oj8HV7NmazMfOJstuVDSAdOvJvRegP
-	aZXrKsJ3lsIMWNsqbdlvgoyjaOAHUZADlxV5d/XfnnTLNf4BLIMd2h9ufY22rm45RvV5jh
-	i/pwPL+QFqlt23QwFsj2XyHGBfG97QiWZ6Xh8YWl8o2v4J/zSNZj4NNo0ij89gn0gVdd+P
-	BdCzzyNYarBgseug+VatSBWhs7neOZ9SUUh7ckdGp7z1MLp3Gj+PktBLRkGfbg==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Henrique Carvalho <henrique.carvalho@suse.com>, sfrench@samba.org
-Cc: ematsumiya@suse.de, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org,
- Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: Re: [PATCH 1/2] smb: client: disable directory caching when
- dir_cache_timeout is zero
-In-Reply-To: <20241122203901.283703-1-henrique.carvalho@suse.com>
-References: <20241122203901.283703-1-henrique.carvalho@suse.com>
-Date: Fri, 22 Nov 2024 19:07:06 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZ++Eu7T"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53da6801c6dso2355381e87.0;
+        Fri, 22 Nov 2024 14:14:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732313673; x=1732918473; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cfr5Vm544hL51GdwhcMXXqC83zX/wqHoEmLypgXkod8=;
+        b=FZ++Eu7TK2NqAyLWHO28jjDkgHAwHUqxIs9kNTB0miIurrokggDa9p8YU9SBplnuHw
+         KWRXRXkBRRffB2TiChZmU2sbxQQO326QMeqajXTKQ9zxsBrggyk5j5uGXN5I6Tf2drIh
+         ELkdydk2nYd8ESx3JDk0AlvdQo9oiMoNGV+GSlMLnJz4VRiPBu2+kx+AHCs+49FeBusu
+         bzLdfV+3BZ2iIb6mr6zUbQf9cw6qqFv+zGD6WzH2ZVHVBzgroOBHATt1T9dD+vXQtZdz
+         A+uRPsSTO4cFePykUn+fxn/9idUMUWmSKMKVtZsi/NAo2rKemWqG4ENSKEgeElqiUXvh
+         ybaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732313673; x=1732918473;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cfr5Vm544hL51GdwhcMXXqC83zX/wqHoEmLypgXkod8=;
+        b=J7vLW2Pq0WMxzhXeZ9pCcvhMEEePM9Q4I9/YwqyM39K/w80Z/TUGf/WGgdMfiO0Go6
+         oBF0Xmu6LPTFdSDuE99zF3jifcqH3vn9BIZmV6jQKgrNJXn1awPpce2AySge04bswq1d
+         o+won9orKxXubC6jmIMvshNcvJwlqLkbAv87eaQOJ9wXnmUja6gmtI7q+qEv4kHg4Ir7
+         NpyLxpOythFHU3c/vCZ7Y95wcnqnCwAsqOj/nxt99RSQCSDrV5OBSC5UJIn76XsxBvza
+         zss7TaMOEYOlX7kaPPLpKG16XUXdksesFi+yOh/Y4zDtv93Jo4HiDDvsz3VsE1qMfrkR
+         Bd4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXK2Ta8hWSGRhzoTgoF6IGTxSrabvP3oQ9e7FzMy3ZP+IobtwlNS6aTMJxso++mwp7xCjDKyGiMhv7f@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuzumeNWuo+2/4JRPMIU7FSchTYg9xAdGAQA41Bk/6NN8qA3Zx
+	GS2xH/if+neEYQYBDEKa55ac+sPBjwIj4yKGKArRUOMG5+DI1SVVh/YBUaKqnLpRa8ryvQGles4
+	dlgst2cms1FSHL7rOCcxaA8naDaJ5L6fo
+X-Gm-Gg: ASbGncs7UKSFg46ljmeLuWACgmpDPsdce4wrKODpHuTZ0nuRpTzYHM0dD6NMtGBqwJd
+	aBuYjWRtPTI5lzl48ijx4dJGGYroZGGsxs/i+ubIjrNdDWxnSajAmXohTUKa3RO8V
+X-Google-Smtp-Source: AGHT+IGKIcyLi6CxkNbWAFYn9BO2rQDfmMAtJW7ZSH88vE39T2SNb1i8FylVyLr0l/sHAvdtsJBN2EF83XxNQPYpyhY=
+X-Received: by 2002:a05:6512:b81:b0:539:fc45:a292 with SMTP id
+ 2adb3069b0e04-53dd39a4b25mr2889940e87.43.1732313673161; Fri, 22 Nov 2024
+ 14:14:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 22 Nov 2024 16:14:22 -0600
+Message-ID: <CAH2r5mvA00Q69_YqTQFgG-AmBx8N1BdxA8MM24iknf9DSrnyGQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Henrique Carvalho <henrique.carvalho@suse.com> writes:
+Please pull the following changes since commit
+adc218676eef25575469234709c2d87185ca223a:
 
-> According to the dir_cache_timeout description, setting it to zero
-> should disable the caching of directory contents. However, even when
-> dir_cache_timeout is zero, some caching related functions are still
-> invoked, and the worker thread is initiated, which is unintended
-> behavior.
->
-> Fix the issue by setting tcon->nohandlecache to true when
-> dir_cache_timeout is zero, ensuring that directory handle caching
-> is properly disabled.
->
-> Clean up the code to reflect this change, to improve consistency,
-> and to remove other unnecessary checks.
->
-> is_smb1_server() check inside open_cached_dir() can be removed because
-> dir caching is only enabled for SMB versions >= 2.0.
->
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
->  fs/smb/client/cached_dir.c | 12 +++++++-----
->  fs/smb/client/cifsproto.h  |  2 +-
->  fs/smb/client/connect.c    | 10 +++++-----
->  fs/smb/client/misc.c       |  4 ++--
->  4 files changed, 15 insertions(+), 13 deletions(-)
+  Linux 6.12 (2024-11-17 14:15:08 -0800)
 
-The fix could be simply this:
+are available in the Git repository at:
 
-	diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-	index b227d61a6f20..62a29183c655 100644
-	--- a/fs/smb/client/connect.c
-	+++ b/fs/smb/client/connect.c
-	@@ -2614,7 +2614,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
-	 
-	 	if (ses->server->dialect >= SMB20_PROT_ID &&
-	 	    (ses->server->capabilities & SMB2_GLOBAL_CAP_DIRECTORY_LEASING))
-	-		nohandlecache = ctx->nohandlecache;
-	+		nohandlecache = ctx->nohandlecache || !dir_cache_timeout;
-	 	else
-	 		nohandlecache = true;
-	 	tcon = tcon_info_alloc(!nohandlecache, netfs_trace_tcon_ref_new);
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.13-rc-part1-SMB3-client-f=
+ixes
 
-and easily backported to -stable kernels that have
+for you to fetch changes up to a9685b409a03b73d2980bbfa53eb47555802d0a9:
 
-        238b351d0935 ("smb3: allow controlling length of time directory entries are cached with dir leases")
+  smb: prevent use-after-free due to open_cached_dir error paths
+(2024-11-21 10:45:50 -0600)
 
-And yes, is_smb1_server() check makes no sense as tcon->nohandlecache
-would already be set.
+----------------------------------------------------------------
+15 smb3 client fixes, most also for stable
+- Fix two SMB3.1.1 POSIX Extensions problems
+- Fixes for special file handling (symlinks and FIFOs)
+- Improve compounding
+- Four cleanup patches
+- Fix use after free in signing
+- Add support for handling namespaces for reconnect related upcalls
+(e.g. for DNS names resolution and auth)
+- Fix various directory lease problems (directory entry caching),
+including some important potential use after frees
+
+There are additional important fixes still being tested that are not
+included in this P/R, but should be ready later
+in the merge window, including for remount cases, e.g. for DFS, and
+also additional important directory lease fixes.
+----------------------------------------------------------------
+Dan Carpenter (1):
+      smb/client: Prevent error pointer dereference
+
+Dr. David Alan Gilbert (1):
+      cifs: Remove pre-historic unused CIFSSMBCopy
+
+Kees Cook (1):
+      smb: client: memcpy() with surrounding object base address
+
+Pali Roh=C3=A1r (1):
+      cifs: Recognize SFU char/block devices created by Windows NFS
+server on Windows Server <<2012
+
+Paul Aurich (3):
+      smb: cached directories can be more than root file handle
+      smb: Don't leak cfid when reconnect races with open_cached_dir
+      smb: prevent use-after-free due to open_cached_dir error paths
+
+Paulo Alcantara (4):
+      smb: client: fix use-after-free of signing key
+      smb: client: improve compound padding in encryption
+      smb: client: get rid of bounds check in SMB2_ioctl_init()
+      smb: client: handle max length for SMB symlinks
+
+Ralph Boehme (1):
+      fs/smb/client: implement chmod() for SMB3 POSIX Extensions
+
+Ritvik Budhiraja (1):
+      CIFS: New mount option for cifs.upcall namespace resolution
+
+Steve French (1):
+      smb3: request handle caching when caching directories
+
+Thorsten Blum (1):
+      smb: client: Use str_yes_no() helper function
+
+ fs/smb/client/cached_dir.c    | 99
+++++++++++++++++++++++++++---------------------------------
+ fs/smb/client/cifs_spnego.c   | 16 ++++++++++
+ fs/smb/client/cifsacl.c       | 54 +++++++++++++++++++-------------
+ fs/smb/client/cifsfs.c        | 25 +++++++++++++++
+ fs/smb/client/cifsglob.h      | 11 +++++--
+ fs/smb/client/cifsproto.h     | 11 ++-----
+ fs/smb/client/cifssmb.c       | 65 +--------------------------------------
+ fs/smb/client/connect.c       | 20 ++++++++++++
+ fs/smb/client/dfs_cache.c     |  8 ++---
+ fs/smb/client/fs_context.c    | 39 +++++++++++++++++++++++
+ fs/smb/client/fs_context.h    | 10 ++++++
+ fs/smb/client/inode.c         | 26 +++++++++++++++-
+ fs/smb/client/reparse.c       |  5 ++-
+ fs/smb/client/reparse.h       |  2 ++
+ fs/smb/client/smb2ops.c       | 39 +++--------------------
+ fs/smb/client/smb2pdu.c       | 11 +------
+ fs/smb/client/smb2proto.h     |  2 --
+ fs/smb/client/smb2transport.c | 56 +++++++++++++++++++++++----------
+ fs/smb/client/transport.c     | 40 ++++++++----------------
+ 19 files changed, 293 insertions(+), 246 deletions(-)
+
+--=20
+Thanks,
+
+Steve
