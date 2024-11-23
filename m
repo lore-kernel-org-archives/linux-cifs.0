@@ -1,46 +1,46 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3FC2F5A
-	for <linux-cifs@vger.kernel.org>; Sat, 23 Nov 2024 04:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4212F5A
+	for <linux-cifs@vger.kernel.org>; Sat, 23 Nov 2024 04:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732335451; cv=none; b=sllsUFG2Q3X1pQ6nWrUny4x3IQAJU+3fBPVNdz4apBpM/2eNuB0FxEnsjsoIOTq8IVotGV8T39KiopkuH2gVc+mPLIjEiup6fQgBtC6QlCa4wy/CczPbuqiH09G25YqYVBwBjhX2gjH5YsAa2IDogXwM8gIN1xgT6FP5cE+vFwA=
+	t=1732335454; cv=none; b=fOyk2Qx5RRgofUizZKC1lMTB2xfNKYYw+xA+FRhgnCp5R6/PMpOMeGCv4fCQMRmZfr+CZqi7XPvBCvDCUVlzgCDPXpjUormBMHPt4+6g52j1qbOyiAQAbGXQSuwv/FET16ucfMISwt/LMPUlmJ1suvT5L26hom+zCHWxF/SeR6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732335451; c=relaxed/simple;
-	bh=vtDD94taRJVz7umoL58jmGAGvtjPOyC5J+sh9uYujr8=;
+	s=arc-20240116; t=1732335454; c=relaxed/simple;
+	bh=6yocvjo1r+idSb8E2R9bWHVREUuXmN46JETSQqUjeV8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J+h1VWemi4vpRZ/RHENtrP5bACuU90kCIJjTJKUs1ZcXrVPl5uvaMULmlyNRPgC/HbbBU9pn1VULxA7aOPl/9q3Q6xvLo0Ife19n/mxMEQDRnliKz6a8Kur8aDorw6QcA3VSBTZjNysHqk69/8gdhsxaWCpv/g0lyb4JFQbunEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=bdhWAZp5+0JIQNz3JdDtkpx5CqJ4R/JtJQkpQct57e7xNXFwyg3r1rh41wo5PX4RhU0ACR9Wyg14x/qsUGbuEC6Sf/K9cZ1+NI7gTE64Mm4NUo8lyU3HLr5LD8Ppp7d394MsfbE0fp7ZSoJCB/C9muAemtviR3aJeA6Hr6d39aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-724e1b08fc7so1271394b3a.0
-        for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 20:17:30 -0800 (PST)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-72483f6e2fbso2523167b3a.2
+        for <linux-cifs@vger.kernel.org>; Fri, 22 Nov 2024 20:17:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732335449; x=1732940249;
+        d=1e100.net; s=20230601; t=1732335452; x=1732940252;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=61hZmkrwIDZcFv2rjjEIlJLgIJemKfgpT2QsJ/H1eMA=;
-        b=W+Eh1aJBEfAW3YT5sa2fg+HRGSoqgcazETYarH8cY0ojdhChAs/YRKLIS77o1aiETo
-         jkOJr9xnXqKz6IJ65XRUtTdIUhaTeXocoMn3wLwG6J0sPzJWEKcsHEXunK8xGeDWY3mI
-         o48JFJBUMi1F9do/50jA1se2otZPyNeWOuyU0IFI7EsZfYpJioLA4805rtwP5r8ql0SF
-         L9aMOcDH0CLzpgNgPhj+LPUXCXKZOG0etl9w6TBcnXAZQpBOsslav0UUWz3ChfhfVOHN
-         4bwm2rulGQj3BxAhIKGEFJJOGSU2bi/HJo+8XCjQbllBcyiFK7J+FSwgULAVNYN9ZgvF
-         Z7HA==
-X-Gm-Message-State: AOJu0Yxv1CZJduyPz3JVsbTf+wWNWygt7LzZ7hKMZZDkRBsIR3hSpdhE
-	1EXNrwSO+aJN3Hy/ttmv0qJxoKWEZ4oZePlEnil14xZs2Ei7mWsWObiCwg==
-X-Gm-Gg: ASbGncu1hQueCahj/2EKvb25wghs1AABl6qWi0dx1xDDqcM2sr00xm4cmbRAiICG34e
-	qxqeUWfddz0PPz09S0dimC0GclPD/XZQfhhOnqfkFqyougdjX8tIFxxDYgCk+1BQvcmCxQ2E+6o
-	xaIC7gyFK1Gy3clfbjqZ7696CRHxdZOg7z+wDFfVIQFxrEfy4gPnwnrzHsjbUoX9ekrZ+SvhO3o
-	SpNeMsMs2fCC8+R6aTdKg/42+bz2SOwh6eT+PqmwJMuAeGG9QbEDYVfH9hx0tze
-X-Google-Smtp-Source: AGHT+IHP7Ksm3jck7gp2lerF/NZoliTnjv+awDXk2DY3uQ//eDLEY/eDDctO3/MF7J43LRUTXV9W7A==
-X-Received: by 2002:a17:903:2349:b0:20c:8907:908 with SMTP id d9443c01a7336-2129f81ef81mr72212235ad.44.1732335449311;
-        Fri, 22 Nov 2024 20:17:29 -0800 (PST)
+        bh=elRqtsOhafesboR0UUM6ApYKR1KbOa9jnnWd8nAoTrA=;
+        b=B58P+VJ7ANd9UJwch824y+Ck6U2O/ie1Zq2YbeAFUPM88/ATboyD7YXi36Ym4x4Iiw
+         1sDXibZJHxtSiXNlpprsqqcQ9QY9IstaAg8A81SzaJidpxFcZQfZWxR72XLh3FoPTyq/
+         MsWWcnwH0lKsf0IO0Vawuue51oUYdlDQ0iLKygf8vyrwEdlTQL3/6L3owyAhDg9P+iA+
+         BBRWm8D7V1qK47ryBhbg0JE2o5u9V3fKGfzJhKgk1eBV/7/WVjwDhbogVMENKijeOTlw
+         jol9r7YKuwoE+r2/DdckefRj90XMA79LhWvN2IP5tyd7odLICsfnJc3hd2RDZrbk8gwE
+         UBnA==
+X-Gm-Message-State: AOJu0YzgF5BBRd7UZ3FWFknaBDKQWw8yXuFUXVu5Ab36uJJgDQmvTU5c
+	U6kWoKTzhdX0iwZu95xxNRv3cQy/1KvkLZEFrFvIuC3dFCTGUMK8v3DURA==
+X-Gm-Gg: ASbGncv30ScAVirXdY+vsmS5oF9ipBLR2cK35YV0bycpksb6HXcmbXRBWswXyBNrzLI
+	sPZ+7V/jUqWr10s/Qm6wSPRnQArvneUa4YIWIg+0AOLup7fCRVYc1eScWtPdSs578sRmG/fHgIx
+	I7jgosjn34O/qZ3wAsOMoIhLNkcQeJSh45MQgxR6snkbO+CVhYlIBGrowq/MlQp9dJIln3eYGjE
+	VcWgTzoOIjhUfv+uY8yPhNZ/GEhDziBz3N7qQf+r9D9HOWklsoQTd+3CVlRj1i2
+X-Google-Smtp-Source: AGHT+IGaGTNtiUj7R0ANPzTg4mxaFxfpfK2Et3ecxQqe6HxL4kuBuzD9AhfXg3ZsZGOrht4f31QPjA==
+X-Received: by 2002:a17:903:228f:b0:211:f8c8:373d with SMTP id d9443c01a7336-2129f609982mr88666205ad.31.1732335451948;
+        Fri, 22 Nov 2024 20:17:31 -0800 (PST)
 Received: from localhost.localdomain ([1.227.206.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129dba20e2sm24437805ad.94.2024.11.22.20.17.27
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129dba20e2sm24437805ad.94.2024.11.22.20.17.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 20:17:29 -0800 (PST)
+        Fri, 22 Nov 2024 20:17:31 -0800 (PST)
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -48,9 +48,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 4/6] ksmbd: add netdev-up/down event debug print
-Date: Sat, 23 Nov 2024 13:17:04 +0900
-Message-Id: <20241123041706.4943-4-linkinjeon@kernel.org>
+Subject: [PATCH 5/6] ksmbd: add debug print for pending request during server shutdown
+Date: Sat, 23 Nov 2024 13:17:05 +0900
+Message-Id: <20241123041706.4943-5-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241123041706.4943-1-linkinjeon@kernel.org>
 References: <20241123041706.4943-1-linkinjeon@kernel.org>
@@ -62,45 +62,27 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add netdev-up/down event debug print to find what netdev is connected or
-disconnected.
+We need to know how many pending requests are left at the end of server
+shutdown. That means we need to know how long the server will wait
+to process pending requests in case of a server shutdown.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/transport_tcp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/smb/server/connection.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index cc77ad4f765a..0d9007285e30 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -521,6 +521,8 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
- 				found = 1;
- 				if (iface->state != IFACE_STATE_DOWN)
- 					break;
-+				ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
-+					    iface->name);
- 				ret = create_socket(iface);
- 				if (ret)
- 					return NOTIFY_OK;
-@@ -531,6 +533,8 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
- 			iface = alloc_iface(kstrdup(netdev->name, KSMBD_DEFAULT_GFP));
- 			if (!iface)
- 				return NOTIFY_OK;
-+			ksmbd_debug(CONN, "netdev-up event: netdev(%s) is going up\n",
-+				    iface->name);
- 			ret = create_socket(iface);
- 			if (ret)
- 				break;
-@@ -540,6 +544,8 @@ static int ksmbd_netdev_event(struct notifier_block *nb, unsigned long event,
- 		list_for_each_entry(iface, &iface_list, entry) {
- 			if (!strcmp(iface->name, netdev->name) &&
- 			    iface->state == IFACE_STATE_CONFIGURED) {
-+				ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
-+						iface->name);
- 				tcp_stop_kthread(iface->ksmbd_kthread);
- 				iface->ksmbd_kthread = NULL;
- 				mutex_lock(&iface->sock_release_lock);
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 23c5ff84c9eb..a329e6c9076e 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -404,6 +404,7 @@ int ksmbd_conn_handler_loop(void *p)
+ out:
+ 	ksmbd_conn_set_releasing(conn);
+ 	/* Wait till all reference dropped to the Server object*/
++	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
+ 	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
+ 
+ 	if (IS_ENABLED(CONFIG_UNICODE))
 -- 
 2.25.1
 
