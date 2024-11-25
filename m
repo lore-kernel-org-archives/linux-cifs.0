@@ -1,157 +1,230 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE7E2B9BF
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 20:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE4D18E359;
+	Mon, 25 Nov 2024 21:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732565854; cv=none; b=KYdsLGmXAxoZYmBikzdzFNlq206srA/BIQKO4YE00jOUfBywvsk1Mx9dDZMSSRb8ucPie3FDLYvlARSJ0C+fxuHh3WDE39xejob4vEE3FP3hOQdeECMjHgT0oj2SOID5dSwmVYxE6+vpr/XMtqKpBXfioNhPSkvR1Skgp74ubrY=
+	t=1732569861; cv=none; b=ouoZy5ExRnODV4Xes0kXp8zjoHdgLb1Ys2Pt2mAs8GBZk4pXd7KzVHLsbFjJmbf8bCqXX14bQ2w8RdmMMJ3pIstvfE1YIsTaM/GtYYGL4QJI4gIjngUVNuk7aMSfqeNyhQQb4Z+Lszj6Yd924k2l75S6nAXfxYMM4y3IojumdsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732565854; c=relaxed/simple;
-	bh=Zns0QWWr/x5SQBU9W63gY1p7YIz/qPRnb6KMtORJjog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sEnCJfp5hkoioBVtyvJuxxz/IO+u3uvmHVU+aQRx9TTKrx6Bw/3Twgx+ewMFGELtoSAzM+52fNOpTsBLNU9jMbYVcfunbcz++qCz5spfjxGD4cUU9rvkESNNSlfJVZj85yva4A8WS1r1UHdgWyHfkTuzQ+S+Ly8xEbYLJXa8aag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=MBIm6k95; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1732569861; c=relaxed/simple;
+	bh=5CtDAEAGFgIRPa64S8d1hGjtFDiHuHdt+XKkD8Kc1W0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sd6/RzQByjbNRnX6I/QXBa7XGXhR2eLs2BtScZ6MQL0aq6fVAHIurQsjU6b/Gccx4kA+Kiwc3jozfaxH6btqSu0H2qbx9QDXfGKs7CYK9UVMUD93heDrUKJUFLHot9tb8jOglsDxVWVYG6l+Sm6lI22zf5ze1YNLr09KxOXL8NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTQbYeHD; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="MBIm6k95"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732565848;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=U2ShDvkg6aZDncZn7dVgaupumXokISHBdE8N0+cfCys=;
-	b=MBIm6k953SILPWfkPQHjm4/4UKoYZ+33GtgZumANjXjYAv1zwiP7HJm8aIMLPyWnaN7Uma
-	Ofj1oJ0NQd/BUtMAxilOlUt34RScS2vVSK5423VJaygO9fbic2Q4Nbc7go1wcpFdhWp0jS
-	6MT/SHonqovs4sAqtvXJUKHhlhrQx0VdZHlgyQq5uH1dMJ2ONnDinSr/6mozy5oWQYIXcQ
-	M/q+OTrvwga07zw6nXcQdJqQH1xF9RzQaB6BCZY4Io1/OmMgZO+aLS59+iq0hNIyKFUFhj
-	7V5oKfuqt7CoLivgly1gvYv9zEf9HkAenoY7575a+ZSq7QAxC+wXidP3vGm3mQ==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH] smb: client: fix NULL ptr deref in crypto_aead_setkey()
-Date: Mon, 25 Nov 2024 17:17:23 -0300
-Message-ID: <20241125201723.190140-1-pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTQbYeHD"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53ddd4705f8so2128714e87.0;
+        Mon, 25 Nov 2024 13:24:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732569855; x=1733174655; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0+1WZ/SbKZYL7GP2tOCW3l+o5U7i+3bfPsO9z/9LP1Y=;
+        b=dTQbYeHDUA9BFuTnvidkw5GGOzNVvOzl2K8MkXY4RR8JZ5g0jimFEkr4QGrZub6OY9
+         vTCCc6Dh867nBtkqNgKXRV8YUYa10aQC7vlefl/5v1RNmcwn6WqXaamtnvHDn8u/y/ol
+         xXyPD5XDB1D8qmlUjrMlB/b6Wr+UElNP6LHxVNFJ7QfnOgMvnnspoTCRtFDb+2n5CwvL
+         B+Gf93HwA21sdaJKfwpWugzuGg+h21pLfYJRncZrUCzANE0oVJ1HwB0FYaZtJpPeR3V3
+         AGJn+toqLtjQL9KoBv26kGO65x2q9yWMBYkkFiMXegKqKSaubj8RVd8V2JVpt/GY66lZ
+         TAdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732569855; x=1733174655;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0+1WZ/SbKZYL7GP2tOCW3l+o5U7i+3bfPsO9z/9LP1Y=;
+        b=W8F6TD+LsM5tOYsdrLsdJ84K/Ru/Ux7CnTsYV2t5yekxvqZkAqX8LH64Jj4Obm/Jpu
+         g7tYaH+iu+cebzpWAkG4DD03jnX5Ru/zCPS49fglWAPm9FpEs+J2r9qX3dc5XqhSNCKE
+         4qJGoHY1MwRq5eZuFPf1GEuGOR6sIckblYoOJMsuFW1/RzMqcTfxtM4ExiW9/xRr5+SV
+         BMdPIuKX0elXFoE1wP82ZkCJcsVXJ7hbUGUn8iCvIhJbdiffmiofIrJ1A1aDX8uR/Q+s
+         AfaCb6I9EatyM1wPjDbL5p6pydeQPaAqwfcQT7W5nOiyT5sfWdr5XzNXP+huSjlSZXKp
+         Kwsg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1Aj3zJqkZWcRkCymOMAjyEvcQ/OxEApAdw3uDv6uBsAaD32IoDYWXD5mF539QUyb5DACPpLsXMW7BmV7Z@vger.kernel.org, AJvYcCXRyClnjHsXbO71ZwdUAFTuql9VDToSCj3ukzHxNEC3COxAFXc+CKbdX29KxTKUHwGdycsic2KsCW6V@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxyvw9uOGmHX3oYpTG/Xa+k9XcFFG3a0y1rImF7lWUZnnzH7a4b
+	npgS9AQDjdoMplxYW/oPnZ807XguYUFE8Hl2eshxx6ivVmI+49/Gv4GkzWLjwzclh+0iOffVvi3
+	zPFjbfcKxA/JY5enjsXn8hFrS8jg=
+X-Gm-Gg: ASbGncuv7FDeQzb/wDzJ+oUMEBmWbG2MGptJce8CGOFq/dDoD6HTcoXgPN+mlfHLhEi
+	IvPOlNHx5yssH6+rv/pdqyugHsQbkKmGpunllqBnLO4M/ch7s8x2fcBEnsp6dDJrI
+X-Google-Smtp-Source: AGHT+IEY8/fB2/n9+nqmJCBIY3Q6rmtjh/JVWx2KCtVuohcw6+KzsNR8Ms/wRbMD1bUJRL/ev17UljKa17Tih0kFoDI=
+X-Received: by 2002:a05:6512:b9b:b0:53d:e123:fba7 with SMTP id
+ 2adb3069b0e04-53de88505dbmr290218e87.26.1732569855254; Mon, 25 Nov 2024
+ 13:24:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241006090548.30053-1-pali@kernel.org>
+In-Reply-To: <20241006090548.30053-1-pali@kernel.org>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 25 Nov 2024 15:24:03 -0600
+Message-ID: <CAH2r5mtLoAsZfHHe33=WfDjLZ1PNgV-SgcN1F-o0g1XXLsoAng@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Add support for parsing WSL-style symlinks
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Neither SMB3.0 or SMB3.02 supports encryption negotiate context, so
-when SMB2_GLOBAL_CAP_ENCRYPTION flag is set in the negotiate response,
-the client uses AES-128-CCM as the default cipher.  See MS-SMB2
-3.3.5.4.
+This patch
 
-Commit b0abcd65ec54 ("smb: client: fix UAF in async decryption") added
-a @server->cipher_type check to conditionally call
-smb3_crypto_aead_allocate(), but that check would always be false as
-@server->cipher_type is unset for SMB3.02.
+commit 06a7adf318a30bdcfa1222ed6d2640e6bb266d7b
+Author: Pali Roh=C3=A1r <pali@kernel.org>
+Date:   Sat Sep 28 13:21:24 2024 +0200
 
-Fix the following KASAN splat by setting @server->cipher_type for
-SMB3.02 as well.
+    cifs: Add support for parsing WSL-style symlinks
 
-mount.cifs //srv/share /mnt -o vers=3.02,seal,...
 
-BUG: KASAN: null-ptr-deref in crypto_aead_setkey+0x2c/0x130
-Read of size 8 at addr 0000000000000020 by task mount.cifs/1095
-CPU: 1 UID: 0 PID: 1095 Comm: mount.cifs Not tainted 6.12.0 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-3.fc41
-04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x5d/0x80
- ? crypto_aead_setkey+0x2c/0x130
- kasan_report+0xda/0x110
- ? crypto_aead_setkey+0x2c/0x130
- crypto_aead_setkey+0x2c/0x130
- crypt_message+0x258/0xec0 [cifs]
- ? __asan_memset+0x23/0x50
- ? __pfx_crypt_message+0x10/0x10 [cifs]
- ? mark_lock+0xb0/0x6a0
- ? hlock_class+0x32/0xb0
- ? mark_lock+0xb0/0x6a0
- smb3_init_transform_rq+0x352/0x3f0 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- smb_send_rqst+0x144/0x230 [cifs]
- ? __pfx_smb_send_rqst+0x10/0x10 [cifs]
- ? hlock_class+0x32/0xb0
- ? smb2_setup_request+0x225/0x3a0 [cifs]
- ? __pfx_cifs_compound_last_callback+0x10/0x10 [cifs]
- compound_send_recv+0x59b/0x1140 [cifs]
- ? __pfx_compound_send_recv+0x10/0x10 [cifs]
- ? __create_object+0x5e/0x90
- ? hlock_class+0x32/0xb0
- ? do_raw_spin_unlock+0x9a/0xf0
- cifs_send_recv+0x23/0x30 [cifs]
- SMB2_tcon+0x3ec/0xb30 [cifs]
- ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- ? __pfx_lock_release+0x10/0x10
- ? do_raw_spin_trylock+0xc6/0x120
- ? lock_acquire+0x3f/0x90
- ? _get_xid+0x16/0xd0 [cifs]
- ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
- ? cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
- cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
- ? __pfx_cifs_get_smb_ses+0x10/0x10 [cifs]
- ? cifs_get_tcp_session+0xaa0/0xca0 [cifs]
- cifs_mount_get_session+0x8a/0x210 [cifs]
- dfs_mount_share+0x1b0/0x11d0 [cifs]
- ? __pfx___lock_acquire+0x10/0x10
- ? __pfx_dfs_mount_share+0x10/0x10 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- ? find_held_lock+0x8a/0xa0
- ? hlock_class+0x32/0xb0
- ? lock_release+0x203/0x5d0
- cifs_mount+0xb3/0x3d0 [cifs]
- ? do_raw_spin_trylock+0xc6/0x120
- ? __pfx_cifs_mount+0x10/0x10 [cifs]
- ? lock_acquire+0x3f/0x90
- ? find_nls+0x16/0xa0
- ? smb3_update_mnt_flags+0x372/0x3b0 [cifs]
- cifs_smb3_do_mount+0x1e2/0xc80 [cifs]
- ? __pfx_vfs_parse_fs_string+0x10/0x10
- ? __pfx_cifs_smb3_do_mount+0x10/0x10 [cifs]
- smb3_get_tree+0x1bf/0x330 [cifs]
- vfs_get_tree+0x4a/0x160
- path_mount+0x3c1/0xfb0
- ? kasan_quarantine_put+0xc7/0x1d0
- ? __pfx_path_mount+0x10/0x10
- ? kmem_cache_free+0x118/0x3e0
- ? user_path_at+0x74/0xa0
- __x64_sys_mount+0x1a6/0x1e0
- ? __pfx___x64_sys_mount+0x10/0x10
- ? mark_held_locks+0x1a/0x90
- do_syscall_64+0xbb/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+ led to compile warning:
 
-Cc: Tom Talpey <tom@talpey.com>
-Fixes: b0abcd65ec54 ("smb: client: fix UAF in async decryption")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
----
- fs/smb/client/smb2pdu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+  CC [M]  fs/smb/client/reparse.o
+  CHECK   fs/smb/client/reparse.c
+fs/smb/client/reparse.c:679:45: warning: incorrect type in argument 4
+(different base types)
+fs/smb/client/reparse.c:679:45:    expected unsigned short [usertype] *pwcs
+fs/smb/client/reparse.c:679:45:    got restricted __le16 [usertype]
+*[assigned] symname_utf16
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 055236835537..6d4c48b33701 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1231,7 +1231,9 @@ SMB2_negotiate(const unsigned int xid,
- 	 * SMB3.0 supports only 1 cipher and doesn't have a encryption neg context
- 	 * Set the cipher type manually.
- 	 */
--	if (server->dialect == SMB30_PROT_ID && (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
-+	if ((server->dialect == SMB30_PROT_ID ||
-+	     server->dialect == SMB302_PROT_ID) &&
-+	    (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
- 		server->cipher_type = SMB2_ENCRYPTION_AES128_CCM;
- 
- 	security_blob = smb2_get_data_area_len(&blob_offset, &blob_length,
--- 
-2.47.0
 
+Let me know if updated version needed
+
+On Sun, Oct 6, 2024 at 4:07=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> wr=
+ote:
+>
+> Linux CIFS client currently does not implement readlink() for WSL-style
+> symlinks. It is only able to detect that file is of WSL-style symlink, bu=
+t
+> is not able to read target symlink location.
+>
+> Add this missing functionality and implement support for parsing content =
+of
+> WSL-style symlink.
+>
+> The important note is that symlink target location stored for WSL symlink
+> reparse point (IO_REPARSE_TAG_LX_SYMLINK) is in UTF-8 encoding instead of
+> UTF-16 (which is used in whole SMB protocol and also in all other symlink
+> styles). So for proper locale/cp support it is needed to do conversion fr=
+om
+> UTF-8 to local_nls.
+>
+> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+> ---
+>  fs/smb/client/reparse.c | 49 +++++++++++++++++++++++++++++++++++++++++
+>  fs/smb/common/smb2pdu.h |  9 ++++++++
+>  2 files changed, 58 insertions(+)
+>
+> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> index a577b2d2a4fc..6e9d914bac41 100644
+> --- a/fs/smb/client/reparse.c
+> +++ b/fs/smb/client/reparse.c
+> @@ -875,6 +875,52 @@ static int parse_reparse_symlink(struct reparse_syml=
+ink_data_buffer *sym,
+>                                          cifs_sb);
+>  }
+>
+> +static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buf=
+fer *buf,
+> +                                    struct cifs_sb_info *cifs_sb,
+> +                                    struct cifs_open_info_data *data)
+> +{
+> +       int len =3D le16_to_cpu(buf->ReparseDataLength);
+> +       int symname_utf8_len;
+> +       __le16 *symname_utf16;
+> +       int symname_utf16_len;
+> +
+> +       if (len <=3D sizeof(buf->Flags)) {
+> +               cifs_dbg(VFS, "srv returned malformed wsl symlink buffer\=
+n");
+> +               return -EIO;
+> +       }
+> +
+> +       /* PathBuffer is in UTF-8 but without trailing null-term byte */
+> +       symname_utf8_len =3D len - sizeof(buf->Flags);
+> +       /*
+> +        * Check that buffer does not contain null byte
+> +        * because Linux cannot process symlink with null byte.
+> +        */
+> +       if (strnlen(buf->PathBuffer, symname_utf8_len) !=3D symname_utf8_=
+len) {
+> +               cifs_dbg(VFS, "srv returned null byte in wsl symlink targ=
+et location\n");
+> +               return -EIO;
+> +       }
+> +       symname_utf16 =3D kzalloc(symname_utf8_len * 2, GFP_KERNEL);
+> +       if (!symname_utf16)
+> +               return -ENOMEM;
+> +       symname_utf16_len =3D utf8s_to_utf16s(buf->PathBuffer, symname_ut=
+f8_len,
+> +                                           UTF16_LITTLE_ENDIAN,
+> +                                           symname_utf16, symname_utf8_l=
+en * 2);
+> +       if (symname_utf16_len < 0) {
+> +               kfree(symname_utf16);
+> +               return symname_utf16_len;
+> +       }
+> +       symname_utf16_len *=3D 2; /* utf8s_to_utf16s() returns number of =
+u16 items, not byte length */
+> +
+> +       data->symlink_target =3D cifs_strndup_from_utf16((u8 *)symname_ut=
+f16,
+> +                                                      symname_utf16_len,=
+ true,
+> +                                                      cifs_sb->local_nls=
+);
+> +       kfree(symname_utf16);
+> +       if (!data->symlink_target)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+>  int parse_reparse_point(struct reparse_data_buffer *buf,
+>                         u32 plen, struct cifs_sb_info *cifs_sb,
+>                         const char *full_path,
+> @@ -894,6 +940,9 @@ int parse_reparse_point(struct reparse_data_buffer *b=
+uf,
+>                         (struct reparse_symlink_data_buffer *)buf,
+>                         plen, unicode, cifs_sb, full_path, data);
+>         case IO_REPARSE_TAG_LX_SYMLINK:
+> +               return parse_reparse_wsl_symlink(
+> +                       (struct reparse_wsl_symlink_data_buffer *)buf,
+> +                       cifs_sb, data);
+>         case IO_REPARSE_TAG_AF_UNIX:
+>         case IO_REPARSE_TAG_LX_FIFO:
+>         case IO_REPARSE_TAG_LX_CHR:
+> diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+> index c769f9dbc0b4..275184c31a89 100644
+> --- a/fs/smb/common/smb2pdu.h
+> +++ b/fs/smb/common/smb2pdu.h
+> @@ -1552,6 +1552,15 @@ struct reparse_symlink_data_buffer {
+>
+>  /* See MS-FSCC 2.1.2.6 and cifspdu.h for struct reparse_posix_data */
+>
+> +/* For IO_REPARSE_TAG_LX_SYMLINK */
+> +struct reparse_wsl_symlink_data_buffer {
+> +       __le32  ReparseTag;
+> +       __le16  ReparseDataLength;
+> +       __u16   Reserved;
+> +       __le32  Flags;
+> +       __u8    PathBuffer[]; /* Variable Length UTF-8 string without nul=
+-term */
+> +} __packed;
+> +
+>  struct validate_negotiate_info_req {
+>         __le32 Capabilities;
+>         __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+> --
+> 2.20.1
+>
+>
+
+
+--=20
+Thanks,
+
+Steve
