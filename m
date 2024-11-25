@@ -1,108 +1,127 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C71336D
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 01:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E6514AD2D;
+	Mon, 25 Nov 2024 07:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732497557; cv=none; b=Fz3Clmvoh36cU+xtwj/2rbIeWSu9FrlVewSZfRzUp7ALSNNLPXpiwo3tcXIwn+TFGkblq5RdKIsopWCcsi1ps6NfJJslzVyQmlZvPzq0+ev/+T+eRSO1kFKDDVRjcUJCY8k2I37IsXMcuE2VdMcDWtpDVfrlG57mwFoqNgqFM64=
+	t=1732521235; cv=none; b=hkpeLYUkUmzRftA/+h1IRnOFoFe6agyj5OE9mLtx5fIs6w2fhkEBGvFnaVLDfVMTSFOR9SLj4PSESPWlQnq/y4QL36pCr/y9vw7oUPIbyin8h+fdNhoDYtqHaijagRsns6WtdBGSH31lTeHbd435pxQ5E0WAKPn+wcvHOkbBrfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732497557; c=relaxed/simple;
-	bh=5REnBKsbu9dhPP0a7hb6d9SPJFeGbmJ1vCeTvyiQONE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jUSbjNCEtZ93WAI5OJOLdkzPpcrUwMAN7rKdMwy0NSP86uVFTwrvhWytxBsCTCxagYbiUQgHFwPot/uFjIFy71fQJ+r+qtl8H3OuM8DiUi+Si7Tbb5NUuBcFeF9aPaxlUF3TGAL3RbdXhjekcktLZkcgTgrEpPYrh5uITN5aCos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXRvuY8v; arc=none smtp.client-ip=209.85.167.47
+	s=arc-20240116; t=1732521235; c=relaxed/simple;
+	bh=MTOg65FPbtEHzj6ceXeU2wiwD4YbqciYNRjbouWBU7Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cNTx7V+PYl00OfQboKjW7YWlfD+Z5L/WInNAYYhkJ3fEPcreL6LGv18JLDdKGrb2nu5UtOLiJg0GmzRnSVNsUlTC5PAUQ9476w3zbZsyanxQ3vmkIYkFudXgnYZZc4Tiv52MTTBtw3N6/xvVWR/DtXJIn04hpWaDnPpqd7Ya1x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XdqDE4eT; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXRvuY8v"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-53dde4f0f23so1004008e87.3
-        for <linux-cifs@vger.kernel.org>; Sun, 24 Nov 2024 17:19:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdqDE4eT"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-724e1d0a52dso95485b3a.2;
+        Sun, 24 Nov 2024 23:53:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732497553; x=1733102353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qexvsLcoW9zE3mmFWDdvWHsfQto1Xwdffzfj51luljs=;
-        b=GXRvuY8vR+ubIwa6KENKVBpXq6cRVOJ+S72SGIYw3h+kMYKFNFesU4yvWw3erlUL1U
-         LC5NqgNdCIfoJCdnE35W1QOlMknVaozjb1KT9DX0TU7YvnysB8HR0etLzWBsbBbz3+eU
-         7ZLPNeoEImh0Vzk3fiZXxkbf36SmNrz50e4EKIwaHMzp0W4YDzI2IA523JGy8vY7JQGi
-         sXi4P60ZN3lR+aJBrDID4uuQlaqmlL4nNpYDdc47rQlSiIAqNJRFzdPgZAAw6qjit9lW
-         OJSHkxZvFwxVXuovb/JsmcqOGldXjp6yxIzBs5f5xumMBmp1K7YqKjY/Bs4q2xM5zUIF
-         nNGQ==
+        d=gmail.com; s=20230601; t=1732521233; x=1733126033; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b6jiE8fsXfsP4ikoV8qpavcElY9z/0rHh5JLKGf+AVY=;
+        b=XdqDE4eTJnOXLkXSj/DRtrLaE86lL5iB2BLXiqrLE+s36MTJIuxFcybQ3ze85CXG8Q
+         /hwfJm0QFOH7Hh4rDD0zmCEfTA5bZAtEf6cXJJ4I8X+zxzV1oUN1nfff5lVk6XluYBb9
+         4lJTe6NCDVqepuiBI0l//1flFzz7FtrJ/dbY+p2hfZqsh8mjaiLNn2yY05MrfMCpAbve
+         IuZsBa9y+wQYh9rnH/8prqRkjeIgNox1uqb9wnmFUQduDpYLVByZUvsVbTFq79rNZwbA
+         vzBiB6T8UB2pAXhhk4l78qZOCe+uqtkh0SIxYFa4Q9UTUgn5Jdd/vDiQMH8MVhPNr7oE
+         Rsyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732497553; x=1733102353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qexvsLcoW9zE3mmFWDdvWHsfQto1Xwdffzfj51luljs=;
-        b=uevvOXEPcA8eo2aPLPUWShU+TvjCbhQ+G+dMzStMxKuK0xVdMNflLTHWKxn4bP7PSW
-         zSDxRv8pcg4QueXofWNrCnDyeZJ0hHAtcKKvGuf+weJ1ar5MBiWAp7NKySrZ+ehw21Wf
-         l7gHlwxURtN3UlToD7mU1szlDOhBWRAESCOTIkiavXRK2Re8gqE8jzyymlCaxvQhCn6L
-         9SucsDo9cAJNSM4XVxWJ+sCmgBhunLUQG2RmOScki4gxE1oEuEuC8p24PxEYoaWU9T4a
-         8ZX7QGiPCL8fNRnAqmkBnoZ4smdgF3o9oMG2ocn3Xbs4UiXb4r9DsDM9snDhYxreJlEn
-         CwHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWE+LE0EqoKqsa3R65UZyLFZC52IfznH1zhYlCxvFvsqc6I+N5JS40IrBUBnEa/+SJk/Nm2WE8VYMkp@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl+z8iu3kvUwZyFAbZgdJpcdxW3GIJmo3CvjgByUN4PE5NbG33
-	bdraZC2FbIi/8JoGRtJQqhM0Njed6w6Xwwbc92ZHMfE1lSP+w5c2CCLmwqzV8zMWKJjHBdTBTzQ
-	600Y5IAk7BQYc2mfPBa/m8lmAvMU=
-X-Gm-Gg: ASbGncvdSETwRGkvOGBLe1GIzw/ATX8lLuICrJmXgZk5kep8s5xTrnyXX+hFM5aSsYj
-	6EoDVyh8JKSUoLwPydQn2VfMYnzk0VlXKVWW3z4q11aAGarAPmQw2lcYudiRdQ2Kc
-X-Google-Smtp-Source: AGHT+IFGK4ciuVBZPt0Kj36tbNEIX0lNZu+HhFiAZMHFy30KO5uRw/w7pfwT7aQV90UEnEGhGkfhyfGUuGeN24tXngE=
-X-Received: by 2002:a05:6512:239f:b0:53d:e57e:dd4a with SMTP id
- 2adb3069b0e04-53de57edd9cmr135151e87.22.1732497553266; Sun, 24 Nov 2024
- 17:19:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732521233; x=1733126033;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b6jiE8fsXfsP4ikoV8qpavcElY9z/0rHh5JLKGf+AVY=;
+        b=t0fatmKjdoVZVjj0NeE8X9Mn+ZSCa5eW+se5lGqzcwyAxBivbNONP0MTwgN28WLQ5N
+         zpULbFy6xZCBWMdJrPWEz+ZApuHO7+Eh14hBYbsc7bh/YG9HQawzPTzHs+5kXU8ypouQ
+         /Qk1YRX21ZpWuWILDUvYABMuXApNnudQOb/C/NdZHTEozeG+EjwEqYeOOww3UnhT0r6i
+         nXzJmLQGniathQ5KVA0+v8oIVkIDFA1QYAtH6Bi12SgqZ/qnKUSiE25ndEWXmoYxUlFh
+         C3tJ3zI/dnu0YJmBd27/swJvo9XEFZ47OqgoWGPJdGZ8Ew85vlhSjno67BheUTUJAKsy
+         AUtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXU5PKTNhY9ZIuAgfGacZXh1glJgZCqPwXnKyH8M4QKXm4bfVBaMi6M1I4meq+2YOTSRC/YNxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB3EF/44BhKS7dtxOctdDRwsan4hD+BYEG9U0X1GN4nI4PEoo5
+	MIMg/eO+Q+W4/U8FYhV2OAqk9YAJ7IHIq3DuuW4DlCQBSo1TjNmGbYW/3HmJ
+X-Gm-Gg: ASbGncv1TMYhEVP7hwqq9lzZjZIIV5KKZryA3OvatMgdxrx0oNLTsFsGxMUpO1XOIYE
+	PyVYYzjfSuIpKJHSiY0O9OlFEgA6Tq05aiN1p7TUY4WCk/rW9Oa/bRornS1q4KjJotJ/kxuhKdq
+	xm6dJKopbfn3uTyhIs42TJeV4849Jl3PWMpdne6u91CxgvrV5iD9wd62/OwGiyQuIRHO3VaWRYa
+	UKKK/owbCKTXUqRjS0suQB1eGUuS0b0vd1/PMXDFMmULfVgcKbslAQQz5fDrWbFijKC
+X-Google-Smtp-Source: AGHT+IFNuAayu5EdvZepTbzrWMZnA6GqzPGU7jW9+JoQ1R9AXY0IBG2nXCYhRIDpb9rIQW4j8RRnpQ==
+X-Received: by 2002:a05:6a00:9297:b0:71e:596a:a392 with SMTP id d2e1a72fcca58-724df5d0c2bmr6744333b3a.2.1732521233132;
+        Sun, 24 Nov 2024 23:53:53 -0800 (PST)
+Received: from localhost.localdomain ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724de456488sm5780804b3a.9.2024.11.24.23.53.50
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 24 Nov 2024 23:53:52 -0800 (PST)
+From: Yunseong Kim <yskelg@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org,
+	syzkaller@googlegroups.com,
+	Austin Kim <austindh.kim@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fix use-after-free in SMB request handling
+Date: Mon, 25 Nov 2024 16:45:55 +0900
+Message-ID: <20241125074552.51888-4-yskelg@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123011437.375637-1-henrique.carvalho@suse.com> <1759723155478fb008c3b36bdd07c63f@manguebit.com>
-In-Reply-To: <1759723155478fb008c3b36bdd07c63f@manguebit.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 24 Nov 2024 19:19:02 -0600
-Message-ID: <CAH2r5mscAw9k_-r3_uqO4E3hMiNuxENTHjGzygPjpTOeKfrC6A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] smb: client: disable directory caching when
- dir_cache_timeout is zero
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, sfrench@samba.org, ematsumiya@suse.de, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-added the reviewed-by for these three. Testing seems to be going ok on
-these so far - let me know if any updates or missed/new patches
+A race condition exists between SMB request handling in
+`ksmbd_conn_handler_loop()` and the freeing of `ksmbd_conn` in the
+workqueue handler `handle_ksmbd_work()`. This leads to a UAF.
+- KASAN: slab-use-after-free Read in handle_ksmbd_work
+- KASAN: slab-use-after-free in rtlock_slowlock_locked
 
-On Sun, Nov 24, 2024 at 4:14=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
-wrote:
->
-> Henrique Carvalho <henrique.carvalho@suse.com> writes:
->
-> > Setting dir_cache_timeout to zero should disable the caching of
-> > directory contents. Currently, even when dir_cache_timeout is zero,
-> > some caching related functions are still invoked, which is unintended
-> > behavior.
-> >
-> > Fix the issue by setting tcon->nohandlecache to true when
-> > dir_cache_timeout is zero, ensuring that directory handle caching
-> > is properly disabled.
-> >
-> > Fixes: 238b351d0935 ("smb3: allow controlling length of time directory =
-entries are cached with dir leases")
-> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> > ---
-> > V1 -> V2: Split patch and addressed review comments
-> >
-> >  fs/smb/client/connect.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
->
+This race condition arises as follows:
+- `ksmbd_conn_handler_loop()` waits for `conn->r_count` to reach zero:
+  `wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);`
+- Meanwhile, `handle_ksmbd_work()` decrements `conn->r_count` using
+  `atomic_dec_return(&conn->r_count)`, and if it reaches zero, calls
+  `ksmbd_conn_free()`, which frees `conn`.
+- However, after `handle_ksmbd_work()` decrements `conn->r_count`,
+  it may still access `conn->r_count_q` in the following line:
+  `waitqueue_active(&conn->r_count_q)` or `wake_up(&conn->r_count_q)`
+  This results in a UAF, as `conn` has already been freed.
 
+The discovery of this UAF can be referenced in the following PR for
+syzkaller's support for SMB requests.  
+Link: https://github.com/google/syzkaller/pull/5524
 
---=20
-Thanks,
+Fixes: ee426bfb9d09 ("ksmbd: add refcnt to ksmbd_conn struct")
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org # v6.6.55+, v6.10.14+, v6.11.3+
+Cc: syzkaller@googlegroups.com
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+---
+ fs/smb/server/server.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Steve
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index e6cfedba9992..c8cc6fa6fc3e 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -276,8 +276,12 @@ static void handle_ksmbd_work(struct work_struct *wk)
+ 	 * disconnection. waitqueue_active is safe because it
+ 	 * uses atomic operation for condition.
+ 	 */
++	atomic_inc(&conn->refcnt);
+ 	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
+ 		wake_up(&conn->r_count_q);
++
++	if (atomic_dec_and_test(&conn->refcnt))
++		kfree(conn);
+ }
+ 
+ /**
+-- 
+2.43.0
+
