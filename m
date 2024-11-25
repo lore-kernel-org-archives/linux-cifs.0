@@ -1,121 +1,147 @@
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9020318DF8D;
-	Mon, 25 Nov 2024 08:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AAC29415
+	for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 15:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732524856; cv=none; b=O8KSCWPcxEWo79SWi0irccDfhinSncNxvx6dljUCcsolE3BAA2fdfO1yaWETnXAdyild+jhM4aK+QYSnkiShcWOs/wfKK+dJJk+tGD/p6vrqcscUEGuHuy/gcVI4O5S3gFNZ9d+LYxf6a0q11mjdJv+swUgrhmg7oGsusBQN0WQ=
+	t=1732550306; cv=none; b=DKLuCoYXUIr/8Fvk6DI2fGpDNaVKU3UJ8zx9J99W0k6iZAoaTh9dTNbEk7unScELvPebrKsnXmIKVX7zIK/QjT734d8dS9nduZlB6NnucNi8XSJqsprzpjMenwsCQM1/jg010R2sz6PV01s1zJJLP4knGEbF5Rm+jOnkLWf2nlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732524856; c=relaxed/simple;
-	bh=xV69ApqQ+gYiW0Cq34RkQgROnh9IshIjsivHhrCYb3k=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rFaDroLU5OFFW6OayIfG3yl3b71e4kLfSQcQhr4J9EygQwI6jVVJxYM/3Ei9J+sDj6xoCu+eVnP1AD/gnPeBvuq2TRiB4eWaDDuX39kUajHKXTECfAIv0eKwVwvzOCUcyv1xNiXZcn1S4g/7cAPN1djOPlM7GltEWVLbu8GbpOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pL+t1BZD; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1732550306; c=relaxed/simple;
+	bh=o/vpT5j+e6lQvNqzDLmJdFKzWZDWx+pB3bDltWZaE+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cFlHeOnljZ8s5ZbB6P7W+22fSyi06HkaMaDi2u3qIFGZu0WYiTWsSaEHqHCucoPg7uLUold3JMsz0bg8FdWHQkR1eX1fjqmE76Tkxvlb/ikzR+BDszy9HVYGPrK6++3Id4jIujfd3sjF9dYlpAbmEBjH132BSAQctCrVblGoClU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sB1+GWaF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=l2sXK6Uz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sB1+GWaF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=l2sXK6Uz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pL+t1BZD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732524855; x=1764060855;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=xV69ApqQ+gYiW0Cq34RkQgROnh9IshIjsivHhrCYb3k=;
-  b=pL+t1BZDZz1pCqHucEgW0ZJDJ24QxGo6ATQ/sUaGanHdidnX0AtrInZ7
-   lCz8eI1JuX7x9bhgR+VbeLLcH5qhVTL+J2wzpIEWETZOw72uxK3yqhvee
-   Us/cBIAc6Rcryfp7pcqyAh/zHg83mkijstKXjOqu0DsDlKFoxMbxgrIci
-   I=;
-X-IronPort-AV: E=Sophos;i="6.12,182,1728950400"; 
-   d="scan'208";a="698010430"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 08:54:10 +0000
-Received: from EX19MTAUEC002.ant.amazon.com [10.0.29.78:20039]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.19.131:2525] with esmtp (Farcaster)
- id 61843e51-cbcc-43eb-9f46-8bb6a50bf74a; Mon, 25 Nov 2024 08:54:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 61843e51-cbcc-43eb-9f46-8bb6a50bf74a
-Received: from EX19EXOUEC002.ant.amazon.com (10.252.135.179) by
- EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 25 Nov 2024 08:54:06 +0000
-Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19EXOUEC002.ant.amazon.com (10.252.135.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 25 Nov 2024 08:54:03 +0000
-Received: from email-imr-corp-prod-pdx-all-2b-a57195ef.us-west-2.amazon.com
- (10.124.125.2) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Mon, 25 Nov 2024 08:54:03 +0000
-Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com [10.15.1.225])
-	by email-imr-corp-prod-pdx-all-2b-a57195ef.us-west-2.amazon.com (Postfix) with ESMTP id 47F0BA0676;
-	Mon, 25 Nov 2024 08:54:03 +0000 (UTC)
-Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
-	id D1E5E1E9C; Mon, 25 Nov 2024 09:54:02 +0100 (CET)
-From: Mahmoud Adam <mngyadam@amazon.com>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>
-CC: <gregkh@linuxfoundation.org>, <stfrench@microsoft.com>,
-	<stable@vger.kernel.org>, <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: Fix buffer overflow when parsing NFS reparse points
-In-Reply-To: <20241123122050.23euwjcjsuqwiodx@pali> ("Pali =?utf-8?Q?Roh?=
- =?utf-8?Q?=C3=A1r=22's?= message of
-	"Sat, 23 Nov 2024 13:20:50 +0100")
-References: <20241122134410.124563-1-mngyadam@amazon.com>
-	<20241123122050.23euwjcjsuqwiodx@pali>
-Date: Mon, 25 Nov 2024 09:54:02 +0100
-Message-ID: <lrkyqmshny9qt.fsf@dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sB1+GWaF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="l2sXK6Uz";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sB1+GWaF";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="l2sXK6Uz"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 99EC51F442;
+	Mon, 25 Nov 2024 15:58:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732550302; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DH++ATPHxhh6qSvmq4BR4yNpPS7KbYXz7a6Yv5TbhKw=;
+	b=sB1+GWaFakgjDsidhaN5rMAyqZD4rEpn+++Wzvewkyou2q+cJecSIiu8bKZBp2VOsQlhEr
+	C4Ox1vszf9ysdDJQNXe/K4mzKo6CdDn9pinZOyJZ1c1kSZo1xTvGjIDgkQJyCWIapwtoYQ
+	Is5CSaRZDV3Czb2GhNS18deLcYfjXII=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732550302;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DH++ATPHxhh6qSvmq4BR4yNpPS7KbYXz7a6Yv5TbhKw=;
+	b=l2sXK6UzWu6zZTqRk75JajyrdxYIiM+vc8TpbJ4zZElPntuHx/3Ho+CC3lZGmhH12D5iP9
+	yEtdI1hi+GT8f+Bw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732550302; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DH++ATPHxhh6qSvmq4BR4yNpPS7KbYXz7a6Yv5TbhKw=;
+	b=sB1+GWaFakgjDsidhaN5rMAyqZD4rEpn+++Wzvewkyou2q+cJecSIiu8bKZBp2VOsQlhEr
+	C4Ox1vszf9ysdDJQNXe/K4mzKo6CdDn9pinZOyJZ1c1kSZo1xTvGjIDgkQJyCWIapwtoYQ
+	Is5CSaRZDV3Czb2GhNS18deLcYfjXII=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732550302;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DH++ATPHxhh6qSvmq4BR4yNpPS7KbYXz7a6Yv5TbhKw=;
+	b=l2sXK6UzWu6zZTqRk75JajyrdxYIiM+vc8TpbJ4zZElPntuHx/3Ho+CC3lZGmhH12D5iP9
+	yEtdI1hi+GT8f+Bw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 128B113890;
+	Mon, 25 Nov 2024 15:58:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nVn5Mp2eRGevZwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 25 Nov 2024 15:58:21 +0000
+Date: Mon, 25 Nov 2024 12:56:00 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Marco Crivellari <marco.crivellari@suse.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	henrique.carvalho@suse.com, ematsumiya@suse.com
+Subject: Re: [PATCH] Update misleading comment in cifs_chan_update_iface
+Message-ID: <ubfww55cebjyaur47o2s34qkpcqdmck4zvdx7q47e2tk4bvkwe@xvefnpedopnf>
+References: <20241107164029.322205-1-marco.crivellari@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241107164029.322205-1-marco.crivellari@suse.com>
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	RCVD_TLS_ALL(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
-
-> On Friday 22 November 2024 14:44:10 Mahmoud Adam wrote:
->> From: Pali Roh=C3=A1r <pali@kernel.org>
->>=20
->> upstream e2a8910af01653c1c268984855629d71fb81f404 commit.
->>=20
->> ReparseDataLength is sum of the InodeType size and DataBuffer size.
->> So to get DataBuffer size it is needed to subtract InodeType's size from
->> ReparseDataLength.
->>=20
->> Function cifs_strndup_from_utf16() is currentlly accessing buf->DataBuff=
-er
->> at position after the end of the buffer because it does not subtract
->> InodeType size from the length. Fix this problem and correctly subtract
->> variable len.
->>=20
->> Member InodeType is present only when reparse buffer is large enough. Ch=
-eck
->> for ReparseDataLength before accessing InodeType to prevent another inva=
-lid
->> memory access.
->>=20
->> Major and minor rdev values are present also only when reparse buffer is
->> large enough. Check for reparse buffer size before calling reparse_mkdev=
-().
->>=20
->> Fixes: d5ecebc4900d ("smb3: Allow query of symlinks stored as reparse po=
-ints")
->> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
->> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
->> Signed-off-by: Steve French <stfrench@microsoft.com>
->> [use variable name symlink_buf, the other buf->InodeType accesses are
->> not used in current version so skip]
->> Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
->> ---
->> This fixes CVE-2024-49996, and applies cleanly on 5.4->6.1, 6.6 and
->> later already has the fix.
+On 11/07, Marco Crivellari wrote:
+>Since commit 8da33fd11c05 ("cifs: avoid deadlocks while updating iface")
+>cifs_chan_update_iface now takes the chan_lock itself, so update the
+>comment accordingly.
 >
-> Interesting... I have not know that there is CVE number for this issue.
-> Have you asked for assigning CVE number? Or was it there before?
+>Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+>---
+> fs/smb/client/sess.c | 5 +----
+> 1 file changed, 1 insertion(+), 4 deletions(-)
 >
-Nope, It was assigned a CVE here:
- https://lore.kernel.org/all/2024102138-CVE-2024-49996-0d29@gregkh/
+>diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+>index 3216f786908f..51614a36a100 100644
+>--- a/fs/smb/client/sess.c
+>+++ b/fs/smb/client/sess.c
+>@@ -359,10 +359,7 @@ cifs_disable_secondary_channels(struct cifs_ses *ses)
+> 	spin_unlock(&ses->chan_lock);
+> }
+>
+>-/*
+>- * update the iface for the channel if necessary.
+>- * Must be called with chan_lock held.
+>- */
+>+/* update the iface for the channel if necessary. */
+> void
+> cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+> {
+>-- 
 
--MNAdam
+Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+
+
+Cheers
