@@ -1,157 +1,119 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F272C2AD25
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 16:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B143B2500CC
+	for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 20:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732551813; cv=none; b=Lw6hIaA5ikP4A7BFV7qMWj/AxyunhHg8NESRzAkKjPbxwzFYPAKdOPwcFB2yf7Q6YuKWCqMueHvqPB1sWnJqIw0ZRlU20XwRcbsLu8WbolT4gem4baH8wKUaRPyhv3hcjgHwDMfcSFlyMLBQV1kr7xT5tu4VmUJYTbN9y4Mc2n0=
+	t=1732565224; cv=none; b=p63mUOy6S04u23wRekgfzch7p/HXx3+X0/ugSU9RBDJSC/bHRUTl/kOnaCOEziM3Q/yCyLU+qPPKQwqmBv7GYb/4JPbRahhQSHbOXkCdUAK4WuZnVZcyj2Cur0HIZ0ASKIGTrWKN/ytZxKxih4uXCvqWxtrRcxyrhARniNNs5rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732551813; c=relaxed/simple;
-	bh=2MipmUeX50xs/NCWz2nDTbgSpGFkLcZ/+24FvGOEyqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4nik7J/PN6GphS5IxSIVnRuWLpjY5+mjgYTi5a3v0AgfecZUq/Hkc7q5CPtxWOav40W8OXhVTG2MzKW20j1WKe1xsoGbWX9OAa/qOyLoeH+QY8lVhlJc71k3BpXU6teUiUBN+8zmTH9xX5RjjqebrwdPcSAUYsj9hoiIYaEpdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vyyeD/ct; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BXHk/hzp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vyyeD/ct; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BXHk/hzp; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1732565224; c=relaxed/simple;
+	bh=2e2tnDG6vCpSUBbw0RSUHfSowPBONf63T0DmUPF+rJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KBysvkaFf/DEKccimhzqNEqA8hH6jYEVzD5GWp65WF/zzKMDKQ6gGkkRJ1/TO4sZHZbLYwCpjj/pnNm1gyzInqkza4Jseg2GqD0UY4VdaMpdFoi+ylQFhKy4TPJqczlUqEkuuuVsYkxkOcG7GBLfkjVze7KeKfmwVvuTiYU9pOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzfltClH; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vyyeD/ct";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BXHk/hzp";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vyyeD/ct";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BXHk/hzp"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 045A4211A3;
-	Mon, 25 Nov 2024 16:23:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732551810; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J9FqqRlYrXUm2ypWIRGTFgmcMEzbPzbnXVP06Wn9QMU=;
-	b=vyyeD/ctqLsGFlEoFVtl8v/yaLrhZFkZ8DlU9z5KNXGjpSpeSZ/cdOUhQqXaTqT7dRe08X
-	FPvUHQ1AxSEsx9pZyc2grCjht5HT6rgNc7arzpM1BOKr9bQ+bt5xEh7EidE5Y/9O0wVdS/
-	SWchBEqDnS9eC0jOCQnTZ1vA8pI5UFk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732551810;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J9FqqRlYrXUm2ypWIRGTFgmcMEzbPzbnXVP06Wn9QMU=;
-	b=BXHk/hzpy6avtfTogxbn7Zu+ySRykdd9Q8G5bPijBpMKAWmC3El/0X2FIvrRalcVPJEUCI
-	sW1AFZy2buqI/nCA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="vyyeD/ct";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="BXHk/hzp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1732551810; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J9FqqRlYrXUm2ypWIRGTFgmcMEzbPzbnXVP06Wn9QMU=;
-	b=vyyeD/ctqLsGFlEoFVtl8v/yaLrhZFkZ8DlU9z5KNXGjpSpeSZ/cdOUhQqXaTqT7dRe08X
-	FPvUHQ1AxSEsx9pZyc2grCjht5HT6rgNc7arzpM1BOKr9bQ+bt5xEh7EidE5Y/9O0wVdS/
-	SWchBEqDnS9eC0jOCQnTZ1vA8pI5UFk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1732551810;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J9FqqRlYrXUm2ypWIRGTFgmcMEzbPzbnXVP06Wn9QMU=;
-	b=BXHk/hzpy6avtfTogxbn7Zu+ySRykdd9Q8G5bPijBpMKAWmC3El/0X2FIvrRalcVPJEUCI
-	sW1AFZy2buqI/nCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 80DB613890;
-	Mon, 25 Nov 2024 16:23:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id oT5oEoGkRGcIcAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 25 Nov 2024 16:23:29 +0000
-Date: Mon, 25 Nov 2024 13:21:12 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] smb: client: change return value in
- open_cached_dir_by_dentry() if !cfids
-Message-ID: <jd3kud65onl4sylbhis7qdgce7jxliekvoofknmrmswxrvnhd4@dnukbqq663hc>
-References: <20241123011437.375637-1-henrique.carvalho@suse.com>
- <20241123011437.375637-3-henrique.carvalho@suse.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzfltClH"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53dded7be84so2433953e87.1
+        for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 12:07:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732565221; x=1733170021; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b6W7U/3kNQ1Q21gQ2G25xQVR3qZVJP3a1CLybJY2EFA=;
+        b=DzfltClH6SEUL5GMmPUeHefklmo6NH2XIJm3A0cLj7TfSj+zHuTEccDBZbII0gwEWM
+         AlkH5Tx5sXrTx4uX6bYABV+EZ5kEDJxRGJv86sAfL4LEntBQy0IQR8Fw4/Tg+WLoDPvf
+         9leSFJ+RBFUKMo14GOKOjerblBJTvr0ZO5D1K3NudlSYullwhRAGSD++9q7fPk9T5hqg
+         SxubrsDWqNdkPj4C8L9lSQC9ZAwaWFV6d2w/1FFvUg1lEtE3e8Xno4NYXurPd7fdcren
+         S+H+khmSDTdduy8TDs5RNhrEDoXItqKZv+OdWddMt/ZRXDdoMxb95UpOlmfSBt/CMA+/
+         Wyyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732565221; x=1733170021;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b6W7U/3kNQ1Q21gQ2G25xQVR3qZVJP3a1CLybJY2EFA=;
+        b=FW9uKnSELdjo+denFHZoFJwqy/KRVtjd9SagrMVM8GTIGgl7ZGOwktJ/Pl4Cem87Qt
+         8RXeJacyIrUHRKCZrD7hPpllwcWMqDcCld9P6sizU+XBg0dHmcsoYLEpTCoNvTkDk4FQ
+         2HBd4Sm48sTh3VunAwSYvihHMrRaVvoTRi6zT3bbAdVZfT9IW0VwOUh3YuStXAQSVYZ/
+         /XtAR08dRqy49wRyJ+iH33n9tKsIq8ruMXfvWm4/XG+mVg73OAejsVUyJTFmHyPFFbnW
+         nb4ZHwCtXUf2J0qxyWkRy+nNxG8cPc+xoyDhTYV3hj5oIpx5RQpjmj57N0m62zT2H0SU
+         DPpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWN6Bfd5D+OaSClGVdZc9e5uRAPINTvoO39EAjLISsn93e41e407bl4nGmBcSnaFPhnQ1DlK7GXJDa0@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLYmOWacgR0jRAOhqk6aztqXeNR1+I3O7W7zV1Y4pQAo0AkSmk
+	qRYAk6b8i5ZyRxamvVUQ7kB8dw67n0e6xpuLhOF3EX1/+1Rw5QZ8yCSEaGpG5fEhHwFOXLb2xxY
+	sDfu/Dr4gRvOF6e6oueNURTF4vtHHZQ==
+X-Gm-Gg: ASbGncv8NIJFhUl3iKnkmPtZzclXQhtuKw9idrib7yo3VbJ+usXDhUVSwk3j7pfZqUC
+	n+wkG20zVVaOb4BoZ2Suq9v0/ptrQs4DHILGGMbVC+4+hQpGeXWafP2H8SCVMl659
+X-Google-Smtp-Source: AGHT+IHlmfmORdVLbFYWqK2oYXR8My3YrjE+k8loufRbFremEYsS8VJrWjZs3JQ/qeFRkd/bTv3IYdvAoCCLlRM5EEk=
+X-Received: by 2002:a05:6512:159e:b0:53d:def2:27d8 with SMTP id
+ 2adb3069b0e04-53ddef22934mr3024536e87.23.1732565220551; Mon, 25 Nov 2024
+ 12:07:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241123011437.375637-3-henrique.carvalho@suse.com>
-X-Rspamd-Queue-Id: 045A4211A3
-X-Spam-Score: -4.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[samba.org,manguebit.com,gmail.com,microsoft.com,talpey.com,vger.kernel.org];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <20241107164029.322205-1-marco.crivellari@suse.com> <ubfww55cebjyaur47o2s34qkpcqdmck4zvdx7q47e2tk4bvkwe@xvefnpedopnf>
+In-Reply-To: <ubfww55cebjyaur47o2s34qkpcqdmck4zvdx7q47e2tk4bvkwe@xvefnpedopnf>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 25 Nov 2024 14:06:49 -0600
+Message-ID: <CAH2r5mvkxTUbYYRtqVD9_byuXfiST+Gg1HOXpuz-rgVK8eY=Eg@mail.gmail.com>
+Subject: Re: [PATCH] Update misleading comment in cifs_chan_update_iface
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Marco Crivellari <marco.crivellari@suse.com>, linux-cifs@vger.kernel.org, pc@manguebit.com, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, henrique.carvalho@suse.com, ematsumiya@suse.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/22, Henrique Carvalho wrote:
->Change return value from -ENOENT to -EOPNOTSUPP to maintain consistency
->with the return value of open_cached_dir() for the same case. This
->change is safe as the only calling function does not differentiate
->between these return values.
->
->Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
->---
->V1 -> V2: Split patch and addressed review comments
->
-> fs/smb/client/cached_dir.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->index 85a8cc04e2c81..d8b1cf1043c35 100644
->--- a/fs/smb/client/cached_dir.c
->+++ b/fs/smb/client/cached_dir.c
->@@ -396,7 +396,7 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
-> 	struct cached_fids *cfids = tcon->cfids;
->
-> 	if (cfids == NULL)
->-		return -ENOENT;
->+		return -EOPNOTSUPP;
->
-> 	spin_lock(&cfids->cfid_list_lock);
-> 	list_for_each_entry(cfid, &cfids->entries, entry) {
+added to cifs-2.6.git for-next (and added the RB to the other three a well)
 
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+On Mon, Nov 25, 2024 at 9:58=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
+ wrote:
+>
+> On 11/07, Marco Crivellari wrote:
+> >Since commit 8da33fd11c05 ("cifs: avoid deadlocks while updating iface")
+> >cifs_chan_update_iface now takes the chan_lock itself, so update the
+> >comment accordingly.
+> >
+> >Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+> >---
+> > fs/smb/client/sess.c | 5 +----
+> > 1 file changed, 1 insertion(+), 4 deletions(-)
+> >
+> >diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> >index 3216f786908f..51614a36a100 100644
+> >--- a/fs/smb/client/sess.c
+> >+++ b/fs/smb/client/sess.c
+> >@@ -359,10 +359,7 @@ cifs_disable_secondary_channels(struct cifs_ses *se=
+s)
+> >       spin_unlock(&ses->chan_lock);
+> > }
+> >
+> >-/*
+> >- * update the iface for the channel if necessary.
+> >- * Must be called with chan_lock held.
+> >- */
+> >+/* update the iface for the channel if necessary. */
+> > void
+> > cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *se=
+rver)
+> > {
+> >--
+>
+> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+>
+>
+> Cheers
 
 
-Cheers
+
+--=20
+Thanks,
+
+Steve
