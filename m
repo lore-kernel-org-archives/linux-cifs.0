@@ -1,186 +1,262 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5FF1DA2E5
-	for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 17:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C541DEFC2
+	for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 21:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732642092; cv=none; b=m+7NYP0l4cF5j8L4yg5gS+vSBhw4IaoXD5Sm9VpJKxZvRD3LDU/fD297G9raVQOBKEsLD5xcuH+457w1EqawVh3FXkYsEOFKR88V99wXMVhqlNGHY73m+SZWUO+2WybdIOptENOeiPrKxTTi+lHF2ETsEZKbVHBww4vJn+a8a40=
+	t=1732657069; cv=none; b=Ka8TxH96i9ya04ts5M1nsxrx9py+dZXIYBZbNr0SDdVDHpUnPK6sjs1aQe2Uqia9Pymu5CVTcKbsdfx2a8TIshlmBO15rSAn3bP7HKsjJKzrjn5izKzfShraY75GVejZbJhlK9xoqKQAj7nXJmyyvKkCFTUnqUFD2Fe6Q+6TmOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732642092; c=relaxed/simple;
-	bh=sVyt3v3sV4c3F6DZUhk8AdIdxA73NaMUSu0/Xdbcd9M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GM4v5fw7avnChmHy0gFXSZoUaVN8RuLercFJC8gLOjF041a9jJLpexXOGcgVAslXA/Dy0kIh0I7NcdlQIVw9BqnrPxZxysIE+E3u1Gub36uE8vS5ePCnjFWOty4BjH7Ga4OAkHw7UmA4V5BbSOP+C5owqYWFnuq3Cq0KD4TYhe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2OrGif8; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732657069; c=relaxed/simple;
+	bh=zqrFja0j5sP+US8PJ65ix6C9Jjje0HK4f176MAYDGoE=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8WWGd2b1Vec9KCi27Q+G0wlw+muS12/VImCNhJSAIQzIZZ52PzhbNHc6T8FAdG0RjiF/0NT8pFIilVO89XqN7rBcAlvRO6pD5OUjHKSMLl9qMpDjjnrIeyjupHbLKSU9kDuHTZYjKAWjlVsd+AfZ6lAxxoIgnLKb5NqsXr5cgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=CKc/U78k; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=eRAAL3Kq; arc=none smtp.client-ip=74.207.241.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2OrGif8"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e9ff7a778cso5272961a91.1
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 09:28:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732642090; x=1733246890; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkzluFdR/XThbmvf9PPNjQ9IlLi9FaTm3zamxDNL6/k=;
-        b=i2OrGif8XioSZhE9BrOUPixAC5kozYo1Onhgl98wjKH1f/x8pBwLOnj0CKaLaDMgxm
-         iuR2reI2pkSrhbWQxE0hvuT9c/dFuL96wrkyOOADNl9CJQRfd7Lk5M6WlRbtHhxZepGi
-         2DJ+NSy8IHIIbgIfsN2lRtbSA95t44kpiBD5YNgUI7Z+4JOpgi2CgMXF0mQQg3h/bnj6
-         AzKlcpjQyRq+bVZEkK1p2JUWeh+oYEAa0S+YScqN0iX/z9jkLR5Wrt3hWSpBog+Wcdjx
-         5x8T85Ct5SsgciuTvMdnlC+67Rjq80HwWCogFEZQwH48VYoo+UnuJrgBcQhpAv8+HesN
-         f5Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732642090; x=1733246890;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GkzluFdR/XThbmvf9PPNjQ9IlLi9FaTm3zamxDNL6/k=;
-        b=JROjcvjSGjn1Munpxw8YuK3hWzpI/yPe8b20G2CwP8xRI5jDcbPDEtsfGvEFC6QViO
-         VfLoSG0Od54tbFZwUeZvIPJJvhVmOn4Oe3NgYq27ZjaevPVL4jtMF90DTIqUDz3y3pZt
-         A+0A+eCpMA8xd+1ujfyW0e2MUqzfBwINQQUxcCdeYI4GwZiWZpMpMD72V61ZJCr40iZD
-         dqkuN+F6V83tB/+QR371LdXIG9k6/sBMoKJpjFJqOKr4lZJSG+Q0SglrE/mHUe46qPi7
-         pr0Re9S23XPMLOP7cQLq8wvaE6pRGpa0EA0YqHiD5pIS2G8FH+pPX/nw1GAKLSrNNAS3
-         DdLw==
-X-Gm-Message-State: AOJu0Yxdhnw9nvNnS1vwf0Z/oEmLARWuxjUVSYfOKRkkCmnS9ALOemlj
-	N2lgpBED6XXy4lMETxJ3WSlge4JgF681OoPzE8CEBfr4igV9RYVCA5Sb9WYm
-X-Gm-Gg: ASbGncu4aIS1ZAOD0GD0BpjU/ifZEwYU/+PEFCoaUNw8gOW7smtISAQ0QyRGxqlPTv2
-	j7sydggTHeT8OFohUbpgpjVAmTP+IAdgN4WNgBeesQ7wSancpw9QxGn5x5obmp36Y6/pW1QCHHs
-	L4Cw9kqSQRUOxzW2gqxznSXSTZoimv2ZV8DFMdVhlicu9drii90r9oqYL9pfdeaywbN7tXyEDDn
-	oEuVu6XY0ggjq673C9ygzaIgI9VXYeuejFWhREmXQlNMVNe7Egyf2voQOdjXDZUiEy5nYITwSg=
-X-Google-Smtp-Source: AGHT+IGI+GTMG0l96IFAHzqvKldZ30tY8sRT81Q+nt5nCKFOZi8COQU97yZbzg02ugRlExGu0V+eBA==
-X-Received: by 2002:a17:90a:fb90:b0:2ea:7ba7:33b9 with SMTP id 98e67ed59e1d1-2edebf22a2dmr6493895a91.14.1732642090440;
-        Tue, 26 Nov 2024 09:28:10 -0800 (PST)
-Received: from bharathsm-Virtual-Machine.. ([131.107.8.125])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2eb0cfe7ac5sm9112404a91.4.2024.11.26.09.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 09:28:10 -0800 (PST)
-From: bharathsm.hsk@gmail.com
-To: linux-cifs@vger.kernel.org,
-	sfrench@samba.org,
-	metze@samba.org,
-	jlayton@samba.org,
-	pshilovsky@samba.org,
-	pc@manguebit.com,
-	dhowells@redhat.com,
-	sprasad@microsoft.com,
-	rbudhiraja@microsoft.com
-Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH] cifs-utils: Skip TGT check if valid service ticket is already available
-Date: Tue, 26 Nov 2024 22:57:44 +0530
-Message-ID: <20241126172744.25894-1-bharathsm.hsk@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="CKc/U78k";
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="eRAAL3Kq"
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+ d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
+ t=1732657060; h=date : from : to : subject : message-id : references :
+ mime-version : content-type : in-reply-to : from;
+ bh=UQoULP1P2yps1XKbEcvkh8pqNN533119MuA2uBKC9BE=;
+ b=CKc/U78khXDhg7pniEtCRCRvpRMJdsJSzhoyAW12Byt3Dt99GzARjcvm1/vaq0von9dyT
+ G7UBKCo6xGn5txaCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
+ i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1732657060; h=date :
+ from : to : subject : message-id : references : mime-version :
+ content-type : in-reply-to : from;
+ bh=UQoULP1P2yps1XKbEcvkh8pqNN533119MuA2uBKC9BE=;
+ b=eRAAL3Kq2fuFLVKteICPWdm+KUP4iOVIVIjmjbYYIhRaiwmmPYEyPofiAvbBdQ4z3iRcP
+ CNV4MvRVtZaW9NMLijeyYXbKNLD3BuW+RtBatnXLz3GucyMVFrzltq+R5G7HC+M0xrYxVlW
+ yFtbMhduzLBAKKNL6tDtTL1oJ/KVg4h99DeELt1HZy1FiLbBoxhXG+x0xLHvt8wjHMUrOmR
+ SIpvhyCvnhtFx3N/ZHCVHzkcnQCwHtysvIqK/qH37cvz9WRGk4SCQUJSOlbDZN+JnTqce+y
+ ilCE9yIlxUC5nZY7gVyg0oSzEBGEqKbLEBZMX4Ch8sBXTKjm4YwZXS3PE6OA==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
+	 client-signature ED25519)
+	(Client CN "otters", Issuer "otters" (not verified))
+	by o-chul.darkrain42.org (Postfix) with ESMTPS id DFE1980F5;
+	Tue, 26 Nov 2024 13:37:40 -0800 (PST)
+Received: by haley.home.arpa (Postfix, from userid 1000)
+	id 1BBA635AAD; Tue, 26 Nov 2024 13:37:40 -0800 (PST)
+Date: Tue, 26 Nov 2024 13:37:39 -0800
+From: Paul Aurich <paul@darkrain42.org>
+To: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org,
+	Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: Re: [PATCH v2 4/4] smb: During unmount, ensure all cached dir
+ instances drop their dentry
+Message-ID: <Z0Y_o2nH16BynCO5@haley.home.arpa>
+Mail-Followup-To: Paulo Alcantara <pc@manguebit.com>,
+	linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+References: <20241118215028.1066662-1-paul@darkrain42.org>
+ <20241118215028.1066662-5-paul@darkrain42.org>
+ <2a818d91e9f3c392b2739a4c2a018085@manguebit.com>
+ <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="RawQ1PeImBrbYPBt"
+Content-Disposition: inline
+In-Reply-To: <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
 
-From: Bharath SM <bharathsm@microsoft.com>
 
-When handling upcalls from the kernel for SMB session setup requests using
-Kerberos authentication, if the credential cache already contains a valid
-service ticket, it can be used directly without checking for the TGT again.
+--RawQ1PeImBrbYPBt
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
 
-Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+On 2024-11-22 19:28:34 -0800, Paul Aurich wrote:
+>On 2024-11-21 23:05:51 -0300, Paulo Alcantara wrote:
+>>Hi Paul,
+>>
+>>Thanks for looking into this!  Really appreciate it.
+>>
+>>Paul Aurich <paul@darkrain42.org> writes:
+>>
+>>>The unmount process (cifs_kill_sb() calling close_all_cached_dirs()) can
+>>>race with various cached directory operations, which ultimately results
+>>>in dentries not being dropped and these kernel BUGs:
+>>>
+>>>BUG: Dentry ffff88814f37e358{i=1000000000080,n=/}  still in use (2) [unmount of cifs cifs]
+>>>VFS: Busy inodes after unmount of cifs (cifs)
+>>>------------[ cut here ]------------
+>>>kernel BUG at fs/super.c:661!
+>>>
+>>>This happens when a cfid is in the process of being cleaned up when, and
+>>>has been removed from the cfids->entries list, including:
+>>>
+>>>- Receiving a lease break from the server
+>>>- Server reconnection triggers invalidate_all_cached_dirs(), which
+>>>  removes all the cfids from the list
+>>>- The laundromat thread decides to expire an old cfid.
+>>>
+>>>To solve these problems, dropping the dentry is done in queued work done
+>>>in a newly-added cfid_put_wq workqueue, and close_all_cached_dirs()
+>>>flushes that workqueue after it drops all the dentries of which it's
+>>>aware. This is a global workqueue (rather than scoped to a mount), but
+>>>the queued work is minimal.
+>>
+>>Why does it need to be a global workqueue?  Can't you make it per tcon?
+>
+>The problem with a per-tcon workqueue is I didn't see clean way to 
+>deal with multiuser mounts and flushing the workqueue in 
+>close_all_cached_dirs() -- when dealing with each individual tcon, 
+>we're still holding tlink_tree_lock, so an arbitrary sleep seems 
+>problematic.
+>
+>There could be a per-sb workqueue (stored in cifs_sb or the master 
+>tcon) but is there a way to get back to the superblock / master tcon 
+>with just a tcon (e.g. cached_dir_lease_break, when processing a lease 
+>break)?
+>
+>>>The final cleanup work for cleaning up a cfid is performed via work
+>>>queued in the serverclose_wq workqueue; this is done separate from
+>>>dropping the dentries so that close_all_cached_dirs() doesn't block on
+>>>any server operations.
+>>>
+>>>Both of these queued works expect to invoked with a cfid reference and
+>>>a tcon reference to avoid those objects from being freed while the work
+>>>is ongoing.
+>>
+>>Why do you need to take a tcon reference?
+>
+>In the existing code (and my patch, without the refs), I was seeing an 
+>intermittent use-after-free of the tcon or cached_fids struct by 
+>queued work processing a lease break -- the cfid isn't linked from 
+>cached_fids, but smb2_close_cached_fid invoking SMB2_close can race 
+>with the unmount and cifs_put_tcon
+>
+>Something like:
+>
+>    t1                              t2
+>cached_dir_lease_break
+>smb2_cached_lease_break
+>smb2_close_cached_fid
+>SMB2_close starts
+>                                    cifs_kill_sb
+>                                    cifs_umount
+>                                    cifs_put_link
+>                                    cifs_put_tcon
+>SMB2_close continues
+>
+>I had a version of the patch that kept the 'in flight lease breaks' on 
+>a second list in cached_fids so that they could be cancelled 
+>synchronously from free_cached_fids(), but I struggled with it (I 
+>can't remember exactly, but I think I was struggling to get the linked 
+>list membership / removal handling and num_entries handling 
+>consistent).
+>
+>>Can't you drop the dentries
+>>when tearing down tcon in cifs_put_tcon()?  No concurrent mounts would
+>>be able to access or free it.
+>
+>The dentries being dropped must occur before kill_anon_super(), as 
+>that's where the 'Dentry still in use' check is. All the tcons are put 
+>in cifs_umount(), which occurs after:
+>
+>    kill_anon_super(sb);
+>    cifs_umount(cifs_sb);
+>
+>The other thing is that cifs_umount_begin() has this comment, which 
+>made me think a tcon can actually be tied to two distinct mount 
+>points:
+>
+>        if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
+>                /* we have other mounts to same share or we have
+>                   already tried to umount this and woken up
+>                   all waiting network requests, nothing to do */
+>
+>Although, as I'm thinking about it again, I think I've misunderstood 
+>(and that comment is wrong?).
+>
+>It did cross my mind to pull some of the work out of cifs_umount into 
+>cifs_kill_sb (specifically, I wanted to cancel prune_tlinks earlier) 
+>-- no prune_tlinks would make it more feasible to drop tlink_tree_lock 
+>in close_all_cached_dirs(), at which point a per-tcon workqueue is 
+>more practical.
+>
+>>After running xfstests I've seen a leaked tcon in
+>>/proc/fs/cifs/DebugData with no CIFS superblocks, which might be related
+>>to this.
+>>
+>>Could you please check if there is any leaked connection in
+>>/proc/fs/cifs/DebugData after running your tests?
+>
+>After I finish with my tests (I'm not using xfstests, although perhaps 
+>I should be) and unmount the share, DebugData doesn't show any 
+>connections for me.
+
+I was able to reproduce this leak.  I believe the attached patch addresses it.
+
+I'm able to intermittently see a 'Dentry still in use' bug with xfstests 
+generic/241 (what Steve saw) (the attached patch doesn't help with that). I'm 
+still unsure what's going on there.
+
+>~Paul
+
+--RawQ1PeImBrbYPBt
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-smb-Initialize-cfid-tcon-before-performing-network-o.patch"
+
+>From cc5f87508d85e5bb8e855b9f851683838a3b5425 Mon Sep 17 00:00:00 2001
+From: Paul Aurich <paul@darkrain42.org>
+Date: Tue, 26 Nov 2024 13:27:29 -0800
+Subject: [PATCH] smb: Initialize cfid->tcon before performing network ops
+
+Avoid leaking a tcon ref when a lease break races with opening the
+cached directory. Processing the leak break might take a reference to
+the tcon in cached_dir_lease_break() and then fail to release the ref in
+cached_dir_offload_close, since cfid->tcon is still NULL.
+
+Signed-off-by: Paul Aurich <paul@darkrain42.org>
 ---
- cifs.upcall.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 58 insertions(+), 6 deletions(-)
+ fs/smb/client/cached_dir.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index ff6f2bd..4ad0c8e 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -552,11 +552,6 @@ get_existing_cc(const char *env_cachename)
- 		syslog(LOG_DEBUG, "%s: default ccache is %s\n", __func__, cachename);
- 		krb5_free_string(context, cachename);
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index d9e1d1dc6178..fe738623cf1b 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -227,10 +227,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			rc = -ENOENT;
+ 			goto out;
+ 		}
  	}
--
--	if (!get_tgt_time(cc)) {
--		krb5_cc_close(context, cc);
--		cc = NULL;
--	}
- 	return cc;
- }
+ 	cfid->dentry = dentry;
++	cfid->tcon = tcon;
  
-@@ -638,6 +633,49 @@ icfk_cleanup:
- 
- #define CIFS_SERVICE_NAME "cifs"
- 
-+static krb5_error_code check_service_ticket_exists(krb5_ccache ccache,
-+		const char *hostname) {
-+
-+	krb5_error_code rc;
-+	krb5_creds mcreds, out_creds;
-+
-+	memset(&mcreds, 0, sizeof(mcreds));
-+
-+	rc = krb5_cc_get_principal(context, ccache, &mcreds.client);
-+	if (rc) {
-+		syslog(LOG_DEBUG, "%s: unable to get client principal from cache: %s",
-+					__func__, krb5_get_error_message(context, rc));
-+		return rc;
-+	}
-+
-+	rc = krb5_sname_to_principal(context, hostname, CIFS_SERVICE_NAME,
-+			KRB5_NT_UNKNOWN, &mcreds.server);
-+	if (rc) {
-+		syslog(LOG_DEBUG, "%s: unable to convert service name (%s) to principal: %s",
-+					__func__, hostname, krb5_get_error_message(context, rc));
-+		krb5_free_principal(context, mcreds.client);
-+		return rc;
-+	}
-+
-+	rc = krb5_timeofday(context, &mcreds.times.endtime);
-+	if (rc) {
-+		syslog(LOG_DEBUG, "%s: unable to get time: %s",
-+			__func__, krb5_get_error_message(context, rc));
-+		goto out_free_principal;
-+	}
-+
-+	rc = krb5_cc_retrieve_cred(context, ccache, KRB5_TC_MATCH_TIMES, &mcreds, &out_creds);
-+
-+	if (!rc)
-+		krb5_free_cred_contents(context, &out_creds);
-+
-+out_free_principal:
-+	krb5_free_principal(context, mcreds.server);
-+	krb5_free_principal(context, mcreds.client);
-+
-+	return rc;
-+}
-+
- static int
- cifs_krb5_get_req(const char *host, krb5_ccache ccache,
- 		  DATA_BLOB * mechtoken, DATA_BLOB * sess_key)
-@@ -1516,12 +1554,26 @@ int main(const int argc, char *const argv[])
- 		goto out;
+ 	/*
+ 	 * We do not hold the lock for the open because in case
+ 	 * SMB2_open needs to reconnect.
+ 	 * This is safe because no other thread will be able to get a ref
+@@ -298,11 +299,10 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			pr_warn_once("server share %s deleted\n",
+ 				     tcon->tree_name);
+ 		}
+ 		goto oshr_free;
  	}
+-	cfid->tcon = tcon;
+ 	cfid->is_open = true;
  
-+	host = arg->hostname;
- 	ccache = get_existing_cc(env_cachename);
-+	if (ccache != NULL) {
-+		rc = check_service_ticket_exists(ccache, host);
-+		if(rc == 0) {
-+			 syslog(LOG_DEBUG, "%s: valid service ticket exists in credential cache",
-+					 __func__);
-+		} else {
-+			 if (!get_tgt_time(ccache)) {
-+				syslog(LOG_DEBUG, "%s: valid TGT is not present in credential cache",
-+						__func__);
-+				krb5_cc_close(context, ccache);
-+				ccache = NULL;
-+			}
-+		}
-+	}
- 	/* Couldn't find credcache? Try to use keytab */
- 	if (ccache == NULL && arg->username[0] != '\0')
- 		ccache = init_cc_from_keytab(keytab_name, arg->username);
+ 	spin_lock(&cfids->cfid_list_lock);
  
--	host = arg->hostname;
- 
- 	// do mech specific authorization
- 	switch (arg->sec) {
+ 	o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
 -- 
-2.43.0
+2.45.2
+
+
+--RawQ1PeImBrbYPBt--
 
