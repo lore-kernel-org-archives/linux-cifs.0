@@ -1,113 +1,129 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512288F54
-	for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 06:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF2F14A85
+	for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 08:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732601527; cv=none; b=AaKMJwk0vm6W/AS4uXz/7ICxSjfD7OqIQ3nJxbTK3y2Qvns459YmzA3XH1oAccF0dBeF0Aj0I+ZevpYUR8wAFOhKuM+vt3b/Ma0sfOcFX6fkPqmZsIv0PvkvK+zcrTgvNpzWg6CLcGI5FNHtDhjLZjH/9Zi41bhq0WKBD2B4tYQ=
+	t=1732610242; cv=none; b=K/wqIY58fi26S0vAmgEQZwUWHuoyp4Cl+TIythAMJFvxhPfHaEZ9kibSXUC/E8Yb/uUDJnV0PCAS/VhIQ38qSXPeYgo8vgc2j3riHtaFW14l9DYt3dz3ew0Ut7fHg7D6yfgUnpyCiEj/p8wm2ATY06TGoJR8QtbU7EBbpG/5e3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732601527; c=relaxed/simple;
-	bh=G8IDoxjpw9w7QMMvmX8zZSewkZW0bvbcv0wDpVO+y7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHLk523awDoWtwidUuK4/USh0CjDbCwdllw1ABuCBNqf9PesJ38xv3u/zVaZinqM+sbp7JmCgwdOkG0UMrunGpkqdQx38NwmHswqlji3sYFmls+CfQOATcC94UZFafoTl8RinEPP+ioQn+HGz6Wqh1RhsAVhJn48cnNcnGGMHuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nNPPmoy7; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732610242; c=relaxed/simple;
+	bh=QKc45+S8ys9Iu/H5PdBQCFaYBYAOanQzZFv2h3MFDHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G/p0wU15qJQXPOm+AT9sflzDUyhQs/es+ablBTCFnXQ6CEU20Xlw4ek9pyKN4K1LMKWWsmAIBk0xh/TSO6o1qRRll5CGRqjui021e9TVEq6Kr8nTMppBWfZ1DfOuqXF8wfeQ93ZXUKMmdJCw9i9Vg4ErIzCKcSQJGC+/yYR/tGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZVdXnsZb; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nNPPmoy7"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38246333e12so5220771f8f.1
-        for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2024 22:12:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZVdXnsZb"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53de035ea13so2147765e87.0
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Nov 2024 00:37:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732601524; x=1733206324; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=suse.com; s=google; t=1732610238; x=1733215038; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ShZ5CVYRw8VHCG0KyxbarF6vtOAF9YYbvwBWyFBOcMQ=;
-        b=nNPPmoy7viByGA3ejw+Mz3E/YeAijwKdMhYRP0zLKmma67mghMacAUaV/TM/Adao0m
-         yNHQ669KdI6DIP8cyAdFARlZ6hE/1e1zZNAvcvj7xRU4km+KckIqth+ix8XuqZTQlKyA
-         z6VBDj6P+mL37ROod/Z9s4SfMkbl5/t9zm9jJt9KrJ+VyRw1291MRfIsAGesRnUjaHUC
-         Zg6+S0wRN2SgWm/ovnfO6AfMK64Mnmx0JsY8VJzV5w2mpDoFkCaoYidRluETzB9lpuWj
-         BXkjQxE/vlnkmvcE4eejEBj1ZVtxA+3J5hHUQe0ibxW9eCGS7bzx/8vODEFmfzNutdki
-         RkFA==
+        bh=22jR0XBhI2E9c5FkIFrqUGsHT0bkN1pI5hofWrMAXOw=;
+        b=ZVdXnsZbGFab+me24bYw0WtPSMXLKenLhTYjv1felzbcpZzwmOfTsE6TX6+TMor+wX
+         BB3JGHWejS2o6Q3FVn29woscHFU/7GErvyR9o1NhclL+xc0RlZPTdvlRQTxfNCO/wZyH
+         PUs4OFNfCzmSHLkxJ13l3w1HdLHtug6/zwIVlPxVModMbkaNrGX6irh1oX3RsDMiVvyf
+         I6u90t+vRNQE5rp3DmzQktEMKiKLptllP+OUY2Ao+KIIOsd67P7biZQCxtPREjeAkHUr
+         IA1PW4TwhYAjATnZ3y1SGETh1WMTxTZR/iu2gFf0onX2rEQ+YB9FtPSukEW8fyMfhMPy
+         QCFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732601524; x=1733206324;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1732610238; x=1733215038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ShZ5CVYRw8VHCG0KyxbarF6vtOAF9YYbvwBWyFBOcMQ=;
-        b=cByhqwP0gyq3dA+vLAiIOATWiTDs7CEGh8j23gG1I51TrLFtPXoDzLGxWZ5+2Qc4KI
-         73L2RJCZXgywXfRXiFj/+01UoSH2jYrSKZrE2QLXg1V+cTLoH/aiiOoboxmNpJuaRWh2
-         ccdlZOFu8a67QP38j23kxRaivcwsdsydE5/L7yAUvO8YgTctvbxlPRcZzu17FjDzRqzp
-         arvDIgWryGCJ5jKRh3PX8y29+si9sNpEiQOiCcMwbytdljZmPcYKHgEDUpUIPZ8nWI2K
-         72zdp3RYBM/pgvWB6Jq7AT8GDuLRUtwsVz/bCxNmj1f8K757ROYqblv+vgG5cmGu818x
-         qyfA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+eKhcCFVzgwH6HN+qTorHdVgKJTZJmpotU6je5TfJ5NcMMDIVd/tPAlR/I7v0XCTjN6Db5kGUZoyA@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuPCYAGlJzsVgvRVcp6AzYHsHcT72iSCSDaQZCyl/l4lFVG5s6
-	wUAq1RDyDXPit8hrY4uqW86mc99AxWai8tuk+qEt7xIcNPJvZr6n
-X-Gm-Gg: ASbGncvMuZ3w+9jhSLNqgmLK24ueAt2S0DgvUxpJaqxMOHUV7u6E43tO98rtfJRCnJP
-	r2KudpNXhR4Y7nJuQP0c5HiT+DKYJYmbOuZEM61LH9phOH1cU7DJTbJA4dDQHhYEJ/d8vr6ZCKP
-	lQO82VtgYePhzpNzirR4t/py7p0r7CKSfQpR3GpAexTGxMPKLojY8i50KJsWXTbewuJ/rqDXR0J
-	/LdG8Lyx/JVSDG9mfztQJgrvaNjC3FPMIxTWqw2UzhuAH8LNEtU9vl2pbCW
-X-Google-Smtp-Source: AGHT+IFwrIvt02kf1JfHwrdM0PL9/P7IcZ8NYaUpTF81eUgQxXcun89f//FlmUdrf00jdeycMPMHeA==
-X-Received: by 2002:a05:6000:18ac:b0:382:3afd:1258 with SMTP id ffacd0b85a97d-38260b3ccbemr15944999f8f.8.1732601523406;
-        Mon, 25 Nov 2024 22:12:03 -0800 (PST)
-Received: from azathoth.suse.cz ([45.250.247.14])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3825fb30590sm12374477f8f.57.2024.11.25.22.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 22:12:03 -0800 (PST)
-From: Brahmajit Das <brahmajit.xyz@gmail.com>
-To: linkinjeon@kernel.org
-Cc: brahmajit.xyz@gmail.com,
-	ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org,
-	sfrench@samba.org
-Subject: [PATCH v2] smb: server: Fix building with GCC 15
-Date: Tue, 26 Nov 2024 11:41:35 +0530
-Message-ID: <20241126061135.2762074-1-brahmajit.xyz@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <CAKYAXd_aZ1RT4yxC4fasmYk+M6vWrpwrjrJgxvf2hNzra7VJPw@mail.gmail.com>
-References: <CAKYAXd_aZ1RT4yxC4fasmYk+M6vWrpwrjrJgxvf2hNzra7VJPw@mail.gmail.com>
+        bh=22jR0XBhI2E9c5FkIFrqUGsHT0bkN1pI5hofWrMAXOw=;
+        b=Kgs0kFxpav7+pMtIszvW7FlyhQdLSf5ZbQgxpw0DdAaALzQBr7S0oYo8luvuLjlbd9
+         oRA1Z4zogZcG6PPYoBdBqUmz949WatxiQNM9ON+9B9JdtyQyk3YOE3jaVgdfM96IX8sT
+         lrLCYs0L8UpmvZqA5ZVVeoOfapt835HP1bq4Y052yqP6xftELYK/mtXJgrh8qHjs/u9d
+         8tMQiE7siYP8Fl+Lv8WdFUaU1PrDIwItCDQ+00I+JsiOZQ4V+1ImVKz8U/hAWPcOxVZ+
+         HmpnlN5ENSZ/KNflQGbD9MnDBJbyZGgbZeIcYsr60Z6x+qTl8H5heeR4LBi8hIYZV4lQ
+         L+fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoy6Xue4WKqd7MWu4TtinXMkcRn358y2T6baxg4do0uEWbHtskZUThD1pQ541Ztwa+y8K6HZeIkfPy@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOhOtqqOGbskQG8UutGiN6EVMFSZVx5t3tK54YknIate2HurKM
+	xGTyvYqeIx5R8yw3eJy2z5SYG2MhcTBNxB5kuInADPMDMgXDJ+UglBRKGh3DWWJaGdki0UTvaUV
+	3n+BljK4nIJ6Xu+kkYa80UgKCrFLat2OWXSj6ZA==
+X-Gm-Gg: ASbGncuq5lbnb7OhYk6kEH98cba/xncdqpIktWu1+hMNtvppzbETXqkvtge2JKByPZU
+	eQHphGu0NqlXQOPC6sC99zpaygoMs/oDD7qWCsO7Mw+Mn4mJoDhJ6uMlFy+5WEIre
+X-Google-Smtp-Source: AGHT+IF6n0DQov5U2UgZPQN0AL+TGZYLiETID7ErOo+8LH+/8Nlb2B7zs4RPo2VVCUZpnsrEpaPp5Y+H+OzaKCiK/9Q=
+X-Received: by 2002:a05:6512:b22:b0:53d:e50a:7031 with SMTP id
+ 2adb3069b0e04-53de50a7229mr3799409e87.3.1732610237879; Tue, 26 Nov 2024
+ 00:37:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241107164029.322205-1-marco.crivellari@suse.com>
+ <ubfww55cebjyaur47o2s34qkpcqdmck4zvdx7q47e2tk4bvkwe@xvefnpedopnf> <CAH2r5mvkxTUbYYRtqVD9_byuXfiST+Gg1HOXpuz-rgVK8eY=Eg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvkxTUbYYRtqVD9_byuXfiST+Gg1HOXpuz-rgVK8eY=Eg@mail.gmail.com>
+From: Marco Crivellari <marco.crivellari@suse.com>
+Date: Tue, 26 Nov 2024 09:37:07 +0100
+Message-ID: <CAAofZF75rLSv+uehm3qdjdNL8Xv8X4KA7+Zhym34+VmOgxmkHA@mail.gmail.com>
+Subject: Re: [PATCH] Update misleading comment in cifs_chan_update_iface
+To: Steve French <smfrench@gmail.com>
+Cc: Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org, pc@manguebit.com, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, henrique.carvalho@suse.com, ematsumiya@suse.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-GCC 15 introduces -Werror=unterminated-string-initialization by default,
-this results in the following build error
+Thank you,
 
-fs/smb/server/smb_common.c:21:35: error: initializer-string for array of 'char' is too long [-Werror=unterminated-string-ini
-tialization]
-   21 | static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
+Marco
 
-To this we are replacing char basechars[43] with a character pointer
-and then using strlen to get the length.
-
-Signed-off-by: Brahmajit Das <brahmajit.xyz@gmail.com>
----
- fs/smb/server/smb_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 75b4eb856d32..af8e24163bf2 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -18,8 +18,8 @@
- #include "mgmt/share_config.h"
- 
- /*for shortname implementation */
--static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
--#define MANGLE_BASE (sizeof(basechars) / sizeof(char) - 1)
-+static const char *basechars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-+#define MANGLE_BASE (strlen(basechars) - 1)
- #define MAGIC_CHAR '~'
- #define PERIOD '.'
- #define mangle(V) ((char)(basechars[(V) % MANGLE_BASE]))
--- 
-2.47.0
-
+On Mon, Nov 25, 2024 at 9:07=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> added to cifs-2.6.git for-next (and added the RB to the other three a wel=
+l)
+>
+> On Mon, Nov 25, 2024 at 9:58=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.d=
+e> wrote:
+> >
+> > On 11/07, Marco Crivellari wrote:
+> > >Since commit 8da33fd11c05 ("cifs: avoid deadlocks while updating iface=
+")
+> > >cifs_chan_update_iface now takes the chan_lock itself, so update the
+> > >comment accordingly.
+> > >
+> > >Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+> > >---
+> > > fs/smb/client/sess.c | 5 +----
+> > > 1 file changed, 1 insertion(+), 4 deletions(-)
+> > >
+> > >diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> > >index 3216f786908f..51614a36a100 100644
+> > >--- a/fs/smb/client/sess.c
+> > >+++ b/fs/smb/client/sess.c
+> > >@@ -359,10 +359,7 @@ cifs_disable_secondary_channels(struct cifs_ses *=
+ses)
+> > >       spin_unlock(&ses->chan_lock);
+> > > }
+> > >
+> > >-/*
+> > >- * update the iface for the channel if necessary.
+> > >- * Must be called with chan_lock held.
+> > >- */
+> > >+/* update the iface for the channel if necessary. */
+> > > void
+> > > cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *=
+server)
+> > > {
+> > >--
+> >
+> > Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+> >
+> >
+> > Cheers
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
