@@ -1,165 +1,158 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F141F8F1A
-	for <linux-cifs@vger.kernel.org>; Wed, 27 Nov 2024 17:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75302010E0
+	for <linux-cifs@vger.kernel.org>; Wed, 27 Nov 2024 17:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732727542; cv=none; b=dcXD12mfD8q6yCE4i3qWtsWxli6KjVF+rNu6RNp3jJvvsyteA9taoS30w0vJCaGP/ULi+ZEBuS26w9UqCwv+Bcc38h/FK5DCzHavGcQBUYaXea6LHVuIkRNMO74/aydrOb4/AprWvEmLh6MMDLAXQCRfYPz5ruF5IIWQwERlrBY=
+	t=1732728976; cv=none; b=aut2nBaWeueBhY1r9Ci5tCRPsjmHAyVC58mXlxZEtD9nshdLkhRePzJZVbI6CDv97J71fh8gUdTsMM4r1q2bsUjqdkDdu1QQmw5n7EELoErycu9u2aFhwF2B/nY/gNgDWyvxXNYT09u8FbZDyDvPPD1AccDJNjQrRg+C0/BHvOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732727542; c=relaxed/simple;
-	bh=dn1peMP/zWb6BG2Mcwg2Cev6BMwSA8iW1rSGVAMMNPU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uMVvyW9dNqngiH+vMc/1dY68NgGxQekdBSJGWmZKiV/GtpxI8YseHZsbX2GgePPvy8b8S8r/kLEt0pyQ/nVFtI7kH1RD4lkwKLgL3VVxudLmXOpNy4CCXCwtrVm5/8RAw9XBqJUQki4wkKdiLSgWm1WwzbLDktvJR/mNUktHgus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeeF3sYl; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732728976; c=relaxed/simple;
+	bh=QEC+ifYTCxFJwAQGf3UjeRIuYXtie0gIEs7HeuWHmrI=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=S+ZMTBTPgFTTsAROlFQwIIb8w71uAsVIAZRf9TmOuF9v8HomkGa30ls/1nNGHdYRrPrngyYeVVocfjOR3pKojFmX2a3WBEhzhNGSK+yfUp4dN92mh7GzEyri5dOsDmJCNAQHh1S8IeOVjvaGoN81XjHJJwSCm1w5XtCV0ty+e+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=XmaWx+Bh; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeeF3sYl"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53dd57589c8so1117370e87.1
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Nov 2024 09:12:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732727539; x=1733332339; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0vvCKpmcEvqvIZh4e0NIcovBLoe8p98fysY7W937IDE=;
-        b=WeeF3sYlyQDipYfXRaRCdkJ9C3sMCsC65MmtV4NniGg7xaKAsVGKQTPduyWc6M32WM
-         ZDibQM76hF7Iwg0lKOKOG2TYDgCh8WWNjiALKAgI69Kf3pFSQrhCugM2Ei16C7A6pCAb
-         AEzN2Im+9kF/hjLXWDaq5oL+iMuMg6wWZwr6eoQ0REhmIExnXqGqF8zAmKrxJqmnSEDI
-         E7inVTSEpM5sD7Tu/QWl3+/JQJ1zFHlCDWnoNwJYxnXbVe6kqd18VhB0Cw8EUkZUI2XC
-         8eWDxbUrJNnMNBKZq39R6Ll8Fk5m8iRtHjaB0UXP1xdcj5vBs5ndw/LLpkFHPSWl+Goj
-         /Emg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732727539; x=1733332339;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0vvCKpmcEvqvIZh4e0NIcovBLoe8p98fysY7W937IDE=;
-        b=T74rlQ6Jbyqel+2NBwBAvlUpESsI+A+yJlwvIHoRmSCNT0JqsZaKdiQj6iEhjTJsSH
-         xK0T0Q2+CMTCjpMepzTahRot+2UXuyqLzsXZVyA7Lc9rYDtBB6tesK4EXgIU2bWlKQRO
-         tPIGrDiUtkOcSD94qrMV9a1sd1yzC8ScV3gLZOUIxN8bpBmThB750D3mTbLpTPvxBKoY
-         5ESrApFa/UrnN/Vc901560VakUU4z2rXbCwv//NM1OzAVvq+1ttISgzLQ4vH1iSyRWSv
-         gVvwYhBmRbJ45UYbQ8vHO+D7TiTeuqUXxzWVOWAcOBCAjoqX4i49exzSb6h7bjF+30XJ
-         +how==
-X-Forwarded-Encrypted: i=1; AJvYcCXjB5RcYXBjnM2M+sTHxBqn10v8PhpyFjUovpICqSFZ0y0mrLrt0fEc25gaWm+K0RQHoXOtXqIRFo7w@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkB7o5Bae6XHiM+2hbGMrSfYxU0UKHpi7TyoLl5V2UlkOT2Hpd
-	T23rbLgezWVNkplFUnYeMmclyYd0h0UWgSdevxGF0Re+A7sUBj2rqOJKHOExOi2tBrBnSM9j7jp
-	6HAYuLx0Jtv7DMRMOEU6sioJs9mo=
-X-Gm-Gg: ASbGncuTPeoKVEsUoM4VSXa4N99eg8M6dRNhMQHsYD9PSwJVo7DkffvIjOKeMDsvZxQ
-	fwTYa7QRMehda3Kte4ZZt1yRYzECJLUBRwiL7go2GrTI9/1LAW56mw91v1JlpfTfmYQ==
-X-Google-Smtp-Source: AGHT+IGFkIDpNUJuZvXB6abdVwE+V2+Nh2CYY1ppw7XFMnTvHy2UR15wCQMfhP1x6mG9inLHwVLTFOU00PnyemDQVC8=
-X-Received: by 2002:a05:6512:1387:b0:53d:e8ed:2b08 with SMTP id
- 2adb3069b0e04-53df507805amr58757e87.20.1732727538632; Wed, 27 Nov 2024
- 09:12:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XmaWx+Bh"
+Message-ID: <000336dd52367993e8e4c4533e6e80b3@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1732728966;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tLvTlm0SPKY/pOOcLHCB88WzsDjeIXlo2Uc1RDQqD+k=;
+	b=XmaWx+BhRDYnRmnNkxIV4fJxwSCEZPzP7XmU+jmwiEJFLSnkVmA4FbNyCyd71ucNnHdevx
+	wIigAOCStGfk6jcWSZx70tjTFx2uPXKlWngfhgjUJF/yjEgmlRajwFg6HH49Owc2jDXLPh
+	DPYiEZTTyJBTiBSYoXJ/vtU2Um8xPjmS/q9B5YeZT55OOkhEDsxJ0TNQ37Q+Z4253D8d1O
+	pUHVnQdqB+Aws/dUC1+Iy3vyWRW7ExDCn0auRd5cbaBryUokvF7C4y4zJpOCzwzwQBpWk4
+	BUgD1ptrnifstq1jDUja/N0f1JQX2qHLy/4b4vNf8dG7a7msVtILJP+UBNtODQ==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Paul Aurich <paul@darkrain42.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, Ronnie
+ Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+ <bharathsm@microsoft.com>
+Subject: Re: [PATCH v2 4/4] smb: During unmount, ensure all cached dir
+ instances drop their dentry
+In-Reply-To: <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
+References: <20241118215028.1066662-1-paul@darkrain42.org>
+ <20241118215028.1066662-5-paul@darkrain42.org>
+ <2a818d91e9f3c392b2739a4c2a018085@manguebit.com>
+ <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
+Date: Wed, 27 Nov 2024 14:36:03 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118215028.1066662-1-paul@darkrain42.org> <20241118215028.1066662-5-paul@darkrain42.org>
- <2a818d91e9f3c392b2739a4c2a018085@manguebit.com> <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
- <Z0Y_o2nH16BynCO5@haley.home.arpa> <CAH2r5ms8TmNZ+7DCY8RzUoL+v4Yhnu7BVh--H+PoYrdFDji5+g@mail.gmail.com>
- <l6dfqnk6w5lq55e57uosgntpdtyr7gxpv5kshjanpbvons7y6c@mh77z33tl63n>
-In-Reply-To: <l6dfqnk6w5lq55e57uosgntpdtyr7gxpv5kshjanpbvons7y6c@mh77z33tl63n>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 27 Nov 2024 11:12:07 -0600
-Message-ID: <CAH2r5mtNmSFSgDBBVtfGuXQvDdFFF8FLrivS1zLZHQCJ=vvf+g@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] smb: During unmount, ensure all cached dir
- instances drop their dentry
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org, 
-	Steve French <sfrench@samba.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Nov 27, 2024 at 11:07=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de=
-> wrote:
->
-> On 11/27, Steve French wrote:
-> >I did see the generic/241 failure again with current for-next
-> >(unrelated to this patch though).  Will try to repro it again - but
-> >any ideas how to narrow it down or fix it would be helpful.
->
-> We're seeing this too when backporting that patch series to SLE15-SP6,
-> by only running generic/072, so I don't think it's unrelated.
->
-> We also hit, also with generic/072, but only once, the WARN() in
-> cached_dir_offload_close() (introduced in this same patch):
->
->      [  526.946722] WARNING: CPU: 2 PID: 23778 at fs/smb/client/cached_di=
-r.c:555 cached_dir_offload_close+0x90/0xa0 [cifs]
->      [  526.948561] Modules linked in: cifs cifs_arc4 cifs_md4
->      [  526.949385] CPU: 2 PID: 23778 Comm: kworker/2:1 Kdump: loaded Not=
- tainted 6.4.0-lku #91 SLE15-SP6 (unreleased)
->      [  526.949394] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), B=
-IOS rel-1.16.3-2-gc13ff2cd-prebuilt.qemu.org 04/01/2014
->      [  526.949398] Workqueue: serverclose cached_dir_offload_close [cifs=
-]
->      [  526.951938] RIP: 0010:cached_dir_offload_close+0x90/0xa0 [cifs]
->      [  526.953827] Code: e8 a5 fb ff ff 4c 89 e7 5b 5d 41 5c e9 99 57 fc=
- ff 48 89 ef be 03 00 00 00 e8 5c d4 c5 c9 4c 89 e7 5b 5d 41 5c e9 80 57 fc=
- ff <0f> 0b eb 99 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
->      [  526.953836] RSP: 0018:ffff888108b7fdd8 EFLAGS: 00010202
->      [  526.953844] RAX: 0000000000000000 RBX: ffff888100de68d0 RCX: ffff=
-ffffc042e7d4
->      [  526.953849] RDX: 1ffff110201bcd04 RSI: 0000000000000008 RDI: ffff=
-888100de6820
->      [  526.953854] RBP: ffff8881063d8a00 R08: 0000000000000001 R09: ffff=
-ed10201bcd1a
->      [  526.953858] R10: ffff888100de68d7 R11: 0000000000000000 R12: ffff=
-888100a2b000
->      [  526.953862] R13: 0000000000000080 R14: ffff88814f336ea8 R15: ffff=
-888100de68d8
->      [  526.953872] FS:  0000000000000000(0000) GS:ffff88814f300000(0000)=
- knlGS:0000000000000000
->      [  526.965888] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->      [  526.965897] CR2: 00007f841e6ea698 CR3: 0000000106c68000 CR4: 0000=
-000000750ee0
->      [  526.965904] PKRU: 55555554
->      [  526.965908] Call Trace:
->      [  526.965912]  <TASK>
->      [  526.965917]  ? __warn+0x92/0xf0
->      [  526.965932]  ? cached_dir_offload_close+0x90/0xa0 [cifs]
->      [  526.972634]  ? report_bug+0x163/0x190
->      [  526.972652]  ? handle_bug+0x3a/0x70
->      [  526.972665]  ? exc_invalid_op+0x17/0x40
->      [  526.972674]  ? asm_exc_invalid_op+0x1a/0x20
->      [  526.972688]  ? cached_dir_offload_close+0x24/0xa0 [cifs]
->      [  526.977239]  ? cached_dir_offload_close+0x90/0xa0 [cifs]
->      [  526.978831]  ? cached_dir_offload_close+0x24/0xa0 [cifs]
->      [  526.979133]  process_one_work+0x42c/0x730
->      [  526.979176]  worker_thread+0x8e/0x700
->      [  526.979190]  ? __pfx_worker_thread+0x10/0x10
->      [  526.979200]  kthread+0x197/0x1d0
->      [  526.979208]  ? kthread+0xeb/0x1d0
->      [  526.979216]  ? __pfx_kthread+0x10/0x10
->      [  526.979225]  ret_from_fork+0x29/0x50
->      [  526.979237]  </TASK>
->      [  526.979241] ---[ end trace 0000000000000000 ]---
->
-> Will update here if we find a fix/root cause.
->
->
-> Cheers,
->
-> Enzo
+Paul Aurich <paul@darkrain42.org> writes:
 
-Presumably it is related to the dir lease series but one of the
-earlier ones not the most recent one, since we saw it running before -
-but without the patch series we saw the unmount crash when racing with
-freeing cached dentries so would be helpful to narrow the bug down so
-we can fix the original problem that has been around for quite a while
-now - especially important now that more servers will be enabling
-directory leases (e.g. Samba can now be tested against)
+> On 2024-11-21 23:05:51 -0300, Paulo Alcantara wrote:
+>>
+>>Why does it need to be a global workqueue?  Can't you make it per tcon?
+>
+> The problem with a per-tcon workqueue is I didn't see clean way to deal with 
+> multiuser mounts and flushing the workqueue in close_all_cached_dirs() -- when 
+> dealing with each individual tcon, we're still holding tlink_tree_lock, so an 
+> arbitrary sleep seems problematic.
 
+OK.
 
+> There could be a per-sb workqueue (stored in cifs_sb or the master tcon) but 
+> is there a way to get back to the superblock / master tcon with just a tcon 
+> (e.g. cached_dir_lease_break, when processing a lease break)?
 
+Yes - cifs_get_dfs_tcon_super() does that.
 
---=20
-Thanks,
+>>> The final cleanup work for cleaning up a cfid is performed via work
+>>> queued in the serverclose_wq workqueue; this is done separate from
+>>> dropping the dentries so that close_all_cached_dirs() doesn't block on
+>>> any server operations.
+>>>
+>>> Both of these queued works expect to invoked with a cfid reference and
+>>> a tcon reference to avoid those objects from being freed while the work
+>>> is ongoing.
+>>
+>>Why do you need to take a tcon reference?
+>
+> In the existing code (and my patch, without the refs), I was seeing an 
+> intermittent use-after-free of the tcon or cached_fids struct by queued work 
+> processing a lease break -- the cfid isn't linked from cached_fids, but 
+> smb2_close_cached_fid invoking SMB2_close can race with the unmount and 
+> cifs_put_tcon
+>
+> Something like:
+>
+>      t1                              t2
+> cached_dir_lease_break
+> smb2_cached_lease_break
+> smb2_close_cached_fid
+> SMB2_close starts
+>                                      cifs_kill_sb
+>                                      cifs_umount
+>                                      cifs_put_link
+>                                      cifs_put_tcon
+> SMB2_close continues
 
-Steve
+Makes sense.
+
+> I had a version of the patch that kept the 'in flight lease breaks' on 
+> a second list in cached_fids so that they could be cancelled synchronously 
+> from free_cached_fids(), but I struggled with it (I can't remember exactly, 
+> but I think I was struggling to get the linked list membership / removal 
+> handling and num_entries handling consistent).
+
+No worries.  The damn thing isn't trivial to follow.
+
+>> Can't you drop the dentries
+>>when tearing down tcon in cifs_put_tcon()?  No concurrent mounts would
+>>be able to access or free it.
+>
+> The dentries being dropped must occur before kill_anon_super(), as that's 
+> where the 'Dentry still in use' check is. All the tcons are put in 
+> cifs_umount(), which occurs after:
+>
+>      kill_anon_super(sb);
+>      cifs_umount(cifs_sb);
+
+Right.  Can't we call cancel_work_sync() to make sure that any leases
+breakes are processed on the cached directory handle before calling the
+above?
+
+> The other thing is that cifs_umount_begin() has this comment, which made me 
+> think a tcon can actually be tied to two distinct mount points:
+>
+>          if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
+>                  /* we have other mounts to same share or we have
+>                     already tried to umount this and woken up
+>                     all waiting network requests, nothing to do */
+>
+> Although, as I'm thinking about it again, I think I've misunderstood (and that 
+> comment is wrong?).
+
+Comment is correct as a single tcon may be shared among different
+mounts.
+
+Consider the following where a single tcon is shared:
+
+mount.cifs //srv/share /mnt/1 -o $opts
+mount.cifs //srv/share/dir /mnt/2 -o $opts
+
+There will be two different superblocks that end up using same tcon.
+
+> It did cross my mind to pull some of the work out of cifs_umount into 
+> cifs_kill_sb (specifically, I wanted to cancel prune_tlinks earlier) -- no 
+> prune_tlinks would make it more feasible to drop tlink_tree_lock in 
+> close_all_cached_dirs(), at which point a per-tcon workqueue is more 
+> practical.
+
+Yeah, multiuser tcons just make it even more complicated.
+
+Sorry for the delay as I've been quite busy with other stuff.
+
+Great work, BTW.
