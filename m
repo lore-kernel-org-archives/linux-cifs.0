@@ -1,158 +1,438 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75302010E0
-	for <linux-cifs@vger.kernel.org>; Wed, 27 Nov 2024 17:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E908082D66
+	for <linux-cifs@vger.kernel.org>; Wed, 27 Nov 2024 19:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732728976; cv=none; b=aut2nBaWeueBhY1r9Ci5tCRPsjmHAyVC58mXlxZEtD9nshdLkhRePzJZVbI6CDv97J71fh8gUdTsMM4r1q2bsUjqdkDdu1QQmw5n7EELoErycu9u2aFhwF2B/nY/gNgDWyvxXNYT09u8FbZDyDvPPD1AccDJNjQrRg+C0/BHvOg=
+	t=1732737315; cv=none; b=WcaMZebqO5KSltvnxZn3+p0+EFScuMuhlMwIpzm0Idut6iTK34YhQwSV+o30qCVR8Onio1Pk3eIJgI7LfjpVtmqAlmxcDD6Wi3E18EUveejc3v8cozF+kx2FvcEA/FMIJx6MxCv37HCUgn4YytMv00uaZbQo7adNfxU+Ns4zHOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732728976; c=relaxed/simple;
-	bh=QEC+ifYTCxFJwAQGf3UjeRIuYXtie0gIEs7HeuWHmrI=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=S+ZMTBTPgFTTsAROlFQwIIb8w71uAsVIAZRf9TmOuF9v8HomkGa30ls/1nNGHdYRrPrngyYeVVocfjOR3pKojFmX2a3WBEhzhNGSK+yfUp4dN92mh7GzEyri5dOsDmJCNAQHh1S8IeOVjvaGoN81XjHJJwSCm1w5XtCV0ty+e+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=XmaWx+Bh; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1732737315; c=relaxed/simple;
+	bh=giioSpX4je54ZJICQDgx1rtZxaCTX1QWOSk3x11ptNw=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=lVwiaPMYh+fTujCLUOmvT9xF8Ns+qeODbIZk1XPsaX1sf7WEwkMFRhd3ihpR6KrULy4Z+anXzduyrBBNbZYzmFMR0HGjZbUYcYtO5Up71lQhlflOLWWsIOm0t/Tq7dXhFQpenECtST4DJK1uqIcOzy1zyqtVYXalhhvKFp9KzSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=XyheVdNb; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XmaWx+Bh"
-Message-ID: <000336dd52367993e8e4c4533e6e80b3@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1732728966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tLvTlm0SPKY/pOOcLHCB88WzsDjeIXlo2Uc1RDQqD+k=;
-	b=XmaWx+BhRDYnRmnNkxIV4fJxwSCEZPzP7XmU+jmwiEJFLSnkVmA4FbNyCyd71ucNnHdevx
-	wIigAOCStGfk6jcWSZx70tjTFx2uPXKlWngfhgjUJF/yjEgmlRajwFg6HH49Owc2jDXLPh
-	DPYiEZTTyJBTiBSYoXJ/vtU2Um8xPjmS/q9B5YeZT55OOkhEDsxJ0TNQ37Q+Z4253D8d1O
-	pUHVnQdqB+Aws/dUC1+Iy3vyWRW7ExDCn0auRd5cbaBryUokvF7C4y4zJpOCzwzwQBpWk4
-	BUgD1ptrnifstq1jDUja/N0f1JQX2qHLy/4b4vNf8dG7a7msVtILJP+UBNtODQ==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Paul Aurich <paul@darkrain42.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, Ronnie
- Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
- <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>
-Subject: Re: [PATCH v2 4/4] smb: During unmount, ensure all cached dir
- instances drop their dentry
-In-Reply-To: <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
-References: <20241118215028.1066662-1-paul@darkrain42.org>
- <20241118215028.1066662-5-paul@darkrain42.org>
- <2a818d91e9f3c392b2739a4c2a018085@manguebit.com>
- <Z0FL4kIUiCMFDVfe@vaarsuvius.home.arpa>
-Date: Wed, 27 Nov 2024 14:36:03 -0300
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="XyheVdNb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=giioSpX4je54ZJICQDgx1rtZxaCTX1QWOSk3x11ptNw=; b=XyheVdNbXGvgBDcVl8M6ya4eqP
+	I44kqZZuo9taC+lgTJqHjHzzJuBhRNp8Yc4hgX0Qz7yinCCp/nWm7TfprfGWuJVf9aZ0AiOlZIhWz
+	2Z4rgDzsKRQ+LhxfWOa3FKLszgi8RHvUoB8DHNt64izGIuSgYv9j6ceec//Gi50hTmX/vOzQTybXU
+	PNElIUdymDv5z07hNg9QLDPK4nGuG21yyx2N/NuKSIbK4lc8eJf3otYYNF7pNkWPxaJRF10MGy8QR
+	/+KiP0UyYkzlP/hlw02sZtGEWrW5kNt9OayP9dqt3cNMNINtqKlnJXs1+Uo5mxAq2pHyvWaKx5Z9b
+	8DEXMfB2zP982XJXB8hM1IemN+L2QpvpQjZvq1MtNILWvWL1P+IYtPGKNVWuZ/06ueX0tfOW/BiZN
+	YAH1kV1gQnA+NIruRNrP5NczmVr7s1btAidwYJ3gp7ZIwkXLsZVJo4zTuum966dhuyWNYbm1r2Ra3
+	PKy7eEE0DCzCO3ceduZG3CeE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tGNdK-001l6D-2G;
+	Wed, 27 Nov 2024 19:23:30 +0000
+Message-ID: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
+Date: Wed, 27 Nov 2024 20:23:29 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+To: Steven French <Steven.French@microsoft.com>,
+ Paulo Alcantara <pc@manguebit.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Special files broken against Samba master
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------R3Q03bOKSfZ3hX2OF8O8Tyd7"
 
-Paul Aurich <paul@darkrain42.org> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------R3Q03bOKSfZ3hX2OF8O8Tyd7
+Content-Type: multipart/mixed; boundary="------------61Rx7FZH7Xxqj1WSStWKBXXF";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Steven French <Steven.French@microsoft.com>,
+ Paulo Alcantara <pc@manguebit.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Message-ID: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
+Subject: Special files broken against Samba master
 
-> On 2024-11-21 23:05:51 -0300, Paulo Alcantara wrote:
->>
->>Why does it need to be a global workqueue?  Can't you make it per tcon?
->
-> The problem with a per-tcon workqueue is I didn't see clean way to deal with 
-> multiuser mounts and flushing the workqueue in close_all_cached_dirs() -- when 
-> dealing with each individual tcon, we're still holding tlink_tree_lock, so an 
-> arbitrary sleep seems problematic.
+--------------61Rx7FZH7Xxqj1WSStWKBXXF
+Content-Type: multipart/mixed; boundary="------------ULcQw558TFOZzSKpPQEOOq0C"
 
-OK.
+--------------ULcQw558TFOZzSKpPQEOOq0C
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> There could be a per-sb workqueue (stored in cifs_sb or the master tcon) but 
-> is there a way to get back to the superblock / master tcon with just a tcon 
-> (e.g. cached_dir_lease_break, when processing a lease break)?
+SGkhDQoNCkFnYWluc3QgU2FtYmEgbWFzdGVyIHNwZWNpYWwgZmlsZXMgYXJlIGJyb2tlbiB3
+aXRoIHBvc2l4IGV4dGVuc2lvbnMuDQoNCk9uIHRoZSBTYW1iYSBzZXJ2ZXI6DQoNCnJvb3RA
+c21iMy1wb3NpeDovaG9tZS9zYW1iYSMgbHMgLWxpIC9zcnYvc2FtYmEvdGVzdC9wb3NpeC8N
+Cmluc2dlc2FtdCAyMA0KMTMxOTU4IGJydy1yLS1yLS0gIDEgcm9vdCAgcm9vdCAgMCwgMCAx
+NS4gTm92IDEyOjA0IGJsb2NrZGV2DQoxMzE5NjUgY3J3LXItLXItLSAgMSByb290ICByb290
+ICAxLCAxIDE1LiBOb3YgMTI6MDQgY2hhcmRldg0KMTMxOTY2IHBydy1yLS1yLS0gIDEgc2Ft
+YmEgc2FtYmEgICAgMCAxNS4gTm92IDEyOjA1IGZpZg0KMTMxOTUzIC1ydy1yd3hydy0rIDIg
+c2FtYmEgc2FtYmEgICAgNCAxOC4gTm92IDExOjM3IGZpbGUNCjEzMTk1MyAtcnctcnd4cnct
+KyAyIHNhbWJhIHNhbWJhICAgIDQgMTguIE5vdiAxMTozNyBoYXJkbGluaw0KMTMxOTU3IGxy
+d3hyd3hyd3ggIDEgc2FtYmEgc2FtYmEgICAgNCAxNS4gTm92IDEyOjAzIHN5bWxpbmsgLT4g
+ZmlsZQ0KMTMxOTU0IC1yd3hyd3hyLXgrIDEgc2FtYmEgc2FtYmEgICAgMCAxOC4gTm92IDE1
+OjI4IHN5bWxpbmtvdmVyc21iDQoNCiMgbW91bnQuY2lmcyAvLzEyNy4wLjAuMS9wb3NpeCAv
+bW50L3NtYjN1bml4LyAtbyANCnVzZXJuYW1lPXNhbWJhLHBhc3N3b3JkPXgscG9zaXgNCg0K
+IyBscyAtbGkgL21udC9zbWIzdW5peC9wb3NpeC8NCmxzOiBjYW5ub3QgYWNjZXNzICcvbW50
+L3NtYjN1bml4L3Bvc2l4L2Jsb2NrZGV2JzogTm8gZGF0YSBhdmFpbGFibGUNCmxzOiBjYW5u
+b3QgYWNjZXNzICcvbW50L3NtYjN1bml4L3Bvc2l4L2NoYXJkZXYnOiBObyBkYXRhIGF2YWls
+YWJsZQ0KbHM6IGNhbm5vdCBhY2Nlc3MgJy9tbnQvc21iM3VuaXgvcG9zaXgvc3ltbGlua292
+ZXJzbWInOiBObyBkYXRhIGF2YWlsYWJsZQ0KbHM6IGNhbm5vdCBhY2Nlc3MgJy9tbnQvc21i
+M3VuaXgvcG9zaXgvZmlmbyc6IE5vIGRhdGEgYXZhaWxhYmxlDQpsczogY2Fubm90IGFjY2Vz
+cyAnL21udC9zbWIzdW5peC9wb3NpeC9zeW1saW5rJzogTm8gZGF0YSBhdmFpbGFibGUNCnRv
+dGFsIDE2DQogICAgICA/IC0/Pz8/Pz8/Pz8gPyA/ICAgID8gICAgID8gICAgICAgICAgICA/
+IGJsb2NrZGV2DQogICAgICA/IC0/Pz8/Pz8/Pz8gPyA/ICAgID8gICAgID8gICAgICAgICAg
+ICA/IGNoYXJkZXYNCiAgICAgID8gLT8/Pz8/Pz8/PyA/ID8gICAgPyAgICAgPyAgICAgICAg
+ICAgID8gZmlmbw0KMTMxOTUzIC1ydy1yd3hydy0gMiByb290IHNhbWJhIDQgTm92IDE4IDEx
+OjM3IGZpbGUNCjEzMTk1MyAtcnctcnd4cnctIDIgcm9vdCBzYW1iYSA0IE5vdiAxOCAxMToz
+NyBoYXJkbGluaw0KICAgICAgPyAtPz8/Pz8/Pz8/ID8gPyAgICA/ICAgICA/ICAgICAgICAg
+ICAgPyBzeW1saW5rDQogICAgICA/IC0/Pz8/Pz8/Pz8gPyA/ICAgID8gICAgID8gICAgICAg
+ICAgICA/IHN5bWxpbmtvdmVyc21iDQoNCkkgaGF2ZSB0d28gV0lQIHBhdGNoZXMgdGhhdCBm
+aXggdGhpcyBhcyBhIHNpZGUgZWZmZWN0IG9mIGFkZGluZyBzdXBwb3J0IA0KdG8gdXNpbmcg
+dGhlIG5ldyBQT1NJWCB0eXBlIGFzIGRpc2N1c3NlZCBhdCBTREMsIHBhdGNoZXMgYXR0YWNo
+ZWQ6DQoNCnJvb3RAc21iMy1wb3NpeDovaG9tZS9zYW1iYSMgbHMgLWxpIC9tbnQvc21iM3Vu
+aXgvcG9zaXgvDQppbnNnZXNhbXQgMjENCjEzMTk1OCBicnctci0tci0tIDEgcm9vdCByb290
+ICAwLCAwIDE1LiBOb3YgMTI6MDQgYmxvY2tkZXYNCjEzMTk2NSBjcnctci0tci0tIDEgcm9v
+dCByb290ICAxLCAxIDE1LiBOb3YgMTI6MDQgY2hhcmRldg0KMTMxOTY2IHBydy1yLS1yLS0g
+MSByb290IHNhbWJhICAgIDAgMTUuIE5vdiAxMjowNSBmaWZvDQoxMzE5NTMgLXJ3LXJ3eHJ3
+LSAyIHJvb3Qgc2FtYmEgICAgNCAxOC4gTm92IDExOjM3IGZpbGUNCjEzMTk1MyAtcnctcnd4
+cnctIDIgcm9vdCBzYW1iYSAgICA0IDE4LiBOb3YgMTE6MzcgaGFyZGxpbmsNCjEzMTk1NyBs
+cnd4cnd4cnd4IDEgcm9vdCBzYW1iYSAgICA0IDE1LiBOb3YgMTI6MDMgc3ltbGluayAtPiBm
+aWxlDQoxMzE5NTQgbHJ3eHJ3eHIteCAxIHJvb3Qgc2FtYmEgICAyMyAxOC4gTm92IDE1OjI4
+IHN5bWxpbmtvdmVyc21iIC0+IA0KbW50L3NtYjN1bml4L3Bvc2l4L2ZpbGUNCg0KSSdtIGFs
+c28gb3B0aW1pemluZyBhd2F5IHVubmVlZGVkIHJlcGFyc2UgcG9pbnQgcXVlcmllcyANCihj
+cmVhdGUrZnNjdGwrY2xvc2UpIGZvciBuZnMgcmVwYXJzZSBwb2ludHMgd2hlcmUgd2Ugb25s
+eSBuZWVkIHRoZSBmaWxlIA0KdHlwZSB3aGljaCB3ZSBub3cgZ2V0IGFuZCB1c2UgdmlhIHRo
+ZSBzbWIzIHBvc2l4IHR5cGUuDQoNCkknbSBzdXJlIEknbSBkb2luZyB0aGluZ3Mgd3Jvbmcu
+IENhbiB5b3UgaGVscCBtZSBnZXR0aW5nIHRoaXMgYWNyb3NzIHRoZSANCmxpbmU/DQoNCi1z
+bG93DQoNClsxXSANCjxodHRwczovL3d3dy5zYW1iYS5vcmcvfnNsb3cvU01CM19QT1NJWC9m
+c2NjX3Bvc2l4X2V4dGVuc2lvbnMuaHRtbCNwb3NpeC1maWxlLXR5cGUtZGVmaW5pdGlvbj4N
+Cg==
+--------------ULcQw558TFOZzSKpPQEOOq0C
+Content-Type: text/x-patch; charset=UTF-8; name="posix-type.patch"
+Content-Disposition: attachment; filename="posix-type.patch"
+Content-Transfer-Encoding: base64
 
-Yes - cifs_get_dfs_tcon_super() does that.
+RnJvbSBhNTdjMzJkYTg3NGYyODVhZjI2NmI3ZmJiYWVmYjc5NDA5OTFkMDQ5IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBSYWxwaCBCb2VobWUgPHNsb3dAc2FtYmEub3JnPgpE
+YXRlOiBGcmksIDE1IE5vdiAyMDI0IDEzOjE1OjUwICswMTAwClN1YmplY3Q6IFtQQVRDSCAx
+LzNdIGZzL3NtYi9jbGllbnQ6IGF2b2lkIHF1ZXJ5aW5nIFNNQjJfT1BfUVVFUllfV1NMX0VB
+IGZvcgogU01CMyBQT1NJWAoKLS0tCiBmcy9zbWIvY2xpZW50L3NtYjJpbm9kZS5jIHwgMyAr
+Ky0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRp
+ZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L3NtYjJpbm9kZS5jIGIvZnMvc21iL2NsaWVudC9z
+bWIyaW5vZGUuYwppbmRleCBlNDlkMGMyNWViMDMuLmFiMDY5ZDUyODVjNSAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NsaWVudC9zbWIyaW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50L3NtYjJp
+bm9kZS5jCkBAIC05NDEsNyArOTQxLDggQEAgaW50IHNtYjJfcXVlcnlfcGF0aF9pbmZvKGNv
+bnN0IHVuc2lnbmVkIGludCB4aWQsCiAJCWlmIChyYyB8fCAhZGF0YS0+cmVwYXJzZV9wb2lu
+dCkKIAkJCWdvdG8gb3V0OwogCi0JCWNtZHNbbnVtX2NtZHMrK10gPSBTTUIyX09QX1FVRVJZ
+X1dTTF9FQTsKKwkJaWYgKCF0Y29uLT5wb3NpeF9leHRlbnNpb25zKQorCQkJY21kc1tudW1f
+Y21kcysrXSA9IFNNQjJfT1BfUVVFUllfV1NMX0VBOwogCQkvKgogCQkgKiBTa2lwIFNNQjJf
+T1BfR0VUX1JFUEFSU0UgaWYgc3ltbGluayBhbHJlYWR5IHBhcnNlZCBpbiBjcmVhdGUKIAkJ
+ICogcmVzcG9uc2UuCi0tIAoyLjQ3LjAKCgpGcm9tIGFmZDJkY2U4NGIxYWU5NzBiMmVjNDQy
+MTk0ODE5NDc0NmY1NDJjZjYgTW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCkZyb206IFJhbHBo
+IEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+CkRhdGU6IEZyaSwgMTUgTm92IDIwMjQgMTk6MjE6
+MDQgKzAxMDAKU3ViamVjdDogW1BBVENIIDIvM10gZnMvc21iL2NsaWVudDogSW1wbGVtZW50
+IG5ldyBTTUIzIFBPU0lYIHR5cGUKCkZpeGVzIHNwZWNpYWwgZmlsZXMgYWdhaW5zdCBjdXJy
+ZW50IFNhbWJhLgoKT24gdGhlIFNhbWJhIHNlcnZlcjoKCmluc2dlc2FtdCAyMAoxMzE5NTgg
+YnJ3LXItLXItLSAgMSByb290ICByb290ICAwLCAwIDE1LiBOb3YgMTI6MDQgYmxvY2tkZXYK
+MTMxOTY1IGNydy1yLS1yLS0gIDEgcm9vdCAgcm9vdCAgMSwgMSAxNS4gTm92IDEyOjA0IGNo
+YXJkZXYKMTMxOTY2IHBydy1yLS1yLS0gIDEgc2FtYmEgc2FtYmEgICAgMCAxNS4gTm92IDEy
+OjA1IGZpZm8KMTMxOTUzIC1ydy1yd3hydy0rIDIgc2FtYmEgc2FtYmEgICAgNCAxOC4gTm92
+IDExOjM3IGZpbGUKMTMxOTUzIC1ydy1yd3hydy0rIDIgc2FtYmEgc2FtYmEgICAgNCAxOC4g
+Tm92IDExOjM3IGhhcmRsaW5rCjEzMTk1NyBscnd4cnd4cnd4ICAxIHNhbWJhIHNhbWJhICAg
+IDQgMTUuIE5vdiAxMjowMyBzeW1saW5rIC0+IGZpbGUKMTMxOTU0IC1yd3hyd3hyLXgrIDEg
+c2FtYmEgc2FtYmEgICAgMCAxOC4gTm92IDE1OjI4IHN5bWxpbmtvdmVyc21iCgpCZWZvcmU6
+CgpsczogY2Fubm90IGFjY2VzcyAnL21udC9zbWIzdW5peC9wb3NpeC9ibG9ja2Rldic6IE5v
+IGRhdGEgYXZhaWxhYmxlCmxzOiBjYW5ub3QgYWNjZXNzICcvbW50L3NtYjN1bml4L3Bvc2l4
+L2NoYXJkZXYnOiBObyBkYXRhIGF2YWlsYWJsZQpsczogY2Fubm90IGFjY2VzcyAnL21udC9z
+bWIzdW5peC9wb3NpeC9zeW1saW5rb3ZlcnNtYic6IE5vIGRhdGEgYXZhaWxhYmxlCmxzOiBj
+YW5ub3QgYWNjZXNzICcvbW50L3NtYjN1bml4L3Bvc2l4L2ZpZm8nOiBObyBkYXRhIGF2YWls
+YWJsZQpsczogY2Fubm90IGFjY2VzcyAnL21udC9zbWIzdW5peC9wb3NpeC9zeW1saW5rJzog
+Tm8gZGF0YSBhdmFpbGFibGUKdG90YWwgMTYKICAgICA/IC0/Pz8/Pz8/Pz8gPyA/ICAgID8g
+ICAgID8gICAgICAgICAgICA/IGJsb2NrZGV2CiAgICAgPyAtPz8/Pz8/Pz8/ID8gPyAgICA/
+ICAgICA/ICAgICAgICAgICAgPyBjaGFyZGV2CiAgICAgPyAtPz8/Pz8/Pz8/ID8gPyAgICA/
+ICAgICA/ICAgICAgICAgICAgPyBmaWZvCjEzMTk1MyAtcnctcnd4cnctIDIgcm9vdCBzYW1i
+YSA0IE5vdiAxOCAxMTozNyBmaWxlCjEzMTk1MyAtcnctcnd4cnctIDIgcm9vdCBzYW1iYSA0
+IE5vdiAxOCAxMTozNyBoYXJkbGluawogICAgID8gLT8/Pz8/Pz8/PyA/ID8gICAgPyAgICAg
+PyAgICAgICAgICAgID8gc3ltbGluawogICAgID8gLT8/Pz8/Pz8/PyA/ID8gICAgPyAgICAg
+PyAgICAgICAgICAgID8gc3ltbGlua292ZXJzbWIKCkFmdGVyOgoKaW5zZ2VzYW10IDIxCjEz
+MTk1OCBicnctci0tci0tIDEgcm9vdCByb290ICAwLCAwIDE1LiBOb3YgMTI6MDQgYmxvY2tk
+ZXYKMTMxOTY1IGNydy1yLS1yLS0gMSByb290IHJvb3QgIDEsIDEgMTUuIE5vdiAxMjowNCBj
+aGFyZGV2CjEzMTk2NiBwcnctci0tci0tIDEgcm9vdCBzYW1iYSAgICAwIDE1LiBOb3YgMTI6
+MDUgZmlmbwoxMzE5NTMgLXJ3LXJ3eHJ3LSAyIHJvb3Qgc2FtYmEgICAgNCAxOC4gTm92IDEx
+OjM3IGZpbGUKMTMxOTUzIC1ydy1yd3hydy0gMiByb290IHNhbWJhICAgIDQgMTguIE5vdiAx
+MTozNyBoYXJkbGluawoxMzE5NTcgbHJ3eHJ3eHJ3eCAxIHJvb3Qgc2FtYmEgICAgNCAxNS4g
+Tm92IDEyOjAzIHN5bWxpbmsgLT4gZmlsZQoxMzE5NTQgbHJ3eHJ3eHIteCAxIHJvb3Qgc2Ft
+YmEgICAyMyAxOC4gTm92IDE1OjI4IHN5bWxpbmtvdmVyc21iIC0+IG1udC9zbWIzdW5peC9w
+b3NpeC9maWxlCi0tLQogZnMvc21iL2NsaWVudC9jaWZzcHJvdG8uaCB8ICAxICsKIGZzL3Nt
+Yi9jbGllbnQvaW5vZGUuYyAgICAgfCA4OSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKy0tLS0KIGZzL3NtYi9jbGllbnQvcmVhZGRpci5jICAgfCAzNSArKysrKysrLS0t
+LS0tLS0KIGZzL3NtYi9jbGllbnQvcmVwYXJzZS5jICAgfCA4NCArKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tLS0KIDQgZmlsZXMgY2hhbmdlZCwgMTQ5IGluc2VydGlvbnMo
+KyksIDYwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc3By
+b3RvLmggYi9mcy9zbWIvY2xpZW50L2NpZnNwcm90by5oCmluZGV4IGQzMTJlYTk3NzZjZS4u
+MjBlZTdmZWI5YzQ5IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2NpZnNwcm90by5oCisr
+KyBiL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKQEAgLTY3Niw2ICs2NzYsNyBAQCBpbnQg
+X19jaWZzX3NmdV9tYWtlX25vZGUodW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlub2RlICpp
+bm9kZSwKIGludCBjaWZzX3NmdV9tYWtlX25vZGUodW5zaWduZWQgaW50IHhpZCwgc3RydWN0
+IGlub2RlICppbm9kZSwKIAkJICAgICAgIHN0cnVjdCBkZW50cnkgKmRlbnRyeSwgc3RydWN0
+IGNpZnNfdGNvbiAqdGNvbiwKIAkJICAgICAgIGNvbnN0IGNoYXIgKmZ1bGxfcGF0aCwgdW1v
+ZGVfdCBtb2RlLCBkZXZfdCBkZXYpOwordW1vZGVfdCB3aXJlX21vZGVfdG9fcG9zaXgodTMy
+IHdpcmUpOwogCiAjaWZkZWYgQ09ORklHX0NJRlNfREZTX1VQQ0FMTAogc3RhdGljIGlubGlu
+ZSBpbnQgZ2V0X2Rmc19wYXRoKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZz
+X3NlcyAqc2VzLApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9pbm9kZS5jIGIvZnMvc21i
+L2NsaWVudC9pbm9kZS5jCmluZGV4IDcyZWJkNzJkZDAyYi4uMGRjZjllMzYzNWZmIDEwMDY0
+NAotLS0gYS9mcy9zbWIvY2xpZW50L2lub2RlLmMKKysrIGIvZnMvc21iL2NsaWVudC9pbm9k
+ZS5jCkBAIC03MjQsNiArNzI0LDg0IEBAIHN0YXRpYyBpbnQgY2lmc19zZnVfbW9kZShzdHJ1
+Y3QgY2lmc19mYXR0ciAqZmF0dHIsIGNvbnN0IHVuc2lnbmVkIGNoYXIgKnBhdGgsCiAjZW5k
+aWYKIH0KIAorI2RlZmluZSBQT1NJWF9UWVBFX0ZJTEUgICAgMAorI2RlZmluZSBQT1NJWF9U
+WVBFX0RJUiAgICAgMQorI2RlZmluZSBQT1NJWF9UWVBFX1NZTUxJTksgMgorI2RlZmluZSBQ
+T1NJWF9UWVBFX0NIQVJERVYgMworI2RlZmluZSBQT1NJWF9UWVBFX0JMS0RFViAgNAorI2Rl
+ZmluZSBQT1NJWF9UWVBFX0ZJRk8gICAgNQorI2RlZmluZSBQT1NJWF9UWVBFX1NPQ0tFVCAg
+NgorCisjZGVmaW5lIFBPU0lYX1hfT1RIICAgICAgMDAwMDAwMQorI2RlZmluZSBQT1NJWF9X
+X09USCAgICAgIDAwMDAwMDIKKyNkZWZpbmUgUE9TSVhfUl9PVEggICAgICAwMDAwMDA0Cisj
+ZGVmaW5lIFBPU0lYX1hfR1JQICAgICAgMDAwMDAxMAorI2RlZmluZSBQT1NJWF9XX0dSUCAg
+ICAgIDAwMDAwMjAKKyNkZWZpbmUgUE9TSVhfUl9HUlAgICAgICAwMDAwMDQwCisjZGVmaW5l
+IFBPU0lYX1hfVVNSICAgICAgMDAwMDEwMAorI2RlZmluZSBQT1NJWF9XX1VTUiAgICAgIDAw
+MDAyMDAKKyNkZWZpbmUgUE9TSVhfUl9VU1IgICAgICAwMDAwNDAwCisjZGVmaW5lIFBPU0lY
+X1NUSUNLWSAgICAgMDAwMTAwMAorI2RlZmluZSBQT1NJWF9TRVRfR0lEICAgIDAwMDIwMDAK
+KyNkZWZpbmUgUE9TSVhfU0VUX1VJRCAgICAwMDA0MDAwCisKKyNkZWZpbmUgUE9TSVhfT1RI
+X01BU0sgICAgICAwMDAwMDA3CisjZGVmaW5lIFBPU0lYX0dSUF9NQVNLICAgICAgMDAwMDA3
+MAorI2RlZmluZSBQT1NJWF9VU1JfTUFTSyAgICAgIDAwMDA3MDAKKyNkZWZpbmUgUE9TSVhf
+UEVSTV9NQVNLICAgICAwMDAwNzc3CisjZGVmaW5lIFBPU0lYX0ZJTEVUWVBFX01BU0sgMDA3
+MDAwMAorCisjZGVmaW5lIFBPU0lYX0ZJTEVUWVBFX1NISUZUIDEyCisKK3N0YXRpYyB1MzIg
+d2lyZV9wZXJtc190b19wb3NpeCh1MzIgd2lyZSkKK3sKKyAgICAgICAgdTMyIG1vZGUgPSAw
+OworCisgICAgICAgIG1vZGUgfD0gKHdpcmUgJiBQT1NJWF9YX09USCkgPyBTX0lYT1RIIDog
+MDsKKyAgICAgICAgbW9kZSB8PSAod2lyZSAmIFBPU0lYX1dfT1RIKSA/IFNfSVdPVEggOiAw
+OworICAgICAgICBtb2RlIHw9ICh3aXJlICYgUE9TSVhfUl9PVEgpID8gU19JUk9USCA6IDA7
+CisgICAgICAgIG1vZGUgfD0gKHdpcmUgJiBQT1NJWF9YX0dSUCkgPyBTX0lYR1JQIDogMDsK
+KyAgICAgICAgbW9kZSB8PSAod2lyZSAmIFBPU0lYX1dfR1JQKSA/IFNfSVdHUlAgOiAwOwor
+ICAgICAgICBtb2RlIHw9ICh3aXJlICYgUE9TSVhfUl9HUlApID8gU19JUkdSUCA6IDA7Cisg
+ICAgICAgIG1vZGUgfD0gKHdpcmUgJiBQT1NJWF9YX1VTUikgPyBTX0lYVVNSIDogMDsKKyAg
+ICAgICAgbW9kZSB8PSAod2lyZSAmIFBPU0lYX1dfVVNSKSA/IFNfSVdVU1IgOiAwOworICAg
+ICAgICBtb2RlIHw9ICh3aXJlICYgUE9TSVhfUl9VU1IpID8gU19JUlVTUiA6IDA7CisgICAg
+ICAgIG1vZGUgfD0gKHdpcmUgJiBQT1NJWF9TVElDS1kpID8gU19JU1ZUWCA6IDA7CisgICAg
+ICAgIG1vZGUgfD0gKHdpcmUgJiBQT1NJWF9TRVRfR0lEKSA/IFNfSVNHSUQgOiAwOworICAg
+ICAgICBtb2RlIHw9ICh3aXJlICYgUE9TSVhfU0VUX1VJRCkgPyBTX0lTVUlEIDogMDsKKwor
+ICAgICAgICByZXR1cm4gbW9kZTsKK30KKworc3RhdGljIHUzMiBwb3NpeF9maWxldHlwZXNb
+XSA9IHsKKwlTX0lGUkVHLAorCVNfSUZESVIsCisJU19JRkxOSywKKwlTX0lGQ0hSLAorCVNf
+SUZCTEssCisJU19JRklGTywKKwlTX0lGU09DSworfTsKKworc3RhdGljIHUzMiB3aXJlX2Zp
+bGV0eXBlX3RvX3Bvc2l4KHUzMiB3aXJlX3R5cGUpCit7CisJaWYgKHdpcmVfdHlwZSA+PSBB
+UlJBWV9TSVpFKHBvc2l4X2ZpbGV0eXBlcykpIHsKKwkJcHJfd2FybigiVW5leHBlY3RlZCB0
+eXBlICV1Iiwgd2lyZV90eXBlKTsKKwkJcmV0dXJuIDA7CisJfQorCXJldHVybiBwb3NpeF9m
+aWxldHlwZXNbd2lyZV90eXBlXTsKK30KKwordW1vZGVfdCB3aXJlX21vZGVfdG9fcG9zaXgo
+dTMyIHdpcmUpCit7CisJdTMyIHdpcmVfdHlwZTsKKwl1MzIgbW9kZTsKKworCXdpcmVfdHlw
+ZSA9ICh3aXJlICYgUE9TSVhfRklMRVRZUEVfTUFTSykgPj4gUE9TSVhfRklMRVRZUEVfU0hJ
+RlQ7CisJbW9kZSA9ICh3aXJlX3Blcm1zX3RvX3Bvc2l4KHdpcmUpIHwgd2lyZV9maWxldHlw
+ZV90b19wb3NpeCh3aXJlX3R5cGUpKTsKKwlyZXR1cm4gKHVtb2RlX3QpbW9kZTsKK30KKwog
+LyogRmlsbCBhIGNpZnNfZmF0dHIgc3RydWN0IHdpdGggaW5mbyBmcm9tIFBPU0lYIGluZm8g
+c3RydWN0ICovCiBzdGF0aWMgdm9pZCBzbWIzMTFfcG9zaXhfaW5mb190b19mYXR0cihzdHJ1
+Y3QgY2lmc19mYXR0ciAqZmF0dHIsCiAJCQkJICAgICAgIHN0cnVjdCBjaWZzX29wZW5faW5m
+b19kYXRhICpkYXRhLApAQCAtNzYwLDIwICs4MzgsMTMgQEAgc3RhdGljIHZvaWQgc21iMzEx
+X3Bvc2l4X2luZm9fdG9fZmF0dHIoc3RydWN0IGNpZnNfZmF0dHIgKmZhdHRyLAogCWZhdHRy
+LT5jZl9ieXRlcyA9IGxlNjRfdG9fY3B1KGluZm8tPkFsbG9jYXRpb25TaXplKTsKIAlmYXR0
+ci0+Y2ZfY3JlYXRldGltZSA9IGxlNjRfdG9fY3B1KGluZm8tPkNyZWF0aW9uVGltZSk7CiAJ
+ZmF0dHItPmNmX25saW5rID0gbGUzMl90b19jcHUoaW5mby0+SGFyZExpbmtzKTsKLQlmYXR0
+ci0+Y2ZfbW9kZSA9ICh1bW9kZV90KSBsZTMyX3RvX2NwdShpbmZvLT5Nb2RlKTsKKwlmYXR0
+ci0+Y2ZfbW9kZSA9IHdpcmVfbW9kZV90b19wb3NpeChsZTMyX3RvX2NwdShpbmZvLT5Nb2Rl
+KSk7CiAKIAlpZiAoY2lmc19vcGVuX2RhdGFfcmVwYXJzZShkYXRhKSAmJgogCSAgICBjaWZz
+X3JlcGFyc2VfcG9pbnRfdG9fZmF0dHIoY2lmc19zYiwgZmF0dHIsIGRhdGEpKQogCQlnb3Rv
+IG91dF9yZXBhcnNlOwogCi0JZmF0dHItPmNmX21vZGUgJj0gflNfSUZNVDsKLQlpZiAoZmF0
+dHItPmNmX2NpZnNhdHRycyAmIEFUVFJfRElSRUNUT1JZKSB7Ci0JCWZhdHRyLT5jZl9tb2Rl
+IHw9IFNfSUZESVI7Ci0JCWZhdHRyLT5jZl9kdHlwZSA9IERUX0RJUjsKLQl9IGVsc2UgeyAv
+KiBmaWxlICovCi0JCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZSRUc7Ci0JCWZhdHRyLT5jZl9k
+dHlwZSA9IERUX1JFRzsKLQl9CisJZmF0dHItPmNmX2R0eXBlID0gU19EVChmYXR0ci0+Y2Zf
+bW9kZSk7CiAKIG91dF9yZXBhcnNlOgogCWlmIChTX0lTTE5LKGZhdHRyLT5jZl9tb2RlKSkg
+ewpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9yZWFkZGlyLmMgYi9mcy9zbWIvY2xpZW50
+L3JlYWRkaXIuYwppbmRleCBiM2E4ZjljNmZjZmYuLjI4MDcxYjJiZTg4YyAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NsaWVudC9yZWFkZGlyLmMKKysrIGIvZnMvc21iL2NsaWVudC9yZWFkZGly
+LmMKQEAgLTI0MSwzMSArMjQxLDI4IEBAIGNpZnNfcG9zaXhfdG9fZmF0dHIoc3RydWN0IGNp
+ZnNfZmF0dHIgKmZhdHRyLCBzdHJ1Y3Qgc21iMl9wb3NpeF9pbmZvICppbmZvLAogCWZhdHRy
+LT5jZl9ubGluayA9IGxlMzJfdG9fY3B1KGluZm8tPkhhcmRMaW5rcyk7CiAJZmF0dHItPmNm
+X2NpZnNhdHRycyA9IGxlMzJfdG9fY3B1KGluZm8tPkRvc0F0dHJpYnV0ZXMpOwogCi0JLyoK
+LQkgKiBTaW5jZSB3ZSBzZXQgdGhlIGlub2RlIHR5cGUgYmVsb3cgd2UgbmVlZCB0byBtYXNr
+IG9mZgotCSAqIHRvIGF2b2lkIHN0cmFuZ2UgcmVzdWx0cyBpZiBiaXRzIHNldCBhYm92ZS4K
+LQkgKiBYWFg6IHdoeSBub3QgbWFrZSBzZXJ2ZXImY2xpZW50IHVzZSB0aGUgdHlwZSBiaXRz
+PwotCSAqLwotCWZhdHRyLT5jZl9tb2RlID0gbGUzMl90b19jcHUoaW5mby0+TW9kZSkgJiB+
+U19JRk1UOworCWlmIChmYXR0ci0+Y2ZfY2lmc2F0dHJzICYgQVRUUl9SRVBBUlNFKSB7CisJ
+CWZhdHRyLT5jZl9jaWZzdGFnID0gbGUzMl90b19jcHUoaW5mby0+UmVwYXJzZVRhZyk7CisJ
+fQorCisJZmF0dHItPmNmX21vZGUgPSB3aXJlX21vZGVfdG9fcG9zaXgobGUzMl90b19jcHUo
+aW5mby0+TW9kZSkpOworCWZhdHRyLT5jZl9kdHlwZSA9IFNfRFQobGUzMl90b19jcHUoaW5m
+by0+TW9kZSkpOworCisJc3dpdGNoIChmYXR0ci0+Y2ZfbW9kZSAmIFNfSUZNVCkgeworCWNh
+c2UgU19JRkxOSzoKKwljYXNlIFNfSUZCTEs6CisJY2FzZSBTX0lGQ0hSOgorCQlmYXR0ci0+
+Y2ZfZmxhZ3MgfD0gQ0lGU19GQVRUUl9ORUVEX1JFVkFMOworCQlicmVhazsKKwlkZWZhdWx0
+OgorCQlicmVhazsKKwl9CiAKIAljaWZzX2RiZyhGWUksICJwb3NpeCBmYXR0cjogZGV2ICVk
+LCByZXBhcnNlICVkLCBtb2RlICVvXG4iLAogCQkgbGUzMl90b19jcHUoaW5mby0+RGV2aWNl
+SWQpLAogCQkgbGUzMl90b19jcHUoaW5mby0+UmVwYXJzZVRhZyksCiAJCSBsZTMyX3RvX2Nw
+dShpbmZvLT5Nb2RlKSk7CiAKLQlpZiAoZmF0dHItPmNmX2NpZnNhdHRycyAmIEFUVFJfRElS
+RUNUT1JZKSB7Ci0JCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZESVI7Ci0JCWZhdHRyLT5jZl9k
+dHlwZSA9IERUX0RJUjsKLQl9IGVsc2UgewotCQkvKgotCQkgKiBtYXJrIGFueXRoaW5nIHRo
+YXQgaXMgbm90IGEgZGlyIGFzIHJlZ3VsYXIKLQkJICogZmlsZS4gc3BlY2lhbCBmaWxlcyBz
+aG91bGQgaGF2ZSB0aGUgUkVQQVJTRQotCQkgKiBhdHRyaWJ1dGUgYW5kIHdpbGwgYmUgbWFy
+a2VkIGFzIG5lZWRpbmcgcmV2YWx1YXRpb24KLQkJICovCi0JCWZhdHRyLT5jZl9tb2RlIHw9
+IFNfSUZSRUc7Ci0JCWZhdHRyLT5jZl9kdHlwZSA9IERUX1JFRzsKLQl9Ci0KIAlzaWRfdG9f
+aWQoY2lmc19zYiwgJnBhcnNlZC5vd25lciwgZmF0dHIsIFNJRE9XTkVSKTsKIAlzaWRfdG9f
+aWQoY2lmc19zYiwgJnBhcnNlZC5ncm91cCwgZmF0dHIsIFNJREdST1VQKTsKIH0KZGlmZiAt
+LWdpdCBhL2ZzL3NtYi9jbGllbnQvcmVwYXJzZS5jIGIvZnMvc21iL2NsaWVudC9yZXBhcnNl
+LmMKaW5kZXggNzRhYmJkZjUwMjZjLi5kMzkyYjljNTNlNDMgMTAwNjQ0Ci0tLSBhL2ZzL3Nt
+Yi9jbGllbnQvcmVwYXJzZS5jCisrKyBiL2ZzL3NtYi9jbGllbnQvcmVwYXJzZS5jCkBAIC02
+NjEsNDQgKzY2MSw2MCBAQCBzdGF0aWMgdm9pZCB3c2xfdG9fZmF0dHIoc3RydWN0IGNpZnNf
+b3Blbl9pbmZvX2RhdGEgKmRhdGEsCiAJZmF0dHItPmNmX2R0eXBlID0gU19EVChmYXR0ci0+
+Y2ZfbW9kZSk7CiB9CiAKLWJvb2wgY2lmc19yZXBhcnNlX3BvaW50X3RvX2ZhdHRyKHN0cnVj
+dCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsCi0JCQkJIHN0cnVjdCBjaWZzX2ZhdHRyICpmYXR0
+ciwKLQkJCQkgc3RydWN0IGNpZnNfb3Blbl9pbmZvX2RhdGEgKmRhdGEpCitzdGF0aWMgYm9v
+bCBwb3NpeF9yZXBhcnNlX3RvX2ZhdHRyKHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2Is
+CisJCQkJICAgc3RydWN0IGNpZnNfZmF0dHIgKmZhdHRyLAorCQkJCSAgIHN0cnVjdCBjaWZz
+X29wZW5faW5mb19kYXRhICpkYXRhKQogewogCXN0cnVjdCByZXBhcnNlX3Bvc2l4X2RhdGEg
+KmJ1ZiA9IGRhdGEtPnJlcGFyc2UucG9zaXg7Ci0JdTMyIHRhZyA9IGRhdGEtPnJlcGFyc2Uu
+dGFnOwogCi0JaWYgKHRhZyA9PSBJT19SRVBBUlNFX1RBR19ORlMgJiYgYnVmKSB7Ci0JCWlm
+IChsZTE2X3RvX2NwdShidWYtPlJlcGFyc2VEYXRhTGVuZ3RoKSA8IHNpemVvZihidWYtPklu
+b2RlVHlwZSkpCisJaWYgKGJ1ZiA9PSBOVUxMKSB7CisJCXJldHVybiB0cnVlOworCX0KKwor
+CWlmIChsZTE2X3RvX2NwdShidWYtPlJlcGFyc2VEYXRhTGVuZ3RoKSA8IHNpemVvZihidWYt
+Pklub2RlVHlwZSkpIHsKKwkJV0FSTl9PTl9PTkNFKDEpOworCQlyZXR1cm4gZmFsc2U7CisJ
+fQorCisJc3dpdGNoIChsZTY0X3RvX2NwdShidWYtPklub2RlVHlwZSkpIHsKKwljYXNlIE5G
+U19TUEVDRklMRV9DSFI6CisJCWlmIChsZTE2X3RvX2NwdShidWYtPlJlcGFyc2VEYXRhTGVu
+Z3RoKSAhPSBzaXplb2YoYnVmLT5Jbm9kZVR5cGUpICsgOCkgeworCQkJV0FSTl9PTl9PTkNF
+KDEpOwogCQkJcmV0dXJuIGZhbHNlOwotCQlzd2l0Y2ggKGxlNjRfdG9fY3B1KGJ1Zi0+SW5v
+ZGVUeXBlKSkgewotCQljYXNlIE5GU19TUEVDRklMRV9DSFI6Ci0JCQlpZiAobGUxNl90b19j
+cHUoYnVmLT5SZXBhcnNlRGF0YUxlbmd0aCkgIT0gc2l6ZW9mKGJ1Zi0+SW5vZGVUeXBlKSAr
+IDgpCi0JCQkJcmV0dXJuIGZhbHNlOwotCQkJZmF0dHItPmNmX21vZGUgfD0gU19JRkNIUjsK
+LQkJCWZhdHRyLT5jZl9yZGV2ID0gcmVwYXJzZV9ta2RldihidWYtPkRhdGFCdWZmZXIpOwot
+CQkJYnJlYWs7Ci0JCWNhc2UgTkZTX1NQRUNGSUxFX0JMSzoKLQkJCWlmIChsZTE2X3RvX2Nw
+dShidWYtPlJlcGFyc2VEYXRhTGVuZ3RoKSAhPSBzaXplb2YoYnVmLT5Jbm9kZVR5cGUpICsg
+OCkKLQkJCQlyZXR1cm4gZmFsc2U7Ci0JCQlmYXR0ci0+Y2ZfbW9kZSB8PSBTX0lGQkxLOwot
+CQkJZmF0dHItPmNmX3JkZXYgPSByZXBhcnNlX21rZGV2KGJ1Zi0+RGF0YUJ1ZmZlcik7Ci0J
+CQlicmVhazsKLQkJY2FzZSBORlNfU1BFQ0ZJTEVfRklGTzoKLQkJCWZhdHRyLT5jZl9tb2Rl
+IHw9IFNfSUZJRk87Ci0JCQlicmVhazsKLQkJY2FzZSBORlNfU1BFQ0ZJTEVfU09DSzoKLQkJ
+CWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZTT0NLOwotCQkJYnJlYWs7Ci0JCWNhc2UgTkZTX1NQ
+RUNGSUxFX0xOSzoKLQkJCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZMTks7Ci0JCQlicmVhazsK
+LQkJZGVmYXVsdDoKKwkJfQorCQlmYXR0ci0+Y2ZfbW9kZSB8PSBTX0lGQ0hSOworCQlmYXR0
+ci0+Y2ZfcmRldiA9IHJlcGFyc2VfbWtkZXYoYnVmLT5EYXRhQnVmZmVyKTsKKwkJYnJlYWs7
+CisJY2FzZSBORlNfU1BFQ0ZJTEVfQkxLOgorCQlpZiAobGUxNl90b19jcHUoYnVmLT5SZXBh
+cnNlRGF0YUxlbmd0aCkgIT0gc2l6ZW9mKGJ1Zi0+SW5vZGVUeXBlKSArIDgpIHsKIAkJCVdB
+Uk5fT05fT05DRSgxKTsKIAkJCXJldHVybiBmYWxzZTsKIAkJfQotCQlnb3RvIG91dDsKKwkJ
+ZmF0dHItPmNmX21vZGUgfD0gU19JRkJMSzsKKwkJZmF0dHItPmNmX3JkZXYgPSByZXBhcnNl
+X21rZGV2KGJ1Zi0+RGF0YUJ1ZmZlcik7CisJCWJyZWFrOworCWNhc2UgTkZTX1NQRUNGSUxF
+X0ZJRk86CisJCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZJRk87CisJCWJyZWFrOworCWNhc2Ug
+TkZTX1NQRUNGSUxFX1NPQ0s6CisJCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZTT0NLOworCQli
+cmVhazsKKwljYXNlIE5GU19TUEVDRklMRV9MTks6CisJCWZhdHRyLT5jZl9tb2RlIHw9IFNf
+SUZMTks7CisJCWJyZWFrOworCWRlZmF1bHQ6CisJCVdBUk5fT05fT05DRSgxKTsKKwkJcmV0
+dXJuIGZhbHNlOwogCX0KKwlyZXR1cm4gdHJ1ZTsKK30KKworYm9vbCBjaWZzX3JlcGFyc2Vf
+cG9pbnRfdG9fZmF0dHIoc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19zYiwKKwkJCQkgc3Ry
+dWN0IGNpZnNfZmF0dHIgKmZhdHRyLAorCQkJCSBzdHJ1Y3QgY2lmc19vcGVuX2luZm9fZGF0
+YSAqZGF0YSkKK3sKKwl1MzIgdGFnID0gZGF0YS0+cmVwYXJzZS50YWc7CisJYm9vbCBvazsK
+IAogCXN3aXRjaCAodGFnKSB7CiAJY2FzZSBJT19SRVBBUlNFX1RBR19JTlRFUk5BTDoKQEAg
+LTcxOCwxNSArNzM0LDE5IEBAIGJvb2wgY2lmc19yZXBhcnNlX3BvaW50X3RvX2ZhdHRyKHN0
+cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsCiAJY2FzZSBJT19SRVBBUlNFX1RBR19MWF9C
+TEs6CiAJCXdzbF90b19mYXR0cihkYXRhLCBjaWZzX3NiLCB0YWcsIGZhdHRyKTsKIAkJYnJl
+YWs7CisJY2FzZSBJT19SRVBBUlNFX1RBR19ORlM6CisJCW9rID0gcG9zaXhfcmVwYXJzZV90
+b19mYXR0cihjaWZzX3NiLCBmYXR0ciwgZGF0YSk7CisJCWlmICghb2spCisJCQlyZXR1cm4g
+ZmFsc2U7CisJCWJyZWFrOwogCWNhc2UgMDogLyogU01CMSBzeW1saW5rICovCiAJY2FzZSBJ
+T19SRVBBUlNFX1RBR19TWU1MSU5LOgotCWNhc2UgSU9fUkVQQVJTRV9UQUdfTkZTOgogCQlm
+YXR0ci0+Y2ZfbW9kZSB8PSBTX0lGTE5LOwogCQlicmVhazsKIAlkZWZhdWx0OgogCQlyZXR1
+cm4gZmFsc2U7CiAJfQotb3V0OgorCiAJZmF0dHItPmNmX2R0eXBlID0gU19EVChmYXR0ci0+
+Y2ZfbW9kZSk7CiAJcmV0dXJuIHRydWU7CiB9Ci0tIAoyLjQ3LjAKCgpGcm9tIDQzNmUyZGQz
+NTI5ODBmMGJlN2Y0M2UwMmM4YzI0ZDU1OGE3ZDU0YmMgTW9uIFNlcCAxNyAwMDowMDowMCAy
+MDAxCkZyb206IFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+CkRhdGU6IE1vbiwgMjUg
+Tm92IDIwMjQgMTY6MTk6NTYgKzAxMDAKU3ViamVjdDogW1BBVENIIDMvM10gZnMvc21iL2Ns
+aWVudDogY2lmc19wcmltZV9kY2FjaGUoKSBmb3IgU01CMyBQT1NJWCByZXBhcnNlCiBwb2lu
+dHMKCi0tLQogZnMvc21iL2NsaWVudC9yZWFkZGlyLmMgfCAxOCArKysrKysrKysrKysrKysr
+Ky0KIDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpk
+aWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9yZWFkZGlyLmMgYi9mcy9zbWIvY2xpZW50L3Jl
+YWRkaXIuYwppbmRleCAyODA3MWIyYmU4OGMuLmQyMTM3YmNiOGQ4NyAxMDA2NDQKLS0tIGEv
+ZnMvc21iL2NsaWVudC9yZWFkZGlyLmMKKysrIGIvZnMvc21iL2NsaWVudC9yZWFkZGlyLmMK
+QEAgLTcxLDYgKzcxLDggQEAgY2lmc19wcmltZV9kY2FjaGUoc3RydWN0IGRlbnRyeSAqcGFy
+ZW50LCBzdHJ1Y3QgcXN0ciAqbmFtZSwKIAlzdHJ1Y3QgaW5vZGUgKmlub2RlOwogCXN0cnVj
+dCBzdXBlcl9ibG9jayAqc2IgPSBwYXJlbnQtPmRfc2I7CiAJc3RydWN0IGNpZnNfc2JfaW5m
+byAqY2lmc19zYiA9IENJRlNfU0Ioc2IpOworCWJvb2wgcG9zaXggPSBjaWZzX3NiX21hc3Rl
+cl90Y29uKGNpZnNfc2IpLT5wb3NpeF9leHRlbnNpb25zOworCWJvb2wgcmVwYXJzZV9uZWVk
+X3JldmFsID0gZmFsc2U7CiAJREVDTEFSRV9XQUlUX1FVRVVFX0hFQURfT05TVEFDSyh3cSk7
+CiAJaW50IHJjOwogCkBAIC04NSw3ICs4NywyMSBAQCBjaWZzX3ByaW1lX2RjYWNoZShzdHJ1
+Y3QgZGVudHJ5ICpwYXJlbnQsIHN0cnVjdCBxc3RyICpuYW1lLAogCQkgKiB0aGlzIHNwYXJl
+cyB1cyBhbiBpbnZhbGlkYXRpb24uCiAJCSAqLwogcmV0cnk6Ci0JCWlmICgoZmF0dHItPmNm
+X2NpZnNhdHRycyAmIEFUVFJfUkVQQVJTRSkgfHwKKwkJaWYgKHBvc2l4KSB7CisJCQlzd2l0
+Y2ggKGZhdHRyLT5jZl9tb2RlICYgU19JRk1UKSB7CisJCQljYXNlIFNfSUZMTks6CisJCQlj
+YXNlIFNfSUZCTEs6CisJCQljYXNlIFNfSUZDSFI6CisJCQkJcmVwYXJzZV9uZWVkX3JldmFs
+ID0gdHJ1ZTsKKwkJCQlicmVhazsKKwkJCWRlZmF1bHQ6CisJCQkJYnJlYWs7CisJCQl9CisJ
+CX0gZWxzZSBpZiAoZmF0dHItPmNmX2NpZnNhdHRycyAmIEFUVFJfUkVQQVJTRSkgeworCQkJ
+cmVwYXJzZV9uZWVkX3JldmFsID0gdHJ1ZTsKKwkJfQorCisJCWlmIChyZXBhcnNlX25lZWRf
+cmV2YWwgfHwKIAkJICAgIChmYXR0ci0+Y2ZfZmxhZ3MgJiBDSUZTX0ZBVFRSX05FRURfUkVW
+QUwpKQogCQkJcmV0dXJuOwogCi0tIAoyLjQ3LjAKCg==
 
->>> The final cleanup work for cleaning up a cfid is performed via work
->>> queued in the serverclose_wq workqueue; this is done separate from
->>> dropping the dentries so that close_all_cached_dirs() doesn't block on
->>> any server operations.
->>>
->>> Both of these queued works expect to invoked with a cfid reference and
->>> a tcon reference to avoid those objects from being freed while the work
->>> is ongoing.
->>
->>Why do you need to take a tcon reference?
->
-> In the existing code (and my patch, without the refs), I was seeing an 
-> intermittent use-after-free of the tcon or cached_fids struct by queued work 
-> processing a lease break -- the cfid isn't linked from cached_fids, but 
-> smb2_close_cached_fid invoking SMB2_close can race with the unmount and 
-> cifs_put_tcon
->
-> Something like:
->
->      t1                              t2
-> cached_dir_lease_break
-> smb2_cached_lease_break
-> smb2_close_cached_fid
-> SMB2_close starts
->                                      cifs_kill_sb
->                                      cifs_umount
->                                      cifs_put_link
->                                      cifs_put_tcon
-> SMB2_close continues
+--------------ULcQw558TFOZzSKpPQEOOq0C--
 
-Makes sense.
+--------------61Rx7FZH7Xxqj1WSStWKBXXF--
 
-> I had a version of the patch that kept the 'in flight lease breaks' on 
-> a second list in cached_fids so that they could be cancelled synchronously 
-> from free_cached_fids(), but I struggled with it (I can't remember exactly, 
-> but I think I was struggling to get the linked list membership / removal 
-> handling and num_entries handling consistent).
+--------------R3Q03bOKSfZ3hX2OF8O8Tyd7
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-No worries.  The damn thing isn't trivial to follow.
+-----BEGIN PGP SIGNATURE-----
 
->> Can't you drop the dentries
->>when tearing down tcon in cifs_put_tcon()?  No concurrent mounts would
->>be able to access or free it.
->
-> The dentries being dropped must occur before kill_anon_super(), as that's 
-> where the 'Dentry still in use' check is. All the tcons are put in 
-> cifs_umount(), which occurs after:
->
->      kill_anon_super(sb);
->      cifs_umount(cifs_sb);
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmdHcbIFAwAAAAAACgkQqh6bcSY5nkYr
+dA//dy+3OlaYoVa3YXGvk8KFrwPOFJdKHmVAsrenRp4zzgzzJB0h5Do+x5XuLwHe1W5irolLWiJV
+HoYjw9WXCCmMbImVICESl87ZFoukOHHPEBNARd8rCzWfAkYCZXVoVhQ5uK6+nB9NTcbheGr9jLh1
+zX9zw+8Txmz+rvVpGRkv0zoB0jE+G+Jo8Ob2rBlJWSC72Jgtj78Ebb+KcOpsetrp8FAqyjC32Jmn
+NTXVyQbqIcAG3ac7hpKFM87kwtGvfBe4Xrisx64al3rA3abuuo9rR1xbn4mIcRe6EwH+nRusBXS+
+D/ag0e4kSlghNE2bpsdLZlU5tnjZ/atVsBTCqmHGCHbYwrPbBldqM1Zfki1HZ9tW3MatRX38bFJZ
+Lt4PF35BadHZ2ufHvZ+w6h2OiQvgg0NNeHy9Yvp80cupKT5HrVVpOAutkNGZYOjaMNqXWnj1/yNZ
+FFCEWcQ4XjPiJq0EPUmvt3iiPC87J2EdISeHcNyH2TNpgMsE/A/PVMlycp2FS9yGaDtmyAyZDMzC
+qXtaAoJQT4ARvhqyl6s4feR3ZPTQSoPWXAbnPc9kFqlSHoQEdDLC2RiRFW1qt9et+7tMZinM44ta
+8G+drwFIl46VpN2xNL8E+WFex2LcpFcmHlm9fRlA0sFbHYXF3DwGK+iyGVUIFTBkpD5fB3jRdbCo
+CwY=
+=0crL
+-----END PGP SIGNATURE-----
 
-Right.  Can't we call cancel_work_sync() to make sure that any leases
-breakes are processed on the cached directory handle before calling the
-above?
-
-> The other thing is that cifs_umount_begin() has this comment, which made me 
-> think a tcon can actually be tied to two distinct mount points:
->
->          if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
->                  /* we have other mounts to same share or we have
->                     already tried to umount this and woken up
->                     all waiting network requests, nothing to do */
->
-> Although, as I'm thinking about it again, I think I've misunderstood (and that 
-> comment is wrong?).
-
-Comment is correct as a single tcon may be shared among different
-mounts.
-
-Consider the following where a single tcon is shared:
-
-mount.cifs //srv/share /mnt/1 -o $opts
-mount.cifs //srv/share/dir /mnt/2 -o $opts
-
-There will be two different superblocks that end up using same tcon.
-
-> It did cross my mind to pull some of the work out of cifs_umount into 
-> cifs_kill_sb (specifically, I wanted to cancel prune_tlinks earlier) -- no 
-> prune_tlinks would make it more feasible to drop tlink_tree_lock in 
-> close_all_cached_dirs(), at which point a per-tcon workqueue is more 
-> practical.
-
-Yeah, multiuser tcons just make it even more complicated.
-
-Sorry for the delay as I've been quite busy with other stuff.
-
-Great work, BTW.
+--------------R3Q03bOKSfZ3hX2OF8O8Tyd7--
