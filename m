@@ -1,247 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91C215CD46
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Nov 2024 16:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB8B1B95B
+	for <linux-cifs@vger.kernel.org>; Fri, 29 Nov 2024 16:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732897214; cv=none; b=MvxdDOkTsrRViqo1QAoGVe7a7Eyg+foHhjdceAiTTZDt6QMWylLtJGozWmgDlH4DWRaWg03tDyTNINSfVHZVmElmSGLQ/uRmCH84HPYoDE83fYZ10A728MwHNeye5B7SpaP9Xsr5nbkgOofwwj5zPX92eV8MRMMp22cFLO0JlYY=
+	t=1732897337; cv=none; b=sfk9ta6Py+OGijeDq1oSLcSD4bvN/93D0fqGexT8eElv2Lxo5J4X6U+lGkWUK6/wxwfrOHMQ5meHDvAMSZFBSMEHj3FUgOObxbP3+6ue3fHyJzrD9VqHmA8Z+vXPzDcMGDcbw4zSP0mkLhrYR7MlMX3UKIC0cF1MlJjDOieVhBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732897214; c=relaxed/simple;
-	bh=VLIEVNL9LBNDEDmtL3P5+Dw+zfGuvDucK94TvHOCz8o=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Kk3qNi/q2YLtytpbnxOXI9blxnYVjRhvKcTGBYJhVdnBJV5GvjtljSuAuLBkHkiOYf1LQ9NZZqcrDQZgnTbhgFOiv0LbqEbH47QgYfli3+qpBbmdXVnSXmEug8dxPCoCzUYqOiAJOKXXOOaWGOXKa5FNFlqjUJIhQMVWs5abx1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMXvO+Sn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1732897337; c=relaxed/simple;
+	bh=KxQb7vGvYOOLTCN6/uHGhmb+QvUAEh/oCdCRT4j8Do0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=q5HFw/nk8MVhovMDelGu6y/MW4pN/Zmj49nZgyVbBXDcP1UcZSLBD/RGcuTJOWUAadHvs+qXxo65Ar10qHQ8U5GpL/Ziu9dzfNMVcMr1YhRcMoi2gSQJfB+c+m6KtsE6d2g1E6AEQbbJTdSfUjB2Vx3i7fBCbUaSqvG4rbcU8oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=14Er4vvD; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMXvO+Sn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732897211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b5o8km8xnhEeZ9EFzhJ7F1HLgoKQ4zXXkjzA/RaAN1c=;
-	b=WMXvO+SnO8I4yXzy7UXCcO4a3tPn/dYG/bjIpyvKgyNtoCElkiJqyfmpmc4/y+avkys/32
-	smPW0i+TEGYks6CJ2w/ZlYs0wTFcf+qqIiybPPnxW3HETdALYfkzHuEqDIXj+WY2Ra8QLB
-	3aCqi24I1U2ZlHWDlrrPcUiF8WWZ/QA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-389-TkIfTi1AOgyUXVT740yygA-1; Fri,
- 29 Nov 2024 11:20:07 -0500
-X-MC-Unique: TkIfTi1AOgyUXVT740yygA-1
-X-Mimecast-MFC-AGG-ID: TkIfTi1AOgyUXVT740yygA
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 706971953952;
-	Fri, 29 Nov 2024 16:20:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E45931955D47;
-	Fri, 29 Nov 2024 16:19:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <67478d91.050a0220.253251.0061.GAE@google.com>
-References: <67478d91.050a0220.253251.0061.GAE@google.com>
-To: syzbot <syzbot+8965fea6a159ab9aa32d@syzkaller.appspotmail.com>
-Cc: dhowells@redhat.com, asmadeus@codewreck.org, bharathsm@microsoft.com,
-    brauner@kernel.org, ericvh@kernel.org, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    linux-trace-kernel@vger.kernel.org, linux_oss@crudebyte.com,
-    lucho@ionkov.net, marc.dionne@auristor.com,
-    mathieu.desnoyers@efficios.com, mhiramat@kernel.org,
-    netfs@lists.linux.dev, pc@manguebit.com, ronniesahlberg@gmail.com,
-    rostedt@goodmis.org, samba-technical@lists.samba.org,
-    sfrench@samba.org, sprasad@microsoft.com,
-    syzkaller-bugs@googlegroups.com, tom@talpey.com,
-    v9fs@lists.linux.dev
-Subject: Re: [syzbot] [netfs?] INFO: task hung in netfs_unbuffered_read_iter
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="14Er4vvD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=KxQb7vGvYOOLTCN6/uHGhmb+QvUAEh/oCdCRT4j8Do0=; b=14Er4vvDdHnNPhKWJ1MWTTUv5j
+	/VLaFKLbDACrPDWl89ynKYraCZDn00wmMqH/QjZu0UXmW9UEzP0ZgY8DIorDwYP3YAZXkNko1dC1D
+	fxqk9DiYJs7gbC5emrKgp23Xi1dusDB8TEZnEEG7kQPctwcs9Cep/sXbE56/KXJmDsbrZhCFXVnFd
+	eXfOd4cqZuCBlD/QRkPy0/emw4Rr7XV8xtvbDzvrrfROL1c8tdR8HUVZsf6Ex5C2CCo6h0ty6dsaE
+	mqdqWhP+NWzbM2nQXd5ocE5cQGdXp3OMlBJESfF0gRyexp57/9aj3s9ciqze5TdbJbckThsoNGtQO
+	R/6nD+q3SIgqm+kcoxb3DlsQIrWxZUKqIszmHDNicVSo7HiAKligHOBVLA60i5IhQvEVDO5ONRViG
+	tSwFmQ8kVm0TglWYebgBetRzpfEzjAbx6hwy1/fL9cLetfP43qmz8cESDXCh7JW/qQslSMshC5UCR
+	G3oNm4r5QjetkgPR/VO+CRZd;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tH3ky-0022Gv-2V;
+	Fri, 29 Nov 2024 16:22:12 +0000
+Message-ID: <6c44d87f-de98-4efd-b016-a491e9c57cb5@samba.org>
+Date: Fri, 29 Nov 2024 17:22:11 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4020303.1732897192.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 29 Nov 2024 16:19:52 +0000
-Message-ID: <4020304.1732897192@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Samba] Random EINVAL when opening files with SMB3 POSIX
+ extensions enabled
+To: Andrew Gunnerson <accounts.samba@chiller3.com>,
+ Steve French <smfrench@gmail.com>
+References: <9995d904-6d0b-4086-b49c-944e845f127e@app.fastmail.com>
+ <fa1f85a7-b086-485c-bb25-3c3d8c4cc490@samba.org>
+ <53b97278-a054-4bf1-97cb-e2d648c6868a@app.fastmail.com>
+Content-Language: en-US, de-DE
+Cc: samba@lists.samba.org, CIFS <linux-cifs@vger.kernel.org>
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <53b97278-a054-4bf1-97cb-e2d648c6868a@app.fastmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------0gMYHnroEb8KsABHFtYnvWX3"
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs=
-.git netfs-writeback
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------0gMYHnroEb8KsABHFtYnvWX3
+Content-Type: multipart/mixed; boundary="------------lCLdMTvm9a63GUXFARcAvDWe";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Andrew Gunnerson <accounts.samba@chiller3.com>,
+ Steve French <smfrench@gmail.com>
+Cc: samba@lists.samba.org, CIFS <linux-cifs@vger.kernel.org>
+Message-ID: <6c44d87f-de98-4efd-b016-a491e9c57cb5@samba.org>
+Subject: Re: [Samba] Random EINVAL when opening files with SMB3 POSIX
+ extensions enabled
+References: <9995d904-6d0b-4086-b49c-944e845f127e@app.fastmail.com>
+ <fa1f85a7-b086-485c-bb25-3c3d8c4cc490@samba.org>
+ <53b97278-a054-4bf1-97cb-e2d648c6868a@app.fastmail.com>
+In-Reply-To: <53b97278-a054-4bf1-97cb-e2d648c6868a@app.fastmail.com>
 
-commit 1daca71a815b0d8cfe3db81a31b6dd3fc0da4b50
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri Nov 29 16:19:03 2024 +0000
+--------------lCLdMTvm9a63GUXFARcAvDWe
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-    netfs: Fix hang in synchronous read due to failed subreq
-    =
+T24gMTEvMjgvMjQgOTo0NiBQTSwgQW5kcmV3IEd1bm5lcnNvbiB3cm90ZToNCj4gVGhhbmtz
+IGZvciB0aGUgcmVwbGllcyENCj4gDQo+IE9uIFRodSwgTm92IDI4LCAyMDI0LCBhdCAwNDoz
+NCwgUm93bGFuZCBQZW5ueSB2aWEgc2FtYmEgd3JvdGU6DQo+PiBJIGRvIG5vdCB1c2UgdGhl
+IFNNQjMgVW5peCBleHRlbnNpb25zLCBidXQgcGVyaGFwcyB5b3UgbWF5IG5vdCBiZQ0KPj4g
+ZWl0aGVyLCBoYXZlIHlvdSB0cmllZCByZXBsYWNpbmcgJ3NlcnZlciBtaW4gcHJvdG9jb2wg
+PSBTTUIyJyAod2hpY2ggaXMNCj4+IHRoZSBkZWZhdWx0IGFueXdheSkgd2l0aCAnc2VydmVy
+IG1pbiBwcm90b2NvbCA9IFNNQjMnID8NCj4gDQo+IEkgdG9vayBhIHBhY2tldCBjYXB0dXJl
+IGFuZCBkbyBzZWUgdGhlIHRoZSBjbGllbnQgbWFraW5nIFBPU0lYIGV4dGVuc2lvbg0KPiBy
+ZXF1ZXN0cywgbGlrZSBTTUIyX0ZJTEVfUE9TSVhfSU5GTy4NCj4gDQo+IE9uIFRodSwgTm92
+IDI4LCAyMDI0LCBhdCAwNDo1MywgUmFscGggQm9laG1lIHdyb3RlOg0KPj4gY2FuIHlvdSBn
+cmFiIGEgbmV0d29yayB0cmFjZSB3aGVuIGl0IGhhcHBlbnM/DQo+IA0KPiBTdXJlIHRoaW5n
+ISBJIGRpc2FibGVkIFNNQiBlbmNyeXB0aW9uIGZpcnN0IHNpbmNlIGl0IHNlZW1lZCB0byBt
+YWtlIHRoZSBwY2Fwcw0KPiB1c2VsZXNzLg0KPiANCj4gMS4gcGNhcCB3aGVuIHJ1bm5pbmcg
+YGNhdCA8ZmlsZT5gLCB3aGljaCBmYWlscyB3aXRoIEVJTlZBTDoNCj4gDQo+ICAgICAgaHR0
+cHM6Ly9maWxlcy5wdWIuY2hpbGxlcjMuY29tL2lzc3Vlcy9zYW1iYS9wb3NpeF9leHRlbnNp
+b25zLzIwMjQtMTEtMjgvcG9zaXhfZW5hYmxlZF9icm9rZW4ucGNhcA0KPiANCml0J3MgYSBj
+bGllbnQgcHJvYmxlbS4NCg0KU2VlIHBhY2tldCAzMDogdGhlIGNsaWVudCBpc3N1ZXMgYW4g
+UE9TSVggU01CMi1DUkVBVEUgd2l0aCBhIHBhdGhuYW1lIA0Kc3RhcnRpbmcgd2l0aCBhICIv
+IiB3aGljaCBpcyBub3QgYWxsb3dlZC4gSWYgeW91IGNoZWNrIHRoZSB3b3JraW5nIGNhc2Vz
+IA0KdGhlcmUgdGhlIHBhdGhuYW1lcyBhcmUgcmVsYXRpdmUgYW5kIGRvbid0IHN0YXJ0IHdp
+dGggIi8iLg0KDQpAU3RldmU6IGRvIHlvdSBoYXZlIGFueSBpZGVhIHdoYXQgY291bGQgYmUg
+Y2F1c2luZyB0aGlzIGluIGNpZnMua28/DQoNCi1zbG93DQoNCg0KDQo=
 
-    When netfs is performing a synchronous read, it doesn't offload the
-    collection of results off to a workqueue, but rather does the collecti=
-on in
-    the app thread - thereby avoiding the overhead of using a work queue.
-    =
+--------------lCLdMTvm9a63GUXFARcAvDWe--
 
-    However, if a failure occurs and we might want to retry or if it wants=
- to
-    throttle the production of new subreqs, netfs can throw a pause on the
-    producer by setting NETFS_RREQ_PAUSE.  This is fine if collection is d=
-one
-    by workqueue, but in synchronous mode, the collection and retry is don=
-e
-    after the producer loop completes - thereby deadlocking the two parts.
-    =
+--------------0gMYHnroEb8KsABHFtYnvWX3
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-    Fix this by making the synchronous read producer loop, when it sees th=
-e
-    PAUSE flag, go and wait for the flag to be cleared or the op to comple=
-te
-    whilst running the collector to process results.
-    =
+-----BEGIN PGP SIGNATURE-----
 
-    This fixes "netfs: Change the read result collector to only use one wo=
-rk
-    item" - but there's no stable commit ID yet.
-    =
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmdJ6jQFAwAAAAAACgkQqh6bcSY5nkZs
+yxAAoaXcGzrnmjY0ZSt7KjslznXj2agOeXO8PZ9LM8uH5t9QV2/a9yDIMPHHk8lV5scoDZniZzBT
+BJuqOr5T9DdpgD+VdRg8QviPwhJPYfIe0laWzLaud8CkBqFp/tfoEczPqgYwCo9piOPive0tpgI0
+SpsolFLbQU7PQ113FDGWt8XAbO2sfFZAEe5PTv/j373wByfZSPgN1hdHJyz4Qi8UYOGSt247O3aA
+uhjF0ZnecQ6Fc29RGA8i36a6VKiFYPGzZI7FMG1htQ7CtVy9pq3vHwxETAzRty7bVB2Nq4Qpi4M2
+Gl1D0Rao8yZ5SEJvVOuvHkBPjUizDJ7VG5gVySBVifby2iUMCcs3qUoPRfkRKs0rKDWCdB17SInY
+OL73g2yj7ebgzh7JIXbSEgktyr3w9BNV8G/ZwWRSQqMrncOpXn1o0JlpOtx4rckIFSowFhqP27de
+N+5qSCtBCSukXQIe1iRqK6/DNslR5zZjSF9TG9tLrw/tnVzhAqwLOHrWuGGaZn0UyWVwmMA2YHo5
+b5HBT/xVEoPtXqMfuCFv9WKoLFlgd4ldzmJnua8y7Bgpb/5FpwYGICfv5P0HBhjiqdO7DlxgYnDp
+Wa8EpAptsPgHvleftqh01LnzSppyfGYP5552PxUuGqQAXqCz5EYGblRZvxPTGQ8JSQqDf57mzzxX
+5hY=
+=7Jc0
+-----END PGP SIGNATURE-----
 
-    Reported-by: syzbot+8965fea6a159ab9aa32d@syzkaller.appspotmail.com
-    Signed-off-by: David Howells <dhowells@redhat.com>
-    cc: Jeff Layton <jlayton@kernel.org>
-    cc: netfs@lists.linux.dev
-    cc: linux-fsdevel@vger.kernel.org
-
-diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
-index dedcfc2bab2d..0bf3c2f5a710 100644
---- a/fs/netfs/direct_read.c
-+++ b/fs/netfs/direct_read.c
-@@ -102,10 +102,8 @@ static int netfs_dispatch_unbuffered_reads(struct net=
-fs_io_request *rreq)
- =
-
- 		rreq->netfs_ops->issue_read(subreq);
- =
-
--		if (test_bit(NETFS_RREQ_PAUSE, &rreq->flags)) {
--			trace_netfs_rreq(rreq, netfs_rreq_trace_wait_pause);
--			wait_on_bit(&rreq->flags, NETFS_RREQ_PAUSE, TASK_UNINTERRUPTIBLE);
--		}
-+		if (test_bit(NETFS_RREQ_PAUSE, &rreq->flags))
-+			netfs_wait_for_pause(rreq);
- 		if (test_bit(NETFS_RREQ_FAILED, &rreq->flags))
- 			break;
- 		if (test_bit(NETFS_RREQ_BLOCKED, &rreq->flags) &&
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 334bf9f6e6f2..db59ed8880e3 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -96,6 +96,7 @@ void netfs_read_collection_worker(struct work_struct *wo=
-rk);
- void netfs_wake_read_collector(struct netfs_io_request *rreq);
- void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error=
-, bool was_async);
- ssize_t netfs_wait_for_read(struct netfs_io_request *rreq);
-+void netfs_wait_for_pause(struct netfs_io_request *rreq);
- =
-
- /*
-  * read_pgpriv2.c
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index f1b15c20b6f8..3803ef5894c8 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -312,7 +312,7 @@ static void netfs_collect_read_results(struct netfs_io=
-_request *rreq)
- 	if ((notes & MADE_PROGRESS) && test_bit(NETFS_RREQ_PAUSE, &rreq->flags))=
- {
- 		trace_netfs_rreq(rreq, netfs_rreq_trace_unpause);
- 		clear_bit_unlock(NETFS_RREQ_PAUSE, &rreq->flags);
--		wake_up_bit(&rreq->flags, NETFS_RREQ_PAUSE);
-+		wake_up(&rreq->waitq);
- 	}
- =
-
- 	if (notes & MADE_PROGRESS) {
-@@ -659,3 +659,39 @@ ssize_t netfs_wait_for_read(struct netfs_io_request *=
-rreq)
- =
-
- 	return ret;
- }
-+
-+/*
-+ * Wait for a paused read operation to unpause or complete in some manner=
-.
-+ */
-+void netfs_wait_for_pause(struct netfs_io_request *rreq)
-+{
-+	struct netfs_io_subrequest *subreq;
-+	struct netfs_io_stream *stream =3D &rreq->io_streams[0];
-+	DEFINE_WAIT(myself);
-+
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_wait_pause);
-+
-+	for (;;) {
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_queue);
-+		prepare_to_wait(&rreq->waitq, &myself, TASK_UNINTERRUPTIBLE);
-+
-+		subreq =3D list_first_entry_or_null(&stream->subrequests,
-+						  struct netfs_io_subrequest, rreq_link);
-+		if (subreq &&
-+		    (!test_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags) ||
-+		     test_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags))) {
-+			__set_current_state(TASK_RUNNING);
-+			netfs_read_collection(rreq);
-+			continue;
-+		}
-+
-+		if (!test_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags) ||
-+		    !test_bit(NETFS_RREQ_PAUSE, &rreq->flags))
-+			break;
-+
-+		schedule();
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_woke_queue);
-+	}
-+
-+	finish_wait(&rreq->waitq, &myself);
-+}
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 4a1499167770..bb74f30a4216 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -324,7 +324,7 @@ static void netfs_collect_write_results(struct netfs_i=
-o_request *wreq)
- 	if ((notes & MADE_PROGRESS) && test_bit(NETFS_RREQ_PAUSE, &wreq->flags))=
- {
- 		trace_netfs_rreq(wreq, netfs_rreq_trace_unpause);
- 		clear_bit_unlock(NETFS_RREQ_PAUSE, &wreq->flags);
--		wake_up_bit(&wreq->flags, NETFS_RREQ_PAUSE);
-+		wake_up(&wreq->waitq);
- 	}
- =
-
- 	if (notes & NEED_REASSESS) {
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index cd2b349243b3..6506bf1d970e 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -721,7 +721,7 @@ int netfs_unbuffered_write(struct netfs_io_request *wr=
-eq, bool may_wait, size_t
- 		rolling_buffer_advance(&wreq->buffer, part);
- 		if (test_bit(NETFS_RREQ_PAUSE, &wreq->flags)) {
- 			trace_netfs_rreq(wreq, netfs_rreq_trace_wait_pause);
--			wait_on_bit(&wreq->flags, NETFS_RREQ_PAUSE, TASK_UNINTERRUPTIBLE);
-+			wait_event(wreq->waitq, !test_bit(NETFS_RREQ_PAUSE, &wreq->flags));
- 		}
- 		if (test_bit(NETFS_RREQ_FAILED, &wreq->flags))
- 			break;
-
+--------------0gMYHnroEb8KsABHFtYnvWX3--
