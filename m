@@ -1,79 +1,63 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0991D90B9
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Dec 2024 17:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21866F30C
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Dec 2024 22:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733161944; cv=none; b=hlpSpQTg53CUsCCWFaO1OCfg8PQ0uYZdVWeL/nRtXf0Ddh2fpa6BRybZDLLBdqg9VuN78ZgeGQFwCIsTkRodZAaphgOht7MmF3vp1i52T9OGv5/HLY+MLYPxFb4KzpoVw3DAfUG8FTBFGGnralFou1+Gn03CN6hyTt256HF6fuE=
+	t=1733179247; cv=none; b=tNc/Nv65qFVSgJsjG48kbts/KHUv2/MOxJnxnlqD76JZfM1Hrhw1RZNUJzJtjVoVx1P6pmyk8Y7aPfytPNlbVrvWYVzd6/JjwNbNs0b0+RG8RvF5IGCTw/srXK8cRgtOJ/AbQ53S7vecXUVlOC99XfFmB8vjkyfCCGqBDjfTAQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733161944; c=relaxed/simple;
-	bh=Y6+M6N4Ri6Lm7N+iQEecNEOh7R00Sb1KLscodqMPW9I=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ba9cHLOcKLW3hiGSE9BXK9P1uxQJzze+/JTPBqyioOxZHk7Y7yi6k22UaQ2hGcHsmR40kW451/o8Jyz2tqWFobx6ZANUxEDmzlkGZuzEjCKXdhSd5bXHCXDZkfWeNseh6EKI98ddWiblFQACJ95pg/DH/9Ul30yrjg0jVPv2OlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=diA9CROf; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733179247; c=relaxed/simple;
+	bh=UDWB4i9zA0iElfSmtvbNyvNH3C3kZ+x5vkDcnzSR6mg=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=dGLGjWfhpLk5e5f8bcGHI5Gfsln1yGuJCcOwUqpAj+vw5ETuHOjwkEdFM0iOwxh7ihAgV8XmjoZGFxCTMsEJj5xM4EeKaU49H/8znWKyTd3rPI14l0UPKoy21fcfjKXHDBKrGFBeOQyad6b7lGA5myD97/KagmGbBxOlqdMy6To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=P/sedAWm; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="diA9CROf"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53e0844ee50so1776348e87.0
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Dec 2024 09:52:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733161941; x=1733766741; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BVuiv0fJfeJQD+vI9caNe+uqhSxSsMu793H9JOnr6BA=;
-        b=diA9CROfCt7Z0VKpYbDasoxU05VyjAm3ZTgiNLFRzf60+CYgkva7xzYDDXbgf4+o6K
-         ME7Z8zlIzhpG7ZY7ETVCxy4YWmEfS0Y9DrE2JxPKHqeAIU7pMnR0gymJaKeF0WWvpHgj
-         JYrm3uUSBCF0BfoWXQgDOiNfiSeTbkicFShoZETs+pl4SIqzD7Pc3n+0Xs9IYFw3CDzM
-         QnECI5W81R4jlbq2Kfzm8BthIoYpnaAKnxbZwe0a/3i/R9QZA1PJVQWawN+cUx0bAcCc
-         mqqX0SxbizJNyp6sRnNiCB/nNFrheMMrqgqViSgOBsqmPopun58iMTn5hmEAJe7qnsP0
-         /9dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733161941; x=1733766741;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BVuiv0fJfeJQD+vI9caNe+uqhSxSsMu793H9JOnr6BA=;
-        b=mVTpkGpYZn/AcWy7B5EnrukcZp6Zdlrg2rx1UYyrbjBRoWQsoWJ8RXEfUjyYjOumUu
-         j9ZsgHCKN/wwNgoM0ecxgJUuCHggpmr7xL0Z4DZyc7ZzAlRrbajwEPkGCgMT0cXz8MD4
-         FNta/1mMPaIjmueMiY8rvW3SF+cEm6ZUTGYcS6n2ypSmV4LgoEpZXPQW9g/i5O/1bj3Q
-         LrHyshhdzzuuweBmcH63mfz/XuFsa9T/orjS7BIATsZJHg9NXJwpcD4zZegsRhVRcC/Y
-         Zapup45LCZvYMJf7XPOjL/lVi9Cev+uC7ID5gS5q9ZRJ0tfRuiIxNCllhKRw1I/qnVvP
-         njTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVH09YnRLycTSewKkBtado3xLmp+P0/6B6H9i/2sI+OBDKe+OpmrW1ZhHjCDGBTWu/guGykyT5gzwD0@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqAS9cGwBngblIC26JYzchGX0t8RXXa+sZYbT9QWtL+T9571PU
-	6QQvtNNFeolEjSyFSd9FQ5svpP+hYhZRYNuKB8oyREz7mkNVuavumIuwBZokopaxFeHVcFwHDVV
-	xBCnba8zmPE3XdKLcK7JqpvW17BI=
-X-Gm-Gg: ASbGncttdK2HiLAEEM5d4IgLWFLrgpf2jLU15lcmxLXAca8gAi7P867jj4X6DyXQVsX
-	DLk783M6G3vKOYlejCXJWfaMC8Mbn2BVNoHh+gAjFnYWPgtlgEkFsXePLH2yM88+6MQ==
-X-Google-Smtp-Source: AGHT+IEEQaRYZBC/AJHX+nMq3zidsZt8UsIBLx5EnKNKl5O4zJWUVZ/hV/AkA5Nj5678t5PchIwdaw3rgm38fzc2xzs=
-X-Received: by 2002:a05:6512:124f:b0:53a:bb9:b54a with SMTP id
- 2adb3069b0e04-53df010e386mr13647279e87.48.1733161940605; Mon, 02 Dec 2024
- 09:52:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="P/sedAWm"
+Message-ID: <0a8569561645ad202c5cceba02cda93a@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1733179237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iXJzFwAJ52p7a8vbN8jLrQUAFsED+Pn8hmrw9pCNDkY=;
+	b=P/sedAWm1ofz6Oqcj8g8dn64AqwJxsuNsHlMiH6pZNdu/pSvzOAMDI5BzHhwlcmGwa5+Sm
+	6p87pNI/XRlkx3WfsVUJC+Hu/SaRbo4uCo3H0BP7HlKyVwwPQSVZ0v9FgaUA5AM/rbchRo
+	a07L3whx3Nd6seK4jKnum8kGyX5z5NQZVYxjwBL7HGPwkfBUe65QnP1ltqcB1B6Davv7Jj
+	UOTEmGQb6kBo3IfgJJBRbxx7nwpT0bQpgOrJx46vZ5n43sjA207yA2PYNoeIyiuI4E8xGq
+	wSXGir5F6yozIArBrbjZaTbP8x+6rAa05Z8uj4BovD6Z6ZZWmmo1lCpzhuUIhg==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Ralph Boehme <slow@samba.org>, Steven French <Steven.French@microsoft.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Special files broken against Samba master
+In-Reply-To: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
+References: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
+Date: Mon, 02 Dec 2024 19:40:34 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 2 Dec 2024 11:52:08 -0600
-Message-ID: <CAH2r5mtJ-GtVWf-U5-WMrcg92cv+pd94n+F8phztuLKpYMv9Bg@mail.gmail.com>
-Subject: xfstest test
-To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-I sometimes see xfstest generic/207 fail (e.g. to Azure
-http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/281/steps/70/logs/stdio)
-but usually passes.
+Ralph Boehme <slow@samba.org> writes:
 
-e.g. "write of 4096 bytes @5455872 finished, expected filesize at
-least 5459968, but got 5455872"
+> I'm also optimizing away unneeded reparse point queries 
+> (create+fsctl+close) for nfs reparse points where we only need the file 
+> type which we now get and use via the smb3 posix type.
 
-Does anyone else see that fail? or have a better repro scenario to
-narrow it down?
+Awesome!  Yeah, we don't need to revalidate the special files with
+SMB3.1.1 POSIX as we can already parse file type directly from query dir
+response.  We could that in separate patches, so no worries.  This will
+definitely help with getdents(2).
 
+> I'm sure I'm doing things wrong. Can you help me getting this across the 
+> line?
 
--- 
-Thanks,
+Patches look good, thanks.  It would be great making sure it didn't
+regress against NFS server on Windows, but Steve can do that.
 
-Steve
+Thanks Ralph!
