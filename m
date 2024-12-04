@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF9A2101B1;
-	Wed,  4 Dec 2024 23:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCEA212B3B;
+	Wed,  4 Dec 2024 23:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733355303; cv=none; b=n6dt4EVyA3Z15R5o+61Musd5L6rmkVw0SoSRTIVrzYHeyuHC8AEM/ewnGGDAUdVR4YZ7dVKNCzKqMuM5qewyA16X61B+5jXizwPyGjLYW5H7Rrc0JZSlXrdLlKfM/zGVJCFz45TBObItUPqXY9u0gPXk1bCDKaWPV6ltmh+mmNg=
+	t=1733355329; cv=none; b=OrpDvvxsqh1x9cmk+X1INSSvk0G6EJD1Q1dnvq8iDKBOxn4vJ/7KSuT6I1jcI4Mt8YJOgon1jfRQc2kiaOJnUvh6BK1l2eOy661UHrLrDo7KRmB6K4OzxViu3vTDZ4WJK6mf/dJYc4iPzuQR/KuHjhBDGU2EoPklDEioDOYZ7uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733355303; c=relaxed/simple;
-	bh=adTCL/do/oOSbOd7oGH5zx91NR4XDjRHqW8saseRH/Q=;
+	s=arc-20240116; t=1733355329; c=relaxed/simple;
+	bh=6g/3gOZpjLqFEtM76L2A0xUggHcj0QKf3jkNqW6mKdU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ChLAM6zI8E1ZCAokvHxwRFWhN0ynN+azSCnHaMZyyXwEMM+T2+EhxlHQ/wgFpzQU+CXkHLKKkrYRygmXj62h0RaDh2dyAyhWafr+oFaLBnbd5Ryyo6Fseufof8t8pXiYjqwLpUnMqkVR/Cn4KyhNN7a+3AQ8Agz4IF95Ed5lOqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g2z2cPRw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=icH+QJoKenU70rnR8yFZNZoDmOungKexqdj1EGlEcESgqkNjTlt7e3z4gCf1WLaMR6HgN4xP3P0q4DjhXtYofTAYmq9deOQH6jSR92r8tstiU2Bp2yc1ItsXbzHHRPAibcMGKElqTshL5n3ZwIgYtylgL6jrDaHPyfhpvbFh4wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9VddgDm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g2z2cPRw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33E9C4CECD;
-	Wed,  4 Dec 2024 23:35:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9VddgDm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36976C4CED2;
+	Wed,  4 Dec 2024 23:35:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733355302;
-	bh=adTCL/do/oOSbOd7oGH5zx91NR4XDjRHqW8saseRH/Q=;
+	s=k20201202; t=1733355329;
+	bh=6g/3gOZpjLqFEtM76L2A0xUggHcj0QKf3jkNqW6mKdU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=g2z2cPRwuD2DBBfWoSPyp5jZ1YmKAva3Kfaw6Mw62riJ4LChmFiwWLUGe0ThKskiD
-	 lsYdaeeBFMYVt/7NAbTUiItxVLhCSnhIyHYHm5/by0WNgL1jQmPfMdNvMhyN79gWdA
-	 J/AFU6yrZZNQnDIGWMPM9EH1lHo13dZTP2B/xC+nfBmYbbGOtQ+EQbnG7SN6OTVWzJ
-	 E4bjHu96PMRRrNrZh+e1nM3IIN/SJ3A12l57tCAqZtwDdJ9rHONLjSeXIwLiA6RIOZ
-	 cyuU1tub4YsnvVwPf26Cn6wjia9mYcAisLn7aN8ApfUPNzNycM7HG7GV0ovO+0neUp
-	 ooJxZRi8SUxPA==
+	b=s9VddgDmnhooTFCg+1QSbhYbf41oKuY3EJbY4FgyEo47VVXC1ylBQ1nJ/Vz8FpM9X
+	 Vb2eufM6aUixXZqJjpi0OLMPWHJG1uGEN3D3rlR0g0CSWpr+JBdJFyx/V86GMTXuH8
+	 Vdm2EGuxv1Zob7hv/7jcrv/Zy71vsrYlKo9GjF7CBt6e8S11MArB6wFZQQojx0TW+J
+	 niT99oclN+uw8keYeH56iG6npqx4+spzNPfzWhHjtofRN7dCE5egvATfqY9R7j6cGS
+	 4U/Z0HbQwlUj/IpE9llIj0+4vmV/JpDVEfTTfGJ1s5y7/Jxwy1uS7B5FDOBmsK+coM
+	 m0WByteKXJnHQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Paulo Alcantara <pc@manguebit.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.12 6/8] smb: client: don't try following DFS links in cifs_tree_connect()
-Date: Wed,  4 Dec 2024 17:23:22 -0500
-Message-ID: <20241204222334.2249307-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 5/7] smb: client: don't try following DFS links in cifs_tree_connect()
+Date: Wed,  4 Dec 2024 17:23:47 -0500
+Message-ID: <20241204222402.2249702-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241204222334.2249307-1-sashal@kernel.org>
-References: <20241204222334.2249307-1-sashal@kernel.org>
+In-Reply-To: <20241204222402.2249702-1-sashal@kernel.org>
+References: <20241204222402.2249702-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.1
+X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.com>
@@ -79,10 +79,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 17 insertions(+), 171 deletions(-)
 
 diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index 3f6077c68d68a..c35953843373e 100644
+index 3ec965547e3d4..bd259b04cdede 100644
 --- a/fs/smb/client/dfs.c
 +++ b/fs/smb/client/dfs.c
-@@ -321,49 +321,6 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+@@ -324,49 +324,6 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs)
  	return rc;
  }
  
@@ -132,7 +132,7 @@ index 3f6077c68d68a..c35953843373e 100644
  static int target_share_matches_server(struct TCP_Server_Info *server, char *share,
  				       bool *target_match)
  {
-@@ -388,77 +345,22 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
+@@ -391,77 +348,22 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
  	return rc;
  }
  
@@ -220,7 +220,7 @@ index 3f6077c68d68a..c35953843373e 100644
  		kfree(share);
  		kfree(prefix);
  		share = prefix = NULL;
-@@ -479,69 +381,16 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
+@@ -482,69 +384,16 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
  		}
  
  		dfs_cache_noreq_update_tgthint(server->leaf_fullpath + 1, tit);
@@ -293,7 +293,7 @@ index 3f6077c68d68a..c35953843373e 100644
  	dfs_cache_free_tgts(tl);
  	return rc;
  }
-@@ -596,14 +445,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+@@ -599,14 +448,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
  	if (!IS_ERR(sb))
  		cifs_sb = CIFS_SB(sb);
  
