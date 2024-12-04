@@ -1,293 +1,317 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A91D17335C
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Dec 2024 20:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF9A2101B1;
+	Wed,  4 Dec 2024 23:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733345421; cv=none; b=hI3TkJ8j8+Jdt13ZgVD7LCKTo5+wLFaRPYZn8HYKtNniqHlfc2HNPinXVKCXc/bYm1rBy6pC5JGwdI2MqPrYwS62ulSO9bWSmXkjVLAOG4S6EsJxUCMu8RgkAfXvUjTj/JrSJ1xbMa5+6J4eewb+swY0Z7ReQqiDTLwFXIm9PCM=
+	t=1733355303; cv=none; b=n6dt4EVyA3Z15R5o+61Musd5L6rmkVw0SoSRTIVrzYHeyuHC8AEM/ewnGGDAUdVR4YZ7dVKNCzKqMuM5qewyA16X61B+5jXizwPyGjLYW5H7Rrc0JZSlXrdLlKfM/zGVJCFz45TBObItUPqXY9u0gPXk1bCDKaWPV6ltmh+mmNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733345421; c=relaxed/simple;
-	bh=zS/S5iQaUxwqYsuRHngSz7VCbNKGq10Bz2AmTZWMMZA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qDXRn4LL43suFFoanqDsNW1vazqZjVjuHF71ieP4lMEJUHzKkNYS1ItRArkJ7vbx57kMb9Ixac4Wvm9VmqCSbQc0FKlASgq2x2Bw4Ns594OMUjWVr6aC2/yqfbnNZHyvjre8W9dJ2FAO49g8+VQbiK9gebRkKt1gYco06xchQyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FT0KV/7/; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733355303; c=relaxed/simple;
+	bh=adTCL/do/oOSbOd7oGH5zx91NR4XDjRHqW8saseRH/Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ChLAM6zI8E1ZCAokvHxwRFWhN0ynN+azSCnHaMZyyXwEMM+T2+EhxlHQ/wgFpzQU+CXkHLKKkrYRygmXj62h0RaDh2dyAyhWafr+oFaLBnbd5Ryyo6Fseufof8t8pXiYjqwLpUnMqkVR/Cn4KyhNN7a+3AQ8Agz4IF95Ed5lOqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g2z2cPRw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FT0KV/7/"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ee86a1a92dso182203a91.1
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Dec 2024 12:50:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733345418; x=1733950218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zqjUu1TaL94H4DtlEcTBsxSwFBHL7CZGTxLr1XjWF1U=;
-        b=FT0KV/7/vFZxNJg5UzKb0NqfSl2EPqFCR9nU/cSAW4J3lIwrNvSnJKUeMITSrMUlpv
-         6d7kGHixtw5qUKgHUIXN41jNUWi90E2J4U4QPQGNn8bcKiAOxV80dRUF5NWKdh/A7Fxn
-         U5opBlo+zQqHMUMFbeBXFQXMRW5sPQDXk69+TeQA5WvxtTqY6kljt2/FGP8iDZAy6CNx
-         Hni5a1RmZPbjoyCxjGb2dvSMjjcUGi4BbYowrdDXFjxnHLBU23IbvpWUUL2BTW6Vwf4d
-         mNlERk78YQgX5gSZm16/g4u0n1s73xuthxI1x78ksi8ZM08Dxs0Df284402fhBSa9k2y
-         mF8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733345418; x=1733950218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zqjUu1TaL94H4DtlEcTBsxSwFBHL7CZGTxLr1XjWF1U=;
-        b=lnokVMs1XcfMduh0Rq7rm78yqrRPB9aV9wiQu0n6gnMN2nJ65c6uzdN2xK2j/FUyeC
-         5uJHWafxi8xQS6FTWsLfdudFQjgat+lrH1e24S+xAyYXyh1ReKZCykq5XY4Uu1UbRKX6
-         mgMN3nlPh81YwqNLo/jSbjyfi59UFF/TNXd34EG47CfTr9uwSejgvOI3TNKV6gxU7NZR
-         XPjqDs8myc6Du2YP0PVaXzJHf5ro+KwutnzjmMQ+0S9PklWCM1CA5isqzYhQAGrgkBqi
-         8Q3IvmA3Zmi/R/xQ9F4ykt9eD+ydd5NEF2iQ8U+WYnC8z1zXVfgLtBC1huQTI9aY63Pz
-         bdOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUf7uvDFzC/Z0t7f/Ozze68TSebWyiQHVJU+SBW1dhYtPDOsb0SG7rR/dapreFzweklII7mjL/4GQrK@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6b54KCXSDjsl3FtjVBDRKWNkRzsGHyfLcNzScf6Hot0pV33EI
-	x7IRfMfTJB72E7Q8IxMsn11nADXZGtWW5PyWyU1VrB0HZVrjAI4hGwyqDFmTn9rExkwobVpuBZx
-	n5pbdBK+B8vtevt6g5/i71jTi4c0=
-X-Gm-Gg: ASbGncvTCFt2o/XffiWsjtBYwoezD3h988oyn/Heo2hsoDhFUkVgXV/EpbiZU7TMx5/
-	1hgKWa2F5BSxegcR5bzFt/wuxQORq/ew=
-X-Google-Smtp-Source: AGHT+IET7+OCIVOzYjbk5AAWwR9t/xOQKVvkZKOOdOMWDsqfXwyPu1c3a9M2fh2eZWX8Vfp9inL4uMTmnqOelKQxXjo=
-X-Received: by 2002:a17:90a:ec87:b0:2ee:f19b:86e5 with SMTP id
- 98e67ed59e1d1-2ef0120125cmr11070912a91.14.1733345417727; Wed, 04 Dec 2024
- 12:50:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g2z2cPRw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33E9C4CECD;
+	Wed,  4 Dec 2024 23:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733355302;
+	bh=adTCL/do/oOSbOd7oGH5zx91NR4XDjRHqW8saseRH/Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=g2z2cPRwuD2DBBfWoSPyp5jZ1YmKAva3Kfaw6Mw62riJ4LChmFiwWLUGe0ThKskiD
+	 lsYdaeeBFMYVt/7NAbTUiItxVLhCSnhIyHYHm5/by0WNgL1jQmPfMdNvMhyN79gWdA
+	 J/AFU6yrZZNQnDIGWMPM9EH1lHo13dZTP2B/xC+nfBmYbbGOtQ+EQbnG7SN6OTVWzJ
+	 E4bjHu96PMRRrNrZh+e1nM3IIN/SJ3A12l57tCAqZtwDdJ9rHONLjSeXIwLiA6RIOZ
+	 cyuU1tub4YsnvVwPf26Cn6wjia9mYcAisLn7aN8ApfUPNzNycM7HG7GV0ovO+0neUp
+	 ooJxZRi8SUxPA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.12 6/8] smb: client: don't try following DFS links in cifs_tree_connect()
+Date: Wed,  4 Dec 2024 17:23:22 -0500
+Message-ID: <20241204222334.2249307-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241204222334.2249307-1-sashal@kernel.org>
+References: <20241204222334.2249307-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANT5p=pUGYwswgXM-pniMjEWwbLK0cKXPBOJB9cG_cOrkBwQhg@mail.gmail.com>
- <CANT5p=qBwjBm-D8soFVVtswGEfmMtQXVW83=TNfUtvyHeFQZBA@mail.gmail.com>
- <505338.1733181074@warthog.procyon.org.uk> <526707.1733224486@warthog.procyon.org.uk>
- <CANT5p=pO28C+XEC44taAT-Z6W_spB-QzJb+MOXv68bDRGqJn=w@mail.gmail.com> <CANT5p=qc97-Ncs4E6_KfcYVxBYU5cw5LnPJoccb3gePa8OuCKg@mail.gmail.com>
-In-Reply-To: <CANT5p=qc97-Ncs4E6_KfcYVxBYU5cw5LnPJoccb3gePa8OuCKg@mail.gmail.com>
-From: ronnie sahlberg <ronniesahlberg@gmail.com>
-Date: Thu, 5 Dec 2024 06:50:05 +1000
-Message-ID: <CAN05THTXWKGDynqPLzSfT2j0vvQ9At0YKBHYWMm0KM4mCgyOxA@mail.gmail.com>
-Subject: Re: null-ptr deref found in netfs code
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.1
+Content-Transfer-Encoding: 8bit
 
-If you run the kernel under gdb and set a breakpoint on panic you
-should be able to see the exact line where it failedand you will also
-be able to check the variables and what they are set to.
+From: Paulo Alcantara <pc@manguebit.com>
 
-On Thu, 5 Dec 2024 at 02:31, Shyam Prasad N <nspmangalore@gmail.com> wrote:
->
-> On Wed, Dec 4, 2024 at 10:00=E2=80=AFPM Shyam Prasad N <nspmangalore@gmai=
-l.com> wrote:
-> >
-> > On Tue, Dec 3, 2024 at 4:44=E2=80=AFPM David Howells <dhowells@redhat.c=
-om> wrote:
-> > >
-> > > Okay, I think I see the problem.
-> > >
-> > > Looking at the following extraction from the trace:
-> > >
-> > > > netfs_rreq_ref: R=3D0000290e NEW         r=3D1
-> > > > netfs_read: R=3D0000290e READAHEAD c=3D00000000 ni=3D0 s=3D85e00000=
- l=3D800000 sz=3D280000000
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D85e00-85fff read
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86000-861ff read
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86200-863ff read
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86400-865ff read
-> > >
-> > > We're requesting reads of four folios, each consisting of 512 pages f=
-or a
-> > > total of 8MiB.
-> > >
-> > > > netfs_sreq: R=3D0000290e[1] DOWN SUBMT f=3D02 s=3D85e00000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[2] DOWN SUBMT f=3D02 s=3D85f00000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[3] DOWN SUBMT f=3D02 s=3D86000000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[4] DOWN SUBMT f=3D02 s=3D86100000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[5] DOWN SUBMT f=3D02 s=3D86200000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[6] DOWN SUBMT f=3D02 s=3D86300000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[7] DOWN SUBMT f=3D02 s=3D86400000 0/100000=
- e=3D0
-> > > > netfs_sreq: R=3D0000290e[8] DOWN SUBMT f=3D02 s=3D86500000 0/100000=
- e=3D0
-> > >
-> > > That got broken down into 8 submissions, each for a 1MiB slice.
-> > >
-> > > > netfs_sreq: R=3D0000290e[1] DOWN IO    f=3D02 s=3D85e00000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[01] s=3D85e00000 ct=3D0/100000 pa=3D10=
-0000/100000 sl=3D0
-> > > > netfs_donate: R=3D0000290e[01] -> [02] to-next am=3D100000
-> > >
-> > > Subrequest 1 completed, but wasn't large enough to cover a whole foli=
-o, so it
-> > > donated its coverage forwards to subreq 2.
-> > >
-> > > > netfs_sreq: R=3D0000290e[6] DOWN IO    f=3D02 s=3D86300000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[06] s=3D86300000 ct=3D0/100000 pa=3D10=
-0000/100000 sl=3D2
-> > > > netfs_donate: R=3D0000290e[06] -> [05] tail-to-prev am=3D100000
-> > >
-> > > Subrequest 6 completed, but wasn't large enough to cover a whole foli=
-o, so it
-> > > donated its coverage backwards to subreq 5.
-> > >
-> > > > netfs_sreq: R=3D0000290e[2] DOWN IO    f=3D02 s=3D85f00000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[02] s=3D85e00000 ct=3D0/200000 pa=3D20=
-0000/200000 sl=3D0
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D85e00-85fff read-done
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D85e00-85fff read-unlock
-> > >
-> > > Subreq 2 completed, and with the donation from subreq 1, had sufficie=
-nt to
-> > > unlock the first folio.
-> > >
-> > > > netfs_sreq: R=3D0000290e[5] DOWN IO    f=3D02 s=3D86200000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[05] s=3D86200000 ct=3D0/200000 pa=3D20=
-0000/200000 sl=3D2
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86200-863ff read-done
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86200-863ff read-unlock
-> > >
-> > > Subreq 5 completed, and with the donation from subreq 6, had sufficie=
-nt to
-> > > unlock the third folio.
-> > >
-> > > > netfs_sreq: R=3D0000290e[3] DOWN IO    f=3D02 s=3D86000000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[03] s=3D86000000 ct=3D0/100000 pa=3D10=
-0000/100000 sl=3D1
-> > > > netfs_donate: R=3D0000290e[03] -> [04] to-next am=3D100000
-> > >
-> > > Subrequest 3 completed, but wasn't large enough to cover a whole foli=
-o, so it
-> > > donated its coverage forwards to subreq 4.  So far, so good.
-> > >
-> > > > netfs_sreq: R=3D0000290e[7] DOWN IO    f=3D02 s=3D86400000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[07] s=3D86400000 ct=3D0/100000 pa=3D10=
-0000/100000 sl=3D3
-> > > > netfs_donate: R=3D0000290e[07] -> [04] to-prev am=3D0
-> > >
-> > > Subreq 7 completed, but wasn't large enough to cover a whole folio, s=
-o it
-> > > donated its coverage backwards to subreq 4.  This is a bug as subreq =
-7 is not
-> > > contiguous with subreq 4.  It should instead have donated forwards to=
- subreq
-> > > 8.
-> > >
-> > > > netfs_sreq: R=3D0000290e[4] DOWN IO    f=3D02 s=3D86100000 100000/1=
-00000 e=3D0
-> > > > netfs_sreq: R=3D0000290e[4] DOWN +DON  f=3D02 s=3D86000000 300000/3=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[04] s=3D86000000 ct=3D0/300000 pa=3D20=
-0000/300000 sl=3D1
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86000-861ff read-done
-> > > > netfs_folio: i=3Df1c2900000000000 ix=3D86000-861ff read-unlock
-> > >
-> > > Subreq 4 completed, and with the donation from subreq 2, had sufficie=
-nt to
-> > > unlock the second folio.  However, it also has some excess from subre=
-q 7 that
-> > > it can't do anything with - and this gets lost.
-> > >
-> > > > netfs_sreq: R=3D0000290e[8] DOWN IO    f=3D02 s=3D86500000 100000/1=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[08] s=3D86500000 ct=3D0/100000 pa=3D10=
-0000/100000 sl=3D3
-> > > > netfs_donate: R=3D0000290e[08] -> [04] tail-to-prev am=3D100000
-> > >
-> > > Here's a repeat of the bug: subreq 8 donates to subreq 4, but, again,=
- is not
-> > > contiguous.  As these are happening concurrently, the other thread ha=
-sn't
-> > > delisted subreq 4 yet.
-> > >
-> > > > netfs_sreq: R=3D0000290e[4] DOWN +DON  f=3D02 s=3D86000000 400000/4=
-00000 e=3D0
-> > > > netfs_progress: R=3D0000290e[04] s=3D86200000 ct=3D200000/400000 pa=
-=3D200000/200000 sl=3D2
-> > >
-> > > The request screwed at this point: subreq 4 shows the extra stuff it =
-has been
-> > > donated, but it is unable to do anything with it.  There is no folio =
-to
-> > > wrangle as the third slot (sl=3D2) in the queue has already been clea=
-red.
-> > >
-> > > (Note that this bug shouldn't happen with the patches currently on my
-> > > netfs-writeback branch as I got rid of the donation mechanism in pref=
-erence
-> > > for something simpler with single-threaded collection.)
-> > >
-> > > David
-> > >
-> >
-> > Hi David,
-> >
-> > Tried your submitted patch "netfs: Fix non-contiguous donation between
-> > completed reads" with the same workload.
-> > It seems to be crashing elsewhere. I'm trying to get the OOPS message
-> > and ftrace, but it seems to be crashing the kernel.
-> >
-> > --
-> > Regards,
-> > Shyam
->
-> Here's what I managed to get before the VM crashed:
->
-> [Wed Dec  4 16:27:10 2024] BUG: kernel NULL pointer dereference,
-> address: 0000000000000068
-> [Wed Dec  4 16:27:10 2024] #PF: supervisor read access in kernel mode
-> [Wed Dec  4 16:27:10 2024] #PF: error_code(0x0000) - not-present page
-> [Wed Dec  4 16:27:10 2024] PGD 0 P4D 0
-> [Wed Dec  4 16:27:10 2024] Oops: Oops: 0000 [#1] SMP PTI
-> [Wed Dec  4 16:27:10 2024] CPU: 6 UID: 0 PID: 1263 Comm: kworker/6:3
-> Tainted: G           OE      6.12.0-mainline #10
-> [Wed Dec  4 16:27:10 2024] Tainted: [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MODU=
-LE
-> [Wed Dec  4 16:27:10 2024] Hardware name: Microsoft Corporation
-> Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1
-> 08/23/2024
-> [Wed Dec  4 16:27:10 2024] Workqueue: cifsiod smb2_readv_worker [cifs]
-> [Wed Dec  4 16:27:10 2024] RIP:
-> 0010:netfs_consume_read_data.isra.0+0x2d6/0xbe0 [netfs]
-> [Wed Dec  4 16:27:10 2024] Code: 48 8b 43 78 4c 8b 7d c0 4c 8b 43 68
-> 48 85 c0 0f 85 76 05 00 00 48 8b 55 90 48 8b 73 30 48 83 c2 70 48 39
-> d6 74 16 48 8b 7d 88 <48> 8b 4f 68 48 03 4f 60 48 39 4b 60 0f 84 58 06
-> 00 00 49 29 c0 48
-> [Wed Dec  4 16:27:10 2024] RSP: 0018:ffffad4a4582bd98 EFLAGS: 00010283
-> [Wed Dec  4 16:27:10 2024] RAX: 0000000000000000 RBX: ffff9810d6ff6280
-> RCX: 0000000000100000
-> [Wed Dec  4 16:27:10 2024] RDX: ffff981154071eb0 RSI: ffff9810d6ff71a8
-> RDI: 0000000000000000
-> [Wed Dec  4 16:27:10 2024] workqueue: smb2_readv_worker [cifs] hogged
-> CPU for >10000us 4 times, consider switching to WQ_UNBOUND
-> [Wed Dec  4 16:27:10 2024] RBP: ffffad4a4582be10 R08: 0000000000100000
-> R09: 0000000000000000
-> [Wed Dec  4 16:27:10 2024] R10: 0000000000000008 R11: fefefefefefefeff
-> R12: 0000000000000000
-> [Wed Dec  4 16:27:10 2024] workqueue: smb2_readv_worker [cifs] hogged
-> CPU for >10000us 5 times, consider switching to WQ_UNBOUND
-> [Wed Dec  4 16:27:10 2024] workqueue: smb2_readv_worker [cifs] hogged
-> CPU for >10000us 7 times, consider switching to WQ_UNBOUND
-> [Wed Dec  4 16:27:10 2024] R13: ffff981154072028 R14: 0000000000200000
-> R15: ffff981154072028
-> [Wed Dec  4 16:27:10 2024] workqueue: smb2_readv_worker [cifs] hogged
-> CPU for >10000us 11 times, consider switching to WQ_UNBOUND
->
->
-> --
-> Regards,
-> Shyam
->
+[ Upstream commit 36008fe6e3dc588e5e9ceae6e82c7f69399eb5d8 ]
+
+We can't properly support chasing DFS links in cifs_tree_connect()
+because
+
+  (1) We don't support creating new sessions while we're reconnecting,
+      which would be required for DFS interlinks.
+
+  (2) ->is_path_accessible() can't be called from cifs_tree_connect()
+     as it would deadlock with smb2_reconnect().  This is required for
+     checking if new DFS target is a nested DFS link.
+
+By unconditionally trying to get an DFS referral from new DFS target
+isn't correct because if the new DFS target (interlink) is an DFS
+standalone namespace, then we would end up getting -ELOOP and then
+potentially leaving tcon disconnected.
+
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/dfs.c | 188 ++++----------------------------------------
+ 1 file changed, 17 insertions(+), 171 deletions(-)
+
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index 3f6077c68d68a..c35953843373e 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -321,49 +321,6 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
+ 	return rc;
+ }
+ 
+-/* Update dfs referral path of superblock */
+-static int update_server_fullpath(struct TCP_Server_Info *server, struct cifs_sb_info *cifs_sb,
+-				  const char *target)
+-{
+-	int rc = 0;
+-	size_t len = strlen(target);
+-	char *refpath, *npath;
+-
+-	if (unlikely(len < 2 || *target != '\\'))
+-		return -EINVAL;
+-
+-	if (target[1] == '\\') {
+-		len += 1;
+-		refpath = kmalloc(len, GFP_KERNEL);
+-		if (!refpath)
+-			return -ENOMEM;
+-
+-		scnprintf(refpath, len, "%s", target);
+-	} else {
+-		len += sizeof("\\");
+-		refpath = kmalloc(len, GFP_KERNEL);
+-		if (!refpath)
+-			return -ENOMEM;
+-
+-		scnprintf(refpath, len, "\\%s", target);
+-	}
+-
+-	npath = dfs_cache_canonical_path(refpath, cifs_sb->local_nls, cifs_remap(cifs_sb));
+-	kfree(refpath);
+-
+-	if (IS_ERR(npath)) {
+-		rc = PTR_ERR(npath);
+-	} else {
+-		mutex_lock(&server->refpath_lock);
+-		spin_lock(&server->srv_lock);
+-		kfree(server->leaf_fullpath);
+-		server->leaf_fullpath = npath;
+-		spin_unlock(&server->srv_lock);
+-		mutex_unlock(&server->refpath_lock);
+-	}
+-	return rc;
+-}
+-
+ static int target_share_matches_server(struct TCP_Server_Info *server, char *share,
+ 				       bool *target_match)
+ {
+@@ -388,77 +345,22 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
+ 	return rc;
+ }
+ 
+-static void __tree_connect_ipc(const unsigned int xid, char *tree,
+-			       struct cifs_sb_info *cifs_sb,
+-			       struct cifs_ses *ses)
+-{
+-	struct TCP_Server_Info *server = ses->server;
+-	struct cifs_tcon *tcon = ses->tcon_ipc;
+-	int rc;
+-
+-	spin_lock(&ses->ses_lock);
+-	spin_lock(&ses->chan_lock);
+-	if (cifs_chan_needs_reconnect(ses, server) ||
+-	    ses->ses_status != SES_GOOD) {
+-		spin_unlock(&ses->chan_lock);
+-		spin_unlock(&ses->ses_lock);
+-		cifs_server_dbg(FYI, "%s: skipping ipc reconnect due to disconnected ses\n",
+-				__func__);
+-		return;
+-	}
+-	spin_unlock(&ses->chan_lock);
+-	spin_unlock(&ses->ses_lock);
+-
+-	cifs_server_lock(server);
+-	scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", server->hostname);
+-	cifs_server_unlock(server);
+-
+-	rc = server->ops->tree_connect(xid, ses, tree, tcon,
+-				       cifs_sb->local_nls);
+-	cifs_server_dbg(FYI, "%s: tree_reconnect %s: %d\n", __func__, tree, rc);
+-	spin_lock(&tcon->tc_lock);
+-	if (rc) {
+-		tcon->status = TID_NEED_TCON;
+-	} else {
+-		tcon->status = TID_GOOD;
+-		tcon->need_reconnect = false;
+-	}
+-	spin_unlock(&tcon->tc_lock);
+-}
+-
+-static void tree_connect_ipc(const unsigned int xid, char *tree,
+-			     struct cifs_sb_info *cifs_sb,
+-			     struct cifs_tcon *tcon)
+-{
+-	struct cifs_ses *ses = tcon->ses;
+-
+-	__tree_connect_ipc(xid, tree, cifs_sb, ses);
+-	__tree_connect_ipc(xid, tree, cifs_sb, CIFS_DFS_ROOT_SES(ses));
+-}
+-
+-static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *tcon,
+-				     struct cifs_sb_info *cifs_sb, char *tree, bool islink,
+-				     struct dfs_cache_tgt_list *tl)
++static int tree_connect_dfs_target(const unsigned int xid,
++				   struct cifs_tcon *tcon,
++				   struct cifs_sb_info *cifs_sb,
++				   char *tree, bool islink,
++				   struct dfs_cache_tgt_list *tl)
+ {
+-	int rc;
++	const struct smb_version_operations *ops = tcon->ses->server->ops;
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+-	const struct smb_version_operations *ops = server->ops;
+-	struct cifs_ses *root_ses = CIFS_DFS_ROOT_SES(tcon->ses);
+-	char *share = NULL, *prefix = NULL;
+ 	struct dfs_cache_tgt_iterator *tit;
++	char *share = NULL, *prefix = NULL;
+ 	bool target_match;
+-
+-	tit = dfs_cache_get_tgt_iterator(tl);
+-	if (!tit) {
+-		rc = -ENOENT;
+-		goto out;
+-	}
++	int rc = -ENOENT;
+ 
+ 	/* Try to tree connect to all dfs targets */
+-	for (; tit; tit = dfs_cache_get_next_tgt(tl, tit)) {
+-		const char *target = dfs_cache_get_tgt_name(tit);
+-		DFS_CACHE_TGT_LIST(ntl);
+-
++	for (tit = dfs_cache_get_tgt_iterator(tl);
++	     tit; tit = dfs_cache_get_next_tgt(tl, tit)) {
+ 		kfree(share);
+ 		kfree(prefix);
+ 		share = prefix = NULL;
+@@ -479,69 +381,16 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
+ 		}
+ 
+ 		dfs_cache_noreq_update_tgthint(server->leaf_fullpath + 1, tit);
+-		tree_connect_ipc(xid, tree, cifs_sb, tcon);
+-
+ 		scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
+-		if (!islink) {
+-			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, cifs_sb->local_nls);
+-			break;
+-		}
+-
+-		/*
+-		 * If no dfs referrals were returned from link target, then just do a TREE_CONNECT
+-		 * to it.  Otherwise, cache the dfs referral and then mark current tcp ses for
+-		 * reconnect so either the demultiplex thread or the echo worker will reconnect to
+-		 * newly resolved target.
+-		 */
+-		if (dfs_cache_find(xid, root_ses, cifs_sb->local_nls, cifs_remap(cifs_sb), target,
+-				   NULL, &ntl)) {
+-			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, cifs_sb->local_nls);
+-			if (rc)
+-				continue;
+-
++		rc = ops->tree_connect(xid, tcon->ses, tree,
++				       tcon, tcon->ses->local_nls);
++		if (islink && !rc && cifs_sb)
+ 			rc = cifs_update_super_prepath(cifs_sb, prefix);
+-		} else {
+-			/* Target is another dfs share */
+-			rc = update_server_fullpath(server, cifs_sb, target);
+-			dfs_cache_free_tgts(tl);
+-
+-			if (!rc) {
+-				rc = -EREMOTE;
+-				list_replace_init(&ntl.tl_list, &tl->tl_list);
+-			} else
+-				dfs_cache_free_tgts(&ntl);
+-		}
+ 		break;
+ 	}
+ 
+-out:
+ 	kfree(share);
+ 	kfree(prefix);
+-
+-	return rc;
+-}
+-
+-static int tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *tcon,
+-				   struct cifs_sb_info *cifs_sb, char *tree, bool islink,
+-				   struct dfs_cache_tgt_list *tl)
+-{
+-	int rc;
+-	int num_links = 0;
+-	struct TCP_Server_Info *server = tcon->ses->server;
+-	char *old_fullpath = server->leaf_fullpath;
+-
+-	do {
+-		rc = __tree_connect_dfs_target(xid, tcon, cifs_sb, tree, islink, tl);
+-		if (!rc || rc != -EREMOTE)
+-			break;
+-	} while (rc = -ELOOP, ++num_links < MAX_NESTED_LINKS);
+-	/*
+-	 * If we couldn't tree connect to any targets from last referral path, then
+-	 * retry it from newly resolved dfs referral.
+-	 */
+-	if (rc && server->leaf_fullpath != old_fullpath)
+-		cifs_signal_cifsd_for_reconnect(server, true);
+-
+ 	dfs_cache_free_tgts(tl);
+ 	return rc;
+ }
+@@ -596,14 +445,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 	if (!IS_ERR(sb))
+ 		cifs_sb = CIFS_SB(sb);
+ 
+-	/*
+-	 * Tree connect to last share in @tcon->tree_name whether dfs super or
+-	 * cached dfs referral was not found.
+-	 */
+-	if (!cifs_sb || !server->leaf_fullpath ||
++	/* Tree connect to last share in @tcon->tree_name if no DFS referral */
++	if (!server->leaf_fullpath ||
+ 	    dfs_cache_noreq_find(server->leaf_fullpath + 1, &ref, &tl)) {
+-		rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name, tcon,
+-				       cifs_sb ? cifs_sb->local_nls : nlsc);
++		rc = ops->tree_connect(xid, tcon->ses, tcon->tree_name,
++				       tcon, tcon->ses->local_nls);
+ 		goto out;
+ 	}
+ 
+-- 
+2.43.0
+
