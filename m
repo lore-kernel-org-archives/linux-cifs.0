@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2EC221474;
-	Wed,  4 Dec 2024 17:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD652251C1;
+	Wed,  4 Dec 2024 17:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733331730; cv=none; b=tGxtB5+WX4sVqekQ9IaMQvk9FW9gby6+9NbfyzFvCzeay7geN7WJ8cYt2osEOP3CcCNQ0/12qICXUZAKe15LdkXPAvGBRJlE4JUHVXOQY+0R8ZOUn/xi0jk4qj0m0L2x2MC5WvtjIMy5bJBSy0MceWblaKv5jmnk1B2OYV8F4YA=
+	t=1733331774; cv=none; b=mXjuHuim2nZqupDn8NO/yVIjplQZMPMzMI8QdBLB7gSDNd8OpD4fi3dmA+DRFZfKIkCYCOteBuTKBWfG2m8woVqhMucqaqSlqe0+qB6pvmu+ukaYRQQOS+jx320oLyvs9ujNSGDucLR02GYAFUbSm7TFA/zA801MWkvpFh0oBw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733331730; c=relaxed/simple;
-	bh=TAZkU2/9ASsYEjOO7G8MaU7/9Xway/EOa6HJfawrR2w=;
+	s=arc-20240116; t=1733331774; c=relaxed/simple;
+	bh=uk4wdUmdwzt9KGwhiq+XwZHaY3wVvPrKAOZc1qX0dCw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UFeCa0Ng++qvgybJGATFVnrHC9CUIPEWRlVqHIU8wicg8GimzxTx62GzKRzouHGgX5B9l8KnCE9JjuXnt+E4gGosKRaD83KNphi/RM7qWrtjNlmQZ0lkH1JS0wST/BzPm18VRTpZOTzSX89TnrEv0dcNPWrYa+afVC7OUSj5G9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMsekpcW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ETEl1mZqKmkTossVLnvxnCjC+PcTcBnM7GtcwIi9eqgK2GKBmdDqk/yofXRSn3hXVAHS8++XHDUD1xa8aG3YnFOhDS9qyMo2Y2P605ZKlf19fPmihdA9fuf9wk+PR7QASAotcL2x0Lglz6HuMqa4WEviiATNX7aVlJi2U7WpENc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2xJUSFB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMsekpcW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B817BC4CECD;
-	Wed,  4 Dec 2024 17:02:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2xJUSFB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9CB0C4CECD;
+	Wed,  4 Dec 2024 17:02:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733331729;
-	bh=TAZkU2/9ASsYEjOO7G8MaU7/9Xway/EOa6HJfawrR2w=;
+	s=k20201202; t=1733331773;
+	bh=uk4wdUmdwzt9KGwhiq+XwZHaY3wVvPrKAOZc1qX0dCw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oMsekpcWnkWReS46Tq5mr9vpdnYuTuXIex0vd0oR7WWX4BvmBORxyP+9iY4m8vfz0
-	 dRar1MQnb/D3q3tc4DKzdrcrr/3bRAT3dBwmWjdeuNGJwMUe5CIp/JmEu1qZwrY29h
-	 FkKRolfJi0rIkjLz169xVVrMI/MUPb4NZjukDDSjKA83VTRuyeRdMU3UgRQ+Ba5Edy
-	 wme/tGOwF8HpRPmz8tCRge1+sXnPhMPeWfcPdTpaCk5i3Scenbh8G5dIR7lLGBa8da
-	 5lRZeDY8GlY/jtBuD3ItBxukLmzWn+huDaOezJ5V+yvCN5PlWHiV/uunb71iKLqD92
-	 B/vbgrtUwWdcg==
+	b=P2xJUSFBmijAQXgwGtydN7ZDLh4f3Z/NEtuSDWmA7ndPOhKOgFzCyhPKRcC7BmDOt
+	 3lyfGKeTNJz/Xz57kmV2pT8WGVuwGyClO/Meci0JuHFcwBtC/3U/7zDTmK/ETtq0/9
+	 QzH51TKR8d8lpApRABOKZoVfcVvAQZEjxICW16O45hwhXF+Ac1tjwkF9hICC58H58Q
+	 yXNDgeemLUitY4I1hd87mOM7VDw2I6yaHGa/ehr3QTLHQKlabFnzrndhxRHyGd2JHj
+	 VdNTrYItf6Yez7LtHvYTlYSI1Pj3657ypSUT7TZ2Q7tGdjRyB7m3r45K0DDuSTaEns
+	 QMN57c8+TbryA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: Kees Cook <kees@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.6 23/24] smb: client: memcpy() with surrounding object base address
-Date: Wed,  4 Dec 2024 10:49:43 -0500
-Message-ID: <20241204155003.2213733-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 14/15] smb: client: memcpy() with surrounding object base address
+Date: Wed,  4 Dec 2024 10:50:53 -0500
+Message-ID: <20241204155105.2214350-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241204155003.2213733-1-sashal@kernel.org>
-References: <20241204155003.2213733-1-sashal@kernel.org>
+In-Reply-To: <20241204155105.2214350-1-sashal@kernel.org>
+References: <20241204155105.2214350-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.63
+X-stable-base: Linux 6.1.119
 Content-Transfer-Encoding: 8bit
 
 From: Kees Cook <kees@kernel.org>
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 301189ee1335b..a34db419e46f7 100644
+index 67c5fc2b2db94..6077fe1dcc9ce 100644
 --- a/fs/smb/client/cifssmb.c
 +++ b/fs/smb/client/cifssmb.c
-@@ -5364,7 +5364,7 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -5349,7 +5349,7 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
  	param_offset = offsetof(struct smb_com_transaction2_spi_req,
  				InformationLevel) - 4;
  	offset = param_offset + params;
