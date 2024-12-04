@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCEA212B3B;
-	Wed,  4 Dec 2024 23:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B564224AEF;
+	Wed,  4 Dec 2024 23:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733355329; cv=none; b=OrpDvvxsqh1x9cmk+X1INSSvk0G6EJD1Q1dnvq8iDKBOxn4vJ/7KSuT6I1jcI4Mt8YJOgon1jfRQc2kiaOJnUvh6BK1l2eOy661UHrLrDo7KRmB6K4OzxViu3vTDZ4WJK6mf/dJYc4iPzuQR/KuHjhBDGU2EoPklDEioDOYZ7uQ=
+	t=1733355350; cv=none; b=mBEebNUlLjl5xg3CV0WxOhu1ENKgj0Dal+4mqzHUZXWUGNPoiIBGiRma7neAFRJgp3H4umcn44EIjMOcuXslYnVFAvHGCWfNaTH6PVOoOVysyANBoaCe5bMjoNsgDXMEU6F7HGT4KOh06B2HYhsQ3xiTYCP7viqGOUzLxWgbCvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733355329; c=relaxed/simple;
+	s=arc-20240116; t=1733355350; c=relaxed/simple;
 	bh=6g/3gOZpjLqFEtM76L2A0xUggHcj0QKf3jkNqW6mKdU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=icH+QJoKenU70rnR8yFZNZoDmOungKexqdj1EGlEcESgqkNjTlt7e3z4gCf1WLaMR6HgN4xP3P0q4DjhXtYofTAYmq9deOQH6jSR92r8tstiU2Bp2yc1ItsXbzHHRPAibcMGKElqTshL5n3ZwIgYtylgL6jrDaHPyfhpvbFh4wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9VddgDm; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=saeO9SSFjztvJ0JXIOpQ52YQEbpjAxw8hnkbFdzAFYVmWP4fW+mHBvZTPDgHRpxTNhke4+UnyXUCeNB3cWTBaTMpYPE5DzcdwGrEqafVEog+IoP7uPBUCwnVqp0FmdmoZ6W4u0WezhBV6ddwyzDQG7X3TUHuxkxPVZmKFi0HeH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMGVWdQs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9VddgDm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36976C4CED2;
-	Wed,  4 Dec 2024 23:35:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMGVWdQs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E62C4CECD;
+	Wed,  4 Dec 2024 23:35:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733355329;
+	s=k20201202; t=1733355350;
 	bh=6g/3gOZpjLqFEtM76L2A0xUggHcj0QKf3jkNqW6mKdU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s9VddgDmnhooTFCg+1QSbhYbf41oKuY3EJbY4FgyEo47VVXC1ylBQ1nJ/Vz8FpM9X
-	 Vb2eufM6aUixXZqJjpi0OLMPWHJG1uGEN3D3rlR0g0CSWpr+JBdJFyx/V86GMTXuH8
-	 Vdm2EGuxv1Zob7hv/7jcrv/Zy71vsrYlKo9GjF7CBt6e8S11MArB6wFZQQojx0TW+J
-	 niT99oclN+uw8keYeH56iG6npqx4+spzNPfzWhHjtofRN7dCE5egvATfqY9R7j6cGS
-	 4U/Z0HbQwlUj/IpE9llIj0+4vmV/JpDVEfTTfGJ1s5y7/Jxwy1uS7B5FDOBmsK+coM
-	 m0WByteKXJnHQ==
+	b=LMGVWdQs85YIpRgdyuxigDjY6iiOK58kuTi75i5a9fTGJKWmQ60eLdUSQ7lIe2qV+
+	 dev6rljXAWK4BbfMjXMtmTvaw+pezHkijyijrI65cbI97z5xtUDZCCy6yapD2ESex7
+	 dwpAMpqrqP+4ZonJx1kVsCCIxM5tMrdbPtYsCsjHBScwtxSaVyo7y8uus4DmED7Jdu
+	 IaH8WC/0j0GpaNgmHuzSGlBb7ghs9cozEc8LnuFCsK+eEyidlQpmV4vhM3fiajNvxE
+	 6QDFhHKGpZBLboT4f5yFE/D1x1i6d2x5FZmEkltKBjYLHefJuWUPZJ/GFS0hrSoHn4
+	 YrUgrb0W5NGvQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Paulo Alcantara <pc@manguebit.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.11 5/7] smb: client: don't try following DFS links in cifs_tree_connect()
-Date: Wed,  4 Dec 2024 17:23:47 -0500
-Message-ID: <20241204222402.2249702-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 4/6] smb: client: don't try following DFS links in cifs_tree_connect()
+Date: Wed,  4 Dec 2024 17:24:13 -0500
+Message-ID: <20241204222425.2250046-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241204222402.2249702-1-sashal@kernel.org>
-References: <20241204222402.2249702-1-sashal@kernel.org>
+In-Reply-To: <20241204222425.2250046-1-sashal@kernel.org>
+References: <20241204222425.2250046-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11.10
+X-stable-base: Linux 6.6.63
 Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.com>
