@@ -1,78 +1,93 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DAF1474AF
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Dec 2024 14:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56AF1494A8;
+	Fri,  6 Dec 2024 14:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733496588; cv=none; b=PWTnXaouPhdb7RKvFZ+JXj/oHPZtmmne/QkK1fmzsXDA+AuZu4mXUmHclWsW3CjgqmURL8Rle8d8lBNWIO5fUlD2hTC8sEoZchLFFJYIwfLS6PB3HplwMt0mhT7e0tEX4lE9PRgXsy1MJZW/kAhCFcpZSh2ga0BTOv1Friba9+E=
+	t=1733497011; cv=none; b=merNssP/5udeKPsVM+6UW1Bf+bhpNt6cg5f31GSfJL2oq9oyM+jT2P9maiYt8CavLJyaDxuTigWoKPbU8lGEZpC94ZEdkoGirbhvAbahOzTZU99c1KTWT4K5CnmxMYkdHP855V4PI2x8CXDBjLZ2lDedvvRF6Lc2XVxKwxCKuLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733496588; c=relaxed/simple;
-	bh=GoHTj64/ZEd3D2vEKsIPJYnSD1xlHaHMuxXjQhX9blw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K68VfwDYN5jSrIWleU5FH4/ivCXpT1WKwQhiFwFZsLWExILbU2O84nWfsNbNPLCD76P+fG5WG+W5mEmPCjj39PJlo2yCY1TpBfwi+sOH6+iuniNllgbOoMzhh4+wZNfpRxf12gSouW9jntx4U1DVl+L4FT+Wdc6c//CJf60SIvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=M3OYaxBA; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1733497011; c=relaxed/simple;
+	bh=XgLZDE0L+3IfV0yth2uDUAUVqNfm/D7z1GB9Pl0dfic=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nzwbs2KVuTcsHdKS8WfB1uBYm/Wr+BrzUHixahL7lY7omGSUY6QUbXAPpHf3Cl+GoZu0BBq1hT67argBJxM0BOMwvFY0Vsg+F0pSmTiQ7e091c51D6L+PW5tMNJHsOlL33naZHlmADrLVR6r6XPyL+vjxcCDngWYOUruFZQ3QNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+OQavps; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="M3OYaxBA"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1733496576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8MQ1IbEpcH+z3LBpSFGpQNfXeKyfsnX7KchiQxRnrwY=;
-	b=M3OYaxBAsq2nbI+48HedlcWk8JyrYFXkBwgk4lBW1cHVDhgmWYtsu9xg7wxyeclXClB8WH
-	ZvpiS4yZNDByqcNlhzEPYHidP0NPodRSwf8LJaU0cvAQOeMY6MQItEs7hPtwjkZqCLiiXq
-	xTbyjlJJ1qxHQfYQeGWBymposD5M28tOGMcGahx0gFV0H+o/o9mUORqBMr7o68tFJPJvbv
-	S+3uo5VMabmUvWJrGmSE42c42bT81WOCZnOewoDr+8Vy4jc6o7bH3W8sakCKYZWPtqNArA
-	LOgunOV4ja+cgMSMusFzVn/ECDHZ+G4z/5llaLzwTN+cyRBEgHffArumAtF9Fw==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH] smb: client: fix potential race in cifs_put_tcon()
-Date: Fri,  6 Dec 2024 11:49:07 -0300
-Message-ID: <20241206144907.162730-1-pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+OQavps"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83EAFC4CEDC;
+	Fri,  6 Dec 2024 14:56:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733497011;
+	bh=XgLZDE0L+3IfV0yth2uDUAUVqNfm/D7z1GB9Pl0dfic=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Z+OQavpsVLkBByke+FQjn2SmcCiB/9A5v7km0F5rK0fqYPyZkqkjIjVOuualQY109
+	 AJkEVeYxqJT5y97hd5nw3sOC+UaZkmuHWpAU8v0PkTsi58rUNMjxtdrCVyTH9MPS/m
+	 0V/HX/g2bNmHFLynvQNOvHmMnpJcwrqOd1qKU2TdML8AXf1Sd3AxDHV9SqnaWdV9lI
+	 rnVF228WW+SuSP34BQSHmlY99rFcpb6TUaPl4BiQw/kGsWwVuoRkzQLx+ztEu9ANCU
+	 DygMVHGmeP/rI4HLla06WCRPz2FJNELy9dnhrJScqryHayz+qwEUUvKV1pHg/umCP4
+	 /TWeQwTalEUqg==
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-29e70c9dc72so1242973fac.0;
+        Fri, 06 Dec 2024 06:56:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUmCMZd9cVRuJ8d1YL+X0V+pkau/nA6Tak0E9vI7/roGhB/M8eovgQA9P40WOq1LVlkMCDp+d1GPoNj@vger.kernel.org, AJvYcCVNbLM2Rz1WPOe+49umYIydx7MyTczNTIjTYiqEvWIXv9iqPQp0rbyp1xWcs3iyad8b64vJAjoe/kQ9kBkzzA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo+7JQp9m+Ty8dyljchKI6EW3yRkSRqb+cabJr3TuSs/iY66KB
+	/MKDvOqAghYz1EA/AEkVZRUx4xxlMpJN9MSMuvtEdtLjU9rliBfRkJ0/SwG7GW8uEfcBRdKPY7c
+	/SULtDYMFmO5mXvg9Wd6DirE0A9I=
+X-Google-Smtp-Source: AGHT+IE4PHAtUQ85vUjMtstEGTEOcMtHIQm3DFsimoekg2HprS6Hh/iAhcI/QyggWWq+9gimg+SAvK4lzHXYZF+d0xg=
+X-Received: by 2002:a05:6870:96a6:b0:254:bd24:de83 with SMTP id
+ 586e51a60fabf-29f73255815mr1972282fac.12.1733497010863; Fri, 06 Dec 2024
+ 06:56:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241206164155.3c80d28e.ddiss@suse.de> <CAKYAXd8U-kQa5+fg4QvcUeOkAuX128v_VLxNz5=trF85ZONrYA@mail.gmail.com>
+ <20241206233654.3a3207ba.ddiss@suse.de>
+In-Reply-To: <20241206233654.3a3207ba.ddiss@suse.de>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 6 Dec 2024 23:56:39 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-7otRiYAZdMZtZxp3Rp_X0X4DaTWF6mJTjpMmejOC7nQ@mail.gmail.com>
+Message-ID: <CAKYAXd-7otRiYAZdMZtZxp3Rp_X0X4DaTWF6mJTjpMmejOC7nQ@mail.gmail.com>
+Subject: Re: ksmbd: v6.13-rc1 WARNING at fs/attr.c:300 setattr_copy+0x1ee/0x200
+To: David Disseldorp <ddiss@suse.de>
+Cc: Jeff Layton <jlayton@kernel.org>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-dfs_cache_refresh() delayed worker could race with cifs_put_tcon(), so
-make sure to call list_replace_init() on @tcon->dfs_ses_list after
-kworker is cancelled or finished.
+On Fri, Dec 6, 2024 at 9:37=E2=80=AFPM David Disseldorp <ddiss@suse.de> wro=
+te:
+>
+> On Fri, 6 Dec 2024 16:35:18 +0900, Namjae Jeon wrote:
+> ...
+> > > 300                 WARN_ON_ONCE(ia_valid & ATTR_MTIME);
+> > >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^--- here.
+>
+> I should mention, fstests generic/215 atop a 6.13.0-rc1 cifs.ko SMB3
+> mount was the trigger for this ksmbd warning.
+Okay, I have reproduced it. Thanks. I will take a look.
+>
+> > > Looking at smb2pdu.c:set_file_basic_info() it's easy enough to see ho=
+w
+> > > we can get here with !ATTR_CTIME alongside ATTR_MTIME.
+> > >
+> > > The following patch avoids the warning, but I'm not familiar with thi=
+s
+> > > code-path, so please let me know whether or not it makes sense:
+> > mtime and atime will probably not be updated.
+>
+> Unless I'm missing something, this patched ksmbd still triggers mtime
+> update via the setattr_copy_mgtime()->(ia_valid & ATTR_MTIME_SET) path.
+If FS_MGTIME flag is not set in the fstype of local filesystem, mtime
+is not updated with only ATTR_MTIME_SET.
 
-Fixes: 4f42a8b54b5c ("smb: client: fix DFS interlink failover")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
----
- fs/smb/client/connect.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 56b3a9eb9b05..2372538a1211 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2532,9 +2532,6 @@ cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- 
- 	list_del_init(&tcon->tcon_list);
- 	tcon->status = TID_EXITING;
--#ifdef CONFIG_CIFS_DFS_UPCALL
--	list_replace_init(&tcon->dfs_ses_list, &ses_list);
--#endif
- 	spin_unlock(&tcon->tc_lock);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -2542,6 +2539,7 @@ cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- 	cancel_delayed_work_sync(&tcon->query_interfaces);
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	cancel_delayed_work_sync(&tcon->dfs_cache_work);
-+	list_replace_init(&tcon->dfs_ses_list, &ses_list);
- #endif
- 
- 	if (tcon->use_witness) {
--- 
-2.47.1
-
+Thanks.
+>
+> > I will change it so that ATTR_CTIME is also set when changing mtime.
+>
+> That should also work. I was turned off that path due to the
+> 64e7875560270 ("ksmbd: fix oops from fuse driver") ATTR_CTIME changes.
+>
+> Thanks, David
