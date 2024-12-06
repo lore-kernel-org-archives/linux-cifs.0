@@ -1,152 +1,112 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164F01FCF40;
-	Fri,  6 Dec 2024 12:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4664247F53
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Dec 2024 14:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733488630; cv=none; b=Y37Ll1MeeNc0oldQ7ztGZLXwM4ufFcmOarf6NRVNozo8Hu+18d7PzqU/DNwZ2N0cNiKSibyKnno982t6ux2MFx2WKHtVopMRh3GPZ9B3rhBM3t0hBk0hfdjDI5kA1erp4L9Apy+3PY+Bu4izZvtmp+6UgnclpfaU5spNq8ELz68=
+	t=1733496330; cv=none; b=dHD589H03Rv5DIrJqqKf/0AdjrxqIuK3vUF+4/gDVUWzMCAvdJ6UMCRa+bpc81YtOi21U7mB3BNuOV1052Ls7+yoT27O/9+B+RSjvEy8WKd3JwPyLCGyd+pkH5Kp9lVe1gnPkc+ZMC59EICzNlFOfaUSgrjKRp4XUGg/ZQLPuLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733488630; c=relaxed/simple;
-	bh=o6wRrS3k07uBZ5yBKQHBLycycX25rpyqfhX4KmiWlDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A2onQvR4ZJZPp6g+fPd14a2BBOGMxf57ngJMGPUJg5TbLzHL+c9MoQxCM8HxtC24Bef7sSPQZ+5FOEo8hPsz1l51WoARK19KWguyfRRDWSpjtu3wGEAFULgPG0P9U3EzzaqKZ2vw/MLnMl37BU7+x0GG+YKRIRR3bToWo+KNzrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lG+M9Z3O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TrKShBSJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=lG+M9Z3O; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TrKShBSJ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1733496330; c=relaxed/simple;
+	bh=03K0y3+QAQCLIPyXRj6HvmwqtWwDrvNbtJhGQURKJl8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l0cEey+eYoiwTGj8KdPQX53Dw7OJtq3x3cWeY515D9uJghMOQuZKdLQt1fvqUKxKCS18JVINR+BXBoOfE3gj77cyb7nYOgLlFK/2wVuqsvHj7XpcM08QF1xEVAtJLy6qLtmjiEGUhzjowHS9dGzVESes8gEg5+WPRwp/PCtbnsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBg0TVco; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lG+M9Z3O";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TrKShBSJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="lG+M9Z3O";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TrKShBSJ"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 335C11F397;
-	Fri,  6 Dec 2024 12:37:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733488627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5uE5wJA9vj7KF0w77/4O+vlPlqnKO1saLwErislPea0=;
-	b=lG+M9Z3OLrLsKUDAxHtpA1M6Rz+46AINscgR0kXPIejzsxEBUqnhLt2hBHp7dI2t1XaPpj
-	JZqcKeZ1Lq0UKgaehzTymtVR0Eb7iXTOH57AORFn8tPgYhBVfI3VpSc+o/JQNaTPedwcmY
-	u30sfu2UiWRZg4MVvxWM23ZlUfj2QCw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733488627;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5uE5wJA9vj7KF0w77/4O+vlPlqnKO1saLwErislPea0=;
-	b=TrKShBSJNXFDBRgrQ4E9q69zMevrNPWhnVYTHLMAACL726CCBsIiql3/JO9yPGTeTpqRk6
-	0lOIzfO/UEhOPYDQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=lG+M9Z3O;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=TrKShBSJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733488627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5uE5wJA9vj7KF0w77/4O+vlPlqnKO1saLwErislPea0=;
-	b=lG+M9Z3OLrLsKUDAxHtpA1M6Rz+46AINscgR0kXPIejzsxEBUqnhLt2hBHp7dI2t1XaPpj
-	JZqcKeZ1Lq0UKgaehzTymtVR0Eb7iXTOH57AORFn8tPgYhBVfI3VpSc+o/JQNaTPedwcmY
-	u30sfu2UiWRZg4MVvxWM23ZlUfj2QCw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733488627;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5uE5wJA9vj7KF0w77/4O+vlPlqnKO1saLwErislPea0=;
-	b=TrKShBSJNXFDBRgrQ4E9q69zMevrNPWhnVYTHLMAACL726CCBsIiql3/JO9yPGTeTpqRk6
-	0lOIzfO/UEhOPYDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 64E82138A7;
-	Fri,  6 Dec 2024 12:37:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5VhqB/HvUmeeRgAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Fri, 06 Dec 2024 12:37:05 +0000
-Date: Fri, 6 Dec 2024 23:36:54 +1100
-From: David Disseldorp <ddiss@suse.de>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Jeff Layton <jlayton@kernel.org>, "linux-cifs@vger.kernel.org"
- <linux-cifs@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
- <linux-fsdevel@vger.kernel.org>
-Subject: Re: ksmbd: v6.13-rc1 WARNING at fs/attr.c:300
- setattr_copy+0x1ee/0x200
-Message-ID: <20241206233654.3a3207ba.ddiss@suse.de>
-In-Reply-To: <CAKYAXd8U-kQa5+fg4QvcUeOkAuX128v_VLxNz5=trF85ZONrYA@mail.gmail.com>
-References: <20241206164155.3c80d28e.ddiss@suse.de>
-	<CAKYAXd8U-kQa5+fg4QvcUeOkAuX128v_VLxNz5=trF85ZONrYA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBg0TVco"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53e152731d0so2846595e87.0
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Dec 2024 06:45:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733496326; x=1734101126; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oQCBmb3u5z+KH8EDBc5f5oRAjDMgMvMOYMttFypBTE8=;
+        b=QBg0TVcoAa34oFDB5WhLX0v/4zJrZfz/5bvkCHpTGdomwWXthcxEmS0btyHLt/UFHg
+         ET9SBnI9atI9+b6jS+fVArhhrhzG+IQGyTVbHUuop0qL693fR4lxmi0rS5so76TZ7QHw
+         5j6X+QwbxEUAsseXr6pvLYryKYeBClSJsbp0D49jqtQvMTKcz/EC1XYvk/2npxmTcyVE
+         sZ1K1OB8/AjCpdmpXU3R9FxFbDK+fUTnYLVwTAPSdXaIGvSV2bgwTvc5QWbWXofR2XM7
+         sInTLIMkRyXjC6GJIz1efEX5pcnk2sFiNmFQ9/NF4vuqYuUU2MKvC6kEivRSmyPHPh3j
+         hJsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733496326; x=1734101126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oQCBmb3u5z+KH8EDBc5f5oRAjDMgMvMOYMttFypBTE8=;
+        b=iBYF0F5l/zm4cJt/hRuibTH7ZNTDSvxCWyRcEhD3nzT5eeADHt5Knf0JA47/soZH9a
+         rJeDckVnfTfro+N2wUTT65+2ZJbwklWQOupAt6dAlR7f/RmUZlPOtn4YtxVvYToLgjCl
+         LQT9n0Iag9TR52WTPUF+dXQiltflcHnl49Amp20sgmnI9XadIsSycLkH57LGA2K926UK
+         bLzqM/qvPK8w9H0AYLFTQh+7yqHcB5YepJTD1iu5a5MV6cgxDRPDHh1ddwge482cRe/c
+         cpF6ONcblHFzAT8BS3vHj2Yks4RBHOK289gxTmiGK4FiEsS4VPrSVdFw9/V5Qtjtq8yz
+         2ixw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdpIzy0ZZ7IV71JkJxCbj6utek+bMD7/YA0JqUSoKz+q4fCzDH9axOvbktAV84Gu2BygsxpF1uRxQn@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsP3cOhhNEDhJZjVEeFauIUEacFtle3OBIhoVUngnZf6c3EGJh
+	94yYZZNTYOJzKe+UZqVdCwGD5qw2cwNG9X7ZuGsJ9I4ll/SmpVRGFuub+03xtD7yKpvNG2eZ0BE
+	em/g30dUvr3duktigOtbULCAsZJeQsw==
+X-Gm-Gg: ASbGncvEjgNDWtXl/lCVbCqTFV2lI/p8lcBGH/Sa+tgQWaG1bMLXOzhsHenU9pBhB9X
+	6hPTNq8B8ZpInASE8beMUuatbldPnu77dA7FZ3L5I8JhOS7nlvAzrn4NUGdi0cmDUrQ==
+X-Google-Smtp-Source: AGHT+IFBHJP7kNGLEYMhCX1YiTXq2xcpqRJNSmPuMFWjStfw7kix7aguW6kYPkI+xryzTz/SmWDirp+Cr/EA/tmRV4Y=
+X-Received: by 2002:a05:6512:234b:b0:53d:f647:430c with SMTP id
+ 2adb3069b0e04-53e21916dbfmr2552438e87.17.1733496325971; Fri, 06 Dec 2024
+ 06:45:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 335C11F397
-X-Spam-Score: -3.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	RCPT_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
+ <0a8569561645ad202c5cceba02cda93a@manguebit.com> <9e94e437-487d-426d-aa96-3477e95ececa@samba.org>
+ <CAH2r5muhai7Jp7feS99RSoP5S89PPzhXatv-akRtv+=Gd9+g9g@mail.gmail.com> <17cb364a-74c9-4403-a1d1-5b5ef1c71e4f@samba.org>
+In-Reply-To: <17cb364a-74c9-4403-a1d1-5b5ef1c71e4f@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 6 Dec 2024 08:45:14 -0600
+Message-ID: <CAH2r5muWuKBQNb9bF=Vy0YKmybMnTh008ycVeCL+dwrAyLvnyA@mail.gmail.com>
+Subject: Re: Special files broken against Samba master
+To: Ralph Boehme <slow@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.com>, Steven French <Steven.French@microsoft.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 6 Dec 2024 16:35:18 +0900, Namjae Jeon wrote:
-...
-> > 300                 WARN_ON_ONCE(ia_valid & ATTR_MTIME);
-> >                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^--- here.
+On Fri, Dec 6, 2024 at 6:11=E2=80=AFAM Ralph Boehme <slow@samba.org> wrote:
+>
+> Hi Steve
+>
+> thanks for digging into this!
+>
+> On 12/5/24 1:06 AM, Steve French wrote:
+> > I updated patch 2
+> > (0002-fs-smb-client-Implement-new-SMB3-POSIX-type.patch) to address
+> > various checkpatch warnings,
+>
+> oh, sorry for those! I'll try to remember to run it myself next time.
+>
+> > and added one small changeset to fix
+> > mounts to older servers which don't fill in the file type in the level
+> > 100 Mode field (0004-smb3.1.1-fix-posix-mounts-to-older-servers.patch),
+> > and updated them in cifs-2.6.git for-next.  Let me know if any
+> > objections.
+>
+> hm, not sure I like adding code to support non compliant SMB3 POSIX
+> server implementations at this early stage of implementing them across
+> various projects, clients and servers. Can't Namjae just fix it in ksmbd?
 
-I should mention, fstests generic/215 atop a 6.13.0-rc1 cifs.ko SMB3
-mount was the trigger for this ksmbd warning.
+We will make sure ksmbd is changed to fill in the file type, but we
+should reduce risks (where fix is easy) of breaking mounts to existing
+servers, especially since this has been in for more than three years and
+since the sanity check is safe and easy (ATTRIBUTE_DIRECTORY
+will always be set correctly by a server).   There is also at least
+one other server that implemented earlier version of the SMB3.1.1
+POSIX Extensions so better to be safe when we can do a minor
+check like this on the client so we don't risk any regressions, and
+it also will reduce risk of a future server bug breaking mounts.
 
-> > Looking at smb2pdu.c:set_file_basic_info() it's easy enough to see how
-> > we can get here with !ATTR_CTIME alongside ATTR_MTIME.
-> >
-> > The following patch avoids the warning, but I'm not familiar with this
-> > code-path, so please let me know whether or not it makes sense:  
-> mtime and atime will probably not be updated.
 
-Unless I'm missing something, this patched ksmbd still triggers mtime
-update via the setattr_copy_mgtime()->(ia_valid & ATTR_MTIME_SET) path.
+--=20
+Thanks,
 
-> I will change it so that ATTR_CTIME is also set when changing mtime.
-
-That should also work. I was turned off that path due to the
-64e7875560270 ("ksmbd: fix oops from fuse driver") ATTR_CTIME changes.
-
-Thanks, David
+Steve
