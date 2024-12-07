@@ -1,88 +1,111 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD6C38FA6
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Dec 2024 04:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCD3126BF9;
+	Sat,  7 Dec 2024 22:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733546055; cv=none; b=nAywMv6YGKW+IqmU3imgGlgPX4ScKLUJT91Rmwl5/FLdo8jBcN72U6dEbv5w5wSYJ3cFCBUatG1M+hw30wxiPou3uGfOJ9hKJj8WHW0ZvYuMJHVwyGmvO7k/pCDVS6XwAtUcnuLyQAFhxjrPXNZHk8rOfwe0OnsTd9QW9dQxI2M=
+	t=1733610178; cv=none; b=u9hHY8Z5bgEIHQTihARzLgnQAVJBdM/o46hfSyBQBBARWugWlwzkpr5zkQR7yDSboh+AobemZObPvV9pY/yvbE/4FYVboQKm3Bgn+WgBeYq2EunZKi/KUJFYDvOWa+V9CYGNGUMcrrf/CYzYei5MFds1T1rmBnKR6FLT5TkgYxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733546055; c=relaxed/simple;
-	bh=xxsZrkawzY+Nlp4b4VWtjX4cVtX+fS21BmfIukU4Go0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HLPGlsbsRw7I8eq200aZZzJ89x3h5T2qFVnWbfxCbtbxky//33w0qmI2OEKf3mlqPhyoOP2O61D/lvIvAZBcF9u0DAHTXfuwU7/QnNcxPBtE2qaUWNyse9BNZCyKYhV75BzFcWQ2bWm2wA3D8+FRYFVOS2gZG25tmecHHeLLeYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=OmnTUo+x; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1733610178; c=relaxed/simple;
+	bh=AJELeyno/lxCErGWfe1uIuBsCiCosW9aJknx5oSLG4Q=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=f23uI7va5lwJP4IOrvIlf+szzZIoHE86vih+J+izNo8lhBmcAN9cmVHRRT13L/UvBfjxeM3xdPGpovzMPLoWe+me9lsOEVXjXgBB9uXoFt2y9Jkt4Amz0DzSbrEgc5eFIzk0SlLqw3Q4dXdNfwWdaLl/6frmf1F7wd+X1OM1HIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nGzkS/Dr; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="OmnTUo+x"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=vrgjbnOtPxYJlYfLipcER+Wosg1cL+h8NE6cFBNOQAg=; b=OmnTUo+xPtYs1tNBqj75ctiSS4
-	G4zYtGH6ZcboakPUMI/6l1smxKz3hCjtJjye0nFsOSjlg+LK9q2d8qiRqwPJAGYxYGot38s/LDuab
-	6WQZE6/sbi1kyhys/JIPE2xkUPkHh8fX4/RDtuRlp/VNgw2nOFbYXRC0YnuvkFfxyv/rCXKrzNXX5
-	u5DGNY4I3lcv6TSMkqchh5GdaGO57JuAvNVOlP2YRx9dPyvnAQiFmUhOqZXc0cctfC7CAxyw4Di2r
-	UwDGp5TcvNju4OLAXjmlh/38ObkR/MLFypnitDfxioD3k7PAyyKrumu2w3OWRG4i/NF8U6H7TvWcr
-	g35M1egAdyEYuGzCwY9dXtU/EojtEVTtj6KGZGSj3pLvn+9RbBieSVQpxk3fk0CrmZ9YvxougocFW
-	3SxKD+nnpVgQR13sz1vTbvFOVOQ98appnERi8GZy5/HeVBsTVdm/XXvGGEcplJNzMizowzBJWsjr/
-	GaaHIcGgPKjbb0Q6aQxh7pIs;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1tJmW9-001MqM-0R;
-	Sat, 07 Dec 2024 04:34:09 +0000
-Date: Fri, 6 Dec 2024 20:34:06 -0800
-From: Jeremy Allison <jra@samba.org>
-To: Ralph Boehme <slow@samba.org>
-Cc: Andrew Gunnerson <accounts.samba@chiller3.com>,
-	Steve French <smfrench@gmail.com>, samba@lists.samba.org,
-	CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [Samba] Random EINVAL when opening files with SMB3 POSIX
- extensions enabled
-Message-ID: <Z1PQPsijuDuBiZuH@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <9995d904-6d0b-4086-b49c-944e845f127e@app.fastmail.com>
- <fa1f85a7-b086-485c-bb25-3c3d8c4cc490@samba.org>
- <53b97278-a054-4bf1-97cb-e2d648c6868a@app.fastmail.com>
- <6c44d87f-de98-4efd-b016-a491e9c57cb5@samba.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nGzkS/Dr"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5401bd6cdb4so58495e87.2;
+        Sat, 07 Dec 2024 14:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733610174; x=1734214974; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FYcS3kK1mI+zB2no3lgHwxCym7Ppt8Og1OLk8bPMxlw=;
+        b=nGzkS/Drnmy8Bn7c6gWUmco/ihjJGwSZ1Ur4TPDBSASfX5vT860DjQRAXWmaTS0lJx
+         3pVMYH2u3CPPb1c9E/6toF9V9QpJr284DYylRCGrWEKu3mQUlcb+AgP+QO7mXKP03NMK
+         V9WcUVnTh5BktiRaqkIy7pXgB/KckdRPbTUruklRxzWOC0jTm5A7rBlyhfvXB6U7cV0C
+         fidW1sKPq0FIdEjyLI3mDfeM81BcTRwzfHOzJUXmp5HOXEG7FaUwL9HZenr2Oilr7a4I
+         kRChLE3RlYK2lcvSfvgahAI7trT6cs72bKqJyiZtPofuI8XYaT3KXNXNviMENvhomnWW
+         8lww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733610174; x=1734214974;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FYcS3kK1mI+zB2no3lgHwxCym7Ppt8Og1OLk8bPMxlw=;
+        b=vyEkG+h7X7HMtxqtIP9LQ3PK8s57DGWY+ByG9GH5iLDWKOonpUa+DwsafpzoJRFYDo
+         iAM8G3ZKyEVoqeCDB8HVOsE9qbGG3jonF8aJl6bg5C/OF0ts6ny3QBqW31g9VbW+Wi80
+         8/P4sQVxAoV4Ve5stoxzsfqjggC5j+1APXXnepqlWsNyv9yjtFXhgV5cm3SI5ftBMKBB
+         lMDRysJNxgXK3JTQpDofYml4FW6jwYHZr5prDGhqu3QW7y8qQFXtxhlIu3qa27XcIBtr
+         KOTrBwB6MR24VmesnixXHwJ09Qh1CwsNcHQY3oTZRixay5A64ETaPv7Zy8/y0TEusZvH
+         UtuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVi4cOmj0fsUAJe3gQY+YwYsC2DmP7F8AglkgizODwgvvYjmf8oIUTsnM/seSG5Ee5Oom5WsYH3dnYHO3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZNGcXew8QIvcco2BJG/ESeejGnYP48O+zug5JeRz6ndIfOmbn
+	M6aIlV/9vkyNfuEVY3iTY3Svt9Ne5T/+Zt9/D1paxe57ES5u77xFJCscMS383Ts/yptwlfwoiea
+	wpC1aDgq3/1g1uNjm9FPrv3H0ank1p74H
+X-Gm-Gg: ASbGncunt/Sqi1V1TNTRr7GAnb/Gc33PxIbTiBFhUpTiHisc6X2mVVF3JnVfCBDg0e7
+	s8095IJn4dV9qTB4Ufvo4W+uRk3uZCA2wyGXnft3VmOV79PsWL0LNbTb0YcOWA259kw==
+X-Google-Smtp-Source: AGHT+IElkYwue1sraAIl6xu+fWssvIR7Ss5w6WER45aGlKBABtxcHRHEWxPOe+eO0fSlr1ekngeW5El/JkQLcS7hoP4=
+X-Received: by 2002:a05:6512:3051:b0:53e:398c:bf9e with SMTP id
+ 2adb3069b0e04-53e398cc127mr1306066e87.55.1733610174199; Sat, 07 Dec 2024
+ 14:22:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <6c44d87f-de98-4efd-b016-a491e9c57cb5@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 7 Dec 2024 16:22:42 -0600
+Message-ID: <CAH2r5mus1UqScCCqqWoPO_9Zu0yr6=DMf4cu+YOusFn9HVX3nQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 29, 2024 at 05:22:11PM +0100, Ralph Boehme via samba wrote:
->On 11/28/24 9:46 PM, Andrew Gunnerson wrote:
->>Thanks for the replies!
->>
->>On Thu, Nov 28, 2024, at 04:34, Rowland Penny via samba wrote:
->>>I do not use the SMB3 Unix extensions, but perhaps you may not be
->>>either, have you tried replacing 'server min protocol = SMB2' (which is
->>>the default anyway) with 'server min protocol = SMB3' ?
->>
->>I took a packet capture and do see the the client making POSIX extension
->>requests, like SMB2_FILE_POSIX_INFO.
->>
->>On Thu, Nov 28, 2024, at 04:53, Ralph Boehme wrote:
->>>can you grab a network trace when it happens?
->>
->>Sure thing! I disabled SMB encryption first since it seemed to make the pcaps
->>useless.
->>
->>1. pcap when running `cat <file>`, which fails with EINVAL:
->>
->>     https://files.pub.chiller3.com/issues/samba/posix_extensions/2024-11-28/posix_enabled_broken.pcap
->>
->it's a client problem.
->
->See packet 30: the client issues an POSIX SMB2-CREATE with a pathname 
->starting with a "/" which is not allowed. If you check the working 
->cases there the pathnames are relative and don't start with "/".
->
->@Steve: do you have any idea what could be causing this in cifs.ko?
+Please pull the following changes since commit
+40384c840ea1944d7c5a392e8975ed088ecf0b37:
 
-DFS mistake ?
+  Linux 6.13-rc1 (2024-12-01 14:28:56 -0800)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.13-rc1-smb3-client-fixes
+
+for you to fetch changes up to c32b624fa4f7ca5a2ff217a0b1b2f1352bb4ec11:
+
+  smb: client: fix potential race in cifs_put_tcon() (2024-12-06 09:14:38 -0600)
+
+----------------------------------------------------------------
+Five SMB3 client fixes, also for stable
+- DFS fix (for race with tree disconnect and dfs cache worker)
+- Four fixes for SMB3.1.1 posix extensions
+       - improving special file support e.g. to Samba, retrieving the
+file type earlier
+       - reducing roundtrips (e.g. on ls -l, in some cases)
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      smb: client: fix potential race in cifs_put_tcon()
+
+Ralph Boehme (3):
+      fs/smb/client: avoid querying SMB2_OP_QUERY_WSL_EA for SMB3 POSIX
+      fs/smb/client: Implement new SMB3 POSIX type
+      fs/smb/client: cifs_prime_dcache() for SMB3 POSIX reparse points
+
+Steve French (1):
+      smb3.1.1: fix posix mounts to older servers
+
+ fs/smb/client/cifsproto.h |  1 +
+ fs/smb/client/connect.c   |  4 +--
+ fs/smb/client/inode.c     | 94
+++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ fs/smb/client/readdir.c   | 54 +++++++++++++++++++++-------------
+ fs/smb/client/reparse.c   | 84
+++++++++++++++++++++++++++++++++---------------------
+ fs/smb/client/smb2inode.c |  3 +-
+ 6 files changed, 175 insertions(+), 65 deletions(-)
+
+-- 
+Thanks,
+
+Steve
