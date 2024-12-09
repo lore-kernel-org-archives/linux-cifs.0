@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3BE1F5F6;
-	Mon,  9 Dec 2024 18:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EEE13B58A;
+	Mon,  9 Dec 2024 18:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733767268; cv=none; b=G+v0kDLz3i/T5pr0b87T4HKRBaqTvduh0gWA+0DZ41QWuG1pq1GEQTBsXzqV0xIqTwpVU61SZZ+o6oQvqWn2UO8khUypGymFodOjhqo+VlEYNzZoXA37c9YaYtZ/Cw1l/zv/vT1UQhLSO0CoXGlsP6it+MpzTEpLYJnXs0LyYnw=
+	t=1733767373; cv=none; b=tMPgH7yt70Kn5ENIJbfNnstEq9OQyDp77kTl2r5QX7CVGL1GSgZ+FajGncFTAx+OImVbgz+TG0Str8Y/16++WvaWkCScwTwA7AAuPimm3oEDtOlJd6wnIYJCjGhhAMlIyA6VYdv4U0NOIyEDjZQI1W9W8ViGaaKuLXgsPXFcLRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733767268; c=relaxed/simple;
-	bh=/oT6/Vn+/Z7XCxZA/yvDsc479uxCr0mcH2ho2Iu89sM=;
+	s=arc-20240116; t=1733767373; c=relaxed/simple;
+	bh=9yg4o2Q8KuxzIuB3VoI8UqVNh3QgrddreIS17KNUelo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRHQeLIzqSoEEOxAkXDK9bbF7azPK9o5zFnO5lff662pUiUhaFohM5EI8z7iR48uob/K7+GkqF6Qaqzx/34TMtX75AZZeQTf71Jj9Ox/VO/DC2WcO3aSslrscjVRU2kmUxBDr1PwxHGyygEJlw4L0OGQ61IRXPtRct+u84WfMk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=geZJqpH2; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=aYpqdKKWifTUbyT/9g09uttARwVKZ9TbD1Z67yKivj0UlBGk9ARRwRjojPQsFzD9Fi6kBeZBAF6jz4gIJqG4fm0/lLG0RpmJA7vUW3r5PsB435RECIyCEoQJIdblv+eFaLDWJ4K8HJcTfmUAV8Yw6Elc9OtC39Xahu8e/3gRzNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbcHVMaw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="geZJqpH2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82276C4CED1;
-	Mon,  9 Dec 2024 18:01:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbcHVMaw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12066C4CED1;
+	Mon,  9 Dec 2024 18:02:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733767267;
-	bh=/oT6/Vn+/Z7XCxZA/yvDsc479uxCr0mcH2ho2Iu89sM=;
+	s=k20201202; t=1733767372;
+	bh=9yg4o2Q8KuxzIuB3VoI8UqVNh3QgrddreIS17KNUelo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=geZJqpH2gMI6E95MzdhulA2ZTfmDm504BCs/+wo4mbABnFXJOal2Ovu5Wb5SNVv2Z
-	 Mq4XbxiGrGHt6/yvxdF8b2Rs4CYDGSeGvwr/lB3/16LaABxn+wR86nkSO2nSqPXa2L
-	 0GDyMVwPqhz55m4PV3yajFooJgaNpszAAkEhb4jIc+rBotXYAXrYOEnXCwFeiFbx5y
-	 MtK+Cq+ZBYI9DJH3X4aXjaYNTEOByBXHPlMtnY6EvakxEIpkOcpjhDYRBQ84KhSXkj
-	 NBNopyWBgr5HPUMMHjh9GI7blfuZNxOfjAQIOEgCpYYRAmE4WtpSOSbxCiYKepjwnb
-	 U1AiXzNwpyLpA==
+	b=tbcHVMaw1xNMHpOcN86GOHR500mdemsse/s8Dvr/K8g7PoW3MD4KqcMu70uaoLTt3
+	 dEsH1oPBqd0syxxohGjH1XTkYCGz4MKfr+hr4mhNyC66NZSyOEQM9muQ95bdVZKa4T
+	 kEYPtdWnvSpp8kMfBSelL7MSpvopedJAagwChnlJ/BrErThXMB0HSs9D+bKHM792jn
+	 i3fNw+j1JKMe/3AvJsypS/T05/wxoDuSP2laSLQVelsEczmd7eiMWLzgmHmIkZigJI
+	 y2NKIuZLXaDxi/j8ogDUj7CmG+n5Y+i2PNsJw+4gay4hBIoWXZfDMthDw93jQf4uRr
+	 asq02a8McBzYQ==
 Received: by pali.im (Postfix)
-	id 505D48A0; Mon,  9 Dec 2024 19:00:58 +0100 (CET)
-Date: Mon, 9 Dec 2024 19:00:58 +0100
+	id F20B28A0; Mon,  9 Dec 2024 19:02:42 +0100 (CET)
+Date: Mon, 9 Dec 2024 19:02:42 +0100
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/7] cifs: Add support for creating NFS-style symlinks
-Message-ID: <20241209180058.7w2ytnmgg34xnsci@pali>
-References: <20241012085252.560-1-pali@kernel.org>
- <20241012085601.694-1-pali@kernel.org>
+Subject: Re: [PATCH v3] cifs: Fix parsing native symlinks directory/file type
+Message-ID: <20241209180242.udutn667vjjyfi4f@pali>
+References: <20241005140300.19416-5-pali@kernel.org>
+ <20241015143041.23721-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,147 +46,166 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241012085601.694-1-pali@kernel.org>
+In-Reply-To: <20241015143041.23721-1-pali@kernel.org>
 User-Agent: NeoMutt/20180716
 
-On Saturday 12 October 2024 10:56:01 Pali Rohár wrote:
-> CIFS client is currently able to parse NFS-style symlinks, but is not able
-> to create them. This functionality is useful when the mounted SMB share is
-> used also by Windows NFS server (on Windows Server 2012 or new). It allows
-> interop of symlinks between SMB share mounted by Linux CIFS client and same
-> export from Windows NFS server mounted by some NFS client.
+On Tuesday 15 October 2024 16:30:41 Pali Rohár wrote:
+> As SMB protocol distinguish between symlink to directory and symlink to
+> file, add some mechanism to disallow resolving incompatible types.
 > 
-> New symlinks would be created in NFS-style only in case the mount option
-> -o reparse=nfs is specified, which is not by default. So default CIFS
-> mounts are not affected by this change.
+> When SMB symlink is of the directory type, ensure that its target path ends
+> with slash. This forces Linux to not allow resolving such symlink to file.
+> 
+> And when SMB symlink is of the file type and its target path ends with
+> slash then returns an error as such symlink is unresolvable. Such symlink
+> always points to invalid location as file cannot end with slash.
+> 
+> As POSIX server does not distinguish between symlinks to file and symlink
+> directory, do not apply this change for symlinks from POSIX SMB server. For
+> POSIX SMB servers, this change does nothing.
+> 
+> This mimics Windows behavior of native SMB symlinks.
 > 
 > Signed-off-by: Pali Rohár <pali@kernel.org>
 > ---
->  fs/smb/client/reparse.c | 47 ++++++++++++++++++++++++++++++++++-------
->  1 file changed, 39 insertions(+), 8 deletions(-)
+> Changes in v3:
+> * Relax non-directory case condition in smb2_fix_symlink_target_type()
+>   for compatibility with older Linux clients.
+> * Use krealloc() instead of kzalloc()+memcpy()
+> ---
+>  fs/smb/client/inode.c     |  5 ++++
+>  fs/smb/client/smb2file.c  | 48 +++++++++++++++++++++++++++++++++++++++
+>  fs/smb/client/smb2inode.c |  4 ++++
+>  fs/smb/client/smb2proto.h |  1 +
+>  4 files changed, 58 insertions(+)
 > 
-> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> index 57320a4c4d79..cd12704cae0c 100644
-> --- a/fs/smb/client/reparse.c
-> +++ b/fs/smb/client/reparse.c
-> @@ -406,6 +406,8 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
->  
->  static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
->  			       mode_t mode, dev_t dev,
-> +			       __le16 *symname_utf16,
-> +			       int symname_utf16_len,
->  			       struct kvec *iov)
->  {
->  	u64 type;
-> @@ -416,13 +418,18 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
->  	switch ((type = reparse_mode_nfs_type(mode))) {
->  	case NFS_SPECFILE_BLK:
->  	case NFS_SPECFILE_CHR:
-> -		dlen = sizeof(__le64);
-> +		dlen = 2 * sizeof(__le32);
-> +		((__le32 *)buf->DataBuffer)[0] = MAJOR(dev);
-> +		((__le32 *)buf->DataBuffer)[1] = MINOR(dev);
-> +		break;
-> +	case NFS_SPECFILE_LNK:
-> +		dlen = symname_utf16_len;
-> +		memcpy(buf->DataBuffer, symname_utf16, symname_utf16_len);
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 2ac9cc8d327d..3fd625b356bd 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -1140,6 +1140,11 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+>  							      full_path,
+>  							      iov, data);
+>  		}
+> +
+> +		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
+> +			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
+> +			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
+> +		}
 >  		break;
->  	case NFS_SPECFILE_FIFO:
->  	case NFS_SPECFILE_SOCK:
->  		dlen = 0;
->  		break;
-> -	case NFS_SPECFILE_LNK: /* TODO: add support for NFS symlinks */
->  	default:
->  		return -EOPNOTSUPP;
 >  	}
-> @@ -432,8 +439,6 @@ static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
->  	buf->InodeType = cpu_to_le64(type);
->  	buf->ReparseDataLength = cpu_to_le16(len + dlen -
->  					     sizeof(struct reparse_data_buffer));
-> -	*(__le64 *)buf->DataBuffer = cpu_to_le64(((u64)MINOR(dev) << 32) |
-> -						 MAJOR(dev));
->  	iov->iov_base = buf;
->  	iov->iov_len = len + dlen;
->  	return 0;
-> @@ -444,21 +449,42 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  		     const char *full_path, umode_t mode, dev_t dev,
->  		     const char *symname)
->  {
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifs_open_info_data data;
-> -	struct reparse_posix_data *p;
-> +	struct reparse_posix_data *p = NULL;
-> +	__le16 *symname_utf16 = NULL;
-> +	int symname_utf16_len = 0;
->  	struct inode *new;
->  	struct kvec iov;
->  	__u8 buf[sizeof(*p) + sizeof(__le64)];
->  	int rc;
 >  
-> -	p = (struct reparse_posix_data *)buf;
-> -	rc = nfs_set_reparse_buf(p, mode, dev, &iov);
-> +	if (S_ISLNK(mode)) {
-> +		symname_utf16 = cifs_strndup_to_utf16(symname, strlen(symname),
-> +						      &symname_utf16_len,
-> +						      cifs_sb->local_nls,
-> +						      NO_MAP_UNI_RSVD);
-> +		if (!symname_utf16) {
-> +			rc = -ENOMEM;
-> +			goto out;
-> +		}
-> +		symname_utf16_len -= 2; /* symlink is without trailing wide-nul */
-> +		p = kzalloc(sizeof(*p) + symname_utf16_len, GFP_KERNEL);
-> +		if (!p) {
-> +			rc = -ENOMEM;
-> +			goto out;
-> +		}
-> +	} else {
-> +		p = (struct reparse_posix_data *)buf;
-> +	}
-> +	rc = nfs_set_reparse_buf(p, mode, dev, symname_utf16, symname_utf16_len, &iov);
->  	if (rc)
-> -		return rc;
-> +		goto out;
->  
->  	data = (struct cifs_open_info_data) {
->  		.reparse_point = true,
->  		.reparse = { .tag = IO_REPARSE_TAG_NFS, .posix = p, },
-> +		.symlink_target = kstrdup(symname, GFP_KERNEL),
->  	};
->  
->  	new = smb2_get_reparse_inode(&data, inode->i_sb, xid,
-> @@ -468,6 +494,11 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  	else
->  		rc = PTR_ERR(new);
->  	cifs_free_open_info(&data);
-> +out:
-> +	if (S_ISLNK(mode)) {
-> +		kfree(symname_utf16);
-> +		kfree(p);
-> +	}
->  	return rc;
+> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+> index e836bc2193dd..4b07274e824a 100644
+> --- a/fs/smb/client/smb2file.c
+> +++ b/fs/smb/client/smb2file.c
+> @@ -63,6 +63,49 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+>  	return sym;
 >  }
 >  
+> +int smb2_fix_symlink_target_type(char **target, bool directory, struct cifs_sb_info *cifs_sb)
+> +{
+> +	char *buf;
+> +	int len;
+> +
+> +	/*
+> +	 * POSIX server does not distinguish between symlinks to file and
+> +	 * symlink directory. So nothing is needed to fix on the client side.
+> +	 */
+> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
+> +		return 0;
+> +
+> +	len = strlen(*target);
+> +	if (!len)
+> +		return -EIO;
+> +
+> +	/*
+> +	 * If this is directory symlink and it does not have trailing slash then
+> +	 * append it. Trailing slash simulates Windows/SMB behavior which do not
+> +	 * allow resolving directory symlink to file.
+> +	 */
+> +	if (directory && (*target)[len-1] != '/') {
+> +		buf = krealloc(*target, len+2, GFP_KERNEL);
+> +		if (!buf)
+> +			return -ENOMEM;
+> +		buf[len] = '/';
+> +		buf[len+1] = '\0';
+> +		*target = buf;
+> +		len++;
+> +	}
+> +
+> +	/*
+> +	 * If this is a file (non-directory) symlink and it points to path name
+> +	 * with trailing slash then this is an invalid symlink because file name
+> +	 * cannot contain slash character. File name with slash is invalid on
+> +	 * both Windows and Linux systems. So return an error for such symlink.
+> +	 */
+> +	if (!directory && (*target)[len-1] == '/')
+> +		return -EIO;
+> +
+> +	return 0;
+> +}
+> +
+>  int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const struct kvec *iov,
+>  				const char *full_path, char **path)
+>  {
+> @@ -133,6 +176,11 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
+>  					       NULL, NULL, NULL);
+>  				oparms->create_options &= ~OPEN_REPARSE_POINT;
+>  			}
+> +			if (!rc) {
+> +				bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
+> +				rc = smb2_fix_symlink_target_type(&data->symlink_target,
+> +								  directory, oparms->cifs_sb);
+> +			}
+>  		}
+>  	}
+>  
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index a188908914fe..b8ccc8fd88f2 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -960,6 +960,10 @@ int smb2_query_path_info(const unsigned int xid,
+>  		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+>  				      &oparms, in_iov, cmds, num_cmds,
+>  				      cfile, NULL, NULL, NULL);
+> +		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
+> +			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
+> +			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
+> +		}
+>  		break;
+>  	case -EREMOTE:
+>  		break;
+> diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+> index db93447f0f5a..5390d5a61039 100644
+> --- a/fs/smb/client/smb2proto.h
+> +++ b/fs/smb/client/smb2proto.h
+> @@ -113,6 +113,7 @@ extern int smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+>  			  struct cifs_sb_info *cifs_sb,
+>  			  const unsigned char *path, char *pbuf,
+>  			  unsigned int *pbytes_read);
+> +int smb2_fix_symlink_target_type(char **target, bool directory, struct cifs_sb_info *cifs_sb);
+>  int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
+>  			      bool unicode, bool relative,
+>  			      const char *full_path,
 > -- 
 > 2.20.1
 > 
 
-This change also needs fixup for big endian systems:
+I was informed that function smb2_fix_symlink_target_type() may
+dereference NULL pointer by strlen() call. So I'm proposing this fixup:
 
-    fixup! cifs: Add support for creating NFS-style symlinks
-
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index af08e5918adb..c2569347d746 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -419,8 +419,8 @@ static int nfs_set_reparse_buf(struct reparse_nfs_data_buffer *buf,
- 	case NFS_SPECFILE_BLK:
- 	case NFS_SPECFILE_CHR:
- 		dlen = 2 * sizeof(__le32);
--		((__le32 *)buf->DataBuffer)[0] = MAJOR(dev);
--		((__le32 *)buf->DataBuffer)[1] = MINOR(dev);
-+		((__le32 *)buf->DataBuffer)[0] = cpu_to_le32(MAJOR(dev));
-+		((__le32 *)buf->DataBuffer)[1] = cpu_to_le32(MINOR(dev));
- 		break;
- 	case NFS_SPECFILE_LNK:
- 		dlen = symname_utf16_len;
+diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+index b0037058e8d9..47ba0b50f514 100644
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -75,6 +75,9 @@ int smb2_fix_symlink_target_type(char **target, bool directory, struct cifs_sb_i
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
+ 		return 0;
+ 
++	if (!*target)
++		return -EIO;
++
+ 	len = strlen(*target);
+ 	if (!len)
+ 		return -EIO;
