@@ -1,62 +1,132 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DA519DF99
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Dec 2024 13:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DDD1A256B
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Dec 2024 13:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733836773; cv=none; b=BRsXZ4tm1106FljwP5efUl/FIvlFkcAIk3j754iGlXl62uBBKS0Ne8xg0U9529qLSq00JUxKC9+aIpbcAtQeVnVhlpvthzE3MXVrKBF6EmVsf7WbSSxCg+asJH42O3FL+Oh7S5RAqsL2TY0vYd79YOfsmciATyaBDwc4wb0TGCM=
+	t=1733837054; cv=none; b=Akz31G3qSPleWkW1rxbyOGpdconmIP4hDeFrHEdsn646mmqUs0nCzpz8Rc9yXxSB6dOcdSPwdoIxwi57B3RTb7N4v/w5zr5En9f5eaxu3VxIBxAgPhyVlDWu7zeSO9YWP02FhQeEaZ2DVJZ2HfKj3J1eF8LsrUxGaRuWwendw+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733836773; c=relaxed/simple;
-	bh=00uuIXSbxE2chD/OpQhguw6mytogPGTzjnNwnmvbUiQ=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=Dr4jjuUMWTEytiul20u8Qx08D4KJT1BQyF6OInuXMCW/UfleJObj+nxUzX5NuFBih8s+zxCGs543VLIiPN2QUhIvGV3cmhwKe3RS0XkNQfVU/ffQWjmUocDmbbbAeN7k6VTzx9dkeMjwz4uLckexCsVcojqGRpoaWrIn6oYvd/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=d4not0Gp; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1733837054; c=relaxed/simple;
+	bh=jxfy3loTrCXPEYvbEDexIbMa+iM3+hiONGwnX9Mx1mI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z/J7Hv4jhjftvivarLmYG4WIACOm/lmXF2gdgXYVZrz0e27l2C7Vm2C/kIJAj1QkYrf9IxBDAiv1Jq6EhTnWUDDXKI7usMkuVDQ59hLrayRxjywk44xePDyxS6LiSVb6JrIJTcWLuHV+epC9Pd2hZZ+/PR/oTIH2uMplhF+ZQFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=W1OzMWSK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=taWJ6gr5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vacfZt3c; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KZCLHqn4; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="d4not0Gp"
-Message-ID: <8d0a687be2cba9cb4d2745c0752d8fbf@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1733836769;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9IEPlQMQvlkiLKRfqeiaab83yX8hGfdB1uCPnwcxN28=;
-	b=d4not0GpS0fPHkqSLvMk2XFAgqzEehnVEFFOJE5WU1kz2i/X+Dv1m11X7Osnyr9uHoqi6E
-	vIo4PpGKb14m6/zhdPdXabktksZ6mgyAXsO/WgOhpKy/mK1EU42xXf8kiScQjDivj3IHeb
-	HicC0v02J06b9HAyHzzKg4skh2pEC8L168lWR34FORS3Hzj/XAXdOKWK7I4J/qAE+ykvrZ
-	Gs1Pf4csJay8ArDE8mS99cN4ih3k9rEn/teFpx95iC+QqJ/AF2vpoVew266zJ5nhOKX1n2
-	7/iPAbJdo7RxSDtTUNfPTyrMFaOSwF3EsoV5exSZJfv2FoNlNaA98GidUIL4Ig==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>
-Cc: Ralph Boehme <slow@samba.org>, Steven French
- <Steven.French@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Special files broken against Samba master
-In-Reply-To: <20241209195420.7mnya3ua2y7nl6tp@pali>
-References: <458d3314-2010-4271-bb73-bff47e9de358@samba.org>
- <20241209183946.yafga2vixfdx5edu@pali>
- <1098e751d1109d8730254ada7648ae4d@manguebit.com>
- <20241209193445.yrcaa7ciqegvs6fz@pali>
- <829df5e75aba7f0857ff688689b52676@manguebit.com>
- <20241209195420.7mnya3ua2y7nl6tp@pali>
-Date: Tue, 10 Dec 2024 10:19:26 -0300
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="W1OzMWSK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="taWJ6gr5";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vacfZt3c";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KZCLHqn4"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 32BA221161;
+	Tue, 10 Dec 2024 13:24:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1733837050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
+	b=W1OzMWSKChzTyQfB1yk05RrGy8QjY85lBxh0TdKtYotpsZ1LF36vng3w51H6Stt5pTpSlT
+	98J9Wlk9xBWfvAy0AMS0138aI3X5qXr/pL0Rrq/J/i/E0Bae4eFlkmXpqxUQFexOrCG646
+	NyHmytAy1mf3PeVw9QPYTxRrMim/4Nc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1733837050;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
+	b=taWJ6gr5rhnz7tWG6eIc+GpD4Wu8lJBf4wy/UziyLE5+AUQdhKxna4peotLtvEyjmR18ek
+	mzeWMvUBSjV9wsCA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1733837049; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
+	b=vacfZt3czOJ2RyKo5JRYReeGDPW4e11uYN8B3Iqtx+dyr4zzhnwXMIHf9jxgNmQOCEOkKy
+	wqhuQYOZA8GoDZirMHoEoM4Xo5TdGj/VuFcpgb/PNmt5uEqZRtnY60QMXlrhDjI/PETLmZ
+	0y7FnmF7wsnr6g6+aPCpWv4VmgXMoNU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1733837049;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
+	b=KZCLHqn4CvLXEEMWb71cfA/eK3swlrkJbR3kOiVby+qwEO3uAowVIgAI5dMxmpj3gfoDE9
+	UPiY0p/ndZyiGEAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B5322138D2;
+	Tue, 10 Dec 2024 13:24:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id IIU6H/hAWGfjfgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 10 Dec 2024 13:24:08 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com
+Subject: [PATCH] smb: client: destroy cfid_put_wq on module exit
+Date: Tue, 10 Dec 2024 10:21:48 -0300
+Message-ID: <20241210132148.2935-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -2.65
+X-Spamd-Result: default: False [-2.65 / 50.00];
+	BAYES_HAM(-2.85)[99.36%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	ARC_NA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/smb/client/cifsfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> Ok. Would you have a time to prepare a patch? I have still feeling that
-> the smb2_compound_op() code and EAs code is rather complicated for me.
-> I would like if somebody else could look at it, as I have feeling if I
-> try to do it, it can end up with something more broken...
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index c9f9b6e97964..9d96b833015c 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -2043,6 +2043,7 @@ exit_cifs(void)
+ 	destroy_workqueue(decrypt_wq);
+ 	destroy_workqueue(fileinfo_put_wq);
+ 	destroy_workqueue(serverclose_wq);
++	destroy_workqueue(cfid_put_wq);
+ 	destroy_workqueue(cifsiod_wq);
+ 	cifs_proc_clean();
+ }
+-- 
+2.43.0
 
-Yeah, it's a bit tricky.  I'll let you know when I have patch so I can
-try it against your old servers.
