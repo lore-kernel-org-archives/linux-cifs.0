@@ -1,132 +1,103 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DDD1A256B
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Dec 2024 13:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E00C2451CD
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Dec 2024 02:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733837054; cv=none; b=Akz31G3qSPleWkW1rxbyOGpdconmIP4hDeFrHEdsn646mmqUs0nCzpz8Rc9yXxSB6dOcdSPwdoIxwi57B3RTb7N4v/w5zr5En9f5eaxu3VxIBxAgPhyVlDWu7zeSO9YWP02FhQeEaZ2DVJZ2HfKj3J1eF8LsrUxGaRuWwendw+A=
+	t=1733885214; cv=none; b=o7qABPgOC60dpuUirle5w7ZUDXRQ/MiNigLXsJm25bfalSoX51wYWvo317zds2JaxLPbcfP3U2+Fer69zbSLQvK+BcY3kYWydjAhVBdUz0poI3bJWOQqC8wgn09qiqjHWpBSXxgAeZDOY5/BGIfuQWc05/3k2tjMS9Y3H+97jM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733837054; c=relaxed/simple;
-	bh=jxfy3loTrCXPEYvbEDexIbMa+iM3+hiONGwnX9Mx1mI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z/J7Hv4jhjftvivarLmYG4WIACOm/lmXF2gdgXYVZrz0e27l2C7Vm2C/kIJAj1QkYrf9IxBDAiv1Jq6EhTnWUDDXKI7usMkuVDQ59hLrayRxjywk44xePDyxS6LiSVb6JrIJTcWLuHV+epC9Pd2hZZ+/PR/oTIH2uMplhF+ZQFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=W1OzMWSK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=taWJ6gr5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vacfZt3c; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=KZCLHqn4; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1733885214; c=relaxed/simple;
+	bh=W0/CiTqoplIUoWdk03axt5FDqqwxa1rZWbYMTfTfF6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JoG8cztaGw0L95PAMCEZZHgAvUn1KTNYcNCGHmWLRw8mX5JqnuJn03SsjuhfyoQibzt0L01H/0B2SgkV3uN5k/97OEPPM6YtilprdqGwv2vLueXOwgTpijUhjqu1hRgEO/TjFIB3HKdn6mVgV7b+MV410p/jgk7Ox3zkQ+e3CC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnbS/lxJ; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="W1OzMWSK";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="taWJ6gr5";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vacfZt3c";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="KZCLHqn4"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 32BA221161;
-	Tue, 10 Dec 2024 13:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733837050; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
-	b=W1OzMWSKChzTyQfB1yk05RrGy8QjY85lBxh0TdKtYotpsZ1LF36vng3w51H6Stt5pTpSlT
-	98J9Wlk9xBWfvAy0AMS0138aI3X5qXr/pL0Rrq/J/i/E0Bae4eFlkmXpqxUQFexOrCG646
-	NyHmytAy1mf3PeVw9QPYTxRrMim/4Nc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733837050;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
-	b=taWJ6gr5rhnz7tWG6eIc+GpD4Wu8lJBf4wy/UziyLE5+AUQdhKxna4peotLtvEyjmR18ek
-	mzeWMvUBSjV9wsCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1733837049; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
-	b=vacfZt3czOJ2RyKo5JRYReeGDPW4e11uYN8B3Iqtx+dyr4zzhnwXMIHf9jxgNmQOCEOkKy
-	wqhuQYOZA8GoDZirMHoEoM4Xo5TdGj/VuFcpgb/PNmt5uEqZRtnY60QMXlrhDjI/PETLmZ
-	0y7FnmF7wsnr6g6+aPCpWv4VmgXMoNU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1733837049;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=F3KgD2X3BEXnztKBLQfbTPRgkZTwsLGVyEJ40KqcXd4=;
-	b=KZCLHqn4CvLXEEMWb71cfA/eK3swlrkJbR3kOiVby+qwEO3uAowVIgAI5dMxmpj3gfoDE9
-	UPiY0p/ndZyiGEAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B5322138D2;
-	Tue, 10 Dec 2024 13:24:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IIU6H/hAWGfjfgAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 10 Dec 2024 13:24:08 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH] smb: client: destroy cfid_put_wq on module exit
-Date: Tue, 10 Dec 2024 10:21:48 -0300
-Message-ID: <20241210132148.2935-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnbS/lxJ"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-540215984f0so2509740e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Dec 2024 18:46:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733885210; x=1734490010; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fC606rPojEqVSVoqYhusQIVlu2EF9QA4VOCUFP3nI4w=;
+        b=CnbS/lxJGSSkj2Jhlo00+kYnB8PWeOncc8gOJE9zmrp7vi5nhO+qR6DbANl35StOR2
+         e2xaa0pACUqb/iIoGfHyU6TLemdkE16FOPh1ijHMk2wT6U8qTnfZZwjrAMmS94r2LWRG
+         6anXdTuQ2TVGHGdvaZoTSH1SC0J7Xn5a0Gvblcx1zkL0Llh0gE3eoYoITOmZMmILeccD
+         8MVyMSrS+DYUMMlmx9XB/Ykwh4sKrJ0IugMz9+pkAekR3rwpYt3mwUyCgKca8z3/JxzI
+         AStF0HPEPkG1g93wRM+Gnj/g6Fb+NplMfgy3W1dXWnNGEkdbmP62Rw37baiTo06CIgDF
+         1pKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733885211; x=1734490011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fC606rPojEqVSVoqYhusQIVlu2EF9QA4VOCUFP3nI4w=;
+        b=YtaCPv1QiDn8ivPXDQLng4c85AbKiC/fTxPEAtZ25JY0Oxk307QTku9oByCV9iQg2d
+         cqdN05m9Q4RCDny2/PNes3Lw9OBz4D1+plpVpENArb36HgnNnIrLB/XQWoixhqIFHF69
+         1RajIwJuA6H2/ASteAXocwvejLKTwQCVbetkVT5PFCUHD4B2pCn3eTa2DVUCpxZelS6l
+         iKSNIyAJViBm3v2FcJFIxkl8DvuNyHYQRjQ3qqnhUwcOgnBPq/Mq5TyaYiTfMU4EfB1q
+         MlC9TRkDarhERyr8SwGHC2EH3MHpdr3xRfhckh44BOREYuRYZuMC0YKj+CXGXfFnaTBJ
+         Au7g==
+X-Gm-Message-State: AOJu0YyIse6r7NB3SC4NOSNNJQKlMeP9+ST0Z+cobp/Q1fYjNuhlV/qL
+	/RySmKRQij+hcovG7JNmjTwlztdqnxXZj0ZU50e0fGY59rUfEnZ4ut77CfGEypZ5RVDFwNpq+1t
+	R2LYkvKjUnYCsJOY5sQEjLlBHAAI=
+X-Gm-Gg: ASbGnctFuYH4pN+NEBMWwKeimoT7AFWT0lfPQ3LY7F3KGIcEE1i+G9GyV7vuDd6IQPO
+	QGwohiS8e5QsCGwxngWth9wTgJMx9VkjC9XDIJZSZ8xXEE/pl/jAmPt0ZLzA2YCkjfvQaHw==
+X-Google-Smtp-Source: AGHT+IFQ7HKvm86txHiNrbEkfC7eZy7WMf+bX+DX+DXtHKexRaDIJGZDQoqqhjnuqeVRpma11wzEyRsNXcJT8OeyiFQ=
+X-Received: by 2002:a05:6512:3f12:b0:53e:f507:3801 with SMTP id
+ 2adb3069b0e04-5402a60be14mr286636e87.48.1733885210360; Tue, 10 Dec 2024
+ 18:46:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.65
-X-Spamd-Result: default: False [-2.65 / 50.00];
-	BAYES_HAM(-2.85)[99.36%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	ARC_NA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <20241210132148.2935-1-ematsumiya@suse.de>
+In-Reply-To: <20241210132148.2935-1-ematsumiya@suse.de>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 10 Dec 2024 20:46:39 -0600
+Message-ID: <CAH2r5mv25sn_fVLjbRtk_mY66OT+iDEfo12HvMX8uh1o66PutQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: destroy cfid_put_wq on module exit
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	henrique.carvalho@suse.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/client/cifsfs.c | 1 +
- 1 file changed, 1 insertion(+)
+Good catch.  added Cc: stable and merged into cifs-2.6.git
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index c9f9b6e97964..9d96b833015c 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -2043,6 +2043,7 @@ exit_cifs(void)
- 	destroy_workqueue(decrypt_wq);
- 	destroy_workqueue(fileinfo_put_wq);
- 	destroy_workqueue(serverclose_wq);
-+	destroy_workqueue(cfid_put_wq);
- 	destroy_workqueue(cifsiod_wq);
- 	cifs_proc_clean();
- }
--- 
-2.43.0
+On Tue, Dec 10, 2024 at 7:24=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
+ wrote:
+>
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>  fs/smb/client/cifsfs.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+> index c9f9b6e97964..9d96b833015c 100644
+> --- a/fs/smb/client/cifsfs.c
+> +++ b/fs/smb/client/cifsfs.c
+> @@ -2043,6 +2043,7 @@ exit_cifs(void)
+>         destroy_workqueue(decrypt_wq);
+>         destroy_workqueue(fileinfo_put_wq);
+>         destroy_workqueue(serverclose_wq);
+> +       destroy_workqueue(cfid_put_wq);
+>         destroy_workqueue(cifsiod_wq);
+>         cifs_proc_clean();
+>  }
+> --
+> 2.43.0
+>
 
+
+--=20
+Thanks,
+
+Steve
