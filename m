@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BB5239BC5;
-	Wed, 11 Dec 2024 18:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668A2248F80;
+	Wed, 11 Dec 2024 18:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943061; cv=none; b=cV1Pj6wQdAVDfCFqP97+PUXyokGWC8qb9DB2jj0c5XgFt+InNOMgQHmdZ01PP6W7WdnlRfy4TRdoBjumVmHOerSpFfgzNqLtIIOXKEDsC+a0PqcGF7oKaZ+tkspW1gUwYvYJ402TohIc9ingDKz85bsw5CKXBukGfwty+DeFDwU=
+	t=1733943151; cv=none; b=UOe98KUGaOAsN07YVcj0UzgHAgwWa5+QQoKGDMnTezjbssUup+6XY981ZeCW8ExZtNPRqpSdWIPnzUQaqvuUBS4UVzk2jpShN++FuQ7bZVcOUTGwDt5M+a48MV7ejz8Ed3IQMuvGaEzp7LIheatJJb+N8tlQr8tWRCtrqN1j+OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943061; c=relaxed/simple;
-	bh=7Qy4ZhAFYEJeE2aHC5sTXAZwDOO6QBrXQCavMtu5fuI=;
+	s=arc-20240116; t=1733943151; c=relaxed/simple;
+	bh=5hSPMnldBgY9UKf/u0hqAzFOb+7nLofEL7LtC2t2ljY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NOxuPD9+vndRMILU7UYlLikIYWa8eO0htRvxk+tvySLbyQ7tuiObow/Jv3QheIs3EKiowUexcUWBFNQT4bPDoYC3n0QFhKWks6TZ72jYqtGps6AOtyMk3CRQSNkr1R6BH1qP6pqcpnZP2+6kZ6aucGZVCiQDo0ewAgvRCnziSh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjgDrnKW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aHe+L1GLefZoBlTuVWNAFlzc8DnSsWmE9LZK7dG6ufchWfEvpJb/7gkll6JbxTxnMs5XmpBJq+K5T02QA5nnQ1CW6Msx+xqcv4PUDn9DvkAaozmOdTDellCHA2QszXAoW4U7dcCmuTr/kxmhgOdWACpGnOym1xOStsPsZcZWuLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AbdROcji; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjgDrnKW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D58C4CEDF;
-	Wed, 11 Dec 2024 18:50:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AbdROcji"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CBD5C4CEDF;
+	Wed, 11 Dec 2024 18:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943060;
-	bh=7Qy4ZhAFYEJeE2aHC5sTXAZwDOO6QBrXQCavMtu5fuI=;
+	s=k20201202; t=1733943151;
+	bh=5hSPMnldBgY9UKf/u0hqAzFOb+7nLofEL7LtC2t2ljY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pjgDrnKWBCjZpUS1s8FtHoLRnbFSOTvlgs/is12L9L7Py/wSJrdhhowjH5lTngmJ/
-	 p8TRG4W+pKDM6eTlA81s1wFkIQiBvIcvebU1v95hfLpQWjH9OuWhqgBiaWFZys8dCl
-	 KJwrIbyrUgtBzIR52P14CDc+rn8crTTZKz23rm1yIQtG0g6HBh4HYTvJeh6b1rcIb8
-	 qnFBSCrc6DxbX7mrdKxJG4/mxspFAUI0HBqCKcJ20gDPA8K/cXUCaDocwIUlaqYwQD
-	 Cn/jyvWqHdd3wTLOAzc4La91n3H+EcwUpOaToHIb8K9+YJdqdMU9fNtZQN+Xjy62dv
-	 bXGDl9aIvNGzA==
+	b=AbdROcjia1Er0mEHYwNEqRyIhErZwbiL2vj6AuJ+AW2bE/WTZ8a8cbQgWa6+rediu
+	 pUbVLYqRZJNDm2LWNyj/ezZwV19PrZh8W6jm6d+YJmV82PR6nTapw6B1FB0cL9czqa
+	 A9eJgVejEA3nPrYH5jjUa1dttcTTj7pkgFwE0/v1cxWm4VivtnJK7tubE1MCXy82wY
+	 xAG4uWmEKUW54hp61KLWgbt07I6IrmWqnkDV6ZtVCFb4osrI1o2qEN30ZwKMmDKtu1
+	 L+ylKIbYXPLh3rb4JiiEzH3SiASUcwRMFmFeDB1dxmP+X1BWZOmr8I2UgzFZTS59Fe
+	 TBM8lvtYCrRuQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Brahmajit Das <brahmajit.xyz@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 15/36] smb: server: Fix building with GCC 15
-Date: Wed, 11 Dec 2024 13:49:31 -0500
-Message-ID: <20241211185028.3841047-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 08/23] smb: server: Fix building with GCC 15
+Date: Wed, 11 Dec 2024 13:51:45 -0500
+Message-ID: <20241211185214.3841978-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185028.3841047-1-sashal@kernel.org>
-References: <20241211185028.3841047-1-sashal@kernel.org>
+In-Reply-To: <20241211185214.3841978-1-sashal@kernel.org>
+References: <20241211185214.3841978-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.4
+X-stable-base: Linux 6.6.65
 Content-Transfer-Encoding: 8bit
 
 From: Brahmajit Das <brahmajit.xyz@gmail.com>
@@ -77,7 +77,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 75b4eb856d32f..af8e24163bf26 100644
+index 663b014b9d188..23537e1b34685 100644
 --- a/fs/smb/server/smb_common.c
 +++ b/fs/smb/server/smb_common.c
 @@ -18,8 +18,8 @@
