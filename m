@@ -1,103 +1,105 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E00C2451CD
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Dec 2024 02:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A6D1D89F5;
+	Wed, 11 Dec 2024 09:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733885214; cv=none; b=o7qABPgOC60dpuUirle5w7ZUDXRQ/MiNigLXsJm25bfalSoX51wYWvo317zds2JaxLPbcfP3U2+Fer69zbSLQvK+BcY3kYWydjAhVBdUz0poI3bJWOQqC8wgn09qiqjHWpBSXxgAeZDOY5/BGIfuQWc05/3k2tjMS9Y3H+97jM4=
+	t=1733907755; cv=none; b=DfBVWJSe2DsV8vuU1By+mOmRlhzhiDDTKho7RoTQQNUqgfuoWMyGQKB8uwLsKPfuHfVs0B4tFLV3NfbGkyBgZKyRB13A8zNBSJFChhUAgPJsa9cVjhOJ4neDwAeLFt+CLD6FYEptxnqa/PTF7HNsP43NeVwhEV2/45ZfbTamQ88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733885214; c=relaxed/simple;
-	bh=W0/CiTqoplIUoWdk03axt5FDqqwxa1rZWbYMTfTfF6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JoG8cztaGw0L95PAMCEZZHgAvUn1KTNYcNCGHmWLRw8mX5JqnuJn03SsjuhfyoQibzt0L01H/0B2SgkV3uN5k/97OEPPM6YtilprdqGwv2vLueXOwgTpijUhjqu1hRgEO/TjFIB3HKdn6mVgV7b+MV410p/jgk7Ox3zkQ+e3CC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnbS/lxJ; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnbS/lxJ"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-540215984f0so2509740e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Dec 2024 18:46:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733885210; x=1734490010; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fC606rPojEqVSVoqYhusQIVlu2EF9QA4VOCUFP3nI4w=;
-        b=CnbS/lxJGSSkj2Jhlo00+kYnB8PWeOncc8gOJE9zmrp7vi5nhO+qR6DbANl35StOR2
-         e2xaa0pACUqb/iIoGfHyU6TLemdkE16FOPh1ijHMk2wT6U8qTnfZZwjrAMmS94r2LWRG
-         6anXdTuQ2TVGHGdvaZoTSH1SC0J7Xn5a0Gvblcx1zkL0Llh0gE3eoYoITOmZMmILeccD
-         8MVyMSrS+DYUMMlmx9XB/Ykwh4sKrJ0IugMz9+pkAekR3rwpYt3mwUyCgKca8z3/JxzI
-         AStF0HPEPkG1g93wRM+Gnj/g6Fb+NplMfgy3W1dXWnNGEkdbmP62Rw37baiTo06CIgDF
-         1pKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733885211; x=1734490011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fC606rPojEqVSVoqYhusQIVlu2EF9QA4VOCUFP3nI4w=;
-        b=YtaCPv1QiDn8ivPXDQLng4c85AbKiC/fTxPEAtZ25JY0Oxk307QTku9oByCV9iQg2d
-         cqdN05m9Q4RCDny2/PNes3Lw9OBz4D1+plpVpENArb36HgnNnIrLB/XQWoixhqIFHF69
-         1RajIwJuA6H2/ASteAXocwvejLKTwQCVbetkVT5PFCUHD4B2pCn3eTa2DVUCpxZelS6l
-         iKSNIyAJViBm3v2FcJFIxkl8DvuNyHYQRjQ3qqnhUwcOgnBPq/Mq5TyaYiTfMU4EfB1q
-         MlC9TRkDarhERyr8SwGHC2EH3MHpdr3xRfhckh44BOREYuRYZuMC0YKj+CXGXfFnaTBJ
-         Au7g==
-X-Gm-Message-State: AOJu0YyIse6r7NB3SC4NOSNNJQKlMeP9+ST0Z+cobp/Q1fYjNuhlV/qL
-	/RySmKRQij+hcovG7JNmjTwlztdqnxXZj0ZU50e0fGY59rUfEnZ4ut77CfGEypZ5RVDFwNpq+1t
-	R2LYkvKjUnYCsJOY5sQEjLlBHAAI=
-X-Gm-Gg: ASbGnctFuYH4pN+NEBMWwKeimoT7AFWT0lfPQ3LY7F3KGIcEE1i+G9GyV7vuDd6IQPO
-	QGwohiS8e5QsCGwxngWth9wTgJMx9VkjC9XDIJZSZ8xXEE/pl/jAmPt0ZLzA2YCkjfvQaHw==
-X-Google-Smtp-Source: AGHT+IFQ7HKvm86txHiNrbEkfC7eZy7WMf+bX+DX+DXtHKexRaDIJGZDQoqqhjnuqeVRpma11wzEyRsNXcJT8OeyiFQ=
-X-Received: by 2002:a05:6512:3f12:b0:53e:f507:3801 with SMTP id
- 2adb3069b0e04-5402a60be14mr286636e87.48.1733885210360; Tue, 10 Dec 2024
- 18:46:50 -0800 (PST)
+	s=arc-20240116; t=1733907755; c=relaxed/simple;
+	bh=kVo6a6DxVmOCyCoM54sp8e3Cs5dhcsi76qwqIuAEqeg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LADUqgPSt0NmEilCthAbAE8AxLRlMDNaZaMTS8MbE6+64N+Ve6wWlzEg1AmBuc2jvlwqSyFJs4EtXEWR14V5Khds/L2TFonSveeci1mUP3Ct9nL3rh5echiver0t8dQMypxlFkjjR3TAsiHVKTf+Tz4Ay0z4L/ja2iDSPffy2/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BB5x2FA012144;
+	Wed, 11 Dec 2024 09:02:01 GMT
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 43cx4xby0q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 11 Dec 2024 09:02:00 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Wed, 11 Dec 2024 01:01:59 -0800
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Wed, 11 Dec 2024 01:01:56 -0800
+From: <jianqi.ren.cn@windriver.com>
+To: <pc@manguebit.com>, <gregkh@linuxfoundation.org>
+CC: <stfrench@microsoft.com>, <stable@vger.kernel.org>, <sfrench@samba.org>,
+        <pc@cjr.nz>, <lsahlber@redhat.com>, <sprasad@microsoft.com>,
+        <tom@talpey.com>, <linux-cifs@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <samba-technical@lists.samba.org>
+Subject: [PATCH 6.1.y] smb: client: fix potential UAF in cifs_dump_full_key()
+Date: Wed, 11 Dec 2024 17:59:50 +0800
+Message-ID: <20241211095950.2069548-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210132148.2935-1-ematsumiya@suse.de>
-In-Reply-To: <20241210132148.2935-1-ematsumiya@suse.de>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 10 Dec 2024 20:46:39 -0600
-Message-ID: <CAH2r5mv25sn_fVLjbRtk_mY66OT+iDEfo12HvMX8uh1o66PutQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: destroy cfid_put_wq on module exit
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: hV0_1fjkQGckBZqL0vkKdYPHkPWW26Zm
+X-Proofpoint-ORIG-GUID: hV0_1fjkQGckBZqL0vkKdYPHkPWW26Zm
+X-Authority-Analysis: v=2.4 cv=Y/UCsgeN c=1 sm=1 tr=0 ts=67595508 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=RZcAm9yDv7YA:10 a=Li1AiuEPAAAA:8 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8 a=t7CeM3EgAAAA:8 a=1_rInJw21EjIxf1COpsA:9
+ a=qGKPP_lnpMOaqR3bcYHU:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-11_08,2024-12-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxscore=0 clxscore=1011 malwarescore=0 priorityscore=1501
+ phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2411120000 definitions=main-2412110067
 
-Good catch.  added Cc: stable and merged into cifs-2.6.git
+From: Paulo Alcantara <pc@manguebit.com>
 
-On Tue, Dec 10, 2024 at 7:24=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
->
-> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-> ---
->  fs/smb/client/cifsfs.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-> index c9f9b6e97964..9d96b833015c 100644
-> --- a/fs/smb/client/cifsfs.c
-> +++ b/fs/smb/client/cifsfs.c
-> @@ -2043,6 +2043,7 @@ exit_cifs(void)
->         destroy_workqueue(decrypt_wq);
->         destroy_workqueue(fileinfo_put_wq);
->         destroy_workqueue(serverclose_wq);
-> +       destroy_workqueue(cfid_put_wq);
->         destroy_workqueue(cifsiod_wq);
->         cifs_proc_clean();
->  }
-> --
-> 2.43.0
->
+[ Upstream commit 58acd1f497162e7d282077f816faa519487be045 ]
 
+Skip sessions that are being teared down (status == SES_EXITING) to
+avoid UAF.
 
---=20
-Thanks,
+Cc: stable@vger.kernel.org
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+---
+ fs/smb/client/ioctl.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Steve
+diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
+index ae9905e2b9d4..7402070b7a06 100644
+--- a/fs/smb/client/ioctl.c
++++ b/fs/smb/client/ioctl.c
+@@ -246,7 +246,9 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon, struct smb3_full_key_debug
+ 		spin_lock(&cifs_tcp_ses_lock);
+ 		list_for_each_entry(server_it, &cifs_tcp_ses_list, tcp_ses_list) {
+ 			list_for_each_entry(ses_it, &server_it->smb_ses_list, smb_ses_list) {
+-				if (ses_it->Suid == out.session_id) {
++				spin_lock(&ses_it->ses_lock);
++				if (ses_it->ses_status != SES_EXITING &&
++				    ses_it->Suid == out.session_id) {
+ 					ses = ses_it;
+ 					/*
+ 					 * since we are using the session outside the crit
+@@ -254,9 +256,11 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon, struct smb3_full_key_debug
+ 					 * so increment its refcount
+ 					 */
+ 					ses->ses_count++;
++					spin_unlock(&ses_it->ses_lock);
+ 					found = true;
+ 					goto search_end;
+ 				}
++				spin_unlock(&ses_it->ses_lock);
+ 			}
+ 		}
+ search_end:
+-- 
+2.25.1
+
