@@ -1,96 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9030624BFBD;
-	Wed, 11 Dec 2024 18:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46156211A1E;
+	Thu, 12 Dec 2024 12:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733943207; cv=none; b=CZFzwPsYaT+cpzcuEWsks8gitiTZIo97xL1ijr+4A+3YGXomW3Z6eqN/4B2ZCT4XTTP1HPpqKTRZTWvpyqdATWtSoU5uN5HGo3sCL6w+WClgHlvEX1tyIl74fw1wn+IZAfUkwwk5WfDQqAdlvkMsBQ5BjRdzVTn4AHNW7m8Z83k=
+	t=1734005394; cv=none; b=O1t2BUeV7nnF0Wg1G9IJ/Cb1Bg8iLXO4WEiCYgxZUumIZ9r+qoldVoiuXgmC3l1GjUt/nhdsWMJD5hHtGAZsnUQADDTYwhbEQsD4LqtG/BZY2dnHLtm2GMump+jfUJI+0UzyjngUYnDDKoYmL9bw2KT/3LSVf/C57HsVhJLm9KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733943207; c=relaxed/simple;
-	bh=gtfK1xE7XlmwD1ug30T5tBRF9vPEHtlcID7wOpXqfZ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oDyDGJEXtxTT07Q7jMBoJYbrXK41AxVJqEGd1/ETUK/6S9BhA51CKfMyUsuFJV4KKlcndHHIuTG47AYg9aHDQjMhvfwTMykd+ex9ATTvp9NjoGDNMzsLyYnqP3pFiQCCnGfUu6t/uY3Yie6J+avIq3fx9gleQfnRkHHdMMHAfFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBO3nAW+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734005394; c=relaxed/simple;
+	bh=U59/QLEl7hYdBEpB1dXTAZwPI8WQJUNGqd3XEIbuTu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1bonTp7Ei/OYt60aw3RJW7kK/3HgZzxCOqFG5ff12u2hStLdWDuHx9BfVkU4zeN6uDIDyongS/3s6ugrk4OcQBR/her44ZT8NsdlB69pgkCxy2L8G06wTWP7nX44IFZ5Qu1V+XWTZxnzNxIrc6eoPjwFq4cbQ/QBmsAoE0VaPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gqJ0dtRL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBO3nAW+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F548C4CEDE;
-	Wed, 11 Dec 2024 18:53:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733943207;
-	bh=gtfK1xE7XlmwD1ug30T5tBRF9vPEHtlcID7wOpXqfZ0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cBO3nAW+2yFi68xKOylYHGSvBTqVT94bXfSDQAFTLUjLYFua4PjOKbY50RcznFN0S
-	 WMG5YjPHBvgJ5Xnyqz+Nn31B4IlwJrIilA18pBYcbFOdorWhGz2HDs1uPeNi9lDPfx
-	 eqdWKsMDilIy+W1gphlJ/wJF/iQHPgB2q189rMDNPh/bSUVs7e42Jkb9rKjJOLqRko
-	 VNr64FEGnoe43m9+v2kgVZc7QqiPdcXRrQtLP9NiU2VxOsk+3QQCVQ8vJ016J4jKWB
-	 g/OtIE4qV4jY31kHRfoj8hY5iP9cCRtX6v2i5FcNGNGy9MN5xKTaDs02i1S14/qN1S
-	 Fj7JO4C1whT/w==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Brahmajit Das <brahmajit.xyz@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 05/15] smb: server: Fix building with GCC 15
-Date: Wed, 11 Dec 2024 13:52:57 -0500
-Message-ID: <20241211185316.3842543-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241211185316.3842543-1-sashal@kernel.org>
-References: <20241211185316.3842543-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gqJ0dtRL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51D8BC4CED0;
+	Thu, 12 Dec 2024 12:09:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1734005392;
+	bh=U59/QLEl7hYdBEpB1dXTAZwPI8WQJUNGqd3XEIbuTu8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gqJ0dtRL1hbkI6dj8gHqlznbjIRPsWmebAsIa29f66JCocZyEdkI97cvA8SAEp0wi
+	 wTKisIHb9AelfijHOjQchtxpHCEaGBnYLRVxAOyT9zLSM1urllO9EdpMyVLtMVBg9T
+	 +WqhCeq7q8opvqM5o9p40U02+f8xWe8v6H74uU1c=
+Date: Thu, 12 Dec 2024 13:09:49 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: jianqi.ren.cn@windriver.com
+Cc: pc@manguebit.com, stable@vger.kernel.org, sfrench@samba.org, pc@cjr.nz,
+	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: Re: [PATCH 6.1.y] smb: client: fix potential UAF in
+ cifs_dump_full_key()
+Message-ID: <2024121236-jaywalker-outweigh-1c81@gregkh>
+References: <20241209085813.823573-1-jianqi.ren.cn@windriver.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.119
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241209085813.823573-1-jianqi.ren.cn@windriver.com>
 
-From: Brahmajit Das <brahmajit.xyz@gmail.com>
+On Mon, Dec 09, 2024 at 04:58:13PM +0800, jianqi.ren.cn@windriver.com wrote:
+> From: Paulo Alcantara <pc@manguebit.com>
+> 
+> [ Upstream commit 58acd1f497162e7d282077f816faa519487be045 ]
+> 
+> Skip sessions that are being teared down (status == SES_EXITING) to
+> avoid UAF.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+> ---
+>  fs/smb/client/ioctl.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-[ Upstream commit e18655cf35a5958fbf4ae9ca3ebf28871a3a1801 ]
+You sent this twice, both different, so I have no idea what to do at all
+:(
 
-GCC 15 introduces -Werror=unterminated-string-initialization by default,
-this results in the following build error
-
-fs/smb/server/smb_common.c:21:35: error: initializer-string for array of 'char' is too long [-Werror=unterminated-string-ini
-tialization]
-   21 | static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-
-To this we are replacing char basechars[43] with a character pointer
-and then using strlen to get the length.
-
-Signed-off-by: Brahmajit Das <brahmajit.xyz@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/server/smb_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index bdcdc0fc9cad5..7134abeeb53ec 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -18,8 +18,8 @@
- #include "mgmt/share_config.h"
- 
- /*for shortname implementation */
--static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
--#define MANGLE_BASE (sizeof(basechars) / sizeof(char) - 1)
-+static const char *basechars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
-+#define MANGLE_BASE (strlen(basechars) - 1)
- #define MAGIC_CHAR '~'
- #define PERIOD '.'
- #define mangle(V) ((char)(basechars[(V) % MANGLE_BASE]))
--- 
-2.43.0
 
