@@ -1,191 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262351C3BF3
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Dec 2024 12:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7521DF261
+	for <linux-cifs@vger.kernel.org>; Fri, 13 Dec 2024 13:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734092131; cv=none; b=noGRt70H/gLoNuG1wo1u+C8lVE6v4h+ct00cf/4JObjKUeyvdBJq432a0V9Ov60hW4x2+BGoqJ82GWs/dPlfe0+hAzNeF4e9QqwKC42VoxBQDHR05IFwjxeJb29AOsZ/X0IjPmt2Xt6mzUY9lcgyBc2lmWaNXr1LhuOG0EYhsSE=
+	t=1734097833; cv=none; b=oLOAHxjgNa+5zThop99IXt+CjE5UUZ/s05rCK5IVUx4pX3xQ4TRwndgfluW88ChVJb2z63eIP+IOQ0JtXC+FVKkV/fmKVbiI/+ROyDc2AFRONLh3xYggrrsRaM5byB4QXuuHOhdFnq2ylCiU1Nw4YLTVrGXgKhIo2UmHqX79nv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734092131; c=relaxed/simple;
-	bh=UxkjqmX7/jNNu+BoQosntWYEiJJKcJInDyj3dU/txIA=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=h1CvMhrKKkQ3JDbpiW8ENQ5aCOCDZAFZCRwvuyx/0QbdPFROJ2lFqWXMNRreLGvN2tA29uxbC+DUywHHH0e60akyVWkIM3M+t3xsR2LHIu4jYY1TR7InySFxY48wGzptz5qgv+tvyMKNSNrZgK3gLCl/WuGWp4DTSIhs1//Oj5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4M1BRuo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734097833; c=relaxed/simple;
+	bh=yrjsEmooXq2ypadXEezCFG+UKHZM0Z6P5rrlvhFilyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iqJ5ZPLqtt0U1vgmX9M6f8nqgtQPWShQbm+Fmk3kDYbr1QNV4pg+fdwcdPLzJnIR6qixRPY5DAmi67tBt7ljqYnCMRYIFrzeHviJ9NPNGgNn8qtrg0fGxWswPTSvzAIhwegTpGS5vRsY9K5FwaDuaHt+sP8bo5IiOrL3kUs60y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AuhBKtGR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4M1BRuo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0846C4CED4
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Dec 2024 12:15:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734092130;
-	bh=UxkjqmX7/jNNu+BoQosntWYEiJJKcJInDyj3dU/txIA=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=n4M1BRuocXeW8+Wo4RG1iyuJGdMxXiUKmVazMN8kOhExTxoSZZF7vvRWv+thHJNmN
-	 QRoKFq1IEieL+nN6fH/f6FRGW88JauGeJam2bv5hDNzLJsplfrJqVFmqfSpQ1u6m5U
-	 v0vJqSL3SI4XMTeygT7Qa7m6rYkWqarwOF1RPZpGCLg/zYq7JBEfV358w8J6wrGr2N
-	 JPxyQDvH6qKar6yVkHcVGMFoWR/MI2Ds23QTHflkfKGh2HM0RQKrrG5BvZ/EVvn0yG
-	 CM3N1Ls+BuYplfTUsLoazxSS4Jqm/vIiaAjnIe9IMSEZFrqGG9EfhssqJT7c2p/53j
-	 aG/Zqw7ysdLzQ==
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 952371200043;
-	Fri, 13 Dec 2024 07:15:29 -0500 (EST)
-Received: from phl-imap-12 ([10.202.2.86])
-  by phl-compute-03.internal (MEProxy); Fri, 13 Dec 2024 07:15:29 -0500
-X-ME-Sender: <xms:YSVcZ14LIF9HatqNwXFaajw9wwEvOMGdUC1IhSD-BT--zt1EF5mDPQ>
-    <xme:YSVcZy5neZGXYW3Ho4ey5JU_g0d-pvsdMoTRy_Cc6AgovoEzjckkI_SWVe4kHC-eI
-    0QEh0ihQi7wCYGDlck>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkeejgdefjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeen
-    ucfhrhhomhepfdfnvghonhcutfhomhgrnhhovhhskhihfdcuoehlvghonheskhgvrhhnvg
-    hlrdhorhhgqeenucggtffrrghtthgvrhhnpeetgedugfeuleeufefgffevgfelteetkeeg
-    hedtlefgffeivefgueetjefhteehgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehlvghonhdomhgvshhmthhprghuthhhphgvrhhsohhnrghl
-    ihhthidquddvfedtheefleekgedqvdejjeeljeejvdekqdhlvghonheppehkvghrnhgvlh
-    drohhrgheslhgvohhnrdhnuhdpnhgspghrtghpthhtohepfedpmhhouggvpehsmhhtphho
-    uhhtpdhrtghpthhtohephhhurghnghhkrghnghhjihhnghesghhmrghilhdrtghomhdprh
-    gtphhtthhopehlihhnkhhinhhjvghonheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    lhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:YSVcZ8eaLP0iRlbhNPJfoYBMeDSLkgnmyYkTkqOArujOs8ELuvlOqg>
-    <xmx:YSVcZ-IcZGWl7KYxpTFuaZDcBU1hr86My9w6fSDK9f9jzciHPPiPhA>
-    <xmx:YSVcZ5IcL_YoOKjeVfCgdjn4FG5HQj5s-5Ekb4NSpLp8O72TuCKhlA>
-    <xmx:YSVcZ3zyOJlZgTYvsF6p1ovxd8LhPeZkhj8vOcCffP54y9cbAPawjg>
-    <xmx:YSVcZ1I4COxT1sSq5JNDjUJBHgVgg1bXEaorMACuEAuwUNG_Im5bEMF0>
-Feedback-ID: i927946fb:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 6347C1C20065; Fri, 13 Dec 2024 07:15:29 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AuhBKtGR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734097829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zlbVdG3EuDS4xv5qOG5kSQTp/vih38GtqzMbAmIdEqA=;
+	b=AuhBKtGRx8vXJJtAKxnyC927Q8QGh+0ofbaF6Epkd8t1h+944nggTsIPSiRxYr/O9fOk1Q
+	bTqovgXKEkzP3boom6J3cOYwiL1JvIc74B42xxDhDGh+8yXzxckFJXLSUzTXma3u4k1BXN
+	aQr3Gx+8njVJCjB5XiLmfNYOZ13lEEw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-woItBugOMb6D8BiRItruoA-1; Fri,
+ 13 Dec 2024 08:50:26 -0500
+X-MC-Unique: woItBugOMb6D8BiRItruoA-1
+X-Mimecast-MFC-AGG-ID: woItBugOMb6D8BiRItruoA
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23A451955D4B;
+	Fri, 13 Dec 2024 13:50:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.48])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8520330044C1;
+	Fri, 13 Dec 2024 13:50:16 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Xiubo Li <xiubli@redhat.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/10] netfs, ceph, nfs, cachefiles: Miscellaneous fixes/changes
+Date: Fri, 13 Dec 2024 13:50:00 +0000
+Message-ID: <20241213135013.2964079-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 13 Dec 2024 14:15:09 +0200
-From: "Leon Romanovsky" <leon@kernel.org>
-To: "Kangjing Huang" <huangkangjing@gmail.com>
-Cc: "Namjae Jeon" <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
-Message-Id: <41b8eb22-069b-4670-86ce-cadc545454da@app.fastmail.com>
-In-Reply-To: 
- <CAPbmFQZc4gq7fiTbHGYgaaS=Zj49G-nSRB85=Je0KrX2eVjyoQ@mail.gmail.com>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
- <20241027201857.GA1615717@unreal>
- <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
- <20241105112313.GE311159@unreal>
- <20241106102439.4ca5effc.pasic@linux.ibm.com> <20241106135910.GF5006@unreal>
- <20241107125643.04f97394.pasic@linux.ibm.com>
- <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
- <20241108175906.GB189042@unreal>
- <CAPbmFQZc4gq7fiTbHGYgaaS=Zj49G-nSRB85=Je0KrX2eVjyoQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+Hi Christian,
 
+Here are some miscellaneous fixes and changes for netfslib and the ceph and
+nfs filesystems:
 
-On Fri, Dec 13, 2024, at 13:07, Kangjing Huang wrote:
-> Hi there,
->
-> I am the original author of commit ecce70cf17d9 ("ksmbd: fix missing
-> RDMA-capable flag for IPoIB device in ksmbd_rdma_capable_netdev()"),
-> as mentioned in the thread.
->
-> I am working on modifying the patch to take care of the layering
-> violation. The original patch was meant to fix an issue with ksmbd,
-> where an IPoIB netdev was not recognized as RDMA-capable.
+ (1) Ignore silly-rename files from afs and nfs when building the header
+     archive in a kernel build.
 
-This is exactly the purpose and design of IPoIB, to present regular netd=
-ev to the users and hide IB layer from them.
+ (2) netfs: Fix the way read result collection applies results to folios
+     when each folio is being read by multiple subrequests and the results
+     come out of order.
 
-> The original
-> version of the capability evaluation tries to match each netdev to
-> ib_device by calling get_netdev in ib verbs. However this only works
-> in cases where the ib_device is the upper layer of netdev (e.g. RoCE),
-> and since with IPoIB it is the other way around (netdev is the upper
-> layer of ib_device), get_netdev won't work anymore.
->
-> I tried to replicate the behavior of device matching reversely in the
-> original version of my patch using GID, which ended up as the layering
-> violation. However I am unaware of any exported functions from the
-> IPoIB driver that could do the reverse lookup from netdev to the lower
-> layer ib_device. Actually it seems that the IPoIB driver does not have
-> any exported symbols at all.
->
-> It might be that the device matching in reverse just does not make any
-> sense and does not need to be done at all. As long as it is an IPoIB
-> device (netdev->type =3D=3D ARPHRD_INFINIBAND) it might be ok to just
-> automatically assume it is RDMA-capable. I am not 100% sure about this
-> though.
->
-> I am uncertain about how to proceed at this point and would like to
-> know your thoughts and opinions on this.
+ (3) netfs: Fix ENOMEM handling in buffered reads.
 
-Delete this code completely and make sure that ksmbd has two paths only.=
- One for netdevs and one for ib_devices. It is upto users to decide on w=
-hich interface to run.
+ (4) nfs: Fix an oops in nfs_netfs_init_request() when copying to the cache.
 
-Thanks=20
+ (5) cachefiles: Parse the "secctx" command immediately to get the correct
+     error rather than leaving it to the "bind" command.
 
->
-> Thanks,
-> Kangjing
->
-> On Fri, Nov 8, 2024 at 5:59=E2=80=AFPM Leon Romanovsky <leon@kernel.or=
-g> wrote:
->>
->> On Fri, Nov 08, 2024 at 08:40:40AM +0900, Namjae Jeon wrote:
->> > On Thu, Nov 7, 2024 at 9:00=E2=80=AFPM Halil Pasic <pasic@linux.ibm=
-.com> wrote:
->> > >
->> > > On Wed, 6 Nov 2024 15:59:10 +0200
->> > > Leon Romanovsky <leon@kernel.org> wrote:
->> > >
->> > > > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDM=
-A core code?
->> > > >
->> > > > RDMA core code is drivers/infiniband/core/*.
->> > >
->> > > Understood. So this is a violation of the no direct access to the
->> > > callbacks rule.
->> > >
->> > > >
->> > > > > I would guess it is not, and I would not actually mind sendin=
-g a patch
->> > > > > but I have trouble figuring out the logic behind  commit ecce=
-70cf17d9
->> > > > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
->> > > > > ksmbd_rdma_capable_netdev()").
->> > > >
->> > > > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to=
- avoid
->> > > > GID, netdev and fabric complexity.
->> > >
->> > > I'm not familiar enough with either of the subsystems. Based on y=
-our
->> > > answer my guess is that it ain't outright bugous but still a laye=
-ring
->> > > violation. Copying linux-cifs@vger.kernel.org so that
->> > > the smb are aware.
->> > Could you please elaborate what the violation is ?
->>
->> There are many, but the most screaming is that ksmbd has logic to
->> differentiate IPoIB devices. These devices are pure netdev devices
->> and should be treated like that. ULPs should treat them exactly
->> as they treat netdev devices.
->>
->> > I would also appreciate it if you could suggest to me how to fix th=
-is.
->> >
->> > Thanks.
->> > >
->> > > Thank you very much for all the explanations!
->> > >
->> > > Regards,
->> > > Halil
->> > >
->
->
->
-> --=20
-> Kangjing "Chaser" Huang
+ (6) netfs: Remove a redundant smp_rmb().  This isn't a bug per se and
+     could be deferred.
+
+ (7) netfs: Fix missing barriers by using clear_and_wake_up_bit().
+
+ (8) netfs: Work around recursion in read retry by failing and abandoning
+     the retried subrequest if no I/O is performed.
+
+     [!] NOTE: This only works around the recursion problem if the
+     	 recursion keeps returning no data.  If the server manages, say, to
+     	 repeatedly return a single byte of data faster than the retry
+     	 algorithm can complete, it will still recurse and the stack
+     	 overrun may still occur.  Actually fixing this requires quite an
+     	 intrusive change which will hopefully make the next merge window.
+
+ (9) netfs: Fix the clearance of a folio_queue when unlocking the page if
+     we're going to want to subsequently send the queue for copying to the
+     cache (if, for example, we're using ceph).
+
+(10) netfs: Fix the lack of cancellation of copy-to-cache when the cache
+     for a file is temporarily disabled (for example when a DIO write is
+     done to the file).  This patch and (9) fix hangs with ceph.
+
+With these patches, I can run xfstest -g quick to completion on ceph with a
+local cache.
+
+The patches can also be found here with a bonus cifs patch:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+
+Thanks,
+David
+
+David Howells (8):
+  kheaders: Ignore silly-rename files
+  netfs: Fix non-contiguous donation between completed reads
+  netfs: Fix enomem handling in buffered reads
+  nfs: Fix oops in nfs_netfs_init_request() when copying to cache
+  netfs: Fix missing barriers by using clear_and_wake_up_bit()
+  netfs: Work around recursion by abandoning retry if nothing read
+  netfs: Fix ceph copy to cache on write-begin
+  netfs: Fix the (non-)cancellation of copy when cache is temporarily
+    disabled
+
+Max Kellermann (1):
+  cachefiles: Parse the "secctx" immediately
+
+Zilin Guan (1):
+  netfs: Remove redundant use of smp_rmb()
+
+ fs/9p/vfs_addr.c         |  6 +++++-
+ fs/afs/write.c           |  5 ++++-
+ fs/cachefiles/daemon.c   | 14 +++++++-------
+ fs/cachefiles/internal.h |  3 ++-
+ fs/cachefiles/security.c |  6 +++---
+ fs/netfs/buffered_read.c | 28 ++++++++++++++++------------
+ fs/netfs/direct_write.c  |  1 -
+ fs/netfs/read_collect.c  | 33 +++++++++++++++++++--------------
+ fs/netfs/read_pgpriv2.c  |  4 ++++
+ fs/netfs/read_retry.c    |  6 ++++--
+ fs/netfs/write_collect.c | 14 +++++---------
+ fs/netfs/write_issue.c   |  2 ++
+ fs/nfs/fscache.c         |  9 ++++++++-
+ fs/smb/client/cifssmb.c  | 13 +++++++++----
+ fs/smb/client/smb2pdu.c  |  9 ++++++---
+ include/linux/netfs.h    |  6 +++---
+ kernel/gen_kheaders.sh   |  1 +
+ 17 files changed, 98 insertions(+), 62 deletions(-)
+
