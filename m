@@ -1,229 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081B71E049F
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Dec 2024 14:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E651E04BF;
+	Fri, 13 Dec 2024 14:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734098679; cv=none; b=WdgSYHq4ZK+4+/HnZ85O1Nxmf4cchkQp9/kYlSprR7/7VrFsW0bNas+Zyh4qBD82wzsCTSZLgK1i2fWVOA+bvZy5LpjJFuav71GazElul+Iqq7YMSlqaccjMrC03e/vBzN10r5fGaljjrDXUntEVBBOTGG8oSo7cdDQMop2J2NU=
+	t=1734100415; cv=none; b=Gq0JklIqPs46PCLnGfbvLXqChgO21wPR0GxFy9s8BWCBiO7t/2NhFJiYscVKhrZxOFw2nfxkI6s8S986hOI3oeQNzWe0PFwU1Ihxa/0kRF9xEoCIqtm9Jr0SqFjJ7ZCjA/CHskoOYABCis1dAhggbbCzUv9pmocSRHrunrNXhik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734098679; c=relaxed/simple;
-	bh=BLcmeVJ5U4DYQzHKAiQZlh7Ak2tSTMDloMiK5se3BJg=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=EVDUUfyNhMIke3H1ftsaaH1ixa+CGcFrRHG81oJGNh6RPwEmfV9POw99Ua159z6szEpyO7oj7RQXVDXPWiISmUj10405j371yVwZLlkXlm7m2D72FA8jo2WH7DKk8jsYkk/lF2aKL4kOvW6mBeuoHqQ6n9E60hISOLRP0XKwLi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fbW1lkm9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734100415; c=relaxed/simple;
+	bh=PxRIzyngJAldqq4VCoyyeFAPVgtSl6U/ZhJk5pQ33xA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JjsIW+GwP+dcsPZZDwHz86z+WjZT9ehMlwEqhFVTq1CZBrKsJS+HsDqTk8HYpSO4SFakoaOht5aF/n6LwggsJSW6bzWHB+BTOjeliUMmVY41bwUX7xUyGFSB2nLT62S3IklqKQrujtLyy8bjonanIumKnWB3ReG2cA6FOU/s2sY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YOt/nXPx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fbW1lkm9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734098676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BMjJh3rNwqJWG/q45S190yCaLe7IaLUoUOyUtTRrI4M=;
-	b=fbW1lkm9MwHLhbM6SF61UyyGxvPMRKwkKHnwWZUZ/abJhwWA9Gg3UEMt8/AXNo7rEejY58
-	ouWse9VNbN0WmKOjtyHnEtsyTvE6lVqSv58yTZlkO9wO/gg4kVDXE9NFAnlPhy9BoYBrtQ
-	HIlWNC+N+y2H6Qqw9f1r/x2mV/yK5Js=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-A8uEA95lOSGhAgZJarh21Q-1; Fri,
- 13 Dec 2024 09:04:32 -0500
-X-MC-Unique: A8uEA95lOSGhAgZJarh21Q-1
-X-Mimecast-MFC-AGG-ID: A8uEA95lOSGhAgZJarh21Q
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BCB9F1955E9A;
-	Fri, 13 Dec 2024 14:04:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.48])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9948F195605A;
-	Fri, 13 Dec 2024 14:04:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20241213135013.2964079-1-dhowells@redhat.com>
-References: <20241213135013.2964079-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-    Ilya Dryomov <idryomov@gmail.com>
-Cc: dhowells@redhat.com, Max Kellermann <max.kellermann@ionos.com>,
-    Xiubo Li <xiubli@redhat.com>, Trond Myklebust <trondmy@kernel.org>,
-    Jeff Layton <jlayton@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-    linux-kernel@vger.kernel.org
-Subject: ceph xfstests failures [was Re: [PATCH 00/10] netfs, ceph, nfs, cachefiles: Miscellaneous fixes/changes]
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YOt/nXPx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D478C4CED2;
+	Fri, 13 Dec 2024 14:33:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1734100414;
+	bh=PxRIzyngJAldqq4VCoyyeFAPVgtSl6U/ZhJk5pQ33xA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YOt/nXPxQgz3yWLmPb1Mu4UWkbSo9EgR71TMdP1Dt9VeiEPbUDOyGFDvt5Dhv7duq
+	 6lahiweo04d9zs30z/TNlZNyTal8nLEznFhyFcQG65q1/H3W5yz7oK79m3dn6smqzL
+	 0BRKH6AT8GjeHRhMkrBLbJ7c/Ab1KRKXLNSG2Yko=
+Date: Fri, 13 Dec 2024 15:33:31 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Michael Krause <mk@galax.is>
+Cc: Salvatore Bonaccorso <carnil@debian.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Michael Krause <mk-debian@galax.is>,
+	Steve French <stfrench@microsoft.com>, stable@vger.kernel.org,
+	regressions@lists.linux.dev, linux-cifs@vger.kernel.org
+Subject: Re: backporting 24a9799aa8ef ("smb: client: fix UAF in
+ smb2_reconnect_server()") to older stable series
+Message-ID: <2024121316-refresh-skintight-c338@gregkh>
+References: <2024040834-magazine-audience-8aa4@gregkh>
+ <Z0rZFrZ0Cz3LJEbI@eldamar.lan>
+ <2e1ad828-24b3-488d-881e-69232c8c6062@galax.is>
+ <1037557ef401a66691a4b1e765eec2e2@manguebit.com>
+ <Z08ZdhIQeqHDHvqu@eldamar.lan>
+ <3441d88b-92e6-4f89-83a4-9230c8701d73@galax.is>
+ <2024121243-perennial-coveting-b863@gregkh>
+ <e9f36681-2d7e-4153-9cdf-cf556e290a53@galax.is>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2964552.1734098664.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Dec 2024 14:04:24 +0000
-Message-ID: <2964553.1734098664@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9f36681-2d7e-4153-9cdf-cf556e290a53@galax.is>
 
-David Howells <dhowells@redhat.com> wrote:
+On Thu, Dec 12, 2024 at 10:48:55PM +0100, Michael Krause wrote:
+> On 12/12/24 1:26 PM, Greg KH wrote:
+> > On Tue, Dec 10, 2024 at 12:05:00AM +0100, Michael Krause wrote:
+> > > On 12/3/24 3:45 PM, Salvatore Bonaccorso wrote:
+> > > > Paulo,
+> > > > 
+> > > > On Tue, Dec 03, 2024 at 10:18:25AM -0300, Paulo Alcantara wrote:
+> > > > > Michael Krause <mk-debian@galax.is> writes:
+> > > > > 
+> > > > > > On 11/30/24 10:21 AM, Salvatore Bonaccorso wrote:
+> > > > > > > Michael, did a manual backport of 24a9799aa8ef ("smb: client: fix UAF
+> > > > > > > in smb2_reconnect_server()") which seems in fact to solve the issue.
+> > > > > > > 
+> > > > > > > Michael, can you please post your backport here for review from Paulo
+> > > > > > > and Steve?
+> > > > > > 
+> > > > > > Of course, attached.
+> > > > > > 
+> > > > > > Now I really hope I didn't screw it up :)
+> > > > > 
+> > > > > LGTM.  Thanks Michael for the backport.
+> > > > 
+> > > > Thanks a lot for the review. So to get it accepted it needs to be
+> > > > brough into the form which Greg can pick up. Michael can you do that
+> > > > and add your Signed-off line accordingly?
+> > > Happy to. Hope this is in the proper format:
+> > 
+> > It's corrupted somehow:
+> > 
+> > patching file fs/smb/client/connect.c
+> > patch: **** malformed patch at line 202:  		if (rc)
+> > 
+> > 
+> > Can you resend it or attach it?
+> > 
+> > thanks,
+> > 
+> > greg k-h
+> 
+> Ugh, how embarrassing. I'm sorry, I "fixed" some minor whitespace issue directly in the patch and apparently did something wrong.
+> 
+> I redid the white space fix before diffing again and attach and inline the new version. The chunks are a bit alternated to the earlier version now unfortunately. This one applies..
 
-> With these patches, I can run xfstest -g quick to completion on ceph wit=
-h a
-> local cache.
+Doesn't apply for me:
 
-I should qualify that.  The thing completes and doesn't hang, but I get 6
-failures:
+checking file fs/smb/client/connect.c
+Hunk #1 FAILED at 259.
+Hunk #2 FAILED at 1977.
+Hunk #3 FAILED at 2035.
+3 out of 3 hunks FAILED
+checking file fs/smb/client/connect.c
 
-    Failures: generic/604 generic/633 generic/645 generic/696 generic/697 =
-generic/732
+Any ideas?
 
-Though these don't appear to be anything to do with netfslib (see attached=
-).
-There are two cases where the mount is busy and the rest seems to be due t=
-o
-id-mapped mounts and/or user namespaces.
+thanks,
 
-The xfstest local.config file looks something like:
-
-    export FSTYP=3Dceph
-    export TEST_DEV=3D<ipaddr>:/test
-    export TEST_DIR=3D/xfstest.test
-    TEST_FS_MOUNT_OPTS=3D'-o name=3Dadmin,mds_namespace=3Dtest,fs=3Dtest,f=
-sc'
-    export SCRATCH_DEV=3D<ipaddr>:/scratch
-    export SCRATCH_MNT=3D/xfstest.scratch
-    export MOUNT_OPTIONS=3D'-o name=3Dadmin,mds_namespace=3Dscratch,fs=3Ds=
-cratch,fsc=3Dscratch'
-
-David
----
-# ./check -E .exclude generic/604 generic/633 generic/645 generic/696 gene=
-ric/697 generic/732
-FSTYP         -- ceph
-PLATFORM      -- Linux/x86_64 andromeda 6.13.0-rc2-build3+ #5311 SMP Fri D=
-ec 13 09:03:34 GMT 2024
-MKFS_OPTIONS  -- <ipaddr>:/scratch
-MOUNT_OPTIONS -- -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3D=
-scratch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstes=
-t.scratch
-
-generic/604 2s ... [failed, exit status 1]- output mismatch (see /root/xfs=
-tests-dev/results//generic/604.out.bad)
-    --- tests/generic/604.out   2024-09-12 12:36:14.187441830 +0100
-    +++ /root/xfstests-dev/results//generic/604.out.bad 2024-12-13 13:18:5=
-1.910900871 +0000
-    @@ -1,2 +1,4 @@
-     QA output created by 604
-    -Silence is golden
-    +mount error 16 =3D Device or resource busy
-    +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscra=
-tch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.sc=
-ratch failed
-    +(see /root/xfstests-dev/results//generic/604.full for details)
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/604.out /root/xfstests-=
-dev/results//generic/604.out.bad'  to see the entire diff)
-generic/633       [failed, exit status 1]- output mismatch (see /root/xfst=
-ests-dev/results//generic/633.out.bad)
-    --- tests/generic/633.out   2024-09-12 12:36:14.187441830 +0100
-    +++ /root/xfstests-dev/results//generic/633.out.bad 2024-12-13 13:18:5=
-5.958979531 +0000
-    @@ -1,2 +1,4 @@
-     QA output created by 633
-     Silence is golden
-    +idmapped-mounts.c: 307: tcore_create_in_userns - Input/output error -=
- failure: open file
-    +vfstest.c: 2418: run_test - Success - failure: create operations in u=
-ser namespace
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/633.out /root/xfstests-=
-dev/results//generic/633.out.bad'  to see the entire diff)
-generic/645       [failed, exit status 1]- output mismatch (see /root/xfst=
-ests-dev/results//generic/645.out.bad)
-    --- tests/generic/645.out   2024-09-12 12:36:14.191441810 +0100
-    +++ /root/xfstests-dev/results//generic/645.out.bad 2024-12-13 13:19:2=
-5.526908024 +0000
-    @@ -1,2 +1,4 @@
-     QA output created by 645
-     Silence is golden
-    +idmapped-mounts.c: 6671: nested_userns - Invalid argument - failure: =
-sys_mount_setattr
-    +vfstest.c: 2418: run_test - Invalid argument - failure: test that nes=
-ted user namespaces behave correctly when attached to idmapped mounts
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/645.out /root/xfstests-=
-dev/results//generic/645.out.bad'  to see the entire diff)
-generic/696       - output mismatch (see /root/xfstests-dev/results//gener=
-ic/696.out.bad)
-    --- tests/generic/696.out   2024-09-12 12:36:14.195441791 +0100
-    +++ /root/xfstests-dev/results//generic/696.out.bad 2024-12-13 13:19:3=
-0.254804087 +0000
-    @@ -1,2 +1,6 @@
-     QA output created by 696
-    +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output =
-error - failure: create
-    +vfstest.c: 2418: run_test - Success - failure: create operations by u=
-sing umask in directories with setgid bit set on idmapped mount
-    +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output =
-error - failure: create
-    +vfstest.c: 2418: run_test - Success - failure: create operations by u=
-sing umask in directories with setgid bit set on idmapped mount
-     Silence is golden
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/696.out /root/xfstests-=
-dev/results//generic/696.out.bad'  to see the entire diff)
-
-HINT: You _MAY_ be missing kernel fix:
-      ac6800e279a2 fs: Add missing umask strip in vfs_tmpfile 1639a49ccdce=
- fs: move S_ISGID stripping into the vfs_*() helpers
-
-generic/697       - output mismatch (see /root/xfstests-dev/results//gener=
-ic/697.out.bad)
-    --- tests/generic/697.out   2024-09-12 12:36:14.195441791 +0100
-    +++ /root/xfstests-dev/results//generic/697.out.bad 2024-12-13 13:19:3=
-1.749225548 +0000
-    @@ -1,2 +1,4 @@
-     QA output created by 697
-    +idmapped-mounts.c: 8218: setgid_create_acl_idmapped - Input/output er=
-ror - failure: create
-    +vfstest.c: 2418: run_test - Success - failure: create operations by u=
-sing acl in directories with setgid bit set on idmapped mount
-     Silence is golden
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/697.out /root/xfstests-=
-dev/results//generic/697.out.bad'  to see the entire diff)
-
-HINT: You _MAY_ be missing kernel fix:
-      1639a49ccdce fs: move S_ISGID stripping into the vfs_*() helpers
-
-generic/732 1s ... [failed, exit status 1]- output mismatch (see /root/xfs=
-tests-dev/results//generic/732.out.bad)
-    --- tests/generic/732.out   2024-09-12 12:36:14.195441791 +0100
-    +++ /root/xfstests-dev/results//generic/732.out.bad 2024-12-13 13:19:3=
-4.482858235 +0000
-    @@ -1,2 +1,5 @@
-     QA output created by 732
-     Silence is golden
-    +mount error 16 =3D Device or resource busy
-    +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscra=
-tch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.te=
-st/mountpoint2-732 failed
-    +(see /root/xfstests-dev/results//generic/732.full for details)
-    ...
-    (Run 'diff -u /root/xfstests-dev/tests/generic/732.out /root/xfstests-=
-dev/results//generic/732.out.bad'  to see the entire diff)
-Ran: generic/604 generic/633 generic/645 generic/696 generic/697 generic/7=
-32
-Failures: generic/604 generic/633 generic/645 generic/696 generic/697 gene=
-ric/732
-Failed 6 of 6 tests
-
+greg k-h
