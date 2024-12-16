@@ -1,297 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDFA1D63DD
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 20:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864B21E412A
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 20:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734381780; cv=none; b=dVtgewkbYlOtS0eC7EORk9/ooNLLHa5HYUDznQsOYS+mNlvc3Pn4qqCuzqKxTT1FR8QvfM1EmgW+aoxWsWw/7rOzqY+trRptsfG/70k1vYI9sOwAxUzQCBBH7YiXDQRzZOew3/Ou6sdwmPiKa6fLuBfndRk9NobANqxuNrlLYys=
+	t=1734381788; cv=none; b=DNT7mK3mEG5uIDTN9BLmoOgMFMkYroz/phsV6GjcFcukpGHUyvUrI/NATlBQK4ptI3iPS1ECQ92SiQSpQegMyEMsgq5Khrw21XWfGy+T4DEtyEssqcWOTnXkcsmifN6iCpnHaNJ8+0U31u2xgg+Y8fcscOf6fYztJZzAcBCarwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734381780; c=relaxed/simple;
-	bh=TPib/jBc03UFvozatFPF3MMXl8SN6lFqc8ChVYwnJ7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GAPgw2rOy6EPbHrIiHxrOd+hQFkplcMeNbRZtdqvXv5XUudpfZW2IhPDRovJPcWeIK/Aog+Beio4Fp165Wb26NtWVa/5ondG/N1xm9CdapovLBkSMULFSSHY28E8AQuCJC3eL2PArEXABxkDUM7JBHblZutnNMWe6uGNGRDUXAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RW/CRnHk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734381788; c=relaxed/simple;
+	bh=TVJNi5nyq5tLG1qjP8fziS3NtAysN5+4R5PQqBykDXs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PASGS4NmgKs7pc2CTpQQQYF5bZGKk2c1KTy4zQQFEJlX0AUXNkw2KJMMYNCK0MCfxTHnmzeXj14TM/K6i3s8q/2r9ADfGeppXmA20nVj9Fpk6/SLCjfOwEOY3sULMgsw+XPS844iLMcZbnV5zhxjyfYFr3tue8P/x7rzIcNe4IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=StbyivAT; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RW/CRnHk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734381777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R1KN0H1DyrTJ9oId0tb+k5ruXvxmzXbOtML0jIjZVz8=;
-	b=RW/CRnHkjZZYliILwG44Vpfw3TSt5x82RdebD4iOkSs6AoclO3W0jKHiMTmKfUQpTrgMRj
-	l5SbNFDIqxgsFX5BgL+EZMFKmGBZK0EA0SWzoG3jGNt1yJNZEuooD/Ll8Xqmbrc4SrEfvj
-	ustgqi9Mf7kIyDY8oub/g8pKkmLe4qM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-646-dbBrdsInOVus8GFxw7tcpQ-1; Mon,
- 16 Dec 2024 15:42:54 -0500
-X-MC-Unique: dbBrdsInOVus8GFxw7tcpQ-1
-X-Mimecast-MFC-AGG-ID: dbBrdsInOVus8GFxw7tcpQ
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 605751956059;
-	Mon, 16 Dec 2024 20:42:50 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.48])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 18CA519560AD;
-	Mon, 16 Dec 2024 20:42:43 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-cachefs@redhat.com
-Subject: [PATCH v5 10/32] netfs: Don't use bh spinlock
-Date: Mon, 16 Dec 2024 20:41:00 +0000
-Message-ID: <20241216204124.3752367-11-dhowells@redhat.com>
-In-Reply-To: <20241216204124.3752367-1-dhowells@redhat.com>
-References: <20241216204124.3752367-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="StbyivAT"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53e399e3310so5444928e87.1
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 12:43:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734381785; x=1734986585; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iGWxq/VDiU/+OeuzDwAfM9TbfhoKtUJupk3G6RL6dtw=;
+        b=StbyivAT8fvB2CYfbWUCn2imZ3kWg0DEeU9hIaMav5GrPN7tBTJpOFWomVeHUuoOcY
+         JC53hANBcGj+PUTIKQXRpxm7+0x0RoSfBrLzIiYJrYWOcdwP7I0DXYsC2zRgAqW/LhQL
+         1M1sbzQKQqxuAL5/4EG69g8iusR169YVaqil9wSE0WNt0BjMlDNLVbCgwHMCslgvD9io
+         swazWxpelXOWoUIZy2xXkHs2kWIPDBFdnZEqn7Q/RunvLAlnJZn6hsICJbJHtL6wYJoW
+         AQjD2PLVgC1xwLrqqaP/A4Iqxfsfk0t1KpzcUqcmk1s1eu0NP3GzatlbW4NYW/ZTC3Vj
+         UhAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734381785; x=1734986585;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iGWxq/VDiU/+OeuzDwAfM9TbfhoKtUJupk3G6RL6dtw=;
+        b=Vt9ylrSxKUY9n3k2uKMYvZh7QTmTcGyuKKm5maf/GlbUJNGhaLO7MgUFymjj3+fXEX
+         6EJJff1DKPUnXzrmxNd672abNkzUJFi4Vj3MtfWyqZvtzQK59MEVDS1G1NVvrRtOIhOR
+         doVBpSv/WLrX3sXuk4Khq9kwudAXZfWagFr42YPmb2GgnVijJ0wACTJx3kKsyXjCwnLK
+         0qdy92BL11Vv8ub1r3ZIK0yRyrsU+5EVaSZ8GtIyWfhf0Im6ekxZsGDrwHDXv4OEcmKS
+         UI3A1SHM5dEcWBWC1STuIrXMWjCvBsJF6HhHy94sUYAVt/8RMR5Bs8qJeGZM5GluRbk5
+         S0uQ==
+X-Gm-Message-State: AOJu0YxjUmfdIojceiL/K5v3g20ha0XSNGTBYUsGkkx3Y3rcz73fKkHV
+	KUt6ucfHtVugnjlPu/xaD337NMV9qULLXf5MlEM/upGsaIaqfdAWSt9/NIdkCFS5kmQuxg7RjhO
+	X+CNRQ3U8Rr3A4HFHFJmsR6Gg4yI=
+X-Gm-Gg: ASbGncv9K/2/Tq5TZVD5t8xaTO0p+gEphOzY5Af25PxQgAyqIyhbSIqYX4ZLe/B/0la
+	Ts2vrHcBJRtHmsDb/PHG1GSMiNaV8q9h5lisHAz06SZGwli76LXJMiojz5JU/M3QxRwDwLb/f
+X-Google-Smtp-Source: AGHT+IHE3gZptUZAC0teFklx8LqSL00Pohsp2yLOOSy1bu51Dyg9D8yWx6dtLdFuOHJyxsNAv5RjGOmVMulEavpLM/Y=
+X-Received: by 2002:ac2:4c47:0:b0:53e:2bb0:4942 with SMTP id
+ 2adb3069b0e04-54099b6d640mr4625921e87.57.1734381784314; Mon, 16 Dec 2024
+ 12:43:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <20241216183936.5245-1-bharathsm@microsoft.com>
+In-Reply-To: <20241216183936.5245-1-bharathsm@microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 16 Dec 2024 14:42:53 -0600
+Message-ID: <CAH2r5mtCA-qeLmYZft8RNam5jBmDCt_9sOKTMb6-OEu0NaZSGQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: use macros instead of constants for leasekey size
+ and default cifsattrs value
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: linux-cifs@vger.kernel.org, sfrench@samba.org, pc@manguebit.com, 
+	sprasad@microsoft.com, Bharath SM <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-All the accessing of the subrequest lists is now done in process context,
-possibly in a workqueue, but not now in a BH context, so we don't need the
-lock against BH interference when taking the netfs_io_request::lock
-spinlock.
+merged into cifs-2.6.git for-next
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/netfs/buffered_read.c |  4 ++--
- fs/netfs/direct_read.c   |  4 ++--
- fs/netfs/read_collect.c  | 20 ++++++++++----------
- fs/netfs/read_retry.c    |  8 ++++----
- fs/netfs/write_collect.c |  4 ++--
- fs/netfs/write_issue.c   |  4 ++--
- 6 files changed, 22 insertions(+), 22 deletions(-)
+On Mon, Dec 16, 2024 at 12:39=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
+m> wrote:
+>
+> Replace default hardcoded value for cifsAttrs with ATTR_ARCHIVE macro
+> Use SMB2_LEASE_KEY_SIZE macro for leasekey size in smb2_lease_break
+>
+> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> ---
+>  fs/smb/client/cifsfs.c  | 2 +-
+>  fs/smb/client/smb2pdu.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+> index c9f9b6e97964..722be656f5dc 100644
+> --- a/fs/smb/client/cifsfs.c
+> +++ b/fs/smb/client/cifsfs.c
+> @@ -398,7 +398,7 @@ cifs_alloc_inode(struct super_block *sb)
+>         cifs_inode =3D alloc_inode_sb(sb, cifs_inode_cachep, GFP_KERNEL);
+>         if (!cifs_inode)
+>                 return NULL;
+> -       cifs_inode->cifsAttrs =3D 0x20;   /* default */
+> +       cifs_inode->cifsAttrs =3D ATTR_ARCHIVE;   /* default */
+>         cifs_inode->time =3D 0;
+>         /*
+>          * Until the file is open and we have gotten oplock info back fro=
+m the
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 010eae9d6c47..c945b94318f8 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -6204,7 +6204,7 @@ SMB2_lease_break(const unsigned int xid, struct cif=
+s_tcon *tcon,
+>         req->StructureSize =3D cpu_to_le16(36);
+>         total_len +=3D 12;
+>
+> -       memcpy(req->LeaseKey, lease_key, 16);
+> +       memcpy(req->LeaseKey, lease_key, SMB2_LEASE_KEY_SIZE);
+>         req->LeaseState =3D lease_state;
+>
+>         flags |=3D CIFS_NO_RSP_BUF;
+> --
+> 2.43.0
+>
+>
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index fa1013020ac9..4ff4b587dc4b 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -200,12 +200,12 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq)
- 		subreq->len	= size;
- 
- 		atomic_inc(&rreq->nr_outstanding);
--		spin_lock_bh(&rreq->lock);
-+		spin_lock(&rreq->lock);
- 		list_add_tail(&subreq->rreq_link, &rreq->subrequests);
- 		subreq->prev_donated = rreq->prev_donated;
- 		rreq->prev_donated = 0;
- 		trace_netfs_sreq(subreq, netfs_sreq_trace_added);
--		spin_unlock_bh(&rreq->lock);
-+		spin_unlock(&rreq->lock);
- 
- 		source = netfs_cache_prepare_read(rreq, subreq, rreq->i_size);
- 		subreq->source = source;
-diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
-index 54027fd14904..1a20cc3979c7 100644
---- a/fs/netfs/direct_read.c
-+++ b/fs/netfs/direct_read.c
-@@ -68,12 +68,12 @@ static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
- 		subreq->len	= size;
- 
- 		atomic_inc(&rreq->nr_outstanding);
--		spin_lock_bh(&rreq->lock);
-+		spin_lock(&rreq->lock);
- 		list_add_tail(&subreq->rreq_link, &rreq->subrequests);
- 		subreq->prev_donated = rreq->prev_donated;
- 		rreq->prev_donated = 0;
- 		trace_netfs_sreq(subreq, netfs_sreq_trace_added);
--		spin_unlock_bh(&rreq->lock);
-+		spin_unlock(&rreq->lock);
- 
- 		netfs_stat(&netfs_n_rh_download);
- 		if (rreq->netfs_ops->prepare_read) {
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index 454a5bbdd6f8..26e430baeb5a 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -144,7 +144,7 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 	prev_donated = READ_ONCE(subreq->prev_donated);
- 	next_donated =  READ_ONCE(subreq->next_donated);
- 	if (prev_donated || next_donated) {
--		spin_lock_bh(&rreq->lock);
-+		spin_lock(&rreq->lock);
- 		prev_donated = subreq->prev_donated;
- 		next_donated =  subreq->next_donated;
- 		subreq->start -= prev_donated;
-@@ -157,7 +157,7 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 			next_donated = subreq->next_donated = 0;
- 		}
- 		trace_netfs_sreq(subreq, netfs_sreq_trace_add_donations);
--		spin_unlock_bh(&rreq->lock);
-+		spin_unlock(&rreq->lock);
- 	}
- 
- 	avail = subreq->transferred;
-@@ -186,18 +186,18 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 		} else if (fpos < start) {
- 			excess = fend - subreq->start;
- 
--			spin_lock_bh(&rreq->lock);
-+			spin_lock(&rreq->lock);
- 			/* If we complete first on a folio split with the
- 			 * preceding subreq, donate to that subreq - otherwise
- 			 * we get the responsibility.
- 			 */
- 			if (subreq->prev_donated != prev_donated) {
--				spin_unlock_bh(&rreq->lock);
-+				spin_unlock(&rreq->lock);
- 				goto donation_changed;
- 			}
- 
- 			if (list_is_first(&subreq->rreq_link, &rreq->subrequests)) {
--				spin_unlock_bh(&rreq->lock);
-+				spin_unlock(&rreq->lock);
- 				pr_err("Can't donate prior to front\n");
- 				goto bad;
- 			}
-@@ -213,7 +213,7 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 
- 			if (subreq->consumed >= subreq->len)
- 				goto remove_subreq_locked;
--			spin_unlock_bh(&rreq->lock);
-+			spin_unlock(&rreq->lock);
- 		} else {
- 			pr_err("fpos > start\n");
- 			goto bad;
-@@ -241,11 +241,11 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 	/* Donate the remaining downloaded data to one of the neighbouring
- 	 * subrequests.  Note that we may race with them doing the same thing.
- 	 */
--	spin_lock_bh(&rreq->lock);
-+	spin_lock(&rreq->lock);
- 
- 	if (subreq->prev_donated != prev_donated ||
- 	    subreq->next_donated != next_donated) {
--		spin_unlock_bh(&rreq->lock);
-+		spin_unlock(&rreq->lock);
- 		cond_resched();
- 		goto donation_changed;
- 	}
-@@ -296,11 +296,11 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq)
- 	goto remove_subreq_locked;
- 
- remove_subreq:
--	spin_lock_bh(&rreq->lock);
-+	spin_lock(&rreq->lock);
- remove_subreq_locked:
- 	subreq->consumed = subreq->len;
- 	list_del(&subreq->rreq_link);
--	spin_unlock_bh(&rreq->lock);
-+	spin_unlock(&rreq->lock);
- 	netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_consumed);
- 	return true;
- 
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index a2021efa44c0..a33bd06e80f8 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -142,12 +142,12 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 			__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
- 			subreq->retry_count++;
- 
--			spin_lock_bh(&rreq->lock);
-+			spin_lock(&rreq->lock);
- 			list_add_tail(&subreq->rreq_link, &rreq->subrequests);
- 			subreq->prev_donated += rreq->prev_donated;
- 			rreq->prev_donated = 0;
- 			trace_netfs_sreq(subreq, netfs_sreq_trace_retry);
--			spin_unlock_bh(&rreq->lock);
-+			spin_unlock(&rreq->lock);
- 
- 			BUG_ON(!len);
- 
-@@ -217,9 +217,9 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 		__clear_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
- 	}
--	spin_lock_bh(&rreq->lock);
-+	spin_lock(&rreq->lock);
- 	list_splice_tail_init(&queue, &rreq->subrequests);
--	spin_unlock_bh(&rreq->lock);
-+	spin_unlock(&rreq->lock);
- }
- 
- /*
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 237018caba27..f026cbc0e2fe 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -238,14 +238,14 @@ static void netfs_collect_write_results(struct netfs_io_request *wreq)
- 
- 		cancel:
- 			/* Remove if completely consumed. */
--			spin_lock_bh(&wreq->lock);
-+			spin_lock(&wreq->lock);
- 
- 			remove = front;
- 			list_del_init(&front->rreq_link);
- 			front = list_first_entry_or_null(&stream->subrequests,
- 							 struct netfs_io_subrequest, rreq_link);
- 			stream->front = front;
--			spin_unlock_bh(&wreq->lock);
-+			spin_unlock(&wreq->lock);
- 			netfs_put_subrequest(remove, false,
- 					     notes & SAW_FAILURE ?
- 					     netfs_sreq_trace_put_cancel :
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 7a14a48e62ee..286bc2aa3ca0 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -203,7 +203,7 @@ static void netfs_prepare_write(struct netfs_io_request *wreq,
- 	 * the list.  The collector only goes nextwards and uses the lock to
- 	 * remove entries off of the front.
- 	 */
--	spin_lock_bh(&wreq->lock);
-+	spin_lock(&wreq->lock);
- 	list_add_tail(&subreq->rreq_link, &stream->subrequests);
- 	if (list_is_first(&subreq->rreq_link, &stream->subrequests)) {
- 		stream->front = subreq;
-@@ -214,7 +214,7 @@ static void netfs_prepare_write(struct netfs_io_request *wreq,
- 		}
- 	}
- 
--	spin_unlock_bh(&wreq->lock);
-+	spin_unlock(&wreq->lock);
- 
- 	stream->construct = subreq;
- }
 
+--=20
+Thanks,
+
+Steve
