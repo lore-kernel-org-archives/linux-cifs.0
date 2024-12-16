@@ -1,114 +1,106 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817D72AF03;
-	Mon, 16 Dec 2024 10:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403ED190674
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 18:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734344026; cv=none; b=KFvlKgOqE8enXyO8gpud4AJUQ9/uo7ht0xhWxQiBuTo0W/pq+RDPBazW8s7Grx4ihG5xsZv0/aUhlTb01wt5492el1JvIn8iiNiG2KuRyGi8D0l8Nmeq4iPihkL6a09dXvfcjCEFJyGtbjdddD2TGNNXJO0tDqwnAObg01WyfJM=
+	t=1734373922; cv=none; b=azqGh6J5+zyWG4XFH3Ab26TeuEl9902R6rv21tVnJmIlvhG93a94AygBQ2hyknsGgwwH62YxovlHE5Mg2ll07qZ7md558qkrliGKClB5G9sj+AyuPmwtiT5g5Bmj99VldWhAThI0z6jBaiHObvVYbmkF91dJSwEcUkJQaPV4AVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734344026; c=relaxed/simple;
-	bh=6o4jofo5o0s4egvVbxhwmAn4YH9WdHGRsBXLWeO+DtM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=llWH7MRcpQy8dGn/jx8skZVadlDxoccd0lbpK7Y9ONTF97m5uy+cnN8V1Q5NUic78onqaRGtWZpJU+8uPwHSvo7bVxyg/xVU/ONFx3ST9VI8mpnN60w4AUgdKlbKlRbz6QEXsezNbuLCg2CyZkC3/dtVHoST2FM4Maa27ZfTI+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ArWhBjJl; arc=none smtp.client-ip=209.85.210.173
+	s=arc-20240116; t=1734373922; c=relaxed/simple;
+	bh=a9JfPJzYopSNL6rXFJo5c5DzJyJOBzrPC3dI9BI69q0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cQ1CLoJpOuyWbrA3imLnJVzI5F8gWjL/CHsFetBSqHz5trfkHzVsB3I1sFQbmfP6EwB5Ln9a9XdQBuchzRaODrc6dI4EKGlXgyVnp/Zvslp5eQ5R2xqQ7vHQKRas3NBKxEtMSZRPTJE98e6JVb/oV7SGUiFSVxD31la8Ep0L9OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=craansmA; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ArWhBjJl"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-728f1525565so4530416b3a.1;
-        Mon, 16 Dec 2024 02:13:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="craansmA"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-725ef0397aeso3909546b3a.2
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 10:32:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734344025; x=1734948825; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V9ZM1VYLJhmWw0JXWXrNZw/asAR3qnp4u24wAg0Zo6s=;
-        b=ArWhBjJl3hPPOaKkIaY/r+yGPfLKSnkKdtF1TEpdvVhnWMOKURtfK/Wn5Ix/UNNpzX
-         pZrrqBnJVHlbkENmVJLNlVaP0hTHxqSN8zJtu3np8YV3WQzU4ZnbFqSRJzhDjS+Yv+lh
-         VZ+4KObdpdXeZOzP7J6NH3YfE4mb2gcewtTPjW0H/rFt7vFyAkkxqvA4RM2KWejpQv5x
-         6C9dvGXjsA4SCWDSU4qzdHbdptEKkGlTwCjtDds/pUGtc3zBBUKhfTHLoEVXAT8LG+64
-         3l1SCjyQChpZQ6AdjHNDjhLv+2L1bxmEamsQkDFoqb5Luj7Asd0eVlTi18xkAj0ava2e
-         s6GA==
+        d=gmail.com; s=20230601; t=1734373920; x=1734978720; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/5BuJMQWdxGaX9Vsp6m161sVX1PJlD7e79C00UFHCBw=;
+        b=craansmA7XzvKUAk6oYnpk6Rqvr3K+xsVtoR3FE4JmvvySOWFDXqQEIUMPEczDloot
+         n6tX93f4YIjk90RnCr7Zfxk9YaG12N5NAqphZvtZIZ6mbK3t6OuuQ6GEUYfTUarF5s1H
+         H0YlH+gawYrnrFYtMulbBO3TJ/KU50nuIUaO7yegjcdjbFqG4Bqjkb6vSQW1jqwtdQz9
+         K5nQETcCTo9FZLc3mdU30btHFgZDlG24/OS+/f0OhaO36y72EVD0ayw04UmtnTJYloqc
+         kocrC8FI5BXCdZmJbsi7YGMFemGq7oJGbxAz5PHkGKON4+ICLVnOd9RuHojOiOmG6xwl
+         eTIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734344025; x=1734948825;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V9ZM1VYLJhmWw0JXWXrNZw/asAR3qnp4u24wAg0Zo6s=;
-        b=BvT4pudPVPlb4iKaFCjVriJQTM2XQ1ovXhOWJJX9/XHZJLxM06tuvpcO53bImru50u
-         eCvT4kl2Vxc88xpU8zz6iCJEs/jJ35KLYnZX4JPex7oJ9Xomf7DV7UlJ1D97Oyy/ZGqJ
-         Rvw2LoZd+wf4aL+E3FBre6FRsndV44I9sGXMrnrPCZNuWNBT8r9f97h2CR9eSmG/3xx0
-         wF3n2iXF7VMS9U00uHiJ/FXBBXDISvwlPGYBWkrNprxLDwISbqsOzBEuwmjDsds7evRa
-         fovmE5gTJQioUfG7e4zELpVJBPn6fu0bPJmrlcDsFfTxlcTY1NeRO6ZTYAR93lG257QE
-         3ghw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY8Pq35Ai8nboc5CMbQH0A9pYJBAiivv4BxokddKHnyu0ug4lvLY6bO2pJ9x7qC1iytiP1Vme733W8@vger.kernel.org, AJvYcCUgj+VAC9wZScEale4DvdNt6oaQkScbLqvU4dedr0S2X5GbGTg90AxvRBhi+bezyUJDTFJe6sYanOwG@vger.kernel.org, AJvYcCVFeBzHM9UQ22kV5ed0chN0KT+kFeFLr1umx5PCZWCynHEIE1ONeM2uAtRj803fgHYWvpH/6VBSSa24YeBM@vger.kernel.org, AJvYcCWDTIkjNr30p6AOumCmZ5VBQ8PY8TmJ4PwqmZR/c2nWTq8W9dgFXplTD2uaBQ4+Alk+Xj0a8Mbh709IN7nRCw==@vger.kernel.org, AJvYcCXFJ/hXevDkYzQJ1eERqLePiy2/yzSfCcywqxTxPgxv5+L7NwLTguvIDsJM0gt8uyAqfkCc+Q2lcMazrA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTe67VOy4vncRMgAkQ0GdDriMtRUv8BENPHvOjbXrwBVJxkU46
-	LSKkU9A+GbvtJf/9Eqrzilwlq3uynuXBk4nJCFbDKlKz3TrAfsJC
-X-Gm-Gg: ASbGncus2+wAW8zO/M4IDWlchL4Qx8c/EiHaaynjcEUCZWuSykEdl6rQWcHcD9tqNoj
-	XLiBaZUepirhuO+nFFomVyqJrHFdE+mh4SkrhMXgXzD4GAk/o6HfqWmU5Rqx8VcVN5iqlq99muG
-	uhzK0hN/75NHl2Qgj6t34NkrblyL3tGs8ad63hFuu7mX0N0WkmJ9bvpIteW5oedQsnzsGQufQp5
-	PUlDj6tLqSA0m3K+EootKncgwXHVIl23OhLDxjy4lNj5zYVX1XUmchop8N+mOYgIGTzUDUcW/kB
-	SlYE+eMwkiwL5gTiQkpgAt0=
-X-Google-Smtp-Source: AGHT+IFq3zJyvoXfAV7XVBdCiDQC4vaO/7xLrUwixiOvu21RBmLw5wfgxXzoYw8zU6Yia4k+KM7puQ==
-X-Received: by 2002:a05:6a20:4304:b0:1e1:bdae:e045 with SMTP id adf61e73a8af0-1e1dfd91980mr18130458637.23.1734344023005;
-        Mon, 16 Dec 2024 02:13:43 -0800 (PST)
-Received: from [10.0.2.15] (KD106167137155.ppp-bb.dion.ne.jp. [106.167.137.155])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918bce39csm4517791b3a.189.2024.12.16.02.13.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2024 02:13:42 -0800 (PST)
-Message-ID: <843f5270-d715-4c98-b191-1c271eb418c5@gmail.com>
-Date: Mon, 16 Dec 2024 19:13:39 +0900
+        d=1e100.net; s=20230601; t=1734373920; x=1734978720;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/5BuJMQWdxGaX9Vsp6m161sVX1PJlD7e79C00UFHCBw=;
+        b=n4hhiPNcIW49EUimV87yJ9FpfZKnhI++wS+io2vtpDoNcauJKJCEPk+RjX1ilZQ7xv
+         uNJc+WubZvhRNpbgdB2XXM0zMHrS7soDSLTgKzZ9tTNZHuwBzUeBvQX/xBOMdpuG8ntK
+         TOkRYpVcz6vvmoUrpBmkjd60K1hf5fI0pXTPX8duszZrAwoMRrqJ3sYJH52ghFmxCqF+
+         dLgULtm2fZORjF01L6+Fx+eN+e9A0puw6RCy61evptx3bI5g6+gN0Q7WPi8nkubFLdYX
+         f2iXZXc8+FPoHzRGDgdbuNNQj5WNtSFTL4VJbUNts/f5sIb1goyxdfSMtBuMsFM4JUP6
+         Ks3Q==
+X-Gm-Message-State: AOJu0YzjkiqAMcD/C2q+LD2krREGTdSYyTD5RSHFqolG7GwEypbGZjp4
+	GBf2QQKLEIDdNyw4J2fXRRbSZZYaYKlz2yCJKzk4M4urmUi4sJCRQW2gVhy5
+X-Gm-Gg: ASbGnctGFWw2EfnEwLBB2ehwgTegztRbHoTnzJnsTQy7HEJIp7TwJb5NyvjszTr1NOa
+	nGLgVW+ug+s5oXji8NUurAiakNNSh+giqPxdSWVJD1Ch9cAJmTAUUEcECod8chFpxizy7i3x2F9
+	f9MSX6PJrnuv8gRSjlqzDp350ereiTIrXu2W4Pnux89y2m2/+jLWKlKpaH6NuT+cCGOQ4NpKh9d
+	BC/vMGddTunHc9eN1WD6Gs9nadF7UX0aFhcw2Elk4m0k+GmACS+v9VM4lTxFft0KJ04+EJzf8RZ
+	czmDPtfx
+X-Google-Smtp-Source: AGHT+IGrK0er33BrkeA4vAU6NTHzgS863jqDo28Mbq9fhYrSCqUNZuCG7rJrFKN6616eswZzvkHh7w==
+X-Received: by 2002:a05:6a20:db0a:b0:1e1:72ce:fefc with SMTP id adf61e73a8af0-1e1dfdcb7famr20102114637.22.1734373920206;
+        Mon, 16 Dec 2024 10:32:00 -0800 (PST)
+Received: from bharathsm-Virtual-Machine.. ([131.107.160.189])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-801d5c3a513sm4459967a12.72.2024.12.16.10.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2024 10:31:59 -0800 (PST)
+From: Bharath SM <bharathsm.hsk@gmail.com>
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
+To: linux-cifs@vger.kernel.org,
+	sfrench@samba.org,
+	pc@manguebit.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	ronniesahlberg@gmail.com
+Cc: Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH] smb: enable reuse of deferred file handles for write operations
+Date: Tue, 17 Dec 2024 00:01:48 +0530
+Message-ID: <20241216183148.4291-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/10] netfs: Remove redundant use of smp_rmb()
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>
-Cc: Max Kellermann <max.kellermann@ionos.com>,
- Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
- Trond Myklebust <trondmy@kernel.org>, Jeff Layton <jlayton@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev,
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Zilin Guan <zilin@seu.edu.cn>, Akira Yokosawa <akiyks@gmail.com>
-References: <20241213135013.2964079-1-dhowells@redhat.com>
- <20241213135013.2964079-7-dhowells@redhat.com>
-Content-Language: en-US
-From: Akira Yokosawa <akiyks@gmail.com>
-In-Reply-To: <20241213135013.2964079-7-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-David Howells wrote:
-> From: Zilin Guan <zilin@seu.edu.cn>
-> 
-> The function netfs_unbuffered_write_iter_locked() in
-> fs/netfs/direct_write.c contains an unnecessary smp_rmb() call after
-> wait_on_bit(). Since wait_on_bit() already incorporates a memory barrier
-> that ensures the flag update is visible before the function returns, the
-> smp_rmb() provides no additional benefit and incurs unnecessary overhead.
-> 
-> This patch removes the redundant barrier to simplify and optimize the code.
-> 
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Akira Yokosawa <akiyks@gmail.com>
+Previously, deferred file handles were reused only for read
+operations, this commit extends to reusing deferred handles
+for write operations.
 
-Reviewed-by: Akira Yokosawa <akiyks@gmail.com>
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/smb/client/file.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> Link: https://lore.kernel.org/r/20241207021952.2978530-1-zilin@seu.edu.cn/
-> ---
->  fs/netfs/direct_write.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index a58a3333ecc3..98deff1de74c 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -990,7 +990,11 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	}
+ 
+ 	/* Get the cached handle as SMB2 close is deferred */
+-	rc = cifs_get_readable_path(tcon, full_path, &cfile);
++	if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
++		rc = cifs_get_writable_path(tcon, full_path, FIND_WR_ANY, &cfile);
++	} else {
++		rc = cifs_get_readable_path(tcon, full_path, &cfile);
++	}
+ 	if (rc == 0) {
+ 		if (file->f_flags == cfile->f_flags) {
+ 			file->private_data = cfile;
+-- 
+2.43.0
 
