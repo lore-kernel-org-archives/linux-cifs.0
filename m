@@ -1,115 +1,143 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6BA1F03EA
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 20:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50C11D515D
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 20:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734381811; cv=none; b=C5wTSdWBK5dDyTTucCKW9zxOxaU2+2i2HlIzGcsO9Sckn7qO6zRE+ZhF5+mZh7uPAsjdFhgpxnmaCpFldEOvE9tSHmcsF+crKf/lkunn/CHOx5v8HHUBAnEx0dIsf0elX8rdhIY75UmsrizyM8KDdKMKxjy+876+tyzC/C0dF1w=
+	t=1734381815; cv=none; b=jBRDD1JslUuL1rCDkQiMiegg/WQybs+EedGby/f4pCeLS3K6JX4rt8OTXevkDDQJZNHzGKhwLxumsMzlwGjisDJn1GgmTcAih8Smwv6y6ql2T2YIynPCqfSCINu4EoZOh9BJ6p8juzw4e8egqtL5yoT6lSd3D75C/MjvNH8/x8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734381811; c=relaxed/simple;
-	bh=YzOBWwJXq+gr5pD+zjivvl5CzSKcezJusBtIISQOaHo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u1wZaY5ooTQJJGOYk0WWkK/HVvD1knJJxsHEvJiC0uDKQBLD76GXL6Rs1ARX3JkykIIypy/b3wb9G4bo1CVS1N1XAXYKTez2RJBfz5fcXSfJ1K784C4cZV79P8RdykoZMQ2SW/yG6uReh42i4ehwTpGJ6dRoujW6nEo8b2AJuow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cDGWz0Mz; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734381815; c=relaxed/simple;
+	bh=OTgo6y/iUbtT78QGPD0sssJss9B2yP/TOW1RhzQxkkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gew4hhldK0ff/E9Isz61XkgZNzpKN25iGskVIyzrBiaeMCGMqa0VwtiqiAsXx+iwu72roNu0lZE4aSmsETHkx2x0QH/vHfoK+HTTkNyFG9YmsFyZRy4A6aPc7lUn0a6JU92pA+xSUTLPHe8UioNA13KoBaOt9r2z2aKqphJePoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OQa4S10D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDGWz0Mz"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5401c52000fso4579771e87.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2024 12:43:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734381806; x=1734986606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dT4eKAzQPBGJCllASp1Ks7LU450jRKe9zEY/RP+jIA8=;
-        b=cDGWz0MzCOXgQtD/cFhX7zeV3qDdwBY59R/ByAvriV9B019RfspwzD02kOYIl28qfB
-         //GC/Rx8+l+RsJim47q5MeqmOg25JHWtha1/qpORqawrAsclUXgdkgCP4DApv0JQN6g9
-         C4//b0WNLWk92c3eiWOo2qtO59a3rUC1kV3J8gAV2KRluuX/y17GPGJALd1vUxzeXl6t
-         YXtZPHm33lpU7bqpo7Ryp6E+3AWzVs2ojQV2Kg7kMXPp68Ux7Pl6GxyV0hUlEprV9E78
-         wZX1JrJenf4WcQw+Deykh5meOqiOO7phxXfsq4PhGfVsZYKpxpy+suQLLF60xhadtN6T
-         InzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734381806; x=1734986606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dT4eKAzQPBGJCllASp1Ks7LU450jRKe9zEY/RP+jIA8=;
-        b=jX3CY2BMyOxwEIxn/lxVxqvkRY6C1Oxn4aQqCMKV4Zi53uXDKLA2PLstz5jMPxz6+g
-         QZTYl8pLoYjFEvydASi0WDSpm915lLWg48x/mIJTOJES1CSGHVAqP47OUiHov/H6N7dt
-         rCxqOE1s7yEIh4IoHTGH9yHOdMfSHKWUulpCU/C3jShPYjwfxStnYUjvnm3PHwAAVoLS
-         NsTX0dVxdAa+wPfoX5xv4n6025pjrUREtlO1EVWJXBd3urBImpRaoYeY1UlZGzmnhdG2
-         y18sU2HXyvVnjV4cPotlb+XGqUdOhjwF7eMH3zsttqQHbY9DBoAZ6g9P6vY97ng6mvgp
-         224w==
-X-Gm-Message-State: AOJu0Ywqt5qpLxdi2n5yP5RnUaUuRQsOAdL78MI6b3bO0X6sUnKG3Nsh
-	5RV2HjLIMKAohLI5NDnBqhtpap1Ad/s6O66xEwL5Hr1o5YgpV/xbQ24g1PH9qhXsr+vGFFdtLqZ
-	mnMzO7Km98uSjVJcNNcdXD4wWLI4=
-X-Gm-Gg: ASbGnctM+s/7vEDSVHUn70LBxSuWlFcub1W+M8b/IE2XKRqMD3XggaNsQuy64FW7bXa
-	5OJFRZ/GlFTa2zu6dVzfKdnK3v+Y3B8MD8dKIAKy4axUUrGg9wwi2PsLW58yKku2AD8J4Kv/X
-X-Google-Smtp-Source: AGHT+IGLDlKbpm4khM72VtntJzHAFA/li38TvFuaiKEe4FkeMcMt3t37LUjT7AfmZ2lSaB1xpsqUt2ZSgdk6aThrzVw=
-X-Received: by 2002:a05:6512:3082:b0:53f:231e:6fa2 with SMTP id
- 2adb3069b0e04-5409055dd7bmr4279325e87.26.1734381806182; Mon, 16 Dec 2024
- 12:43:26 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQa4S10D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734381813;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+h5xevLUTgx7DT+yXa3KdTAzsT6twp0kWM1j+wkaZ80=;
+	b=OQa4S10DZXzEGPd+hMYVyooWXnUuSopQZH9MEF2+9cPiUeRb1j4mq4U6tkLb4OEE7Rewgr
+	+RfNT+y8RFeB6oIWvWktUOEcl2ueVsGirOGEuPEOrWLWFLITUBVL38wXoeSlffQlFPtxma
+	2AAc/AH+xyzNiTvf6uNRzNxWcVV4N7Y=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-8FHzIFyHP_G1A-tElrmP_g-1; Mon,
+ 16 Dec 2024 15:43:29 -0500
+X-MC-Unique: 8FHzIFyHP_G1A-tElrmP_g-1
+X-Mimecast-MFC-AGG-ID: 8FHzIFyHP_G1A-tElrmP_g
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 173481956064;
+	Mon, 16 Dec 2024 20:43:27 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.48])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 79E3719560B0;
+	Mon, 16 Dec 2024 20:43:21 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 15/32] cachefiles: Add some subrequest tracepoints
+Date: Mon, 16 Dec 2024 20:41:05 +0000
+Message-ID: <20241216204124.3752367-16-dhowells@redhat.com>
+In-Reply-To: <20241216204124.3752367-1-dhowells@redhat.com>
+References: <20241216204124.3752367-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241216183148.4291-1-bharathsm@microsoft.com>
-In-Reply-To: <20241216183148.4291-1-bharathsm@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 16 Dec 2024 14:43:15 -0600
-Message-ID: <CAH2r5mumh1xU8zAdE9sqmgGN11sY=HedD-PpdqCvR3BTod1NwQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: enable reuse of deferred file handles for write operations
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: linux-cifs@vger.kernel.org, sfrench@samba.org, pc@manguebit.com, 
-	sprasad@microsoft.com, tom@talpey.com, ronniesahlberg@gmail.com, 
-	Bharath SM <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-merged into cifs-2.6.git for-next pending review and more testing
+Add some tracepoints into the cachefiles write paths.
 
-On Mon, Dec 16, 2024 at 12:36=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
-m> wrote:
->
-> Previously, deferred file handles were reused only for read
-> operations, this commit extends to reusing deferred handles
-> for write operations.
->
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> ---
->  fs/smb/client/file.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index a58a3333ecc3..98deff1de74c 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -990,7 +990,11 @@ int cifs_open(struct inode *inode, struct file *file=
-)
->         }
->
->         /* Get the cached handle as SMB2 close is deferred */
-> -       rc =3D cifs_get_readable_path(tcon, full_path, &cfile);
-> +       if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
-> +               rc =3D cifs_get_writable_path(tcon, full_path, FIND_WR_AN=
-Y, &cfile);
-> +       } else {
-> +               rc =3D cifs_get_readable_path(tcon, full_path, &cfile);
-> +       }
->         if (rc =3D=3D 0) {
->                 if (file->f_flags =3D=3D cfile->f_flags) {
->                         file->private_data =3D cfile;
-> --
-> 2.43.0
->
->
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: netfs@lists.linux.dev
+---
+ fs/cachefiles/io.c           | 4 ++++
+ include/trace/events/netfs.h | 3 +++
+ 2 files changed, 7 insertions(+)
 
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 6a821a959b59..92058ae43488 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -13,6 +13,7 @@
+ #include <linux/falloc.h>
+ #include <linux/sched/mm.h>
+ #include <trace/events/fscache.h>
++#include <trace/events/netfs.h>
+ #include "internal.h"
+ 
+ struct cachefiles_kiocb {
+@@ -366,6 +367,7 @@ static int cachefiles_write(struct netfs_cache_resources *cres,
+ 	if (!fscache_wait_for_operation(cres, FSCACHE_WANT_WRITE)) {
+ 		if (term_func)
+ 			term_func(term_func_priv, -ENOBUFS, false);
++		trace_netfs_sreq(term_func_priv, netfs_sreq_trace_cache_nowrite);
+ 		return -ENOBUFS;
+ 	}
+ 
+@@ -695,6 +697,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
+ 		iov_iter_truncate(&subreq->io_iter, len);
+ 	}
+ 
++	trace_netfs_sreq(subreq, netfs_sreq_trace_cache_prepare);
+ 	cachefiles_begin_secure(cache, &saved_cred);
+ 	ret = __cachefiles_prepare_write(object, cachefiles_cres_file(cres),
+ 					 &start, &len, len, true);
+@@ -704,6 +707,7 @@ static void cachefiles_issue_write(struct netfs_io_subrequest *subreq)
+ 		return;
+ 	}
+ 
++	trace_netfs_sreq(subreq, netfs_sreq_trace_cache_write);
+ 	cachefiles_write(&subreq->rreq->cache_resources,
+ 			 subreq->start, &subreq->io_iter,
+ 			 netfs_write_subrequest_terminated, subreq);
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index 2dfc9f716e3b..02f6e179b7bc 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -74,6 +74,9 @@
+ #define netfs_sreq_traces					\
+ 	EM(netfs_sreq_trace_add_donations,	"+DON ")	\
+ 	EM(netfs_sreq_trace_added,		"ADD  ")	\
++	EM(netfs_sreq_trace_cache_nowrite,	"CA-NW")	\
++	EM(netfs_sreq_trace_cache_prepare,	"CA-PR")	\
++	EM(netfs_sreq_trace_cache_write,	"CA-WR")	\
+ 	EM(netfs_sreq_trace_clear,		"CLEAR")	\
+ 	EM(netfs_sreq_trace_discard,		"DSCRD")	\
+ 	EM(netfs_sreq_trace_donate_to_prev,	"DON-P")	\
 
---=20
-Thanks,
-
-Steve
