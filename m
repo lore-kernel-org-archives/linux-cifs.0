@@ -1,141 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFE14437A;
-	Sun, 15 Dec 2024 09:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0FD202C37;
+	Mon, 16 Dec 2024 10:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734254740; cv=none; b=mocN9t3ZvMo/vTFXTaiDxpptFGyK4W0IVt6wO2ITGkUDeTKpcPmEEXCeVr8uufjez8TtfWSFSkGaqCde+WV9ccE41aTGRpwqT4RXI0weYqtRrU9Kc9BdMiXJPJbRern5vlRxdLTuSBpxvHQSwVQy4sElQ/lmkjARVcL4cs2EjtI=
+	t=1734343900; cv=none; b=QEyy60KbTKCSqHi0azTOcp6uphQGudZDqIH7QVsxFYfbNVKNZacrlg+LR/2PKS/lItJfK3bn2Zi9IapSMAiPiH5IfuJWBPlN9/XDc6dSWe+b/Im80cBdUNM8I63Z8ssI6X6LwgS8iqQH6+5VrpSzR7/Me93ZsBNfcuBqjPyzFkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734254740; c=relaxed/simple;
-	bh=n5sgv/yHJHqT+g+r76/KJjMHQA2PFotryeScYqJ16P8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SxqItfZotBj0UN+2jpXyGcL+mJLsQ4GIR6Fxl6YNCXxOZfUMRvjy/h9+UPe6wHQNc2keRl24AnDA1v0TJvXzBDpsZX+j6vFCBbKeYrp3PVouHxfpmay2pzVXEUdIEQr+FaR8FTssQLBwfY6PRXv+aDWLDfSkP1UBw31kg1CWCL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=leh0GujJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734343900; c=relaxed/simple;
+	bh=rerkDv4+3ixVJGqlsrEPNvGYbtkP0sOJsqUbWCAaK68=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nq2pQac55EAsTRe8/ZuSElpqzLIQVvE5kcpsqINJj772vFihqSE02DbA4UqBmjWp1oMALUhkp+IhE4bCU0aYXFOBYy9Jaepn0nZv0d1yEcmqS3S0MqFkvQ7hAdEqx7eirwdQhK7u4VGwlSbVIi7Yp2vQ1ouzli8F8WK4NYpP6fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VU9yAmyb; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="leh0GujJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD4AC4CECE;
-	Sun, 15 Dec 2024 09:25:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1734254740;
-	bh=n5sgv/yHJHqT+g+r76/KJjMHQA2PFotryeScYqJ16P8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=leh0GujJ13SNYMeNkf2gf5Yk8ook8S4bRb3lzDD/nj6k60Yq74N7r9kwB0sValSxs
-	 QYtid9sAMfJ2KilwWSRrtyW1C/4XXQVhiuu9eTo4SAqOuuD2lBDB+4FBwJTfGaa7Ta
-	 pGTuk/dQB5eALr3FTaL/La6i60EMMRfRkn+yixKQ=
-Date: Sun, 15 Dec 2024 10:25:37 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Salvatore Bonaccorso <carnil@debian.org>
-Cc: Michael Krause <mk@galax.is>, Paulo Alcantara <pc@manguebit.com>,
-	Michael Krause <mk-debian@galax.is>,
-	Steve French <stfrench@microsoft.com>, stable@vger.kernel.org,
-	regressions@lists.linux.dev, linux-cifs@vger.kernel.org
-Subject: Re: backporting 24a9799aa8ef ("smb: client: fix UAF in
- smb2_reconnect_server()") to older stable series
-Message-ID: <2024121515-ranch-cassette-84f7@gregkh>
-References: <2024040834-magazine-audience-8aa4@gregkh>
- <Z0rZFrZ0Cz3LJEbI@eldamar.lan>
- <2e1ad828-24b3-488d-881e-69232c8c6062@galax.is>
- <1037557ef401a66691a4b1e765eec2e2@manguebit.com>
- <Z08ZdhIQeqHDHvqu@eldamar.lan>
- <3441d88b-92e6-4f89-83a4-9230c8701d73@galax.is>
- <2024121243-perennial-coveting-b863@gregkh>
- <e9f36681-2d7e-4153-9cdf-cf556e290a53@galax.is>
- <2024121316-refresh-skintight-c338@gregkh>
- <Z1xYf9ShY2OuNiZo@eldamar.lan>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VU9yAmyb"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-725dc290c00so3763751b3a.0;
+        Mon, 16 Dec 2024 02:11:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734343898; x=1734948698; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l+ixtMUrgX7I9rD5qvImPgp6IqifPuxLwfcX3hM//qc=;
+        b=VU9yAmybm0sskcfNoQ0Q30POeXon5zfQAhCVK03eKlu7Lm4f8NqIYolFjwSUjUGwqa
+         64NsuJqrruHPvAqx8O33+WBr7+hiNBkpCc8wMhvoXy93Xo3AwEVzIYyKUnMlxPZRnxHE
+         waG3Ds5zsA1OzWLIZEzIVsPfFfTSGeu9rjIqYqCjpzroCDogIs0oH5T5iiKdnmNTzARf
+         R+1ct7QF6dljhd5oAUPfB32ajrTGi2Ft/ifBBUrs7q8pt7XwMGnjZH9Ah8C9OL6Gu/fW
+         /rKaXDOtxbpeBoNiSbkdgzLPjyaueT8Q9cCIsExWMcxGHSN04GlVuzrsfkbyqw+U3lKq
+         vVJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734343898; x=1734948698;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l+ixtMUrgX7I9rD5qvImPgp6IqifPuxLwfcX3hM//qc=;
+        b=FVSUFScJZ+ECR+TxvrpIN0LYniX5HIJy1CnkXz8KtsSiREAVk6/WoCJ3+MhKn3XDtk
+         7kZ37ewtS2VaDMdBq5eXCHlpCP9haS6x2/Pf4jjQr0kJYxYsfl01FrpTIHLZ9zaf8wca
+         fVox3hQ/JU4R/i0BwyFh/5bimFzuzA+gSr9hLpOEnBS+XJClCkXNmumjpU9CC8EvYnpp
+         Y8yloePnGb9nlnH/02B0vvxGXjGj2clrvdLB5cnyqQ0u+BUr/EMR289RskoT/c3BzF38
+         Nf1fuVz0E20c4YLgqu6j/B0f8lMCKgNRWt/Sp5mH9aCLl8ME52PxaghSyRrsh6q7Mnq3
+         0Y5g==
+X-Forwarded-Encrypted: i=1; AJvYcCU2yvOqhtoN+orqFev+7bJDudHvO1OeEyMWYtKuCqUbd1Vkztz+vGzLkelambC4UYxsAItKndi+Yrqmog==@vger.kernel.org, AJvYcCU33C9oUmh3pNt2C5d/AF2JmKz55j89elgeGdYCftUkYI/lEW3swm/hWl7O7TyK27eDC0pcITeJcwe3@vger.kernel.org, AJvYcCUUUZsIZefUs3BYsyD0T9H/kHdloggMFc2olvXF71D2dhC7eu1twVlQ26aG7/4/ZkXLSx+aXa0KhQHc@vger.kernel.org, AJvYcCUotRoFq4Z1s48u8LYzA1zqIjHikXoy34bDifa45YRh1gBPCLTXdZ6DxO/7DzKu+txu6lVvMSBHl/xZ62cb@vger.kernel.org, AJvYcCVPHCS1Sw5pXOxak+lyqwt5LWnjrBYqiM2Wpx3FE1H14caq5Nd5cUvSjWy+3xVrjzEnanjaCDubOkG2rBx+xw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaRVxh9v/NktJRWypb/uSFzUHXxcGW/+IQw0i1rG5aZpqJlu5Y
+	YAUtlvxv3n7yxFJYENqqBoXCvNr+J4y3tczqnDIdow8hoD2AhESZ
+X-Gm-Gg: ASbGnctalaGf+cBY5ST9u26WoMVag4PYarq6PT2EftQKpuRGA4x8UQ8FNgxR0+u98Zg
+	kPY1CSA3bIqGNMm6Ha/oaVCPUOqi5F68Q5luzFaggw8ecIrqplPGyUq+W/byEb69r6e3SFVKBHU
+	yHSIlqw+/AVQ2/qIJVP7XW1qB7YWvDpVZszpv6RUJyNQrADD7pHDdxVI4JxX6WCQMfAK5330/Cy
+	DCOzx0YXvbu7A3yApxH6EoktxFP2uM9TXzRUNphYhf4NGTHMKfeW8YKojFGEgg9oBP8f0WbCC/X
+	dsOfkgnERA9o+stfLlzxa7A=
+X-Google-Smtp-Source: AGHT+IGkvlAjtALOBMooHfO7cK9L9lvwDBwHCDIhwn8y88sRHLlwLffLXlgmsZ5Mm6dr710N1QQFRg==
+X-Received: by 2002:a05:6a20:a11c:b0:1e1:e1c0:1c05 with SMTP id adf61e73a8af0-1e1e1c0202amr16720966637.9.1734343898208;
+        Mon, 16 Dec 2024 02:11:38 -0800 (PST)
+Received: from [10.0.2.15] (KD106167137155.ppp-bb.dion.ne.jp. [106.167.137.155])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-801d5c3a513sm3824066a12.72.2024.12.16.02.11.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2024 02:11:37 -0800 (PST)
+Message-ID: <554ff96b-5be5-46b0-ac8b-f178394856f3@gmail.com>
+Date: Mon, 16 Dec 2024 19:11:33 +0900
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z1xYf9ShY2OuNiZo@eldamar.lan>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] netfs: Fix missing barriers by using
+ clear_and_wake_up_bit()
+To: David Howells <dhowells@redhat.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>
+Cc: Christian Brauner <christian@brauner.io>,
+ Max Kellermann <max.kellermann@ionos.com>, Ilya Dryomov
+ <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
+ Trond Myklebust <trondmy@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Zilin Guan <zilin@seu.edu.cn>, Akira Yokosawa <akiyks@gmail.com>
+References: <27fff669-bec4-4255-ba2f-4b154b474d97@gmail.com>
+ <20241213135013.2964079-1-dhowells@redhat.com>
+ <20241213135013.2964079-8-dhowells@redhat.com>
+ <3332016.1734183881@warthog.procyon.org.uk>
+Content-Language: en-US
+From: Akira Yokosawa <akiyks@gmail.com>
+In-Reply-To: <3332016.1734183881@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 13, 2024 at 04:53:35PM +0100, Salvatore Bonaccorso wrote:
-> Hi Greg,
+David Howells wrote:
+> [Adding Paul McKenney as he's the expert.]
 > 
-> On Fri, Dec 13, 2024 at 03:33:31PM +0100, Greg KH wrote:
-> > On Thu, Dec 12, 2024 at 10:48:55PM +0100, Michael Krause wrote:
-> > > On 12/12/24 1:26 PM, Greg KH wrote:
-> > > > On Tue, Dec 10, 2024 at 12:05:00AM +0100, Michael Krause wrote:
-> > > > > On 12/3/24 3:45 PM, Salvatore Bonaccorso wrote:
-> > > > > > Paulo,
-> > > > > > 
-> > > > > > On Tue, Dec 03, 2024 at 10:18:25AM -0300, Paulo Alcantara wrote:
-> > > > > > > Michael Krause <mk-debian@galax.is> writes:
-> > > > > > > 
-> > > > > > > > On 11/30/24 10:21 AM, Salvatore Bonaccorso wrote:
-> > > > > > > > > Michael, did a manual backport of 24a9799aa8ef ("smb: client: fix UAF
-> > > > > > > > > in smb2_reconnect_server()") which seems in fact to solve the issue.
-> > > > > > > > > 
-> > > > > > > > > Michael, can you please post your backport here for review from Paulo
-> > > > > > > > > and Steve?
-> > > > > > > > 
-> > > > > > > > Of course, attached.
-> > > > > > > > 
-> > > > > > > > Now I really hope I didn't screw it up :)
-> > > > > > > 
-> > > > > > > LGTM.  Thanks Michael for the backport.
-> > > > > > 
-> > > > > > Thanks a lot for the review. So to get it accepted it needs to be
-> > > > > > brough into the form which Greg can pick up. Michael can you do that
-> > > > > > and add your Signed-off line accordingly?
-> > > > > Happy to. Hope this is in the proper format:
-> > > > 
-> > > > It's corrupted somehow:
-> > > > 
-> > > > patching file fs/smb/client/connect.c
-> > > > patch: **** malformed patch at line 202:  		if (rc)
-> > > > 
-> > > > 
-> > > > Can you resend it or attach it?
-> > > > 
-> > > > thanks,
-> > > > 
-> > > > greg k-h
-> > > 
-> > > Ugh, how embarrassing. I'm sorry, I "fixed" some minor whitespace issue directly in the patch and apparently did something wrong.
-> > > 
-> > > I redid the white space fix before diffing again and attach and inline the new version. The chunks are a bit alternated to the earlier version now unfortunately. This one applies..
-> > 
-> > Doesn't apply for me:
-> > 
-> > checking file fs/smb/client/connect.c
-> > Hunk #1 FAILED at 259.
-> > Hunk #2 FAILED at 1977.
-> > Hunk #3 FAILED at 2035.
-> > 3 out of 3 hunks FAILED
-> > checking file fs/smb/client/connect.c
-> > 
-> > Any ideas?
+> Akira Yokosawa <akiyks@gmail.com> wrote:
 > 
-> Hmm, that is strange. I just did the follwoing:
+>> David Howells wrote:
+>>> Use clear_and_wake_up_bit() rather than something like:
+>>>
+>>> 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+>>> 	wake_up_bit(&rreq->flags, NETFS_RREQ_IN_PROGRESS);
+>>>
+>>> as there needs to be a barrier inserted between which is present in
+>>> clear_and_wake_up_bit().
+>>
+>> If I am reading the kernel-doc comment of clear_bit_unlock() [1, 2]:
+>>
+>>     This operation is atomic and provides release barrier semantics.
+>>
+>> correctly, there already seems to be a barrier which should be
+>> good enough.
+>>
+>> [1]: https://www.kernel.org/doc/html/latest/core-api/kernel-api.html#c.clear_bit_unlock
+>> [2]: include/asm-generic/bitops/instrumented-lock.h
+>>
+>>>
+>>> Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
+>>> Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
+>>
+>> So I'm not sure this fixes anything.
+>>
+>> What am I missing?
 > 
-> $ git branch 6.1.y-backport-smb-uaf-smb2_reconnect_server v6.1.119
-> $ git checkout 6.1.y-backport-smb-uaf-smb2_reconnect_server
-> $ git am /tmp/backport-6.1-smb-client-fix-UAF-in-smb2_reconnect_server.v2.patch
-> Applying: smb: client: fix UAF in smb2_reconnect_server()
-> .git/rebase-apply/patch:102: space before tab in indent.
->         spin_unlock(&ses->ses_lock);
-> warning: 1 line adds whitespace errors.
+> We may need two barriers.  You have three things to synchronise:
 > 
-> The warning looks correct, there is a space before the indent here:
+>  (1) The stuff you did before unlocking.
 > 
-> [...]
-> 180 +^Ido_logoff = ses->ses_status == SES_GOOD && server->ops->logoff;$
-> 181 +^Ises->ses_status = SES_EXITING;$
-> 182 +^Itcon = ses->tcon_ipc;$
-> 183 +^Ises->tcon_ipc = NULL;$
-> 184 + ^Ispin_unlock(&ses->ses_lock);$  <--- space before the indent
-> tab
-> 185 +^Ispin_unlock(&cifs_tcp_ses_lock);$
-> 186  $
-> 187 -^Iif (ses->ses_status == SES_EXITING && server->ops->logoff) {$
-> [...]
+>  (2) The lock bit.
+> 
+>  (3) The task state.
+> 
+> clear_bit_unlock() interposes a release barrier between (1) and (2).
+> 
+> Neither clear_bit_unlock() nor wake_up_bit(), however, necessarily interpose a
+> barrier between (2) and (3).
 
-Ok, this looks like it was a base64 issue on my side, with my tools,
-sorry about that.  Now queued up!
+Got it!
 
-greg k-h
+I was confused because I compared kernel-doc comments of clear_bit_unlock()
+and clear_and_wake_up_bit() only, without looking at latter's code.
+
+clear_and_wake_up_bit() has this description in its kernel-doc:
+
+ * The designated bit is cleared and any tasks waiting in wait_on_bit()
+ * or similar will be woken.  This call has RELEASE semantics so that
+ * any changes to memory made before this call are guaranteed to be visible
+ * after the corresponding wait_on_bit() completes.
+
+, without any mention of additional full barrier at your (3) above.
+
+It might be worth mentioning it there.
+
+Thoughts?
+
+FWIW,
+
+Reviewed-by: Akira Yokosawa <akiyks@gmail.com>
+
+>                               I'm not sure it entirely matters, but it seems
+> that since we have a function that combines the two, we should probably use
+> it - though, granted, it might not actually be a fix.
+
+Looks like it should matter where smp_mb__after_atomic() is stronger than
+a plain barrier().
+
+Akira
+
