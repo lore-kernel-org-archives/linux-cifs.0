@@ -1,125 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501931F8F17;
-	Tue, 17 Dec 2024 17:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDA81F709D
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Dec 2024 19:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734456643; cv=none; b=cGgi0WTzSslhJPPVo7W0kJbTDxvXoBwl2FD8cbevv2DnZE+sxx27bkX4ughpQ9WjC+Ndvw7KoVuQ6wWgYpb3k1X2URJhK3/EG2DGzgDxxDwqeE5hFczONNYkDf+6lFY5h90hu+2EOnG0S3CZ1IOIivCU8SBVXxb9Fc/4hycFqK4=
+	t=1734464541; cv=none; b=rFciJS/TB0hRjRx/RSGRnXdgNzY11Q99vK+/9XHL+3pxm8X7w/rkwcw+FhUlcbQNvgue5T/dHEH1jdLU6j0UNcTOwYwKP9ByGICXXb2Y1KbCc0JzRT3u3x57UQkdZ53eSRLIJyVw7IgCHI7H+A4lB3DNJcFOd+Scx8tyLkMR8Eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734456643; c=relaxed/simple;
-	bh=tTve6jmv6a7QTCCQ45wocrrPtqChJHiXIX15NyGbte0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XWcA62e+7WpI9BFkJ2QWY3CT1D+5p2nM4WNhzD3jxE37fUe7SiAQJO/yQou1opMJB8Pd89g0k37a7K+6OuPpI6v4u1R2PgCizvMJ2GJQC6Chzh+7Se4FfkAIlmCF5RISr3HW5/KOIOFVeBvk8zn27yLmmmNdlsbCP2ICTE/gpe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=dguw94iC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734464541; c=relaxed/simple;
+	bh=achiuxBzbM3VEP5eZ162jNXTWMy+0cD2XHlKR/0lQsw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=d4DD0eVDejXp5wYkEsczF/kTRdCz0JoGkp8RLi/ym/gRBCH6QferIA3C+R0jLK4V22lyLbvLr6+nD586k7xyXrPN88TlKuB6nAszi+kPg4pCFQG0yoVx3MH2zUi897CwX/0xeVh1yam+COVvA3pUA4q2izQsJ9D+QbrENJ0/ltM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EuCITKvR; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="dguw94iC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 538DDC4CEEC;
-	Tue, 17 Dec 2024 17:30:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1734456642;
-	bh=tTve6jmv6a7QTCCQ45wocrrPtqChJHiXIX15NyGbte0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dguw94iCkuly+aE2ahi87SdbbWRG1Zfk49bDOSmBMIOWlGpyV8wfkRRwJwR7lo5Mn
-	 03QT2h8PjU92AQ3m/tvtCcAti5YyCgQpstAIkNe6fmzbrfs1vtUfecX4AqspWndhT3
-	 HzR/AWdLNxDoc+HFGiu6uTNk4KhwwCZw0rjSE4wg=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 122/172] cifs: Fix rmdir failure due to ongoing I/O on deleted file
-Date: Tue, 17 Dec 2024 18:07:58 +0100
-Message-ID: <20241217170551.394460766@linuxfoundation.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241217170546.209657098@linuxfoundation.org>
-References: <20241217170546.209657098@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EuCITKvR"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53e399e3310so6619985e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Dec 2024 11:42:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734464537; x=1735069337; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f22HL5gpkon9dTeKpgexWS/AAUlUTb2ka1v0JukniNo=;
+        b=EuCITKvRHu6enlJAUMo4n7mDYtv1+d5wd8WkVPQZrWke9/mF2HAreXgDDWPjZdOA2J
+         dihPZ8bgwwvK5neTq4HwesRC2wc+Z1VqcCthRaSuaVcimPbKM1l8WMnx85SZz8AvsUWJ
+         KTMsB3fxVh4fCW77Vp4wsUXXe8C1M2OjQeB4vPlAaPzt/sXfxZBnuC39dMc8opv7VATx
+         ZJcIYXg34TAfS67jnmpP1aJ+hc5HyBvRaCjpQoYXB/kdbj30dzi2pihbXSGsGJPNsTv9
+         UjDzJ3p08pnOv/vuSWMFNT6R5pYF7VKxs6Qixzl4IsSkI1/ik3jiDvhENhc+nr2ybPn0
+         dL/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734464537; x=1735069337;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f22HL5gpkon9dTeKpgexWS/AAUlUTb2ka1v0JukniNo=;
+        b=C/p9hLlx6p4DiqDYi+aY99P9pnOcJGkjUIC7KMuLCmWg+u/sXtWw4MyQsUXYV90jv7
+         TwlZzFxWnLmXdG47hrTpEkOUzpyWCZ3QUo45mmXyPFsHYWer+8g/vIypvhM+qGElpsCJ
+         Ngoiiji1Kt7QFTuD1q8nwTJqLh0hK3yxOk3XQhW+1X0DORrg773tUHZrVrT++wojdA00
+         bJSuZRQ2wVDaSJX6KiI+XvndTkZvWqfkyZcgzjV+wLpz4Z9+4ffNZS3sY6YjX9EM5bFx
+         XdGX4pbJtzNCO28Czy9ETmPvKGjyEXPm33bHnYj9DonXu+gU8b1zKnTMEXWWUK1iBXW2
+         Zdyw==
+X-Gm-Message-State: AOJu0Ywd2yk3ZiMD1NUpiE8PxG6bb3UrHQKoQ8NbFp8Gov2N7ryOM9iL
+	vrP/FhL+fPh/OF9fJuAfLH3EzIyZ/oPj+qxggUrLw/O8dpSj0LU+qCDMjEq0HD9fv1Pd96nYiCC
+	VqycodzrwRYfb3YmmlETUmL2tlmrDGA==
+X-Gm-Gg: ASbGncsX921LsMFaidykam5ERdbeGNy8xUPKxKURhYIUWiF78+VWu94LBnERyqWbZbp
+	wr4TfEdoArIIa7D/S//zqJ4100KVaBwucBqsli8meTyN8DyNywI2QxXkRO1b6LDhm8c+tlKCD
+X-Google-Smtp-Source: AGHT+IE72eXnX/sUeBtrIbIymV/8G9Gv4N6qVCVZ+gNmaAuTR+yZzG7En4CVK4/E1VwhTU2POOQAAGN5VLIP9jz8mlY=
+X-Received: by 2002:a05:6512:3e16:b0:53e:94f9:8c86 with SMTP id
+ 2adb3069b0e04-541ed900027mr117313e87.35.1734464537318; Tue, 17 Dec 2024
+ 11:42:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <011da8e5ae7537ad188cc49cee6f96e09eb1b8db.1734427173.git.dsimic@manjaro.org>
+ <CAH2r5mt61UvqdE-15ndegOHROObk0CfcZxMnTZeSn9oJymY=YA@mail.gmail.com>
+In-Reply-To: <CAH2r5mt61UvqdE-15ndegOHROObk0CfcZxMnTZeSn9oJymY=YA@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 17 Dec 2024 13:42:06 -0600
+Message-ID: <CAH2r5mtd9uS_gJYS01mdBxHP=2Rn4vh8etLQkZnUjyNeTGWd6g@mail.gmail.com>
+Subject: Fwd: [PATCH] smb: client: Deduplicate "select NETFS_SUPPORT" in Kconfig
+To: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+merged into cifs-2.6.git for-next
 
-------------------
-
-From: David Howells <dhowells@redhat.com>
-
-[ Upstream commit bb57c81e97e0082abfb0406ed6f67c615c3d206c ]
-
-The cifs_io_request struct (a wrapper around netfs_io_request) holds open
-the file on the server, even beyond the local Linux file being closed.
-This can cause problems with Windows-based filesystems as the file's name
-still exists after deletion until the file is closed, preventing the parent
-directory from being removed and causing spurious test failures in xfstests
-due to inability to remove a directory.  The symptom looks something like
-this in the test output:
-
-   rm: cannot remove '/mnt/scratch/test/p0/d3': Directory not empty
-   rm: cannot remove '/mnt/scratch/test/p1/dc/dae': Directory not empty
-
-Fix this by waiting in unlink and rename for any outstanding I/O requests
-to be completed on the target file before removing that file.
-
-Note that this doesn't prevent Linux from trying to start new requests
-after deletion if it still has the file open locally - something that's
-perfectly acceptable on a UNIX system.
-
-Note also that whilst I've marked this as fixing the commit to make cifs
-use netfslib, I don't know that it won't occur before that.
-
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/inode.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index b35fe1075503..fafc07e38663 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1925,6 +1925,7 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
- 		goto unlink_out;
- 	}
- 
-+	netfs_wait_for_outstanding_io(inode);
- 	cifs_close_deferred_file_under_dentry(tcon, full_path);
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
-@@ -2442,8 +2443,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 	}
- 
- 	cifs_close_deferred_file_under_dentry(tcon, from_name);
--	if (d_inode(target_dentry) != NULL)
-+	if (d_inode(target_dentry) != NULL) {
-+		netfs_wait_for_outstanding_io(d_inode(target_dentry));
- 		cifs_close_deferred_file_under_dentry(tcon, to_name);
-+	}
- 
- 	rc = cifs_do_rename(xid, source_dentry, from_name, target_dentry,
- 			    to_name);
--- 
-2.39.5
+On Tue, Dec 17, 2024 at 3:26=E2=80=AFAM Dragan Simic <dsimic@manjaro.org> w=
+rote:
+>
+> Repeating automatically selected options in Kconfig files is redundant, s=
+o
+> let's delete repeated "select NETFS_SUPPORT" that was added accidentally.
+>
+> Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
+> Signed-off-by: Dragan Simic <dsimic@manjaro.org>
+> ---
+>  fs/smb/client/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
+> index 2aff6d1395ce..9f05f94e265a 100644
+> --- a/fs/smb/client/Kconfig
+> +++ b/fs/smb/client/Kconfig
+> @@ -2,7 +2,6 @@
+>  config CIFS
+>         tristate "SMB3 and CIFS support (advanced network filesystem)"
+>         depends on INET
+> -       select NETFS_SUPPORT
+>         select NLS
+>         select NLS_UCS2_UTILS
+>         select CRYPTO
+>
 
 
+--=20
+Thanks,
 
+Steve
+
+
+--=20
+Thanks,
+
+Steve
