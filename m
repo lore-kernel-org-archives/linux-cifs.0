@@ -1,249 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE39615854A
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Dec 2024 15:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B231A3A8A;
+	Wed, 18 Dec 2024 23:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734534635; cv=none; b=Q2WYbfCBrtKCG9861Em767TZKoZLb5DpB7qX3ULHis/hQyDv8DKFDGKpT3nE/zY2hsQAOi8F7kspKivvHE5bcCx8ZSBMOu+hjBZ6KAfShOpg0ri7JBXv6gQC6MlUzg3Y0RcEJCb3DB00ejW4t161A/scjALJEpdBASbQaAflwns=
+	t=1734565271; cv=none; b=Zm/rBdcDDBfGxvzjWl3CyKR5aFdcHiHV5tpxvd478N9Xf30HtW2SRyG9F4D5WatbsrDwe7389yzDZOIv98hjyAfAunYZjjPHZEGgEaQ0TFV2TWeducU7LrJyq0NfdBN2UB0Sak1BqmvPrAu28bKsGOtFNeKkROISc6qAHrV5Mjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734534635; c=relaxed/simple;
-	bh=dJ5MgtcOdIkkXX2Gd0V5R5VUbYMOC+PpISay7kYQ4G0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XqbngZdK3iqLozznPhW+ztS4+eJUep5Z+baQ91yx1K6/BIr0Z/8HwVSYdfp62qLmy2OyqVp8+7Vao2L7kYxnqDMK0GQLMlg1gou7mCvZ9z+6bavXsldFZ5QBAhyqJVzp3j+e7gMU0GS2lwn0unYvmVyQK3aXSWOVP2Rhhk2MoO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VbnHJs4w; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734565271; c=relaxed/simple;
+	bh=HXCj/+HiTM+8izk99J1VFko+gJAk0Pq6hf+nMvvX8NI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Iv+tgrMOPrb5upxxsiSkndpPyQ/7rOlCmj+D6yjf7ClwDhpNbiLLLaos0L9mjML/0CGrx8frABgCJ1gO8KUMgSjSHP57RJybhN4AzZZwNZBEwwY6JIuZPdL0FVU7PRbLpI9bu6/vYXLELQw75h6wv1mr+qM2zSvW4unV95prRps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eR3cAI7l; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbnHJs4w"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734534632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Rq13+spy+qCFhDJsgxiTRuvUnBVAzO08weFgvcvuB7I=;
-	b=VbnHJs4wxrbSt6BFVIUDwtCfE3hTW5zf21sE4LQ3WTZuWv1Vb9OfJICLBCEoUgLg94kEq9
-	HMJI11Gl95F2WfzIJlynDMpv9GcieUSuP2VyLByujawkAC8m9yjyGwOU8UIdLoXWtMnatx
-	Wcsuh8RaEVGZpDsYAPckEGOrBfVbRtQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-B7KcHiS5P-KvQk0dL7E4Iw-1; Wed, 18 Dec 2024 10:10:31 -0500
-X-MC-Unique: B7KcHiS5P-KvQk0dL7E4Iw-1
-X-Mimecast-MFC-AGG-ID: B7KcHiS5P-KvQk0dL7E4Iw
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5d3bf75bbf1so1067170a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Dec 2024 07:10:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eR3cAI7l"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53e3c47434eso126444e87.3;
+        Wed, 18 Dec 2024 15:41:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734565267; x=1735170067; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MrtX6X5vXAcaMBwNZyU2z10NHWjiZy9DO5f6NVtav3U=;
+        b=eR3cAI7lWQUqOlseodd76nlk9jQ2YEeiZbsAJEXmMKPrxpOu1tOtWSQAo6twFWS/fx
+         9vccQiNYecUOiBKsCLT4+NA/HzmTYwgnMd7IiG6sUUePTnX06XmfIZp6AiAD1yJTSzZq
+         gUoq6947eFKmjBgucJVH6fQC/ErlTgwgjqsjNgBmr1HCRfNzWiG6OOl+IiqREz+el+rG
+         09CqWEW5V4Gby7c1ILMRwvMDiq0oZt2eK74Yx2l3mmTuz0Hm2DeU/NXBNqbfz1V0Ioxo
+         qrrkTh+MUev+G7MbYocqeKEZdw59lQh8AmxMWrHH3PllBvfBYH6kK1YYd/M6bM7LzNwE
+         oVbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734534630; x=1735139430;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rq13+spy+qCFhDJsgxiTRuvUnBVAzO08weFgvcvuB7I=;
-        b=qEQiAoJgNeWzxMF4o7fMlZ1HJrlFIn9+Q/Z48Z4OMs6S+Qplxru/CEOm0t5pUCde3o
-         SjTK2YYJ7Fhhi6KiCyAy8RM15UfaUIjl4sqNXlGAkaJuyHeTBLOIe82jsI0qT3FUI6J1
-         gkQjMzUQK69e/8Nf1W1A874YQ9IE+ILwt7m7/xxHHQ13qbF7M2BE15SLZWHCRFtzuOGD
-         KIKhKAFxIfWMOMAYc3IcEFswkx2bUjtvXbPhaimgBbt6GR4tFsQU7HGOC5+ZcswQp79o
-         FzENFF2VtUsWXV+qwJ/Kjj0lpNYiyUZ2MPOQxjEQ3viAH7Aa8lJjmqP4AOIVJIeCtgI7
-         u2Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVICbM5kpMF0RFdd8dvBFNNZom2zTVFuj6dFTf14QFiQa+G4g+A26bFAgN1WsIW7HzyNLX7aT5tEJ0@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ1CVLRy36lFCvTnYJ3Qtx58tfJUxnlSsfZFueX4JUaqlmhNAN
-	vbPlMOnD3pxcmk+J9bDhey2JjNJj2dD5Tm3tzRd4aU9A5lvXUUrBXxEMaFkE8Lx4S5nSlexxHV8
-	i0l/uTSN1qW7WPkVmspTpnBnrmnw4TLJfmu47/7go+eGmg0hVQAoRi/Ez0SP7wOKwoEa4bQ/5uI
-	dEjYFsgq+uU5FKHD/aEjEFkLHcAw8FLIAUdw==
-X-Gm-Gg: ASbGncubda7pbXZUrKlyCfNeEWwVeZpSlwfP02xvdn9P/UCVJCFPAAsiUwQdRWuHR9K
-	qd85xErHXaKjPjOBZle0YZNf5ezQVQNU3gOWPmw==
-X-Received: by 2002:a05:6402:4341:b0:5d3:e58c:25e2 with SMTP id 4fb4d7f45d1cf-5d7d556a032mr7458435a12.2.1734534630099;
-        Wed, 18 Dec 2024 07:10:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGPXB4Hx123hIFkjF3f0ABZNjkTu8BSyACv9a6CvqUYXqkqjaQQ+sXVlOZWB1mhhZKOt1MoxEBCl6ooO9B/teI=
-X-Received: by 2002:a05:6402:4341:b0:5d3:e58c:25e2 with SMTP id
- 4fb4d7f45d1cf-5d7d556a032mr7458383a12.2.1734534629616; Wed, 18 Dec 2024
- 07:10:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734565267; x=1735170067;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MrtX6X5vXAcaMBwNZyU2z10NHWjiZy9DO5f6NVtav3U=;
+        b=uQjaq48IF03EmYGh59kg60FtleGVDGmYTt7nVEy2wDalFFsQ2zKSqBIJ4UL6Al+7WS
+         6d6XnOx/vhx2kNGdmo7yCmmRVkG/z9zDamixh4Mc3U014g/eOhM7DiVvYXqu1LLlKNPF
+         agvfHIePDzxS3Rquz07Z+9YHQ5LU4kmziaMd3URCa6mq9eKHCJhRAnf4J3SWq1JfzlYy
+         ozKM1k/XEet+cJ/DExmzCvCL9XM/8ofetL527azMgG+cAcaiTs92B5mfQPgSZ3XmxzCR
+         7meF1uYpyoaXlbrDJTXy8jM4EZLxlpxLo6lj/Y9mS4WMpcqD94jq5ubVnvzgypxlZ7IK
+         Tycw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8xRN8IgR0GizC1kK50vlFyOEwdo3sR73pQZzDcsPBthSJVkstI2xGLkhEDkAFeEdER5h8PAGuds1T@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw68zTC7olti4/Qau4COGU/CrP42Zi4dbcKD//HZN8MiboH/P4H
+	dSF0jaUwNRF1TWk96XSes4c0XCFRzIH3Qp85lDgtiQnqyA963IZqczoxX4HzzryrTjSyCnDcKIF
+	OWa/KVN13PsrtITxz6SjLFve8XxM=
+X-Gm-Gg: ASbGncu8CNIM1nvpOxvyejRQ2KvutDjv6+59Y64fel3p+VJJQ0RanrHJ8d+0JWq6a07
+	8ooGndwRM+Fqsjs37f49V0P+xzW7O/pEzf9ySKxN/4VB/U4dI27vDsNRm5tiR6hrhM2X9m8U=
+X-Google-Smtp-Source: AGHT+IHKuPY+MeBUOCVG0v1nJPNrOOoDTp6QrVNA3E1A0Bcx1dYdEwONH+wvobS/rO9i7W8vqwfXh9p922sq6Dc2R3k=
+X-Received: by 2002:a05:6512:b9c:b0:53e:39c2:f032 with SMTP id
+ 2adb3069b0e04-541e674c53emr1624982e87.14.1734565267206; Wed, 18 Dec 2024
+ 15:41:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213135013.2964079-1-dhowells@redhat.com> <2964553.1734098664@warthog.procyon.org.uk>
-In-Reply-To: <2964553.1734098664@warthog.procyon.org.uk>
-From: Alex Markuze <amarkuze@redhat.com>
-Date: Wed, 18 Dec 2024 17:10:18 +0200
-Message-ID: <CAO8a2ShjqL=-jk8_8Lk5+V13Tf60B+c8K6XovXEQH7F-gPP4-Q@mail.gmail.com>
-Subject: Re: ceph xfstests failures [was Re: [PATCH 00/10] netfs, ceph, nfs,
- cachefiles: Miscellaneous fixes/changes]
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>, Ilya Dryomov <idryomov@gmail.com>, 
-	Max Kellermann <max.kellermann@ionos.com>, Xiubo Li <xiubli@redhat.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 18 Dec 2024 17:40:56 -0600
+Message-ID: <CAH2r5msORKXoRLDHnu8H62W7ryRf2AdV4b-4R_3w=ep2g+yzsg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hey David.
-Thanks, for the find. I've seen your mail, but it was a busy week.
-If you can, please open a https://tracker.ceph.com/ bug and assign it to me=
-.
+Please pull the following changes since commit
+78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
 
-On Fri, Dec 13, 2024 at 4:05=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> David Howells <dhowells@redhat.com> wrote:
->
-> > With these patches, I can run xfstest -g quick to completion on ceph wi=
-th a
-> > local cache.
->
-> I should qualify that.  The thing completes and doesn't hang, but I get 6
-> failures:
->
->     Failures: generic/604 generic/633 generic/645 generic/696 generic/697=
- generic/732
->
-> Though these don't appear to be anything to do with netfslib (see attache=
-d).
-> There are two cases where the mount is busy and the rest seems to be due =
-to
-> id-mapped mounts and/or user namespaces.
->
-> The xfstest local.config file looks something like:
->
->     export FSTYP=3Dceph
->     export TEST_DEV=3D<ipaddr>:/test
->     export TEST_DIR=3D/xfstest.test
->     TEST_FS_MOUNT_OPTS=3D'-o name=3Dadmin,mds_namespace=3Dtest,fs=3Dtest,=
-fsc'
->     export SCRATCH_DEV=3D<ipaddr>:/scratch
->     export SCRATCH_MNT=3D/xfstest.scratch
->     export MOUNT_OPTIONS=3D'-o name=3Dadmin,mds_namespace=3Dscratch,fs=3D=
-scratch,fsc=3Dscratch'
->
-> David
-> ---
-> # ./check -E .exclude generic/604 generic/633 generic/645 generic/696 gen=
-eric/697 generic/732
-> FSTYP         -- ceph
-> PLATFORM      -- Linux/x86_64 andromeda 6.13.0-rc2-build3+ #5311 SMP Fri =
-Dec 13 09:03:34 GMT 2024
-> MKFS_OPTIONS  -- <ipaddr>:/scratch
-> MOUNT_OPTIONS -- -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=
-=3Dscratch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfst=
-est.scratch
->
-> generic/604 2s ... [failed, exit status 1]- output mismatch (see /root/xf=
-stests-dev/results//generic/604.out.bad)
->     --- tests/generic/604.out   2024-09-12 12:36:14.187441830 +0100
->     +++ /root/xfstests-dev/results//generic/604.out.bad 2024-12-13 13:18:=
-51.910900871 +0000
->     @@ -1,2 +1,4 @@
->      QA output created by 604
->     -Silence is golden
->     +mount error 16 =3D Device or resource busy
->     +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscr=
-atch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.sc=
-ratch failed
->     +(see /root/xfstests-dev/results//generic/604.full for details)
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/604.out /root/xfstests=
--dev/results//generic/604.out.bad'  to see the entire diff)
-> generic/633       [failed, exit status 1]- output mismatch (see /root/xfs=
-tests-dev/results//generic/633.out.bad)
->     --- tests/generic/633.out   2024-09-12 12:36:14.187441830 +0100
->     +++ /root/xfstests-dev/results//generic/633.out.bad 2024-12-13 13:18:=
-55.958979531 +0000
->     @@ -1,2 +1,4 @@
->      QA output created by 633
->      Silence is golden
->     +idmapped-mounts.c: 307: tcore_create_in_userns - Input/output error =
-- failure: open file
->     +vfstest.c: 2418: run_test - Success - failure: create operations in =
-user namespace
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/633.out /root/xfstests=
--dev/results//generic/633.out.bad'  to see the entire diff)
-> generic/645       [failed, exit status 1]- output mismatch (see /root/xfs=
-tests-dev/results//generic/645.out.bad)
->     --- tests/generic/645.out   2024-09-12 12:36:14.191441810 +0100
->     +++ /root/xfstests-dev/results//generic/645.out.bad 2024-12-13 13:19:=
-25.526908024 +0000
->     @@ -1,2 +1,4 @@
->      QA output created by 645
->      Silence is golden
->     +idmapped-mounts.c: 6671: nested_userns - Invalid argument - failure:=
- sys_mount_setattr
->     +vfstest.c: 2418: run_test - Invalid argument - failure: test that ne=
-sted user namespaces behave correctly when attached to idmapped mounts
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/645.out /root/xfstests=
--dev/results//generic/645.out.bad'  to see the entire diff)
-> generic/696       - output mismatch (see /root/xfstests-dev/results//gene=
-ric/696.out.bad)
->     --- tests/generic/696.out   2024-09-12 12:36:14.195441791 +0100
->     +++ /root/xfstests-dev/results//generic/696.out.bad 2024-12-13 13:19:=
-30.254804087 +0000
->     @@ -1,2 +1,6 @@
->      QA output created by 696
->     +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output=
- error - failure: create
->     +vfstest.c: 2418: run_test - Success - failure: create operations by =
-using umask in directories with setgid bit set on idmapped mount
->     +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output=
- error - failure: create
->     +vfstest.c: 2418: run_test - Success - failure: create operations by =
-using umask in directories with setgid bit set on idmapped mount
->      Silence is golden
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/696.out /root/xfstests=
--dev/results//generic/696.out.bad'  to see the entire diff)
->
-> HINT: You _MAY_ be missing kernel fix:
->       ac6800e279a2 fs: Add missing umask strip in vfs_tmpfile 1639a49ccdc=
-e fs: move S_ISGID stripping into the vfs_*() helpers
->
-> generic/697       - output mismatch (see /root/xfstests-dev/results//gene=
-ric/697.out.bad)
->     --- tests/generic/697.out   2024-09-12 12:36:14.195441791 +0100
->     +++ /root/xfstests-dev/results//generic/697.out.bad 2024-12-13 13:19:=
-31.749225548 +0000
->     @@ -1,2 +1,4 @@
->      QA output created by 697
->     +idmapped-mounts.c: 8218: setgid_create_acl_idmapped - Input/output e=
-rror - failure: create
->     +vfstest.c: 2418: run_test - Success - failure: create operations by =
-using acl in directories with setgid bit set on idmapped mount
->      Silence is golden
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/697.out /root/xfstests=
--dev/results//generic/697.out.bad'  to see the entire diff)
->
-> HINT: You _MAY_ be missing kernel fix:
->       1639a49ccdce fs: move S_ISGID stripping into the vfs_*() helpers
->
-> generic/732 1s ... [failed, exit status 1]- output mismatch (see /root/xf=
-stests-dev/results//generic/732.out.bad)
->     --- tests/generic/732.out   2024-09-12 12:36:14.195441791 +0100
->     +++ /root/xfstests-dev/results//generic/732.out.bad 2024-12-13 13:19:=
-34.482858235 +0000
->     @@ -1,2 +1,5 @@
->      QA output created by 732
->      Silence is golden
->     +mount error 16 =3D Device or resource busy
->     +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscr=
-atch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.te=
-st/mountpoint2-732 failed
->     +(see /root/xfstests-dev/results//generic/732.full for details)
->     ...
->     (Run 'diff -u /root/xfstests-dev/tests/generic/732.out /root/xfstests=
--dev/results//generic/732.out.bad'  to see the entire diff)
-> Ran: generic/604 generic/633 generic/645 generic/696 generic/697 generic/=
-732
-> Failures: generic/604 generic/633 generic/645 generic/696 generic/697 gen=
-eric/732
-> Failed 6 of 6 tests
->
->
+  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
 
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/v6.13-rc3-ksmbd-server-fixes
+
+for you to fetch changes up to fe4ed2f09b492e3507615a053814daa8fafdecb1:
+
+  ksmbd: conn lock to serialize smb2 negotiate (2024-12-15 22:20:03 -0600)
+
+----------------------------------------------------------------
+three kernel server fixes
+- Two fixes for better handling maximum outstanding requests
+- Fix simultaneous negotiate protocol race
+----------------------------------------------------------------
+Marios Makassikis (2):
+      ksmbd: count all requests in req_running counter
+      ksmbd: fix broken transfers when exceeding max simultaneous operations
+
+Namjae Jeon (1):
+      ksmbd: conn lock to serialize smb2 negotiate
+
+ fs/smb/server/connection.c    | 18 ++++++++++++++----
+ fs/smb/server/connection.h    |  1 -
+ fs/smb/server/server.c        |  7 +------
+ fs/smb/server/server.h        |  1 +
+ fs/smb/server/smb2pdu.c       |  2 ++
+ fs/smb/server/transport_ipc.c |  5 ++++-
+ 6 files changed, 22 insertions(+), 12 deletions(-)
+
+-- 
+Thanks,
+
+Steve
