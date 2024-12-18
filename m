@@ -1,281 +1,249 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A281494C3
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Dec 2024 03:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE39615854A
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Dec 2024 15:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734492270; cv=none; b=k/VcQOWhawmtHvIYGQUTjB1toi/Tv+Qj7S9/K3vqPecgdTCN3Ze/ZKxRedjsQSFygVmWiIwRuRJYQ7eeUGxoUGBAXBbl2L0+Ofo/D48XmT2p8prVe31J74Y4tJjLfsW6jPQ2AVzKw/sH3cTvkDg4t3SS3hP9+Xo9CXRKKnFGDMI=
+	t=1734534635; cv=none; b=Q2WYbfCBrtKCG9861Em767TZKoZLb5DpB7qX3ULHis/hQyDv8DKFDGKpT3nE/zY2hsQAOi8F7kspKivvHE5bcCx8ZSBMOu+hjBZ6KAfShOpg0ri7JBXv6gQC6MlUzg3Y0RcEJCb3DB00ejW4t161A/scjALJEpdBASbQaAflwns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734492270; c=relaxed/simple;
-	bh=c7JODEXksCUlACS5BFUotXmeQ7S81wE12FTG37257a0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=tp3KSM/cGLqh938wJtNEx9ezyc0F+VikcKeRG1SJ5AWdqtf+4Wb4pqUTES8FZgYebtfHFUMoc6AMPA6kxzcqskZKM8zVgxd4FtKuUgOlEepv1iZX/waM6QZTuPI6lYAm0pnG4gUL1KpfRY5K+9H5wbwFYg/2vN/5j6GH2PPcILI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1lwjdat; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734534635; c=relaxed/simple;
+	bh=dJ5MgtcOdIkkXX2Gd0V5R5VUbYMOC+PpISay7kYQ4G0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XqbngZdK3iqLozznPhW+ztS4+eJUep5Z+baQ91yx1K6/BIr0Z/8HwVSYdfp62qLmy2OyqVp8+7Vao2L7kYxnqDMK0GQLMlg1gou7mCvZ9z+6bavXsldFZ5QBAhyqJVzp3j+e7gMU0GS2lwn0unYvmVyQK3aXSWOVP2Rhhk2MoO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VbnHJs4w; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1lwjdat"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30033e07ef3so3950421fa.0
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Dec 2024 19:24:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734492265; x=1735097065; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dCX3GcnHoVOaB9KmiYj8QNDfWxPyq3jtetYwuX+Kc5E=;
-        b=V1lwjdat+dP2tV7oPxqc/8GRDE6RC98UeR7EloeUZZqZ1UkC/fpF2po8E/CRAODlHr
-         0HMMotY8Ot2kzO9QfkOy2QTHAHLSeUA7Ti/Ox/MCqthKygz5OTbH3ofkwF2TKuNeNz4Q
-         ARLDkHZ9v866VPk2qdfBHhC31yEByLRo4PqRUj3xERPPnk9oIRUDwx56xFdTQkuB23OZ
-         nZtTHK/gPHf4+egxba4kAHakvoYrtz9kNcRsmsdZ2zlF7Rf95Ipdvu9X/SmYgKmKhQEs
-         PjPbmQdUoG/q5GtGPTdEtj6cIOwvXwWMrPYVtP1SnygVEojcFyIEbXLvV4WZkZdNRInR
-         +O5w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbnHJs4w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734534632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rq13+spy+qCFhDJsgxiTRuvUnBVAzO08weFgvcvuB7I=;
+	b=VbnHJs4wxrbSt6BFVIUDwtCfE3hTW5zf21sE4LQ3WTZuWv1Vb9OfJICLBCEoUgLg94kEq9
+	HMJI11Gl95F2WfzIJlynDMpv9GcieUSuP2VyLByujawkAC8m9yjyGwOU8UIdLoXWtMnatx
+	Wcsuh8RaEVGZpDsYAPckEGOrBfVbRtQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-B7KcHiS5P-KvQk0dL7E4Iw-1; Wed, 18 Dec 2024 10:10:31 -0500
+X-MC-Unique: B7KcHiS5P-KvQk0dL7E4Iw-1
+X-Mimecast-MFC-AGG-ID: B7KcHiS5P-KvQk0dL7E4Iw
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5d3bf75bbf1so1067170a12.1
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Dec 2024 07:10:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734492265; x=1735097065;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dCX3GcnHoVOaB9KmiYj8QNDfWxPyq3jtetYwuX+Kc5E=;
-        b=jypMM3P2F5PhZtc/thuE9gVYhtIHsJJ/8TGdwJk8tfXGxOxusFvEONPECtCootnntE
-         ChzL/Br1M/hUlzPxEbKxHhf3aIUZjQiHFkVBcaE2xY+dp7UvYcLbIObuRvn0aIgepopZ
-         l3nd5yppJroVt58SiMcUR1uSYy2BNJWGdy+nL7/Px4Ov9m+e8Fmf6xz8I4mYa60XwTyD
-         ZZmKWXEVhwAKSyQju+KSc71D/3S6SFrL4kglCW5wiTN5QHIGQXN6b42IFrGAW1syORCM
-         uxr/UbNhOT/m5wi4FGRrA1JfKzuysEW7+fqCTDgno+/tOMGlFLm6OJ255NYUY8rhK4Tj
-         aP1Q==
-X-Gm-Message-State: AOJu0YztgoAO/jRYHaUlgLi+EEUqtX5+fThRl4GuhEuaEPlzPGUj3wZs
-	Jhe9TiUbCwuVXdK6NaRkZsznnvbE3ryJfwv+INJe6jfQfhfMDLEy1jX8lgpjh2kidDRMqEaxkN2
-	ke/KKAsyIkgZmxI2lxH2lsv/Q5ivrxszY
-X-Gm-Gg: ASbGnculkHDU9bXMOQ8pg+Me9QoFKlYjXnnV4MV+z/UGH55SiYNoXWxARt3vqiwi2NJ
-	ZY+hFKvWzsuPwNduqbG+rxyyTQYbA7DfwU6OnVkSW4eQCP4JN7pWiApOhZdK3u3ch/2YHKoTu
-X-Google-Smtp-Source: AGHT+IGY9pRp7SB0b8W4JLgHkbt1Bhkt4YDLuWmTebba4x1klLIDMVX5+wcayzjpqGjOxQYfQ10Qb+9gZS1eGIBL5LQ=
-X-Received: by 2002:a05:651c:b0d:b0:302:251a:bcfe with SMTP id
- 38308e7fff4ca-3044e624278mr3474441fa.6.1734492264597; Tue, 17 Dec 2024
- 19:24:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734534630; x=1735139430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rq13+spy+qCFhDJsgxiTRuvUnBVAzO08weFgvcvuB7I=;
+        b=qEQiAoJgNeWzxMF4o7fMlZ1HJrlFIn9+Q/Z48Z4OMs6S+Qplxru/CEOm0t5pUCde3o
+         SjTK2YYJ7Fhhi6KiCyAy8RM15UfaUIjl4sqNXlGAkaJuyHeTBLOIe82jsI0qT3FUI6J1
+         gkQjMzUQK69e/8Nf1W1A874YQ9IE+ILwt7m7/xxHHQ13qbF7M2BE15SLZWHCRFtzuOGD
+         KIKhKAFxIfWMOMAYc3IcEFswkx2bUjtvXbPhaimgBbt6GR4tFsQU7HGOC5+ZcswQp79o
+         FzENFF2VtUsWXV+qwJ/Kjj0lpNYiyUZ2MPOQxjEQ3viAH7Aa8lJjmqP4AOIVJIeCtgI7
+         u2Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCWVICbM5kpMF0RFdd8dvBFNNZom2zTVFuj6dFTf14QFiQa+G4g+A26bFAgN1WsIW7HzyNLX7aT5tEJ0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ1CVLRy36lFCvTnYJ3Qtx58tfJUxnlSsfZFueX4JUaqlmhNAN
+	vbPlMOnD3pxcmk+J9bDhey2JjNJj2dD5Tm3tzRd4aU9A5lvXUUrBXxEMaFkE8Lx4S5nSlexxHV8
+	i0l/uTSN1qW7WPkVmspTpnBnrmnw4TLJfmu47/7go+eGmg0hVQAoRi/Ez0SP7wOKwoEa4bQ/5uI
+	dEjYFsgq+uU5FKHD/aEjEFkLHcAw8FLIAUdw==
+X-Gm-Gg: ASbGncubda7pbXZUrKlyCfNeEWwVeZpSlwfP02xvdn9P/UCVJCFPAAsiUwQdRWuHR9K
+	qd85xErHXaKjPjOBZle0YZNf5ezQVQNU3gOWPmw==
+X-Received: by 2002:a05:6402:4341:b0:5d3:e58c:25e2 with SMTP id 4fb4d7f45d1cf-5d7d556a032mr7458435a12.2.1734534630099;
+        Wed, 18 Dec 2024 07:10:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGPXB4Hx123hIFkjF3f0ABZNjkTu8BSyACv9a6CvqUYXqkqjaQQ+sXVlOZWB1mhhZKOt1MoxEBCl6ooO9B/teI=
+X-Received: by 2002:a05:6402:4341:b0:5d3:e58c:25e2 with SMTP id
+ 4fb4d7f45d1cf-5d7d556a032mr7458383a12.2.1734534629616; Wed, 18 Dec 2024
+ 07:10:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 17 Dec 2024 21:24:12 -0600
-Message-ID: <CAH2r5msqxcvHcbDt0x_eNpbdPxUhgFoOAPchZ16EBZeFhCdAKA@mail.gmail.com>
-Subject: [PATCH][SMB3 client] fix TCP timers deadlock after rmmod
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Enzo Matsumiya <ematsumiya@suse.de>
-Content-Type: multipart/mixed; boundary="0000000000004c2449062982f3e5"
-
---0000000000004c2449062982f3e5
+References: <20241213135013.2964079-1-dhowells@redhat.com> <2964553.1734098664@warthog.procyon.org.uk>
+In-Reply-To: <2964553.1734098664@warthog.procyon.org.uk>
+From: Alex Markuze <amarkuze@redhat.com>
+Date: Wed, 18 Dec 2024 17:10:18 +0200
+Message-ID: <CAO8a2ShjqL=-jk8_8Lk5+V13Tf60B+c8K6XovXEQH7F-gPP4-Q@mail.gmail.com>
+Subject: Re: ceph xfstests failures [was Re: [PATCH 00/10] netfs, ceph, nfs,
+ cachefiles: Miscellaneous fixes/changes]
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Ilya Dryomov <idryomov@gmail.com>, 
+	Max Kellermann <max.kellermann@ionos.com>, Xiubo Li <xiubli@redhat.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Enzo had an interesting patch, that seems to fix an important problem.
+Hey David.
+Thanks, for the find. I've seen your mail, but it was a busy week.
+If you can, please open a https://tracker.ceph.com/ bug and assign it to me=
+.
 
-Here was his repro scenario:
+On Fri, Dec 13, 2024 at 4:05=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> David Howells <dhowells@redhat.com> wrote:
+>
+> > With these patches, I can run xfstest -g quick to completion on ceph wi=
+th a
+> > local cache.
+>
+> I should qualify that.  The thing completes and doesn't hang, but I get 6
+> failures:
+>
+>     Failures: generic/604 generic/633 generic/645 generic/696 generic/697=
+ generic/732
+>
+> Though these don't appear to be anything to do with netfslib (see attache=
+d).
+> There are two cases where the mount is busy and the rest seems to be due =
+to
+> id-mapped mounts and/or user namespaces.
+>
+> The xfstest local.config file looks something like:
+>
+>     export FSTYP=3Dceph
+>     export TEST_DEV=3D<ipaddr>:/test
+>     export TEST_DIR=3D/xfstest.test
+>     TEST_FS_MOUNT_OPTS=3D'-o name=3Dadmin,mds_namespace=3Dtest,fs=3Dtest,=
+fsc'
+>     export SCRATCH_DEV=3D<ipaddr>:/scratch
+>     export SCRATCH_MNT=3D/xfstest.scratch
+>     export MOUNT_OPTIONS=3D'-o name=3Dadmin,mds_namespace=3Dscratch,fs=3D=
+scratch,fsc=3Dscratch'
+>
+> David
+> ---
+> # ./check -E .exclude generic/604 generic/633 generic/645 generic/696 gen=
+eric/697 generic/732
+> FSTYP         -- ceph
+> PLATFORM      -- Linux/x86_64 andromeda 6.13.0-rc2-build3+ #5311 SMP Fri =
+Dec 13 09:03:34 GMT 2024
+> MKFS_OPTIONS  -- <ipaddr>:/scratch
+> MOUNT_OPTIONS -- -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=
+=3Dscratch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfst=
+est.scratch
+>
+> generic/604 2s ... [failed, exit status 1]- output mismatch (see /root/xf=
+stests-dev/results//generic/604.out.bad)
+>     --- tests/generic/604.out   2024-09-12 12:36:14.187441830 +0100
+>     +++ /root/xfstests-dev/results//generic/604.out.bad 2024-12-13 13:18:=
+51.910900871 +0000
+>     @@ -1,2 +1,4 @@
+>      QA output created by 604
+>     -Silence is golden
+>     +mount error 16 =3D Device or resource busy
+>     +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscr=
+atch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.sc=
+ratch failed
+>     +(see /root/xfstests-dev/results//generic/604.full for details)
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/604.out /root/xfstests=
+-dev/results//generic/604.out.bad'  to see the entire diff)
+> generic/633       [failed, exit status 1]- output mismatch (see /root/xfs=
+tests-dev/results//generic/633.out.bad)
+>     --- tests/generic/633.out   2024-09-12 12:36:14.187441830 +0100
+>     +++ /root/xfstests-dev/results//generic/633.out.bad 2024-12-13 13:18:=
+55.958979531 +0000
+>     @@ -1,2 +1,4 @@
+>      QA output created by 633
+>      Silence is golden
+>     +idmapped-mounts.c: 307: tcore_create_in_userns - Input/output error =
+- failure: open file
+>     +vfstest.c: 2418: run_test - Success - failure: create operations in =
+user namespace
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/633.out /root/xfstests=
+-dev/results//generic/633.out.bad'  to see the entire diff)
+> generic/645       [failed, exit status 1]- output mismatch (see /root/xfs=
+tests-dev/results//generic/645.out.bad)
+>     --- tests/generic/645.out   2024-09-12 12:36:14.191441810 +0100
+>     +++ /root/xfstests-dev/results//generic/645.out.bad 2024-12-13 13:19:=
+25.526908024 +0000
+>     @@ -1,2 +1,4 @@
+>      QA output created by 645
+>      Silence is golden
+>     +idmapped-mounts.c: 6671: nested_userns - Invalid argument - failure:=
+ sys_mount_setattr
+>     +vfstest.c: 2418: run_test - Invalid argument - failure: test that ne=
+sted user namespaces behave correctly when attached to idmapped mounts
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/645.out /root/xfstests=
+-dev/results//generic/645.out.bad'  to see the entire diff)
+> generic/696       - output mismatch (see /root/xfstests-dev/results//gene=
+ric/696.out.bad)
+>     --- tests/generic/696.out   2024-09-12 12:36:14.195441791 +0100
+>     +++ /root/xfstests-dev/results//generic/696.out.bad 2024-12-13 13:19:=
+30.254804087 +0000
+>     @@ -1,2 +1,6 @@
+>      QA output created by 696
+>     +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output=
+ error - failure: create
+>     +vfstest.c: 2418: run_test - Success - failure: create operations by =
+using umask in directories with setgid bit set on idmapped mount
+>     +idmapped-mounts.c: 7763: setgid_create_umask_idmapped - Input/output=
+ error - failure: create
+>     +vfstest.c: 2418: run_test - Success - failure: create operations by =
+using umask in directories with setgid bit set on idmapped mount
+>      Silence is golden
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/696.out /root/xfstests=
+-dev/results//generic/696.out.bad'  to see the entire diff)
+>
+> HINT: You _MAY_ be missing kernel fix:
+>       ac6800e279a2 fs: Add missing umask strip in vfs_tmpfile 1639a49ccdc=
+e fs: move S_ISGID stripping into the vfs_*() helpers
+>
+> generic/697       - output mismatch (see /root/xfstests-dev/results//gene=
+ric/697.out.bad)
+>     --- tests/generic/697.out   2024-09-12 12:36:14.195441791 +0100
+>     +++ /root/xfstests-dev/results//generic/697.out.bad 2024-12-13 13:19:=
+31.749225548 +0000
+>     @@ -1,2 +1,4 @@
+>      QA output created by 697
+>     +idmapped-mounts.c: 8218: setgid_create_acl_idmapped - Input/output e=
+rror - failure: create
+>     +vfstest.c: 2418: run_test - Success - failure: create operations by =
+using acl in directories with setgid bit set on idmapped mount
+>      Silence is golden
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/697.out /root/xfstests=
+-dev/results//generic/697.out.bad'  to see the entire diff)
+>
+> HINT: You _MAY_ be missing kernel fix:
+>       1639a49ccdce fs: move S_ISGID stripping into the vfs_*() helpers
+>
+> generic/732 1s ... [failed, exit status 1]- output mismatch (see /root/xf=
+stests-dev/results//generic/732.out.bad)
+>     --- tests/generic/732.out   2024-09-12 12:36:14.195441791 +0100
+>     +++ /root/xfstests-dev/results//generic/732.out.bad 2024-12-13 13:19:=
+34.482858235 +0000
+>     @@ -1,2 +1,5 @@
+>      QA output created by 732
+>      Silence is golden
+>     +mount error 16 =3D Device or resource busy
+>     +mount -o name=3Dadmin,mds_namespace=3Dscratch,fs=3Dscratch,fsc=3Dscr=
+atch -o context=3Dsystem_u:object_r:root_t:s0 <ipaddr>:/scratch /xfstest.te=
+st/mountpoint2-732 failed
+>     +(see /root/xfstests-dev/results//generic/732.full for details)
+>     ...
+>     (Run 'diff -u /root/xfstests-dev/tests/generic/732.out /root/xfstests=
+-dev/results//generic/732.out.bad'  to see the entire diff)
+> Ran: generic/604 generic/633 generic/645 generic/696 generic/697 generic/=
+732
+> Failures: generic/604 generic/633 generic/645 generic/696 generic/697 gen=
+eric/732
+> Failed 6 of 6 tests
+>
+>
 
-     tw:~ # mount.cifs -o credentials=/root/wincreds,echo_interval=10
-//someserver/target1 /mnt/test
-     tw:~ # ls /mnt/test
-     abc  dir1  dir3  target1_file.txt  tsub
-     tw:~ # iptables -A INPUT -s someserver -j DROP
-
-Trigger reconnect and wait for 3*echo_interval:
-
-     tw:~ # cat /mnt/test/target1_file.txt
-     cat: /mnt/test/target1_file.txt: Host is down
-
-Then umount and rmmod.  Note that rmmod might take several iterations
-until it properly tears down everything, so make sure you see the "not
-loaded" message before proceeding:
-
-     tw:~ # umount /mnt/*; rmmod cifs
-     umount: /mnt/az: not mounted.
-     umount: /mnt/dfs: not mounted.
-     umount: /mnt/local: not mounted.
-     umount: /mnt/scratch: not mounted.
-     rmmod: ERROR: Module cifs is in use
-     ...
-     tw:~ # rmmod cifs
-     rmmod: ERROR: Module cifs is not currently loaded
-
-Then kickoff the TCP internals:
-     tw:~ # iptables -F
-
-Gets the lockdep warning (requires CONFIG_LOCKDEP=y) + a NULL deref
-later on.
-
-
-Any thoughts on his patch?  See below (and attached)
-
-    Commit ef7134c7fc48 ("smb: client: Fix use-after-free of network
-namespace.")
-    fixed a netns UAF by manually enabled socket refcounting
-    (sk->sk_net_refcnt=1 and sock_inuse_add(net, 1)).
-
-    The reason the patch worked for that bug was because we now hold
-    references to the netns (get_net_track() gets a ref internally)
-    and they're properly released (internally, on __sk_destruct()),
-    but only because sk->sk_net_refcnt was set.
-
-    Problem:
-    (this happens regardless of CONFIG_NET_NS_REFCNT_TRACKER and regardless
-    if init_net or other)
-
-    Setting sk->sk_net_refcnt=1 *manually* and *after* socket creation is not
-    only out of cifs scope, but also technically wrong -- it's set conditionally
-    based on user (=1) vs kernel (=0) sockets.  And net/ implementations
-    seem to base their user vs kernel space operations on it.
-
-    e.g. upon TCP socket close, the TCP timers are not cleared because
-    sk->sk_net_refcnt=1:
-    (cf. commit 151c9c724d05 ("tcp: properly terminate timers for
-kernel sockets"))
-
-    net/ipv4/tcp.c:
-        void tcp_close(struct sock *sk, long timeout)
-        {
-            lock_sock(sk);
-            __tcp_close(sk, timeout);
-            release_sock(sk);
-            if (!sk->sk_net_refcnt)
-                    inet_csk_clear_xmit_timers_sync(sk);
-            sock_put(sk);
-        }
-
-    Which will throw a lockdep warning and then, as expected, deadlock on
-    tcp_write_timer().
-
-    A way to reproduce this is by running the reproducer from ef7134c7fc48
-    and then 'rmmod cifs'.  A few seconds later, the deadlock/lockdep
-    warning shows up.
-
-    Fix:
-    We shouldn't mess with socket internals ourselves, so do not set
-    sk_net_refcnt manually.
-
-    Also change __sock_create() to sock_create_kern() for explicitness.
-
-    As for non-init_net network namespaces, we deal with it the best way
-    we can -- hold an extra netns reference for server->ssocket and drop it
-    when it's released.  This ensures that the netns still exists whenever
-    we need to create/destroy server->ssocket, but is not directly tied to
-    it.
-
-    Fixes: ef7134c7fc48 ("smb: client: Fix use-after-free of network
-namespace.")
-
-
--- 
-Thanks,
-
-Steve
-
---0000000000004c2449062982f3e5
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb-client-fix-TCP-timers-deadlock-after-rmmod.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb-client-fix-TCP-timers-deadlock-after-rmmod.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m4tbrgnr0>
-X-Attachment-Id: f_m4tbrgnr0
-
-RnJvbSBmNmNmYTRiYzI2MTQ3N2Y3YTkxYzQ2ZjM0YjhkMTYzZjE5ODcwMjQ5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBFbnpvIE1hdHN1bWl5YSA8ZW1hdHN1bWl5YUBzdXNlLmRlPgpE
-YXRlOiBUdWUsIDEwIERlYyAyMDI0IDE4OjE1OjEyIC0wMzAwClN1YmplY3Q6IFtQQVRDSCAxLzRd
-IHNtYjogY2xpZW50OiBmaXggVENQIHRpbWVycyBkZWFkbG9jayBhZnRlciBybW1vZAoKQ29tbWl0
-IGVmNzEzNGM3ZmM0OCAoInNtYjogY2xpZW50OiBGaXggdXNlLWFmdGVyLWZyZWUgb2YgbmV0d29y
-ayBuYW1lc3BhY2UuIikKZml4ZWQgYSBuZXRucyBVQUYgYnkgbWFudWFsbHkgZW5hYmxlZCBzb2Nr
-ZXQgcmVmY291bnRpbmcKKHNrLT5za19uZXRfcmVmY250PTEgYW5kIHNvY2tfaW51c2VfYWRkKG5l
-dCwgMSkpLgoKVGhlIHJlYXNvbiB0aGUgcGF0Y2ggd29ya2VkIGZvciB0aGF0IGJ1ZyB3YXMgYmVj
-YXVzZSB3ZSBub3cgaG9sZApyZWZlcmVuY2VzIHRvIHRoZSBuZXRucyAoZ2V0X25ldF90cmFjaygp
-IGdldHMgYSByZWYgaW50ZXJuYWxseSkKYW5kIHRoZXkncmUgcHJvcGVybHkgcmVsZWFzZWQgKGlu
-dGVybmFsbHksIG9uIF9fc2tfZGVzdHJ1Y3QoKSksCmJ1dCBvbmx5IGJlY2F1c2Ugc2stPnNrX25l
-dF9yZWZjbnQgd2FzIHNldC4KClByb2JsZW06Cih0aGlzIGhhcHBlbnMgcmVnYXJkbGVzcyBvZiBD
-T05GSUdfTkVUX05TX1JFRkNOVF9UUkFDS0VSIGFuZCByZWdhcmRsZXNzCmlmIGluaXRfbmV0IG9y
-IG90aGVyKQoKU2V0dGluZyBzay0+c2tfbmV0X3JlZmNudD0xICptYW51YWxseSogYW5kICphZnRl
-ciogc29ja2V0IGNyZWF0aW9uIGlzIG5vdApvbmx5IG91dCBvZiBjaWZzIHNjb3BlLCBidXQgYWxz
-byB0ZWNobmljYWxseSB3cm9uZyAtLSBpdCdzIHNldCBjb25kaXRpb25hbGx5CmJhc2VkIG9uIHVz
-ZXIgKD0xKSB2cyBrZXJuZWwgKD0wKSBzb2NrZXRzLiAgQW5kIG5ldC8gaW1wbGVtZW50YXRpb25z
-CnNlZW0gdG8gYmFzZSB0aGVpciB1c2VyIHZzIGtlcm5lbCBzcGFjZSBvcGVyYXRpb25zIG9uIGl0
-LgoKZS5nLiB1cG9uIFRDUCBzb2NrZXQgY2xvc2UsIHRoZSBUQ1AgdGltZXJzIGFyZSBub3QgY2xl
-YXJlZCBiZWNhdXNlCnNrLT5za19uZXRfcmVmY250PTE6CihjZi4gY29tbWl0IDE1MWM5YzcyNGQw
-NSAoInRjcDogcHJvcGVybHkgdGVybWluYXRlIHRpbWVycyBmb3Iga2VybmVsIHNvY2tldHMiKSkK
-Cm5ldC9pcHY0L3RjcC5jOgogICAgdm9pZCB0Y3BfY2xvc2Uoc3RydWN0IHNvY2sgKnNrLCBsb25n
-IHRpbWVvdXQpCiAgICB7CiAgICAJbG9ja19zb2NrKHNrKTsKICAgIAlfX3RjcF9jbG9zZShzaywg
-dGltZW91dCk7CiAgICAJcmVsZWFzZV9zb2NrKHNrKTsKICAgIAlpZiAoIXNrLT5za19uZXRfcmVm
-Y250KQogICAgCQlpbmV0X2Nza19jbGVhcl94bWl0X3RpbWVyc19zeW5jKHNrKTsKICAgIAlzb2Nr
-X3B1dChzayk7CiAgICB9CgpXaGljaCB3aWxsIHRocm93IGEgbG9ja2RlcCB3YXJuaW5nIGFuZCB0
-aGVuLCBhcyBleHBlY3RlZCwgZGVhZGxvY2sgb24KdGNwX3dyaXRlX3RpbWVyKCkuCgpBIHdheSB0
-byByZXByb2R1Y2UgdGhpcyBpcyBieSBydW5uaW5nIHRoZSByZXByb2R1Y2VyIGZyb20gZWY3MTM0
-YzdmYzQ4CmFuZCB0aGVuICdybW1vZCBjaWZzJy4gIEEgZmV3IHNlY29uZHMgbGF0ZXIsIHRoZSBk
-ZWFkbG9jay9sb2NrZGVwCndhcm5pbmcgc2hvd3MgdXAuCgpGaXg6CldlIHNob3VsZG4ndCBtZXNz
-IHdpdGggc29ja2V0IGludGVybmFscyBvdXJzZWx2ZXMsIHNvIGRvIG5vdCBzZXQKc2tfbmV0X3Jl
-ZmNudCBtYW51YWxseS4KCkFsc28gY2hhbmdlIF9fc29ja19jcmVhdGUoKSB0byBzb2NrX2NyZWF0
-ZV9rZXJuKCkgZm9yIGV4cGxpY2l0bmVzcy4KCkFzIGZvciBub24taW5pdF9uZXQgbmV0d29yayBu
-YW1lc3BhY2VzLCB3ZSBkZWFsIHdpdGggaXQgdGhlIGJlc3Qgd2F5CndlIGNhbiAtLSBob2xkIGFu
-IGV4dHJhIG5ldG5zIHJlZmVyZW5jZSBmb3Igc2VydmVyLT5zc29ja2V0IGFuZCBkcm9wIGl0Cndo
-ZW4gaXQncyByZWxlYXNlZC4gIFRoaXMgZW5zdXJlcyB0aGF0IHRoZSBuZXRucyBzdGlsbCBleGlz
-dHMgd2hlbmV2ZXIKd2UgbmVlZCB0byBjcmVhdGUvZGVzdHJveSBzZXJ2ZXItPnNzb2NrZXQsIGJ1
-dCBpcyBub3QgZGlyZWN0bHkgdGllZCB0bwppdC4KCkZpeGVzOiBlZjcxMzRjN2ZjNDggKCJzbWI6
-IGNsaWVudDogRml4IHVzZS1hZnRlci1mcmVlIG9mIG5ldHdvcmsgbmFtZXNwYWNlLiIpClNpZ25l
-ZC1vZmYtYnk6IEVuem8gTWF0c3VtaXlhIDxlbWF0c3VtaXlhQHN1c2UuZGU+ClNpZ25lZC1vZmYt
-Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xp
-ZW50L2Nvbm5lY3QuYyB8IDM2ICsrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQog
-MSBmaWxlIGNoYW5nZWQsIDI2IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAt
-LWdpdCBhL2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jIGIvZnMvc21iL2NsaWVudC9jb25uZWN0LmMK
-aW5kZXggMjM3MjUzOGExMjExLi5kZGNjOWU1MTRhMGUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGll
-bnQvY29ubmVjdC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jCkBAIC05ODcsOSArOTg3
-LDEzIEBAIGNsZWFuX2RlbXVsdGlwbGV4X2luZm8oc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2Vy
-dmVyKQogCW1zbGVlcCgxMjUpOwogCWlmIChjaWZzX3JkbWFfZW5hYmxlZChzZXJ2ZXIpKQogCQlz
-bWJkX2Rlc3Ryb3koc2VydmVyKTsKKwogCWlmIChzZXJ2ZXItPnNzb2NrZXQpIHsKIAkJc29ja19y
-ZWxlYXNlKHNlcnZlci0+c3NvY2tldCk7CiAJCXNlcnZlci0+c3NvY2tldCA9IE5VTEw7CisKKwkJ
-LyogUmVsZWFzZSBuZXRucyByZWZlcmVuY2UgZm9yIHRoZSBzb2NrZXQuICovCisJCXB1dF9uZXQo
-Y2lmc19uZXRfbnMoc2VydmVyKSk7CiAJfQogCiAJaWYgKCFsaXN0X2VtcHR5KCZzZXJ2ZXItPnBl
-bmRpbmdfbWlkX3EpKSB7CkBAIC0xMDM3LDYgKzEwNDEsNyBAQCBjbGVhbl9kZW11bHRpcGxleF9p
-bmZvKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKIAkJICovCiAJfQogCisJLyogUmVs
-ZWFzZSBuZXRucyByZWZlcmVuY2UgZm9yIHRoaXMgc2VydmVyLiAqLwogCXB1dF9uZXQoY2lmc19u
-ZXRfbnMoc2VydmVyKSk7CiAJa2ZyZWUoc2VydmVyLT5sZWFmX2Z1bGxwYXRoKTsKIAlrZnJlZShz
-ZXJ2ZXIpOwpAQCAtMTcxMyw2ICsxNzE4LDggQEAgY2lmc19nZXRfdGNwX3Nlc3Npb24oc3RydWN0
-IHNtYjNfZnNfY29udGV4dCAqY3R4LAogCiAJdGNwX3Nlcy0+b3BzID0gY3R4LT5vcHM7CiAJdGNw
-X3Nlcy0+dmFscyA9IGN0eC0+dmFsczsKKworCS8qIEdyYWIgbmV0bnMgcmVmZXJlbmNlIGZvciB0
-aGlzIHNlcnZlci4gKi8KIAljaWZzX3NldF9uZXRfbnModGNwX3NlcywgZ2V0X25ldChjdXJyZW50
-LT5uc3Byb3h5LT5uZXRfbnMpKTsKIAogCXRjcF9zZXMtPmNvbm5faWQgPSBhdG9taWNfaW5jX3Jl
-dHVybigmdGNwU2VzTmV4dElkKTsKQEAgLTE4NDQsNiArMTg1MSw3IEBAIGNpZnNfZ2V0X3RjcF9z
-ZXNzaW9uKHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCwKIG91dF9lcnJfY3J5cHRvX3JlbGVh
-c2U6CiAJY2lmc19jcnlwdG9fc2VjbWVjaF9yZWxlYXNlKHRjcF9zZXMpOwogCisJLyogUmVsZWFz
-ZSBuZXRucyByZWZlcmVuY2UgZm9yIHRoaXMgc2VydmVyLiAqLwogCXB1dF9uZXQoY2lmc19uZXRf
-bnModGNwX3NlcykpOwogCiBvdXRfZXJyOgpAQCAtMTg1Miw4ICsxODYwLDEwIEBAIGNpZnNfZ2V0
-X3RjcF9zZXNzaW9uKHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCwKIAkJCWNpZnNfcHV0X3Rj
-cF9zZXNzaW9uKHRjcF9zZXMtPnByaW1hcnlfc2VydmVyLCBmYWxzZSk7CiAJCWtmcmVlKHRjcF9z
-ZXMtPmhvc3RuYW1lKTsKIAkJa2ZyZWUodGNwX3Nlcy0+bGVhZl9mdWxscGF0aCk7Ci0JCWlmICh0
-Y3Bfc2VzLT5zc29ja2V0KQorCQlpZiAodGNwX3Nlcy0+c3NvY2tldCkgewogCQkJc29ja19yZWxl
-YXNlKHRjcF9zZXMtPnNzb2NrZXQpOworCQkJcHV0X25ldChjaWZzX25ldF9ucyh0Y3Bfc2VzKSk7
-CisJCX0KIAkJa2ZyZWUodGNwX3Nlcyk7CiAJfQogCXJldHVybiBFUlJfUFRSKHJjKTsKQEAgLTMx
-MzEsMjAgKzMxNDEsMjAgQEAgZ2VuZXJpY19pcF9jb25uZWN0KHN0cnVjdCBUQ1BfU2VydmVyX0lu
-Zm8gKnNlcnZlcikKIAkJc29ja2V0ID0gc2VydmVyLT5zc29ja2V0OwogCX0gZWxzZSB7CiAJCXN0
-cnVjdCBuZXQgKm5ldCA9IGNpZnNfbmV0X25zKHNlcnZlcik7Ci0JCXN0cnVjdCBzb2NrICpzazsK
-IAotCQlyYyA9IF9fc29ja19jcmVhdGUobmV0LCBzZmFtaWx5LCBTT0NLX1NUUkVBTSwKLQkJCQkg
-ICBJUFBST1RPX1RDUCwgJnNlcnZlci0+c3NvY2tldCwgMSk7CisJCXJjID0gc29ja19jcmVhdGVf
-a2VybihuZXQsIHNmYW1pbHksIFNPQ0tfU1RSRUFNLCBJUFBST1RPX1RDUCwgJnNlcnZlci0+c3Nv
-Y2tldCk7CiAJCWlmIChyYyA8IDApIHsKIAkJCWNpZnNfc2VydmVyX2RiZyhWRlMsICJFcnJvciAl
-ZCBjcmVhdGluZyBzb2NrZXRcbiIsIHJjKTsKIAkJCXJldHVybiByYzsKIAkJfQogCi0JCXNrID0g
-c2VydmVyLT5zc29ja2V0LT5zazsKLQkJX19uZXRuc190cmFja2VyX2ZyZWUobmV0LCAmc2stPm5z
-X3RyYWNrZXIsIGZhbHNlKTsKLQkJc2stPnNrX25ldF9yZWZjbnQgPSAxOwotCQlnZXRfbmV0X3Ry
-YWNrKG5ldCwgJnNrLT5uc190cmFja2VyLCBHRlBfS0VSTkVMKTsKLQkJc29ja19pbnVzZV9hZGQo
-bmV0LCAxKTsKKwkJLyoKKwkJICogR3JhYiBuZXRucyByZWZlcmVuY2UgZm9yIHRoZSBzb2NrZXQu
-CisJCSAqCisJCSAqIEl0J2xsIGJlIHJlbGVhc2VkIGhlcmUsIG9uIGVycm9yLCBvciBpbiBjbGVh
-bl9kZW11bHRpcGxleF9pbmZvKCkgdXBvbiBzZXJ2ZXIKKwkJICogdGVhcmRvd24uCisJCSAqLwor
-CQlnZXRfbmV0KG5ldCk7CiAKIAkJLyogQkIgb3RoZXIgc29ja2V0IG9wdGlvbnMgdG8gc2V0IEtF
-RVBBTElWRSwgTk9ERUxBWT8gKi8KIAkJY2lmc19kYmcoRllJLCAiU29ja2V0IGNyZWF0ZWRcbiIp
-OwpAQCAtMzE1OCw4ICszMTY4LDEwIEBAIGdlbmVyaWNfaXBfY29ubmVjdChzdHJ1Y3QgVENQX1Nl
-cnZlcl9JbmZvICpzZXJ2ZXIpCiAJfQogCiAJcmMgPSBiaW5kX3NvY2tldChzZXJ2ZXIpOwotCWlm
-IChyYyA8IDApCisJaWYgKHJjIDwgMCkgeworCQlwdXRfbmV0KGNpZnNfbmV0X25zKHNlcnZlcikp
-OwogCQlyZXR1cm4gcmM7CisJfQogCiAJLyoKIAkgKiBFdmVudHVhbGx5IGNoZWNrIGZvciBvdGhl
-ciBzb2NrZXQgb3B0aW9ucyB0byBjaGFuZ2UgZnJvbQpAQCAtMzE5Niw2ICszMjA4LDcgQEAgZ2Vu
-ZXJpY19pcF9jb25uZWN0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKIAlpZiAocmMg
-PCAwKSB7CiAJCWNpZnNfZGJnKEZZSSwgIkVycm9yICVkIGNvbm5lY3RpbmcgdG8gc2VydmVyXG4i
-LCByYyk7CiAJCXRyYWNlX3NtYjNfY29ubmVjdF9lcnIoc2VydmVyLT5ob3N0bmFtZSwgc2VydmVy
-LT5jb25uX2lkLCAmc2VydmVyLT5kc3RhZGRyLCByYyk7CisJCXB1dF9uZXQoY2lmc19uZXRfbnMo
-c2VydmVyKSk7CiAJCXNvY2tfcmVsZWFzZShzb2NrZXQpOwogCQlzZXJ2ZXItPnNzb2NrZXQgPSBO
-VUxMOwogCQlyZXR1cm4gcmM7CkBAIC0zMjA0LDYgKzMyMTcsOSBAQCBnZW5lcmljX2lwX2Nvbm5l
-Y3Qoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQogCWlmIChzcG9ydCA9PSBodG9ucyhS
-RkMxMDAxX1BPUlQpKQogCQlyYyA9IGlwX3JmYzEwMDFfY29ubmVjdChzZXJ2ZXIpOwogCisJaWYg
-KHJjIDwgMCkKKwkJcHV0X25ldChjaWZzX25ldF9ucyhzZXJ2ZXIpKTsKKwogCXJldHVybiByYzsK
-IH0KIAotLSAKMi40My4wCgo=
---0000000000004c2449062982f3e5--
