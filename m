@@ -1,63 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63E619EEB4;
-	Thu, 19 Dec 2024 17:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CFB1A76D5
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Dec 2024 18:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734627799; cv=none; b=oRbgUL1kHkhCwsSr7UB3EuQpnHd0wuQ2KSUPXdoZaEvlZqNM45MHsg481e3goYU4WAmL/NSqgXHeFHevH5j6IE4NdvYHh6QRX+/cy4RdyP+TaP1xPc0SlF+nl7vvKhOMctE9ZC+pCrf5qVXNBdruS28UynwiDitZLMnxDNRRLH4=
+	t=1734631223; cv=none; b=NEFFKmlvKJMLlN9dIPOK+nDGAme0uQt9hAOp6J1AhWoTs2AnfDwP+HuHhK0WuPwIoLMdPn3x1a+sfiAq1eGp4yfFfhiH1qfRxG9Pencup5tkxu+V8qPXzdDS4jBv0fOeYz8kd5WUg6mB/wN3EAbbsk0WUUTqux3Si7vv5aWzfqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734627799; c=relaxed/simple;
-	bh=zgAdfmFD8lINgqFzGU8Zrd6atG5xBFN28cpA7woERpU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=RO9Y3bbJDY0r6WWz4g9rPRcdXoazsVoU1SO85sL8FrfT/7pVk+A8q2gkflJGE9RLPGDyvYGtPIrqyOAz3L/kVtWzx7ZxKygserDQ+Na4m90nh0ZeLqmX1Eao4/m6x7X4yenIe5qSyx9Rgm0I90R5zqvzRUOlxr6ht6M/ADUDH0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYLjpomb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734631223; c=relaxed/simple;
+	bh=rbQa8Mze+5MENXGfW5CI6I5AO4HIqA72Srs5TVI3pv0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pu7AJDB7rKF8zOeKk6y3/qUhVtUqRyGeOcx61csqd3PHuEDtP/Mk8IrYiw3OroBw/q98z9hJvHzKH0I0uB6SGFMkiMUALFqT/DS5zBXhLu7QVo57WtwJgQ4aEUg6p6gAvL24lGxGBChVnNgrL+dbVO2NlTVy21p68LMvbyNg74Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DP3trsUG; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYLjpomb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7E7EC4CECE;
-	Thu, 19 Dec 2024 17:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734627798;
-	bh=zgAdfmFD8lINgqFzGU8Zrd6atG5xBFN28cpA7woERpU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=kYLjpombScnJwqv83EulZkdcJs6ar/xb7VWgSvSxT/KHBrqd7oPg/g0m9hkgTfSwe
-	 m3TQyH+qpXzTOk1eJ/Yke/NF7dQpGHRY9Zt92Tlj/bz6M/YmQWoZI2AaCNlVFGUZfu
-	 V0suNjOcEt7lbHua1gw9RMdk474blbiVPO35A9jMuBcvAauATbWJSxu5ifOMrTtruS
-	 +rXaFxhIOADuScAvtrh0hrKV1PH3pYEsrbrNhgb6Vr37xqWBbSL6Nb8uezl4TBMk5Y
-	 NYld6jHxcIcaQtp7SoAzcANmOzo2mgtb7Fw1zL/0i0vIYaupb9HzoalXuEULEsJ22R
-	 8FBqqpswn5vdQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADED63806656;
-	Thu, 19 Dec 2024 17:03:37 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msORKXoRLDHnu8H62W7ryRf2AdV4b-4R_3w=ep2g+yzsg@mail.gmail.com>
-References: <CAH2r5msORKXoRLDHnu8H62W7ryRf2AdV4b-4R_3w=ep2g+yzsg@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msORKXoRLDHnu8H62W7ryRf2AdV4b-4R_3w=ep2g+yzsg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.13-rc3-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: fe4ed2f09b492e3507615a053814daa8fafdecb1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 466b2d40f60ce874cb9b56dc88bd1a0880a43786
-Message-Id: <173462781630.2314669.8440604095424887757.pr-tracker-bot@kernel.org>
-Date: Thu, 19 Dec 2024 17:03:36 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DP3trsUG"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21675fd60feso12868735ad.2
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Dec 2024 10:00:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734631220; x=1735236020; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OYEnbng14Mvnn4vxsBylCr8HsKPPgoJTl0I9pX9025E=;
+        b=DP3trsUG+NJZ7jTKuDuohy5JbrGkFGhEr+pPaVrngcrLo8eiKb6Nr4zuL2O+TEjHTA
+         hEyJEk/oX72+OJhonzo5L2Qc7Msaz6zIE/shTC9iDowtrRqZ28FbLSpsABYX7VhXPUQX
+         Ncy3X8beM5TTrkR7JTnUAavXhg+scc8salKHH0Q8XFMTG8a9Mm5ySye5M8QXLlf+dyLz
+         eEHYmmHO8o8XCQPn7LbY1kGpvR6oWyHnXyuDYyBukRH+/SHhmgFmzvrbJ9XKkJbLu+ig
+         arlox+wPFDsVmV6LqHgz18NSkOOLX5DIyAX9qi+vCy5HKelsK1s1yDBVnaJBd9Y4ypHE
+         0Jzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734631220; x=1735236020;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OYEnbng14Mvnn4vxsBylCr8HsKPPgoJTl0I9pX9025E=;
+        b=I8r9xF+cpmQ7Xbi2zxehLuNITRievVU44GAacODHpkoOqyOCJpBJ7llswds4Rod2Gv
+         svFZEZGhvvGR1KTRrQu3LYGscmUr0fLV7y5t5pksY5H2q7l0NN6QZHW8Pa2tQA1+HFQ6
+         CHW0p9/rKzxh3LttzWP1fF8RMIWwif5ORTPlwfYEDAl+IpTZQ2aEAVSBzhXeLAFnasV4
+         Aul/6lcv2ehG2B3pKzKNDPUYJfyvwDI7vmiHai8SxrL9s3hoVzKey7HpiCGvI9sYo+G8
+         AsWk7F2TqvYt06bEdrvCK6x5SHWJAbLWiyNs5GsdogOhJfsFV3MwTk4ZbvCAa0J0IdVi
+         9lFA==
+X-Gm-Message-State: AOJu0Yy3La+oY7r3gqkiimW6ZpVFWMlJS+xm7ayh8kiI9EZ9+jbrgalZ
+	E3/T5QIUr7o6SdQk9L88opBYPj2YiVatw4lkFevQm7lu4Zi4BYLHdga2Vw==
+X-Gm-Gg: ASbGncsm5vafgYRTNPztbcL8uti3YsFWkZTT1hU+/WEvaSNoD3+G5tNy6wrIcSc6ZX8
+	zshAYU1loI69pW4XP2m2lWElkQBAYE8gRZn1sRHMGPhQUlLg3RDVneVF/KAVGdKH9RNTfJBx4pq
+	wPHHb/y+XbDZbgX/Ta4Eaun7Ve9/fx91zip/utTRZdPLUiaVKTooBJXqA6HqZ2M7ZBPB8uuaN3k
+	of167PzEE7O4aMOGkXIgKO/woJFhEOyaIgrdnqH1c9cQbmZYXr1D5Xsmrk0A3x3PkOuabwsNJVV
+	IxxJ25Mg
+X-Google-Smtp-Source: AGHT+IF/achmFZamRFtRwUu5QhsOnoXaOThsDT2gmpw6Axm1j0IvBR1p17Z4fXZnv9Oc/GjGp2/eug==
+X-Received: by 2002:a17:90b:544e:b0:2ee:7415:4768 with SMTP id 98e67ed59e1d1-2f4520f2fe3mr431402a91.17.1734631220135;
+        Thu, 19 Dec 2024 10:00:20 -0800 (PST)
+Received: from bharathsm-Virtual-Machine.. ([131.107.160.189])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2f2db9939b5sm4260034a91.1.2024.12.19.10.00.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2024 10:00:19 -0800 (PST)
+From: Bharath SM <bharathsm.hsk@gmail.com>
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
+To: linux-cifs@vger.kernel.org,
+	dhowells@redhat.com,
+	sfrench@samba.org,
+	sprasad@microsoft.com,
+	pc@manguebit.com
+Cc: Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH] smb: fix bytes written value in /proc/fs/cifs/Stats
+Date: Thu, 19 Dec 2024 23:28:50 +0530
+Message-ID: <20241219175850.34836-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Wed, 18 Dec 2024 17:40:56 -0600:
+With recent netfs apis changes, the bytes written
+value was not getting updated in /proc/fs/cifs/Stats.
+Fix this by updating tcon->bytes in write operations.
 
-> git://git.samba.org/ksmbd.git tags/v6.13-rc3-ksmbd-server-fixes
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/smb/client/smb2pdu.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/466b2d40f60ce874cb9b56dc88bd1a0880a43786
-
-Thank you!
-
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index c945b94318f8..959359301250 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -4840,6 +4840,8 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		if (written > wdata->subreq.len)
+ 			written &= 0xFFFF;
+ 
++		cifs_stats_bytes_written(tcon, written);
++
+ 		if (written < wdata->subreq.len)
+ 			wdata->result = -ENOSPC;
+ 		else
+@@ -5156,6 +5158,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 		cifs_dbg(VFS, "Send error in write = %d\n", rc);
+ 	} else {
+ 		*nbytes = le32_to_cpu(rsp->DataLength);
++		cifs_stats_bytes_written(io_parms->tcon, *nbytes);
+ 		trace_smb3_write_done(0, 0, xid,
+ 				      req->PersistentFileId,
+ 				      io_parms->tcon->tid,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.43.0
+
