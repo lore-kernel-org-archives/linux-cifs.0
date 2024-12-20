@@ -1,126 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7873E231A5F;
-	Fri, 20 Dec 2024 17:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BD7225A30;
+	Fri, 20 Dec 2024 22:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734714818; cv=none; b=c/hNPUrPPSFNFS/WUvlx72i2nkl7zJ7GsSPqty2V3Nmpy1zalzDC53Vupuz8EzXJrkgGdAwUdJyrcjDk3naqYC14qYuOOi/2NtxmDKA+P3tlcN0XrGUwG401aNgOC6ltaXQPsyuf4C5WLKLSnzs4YNyOWviymNgx03e5Fhks3oo=
+	t=1734732025; cv=none; b=oL7GRuQmIOlWLn01LhikEEeKh4Le8FQ7JWn8Bj4ROPETnLvP9kM52c3v3eXp2mL4B0R7LEIzVh4rGwAt0utGeO5wWpCjfUWl0KT6oUrZy88tFxnDFWxTwq8OcZYZR1GhnH77LPA1kbHgc46WDxRu59qUjyPbn2QuJB4b+GrYYiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734714818; c=relaxed/simple;
-	bh=o5vIrR/3iGxvCBLI7ftNNEp4g1Apz50WPA0CKE8r2bc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VqazfrrsANHJv6qy3hfYYWm+WsVHqx0FsUUXly9rgsBvdVowIegFNSGVG17vjuUHNM9nQ7WFTBPn9EHYg2eCpfOML+26JGySnpYh9w5FH3UCn/saeMmdfsrYkzwm7eb/41om+sAcTIaCxLXT9yd2ylIL9ZvXGhmNfL28TtWD+8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUbFGz0Y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734732025; c=relaxed/simple;
+	bh=N+HFtWfX0nosQZ66+74h5MBDUgYszOwWerV+0GmT2XA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZ1zbCO0MbdPaKRLp5kF4r+5sAtlvKZEZKvQqbq2ZZjwoG1HVn+U9TUz2/DRYB8s15tGpbiEPVZ2ODHaMYF3pGGQS8WC9/o0y1Gf8VYm4XXSVoBhhBPRrGHOHdbScSPkG+JJIYqW3+YO6nip0y3Wu3dzYh8mr+4JpozNBSvh0ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=A76R6d9x; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUbFGz0Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C2EFC4CECD;
-	Fri, 20 Dec 2024 17:13:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734714818;
-	bh=o5vIrR/3iGxvCBLI7ftNNEp4g1Apz50WPA0CKE8r2bc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BUbFGz0YZ64foXTuNyav1lR2TnlAYvtM2G7nTfrHyUaSNnsH3aFpv6Re6pipNVsy6
-	 /+hbEmkbgJgelLpso2Ho26E3l2L0k55dvQYGGR91vCuL/fJDp0x624aOlKO6Bxl3yE
-	 kx3Tk1e/oT2qxg9gYi/r3FVFT/tZwPvW9G99kHq0+xo5bZXG97q7o2sHRQf2eC6Iyi
-	 SBiqnsxQVKKBE4+s3M/UuhLM3LBtVSwdB/CgrBPV8RqYDm66bE7hcw1OmaE+ufSH2L
-	 G08Wz/o9iEeua4w0nCewPDxjyQ/2LBAEKVUY8Ye5y+XBn1XG3o7mDZEydqjd9dWOH/
-	 XDJVB0YCwR03w==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Hobin Woo <hobin.woo@samsung.com>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Yoonho Shin <yoonho.shin@samsung.com>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 08/12] ksmbd: retry iterate_dir in smb2_query_dir
-Date: Fri, 20 Dec 2024 12:13:13 -0500
-Message-Id: <20241220171317.512120-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241220171317.512120-1-sashal@kernel.org>
-References: <20241220171317.512120-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="A76R6d9x"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=7iUbqS7JWnZ3ax3uSOMzFtIQXtN7rO5/oWPnrE/sF50=; b=A76R6d9xE4oc0etr
+	4p/N70jyFP/e4TKttJARAM9ekG3bi8GNisFGRbjB9946X6uIKjJRJcI8i2igSzTjYpsDB6RolXwNY
+	c4G/N+Zd/XFTaMErN2r9wWeYzuSrpBgGe0QbZlrItklPFDDWSQQ8u0sM5vWLfpk+R9X1rtb4LcCCu
+	WdiA1DLX7b2f4IYfIOK+yI9OZkoqaP1mYSnfBRUT8vAVt0J4QQO6ktbFTcuCkShZM+IekyQtv+CaO
+	CJyxQNbm0OrAfRrmgTTOL9NtzgorI+VooWecepO7uqPPpdxaPYrMMRrfOJ034YqO2gnLPbvpdXHHz
+	pAGz4DxXbs1UHb0oCg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tOl2R-006cqt-0w;
+	Fri, 20 Dec 2024 22:00:03 +0000
+From: linux@treblig.org
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] cifs: Remove unused is_server_using_iface()
+Date: Fri, 20 Dec 2024 21:59:37 +0000
+Message-ID: <20241220215937.233721-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.121
 Content-Transfer-Encoding: 8bit
 
-From: Hobin Woo <hobin.woo@samsung.com>
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-[ Upstream commit 2b904d61a97e8ba79e3bc216ba290fd7e1d85028 ]
+The last use of is_server_using_iface() was removed in 2022 by
+commit aa45dadd34e4 ("cifs: change iface_list from array to sorted linked
+list")
 
-Some file systems do not ensure that the single call of iterate_dir
-reaches the end of the directory. For example, FUSE fetches entries from
-a daemon using 4KB buffer and stops fetching if entries exceed the
-buffer. And then an actor of caller, KSMBD, is used to fill the entries
-from the buffer.
-Thus, pattern searching on FUSE, files located after the 4KB could not
-be found and STATUS_NO_SUCH_FILE was returned.
+Remove it.
 
-Signed-off-by: Hobin Woo <hobin.woo@samsung.com>
-Reviewed-by: Sungjong Seo <sj1557.seo@samsung.com>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Tested-by: Yoonho Shin <yoonho.shin@samsung.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- fs/smb/server/smb2pdu.c | 12 +++++++++++-
- fs/smb/server/vfs.h     |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsproto.h |  2 --
+ fs/smb/client/sess.c      | 25 -------------------------
+ 2 files changed, 27 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index cb7756469621..bdd94339725c 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3988,6 +3988,7 @@ static bool __query_dir(struct dir_context *ctx, const char *name, int namlen,
- 	/* dot and dotdot entries are already reserved */
- 	if (!strcmp(".", name) || !strcmp("..", name))
- 		return true;
-+	d_info->num_scan++;
- 	if (ksmbd_share_veto_filename(priv->work->tcon->share_conf, name))
- 		return true;
- 	if (!match_pattern(name, namlen, priv->search_pattern))
-@@ -4148,8 +4149,17 @@ int smb2_query_dir(struct ksmbd_work *work)
- 	query_dir_private.info_level		= req->FileInformationClass;
- 	dir_fp->readdir_data.private		= &query_dir_private;
- 	set_ctx_actor(&dir_fp->readdir_data.ctx, __query_dir);
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 754417cb3294..d26f9bbb5382 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -614,8 +614,6 @@ int cifs_alloc_hash(const char *name, struct shash_desc **sdesc);
+ void cifs_free_hash(struct shash_desc **sdesc);
+ 
+ int cifs_try_adding_channels(struct cifs_ses *ses);
+-bool is_server_using_iface(struct TCP_Server_Info *server,
+-			   struct cifs_server_iface *iface);
+ bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface);
+ void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
+ 
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 3306fb655136..91d4d409cb1d 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -27,31 +27,6 @@ static int
+ cifs_ses_add_channel(struct cifs_ses *ses,
+ 		     struct cifs_server_iface *iface);
+ 
+-bool
+-is_server_using_iface(struct TCP_Server_Info *server,
+-		      struct cifs_server_iface *iface)
+-{
+-	struct sockaddr_in *i4 = (struct sockaddr_in *)&iface->sockaddr;
+-	struct sockaddr_in6 *i6 = (struct sockaddr_in6 *)&iface->sockaddr;
+-	struct sockaddr_in *s4 = (struct sockaddr_in *)&server->dstaddr;
+-	struct sockaddr_in6 *s6 = (struct sockaddr_in6 *)&server->dstaddr;
 -
-+again:
-+	d_info.num_scan = 0;
- 	rc = iterate_dir(dir_fp->filp, &dir_fp->readdir_data.ctx);
-+	/*
-+	 * num_entry can be 0 if the directory iteration stops before reaching
-+	 * the end of the directory and no file is matched with the search
-+	 * pattern.
-+	 */
-+	if (rc >= 0 && !d_info.num_entry && d_info.num_scan &&
-+	    d_info.out_buf_len > 0)
-+		goto again;
- 	/*
- 	 * req->OutputBufferLength is too small to contain even one entry.
- 	 * In this case, it immediately returns OutputBufferLength 0 to client.
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index e761dde2443e..cc47e71c4de1 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -43,6 +43,7 @@ struct ksmbd_dir_info {
- 	char		*rptr;
- 	int		name_len;
- 	int		out_buf_len;
-+	int		num_scan;
- 	int		num_entry;
- 	int		data_count;
- 	int		last_entry_offset;
+-	if (server->dstaddr.ss_family != iface->sockaddr.ss_family)
+-		return false;
+-	if (server->dstaddr.ss_family == AF_INET) {
+-		if (s4->sin_addr.s_addr != i4->sin_addr.s_addr)
+-			return false;
+-	} else if (server->dstaddr.ss_family == AF_INET6) {
+-		if (memcmp(&s6->sin6_addr, &i6->sin6_addr,
+-			   sizeof(i6->sin6_addr)) != 0)
+-			return false;
+-	} else {
+-		/* unknown family.. */
+-		return false;
+-	}
+-	return true;
+-}
+-
+ bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface)
+ {
+ 	int i;
 -- 
-2.39.5
+2.47.1
 
