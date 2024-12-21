@@ -1,119 +1,106 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BD7225A30;
-	Fri, 20 Dec 2024 22:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71711A841A;
+	Sat, 21 Dec 2024 03:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734732025; cv=none; b=oL7GRuQmIOlWLn01LhikEEeKh4Le8FQ7JWn8Bj4ROPETnLvP9kM52c3v3eXp2mL4B0R7LEIzVh4rGwAt0utGeO5wWpCjfUWl0KT6oUrZy88tFxnDFWxTwq8OcZYZR1GhnH77LPA1kbHgc46WDxRu59qUjyPbn2QuJB4b+GrYYiU=
+	t=1734751662; cv=none; b=LEciukzpZdBya2uwTZuRY0xXvW3ql/kovxXppp/PIjrVZ2ZoZR4b85MXPKPgdfJa4ocHUmRXsGz2g9IRKYYOss8Uuy9tCx8Gt0XaswDrlBC1kuRARRF2sWTadT9wpAjG8I/iZ6YJqSG5EeCo8VaOumezsOaZKe5rrRCi/r39xc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734732025; c=relaxed/simple;
-	bh=N+HFtWfX0nosQZ66+74h5MBDUgYszOwWerV+0GmT2XA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZ1zbCO0MbdPaKRLp5kF4r+5sAtlvKZEZKvQqbq2ZZjwoG1HVn+U9TUz2/DRYB8s15tGpbiEPVZ2ODHaMYF3pGGQS8WC9/o0y1Gf8VYm4XXSVoBhhBPRrGHOHdbScSPkG+JJIYqW3+YO6nip0y3Wu3dzYh8mr+4JpozNBSvh0ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=A76R6d9x; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1734751662; c=relaxed/simple;
+	bh=rubgnwj5/9ZxRG3BkSM0MTYYGd810ghgLYvBpI3gcS4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ja+DbJCm0k1TlfutrzaD70zYEt7Wu6HMnv3n4JFnlEoE49uHW4Ka3EA4NH4/VTKS8E01MJJl+h/DI0KKXciGiPi6gpPFtW/Mu7KKn6R/oVIkLbloWyL12syI6eOkhoITJz7v3E8vfofTr2fKs/4PEVe+0p3k/z6EacBq4zPRHyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvGH+K4+; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="A76R6d9x"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=7iUbqS7JWnZ3ax3uSOMzFtIQXtN7rO5/oWPnrE/sF50=; b=A76R6d9xE4oc0etr
-	4p/N70jyFP/e4TKttJARAM9ekG3bi8GNisFGRbjB9946X6uIKjJRJcI8i2igSzTjYpsDB6RolXwNY
-	c4G/N+Zd/XFTaMErN2r9wWeYzuSrpBgGe0QbZlrItklPFDDWSQQ8u0sM5vWLfpk+R9X1rtb4LcCCu
-	WdiA1DLX7b2f4IYfIOK+yI9OZkoqaP1mYSnfBRUT8vAVt0J4QQO6ktbFTcuCkShZM+IekyQtv+CaO
-	CJyxQNbm0OrAfRrmgTTOL9NtzgorI+VooWecepO7uqPPpdxaPYrMMRrfOJ034YqO2gnLPbvpdXHHz
-	pAGz4DxXbs1UHb0oCg==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tOl2R-006cqt-0w;
-	Fri, 20 Dec 2024 22:00:03 +0000
-From: linux@treblig.org
-To: sfrench@samba.org,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] cifs: Remove unused is_server_using_iface()
-Date: Fri, 20 Dec 2024 21:59:37 +0000
-Message-ID: <20241220215937.233721-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvGH+K4+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-54026562221so2445405e87.1;
+        Fri, 20 Dec 2024 19:27:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734751659; x=1735356459; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=96DeUPdpKFj/5zSnGwKoF9G0VXYJ5enVxaoUjuGpltc=;
+        b=NvGH+K4+1+qHUC1C0tOfNp7SZbvf3BOA9tZkrtdQkcdyNulBcAUtnsAS4bTBRZvc6T
+         wahsalIhaSufDEyVF6Rn6DyN7loCRfg/zyU8s4nJR50vY3pVQV7NLehSFBny3EooPqNq
+         3oszcd3yl55EWEyoDPy8gJN+n47WdXdBy4kLTr/czyPWvkP5tbm6TLSbusUIARnq8pQ3
+         Bl3GuE26a854yc7gqp8wGr2DYnechLMjQCww5+FF5emv+St8CWSCV1L1+bshfhrE8h5C
+         q5sVigWpglNyY7SnaHpdJqhz6/PMEv+uZShjJYHwPyZaxGN5zQDn1XGaMpKNe/O62j5H
+         Hi5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734751659; x=1735356459;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=96DeUPdpKFj/5zSnGwKoF9G0VXYJ5enVxaoUjuGpltc=;
+        b=vvf165R9NpZuSNjvIONXKMSZ66XmBIU9BxWxDWo1LgJX+3tGgdr5TCikR/NBRGdDm4
+         PPnSnnoOD8ML5DXDMA/z6IvEvfidUMuJfjTKEwiVV+bKcWV44SmMr+kvSD3VOlggKqi4
+         eNdJukl7zU+oAerGL/fEW9kjcwH/xOzGlWaXCJA72loNcyo/BPhCx9qRmqsXnZLng25s
+         CEwjD55PAgS9HAxs70PaX8dyYdpZd4/nkDuwa8KJOGFv4cTUsQh4YFQcVc5oMfmLYw0z
+         xKugcYt8BZhWEFidt5igG1MjtEXtPbvr/Eb1HO/BsLBFZ2zeuCC6Fqd88i1WHyKBejIz
+         +qMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVOv8JEte+Sut4sVTIvKbYQHwKT0nT4h5VF4P7y5RTe1796007Ysj/zIz3G2fYOmJzsSXNbq1oN6yt6@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXkcnTYtiG1Yf9t+D3ExDWIGXeEL994IKRLQ4Ladx+0XbL1TbQ
+	rAjlchTO1U0/B5yCPyoWgnjAdEwT17Iv6ga6ZjohRv9CH2DFdU7/zKk7ZqQygfeCAbN9beOsrIY
+	854dRa9mbJyUhZn+JHgZARMLxKgM6UMr/
+X-Gm-Gg: ASbGncvsmLyvX9JWUdxYnQkjpcOqt3UU5980U9ko8MnYUK2pUVfDZZqaWnMicKIe0lI
+	rQK/ykwz5a2iv6YGo3WiiyFFNDjuapA1UGKn/NA==
+X-Google-Smtp-Source: AGHT+IFXMQRlKzrykmm97yybUr97nM0J2zbFmJZlr1gaBp34CAIkKF9lDpLAAIP8vbh5XOwzARgN8FuB0ITye3oNxrM=
+X-Received: by 2002:a05:6512:12c9:b0:53e:389d:8ce4 with SMTP id
+ 2adb3069b0e04-54229549444mr1401487e87.34.1734751658996; Fri, 20 Dec 2024
+ 19:27:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 20 Dec 2024 21:27:28 -0600
+Message-ID: <CAH2r5mvT2k2ToswPuhzqtcxTjAa6mAEYgZ5ZOHUeE19jYq=xoA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Please pull the following changes since commit
+78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
 
-The last use of is_server_using_iface() was removed in 2022 by
-commit aa45dadd34e4 ("cifs: change iface_list from array to sorted linked
-list")
+  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
 
-Remove it.
+are available in the Git repository at:
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- fs/smb/client/cifsproto.h |  2 --
- fs/smb/client/sess.c      | 25 -------------------------
- 2 files changed, 27 deletions(-)
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.13-rc3-SMB3-client-fixes
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 754417cb3294..d26f9bbb5382 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -614,8 +614,6 @@ int cifs_alloc_hash(const char *name, struct shash_desc **sdesc);
- void cifs_free_hash(struct shash_desc **sdesc);
- 
- int cifs_try_adding_channels(struct cifs_ses *ses);
--bool is_server_using_iface(struct TCP_Server_Info *server,
--			   struct cifs_server_iface *iface);
- bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface);
- void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
- 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index 3306fb655136..91d4d409cb1d 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -27,31 +27,6 @@ static int
- cifs_ses_add_channel(struct cifs_ses *ses,
- 		     struct cifs_server_iface *iface);
- 
--bool
--is_server_using_iface(struct TCP_Server_Info *server,
--		      struct cifs_server_iface *iface)
--{
--	struct sockaddr_in *i4 = (struct sockaddr_in *)&iface->sockaddr;
--	struct sockaddr_in6 *i6 = (struct sockaddr_in6 *)&iface->sockaddr;
--	struct sockaddr_in *s4 = (struct sockaddr_in *)&server->dstaddr;
--	struct sockaddr_in6 *s6 = (struct sockaddr_in6 *)&server->dstaddr;
--
--	if (server->dstaddr.ss_family != iface->sockaddr.ss_family)
--		return false;
--	if (server->dstaddr.ss_family == AF_INET) {
--		if (s4->sin_addr.s_addr != i4->sin_addr.s_addr)
--			return false;
--	} else if (server->dstaddr.ss_family == AF_INET6) {
--		if (memcmp(&s6->sin6_addr, &i6->sin6_addr,
--			   sizeof(i6->sin6_addr)) != 0)
--			return false;
--	} else {
--		/* unknown family.. */
--		return false;
--	}
--	return true;
--}
--
- bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface)
- {
- 	int i;
+for you to fetch changes up to 92941c7f2c9529fac1b2670482d0ced3b46eac70:
+
+  smb: fix bytes written value in /proc/fs/cifs/Stats (2024-12-19
+12:14:11 -0600)
+
+----------------------------------------------------------------
+Four smb3 client fixes
+- fix regression in display of write stats
+- fix rmmod failure with network namespaces
+- two minor cleanup
+----------------------------------------------------------------
+Bharath SM (2):
+      smb: use macros instead of constants for leasekey size and
+default cifsattrs value
+      smb: fix bytes written value in /proc/fs/cifs/Stats
+
+Dragan Simic (1):
+      smb: client: Deduplicate "select NETFS_SUPPORT" in Kconfig
+
+Enzo Matsumiya (1):
+      smb: client: fix TCP timers deadlock after rmmod
+
+ fs/smb/client/Kconfig   |  1 -
+ fs/smb/client/cifsfs.c  |  2 +-
+ fs/smb/client/connect.c | 36 ++++++++++++++++++++++++++----------
+ fs/smb/client/smb2pdu.c |  5 ++++-
+ 4 files changed, 31 insertions(+), 13 deletions(-)
+
 -- 
-2.47.1
+Thanks,
 
+Steve
