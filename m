@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3040190054;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA0B191493;
 	Sun, 22 Dec 2024 15:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734880293; cv=none; b=RZGV1ZO2tyoXDKn+p04vBQAFmMPL5tbHO3tecNFT5D0u0uISYO4m7QeXdPmiAv2lDPEPhC0pczseDfRZ5opTZvhyw6z3wEzYnUDxUO8qgOTtvJinXouZdgpTh+VWCitTB2SNsKj3eWWphyFf4yZqn40SGq0Gey5BKUsgllPa28k=
+	t=1734880294; cv=none; b=raNw95aCsZBpgeJ+1GeN1M8ptmYoqbVIeLTzxKnSkJyCP4NZ1hTO6QBKiSJAIe3pT9Z4G2i+iFSJLw6ylVBuVi4jqaIiZFREmKyljoHvWC+K2v4Drnc9zorwpo06kxOe/OlolkFQM61VBLMkdZUU6d7dYNUOqCc5aGyMSrFOQOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734880293; c=relaxed/simple;
-	bh=XQ//vd9aMqG0wrIXFj0REfqyyWPJnL6J2ImYL2qPgwM=;
+	s=arc-20240116; t=1734880294; c=relaxed/simple;
+	bh=kEKyY3zHrznWfA5YcZAgbJQi1JdoYvKGAJGSmYsejl8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SYEs8FPLwQYfubs3QIAUQR9ojBc0wSDsPXl3YNf7z4y6UAKxpw8PuL+KIKeNe+pg8YPh8WLTOp1ll9o45j5c4yxh9WN2MYMo0xA2gkwwgODmNtkbqvHgPmT4CmYy2bYmaqUzoBnS27aCNBpCZ77A2XnXrPz/JanvDuXgsQ6+L5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XgguiDnr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hkBUTZFyl1cXfkMFrNHDIOdybmT9G0QoSk5Ayzv7dPmEZaJp0rmbRSXbMm/HmiafaVX3kN9WsrFLz17xj3q7nQjI9jKEWq79eU+ZRLiVdCnsz+E1EDA7kkEC3zAoo4nw6FuUn63KtdOLO6B9kSvAYz88e8o3PiCiN+o8r8NlNSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbYAOBVX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XgguiDnr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0220FC4CEDD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbYAOBVX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6080FC4CED3;
 	Sun, 22 Dec 2024 15:11:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734880293;
-	bh=XQ//vd9aMqG0wrIXFj0REfqyyWPJnL6J2ImYL2qPgwM=;
+	bh=kEKyY3zHrznWfA5YcZAgbJQi1JdoYvKGAJGSmYsejl8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XgguiDnr1e64ZvX16yH7zL+V7DVTHW7FsWwLDYiA2bGgWP3usf1glmCWkFBmrR6Nm
-	 FdL+lV3wkaTY5t5ppZ9uYsK9hlq4j8U56o4T1++huhMIBVhv+dQdGMgvKIkcBgjqUY
-	 dhxBsaAtSJEQMkNqHvQsJLmGMcvsRN9Pi8gmgTtU2B8r65mMvotnB2+kggKXqgfYks
-	 UzZnjrtVL7rYVOMJ0Y+4PVXJjxfuuOvLNPZI38pZaXIqRIFBLJibsN0PVIP6/T3+XQ
-	 FuDfvBxLcHi+vWVK+92rFV1KYsbMzx0rNCIbOYHQ/EdZppKMXJrNLDLzYN28W/NhJR
-	 dfaqbVAEVLrDA==
+	b=rbYAOBVX5uRVx9ok7BnjyD+HugNjxT/lnLe9lpTrne/9ePnr+Jotsz/LWj/GFPt7k
+	 nlQLWqyUihujC0xrOqo1xFUoEvSPmX7u90DKxABhKpB3RcAzYU12sVihLYTb+bFz4l
+	 zMQTF18dpIoT2wLslWAOnpopBXUt4uA8POY2Nkh/IgXnEKW8ydGot2bINHK6ulrOnr
+	 tBCliqtV24KPu2WkMu3U+IO1kf6nlyNQ3zRJ2mm2x5eRt1s45jnWd/bRpTAchb5r0h
+	 QJUZ90T13Kzgq/iJPTzkgsgGQr1yv0ZGp9XfbXGdsKRmFJJlKj25MVOfdZDByYw0Ea
+	 IUH6zHF+k9iWg==
 Received: by pali.im (Postfix)
-	id 1C4C6B9A; Sun, 22 Dec 2024 16:11:23 +0100 (CET)
+	id 99C45EEC; Sun, 22 Dec 2024 16:11:23 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] cifs: Change ->get_acl() API callback to request only for asked info
-Date: Sun, 22 Dec 2024 16:10:49 +0100
-Message-Id: <20241222151051.23917-3-pali@kernel.org>
+Subject: [PATCH 4/4] cifs: Add a new xattr system.smb3_ntsd_owner for getting or setting owner
+Date: Sun, 22 Dec 2024 16:10:51 +0100
+Message-Id: <20241222151051.23917-5-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241222151051.23917-1-pali@kernel.org>
 References: <20241222151051.23917-1-pali@kernel.org>
@@ -49,99 +49,110 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Currently ->get_acl() always request for ONWER, GROUP and DACL, even when
-only DACLs was requested. Change API callback to request only information
-for which the caller asked. Therefore when only DACLs requested, then SMB
-client send DACL-only request.
+Changing owner is controlled by DACL permission WRITE_OWNER. Changing DACL
+itself is controlled by DACL permisssion WRITE_DAC. Owner of the file has
+implicit WRITE_DAC permission even when it is not explicitly granted for
+owner by DACL.
+
+Reading DACL or owner is controlled only by one permission READ_CONTROL.
+WRITE_OWNER permission can be bypassed by the SeTakeOwnershipPrivilege,
+which is by default available for local administrators.
+
+So if the local administrator wants to access some file to which does not
+have access, it is required to first change owner to ourself and then
+change DACL permissions.
+
+Currently Linux SMB client does not support to do this, because it does not
+provide a way to change owner without touching DACL permissions.
+
+Fix this problem by introducing a new xattr for setting only owner part of
+security descriptor.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsacl.c |  4 ++--
- fs/smb/client/cifssmb.c |  3 +--
- fs/smb/client/smb2pdu.c |  4 +---
- fs/smb/client/xattr.c   | 15 +++++++++++----
- 4 files changed, 15 insertions(+), 11 deletions(-)
+ fs/smb/client/xattr.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index b07f3609adec..1054c62ade6c 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1546,7 +1546,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
- 	int rc = 0;
- 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
- 	struct smb_version_operations *ops;
--	const u32 info = 0;
-+	const u32 info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
- 
- 	cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
- 
-@@ -1600,7 +1600,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
- 	struct tcon_link *tlink;
- 	struct smb_version_operations *ops;
- 	bool mode_from_sid, id_from_sid;
--	const u32 info = 0;
-+	const u32 info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
- 	bool posix;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 2791c1cbadfa..2763db49b155 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -3386,8 +3386,7 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
- 	/* BB TEST with big acls that might need to be e.g. larger than 16K */
- 	pSMB->MaxSetupCount = 0;
- 	pSMB->Fid = fid; /* file handle always le */
--	pSMB->AclFlags = cpu_to_le32(CIFS_ACL_OWNER | CIFS_ACL_GROUP |
--				     CIFS_ACL_DACL | info);
-+	pSMB->AclFlags = cpu_to_le32(info);
- 	pSMB->ByteCount = cpu_to_le16(11); /* 3 bytes pad + 8 bytes parm */
- 	inc_rfc1001_len(pSMB, 11);
- 	iov[0].iov_base = (char *)pSMB;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 010eae9d6c47..ccded987f82b 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3928,12 +3928,10 @@ SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 	       u64 persistent_fid, u64 volatile_fid,
- 	       void **data, u32 *plen, u32 extra_info)
- {
--	__u32 additional_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
--				extra_info;
- 	*plen = 0;
- 
- 	return query_info(xid, tcon, persistent_fid, volatile_fid,
--			  0, SMB2_O_INFO_SECURITY, additional_info,
-+			  0, SMB2_O_INFO_SECURITY, extra_info,
- 			  SMB2_MAX_BUFFER_SIZE, MIN_SEC_DESC_LEN, data, plen);
- }
- 
 diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
-index 58a584f0b27e..7d49f38f01f3 100644
+index 95b8269851f3..b88fa04f5792 100644
 --- a/fs/smb/client/xattr.c
 +++ b/fs/smb/client/xattr.c
-@@ -320,10 +320,17 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
- 		if (pTcon->ses->server->ops->get_acl == NULL)
- 			goto out; /* rc already EOPNOTSUPP */
+@@ -32,6 +32,7 @@
+  */
+ #define SMB3_XATTR_CIFS_ACL "system.smb3_acl" /* DACL only */
+ #define SMB3_XATTR_CIFS_NTSD_SACL "system.smb3_ntsd_sacl" /* SACL only */
++#define SMB3_XATTR_CIFS_NTSD_OWNER "system.smb3_ntsd_owner" /* owner only */
+ #define SMB3_XATTR_CIFS_NTSD "system.smb3_ntsd" /* owner plus DACL */
+ #define SMB3_XATTR_CIFS_NTSD_FULL "system.smb3_ntsd_full" /* owner/DACL/SACL */
+ #define SMB3_XATTR_ATTRIB "smb3.dosattrib"  /* full name: user.smb3.dosattrib */
+@@ -39,7 +40,7 @@
+ /* BB need to add server (Samba e.g) support for security and trusted prefix */
  
--		if (handler->flags == XATTR_CIFS_NTSD_FULL) {
--			extra_info = SACL_SECINFO;
--		} else {
--			extra_info = 0;
-+		switch (handler->flags) {
-+		case XATTR_CIFS_NTSD_FULL:
-+			extra_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO | SACL_SECINFO;
+ enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
+-	XATTR_CIFS_NTSD_SACL,
++	XATTR_CIFS_NTSD_SACL, XATTR_CIFS_NTSD_OWNER,
+ 	XATTR_CIFS_NTSD, XATTR_CIFS_NTSD_FULL };
+ 
+ static int cifs_attrib_set(unsigned int xid, struct cifs_tcon *pTcon,
+@@ -163,6 +164,7 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 
+ 	case XATTR_CIFS_ACL:
+ 	case XATTR_CIFS_NTSD_SACL:
++	case XATTR_CIFS_NTSD_OWNER:
+ 	case XATTR_CIFS_NTSD:
+ 	case XATTR_CIFS_NTSD_FULL: {
+ 		struct smb_ntsd *pacl;
+@@ -190,6 +192,10 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 						    CIFS_ACL_GROUP |
+ 						    CIFS_ACL_DACL);
+ 					break;
++				case XATTR_CIFS_NTSD_OWNER:
++					aclflags = (CIFS_ACL_OWNER |
++						    CIFS_ACL_GROUP);
++					break;
+ 				case XATTR_CIFS_NTSD_SACL:
+ 					aclflags = CIFS_ACL_SACL;
+ 					break;
+@@ -315,6 +321,7 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 
+ 	case XATTR_CIFS_ACL:
+ 	case XATTR_CIFS_NTSD_SACL:
++	case XATTR_CIFS_NTSD_OWNER:
+ 	case XATTR_CIFS_NTSD:
+ 	case XATTR_CIFS_NTSD_FULL: {
+ 		/*
+@@ -334,6 +341,9 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 		case XATTR_CIFS_NTSD:
+ 			extra_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
+ 			break;
++		case XATTR_CIFS_NTSD_OWNER:
++			extra_info = OWNER_SECINFO | GROUP_SECINFO;
 +			break;
-+		case XATTR_CIFS_NTSD:
-+			extra_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
-+			break;
-+		case XATTR_CIFS_ACL:
-+		default:
-+			extra_info = DACL_SECINFO;
-+			break;
- 		}
- 		pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
- 				inode, full_path, &acllen, extra_info);
+ 		case XATTR_CIFS_NTSD_SACL:
+ 			extra_info = SACL_SECINFO;
+ 			break;
+@@ -465,6 +475,13 @@ static const struct xattr_handler smb3_ntsd_sacl_xattr_handler = {
+ 	.set = cifs_xattr_set,
+ };
+ 
++static const struct xattr_handler smb3_ntsd_owner_xattr_handler = {
++	.name = SMB3_XATTR_CIFS_NTSD_OWNER,
++	.flags = XATTR_CIFS_NTSD_OWNER,
++	.get = cifs_xattr_get,
++	.set = cifs_xattr_set,
++};
++
+ static const struct xattr_handler cifs_cifs_ntsd_xattr_handler = {
+ 	.name = CIFS_XATTR_CIFS_NTSD,
+ 	.flags = XATTR_CIFS_NTSD,
+@@ -511,6 +528,7 @@ const struct xattr_handler * const cifs_xattr_handlers[] = {
+ 	&cifs_cifs_acl_xattr_handler,
+ 	&smb3_acl_xattr_handler, /* alias for above since avoiding "cifs" */
+ 	&smb3_ntsd_sacl_xattr_handler,
++	&smb3_ntsd_owner_xattr_handler,
+ 	&cifs_cifs_ntsd_xattr_handler,
+ 	&smb3_ntsd_xattr_handler, /* alias for above since avoiding "cifs" */
+ 	&cifs_cifs_ntsd_full_xattr_handler,
 -- 
 2.20.1
 
