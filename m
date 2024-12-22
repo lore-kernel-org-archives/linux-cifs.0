@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9816218FC85;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8541190051;
 	Sun, 22 Dec 2024 15:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734882290; cv=none; b=jv9v0SuzvZMzF3nrpalhkZqJvocBQ6/msO+IxtEsuWu44kWlY3ljdnHd+TD9NEBTXJHf8zI3PfEpIMYzkyxQCOsLnUuvwWcxJCeuBiKtdcJTOxUPj7tKLZkYw0TzUN2GbhcEZPqE5LcxuDMXlI6eOlJ1ES1O3/bBpzuRRppjr/Q=
+	t=1734882290; cv=none; b=YDvYxZ8O2RKYIwszWkHMLV8Z+G40OI/J5BYDu3ZGjiWEkLebrXG6xlheQTH/TbRfhnR9prZ9JkErGaa+5ymqnS+hrM6ITA41fQWjKzQT7gWrCy9pefC1ErMgTg/BgV3g0F9OqDvpeORRzQLJQNqGy0kXXBLnNaaWPOtkvZlS/Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734882290; c=relaxed/simple;
-	bh=3onlQYxHbJn5sSsJa75CcVW58TTix8UZLOMI9JMW5UY=;
+	bh=vZKFm2ZEqacVyuVEfxw0+dRyd+24gQiBndfQn3r89J0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TBfQUgsNrX611VVeHBrT1cffe16Vh+cmUDYxqA6/BQsMH/N2DEz+GK/PukRRpWZb3mOk53ikfrU/k2G1r913ojwf7VccdCA+N7WXIOuggk91h0oIJtQacQvOEVZ1IS4PoVjba6oHCNeBelUr/uhJiIRBdl8d1glxxqAGOI+mRPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yu9ec+k7; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BRovRknQznlJ58V24nfExyRaFKuHjWU9+DKyCF13xas92eah70Tsj5gYtQA0eo7Asvb/DYSiEpKEokiapBYvlA6gzIT6rB58voXyiFqUQbFsyKxM4ysNq9tazAD21KCCvr31maelXw24NnT7o9Fy5Rjd1yBhCgo6UAL7o8jX2tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsoE+Ehf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yu9ec+k7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF67BC4CEDD;
-	Sun, 22 Dec 2024 15:44:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsoE+Ehf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70380C4CEDE;
+	Sun, 22 Dec 2024 15:44:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734882290;
-	bh=3onlQYxHbJn5sSsJa75CcVW58TTix8UZLOMI9JMW5UY=;
+	bh=vZKFm2ZEqacVyuVEfxw0+dRyd+24gQiBndfQn3r89J0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Yu9ec+k73YXeoiaYK8q4DDiLAxjwNaTRYBdnAy2F8Tq59EsWQ6H8KnZmjw1UcPh/6
-	 +6Jn/BAhbN/gk0zoOZ5Rs6Lz8xRlBFeQKzvNDWhKlglS9L/Nb1bX2CQpx+2ABOHect
-	 r+/DFGWJp4uESrbHLXZuMAcds3e7L7Y4z8UdD2U3dJctK3wQKpVnh3CMcWuCd5yjpA
-	 9HqRkkXG8ulmAd1YbQMB3oHzRUOApCaLg7Fx2eWQKRNXLVWYPrCH+u03T7HQmtMYXL
-	 tZO8tvUSQVAMwDooTStBwp2hZ+v4y8tUew3evBEvQ4+M0+ypjVXmsPuVdfu9qa+NCH
-	 zwh3YZinIsoyw==
+	b=MsoE+Ehf+u7SurXPtfe8LCch7VJqvwIp/F96oTySu30g3WMryazETaNVFDcUAZg61
+	 oWoWUo1cLNHcJygfH2x6iXgOVJ0cI0M3PybzgG1ckEKqVQ/1SzemCiA0MMnsCk0J2o
+	 qFEXs/acyckSrNiyWOmvjIv/e5mlADgVcgAEt+dklyMCnUb4GYgIWZePaFPEnC+bMU
+	 Gg20U5q9fgjVZ4ntTld00+kGzOdC1XtuyEGEY/Oa7OefUOoAkJD2a8LN5Vu4hZsWZa
+	 0jO7Y2lTEG/DQX1yejwJUiA13C3L84cuCFHini+Bwy+NanwtW8BAdGthfeqbh4TrQK
+	 4oEy1ZmZqiYVA==
 Received: by pali.im (Postfix)
-	id 17DC2982; Sun, 22 Dec 2024 16:44:40 +0100 (CET)
+	id 9ADD1EEC; Sun, 22 Dec 2024 16:44:40 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] cifs: Split parse_reparse_point callback to functions: get buffer and parse buffer
-Date: Sun, 22 Dec 2024 16:43:37 +0100
-Message-Id: <20241222154340.24104-2-pali@kernel.org>
+Subject: [PATCH 4/4] cifs: Check if server supports reparse points before using them
+Date: Sun, 22 Dec 2024 16:43:40 +0100
+Message-Id: <20241222154340.24104-5-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241222154340.24104-1-pali@kernel.org>
 References: <20241222154340.24104-1-pali@kernel.org>
@@ -49,184 +49,86 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Parsing reparse point buffer is generic for all SMB versions and is already
-implemented by global function parse_reparse_point().
-
-Getting reparse point buffer from the SMB response is SMB version specific,
-so introduce for it a new callback get_reparse_point_buffer.
-
-This functionality split is needed for next change - getting reparse point
-buffer without parsing it.
+Do not attempt to query or create reparse point when server fs does not
+support it. This will prevent creating unusable empty object on the server.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsglob.h |  6 ++----
- fs/smb/client/inode.c    | 11 +++++++----
- fs/smb/client/reparse.c  | 15 +++++----------
- fs/smb/client/reparse.h  |  5 +----
- fs/smb/client/smb1ops.c  | 17 ++++++-----------
- fs/smb/client/smb2ops.c  |  8 ++++----
- 6 files changed, 25 insertions(+), 37 deletions(-)
+ fs/smb/client/cifssmb.c   | 3 +++
+ fs/smb/client/link.c      | 3 ++-
+ fs/smb/client/smb2inode.c | 8 ++++++++
+ fs/smb/client/smb2ops.c   | 4 ++--
+ 4 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 369458d37f99..d4c60d85d7a4 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -629,10 +629,8 @@ struct smb_version_operations {
- 	bool (*is_status_io_timeout)(char *buf);
- 	/* Check for STATUS_NETWORK_NAME_DELETED */
- 	bool (*is_network_name_deleted)(char *buf, struct TCP_Server_Info *srv);
--	int (*parse_reparse_point)(struct cifs_sb_info *cifs_sb,
--				   const char *full_path,
--				   struct kvec *rsp_iov,
--				   struct cifs_open_info_data *data);
-+	struct reparse_data_buffer * (*get_reparse_point_buffer)(const struct kvec *rsp_iov,
-+								 u32 *plen);
- 	int (*create_reparse_symlink)(const unsigned int xid,
- 				      struct inode *inode,
- 				      struct dentry *dentry,
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index ed32d78971f8..b295d161373c 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1207,10 +1207,13 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 		/* Check for cached reparse point data */
- 		if (data->symlink_target || data->reparse.buf) {
- 			rc = 0;
--		} else if (iov && server->ops->parse_reparse_point) {
--			rc = server->ops->parse_reparse_point(cifs_sb,
--							      full_path,
--							      iov, data);
-+		} else if (iov && server->ops->get_reparse_point_buffer) {
-+			struct reparse_data_buffer *reparse_buf;
-+			u32 reparse_len;
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 2763db49b155..83365861a99c 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -2695,6 +2695,9 @@ int cifs_query_reparse_point(const unsigned int xid,
+ 	if (cap_unix(tcon->ses))
+ 		return -EOPNOTSUPP;
+ 
++	if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_REPARSE_POINTS))
++		return -EOPNOTSUPP;
 +
-+			reparse_buf = server->ops->get_reparse_point_buffer(iov, &reparse_len);
-+			rc = parse_reparse_point(reparse_buf, reparse_len,
-+						 cifs_sb, full_path, data);
- 			/*
- 			 * If the reparse point was not handled but it is the
- 			 * name surrogate which points to directory, then treat
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 6ffda4455f9b..f01214d6c5d4 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -1096,18 +1096,13 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
- 	}
- }
+ 	oparms = (struct cifs_open_parms) {
+ 		.tcon = tcon,
+ 		.cifs_sb = cifs_sb,
+diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
+index 6e6c09cc5ce7..a88253668286 100644
+--- a/fs/smb/client/link.c
++++ b/fs/smb/client/link.c
+@@ -643,7 +643,8 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
+ 	case CIFS_SYMLINK_TYPE_NATIVE:
+ 	case CIFS_SYMLINK_TYPE_NFS:
+ 	case CIFS_SYMLINK_TYPE_WSL:
+-		if (server->ops->create_reparse_symlink) {
++		if (server->ops->create_reparse_symlink &&
++		    (le32_to_cpu(pTcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_REPARSE_POINTS)) {
+ 			rc = server->ops->create_reparse_symlink(xid, inode,
+ 								 direntry,
+ 								 pTcon,
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 379ac3cbad1f..818537c83d41 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1289,6 +1289,14 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 	int rc;
+ 	int i;
  
--int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
--			     const char *full_path,
--			     struct kvec *rsp_iov,
--			     struct cifs_open_info_data *data)
-+struct reparse_data_buffer *smb2_get_reparse_point_buffer(const struct kvec *rsp_iov,
-+							  u32 *plen)
- {
--	struct reparse_data_buffer *buf;
- 	struct smb2_ioctl_rsp *io = rsp_iov->iov_base;
--	u32 plen = le32_to_cpu(io->OutputCount);
--
--	buf = (struct reparse_data_buffer *)((u8 *)io +
--					     le32_to_cpu(io->OutputOffset));
--	return parse_reparse_point(buf, plen, cifs_sb, full_path, data);
-+	*plen = le32_to_cpu(io->OutputCount);
-+	return (struct reparse_data_buffer *)((u8 *)io +
-+					      le32_to_cpu(io->OutputOffset));
- }
- 
- static void wsl_to_fattr(struct cifs_open_info_data *data,
-diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
-index 5a753fec7e2c..c17130657def 100644
---- a/fs/smb/client/reparse.h
-+++ b/fs/smb/client/reparse.h
-@@ -119,9 +119,6 @@ int smb2_create_reparse_symlink(const unsigned int xid, struct inode *inode,
- int smb2_mknod_reparse(unsigned int xid, struct inode *inode,
- 		       struct dentry *dentry, struct cifs_tcon *tcon,
- 		       const char *full_path, umode_t mode, dev_t dev);
--int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
--			     const char *full_path,
--			     struct kvec *rsp_iov,
--			     struct cifs_open_info_data *data);
-+struct reparse_data_buffer *smb2_get_reparse_point_buffer(const struct kvec *rsp_iov, u32 *len);
- 
- #endif /* _CIFS_REPARSE_H */
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index 3667fb94cbf5..01a7d6b23c7e 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -993,18 +993,13 @@ static int cifs_query_symlink(const unsigned int xid,
- 	return rc;
- }
- 
--static int cifs_parse_reparse_point(struct cifs_sb_info *cifs_sb,
--				    const char *full_path,
--				    struct kvec *rsp_iov,
--				    struct cifs_open_info_data *data)
-+static struct reparse_data_buffer *cifs_get_reparse_point_buffer(const struct kvec *rsp_iov,
-+								 u32 *plen)
- {
--	struct reparse_data_buffer *buf;
- 	TRANSACT_IOCTL_RSP *io = rsp_iov->iov_base;
--	u32 plen = le16_to_cpu(io->ByteCount);
--
--	buf = (struct reparse_data_buffer *)((__u8 *)&io->hdr.Protocol +
--					     le32_to_cpu(io->DataOffset));
--	return parse_reparse_point(buf, plen, cifs_sb, full_path, data);
-+	*plen = le16_to_cpu(io->ByteCount);
-+	return (struct reparse_data_buffer *)((__u8 *)&io->hdr.Protocol +
-+					      le32_to_cpu(io->DataOffset));
- }
- 
- static bool
-@@ -1139,7 +1134,7 @@ struct smb_version_operations smb1_operations = {
- 	.rename = CIFSSMBRename,
- 	.create_hardlink = CIFSCreateHardLink,
- 	.query_symlink = cifs_query_symlink,
--	.parse_reparse_point = cifs_parse_reparse_point,
-+	.get_reparse_point_buffer = cifs_get_reparse_point_buffer,
- 	.open = cifs_open_file,
- 	.set_fid = cifs_set_fid,
- 	.close = cifs_close_file,
++	/*
++	 * If server filesystem does not support reparse points then do not
++	 * attempt to create reparse point. This will prevent creating unusable
++	 * empty object on the server.
++	 */
++	if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_REPARSE_POINTS))
++		return ERR_PTR(-EOPNOTSUPP);
++
+ 	oparms = CIFS_OPARMS(cifs_sb, tcon, full_path,
+ 			     SYNCHRONIZE | DELETE |
+ 			     FILE_READ_ATTRIBUTES |
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 87cb1872db28..0a91f18d4a54 100644
+index 0a91f18d4a54..50adb5cdfce9 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -5270,7 +5270,7 @@ struct smb_version_operations smb20_operations = {
- 	.unlink = smb2_unlink,
- 	.rename = smb2_rename_path,
- 	.create_hardlink = smb2_create_hardlink,
--	.parse_reparse_point = smb2_parse_reparse_point,
-+	.get_reparse_point_buffer = smb2_get_reparse_point_buffer,
- 	.query_mf_symlink = smb3_query_mf_symlink,
- 	.create_mf_symlink = smb3_create_mf_symlink,
- 	.create_reparse_symlink = smb2_create_reparse_symlink,
-@@ -5373,7 +5373,7 @@ struct smb_version_operations smb21_operations = {
- 	.unlink = smb2_unlink,
- 	.rename = smb2_rename_path,
- 	.create_hardlink = smb2_create_hardlink,
--	.parse_reparse_point = smb2_parse_reparse_point,
-+	.get_reparse_point_buffer = smb2_get_reparse_point_buffer,
- 	.query_mf_symlink = smb3_query_mf_symlink,
- 	.create_mf_symlink = smb3_create_mf_symlink,
- 	.create_reparse_symlink = smb2_create_reparse_symlink,
-@@ -5480,7 +5480,7 @@ struct smb_version_operations smb30_operations = {
- 	.unlink = smb2_unlink,
- 	.rename = smb2_rename_path,
- 	.create_hardlink = smb2_create_hardlink,
--	.parse_reparse_point = smb2_parse_reparse_point,
-+	.get_reparse_point_buffer = smb2_get_reparse_point_buffer,
- 	.query_mf_symlink = smb3_query_mf_symlink,
- 	.create_mf_symlink = smb3_create_mf_symlink,
- 	.create_reparse_symlink = smb2_create_reparse_symlink,
-@@ -5596,7 +5596,7 @@ struct smb_version_operations smb311_operations = {
- 	.unlink = smb2_unlink,
- 	.rename = smb2_rename_path,
- 	.create_hardlink = smb2_create_hardlink,
--	.parse_reparse_point = smb2_parse_reparse_point,
-+	.get_reparse_point_buffer = smb2_get_reparse_point_buffer,
- 	.query_mf_symlink = smb3_query_mf_symlink,
- 	.create_mf_symlink = smb3_create_mf_symlink,
- 	.create_reparse_symlink = smb2_create_reparse_symlink,
+@@ -5202,7 +5202,7 @@ static int smb2_make_node(unsigned int xid, struct inode *inode,
+ 			  const char *full_path, umode_t mode, dev_t dev)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+-	int rc;
++	int rc = -EOPNOTSUPP;
+ 
+ 	/*
+ 	 * Check if mounted with mount parm 'sfu' mount parm.
+@@ -5213,7 +5213,7 @@ static int smb2_make_node(unsigned int xid, struct inode *inode,
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL) {
+ 		rc = cifs_sfu_make_node(xid, inode, dentry, tcon,
+ 					full_path, mode, dev);
+-	} else {
++	} else if (le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_REPARSE_POINTS) {
+ 		rc = smb2_mknod_reparse(xid, inode, dentry, tcon,
+ 					full_path, mode, dev);
+ 	}
 -- 
 2.20.1
 
