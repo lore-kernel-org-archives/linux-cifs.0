@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D46191494;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAC31925AF;
 	Sun, 22 Dec 2024 16:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734885098; cv=none; b=C+fc5PQPiVSgA1W9ukjyCJpjdunxZOHcw1A0Z5LdaLFiw8WsGduaFQxipXaEdLcEbJpSet9HmCP+yRB6hKo7+65l+oUJQzG7VLMYcY/UoaaLrD4kTDI6VLzpQdRuFuAjObX73XCSprG+evLIudganzXz8rCsQ5a14ZoUL5NcI08=
+	t=1734885098; cv=none; b=AcW19yJK61GvKv/9RXEXLK1M/GYQ1qaPNlHWy55qOViYttCGduzoxZGIPXiekcMWUcH4/YWuFJxpBS7Niv3+OzLYvtG383tuQhyHHN1mpXbYLSHQCF84TDm79WAqteGjiRxX9WPsH5nx8i2nUXFSglln7sZYixNnGjA3PSTn74Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734885098; c=relaxed/simple;
-	bh=NRRD2uElNzPne/pT6ZpTaz7mf1/D4UiWgY+uhccv2l0=;
+	bh=roMvo+vaCtZhM+ffAECwM9kTdTDexaaoB04VHkeB1IU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DiV6B+CR3NvlWT+eHLJowe/djC8s2MZ6rZWwSmto8+4je4dp12G5vL3uWNnItEpEjgibZAmevtur7CJxW8JzGYrOLKg5ni4ehN/2pz8hu4BCdJ6e63aGYYS7l8Iezv9kTDF0bcvMEXKlrHdLpLx69SaPobgGw2T5Q0nFSo/0cP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGjb6QIJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=c1XnYZYWmvU/EhDYtf/jo5UlNJsIg0mdFIgH/QtSK3gBHEoOTfQkZme10fgSOeATsYnlOmxaY3f2GAGdVkFV3oxpFBz06Etudm6esp5tFCQBlqjhBWI9Jd9JiCIcemRbwVX7i1Yu25O4FrFu+C4kItaMriUqIBj2wvJaNHjk8Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bou9qV7T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGjb6QIJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06F4C4CEDC;
-	Sun, 22 Dec 2024 16:31:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bou9qV7T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18DD2C4CEDF;
+	Sun, 22 Dec 2024 16:31:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734885098;
-	bh=NRRD2uElNzPne/pT6ZpTaz7mf1/D4UiWgY+uhccv2l0=;
+	bh=roMvo+vaCtZhM+ffAECwM9kTdTDexaaoB04VHkeB1IU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uGjb6QIJzmtCS6Us5/vgHCRG5Vs9dxlv4AToOib9mD3SIXRdvR6XXFKJb3oLxZVuC
-	 lIEL7sZYw5YHL7vESYxduYa1VDkxVeerCoK11RZEgdab2KmAcxVCu2KBQq9wITvHAD
-	 6bSz76yqRJH8EqkFPp3RKMRXfpBqo653tV3z1EsvU6ZYEMuBHaFPAa0njELHdqtMUF
-	 emL+C6H5cLCLdkhoX0/YEmg+j1JvTPyVfj1fPKFrSRemN1H6asA03Ren29YLTJ42SY
-	 66Twz/m2FFOLiZS5lHXxHHzKOcYX2D4+GdORmAGYpDL7J+CUlmJ6S7fp28UMk8WWtF
-	 DQsDtUeNu3icQ==
+	b=bou9qV7TQncyJim9svbw5bDJcXfV9Hz/dIiV1AVFg0lVZ03jVFE9h3sKIKPfjq0P8
+	 5+DbhVH4jukBG+e1U4WQJvGh2FYEJn5jgQ/DTZyRvD3bs/XHt1pciXA060sAB+UnE1
+	 nm8Hdt29RGguaqEn59K8sDruan4hqI+IyY1mrkaa2zvwJ9pcrK9cvi57ZkFF/85Jx/
+	 MRxgL0l6EJXjzJyeH5dT0VdrurGLIw0JNZziAfDO7xOg4kBK0+YQZCybHmTQR5jEwH
+	 41k+510l3/zyJ1sQ205TcRvkyOD1dCJsc3LbbBqigUoXIaP+aNuBAhqmhZy3NFEDBG
+	 SSWEqUT6MONtQ==
 Received: by pali.im (Postfix)
-	id BC88EF38; Sun, 22 Dec 2024 17:31:27 +0100 (CET)
+	id EF695F3C; Sun, 22 Dec 2024 17:31:27 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 5/6] cifs: Fix negotiate retry functionality
-Date: Sun, 22 Dec 2024 17:30:49 +0100
-Message-Id: <20241222163050.24359-6-pali@kernel.org>
+Subject: [PATCH 6/6] cifs: Set default Netbios RFC1001 server name to hostname in UNC
+Date: Sun, 22 Dec 2024 17:30:50 +0100
+Message-Id: <20241222163050.24359-7-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241222163050.24359-1-pali@kernel.org>
 References: <20241222163050.24359-1-pali@kernel.org>
@@ -49,96 +49,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-SMB negotiate retry functionality in cifs_negotiate() is currently broken
-and does not work when doing socket reconnect. Caller of this function,
-which is cifs_negotiate_protocol() requires that tcpStatus after successful
-execution of negotiate callback stay in CifsInNegotiate. But if the
-CIFSSMBNegotiate() called from cifs_negotiate() fails due to connection
-issues then tcpStatus is changed as so repeated CIFSSMBNegotiate() call
-does not help.
+Windows SMB servers (including SMB2+) which are working over RFC1001
+require that Netbios server name specified in RFC1001 Session Request
+packet is same as the UNC host name. Netbios server name can be already
+specified manually via -o servern= option.
 
-Fix this problem by moving retrying code from negotiate callback (which is
-either cifs_negotiate() or smb2_negotiate()) to cifs_negotiate_protocol()
-which is caller of those callbacks. This allows to properly handle and
-implement correct transistions between tcpStatus states as function
-cifs_negotiate_protocol() already handles it.
-
-With this change, cifs_negotiate_protocol() now handles also -EAGAIN error
-set by the RFC1002_NEGATIVE_SESSION_RESPONSE processing after reconnecting
-with NetBIOS session.
+With this change the RFC1001 server name is set automatically by extracting
+the hostname from the mount source.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/connect.c | 10 ++++++++++
- fs/smb/client/smb1ops.c |  7 -------
- fs/smb/client/smb2ops.c |  3 ---
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ fs/smb/client/fs_context.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 9a76cdf71086..fdeeb0b9000d 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -4206,11 +4206,13 @@ int
- cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses,
- 			struct TCP_Server_Info *server)
- {
-+	bool in_retry = false;
- 	int rc = 0;
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 3774f02f45c9..0bda7ada4f81 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1125,6 +1125,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	int i, opt;
+ 	bool is_smb3 = !strcmp(fc->fs_type->name, "smb3");
+ 	bool skip_parsing = false;
++	char *hostname;
  
- 	if (!server->ops->need_neg || !server->ops->negotiate)
- 		return -ENOSYS;
+ 	cifs_dbg(FYI, "CIFS: parsing cifs mount option '%s'\n", param->key);
  
-+retry:
- 	/* only send once per connect */
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus != CifsGood &&
-@@ -4230,6 +4232,14 @@ cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses,
- 	spin_unlock(&server->srv_lock);
- 
- 	rc = server->ops->negotiate(xid, ses, server);
-+	if (rc == -EAGAIN) {
-+		/* Allow one retry attempt */
-+		if (!in_retry) {
-+			in_retry = true;
-+			goto retry;
+@@ -1447,6 +1448,16 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			cifs_errorf(fc, "OOM when copying UNC string\n");
+ 			goto cifs_parse_mount_err;
+ 		}
++		hostname = extract_hostname(ctx->UNC);
++		if (IS_ERR(hostname)) {
++			cifs_errorf(fc, "Cannot extract hostname from UNC string\n");
++			goto cifs_parse_mount_err;
 +		}
-+		rc = -EHOSTDOWN;
-+	}
- 	if (rc == 0) {
- 		spin_lock(&server->srv_lock);
- 		if (server->tcpStatus == CifsInNegotiate)
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index 01a7d6b23c7e..0533aca770fc 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -426,13 +426,6 @@ cifs_negotiate(const unsigned int xid,
- {
- 	int rc;
- 	rc = CIFSSMBNegotiate(xid, ses, server);
--	if (rc == -EAGAIN) {
--		/* retry only once on 1st time connection */
--		set_credits(server, 1);
--		rc = CIFSSMBNegotiate(xid, ses, server);
--		if (rc == -EAGAIN)
--			rc = -EHOSTDOWN;
--	}
- 	return rc;
- }
- 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 50adb5cdfce9..119ecb6641d1 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -464,9 +464,6 @@ smb2_negotiate(const unsigned int xid,
- 	server->CurrentMid = 0;
- 	spin_unlock(&server->mid_lock);
- 	rc = SMB2_negotiate(xid, ses, server);
--	/* BB we probably don't need to retry with modern servers */
--	if (rc == -EAGAIN)
--		rc = -EHOSTDOWN;
- 	return rc;
- }
- 
++		/* last byte, type, is 0x20 for servr type */
++		memset(ctx->target_rfc1001_name, 0x20, RFC1001_NAME_LEN_WITH_NULL);
++		for (i = 0; i < RFC1001_NAME_LEN && hostname[i] != 0; i++)
++			ctx->target_rfc1001_name[i] = toupper(hostname[i]);
++		kfree(hostname);
+ 		break;
+ 	case Opt_user:
+ 		kfree(ctx->username);
 -- 
 2.20.1
 
