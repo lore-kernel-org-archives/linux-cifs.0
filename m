@@ -1,46 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B82F18CBFB;
-	Sun, 22 Dec 2024 13:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F169F38385;
+	Sun, 22 Dec 2024 14:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734873682; cv=none; b=hRHXWPTUtqom7ie4dEJl+8kusVkqm95A8f9YPEH2SuSq9Vhcd+vsDpGMGOoGAVcOsaF9A5wwtp+iBzA28EYi16yd9PkDb46L7Z1fF4xBIgsfX+MTGa+EQGLiBIVPjWlYiXZ3NIEIIpUPxhjU2EXi3d7k2+prk3rHW+gArvbBAtM=
+	t=1734879572; cv=none; b=dxkasNMbzF/PUw3N4d3ZW1yWHgrVbFGb0P+wO1F1keCrP5NlBJ4FRYrHd2g4U6IBdaJYQzqWN/6pGLjyeTopsTR42y/gk2xO39gJum/P9fIV3pL0LDzE8eqvbUgV7nsxqyHFD/7U22jcUpsYrf6PdtyGllnZADBf4JbQbE0Zda0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734873682; c=relaxed/simple;
-	bh=0Apiqfb+mW1FlytI+dSVCzNPl/9NWYiL87JTDyfjZao=;
+	s=arc-20240116; t=1734879572; c=relaxed/simple;
+	bh=wwqBsWcxZC84pRk3Bl1cSD+E6PrIZa85GEnwzxufZKc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q2RuGayPiXn4FOAJwbsmT5t6qFNNhlVFEZ1Y7Yg2MfwO3wsNA2WMlFdQhuv7Gbb5nNne6QNcEwiQvCePH97PuinQCT7cf3cFPTcbesVuyMK+gyXEEJ9//pBaE3W5ZO9jRVG+1gDffeBYYI3+rDeKrtPmhXrIEiI1pmhuaRt2OLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5b3OyDy; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OrsBwEeub+qdTkmsZ8MLaAt7iu8X1Q1yABpcpfssQds/VOEonc5EOqYed4fcmd3qRbvzrikBHGqt5Y9v+I4LiZYxNflimBbjJLt9bZ/wiaaLFLiZDPuBrTvl3YLb33yan0L+4vAd1KzHHXGg4qFFii5Jux1SDRfe21TBalQaEzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHuYvL2F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5b3OyDy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A419BC4CED6;
-	Sun, 22 Dec 2024 13:21:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHuYvL2F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 691B6C4CECD;
+	Sun, 22 Dec 2024 14:59:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734873682;
-	bh=0Apiqfb+mW1FlytI+dSVCzNPl/9NWYiL87JTDyfjZao=;
+	s=k20201202; t=1734879571;
+	bh=wwqBsWcxZC84pRk3Bl1cSD+E6PrIZa85GEnwzxufZKc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e5b3OyDyR75Uz1X2IBOxRwlZ2pxDyoqgATeETOdwLRy2bos8Rf4/j66PhFWwZq5Cr
-	 U4FkLcspZ/h0qZ4fRHZ0ZPxtUbwm1RdSayIdfpZrmjscaQ2lJz6p6AYcwx0qyePCaW
-	 qYPiv5gT1WDIpr9H8+4jTbAxwEJBlWt5+ZbgYtzw+DX2VHh1vD0SzoFh/ceHTpKz1g
-	 Q+CG8z4EPfOvNy1j9GyANgOPrphMVY3ZWWAzClMBOwtzWlc2+mHtFpo8E8ONc/7hWW
-	 thFnEji7foRVXlsNOqXaKNwDLk4WaBjvXWRDGVP3psvpsqBoMY6LwkinnApwidHcgY
-	 QDE04lKIzIVQA==
+	b=nHuYvL2F0rbjMT3L/GH1PWeTxTOz/OmZPs3e2dyb9/fQtVJCHFOJcX8hLgSIAcZwZ
+	 MQzcWnbei8vJfi9DbCv8KqtsFVGGTBDj1W23laSVVr2iqlgism0oOoFww6dB8VrtAZ
+	 QPY3VerPtMlhnrFv0zpZcaPSPnnMpBjDh/g0/XTV/CK/mIFiyqOPd9cMAND0ls2RX8
+	 ndi3zBJHEOH9C9QE0pFx7WrQ33MmoFfySXd0EqZjIvcHVJJ84SqrF39cJt7w5Qf4Df
+	 i3B50nuh1uyjRG5RiVC/KwY9000uzmiScdMx/yKgo0WWFo8xuIDCSjYclXY1beAVYr
+	 1yjIKGpEEspqg==
 Received: by pali.im (Postfix)
-	id A6803B9A; Sun, 22 Dec 2024 14:21:11 +0100 (CET)
+	id B56B2B9A; Sun, 22 Dec 2024 15:59:21 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] cifs: Improve stat() to work also without FILE_READ_ATTRIBUTES
-Date: Sun, 22 Dec 2024 14:20:29 +0100
-Message-Id: <20241222132029.23431-3-pali@kernel.org>
+Subject: [PATCH 2/4] cifs: Treat unhandled directory name surrogate reparse points as mount directory nodes
+Date: Sun, 22 Dec 2024 15:58:43 +0100
+Message-Id: <20241222145845.23801-3-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241222132029.23431-1-pali@kernel.org>
-References: <20241005160826.20825-1-pali@kernel.org>
- <20241222132029.23431-1-pali@kernel.org>
+In-Reply-To: <20241222145845.23801-1-pali@kernel.org>
+References: <20241222145845.23801-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,174 +49,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-If SMB2_OP_QUERY_INFO (called when POSIX extensions are not used) failed
-with STATUS_ACCESS_DENIED then it means that caller does not have
-permission to open the path with FILE_READ_ATTRIBUTES access and therefore
-cannot issue SMB2_OP_QUERY_INFO command.
+If the reparse point was not handled (indicated by the -EOPNOTSUPP from
+ops->parse_reparse_point() call) but reparse tag is of type name surrogate
+directory type, then treat is as a new mount point.
 
-This will result in the -EACCES error from stat() sycall.
+Name surrogate reparse point represents another named entity in the system.
 
-There is an alternative way how to query limited information about path but
-still suitable for stat() syscall. SMB2 OPEN/CREATE operation returns in
-its successful response subset of query information.
-
-So try to open the path without FILE_READ_ATTRIBUTES but with
-MAXIMUM_ALLOWED access which will grant the maximum possible access to the
-file and the response will contain required query information for stat()
-syscall.
-
-This will improve smb2_query_path_info() to query also files which do not
-grant FILE_READ_ATTRIBUTES access to caller.
+From SMB client point of view, this another entity is resolved on the SMB
+server, and server serves its content automatically. Therefore from Linux
+client point of view, this name surrogate reparse point of directory type
+crosses mount point.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifspdu.h   |  1 +
- fs/smb/client/smb2file.c  |  3 +-
- fs/smb/client/smb2glob.h  |  1 +
- fs/smb/client/smb2inode.c | 71 ++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 74 insertions(+), 2 deletions(-)
+ fs/smb/client/inode.c    | 13 +++++++++++++
+ fs/smb/common/smbfsctl.h |  3 +++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index ee78bb6741d6..d0e7fbc5cacd 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -217,6 +217,7 @@
- 					  /* of an input/output request       */
- #define SYSTEM_SECURITY       0x01000000  /* The system access control list   */
- 					  /* can be read and changed          */
-+#define MAXIMUM_ALLOWED       0x02000000
- #define GENERIC_ALL           0x10000000
- #define GENERIC_EXECUTE       0x20000000
- #define GENERIC_WRITE         0x40000000
-diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index ff255fdc4532..1476cb824ae4 100644
---- a/fs/smb/client/smb2file.c
-+++ b/fs/smb/client/smb2file.c
-@@ -158,7 +158,8 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
- 	if (smb2_path == NULL)
- 		return -ENOMEM;
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 19b6d68007fb..b26403e6fc2c 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -1215,6 +1215,19 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+ 			rc = server->ops->parse_reparse_point(cifs_sb,
+ 							      full_path,
+ 							      iov, data);
++			/*
++			 * If the reparse point was not handled but it is the
++			 * name surrogate which points to directory, then treat
++			 * is as a new mount point. Name surrogate reparse point
++			 * represents another named entity in the system.
++			 */
++			if (rc == -EOPNOTSUPP &&
++			    IS_REPARSE_TAG_NAME_SURROGATE(data->reparse.tag) &&
++			    (le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY)) {
++				rc = 0;
++				cifs_create_junction_fattr(fattr, sb);
++				goto out;
++			}
+ 		}
  
--	if (!(oparms->desired_access & FILE_READ_ATTRIBUTES)) {
-+	if (!(oparms->desired_access & FILE_READ_ATTRIBUTES) &&
-+	    !(oparms->desired_access & MAXIMUM_ALLOWED)) {
- 		oparms->desired_access |= FILE_READ_ATTRIBUTES;
- 		retry_without_read_attributes = true;
- 	}
-diff --git a/fs/smb/client/smb2glob.h b/fs/smb/client/smb2glob.h
-index 2466e6155136..224495322a05 100644
---- a/fs/smb/client/smb2glob.h
-+++ b/fs/smb/client/smb2glob.h
-@@ -38,6 +38,7 @@ enum smb2_compound_ops {
- 	SMB2_OP_SET_REPARSE,
- 	SMB2_OP_GET_REPARSE,
- 	SMB2_OP_QUERY_WSL_EA,
-+	SMB2_OP_OPEN_QUERY,
- };
+ 		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
+diff --git a/fs/smb/common/smbfsctl.h b/fs/smb/common/smbfsctl.h
+index 4b379e84c46b..3253a18ecb5c 100644
+--- a/fs/smb/common/smbfsctl.h
++++ b/fs/smb/common/smbfsctl.h
+@@ -159,6 +159,9 @@
+ #define IO_REPARSE_TAG_LX_CHR	     0x80000025
+ #define IO_REPARSE_TAG_LX_BLK	     0x80000026
  
- /* Used when constructing chained read requests. */
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index e8bb3f8b53f1..379ac3cbad1f 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -188,6 +188,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct TCP_Server_Info *server;
- 	int num_rqst = 0, i;
- 	int resp_buftype[MAX_COMPOUND];
-+	struct smb2_create_rsp *create_rsp = NULL;
- 	struct smb2_query_info_rsp *qi_rsp = NULL;
- 	struct cifs_open_info_data *idata;
- 	struct inode *inode = NULL;
-@@ -265,7 +266,13 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 	num_rqst++;
- 	rc = 0;
- 
--	for (i = 0; i < num_cmds; i++) {
-+	i = 0;
++/* If Name Surrogate Bit is set, the file or directory represents another named entity in the system. */
++#define IS_REPARSE_TAG_NAME_SURROGATE(tag) (!!((tag) & 0x20000000))
 +
-+	/* Skip the leading explicit OPEN operation */
-+	if (num_cmds > 0 && cmds[0] == SMB2_OP_OPEN_QUERY)
-+		i++;
-+
-+	for (; i < num_cmds; i++) {
- 		/* Operation */
- 		switch (cmds[i]) {
- 		case SMB2_OP_QUERY_INFO:
-@@ -637,6 +644,26 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 		tcon->need_reconnect = true;
- 	}
- 
-+	if (rc == 0 && num_cmds > 0 && cmds[0] == SMB2_OP_OPEN_QUERY) {
-+		create_rsp = rsp_iov[0].iov_base;
-+		idata = in_iov[0].iov_base;
-+		idata->fi.CreationTime = create_rsp->CreationTime;
-+		idata->fi.LastAccessTime = create_rsp->LastAccessTime;
-+		idata->fi.LastWriteTime = create_rsp->LastWriteTime;
-+		idata->fi.ChangeTime = create_rsp->ChangeTime;
-+		idata->fi.Attributes = create_rsp->FileAttributes;
-+		idata->fi.AllocationSize = create_rsp->AllocationSize;
-+		idata->fi.EndOfFile = create_rsp->EndofFile;
-+		if (le32_to_cpu(idata->fi.NumberOfLinks) == 0)
-+			idata->fi.NumberOfLinks = cpu_to_le32(1); /* dummy value */
-+		idata->fi.DeletePending = 0;
-+		idata->fi.Directory = !!(le32_to_cpu(create_rsp->FileAttributes) & ATTR_DIRECTORY);
-+
-+		/* smb2_parse_contexts() fills idata->fi.IndexNumber */
-+		rc = smb2_parse_contexts(server, &rsp_iov[0], &oparms->fid->epoch,
-+					 oparms->fid->lease_key, &oplock, &idata->fi, NULL);
-+	}
-+
- 	for (i = 0; i < num_cmds; i++) {
- 		switch (cmds[i]) {
- 		case SMB2_OP_QUERY_INFO:
-@@ -934,6 +961,48 @@ int smb2_query_path_info(const unsigned int xid,
- 	case 0:
- 		rc = parse_create_response(data, cifs_sb, full_path, &out_iov[0]);
- 		break;
-+	case -EACCES:
-+		/*
-+		 * If SMB2_OP_QUERY_INFO (called when POSIX extensions are not used) failed with
-+		 * STATUS_ACCESS_DENIED then it means that caller does not have permission to
-+		 * open the path with FILE_READ_ATTRIBUTES access and therefore cannot issue
-+		 * SMB2_OP_QUERY_INFO command.
-+		 *
-+		 * There is an alternative way how to query limited information about path but still
-+		 * suitable for stat() syscall. SMB2 OPEN/CREATE operation returns in its successful
-+		 * response subset of query information.
-+		 *
-+		 * So try to open the path without FILE_READ_ATTRIBUTES but with MAXIMUM_ALLOWED
-+		 * access which will grant the maximum possible access to the file and the response
-+		 * will contain required query information for stat() syscall.
-+		 */
-+
-+		if (tcon->posix_extensions)
-+			break;
-+
-+		for (i = 0; i < ARRAY_SIZE(out_buftype); i++) {
-+			free_rsp_buf(out_buftype[i], out_iov[i].iov_base);
-+			out_buftype[i] = 0;
-+			out_iov[i].iov_base = NULL;
-+		}
-+
-+		num_cmds = 1;
-+		cmds[0] = SMB2_OP_OPEN_QUERY;
-+		in_iov[0].iov_base = data;
-+		in_iov[0].iov_len = sizeof(*data);
-+		oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, MAXIMUM_ALLOWED,
-+				     FILE_OPEN, create_options, ACL_NO_MODE);
-+		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
-+				      &oparms, in_iov, cmds, num_cmds,
-+				      cfile, out_iov, out_buftype, NULL);
-+
-+		hdr = out_iov[0].iov_base;
-+		if (!hdr || out_buftype[0] == CIFS_NO_BUFFER)
-+			goto out;
-+
-+		if (!rc)
-+			rc = parse_create_response(data, cifs_sb, full_path, &out_iov[0]);
-+		break;
- 	case -EOPNOTSUPP:
- 		/*
- 		 * BB TODO: When support for special files added to Samba
+ /* fsctl flags */
+ /* If Flags is set to this value, the request is an FSCTL not ioctl request */
+ #define SMB2_0_IOCTL_IS_FSCTL		0x00000001
 -- 
 2.20.1
 
