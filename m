@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CE518FDB1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CEE190068;
 	Sun, 22 Dec 2024 17:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734888267; cv=none; b=XFwrFBxEkVkvHpPOnHkHBMJcmTxhLbgyPAgp5jXzooP64oc99Us8314Jjak3W2pLmWsDIiBugFjrxlkkRuOM+CZcZA/+OvHmBGnFeGielTXyu/DHX1GF3mYOU1HmEv9plF1CvzGN/EWM5aLzbnfDY8zrQa/G7nrVD5UUr4YnvP8=
+	t=1734888267; cv=none; b=fYFVENjigopI4fNx3YtiLg6Y18q18/GSD69dTQkTJr+59feCir+9WZR/HjNq0Uv1Jc0LHe91A5YgTA7X3MvoxKPZINiLIJJp0/fSUE6pHUnxRIunBCJ2l9k+9A/gTCNw6Zrpp1R9cBvvaSPv7u7O4kCD3U4ZDauFSSxOBEFVlI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734888267; c=relaxed/simple;
-	bh=aIYOqhz5FdfkYztJgvxKEqV4kx6kHrQ16z83tQXRv80=;
+	bh=c8zviAS9Da2By6CGp+7qvmzMNe6QG4WU9CJQtwf+usU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OnJtQJbhFsrvRk3CGYATYRWcooiHVrS5rDOJM5dBjH8ncUxwCNICGWv3u4VgFjYvhyjpxzSFvGHzClp8Z5ffbMhOHLZaqDBB1i9049bBfC44wX6l1oCZqHaM+MUSPNWf/O9LptRwGX/SOSi+q/6294YDH56Yj6SWp9mbEuYNQqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEc1UHZ0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=QjsJVpn68giSRLN5rhgyF7w/cHA+N3yIR6MoDb9HdvHDHhVdSoIs9zFG1MHxp4d8JVmkuYSlwudnEUnpoqm8P39lUijxpJz1SdVESvRQWbIUu2oxST3uaaKgoooqd2Av6gFue8m1RNIABPKfwWinUziOT9K41s/FmrgsxUFDD2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RFnO3Wc6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEc1UHZ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18171C4CEDD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RFnO3Wc6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE9FC4CEDE;
 	Sun, 22 Dec 2024 17:24:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734888267;
-	bh=aIYOqhz5FdfkYztJgvxKEqV4kx6kHrQ16z83tQXRv80=;
+	bh=c8zviAS9Da2By6CGp+7qvmzMNe6QG4WU9CJQtwf+usU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aEc1UHZ0fhGYVavg/Mzx3CZAg16dt/RNEVm/lrvvfDUjUeUGOhdfWtkDRnS0mljCn
-	 TMgvNIDwSTtWvygTAgcpZOTD5tXHd1f7jPEda5zT3WoLFCGfhUvI4Jtz9OqkXSAdsD
-	 1aixNq7xTnspkgaFgg50ZD5BfMCH1oztzVx8lCLct89geWUevG53jQIN0dZocxcBIp
-	 oIuFP2eo1PVpra5yycCCPvw+npZaWZMcZjjPoUuX2xWFB7xzzUPK8uOtKLByKIOsVP
-	 /XkC2su2cQzPoF44tjbUC1C7hcsFbHzuuw1Sa6bzKy/X16XV/cUUQh4lw7SN6DiI+y
-	 qAsl4j0b6qKBA==
+	b=RFnO3Wc6x7ghsLo0QsUVVVzugr0CBRHImrM3+KL+hhP/yAb+Fyy58spBXqGvfai+2
+	 4+eAT2Lak6LVCEuFcHjGPe5QUIJfRNrxTGVxivAAMTWQTYvJJov/q3G0H4Ft6FjSxA
+	 PhjBBoZhbiLKeLqynH++OzP5uNBWltzuA7BqL3Qr29Kmd1Wye6Kp0B68Y37tiNtQZo
+	 mnz/CmDq87Y0x/2NlF0kA+HYLKBVqB+fUtzQiXYEuyyWE+ZpOBv0bRKxe+wkNKpkqW
+	 xuy8V9lszuO/9AmMOiyQQ10UZOg3YjpCWuNIK91HabT0/E8fSAI9qfn2OS/CW3dIFA
+	 VK3LfnkyqSQ6w==
 Received: by pali.im (Postfix)
-	id 5122C982; Sun, 22 Dec 2024 18:24:17 +0100 (CET)
+	id 849CDB9A; Sun, 22 Dec 2024 18:24:17 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
@@ -36,9 +36,9 @@ To: Steve French <sfrench@samba.org>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] cifs: Remove struct reparse_posix_data from struct cifs_open_info_data
-Date: Sun, 22 Dec 2024 18:24:02 +0100
-Message-Id: <20241222172404.24755-2-pali@kernel.org>
+Subject: [PATCH 2/3] cifs: Remove duplicate struct reparse_symlink_data and SYMLINK_FLAG_RELATIVE
+Date: Sun, 22 Dec 2024 18:24:03 +0100
+Message-Id: <20241222172404.24755-3-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241222172404.24755-1-pali@kernel.org>
 References: <20241222172404.24755-1-pali@kernel.org>
@@ -51,62 +51,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Linux SMB client already supports more reparse point types but only the
-reparse_posix_data is defined in union of struct cifs_open_info_data.
-This union is currently used as implicit casting between point types.
+In file common/smb2pdu.h is defined struct reparse_symlink_data_buffer
+which is same as struct reparse_symlink_data and is used in the whole code.
+So remove duplicate struct reparse_symlink_data from client/cifspdu.h.
 
-With this code style, it hides information that union is used for pointer
-casting, and just in mknod_nfs() and posix_reparse_to_fattr() functions.
-
-Other reparse point buffers do not use this kind of casting. So remove
-reparse_posix_data from reparse part of struct cifs_open_info_data and for
-all cases of reparse buffer use just struct reparse_data_buffer *buf.
+In file common/smb2pdu.h is defined also SYMLINK_FLAG_RELATIVE constant, so
+remove duplication from client/cifspdu.h.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsglob.h | 5 +----
- fs/smb/client/reparse.c  | 5 ++---
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ fs/smb/client/cifspdu.h | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index b56fca6dd195..5045ead02c43 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -262,10 +262,7 @@ struct cifs_open_info_data {
- 			struct kvec iov;
- 		} io;
- 		__u32 tag;
--		union {
--			struct reparse_data_buffer *buf;
--			struct reparse_posix_data *posix;
--		};
-+		struct reparse_data_buffer *buf;
- 	} reparse;
- 	struct {
- 		__u8		eas[SMB2_WSL_MAX_QUERY_EA_RESP_SIZE];
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index f01214d6c5d4..40070e99fc8a 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -486,7 +486,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index d0e7fbc5cacd..2a29fa31c927 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -1485,22 +1485,6 @@ struct file_notify_information {
+ 	__u8  FileName[];
+ } __attribute__((packed));
  
- 	data = (struct cifs_open_info_data) {
- 		.reparse_point = true,
--		.reparse = { .tag = IO_REPARSE_TAG_NFS, .posix = p, },
-+		.reparse = { .tag = IO_REPARSE_TAG_NFS, .buf = (struct reparse_data_buffer *)p, },
- 		.symlink_target = kstrdup(symname, GFP_KERNEL),
- 	};
- 
-@@ -1165,8 +1165,7 @@ static bool posix_reparse_to_fattr(struct cifs_sb_info *cifs_sb,
- 				   struct cifs_fattr *fattr,
- 				   struct cifs_open_info_data *data)
- {
--	struct reparse_posix_data *buf = data->reparse.posix;
+-/* For IO_REPARSE_TAG_SYMLINK */
+-struct reparse_symlink_data {
+-	__le32	ReparseTag;
+-	__le16	ReparseDataLength;
+-	__u16	Reserved;
+-	__le16	SubstituteNameOffset;
+-	__le16	SubstituteNameLength;
+-	__le16	PrintNameOffset;
+-	__le16	PrintNameLength;
+-	__le32	Flags;
+-	char	PathBuffer[];
+-} __attribute__((packed));
 -
-+	struct reparse_posix_data *buf = (struct reparse_posix_data *)data->reparse.buf;
- 
- 	if (buf == NULL)
- 		return true;
+-/* Flag above */
+-#define SYMLINK_FLAG_RELATIVE 0x00000001
+-
+ /* For IO_REPARSE_TAG_NFS */
+ #define NFS_SPECFILE_LNK	0x00000000014B4E4C
+ #define NFS_SPECFILE_CHR	0x0000000000524843
 -- 
 2.20.1
 
