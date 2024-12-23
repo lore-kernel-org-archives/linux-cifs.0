@@ -1,189 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F5619068E;
-	Sun, 22 Dec 2024 17:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B306EEB5
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Dec 2024 08:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734888268; cv=none; b=PfvvB5Jv6vSpvJszvVQOgskLZkQDunHnk0Zo7mU5ixg9VI3mILEELJWqDeTQ0tM8w3+nh1u2wxRXulCnx4sLvJwYWn43cyl6AnhJsZCx/hPjc+157h9xbDoa+U47gnfYef9JuGjbFJMFqAzLFa6rhqma53tolYtpV87idBQp15A=
+	t=1734941564; cv=none; b=fM3EelE+N4ja9fGFGeQhmPFYqyc4txq8qHST/EXwmrg9UHs5LnRZ+Zg5p52+BFtPHxqcYjZX/p71qf90jHhksMNKLNXZkJslWzkcq9EyCmcjnfEsg5WuaCJ5MNKNPBaUc5nUiD8MmCDzcp4sN/q7cK8LUE5N5ohticsVphTaxCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734888268; c=relaxed/simple;
-	bh=WJK7TY5E0PYn0ZjBtJv7A7+wKin7P2WriV5KcJ0M7wI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NDygbBnziwtMfasdWz85rShZb8lEyA3NuThITE+LGMn2CuXYiOuGFjbW1E6KLM3uToa83A2czyGUImwEAvQ2o48KcyeaibiqkUB5GTh0JPVdygJ+PbSIDc42wyUToRfEoX/l2dBNokXcB0p5qSWjQbUGoOckpSEOPpihT5U1Sq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ku0M9Pjt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734941564; c=relaxed/simple;
+	bh=JteOWFk5ZyKeD7RxsMFAc+tnVcNEizpPWB2m9rUjgVE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=oxt7wMd/+ab76FZyiPXCoXksoWBwlV1wsD3t9j+9vFFgYtzE5n6uezFMz73UldeYDA6RxDMRKe6TMvbVv2y7amIyGM3jIRB0fPHdkr/7jnLndLtjxkPsZ0yehYUPMbRZg0IgcoafAniwb2DPz8oQ2n0gGBsdas9GBLDZ1pWQ6D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BK0fRE+B; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ku0M9Pjt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 379C2C4CEDC;
-	Sun, 22 Dec 2024 17:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734888267;
-	bh=WJK7TY5E0PYn0ZjBtJv7A7+wKin7P2WriV5KcJ0M7wI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ku0M9PjtDm2y1KBc5U9oR2mll+PMczTz99Fvfu7WeF4TJD3sE6eyxByvWOHk+KBPi
-	 H/vwYk4j+vIvFBGwVbV7ZYt8pFbAHHf5/3HsGoEsjX6IiqUkuojjkkxZb27KpICHA3
-	 yJfy5sSnPV1kwruoBCI+LVepDeQqaODuCmlbiWGfgwdSt81ZSd6LP+jOEdXV0XW9kt
-	 DUE1u2qOWQSIGqmCp18ZOmjBJVUOzjG2dnEHHQK3z3K2hMN0Q8JHcXs813L0hIGBOf
-	 Q/U1UrQpfzKZk4rJs3A4br4VnpAcyUWQoIY4CGOoJMil5js86bkoB6HmTaJdfXbkhN
-	 U+2yuOqN0OKSA==
-Received: by pali.im (Postfix)
-	id ABD3ED48; Sun, 22 Dec 2024 18:24:17 +0100 (CET)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] cifs: Rename struct reparse_posix_data to reparse_nfs_data_buffer and move to common/smb2pdu.h
-Date: Sun, 22 Dec 2024 18:24:04 +0100
-Message-Id: <20241222172404.24755-4-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241222172404.24755-1-pali@kernel.org>
-References: <20241222172404.24755-1-pali@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BK0fRE+B"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e3fd6cd9ef7so3894515276.1
+        for <linux-cifs@vger.kernel.org>; Mon, 23 Dec 2024 00:12:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734941561; x=1735546361; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BcfE8fJ35Ps7w9P1+ulvqBvPg71/ddEKbiRIcLw0Gk0=;
+        b=BK0fRE+BBwXNAad7kk9viTHFY53J1YDmya1lDs190B2I/4zEK+QSDvgN6UtLxJC2l8
+         nF/I0LhtdDBLdDHt9jkNf4VIup18svz97sdNHOXV/4vlvPQ/fhB7uPYVwvWgQM7zN1Ym
+         6G3Gh48Nq2jUHJISkDBJOErG6BLyg9gtlIVTA6p6XMPioG9/1+oftZ1zpcaLXbj7GySf
+         firNhMs8N9IkRHxmhiIu5lX31BE68vEmtZxXHMVuFuvJ7C6Kd6uMDg7Q3P5ZkrsrEVbb
+         Yi1HY2pV7cKzn0fBoNNO4aphOrcShfTd2mm/Klmjmuy0z1wO9QYGhT5IHe1FFJnW0yT3
+         67KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734941561; x=1735546361;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BcfE8fJ35Ps7w9P1+ulvqBvPg71/ddEKbiRIcLw0Gk0=;
+        b=IY7Gi0ywxp0oXqMX5EUjJVDOAfcj42AnwCS94cIng9jmUNXS8t7BkSxotflxLWZyl2
+         2WTpXVGHoVq+QHQ4XTXi4fCxifiyW5+5Shi/tzegP0QxOjMc1LLUONiqLeJOazcglnpI
+         KxxzkDtvCZBASfB9qzpiekY2uTwjNRHmUJpuTgW4zTbFi8iNSeB1npbeFkviEg67+8kC
+         8RtmLsTnhb0/q5jwR/Pg2H2ml8wo5s7VqpjD3WQsJZAiH2BXDVACBs5YGITm9c5zO2IP
+         bnLPX2P6wLKrqL/pclo3sGOtI2Feqi67C+DMfMxOj/jb+Nj0h7U0J+iV7UZh9FKC/jDr
+         9vbw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHzdh/OqL24g4kiTUzMkAk3QQlSntKKhi+aT1XNB1JmxnfXnDK2UQzm62LmZnaD5y46Jn/t8gQZOys@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJaBSqiFgFi2AGsBVRdnnczCQp8hZR5W31PLq6lxHUQtGPW6fK
+	i1C7DWN/v9Sf/IVBsMS2eXcl/qfMQN/QGMYUogD3M3uY0YcAtTlqrBsI5qQyKNhF70iH58AjTVj
+	nmJ9gGnRmswLXAOueoyDO/yzoWOg=
+X-Gm-Gg: ASbGncst7F4Z6SGUhmGjz9byUgELRDIyuT7OgqaB/gVPIavxH8MkQrTRFby25Qtxkzn
+	B54HVIAtU0uUD8XlXZ3T04JPoa47YnVLMnapyQ2EoAhNRttq1RKlsp9YsZZAhvtgIzys7
+X-Google-Smtp-Source: AGHT+IFdN+4MGkVUUx+Jc3NTVJFfUPLaY03Q9axW/CXlHIIqUEkMYMkUYuFOiuunJ/dNdjlMxr0QQI8kIXght+vwhd4=
+X-Received: by 2002:a05:6902:1ac8:b0:e4c:456b:19de with SMTP id
+ 3f1490d57ef6-e538ce5895amr9118106276.16.1734941560667; Mon, 23 Dec 2024
+ 00:12:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241216183148.4291-1-bharathsm@microsoft.com>
+ <CAH2r5mumh1xU8zAdE9sqmgGN11sY=HedD-PpdqCvR3BTod1NwQ@mail.gmail.com>
+ <CANT5p=rYjgbteSBRuZFfXYwC-g6QLMG20250RzO9Es8GZPeL2g@mail.gmail.com> <Z2SijUfZWp37R2Do@haley.home.arpa>
+In-Reply-To: <Z2SijUfZWp37R2Do@haley.home.arpa>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Mon, 23 Dec 2024 13:42:29 +0530
+Message-ID: <CAGypqWxW-tG9omw7+s=DK89KPs+RFDFneYUKa2ZqjZ0yJkjbAw@mail.gmail.com>
+Subject: Re: [PATCH] smb: enable reuse of deferred file handles for write operations
+To: Shyam Prasad N <nspmangalore@gmail.com>, Steve French <smfrench@gmail.com>, 
+	Bharath SM <bharathsm.hsk@gmail.com>, linux-cifs@vger.kernel.org, sfrench@samba.org, 
+	pc@manguebit.com, sprasad@microsoft.com, tom@talpey.com, 
+	ronniesahlberg@gmail.com, Bharath SM <bharathsm@microsoft.com>
+Content-Type: multipart/mixed; boundary="0000000000006e4d7b0629eb8fdd"
 
-Function parse_reparse_posix() parses NFS-style reparse points, which are
-used only by Windows NFS server since Windows Server 2012 version. This
-style is not understood by Microsoft POSIX/Interix/SFU/SUA subsystems.
+--0000000000006e4d7b0629eb8fdd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-So make it clear that parse_reparse_posix() function and reparse_posix_data
-structure are not POSIX general, but rather NFS specific.
+Thanks Shyam and Paul Aurich for reviewing and sharing comments.!
+I have attached an updated patch.
 
-All reparse buffer structures are defined in common/smb2pdu.h and have
-_buffer suffix. So move struct reparse_posix_data from client/cifspdu.h to
-common/smb2pdu.h and rename it to reparse_nfs_data_buffer for consistency.
-Note that also SMB specification in [MS-FSCC] document, section 2.1.2.6
-defines it under name "Network File System (NFS) Reparse Data Buffer".
-So use this name for consistency.
+On Fri, Dec 20, 2024 at 4:17=E2=80=AFAM Paul Aurich <paul@darkrain42.org> w=
+rote:
+>
+> On 2024-12-19 15:03:48 +0530, Shyam Prasad N wrote:
+> >On Tue, Dec 17, 2024 at 2:22=E2=80=AFAM Steve French <smfrench@gmail.com=
+> wrote:
+> >>
+> >> merged into cifs-2.6.git for-next pending review and more testing
+> >>
+> >> On Mon, Dec 16, 2024 at 12:36=E2=80=AFPM Bharath SM <bharathsm.hsk@gma=
+il.com> wrote:
+> >> >
+> >> > Previously, deferred file handles were reused only for read
+> >> > operations, this commit extends to reusing deferred handles
+> >> > for write operations.
+> >> >
+> >> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> >> > ---
+> >> >  fs/smb/client/file.c | 6 +++++-
+> >> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> >> >
+> >> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> >> > index a58a3333ecc3..98deff1de74c 100644
+> >> > --- a/fs/smb/client/file.c
+> >> > +++ b/fs/smb/client/file.c
+> >> > @@ -990,7 +990,11 @@ int cifs_open(struct inode *inode, struct file =
+*file)
+> >> >         }
+> >> >
+> >> >         /* Get the cached handle as SMB2 close is deferred */
+> >> > -       rc =3D cifs_get_readable_path(tcon, full_path, &cfile);
+> >> > +       if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
+> >> > +               rc =3D cifs_get_writable_path(tcon, full_path, FIND_=
+WR_ANY, &cfile);
+> >
+> >Wondering if FIND_WR_ANY is okay for all use cases?
+> >Specifically, I'm checking where FIND_WR_FSUID_ONLY is relevant.
+> >@Steve French Is this for multiuser mounts? I don't think so, since
+> >multiuser mounts come with their own tcon, and we search writable
+> >files in our tcon's open list.
+>
+> I think this should be FIND_WR_FSUID_ONLY, yeah.  (IMHO, that should be t=
+he
+> default, and FIND_WR_ANY should be renamed something indicating it should=
+ only
+> be used in specific situations and it's probably not what the caller want=
+s.)
+>
+> I have a series I need to resurrect and polish that fixes a few problems =
+along
+> these lines, but it doesn't touch the 'writable file' path.
+>
+> >> > +       } else {
+> >> > +               rc =3D cifs_get_readable_path(tcon, full_path, &cfil=
+e);
+> >> > +       }
+> >> >         if (rc =3D=3D 0) {
+> >> >                 if (file->f_flags =3D=3D cfile->f_flags) {
+> >> >                         file->private_data =3D cfile;
+> >> > --
+> >> > 2.43.0
+> >> >
+> >> >
+> >>
+> >>
+> >> --
+> >> Thanks,
+> >>
+> >> Steve
+> >>
+> >Other than that one thing to look at, the changes look good to me.
+> >
+> >--
+> >Regards,
+> >Shyam
+>
+> ~Paul
+>
 
-Having this structure in common/smb2pdu.h can be useful for ksmbd server
-code as NFS-style reparse points is the preferred way for implementing
-support for special files.
+--0000000000006e4d7b0629eb8fdd
+Content-Type: application/octet-stream; 
+	name="0001-smb-enable-reuse-of-deferred-file-handles-for-write-.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb-enable-reuse-of-deferred-file-handles-for-write-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m50r2ti50>
+X-Attachment-Id: f_m50r2ti50
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
- fs/smb/client/cifspdu.h | 14 --------------
- fs/smb/client/reparse.c | 12 ++++++------
- fs/smb/common/smb2pdu.h | 14 +++++++++++++-
- 3 files changed, 19 insertions(+), 21 deletions(-)
-
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 2a29fa31c927..f4c348b5c4f1 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -1485,20 +1485,6 @@ struct file_notify_information {
- 	__u8  FileName[];
- } __attribute__((packed));
- 
--/* For IO_REPARSE_TAG_NFS */
--#define NFS_SPECFILE_LNK	0x00000000014B4E4C
--#define NFS_SPECFILE_CHR	0x0000000000524843
--#define NFS_SPECFILE_BLK	0x00000000004B4C42
--#define NFS_SPECFILE_FIFO	0x000000004F464946
--#define NFS_SPECFILE_SOCK	0x000000004B434F53
--struct reparse_posix_data {
--	__le32	ReparseTag;
--	__le16	ReparseDataLength;
--	__u16	Reserved;
--	__le64	InodeType; /* LNK, FIFO, CHR etc. */
--	__u8	DataBuffer[];
--} __attribute__((packed));
--
- struct cifs_quota_data {
- 	__u32	rsrvd1;  /* 0 */
- 	__u32	sid_size;
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 40070e99fc8a..9fe9dd71a6fa 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -407,7 +407,7 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
- 	return rc;
- }
- 
--static int nfs_set_reparse_buf(struct reparse_posix_data *buf,
-+static int nfs_set_reparse_buf(struct reparse_nfs_data_buffer *buf,
- 			       mode_t mode, dev_t dev,
- 			       __le16 *symname_utf16,
- 			       int symname_utf16_len,
-@@ -454,7 +454,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifs_open_info_data data;
--	struct reparse_posix_data *p = NULL;
-+	struct reparse_nfs_data_buffer *p = NULL;
- 	__le16 *symname_utf16 = NULL;
- 	int symname_utf16_len = 0;
- 	struct inode *new;
-@@ -478,7 +478,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- 			goto out;
- 		}
- 	} else {
--		p = (struct reparse_posix_data *)buf;
-+		p = (struct reparse_nfs_data_buffer *)buf;
- 	}
- 	rc = nfs_set_reparse_buf(p, mode, dev, symname_utf16, symname_utf16_len, &iov);
- 	if (rc)
-@@ -716,7 +716,7 @@ int smb2_mknod_reparse(unsigned int xid, struct inode *inode,
- }
- 
- /* See MS-FSCC 2.1.2.6 for the 'NFS' style reparse tags */
--static int parse_reparse_posix(struct reparse_posix_data *buf,
-+static int parse_reparse_nfs(struct reparse_nfs_data_buffer *buf,
- 			       struct cifs_sb_info *cifs_sb,
- 			       struct cifs_open_info_data *data)
- {
-@@ -1069,7 +1069,7 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
- 	/* See MS-FSCC 2.1.2 */
- 	switch (le32_to_cpu(buf->ReparseTag)) {
- 	case IO_REPARSE_TAG_NFS:
--		return parse_reparse_posix((struct reparse_posix_data *)buf,
-+		return parse_reparse_nfs((struct reparse_nfs_data_buffer *)buf,
- 					   cifs_sb, data);
- 	case IO_REPARSE_TAG_SYMLINK:
- 		return parse_reparse_native_symlink(
-@@ -1165,7 +1165,7 @@ static bool posix_reparse_to_fattr(struct cifs_sb_info *cifs_sb,
- 				   struct cifs_fattr *fattr,
- 				   struct cifs_open_info_data *data)
- {
--	struct reparse_posix_data *buf = (struct reparse_posix_data *)data->reparse.buf;
-+	struct reparse_nfs_data_buffer *buf = (struct reparse_nfs_data_buffer *)data->reparse.buf;
- 
- 	if (buf == NULL)
- 		return true;
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 3c7c706c797d..3336df2ea5d4 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1550,7 +1550,19 @@ struct reparse_symlink_data_buffer {
- 	__u8	PathBuffer[]; /* Variable Length */
- } __packed;
- 
--/* See MS-FSCC 2.1.2.6 and cifspdu.h for struct reparse_posix_data */
-+/* For IO_REPARSE_TAG_NFS - see MS-FSCC 2.1.2.6 */
-+#define NFS_SPECFILE_LNK	0x00000000014B4E4C
-+#define NFS_SPECFILE_CHR	0x0000000000524843
-+#define NFS_SPECFILE_BLK	0x00000000004B4C42
-+#define NFS_SPECFILE_FIFO	0x000000004F464946
-+#define NFS_SPECFILE_SOCK	0x000000004B434F53
-+struct reparse_nfs_data_buffer {
-+	__le32	ReparseTag;
-+	__le16	ReparseDataLength;
-+	__u16	Reserved;
-+	__le64	InodeType; /* NFS_SPECFILE_* */
-+	__u8	DataBuffer[];
-+} __packed;
- 
- /* For IO_REPARSE_TAG_LX_SYMLINK */
- struct reparse_wsl_symlink_data_buffer {
--- 
-2.20.1
-
+RnJvbSA4NjQzYWY3Nzg1N2UzMTI5OTI0ZTc4OGI0ZGVmOTg3Mjc5OGMxNzcyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
+RGF0ZTogRnJpLCAxMyBEZWMgMjAyNCAyMjo1MDoyMSArMDUzMApTdWJqZWN0OiBbUEFUQ0hdIHNt
+YjogZW5hYmxlIHJldXNlIG9mIGRlZmVycmVkIGZpbGUgaGFuZGxlcyBmb3Igd3JpdGUKIG9wZXJh
+dGlvbnMKClByZXZpb3VzbHksIGRlZmVycmVkIGZpbGUgaGFuZGxlcyB3ZXJlIHJldXNlZCBvbmx5
+IGZvciByZWFkCm9wZXJhdGlvbnMsIHRoaXMgY29tbWl0IGV4dGVuZHMgdG8gcmV1c2luZyBkZWZl
+cnJlZCBoYW5kbGVzCmZvciB3cml0ZSBvcGVyYXRpb25zLiBCeSByZXVzaW5nIHRoZXNlIGhhbmRs
+ZXMgd2UgY2FuIHJlZHVjZQp0aGUgbmVlZCBmb3Igb3Blbi9jbG9zZSBvcGVyYXRpb25zIG92ZXIg
+dGhlIHdpcmUuCgpTaWduZWQtb2ZmLWJ5OiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0
+LmNvbT4KLS0tCiBmcy9zbWIvY2xpZW50L2ZpbGUuYyB8IDYgKysrKystCiAxIGZpbGUgY2hhbmdl
+ZCwgNSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2Ns
+aWVudC9maWxlLmMgYi9mcy9zbWIvY2xpZW50L2ZpbGUuYwppbmRleCBhNThhMzMzM2VjYzMuLjNi
+MmQzMzI5MWE3ZSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9maWxlLmMKKysrIGIvZnMvc21i
+L2NsaWVudC9maWxlLmMKQEAgLTk5MCw3ICs5OTAsMTEgQEAgaW50IGNpZnNfb3BlbihzdHJ1Y3Qg
+aW5vZGUgKmlub2RlLCBzdHJ1Y3QgZmlsZSAqZmlsZSkKIAl9CiAKIAkvKiBHZXQgdGhlIGNhY2hl
+ZCBoYW5kbGUgYXMgU01CMiBjbG9zZSBpcyBkZWZlcnJlZCAqLwotCXJjID0gY2lmc19nZXRfcmVh
+ZGFibGVfcGF0aCh0Y29uLCBmdWxsX3BhdGgsICZjZmlsZSk7CisJaWYgKE9QRU5fRk1PREUoZmls
+ZS0+Zl9mbGFncykgJiBGTU9ERV9XUklURSkgeworCQlyYyA9IGNpZnNfZ2V0X3dyaXRhYmxlX3Bh
+dGgodGNvbiwgZnVsbF9wYXRoLCBGSU5EX1dSX0ZTVUlEX09OTFksICZjZmlsZSk7CisJfSBlbHNl
+IHsKKwkJcmMgPSBjaWZzX2dldF9yZWFkYWJsZV9wYXRoKHRjb24sIGZ1bGxfcGF0aCwgJmNmaWxl
+KTsKKwl9CiAJaWYgKHJjID09IDApIHsKIAkJaWYgKGZpbGUtPmZfZmxhZ3MgPT0gY2ZpbGUtPmZf
+ZmxhZ3MpIHsKIAkJCWZpbGUtPnByaXZhdGVfZGF0YSA9IGNmaWxlOwotLSAKMi40My4wCgo=
+--0000000000006e4d7b0629eb8fdd--
