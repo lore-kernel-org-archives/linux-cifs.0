@@ -1,184 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980D4433D5;
-	Tue, 24 Dec 2024 15:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A204E1B3926;
+	Tue, 24 Dec 2024 16:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735052934; cv=none; b=T0ka5hJvf7PUjFcAFmJazOz05qWXX3oL/KW0WtFIJtVr+AahA/5Ri26AJi1wlnIK/pLUJB653khF8G6ECp2bs5zXDmmpPYd8/rBfZ0b+YvKzGMqa6sZeiXuwz7kJ6R0j/RVh4rmGvCHf+32vV+MvwoQ5T9bagHeFiVKtHgDkQKg=
+	t=1735056346; cv=none; b=BSAUqVf2lDgWgG7gkUMWAaADdYayjQEjlSQQwBsgGk9FTvJ+I3HYKSJ+RdczB0uCm2bEz0YLYNF0I5Po35W45uO5cwtymJ6XgBHcGaDtAymnaHrb8BUDYBGpXKqIH7C67hgomi6HL+i7osVubbmkO/LU1TI14PR3jyXqCL8Nwuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735052934; c=relaxed/simple;
-	bh=t+eTCTW8q86a8W3zzragF/IFMO+Udsti7SmsXAau0ZY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Ahl3FOs+ipBdyAf0PYpsNiTTxrIF1SCVMhjZCjLrUN3JuT2aBK08KproCClrls+Pvf+yrXQVTmZhnCZGf69TNlzzh+q/lmKQQcIOfWrJQ9SSyb6diPFM82uuHcshqQawWK7YnOJ4Kk1gzFasSm5elKzkdMPNeTDeJTnk4DKZrCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwNRi38S; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735056346; c=relaxed/simple;
+	bh=ZpKBVprYkpYtjeHa4udStkTIytH/4XDXfCEGZY/JC3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ae7uLdcxGD5dzihPRy/eMBdz88YamngOF32un7iFLM5NWWG3qdMeps2ay5pIWD0AYwQhlKwspAC0qdv4psjWK5OGHNRSczWbUOWW1TwsyJ5fUe/7lj0CPdWofF+aDUkrrYF6vVIeOITSf0x5G1fMT36jBa7NZFJFrVwEjthyPkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wzw+JBz0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwNRi38S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB500C4CED0;
-	Tue, 24 Dec 2024 15:08:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wzw+JBz0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF13C4CED0;
+	Tue, 24 Dec 2024 16:05:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735052934;
-	bh=t+eTCTW8q86a8W3zzragF/IFMO+Udsti7SmsXAau0ZY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HwNRi38SZx6Jxmvq+E6VbhGyrEAlYf8FJqoHyc90xUr8pY5SjJ/V/Siu18asW0/q3
-	 8NQBnNQMJUd+DB9ElVP2LcmS4BSZYHr/9CKNiC7ki6b67M6O3xMV+cuG6namp9zaDl
-	 TeOPxUOz4ln9qzmDhB89paUyRpp5vSOxSniKsKNY+HPUh2uHOxrYWbEMR8PUF1yxF9
-	 z1yZQS182vgy9UDWmpJZgFaEv5NnPb7llF4UwTWqNMMbI65jnFcethr4McGj8buhSm
-	 bJ+OjCdkjebZ5LbAR6mdVkEureDHBqukRfOQpOBtMckSdELO0eUEbT8lhjlrVAspdh
-	 XAyFXsSEc5UMg==
+	s=k20201202; t=1735056346;
+	bh=ZpKBVprYkpYtjeHa4udStkTIytH/4XDXfCEGZY/JC3s=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Wzw+JBz0bPJmn5MAIY2rpZJBiJoB3vO8JmL+mvdO7rlJ08uZpa9WQpSk0o0vuL3Hy
+	 R8Y9QhqO7HCIziB8XMGRQAzuoxgwbD3iFnIkLufsGrVHzCW1aVep+HEGY8BqTC8nma
+	 f408MziE079pqIALFjCYGkpzLXnNeGB3YrbgJA3NKFQLlqOEj/Uz6rycGOn4iAjPoq
+	 +FNboMNT3wg2UaHqJEuZ2ISUxLU6MkCgoHch4QGkHVjcW1JV6MSDC8J3R1FAi6MESx
+	 jQaHn/DKLVfNgNUoE237sPfun03v3kpICE4lRPhd/fgtI026ecFOYieZxu9Voh2ecV
+	 sYiXSCk/Iv5tw==
 Received: by pali.im (Postfix)
-	id D14AD988; Tue, 24 Dec 2024 16:08:43 +0100 (CET)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: linux-cifs@vger.kernel.org,
+	id 00CCF988; Tue, 24 Dec 2024 17:05:35 +0100 (CET)
+Date: Tue, 24 Dec 2024 17:05:35 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Update description about ACL permissions
-Date: Tue, 24 Dec 2024 16:08:29 +0100
-Message-Id: <20241224150829.3926-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
+Cc: Steve French <sfrench@samba.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+Subject: Errno codes from symlink() syscall
+Message-ID: <20241224160535.pi6nazpugqkhvfns@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20180716
 
-There are some incorrect information about individual SMB permission
-constants like WRITE_DAC can change ownership, or incomplete information to
-distinguish between ACL types (discretionary vs system) and there is
-completely missing information how permissions apply for directory objects
-and what is meaning of GENERIC_* bits.
+TL;DR;
+Which errno code should network fs driver returns on create symlink
+failure to userspace application for these cases?
+* creating new symlink is not supported by fs driver mount options
+* creating new symlink is not supported by remote server software
+* creating new symlink is not supported by remote server storage
+* creating new symlink is not permitted for user due to missing
+  privilege/capability (indicated by remote server)
+* access to the directory was denied due to ACL/mode (on remote)
 
-Fix and extend description of all SMB permission constants to match the
-reality, how the reference Windows SMB / NTFS implementation handles them.
 
-Links to official Microsoft documentation related to permissions:
-https://learn.microsoft.com/en-us/windows/win32/fileio/file-access-rights-constants
-https://learn.microsoft.com/en-us/windows/win32/secauthz/access-mask
-https://learn.microsoft.com/en-us/windows/win32/secauthz/standard-access-rights
-https://learn.microsoft.com/en-us/windows/win32/secauthz/generic-access-rights
-https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile
-https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatefile
+Hello,
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
+I discussed with Steve that current error codes from symlink() syscall
+propagated to userspace on mounted SMB share are in most cases
+misleading for end user who is trying to create a new symlink via ln -s
+command.
 
-Anyway, I see that these client constants are copied also in server
-fs/smb/server/smb_common.h file. Maybe they could be deduplicated into
-some fs/smb/common/* file?
+Linux SMB client (cifs.ko) can see different kind of errors when it is
+trying to create a symlink on SMB server. I know at least about these
+errors which can happen:
 
----
- fs/smb/client/cifspdu.h | 77 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 60 insertions(+), 17 deletions(-)
+1 For the current mount parameters, the Linux SMB client does not
+  implement creating a new symlink yet and server supports symlinks.
+  This applies for example for SMB1 dialect against Windows server, when
+  Linux SMB client is already able to query existing symlinks via
+  readlink() syscall (just not able to create new one).
 
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index f4c348b5c4f1..3ad1bb79ea9e 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -190,38 +190,81 @@
-  */
- 
- #define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
-+					  /* or directory child entries can   */
-+					  /* be listed together with the      */
-+					  /* associated child attributes      */
-+					  /* (so the FILE_READ_ATTRIBUTES on  */
-+					  /* the child entry is not needed)   */
- #define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
-+					  /* or new file can be created in    */
-+					  /* the directory                    */
- #define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
-+					  /* (for non-local files over SMB it */
-+					  /* is same as FILE_WRITE_DATA)      */
-+					  /* or new subdirectory can be       */
-+					  /* created in the directory         */
- #define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
- 					  /* with the file can be read        */
- #define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
- 					  /* with the file can be written     */
- #define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
- 					  /* the file using system paging I/O */
--#define FILE_DELETE_CHILD     0x00000040
-+					  /* for executing the file / script  */
-+					  /* or right to traverse directory   */
-+					  /* (but by default all users have   */
-+					  /* bypass traverse privilege and do */
-+					  /* not need this permission at all) */
-+#define FILE_DELETE_CHILD     0x00000040  /* Child entry can be deleted from  */
-+					  /* the directory (so the DELETE on  */
-+					  /* the child entry is not needed)   */
- #define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
--					  /* file can be read                 */
-+					  /* file or directory can be read    */
- #define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
--					  /* file can be written              */
--#define DELETE                0x00010000  /* The file can be deleted          */
--#define READ_CONTROL          0x00020000  /* The access control list and      */
--					  /* ownership associated with the    */
--					  /* file can be read                 */
--#define WRITE_DAC             0x00040000  /* The access control list and      */
--					  /* ownership associated with the    */
--					  /* file can be written.             */
-+					  /* file or directory can be written */
-+#define DELETE                0x00010000  /* The file or dir can be deleted   */
-+#define READ_CONTROL          0x00020000  /* The discretionary access control */
-+					  /* list and ownership associated    */
-+					  /* with the file or dir can be read */
-+#define WRITE_DAC             0x00040000  /* The discretionary access control */
-+					  /* list associated with the file or */
-+					  /* directory can be written         */
- #define WRITE_OWNER           0x00080000  /* Ownership information associated */
--					  /* with the file can be written     */
-+					  /* with the file/dir can be written */
- #define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
- 					  /* synchronize with the completion  */
- 					  /* of an input/output request       */
- #define SYSTEM_SECURITY       0x01000000  /* The system access control list   */
--					  /* can be read and changed          */
--#define MAXIMUM_ALLOWED       0x02000000
--#define GENERIC_ALL           0x10000000
--#define GENERIC_EXECUTE       0x20000000
--#define GENERIC_WRITE         0x40000000
--#define GENERIC_READ          0x80000000
-+					  /* list associated with the file or */
-+					  /* dir can be read or written       */
-+					  /* (cannot be in DACL, can in SACL) */
-+#define MAXIMUM_ALLOWED       0x02000000  /* Maximal subset of GENERIC_ALL    */
-+					  /* permissions which can be granted */
-+					  /* (cannot be in DACL nor SACL)     */
-+#define GENERIC_ALL           0x10000000  /* Same as: GENERIC_EXECUTE |       */
-+					  /*          GENERIC_WRITE |         */
-+					  /*          GENERIC_READ |          */
-+					  /*          FILE_DELETE_CHILD |     */
-+					  /*          DELETE |                */
-+					  /*          WRITE_DAC |             */
-+					  /*          WRITE_OWNER             */
-+					  /* So GENERIC_ALL contains all bits */
-+					  /* mentioned above except these two */
-+					  /* SYSTEM_SECURITY  MAXIMUM_ALLOWED */
-+#define GENERIC_EXECUTE       0x20000000  /* Same as: FILE_EXECUTE |          */
-+					  /*          FILE_READ_ATTRIBUTES |  */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
-+#define GENERIC_WRITE         0x40000000  /* Same as: FILE_WRITE_DATA |       */
-+					  /*          FILE_APPEND_DATA |      */
-+					  /*          FILE_WRITE_EA |         */
-+					  /*          FILE_WRITE_ATTRIBUTES | */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
-+#define GENERIC_READ          0x80000000  /* Same as: FILE_READ_DATA |        */
-+					  /*          FILE_READ_EA |          */
-+					  /*          FILE_READ_ATTRIBUTES |  */
-+					  /*          READ_CONTROL |          */
-+					  /*          SYNCHRONIZE             */
- 					 /* In summary - Relevant file       */
- 					 /* access flags from CIFS are       */
- 					 /* file_read_data, file_write_data  */
--- 
-2.20.1
+2 For the current mount parameters, the SMB server does not support
+  symlink operations at all. But it can support it when using other
+  mount parameters. This applies for example for older Samba server with
+  SMB2+ dialect (when older version supported symlinks only over SMB1).
 
+3 The SMB server for the mounted share does not support symlink
+  operations at all. For example server supports symlinks, but mounted
+  share is on FAT32 on which symlinks cannot be stored.
+
+4 The user who is logged to SMB server does not have a privilege to
+  create a new symlink at all. But server and also share supports
+  symlinks without any problem. Just this user is less privileged,
+  and no ACL/mode can help.
+
+5 The user does not have access right to create a new object (file,
+  directory, symlink, etc...) in the specified directory. For example
+  "chmod -w" can cause this.
+
+Linux SMB client should have all information via different SMB error
+codes to distinguish between all these 5 situations.
+
+On Windows servers for creating a new symlink is required that user has
+SeCreateSymbolicLinkPrivilege. This privilege is by default enabled only
+for Administrators, so by default ordinary users cannot create symlinks
+due to security restrictions. On the other hand, querying symlink path
+is allowed for any user (who has access to that symlink fs object).
+
+Therefore it is important for user who is calling 'ln -s' command on SMB
+share mounted on Linux to distinguish between 4 and 5 on failure. If
+user needs to just add "write-directory" permission (chmod +w) or asking
+AD admin for adding SeCreateSymbolicLinkPrivilege into Group Policy.
+
+
+I would like to open a discussion on fsdevel list, what errno codes from
+symlink() syscall should be reported to userspace for particular
+situations 1 - 5?
+
+Situation 5 should be classic EACCES. I think this should be clear.
+
+Situation 4 start to be complicated. Windows "privilege" is basically
+same as Linux "capability", it is bound to the process and in normal
+situation it is set by login manager. Just Linux does not have
+equivalent capability for allowing creating new symlink. But generally
+Linux for missing permission which is granted by capability (e.g. for
+ioperm() via CAP_SYS_RAWIO) is in lot of cases returned errno EPERM.
+
+So I thought that EPERM is a good errno candidate for situation 4, until
+I figured out that "symlink(2)" manapage has documented that EPERM has
+completely different meaning:
+
+  EPERM  The filesystem containing linkpath does not support the
+         creation of symbolic links.
+
+And I do not understand why. I have tried to call 'ln -s' on FAT32 and
+it really showed me: "Operation not permitted" even under root. For user
+this error message sounds like it needs to be admin / root. It is very
+misleading.
+
+At least it looks like that EPERM cannot be used for this situation.
+And so it is not so easy to figure out what error codes should be
+correctly returned to userspace.
+
+
+Pali
