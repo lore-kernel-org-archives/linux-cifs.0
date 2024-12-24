@@ -1,41 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1111BC20;
-	Tue, 24 Dec 2024 13:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980D4433D5;
+	Tue, 24 Dec 2024 15:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735046376; cv=none; b=IB+urYXM5Khvjnpcc7dbpUNtPrh5BNBCiHx9/tXEI3+njC8DZcWZUVtf9kBaiOd8QvmmnpyvzQYpOlTUIiBSWSLZGu6+Ufy7lTpVgB4YvS6sXg5wjCRuCgTUq4oMl4Ph0XEMkFPRvW0fdPQTDz1T9UH6EduRQ3Ls67mxxFDM/AE=
+	t=1735052934; cv=none; b=T0ka5hJvf7PUjFcAFmJazOz05qWXX3oL/KW0WtFIJtVr+AahA/5Ri26AJi1wlnIK/pLUJB653khF8G6ECp2bs5zXDmmpPYd8/rBfZ0b+YvKzGMqa6sZeiXuwz7kJ6R0j/RVh4rmGvCHf+32vV+MvwoQ5T9bagHeFiVKtHgDkQKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735046376; c=relaxed/simple;
-	bh=V4I94Tz0kDy0ddqBKcT7fW2KnTaG2u5ww3vXh4Ky8xk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jBy/yb2ofLpLy77mGyC5wdXsfd8BdWstRmmyp0PVmtoOjqffk+YWFgDkZQJYrhT9CtGWa869cI1yT+7injm5kiNeOM3vZ+NJMtpFfw9yTEzcLI7zpvVLToVhgNYqCw8gAqRCB3UOUjAuM2Cyj5byK9RoYgyJ7v5A7/yms4tXUSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmnNG0W9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735052934; c=relaxed/simple;
+	bh=t+eTCTW8q86a8W3zzragF/IFMO+Udsti7SmsXAau0ZY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Ahl3FOs+ipBdyAf0PYpsNiTTxrIF1SCVMhjZCjLrUN3JuT2aBK08KproCClrls+Pvf+yrXQVTmZhnCZGf69TNlzzh+q/lmKQQcIOfWrJQ9SSyb6diPFM82uuHcshqQawWK7YnOJ4Kk1gzFasSm5elKzkdMPNeTDeJTnk4DKZrCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwNRi38S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmnNG0W9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4776EC4CED0;
-	Tue, 24 Dec 2024 13:19:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwNRi38S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB500C4CED0;
+	Tue, 24 Dec 2024 15:08:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735046375;
-	bh=V4I94Tz0kDy0ddqBKcT7fW2KnTaG2u5ww3vXh4Ky8xk=;
+	s=k20201202; t=1735052934;
+	bh=t+eTCTW8q86a8W3zzragF/IFMO+Udsti7SmsXAau0ZY=;
 	h=From:To:Cc:Subject:Date:From;
-	b=EmnNG0W9VeMWMhUOAHhBKAVe0fqQnsxW+KsVksRVyB7zrnIl104qOX56uhIM6IVnf
-	 Ijr8k/JLf6hwYEfNC+XfX0vsNnwXdEKhlR4CwUzSh0axYO/gIOk5k1CzMPcayfK7pr
-	 79bTCobZopX7QfA769adwNNMZO9Ps43HzzIm+O6y2FuxOka2Yz/FwfrSbPavCoTsFp
-	 BM4wOWCp/PSRES3UHw1kp629mA1Xg7qY40bCuFuR6b3I3PLLSmwn1m+hRkv3GHwMeg
-	 GUOj8VFOu7jVm46JCFv4RtMmSVctCNg56KyeAlNg2EgN5PWZCCgIm97316kdXqz2Qw
-	 9StePBPQexfCQ==
+	b=HwNRi38SZx6Jxmvq+E6VbhGyrEAlYf8FJqoHyc90xUr8pY5SjJ/V/Siu18asW0/q3
+	 8NQBnNQMJUd+DB9ElVP2LcmS4BSZYHr/9CKNiC7ki6b67M6O3xMV+cuG6namp9zaDl
+	 TeOPxUOz4ln9qzmDhB89paUyRpp5vSOxSniKsKNY+HPUh2uHOxrYWbEMR8PUF1yxF9
+	 z1yZQS182vgy9UDWmpJZgFaEv5NnPb7llF4UwTWqNMMbI65jnFcethr4McGj8buhSm
+	 bJ+OjCdkjebZ5LbAR6mdVkEureDHBqukRfOQpOBtMckSdELO0eUEbT8lhjlrVAspdh
+	 XAyFXsSEc5UMg==
 Received: by pali.im (Postfix)
-	id 312A9988; Tue, 24 Dec 2024 14:19:25 +0100 (CET)
+	id D14AD988; Tue, 24 Dec 2024 16:08:43 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] cifs: Fix getting reparse points from servers without EAs support
-Date: Tue, 24 Dec 2024 14:18:59 +0100
-Message-Id: <20241224131859.3457-1-pali@kernel.org>
+Subject: [PATCH] cifs: Update description about ACL permissions
+Date: Tue, 24 Dec 2024 16:08:29 +0100
+Message-Id: <20241224150829.3926-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -46,100 +48,137 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-If SMB server does not support EAs then for SMB2_OP_QUERY_WSL_EA request it
-returns STATUS_EAS_NOT_SUPPORTED. Function smb2_compound_op() translates
-STATUS_EAS_NOT_SUPPORTED to -EOPNOTSUPP which cause failure during calling
-lstat() syscall from userspace on any reparse point, including Native SMB
-symlink (which does not use any EAs).
+There are some incorrect information about individual SMB permission
+constants like WRITE_DAC can change ownership, or incomplete information to
+distinguish between ACL types (discretionary vs system) and there is
+completely missing information how permissions apply for directory objects
+and what is meaning of GENERIC_* bits.
 
-If SMB server does not support to attach both EAs and Reparse Point to path
-at the same time then same error STATUS_EAS_NOT_SUPPORTED is returned. This
-is the case for Windows 8 / Windows Server 2012. It is known limitation of
-NTFS driver in those older Windows versions.
+Fix and extend description of all SMB permission constants to match the
+reality, how the reference Windows SMB / NTFS implementation handles them.
 
-Since commit ea41367b2a60 ("smb: client: introduce SMB2_OP_QUERY_WSL_EA")
-Linux SMB client always ask for EAs on detected reparse point paths due to
-support of WSL EAs. But this commit broke reparse point support for all
-older Windows SMB servers which do not have support for WSL and WSL EAs.
+Links to official Microsoft documentation related to permissions:
+https://learn.microsoft.com/en-us/windows/win32/fileio/file-access-rights-constants
+https://learn.microsoft.com/en-us/windows/win32/secauthz/access-mask
+https://learn.microsoft.com/en-us/windows/win32/secauthz/standard-access-rights
+https://learn.microsoft.com/en-us/windows/win32/secauthz/generic-access-rights
+https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile
+https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntcreatefile
 
-Avoid this problem by retrying the request without SMB2_OP_QUERY_WSL_EA
-when it fails on -EOPNOTSUPP error.
-
-This should fix broken support for all special files (symlink, fifo,
-socket, block and char) for SMB server which do not support EAs at all and
-for SMB server which do not allow to attach both EAs and Reparse Point at
-the same time.
-
-Fixes: ea41367b2a60 ("smb: client: introduce SMB2_OP_QUERY_WSL_EA")
-Cc: stable@vger.kernel.org
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/smb2inode.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index e8bb3f8b53f1..58276434e47b 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -875,6 +875,7 @@ int smb2_query_path_info(const unsigned int xid,
- 	bool islink;
- 	int i, num_cmds = 0;
- 	int rc, rc2;
-+	bool skip_wsl_ea;
+Anyway, I see that these client constants are copied also in server
+fs/smb/server/smb_common.h file. Maybe they could be deduplicated into
+some fs/smb/common/* file?
+
+---
+ fs/smb/client/cifspdu.h | 77 ++++++++++++++++++++++++++++++++---------
+ 1 file changed, 60 insertions(+), 17 deletions(-)
+
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index f4c348b5c4f1..3ad1bb79ea9e 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -190,38 +190,81 @@
+  */
  
- 	data->adjust_tz = false;
- 	data->reparse_point = false;
-@@ -943,7 +944,13 @@ int smb2_query_path_info(const unsigned int xid,
- 		if (rc || !data->reparse_point)
- 			goto out;
- 
--		if (!tcon->posix_extensions)
-+		skip_wsl_ea = false;
-+retry_cmd:
-+		/*
-+		 * Skip SMB2_OP_QUERY_WSL_EA if using POSIX extensions or
-+		 * retrying request with explicitly skipping for WSL EAs.
-+		 */
-+		if (!tcon->posix_extensions && !skip_wsl_ea)
- 			cmds[num_cmds++] = SMB2_OP_QUERY_WSL_EA;
- 		/*
- 		 * Skip SMB2_OP_GET_REPARSE if symlink already parsed in create
-@@ -961,6 +968,35 @@ int smb2_query_path_info(const unsigned int xid,
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      &oparms, in_iov, cmds, num_cmds,
- 				      cfile, NULL, NULL, NULL);
-+		if (rc == -EOPNOTSUPP && !tcon->posix_extensions && !skip_wsl_ea) {
-+			/*
-+			 * Older Windows versions do not allow to set both EAs
-+			 * and Reparse Point as the same time. This is known
-+			 * limitation of older NTFS driver and it was fixed in
-+			 * Windows 10. Trying to query EAs on file which has
-+			 * Reparse Point set ends with STATUS_EAS_NOT_SUPPORTED
-+			 * error, even when server filesystem supports EAs.
-+			 * This error is translated to errno -EOPNOTSUPP.
-+			 * So in this case retry the request again without EAs.
-+			 */
-+			skip_wsl_ea = true;
-+			num_cmds = 1;
-+			goto retry_cmd;
-+		}
-+		if (rc == 0 && skip_wsl_ea &&
-+		    (data->reparse.tag == IO_REPARSE_TAG_LX_CHR ||
-+		     data->reparse.tag == IO_REPARSE_TAG_LX_BLK)) {
-+			/*
-+			 * WSL CHR and BLK reparse points store major and minor
-+			 * device numbers in EAs (instead of reparse point buffer,
-+			 * like it is for WSL symlink or NFS reparse point types).
-+			 * Therefore with skipped EAs it is not possible to finish
-+			 * query of these files. So change error back to the
-+			 * original -EOPNOTSUPP.
-+			 */
-+			rc = -EOPNOTSUPP;
-+		}
-+
- 		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
- 			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
- 			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
+ #define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
++					  /* or directory child entries can   */
++					  /* be listed together with the      */
++					  /* associated child attributes      */
++					  /* (so the FILE_READ_ATTRIBUTES on  */
++					  /* the child entry is not needed)   */
+ #define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
++					  /* or new file can be created in    */
++					  /* the directory                    */
+ #define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
++					  /* (for non-local files over SMB it */
++					  /* is same as FILE_WRITE_DATA)      */
++					  /* or new subdirectory can be       */
++					  /* created in the directory         */
+ #define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
+ 					  /* with the file can be read        */
+ #define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
+ 					  /* with the file can be written     */
+ #define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
+ 					  /* the file using system paging I/O */
+-#define FILE_DELETE_CHILD     0x00000040
++					  /* for executing the file / script  */
++					  /* or right to traverse directory   */
++					  /* (but by default all users have   */
++					  /* bypass traverse privilege and do */
++					  /* not need this permission at all) */
++#define FILE_DELETE_CHILD     0x00000040  /* Child entry can be deleted from  */
++					  /* the directory (so the DELETE on  */
++					  /* the child entry is not needed)   */
+ #define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
+-					  /* file can be read                 */
++					  /* file or directory can be read    */
+ #define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
+-					  /* file can be written              */
+-#define DELETE                0x00010000  /* The file can be deleted          */
+-#define READ_CONTROL          0x00020000  /* The access control list and      */
+-					  /* ownership associated with the    */
+-					  /* file can be read                 */
+-#define WRITE_DAC             0x00040000  /* The access control list and      */
+-					  /* ownership associated with the    */
+-					  /* file can be written.             */
++					  /* file or directory can be written */
++#define DELETE                0x00010000  /* The file or dir can be deleted   */
++#define READ_CONTROL          0x00020000  /* The discretionary access control */
++					  /* list and ownership associated    */
++					  /* with the file or dir can be read */
++#define WRITE_DAC             0x00040000  /* The discretionary access control */
++					  /* list associated with the file or */
++					  /* directory can be written         */
+ #define WRITE_OWNER           0x00080000  /* Ownership information associated */
+-					  /* with the file can be written     */
++					  /* with the file/dir can be written */
+ #define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
+ 					  /* synchronize with the completion  */
+ 					  /* of an input/output request       */
+ #define SYSTEM_SECURITY       0x01000000  /* The system access control list   */
+-					  /* can be read and changed          */
+-#define MAXIMUM_ALLOWED       0x02000000
+-#define GENERIC_ALL           0x10000000
+-#define GENERIC_EXECUTE       0x20000000
+-#define GENERIC_WRITE         0x40000000
+-#define GENERIC_READ          0x80000000
++					  /* list associated with the file or */
++					  /* dir can be read or written       */
++					  /* (cannot be in DACL, can in SACL) */
++#define MAXIMUM_ALLOWED       0x02000000  /* Maximal subset of GENERIC_ALL    */
++					  /* permissions which can be granted */
++					  /* (cannot be in DACL nor SACL)     */
++#define GENERIC_ALL           0x10000000  /* Same as: GENERIC_EXECUTE |       */
++					  /*          GENERIC_WRITE |         */
++					  /*          GENERIC_READ |          */
++					  /*          FILE_DELETE_CHILD |     */
++					  /*          DELETE |                */
++					  /*          WRITE_DAC |             */
++					  /*          WRITE_OWNER             */
++					  /* So GENERIC_ALL contains all bits */
++					  /* mentioned above except these two */
++					  /* SYSTEM_SECURITY  MAXIMUM_ALLOWED */
++#define GENERIC_EXECUTE       0x20000000  /* Same as: FILE_EXECUTE |          */
++					  /*          FILE_READ_ATTRIBUTES |  */
++					  /*          READ_CONTROL |          */
++					  /*          SYNCHRONIZE             */
++#define GENERIC_WRITE         0x40000000  /* Same as: FILE_WRITE_DATA |       */
++					  /*          FILE_APPEND_DATA |      */
++					  /*          FILE_WRITE_EA |         */
++					  /*          FILE_WRITE_ATTRIBUTES | */
++					  /*          READ_CONTROL |          */
++					  /*          SYNCHRONIZE             */
++#define GENERIC_READ          0x80000000  /* Same as: FILE_READ_DATA |        */
++					  /*          FILE_READ_EA |          */
++					  /*          FILE_READ_ATTRIBUTES |  */
++					  /*          READ_CONTROL |          */
++					  /*          SYNCHRONIZE             */
+ 					 /* In summary - Relevant file       */
+ 					 /* access flags from CIFS are       */
+ 					 /* file_read_data, file_write_data  */
 -- 
 2.20.1
 
