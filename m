@@ -1,141 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A204E1B3926;
-	Tue, 24 Dec 2024 16:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754871CA81
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Dec 2024 14:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735056346; cv=none; b=BSAUqVf2lDgWgG7gkUMWAaADdYayjQEjlSQQwBsgGk9FTvJ+I3HYKSJ+RdczB0uCm2bEz0YLYNF0I5Po35W45uO5cwtymJ6XgBHcGaDtAymnaHrb8BUDYBGpXKqIH7C67hgomi6HL+i7osVubbmkO/LU1TI14PR3jyXqCL8Nwuw=
+	t=1735138073; cv=none; b=gM5WTJLgdzpDojU/3JcBj3qvxIeNFe6u32TgCTsyRKp4M8FRByiuyy5v7G/OxCB29kuGDGAbRgbIFEcJETkzMhWDNYBr8K1e5yNrJ529pFaGtx+6yT5iuUNlT8YhXlamBI4qtqv7X8UOFp1OVRvVSPlooL7+JrbR7YoQeidvP7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735056346; c=relaxed/simple;
-	bh=ZpKBVprYkpYtjeHa4udStkTIytH/4XDXfCEGZY/JC3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ae7uLdcxGD5dzihPRy/eMBdz88YamngOF32un7iFLM5NWWG3qdMeps2ay5pIWD0AYwQhlKwspAC0qdv4psjWK5OGHNRSczWbUOWW1TwsyJ5fUe/7lj0CPdWofF+aDUkrrYF6vVIeOITSf0x5G1fMT36jBa7NZFJFrVwEjthyPkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wzw+JBz0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735138073; c=relaxed/simple;
+	bh=9jvbF1yGF8xC5fl4/s5wZreZW1tG5/yv872AIQ9eTGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o62z7lNynHzueV6ibQ/W30MKHdwnKhIyX8z4ZucDvTFRfoTg6hFuRvJRGnq1lpCECtDsOovkGWt0uLdtZapcMhXV9SF4fvz4USTvKm33dfxbxopHf8ATmdmf8QNJ/3PYlJeEOIY6CzbOWw2f3WTWisNsFsTz13UguEjtDcyLKzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tz0pWUas; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wzw+JBz0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF13C4CED0;
-	Tue, 24 Dec 2024 16:05:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tz0pWUas"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9427C4CECD;
+	Wed, 25 Dec 2024 14:47:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735056346;
-	bh=ZpKBVprYkpYtjeHa4udStkTIytH/4XDXfCEGZY/JC3s=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Wzw+JBz0bPJmn5MAIY2rpZJBiJoB3vO8JmL+mvdO7rlJ08uZpa9WQpSk0o0vuL3Hy
-	 R8Y9QhqO7HCIziB8XMGRQAzuoxgwbD3iFnIkLufsGrVHzCW1aVep+HEGY8BqTC8nma
-	 f408MziE079pqIALFjCYGkpzLXnNeGB3YrbgJA3NKFQLlqOEj/Uz6rycGOn4iAjPoq
-	 +FNboMNT3wg2UaHqJEuZ2ISUxLU6MkCgoHch4QGkHVjcW1JV6MSDC8J3R1FAi6MESx
-	 jQaHn/DKLVfNgNUoE237sPfun03v3kpICE4lRPhd/fgtI026ecFOYieZxu9Voh2ecV
-	 sYiXSCk/Iv5tw==
+	s=k20201202; t=1735138072;
+	bh=9jvbF1yGF8xC5fl4/s5wZreZW1tG5/yv872AIQ9eTGk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tz0pWUas5aa4bOhsN9Nrud7URWY6vlvf0D5Q9J3NnrzlU5egnd7Q0tL279tg1c5j5
+	 MhWrLAAnB1HBM5HV87mhDm2oHQPKpvr0c939rhyCbHPKF8e9JTxsbkJItRoPwXFCi9
+	 e821u3I9JLLmh/MX8s7sxgHIL7a7dbVh3eHtxBFxGWKP3DZ+PmyPYQfPZnFURYiVH7
+	 u+eEIoIfDnKMkswuvHIyK1OKZ0r/ZNXrT/XuzawUfEwQHgy0Ts9JSkXb80vnKoIict
+	 qfV+UmF0y9HuarG7Unx78Uq+6r8azcCyKgSq1y83LZcDmlrmKY8LF+B0lGUYnk7V30
+	 8mCr/+BWIYShA==
 Received: by pali.im (Postfix)
-	id 00CCF988; Tue, 24 Dec 2024 17:05:35 +0100 (CET)
-Date: Tue, 24 Dec 2024 17:05:35 +0100
+	id 7AF4878E; Wed, 25 Dec 2024 15:47:42 +0100 (CET)
+Date: Wed, 25 Dec 2024 15:47:42 +0100
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Errno codes from symlink() syscall
-Message-ID: <20241224160535.pi6nazpugqkhvfns@pali>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Subject: Re: SMB2 DELETE vs UNLINK
+Message-ID: <20241225144742.zef64foqrc6752o7@pali>
+References: <20241006103127.4f3mix7lhbgqgutg@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241006103127.4f3mix7lhbgqgutg@pali>
 User-Agent: NeoMutt/20180716
 
-TL;DR;
-Which errno code should network fs driver returns on create symlink
-failure to userspace application for these cases?
-* creating new symlink is not supported by fs driver mount options
-* creating new symlink is not supported by remote server software
-* creating new symlink is not supported by remote server storage
-* creating new symlink is not permitted for user due to missing
-  privilege/capability (indicated by remote server)
-* access to the directory was denied due to ACL/mode (on remote)
+On Sunday 06 October 2024 12:31:27 Pali Rohár wrote:
+> Hello,
+> 
+> Windows NT systems and SMB2 protocol support only DELETE operation which
+> unlinks file from the directory after the last client/process closes the
+> opened handle.
+> 
+> So when file is opened by more client/processes and somebody wants to
+> unlink that file, it stay in the directory until the last client/process
+> stop using it.
+> 
+> This DELETE operation can be issued either by CLOSE request on handle
+> opened by DELETE_ON_CLOSE flag, or by SET_INFO request with class 13
+> (FileDispositionInformation) and with set DeletePending flag.
+> 
+> 
+> But starting with Windows 10, version 1709, there is support also for
+> UNLINK operation, via class 64 (FileDispositionInformationEx) [1] where
+> is FILE_DISPOSITION_POSIX_SEMANTICS flag [2] which does UNLINK after
+> CLOSE and let file content usable for all other processes. Internally
+> Windows NT kernel moves this file on NTFS from its directory into some
+> hidden are. Which is de-facto same as what is POSIX unlink. There is
+> also class 65 (FileRenameInformationEx) which is allows to issue POSIX
+> rename (unlink the target if it exists).
+> 
+> What do you think about using & implementing this functionality for the
+> Linux unlink operation? As the class numbers are already reserved and
+> documented, I think that it could make sense to use them also over SMB
+> on POSIX systems.
+> 
+> 
+> Also there is another flag FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE
+> which can be useful for unlink. It allows to unlink also file which has
+> read-only attribute set. So no need to do that racy (unset-readonly,
+> set-delete-pending, set-read-only) compound on files with more file
+> hardlinks.
+> 
+> I think that this is something which SMB3 POSIX extensions can use and
+> do not have to invent new extensions for the same functionality.
+> 
+> 
+> [1] - https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ne-wdm-_file_information_class
+> [2] - https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/ns-ntddk-_file_disposition_information_ex
+> [3] - https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_rename_information
 
+And now I figured out that struct FILE_FS_ATTRIBUTE_INFORMATION which
+has member FileSystemAttributes contains new documented bit:
 
-Hello,
+0x00000400 - FILE_SUPPORTS_POSIX_UNLINK_RENAME
+The file system supports POSIX-style delete and rename operations.
 
-I discussed with Steve that current error codes from symlink() syscall
-propagated to userspace on mounted SMB share are in most cases
-misleading for end user who is trying to create a new symlink via ln -s
-command.
+See Windows NT spec:
+https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_fs_attribute_information
 
-Linux SMB client (cifs.ko) can see different kind of errors when it is
-trying to create a symlink on SMB server. I know at least about these
-errors which can happen:
+Interesting is that this struct FILE_FS_ATTRIBUTE_INFORMATION is
+available over SMB protocol too but bit value 0x00000400 is not
+documented in [MS-FSCC] section 2.5.1 FileFsAttributeInformation:
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/ebc7e6e5-4650-4e54-b17c-cf60f6fbeeaa
 
-1 For the current mount parameters, the Linux SMB client does not
-  implement creating a new symlink yet and server supports symlinks.
-  This applies for example for SMB1 dialect against Windows server, when
-  Linux SMB client is already able to query existing symlinks via
-  readlink() syscall (just not able to create new one).
+So it really looks like that POSIX unlink is prepared for SMB, just is
+not documented or implemented in Windows yet.
 
-2 For the current mount parameters, the SMB server does not support
-  symlink operations at all. But it can support it when using other
-  mount parameters. This applies for example for older Samba server with
-  SMB2+ dialect (when older version supported symlinks only over SMB1).
-
-3 The SMB server for the mounted share does not support symlink
-  operations at all. For example server supports symlinks, but mounted
-  share is on FAT32 on which symlinks cannot be stored.
-
-4 The user who is logged to SMB server does not have a privilege to
-  create a new symlink at all. But server and also share supports
-  symlinks without any problem. Just this user is less privileged,
-  and no ACL/mode can help.
-
-5 The user does not have access right to create a new object (file,
-  directory, symlink, etc...) in the specified directory. For example
-  "chmod -w" can cause this.
-
-Linux SMB client should have all information via different SMB error
-codes to distinguish between all these 5 situations.
-
-On Windows servers for creating a new symlink is required that user has
-SeCreateSymbolicLinkPrivilege. This privilege is by default enabled only
-for Administrators, so by default ordinary users cannot create symlinks
-due to security restrictions. On the other hand, querying symlink path
-is allowed for any user (who has access to that symlink fs object).
-
-Therefore it is important for user who is calling 'ln -s' command on SMB
-share mounted on Linux to distinguish between 4 and 5 on failure. If
-user needs to just add "write-directory" permission (chmod +w) or asking
-AD admin for adding SeCreateSymbolicLinkPrivilege into Group Policy.
-
-
-I would like to open a discussion on fsdevel list, what errno codes from
-symlink() syscall should be reported to userspace for particular
-situations 1 - 5?
-
-Situation 5 should be classic EACCES. I think this should be clear.
-
-Situation 4 start to be complicated. Windows "privilege" is basically
-same as Linux "capability", it is bound to the process and in normal
-situation it is set by login manager. Just Linux does not have
-equivalent capability for allowing creating new symlink. But generally
-Linux for missing permission which is granted by capability (e.g. for
-ioperm() via CAP_SYS_RAWIO) is in lot of cases returned errno EPERM.
-
-So I thought that EPERM is a good errno candidate for situation 4, until
-I figured out that "symlink(2)" manapage has documented that EPERM has
-completely different meaning:
-
-  EPERM  The filesystem containing linkpath does not support the
-         creation of symbolic links.
-
-And I do not understand why. I have tried to call 'ln -s' on FAT32 and
-it really showed me: "Operation not permitted" even under root. For user
-this error message sounds like it needs to be admin / root. It is very
-misleading.
-
-At least it looks like that EPERM cannot be used for this situation.
-And so it is not so easy to figure out what error codes should be
-correctly returned to userspace.
-
-
-Pali
+Maybe somebody could ask Microsoft documentation team for more details?
