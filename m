@@ -1,296 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BEC1FAA;
-	Thu, 26 Dec 2024 00:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E1877F10;
+	Thu, 26 Dec 2024 09:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735172562; cv=none; b=lpdMajkUYHNj5MaBAzwmqydhPn1xCMx05/0ncGFe5W8TmzAHNb/hyQiHJujflZK6o70ejJ9ojOMtocwNk9xx9QZ1nq6Fp9HWpkMM5r7awGhqEDQh+b5APBKArQoIJKVGQUJRuWEOblGwk33JgM1gQ7cnuIMk9vikdPOsNFC0pv4=
+	t=1735206027; cv=none; b=i2ejqVWUW8PaKbQwfQHjStpX3kZwr03SaGH4BEOU0ptTZq/KR4HDHZWAD/3ikZtZoSWM8DabOQGDy+CL+Bn/kIAxGAMi3imPcclr18wjhWOrrDhItY/6yzHsPwFAarJ4yEjS/kx4fmH49VrB+MmJ0E9LqM9vdLMSNm2IK8ipDek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735172562; c=relaxed/simple;
-	bh=8C6bhKgvSDrLCo0f5xI2WhUPH4PZ/Ia2r+YYfvLbbhc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CShe7zf2ZLiABo8Du1JWZNAIEkmjWtx/ODsIvInInPDsV5YCz+5yAObJy27Niyd76SUUH549TLSgB7XwJbn5NZ5SkDU9PUUQo2JZleWPF2jqhvS7R6VUGdMWvxJFYRX5dYWs6jEtSwJTGmPd6KrWKHiF8wwS0AHdHz9F+cpuOco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrSuNBdD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrSuNBdD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F5ECC4CECD;
-	Thu, 26 Dec 2024 00:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735172562;
-	bh=8C6bhKgvSDrLCo0f5xI2WhUPH4PZ/Ia2r+YYfvLbbhc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=DrSuNBdDqDMGcHc/9RVCNFk3hbjGpInTHr8b+Bb34JOkH04y5iweXaMjacV/XeBfZ
-	 XswGPl57ygMeF2e75vC5KBRk5WrLcNj1LMRkcgAxWGU4JxyL0M9haIETxW878HdlDc
-	 B9PEssUD1sVhykMsACLGmKXLSxXPPMZekOL9LZ7zU4wEIEadhljQl0xa4fYoC6Mj02
-	 m/90rmx1aFXvrverfJ9ibrKt7ndmdNFvi6yGjGgFoThqrmHETHnp7rdTYXWixJezha
-	 ifsfEMRWITFkYnKU0OVa4XBfMqC4CaLEvf4fXemQpkxiIn4Us4siliPH9Y4bmiUUqB
-	 xmBwJCNm/6Cxw==
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-71e3cbd0583so1329533a34.1;
-        Wed, 25 Dec 2024 16:22:42 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUSp9gqDnZrpka0UmYDzStZ30hOHCVtExVZFbO7gE27UaySGLZgXIF14pFCXXhFK6pfnNRiG2H2/r51@vger.kernel.org, AJvYcCUetVOZioQVheyrdfAyFY4mG6K6YI9aRBLRe4/5FdpNvZwKM4M6BwkC3axIt5Dg2grL6OqFJglouMCAikHF@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtQ/t5lAR3eEDMJekhW7yVjI/XCuzPN2zODWtDwL5aGR/wBSC/
-	aHdIAOkidQqQrDwZ7MgXNvNsHfctuaKPUIvVq32z7qAA6uwWb1Nx5ltWdyBwvzPsY6KHN4orvWv
-	PqDONOnheejP0neyWQRxViyGuJns=
-X-Google-Smtp-Source: AGHT+IH0/oiRnGn8rBEjpaaztO/jeQB5M+mPBwBf9l5S5h6mVzkVZiTetUkzwJAdGfZHynpWzdRPvIoAA3B2lbsMFNA=
-X-Received: by 2002:a05:6808:168c:b0:3e5:f4fa:5984 with SMTP id
- 5614622812f47-3ed890b182amr9086373b6e.38.1735172561532; Wed, 25 Dec 2024
- 16:22:41 -0800 (PST)
+	s=arc-20240116; t=1735206027; c=relaxed/simple;
+	bh=Tihhrhi2Ux00xrX4+kJKYBgLtwpvSFXFTRGw8jfJTAI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BF9tgEx8zjrv3Pu0F3uP+k/Y3ykD5Ql6xDWVgZJgkM2vm3mvMgjZiiOOA+eh7Aa0yj5qLfLl7UptcyoUMssVtxV5FwILX9mqBxmWVOdZ1/s1pEpattIKnitF/w+qGkCQoHIWsqI97HVTY6m5AcsaPA5xSMyBvLC3/ohxRTI/NzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (188.234.32.57) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 26 Dec
+ 2024 12:25:03 +0300
+From: d.privalov <d.privalov@omp.ru>
+To: Steve French <sfrench@samba.org>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>,
+	<stable@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, Steve French
+	<stfrench@microsoft.com>, Dmitriy Privalov <d.privalov@omp.ru>
+Subject: [PATCH 5.10/5.15 1/1] smb: client: fix use-after-free bug in cifs_debug_data_proc_show()
+Date: Thu, 26 Dec 2024 12:25:15 +0300
+Message-ID: <20241226092516.43194-1-d.privalov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241224150829.3926-1-pali@kernel.org>
-In-Reply-To: <20241224150829.3926-1-pali@kernel.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 26 Dec 2024 09:22:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Wy0_skGEhrWNT1u7w4VTbmk_FUH_PN2oN6G-npM3Ntg@mail.gmail.com>
-Message-ID: <CAKYAXd_Wy0_skGEhrWNT1u7w4VTbmk_FUH_PN2oN6G-npM3Ntg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Update description about ACL permissions
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 12/26/2024 08:49:16
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190069 [Dec 26 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 49 0.3.49
+ 28b3b64a43732373258a371bd1554adb2caa23cb
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 188.234.32.57 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.32.57
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/26/2024 08:52:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/26/2024 7:26:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Dec 25, 2024 at 12:08=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> =
-wrote:
->
-> There are some incorrect information about individual SMB permission
-> constants like WRITE_DAC can change ownership, or incomplete information =
-to
-> distinguish between ACL types (discretionary vs system) and there is
-> completely missing information how permissions apply for directory object=
-s
-> and what is meaning of GENERIC_* bits.
->
-> Fix and extend description of all SMB permission constants to match the
-> reality, how the reference Windows SMB / NTFS implementation handles them=
-.
->
-> Links to official Microsoft documentation related to permissions:
-> https://learn.microsoft.com/en-us/windows/win32/fileio/file-access-rights=
--constants
-> https://learn.microsoft.com/en-us/windows/win32/secauthz/access-mask
-> https://learn.microsoft.com/en-us/windows/win32/secauthz/standard-access-=
-rights
-> https://learn.microsoft.com/en-us/windows/win32/secauthz/generic-access-r=
-ights
-> https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-=
-ntcreatefile
-> https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-n=
-tifs-ntcreatefile
->
-> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
-> ---
->
-> Anyway, I see that these client constants are copied also in server
-> fs/smb/server/smb_common.h file. Maybe they could be deduplicated into
-> some fs/smb/common/* file?
-Yes, We can move them to fs/smb/common/* file.
+From: Paulo Alcantara <pc@manguebit.com>
 
-Thanks.
->
-> ---
->  fs/smb/client/cifspdu.h | 77 ++++++++++++++++++++++++++++++++---------
->  1 file changed, 60 insertions(+), 17 deletions(-)
->
-> diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-> index f4c348b5c4f1..3ad1bb79ea9e 100644
-> --- a/fs/smb/client/cifspdu.h
-> +++ b/fs/smb/client/cifspdu.h
-> @@ -190,38 +190,81 @@
->   */
->
->  #define FILE_READ_DATA        0x00000001  /* Data can be read from the f=
-ile   */
-> +                                         /* or directory child entries c=
-an   */
-> +                                         /* be listed together with the =
-     */
-> +                                         /* associated child attributes =
-     */
-> +                                         /* (so the FILE_READ_ATTRIBUTES=
- on  */
-> +                                         /* the child entry is not neede=
-d)   */
->  #define FILE_WRITE_DATA       0x00000002  /* Data can be written to the =
-file  */
-> +                                         /* or new file can be created i=
-n    */
-> +                                         /* the directory               =
-     */
->  #define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the=
- file */
-> +                                         /* (for non-local files over SM=
-B it */
-> +                                         /* is same as FILE_WRITE_DATA) =
-     */
-> +                                         /* or new subdirectory can be  =
-     */
-> +                                         /* created in the directory    =
-     */
->  #define FILE_READ_EA          0x00000008  /* Extended attributes associa=
-ted   */
->                                           /* with the file can be read   =
-     */
->  #define FILE_WRITE_EA         0x00000010  /* Extended attributes associa=
-ted   */
->                                           /* with the file can be written=
-     */
->  #define FILE_EXECUTE          0x00000020  /*Data can be read into memory=
- from */
->                                           /* the file using system paging=
- I/O */
-> -#define FILE_DELETE_CHILD     0x00000040
-> +                                         /* for executing the file / scr=
-ipt  */
-> +                                         /* or right to traverse directo=
-ry   */
-> +                                         /* (but by default all users ha=
-ve   */
-> +                                         /* bypass traverse privilege an=
-d do */
-> +                                         /* not need this permission at =
-all) */
-> +#define FILE_DELETE_CHILD     0x00000040  /* Child entry can be deleted =
-from  */
-> +                                         /* the directory (so the DELETE=
- on  */
-> +                                         /* the child entry is not neede=
-d)   */
->  #define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with =
-the   */
-> -                                         /* file can be read            =
-     */
-> +                                         /* file or directory can be rea=
-d    */
->  #define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with =
-the   */
-> -                                         /* file can be written         =
-     */
-> -#define DELETE                0x00010000  /* The file can be deleted    =
-      */
-> -#define READ_CONTROL          0x00020000  /* The access control list and=
-      */
-> -                                         /* ownership associated with th=
-e    */
-> -                                         /* file can be read            =
-     */
-> -#define WRITE_DAC             0x00040000  /* The access control list and=
-      */
-> -                                         /* ownership associated with th=
-e    */
-> -                                         /* file can be written.        =
-     */
-> +                                         /* file or directory can be wri=
-tten */
-> +#define DELETE                0x00010000  /* The file or dir can be dele=
-ted   */
-> +#define READ_CONTROL          0x00020000  /* The discretionary access co=
-ntrol */
-> +                                         /* list and ownership associate=
-d    */
-> +                                         /* with the file or dir can be =
-read */
-> +#define WRITE_DAC             0x00040000  /* The discretionary access co=
-ntrol */
-> +                                         /* list associated with the fil=
-e or */
-> +                                         /* directory can be written    =
-     */
->  #define WRITE_OWNER           0x00080000  /* Ownership information assoc=
-iated */
-> -                                         /* with the file can be written=
-     */
-> +                                         /* with the file/dir can be wri=
-tten */
->  #define SYNCHRONIZE           0x00100000  /* The file handle can waited =
-on to */
->                                           /* synchronize with the complet=
-ion  */
->                                           /* of an input/output request  =
-     */
->  #define SYSTEM_SECURITY       0x01000000  /* The system access control l=
-ist   */
-> -                                         /* can be read and changed     =
-     */
-> -#define MAXIMUM_ALLOWED       0x02000000
-> -#define GENERIC_ALL           0x10000000
-> -#define GENERIC_EXECUTE       0x20000000
-> -#define GENERIC_WRITE         0x40000000
-> -#define GENERIC_READ          0x80000000
-> +                                         /* list associated with the fil=
-e or */
-> +                                         /* dir can be read or written  =
-     */
-> +                                         /* (cannot be in DACL, can in S=
-ACL) */
-> +#define MAXIMUM_ALLOWED       0x02000000  /* Maximal subset of GENERIC_A=
-LL    */
-> +                                         /* permissions which can be gra=
-nted */
-> +                                         /* (cannot be in DACL nor SACL)=
-     */
-> +#define GENERIC_ALL           0x10000000  /* Same as: GENERIC_EXECUTE | =
-      */
-> +                                         /*          GENERIC_WRITE |    =
-     */
-> +                                         /*          GENERIC_READ |     =
-     */
-> +                                         /*          FILE_DELETE_CHILD |=
-     */
-> +                                         /*          DELETE |           =
-     */
-> +                                         /*          WRITE_DAC |        =
-     */
-> +                                         /*          WRITE_OWNER        =
-     */
-> +                                         /* So GENERIC_ALL contains all =
-bits */
-> +                                         /* mentioned above except these=
- two */
-> +                                         /* SYSTEM_SECURITY  MAXIMUM_ALL=
-OWED */
-> +#define GENERIC_EXECUTE       0x20000000  /* Same as: FILE_EXECUTE |    =
-      */
-> +                                         /*          FILE_READ_ATTRIBUTE=
-S |  */
-> +                                         /*          READ_CONTROL |     =
-     */
-> +                                         /*          SYNCHRONIZE        =
-     */
-> +#define GENERIC_WRITE         0x40000000  /* Same as: FILE_WRITE_DATA | =
-      */
-> +                                         /*          FILE_APPEND_DATA | =
-     */
-> +                                         /*          FILE_WRITE_EA |    =
-     */
-> +                                         /*          FILE_WRITE_ATTRIBUT=
-ES | */
-> +                                         /*          READ_CONTROL |     =
-     */
-> +                                         /*          SYNCHRONIZE        =
-     */
-> +#define GENERIC_READ          0x80000000  /* Same as: FILE_READ_DATA |  =
-      */
-> +                                         /*          FILE_READ_EA |     =
-     */
-> +                                         /*          FILE_READ_ATTRIBUTE=
-S |  */
-> +                                         /*          READ_CONTROL |     =
-     */
-> +                                         /*          SYNCHRONIZE        =
-     */
->                                          /* In summary - Relevant file   =
-    */
->                                          /* access flags from CIFS are   =
-    */
->                                          /* file_read_data, file_write_da=
-ta  */
-> --
-> 2.20.1
->
+commit d328c09ee9f15ee5a26431f5aad7c9239fa85e62 upstream.
+
+Skip SMB sessions that are being teared down
+(e.g. @ses->ses_status == SES_EXITING) in cifs_debug_data_proc_show()
+to avoid use-after-free in @ses.
+
+This fixes the following GPF when reading from /proc/fs/cifs/DebugData
+while mounting and umounting
+
+  [ 816.251274] general protection fault, probably for non-canonical
+  address 0x6b6b6b6b6b6b6d81: 0000 [#1] PREEMPT SMP NOPTI
+  ...
+  [  816.260138] Call Trace:
+  [  816.260329]  <TASK>
+  [  816.260499]  ? die_addr+0x36/0x90м
+  [  816.260762]  ? exc_general_protection+0x1b3/0x410
+  [  816.261126]  ? asm_exc_general_protection+0x26/0x30
+  [  816.261502]  ? cifs_debug_tcon+0xbd/0x240 [cifs]
+  [  816.261878]  ? cifs_debug_tcon+0xab/0x240 [cifs]
+  [  816.262249]  cifs_debug_data_proc_show+0x516/0xdb0 [cifs]
+  [  816.262689]  ? seq_read_iter+0x379/0x470
+  [  816.262995]  seq_read_iter+0x118/0x470
+  [  816.263291]  proc_reg_read_iter+0x53/0x90
+  [  816.263596]  ? srso_alias_return_thunk+0x5/0x7f
+  [  816.263945]  vfs_read+0x201/0x350
+  [  816.264211]  ksys_read+0x75/0x100
+  [  816.264472]  do_syscall_64+0x3f/0x90
+  [  816.264750]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+  [  816.265135] RIP: 0033:0x7fd5e669d381
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[d.privalov: Adapt checking status ses->ses_status to use global lock GlobalMid_Lock]
+Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
+---
+ fs/cifs/cifs_debug.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 53588d7517b4..c094f44fbbde 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -356,6 +356,11 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 		list_for_each(tmp2, &server->smb_ses_list) {
+ 			ses = list_entry(tmp2, struct cifs_ses,
+ 					 smb_ses_list);
++			spin_lock(&GlobalMid_Lock);
++			if (ses->status == CifsExiting) {
++				spin_unlock(&GlobalMid_Lock);
++				continue;
++			}
+ 			if ((ses->serverDomain == NULL) ||
+ 				(ses->serverOS == NULL) ||
+ 				(ses->serverNOS == NULL)) {
+@@ -375,6 +380,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 				ses->capabilities, ses->status);
+ 			}
++			spin_unlock(&GlobalMid_Lock);
+ 
+ 			seq_printf(m,"Security type: %s\n",
+ 				get_security_type_str(server->ops->select_sectype(server, ses->sectype)));
+ 
+-- 
+2.34.1
+
