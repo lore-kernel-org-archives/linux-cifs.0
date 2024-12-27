@@ -1,43 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2141F4273;
-	Fri, 27 Dec 2024 13:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B514320B;
+	Fri, 27 Dec 2024 14:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735304510; cv=none; b=pznOaH2ywq30gNxDEU5QgBRgfFtI7F/bUO30Nwqi8QdEDaOK1zwwM+/rNvnzIzF88ybsBhGAOFh6zY3SehlS8StNkj/+08UrS3J3KyzEnlJtrw+pI6kcgtXmxa5Yt6de3lClw9Z38kBVQoQ6ez8HwG4KMUAfgpMnl53oyVuxOcE=
+	t=1735310491; cv=none; b=dLqHr/d1JLtium+ZsFkF24ZiAggbSZMxSiuHfHdMDS9GYp6ls5NK1q6iyCI+g0aoFAZR5XmAByKAVcxkCpCeLfV+COE3ff0Z2JWHM34wpNISUrgE4q9R3Pa3uZCav+n68ZY7A+Tcse8Hxe/kBeqLycgdwc4LXf/+FE2+cUmc03o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735304510; c=relaxed/simple;
-	bh=dolR1U+H4lYAhezUG/pHOFnyYj42yMbru3ukd01vFuw=;
+	s=arc-20240116; t=1735310491; c=relaxed/simple;
+	bh=Av43lv3ytxE1A7i3cWYA3i7vXwopXr2ob5+8N2cvPpI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g56HyRq9Pd1x75m38CbNr5B9tVOBfF1Il6kBNvABjG5SbRRnsXR8mnojLtVSHPyAvaM18g6j6abIJHfEzsViXa1DY+IZJQNSYLHoUVFtyndh6Lv5WfP2tpww7g/wn+q8EdH1AusN652T2Y7hJrie+mdqzvF9esqJzeS+J2gIPF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O73zKzYO; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=HPlNXWCaP7pEW/DSMHT5pVuOrhEO8I/pkuk+qtETzacnc7Cqflwb8QOuj/X6BmhmuL6JH957JTJnPqKw81INqvTz8Gh4KGwnpYYkiqevU8EHlVu+HJ8i6t9jYkU7GeKg0Q0vaLbZL0QVrNj2rNnaoh7Mj3rTOHh+/KXupOSCA8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMKQ7aRF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O73zKzYO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CFFBC4CED0;
-	Fri, 27 Dec 2024 13:01:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMKQ7aRF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E23C4CED0;
+	Fri, 27 Dec 2024 14:41:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735304509;
-	bh=dolR1U+H4lYAhezUG/pHOFnyYj42yMbru3ukd01vFuw=;
+	s=k20201202; t=1735310490;
+	bh=Av43lv3ytxE1A7i3cWYA3i7vXwopXr2ob5+8N2cvPpI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O73zKzYOWIiDzOCHTa3vQkZNamfw5/uwvq1HgENkP5tBIZT+0SnrBl9tv08MU1ghO
-	 m9PSX4EwzMfOzZH8wIs9aA6Vy1OB9nYJQI1U9PPY1ATCGc5hJNMSteQpem+X27fBox
-	 eqQS1jlU4qDo9hLIMVJPbMXBXvCtoDZSPbYvKltrGegnQn+DIYHz6nULeaE9QZyve6
-	 4YQtYtA1ymB7hXsVo+pR0r4o+p1hY7b8hNsbXs9X2Rgn6bh/zn18NddFhoZuxPe6C5
-	 TZw/++2A7DVWS9i9ZvlhFKZ+SmP/9mWS+abur4KHZpi8KkM5oFzDb1IBAWaUgyKa3f
-	 3pYGSuFg1nOWQ==
+	b=qMKQ7aRFUDgOsmG486tOAf5LrfM0JG1zIYen41kXAgV9cW+o2f46U1MYpM/r2PNy7
+	 Lw4UgNahNryDW+RevVGjXp25lw4xfPVNe9Lr3P7Hg3mIZV9Jxo2p5byt+2LReu+A6d
+	 czrEDLnXhOV0QCjce3ji1kobvQBxLYjTARJwa5Up25qWRCsXOjTTuTMBz4u2tg30jY
+	 5IgzQiDfPhr+/qAlOGuzE9+VMIfKpzmZnJD1AKrvb2qPQOtMHFhlmP5wzAhRyAXqQM
+	 up952nee/Kcv8HmlvdklJ20sKR4Lq0AEos31NuRz5/zMerar6zpNLahnvofUjDXSSd
+	 7qNOM9vi7h3Vg==
 Received: by pali.im (Postfix)
-	id 6D289787; Fri, 27 Dec 2024 14:01:39 +0100 (CET)
-Date: Fri, 27 Dec 2024 14:01:39 +0100
+	id 4A337787; Fri, 27 Dec 2024 15:41:20 +0100 (CET)
+Date: Fri, 27 Dec 2024 15:41:20 +0100
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Re: Errno codes from symlink() syscall
-Message-ID: <20241227130139.dplqu5jlli57hhhm@pali>
-References: <20241224160535.pi6nazpugqkhvfns@pali>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] cifs: Implement is_network_name_deleted for SMB1
+Message-ID: <20241227144120.lnxc4acxpkvt7khw@pali>
+References: <20241222171431.24657-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -47,115 +45,104 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241224160535.pi6nazpugqkhvfns@pali>
+In-Reply-To: <20241222171431.24657-1-pali@kernel.org>
 User-Agent: NeoMutt/20180716
 
-On Tuesday 24 December 2024 17:05:35 Pali Rohár wrote:
-> TL;DR;
-> Which errno code should network fs driver returns on create symlink
-> failure to userspace application for these cases?
-> * creating new symlink is not supported by fs driver mount options
-> * creating new symlink is not supported by remote server software
-> * creating new symlink is not supported by remote server storage
-> * creating new symlink is not permitted for user due to missing
->   privilege/capability (indicated by remote server)
-> * access to the directory was denied due to ACL/mode (on remote)
+On Sunday 22 December 2024 18:14:31 Pali Rohár wrote:
+> This change allows Linux SMB1 client to autoreconnect the share when it is
+> modified on server by admin operation which removes and re-adds it.
 > 
+> Implementation is reused from SMB2+ is_network_name_deleted callback. There
+> are just adjusted checks for error codes and access to struct smb_hdr.
 > 
-> Hello,
+> Signed-off-by: Pali Rohár <pali@kernel.org>
+> ---
+>  fs/smb/client/smb1ops.c | 44 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
 > 
-> I discussed with Steve that current error codes from symlink() syscall
-> propagated to userspace on mounted SMB share are in most cases
-> misleading for end user who is trying to create a new symlink via ln -s
-> command.
-> 
-> Linux SMB client (cifs.ko) can see different kind of errors when it is
-> trying to create a symlink on SMB server. I know at least about these
-> errors which can happen:
-> 
-> 1 For the current mount parameters, the Linux SMB client does not
->   implement creating a new symlink yet and server supports symlinks.
->   This applies for example for SMB1 dialect against Windows server, when
->   Linux SMB client is already able to query existing symlinks via
->   readlink() syscall (just not able to create new one).
-> 
-> 2 For the current mount parameters, the SMB server does not support
->   symlink operations at all. But it can support it when using other
->   mount parameters. This applies for example for older Samba server with
->   SMB2+ dialect (when older version supported symlinks only over SMB1).
-> 
-> 3 The SMB server for the mounted share does not support symlink
->   operations at all. For example server supports symlinks, but mounted
->   share is on FAT32 on which symlinks cannot be stored.
-> 
-> 4 The user who is logged to SMB server does not have a privilege to
->   create a new symlink at all. But server and also share supports
->   symlinks without any problem. Just this user is less privileged,
->   and no ACL/mode can help.
-> 
-> 5 The user does not have access right to create a new object (file,
->   directory, symlink, etc...) in the specified directory. For example
->   "chmod -w" can cause this.
-> 
-> Linux SMB client should have all information via different SMB error
-> codes to distinguish between all these 5 situations.
-> 
-> On Windows servers for creating a new symlink is required that user has
-> SeCreateSymbolicLinkPrivilege. This privilege is by default enabled only
-> for Administrators, so by default ordinary users cannot create symlinks
-> due to security restrictions. On the other hand, querying symlink path
-> is allowed for any user (who has access to that symlink fs object).
-> 
-> Therefore it is important for user who is calling 'ln -s' command on SMB
-> share mounted on Linux to distinguish between 4 and 5 on failure. If
-> user needs to just add "write-directory" permission (chmod +w) or asking
-> AD admin for adding SeCreateSymbolicLinkPrivilege into Group Policy.
-> 
-> 
-> I would like to open a discussion on fsdevel list, what errno codes from
-> symlink() syscall should be reported to userspace for particular
-> situations 1 - 5?
-> 
-> Situation 5 should be classic EACCES. I think this should be clear.
-> 
-> Situation 4 start to be complicated. Windows "privilege" is basically
-> same as Linux "capability", it is bound to the process and in normal
-> situation it is set by login manager. Just Linux does not have
-> equivalent capability for allowing creating new symlink. But generally
-> Linux for missing permission which is granted by capability (e.g. for
-> ioperm() via CAP_SYS_RAWIO) is in lot of cases returned errno EPERM.
-> 
-> So I thought that EPERM is a good errno candidate for situation 4, until
-> I figured out that "symlink(2)" manapage has documented that EPERM has
-> completely different meaning:
-> 
->   EPERM  The filesystem containing linkpath does not support the
->          creation of symbolic links.
-> 
-> And I do not understand why. I have tried to call 'ln -s' on FAT32 and
-> it really showed me: "Operation not permitted" even under root. For user
-> this error message sounds like it needs to be admin / root. It is very
-> misleading.
-> 
-> At least it looks like that EPERM cannot be used for this situation.
-> And so it is not so easy to figure out what error codes should be
-> correctly returned to userspace.
-> 
-> 
-> Pali
+> diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+> index 0533aca770fc..76e7353f2a72 100644
+> --- a/fs/smb/client/smb1ops.c
+> +++ b/fs/smb/client/smb1ops.c
+> @@ -14,6 +14,8 @@
+>  #include "cifspdu.h"
+>  #include "cifs_unicode.h"
+>  #include "fs_context.h"
+> +#include "nterr.h"
+> +#include "smberr.h"
+>  
+>  /*
+>   * An NT cancel request header looks just like the original request except:
+> @@ -1075,6 +1077,47 @@ cifs_make_node(unsigned int xid, struct inode *inode,
+>  				  full_path, mode, dev);
+>  }
+>  
+> +static bool
+> +cifs_is_network_name_deleted(char *buf, struct TCP_Server_Info *server)
+> +{
+> +	struct smb_hdr *shdr = (struct smb_hdr *)buf;
+> +	struct TCP_Server_Info *pserver;
+> +	struct cifs_ses *ses;
+> +	struct cifs_tcon *tcon;
+> +
+> +	if (shdr->Flags2 & SMBFLG2_ERR_STATUS) {
+> +		if (shdr->Status.CifsError != cpu_to_le32(NT_STATUS_NETWORK_NAME_DELETED))
+> +			return false;
+> +	} else {
+> +		if (shdr->Status.DosError.ErrorClass != ERRSRV ||
+> +		    shdr->Status.DosError.Error != cpu_to_le16(ERRinvtid))
+> +			return false;
+> +	}
+> +
+> +	/* If server is a channel, select the primary channel */
+> +	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
+> +
+> +	spin_lock(&cifs_tcp_ses_lock);
+> +	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
+> +		if (cifs_ses_exiting(ses))
+> +			continue;
+> +		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+> +			if (tcon->tid == le32_to_cpu(shdr->Tid)) {
 
-I was thinking more about it and the reasonable solution could be to use
-following errno codes for these situations:
+Kernel test robot complained on this line about endianity issues. I have
+looked why, and I figured out that for smb1 the tcon->tid value is
+stored in the little endian, but for smb2+ it is stored in cpu endian.
+Hence this line should be:
 
- EOPNOTSUPP - server or client does not support symlink operation
- EPERM - user does not have privilege / capability to create new symlink
- EACCES - user does not have (ACL) permission to create new symlink
+-			if (tcon->tid == le32_to_cpu(shdr->Tid)) {
++			if (tcon->tid == shdr->Tid) {
 
-But in this case it would be needed to extend symlink(2) manpage. It is
-feasible? Or the meaning of EPERM is written in the stone, it means that
-operation is not supported, and it cannot be changed?
+I will include this fixup into v2 when needed (during next rebase).
 
-For me it sounds a bug if EPERM means "not supported", and also "ln -s"
-tool does not understand this EPERM error as it shows human readable
-message "Operation not permitted" instead of "Operation not supported"
-(which is the correct one in this situation).
+Note that it is hard to catch such endianity issues as majority of user
+machines are little endian, so such issues are hidden.
+
+> +				spin_lock(&tcon->tc_lock);
+> +				tcon->need_reconnect = true;
+> +				spin_unlock(&tcon->tc_lock);
+> +				spin_unlock(&cifs_tcp_ses_lock);
+> +				pr_warn_once("Server share %s deleted.\n",
+> +					     tcon->tree_name);
+> +				return true;
+> +			}
+> +		}
+> +	}
+> +	spin_unlock(&cifs_tcp_ses_lock);
+> +
+> +	return false;
+> +}
+> +
+>  struct smb_version_operations smb1_operations = {
+>  	.send_cancel = send_nt_cancel,
+>  	.compare_fids = cifs_compare_fids,
+> @@ -1159,6 +1202,7 @@ struct smb_version_operations smb1_operations = {
+>  	.get_acl_by_fid = get_cifs_acl_by_fid,
+>  	.set_acl = set_cifs_acl,
+>  	.make_node = cifs_make_node,
+> +	.is_network_name_deleted = cifs_is_network_name_deleted,
+>  };
+>  
+>  struct smb_version_values smb1_values = {
+> -- 
+> 2.20.1
+> 
