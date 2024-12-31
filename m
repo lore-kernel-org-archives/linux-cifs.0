@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1694E1B043E;
-	Tue, 31 Dec 2024 22:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1968B1B4124;
+	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735684630; cv=none; b=t1kpUiy9vTbnjb19/PKELxsSFkkHJzIhxIqCO0UiuDWmGbratwtW3g7a0+Cda226+ixrEkpS/hWJrALj5StWNt+DiQuMAQurmt3BhbZsnzHI8wT4slx55toAgtjFByBqFe3otzaHIuoP0iEL5qgbFygsyjyo/4nXDn0zZu9ds9c=
+	t=1735684630; cv=none; b=d2VP69XHeOh4+//tFeNLZgszrCAOFITEKPROMHNxIhrjOH3ZgcGSxfoYvCo0t1bFbY+CnRmKNpeML7QcvWIovl7D83rqyaQeu/nC4hjR2roDQfY+OWKoqt9W9B1pKuKK69ONscTfuwcJnBiOMbGcxgTxtTB0+A5xytJ1WUM1hIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735684630; c=relaxed/simple;
-	bh=y8jvzkyAzxyNwmUGiUFU/ZrZFKeYb2sh7YIJFEf7HB8=;
+	bh=qeIuosm52zyCma7WnhBPMzKwH4sWBW0yo2xCyxH0MpI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WVvrA2uW4zICrizETuB5PKsJW2ULZ8niF3ZuTC4Q3op9wsEKwq37Pp8hHFA4yht++gfUSQnVWmOD3ZG8CmYaGmHs3EhGlWC4xseQr7rZqNKasxjgU103O0b0YQDezVry6t+RozfHGSeUfEyKrRyoDahqY7oHkS9+knB/YsPTY5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gLl/i9jq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=X2CTX0oKYJpO8761zojuSxiEFejufSzHKvZ4wdx3ZN2/ZyCGC51Elr//XYnkhlAIzbRGejJ2vk7NE4N1wl278cRn4JIYq5DJIAGwmhQc/Z8MLD3iq7y0OZxmG+1MqXJUq9Hp3bHaAQUKXSHiPHAfidtUXVCuO5oFNOu3PsW88oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQs/EV76; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLl/i9jq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9E27C4CEDD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQs/EV76"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1D43C4CEDE;
 	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735684630;
-	bh=y8jvzkyAzxyNwmUGiUFU/ZrZFKeYb2sh7YIJFEf7HB8=;
+	s=k20201202; t=1735684629;
+	bh=qeIuosm52zyCma7WnhBPMzKwH4sWBW0yo2xCyxH0MpI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gLl/i9jqiCdV9ki4y6XNyFPjqjxl3quCZMB897JpN6RgNfze9zROc7VAelBNQ91YU
-	 M6GA+SZPLIzonllwazQcZHF49QaeOy8/sbjb1ursumBobX1KsLL5BkOZ2FcBMQ8xQ5
-	 eO91dkSQxvBYuGVVfwiEsZi9d6DT3xSo6RDfopSx5JXxKDl67l3MD5auchQf8hb1Sv
-	 zTogvAqctOrxqIKYfkETtnQajw5q4oDDQrCWrYS6Ldi1A+Obx3gplOfkug/ktjIJsp
-	 n5nKOUnK35Jc1Hz888yP4mn4p4cSFRobsZH8fCBSWsyXJ6F+NiSXK7TRp2UZmhzEbq
-	 Bscp2iOUn+YmA==
+	b=jQs/EV76vlGzoTfAno8Y9kBSDzSQyzRpRNrxPhdQkFLVRXY0dzgigPMyp6FsuhOxF
+	 PZOMDf/bKhPlfsiz1C2dZUhsAtanccn5QWMnOABxQfTiStZEaLRJMCA7G0mbHMHt5K
+	 TLczRRsHvMnDeCuXIvJ93NQuWeSsbeN6NWQuDEVXoETG0guXpzvL3QM4NLnBJslFD9
+	 fW1LgH/UWRmPCBlCAIs6knVvwujVekFjr2SYpNiLVuCoUy/V5GQBalsNV6BW7ziRKS
+	 SQwjjt5xtWVzDJIoLSvsNFXrflQoAUGr0sjSS1gYLMfb2HE/vJ2sO+1vMTu/Qk/7dm
+	 IibLmdzjWVucg==
 Received: by pali.im (Postfix)
-	id 9698DC2E; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
+	id 7C7B898C; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 04/12] cifs: Fix and improve cifs_is_path_accessible() function
-Date: Tue, 31 Dec 2024 23:36:34 +0100
-Message-Id: <20241231223642.15722-4-pali@kernel.org>
+Subject: [PATCH 03/12] cifs: Optimize CIFSFindFirst() response when not searching
+Date: Tue, 31 Dec 2024 23:36:33 +0100
+Message-Id: <20241231223642.15722-3-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241231223642.15722-1-pali@kernel.org>
 References: <20241231223642.15722-1-pali@kernel.org>
@@ -48,67 +48,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Do not call SMBQueryInformation() command for path with SMB wildcard
-characters on non-UNICODE connection because server expands wildcards.
-Function cifs_is_path_accessible() needs to check if the real path exists
-and must not expand wildcard characters.
-
-Do not dynamically allocate memory for small FILE_ALL_INFO structure and
-instead allocate it on the stack. This structure is allocated on stack by
-all other functions.
-
-When CAP_NT_SMBS was not negotiated then do not issue CIFSSMBQPathInfo()
-command. This command returns failure by non-NT Win9x SMB servers, so there
-is no need try it. The purpose of cifs_is_path_accessible() function is
-just to check if the path is accessible, so SMBQueryInformation() for old
-servers is enough.
+When not searching for child entries with msearch wildcard pattern then ask
+server just for one output entry. There is no need to ask for more entries
+as we are interested only for one search result, as we are doing query on
+path.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/smb1ops.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ fs/smb/client/cifssmb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index d959097ec2d2..bef8e03edf1d 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -520,21 +520,27 @@ static int
- cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
- 			struct cifs_sb_info *cifs_sb, const char *full_path)
- {
--	int rc;
--	FILE_ALL_INFO *file_info;
-+	int rc = -EOPNOTSUPP;
-+	FILE_ALL_INFO file_info;
- 
--	file_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
--	if (file_info == NULL)
--		return -ENOMEM;
-+	if (tcon->ses->capabilities & CAP_NT_SMBS)
-+		rc = CIFSSMBQPathInfo(xid, tcon, full_path, &file_info,
-+				      0 /* not legacy */, cifs_sb->local_nls,
-+				      cifs_remap(cifs_sb));
- 
--	rc = CIFSSMBQPathInfo(xid, tcon, full_path, file_info,
--			      0 /* not legacy */, cifs_sb->local_nls,
--			      cifs_remap(cifs_sb));
-+	/*
-+	 * Non-UNICODE variant of fallback functions below expands wildcards,
-+	 * so they cannot be used for querying paths with wildcard characters.
-+	 * Therefore for such paths returns -ENOENT as they cannot exist.
-+	 */
-+	if ((rc == -EOPNOTSUPP || rc == -EINVAL) &&
-+	    !(tcon->ses->capabilities & CAP_UNICODE) &&
-+	    strpbrk(full_path, "*?\"><"))
-+		rc = -ENOENT;
- 
- 	if (rc == -EOPNOTSUPP || rc == -EINVAL)
--		rc = SMBQueryInformation(xid, tcon, full_path, file_info,
-+		rc = SMBQueryInformation(xid, tcon, full_path, &file_info,
- 				cifs_sb->local_nls, cifs_remap(cifs_sb));
--	kfree(file_info);
- 	return rc;
- }
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 7c42a0651138..c0dc404e27b3 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -4155,7 +4155,7 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 	pSMB->SearchAttributes =
+ 	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
+ 			ATTR_DIRECTORY);
+-	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
++	pSMB->SearchCount = cpu_to_le16(msearch ? CIFSMaxBufSize/sizeof(FILE_UNIX_INFO) : 1);
+ 	pSMB->SearchFlags = cpu_to_le16(search_flags);
+ 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
  
 -- 
 2.20.1
