@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0A01B4236;
-	Tue, 31 Dec 2024 22:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D1C1B423F;
+	Tue, 31 Dec 2024 22:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735684552; cv=none; b=CCpkj6urdyUO+YV2EmLr0jRsestOK6RcXv6It4FFkoEPqor6RQeWH+ZVA7FijcqdXjOCuatV4Y135rf9Mn/BzYOS5idGHRktKoCLMUbWoRwFaN9bC9pmoG7A8yXCyKKTMgB0HjQ6MBKQeiq/jgTX07acZoh/jAvyBJIVE1oPirE=
+	t=1735684552; cv=none; b=YFzFJ7Jf1ilYR15/mXYtIi44CzY9FAkw/AjFFGXoWr0KRhQcHk0WTEhhOAKMd8FHLmBCSzZ9Ieqgwv1tRRtkMfC+jqh/0204tHkH95nVussuyhzsx8jV5ntznDFytsx1F21PL18M79Qkc90SQ+UeB4LM6FMXUyXAN/8UsmdK5gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735684552; c=relaxed/simple;
-	bh=ox+e+7YGWz2v0UmWQWMAc9JFxQV71DFh1C6Wg9eekfk=;
+	bh=5FhqwMpNh+GxOZdVjCIrqXAW5O5GZC6ckTBgwbfr7cQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A9EO3A/8O5ADw7GkaINVy15gw/km7S9iKq/dkSdTT7MFIZEj+LWmnymUwTL6GPCktf77TMMgqw+Fn0wDC6FoJqS8xYXTYVw+JUF6U1z+OV6VKo/QfpUOC2BtMssgivHsGgtui+JtMNmVb0vUKn7SMdIi/duV1jMkq1dl95qG/xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GfSZ6y9Q; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Visbnz3414R07xcD//9U3fQXVyqokridGWuTrOMZF/X+955sA8PW0q03SIbLz8fhl1UhB2dwAwDZQFjTnfFqy85HERth9G7vANV1a5yCxfhisI1KnYLoC9ul6SxNTZWCszigU/phyRvCWs6ZKm3XZCm3warb0n3AFGJgrSBr2PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3QUSnri; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GfSZ6y9Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E09C4CEDF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3QUSnri"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC3DFC4CEDD;
 	Tue, 31 Dec 2024 22:35:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735684551;
-	bh=ox+e+7YGWz2v0UmWQWMAc9JFxQV71DFh1C6Wg9eekfk=;
+	s=k20201202; t=1735684552;
+	bh=5FhqwMpNh+GxOZdVjCIrqXAW5O5GZC6ckTBgwbfr7cQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GfSZ6y9Q6zrAq01SItvosH9aNDm1C0ReHOedDEcXPTEyPvnAd4NC3zmmaAMT4m5o/
-	 f/IdKBmNxdh7HpCIkF5G/5YQltHxltb4CbxeofywSPXGQx506rJZLibknCPbRNP+Oy
-	 G/RWJhSxgxJ3ezGE1Ixa5qdnyNDh60Hz/stPM+3RGyYXrTnDmAWUuaW8+4fmwIlWEw
-	 GdvNEdvkjjHnvc22e+O/D4rwerbThwJ2j/gBi9ffW1x4BLTG1ZMltxnsw/IxNU8c7F
-	 lKVL1cnbHfhslLcY2k0PDIpeHhE8jnHyun/Wpf7dhFR23F3xzOo5F7BI8SCbXg4kUW
-	 YWHSSfSY2Whmg==
+	b=V3QUSnrioqsKnghsxySA5s/sCe3DPnLFpVqdiwmzF29unI7Mb8STDfnWREgBzxfZP
+	 pCxx5/Io4a58SQC8tjeC+E1hetIuCPVtd6KCs2JU/wMsu47qQ4c2ABVSMIR0AzuFc7
+	 aro6vUuMD1B8zeP8+O6fU2xAFa9clj38knV4oMlZGFavS94npQmXOUDclR5p2skJBd
+	 V644n3L1Bln4qyEJG3O3aPDDTnhmdyS/dMuXcyluNCqzaPBojXlSfAmBAO0T33gagx
+	 M9PL+DvOoJ03t0cd9FrjbkB+JRavr4rhKh8PG3rMQGRWHDbzS7dRYMlZWN8kTaFc/q
+	 ytEJEvW9tvc0g==
 Received: by pali.im (Postfix)
-	id 41937C2E; Tue, 31 Dec 2024 23:35:41 +0100 (CET)
+	id 682F9D12; Tue, 31 Dec 2024 23:35:41 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] cifs: Improve SMB2+ stat() to work also for paths in DELETE_PENDING state
-Date: Tue, 31 Dec 2024 23:35:13 +0100
-Message-Id: <20241231223514.15595-4-pali@kernel.org>
+Subject: [PATCH 5/5] cifs: Improve detect_directory_symlink_target() function
+Date: Tue, 31 Dec 2024 23:35:14 +0100
+Message-Id: <20241231223514.15595-5-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241231223514.15595-1-pali@kernel.org>
 References: <20241231223514.15595-1-pali@kernel.org>
@@ -48,266 +48,134 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Paths in DELETE_PENDING state cannot be opened at all. So standard way of
-querying path attributes for this case is not possible.
+Function detect_directory_symlink_target() is not curruntly able to detect
+if the target path is directory in case the path is in the DELETE_PENDING
+state or the user has not granted FILE_READ_ATTRIBUTES permission on the
+path. This limitation is written in TODO comment.
 
-There is an alternative way how to query limited information about file
-over SMB2+ dialects without opening file itself. It is by opening the
-parent directory, querying specific child with filled search filer and
-asking for attributes for that child.
-
-Implement this fallback when standard case in smb2_query_path_info fails
-with STATUS_DELETE_PENDING error and stat was asked for path which is not
-top level one (because top level does not have parent directory at all).
+Resolve this problem by replacing code which determinate path type by the
+query_path_info() callback, which now is able to handle all these cases.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsglob.h  |   1 +
- fs/smb/client/smb2glob.h  |   1 +
- fs/smb/client/smb2inode.c | 171 +++++++++++++++++++++++++++++++++++++-
- 3 files changed, 170 insertions(+), 3 deletions(-)
+ fs/smb/client/reparse.c | 75 ++++++++++++++---------------------------
+ 1 file changed, 25 insertions(+), 50 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 06ad727e824b..1338b3473ef3 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2329,6 +2329,7 @@ struct smb2_compound_vars {
- 	struct smb_rqst rqst[MAX_COMPOUND];
- 	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
- 	struct kvec qi_iov;
-+	struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
- 	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
- 	struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
- 	struct kvec close_iov;
-diff --git a/fs/smb/client/smb2glob.h b/fs/smb/client/smb2glob.h
-index 224495322a05..1cb219605e75 100644
---- a/fs/smb/client/smb2glob.h
-+++ b/fs/smb/client/smb2glob.h
-@@ -39,6 +39,7 @@ enum smb2_compound_ops {
- 	SMB2_OP_GET_REPARSE,
- 	SMB2_OP_QUERY_WSL_EA,
- 	SMB2_OP_OPEN_QUERY,
-+	SMB2_OP_QUERY_DIRECTORY,
- };
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 69efbcae6683..ad53b9b4a238 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -248,18 +248,16 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
+ 					   bool *directory)
+ {
+ 	char sep = CIFS_DIR_SEP(cifs_sb);
+-	struct cifs_open_parms oparms;
++	struct cifs_open_info_data query_info;
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
+ 	const char *basename;
+-	struct cifs_fid fid;
+ 	char *resolved_path;
+ 	int full_path_len;
+ 	int basename_len;
+ 	int symname_len;
+ 	char *path_sep;
+-	__u32 oplock;
+-	int open_rc;
++	int query_rc;
  
- /* Used when constructing chained read requests. */
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index b6342b043073..1a8a2f83a3d9 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -190,6 +190,8 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 	int resp_buftype[MAX_COMPOUND];
- 	struct smb2_create_rsp *create_rsp = NULL;
- 	struct smb2_query_info_rsp *qi_rsp = NULL;
-+	struct smb2_query_directory_req *qd_rqst = NULL;
-+	struct smb2_query_directory_rsp *qd_rsp = NULL;
- 	struct cifs_open_info_data *idata;
- 	struct inode *inode = NULL;
- 	int flags = 0;
-@@ -344,6 +346,39 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 			trace_smb3_posix_query_info_compound_enter(xid, ses->Suid,
- 								   tcon->tid, full_path);
- 			break;
-+		case SMB2_OP_QUERY_DIRECTORY:
-+			rqst[num_rqst].rq_iov = &vars->qd_iov[0];
-+			rqst[num_rqst].rq_nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
-+
-+			rc = SMB2_query_directory_init(xid,
-+						       tcon,
-+						       server,
-+						       &rqst[num_rqst],
-+						       cfile ? cfile->fid.persistent_fid : COMPOUND_FID,
-+						       cfile ? cfile->fid.volatile_fid : COMPOUND_FID,
-+						       0,
-+						       (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) ?
-+						        SMB_FIND_FILE_ID_FULL_DIR_INFO :
-+						        SMB_FIND_FILE_FULL_DIRECTORY_INFO);
-+			if (!rc) {
-+				/*
-+				 * Change the default search wildcard pattern '*'
-+				 * to the requested file name stored in in_iov[i]
-+				 * and request for only one single entry.
-+				 */
-+				qd_rqst = rqst[num_rqst].rq_iov[0].iov_base;
-+				qd_rqst->Flags |= SMB2_RETURN_SINGLE_ENTRY;
-+				qd_rqst->FileNameLength = cpu_to_le16(in_iov[i].iov_len);
-+				rqst[num_rqst].rq_iov[1] = in_iov[i];
-+			}
-+			if (!rc && (!cfile || num_rqst > 1)) {
-+				smb2_set_next_command(tcon, &rqst[num_rqst]);
-+				smb2_set_related(&rqst[num_rqst]);
-+			} else if (rc) {
-+				goto finished;
-+			}
-+			num_rqst++;
-+			break;
- 		case SMB2_OP_DELETE:
- 			trace_smb3_delete_enter(xid, ses->Suid, tcon->tid, full_path);
- 			break;
-@@ -716,6 +751,55 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 				trace_smb3_posix_query_info_compound_done(xid, ses->Suid,
- 									  tcon->tid);
- 			break;
-+		case SMB2_OP_QUERY_DIRECTORY:
-+			if (rc == 0) {
-+				qd_rsp = (struct smb2_query_directory_rsp *)
-+					rsp_iov[i + 1].iov_base;
-+				rc = smb2_validate_iov(le16_to_cpu(qd_rsp->OutputBufferOffset),
-+						       le32_to_cpu(qd_rsp->OutputBufferLength),
-+						       &rsp_iov[i + 1],
-+						       (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) ?
-+						        sizeof(SEARCH_ID_FULL_DIR_INFO) :
-+						        sizeof(FILE_FULL_DIRECTORY_INFO));
-+			}
-+			if (rc == 0) {
-+				/*
-+				 * Both SEARCH_ID_FULL_DIR_INFO and FILE_FULL_DIRECTORY_INFO
-+				 * have same member offsets except the UniqueId and FileName.
-+				 */
-+				SEARCH_ID_FULL_DIR_INFO *si = (SEARCH_ID_FULL_DIR_INFO *)qd_rsp->Buffer;
-+				idata = in_iov[i + 1].iov_base;
-+				idata->fi.CreationTime = si->CreationTime;
-+				idata->fi.LastAccessTime = si->LastAccessTime;
-+				idata->fi.LastWriteTime = si->LastWriteTime;
-+				idata->fi.ChangeTime = si->ChangeTime;
-+				idata->fi.Attributes = si->ExtFileAttributes;
-+				idata->fi.AllocationSize = si->AllocationSize;
-+				idata->fi.EndOfFile = si->EndOfFile;
-+				idata->fi.EASize = si->EaSize;
-+				/*
-+				 * UniqueId is present only in struct SEARCH_ID_FULL_DIR_INFO.
-+				 * It is not present in struct FILE_FULL_DIRECTORY_INFO.
-+				 * struct SEARCH_ID_FULL_DIR_INFO was requested only when
-+				 * CIFS_MOUNT_SERVER_INUM is set.
-+				 */
-+				if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
-+					idata->fi.IndexNumber = si->UniqueId;
-+				if (le32_to_cpu(idata->fi.NumberOfLinks) == 0)
-+					idata->fi.NumberOfLinks = cpu_to_le32(1); /* dummy value */
-+				idata->fi.DeletePending = 0;
-+				idata->fi.Directory = !!(le32_to_cpu(si->ExtFileAttributes) & ATTR_DIRECTORY);
-+			}
-+			SMB2_query_directory_free(&rqst[num_rqst++]);
-+			if (rc)
-+				trace_smb3_query_dir_err(xid,
-+							 cfile ? cfile->fid.persistent_fid : COMPOUND_FID,
-+							 tcon->tid, ses->Suid, 0, 0, rc);
-+			else
-+				trace_smb3_query_dir_done(xid,
-+							  cfile ? cfile->fid.persistent_fid : COMPOUND_FID,
-+							  tcon->tid, ses->Suid, 0, 0);
-+			break;
- 		case SMB2_OP_DELETE:
- 			if (rc)
- 				trace_smb3_delete_err(xid,  ses->Suid, tcon->tid, rc);
-@@ -894,6 +978,7 @@ int smb2_query_path_info(const unsigned int xid,
- 	struct cifs_open_parms oparms;
- 	__u32 create_options = 0;
- 	struct cifsFileInfo *cfile;
-+	struct cifsFileInfo *parent_cfile;
- 	struct cached_fid *cfid = NULL;
- 	struct smb2_hdr *hdr;
- 	struct kvec in_iov[3], out_iov[3] = {};
-@@ -1085,9 +1170,9 @@ int smb2_query_path_info(const unsigned int xid,
- 		break;
- 	case -EREMOTE:
- 		break;
--	default:
--		if (hdr->Status != STATUS_OBJECT_NAME_INVALID)
--			break;
-+	}
-+
-+	if (hdr->Status == STATUS_OBJECT_NAME_INVALID) {
- 		rc2 = cifs_inval_name_dfs_link_error(xid, tcon, cifs_sb,
- 						     full_path, &islink);
- 		if (rc2) {
-@@ -1096,6 +1181,86 @@ int smb2_query_path_info(const unsigned int xid,
- 		}
- 		if (islink)
- 			rc = -EREMOTE;
-+	} else if (hdr->Status == STATUS_DELETE_PENDING && full_path[0]) {
+ 	/*
+ 	 * First do some simple check. If the original Linux symlink target ends
+@@ -282,7 +280,8 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
+ 	if (symname[0] == '/') {
+ 		cifs_dbg(FYI,
+ 			 "%s: cannot determinate if the symlink target path '%s' "
+-			 "is directory or not, creating '%s' as file symlink\n",
++			 "is directory or not because path is absolute, "
++			 "creating '%s' as file symlink\n",
+ 			 __func__, symname, full_path);
+ 		return 0;
+ 	}
+@@ -320,58 +319,34 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
+ 	if (sep == '\\')
+ 		convert_delimiter(path_sep, sep);
+ 
++	/*
++	 * Query resolved SMB symlink path and check if it is a directory or not.
++	 * Callback query_path_info() already handles cases when the server does
++	 * not grant FILE_READ_ATTRIBUTES permission for object, or when server
++	 * denies opening the object (e.g. because of DELETE_PENDING state).
++	 */
+ 	tcon = tlink_tcon(tlink);
+-	oparms = CIFS_OPARMS(cifs_sb, tcon, resolved_path,
+-			     FILE_READ_ATTRIBUTES, FILE_OPEN, 0, ACL_NO_MODE);
+-	oparms.fid = &fid;
+-
+-	/* Try to open as a directory (NOT_FILE) */
+-	oplock = 0;
+-	oparms.create_options = cifs_create_options(cifs_sb,
+-						    CREATE_NOT_FILE | OPEN_REPARSE_POINT);
+-	open_rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
+-	if (open_rc == 0) {
+-		/* Successful open means that the target path is definitely a directory. */
+-		*directory = true;
+-		tcon->ses->server->ops->close(xid, tcon, &fid);
+-	} else if (open_rc == -ENOTDIR) {
+-		/* -ENOTDIR means that the target path is definitely a file. */
+-		*directory = false;
+-	} else if (open_rc == -ENOENT) {
++	query_rc = tcon->ses->server->ops->query_path_info(xid, tcon, cifs_sb,
++							   resolved_path, &query_info);
++	if (query_rc == 0) {
++		/* Query on path was successful, so just check for directory attr. */
++		*directory = le32_to_cpu(query_info.fi.Attributes) & ATTR_DIRECTORY;
++	} else if (query_rc == -ENOENT) {
+ 		/* -ENOENT means that the target path does not exist. */
+ 		cifs_dbg(FYI,
+ 			 "%s: symlink target path '%s' does not exist, "
+ 			 "creating '%s' as file symlink\n",
+ 			 __func__, symname, full_path);
+ 	} else {
+-		/* Try to open as a file (NOT_DIR) */
+-		oplock = 0;
+-		oparms.create_options = cifs_create_options(cifs_sb,
+-							    CREATE_NOT_DIR | OPEN_REPARSE_POINT);
+-		open_rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
+-		if (open_rc == 0) {
+-			/* Successful open means that the target path is definitely a file. */
+-			*directory = false;
+-			tcon->ses->server->ops->close(xid, tcon, &fid);
+-		} else if (open_rc == -EISDIR) {
+-			/* -EISDIR means that the target path is definitely a directory. */
+-			*directory = true;
+-		} else {
+-			/*
+-			 * This code branch is called when we do not have a permission to
+-			 * open the resolved_path or some other client/process denied
+-			 * opening the resolved_path.
+-			 *
+-			 * TODO: Try to use ops->query_dir_first on the parent directory
+-			 * of resolved_path, search for basename of resolved_path and
+-			 * check if the ATTR_DIRECTORY is set in fi.Attributes. In some
+-			 * case this could work also when opening of the path is denied.
+-			 */
+-			cifs_dbg(FYI,
+-				 "%s: cannot determinate if the symlink target path '%s' "
+-				 "is directory or not, creating '%s' as file symlink\n",
+-				 __func__, symname, full_path);
+-		}
 +		/*
-+		 * If SMB2 OPEN/CREATE fails with STATUS_DELETE_PENDING error,
-+		 * it means that the path is in delete pending state and it is
-+		 * not possible to open it until some other client clears delete
-+		 * pending state or all other clients close all opened handles
-+		 * to that path.
-+		 *
-+		 * There is an alternative way how to query limited information
-+		 * about path which is in delete pending state still suitable
-+		 * for the stat() syscall. It is by opening the parent directory,
-+		 * querying specific child with filled search filer and asking
-+		 * for attributes for that child.
++		 * This code branch is called when we do not have a permission to
++		 * query the resolved_path or some other error occurred during query.
 +		 */
-+
-+		char *parent_path;
-+		const char *basename;
-+		__le16 *basename_utf16;
-+		int basename_utf16_len;
-+
-+		basename = strrchr(full_path, CIFS_DIR_SEP(cifs_sb));
-+		if (basename) {
-+			parent_path = kstrndup(full_path, basename - full_path, GFP_KERNEL);
-+			basename++;
-+		} else {
-+			parent_path = kstrdup("", GFP_KERNEL);
-+			basename = full_path;
-+		}
-+
-+		if (!parent_path) {
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+
-+		basename_utf16 = cifs_convert_path_to_utf16(basename, cifs_sb);
-+		if (!basename_utf16) {
-+			kfree(parent_path);
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+
-+		basename_utf16_len = 2 * UniStrnlen((wchar_t *)basename_utf16, PATH_MAX);
-+
-+retry_query_directory:
-+		for (i = 0; i < ARRAY_SIZE(out_buftype); i++) {
-+			free_rsp_buf(out_buftype[i], out_iov[i].iov_base);
-+			out_buftype[i] = 0;
-+			out_iov[i].iov_base = NULL;
-+		}
-+
-+		num_cmds = 1;
-+		cmds[0] = SMB2_OP_QUERY_DIRECTORY;
-+		in_iov[0].iov_base = basename_utf16;
-+		in_iov[0].iov_len = basename_utf16_len;
-+		in_iov[1].iov_base = data;
-+		in_iov[1].iov_len = sizeof(*data);
-+		oparms = CIFS_OPARMS(cifs_sb, tcon, parent_path, FILE_READ_DATA,
-+				     FILE_OPEN, CREATE_NOT_FILE, ACL_NO_MODE);
-+		cifs_get_readable_path(tcon, parent_path, &parent_cfile);
-+		rc = smb2_compound_op(xid, tcon, cifs_sb, parent_path,
-+				      &oparms, in_iov, cmds, num_cmds,
-+				      parent_cfile, out_iov, out_buftype, NULL);
-+		if (rc == -EOPNOTSUPP && (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
-+			/*
-+			 * If querying of server inode numbers is not supported
-+			 * but is enabled, then disable it and try again.
-+			 */
-+			cifs_autodisable_serverino(cifs_sb);
-+			goto retry_query_directory;
-+		}
-+
-+		kfree(parent_path);
-+		kfree(basename_utf16);
-+
-+		hdr = out_iov[0].iov_base;
-+		if (!hdr || out_buftype[0] == CIFS_NO_BUFFER)
-+			goto out;
-+
-+		/* As we are in code path for STATUS_DELETE_PENDING, set DeletePending. */
-+		data->fi.DeletePending = 1;
++		cifs_dbg(FYI,
++			 "%s: cannot determinate if the symlink target path '%s' "
++			 "is directory or not because query path failed (%d), "
++			 "creating '%s' as file symlink\n",
++			 __func__, symname, query_rc, full_path);
  	}
  
- out:
+ 	kfree(resolved_path);
 -- 
 2.20.1
 
