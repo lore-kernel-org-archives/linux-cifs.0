@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1968B1B4124;
-	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DDF1B422D;
+	Tue, 31 Dec 2024 22:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735684630; cv=none; b=d2VP69XHeOh4+//tFeNLZgszrCAOFITEKPROMHNxIhrjOH3ZgcGSxfoYvCo0t1bFbY+CnRmKNpeML7QcvWIovl7D83rqyaQeu/nC4hjR2roDQfY+OWKoqt9W9B1pKuKK69ONscTfuwcJnBiOMbGcxgTxtTB0+A5xytJ1WUM1hIs=
+	t=1735684630; cv=none; b=JiXNYzPd0Tnm1YyX/lPiKaqypk6j4aPdKI2JPCAZjJjk9coIRHFEXThnovKs/S2EcIYNkWB7d+DWUAPh3eycE4D8/uoXP2kPPNeX6HF9Rl4ayw5ObVgNzBgPuZHui1D2oC/pxnxGhYV0vfOXLId9julOWxO9WyEvKiaki7d7UKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735684630; c=relaxed/simple;
-	bh=qeIuosm52zyCma7WnhBPMzKwH4sWBW0yo2xCyxH0MpI=;
+	bh=l0Utkx3SUgSbQuWV7cfRUZJv8R3Vj8FAI5oHLPywygY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X2CTX0oKYJpO8761zojuSxiEFejufSzHKvZ4wdx3ZN2/ZyCGC51Elr//XYnkhlAIzbRGejJ2vk7NE4N1wl278cRn4JIYq5DJIAGwmhQc/Z8MLD3iq7y0OZxmG+1MqXJUq9Hp3bHaAQUKXSHiPHAfidtUXVCuO5oFNOu3PsW88oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQs/EV76; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=GAyWC+pV3gpE1oBzYYYZE+pl7DLwlKdQEEKCy5XV9K/IkF5Ijr2v4wAmqPtNisylBBBu2VK1F8IwZyqEbvRJo+p7bv/m4J/eFRXdAQHl+xHM7YyAIe3+ja8Q8UZ6mIWC7ZOy8R8aIbVl1ofFsOqEE/7DDxkl3vFpJ72fcU9Mwrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A0yE85i/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQs/EV76"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1D43C4CEDE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0yE85i/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E468DC4CEE0;
 	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735684629;
-	bh=qeIuosm52zyCma7WnhBPMzKwH4sWBW0yo2xCyxH0MpI=;
+	s=k20201202; t=1735684630;
+	bh=l0Utkx3SUgSbQuWV7cfRUZJv8R3Vj8FAI5oHLPywygY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jQs/EV76vlGzoTfAno8Y9kBSDzSQyzRpRNrxPhdQkFLVRXY0dzgigPMyp6FsuhOxF
-	 PZOMDf/bKhPlfsiz1C2dZUhsAtanccn5QWMnOABxQfTiStZEaLRJMCA7G0mbHMHt5K
-	 TLczRRsHvMnDeCuXIvJ93NQuWeSsbeN6NWQuDEVXoETG0guXpzvL3QM4NLnBJslFD9
-	 fW1LgH/UWRmPCBlCAIs6knVvwujVekFjr2SYpNiLVuCoUy/V5GQBalsNV6BW7ziRKS
-	 SQwjjt5xtWVzDJIoLSvsNFXrflQoAUGr0sjSS1gYLMfb2HE/vJ2sO+1vMTu/Qk/7dm
-	 IibLmdzjWVucg==
+	b=A0yE85i/RvaaJAxHnFBCGmrxcKnFJNcFhELP6Ae76/iJDqUZZbjDekzVqxN7Mx+/1
+	 qu2+C41k+xmHCYop8/lYXRLYdMCVY6Z8WYebKEbRiRmiBaulb7PhOv5047D4yhtTuh
+	 MtP7Q0zNIoFGdnxYmGrUVmuYa5ebt4GSOw9AAx7mb/4AjHqXemNwRai/ierquTUUjR
+	 y//F57uouLfXpahJMwxgqwAtJqnYH9S+owQ7RESG0mim7FgFP0SmgV4ldPv4HkCvC1
+	 xsevuaWQ5pp8dZNXMrrrTmT4DUgQsJrWPnqdwS+H2YoUiYllYBh2abJTGn1C5ZPLca
+	 mEXeRHBKGz/1Q==
 Received: by pali.im (Postfix)
-	id 7C7B898C; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
+	id B1BE2D12; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 03/12] cifs: Optimize CIFSFindFirst() response when not searching
-Date: Tue, 31 Dec 2024 23:36:33 +0100
-Message-Id: <20241231223642.15722-3-pali@kernel.org>
+Subject: [PATCH 05/12] cifs: Fix cifs_query_path_info() for Windows NT servers
+Date: Tue, 31 Dec 2024 23:36:35 +0100
+Message-Id: <20241231223642.15722-5-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241231223642.15722-1-pali@kernel.org>
 References: <20241231223642.15722-1-pali@kernel.org>
@@ -48,29 +48,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When not searching for child entries with msearch wildcard pattern then ask
-server just for one output entry. There is no need to ask for more entries
-as we are interested only for one search result, as we are doing query on
-path.
+For TRANS2 QUERY_PATH_INFO request when the path does not exist, the
+Windows NT SMB server returns error response STATUS_OBJECT_NAME_NOT_FOUND
+or ERRDOS/ERRbadfile without the SMBFLG_RESPONSE flag set. Similarly it
+returns STATUS_DELETE_PENDING when the file is being deleted. And looks
+like that any error response from TRANS2 QUERY_PATH_INFO does not have
+SMBFLG_RESPONSE flag set.
+
+So relax check in check_smb_hdr() for detecting if the packet is response
+for this special case.
+
+This change fixes stat() operation against Windows NT SMB servers and also
+all operations which depends on -ENOENT result from stat like creat() or
+mkdir().
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/client/misc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 7c42a0651138..c0dc404e27b3 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -4155,7 +4155,7 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
- 	pSMB->SearchAttributes =
- 	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
- 			ATTR_DIRECTORY);
--	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
-+	pSMB->SearchCount = cpu_to_le16(msearch ? CIFSMaxBufSize/sizeof(FILE_UNIX_INFO) : 1);
- 	pSMB->SearchFlags = cpu_to_le16(search_flags);
- 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 4373dd64b66d..5122f3895dfc 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -323,6 +323,14 @@ check_smb_hdr(struct smb_hdr *smb)
+ 	if (smb->Command == SMB_COM_LOCKING_ANDX)
+ 		return 0;
  
++	/*
++	 * Windows NT server returns error resposne (e.g. STATUS_DELETE_PENDING
++	 * or STATUS_OBJECT_NAME_NOT_FOUND or ERRDOS/ERRbadfile or any other)
++	 * for some TRANS2 requests without the RESPONSE flag set in header.
++	 */
++	if (smb->Command == SMB_COM_TRANSACTION2 && smb->Status.CifsError != 0)
++		return 0;
++
+ 	cifs_dbg(VFS, "Server sent request, not response. mid=%u\n",
+ 		 get_mid(smb));
+ 	return 1;
 -- 
 2.20.1
 
