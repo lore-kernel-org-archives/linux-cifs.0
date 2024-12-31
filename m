@@ -1,41 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA0C1B042A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196261B2EFB;
 	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735684630; cv=none; b=AAQkMxOBhdWHxSfrH/Ts9qyQvTwe1f4EMUo/TLgA+BcB/O47Mj3azqu8R9olMcxOwIKyIz8a3w41CuAaUCHtuh37D3dX8gy6Uw2RJuAewLVdig5iVj3SVNDmtut7iMhZqUkaJDb5nUsJY1uidey33Zi3UctM+QHzu+B03cuNqVM=
+	t=1735684630; cv=none; b=OUJ2BEpnbEz2cO4e2kJtw6R4czZxFLZudpUNRVmJRUWRJm3+vsQWgII59JgYUYX/nzBqtYdWZzoEnAcdNb1omGY1s9q/LPoe6DflG0VVTtCYcSzlzC7tD6icjPTePHHPbuNer68gV06uUWM+4RlpgQ3KtQw2Q3cxFoH4JGw1aKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735684630; c=relaxed/simple;
-	bh=4j8MqoiJKVErbLBGKe6ycwnF4jbeDiBki/o5B+5xBO4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=gCnO/wzkucZvfW2Ahkp6eVxLXyxzsAXbBKzoVkN//RgzX5MrN1C+/aahZrrhzvNd+WvxzfOOjUDkW2l+L5o1LcUmvKcPrl2YWK+07ibYHKPNKeCVXuT0+aeKgGuoA2j2gjlLO3naWPWADl7O9+CAHX5sTz9pImuo5DAI6tarAqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EMrwuBlk; arc=none smtp.client-ip=10.30.226.201
+	bh=6GSndX9vgk1Jj7hX2LSrDyaH6Z1T2mZF8OG3lq2E9Yo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nW+19J1A/cCLOFCh2gOobRKQd+gdjE3dvEIzizo/czZKnPyYUazP5gvORMn/V5cqNORYnhfS8SKaTzTWi4+Q/bu7c4Tmw8nZhxDj0kIslHrKYkIx6RNeMNbLlEad8RZZ5qLPwG31+rUG6o8lXkbOAYDQFGUY7aKVPYY8459XlVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2/cBQpl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMrwuBlk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F64EC4CED2;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2/cBQpl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DDEFC4CED6;
 	Tue, 31 Dec 2024 22:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735684629;
-	bh=4j8MqoiJKVErbLBGKe6ycwnF4jbeDiBki/o5B+5xBO4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EMrwuBlkUs53KWkw5ZY/N25QGTiRreQgy8C72PoXHOypLGKck2hT/B7bV1m7wyj2S
-	 wqiTMx23lHNpShcvhP8RYxAFQF3MUx4/SHa+5gXEr5iaIoJYdzL6/xG9LQ1WIhf0Qb
-	 3bhmj/IReZiRkNFfzeL9+KkxgQD2+ZoM6mXN7AnHHNKEZT48NB4cLYBytTurExBKVN
-	 Oezb0KYplrSGTDBkO4X8CyHUhr3ewDXAcuqRqpLWfndXHVrURdfl80HjlH5nufiH8O
-	 GiFPRm30fyZF2xDP+m6TmbR18Fs5nXEURAr5qSSOz5YiaBGE8AdE0++z1J9mXCACWD
-	 lNa/Jj3tqnQcQ==
+	bh=6GSndX9vgk1Jj7hX2LSrDyaH6Z1T2mZF8OG3lq2E9Yo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=q2/cBQplPCrFqdBs0EfzoJG6/668qmnaEAwXcB9bRNo1hqv6aPp4aMlwUzGFhJX6/
+	 EsZX01WBSYz11BQSodzhAifOGWlcbtKpVRzL7yLeex4alTck+m1EveWVnv9Bk6O15K
+	 iEqasx5NUFeVdG+1qDagHSwu1jzO5VWs3WYBNoVtVvW3ONH8hWS10Fdcebyp3SxJyi
+	 ewcbR80WU5uE0VVBMwp7jfwAkWH3Pqtfd1aPpr5gif51Z1FA4F7NvDlMgvEpipY6CV
+	 5ayHUwnfo2DuyL0JDw4Xe60BcpDPdyd744IlW7aoX5gaL0sUqwQdRDfYV1nUjo5No+
+	 kqniKm0hDKs0Q==
 Received: by pali.im (Postfix)
-	id 4417997E; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
+	id 601A6983; Tue, 31 Dec 2024 23:37:00 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 01/12] cifs: Fix struct FILE_ALL_INFO
-Date: Tue, 31 Dec 2024 23:36:31 +0100
-Message-Id: <20241231223642.15722-1-pali@kernel.org>
+Subject: [PATCH 02/12] cifs: Fix calling CIFSFindFirst() for root path without msearch
+Date: Tue, 31 Dec 2024 23:36:32 +0100
+Message-Id: <20241231223642.15722-2-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241231223642.15722-1-pali@kernel.org>
+References: <20241231223642.15722-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,69 +48,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-struct FILE_ALL_INFO for level 263 (0x107) used by QPathInfo does not have
-any IndexNumber, AccessFlags, IndexNumber1, CurrentByteOffset, Mode or
-AlignmentRequirement members. So remove all of them.
+To query root path (without msearch wildcard) it is needed to
+send pattern "\" instead of "" (empty string).
 
-Also adjust code in move_cifs_info_to_smb2() function which convers struct
-FILE_ALL_INFO to struct smb2_file_all_info.
-
-Fixed content of struct FILE_ALL_INFO was verified that is correct against:
-* [MS-CIFS] section 2.2.8.3.10 SMB_QUERY_FILE_ALL_INFO
-* Samba server implementation of trans2 query file/path for level 263
-* Packet structure tests against Windows SMB servers
-
-This change fixes CIFSSMBQFileInfo() and CIFSSMBQPathInfo() functions which
-directly copy received FILE_ALL_INFO network buffers into kernel structures
-of FILE_ALL_INFO type.
+This allows to use CIFSFindFirst() to query information about root path.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsglob.h | 12 +++++++-----
- fs/smb/client/cifspdu.h  |  6 ------
- 2 files changed, 7 insertions(+), 11 deletions(-)
+ fs/smb/client/cifssmb.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 1338b3473ef3..82e819f9d24e 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2216,11 +2216,13 @@ static inline size_t ntlmssp_workstation_name_size(const struct cifs_ses *ses)
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 604e204e3f57..7c42a0651138 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -4108,6 +4108,12 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 			pSMB->FileName[name_len] = 0;
+ 			pSMB->FileName[name_len+1] = 0;
+ 			name_len += 2;
++		} else if (!searchName[0]) {
++			pSMB->FileName[0] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[1] = 0;
++			pSMB->FileName[2] = 0;
++			pSMB->FileName[3] = 0;
++			name_len = 4;
+ 		}
+ 	} else {
+ 		name_len = copy_path_name(pSMB->FileName, searchName);
+@@ -4119,6 +4125,10 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 			pSMB->FileName[name_len] = '*';
+ 			pSMB->FileName[name_len+1] = 0;
+ 			name_len += 2;
++		} else if (!searchName[0]) {
++			pSMB->FileName[0] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[1] = 0;
++			name_len = 2;
+ 		}
+ 	}
  
- static inline void move_cifs_info_to_smb2(struct smb2_file_all_info *dst, const FILE_ALL_INFO *src)
- {
--	memcpy(dst, src, (size_t)((u8 *)&src->AccessFlags - (u8 *)src));
--	dst->AccessFlags = src->AccessFlags;
--	dst->CurrentByteOffset = src->CurrentByteOffset;
--	dst->Mode = src->Mode;
--	dst->AlignmentRequirement = src->AlignmentRequirement;
-+	memcpy(dst, src, (size_t)((u8 *)&src->EASize - (u8 *)src));
-+	dst->IndexNumber = 0;
-+	dst->EASize = src->EASize;
-+	dst->AccessFlags = 0;
-+	dst->CurrentByteOffset = 0;
-+	dst->Mode = 0;
-+	dst->AlignmentRequirement = 0;
- 	dst->FileNameLength = src->FileNameLength;
- }
- 
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index 3ad1bb79ea9e..e5e397291da9 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -2294,13 +2294,7 @@ typedef struct { /* data block encoding of response to level 263 QPathInfo */
- 	__u8 DeletePending;
- 	__u8 Directory;
- 	__u16 Pad2;
--	__le64 IndexNumber;
- 	__le32 EASize;
--	__le32 AccessFlags;
--	__u64 IndexNumber1;
--	__le64 CurrentByteOffset;
--	__le32 Mode;
--	__le32 AlignmentRequirement;
- 	__le32 FileNameLength;
- 	union {
- 		char __pad;
 -- 
 2.20.1
 
