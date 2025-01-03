@@ -1,41 +1,38 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB121BEF9D
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Jan 2025 22:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398371917ED
+	for <linux-cifs@vger.kernel.org>; Fri,  3 Jan 2025 22:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735943152; cv=none; b=Fu8ZVUbA/YDiLkG1+65goqbcVusiEKXexVNhVKS2PL3qC56sVSPRWMPBGHK1gnO/HIFaAVn/k1TkIvFaa2UWuy9dOvf8VycWlIzBUJzQmfXeypLdMrZOW/ZpDDhFKdxqkpEYAXztqbmCOIbYfMw7xV6D4lWLwZ7yj+L80vNiHRE=
+	t=1735943364; cv=none; b=IMC3OEL808jNBLbyaFZRrygfbUNZz8JzQ4jzx1u/YwXojmyVqUqYa47RfpeV4VQG6cm/+MqgZ/NhjfrqO0fE8xRVTkkFfXFKepMMgpzrHihi/lVS3me0XpFkNDZTtOkXtLLYdqpWeSAYO/gkZ/uFJX3Sph/EsgGC7/PZNmrjyjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735943152; c=relaxed/simple;
-	bh=WIeT1Z7Dg+dIjPbXwAeteAFm8T4TdcIr/DwE96jPWlQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RVthlvNMuUPLmY8gXFVcncdURd97lHacFF1haNlk7Nva8VtmPefTDxLKLbQisRgYRKDhOEjl8tqNoHj4yNnZz1KI2/XKhMS6IdU9lRUMPU6RlF5tbNcg1+gqL81PrXck6OgKQ4k5Rt54VYbhkHkbq5vDRXWWLbljQJpE8ZYSYac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=F8Q5CIQp; arc=none smtp.client-ip=167.235.159.17
+	s=arc-20240116; t=1735943364; c=relaxed/simple;
+	bh=JiPUhkh6gyobeUA8yUfYWq/dgfN29sKbusue6R4jLrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OGtGWTzwxOnpdoueJho107XEf0R4+pRMyBU+Td7Wpw8vAVRHU9cguUZqgWfmGzuupg142Qu/rI068uYJYNjBoxUxC3VyOGGeiu/kPzfMC0JGc+tB/mJhZRQWRe3lYhNzrkvFCcTYAp1TfseA0KPBg7FOFvUKuvKQJ7wFiRuLQb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=cFSuNb6S; arc=none smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="F8Q5CIQp"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="cFSuNb6S"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1735943148;
+	s=dkim; t=1735943359;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q4A0RciEHWvUEKXE9E8Jnh4UHYb1lakTO/Ck4veRFrM=;
-	b=F8Q5CIQpkMDXA+BfU5dKxXWdfQ9qSi3YzOECR8yhlh5dk4rgnD7jXRjo6mFES9eTETpdJ1
-	Who6EPoT0hIhk+n2pIAtTpnnHxYCnyrmgsGORyC8TpMy2G+AJw5FFaKrqxnSq+uRTln+Fg
-	LpbXQjEK6S+8GE8doYsy+toTsiMOpd+pMM4juwbCtTdRzdhE8f4BLWUp2dQFnVFYNcClLy
-	A3qE2Qi8+KYiLBzBfaRSpLF7JXIZ9wyzXLYiCX45wDC6Pm+g1ADsyuZPMbwr0xRQAglJts
-	e/lYIKYF7LDNUzOT+0Cy8AOLCzFddDJxblSqb7jzev9Q/Wm/SKf/4zhsGNtb+Q==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+KcThN5rTGpaX5TDR3GD1FbPQHxtkqdAmxzVVcmoXP8=;
+	b=cFSuNb6ShDPNLuUmNgq9nC1tiLKwPCiDK+dIL+czZPjg7chjyB3+983ztmDxXqG33IoWea
+	qpdK8ee2ci23PWGGWgoVBJgo1y9b/GNy27PNlv05FZbXo1wYUKStUcTSzfa8un68fJn/S5
+	Q/GTem9HOfB8NgToCglbCK2nQlWdRHd81gTmtcdv3L21sbQedP7lEonk9CqZx/4uNOrvhf
+	EGzIs/3sD3TsEEcV1+dYvx695DJkP+sLcdw0po/hYX5QzHEFq2EpDWHrWilOp1jNmgDEnE
+	/t8zu18XIDyClaLHWdrkQiNoRgACS0bw40xg9Y+c32SQ3yf1NdCUdktNBp91tw==
 To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH 4/4] smb: client: parse DNS domain name from domain= option
-Date: Fri,  3 Jan 2025 19:25:34 -0300
-Message-ID: <20250103222534.86744-4-pc@manguebit.com>
-In-Reply-To: <20250103222534.86744-1-pc@manguebit.com>
-References: <20250103222534.86744-1-pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 1/4] smb: client: introduce av_for_each_entry() helper
+Date: Fri,  3 Jan 2025 19:28:55 -0300
+Message-ID: <20250103222858.87176-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,52 +41,191 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the user specified a DNS domain name in domain= mount option, then
-use it instead of parsing it in NTLMSSP CHALLENGE_MESSAGE message.
+Use new helper in find_domain_name() and find_timestamp() to avoid
+duplicating code.
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/connect.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ fs/smb/client/cifsencrypt.c | 123 ++++++++++++++++--------------------
+ fs/smb/client/cifspdu.h     |   2 +-
+ 2 files changed, 54 insertions(+), 71 deletions(-)
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index d4b571d74191..35d0243ae177 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -2280,12 +2280,13 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx __attribute__((unused)),
- struct cifs_ses *
- cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
- {
--	int rc = 0;
-+	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
-+	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
-+	struct cifs_ses *ses;
-+	unsigned int xid;
- 	int retries = 0;
--	unsigned int xid;
--	struct cifs_ses *ses;
--	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
--	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
-+	size_t len;
-+	int rc = 0;
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index 7a43daacc815..981897ec4dcd 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -315,6 +315,39 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	return 0;
+ }
  
- 	xid = get_xid();
- 
-@@ -2375,6 +2376,14 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
- 		ses->domainName = kstrdup(ctx->domainname, GFP_KERNEL);
- 		if (!ses->domainName)
- 			goto get_ses_fail;
++#define AV_TYPE(av)		(le16_to_cpu(av->type))
++#define AV_LEN(av)		(le16_to_cpu(av->length))
++#define AV_DATA_PTR(av)	((void *)av->data)
 +
-+		len = strnlen(ctx->domainname, CIFS_MAX_DOMAINNAME_LEN);
-+		if (!cifs_netbios_name(ctx->domainname, len)) {
-+			ses->dns_dom = kstrndup(ctx->domainname,
-+						len, GFP_KERNEL);
-+			if (!ses->dns_dom)
-+				goto get_ses_fail;
-+		}
- 	}
++#define av_for_each_entry(ses, av) \
++	for (av = NULL; (av = find_next_av(ses, av));)
++
++static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
++					  struct ntlmssp2_name *av)
++{
++	u16 len;
++	u8 *end;
++
++	end = (u8 *)ses->auth_key.response + ses->auth_key.len;
++	if (!av) {
++		if (unlikely(!ses->auth_key.response || !ses->auth_key.len))
++			return NULL;
++		av = (void *)ses->auth_key.response;
++	} else {
++		av = (void *)((u8 *)av + sizeof(*av) + AV_LEN(av));
++	}
++
++	if ((u8 *)av + sizeof(*av) > end)
++		return NULL;
++
++	len = AV_LEN(av);
++	if (AV_TYPE(av) == NTLMSSP_AV_EOL)
++		return NULL;
++	if (!len || (u8 *)av + sizeof(*av) + len > end)
++		return NULL;
++	return av;
++}
++
+ /* Server has provided av pairs/target info in the type 2 challenge
+  * packet and we have plucked it and stored within smb session.
+  * We parse that blob here to find netbios domain name to be used
+@@ -325,49 +358,23 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
+  * may not fail against other (those who are not very particular
+  * about target string i.e. for some, just user name might suffice.
+  */
+-static int
+-find_domain_name(struct cifs_ses *ses, const struct nls_table *nls_cp)
++static int find_domain_name(struct cifs_ses *ses)
+ {
+-	unsigned int attrsize;
+-	unsigned int type;
+-	unsigned int onesize = sizeof(struct ntlmssp2_name);
+-	unsigned char *blobptr;
+-	unsigned char *blobend;
+-	struct ntlmssp2_name *attrptr;
++	const struct nls_table *nlsc = ses->local_nls;
++	struct ntlmssp2_name *av;
++	u16 len;
  
- 	strscpy(ses->workstation_name, ctx->workstation_name, sizeof(ses->workstation_name));
+-	if (!ses->auth_key.len || !ses->auth_key.response)
+-		return 0;
+-
+-	blobptr = ses->auth_key.response;
+-	blobend = blobptr + ses->auth_key.len;
+-
+-	while (blobptr + onesize < blobend) {
+-		attrptr = (struct ntlmssp2_name *) blobptr;
+-		type = le16_to_cpu(attrptr->type);
+-		if (type == NTLMSSP_AV_EOL)
+-			break;
+-		blobptr += 2; /* advance attr type */
+-		attrsize = le16_to_cpu(attrptr->length);
+-		blobptr += 2; /* advance attr size */
+-		if (blobptr + attrsize > blobend)
+-			break;
+-		if (type == NTLMSSP_AV_NB_DOMAIN_NAME) {
+-			if (!attrsize || attrsize >= CIFS_MAX_DOMAINNAME_LEN)
+-				break;
+-			if (!ses->domainName) {
+-				ses->domainName =
+-					kmalloc(attrsize + 1, GFP_KERNEL);
+-				if (!ses->domainName)
+-						return -ENOMEM;
+-				cifs_from_utf16(ses->domainName,
+-					(__le16 *)blobptr, attrsize, attrsize,
+-					nls_cp, NO_MAP_UNI_RSVD);
+-				break;
+-			}
++	av_for_each_entry(ses, av) {
++		len = AV_LEN(av);
++		if (AV_TYPE(av) == NTLMSSP_AV_NB_DOMAIN_NAME &&
++		    len < CIFS_MAX_DOMAINNAME_LEN && !ses->domainName) {
++			ses->domainName = kmalloc(len + 1, GFP_KERNEL);
++			if (!ses->domainName)
++				return -ENOMEM;
++			cifs_from_utf16(ses->domainName, AV_DATA_PTR(av),
++					len, len, nlsc, NO_MAP_UNI_RSVD);
+ 		}
+-		blobptr += attrsize; /* advance attr  value */
+ 	}
+-
+ 	return 0;
+ }
+ 
+@@ -377,40 +384,16 @@ find_domain_name(struct cifs_ses *ses, const struct nls_table *nls_cp)
+  * as part of ntlmv2 authentication (or local current time as
+  * default in case of failure)
+  */
+-static __le64
+-find_timestamp(struct cifs_ses *ses)
++static __le64 find_timestamp(struct cifs_ses *ses)
+ {
+-	unsigned int attrsize;
+-	unsigned int type;
+-	unsigned int onesize = sizeof(struct ntlmssp2_name);
+-	unsigned char *blobptr;
+-	unsigned char *blobend;
+-	struct ntlmssp2_name *attrptr;
++	struct ntlmssp2_name *av;
+ 	struct timespec64 ts;
+ 
+-	if (!ses->auth_key.len || !ses->auth_key.response)
+-		return 0;
+-
+-	blobptr = ses->auth_key.response;
+-	blobend = blobptr + ses->auth_key.len;
+-
+-	while (blobptr + onesize < blobend) {
+-		attrptr = (struct ntlmssp2_name *) blobptr;
+-		type = le16_to_cpu(attrptr->type);
+-		if (type == NTLMSSP_AV_EOL)
+-			break;
+-		blobptr += 2; /* advance attr type */
+-		attrsize = le16_to_cpu(attrptr->length);
+-		blobptr += 2; /* advance attr size */
+-		if (blobptr + attrsize > blobend)
+-			break;
+-		if (type == NTLMSSP_AV_TIMESTAMP) {
+-			if (attrsize == sizeof(u64))
+-				return *((__le64 *)blobptr);
+-		}
+-		blobptr += attrsize; /* advance attr value */
++	av_for_each_entry(ses, av) {
++		if (AV_TYPE(av) == NTLMSSP_AV_TIMESTAMP &&
++		    AV_LEN(av) == sizeof(u64))
++			return *((__le64 *)AV_DATA_PTR(av));
+ 	}
+-
+ 	ktime_get_real_ts64(&ts);
+ 	return cpu_to_le64(cifs_UnixTimeToNT(ts));
+ }
+@@ -563,7 +546,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
+ 		if (!ses->domainName) {
+ 			if (ses->domainAuto) {
+-				rc = find_domain_name(ses, nls_cp);
++				rc = find_domain_name(ses);
+ 				if (rc) {
+ 					cifs_dbg(VFS, "error %d finding domain name\n",
+ 						 rc);
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index ee78bb6741d6..17202754e6d0 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -649,7 +649,7 @@ typedef union smb_com_session_setup_andx {
+ struct ntlmssp2_name {
+ 	__le16 type;
+ 	__le16 length;
+-/*	char   name[length]; */
++	__u8 data[];
+ } __attribute__((packed));
+ 
+ struct ntlmv2_resp {
 -- 
 2.47.1
 
