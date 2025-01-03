@@ -1,41 +1,37 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32962629C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32EC185955
 	for <linux-cifs@vger.kernel.org>; Fri,  3 Jan 2025 22:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735943563; cv=none; b=LlM7WHSmAZ3TRQ1kClL+u5c9PDzzfwJVbsFxHzNj4XlymhoY8KrdUIwh7eWyI730arb5CTu1wDIWzBYhGApKf08ONA3NB4fF9GLD8APO0gcRhyQFRVE38bzA60ehc6rgwKhiSHLLJlKxamGWhM4Bi1PVZz2hlOuHrjYW5H+OuXg=
+	t=1735943563; cv=none; b=unp1VA/O5DjBArV5gIDJ0sda5eCpaqQ42WXRFsYPwxhpy4P+rNVNZFKRjyXcBZjnlWT/NznmG6FddjBtQmCdsoqjylcb5ikkrSrpqCJ6VPCvgtOS4XRgnK0YlqXHgJNnCEd7Y23u7Xst/6KN4HAw2aRRmuiKR7/Nu2A3SkQxgT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735943563; c=relaxed/simple;
-	bh=Qu3EIwaOJxaXMuuTtMIaROkGFwDpEl8BG5j8qRcPFf8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VJM+EWJyqwU6WlKMZeyXChaoIDlRfVzafVvyAYyflhUE1wcXI9BNRgXZa287L0pqrEWnmkat3Ma95Ip5oNPGH5VAAmZYkKjtVERYygB+yGybhiTogFh4vf1pGngB+hoWFDH4yzqp35hGRrttlzr1/9THUwHL9YyX4BdcEa6XD5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=GijgStQP; arc=none smtp.client-ip=167.235.159.17
+	bh=JiPUhkh6gyobeUA8yUfYWq/dgfN29sKbusue6R4jLrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r3TS3sms3Wzt9edlG1Isf/51cv8WckB8ZSiOAgmQmAvkyk5AqJ5r8oHCvkZ+0V7/tv4yiv7PuZYBBsF2dOmzPzLkJUWdGkx+ixrzkc7o/rJV/cflx1xxL6sZTt7WgJWATAjoZnLyJfyM+Rg+I0e9X5vHXLXrZMuLeW/1LPDIo3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=q/BV0ses; arc=none smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="GijgStQP"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="q/BV0ses"
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1735943141;
+	s=dkim; t=1735943137;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZFGPStBVdO4K0GOx22DMvDVu/MX61EtFoDGohtYbQb4=;
-	b=GijgStQPEt/wcTjzRC+vz6IPrBWRDoYw/TYGvyLrlo7qr5/rmBOJ6y3F2lrvNldC+LRsMB
-	1KVk7HLI5s6mK8DXQ6HqrABjp6YpcoloX0xJLipfAW/ThzvYgex3KhhLUIbGFrF9ElygOL
-	M3uN3kJFexwkIq+YLNMSvlTmtYk97BtVsWsKZy8Bnj1a1XWGR1evtGpZuo0iBc/+T7tvs8
-	iIhB8Gle2ndxn0TjobQJ4HHOQlE2aFnwL96ZBcujNSCt8/VCOqCePpoKxocUPJTl+Rdvm6
-	p3tFEyZuiefAxIyOwYqEPD61MSs5m3qHgU4ufStWWnIw+gQZNZ/kh/hJFZpZrA==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+KcThN5rTGpaX5TDR3GD1FbPQHxtkqdAmxzVVcmoXP8=;
+	b=q/BV0sesjKxLn7YIYjYMqR6KIA/hUbfYNcFmsW4/geQBR0uk26Y9298fRKMOUXRLJoKiQ7
+	GZHT0Qnfx/9//+bOTmBYoa/yUaz02wk7KLIRyq1pK7BlqKyNQGpfgVY7ZfXbCHmG9LBfU0
+	jD/eUgNfhWiR/1HaoCBVt3RSuKKa23vg+XObJwYughhNISpcsUKmict4Xtj528Aq3u8i1g
+	iRInBoHwWmrHlXICuMuC14B1eKSYLOHvMy03jczPLOpoKq6pH96z1hFcXxMsXGfW9+uqsO
+	wxekIRc9JdmQyErBPg8jeEumTePOcDu5zPc684S6XTz72oJODta+/Zjo2IJ4Ng==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH 2/4] smb: client: parse av pair type 4 in CHALLENGE_MESSAGE
-Date: Fri,  3 Jan 2025 19:25:32 -0300
-Message-ID: <20250103222534.86744-2-pc@manguebit.com>
-In-Reply-To: <20250103222534.86744-1-pc@manguebit.com>
-References: <20250103222534.86744-1-pc@manguebit.com>
+Subject: [PATCH 1/4] smb: client: introduce av_for_each_entry() helper
+Date: Fri,  3 Jan 2025 19:25:31 -0300
+Message-ID: <20250103222534.86744-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,136 +40,191 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Parse FQDN of the domain in CHALLENGE_MESSAGE message as it's gonna be
-useful when mounting DFS shares against old Windows Servers (2012 R2
-or earlier) that return not fully qualified hostnames for DFS targets
-by default.
+Use new helper in find_domain_name() and find_timestamp() to avoid
+duplicating code.
 
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
 ---
- fs/smb/client/cifsencrypt.c | 63 ++++++++++++++++++++++++-------------
- fs/smb/client/cifsglob.h    |  1 +
- fs/smb/client/misc.c        |  1 +
- 3 files changed, 43 insertions(+), 22 deletions(-)
+ fs/smb/client/cifsencrypt.c | 123 ++++++++++++++++--------------------
+ fs/smb/client/cifspdu.h     |   2 +-
+ 2 files changed, 54 insertions(+), 71 deletions(-)
 
 diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 981897ec4dcd..e69968e88fe7 100644
+index 7a43daacc815..981897ec4dcd 100644
 --- a/fs/smb/client/cifsencrypt.c
 +++ b/fs/smb/client/cifsencrypt.c
-@@ -348,31 +348,37 @@ static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
- 	return av;
+@@ -315,6 +315,39 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	return 0;
  }
  
--/* Server has provided av pairs/target info in the type 2 challenge
-- * packet and we have plucked it and stored within smb session.
-- * We parse that blob here to find netbios domain name to be used
-- * as part of ntlmv2 authentication (in Target String), if not already
-- * specified on the command line.
-- * If this function returns without any error but without fetching
-- * domain name, authentication may fail against some server but
-- * may not fail against other (those who are not very particular
-- * about target string i.e. for some, just user name might suffice.
-+/*
-+ * Check if server has provided av pair of @type in the NTLMSSP
-+ * CHALLENGE_MESSAGE blob.
-  */
--static int find_domain_name(struct cifs_ses *ses)
-+static int find_av_name(struct cifs_ses *ses, u16 type, char **name, u16 maxlen)
- {
- 	const struct nls_table *nlsc = ses->local_nls;
- 	struct ntlmssp2_name *av;
--	u16 len;
-+	u16 len, nlen;
++#define AV_TYPE(av)		(le16_to_cpu(av->type))
++#define AV_LEN(av)		(le16_to_cpu(av->length))
++#define AV_DATA_PTR(av)	((void *)av->data)
 +
-+	if (*name)
-+		return 0;
++#define av_for_each_entry(ses, av) \
++	for (av = NULL; (av = find_next_av(ses, av));)
++
++static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
++					  struct ntlmssp2_name *av)
++{
++	u16 len;
++	u8 *end;
++
++	end = (u8 *)ses->auth_key.response + ses->auth_key.len;
++	if (!av) {
++		if (unlikely(!ses->auth_key.response || !ses->auth_key.len))
++			return NULL;
++		av = (void *)ses->auth_key.response;
++	} else {
++		av = (void *)((u8 *)av + sizeof(*av) + AV_LEN(av));
++	}
++
++	if ((u8 *)av + sizeof(*av) > end)
++		return NULL;
++
++	len = AV_LEN(av);
++	if (AV_TYPE(av) == NTLMSSP_AV_EOL)
++		return NULL;
++	if (!len || (u8 *)av + sizeof(*av) + len > end)
++		return NULL;
++	return av;
++}
++
+ /* Server has provided av pairs/target info in the type 2 challenge
+  * packet and we have plucked it and stored within smb session.
+  * We parse that blob here to find netbios domain name to be used
+@@ -325,49 +358,23 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
+  * may not fail against other (those who are not very particular
+  * about target string i.e. for some, just user name might suffice.
+  */
+-static int
+-find_domain_name(struct cifs_ses *ses, const struct nls_table *nls_cp)
++static int find_domain_name(struct cifs_ses *ses)
+ {
+-	unsigned int attrsize;
+-	unsigned int type;
+-	unsigned int onesize = sizeof(struct ntlmssp2_name);
+-	unsigned char *blobptr;
+-	unsigned char *blobend;
+-	struct ntlmssp2_name *attrptr;
++	const struct nls_table *nlsc = ses->local_nls;
++	struct ntlmssp2_name *av;
++	u16 len;
  
- 	av_for_each_entry(ses, av) {
- 		len = AV_LEN(av);
--		if (AV_TYPE(av) == NTLMSSP_AV_NB_DOMAIN_NAME &&
--		    len < CIFS_MAX_DOMAINNAME_LEN && !ses->domainName) {
--			ses->domainName = kmalloc(len + 1, GFP_KERNEL);
--			if (!ses->domainName)
-+		if (AV_TYPE(av) != type)
-+			continue;
-+		if (!IS_ALIGNED(len, sizeof(__le16))) {
-+			cifs_dbg(VFS | ONCE, "%s: bad length(%u) for type %u\n",
-+				 __func__, len, type);
-+			continue;
-+		}
-+		nlen = len / sizeof(__le16);
-+		if (nlen <= maxlen) {
-+			++nlen;
-+			*name = kmalloc(nlen, GFP_KERNEL);
-+			if (!*name)
- 				return -ENOMEM;
--			cifs_from_utf16(ses->domainName, AV_DATA_PTR(av),
--					len, len, nlsc, NO_MAP_UNI_RSVD);
-+			cifs_from_utf16(*name, AV_DATA_PTR(av), nlen,
-+					len, nlsc, NO_MAP_UNI_RSVD);
-+			break;
+-	if (!ses->auth_key.len || !ses->auth_key.response)
+-		return 0;
+-
+-	blobptr = ses->auth_key.response;
+-	blobend = blobptr + ses->auth_key.len;
+-
+-	while (blobptr + onesize < blobend) {
+-		attrptr = (struct ntlmssp2_name *) blobptr;
+-		type = le16_to_cpu(attrptr->type);
+-		if (type == NTLMSSP_AV_EOL)
+-			break;
+-		blobptr += 2; /* advance attr type */
+-		attrsize = le16_to_cpu(attrptr->length);
+-		blobptr += 2; /* advance attr size */
+-		if (blobptr + attrsize > blobend)
+-			break;
+-		if (type == NTLMSSP_AV_NB_DOMAIN_NAME) {
+-			if (!attrsize || attrsize >= CIFS_MAX_DOMAINNAME_LEN)
+-				break;
+-			if (!ses->domainName) {
+-				ses->domainName =
+-					kmalloc(attrsize + 1, GFP_KERNEL);
+-				if (!ses->domainName)
+-						return -ENOMEM;
+-				cifs_from_utf16(ses->domainName,
+-					(__le16 *)blobptr, attrsize, attrsize,
+-					nls_cp, NO_MAP_UNI_RSVD);
+-				break;
+-			}
++	av_for_each_entry(ses, av) {
++		len = AV_LEN(av);
++		if (AV_TYPE(av) == NTLMSSP_AV_NB_DOMAIN_NAME &&
++		    len < CIFS_MAX_DOMAINNAME_LEN && !ses->domainName) {
++			ses->domainName = kmalloc(len + 1, GFP_KERNEL);
++			if (!ses->domainName)
++				return -ENOMEM;
++			cifs_from_utf16(ses->domainName, AV_DATA_PTR(av),
++					len, len, nlsc, NO_MAP_UNI_RSVD);
  		}
+-		blobptr += attrsize; /* advance attr  value */
  	}
+-
  	return 0;
-@@ -546,16 +552,29 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ }
+ 
+@@ -377,40 +384,16 @@ find_domain_name(struct cifs_ses *ses, const struct nls_table *nls_cp)
+  * as part of ntlmv2 authentication (or local current time as
+  * default in case of failure)
+  */
+-static __le64
+-find_timestamp(struct cifs_ses *ses)
++static __le64 find_timestamp(struct cifs_ses *ses)
+ {
+-	unsigned int attrsize;
+-	unsigned int type;
+-	unsigned int onesize = sizeof(struct ntlmssp2_name);
+-	unsigned char *blobptr;
+-	unsigned char *blobend;
+-	struct ntlmssp2_name *attrptr;
++	struct ntlmssp2_name *av;
+ 	struct timespec64 ts;
+ 
+-	if (!ses->auth_key.len || !ses->auth_key.response)
+-		return 0;
+-
+-	blobptr = ses->auth_key.response;
+-	blobend = blobptr + ses->auth_key.len;
+-
+-	while (blobptr + onesize < blobend) {
+-		attrptr = (struct ntlmssp2_name *) blobptr;
+-		type = le16_to_cpu(attrptr->type);
+-		if (type == NTLMSSP_AV_EOL)
+-			break;
+-		blobptr += 2; /* advance attr type */
+-		attrsize = le16_to_cpu(attrptr->length);
+-		blobptr += 2; /* advance attr size */
+-		if (blobptr + attrsize > blobend)
+-			break;
+-		if (type == NTLMSSP_AV_TIMESTAMP) {
+-			if (attrsize == sizeof(u64))
+-				return *((__le64 *)blobptr);
+-		}
+-		blobptr += attrsize; /* advance attr value */
++	av_for_each_entry(ses, av) {
++		if (AV_TYPE(av) == NTLMSSP_AV_TIMESTAMP &&
++		    AV_LEN(av) == sizeof(u64))
++			return *((__le64 *)AV_DATA_PTR(av));
+ 	}
+-
+ 	ktime_get_real_ts64(&ts);
+ 	return cpu_to_le64(cifs_UnixTimeToNT(ts));
+ }
+@@ -563,7 +546,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
  	if (ses->server->negflavor == CIFS_NEGFLAVOR_EXTENDED) {
  		if (!ses->domainName) {
  			if (ses->domainAuto) {
--				rc = find_domain_name(ses);
--				if (rc) {
--					cifs_dbg(VFS, "error %d finding domain name\n",
--						 rc);
-+				/*
-+				 * Domain (workgroup) hasn't been specified in
-+				 * mount options, so try to find it in
-+				 * CHALLENGE_MESSAGE message and then use it as
-+				 * part of NTLMv2 authentication.
-+				 */
-+				rc = find_av_name(ses, NTLMSSP_AV_NB_DOMAIN_NAME,
-+						  &ses->domainName,
-+						  CIFS_MAX_DOMAINNAME_LEN);
-+				if (rc)
- 					goto setup_ntlmv2_rsp_ret;
--				}
- 			} else {
- 				ses->domainName = kstrdup("", GFP_KERNEL);
-+				if (!ses->domainName) {
-+					rc = -ENOMEM;
-+					goto setup_ntlmv2_rsp_ret;
-+				}
- 			}
- 		}
-+		rc = find_av_name(ses, NTLMSSP_AV_DNS_DOMAIN_NAME,
-+				  &ses->dns_dom, CIFS_MAX_DOMAINNAME_LEN);
-+		if (rc)
-+			goto setup_ntlmv2_rsp_ret;
- 	} else {
- 		rc = build_avpair_blob(ses, nls_cp);
- 		if (rc) {
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 6e63abe461fd..e5982136e66f 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1154,6 +1154,7 @@ struct cifs_ses {
- 	/* ========= end: protected by chan_lock ======== */
- 	struct cifs_ses *dfs_root_ses;
- 	struct nls_table *local_nls;
-+	char *dns_dom; /* FQDN of the domain */
- };
+-				rc = find_domain_name(ses, nls_cp);
++				rc = find_domain_name(ses);
+ 				if (rc) {
+ 					cifs_dbg(VFS, "error %d finding domain name\n",
+ 						 rc);
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index ee78bb6741d6..17202754e6d0 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -649,7 +649,7 @@ typedef union smb_com_session_setup_andx {
+ struct ntlmssp2_name {
+ 	__le16 type;
+ 	__le16 length;
+-/*	char   name[length]; */
++	__u8 data[];
+ } __attribute__((packed));
  
- static inline bool
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 4373dd64b66d..c23d5ba44cae 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -101,6 +101,7 @@ sesInfoFree(struct cifs_ses *buf_to_free)
- 	kfree_sensitive(buf_to_free->password2);
- 	kfree(buf_to_free->user_name);
- 	kfree(buf_to_free->domainName);
-+	kfree(buf_to_free->dns_dom);
- 	kfree_sensitive(buf_to_free->auth_key.response);
- 	spin_lock(&buf_to_free->iface_lock);
- 	list_for_each_entry_safe(iface, niface, &buf_to_free->iface_list,
+ struct ntlmv2_resp {
 -- 
 2.47.1
 
