@@ -1,128 +1,146 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A06BEEB2
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jan 2025 09:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4741632FB
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Jan 2025 11:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736155447; cv=none; b=oGf0BG6amU2UlnUZpj0YGUVrC+CjpogAb8wYUXr+MvAGh2RYykhhu1GeGw2uLzqrztwLJXzJTbBRrYRyyjXE3luZa6xJdo2v0yzx+kRCeG0NMqY50bl7OIdX2hEEXZNpzn+qxApo61ig8JkrNS2WkRy+6lsBbuieLOxW5hurGTI=
+	t=1736163455; cv=none; b=eJO+d/0k/GyUwPv6phTJYDAG0fThAmkCxnNnOf6oirlcfLPsmEO31FflCuqJM5kGGR2fyGxfEac3eZi5gz6gxeNc42NE49l0hBz4sRgdGtNe6BjgRrwQjPBK9EXGT40f1nU4CfX2b9pYcA7rEd+MMt3Lw3ZPcfoPPznZIOvwEDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736155447; c=relaxed/simple;
-	bh=go1e6F4x7lRHFju5KcuNAqxUxAG/TKL04N7c4MOc6KU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZCti8J+VrQ66GxugUbz+DY+eiRweAGMbM+oGdnBXUjOtfTBX5tvYBN5URQHtIoLZ9+EeTHWQA0xHdTXeWGLK3XcwjuokO5tbsLJHqFzJrNhsXWWJBt2WaL/kboEshpvgAZmpopYICVicyvplgeuN2DpGLtXnFWSc9jg1E6eT2vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zH2bCbwM; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1736163455; c=relaxed/simple;
+	bh=vSkL70mPa9ZU0T2jcqCFDByTZW4036xqdGj/g8j0Pcc=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=BUuDZxCu60DBal3OPSmA+Qus3vRo147jGr5+AJm8Y4y++Ds3fGinNrbdIPt0AaRJ42Ajg6lL54+PpCrtstAC7BWJqd2upVVERpVRRQOVabTU4ZKQG2lfLW1NnN+4RG/fxHIC8DfAQ7QZozc7g94lbYd79CRjjPnX9nPebIlK5X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e+slmJug; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zH2bCbwM"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4362f61757fso140862235e9.2
-        for <linux-cifs@vger.kernel.org>; Mon, 06 Jan 2025 01:24:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736155444; x=1736760244; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GX5SU/kd2TSZ3EuamtsC8/80yfw0NsWsL7c8xc1tDKg=;
-        b=zH2bCbwMp6JdUu+Qz9u2S5sLA8m8cKUZe+CkTteL/k/emBTvI8wyAE+PwJ7dPhaLkg
-         VuTH/L7M2+/fCXZ6mAn4HresqfvlPHFZfDQV+wQauDAygzlHoa/YD3FptoOmlHehWthm
-         fvzWgyY4Xe2YOv5YLKCGGFFoqk2oRHBvltQ2oLyndJg6AcSZoT+UrLOjKTnUlxV+CxBI
-         vEl5bOl1xKpLuvjOpRrjpTRhvLx7S0NzOmA+wCMNGmT1C3zFBTDkEmMnp6N/L9jDQMFD
-         zJElCgSEIyk3ONdoX9NHCTjyTDwk6MxUwC2phPZJDUgyYSRljwtyes16QtwLyNmtm1td
-         rLug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736155444; x=1736760244;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GX5SU/kd2TSZ3EuamtsC8/80yfw0NsWsL7c8xc1tDKg=;
-        b=INLGKl7EOL9ZnPlL7/V6q/4TlVcmejAkVC2sIR/ZZRiIc90gh4R1IuqscJBY6GHqfl
-         LvEc8luy9ls+AjqFAqH2WG5V5I5632Ul8/+yuMqtRKY5axqpTncerNR9MsyImDjxrtRT
-         1kyPFB2Ijgc2E/gpRS7aksBhaCVB6VUT55OuvPF/lx9pOony2RFXY5ueTftiKgf3ukQS
-         ZETppDgHmsBCLPr4NCdCUX23pbhnv8g8X0f61gQL0+g6+rEzAz8Nv/UmRAAIakQQ+pl2
-         dra2AqcISIOnpfA2rUAI6/tgN/fzAWCMNh/IQTMj4HbISer8JaQUGi072qCutR6z2oqt
-         7Osw==
-X-Forwarded-Encrypted: i=1; AJvYcCUk+GRN1C5ldIeDILhJobyfvU3WTU+9FzdSqamHTPp4BiU+lZMIbrxjbSS73zJRBpcsdgwKFZDr7r0Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDgJJKF7hvpmyEl3+D9YxryUbq7G6XAqKtfJpy9CtWLX7LCp8W
-	KeA0qbdg98ghkIM9tulKAMKbe+depkO3xyO+qhIZa2QRSPcwznKQuZ8XVZV5gUE=
-X-Gm-Gg: ASbGncvyCXEUCNueGBh3NobQ7NY5e7i3/MYNza9fBWK8eCigCtBw5Hq8YVkLSQIbM9y
-	pJMt7ztyyrgrlIs5Ibhn5kn4+jbpEFtlWr3g/bbXRF5zX+YudCd5qbWN5g0iKBSkwH3vkcAmXi9
-	MMs858ZQud/FO01i0AkCFgQg4WHUoVkuYXHMEXzvqMLkfJiYKJFEd4aSUa6ufWshHQelci22o7C
-	flmkEc9NjhYeU/E9VBq3CdRpnfkgjxcPX9gzWbVwEEfD/oIigL5jr5gVKaFIg==
-X-Google-Smtp-Source: AGHT+IFx2lXm7TTxCwCaL3KoFUyod+c+0FVOGIvbve9KBxsmlG4U+0xq00kI18NVyoTycIppMXQBZw==
-X-Received: by 2002:a05:600c:45c6:b0:42c:c28c:e477 with SMTP id 5b1f17b1804b1-43668b4808fmr439549465e9.23.1736155443819;
-        Mon, 06 Jan 2025 01:24:03 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b015absm596603375e9.13.2025.01.06.01.24.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 01:24:03 -0800 (PST)
-Date: Mon, 6 Jan 2025 12:24:00 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Steve French <stfrench@microsoft.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [cifs:for-next-next 13/13] fs/smb/client/fs_context.c:1466
- smb3_fs_context_parse_param() warn: statement has no effect 22
-Message-ID: <a376beb3-c362-4b73-b2e6-9104d4df6978@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+slmJug"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736163453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Kp15SreWS1fhtE7z/OTQXIsjz7AhnxT/exdmyKm2weg=;
+	b=e+slmJugWOR4eZqRZ9JElrYZ0o7LQg6blsZdE36JSb5th4pBWBLv3fKjpsZDx+Jz+EtS54
+	oDyQx6CEiOLyEmtB3ZB1x+IIlvnQNeZsZpbM+qQfyD/lTg5fJNID5BPc6+eWY2c39NUBIa
+	ZykNv/teCDxQ41T+H7AdAuSTFpT8opM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-9tlihHwDM_G6dW8v7aOHtQ-1; Mon,
+ 06 Jan 2025 06:37:30 -0500
+X-MC-Unique: 9tlihHwDM_G6dW8v7aOHtQ-1
+X-Mimecast-MFC-AGG-ID: 9tlihHwDM_G6dW8v7aOHtQ
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 740D3195608C;
+	Mon,  6 Jan 2025 11:37:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0BC9D1956056;
+	Mon,  6 Jan 2025 11:37:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <fedd8a40d54b2969097ffa4507979858@3xo.fr>
+References: <fedd8a40d54b2969097ffa4507979858@3xo.fr> <669f22fc89e45dd4e56d75876dc8f2bf@3xo.fr>
+To: nicolas.baranger@3xo.fr
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Christoph Hellwig <hch@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>,
+    Christian Brauner <brauner@kernel.org>, netfs@lists.linux.dev,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] netfs: Fix kernel async DIO
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <286637.1736163444.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Jan 2025 11:37:24 +0000
+Message-ID: <286638.1736163444@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next-next
-head:   8f97b4a68ea216bad142a5391e30fa63c8efce30
-commit: 8f97b4a68ea216bad142a5391e30fa63c8efce30 [13/13] smb3 client: minor cleanup of username parsing on mount
-config: x86_64-randconfig-161-20241220 (https://download.01.org/0day-ci/archive/20241222/202412220354.ZyCvciEy-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+Hi Nicolas,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202412220354.ZyCvciEy-lkp@intel.com/
+Does the attached fix your problem?
 
-smatch warnings:
-fs/smb/client/fs_context.c:1466 smb3_fs_context_parse_param() warn: statement has no effect 22
+David
+---
+netfs: Fix kernel async DIO
 
-vim +1466 fs/smb/client/fs_context.c
+Netfslib needs to be able to handle kernel-initiated asynchronous DIO that
+is supplied with a bio_vec[] array.  Currently, because of the async flag,
+this gets passed to netfs_extract_user_iter() which throws a warning and
+fails because it only handles IOVEC and UBUF iterators.  This can be
+triggered through a combination of cifs and a loopback blockdev with
+something like:
 
-8f97b4a68ea216b fs/smb/client/fs_context.c Steve French     2024-10-23  1452  		/* if first character is null, then anonymous auth */
-8f97b4a68ea216b fs/smb/client/fs_context.c Steve French     2024-10-23  1453  		if (*(param->string) == 0) {
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1454  			/* null user, ie. anonymous authentication */
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1455  			ctx->nullauth = 1;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1456  			break;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1457  		}
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1458  
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1459  		if (strnlen(param->string, CIFS_MAX_USERNAME_LEN) >
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1460  		    CIFS_MAX_USERNAME_LEN) {
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1461  			pr_warn("username too long\n");
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1462  			goto cifs_parse_mount_err;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1463  		}
-8f97b4a68ea216b fs/smb/client/fs_context.c Steve French     2024-10-23  1464  		ctx->username = param->string, GFP_KERNEL;
-8f97b4a68ea216b fs/smb/client/fs_context.c Steve French     2024-10-23  1465  		/* streal string from caller, but set to NULL so caller doesn't free */
+        mount //my/cifs/share /foo
+        dd if=3D/dev/zero of=3D/foo/m0 bs=3D4K count=3D1K
+        losetup --sector-size 4096 --direct-io=3Don /dev/loop2046 /foo/m0
+        echo hello >/dev/loop2046
 
-Typo: "streal" should be "steal".
+This causes the following to appear in syslog:
 
-8f97b4a68ea216b fs/smb/client/fs_context.c Steve French     2024-10-23 @1466  		param->string == NULL;
+        WARNING: CPU: 2 PID: 109 at fs/netfs/iterator.c:50 netfs_extract_u=
+ser_iter+0x170/0x250 [netfs]
 
+and the write to fail.
 
-It should be = instead of ==.  It's surprising this compiles...
+Fix this by removing the check in netfs_unbuffered_write_iter_locked() tha=
+t
+causes async kernel DIO writes to be handled as userspace writes.  Note
+that this change relies on the kernel caller maintaining the existence of
+the bio_vec array (or kvec[] or folio_queue) until the op is complete.
 
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1467  		break;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1468  	case Opt_pass:
-a4e430c8c8ba96b fs/cifs/fs_context.c       Enzo Matsumiya   2022-09-20  1469  		kfree_sensitive(ctx->password);
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1470  		ctx->password = NULL;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1471  		if (strlen(param->string) == 0)
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1472  			break;
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1473  
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1474  		ctx->password = kstrdup(param->string, GFP_KERNEL);
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1475  		if (ctx->password == NULL) {
-24fedddc954ed16 fs/cifs/fs_context.c       Aurelien Aptel   2021-03-01  1476  			cifs_errorf(fc, "OOM when copying password string\n");
-24e0a1eff9e2b98 fs/cifs/fs_context.c       Ronnie Sahlberg  2020-12-10  1477  			goto cifs_parse_mount_err;
+Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+Reported by: Nicolas Baranger <nicolas.baranger@3xo.fr>
+Closes: https://lore.kernel.org/r/fedd8a40d54b2969097ffa4507979858@3xo.fr/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <smfrench@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: netfs@lists.linux.dev
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/netfs/direct_write.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
+index eded8afaa60b..42ce53cc216e 100644
+--- a/fs/netfs/direct_write.c
++++ b/fs/netfs/direct_write.c
+@@ -67,7 +67,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb =
+*iocb, struct iov_iter *
+ 		 * allocate a sufficiently large bvec array and may shorten the
+ 		 * request.
+ 		 */
+-		if (async || user_backed_iter(iter)) {
++		if (user_backed_iter(iter)) {
+ 			n =3D netfs_extract_user_iter(iter, len, &wreq->buffer.iter, 0);
+ 			if (n < 0) {
+ 				ret =3D n;
+@@ -77,6 +77,11 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb=
+ *iocb, struct iov_iter *
+ 			wreq->direct_bv_count =3D n;
+ 			wreq->direct_bv_unpin =3D iov_iter_extract_will_pin(iter);
+ 		} else {
++			/* If this is a kernel-generated async DIO request,
++			 * assume that any resources the iterator points to
++			 * (eg. a bio_vec array) will persist till the end of
++			 * the op.
++			 */
+ 			wreq->buffer.iter =3D *iter;
+ 		}
+ 	}
 
