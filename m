@@ -1,146 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4741632FB
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jan 2025 11:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDBC1DC9B8;
+	Mon,  6 Jan 2025 12:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.129.21.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736163455; cv=none; b=eJO+d/0k/GyUwPv6phTJYDAG0fThAmkCxnNnOf6oirlcfLPsmEO31FflCuqJM5kGGR2fyGxfEac3eZi5gz6gxeNc42NE49l0hBz4sRgdGtNe6BjgRrwQjPBK9EXGT40f1nU4CfX2b9pYcA7rEd+MMt3Lw3ZPcfoPPznZIOvwEDM=
+	t=1736165281; cv=none; b=tYpf6QUBXYLUyjMVZyZhAjVHzXekdHimkFY7zXRrmTVjxs1WqwA+pXQHqTdlCHOQ/Oi48HtasLOOul302NAeWCxuuJHqa3mUXjaN28vKTpHxJwpD3Adxjrk5/M/+xBiagdrvQoIMPPCSnQ1NKnailokyYBZ632CMpHZGgZEyEos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736163455; c=relaxed/simple;
-	bh=vSkL70mPa9ZU0T2jcqCFDByTZW4036xqdGj/g8j0Pcc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=BUuDZxCu60DBal3OPSmA+Qus3vRo147jGr5+AJm8Y4y++Ds3fGinNrbdIPt0AaRJ42Ajg6lL54+PpCrtstAC7BWJqd2upVVERpVRRQOVabTU4ZKQG2lfLW1NnN+4RG/fxHIC8DfAQ7QZozc7g94lbYd79CRjjPnX9nPebIlK5X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e+slmJug; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736165281; c=relaxed/simple;
+	bh=n+eqCzLhYHG7tuw4O6CIzecns+zELJBTFr3/HlBdqhg=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=tUueGVqmz9fHHcZahZVK8/87xq6zIl+MR1+JB/gwfKnH/k30eLkiKMQSETwPs8pucx8QFsArhCSsR/225/rQb4gIeX/P4PVhkpyb2lLZlntixxaD+1ZjufUzN4Wx0ztxo3jwB3QbNc1/aUWq3JkZNTc81sA8857hkWo7YTD3g+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr; spf=pass smtp.mailfrom=3xo.fr; dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b=ii3eaTUz; arc=none smtp.client-ip=212.129.21.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3xo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+slmJug"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736163453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kp15SreWS1fhtE7z/OTQXIsjz7AhnxT/exdmyKm2weg=;
-	b=e+slmJugWOR4eZqRZ9JElrYZ0o7LQg6blsZdE36JSb5th4pBWBLv3fKjpsZDx+Jz+EtS54
-	oDyQx6CEiOLyEmtB3ZB1x+IIlvnQNeZsZpbM+qQfyD/lTg5fJNID5BPc6+eWY2c39NUBIa
-	ZykNv/teCDxQ41T+H7AdAuSTFpT8opM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-9tlihHwDM_G6dW8v7aOHtQ-1; Mon,
- 06 Jan 2025 06:37:30 -0500
-X-MC-Unique: 9tlihHwDM_G6dW8v7aOHtQ-1
-X-Mimecast-MFC-AGG-ID: 9tlihHwDM_G6dW8v7aOHtQ
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b="ii3eaTUz"
+Received: from localhost (mail.3xo.fr [212.129.21.66])
+	by mail.3xo.fr (Postfix) with ESMTP id EFA89C6;
+	Mon,  6 Jan 2025 13:07:49 +0100 (CET)
+X-Virus-Scanned: Debian amavis at nxo2.3xo.fr
+Received: from mail.3xo.fr ([212.129.21.66])
+ by localhost (mail.3xo.fr [212.129.21.66]) (amavis, port 10024) with ESMTP
+ id yelSwzv8orKl; Mon,  6 Jan 2025 13:07:45 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.3xo.fr D5D0DC1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3xo.fr; s=3xo;
+	t=1736165264; bh=UpXQpAdzuVWioOzu9/NdHU8wrAjhGB8vN3JBxloLtNA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ii3eaTUzz0XJhouEH2C8MxeCAo1boJMMOyRMmxIKu/sDICAC5IIESPnKRrrg7XbZX
+	 aXEJQX5Ea+EST5ZvEfrV07vsce7M+WimXFPPDoV1WeZxk/hud57EFA14qTPt2R8jXQ
+	 XiCBOoApIkg73bpEfms5UFv0GAWS5vJxZ55twOMQMO35mbiYyZCo/9ugylv9QdcvLA
+	 2+wio020eNt0pi55OWLHex1rHZQQsWb0NiuGOcuZS83B/+GeC3uFhXZPRWopQV85aB
+	 Y0Faoe+zMABvuFysCi/80dcURH6OXN+iGg4yiOQC7Fw9/1hzdMJ+QK8iPGJXVnWGMt
+	 +qCGWfhTzxWOw==
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 740D3195608C;
-	Mon,  6 Jan 2025 11:37:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0BC9D1956056;
-	Mon,  6 Jan 2025 11:37:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <fedd8a40d54b2969097ffa4507979858@3xo.fr>
-References: <fedd8a40d54b2969097ffa4507979858@3xo.fr> <669f22fc89e45dd4e56d75876dc8f2bf@3xo.fr>
-To: nicolas.baranger@3xo.fr
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Christoph Hellwig <hch@infradead.org>,
-    Jeff Layton <jlayton@kernel.org>,
-    Christian Brauner <brauner@kernel.org>, netfs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Fix kernel async DIO
+	by mail.3xo.fr (Postfix) with ESMTPSA id D5D0DC1;
+	Mon,  6 Jan 2025 13:07:44 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <286637.1736163444.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jan 2025 11:37:24 +0000
-Message-ID: <286638.1736163444@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Date: Mon, 06 Jan 2025 13:07:44 +0100
+From: nicolas.baranger@3xo.fr
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <smfrench@gmail.com>, Christoph Hellwig
+ <hch@infradead.org>, Jeff Layton <jlayton@kernel.org>, Christian Brauner
+ <brauner@kernel.org>, netfs@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfs: Fix kernel async DIO
+In-Reply-To: <286638.1736163444@warthog.procyon.org.uk>
+References: <fedd8a40d54b2969097ffa4507979858@3xo.fr>
+ <669f22fc89e45dd4e56d75876dc8f2bf@3xo.fr>
+ <286638.1736163444@warthog.procyon.org.uk>
+Message-ID: <b3e8129937055ff8971d8be44286f0b8@3xo.fr>
+X-Sender: nicolas.baranger@3xo.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Nicolas,
+Hi David
 
-Does the attached fix your problem?
+Thanks for the job !
+I will buid Linux 6.10 and mainline with the provided change and I'm 
+comming here as soon as I get results from tests (CET working time).
 
-David
----
-netfs: Fix kernel async DIO
+Thanks again for help in this issue
+Nicolas
 
-Netfslib needs to be able to handle kernel-initiated asynchronous DIO that
-is supplied with a bio_vec[] array.  Currently, because of the async flag,
-this gets passed to netfs_extract_user_iter() which throws a warning and
-fails because it only handles IOVEC and UBUF iterators.  This can be
-triggered through a combination of cifs and a loopback blockdev with
-something like:
+Le 2025-01-06 12:37, David Howells a écrit :
 
-        mount //my/cifs/share /foo
-        dd if=3D/dev/zero of=3D/foo/m0 bs=3D4K count=3D1K
-        losetup --sector-size 4096 --direct-io=3Don /dev/loop2046 /foo/m0
-        echo hello >/dev/loop2046
-
-This causes the following to appear in syslog:
-
-        WARNING: CPU: 2 PID: 109 at fs/netfs/iterator.c:50 netfs_extract_u=
-ser_iter+0x170/0x250 [netfs]
-
-and the write to fail.
-
-Fix this by removing the check in netfs_unbuffered_write_iter_locked() tha=
-t
-causes async kernel DIO writes to be handled as userspace writes.  Note
-that this change relies on the kernel caller maintaining the existence of
-the bio_vec array (or kvec[] or folio_queue) until the op is complete.
-
-Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
-Reported by: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Closes: https://lore.kernel.org/r/fedd8a40d54b2969097ffa4507979858@3xo.fr/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <smfrench@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/direct_write.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index eded8afaa60b..42ce53cc216e 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -67,7 +67,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb =
-*iocb, struct iov_iter *
- 		 * allocate a sufficiently large bvec array and may shorten the
- 		 * request.
- 		 */
--		if (async || user_backed_iter(iter)) {
-+		if (user_backed_iter(iter)) {
- 			n =3D netfs_extract_user_iter(iter, len, &wreq->buffer.iter, 0);
- 			if (n < 0) {
- 				ret =3D n;
-@@ -77,6 +77,11 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb=
- *iocb, struct iov_iter *
- 			wreq->direct_bv_count =3D n;
- 			wreq->direct_bv_unpin =3D iov_iter_extract_will_pin(iter);
- 		} else {
-+			/* If this is a kernel-generated async DIO request,
-+			 * assume that any resources the iterator points to
-+			 * (eg. a bio_vec array) will persist till the end of
-+			 * the op.
-+			 */
- 			wreq->buffer.iter =3D *iter;
- 		}
- 	}
-
+> Hi Nicolas,
+> 
+> Does the attached fix your problem?
+> 
+> David
+> ---
+> netfs: Fix kernel async DIO
+> 
+> Netfslib needs to be able to handle kernel-initiated asynchronous DIO 
+> that
+> is supplied with a bio_vec[] array.  Currently, because of the async 
+> flag,
+> this gets passed to netfs_extract_user_iter() which throws a warning 
+> and
+> fails because it only handles IOVEC and UBUF iterators.  This can be
+> triggered through a combination of cifs and a loopback blockdev with
+> something like:
+> 
+> mount //my/cifs/share /foo
+> dd if=/dev/zero of=/foo/m0 bs=4K count=1K
+> losetup --sector-size 4096 --direct-io=on /dev/loop2046 /foo/m0
+> echo hello >/dev/loop2046
+> 
+> This causes the following to appear in syslog:
+> 
+> WARNING: CPU: 2 PID: 109 at fs/netfs/iterator.c:50 
+> netfs_extract_user_iter+0x170/0x250 [netfs]
+> 
+> and the write to fail.
+> 
+> Fix this by removing the check in netfs_unbuffered_write_iter_locked() 
+> that
+> causes async kernel DIO writes to be handled as userspace writes.  Note
+> that this change relies on the kernel caller maintaining the existence 
+> of
+> the bio_vec array (or kvec[] or folio_queue) until the op is complete.
+> 
+> Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+> Reported by: Nicolas Baranger <nicolas.baranger@3xo.fr>
+> Closes: 
+> https://lore.kernel.org/r/fedd8a40d54b2969097ffa4507979858@3xo.fr/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: netfs@lists.linux.dev
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> fs/netfs/direct_write.c |    7 ++++++-
+> 1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
+> index eded8afaa60b..42ce53cc216e 100644
+> --- a/fs/netfs/direct_write.c
+> +++ b/fs/netfs/direct_write.c
+> @@ -67,7 +67,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct 
+> kiocb *iocb, struct iov_iter *
+> * allocate a sufficiently large bvec array and may shorten the
+> * request.
+> */
+> -        if (async || user_backed_iter(iter)) {
+> +        if (user_backed_iter(iter)) {
+> n = netfs_extract_user_iter(iter, len, &wreq->buffer.iter, 0);
+> if (n < 0) {
+> ret = n;
+> @@ -77,6 +77,11 @@ ssize_t netfs_unbuffered_write_iter_locked(struct 
+> kiocb *iocb, struct iov_iter *
+> wreq->direct_bv_count = n;
+> wreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
+> } else {
+> +            /* If this is a kernel-generated async DIO request,
+> +             * assume that any resources the iterator points to
+> +             * (eg. a bio_vec array) will persist till the end of
+> +             * the op.
+> +             */
+> wreq->buffer.iter = *iter;
+> }
+> }
