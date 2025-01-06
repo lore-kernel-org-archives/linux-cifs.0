@@ -1,114 +1,68 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF18618A6A8;
-	Mon,  6 Jan 2025 03:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C762D600;
+	Mon,  6 Jan 2025 07:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736134807; cv=none; b=ueC8FqNClAwRTK5eBAYQVK9d2bEvoMFYzkv/msfn4Bs4v7/lwM3zpbnUWxfBCZEfrbPAQ+gZDFz8iOYfpBGhCPjachWbkYvrLhKZxfuyCNG9yfSPcFX/VSBUd/xN97zNRjQi5ZhuDf6E5PCoAipBzamFkStEDxwtgeJVKkwHkGw=
+	t=1736148026; cv=none; b=muHx0XCXvCMuc427Rd3TyEyF3PoD5/W7R/ti+jjtEPVLzZJttIbznfsDEikUw/e6XmaIrw2XqY0kIVZLvbspVBwlbFzzu/UVp+PDrfn+peLjpEeNInmU5ik+22xH4loCHAKBDf9GTfF8n5xfByu4QKStMm8TV3WuSjaR+oqMfhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736134807; c=relaxed/simple;
-	bh=831+LLrgqAoeCXD8udCajMbuCf+4W3nRQKEtuvTCw3c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8FEX4viMVE+ZB968cmGcUrjo2cNmP1cHJu+3TodjvYlvoYTAGuoBXcYHtob5LGE5wDZ+0UWMOLR0OzD7b1NOYLrv85XlGz4zChKu+5yKIZIIOQ8znITCg044gJEfx6Xj7zVtDdqpDvmtFGnNf6imd9EidCdxsPMOC2lAh5QtCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0HqvrXb; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736148026; c=relaxed/simple;
+	bh=kTdW82KceLUTOgNYaoGPbkHA7WjfDp+EMoSxq8n/HRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YknXueTY+xxnN8E5UPRy+M57G/MatDRLCbTK8h/DGwfQ9i+ROvSJqWg8Myq6IWKk0jccR8aGRs2T6cTjpZzUGH06g354MMA4p7lNI872zGF+/kqJj5h5MOZEX2mLQ/uMaPaG4Vt4FEuPX1Chai2JquXrVxtx1ghGtdkNemJYnt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WK5VqBxI; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0HqvrXb"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso15651558a91.3;
-        Sun, 05 Jan 2025 19:40:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736134805; x=1736739605; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MBawy8Fgo01NGKL+RGKl0s0P/slCwgV4k1+be4GVL4w=;
-        b=H0HqvrXbJNOJXeHIvIdvLjxSCT4zDQSMnTs8k4FKJW5KWLfWIx0p10voi2g1NJvFAQ
-         wUEDeXBxzBHza3reZKBB/l4g0UI6No5eVNp1PD5r1RfgdnGLQwKalKZhhIDGaOcQFSmr
-         Ej9OpBrlo2slJHYOIF3wjA+giaze51xY9mp/5U6+ROlOogpIwJI6u4WqDpjnWIuI83Dm
-         TAY+RuIGJiPS44Snwyryx3JSXe78NDRooN2iQHPVXQtNZbqyZow67cX9I76qr0c7uEdR
-         uRYrUBPs4LOHIRH4AwtMGiwAqNzJSFoRVqOxvSyAFVmjcbaBi/YM6b1aEbzsebR0T5IR
-         VTBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736134805; x=1736739605;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MBawy8Fgo01NGKL+RGKl0s0P/slCwgV4k1+be4GVL4w=;
-        b=mqC/oW6dPFfM3MC54O3XxAvuRz3f2g79QXM0hHH0qsAaEc5GV+fW9eddNwLNeQwYDi
-         4zP/grH+Wg0c7/4nMTYAAYUWLR4N5K+izGXmZXxYXq7NWTKzZMpseEP09EeOE00e+Kr7
-         MMYlEuQkv86ixb4goR+W2ArrFpeyWVS2+d05Dcftc897S69t7aunKvxCuSKKVs8jBPtc
-         VD4GnweTz81UYMAG3SkuETs3Bh3iq8prshNCySwyn1OiHJ1K6K66hSmQaC0/C8ZeUAp/
-         zK8XRD3fxhk98dtoWRuV/Qz5ESKEc7+FzFxjMIaRXh8lui3iCC6bPFVRq/vGtXgEw40B
-         CmbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3zIzyejQwp8q+gP6qoq1Uph3pslLOo10vB9fS8mJQBGyZDRSIdG0GEKzTgdTFhCIff3LkyC4FW0+gUMvc@vger.kernel.org, AJvYcCW8U6R+txjaHWAvPKABX1zSsnziL/mjZFU+IcvQA9BjMcNw1WMkFuSkHf0OQygTI82sBY/vhQLFPVQF@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLjpd7mirsRFVW5R4ECNzIYorrivZQDewYZkfH5JtKdxMaNEbZ
-	f29XguLdIe3BZI9eorYWU+bj5K3390gXrPBQs1VcDhBEVV0hgNL5
-X-Gm-Gg: ASbGnct4ObG8Y6MFN6+evVM0VMB9wQ/U1tQZC8QevBGoWdOf155cYRvn4TOPvqE9Gab
-	jo+no8PQIVrI+kgsiqyPrqEkaLVfz7saLtV96o0qkJway64r0xcQw2oYEn+h/nlBf/+D5jvz/wE
-	o5v3T5io+H5XfTpn7EENCEzyPDlHof+QFSKPRVy7ZzqScokzmaGA2hwUeKhCziik9j81doW7c98
-	SefhPTsPvu/YBsh+z1f6J8BcXHm5MfmkViAgrd8Wk2cbnPmaTi9hVZK
-X-Google-Smtp-Source: AGHT+IF0xx4ke/INErYy6rKF2W8XUnNFU9yJEO3n45dtc4SeTHYH4S+aYFcy7sgXbP1n7i91LV3VxQ==
-X-Received: by 2002:a05:6a00:39a6:b0:729:1b8f:9645 with SMTP id d2e1a72fcca58-72abdebf1a1mr86721585b3a.24.1736134805002;
-        Sun, 05 Jan 2025 19:40:05 -0800 (PST)
-Received: from XHEGW.lan ([111.196.227.62])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad830adasm30232955b3a.44.2025.01.05.19.40.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jan 2025 19:40:04 -0800 (PST)
-From: He Wang <xw897002528@gmail.com>
-To: 
-Cc: He Wang <xw897002528@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] ksmbd: fix unexpectedly changed path in ksmbd_vfs_kern_path_locked
-Date: Mon,  6 Jan 2025 03:39:54 +0000
-Message-ID: <20250106033956.27445-2-xw897002528@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250106033956.27445-1-xw897002528@gmail.com>
-References: <20250106033956.27445-1-xw897002528@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WK5VqBxI"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Fmt8qYME6/9w9R8bbYrO57pxWUiLXsFoyO6fNt5bpLg=; b=WK5VqBxIPQkHZEzwkVc5VI4bQ7
+	t7SxkA8xtNog9Uh+/UnZTvEJCwdFX7jhlGs+ZRcwN5NsgNuVx1UJbMEnndpM+D64wrQ3KUMWH/7hp
+	R06Qp+FYa0T3T+NU03ww95Gy3xjbp5lV42u1FBY0v5FFKlZtSEC3LjvouJcpGqCyWhilI7r4c23Zv
+	fnNwTIh54oeDCK4QQG30/m/1mEtdLCmi3G/csyQ7jAXeWQtyz53qm4eIUtABZaRj2SW1sbMhdd1Qr
+	F16qvQlbx1+SVLceIWDt6nZ81nN32dDYZ39zcXYIoVpXJmPNfct4THXXPYa926NMUzFYk8aJmswNA
+	Msw0YQ7A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tUhPR-00000000OAK-1uPR;
+	Mon, 06 Jan 2025 07:20:21 +0000
+Date: Sun, 5 Jan 2025 23:20:21 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: nicolas.baranger@3xo.fr
+Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+	David Howells <dhowells@redhat.com>
+Subject: Re: Losetup Direct I/O breaks BACK-FILE filesystem on CIFS share
+ (Appears in Linux 6.10 and reproduced on mainline)
+Message-ID: <Z3uENYsAlKhUdQgY@infradead.org>
+References: <669f22fc89e45dd4e56d75876dc8f2bf@3xo.fr>
+ <fedd8a40d54b2969097ffa4507979858@3xo.fr>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fedd8a40d54b2969097ffa4507979858@3xo.fr>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-When `ksmbd_vfs_kern_path_locked` met an error and it is not the last
-entry, it will exit without restoring changed path buffer. But later this
-buffer may be used as the filename for creation.
+On Wed, Jan 01, 2025 at 07:00:58PM +0100, nicolas.baranger@3xo.fr wrote:
+> 
+> Dear mainteners
+> 
+> Don't know if it's the right place to contact kernel developers but today I
+> did report the following bug which appears in Linux 6.10 and I'm able to
+> reproduce from Linux 6.10 to mainline
+> 
+> I think the new way CIFS is using NETFS could be one of the cause of the
+> issue, as doing :
 
-Signed-off-by: He Wang <xw897002528@gmail.com>
----
- fs/smb/server/vfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 88d167a5f..40f08eac5 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1264,6 +1264,8 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
- 					      filepath,
- 					      flags,
- 					      path);
-+			if (!is_last)
-+				next[0] = '/';
- 			if (err)
- 				goto out2;
- 			else if (is_last)
-@@ -1271,7 +1273,6 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
- 			path_put(parent_path);
- 			*parent_path = *path;
- 
--			next[0] = '/';
- 			remain_len -= filename_len + 1;
- 		}
- 
--- 
-2.46.2
+The poblem is that netfs_extract_user_iter rejects iter types other than
+ubuf and iovec, which breaks loop which is using bvec iters.  It would
+also break other things like io_uring pre-registered buffers, and all
+of these are regressions compared to the old cifs code.
 
