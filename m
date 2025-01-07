@@ -1,135 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B27A190052
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Jan 2025 18:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A401F2384;
+	Tue,  7 Jan 2025 20:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736275180; cv=none; b=OL4S1jAJVNUXOlx07Hn4as4A25imyOm3tYFPT4ftECfOyvenr5Dl5/nOMNX3uIdRD6pUSRajMbHYA2efj6rfygE1GkMoRAgyyiFsOggIHNhJaepVApo3wRlCO4PkMK0CKqZniREgB2521lyK++EMO5QhQiARNzeLEn9b0maxXw8=
+	t=1736281467; cv=none; b=OX9ajXTHb6OzBkimUZY/+Gs0ArFQ1JKHhaNofS97+aNkA4qFTTtwAhjeBqjYggJ8OvfavYbyzHwmJG1M42SKl/G1Z/FIprjXcJw00yT2a3uyNxBBYnQ0sGaOhUub+nMYSWXYqchwXmgT2xckin5muWExpLXykKuWUv2rsAcrENY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736275180; c=relaxed/simple;
-	bh=5WYXUpQPGVXhqaV9VdfXAy839GK5dHFgwTrPjPlMdXA=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=PdUKNmzrMw2LtZxcbpLKaU7Xs4+BzbvQWpFpP+naHE0WeVAxb1KL1UEqXF+32j+PUflgn7YlaalbaTOJG2FgUEAWjbbuOREl0u1HD9895dgHtz1mz3Wk4FIEthaZqaEkIqVVW00sJM7Mxkd5WmfgVY/pS4sAd/ZhlapEiZUGpYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SL6NOU3h; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736281467; c=relaxed/simple;
+	bh=j5VmwBlEF/J26s3L5ZSV/k29majKv/wLO9yOgUzHePE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AV4ztVKarIgJwHCHyv6/vPsVUAS4Jcicv5hnYnUcWaC4HErQgdrIck6HbG+meZJwklUsKC4SV2tlnZirF7ZASObP6SoXo3tiBsjJrwr+1MZ5J6NCsRQDwjwgxRIXZhz5X8nQVfeGM8KNltQuaR9NIR1OfW8Eyq9feWea/HFaUjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tv2KbLmn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SL6NOU3h"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736275176;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=P1+ypZtOfhvrgbMyRTn27M8yHHraLIlusZRvt7dT4ko=;
-	b=SL6NOU3hx119crocT4/Ym3IhsUbrLCOK2tDqHvrHEEG+sVGVSzNM90oJPfJRJZk40YgP5G
-	QXQRSIDiK0K/t0WXxseMHiRjhpaZoqYhRHWUBA6a0tSbqaYfdiIeS39uh0pyqgAXn6rptF
-	EIksU/QvbaCRXbMGyOlDBnfPkPcJNd4=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-318-C6BJI74wO4id5nc8uicbFQ-1; Tue,
- 07 Jan 2025 13:39:33 -0500
-X-MC-Unique: C6BJI74wO4id5nc8uicbFQ-1
-X-Mimecast-MFC-AGG-ID: C6BJI74wO4id5nc8uicbFQ
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4645A1956089;
-	Tue,  7 Jan 2025 18:39:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 821BC3000197;
-	Tue,  7 Jan 2025 18:39:28 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>
-cc: dhowells@redhat.com, Nicolas Baranger <nicolas.baranger@3xo.fr>,
-    Paulo Alcantara (Red Hat) <pc@manguebit.com>,
-    Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>,
-    netfs@lists.linux.dev, linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Fix kernel async DIO
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tv2KbLmn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99DBBC4CED6;
+	Tue,  7 Jan 2025 20:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736281467;
+	bh=j5VmwBlEF/J26s3L5ZSV/k29majKv/wLO9yOgUzHePE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tv2KbLmnt95vaZLQS+xvR/7GYApkjoqpPFBYYYeAiG2Vnoms1hJ/IP0d4JE/YNBQM
+	 dGRkgpya61PcpA/cHPTPZvIg8SbnQWHYu+bzWpWKBfSTxOxTL1pWz5nH/MBZPFxehq
+	 6FsWuVsfn8Ch5VhjK4FkvizYuxEDurk/VWqfj4xb7q1F59BxcdxCvDs48us/xX+etP
+	 rkvT5dqHLKrboFYze3hZHZXS2BcsIo4jzDswHVgfPWdQvCGtJf6X6JCETaXCBQeNO9
+	 /76FcIh6tlVHwjdb3cexEDcbNK8txmysLWMzmjhRiAi7LrjFarDuNbnHTjFhP4YxnH
+	 Dl04MB7LTJa2g==
+Received: by pali.im (Postfix)
+	id 345C17D5; Tue,  7 Jan 2025 21:24:16 +0100 (CET)
+Date: Tue, 7 Jan 2025 21:24:16 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] cifs: Fix getting reparse points from servers without
+ EAs support
+Message-ID: <20250107202416.6z4bw5wdgjnymkjg@pali>
+References: <20241224131859.3457-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <608724.1736275167.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2025 18:39:27 +0000
-Message-ID: <608725.1736275167@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241224131859.3457-1-pali@kernel.org>
+User-Agent: NeoMutt/20180716
 
-Netfslib needs to be able to handle kernel-initiated asynchronous DIO that
-is supplied with a bio_vec[] array.  Currently, because of the async flag,
-this gets passed to netfs_extract_user_iter() which throws a warning and
-fails because it only handles IOVEC and UBUF iterators.  This can be
-triggered through a combination of cifs and a loopback blockdev with
-something like:
+Hello, do you have any comments for this fix?
 
-        mount //my/cifs/share /foo
-        dd if=3D/dev/zero of=3D/foo/m0 bs=3D4K count=3D1K
-        losetup --sector-size 4096 --direct-io=3Don /dev/loop2046 /foo/m0
-        echo hello >/dev/loop2046
-
-This causes the following to appear in syslog:
-
-        WARNING: CPU: 2 PID: 109 at fs/netfs/iterator.c:50 netfs_extract_u=
-ser_iter+0x170/0x250 [netfs]
-
-and the write to fail.
-
-Fix this by removing the check in netfs_unbuffered_write_iter_locked() tha=
-t
-causes async kernel DIO writes to be handled as userspace writes.  Note
-that this change relies on the kernel caller maintaining the existence of
-the bio_vec array (or kvec[] or folio_queue) until the op is complete.
-
-Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
-Reported-by: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Closes: https://lore.kernel.org/r/fedd8a40d54b2969097ffa4507979858@3xo.fr/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Steve French <smfrench@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/direct_write.c |    7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 173e8b5e6a93..f9421f3e6d37 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -67,7 +67,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb =
-*iocb, struct iov_iter *
- 		 * allocate a sufficiently large bvec array and may shorten the
- 		 * request.
- 		 */
--		if (async || user_backed_iter(iter)) {
-+		if (user_backed_iter(iter)) {
- 			n =3D netfs_extract_user_iter(iter, len, &wreq->iter, 0);
- 			if (n < 0) {
- 				ret =3D n;
-@@ -77,6 +77,11 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb=
- *iocb, struct iov_iter *
- 			wreq->direct_bv_count =3D n;
- 			wreq->direct_bv_unpin =3D iov_iter_extract_will_pin(iter);
- 		} else {
-+			/* If this is a kernel-generated async DIO request,
-+			 * assume that any resources the iterator points to
-+			 * (eg. a bio_vec array) will persist till the end of
-+			 * the op.
-+			 */
- 			wreq->iter =3D *iter;
- 		}
- =
-
+On Tuesday 24 December 2024 14:18:59 Pali Rohár wrote:
+> If SMB server does not support EAs then for SMB2_OP_QUERY_WSL_EA request it
+> returns STATUS_EAS_NOT_SUPPORTED. Function smb2_compound_op() translates
+> STATUS_EAS_NOT_SUPPORTED to -EOPNOTSUPP which cause failure during calling
+> lstat() syscall from userspace on any reparse point, including Native SMB
+> symlink (which does not use any EAs).
+> 
+> If SMB server does not support to attach both EAs and Reparse Point to path
+> at the same time then same error STATUS_EAS_NOT_SUPPORTED is returned. This
+> is the case for Windows 8 / Windows Server 2012. It is known limitation of
+> NTFS driver in those older Windows versions.
+> 
+> Since commit ea41367b2a60 ("smb: client: introduce SMB2_OP_QUERY_WSL_EA")
+> Linux SMB client always ask for EAs on detected reparse point paths due to
+> support of WSL EAs. But this commit broke reparse point support for all
+> older Windows SMB servers which do not have support for WSL and WSL EAs.
+> 
+> Avoid this problem by retrying the request without SMB2_OP_QUERY_WSL_EA
+> when it fails on -EOPNOTSUPP error.
+> 
+> This should fix broken support for all special files (symlink, fifo,
+> socket, block and char) for SMB server which do not support EAs at all and
+> for SMB server which do not allow to attach both EAs and Reparse Point at
+> the same time.
+> 
+> Fixes: ea41367b2a60 ("smb: client: introduce SMB2_OP_QUERY_WSL_EA")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Pali Rohár <pali@kernel.org>
+> ---
+>  fs/smb/client/smb2inode.c | 38 +++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 37 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+> index e8bb3f8b53f1..58276434e47b 100644
+> --- a/fs/smb/client/smb2inode.c
+> +++ b/fs/smb/client/smb2inode.c
+> @@ -875,6 +875,7 @@ int smb2_query_path_info(const unsigned int xid,
+>  	bool islink;
+>  	int i, num_cmds = 0;
+>  	int rc, rc2;
+> +	bool skip_wsl_ea;
+>  
+>  	data->adjust_tz = false;
+>  	data->reparse_point = false;
+> @@ -943,7 +944,13 @@ int smb2_query_path_info(const unsigned int xid,
+>  		if (rc || !data->reparse_point)
+>  			goto out;
+>  
+> -		if (!tcon->posix_extensions)
+> +		skip_wsl_ea = false;
+> +retry_cmd:
+> +		/*
+> +		 * Skip SMB2_OP_QUERY_WSL_EA if using POSIX extensions or
+> +		 * retrying request with explicitly skipping for WSL EAs.
+> +		 */
+> +		if (!tcon->posix_extensions && !skip_wsl_ea)
+>  			cmds[num_cmds++] = SMB2_OP_QUERY_WSL_EA;
+>  		/*
+>  		 * Skip SMB2_OP_GET_REPARSE if symlink already parsed in create
+> @@ -961,6 +968,35 @@ int smb2_query_path_info(const unsigned int xid,
+>  		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+>  				      &oparms, in_iov, cmds, num_cmds,
+>  				      cfile, NULL, NULL, NULL);
+> +		if (rc == -EOPNOTSUPP && !tcon->posix_extensions && !skip_wsl_ea) {
+> +			/*
+> +			 * Older Windows versions do not allow to set both EAs
+> +			 * and Reparse Point as the same time. This is known
+> +			 * limitation of older NTFS driver and it was fixed in
+> +			 * Windows 10. Trying to query EAs on file which has
+> +			 * Reparse Point set ends with STATUS_EAS_NOT_SUPPORTED
+> +			 * error, even when server filesystem supports EAs.
+> +			 * This error is translated to errno -EOPNOTSUPP.
+> +			 * So in this case retry the request again without EAs.
+> +			 */
+> +			skip_wsl_ea = true;
+> +			num_cmds = 1;
+> +			goto retry_cmd;
+> +		}
+> +		if (rc == 0 && skip_wsl_ea &&
+> +		    (data->reparse.tag == IO_REPARSE_TAG_LX_CHR ||
+> +		     data->reparse.tag == IO_REPARSE_TAG_LX_BLK)) {
+> +			/*
+> +			 * WSL CHR and BLK reparse points store major and minor
+> +			 * device numbers in EAs (instead of reparse point buffer,
+> +			 * like it is for WSL symlink or NFS reparse point types).
+> +			 * Therefore with skipped EAs it is not possible to finish
+> +			 * query of these files. So change error back to the
+> +			 * original -EOPNOTSUPP.
+> +			 */
+> +			rc = -EOPNOTSUPP;
+> +		}
+> +
+>  		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
+>  			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
+>  			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
+> -- 
+> 2.20.1
+> 
