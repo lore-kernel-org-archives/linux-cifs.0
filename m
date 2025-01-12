@@ -1,153 +1,77 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F92914A8B;
-	Sun, 12 Jan 2025 15:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBEC1C2317;
+	Sun, 12 Jan 2025 23:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736695009; cv=none; b=rvMEmBeB3lUGC4L3+2vNt1mGWeyenRA5h8WPkfKebxxMyEHz0QRwQReE7XyCPRjlBNhqMptn5u8bi3w99ZH9QEFVHS6SbZHrySX3iZtJI5YTavZs5kT0mtX7EWAvTQKn9RgpSQA+NeIDkrUrI7d6Vv7Eo6I4FoBsw55IVXF5IvY=
+	t=1736725321; cv=none; b=hIGa8iMiQITXiktKrbAZDGGU2oijHp3PNtdtrhVF5nqHldaBzEwfJaEYb0lFTPro6MJLxYuHOaIgyDofBBXbIKfYWXBjRcQOs957GNOO5/8wJ1jOs4f07frxQiX71frsYEmSB57w86env4FIwWzLLu2LvuwLa4Rtei5ucop5qFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736695009; c=relaxed/simple;
-	bh=bHd4CknC46pqFA3EPRzbCIj0FZSUzusoE4Y3+QGpI/A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4s9mHTsRT5HT23mSoKxQr0HWby0bG9EzMXXP7adJmzrZAzp6ENm7VUFcbLymU4Z5D4LbkHldEPGWrmXOPqDKA7uZRA/j8dZAJ05YwRtSTFLKo/1dza2XGBq0nBjUsnu3q4ofB+JNJUDRG7Bi0ZwtSBQGCWAh/q4Uum8CyTGnuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=laX8f18i; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1736725321; c=relaxed/simple;
+	bh=LO7w1Pre0BKkQ4EiKO6f1ITzmXgnY7JX2Qjp9cillM0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LauKUCSFlz/vaDvTlhPmbffPR5QUqzFPCvNJ61nYKHGmus93hGr0OBQwYFSYyzaUldh/PTR3soCG1S+nrULBtzpfDI0+RMF6vjJoQQtE8+Zb15BRSBPaPfXq/EqAfUKg2M3LdSetdHUsENYS5jkeLTvId4gKtx64NgRR2EgCevE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPn0LQ+R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="laX8f18i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=o4Hk1ER3vX4vB8BpoLIZWOLvqbOgav8WlZ34R/1uyY4=; b=laX8f18i5ZPPiX+A
-	1GP80aad8e/SIbCeXCYrPji+0q02+RHJDprdAheZKXk/IyUkIJc6zA1QhjC7mH4tvDnVqvO0EhUOi
-	WTrwW8Q3t230AqKJsRpzX8gfOiovih82L+J0RajOADFRTijGXLpSDnyNc2ZG6jX8IeUsZbVlZp1jg
-	2EX8M4ORPWOWFj3UCMqjETHMdtt2c5/iR0YuroISpR47phFT7bTHoeCC2Jecss0xj7qx3rjEAfgcC
-	YMlg9rUkg19qK9uFBWmFTTq/+js08qb/1ose2H41JVV4pM0ilCdEPufZ6B4INOl7GDDbE1y5jJxol
-	L1YdL/APY2u1mFKvQQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tWzhe-009k0Y-0P;
-	Sun, 12 Jan 2025 15:16:38 +0000
-From: linux@treblig.org
-To: linkinjeon@kernel.org,
-	sfrench@samba.org,
-	senozhatsky@chromium.org,
-	tom@talpey.com
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] ksmbd: Remove unused functions
-Date: Sun, 12 Jan 2025 15:16:37 +0000
-Message-ID: <20250112151637.275312-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPn0LQ+R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6831C4CEE3;
+	Sun, 12 Jan 2025 23:42:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736725320;
+	bh=LO7w1Pre0BKkQ4EiKO6f1ITzmXgnY7JX2Qjp9cillM0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qPn0LQ+RRc3SIl3UTQoPrf2R6RTopWYxaELWFjRSHNaWYcrtiSP5h+8PtzMCweyIs
+	 gHS0XkD/0drJ/YkrVH8wQJfjQEIjB5VnlfiuAVB3S4AmZUYcLJOkZrbbMP55ZavU95
+	 zeCtlDNErq2bbI30/qIvkL46t0GJM9k31YpmtT+SyZQVxPlqb3ppsZblvOmFoUCD9o
+	 XPsuoF/WGP8kP9kfoJ39uwGfHF1wOzNyi8ALF3iX+ua7T5JTKZaASwZ4Rjt3Yk3w5W
+	 zMGSGBTn/HUvhxMBcCWXBFRRK4DOw7oEv4963LDWgqKX6FLAXmDjx9RwUWywqrz4wP
+	 e9mLIBrE7G5Rw==
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3ebbec36900so1977714b6e.1;
+        Sun, 12 Jan 2025 15:42:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUB9Wj+fyjPAq84kuGOx3qogHXba8hs7+P4DaV9k2r7jBHOFM83TvCTeA6OESmWf4Bv8y5FmMDZbzhR@vger.kernel.org, AJvYcCWkbNBbLe7zdq54BB2vJ59l85EhrbOCbeEC7KGO9oNTAn+/UC6gvj4c323lOQMmePGNtH2d1z77CzRTuNjX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmQCXU6efhlpD5uV2S2ope/guhWHnC9ehe7b79TY4rlQtbpu+E
+	yazsyGpbUIfi8ok9DZNkYd0aUpf0ShWqrIy97hfAq8sZgKAVnRtd19zsCXlGHJp3v8cHJz4hTbP
+	6Wx4tTe6a2RdLWtUlzkJv1qfbas0=
+X-Google-Smtp-Source: AGHT+IHubZd8i/m4odjvTcyjdLjtAfPAL8PVe5gqI1lm/8llcaAjcxPW88+zgLPJqqpdLGiY5/ysmPPPWIbzf66I5e8=
+X-Received: by 2002:a05:6808:3c89:b0:3eb:5c27:f75c with SMTP id
+ 5614622812f47-3ef2ec96edemr11329379b6e.12.1736725320216; Sun, 12 Jan 2025
+ 15:42:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250112151637.275312-1-linux@treblig.org>
+In-Reply-To: <20250112151637.275312-1-linux@treblig.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 13 Jan 2025 08:41:50 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8CcLRnLBsjXNWmT0nS0jdSOZWPs2m-Wak2EPwc9Y0dTA@mail.gmail.com>
+X-Gm-Features: AbW1kva9PxmqxWOtVX7lcKuAD7CassO1ncaXV2g0A6PA7dPej4bKrxae6VzHV_A
+Message-ID: <CAKYAXd8CcLRnLBsjXNWmT0nS0jdSOZWPs2m-Wak2EPwc9Y0dTA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Remove unused functions
+To: linux@treblig.org
+Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-
-ksmbd_rpc_rap() was added in 2021 as part of
-commit 0626e6641f6b ("cifsd: add server handler for central processing and
-tranport layers")
-
-ksmbd_vfs_posix_lock_wait_timeout() was added in 2021 as part of
-commit f44158485826 ("cifsd: add file operations")
-
-both have remained unused.
-
-Remove them.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- fs/smb/server/transport_ipc.c | 25 -------------------------
- fs/smb/server/transport_ipc.h |  2 --
- fs/smb/server/vfs.c           |  7 -------
- fs/smb/server/vfs.h           |  1 -
- 4 files changed, 35 deletions(-)
-
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index befaf42b84cc..e5049ea1d8b2 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -871,31 +871,6 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
- 	return resp;
- }
- 
--struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payload,
--					size_t payload_sz)
--{
--	struct ksmbd_ipc_msg *msg;
--	struct ksmbd_rpc_command *req;
--	struct ksmbd_rpc_command *resp;
--
--	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
--	if (!msg)
--		return NULL;
--
--	msg->type = KSMBD_EVENT_RPC_REQUEST;
--	req = (struct ksmbd_rpc_command *)msg->payload;
--	req->handle = ksmbd_acquire_id(&ipc_ida);
--	req->flags = rpc_context_flags(sess);
--	req->flags |= KSMBD_RPC_RAP_METHOD;
--	req->payload_sz = payload_sz;
--	memcpy(req->payload, payload, payload_sz);
--
--	resp = ipc_msg_send_request(msg, req->handle);
--	ipc_msg_handle_free(req->handle);
--	ipc_msg_free(msg);
--	return resp;
--}
--
- static int __ipc_heartbeat(void)
- {
- 	unsigned long delta;
-diff --git a/fs/smb/server/transport_ipc.h b/fs/smb/server/transport_ipc.h
-index d9b6737f8cd0..e51850f1423b 100644
---- a/fs/smb/server/transport_ipc.h
-+++ b/fs/smb/server/transport_ipc.h
-@@ -41,8 +41,6 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
- struct ksmbd_rpc_command *ksmbd_rpc_read(struct ksmbd_session *sess, int handle);
- struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle,
- 					  void *payload, size_t payload_sz);
--struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payload,
--					size_t payload_sz);
- void ksmbd_ipc_release(void);
- void ksmbd_ipc_soft_reset(void);
- int ksmbd_ipc_init(void);
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 40f08eac519c..6890016e1923 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1856,13 +1856,6 @@ void ksmbd_vfs_posix_lock_wait(struct file_lock *flock)
- 	wait_event(flock->c.flc_wait, !flock->c.flc_blocker);
- }
- 
--int ksmbd_vfs_posix_lock_wait_timeout(struct file_lock *flock, long timeout)
--{
--	return wait_event_interruptible_timeout(flock->c.flc_wait,
--						!flock->c.flc_blocker,
--						timeout);
--}
--
- void ksmbd_vfs_posix_lock_unblock(struct file_lock *flock)
- {
- 	locks_delete_block(flock);
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index 06903024a2d8..2893f59803a6 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -140,7 +140,6 @@ int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
- 				struct dentry *dentry,
- 				struct ksmbd_kstat *ksmbd_kstat);
- void ksmbd_vfs_posix_lock_wait(struct file_lock *flock);
--int ksmbd_vfs_posix_lock_wait_timeout(struct file_lock *flock, long timeout);
- void ksmbd_vfs_posix_lock_unblock(struct file_lock *flock);
- int ksmbd_vfs_remove_acl_xattrs(struct mnt_idmap *idmap,
- 				const struct path *path);
--- 
-2.47.1
-
+On Mon, Jan 13, 2025 at 12:16=E2=80=AFAM <linux@treblig.org> wrote:
+>
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>
+> ksmbd_rpc_rap() was added in 2021 as part of
+> commit 0626e6641f6b ("cifsd: add server handler for central processing an=
+d
+> tranport layers")
+>
+> ksmbd_vfs_posix_lock_wait_timeout() was added in 2021 as part of
+> commit f44158485826 ("cifsd: add file operations")
+>
+> both have remained unused.
+>
+> Remove them.
+>
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Applied it to #ksmbd-for-next-next.
+Thanks!
