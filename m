@@ -1,158 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76D11C3C1D;
-	Tue, 14 Jan 2025 07:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557A31ADC9C
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Jan 2025 10:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736841210; cv=none; b=nD7BW02F9kGG75llzS/QANXK8LyBi37hZpLge/aaCJxvR4jUXXaqbrRu2FcyvFKDHb7ceI/JX9N6ufe3zvNzlK/4Mj9Li45bXIkQdaLdv8/U/zp8zzQuO1sAgQb44C9UWy5uC5huM4hbp4oHqJHAY7nR5RRN5zUkIYSao08VOuc=
+	t=1736849905; cv=none; b=Y9hfhgLIbsgkjhX3QkY2JiHm7+gwFPvexeQt4zaPRv5FjsmzbMPLR5xKN5mLnNC3wc0EowZJ7PvGEQ1xyrNFvDeuV6GhjWGi0c6ZQ6+/c2m+ppXUJ1b58MfAWNL10YhjdfBEM3/hayubOAvx4lNg7SfMcU0Af5u7Q0xoz4z4MqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736841210; c=relaxed/simple;
-	bh=63VgHGphQCIs8YfTA8UgmH/w3X7QlOENsh5Hq2JEu94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=calOfoaiVij65qilguSTnhkfLsaQaUxPkz8LrOu/iRmqMFtebuBOrL2RkVnHiBPy36o2IVQp3qfY4XeeGoVtKq36PzqGN5MwQvXLMBuK2i6hYE67wu3AB5OlPgohel2msgTJGqL0gVk+ZDGQ/uFJEYXUeH5tLZ59NNYGB61RZ00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPWiPFuI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736849905; c=relaxed/simple;
+	bh=Phk8b9T+9WHb4sdBu4TnvawdtCyfivT+01BinaHctZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bwrZMEeZPKaNxnFVACVDxnTy/f+XS5+glUABLh9S8l9+ClF9WOmwSulA/55+eO8D+HmYTTpSj+l4JrT0CvB9V4nXPPLgr0yViGQp68dHa+cYPKJyO44c+3wiYM+6FWed0LbSLcJD7++zs0omJG2zHqnTxy01CFwDfN17YV+J2Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xurKFT/I; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPWiPFuI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D6EC4CEE4;
-	Tue, 14 Jan 2025 07:53:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736841210;
-	bh=63VgHGphQCIs8YfTA8UgmH/w3X7QlOENsh5Hq2JEu94=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=pPWiPFuI07bRksnNX0VJOllM1rEoWX1SgHJ2iQ+T8s1xF9e+H74Ocw4maUut1bUap
-	 jJxikFVXA9U2DMF2IwiGIrIqjlDKrAUtZ/G4mZo8SY8PQ01uM2DdcjApWp8IwjiNGN
-	 9XrQVzrpNZpTb8TPGpYoq43iyU3pSdItNTuNa+verVY0PBhwD4y1p2fvKtfz96MRQb
-	 0Db6nUlVs1DmmcrfZyUTZPKgxXRlbeyWBvl3l2V05w9Jmxdl2JgAhImwqIGVEdrqxo
-	 QasAtVPvI3SbfnxRUL2OpsDAVEog9YHSHuLjPxtYIdrEa0CLGK/hducHeQKJPSBS8B
-	 xtT1VqyDi1/Wg==
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3eba0f09c3aso1673455b6e.1;
-        Mon, 13 Jan 2025 23:53:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVMGN/1EkgMQjR7QfJPoOYlXMWZyI5BouN22HVDdvOHa1eihwZ9pT6zkraWQyGv4lFmhYbJbDegTGMnPtcZpAY=@vger.kernel.org, AJvYcCVlK5i6VBvEeFEC/vbOg1qhnGm5oihYG+f+CCwla3NQE8wz4618vKPFymJKmPQcwmrIy4P2I8wYtKh9KA==@vger.kernel.org, AJvYcCWw3DOpsqLTw0l7LfR1M1lTptjJP0XJkDfS0v5SzlX+RvtvoXnn1QVsBNKxqcPp5XFcsEoKHKWBHtMDHEOw@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFMSRcQtM0wRbrwQYmuMAhFWjTfGWbhofqAqKvh12rTJH6F0LJ
-	K9IVbC8N5jp6TNXflmRuiJZH3Bb/5a30U3rOM5cyV2VvOrGbTxz8H77/TRc+x4f+4Px8JDZ7cRk
-	NU+Vtg/5RMP6tNcRi5uW/Ix8Jm84=
-X-Google-Smtp-Source: AGHT+IHmLF0eUtPIzaHIUSZG0mgmC6bZW8vZrCVLDkp0z1bOJDpfDAonHA/0kukXKqvGx9dhDF7Jm+aL0BdotsiBUD4=
-X-Received: by 2002:a05:6808:1a0e:b0:3e3:bd1c:d584 with SMTP id
- 5614622812f47-3ef2ec6ddfbmr18226301b6e.9.1736841209610; Mon, 13 Jan 2025
- 23:53:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xurKFT/I"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab2e308a99bso156868566b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Jan 2025 02:18:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1736849901; x=1737454701; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HiN+MGob9C/wk/ZA5GyHyYf/yvpWUeM+njdEkAZ9s5M=;
+        b=xurKFT/IORv/Svwo/aRFaFpJxYIS0HAy715idWlpOTpFkXLA3LcZnaLZrP2yHkL34d
+         lPGZdyagE/svPtk0ohFx7/Ts0LKDURKWPhgf9D8xqICaQLZspizYOoUSjvVHkP+fMt9m
+         okntnJDC/KxxKUrzypOgedKoU85c+LsV+v/DDBow0M0wjC6HKiHdGdWlCqWXDiZ/G42Z
+         2MUnFVSWllXAiM9tLtqrRBlOuT+LKDU6XXMs5P7DdE/jkTETsld8fcrtPBSgdNlsQnVP
+         XMbhD7BYzxRizW/LNuhdZk0WPRigmgTrAOxd/AvEx5EX8tc7UQ8ETHPJ4HTx9Eqc0IU/
+         w4BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736849901; x=1737454701;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HiN+MGob9C/wk/ZA5GyHyYf/yvpWUeM+njdEkAZ9s5M=;
+        b=khRvOiWTsXghFDmtCX/i3ezyeYL3eTE12mCY1UHlDxdGZ6N7LBiASz0rW+I0+Oe/nt
+         Sw2LPOJnVWkBLlS/FMR4CFsO5HPwmdH7PrDnV1uLAvnbqiXHynyOlT0ioCC9vZKqTeAu
+         +LwLZ4DYXokDWt8cmpeZb5kE7CfgDMRRwW0V+JSzhK+Nw4SEO5KZjW72Q7DXI11gwxRQ
+         fPsn0CK+QHlIE54lZY1wnCrO7sahCWFga1jXwFwlfRtcYJ0TEJKUroJrNIvffqb+aOiy
+         wfnlXUquJTHSC2Mx2jSjs+bC2Sodl3+StPAH+ysgpsJpZaatelVraHbMsLyASVwjNJgs
+         7GeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpQwzZi9H9aBSuItK5h4lbwIOZGVs8q4WcH8Bmas9fpe9ZN7aMpI+9ZeNd3u47IZqnRtmJoX4RUY7a@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/12dscFuW2URGI4Lz/BtiqBRFVt1qMOGvbYuG8aRkmvr+AHaV
+	6I7knnyzp6qMX/MeIfafr6c/tbvTl9Iw6CoVAmPb+j6HOgq9pbVhfFDStU7xi3M=
+X-Gm-Gg: ASbGnctRL9c3mjpBWayGxkz6I2W388f1VCSqISxGkUBeErqMKTvObbOJclTCrIPol3z
+	IRopN9fVgkz8U69ywzwCa41mGDDoUtgLtPqOvicAm/HNLTXMEnLekACsavo/Dx39ib+lL8Y5eF1
+	nreiZAQ3w4hLZhkbPLPiJLJkf+S+i/4WcXBU0n+Nao143WODJYs3M1hSTmuYyDZwDHFLa5LATAO
+	72Treqrt8Ajlj38ZTNNXIovIfciwu7/YzoOnuo20T32DvZduH/JyLBhKE8MVA==
+X-Google-Smtp-Source: AGHT+IG7WJ9asuOTLZHhddJPlsSkJ0crkaJ1q1rMz0GpfqaRWdDxghBy3ePeVf/MPb7/xuRHzAReRg==
+X-Received: by 2002:a17:907:2d86:b0:ab3:42b2:2886 with SMTP id a640c23a62f3a-ab342b228f4mr34692266b.3.1736849901536;
+        Tue, 14 Jan 2025 02:18:21 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c905cd8asm609773166b.7.2025.01.14.02.18.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 02:18:21 -0800 (PST)
+Date: Tue, 14 Jan 2025 13:18:17 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <sfrench@samba.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH RESEND] ksmbd: fix integer overflows on 32 bit systems
+Message-ID: <2fb3efb4-a889-4b49-8100-51147d9ae426@stanley.mountain>
+References: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
+ <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
-In-Reply-To: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 14 Jan 2025 16:53:18 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
-X-Gm-Features: AbW1kvZZrVoZIpBloSVmTznaPSQlR5WRH3iv0Bm1p0q9P4ZGAjgd6BxkvdeYwwc
-Message-ID: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
-Subject: Re: [PATCH RESEND] ksmbd: fix integer overflows on 32 bit systems
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
 
-On Mon, Jan 13, 2025 at 3:17=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro=
-.org> wrote:
+On Tue, Jan 14, 2025 at 04:53:18PM +0900, Namjae Jeon wrote:
+> On Mon, Jan 13, 2025 at 3:17 PM Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> >
+> > On 32bit systems the addition operations in ipc_msg_alloc() can
+> > potentially overflow leading to memory corruption.  Fix this using
+> > size_add() which will ensure that the invalid allocations do not succeed.
+> You previously said that memcpy overrun does not occur due to memory
+> allocation failure with SIZE_MAX.
 >
-> On 32bit systems the addition operations in ipc_msg_alloc() can
-> potentially overflow leading to memory corruption.  Fix this using
-> size_add() which will ensure that the invalid allocations do not succeed.
-You previously said that memcpy overrun does not occur due to memory
-allocation failure with SIZE_MAX.
-Would it be better to handle integer overflows as an error before
-memory allocation?
-And static checkers don't detect memcpy overrun by considering memory
-allocation failure?
+> Would it be better to handle integer overflows as an error before
+> memory allocation?
 
-Thanks.
-> In the callers, move the two constant values
-> "sizeof(struct ksmbd_rpc_command) + 1" onto the same side and use
-> size_add() for the user controlled values.
->
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
-d tranport layers")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> I sent this patch in Oct 2023 but it wasn't applied.
-> https://lore.kernel.org/all/205c4ec1-7c41-4f5d-8058-501fc1b5163c@moroto.m=
-ountain/
-> I reviewed this code again today and it is still an issue.
->
->  fs/smb/server/transport_ipc.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.=
-c
-> index befaf42b84cc..ec72c97b2f0b 100644
-> --- a/fs/smb/server/transport_ipc.c
-> +++ b/fs/smb/server/transport_ipc.c
-> @@ -242,7 +242,7 @@ static void ipc_update_last_active(void)
->  static struct ksmbd_ipc_msg *ipc_msg_alloc(size_t sz)
->  {
->         struct ksmbd_ipc_msg *msg;
-> -       size_t msg_sz =3D sz + sizeof(struct ksmbd_ipc_msg);
-> +       size_t msg_sz =3D size_add(sz, sizeof(struct ksmbd_ipc_msg));
->
->         msg =3D kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
->         if (msg)
-> @@ -626,8 +626,8 @@ ksmbd_ipc_spnego_authen_request(const char *spnego_bl=
-ob, int blob_len)
->         struct ksmbd_spnego_authen_request *req;
->         struct ksmbd_spnego_authen_response *resp;
->
-> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_spnego_authen_request) =
+I mean we could do something like the below patch but I'd prefer to fix
+it this way.
+
+> And static checkers don't detect memcpy overrun by considering memory
+> allocation failure?
+
+How the struct_size()/array_size() kernel hardenning works is that if
+you pass in a too large value instead of wrapping to a small value, the
+math results in SIZE_MAX so the allocation will fail.  We already handle
+allocation failures correctly so it's fine.
+
+The problem in this code is that on 32 bit systems if you chose a "sz"
+value which is (unsigned int)-4 then the kvzalloc() allocation will
+succeed but the buffer will be 4 bytes smaller than intended and the
+"msg->sz = sz;" assignment will corrupt memory.
+
+Anyway, here is how the patch could look like with bounds checking instead
+of size_add().  We could fancy it up a bit, but I don't like fancy math.
+
+regards,
+dan carpenter
+
+diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
+index befaf42b84cc..e1e3bfff163c 100644
+--- a/fs/smb/server/transport_ipc.c
++++ b/fs/smb/server/transport_ipc.c
+@@ -626,6 +626,9 @@ ksmbd_ipc_spnego_authen_request(const char *spnego_blob, int blob_len)
+ 	struct ksmbd_spnego_authen_request *req;
+ 	struct ksmbd_spnego_authen_response *resp;
+ 
++	if (blob_len > INT_MAX)
++		return NULL;
 +
-> -                       blob_len + 1);
-> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_spnego_authen_=
-request) + 1,
-> +                                    blob_len));
->         if (!msg)
->                 return NULL;
->
-> @@ -805,7 +805,8 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmb=
-d_session *sess, int handle
->         struct ksmbd_rpc_command *req;
->         struct ksmbd_rpc_command *resp;
->
-> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
-sz + 1);
-> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
- 1,
-> +                                    payload_sz));
->         if (!msg)
->                 return NULL;
->
-> @@ -853,7 +854,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmb=
-d_session *sess, int handle
->         struct ksmbd_rpc_command *req;
->         struct ksmbd_rpc_command *resp;
->
-> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
-sz + 1);
-> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
- 1, payload_sz));
->         if (!msg)
->                 return NULL;
->
-> @@ -878,7 +879,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_=
-session *sess, void *payloa
->         struct ksmbd_rpc_command *req;
->         struct ksmbd_rpc_command *resp;
->
-> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
-sz + 1);
-> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
- 1, payload_sz));
->         if (!msg)
->                 return NULL;
->
-> --
-> 2.45.2
->
+ 	msg = ipc_msg_alloc(sizeof(struct ksmbd_spnego_authen_request) +
+ 			blob_len + 1);
+ 	if (!msg)
+@@ -805,6 +808,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
+ 	struct ksmbd_rpc_command *req;
+ 	struct ksmbd_rpc_command *resp;
+ 
++	if (payload_sz > INT_MAX)
++		return NULL;
++
+ 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
+ 	if (!msg)
+ 		return NULL;
+@@ -853,6 +859,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
+ 	struct ksmbd_rpc_command *req;
+ 	struct ksmbd_rpc_command *resp;
+ 
++	if (payload_sz > INT_MAX)
++		return NULL;
++
+ 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
+ 	if (!msg)
+ 		return NULL;
+@@ -878,6 +887,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payloa
+ 	struct ksmbd_rpc_command *req;
+ 	struct ksmbd_rpc_command *resp;
+ 
++	if (payload_sz > INT_MAX)
++		return NULL;
++
+ 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
+ 	if (!msg)
+ 		return NULL;
