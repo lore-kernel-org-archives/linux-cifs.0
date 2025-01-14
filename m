@@ -1,158 +1,122 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557A31ADC9C
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Jan 2025 10:18:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0B423242C
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Jan 2025 15:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736849905; cv=none; b=Y9hfhgLIbsgkjhX3QkY2JiHm7+gwFPvexeQt4zaPRv5FjsmzbMPLR5xKN5mLnNC3wc0EowZJ7PvGEQ1xyrNFvDeuV6GhjWGi0c6ZQ6+/c2m+ppXUJ1b58MfAWNL10YhjdfBEM3/hayubOAvx4lNg7SfMcU0Af5u7Q0xoz4z4MqE=
+	t=1736869742; cv=none; b=oQ0SZB+alrdJ5lLnsXmFE/lPSRIAsFT943qzSx/e4ykhUEILkWFBvWEQV/muH0/lMUyMG2txJrUT5Qv8mDUPonxTyeHOi6topx0xwgst7O/EZkMJHzPIyanBhpHczJfrc5GB5O0Swidjr92hHIkuViRvslsHxNN2lII+lHyaIHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736849905; c=relaxed/simple;
-	bh=Phk8b9T+9WHb4sdBu4TnvawdtCyfivT+01BinaHctZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bwrZMEeZPKaNxnFVACVDxnTy/f+XS5+glUABLh9S8l9+ClF9WOmwSulA/55+eO8D+HmYTTpSj+l4JrT0CvB9V4nXPPLgr0yViGQp68dHa+cYPKJyO44c+3wiYM+6FWed0LbSLcJD7++zs0omJG2zHqnTxy01CFwDfN17YV+J2Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xurKFT/I; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1736869742; c=relaxed/simple;
+	bh=5Mhs+lFA8+VXif7VnMARvz66UHkAheVCmYKSoMqyGeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AoEIjUt3isGQ4HkvgA9gto5M1DDrxisB5+SxITqndRhh2BcDwtUH/k4Iwblq6lGkJD0+OPHvFM0dwYi1CVFAqtpxDYGQAzOYq6TxMbBlTGDKSoSHEgF0XiZ7PD0MDTuiKHPPwm1tsuA7F6/f+kojucpMwGQE6afVuAQiUkwrUvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=eyK7C6tA; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xurKFT/I"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab2e308a99bso156868566b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Jan 2025 02:18:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736849901; x=1737454701; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HiN+MGob9C/wk/ZA5GyHyYf/yvpWUeM+njdEkAZ9s5M=;
-        b=xurKFT/IORv/Svwo/aRFaFpJxYIS0HAy715idWlpOTpFkXLA3LcZnaLZrP2yHkL34d
-         lPGZdyagE/svPtk0ohFx7/Ts0LKDURKWPhgf9D8xqICaQLZspizYOoUSjvVHkP+fMt9m
-         okntnJDC/KxxKUrzypOgedKoU85c+LsV+v/DDBow0M0wjC6HKiHdGdWlCqWXDiZ/G42Z
-         2MUnFVSWllXAiM9tLtqrRBlOuT+LKDU6XXMs5P7DdE/jkTETsld8fcrtPBSgdNlsQnVP
-         XMbhD7BYzxRizW/LNuhdZk0WPRigmgTrAOxd/AvEx5EX8tc7UQ8ETHPJ4HTx9Eqc0IU/
-         w4BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736849901; x=1737454701;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HiN+MGob9C/wk/ZA5GyHyYf/yvpWUeM+njdEkAZ9s5M=;
-        b=khRvOiWTsXghFDmtCX/i3ezyeYL3eTE12mCY1UHlDxdGZ6N7LBiASz0rW+I0+Oe/nt
-         Sw2LPOJnVWkBLlS/FMR4CFsO5HPwmdH7PrDnV1uLAvnbqiXHynyOlT0ioCC9vZKqTeAu
-         +LwLZ4DYXokDWt8cmpeZb5kE7CfgDMRRwW0V+JSzhK+Nw4SEO5KZjW72Q7DXI11gwxRQ
-         fPsn0CK+QHlIE54lZY1wnCrO7sahCWFga1jXwFwlfRtcYJ0TEJKUroJrNIvffqb+aOiy
-         wfnlXUquJTHSC2Mx2jSjs+bC2Sodl3+StPAH+ysgpsJpZaatelVraHbMsLyASVwjNJgs
-         7GeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpQwzZi9H9aBSuItK5h4lbwIOZGVs8q4WcH8Bmas9fpe9ZN7aMpI+9ZeNd3u47IZqnRtmJoX4RUY7a@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/12dscFuW2URGI4Lz/BtiqBRFVt1qMOGvbYuG8aRkmvr+AHaV
-	6I7knnyzp6qMX/MeIfafr6c/tbvTl9Iw6CoVAmPb+j6HOgq9pbVhfFDStU7xi3M=
-X-Gm-Gg: ASbGnctRL9c3mjpBWayGxkz6I2W388f1VCSqISxGkUBeErqMKTvObbOJclTCrIPol3z
-	IRopN9fVgkz8U69ywzwCa41mGDDoUtgLtPqOvicAm/HNLTXMEnLekACsavo/Dx39ib+lL8Y5eF1
-	nreiZAQ3w4hLZhkbPLPiJLJkf+S+i/4WcXBU0n+Nao143WODJYs3M1hSTmuYyDZwDHFLa5LATAO
-	72Treqrt8Ajlj38ZTNNXIovIfciwu7/YzoOnuo20T32DvZduH/JyLBhKE8MVA==
-X-Google-Smtp-Source: AGHT+IG7WJ9asuOTLZHhddJPlsSkJ0crkaJ1q1rMz0GpfqaRWdDxghBy3ePeVf/MPb7/xuRHzAReRg==
-X-Received: by 2002:a17:907:2d86:b0:ab3:42b2:2886 with SMTP id a640c23a62f3a-ab342b228f4mr34692266b.3.1736849901536;
-        Tue, 14 Jan 2025 02:18:21 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c905cd8asm609773166b.7.2025.01.14.02.18.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 02:18:21 -0800 (PST)
-Date: Tue, 14 Jan 2025 13:18:17 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH RESEND] ksmbd: fix integer overflows on 32 bit systems
-Message-ID: <2fb3efb4-a889-4b49-8100-51147d9ae426@stanley.mountain>
-References: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
- <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="eyK7C6tA"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1736869732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VXKMiGQmSd1nUUn+N1a2D0oLZWldx8I8PD5GFA0H9Zc=;
+	b=eyK7C6tAehxUtByGv3uQDKFyRZIX6swi/iTzzJ0nDpqA16RyZc69dS3Ci0PdaZ+5i3XfiG
+	TpQdpjyF/xSnsMvQszkrlAdyPEtFKOnzpdS0NTNhWWp8cSrYaZ4VFUrvTs1pndOHm0AZNC
+	GhhIiyAwS7huY917seSXNFOPq0ADCLAf1yKq25a5m1RAvKofBZUA5oAJe1pWQXPeNpjKUS
+	pe9VViK/tkQHIbwItUbDNdtVDI213VcOEs5zeXlATRCQ4MWX4lN4J+2SPpVo0s7jtBSwxO
+	PNyOZVqeXgAWyWiXz+7dlrBrD7srd0a137ybn+r4/zNdzexJOh8URn+qmf2YbQ==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Jay Shin <jaeshin@redhat.com>
+Subject: [PATCH] smb: client: fix double free of TCP_Server_Info::hostname
+Date: Tue, 14 Jan 2025 12:48:48 -0300
+Message-ID: <20250114154848.43584-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
 
-On Tue, Jan 14, 2025 at 04:53:18PM +0900, Namjae Jeon wrote:
-> On Mon, Jan 13, 2025 at 3:17 PM Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> >
-> > On 32bit systems the addition operations in ipc_msg_alloc() can
-> > potentially overflow leading to memory corruption.  Fix this using
-> > size_add() which will ensure that the invalid allocations do not succeed.
-> You previously said that memcpy overrun does not occur due to memory
-> allocation failure with SIZE_MAX.
->
-> Would it be better to handle integer overflows as an error before
-> memory allocation?
+When shutting down the server in cifs_put_tcp_session(), cifsd thread
+might be reconnecting to multiple DFS targets before it realizes it
+should exit the loop, so we can't free @server->hostname as long as
+cifsd tread is done.  Otherwise the following can happen:
 
-I mean we could do something like the below patch but I'd prefer to fix
-it this way.
+  RIP: 0010:__slab_free+0x223/0x3c0
+  Code: 5e 41 5f c3 cc cc cc cc 4c 89 de 4c 89 cf 44 89 44 24 08 4c 89
+  1c 24 e8 fb cf 8e 00 44 8b 44 24 08 4c 8b 1c 24 e9 5f fe ff ff <0f>
+  0b 41 f7 45 08 00 0d 21 00 0f 85 2d ff ff ff e9 1f ff ff ff 80
+  RSP: 0018:ffffb26180dbfd08 EFLAGS: 00010246
+  RAX: ffff8ea34728e510 RBX: ffff8ea34728e500 RCX: 0000000000800068
+  RDX: 0000000000800068 RSI: 0000000000000000 RDI: ffff8ea340042400
+  RBP: ffffe112041ca380 R08: 0000000000000001 R09: 0000000000000000
+  R10: 6170732e31303000 R11: 70726f632e786563 R12: ffff8ea34728e500
+  R13: ffff8ea340042400 R14: ffff8ea34728e500 R15: 0000000000800068
+  FS: 0000000000000000(0000) GS:ffff8ea66fd80000(0000)
+  000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 00007ffc25376080 CR3: 000000012a2ba001 CR4:
+  PKRU: 55555554
+  Call Trace:
+   <TASK>
+   ? show_trace_log_lvl+0x1c4/0x2df
+   ? show_trace_log_lvl+0x1c4/0x2df
+   ? __reconnect_target_unlocked+0x3e/0x160 [cifs]
+   ? __die_body.cold+0x8/0xd
+   ? die+0x2b/0x50
+   ? do_trap+0xce/0x120
+   ? __slab_free+0x223/0x3c0
+   ? do_error_trap+0x65/0x80
+   ? __slab_free+0x223/0x3c0
+   ? exc_invalid_op+0x4e/0x70
+   ? __slab_free+0x223/0x3c0
+   ? asm_exc_invalid_op+0x16/0x20
+   ? __slab_free+0x223/0x3c0
+   ? extract_hostname+0x5c/0xa0 [cifs]
+   ? extract_hostname+0x5c/0xa0 [cifs]
+   ? __kmalloc+0x4b/0x140
+   __reconnect_target_unlocked+0x3e/0x160 [cifs]
+   reconnect_dfs_server+0x145/0x430 [cifs]
+   cifs_handle_standard+0x1ad/0x1d0 [cifs]
+   cifs_demultiplex_thread+0x592/0x730 [cifs]
+   ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+   kthread+0xdd/0x100
+   ? __pfx_kthread+0x10/0x10
+   ret_from_fork+0x29/0x50
+   </TASK>
 
-> And static checkers don't detect memcpy overrun by considering memory
-> allocation failure?
+Fixes: 7be3248f3139 ("cifs: To match file servers, make sure the server hostname matches")
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/connect.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-How the struct_size()/array_size() kernel hardenning works is that if
-you pass in a too large value instead of wrapping to a small value, the
-math results in SIZE_MAX so the allocation will fail.  We already handle
-allocation failures correctly so it's fine.
-
-The problem in this code is that on 32 bit systems if you chose a "sz"
-value which is (unsigned int)-4 then the kvzalloc() allocation will
-succeed but the buffer will be 4 bytes smaller than intended and the
-"msg->sz = sz;" assignment will corrupt memory.
-
-Anyway, here is how the patch could look like with bounds checking instead
-of size_add().  We could fancy it up a bit, but I don't like fancy math.
-
-regards,
-dan carpenter
-
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index befaf42b84cc..e1e3bfff163c 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -626,6 +626,9 @@ ksmbd_ipc_spnego_authen_request(const char *spnego_blob, int blob_len)
- 	struct ksmbd_spnego_authen_request *req;
- 	struct ksmbd_spnego_authen_response *resp;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ddcc9e514a0e..eaa6be4456d0 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1044,6 +1044,7 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	/* Release netns reference for this server. */
+ 	put_net(cifs_net_ns(server));
+ 	kfree(server->leaf_fullpath);
++	kfree(server->hostname);
+ 	kfree(server);
  
-+	if (blob_len > INT_MAX)
-+		return NULL;
-+
- 	msg = ipc_msg_alloc(sizeof(struct ksmbd_spnego_authen_request) +
- 			blob_len + 1);
- 	if (!msg)
-@@ -805,6 +808,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
- 	struct ksmbd_rpc_command *req;
- 	struct ksmbd_rpc_command *resp;
+ 	length = atomic_dec_return(&tcpSesAllocCount);
+@@ -1670,8 +1671,6 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 	kfree_sensitive(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+-	kfree(server->hostname);
+-	server->hostname = NULL;
  
-+	if (payload_sz > INT_MAX)
-+		return NULL;
-+
- 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
- 	if (!msg)
- 		return NULL;
-@@ -853,6 +859,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
- 	struct ksmbd_rpc_command *req;
- 	struct ksmbd_rpc_command *resp;
- 
-+	if (payload_sz > INT_MAX)
-+		return NULL;
-+
- 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
- 	if (!msg)
- 		return NULL;
-@@ -878,6 +887,9 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payloa
- 	struct ksmbd_rpc_command *req;
- 	struct ksmbd_rpc_command *resp;
- 
-+	if (payload_sz > INT_MAX)
-+		return NULL;
-+
- 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
- 	if (!msg)
- 		return NULL;
+ 	task = xchg(&server->tsk, NULL);
+ 	if (task)
+-- 
+2.47.1
+
