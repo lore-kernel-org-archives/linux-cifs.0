@@ -1,135 +1,158 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6E31CF5EE;
-	Mon, 13 Jan 2025 18:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76D11C3C1D;
+	Tue, 14 Jan 2025 07:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793284; cv=none; b=PjtjmIteCfiqZMGKn2PkpcuhKCdaB0TQWmNe97P/9aRzwkSrSWY0hYeBey11+Tx/bZueiQAZfGplWOIJI3fDPkKg+C0L+jbmRCnXJr23w476VnikJ4T7wtnKglceaHe1WQXCrxW/QxjRHuob+3V9zFuH44VXO2y3xYqHZxx7/+4=
+	t=1736841210; cv=none; b=nD7BW02F9kGG75llzS/QANXK8LyBi37hZpLge/aaCJxvR4jUXXaqbrRu2FcyvFKDHb7ceI/JX9N6ufe3zvNzlK/4Mj9Li45bXIkQdaLdv8/U/zp8zzQuO1sAgQb44C9UWy5uC5huM4hbp4oHqJHAY7nR5RRN5zUkIYSao08VOuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793284; c=relaxed/simple;
-	bh=ma1f0ZEWo2M41Ot4ZwjiyYJf7GdNuqfbTmHT6Gn1vRs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eoBzvqv7Lif8je+m7IWRNyDBkhNbmrNqu2c+ZDmDRp//WLvDnLHTV/RO5CXI02kIkf0ZU48qPb6m4QQ/dAbIaTPdUxOXrpnV31vtcug8Y7QjL+nP4SFd1/Eekd21tvnWgd5vVGaW2n9u/TlciUq+Wfuxk5d5A2nwAhfVSaX4Tr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2lnj6Pw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736841210; c=relaxed/simple;
+	bh=63VgHGphQCIs8YfTA8UgmH/w3X7QlOENsh5Hq2JEu94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=calOfoaiVij65qilguSTnhkfLsaQaUxPkz8LrOu/iRmqMFtebuBOrL2RkVnHiBPy36o2IVQp3qfY4XeeGoVtKq36PzqGN5MwQvXLMBuK2i6hYE67wu3AB5OlPgohel2msgTJGqL0gVk+ZDGQ/uFJEYXUeH5tLZ59NNYGB61RZ00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPWiPFuI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2lnj6Pw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 698B7C4CED6;
-	Mon, 13 Jan 2025 18:34:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPWiPFuI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D6EC4CEE4;
+	Tue, 14 Jan 2025 07:53:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793283;
-	bh=ma1f0ZEWo2M41Ot4ZwjiyYJf7GdNuqfbTmHT6Gn1vRs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i2lnj6Pw5ZXJUZv2rx5hIlXL43KX4qDW9XdJsEu6s4cYmq0JAerPOsKMgGFpM2IVw
-	 4ZokhoG5iE1DEj1UbWAYBQ/Ox7e0i5+SZCeo638vJJkypCw0JiK9XNX8Esa7jAtocB
-	 j0QHDw/0eOXFTHiFDRI6VWKs0gMGAXaeutYgsWzFYgDngZSLyViCHIoBNTh8r95ozr
-	 mmrH6AnG6cytVWLvCic43hx9PXGPUNQ6Kj580F/VKuxTyddnCCh6rWQEWW36WxGGP/
-	 0miMqExK66veveJ0yF/sYl279oYJOy/CM3Deia05Sh3UPdEG64CQD7ei0uvqsYrbpI
-	 mZjAnt4hpzrjw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.12 07/20] netfs: Fix non-contiguous donation between completed reads
-Date: Mon, 13 Jan 2025 13:34:12 -0500
-Message-Id: <20250113183425.1783715-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250113183425.1783715-1-sashal@kernel.org>
-References: <20250113183425.1783715-1-sashal@kernel.org>
+	s=k20201202; t=1736841210;
+	bh=63VgHGphQCIs8YfTA8UgmH/w3X7QlOENsh5Hq2JEu94=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pPWiPFuI07bRksnNX0VJOllM1rEoWX1SgHJ2iQ+T8s1xF9e+H74Ocw4maUut1bUap
+	 jJxikFVXA9U2DMF2IwiGIrIqjlDKrAUtZ/G4mZo8SY8PQ01uM2DdcjApWp8IwjiNGN
+	 9XrQVzrpNZpTb8TPGpYoq43iyU3pSdItNTuNa+verVY0PBhwD4y1p2fvKtfz96MRQb
+	 0Db6nUlVs1DmmcrfZyUTZPKgxXRlbeyWBvl3l2V05w9Jmxdl2JgAhImwqIGVEdrqxo
+	 QasAtVPvI3SbfnxRUL2OpsDAVEog9YHSHuLjPxtYIdrEa0CLGK/hducHeQKJPSBS8B
+	 xtT1VqyDi1/Wg==
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3eba0f09c3aso1673455b6e.1;
+        Mon, 13 Jan 2025 23:53:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVMGN/1EkgMQjR7QfJPoOYlXMWZyI5BouN22HVDdvOHa1eihwZ9pT6zkraWQyGv4lFmhYbJbDegTGMnPtcZpAY=@vger.kernel.org, AJvYcCVlK5i6VBvEeFEC/vbOg1qhnGm5oihYG+f+CCwla3NQE8wz4618vKPFymJKmPQcwmrIy4P2I8wYtKh9KA==@vger.kernel.org, AJvYcCWw3DOpsqLTw0l7LfR1M1lTptjJP0XJkDfS0v5SzlX+RvtvoXnn1QVsBNKxqcPp5XFcsEoKHKWBHtMDHEOw@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFMSRcQtM0wRbrwQYmuMAhFWjTfGWbhofqAqKvh12rTJH6F0LJ
+	K9IVbC8N5jp6TNXflmRuiJZH3Bb/5a30U3rOM5cyV2VvOrGbTxz8H77/TRc+x4f+4Px8JDZ7cRk
+	NU+Vtg/5RMP6tNcRi5uW/Ix8Jm84=
+X-Google-Smtp-Source: AGHT+IHmLF0eUtPIzaHIUSZG0mgmC6bZW8vZrCVLDkp0z1bOJDpfDAonHA/0kukXKqvGx9dhDF7Jm+aL0BdotsiBUD4=
+X-Received: by 2002:a05:6808:1a0e:b0:3e3:bd1c:d584 with SMTP id
+ 5614622812f47-3ef2ec6ddfbmr18226301b6e.9.1736841209610; Mon, 13 Jan 2025
+ 23:53:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.9
-Content-Transfer-Encoding: 8bit
+References: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
+In-Reply-To: <b00cd043-7e52-4462-8bb7-b067095bd5fd@stanley.mountain>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 14 Jan 2025 16:53:18 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
+X-Gm-Features: AbW1kvZZrVoZIpBloSVmTznaPSQlR5WRH3iv0Bm1p0q9P4ZGAjgd6BxkvdeYwwc
+Message-ID: <CAKYAXd95gAZ4h1TJtFg2bKakSLQcR2294+mZ1tJY5zb2V-rhaA@mail.gmail.com>
+Subject: Re: [PATCH RESEND] ksmbd: fix integer overflows on 32 bit systems
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: David Howells <dhowells@redhat.com>
+On Mon, Jan 13, 2025 at 3:17=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
+>
+> On 32bit systems the addition operations in ipc_msg_alloc() can
+> potentially overflow leading to memory corruption.  Fix this using
+> size_add() which will ensure that the invalid allocations do not succeed.
+You previously said that memcpy overrun does not occur due to memory
+allocation failure with SIZE_MAX.
+Would it be better to handle integer overflows as an error before
+memory allocation?
+And static checkers don't detect memcpy overrun by considering memory
+allocation failure?
 
-[ Upstream commit c8b90d40d5bba8e6fba457b8a7c10d3c0d467e37 ]
-
-When a read subrequest finishes, if it doesn't have sufficient coverage to
-complete the folio(s) covering either side of it, it will donate the excess
-coverage to the adjacent subrequests on either side, offloading
-responsibility for unlocking the folio(s) covered to them.
-
-Now, preference is given to donating down to a lower file offset over
-donating up because that check is done first - but there's no check that
-the lower subreq is actually contiguous, and so we can end up donating
-incorrectly.
-
-The scenario seen[1] is that an 8MiB readahead request spanning four 2MiB
-folios is split into eight 1MiB subreqs (numbered 1 through 8).  These
-terminate in the order 1,6,2,5,3,7,4,8.  What happens is:
-
-	- 1 donates to 2
-	- 6 donates to 5
-	- 2 completes, unlocking the first folio (with 1).
-	- 5 completes, unlocking the third folio (with 6).
-	- 3 donates to 4
-	- 7 donates to 4 incorrectly
-	- 4 completes, unlocking the second folio (with 3), but can't use
-	  the excess from 7.
-	- 8 donates to 4, also incorrectly.
-
-Fix this by preventing downward donation if the subreqs are not contiguous
-(in the example above, 7 donates to 4 across the gap left by 5 and 6).
-
-Reported-by: Shyam Prasad N <nspmangalore@gmail.com>
-Closes: https://lore.kernel.org/r/CANT5p=qBwjBm-D8soFVVtswGEfmMtQXVW83=TNfUtvyHeFQZBA@mail.gmail.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/526707.1733224486@warthog.procyon.org.uk/ [1]
-Link: https://lore.kernel.org/r/20241213135013.2964079-3-dhowells@redhat.com
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/netfs/read_collect.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index 3cbb289535a8..b415e3972336 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -247,16 +247,17 @@ static bool netfs_consume_read_data(struct netfs_io_subrequest *subreq, bool was
- 
- 	/* Deal with the trickiest case: that this subreq is in the middle of a
- 	 * folio, not touching either edge, but finishes first.  In such a
--	 * case, we donate to the previous subreq, if there is one, so that the
--	 * donation is only handled when that completes - and remove this
--	 * subreq from the list.
-+	 * case, we donate to the previous subreq, if there is one and if it is
-+	 * contiguous, so that the donation is only handled when that completes
-+	 * - and remove this subreq from the list.
- 	 *
- 	 * If the previous subreq finished first, we will have acquired their
- 	 * donation and should be able to unlock folios and/or donate nextwards.
- 	 */
- 	if (!subreq->consumed &&
- 	    !prev_donated &&
--	    !list_is_first(&subreq->rreq_link, &rreq->subrequests)) {
-+	    !list_is_first(&subreq->rreq_link, &rreq->subrequests) &&
-+	    subreq->start == prev->start + prev->len) {
- 		prev = list_prev_entry(subreq, rreq_link);
- 		WRITE_ONCE(prev->next_donated, prev->next_donated + subreq->len);
- 		subreq->start += subreq->len;
--- 
-2.39.5
-
+Thanks.
+> In the callers, move the two constant values
+> "sizeof(struct ksmbd_rpc_command) + 1" onto the same side and use
+> size_add() for the user controlled values.
+>
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
+d tranport layers")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+> I sent this patch in Oct 2023 but it wasn't applied.
+> https://lore.kernel.org/all/205c4ec1-7c41-4f5d-8058-501fc1b5163c@moroto.m=
+ountain/
+> I reviewed this code again today and it is still an issue.
+>
+>  fs/smb/server/transport_ipc.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.=
+c
+> index befaf42b84cc..ec72c97b2f0b 100644
+> --- a/fs/smb/server/transport_ipc.c
+> +++ b/fs/smb/server/transport_ipc.c
+> @@ -242,7 +242,7 @@ static void ipc_update_last_active(void)
+>  static struct ksmbd_ipc_msg *ipc_msg_alloc(size_t sz)
+>  {
+>         struct ksmbd_ipc_msg *msg;
+> -       size_t msg_sz =3D sz + sizeof(struct ksmbd_ipc_msg);
+> +       size_t msg_sz =3D size_add(sz, sizeof(struct ksmbd_ipc_msg));
+>
+>         msg =3D kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
+>         if (msg)
+> @@ -626,8 +626,8 @@ ksmbd_ipc_spnego_authen_request(const char *spnego_bl=
+ob, int blob_len)
+>         struct ksmbd_spnego_authen_request *req;
+>         struct ksmbd_spnego_authen_response *resp;
+>
+> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_spnego_authen_request) =
++
+> -                       blob_len + 1);
+> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_spnego_authen_=
+request) + 1,
+> +                                    blob_len));
+>         if (!msg)
+>                 return NULL;
+>
+> @@ -805,7 +805,8 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmb=
+d_session *sess, int handle
+>         struct ksmbd_rpc_command *req;
+>         struct ksmbd_rpc_command *resp;
+>
+> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
+sz + 1);
+> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
+ 1,
+> +                                    payload_sz));
+>         if (!msg)
+>                 return NULL;
+>
+> @@ -853,7 +854,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmb=
+d_session *sess, int handle
+>         struct ksmbd_rpc_command *req;
+>         struct ksmbd_rpc_command *resp;
+>
+> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
+sz + 1);
+> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
+ 1, payload_sz));
+>         if (!msg)
+>                 return NULL;
+>
+> @@ -878,7 +879,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_=
+session *sess, void *payloa
+>         struct ksmbd_rpc_command *req;
+>         struct ksmbd_rpc_command *resp;
+>
+> -       msg =3D ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_=
+sz + 1);
+> +       msg =3D ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) +=
+ 1, payload_sz));
+>         if (!msg)
+>                 return NULL;
+>
+> --
+> 2.45.2
+>
