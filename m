@@ -1,135 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76228248BDE;
-	Wed, 15 Jan 2025 10:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667FF1E98EF
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Jan 2025 11:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736938096; cv=none; b=XtMZqL1TrxwwcSThppHNVPpQiBie1QxNVas4LzAI3GotEwfrZfWW6aLIHdy+fWX4JlA9mBeugNYWTOyEXNO4KyCN062Gk7YOOBP/GJqQdOfyC1GN/9U3wrWyOcvV3xk4GVMaVu4hURC2hjBBCbJpDFKIzHHqdRgo+EggrHLH98M=
+	t=1736939358; cv=none; b=Id1eriTJv1JdmvgG2TbosyO5c50hBXy7s01IExnUoKbyTWzIZk8C61ktZiL/d+3t5oi2d+A+Ctl4+PDKAgy3S/6KOk24g7ZzMNfvdeP7LmpmZ+ky59LWnxGIIRZORteHDy0Ukbrv83b2wtPD5cIt56UZBSZqjdZE0yCiD+g5nmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736938096; c=relaxed/simple;
-	bh=DBvTNx5WZ00FXWc9brltJLXVau2q4RNCLcI8SZa5Qr0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mTPiGHGBckGU7bIYPkyTQtuaZgQoSbsCTaO5lR9kg+tF9S03c0C/AHHWLJFNMgGbdpFHv2jQRAaVRaGdpv7rAeaXUXqvEhgZCjys2ggnM6rQEsW4kqqQyaUfDAaHiFCEngANg6mYarm/LXedBME36rh/mvdvdEi87Q3YJ+xCuz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uHdCCXl8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736939358; c=relaxed/simple;
+	bh=2fSe49bkNrDNkSkvqAS/A8a3rgrNIaZQAyE5547fVTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fPau1R20TxXUvYO2v5PpiQuRPn00tzyhjSrTjpmccY1xeQZHc3xDvV+K3G/NQeJvNMEhNwATMdWAMr982yRnp7udTxhECaTUDLHivSTicg/J89XEQibd58gkBWDw9TtOjfJPIieqvNN9YtZgrMIehSFpEBQ2YKFZ/9eVpDhQIgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+GCpO9e; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uHdCCXl8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A70D5C4CEDF;
-	Wed, 15 Jan 2025 10:48:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1736938096;
-	bh=DBvTNx5WZ00FXWc9brltJLXVau2q4RNCLcI8SZa5Qr0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uHdCCXl83FVzNp7SO/AWWJBLB9tYjocOMrmu5G6n+qZkkrgn6pig5VdRQBfu9jcVB
-	 7PtwjxPesdpxs5Ca9Fn/8FLUcj3YO1ZshPejya6QGclHWGvK0aWhnEey5EcEOyaDnH
-	 xOcllnN4lT4G/Q46TXkRdLi3pPv58aJY9QZO3j8w=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Nicolas Baranger <nicolas.baranger@3xo.fr>,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Steve French <smfrench@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 081/189] netfs: Fix kernel async DIO
-Date: Wed, 15 Jan 2025 11:36:17 +0100
-Message-ID: <20250115103609.579059069@linuxfoundation.org>
-X-Mailer: git-send-email 2.48.0
-In-Reply-To: <20250115103606.357764746@linuxfoundation.org>
-References: <20250115103606.357764746@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+GCpO9e"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so1402967766b.3
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Jan 2025 03:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736939354; x=1737544154; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=reiyifGzvCkDi7U+hQ36D1LYIrQZs6K3CVyjcafuvjs=;
+        b=i+GCpO9eCnptPqaeMfQr7qfIjaqky0D6HQVPal//AvS4BEXw+Tlj+jsIAx8/nagjPt
+         hkEnGLQk5xUN2/3qKd0FYvPxxKgMeiJ3eefHAXbTRF1HJE8tK01fbQsU0U9j7tJpFxND
+         r6BRYO6fXe+xzcE8waVUW+sFHBIWwuqRcUHVR6lo7HlL+h/QGnQvly1Pb6KHAaMgCC7/
+         T1GXMolpwCk+uFKh7hJ9kgln0J3qsE4uBH5bDcmW7CaZDW7MBlM0VOxIUjTqFc9ejoms
+         E6GjllYx0WC52f549K989wuESZWkX741qYxfzg/7G2aIic7ylKzZchkgnRb38T/qdFro
+         y0nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736939354; x=1737544154;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=reiyifGzvCkDi7U+hQ36D1LYIrQZs6K3CVyjcafuvjs=;
+        b=QgQBdQIOzEvIsN081QKIUmVJ9hN+30ORGqncNovSwLRbziBZ16yZHCsf9K1uzO3ZFb
+         PDCPjfHq47N/HRNBfLrJmBKPXOm3SljhMlDKlcdH2o+t6HsUhfi4AOL0hX49JI5eVOKa
+         O+xwcGfS+45uAKkIkVfODWlWBpJjkljLHNRcZ9X9IHZa5YnSDwSApEKxSHat42fAxtiS
+         Cc0EPXkqTuC+I556+xLRmk4l/7SkhUBWIpy735pOfH0QA5Gp6O1a5TQB6vfeR0SNW8tQ
+         /QzYn0JyydwHXvbNVCTyF8LY9xivW+nVq0s2h0gaIXAogMRZp6WPwSEQBwCCB8y/yOxP
+         SVNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUf9tofGATgJ9VOW2s+hP2O09PacDtaUe/6RYRJg+ODKCs9vJ6fgMjWO7kp4Lmw/PCecBIJt4vFSz1P@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ7T0HWflMaUPqcg9lD8UcSPL8Ed6UI6sh8Kj8Z66nrpzZuSnc
+	rK0W2d/Di2HVwwQJ3qe6uPTMUOgsmIk10gNQNeYoaG0BhrQ/4UKv6RJQ/Z1pyfDPZpLLd/UruQN
+	R/0jXuu1cTa9YJi/RrgOTI6mvAXs=
+X-Gm-Gg: ASbGnctkOM/H1YsyvTwFHlcpowGIYvCfuSvbrEKBefFYFz7qSNpH/TrzJSVaoKoHVav
+	6GWx44KcWcOZk1inKQk9EFI9w80/BNlCwD3OO2Uyka4fmrrNUNl9DR5+75Ej06l6kGN3C
+X-Google-Smtp-Source: AGHT+IEZHFJVMc2NjYI58D7JHFas9/yGP4uBwGuXkU+zDXlZh71gOJOoWgvb6tBRIG49HbIEwtYSKj5flyTzzH3lXSY=
+X-Received: by 2002:a17:907:7e9b:b0:aae:bd4c:2683 with SMTP id
+ a640c23a62f3a-ab2abdbe9famr3147774966b.49.1736939354270; Wed, 15 Jan 2025
+ 03:09:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANT5p=o-1V2ea-+Lj+M0h4=syXyJYu73JU3F0dXij=KVwWUTOw@mail.gmail.com>
+ <eed163634d34c59bdfe3071c782276c2@manguebit.com> <CANT5p=rEjCwxm8t_zayJ3VGTcXYgBgnSaeFUHwkpuL0DfZY0=Q@mail.gmail.com>
+ <6f1f7984ded4a0152854ecc07b0ab56d@manguebit.com>
+In-Reply-To: <6f1f7984ded4a0152854ecc07b0ab56d@manguebit.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Wed, 15 Jan 2025 16:39:03 +0530
+X-Gm-Features: AbW1kvbX6xgNBKafQOqG2L1n43FwbwmVPEeo6CUFOGXsUuacS25FNi_Mt3PQlMo
+Message-ID: <CANT5p=rm6pvyDV9RDG3=YP+83kpqD60YbJE-HwVEoeBewBZ4qQ@mail.gmail.com>
+Subject: Re: Negative dentries on Linux SMB filesystems
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: Steve French <smfrench@gmail.com>, Bharath SM <bharathsm.hsk@gmail.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>, 
+	Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+On Mon, Jan 13, 2025 at 9:59=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
+>
+> Shyam Prasad N <nspmangalore@gmail.com> writes:
+>
+> > Hi Paulo,
+> >
+> > Thanks for your replies.
+> >
+> > On Mon, Jan 13, 2025 at 8:55=E2=80=AFPM Paulo Alcantara <pc@manguebit.c=
+om> wrote:
+> >>
+> >> Shyam Prasad N <nspmangalore@gmail.com> writes:
+> >>
+> >> > Ideally, negative dentries should allow a filename lookup to happen
+> >> > entirely from the dentry cache if the lookup had happened once
+> >> > already. But I noticed that the SMB client goes to the server every
+> >> > time we do a stat of a file that does not exist.
+> >>
+> >> This is a network filesystem.  If the last lookup ended up with a
+> >> negative dentry in dcache, that doesn't mean the file won't exist the
+> >> next time we look it up again.  The file could have been created by a
+> >> different client, so we need to query it on server.
+> >
+> > I agree. But we do have tools to trade performance for accuracy using
+> > parameters like actimeo/acdirmax/acregmax.
+>
+> Do you mean using these parameters for negative dentries?  These are
+> used for caching file attributes of files and directories, which means
+> they are all positive dentries.
+Yes. Precisely.
 
-------------------
+>
+> > So we can avoid going to the server each time if it's within some inter=
+val.
+> > If the server gives us dir leases, we can be sure that the dentries
+> > have not changed without us knowing. So we can definitely cache the
+> > negative dentries till as long as we have the lease.
+>
+> Yes, that could be done with directory leases.
+>
+> Note that negative dentries are also cached when @lookupCacheEnabled is
+> set.
+Ah ok. I need to check about this.
 
-From: David Howells <dhowells@redhat.com>
-
-[ Upstream commit 3f6bc9e3ab9b127171d39f9ac6eca1abb693b731 ]
-
-Netfslib needs to be able to handle kernel-initiated asynchronous DIO that
-is supplied with a bio_vec[] array.  Currently, because of the async flag,
-this gets passed to netfs_extract_user_iter() which throws a warning and
-fails because it only handles IOVEC and UBUF iterators.  This can be
-triggered through a combination of cifs and a loopback blockdev with
-something like:
-
-        mount //my/cifs/share /foo
-        dd if=/dev/zero of=/foo/m0 bs=4K count=1K
-        losetup --sector-size 4096 --direct-io=on /dev/loop2046 /foo/m0
-        echo hello >/dev/loop2046
-
-This causes the following to appear in syslog:
-
-        WARNING: CPU: 2 PID: 109 at fs/netfs/iterator.c:50 netfs_extract_user_iter+0x170/0x250 [netfs]
-
-and the write to fail.
-
-Fix this by removing the check in netfs_unbuffered_write_iter_locked() that
-causes async kernel DIO writes to be handled as userspace writes.  Note
-that this change relies on the kernel caller maintaining the existence of
-the bio_vec array (or kvec[] or folio_queue) until the op is complete.
-
-Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
-Reported-by: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Closes: https://lore.kernel.org/r/fedd8a40d54b2969097ffa4507979858@3xo.fr/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/608725.1736275167@warthog.procyon.org.uk
-Tested-by: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Steve French <smfrench@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/netfs/direct_write.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 88f2adfab75e..26cf9c94deeb 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -67,7 +67,7 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
- 		 * allocate a sufficiently large bvec array and may shorten the
- 		 * request.
- 		 */
--		if (async || user_backed_iter(iter)) {
-+		if (user_backed_iter(iter)) {
- 			n = netfs_extract_user_iter(iter, len, &wreq->iter, 0);
- 			if (n < 0) {
- 				ret = n;
-@@ -77,6 +77,11 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
- 			wreq->direct_bv_count = n;
- 			wreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
- 		} else {
-+			/* If this is a kernel-generated async DIO request,
-+			 * assume that any resources the iterator points to
-+			 * (eg. a bio_vec array) will persist till the end of
-+			 * the op.
-+			 */
- 			wreq->iter = *iter;
- 		}
- 
--- 
-2.39.5
+My point was that today, if we keep doing a stat for a non existent
+file in 1 second loop, each call translates to a server QueryInfo,
+unless dir leases are enabled.
 
 
-
+--=20
+Regards,
+Shyam
