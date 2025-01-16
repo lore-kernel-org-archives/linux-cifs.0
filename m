@@ -1,181 +1,215 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2121.outbound.protection.outlook.com [40.107.223.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D2B137930
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jan 2025 17:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737048758; cv=none; b=QbC6EfERIdNv8qgWzSbsK2P4/TSg8Ce8EAaXA0Dq7IhEsacUYe0sVIc8w8F0U+/1iG78ls4F0LFXjenjxbRTwNPzy3gCpM58yYR8U+bYaN4qN5ntvbUZDqV5VClzCubrv/EsONsJVrDGEWezh9FiELa3InPgvDqqv0bP6af2reI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737048758; c=relaxed/simple;
-	bh=sI/IChu00Fd3OoRQG34PZTNTxwbBRbAF57DCb/TVUD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XZxKphmigqKmrHDS+6T311RnTyMc89QIbj8DUiQQYVa3rf2j8qC4q+wJ9Of29qlPOdr7z+Gonrxx0l9M8efYGkkMKuNqg4yYPHjPL7y0V2R5YSoB9QgTcFdMFPrby7Rc0EmYCdySh7i2MivVPiJqYV46LDxxtn2x4sWSpweT4HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WrQfnE4B; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrQfnE4B"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54298ec925bso1372050e87.3
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Jan 2025 09:32:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737048755; x=1737653555; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PYf3ZnIRLcaHdRKpjktj+BOON0K3FNyeoL3IDq3UH0w=;
-        b=WrQfnE4BfwFML8Uzg1rfKe5+cKdfnGldxdr2cq14UGNebPeEpJ4eaF5H/3bRYMgHoh
-         J8rCWXwRrnTNq3iwY8EWezun6ZVtjD3H5piVsTTlgykvNvXEh7N2J0OCvHwA63RH9G+y
-         YyEKsEwXDAMLwTJC64VN5IcjftmhQEfD3sq8a71TVcyvFW1TG5V8l6ZIGoAux2D8EZm/
-         M80p7ekP+muh+wUDbLOokwBvo2UBOYo63zMuIoQAp1KYRy0oI6BIoxDc+h8w/hWo45Rf
-         +5IJUmpns82JGW7b8gywiIx7zzMgCZbE3EPZX8RT5eLqQ/8nsuV8qjEHK7+hB36iImSz
-         IJvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737048755; x=1737653555;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PYf3ZnIRLcaHdRKpjktj+BOON0K3FNyeoL3IDq3UH0w=;
-        b=Vrx/upsIAkgUCPmxo0jzRPghSkiETs25DBad3KOnWNzdZ1Fy+uUxGbRLvn4/vhs1io
-         tTHpvMMFY47Sq+Kw3qiT9b7M9IdT3tdIKdWmPMhvjqIsNEL2Wf9QxGs0+i3XMQ5+mIkK
-         1br3SapHG4wUj1rVPsMmJcjkpAbzZ9B0xJdNsy+8ME+JX/12NdtKUH/rf3U++IBSxZsm
-         O+1b4TOkj6PdZKdpLKE5zTsH6u5t0ZD815V15zOwTp4e2UnCU/zy6+qI7meOBGDACfJG
-         4hYjqODmJTyQlLg36pbWoalT5zA0FtVgL1FjTxWMVyrfwlRGl2bWuq46kLHEuhL5kSSC
-         HXTA==
-X-Gm-Message-State: AOJu0YzAZWvIh0EBTYW2Z3yEWpdA02ARVHuc45xwug5mhD5Sw80c6sy3
-	w+YXempwY8UbMtDQ25eAFZJDNGxJ49e0qw9DIeOXHAsRAM6HZO5pDKZpWAssrge6DZuSZkW25A7
-	Q7DKRqNqZ7pYu8JsO6yMDPd5sTw8=
-X-Gm-Gg: ASbGncsOGPMQfDDCLt2ChGeF9+WzF7x4H/Mx9l90NKWRDl0JgjrlqmqJ1i4SW6I1N/s
-	QZRJsBXgpw+AuvM4u/CT+C8bRqFvUGFKPGiNNfwU=
-X-Google-Smtp-Source: AGHT+IGcJNLXFfA4RuWsxHNguqzJLll4EnbazLlLqTq6zo1F2zOqNWg7mMtyI01omv05C1stOXV/9hQj6slxzFtSDMM=
-X-Received: by 2002:a05:6512:15a8:b0:541:21f9:45b6 with SMTP id
- 2adb3069b0e04-54284801becmr11183999e87.37.1737048754890; Thu, 16 Jan 2025
- 09:32:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26E822D4E6;
+	Thu, 16 Jan 2025 18:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.121
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737050580; cv=fail; b=lwexr93Xx/jPyL9wROSS87DjoiY6GFy9WphD4974ClfdCOJlhF2w/0bRKwK5xDsOkmJE2yqfQBGm299L6uol6LTtWIrAUiDcdL6P+fU2wMnRw7Nz7qb6/cK2fEfII0ofTNPcHE1/nBhmFWrpDzcAA6sEmiPVRHD41VqThO74elo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737050580; c=relaxed/simple;
+	bh=M2l5MoO0yz5WiTsOxsX24AWLgA7CVWqocdpHdmW2m1A=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qe4XnDeEXuUcUaE6SfS4wlRyI9SkoxyE8iEp1+W1b1UZk7mODlT/cWy7d7v2W3QYZvK7ZEJ5qqi7cdQQP4gthqAqCqhBN0CwKJBGneyh/62j9YrjQRabCECphg6W+vE2qFaxlADBH9FovBAagH1vms+jDre/niBsvbX7PjtwvOE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.223.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QnCMj5ZilKvHcvbYYT6W2MJaUtNeoWyNUGHtHO7fb1IkB3AzefnDZsbmoAjLLV7CtwxCaXHCtJA4Kld+M4z5CPZ2NgyMW7qm/94KDlI9pCqAzAiabzSAAPCAWd9YHJ5jPp9sHsholfoPkTyfL4guQF+IvIW19mw2uPJXME6aU568E2mtdq97e7c87pqRjf/E63Hoe8jFbz2FhhWuaparc05hHzdX5+i41wsAn3wh0PrIkP8nJcPzNdL6b3GFJMnStsnfjxmW+Fu9Vyahdy40rOYdEvnylyW43LLwZZp6/QCzMzlb2iIDIOlt+45zM593L1ty4klxl8612lI7QLZc4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LR4o0NbUvvutr9wjADCXFcR5s+Eny9aDxgrukgzrFWA=;
+ b=RJH4agwmY2L3qlucd1fiCqDOv/lg6NqYMmP4izhnORVs7o/weaY9fsxOor+Z7+kcadtqstFLz0Db3kJ0xe2KTYfTi9TCw8O67zmMO1bLIlrZ97P7vGJtqFWtBun1brIiDn3zddYSw9uXWG9DO56hKXZ7eWS7WrP7p/rAbQL8VMwXnpxfjyhc/I5zLSTTjxCPZIiUsD76sK/epf2MTBU/os70P91SD9Y52ZNknT7sFOQ8LUdSUimXW9rFjMzpDxZ8e2b0aV/jJFRjrJl+X2L6WS7j2CgSc5osSn15kWxnk5mxnQvWOATnbJ8CEAp2g82Pr3jZQqwaMVztnAygS1YxgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB5246.prod.exchangelabs.com (2603:10b6:805:d8::14) by
+ SJ0PR01MB6288.prod.exchangelabs.com (2603:10b6:a03:29a::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8356.13; Thu, 16 Jan 2025 18:02:56 +0000
+Received: from SN6PR01MB5246.prod.exchangelabs.com
+ ([fe80::cf18:495f:c6c:ec90]) by SN6PR01MB5246.prod.exchangelabs.com
+ ([fe80::cf18:495f:c6c:ec90%5]) with mapi id 15.20.8356.003; Thu, 16 Jan 2025
+ 18:02:56 +0000
+Message-ID: <80f4901d-1261-4e74-b22e-a205928cf4ad@talpey.com>
+Date: Thu, 16 Jan 2025 13:02:51 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] smb: client: correctly handle ErrorContextData as a
+ flexible array
+To: Liang Jie <buaajxlj@163.com>, sfrench@samba.org
+Cc: pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ bharathsm@microsoft.com, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ Liang Jie <liangjie@lixiang.com>
+References: <20250116072948.682402-1-buaajxlj@163.com>
+Content-Language: en-US
+From: Tom Talpey <tom@talpey.com>
+In-Reply-To: <20250116072948.682402-1-buaajxlj@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR14CA0006.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::11) To SN6PR01MB5246.prod.exchangelabs.com
+ (2603:10b6:805:d8::14)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116172903.666243-1-pc@manguebit.com>
-In-Reply-To: <20250116172903.666243-1-pc@manguebit.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 16 Jan 2025 11:32:23 -0600
-X-Gm-Features: AbW1kvYXKp_j1EkdWlln7jsrMOfkEz8K22AcNqjValrpu2JlZF8FcZeNmsHgbhg
-Message-ID: <CAH2r5ms-XiL6nh0gm0zUNMHRupaRKPm-bzQ4HJwiYe3vX9cmHQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix oops due to unset link speed
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org, Shyam Prasad N <nspmangalore@gmail.com>, 
-	Tom Talpey <tom@talpey.com>, Frank Sorenson <sorenson@redhat.com>, Jay Shin <jaeshin@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB5246:EE_|SJ0PR01MB6288:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1932ab2c-c606-465f-a5cf-08dd365800e8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YlJiY2w3STRmbUt4ZnhHc1QwY25WU2F2YmhJV3lEektuZVpFb0xUNHV2Vkhv?=
+ =?utf-8?B?VE43LzFZem5UTWltOGhsT1JSK3VWNHdPN1ZmRTFsUDFGZ3M4amQ4QTJhMEFK?=
+ =?utf-8?B?REloRjd3MnE3UFV3VlArU1E0bGRzRFhpa1JzdU5vN20wODVRNVdCa21la0Nx?=
+ =?utf-8?B?S3RqdEtPRC9KeWZlUlFRV0RVT3hNT3N6cFBaaC9FVHBkMHBVSVYyejdRbEJy?=
+ =?utf-8?B?TW1wNGZtbmYyeEhvcyt0bUFzNG50ZVM1akNGSlcyNmJZaGNwK2ozM0loSmRt?=
+ =?utf-8?B?Qnp4VkpyUWtMVVh3VzRJNk5QY2haYjVTek5UZzJySWZZNFEwSzg1SmQ3UEZr?=
+ =?utf-8?B?K2pMTFJrRTNqQm5CMDZnYUYrMktDOUxwQjNlV0RiL3A3WVRJZEVDSW5TZDBS?=
+ =?utf-8?B?cTBISDlJby9lYURKa1BxdWR0Q1g3dmJveWszYmpzTytjUWh0RTNvWXJwSUow?=
+ =?utf-8?B?cElsOXB0VWNEbU13S1ROZ251RThlLzBXRUwrK1lTdld5OXMvQ0M0bmptNmI3?=
+ =?utf-8?B?WDlyeVJHUklDZjF4TjBjSWZuMW5xSUpCQjVUR2RQZDJGMTBoc3l0Q0htTWUz?=
+ =?utf-8?B?ay9NNjJLTkw3MEFHR3hCRWk2Mlc0NUxtM3JZazNFdjRIWGhzWHF2cXBJbEl5?=
+ =?utf-8?B?L1FxMnFHelM4V2JpbUFnOFdHemNUeXFTakh4TkltdlpSa1JUc21Od0N2NVB2?=
+ =?utf-8?B?SmpIZ1ZXQ3dncFg5aGxRVFErRWhaVzdiYWxiY3Vrd3Iyakl4bmdtSHhOeWVI?=
+ =?utf-8?B?dWdrZEZLMnRLKzBBbXh4cUo0UC8va2owVWMxZVlSRFp1SUprQkxHdkE5a0Jr?=
+ =?utf-8?B?bWk2TzdYYzBFTW5jR3o1T2VvYUpQZTZVKzRpU2JHQkE3ZkhjWGdZRjhtNmVB?=
+ =?utf-8?B?bDVWb2UzYXB3SXFzVzRQNG9Ub3NIeEpBeDJwbFdIbllnSkpkeGJ0aWlYVnYx?=
+ =?utf-8?B?dGxUdUVJb3M0Q3hveE9aRWFCSERtSXcrbitXV2JWdnpvYXdrbHo3dzlaUXNP?=
+ =?utf-8?B?UjRMOGZydnpPcnFkWUJ6UnZ4cytxeDVpNVVlalhvanh3WXFhdk40SCt0ZjNy?=
+ =?utf-8?B?Tm9SMzhveThCK0JGdVdUUSs0QnI2U1drZ3dXSGU1R0pnUllsWnJtSHBuUzFD?=
+ =?utf-8?B?OEdhcE5ndXFnWW8zUFNsYVF0aHFwRTFOc0o3STJpWGVKSWlyTHhmSkQ4dGdF?=
+ =?utf-8?B?YVBDZEcxV1ZkMEJnMFNOcnBXclFDaTJUTkVydWVadGFLS3dyWHZkUFVlQWZm?=
+ =?utf-8?B?K1lja0FKcDlMVVhhNGcwRTVDWWNibk5wNkJOUmRRTUNyZG01MHdLMjZqM1R6?=
+ =?utf-8?B?bU9wQUZTV2hmTlEvVEJxZU8wRG5WdDROcmhiUlduU1IzWnZTNkJhYWowanJZ?=
+ =?utf-8?B?clF1eGVlS1g1RXpLMmNPVDZLcXdXUFZZVWtJSldOV1ZpWUEvMkM1aDdWZWR5?=
+ =?utf-8?B?YXlrWnp6aTB6SnIyVm9FNklJN2ZMOStJMjFDenA2NlFBQVFmNFVrZEdRQ3J3?=
+ =?utf-8?B?emdQa3FBR2xlS2JkbU1FUVRyOEdLYXZHdVpRSXBrd3B1MXJhVDdKdWtETkhE?=
+ =?utf-8?B?aHlYN0pzN2pkOVc4MU1xQUFwUnFNMmYrM0NFTFFOVXNZdW9wWmlnQXdpZ2dF?=
+ =?utf-8?B?c2w3amhVWFVHMzlNclRtbHZrTGo2WlNzaFM3UGRvU2ZwaEY2RmlRR2xWWDJw?=
+ =?utf-8?B?WThBR1IrTEpWMWlmck1rOEZVM2NHbk9pTE92UVo5d2RpaWVhd2xzdFVuem0x?=
+ =?utf-8?B?LzJHQ203cGorVXdMM0ZVZFlxbTNadXBRbE5UdWlKckFUYUg2dmRoVWM2OWR5?=
+ =?utf-8?B?MzFIVVJ3aklRUWUrUzExWkZCZzgwU0Zxd0hvWDNmRWRQejFBcWFINWY0MWV0?=
+ =?utf-8?Q?Rigp1xMQYzghN?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB5246.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NDlwN0xmY1JYR1krU1FnWkVTRlJ6a0ZlQkZ3VkFZMlN4MG0vdUxLWGp3bkFz?=
+ =?utf-8?B?WWs2bXlmV0p2WHRaSkhvMU43SnQyckJuZlhLUTNoV0VVTHk3YU41MGh4Yksx?=
+ =?utf-8?B?ekdmOHpwTE9IVDVncnVpUjdzbVN5MjVyVVFzQjVIUWNwaWtreXhIbnR3S0lL?=
+ =?utf-8?B?YkRGdnZuYmZiaWhIdWFTclFsa0lSSzRTNlh4VUdTVHU1djB6dnpaWXI0cmpC?=
+ =?utf-8?B?OXZGUDRVNzdyWi82RHNKeUJoVzJPcjBZNlZXVW12V0tQNkpGR3RaakNnU2M3?=
+ =?utf-8?B?Uld5MFdoa0VHTmE0d1RPOUc1a21PSThxK0UyL2FXWlN0Nm9IMlBkM1YwOU5P?=
+ =?utf-8?B?bGYvVDUrY2Y3QTB0RTVKaTBtOUlBSkJyRERHbmw2YmlxaVh2dHAvV1Urc24v?=
+ =?utf-8?B?a2p2d1c3Y3lYc1FnTE9TbmpwRUNDc1lJVkpsZFRzSUJ3QTlYYjVtSE0wLy90?=
+ =?utf-8?B?UjU0bzl2eWtjZE9WR05GS3RSMUluSXRpRjAvV1g2TVRmWWV6U0hFV3pISGlY?=
+ =?utf-8?B?RkgrQUpSb3BaTXNZSkRDS2tMb25PbmNMSEtrWGl5ei9QMjRRRVYyeUh3NWZJ?=
+ =?utf-8?B?VnJlQ1k1Vy9TNC9FeFZUQU1mQmdpaEd2RWh2OVZQVDV5MnovS0w4dzJXSG44?=
+ =?utf-8?B?VmhiTTFBMlpoUGtQTjB2K25JUlF3Mmk4SzlmM3R2NHc1ZHM3UXJuVEdjUXQ3?=
+ =?utf-8?B?UVVqTjNoQ0lmbHdrUGdkSHJoaWtIOE82SjVwM2FFUWN3blpUUzRzNkU4WnZ6?=
+ =?utf-8?B?dy9mLzZJT0ZZQVJSai9IcFMxeTh2OWFINld3K2szdG01b081N2dZSWRkVWtR?=
+ =?utf-8?B?aEkrQk9sdDEwRVZPVU5sRVkzQkMzYVVpbkxhZ2ZlZkZpSlE5RmkvcXFtaEoy?=
+ =?utf-8?B?RzhUZ04zREtVTkxYQVZPeXNHSHlYVkFmbnVUM2ZhenQzckRSTHJIcUpFK2Yr?=
+ =?utf-8?B?K2ZxZGc3OWp2VTI5dU5LemlMSkkwazd1NVNYZ0pWK0VMd2gwV0Q3dmVseUJD?=
+ =?utf-8?B?Ulp0TEpSb1p4Vnl1Z0loNThzNDg3eVFLZHBSU2ZyMjdLK2tmZEo4VHIrMjFK?=
+ =?utf-8?B?cHZIS2dRMUtNU3dOdDdFbnVkbDg0eGlib3Bxd3RxTnVNNEFlUWdkbVFOejVp?=
+ =?utf-8?B?dnEzYTBKbHFHZTBDNlEzK0ZwcHNUL3ZVNzVuVUtGcmo0OFFHVFNqVVVkb29I?=
+ =?utf-8?B?aVN4dkhLcjdrbUI0OFFCSEpXTDMxa1ZQSkg4Ym5jZVVVL0JNbnBZWTkwZGdh?=
+ =?utf-8?B?VTFORURkU2ErTmpld1k2YXExUWdpQUNWRDcrRUxRdk9wdHhhMy9CN3B2OXg1?=
+ =?utf-8?B?KzVidDN5VVJ4WjFLaEQzN21IbS9KUVBIdmZjMFZ4NGx2Q0prUHU2VmZ4TDBx?=
+ =?utf-8?B?SGZiMGxJbnZLZkRBKy9BS3pSOG5Vd0lQK3dGdmVrdSs2UUtMd0FxRGZmY1M0?=
+ =?utf-8?B?a0N0cVhFaFA1N05xRHNKSVhRM3JCR2hwVXVxRmdhN09ySmh5RjJadVZZT2dT?=
+ =?utf-8?B?ZVRBNFJaa2pkT3FieFRQaFBsUk1IRGVnNEovdjBOWkhYamUzMFhuTGFwanVx?=
+ =?utf-8?B?Vk1oY0JhZjkxOTMwam9lSHJRU2wxOEV5ZXUyeStmTWdlWGx5QWYxcHE3UlFR?=
+ =?utf-8?B?STkzdlEvSXpSVStKMGNrWjNsY08xY2N0aHNHUU56Z3Q3L3IxWEUrMzZBZ0xa?=
+ =?utf-8?B?dWFCTm9uRTZJOTgwS3VJSTl6a2RwVFRIeEM0dW5vcnNlVVBDb25NVHppVWMv?=
+ =?utf-8?B?R2I3V3RreFJ2K25qYjBQUC9lZUZSVnR6OTdHRlRCRDkzdFRVMmoxb3JYeEQz?=
+ =?utf-8?B?ZnEyZWVrSE9HQ3lQcUN4R3ZGdjd3c1RELzd6dWRDTXJyRjdwWkJ3bHU5bzIx?=
+ =?utf-8?B?alVIVHptckhJZGw0ZlFqeTgzVk14NGZLQTh5NEVYWVdQemxtUTVrT3J4YmZa?=
+ =?utf-8?B?anhpQkp5aG9BOWo5a0lkU09MbHc1OXlmQnZCMUdXS2lSQndKZmlTSWxQclFV?=
+ =?utf-8?B?VXlJU3IvaTBGdVlIRDlnKzMrK09DdG0zaGZFWUwvR2dGUzFOYm52cjczNDZU?=
+ =?utf-8?B?SW10MjI1TXFHa2JPeEJDNFZ4Y2hyaTB6eXd1ZE5GTU4za0VXdlR2QWVEem1x?=
+ =?utf-8?Q?1P34=3D?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1932ab2c-c606-465f-a5cf-08dd365800e8
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB5246.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 18:02:55.8229
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X0f9cKfQEQaFiqbrt3pjR04HxUshWeyRIwm85Vxl1z5LxCLQ9ikrz9gL5fL/BWx7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6288
 
-merged into cifs-2.6.git for-next pending additional review and testing
+On 1/16/2025 2:29 AM, Liang Jie wrote:
+> From: Liang Jie <liangjie@lixiang.com>
+> 
+> The `smb2_symlink_err_rsp` structure was previously defined with
+> `ErrorContextData` as a single `__u8` byte. However, the `ErrorContextData`
+> field is intended to be a variable-length array based on `ErrorDataLength`.
+> This mismatch leads to incorrect pointer arithmetic and potential memory
+> access issues when processing error contexts.
+> 
+> Updates the `ErrorContextData` field to be a flexible array
+> (`__u8 ErrorContextData[]`). Additionally, it modifies the corresponding
+> casts in the `symlink_data()` function to properly handle the flexible
+> array, ensuring correct memory calculations and data handling.
 
-On Thu, Jan 16, 2025 at 11:29=E2=80=AFAM Paulo Alcantara <pc@manguebit.com>=
- wrote:
->
-> It isn't guaranteed that NETWORK_INTERFACE_INFO::LinkSpeed will always
-> be set by the server, so the client must handle any values and then
-> prevent oopses like below from happening:
->
-> Oops: divide error: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> CPU: 0 UID: 0 PID: 1323 Comm: cat Not tainted 6.13.0-rc7 #2
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-3.fc41
-> 04/01/2014
-> RIP: 0010:cifs_debug_data_proc_show+0xa45/0x1460 [cifs] Code: 00 00 48
-> 89 df e8 3b cd 1b c1 41 f6 44 24 2c 04 0f 84 50 01 00 00 48 89 ef e8
-> e7 d0 1b c1 49 8b 44 24 18 31 d2 49 8d 7c 24 28 <48> f7 74 24 18 48 89
-> c3 e8 6e cf 1b c1 41 8b 6c 24 28 49 8d 7c 24
-> RSP: 0018:ffffc90001817be0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: ffff88811230022c RCX: ffffffffc041bd99
-> RDX: 0000000000000000 RSI: 0000000000000567 RDI: ffff888112300228
-> RBP: ffff888112300218 R08: fffff52000302f5f R09: ffffed1022fa58ac
-> R10: ffff888117d2c566 R11: 00000000fffffffe R12: ffff888112300200
-> R13: 000000012a15343f R14: 0000000000000001 R15: ffff888113f2db58
-> FS: 00007fe27119e740(0000) GS:ffff888148600000(0000)
-> knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fe2633c5000 CR3: 0000000124da0000 CR4: 0000000000750ef0
-> PKRU: 55555554
-> Call Trace:
->  <TASK>
->  ? __die_body.cold+0x19/0x27
->  ? die+0x2e/0x50
->  ? do_trap+0x159/0x1b0
->  ? cifs_debug_data_proc_show+0xa45/0x1460 [cifs]
->  ? do_error_trap+0x90/0x130
->  ? cifs_debug_data_proc_show+0xa45/0x1460 [cifs]
->  ? exc_divide_error+0x39/0x50
->  ? cifs_debug_data_proc_show+0xa45/0x1460 [cifs]
->  ? asm_exc_divide_error+0x1a/0x20
->  ? cifs_debug_data_proc_show+0xa39/0x1460 [cifs]
->  ? cifs_debug_data_proc_show+0xa45/0x1460 [cifs]
->  ? seq_read_iter+0x42e/0x790
->  seq_read_iter+0x19a/0x790
->  proc_reg_read_iter+0xbe/0x110
->  ? __pfx_proc_reg_read_iter+0x10/0x10
->  vfs_read+0x469/0x570
->  ? do_user_addr_fault+0x398/0x760
->  ? __pfx_vfs_read+0x10/0x10
->  ? find_held_lock+0x8a/0xa0
->  ? __pfx_lock_release+0x10/0x10
->  ksys_read+0xd3/0x170
->  ? __pfx_ksys_read+0x10/0x10
->  ? __rcu_read_unlock+0x50/0x270
->  ? mark_held_locks+0x1a/0x90
->  do_syscall_64+0xbb/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fe271288911
-> Code: 00 48 8b 15 01 25 10 00 f7 d8 64 89 02 b8 ff ff ff ff eb bd e8
-> 20 ad 01 00 f3 0f 1e fa 80 3d b5 a7 10 00 00 74 13 31 c0 0f 05 <48> 3d
-> 00 f0 ff ff 77 4f c3 66 0f 1f 44 00 00 55 48 89 e5 48 83 ec
-> RSP: 002b:00007ffe87c079d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 0000000000040000 RCX: 00007fe271288911
-> RDX: 0000000000040000 RSI: 00007fe2633c6000 RDI: 0000000000000003
-> RBP: 00007ffe87c07a00 R08: 0000000000000000 R09: 00007fe2713e6380
-> R10: 0000000000000022 R11: 0000000000000246 R12: 0000000000040000
-> R13: 00007fe2633c6000 R14: 0000000000000003 R15: 0000000000000000
->  </TASK>
->
-> Fix this by setting cifs_server_iface::speed to a sane value (1Gbps)
-> by default when link speed is unset.
->
-> Cc: Shyam Prasad N <nspmangalore@gmail.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Fixes: a6d8fb54a515 ("cifs: distribute channels across interfaces based o=
-n speed")
-> Reported-by: Frank Sorenson <sorenson@redhat.com>
-> Reported-by: Jay Shin <jaeshin@redhat.com>
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Is there some reason you didn't also add the __counted_by_le attribute
+to reference the ErrorDataLength protocol field?
+
+Tom.
+
+> 
+> These changes improve the robustness of SMB2 symlink error processing.
+> 
+> Signed-off-by: Liang Jie <liangjie@lixiang.com>
 > ---
->  fs/smb/client/smb2ops.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 87cb1872db28..9790ff2cc5b3 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -658,7 +658,8 @@ parse_server_interfaces(struct network_interface_info=
-_ioctl_rsp *buf,
->
->         while (bytes_left >=3D (ssize_t)sizeof(*p)) {
->                 memset(&tmp_iface, 0, sizeof(tmp_iface));
-> -               tmp_iface.speed =3D le64_to_cpu(p->LinkSpeed);
-> +               /* default to 1Gbps when link speed is unset */
-> +               tmp_iface.speed =3D le64_to_cpu(p->LinkSpeed) ?: 10000000=
-00;
->                 tmp_iface.rdma_capable =3D le32_to_cpu(p->Capability & RD=
-MA_CAPABLE) ? 1 : 0;
->                 tmp_iface.rss_capable =3D le32_to_cpu(p->Capability & RSS=
-_CAPABLE) ? 1 : 0;
->
-> --
-> 2.47.1
->
+>   fs/smb/client/smb2file.c | 4 ++--
+>   fs/smb/client/smb2pdu.h  | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+> index e836bc2193dd..9ec44eab8dbc 100644
+> --- a/fs/smb/client/smb2file.c
+> +++ b/fs/smb/client/smb2file.c
+> @@ -42,14 +42,14 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+>   		end = (struct smb2_error_context_rsp *)((u8 *)err + iov->iov_len);
+>   		do {
+>   			if (le32_to_cpu(p->ErrorId) == SMB2_ERROR_ID_DEFAULT) {
+> -				sym = (struct smb2_symlink_err_rsp *)&p->ErrorContextData;
+> +				sym = (struct smb2_symlink_err_rsp *)p->ErrorContextData;
+>   				break;
+>   			}
+>   			cifs_dbg(FYI, "%s: skipping unhandled error context: 0x%x\n",
+>   				 __func__, le32_to_cpu(p->ErrorId));
+>   
+>   			len = ALIGN(le32_to_cpu(p->ErrorDataLength), 8);
+> -			p = (struct smb2_error_context_rsp *)((u8 *)&p->ErrorContextData + len);
+> +			p = (struct smb2_error_context_rsp *)(p->ErrorContextData + len);
+>   		} while (p < end);
+>   	} else if (le32_to_cpu(err->ByteCount) >= sizeof(*sym) &&
+>   		   iov->iov_len >= SMB2_SYMLINK_STRUCT_SIZE) {
+> diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+> index 076d9e83e1a0..ba2696352634 100644
+> --- a/fs/smb/client/smb2pdu.h
+> +++ b/fs/smb/client/smb2pdu.h
+> @@ -79,7 +79,7 @@ struct smb2_symlink_err_rsp {
+>   struct smb2_error_context_rsp {
+>   	__le32 ErrorDataLength;
+>   	__le32 ErrorId;
+> -	__u8  ErrorContextData; /* ErrorDataLength long array */
+> +	__u8  ErrorContextData[]; /* ErrorDataLength long array */
+>   } __packed;
+>   
+>   /* ErrorId values */
 
-
---=20
-Thanks,
-
-Steve
