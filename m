@@ -1,100 +1,117 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB5325A63D;
-	Fri, 17 Jan 2025 04:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1E825A638;
+	Fri, 17 Jan 2025 04:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737089355; cv=none; b=dNNuHVzIOvfmy6lt4WsAr5XOj9tQ9P8V+JZd6IMam3L7St8qBX06qsCtCsOSpRsJBjctsrgH73XUQrMCS+lpvWlolyVfOnZ0revHj8q+NMIC3MRTcUHjWH4qINmLKLW9+94VK4bSlUolOSqjJXU4x9qT5jiUkaKWOQY+Jz0/JfA=
+	t=1737089918; cv=none; b=suvXn8JtO89+86MrQPXGppadg6YB8r3ejA3SMIM2vmIP5ajoQf48kUJRpY7sy5vjxy0m2vQsRGAB5oDi1K4d8w8bnHHXyQnFc+NVNR0TKham5WvD9t36nIDUvqY/d8TjpTJ2RWYOhA9YIqRVBQqYXAtFJVQFePWQNx70Is5hjj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737089355; c=relaxed/simple;
-	bh=JYLDItmINydPccxIGtAwrPjrdV5Plap0VCvDX8gpTiU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=r+TgvKTClv60k2WZENaFbjysGLt3Mt5YWcDIQ1gC7QXYFhUQazvnt3suVcM68gkAkPeN/d6novk7XqQIi7Hh7KrAji8JFc7f77gki8LfCVUiiu9r3sdzzIERP/NJvHb6nnRFcnY7JUQVZhSSoOQtFMXEtg2ICRAlLtUraeUReoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B6saAjfF; arc=none smtp.client-ip=209.85.167.47
+	s=arc-20240116; t=1737089918; c=relaxed/simple;
+	bh=3TqEPNi+NzA6NIQjC0HF+H0p0Co1CYEKZJj+KUSXMK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cetxr7GY6qdiNBDh9gxCTWrNbGgWsygo3ah0v/wFsMaERksRbtmZ3+Kr1HuyQOswAvjbxAnHNJydjy36zrY9bHPnBksyCeph+BwBr1xBw27FtSsy2/mJRkrPIQApFV/CWDGsKJiUU9n/VGwXRq1twngHoHDQtWZZ0RAzL5XeRx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sc5rc0aL; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6saAjfF"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5401c52000fso1702412e87.2;
-        Thu, 16 Jan 2025 20:49:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sc5rc0aL"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53e399e3310so1831690e87.1;
+        Thu, 16 Jan 2025 20:58:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737089352; x=1737694152; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=whpgID72eYmRYyj4FYrMS7loa4XnZZ42YqJMUQw49/8=;
-        b=B6saAjfFFYus2ea+FAqSe2ruKU//FwMlIg80PLenPMnn1DvqYkEo7ODXyWhRxx7YlU
-         xe63Ye8Vz4HnzOArt9k5Z4lxyUp2PToHT6ed7nZVwisAkrlIuUm0aEoMDh3gEHXuL8Oh
-         dZLXrB4/KEoDXp2L8DDe4v06WKmYfArG3ooHvSdleE1q/oz2jJQCYTfqf8SWeauctfte
-         UY14pSAT7t9IyYue1AJ3r4askUleQw4x68pgLUFHSRim90ZTDS4wS5qrIXK4Ea45WxPJ
-         sYWWuNp5g1eUjaBpuB/ReEB1DD3A9MmlNXqo4o10pqyZEejvMKYZdBETCL2mmGlMviB+
-         NMTg==
+        d=gmail.com; s=20230601; t=1737089915; x=1737694715; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tzm9lH2OYi1MZ0f44oUVEAvNExW5oZ55tRiGLF5Rq1o=;
+        b=Sc5rc0aLHZPrYG2uvdNLjm7KZWGPe+XVfbFV/aubEC8KUNJHqgw3vBrl6Uss2DKoFT
+         YNJoXSjWzj4XfyLXOJ/QNOJC5/pcDZyB+iAwhfGigDjDPlFsLYVOnAZutTokW5cMthUu
+         BoLWk+ASNnZiAAxqWhhuVRRykqMcBMqwQ0ZTEvtkXS/lAVwE/NGOd7ypSLM7Rb2r09iF
+         v1ta3oTq1xnM5qsBidwzNvWz8uCsew6ptP/yZtGKjUWk1Un3hd0l86BN6F8FPc4QEkNV
+         oYQhmHrxyvXsh3o1E2cT5SBcSgvUcQ4Zdeb0IzrOdAZT7QhlEzXqdYO4vX208AcrAqsM
+         pX+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737089352; x=1737694152;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=whpgID72eYmRYyj4FYrMS7loa4XnZZ42YqJMUQw49/8=;
-        b=qxwfs74HqC3TDzOadfXAtZ/OL09ivzWK+kHiJm7bpYQRExdBzQFcZ2x92cYdlpRQ2n
-         0f3JqyEDAHBph+PxcBCEacdZWI0sCaLbM8CKI6JGP0vx6Srv87wsl3JfXj16qTaRIyOg
-         y+AorSNjG8ka/u9w3bE/Xme1lVfcySNphgfpeElT91zn8Kw4m5+0+7LVUPSD9tdchIgn
-         FX+8sO4jt7vml9Y/bhNZA93ciVbGFgbBcy9Mx3DfBs3V2mWaBIASlxoG/+QjiMDoo3Js
-         mmJhU19uar3YTBFk4lLuz4+NmOmgPIkEUHo10UEtxoMXOruz3yYDFoAAX33jjqT4XHpY
-         6ytA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwOJfG1IwE6q+qrEmI+/hnFzh7DH1Dt/Vx2z+ToXVMyyFhOQGnx93yZjS1cMQffYR4nkBJAXZmYnrp@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkIH4ET8Jq2XwN6vM7H/EP5GuDxwoRwAtToSPdNJ9BVQPtKfF/
-	Nv2pFA8Z4I3Z7NWDRj6vXujPPLO+CT5FbRvvDZpJ5UVfcXF1vLzvGS6CyRRQPZE9R7AbRD6ftpg
-	N9frVDXEgql6EPFNQzwZO7UcmtyIPiA==
-X-Gm-Gg: ASbGncsBtyGrQPN3yjRlYyFHnKUnGqoonUkyoABiJchOp+rpExehUkc+r7qlh0opQRY
-	GNGgNr2dw6muOu6LTVFU1kRfw9qzf/iel3GY=
-X-Google-Smtp-Source: AGHT+IEngmLzDq3hNcwbU0zfck1WreMthSaGtFlM/t7NWS5k8KrFe768f4HdCbwf1//czeBckNkojQgz7iSswe7REyA=
-X-Received: by 2002:ac2:5e9d:0:b0:542:2166:44cb with SMTP id
- 2adb3069b0e04-5439c282b25mr231932e87.35.1737089351788; Thu, 16 Jan 2025
- 20:49:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737089915; x=1737694715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tzm9lH2OYi1MZ0f44oUVEAvNExW5oZ55tRiGLF5Rq1o=;
+        b=lph8gXDf0DfQHlREGNVSdXp/DZRAkMruq3f/XXyKBC0EU2TThkgiFW77oPA0pVkeOP
+         vtYanLB2p29psJy2gT9pMNRhw91b/56+LHimsi8hXAmXz34fx5Ade6GUdLcjK0CwhBIw
+         Oz/bb2WQQHVfGfDrd+oz+BfQmR3IEIm9+4KScl4EfC0+va0pptpHzZxYufeQeWf0ru73
+         ovy+jvAqma2RMauMXcWudYcgoJrxIy97zjIYm8YaIbeeI1b+p2s7a9hWj9Es45QgWyan
+         hATOTPx0LbKK+oQ4dKMU2Qz/IXHxXulytZqmWikQ7tZN//LJDgmvcXp2LIr935vqar2z
+         E2DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCNgD512/R5hRq33US55xR3aAq5FMo7PEAzRP8dYwifOrjSCkNuGohS5Q48UTI4HTrK1ZAt7Z1G37l@vger.kernel.org, AJvYcCUZ1/nLEA2NGJFbM0vnitwjjcRwtqPyP1Fqp6FG5MzeF4bwQffEHkhCADr0vhamNyBAL/gLJBoWUF/dcQ==@vger.kernel.org, AJvYcCW9YH/GahgKKK5LGyp8oaIBvToNWJ+x6M62uyXeQcWieNYWkbapv4MTZ2zs8lOHsmfX9RILuUPGJwc6hTsw@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd6Pd5dKVCNUModT8Gvn2JCL9XbMUnplDpYK7+jZbFUg8IdxNl
+	ZjT/3baxqYJbWu7kuSCYT7xf/GudDfKDGJpJZxIJeVKjcyuC86Nc0nvyUbzoG5pYDBsh2m4x+xe
+	xv0IaSurJt11byl98DV6NjBrdU3g=
+X-Gm-Gg: ASbGnctZXcj/9qvVqYyF4tJ6OIoevX6YmyfbLa962gPuFKdlw4gHBc1tw9Z63kIU+m5
+	89KOxE2HueUQSQoHhVfWylzYnZMXzFq0Qh/k=
+X-Google-Smtp-Source: AGHT+IGwF1J7J3gQBGnFggK6bM6nqcnuI42aL/3XsDpeNsGwx37aCvL5jAHp0iJbMfoNN0/iE+2E48+BEjvBEnEmqm8=
+X-Received: by 2002:ac2:41d7:0:b0:542:62e6:4517 with SMTP id
+ 2adb3069b0e04-5439c2289d6mr222726e87.12.1737089914659; Thu, 16 Jan 2025
+ 20:58:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250117085958.0b91a98b@canb.auug.org.au>
+In-Reply-To: <20250117085958.0b91a98b@canb.auug.org.au>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 16 Jan 2025 22:49:00 -0600
-X-Gm-Features: AbW1kvZrl7R8-3nK0hX-0Witd3YFXEWNR9rlLU12ZuE96UIdc258GKaZdIhyzeg
-Message-ID: <CAH2r5mu3N+w35w+z_UAK4gnriBD+2gxvemXXR93XS_wF9nMRNQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Date: Thu, 16 Jan 2025 22:58:23 -0600
+X-Gm-Features: AbW1kvb_jrwwrP_0HuZJ6nbxdk0x_xiz8Nep63SpAzmpYwKkz6vYawLhM5Jlw0w
+Message-ID: <CAH2r5msnvt3KF7Ro1FHrw4ckW9ZrqhgnEBaZ4YSPb_tTyrjXXA@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the cifs tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: "Paulo Alcantara (Red Hat)" <pc@manguebit.com>, Steve French <stfrench@microsoft.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-5bc55a333a2f7316b58edc7573e8e893f7acb532:
+applied updated patch from Paulo which should address this
 
-  Linux 6.13-rc7 (2025-01-12 14:37:56 -0800)
+On Thu, Jan 16, 2025 at 4:00=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (powerpc
+> ppc64_defconfig) failed like this:
+>
+> In file included from fs/smb/client/dns_resolve.h:15,
+>                  from fs/smb/client/dns_resolve.c:18:
+> fs/smb/client/cifsproto.h:32:28: warning: 'struct TCP_Server_Info' declar=
+ed inside parameter list will not be visible outside of this definition or =
+declaration
+>    32 | extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
+>       |                            ^~~~~~~~~~~~~~~
+> fs/smb/client/cifsproto.h:79:45: warning: 'struct cifs_tcon' declared ins=
+ide parameter list will not be visible outside of this definition or declar=
+ation
+>    79 |                                      struct cifs_tcon *tcon,
+>       |                                             ^~~~~~~~~
+> (and many more like this)
+>
+> Caused by commit
+>
+>   42b78fe1919b ("smb: client: provide dns_resolve_{unc,name} helpers")
+>
+> Looks like a missing include.
+>
+> I have used the cifs tree from next-20250116 for today.
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.13-rc7-SMB3-client-fixes
 
-for you to fetch changes up to fa2f9906a7b333ba757a7dbae0713d8a5396186e:
-
-  smb: client: fix double free of TCP_Server_Info::hostname
-(2025-01-15 16:56:06 -0600)
-
-----------------------------------------------------------------
-two client fixes, both for stable
-- fix double free when reconnect racing with closing session
-- fix SMB1 reconnect with password rotation
-
-----------------------------------------------------------------
-Meetakshi Setiya (1):
-      cifs: support reconnect with alternate password for SMB1
-
-Paulo Alcantara (1):
-      smb: client: fix double free of TCP_Server_Info::hostname
-
- fs/smb/client/cifssmb.c | 11 ++++++++++-
- fs/smb/client/connect.c |  3 +--
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
---
+--=20
 Thanks,
 
 Steve
