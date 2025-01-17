@@ -1,45 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606651A7264;
-	Fri, 17 Jan 2025 18:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37654187550;
+	Fri, 17 Jan 2025 20:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737140399; cv=none; b=f7kR2uwrYHoNSCj8vof4POMzNSeyaHhZ8SKZx7Ka6otn+lSrni2rIhi4WTxx9TU9itfgAaK+Dy4J8rXRSJRi+C+iczXWmoVqYphyBA3RA6qxUk4kA7v21RxNLrkJLOeODdlb660+iGlLqc7ttI193bcgXbNy+pOt0tQH2UcNdjA=
+	t=1737145273; cv=none; b=VakgUhN7MQUE7GdTYQuYvLA7FtE6NUc+ctm+kJw54TtPEQTYx4FJfuzyD8sVmYP+zZG1L47XUpQd6owDZKtz+PqcaI8stfKKMfSb0SFnyUr/e00DNgqxaCUVCSRKG2JMew0Me5W4w9+X9CQGFOWgJ4vwE0IWT9NTpQlLrXT+1MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737140399; c=relaxed/simple;
-	bh=IIYH1QtR7cDugeuJHjDQBtGd2ezmKCnzrfSl2UNAs48=;
+	s=arc-20240116; t=1737145273; c=relaxed/simple;
+	bh=ROGQL94JJBV0KRhHzTN8QBzxRtcA0Nf5b5bj344qzLs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=njFOVHEiMaaoxRD3CMBGPRZsKUHOpTW/loQa4Lw5JpHSdGuvvOGzYihiRYyL1kuML5Bto56g+xF6X+9NBtk+ZGt6PW7omyErlRsOCgdb3aDHLkGrg4fhBLSes98v2ZwDh6R5SwQ0qpwAD06RQQ2JucAu2pZtT+13ZMOo4eC26AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=joSh6hxa; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=lP7/3DdwyK+WbdryLg1Im3i0H+4NB4CJhvcHUZTBTi+4qOgwISmwW2iH+qX1slS8xYfxb4dwsDVDZkdRnrkdQUBjkuV3Mo+DpLe81E2V8RCU+o1bSN+yNoZvwcoh44rUrmB65SFscRcaYT07BAmUkDdzxYPwd7ro+OZZoLPZMy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ivx4PVLh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="joSh6hxa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6723C4CEDD;
-	Fri, 17 Jan 2025 18:59:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ivx4PVLh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973A9C4CEDD;
+	Fri, 17 Jan 2025 20:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737140399;
-	bh=IIYH1QtR7cDugeuJHjDQBtGd2ezmKCnzrfSl2UNAs48=;
+	s=k20201202; t=1737145272;
+	bh=ROGQL94JJBV0KRhHzTN8QBzxRtcA0Nf5b5bj344qzLs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=joSh6hxauuVE4FpYIthWuQv5DdpHci197aOTrXTfzEBCq+bjPjfGIzjY7zYTVtwMU
-	 yTlM7A9G92IAuhHTskU2N678XNNbZzLxkLx31n8dgtq1TdtkxkF/j0/2zw6U7ibUt5
-	 4qstX46Kj7+ev5Hn1bAAGZvlYC5jZckbrA9BUL5Kyqo5jIVKAoG7nCwsTJJ/ckBY30
-	 fOPAqkP6b1+R1xknJ5ktv32Y1iMHPwz2Z8EmGpZUSvJLjKQKgAETIEgK5uiDPwGhJs
-	 Bn7wT2h49O3PTA4s9laS1OL1LdmHXtu/Jacx/XhvXbjD/o3IXkn+cxw93AwIkzu/j4
-	 DuK0ntuAaltMg==
-Received: by pali.im (Postfix)
-	id 366737A1; Fri, 17 Jan 2025 19:59:47 +0100 (CET)
-Date: Fri, 17 Jan 2025 19:59:47 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+	b=Ivx4PVLh7h2Q0UqMKxmRkBm5loPXAEio0SvK/FSvHIFEwDQDZVHE5oyFqnCA/ol8h
+	 cKcsEqjC7Vre1XXhoAdngnm22VpcKyd9jvjo84ty00DNJYtoniCGVJvUVPjUnh/TeT
+	 aNT5XpGCq3VMn2M1vYJRsjDZn8I8l6BautNG6utwYxNpcP6dVleekQiEEUwvWhyXqE
+	 C1L/XAzjJ8c7d0SoVXaoR0ZY2EUepbMghiNh8M9erao17PBEsinYMobyKjw39w/g1g
+	 yVp15TbpDb7xUhaobrksTMTmkDM/GK34jvHOuWSpe8PpBFKBRjBMo+y7oxVXVmwdSt
+	 3ZIXXeAZZ+XTA==
+Date: Fri, 17 Jan 2025 12:21:12 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
 To: Amir Goldstein <amir73il@gmail.com>
-Cc: "Darrick J. Wong" <djwong@kernel.org>,
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>,
 	Chuck Lever <chuck.lever@oracle.com>,
 	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
 	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	xfs <linux-xfs@vger.kernel.org>
 Subject: Re: Immutable vs read-only for Windows compatibility
-Message-ID: <20250117185947.ylums2dhmo3j6hol@pali>
+Message-ID: <20250117202112.GH3561231@frogsfrogsfrogs>
 References: <cf0b8342-8a4b-4485-a5d1-0da20e6d14e7@oracle.com>
  <20250114211050.iwvxh7fon7as7sty@pali>
  <0659dfe1-e160-40fd-b95a-5d319ca3504f@oracle.com>
@@ -59,9 +58,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <CAOQ4uxhh1LDz5zXzqFENPhJ9k851AL3E7Xc2d7pSVVYX4Fu9Jw@mail.gmail.com>
-User-Agent: NeoMutt/20180716
 
-On Friday 17 January 2025 19:46:30 Amir Goldstein wrote:
+On Fri, Jan 17, 2025 at 07:46:30PM +0100, Amir Goldstein wrote:
 > > > Looking at the FILE_ATTRIBUTE_* flags defined in SMB protocol
 > > >  (fs/smb/common/smb2pdu.h) I wonder how many of them will be
 > > > needed for applications beyond the obvious ones that were listed.
@@ -91,28 +89,21 @@ On Friday 17 January 2025 19:46:30 Amir Goldstein wrote:
 > a user API to get/set those attributes for the filesystems that
 > already support them and possibly for vfs to enforce some of them
 > (e.g. READONLY) in generic code.
-
-Yes, you understood it correctly. I was asking for standardizing API how
-to get/set these attributes from userspace. And Chuck wrote that would
-like to have also standardized it for kernel consumers like nfsd or
-ksmbd. Which makes sense.
-
+> 
 > Nevertheless, I understand the confusion because I know there
 > is also demand for storing those attributes by file servers in a
 > standard way and for vfs to respect those attributes on the host.
-
-Userspace fileserver, like Samba, would just use that standardized
-userspace API for get/set attributes. And in-kernel fileservers like
-nfsd or ksmbd would like to use that API too.
-
-And there were some proposals how filesystems without native
-support for these attributes could store and preserve these attributes.
-So this can be a confusion in this email thread discussion.
-
+> 
 > Full disclosure - I have an out of tree xfs patch that implements
 > ioctls XFS_IOC_[GS]ETDOSATTRAT and stashes these
 > attributes in the unused di_dmevmask space.
-> 
+
+[cc linux-xfs]
+
+Urrrrk, please don't fork the xfs ondisk format!
+
+--D
+
 > Compared to the smb server alternative of storing those attributes
 > as xattrs on the server, this saves a *lot* of IO in an SMB file browsing
 > workload, where most of the inodes have large (ACL) xattrs that do
@@ -124,6 +115,4 @@ So this can be a confusion in this email thread discussion.
 > 
 > Thanks,
 > Amir.
-
-So you would also benefit from standardizing of API for these attributes
-as then you could implement that API for xfs.
+> 
