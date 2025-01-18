@@ -1,167 +1,403 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE82ABA38;
-	Sat, 18 Jan 2025 19:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C9614A627
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Jan 2025 20:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737228803; cv=none; b=OYt/bPT2AW/QzRgTsTJ87aiIOXQaLE1WYLcmpGhF7+ynI84o9N4kf4xOZ8MrH/NXx49e45hrlP031C4cTcwRHJoIyWgzX/T0BsykGxu8nafjwAq9zDSfRq/RKRHHe96UYDkx/6gxuVPfgcXnnlA0LYjSPcnNwL2hmJPlGgDBpeE=
+	t=1737230665; cv=none; b=flbatzWqeYj7W6GeVH5lwVqJ6M6HnyvIf5sXqkxA3dpykU4BQQvV3M+9o7xI6/J5f6AQeTLfCPiqKSWot0kDvKXU/Mp9sGcPh8K4jRDCezwFiYke3EZzg8+agvMj4QNWXEenEPvYu+Glu5y8FV49aGm8Ep2j8G+DH6dTV0Yq0sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737228803; c=relaxed/simple;
-	bh=if3Vo/AO41fvcq7LdIiUh4BYn57++aZ+yERLCW84m/Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ICZKS4hdnkKWDEnKwSusMlzkAoPU/mDgg58t0b5ChIQT664TRk9l5H85dz1/v1TtbSxwCI/fa+ej+2iG1lvB+NEJaA3EUCFtEQbMOMRlICaGP5CG0zjj2WsisLId5f0cWeUsSptCwcKGRwXV5N78Tkd/C0u1F2sGmkMIpG3NBrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hoISdcwq; arc=none smtp.client-ip=209.85.167.52
+	s=arc-20240116; t=1737230665; c=relaxed/simple;
+	bh=RhdgjStzVBqlo1m5evFdbM5745CIGO0VbOc67EK8h/Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NUTbI5IxdzZgJYs25ZrzTI50Wm0vv7OkRb9t5B87U2kRJryWj4y0A9/28t4uU8Zpi7R6YTnWJBSA0io7+OAZYsiqAJJDFBi8p97ESmym6ji9jwXLVr9m0BjBYz1JSUTKyXpELLpa387aRPFOWRxI75Bgk3AgUDBiYbIUmT2fsxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LSca1tbI; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hoISdcwq"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-54021daa6cbso3461069e87.0;
-        Sat, 18 Jan 2025 11:33:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LSca1tbI"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43622267b2eso31281225e9.0
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Jan 2025 12:04:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737228800; x=1737833600; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W7Oyn69SMQEPAtr/12a6Ym0htpFikla3Rih6I5+rYZ0=;
-        b=hoISdcwqhxoz2U2nFj1V9VFAUWIsm59D3BWbcH000Yo0OQpmX9SafgivHATkZlAPcF
-         FMGsBS2OyDxZKsnHcZkPGokN8AbX1UDgT0ZgApVF22hb4jbm1ilWMqFcqvszpWYdbh71
-         sPCywiuesIHD3rQUcAeebjdF94QLVy2ZhKxl2YFHFjFwJlk6ksdMyp5EYV5CLpsMiiiD
-         lLKYIHwHMyypROQR0cPHfcV099nn6nKGo3DjAaWqB+BXC0Hb7R3ehExxGsOttu89t7Sy
-         76lqWKbdGoaJeCvh4K8nBI9ewC/kcJ1ChhYUKtLNbE0Xi+hIRcZPqy1cYu6pOYK8wOEL
-         nhHg==
+        d=gmail.com; s=20230601; t=1737230661; x=1737835461; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XBADp6g93ZWQfjmIVv+lg8DGdk1UNRD39g0JZ3QtEoo=;
+        b=LSca1tbIhuXBmU4Z1FiP+ramOylkZBgJvL+9/FfafIDthH6we4d56ssPzcNll+TK66
+         lrEi6xKmrJt53DrF0nLoMBvqsnPWjrv1pPicj3XvgePhyuo1Yq5Y9lgKSd40AZx0QrUg
+         LXHSnWGf5KiOgUn9za7FGfuDQbofVNO127Of6pjyzSuf6irqNgHfFg+oJ/bC+1bY2MHq
+         CcE3dLHM7IERxI9U3eJPGBjQ7cDRZkvb7Ba09u+pafBE5jRA+s9H3itXSkZgHEvH6C0E
+         rkhQ/nTd/2E/2mIa3pYYnle/oobqPI4qqXVy1DhhKlVB+XtTAD19tOh2krpfbVbVtkS5
+         ksBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737228800; x=1737833600;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W7Oyn69SMQEPAtr/12a6Ym0htpFikla3Rih6I5+rYZ0=;
-        b=JZUl7Tcpzbna9wOZJxoDEstoNA6kIgus9BNxeJnPWwkRrrFUXV+YLTDpYD02KXRnMY
-         6xpIPAr1VoUiIA9I26ObRKmRgADIjL40XilukPYe6Dqxf82dIYifcRJT1c3DoPaV0O4f
-         O8JUSxbx0FdpQielSHyrSwEta7no2JwKh6LmhT4kDhi6EK1g5GutGBIl2gq2brN9Ko5u
-         sVHQ4YrJmu64EeR3wtaYrcXOQayZIUowH7jM3gMLPLf/Ic6NkKiRNfHmLzaWexFdx9s4
-         PDpSu7wCTWe9v/SLBgUdlKwFUMDBhcU/NEf42mPJ0+b3VkfColrFyKbNUR+foVO6NtI5
-         femw==
-X-Forwarded-Encrypted: i=1; AJvYcCUl1Azwi56zTW/qKCbZ+CzFAe23zNc0Q5XuneZE2DzJA+xoRzClMXZfGdsUmDEOjIzqP+ZfJsI8H9ho@vger.kernel.org, AJvYcCXp5MCCfIz9E1rrRHIeNbIfdBdbev1TanaUiIfO1JzD3Di5+HoBOz1XIvxpDY7Tjtm40qf3uc/2EVEbZQik@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+TeofbfLhRZwE4nBhL+/cPWhRmkyTDuYyedi9SOfnAslIcbfv
-	ANYRcpeBBt6JyGx6fwMdpmgc3UPD9XSnWKA8x599uadbcwtVOC/Yzz1SVCzemGX8VHi6bL9eDFf
-	Fy+zeGqDM3erIzHC0ibqgne2/LyI=
-X-Gm-Gg: ASbGncvgTv9kvh3JPRRffoSvqmk6AF45Y49yIYCcvwRrORB1Ed8b+1sU/DeI00mlpaj
-	wJUltIavGP5D4AR/x2Ujk5UMOQCuAeBjIKisFrVVRSdQ/JI3F2Zym+v5SGlrIB3MdkLDUHJMJBj
-	9glxRWAKbPRw==
-X-Google-Smtp-Source: AGHT+IHJ6JyE2OP7a6OtC0Dftnxkf2oOPfTsXgGG6YaJAXL6ZXgHC9MMSBipkVIRmXQRU5RSL+9XvXY/4Rj+DU85MBI=
-X-Received: by 2002:a05:6512:b94:b0:542:7217:361a with SMTP id
- 2adb3069b0e04-5439c22c3bemr2154552e87.10.1737228799599; Sat, 18 Jan 2025
- 11:33:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737230661; x=1737835461;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XBADp6g93ZWQfjmIVv+lg8DGdk1UNRD39g0JZ3QtEoo=;
+        b=qsSp8l57UMQqp/a+mAV/9OCTnKm5AqHvMDawQJvH1vklLX5uHTyr93BsRL/JuhY4Qa
+         +dHOHdwan4mxbeIG0BhnbiC9yN84VftEH3eF3DhX2ALCpr5Qa647/n5j+ZnsaL+7cfNE
+         OljB6JkovsXo1kIkr53Upb/uujUHT9ajCiyKVZUJ9zmUq/JWqHssr8N0dtecEOWWivVC
+         HVu34H9qTcqbKeLLhz7Brvv1MJj4n7MKQIis1xD0ntqzVeOtSQyPgE/CXt9b/8oxJwPy
+         JQ5x0Gh7pHesvkO4RmXkCnhKoHr1uBCvCaJDh7ludBSxf5lh84S2wOQJip3pRkgd3gZY
+         6YAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUmaOes/s0ZpalPFWyoQfWGcIwbFp2qCLeJ5Tqk2bj8O6u7s0hwGDdX16qKLWd4u4rX4KvXuW0ClA3w@vger.kernel.org
+X-Gm-Message-State: AOJu0YyemIAQrb7poktknCtUymobSROAsgFg8Xr/N85JBiZp/Y0t87+8
+	Z21bSSBE2DX/yBbw7fYvy3mqlO+5TuNkL6MWYj262WVotval235j
+X-Gm-Gg: ASbGncuqzDyUIXNMUU/qVKuPUwm7Tku9v+Z6aIV8sJpQIk6K3Vg9X74FsxQd0c+1/OI
+	2nmv8lnCU+1rOYwikFCQ3et7qVYyqhYSJiq+XoMeaJ2Q9MfN6imEYsOnIqbaedhrxYSbhmJ30Xk
+	pxLZEhyiSkC4/Z9P9z+3LGpkLYd1qJ+heJIf1nLzM+AUoysocw0eT5MOwG+kzGxO3Qo1WXC9TK7
+	Xus8+MbHGwR4G0G/3PLhZ5WNJ1mYP6ZZPWOfy3j46jy5N/XFWjwRZSJss1BzfXCp8eYT5uK/u1u
+	WDM=
+X-Google-Smtp-Source: AGHT+IEbettSL2aivUM7xzh0We2E6IcWPbek5Tbq8C2pRdifr51bEN8tgofFudLheBOrYQdZ6pqOlg==
+X-Received: by 2002:a05:600c:1e1e:b0:434:ffb2:f9df with SMTP id 5b1f17b1804b1-438913f0a7amr75023575e9.17.1737230661407;
+        Sat, 18 Jan 2025 12:04:21 -0800 (PST)
+Received: from localhost.home ([2a02:a03f:e6d8:fc01:121f:74ff:fe57:106])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3214fbdsm6081235f8f.19.2025.01.18.12.04.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Jan 2025 12:04:21 -0800 (PST)
+From: Ruben Devos <devosruben6@gmail.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	Ruben Devos <devosruben6@gmail.com>
+Subject: [PATCH] smb: client: fix order of arguments of tracepoints
+Date: Sat, 18 Jan 2025 21:03:30 +0100
+Message-ID: <20250118200330.21020-1-devosruben6@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250118123528.3342182-1-buaajxlj@163.com>
-In-Reply-To: <20250118123528.3342182-1-buaajxlj@163.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 18 Jan 2025 13:33:07 -0600
-X-Gm-Features: AbW1kvYHBHgsZWI7BzBH9WuuK9Af-17TbFKMiC9niwz7OStv8ibFhtcy--ryEUQ
-Message-ID: <CAH2r5muQG67z3MEh2gp_Ww=yv1AAZxHORydR9x0ABCeufUjfWQ@mail.gmail.com>
-Subject: Re: [PATCH v2] smb: client: correctly handle ErrorContextData as a
- flexible array
-To: Liang Jie <buaajxlj@163.com>
-Cc: sfrench@samba.org, tom@talpey.com, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, fanggeng@lixiang.com, 
-	yangchen11@lixiang.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	Liang Jie <liangjie@lixiang.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-updated patch in for-next now
+The tracepoints based on smb3_inf_compound_*_class have tcon id and
+session id swapped around. This results in incorrect output in
+`trace-cmd report`.
 
+Fix the order of arguments to resolve this issue. The trace-cmd output
+below shows the before and after of the smb3_delete_enter and
+smb3_delete_done events as an example. The smb3_cmd_* events show the
+correct session and tcon id for reference.
 
-On Sat, Jan 18, 2025 at 6:37=E2=80=AFAM Liang Jie <buaajxlj@163.com> wrote:
->
-> From: Liang Jie <liangjie@lixiang.com>
->
-> The `smb2_symlink_err_rsp` structure was previously defined with
-> `ErrorContextData` as a single `__u8` byte. However, the `ErrorContextDat=
-a`
-> field is intended to be a variable-length array based on `ErrorDataLength=
-`.
-> This mismatch leads to incorrect pointer arithmetic and potential memory
-> access issues when processing error contexts.
->
-> Updates the `ErrorContextData` field to be a flexible array
-> (`__u8 ErrorContextData[]`). Additionally, it modifies the corresponding
-> casts in the `symlink_data()` function to properly handle the flexible
-> array, ensuring correct memory calculations and data handling.
->
-> These changes improve the robustness of SMB2 symlink error processing.
->
-> Signed-off-by: Liang Jie <liangjie@lixiang.com>
-> Suggested-by: Tom Talpey <tom@talpey.com>
-> ---
->
-> Changes in v2:
-> - Add the __counted_by_le attribute to reference the ErrorDataLength prot=
-ocol field.
-> - Link to v1: https://lore.kernel.org/all/20250116072948.682402-1-buaajxl=
-j@163.com/
->
->  fs/smb/client/smb2file.c | 4 ++--
->  fs/smb/client/smb2pdu.h  | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-> index e836bc2193dd..9ec44eab8dbc 100644
-> --- a/fs/smb/client/smb2file.c
-> +++ b/fs/smb/client/smb2file.c
-> @@ -42,14 +42,14 @@ static struct smb2_symlink_err_rsp *symlink_data(cons=
-t struct kvec *iov)
->                 end =3D (struct smb2_error_context_rsp *)((u8 *)err + iov=
-->iov_len);
->                 do {
->                         if (le32_to_cpu(p->ErrorId) =3D=3D SMB2_ERROR_ID_=
-DEFAULT) {
-> -                               sym =3D (struct smb2_symlink_err_rsp *)&p=
-->ErrorContextData;
-> +                               sym =3D (struct smb2_symlink_err_rsp *)p-=
->ErrorContextData;
->                                 break;
->                         }
->                         cifs_dbg(FYI, "%s: skipping unhandled error conte=
-xt: 0x%x\n",
->                                  __func__, le32_to_cpu(p->ErrorId));
->
->                         len =3D ALIGN(le32_to_cpu(p->ErrorDataLength), 8)=
-;
-> -                       p =3D (struct smb2_error_context_rsp *)((u8 *)&p-=
->ErrorContextData + len);
-> +                       p =3D (struct smb2_error_context_rsp *)(p->ErrorC=
-ontextData + len);
->                 } while (p < end);
->         } else if (le32_to_cpu(err->ByteCount) >=3D sizeof(*sym) &&
->                    iov->iov_len >=3D SMB2_SYMLINK_STRUCT_SIZE) {
-> diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
-> index 076d9e83e1a0..3c09a58dfd07 100644
-> --- a/fs/smb/client/smb2pdu.h
-> +++ b/fs/smb/client/smb2pdu.h
-> @@ -79,7 +79,7 @@ struct smb2_symlink_err_rsp {
->  struct smb2_error_context_rsp {
->         __le32 ErrorDataLength;
->         __le32 ErrorId;
-> -       __u8  ErrorContextData; /* ErrorDataLength long array */
-> +       __u8  ErrorContextData[] __counted_by_le(ErrorDataLength);
->  } __packed;
->
->  /* ErrorId values */
-> --
-> 2.25.1
->
->
+Also fix tracepoint set -> get in the SMB2_OP_GET_REPARSE case.
 
+BEFORE:
+rm-2211  [001] .....  1839.550888: smb3_delete_enter:    xid=281 sid=0x5 tid=0x3d path=\hello2.txt
+rm-2211  [001] .....  1839.550894: smb3_cmd_enter:        sid=0x1ac000000003d tid=0x5 cmd=5 mid=61
+rm-2211  [001] .....  1839.550896: smb3_cmd_enter:        sid=0x1ac000000003d tid=0x5 cmd=6 mid=62
+rm-2211  [001] .....  1839.552091: smb3_cmd_done:         sid=0x1ac000000003d tid=0x5 cmd=5 mid=61
+rm-2211  [001] .....  1839.552093: smb3_cmd_done:         sid=0x1ac000000003d tid=0x5 cmd=6 mid=62
+rm-2211  [001] .....  1839.552103: smb3_delete_done:     xid=281 sid=0x5 tid=0x3d
 
---
-Thanks,
+AFTER:
+rm-2501  [001] .....  3237.656110: smb3_delete_enter:    xid=88 sid=0x1ac0000000041 tid=0x5 path=\hello2.txt
+rm-2501  [001] .....  3237.656122: smb3_cmd_enter:        sid=0x1ac0000000041 tid=0x5 cmd=5 mid=84
+rm-2501  [001] .....  3237.656123: smb3_cmd_enter:        sid=0x1ac0000000041 tid=0x5 cmd=6 mid=85
+rm-2501  [001] .....  3237.657909: smb3_cmd_done:         sid=0x1ac0000000041 tid=0x5 cmd=5 mid=84
+rm-2501  [001] .....  3237.657909: smb3_cmd_done:         sid=0x1ac0000000041 tid=0x5 cmd=6 mid=85
+rm-2501  [001] .....  3237.657922: smb3_delete_done:     xid=88 sid=0x1ac0000000041 tid=0x5
 
-Steve
+Signed-off-by: Ruben Devos <devosruben6@gmail.com>
+---
+ fs/smb/client/dir.c       |   6 +--
+ fs/smb/client/smb2inode.c | 108 +++++++++++++++++++-------------------
+ 2 files changed, 57 insertions(+), 57 deletions(-)
+
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 864b194dbaa0..1822493dd084 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -627,7 +627,7 @@ int cifs_mknod(struct mnt_idmap *idmap, struct inode *inode,
+ 		goto mknod_out;
+ 	}
+ 
+-	trace_smb3_mknod_enter(xid, tcon->ses->Suid, tcon->tid, full_path);
++	trace_smb3_mknod_enter(xid, tcon->tid, tcon->ses->Suid, full_path);
+ 
+ 	rc = tcon->ses->server->ops->make_node(xid, inode, direntry, tcon,
+ 					       full_path, mode,
+@@ -635,9 +635,9 @@ int cifs_mknod(struct mnt_idmap *idmap, struct inode *inode,
+ 
+ mknod_out:
+ 	if (rc)
+-		trace_smb3_mknod_err(xid,  tcon->ses->Suid, tcon->tid, rc);
++		trace_smb3_mknod_err(xid,  tcon->tid, tcon->ses->Suid, rc);
+ 	else
+-		trace_smb3_mknod_done(xid, tcon->ses->Suid, tcon->tid);
++		trace_smb3_mknod_done(xid, tcon->tid, tcon->ses->Suid);
+ 
+ 	free_dentry_path(page);
+ 	free_xid(xid);
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index a55f0044d30b..274672755c19 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -298,8 +298,8 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_query_info_compound_enter(xid, ses->Suid,
+-							     tcon->tid, full_path);
++			trace_smb3_query_info_compound_enter(xid, tcon->tid,
++							     ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_POSIX_QUERY_INFO:
+ 			rqst[num_rqst].rq_iov = &vars->qi_iov;
+@@ -334,18 +334,18 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_posix_query_info_compound_enter(xid, ses->Suid,
+-								   tcon->tid, full_path);
++			trace_smb3_posix_query_info_compound_enter(xid, tcon->tid,
++								   ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_DELETE:
+-			trace_smb3_delete_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_delete_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_MKDIR:
+ 			/*
+ 			 * Directories are created through parameters in the
+ 			 * SMB2_open() call.
+ 			 */
+-			trace_smb3_mkdir_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_mkdir_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_RMDIR:
+ 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
+@@ -363,7 +363,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			smb2_set_next_command(tcon, &rqst[num_rqst]);
+ 			smb2_set_related(&rqst[num_rqst++]);
+-			trace_smb3_rmdir_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_rmdir_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_SET_EOF:
+ 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
+@@ -398,7 +398,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_set_eof_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_set_eof_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_SET_INFO:
+ 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
+@@ -429,8 +429,8 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_set_info_compound_enter(xid, ses->Suid,
+-							   tcon->tid, full_path);
++			trace_smb3_set_info_compound_enter(xid, tcon->tid,
++							   ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_RENAME:
+ 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
+@@ -469,7 +469,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_rename_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_rename_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_HARDLINK:
+ 			rqst[num_rqst].rq_iov = &vars->si_iov[0];
+@@ -496,7 +496,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			smb2_set_next_command(tcon, &rqst[num_rqst]);
+ 			smb2_set_related(&rqst[num_rqst++]);
+-			trace_smb3_hardlink_enter(xid, ses->Suid, tcon->tid, full_path);
++			trace_smb3_hardlink_enter(xid, tcon->tid, ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_SET_REPARSE:
+ 			rqst[num_rqst].rq_iov = vars->io_iov;
+@@ -523,8 +523,8 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_set_reparse_compound_enter(xid, ses->Suid,
+-							      tcon->tid, full_path);
++			trace_smb3_set_reparse_compound_enter(xid, tcon->tid,
++							      ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_GET_REPARSE:
+ 			rqst[num_rqst].rq_iov = vars->io_iov;
+@@ -549,8 +549,8 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				goto finished;
+ 			}
+ 			num_rqst++;
+-			trace_smb3_get_reparse_compound_enter(xid, ses->Suid,
+-							      tcon->tid, full_path);
++			trace_smb3_get_reparse_compound_enter(xid, tcon->tid,
++							      ses->Suid, full_path);
+ 			break;
+ 		case SMB2_OP_QUERY_WSL_EA:
+ 			rqst[num_rqst].rq_iov = &vars->ea_iov;
+@@ -656,11 +656,11 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 			}
+ 			SMB2_query_info_free(&rqst[num_rqst++]);
+ 			if (rc)
+-				trace_smb3_query_info_compound_err(xid,  ses->Suid,
+-								   tcon->tid, rc);
++				trace_smb3_query_info_compound_err(xid,  tcon->tid,
++								   ses->Suid, rc);
+ 			else
+-				trace_smb3_query_info_compound_done(xid, ses->Suid,
+-								    tcon->tid);
++				trace_smb3_query_info_compound_done(xid, tcon->tid,
++								    ses->Suid);
+ 			break;
+ 		case SMB2_OP_POSIX_QUERY_INFO:
+ 			idata = in_iov[i].iov_base;
+@@ -683,15 +683,15 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 			SMB2_query_info_free(&rqst[num_rqst++]);
+ 			if (rc)
+-				trace_smb3_posix_query_info_compound_err(xid,  ses->Suid,
+-									 tcon->tid, rc);
++				trace_smb3_posix_query_info_compound_err(xid,  tcon->tid,
++									 ses->Suid, rc);
+ 			else
+-				trace_smb3_posix_query_info_compound_done(xid, ses->Suid,
+-									  tcon->tid);
++				trace_smb3_posix_query_info_compound_done(xid, tcon->tid,
++									  ses->Suid);
+ 			break;
+ 		case SMB2_OP_DELETE:
+ 			if (rc)
+-				trace_smb3_delete_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_delete_err(xid, tcon->tid, ses->Suid, rc);
+ 			else {
+ 				/*
+ 				 * If dentry (hence, inode) is NULL, lease break is going to
+@@ -699,59 +699,59 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				 */
+ 				if (inode)
+ 					cifs_mark_open_handles_for_deleted_file(inode, full_path);
+-				trace_smb3_delete_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_delete_done(xid, tcon->tid, ses->Suid);
+ 			}
+ 			break;
+ 		case SMB2_OP_MKDIR:
+ 			if (rc)
+-				trace_smb3_mkdir_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_mkdir_err(xid, tcon->tid, ses->Suid, rc);
+ 			else
+-				trace_smb3_mkdir_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_mkdir_done(xid, tcon->tid, ses->Suid);
+ 			break;
+ 		case SMB2_OP_HARDLINK:
+ 			if (rc)
+-				trace_smb3_hardlink_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_hardlink_err(xid,  tcon->tid, ses->Suid, rc);
+ 			else
+-				trace_smb3_hardlink_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_hardlink_done(xid, tcon->tid, ses->Suid);
+ 			SMB2_set_info_free(&rqst[num_rqst++]);
+ 			break;
+ 		case SMB2_OP_RENAME:
+ 			if (rc)
+-				trace_smb3_rename_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_rename_err(xid, tcon->tid, ses->Suid, rc);
+ 			else
+-				trace_smb3_rename_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_rename_done(xid, tcon->tid, ses->Suid);
+ 			SMB2_set_info_free(&rqst[num_rqst++]);
+ 			break;
+ 		case SMB2_OP_RMDIR:
+ 			if (rc)
+-				trace_smb3_rmdir_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_rmdir_err(xid, tcon->tid, ses->Suid, rc);
+ 			else
+-				trace_smb3_rmdir_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_rmdir_done(xid, tcon->tid, ses->Suid);
+ 			SMB2_set_info_free(&rqst[num_rqst++]);
+ 			break;
+ 		case SMB2_OP_SET_EOF:
+ 			if (rc)
+-				trace_smb3_set_eof_err(xid,  ses->Suid, tcon->tid, rc);
++				trace_smb3_set_eof_err(xid, tcon->tid, ses->Suid, rc);
+ 			else
+-				trace_smb3_set_eof_done(xid, ses->Suid, tcon->tid);
++				trace_smb3_set_eof_done(xid, tcon->tid, ses->Suid);
+ 			SMB2_set_info_free(&rqst[num_rqst++]);
+ 			break;
+ 		case SMB2_OP_SET_INFO:
+ 			if (rc)
+-				trace_smb3_set_info_compound_err(xid,  ses->Suid,
+-								 tcon->tid, rc);
++				trace_smb3_set_info_compound_err(xid,  tcon->tid,
++								 ses->Suid, rc);
+ 			else
+-				trace_smb3_set_info_compound_done(xid, ses->Suid,
+-								  tcon->tid);
++				trace_smb3_set_info_compound_done(xid, tcon->tid,
++								  ses->Suid);
+ 			SMB2_set_info_free(&rqst[num_rqst++]);
+ 			break;
+ 		case SMB2_OP_SET_REPARSE:
+ 			if (rc) {
+-				trace_smb3_set_reparse_compound_err(xid,  ses->Suid,
+-								    tcon->tid, rc);
++				trace_smb3_set_reparse_compound_err(xid, tcon->tid,
++								    ses->Suid, rc);
+ 			} else {
+-				trace_smb3_set_reparse_compound_done(xid, ses->Suid,
+-								     tcon->tid);
++				trace_smb3_set_reparse_compound_done(xid, tcon->tid,
++								     ses->Suid);
+ 			}
+ 			SMB2_ioctl_free(&rqst[num_rqst++]);
+ 			break;
+@@ -764,18 +764,18 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				rbuf = reparse_buf_ptr(iov);
+ 				if (IS_ERR(rbuf)) {
+ 					rc = PTR_ERR(rbuf);
+-					trace_smb3_set_reparse_compound_err(xid,  ses->Suid,
+-									    tcon->tid, rc);
++					trace_smb3_get_reparse_compound_err(xid, tcon->tid,
++									    ses->Suid, rc);
+ 				} else {
+ 					idata->reparse.tag = le32_to_cpu(rbuf->ReparseTag);
+-					trace_smb3_set_reparse_compound_done(xid, ses->Suid,
+-									     tcon->tid);
++					trace_smb3_get_reparse_compound_done(xid, tcon->tid,
++									     ses->Suid);
+ 				}
+ 				memset(iov, 0, sizeof(*iov));
+ 				resp_buftype[i + 1] = CIFS_NO_BUFFER;
+ 			} else {
+-				trace_smb3_set_reparse_compound_err(xid, ses->Suid,
+-								    tcon->tid, rc);
++				trace_smb3_get_reparse_compound_err(xid, tcon->tid,
++								    ses->Suid, rc);
+ 			}
+ 			SMB2_ioctl_free(&rqst[num_rqst++]);
+ 			break;
+@@ -792,11 +792,11 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				}
+ 			}
+ 			if (!rc) {
+-				trace_smb3_query_wsl_ea_compound_done(xid, ses->Suid,
+-								      tcon->tid);
++				trace_smb3_query_wsl_ea_compound_done(xid, tcon->tid,
++								      ses->Suid);
+ 			} else {
+-				trace_smb3_query_wsl_ea_compound_err(xid, ses->Suid,
+-								     tcon->tid, rc);
++				trace_smb3_query_wsl_ea_compound_err(xid, tcon->tid,
++								     ses->Suid, rc);
+ 			}
+ 			SMB2_query_info_free(&rqst[num_rqst++]);
+ 			break;
+-- 
+2.48.1
+
