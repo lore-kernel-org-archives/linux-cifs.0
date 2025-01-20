@@ -1,42 +1,41 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A3E1E98E6
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Jan 2025 16:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B098364D6
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Jan 2025 17:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737389435; cv=none; b=u3Vs5YKZfCT9rF4g/2OsJcjwsrgw23gLB+mytOmdJN0wz/M7hqB8OCqfvll65mMvN3BvCsEEzTmkSSQd48q3E16fzhaQfXSaqEkc7ygpB7B1hF2JVXSR+zbt/vEfI97nAmrHRdllYHSO/+kJkTmadTegS7P6mIWN2BXptHfMvQY=
+	t=1737395550; cv=none; b=tNaO+raDi5oWZy/oEC+BYQCV4KtE0fP7SnI+8ITl6pX3+5YR4SiUp6bwgq3+e9TrII4W7m+jGuv8eTvaDrYEpzDA12HMzbgwrTnIT0sMAbjpFvccMr5GwVAfwk0Z0xzLeD+GRdkMXmhlaYgMgJReNP8Bfj/5LHadjxIpOR8A+xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737389435; c=relaxed/simple;
-	bh=g22e7q7lKgVEJppwDOqdSri3PqdSTKjIrstI42+2FGA=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=sCTb/vozal1wGUGmYhGYIJPLhGcNbjvfAwpjBrmeuIEvyz4TSC5bsOB0raCiEJvJPVxLxhGGpX3V8fGXJVhxGL8c3wZzT8hqrYEZTJsrq6qF1xlMZzXWgLOI/mIXtrYrK+zeSPI32WKEnMRu27NyAQU9fT9aBqoXkVgaCUAmSks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=lz5Sk6CJ; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1737395550; c=relaxed/simple;
+	bh=nJQKCKVr35wPoNLV0N4tHd8YT1d/+rf8JEYkiP67DFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1JcoERqNQ34B0iRrn1aAisc0Ok7D5c6EGF7IwXNQ8l1HDjfTbAna422mrdCe1+QSnxjHgI77maq49oWlnRkxOKXnJXhL4G5Q90QCxmbJfP4aQAHVe0qKAM4+INAq+s51qjJkwJ0P7NDR08bv/UiQEGQ9rWdrqHFLusXoPN09Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Shjvgwh6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="lz5Sk6CJ"
-Message-ID: <92333abc251f433ebe5e0cca280f7426@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1737389431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ssa04VaK2gDCqVOJlUDTxDLMsdArumRoyKPJHdM2vQE=;
-	b=lz5Sk6CJDKaEJWOn1bRTmbskZeIGYKrWA4iaElKpy5H/zAKZarc6wKTZEb6L5NsxJLC3rg
-	w3Ok4us1lkSSGVxyr67ICGpEcrdbweype9Z6ryh+Bjtw6GD3EfPUr/TxIT95Z814bQCvGt
-	s+/eMyVIOoDz//JMzhHaiZLuPn+CQDt2hihS4p/iyTC7Ipd2d/i/kfzPJ2CIN8XF+af2LZ
-	MEsQkuvPZERtYuHwUvwiEf+qlGJBO5/xtcnUVT0RFZk+E7/BICfJHTRICUB9QvbaFYwZcV
-	XvQODBYoWZvJLO9MUbncXQY8d13PnmbAvOCcBBO1trtTx4eTk++tYxWYu2O31g==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Pavel Shilovsky
- <pshilovsky@samba.org>
-Cc: linux-cifs@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH cifs-utils] cldap_ping.c: add missing <sys/types.h> include
-In-Reply-To: <20241226204235.2311371-1-thomas.petazzoni@bootlin.com>
-References: <20241226204235.2311371-1-thomas.petazzoni@bootlin.com>
-Date: Mon, 20 Jan 2025 13:10:28 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Shjvgwh6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 817A7C4CEDD;
+	Mon, 20 Jan 2025 17:52:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737395549;
+	bh=nJQKCKVr35wPoNLV0N4tHd8YT1d/+rf8JEYkiP67DFE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Shjvgwh6jy5+Wd2fxYm9acQOO1MwgFdpwiKWSBoqOMyHhqLNb3ojmUipwDPOCQHO4
+	 6BrbAZGZKApBQenqnDflc8iQPENyspi/nRwIl7hTzKso6/hjQKSGRVURUQZuNnhcNL
+	 F3FQjRvYdRUm5CSU51B/biJRyiRmDHLpul8+7IRjX/mQIPPOcVx0pTwEYr8XeHf62+
+	 +0Lra4Vdm+69xRBIXHQ8oMhvdZbKre3KMEf6PaX+W/aTWv4+7QGIj/g3ccCULp0Srr
+	 qL780sYYCntT+mtpNO6f4qI2BlfamAb/peQPoM+yzZS80RVd6EG1nQel5et3rtwYmA
+	 be5Fd8Kl5Xt5A==
+Received: by pali.im (Postfix)
+	id 53388A28; Mon, 20 Jan 2025 18:52:18 +0100 (CET)
+Date: Mon, 20 Jan 2025 18:52:18 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH 34/71] cifs: Set default Netbios RFC1001 server name to
+ hostname in UNC
+Message-ID: <20250120175218.jyq3iifulujggukp@pali>
+References: <CAH2r5mtOobiuE1v5Qf0JqEg7VttodHJy-95KFOyYHtVsx=bHfA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,23 +43,39 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mtOobiuE1v5Qf0JqEg7VttodHJy-95KFOyYHtVsx=bHfA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-Thomas Petazzoni <thomas.petazzoni@bootlin.com> writes:
+On Sunday 19 January 2025 19:38:23 Steve French wrote:
+> >Windows SMB servers (including SMB2+) which are working over RFC1001
+> >require that Netbios server name specified in RFC1001 Session Request
+> >packet is same as the UNC host name. Netbios server name can be already
+> >specified manually via -o servern= option.
+> >With this change the RFC1001 server name is set automatically by extracting
+> >the hostname from the mount source.
+> >
+> > Signed-off-by: Pali Rohár <pali@kernel.org>
+> 
+> Pali,
+> Is there a good way to simulate this with SMB2.1 or SMB3+ mount to Windows?
+> 
+> -- 
+> Thanks,
+> 
+> Steve
 
-> Fixes:
->
-> cldap_ping.c: In function =E2=80=98read_dns_string=E2=80=99:
-> cldap_ping.c:72:37: error: =E2=80=98u_char=E2=80=99 undeclared (first use=
- in this function)
->
-> when building with the musl C library, but even with glibc u_char is
-> defined in <sys/types.h>, it happens to work with glibc <sys/types.h>
-> gets included by another header.
->
-> Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-> ---
->  cldap_ping.c | 1 +
->  1 file changed, 1 insertion(+)
+Sure, it is very easy. Just call standard mount with -o port=139 option.
+For example:
 
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+mount //hostname/share /mnt/smb -t cifs -o vers=3.1.1,port=139
+
+And you can watch network traffic in wireshark.
+
+Just to note that for SMB 3.1.1 it is currently broken and other patches
+in this series are fixing it:
+https://lore.kernel.org/linux-cifs/20241222163050.24359-1-pali@kernel.org/t/#u
+
+Your mentioned change "cifs: Set default Netbios RFC1001 server name to
+hostname in UNC" is the last one in that patch series.
