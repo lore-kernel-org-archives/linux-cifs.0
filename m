@@ -1,57 +1,57 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618FD1D5CD4;
-	Thu, 23 Jan 2025 06:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C379413B7A3;
+	Thu, 23 Jan 2025 07:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737615212; cv=none; b=DNGRgjXGAEzbclXrnd0J2iodS/HpnGKpUpkvM9p9lBuOT69pjIFgJAhZp1U9ab+lUphCtRO4PkXQd14rn1zFcFcb5ajPxZ4iutUbvAsYTUuTbPJs72Bs+iOvhUPiy5e6gSbriYdhDfuROhqqjkbAhi3+NGi9zULPdYyxc2l9sHo=
+	t=1737616152; cv=none; b=nP4t7r1BpoZXIYzWBBA8YwXBzaq7aI3keWmQLZ9tLSYhNkIkLlPV18eHEe+MiO6HAvPfXRerD0FgDBXDH/kdn53wpJPZvTKe+Xs+864XCKaS60PcD56t7H4ydnwaU3iqUCW/WQ7+cqXc/0zyygPTu7FtrwtxRaqJx3AXJOgUtYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737615212; c=relaxed/simple;
-	bh=iBgkSky6fnbO1cLUZmadGZMAMVeosWRZe+rHHOBMW2Y=;
+	s=arc-20240116; t=1737616152; c=relaxed/simple;
+	bh=hbjrAXdHmfk7cv6vDQsnpOKhRGQn5VMaCqFvInWXzQ0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G/f5VoY+QcOGuzW5N2nO4xr79dUtHlOvYiqCIt4VJlN/tFyjcia/buczCzkOG6OC3sdwFMoV5FVaVW7K9pKvzKraFL9gs8Vr8dPsi8/WJRssTRfLub8oqTNSsACjwiDBo28i8PMdZT6nWnxHgjg2QxBjauw4Jq4CeRUHa7tuBxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VghAnNyr; arc=none smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=AX76sf2LPdSYW2oldBt3eF22ZzYTFEDF6sji84YclQ1YfEP4BPrbSett7Xi3QN2XfztTgmlvZbV5kfMUGxJNfESdTCgLCbkRYy2XrjSlNFfPbtatgOAHjkimE8usO61a1zKOzUuJU4KK6yYPT1JSjKGaP9wMeaM55Tkxtww7oL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QayW0I3J; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VghAnNyr"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-54298ec925bso691284e87.3;
-        Wed, 22 Jan 2025 22:53:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QayW0I3J"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5401bd6cdb7so634762e87.2;
+        Wed, 22 Jan 2025 23:09:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737615208; x=1738220008; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737616149; x=1738220949; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wnPSsUQ0qfEEwNc+lgHzstM/XyUR94iwMM2Qt9glQkQ=;
-        b=VghAnNyrYxo012hnauL8CcyQH7DndCJIfiTgXP+5LCOqyKzuibrqVIAPOkJNPWFh8b
-         5c/DrkRwCPTuoY0uWxi3rvQN55G2ZQ2AX3w+RoVZVyIInM13phrXErXBpNGEJAoeZH6W
-         oAOT50QT6NmgUt4L6d3ajEWa7FQKBcKc9j8VceucsQtn6LE8ZcGWu5RmSAwR+HZeU6P3
-         Fqtvg2FMx9/SUr5XyIfQuSfASX13dwokBi5BJz7CV6RNz+m/s7B60bDs5wLbz1hAkoCI
-         sB0/rGsbSzNt+n54XfTT+WysTc9+hDLF9fNnaqJSo7MeuJXyjXDu9C9rA/Jw3W/gVygM
-         51IQ==
+        bh=H4rkMsWW0RDeeD8nJ39BOxr84N8T1/wgbed1XpzG2QI=;
+        b=QayW0I3JGsxYQCtQAmFMCuY3gME6g5F6bT+L7TU/P4U2EIpjw4ELD3o8tRtYnlhp3l
+         EQEZTkZS7L5U22c/i2bkSnrNfX3YXzFRTQ0FA18PYJ8E3WbZJTboWWoxkX085dEeaf2h
+         XwcOJtMlD0L2KQ+oK/uRar0xhEG8jq8OvNOnHsYVng3/KstdSkXJMY3/Afi6PstxVMql
+         zqfSe8xhq8xwgiNibnFtKEyk0ThNzEzQUcGuS56pKv3SZKo8mRSFXRGz7/rpZ8POKuTt
+         fsRSv7ag2vs9NokLJcy8vMTbFFbKV7L+f9lMjY0Bd4KmHjE1AO8ur9e7QJaacnjjjcuT
+         I4/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737615208; x=1738220008;
+        d=1e100.net; s=20230601; t=1737616149; x=1738220949;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wnPSsUQ0qfEEwNc+lgHzstM/XyUR94iwMM2Qt9glQkQ=;
-        b=coUOLLDgLF1qDQXnzopOJ/O9KeFLSNCQ1hN9cB8z1397pnx1jYoCR2B6astHXhKGhi
-         raSOhGGBtRbqnioZJTAkxKhtJixEehxS6FzwYp0hHAssAwcWR1967LUf7VOEQjzH5l+3
-         8DvWpKVy50+EKozjy6fA7yozpPcZCzkEnVKkFagKXkYYkBQlDQQn053EzbLGulm/5giG
-         1oXMLpci3DSSnj3ldP6UCwZ7rY6Xo4tsBWSTLJha6SubTW0hd5hAnkubPPSkNmZ1MJyb
-         PZLsg3J4fIR3oMLuHDNxAAzBe/opQK0a6A+Vzu9k+jL9yTyi48j5ga7ca7m6nmiL2GX/
-         5BZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkAygvlSHjbKKUg9IcTdlu4TbYUO2X4LCgLLeqtY9xUKT9ZRZtOhIDsG4DLVVEsF/lo6gIJCDCD0jbZ8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye/L012lZe9Usz5UqWFXBdYGGONSlRTXSWhcdPiuiDI52dJpmt
-	bWZ7GYoBOLYJ08GAzLawvYoldbcRxyp/JOEv8x9DYqW0YWPhUMoJhuvxIch8AqCNBY++6iCqJtR
-	MMUyXCNI95NTAZmgrnH4tBdyUyG4=
-X-Gm-Gg: ASbGncvn1RUIwiWU8X+MJ8pjySj/k+FVuYkBiOOc1fOqsM66VcVPf2ueIlyyeuKhnD5
-	FPdZr+JXFOsiR/wAlyvd/g4Ibc4VmQNSiNNZBl7u3C0IjGu0jz8+maphclJC6yw==
-X-Google-Smtp-Source: AGHT+IF8F07w0S0sNsKmMQTjAGqMV/xLgynuZ15VSkL7CPlZiC5SxcV4sPjb04nOxtNKsI/+PwthkxBiomhSagY93N0=
-X-Received: by 2002:ac2:4acb:0:b0:540:1a0c:9ba6 with SMTP id
- 2adb3069b0e04-5439c282d2bmr7418190e87.34.1737615208148; Wed, 22 Jan 2025
- 22:53:28 -0800 (PST)
+        bh=H4rkMsWW0RDeeD8nJ39BOxr84N8T1/wgbed1XpzG2QI=;
+        b=PHxhw4fKBHi1KOkSzMAUUiik0myFkG3pJY1y6qmjAVonYSOKByxAhN5wMMnrnvY6+v
+         8aNnfRvvgCbdMtp+xVgjwn8P4kZ+wnyKyzWA+hjQhv9e7bzGML0r57v/tGQXg6E+QHsJ
+         Vxq6erGAFuVcyww71iBdgZ9UE4QxeFaqHbFtZMpArse1dbGadELW7DvlDxJfHT1XOutQ
+         LmPfi71wStuhPMeh+02VSyKG6115RlAxM5cuH1bTb/ctqowtgq2m7zrxIcbSpcfcqG6G
+         wNSWk+r+mSkuydeEtv0umqndnXvqBBcBpa3CHwEuBGI2ufLB9n8UcxbcDPKDZiRvkQ+p
+         ms9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWVQ6qHdE3+QKrT2XZ5iEcpkKMmYylAchicAsC3YqAbQnJ357A8EtIivA9CmxQoIqdWHhvd80hSWxKXQ14=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBoE86sTW9d7paNYkKIeLchxWtpATEMXdCDsBdEGb4C/2hA5gB
+	4Mqprx3gBDKblI1px76QF07kN/g+JaZZY9zRSKs1WMzQ5AA78tuWw0/yT6hDIbVlXwZmiPqEGBD
+	4HPQc2WRhakGLcE6B5O/xHPrVouM=
+X-Gm-Gg: ASbGnctY2onGmia2qqgioW2KpBDBkkTtwyGfayGhEnohsukpjGZ05OnNp0Yczv5Xxnr
+	K8JBQqQcJTE/I3TOKQZlkFQbsum3xR8TTuZYTCj/MzlE9tC1J2QlrAEVy4U9cFA==
+X-Google-Smtp-Source: AGHT+IFOWJEi3/q4B0k65yhMG8okQtJPffEx+2AH+oieI6vAHTC8JsfUdKAV6m5h+qsy7kJKUFapN1GpTNIHc4igjAU=
+X-Received: by 2002:ac2:4294:0:b0:540:1f7d:8bc4 with SMTP id
+ 2adb3069b0e04-5439c281105mr8228903e87.48.1737616148331; Wed, 22 Jan 2025
+ 23:09:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -59,11 +59,12 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <CAPhCUnV5ocw5HfW+jNRaRPgntoM4uXeHNcC03XL00wLZjSm1Vw@mail.gmail.com>
-In-Reply-To: <CAPhCUnV5ocw5HfW+jNRaRPgntoM4uXeHNcC03XL00wLZjSm1Vw@mail.gmail.com>
+ <CAH2r5mvnJ6SLtHM_PWOQZ9dTsDd1BaQbOK2UBi9-AxRzt4sJpg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvnJ6SLtHM_PWOQZ9dTsDd1BaQbOK2UBi9-AxRzt4sJpg@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Jan 2025 00:53:15 -0600
-X-Gm-Features: AWEUYZlkHdaogeFWJ5rINa9Cu5aEXC5ApYuu6eDIXGV-Oh5qK9nKcO8dQpdqLcg
-Message-ID: <CAH2r5mvnJ6SLtHM_PWOQZ9dTsDd1BaQbOK2UBi9-AxRzt4sJpg@mail.gmail.com>
+Date: Thu, 23 Jan 2025 01:08:57 -0600
+X-Gm-Features: AWEUYZnTQSNMiJRW9mE_rweQVteoeTfiX4TRocN5OuShg3kRiaMvx8DvBrovhJI
+Message-ID: <CAH2r5muwsjAXMHJ53HVBYbZSCmFE_XGz0KV-QaDskMtc963+jw@mail.gmail.com>
 Subject: Re: Bug in getting file attributes with SMB3.1.1 and posix
 To: Oleh Nykyforchyn <oleh.nyk@gmail.com>
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -71,32 +72,45 @@ Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Very good catch - sorry for the delay.   I can now reproduce the
-problem.  Looking into it now.  Thanks for pointing this out
+I also did verify that your patch does fix the problem - but also am
+checking if better way to fix it
 
-On Wed, Jan 1, 2025 at 11:05=E2=80=AFAM Oleh Nykyforchyn <oleh.nyk@gmail.co=
-m> wrote:
+On Thu, Jan 23, 2025 at 12:53=E2=80=AFAM Steve French <smfrench@gmail.com> =
+wrote:
 >
-> Hello,
+> Very good catch - sorry for the delay.   I can now reproduce the
+> problem.  Looking into it now.  Thanks for pointing this out
 >
-> I encountered a funny bug when a share is mounted with vers=3D3.1.1, posi=
-x,... If a file size has bits 0x410 =3D ATTR_DIRECTORY | ATTR_REPARSE =3D 1=
-040 set, then the file is regarded as a directory and its open fails. A sim=
-plest test example is any file 1040 bytes long.
+> On Wed, Jan 1, 2025 at 11:05=E2=80=AFAM Oleh Nykyforchyn <oleh.nyk@gmail.=
+com> wrote:
+> >
+> > Hello,
+> >
+> > I encountered a funny bug when a share is mounted with vers=3D3.1.1, po=
+six,... If a file size has bits 0x410 =3D ATTR_DIRECTORY | ATTR_REPARSE =3D=
+ 1040 set, then the file is regarded as a directory and its open fails. A s=
+implest test example is any file 1040 bytes long.
+> >
+> > The cause of this bug is that Attributes field in smb2_file_all_info st=
+ruct occupies the same place that EndOfFile field in smb311_posix_qinfo, an=
+d sometimes the latter struct is incorrectly processed as if it was the fir=
+st one. I attach an example patch that solves the problem for me, obviously=
+ not ready for submission, but just to show which places in the code are su=
+bject to problems. The patch is against linux-6.12.6 kernel, but, AFAICS, n=
+othing has changed since then in relevant places. If I have guessed more or=
+ less correctly what the intended functionality is, please feel free to use=
+ my patch as a basis for corrections.
+> >
+> > Best regards
+> >
+> > Olen Nykyforchyn
 >
-> The cause of this bug is that Attributes field in smb2_file_all_info stru=
-ct occupies the same place that EndOfFile field in smb311_posix_qinfo, and =
-sometimes the latter struct is incorrectly processed as if it was the first=
- one. I attach an example patch that solves the problem for me, obviously n=
-ot ready for submission, but just to show which places in the code are subj=
-ect to problems. The patch is against linux-6.12.6 kernel, but, AFAICS, not=
-hing has changed since then in relevant places. If I have guessed more or l=
-ess correctly what the intended functionality is, please feel free to use m=
-y patch as a basis for corrections.
 >
-> Best regards
 >
-> Olen Nykyforchyn
+> --
+> Thanks,
+>
+> Steve
 
 
 
