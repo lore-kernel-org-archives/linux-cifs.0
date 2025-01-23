@@ -1,46 +1,46 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458CC211700
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jan 2025 16:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11545F4F1
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jan 2025 16:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737649919; cv=none; b=hMZXaN9ie9mgqK6qIAtnQKQCNrArbTSM5Kbp38xzXNRYQPX/1I7p1yRM4JnbfNgPmRFHyGpWWp5F2zebZIs/zWGyVewpdrm0OIFQXSDqSmprvvQiSk2OsjBSjsRyV0m2biSBRVLqJkoLniJMji8zueV2BSLKdx36RNoFytOz0ts=
+	t=1737650112; cv=none; b=F+5c8JsMY+n0G/l+4qmb8trnf0WyqOcOhB0A+aLPoYqL1ApgBFnMtTjaNdnOGi8ibLKEGoBW7lHVftW/2H+uyynDHMVAPi4M4IZBTjLABDuIhQSXHK9qyTuSiZ4QFMzfm4xxTQyNX6Ad5oCvbjLMAJwozmFch3RyaSQcSKkL1cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737649919; c=relaxed/simple;
-	bh=/bUtW6hMwrEG2dn2NFmhKabAvL9HPwgGP31FobUYzDA=;
+	s=arc-20240116; t=1737650112; c=relaxed/simple;
+	bh=4s8arKEzKFcw11WEeaT51lV0rCLvy/X9TFO9s/w3jr4=;
 	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=uxyhYBP1bnFOFRvr+EmTUc8DmNpY0uM+nAZW/dj5K4/h3Yo7uHVDl2w6rv+TpEpVUHT4gV+0V3f+s31qSUc/SdYukyYMci6yO0W3BlLi5pbXUSM93lwLB0I7/HtldPXy5neerdjLBkIftrZi5BxsxS9EHNl0WYsVgazqxJVUWjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZdGAVnmJ; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Date:Message-ID; b=EGCSiu5RNUZ6iVazeDxnlMPduaSmmLWjtWb6wru7mc4OtuAq5t6jpON+5pAMBf/IETn6GIJcQbAcQ7rfDjQAHW/yHPgqvmL7YAEw9MTWGYPiazyBMhWip4wN7tgsE+Y5IlMa+2Yec1KEfrptus5hjZG6PohFmgqCW5Ce51Z+Qjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XPzrmAJd; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdGAVnmJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPzrmAJd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737649916;
+	s=mimecast20190719; t=1737650110;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=90kDIZbIPZR8LclIILYErH2AuCR6R7uS1QNeYpHNJHg=;
-	b=ZdGAVnmJlk+oPHyysEYLnQakuvQOEacW1rPXq1MxMuSAFhVyyPXZ9RBHaneoPRrHxJRRU4
-	dbaeNAxRg03VgpL5sDF1b1cuu+qM/BoLOGlAGy3Bzx9xD6FgEfdggHWn8wpxwCXwORkHXH
-	mXE+LRH/AgQF7khPxFIygDRJ7bBkT/o=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Q73QoaoamFs4RRlWa4WN0Q+HIVuWllUe8vbGo74uYpI=;
+	b=XPzrmAJdo4iRTDi5NEJWtABeV7zebVUWIbGgp6m72POLZT90R+MvqAHyKhdQq3wN+Ffqqf
+	VtismKewhC5AR9W/HmElwjhqoXUbxBvYyG8OGoQZozv8z1qzF+RSJplJYCc1ePaXgzLxEj
+	xGaae86SVbAWm39e9aEKItUYUxZy96k=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-388-WPK8im1EMvWGj3YH7_KLPA-1; Thu,
- 23 Jan 2025 11:31:52 -0500
-X-MC-Unique: WPK8im1EMvWGj3YH7_KLPA-1
-X-Mimecast-MFC-AGG-ID: WPK8im1EMvWGj3YH7_KLPA
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-339-yr9ZROtBMZGc6TMUEL0IyQ-1; Thu,
+ 23 Jan 2025 11:35:05 -0500
+X-MC-Unique: yr9ZROtBMZGc6TMUEL0IyQ-1
+X-Mimecast-MFC-AGG-ID: yr9ZROtBMZGc6TMUEL0IyQ
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B32F419560B1;
-	Thu, 23 Jan 2025 16:31:51 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A65819560A2;
+	Thu, 23 Jan 2025 16:35:02 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6E815195608E;
-	Thu, 23 Jan 2025 16:31:50 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D573B19560A7;
+	Thu, 23 Jan 2025 16:35:00 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
@@ -59,15 +59,19 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2194114.1737649909.1@warthog.procyon.org.uk>
-Date: Thu, 23 Jan 2025 16:31:49 +0000
-Message-ID: <2194115.1737649909@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-ID: <2194784.1737650099.1@warthog.procyon.org.uk>
+Date: Thu, 23 Jan 2025 16:34:59 +0000
+Message-ID: <2194785.1737650099@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Shyam,
+Shyam Prasad N <nspmangalore@gmail.com> wrote:
 
-Do you have any particular way of reproducing this?  It's been a while since I
-looked at this bug.
+> I tried this again with 6.13-rc1 and the null-ptr deref seems to be
+> slightly different (same function).
+
+Note that v6.13-rc1 doesn't include my patch.  You need to be on v6.13-rc7 for
+that.  There are a number of other patches that went in too that might affect
+what you're seeing.
 
 David
 
