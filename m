@@ -1,259 +1,217 @@
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+Received: from fabamailgate01.fabasoft.com (fabamailgate01.fabasoft.com [192.84.221.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3921A21A43C;
-	Fri, 24 Jan 2025 19:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5495413A3F7
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jan 2025 23:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.84.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737748496; cv=none; b=M0kCmaRy42kDLehBgJ9XrKJ9BRXI10B2EOESF3UEFQZbu45vB/ebwP+3j5TtDoUssn+lP0TKRmnr0DMhcBxxRDHTACvFI17Vx3AWt58NYfNhEtw/3L7fJ+X9oC2/3FyP1h62RG51YkP1xdm1JwGtKgiRaJJXrdtX2mrzY+hIzJw=
+	t=1737759924; cv=none; b=HLJLjXInfY3X+/gpEGAabX0WSge8LN2WAwDVMqovaq1+FZL2XBYM3tjIf7arTQJKKjyErCyUoYoStPag/AQiKrCMhF1P3hqjjlgQU/ZcZdtYR3y0OfcQbLFg8tLEP2NkXCHvzsYLGbo1XKc4/0puuQ5cUEriwYuAVJfeSNp1hMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737748496; c=relaxed/simple;
-	bh=Oo+yYJvHx0J+MvWMPe6O1BeI4kU2b5HNdxVD2LwXshA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VcIShNH28MPkqNvXBuABv8I86qgYJDNjOda6hVbcU3nsUF3sHtomQoDzgWbAgfacX0XtiJiyC0sa8qSELvuyApuSCDcGkF9Y3lo/mU6h2zxOFegg6LusU+xkGIl2jUXh6WmLtk0GTcJeqD+WJRKLv/XQCpbH2ugOEsThHeW+6BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=UYR56BC5; arc=none smtp.client-ip=185.70.40.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="UYR56BC5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1737748491; x=1738007691;
-	bh=WPCmK7URrEy7NOqMZEP/caP4Gj0g1hUC7OKlgx+c3dY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=UYR56BC5UZLNsKXH/ITJM6m10LcrV9IMfcxYmVw7ezph9ldDjZxvHpLCf22NzsZXr
-	 OrtdrGTe0IEg/2uXeHRqE+5QFrrGiI2O/3gOK3ahONeosAcRBmfMNVTgYI3czCtp6P
-	 lHl5LYy7Jsr9Xv/6gVxQUo0MB89dVLszkRF5f1hFeaZiGXh9aqV7mjtL2bFljmbu7a
-	 3msIkFFaWc0liztBJiH3nHT5tFsDxDRDjPShqVvhx96DZHE32OTL/1JmyNXzl6O68F
-	 dloKSQtVQfYlyyCI178bmd1mUkfMqVTpBUkRzcp1MQMW3dOhvyM5pJFzqO7AQvZyIV
-	 jGDp4MsJ6jk2g==
-Date: Fri, 24 Jan 2025 19:54:43 +0000
-To: Marc Dionne <marc.c.dionne@gmail.com>
-From: Ihor Solodrai <ihor.solodrai@pm.me>
-Cc: David Howells <dhowells@redhat.com>, Christian Brauner <christian@brauner.io>, Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH v5 27/32] netfs: Change the read result collector to only use one work item
-Message-ID: <ZWHFHDukzfc7hoFZ8s7ebITzzuXLdL3jtI1Gm7XASpFGprxofyelizx8oA4JZthmee_YlnO7okLF4aUNLXaiZ2Ib_JtUTWzbCcsrnl4LX5w=@pm.me>
-In-Reply-To: <CAB9dFds_bPG1vThvOxhKcoFbUPGURYRHrY_zubPrAqpQrgHA7A@mail.gmail.com>
-References: <20241216204124.3752367-1-dhowells@redhat.com> <20241216204124.3752367-28-dhowells@redhat.com> <a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=@pm.me> <CAB9dFdtVFgG7OWZRytL9Vpr=knNPnMe6b_Esg7rgfFfwLa8j0A@mail.gmail.com> <GHG6tQSGPRj9L93-skG-HGz4vGtXUxy6ibsUTKloUKncNmy8A7xgte0MEiI0iZJ7jD-SSrZiK2oswgvJCRan_0ZMi6xDlP11SHDi1Utf7mI=@pm.me> <CAB9dFds_bPG1vThvOxhKcoFbUPGURYRHrY_zubPrAqpQrgHA7A@mail.gmail.com>
-Feedback-ID: 27520582:user:proton
-X-Pm-Message-ID: 4f0aec3e0f4ce82aa482624e5964b7d886d7a0e5
+	s=arc-20240116; t=1737759924; c=relaxed/simple;
+	bh=pdV/wEhDuA/ovVE4yppk4EG30Fw5A2+SQ6chMJaw79M=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=DsTeNEEQUsZJp4kRaqDxg6sPUy+oHG6LJ2lQbdP0fczZZ44viZgzFhnpD7VC41ZWeaRDs75nPX3Z779w9OC4sW3G+dE1koFf34ZatyABr0z1wV1OUPYJAHxyLLYzU1IKVVIS1R4px5IG/ETtXGLoIajoxrOCr6QyO7jfVBDCVxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com; spf=pass smtp.mailfrom=fabasoft.com; arc=none smtp.client-ip=192.84.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fabasoft.com
+Received: from fabamailgate01.fabasoft.com (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by fabamailgate01.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS id DB2752004130
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jan 2025 00:05:17 +0100 (CET)
+Received: from [127.0.0.1] (helo=fabamailgate01.fabasoft.com)
+	by fabamailgate01.fabasoft.com with ESMTP (eXpurgate 4.51.0)
+	(envelope-from <horst.reiterer@fabasoft.com>)
+	id 67941cad-045f-7f0000012b03-7f000001dbf0-1
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jan 2025 00:05:17 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com (fabaexch01 [10.10.5.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by fabamailgate01.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jan 2025 00:05:17 +0100 (CET)
+Received: from FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) by
+ FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sat, 25 Jan 2025 00:05:17 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7]) by
+ FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7%4]) with mapi id
+ 15.01.2507.044; Sat, 25 Jan 2025 00:05:17 +0100
+From: "Reiterer, Horst" <horst.reiterer@fabasoft.com>
+To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: Regression: smb: chmod ignored (5.14.0-427.40.1.el9_4 vs.
+ 5.14.0-503.15.1.el9_5)
+Thread-Topic: Regression: smb: chmod ignored (5.14.0-427.40.1.el9_4 vs.
+ 5.14.0-503.15.1.el9_5)
+Thread-Index: AdturiUHVSVT8VVlSIaajlplMuoqUw==
+Date: Fri, 24 Jan 2025 23:05:17 +0000
+Message-ID: <85a16504e09147a195ac0aac1c801280@fabasoft.com>
+Accept-Language: en-US, de-AT
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-purgate-ID: 152191::1737759917-DCFC7ACB-60320B6A/0/0
+X-purgate-type: clean
+X-purgate-size: 5653
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: clean
+X-purgate: This mail is considered clean
 
-On Friday, January 24th, 2025 at 11:07 AM, Marc Dionne <marc.c.dionne@gmail=
-.com> wrote:
+Hi,
 
->=20
->=20
-> On Fri, Jan 24, 2025 at 2:46=E2=80=AFPM Ihor Solodrai ihor.solodrai@pm.me=
- wrote:
->=20
-> > On Friday, January 24th, 2025 at 10:21 AM, Marc Dionne marc.dionne@auri=
-stor.com wrote:
-> >=20
-> > > [...]
-> > >=20
-> > > > A log snippet:
-> > > >=20
-> > > > 2025-01-24T02:15:03.9009694Z [ 246.932163] INFO: task ip:1055 block=
-ed for more than 122 seconds.
-> > > > 2025-01-24T02:15:03.9013633Z [ 246.932709] Tainted: G OE 6.13.0-g2b=
-cb9cf535b8-dirty #149
-> > > > 2025-01-24T02:15:03.9018791Z [ 246.933249] "echo 0 > /proc/sys/kern=
-el/hung_task_timeout_secs" disables this message.
-> > > > 2025-01-24T02:15:03.9025896Z [ 246.933802] task:ip state:D stack:0 =
-pid:1055 tgid:1055 ppid:1054 flags:0x00004002
-> > > > 2025-01-24T02:15:03.9028228Z [ 246.934564] Call Trace:
-> > > > 2025-01-24T02:15:03.9029758Z [ 246.934764] <TASK>
-> > > > 2025-01-24T02:15:03.9032572Z [ 246.934937] __schedule+0xa91/0xe80
-> > > > 2025-01-24T02:15:03.9035126Z [ 246.935224] schedule+0x41/0xb0
-> > > > 2025-01-24T02:15:03.9037992Z [ 246.935459] v9fs_evict_inode+0xfe/0x=
-170
-> > > > 2025-01-24T02:15:03.9041469Z [ 246.935748] ? __pfx_var_wake_functio=
-n+0x10/0x10
-> > > > 2025-01-24T02:15:03.9043837Z [ 246.936101] evict+0x1ef/0x360
-> > > > 2025-01-24T02:15:03.9046624Z [ 246.936340] __dentry_kill+0xb0/0x220
-> > > > 2025-01-24T02:15:03.9048855Z [ 246.936610] ? dput+0x3a/0x1d0
-> > > > 2025-01-24T02:15:03.9051128Z [ 246.936838] dput+0x114/0x1d0
-> > > > 2025-01-24T02:15:03.9053548Z [ 246.937069] __fput+0x136/0x2b0
-> > > > 2025-01-24T02:15:03.9056154Z [ 246.937305] task_work_run+0x89/0xc0
-> > > > 2025-01-24T02:15:03.9058593Z [ 246.937571] do_exit+0x2c6/0x9c0
-> > > > 2025-01-24T02:15:03.9061349Z [ 246.937816] do_group_exit+0xa4/0xb0
-> > > > 2025-01-24T02:15:03.9064401Z [ 246.938090] __x64_sys_exit_group+0x1=
-7/0x20
-> > > > 2025-01-24T02:15:03.9067235Z [ 246.938390] x64_sys_call+0x21a0/0x21=
-a0
-> > > > 2025-01-24T02:15:03.9069924Z [ 246.938672] do_syscall_64+0x79/0x120
-> > > > 2025-01-24T02:15:03.9072746Z [ 246.938941] ? clear_bhb_loop+0x25/0x=
-80
-> > > > 2025-01-24T02:15:03.9075581Z [ 246.939230] ? clear_bhb_loop+0x25/0x=
-80
-> > > > 2025-01-24T02:15:03.9079275Z [ 246.939510] entry_SYSCALL_64_after_h=
-wframe+0x76/0x7e
-> > > > 2025-01-24T02:15:03.9081976Z [ 246.939875] RIP: 0033:0x7fb86f66f21d
-> > > > 2025-01-24T02:15:03.9087533Z [ 246.940153] RSP: 002b:00007ffdb3cf93=
-f8 EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
-> > > > 2025-01-24T02:15:03.9092590Z [ 246.940689] RAX: ffffffffffffffda RB=
-X: 00007fb86f785fa8 RCX: 00007fb86f66f21d
-> > > > 2025-01-24T02:15:03.9097722Z [ 246.941201] RDX: 00000000000000e7 RS=
-I: ffffffffffffff80 RDI: 0000000000000000
-> > > > 2025-01-24T02:15:03.9102762Z [ 246.941705] RBP: 00007ffdb3cf9450 R0=
-8: 00007ffdb3cf93a0 R09: 0000000000000000
-> > > > 2025-01-24T02:15:03.9107940Z [ 246.942215] R10: 00007ffdb3cf92ff R1=
-1: 0000000000000202 R12: 0000000000000001
-> > > > 2025-01-24T02:15:03.9113002Z [ 246.942723] R13: 0000000000000000 R1=
-4: 0000000000000000 R15: 00007fb86f785fc0
-> > > > 2025-01-24T02:15:03.9114614Z [ 246.943244] </TASK>
-> > >=20
-> > > That looks very similar to something I saw in afs testing, with a
-> > > similar stack but in afs_evict_inode where it hung waiting in
-> > > netfs_wait_for_outstanding_io.
-> > >=20
-> > > David pointed to this bit where there's a double get in
-> > > netfs_retry_read_subrequests, since netfs_reissue_read already takes
-> > > care of getting a ref on the subrequest:
-> > >=20
-> > > diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-> > > index 2290af0d51ac..53d62e31a4cc 100644
-> > > --- a/fs/netfs/read_retry.c
-> > > +++ b/fs/netfs/read_retry.c
-> > > @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct
-> > > netfs_io_request *rreq)
-> > > __clear_bit(NETFS_SREQ_BOUNDARY,
-> > > &subreq->flags);
-> > >=20
-> > > }
-> > >=20
-> > > - netfs_get_subrequest(subreq,
-> > > netfs_sreq_trace_get_resubmit);
-> > > netfs_reissue_read(rreq, subreq);
-> > > if (subreq =3D=3D to)
-> > > break;
-> > >=20
-> > > That seems to help for my afs test case, I suspect it might help in
-> > > your case as well.
-> >=20
-> > Hi Marc. Thank you for the suggestion.
-> >=20
-> > I've just tried this diff on top of bpf-next (d0d106a2bd21):
-> >=20
-> > diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-> > index 2290af0d51ac..53d62e31a4cc 100644
-> > --- a/fs/netfs/read_retry.c
-> > +++ b/fs/netfs/read_retry.c
-> > @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct net=
-fs_io_request *rreq)
-> > __clear_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
-> > }
-> >=20
-> > - netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
-> > netfs_reissue_read(rreq, subreq);
-> > if (subreq =3D=3D to)
-> > break;
-> >=20
-> > and I'm getting a hung task with the same stack
-> >=20
-> > [ 184.362292] INFO: task modprobe:2527 blocked for more than 20 seconds=
-.
-> > [ 184.363173] Tainted: G OE 6.13.0-gd0d106a2bd21-dirty #1
-> > [ 184.363651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disabl=
-es this message.
-> > [ 184.364142] task:modprobe state:D stack:0 pid:2527 tgid:2527 ppid:213=
-4 flags:0x00000002
-> > [ 184.364743] Call Trace:
-> > [ 184.364907] <TASK>
-> > [ 184.365057] __schedule+0xa91/0xe80
-> > [ 184.365311] schedule+0x41/0xb0
-> > [ 184.365525] v9fs_evict_inode+0xfe/0x170
-> > [ 184.365782] ? __pfx_var_wake_function+0x10/0x10
-> > [ 184.366082] evict+0x1ef/0x360
-> > [ 184.366312] __dentry_kill+0xb0/0x220
-> > [ 184.366561] ? dput+0x3a/0x1d0
-> > [ 184.366765] dput+0x114/0x1d0
-> > [ 184.366962] __fput+0x136/0x2b0
-> > [ 184.367172] __x64_sys_close+0x9e/0xd0
-> > [ 184.367443] do_syscall_64+0x79/0x120
-> > [ 184.367685] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > [ 184.368005] RIP: 0033:0x7f4c6fc7f60b
-> > [ 184.368249] RSP: 002b:00007ffc7582beb8 EFLAGS: 00000297 ORIG_RAX: 000=
-0000000000003
-> > [ 184.368733] RAX: ffffffffffffffda RBX: 0000555e18cff7a0 RCX: 00007f4c=
-6fc7f60b
-> > [ 184.369176] RDX: 00007f4c6fd64ee0 RSI: 0000000000000001 RDI: 00000000=
-00000000
-> > [ 184.369634] RBP: 00007ffc7582bee0 R08: 0000000000000000 R09: 00000000=
-00000007
-> > [ 184.370078] R10: 0000555e18cff980 R11: 0000000000000297 R12: 00000000=
-00000000
-> > [ 184.370544] R13: 00007f4c6fd65030 R14: 0000555e18cff980 R15: 0000555e=
-18d7b750
-> > [ 184.371004] </TASK>
-> > [ 184.371151]
-> > [ 184.371151] Showing all locks held in the system:
-> > [ 184.371560] 1 lock held by khungtaskd/32:
-> > [ 184.371816] #0: ffffffff83195d90 (rcu_read_lock){....}-{1:3}, at: deb=
-ug_show_all_locks+0x2e/0x180
-> > [ 184.372397] 2 locks held by kworker/u8:21/2134:
-> > [ 184.372695] #0: ffff9a5300104d48 ((wq_completion)events_unbound){+.+.=
-}-{0:0}, at: process_scheduled_works+0x23a/0x600
-> > [ 184.373376] #1: ffff9e9882187e20 ((work_completion)(&sub_info->work))=
-{+.+.}-{0:0}, at: process_scheduled_works+0x25a/0x600
-> > [ 184.374075]
-> > [ 184.374182] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> >=20
-> > So this appears to be something different.
-> >=20
-> > > Marc
->=20
->=20
-> Looks like there may be a similar issue with the
-> netfs_get_subrequest() at line 196, which also precedes a call to
-> netfs_reissue_read. Might be worth trying with that removed as well.
+after updating from AlmaLinux 9.4 to 9.5 (https://repo.almalinux.org/vault/=
+9.4/BaseOS/Source/Packages/kernel-5.14.0-427.40.1.el9_4.src.rpm vs. https:/=
+/repo.almalinux.org/vault/9.5/BaseOS/Source/Packages/kernel-5.14.0-503.15.1=
+.el9_5.src.rpm), chmod gets ignored by the CIFS filesystem when executed ag=
+ainst a Windows file server unless chmod happens in another process.
 
-Just did that. Got lucky locally, but no changes on CI:
-https://github.com/kernel-patches/vmtest/actions/runs/12956261831/job/36142=
-811371
+Mount options as reported by mount:
 
-Do you know of any pending patches addressing the double-get issue?
-Does this diff reliably fix the hang in afs_evict_inode?
+  rw,relatime,context=3Dsystem_u:object_r:tmp_t:s0,vers=3D3.1.1,cache=3Dstr=
+ict,username=3D<username> =20
+  uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D<addr>,file_mode=3D0755,dir_=
+mode=3D0755,soft
+  nounix,serverino,mapposix,reparse=3Dnfs,rsize=3D4194304,wsize=3D4194304,b=
+size=3D1048576
+  retrans=3D1,echo_interval=3D60,actimeo=3D1,closetimeo=3D1
 
-Thanks.
+Reproduction (see source below):
 
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 2290af0d51ac..6c8327f4227c 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct netfs_i=
-o_request *rreq)
-                                __clear_bit(NETFS_SREQ_BOUNDARY, &subreq->f=
-lags);
-                        }
-=20
--                       netfs_get_subrequest(subreq, netfs_sreq_trace_get_r=
-esubmit);
-                        netfs_reissue_read(rreq, subreq);
-                        if (subreq =3D=3D to)
-                                break;
-@@ -194,7 +193,6 @@ static void netfs_retry_read_subrequests(struct netfs_i=
-o_request *rreq)
-                        trace_netfs_sreq_ref(rreq->debug_id, subreq->debug_=
-index,
-                                             refcount_read(&subreq->ref),
-                                             netfs_sreq_trace_new);
--                       netfs_get_subrequest(subreq, netfs_sreq_trace_get_r=
-esubmit);
-=20
-                        list_add(&subreq->rreq_link, &to->rreq_link);
-                        to =3D list_next_entry(to, rreq_link);
+  ./test <path/to/mountpoint>/<non-existent-filename> all
+  Unexpected mode 100555
 
->=20
-> Marc
+strace:
+
+openat(AT_FDCWD, "/mnt/test", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 3
+close(3)                                =3D 0
+chmod("/mnt/test", 0400) =3D 0
+openat(AT_FDCWD, "/mnt/test", O_RDONLY) =3D 3
+close(3)                                =3D 0
+newfstatat(AT_FDCWD, "/mnt/test", {st_dev=3Dmakedev(0, 0x2b), st_ino=3D1407=
+374884039565, st_mode=3DS_IFREG|0555, st_nlink=3D1, st_uid=3D0, st_gid=3D0,=
+ st_blksize=3D1048576, st_blocks=3D0, st_size=3D0, st_atime=3D17
+37759300 /* 2025-01-24T23:55:00.242552200+0100 */, st_atime_nsec=3D24255220=
+0, st_mtime=3D1737759300 /* 2025-01-24T23:55:00.242552200+0100 */, st_mtime=
+_nsec=3D242552200, st_ctime=3D1737759300 /* 2025-01-
+24T23:55:00.243552200+0100 */, st_ctime_nsec=3D243552200}, 0) =3D 0
+chmod("/mnt/test", 0600) =3D 0
+newfstatat(AT_FDCWD, "/mnt/test", {st_dev=3Dmakedev(0, 0x2b), st_ino=3D1407=
+374884039565, st_mode=3DS_IFREG|0555, st_nlink=3D1, st_uid=3D0, st_gid=3D0,=
+ st_blksize=3D1048576, st_blocks=3D0, st_size=3D0, st_atime=3D17
+37759300 /* 2025-01-24T23:55:00.242552200+0100 */, st_atime_nsec=3D24255220=
+0, st_mtime=3D1737759300 /* 2025-01-24T23:55:00.242552200+0100 */, st_mtime=
+_nsec=3D242552200, st_ctime=3D1737759300 /* 2025-01-
+24T23:55:00.245552200+0100 */, st_ctime_nsec=3D245552200}, 0) =3D 0
+write(2, "Unexpected mode 100555\n", 23Unexpected mode 100555
+) =3D 23
+exit_group(1)                           =3D ?
++++ exited with 1 +++
+
+Workaround (executing the test in two processes):
+
+  ./test <path/to/mountpoint>/<non-existent-filename> first
+  ./test <path/to/mountpoint>/<non-existent-filename> last
+
+strace:
+
+openat(AT_FDCWD, "/mnt/test", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 3
+close(3)                                =3D 0
+chmod("/mnt/test", 0400) =3D 0
+openat(AT_FDCWD, "/mnt/test", O_RDONLY) =3D 3
+close(3)                                =3D 0
+exit_group(0)                           =3D ?
++++ exited with 0 +++
+
+newfstatat(AT_FDCWD, "/mnt/test", {st_dev=3Dmakedev(0, 0x2b), st_ino=3D1407=
+374884039566, st_mode=3DS_IFREG|0555, st_nlink=3D1, st_uid=3D0, st_gid=3D0,=
+ st_blksize=3D1048576, st_blocks=3D0, st_size=3D0, st_atime=3D17
+37759424 /* 2025-01-24T23:57:04.152930200+0100 */, st_atime_nsec=3D15293020=
+0, st_mtime=3D1737759424 /* 2025-01-24T23:57:04.152930200+0100 */, st_mtime=
+_nsec=3D152930200, st_ctime=3D1737759424 /* 2025-01-
+24T23:57:04.152930200+0100 */, st_ctime_nsec=3D152930200}, 0) =3D 0
+chmod("/mnt/test", 0600) =3D 0
+newfstatat(AT_FDCWD, "/mnt/test", {st_dev=3Dmakedev(0, 0x2b), st_ino=3D1407=
+374884039566, st_mode=3DS_IFREG|0755, st_nlink=3D1, st_uid=3D0, st_gid=3D0,=
+ st_blksize=3D1048576, st_blocks=3D0, st_size=3D0, st_atime=3D17
+37759424 /* 2025-01-24T23:57:04.152930200+0100 */, st_atime_nsec=3D15293020=
+0, st_mtime=3D1737759424 /* 2025-01-24T23:57:04.152930200+0100 */, st_mtime=
+_nsec=3D152930200, st_ctime=3D1737759449 /* 2025-01-
+24T23:57:29.621213500+0100 */, st_ctime_nsec=3D621213500}, 0) =3D 0
+openat(AT_FDCWD, "/mnt/test", O_WRONLY|O_CREAT|O_TRUNC, 0666) =3D 3
+close(3)                                =3D 0
+exit_group(0)                           =3D ?
++++ exited with 0 +++
+
+Please let me know if your can reproduce the issue using the sample.
+
+Cheers,
+
+Horst Reiterer
+
+test.c:
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+  if (argc !=3D 3) {
+    fprintf(stderr, "test <path> <all|first|last>\n");
+    return 2;
+  }
+  char *path =3D argv[1];
+  char *mode =3D argv[2];
+  int fd;
+  if (strcmp(mode, "all") =3D=3D 0 || strcmp(mode, "first") =3D=3D 0) {
+    if ((fd =3D open(path, O_WRONLY|O_CREAT|O_TRUNC, 0666)) =3D=3D -1) {
+      perror("open");
+      return 1;
+    }
+    close(fd);
+    if (chmod(path, 0400) =3D=3D -1) {
+      perror("chmod");
+      return 1;
+    }
+    if ((fd =3D open(path, O_RDONLY)) =3D=3D -1) {
+      perror("open");
+      return 1;
+    }
+    close(fd);
+  }
+  if (strcmp(mode, "all") =3D=3D 0 || strcmp(mode, "last") =3D=3D 0) {
+    struct stat statbuf;
+    if (stat(path, &statbuf) =3D=3D -1) {
+      perror("stat");
+      return 1;
+    }
+    mode_t modebefore =3D statbuf.st_mode;
+    if (chmod(path, 0600) =3D=3D -1) {
+      perror("chmod");
+      return 1;
+    }
+    if (stat(path, &statbuf) =3D=3D -1) {
+      perror("stat");
+      return 1;
+    }
+    if (statbuf.st_mode =3D=3D modebefore) {
+      fprintf(stderr, "Unexpected mode %o\n", statbuf.st_mode);
+      return 1;
+    }
+    if ((fd =3D open(path, O_WRONLY|O_CREAT|O_TRUNC, 0666)) =3D=3D -1) {
+      perror("open");
+      return 1;
+    }
+    close(fd);
+  }
+  return 0;
+}
