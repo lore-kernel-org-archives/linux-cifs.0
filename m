@@ -1,249 +1,214 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995F8288B1
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Jan 2025 17:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6511B20E004;
+	Fri, 24 Jan 2025 17:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737741189; cv=none; b=P3miVUs4UKxTFz3KLSwPKKDDRMKfBqRgi4tuv4REhZf62AlXwkYPkusn26RI9n8sgRrKFDgoy/OBWKZG+NwjJQ0Hf4aNrVTn8oXPMnsil12xCkHbs0T1xwuwPr2o9LM8rDdKP59nvSsYK3DQGc+OvRHmaNbloMjXol4n5eHgf7s=
+	t=1737741598; cv=none; b=Nt3D2WnP853pyl3wBO//NOFGDo3BBhyqrgpfA2NAGPCGbsFBRMOUYEd+mlCtceGBMMjHCnyWLY0mba/hDTa/ZhjScN0i54OQEYjopIrtY3kuxLoMdP8E2TOiGjoUezFZuC33quPaXq5tgXSRn3mbuUyGXmjvFUSTBdWuunMwdjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737741189; c=relaxed/simple;
-	bh=j28mP2aj/CIrbfRr855+I7GwRprlc1BgL9OAxMeES2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FgzhXexH0rDDH2oYumvYOzYKSrq1V2nHlkxrP308iSmz7PjC2pKCn+A2l6E6/Wh0aLe4wCONJh+9slOGqy5hktKTVD1XB7U9pOG2sdyU6qqKnYmFTfFRWV8zLpBJxw+MWSscC6TMhOWoEjrlQ1wgL1vicv8jrxEQ5JnK0B9Gouw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WVTts7v5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737741598; c=relaxed/simple;
+	bh=BXEp/Ifx1dkFW+s6C1bLT7iPr5FF0eKvtB+OTekdsY0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ENXO8vJB+N+TWZYcbv7YCyxZNPfvUVyha7ej4TU/97LYW7S3utIvs2MF/La1POGjayyLVMTnt5xz4GBMqWKWkpvK5r1vDD8cH5jrm0+gE6DYTAoqBm6G5X7bGAG3F1L6zhmLLtY89PhxTHFSOzsZqNmbLGBimSeKXwnjIn/JqSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=JIbIB9RK; arc=none smtp.client-ip=185.70.43.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVTts7v5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737741186;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2R8oBEZ74um3RAUVmjzizhAA2n5YJJyQ/bVBUuFD1N8=;
-	b=WVTts7v5bx3eKTMmGC793VplW7Gd1WLSA1/ZfqD9oek69pb1C39G9eTGfchF3ZKUkvUJWy
-	d/gvuxwU6YQFBwmYohDRaBrzoZmUga6Kf+FZyaDWn+vqSLQiLZVdkUtsSqlwcSptc7cUBb
-	1wBMpztUcbW3lxfNdXkwoQYYgTkE4yk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-b2ot7AtdPdOi5TVw2TYUnA-1; Fri,
- 24 Jan 2025 12:53:02 -0500
-X-MC-Unique: b2ot7AtdPdOi5TVw2TYUnA-1
-X-Mimecast-MFC-AGG-ID: b2ot7AtdPdOi5TVw2TYUnA
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D075318009CD;
-	Fri, 24 Jan 2025 17:53:01 +0000 (UTC)
-Received: from tbecker-thinkpadp16vgen1.rmtbr.csb (unknown [10.96.134.104])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7109A1955BE3;
-	Fri, 24 Jan 2025 17:53:00 +0000 (UTC)
-From: tbecker@redhat.com
-To: linux-cifs@vger.kernel.org,
-	pc@manguebit.com
-Cc: Thiago Becker <tbecker@redhat.com>
-Subject: [PATCH vvv] cifscreds: allow user to set the key's timeout
-Date: Fri, 24 Jan 2025 14:52:57 -0300
-Message-ID: <20250124175257.1227916-1-tbecker@redhat.com>
-In-Reply-To: <20250114203509.172766-1-tbecker@redhat.com>
-References: <20250114203509.172766-1-tbecker@redhat.com>
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="JIbIB9RK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1737741587; x=1738000787;
+	bh=4rrjsE+MvicrrQ6Y6gD9cIT/HyQUToaWe+K01zQPoq8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=JIbIB9RK1AoMS0k9EJR6pJxIvCsuc8wWj0+M0dglHO9q1JpdzdAmkHasYCrL6Xtg3
+	 yZLr3M62KQpW6QElSB9M+pcd4aMm0HT2wqw0UCCvPmLAHp0lzj3Ee1K42YrTJnD1ZJ
+	 iMniNpaAOj+ZqKs0nfS4IhVd194HyBZ9cNCQm9XctxK4WpskYdAABH7CX2J5lBkY13
+	 e0IfEJyknM5ANHMu9Kt8dKBp9jMsb84bURnBlrw52rQdtq+69a5McLcAQtpO65sGdt
+	 41iS4elHgn1exDbKEeUD8x2Poaxtujd+Vr2jIZyVsNGCPiSgDJOwnEXYL+xEoaLsuF
+	 mLAK+CeNGGy/w==
+Date: Fri, 24 Jan 2025 17:59:39 +0000
+To: David Howells <dhowells@redhat.com>
+From: Ihor Solodrai <ihor.solodrai@pm.me>
+Cc: Christian Brauner <christian@brauner.io>, Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH v5 27/32] netfs: Change the read result collector to only use one work item
+Message-ID: <a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=@pm.me>
+In-Reply-To: <20241216204124.3752367-28-dhowells@redhat.com>
+References: <20241216204124.3752367-1-dhowells@redhat.com> <20241216204124.3752367-28-dhowells@redhat.com>
+Feedback-ID: 27520582:user:proton
+X-Pm-Message-ID: 2d63f4f4ff77fa7cfd9219388b78b772c9c2eebe
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Thiago Becker <tbecker@redhat.com>
+On Monday, December 16th, 2024 at 12:41 PM, David Howells <dhowells@redhat.=
+com> wrote:
 
-Allow the user to set the key's timeout when adding a new credential.
+> Change the way netfslib collects read results to do all the collection fo=
+r
+> a particular read request using a single work item that walks along the
+> subrequest queue as subrequests make progress or complete, unlocking foli=
+os
+> progressively rather than doing the unlock in parallel as parallel reques=
+ts
+> come in.
+>=20
+> The code is remodelled to be more like the write-side code, though only
+> using a single stream. This makes it more directly comparable and thus
+> easier to duplicate fixes between the two sides.
+>=20
+> This has a number of advantages:
+>=20
+> (1) It's simpler. There doesn't need to be a complex donation mechanism
+> to handle mismatches between the size and alignment of subrequests and
+> folios. The collector unlocks folios as the subrequests covering each
+> complete.
+>=20
+> (2) It should cause less scheduler overhead as there's a single work item
+> in play unlocking pages in parallel when a read gets split up into a
+> lot of subrequests instead of one per subrequest.
+>=20
+> Whilst the parallellism is nice in theory, in practice, the vast
+> majority of loads are sequential reads of the whole file, so
+> committing a bunch of threads to unlocking folios out of order doesn't
+> help in those cases.
+>=20
+> (3) It should make it easier to implement content decryption. A folio
+> cannot be decrypted until all the requests that contribute to it have
+> completed - and, again, most loads are sequential and so, most of the
+> time, we want to begin decryption sequentially (though it's great if
+> the decryption can happen in parallel).
+>=20
+> There is a disadvantage in that we're losing the ability to decrypt and
+> unlock things on an as-things-arrive basis which may affect some
+> applications.
+>=20
+> Signed-off-by: David Howells dhowells@redhat.com
+>=20
+> cc: Jeff Layton jlayton@kernel.org
+>=20
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> fs/9p/vfs_addr.c | 3 +-
+> fs/afs/dir.c | 8 +-
+> fs/ceph/addr.c | 9 +-
+> fs/netfs/buffered_read.c | 160 ++++----
+> fs/netfs/direct_read.c | 60 +--
+> fs/netfs/internal.h | 21 +-
+> fs/netfs/main.c | 2 +-
+> fs/netfs/objects.c | 34 +-
+> fs/netfs/read_collect.c | 716 ++++++++++++++++++++---------------
+> fs/netfs/read_pgpriv2.c | 203 ++++------
+> fs/netfs/read_retry.c | 207 +++++-----
+> fs/netfs/read_single.c | 37 +-
+> fs/netfs/write_collect.c | 4 +-
+> fs/netfs/write_issue.c | 2 +-
+> fs/netfs/write_retry.c | 14 +-
+> fs/smb/client/cifssmb.c | 2 +
+> fs/smb/client/smb2pdu.c | 5 +-
+> include/linux/netfs.h | 16 +-
+> include/trace/events/netfs.h | 79 +---
+> 19 files changed, 819 insertions(+), 763 deletions(-)
 
-Signed-off-by: Thiago Becker <tbecker@redhat.com>
----
- cifscreds.c     | 17 +++++++++++------
- cifscreds.rst   |  4 ++++
- cifskey.c       | 12 ++++++++++--
- cifskey.h       |  7 ++++++-
- pam_cifscreds.c |  4 ++--
- 5 files changed, 33 insertions(+), 11 deletions(-)
+Hello David.
 
-diff --git a/cifscreds.c b/cifscreds.c
-index c52f495..f552bc8 100644
---- a/cifscreds.c
-+++ b/cifscreds.c
-@@ -43,6 +43,7 @@ struct cmdarg {
- 	char		*host;
- 	char		*user;
- 	char		keytype;
-+	unsigned int	timeout;
- };
- 
- struct command {
-@@ -59,7 +60,7 @@ static int cifscreds_update(struct cmdarg *arg);
- static const char *thisprogram;
- 
- static struct command commands[] = {
--	{ cifscreds_add,	"add",		"[-u username] [-d] <host|domain>" },
-+	{ cifscreds_add,	"add",		"[-u username] [-d] <host|domain> [-t timeout]" },
- 	{ cifscreds_clear,	"clear",	"[-u username] [-d] <host|domain>" },
- 	{ cifscreds_clearall,	"clearall",	"" },
- 	{ cifscreds_update,	"update",	"[-u username] [-d] <host|domain>" },
-@@ -69,6 +70,7 @@ static struct command commands[] = {
- static struct option longopts[] = {
- 	{"username", 1, NULL, 'u'},
- 	{"domain", 0, NULL, 'd' },
-+	{"timeout", 0, NULL, 't' },
- 	{NULL, 0, NULL, 0}
- };
- 
-@@ -218,7 +220,7 @@ static int cifscreds_add(struct cmdarg *arg)
- 		*nextaddress++ = '\0';
- 
- 	while (currentaddress) {
--		key_serial_t key = key_add(currentaddress, arg->user, pass, arg->keytype);
-+		key_serial_t key = key_add(currentaddress, arg->user, pass, arg->keytype, arg->timeout);
- 		if (key <= 0) {
- 			fprintf(stderr, "error: Add credential key for %s: %s\n",
- 				currentaddress, strerror(errno));
-@@ -253,7 +255,7 @@ static int cifscreds_clear(struct cmdarg *arg)
- 	char *currentaddress, *nextaddress;
- 	int ret = 0, count = 0, errors = 0;
- 
--	if (arg->host == NULL || arg->user == NULL)
-+	if (arg->host == NULL || arg->user == NULL || arg->timeout)
- 		return usage();
- 
- 	if (arg->keytype == 'd')
-@@ -362,7 +364,7 @@ static int cifscreds_update(struct cmdarg *arg)
- 	char *addrs[16];
- 	int ret = 0, id, count = 0;
- 
--	if (arg->host == NULL || arg->user == NULL)
-+	if (arg->host == NULL || arg->user == NULL || arg->timeout)
- 		return usage();
- 
- 	if (arg->keytype == 'd')
-@@ -419,7 +421,7 @@ static int cifscreds_update(struct cmdarg *arg)
- 	pass = getpass("Password: ");
- 
- 	for (id = 0; id < count; id++) {
--		key_serial_t key = key_add(addrs[id], arg->user, pass, arg->keytype);
-+		key_serial_t key = key_add(addrs[id], arg->user, pass, arg->keytype, 0);
- 		if (key <= 0)
- 			fprintf(stderr, "error: Update credential key "
- 				"for %s: %s\n", addrs[id], strerror(errno));
-@@ -474,7 +476,7 @@ int main(int argc, char **argv)
- 	if (argc == 1)
- 		return usage();
- 
--	while((n = getopt_long(argc, argv, "du:", longopts, NULL)) != -1) {
-+	while((n = getopt_long(argc, argv, "dut:", longopts, NULL)) != -1) {
- 		switch (n) {
- 		case 'd':
- 			arg.keytype = (char) n;
-@@ -482,6 +484,9 @@ int main(int argc, char **argv)
- 		case 'u':
- 			arg.user = optarg;
- 			break;
-+		case 't':
-+			arg.timeout = atoi(optarg);
-+			break;
- 		default:
- 			return usage();
- 		}
-diff --git a/cifscreds.rst b/cifscreds.rst
-index a6676cb..14f5bda 100644
---- a/cifscreds.rst
-+++ b/cifscreds.rst
-@@ -68,6 +68,10 @@ OPTIONS
-   adding the credentials. This option allows the user to substitute a
-   different username.
- 
-+-t, --timeout
-+  Sets the key timeout in seconds. If not set, will use the system default
-+  timeout for logon keys.
-+
- *****
- NOTES
- *****
-diff --git a/cifskey.c b/cifskey.c
-index 919540f..4fef02f 100644
---- a/cifskey.c
-+++ b/cifskey.c
-@@ -40,11 +40,12 @@ key_search(const char *addr, char keytype)
- 
- /* add or update a specific key to keyring */
- key_serial_t
--key_add(const char *addr, const char *user, const char *pass, char keytype)
-+key_add(const char *addr, const char *user, const char *pass, char keytype, unsigned timeout)
- {
- 	int len;
- 	char desc[INET6_ADDRSTRLEN + sizeof(KEY_PREFIX) + 4];
- 	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
-+	key_serial_t key;
- 
- 	/* set key description */
- 	if (snprintf(desc, sizeof(desc), "%s:%c:%s", KEY_PREFIX, keytype, addr) >= (int)sizeof(desc)) {
-@@ -59,5 +60,12 @@ key_add(const char *addr, const char *user, const char *pass, char keytype)
- 		return -1;
- 	}
- 
--	return add_key(CIFS_KEY_TYPE, desc, val, len + 1, DEST_KEYRING);
-+	if ((key = add_key(CIFS_KEY_TYPE, desc, val, len + 1, DEST_KEYRING)) < 0) {
-+		return -1;
-+	}
-+
-+	if (timeout > 0)
-+		keyctl_set_timeout(key, timeout);
-+
-+	return key;
- }
-diff --git a/cifskey.h b/cifskey.h
-index ed0c469..0069445 100644
---- a/cifskey.h
-+++ b/cifskey.h
-@@ -41,7 +41,12 @@
- #define CIFS_KEY_PERMS (KEY_POS_VIEW|KEY_POS_WRITE|KEY_POS_SEARCH| \
- 			KEY_USR_VIEW|KEY_USR_WRITE|KEY_USR_SEARCH)
- 
-+/**
-+ * Default key timeout is 24 hours
-+ */
-+#define DEFAULT_KEY_TIMEOUT (24 * 60 * 60)
-+
- key_serial_t key_search(const char *addr, char keytype);
--key_serial_t key_add(const char *addr, const char *user, const char *pass, char keytype);
-+key_serial_t key_add(const char *addr, const char *user, const char *pass, char keytype, unsigned timeout);
- 
- #endif /* _CIFSKEY_H */
-diff --git a/pam_cifscreds.c b/pam_cifscreds.c
-index eb9851d..2b8c0b6 100644
---- a/pam_cifscreds.c
-+++ b/pam_cifscreds.c
-@@ -232,7 +232,7 @@ static int cifscreds_pam_add(pam_handle_t *ph, const char *user, const char *pas
- 		*nextaddress++ = '\0';
- 
- 	while (currentaddress) {
--		key_serial_t key = key_add(currentaddress, user, password, keytype);
-+		key_serial_t key = key_add(currentaddress, user, password, keytype, DEFAULT_KEY_TIMEOUT);
- 		if (key <= 0) {
- 			pam_syslog(ph, LOG_ERR, "error: Add credential key for %s: %s",
- 				currentaddress, strerror(errno));
-@@ -335,7 +335,7 @@ static int cifscreds_pam_update(pam_handle_t *ph, const char *user, const char *
- 	}
- 
- 	for (id = 0; id < count; id++) {
--		key_serial_t key = key_add(currentaddress, user, password, keytype);
-+		key_serial_t key = key_add(currentaddress, user, password, keytype, DEFAULT_KEY_TIMEOUT);
- 		if (key <= 0) {
- 			pam_syslog(ph, LOG_ERR, "error: Update credential key for %s: %s",
- 				   (currentaddress ?: "(null)"), strerror(errno));
--- 
-2.47.1
+After recent merge from upstream BPF CI started consistently failing
+with a task hanging in v9fs_evict_inode. I bisected the failure to
+commit e2d46f2ec332, pointing to this patch.
+
+Reverting the patch seems to have helped:
+https://github.com/kernel-patches/vmtest/actions/runs/12952856569
+
+Could you please investigate?
+
+Examples of failed jobs:
+  * https://github.com/kernel-patches/bpf/actions/runs/12941732247
+  * https://github.com/kernel-patches/bpf/actions/runs/12933849075
+
+A log snippet:
+
+    2025-01-24T02:15:03.9009694Z [  246.932163] INFO: task ip:1055 blocked =
+for more than 122 seconds.
+    2025-01-24T02:15:03.9013633Z [  246.932709]       Tainted: G           =
+OE      6.13.0-g2bcb9cf535b8-dirty #149
+    2025-01-24T02:15:03.9018791Z [  246.933249] "echo 0 > /proc/sys/kernel/=
+hung_task_timeout_secs" disables this message.
+    2025-01-24T02:15:03.9025896Z [  246.933802] task:ip              state:=
+D stack:0     pid:1055  tgid:1055  ppid:1054   flags:0x00004002
+    2025-01-24T02:15:03.9028228Z [  246.934564] Call Trace:
+    2025-01-24T02:15:03.9029758Z [  246.934764]  <TASK>
+    2025-01-24T02:15:03.9032572Z [  246.934937]  __schedule+0xa91/0xe80
+    2025-01-24T02:15:03.9035126Z [  246.935224]  schedule+0x41/0xb0
+    2025-01-24T02:15:03.9037992Z [  246.935459]  v9fs_evict_inode+0xfe/0x17=
+0
+    2025-01-24T02:15:03.9041469Z [  246.935748]  ? __pfx_var_wake_function+=
+0x10/0x10
+    2025-01-24T02:15:03.9043837Z [  246.936101]  evict+0x1ef/0x360
+    2025-01-24T02:15:03.9046624Z [  246.936340]  __dentry_kill+0xb0/0x220
+    2025-01-24T02:15:03.9048855Z [  246.936610]  ? dput+0x3a/0x1d0
+    2025-01-24T02:15:03.9051128Z [  246.936838]  dput+0x114/0x1d0
+    2025-01-24T02:15:03.9053548Z [  246.937069]  __fput+0x136/0x2b0
+    2025-01-24T02:15:03.9056154Z [  246.937305]  task_work_run+0x89/0xc0
+    2025-01-24T02:15:03.9058593Z [  246.937571]  do_exit+0x2c6/0x9c0
+    2025-01-24T02:15:03.9061349Z [  246.937816]  do_group_exit+0xa4/0xb0
+    2025-01-24T02:15:03.9064401Z [  246.938090]  __x64_sys_exit_group+0x17/=
+0x20
+    2025-01-24T02:15:03.9067235Z [  246.938390]  x64_sys_call+0x21a0/0x21a0
+    2025-01-24T02:15:03.9069924Z [  246.938672]  do_syscall_64+0x79/0x120
+    2025-01-24T02:15:03.9072746Z [  246.938941]  ? clear_bhb_loop+0x25/0x80
+    2025-01-24T02:15:03.9075581Z [  246.939230]  ? clear_bhb_loop+0x25/0x80
+    2025-01-24T02:15:03.9079275Z [  246.939510]  entry_SYSCALL_64_after_hwf=
+rame+0x76/0x7e
+    2025-01-24T02:15:03.9081976Z [  246.939875] RIP: 0033:0x7fb86f66f21d
+    2025-01-24T02:15:03.9087533Z [  246.940153] RSP: 002b:00007ffdb3cf93f8 =
+EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
+    2025-01-24T02:15:03.9092590Z [  246.940689] RAX: ffffffffffffffda RBX: =
+00007fb86f785fa8 RCX: 00007fb86f66f21d
+    2025-01-24T02:15:03.9097722Z [  246.941201] RDX: 00000000000000e7 RSI: =
+ffffffffffffff80 RDI: 0000000000000000
+    2025-01-24T02:15:03.9102762Z [  246.941705] RBP: 00007ffdb3cf9450 R08: =
+00007ffdb3cf93a0 R09: 0000000000000000
+    2025-01-24T02:15:03.9107940Z [  246.942215] R10: 00007ffdb3cf92ff R11: =
+0000000000000202 R12: 0000000000000001
+    2025-01-24T02:15:03.9113002Z [  246.942723] R13: 0000000000000000 R14: =
+0000000000000000 R15: 00007fb86f785fc0
+    2025-01-24T02:15:03.9114614Z [  246.943244]  </TASK>
+    2025-01-24T02:15:03.9115895Z [  246.943415]
+    2025-01-24T02:15:03.9119326Z [  246.943415] Showing all locks held in t=
+he system:
+    2025-01-24T02:15:03.9122278Z [  246.943865] 1 lock held by khungtaskd/3=
+2:
+    2025-01-24T02:15:03.9128640Z [  246.944162]  #0: ffffffffa9195d90 (rcu_=
+read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180
+    2025-01-24T02:15:03.9131426Z [  246.944792] 2 locks held by kworker/0:2=
+/86:
+    2025-01-24T02:15:03.9132752Z [  246.945102]
+    2025-01-24T02:15:03.9136561Z [  246.945222] =3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+It's worth noting that that the hanging does not happen on *every*
+test run, but often enough to fail the CI pipeline.
+
+You may try reproducing with a container I used for bisection:
+
+    docker pull ghcr.io/theihor/bpf:v9fs_evict_inode-repro
+    docker run -d --privileged --device=3D/dev/kvm --cap-add ALL -v /path/t=
+o/your/kernel/source:/ci/workspace ghcr.io/theihor/bpf:v9fs_evict_inode-rep=
+ro
+    docker exec -it <container_id_or_name> /bin/bash
+    /ci/run.sh # in the container shell
+
+Note that inside the container it's an "ubuntu" user, and you might
+have to run `chown -R ubuntu:ubuntu /ci/workspace` first, or switch to
+root.
+
+> [...]
 
