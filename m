@@ -1,85 +1,105 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fabamailgate01.fabasoft.com (fabamailgate01.fabasoft.com [192.84.221.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9A41CD3F
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Jan 2025 19:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476E22066CB
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jan 2025 22:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.84.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737832409; cv=none; b=YUmJbdKBY+Dqkvse0qm48sh58NQMDeVO3PfoBg8eEweyL7mWnfwUvXwMuKc60J8nRRVF5HTbsWKxF0Xfe5aKo0wYzqjHMBz9h1Nh6zo6yVxJlgzRCcqby0QGIcY02h0DFGfTdEspkq2O9tDxcp2wgAUafbNvcwmHnMv0Q13KH4k=
+	t=1737843775; cv=none; b=YGShlFR/KULJCIZJBtmixqeRP+EHiusERbmedauHsnI2iwKxpFtfbNPA6LHfcLkWcuIQhSlAV4fXr8j8d9ApBi4DsjBbYnkgayXjpkRYAPpx1VWUUXKUZATXhjqnVAnA3v4vLED7sXdCXxuIOyJ9UI+VEc7nSqetJLDU3GBpsTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737832409; c=relaxed/simple;
-	bh=uEAqHALv9jm3tIyuT8/pzN4T87bt0/r3RzDVEWe3NpU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=VgrL075J7wZQhMve/K5Dq6H1kIAHHjam6xV92YjHGFBwg45H2kW+b/ci7g6amOCc5UPs7SpD3DGREIkodHiQWUAqDbjRxMcPDIBhLskr5UGgl26pYd1eCD/jmQzLI0wvXzWmY1qrIYtR1yG6U4iuWPfQUnUnFkxUbm73Mg13uiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SdrBpIvu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdrBpIvu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737832406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t4auuM+gRkH6XArHeITXiQdSx2SBGpYHUM9PVbfE8WM=;
-	b=SdrBpIvu9M88fhId5bEdt47qg7k5NU5OK4Uc7XF6BakpBsfkg3/ccM1aZOcckaOSVWpcuv
-	h/dWsWBr3Krwa1LbUvrJBUTrYv1qfLLrXc8tr8XAsGmSovE0gl4xwT5n0vLX4mxa31L+IM
-	QlF44MldKEcUO2FoEdMDGulxKpMqnwM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-643-ZY4eqW5mPi-C2Y5l_erkXw-1; Sat,
- 25 Jan 2025 14:13:22 -0500
-X-MC-Unique: ZY4eqW5mPi-C2Y5l_erkXw-1
-X-Mimecast-MFC-AGG-ID: ZY4eqW5mPi-C2Y5l_erkXw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1737843775; c=relaxed/simple;
+	bh=SPcyrQtXln2T2uDvxn+Ph/exivwbXMt9N+aWFHgcsjY=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=LmxbBnYmoi1DP/pzvrEIphcFoTIsP8ODbA8hvvqBaRucbmsK7Hi9fnhFv9Fy6zIcjkFMuDFkR5cOGrmWXz8P7Kv6UxR7XVx9wUVPEFjsKfwKD8kGwKs4l7/nJnbIS4NdCuxLd3M4+LaSp8mSOCj7R8D3XkdQ8WlBC0WkRBdpSSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com; spf=pass smtp.mailfrom=fabasoft.com; arc=none smtp.client-ip=192.84.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fabasoft.com
+Received: from fabamailgate01.fabasoft.com (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BF4F19560BB;
-	Sat, 25 Jan 2025 19:13:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 33AE119560AD;
-	Sat, 25 Jan 2025 19:13:20 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CANT5p=pgD_jM6y1VRUHZRRfSkQWm3juW3oLOVpqFMzW1hMOgOQ@mail.gmail.com>
-References: <CANT5p=pgD_jM6y1VRUHZRRfSkQWm3juW3oLOVpqFMzW1hMOgOQ@mail.gmail.com> <CANT5p=pUGYwswgXM-pniMjEWwbLK0cKXPBOJB9cG_cOrkBwQhg@mail.gmail.com> <CANT5p=qBwjBm-D8soFVVtswGEfmMtQXVW83=TNfUtvyHeFQZBA@mail.gmail.com> <505338.1733181074@warthog.procyon.org.uk> <526707.1733224486@warthog.procyon.org.uk> <CANT5p=pO28C+XEC44taAT-Z6W_spB-QzJb+MOXv68bDRGqJn=w@mail.gmail.com> <CANT5p=qc97-Ncs4E6_KfcYVxBYU5cw5LnPJoccb3gePa8OuCKg@mail.gmail.com> <CAN05THTXWKGDynqPLzSfT2j0vvQ9At0YKBHYWMm0KM4mCgyOxA@mail.gmail.com> <CANT5p=rFSLgCyZ8D1CUcSBzmyW+voAbxbOwRHH+=vPgxhLaRfw@mail.gmail.com> <CANT5p=rw_mewxPrp0xxQcBRY8Z7Zwg6RQMCXyc7vwWvDur5dHQ@mail.gmail.com> <CANT5p=peKRDJi6XHKpuDKx82sJdJKVwa-gW_KGUOcyh_rt0tWQ@mail.gmail.com> <2194785.1737650099@warthog.procyon.org.uk>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: dhowells@redhat.com, ronnie sahlberg <ronniesahlberg@gmail.com>,
-    Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: null-ptr deref found in netfs code
+	by fabamailgate01.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS id 5277D2004130;
+	Sat, 25 Jan 2025 23:22:44 +0100 (CET)
+Received: from [127.0.0.1] (helo=fabamailgate01.fabasoft.com)
+	by fabamailgate01.fabasoft.com with ESMTP (eXpurgate 4.51.0)
+	(envelope-from <horst.reiterer@fabasoft.com>)
+	id 67956434-045f-7f0000012b03-7f000001d8ee-1
+	for <multiple-recipients>; Sat, 25 Jan 2025 23:22:44 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com (fabaexch01 [10.10.5.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by fabamailgate01.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS;
+	Sat, 25 Jan 2025 23:22:44 +0100 (CET)
+Received: from FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) by
+ FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Sat, 25 Jan 2025 23:22:43 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7]) by
+ FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7%4]) with mapi id
+ 15.01.2507.044; Sat, 25 Jan 2025 23:22:43 +0100
+From: "Reiterer, Horst" <horst.reiterer@fabasoft.com>
+To: "pc@manguebit.com" <pc@manguebit.com>
+CC: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: RE: Regression: smb: chmod ignored (5.14.0-427.40.1.el9_4 vs.
+ 5.14.0-503.15.1.el9_5)
+Thread-Topic: Regression: smb: chmod ignored (5.14.0-427.40.1.el9_4 vs.
+ 5.14.0-503.15.1.el9_5)
+Thread-Index: Adtvd23lVSVT8VVlSIaajlplMuoqUw==
+Date: Sat, 25 Jan 2025 22:22:43 +0000
+Message-ID: <e70df2a91d1346fdbe88463d4edbf05c@fabasoft.com>
+Accept-Language: en-US, de-AT
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2727966.1737832399.1@warthog.procyon.org.uk>
-Date: Sat, 25 Jan 2025 19:13:19 +0000
-Message-ID: <2727967.1737832399@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-purgate-ID: 152191::1737843764-D67BAACB-75584E38/0/0
+X-purgate-type: clean
+X-purgate-size: 1136
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: clean
+X-purgate: This mail is considered clean
 
-Shyam Prasad N <nspmangalore@gmail.com> wrote:
+Hi Paulo,
 
-> >> netfs: R=00005a08[a] s=2600000-29fffff ctl=200000/400000/400000 sl=5
-> But based on the OOPS that I attached in my last email, slot number is
-> 5, which explains why folio at that slot is NULL.
-> 
-> I don't understand the donation logic well enough to understand why
-> slot could have overflowed like this. Maybe you can?
+thanks for testing with mainline. Bug created:
 
-Can you get a trace with the following tracepoints turned on:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219724
 
-netfs_read
-netfs_rreq
-netfs_sreq
-netfs_donate
+Cheers,
 
-Thanks,
-David
+Horst Reiterer
 
+-----Urspr=FCngliche Nachricht-----
+Von: Paulo Alcantara <pc@manguebit.com>=20
+Gesendet: Samstag, 25. Januar 2025 15:25
+An: Reiterer, Horst <horst.reiterer@fabasoft.com>; linux-cifs@vger.kernel.o=
+rg
+Betreff: Re: Regression: smb: chmod ignored (5.14.0-427.40.1.el9_4 vs. 5.14=
+.0-503.15.1.el9_5)
+
+Hi,
+
+Thanks for the report.
+
+"Reiterer, Horst" <horst.reiterer@fabasoft.com> writes:
+
+> after updating from AlmaLinux 9.4 to 9.5=20
+> (https://repo.almalinux.org/vault/9.4/BaseOS/Source/Packages/kernel-5.
+> 14.0-427.40.1.el9_4.src.rpm vs.=20
+> https://repo.almalinux.org/vault/9.5/BaseOS/Source/Packages/kernel-5.1
+> 4.0-503.15.1.el9_5.src.rpm), chmod gets ignored by the CIFS filesystem=20
+> when executed against a Windows file server unless chmod happens in=20
+> another process.
+
+Yeah, I was able to reproduce it with mainline kernel as well.
+
+Could you please file a bug [1] against File System -> CIFS component?
+
+Thanks.
+
+[1] https://bugzilla.kernel.org/
