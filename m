@@ -1,408 +1,189 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928C9F513
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Jan 2025 00:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94381C878E
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Jan 2025 07:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738024404; cv=none; b=WGTDuAaZCkja+DYQ7KI7gFc0iUslJ0iTh6w6+jahW7DOcBwuxXxrzem18j3FCuyLnTC3jRer9CRUK34P2c8VJhm7kLLonRoJopi0ZfTYW6jN7k9KI/SnfGvbId5ap7JqXkTz+2D5yzOZk4srijE4iNoL42cAIp0IBPpN5MM2cbw=
+	t=1738048410; cv=none; b=aFf2GscAu2vJYYrlsbjcaanEbsEqS8SAdhjOW2j1muixBoSNxx8T97+R3cfQsBXpfF70Jpz5cNbcuJDJLTrbk3Tzasjsgk6uRQfbq6gq8ZE8T5Vd/i6i+ICZkpvQcQcI0QBj04hoNPXTrSZUtCbpduDqnodSNNRjfwBBJfEBids=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738024404; c=relaxed/simple;
-	bh=VQ109A+EZoTXTZjyAoi8YdtXLVBDPw67auEvlLmk2Qg=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=AjvS8+qCq1S6st7nva0uszfy5n76O4ugu67xncV9AtXFcdoAJjOCfC5f+/dz4z19DPxBeNLyoi0hor/eVGm6furKhj6k1XOmtbAZIS5HHiH3BMKZCilHM5ibMDmtMEwV6zaUT8wXF47IN2GrVUaWPpH2nRK/vahuLzjCrGm3upc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GCxMeeTv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1738048410; c=relaxed/simple;
+	bh=5U+q8G47oNRn/ewSSC7hApC27P6RL4NTAgE+ob+bYmE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=iduuAvlETHvtsYwb6qZz+S3D70iM8pi3/sNeB0SKtPYFr0HsDtYNMHNyclGvshZ1tKPmeDOas3R/u0+XywF9kMDIjYuDBn8YA6/Z61HTwfisZmiYk1TthElxOYMuq3QRr6SeHdj89f6+p12ZbBk3lO9nAeMUbtnJpMSPgjNQK98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwnPjy3C; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCxMeeTv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738024401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=T0u0ARtkoWSm+znM5BGA/tKUMlbw04PiNt+8yZ2aXSQ=;
-	b=GCxMeeTv7axizb/RGC7JfqAm20zmIDFVQfojVnpckjv35RqQfGJ2z2ajQwwiixdTHR4ABl
-	jdSOpem/xHgOkpI2j1ArycFOWxl1Q6FrfhmbMSP0+fV7cVSel+7InlhcrfrngGPUCVRiPJ
-	LSFsM5y1rmaJF11kFbmnylthE/kM/Vk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-KyRmQM50MQu5gBOLhjPWPw-1; Mon,
- 27 Jan 2025 19:33:15 -0500
-X-MC-Unique: KyRmQM50MQu5gBOLhjPWPw-1
-X-Mimecast-MFC-AGG-ID: KyRmQM50MQu5gBOLhjPWPw
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2596118004A9;
-	Tue, 28 Jan 2025 00:33:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF52319560A3;
-	Tue, 28 Jan 2025 00:33:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Ihor Solodrai <ihor.solodrai@pm.me>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Steve French <stfrench@microsoft.com>
-cc: dhowells@redhat.com, Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>,
-    Paulo Alcantara <pc@manguebit.com>, Jeff Layton <jlayton@kernel.org>,
-    Christian Brauner <brauner@kernel.org>, v9fs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Fix a number of read-retry hangs
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwnPjy3C"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-540254357c8so5312120e87.1
+        for <linux-cifs@vger.kernel.org>; Mon, 27 Jan 2025 23:13:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738048406; x=1738653206; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WusTfgPBKYdPXO28CMdbQyIwxw9Tkvpu+VYEDGlZQyQ=;
+        b=mwnPjy3CE1wAFNCfJXnoui5JRpTVyCD7rpySHYYT2J8dD3O1JTIdE+COO0u+Z1iFa1
+         lRI9SyeEjbRIE+WuCcshYb4+46CHoOZwaHbkrhjzaWcEpZxtvyb5/TssXaruLdftsclg
+         0aS8J1kvJQhiRbwwJ7hzaV4rAtBXN61UjzI9HU0sZhcM5V6s1LiFXMsgN52nAsnxsbZs
+         pO++iaV3t+brGRfaUrgz2NxeD+fBZyUIIW1ycLGnszQ7MkYC3KnqRJBFu+juqSCVnP9t
+         Hm8dVEwV3DsJe+FDG2agS4hrf17XhuDUyz+YzKgimoFqKkXSCp2YkfB0dBedfG2VFRzJ
+         UAow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738048406; x=1738653206;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WusTfgPBKYdPXO28CMdbQyIwxw9Tkvpu+VYEDGlZQyQ=;
+        b=c125pCrf19zPLLF7iGfV8M+j5q24laq9crsYnEbGlR1dIHfbwdr1KeZFFlMMjyfj5j
+         enD5qSjhJJw5KPXXW11yjzz3W9B9QuUdtfaAH51R+HsshSepvs5SJdvxQi9mVo4I72FR
+         tBBCFm4TdY16QsAmuAlCx2XrJsK4CiCmi4f43yj6uHIcA/EpWp+PTspJGDTTdAZeDQUD
+         4S2GOCfnV2H7rY+8nTvMHrWEsmpQEp8SEIAJosUi35NBPkbC3EDetzdobU7l4ue2kOfe
+         Y7u8VekFFdqgaqwAsVgbPWzzhyHsVd6oJtlSyuBja1PE/jWKSK9vHNsutN8Bc0GoGbMM
+         8FjQ==
+X-Gm-Message-State: AOJu0YwgZJzuaePKv1m/YrQYpr3LU4DyRKhlr/SiAG/gdkwvjJZ7vhoS
+	spE+p6f4kjzei/EKUXRzGsbPsJCIN1H8s6SAdd9H0QNP9xjquIWWoLl+Pi5soEHYqaKsv+TxmxI
+	VSiOSWt49NEoYoNvP+LgyJanlqisGvn30
+X-Gm-Gg: ASbGncv+xvYpZFun3q2opnqSzg8xDe8EYGFjLU9sd9HYr2byYrJXA9wSG9j4Pfc0M76
+	f5ixVPFFo1JgjgTZvPZ/McgF+wxpEYZmLUs59XA77I/Oegc/yJdxBBbNn76CLru/1d7B+OBHcB/
+	6Sml7x24oblKaWIQgLQKa3sNEnlPAKITE=
+X-Google-Smtp-Source: AGHT+IHpnD3Jykh2NVNzhMAIMj3SA4VjCmtgIAevK5z3WKsdC0sDcs3lciRMCz2uMPEok9tSY4wLBK3eQPeyV2nICb8=
+X-Received: by 2002:a05:6512:2346:b0:53e:23ec:b2e7 with SMTP id
+ 2adb3069b0e04-5439c2805f9mr16949223e87.34.1738048405980; Mon, 27 Jan 2025
+ 23:13:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3173327.1738024385.1@warthog.procyon.org.uk>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 28 Jan 2025 01:13:14 -0600
+X-Gm-Features: AWEUYZlQViSD1GYJ0S4TtC3UGoP482C6Dvz7VN2iCBkZw-Eu1oqzj9CvCS0YZX0
+Message-ID: <CAH2r5mvq8F6o3+FQxFrJODndYrG_4Gb_A7n_i2Qae+8tZdR58A@mail.gmail.com>
+Subject: [PATCH][SMB3 client] allow us to get kerberos ticket when server
+ advertises IAKerb
+To: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000d76b2f062cbeed05"
+
+--000000000000d76b2f062cbeed05
+Content-Type: multipart/alternative; boundary="000000000000d76b2d062cbeed03"
+
+--000000000000d76b2d062cbeed03
+Content-Type: text/plain; charset="UTF-8"
+
+There are now more servers which advertise support for IAKerb (passthrough
+Kerberos authentication via proxy).  IAKerb is a public extension industry
+standard Kerberos protocol that allows a client without line-of-sight
+to a Domain Controller to authenticate. There can be cases where we
+would fail to mount if the server only advertises the OID for IAKerb
+in SPNEGO/GSSAPI.  Add code to allow us to still upcall to userspace
+in these cases to obtain the Kerberos ticket.
+
+See attached WIP patch
+-- 
+Thanks,
+
+Steve
+
+--000000000000d76b2d062cbeed03
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Jan 2025 00:33:05 +0000
-Message-ID: <3173328.1738024385@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Ihor, Marc, Steve,
+<div dir=3D"ltr"><div>There are now more servers which advertise support fo=
+r IAKerb (passthrough<br>Kerberos authentication via proxy).=C2=A0 IAKerb i=
+s a public extension industry<br>standard Kerberos protocol that allows a c=
+lient without line-of-sight<br>to a Domain Controller to authenticate. Ther=
+e can be cases where we<br>would fail to mount if the server only advertise=
+s the OID for IAKerb<br>in SPNEGO/GSSAPI.=C2=A0 Add code to allow us to sti=
+ll upcall to userspace<br>in these cases to obtain the Kerberos ticket.<br>=
+</div><div><br></div><div>See attached WIP patch</div><span class=3D"gmail_=
+signature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_signature" =
+data-smartmail=3D"gmail_signature">Thanks,<br><br>Steve</div></div>
 
-I think this patch should better fix the hangs that have been seen than Ih=
-or's
-previously tested fix (which I think isn't actually correct).
+--000000000000d76b2d062cbeed03--
+--000000000000d76b2f062cbeed05
+Content-Type: text/x-patch; charset="US-ASCII"; name="0001-smb3-add-support-for-IAKerb.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-support-for-IAKerb.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m6g53z010>
+X-Attachment-Id: f_m6g53z010
 
-David
----
-From: David Howells <dhowells@redhat.com>
-
-netfs: Fix a number of read-retry hangs
-
-Fix a number of hangs in the netfslib read-retry code, including:
-
- (1) netfs_reissue_read() doubles up the getting of references on
-     subrequests, thereby leaking the subrequest and causing inode evictio=
-n
-     to wait indefinitely.  This can lead to the kernel reporting a hang i=
-n
-     the filesystem's evict_inode().
-
-     Fix this by removing the get from netfs_reissue_read() and adding one
-     to netfs_retry_read_subrequests() to deal with the one place that
-     didn't double up.
-
- (2) The loop in netfs_retry_read_subrequests() that retries a sequence of
-     failed subrequests doesn't record whether or not it retried the one
-     that the "subreq" pointer points to when it leaves the loop.  It may
-     not if renegotiation/repreparation of the subrequests means that fewe=
-r
-     subrequests are needed to span the cumulative range of the sequence.
-
-     Because it doesn't record this, the piece of code that discards
-     now-superfluous subrequests doesn't know whether it should discard th=
-e
-     one "subreq" points to - and so it doesn't.
-
-     Fix this by noting whether the last subreq it examines is superfluous
-     and if it is, then getting rid of it and all subsequent subrequests.
-
-     If that one one wasn't superfluous, then we would have tried to go
-     round the previous loop again and so there can be no further unretrie=
-d
-     subrequests in the sequence.
-
- (3) netfs_retry_read_subrequests() gets yet an extra ref on any additiona=
-l
-     subrequests it has to get because it ran out of ones it could reuse t=
-o
-     to renegotiation/repreparation shrinking the subrequests.
-
-     Fix this by removing that extra ref.
-
- (4) In netfs_retry_reads(), it was using wait_on_bit() to wait for
-     NETFS_SREQ_IN_PROGRESS to be cleared on all subrequests in the
-     sequence - but netfs_read_subreq_terminated() is now using a wait
-     queue on the request instead and so this wait will never finish.
-
-     Fix this by waiting on the wait queue instead.  To make this work, a
-     new flag, NETFS_RREQ_RETRYING, is now set around the wait loop to tel=
-l
-     the wake-up code to wake up the wait queue rather than requeuing the
-     request's work item.
-
-     Note that this flag replaces the NETFS_RREQ_NEED_RETRY flag which is
-     no longer used.
-
- (5) Whilst not strictly anything to do with the hang,
-     netfs_retry_read_subrequests() was also doubly incrementing the
-     subreq_counter and re-setting the debug index, leaving a gap in the
-     trace.  This is also fixed.
-
-One of these hangs was observed with 9p and with cifs.  Others were forced
-by manual code injection into fs/afs/file.c.  Firstly, afs_prepare_read()
-was created to provide an changing pattern of maximum subrequest sizes:
-
-        static int afs_prepare_read(struct netfs_io_subrequest *subreq)
-        {
-                struct netfs_io_request *rreq =3D subreq->rreq;
-                if (!S_ISREG(subreq->rreq->inode->i_mode))
-                        return 0;
-                if (subreq->retry_count < 20)
-                        rreq->io_streams[0].sreq_max_len =3D
-                                umax(200, 2222 - subreq->retry_count * 40)=
-;
-                else
-                        rreq->io_streams[0].sreq_max_len =3D 3333;
-                return 0;
-        }
-
-and pointed to by afs_req_ops.  Then the following:
-
-        struct netfs_io_subrequest *subreq =3D op->fetch.subreq;
-        if (subreq->error =3D=3D 0 &&
-            S_ISREG(subreq->rreq->inode->i_mode) &&
-            subreq->retry_count < 20) {
-                subreq->transferred =3D subreq->already_done;
-                __clear_bit(NETFS_SREQ_HIT_EOF, &subreq->flags);
-                __set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
-                afs_fetch_data_notify(op);
-                return;
-        }
-
-was inserted into afs_fetch_data_success() at the beginning and struct
-netfs_io_subrequest given an extra field, "already_done" that was set to
-the value in "subreq->transferred" by netfs_reissue_read().
-
-When reading a 4K file, the subrequests would get gradually smaller, a new
-subrequest would be allocated around the 3rd retry and then eventually be
-rendered superfluous when the 20th retry was hit and the limit on the firs=
-t
-subrequest was eased.
-
-Reported-by: Ihor Solodrai <ihor.solodrai@pm.me>
-Closes: https://lore.kernel.org/r/a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_x=
-wDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=3D@pm.=
-me/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Steve French <stfrench@microsoft.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: v9fs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/read_collect.c      |    6 ++++--
- fs/netfs/read_retry.c        |   40 ++++++++++++++++++++++++++++++-------=
----
- include/linux/netfs.h        |    2 +-
- include/trace/events/netfs.h |    4 +++-
- 4 files changed, 38 insertions(+), 14 deletions(-)
-
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index f65affa5a9e4..636cc5a98ef5 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -470,7 +470,8 @@ void netfs_read_collection_worker(struct work_struct *=
-work)
-  */
- void netfs_wake_read_collector(struct netfs_io_request *rreq)
- {
--	if (test_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &rreq->flags)) {
-+	if (test_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &rreq->flags) &&
-+	    !test_bit(NETFS_RREQ_RETRYING, &rreq->flags)) {
- 		if (!work_pending(&rreq->work)) {
- 			netfs_get_request(rreq, netfs_rreq_trace_get_work);
- 			if (!queue_work(system_unbound_wq, &rreq->work))
-@@ -586,7 +587,8 @@ void netfs_read_subreq_terminated(struct netfs_io_subr=
-equest *subreq)
- 	smp_mb__after_atomic(); /* Clear IN_PROGRESS before task state */
- =
-
- 	/* If we are at the head of the queue, wake up the collector. */
--	if (list_is_first(&subreq->rreq_link, &stream->subrequests))
-+	if (list_is_first(&subreq->rreq_link, &stream->subrequests) ||
-+	    test_bit(NETFS_RREQ_RETRYING, &rreq->flags))
- 		netfs_wake_read_collector(rreq);
- =
-
- 	netfs_put_subrequest(subreq, true, netfs_sreq_trace_put_terminated);
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 2290af0d51ac..8316c4533a51 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -14,7 +14,6 @@ static void netfs_reissue_read(struct netfs_io_request *=
-rreq,
- {
- 	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
- 	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
--	netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
- 	subreq->rreq->netfs_ops->issue_read(subreq);
- }
- =
-
-@@ -48,6 +47,7 @@ static void netfs_retry_read_subrequests(struct netfs_io=
-_request *rreq)
- 				__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
- 				subreq->retry_count++;
- 				netfs_reset_iter(subreq);
-+				netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
- 				netfs_reissue_read(rreq, subreq);
- 			}
- 		}
-@@ -75,7 +75,7 @@ static void netfs_retry_read_subrequests(struct netfs_io=
-_request *rreq)
- 		struct iov_iter source;
- 		unsigned long long start, len;
- 		size_t part;
--		bool boundary =3D false;
-+		bool boundary =3D false, subreq_superfluous =3D false;
- =
-
- 		/* Go through the subreqs and find the next span of contiguous
- 		 * buffer that we then rejig (cifs, for example, needs the
-@@ -116,8 +116,10 @@ static void netfs_retry_read_subrequests(struct netfs=
-_io_request *rreq)
- 		/* Work through the sublist. */
- 		subreq =3D from;
- 		list_for_each_entry_from(subreq, &stream->subrequests, rreq_link) {
--			if (!len)
-+			if (!len) {
-+				subreq_superfluous =3D true;
- 				break;
-+			}
- 			subreq->source	=3D NETFS_DOWNLOAD_FROM_SERVER;
- 			subreq->start	=3D start - subreq->transferred;
- 			subreq->len	=3D len   + subreq->transferred;
-@@ -154,19 +156,21 @@ static void netfs_retry_read_subrequests(struct netf=
-s_io_request *rreq)
- =
-
- 			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
- 			netfs_reissue_read(rreq, subreq);
--			if (subreq =3D=3D to)
-+			if (subreq =3D=3D to) {
-+				subreq_superfluous =3D false;
- 				break;
-+			}
- 		}
- =
-
- 		/* If we managed to use fewer subreqs, we can discard the
- 		 * excess; if we used the same number, then we're done.
- 		 */
- 		if (!len) {
--			if (subreq =3D=3D to)
-+			if (!subreq_superfluous)
- 				continue;
- 			list_for_each_entry_safe_from(subreq, tmp,
- 						      &stream->subrequests, rreq_link) {
--				trace_netfs_sreq(subreq, netfs_sreq_trace_discard);
-+				trace_netfs_sreq(subreq, netfs_sreq_trace_superfluous);
- 				list_del(&subreq->rreq_link);
- 				netfs_put_subrequest(subreq, false, netfs_sreq_trace_put_done);
- 				if (subreq =3D=3D to)
-@@ -187,14 +191,12 @@ static void netfs_retry_read_subrequests(struct netf=
-s_io_request *rreq)
- 			subreq->source		=3D NETFS_DOWNLOAD_FROM_SERVER;
- 			subreq->start		=3D start;
- 			subreq->len		=3D len;
--			subreq->debug_index	=3D atomic_inc_return(&rreq->subreq_counter);
- 			subreq->stream_nr	=3D stream->stream_nr;
- 			subreq->retry_count	=3D 1;
- =
-
- 			trace_netfs_sreq_ref(rreq->debug_id, subreq->debug_index,
- 					     refcount_read(&subreq->ref),
- 					     netfs_sreq_trace_new);
--			netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
- =
-
- 			list_add(&subreq->rreq_link, &to->rreq_link);
- 			to =3D list_next_entry(to, rreq_link);
-@@ -256,14 +258,32 @@ void netfs_retry_reads(struct netfs_io_request *rreq=
-)
- {
- 	struct netfs_io_subrequest *subreq;
- 	struct netfs_io_stream *stream =3D &rreq->io_streams[0];
-+	DEFINE_WAIT(myself);
-+
-+	set_bit(NETFS_RREQ_RETRYING, &rreq->flags);
- =
-
- 	/* Wait for all outstanding I/O to quiesce before performing retries as
- 	 * we may need to renegotiate the I/O sizes.
- 	 */
- 	list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
--		wait_on_bit(&subreq->flags, NETFS_SREQ_IN_PROGRESS,
--			    TASK_UNINTERRUPTIBLE);
-+		if (!test_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags))
-+			continue;
-+
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_queue);
-+		for (;;) {
-+			prepare_to_wait(&rreq->waitq, &myself, TASK_UNINTERRUPTIBLE);
-+
-+			if (!test_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags))
-+				break;
-+
-+			trace_netfs_sreq(subreq, netfs_sreq_trace_wait_for);
-+			schedule();
-+			trace_netfs_rreq(rreq, netfs_rreq_trace_woke_queue);
-+		}
-+
-+		finish_wait(&rreq->waitq, &myself);
- 	}
-+	clear_bit(NETFS_RREQ_RETRYING, &rreq->flags);
- =
-
- 	trace_netfs_rreq(rreq, netfs_rreq_trace_resubmit);
- 	netfs_retry_read_subrequests(rreq);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 071d05d81d38..c86a11cfc4a3 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -278,7 +278,7 @@ struct netfs_io_request {
- #define NETFS_RREQ_PAUSE		11	/* Pause subrequest generation */
- #define NETFS_RREQ_USE_IO_ITER		12	/* Use ->io_iter rather than ->i_pages=
- */
- #define NETFS_RREQ_ALL_QUEUED		13	/* All subreqs are now queued */
--#define NETFS_RREQ_NEED_RETRY		14	/* Need to try retrying */
-+#define NETFS_RREQ_RETRYING		14	/* Set if we're in the retry path */
- #define NETFS_RREQ_USE_PGPRIV2		31	/* [DEPRECATED] Use PG_private_2 to ma=
-rk
- 						 * write to cache on read */
- 	const struct netfs_request_ops *netfs_ops;
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 6e699cadcb29..f880835f7695 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -99,7 +99,7 @@
- 	EM(netfs_sreq_trace_limited,		"LIMIT")	\
- 	EM(netfs_sreq_trace_need_clear,		"N-CLR")	\
- 	EM(netfs_sreq_trace_partial_read,	"PARTR")	\
--	EM(netfs_sreq_trace_need_retry,		"NRTRY")	\
-+	EM(netfs_sreq_trace_need_retry,		"ND-RT")	\
- 	EM(netfs_sreq_trace_prepare,		"PREP ")	\
- 	EM(netfs_sreq_trace_prep_failed,	"PRPFL")	\
- 	EM(netfs_sreq_trace_progress,		"PRGRS")	\
-@@ -108,7 +108,9 @@
- 	EM(netfs_sreq_trace_short,		"SHORT")	\
- 	EM(netfs_sreq_trace_split,		"SPLIT")	\
- 	EM(netfs_sreq_trace_submit,		"SUBMT")	\
-+	EM(netfs_sreq_trace_superfluous,	"SPRFL")	\
- 	EM(netfs_sreq_trace_terminated,		"TERM ")	\
-+	EM(netfs_sreq_trace_wait_for,		"_WAIT")	\
- 	EM(netfs_sreq_trace_write,		"WRITE")	\
- 	EM(netfs_sreq_trace_write_skip,		"SKIP ")	\
- 	E_(netfs_sreq_trace_write_term,		"WTERM")
-
+RnJvbSA0NzcyNjUxZmYxODkwMDA5OGY3YTNlZTcwODhmZmJmZGMyMGM0YzE1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMjggSmFuIDIwMjUgMDE6MDQ6MjMgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhZGQgc3VwcG9ydCBmb3IgSUFLZXJiCgpUaGVyZSBhcmUgbm93IG1vcmUgc2VydmVycyB3
+aGljaCBhZHZlcnRpc2Ugc3VwcG9ydCBmb3IgSUFLZXJiIChwYXNzdGhyb3VnaApLZXJiZXJvcyBh
+dXRoZW50aWNhdGlvbiB2aWEgcHJveHkpLiAgSUFLZXJiIGlzIGEgcHVibGljIGV4dGVuc2lvbiBp
+bmR1c3RyeQpzdGFuZGFyZCBLZXJiZXJvcyBwcm90b2NvbCB0aGF0IGFsbG93cyBhIGNsaWVudCB3
+aXRob3V0IGxpbmUtb2Ytc2lnaHQKdG8gYSBEb21haW4gQ29udHJvbGxlciB0byBhdXRoZW50aWNh
+dGUuIFRoZXJlIGNhbiBiZSBjYXNlcyB3aGVyZSB3ZQp3b3VsZCBmYWlsIHRvIG1vdW50IGlmIHRo
+ZSBzZXJ2ZXIgb25seSBhZHZlcnRpc2VzIHRoZSBPSUQgZm9yIElBS2VyYgppbiBTUE5FR08vR1NT
+QVBJLiAgQWRkIGNvZGUgdG8gYWxsb3cgdXMgdG8gc3RpbGwgdXBjYWxsIHRvIHVzZXJzcGFjZQpp
+biB0aGVzZSBjYXNlcyB0byBvYnRhaW4gdGhlIEtlcmJlcm9zIHRpY2tldC4KClNpZ25lZC1vZmYt
+Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xp
+ZW50L2FzbjEuYyAgICAgICAgfCAyICsrCiBmcy9zbWIvY2xpZW50L2NpZnNfc3BuZWdvLmMgfCA0
+ICsrKy0KIGZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaCAgICB8IDQgKysrKwogZnMvc21iL2NsaWVu
+dC9zZXNzLmMgICAgICAgIHwgMyArKy0KIGZzL3NtYi9jbGllbnQvc21iMnBkdS5jICAgICB8IDIg
+Ky0KIDUgZmlsZXMgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkKCmRp
+ZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2FzbjEuYyBiL2ZzL3NtYi9jbGllbnQvYXNuMS5jCmlu
+ZGV4IGI1NzI0ZWY5ZjE4Mi4uMjE0YTQ0NTA5ZTdiIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50
+L2FzbjEuYworKysgYi9mcy9zbWIvY2xpZW50L2FzbjEuYwpAQCAtNTIsNiArNTIsOCBAQCBpbnQg
+Y2lmc19uZWdfdG9rZW5faW5pdF9tZWNoX3R5cGUodm9pZCAqY29udGV4dCwgc2l6ZV90IGhkcmxl
+biwKIAkJc2VydmVyLT5zZWNfa2VyYmVyb3MgPSB0cnVlOwogCWVsc2UgaWYgKG9pZCA9PSBPSURf
+bnRsbXNzcCkKIAkJc2VydmVyLT5zZWNfbnRsbXNzcCA9IHRydWU7CisJZWxzZSBpZiAob2lkID09
+IE9JRF9JQUtlcmIpCisJCXNlcnZlci0+c2VjX2lha2VyYiA9IHRydWU7CiAJZWxzZSB7CiAJCWNo
+YXIgYnVmWzUwXTsKIApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzX3NwbmVnby5jIGIv
+ZnMvc21iL2NsaWVudC9jaWZzX3NwbmVnby5jCmluZGV4IDI4ZjU2OGI1ZmMyNy4uYmMxYzFlOWIy
+ODhhIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2NpZnNfc3BuZWdvLmMKKysrIGIvZnMvc21i
+L2NsaWVudC9jaWZzX3NwbmVnby5jCkBAIC0xMzgsMTEgKzEzOCwxMyBAQCBjaWZzX2dldF9zcG5l
+Z29fa2V5KHN0cnVjdCBjaWZzX3NlcyAqc2VzSW5mbywKIAogCWRwID0gZGVzY3JpcHRpb24gKyBz
+dHJsZW4oZGVzY3JpcHRpb24pOwogCi0JLyogZm9yIG5vdywgb25seSBzZWM9a3JiNSBhbmQgc2Vj
+PW1za3JiNSBhcmUgdmFsaWQgKi8KKwkvKiBmb3Igbm93LCBvbmx5IHNlYz1rcmI1IGFuZCBzZWM9
+bXNrcmI1IGFuZCBpYWtlcmIgYXJlIHZhbGlkICovCiAJaWYgKHNlcnZlci0+c2VjX2tlcmJlcm9z
+KQogCQlzcHJpbnRmKGRwLCAiO3NlYz1rcmI1Iik7CiAJZWxzZSBpZiAoc2VydmVyLT5zZWNfbXNr
+ZXJiZXJvcykKIAkJc3ByaW50ZihkcCwgIjtzZWM9bXNrcmI1Iik7CisJZWxzZSBpZiAoc2VydmVy
+LT5zZWNfaWFrZXJiKQorCQlzcHJpbnRmKGRwLCAiO3NlYz1pYWtlcmIiKTsKIAllbHNlIHsKIAkJ
+Y2lmc19kYmcoVkZTLCAidW5rbm93biBvciBtaXNzaW5nIHNlcnZlciBhdXRoIHR5cGUsIHVzZSBr
+cmI1XG4iKTsKIAkJc3ByaW50ZihkcCwgIjtzZWM9a3JiNSIpOwpkaWZmIC0tZ2l0IGEvZnMvc21i
+L2NsaWVudC9jaWZzZ2xvYi5oIGIvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCmluZGV4IDQ5ZmZj
+MDQwZjczNi4uYTc2NWI5MTg4NWZkIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L2NpZnNnbG9i
+LmgKKysrIGIvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCkBAIC0xNTEsNiArMTUxLDcgQEAgZW51
+bSBzZWN1cml0eUVudW0gewogCU5UTE12MiwJCQkvKiBMZWdhY3kgTlRMTSBhdXRoIHdpdGggTlRM
+TXYyIGhhc2ggKi8KIAlSYXdOVExNU1NQLAkJLyogTlRMTVNTUCB3aXRob3V0IFNQTkVHTywgTlRM
+TXYyIGhhc2ggKi8KIAlLZXJiZXJvcywJCS8qIEtlcmJlcm9zIHZpYSBTUE5FR08gKi8KKwlJQUtl
+cmIsCQkJLyogS2VyYmVyb3MgcHJveHkgKi8KIH07CiAKIGVudW0gdXBjYWxsX3RhcmdldF9lbnVt
+IHsKQEAgLTc1MSw2ICs3NTIsNyBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvIHsKIAlib29sCXNl
+Y19rZXJiZXJvc3UydTsJLyogc3VwcG9ydHMgVTJVIEtlcmJlcm9zICovCiAJYm9vbAlzZWNfa2Vy
+YmVyb3M7CQkvKiBzdXBwb3J0cyBwbGFpbiBLZXJiZXJvcyAqLwogCWJvb2wJc2VjX21za2VyYmVy
+b3M7CQkvKiBzdXBwb3J0cyBsZWdhY3kgTVMgS2VyYmVyb3MgKi8KKwlib29sCXNlY19pYWtlcmI7
+CQkvKiBzdXBwb3J0cyBwYXNzLXRocm91Z2ggYXV0aCBmb3IgS2VyYmVyb3MgKGtyYjUgcHJveHkp
+ICovCiAJYm9vbAlsYXJnZV9idWY7CQkvKiBpcyBjdXJyZW50IGJ1ZmZlciBsYXJnZT8gKi8KIAkv
+KiB1c2UgU01CRCBjb25uZWN0aW9uIGluc3RlYWQgb2Ygc29ja2V0ICovCiAJYm9vbAlyZG1hOwpA
+QCAtMjExOCw2ICsyMTIwLDggQEAgc3RhdGljIGlubGluZSBjaGFyICpnZXRfc2VjdXJpdHlfdHlw
+ZV9zdHIoZW51bSBzZWN1cml0eUVudW0gc2VjdHlwZSkKIAkJcmV0dXJuICJLZXJiZXJvcyI7CiAJ
+Y2FzZSBOVExNdjI6CiAJCXJldHVybiAiTlRMTXYyIjsKKwljYXNlIElBS2VyYjoKKwkJcmV0dXJu
+ICJJQUtlcmIiOwogCWRlZmF1bHQ6CiAJCXJldHVybiAiVW5rbm93biI7CiAJfQpkaWZmIC0tZ2l0
+IGEvZnMvc21iL2NsaWVudC9zZXNzLmMgYi9mcy9zbWIvY2xpZW50L3Nlc3MuYwppbmRleCA5MWQ0
+ZDQwOWNiMWQuLmZhYTgwZTdkNTRhNiAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zZXNzLmMK
+KysrIGIvZnMvc21iL2NsaWVudC9zZXNzLmMKQEAgLTEyMzUsMTIgKzEyMzUsMTMgQEAgY2lmc19z
+ZWxlY3Rfc2VjdHlwZShzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGVudW0gc2VjdXJp
+dHlFbnVtIHJlcXVlc3RlZCkKIAkJc3dpdGNoIChyZXF1ZXN0ZWQpIHsKIAkJY2FzZSBLZXJiZXJv
+czoKIAkJY2FzZSBSYXdOVExNU1NQOgorCQljYXNlIElBS2VyYjoKIAkJCXJldHVybiByZXF1ZXN0
+ZWQ7CiAJCWNhc2UgVW5zcGVjaWZpZWQ6CiAJCQlpZiAoc2VydmVyLT5zZWNfbnRsbXNzcCAmJgog
+CQkJICAgIChnbG9iYWxfc2VjZmxhZ3MgJiBDSUZTU0VDX01BWV9OVExNU1NQKSkKIAkJCQlyZXR1
+cm4gUmF3TlRMTVNTUDsKLQkJCWlmICgoc2VydmVyLT5zZWNfa2VyYmVyb3MgfHwgc2VydmVyLT5z
+ZWNfbXNrZXJiZXJvcykgJiYKKwkJCWlmICgoc2VydmVyLT5zZWNfa2VyYmVyb3MgfHwgc2VydmVy
+LT5zZWNfbXNrZXJiZXJvcyB8fCBzZXJ2ZXItPnNlY19pYWtlcmIpICYmCiAJCQkgICAgKGdsb2Jh
+bF9zZWNmbGFncyAmIENJRlNTRUNfTUFZX0tSQjUpKQogCQkJCXJldHVybiBLZXJiZXJvczsKIAkJ
+CWZhbGx0aHJvdWdoOwpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMgYi9mcy9z
+bWIvY2xpZW50L3NtYjJwZHUuYwppbmRleCA5ZjU0NTk2YTY4NjYuLjQwYWQ5ZTc5NDM3YSAxMDA2
+NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKKysrIGIvZnMvc21iL2NsaWVudC9zbWIy
+cGR1LmMKQEAgLTE0MjksNyArMTQyOSw3IEBAIHNtYjJfc2VsZWN0X3NlY3R5cGUoc3RydWN0IFRD
+UF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBlbnVtIHNlY3VyaXR5RW51bSByZXF1ZXN0ZWQpCiAJCWlm
+IChzZXJ2ZXItPnNlY19udGxtc3NwICYmCiAJCQkoZ2xvYmFsX3NlY2ZsYWdzICYgQ0lGU1NFQ19N
+QVlfTlRMTVNTUCkpCiAJCQlyZXR1cm4gUmF3TlRMTVNTUDsKLQkJaWYgKChzZXJ2ZXItPnNlY19r
+ZXJiZXJvcyB8fCBzZXJ2ZXItPnNlY19tc2tlcmJlcm9zKSAmJgorCQlpZiAoKHNlcnZlci0+c2Vj
+X2tlcmJlcm9zIHx8IHNlcnZlci0+c2VjX21za2VyYmVyb3MgfHwgc2VydmVyLT5zZWNfaWFrZXJi
+KSAmJgogCQkJKGdsb2JhbF9zZWNmbGFncyAmIENJRlNTRUNfTUFZX0tSQjUpKQogCQkJcmV0dXJu
+IEtlcmJlcm9zOwogCQlmYWxsdGhyb3VnaDsKLS0gCjIuNDMuMAoK
+--000000000000d76b2f062cbeed05--
