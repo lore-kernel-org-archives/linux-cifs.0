@@ -1,221 +1,119 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998A91C5F2C
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Jan 2025 19:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C561ACEC2
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 22:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738091480; cv=none; b=j2LpxpC+ob2JAl5DkBdtQLxfFvblo5WvHp1EYSf+ufXqzEcsI596yvf0NaZ79hQcIdrSkN1rTVp3BtXUh7zaZ6LrUwxRLax7YBTzTBBfzObzVe36dYEbT7211edmLILZkR5M3NEQJLMCk+053+jM5oa/tiyGDc+nUUFF4OUAAt8=
+	t=1738189433; cv=none; b=Jp8ywhBxXKgAgBeYEw7ds7SWyQHcsfEgOzlZk6HXbIkmljITI/aji8oMXubM8NGTim3Y09QSn/l57V3D49T/9+u5AC/vQIaz1MhCo1ersrVSaQHsNM6BuSZCi/ESkqUegzA8x4qoZ4FOIsEr9TlQUc04Jml7/wTkezhL+cWD9sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738091480; c=relaxed/simple;
-	bh=+hzuBfFg7K6TqkJXl//PSTrUF4nd/QIbA4vDwZ41wOU=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=DnQAU50kMI9+OtUakaPo4+SLNWoeCdDjF6sQvP8ABue9720TrnLfRluoYmR4Xj3Rc+6GMvumtfM/PCWkV8VPWVd6mgKHp0SAeFo9sJ2KyFvSj+RDWVkGt1Y36shTbkrnSnAv8MtquT3r1GUKGiqGyKWmG6crITl+ehcm39dvV/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DVWx3TJs; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1738189433; c=relaxed/simple;
+	bh=legDdMj7/8HT7EQ3FnSqgdiVtZP7MnbJiA1muaK7Os8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qIeGfIZvHjQLiJrlorIonHBSvdmZ//xsS+KQjETTCSO4TPXIIcOJTrI8pwUmAkKeU8tvMLb3d/A4FxZ2Xixzz5SdO6Mc8KAy91i+mII/TAgq2YUFUQqZO80Vy1BAgb4wUOU/8pW+uTCTuN0SpRnLD6yJcb3n4NaWd4PYGYbikik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAzE/pTL; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DVWx3TJs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAzE/pTL"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53f22fd6832so173174e87.1
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 14:23:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738189430; x=1738794230; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Zn1VyREdaZ5O/jl4CgB3Z6vaU4evrMWsuCKgGuxXk6A=;
+        b=CAzE/pTLqlCIYUcM2buqNoZ7X38XdUUmGA5P+pwp3wE6rNELHrB0qa3RxZu8dzZbZs
+         w7Zu/Jn8CLR+cEHAuuJ5xO9taAJ5lBuYWapqLhHU/EKYJwo8UmIuCyF2XIgzBnYoZ/mO
+         7/hdQOF20E1a8x29JzQv2pQ23dY7RzZJv847zp3eMIX8wlzFZm/KmikQqUGQeW8J0vEd
+         rs609kXxW0HlvfZ3BQKym8iQr1GbNL/iWb60VyI0qplb4HCCefbi9uEvf0LjUYoV5+YG
+         110BVgsAWyBVoP+9h1hRBs8uRnlBC/35Z6bdW45OIV6ilApOqmnUSBIOWNGxJyi8L+nx
+         O8Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738189430; x=1738794230;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Zn1VyREdaZ5O/jl4CgB3Z6vaU4evrMWsuCKgGuxXk6A=;
+        b=sFt0LMl84GyGRgdwrocwBa5rkmkmDJpw1zD6OM0ZTX1rX5MRNb3dXstn9r5XKcdYhT
+         lWB5Gza8zXvI58SOzu3j7mbpLplaPVCvn+an5I0Gxgc7WP/KsuHEgnsEy+LBT9MUVH2H
+         +SN/dn0EAc7lHSAnOGIQYq8E2ZAziM1EOvJ6wlKu66J11o2yXWGbu5ao/FeeTwOydRo5
+         GptwH8rZS37pk65dl6wOD924OPpE6SQYXf6GEDfarc8A8BzoGZr/ehPUYH2E5/iJJcko
+         uFnifoS55kpo9Jm10yRL6PLNberv9Lt5kzPiCEMUNZ77h1EiTadssQZcmx9mMVTNVAh4
+         tRyA==
+X-Gm-Message-State: AOJu0YwbIdvmxI+ykRTlIGjGtZpwgcFl2IPpgKxmnb2vT7ZDL51djDll
+	zky/UsXWxKxvYCi9cyPQVPTNho5PlZpgLtzWRjGkWixdNk9AtSUmUD8DjVu5K7r4KcereVqqUoF
+	Yd5qw7PyVAg0nOBssmaiYQEZaRBUgq2jY
+X-Gm-Gg: ASbGncuO6wvk8/o+HRMYDr9VabtB7wGYr6z+IHEVRx5jjUsGufcr1nkra9ITtqrmSvo
+	L+afd76fWMFzCTuV3tpXYoMIS6ix+v+Wk30571MG+eVGND9deDPg1E53nguOwqUXILKTYUvMxRw
+	==
+X-Google-Smtp-Source: AGHT+IEkc4flHw8WQEbHV5Wj0iy7pcEzI8ZSyX+pOa+KjPqmmTf58P/XqPzrUs23ep+M74q5vFWYVW3uTfH/bk2O3nY=
+X-Received: by 2002:ac2:430a:0:b0:540:1b2d:8ef3 with SMTP id
+ 2adb3069b0e04-543e4c3ca2cmr1399728e87.52.1738189429577; Wed, 29 Jan 2025
+ 14:23:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738091466;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mmZT8PaXoi/HunjOtQbjefqQfnCV71OuFQe94XCRs20=;
-	b=DVWx3TJs2soTZpBNemucvFacnryUUHga12rgZBxAaTOhcYj1iFJyC/YOMue+8tUTZF7bxa
-	t4RNum65n2ZPreOB+DqRztoXAr33zSlnnqYrfOL0nikI8PmfwlpZ0Cq3wJB8yH9ucFBPnz
-	ezKiXyQ+O4wSq08poCTOcU41RlpGK5o=
-Date: Tue, 28 Jan 2025 19:11:04 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Ihor Solodrai" <ihor.solodrai@linux.dev>
-Message-ID: <335ad811ae2cf5ebdfc494c185b9f02e9ca40c3e@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH] netfs: Add retry stat counters
-To: "David Howells" <dhowells@redhat.com>, "Marc Dionne"
- <marc.dionne@auristor.com>, "Steve French" <stfrench@microsoft.com>
-Cc: dhowells@redhat.com, "Eric Van Hensbergen" <ericvh@kernel.org>,
- "Latchesar Ionkov" <lucho@ionkov.net>, "Dominique Martinet"
- <asmadeus@codewreck.org>, "Christian Schoenebeck"
- <linux_oss@crudebyte.com>, "Paulo Alcantara" <pc@manguebit.com>, "Jeff
- Layton" <jlayton@kernel.org>, "Christian Brauner" <brauner@kernel.org>,
- v9fs@lists.linux.dev, linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- ast@kernel.org, bpf@vger.kernel.org
-In-Reply-To: <3187377.1738056789@warthog.procyon.org.uk>
-References: <3173328.1738024385@warthog.procyon.org.uk>
- <3187377.1738056789@warthog.procyon.org.uk>
-X-Migadu-Flow: FLOW_OUT
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 29 Jan 2025 16:23:38 -0600
+X-Gm-Features: AWEUYZlnwsHU9qPe3vRperR7Op39lR3XoUF2yzStJuUOf7P5_oZUW1E5y6YVahI
+Message-ID: <CAH2r5mvdyi_6OZQ69z5zhiNapJZ778K_ZraY9dVpmAjgr7czSw@mail.gmail.com>
+Subject: parse_reparse_point confusing function name
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>
+Content-Type: text/plain; charset="UTF-8"
 
-January 28, 2025 at 1:33 AM, "David Howells" <dhowells@redhat.com> wrote:
+Any thoughts on whether the use of two different parse_reparse_point()
+functions with the same name is confusing?  Should we change the name
+of one of them?
 
->=20
->=20Here's an additional patch to allow stats on the number of retries to=
- be
->=20
->=20obtained. This isn't a fix per se.
->=20
->=20David
->
-> [...]
+in fs/smb/client/cifsproto.h there is one parse_reparse_point() declaration:
 
-Hi David, Marc.
+int parse_reparse_point(struct reparse_data_buffer *buf,
+                        u32 plen, struct cifs_sb_info *cifs_sb,
+                        const char *full_path,
+                        struct cifs_open_info_data *data);
 
-I regret to report that this patch didn't fix the hanging in
-v9fs_evict_inode when running selftests/bpf.
 
-Here is what I tried to test:
+And in fs/smb/client/cifsglob.h there is a different one;
+smb_version_operation --> parse_reparse_point()
 
-  * Checked out latest bpf-next source tree (0fc5dddb9409)
-  * Applied patch: https://lore.kernel.org/netfs/3173328.1738024385@warth=
-og.procyon.org.uk/
-  * Applied retry stats patch: https://lore.kernel.org/netfs/3187377.1738=
-056789@warthog.procyon.org.uk/
-  * Modified tools/testing/selftests/bpf/config to enable /proc/fs/netfs/=
-stats
-  * Modified CI scripts to collect the stats
-  * Ran the shell script reproducing the CI testing pipeline
+        int (*parse_reparse_point)(struct cifs_sb_info *cifs_sb,
+                                   const char *full_path,
+                                   struct kvec *rsp_iov,
+                                   struct cifs_open_info_data *data);
 
-Bash piece starting a process collecting /proc/fs/netfs/stats:
 
-    function tail_netfs {
-        echo -n > /mnt/vmtest/netfs-stats.log
-        while true; do
-            echo >> /mnt/vmtest/netfs-stats.log
-            cat /proc/fs/netfs/stats >> /mnt/vmtest/netfs-stats.log
-            sleep 1
-        done
-    }
-    export -f tail_netfs
-    nohup bash -c 'tail_netfs' & disown
+/smb3-kernel$ git grep parse_reparse_point
+fs/smb/client/cifsglob.h:       int (*parse_reparse_point)(struct
+cifs_sb_info *cifs_sb,
+fs/smb/client/cifsproto.h:int parse_reparse_point(struct
+reparse_data_buffer *buf,
+fs/smb/client/inode.c:          } else if (iov &&
+server->ops->parse_reparse_point) {
+fs/smb/client/inode.c:                  rc =
+server->ops->parse_reparse_point(cifs_sb,
+fs/smb/client/reparse.c:int parse_reparse_point(struct reparse_data_buffer *buf,
+fs/smb/client/reparse.c:int smb2_parse_reparse_point(struct
+cifs_sb_info *cifs_sb,
+fs/smb/client/reparse.c:        return parse_reparse_point(buf, plen,
+cifs_sb, full_path, data);
+fs/smb/client/reparse.h:int smb2_parse_reparse_point(struct
+cifs_sb_info *cifs_sb,
+fs/smb/client/smb1ops.c:static int cifs_parse_reparse_point(struct
+cifs_sb_info *cifs_sb,
+fs/smb/client/smb1ops.c:        return parse_reparse_point(buf, plen,
+cifs_sb, full_path, data);
+fs/smb/client/smb1ops.c:        .parse_reparse_point = cifs_parse_reparse_point,
+fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
 
-Last recored /proc/fs/netfs/stats (note 0 retries):
 
-    Reads  : DR=3D0 RA=3D15184 RF=3D5 RS=3D0 WB=3D0 WBZ=3D0
-    Writes : BW=3D488 WT=3D0 DW=3D0 WP=3D488 2C=3D0
-    ZeroOps: ZR=3D7964 sh=3D0 sk=3D0
-    DownOps: DL=3D15189 ds=3D15189 df=3D0 di=3D0
-    CaRdOps: RD=3D0 rs=3D0 rf=3D0
-    UpldOps: UL=3D488 us=3D488 uf=3D0
-    CaWrOps: WR=3D0 ws=3D0 wf=3D0
-    Retries: rq=3D0 rs=3D0 wq=3D0 ws=3D0
-    Objs   : rr=3D2 sr=3D1 foq=3D1 wsc=3D0
-    WbLock : skip=3D0 wait=3D0
-    -- FS-Cache statistics --
-    Cookies: n=3D0 v=3D0 vcol=3D0 voom=3D0
-    Acquire: n=3D0 ok=3D0 oom=3D0
-    LRU    : n=3D0 exp=3D0 rmv=3D0 drp=3D0 at=3D0
-    Invals : n=3D0
-    Updates: n=3D0 rsz=3D0 rsn=3D0
-    Relinqs: n=3D0 rtr=3D0 drop=3D0
-    NoSpace: nwr=3D0 ncr=3D0 cull=3D0
-    IO     : rd=3D0 wr=3D0 mis=3D0
+-- 
+Thanks,
 
-The stack on hung task hasn't changed:
-
-    [  184.375149] INFO: task modprobe:2759 blocked for more than 20 seco=
-nds.
-    [  184.376149]       Tainted: G           OE      6.13.0-gbb67a65a921=
-c-dirty #3
-    [  184.376593] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" dis=
-ables this message.
-    [  184.377119] task:modprobe        state:D stack:0     pid:2759  tgi=
-d:2759  ppid:455    flags:0x00004002
-    [  184.377701] Call Trace:
-    [  184.377886]  <TASK>
-    [  184.378039]  __schedule+0xa91/0xe80
-    [  184.378282]  schedule+0x41/0xb0
-    [  184.378490]  v9fs_evict_inode+0xfe/0x170
-    [  184.378754]  ? __pfx_var_wake_function+0x10/0x10
-    [  184.379070]  evict+0x1ef/0x360
-    [  184.379288]  __dentry_kill+0xb0/0x220
-    [  184.379528]  ? dput+0x3a/0x1d0
-    [  184.379736]  dput+0x114/0x1d0
-    [  184.379946]  __fput+0x136/0x2b0
-    [  184.380158]  task_work_run+0x89/0xc0
-    [  184.380396]  do_exit+0x2c6/0x9c0
-    [  184.380617]  do_group_exit+0xa4/0xb0
-    [  184.380870]  __x64_sys_exit_group+0x17/0x20
-    [  184.381137]  x64_sys_call+0x21a0/0x21a0
-    [  184.381386]  do_syscall_64+0x79/0x120
-    [  184.381630]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-    [  184.381969] RIP: 0033:0x7f817bf7c21d
-    [  184.382202] RSP: 002b:00007fff92c8d148 EFLAGS: 00000206 ORIG_RAX: =
-00000000000000e7
-    [  184.382676] RAX: ffffffffffffffda RBX: 00007f817c092fa8 RCX: 00007=
-f817bf7c21d
-    [  184.383138] RDX: 00000000000000e7 RSI: ffffffffffffff88 RDI: 00000=
-00000000001
-    [  184.383582] RBP: 00007fff92c8d1a0 R08: 00007fff92c8d0e8 R09: 00000=
-00000000000
-    [  184.384042] R10: 00007fff92c8d05f R11: 0000000000000206 R12: 00000=
-00000000001
-    [  184.384486] R13: 0000000000000000 R14: 0000000000000001 R15: 00007=
-f817c092fc0
-    [  184.384963]  </TASK>
-    [  184.385112]
-    [  184.385112] Showing all locks held in the system:
-    [  184.385499] 1 lock held by khungtaskd/32:
-    [  184.385793]  #0: ffffffff9d195d90 (rcu_read_lock){....}-{1:3}, at:=
- debug_show_all_locks+0x2e/0x180
-    [  184.386366] 2 locks held by kworker/u8:10/455:
-    [  184.386649]  #0: ffffa1a240104d48 ((wq_completion)events_unbound){=
-+.+.}-{0:0}, at: process_scheduled_works+0x23a/0x600
-    [  184.387357]  #1: ffffb06380a23e20 ((work_completion)(&sub_info->wo=
-rk)){+.+.}-{0:0}, at: process_scheduled_works+0x25a/0x600
-    [  184.388076]
-    [  184.388183] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-
-I pushed full logs to github:
-https://github.com/kernel-patches/bpf/commit/88c0d0e1692b04c0d54b7c194100=
-3758d23e0d6a
-
-I recommend trying to reproduce with steps I shared in my initial report:
-https://lore.kernel.org/bpf/a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhL=
-vgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=3D@pm.me/
-
-I know it may not be very convenient due to all the CI stuff, but you
-should be able to use it to iterate on the kernel source locally and
-narrow down the problem.
-
-I have everything set up, so you also might share some debugging code
-for me to run if you prefer.
-
-Thanks.
-
----
-
-Not directly related, but it took me a while to figure out how to
-collect the netfs stats.
-
-I first added:
-    CONFIG_NETFS_DEBUG=3Dy
-    CONFIG_NETFS_STATS=3Dy
-
-But that didn't work, because /proc/fs/netfs/stats is created only
-with CONFIG_FSCACHE_STATS (fs/netfs/main.c):
-
-    #ifdef CONFIG_FSCACHE_STATS
-            if (!proc_create_single("fs/netfs/stats", S_IFREG | 0444, NUL=
-L,
-                                    netfs_stats_show))
-                    goto error_procfile;
-    #endif
-
-And that depends on CONFIG_FSCACHE=3Dy, so I ended up with:
-
-    CONFIG_FSCACHE=3Dy
-    CONFIG_FSCACHE_STATS=3Dy
-    CONFIG_NETFS_SUPPORT=3Dy
-    CONFIG_NETFS_DEBUG=3Dy
-    CONFIG_NETFS_STATS=3Dy
+Steve
