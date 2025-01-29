@@ -1,54 +1,54 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C561ACEC2
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 22:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F1ADDCD
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 23:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738189433; cv=none; b=Jp8ywhBxXKgAgBeYEw7ds7SWyQHcsfEgOzlZk6HXbIkmljITI/aji8oMXubM8NGTim3Y09QSn/l57V3D49T/9+u5AC/vQIaz1MhCo1ersrVSaQHsNM6BuSZCi/ESkqUegzA8x4qoZ4FOIsEr9TlQUc04Jml7/wTkezhL+cWD9sE=
+	t=1738193979; cv=none; b=apRYlp6sq4YWZsQny7qZbwdeLV9p7VJBdyJJVrtFt0/J7ZM/WEfFtyi6ByddESMiH2T3fbG1ZpACwMm/aboHaVVbmEj0ydUvHkIHD/mzcBt8CnmIzRQENFk6biZNJWIw1u/28+ZWQg3grtP0cTY+9w14Ud70DMABA+xe2dJ9JrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738189433; c=relaxed/simple;
-	bh=legDdMj7/8HT7EQ3FnSqgdiVtZP7MnbJiA1muaK7Os8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qIeGfIZvHjQLiJrlorIonHBSvdmZ//xsS+KQjETTCSO4TPXIIcOJTrI8pwUmAkKeU8tvMLb3d/A4FxZ2Xixzz5SdO6Mc8KAy91i+mII/TAgq2YUFUQqZO80Vy1BAgb4wUOU/8pW+uTCTuN0SpRnLD6yJcb3n4NaWd4PYGYbikik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAzE/pTL; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1738193979; c=relaxed/simple;
+	bh=KDagXZZ0pHyb7O62aFJhlsMal9tQ1N6ZapbGMteIZOc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=WHfqz74fnlhzB4NJZAhFME8B+a4f1jYdRgr3Hs5CB5xQlud+44OgEHIT9jEMRKvsRpTOcLVZihmeXTFuCXV8vfHEWpH7+DWX0ckpi1L3eViqa5iLDS8vvsepwQ/14hzUlB88hXjRaGf8ueb2ciCvYLUDx+kSmeMKunF17PaFf5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iFTK13ya; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAzE/pTL"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53f22fd6832so173174e87.1
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 14:23:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFTK13ya"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-540215984f0so211428e87.1
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Jan 2025 15:39:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738189430; x=1738794230; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1738193976; x=1738798776; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Zn1VyREdaZ5O/jl4CgB3Z6vaU4evrMWsuCKgGuxXk6A=;
-        b=CAzE/pTLqlCIYUcM2buqNoZ7X38XdUUmGA5P+pwp3wE6rNELHrB0qa3RxZu8dzZbZs
-         w7Zu/Jn8CLR+cEHAuuJ5xO9taAJ5lBuYWapqLhHU/EKYJwo8UmIuCyF2XIgzBnYoZ/mO
-         7/hdQOF20E1a8x29JzQv2pQ23dY7RzZJv847zp3eMIX8wlzFZm/KmikQqUGQeW8J0vEd
-         rs609kXxW0HlvfZ3BQKym8iQr1GbNL/iWb60VyI0qplb4HCCefbi9uEvf0LjUYoV5+YG
-         110BVgsAWyBVoP+9h1hRBs8uRnlBC/35Z6bdW45OIV6ilApOqmnUSBIOWNGxJyi8L+nx
-         O8Dg==
+        bh=NzHY5KQzT/2uDyL2AmDcsi3/jwW2XlgLGwARBobr7yc=;
+        b=iFTK13ya/OUVV9qj5Z0nM95hoNYJyITYR1u7sOYsBAHN9XCMjfUQ3AlG5IL3GiXuqH
+         INX81qxIb9gHmfY5pO3v9l8LxCHb1Oxdu57AWrrsEDBRgtHM7PkhKmgyJGeLmZ0+08cv
+         oSW7dQ8Q/a993h51nmzzY4PhZ9Aj7w3O7UXrFRsfmmR8qgCw6pRX3J4yzPZY6JcmjU90
+         LgnoQwxWZ/gOA+AqtmqrN9hBvjbALBmiERDC7WtNnzr6MWvqOxVey+ntdiSR+bxHGECM
+         DQQo5weBbsc9r6jhO4Q1d4FelUB8oh1EfnkK3dEUcXMLBCae5zLHUWpYgaR7R1hY62k6
+         8v6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738189430; x=1738794230;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1738193976; x=1738798776;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zn1VyREdaZ5O/jl4CgB3Z6vaU4evrMWsuCKgGuxXk6A=;
-        b=sFt0LMl84GyGRgdwrocwBa5rkmkmDJpw1zD6OM0ZTX1rX5MRNb3dXstn9r5XKcdYhT
-         lWB5Gza8zXvI58SOzu3j7mbpLplaPVCvn+an5I0Gxgc7WP/KsuHEgnsEy+LBT9MUVH2H
-         +SN/dn0EAc7lHSAnOGIQYq8E2ZAziM1EOvJ6wlKu66J11o2yXWGbu5ao/FeeTwOydRo5
-         GptwH8rZS37pk65dl6wOD924OPpE6SQYXf6GEDfarc8A8BzoGZr/ehPUYH2E5/iJJcko
-         uFnifoS55kpo9Jm10yRL6PLNberv9Lt5kzPiCEMUNZ77h1EiTadssQZcmx9mMVTNVAh4
-         tRyA==
-X-Gm-Message-State: AOJu0YwbIdvmxI+ykRTlIGjGtZpwgcFl2IPpgKxmnb2vT7ZDL51djDll
-	zky/UsXWxKxvYCi9cyPQVPTNho5PlZpgLtzWRjGkWixdNk9AtSUmUD8DjVu5K7r4KcereVqqUoF
-	Yd5qw7PyVAg0nOBssmaiYQEZaRBUgq2jY
-X-Gm-Gg: ASbGncuO6wvk8/o+HRMYDr9VabtB7wGYr6z+IHEVRx5jjUsGufcr1nkra9ITtqrmSvo
-	L+afd76fWMFzCTuV3tpXYoMIS6ix+v+Wk30571MG+eVGND9deDPg1E53nguOwqUXILKTYUvMxRw
-	==
-X-Google-Smtp-Source: AGHT+IEkc4flHw8WQEbHV5Wj0iy7pcEzI8ZSyX+pOa+KjPqmmTf58P/XqPzrUs23ep+M74q5vFWYVW3uTfH/bk2O3nY=
-X-Received: by 2002:ac2:430a:0:b0:540:1b2d:8ef3 with SMTP id
- 2adb3069b0e04-543e4c3ca2cmr1399728e87.52.1738189429577; Wed, 29 Jan 2025
- 14:23:49 -0800 (PST)
+        bh=NzHY5KQzT/2uDyL2AmDcsi3/jwW2XlgLGwARBobr7yc=;
+        b=Q8qGcoXDlX3W3snx9eHuJzkQkzbMfuOQXxZnt9PRZyYx9r5ARvnRbjyOU/wkB76nmn
+         QU3JgzOwiJaMxYEOJPiZLICK6SK3scpPZVyRu1zKCK5NwIzTe5rNCBbePpB/g/+fZnGR
+         w9PRBDOpCWqiI+X6QLDIZQWiXnCfyQhXhNo/MMGkJfVQnyq6AD9C3AEK0+rZlLILpbUU
+         iwf53AmH+konyJ+6y8E8OTrrMCg8bXOXp/muhbB2bKSqsYfZ69Ljn/2HK+3AwVSRPdAp
+         0kkjRqy7fwpkLMR04Z5b1BjSx96bEdelXrgSkUtD4Sz0T8zDtAl4M2S3YxtBfaeLLPwj
+         MXhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPKTZySx2vac+IR2LHJFrvLNqfFCDxpDpuu5sMMIsfJ3w/czXDA+/MDz0YlBzRIBfCVffgiEKSO6q2@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgnQBfooUe93NDz+oJOfaAdeZ1BqVcedBZlSmfwRf911+iYfun
+	t3RNnNWJGBtBt+D878m2TSB8IIVLcYDxZJ31BvNRjAjnxIDGNVzaCzv4F5FHJ4w5exkt66gopo2
+	cS119XN1x7KcZail1G+CeGS2wz1ggZQ6M
+X-Gm-Gg: ASbGncu0S1bO9FBM87xB0xyM3RvrAyM+rZNmHpmvx+ECmazI3muy3IFu+uyvuJUqhP5
+	5bBADPwfz5gO8o4smi7RpsiPwLcOt7fV3mBOrJqPjFK9FIN6wll+fNppmTnXAs/nzp5Grbexq
+X-Google-Smtp-Source: AGHT+IFaNLWVLclSY15aqKDpcKAy2ngSz4MDaR61IAyU89DZ7JX1QNZnftx0/QQ1RuxlxkJV3oVxRezG7J1x8zbopyA=
+X-Received: by 2002:a05:6512:108d:b0:540:1c16:f2f7 with SMTP id
+ 2adb3069b0e04-543e4be8e86mr1675306e87.14.1738193975599; Wed, 29 Jan 2025
+ 15:39:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -56,62 +56,24 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 29 Jan 2025 16:23:38 -0600
-X-Gm-Features: AWEUYZlnwsHU9qPe3vRperR7Op39lR3XoUF2yzStJuUOf7P5_oZUW1E5y6YVahI
-Message-ID: <CAH2r5mvdyi_6OZQ69z5zhiNapJZ778K_ZraY9dVpmAjgr7czSw@mail.gmail.com>
-Subject: parse_reparse_point confusing function name
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>
+Date: Wed, 29 Jan 2025 17:39:24 -0600
+X-Gm-Features: AWEUYZl3f9DrhHeT_bXdizeFPLvzf2MQFgikugtJzRq3HGTuH11ZRwpA6NWA3EU
+Message-ID: <CAH2r5muXhrTc_pa-uhB62dOjQDZR5WBzz4NiVFimVQ=oTysekw@mail.gmail.com>
+Subject: Re: [PATCH 18/62] cifs: Check if server supports reparse points
+ before using them
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Any thoughts on whether the use of two different parse_reparse_point()
-functions with the same name is confusing?  Should we change the name
-of one of them?
+In the patch below, do you have an example you tried where server
+without reparse point support that left a file/directory around after
+a failed attempt to create FIFO/SYMLINK or other special file via
+reparse point?
 
-in fs/smb/client/cifsproto.h there is one parse_reparse_point() declaration:
+[PATCH 18/62] cifs: Check if server supports reparse points before using them
 
-int parse_reparse_point(struct reparse_data_buffer *buf,
-                        u32 plen, struct cifs_sb_info *cifs_sb,
-                        const char *full_path,
-                        struct cifs_open_info_data *data);
-
-
-And in fs/smb/client/cifsglob.h there is a different one;
-smb_version_operation --> parse_reparse_point()
-
-        int (*parse_reparse_point)(struct cifs_sb_info *cifs_sb,
-                                   const char *full_path,
-                                   struct kvec *rsp_iov,
-                                   struct cifs_open_info_data *data);
-
-
-/smb3-kernel$ git grep parse_reparse_point
-fs/smb/client/cifsglob.h:       int (*parse_reparse_point)(struct
-cifs_sb_info *cifs_sb,
-fs/smb/client/cifsproto.h:int parse_reparse_point(struct
-reparse_data_buffer *buf,
-fs/smb/client/inode.c:          } else if (iov &&
-server->ops->parse_reparse_point) {
-fs/smb/client/inode.c:                  rc =
-server->ops->parse_reparse_point(cifs_sb,
-fs/smb/client/reparse.c:int parse_reparse_point(struct reparse_data_buffer *buf,
-fs/smb/client/reparse.c:int smb2_parse_reparse_point(struct
-cifs_sb_info *cifs_sb,
-fs/smb/client/reparse.c:        return parse_reparse_point(buf, plen,
-cifs_sb, full_path, data);
-fs/smb/client/reparse.h:int smb2_parse_reparse_point(struct
-cifs_sb_info *cifs_sb,
-fs/smb/client/smb1ops.c:static int cifs_parse_reparse_point(struct
-cifs_sb_info *cifs_sb,
-fs/smb/client/smb1ops.c:        return parse_reparse_point(buf, plen,
-cifs_sb, full_path, data);
-fs/smb/client/smb1ops.c:        .parse_reparse_point = cifs_parse_reparse_point,
-fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
-fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
-fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
-fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
-
+Do not attempt to query or create reparse point when server fs does not
+support it. This will prevent creating unusable empty object on the server.
 
 -- 
 Thanks,
