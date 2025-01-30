@@ -1,259 +1,108 @@
-Received: from mail-gw01.astralinux.ru (mail-gw01.astralinux.ru [37.230.196.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358CC1B6CF1;
-	Thu, 30 Jan 2025 09:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.230.196.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5A31BB6BC
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2025 14:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738230663; cv=none; b=m6g0qFjCG3Od0iabMrq5lmn9rkS63sbbuzQtOh1heviNUxAM4w4EhXjA2aPXPvYJ4CnhsXT49QcUnuO/4DaQAwDh/UJXUZ8RWWTaJAzLfAW9f+wR6np4ZsNxac5clMVgnnGKykzFL0rraA3hlBmlwvnPvRKBrmY7a1RGCf4v3wg=
+	t=1738248231; cv=none; b=qL+lLgu7jVUYa7zTWxXXMmaN1POGPnxKfBo4QAuGcRya5i6hkkrnT1snjGZc7Ru617V9ne3H0NltrZ9/YGCTZERV52jGi8Zt3IvLEHXQrOE/WOSj4hatPaPTsIaJU4ixj0eoACJriHvGtjop5q1nRuEDqUrb6PNftudz4j2rAkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738230663; c=relaxed/simple;
-	bh=zFw/oxD/hhXERfjqXxTSGrmCJAlGKIGfDHc0udUzyQw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BDlU5VvsmmapfHI+bMMXS4kVSCqmsUGChelHIxBgntUH7WIRDgnkqzpo6Aa+e7/kAOpj+cUQfODqHsmGla9gZHznhF/jKM48DFIhvr9BGMqz8eUFuFUpAeLvtkMzCYVP0R049m61TxNY8xq4BoOwzucqHyDA3Vify/y/pY9r9ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=37.230.196.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from gca-sc-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw01.astralinux.ru (Postfix) with ESMTP id A365524B8E;
-	Thu, 30 Jan 2025 12:44:10 +0300 (MSK)
-Received: from new-mail.astralinux.ru (gca-yc-ruca-srv-mail04.astralinux.ru [10.177.185.109])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw01.astralinux.ru (Postfix) with ESMTPS;
-	Thu, 30 Jan 2025 12:44:08 +0300 (MSK)
-Received: from localhost.localdomain (unknown [10.177.20.111])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4YkDcj4HlSzkWyW;
-	Thu, 30 Jan 2025 12:44:05 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@cjr.nz>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1] smb: client: fix UAF in async decryption
-Date: Thu, 30 Jan 2025 12:43:50 +0300
-Message-ID: <20250130094353.627234-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738248231; c=relaxed/simple;
+	bh=UeIsAiwwTN/Rsk8k3BZ/8+xcNtjXSrKgf8pAyMMnNuE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DVGtxX1u0671gXJUEW7KKEwUsz+zBfF5dL2o5McP/XAHMu8gq55QcuxNYIsvci47ANSiuk4G5Il03onZP7VzSaUrQ5e9cmRVRK26FHSkfICm6HqzWW/crnp2i1th+e9fnD0VPSDgYSgzqwKSNYi+Z99biqjsSkpk2Ln62zA2QUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZHaSb/ks; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZHaSb/ks"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ee46851b5eso1162907a91.1
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2025 06:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738248229; x=1738853029; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FojObKZNveW6yLw1laomnuD8py9ef6t+zzTVXe/2GBA=;
+        b=ZHaSb/kspOabFI5Ik9E6jsW1KyOs3PPRJArQe1HrotobAlZlS2Juv06fjIjB8PQdqJ
+         sGpoLgO1Z6ecumxLCYlnF1sWff19dOfMjTYXOZtwtBWxoUaaId7J+qPrdBC1q0CmBXoM
+         nt1t+iRVEAvetxI9mGOt477nBwBZgRurLGhz/VdYMoGCjINlKi4dUkU6hXN27SdgBoag
+         BxEAvgV1yWiVMUtFKU978B/Ea6aTxSA4SwJ1o/gZVkug/nINUPNAUHCETiqTEGAFEmX2
+         jlllWznHPoqSGpG+B96jI/tLMZhqB3o8So4/P9kunCL8E3gDSruXFDv7IQ2LvrbLkqMn
+         eL6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738248229; x=1738853029;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FojObKZNveW6yLw1laomnuD8py9ef6t+zzTVXe/2GBA=;
+        b=tkOYKZtO7pWipDQoSUG1tLnH7jrNu6MYfWY+uqT++SJf06P3/85MeFBpZJJnDN0RS0
+         C2ef75m0eNiewLCogb4oWK0UsEe+84MImz6EKQ76itFkJjw7o6cRdKsPVSFo3Nu6U96j
+         S9D60qW1L5/P3EAa4SCax3sF4W04+fu2MgOo+9r89KXCowog8WJ2eYhPgNHSC3Fj6p/e
+         Qa7DShBAwkQQ5a351Vn54r2JO6LW0CBBlZ1uTMbiW6JNYXKQOePmzV/fBqfZ9c2g9Zja
+         jly48tyadZdyrk3I2h4XbPvdC2AJrYjhCpBUM5Ym4IRE/YvZNCk6aHmyPqRcDnBVVQyu
+         isMw==
+X-Gm-Message-State: AOJu0YysTczhe48+pkhtVnesV5h3LbRKVTPgjb7W/y3RDE2kuRDZUlKe
+	dMCJwc0HJMX8Semuz4DRm61r8ahg2ZCpKHjEvfiLRVkxGuIo51uxXCv0w0+rclpHeMHyh3NvOT2
+	KLQgL0SdAQYtloZHhzpgyGHQSAb9KFQ==
+X-Gm-Gg: ASbGnctYJxs0a8uvZFLT5s4JRBfXLbXQ4MiFQLm1XsscWGDSJ2lsR4HJjy/K5H81bCr
+	pYyV3VoEYtHo3DB04ufnS7bC1O+soO7JAyVxP4B6/E5lBmGjdxs8Ogp62NePxsCqWueKWsDb5BT
+	fLludYcQ1qa8TkRkfxYp/azYZwnAE=
+X-Google-Smtp-Source: AGHT+IEw3jR6GrXXmbvA+HFqTBsNKI0BQQ30/ga0HBWLDrMn/UT9GCv6rDccWKNJW/wdDl0jHrfKp+qZ0Q9UybC4GoA=
+X-Received: by 2002:a17:90b:2c84:b0:2f6:d266:f462 with SMTP id
+ 98e67ed59e1d1-2f83ac83eadmr10871386a91.35.1738248229201; Thu, 30 Jan 2025
+ 06:43:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;new-mail.astralinux.ru:7.1.1;astralinux.ru:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 190683 [Jan 30 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/01/30 07:21:00 #27156911
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
+From: Ritvik Budhiraja <budhirajaritviksmb@gmail.com>
+Date: Thu, 30 Jan 2025 06:43:37 -0800
+X-Gm-Features: AWEUYZn8xw2vgPaaVS3PJ8f2yq0QKMqrx745ee1oGkfgMsPIl_R2juEIZOmwugU
+Message-ID: <CA+EPQ647ii+vEbiaYT5dQXn__t2KEVypKyfsovbrwCrBQcTZow@mail.gmail.com>
+Subject: [PATCH] cifs-utils: add documentation for upcall_target
+To: linux-cifs@vger.kernel.org, Shyam Prasad <nspmangalore@gmail.com>, 
+	Bharath SM <bharathsm.hsk@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+From: Ritvik Budhiraja <rbudhiraja@microsoft.com>
 
-[ Upstream commit b0abcd65ec545701b8793e12bc27dc98042b151a ]
+Update man page with documentation for upcal_target
+mount parameter.
 
-Doing an async decryption (large read) crashes with a
-slab-use-after-free way down in the crypto API.
-
-Reproducer:
-    # mount.cifs -o ...,seal,esize=1 //srv/share /mnt
-    # dd if=/mnt/largefile of=/dev/null
-    ...
-    [  194.196391] ==================================================================
-    [  194.196844] BUG: KASAN: slab-use-after-free in gf128mul_4k_lle+0xc1/0x110
-    [  194.197269] Read of size 8 at addr ffff888112bd0448 by task kworker/u77:2/899
-    [  194.197707]
-    [  194.197818] CPU: 12 UID: 0 PID: 899 Comm: kworker/u77:2 Not tainted 6.11.0-lku-00028-gfca3ca14a17a-dirty #43
-    [  194.198400] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.2-3-gd478f380-prebuilt.qemu.org 04/01/2014
-    [  194.199046] Workqueue: smb3decryptd smb2_decrypt_offload [cifs]
-    [  194.200032] Call Trace:
-    [  194.200191]  <TASK>
-    [  194.200327]  dump_stack_lvl+0x4e/0x70
-    [  194.200558]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.200809]  print_report+0x174/0x505
-    [  194.201040]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-    [  194.201352]  ? srso_return_thunk+0x5/0x5f
-    [  194.201604]  ? __virt_addr_valid+0xdf/0x1c0
-    [  194.201868]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.202128]  kasan_report+0xc8/0x150
-    [  194.202361]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.202616]  gf128mul_4k_lle+0xc1/0x110
-    [  194.202863]  ghash_update+0x184/0x210
-    [  194.203103]  shash_ahash_update+0x184/0x2a0
-    [  194.203377]  ? __pfx_shash_ahash_update+0x10/0x10
-    [  194.203651]  ? srso_return_thunk+0x5/0x5f
-    [  194.203877]  ? crypto_gcm_init_common+0x1ba/0x340
-    [  194.204142]  gcm_hash_assoc_remain_continue+0x10a/0x140
-    [  194.204434]  crypt_message+0xec1/0x10a0 [cifs]
-    [  194.206489]  ? __pfx_crypt_message+0x10/0x10 [cifs]
-    [  194.208507]  ? srso_return_thunk+0x5/0x5f
-    [  194.209205]  ? srso_return_thunk+0x5/0x5f
-    [  194.209925]  ? srso_return_thunk+0x5/0x5f
-    [  194.210443]  ? srso_return_thunk+0x5/0x5f
-    [  194.211037]  decrypt_raw_data+0x15f/0x250 [cifs]
-    [  194.212906]  ? __pfx_decrypt_raw_data+0x10/0x10 [cifs]
-    [  194.214670]  ? srso_return_thunk+0x5/0x5f
-    [  194.215193]  smb2_decrypt_offload+0x12a/0x6c0 [cifs]
-
-This is because TFM is being used in parallel.
-
-Fix this by allocating a new AEAD TFM for async decryption, but keep
-the existing one for synchronous READ cases (similar to what is done
-in smb3_calc_signature()).
-
-Also remove the calls to aead_request_set_callback() and
-crypto_wait_req() since it's always going to be a synchronous operation.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+Signed-off-by: Ritvik Budhiraja <rbudhiraja@microsoft.com>
 ---
-Backport fix for CVE-2024-50047
- fs/smb/client/smb2ops.c | 47 ++++++++++++++++++++++++-----------------
- fs/smb/client/smb2pdu.c |  6 ++++++
- 2 files changed, 34 insertions(+), 19 deletions(-)
+ mount.cifs.rst | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 62935d61192a..4b9cd9893ac6 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4488,7 +4488,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
-  */
- static int
- crypt_message(struct TCP_Server_Info *server, int num_rqst,
--	      struct smb_rqst *rqst, int enc)
-+	      struct smb_rqst *rqst, int enc, struct crypto_aead *tfm)
- {
- 	struct smb2_transform_hdr *tr_hdr =
- 		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
-@@ -4499,8 +4499,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	u8 key[SMB3_ENC_DEC_KEY_SIZE];
- 	struct aead_request *req;
- 	u8 *iv;
--	DECLARE_CRYPTO_WAIT(wait);
--	struct crypto_aead *tfm;
- 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
- 	void *creq;
- 
-@@ -4511,14 +4509,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 		return rc;
- 	}
- 
--	rc = smb3_crypto_aead_allocate(server);
--	if (rc) {
--		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
--		return rc;
--	}
--
--	tfm = enc ? server->secmech.enc : server->secmech.dec;
--
- 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
- 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
- 		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
-@@ -4557,11 +4547,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
- 	aead_request_set_ad(req, assoc_data_len);
- 
--	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  crypto_req_done, &wait);
--
--	rc = crypto_wait_req(enc ? crypto_aead_encrypt(req)
--				: crypto_aead_decrypt(req), &wait);
-+	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
- 
- 	if (!rc && enc)
- 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
-@@ -4650,7 +4636,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
- 	/* fill the 1st iov with a transform header */
- 	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
- 
--	rc = crypt_message(server, num_rqst, new_rq, 1);
-+	rc = crypt_message(server, num_rqst, new_rq, 1, server->secmech.enc);
- 	cifs_dbg(FYI, "Encrypt message returned %d\n", rc);
- 	if (rc)
- 		goto err_free;
-@@ -4676,8 +4662,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
- 		 unsigned int npages, unsigned int page_data_size,
- 		 bool is_offloaded)
- {
--	struct kvec iov[2];
-+	struct crypto_aead *tfm;
- 	struct smb_rqst rqst = {NULL};
-+	struct kvec iov[2];
- 	int rc;
- 
- 	iov[0].iov_base = buf;
-@@ -4692,9 +4679,31 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
- 	rqst.rq_pagesz = PAGE_SIZE;
- 	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
- 
--	rc = crypt_message(server, 1, &rqst, 0);
-+	if (is_offloaded) {
-+		if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
-+		    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
-+			tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
-+		else
-+			tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
-+		if (IS_ERR(tfm)) {
-+			rc = PTR_ERR(tfm);
-+			cifs_server_dbg(VFS, "%s: Failed alloc decrypt TFM, rc=%d\n", __func__, rc);
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index 67c5138..631482d 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -636,6 +636,21 @@ acdirmax=arg
+   If this option is not specified, then acdirmax value will be set to
+``actimeo``
+   value, see ``actimeo`` for more details.
+
++upcall_target=arg
++  Determines the namespace in which upcalls from the SMB filesystem
+should be handled.
++  Allowed values are:
++  - ``mount`` - Resolve upcalls to the host namespace.
++  - ``app`` - Resolve upcalls in the namespace of the calling thread
+(application).
++  Default value is ``app``.
++  This option is useful in environments like Kubernetes, where the mount
++  may be performed by a driver pod on behalf of an application running
++  in a separate container. It ensures that Kerberos credentials and other
++  user-specific data are accessed in the correct namespace.
++  By specifying ``app``, upcalls can be resolved in the application's
+namespace,
++  ensuring the correct credentials are used. ``mount`` allows resolution in the
++  host namespace, which may be necessary when credentials or configurations
++  are managed outside the container.
 +
-+			return rc;
-+		}
-+	} else {
-+		if (unlikely(!server->secmech.dec))
-+			return -EIO;
-+
-+		tfm = server->secmech.dec;
-+	}
-+
-+	rc = crypt_message(server, 1, &rqst, 0, tfm);
- 	cifs_dbg(FYI, "Decrypt message returned %d\n", rc);
- 
-+	if (is_offloaded)
-+		crypto_free_aead(tfm);
-+
- 	if (rc)
- 		return rc;
- 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 9975711236b2..ae38ba7f1966 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1105,6 +1105,12 @@ SMB2_negotiate(const unsigned int xid,
- 		else
- 			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
- 	}
-+
-+	if (server->cipher_type && !rc) {
-+		rc = smb3_crypto_aead_allocate(server);
-+		if (rc)
-+			cifs_server_dbg(VFS, "%s: crypto alloc failed, rc=%d\n", __func__, rc);
-+	}
- neg_exit:
- 	free_rsp_buf(resp_buftype, rsp);
- 	return rc;
--- 
+ multichannel
+   This option enables multichannel feature. Multichannel is an SMB3 protocol
+   feature that allows client to establish multiple transport connections to an
+--
 2.43.0
-
