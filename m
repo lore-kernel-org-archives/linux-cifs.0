@@ -1,87 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EDC1AF0C8
-	for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2025 21:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144B01946C8
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2025 21:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738271916; cv=none; b=RGFXlqbd/0q6Dw+lstj9s4azXw5XJo7tXZlultHTgOkFfcpceyGUTYMcqGRKxy6n9OnUMc994mlJXqB0A3BOD8j9Fffi/2O9vIOaO/XqAdG/ju5/Cht+lSujTAlnXUnFdYhfeHLYdhL+b/EcZk7DbgakT11V1FKeKvBxp2xQ1ac=
+	t=1738272037; cv=none; b=ki4HmqWyA8i3xuA7WDHXRhwhKbJb9vM9camXdyTJxGeb6zpCj4xVSIo+ovfhhtF8DuACA+KsyVPEj3DmWZ6aHenaBAmIAMiEzA1qt2CuY7SYxySD1kgkirninhSwZG6MEEen48X/wLkrZCQAKWI1ulSZoQsbI4kvZiKQ4TTMyts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738271916; c=relaxed/simple;
-	bh=4klZUimzg7AWIJ29uNxC1PJmcoDB9wOczqDusmeM79Y=;
+	s=arc-20240116; t=1738272037; c=relaxed/simple;
+	bh=HBknriVBy+aKEfI6Hby2whkwYeMRT9LYebw6zdxQF4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uZue4KbPsyvgx6ML8VwNPp0hOWEyBIhSedwuSejkwDjM/ddx46Sm1HdtiH9bgWvmuxN+IrGkq2XLAtjzx2F0NKDSHhYx7OfxhOY11wz7Oq/m3sEO1iZIO+EdAaP7AXQ1bXR/6wPBGqJcE3PSTz+/oDkQB8Js4avh6JIASDe/pQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBZszCCa; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=KItRLkI0pwpjtFmEQvtyZUtOdauTCh4Ea2izLF2BautFRykh0ujVJrUGchzBQtV/4Xvq31ZRRAYRMTqHe4fPK14ZuEHLRxUT3Sye38mQ9yGxG59OuYvXQd4uLZCac2xvo3FW7oE8u0eOOaNI/gox69gK7mUoLxjN7y91dzdGCHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9avWksE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBZszCCa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47D05C4CED2;
-	Thu, 30 Jan 2025 21:18:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9avWksE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59451C4CED2;
+	Thu, 30 Jan 2025 21:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738271914;
-	bh=4klZUimzg7AWIJ29uNxC1PJmcoDB9wOczqDusmeM79Y=;
+	s=k20201202; t=1738272036;
+	bh=HBknriVBy+aKEfI6Hby2whkwYeMRT9LYebw6zdxQF4w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cBZszCCad2AAbU2XlXFiNydQiP4eWlWv+hpUKkmKAFthC1v/HXCEB0u4E80SkXoFI
-	 YU9P7gXZMRL1maR0lkmPuNnkW3/Byeocayf+D7GyE9OkhXS60UMQhNBcNBcHCRewtB
-	 GpV8ExycOMMjuE6I5Sf2tqekZLxaEAcYvbGmucuFQeP051/7b9teLO7hhzteB6DwJK
-	 seRzOXcjuRyBzP5eZS5A2kD86XeLtBJbDPu5Tpf9Xkzcd3VLB2LISJK/96b4oO/WgT
-	 ZJSAPFIysNmMkE38FJ8xFARQcZ3VzcT5sWH4IDA5jTssBs8yf6o1FPM47XmnGUCCTR
-	 Iud/aKtFy2mSw==
+	b=Q9avWksET8RwRkGR7cdghm4N1dp3YRiqmPKNkL0h0j39Zor/hRJR8dbVq10/0FcEA
+	 Q3jRHnbvU/EtvmjRZIv0VXkS8jGe8C3OKFqPHbQH9WxqKtVfBlm/1FS2eGiqKWtiVZ
+	 zja+Ueh9t0d6YFBfgx8XRoFTBONHMt5dDRJl8JS2fEOt0WMVWIh3sY435XCBfcqhXR
+	 5ZhADYaaaf77pS13+ZZqss1RDoEMOT8GlKfadzRQmo+SVCm74sXA9iMWyw7hwBRT5s
+	 Qv5IeOTueKh0D/lIdD6X+KCGl25sKwGhh8sTqh/Ig7Ko1j+ZP3cGKhPKtO9/v0tXkj
+	 0A/GUxMPjo4gA==
 Received: by pali.im (Postfix)
-	id 9114C559; Thu, 30 Jan 2025 22:18:22 +0100 (CET)
-Date: Thu, 30 Jan 2025 22:18:22 +0100
+	id 1B2F5559; Thu, 30 Jan 2025 22:20:25 +0100 (CET)
+Date: Thu, 30 Jan 2025 22:20:24 +0100
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH 18/62] cifs: Check if server supports reparse points
- before using them
-Message-ID: <20250130211822.6swdk5ghckth65up@pali>
-References: <CAH2r5muXhrTc_pa-uhB62dOjQDZR5WBzz4NiVFimVQ=oTysekw@mail.gmail.com>
- <CAH2r5mu49ffRd=R7KqWXvXzXysy54obBJ8egrH1fbKbyYbMWGQ@mail.gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>
+Subject: Re: parse_reparse_point confusing function name
+Message-ID: <20250130212024.wthp4zsstbqmaqj4@pali>
+References: <CAH2r5mvdyi_6OZQ69z5zhiNapJZ778K_ZraY9dVpmAjgr7czSw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mu49ffRd=R7KqWXvXzXysy54obBJ8egrH1fbKbyYbMWGQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mvdyi_6OZQ69z5zhiNapJZ778K_ZraY9dVpmAjgr7czSw@mail.gmail.com>
 User-Agent: NeoMutt/20180716
 
-That is a good point. But question is: are there such broken servers
-which do not correctly announce support for reparse points? I was
-thinking that such servers would be rather rare or maybe not exist at
-all as even Windows SMB client would not work correctly against them for
-symlinks and other reparse points. IMHO there are more servers which
-either do not support reparse point at all (older Samba servers) or
-servers which supports them, but underlying filesystem not (e.g. Windows
-SMB server with FAT32 filesystem).
+Feel free to change function name. I think that it is always a good idea
+to use different names for different things. Just inventing correct or
+better name is hard...
 
-On Wednesday 29 January 2025 18:00:21 Steve French wrote:
->  I was thinking about the possibility that there a servers with bugs
-> (ie that support it but don't set the flag right) - so haven't merged
-> this one yet - so I want to know how bad end result is if server is
-> correctly behaving but doesn't advertise reparse points and you try to
-> create one that leaves debris (file/directory).
+On Wednesday 29 January 2025 16:23:38 Steve French wrote:
+> Any thoughts on whether the use of two different parse_reparse_point()
+> functions with the same name is confusing?  Should we change the name
+> of one of them?
 > 
-> On Wed, Jan 29, 2025 at 5:39 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > In the patch below, do you have an example you tried where server
-> > without reparse point support that left a file/directory around after
-> > a failed attempt to create FIFO/SYMLINK or other special file via
-> > reparse point?
-> >
-> > [PATCH 18/62] cifs: Check if server supports reparse points before using them
-> >
-> > Do not attempt to query or create reparse point when server fs does not
-> > support it. This will prevent creating unusable empty object on the server.
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
+> in fs/smb/client/cifsproto.h there is one parse_reparse_point() declaration:
 > 
+> int parse_reparse_point(struct reparse_data_buffer *buf,
+>                         u32 plen, struct cifs_sb_info *cifs_sb,
+>                         const char *full_path,
+>                         struct cifs_open_info_data *data);
+> 
+> 
+> And in fs/smb/client/cifsglob.h there is a different one;
+> smb_version_operation --> parse_reparse_point()
+> 
+>         int (*parse_reparse_point)(struct cifs_sb_info *cifs_sb,
+>                                    const char *full_path,
+>                                    struct kvec *rsp_iov,
+>                                    struct cifs_open_info_data *data);
+> 
+> 
+> /smb3-kernel$ git grep parse_reparse_point
+> fs/smb/client/cifsglob.h:       int (*parse_reparse_point)(struct
+> cifs_sb_info *cifs_sb,
+> fs/smb/client/cifsproto.h:int parse_reparse_point(struct
+> reparse_data_buffer *buf,
+> fs/smb/client/inode.c:          } else if (iov &&
+> server->ops->parse_reparse_point) {
+> fs/smb/client/inode.c:                  rc =
+> server->ops->parse_reparse_point(cifs_sb,
+> fs/smb/client/reparse.c:int parse_reparse_point(struct reparse_data_buffer *buf,
+> fs/smb/client/reparse.c:int smb2_parse_reparse_point(struct
+> cifs_sb_info *cifs_sb,
+> fs/smb/client/reparse.c:        return parse_reparse_point(buf, plen,
+> cifs_sb, full_path, data);
+> fs/smb/client/reparse.h:int smb2_parse_reparse_point(struct
+> cifs_sb_info *cifs_sb,
+> fs/smb/client/smb1ops.c:static int cifs_parse_reparse_point(struct
+> cifs_sb_info *cifs_sb,
+> fs/smb/client/smb1ops.c:        return parse_reparse_point(buf, plen,
+> cifs_sb, full_path, data);
+> fs/smb/client/smb1ops.c:        .parse_reparse_point = cifs_parse_reparse_point,
+> fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+> fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+> fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
+> fs/smb/client/smb2ops.c:        .parse_reparse_point = smb2_parse_reparse_point,
 > 
 > 
 > -- 
