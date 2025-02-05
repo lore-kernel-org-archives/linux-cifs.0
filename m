@@ -1,277 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA6F2054E1;
-	Tue,  4 Feb 2025 21:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD47D163
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Feb 2025 00:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738704752; cv=none; b=fycYKctmbzxh3SzjugPofX5QoUZC6ChSJo+zJ6ZRbhTzI93dHMIhcH+xpdAHqB16RYbkpVu/a8RH0Rmy3/X7NmFIZLCyXTxUMiGzcpIa37LyuVdHh5qPz2xwxINcFcQd22gLmcQLCzlQ/a0gK6hQT9YMT9l5mvXVYQZjXrReZtU=
+	t=1738714016; cv=none; b=U71tzwlSZuUc4WW5/5AXPuhmjYUFUZM5+MHTOfT3tqRKV2vV5pL/E0VLqV0STwLIiC3hFSQlXd1NMOt4KrjcJ5BMrDp/6GXg2n02ZCXktplHBKp5NyMEw/uODnhjSwJH9V4nFgg0onV4Nap2Zh84GmMse2JxfPYUumct+6i4Fus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738704752; c=relaxed/simple;
-	bh=C3dbbEAFevjdVfANzRZoMw2PT7z4oSO3rdifCBeUHxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u851yoTDpeQdiD8fsGNIpQheXoKupovCWh2JU3IOiJgXoTNQNyTQ9nFZpEvxBrcUptGjxyZBmvcPvWaWmUWnEGoMC+lFEQNMYsqWYZ24oS18mORNM6XukbCskk2XbE/eD0YRUlglSD/WN/qz6rGfnmkSEzvoGJKnRyS6u+prKcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvmBdeam; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738714016; c=relaxed/simple;
+	bh=ONOD+TfZ5TTxEyDsgTEUfpuqs/GtUcB2oj/7IxWmRXw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=NPBaxn51kqs40hAnR6ajAAbD0KtiEkCgswV6hSJbx9v78Qtdg925NWdS/0aZot+KENZGnns+OXwy6IP+AfYlvm+N6hWzgv9bBePPTnoZu+c8akVxreGNi69oruqT51KDNpNIrmE+bEP8pR0f4AImAY/+w8dFDz/zcvDq+KNZipY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3BVRC2K; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvmBdeam"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD17DC4CEDF;
-	Tue,  4 Feb 2025 21:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738704752;
-	bh=C3dbbEAFevjdVfANzRZoMw2PT7z4oSO3rdifCBeUHxU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DvmBdeam2/YQrcuzF/h3tF/UzcMLi2fM6diaW3B7QY5MNcRhZJf9JyS6en3X+7nOH
-	 j22ul35RJWX/Au7Q3AwAUAfUooXLNo/rXDKIeR0TND+TVXG8d+NdEJFwE42jBkeVhi
-	 61vA9zyFGuwnxXeXxFIoPlDEw6sl+TCPWQ7Itv1lg+06VtzyHCwSySplGs5TZLUGpl
-	 AWnC7Cr6DX1kPbK3ItYIRI2jPSIN/rNOMk+r3/q1MiNcGJ6nysPrvXXH4EDjZbnlw4
-	 xlaQ1Tb6XCRbsX7OTGhb8VKk1FNEjU1hdtFck6+Iv1VDMpvRTvEyD/p0SkOybZMsLK
-	 iRg9NYtEkRumg==
-Received: by pali.im (Postfix)
-	id 6F561758; Tue,  4 Feb 2025 22:32:19 +0100 (CET)
-Date: Tue, 4 Feb 2025 22:32:19 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: "Darrick J. Wong" <djwong@kernel.org>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Immutable vs read-only for Windows compatibility
-Message-ID: <20250204213219.2evhakeg4riahv6u@pali>
-References: <20250114215350.gkc2e2kcovj43hk7@pali>
- <CAN05THSXjmVtvYdFLB67kKOwGN5jsAiihtX57G=HT7fBb62yEw@mail.gmail.com>
- <20250114235547.ncqaqcslerandjwf@pali>
- <20250114235925.GC3561231@frogsfrogsfrogs>
- <CAOQ4uxjj3XUNh6p3LLp_4YCJQ+cQHu7dj8uM3gCiU61L3CQRpA@mail.gmail.com>
- <20250117173900.GN3557553@frogsfrogsfrogs>
- <CAOQ4uxhh1LDz5zXzqFENPhJ9k851AL3E7Xc2d7pSVVYX4Fu9Jw@mail.gmail.com>
- <20250117185947.ylums2dhmo3j6hol@pali>
- <20250202152343.ahy4hnzbfuzreirz@pali>
- <CAOQ4uxgjbHTyQ53u=abWhyQ81ATL4cqSeWKDfOjz-EaR0NGmug@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3BVRC2K"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5439e331cceso1378485e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Feb 2025 16:06:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738714013; x=1739318813; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YVk6hpU2pZ7xpK6zq1wxpM3dZuMb8GMpjjaI+pHQ9gk=;
+        b=S3BVRC2KAF04zgKhDns9zZKDEXo6wUFGwGRRCWYiBF6HESvp1rM/Rop+5phAGxt2VA
+         StIjIWFjkI3Rz2TqHgAcLrCNXOnLarU0btMcBvSfJlYfry7jS2/zs/ui6mjq6xctP2Vs
+         IAiuZpMZUvv9xx6OXWpCMU6kkwEZX6UM5X3JBEJBrUYv0bh3a3Jtf2rg+KhnuevbyUvJ
+         FSgJ9zZ+NnjlMpg5SwuakJK5RoEV3W2NThmo9AVwg1RoVXeL3F/uBfD0wotCphA7WC8l
+         je6besFKn2xynaCQ32wJGQFEZ5OY8HEZCj38BShq8TTHT1+tp0P29zI8uMne6BKL2Kux
+         FgwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738714013; x=1739318813;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YVk6hpU2pZ7xpK6zq1wxpM3dZuMb8GMpjjaI+pHQ9gk=;
+        b=HYenH7644JmhFtO7um+wGEFWrkME1NlAFx2lVok15irKtkVyFnGqnMAmAPqj7s7SdS
+         bHNNcq6f7j04STFbmtjD5wK3iVv5DKqPs7NsStKAzGsUQ3UACKpxLxkD5SY04pGuAZMe
+         PTlKVOXwA4SgYC7qwgAdBRp+PR0pes6mqX+xGyoIFjA2bWyRHPtic+FhbNqsZ8oxwH6X
+         rBmxIubpMFQLsscgeI2qptGa82RS3WrsT6XVM7saEgxpPtBrt7kvEBVhWK3CLMyocpiI
+         PqFJd8nTPqB8WPwbIN3wUva2YtheQJ9omxhMQMDD1ftdbHyBtxojs+fU1b/rkaZmXG1n
+         zCMw==
+X-Gm-Message-State: AOJu0YygeJ8rfI2QWEv2Axnll781YFpEYv3YIyrm03UPOi5q+U+S5+jy
+	VXvtq+e2fiOV4jrqgOO4yk/QwbgaM/86awivMo3FIiZUEuFAiJwea+cD+r3/TCm0sPbuGxAXfxY
+	OFzl66o7NI9y/lxcGuT0lFLjZnsPk6iX6
+X-Gm-Gg: ASbGncs0vqDV910o/xt+R2QhtCdVwcUfhhT5iK0KyI06zXAL8dnvh2nGdujEbSMQf7B
+	UABr0tE17L1YvivVxGJVCXhdZVniaDz/v/BsHWwTkuRBpr+Rk5RYta57MonbRW41cVpsnStJZQz
+	0yPmSF6NbKCDR+itw70Bdx1p/ulwEEXcM=
+X-Google-Smtp-Source: AGHT+IFz6DAvQraRve3XpGlkozDeUEUNobT3bHVAfsS5TwF14w/tWgQGPE0cw0v7dWjui1eHayrsDpnDk5rkm8MeCIs=
+X-Received: by 2002:a05:6512:686:b0:543:f1d1:c6cf with SMTP id
+ 2adb3069b0e04-544059f9cd4mr183646e87.10.1738714012638; Tue, 04 Feb 2025
+ 16:06:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxgjbHTyQ53u=abWhyQ81ATL4cqSeWKDfOjz-EaR0NGmug@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 4 Feb 2025 18:06:41 -0600
+X-Gm-Features: AWEUYZlxLXUrKlbrk5kGe14p7KcR2yRAHAPHylLU0wr7AWt6iXvGzfnYJC3xgpM
+Message-ID: <CAH2r5mt15YNyLuvJGnUaMb3SU5-zZdak+k9Dx6an3aLqBY4XUg@mail.gmail.com>
+Subject: Re: [PATCH 13/43] cifs: Treat unhandled directory name surrogate
+ reparse points as mount directory nodes
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000170258062d59e7b2"
 
-On Monday 03 February 2025 22:59:46 Amir Goldstein wrote:
-> On Sun, Feb 2, 2025 at 4:23 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > On Friday 17 January 2025 19:59:47 Pali Rohár wrote:
-> > > On Friday 17 January 2025 19:46:30 Amir Goldstein wrote:
-> > > > > > Looking at the FILE_ATTRIBUTE_* flags defined in SMB protocol
-> > > > > >  (fs/smb/common/smb2pdu.h) I wonder how many of them will be
-> > > > > > needed for applications beyond the obvious ones that were listed.
-> > > > >
-> > > > > Well they only asked for seven of them. ;)
-> > > > >
-> > > > > I chatted with Ted about this yesterday, and ... some of the attributes
-> > > > > (like read only) imply that you'd want the linux server to enforce no
-> > > > > writing to the file; some like archive seem a little superfluous since
-> > > > > on linux you can compare cmtime from the backup against what's in the
-> > > > > file now; and still others (like hidden/system) might just be some dorky
-> > > > > thing that could be hidden in some xattr because a unix filesystem won't
-> > > > > care.
-> > > > >
-> > > > > And then there are other attrs like "integrity stream" where someone
-> > > > > with more experience with windows would have to tell me if fsverity
-> > > > > provides sufficient behaviors or not.
-> > > > >
-> > > > > But maybe we should start by plumbing one of those bits in?  I guess the
-> > > > > gross part is that implies an ondisk inode format change or (gross)
-> > > > > xattr lookups in the open path.
-> > > > >
-> > > >
-> > > > I may be wrong, but I think there is a confusion in this thread.
-> > > > I don't think that Pali was looking for filesystems to implement
-> > > > storing those attributes. I read his email as a request to standardize
-> > > > a user API to get/set those attributes for the filesystems that
-> > > > already support them and possibly for vfs to enforce some of them
-> > > > (e.g. READONLY) in generic code.
-> > >
-> > > Yes, you understood it correctly. I was asking for standardizing API how
-> > > to get/set these attributes from userspace. And Chuck wrote that would
-> > > like to have also standardized it for kernel consumers like nfsd or
-> > > ksmbd. Which makes sense.
-> > >
-> > > > Nevertheless, I understand the confusion because I know there
-> > > > is also demand for storing those attributes by file servers in a
-> > > > standard way and for vfs to respect those attributes on the host.
-> > >
-> > > Userspace fileserver, like Samba, would just use that standardized
-> > > userspace API for get/set attributes. And in-kernel fileservers like
-> > > nfsd or ksmbd would like to use that API too.
-> > >
-> > > And there were some proposals how filesystems without native
-> > > support for these attributes could store and preserve these attributes.
-> > > So this can be a confusion in this email thread discussion.
-> >
-> > So to recap, for set-API there are possible options:
-> >
-> > 1) extending FS_IOC_FSSETXATTR / FS_IOC_SETFLAGS for each individual bit
-> >
-> > 2) creating one new xattr in system namespace which will contain all bit
-> >    flags in one structure
-> >
-> > 3) creating new xattr in system namespace for each individual flag
-> >
-> > Disadvantages for option 1) is that "cp -a" or "rsync -a" does not
-> > preserve them. If in option 2) or 3) those xattrs would be visible in
-> > listxattr() call then this can be advantage, as all flags are properly
-> > preserved when doing "archive" backup.
-> >
-> > Do you have any preference which of those options should be used?
-> >
-> 
-> Darrick said in this thread twice:
-> statx/FS_IOC_FSGETXATTR to retrieve and FS_IOC_FSSETXATTR to set.
-> (NOT FS_IOC_SETFLAGS)
-> and I wrote that I agree with him.
-> 
-> I suggest that you let go of the cp -a out-of-the-box requirement.
-> It is not going to pass muster - maybe for a specific filesystem but
-> as a filesystem agnostic feature, unless you change cp tool.
+--000000000000170258062d59e7b2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ok. I was not sure that this is the decided way. So we are going to
-take this direction. I hope that cp and rsync tools would accept
-changes/patches in future for ability to copy these flags too.
+Do you have a repro scenario (an easy way to create the surrogate
+directory type you mention) to test your patch below
 
-> >
-> > And how many bit flags are needed? I have done some investigation. Lets
-> > start with table which describes all 32 possible bit flags which are
-> > used by Windows system and also by filesystems FAT / exFAT / NTFS / ReFS
-> > and also by SMB over network:
-> >
-> > bit / attrib.exe flag / SDK constant / description
-> >
-> >  0 - R - FILE_ATTRIBUTE_READONLY              - writing to file or deleting it is disallowed
-> >  1 - H - FILE_ATTRIBUTE_HIDDEN                - inode is hidden
-> >  2 - S - FILE_ATTRIBUTE_SYSTEM                - inode is part of operating system
-> >  3 -   - FILE_ATTRIBUTE_VOLUME                - inode is the disk volume label entry
-> >  4 -   - FILE_ATTRIBUTE_DIRECTORY             - inode is directory
-> >  5 - A - FILE_ATTRIBUTE_ARCHIVE               - inode was not archived yet (when set)
-> >  6 -   - FILE_ATTRIBUTE_DEVICE                - inode represents  in-memory device (e.g. C:\), flag not stored on filesystem
-> >  7 -   - FILE_ATTRIBUTE_NORMAL                - no other flag is set (value 0 means to not change flags, bit 7 means to clear all flags)
-> >  8 -   - FILE_ATTRIBUTE_TEMPORARY             - inode data do not have to be flushed to disk
-> >  9 -   - FILE_ATTRIBUTE_SPARSE_FILE           - file is sparse with holes
-> > 10 -   - FILE_ATTRIBUTE_REPARSE_POINT         - inode has attached reparse point (symlink is also reparse point)
-> > 11 -   - FILE_ATTRIBUTE_COMPRESSED            - file is compressed, for directories it means that newly created inodes would have this flag set
-> > 12 - O - FILE_ATTRIBUTE_OFFLINE               - HSM - inode is used by HSM
-> > 13 - I - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED   - inode will not be indexed by content indexing service
-> > 14 -   - FILE_ATTRIBUTE_ENCRYPTED             - file is encrypted, for directories it means that newly created inodes would have this flag set
-> > 15 - V - FILE_ATTRIBUTE_INTEGRITY_STREAM      - fs does checksumming of data and metadata when reading inode, read-only
-> > 16 -   - FILE_ATTRIBUTE_VIRTUAL               - inode is in %LocalAppData%\VirtualStore, flag not stored on filesystem
-> > 17 - X - FILE_ATTRIBUTE_NO_SCRUB_DATA         - do not use scrubber (proactive background data integrity scanner) on this file, for directories it means that newly created inodes would have this flag set
-> > 18 -   - FILE_ATTRIBUTE_EA                    - inode has xattrs, (not in readdir output, shares same bit with FILE_ATTRIBUTE_RECALL_ON_OPEN)
-> > 18 -   - FILE_ATTRIBUTE_RECALL_ON_OPEN        - HSM - inode is not stored locally (only in readdir output, shares same bit with FILE_ATTRIBUTE_EA)
-> > 19 - P - FILE_ATTRIBUTE_PINNED                - HSM - inode data content must be always stored on locally
-> > 20 - U - FILE_ATTRIBUTE_UNPINNED              - HSM - inode data content can be removed from local storage
-> > 21 -   -                                      - reserved
-> > 22 -   - FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS - HSM - inode data content is not stored locally
-> > 23 -   -                                      - reserved
-> > 24 -   -                                      - reserved
-> > 25 -   -                                      - reserved
-> > 26 -   -                                      - reserved
-> > 27 -   -                                      - reserved
-> > 28 -   -                                      - reserved
-> > 29 - B - FILE_ATTRIBUTE_STRICTLY_SEQUENTIAL   - SMR Blob, unknown meaning, read-only
-> > 30 -   -                                      - reserved
-> > 31 -   -                                      - reserved
-> >
-> 
-> I suspect that we need to reserve expansion for more than 7 bits if we
-> design a proper API.
-> The fsx_xflags field is already too crowded for adding so many flags
-> We can use the padding at the end of fsxattr to add __u32 fsx_dosattrib
-> or fsx_dosflags field.
-> 
-> > (HSM means Hierarchical Storage Management software, which uses reparse
-> > points to make some remote file/folder available on the local
-> > filesystem, for example OneDrive or DropBox)
-> >
-> 
-> I am quite interested in supporting those HSM flags for fanotify.
 
-Ok. I heard that more people are interesting in these flags, so seems
-that this is some area which is missing on Linux.
 
-> > From above list only following bit flags are suitable for modification
-> > over some Linux API:
-> > - FILE_ATTRIBUTE_READONLY
-> > - FILE_ATTRIBUTE_HIDDEN
-> > - FILE_ATTRIBUTE_SYSTEM
-> > - FILE_ATTRIBUTE_ARCHIVE
-> > - FILE_ATTRIBUTE_TEMPORARY
-> > - FILE_ATTRIBUTE_COMPRESSED
-> > - FILE_ATTRIBUTE_OFFLINE
-> > - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
-> > - FILE_ATTRIBUTE_ENCRYPTED
-> > - FILE_ATTRIBUTE_NO_SCRUB_DATA
-> > - FILE_ATTRIBUTE_PINNED
-> > - FILE_ATTRIBUTE_UNPINNED
-> >
-> > And if I'm looking correctly the FILE_ATTRIBUTE_COMPRESSED can be
-> > already mapped to Linux FS_COMPR_FL / STATX_ATTR_COMPRESSED, which has
-> > same meaning. Also FILE_ATTRIBUTE_ENCRYPTED can be mapped to
-> > FS_ENCRYPT_FL / STATX_ATTR_ENCRYPTED. Note that these two flags cannot
-> > be set over WinAPI or SMB directly and it is required to use special
-> > WinAPI or SMB ioctl.
-> >
-> 
-> There is a standard way to map from fileattr::flags
-> to fileattr::fsx_xflags, so that you could set/get COMPR,ENCRYPT using
-> FS_IOC_FS[GS]ETXATTR ioctl.
-> see fileattr_fill_flags/fileattr_fill_xflags.
-> but I think that xfs_fileattr_set() will need to have a supported xflags mask
-> check if you start adding xflags that xfs does not currently support and
-> other filesystems do support.
+If the reparse point was not handled (indicated by the -EOPNOTSUPP from
+ops->parse_reparse_point() call) but reparse tag is of type name surrogate
+directory type, then treat is as a new mount point.
 
-Ok. I will try to play with it.
+Name surrogate reparse point represents another named entity in the system.
 
-> > So totally are needed 10 new bit flags. And for future there are 9
-> > reserved bits which could be introduced by MS in future.
-> >
-> > Additionally there are get-only attributes which can be useful for statx
-> > purposes (for example exported by cifs.ko SMB client):
-> > - FILE_ATTRIBUTE_REPARSE_POINT
-> > - FILE_ATTRIBUTE_INTEGRITY_STREAM
-> > - FILE_ATTRIBUTE_RECALL_ON_OPEN
-> > - FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
-> > - FILE_ATTRIBUTE_STRICTLY_SEQUENTIAL
-> >
-> > From the above list of flags suitable for modification, following bit
-> > flags have no meaning for kernel and it is up to userspace how will use
-> > them. What is needed from kernel and/or filesystem driver is to preserve
-> > those bit flags.
-> > - FILE_ATTRIBUTE_HIDDEN
-> > - FILE_ATTRIBUTE_SYSTEM
-> > - FILE_ATTRIBUTE_ARCHIVE
-> > - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
-> >
-> > Following are bit flags which kernel / VFS / fsdriver would have to
-> > handle specially, to provide enforcement or correct behavior of them:
-> > - FILE_ATTRIBUTE_READONLY - enforce that data modification or unlink is disallowed when set
-> > - FILE_ATTRIBUTE_COMPRESSED - enforce compression on filesystem when set
-> > - FILE_ATTRIBUTE_ENCRYPTED - enforce encryption on filesystem when set
-> >
-> > Then there are HSM flags which for local filesystem would need some
-> > cooperation with userspace synchronization software. For network
-> > filesystems (SMB / NFS4) they need nothing special, just properly
-> > propagating them over network:
-> > - FILE_ATTRIBUTE_OFFLINE
-> > - FILE_ATTRIBUTE_PINNED
-> > - FILE_ATTRIBUTE_UNPINNED
-> >
-> > About following 2 flags, I'm not sure if the kernel / VFS / fs driver
-> > has to do something or it can just store bits to fs:
-> > - FILE_ATTRIBUTE_TEMPORARY
-> > - FILE_ATTRIBUTE_NO_SCRUB_DATA
+From SMB client point of view, this another entity is resolved on the SMB
+server, and server serves its content automatically. Therefore from Linux
+client point of view, this name surrogate reparse point of directory type
+crosses mount point.
+
+Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+
+
+--=20
+Thanks,
+
+Steve
+
+--000000000000170258062d59e7b2
+Content-Type: text/x-patch; charset="UTF-8"; 
+	name="0013-cifs-Treat-unhandled-directory-name-surrogate-repars.patch"
+Content-Disposition: attachment; 
+	filename="0013-cifs-Treat-unhandled-directory-name-surrogate-repars.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m6r5egmi0>
+X-Attachment-Id: f_m6r5egmi0
+
+RnJvbSBjODE0MTQ2MmM3ZTg1MDM5OGUzN2E5YTA3ZGM1N2Q0YWM3YjcxMGYwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/UGFsaT0yMFJvaD1DMz1BMXI/PSA8cGFsaUBr
+ZXJuZWwub3JnPgpEYXRlOiBXZWQsIDE4IFNlcCAyMDI0IDAwOjI4OjI1ICswMjAwClN1YmplY3Q6
+IFtQQVRDSCAxMy80M10gY2lmczogVHJlYXQgdW5oYW5kbGVkIGRpcmVjdG9yeSBuYW1lIHN1cnJv
+Z2F0ZSByZXBhcnNlCiBwb2ludHMgYXMgbW91bnQgZGlyZWN0b3J5IG5vZGVzCk1JTUUtVmVyc2lv
+bjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOApDb250ZW50LVRy
+YW5zZmVyLUVuY29kaW5nOiA4Yml0CgpJZiB0aGUgcmVwYXJzZSBwb2ludCB3YXMgbm90IGhhbmRs
+ZWQgKGluZGljYXRlZCBieSB0aGUgLUVPUE5PVFNVUFAgZnJvbQpvcHMtPnBhcnNlX3JlcGFyc2Vf
+cG9pbnQoKSBjYWxsKSBidXQgcmVwYXJzZSB0YWcgaXMgb2YgdHlwZSBuYW1lIHN1cnJvZ2F0ZQpk
+aXJlY3RvcnkgdHlwZSwgdGhlbiB0cmVhdCBpcyBhcyBhIG5ldyBtb3VudCBwb2ludC4KCk5hbWUg
+c3Vycm9nYXRlIHJlcGFyc2UgcG9pbnQgcmVwcmVzZW50cyBhbm90aGVyIG5hbWVkIGVudGl0eSBp
+biB0aGUgc3lzdGVtLgoKRnJvbSBTTUIgY2xpZW50IHBvaW50IG9mIHZpZXcsIHRoaXMgYW5vdGhl
+ciBlbnRpdHkgaXMgcmVzb2x2ZWQgb24gdGhlIFNNQgpzZXJ2ZXIsIGFuZCBzZXJ2ZXIgc2VydmVz
+IGl0cyBjb250ZW50IGF1dG9tYXRpY2FsbHkuIFRoZXJlZm9yZSBmcm9tIExpbnV4CmNsaWVudCBw
+b2ludCBvZiB2aWV3LCB0aGlzIG5hbWUgc3Vycm9nYXRlIHJlcGFyc2UgcG9pbnQgb2YgZGlyZWN0
+b3J5IHR5cGUKY3Jvc3NlcyBtb3VudCBwb2ludC4KClNpZ25lZC1vZmYtYnk6IFBhbGkgUm9ow6Fy
+IDxwYWxpQGtlcm5lbC5vcmc+Ci0tLQogZnMvc21iL2NsaWVudC9pbm9kZS5jICAgIHwgMTMgKysr
+KysrKysrKysrKwogZnMvc21iL2NvbW1vbi9zbWJmc2N0bC5oIHwgIDMgKysrCiAyIGZpbGVzIGNo
+YW5nZWQsIDE2IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lub2Rl
+LmMgYi9mcy9zbWIvY2xpZW50L2lub2RlLmMKaW5kZXggOWNjMzFjZjZlYmQwLi4yMTQyNDA2MTI1
+NDkgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvaW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50
+L2lub2RlLmMKQEAgLTEyMTUsNiArMTIxNSwxOSBAQCBzdGF0aWMgaW50IHJlcGFyc2VfaW5mb190
+b19mYXR0cihzdHJ1Y3QgY2lmc19vcGVuX2luZm9fZGF0YSAqZGF0YSwKIAkJCXJjID0gc2VydmVy
+LT5vcHMtPnBhcnNlX3JlcGFyc2VfcG9pbnQoY2lmc19zYiwKIAkJCQkJCQkgICAgICBmdWxsX3Bh
+dGgsCiAJCQkJCQkJICAgICAgaW92LCBkYXRhKTsKKwkJCS8qCisJCQkgKiBJZiB0aGUgcmVwYXJz
+ZSBwb2ludCB3YXMgbm90IGhhbmRsZWQgYnV0IGl0IGlzIHRoZQorCQkJICogbmFtZSBzdXJyb2dh
+dGUgd2hpY2ggcG9pbnRzIHRvIGRpcmVjdG9yeSwgdGhlbiB0cmVhdAorCQkJICogaXMgYXMgYSBu
+ZXcgbW91bnQgcG9pbnQuIE5hbWUgc3Vycm9nYXRlIHJlcGFyc2UgcG9pbnQKKwkJCSAqIHJlcHJl
+c2VudHMgYW5vdGhlciBuYW1lZCBlbnRpdHkgaW4gdGhlIHN5c3RlbS4KKwkJCSAqLworCQkJaWYg
+KHJjID09IC1FT1BOT1RTVVBQICYmCisJCQkgICAgSVNfUkVQQVJTRV9UQUdfTkFNRV9TVVJST0dB
+VEUoZGF0YS0+cmVwYXJzZS50YWcpICYmCisJCQkgICAgKGxlMzJfdG9fY3B1KGRhdGEtPmZpLkF0
+dHJpYnV0ZXMpICYgQVRUUl9ESVJFQ1RPUlkpKSB7CisJCQkJcmMgPSAwOworCQkJCWNpZnNfY3Jl
+YXRlX2p1bmN0aW9uX2ZhdHRyKGZhdHRyLCBzYik7CisJCQkJZ290byBvdXQ7CisJCQl9CiAJCX0K
+IAogCQlpZiAoZGF0YS0+cmVwYXJzZS50YWcgPT0gSU9fUkVQQVJTRV9UQUdfU1lNTElOSyAmJiAh
+cmMpIHsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jb21tb24vc21iZnNjdGwuaCBiL2ZzL3NtYi9jb21t
+b24vc21iZnNjdGwuaAppbmRleCA0YjM3OWU4NGM0NmIuLjMyNTNhMThlY2I1YyAxMDA2NDQKLS0t
+IGEvZnMvc21iL2NvbW1vbi9zbWJmc2N0bC5oCisrKyBiL2ZzL3NtYi9jb21tb24vc21iZnNjdGwu
+aApAQCAtMTU5LDYgKzE1OSw5IEBACiAjZGVmaW5lIElPX1JFUEFSU0VfVEFHX0xYX0NIUgkgICAg
+IDB4ODAwMDAwMjUKICNkZWZpbmUgSU9fUkVQQVJTRV9UQUdfTFhfQkxLCSAgICAgMHg4MDAwMDAy
+NgogCisvKiBJZiBOYW1lIFN1cnJvZ2F0ZSBCaXQgaXMgc2V0LCB0aGUgZmlsZSBvciBkaXJlY3Rv
+cnkgcmVwcmVzZW50cyBhbm90aGVyIG5hbWVkIGVudGl0eSBpbiB0aGUgc3lzdGVtLiAqLworI2Rl
+ZmluZSBJU19SRVBBUlNFX1RBR19OQU1FX1NVUlJPR0FURSh0YWcpICghISgodGFnKSAmIDB4MjAw
+MDAwMDApKQorCiAvKiBmc2N0bCBmbGFncyAqLwogLyogSWYgRmxhZ3MgaXMgc2V0IHRvIHRoaXMg
+dmFsdWUsIHRoZSByZXF1ZXN0IGlzIGFuIEZTQ1RMIG5vdCBpb2N0bCByZXF1ZXN0ICovCiAjZGVm
+aW5lIFNNQjJfMF9JT0NUTF9JU19GU0NUTAkJMHgwMDAwMDAwMQotLSAKMi40My4wCgo=
+--000000000000170258062d59e7b2--
