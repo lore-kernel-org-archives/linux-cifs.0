@@ -1,504 +1,275 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3851DD526;
-	Wed,  5 Feb 2025 22:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7661FC0ED;
+	Thu,  6 Feb 2025 06:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738792889; cv=none; b=CUAosVO4xEldE3kL2XR2Wx4WIQEQTvrY9fofAadzzegSiLP1BYrnlvQlWTapFvzwNsRR3rVniHPQLg/QRm6IQr2NMAv9PqksDjVXieZ+ue5waoyhhDKxFxsHnlKQiXKosRv5DpYc64rYSBZBdHC/owkxZO1TO/Lm0oAUNVXpuf0=
+	t=1738824678; cv=none; b=GBHI9CkG0PBqx0+7lut+C3VIZQ53AFiqDpX/Uf/S+k3yaXO7DxySYr8FDRDcllWf7a5uht73je5Mwqvkazvr/JG8OT29z01kub28GaORkZQOlPOOCPQ/wz587RN1YU2qtYJG/ateYgTEch6mfCqNZ++5sHhjqPapzFrvTT59RVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738792889; c=relaxed/simple;
-	bh=DLaDrx1ymzkUzSVp/m4UlBZ11W07m8Flm2xClTwZvHw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMXrxTonAMZjQ2+MeD6wfureSMdm6rdjG1mNnX5aLng041XbHKuFgTY3CxsQ3ML9By9tnjP2XonXankgo6LQqezGDxEUk7vOCItfUOJJK7xrsbmu0a6oQ537SJUMmJKvQ9Mqs/ZI4a3QlPXS8miLj6a1/QxKkd0vMC7RaIy+PLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+hPF3gb; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1738824678; c=relaxed/simple;
+	bh=W207mP0jcnmjStXnf5hc7cwKs++y+DnzP/lWeZHqjG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Er3hrP7H5X0uKhTy7A2AMgAgR3KtL8hyycqnuxR6+f8O3rb18GByt8wDBoHVDwEy6Yp5mhOelXRwRO9aCpaIU2/D6j2vcdBkVE868C7uyeB/p+GvYLbkBPeAvW+KcYQHrENdXdyhvDQx/6bgR6cDWFmamzopqprZPTFhZlB88g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CSs+4FTK; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+hPF3gb"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5dcebd8604bso365995a12.3;
-        Wed, 05 Feb 2025 14:01:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSs+4FTK"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2166f1e589cso14057815ad.3;
+        Wed, 05 Feb 2025 22:51:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738792885; x=1739397685; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DnjIdNHns/v6cRzRhPY12PUprVa4q8GLUEjx+e4YvFs=;
-        b=W+hPF3gbhmaNR9ZJd3fOaFgIHU7CcCt1Q8wHNzr2qjP1YUn+4UU4OnmOn6PAwYpmlg
-         XNVAkdWii+mIM5x0BhGdDrky4npaSXFUJ/UhgUjTCeP9OPPNOrvhYYBsXz0IZqU1XzTR
-         vXsU1GtFGZUIZR99ikQpvK9lW47fCN8/Zf04VmRQOd2vDXqGVMf1uKh8R4WUsHt+QO2i
-         fr5R2GkfTeaUUgAg/XEgU/GLGMR2gFMQ6ujAjic4j/uxAJwV8t9CrOb/b/VeqzWKfmAl
-         Ht2jqIG9vOMRe+TzTXUjwbnmWLIuRLBbb3ELCpAMvsW7Tq7Jtca9eyTQ6CmquIqdfn0a
-         brCg==
+        d=gmail.com; s=20230601; t=1738824675; x=1739429475; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wI9ZpMw7Gy7qg2Uts/pom0IsswPhT1sIy/kO+FUrGLM=;
+        b=CSs+4FTKRjVc5u1Z9GemnYLMwAqgka1/++1iMfmvVPnkCp7K8ik55+/u+HZLztmwuo
+         kZzAbYfo652pmQYN+p07ZZpIc+R/OSKvMlrj4fKqtsFyf4W339htcF8cR04qBWh1L9ND
+         zY3uzH+joCdfXniU5kijGq3hfKM04jqkqAuVKKe7UZIDSa2oaC1BbeEza8KETuoSoDa+
+         ASVASY1uN4JbafM8p6Ah/AJMWRB88JjsOwSCpB/4E1XrJNY0IXUE3v8LTOC26lL7vjJ6
+         zpXXqs5qzLNdJYYSiYhyeWPAGuLGA4I70JFWcZ+xj82CGbS2C6jl2lW6HloDdsOmtsuB
+         BKwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738792885; x=1739397685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DnjIdNHns/v6cRzRhPY12PUprVa4q8GLUEjx+e4YvFs=;
-        b=j8eOatHfgD81PPN7l3el5seoGhHskCm3EX1eQevASnKUbogVxanGcNoBXFBGllpqyX
-         DDakO35hNo+pRuOmcY9Cxub2aGWCEWixt/7t6ioNP4tDpDtX8ABRdxpSpVQ3OYGKWyII
-         v8szw3hZiajemvH2mMhHqg5Ua8zceUGyCWffFfArN/mp8UOKWJWQkR5uo0fbAEctOXju
-         /TDZAH2jr7vdKpLFC+fKAJfhDV8aRKJid7iwcPKN5cb2mLTny+YEIqrdUu3/cA5h8GVv
-         Onbi29R9L/4exPQ5qJdlESQ2MSU3gMHGYCkal/1P5EipYVpqyiMhifOk2d3WykjLr+3R
-         xDhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzMA+sQzdPTeKcN1pOi3b/3sHvXcGYliJE4HVueXWW/gjljg9PKxZvPpFjbL53hdAY7VnXgCZRNrOn@vger.kernel.org, AJvYcCXHHeZmroybiParukFe0TogkYoSMAOr56VDacrteuxirFVByQ4tEYnWeaTUSq+jVaX2aa7sPtQFw8QpuPFS@vger.kernel.org, AJvYcCXk4RSU9pQn0Subfzm4r3Wi5uKd+4c4XRToV7OSWB3xQHJE3nO5CHc2xBCeq4usHamTAjDnE0oBMxz9OHCLIw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY366+hPJPfp/pywZRNF7GnDmpWDDWHgc2d9o3uLIU2RExBm8A
-	A/jRfJb5lFkAXW/xsqfFJeDx9FTToCHYl72xb7iSPO1/Tlp0s8PAaJ5zy6TLZ27dNiKw/otN+ev
-	nJ7p1Z/jqdMJ0/ZfmAkn/lM2uj9AGPeRhNIg=
-X-Gm-Gg: ASbGncuWF04Us/J2gRosAMJp9MsZ8OmfD2x9Fw6EQNMbKwUDQO0emGUPRRZQLvSWlEt
-	VGH9YJLirx5uTuACgol3viVJ9QOFKW6HEfSXYQtyRO1C3PCv0ZdhqSALlt+rKngIubOodSzSD
-X-Google-Smtp-Source: AGHT+IGrj/nSPrWNFvwnS4jyD0PejaC8xi7+HsXw6p1BCAcFZK20LBJBmJT9arjMRNuBWmLJUqLUG2PTftxmhQFSlEo=
-X-Received: by 2002:a05:6402:528c:b0:5dc:7538:3c0 with SMTP id
- 4fb4d7f45d1cf-5dcdb6fa4e5mr11507577a12.4.1738792885016; Wed, 05 Feb 2025
- 14:01:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738824675; x=1739429475;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wI9ZpMw7Gy7qg2Uts/pom0IsswPhT1sIy/kO+FUrGLM=;
+        b=rvQl8/v3U+Gtpu/keZS/p4sNYKQOLOuoaAvgKSFLtAY85w9s37UvUCkK4Vvpt6Ziy0
+         Kh5EM9L9JfcwZDAmOX7qb2DeudtFE11Kyba0vmojnrGg4CJ796MDB1A7l4SN6lOS2P0p
+         3xbND0nma3RXp/+yYjQKUAS2LUfgLK2uifzoqJN+7G4aH+Dzb1UpAyKkKMpaI8her2Wd
+         ERYGrobZlFwMHFq/4HAQ8ZeYdm16E0vAwBE0vIfp/2hy8E1hQivgRZ2weo2vF4/sn91r
+         Lm9zLztJ0vlOvub7+1pcGj//fcAn48mv4EMIEQIS27JMxRpHRhaJ+QuQdlHuTvcx6q/x
+         BDug==
+X-Forwarded-Encrypted: i=1; AJvYcCVOvaZOMfTjmRnKEPNtBJ9JitnYc2KByRqbb9uEAJEWtTGHiOLHZ7X0jfYef/niKynhDV4/FbFoqzOs@vger.kernel.org, AJvYcCWA81p0J7D3uT4uU81Ixsk2vvy+PrVzGN9gMvvZlP42fzkVdGs/3rveW86V2rFzIoZ7+dMljMDLnLV2ANZu@vger.kernel.org, AJvYcCWmRbJhiAvFcyfQgWpaWR1118JyTZ8EMZ+OXt2REsu7wRxyleSmaOy0naNmUGmDN76tqzeUiIJ0@vger.kernel.org
+X-Gm-Message-State: AOJu0YySEt22cgstwi7V+Vr71Mex8/i6lHmV9DozErGjn9MpHi0x4OXK
+	lss/xAdxYkR4v0LgP4Z5AdEhfcc7ge5q+q0QVklqc0SBeotKZF1L
+X-Gm-Gg: ASbGncvRlqWemc2gOdcejd1gt6IeWwyqZOksWklKei0rC+M+3sbvFA3P4u6GZ/P43/K
+	6vT0GgYB4ziNQnQOUgIblv6v90endp5EYdIodW57O0/k+JUskRt6MAxT85fnvVYhbXlsOHm/uky
+	6YvGqxZLHPMjeFtAV2+lOLu9M/a/VULviXMPK24qu14Q5b+oP68P9NPlwW+VXncK0dZGfN3m33A
+	Q/UGa8pwmxs1etRyrwjeMMYS8ty3TfNFvDrg17YYT3shbhI3Pce3mgvkE/3cMuV2mqcltK2BcVn
+	yCiCQxE+D8zIkayRro3PTX2ZWTAB5UQeR52Mcx7m+A==
+X-Google-Smtp-Source: AGHT+IFCSk9bei0s7d9S8Plb0v82TXjv46ncAdySuahsCcNj1H9jo7JiH6fmo1DXl1oIX/c9KDyWwQ==
+X-Received: by 2002:a17:902:f687:b0:216:4cc0:aa4e with SMTP id d9443c01a7336-21f17f11399mr92063645ad.47.1738824675334;
+        Wed, 05 Feb 2025 22:51:15 -0800 (PST)
+Received: from met-Virtual-Machine.. ([131.107.159.169])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f36538c26sm5169325ad.55.2025.02.05.22.51.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 22:51:14 -0800 (PST)
+From: meetakshisetiyaoss@gmail.com
+To: sfrench@samba.org,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	nspmangalore@gmail.com,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	bharathsm.hsk@gmail.com,
+	bharathsm@microsoft.com
+Cc: Meetakshi Setiya <msetiya@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/2] smb: client: change lease epoch type from unsigned int to __u16
+Date: Thu,  6 Feb 2025 01:50:41 -0500
+Message-ID: <20250206065101.339850-1-meetakshisetiyaoss@gmail.com>
+X-Mailer: git-send-email 2.46.0.46.g406f326d27
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOQ4uxhh1LDz5zXzqFENPhJ9k851AL3E7Xc2d7pSVVYX4Fu9Jw@mail.gmail.com>
- <20250117185947.ylums2dhmo3j6hol@pali> <20250202152343.ahy4hnzbfuzreirz@pali>
- <CAOQ4uxgjbHTyQ53u=abWhyQ81ATL4cqSeWKDfOjz-EaR0NGmug@mail.gmail.com>
- <20250203221955.bgvlkp273o3wnzmf@pali> <CAOQ4uxhkB6oTJm7DvQxFbxkQ1u_KMUFEL0eWKVYf39hnuYrnfQ@mail.gmail.com>
- <20250203233403.5a5pcgl5xylj47nb@pali> <CAOQ4uxisXgDOuE1oDH6qtLYoiFeG55kjpUJaXDxZ+tp2ck++Sg@mail.gmail.com>
- <20250204212638.3hhlbc5muutnlluw@pali> <CAOQ4uxg5k5FP43y93FRujj54kVk8TyXD2AeO_VFJ2m+aB=b1_Q@mail.gmail.com>
- <20250205181645.4ps3kzafyasg4dgj@pali>
-In-Reply-To: <20250205181645.4ps3kzafyasg4dgj@pali>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Wed, 5 Feb 2025 23:01:13 +0100
-X-Gm-Features: AWEUYZnmLX3GPJ1ohnud4ivBzV02bJ06lbpI49PMwuBLfcyBPMgZpWfstrB3Et8
-Message-ID: <CAOQ4uxg96LRqneKvNVH4S97OfaGt=yNbntgqHk6E=T-fojeOAA@mail.gmail.com>
-Subject: Re: Immutable vs read-only for Windows compatibility
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, ronnie sahlberg <ronniesahlberg@gmail.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Steve French <sfrench@samba.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 5, 2025 at 7:16=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> wr=
-ote:
->
-> On Wednesday 05 February 2025 17:33:30 Amir Goldstein wrote:
-> > On Tue, Feb 4, 2025 at 10:26=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.or=
-g> wrote:
-> > >
-> > > On Tuesday 04 February 2025 12:54:01 Amir Goldstein wrote:
-> > > > On Tue, Feb 4, 2025 at 12:34=E2=80=AFAM Pali Roh=C3=A1r <pali@kerne=
-l.org> wrote:
-> > > > >
-> > > > > On Tuesday 04 February 2025 00:02:44 Amir Goldstein wrote:
-> > > > > > On Mon, Feb 3, 2025 at 11:20=E2=80=AFPM Pali Roh=C3=A1r <pali@k=
-ernel.org> wrote:
-> > > > > > >
-> > > > > > > On Monday 03 February 2025 22:59:46 Amir Goldstein wrote:
-> > > > > > > > On Sun, Feb 2, 2025 at 4:23=E2=80=AFPM Pali Roh=C3=A1r <pal=
-i@kernel.org> wrote:
-> > > > > > > > > And there is still unresolved issue with FILE_ATTRIBUTE_R=
-EADONLY.
-> > > > > > > > > Its meaning is similar to existing Linux FS_IMMUTABLE_FL,=
- just
-> > > > > > > > > FILE_ATTRIBUTE_READONLY does not require root / CAP_LINUX=
-_IMMUTABLE.
-> > > > > > > > >
-> > > > > > > > > I think that for proper support, to enforce FILE_ATTRIBUT=
-E_READONLY
-> > > > > > > > > functionality, it is needed to introduce new flag e.g.
-> > > > > > > > > FS_IMMUTABLE_FL_USER to allow setting / clearing it also =
-for normal
-> > > > > > > > > users without CAP_LINUX_IMMUTABLE. Otherwise it would be =
-unsuitable for
-> > > > > > > > > any SMB client, SMB server or any application which would=
- like to use
-> > > > > > > > > it, for example wine.
-> > > > > > > > >
-> > > > > > > > > Just to note that FreeBSD has two immutable flags SF_IMMU=
-TABLE and
-> > > > > > > > > UF_IMMUTABLE, one settable only by superuser and second f=
-or owner.
-> > > > > > > > >
-> > > > > > > > > Any opinion?
-> > > > > > > >
-> > > > > > > > For filesystems that already support FILE_ATTRIBUTE_READONL=
-Y,
-> > > > > > > > can't you just set S_IMMUTABLE on the inode and vfs will do=
- the correct
-> > > > > > > > enforcement?
-> > > > > > > >
-> > > > > > > > The vfs does not control if and how S_IMMUTABLE is set by f=
-ilesystems,
-> > > > > > > > so if you want to remove this vfs flag without CAP_LINUX_IM=
-MUTABLE
-> > > > > > > > in smb client, there is nothing stopping you (I think).
-> > > > > > >
-> > > > > > > Function fileattr_set_prepare() checks for CAP_LINUX_IMMUTABL=
-E when
-> > > > > > > trying to change FS_IMMUTABLE_FL bit. This function is called=
- from
-> > > > > > > ioctl(FS_IOC_SETFLAGS) and also from ioctl(FS_IOC_FSSETXATTR)=
-.
-> > > > > > > And when function fileattr_set_prepare() fails then .fileattr=
-_set
-> > > > > > > callback is not called at all. So I think that it is not poss=
-ible to
-> > > > > > > remove the IMMUTABLE flag from userspace without capability f=
-or smb
-> > > > > > > client.
-> > > > > > >
-> > > > > >
-> > > > > > You did not understand what I meant.
-> > > > > >
-> > > > > > You cannot relax the CAP_LINUX_IMMUTABLE for setting FS_IMMUTAB=
-LE_FL
-> > > > > > and there is no reason that you will need to relax it.
-> > > > > >
-> > > > > > The vfs does NOT enforce permissions according to FS_IMMUTABLE_=
-FL
-> > > > > > The vfs enforces permissions according to the S_IMMUTABLE in-me=
-mory
-> > > > > > inode flag.
-> > > > > >
-> > > > > > There is no generic vfs code that sets S_IMMUTABLE inode flags,=
- its
-> > > > > > the filesystems that translate the on-disk FS_IMMUTABLE_FL to
-> > > > > > in-memory S_IMMUTABLE inode flag.
-> > > > > >
-> > > > > > So if a filesystem already has an internal DOSATTRIB flags set,=
- this
-> > > > > > filesystem can set the in-memory S_IMMUTABLE inode flag accordi=
-ng
-> > > > > > to its knowledge of the DOSATTRIB_READONLY flag and the
-> > > > > > CAP_LINUX_IMMUTABLE rules do not apply to the DOSATTRIB_READONL=
-Y
-> > > > > > flag, which is NOT the same as the FS_IMMUTABLE_FL flag.
-> > > > > >
-> > > > > > > And it would not solve this problem for local filesystems (nt=
-fs or ext4)
-> > > > > > > when Samba server or wine would want to set this bit.
-> > > > > > >
-> > > > > >
-> > > > > > The Samba server would use the FS_IOC_FS[GS]ETXATTR ioctl
-> > > > > > API to get/set dosattrib, something like this:
-> > > > > >
-> > > > > > struct fsxattr fsxattr;
-> > > > > > ret =3D ioctl_get_fsxattr(fd, &fsxattr);
-> > > > > > if (!ret && fsxattr.fsx_xflags & FS_XFLAG_HASDOSATTR) {
-> > > > > >     fsxattr.fsx_dosattr |=3D fs_dosattrib_readonly;
-> > > > > >     ret =3D ioctl_set_fsxattr(fd, &fsxattr);
-> > > > > > }
-> > > > >
-> > > > > Thanks for more explanation. First time I really did not understo=
-od it.
-> > > > > But now I think I understood it. So basically there would be two =
-flags
-> > > > > which would result in setting S_IMMUTABLE on inode. One is the ex=
-isting
-> > > > > FS_IMMUTABLE_FL which requires the capability and some new flag (=
-e.g.
-> > > > > FS_XFLAG_HASDOSATTR) which would not require it and can be implem=
-ented
-> > > > > for cifs, vfat, ntfs, ... Right?
-> > > > >
-> > > >
-> > > > Well, almost right.
-> > > > The flag that would correspond to FILE_ATTRIBUTE_READONLY
-> > > > is FS_DOSATTRIB_READONLY from the new field fsx_dosattrib
-> > > > (see below)
-> > >
-> > > Thank you for example, it is for sure good starting point for me.
-> > >
-> > > > --- a/include/uapi/linux/fs.h
-> > > > +++ b/include/uapi/linux/fs.h
-> > > > @@ -145,7 +145,8 @@ struct fsxattr {
-> > > >         __u32           fsx_nextents;   /* nextents field value (ge=
-t)   */
-> > > >         __u32           fsx_projid;     /* project identifier (get/=
-set) */
-> > > >         __u32           fsx_cowextsize; /* CoW extsize field value =
-(get/set)*/
-> > > > -       unsigned char   fsx_pad[8];
-> > > > +       __u32           fsx_dosattrib;  /* dosattrib field value (g=
-et/set) */
-> > > > +       unsigned char   fsx_pad[4];
-> > > >  };
-> > > >
-> > > >  /*
-> > > > @@ -167,7 +168,16 @@ struct fsxattr {
-> > > >  #define FS_XFLAG_FILESTREAM    0x00004000      /* use filestream a=
-llocator */
-> > > >  #define FS_XFLAG_DAX           0x00008000      /* use DAX for IO *=
-/
-> > > >  #define FS_XFLAG_COWEXTSIZE    0x00010000      /* CoW extent size
-> > > > allocator hint */
-> > > > -#define FS_XFLAG_HASATTR       0x80000000      /* no DIFLAG for th=
-is   */
-> > > > +#define FS_XFLAG_HASATTR       0x80000000      /* has extended att=
-ributes */
-> > > > +
-> > > > +/*
-> > > > + * Flags for the fsx_dosattrib field
-> > > > + */
-> > > > +#define FS_DOSATTRIB_READONLY  0x00000001      /* R - read-only */
-> > > > +#define FS_DOSATTRIB_HIDDEN    0x00000002      /* H - hidden */
-> > > > +#define FS_DOSATTRIB_SYSTEM    0x00000004      /* S - system */
-> > > > +#define FS_DOSATTRIB_ARCHIVE   0x00000020      /* A - archive */
-> > > > +#define FS_DOSATTRIB_HASATTR   0x80000000      /* has dos attribut=
-es */
-> > >
-> > > Should these FS_DOSATTRIB_* constants follows the Windows
-> > > FILE_ATTRIBUTE_* constants? Because I see that you put a gap between
-> > > system and archive.
-> > >
-> >
-> > Well, no, they do not need to follow Windows contestants,
-> > but then again, why not?
->
-> I have just few cons:
-> - there are gaps and unused bits (e.g. FILE_ATTRIBUTE_VOLUME)
-> - there are bits which have more meanings (FILE_ATTRIBUTE_EA / FILE_ATTRI=
-BUTE_RECALL_ON_OPEN)
-> - there are bits used only by WinAPI and not by NT / SMB
-> - there are bits which have different NT meaning in readdir() and in stat=
-()
-> - there are bits for which we already have FS_IOC_GETFLAGS API
->
+From: Meetakshi Setiya <msetiya@microsoft.com>
 
-valid points
+MS-SMB2 section 2.2.13.2.10 specifies that 'epoch' should be a 16-bit
+unsigned integer used to track lease state changes. Change the data
+type of all instances of 'epoch' from unsigned int to __u16. This
+simplifies the epoch change comparisons and makes the code more
+compliant with the protocol spec.
 
-> I think it that is is bad a idea if bit N in our ioctl() would have
-> different meaning than in our statx().
->
+Cc: stable@vger.kernel.org
+Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+---
+ fs/smb/client/cifsglob.h  | 12 ++++++------
+ fs/smb/client/smb1ops.c   |  2 +-
+ fs/smb/client/smb2ops.c   | 18 +++++++++---------
+ fs/smb/client/smb2pdu.c   |  2 +-
+ fs/smb/client/smb2proto.h |  2 +-
+ 5 files changed, 18 insertions(+), 18 deletions(-)
 
-definitely not, but I am not sure which bits you are referring to,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index a68434ad744a..2c1b0438fe7d 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -357,7 +357,7 @@ struct smb_version_operations {
+ 	int (*handle_cancelled_mid)(struct mid_q_entry *, struct TCP_Server_Info *);
+ 	void (*downgrade_oplock)(struct TCP_Server_Info *server,
+ 				 struct cifsInodeInfo *cinode, __u32 oplock,
+-				 unsigned int epoch, bool *purge_cache);
++				 __u16 epoch, bool *purge_cache);
+ 	/* process transaction2 response */
+ 	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
+ 			     char *, int);
+@@ -552,12 +552,12 @@ struct smb_version_operations {
+ 	/* if we can do cache read operations */
+ 	bool (*is_read_op)(__u32);
+ 	/* set oplock level for the inode */
+-	void (*set_oplock_level)(struct cifsInodeInfo *, __u32, unsigned int,
++	void (*set_oplock_level)(struct cifsInodeInfo *, __u32, __u16,
+ 				 bool *);
+ 	/* create lease context buffer for CREATE request */
+ 	char * (*create_lease_buf)(u8 *lease_key, u8 oplock);
+ 	/* parse lease context buffer and return oplock/epoch info */
+-	__u8 (*parse_lease_buf)(void *buf, unsigned int *epoch, char *lkey);
++	__u8 (*parse_lease_buf)(void *buf, __u16 *epoch, char *lkey);
+ 	ssize_t (*copychunk_range)(const unsigned int,
+ 			struct cifsFileInfo *src_file,
+ 			struct cifsFileInfo *target_file,
+@@ -1447,7 +1447,7 @@ struct cifs_fid {
+ 	__u8 create_guid[16];
+ 	__u32 access;
+ 	struct cifs_pending_open *pending_open;
+-	unsigned int epoch;
++	__u16 epoch;
+ #ifdef CONFIG_CIFS_DEBUG2
+ 	__u64 mid;
+ #endif /* CIFS_DEBUG2 */
+@@ -1480,7 +1480,7 @@ struct cifsFileInfo {
+ 	bool oplock_break_cancelled:1;
+ 	bool status_file_deleted:1; /* file has been deleted */
+ 	bool offload:1; /* offload final part of _put to a wq */
+-	unsigned int oplock_epoch; /* epoch from the lease break */
++	__u16 oplock_epoch; /* epoch from the lease break */
+ 	__u32 oplock_level; /* oplock/lease level from the lease break */
+ 	int count;
+ 	spinlock_t file_info_lock; /* protects four flag/count fields above */
+@@ -1577,7 +1577,7 @@ struct cifsInodeInfo {
+ 	spinlock_t	open_file_lock;	/* protects openFileList */
+ 	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
+ 	unsigned int oplock;		/* oplock/lease level we have */
+-	unsigned int epoch;		/* used to track lease state changes */
++	__u16 epoch;		/* used to track lease state changes */
+ #define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
+ #define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
+ #define CIFS_INODE_FLAG_UNUSED		  (2) /* Unused flag */
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 9756b876a75e..d6e2fb669c40 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -377,7 +377,7 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+ static void
+ cifs_downgrade_oplock(struct TCP_Server_Info *server,
+ 		      struct cifsInodeInfo *cinode, __u32 oplock,
+-		      unsigned int epoch, bool *purge_cache)
++		      __u16 epoch, bool *purge_cache)
+ {
+ 	cifs_set_oplock_level(cinode, oplock);
+ }
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 77309217dab4..ec36bed54b0b 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3904,22 +3904,22 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
+ static void
+ smb2_downgrade_oplock(struct TCP_Server_Info *server,
+ 		      struct cifsInodeInfo *cinode, __u32 oplock,
+-		      unsigned int epoch, bool *purge_cache)
++		      __u16 epoch, bool *purge_cache)
+ {
+ 	server->ops->set_oplock_level(cinode, oplock, 0, NULL);
+ }
+ 
+ static void
+ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+-		       unsigned int epoch, bool *purge_cache);
++		       __u16 epoch, bool *purge_cache);
+ 
+ static void
+ smb3_downgrade_oplock(struct TCP_Server_Info *server,
+ 		       struct cifsInodeInfo *cinode, __u32 oplock,
+-		       unsigned int epoch, bool *purge_cache)
++		       __u16 epoch, bool *purge_cache)
+ {
+ 	unsigned int old_state = cinode->oplock;
+-	unsigned int old_epoch = cinode->epoch;
++	__u16 old_epoch = cinode->epoch;
+ 	unsigned int new_state;
+ 
+ 	if (epoch > old_epoch) {
+@@ -3939,7 +3939,7 @@ smb3_downgrade_oplock(struct TCP_Server_Info *server,
+ 
+ static void
+ smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+-		      unsigned int epoch, bool *purge_cache)
++		      __u16 epoch, bool *purge_cache)
+ {
+ 	oplock &= 0xFF;
+ 	cinode->lease_granted = false;
+@@ -3963,7 +3963,7 @@ smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+ 
+ static void
+ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+-		       unsigned int epoch, bool *purge_cache)
++		       __u16 epoch, bool *purge_cache)
+ {
+ 	char message[5] = {0};
+ 	unsigned int new_oplock = 0;
+@@ -4000,7 +4000,7 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+ 
+ static void
+ smb3_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+-		      unsigned int epoch, bool *purge_cache)
++		      __u16 epoch, bool *purge_cache)
+ {
+ 	unsigned int old_oplock = cinode->oplock;
+ 
+@@ -4114,7 +4114,7 @@ smb3_create_lease_buf(u8 *lease_key, u8 oplock)
+ }
+ 
+ static __u8
+-smb2_parse_lease_buf(void *buf, unsigned int *epoch, char *lease_key)
++smb2_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key)
+ {
+ 	struct create_lease *lc = (struct create_lease *)buf;
+ 
+@@ -4125,7 +4125,7 @@ smb2_parse_lease_buf(void *buf, unsigned int *epoch, char *lease_key)
+ }
+ 
+ static __u8
+-smb3_parse_lease_buf(void *buf, unsigned int *epoch, char *lease_key)
++smb3_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key)
+ {
+ 	struct create_lease_v2 *lc = (struct create_lease_v2 *)buf;
+ 
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 40ad9e79437a..51204ff58bf6 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -2329,7 +2329,7 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
+ 
+ int smb2_parse_contexts(struct TCP_Server_Info *server,
+ 			struct kvec *rsp_iov,
+-			unsigned int *epoch,
++			__u16 *epoch,
+ 			char *lease_key, __u8 *oplock,
+ 			struct smb2_file_all_info *buf,
+ 			struct create_posix_rsp *posix)
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 2336dfb23f36..4662c7e2d259 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -283,7 +283,7 @@ extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
+ 					enum securityEnum);
+ int smb2_parse_contexts(struct TCP_Server_Info *server,
+ 			struct kvec *rsp_iov,
+-			unsigned int *epoch,
++			__u16 *epoch,
+ 			char *lease_key, __u8 *oplock,
+ 			struct smb2_file_all_info *buf,
+ 			struct create_posix_rsp *posix);
+-- 
+2.46.0.46.g406f326d27
 
-> Should we duplicate FS_IOC_GETFLAGS FS_COMPR_FL and FS_ENCRYPT_FL into
-> that new fsx_dosattrib? For me it sounds like that it is a better idea
-> to have compression bit and encryption bit only in one field and not
-> duplicated.
->
-
-No duplicates, of course, but notice there are no XFLAG for COMPR
-and ENCRYPT.
-
-The FS_IOC_[GS]ETFLAGS are a different alternative API.
-It does not matter if you define them in fsx_xflags or on fsx_dosattrib
-they will not be a duplicate of the FS_COMPR_FL flags, same as
-FS_XFLAG_APPEND is not a duplicate of FS_APPEND_FL
-it is a different API to control the same on-disk flag.
-But you will need to include COMPRT/CRYPT in the
-FS_XFLAG_COMMON masks, so the fsx_xflags probably makes
-more sense.
-
-
-> But we can slightly follow Windows constants. Not exactly, but remove
-> redundancy, remove reserved bits, modify bits to have exactly one
-> meaning, etc... So basically do some sane modifications.
->
-
-Yep, conformity for the sake of conformity.
-No hard rules.
-
-> > I mean if we only ever needed the 4 RHSA bits above, we could
-> > have used the FS_XFLAG_* flags space, but if we extend the API
-> > with a new 32bit field, why not use 1-to-1 mapping at least as a starti=
-ng point.
->
-> I understand it, for me it looks also a good idea, just needs to resolve
-> those problems above... and it would result in incompatibility that it
-> would not be 1-to-1 mapping at the end.
->
-> > You can see that it is quite common that filesystems re-define the
-> > same constants for these flags (e.g. EXT4_IMMUTABLE_FL).
-> > I am a bit surprised that there is no build time assertion
-> > BUILD_BUG_ON(EXT4_IMMUTABLE_FL !=3D FS_IMMUTABLE_FL)
-> > which would be the standard way to make sure that the constants
-> > stay in sync if they need to be in sync, but some filesystems don't
-> > even assume that these constants are in sync (e.g. f2fs_fsflags_map)
-> >
-> > > > This last special flag is debatable and I am not really sure that w=
-e need it.
-> > >
-> > > This constant has very similar meaning to FILE_ATTRIBUTE_NORMAL. Both
-> > > has some compatibility meaning that "field is valid or something is s=
-et".
-> > > Just FILE_ATTRIBUTE_NORMAL is not 31th bit.
-> > >
-> >
-> > No it does not. I don't think that you understood the meaning of
-> > FS_DOSATTRIB_HASATTR.
-> > Nevermind it was a bad idea anyway. see more below.
-> >
-> > > > It is needed for proper backward compat with existing userspace too=
-ls.
-> > > > For example, if there was a backup tool storing the fsxattr blob re=
-sult of
-> > > > FS_IOC_FSGETXATTR and sets it later during restore with
-> > > > FS_IOC_FSSETXATTR, then it would be better to ignore a zero
-> > > > value of fsx_dosattrib instead of resetting all of the on-disk dosa=
-ttrib flags
-> > > > if the restore happens after ntfs gained support for setting dosatt=
-rib flags
-> > > > via FS_IOC_FSSETXATTR.
-> > > >
-> > > > When using the standard tools to set fsxattr (chattr and xfs_io -c =
-chattr)
-> > > > the tool does FS_IOC_FSGETXATTR + modify + FS_IOC_FSSETXATTR,
-> > > > so those tools are expected to leave new bits in fsx_dosattrib at t=
-heir
-> > > > value if ntfs gains support for get/set fsx_dosattrib.
-> > > >
-> > > > Setting the auxiliary FS_DOSATTRIB_HASATTR flag can help the
-> > > > kernel/fs to explicitly state that the values returned in fsx_dosat=
-trib
-> > > > are valid and the tool to state that values set in fsx_dosattrib ar=
-e valid.
-> > > > But using a single flag will not help expanding ntfs support for mo=
-re
-> > > > fsx_dosattrib flags later, so I am not sure if it is useful (?).
-> > >
-> > > If the fsx_dosattrib would match all FILE_ATTRIBUTE_* then we can do =
-it
-> > > as the ntfs matches FILE_ATTRIBUTE_* and no extension is needed for
-> > > future.
-> > >
-> > > And I think that this backward compatibility sounds good.
-> > >
-> >
-> > That's only true if you can support ALL the dosattrib flags from the
-> > first version and that Windows will not add any of the reserved
-> > flags in the future, which is hard to commit to.
->
-> I see, it would not work. And Windows will for sure use some reserved
-> bits in future.
->
-> > > What could be useful for userspace is also ability to figure out whic=
-h
-> > > FS_DOSATTRIB_* are supported by the filesystem. Because for example U=
-DF
-> > > on-disk format supports only FS_DOSATTRIB_HIDDEN bit. And FAT only th=
-ose
-> > > attributes which are in the lowest byte.
-> > >
-> >
-> > Exactly.
-> > statx has this solved with the stx_attributes_mask field.
-> >
-> > We could do the same for FS_IOC_FS[GS]ETXATTR, but because
-> > right now, this API does not verify that fsx_pad is zero, we will need =
-to
-> > define a new set of ioctl consants FS_IOC_[GS]ETFSXATTR2
-> > with the exact same functionality but that userspace knows that they
-> > publish and respect the dosattrib mask:
->
-> I understand and this is a problem.
->
-> > --- a/fs/ioctl.c
-> > +++ b/fs/ioctl.c
-> > @@ -868,9 +868,11 @@ static int do_vfs_ioctl(struct file *filp, unsigne=
-d int fd,
-> >         case FS_IOC_SETFLAGS:
-> >                 return ioctl_setflags(filp, argp);
-> >
-> > +       case FS_IOC_GETFSXATTR2:
-> >         case FS_IOC_FSGETXATTR:
-> >                 return ioctl_fsgetxattr(filp, argp);
-> >
-> > +       case FS_IOC_SETFSXATTR2:
-> >         case FS_IOC_FSSETXATTR:
-> >                 return ioctl_fssetxattr(filp, argp);
-> > --- a/include/uapi/linux/fs.h
-> > +++ b/include/uapi/linux/fs.h
-> > @@ -145,7 +145,8 @@ struct fsxattr {
-> >         __u32           fsx_nextents;   /* nextents field value (get)  =
- */
-> >         __u32           fsx_projid;     /* project identifier (get/set)=
- */
-> >         __u32           fsx_cowextsize; /* CoW extsize field value (get=
-/set)*/
-> > -       unsigned char   fsx_pad[8];
-> > +       __u32           fsx_dosattrib;  /* dosattrib field value (get/s=
-et) */
-> > +       __u32           fsx_dosattrib_mask; /* dosattrib field validity=
- mask */
-> >  };
-> >
-> >  /*
-> > @@ -238,6 +248,9 @@ struct fsxattr {
-> >  #define FS_IOC32_SETFLAGS              _IOW('f', 2, int)
-> >  #define FS_IOC32_GETVERSION            _IOR('v', 1, int)
-> >  #define FS_IOC32_SETVERSION            _IOW('v', 2, int)
-> > +#define FS_IOC_GETFSXATTR2              _IOR('x', 31, struct fsxattr)
-> > +#define FS_IOC_SETFSXATTR2              _IOW('x', 32, struct fsxattr)
-> > +/* Duplicate legacy ioctl numbers for backward compact */
-> >  #define FS_IOC_FSGETXATTR              _IOR('X', 31, struct fsxattr)
-> >  #define FS_IOC_FSSETXATTR              _IOW('X', 32, struct fsxattr)
-> >  #define FS_IOC_GETFSLABEL              _IOR(0x94, 49, char[FSLABEL_MAX=
-])
-> >
-> > We could also use this opportunity to define a larger fsxattr2 struct
-> > that also includes an fsx_xflags_mask field, so that the xflags namespa=
-ce
-> > could also be extended in a backward compat way going forward:
-> >
-> > @@ -145,7 +145,21 @@ struct fsxattr {
-> >         __u32           fsx_nextents;   /* nextents field value (get)  =
- */
-> >         __u32           fsx_projid;     /* project identifier (get/set)=
- */
-> >         __u32           fsx_cowextsize; /* CoW extsize field value (get=
-/set)*/
-> >         unsigned char   fsx_pad[8];
-> >
-> >  };
-> > +
-> > +/*
-> > + * Structure for FS_IOC_[GS]ETFSXATTR2.
-> > + */
-> > +struct fsxattr2 {
-> > +       __u32           fsx_xflags;     /* xflags field value (get/set)=
- */
-> > +       __u32           fsx_extsize;    /* extsize field value (get/set=
-)*/
-> > +       __u32           fsx_nextents;   /* nextents field value (get)  =
- */
-> > +       __u32           fsx_projid;     /* project identifier (get/set)=
- */
-> > +       __u32           fsx_cowextsize; /* CoW extsize field value (get=
-/set)*/
-> > +       __u32           fsx_xflags_mask; /* xflags field validity mask =
-*/
-> > +       __u32           fsx_dosattrib;  /* dosattrib field value (get/s=
-et) */
-> > +       __u32           fsx_dosattrib_mask; /* dosattrib field validity=
- mask */
-> > +};
-> >
-> > And you'd also need to flug those new mask and dosattrib
-> > via struct fileattr into filesystems - too much to explain.
-> > try to figure it out (unless someone objects) and if you can't figure
-> > it out let me know.
->
-> Yea, I think that this is thing which I should be able to figure out
-> once I start changing it.
->
-> Anyway, I have alternative idea to the problem with fsx_pad. What about
-> introducing new fsx_xflags flag which would say that fsx_pad=3Dfsx_dosatt=
-rib
-> is present? E.g.
->
-> #define FS_XFLAG_HASDOSATTRIB 0x40000000
->
-> Then we would not need new FS_IOC_GETFSXATTR2/FS_IOC_SETFSXATTR2 ioctls.
->
-> Also fsx_pad has 8 bytes, which can store both attrib and mask, so new
-> struct fsxattr2 would not be needed too.
->
-
-As I wrote in the other response, this can work, but has some pitfalls.
-
-Thanks,
-Amir.
