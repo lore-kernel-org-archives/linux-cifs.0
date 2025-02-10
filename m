@@ -1,245 +1,175 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DC624CEEF;
-	Mon, 10 Feb 2025 21:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547771509A0
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Feb 2025 23:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739224476; cv=none; b=sPnALCgWLpLf24rIpkt8WzK0T3grDY3twj27QdR6aP997MPct58y3ovhPC80cJNTJqFd89HaCi/Y+ZIE3S7k/GV6kGeoOZK9mn+ndxOLRFCFN35HbiVgH5AcqmUClAYHSZNAk4Qgqvtw+hJVjsNxlpNbpGFcd3VWxV/LCeYKbpU=
+	t=1739229553; cv=none; b=rM6hggW5L7NXtkkr4cHMC/wTgITQKiUYFm2gM+OYpKpZwXakKYt7m2oAf8VyD+Gt28xPWpMiKtG4ShATbagFtImMTV2MC3cO5xH5J3zPWKpdBWc8d7z9ujVAM+50nmt5wZxKBfBwL3sMlINd8Z9m4EfXRqQH+XPql6t2f/BEoOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739224476; c=relaxed/simple;
-	bh=AyQraTfsD0eAKJNbpAIj37781+CGfi6OdK1JVn5lhT4=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=CadWTTC3+lr9nEMMim8NeboHksDkhueuQPcysn5wMAXQrJaTFvdq02yVduDZwMrqrSJgooaye2qoBOxq5jU1prWPYWlUktkrnekOz8OoWA2+/dLsLTO+0t29exEPAt71HnhkXeh+RoW02y7hcTNgunCYHWYmYaK52pctITTWtZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f65VgwxR; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1739229553; c=relaxed/simple;
+	bh=WtfLk+YtNZL/W7iw8DNGwzsp9tN0JOYfou8cMl9XKtI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=rc5++IJbEuFGy/a2s3ZT9GO5SPCPLVtKj474k0DP20xOpWByiqJ2W20SufAFf7gR5EEccbw/mn1Cd8z/EDgJ1OO8tyYiu5mmop0YNnrDDKcfbyzhmfek7gu88seJOg38OCYT40r25NFkeRKx30f2ZOoF0xxCaMlKYav3aX7vVpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TjOe4yai; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f65VgwxR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TjOe4yai"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739229549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BCFGrlEtzNntYujJOFVmJbBSaFSsuqUeDjxzqx00PbU=;
+	b=TjOe4yaicRGLBwjfyGwUoo11vs1415or2xgsmjMAlMacQbACFU17XhCp7wjhYjRVf5bT5X
+	as7NOg7aNLOX9a6IViyhFwDyEzPGPVYSZOkaKpyFAebTs6JXijgJF4tP18BFTZ5WcLdQPt
+	F69asSA+M+LNmfXsuxI8y118++hsKrM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-497-qujH-pw7NCGUxgAQih54Bg-1; Mon,
+ 10 Feb 2025 18:19:06 -0500
+X-MC-Unique: qujH-pw7NCGUxgAQih54Bg-1
+X-Mimecast-MFC-AGG-ID: qujH-pw7NCGUxgAQih54Bg
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A565B1800374;
+	Mon, 10 Feb 2025 23:19:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C27CE3001D12;
+	Mon, 10 Feb 2025 23:18:58 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <8d8a5d5b00688ea553b106db690e8a01f15b1410@linux.dev>
+References: <8d8a5d5b00688ea553b106db690e8a01f15b1410@linux.dev> <335ad811ae2cf5ebdfc494c185b9f02e9ca40c3e@linux.dev> <3173328.1738024385@warthog.procyon.org.uk> <3187377.1738056789@warthog.procyon.org.uk> <2986469.1739185956@warthog.procyon.org.uk>
+To: "Ihor Solodrai" <ihor.solodrai@linux.dev>
+Cc: dhowells@redhat.com, "Marc Dionne" <marc.dionne@auristor.com>,
+    "Steve
+ French" <stfrench@microsoft.com>,
+    "Eric Van Hensbergen" <ericvh@kernel.org>,
+    "Latchesar  Ionkov" <lucho@ionkov.net>,
+    "Dominique Martinet" <asmadeus@codewreck.org>,
+    "Christian Schoenebeck" <linux_oss@crudebyte.com>,
+    "Paulo Alcantara" <pc@manguebit.com>,
+    "Jeff Layton" <jlayton@kernel.org>,
+    "Christian Brauner" <brauner@kernel.org>, v9fs@lists.linux.dev,
+    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+    ast@kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH] netfs: Add retry stat counters
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739224461;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=41Jhkvba1WFpStcLbcComfly4EhWKsI/5ZXXHmjcCPc=;
-	b=f65VgwxRDwvtEdsu7NuNmtX7Cgk1A2R7ciEt77+LFeoEdkDCJpP46zQl/tiWsPH6GSyHXV
-	3BH4gtWmgsJ/ZkYujW+eU7UhgmO9yYvbv9BNFhJxWx7L9V32PfS1aGM82g5GOAQqkBbJN7
-	tc0lxdvFecc/O7MqyUewFbtWj8ltvmk=
-Date: Mon, 10 Feb 2025 21:54:19 +0000
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3210863.1739229537.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Ihor Solodrai" <ihor.solodrai@linux.dev>
-Message-ID: <8d8a5d5b00688ea553b106db690e8a01f15b1410@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH] netfs: Add retry stat counters
-To: "David Howells" <dhowells@redhat.com>
-Cc: dhowells@redhat.com, "Marc Dionne" <marc.dionne@auristor.com>, "Steve
- French" <stfrench@microsoft.com>, "Eric Van Hensbergen"
- <ericvh@kernel.org>, "Latchesar  Ionkov" <lucho@ionkov.net>, "Dominique
- Martinet" <asmadeus@codewreck.org>, "Christian Schoenebeck"
- <linux_oss@crudebyte.com>, "Paulo Alcantara" <pc@manguebit.com>, "Jeff
- Layton" <jlayton@kernel.org>, "Christian Brauner" <brauner@kernel.org>,
- v9fs@lists.linux.dev, linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- ast@kernel.org, bpf@vger.kernel.org
-In-Reply-To: <2986469.1739185956@warthog.procyon.org.uk>
-References: <335ad811ae2cf5ebdfc494c185b9f02e9ca40c3e@linux.dev>
- <3173328.1738024385@warthog.procyon.org.uk>
- <3187377.1738056789@warthog.procyon.org.uk>
- <2986469.1739185956@warthog.procyon.org.uk>
-X-Migadu-Flow: FLOW_OUT
+Date: Mon, 10 Feb 2025 23:18:57 +0000
+Message-ID: <3210864.1739229537@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 2/10/25 2:57 AM, David Howells wrote:
-> Ihor Solodrai <ihor.solodrai@linux.dev> wrote:
->
->> I recommend trying to reproduce with steps I shared in my initial repo=
-rt:
->> https://lore.kernel.org/bpf/a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwD=
-AhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=3D@pm.m=
-e/
->>
->> I know it may not be very convenient due to all the CI stuff,
->
-> That's an understatement. :-)
->
->> but you should be able to use it to iterate on the kernel source local=
-ly and
->> narrow down the problem.
->
-> Can you share just the reproducer without all the docker stuff?=20=20
+Ihor Solodrai <ihor.solodrai@linux.dev> wrote:
 
-I=20wrote a couple of shell scripts with a gist of what's happening on
-CI: build kernel, build selftests and run. You may try them.
+> Done. I pushed the logs to the previously mentioned github branch:
+> https://github.com/kernel-patches/bpf/commit/699a3bb95e2291d877737438fb6=
+41628702fd18f
 
-Pull this branch from my github:
-https://github.com/theihor/bpf/tree/netfs-debug
+Perfect, thanks.
 
-It's the kernel source in a broken state with the scripts.
-Inlining the scripts here:
+Looking at the last record of /proc/fs/netfs/requests, I see:
 
-## ./reproducer.sh
+	REQUEST  OR REF FL ERR  OPS COVERAGE
+	=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=3D=3D =3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+	00000a98 RA   1 2001    0   0 @0000 2000/2000
 
-#!/bin/bash
+So the request of interest is R=3D00000a98 in the trace.  Grepping for tha=
+t, I
+see (with a few columns cut out):
 
-set -euo pipefail
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 NEW         r=3D1
+ test_progs-no_a-97: netfs_read: R=3D00000a98 READAHEAD c=3D00000000 ni=3D=
+2ec02f16 s=3D0 l=3D2000 sz=3D17a8
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 GET SUBREQ  r=3D2
+ test_progs-no_a-97: netfs_sreq: R=3D00000a98[1] DOWN TERM  f=3D192 s=3D0 =
+17a8/17a8 s=3D1 e=3D0
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 GET WORK    r=3D3
+ test_progs-no_a-97: netfs_sreq_ref: R=3D00000a98[1] PUT TERM    r=3D1
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 GET SUBREQ  r=3D4
+ test_progs-no_a-97: netfs_sreq: R=3D00000a98[2] ZERO SUBMT f=3D00 s=3D17a=
+8 0/858 s=3D0 e=3D0
+    kworker/u8:2-36: netfs_rreq_ref: R=3D00000a98 SEE WORK    r=3D4
+    kworker/u8:2-36: netfs_rreq: R=3D00000a98 RA COLLECT f=3D2021
+    kworker/u8:2-36: netfs_sreq: R=3D00000a98[1] DOWN DSCRD f=3D92 s=3D0 1=
+7a8/17a8 s=3D1 e=3D0
+    kworker/u8:2-36: netfs_sreq_ref: R=3D00000a98[1] PUT DONE    r=3D0
+    kworker/u8:2-36: netfs_sreq: R=3D00000a98[1] DOWN FREE  f=3D92 s=3D0 1=
+7a8/17a8 s=3D1 e=3D0
+    kworker/u8:2-36: netfs_rreq_ref: R=3D00000a98 PUT SUBREQ  r=3D3
+    kworker/u8:2-36: netfs_rreq: R=3D00000a98 RA COMPLET f=3D2021
+    kworker/u8:2-36: netfs_rreq: R=3D00000a98 RA WAKE-IP f=3D2021
+    kworker/u8:2-36: netfs_rreq: R=3D00000a98 RA DONE    f=3D2001
+    kworker/u8:2-36: netfs_rreq_ref: R=3D00000a98 PUT WORK    r=3D2
+ test_progs-no_a-97: netfs_sreq: R=3D00000a98[2] ZERO TERM  f=3D102 s=3D17=
+a8 858/858 s=3D1 e=3D0
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 GET WORK    r=3D3
+ test_progs-no_a-97: netfs_sreq_ref: R=3D00000a98[2] PUT TERM    r=3D1
+ test_progs-no_a-97: netfs_rreq_ref: R=3D00000a98 PUT RETURN  r=3D2
+    kworker/u8:2-36: netfs_rreq_ref: R=3D00000a98 SEE WORK    r=3D2
+    kworker/u8:2-36: netfs_rreq_ref: R=3D00000a98 PUT WORK    r=3D1
 
-export KBUILD_OUTPUT=3D$(realpath kbuild-output)
-mkdir -p $KBUILD_OUTPUT
+You can see subrequest 1 completes fine, the subrequest is freed and the r=
+ef
+it had on the request is put:
 
-cp -f repro.config $KBUILD_OUTPUT/.config
-make olddefconfig
-make -j$(nproc) all
-make -j$(nproc) headers
+	netfs_sreq: R=3D00000a98[1] DOWN FREE  f=3D92 s=3D0 17a8/17a8 s=3D1 e=3D0
+	netfs_rreq_ref: R=3D00000a98 PUT SUBREQ  r=3D3
 
-# apt install lsb-release wget software-properties-common gnupg
-# bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-export LLVM_VERSION=3D18
+Subrequest 2, however isn't collected:
 
-make -C tools/testing/selftests/bpf \
-     CLANG=3Dclang-${LLVM_VERSION} \
-     LLC=3Dllc-${LLVM_VERSION} \
-     LLVM_STRIP=3Dllvm-strip-${LLVM_VERSION} \
-     -j$(nproc) test_progs-no_alu32
+	netfs_sreq: R=3D00000a98[2] ZERO SUBMT f=3D00 s=3D17a8 0/858 s=3D0 e=3D0
+	netfs_sreq: R=3D00000a98[2] ZERO TERM  f=3D102 s=3D17a8 858/858 s=3D1 e=3D=
+0
+	netfs_sreq_ref: R=3D00000a98[2] PUT TERM    r=3D1
 
-# wget https://github.com/danobi/vmtest/releases/download/v0.15.0/vmtest-=
-x86_64
-# chmod +x vmtest-x86_64
-./vmtest-x86_64 -k $KBUILD_OUTPUT/$(make -s image_name) ./run-bpf-selftes=
-ts.sh | tee test.log
+and the work happens again in kworker/u8:2-36 right at the end:
 
-## end of ./reproducer.sh
+	netfs_rreq_ref: R=3D00000a98 SEE WORK    r=3D2
+	netfs_rreq_ref: R=3D00000a98 PUT WORK    r=3D1
 
-## ./run-bpf-selftests.sh
+but this doesn't do anything.
 
-#!/bin/bash
+The excess buffer clearance happened in the app thread (test_progs-no_a-97=
+):
 
-/bin/mount bpffs /sys/fs/bpf -t bpf
-ip link set lo up
+	netfs_sreq: R=3D00000a98[2] ZERO TERM  f=3D102 s=3D17a8 858/858 s=3D1 e=3D=
+0
 
-echo 10 > /proc/sys/kernel/hung_task_timeout_secs
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_read/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write_iter/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_rreq/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_rreq_ref/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_sreq/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_sreq_ref/enable
-echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_failure/enable
+> Let me know if I can help with anything else.
 
-function tail_proc {
-    src=3D$1
-    dst=3D$2
-    echo -n > $dst
-    while true; do
-        echo >> $dst
-        cat $src >> $dst
-        sleep 1
-    done
-}
-export -f tail_proc
+Can you add some more tracepoints?
 
-nohup bash -c 'tail_proc /proc/fs/netfs/stats netfs-stats.log' & disown
-nohup bash -c 'tail_proc /proc/fs/netfs/requests netfs-requests.log' & di=
-sown
-nohup bash -c 'trace-cmd show -p > trace-cmd.log' & disown
+echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_collect/enable
+echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_collect_sreq/enable
+echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_collect_state/enable
 
-cd tools/testing/selftests/bpf
-./test_progs-no_alu32
+However, I think I may have spotted the issue: I'm mixing
+clear_and_wake_up_bit() for NETFS_RREQ_IN_PROGRESS (which will use a commo=
+n
+system waitqueue) with waiting on an rreq-specific waitqueue in such as
+netfs_wait_for_read().
 
-## end of ./run-bpf-selftests.sh
+I'll work up a fix patch for that tomorrow.
 
-One of the reasons for suggesting docker is that all the dependencies
-are pre-packaged in the image, and so the environment is pretty close
-to the actual CI environment. With only shell scripts you will have to
-detect and install missing dependencies on your system and hope
-package versions are more or less the same and don't affect the issue.
+Thanks,
+David
 
-Notable things: LLVM 18, pahole, qemu, qemu-guest-agent, vmtest tool.
-
-> Is this one
-> of those tests that requires 9p over virtio?  I have a different enviro=
-nment
-> for that.
-
-We run the tests via vmtest tool: https://github.com/danobi/vmtest
-This is essentially a qemu wrapper.
-
-I am not familiar with its internals, but for sure it is using 9p.
-
-
-On 2/10/25 3:12 AM, David Howells wrote:
-> Ihor Solodrai <ihor.solodrai@linux.dev> wrote:
->
->> Bash piece starting a process collecting /proc/fs/netfs/stats:
->>
->>     function tail_netfs {
->>         echo -n > /mnt/vmtest/netfs-stats.log
->>         while true; do
->>             echo >> /mnt/vmtest/netfs-stats.log
->>             cat /proc/fs/netfs/stats >> /mnt/vmtest/netfs-stats.log
->>             sleep 1
->>         done
->>     }
->>     export -f tail_netfs
->>     nohup bash -c 'tail_netfs' & disown
->
-> I'm afraid, intermediate snapshots of this file aren't particularly use=
-ful -
-> just the last snapshot:
-
-The reason I wrote it like this is because the test runner hangs, and
-so I have to kill qemu to stop it (with no ability to run
-post-processing within qemu instance; well, at least I don't know how
-to do it).
-
->
-> [...]
->
-> Could you collect some tracing:
->
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_read/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write_iter/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_rreq/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_rreq_ref/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_sreq/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_sreq_ref/enable
-> echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_failure/enable
->
-> and then collect the tracelog:
->
-> trace-cmd show | bzip2 >some_file_somewhere.bz2
->
-> And if you could collect /proc/fs/netfs/requests as well, that will sho=
-w the
-> debug IDs of the hanging requests.  These can be used to grep the trace=
- by
-> prepending "R=3D".  For example, if you see:
->
-> 	REQUEST  OR REF FL ERR  OPS COVERAGE
-> 	=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=3D=
-=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D
-> 	00000043 WB   1 2120    0   0 @34000000 0/0
->
-> then:
->
-> 	trace-cmd show | grep R=3D00000043
-
-Done. I pushed the logs to the previously mentioned github branch:
-https://github.com/kernel-patches/bpf/commit/699a3bb95e2291d877737438fb64=
-1628702fd18f
-
-Let me know if I can help with anything else.
-
->
-> Thanks,
-> David
->
