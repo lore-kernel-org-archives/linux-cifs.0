@@ -1,163 +1,146 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A611F236C;
-	Tue, 11 Feb 2025 10:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090E81F153C;
+	Tue, 11 Feb 2025 10:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739268090; cv=none; b=C679065kmAriTa3LKwEj61D8J0SxG4/bjQSoTWUv6HXK2KZYkhBFhQCIUhmFM2EHFJLy7ZZMC1Wl+ne4wdn4Y8IXdrXnYyb2NBl5gvLdkB4au2mrRoL9IhfobYievN/XO1KjEyD0Oa4aXZP/z45DB0BKDm6V+LQ2GraxRV5tWas=
+	t=1739269303; cv=none; b=ZFrlSfXVUBwZtamH80D1S/gIrdi19W64s1XeQcKSoOmEN+thG7EgpNgBJwahmu0rdIN4vdKDcprS4dZyyF4XoCIcr5yXRq0CqF3KqyX3Ri+tK5M7zOzr1idFNx2h+a9BvNZQxMFx826Yt8cT2vt+fO3mXQJGVLA+r8KcyfTllDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739268090; c=relaxed/simple;
-	bh=iErw32Uq4t5PXKFtsL4Eo9itj9Sq8wa9Jeeaqn9/UuE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l6AOlCaW206zvVtQVpLiX0tyLEFr9USNWslFpt+S5qxIvwm+e9K8zaZC6gj8nJncSy7JsH84mCCl5WaE1EmUeG35fDLzJA3dM9wRJ4+4fdjX38kkpP/zrCy4PwpwGIfRsGyDdzfqvICWOWAJZdbAen9CzJEOSq+TuIuuTUya/hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QzZRn0YJ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739269303; c=relaxed/simple;
+	bh=53LQ3r8rvZEOLHkZknlLjoX+zOotefhV9iMPwrCGnAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mE0+KTeRisMKjMNXsnP8WoVIZrwTeomhBnZWyX68TlSfORxaZGyc008qiVHolL5t1eqizXh2du7NdEmVbJG8GXApo/7j2JST9UX8ETsRQ+FFQbe9KDc1LWKTr/2PDX7UvrMqAqRCjQsUyoopZJpxm2drkF8khTcEGDDRXjDIC9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmRWdrFb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QzZRn0YJ"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21fa56e1583so26484945ad.3;
-        Tue, 11 Feb 2025 02:01:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739268087; x=1739872887; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lmVkjN/JH5TLrtl/d3KpNoTShOymLH1OzzxUyH/meaQ=;
-        b=QzZRn0YJcKcrREdF0ydAGNJCPt916zxB//L8UALm21bJGAzAghLMZ3NP5pllyiamEe
-         Z14OHIJrK/MWCXREBcmwXABfYlSU01OkMps1JkSPNCfRPfgYtBvQurOlSVVHBwH/sFB7
-         OWGKChWqTJKehZOWy+LCRv+CBTf6I3GGHwm4HgQ+qZsdGcdQcNzzRAWxYXyRIsOAvMuU
-         /OG+FXn/KDnrTHWrQZta+q8IB0SSOUAcP2vtp5SafTYmhC1uxOTdMhGNGeIRKfG+QGVg
-         p+mwEEcZfsNbMtj3aT7R/lMVT6WbrivO1Z+a6h0+qigjbgDuZPKqDu9HVkwnYuQRhF3t
-         aZyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739268087; x=1739872887;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lmVkjN/JH5TLrtl/d3KpNoTShOymLH1OzzxUyH/meaQ=;
-        b=fZ7lc79ABDJfonAM/uSVDjbzPA5SmwTX1AgDyzl+NdKfVRQxscxkDLITVIUr2FE1HB
-         Jb0YbGZMANkHA/oGwqbmIs/SOd4tFVemEh2LDAZY/APCGPn1Usl4UQFn2jdQJbsZizUa
-         TrNIiSnP7+o/uATj0OgHZsRuskG/8X5wLDajGt8PWJb9A67Q0NTd4rNWQa3J0ckdFnSh
-         OjuD40EKHVvqlPmww+R4xJhRBrW8VBt3KicQTVUfjINEyCqYQN6653pGR/H8otMcYI+M
-         W7pVduRH7r/eY8iF/oS3IueTuWol1GugbK+nezkMfGaVgrNFi8Eve2GTPFjJ27YGDrSL
-         z7gw==
-X-Forwarded-Encrypted: i=1; AJvYcCWkA90pRZJQJWN8Q/Au9gX1Fjfl6HN8PGDQcb0uYIFj1ZB3WIZvVarEqjW3DfCN/8o43iVzSYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGgn1GaPchJxft6d8ltVQig3vH1C0JpDpTQuGrrnMX1wz6TEpw
-	fBGp2EiGKowEsEEtvlt/5y5pvJWazDpWBdkeRgCNm7TbLiJq9Xc0Cfc1XoeM
-X-Gm-Gg: ASbGnctS5zkqRdHAIYnrsQJ8wTYjLFsBxCF5Ipe5yQNcfdCHlGU/4vn1NtYSWBx0AiJ
-	la7Eb3J4ZUCf0tyjT+hwP0/5IkCYhvwtWf5L6hGwCvf05oIDtFcdqDgxkCvmZ/CldGaneQ0U2Q0
-	KhNR1n2aysNsVruu3WJ9BWWsMxpGu96lRuBs8ZpOJAlHifu/khNz6Zo/6ZXQczSz47njxXhPLAO
-	qSx0QM+NV27uZH4fU5sCQliuRcNP0sKZKp5BdRPPAx++nSJsDFGZKqwKmJv7YzpG9jgchTuxDfH
-	sGbElBnif24K2D1V7WKNXj/8941CdtoMS5N1K4NS1WskDzBFwA2IIA==
-X-Google-Smtp-Source: AGHT+IGwW3HaNtNKHyCPGuM4og62OtaS9MMOw3inzVQNLyl2Sw1Mg5Lr9Z9adTxVQM3L1qegaH75gw==
-X-Received: by 2002:a05:6a21:2d05:b0:1e1:ffec:b1bf with SMTP id adf61e73a8af0-1ee03b12947mr25752977637.26.1739268087234;
-        Tue, 11 Feb 2025 02:01:27 -0800 (PST)
-Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73085eb5facsm4297730b3a.11.2025.02.11.02.01.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 02:01:26 -0800 (PST)
-From: nspmangalore@gmail.com
-X-Google-Original-From: sprasad@microsoft.com
-To: linux-cifs@vger.kernel.org,
-	smfrench@gmail.com,
-	pc@manguebit.com,
-	bharathsm@microsoft.com,
-	tom@talpey.com,
-	dhowells@redhat.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] cifs: pick channels for individual subrequests
-Date: Tue, 11 Feb 2025 10:00:25 +0000
-Message-ID: <20250211100053.9485-1-sprasad@microsoft.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmRWdrFb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47062C4CEE6;
+	Tue, 11 Feb 2025 10:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739269302;
+	bh=53LQ3r8rvZEOLHkZknlLjoX+zOotefhV9iMPwrCGnAU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=PmRWdrFb/G04JdNJquDTzvPjF/D22gtMfeI2XozIl2a5w0VR9xPryEEFxZ28rE6i+
+	 aHJjfmr/XIyuPk1h2W9RF2qjMZQiXRjY9fjeaABQCuv74Ze6O9TGz0qGkMs9i+EOKc
+	 8drx7a+intTxiwvIglV3lULkGe7afZMEQx6cE7rqsTF68ewrBNF0Ci1vmSuvumKeO7
+	 nv5nfvPKVcgNWnCFZ8NBrd9TVPJaFC7Fwnp3+wry+Mf2eHvXoFaeksmtdM0uv4y+z2
+	 B3aU5kGvlEC81deCPovynsqCVaTkakrXyN3ROC+RT9FaXArIMcBYbshTmM4gh3CsoN
+	 nwj8rAAfzTUxA==
+Date: Tue, 11 Feb 2025 20:51:25 +1030
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] smb: client, common: Avoid multiple
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <Z6skpSq51yv2OhAk@kspp>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-The netfs library could break down a read request into
-multiple subrequests. When multichannel is used, there is
-potential to improve performance when each of these
-subrequests pick a different channel.
+So, in order to avoid ending up with flexible-array members in the
+middle of other structs, we use the `__struct_group()` helper to
+separate the flexible arrays from the rest of the members in the
+flexible structures. We then use the newly created tagged `struct
+smb2_file_link_info_hdr` and `struct smb2_file_rename_info_hdr`
+to replace the type of the objects causing trouble: `rename_info`
+and `link_info` in `struct smb2_compound_vars`.
 
-Today we call cifs_pick_channel when the main read request
-is initialized in cifs_init_request. This change moves this to
-cifs_prepare_read, which is the right place to pick channel since
-it gets called for each subrequest.
+We also want to ensure that when new members need to be added to the
+flexible structures, they are always included within the newly created
+tagged structs. For this, we use `static_assert()`. This ensures that the
+memory layout for both the flexible structure and the new tagged struct
+is the same after any changes.
 
-Interestingly cifs_prepare_write already does channel selection
-for individual subreq, but looks like it was missed for read.
-This is especially important when multichannel is used with
-increased rasize.
+So, with these changes, fix 86 of the following warnings:
 
-In my test setup, with rasize set to 8MB, a sequential read
-of large file was taking 11.5s without this change. With the
-change, it completed in 9s. The difference is even more signigicant
-with bigger rasize.
+fs/smb/client/cifsglob.h:2335:36: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+fs/smb/client/cifsglob.h:2334:38: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-Cc: <stable@vger.kernel.org>
-Cc: David Howells <dhowells@redhat.com>
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- fs/smb/client/cifsglob.h | 1 -
- fs/smb/client/file.c     | 7 ++++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ fs/smb/client/cifsglob.h |  4 ++--
+ fs/smb/common/smb2pdu.h  | 30 ++++++++++++++++++++----------
+ 2 files changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a68434ad744a..243e4881528c 100644
+index f73c57ee5035..70e84e1e415a 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1508,7 +1508,6 @@ struct cifs_io_parms {
- struct cifs_io_request {
- 	struct netfs_io_request		rreq;
- 	struct cifsFileInfo		*cfile;
--	struct TCP_Server_Info		*server;
- 	pid_t				pid;
+@@ -2331,8 +2331,8 @@ struct smb2_compound_vars {
+ 	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
+ 	struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
+ 	struct kvec close_iov;
+-	struct smb2_file_rename_info rename_info;
+-	struct smb2_file_link_info link_info;
++	struct smb2_file_rename_info_hdr rename_info;
++	struct smb2_file_link_info_hdr link_info;
+ 	struct kvec ea_iov;
  };
  
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 79de2f2f9c41..8582cf61242c 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -147,7 +147,7 @@ static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
- 	struct netfs_io_request *rreq = subreq->rreq;
- 	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
- 	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
--	struct TCP_Server_Info *server = req->server;
-+	struct TCP_Server_Info *server;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
- 	size_t size;
- 	int rc = 0;
-@@ -156,6 +156,8 @@ static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
- 		rdata->xid = get_xid();
- 		rdata->have_xid = true;
- 	}
-+
-+	server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
- 	rdata->server = server;
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 3336df2ea5d4..c7a0efda4403 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1707,23 +1707,33 @@ struct smb2_file_internal_info {
+ } __packed; /* level 6 Query */
  
- 	if (cifs_sb->ctx->rsize == 0)
-@@ -198,7 +200,7 @@ static void cifs_issue_read(struct netfs_io_subrequest *subreq)
- 	struct netfs_io_request *rreq = subreq->rreq;
- 	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
- 	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
--	struct TCP_Server_Info *server = req->server;
-+	struct TCP_Server_Info *server = rdata->server;
- 	int rc = 0;
+ struct smb2_file_rename_info { /* encoding of request for level 10 */
+-	__u8   ReplaceIfExists; /* 1 = replace existing target with new */
+-				/* 0 = fail if target already exists */
+-	__u8   Reserved[7];
+-	__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
+-	__le32 FileNameLength;
++	/* New members MUST be added within the struct_group() macro below. */
++	__struct_group(smb2_file_rename_info_hdr, __hdr, __packed,
++		__u8   ReplaceIfExists; /* 1 = replace existing target with new */
++					/* 0 = fail if target already exists */
++		__u8   Reserved[7];
++		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
++		__le32 FileNameLength;
++	);
+ 	char   FileName[];     /* New name to be assigned */
+ 	/* padding - overall struct size must be >= 24 so filename + pad >= 6 */
+ } __packed; /* level 10 Set */
++static_assert(offsetof(struct smb2_file_rename_info, FileName) == sizeof(struct smb2_file_rename_info_hdr),
++	      "struct member likely outside of __struct_group()");
  
- 	cifs_dbg(FYI, "%s: op=%08x[%x] mapping=%p len=%zu/%zu\n",
-@@ -266,7 +268,6 @@ static int cifs_init_request(struct netfs_io_request *rreq, struct file *file)
- 		open_file = file->private_data;
- 		rreq->netfs_priv = file->private_data;
- 		req->cfile = cifsFileInfo_get(open_file);
--		req->server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
- 			req->pid = req->cfile->pid;
- 	} else if (rreq->origin != NETFS_WRITEBACK) {
+ struct smb2_file_link_info { /* encoding of request for level 11 */
+-	__u8   ReplaceIfExists; /* 1 = replace existing link with new */
+-				/* 0 = fail if link already exists */
+-	__u8   Reserved[7];
+-	__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
+-	__le32 FileNameLength;
++	/* New members MUST be added within the struct_group() macro below. */
++	__struct_group(smb2_file_link_info_hdr, __hdr, __packed,
++		__u8   ReplaceIfExists; /* 1 = replace existing link with new */
++					/* 0 = fail if link already exists */
++		__u8   Reserved[7];
++		__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
++		__le32 FileNameLength;
++	);
+ 	char   FileName[];     /* Name to be assigned to new link */
+ } __packed; /* level 11 Set */
++static_assert(offsetof(struct smb2_file_link_info, FileName) == sizeof(struct smb2_file_link_info_hdr),
++	      "struct member likely outside of __struct_group()");
+ 
+ /*
+  * This level 18, although with struct with same name is different from cifs
 -- 
 2.43.0
 
