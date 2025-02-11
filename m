@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5601F2BB7;
-	Tue, 11 Feb 2025 01:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6F01FAC5D;
+	Tue, 11 Feb 2025 01:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739237485; cv=none; b=RFj4ayi/v4UP9kdxIfNiqhsQEcVQGqVxTBDmE2w+mG86IYiLjFaZU5IrG5ZFry3SOa2X1NyX5U9bQ5LCDpHkWn7mJyaiHdWwa0DIXnRr9VIVoL3xzTSBEW4isY+cbia+kbBHZuFIxuXSdQwocdXSIpAvjqJUkLAJCYIEeCetovU=
+	t=1739237519; cv=none; b=fYrNpIHuOZPd65HO2FIgQ5GhT3XHh5I/WUmfv0Bau4SQzNhMIo8//znUt4EBe2edanjOZJOeQALkuJVNu5S/RxlmP3P4mSd8ruIObhtssMJzNuiSylcYPky6XWvPUPK1ZHxPsYaR5m/Gg1s21KizJeZvMFwydbCLwdha/qLme/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739237485; c=relaxed/simple;
-	bh=Sf5wf3nrMe44/8779lMbahSKanPXfB9Q29I0zhUYPsI=;
+	s=arc-20240116; t=1739237519; c=relaxed/simple;
+	bh=BgDpwLWq32mFdpzZrEti+vs+keRXv1yB+qke5D5Khjc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S6mCH+M4H41jYLFpkFtBs/K+uZ2VvX4pJCea0D5Ocsf1/ZOxC/OgmLoBE6HWdkJigusFuHvbqz2CuwK7gSXxJjDUIYFVf7xQgfvf+M8Rj6lHk/5npcosQWqXtDM9h49Y3FAAV53nQ7n7JA/E63Yu2qgLVGT4wjxZzSzVHXn6k/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XutgXRV1; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ULR15xATvYLwyQVx0xw7+gEpPb0cO64cQ5vJjrKAmVwhyU3GIf66oG9KP8qEqsAclya8VPwHY9NfDrwEU5cEuXNs7qiloOnQufaLgdaKXQKKqLW9P2MRf4ZGik9+enNe2pOTBllONQpc3Q+kZEgCw5TGcPatInO2EKo8PZKuXzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ij/+5j6t; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XutgXRV1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA15C4CED1;
-	Tue, 11 Feb 2025 01:31:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ij/+5j6t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5782C4CEE5;
+	Tue, 11 Feb 2025 01:31:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739237485;
-	bh=Sf5wf3nrMe44/8779lMbahSKanPXfB9Q29I0zhUYPsI=;
+	s=k20201202; t=1739237519;
+	bh=BgDpwLWq32mFdpzZrEti+vs+keRXv1yB+qke5D5Khjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XutgXRV1EF+lmd6nPnSQf3R9Gf7zj89x/LH183BTUg/Mw+/rEMn6FftR2lntof6m5
-	 j1pRJTG9+TM4UPvG5c83dq8a/MeulmbGu0IYaONWOyEU3KbH2QoqE29u5s6XCoMrc4
-	 LkiHVXpd0JX2/vNktRPSPvAERz+Sk5SL8kb+BjsvqOfrkF3IS78Y9rRmWOs57mWtVy
-	 WPNXn9dOtbxDiEpL2cscWJV8SLOnsp+FRohld3EFqAxP/D4DynGZVfnOn+TgPWCd9l
-	 T/UkbEwGA5NWwV/fn8hLUCRcqEKU0dKpSTp9ovyScmNJnHisHm25+/wG1X7jryxD2W
-	 iHU9hqzCNDOEA==
+	b=ij/+5j6tklcDffZ4kE1HNRpap+slQmyFKEYnx+4NaONLOwxCfasFN2yVM+HvtgKR0
+	 lcrZPclVPUNohN5uiTxjqIY9AYBQu9v3OrXnLQeAKocU6Vh1atrqAmcw58d5WIvdGz
+	 tzQA6elKpiNNkBokR4mbEyJylOFhkxO1kb35qWfeas0J3s3ookZfnGO4cTDYqSdBAO
+	 aPG7kWaAkualrAM+YtuR+xEda0hiV5rSrfv5HMQ5XTMS3vetk5wgBPbwzppBdzV6Vl
+	 x7j8U1iPVcpwSF/c/iZeWongmbBsdm6PSNtAXF7ceHOVvueHOiFNkz5CnbI5rYQYRh
+	 QZIwYTVm/k6Pw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Paulo Alcantara <pc@manguebit.com>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.12 16/19] smb: client: fix noisy when tree connecting to DFS interlink targets
-Date: Mon, 10 Feb 2025 20:30:44 -0500
-Message-Id: <20250211013047.4096767-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 13/15] smb: client: fix noisy when tree connecting to DFS interlink targets
+Date: Mon, 10 Feb 2025 20:31:33 -0500
+Message-Id: <20250211013136.4098219-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250211013047.4096767-1-sashal@kernel.org>
-References: <20250211013047.4096767-1-sashal@kernel.org>
+In-Reply-To: <20250211013136.4098219-1-sashal@kernel.org>
+References: <20250211013136.4098219-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.13
+X-stable-base: Linux 6.6.76
 Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.com>
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4750505465ae6..80d5705649f36 100644
+index c012fbc2638ed..a7b01c8bd9af1 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -2175,7 +2175,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+@@ -2162,7 +2162,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
  
  tcon_error_exit:
  	if (rsp && rsp->hdr.Status == STATUS_BAD_NETWORK_NAME)
