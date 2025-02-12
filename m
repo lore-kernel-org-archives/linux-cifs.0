@@ -1,170 +1,52 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38797134A8;
-	Wed, 12 Feb 2025 20:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EFF1FF5EF
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Feb 2025 20:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739392544; cv=none; b=H0EAlbEFrOA5tOSkgrm2gvpEOE1IHLj6eW4+LRn7FS4LH5pMaYR6VMtknxQyV3BDcI7JFTeXKRmfbHphS9KqgmfZEwAFNSZVMJIWFWsCBl8YTrazN3OoyiI616bzNM9std3LIcw8vmn4xncEJbpaZiM17KZwysZpstAXgIR6JS0=
+	t=1739393805; cv=none; b=FeOCEaHHocAgF2Y0m5qGpvkpiMefiPdj4SumY6GnhOG9TR80cAi6Io7kPdeSPmEgyqD3A+0/5CO99d/ERYj5A10Bz79uLDA64uphHB0sOC1I0+rs6BqsO+NRGaok307+h6NWbgClF+Myb+wLGew4agGF4r7bA5sclmkxMKYe1e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739392544; c=relaxed/simple;
-	bh=m3fSLrs8RwTeycQL/yS8zwR0LdKMfmutI4GsL4BAGbc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FeB62XxudMMx0Ljxf30mtin9jwZGy0Po6GODW57t6IUnfMc0O+rg+2LdvClgSMhoHZPh+FO90eA3qppulZvIEEKJYOFvyc8fbZ3DqS4Axfzu+qH7PoJriU7Sf7vdfA1Z93aKgvZ+CHwOh18kUjAcrPONWGGgpqGtw6vi+aRurDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=agGalzwQ; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739393805; c=relaxed/simple;
+	bh=Ver/u5L3/WcBHa3ccZxMFxb1Aq8SYVuVwrMRcbM2hdg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=BVm5xwL1/ZwLOYUkfHWU/KHwrtHrEdHlN3ISEudT/EH2JsKQoVPV4Q+gpp+hLA6cBV6JUOHr2KaNI6ytIeDxqoexSzFkWU7iDHiMSKrQlwvHSYHc89qTWzLQ4qpt+eufxQAlXK8FFTZNglAYl5K0NbnAnp8yi7foS0pHX7VDNDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=Ws6tsJpV; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agGalzwQ"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5450f38393aso73156e87.0;
-        Wed, 12 Feb 2025 12:35:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739392540; x=1739997340; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KOlyctz2EGvuteVNgI+DOj0oV4+D7fwYRa1j2XIcfNc=;
-        b=agGalzwQFJkwsH3x3xMy2o9HC1gRRPDM3CNCZjbygSJ5LFfodKYwuhQ4+zidS6OVgu
-         LaBM9XjqTl3DAN1oXFVsg0Mav65a5dH95EaBZkWYJ7w8K7qB8PmmVEMhb+Kb3+pwsK1q
-         8ofbxmnlo2G8yiA4Df8QMXmr85yySeQ11Mnp9fWn+4PEtEEyv9ll++++WtAM6dQ5InOU
-         mpgHsssheVstEbwKh7exyLStw/RKtEJul5wL3ic9c3uqvaZIeLhaxqSvBhodfZAnUg6P
-         wg9g2tk100Co2xzxrq4KaAlaE/pa926T2AKilSsZthuSSOeYGFKoptzBXUEdCrT6/TD4
-         G9Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739392540; x=1739997340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KOlyctz2EGvuteVNgI+DOj0oV4+D7fwYRa1j2XIcfNc=;
-        b=ds3TqeMdziT3q6CFhBmnMqmjVS3gjbVNHxY3vX6zJ/9cO+V5MzWKukSPZfvHw/MYuM
-         VSJmKwV2hzp169GXtEAG9nFWzVnEsU50WKaixS8zGy6+qh9u8vOibDclMeLOjTjOmFr3
-         QKvVBtOruIsJB2kR0B0RNl99iNxuX4NvjM6HtphZ9gY+l5JdQDcZuXPYYpW538LS/tsL
-         t+NP49TnfJYZDqCCi93Lhue5HxoEC3DdwawLYz59tKL63OEDGAdKIsT3U/CAn7cTGCpI
-         MV45l2BdN84pNkzNgldL63aOSPNUdoS05YAREaAD9b+gxtSLcZOkwF/dp1L8uFE2EC+e
-         8qtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUa9N8p5QXhbUcMp5+PgFfatQ8E7fHB8ucf4zxOxXjRBKGewSHHlTl9TBqDMPhVUgXpGRXxapc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWUiZr9jq2TE16LI2fLmyJOhNyqQKEzrIWIp5ZUaBu6mcFWrsk
-	7wic9N1IPNDDvk9fRg/HzjbM7k8wwhwn0qeQDKs+yzDSIpMOUw/Zi1kV3pliJGk14bi7bYn3eIm
-	9F1dQcCAyzYnCgrC47auk2rTApfk=
-X-Gm-Gg: ASbGncu05uMKQzdf34r4EDZAWN1b4Li+FzTRCLc7dwg5PHT+dMJ7qrd1ucMsJ5o7Ng/
-	Mm7GXSApHFXAY2IrVQJm36jfv0uWDyfjELgZ00ZgQgyK8Dd2DSL1hDIAKrKXb36L4G1lvFQEoBA
-	==
-X-Google-Smtp-Source: AGHT+IFZTsIUwQQj/o2a13UQOeNCyuQkKukbW3ljCaZATn9oPt0/nKLvJha06/abaaebuj29iscOoN5W1tgymjejgjU=
-X-Received: by 2002:ac2:4e05:0:b0:545:aaf:13f5 with SMTP id
- 2adb3069b0e04-545184a3aa5mr1636607e87.37.1739392539951; Wed, 12 Feb 2025
- 12:35:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="Ws6tsJpV"
+Message-ID: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1739393375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=QAhQ41hsO8HG3YzAE+E1vV6KmZRuDxC48acTFWz+7s4=;
+	b=Ws6tsJpVycjXCXtfiAIQpYS9G9wJfMHpsIcJQfzepyb+B7FIhlGIJFYslJ/E8Eu7qg4iHi
+	NDk+fhbX1LojyeEF3Tx2QwXRwuwcLtUMRBO532EB56Nm8k7KmvjIaO6cVD3HMqfcuC0Lfu
+	8H8MTBwIt6pyA1ts9q7BdKvpsRj+39SHcohpXtx19Um0W6laIobfh6Mrs5Zxz+kqGK0LJ+
+	9DrD9RgdpPkb29a2BYrXw3wPE4TMcZix1qwUt5ZR8bTWqk6+8bTRHKA4YxuJM2knQH9LPj
+	Rw6A7z3thjep+ulNp/ozbLk/cUBRdYRP5dLCIM67HlSFQn/KI7bG8NqdbY8ABw==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, Pali =?utf-8?Q?Roh=C3=A1r?=
+ <pali@kernel.org>
+Subject: Regression with getcifsacl(1) in v6.14-rc1
+Date: Wed, 12 Feb 2025 17:49:31 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212073440.12538-1-sprasad@microsoft.com>
-In-Reply-To: <20250212073440.12538-1-sprasad@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 12 Feb 2025 14:35:27 -0600
-X-Gm-Features: AWEUYZmbbLBi0xo7rSe-aBd_dDmdlPLbJKvrX_yDK96Q0OtS8SExk0NpP-MFV_U
-Message-ID: <CAH2r5mtOoCrMwo=O+9XxcSuis2GH_Qo2fXhmXd2EyWGKtoBcMA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: deal with the channel loading lag while picking channels
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com, 
-	Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-tentatively merged into cifs-2.6.git for-next pending more reviews and test=
-ing
+Steve,
 
-On Wed, Feb 12, 2025 at 1:35=E2=80=AFAM <nspmangalore@gmail.com> wrote:
->
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> Our current approach to select a channel for sending requests is this:
-> 1. iterate all channels to find the min and max queue depth
-> 2. if min and max are not the same, pick the channel with min depth
-> 3. if min and max are same, round robin, as all channels are equally load=
-ed
->
-> The problem with this approach is that there's a lag between selecting
-> a channel and sending the request (that increases the queue depth on the =
-channel).
-> While these numbers will eventually catch up, there could be a skew in th=
-e
-> channel usage, depending on the application's I/O parallelism and the ser=
-ver's
-> speed of handling requests.
->
-> With sufficient parallelism, this lag can artificially increase the queue=
- depth,
-> thereby impacting the performance negatively.
->
-> This change will change the step 1 above to start the iteration from the =
-last
-> selected channel. This is to reduce the skew in channel usage even in the=
- presence
-> of this lag.
->
-> Fixes: ea90708d3cf3 ("cifs: use the least loaded channel for sending requ=
-ests")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/transport.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> index 0dc80959ce48..e2fbf8b18eb2 100644
-> --- a/fs/smb/client/transport.c
-> +++ b/fs/smb/client/transport.c
-> @@ -1015,14 +1015,16 @@ struct TCP_Server_Info *cifs_pick_channel(struct =
-cifs_ses *ses)
->         uint index =3D 0;
->         unsigned int min_in_flight =3D UINT_MAX, max_in_flight =3D 0;
->         struct TCP_Server_Info *server =3D NULL;
-> -       int i;
-> +       int i, start, cur;
->
->         if (!ses)
->                 return NULL;
->
->         spin_lock(&ses->chan_lock);
-> +       start =3D atomic_inc_return(&ses->chan_seq);
->         for (i =3D 0; i < ses->chan_count; i++) {
-> -               server =3D ses->chans[i].server;
-> +               cur =3D (start + i) % ses->chan_count;
-> +               server =3D ses->chans[cur].server;
->                 if (!server || server->terminate)
->                         continue;
->
-> @@ -1039,17 +1041,15 @@ struct TCP_Server_Info *cifs_pick_channel(struct =
-cifs_ses *ses)
->                  */
->                 if (server->in_flight < min_in_flight) {
->                         min_in_flight =3D server->in_flight;
-> -                       index =3D i;
-> +                       index =3D cur;
->                 }
->                 if (server->in_flight > max_in_flight)
->                         max_in_flight =3D server->in_flight;
->         }
->
->         /* if all channels are equally loaded, fall back to round-robin *=
-/
-> -       if (min_in_flight =3D=3D max_in_flight) {
-> -               index =3D (uint)atomic_inc_return(&ses->chan_seq);
-> -               index %=3D ses->chan_count;
-> -       }
-> +       if (min_in_flight =3D=3D max_in_flight)
-> +               index =3D (uint)start % ses->chan_count;
->
->         server =3D ses->chans[index].server;
->         spin_unlock(&ses->chan_lock);
-> --
-> 2.43.0
->
+The commit 438e2116d7bd ("cifs: Change translation of
+STATUS_PRIVILEGE_NOT_HELD to -EPERM") regressed getcifsacl(1) because it
+expects -EIO to be returned from getxattr(2) when the client can't read
+system.cifs_ntsd_full attribute and then fall back to system.cifs_acl
+attribute.  Either -EIO or -EPERM is wrong for getxattr(2), but that's a
+different problem, though.
 
-
---=20
-Thanks,
-
-Steve
+Reproduced against samba-4.22 server.
