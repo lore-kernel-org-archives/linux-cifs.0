@@ -1,81 +1,127 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A97190470
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Feb 2025 22:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A1F2045A0
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Feb 2025 22:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739398747; cv=none; b=KagnvBaUXt2Y1M0Ffig+lyl8pK7aJUaMXtegQ2bNIs8uW4SS8888O1Ey63RY0Z1yfNQ4dmeQLaKUuWA90lVv9bB9YX3moXzaPlNx1vDTXQ0Hm7TMtlxEM0xyzMHT1PNn2kGay8qHAvgGKe62dv2bWsDyg16pDiSnEn258tRqj2Y=
+	t=1739399065; cv=none; b=UrAmV3BmuJdqKU18Fvea067a9fBXKhdfDP6EQAWPZW1o7vdJfp5qOF7/u8HHQht4wDwrn2eIpsjisFAgrlTA8btSv3DC6AICNWGuJTyW24dErj8jXi/lGZW8TdOUjAcjHiLTeHrti+1OVJDZeR0MdPUmjNK6XxkMNRt04TGdcMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739398747; c=relaxed/simple;
-	bh=5LFQN6drl14403WP9G2BlF+iu+fN0ELTrPud31b0JOg=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=WSvKpO1d+F58+K4sFu4v9JBIuKTyF7WStjk5yKXQTcI032lwaRMIndbYwguQRlRKtMe/zjAdvuAbVToj0+m783JxbYwgE9OX51hgtOlqjYg+2UckUdOOjpATFKy9DZsph2wYgfFSluHliIcINzxZLGi1SND62bbPMpPMuQXF9h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=DlHUVfqw; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1739399065; c=relaxed/simple;
+	bh=o9Rvw5bGAnROKjad7sMpqrfxb3P+iaNsiQvl674qxYA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IXTcsNsAjBJw5VNxRiS276v/GQvTLsHakwwvrAe2yfGtAm/gZX5NbSu2C8pJG9w0OShrx/fxm3yjnjT7LWSDnPflvxo/+PL8q5rsarM0HE3qodWeGmokFenigawm86k96M7iXO/s6TEvN32lW5Q3dwE7TrNe/KX5h2MC9YjQQAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bbffjb2n; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="DlHUVfqw"
-Message-ID: <92b554876923f730500a4dc734ef8e77@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1739398744;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bbffjb2n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739399061;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mLbXTbCIYeQMD+8WdGarmOHOtYEwmHjiqyapfnwp6yg=;
-	b=DlHUVfqwGGl0VpG0yXr5GFnNzDBoAp79Bm318Q6BM8s5RHLeyzb+TszG6AsyPrmr7oL5a/
-	ZpXDU0/41ZUFkj21VvKXnACo+yxvbnGchMsEyXt8gVy8IM5keiIsydVcsLMdLiror9X1UP
-	44BGZGxL/t/LCXwC1kbzbs20COXZiO6JJoPtO0vnnnI7W/45t+XDrIh6d6ot6NKdxMWqRY
-	C4xuV3SquvFZ0tieWK+pmF0q5bextIxDjirdF117gsMEj/aWzUIzBOrXcIuT206Z9D0aOe
-	nRKvCf7+SaaPI8HrIxelsUnA/oGfFGexG6tRwRg4mYIvAP9WTQHTnMjHclxJkA==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-Subject: Re: Regression with getcifsacl(1) in v6.14-rc1
-In-Reply-To: <20250212220743.a22f3mizkdcf53vv@pali>
-References: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
- <20250212220743.a22f3mizkdcf53vv@pali>
-Date: Wed, 12 Feb 2025 19:19:00 -0300
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=j/hFCuHm3dQy3yCXNlW7/z5EXWgYM+xOP2nJGIBn15Q=;
+	b=Bbffjb2n20i4wPWH+dKTMaVn1FDC9OT2iRVuwDF+EMneJbYRg0l3R/G/qO8PULdBJM1dnt
+	qQebRsM5Nn8v4j2el7msZfiHKmwPbCEOn9+ZxIX99vk1eLASMZOruesMh5lzFvHVvmyjvI
+	HOQ9B8E/UUlosxW9zhFHKIrhvgwHLI0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-iPLvlH5hPsCaSV9rKTnwgQ-1; Wed,
+ 12 Feb 2025 17:24:18 -0500
+X-MC-Unique: iPLvlH5hPsCaSV9rKTnwgQ-1
+X-Mimecast-MFC-AGG-ID: iPLvlH5hPsCaSV9rKTnwgQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25E25180087B;
+	Wed, 12 Feb 2025 22:24:13 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.92])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CBFAE19560A3;
+	Wed, 12 Feb 2025 22:24:05 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	Steve French <sfrench@samba.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] netfs: Miscellaneous fixes
+Date: Wed, 12 Feb 2025 22:23:58 +0000
+Message-ID: <20250212222402.3618494-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
+Hi Christian,
 
-> On Wednesday 12 February 2025 17:49:31 Paulo Alcantara wrote:
->> Steve,
->>=20
->> The commit 438e2116d7bd ("cifs: Change translation of
->> STATUS_PRIVILEGE_NOT_HELD to -EPERM") regressed getcifsacl(1) because it
->> expects -EIO to be returned from getxattr(2) when the client can't read
->> system.cifs_ntsd_full attribute and then fall back to system.cifs_acl
->> attribute.  Either -EIO or -EPERM is wrong for getxattr(2), but that's a
->> different problem, though.
->>=20
->> Reproduced against samba-4.22 server.
->
-> That is bad. I can prepare a fix for cifs.ko getxattr syscall to
-> translate -EPERM to -EIO. This will ensure that getcifsacl will work as
-> before as it would still see -EIO error.
+Here are some miscellaneous fixes and changes for netfslib, if you could
+pull them:
 
-Sounds good.
+ (1) Fix a number of read-retry hangs, including:
 
-> But as discussed before, we need to distinguish between
-> privilege/permission error and other generic errors (access/io).
-> So I think that we need 438e2116d7bd commit.
+     (a) Incorrect getting/putting of references on subreqs as we retry
+     	 them.
 
-OK.
+     (b) Failure to track whether a last old subrequest in a retried set is
+     	 superfluous.
 
-> Based on linux-fsdevel discussion it is a good idea to distinguish
-> between errors by mapping status codes to appropriate posix errno, and
-> then updating linux syscall manpages.
+     (c) Inconsistency in the usage of wait queues used for subrequests
+     	 (ie. using clear_and_wake_up_bit() whilst waiting on a private
+     	 waitqueue).
 
-Either way, we shouldn't be leaking -EIO or -EPERM to userland from
-getxattr(2).  By looking at the man pages, -ENODATA seems to be the
-appropriate error to return instead.
+     	 (Note that waitqueue consistency also needs looking at for
+     	 netfs_io_request structs.)
+
+ (2) Add stats counters for retries and publish in /proc/fs/netfs/stats.
+     This is not a fix per se, but is useful in debugging and shouldn't
+     otherwise change the operation of the code.
+
+ (3) Fix the ordering of queuing subrequests with respect to setting the
+     request flag that says we've now queued them all.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+
+Thanks,
+David
+
+David Howells (3):
+  netfs: Fix a number of read-retry hangs
+  netfs: Add retry stat counters
+  netfs: Fix setting NETFS_RREQ_ALL_QUEUED to be after all subreqs
+    queued
+
+ fs/netfs/buffered_read.c     | 19 +++++++++++-----
+ fs/netfs/internal.h          |  4 ++++
+ fs/netfs/read_collect.c      |  6 +++--
+ fs/netfs/read_retry.c        | 43 +++++++++++++++++++++++++++---------
+ fs/netfs/stats.c             |  9 ++++++++
+ fs/netfs/write_issue.c       |  1 +
+ fs/netfs/write_retry.c       |  2 ++
+ include/linux/netfs.h        |  2 +-
+ include/trace/events/netfs.h |  4 +++-
+ 9 files changed, 70 insertions(+), 20 deletions(-)
+
