@@ -1,213 +1,179 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E841FBC9C
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Feb 2025 23:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBD44A00
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Feb 2025 00:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739404055; cv=none; b=Qy/9hoWtWhyrVnGyBCwoeFAVJ7U9KWD88XaDJzFQTDI7sRcfLWXpkaD2+0aNuhzvA+jjcHOxiKUwmqXu0gyqf48yYmw32ZD2DRTnj1g47eWupiQ6dSCl+4LttS0tk19pqKBI0lmJ1JNmXpXBve6aE8HNzHJ1JrP5uiF7sjFoEGg=
+	t=1739404967; cv=none; b=JQqhPLYof3CtcojOCbXz95vYkrgf5PshLHW2rhn2Svb/pgggjI4V0ndbe8Dge16weAQZlRwXd4co9DHIibSHrl9VU8JXQKbYci0QYIpRHDWNF+IhhliWhg636sfgJsNKRLQQ1ryoGEGKsiGkcl0UN4sXSiHZ3UTMifZw6VLmtXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739404055; c=relaxed/simple;
-	bh=aOAuSb15ntxLwAPA2gpQvv9ppWTEIJ3eLmgznIUjXoM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DRTiFPYTbrkXln9eVbGFKHOYQCQ/2dlv0EJSA/oxS9s5wJwzBgV7FibOmm+MpcEYdShU8VEYIf+nzdPDVZXeXOY5l3+Lg5C96hlr8M3JeTF1rv42zKSP0hvgmyba/60MO7d+8/ujUhnrjOfHlvGgwArU3rUMzSuF3u33iFG2K5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUc8IdK0; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739404967; c=relaxed/simple;
+	bh=zUEPWKkju6VeWdQIR1zpSsKtVC96qgFa3bfvKiV4IX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pkOpnVUy5Wwxed2A+wd81ODmFcmHNhg/dezJL6+n/09yZ0N0yp8/BYfA7FHkrPcVAAz6pNFmnW/WmQlBepCRguFVZxqA3uSDMUWCbec8Nhx1D2mrHBBrGoun4f2EgBF7Yz3KmU1SID8M1Nqtws7iBACz8wRjjLVGjurAOrQGoSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIowDGu3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUc8IdK0"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5451d1d56a7so300631e87.0
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Feb 2025 15:47:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739404051; x=1740008851; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=h9g2cp4o7vlcuavFPZ0nrSJO7M/sj84y7KfRUMWizrI=;
-        b=WUc8IdK0zCD77jwS0w13TKEckCh7imRdA0P0lhKK7FBg6dk4lCpgtB7mGoHlVh8hoK
-         XgYdDWLhOn6pL1rjU1GJhlRVS5vubrCaZ1TeWN5eTrFTqeD80ErX6R/P9fzsnXgsyOHM
-         nxZyOhZiegDwlHM5Af9GlKix4pCiVRwmFWTRlymmJqeCJeRDL52+FYWSyydafZoiblaS
-         TxSfvWsHvHyP3FmADtPoGSedfx5wOrqv146crq3dObVDMQ8DVhZVCYaYNwFBNUspJ+2e
-         hylQVGeFgjb5p92OxvXiHVXm/GbPIrFx1WqaouXptWg+GN3a7U8rO4wPFJV+6Idh9Syc
-         Rb4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739404051; x=1740008851;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h9g2cp4o7vlcuavFPZ0nrSJO7M/sj84y7KfRUMWizrI=;
-        b=MrBGYFoRJWPIHbthRFTJAEg2N+matILxM6JwN8+VbCYnz6aJO6qpsAiddjge4Fe06o
-         EtxPlvD+p7NvYb7Fctj0yvBrpRJ5LAZ/+8tD9IpZdmmNMuLgiB3kEPK3p7fxTt6Tmw5U
-         rbX6rwzMg9dkJt1x/Z8GrzNw9i6kjq7kDNrtudwcvRvgdMinM+uIU7w8a8RSGmU/fDxF
-         e+z+eFs5TdP4Qo5zy6Eb4H8ntahi92pdW1vSbPbDpePeVoku5rCC03c9SYTERNb7eA0H
-         E2+3P9dwLx5AbAA5daBFvEp29JzO/o8TsM+jKtso8pKj0w/M+JK3i1p0GXLFJAl0dGCi
-         robw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsh9v+LGiVNxhCYBkZyVmddMUNnzC4V7CViRWehoq3Gf7k8g+f6o6gNMUcAp6mRIuJ+rysu2DL853A@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh3BnfbbB9ttqwetd8nSxoVaO/t1n7AOwyanuR2/Am2+nakKHd
-	sWN5e/Dr74hKML+8WAD6ng5fuG8HcY4GY08I+JKJTODUKLkrgvLFO/V5xcrXmDCkjbNQcoJu6RM
-	gzwj522RrCWveG6apOjwTx2JyBDDYgqs4
-X-Gm-Gg: ASbGncs6x20nUJVTkiP+B1AGZ4xWe0yvjQuH49cWpXQs/NaMnA0GKLPg4W6F7V/wZqc
-	tl8P39XTIH7XcuOFPLNQv60G9Y49w/os7Dra9Euh5P6sbJNGTiChjmc+cWnEKsQxlKTpvpM2pHQ
-	==
-X-Google-Smtp-Source: AGHT+IFkHm3XFgMRSrLs3I4zgIMyPt6Fc/T5B1QoHwqopAbCZJeVXk7FnHxGZAbqR+rvzHbwbDsb9m9115YwHicsLS4=
-X-Received: by 2002:a05:6512:10d2:b0:545:16ef:d5fa with SMTP id
- 2adb3069b0e04-5451dfdbf37mr204885e87.12.1739404051086; Wed, 12 Feb 2025
- 15:47:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIowDGu3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28FAC4CEDF;
+	Thu, 13 Feb 2025 00:02:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739404967;
+	bh=zUEPWKkju6VeWdQIR1zpSsKtVC96qgFa3bfvKiV4IX4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VIowDGu3PyHnVzL8CI57wIiDBYrFNAXTdvbXfs7VN8miXq+YKdzzgj+hCFANqOU5w
+	 r0xZehVyY0seQnt0SCNfg4u0LNfRYuE46ri8Tmz+rPtCGWOUPthYiJ/8F0UauDWqfj
+	 hHnOP+o8FN1aU68vyPUT7aL/bkMd3SbV98DeWO0e+kvkmAnePv5LRWIt2a/sRgWDI2
+	 A6ghaPbHWltsgFr69O3kUdrFWb5mE17uOHN7y6FK0dw//++0Uv1EBQTNfEse46DcGm
+	 kUzE5HVoQtTJGhT9dmr7vZrehQfBx0jlNXI50XSStMS5gc1rTiieMADMkrzaT5Jt8u
+	 /48w+86d8Z3sA==
+Received: by pali.im (Postfix)
+	id 48B7040E; Thu, 13 Feb 2025 01:02:34 +0100 (CET)
+Date: Thu, 13 Feb 2025 01:02:34 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+Subject: Re: Regression with getcifsacl(1) in v6.14-rc1
+Message-ID: <20250213000234.s5ugs57chvi7g7pa@pali>
+References: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
+ <20250212220743.a22f3mizkdcf53vv@pali>
+ <92b554876923f730500a4dc734ef8e77@manguebit.com>
+ <20250212224330.g7wmpd225fripkit@pali>
+ <ee932bc4f65b5d332c3f663aca64105e@manguebit.com>
+ <CAH2r5mtzwOtokQjbX9NzzB6G==t5Wq3Xqz=-K+qqLuBnoKB15g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
- <20250212220743.a22f3mizkdcf53vv@pali> <92b554876923f730500a4dc734ef8e77@manguebit.com>
- <20250212224330.g7wmpd225fripkit@pali> <ee932bc4f65b5d332c3f663aca64105e@manguebit.com>
-In-Reply-To: <ee932bc4f65b5d332c3f663aca64105e@manguebit.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 12 Feb 2025 17:47:19 -0600
-X-Gm-Features: AWEUYZmWWVxTX8F6iP3NNQafIUf9s1axdUxaYmaTNsVmPFh_HETccwU5KljQfyo
-Message-ID: <CAH2r5mtzwOtokQjbX9NzzB6G==t5Wq3Xqz=-K+qqLuBnoKB15g@mail.gmail.com>
-Subject: Re: Regression with getcifsacl(1) in v6.14-rc1
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, linux-cifs@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000962fa2062dfa907c"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mtzwOtokQjbX9NzzB6G==t5Wq3Xqz=-K+qqLuBnoKB15g@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
---000000000000962fa2062dfa907c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 12, 2025 at 4:58=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
-wrote:
->
-> Pali Roh=C3=A1r <pali@kernel.org> writes:
->
-> > On Wednesday 12 February 2025 19:19:00 Paulo Alcantara wrote:
-> >> Pali Roh=C3=A1r <pali@kernel.org> writes:
-> >>
-> >> > On Wednesday 12 February 2025 17:49:31 Paulo Alcantara wrote:
-> >> >> Steve,
-> >> >>
-> >> >> The commit 438e2116d7bd ("cifs: Change translation of
-> >> >> STATUS_PRIVILEGE_NOT_HELD to -EPERM") regressed getcifsacl(1) becau=
-se it
-> >> >> expects -EIO to be returned from getxattr(2) when the client can't =
-read
-> >> >> system.cifs_ntsd_full attribute and then fall back to system.cifs_a=
-cl
-> >> >> attribute.  Either -EIO or -EPERM is wrong for getxattr(2), but tha=
-t's a
-> >> >> different problem, though.
-> >> >>
-> >> >> Reproduced against samba-4.22 server.
-> >> >
-> >> > That is bad. I can prepare a fix for cifs.ko getxattr syscall to
-> >> > translate -EPERM to -EIO. This will ensure that getcifsacl will work=
- as
-> >> > before as it would still see -EIO error.
-> >>
-> >> Sounds good.
-> >>
-> >> > But as discussed before, we need to distinguish between
-> >> > privilege/permission error and other generic errors (access/io).
-> >> > So I think that we need 438e2116d7bd commit.
-> >>
-> >> OK.
-> >>
-> >> > Based on linux-fsdevel discussion it is a good idea to distinguish
-> >> > between errors by mapping status codes to appropriate posix errno, a=
-nd
-> >> > then updating linux syscall manpages.
-> >>
-> >> Either way, we shouldn't be leaking -EIO or -EPERM to userland from
-> >> getxattr(2).  By looking at the man pages, -ENODATA seems to be the
-> >> appropriate error to return instead.
+On Wednesday 12 February 2025 17:47:19 Steve French wrote:
+> On Wed, Feb 12, 2025 at 4:58 PM Paulo Alcantara <pc@manguebit.com> wrote:
 > >
-> > It looks like there are missing error codes for getxattr. Because any
-> > path based syscall can return -EACCES if trying to open path to which
-> > calling process does not have access.
+> > Pali Rohár <pali@kernel.org> writes:
 > >
-> > And EACCES is not mentioned nor documented in getxattr(2). Same applies
-> > for listxattr(2). Now I have tried listxattr() and it really returns
-> > EACCES for /root/file called by nobody.
->
-> Both man pages have this:
->
->         > In addition, the errors documented in stat(2) can also occur.
->
-> and stat(2) actually documents EACCES.
->
-> > -EIO is generic I/O error. And I think that this error code could be
-> > returned by any I/O syscall when unknown I/O error occurs.
->
-> Makes sense.
->
-> > Returning -ENODATA for generic or unknown I/O error is a bad idea
-> > because ENODATA (=3D ENOATTR) has already specific meaning when attribu=
-te
-> > does not exists at all (or process does not have access to it).
->
-> You are right.
->
-> > For me it makes sense to return -EIO and -EPERM by those syscalls. But
-> > for getxattr() we cannot do it due that backward compatibility needed b=
-y
-> > getcifsacl application.
->
-> -EACCES seems the correct one.  But yeah, we can't do it due to
->  getcifsacl(1) relying on -EIO.
+> > > On Wednesday 12 February 2025 19:19:00 Paulo Alcantara wrote:
+> > >> Pali Rohár <pali@kernel.org> writes:
+> > >>
+> > >> > On Wednesday 12 February 2025 17:49:31 Paulo Alcantara wrote:
+> > >> >> Steve,
+> > >> >>
+> > >> >> The commit 438e2116d7bd ("cifs: Change translation of
+> > >> >> STATUS_PRIVILEGE_NOT_HELD to -EPERM") regressed getcifsacl(1) because it
+> > >> >> expects -EIO to be returned from getxattr(2) when the client can't read
+> > >> >> system.cifs_ntsd_full attribute and then fall back to system.cifs_acl
+> > >> >> attribute.  Either -EIO or -EPERM is wrong for getxattr(2), but that's a
+> > >> >> different problem, though.
+> > >> >>
+> > >> >> Reproduced against samba-4.22 server.
+> > >> >
+> > >> > That is bad. I can prepare a fix for cifs.ko getxattr syscall to
+> > >> > translate -EPERM to -EIO. This will ensure that getcifsacl will work as
+> > >> > before as it would still see -EIO error.
+> > >>
+> > >> Sounds good.
+> > >>
+> > >> > But as discussed before, we need to distinguish between
+> > >> > privilege/permission error and other generic errors (access/io).
+> > >> > So I think that we need 438e2116d7bd commit.
+> > >>
+> > >> OK.
+> > >>
+> > >> > Based on linux-fsdevel discussion it is a good idea to distinguish
+> > >> > between errors by mapping status codes to appropriate posix errno, and
+> > >> > then updating linux syscall manpages.
+> > >>
+> > >> Either way, we shouldn't be leaking -EIO or -EPERM to userland from
+> > >> getxattr(2).  By looking at the man pages, -ENODATA seems to be the
+> > >> appropriate error to return instead.
+> > >
+> > > It looks like there are missing error codes for getxattr. Because any
+> > > path based syscall can return -EACCES if trying to open path to which
+> > > calling process does not have access.
+> > >
+> > > And EACCES is not mentioned nor documented in getxattr(2). Same applies
+> > > for listxattr(2). Now I have tried listxattr() and it really returns
+> > > EACCES for /root/file called by nobody.
+> >
+> > Both man pages have this:
+> >
+> >         > In addition, the errors documented in stat(2) can also occur.
+> >
+> > and stat(2) actually documents EACCES.
+> >
+> > > -EIO is generic I/O error. And I think that this error code could be
+> > > returned by any I/O syscall when unknown I/O error occurs.
+> >
+> > Makes sense.
+> >
+> > > Returning -ENODATA for generic or unknown I/O error is a bad idea
+> > > because ENODATA (= ENOATTR) has already specific meaning when attribute
+> > > does not exists at all (or process does not have access to it).
+> >
+> > You are right.
+> >
+> > > For me it makes sense to return -EIO and -EPERM by those syscalls. But
+> > > for getxattr() we cannot do it due that backward compatibility needed by
+> > > getcifsacl application.
+> >
+> > -EACCES seems the correct one.  But yeah, we can't do it due to
+> >  getcifsacl(1) relying on -EIO.
+> 
+> Since EIO is incorrect, we probably should fix getcifsacl ASAP so we
+> can start returning something more correct for this call e.g. -EACCESS
+> or -EPERM
+> 
+> Since updating cifs-utils for newer kernels is relatively easy (and
+> the next version of cifs-utils has some security fixes so will be
+> easier to rollout), why don't we also change getcifsacl ASAP to handle
+> the correct rc to give us more freedom for cifs.ko to return the
+> correct error on newer kernels.  Thoughts about this change to
+> getcifsacl() function which would work with both old and newer kernels
+> with the rc mapping change?  Change to fix the cifs.ko mapping to EIO
+> could be delayed as well so cifs-utils with the updated check is
+> rolled out?!
 
-Since EIO is incorrect, we probably should fix getcifsacl ASAP so we
-can start returning something more correct for this call e.g. -EACCESS
-or -EPERM
+That should work too.
 
-Since updating cifs-utils for newer kernels is relatively easy (and
-the next version of cifs-utils has some security fixes so will be
-easier to rollout), why don't we also change getcifsacl ASAP to handle
-the correct rc to give us more freedom for cifs.ko to return the
-correct error on newer kernels.  Thoughts about this change to
-getcifsacl() function which would work with both old and newer kernels
-with the rc mapping change?  Change to fix the cifs.ko mapping to EIO
-could be delayed as well so cifs-utils with the updated check is
-rolled out?!
+Anyway, if I'm looking correctly at that getcifsacl.c code, it contains
+fallback from fetching SACL+DACL attribute (ATTRNAME_NTSD_FULL) to
+DACL-only attribute.
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index 123d11e..3c12789 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -447,7 +447,8 @@ getxattr:
-                        free(attrval);
-                        bufsize +=3D BUFSIZE;
-                        goto cifsacl;
--               } else if (errno =3D=3D EIO && !(strcmp(attrname,
-ATTRNAME_NTSD_FULL))) {
-+               } else if (((errno =3D=3D EIO) || (errno =3D=3D EPERM) ||
-(errno =3D=3D EACCES)) &&
-+                          !(strcmp(attrname, ATTRNAME_NTSD_FULL))) {
-                        /*
-                         * attempt to fetch SACL in addition to owner
-and DACL via
-                         * ATTRNAME_NTSD_FULL, fall back to owner/DACL via
+And if the user does not have permission to access SACL then
+STATUS_PRIVILEGE_NOT_HELD is returned by the SMB server.
+STATUS_PRIVILEGE_NOT_HELD is being mapped to EPERM.
 
+So EACCES should not be needed there.
 
+If SMB server returns STATUS_ACCESS_DENIED (EACCES) then it means that
+user does not have access to path or DACL, and so fallback from
+SACL+DACL (ATTRNAME_NTSD_FULL) to DACL-only attribute is useless.
 
-Thanks,
-
-Steve
-
---000000000000962fa2062dfa907c
-Content-Type: text/x-patch; charset="US-ASCII"; name="getcifsacl.diff"
-Content-Disposition: attachment; filename="getcifsacl.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m72k6yv50>
-X-Attachment-Id: f_m72k6yv50
-
-ZGlmZiAtLWdpdCBhL2dldGNpZnNhY2wuYyBiL2dldGNpZnNhY2wuYwppbmRleCAxMjNkMTFlLi5h
-NTY2ZGQ3IDEwMDY0NAotLS0gYS9nZXRjaWZzYWNsLmMKKysrIGIvZ2V0Y2lmc2FjbC5jCkBAIC00
-NDcsNyArNDQ3LDggQEAgZ2V0eGF0dHI6CiAJCQlmcmVlKGF0dHJ2YWwpOwogCQkJYnVmc2l6ZSAr
-PSBCVUZTSVpFOwogCQkJZ290byBjaWZzYWNsOwotCQl9IGVsc2UgaWYgKGVycm5vID09IEVJTyAm
-JiAhKHN0cmNtcChhdHRybmFtZSwgQVRUUk5BTUVfTlRTRF9GVUxMKSkpIHsKKwkJfSBlbHNlIGlm
-ICgoKGVycm5vID09IEVJTykgfHwgKGVycm5vID09IEVQRVJNKSB8fCAoZXJybm8gPT0gRUFDQ0VT
-KSkgJiYKKwkJCSAgICEoc3RyY21wKGF0dHJuYW1lLCBBVFRSTkFNRV9OVFNEX0ZVTEwpKSkgewog
-CQkJLyoKIAkJCSAqIGF0dGVtcHQgdG8gZmV0Y2ggU0FDTCBpbiBhZGRpdGlvbiB0byBvd25lciBh
-bmQgREFDTCB2aWEKIAkJCSAqIEFUVFJOQU1FX05UU0RfRlVMTCwgZmFsbCBiYWNrIHRvIG93bmVy
-L0RBQ0wgdmlhCg==
---000000000000962fa2062dfa907c--
+> diff --git a/getcifsacl.c b/getcifsacl.c
+> index 123d11e..3c12789 100644
+> --- a/getcifsacl.c
+> +++ b/getcifsacl.c
+> @@ -447,7 +447,8 @@ getxattr:
+>                         free(attrval);
+>                         bufsize += BUFSIZE;
+>                         goto cifsacl;
+> -               } else if (errno == EIO && !(strcmp(attrname,
+> ATTRNAME_NTSD_FULL))) {
+> +               } else if (((errno == EIO) || (errno == EPERM) ||
+> (errno == EACCES)) &&
+> +                          !(strcmp(attrname, ATTRNAME_NTSD_FULL))) {
+>                         /*
+>                          * attempt to fetch SACL in addition to owner
+> and DACL via
+>                          * ATTRNAME_NTSD_FULL, fall back to owner/DACL via
+> 
+> 
+> 
+> Thanks,
+> 
+> Steve
