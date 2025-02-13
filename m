@@ -1,179 +1,207 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBD44A00
-	for <linux-cifs@vger.kernel.org>; Thu, 13 Feb 2025 00:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D632D33F6;
+	Thu, 13 Feb 2025 00:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739404967; cv=none; b=JQqhPLYof3CtcojOCbXz95vYkrgf5PshLHW2rhn2Svb/pgggjI4V0ndbe8Dge16weAQZlRwXd4co9DHIibSHrl9VU8JXQKbYci0QYIpRHDWNF+IhhliWhg636sfgJsNKRLQQ1ryoGEGKsiGkcl0UN4sXSiHZ3UTMifZw6VLmtXk=
+	t=1739406295; cv=none; b=CHjZBK2juHH+kwNw+El/hGWBmjozQsXefyuiZNstsNqWt5HSYTpby26KgtHsAlMWGKk8Y6p+pt0BQqKiVy3f7SevtoqWBSRimWmpKTX9sPMh6McjocFUtM8BYeisXRVRwxM/+0pWib9IebHI9twmiKITlJxRxHjY23WDSljHMzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739404967; c=relaxed/simple;
-	bh=zUEPWKkju6VeWdQIR1zpSsKtVC96qgFa3bfvKiV4IX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pkOpnVUy5Wwxed2A+wd81ODmFcmHNhg/dezJL6+n/09yZ0N0yp8/BYfA7FHkrPcVAAz6pNFmnW/WmQlBepCRguFVZxqA3uSDMUWCbec8Nhx1D2mrHBBrGoun4f2EgBF7Yz3KmU1SID8M1Nqtws7iBACz8wRjjLVGjurAOrQGoSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIowDGu3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739406295; c=relaxed/simple;
+	bh=DjDGu4LJiaJWSki44VS4+hsfALcexCLDcVp/zpu6xhI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AfhyK2pExgON/6tEIoV6eHJbf3Kz5PCG9VLU2jPJeiXiNWZ3eWqI41FDpacOGfWFgQ0SJNoiOJ12Mt28J+neLfe40+D4eg5TL68czpfo7v9vDUvSxv5GulCgw654988/fZ05a7uPUnQd3SD8Jj9+LgeErxQUzaSDK/xoZI7a9EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqCWwRZ2; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIowDGu3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28FAC4CEDF;
-	Thu, 13 Feb 2025 00:02:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739404967;
-	bh=zUEPWKkju6VeWdQIR1zpSsKtVC96qgFa3bfvKiV4IX4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VIowDGu3PyHnVzL8CI57wIiDBYrFNAXTdvbXfs7VN8miXq+YKdzzgj+hCFANqOU5w
-	 r0xZehVyY0seQnt0SCNfg4u0LNfRYuE46ri8Tmz+rPtCGWOUPthYiJ/8F0UauDWqfj
-	 hHnOP+o8FN1aU68vyPUT7aL/bkMd3SbV98DeWO0e+kvkmAnePv5LRWIt2a/sRgWDI2
-	 A6ghaPbHWltsgFr69O3kUdrFWb5mE17uOHN7y6FK0dw//++0Uv1EBQTNfEse46DcGm
-	 kUzE5HVoQtTJGhT9dmr7vZrehQfBx0jlNXI50XSStMS5gc1rTiieMADMkrzaT5Jt8u
-	 /48w+86d8Z3sA==
-Received: by pali.im (Postfix)
-	id 48B7040E; Thu, 13 Feb 2025 01:02:34 +0100 (CET)
-Date: Thu, 13 Feb 2025 01:02:34 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
-Subject: Re: Regression with getcifsacl(1) in v6.14-rc1
-Message-ID: <20250213000234.s5ugs57chvi7g7pa@pali>
-References: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
- <20250212220743.a22f3mizkdcf53vv@pali>
- <92b554876923f730500a4dc734ef8e77@manguebit.com>
- <20250212224330.g7wmpd225fripkit@pali>
- <ee932bc4f65b5d332c3f663aca64105e@manguebit.com>
- <CAH2r5mtzwOtokQjbX9NzzB6G==t5Wq3Xqz=-K+qqLuBnoKB15g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqCWwRZ2"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5450f38393aso224684e87.0;
+        Wed, 12 Feb 2025 16:24:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739406292; x=1740011092; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rFKAoAFFmffHtnq7ewhn5vFC1+6V/tfY4TsdLPDBRck=;
+        b=MqCWwRZ2s4poMKR16p9lGLCpvck0QIJcNV4ECFj5nT03FAA7TAabihKXXZjfQ1ePA/
+         90TvQbR9TafT3z2Iag5EvxfaiKkfXDZmupuU268aNItvVRrhpBkEhVMdaCLWJYnRsQvq
+         Vx7VbznCCvgYZU+rIIKg3OLynoGBJp5TXCiJOgl7ABjw+vT0m2UZ2SjJpFP6xR+Lbdnd
+         jTvNR3s63G2GgjfnbDmacpZM2VHKkHgug35FulOyecabu/vCbSUh/t9u9oUKDGHLdBVg
+         6H0gpA2x+wJn8vPLFCbCj9ucbUagBZVTXk0N3qNarpXqE2fn32MfA6At+Ua+UPOzp9Pw
+         ycLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739406292; x=1740011092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rFKAoAFFmffHtnq7ewhn5vFC1+6V/tfY4TsdLPDBRck=;
+        b=WuHvEx8B+XGMsqLX85YscCI9onOYUimz6dg0SmoFq3JwHahMVRTstniCR0wbiJkoYw
+         nb8RMQ2HLaVYX6LF2vOx7ez9s4q0SlUcP34SlF0rcnF9wDgSH83x8eX25QKg09M2aOou
+         WW4XKfEP0yDTJBRJ1uB4ztcGm4SSyLPcgrQPFg68xEm0vV9T1Zv2oqn6IuqRMv5HJkb4
+         HeQ0CbhdnrWrZ4aYD+M4qqVsUATHWtJ4r58a0pluKFS8Kzs6wHcClMMuvZZmItQWP1lM
+         9uNblCav9aw3VPdCQ0OjpFAowVfWr4ZNML/c4VzwiP7kQrJhldNg0vtzsydRPiwMJiQV
+         NlHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSHAiv7i3ZPXq/DNKZnXawCmfsvz+aNKWacAhSZVlcUvhjIDR2LH2NC/zsQ7CwOP58vbtJKKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0pQc9AP7Niy7B5gfkglpLbO2wEtIaqFBALOG7SovpRiVT7Wsq
+	KE8mXcIbHFdf22uzU7jQa6ZqI/mSSGAOodZisc9ZomdVAfJq/R889cXs7gFSXcCiD+xfWb7NNju
+	bJZtnvcTzVPLgXC0kFQC7Nk09zb8bT6Bg
+X-Gm-Gg: ASbGncubGwQtPcJTomidKwQNDN3gDoYkQxqUITE0ZZFqoSOmxPTlV3uUjpLVu/FjLph
+	mvJyhPVcb4V7jk3vT5H6QOewl2sujKzdltGpX8du/92ujO0VaSWCP0HAjfuC5S0oK2jm6UNmFIw
+	==
+X-Google-Smtp-Source: AGHT+IGcCBr8faoW1VnoAxsY8E8lL+KD76utgfX3ofSMhWm5Not7DRy6s2/mOVHq0SkC0X4NEOt/szkPpJXxSaFasvY=
+X-Received: by 2002:a05:6512:2039:b0:545:bda:f0f with SMTP id
+ 2adb3069b0e04-545184a2e5cmr1332840e87.34.1739406291678; Wed, 12 Feb 2025
+ 16:24:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mtzwOtokQjbX9NzzB6G==t5Wq3Xqz=-K+qqLuBnoKB15g@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+References: <20250212073440.12538-1-sprasad@microsoft.com> <CAH2r5mtOoCrMwo=O+9XxcSuis2GH_Qo2fXhmXd2EyWGKtoBcMA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtOoCrMwo=O+9XxcSuis2GH_Qo2fXhmXd2EyWGKtoBcMA@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 12 Feb 2025 18:24:40 -0600
+X-Gm-Features: AWEUYZldIzzY3etfIhKCLZvVO9AmPN0tpKOtoafzdS1Uxh4usmgN5Rt7JiJVMEQ
+Message-ID: <CAH2r5mv0jw9Kb2vyZxzjkD6LhajpM04HfYhJDQL=Co+xcrRY7A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] cifs: deal with the channel loading lag while picking channels
+To: nspmangalore@gmail.com
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, bharathsm@microsoft.com, 
+	Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wednesday 12 February 2025 17:47:19 Steve French wrote:
-> On Wed, Feb 12, 2025 at 4:58 PM Paulo Alcantara <pc@manguebit.com> wrote:
-> >
-> > Pali Rohár <pali@kernel.org> writes:
-> >
-> > > On Wednesday 12 February 2025 19:19:00 Paulo Alcantara wrote:
-> > >> Pali Rohár <pali@kernel.org> writes:
-> > >>
-> > >> > On Wednesday 12 February 2025 17:49:31 Paulo Alcantara wrote:
-> > >> >> Steve,
-> > >> >>
-> > >> >> The commit 438e2116d7bd ("cifs: Change translation of
-> > >> >> STATUS_PRIVILEGE_NOT_HELD to -EPERM") regressed getcifsacl(1) because it
-> > >> >> expects -EIO to be returned from getxattr(2) when the client can't read
-> > >> >> system.cifs_ntsd_full attribute and then fall back to system.cifs_acl
-> > >> >> attribute.  Either -EIO or -EPERM is wrong for getxattr(2), but that's a
-> > >> >> different problem, though.
-> > >> >>
-> > >> >> Reproduced against samba-4.22 server.
-> > >> >
-> > >> > That is bad. I can prepare a fix for cifs.ko getxattr syscall to
-> > >> > translate -EPERM to -EIO. This will ensure that getcifsacl will work as
-> > >> > before as it would still see -EIO error.
-> > >>
-> > >> Sounds good.
-> > >>
-> > >> > But as discussed before, we need to distinguish between
-> > >> > privilege/permission error and other generic errors (access/io).
-> > >> > So I think that we need 438e2116d7bd commit.
-> > >>
-> > >> OK.
-> > >>
-> > >> > Based on linux-fsdevel discussion it is a good idea to distinguish
-> > >> > between errors by mapping status codes to appropriate posix errno, and
-> > >> > then updating linux syscall manpages.
-> > >>
-> > >> Either way, we shouldn't be leaking -EIO or -EPERM to userland from
-> > >> getxattr(2).  By looking at the man pages, -ENODATA seems to be the
-> > >> appropriate error to return instead.
-> > >
-> > > It looks like there are missing error codes for getxattr. Because any
-> > > path based syscall can return -EACCES if trying to open path to which
-> > > calling process does not have access.
-> > >
-> > > And EACCES is not mentioned nor documented in getxattr(2). Same applies
-> > > for listxattr(2). Now I have tried listxattr() and it really returns
-> > > EACCES for /root/file called by nobody.
-> >
-> > Both man pages have this:
-> >
-> >         > In addition, the errors documented in stat(2) can also occur.
-> >
-> > and stat(2) actually documents EACCES.
-> >
-> > > -EIO is generic I/O error. And I think that this error code could be
-> > > returned by any I/O syscall when unknown I/O error occurs.
-> >
-> > Makes sense.
-> >
-> > > Returning -ENODATA for generic or unknown I/O error is a bad idea
-> > > because ENODATA (= ENOATTR) has already specific meaning when attribute
-> > > does not exists at all (or process does not have access to it).
-> >
-> > You are right.
-> >
-> > > For me it makes sense to return -EIO and -EPERM by those syscalls. But
-> > > for getxattr() we cannot do it due that backward compatibility needed by
-> > > getcifsacl application.
-> >
-> > -EACCES seems the correct one.  But yeah, we can't do it due to
-> >  getcifsacl(1) relying on -EIO.
-> 
-> Since EIO is incorrect, we probably should fix getcifsacl ASAP so we
-> can start returning something more correct for this call e.g. -EACCESS
-> or -EPERM
-> 
-> Since updating cifs-utils for newer kernels is relatively easy (and
-> the next version of cifs-utils has some security fixes so will be
-> easier to rollout), why don't we also change getcifsacl ASAP to handle
-> the correct rc to give us more freedom for cifs.ko to return the
-> correct error on newer kernels.  Thoughts about this change to
-> getcifsacl() function which would work with both old and newer kernels
-> with the rc mapping change?  Change to fix the cifs.ko mapping to EIO
-> could be delayed as well so cifs-utils with the updated check is
-> rolled out?!
+Shyam,
+Could the two test failures in:
 
-That should work too.
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/=
+builds/386
 
-Anyway, if I'm looking correctly at that getcifsacl.c code, it contains
-fallback from fetching SACL+DACL attribute (ATTRNAME_NTSD_FULL) to
-DACL-only attribute.
+be related to this patch ie tests generic/133 and generic/471 failing
+with hundreds of "CIFS: Status code returned 0xc000009a
+STATUS_INSUFFICIENT_RESOURCES" errors.  The only failing tests were
+multichannel related.
 
-And if the user does not have permission to access SACL then
-STATUS_PRIVILEGE_NOT_HELD is returned by the SMB server.
-STATUS_PRIVILEGE_NOT_HELD is being mapped to EPERM.
+This test run was with these six patches:
+600ed21fe802 (HEAD -> for-next, origin/for-next, origin/HEAD) netfs:
+Fix a number of read-retry hangs
+9f75ff5536b1 smb: client, common: Avoid multiple
+-Wflex-array-member-not-at-end warnings
+fab0eddb9fe7 cifs: Treat unhandled directory name surrogate reparse
+points as mount directory nodes
+69476da76b9c cifs: Throw -EOPNOTSUPP error on unsupported reparse
+point type from parse_reparse_point()
+ef590eae88cf cifs: deal with the channel loading lag while picking channels
+f1bf10d7e909 cifs: pick channels for individual subrequests
 
-So EACCES should not be needed there.
+Anyone else seeing the same errors with multichannel on these tests?
 
-If SMB server returns STATUS_ACCESS_DENIED (EACCES) then it means that
-user does not have access to path or DACL, and so fallback from
-SACL+DACL (ATTRNAME_NTSD_FULL) to DACL-only attribute is useless.
+be related
 
-> diff --git a/getcifsacl.c b/getcifsacl.c
-> index 123d11e..3c12789 100644
-> --- a/getcifsacl.c
-> +++ b/getcifsacl.c
-> @@ -447,7 +447,8 @@ getxattr:
->                         free(attrval);
->                         bufsize += BUFSIZE;
->                         goto cifsacl;
-> -               } else if (errno == EIO && !(strcmp(attrname,
-> ATTRNAME_NTSD_FULL))) {
-> +               } else if (((errno == EIO) || (errno == EPERM) ||
-> (errno == EACCES)) &&
-> +                          !(strcmp(attrname, ATTRNAME_NTSD_FULL))) {
->                         /*
->                          * attempt to fetch SACL in addition to owner
-> and DACL via
->                          * ATTRNAME_NTSD_FULL, fall back to owner/DACL via
-> 
-> 
-> 
+On Wed, Feb 12, 2025 at 2:35=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> tentatively merged into cifs-2.6.git for-next pending more reviews and te=
+sting
+>
+> On Wed, Feb 12, 2025 at 1:35=E2=80=AFAM <nspmangalore@gmail.com> wrote:
+> >
+> > From: Shyam Prasad N <sprasad@microsoft.com>
+> >
+> > Our current approach to select a channel for sending requests is this:
+> > 1. iterate all channels to find the min and max queue depth
+> > 2. if min and max are not the same, pick the channel with min depth
+> > 3. if min and max are same, round robin, as all channels are equally lo=
+aded
+> >
+> > The problem with this approach is that there's a lag between selecting
+> > a channel and sending the request (that increases the queue depth on th=
+e channel).
+> > While these numbers will eventually catch up, there could be a skew in =
+the
+> > channel usage, depending on the application's I/O parallelism and the s=
+erver's
+> > speed of handling requests.
+> >
+> > With sufficient parallelism, this lag can artificially increase the que=
+ue depth,
+> > thereby impacting the performance negatively.
+> >
+> > This change will change the step 1 above to start the iteration from th=
+e last
+> > selected channel. This is to reduce the skew in channel usage even in t=
+he presence
+> > of this lag.
+> >
+> > Fixes: ea90708d3cf3 ("cifs: use the least loaded channel for sending re=
+quests")
+> > Cc: <stable@vger.kernel.org>
+> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > ---
+> >  fs/smb/client/transport.c | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+> > index 0dc80959ce48..e2fbf8b18eb2 100644
+> > --- a/fs/smb/client/transport.c
+> > +++ b/fs/smb/client/transport.c
+> > @@ -1015,14 +1015,16 @@ struct TCP_Server_Info *cifs_pick_channel(struc=
+t cifs_ses *ses)
+> >         uint index =3D 0;
+> >         unsigned int min_in_flight =3D UINT_MAX, max_in_flight =3D 0;
+> >         struct TCP_Server_Info *server =3D NULL;
+> > -       int i;
+> > +       int i, start, cur;
+> >
+> >         if (!ses)
+> >                 return NULL;
+> >
+> >         spin_lock(&ses->chan_lock);
+> > +       start =3D atomic_inc_return(&ses->chan_seq);
+> >         for (i =3D 0; i < ses->chan_count; i++) {
+> > -               server =3D ses->chans[i].server;
+> > +               cur =3D (start + i) % ses->chan_count;
+> > +               server =3D ses->chans[cur].server;
+> >                 if (!server || server->terminate)
+> >                         continue;
+> >
+> > @@ -1039,17 +1041,15 @@ struct TCP_Server_Info *cifs_pick_channel(struc=
+t cifs_ses *ses)
+> >                  */
+> >                 if (server->in_flight < min_in_flight) {
+> >                         min_in_flight =3D server->in_flight;
+> > -                       index =3D i;
+> > +                       index =3D cur;
+> >                 }
+> >                 if (server->in_flight > max_in_flight)
+> >                         max_in_flight =3D server->in_flight;
+> >         }
+> >
+> >         /* if all channels are equally loaded, fall back to round-robin=
+ */
+> > -       if (min_in_flight =3D=3D max_in_flight) {
+> > -               index =3D (uint)atomic_inc_return(&ses->chan_seq);
+> > -               index %=3D ses->chan_count;
+> > -       }
+> > +       if (min_in_flight =3D=3D max_in_flight)
+> > +               index =3D (uint)start % ses->chan_count;
+> >
+> >         server =3D ses->chans[index].server;
+> >         spin_unlock(&ses->chan_lock);
+> > --
+> > 2.43.0
+> >
+>
+>
+> --
 > Thanks,
-> 
+>
 > Steve
+
+
+
+--=20
+Thanks,
+
+Steve
