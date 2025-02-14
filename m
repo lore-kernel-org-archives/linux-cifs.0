@@ -1,183 +1,96 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CA3263F25
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Feb 2025 12:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989CD264A80;
+	Fri, 14 Feb 2025 17:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739537018; cv=none; b=pFixMqmBNw2ZeCXeTBgHLoS8UwYCwqgIJW8xeYZtzFLjyBJSY3zGMafEcDbftXfNrtkQUoqSti+PXdo2Nn5m+oeK+ttu62nzL9hpjc4J0Pzjkrew6bCW9xHuwAFFKWkFhqWq2vNkkO300HppPL+l4Om9eqqiHsJx58UOAAR+Lkw=
+	t=1739554704; cv=none; b=G9jWtBN6s5SpFGvcZ0onrWoIIuPTmr7Z9BDfzI79+RcmQz+zCOiP9yvQmZEPknzU1auppik5GFpWvUA+8z1yhUofmO+ORtcMPmfeH0mzWBaGMV0GwWvW9nC6eE2CoB/DEX3r/Zm93aITp6cPVj8BdmEXnFg3zb1BeYdTbUFqQM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739537018; c=relaxed/simple;
-	bh=G3guDaBjJgsPJ3oBaGYFMvKewZ96n4/UDqyUnqjk+dM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EwJw1EUReaN5MkNrddR/S5uCOW1b9HRJpKWKR1UA+n4xULxD3cUoHveNDSVHx/GcK1cFb9yIU4O/A0rrDH++AUJohr2NqmKT15fg5WG2yP3XLFpmdEj0xwUorsCKL8AZF/RQTvNFEu/xSP2mZ2OInT3QAAmnqq1TB/t9FrNWVW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Co6CMPC9; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1739554704; c=relaxed/simple;
+	bh=QPs3gUpFK4FWDMUzE0c96/LCetQlahqqneggbHHyl9g=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rOEEuneHT6QXBAdhFU0meUiuq4TSIaT7wZb1YgM5KhF5jM6jH6IcupOJYG8AxzIN+wWsmgfvqeig4KfskbhV+t3Je/Nv1q+TL4HW0ldrpIafYkI/WZkLCdwoUnrX6cNjtaAr4dLk+pPLpAq1PZEfbEWOs4Kuhj7blch4isWfexo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AjSPnsSb; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Co6CMPC9"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d19f5ce8a0so1382375ab.1
-        for <linux-cifs@vger.kernel.org>; Fri, 14 Feb 2025 04:43:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AjSPnsSb"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5451d1d56a7so2447098e87.0;
+        Fri, 14 Feb 2025 09:38:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739537016; x=1740141816; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=54XIk6tW7SSLZXAC8fkcpYxaagxEO9/7LylwU0etiw0=;
-        b=Co6CMPC9YD1WiD1RoP05W1bCXQ5LhBuFZWcNV4Y0/fKJp8G9067OlmeRi1dqhLY7W3
-         3V4O7lcHQwFZ6GOWjeLjx5nvP7YMpMjsCmCsLp1eY01nE7C1SfuUyozGSj2szddkSJ4x
-         J4EPVwvgE++i9DGWS/5lYJOtQHfaxRx5zbQHUH090eqs+u15TJ9CO/6fQEm1S9TmkG1H
-         0v4gRPR0qOQl5tyj84PaUMc8W73fRT6a0VAHlg3GctGIpesouKiBNOmJqtqx3HCSB+BZ
-         QUCLZqw8zYxofwwzpg1TRpAb0hJgkfHRJMwvvw44nsgkm7GEEPI8nWIUJpMz+lq1iJHM
-         9DMw==
+        d=gmail.com; s=20230601; t=1739554701; x=1740159501; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KBFUDI3xlZQ8GKkkFKuNnNL4ifTKfoCt6m1CciLzViQ=;
+        b=AjSPnsSbQYmSmQd/a3VvcovQuPi+nX+FavmCyda1450T+IzD8jiqHgDALP5E2XCtbX
+         GkorGXA7EXfwy1xgYZ2ZX9I7uPDem+ct5pwD9Vn95y6jkCq0nLxgCKn7zm+IqWcATLrm
+         cqAyXAxzCNq9QysoSy4ojKCgQL9x/PMRW8K9tMyvkOvxNL7PrzJUgPZYfy1p6SruCbWz
+         dImH0x6bEhAWgJZwigRj6Ox19g4P+90S5g9DfeZAmKeTAge4mpIf1nGkeLwwazLKExi0
+         ZEZP2CpCZYxj5edotwJHkPkJdaXzBFV0JEV9JkFhETTqfjrMnACXu7dwTPCs2TYAbb5n
+         xW/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739537016; x=1740141816;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=54XIk6tW7SSLZXAC8fkcpYxaagxEO9/7LylwU0etiw0=;
-        b=guqw1+4LI/IuWpZEyTdr9dCw368jB9U7dlFiw75PgiIx13CA9KYPEt5FC/15ZpIEwE
-         azaOzevGbh7ySyvOEvNnh6dqpC1XonglQ+QtR/G6ZRD1ecH93ly3NQjGm39Qf5w28O8W
-         sE/gtHI+jJXG5NbOXR7wndlTtNVeKxua8MV0ZF3pJhuQEjWRbANZQ/AIEnukAp4KrwZs
-         ksjJXNw24+6sh7Kok9ZB283LNKSOS6jv6fT5K0vDOjQ5BYYS1/OFyQPtNw8fcq/Q2GUN
-         MhO6K0e7VU5TY9IWqBav3rMOqoyH7Lg03LuU7tKx7XiLqDlXyQgzIbVfozxWbnojpcsH
-         PF6g==
-X-Gm-Message-State: AOJu0YyT5uN1NeNrnfrJxsEh7gtkBSnpn4sBFLPXruzB93pFj6mADZMJ
-	sTfYplgNC8lXMg2HdtuBVp4G4Fni3TPnbQhWKyO4CK7nW7h3YmR8PB7KKJxo
-X-Gm-Gg: ASbGncsgP9GkWaITMbIfsGOKjh8T4wu8Yq6RsqhRHcL6C99pwvqnNhuV1yw042ZP20M
-	I9wc0Gf+Yton/mOl0QFAhxxnz6GveC3dht4cjMc9a0Lz/6dATHbWvxLyUH7JMZSXJ2qbtFWFWYG
-	UGqcarUgeZcgIO1e1dDomzdvtQYSIBldaoMNK2ZTx/x8ebWI4lI4KEbzRkehepSCBPBFoWfvtYX
-	9ay1HkcW5608RjCxx7A2Xl1SIZd2238ax+y+/lNlT/DB2MZmKiYaFyfCKFkI8in27URrOhKARFL
-	e7T+SpizBMHkRVhzA3vLF0w+NDEv2Uy6p3ybiU0wS5hp3YMpi9bIE4rQzYdgJybBG8R0puE0QlW
-	BVQ==
-X-Google-Smtp-Source: AGHT+IGQ0cBl54t0FsyormrAQjr+gCDUdEmNQewTOW7ReFRGgaZ6hS7Y3OXwQLyhDUcpAjk+3GmCPg==
-X-Received: by 2002:a05:6e02:2161:b0:3d1:15c9:c15f with SMTP id e9e14a558f8ab-3d18cd2671bmr42967375ab.11.1739537016306;
-        Fri, 14 Feb 2025 04:43:36 -0800 (PST)
-Received: from linuxbox.oloxx3b4wsrernbskgt3tooxxe.gx.internal.cloudapp.net ([74.249.180.8])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4ed281487c5sm795162173.13.2025.02.14.04.43.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 04:43:36 -0800 (PST)
-From: aman1cifs@gmail.com
-To: linux-cifs@vger.kernel.org,
-	sfrench@samba.org,
-	pc@manguebit.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	ronniesahlberg@gmail.com,
-	bharathsm@microsoft.com
-Cc: Aman <aman1@microsoft.com>
-Subject: [PATCH 2/2] CIFS: adds min_offload and other params to cifs_debug
-Date: Fri, 14 Feb 2025 12:43:06 +0000
-Message-ID: <20250214124306.498808-2-aman1cifs@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250214124306.498808-1-aman1cifs@gmail.com>
-References: <20250214124306.498808-1-aman1cifs@gmail.com>
+        d=1e100.net; s=20230601; t=1739554701; x=1740159501;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KBFUDI3xlZQ8GKkkFKuNnNL4ifTKfoCt6m1CciLzViQ=;
+        b=Bhe2mRnu+e2wpmQKRfBJUntEyNR77uiA7OLwa5ZqjCcfScIeVshYkFpOZzgqi0FBer
+         JeEWnTtroHeK69/gCNJN7OLMDvs/TEPv/6iS/HNmjPbU0InxvJNvhmitvBfyLHNtrP2S
+         F9TD0TZfe7vaFHvun+fPcea3kFbJuMZGR3JoC5Evd0V3foWJN6ecUd+9YfElWh8lOA/Y
+         dJDChPnDaOcsWwQ0DlBW1df12DpH2MziyOgkzzDosFyPbHBugC+IYzJuVIzIayjYhRRO
+         bJ7yVCO1sVNeuhzM9RH7Aarsdh04PJR7ajAnL7+KXW0Us81N9glVVrVAweTndHyofwFA
+         oKwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6yQTyMwXzFn07xE2a8sInwaL8OF3Idsp1uIukjdncYkI29OZo3rZh+IJ6S1eIZ/HSEGzzpvG/h6dz@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE60k+CJEpyzx4RAMBcUDd23b5dyFf9D8EZQRVinSjpCP0fQOA
+	WxDOjx71yQjkkpe30q8LDjIZYvE2V0KZX8WXPyizfrUYEW/BeY8O6i/vp3DythiwZECbsMlXDdc
+	ytCyFBJAnTc+emmcON358eycuZsEeImTB
+X-Gm-Gg: ASbGncubNdIzpKgkvvZb3TiZ25tNPQ4RzWB5+ro9FcNod7kcXoes/Nuij17dVooxVhU
+	j7y0N/T1BXH2GTSiiga0XMv99TQLlOCUtY7kfT527VOxAGRyaX/pHEiBszhzaIM7ofqPogwOtG3
+	04b1QgZifiSTIuUFCKn2XZ+xFqoiXO+2k=
+X-Google-Smtp-Source: AGHT+IErlXdNZY2UjkX6nT6T6lZiBSIaI+Czn+PLcvm4idY5EOhV0hA1ZMzQ5mK/HWJ2JnnbqHBYVdc9kUS5DHUWOm4=
+X-Received: by 2002:a05:6512:128a:b0:545:1182:183f with SMTP id
+ 2adb3069b0e04-5451dfc1418mr2790297e87.4.1739554700364; Fri, 14 Feb 2025
+ 09:38:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 14 Feb 2025 11:38:07 -0600
+X-Gm-Features: AWEUYZlBIgfs3V_pXoQk38EcHNutmpOio2VgrE0znV5zSWDZirfTgy_EY3pt4to
+Message-ID: <CAH2r5mvzsA_nUYZHs4mSwU0GOOBGjKEchyjBLrCaSRf7pPyMvw@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Aman <aman1@microsoft.com>
+Please pull the following changes since commit
+a64dcfb451e254085a7daee5fe51bf22959d52d3:
 
-This change adds more parameters for debugging into the status of all
-channels. It adds the following TCP server parameters to cifs_debug.c
+  Linux 6.14-rc2 (2025-02-09 12:45:03 -0800)
 
-        - min_offload
-        - compression.requested
-        - dfs_conn
-        - ignore_signature
-        - leaf_fullpath
-        - retrans
-        - noblockcnt
-        - noblocksnd
-        - sign
-        - max_credits
+are available in the Git repository at:
 
-This is a logical follow up to a previous patch titled:
-"[PATCH] CIFS: Propagate min offload along with other parameters from
-primary to secondary channels",
-however this has been tested and applies independently.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.14-rc2-smb3-client-fixes
 
-Signed-off-by: Aman <aman1@microsoft.com>
----
- fs/smb/client/cifs_debug.c | 47 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+for you to fetch changes up to f1bf10d7e909fe898a112f5cae1e97ce34d6484d:
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index e03c890de..64a565c46 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -147,8 +147,16 @@ cifs_dump_channel(struct seq_file *m, int i, struct cifs_chan *chan)
- 		   "\n\t\tNumber of credits: %d,%d,%d Dialect 0x%x"
- 		   "\n\t\tTCP status: %d Instance: %d"
- 		   "\n\t\tLocal Users To Server: %d SecMode: 0x%x Req On Wire: %d"
--		   "\n\t\tIn Send: %d In MaxReq Wait: %d",
--		   i+1, server->conn_id,
-+		   "\n\t\tIn Send: %d In MaxReq Wait: %d"
-+		   "\n\t\tCompression Requested: %s"
-+		   "\n\t\tdfs_conn: %s"
-+		   "\n\t\tIgnore Signature: %s"
-+		   "\n\t\tretrans: %d"
-+		   "\n\t\tUse non-blocking connect: %s"
-+		   "\n\t\tUse non-blocking sendmsg: %s"
-+		   "\n\t\tSigning Enabled: %s"
-+		   "\n\t\tMin Offload: %d Max Credits: %d",
-+		   i, server->conn_id,
- 		   server->credits,
- 		   server->echo_credits,
- 		   server->oplock_credits,
-@@ -159,7 +167,22 @@ cifs_dump_channel(struct seq_file *m, int i, struct cifs_chan *chan)
- 		   server->sec_mode,
- 		   in_flight(server),
- 		   atomic_read(&server->in_send),
--		   atomic_read(&server->num_waiters));
-+		   atomic_read(&server->num_waiters),
-+		   str_yes_no(server->compression.requested),
-+		   str_yes_no(server->dfs_conn),
-+		   str_yes_no(server->ignore_signature),
-+		   server->retrans,
-+		   str_yes_no(server->noblockcnt),
-+		   str_yes_no(server->noblocksnd),
-+		   str_yes_no(server->sign),
-+		   server->min_offload,
-+		   server->max_credits);
-+
-+	if (server->leaf_fullpath) {
-+		seq_printf(m, "\n\t\tDFS leaf full path: %s",
-+			   server->leaf_fullpath);
-+	}
-+
- #ifdef CONFIG_NET_NS
- 	if (server->net)
- 		seq_printf(m, " Net namespace: %u ", server->net->ns.inum);
-@@ -487,6 +510,24 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		else
- 			seq_puts(m, "disabled (not supported by this server)");
- 
-+		seq_printf(m, "\nCompression Requested: %s"
-+		   "\ndfs_conn: %s"
-+		   "\nIgnore Signature: %s"
-+		   "\nretrans: %d"
-+		   "\nUse non-blocking connect: %s"
-+		   "\nUse non-blocking sendmsg: %s"
-+		   "\nSigning Enabled: %s"
-+		   "\nMin Offload: %d Max Credits: %d",
-+		   str_yes_no(server->compression.requested),
-+		   str_yes_no(server->dfs_conn),
-+		   str_yes_no(server->ignore_signature),
-+		   server->retrans,
-+		   str_yes_no(server->noblockcnt),
-+		   str_yes_no(server->noblocksnd),
-+		   str_yes_no(server->sign),
-+		   server->min_offload,
-+		   server->max_credits);
-+
- 		seq_printf(m, "\n\n\tSessions: ");
- 		i = 0;
- 		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+  cifs: pick channels for individual subrequests (2025-02-11 18:51:07 -0600)
+
+----------------------------------------------------------------
+SMB3 client multichannel fix
+- fix channel allocation, especially when using larger rasize
+----------------------------------------------------------------
+Shyam Prasad N (1):
+      cifs: pick channels for individual subrequests
+
+ fs/smb/client/cifsglob.h | 1 -
+ fs/smb/client/file.c     | 7 ++++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+
 -- 
-2.43.0
+Thanks,
 
+Steve
