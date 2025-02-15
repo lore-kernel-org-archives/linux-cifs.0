@@ -1,157 +1,189 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802391624D4
-	for <linux-cifs@vger.kernel.org>; Sat, 15 Feb 2025 23:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A0C1925AC;
+	Sat, 15 Feb 2025 23:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739661506; cv=none; b=LId/ithw7YQU/MWpNpgIyA8RZvSMutsCX/G4Dmvxil4//9icDkUylLo0MGPdlERE4Yr+mvaXcWwzFl3aqB02EkBRm55fF7zNIREtMiIhb4L12kD8zg9HCzQwHqC7CZOWfXwHZLbIkAf0iBIvfoJMsyyOyw5JadOT1JWf2XHbifQ=
+	t=1739662800; cv=none; b=AI/BqxbDBPSRqks3I08mUON9HzNBEIAyoHv+Fd4mcm9B1i1lnz5zVAeRLUm8fF9bnaS6gCPAWQ2fI6ctIivyjLjAGUvC8cs7Rze6gq6KO3Kky/ru4/XexigusIXs7/Dd8Zrlx0GTvf62wGZFEuOip6Vg25HLHZpashKeiuX3Feo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739661506; c=relaxed/simple;
-	bh=Mg6YznIZuYmP3Rbtj2ujaw6IkgNkKZEy2Lryy0xPRWs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=CVASnu5S83koMBEXyWLmEfSEYgorztTBkbnVE9WqsKDADKt0RE5pKu8tqbXFwtwOuGbyov4Au/GbvZlqJCeze+kYwjGgObTDA97Of/KvMlQp4JlVNcPib29Z24mS4lponOYYzSNBkmmB6TWu7sCJyAZp1a/FhCkw3GfiS7AI2NU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=glUtLW0C; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739662800; c=relaxed/simple;
+	bh=C03vfY/YewPcsWqb71F4heYY/J42ivxfv87i7Ms0uoo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b7Eb2gBu1c8LFi+bb9HO+4UtolIoGN/SX7fkpR6DHNYC3JP4Hjw4HgyYJ+ePqWvNROrUGSwYMUiX+rWbwJJMQVBVLIki6KQFh3w9C6K4XfPvRp4C4TrYF5w242yHG9J1q9X6eWU8OLTo2XTBBW8jLmCNh8/YWETfk/L5CrPBa1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAOF4YbT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="glUtLW0C"
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2bca6017608so391550fac.0
-        for <linux-cifs@vger.kernel.org>; Sat, 15 Feb 2025 15:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739661503; x=1740266303; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pP341ZSJlcbVHWaRZPK9i0q6hHwuLrXg3ZS7ou7uOug=;
-        b=glUtLW0C43SyAUtK/H8ziHIEmMetpWjccgOo2YqWmprKlmdAwtEfOGI1mMZBPN3cQt
-         Pj4ewAph9ezycfG2V8LSXFyAxe7XKqG8bAs5vOWPl3UCoNzM3HCvFXI07E7J0clPJuvl
-         pdniq/lhqU9CxN0uoAJZ+WttvkgmFt1dcPxWZdb92n4JD20id8qpQgFHmrLLjFK0PeFc
-         xf23eMl3nQL0EU4AgJ6adrAbzYta18OGhunGSaGrzKzJfTHCYAwo7XR19eJv1OTsoayW
-         R/GeiU7luZU17hGCONtT8Vh0BN9DREpfIXK/44dHOsnDMjaJEo8DNJL5L+m28mA9vXc4
-         dmFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739661503; x=1740266303;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pP341ZSJlcbVHWaRZPK9i0q6hHwuLrXg3ZS7ou7uOug=;
-        b=QgcJBobBC6mMm2BRwxkq1lG/TzYt76P7iIpMGMzxzk5Lv8agja76knPTiQ6/3junZ8
-         w3X26fJC2gHlgqBoLdNI4qCSJaULZvNEqCkQzqooKD0QUQIlGOgkTfbXJfk7TXXPg1VP
-         s8NsLDTDElXs760J0vkxiw/9C9KthYFMShv9lRt4INJfigqloUTWTerMiundFSPYO8Wl
-         8lH/vD9QNtggFDumTnBjnPix+A5/SX6X+p3kojYRMficXK9XEurEuEeGymIVM9x8Z/6m
-         p4Ygy2J2LRT07yQqe8WIZDvPFgn+10MnQt1qAfihrON7QyVmvn+abPT6Q7NYPLrv3UTW
-         NpAg==
-X-Gm-Message-State: AOJu0YwlR/i+NFeBMaCEAAwNrK8/3NUdIai06cFkKfrsWaECb0pnD8/k
-	PWFbv4iBkvzLShSI6SXXiVcEJRyddOd+nlJQ/0dVR40Ouv8JLKhTGU7CUceilP2JEBjGDUrVbS3
-	o+wS8X05ADoiBkpEjXpSz5do24YY5nm2Dilk=
-X-Gm-Gg: ASbGncup2pyKVNfUFi5906fAtqjn3ruI+1tqtwagVSwpCOLDSX+lH48HuBK6rETrCy2
-	oi8P978hYthDNI98YutqFOiz42DIVku0Iboe4TS87Z3tUmuBSKlrX/i015O7L6d4ONECUQBOGf9
-	HbDA/voYQYKhlSfALXvUeO+bka9YwvmA==
-X-Google-Smtp-Source: AGHT+IFcNdj0WIutekcLsQG4pztOrGb/Dkx3uSKMx2A7K7y5ixbLDEHbpPrkOq63Z2K6jVZ94d1ytLdNoO8wH4NBfHc=
-X-Received: by 2002:a05:6870:3282:b0:27b:55af:ca2b with SMTP id
- 586e51a60fabf-2bc99a9316fmr2068954fac.11.1739661503283; Sat, 15 Feb 2025
- 15:18:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAOF4YbT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35203C4CEDF;
+	Sat, 15 Feb 2025 23:39:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739662799;
+	bh=C03vfY/YewPcsWqb71F4heYY/J42ivxfv87i7Ms0uoo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lAOF4YbT8Fkxq+UQItc/1gGn5BPEEE5z5GToaY8kBogwjZ2w7ege97NXCmFPMR2kM
+	 CMkiz4TasJm3XFfwQPKLuaMpceBUxTNP10KZPEiivB3gB9rX0q4zC7Pra9joHKGhog
+	 sqBAO0sIh+ynP20z2RyoUAIlz7OgtrE/Xy0Y52bRV6jcYqKO9HQhOGg37G6Frx8khd
+	 iTvbAl+uMpdCxIhAFqnCKvWcaRx2BT9KDw7BhnQ5XIDGqzKAETulRiOTL7XkPAadzl
+	 YtAH/mut35SRiUdWwPgVtGJqo2qSBj5sRuq0+ojq9424u/6mHrJCXr0ROX5PIY8RF8
+	 xAf24EmBTYJoQ==
+Received: by pali.im (Postfix)
+	id BAB14676; Sun, 16 Feb 2025 00:39:46 +0100 (CET)
+Date: Sun, 16 Feb 2025 00:39:46 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Amir Goldstein <amir73il@gmail.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steve French <sfrench@samba.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Immutable vs read-only for Windows compatibility
+Message-ID: <20250215233946.cxznczjjiu7vqazf@pali>
+References: <0659dfe1-e160-40fd-b95a-5d319ca3504f@oracle.com>
+ <20250114215350.gkc2e2kcovj43hk7@pali>
+ <CAN05THSXjmVtvYdFLB67kKOwGN5jsAiihtX57G=HT7fBb62yEw@mail.gmail.com>
+ <20250114235547.ncqaqcslerandjwf@pali>
+ <20250114235925.GC3561231@frogsfrogsfrogs>
+ <CAOQ4uxjj3XUNh6p3LLp_4YCJQ+cQHu7dj8uM3gCiU61L3CQRpA@mail.gmail.com>
+ <20250117173900.GN3557553@frogsfrogsfrogs>
+ <CAOQ4uxhh1LDz5zXzqFENPhJ9k851AL3E7Xc2d7pSVVYX4Fu9Jw@mail.gmail.com>
+ <20250117185947.ylums2dhmo3j6hol@pali>
+ <20250202152343.ahy4hnzbfuzreirz@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Robert Fayz <robert.fayz@gmail.com>
-Date: Sat, 15 Feb 2025 18:18:10 -0500
-X-Gm-Features: AWEUYZn6aMF61FxIxiBUwgRwB4wFH0FjlntGc3FVEGal1mAqqbQBpfyHd3q8vLI
-Message-ID: <CAFm7LrPvRY3m_E=Lbc5d6JrR-XtXFQf4uzEbDPKqN4_9mzfPsA@mail.gmail.com>
-Subject: CIFS Troubleshooting
-To: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250202152343.ahy4hnzbfuzreirz@pali>
+User-Agent: NeoMutt/20180716
 
-I hope it's still okay to ask for assistance here.
+Some updates...
 
-I have a NVIDIA Shield Pro 2019 that has a samba server built in and
-is sharing a Western Digital external hard drive.  The client with an
-issue is an x86 laptop PC from Asus.  The linux distro I'm running on
-the client side is CachyOS (x86-v3 optimized arch linux).
+On Sunday 02 February 2025 16:23:43 Pali Rohár wrote:
+> And how many bit flags are needed? I have done some investigation. Lets
+> start with table which describes all 32 possible bit flags which are
+> used by Windows system and also by filesystems FAT / exFAT / NTFS / ReFS
+> and also by SMB over network:
+> 
+> bit / attrib.exe flag / SDK constant / description
+> 
+>  0 - R - FILE_ATTRIBUTE_READONLY              - writing to file or deleting it is disallowed
+>  1 - H - FILE_ATTRIBUTE_HIDDEN                - inode is hidden
+>  2 - S - FILE_ATTRIBUTE_SYSTEM                - inode is part of operating system
+>  3 -   - FILE_ATTRIBUTE_VOLUME                - inode is the disk volume label entry
+>  4 -   - FILE_ATTRIBUTE_DIRECTORY             - inode is directory
+>  5 - A - FILE_ATTRIBUTE_ARCHIVE               - inode was not archived yet (when set)
+>  6 -   - FILE_ATTRIBUTE_DEVICE                - inode represents  in-memory device (e.g. C:\), flag not stored on filesystem
+>  7 -   - FILE_ATTRIBUTE_NORMAL                - no other flag is set (value 0 means to not change flags, bit 7 means to clear all flags)
+>  8 -   - FILE_ATTRIBUTE_TEMPORARY             - inode data do not have to be flushed to disk
+>  9 -   - FILE_ATTRIBUTE_SPARSE_FILE           - file is sparse with holes
+> 10 -   - FILE_ATTRIBUTE_REPARSE_POINT         - inode has attached reparse point (symlink is also reparse point)
+> 11 -   - FILE_ATTRIBUTE_COMPRESSED            - file is compressed, for directories it means that newly created inodes would have this flag set
+> 12 - O - FILE_ATTRIBUTE_OFFLINE               - HSM - inode is used by HSM
+> 13 - I - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED   - inode will not be indexed by content indexing service
+> 14 -   - FILE_ATTRIBUTE_ENCRYPTED             - file is encrypted, for directories it means that newly created inodes would have this flag set
+> 15 - V - FILE_ATTRIBUTE_INTEGRITY_STREAM      - fs does checksumming of data and metadata when reading inode, read-only
 
-The shares from the NVIDIA Shield mount fine, and are visible and I
-can browse them fine.  In fact, I've never had trouble so far with
-upstream writes from the client to the server.  It's only downstream
-transfers from the server the client that eventually fail if the file
-size is large enough to need a few minutes to transfer.  Infrequently,
-my entire desktop will lock up, suggesting a kernel panic, but it's a
-rare and I don't have steps that reliably cause it to happen.  (Well,
-it happens every time if I use vers=2.0 in the mounting configuration,
-but that is not the default configuration or my current mount
-configuration).
+FILE_ATTRIBUTE_INTEGRITY_STREAM can be enabled for individual inode via
+FSCTL_SET_INTEGRITY_INFORMATION or FSCTL_SET_INTEGRITY_INFORMATION_EX
+fs ioctl call, available on Windows and also via SMB protocol. So
+de-facto it is read-write attribute, just over SMB requires separate
+operation for changing it.
 
-If I initiate a copy from the terminal, the error message I get is:
+In similar way can be modified also FILE_ATTRIBUTE_COMPRESSED and
+FILE_ATTRIBUTE_ENCRYPTED attributes.
 
-cp: error reading '<filename>': Resource temporarily unavailable
+> 16 -   - FILE_ATTRIBUTE_VIRTUAL               - inode is in %LocalAppData%\VirtualStore, flag not stored on filesystem
+> 17 - X - FILE_ATTRIBUTE_NO_SCRUB_DATA         - do not use scrubber (proactive background data integrity scanner) on this file, for directories it means that newly created inodes would have this flag set
+> 18 -   - FILE_ATTRIBUTE_EA                    - inode has xattrs, (not in readdir output, shares same bit with FILE_ATTRIBUTE_RECALL_ON_OPEN)
+> 18 -   - FILE_ATTRIBUTE_RECALL_ON_OPEN        - HSM - inode is not stored locally (only in readdir output, shares same bit with FILE_ATTRIBUTE_EA)
+> 19 - P - FILE_ATTRIBUTE_PINNED                - HSM - inode data content must be always stored on locally
+> 20 - U - FILE_ATTRIBUTE_UNPINNED              - HSM - inode data content can be removed from local storage
+> 21 -   -                                      - reserved
+> 22 -   - FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS - HSM - inode data content is not stored locally
+> 23 -   -                                      - reserved
+> 24 -   -                                      - reserved
+> 25 -   -                                      - reserved
+> 26 -   -                                      - reserved
+> 27 -   -                                      - reserved
+> 28 -   -                                      - reserved
+> 29 - B - FILE_ATTRIBUTE_STRICTLY_SEQUENTIAL   - SMR Blob, unknown meaning, read-only
+> 30 -   -                                      - reserved
+> 31 -   -                                      - reserved
+> 
+> (HSM means Hierarchical Storage Management software, which uses reparse
+> points to make some remote file/folder available on the local
+> filesystem, for example OneDrive or DropBox)
+> 
+> From above list only following bit flags are suitable for modification
+> over some Linux API:
+> - FILE_ATTRIBUTE_READONLY
+> - FILE_ATTRIBUTE_HIDDEN
+> - FILE_ATTRIBUTE_SYSTEM
+> - FILE_ATTRIBUTE_ARCHIVE
+> - FILE_ATTRIBUTE_TEMPORARY
+> - FILE_ATTRIBUTE_COMPRESSED
+> - FILE_ATTRIBUTE_OFFLINE
+> - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
+> - FILE_ATTRIBUTE_ENCRYPTED
+> - FILE_ATTRIBUTE_NO_SCRUB_DATA
+> - FILE_ATTRIBUTE_PINNED
+> - FILE_ATTRIBUTE_UNPINNED
 
-These problems *does* happen with kernels:
-6.13.2-arch1-1.1-g14
-6.13.2-2-cachyos
-6.12.13-1-cachyos-lts
+Hence this list needs to be extended by FILE_ATTRIBUTE_INTEGRITY_STREAM
+attribute.
 
-The problem *does not* happen with kernel:
-6.6.77-1-lts66
-Windows 11 (I dual boot)
+FILE_ATTRIBUTE_INTEGRITY_STREAM is interesting attribute as it allows to
+enable checksumming of file content.
 
-The shares are configured in /etc/fstab as:
-//192.168.50.144/internal /cifs/nvidia-internal cifs
-credentials=/etc/samba/credentials/nvidia,defaults,noperm,noauto,vers=3.1.1,x-systemd.automount
-0 0
-//192.168.50.144/NVIDIA-EXT /cifs/nvidia-external cifs
-credentials=/etc/samba/credentials/nvidia,defaults,noperm,noauto,vers=3.1.1,x-systemd.automount
-0 0
-
-System Summary (client)
-OS: CachyOS x86_64
-Host: ROG Strix G733CX_G733CX (1.0)
-Kernel: Linux 6.13.2-arch1-1.1-g14
-mount.cifs version: 7.2
-Server: NVIDIA Shield Pro 2019 (Android with NVIDIA Experience 9.2) (I
-don't know how to get the samba version it uses)
-
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-CIFS Version 2.45
-Features: DFS,FSCACHE,SMB_DIRECT,STATS,DEBUG,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),XATTR,ACL,WITNESS
-CIFSMaxBufSize: 16384
-Active VFS Requests: 0
-
-Servers:
-1) ConnectionId: 0x1 Hostname: 192.168.50.144
-ClientGUID: 29CCE1FB-2026-B248-936A-62E6D7F1B286
-Number of credits: 510,1,1 Dialect 0x311
-Server capabilities: 0x300047
-TCP status: 1 Instance: 1
-Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840
-In Send: 0 In MaxReq Wait: 0
-Compression: disabled on mount
-
-       Sessions:
-       1) Address: 192.168.50.144 Uses: 2 Capability: 0x300047 Session
-Status: 1
-       Security type: RawNTLMSSP  SessionId: 0x25610bd5
-       User: 0 Cred User: 0
-
-       Shares:
-       0) IPC: \\192.168.50.144\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-       PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
-       Share Capabilities: None        Share Flags: 0x0
-       tid: 0x936d9aad Maximal Access: 0x1f00a9
-
-       1) \\192.168.50.144\internal Mounts: 1 DevInfo: 0x20 Attributes: 0x1002f
-       PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x234ded5c
-       Share Capabilities: None Aligned, Partition Aligned,    Share Flags: 0x0
-       tid: 0xff04e9b7 Optimal sector size: 0x200      Maximal Access: 0x1f01ff
-
-       2) \\192.168.50.144\NVIDIA-EXT Mounts: 1 DevInfo: 0x20
-Attributes: 0x1002f
-       PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x41638684
-       Share Capabilities: None Aligned, Partition Aligned,    Share Flags: 0x0
-       tid: 0x94f5fbbb Optimal sector size: 0x200      Maximal Access: 0x1f01ff
-
-
-       MIDs:
---
-
-Witness registrations:
+> And if I'm looking correctly the FILE_ATTRIBUTE_COMPRESSED can be
+> already mapped to Linux FS_COMPR_FL / STATX_ATTR_COMPRESSED, which has
+> same meaning. Also FILE_ATTRIBUTE_ENCRYPTED can be mapped to
+> FS_ENCRYPT_FL / STATX_ATTR_ENCRYPTED. Note that these two flags cannot
+> be set over WinAPI or SMB directly and it is required to use special
+> WinAPI or SMB ioctl.
+> 
+> So totally are needed 10 new bit flags. And for future there are 9
+> reserved bits which could be introduced by MS in future.
+> 
+> Additionally there are get-only attributes which can be useful for statx
+> purposes (for example exported by cifs.ko SMB client):
+> - FILE_ATTRIBUTE_REPARSE_POINT
+> - FILE_ATTRIBUTE_INTEGRITY_STREAM
+> - FILE_ATTRIBUTE_RECALL_ON_OPEN
+> - FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
+> - FILE_ATTRIBUTE_STRICTLY_SEQUENTIAL
+> 
+> From the above list of flags suitable for modification, following bit
+> flags have no meaning for kernel and it is up to userspace how will use
+> them. What is needed from kernel and/or filesystem driver is to preserve
+> those bit flags.
+> - FILE_ATTRIBUTE_HIDDEN
+> - FILE_ATTRIBUTE_SYSTEM
+> - FILE_ATTRIBUTE_ARCHIVE
+> - FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
+> 
+> Following are bit flags which kernel / VFS / fsdriver would have to
+> handle specially, to provide enforcement or correct behavior of them:
+> - FILE_ATTRIBUTE_READONLY - enforce that data modification or unlink is disallowed when set
+> - FILE_ATTRIBUTE_COMPRESSED - enforce compression on filesystem when set
+> - FILE_ATTRIBUTE_ENCRYPTED - enforce encryption on filesystem when set
+> 
+> Then there are HSM flags which for local filesystem would need some
+> cooperation with userspace synchronization software. For network
+> filesystems (SMB / NFS4) they need nothing special, just properly
+> propagating them over network:
+> - FILE_ATTRIBUTE_OFFLINE
+> - FILE_ATTRIBUTE_PINNED
+> - FILE_ATTRIBUTE_UNPINNED
+> 
+> About following 2 flags, I'm not sure if the kernel / VFS / fs driver
+> has to do something or it can just store bits to fs:
+> - FILE_ATTRIBUTE_TEMPORARY
+> - FILE_ATTRIBUTE_NO_SCRUB_DATA
