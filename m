@@ -1,202 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C8581E;
-	Sun, 16 Feb 2025 21:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EC019D89B
+	for <linux-cifs@vger.kernel.org>; Sun, 16 Feb 2025 21:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739739675; cv=none; b=Ji+ALW6y63fKPXeWRAg07x4cht26pF7PMk9B/rnn8jxujGctsfPbAKxOk5EFUOf+Zg85kCwJUOkgBadkfGmlp6dbu/3mMQ0ePli8cZh8UWO0ToHG+AW9zdhK+vTzIYUxs7BKeCcCp0Uf36tbmwF8GaSjrptt+dR0ZZt/K+3F0/c=
+	t=1739739780; cv=none; b=GNkZ8khRtWYI19fFu0z/Ah18InxgQg6v7RGWDlIguNzEKmW5kp0EiqwR2vEs4cfxBaLWFMf5vFUz/A5zOKa0kkuv9LZlyE32MlSSDtNPZCrr3bA0a88DIGaAlmX3z+0GziyvNEsa7ghRo7TIto3mwQXr/8uM3whz4espPVP8x6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739739675; c=relaxed/simple;
-	bh=CUGVELtCbw5vQRe5fBVL8hp/VpFQD8LzQmI0y/mIkAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEmTC9qOLSMFFFN+u0mBoZ8r3Tto5JWJmCp548opI13PjHadf60wqeCklU66dPph7phnCptK5cl9guIwHJgKJLUdxXAWbeWG6Z88mvUJ8QC8unRzOwwaZ2OXiwNvpoGwRpFTJENgnLLUTvSb4xIVdk78sh8Op9caH3qfdQzXaK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=da9DLO86; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739739780; c=relaxed/simple;
+	bh=zUl8iwnUm1WU14t1bR7UanLgkUFGlKnCevtYucCiJSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OVQZJI3bQQIiR4pht1HcBdz3izWD6a0IduZxzvGvZQz5Kk5BK5+QUj/YKBDcD5T/nXXxrZZ2ffzjKL0P2kdmUEa/1UcK06QPOgZ5sqvU1RNL+UfJKPV/VuFYKM1GAI+E/K8dZYxBwjYSFvHVLYduLevb8TX8FEMGxvubLSjZBJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=tEItFFcZ; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="da9DLO86"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA55EC4CEDD;
-	Sun, 16 Feb 2025 21:01:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739739675;
-	bh=CUGVELtCbw5vQRe5fBVL8hp/VpFQD8LzQmI0y/mIkAI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=da9DLO86ZJRB6roU1IO2ZMu1xxMjglLjab87Z0q8vOabBgWZHuRZ44ngjN577OU3G
-	 zUlYnLJrVHmLf84CbiQTXOr7MD+FCUlZjZkMtwMoDDy4eVEBDddMz6N32IUsiAKV6t
-	 /p4QuwntssVyaG3xhUANCIV/sTMkw7bMZ3skmObYXMRJbMtWNk/GuJRTf9nA0Gb/jf
-	 xeGwrKQ+3uHpJGtRP424muJJUz2xrhbg427z0pm9xb823YWQsSDK2xKVR9fxVr/J1p
-	 vVMqESBUibEC3z2i6aiUW5+6bZBUMWPxQl6bUPvPzXtlDG0UboJR1kr6gU3VX5z+S4
-	 MvChrHDbazPeA==
-Received: by pali.im (Postfix)
-	id 060E37FD; Sun, 16 Feb 2025 22:01:01 +0100 (CET)
-Date: Sun, 16 Feb 2025 22:01:01 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: "Darrick J. Wong" <djwong@kernel.org>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/4] fs: Extend FS_IOC_FS[GS]ETXATTR API for Windows
- attributes
-Message-ID: <20250216210101.l4d6mm42pyopgrjj@pali>
-References: <20250216164029.20673-1-pali@kernel.org>
- <20250216164029.20673-3-pali@kernel.org>
- <CAOQ4uxi0saGQYF5qgCKWu_mLNg8FZBHqZu3TvnqpY8v8Hmq-nQ@mail.gmail.com>
- <20250216200120.svl6w3vko7tdgedo@pali>
- <CAOQ4uxi4V0ONe-Sapp8=vncs_F4zOb67_1EpFuydPs7iundZJA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="tEItFFcZ"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1739739770;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0mUDWilM/BHGX3QE+jzAQm51Byuz16Ca+nyWv/v+PJU=;
+	b=tEItFFcZ3a79DJ6Y60af0getp0HF1+61olD3Kalb/iYY7GxuXBbH/T7474A5XO/Czw8Lc4
+	9UZd2P3OfMcSAtT2a2xg7I2JYfbaBm9p6QvpcOwB4BHRt3GVce2wTxZp4aYzIpbdJBrZUF
+	TKr6ugt2c6z/NLA4v3B+TzkRtIGw+dmnQTirc2MenYaYSq5sctsHvtgakPkJsJQ6NPcltM
+	PaTvtvMw6ZLKRy/6bqdf73iH1DyQT1IlugifaEUOGxF00B/MpX31rQmmZ2ZfWv+l5lDgV3
+	WWXZaxUALmrn6sjP8AgzxR1XGDqKaj/z+75xPXdF8dI7ABZinXq/1eQlTolrcg==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Horst Reiterer <horst.reiterer@fabasoft.com>
+Subject: [PATCH] smb: client: fix chmod(2) regression with ATTR_READONLY
+Date: Sun, 16 Feb 2025 18:02:47 -0300
+Message-ID: <20250216210247.190316-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxi4V0ONe-Sapp8=vncs_F4zOb67_1EpFuydPs7iundZJA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
 
-On Sunday 16 February 2025 21:34:42 Amir Goldstein wrote:
-> On Sun, Feb 16, 2025 at 9:01 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > On Sunday 16 February 2025 20:55:09 Amir Goldstein wrote:
-> > > On Sun, Feb 16, 2025 at 5:42 PM Pali Rohár <pali@kernel.org> wrote:
-> > > >
-> > > > struct fsxattr has 8 reserved padding bytes. Use these bytes for defining
-> > > > new fields fsx_xflags2, fsx_xflags2_mask and fsx_xflags_mask in backward
-> > > > compatible manner. If the new FS_XFLAG_HASEXTFIELDS flag in fsx_xflags is
-> > > > not set then these new fields are treated as not present, like before this
-> > > > change.
-> > > >
-> > > > New field fsx_xflags_mask for SET operation specifies which flags in
-> > > > fsx_xflags are going to be changed. This would allow userspace application
-> > > > to change just subset of all flags. For GET operation this field specifies
-> > > > which FS_XFLAG_* flags are supported by the file.
-> > > >
-> > > > New field fsx_xflags2 specify new flags FS_XFLAG2_* which defines some of
-> > > > Windows FILE_ATTRIBUTE_* attributes, which are mostly not going to be
-> > > > interpreted or used by the kernel, and are mostly going to be used by
-> > > > userspace. Field fsx_xflags2_mask then specify mask for them.
-> > > >
-> > > > This change defines just API without filesystem support for them. These
-> > > > attributes can be implemented later for Windows filesystems like FAT, NTFS,
-> > > > exFAT, UDF, SMB, NFS4 which all native storage for those attributes (or at
-> > > > least some subset of them).
-> > > >
-> > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > > ---
-> > > >  include/uapi/linux/fs.h | 36 +++++++++++++++++++++++++++++++-----
-> > > >  1 file changed, 31 insertions(+), 5 deletions(-)
-> > > >
-> > > > diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> > > > index 367bc5289c47..93e947d6e604 100644
-> > > > --- a/include/uapi/linux/fs.h
-> > > > +++ b/include/uapi/linux/fs.h
-> > > > @@ -145,15 +145,26 @@ struct fsxattr {
-> > > >         __u32           fsx_nextents;   /* nextents field value (get)   */
-> > > >         __u32           fsx_projid;     /* project identifier (get/set) */
-> > > >         __u32           fsx_cowextsize; /* CoW extsize field value (get/set)*/
-> > > > -       unsigned char   fsx_pad[8];
-> > > > +       __u16           fsx_xflags2;    /* xflags2 field value (get/set)*/
-> > > > +       __u16           fsx_xflags2_mask;/*mask for xflags2 (get/set)*/
-> > > > +       __u32           fsx_xflags_mask;/* mask for xflags (get/set)*/
-> > > > +       /*
-> > > > +        * For FS_IOC_FSSETXATTR ioctl, fsx_xflags_mask and fsx_xflags2_mask
-> > > > +        * fields specify which FS_XFLAG_* and FS_XFLAG2_* flags from fsx_xflags
-> > > > +        * and fsx_xflags2 fields are going to be changed.
-> > > > +        *
-> > > > +        * For FS_IOC_FSGETXATTR ioctl, fsx_xflags_mask and fsx_xflags2_mask
-> > > > +        * fields specify which FS_XFLAG_* and FS_XFLAG2_* flags are supported.
-> > > > +        */
-> > > >  };
-> > > >
-> > > >  /*
-> > > > - * Flags for the fsx_xflags field
-> > > > + * Flags for the fsx_xflags and fsx_xflags_mask fields
-> > > >   */
-> > > >  #define FS_XFLAG_REALTIME      0x00000001      /* data in realtime volume */
-> > > >  #define FS_XFLAG_PREALLOC      0x00000002      /* preallocated file extents */
-> > > > -#define FS_XFLAG_IMMUTABLE     0x00000008      /* file cannot be modified */
-> > > > +#define FS_XFLAG_IMMUTABLEUSER 0x00000004      /* file cannot be modified, changing this bit does not require CAP_LINUX_IMMUTABLE, equivalent of Windows FILE_ATTRIBUTE_READONLY */
-> > >
-> > > So why not call it FS_XFLAG2_READONLY? IDGI
-> >
-> > Just because to show that these two flags are similar, just one is for
-> > root (or CAP_LINUX_IMMUTABLE) and another is for normal user.
-> >
-> > For example FreeBSD has also both flags (one for root and one for user)
-> > and uses names SF_IMMUTABLE and UF_IMMUTABLE.
-> >
-> > For me having FS_XFLAG_IMMUTABLE and FS_XFLAG2_READONLY sounds less
-> > clear, and does not explain how these two flags differs.
-> >
-> 
-> Yes, I understand, but I do not agree.
-> 
-> What is your goal here?
-> 
-> Do you want to implement FreeBSD UF_IMMUTABLE?
-> maybe UF_APPEND as well?
-> Did anyone ask for this functionality?
-> Not that I know of.
+When the user sets a file or directory as read-only (e.g. ~S_IWUGO),
+the client will set the ATTR_READONLY attribute by sending an
+SMB2_SET_INFO request to the server in cifs_setattr_{,nounix}(), but
+cifsInodeInfo::cifsAttrs will be left unchanged as the client will
+only update the new file attributes in the next call to
+{smb311_posix,cifs}_get_inode_info() with the new metadata filled in
+@data parameter.
 
-None of those.
+Commit a18280e7fdea ("smb: cilent: set reparse mount points as
+automounts") mistakenly removed the @data NULL check when calling
+is_inode_cache_good(), which broke the above case as the new
+ATTR_READONLY attribute would end up not being updated on files with a
+read lease.
 
-> The requirement is to implement an API to the functionality known
-> as READONLY in SMB and NTFS. Right?
+Fix this by updating the inode whenever we have cached metadata in
+@data parameter.
 
-Yes. But Linux is already calling this functionality as "immutable", not
-as "readonly". That is why I thought that using existing name is better
-than inventing a new name for some existing functionality.
+Reported-by: Horst Reiterer <horst.reiterer@fabasoft.com>
+Closes: https://lore.kernel.org/r/85a16504e09147a195ac0aac1c801280@fabasoft.com
+Fixes: a18280e7fdea ("smb: cilent: set reparse mount points as automounts")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/inode.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> TBH, I did not study the semantics of READONLY, but I had a
-> strong feeling that if we looked closely, we will find that other things are
-> possible to do with READONLY files that are not possible with IMMUTABLE
-> files. So I asked ChatGPT and it told me that all these can be changed:
-> 1. File Attributes (Hidden, System, Archive, or Indexed).
-> 2. Permissions (ACL - Access Control List)
-> 3. Timestamps
-> 4. Alternate Data Streams (ADS)
-> 
-> I do not know if ChatGPT is correct
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 214240612549..616149c7f0a5 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -1421,7 +1421,7 @@ int cifs_get_inode_info(struct inode **inode,
+ 	struct cifs_fattr fattr = {};
+ 	int rc;
+ 
+-	if (is_inode_cache_good(*inode)) {
++	if (!data && is_inode_cache_good(*inode)) {
+ 		cifs_dbg(FYI, "No need to revalidate cached inode sizes\n");
+ 		return 0;
+ 	}
+@@ -1520,7 +1520,7 @@ int smb311_posix_get_inode_info(struct inode **inode,
+ 	struct cifs_fattr fattr = {};
+ 	int rc;
+ 
+-	if (is_inode_cache_good(*inode)) {
++	if (!data && is_inode_cache_good(*inode)) {
+ 		cifs_dbg(FYI, "No need to revalidate cached inode sizes\n");
+ 		return 0;
+ 	}
+-- 
+2.48.1
 
-Do not trust ChatGPT.
-
-Modification of main data stream (= file content) or alternate data
-streams is not possible.
-
-Changing of file or extended attributes is possible.
-Timestamp is a file attribute. xattrs are extended attributes.
-
-About ACL I was not sure. But now I tried it and changing ACL is
-possible even with readonly attribute set.
-
-So 1. 2. and 3. is possible to change. 4. not.
-
-> but it also told me that a READONLY
-> file can be deleted (without removing the flag first).
-
-That is wrong. File cannot be deleted if the READONLY attribute is set.
-You first need to clear the READONLY flag. This is one of the main point
-of READONLY attribute.
-
-For example cifs.ko for unlink syscall issue SMB removal and if it is
-failing due to readonly attribute, it clears it and try removal again.
-
-> This is very very far from what IS_IMMUTABLE is.
-> IS_IMMUTABLE is immutable to any metadata change.
-
-I was always looking at this readonly attribute as IMMUTABLE as it
-prevents modification of file content and prevents unlinking the file.
-
-For me it was always very similar to immutable. But if you think that
-changing ACL and file/extended attributes is the reason why it should
-not be called immutable, then I'm fine. Maybe it needs better
-documentation and explanation what each of those two flags can and
-cannot do.
-
-> Thanks,
-> Amir.
