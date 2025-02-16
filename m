@@ -1,145 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36E633C5;
-	Sun, 16 Feb 2025 21:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449F317D346
+	for <linux-cifs@vger.kernel.org>; Sun, 16 Feb 2025 23:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739740650; cv=none; b=NoMG3vI1W6RQqgLwV05FDHca9n0VJnM/eXRS3OVbXl8y7oQMK35dilOaxf4Fljz0IX2/jrAEBfhscCGaSqvk/5JLWAnSg0hbSsFnUApvCTD9IfCQtiLSHcyJSljk1NO3iLe9pcWggQfsiePOnJ+3flXJezhpRGJrOOQrmebPK/M=
+	t=1739748035; cv=none; b=M+WjnvUf8VDI5Tvm1TWgVqk4YBb90NoYG1W+XZ6wLeI9YU97lGCTty6Kr4YE0ZpfCna9mpwWasKuVy2xAksxWPb8FfpFgLS4XghCh1cSnez7WkpdvUmudeK8EM+tdK2hGyRCD+eXnGVEktcS5nM6a62s3iTlPf6Ua5weklYoXgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739740650; c=relaxed/simple;
-	bh=B70L66JAjJLrVOOPdoxtwKfa95fTYtQahdSnp8u5cTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z50KH9tc9JQG6i/r74nL3po/GR1cTgGXq3oku6IJ6c27Sus6au/sQ0BbOswVWmcHnKowG10XnfiXqmON5YAv7TJ/+sTWOPFTAURv1wPKIJZBjig33y++1ZcXqxPGjoKbz0bXVv56wkXKH0L6uKW2KcdjFq1iSjNOGGz2vFmyMmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYQ5J64p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739748035; c=relaxed/simple;
+	bh=RYGN+Rhhe0gO448j0ARsVw3Q4B+E6Su5xVmtP4/kskY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bQ9QboNHBp3dPTOeaJYEp7ZGJ7vJB0Mfkt5MrrHmarT7Y8ITdotI+V3AaxqxVWAuKbCqqisAkuXyMJ+FRLL50hCBmiuusSb9dsOAsDKdhWZnHJ9OpaBhVp6ok0drOEYZPUgpFmve9DSgXU9Gn+sWAM8BdAnDf/+1jeufdlDH3e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BMvf4VLA; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYQ5J64p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B94B6C4CEDD;
-	Sun, 16 Feb 2025 21:17:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739740650;
-	bh=B70L66JAjJLrVOOPdoxtwKfa95fTYtQahdSnp8u5cTA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EYQ5J64pnBy/0gpq4OvAANBzHRHbLamWsJTjcPOWAUNFUyjs5CZjpM7xGSY3MkjJ3
-	 duDSbbHYJcdoPYF03PPqA4IqxD2ewLU+Q55HKxxYH88ypL6M9y7r7clySm5Os88DEs
-	 oFu9bHIgFPIvH5LYl+/YaiiOJkLV4s3pAU4RvzfAijEn9cGhASCro4aXPtB2dsu/eD
-	 mFUylndFn+SRyA6Q4uBTmD9OuyuMcnQ7raBp7gpn7anrHUJIKI8FvQWvD+sV1gtIo+
-	 l2jJI9ZOV/EVdys19PqwjTo6eBwHZt9Kh9J0MND1PL9o0HaSgmImSdZj9KqcjVmojG
-	 F+MJ3pHlnIqYA==
-Received: by pali.im (Postfix)
-	id 7E1147FD; Sun, 16 Feb 2025 22:17:17 +0100 (CET)
-Date: Sun, 16 Feb 2025 22:17:17 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
- for FS_IOC_FS[GS]ETXATTR API
-Message-ID: <20250216211717.f7mvmh4lwpopbukn@pali>
-References: <20250216164029.20673-1-pali@kernel.org>
- <20250216164029.20673-2-pali@kernel.org>
- <20250216183432.GA2404@sol.localdomain>
- <CAOQ4uxigYpzpttfaRc=xAxJc=f2bz89_eCideuftf3egTiE+3A@mail.gmail.com>
- <20250216202441.d3re7lfky6bcozkv@pali>
- <CAOQ4uxj4urR70FmLB_4Qwbp1O5TwvHWSW6QPTCuq7uXp033B7Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMvf4VLA"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5453153782aso1281337e87.2
+        for <linux-cifs@vger.kernel.org>; Sun, 16 Feb 2025 15:20:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739748031; x=1740352831; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uxt/MQdknJ3AT+Yw0Jzh3Tk33id5ktrgblf0ENA9iPA=;
+        b=BMvf4VLANoG9Zwa8K1fkhXT362GQ3jpLRcYdygVQOBHpkXOdKucKO37L5ecWdnCrAz
+         GM9I7/CP4gQFL0F3xNAp7YpIIinUCGTqn5FpLTyAK13TzPxFnx8x0xJ18CYfS2YlqHNA
+         4c2+/HhLmD+3W+blPdnBCfv1j1m4bHHOepd4GR8Mss0AELFUTSK+uROFFLouqGkHB54I
+         nV4Qg1fMls5lk6Mqgx7YCuu/HG/cuvigL6vQo1u4UtAq7PXcqBVJbncTtsivjgBmt7ix
+         6ine8uV6G7DKNJ8yfwsMjgRkHpfB+Wceco1uLG4D19xBxWzi6H8T7wgbqR88coC/8GMU
+         OOcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739748031; x=1740352831;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uxt/MQdknJ3AT+Yw0Jzh3Tk33id5ktrgblf0ENA9iPA=;
+        b=TKvYRv5u7rjCrBneKs3ft25EKoMFOeC7HS8dI4l0NSGe1i0WU0idRCc4dDiNW0fI+0
+         1L4ve/iDdsVEkRvrOYNKzt5kQuNOw6fsU/tEkkwqYcnstbg/88dM26uhxHWtwl/hQF8V
+         9XVPjc0zidjeoIprIy4eJ0nmCTSMXhCpg9fMfvOVx94ggIUcnSbXwAGqg48S2FIip/po
+         a4MPyKpov08WXoHO71lsABt2ZzG25cDaJXRCjSBuD48S4FbP7J3nHiaLaORAYZahM57Z
+         gpUkr5oWWtLyro9OpODkNgA0a2UMHx4xqJda5JukyByTmO1/NNXGuBJBAcmRKsvw0Wj3
+         CYBQ==
+X-Gm-Message-State: AOJu0Yy3clfs24hUI0d3oThzBkYEAfdbe9gN+sgrpgE71+zCKzoJpFA6
+	nFNOFPRdJDok8M91ankfhdq5TyjSza646DSc+eAmSkrPVxvrdCkSDwHSE26yk/z9MfaR07tueHr
+	prZqMvNC/zixsFhbtsxXWJ8gwovD3Ow==
+X-Gm-Gg: ASbGncvupU58G1/cLQ2ZJ/60qK+yEWC7TazmA6IZ8cTsv2CZTmM9EsfurUSD5zBxwtj
+	84MXz/Q19X4uOIu/rQwyRXBsg8cGX3aQhvN07kaEwh9/qCPICMZS8TIy3VmjpVOfWBz8YOj43a6
+	kh2PR4p5q6fq0qCevCoaEYn+R+j+yAD0g=
+X-Google-Smtp-Source: AGHT+IEWnrL4mZXcaNzujXT/n3nkRbqprJqjsW80CZsAZpbXOw6yl0Z/YzLTGPgywVqkTlytUED56ZwvXqfzPoFxID4=
+X-Received: by 2002:a05:6512:ad2:b0:545:c33:40a7 with SMTP id
+ 2adb3069b0e04-5452fe63611mr1290732e87.26.1739748031072; Sun, 16 Feb 2025
+ 15:20:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxj4urR70FmLB_4Qwbp1O5TwvHWSW6QPTCuq7uXp033B7Q@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+References: <20250216210247.190316-1-pc@manguebit.com>
+In-Reply-To: <20250216210247.190316-1-pc@manguebit.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 16 Feb 2025 17:20:19 -0600
+X-Gm-Features: AWEUYZlIykmCqOSli1-i7Uiqt0S1KXdo9dCVFjJTA76y8WtZTfp0-ajqArC58yo
+Message-ID: <CAH2r5muykjcBKmL-9sEurzzzOCBn3C9_ZAXbEFk=-FZjseDVXg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix chmod(2) regression with ATTR_READONLY
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org, Horst Reiterer <horst.reiterer@fabasoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sunday 16 February 2025 21:43:02 Amir Goldstein wrote:
-> On Sun, Feb 16, 2025 at 9:24 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > On Sunday 16 February 2025 21:17:55 Amir Goldstein wrote:
-> > > On Sun, Feb 16, 2025 at 7:34 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >
-> > > > On Sun, Feb 16, 2025 at 05:40:26PM +0100, Pali Rohár wrote:
-> > > > > This allows to get or set FS_COMPR_FL and FS_ENCRYPT_FL bits via FS_IOC_FSGETXATTR/FS_IOC_FSSETXATTR API.
-> > > > >
-> > > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > >
-> > > > Does this really allow setting FS_ENCRYPT_FL via FS_IOC_FSSETXATTR, and how does
-> > > > this interact with the existing fscrypt support in ext4, f2fs, ubifs, and ceph
-> > > > which use that flag?
-> > >
-> > > As far as I can tell, after fileattr_fill_xflags() call in
-> > > ioctl_fssetxattr(), the call
-> > > to ext4_fileattr_set() should behave exactly the same if it came some
-> > > FS_IOC_FSSETXATTR or from FS_IOC_SETFLAGS.
-> > > IOW, EXT4_FL_USER_MODIFIABLE mask will still apply.
-> > >
-> > > However, unlike the legacy API, we now have an opportunity to deal with
-> > > EXT4_FL_USER_MODIFIABLE better than this:
-> > >         /*
-> > >          * chattr(1) grabs flags via GETFLAGS, modifies the result and
-> > >          * passes that to SETFLAGS. So we cannot easily make SETFLAGS
-> > >          * more restrictive than just silently masking off visible but
-> > >          * not settable flags as we always did.
-> > >          */
-> > >
-> > > if we have the xflags_mask in the new API (not only the xflags) then
-> > > chattr(1) can set EXT4_FL_USER_MODIFIABLE in xflags_mask
-> > > ext4_fileattr_set() can verify that
-> > > (xflags_mask & ~EXT4_FL_USER_MODIFIABLE == 0).
-> > >
-> > > However, Pali, this is an important point that your RFC did not follow -
-> > > AFAICT, the current kernel code of ext4_fileattr_set() and xfs_fileattr_set()
-> > > (and other fs) does not return any error for unknown xflags, it just
-> > > ignores them.
-> > >
-> > > This is why a new ioctl pair FS_IOC_[GS]ETFSXATTR2 is needed IMO
-> > > before adding support to ANY new xflags, whether they are mapped to
-> > > existing flags like in this patch or are completely new xflags.
-> > >
-> > > Thanks,
-> > > Amir.
-> >
-> > But xflags_mask is available in this new API. It is available if the
-> > FS_XFLAG_HASEXTFIELDS flag is set. So I think that the ext4 improvement
-> > mentioned above can be included into this new API.
-> >
-> > Or I'm missing something?
-> 
-> Yes, you are missing something very fundamental to backward compat API -
-> You cannot change the existing kernels.
-> 
-> You should ask yourself one question:
-> What happens if I execute the old ioctl FS_IOC_FSSETXATTR
-> on an existing old kernel with the new extended flags?
-> 
-> The answer, to the best of my code emulation abilities is that
-> old kernel will ignore the new xflags including FS_XFLAG_HASEXTFIELDS
-> and this is suboptimal, because it would be better for the new chattr tool
-> to get -EINVAL when trying to set new xflags and mask on an old kernel.
-> 
-> It is true that the new chattr can call the old FS_IOC_FSGETXATTR
-> ioctl and see that it has no FS_XFLAG_HASEXTFIELDS,
+tentatively merged into cifs-2.6.git for-next pending more testing and revi=
+ew
 
-Yes, this was my intention how the backward and forward compatibility
-will work. I thought that reusing existing IOCTL is better than creating
-new IOCTL and duplicating functionality.
+On Sun, Feb 16, 2025 at 3:02=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
+>
+> When the user sets a file or directory as read-only (e.g. ~S_IWUGO),
+> the client will set the ATTR_READONLY attribute by sending an
+> SMB2_SET_INFO request to the server in cifs_setattr_{,nounix}(), but
+> cifsInodeInfo::cifsAttrs will be left unchanged as the client will
+> only update the new file attributes in the next call to
+> {smb311_posix,cifs}_get_inode_info() with the new metadata filled in
+> @data parameter.
+>
+> Commit a18280e7fdea ("smb: cilent: set reparse mount points as
+> automounts") mistakenly removed the @data NULL check when calling
+> is_inode_cache_good(), which broke the above case as the new
+> ATTR_READONLY attribute would end up not being updated on files with a
+> read lease.
+>
+> Fix this by updating the inode whenever we have cached metadata in
+> @data parameter.
+>
+> Reported-by: Horst Reiterer <horst.reiterer@fabasoft.com>
+> Closes: https://lore.kernel.org/r/85a16504e09147a195ac0aac1c801280@fabaso=
+ft.com
+> Fixes: a18280e7fdea ("smb: cilent: set reparse mount points as automounts=
+")
+> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> ---
+>  fs/smb/client/inode.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> index 214240612549..616149c7f0a5 100644
+> --- a/fs/smb/client/inode.c
+> +++ b/fs/smb/client/inode.c
+> @@ -1421,7 +1421,7 @@ int cifs_get_inode_info(struct inode **inode,
+>         struct cifs_fattr fattr =3D {};
+>         int rc;
+>
+> -       if (is_inode_cache_good(*inode)) {
+> +       if (!data && is_inode_cache_good(*inode)) {
+>                 cifs_dbg(FYI, "No need to revalidate cached inode sizes\n=
+");
+>                 return 0;
+>         }
+> @@ -1520,7 +1520,7 @@ int smb311_posix_get_inode_info(struct inode **inod=
+e,
+>         struct cifs_fattr fattr =3D {};
+>         int rc;
+>
+> -       if (is_inode_cache_good(*inode)) {
+> +       if (!data && is_inode_cache_good(*inode)) {
+>                 cifs_dbg(FYI, "No need to revalidate cached inode sizes\n=
+");
+>                 return 0;
+>         }
+> --
+> 2.48.1
+>
 
-> so I agree that a new ioctl is not absolutely necessary,
-> but I still believe that it is a better API design.
 
-If it is a bad idea then for sure I can prepare new IOCTL and move all
-new functionality only into the new IOCTL, no problem.
+--=20
+Thanks,
 
-> Would love to hear what other fs developers prefer.
-> 
-> Thanks,
-> Amir.
+Steve
