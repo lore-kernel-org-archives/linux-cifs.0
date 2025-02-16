@@ -1,64 +1,224 @@
-Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513C7E1
-	for <linux-cifs@vger.kernel.org>; Sun, 16 Feb 2025 19:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CD414A4DF;
+	Sun, 16 Feb 2025 19:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739734041; cv=none; b=GBKeVrznMxlEiSGXImizXofSlGpYOR4dDg0Z4/eiPt6YrlcqK+ThDX2W+hQWH7KSenzhn0Z5EoVrsR4vNmZHtxyn1EH1IZvKjpMWAMIAi03bGxOmJ8shz9Xi1jRIbI5KkMGDGei05B2fgiVSey+/xfWcuepTbdKG7HWsdE4CL64=
+	t=1739735724; cv=none; b=q8/F92VaBsa0UBxyvy3xEJoC4PwkrOdK4cP/hS2FpmeQLUYSCBJ8HnwXtIEXq6p1TwoSWTg1pDQvFRmc3efv/l4z7O4DhBAklCVLhKBe+F8Gj9R+WM0P0UveqEJlkMfJKvW2lMwTuHgm7dtfRvzbEAvdWnSAtW7OxVn4jR8qYWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739734041; c=relaxed/simple;
-	bh=4ex8RcfQu7IHFZxFinFZN7TlSMIqiyusL8wDkw98VtU=;
-	h=Message-Id:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
-	 MIME-Version; b=twaKTPAMEgAZmj2S5DVTU9QMiSdYQcroBg9gLbeFnMJMTJDfIrz34oISKWoI9n61QK/ULjeHEhXlF40n0Kztix2J74WdbA4/3OM/j2PbdaovN9QXE6AycJ7QAZKdMtMD/EX/Hb42K3RDM2J45mrG4+xeYf368AUEInu4uIpTBvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=WntFwhUb; arc=none smtp.client-ip=176.96.139.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
+	s=arc-20240116; t=1739735724; c=relaxed/simple;
+	bh=cUFwdCYp1y9cf9WgQ7945xolw8SU5jXmThPQFq26R3w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ri/DgSI1nXzHmdiJ2WuCqFObvlgb4f0wqni3Q30XynkuBvuCDDtfm+OhtLJJywZoKkvQni1rYJ/AQOLl8HSpQNBrjUJ9A+GoEyM5tGoMpWI9HyXjcGPJFcSDzwV5HGebmhxRMWNhuXO2pxGzcE1IKeKYSNrToNdZ7gKl7Lky1pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WF3UQQNI; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="WntFwhUb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
-	t=1739733603;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
-	bh=XH72tr2idvIk+UOVMGDZP86K+TrBz1B/SN42+v4PqjM=;
-	b=WntFwhUbh9kaRhIxZR7/ouELCb1P/J9jwl9SQWmb5Tl0bSfdaZnYQxUJ6sKLyYacrUHiOB
-	JGRaA9HQLNX1nhD9SV1A3Q0iUK1G/47TD4DfevdTq9OdJC4YUAEEVAVsm/Uzx+m7Wub/cb
-	rTWe6ErWVRhLaPdmxE7TYOaBiu8M9zh8atEoojjPVjF/+2x9kWekDXiG25VgO0NweghkOX
-	kpSeqYyldxZ5riB3qCg23Jpl6Cba/dg6/XgxW4eSVMOvN8mBVIfSjZaL0uXYWvViqHfiJs
-	+T/3NQ9HmiQw8G0T+1hDu76heB5NhBufqstWcXRNGK2Agfy079n/6Eud9j8W5w==
-Message-Id: <41f6d054f2c0a153cdef56de053e109dc3a85952.camel@rx2.rx-server.de>
-Subject: Re: man: Incorrect description of mapchars and mapposix
-From: Philipp Kerling <pkerling@casix.org>
-To: e.bachmakov@gmail.com
-Cc: linux-cifs@vger.kernel.org
-Date: Sun, 16 Feb 2025 20:20:03 +0100
-In-Reply-To: <CADCRUiMn_2Vk3HZzU0WKu3xPgo1P-1aqDy+NjEzOz03W-HFChw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WF3UQQNI"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-abb999658fbso35057466b.3;
+        Sun, 16 Feb 2025 11:55:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739735721; x=1740340521; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FjuEgIRPEVxOOOXwspmjErHTDOYB/IsuvwkVh9SDhiE=;
+        b=WF3UQQNIZum36jc9IcpIiuGwVAS2aHrLlBP6x/LmwuRGX+JRK9f6gJDxTFZiJGL5Qo
+         4LKlY2D2HqNmgJpE+lAArkgRdaCrFbYpgIkfGQ2ugYqwXcq8anT6+esLC5t0z4YlF4IG
+         09s/1s0coM03uIxQ3Ddzh3yB5lpA7hGesK2iPQQ6ikcOYhuJybfd3jlJ5A8tPFE6hF4c
+         4jWOE65Ma7Ft9NAFBLm8mUnQc36NQNYT4VA0FLRjA7byR4Eecl0PyyxDeq4+ar3ZYhwb
+         an1tAq9kPteVoACOsLPF8dImum7cyFdgkozwhMVuRa5+xRNk9cNITMgV0I7EmEPsdcmD
+         TvRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739735721; x=1740340521;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FjuEgIRPEVxOOOXwspmjErHTDOYB/IsuvwkVh9SDhiE=;
+        b=HSZNtH79znkpV1I8mHWj/BevCA2E4Mkt4SIMzf31zEaJDgrqR/BN7TNArUdARL8xTk
+         j0/mesjmInz2VWG/DKLSJFlKLlBtYx14oZvLMIYNKqNqZ0aRB2HIvltYGXd6dJZ3XwG3
+         wuZzdvsgSFAXleQv8f0GACMhS2DqG/5ttTWCX1x/MN3LF5sphps6LkkJKvfMcEFvGPkG
+         LabZ5wuCXAQtqrupXprSl/cLEV/fGqTGQtanjdtHkfrkSMNFUcZ8krV0SKzHLlztvQPL
+         YkBC2EzhVi6/cninRM8frsPNpcRAZRks1FWZQN/BQOmXurYGftLcaKEANII5q7ceyPNg
+         PM6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVHEuWQRItLNs2aM1yOsfRhjPvBhtM4ny0JpLF5o6igoCaqdLJ0+bqYHzPfwV0QkSjcbuTl9Rits53V@vger.kernel.org, AJvYcCWKsb64w/uYwl0ur1yL/1NM0hn/MSXm4bDBOm1sZgIRMH6tdbBZeQmOY8b9X/dcbAHdVXrqFVPE2n/0JZPi@vger.kernel.org, AJvYcCXGUj8knbPPZCrI8Cb+QBc8+ZT6kpzKAFxOBvFEgxilScHvKve8tHzpl+1+8yijwMQzVeL+rjwCV/TLkQh4+Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywsgrf05chZ2hh03HaXtfMNvacYYUxUgUgACKaRxoVi+/p9zuCy
+	DUFFEzhpxD+Ja3I0QMXv0PmrMQrw7FbzX+Du8zp3jPdkSM8tNjLstLlIx21C/LIPq3v0P9BRke5
+	Aw9yt/NS0fXQggtXy5FZ1b5RNF+g=
+X-Gm-Gg: ASbGncsMroDzBXNipDmU5AbzPSUOe8Y5HXoFjOucepdun9zn2GBCSvduFBV37TXfFGc
+	5NYEJ5HJStN9xDj+ulKdCY7Y1Eo4IJF0rYsEh5pI3b0/1HOqCwF864uvMDB0zxI22p/IfZgTC
+X-Google-Smtp-Source: AGHT+IGeUh5D2COm7DcMHyM5fyROj+2hiuMiWSXd7/XaOT0L3NOIbBruVcshszxVHb/lbtMUy7x8ICnFwlGoJdcOB3w=
+X-Received: by 2002:a05:6402:3547:b0:5dc:cf9b:b04a with SMTP id
+ 4fb4d7f45d1cf-5e035ff9d49mr16638900a12.1.1739735720389; Sun, 16 Feb 2025
+ 11:55:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250216164029.20673-1-pali@kernel.org> <20250216164029.20673-3-pali@kernel.org>
+In-Reply-To: <20250216164029.20673-3-pali@kernel.org>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Sun, 16 Feb 2025 20:55:09 +0100
+X-Gm-Features: AWEUYZlaY-TvdolXkAkXWU4H4qU60nI1n-YilFzKQFF4WUuxD4hzLDGa7m4iGBU
+Message-ID: <CAOQ4uxi0saGQYF5qgCKWu_mLNg8FZBHqZu3TvnqpY8v8Hmq-nQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/4] fs: Extend FS_IOC_FS[GS]ETXATTR API for Windows attributes
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, ronnie sahlberg <ronniesahlberg@gmail.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Steve French <sfrench@samba.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I am pretty sure you are right, I also noticed this behavior trying to
-debug some name mangling issues that I head.
+On Sun, Feb 16, 2025 at 5:42=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
+rote:
+>
+> struct fsxattr has 8 reserved padding bytes. Use these bytes for defining
+> new fields fsx_xflags2, fsx_xflags2_mask and fsx_xflags_mask in backward
+> compatible manner. If the new FS_XFLAG_HASEXTFIELDS flag in fsx_xflags is
+> not set then these new fields are treated as not present, like before thi=
+s
+> change.
+>
+> New field fsx_xflags_mask for SET operation specifies which flags in
+> fsx_xflags are going to be changed. This would allow userspace applicatio=
+n
+> to change just subset of all flags. For GET operation this field specifie=
+s
+> which FS_XFLAG_* flags are supported by the file.
+>
+> New field fsx_xflags2 specify new flags FS_XFLAG2_* which defines some of
+> Windows FILE_ATTRIBUTE_* attributes, which are mostly not going to be
+> interpreted or used by the kernel, and are mostly going to be used by
+> userspace. Field fsx_xflags2_mask then specify mask for them.
+>
+> This change defines just API without filesystem support for them. These
+> attributes can be implemented later for Windows filesystems like FAT, NTF=
+S,
+> exFAT, UDF, SMB, NFS4 which all native storage for those attributes (or a=
+t
+> least some subset of them).
+>
+> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+> ---
+>  include/uapi/linux/fs.h | 36 +++++++++++++++++++++++++++++++-----
+>  1 file changed, 31 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> index 367bc5289c47..93e947d6e604 100644
+> --- a/include/uapi/linux/fs.h
+> +++ b/include/uapi/linux/fs.h
+> @@ -145,15 +145,26 @@ struct fsxattr {
+>         __u32           fsx_nextents;   /* nextents field value (get)   *=
+/
+>         __u32           fsx_projid;     /* project identifier (get/set) *=
+/
+>         __u32           fsx_cowextsize; /* CoW extsize field value (get/s=
+et)*/
+> -       unsigned char   fsx_pad[8];
+> +       __u16           fsx_xflags2;    /* xflags2 field value (get/set)*=
+/
+> +       __u16           fsx_xflags2_mask;/*mask for xflags2 (get/set)*/
+> +       __u32           fsx_xflags_mask;/* mask for xflags (get/set)*/
+> +       /*
+> +        * For FS_IOC_FSSETXATTR ioctl, fsx_xflags_mask and fsx_xflags2_m=
+ask
+> +        * fields specify which FS_XFLAG_* and FS_XFLAG2_* flags from fsx=
+_xflags
+> +        * and fsx_xflags2 fields are going to be changed.
+> +        *
+> +        * For FS_IOC_FSGETXATTR ioctl, fsx_xflags_mask and fsx_xflags2_m=
+ask
+> +        * fields specify which FS_XFLAG_* and FS_XFLAG2_* flags are supp=
+orted.
+> +        */
+>  };
+>
+>  /*
+> - * Flags for the fsx_xflags field
+> + * Flags for the fsx_xflags and fsx_xflags_mask fields
+>   */
+>  #define FS_XFLAG_REALTIME      0x00000001      /* data in realtime volum=
+e */
+>  #define FS_XFLAG_PREALLOC      0x00000002      /* preallocated file exte=
+nts */
+> -#define FS_XFLAG_IMMUTABLE     0x00000008      /* file cannot be modifie=
+d */
+> +#define FS_XFLAG_IMMUTABLEUSER 0x00000004      /* file cannot be modifie=
+d, changing this bit does not require CAP_LINUX_IMMUTABLE, equivalent of Wi=
+ndows FILE_ATTRIBUTE_READONLY */
 
-In addition, the description that "nomapchars" is the "default"
-behavior is also wrong. Inspecting smb3_init_fs_context in the kernel
-source (as of 6.13), it says "default to SFM style remapping of seven
-reserved characters unless user overrides it or we negotiate CIFS POSIX
-where  it is unnecessary."
-Also, the SFM style remapping does a bit more than documented. It also
-converts double quotes (") in all positions and space and period chars
-at the end of path components.
+So why not call it FS_XFLAG2_READONLY? IDGI
 
-As far as I can tell, The Linux kernel documentation at
-https://docs.kernel.org/admin-guide/cifs/usage.html has the same
-issues.
+Does anyone think that FS_XFLAG_IMMUTABLEUSER is more clear or something?
 
-I'm willing to propose changes to the documentation if someone can
-confirm that the above statements are indeed correct.
+Thanks,
+Amir.
 
+> +#define FS_XFLAG_IMMUTABLE     0x00000008      /* file cannot be modifie=
+d, changing this bit requires CAP_LINUX_IMMUTABLE */
+>  #define FS_XFLAG_APPEND                0x00000010      /* all writes app=
+end */
+>  #define FS_XFLAG_SYNC          0x00000020      /* all writes synchronous=
+ */
+>  #define FS_XFLAG_NOATIME       0x00000040      /* do not update access t=
+ime */
+> @@ -167,10 +178,25 @@ struct fsxattr {
+>  #define FS_XFLAG_FILESTREAM    0x00004000      /* use filestream allocat=
+or */
+>  #define FS_XFLAG_DAX           0x00008000      /* use DAX for IO */
+>  #define FS_XFLAG_COWEXTSIZE    0x00010000      /* CoW extent size alloca=
+tor hint */
+> -#define FS_XFLAG_COMPRESSED    0x00020000      /* compressed file */
+> -#define FS_XFLAG_ENCRYPTED     0x00040000      /* encrypted file */
+> +#define FS_XFLAG_COMPRESSED    0x00020000      /* compressed file, equiv=
+alent of Windows FILE_ATTRIBUTE_COMPRESSED */
+> +#define FS_XFLAG_ENCRYPTED     0x00040000      /* encrypted file, equiva=
+lent of Windows FILE_ATTRIBUTE_ENCRYPTED */
+> +#define FS_XFLAG_CHECKSUMS     0x00080000      /* checksum for data and =
+metadata, equivalent of Windows FILE_ATTRIBUTE_INTEGRITY_STREAM */
+> +#define FS_XFLAG_HASEXTFIELDS  0x40000000      /* fields fsx_xflags_mask=
+, fsx_xflags2 and fsx_xflags2_mask are present */
+>  #define FS_XFLAG_HASATTR       0x80000000      /* no DIFLAG for this   *=
+/
+>
+> +/*
+> + * Flags for the fsx_xflags2 and fsx_xflags2_mask fields
+> + */
+> +#define FS_XFLAG2_HIDDEN       0x0001  /* inode is hidden, equivalent of=
+ Widows FILE_ATTRIBUTE_HIDDEN */
+> +#define FS_XFLAG2_SYSTEM       0x0002  /* inode is part of operating sys=
+tem, equivalent of Windows FILE_ATTRIBUTE_SYSTEM */
+> +#define FS_XFLAG2_ARCHIVE      0x0004  /* inode was not archived yet, eq=
+uivalent of Windows FILE_ATTRIBUTE_ARCHIVE */
+> +#define FS_XFLAG2_TEMPORARY    0x0008  /* inode content does not have to=
+ preserved across reboots, equivalent of Windows FILE_ATTRIBUTE_TEMPORARY *=
+/
+> +#define FS_XFLAG2_NOTINDEXED   0x0010  /* inode will not be indexed by c=
+ontent indexing service, equivalent of Windows FILE_ATTRIBUTE_NOT_CONTENT_I=
+NDEXED */
+> +#define FS_XFLAG2_NOSCRUBDATA  0x0020  /* file inode will not be checked=
+ by scrubber (proactive background data integrity scanner), for directory i=
+node it means that newly created child would have this flag set, equivalent=
+ of Windows FILE_ATTRIBUTE_NO_SCRUB_DATA */
+> +#define FS_XFLAG2_OFFLINE      0x0040  /* inode is marked as HSM offline=
+, equivalent of Windows FILE_ATTRIBUTE_OFFLINE */
+> +#define FS_XFLAG2_PINNED       0x0080  /* inode data content must be alw=
+ays stored in local HSM storage, equivalent of Windows FILE_ATTRIBUTE_PINNE=
+D */
+> +#define FS_XFLAG2_UNPINNED     0x0100  /* inode data content can be remo=
+ved from local HSM storage, equivalent of Windows FILE_ATTRIBUTE_UNPINNED *=
+/
+> +
+>  /* the read-only stuff doesn't really belong here, but any other place i=
+s
+>     probably as bad and I don't want to create yet another include file. =
+*/
+>
+> --
+> 2.20.1
+>
