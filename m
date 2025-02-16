@@ -1,83 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3DA32C8B;
-	Sun, 16 Feb 2025 18:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513C7E1
+	for <linux-cifs@vger.kernel.org>; Sun, 16 Feb 2025 19:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739731760; cv=none; b=ir8NKPdZtFpyapVZEpo5+7gWlISRzSo5RfMm/uKbJDstdUDAbmEZWwO5XagElP/ySW8TkyIsK8oR/7kunRVS3Joya18tbfzxLh27sPRCOsaiJ5Z2s5oSHa4mFhSm4ZsvcnQMjwtQyD2TJMpttc4CxrjGoqkqs9ClY2dcQc+gR38=
+	t=1739734041; cv=none; b=GBKeVrznMxlEiSGXImizXofSlGpYOR4dDg0Z4/eiPt6YrlcqK+ThDX2W+hQWH7KSenzhn0Z5EoVrsR4vNmZHtxyn1EH1IZvKjpMWAMIAi03bGxOmJ8shz9Xi1jRIbI5KkMGDGei05B2fgiVSey+/xfWcuepTbdKG7HWsdE4CL64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739731760; c=relaxed/simple;
-	bh=6SJKxdr3CHZodxSX4Pw6E6iSXqrdPMgfMqdFeaPKRJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AE5/EQztV7USc6gR+jeGIcRX26ONJla6v8tIucx+j/H4BuAMFSHEwMREMuEeIKyiP65cQXqrH0sqSMto//Pe4YYLzRNxQ+HK33Pn+oRaNi+2c2g0e9Q1Q9WgQbsS3z/BoS5LDyGHqNhlbNQvyCEu+0IZ3H5jMY/EWiK9X+2ley4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCJUU/5h; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739734041; c=relaxed/simple;
+	bh=4ex8RcfQu7IHFZxFinFZN7TlSMIqiyusL8wDkw98VtU=;
+	h=Message-Id:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=twaKTPAMEgAZmj2S5DVTU9QMiSdYQcroBg9gLbeFnMJMTJDfIrz34oISKWoI9n61QK/ULjeHEhXlF40n0Kztix2J74WdbA4/3OM/j2PbdaovN9QXE6AycJ7QAZKdMtMD/EX/Hb42K3RDM2J45mrG4+xeYf368AUEInu4uIpTBvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=WntFwhUb; arc=none smtp.client-ip=176.96.139.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCJUU/5h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED970C4CEDD;
-	Sun, 16 Feb 2025 18:49:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739731760;
-	bh=6SJKxdr3CHZodxSX4Pw6E6iSXqrdPMgfMqdFeaPKRJI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fCJUU/5havBVpgmwHCcK6kNYnX2SSuc6XSM+PIq7vEo0tdLqde/ulHJxwfyVlN/7a
-	 I/PiPRfvnZjkxeXWYMfrFRKLBDjYU/64mzj0qdxFUrjm2gAV016W7cxFsnxlP4KZPV
-	 fnTsQovPjDHQaiXaiUul1ZtlqqOBSbD680lf8xrdmSGrCpGD5Ln+QnuR6sVa6eFooQ
-	 nfGZ1o3QrXtscA3gURVOUaa9wGg/8FF3uIqCJE7fHLgp7tvGIGR3pLhuP7agKVD3zu
-	 KajPFtaEBT1WJfNguhWHSHPWbCRgnTtJst6d9IJtfTMRiEgVCQuZ00YuKrItmveMA/
-	 lSR8TMhrVAXXQ==
-Received: by pali.im (Postfix)
-	id E0AC17FD; Sun, 16 Feb 2025 19:49:07 +0100 (CET)
-Date: Sun, 16 Feb 2025 19:49:07 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Amir Goldstein <amir73il@gmail.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
- for FS_IOC_FS[GS]ETXATTR API
-Message-ID: <20250216184907.wuezls5brv3syosa@pali>
-References: <20250216164029.20673-1-pali@kernel.org>
- <20250216164029.20673-2-pali@kernel.org>
- <20250216183432.GA2404@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="WntFwhUb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
+	t=1739733603;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+	bh=XH72tr2idvIk+UOVMGDZP86K+TrBz1B/SN42+v4PqjM=;
+	b=WntFwhUbh9kaRhIxZR7/ouELCb1P/J9jwl9SQWmb5Tl0bSfdaZnYQxUJ6sKLyYacrUHiOB
+	JGRaA9HQLNX1nhD9SV1A3Q0iUK1G/47TD4DfevdTq9OdJC4YUAEEVAVsm/Uzx+m7Wub/cb
+	rTWe6ErWVRhLaPdmxE7TYOaBiu8M9zh8atEoojjPVjF/+2x9kWekDXiG25VgO0NweghkOX
+	kpSeqYyldxZ5riB3qCg23Jpl6Cba/dg6/XgxW4eSVMOvN8mBVIfSjZaL0uXYWvViqHfiJs
+	+T/3NQ9HmiQw8G0T+1hDu76heB5NhBufqstWcXRNGK2Agfy079n/6Eud9j8W5w==
+Message-Id: <41f6d054f2c0a153cdef56de053e109dc3a85952.camel@rx2.rx-server.de>
+Subject: Re: man: Incorrect description of mapchars and mapposix
+From: Philipp Kerling <pkerling@casix.org>
+To: e.bachmakov@gmail.com
+Cc: linux-cifs@vger.kernel.org
+Date: Sun, 16 Feb 2025 20:20:03 +0100
+In-Reply-To: <CADCRUiMn_2Vk3HZzU0WKu3xPgo1P-1aqDy+NjEzOz03W-HFChw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250216183432.GA2404@sol.localdomain>
-User-Agent: NeoMutt/20180716
 
-On Sunday 16 February 2025 10:34:32 Eric Biggers wrote:
-> On Sun, Feb 16, 2025 at 05:40:26PM +0100, Pali Rohár wrote:
-> > This allows to get or set FS_COMPR_FL and FS_ENCRYPT_FL bits via FS_IOC_FSGETXATTR/FS_IOC_FSSETXATTR API.
-> > 
-> > Signed-off-by: Pali Rohár <pali@kernel.org>
-> 
-> Does this really allow setting FS_ENCRYPT_FL via FS_IOC_FSSETXATTR, and how does
-> this interact with the existing fscrypt support in ext4, f2fs, ubifs, and ceph
-> which use that flag?  In the fscrypt case it's very intentional that
-> FS_ENCRYPT_FL can be gotten via FS_IOC_GETFLAGS but not set via FS_IOC_SETFLAGS.
-> A simple toggle of the flag can't work, as it doesn't provide the needed
-> information.  Instead there is a separate ioctl (FS_IOC_SET_ENCRYPTION_POLICY)
-> for enabling encryption which takes additional parameters and only works on
-> empty directories.
-> 
-> - Eric
+I am pretty sure you are right, I also noticed this behavior trying to
+debug some name mangling issues that I head.
 
-This encrypt flag I have not implemented in the last cifs patch.
-For SMB it needs to use additional SMB IOCTL which is not supported yet.
-So I have not looked at that deeply yet.
+In addition, the description that "nomapchars" is the "default"
+behavior is also wrong. Inspecting smb3_init_fs_context in the kernel
+source (as of 6.13), it says "default to SFM style remapping of seven
+reserved characters unless user overrides it or we negotiate CIFS POSIX
+where  it is unnecessary."
+Also, the SFM style remapping does a bit more than documented. It also
+converts double quotes (") in all positions and space and period chars
+at the end of path components.
 
-I tested only that setting and clearing compression bit is working over
-cifs SMB client, via that additional SMB IOCTL.
+As far as I can tell, The Linux kernel documentation at
+https://docs.kernel.org/admin-guide/cifs/usage.html has the same
+issues.
+
+I'm willing to propose changes to the documentation if someone can
+confirm that the above statements are indeed correct.
+
