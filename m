@@ -1,69 +1,36 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64731DDC21
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Feb 2025 22:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1E32862B7;
+	Tue, 18 Feb 2025 23:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739919395; cv=none; b=r6e8ewMTIi9xTX5S/XPSI5SGGHGcONmeGQNv/KewSZ7sPrEJfCSBd2gGiBCq82pNVTpYZp+/XqJrzfq57pqBYYmedBaRj+ZfhdC3sZT74VUdp1z2xYPlm2mNnz4xsDnOe/6WQNybWxvuKEOuJ2PfvbWqi33UUaC22xzhB89RY0c=
+	t=1739920017; cv=none; b=sijYroweCq0RmC7cvCR0dRj3HwPaHG+c4cbiEXdzU/Nges5Sn3JwmaBaQMesythjPtElTWMlpNvalIAi6R5SR6AWiYpIqyx/Ms/AXiGCwGVtMln3p4yE6U1vSOvuvwJazs1YldqgevSwINb4x0pxtcCH6ja3AtPyPNNC/0q+kUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739919395; c=relaxed/simple;
-	bh=fVxPrj6+hYQCby6mCw3BdWYLLIhFV5a0roY1nnG1mjk=;
+	s=arc-20240116; t=1739920017; c=relaxed/simple;
+	bh=XjJ7I+jIGdeY9vOy9NYF19tpQmyUregmGJlukIni29g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CM7WLYEfvFDAmuSyQbS2yMebLz60BA4/v0kFbWYY9B6sJKMOca92d7ApyjdAAImwX4VV7uO1WsgmHzyBzMsXkhK4rbMgAXM4ffPRVwdR3nqJArXZPx4+gcHyh+bh/op0ph++xvqpLVKnM4Xwu6ZE/tuDvy9OIBDuCzkEyMbS3LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=ML57H0ZS; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=qbTi4FTMvq6eLapSUOS1yIXkU6FAt8kFpm4EEf4or/ui6GyM1BH8YzvcnkF2RSP5klszWK0yePQ18TjFLpc8qK0PMCxJTXYxnb2uIVV0kOxNhfMDFBCwIKY1RlNoD7WLpOZqQhmVxPMh66V8wPtkcVjq51gtVVi9Z9qul4uOOoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cRdA03wr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="ML57H0ZS"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-220c4159f87so80802805ad.0
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Feb 2025 14:56:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1739919393; x=1740524193; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jOVGrwW7CiNLR2dUss7zOvX9uZEpJq6PAvR2PcA9dY8=;
-        b=ML57H0ZSZIKh0NTFj/Hi4cwPTdM7DiQ7EsOi+TlZcfapBdS4AF5gDZ0FcOQBEGOIQt
-         SAyE70RLfIzxbPi2a/WwrO9APgFDdg6bmPoCNoBNJB5IZzcmtxEK+K8+SfP652mSjNFE
-         vDPw2MEcLJ/6a7/ATKS8yFK+1KCDOw63vWXG1gOiuXiCikObS2Qu82egYj7tMoJXpJqj
-         woiX7fbDf4fvO2CETuVhgp7EyGTgn4wVCSpXdnfcoJpWEP5HzjEJNrGXSZ/k1+EEhUV4
-         BnsuzlXcLXCgB7LHI0OEsDJTEbTuKqqe0fK1P1ADYR+lfg31c0Qbw+Y8JTWg4/7gmakX
-         PuPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739919393; x=1740524193;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jOVGrwW7CiNLR2dUss7zOvX9uZEpJq6PAvR2PcA9dY8=;
-        b=PKl8N4dKKqlBAFYurqcDEnj+b2AGuBEmugF1rFvx2ITnF2ftGVrrq4XRk0CEg/hTFa
-         hY0dNz9RxG95ayNOeskid/ta5PghKv0+MG7+9l6q8v+7f9YSolS5memhT98ASdC3cOBE
-         djoBv0vOivk6ATikd5hMicuKcThaDWZobiJB/PpmNVUOaTMKoKv1XjAFK96vhTgy0TV9
-         32wDHHHNsD5sP1rJVXvGGm0lCQzy2QpZsmy8QKdK6kl6MqF905WDHAL/6HSy1fDiKKnG
-         fgKU59Jr6dvdcOxrAoYebqZjdwB7JoPAlhbQVSACkc1JhS3hiSJzZwpomsbM8IxJ6h02
-         WXOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfF15x/V5trRFpr8rwasr9ikzHbFtHszdFdl1+IyJndB+55+/ABDk0KdmAA215jP3MMvN5JZfZP/Fx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwprHh6Tmbeb8Qe1m6fNCvBDxZ0eDdkNUnwzjh9vkKRvZGHbkn9
-	EBbPkCOUbPs8QWja9ElC53YZtbiT3jvgHqVXFaJbbdxY5NJpU+ZkzAevqYPipHQ=
-X-Gm-Gg: ASbGncsnQskrrAiD7EMXzblGBJguXqFzXozblH9n3eDEfs3Asu9aVymElVi03SsnROQ
-	aVpzqf8H/ZoeQcx/mvwmiMMnmV1FAqRABGX9+ktEhd2UAGv1WJpMa0FfyMtMRuwS3AwsdoxnvuS
-	oKYT2a+3BEs4C/22jTYPri6zCisf6op4kHVe1o+Vi6iLdx+zOQ4EV80F6kCZLpRKS8b/xXKXsIn
-	JMp0ihTw4NaG9pZOte0TJQ6LarhZJTS8DNi19s3keU2/vmvodO0j3pgi57g+HZJGAuYpSterIua
-	IwQJ2zCYucNrjkDIHKn+BLc+AdzFyVoGm9QQknLL3cwpKfxLdM5IIDib
-X-Google-Smtp-Source: AGHT+IFNeXqjJ+MxQ2VULjeC3pvBgrgbvWZov0RSWVHhUVra12Eag2ZgbapyJo1xvpnq4PV+cNOtZA==
-X-Received: by 2002:a05:6a00:929a:b0:732:a24:7351 with SMTP id d2e1a72fcca58-7326179d65bmr26282695b3a.6.1739919393107;
-        Tue, 18 Feb 2025 14:56:33 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-89-135.pa.vic.optusnet.com.au. [49.186.89.135])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73274a11a0bsm5349794b3a.123.2025.02.18.14.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 14:56:32 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.98)
-	(envelope-from <david@fromorbit.com>)
-	id 1tkWVw-00000002zlY-37rX;
-	Wed, 19 Feb 2025 09:56:28 +1100
-Date: Wed, 19 Feb 2025 09:56:28 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cRdA03wr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B04BFC4CEE2;
+	Tue, 18 Feb 2025 23:06:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739920016;
+	bh=XjJ7I+jIGdeY9vOy9NYF19tpQmyUregmGJlukIni29g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cRdA03wrhmh0Z67dvZeYvv0z4lKtZVySVfFFLG//fz7rVuX6jieSFXZQ2XwoJiqmO
+	 SzL007jrWcN0m54LgpuQBUIPMK2aFpMEl1afC5nKbMS8AKedlZA18EGQD4MUozFPGt
+	 MzXALowKwoXuYxrF4V5Ube6MRqU7iUU+3zf/dbv7L0bB4g1sLUVdk/t/Cv3MuXmkPW
+	 I24VDr4QPPyq7dd131pe/7EuDHIiULZ6h1g51tqhqzNkB0GiQEPz51KyN/Nmyvyh1g
+	 8JymjhjymFm8hVJrB6UKLkoPq1+2yMEBwPwviX7gU2gezmagVAglWCY7G19arEzqzi
+	 TVkehzz9g2q9g==
+Received: by pali.im (Postfix)
+	id 0C7997EF; Wed, 19 Feb 2025 00:06:43 +0100 (CET)
+Date: Wed, 19 Feb 2025 00:06:43 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Dave Chinner <david@fromorbit.com>
 Cc: Amir Goldstein <amir73il@gmail.com>, Eric Biggers <ebiggers@kernel.org>,
 	"Darrick J. Wong" <djwong@kernel.org>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>,
@@ -75,7 +42,7 @@ Cc: Amir Goldstein <amir73il@gmail.com>, Eric Biggers <ebiggers@kernel.org>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
  for FS_IOC_FS[GS]ETXATTR API
-Message-ID: <Z7UQHL5odYOBqAvo@dread.disaster.area>
+Message-ID: <20250218230643.fuc546ntkq3nnnom@pali>
 References: <20250216164029.20673-1-pali@kernel.org>
  <20250216164029.20673-2-pali@kernel.org>
  <20250216183432.GA2404@sol.localdomain>
@@ -85,48 +52,59 @@ References: <20250216164029.20673-1-pali@kernel.org>
  <Z7Pjb5tI6jJDlFZn@dread.disaster.area>
  <CAOQ4uxh6aWO7Emygi=dXCE3auDcZZCmDP+jmjhgdffuz1Vx6uQ@mail.gmail.com>
  <20250218192701.4q22uaqdyjxfp4p3@pali>
+ <Z7UQHL5odYOBqAvo@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250218192701.4q22uaqdyjxfp4p3@pali>
+In-Reply-To: <Z7UQHL5odYOBqAvo@dread.disaster.area>
+User-Agent: NeoMutt/20180716
 
-On Tue, Feb 18, 2025 at 08:27:01PM +0100, Pali Rohár wrote:
-> On Tuesday 18 February 2025 10:13:46 Amir Goldstein wrote:
-> > > and there is no need for whacky field
-> > > masks or anything like that. All it needs is a single bit to
-> > > indicate if the windows attributes are supported, and they are all
-> > > implemented as normal FS_XFLAG fields in the fsx_xflags field.
-> > >
+On Wednesday 19 February 2025 09:56:28 Dave Chinner wrote:
+> On Tue, Feb 18, 2025 at 08:27:01PM +0100, Pali RohÃ¡r wrote:
+> > On Tuesday 18 February 2025 10:13:46 Amir Goldstein wrote:
+> > > > and there is no need for whacky field
+> > > > masks or anything like that. All it needs is a single bit to
+> > > > indicate if the windows attributes are supported, and they are all
+> > > > implemented as normal FS_XFLAG fields in the fsx_xflags field.
+> > > >
+> > 
+> > If MS adds 3 new attributes then we cannot add them to fsx_xflags
+> > because all bits of fsx_xflags would be exhausted.
 > 
-> If MS adds 3 new attributes then we cannot add them to fsx_xflags
-> because all bits of fsx_xflags would be exhausted.
+> And then we can discuss how to extend the fsxattr structure to
+> implement more flags.
+> 
+> In this scenario we'd also need another flag bit to indicate that
+> there is a second set of windows attributes that are supported...
+> 
+> i.e. this isn't a problem we need to solve right now.
 
-And then we can discuss how to extend the fsxattr structure to
-implement more flags.
+Ok, that is possible solution for now.
 
-In this scenario we'd also need another flag bit to indicate that
-there is a second set of windows attributes that are supported...
+> > Just having only one FS_XFLAGS_HAS_WIN_ATTRS flag for determining windows
+> > attribute support is not enough, as it would not say anything useful for
+> > userspace.
+> 
+> IDGI.
+> 
+> That flag is only needed to tell userspace "this filesystem supports
+> windows attributes". Then GET will return the ones that are set,
+> and SET will return -EINVAL for those that it can't set (e.g.
+> compress, encrypt). What more does userspace actually need?
 
-i.e. this isn't a problem we need to solve right now.
+Userspace backup utility would like to backup as many attributes as
+possible by what is supported by the target filesystem. What would such
+utility would do if the target filesystem supports only HIDDEN
+attribute, and source file has all windows attributes set? It would be
+needed to issue 2*N syscalls in the worst case to set attributes.
+It would be combination of GET+SET for every one windows attribute
+because userspace does not know what is supported and what not.
 
-> Just having only one FS_XFLAGS_HAS_WIN_ATTRS flag for determining windows
-> attribute support is not enough, as it would not say anything useful for
-> userspace.
-
-IDGI.
-
-That flag is only needed to tell userspace "this filesystem supports
-windows attributes". Then GET will return the ones that are set,
-and SET will return -EINVAL for those that it can't set (e.g.
-compress, encrypt). What more does userspace actually need?
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+IMHO this is suboptimal. If filesystem would provide API to get list of
+supported attributes then this can be done by 2-3 syscalls.
