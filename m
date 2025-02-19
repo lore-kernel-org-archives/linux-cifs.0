@@ -1,191 +1,118 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from fabamailgate04.fabasoft.com (fabamailgate04.fabasoft.com [192.84.221.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA061E522
+	for <linux-cifs@vger.kernel.org>; Wed, 19 Feb 2025 10:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.84.221.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739959883; cv=none; b=SskHfzAtY3f12VU53ibQX9n6My5WiGvoUpfmog6KtJCDyzBYms6o+r4J8pGuRSlbvRF3DJ1x3zKrSUvtSK93hP3TxztBf11L07WfJsdjCD0qOF+C2UnCS6diorwO7FVD6OCh9v+9oW0E5TZbhKsPe5LgQTXMiCZ17HSW5i6VzQM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739959883; c=relaxed/simple;
+	bh=eLIohWmPupn529jXvSRRdYDsd/AA0Lbl341PzGfHPUs=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=rtjGrBELPg8/D29aPL5nsFfnFcqGBIYbzbd6hY0Fzrn4KmMljXsmxdf97JKbgcVzOhrpeDVyLDyNHE4JOYiSxPuufkr8oebFGGTRy/yFUVplDTDne9L+SQnL+msVTLBFRY52IF9NxtmoP7vWWzpNv3VZdN4BKS2HhISRyi/Xgp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com; spf=pass smtp.mailfrom=fabasoft.com; arc=none smtp.client-ip=192.84.221.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fabasoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fabasoft.com
+Received: from fabamailgate04.fabasoft.com (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by fabamailgate04.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS id 803AE40380D8;
+	Wed, 19 Feb 2025 11:04:50 +0100 (CET)
+Received: from [127.0.0.1] (helo=fabamailgate04.fabasoft.com)
+	by fabamailgate04.fabasoft.com with ESMTP (eXpurgate 4.51.0)
+	(envelope-from <horst.reiterer@fabasoft.com>)
+	id 67b5acc2-045d-7f0000012b03-7f000001e7e6-1
+	for <multiple-recipients>; Wed, 19 Feb 2025 11:04:50 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com (fabaexch01 [10.10.5.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8730C1C173F;
-	Wed, 19 Feb 2025 07:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739951741; cv=none; b=clDJ3sj7sIRN4zbAtaySTZKcYBFiEQJXt6bRZSfNWRElCB4iofGjTP5DO611LjT7/fsgiHi5jmCNn3D6wLYe7CQ28M9PN1qf595hkNrwAfsNI4GyQrxY79cYf/CXpVOsfCHCKm0oVgEetEnKPYr7fdjJeyA1zpDo9PtPFpXpuhM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739951741; c=relaxed/simple;
-	bh=EbHYomzEGqBM/6gcsBpWHw7Pd+SrgcF93ylJpz/8wak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=euE+6C/2T4bFwo8MBLdMaDam6E9cXnWDoDkbf5IZEtgTsU4wrG6c2uXJyuXJPaZ4mGo4xbio1DaUlXd63gL04NfWZi28mA73BxSehBn1Audc0JDoQ2dQV+rc2/eGP98K1a/Qpvhm1lsZb7KUHlL6h4M230Nuxfau+yaf/F2SWdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RrmAu3ub; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RrmAu3ub"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5ded46f323fso8400225a12.1;
-        Tue, 18 Feb 2025 23:55:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739951738; x=1740556538; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EbHYomzEGqBM/6gcsBpWHw7Pd+SrgcF93ylJpz/8wak=;
-        b=RrmAu3ubJWb5junSC/4qqCzgS62q4vxIoOVtv9yCgEFUvuMqkF3faPVGdYP1Xyzcdz
-         zTVZaa44yHTZgKLBoHbNZJJ5SR4NhozRO0QNm1SvV3bkv9X6ZH+C0D9lt6kxajxhftQK
-         tOmd1IONN5q586sNiAwWJL3aKzSJx6AlH2NaxT1Nh3aMscBtkmsVWrBD0wzEdecHzJxc
-         gTmlnJdLaSbIqCgpK0H1h37HfLa8qUstwY9s2UplDs3c7WI4uBRwJ3JtjJaV7BxO8cZc
-         i2jmPp2u0EmVoY9sZYXquVuAYug37uiva+wMaA8l43bpk0/CK90PwaKAwSH2m5KU1fyW
-         yhyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739951738; x=1740556538;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EbHYomzEGqBM/6gcsBpWHw7Pd+SrgcF93ylJpz/8wak=;
-        b=pI6qS1qrDNlTOYHLZ9nmlxrrezX1zhaQDvrrWe2bziv8SUHE/a/DMn4BFwSq/dGvXq
-         S91MCE1MPIL1hVoUoQaC9mNuWHl0JbpVmNxKnErN/nGoSyp/5GzsKsT51XTx227KYZbx
-         XwaCEsS5P/NZDHyGMFJEx4ltJA9Ezh5g7TP1ZXHiuqgh3HDAdzXsWtzGSYS9H9mhLZpg
-         xhtTZSfzCCf3ktyZxi8TOQHFmbJFTdCXJ9+RyubjNF8WDzwPUPLT6QT5oJjcSQBjtfT0
-         d5Ld2PwMtvidqPphvdeY6sGUS9ccRoE70z28zu2yKYl+acU6l9+pw5U/iiO3PwX/pauq
-         taTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUyljzxfsQPaUjkFrMXzGw/8fgxhce3bLqnoLAsn6aUteVNBL2qfWN8UP6x/TD1rorHquLraajKrCui@vger.kernel.org, AJvYcCVIWbhN+Tko2Py71/LnOyqkZi0dq+prFmO0BTQ85tq0qQMUnYhBBuRF+DKDa4M8putwKsLrNcwBSo3TUXt1qA==@vger.kernel.org, AJvYcCVPy1aCjjLsrDIUeE+2i86rqVk+FTQ1igAjzE+z+kXsVkwUgD13xfPB6RoYggY2eB6z4FLitQA18+m23VKv@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNqt+4hcGhotndZFuooe2m7YK2QohH/yWSID/dZufElV7bGgs4
-	vN/kn2nKZO+ZrnTlBH3ufCpiDXeeNKIj9+rejZvMYP8sX39kgctrI00jVrgaNMJDJEBgvflwcvx
-	ck/USaMwO83KnZy7tuupxlT47Wi0=
-X-Gm-Gg: ASbGncuaH8cT30t0OVMuubvqtzV69gG4x/nzpPb8+TYbwwnlrSE/J3y+NMwYK1Ucr3u
-	JJzEpYCQJqGIck9cRt2zb5Pqvp6yZec0FoPrZHJMTJ5Uu9OprbddSvCRRJbPRzaHz0dKA64ha
-X-Google-Smtp-Source: AGHT+IE3aGxD6kSsZVNJxjQH8TGu4ReOyuVVJu1bMp8BPJ5HJ+l+n0dg4eEt8BRWfqenNWmrM0AaBc+z55xXgVbLjWc=
-X-Received: by 2002:a05:6402:50ca:b0:5e0:4a92:6b34 with SMTP id
- 4fb4d7f45d1cf-5e089516998mr2204298a12.12.1739951737416; Tue, 18 Feb 2025
- 23:55:37 -0800 (PST)
+	by fabamailgate04.fabasoft.com (Fabasoft e-Mail Services) with ESMTPS;
+	Wed, 19 Feb 2025 11:04:50 +0100 (CET)
+Received: from FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) by
+ FABAEXCH01.fabagl.fabasoft.com (10.10.5.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 19 Feb 2025 11:04:50 +0100
+Received: from FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7]) by
+ FABAEXCH01.fabagl.fabasoft.com ([fe80::c9d7:6a74:cdb8:4ed7%4]) with mapi id
+ 15.01.2507.044; Wed, 19 Feb 2025 11:04:50 +0100
+From: "Reiterer, Horst" <horst.reiterer@fabasoft.com>
+To: Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.com>
+CC: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: RE: [PATCH] smb: client: fix chmod(2) regression with ATTR_READONLY
+Thread-Topic: [PATCH] smb: client: fix chmod(2) regression with ATTR_READONLY
+Thread-Index: AduCtJRyurJeY+jcTpC1NDZnGlwmrg==
+Date: Wed, 19 Feb 2025 10:04:50 +0000
+Message-ID: <08e226c8df7246fbaf710f36b39ead4a@fabasoft.com>
+Accept-Language: en-US, de-AT
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250216164029.20673-1-pali@kernel.org> <20250216164029.20673-2-pali@kernel.org>
- <20250216183432.GA2404@sol.localdomain> <CAOQ4uxigYpzpttfaRc=xAxJc=f2bz89_eCideuftf3egTiE+3A@mail.gmail.com>
- <20250216202441.d3re7lfky6bcozkv@pali> <CAOQ4uxj4urR70FmLB_4Qwbp1O5TwvHWSW6QPTCuq7uXp033B7Q@mail.gmail.com>
- <Z7Pjb5tI6jJDlFZn@dread.disaster.area> <CAOQ4uxh6aWO7Emygi=dXCE3auDcZZCmDP+jmjhgdffuz1Vx6uQ@mail.gmail.com>
- <20250218192701.4q22uaqdyjxfp4p3@pali> <Z7UQHL5odYOBqAvo@dread.disaster.area> <20250218230643.fuc546ntkq3nnnom@pali>
-In-Reply-To: <20250218230643.fuc546ntkq3nnnom@pali>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Wed, 19 Feb 2025 08:55:26 +0100
-X-Gm-Features: AWEUYZk6LPVJ6yh4ABnF4RMKDHcNJh_qDgkcHF5dnokJG42zcEIX4XZjn92Do0w
-Message-ID: <CAOQ4uxiAU7UorH1FLcPgoWMXMGRsOt77yRQ12Xkmzcxe8qYuVw@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
- for FS_IOC_FS[GS]ETXATTR API
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Dave Chinner <david@fromorbit.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Darrick J. Wong" <djwong@kernel.org>, ronnie sahlberg <ronniesahlberg@gmail.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Steve French <sfrench@samba.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-purgate-ID: 152191::1739959490-CF3DDAC9-5FE6473A/0/0
+X-purgate-type: clean
+X-purgate-size: 4204
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: clean
+X-purgate: This mail is considered clean
 
-On Wed, Feb 19, 2025 at 12:06=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> =
-wrote:
->
-> On Wednesday 19 February 2025 09:56:28 Dave Chinner wrote:
-> > On Tue, Feb 18, 2025 at 08:27:01PM +0100, Pali Roh=C3=A1r wrote:
-> > > On Tuesday 18 February 2025 10:13:46 Amir Goldstein wrote:
-> > > > > and there is no need for whacky field
-> > > > > masks or anything like that. All it needs is a single bit to
-> > > > > indicate if the windows attributes are supported, and they are al=
-l
-> > > > > implemented as normal FS_XFLAG fields in the fsx_xflags field.
-> > > > >
-> > >
-> > > If MS adds 3 new attributes then we cannot add them to fsx_xflags
-> > > because all bits of fsx_xflags would be exhausted.
-> >
-> > And then we can discuss how to extend the fsxattr structure to
-> > implement more flags.
-> >
-> > In this scenario we'd also need another flag bit to indicate that
-> > there is a second set of windows attributes that are supported...
-> >
-> > i.e. this isn't a problem we need to solve right now.
->
-> Ok, that is possible solution for now.
->
-> > > Just having only one FS_XFLAGS_HAS_WIN_ATTRS flag for determining win=
-dows
-> > > attribute support is not enough, as it would not say anything useful =
-for
-> > > userspace.
-> >
-> > IDGI.
-> >
-> > That flag is only needed to tell userspace "this filesystem supports
-> > windows attributes". Then GET will return the ones that are set,
-> > and SET will return -EINVAL for those that it can't set (e.g.
-> > compress, encrypt). What more does userspace actually need?
-
-Let me state my opinion clearly.
-I think this API smells.
-I do not object to it, but I think we can do better.
-
-I do however object to treating different flags in fsx_xflags
-differently - this is unacceptable IMO.
-
-The difference I am referring to is a nuance, but IMO an important one -
-
-It's fine for GET to raise a flag "this filesystem does not accept SET
-of any unknown flags".
-
-It's not fine IMO for GET to raise a flag "this filesystem does not accept
-SET of unknown flags except for a constant subset of flags that filesystem
-may ignore".
-It's not fine IMO, because it makes userspace life harder for no good reaso=
-n.
-
-This former still allows filesystems to opt-in one by one to the extended A=
-PI,
-but it does not assume anything about the subset of windows attributes
-and legacy Linux attributes that need to be supported.
-
-For example, adding support for set/get hidden/system/archive/readonly
-fo fs/fat, does not require supporting all FS_XFLAG_COMMON by fs/fat
-and an attempt to set unsupported FS_XFLAG_COMMON flags would
-result in -EINVAL just as an attempt to set an unsupported win flag.
-
-But if we agree on setting one special flag in GET to say "new SET
-semantics", I do not understand the objection to fsx_xflags_mask.
-
-Dave, if you actually object to fsx_xflags_mask please explain why.
-"What more does userspace actually need?" is not a good enough
-reason IMO. Userspace could make use of fsx_xflags_mask.
-
->
-> Userspace backup utility would like to backup as many attributes as
-> possible by what is supported by the target filesystem. What would such
-> utility would do if the target filesystem supports only HIDDEN
-> attribute, and source file has all windows attributes set? It would be
-> needed to issue 2*N syscalls in the worst case to set attributes.
-> It would be combination of GET+SET for every one windows attribute
-> because userspace does not know what is supported and what not.
->
-> IMHO this is suboptimal. If filesystem would provide API to get list of
-> supported attributes then this can be done by 2-3 syscalls.
-
-I agree that getting the "attributes supported by filesystem" is important
-and even getting the "gettable" subset and "settable" subset and I also
-agree with Dave that this could be done once and no need to do it for
-every file (although different file types may support a different subsets).
-
-Let's stop for a moment to talk about statx.
-
-I think you should include a statx support path in your series - not later.
-If anything, statx support for exporting those flags should be done
-before adding the GET/SET API.
-
-Why? because there is nothing controversial about it.
-- add a bunch of new STATX_ATTR_ flags
-- filesystems that support them will publish that in stx_attributes_mask
-- COMPR/ENCRYPT are already exported in statx
-
-With that, backup/sync programs are able to query filesystem support
-even without fsx_xflags_mask.
-
-I think this is a hacky way around a proper GET/SET API, but possible.
-
-Thanks,
-Amir.
+SGksDQoNCnRoYW5rcywgU3RldmUgYW5kIFBhdWxvISBDb25zaWRlcmluZyB0aGUgc2V2ZXJpdHkg
+KGNobW9kIGRvZXMgbm90IHRha2UgZWZmZWN0IGFueW1vcmUpIGFuZCB0aGUgZmFjdCB0aGF0IHRo
+aXMgcmVncmVzc2lvbiB3YXMgY2F1c2VkIGJ5IGRyb3BwaW5nIGEgY29uZGl0aW9uIGluIHR3byBs
+aW5lcyBvZiBjb2RlIHRoYXQgaXMgbWVyZWx5IGJlaW5nIHJlc3RvcmVkIGJ5IHRoZSBmaXggKGJh
+c2ljYWxseSwgaXQncyBhIHBhcnRpYWwgcmV2ZXJ0KSwgaXMgdGhlcmUgYW55IHdheSB0byBwcmlv
+cml0aXplIHRoaXMgY2hhbmdlIGFzIHRoZXJlJ3Mgbm8gcHJvZHVjdGlvbi1yZWFkeSB3b3JrYXJv
+dW5kPyBJdCdzIGRpZmZpY3VsdCB0byBhdm9pZCB1cGRhdGluZyB0byA2LjYrIGF0IHRoaXMgcG9p
+bnQuDQoNCkNoZWVycywNCg0KSG9yc3QgUmVpdGVyZXINCg0KLS0tLS1VcnNwcsO8bmdsaWNoZSBO
+YWNocmljaHQtLS0tLQ0KVm9uOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWlsLmNvbT4gDQpH
+ZXNlbmRldDogTW9udGFnLCAxNy4gRmVicnVhciAyMDI1IDAwOjIwDQpBbjogUGF1bG8gQWxjYW50
+YXJhIDxwY0BtYW5ndWViaXQuY29tPg0KQ2M6IGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnOyBS
+ZWl0ZXJlciwgSG9yc3QgPGhvcnN0LnJlaXRlcmVyQGZhYmFzb2Z0LmNvbT4NCkJldHJlZmY6IFJl
+OiBbUEFUQ0hdIHNtYjogY2xpZW50OiBmaXggY2htb2QoMikgcmVncmVzc2lvbiB3aXRoIEFUVFJf
+UkVBRE9OTFkNCg0KdGVudGF0aXZlbHkgbWVyZ2VkIGludG8gY2lmcy0yLjYuZ2l0IGZvci1uZXh0
+IHBlbmRpbmcgbW9yZSB0ZXN0aW5nIGFuZCByZXZpZXcNCg0KT24gU3VuLCBGZWIgMTYsIDIwMjUg
+YXQgMzowMuKAr1BNIFBhdWxvIEFsY2FudGFyYSA8cGNAbWFuZ3VlYml0LmNvbT4gd3JvdGU6DQo+
+DQo+IFdoZW4gdGhlIHVzZXIgc2V0cyBhIGZpbGUgb3IgZGlyZWN0b3J5IGFzIHJlYWQtb25seSAo
+ZS5nLiB+U19JV1VHTyksIA0KPiB0aGUgY2xpZW50IHdpbGwgc2V0IHRoZSBBVFRSX1JFQURPTkxZ
+IGF0dHJpYnV0ZSBieSBzZW5kaW5nIGFuIA0KPiBTTUIyX1NFVF9JTkZPIHJlcXVlc3QgdG8gdGhl
+IHNlcnZlciBpbiBjaWZzX3NldGF0dHJfeyxub3VuaXh9KCksIGJ1dCANCj4gY2lmc0lub2RlSW5m
+bzo6Y2lmc0F0dHJzIHdpbGwgYmUgbGVmdCB1bmNoYW5nZWQgYXMgdGhlIGNsaWVudCB3aWxsIA0K
+PiBvbmx5IHVwZGF0ZSB0aGUgbmV3IGZpbGUgYXR0cmlidXRlcyBpbiB0aGUgbmV4dCBjYWxsIHRv
+DQo+IHtzbWIzMTFfcG9zaXgsY2lmc31fZ2V0X2lub2RlX2luZm8oKSB3aXRoIHRoZSBuZXcgbWV0
+YWRhdGEgZmlsbGVkIGluIA0KPiBAZGF0YSBwYXJhbWV0ZXIuDQo+DQo+IENvbW1pdCBhMTgyODBl
+N2ZkZWEgKCJzbWI6IGNpbGVudDogc2V0IHJlcGFyc2UgbW91bnQgcG9pbnRzIGFzDQo+IGF1dG9t
+b3VudHMiKSBtaXN0YWtlbmx5IHJlbW92ZWQgdGhlIEBkYXRhIE5VTEwgY2hlY2sgd2hlbiBjYWxs
+aW5nIA0KPiBpc19pbm9kZV9jYWNoZV9nb29kKCksIHdoaWNoIGJyb2tlIHRoZSBhYm92ZSBjYXNl
+IGFzIHRoZSBuZXcgDQo+IEFUVFJfUkVBRE9OTFkgYXR0cmlidXRlIHdvdWxkIGVuZCB1cCBub3Qg
+YmVpbmcgdXBkYXRlZCBvbiBmaWxlcyB3aXRoIGEgDQo+IHJlYWQgbGVhc2UuDQo+DQo+IEZpeCB0
+aGlzIGJ5IHVwZGF0aW5nIHRoZSBpbm9kZSB3aGVuZXZlciB3ZSBoYXZlIGNhY2hlZCBtZXRhZGF0
+YSBpbiANCj4gQGRhdGEgcGFyYW1ldGVyLg0KPg0KPiBSZXBvcnRlZC1ieTogSG9yc3QgUmVpdGVy
+ZXIgPGhvcnN0LnJlaXRlcmVyQGZhYmFzb2Z0LmNvbT4NCj4gQ2xvc2VzOiANCj4gaHR0cHM6Ly9s
+b3JlLmtlcm5lbC5vcmcvci84NWExNjUwNGUwOTE0N2ExOTVhYzBhYWMxYzgwMTI4MEBmYWJhc29m
+dC5jbw0KPiBtDQo+IEZpeGVzOiBhMTgyODBlN2ZkZWEgKCJzbWI6IGNpbGVudDogc2V0IHJlcGFy
+c2UgbW91bnQgcG9pbnRzIGFzIA0KPiBhdXRvbW91bnRzIikNCj4gU2lnbmVkLW9mZi1ieTogUGF1
+bG8gQWxjYW50YXJhIChSZWQgSGF0KSA8cGNAbWFuZ3VlYml0LmNvbT4NCj4gLS0tDQo+ICBmcy9z
+bWIvY2xpZW50L2lub2RlLmMgfCA0ICsrLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlv
+bnMoKyksIDIgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lu
+b2RlLmMgYi9mcy9zbWIvY2xpZW50L2lub2RlLmMgaW5kZXggDQo+IDIxNDI0MDYxMjU0OS4uNjE2
+MTQ5YzdmMGE1IDEwMDY0NA0KPiAtLS0gYS9mcy9zbWIvY2xpZW50L2lub2RlLmMNCj4gKysrIGIv
+ZnMvc21iL2NsaWVudC9pbm9kZS5jDQo+IEBAIC0xNDIxLDcgKzE0MjEsNyBAQCBpbnQgY2lmc19n
+ZXRfaW5vZGVfaW5mbyhzdHJ1Y3QgaW5vZGUgKippbm9kZSwNCj4gICAgICAgICBzdHJ1Y3QgY2lm
+c19mYXR0ciBmYXR0ciA9IHt9Ow0KPiAgICAgICAgIGludCByYzsNCj4NCj4gLSAgICAgICBpZiAo
+aXNfaW5vZGVfY2FjaGVfZ29vZCgqaW5vZGUpKSB7DQo+ICsgICAgICAgaWYgKCFkYXRhICYmIGlz
+X2lub2RlX2NhY2hlX2dvb2QoKmlub2RlKSkgew0KPiAgICAgICAgICAgICAgICAgY2lmc19kYmco
+RllJLCAiTm8gbmVlZCB0byByZXZhbGlkYXRlIGNhY2hlZCBpbm9kZSBzaXplc1xuIik7DQo+ICAg
+ICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gICAgICAgICB9DQo+IEBAIC0xNTIwLDcgKzE1MjAs
+NyBAQCBpbnQgc21iMzExX3Bvc2l4X2dldF9pbm9kZV9pbmZvKHN0cnVjdCBpbm9kZSAqKmlub2Rl
+LA0KPiAgICAgICAgIHN0cnVjdCBjaWZzX2ZhdHRyIGZhdHRyID0ge307DQo+ICAgICAgICAgaW50
+IHJjOw0KPg0KPiAtICAgICAgIGlmIChpc19pbm9kZV9jYWNoZV9nb29kKCppbm9kZSkpIHsNCj4g
+KyAgICAgICBpZiAoIWRhdGEgJiYgaXNfaW5vZGVfY2FjaGVfZ29vZCgqaW5vZGUpKSB7DQo+ICAg
+ICAgICAgICAgICAgICBjaWZzX2RiZyhGWUksICJObyBuZWVkIHRvIHJldmFsaWRhdGUgY2FjaGVk
+IGlub2RlIHNpemVzXG4iKTsNCj4gICAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiAgICAgICAg
+IH0NCj4gLS0NCj4gMi40OC4xDQo+DQoNCg0KLS0NClRoYW5rcywNCg0KU3RldmUNCg==
