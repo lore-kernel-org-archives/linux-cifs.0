@@ -1,127 +1,157 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F354C8F;
-	Mon, 24 Feb 2025 00:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5741E1537C8
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2025 01:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740358145; cv=none; b=Qf92ePc92k3kP9vLZaukyHJJu34RGJzK42QW1yr1U4r8ujA4r5DqfNDPLLLehF/FTKVedkINvYTIGCu6T1pvCwebaNr8CSHUzwMRxZiHtAZqEEW+wEcJ4lYe2aorWBKh1nCfSyCqZX+BgimZQud5Ge9Y6x4n+FbhVeIlzUCwvp0=
+	t=1740360862; cv=none; b=fVJK5pAbMndPP7cGbTAchKqbCF2GDm2Eeep7O81M0dWm8hG19hj9ObX8BUGonB8Gukezpi9KuC5V+fGsFV2zqQRwTWEozjxwqWzz9pbkfjWTcXpda2HSICxJ2YiXLIJ947dVofB1nYQgVZr9iMgBe54/GQjwJk30lWPv4MBx7aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740358145; c=relaxed/simple;
-	bh=Jzsw5QO4H3N/xARGLoYmpCSLmmdwVRbyiqi9ZCQ7pEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HY7Xmq3nnL+vZYLyPFebqSfunGeRatIaVZ9dTlgqJvww+aAp9kRNMWSUcPhnOdR4PslbAKLUjCo3hNuaQk//7g1Yo68riwme5GSkGSOJdxnETJ0HqMoWUi6T3zg8NUFzqnUtzaK4IQO1N6fSn8ZrJyvnRrLueHzvCVXD7b80TAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OBTEXrlR; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1740360862; c=relaxed/simple;
+	bh=Al6jKkOiVhexQTQI4Zbtqw8ZvF2LAQnFfueXusXBnhk=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=TgCosaNdmUN717Kj7gODHOG/c01UiNVNV5K5VMPH7zXr7mMOppUuhj4dLZTBPzs4HlrSJZSrD+LK89EH5waJCpScH5n053Wzr1ewL0AHn/Xtd+OUfgfadhc1zxDhVK8N+GcOsMAmGyyCTewkPd4PJL5LhHrgTTg4ntFYjwaUu2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rzonImDk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wKHL00mL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qCjqXg8K; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NnMPKFp7; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBTEXrlR"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5461a485aa2so3563190e87.2;
-        Sun, 23 Feb 2025 16:49:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740358142; x=1740962942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xt2LkBK0hGIK9sk8aSwFk64Mnli3ElVLH6wep+qNJUU=;
-        b=OBTEXrlRir58G3VJhV3cq11NCguVD+yw86EvrG1zpTYNj6wPyxhXvQyV9MFpy9KqfZ
-         mc+Ym2KiIrSLmmyWG2vW9I+JyMqsuyOVeZ4a4GrFoPKIslR+eBE1knLQyc41ZTfcFk9l
-         lXDQmY7WDy4KANl5V5g1IfV0HbYcnewk1LAUr+gDuLavS8OpbckBzRNMJzMkDSEF9An5
-         TksHMFbCE7V/jivLuu6NJaTs0CNJUcRzQvzIb5v+1II6td9OJ/6sulTl333UBlrFdPr5
-         svrH5sNTTjoQd6g6MtRWBohpkrKjjA9r1NYs2WFAhZmfrB02P2PzYn+X9Ce5D/gOaQOI
-         gHoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740358142; x=1740962942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xt2LkBK0hGIK9sk8aSwFk64Mnli3ElVLH6wep+qNJUU=;
-        b=jRpbRkLlofYLDKbuVQ5L31QXjzuaQeP4RY0rQpH5tRcXlt+2uNpK6FIitIro7FS602
-         UVhRRfHqjnf5D9UTboiRLP5OqGhK8nUsTAHax8s9LKbBMDwDv5dH5zwqL+RPkmnjf9nb
-         uN0mp8WuxSB7XK5avCayGQc6f96gMzlTIqV1XUIhGGYbKWBC4RnqUy22KH/OoFoQ78Rz
-         9vehnsQkIdRF10eR1GYF5gslInopqCVBuGFxT/j1S5iuXushnZbPNg8VUNA0/dzPfv3g
-         k8tPBRyR8lNNgYByDxEAgEZ3o5yibZ3xEWUD4lzilZbf9LQ3kF/ux0VyK25wXcxJ2wfF
-         pB/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVSdtSfs0SIz/KdPd9kkVBYcV4IEKtLYum8brzn1OPDf0N8UZeFynv6QEYe2whSXOcQ6G7o1/XlO7ajgOu1@vger.kernel.org, AJvYcCW8EqnMMDafq1FkqdfB50aJvjfRtUsxsfnZ4IMbaHxUOOLJ9pwuKGQPxmjgwoji5aKKDda1lHoL/R06@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw14NFDFarYPr5pZNa3sAs7Sn3MOw+pf1ks9Y6Dmw33AOgRYcH
-	n1iYGYzS8mpX5ANpkHbtvBSbtktUjcIx4enyl4wm3xY4mRiAE4X6cWDuyfOG16goSBqinR5bPN1
-	lGQKi22ZunuIPjgl56bC1vC+gFJ8=
-X-Gm-Gg: ASbGncuTgTwBgrWYuDTPQX1l1t6y5La23EWStFiZ3fKdLdp21hCooVnTsEyiGpCLdcn
-	P4JX4YGkkF2S7rfzVBYUbSZkofsplHLwvPlfcwEutUeRjYHWLhlTclJn3lesFWd6j1wKJUnZW07
-	UMiTBK+E4=
-X-Google-Smtp-Source: AGHT+IGABZZ8wTkaU/4AVUK8/92+7sI96FBM5IfBG3yrIHEi3ysNTlMQstK0NawrS7rEc19Qt2d5Oj4YJWbMFh3Vpxo=
-X-Received: by 2002:a05:6512:1106:b0:53e:3a7c:c0b5 with SMTP id
- 2adb3069b0e04-54838ee288fmr3802000e87.10.1740358141810; Sun, 23 Feb 2025
- 16:49:01 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rzonImDk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wKHL00mL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qCjqXg8K";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NnMPKFp7"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8CC902116D;
+	Mon, 24 Feb 2025 01:34:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740360858; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N6DmzFO4HIzWBxdCLLN4FbtoKwoidbgVbtC5hcg04Dc=;
+	b=rzonImDkwJoVgWfKV5OP1Ih17Ix4H0Uj8cYlPZ+aY6Hdv0gpMIjIyh0ZkQKVgVT/FndPIi
+	sZMx93YtVbo91VfBLYw5Sd6QCpfSxUdFevY2NXEwZL0R6VVTI4hCqHByOBkOvB43Ien6pD
+	P/6G9UJwoNlFoBYkRddy4ZWrLNokImU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740360858;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N6DmzFO4HIzWBxdCLLN4FbtoKwoidbgVbtC5hcg04Dc=;
+	b=wKHL00mL1XwcnqReM3IXJ5QvOzvSSWlBJfXq7VRTKaOqqQlFbKoDoTYOYWQwP6zgNjjEty
+	3hVZKYyoFwDy9BDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1740360857; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N6DmzFO4HIzWBxdCLLN4FbtoKwoidbgVbtC5hcg04Dc=;
+	b=qCjqXg8KOIWeT3woveYRbx7VhkwuOymOoulEdAyAbzEyKPU1njqvzcfJPElrVedFsxBHIA
+	hxTuG7Yu2Md3OY4EmdKk88M7EAXGOkBVk431FVrQCkAV3L5EonJ6odzCnm3MPhvA4Tkm0C
+	xCoR6Ww2x6WwPLM+/hg9l/iLduL29nU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1740360857;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N6DmzFO4HIzWBxdCLLN4FbtoKwoidbgVbtC5hcg04Dc=;
+	b=NnMPKFp7uSRVRE7AKEKm5nzIqIWLBtvgf0+qLo3xf1arIZxW9yW/A3b6APtVdlgfYPoB/h
+	GnKso9DG+FqdTyDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 903E0136B3;
+	Mon, 24 Feb 2025 01:34:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 2AUiCpHMu2dQagAAD6G6ig
+	(envelope-from <neilb@suse.de>); Mon, 24 Feb 2025 01:34:09 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241222145845.23801-1-pali@kernel.org> <20250223222306.plgy3bpy5mjojfve@pali>
-In-Reply-To: <20250223222306.plgy3bpy5mjojfve@pali>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 23 Feb 2025 18:48:50 -0600
-X-Gm-Features: AWEUYZko0ubEJcdQ7txR7GliWeRwpKU887NvYFvgu8t8db5jtuyzTa7hlyTi6R4
-Message-ID: <CAH2r5mv_+ZarrSPEhDjgEYPzqkvdqL-K7NjDsE0sXtrhx65G7A@mail.gmail.com>
-Subject: Re: [PATCH 0/4] cifs: Handle all name surrogate reparse points
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: "NeilBrown" <neilb@suse.de>
+To: "Al Viro" <viro@zeniv.linux.org.uk>
+Cc: "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "Miklos Szeredi" <miklos@szeredi.hu>, "Xiubo Li" <xiubli@redhat.com>,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Richard Weinberger" <richard@nod.at>,
+ "Anton Ivanov" <anton.ivanov@cambridgegreys.com>,
+ "Johannes Berg" <johannes@sipsolutions.net>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
+ "Tom Talpey" <tom@talpey.com>,
+ "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-um@lists.infradead.org, ceph-devel@vger.kernel.org,
+ netfs@lists.linux.dev
+Subject:
+ Re: [PATCH 1/6] Change inode_operations.mkdir to return struct dentry *
+In-reply-to: <20250222041937.GM1977892@ZenIV>
+References: <>, <20250222041937.GM1977892@ZenIV>
+Date: Mon, 24 Feb 2025 12:34:06 +1100
+Message-id: <174036084630.74271.16513912864596248299@noble.neil.brown.name>
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,suse.cz,szeredi.hu,redhat.com,gmail.com,nod.at,cambridgegreys.com,sipsolutions.net,oracle.com,talpey.com,chromium.org,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Sun, Feb 23, 2025 at 4:23=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> w=
-rote:
->
-> Hello Steve, I see that you have merged first two changes (1/4 and 2/4)
-> from this patch series, but the remaining (3/4 and 4/4). Is there any
-> reason why 3/4 and 4/4 was not taken?
+On Sat, 22 Feb 2025, Al Viro wrote:
+> On Fri, Feb 21, 2025 at 10:36:30AM +1100, NeilBrown wrote:
+>=20
+> > +In general, filesystems which use d_instantiate_new() to install the new
+> > +inode can safely return NULL.  Filesystems which may not have an I_NEW i=
+node
+> > +should use d_drop();d_splice_alias() and return the result of the latter.
+>=20
+> IMO that's a bad pattern, _especially_ if you want to go for "in-update"
+> kind of stuff later.
 
-Mainly because I wasn't able to easily test it, and didn't get test
-feedback for anyone else
-on those two who had tried it.
+Agreed.  I have a draft patch to change d_splice_alias() and
+d_exact_alias() to work on hashed dentrys.  I thought it should go after
+these mkdir patches rather than before.
 
-I am ok with looking at them again - and thx for rebasing.   There are
-some of the 41
-patches in your updated cifs branch that do look suitable or rc5
-
-
-> On Sunday 22 December 2024 15:58:41 Pali Roh=C3=A1r wrote:
-> > Name surrogate reparse point represents another named entity in the sys=
-tem.
-> >
-> > If the name surrogate reparse point is not handled by Linux SMB client
-> > and it is of directory type then treat it as a new mount point.
-> >
-> > Cleanup code for all explicit surrogate reparse points (like reparse
-> > points with tag IO_REPARSE_TAG_MOUNT_POINT) as they are handled by
-> > generic name surrogate reparse point code.
-> >
-> > Pali Roh=C3=A1r (4):
-> >   cifs: Throw -EOPNOTSUPP error on unsupported reparse point type from
-> >     parse_reparse_point()
-> >   cifs: Treat unhandled directory name surrogate reparse points as moun=
-t
-> >     directory nodes
-> >   cifs: Remove explicit handling of IO_REPARSE_TAG_MOUNT_POINT in
-> >     inode.c
-> >   cifs: Improve handling of name surrogate reparse points in reparse.c
-> >
-> >  fs/smb/client/inode.c    | 17 +++++++++++++----
-> >  fs/smb/client/reparse.c  | 24 ++++++++++--------------
-> >  fs/smb/common/smbfsctl.h |  3 +++
-> >  3 files changed, 26 insertions(+), 18 deletions(-)
-> >
-> > --
-> > 2.20.1
-> >
->
-
-
---=20
 Thanks,
+NeilBrown
 
-Steve
+
+>=20
+> That's pretty much the same thing as d_drop()/d_rehash() window.
+>=20
+> We'd be better off dropping that BUG_ON() in d_splice_alias() and teaching
+> __d_add() to handle the "it's a hashed negative" case.
+>=20
+
