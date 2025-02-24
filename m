@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C9C263C9E;
-	Mon, 24 Feb 2025 11:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76089267B7C;
+	Mon, 24 Feb 2025 11:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740395875; cv=none; b=efL/LRJ+9Rj1QCc6XSAky5Rv0zpeeuZviZHeL3Qiu1yKznFxqRXORPZ7Hoycj5YevRhZTs3b2OfISWRSu4mxVAQ58DHP4CuGfwkr6VbelcOzwI7cmfBZB9ekCoTP5Ux4EK0dITKJjVwxt3UzbLLjEgUYvHRqFKk3cC+QECqNbZk=
+	t=1740395949; cv=none; b=bBLS+GvQIS0Vhe7uIUmvTtnfW9IoAZ2X9ZM6hC2e02EncDhxs5kSQTEt/qw8FON1ibiT1/FOHOsTgpxkmGmxZaFykNksDRyp8oHaZQnZ1Cb/CJaOlbu2yOUIOOvhDWliV4BLM5vOWt4NndquvIfr0kELd6gwwYOcx6CLJEhrREs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740395875; c=relaxed/simple;
-	bh=AqC/SyyR7zEcSp96cB/NcX/G9sATLEdqTQn4kdPNpnY=;
+	s=arc-20240116; t=1740395949; c=relaxed/simple;
+	bh=gE5uRHqVDZjkgOWqgS95Cm71TIS3auiXFOzMFuV0Ot4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WnZA8Wa1zKKXXMfA24cu6PqUHMl+36G2wlbuMCcOJKTtDJd5DZkmOnqd6mR6d+7LvPQsR+ywWr2D0W8CNZn6xq559ClJ3EytwUGrDex5Z6fNetx8RsTnXrj3kuHlL2GLWAx9vqSISNhG6euo2kDiLnpxjCkrqY1e/tIC3UzeiPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AoGhlDgV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=be/qwof1+dOUlqH/9kqnEvaxHsphbl+Aq+0k+QEL+XPO3ZpY3oEbCTwe5tTEPnQr4Gk55d4qYOx2uI+E6WMnK7bwUxJXYjkghJcW2Ddl4pSi/NaCnCrOJgijDNbKLARPYIwOmBHnVZTuEy4BvoyTplnMltd0dUvL7atEPsqooM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGOFre3M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoGhlDgV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79386C4CED6;
-	Mon, 24 Feb 2025 11:17:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGOFre3M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE834C4CEE8;
+	Mon, 24 Feb 2025 11:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740395874;
-	bh=AqC/SyyR7zEcSp96cB/NcX/G9sATLEdqTQn4kdPNpnY=;
+	s=k20201202; t=1740395948;
+	bh=gE5uRHqVDZjkgOWqgS95Cm71TIS3auiXFOzMFuV0Ot4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AoGhlDgVVwH3hhSDaDa1aVTlaFSOdkFXLyYYYIxo0pZZZZiJ5Xh9S8ge092dy9a6E
-	 F2o6sJCXHIBbFFdwBWxAG1PgUA0WQdRhrrkNBU7Qy9hRg4KIWAXSp6OYOmjwzzFsuK
-	 0Wj3pXf5D7Ka+RYDQ7W7/Z8Tdd9H9kDybk09uqVplJxVLiCNYXMcZENMEX4OeXPOii
-	 qQCNX5SRgsqKkvvjpF2/nCUodKTH0RQtlWRR+55Qz1iCqfUMyMSU/rdG8knTDXvWgi
-	 tNolv13bSiZj7s/Ldtj4O02W+yBQORm8ERVEUnfe1ICZVbBNkDtGBecTmwvq9yQUJs
-	 uRdRYC5hz8vlg==
+	b=MGOFre3MS6BIh7QJVFfUTb+Pu2jhulU/qyWX7yKRPaH1As0OcRLMK9m91FLyYhmae
+	 9hVWfJRg8EFEotcjXYVvpTdClEOctSjI/8fhAjTnZUGKqk2FxPf+ox3/VjloFicrfR
+	 TxK/i4AE49P/PNNuNHrgR0UWLeLeiPDhjLWj4klAxPhS+SentrJdgPr87xjqPymC0+
+	 nCZ2oxLxxsroc4GDqqUX+f8Zz9Y3INMAU2MOQIzTwYa1QuOV98LjtpqP2MTXw+jD7r
+	 B5Tk/a2gKIyVG2YT0D5R4WDVPPWBc7lHxsCM6LiisuUeGHiJIThOmfSznfW0b5esGK
+	 3Kx1tgc1t5jaQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,12 +36,12 @@ Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	linkinjeon@kernel.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.13 29/32] cifs: Treat unhandled directory name surrogate reparse points as mount directory nodes
-Date: Mon, 24 Feb 2025 06:16:35 -0500
-Message-Id: <20250224111638.2212832-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 25/28] cifs: Treat unhandled directory name surrogate reparse points as mount directory nodes
+Date: Mon, 24 Feb 2025 06:17:56 -0500
+Message-Id: <20250224111759.2213772-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250224111638.2212832-1-sashal@kernel.org>
-References: <20250224111638.2212832-1-sashal@kernel.org>
+In-Reply-To: <20250224111759.2213772-1-sashal@kernel.org>
+References: <20250224111759.2213772-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,7 +51,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.13.4
+X-stable-base: Linux 6.12.16
 Content-Transfer-Encoding: 8bit
 
 From: Pali Rohár <pali@kernel.org>
@@ -78,10 +78,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 16 insertions(+)
 
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index f146e06c97eb6..564f113bf739d 100644
+index fafc07e38663c..295afb73fcdd6 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -1215,6 +1215,19 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+@@ -1193,6 +1193,19 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
  			rc = server->ops->parse_reparse_point(cifs_sb,
  							      full_path,
  							      iov, data);
