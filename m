@@ -1,31 +1,31 @@
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [195.16.41.108])
+Received: from mail-gw01.astralinux.ru (mail-gw01.astralinux.ru [37.230.196.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9862661A3;
-	Tue, 25 Feb 2025 09:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.16.41.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D14B2627FB;
+	Tue, 25 Feb 2025 09:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.230.196.243
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740476108; cv=none; b=lVx3BB+IqJFZ4At0qfAMmYGb7csNGL2dGNoo3naaqIdkgVTmJWWEH2ayiuhVbprwZc91MKo6WFE830u+/U1MbVXDSG8fzTvzJARJDaQo6ZiP8RBfsdYHZkDFGt4aZeNs6CyMi84tmvlMYzpynbYe0bOY8v3w+l0XtrSVWEOw54o=
+	t=1740476110; cv=none; b=A5E4kk+3upLDusqPidSrMj306NF/IEDBwbRU4pgXpCmS9Ps/Yf0+ZzjwQ4gLOKqwWMCbIIZ+uW2KA29SL62BaF/iBMrTirlVvx6mbIoLrxVVpyutPBCTNnx7FLARiM9xX/i4AXRvdvMaVAoDhnr+s9ve2hwUiHqeQVwUyUfyz4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740476108; c=relaxed/simple;
-	bh=VKVpn9QhnPv0kuUhUfzxMejbN/ieb227EPXkOuggSWY=;
+	s=arc-20240116; t=1740476110; c=relaxed/simple;
+	bh=ZzsodoARg8d22q1kMhsC7unErXL2OdZ7SV6ILRvCZwQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=azOy6Pev9TvfZSbSBIv1xKvar+TnooOQ85I/5/zyx1pd6ibAAMPZckUYlxz4i6qsn4b2l9ft7x89GVx+EgonNkxQDXpv0wDHvvEjCuvjph7BSO5fFQjPEn+maLbSAq409t5r6tetQfDQ8GrEjz0VCZKZO/zQjuYmmhVY3htxG6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=195.16.41.108
+	 MIME-Version; b=gN1QHR3gDuzOFgK9/fNQlCoWS6jbLm3PRAU7etnV5w8FgRch9xO+LFWozsTv7S1tKOPGK8QKaIOTF6uyf3yD7AGOQTlIowNO92k3R7zTkzFPOeWt2UJDOlSKRQAYkIS63jwJ+46IQ8YaXwM5gLrPGaObDGGi/3aJGZ+S5YP/peQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=37.230.196.243
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from gca-msk-a-srv-ksmg02.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 560E21F9E5;
-	Tue, 25 Feb 2025 12:35:00 +0300 (MSK)
+Received: from gca-sc-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
+	by mail-gw01.astralinux.ru (Postfix) with ESMTP id 3B1D024CAA;
+	Tue, 25 Feb 2025 12:34:57 +0300 (MSK)
 Received: from new-mail.astralinux.ru (gca-yc-ruca-srv-mail03.astralinux.ru [10.177.185.108])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Tue, 25 Feb 2025 12:34:59 +0300 (MSK)
+	by mail-gw01.astralinux.ru (Postfix) with ESMTPS;
+	Tue, 25 Feb 2025 12:34:56 +0300 (MSK)
 Received: from localhost.localdomain (unknown [10.177.20.114])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4Z2CBB2cPRz1h0Mh;
-	Tue, 25 Feb 2025 12:34:58 +0300 (MSK)
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4Z2CB80mfdz1h0Mh;
+	Tue, 25 Feb 2025 12:34:56 +0300 (MSK)
 From: Anastasia Belova <abelova@astralinux.ru>
 To: stable@vger.kernel.org,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -36,13 +36,11 @@ Cc: Anastasia Belova <abelova@astralinux.ru>,
 	linux-kernel@vger.kernel.org,
 	lvc-project@linuxtesting.org,
 	lvc-patches@linuxtesting.org,
-	Tom Talpey <tom@talpey.com>,
-	Jianhong Yin <jiyin@redhat.com>,
-	Paulo Alcantara <pc@manguebit.com>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 5.10/5.15 2/2] smb: client: fix NULL ptr deref in crypto_aead_setkey()
-Date: Tue, 25 Feb 2025 12:34:24 +0300
-Message-ID: <20250225093428.611253-3-abelova@astralinux.ru>
+Subject: [PATCH 5.10/5.15 1/2] smb: client: fix UAF in async decryption
+Date: Tue, 25 Feb 2025 12:34:23 +0300
+Message-ID: <20250225093428.611253-2-abelova@astralinux.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250225093428.611253-1-abelova@astralinux.ru>
 References: <20250225093428.611253-1-abelova@astralinux.ru>
@@ -56,7 +54,7 @@ Content-Transfer-Encoding: 8bit
 X-KSMG-AntiPhishing: NotDetected
 X-KSMG-AntiSpam-Auth: dkim=none
 X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_from_domain_doesnt_match_to}, astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_from_domain_doesnt_match_to}, astralinux.ru:7.1.1;127.0.0.199:7.1.2;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiSpam-Lua-Profiles: 191262 [Feb 25 2025]
 X-KSMG-AntiSpam-Method: none
@@ -69,124 +67,194 @@ X-KSMG-LinksScanning: NotDetected
 X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 1
 
-From: Paulo Alcantara <pc@manguebit.com>
+From: Enzo Matsumiya <ematsumiya@suse.de>
 
-commit 4bdec0d1f658f7c98749bd2c5a486e6cfa8565d2 upstream.
+commit b0abcd65ec545701b8793e12bc27dc98042b151a upstream.
 
-Neither SMB3.0 or SMB3.02 supports encryption negotiate context, so
-when SMB2_GLOBAL_CAP_ENCRYPTION flag is set in the negotiate response,
-the client uses AES-128-CCM as the default cipher.  See MS-SMB2
-3.3.5.4.
+Doing an async decryption (large read) crashes with a
+slab-use-after-free way down in the crypto API.
 
-Commit b0abcd65ec54 ("smb: client: fix UAF in async decryption") added
-a @server->cipher_type check to conditionally call
-smb3_crypto_aead_allocate(), but that check would always be false as
-@server->cipher_type is unset for SMB3.02.
+Reproducer:
+    # mount.cifs -o ...,seal,esize=1 //srv/share /mnt
+    # dd if=/mnt/largefile of=/dev/null
+    ...
+    [  194.196391] ==================================================================
+    [  194.196844] BUG: KASAN: slab-use-after-free in gf128mul_4k_lle+0xc1/0x110
+    [  194.197269] Read of size 8 at addr ffff888112bd0448 by task kworker/u77:2/899
+    [  194.197707]
+    [  194.197818] CPU: 12 UID: 0 PID: 899 Comm: kworker/u77:2 Not tainted 6.11.0-lku-00028-gfca3ca14a17a-dirty #43
+    [  194.198400] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.2-3-gd478f380-prebuilt.qemu.org 04/01/2014
+    [  194.199046] Workqueue: smb3decryptd smb2_decrypt_offload [cifs]
+    [  194.200032] Call Trace:
+    [  194.200191]  <TASK>
+    [  194.200327]  dump_stack_lvl+0x4e/0x70
+    [  194.200558]  ? gf128mul_4k_lle+0xc1/0x110
+    [  194.200809]  print_report+0x174/0x505
+    [  194.201040]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+    [  194.201352]  ? srso_return_thunk+0x5/0x5f
+    [  194.201604]  ? __virt_addr_valid+0xdf/0x1c0
+    [  194.201868]  ? gf128mul_4k_lle+0xc1/0x110
+    [  194.202128]  kasan_report+0xc8/0x150
+    [  194.202361]  ? gf128mul_4k_lle+0xc1/0x110
+    [  194.202616]  gf128mul_4k_lle+0xc1/0x110
+    [  194.202863]  ghash_update+0x184/0x210
+    [  194.203103]  shash_ahash_update+0x184/0x2a0
+    [  194.203377]  ? __pfx_shash_ahash_update+0x10/0x10
+    [  194.203651]  ? srso_return_thunk+0x5/0x5f
+    [  194.203877]  ? crypto_gcm_init_common+0x1ba/0x340
+    [  194.204142]  gcm_hash_assoc_remain_continue+0x10a/0x140
+    [  194.204434]  crypt_message+0xec1/0x10a0 [cifs]
+    [  194.206489]  ? __pfx_crypt_message+0x10/0x10 [cifs]
+    [  194.208507]  ? srso_return_thunk+0x5/0x5f
+    [  194.209205]  ? srso_return_thunk+0x5/0x5f
+    [  194.209925]  ? srso_return_thunk+0x5/0x5f
+    [  194.210443]  ? srso_return_thunk+0x5/0x5f
+    [  194.211037]  decrypt_raw_data+0x15f/0x250 [cifs]
+    [  194.212906]  ? __pfx_decrypt_raw_data+0x10/0x10 [cifs]
+    [  194.214670]  ? srso_return_thunk+0x5/0x5f
+    [  194.215193]  smb2_decrypt_offload+0x12a/0x6c0 [cifs]
 
-Fix the following KASAN splat by setting @server->cipher_type for
-SMB3.02 as well.
+This is because TFM is being used in parallel.
 
-mount.cifs //srv/share /mnt -o vers=3.02,seal,...
+Fix this by allocating a new AEAD TFM for async decryption, but keep
+the existing one for synchronous READ cases (similar to what is done
+in smb3_calc_signature()).
 
-BUG: KASAN: null-ptr-deref in crypto_aead_setkey+0x2c/0x130
-Read of size 8 at addr 0000000000000020 by task mount.cifs/1095
-CPU: 1 UID: 0 PID: 1095 Comm: mount.cifs Not tainted 6.12.0 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-3.fc41
-04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x5d/0x80
- ? crypto_aead_setkey+0x2c/0x130
- kasan_report+0xda/0x110
- ? crypto_aead_setkey+0x2c/0x130
- crypto_aead_setkey+0x2c/0x130
- crypt_message+0x258/0xec0 [cifs]
- ? __asan_memset+0x23/0x50
- ? __pfx_crypt_message+0x10/0x10 [cifs]
- ? mark_lock+0xb0/0x6a0
- ? hlock_class+0x32/0xb0
- ? mark_lock+0xb0/0x6a0
- smb3_init_transform_rq+0x352/0x3f0 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- smb_send_rqst+0x144/0x230 [cifs]
- ? __pfx_smb_send_rqst+0x10/0x10 [cifs]
- ? hlock_class+0x32/0xb0
- ? smb2_setup_request+0x225/0x3a0 [cifs]
- ? __pfx_cifs_compound_last_callback+0x10/0x10 [cifs]
- compound_send_recv+0x59b/0x1140 [cifs]
- ? __pfx_compound_send_recv+0x10/0x10 [cifs]
- ? __create_object+0x5e/0x90
- ? hlock_class+0x32/0xb0
- ? do_raw_spin_unlock+0x9a/0xf0
- cifs_send_recv+0x23/0x30 [cifs]
- SMB2_tcon+0x3ec/0xb30 [cifs]
- ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- ? __pfx_lock_release+0x10/0x10
- ? do_raw_spin_trylock+0xc6/0x120
- ? lock_acquire+0x3f/0x90
- ? _get_xid+0x16/0xd0 [cifs]
- ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
- ? cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
- cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
- ? __pfx_cifs_get_smb_ses+0x10/0x10 [cifs]
- ? cifs_get_tcp_session+0xaa0/0xca0 [cifs]
- cifs_mount_get_session+0x8a/0x210 [cifs]
- dfs_mount_share+0x1b0/0x11d0 [cifs]
- ? __pfx___lock_acquire+0x10/0x10
- ? __pfx_dfs_mount_share+0x10/0x10 [cifs]
- ? lock_acquire.part.0+0xf4/0x2a0
- ? find_held_lock+0x8a/0xa0
- ? hlock_class+0x32/0xb0
- ? lock_release+0x203/0x5d0
- cifs_mount+0xb3/0x3d0 [cifs]
- ? do_raw_spin_trylock+0xc6/0x120
- ? __pfx_cifs_mount+0x10/0x10 [cifs]
- ? lock_acquire+0x3f/0x90
- ? find_nls+0x16/0xa0
- ? smb3_update_mnt_flags+0x372/0x3b0 [cifs]
- cifs_smb3_do_mount+0x1e2/0xc80 [cifs]
- ? __pfx_vfs_parse_fs_string+0x10/0x10
- ? __pfx_cifs_smb3_do_mount+0x10/0x10 [cifs]
- smb3_get_tree+0x1bf/0x330 [cifs]
- vfs_get_tree+0x4a/0x160
- path_mount+0x3c1/0xfb0
- ? kasan_quarantine_put+0xc7/0x1d0
- ? __pfx_path_mount+0x10/0x10
- ? kmem_cache_free+0x118/0x3e0
- ? user_path_at+0x74/0xa0
- __x64_sys_mount+0x1a6/0x1e0
- ? __pfx___x64_sys_mount+0x10/0x10
- ? mark_held_locks+0x1a/0x90
- do_syscall_64+0xbb/0x1d0
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Also remove the calls to aead_request_set_callback() and
+crypto_wait_req() since it's always going to be a synchronous operation.
 
-Cc: Tom Talpey <tom@talpey.com>
-Reported-by: Jianhong Yin <jiyin@redhat.com>
-Cc: stable@vger.kernel.org # v6.12
-Fixes: b0abcd65ec54 ("smb: client: fix UAF in async decryption")
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+[ Anastasia: in old kernels dec and enc fields
+  are named ccmaesdecrypt and ccmaesencrypt. ]
 Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
 ---
- fs/cifs/smb2pdu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Backport fix for CVE-2024-50047
+ fs/cifs/smb2ops.c | 48 +++++++++++++++++++++++++++--------------------
+ fs/cifs/smb2pdu.c |  6 ++++++
+ 2 files changed, 34 insertions(+), 20 deletions(-)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 68f93de2b152..8cfce01cf699 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4291,7 +4291,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
+  */
+ static int
+ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+-	      struct smb_rqst *rqst, int enc)
++	      struct smb_rqst *rqst, int enc, struct crypto_aead *tfm)
+ {
+ 	struct smb2_transform_hdr *tr_hdr =
+ 		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
+@@ -4302,8 +4302,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	u8 key[SMB3_ENC_DEC_KEY_SIZE];
+ 	struct aead_request *req;
+ 	u8 *iv;
+-	DECLARE_CRYPTO_WAIT(wait);
+-	struct crypto_aead *tfm;
+ 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
+ 	void *creq;
+ 
+@@ -4314,15 +4312,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 		return rc;
+ 	}
+ 
+-	rc = smb3_crypto_aead_allocate(server);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+-		return rc;
+-	}
+-
+-	tfm = enc ? server->secmech.ccmaesencrypt :
+-						server->secmech.ccmaesdecrypt;
+-
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
+ 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+ 		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
+@@ -4361,11 +4350,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
+ 	aead_request_set_ad(req, assoc_data_len);
+ 
+-	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				  crypto_req_done, &wait);
+-
+-	rc = crypto_wait_req(enc ? crypto_aead_encrypt(req)
+-				: crypto_aead_decrypt(req), &wait);
++	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
+ 
+ 	if (!rc && enc)
+ 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+@@ -4454,7 +4439,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 	/* fill the 1st iov with a transform header */
+ 	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
+ 
+-	rc = crypt_message(server, num_rqst, new_rq, 1);
++	rc = crypt_message(server, num_rqst, new_rq, 1, server->secmech.ccmaesencrypt);
+ 	cifs_dbg(FYI, "Encrypt message returned %d\n", rc);
+ 	if (rc)
+ 		goto err_free;
+@@ -4480,8 +4465,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ 		 unsigned int npages, unsigned int page_data_size,
+ 		 bool is_offloaded)
+ {
+-	struct kvec iov[2];
++	struct crypto_aead *tfm;
+ 	struct smb_rqst rqst = {NULL};
++	struct kvec iov[2];
+ 	int rc;
+ 
+ 	iov[0].iov_base = buf;
+@@ -4496,9 +4482,31 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ 	rqst.rq_pagesz = PAGE_SIZE;
+ 	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
+ 
+-	rc = crypt_message(server, 1, &rqst, 0);
++	if (is_offloaded) {
++		if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
++		    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
++			tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
++		else
++			tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
++		if (IS_ERR(tfm)) {
++			rc = PTR_ERR(tfm);
++			cifs_server_dbg(VFS, "%s: Failed alloc decrypt TFM, rc=%d\n", __func__, rc);
++
++			return rc;
++		}
++	} else {
++		if (unlikely(!server->secmech.ccmaesdecrypt))
++			return -EIO;
++
++		tfm = server->secmech.ccmaesdecrypt;
++	}
++
++	rc = crypt_message(server, 1, &rqst, 0, tfm);
+ 	cifs_dbg(FYI, "Decrypt message returned %d\n", rc);
+ 
++	if (is_offloaded)
++		crypto_free_aead(tfm);
++
+ 	if (rc)
+ 		return rc;
+ 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 245e2dd5a194..4197096e7fdb 100644
+index 03651cc6b7a5..245e2dd5a194 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -963,7 +963,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	 * SMB3.0 supports only 1 cipher and doesn't have a encryption neg context
- 	 * Set the cipher type manually.
- 	 */
--	if (server->dialect == SMB30_PROT_ID && (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
-+	if ((server->dialect == SMB30_PROT_ID ||
-+	     server->dialect == SMB302_PROT_ID) &&
-+	    (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
- 		server->cipher_type = SMB2_ENCRYPTION_AES128_CCM;
- 
- 	security_blob = smb2_get_data_area_len(&blob_offset, &blob_length,
+@@ -998,6 +998,12 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		else
+ 			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
+ 	}
++
++	if (server->cipher_type && !rc) {
++		rc = smb3_crypto_aead_allocate(server);
++		if (rc)
++			cifs_server_dbg(VFS, "%s: crypto alloc failed, rc=%d\n", __func__, rc);
++	}
+ neg_exit:
+ 	free_rsp_buf(resp_buftype, rsp);
+ 	return rc;
 -- 
 2.43.0
 
