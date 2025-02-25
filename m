@@ -1,334 +1,244 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061841F941
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2025 23:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C12A367
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Feb 2025 03:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740439792; cv=none; b=Wn03teZXuabGloFAVNnybCa6ckgjjnJYLhtvTVLUt7TNybENhCQKIJOxQF3YsSymsfia53+RTwsO97kC6N9YIzG2Xbdpt6/kiJ682YVbXtfGtlBct0XXEAdcaCXP+2GPYd6mRk9au/zanqhPByT0WT5M/6i+E6RiAZHmhgKfpGc=
+	t=1740454940; cv=none; b=ihbqDx/quJhDRKL90jnOn0KsBdubnp0FdybF0fOGKpwat8SoB3OmvvnxjXfZsbJXECR/d/BobhvqkMJu6ZZ8PQJhZ4zvozW2nkVv93AgaPuKnR5ByaSS9s4pjyRYf89SBouRxQUJjmfoSheLSG2ODtnrV2YxkFpOtB787QAOkyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740439792; c=relaxed/simple;
-	bh=vt/y9E4/DcaZ9NV1EBDUcDNYGDvwjv/mQRtyYJZcYqk=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=Z9RbZVNOBH9FzjzC0mUqZ7joap+xvGxrQgwAXiGpoYTjO6JJfrfduGhIxd47Co/sFt37dgh7PL+R1eOCg6wFdwF7Oyt53PGXzPf1gpExzPAg4t47P0k3asMreWwuFZAS429YSFm9cec7q522CffBk49f18nEV7M94zTEFQ2a0h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=loBfTiR6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J3mvHyzY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=loBfTiR6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J3mvHyzY; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1740454940; c=relaxed/simple;
+	bh=9jj19+NzLuiuNb0sAf3HxNj5pndd5pUpK7+tsjaRNrk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pp8UmvfuUxIPt+knYjDMBteU29WDop1+tf2oZmJ/mW/e6mfxCJhzPB6EJn5mSi3ryhKC/y3PRxxBcHAa2KMnPfUQW+RGXDMavpnx0y8vyABDxTFR8DuYZ6IreDY173PLjE27AeuIvCu5OtNLgJXG2tXSvsM9NLTLYtQY+TNnZ3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=sVCQfkiw; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="loBfTiR6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J3mvHyzY";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="loBfTiR6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J3mvHyzY"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1769F1F44E;
-	Mon, 24 Feb 2025 23:29:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740439789; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2oj990YaLGkPA4ae4sIKmdEX5RxKU3jTg87RjSWSYeg=;
-	b=loBfTiR6kAlC/sS0ot1CDtcKEiKmB6GXrsHNK+SsrbeZzGdV6O2ZrsmO8jw3wvJPHK58Kj
-	glzLsVFTkUpcycBhzhfiLzoYOAwECgg5wubkGZIw8GCF2DWKEIFm9faiQIbZ45b9stImh9
-	J9FQoxLwzfFLcLMM4Nzxcdvxtbe/i94=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740439789;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2oj990YaLGkPA4ae4sIKmdEX5RxKU3jTg87RjSWSYeg=;
-	b=J3mvHyzY65SyoNedSF0MYSEG2w3R6giaas15VW09Vb9TUfaAv1RMGveIpiZI1/xnVIoKU6
-	p9GIZjyHOh0bImAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1740439789; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2oj990YaLGkPA4ae4sIKmdEX5RxKU3jTg87RjSWSYeg=;
-	b=loBfTiR6kAlC/sS0ot1CDtcKEiKmB6GXrsHNK+SsrbeZzGdV6O2ZrsmO8jw3wvJPHK58Kj
-	glzLsVFTkUpcycBhzhfiLzoYOAwECgg5wubkGZIw8GCF2DWKEIFm9faiQIbZ45b9stImh9
-	J9FQoxLwzfFLcLMM4Nzxcdvxtbe/i94=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1740439789;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2oj990YaLGkPA4ae4sIKmdEX5RxKU3jTg87RjSWSYeg=;
-	b=J3mvHyzY65SyoNedSF0MYSEG2w3R6giaas15VW09Vb9TUfaAv1RMGveIpiZI1/xnVIoKU6
-	p9GIZjyHOh0bImAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A647613332;
-	Mon, 24 Feb 2025 23:29:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5OlzEuQAvWc2awAAD6G6ig
-	(envelope-from <neilb@suse.de>); Mon, 24 Feb 2025 23:29:40 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="sVCQfkiw"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-221050f3f00so115883625ad.2
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2025 19:42:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1740454938; x=1741059738; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=heiclrdqjdt9ptSQvJcywwubX1oHcT/mg99JdqMdOJc=;
+        b=sVCQfkiwm7U/0MXbJuF2xus/d6Nt0iYqQ4AXqiTcTVk22l6gG6ccQrniqq4yBWi6zN
+         c/VHLu+mOFR/+k1kxlWTpDqnqU9HZxIBoN+Fpz7zxBHrkGFud5AZRF0aEqQclkzMQLjw
+         NK0QHfRn8nGn17GAZTIZjy7wHJ7jOTtsHOa1e6beg6Mcluf/2Ml0DIQHaVx8qLenLfBB
+         17taZWkhNGgMqIYnNNTx1Ngdbg2Tm4dsS0ca8ocbh6sOxPpj0MZhbmhZC6KiPhu2hynv
+         vTFBKbX3J88WXdaW2MTNbQhwiC9v/TUryX1AzJFN5fxqR2FHohszZEEc7PuxORRM/IHA
+         L9TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740454938; x=1741059738;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=heiclrdqjdt9ptSQvJcywwubX1oHcT/mg99JdqMdOJc=;
+        b=WDb3RhQK2NcZK2e3zRu8IYt6TPR+fo33ETVC4BHqxL1bn5JU7jgDpICxTbpcUjovWj
+         CPF6RJO17AVN3mmqa6Z9uZS+louYgf6H9hNxJeiXIugh+PG/F+nTo8hUYUNhmC3U/0vm
+         gXYMi7MGygO4o9UbPMJJo9dfjECz54uXyWB0piZ6M9SBnFbeXT52mHrlkcAuvIzHcyI5
+         6cntMNF1IHq2gaUEMS1j0fF3r0N/0P7DH8RyjX4T6X9aNWJx06BdeGxGAd0xY9CbARpp
+         WGIN4Lw+k1uL1K8tDV0925u/wi0d2VyJ/bIsrxApAdsSHPcxtwC1E0WRcUKy15uG2b76
+         oezw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVtpoigVgam40Nmhx3SWsPTcRFBrjlubId41kpaf19FBwn5vLdRdwkDZ8ysCiAQRLPslDNHs8RmB8C@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/rgkLSgQrkVUFrpp7aBH0Q+sJDwbAaMUaVBUiVG5cUGB2l5vh
+	3CZxMa/aGyJOOasMJaEYTgCfMbXENovQIZijzwSizcw1ZFYLU8Q0nCpNCnax6F0=
+X-Gm-Gg: ASbGncuUH4X9bihvApuQPlQITDJvDzTVspkcRWvf74k76BGpZ7i1Z+wRwUkACLbJXEZ
+	3wcgToGW03qwpKQOSTmPBCwJqovH6SUAROPQylcgDSFR8x9FCNmn4oFmfGHRqEBFsQ4ux8kNvd4
+	QVOYYMnq8I6cbBMXWaHM8YQ7uEgkQo58lWGJ694vnI9Cr3IyI9Plx0SVivScEPIcJkzg4hxWjJd
+	z7Cn6/ggm9SaWgLG9qMCYDuzDEuqjZt6LJyt09F1zZ/inQ/aZtLan9M9Wvwvm7WPO4s5Yrt5iJi
+	6Cd6cKVhBbXiMCJzT03ebaSERGy1r/IreCi7TMcQ1zF8xzKUA3dfUYdRIZL87g/AmvKJX0okTWa
+	q/A==
+X-Google-Smtp-Source: AGHT+IFu9ZTqMmFmKgq2BwNevmgyVHSAbFB+fe6KcaqwYov8nGeJ6zB/x+emYSs02kt5foE3WTELdQ==
+X-Received: by 2002:a05:6a00:1310:b0:730:9567:c3d5 with SMTP id d2e1a72fcca58-7347909fee5mr2844300b3a.4.1740454938499;
+        Mon, 24 Feb 2025 19:42:18 -0800 (PST)
+Received: from dread.disaster.area (pa49-186-89-135.pa.vic.optusnet.com.au. [49.186.89.135])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aedaa643b1asm285306a12.49.2025.02.24.19.42.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2025 19:42:17 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.98)
+	(envelope-from <david@fromorbit.com>)
+	id 1tmlpm-00000005cIf-1lpb;
+	Tue, 25 Feb 2025 14:42:14 +1100
+Date: Tue, 25 Feb 2025 14:42:14 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: Amir Goldstein <amir73il@gmail.com>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steve French <sfrench@samba.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
+ for FS_IOC_FS[GS]ETXATTR API
+Message-ID: <Z708FirwXbRFBqGj@dread.disaster.area>
+References: <CAOQ4uxigYpzpttfaRc=xAxJc=f2bz89_eCideuftf3egTiE+3A@mail.gmail.com>
+ <20250216202441.d3re7lfky6bcozkv@pali>
+ <CAOQ4uxj4urR70FmLB_4Qwbp1O5TwvHWSW6QPTCuq7uXp033B7Q@mail.gmail.com>
+ <Z7Pjb5tI6jJDlFZn@dread.disaster.area>
+ <CAOQ4uxh6aWO7Emygi=dXCE3auDcZZCmDP+jmjhgdffuz1Vx6uQ@mail.gmail.com>
+ <20250218192701.4q22uaqdyjxfp4p3@pali>
+ <Z7UQHL5odYOBqAvo@dread.disaster.area>
+ <20250218230643.fuc546ntkq3nnnom@pali>
+ <CAOQ4uxiAU7UorH1FLcPgoWMXMGRsOt77yRQ12Xkmzcxe8qYuVw@mail.gmail.com>
+ <20250221163443.GA2128534@mit.edu>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Viacheslav Dubeyko" <Slava.Dubeyko@ibm.com>
-Cc: "brauner@kernel.org" <brauner@kernel.org>, "Xiubo Li" <xiubli@redhat.com>,
- "idryomov@gmail.com" <idryomov@gmail.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- "Dai.Ngo@oracle.com" <Dai.Ngo@oracle.com>,
- "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
- "chuck.lever@oracle.com" <chuck.lever@oracle.com>,
- "jlayton@kernel.org" <jlayton@kernel.org>,
- "anna@kernel.org" <anna@kernel.org>, "miklos@szeredi.hu" <miklos@szeredi.hu>,
- "trondmy@kernel.org" <trondmy@kernel.org>,
- "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
- "jack@suse.cz" <jack@suse.cz>, "tom@talpey.com" <tom@talpey.com>,
- "richard@nod.at" <richard@nod.at>,
- "anton.ivanov@cambridgegreys.com" <anton.ivanov@cambridgegreys.com>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "netfs@lists.linux.dev" <netfs@lists.linux.dev>,
- "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
- "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
- "senozhatsky@chromium.org" <senozhatsky@chromium.org>
-Subject: RE:  [PATCH 3/6] ceph: return the correct dentry on mkdir
-In-reply-to: <f7d3e39f5ced7832d451de172004172b59a994eb.camel@ibm.com>
-References: <>, <f7d3e39f5ced7832d451de172004172b59a994eb.camel@ibm.com>
-Date: Tue, 25 Feb 2025 10:29:37 +1100
-Message-id: <174043977707.74271.6498110571534472585@noble.neil.brown.name>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,vger.kernel.org,oracle.com,lists.infradead.org,sipsolutions.net,szeredi.hu,zeniv.linux.org.uk,suse.cz,talpey.com,nod.at,cambridgegreys.com,lists.linux.dev,chromium.org];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250221163443.GA2128534@mit.edu>
 
-On Tue, 25 Feb 2025, Viacheslav Dubeyko wrote:
-> On Mon, 2025-02-24 at 13:15 +1100, NeilBrown wrote:
-> > On Fri, 21 Feb 2025, Viacheslav Dubeyko wrote:
-> > > On Fri, 2025-02-21 at 10:36 +1100, NeilBrown wrote:
-> > > > ceph already splices the correct dentry (in splice_dentry()) from the
-> > > > result of mkdir but does nothing more with it.
-> > > >=20
-> > > > Now that ->mkdir can return a dentry, return the correct dentry.
-> > > >=20
-> > > > Signed-off-by: NeilBrown <neilb@suse.de>
-> > > > ---
-> > > >  fs/ceph/dir.c | 9 ++++++++-
-> > > >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/fs/ceph/dir.c b/fs/ceph/dir.c
-> > > > index 39e0f240de06..c1a1c168bb27 100644
-> > > > --- a/fs/ceph/dir.c
-> > > > +++ b/fs/ceph/dir.c
-> > > > @@ -1099,6 +1099,7 @@ static struct dentry *ceph_mkdir(struct mnt_idm=
-ap *idmap, struct inode *dir,
-> > > >  	struct ceph_client *cl =3D mdsc->fsc->client;
-> > > >  	struct ceph_mds_request *req;
-> > > >  	struct ceph_acl_sec_ctx as_ctx =3D {};
-> > > > +	struct dentry *ret =3D NULL;
-> > >=20
-> > > I believe that it makes sense to initialize pointer by error here and a=
-lways
-> > > return ret as output. If something goes wrong in the logic, then we alr=
-eady have
-> > > error.
-> >=20
-> > I'm not certain that I understand, but I have made a change which seems
-> > to be consistent with the above and included it below.  Please let me
-> > know if it is what you intended.
-> >=20
-> > >=20
-> > > >  	int err;
-> > > >  	int op;
-> > > > =20
-> > > > @@ -1166,14 +1167,20 @@ static struct dentry *ceph_mkdir(struct mnt_i=
-dmap *idmap, struct inode *dir,
-> > > >  	    !req->r_reply_info.head->is_dentry)
-> > > >  		err =3D ceph_handle_notrace_create(dir, dentry);
-> > > >  out_req:
-> > > > +	if (!err && req->r_dentry !=3D dentry)
-> > > > +		/* Some other dentry was spliced in */
-> > > > +		ret =3D dget(req->r_dentry);
-> > > >  	ceph_mdsc_put_request(req);
-> > > >  out:
-> > > >  	if (!err)
-> > > > +		/* Should this use 'ret' ?? */
-> > >=20
-> > > Could we make a decision should or shouldn't? :)
-> > > It looks not good to leave this comment instead of proper implementatio=
-n. Do we
-> > > have some obstacles to make this decision?
-> >=20
-> > I suspect we should use ret, but I didn't want to make a change which
-> > wasn't directly required by my needed.  So I highlighted this which
-> > looks to me like a possible bug, hoping that someone more familiar with
-> > the code would give an opinion.  Do you agree that 'ret' (i.e.
-> > ->r_dentry) should be used when ret is not NULL?
-> >=20
->=20
-> I think if we are going to return ret as a dentry, then it makes sense to c=
-all
-> the ceph_init_inode_acls() for d_inode(ret). I don't see the point to call
-> ceph_init_inode_acls() for d_inode(dentry) then.
+On Fri, Feb 21, 2025 at 11:34:43AM -0500, Theodore Ts'o wrote:
+> I think a few people were talking past each other, because there are two
+> fileds in struct fileattr --- flags, and fsx_xflags.  The flags field
+> is what was originally used by FS_IOC_EXT2_[GS]ETFLAGS, which later
 
-If the mkdir used the original dentry, then ->mkdir returns NULL so ret
-is NULL.  If the mkdir used a different dentry it returns that, so ret
-is not NULL.
+I don't think anyone has been confusing the two - the entire
+discussion has been about fsx_xflags and the struct fsxattr...
 
-I'll try to re-organise the code so that "dentry" is the correct dentry
-on success, and "ret" is the returned dentry, which might be NULL.
+> started getting used by many other file systems, starting with
+> resierfs and btrfs, and so it became FS_IOC_[GS]ETFLAGS.  The bits in
+> that flags word were both the ioctl ABI and the on-disk encoding, and
+> because we were now allowing multiple file systems to allocate bits,
+> and we needed to avoid stepping on each other (for example since btrfs
+> started using FS_NOCOW_FL, that bit position wouldn't be used by ext4,
+> at least not for a publically exported flag).
+> 
+> So we started running out of space in the FS_FLAG_*_FL namespace, and
+> that's why we created FS_IOC_[GS]ETXATTR and the struct fsxattr.  The
 
-Thanks,
-NeilBrown
+No, that is most certainly not how this API came about. 
 
+The FS_IOC_[GS]ETXATTR ioctls were first implement on IRIX close on
+30 years ago. They were ported to Linux with the XFS linux port over
+2 decades ago. Indeed, we've been using them for xfsdump/xfs_restore
+since before XFS was ported to linux.
 
->=20
-> > >=20
-> > > >  		ceph_init_inode_acls(d_inode(dentry), &as_ctx);
-> > > >  	else
-> > > >  		d_drop(dentry);
-> > > >  	ceph_release_acl_sec_ctx(&as_ctx);
-> > > > -	return ERR_PTR(err);
-> > > > +	if (err)
-> > > > +		return ERR_PTR(err);
-> > > > +	return ret;
-> > >=20
-> > > What's about this?
-> > >=20
-> > > return err ? ERR_PTR(err) : ret;
-> >=20
-> > We could do that, but you said above that you thought we should always
-> > return 'ret' - which does make some sense.
-> >=20
-> > What do you think of the following alternate patch?
-> >=20
->=20
-> Patch looks good to me. Thanks.
->=20
-> Reviewed-by: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
->=20
-> > Thanks,
-> > NeilBrown
-> >=20
-> > diff --git a/fs/ceph/dir.c b/fs/ceph/dir.c
-> > index 39e0f240de06..d2e5c557df83 100644
-> > --- a/fs/ceph/dir.c
-> > +++ b/fs/ceph/dir.c
-> > @@ -1099,6 +1099,7 @@ static struct dentry *ceph_mkdir(struct mnt_idmap *=
-idmap, struct inode *dir,
-> >  	struct ceph_client *cl =3D mdsc->fsc->client;
-> >  	struct ceph_mds_request *req;
-> >  	struct ceph_acl_sec_ctx as_ctx =3D {};
-> > +	struct dentry *ret;
-> >  	int err;
-> >  	int op;
-> > =20
-> > @@ -1116,32 +1117,32 @@ static struct dentry *ceph_mkdir(struct mnt_idmap=
- *idmap, struct inode *dir,
-> >  		      ceph_vinop(dir), dentry, dentry, mode);
-> >  		op =3D CEPH_MDS_OP_MKDIR;
-> >  	} else {
-> > -		err =3D -EROFS;
-> > +		ret =3D ERR_PTR(-EROFS);
-> >  		goto out;
-> >  	}
-> > =20
-> >  	if (op =3D=3D CEPH_MDS_OP_MKDIR &&
-> >  	    ceph_quota_is_max_files_exceeded(dir)) {
-> > -		err =3D -EDQUOT;
-> > +		ret =3D ERR_PTR(-EDQUOT);
-> >  		goto out;
-> >  	}
-> >  	if ((op =3D=3D CEPH_MDS_OP_MKSNAP) && IS_ENCRYPTED(dir) &&
-> >  	    !fscrypt_has_encryption_key(dir)) {
-> > -		err =3D -ENOKEY;
-> > +		ret =3D ERR_PTR(-ENOKEY);
-> >  		goto out;
-> >  	}
-> > =20
-> > =20
-> >  	req =3D ceph_mdsc_create_request(mdsc, op, USE_AUTH_MDS);
-> >  	if (IS_ERR(req)) {
-> > -		err =3D PTR_ERR(req);
-> > +		ret =3D ERR_CAST(req);
-> >  		goto out;
-> >  	}
-> > =20
-> >  	mode |=3D S_IFDIR;
-> >  	req->r_new_inode =3D ceph_new_inode(dir, dentry, &mode, &as_ctx);
-> >  	if (IS_ERR(req->r_new_inode)) {
-> > -		err =3D PTR_ERR(req->r_new_inode);
-> > +		ret =3D ERR_CAST(req->r_new_inode);
-> >  		req->r_new_inode =3D NULL;
-> >  		goto out_req;
-> >  	}
-> > @@ -1165,15 +1166,23 @@ static struct dentry *ceph_mkdir(struct mnt_idmap=
- *idmap, struct inode *dir,
-> >  	    !req->r_reply_info.head->is_target &&
-> >  	    !req->r_reply_info.head->is_dentry)
-> >  		err =3D ceph_handle_notrace_create(dir, dentry);
-> > +	ret =3D ERR_PTR(err);
-> >  out_req:
-> > +	if (!IS_ERR(ret) && req->r_dentry !=3D dentry)
-> > +		/* Some other dentry was spliced in */
-> > +		ret =3D dget(req->r_dentry);
-> >  	ceph_mdsc_put_request(req);
-> >  out:
-> > -	if (!err)
-> > -		ceph_init_inode_acls(d_inode(dentry), &as_ctx);
-> > -	else
-> > +	if (!IS_ERR(ret)) {
-> > +		if (ret)
-> > +			ceph_init_inode_acls(d_inode(ret), &as_ctx);
-> > +		else
-> > +			ceph_init_inode_acls(d_inode(dentry), &as_ctx);
-> > +	} else {
-> >  		d_drop(dentry);
-> > +	}
-> >  	ceph_release_acl_sec_ctx(&as_ctx);
-> > -	return ERR_PTR(err);
-> > +	return ret;
-> >  }
-> > =20
-> >  static int ceph_link(struct dentry *old_dentry, struct inode *dir,
-> >=20
->=20
-> Thanks,
-> Slava.
->=20
->=20
+They got lifted to the VFS back in 2016 so that ext4 could use the
+interface for getting/setting project IDs on files. This was done so
+that existing userspace functionality for setting up
+project/directory quotas on XFS could also be used on ext4.
 
+> FS_XFLAG_*_FL space has plenty of space; there are 14 unassigned bit
+> positions, by my count.
+> 
+> As far as the arguments about "proper interface design", as far as
+> Linux is concerned, backwards compatibility trumps "we should have
+> done if it differently".  The one and only guarantee that we have that
+> FS_IOC_GETXATTR followed by FS_IOC_SETXATTR will work.  Nothing else.
+
+That's a somewhat naive understanding of the overall API. The struct
+fsxattr information is also directly exported to userspace via the
+XFS blukstat ioctls. i.e. extent size hints, fsx_xflags, project
+IDs, etc are all exported to userspace via multiple ioctl
+interfaces.
+
+This is all used by xfsdump/xfs_restore to be able to back up and
+restore the inode state that is exposed/controlled by the
+GET/SETXATTR interfaces.
+
+> The use case of "what if a backup program wants to backup the flags
+> and restore on a different file system" is one that hasn't been
+> considered, and I don't think any backup programs do it today.
+
+Wrong. As I've already said: we have been doing exactly this for 20+
+years with xfsdump/restore.
+
+xfsdump uses the bulkstat version of the GET interface, whilst
+restore uses the FS_IOC_SETXATTR interface.
+
+> For
+> that matter, some of the flags, such as the NODUMP flag, are designed
+> to be instructions to a dump/restore system, and not really one that
+> *should* be backed up.
+
+Yes. xfsdump sees this in the bulkstat flags field for the inode and
+then omits the inode from the dump.
+
+Further, xfs_fsr (the online file defragmenter for XFS) uses
+bulkstat and looks at the FS_XFLAGS returned from bulkstat for each
+inode it scans.
+
+> Again, the only semantic that was guaranteed
+> is GETXATTR or GETXATTR followed by SETXATTR.
+
+For making a single delta state change, yes.
+
+For the dump/restore case, calling SETXATTR on a newly created file
+with a preconstructed struct fsxattr state retreived at dump time is
+also supported.
+
+This is not a general use case - it will destroy any existing state
+that file was created with (e.g. override admin inheritence
+settings) by overwriting it with the state from the backup.
+
+It should also be noted that xfs_restore does this in two SETXATTR
+calls, not one. i.e. it splits the set operation into a
+pre-data restore SETXATTR, and one post-data restore SETXATTR.
+
+Why?
+
+Because stuff like extent size hints and realtime state needs to be
+restored before any data is written whilst others can only be set
+after the data has been written because they would otherwise prevent
+data restoration:
+
+/* extended inode flags that can only be set after all data
+ * has been restored to a file.
+ */
+#define POST_DATA_XFLAGS        (XFS_XFLAG_IMMUTABLE |          \
+                                  XFS_XFLAG_APPEND |            \
+                                  XFS_XFLAG_SYNC)
+
+Yup, you can't restore data to the file if it has already been
+marked as immutable....
+
+IOWs, any changes to the flag space also needs to be compatible with
+the XFS bulkstat shadowing of the fsxattr fields+flags and the
+existing usage of these APIs by xfsdump, xfs_restore and xfs_fsr.
+
+> We can define some new interface for return what xflags are supported
+> by a particular file system.
+
+Why do we even care?
+
+On the get side, it just doesn't matter - if the flag isn't set, it
+either is not active or not supported. Either way, it doesn't
+matter if there's a "this is supported mask".
+
+On the set side, adding a mask isn't going to change historic
+behaviour: existing applications will ignore the new mask because
+they haven't been coded to understand it. And vice versa, an old
+kernel will ignore the feature mask if the app uses it because it
+ignores unknown flags/fields.
+
+IOWs, adding a feature mask doesn't solve any of the problems
+related to forwards/backwards compatibility of new features, and so
+we are back to needing to use the API as a GET/SET pair where the
+GET sets all the known state correctly such that a SET operation
+will either do nothing, change the state or return an error because
+an invalid combination of known parameters was passed.
+
+> I suppose the field could double as the bitmask field when
+> FS_IOC_SETXATTR is called, but that just seems to be an overly complex
+> set of semantics.  If someone really wants to do that, I wouldn't
+> really complain, but then what we would actually call the field
+> "flags_supported_on_get_bitmask_on_set" would seem a bit wordy.  :-)
+
+That effectively prevents the existing dump/restore usage of the
+API.
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
