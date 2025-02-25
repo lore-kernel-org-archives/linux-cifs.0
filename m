@@ -1,68 +1,89 @@
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [195.16.41.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66C326159F;
-	Tue, 25 Feb 2025 09:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.16.41.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CB639ACC;
+	Tue, 25 Feb 2025 20:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740476536; cv=none; b=XRgkx3goNHTKzB58hI/eacy5L8kI8yytxW9dt0ELJ0gH0sFDZqSEEs/vBr+URYr9hZn4fIAeI6qzonAlLdzL5fhiA2ytHdUpzS0xIs25Jwwr09B9FWNXqkQamYCRxEbiYuSeO/XMByKHl8Ucj2fxQHGtfhM7SPYwCH19ZoF4VmU=
+	t=1740514072; cv=none; b=MGE+55QEX89WwZBCudHXjfeWxDshToOKH4H8sfp1g+BhmimSTXVbtcquCoSdKoSP13zte5yg4Qa5ixPNJtJrGD3a6piwKCSsf5L4/t8aDkkS6G4Nbk1dEI6fOLSjtO6/X2G8FrDKMlr7BLwZMt4aRVOjBORgNZI1XQJTRdP/ZhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740476536; c=relaxed/simple;
-	bh=eks3Lc85HLhbzd/HK40pZLMZF+S04fiYW8t+tU+g1cU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=myoXAJgZACH0uLHfNrorBUln2fm2dvOaAjTyCFnhCj4b7tquLwz75E3bHi+GhiJBiT4d4cPyQcYiHIJ5OBE4WqK8vxu+BHgwI5EGX703IcMKlSz8vQpMrk3kGB7dAchh5dOlH+sxyXEGCiwuNIb0NJyerLafJckCW/mP3Ow7hkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=195.16.41.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from gca-msk-a-srv-ksmg02.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 030021F4D2;
-	Tue, 25 Feb 2025 12:34:44 +0300 (MSK)
-Received: from new-mail.astralinux.ru (gca-yc-ruca-srv-mail03.astralinux.ru [10.177.185.108])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Tue, 25 Feb 2025 12:34:42 +0300 (MSK)
-Received: from localhost.localdomain (unknown [10.177.20.114])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4Z2C9s0QtQz1h0NN;
-	Tue, 25 Feb 2025 12:34:40 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
+	s=arc-20240116; t=1740514072; c=relaxed/simple;
+	bh=lCzQd9QWZ4PnLOFHOKL7btYHSTjc2fdUQXfsPH4Jv8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYn3IdATll5AEdAbJB7dLcqRRWJMO4Yz5lLQBrtJVGsI6w+GGu/w/vzWprZT9QFj5Qrs6KNlG/QZdGkav1Ph+GQ/RA+bgu8YrShuZY3+jGwjfC5TkjzixYMMl7HsGQpo/tTeganrjKeAzVjGwYCJ5EKaEUfVImm+pq8ta20BnJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=STCzDmCL; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="STCzDmCL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20AE2C4CEDD;
+	Tue, 25 Feb 2025 20:07:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740514072;
+	bh=lCzQd9QWZ4PnLOFHOKL7btYHSTjc2fdUQXfsPH4Jv8Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=STCzDmCLaQW6uTIfXgZILD0Vf9NdcJ6zZxBEFKTxMZCFOZRrn34aa57oI1TwxqJjA
+	 g6+h+hZIjAOGqNmX0SFyJ274R1bsQAkkItt8E8YF0u+r/9RhIFFGbCEFXtN7CdigiO
+	 KJDuvF8p00OOIbRgbOAG7ZnOR9YuCDUSgZgXdWB03TH0xKlX1Z4mtdvzmLQE85wkuL
+	 oGa0ffXE3Df1Rk1A/riKRtzANZ6sY7J53wN2CFkYCfjQNmp92Wqnl/zIwEubTiFoul
+	 gdFZUCquiAIA8SEXWTvJ02uIfwto5xcXcd3llC8Bk8el8tmgxn/FgHEclPJ+jc1dH2
+	 02QAripYLz5lQ==
+Received: by pali.im (Postfix)
+	id D1F3C89B; Tue, 25 Feb 2025 21:07:38 +0100 (CET)
+Date: Tue, 25 Feb 2025 21:07:38 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: Amir Goldstein <amir73il@gmail.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
 	Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	lvc-patches@linuxtesting.org
-Subject: [PATCH 5.10/5.15 0/2] smb: client: fix UAF in async decryption
-Date: Tue, 25 Feb 2025 12:34:22 +0300
-Message-ID: <20250225093428.611253-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.43.0
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 3/4] fs: Implement support for fsx_xflags_mask,
+ fsx_xflags2 and fsx_xflags2_mask into vfs
+Message-ID: <20250225200738.gtgc3rdfpe5d4esm@pali>
+References: <20250216164029.20673-1-pali@kernel.org>
+ <20250216164029.20673-4-pali@kernel.org>
+ <20250221182416.GA2252164@mit.edu>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_from_domain_doesnt_match_to}, astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 191262 [Feb 25 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/02/25 08:32:00 #27449984
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
+In-Reply-To: <20250221182416.GA2252164@mit.edu>
+User-Agent: NeoMutt/20180716
 
-Commit b0abcd65ec54 ("smb: client: fix UAF in async decryption")
-fixes CVE-2024-50047 but brings NULL-pointer dereferebce. So
-commit 4bdec0d1f658 ("smb: client: fix NULL ptr deref in crypto_aead_setkey()")
-should be backported too.
+On Friday 21 February 2025 13:24:16 Theodore Ts'o wrote:
+> On Sun, Feb 16, 2025 at 05:40:28PM +0100, Pali Rohár wrote:
+> > This change adds support for new struct fileattr fields fsx_xflags_mask,
+> > fsx_xflags2 and fsx_xflags2_mask into FS_IOC_FSGETXATTR and
+> > FS_IOC_FSSETXATTR ioctls.
+> 
+> I don't think I saw an answer to this question (but the discussions of
+> the mail thread have really sprawled a bit and so it's hard to review
+> all of the messages in the thread) --- so.... what's your reason for
+> creating this new fsx_xflags2 field as opposed to just defining new
+> flags bits for fsx_xflags field?  There are plenty of unused bits in
+> the FS_XFLAG_* space.
+> 
+> Cheers,
+> 
+> 					- Ted
+> 					
+
+If all bits which I currently defined in fsx_xflags2 should be instead
+defined in fsx_xflags then in fsx_xflags would be only 2 or 3 free bits.
+
+And it is possible that I forgot to include some bits in this RFC
+series, or that Windows starts (or already started) using some reserved
+bits. And that would mean that we are out of the fsx_xflags space.
+
+Also there are 4-5 Windows get-only bits which are not covered by this
+RFC series. It is questionable if they should or should not be.
+
+So IMHO, we do not have enough space in fsx_xflags to cover everything.
