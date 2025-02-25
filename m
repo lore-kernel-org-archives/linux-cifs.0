@@ -1,266 +1,192 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [195.16.41.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90AE1C8616
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Feb 2025 05:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9862661A3;
+	Tue, 25 Feb 2025 09:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.16.41.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740462103; cv=none; b=d3QXz7jy++yB7FsU/cjGYs6ZfopAn6IG5p4KIrRzOoQnd8Kj4QBdg5od6ESSMMzRpBeYeI1bkr4inxBnju1IiGWgwPH0s5oFubyO8XCnj8Pit0tpRe8H3iW6gL2D/fqOn+X8RKWDXnI1U1b2js+VaaZAB+ELWS/AYquhI3v5l40=
+	t=1740476108; cv=none; b=lVx3BB+IqJFZ4At0qfAMmYGb7csNGL2dGNoo3naaqIdkgVTmJWWEH2ayiuhVbprwZc91MKo6WFE830u+/U1MbVXDSG8fzTvzJARJDaQo6ZiP8RBfsdYHZkDFGt4aZeNs6CyMi84tmvlMYzpynbYe0bOY8v3w+l0XtrSVWEOw54o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740462103; c=relaxed/simple;
-	bh=jIa7vOt0JPi1BL4+QmSvZ79tEBZoZ5xFaKD6PkU9iiI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KmIAZPty4j4P1r/TDoWJ2SojrtiwcmmC/Pnzfk90GlOO3BwQeNbR5Py8xTysNnM2M45vx3Y6EBXewE2QFIr2wHis/x9wyKzVBKVtF9wutaXui63AbjHPYmgZm96As4sJFLMuGlnlxTIc8VGc6DbS8eFRGZecZiMVPbuJJRPnnPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=Snu2iggb; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="Snu2iggb"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2fbf77b2b64so10559609a91.2
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2025 21:41:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1740462101; x=1741066901; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SVmlQ0qkrXqqHoBYxNGr5cUY6QJ6t0qt8m6e6uhD0sY=;
-        b=Snu2iggbySVGXvzS0sENdhtUwIHhqzqc7zaYe5I07vwzGp7+voQ1D3ubCMKqSjlS7Z
-         OFcP7p/3XBJm+cduAlp5grFAB1LeEIMOV12E/GlUpC3meQp1vMg/iDA1N5R+64/wOES2
-         LWXy7u3aO6Ka49wowjCSHgUNl/pHPWC4vaaqpKY6uCJ1kY2l9d4XN1NFQFHlNtmut6yK
-         OCzs2caVReAWGY4R4ex8a7qWOetpuqonMX3qXqaiCSLOII+Xry7M64ResMmjvV4rMobW
-         DImKQz6csbtJRlR3G8i8v89JVgPFqy1LQVhpBK2L0hqn5QhwynHCBUs+/eo4U6uu4aEm
-         tTuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740462101; x=1741066901;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SVmlQ0qkrXqqHoBYxNGr5cUY6QJ6t0qt8m6e6uhD0sY=;
-        b=cTZG+8LIGzxyHx3oJplLrGALFS0hhZtnUNIiMOTi8UPFEgKvYNR0SxcNG6bhzp74dp
-         HzMEObRRPwvRVGgrGuXR8HyRVbwoM1nCGQ0tfT9N8UALDElt87XEIFVGxHI6RqSXp/ha
-         IAt4jzPz5o0Ozx1LODw3oxoTAn5XjXIKZJBGlFKFkgVrOrT4lgt9MzXDkJ/0leh54VjZ
-         05ORB1Ao06IpiACtkdL0k1C5wK6q2wFKdbOeBYHObbbPhlaDy8kU8mr4CX+f+S8B2dhs
-         0+zSM5zbOm0SlkklCaJb/TCYdk8mN3bSTL/gam+V2dGzRY3+li5+S/xdD3c4sCTBG8FG
-         nmXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVUooTGY84JbGsA3INOViA8Lt2SS8gP9tAhhOgtQ3KfNmClVD98oAB7BDo+WABXbJ+dR+RD2p7e2ig/@vger.kernel.org
-X-Gm-Message-State: AOJu0YxksaiR7BGs2rilO1mypXFHBcETrNkm99XIJ8WOsg+U5TmCWCts
-	DCnCyTQbCETTS2Hj/a5bhvLa9VldV6usRp+SKvxhGTyV+4QuVeHHHz2xtL8+0+U=
-X-Gm-Gg: ASbGncvtX7TlG/XR5Duw9XjxJhXjU0uRZCxhgClUI5cqvh1zNlOdLaN+9loopWy0o49
-	djOAdscjpevP2D5x2lj3vW8wNU5J14fkwOr6aHkCjCozbBe/7zLbtjB1vjBSL7sS1Oaovmo4zSr
-	hg2d0KElmR7OUFfloVd+9Akgop0gFsR2mN0DWjKXNl177qv8jbQRRqNbvCEVF8REnP4my5hvL2H
-	56l6BtvFxt303d7pk33faMc3M8pgIkxqaiXNDqWSbkWF42+ALzlushbv1hVxj5XhKAmByYTF08g
-	GHyJ+hQuNzggwln7E8ZawOWnJ257z3UvbwqvGfBrETa/t1id0XarZgYLNmsBEllOdDBG55x4DHd
-	Zcg==
-X-Google-Smtp-Source: AGHT+IEKpdHIUEz0cuxzsZpkp0hPqtKV1YUBxtQNV1M0k+7kG6G7UFu3mdg+tbrtRaGfQ7Nl8rnbjw==
-X-Received: by 2002:a05:6a21:7781:b0:1f0:e7e2:b295 with SMTP id adf61e73a8af0-1f0e7e2b2c4mr8881586637.5.1740462100963;
-        Mon, 24 Feb 2025 21:41:40 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-89-135.pa.vic.optusnet.com.au. [49.186.89.135])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a6f6bbesm601367b3a.39.2025.02.24.21.41.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 21:41:40 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.98)
-	(envelope-from <david@fromorbit.com>)
-	id 1tmnhJ-00000005eRs-2VUP;
-	Tue, 25 Feb 2025 16:41:37 +1100
-Date: Tue, 25 Feb 2025 16:41:37 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	s=arc-20240116; t=1740476108; c=relaxed/simple;
+	bh=VKVpn9QhnPv0kuUhUfzxMejbN/ieb227EPXkOuggSWY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=azOy6Pev9TvfZSbSBIv1xKvar+TnooOQ85I/5/zyx1pd6ibAAMPZckUYlxz4i6qsn4b2l9ft7x89GVx+EgonNkxQDXpv0wDHvvEjCuvjph7BSO5fFQjPEn+maLbSAq409t5r6tetQfDQ8GrEjz0VCZKZO/zQjuYmmhVY3htxG6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=195.16.41.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+Received: from gca-msk-a-srv-ksmg02.astralinux.ru (localhost [127.0.0.1])
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 560E21F9E5;
+	Tue, 25 Feb 2025 12:35:00 +0300 (MSK)
+Received: from new-mail.astralinux.ru (gca-yc-ruca-srv-mail03.astralinux.ru [10.177.185.108])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
+	Tue, 25 Feb 2025 12:34:59 +0300 (MSK)
+Received: from localhost.localdomain (unknown [10.177.20.114])
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4Z2CBB2cPRz1h0Mh;
+	Tue, 25 Feb 2025 12:34:58 +0300 (MSK)
+From: Anastasia Belova <abelova@astralinux.ru>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Anastasia Belova <abelova@astralinux.ru>,
 	Steve French <sfrench@samba.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] fs: Add FS_XFLAG_COMPRESSED & FS_XFLAG_ENCRYPTED
- for FS_IOC_FS[GS]ETXATTR API
-Message-ID: <Z71YEf5zO-AjXZwo@dread.disaster.area>
-References: <20250216202441.d3re7lfky6bcozkv@pali>
- <CAOQ4uxj4urR70FmLB_4Qwbp1O5TwvHWSW6QPTCuq7uXp033B7Q@mail.gmail.com>
- <Z7Pjb5tI6jJDlFZn@dread.disaster.area>
- <CAOQ4uxh6aWO7Emygi=dXCE3auDcZZCmDP+jmjhgdffuz1Vx6uQ@mail.gmail.com>
- <20250218192701.4q22uaqdyjxfp4p3@pali>
- <Z7UQHL5odYOBqAvo@dread.disaster.area>
- <20250218230643.fuc546ntkq3nnnom@pali>
- <CAOQ4uxiAU7UorH1FLcPgoWMXMGRsOt77yRQ12Xkmzcxe8qYuVw@mail.gmail.com>
- <20250221163443.GA2128534@mit.edu>
- <CAOQ4uxjwQJiKAqyjEmKUnq-VihyeSsxyEy2F+J38NXwrAXurFQ@mail.gmail.com>
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	lvc-patches@linuxtesting.org,
+	Tom Talpey <tom@talpey.com>,
+	Jianhong Yin <jiyin@redhat.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 5.10/5.15 2/2] smb: client: fix NULL ptr deref in crypto_aead_setkey()
+Date: Tue, 25 Feb 2025 12:34:24 +0300
+Message-ID: <20250225093428.611253-3-abelova@astralinux.ru>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250225093428.611253-1-abelova@astralinux.ru>
+References: <20250225093428.611253-1-abelova@astralinux.ru>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxjwQJiKAqyjEmKUnq-VihyeSsxyEy2F+J38NXwrAXurFQ@mail.gmail.com>
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_from_domain_doesnt_match_to}, astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 191262 [Feb 25 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/02/25 08:32:00 #27449984
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 1
 
-On Fri, Feb 21, 2025 at 06:11:43PM +0100, Amir Goldstein wrote:
-> On Fri, Feb 21, 2025 at 5:34 PM Theodore Ts'o <tytso@mit.edu> wrote:
-> >
-> > I think a few people were talking past each other, because there are two
-> > fileds in struct fileattr --- flags, and fsx_xflags.  The flags field
-> > is what was originally used by FS_IOC_EXT2_[GS]ETFLAGS, which later
-> > started getting used by many other file systems, starting with
-> > resierfs and btrfs, and so it became FS_IOC_[GS]ETFLAGS.  The bits in
-> > that flags word were both the ioctl ABI and the on-disk encoding, and
-> > because we were now allowing multiple file systems to allocate bits,
-> > and we needed to avoid stepping on each other (for example since btrfs
-> > started using FS_NOCOW_FL, that bit position wouldn't be used by ext4,
-> > at least not for a publically exported flag).
-> >
-> > So we started running out of space in the FS_FLAG_*_FL namespace, and
-> > that's why we created FS_IOC_[GS]ETXATTR and the struct fsxattr.  The
-> > FS_XFLAG_*_FL space has plenty of space; there are 14 unassigned bit
-> > positions, by my count.
-> >
-> > As far as the arguments about "proper interface design", as far as
-> > Linux is concerned, backwards compatibility trumps "we should have
-> > done if it differently".  The one and only guarantee that we have that
-> > FS_IOC_GETXATTR followed by FS_IOC_SETXATTR will work.  Nothing else.
-> >
-> > The use case of "what if a backup program wants to backup the flags
-> > and restore on a different file system" is one that hasn't been
-> > considered, and I don't think any backup programs do it today.  For
-> > that matter, some of the flags, such as the NODUMP flag, are designed
-> > to be instructions to a dump/restore system, and not really one that
-> > *should* be backed up.  Again, the only semantic that was guaranteed
-> > is GETXATTR or GETXATTR followed by SETXATTR.
-> >
-> 
-> Thanks for chiming in, Ted!
-> Notes from the original author of FS_IOC_EXT2_[GS]ETFLAGS
-> are valuable.
+From: Paulo Alcantara <pc@manguebit.com>
 
-..... except when they are completely wrong. FS_IOC_[GS]ETXATTR was
-promoted from XFs to the VFS to enable ext4 to use the existing
-project ID and quota infrastructure (e.g. for testing with fstests).
+commit 4bdec0d1f658f7c98749bd2c5a486e6cfa8565d2 upstream.
 
-> 
-> > We can define some new interface for return what xflags are supported
-> > by a particular file system.  This could either be the long-debated,
-> > but never implemented statfsx() system call.  Or it could be extending
-> > what gets returned by FS_IOC_GETXATTR by using one of the fs_pad
-> > fields in struct fsxattr.  This is arguably the simplest way of
-> > dealing with the problem.
-> >
-> 
-> That is also what I think.
-> fsx_xflags_mask semantics for GET are pretty clear
-> and follows the established pattern of  stx_attributes_mask
-> Even if it is not mandatory for userspace, it can be useful.
+Neither SMB3.0 or SMB3.02 supports encryption negotiate context, so
+when SMB2_GLOBAL_CAP_ENCRYPTION flag is set in the negotiate response,
+the client uses AES-128-CCM as the default cipher.  See MS-SMB2
+3.3.5.4.
 
-You keep saying "it can be useful" without actually giving an
-example of when it will be a significant improvement. Then you
-demand proof that it isn't useful to userspace to justify a NACK.
-That's not the way development works - you want the functionality,
-you have to prove to that it is a significant improvement, not
-demand that people prove that it isn't.
+Commit b0abcd65ec54 ("smb: client: fix UAF in async decryption") added
+a @server->cipher_type check to conditionally call
+smb3_crypto_aead_allocate(), but that check would always be false as
+@server->cipher_type is unset for SMB3.02.
 
-As it is, a lot of the "masks won't work" reasoning is in the
-response I jsut wrote to Ted's email.  There appears to be a
-significant lack of knowledge of the scope of the GET/SETXATTR
-interfaces and how we've been using them for the past 20+ years
-amongst the people arguing they should be fundamentally changed
-right now.
+Fix the following KASAN splat by setting @server->cipher_type for
+SMB3.02 as well.
 
-> I asked Dave if he objects to fsx_xflags_mask and got silence,
-> so IMO, if Pali wants to implement fsx_xflags_mask for the API
-> I see no reason to resist it.
+mount.cifs //srv/share /mnt -o vers=3.02,seal,...
 
-You didn't get silence - I only work 3 days a week and I'm
-explicitly not responding to upstream devel list email outside of
-work hours. So it may take several days before I find time to
-respond to any given discussion thread.
+BUG: KASAN: null-ptr-deref in crypto_aead_setkey+0x2c/0x130
+Read of size 8 at addr 0000000000000020 by task mount.cifs/1095
+CPU: 1 UID: 0 PID: 1095 Comm: mount.cifs Not tainted 6.12.0 #1
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-3.fc41
+04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x5d/0x80
+ ? crypto_aead_setkey+0x2c/0x130
+ kasan_report+0xda/0x110
+ ? crypto_aead_setkey+0x2c/0x130
+ crypto_aead_setkey+0x2c/0x130
+ crypt_message+0x258/0xec0 [cifs]
+ ? __asan_memset+0x23/0x50
+ ? __pfx_crypt_message+0x10/0x10 [cifs]
+ ? mark_lock+0xb0/0x6a0
+ ? hlock_class+0x32/0xb0
+ ? mark_lock+0xb0/0x6a0
+ smb3_init_transform_rq+0x352/0x3f0 [cifs]
+ ? lock_acquire.part.0+0xf4/0x2a0
+ smb_send_rqst+0x144/0x230 [cifs]
+ ? __pfx_smb_send_rqst+0x10/0x10 [cifs]
+ ? hlock_class+0x32/0xb0
+ ? smb2_setup_request+0x225/0x3a0 [cifs]
+ ? __pfx_cifs_compound_last_callback+0x10/0x10 [cifs]
+ compound_send_recv+0x59b/0x1140 [cifs]
+ ? __pfx_compound_send_recv+0x10/0x10 [cifs]
+ ? __create_object+0x5e/0x90
+ ? hlock_class+0x32/0xb0
+ ? do_raw_spin_unlock+0x9a/0xf0
+ cifs_send_recv+0x23/0x30 [cifs]
+ SMB2_tcon+0x3ec/0xb30 [cifs]
+ ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
+ ? lock_acquire.part.0+0xf4/0x2a0
+ ? __pfx_lock_release+0x10/0x10
+ ? do_raw_spin_trylock+0xc6/0x120
+ ? lock_acquire+0x3f/0x90
+ ? _get_xid+0x16/0xd0 [cifs]
+ ? __pfx_SMB2_tcon+0x10/0x10 [cifs]
+ ? cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
+ cifs_get_smb_ses+0xcdd/0x10a0 [cifs]
+ ? __pfx_cifs_get_smb_ses+0x10/0x10 [cifs]
+ ? cifs_get_tcp_session+0xaa0/0xca0 [cifs]
+ cifs_mount_get_session+0x8a/0x210 [cifs]
+ dfs_mount_share+0x1b0/0x11d0 [cifs]
+ ? __pfx___lock_acquire+0x10/0x10
+ ? __pfx_dfs_mount_share+0x10/0x10 [cifs]
+ ? lock_acquire.part.0+0xf4/0x2a0
+ ? find_held_lock+0x8a/0xa0
+ ? hlock_class+0x32/0xb0
+ ? lock_release+0x203/0x5d0
+ cifs_mount+0xb3/0x3d0 [cifs]
+ ? do_raw_spin_trylock+0xc6/0x120
+ ? __pfx_cifs_mount+0x10/0x10 [cifs]
+ ? lock_acquire+0x3f/0x90
+ ? find_nls+0x16/0xa0
+ ? smb3_update_mnt_flags+0x372/0x3b0 [cifs]
+ cifs_smb3_do_mount+0x1e2/0xc80 [cifs]
+ ? __pfx_vfs_parse_fs_string+0x10/0x10
+ ? __pfx_cifs_smb3_do_mount+0x10/0x10 [cifs]
+ smb3_get_tree+0x1bf/0x330 [cifs]
+ vfs_get_tree+0x4a/0x160
+ path_mount+0x3c1/0xfb0
+ ? kasan_quarantine_put+0xc7/0x1d0
+ ? __pfx_path_mount+0x10/0x10
+ ? kmem_cache_free+0x118/0x3e0
+ ? user_path_at+0x74/0xa0
+ __x64_sys_mount+0x1a6/0x1e0
+ ? __pfx___x64_sys_mount+0x10/0x10
+ ? mark_held_locks+0x1a/0x90
+ do_syscall_64+0xbb/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-As I've told you many, many times before, Amir: slow down and have
-patience. There is no rush, nor is there a need to force the
-discussion to a rapid conclusion.
+Cc: Tom Talpey <tom@talpey.com>
+Reported-by: Jianhong Yin <jiyin@redhat.com>
+Cc: stable@vger.kernel.org # v6.12
+Fixes: b0abcd65ec54 ("smb: client: fix UAF in async decryption")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+---
+ fs/cifs/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-
-> > I suppose the field could double as the bitmask field when
-> > FS_IOC_SETXATTR is called, but that just seems to be an overly complex
-> > set of semantics.  If someone really wants to do that, I wouldn't
-> > really complain, but then what we would actually call the field
-> > "flags_supported_on_get_bitmask_on_set" would seem a bit wordy.  :-)
-> 
-> If we follow the old rule of SET after GET should always work
-> then fsx_xflags_mask will always be a superset of fsx_xflags,
-
-Doesn't work for xfsdump/restore use case.
-
-Firstly, there's no space in the dump media format for extended
-xflags (i.e. requires new code and backwards incompatible media dump
-formats to be created).
-
-Secondly, if the destination kernel and/or filesystem does not
-support the flags mask or features defined in the flags mask, what
-do we do then?  The policy decision made a couple of decades ago was
-that it is better for the kernel to ignore file attrs it doesn't
-understand on restore and let the restore continue than it is to
-abort the restore....
-
-Better to restore what we support than not be able to restore
-anything, yes?
-
-> so I think it would be sane to return -EINVAL in the case
-> of (fsx_xflags_mask && fsx_xflags & ~fsx_xflags_mask),
-> which is anyway the correct behavior for filesystems when the
-> user is trying to set flags that the filesystem does not support.
-> 
-> As far as I could see, all in-tree filesystems behave this way
-> when the user is trying to set unsupported flags either via
-> FS_IOC_SETFLAGS or via FS_IOC_SETXATTR
-> except xfs, which ignores unsupported fsx_xflags from
-> FS_IOC_SETXATTR.
-> 
-> Changing the behavior of xfs to return -EINVAL for unsupported
-> fsx_xflags if fsx_xflags_mask is non zero is NOT going to break UAPI,
-
-Except that it's completely undesireable behaviour for the existing
-dump/restore usage of this interface.
-
-If we just add the windows attributes to the fsx_flags field as
-I have suggested, then xfsdump/xfs_restore would natively supports
-backing up and restoring windows attributes on XFS files the moment
-that the kernel XFS code supports windows attributes. 
-
-It will not require any dump/restore code or dump media format
-changes, and with the existing SET policy if the destination kernel
-and/or filesystem doesn't support those attributes then they will be
-silently dropped on restore...
-
-Seriously, I said no because I undestand how these interfaces have
-been used for the past 20 years. If you want to change the
-fundamental behavioural characteristics of the API, then you have to
-make sure that it works with the way xfsdump/restore use the API
-across the dump media format. i.e. the consumer of the GET
-information can be a SET operation on a different kernel and
-filesystem.
-
-I've already said no to a new syscall because it's just a set
-of feature bits that can be added to FS_XFLAGS. And the added
-advantage of that is that any backup program that already supports
-backing up the fsxattr information will also support it without API
-or dump media format changes. i.e. we get widespread support for the
-windows attributes pretty much for free.
-
-Yet here we are, with people instead wanting to construct complex
-new APIs which will require entirely new infrastructure across the
-board to support.
-
-Your call - windows attribute support via a small amount of work for
-an existing API addition, or a huge amount of work across the entire
-filesystem ecosystem for a whole new API. The end functionality will
-be identical, but one path is a whole lot less work for everyone
-than the other....
-
--Dave.
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 245e2dd5a194..4197096e7fdb 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -963,7 +963,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	 * SMB3.0 supports only 1 cipher and doesn't have a encryption neg context
+ 	 * Set the cipher type manually.
+ 	 */
+-	if (server->dialect == SMB30_PROT_ID && (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
++	if ((server->dialect == SMB30_PROT_ID ||
++	     server->dialect == SMB302_PROT_ID) &&
++	    (server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
+ 		server->cipher_type = SMB2_ENCRYPTION_AES128_CCM;
+ 
+ 	security_blob = smb2_get_data_area_len(&blob_offset, &blob_length,
 -- 
-Dave Chinner
-david@fromorbit.com
+2.43.0
+
