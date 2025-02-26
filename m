@@ -1,54 +1,57 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712EE21930E
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Feb 2025 13:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312702236FC
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Feb 2025 15:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740576062; cv=none; b=uqp3qrtlYDnsvm4bBycTbYi6yW2bk9SFmCrjGpVLrlq9INy0tSWJ0HDBpmoU9otU4rJ/17c+3Xs8YgUMwzmOh9c0XjjKLZcaoucr+yDh34vSOP/0rnEOxrnDzlFirnxaViBlvpNTfyhykCzUGwwWBsF+zJ0uoUUVnXCFPC82e/4=
+	t=1740583291; cv=none; b=HgxlE5UqHHGX2akPINOQIiOo/zkyfzcZ3kM6Htxja4xrP9H9cclAkABB+mQcy3K1MYar2OouyEcC7LnTx5/gZGQ9WNhiNTvhgbx36PP2nHuaurLYToO2EQZGIwJNvIHOYrMMQdUa6XGBKUSiKVN+SaqEYLea9eGQXZ4kT9oYh/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740576062; c=relaxed/simple;
-	bh=Qnm2hG1KnsQDqXnZ7Ak67qCxfQakLBBxso81jVcduA0=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=QQeDPTW8sTzNmA1613YuGZDzydUH2oxGte5A2e1PiUxvOwph50Ui1kQ965PrJSaqIRXxk995Cd4M24mQ9iHjCKgfHuA62CYaheDcyM0oYIQvMdFIW4BlG1O4oyMw/+knJKXsXyFK/8vrIQnLlUCw7vAQnh9jxOiIUng30EjijL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HjFgdJZU; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1740583291; c=relaxed/simple;
+	bh=kGuDluKlBGVXw7uhB+/9lut/CvhX3J7r0WIB6MvbzaM=;
+	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
+	 From:Date:Message-ID; b=reh25ygedS5b7ZMYcsHJjw/21kvGU21AO1dF/hk2gUyEO64Hf/4bz506B49fsD0KSwmvWY+IGHTNkzhhDJv8oEWt5FWa1z/eSC8vZsz1tlQeF2dh6HAKvIbwie0PWkhkTXeMxGv1i5N6LyIKtEfNbqEmUNPJ36ug075VxRp4+8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QcMiFbA1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HjFgdJZU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QcMiFbA1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740576058;
+	s=mimecast20190719; t=1740583289;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pOKQylrR35KbXG+jocGUv5N9FH8CHHirEUON+cGjZNs=;
-	b=HjFgdJZUnwASIzhI0Iw8ydW/UmjBcsR+seNTTjJmh4v6lkR4Bjr7yZLGh2My4g3AFxaBLM
-	Dt3w4VHgG/cCe66xdOqEvpuaIRuSZPdzdlOcn7hxtwDfEpkBZEiJ5PKYVPTL1sKfCVgajb
-	lu1IDUs6+ftt/jvQzUY+yfM1MbrgrCM=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NXbyCdmoziShPeJAChKxNKhUqohQ4PH+KJxEBCv0dis=;
+	b=QcMiFbA11Fv5S/VUgGAOPTel+qQMVyK0YCzHeh3bOO0WpLHD34gFMEen3dpAnjT5S0b/Gc
+	yQhzumMB/ufJ9ouU0AiSoaXECsZPAwlJxma6wTKSeBuFb0zwSUmgRAGkovH3e739HoyUFA
+	2JJUAbP9Vk2ly+Q8V5oFOPll8qMHEjc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-92-Cd6NdM0AOWCNDV3PSSOq0g-1; Wed,
- 26 Feb 2025 08:20:54 -0500
-X-MC-Unique: Cd6NdM0AOWCNDV3PSSOq0g-1
-X-Mimecast-MFC-AGG-ID: Cd6NdM0AOWCNDV3PSSOq0g_1740576052
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-iwyn0p17N66pFYe-_2Gb-g-1; Wed,
+ 26 Feb 2025 10:21:25 -0500
+X-MC-Unique: iwyn0p17N66pFYe-_2Gb-g-1
+X-Mimecast-MFC-AGG-ID: iwyn0p17N66pFYe-_2Gb-g_1740583283
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A516918EB2CE;
-	Wed, 26 Feb 2025 13:20:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.9])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49C0F1800358;
-	Wed, 26 Feb 2025 13:20:47 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 48D2E1800264;
+	Wed, 26 Feb 2025 15:21:23 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 66FA3180035F;
+	Wed, 26 Feb 2025 15:21:18 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>,
-    Steve French <stfrench@microsoft.com>,
-    Dominique Martinet <asmadeus@codewreck.org>
-cc: dhowells@redhat.com, Ihor Solodrai <ihor.solodrai@pm.me>,
+In-Reply-To: <2602345.1740576046@warthog.procyon.org.uk>
+References: <2602345.1740576046@warthog.procyon.org.uk>
+To: Christian Brauner <brauner@kernel.org>
+Cc: dhowells@redhat.com, Steve French <stfrench@microsoft.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ihor Solodrai <ihor.solodrai@pm.me>,
     Eric Van Hensbergen <ericvh@kernel.org>,
     Latchesar Ionkov <lucho@ionkov.net>,
     Christian Schoenebeck <linux_oss@crudebyte.com>,
@@ -56,7 +59,7 @@ cc: dhowells@redhat.com, Ihor Solodrai <ihor.solodrai@pm.me>,
     v9fs@lists.linux.dev, linux-cifs@vger.kernel.org,
     netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
     linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Fix unbuffered writes
+Subject: Re: [PATCH] netfs: Fix unbuffered writes
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -64,54 +67,21 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2602344.1740576046.1@warthog.procyon.org.uk>
+Content-ID: <2616590.1740580941.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Feb 2025 13:20:46 +0000
-Message-ID: <2602345.1740576046@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+From: David Howells <dhowells@redhat.com>
+Date: Wed, 26 Feb 2025 15:21:17 +0000
+Message-ID: <2635841.1740583277@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Fix netfs_wait_for_request() so that it doesn't check the outcome of a
-synchronous unbuffered write and emit error -EIO and a netfs_failure trace
-line if the write appears to be short.  This will affect both 9p and cifs,
-depending on the mount options; it does not affect DIO writes.
+David Howells <dhowells@redhat.com> wrote:
 
-This check is a problem because the write side doesn't set rreq->submitted=
-,
-but rather ->issued_to (the two ought to be merged as one is superfluous).
-This now occurs because the code was generalised from just the read side t=
-o
-the write side as well.
+> Fixes: 9dc06eff2097 ("netfs: Fix wait/wake to be consistent about the wa=
+itqueue used")
 
-Fixes: 9dc06eff2097 ("netfs: Fix wait/wake to be consistent about the wait=
-queue used")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <stfrench@microsoft.com>
-cc: Ihor Solodrai <ihor.solodrai@pm.me>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: v9fs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/misc.c |    1 +
- 1 file changed, 1 insertion(+)
+Actually, you can ignore this.  It's for a patch that's not upstream and c=
+an
+be folded in.
 
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index 6a5a7704e983..77e7f7c79d27 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -461,6 +461,7 @@ static ssize_t netfs_wait_for_request(struct netfs_io_=
-request *rreq,
- 		case NETFS_DIO_READ:
- 		case NETFS_DIO_WRITE:
- 		case NETFS_READ_SINGLE:
-+		case NETFS_UNBUFFERED_WRITE:
- 			break;
- 		default:
- 			if (rreq->submitted < rreq->len) {
+David
 
