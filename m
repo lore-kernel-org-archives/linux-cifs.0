@@ -1,87 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312702236FC
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Feb 2025 15:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22BE1B4241
+	for <linux-cifs@vger.kernel.org>; Thu, 27 Feb 2025 16:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740583291; cv=none; b=HgxlE5UqHHGX2akPINOQIiOo/zkyfzcZ3kM6Htxja4xrP9H9cclAkABB+mQcy3K1MYar2OouyEcC7LnTx5/gZGQ9WNhiNTvhgbx36PP2nHuaurLYToO2EQZGIwJNvIHOYrMMQdUa6XGBKUSiKVN+SaqEYLea9eGQXZ4kT9oYh/8=
+	t=1740674023; cv=none; b=rkZ8qDaLAaHl33w338FRnukFunRW+pf8aI0zBm6Lp6k5kmcDyAxuZKns9Z4HfdW/nRvEBEgjW7ZFjfvc8uG+InQjmfoHMfHB4xowQGC3Dt4dSQZRZq0kZv0LYqMTYwQGar5MfOD5pIe8GrHlRP/Q0n9WRGNaalawRBNEHAtCkUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740583291; c=relaxed/simple;
-	bh=kGuDluKlBGVXw7uhB+/9lut/CvhX3J7r0WIB6MvbzaM=;
-	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
-	 From:Date:Message-ID; b=reh25ygedS5b7ZMYcsHJjw/21kvGU21AO1dF/hk2gUyEO64Hf/4bz506B49fsD0KSwmvWY+IGHTNkzhhDJv8oEWt5FWa1z/eSC8vZsz1tlQeF2dh6HAKvIbwie0PWkhkTXeMxGv1i5N6LyIKtEfNbqEmUNPJ36ug075VxRp4+8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QcMiFbA1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1740674023; c=relaxed/simple;
+	bh=lxaF58KPaFVMe3vikN4StyN1JXQCaUBw9iXH7TfoXmM=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=C04lCWZjoULUg4zQs+cHiPWRhmzctMh3DIQL4F3TVN2Rs8qW1Z/Qb5LT/ikkfVrou9buPa4HkR/M0rgE6fTL3XqLVi9kISOfpcOBorsI32vcTDF27BmwTaIBkeeuuk+6GlGp4R3OZoOLXfAH/96OCbZspnJK3SQ+f6LO71NCU8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=JgRyoZr3; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QcMiFbA1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740583289;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="JgRyoZr3"
+Message-ID: <880cc89622306730dda9ff471e9bb896@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1740674014;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NXbyCdmoziShPeJAChKxNKhUqohQ4PH+KJxEBCv0dis=;
-	b=QcMiFbA11Fv5S/VUgGAOPTel+qQMVyK0YCzHeh3bOO0WpLHD34gFMEen3dpAnjT5S0b/Gc
-	yQhzumMB/ufJ9ouU0AiSoaXECsZPAwlJxma6wTKSeBuFb0zwSUmgRAGkovH3e739HoyUFA
-	2JJUAbP9Vk2ly+Q8V5oFOPll8qMHEjc=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-iwyn0p17N66pFYe-_2Gb-g-1; Wed,
- 26 Feb 2025 10:21:25 -0500
-X-MC-Unique: iwyn0p17N66pFYe-_2Gb-g-1
-X-Mimecast-MFC-AGG-ID: iwyn0p17N66pFYe-_2Gb-g_1740583283
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 48D2E1800264;
-	Wed, 26 Feb 2025 15:21:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 66FA3180035F;
-	Wed, 26 Feb 2025 15:21:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-In-Reply-To: <2602345.1740576046@warthog.procyon.org.uk>
-References: <2602345.1740576046@warthog.procyon.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: dhowells@redhat.com, Steve French <stfrench@microsoft.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ihor Solodrai <ihor.solodrai@pm.me>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>,
-    Paulo Alcantara <pc@manguebit.com>, Jeff Layton <jlayton@kernel.org>,
-    v9fs@lists.linux.dev, linux-cifs@vger.kernel.org,
-    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfs: Fix unbuffered writes
+	bh=g5DidU6iKoNssVdddsV47pdEZzG2MRw2eN7qzj3tQck=;
+	b=JgRyoZr3ze+OYdMFphzXVaWfpG1bGH0PTr31Ri8zxIZAIt+z9KBhK/vIRf82WxU7gbdKQq
+	/2+FyqQNAtKtTlR1PbR9XiFve5XNDWafh7p1PSmNJH0gJ2xKgobUcKPGB3AV8POJTDolJx
+	n1jpy7HluJwjJwB10RJTzSrVj9cTBfAew2cM+UHGn7QpNVHXDeJQ+ODr4DZxzmKGvgkx1I
+	haw5OCjU/cVfoKtmL0awBPEtu9+nQtelWtpB8RZhWW593JXPa8o10mb9MpmN6yKQEFxeDr
+	fmG2P5Ab7PB/cXATLJVu+iqIffLBFbUauWRoO4AaPUUQDZ+8BLxkC+u8ySTKpg==
+From: Paulo Alcantara <pc@manguebit.com>
+To: aman1cifs@gmail.com, linux-cifs@vger.kernel.org, sfrench@samba.org,
+ sprasad@microsoft.com, tom@talpey.com, ronniesahlberg@gmail.com,
+ bharathsm@microsoft.com
+Cc: Aman <aman1@microsoft.com>
+Subject: Re: [PATCH 1/2] CIFS: Propagate min offload along with other
+ parameters from primary to secondary channels.
+In-Reply-To: <20250214124306.498808-1-aman1cifs@gmail.com>
+References: <20250214124306.498808-1-aman1cifs@gmail.com>
+Date: Thu, 27 Feb 2025 13:33:29 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2616590.1740580941.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-From: David Howells <dhowells@redhat.com>
-Date: Wed, 26 Feb 2025 15:21:17 +0000
-Message-ID: <2635841.1740583277@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain
 
-David Howells <dhowells@redhat.com> wrote:
+aman1cifs@gmail.com writes:
 
-> Fixes: 9dc06eff2097 ("netfs: Fix wait/wake to be consistent about the wa=
-itqueue used")
+> From: Aman <aman1@microsoft.com>
+>
+> In a multichannel setup, it was observed that a few fields were not being
+> copied over to the secondary channels, which impacted performance in cases
+> where these options were relevant but not properly synchronized. To address
+> this, this patch introduces copying the following parameters from the
+> primary channel to the secondary channels:
+>
+> - min_offload
+> - compression.requested
+> - dfs_conn
+> - ignore_signature
+> - leaf_fullpath
+> - noblockcnt
+> - retrans
+> - sign
+>
+> By copying these parameters, we ensure consistency across channels and
+> prevent performance degradation due to missing or outdated settings.
+>
+> Signed-off-by: Aman <aman1@microsoft.com>
+> ---
+>  fs/smb/client/connect.c |  1 +
+>  fs/smb/client/sess.c    | 10 ++++++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index eaa6be445..eb82458eb 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -1721,6 +1721,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+>  	/* Grab netns reference for this server. */
+>  	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
+>  
+> +	tcp_ses->sign = ctx->sign;
+>  	tcp_ses->conn_id = atomic_inc_return(&tcpSesNextId);
+>  	tcp_ses->noblockcnt = ctx->rootfs;
+>  	tcp_ses->noblocksnd = ctx->noblocksnd || ctx->rootfs;
+> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> index 91d4d409c..fdbd32a13 100644
+> --- a/fs/smb/client/sess.c
+> +++ b/fs/smb/client/sess.c
+> @@ -522,6 +522,16 @@ cifs_ses_add_channel(struct cifs_ses *ses,
+>  	ctx->sockopt_tcp_nodelay = ses->server->tcp_nodelay;
+>  	ctx->echo_interval = ses->server->echo_interval / HZ;
+>  	ctx->max_credits = ses->server->max_credits;
+> +	ctx->min_offload = ses->server->min_offload;
+> +	ctx->compress = ses->server->compression.requested;
+> +	ctx->dfs_conn = ses->server->dfs_conn;
+> +	ctx->ignore_signature = ses->server->ignore_signature;
+> +
+> +	if (ses->server->leaf_fullpath)
+> +		ctx->leaf_fullpath = kstrdup(ses->server->leaf_fullpath, GFP_KERNEL);
 
-Actually, you can ignore this.  It's for a patch that's not upstream and c=
-an
-be folded in.
+You're missing NULL check in case kstrdup() fails and also leaking
+@ctx->leaf_fullpath.
 
-David
+You don't need to kstrdup() it as cifs_get_tcp_session() will already do it.
 
+Simply assign @ctx->leaf_fullpath to @ses->server->leaf_fullpath before
+calling cifs_get_tcp_session().
