@@ -1,63 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACC023C9;
-	Sun,  2 Mar 2025 00:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FC45258;
+	Sun,  2 Mar 2025 12:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740874363; cv=none; b=ElmqPQ2/WdsGhR8SqEvKLvL207bdGBXj137wkBcpkZH0JeKbGiBMl3h3EIGQ3Ts6J2Cpx5fiItxGKx6N/WIZkz/B2Ka1oO9NHMqVkxZXpG4rR1kxfyQDHmLCHLuTihNC7ldi6/cv6phoLRlbUokMKJoAMPaj5HO3x87iuRE/qTM=
+	t=1740918300; cv=none; b=tmlXGUUOgw2FFA7YOzIZe+vWS849htyxMVxm9X7dlo1cRnI9IH/6ouYySmOx4O1bL89crI5D5A7mUUuIt/U4+bWMGYAPnaEpvPwzQa2iss4yVkT4ESHRWdWxGFd8mEfI/+IO3Zr/cBp62uZ3z9Mlpf/6Z4oJgXZM2X6ZE5LULN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740874363; c=relaxed/simple;
-	bh=eggE07wPyiYabfDTmPqk6NY83YLuDQYKDzr+xeLbziQ=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=LHuStaaCKT5darepu/Q6nS+4DRSozygpp/Q3UG3o35S2RharU0SbQrEEYdylT4YErrkzXlf24ZcDTKq/Ba7amByaw4fn6qiqnTi0d6zpaHao8sOOyJh8M45FmI5vH1LDxLe6c9rReugxwI6wIUGhvrw6/q8zoDPuN/xqA57ehvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tgUXsv9t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740918300; c=relaxed/simple;
+	bh=GEa3fmIdqUVuzfQanlaEG+LJph7mxlci3BXP0ERpIJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hcQWZWS+RUo7/qbtf0NObqfxhqO5kpFvzzMRcUdkvSY4n8Un3QjZT1C9ICZ8DG0dVFbDtVTYe0A/bQVfwxsmMMvWUpQstHoTd4A+ej63ABT6LnE/5h8vHfB5cgixOXxE9U9DBXpHsP4tbl7KZMUo076eqj4T6MVkVuIHujWu4Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIgbTX2n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tgUXsv9t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7977C4CEDD;
-	Sun,  2 Mar 2025 00:12:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIgbTX2n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2312AC4CED6;
+	Sun,  2 Mar 2025 12:25:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740874362;
-	bh=eggE07wPyiYabfDTmPqk6NY83YLuDQYKDzr+xeLbziQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=tgUXsv9taDPDdgIRcLotXJtPwu5nGBBmkfr0A6LdKuUpnsWHLqSEwAjgq3ES50dSE
-	 Cu9dp+u0prT9xRh3uJ0pCZNoOWca5LLCexpMIr5sbzr35smJD312iv9Ybn7Eyk7XdP
-	 4CjZp7L4MR7p6FZdEtEnqzXsk4+py2T/FYXvbI8hCGkPuHnSP0EpNltqcGWbVIclqk
-	 0CDY0sBrDvHEdaIYZITx7OVNypYU3RNQEc1YKI3M0iropE9K2yobayOjpkBKLbCRt4
-	 OKeTPmPocKpflaID7/DRDyZzSRCfC65KOPxt/Dt+uOuXPa2b2mI5h7vc7kahchfuzL
-	 vRXV7VyQzEnHQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712D5380AACF;
-	Sun,  2 Mar 2025 00:13:16 +0000 (UTC)
-Subject: Re: [GIT PULL] smb client fix
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msEB9nwoZOq70XWmHPV98_gy145DKoY_wiDRwP+N2wOXw@mail.gmail.com>
-References: <CAH2r5msEB9nwoZOq70XWmHPV98_gy145DKoY_wiDRwP+N2wOXw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msEB9nwoZOq70XWmHPV98_gy145DKoY_wiDRwP+N2wOXw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.14-rc4-smb3-client-fix
-X-PR-Tracked-Commit-Id: 66cb85c441cd9c44b193ff75b4d0358fccdc6b9c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ece144f151ac7bf8bb5b98f7d4aeeda7a2eed02a
-Message-Id: <174087439507.2526550.1365886616006138523.pr-tracker-bot@kernel.org>
-Date: Sun, 02 Mar 2025 00:13:15 +0000
+	s=k20201202; t=1740918300;
+	bh=GEa3fmIdqUVuzfQanlaEG+LJph7mxlci3BXP0ERpIJE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SIgbTX2n/h8eMfmwirzeUbariF6JWOmF5h924QuvyUgH46g1AEEZH8PY75RQWOJtL
+	 4UnZQKTwhlcgrpSVPs5UCScEHRAU+8fJrxyBR2/p4UfQp76+Jhe/1wUvT2dU/H+dlG
+	 RNasa3lnlPLkVbd9jjTgYm1iVR6BKvZXcwl3Bp2s6okjZbspVJUAHnAZmIByTFB5S8
+	 VFguBtprqiFxNIbRxPGbHbDLcqPXLdUmH8LsbO7ZHWJH0FPT9Inhja57K9CzuzUWD/
+	 HQrxs14m4gw8SYEOofLhIW4NFN9ZOgFPxPFiuhl1K3RuTuOpEl4i+f4xNitdGyHkhn
+	 n5N2Zvw9DkjGA==
+Received: by pali.im (Postfix)
+	id D83037B3; Sun,  2 Mar 2025 13:24:46 +0100 (CET)
+Date: Sun, 2 Mar 2025 13:24:46 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] cifs: Handle all name surrogate reparse points
+Message-ID: <20250302122446.dpqd6hlpfmy3fo3l@pali>
+References: <20241222145845.23801-1-pali@kernel.org>
+ <20250223222306.plgy3bpy5mjojfve@pali>
+ <CAH2r5mv_+ZarrSPEhDjgEYPzqkvdqL-K7NjDsE0sXtrhx65G7A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mv_+ZarrSPEhDjgEYPzqkvdqL-K7NjDsE0sXtrhx65G7A@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-The pull request you sent on Sat, 1 Mar 2025 18:03:47 -0600:
+On Sunday 23 February 2025 18:48:50 Steve French wrote:
+> On Sun, Feb 23, 2025 at 4:23 PM Pali Rohár <pali@kernel.org> wrote:
+> >
+> > Hello Steve, I see that you have merged first two changes (1/4 and 2/4)
+> > from this patch series, but the remaining (3/4 and 4/4). Is there any
+> > reason why 3/4 and 4/4 was not taken?
+> 
+> Mainly because I wasn't able to easily test it, and didn't get test
+> feedback for anyone else
+> on those two who had tried it.
+> 
+> I am ok with looking at them again - and thx for rebasing.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.14-rc4-smb3-client-fix
+Ok, when you have a time, please look at them.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ece144f151ac7bf8bb5b98f7d4aeeda7a2eed02a
+> There are some of the 41 patches in your updated cifs branch that do look suitable or rc5
 
-Thank you!
+There is "cifs: Change translation of STATUS_DELETE_PENDING to -EBUSY"
+which stops returning -ENOENT for directory entry which still exists.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> 
+> > On Sunday 22 December 2024 15:58:41 Pali Rohár wrote:
+> > > Name surrogate reparse point represents another named entity in the system.
+> > >
+> > > If the name surrogate reparse point is not handled by Linux SMB client
+> > > and it is of directory type then treat it as a new mount point.
+> > >
+> > > Cleanup code for all explicit surrogate reparse points (like reparse
+> > > points with tag IO_REPARSE_TAG_MOUNT_POINT) as they are handled by
+> > > generic name surrogate reparse point code.
+> > >
+> > > Pali Rohár (4):
+> > >   cifs: Throw -EOPNOTSUPP error on unsupported reparse point type from
+> > >     parse_reparse_point()
+> > >   cifs: Treat unhandled directory name surrogate reparse points as mount
+> > >     directory nodes
+> > >   cifs: Remove explicit handling of IO_REPARSE_TAG_MOUNT_POINT in
+> > >     inode.c
+> > >   cifs: Improve handling of name surrogate reparse points in reparse.c
+> > >
+> > >  fs/smb/client/inode.c    | 17 +++++++++++++----
+> > >  fs/smb/client/reparse.c  | 24 ++++++++++--------------
+> > >  fs/smb/common/smbfsctl.h |  3 +++
+> > >  3 files changed, 26 insertions(+), 18 deletions(-)
+> > >
+> > > --
+> > > 2.20.1
+> > >
+> >
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
