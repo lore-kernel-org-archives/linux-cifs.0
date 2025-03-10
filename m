@@ -1,42 +1,42 @@
 Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F47511CBA;
-	Mon, 10 Mar 2025 14:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F50522A7FD;
+	Mon, 10 Mar 2025 14:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741615495; cv=none; b=Z+DbP1HBWM89DgHrcDY2cuJQL80ciG2uSdUmuQRzsDfCLMbiq/G1QTXlxam1CicuDHRbRaWtI1PbISI7+Miax6t1SgzwyN0o/gm0LmSdW25v4Ynhg9XmhI/K9BJqaQ0ISddId2xZlAMfqIdRItLYjFMSBN+2fd/rfdLi6kFDLXw=
+	t=1741615519; cv=none; b=YId4cFCma2wabJ2ckR0pv3AhEl/DZUilDGFgAiEx3KDkR3/s8gy6OGjJ/KIG43LdQwr0I9ndSvJ9P+6wp04JT8FMKiw4TrJY/1lE+eQFX4pbqSgN00bxm5NisOXPsVVIfQzLnTbZLaPmnpr3InXyqF/ADqQaZuikCbq7RekjrDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741615495; c=relaxed/simple;
-	bh=olkjS179wimSfxtgPV3Vx41TMpO0BQoPcjRSzc89dpE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZE8QRq94iuDTQaMgXnlzBcWslYGfW1HhSluFoMNXa1kkuY9KB45dgEDtEbDfTHH7GzL0378ANW2pkXaKber3w8WLXLP3/p0K8HbwGdmq4EMIqjFEWBaBQG2jHheBQKez3fmcDpmPOk/cZhl3Z/mxD0igxET29DuCzw90dONbF14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=jA/gkYzi; arc=none smtp.client-ip=81.200.124.38
+	s=arc-20240116; t=1741615519; c=relaxed/simple;
+	bh=whtOw1E43xFawjustlXCPBOoe7oWD2o0R5JAIJpkqio=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s+OPRDALon8dC47a9HiQgTGWQIgVSPqybDy0vFoGmxT0uDImR726LlFCv3YjxOuUFii0cOU0I0ddBfzLVKBopDik5Fhn0rTXKwkBIfjWkakOzYxNC2JTwBNnVJTdMyqhSLLmHxFLuSF6i0ux0iIdq2EL+EF9dM4flj0ULb8XTYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=rRVWAj1p; arc=none smtp.client-ip=81.200.124.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="jA/gkYzi"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="rRVWAj1p"
 Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 2A785C000C;
-	Mon, 10 Mar 2025 17:04:40 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 2A785C000C
+	by ksmg01.maxima.ru (Postfix) with ESMTP id 78827C000F;
+	Mon, 10 Mar 2025 17:05:13 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 78827C000F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1741615480; bh=UHlBnklIHur729VNFScUIRdriOCA2AaGF+3TlDhQgts=;
+	s=sl; t=1741615513; bh=o7zdU8UMQ+WdZBl+qEXuspEhObBUPmPtiONVmKcSePo=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=jA/gkYzidS4ivy916DokGVn5s6hu5xv8pNro9jewPcciz568XJs1lF9ROz2ltiLRj
-	 FjVm8ZE8Jm3aQkrWrxilSVz/KF13m6Z3WTBGP1PWIPiZ5MfHakOtluaHI75el9iu0M
-	 vG+zm1lyQM4ebIuHhqXYzGNRQbjvjC90XzQ8zZEkoPYqX5YDffUwFrDTtcg8m5Jq0T
-	 ElDlNrWx1He1+qr1UIwor0vMGJkIRI309UWtILeKLOvmP67RlBLVrUk0y2S941JwS2
-	 O/no1jWmcgQVCQCMnWucIbmRnknIoo8WG0p79d13uLj3kAzh/uYogDCSLpyPnKOX7i
-	 HpugK1+m0JHqg==
-Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
+	b=rRVWAj1pAOGJm7g6UNt7TNoe6U5ybY2vyab9gGGa/l+HDVlsg4AG/H9OQyQqv+fov
+	 xNcUZji2io/ygj9pY7n446MohPLqbyras8NbU8jfBkgx/AYo9zHwguC+VasNM3wJAR
+	 G/gxiO4LSpD4iGfFs9RxMt3+JhvXFjy8P0vmzAZsHvoFBoyusSupKsGND+Q6f+lxHp
+	 J42nxt2FTIj2LvQdGxCcTPAadacKcb1wj1zljc45NRpOyQa0B3te9pBAK8Nwmirt0u
+	 Q1/r8TR9KihmM62WzFP9jSuGbkVX589E6HLiRXQWi6vSyhIOwIMcLiVrU2MXd/zuOn
+	 dCIRqGjnqF1Ng==
+Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
 	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Mon, 10 Mar 2025 17:04:40 +0300 (MSK)
+	Mon, 10 Mar 2025 17:05:13 +0300 (MSK)
 Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
  mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 10 Mar 2025 17:04:38 +0300
+ 15.2.1544.4; Mon, 10 Mar 2025 17:05:11 +0300
 From: Ivan Abramov <i.abramov@mt-integration.ru>
 To: Steve French <sfrench@samba.org>
 CC: Ivan Abramov <i.abramov@mt-integration.ru>, Paulo Alcantara
@@ -45,9 +45,9 @@ CC: Ivan Abramov <i.abramov@mt-integration.ru>, Paulo Alcantara
 	<bharathsm@microsoft.com>, <linux-cifs@vger.kernel.org>,
 	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
 	<lvc-project@linuxtesting.org>
-Subject: [PATCH] smb: client: Remove redundant check in cifs_oplock_break()
-Date: Mon, 10 Mar 2025 17:04:06 +0300
-Message-ID: <20250310140406.249169-1-i.abramov@mt-integration.ru>
+Subject: [PATCH] smb: client: Remove redundant check in smb2_is_path_accessible()
+Date: Mon, 10 Mar 2025 17:04:58 +0300
+Message-ID: <20250310140458.249202-1-i.abramov@mt-integration.ru>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -75,12 +75,11 @@ X-KSMG-LinksScanning: NotDetected
 X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 7
 
-There is an unnecessary NULL check of inode in cifs_oplock_break(), since
-there are multiple dereferences of cinode prior to it.
+There is an unnecessary NULL check of cifs_sb in smb2_is_path_accessible(),
+since cifs_sb is dereferenced multiple times prior to it.
 
-Based on usage of cifs_oplock_break() in cifs_new_fileinfo() we can safely
-assume that inode is not NULL, so there is no need to check inode in
-cifs_oplock_break() at all.
+It seems that there is no need to introduce any NULL checks of cifs_sb, 
+since arguments of smb2_is_path_accessible() are assumed to be non-NULL.
 
 Therefore, this redundant check can be removed.
 
@@ -88,22 +87,22 @@ Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
 Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
 ---
- fs/smb/client/file.c | 2 +-
+ fs/smb/client/smb2ops.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 8582cf61242c..66b775ae2f82 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -3082,7 +3082,7 @@ void cifs_oplock_break(struct work_struct *work)
- 		cinode->oplock = 0;
- 	}
- 
--	if (inode && S_ISREG(inode->i_mode)) {
-+	if (S_ISREG(inode->i_mode)) {
- 		if (CIFS_CACHE_READ(cinode))
- 			break_lease(inode, O_RDONLY);
- 		else
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 4dd11eafb69d..6958825431af 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -969,7 +969,7 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 			if (islink)
+ 				rc = -EREMOTE;
+ 		}
+-		if (rc == -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) && cifs_sb &&
++		if (rc == -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) &&
+ 		    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS))
+ 			rc = -EOPNOTSUPP;
+ 		goto out;
 -- 
 2.39.5
 
