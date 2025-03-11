@@ -1,206 +1,95 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ksmg02.maxima.ru (ksmg02.maxima.ru [81.200.124.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9046DF9CB
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 13:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A488E156C62;
+	Tue, 11 Mar 2025 14:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741700388; cv=none; b=jHfKTnnGJrlwPIPgUlEBsr2MqamWxViLfnx2R8WO2hslL9ToChuc31ay7VE1nmiDXhw/gFLS3EaqTytR5j8XSpKh9V+wY2vMbuQHMIyWqVQ1TcSPqE4QcYPUMLioct1Sjyopgv9FZSYY33rQB+qDQ24IZDYVoknzkL+bxRxgBjU=
+	t=1741703147; cv=none; b=cSW1U4JRq0rFOAKYfgqhGT5iCmtbzsioyLDSFQQFW1Njh8MMgovUY6K4L4/ovWE1QN1i3q2lbaNtsjEFpn0jvEWqxR0uOepQeyxEk6W/SEHKynzX27mxOsk/uUxgkovXMEtGULKtLeYVdEOWoczKSj87fMLiXg44mF4AVS5YVdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741700388; c=relaxed/simple;
-	bh=+bzmzN1qAR3YtS3MC9OrOdFQZlRN9XdAJVlpsG2YGow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+Rv7u5WDvC4KulkcSe3JFnjq/lmDWjCeAiLrCoEhHbxR4SpCAb0zqlp2QFt1QTyStOo8VGBR0dw+QiTMuYlLzUs59BMPzIHAruAfjch/f5BF65nSQ9hdjnMpVG+1DLYekbPzyaauBGcZxDHGPAyLqpEIyURpU7f71Mh3yR/ll4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1SFrxcDD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y6fMp4ks; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1SFrxcDD; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y6fMp4ks; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1741703147; c=relaxed/simple;
+	bh=05bZVaLA9/Kh87yiopcsB70RUi/bZ2X4rpmzaPDGjRU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ChEReVoZLWyIsvqSWSqJEZfqYw1s/rvjwT0Q+cSosAtttNQz6nZUZHp8SdT9pv0BZC3INJOvPMhjtegjNUcVy1lk5HtcMH2MbwCNz8IHgO0C+FSAKqH4/8BIbXfR2w5jQILZ8VEIDRdXIPjO7W8gQzABlrIw210yPnAHUU6f3GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=e1EdwjGs; arc=none smtp.client-ip=81.200.124.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1SFrxcDD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y6fMp4ks";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1SFrxcDD";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y6fMp4ks"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7B3AE21168;
-	Tue, 11 Mar 2025 13:39:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741700384; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cjdv2+oogttHfFx3vumfIOyCmOlfaDhdHYcDcv6JGLA=;
-	b=1SFrxcDD6JzPB5RWvUKjnA3ZCu/Ku86YCfb0beDCuWHMsR5OfaxCxfMBWIUgGXD5M1ZOys
-	92vASXS3HCUdOodRw7KIb2TFp2C8Qp7TXF6GUWgoDRG3xQIPHhTHqa4lQsgu8/yBzGOhqM
-	SjbWI3TWovSG6hWsfBFViIMNA0gzDa8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741700384;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cjdv2+oogttHfFx3vumfIOyCmOlfaDhdHYcDcv6JGLA=;
-	b=y6fMp4kstnxd9nE1yENQX9xqOi0h8VnYDgb9s79oMNe+0PuLkUrtbht51T9mZYu14Y8M7S
-	FFHUo2QjF9DHVcAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=1SFrxcDD;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y6fMp4ks
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741700384; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cjdv2+oogttHfFx3vumfIOyCmOlfaDhdHYcDcv6JGLA=;
-	b=1SFrxcDD6JzPB5RWvUKjnA3ZCu/Ku86YCfb0beDCuWHMsR5OfaxCxfMBWIUgGXD5M1ZOys
-	92vASXS3HCUdOodRw7KIb2TFp2C8Qp7TXF6GUWgoDRG3xQIPHhTHqa4lQsgu8/yBzGOhqM
-	SjbWI3TWovSG6hWsfBFViIMNA0gzDa8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741700384;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cjdv2+oogttHfFx3vumfIOyCmOlfaDhdHYcDcv6JGLA=;
-	b=y6fMp4kstnxd9nE1yENQX9xqOi0h8VnYDgb9s79oMNe+0PuLkUrtbht51T9mZYu14Y8M7S
-	FFHUo2QjF9DHVcAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0A1A2134A0;
-	Tue, 11 Mar 2025 13:39:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NiYhMR890GeBSQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 11 Mar 2025 13:39:43 +0000
-Date: Tue, 11 Mar 2025 10:39:37 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pc@manguebit.com, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: Fix match_session bug causing duplicate
- session creation
-Message-ID: <qzsu6rfpof7ipuaaszyt6opjoepnmxfgdgqzecmrnz4itdl5rn@gb3haoqrul55>
-References: <20250311013231.2684868-1-henrique.carvalho@suse.com>
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="e1EdwjGs"
+Received: from ksmg02.maxima.ru (localhost [127.0.0.1])
+	by ksmg02.maxima.ru (Postfix) with ESMTP id 72DE21E0011;
+	Tue, 11 Mar 2025 17:25:35 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg02.maxima.ru 72DE21E0011
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
+	s=sl; t=1741703135; bh=pVr5Bxi/FvTbaIsz7rL3SBie1NbHtO1UVIGxudFCGWg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=e1EdwjGs2bi1w1Xyde5W6L6U9yFZTMft2RCiTCma/+gH+qRR1AtgEqW/SY3FNudPS
+	 5MCO+wiTVpPOdntOgCNjDqQTdAA058oGfpMLZKY16x/wBcp13xjQi+G8k0lzRX4vfK
+	 RgxN4dLw4HJxHTrRbJt7YW9RtQ99HHv3iHtJ4DFut36iLN1MS+ShOpsGrTCLEEenyI
+	 3/+4750tnFdF+Z60/qqgAxE7QlwdrIJEf1dOq7BBbFnCcaVYdnWYt6/rs2WnRRDxtf
+	 KifL/Bm4HaAQ2CtzctmaaYAITYI3NMN8dENYwsTY/wMRIhzqGSMhUDFIiG57dC7JZD
+	 GQFr3EOgZuXSw==
+Received: from ksmg02.maxima.ru (mail.maxima.ru [81.200.124.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
+	by ksmg02.maxima.ru (Postfix) with ESMTPS;
+	Tue, 11 Mar 2025 17:25:35 +0300 (MSK)
+Received: from GS-NOTE-190.mt.ru (10.0.246.70) by mmail-p-exch02.mt.ru
+ (81.200.124.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Tue, 11 Mar
+ 2025 17:25:31 +0300
+From: Murad Masimov <m.masimov@mt-integration.ru>
+To: Steve French <sfrench@samba.org>
+CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
+	<ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, Jeff Layton
+	<jlayton@kernel.org>, Suresh Jayaraman <sjayaraman@suse.de>, "Paulo Alcantara
+ (SUSE)" <pc@cjr.nz>, <linux-cifs@vger.kernel.org>,
+	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, Murad Masimov <m.masimov@mt-integration.ru>
+Subject: [PATCH 0/4] cifs: Fix integer overflow while processing mount options
+Date: Tue, 11 Mar 2025 17:22:02 +0300
+Message-ID: <20250311142206.2045-1-m.masimov@mt-integration.ru>
+X-Mailer: git-send-email 2.46.0.windows.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250311013231.2684868-1-henrique.carvalho@suse.com>
-X-Rspamd-Queue-Id: 7B3AE21168
-X-Spam-Score: -4.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[samba.org,manguebit.com,gmail.com,microsoft.com,talpey.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.de:email,suse.de:dkim];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch02.mt.ru
+ (81.200.124.62)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
+X-KSMG-AntiSpam-Envelope-From: m.masimov@mt-integration.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, mt-integration.ru:7.1.1;81.200.124.62:7.1.2;ksmg02.maxima.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.62
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 191671 [Mar 11 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/11 08:08:00 #27707391
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 7
 
-Hi Henrique,
+These patches fix similar issues that have different origin commits.
+User-provided mount parameters are intended to have upper limits, but
+are validated after their values are converted from seconds to jiffies,
+which can lead to an integer overflow.
 
-On 03/10, Henrique Carvalho wrote:
->Fix a bug in match_session() that can result in duplicate sessions being
->created even when the session data is identical.
->
->match_session() compares ctx->sectype against ses->sectype only. This is
->flawed because ses->sectype could be Unspecified while ctx->sectype
->could be the same selected security type for the compared session. This
->causes the function to mismatch the potential same session, resulting in
->two of the same sessions.
->
->Reproduction steps:
->
->mount.cifs //server/share /mnt/a -o credentials=creds
->mount.cifs //server/share /mnt/b -o credentials=creds,sec=ntlmssp
->cat /proc/fs/cifs/DebugData | grep SessionId | wc -l  # output is 1
->
->mount.cifs //server/share /mnt/b -o credentials=creds,sec=ntlmssp
->mount.cifs //server/share /mnt/a -o credentials=creds
->cat /proc/fs/cifs/DebugData | grep SessionId | wc -l  # output is 2
+Murad Masimov (4):
+  cifs: Fix integer overflow while processing acregmax mount option
+  cifs: Fix integer overflow while processing acdirmax mount option
+  cifs: Fix integer overflow while processing actimeo mount option
+  cifs: Fix integer overflow while processing closetimeo mount option
 
-Minor nit: I think your reproducer results are inverted -- on my tests,
-the session is reused when sec=ntlmssp is passed on first mount, not the
-other way around.
+ fs/smb/client/fs_context.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
->Fixes: 3f618223dc0bd ("move sectype to the cifs_ses instead of
->TCP_Server_Info")
->Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
->---
-> fs/smb/client/connect.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
->
->diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
->index f917de020dd5..0c8c523d52be 100644
->--- a/fs/smb/client/connect.c
->+++ b/fs/smb/client/connect.c
->@@ -1825,8 +1825,11 @@ static int match_session(struct cifs_ses *ses,
-> 			 struct smb3_fs_context *ctx,
-> 			 bool match_super)
-> {
->+	struct TCP_Server_Info *server = ses->server;
->+	enum securityEnum selected_sectype = server->ops->select_sectype(ses->server, ctx->sectype);
+--
+2.39.2
 
-Calling select_sectype() with ctx->sectype as argument works fine for
-Unspecified and ntlmssp* cases (because Unspecified will default to
-ntlmssp if server supports it), but if you do the first mount with
-sec=krb5 and the second with sec=ntlmssp/no sec=, the krb5 session
-will be reused (which is wrong).
-
-I would suggest something like (quickly tested only):
-
-{
--       if (ctx->sectype != Unspecified &&
--           ctx->sectype != ses->sectype)
-+       struct TCP_Server_Info *server = ses->server;
-+       enum securityEnum requested_sectype = server->ops->select_sectype(server, ctx->sectype),
-+                         selected_sectype = server->ops->select_sectype(server, ses->sectype);
-+
-+       if (requested_sectype != selected_sectype)
-		 return 0;
-
-i.e. comparing what the new session would negotiate as sectype vs what
-was negotiated for the previous session.
-
->+
-> 	if (ctx->sectype != Unspecified &&
->-	    ctx->sectype != ses->sectype)
->+	    ctx->sectype != selected_sectype)
-> 		return 0;
->
-> 	if (!match_super && ctx->dfs_root_ses != ses->dfs_root_ses)
->-- 
-
-Other than that,
-
-Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-
-
-Cheers,
-
-Enzo
