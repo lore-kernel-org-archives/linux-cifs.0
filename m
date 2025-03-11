@@ -1,150 +1,87 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A152F25F985
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 18:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5BB264638
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 20:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741719069; cv=none; b=UKcje+IArN2uSLbodiOTFFeeAks24i5LgoF++FKOliKoHdHShLsZXZ8SPDlPTzrNiMFFijqwV/g0A249OBV+ywIuPsftKpXKctUf9pIc6KoGVKUIeOMuclmz+toRzU6DL3A2BUtBIArSwVRW1X57AvmDKFiUeXcBlvG4pyYl2BQ=
+	t=1741724516; cv=none; b=rJPpdMD698vt03P3F7Tlq4djItcEEtx1Gygnoj47XuCIOKrpcwhaVbfxOAP/vBK9g0+YgThmEt3wzyX4EB0mJVmV3oHYfHqeQSRSa1S2hEW7DzbBcdDQUV1Glg5ulR9tc31EuGLPLa8Dtflw84dJYeyIRJpGdguQ4HT6N0xbZEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741719069; c=relaxed/simple;
-	bh=gU3OIZg6UIGxss/koBDwOrLG7qsPc1G6lbBnTH1bOYw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YM0VuVQeOk4Ean3ylK5Bq7hBHLdUgF6mHq0+akRLm0P84YPJ6dfQkgKJ3D1rgXcPHgOen99CSClzqfYCJZ28DZWGj3LMD4o0OolhCVmciH4VgzUxx+Q7VBxu/6R2yZGhhVDZwVv7LKDtrkBrXyWn6zRaON6FE5dLbz6UgqnJ364=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giVKZRlj; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741724516; c=relaxed/simple;
+	bh=Vov0sdfnH0pMExaF1bG1SBHE8cvGmRm9OlqcQkNc6sQ=;
+	h=Message-ID:From:To:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=WLsp5Y5CZ+60/+NQjE5UITimGFCB1KA2rzkTMn8n4QSCldo149ek3nongKwZ7/JYYAmKTj1/yf7n1qPu/C+ASXIpzwKFGie6DtjWTxVvV7+9MkcqN7/UjRSLTjM0t5l2N0F6WnWCOaLIuX61gHuN4uzCEXJxuyNB8azZbpzhLsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=gXLubxSH; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="giVKZRlj"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5495078cd59so6590584e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 11:51:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741719066; x=1742323866; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ym7rbWc78y3RvP2De7B2SqWUYYM/5WV41KF2WOupKm8=;
-        b=giVKZRljO9k5HxQsFPOIGClRfhVV77hFzzVHq5SaV8Eav1aZYO4cQT/b+jLZCOGOLK
-         zSQP2sxGQx7jvKhnNacfTXGPVKoRDx8Jf61tJXYAAGKB/lbqT7I/g+iQ/TOtncicKDMg
-         SE6kCr1XwDcn/4oFjytTQhYm2tCCPm8KDlzeCs/qW4x2FdiVc+jyBHHsYHAWCD55wAqV
-         cnjUOfnfe/yh6MUkwQzCVrC0WbOrsBEtb5PNY4f8PtG649DZyA5J6tmC5Svrfdw+dGN/
-         UVR0LMJ2ASLBOqylJtK8GL5FY+4ya6jhtCZlPwCEFS1P9CZvDpXQyY8rvynEiBWbPKrg
-         YVAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741719066; x=1742323866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ym7rbWc78y3RvP2De7B2SqWUYYM/5WV41KF2WOupKm8=;
-        b=H8WSz3P58lqCDulaFYRIRRmh/YTfEMs1dTke/8ZFCe+sY2MSE7fYk1a664dHLhNk9f
-         nSWMHLvABxImllU1CxKihTG6sEmYgbrvXzaBiwfegb/4vtcgKg+ziqvV0VmALl4bETOd
-         6kmolwTHNd6aPDaFqd+JMFBKpOHlcb30duYyIaaRYthMJL1tQSrxPe2HKZFnE6uE4aMp
-         e5p0mc2ZoU86jlnRI63MkgZ6pmV7g4D/SaRP+NiFiu9DALM826L1AUeFSYyGkPa//2Ul
-         7o1k2bQwrAK6uuHa2WnzcX7rD0J99d4am+pqVc2sQ8hR62ETDlevVCz6la51w6lT2FCh
-         pldw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmE8M6dQ8RpHrE40anQElLaBglGbLL+uvkapeCyJ8eidnEHlLmTQuFJhGIk5bgAvgvjPjPgfwzukdm@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6jARB/M5LDnPlYkwhz+Gs4oMC+EoKjzFEMFGV/3rYVKkVbwv9
-	EzCy2P0745QZAhevbm+29rMbhO6kan2GrY1Dle4unOPwefKumLigFjKr0L788cRw+jRzA9pY5gM
-	FIj/OYV+BwqjbeL7Mvq4KzQ9IAV8=
-X-Gm-Gg: ASbGncuvqEVr1csFyVXxZnEaIxBfA/sa5BrSLHyXnvfwW0vltr7jLhcg7EtnUKFrdpl
-	Pv/Q6MVC9cTqu+2nFV7XHr+HyieEcOodRgRWeQqO/gISzE3KW5+U2XK1+Mew8QXfKI4v8KuPA4u
-	6UgjupyBqmaArTo5QuvTmUA/r+NnOspERSTNeBKgjcw3b2ltZ5FspqLx6MNAP+
-X-Google-Smtp-Source: AGHT+IEVmnJRF1SdVfXEXiCDAyiTJytDXhhcCgQvIfAoCun76IUxRqwgogAlp+wId+VLN9rQgy3Hx0o26oTaIcrLasM=
-X-Received: by 2002:a05:6512:2827:b0:548:e44d:f3ee with SMTP id
- 2adb3069b0e04-549abaac646mr1641000e87.10.1741719065275; Tue, 11 Mar 2025
- 11:51:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="gXLubxSH"
+Message-ID: <e64f3f2231064e771423f32865361c10@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1741723956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OmHCokL1pEq1E0nY4Ruth51FEjIaMBiwg9Bq6dczU14=;
+	b=gXLubxSHIw0mon9YmoJqDqelI00brWHwaJfzMqNFWmUSAmNU/ZzlSKYqgJr8wWvsz5u5kI
+	i0MsZTAOM0MpcJtFJFQkx5k5LrY4soj8RdgQcBNsC6HmNU0dSZ4SP4WBKPssK87S/YxQmk
+	h/VinMfXPi1bgta6HOz518kAi0XYX6SScFHGM5fsIsvKx+CRfX8Jau1cThZiMAX4Dv30br
+	4/UjVRBYmOa1zEkX+q8Vmw3OdHxGFQcajcfA5VEl+N7iw/VMVsZbZ3i5X/DBpg/kGUqBXq
+	JkHS3iMpQ/OkClB4BjoJgJV5U+qET7sLa/xwbbgu1YLy2c7lrpduua0cf9batg==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Adam Williamson <awilliam@redhat.com>, linux-cifs@vger.kernel.org
+Subject: Re: Anonymous mount of CIFS shares fails with cifs-utils 7.2 unless
+ 'sec=none' is added to mount options
+In-Reply-To: <83c00b5fea81c07f6897a5dd3ef50fd3b290f56c.camel@redhat.com>
+References: <83c00b5fea81c07f6897a5dd3ef50fd3b290f56c.camel@redhat.com>
+Date: Tue, 11 Mar 2025 17:12:32 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250311182359.3012730-1-henrique.carvalho@suse.com>
-In-Reply-To: <20250311182359.3012730-1-henrique.carvalho@suse.com>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 11 Mar 2025 13:50:54 -0500
-X-Gm-Features: AQ5f1JqksLWPztxbBFCbxVeR0Q1yU85mWKnb2iK6kxBJQezXrnq7BkM03T7ifzc
-Message-ID: <CAH2r5ms9pbyqxsXGixFyG9p8r6evu5iThr1wmv0sq8d66wQD9Q@mail.gmail.com>
-Subject: Re: [PATCH v2] smb: client: Fix match_session bug preventing session reuse
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: ematsumiya@suse.de, sfrench@samba.org, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-updated cifs-2.6.git for-next with this newer version of the patch
+Adam Williamson <awilliam@redhat.com> writes:
 
-On Tue, Mar 11, 2025 at 1:25=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
+> I have this line in my /etc/fstab to mount a local network CIFS share
+> that requires no authentication:
 >
-> Fix a bug in match_session() that can causes the session to not be
-> reused in some cases.
+> //192.168.1.9/Media		/mnt/data             cifs    noauto,nosuid,soft,guest,uid=99,gid=99,file_mode=0777,dir_mode=0777,users,vers=3.0	0 0
 >
-> Reproduction steps:
+> With cifs-utils 7.2, this suddenly doesn't work. I get an 'invalid
+> argument' error, and in dmesg:
 >
-> mount.cifs //server/share /mnt/a -o credentials=3Dcreds
-> mount.cifs //server/share /mnt/b -o credentials=3Dcreds,sec=3Dntlmssp
-> cat /proc/fs/cifs/DebugData | grep SessionId | wc -l
->
-> mount.cifs //server/share /mnt/b -o credentials=3Dcreds,sec=3Dntlmssp
-> mount.cifs //server/share /mnt/a -o credentials=3Dcreds
-> cat /proc/fs/cifs/DebugData | grep SessionId | wc -l
->
-> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
-> ---
-> V1 -> V2: fix git message, fix krb5 case pointed by Enzo, add IAKerb to
-> switch
->
->  fs/smb/client/connect.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index f917de020dd5..73f93a35eedd 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -1825,9 +1825,8 @@ static int match_session(struct cifs_ses *ses,
->                          struct smb3_fs_context *ctx,
->                          bool match_super)
->  {
-> -       if (ctx->sectype !=3D Unspecified &&
-> -           ctx->sectype !=3D ses->sectype)
-> -               return 0;
-> +       struct TCP_Server_Info *server =3D ses->server;
-> +       enum securityEnum ctx_sec, ses_sec;
->
->         if (!match_super && ctx->dfs_root_ses !=3D ses->dfs_root_ses)
->                 return 0;
-> @@ -1839,11 +1838,20 @@ static int match_session(struct cifs_ses *ses,
->         if (ses->chan_max < ctx->max_channels)
->                 return 0;
->
-> -       switch (ses->sectype) {
-> +       ctx_sec =3D server->ops->select_sectype(server, ctx->sectype);
-> +       ses_sec =3D server->ops->select_sectype(server, ses->sectype);
-> +
-> +       if (ctx_sec !=3D ses_sec)
-> +               return 0;
-> +
-> +       switch (ctx_sec) {
-> +       case IAKerb:
->         case Kerberos:
->                 if (!uid_eq(ctx->cred_uid, ses->cred_uid))
->                         return 0;
->                 break;
-> +       case NTLMv2:
-> +       case RawNTLMSSP:
->         default:
->                 /* NULL username means anonymous session */
->                 if (ses->user_name =3D=3D NULL) {
-> --
-> 2.47.0
->
->
+> cifs: Bad value for 'password2'
 
+Yes, this is a regression.  The problem is that cifs-utils-7.2 is now
+passing an empty password2= for guest authentication and the kernel
+can't handle it.
 
---=20
-Thanks,
+Does the following fix your issue
 
-Steve
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index e9b286d9a7ba..456948d4f328 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -171,6 +171,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_string("username", Opt_user),
+ 	fsparam_string("pass", Opt_pass),
+ 	fsparam_string("password", Opt_pass),
++	fsparam_string("pass2", Opt_pass2),
+ 	fsparam_string("password2", Opt_pass2),
+ 	fsparam_string("ip", Opt_ip),
+ 	fsparam_string("addr", Opt_ip),
+@@ -1125,7 +1126,10 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	 * we will need special handling of them.
+ 	 */
+ 	if (param->type == fs_value_is_string && param->string[0] == 0) {
+-		if (!strcmp("pass", param->key) || !strcmp("password", param->key)) {
++		if (!strcmp("pass2", param->key) || !strcmp("password2", param->key)) {
++			skip_parsing = true;
++			opt = Opt_pass2;
++		} else if (!strcmp("pass", param->key) || !strcmp("password", param->key)) {
+ 			skip_parsing = true;
+ 			opt = Opt_pass;
+ 		} else if (!strcmp("user", param->key) || !strcmp("username", param->key)) {
