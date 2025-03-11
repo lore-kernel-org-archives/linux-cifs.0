@@ -1,43 +1,43 @@
 Received: from ksmg02.maxima.ru (ksmg02.maxima.ru [81.200.124.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5459025B662;
-	Tue, 11 Mar 2025 14:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147C725C6E7;
+	Tue, 11 Mar 2025 14:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741703148; cv=none; b=W99Fdm8JN3h1Tk+IKE51+TArk1vAgp+rOB8HdymCzP1NmJq+3UjipAx809MBgT1dac/JaAvO2JhFEVuAZToOdo3q5B/627iRmzISlg4BZ/D7Qmp2/Z+Q15SFDELrrSyjDwU+/JI3rkwRYE3LcQtqyxNuMR0m/jhT6O3hW95Gbsw=
+	t=1741703150; cv=none; b=Gm2q7yVIvVhbzah0D5W3Irl2K/b5QsisB/Jl/XyaadaWm+5ZzwfPzMUMBZBuwDjhH3eXgMaBWjHEnbXswslEG4V7gW9IDsmqzjei/xYktysOmN62u1fAOxNM/wPBvH4gyTyrGbXfaoKF+UlEsH0vlCL6I4KpIRXIedFbMq4eQ+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741703148; c=relaxed/simple;
-	bh=Ab9WMOjfiwMqqFBSOoR1r2KAdu/+Oo3bObQRNjmyphM=;
+	s=arc-20240116; t=1741703150; c=relaxed/simple;
+	bh=Ulht3x7Xfkshq+RA31+b7Cg6c8KF6Fuy03NB9KcU/wA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pIhUpsmvaHwFRoHCCaYlo6QLDLojR3hLUyu521JQ7wjrm+yKcTmWcN+jN0oMVGF4+FyH1/W/clqwQDn/0pBY0p/nkRFsNpPv93Shs7hw5EX5KQT9Dh4vop/YFVxLZxz4cXmwCY9g+a0O2n3M+rzOP0ME1/eOJgki7NfekqAyX6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=EQMHbEiA; arc=none smtp.client-ip=81.200.124.39
+	 MIME-Version:Content-Type; b=OUTR09b65RdC1sX260x+y2a3luEFtBvlA87JYY1eWhfQmwotgohV+4N7tFZAV9VfO+xIhzsd1XX8+lolB+9UI3FL7UYzpsa7j4SgKa9B0+ykJA+jA0FmEohevChnZTfMZSEf+wkfro/wJuwcmN8op4k8ltUgZDv0r0PLoujeIyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=NL9XaaUx; arc=none smtp.client-ip=81.200.124.39
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="EQMHbEiA"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="NL9XaaUx"
 Received: from ksmg02.maxima.ru (localhost [127.0.0.1])
-	by ksmg02.maxima.ru (Postfix) with ESMTP id 2F4B61E001B;
-	Tue, 11 Mar 2025 17:25:45 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg02.maxima.ru 2F4B61E001B
+	by ksmg02.maxima.ru (Postfix) with ESMTP id 11BF91E0018;
+	Tue, 11 Mar 2025 17:25:41 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg02.maxima.ru 11BF91E0018
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1741703145; bh=Kv8ydK+O3gTte/jeAEnlroRg/U3IVqGbyAKr3GGGwtk=;
+	s=sl; t=1741703141; bh=i8l90tW0lQ0g/H/CHoMHQh7J+/sv5ThipLki0A0dDA4=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=EQMHbEiAYWqUdoR01iN5qfja+GuT2ZpInAIOz52ofPmSH29DonO2U3qJwoMuB9XzG
-	 K3w07IHGbUyEGF+nvhY3X5YyFgYZw2WBL0Tg9iZ4WobXUBd9/BjZ1G9MahTxuouz8q
-	 VO+tYaSUhynkkFDeZzJ715NBzCNVoh/gBkimWk8fseZMxODvRGvVGY5JGfQMXR7vnG
-	 PgNgPOLba0jVRyFCXH/Xx1VOaiB33XzBIlslNcKm/1kQc2doe/XcCupyfRR6U2X0vi
-	 1Z/AfwslSpWpH7Db5yKH6+FxG+CL+E7/Ceh6ObpyNEXv45pgE6OBtlw4ihPG37OgiT
-	 YwfopwtVbu23A==
+	b=NL9XaaUx7wS5yucHxrCe54QPCR3KF0gfNISlNmSr8Q3124LAbSd9x+JJy8zglzfLl
+	 NS7ysCe22McLtN4UYPMOM4ArlGvRC6og7HyDx8IIbi9U4kWi6l3d+OGYkH3SCL+w4I
+	 /6qYYamgHBX3dc1cUJn3WzWly1wuMHr5bqXArRxHRG/Tr8s1UJIq+KPOQfJgyv6Qy9
+	 nkM8LQvjri2T+gH7NpLyRpaFTJj0SDphdLG7pBeKSKZLH/hCjwJOca3P5nWx5QLnCq
+	 ObGt/69KDMmnABSLAwi9H6TMb82Sc0VXAwB9rl4xnSahDynko5pKXwHQdgBXxBl0WM
+	 0+mfFlREXhmzw==
 Received: from ksmg02.maxima.ru (mail.maxima.ru [81.200.124.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
 	by ksmg02.maxima.ru (Postfix) with ESMTPS;
-	Tue, 11 Mar 2025 17:25:45 +0300 (MSK)
+	Tue, 11 Mar 2025 17:25:40 +0300 (MSK)
 Received: from GS-NOTE-190.mt.ru (10.0.246.70) by mmail-p-exch02.mt.ru
  (81.200.124.62) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Tue, 11 Mar
- 2025 17:25:42 +0300
+ 2025 17:25:36 +0300
 From: Murad Masimov <m.masimov@mt-integration.ru>
 To: Steve French <sfrench@samba.org>
 CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
@@ -47,9 +47,9 @@ CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
  (SUSE)" <pc@cjr.nz>, <linux-cifs@vger.kernel.org>,
 	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
 	<lvc-project@linuxtesting.org>, Murad Masimov <m.masimov@mt-integration.ru>
-Subject: [PATCH 4/4] cifs: Fix integer overflow while processing closetimeo mount option
-Date: Tue, 11 Mar 2025 17:22:06 +0300
-Message-ID: <20250311142206.2045-5-m.masimov@mt-integration.ru>
+Subject: [PATCH 1/4] cifs: Fix integer overflow while processing acregmax mount option
+Date: Tue, 11 Mar 2025 17:22:03 +0300
+Message-ID: <20250311142206.2045-2-m.masimov@mt-integration.ru>
 X-Mailer: git-send-email 2.46.0.windows.1
 In-Reply-To: <20250311142206.2045-1-m.masimov@mt-integration.ru>
 References: <20250311142206.2045-1-m.masimov@mt-integration.ru>
@@ -79,36 +79,36 @@ X-KSMG-LinksScanning: NotDetected
 X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 7
 
-User-provided mount parameter closetimeo of type u32 is intended to have
+User-provided mount parameter acregmax of type u32 is intended to have
 an upper limit, but before it is validated, the value is converted from
 seconds to jiffies which can lead to an integer overflow.
 
 Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Fixes: 5efdd9122eff ("smb3: allow deferred close timeout to be configurable")
+Fixes: 5780464614f6 ("cifs: Add new parameter "acregmax" for distinct file and directory metadata timeout")
 Signed-off-by: Murad Masimov <m.masimov@mt-integration.ru>
 ---
  fs/smb/client/fs_context.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 89e54cf238f8..da5973c228ed 100644
+index e9b286d9a7ba..e9045fcf843e 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1366,11 +1366,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		ctx->acdirmax = ctx->acregmax = HZ * result.uint_32;
+@@ -1340,11 +1340,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
  		break;
- 	case Opt_closetimeo:
--		ctx->closetimeo = HZ * result.uint_32;
--		if (ctx->closetimeo > SMB3_MAX_DCLOSETIMEO) {
-+		if (result.uint_32 > SMB3_MAX_DCLOSETIMEO / HZ) {
- 			cifs_errorf(fc, "closetimeo too large\n");
+ 	case Opt_acregmax:
+-		ctx->acregmax = HZ * result.uint_32;
+-		if (ctx->acregmax > CIFS_MAX_ACTIMEO) {
++		if (result.uint_32 > CIFS_MAX_ACTIMEO / HZ) {
+ 			cifs_errorf(fc, "acregmax too large\n");
  			goto cifs_parse_mount_err;
  		}
-+		ctx->closetimeo = HZ * result.uint_32;
++		ctx->acregmax = HZ * result.uint_32;
  		break;
- 	case Opt_echo_interval:
- 		ctx->echo_interval = result.uint_32;
+ 	case Opt_acdirmax:
+ 		ctx->acdirmax = HZ * result.uint_32;
 --
 2.39.2
 
