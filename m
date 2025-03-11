@@ -1,114 +1,109 @@
-Received: from ksmg02.maxima.ru (ksmg02.maxima.ru [81.200.124.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147C725C6E7;
-	Tue, 11 Mar 2025 14:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B3625F985
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 17:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741703150; cv=none; b=Gm2q7yVIvVhbzah0D5W3Irl2K/b5QsisB/Jl/XyaadaWm+5ZzwfPzMUMBZBuwDjhH3eXgMaBWjHEnbXswslEG4V7gW9IDsmqzjei/xYktysOmN62u1fAOxNM/wPBvH4gyTyrGbXfaoKF+UlEsH0vlCL6I4KpIRXIedFbMq4eQ+w=
+	t=1741715118; cv=none; b=i4qRjFzuDsR3t1YYYwG2MhrTXvxEHihbfNeAW79Kl3X0S3SmR7j64sUPOt5XLQPMQC6m1CTPAWL0H/BTwSdqb+nsLVE6czil/NDk6J+kYTJNmzFVtRJVOKHWfjFx0dJbvls1Zjm+ozQir0sPHbUu3d3JvVNLdGeLucL3JkYglgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741703150; c=relaxed/simple;
-	bh=Ulht3x7Xfkshq+RA31+b7Cg6c8KF6Fuy03NB9KcU/wA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OUTR09b65RdC1sX260x+y2a3luEFtBvlA87JYY1eWhfQmwotgohV+4N7tFZAV9VfO+xIhzsd1XX8+lolB+9UI3FL7UYzpsa7j4SgKa9B0+ykJA+jA0FmEohevChnZTfMZSEf+wkfro/wJuwcmN8op4k8ltUgZDv0r0PLoujeIyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=NL9XaaUx; arc=none smtp.client-ip=81.200.124.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
+	s=arc-20240116; t=1741715118; c=relaxed/simple;
+	bh=4UKC3nKFJ3zGDplvUNaNReuUtf9EZmp1hesuOhP9+OY=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=ffqHwlivOYIDkrBMilNGBRTaVtXED0fjLa6xYgIFaXIg/mw/6LrXQDyvlgj6IChuihnd/9269+0NuuqfwbVvemxMq3sZT6g1iVnGZ0pzKO8D+9V/x5XuQ/wzu2RDsO8ZsvTePiVx4y6YC7NywBTiiJgdCs95/kILu1xojQqtlB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/dzF+uN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="NL9XaaUx"
-Received: from ksmg02.maxima.ru (localhost [127.0.0.1])
-	by ksmg02.maxima.ru (Postfix) with ESMTP id 11BF91E0018;
-	Tue, 11 Mar 2025 17:25:41 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg02.maxima.ru 11BF91E0018
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1741703141; bh=i8l90tW0lQ0g/H/CHoMHQh7J+/sv5ThipLki0A0dDA4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=NL9XaaUx7wS5yucHxrCe54QPCR3KF0gfNISlNmSr8Q3124LAbSd9x+JJy8zglzfLl
-	 NS7ysCe22McLtN4UYPMOM4ArlGvRC6og7HyDx8IIbi9U4kWi6l3d+OGYkH3SCL+w4I
-	 /6qYYamgHBX3dc1cUJn3WzWly1wuMHr5bqXArRxHRG/Tr8s1UJIq+KPOQfJgyv6Qy9
-	 nkM8LQvjri2T+gH7NpLyRpaFTJj0SDphdLG7pBeKSKZLH/hCjwJOca3P5nWx5QLnCq
-	 ObGt/69KDMmnABSLAwi9H6TMb82Sc0VXAwB9rl4xnSahDynko5pKXwHQdgBXxBl0WM
-	 0+mfFlREXhmzw==
-Received: from ksmg02.maxima.ru (mail.maxima.ru [81.200.124.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg02.maxima.ru (Postfix) with ESMTPS;
-	Tue, 11 Mar 2025 17:25:40 +0300 (MSK)
-Received: from GS-NOTE-190.mt.ru (10.0.246.70) by mmail-p-exch02.mt.ru
- (81.200.124.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Tue, 11 Mar
- 2025 17:25:36 +0300
-From: Murad Masimov <m.masimov@mt-integration.ru>
-To: Steve French <sfrench@samba.org>
-CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
-	<ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, Jeff Layton
-	<jlayton@kernel.org>, Suresh Jayaraman <sjayaraman@suse.de>, "Paulo Alcantara
- (SUSE)" <pc@cjr.nz>, <linux-cifs@vger.kernel.org>,
-	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, Murad Masimov <m.masimov@mt-integration.ru>
-Subject: [PATCH 1/4] cifs: Fix integer overflow while processing acregmax mount option
-Date: Tue, 11 Mar 2025 17:22:03 +0300
-Message-ID: <20250311142206.2045-2-m.masimov@mt-integration.ru>
-X-Mailer: git-send-email 2.46.0.windows.1
-In-Reply-To: <20250311142206.2045-1-m.masimov@mt-integration.ru>
-References: <20250311142206.2045-1-m.masimov@mt-integration.ru>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/dzF+uN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741715113;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AnIedSKQB3ps7lKQvcEo0MZHMNc0IxjN8dPmqS0REkw=;
+	b=Z/dzF+uNC6c1DQqxXeR8sD8ze6arYsZb/1uoS4oMy5ah3boaFPmvXFI1Jr79o3JYp7M4F3
+	9gDfIEPL7BODAT233WlYr8ovw2XKYE1+Wlnc5msk72UTrfzsdU8V2bcyTPIyWw9p4/SrD/
+	WbBoiAcPwENBCA2Nh9t/n5bw9qXz8zY=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-278-TacwvOW8NUia42WJdnpbiQ-1; Tue, 11 Mar 2025 13:45:12 -0400
+X-MC-Unique: TacwvOW8NUia42WJdnpbiQ-1
+X-Mimecast-MFC-AGG-ID: TacwvOW8NUia42WJdnpbiQ_1741715111
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ff581215a0so15813550a91.0
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 10:45:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741715110; x=1742319910;
+        h=mime-version:user-agent:content-transfer-encoding:date:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AnIedSKQB3ps7lKQvcEo0MZHMNc0IxjN8dPmqS0REkw=;
+        b=itVG1/sQql42NlR6jZSgpazGderM4XA4ttWkbxpIUUir7M51akM/jJf683gO300VOZ
+         qK7NiP2PktDG9qPLPoJfkp4i8yHRt2dx2/5zqF/3kq96aYZKG7embgoVuNK35X2ch2/I
+         /c+QwzwnXjlj39zhukFReJgIGCoyJf4LO+cjjTTn1q3H8snMM3SnLoyzdFWrCoIo9dC6
+         JXoOSBxRJ6wesoK7qQE80pFaG2Q5emzRUyzU4OdXgMr0cffpN4suqgoBgoI81QLAwfOG
+         BWcJvWdChVllziAxkk9y3djajfVqxUh8OkoMOMHH/aBSeA8loofRrnfkuB93McV2ViBu
+         BHuw==
+X-Gm-Message-State: AOJu0YzdgWtarl5u8VwlLuO5nbPDlxyhuk2HCuHVr30sV0Yox6MA3IEz
+	b749tvbZQGQiWat2SiIJrFsmSBQLGegffy4Vhjy8WiRvpxogITwVFma5QrJ22RegJZvqRUxjK5b
+	LJIs/v96NebdYZTJO01cm5z70YZ1Dguw77JI+PdSOzs8MdggnitvgHoHRRcxecWELFj2aVmI+Fd
+	TFse/8ksLKQKyqbAut+GsXD1jJcqfZoG7drKk1bSAoRqTT
+X-Gm-Gg: ASbGncs1SJM6K2QmUgtQMyR7tfCsud5fG0DGypqwcvmLl5a+x6Bto/M/HWS5szwMq1N
+	xf+F9r7aMi09R3lwCn+vATFD3IWVoy8upNYO3T/SZnVLgK2cLFgcLoP1vhLA8PUsfDW3tNdra4j
+	RNU9gH8Xsf1scOkQ34bc/TcFP2Qn/7tIM8dWwgIyg52RAFXQjaKMv+9oNPs4KZnq1SgCORB/n9Z
+	KcEXEaXZdkW77HLF52bwdk6/xQHaU03AUoZIm13410ZaQ3X2rM3NjoGc0E+PpZwSpAvduNYE5+w
+	fiXWCLusKC15opcyxH6HoK9Z27TSjHcs+fPX
+X-Received: by 2002:a17:90b:3849:b0:2fa:1851:a023 with SMTP id 98e67ed59e1d1-2ff7cefc480mr28598730a91.35.1741715110499;
+        Tue, 11 Mar 2025 10:45:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHvfeHJ71WfvpkL57OfM5nSs1i/HtePZcU8Sk82z0JpuJC7UCnyPqYGm/pA4ImngLpQVqKwZg==
+X-Received: by 2002:a17:90b:3849:b0:2fa:1851:a023 with SMTP id 98e67ed59e1d1-2ff7cefc480mr28598701a91.35.1741715110047;
+        Tue, 11 Mar 2025 10:45:10 -0700 (PDT)
+Received: from omnibook.happyassassin.net ([2001:569:7cd5:ea00:c6fc:c4e9:3726:7db0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff6936d0f7sm10338122a91.21.2025.03.11.10.45.08
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 10:45:09 -0700 (PDT)
+Message-ID: <83c00b5fea81c07f6897a5dd3ef50fd3b290f56c.camel@redhat.com>
+Subject: Anonymous mount of CIFS shares fails with cifs-utils 7.2 unless
+ 'sec=none' is added to mount options
+From: Adam Williamson <awilliam@redhat.com>
+To: linux-cifs@vger.kernel.org
+Date: Tue, 11 Mar 2025 10:45:08 -0700
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41app1) 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch02.mt.ru
- (81.200.124.62)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: m.masimov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, mt-integration.ru:7.1.1;81.200.124.62:7.1.2;ksmg02.maxima.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.62
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 191671 [Mar 11 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/11 08:08:00 #27707391
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
 
-User-provided mount parameter acregmax of type u32 is intended to have
-an upper limit, but before it is validated, the value is converted from
-seconds to jiffies which can lead to an integer overflow.
+I have this line in my /etc/fstab to mount a local network CIFS share
+that requires no authentication:
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+//192.168.1.9/Media		/mnt/data             cifs    noauto,nosuid,soft,guest=
+,uid=3D99,gid=3D99,file_mode=3D0777,dir_mode=3D0777,users,vers=3D3.0	0 0
 
-Fixes: 5780464614f6 ("cifs: Add new parameter "acregmax" for distinct file and directory metadata timeout")
-Signed-off-by: Murad Masimov <m.masimov@mt-integration.ru>
----
- fs/smb/client/fs_context.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+With cifs-utils 7.2, this suddenly doesn't work. I get an 'invalid
+argument' error, and in dmesg:
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index e9b286d9a7ba..e9045fcf843e 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1340,11 +1340,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		}
- 		break;
- 	case Opt_acregmax:
--		ctx->acregmax = HZ * result.uint_32;
--		if (ctx->acregmax > CIFS_MAX_ACTIMEO) {
-+		if (result.uint_32 > CIFS_MAX_ACTIMEO / HZ) {
- 			cifs_errorf(fc, "acregmax too large\n");
- 			goto cifs_parse_mount_err;
- 		}
-+		ctx->acregmax = HZ * result.uint_32;
- 		break;
- 	case Opt_acdirmax:
- 		ctx->acdirmax = HZ * result.uint_32;
---
-2.39.2
+cifs: Bad value for 'password2'
+
+If I add `sec=3Dnone` to the mount options, it works. But this should not
+be necessary.
+
+Others have the same problem - see
+https://bbs.archlinux.org/viewtopic.php?id=3D303927 (that's where I found
+the `sec=3Dnone` trick).
+
+I'm not subscribed to this list, so won't see replies unless I'm CCed.
+--=20
+Adam Williamson (he/him/his)
+Fedora QA
+Fedora Chat: @adamwill:fedora.im | Mastodon: @adamw@fosstodon.org
+https://www.happyassassin.net
+
+
+
 
