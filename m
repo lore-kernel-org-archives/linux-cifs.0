@@ -1,140 +1,151 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F2B6AD3
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 03:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2794F19007D
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 03:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741662613; cv=none; b=RyOKnEd2WrlQ0O/j6o27sxv8wYyadiQCmWCPDpH5vxrTuzerqJIq2pEGSYb2C05JOD0kgpKow8+ZU17W6a8fxuq/hnLRNSYJhsHaXvsLK+qf6tCJZD2Ar8zduxs+52r+lolhmCP3LV9k8X5e1yEgkSy1NVjqqx7FgusRxhCqYdk=
+	t=1741663569; cv=none; b=b4JUj7I+fmTXVgP8XzTShoaGPikbWOgdLaBXzWxoOYv3c+1hQSzU6MqSYpggKHMOiaJlS827uu2JP1W659YjiHzFxA/s7LmlqlJca8HnbIiiq928To3RKPGXcFcREQmbNBYJ8bunkvJLCmv+hNPLbNbIocdWWaYJBAnF5dEV4Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741662613; c=relaxed/simple;
-	bh=0x2p6opO4wcJGCxE0ic2d/QTtFvZPmO4JEq0iguuVJU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=JJ8+AYceOPIZCilolEOkOdxIIqPoI+ZlaSqs4mFnoRteeBdCLZ3L4oTBa+NW7WUB2WZtAvkRE/3ViXzO+HaZWtRhQkOYcmjwe00Gd9YJJ8UIAQfgR34Qsbj4PkHFT/bQwzzzSI77h/LZcdwOLCDeBXG+RGSSEsm49Ky3OM1yTbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CMFC2MMa; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1741663569; c=relaxed/simple;
+	bh=1DJPvBfsUi4w2/R6eu367/IDzl7XogU5wIV019F5/DE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q5kjg952DaxbqD0czUA7u5fGYVO9i5b08x7Gmpf6Gy+OvfLjZa7Ef/IVaJgbk/yDgdLPfUcxIU+8Y9HxFXbRdZb23DGWOBRESeYvbSzBy0nwOg6QFt3rs3jCf3NWlwYPumN7luTp6U48a4wJpsTngAKW6eHxPdaJeYUqnGUOiOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0HhDlQ0; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMFC2MMa"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e614da8615so948184a12.1
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Mar 2025 20:10:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0HhDlQ0"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-54996d30bfbso2923170e87.2
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Mar 2025 20:26:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741662609; x=1742267409; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8rhcitOYrqxP9erHkLxD9laxmF8PKh1UUsigNJPPPio=;
-        b=CMFC2MMa0V6yudoDQzbXY8MoW1dTRwfLm3fSxzWfoon7R/sCnvUTgP0GChRrU0acl7
-         bX5Ty1S9dCMskV/i6b2L6/yyBYgji63njJJc0p4bdp/925iUNk6plKT+tPt0O7Vmppu7
-         HNpY/6e6sVscMTuVVxIf8+EkdYLloj5cog07NKkDyptTpT+YP9za53UO2mpdx02agzBN
-         0SrOE1fOrPS6sAQ3YSrXpJ1dUD+wIb3Zk1TFSGyVKmbv7mDusTeWgj0rgzqpH4mipYmH
-         Ff5h5z23//d7L/FyFX+PRlKrv53diSXVJYrvel3eQcjtK7tKWEuljLUqoFDWgx9VxVGd
-         /d3g==
+        d=gmail.com; s=20230601; t=1741663566; x=1742268366; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bUQbaRq+oo16WZ4tf4oKiKVIclztVGEnjMjqnXhAOiA=;
+        b=A0HhDlQ0JpT4xsAQv743EwfaWUAX74uQR+VNODxehav0CuaSBoXShbO6Q67Pb1Xgb3
+         nbAu2fWcf90qpDbe/i78lr2PLLudn7EYhkxOHH6VfOSpgpER/e9PSTNALNApeNnlS4rQ
+         1LvhtdVInFmiSGh9CPjob2NQWHQB/4VFw+VOzS/0whpNzmeTlargMO20xg+UV1WUAtHx
+         nWRCgCS59aV4VCYtp7rvg+qJOM98CXrMfm9nBE/zhtT8+qTZjO0gEULnBkY6CcjcoXwe
+         2Ce9t6SA6O4t7YAAhHP5snR2gMVhaN5Y+ukuKvU/noCACNbuj1eBG8iv/479AUnwsUIW
+         dWxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741662609; x=1742267409;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8rhcitOYrqxP9erHkLxD9laxmF8PKh1UUsigNJPPPio=;
-        b=SmeSANCl9Jtt/9/QEtYpcpushl8BuWjCtqa2mcwdWqGEN6tx7eZwjwBbX5uK4zlCYH
-         HL9nHBz9tLAQufQt8nRw4q8ofDSeTx5cGq9O3ul4VQuC/R+Pw9OMF8IIsMM70tR0GwTz
-         iwTgc07dUVb3QjfgxOKCNQiqyvSpIWrYHT7UrrCEIP7gKGdz0xLVh0Bsgsqja68eMSYn
-         o+JCYq1+c7gwh/PNi0yQ4A/7Tsx6IVQ0eMenQFWyooxv4GLfBiyTtgpa+6+HN/ot2USq
-         AMH9v8uyX2szXObDg2AAdrrQregVhkmAu3YwwsoKKk40A+/0BnhHgVLeGbaFL4iPwEbv
-         39Cw==
-X-Gm-Message-State: AOJu0YxLq6mvmoMQJvhk5LxnD+wQFaqodIqLa5J48Iq71FsOsu/0t89s
-	eew03vsiCHv83gwJ3ZWlONx7XwBKUOtUnwSjdxjsn26O/zxb02G2FnTq9fNaQBBQMd/xHIuj8kk
-	lI5UmuPTJ1NTcsPeLLPYrk5ggho/94A==
-X-Gm-Gg: ASbGncufomW0nJ2aoacdROLX8wMgOdfgfrj2pl7H6QKXtyBGz2oFGecQsQu3W75eTXS
-	FucxibL20+OjrIt4/basksiy6g4JsfJ7SBcNpenKMyt30lF7n4YpQz3soB6jUk4QxsKl9nqMEM2
-	KM0BeOjW+N/giGn3jgTfne5dtLwbs3+h6PTwcGX5eHSZtk+CUJYVeg//coY77J
-X-Google-Smtp-Source: AGHT+IGPoDO1jWS/ydBPyfzIkxDt0f79IWphwX4yollIHWgM+abt7TTNRj5orL+ucviSGdA2qdrcf9Zoc1YrHqfPUJc=
-X-Received: by 2002:a05:6402:5cb:b0:5de:572c:72cf with SMTP id
- 4fb4d7f45d1cf-5e7631dbdd9mr1588013a12.10.1741662609194; Mon, 10 Mar 2025
- 20:10:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741663566; x=1742268366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bUQbaRq+oo16WZ4tf4oKiKVIclztVGEnjMjqnXhAOiA=;
+        b=UCMJ8VLVm9PzbMQuMPaqkYMR3xUSTJsp+28tXbQ2FYOvenMqnt+43WexJVDNzkkkHC
+         eb88tmmhuLQdW63Uai2m4vlVRezu94lV0z8NUgjiSZOgd4MD3U5P001xsxbRpIYVSt2q
+         J8enWx3jDUgTeLLqHP7B3lM8/Dvm0N8yAfiN0quqvCzb1AAdlKc2qyEQvOGNjk78rr+Y
+         pLfEsYO+HqU5C+IVcwuEJFUZpp88C+num710ehjKIx6DKatlovCTyQbVsOuNY7PnAyFd
+         ZImxil7o7GLcvsBXjrO26SMV2Z3f0PYiGB6mySPKQNnPhnxm4gNpAKNGraL+vxvBzx3x
+         06tw==
+X-Gm-Message-State: AOJu0YxvE0F5tJ99KV+vyOHDmBcOD/Qm8okdmYKPwoXCzBNYzI6Kjjdo
+	WwBxU8HP6PwkqqeVpMrR8gQYBYCWk2DZxl0E6j1uyqtMpdbKlVZ56JfXHW1+y2qcF/imW58/7KC
+	yUYxS/FRgPyWYM23OJ43qhWcob37EVg==
+X-Gm-Gg: ASbGncuiA462lomzmiw8Eno73+2Ak/jbL9m99uqW6aju8RYeEoVoA2j/x8+xRCSVjEO
+	IbyOhJTrc3ev+1ZV5TAsHQQQLJwG9X3oGI01SCCN7Y+ejS+iThi4hg3OR8ydprrcCRyUTQqaeVU
+	XDFg474eJ6Z64diES22PYvuQrKfKoikNRMx+SBnUxBMpasHKFxl/x98S40E6dH
+X-Google-Smtp-Source: AGHT+IHBuDvItAIvfbBZUar/HUVuSu2bQ2JbGJKayjPjjjugOt/D6AyFoKjSWYmqx0I9e5SZW35fEPjS6NDdLdbLebw=
+X-Received: by 2002:a05:6512:2394:b0:545:e19:ba1c with SMTP id
+ 2adb3069b0e04-54990e5d359mr5725599e87.19.1741663566093; Mon, 10 Mar 2025
+ 20:26:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250214124306.498808-1-aman1cifs@gmail.com> <20250306174642.584848-2-aman1cifs@gmail.com>
+In-Reply-To: <20250306174642.584848-2-aman1cifs@gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 10 Mar 2025 22:09:56 -0500
-X-Gm-Features: AQ5f1JrvNkNIzPMUS4_SvD_GgWKs1f331kTlH7Mi67UVG1yVZ5K7WCGG_enXxGY
-Message-ID: <CAH2r5muQRk_-JdHbPcGY9Zu7BYZ50nYHRSDJbbTA=Mi2EdBDuA@mail.gmail.com>
-Subject: two patches added to cifs-utils for-next branch
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: =?UTF-8?Q?Pavel_Filipensk=C3=BD?= <pfilipensky@samba.org>
-Content-Type: multipart/mixed; boundary="00000000000023f7890630086d82"
-
---00000000000023f7890630086d82
+Date: Mon, 10 Mar 2025 22:25:54 -0500
+X-Gm-Features: AQ5f1JoDmbpq5xJLs5xZm8evD1ZtCI0P8BlbAumwo2U675c5eUA1zjarOY1MpgM
+Message-ID: <CAH2r5mtrsqR+93ZvcWM3eyd2WrmY9DyRCUCWf=Sr97S3pus8SA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] CIFS: Propagate min offload along with other
+ parameters from primary to secondary channels.
+To: aman1cifs@gmail.com
+Cc: linux-cifs@vger.kernel.org, sfrench@samba.org, pc@manguebit.com, 
+	sprasad@microsoft.com, tom@talpey.com, ronniesahlberg@gmail.com, 
+	bharathsm@microsoft.com, psachdeva@microsoft.com, Aman <aman1@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-See attached.  Also added to my smb3-utils repo on github
+Was doing some testing with this and tried an experiment with
+multichannel and "sign" mount parm - and it looks like even without
+the fix, we do sign on all channels even though tcp_ses->sign was not
+updated on the secondary channels.  Do you have a reproduction
+scenario for the signing issue?
 
-If any objections or review comments, let us know.
+On Thu, Mar 6, 2025 at 11:47=E2=80=AFAM <aman1cifs@gmail.com> wrote:
+>
+> From: Aman <aman1@microsoft.com>
+>
+> In a multichannel setup, it was observed that a few fields were not being
+> copied over to the secondary channels, which impacted performance in case=
+s
+> where these options were relevant but not properly synchronized. To addre=
+ss
+> this, this patch introduces copying the following parameters from the
+> primary channel to the secondary channels:
+>
+> - min_offload
+> - compression.requested
+> - dfs_conn
+> - ignore_signature
+> - leaf_fullpath
+> - noblockcnt
+> - retrans
+> - sign
+>
+> By copying these parameters, we ensure consistency across channels and
+> prevent performance degradation due to missing or outdated settings.
+>
+> Signed-off-by: Aman <aman1@microsoft.com>
+> ---
+>  fs/smb/client/connect.c | 1 +
+>  fs/smb/client/sess.c    | 7 +++++++
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index eaa6be445..eb82458eb 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -1721,6 +1721,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+>         /* Grab netns reference for this server. */
+>         cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
+>
+> +       tcp_ses->sign =3D ctx->sign;
+>         tcp_ses->conn_id =3D atomic_inc_return(&tcpSesNextId);
+>         tcp_ses->noblockcnt =3D ctx->rootfs;
+>         tcp_ses->noblocksnd =3D ctx->noblocksnd || ctx->rootfs;
+> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> index 91d4d409c..b4d76a37a 100644
+> --- a/fs/smb/client/sess.c
+> +++ b/fs/smb/client/sess.c
+> @@ -522,6 +522,13 @@ cifs_ses_add_channel(struct cifs_ses *ses,
+>         ctx->sockopt_tcp_nodelay =3D ses->server->tcp_nodelay;
+>         ctx->echo_interval =3D ses->server->echo_interval / HZ;
+>         ctx->max_credits =3D ses->server->max_credits;
+> +       ctx->min_offload =3D ses->server->min_offload;
+> +       ctx->compress =3D ses->server->compression.requested;
+> +       ctx->dfs_conn =3D ses->server->dfs_conn;
+> +       ctx->ignore_signature =3D ses->server->ignore_signature;
+> +       ctx->leaf_fullpath =3D ses->server->leaf_fullpath;
+> +       ctx->rootfs =3D ses->server->noblockcnt;
+> +       ctx->retrans =3D ses->server->retrans;
+>
+>         /*
+>          * This will be used for encoding/decoding user/domain/pw
+> --
+> 2.43.0
+>
+>
 
 
-
--- 
+--=20
 Thanks,
 
 Steve
-
---00000000000023f7890630086d82
-Content-Type: text/x-patch; charset="UTF-8"; 
-	name="0002-resolve_host.c-Initialize-site_name.patch"
-Content-Disposition: attachment; 
-	filename="0002-resolve_host.c-Initialize-site_name.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m83wxeu60>
-X-Attachment-Id: f_m83wxeu60
-
-RnJvbSBhYTU2NjZhM2FhODA4ZDFjNGQzMzc0MTkyYzY4ZmVmNGY0YTNkM2E2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/UGF2ZWw9MjBGaWxpcGVuc2s9QzM9QkQ/PSA8
-cGZpbGlwZW5za3lAc2FtYmEub3JnPgpEYXRlOiBXZWQsIDkgT2N0IDIwMjQgMTI6Mzk6MjMgKzAy
-MDAKU3ViamVjdDogW1BBVENIIDIvMl0gcmVzb2x2ZV9ob3N0LmM6IEluaXRpYWxpemUgc2l0ZV9u
-YW1lCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1V
-VEYtOApDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiA4Yml0CgpyZXBvcnRlZCBieSBSZWQgSGF0
-IGNvZGUgYW5hbHl6ZXI6CgpjaWZzLXV0aWxzLTcuMS9yZXNvbHZlX2hvc3QuYzoxODg6MzogdW5p
-bml0X3VzZV9pbl9jYWxsOiBVc2luZwp1bmluaXRpYWxpemVkIHZhbHVlICIqc2l0ZV9uYW1lIiBh
-cyBhcmd1bWVudCB0byAiJXMiIHdoZW4gY2FsbGluZwoic25wcmludGYiLgoKU2lnbmVkLW9mZi1i
-eTogUGF2ZWwgRmlsaXBlbnNrw70gPHBmaWxpcGVuc2t5QHNhbWJhLm9yZz4KU2lnbmVkLW9mZi1i
-eTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIHJlc29sdmVfaG9z
-dC5jIHwgMSArCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykKCmRpZmYgLS1naXQgYS9y
-ZXNvbHZlX2hvc3QuYyBiL3Jlc29sdmVfaG9zdC5jCmluZGV4IGZjNjgyZTUuLjkxOGM2YWQgMTAw
-NjQ0Ci0tLSBhL3Jlc29sdmVfaG9zdC5jCisrKyBiL3Jlc29sdmVfaG9zdC5jCkBAIC0xNDcsNiAr
-MTQ3LDcgQEAgaW50IHJlc29sdmVfaG9zdChjb25zdCBjaGFyICpob3N0LCBjaGFyICphZGRyc3Ry
-KSB7CiAJCQlnb3RvIHJlc29sdmVfaG9zdF9vdXQ7CiAKIAkJY2hhciBzaXRlX25hbWVbTUFYQ0RO
-QU1FXTsKKwkJc2l0ZV9uYW1lWzBdID0gJ1wwJzsKIAkJLy8gV2UgYXNzdW1lIHRoYXQgQUQgYWx3
-YXlzIHNlbmRzIHRoZSBpcCBhZGRyZXNzZXMgaW4gdGhlIGFkZHRpb25hbCBkYXRhIGJsb2NrCiAJ
-CWZvciAoaW50IGkgPSAwOyBpIDwgbnNfbXNnX2NvdW50KGdsb2JhbF9kb21haW5faGFuZGxlLCBu
-c19zX2FyKTsgaSsrKSB7CiAJCQluc19yciBycjsKLS0gCjIuNDMuMAoK
---00000000000023f7890630086d82
-Content-Type: text/x-patch; charset="UTF-8"; 
-	name="0001-cldap_ping-Fix-socket-fd-leak.patch"
-Content-Disposition: attachment; 
-	filename="0001-cldap_ping-Fix-socket-fd-leak.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m83wxeun1>
-X-Attachment-Id: f_m83wxeun1
-
-RnJvbSA5MDE0MDlhMmVmNmJiNWI3MmE2Zjc3NDcxM2Y3NTRlYzdjYzNlY2EyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/UGF2ZWw9MjBGaWxpcGVuc2s9QzM9QkQ/PSA8
-cGZpbGlwZW5za3lAc2FtYmEub3JnPgpEYXRlOiBXZWQsIDkgT2N0IDIwMjQgMTI6Mzc6MTIgKzAy
-MDAKU3ViamVjdDogW1BBVENIIDEvMl0gY2xkYXBfcGluZzogRml4IHNvY2tldCBmZCBsZWFrCk1J
-TUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hhcnNldD1VVEYtOApD
-b250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiA4Yml0CgpyZXBvcnRlZCBieSBSZWQgSGF0IGNvZGUg
-YW5hbHl6ZXI6CgpjaWZzLXV0aWxzLTcuMS9jbGRhcF9waW5nLmM6MzIzOjM6IGxlYWtlZF9oYW5k
-bGU6IEhhbmRsZSB2YXJpYWJsZSAic29jayIgZ29pbmcgb3V0IG9mIHNjb3BlIGxlYWtzIHRoZSBo
-YW5kbGUuCgpTaWduZWQtb2ZmLWJ5OiBQYXZlbCBGaWxpcGVuc2vDvSA8cGZpbGlwZW5za3lAc2Ft
-YmEub3JnPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
-b20+Ci0tLQogY2xkYXBfcGluZy5jIHwgMiArKwogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9u
-cygrKQoKZGlmZiAtLWdpdCBhL2NsZGFwX3BpbmcuYyBiL2NsZGFwX3BpbmcuYwppbmRleCBhNjAz
-YmUzLi41YzIwZjg0IDEwMDY0NAotLS0gYS9jbGRhcF9waW5nLmMKKysrIGIvY2xkYXBfcGluZy5j
-CkBAIC0zMTgsOSArMzE4LDExIEBAIGludCBjbGRhcF9waW5nKGNoYXIgKmRvbWFpbiwgc2FfZmFt
-aWx5X3QgZmFtaWx5LCB2b2lkICphZGRyLCBjaGFyICpzaXRlX25hbWUpIHsKIAogCXN0cnVjdCB0
-aW1ldmFsIHRpbWVvdXQgPSB7LnR2X3NlYyA9IDIsIC50dl91c2VjID0gMH07CiAJaWYgKHNldHNv
-Y2tvcHQoc29jaywgU09MX1NPQ0tFVCwgU09fU05EVElNRU8sICZ0aW1lb3V0LCBzaXplb2YodGlt
-ZW91dCkpIDwgMCkgeworCQljbG9zZShzb2NrKTsKIAkJcmV0dXJuIENMREFQX1BJTkdfTkVUV09S
-S19FUlJPUjsKIAl9CiAJaWYgKHNldHNvY2tvcHQoc29jaywgU09MX1NPQ0tFVCwgU09fUkNWVElN
-RU8sICZ0aW1lb3V0LCBzaXplb2YodGltZW91dCkpIDwgMCkgeworCQljbG9zZShzb2NrKTsKIAkJ
-cmV0dXJuIENMREFQX1BJTkdfTkVUV09SS19FUlJPUjsKIAl9CiAKLS0gCjIuNDMuMAoK
---00000000000023f7890630086d82--
