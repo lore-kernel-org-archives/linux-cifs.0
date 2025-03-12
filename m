@@ -1,108 +1,86 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEF718E025;
-	Wed, 12 Mar 2025 03:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF91824A062
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Mar 2025 13:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741750875; cv=none; b=p9DejTkB0AV3snuTcjVj7WWv/ZFjSjGb4df5D4v3BDa99pqBDtm0oRDplvXe5zz1aElYDWbUObNZIf/RKu1YwPAfJedcrwxQ0MrhaQ2DkBr+CBffhILFAq5dT6yZQOO+nxJM6riplGZA3Qs/kTEvGFaI7wIMVIV76yQScuU0kbg=
+	t=1741787499; cv=none; b=kkZLenIXwr127SR/1yEa4aW9WrR2NiMwXLYeYO+G/+tO+q5cM5KKeSIn/NJNNXJirVFHN95uIXyl0ddqTwPAqFXjmpndenBVTbru2ZTNhIxej85x0HiPJWR8fdzqtQ4ciQJ+hSdC6M9DhRt186cL0VIs7Kwivwy+QpqxksQjTkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741750875; c=relaxed/simple;
-	bh=/M6lNxWvHtJlqhwu+uX/2SIdkqV+8TxcYaF6GOqVtcE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brhh9fpQlWyqR05sCDWryOCCA/jEnzEAeZ1eDlscywxu7lNW44sCiF+pl/dYdF3DeVbE6aRbP9St7cbyK6I6KC8AYswRq9Qryp2Un6WS4caZDteEdllYZAn4P5/UbdTW5Hwep/DzvCIpnsIOYOS41go/v6IEU8MletJH+p/wsN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUn4Rx7p; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741787499; c=relaxed/simple;
+	bh=Q45a7BaCH9/8YD4mmCkp3cVXg8obZ7dhivw2nLn+dPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RmKMj9IuKHX8eyL+FjfSsJtTKLX3y8yokJ/IBvibWyBPqgfqg4yXXto4z5sTbF6MddYE3LBGiqEi6O7LBbrWSPRfEIwzqUXiWfaFP7grRdt41D/5zD0raUwxuo9pzfTSiR7e5D/i8ZaYami0TLXJW9tmt0KDpP091VqZxsmgnLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=hDepM/42; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUn4Rx7p"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-548430564d9so6441775e87.2;
-        Tue, 11 Mar 2025 20:41:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741750872; x=1742355672; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=92scuT0mPLxGItmKoFTauVYvE2ycFCz6mNcLharBo24=;
-        b=QUn4Rx7pFA50jqjZ2Heybc7Y2HZXaWDL1mQtdzJIwcr9LkItxUhfu5Dx+y2okpLnrx
-         vd+bjDQEK0Gzayw0OnGJGja7uMcWeQX2J9/U9+Ulxt7MZtIU6lSpXpvG/pFA8d2cUwne
-         sl7X2hGeqyicbgVKzmSrFlNcUN+3XqUwX3UKIODhva9YtcGMipDjWw/Jnu7+zk7nEQ78
-         ZzH+LtK3eM1KcJ8LodZL2CrWI5D6FdV1RJUBBZV/QA/ofp927MtKzWD7EuMJhgoB5PdM
-         YK7d8yc3f3GesSJNW6q0GMhs5oIphEp6o+b4PVvFuT68ku8koKOyvcHTAsiA5uYh7AFG
-         ODrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741750872; x=1742355672;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=92scuT0mPLxGItmKoFTauVYvE2ycFCz6mNcLharBo24=;
-        b=TAAH/U49eTzM3HFY05l0yfXzF2XduLLaBqZEh6Tfk08PxjdHESdgOebXFUgGCpY3Vh
-         CLuYpaV9vfnX8da7O7M39StN1HXYIK80C9fd+btTfvCRlscAgpSG5YMGHxgfTw4AZPx2
-         S/FqOD3Ayg4kBZsvO1kGYu2kCwaKTI7WIqJkXWW4HkgSX2iaoKioB1Byyah0lg0PHhTw
-         jpEmxAHfAYJCxJpQ+lqUleX0k9Xh/vlZZdcJA57T8SeqyjYt3dsP1aOcbmo8/KCzqUGr
-         Hl339r2TTuG5LDywnm41sa8qX/efJeOZmhnhz0/L7/a5JENsQsfdf9jWTQEU2K9WXOns
-         PdiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbnIzqYSjaG9sZaHEq8FZV3oWDExkFntXC2CODcwBYZbZfHdXxHIxrQLcZpSzxvJYgcLaS5FR41kW6qwwt@vger.kernel.org, AJvYcCXmAFCOholv7JCB79CW8uWE8GcqGeJApOkbZsI6MvhLXHXQtVmIYWyrfQQ1RQblQUTlYbH3N+vviBfY@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjfJugHw5xbFztYAcVTHebDbi0XTu0SYe2UKYnRMXVg47In/95
-	u9zNeRs2IKsR0SQhfIceLfsOPKXXkMAzpgg1+rZm4o5oEFbUOjBl3RU8+OJk6swQV/vYHj0+am/
-	xAM7quQI8B1YC53NcDjOyiwG4vGE=
-X-Gm-Gg: ASbGncvg+J3fI5/IFJem6jpRk7si+1nrt+Wo6F32mRtB1+wmQiTWClIoWb9UvLR2Djj
-	mf3wtSkzUlFAu90mWCYHXZ/k6C7vXg/reaEzCV0M8Mkv5Tu5D5bT6bx9QIR6KcBYZYBsN1oj72o
-	bJyOHBqzMwFMJc1U/lrIoHqT5MTJQ3D+sB4WmeoHsQpZnwBja4HKJcdzhYpYU=
-X-Google-Smtp-Source: AGHT+IEXM+5xWJasauWbNbCS2YfDh1yeixbbhn9cHO3JOongiCVBYDLz+zdUkf5WvIfevUBa4DGHP4Ubo+i5MsMuNKA=
-X-Received: by 2002:a05:6512:220a:b0:545:d35:6be2 with SMTP id
- 2adb3069b0e04-54990eacf31mr7132413e87.34.1741750871834; Tue, 11 Mar 2025
- 20:41:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="hDepM/42"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1741787495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sQeLNiHbjUzCdJKY/9uIpq0tj5e2EwjbCQGsOLKY8cM=;
+	b=hDepM/42fDmM1YT0UEvwAF959CF9VtwEQLNHkzqoJlqqNuuHsDBX3hBvv8cw+aB8dkuz9z
+	PjtKjw2wd8i63hMIGRqKdGDplcqz3JW2wySZg8nQSAJTBmbnJBONXlX+vnS91W3O23JmYY
+	Bz32+subJAKX6D9jheuBq8hjKmS2qaQJ0R8MCA3iaa1VowXjATKD2xlJsrSWwTcALntdJc
+	GOUN/N9m/8w5S1U9nMLB46+3EVSmNUeFOrf8370wzaOMJQgf9fNXJLn5bctJa8xSOCGCAf
+	SRaJqWtWej4TNptDccoFNWTaGUedNv4mk99bBgpvhT2HqOK0kunKEEYmmSYLsA==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Adam Williamson <awilliam@redhat.com>
+Subject: [PATCH] smb: client: fix regression with guest option
+Date: Wed, 12 Mar 2025 10:51:31 -0300
+Message-ID: <20250312135131.628756-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250311142206.2045-1-m.masimov@mt-integration.ru>
-In-Reply-To: <20250311142206.2045-1-m.masimov@mt-integration.ru>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 11 Mar 2025 22:41:02 -0500
-X-Gm-Features: AQ5f1Joakb8bvYoYy1SXusb21hOdUoqGZatk-hDwb6TEKKEamC-CnIoAqjUpvm4
-Message-ID: <CAH2r5msC7iL9UcS6CtD4yB-xyDEYrhXy9EWVUNxgxuLy2SsoMA@mail.gmail.com>
-Subject: Re: [PATCH 0/4] cifs: Fix integer overflow while processing mount options
-To: Murad Masimov <m.masimov@mt-integration.ru>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Jeff Layton <jlayton@kernel.org>, Suresh Jayaraman <sjayaraman@suse.de>, 
-	"Paulo Alcantara (SUSE)" <pc@cjr.nz>, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-tentatively merged into cifs-2.6.git for-next pending additional
-review and testing
+When mounting a CIFS share with 'guest' mount option, mount.cifs(8)
+will set empty password= and password2= options.  Currently we only
+handle empty strings from user= and password= options, so the mount
+will fail with
 
-On Tue, Mar 11, 2025 at 9:25=E2=80=AFAM Murad Masimov
-<m.masimov@mt-integration.ru> wrote:
->
-> These patches fix similar issues that have different origin commits.
-> User-provided mount parameters are intended to have upper limits, but
-> are validated after their values are converted from seconds to jiffies,
-> which can lead to an integer overflow.
->
-> Murad Masimov (4):
->   cifs: Fix integer overflow while processing acregmax mount option
->   cifs: Fix integer overflow while processing acdirmax mount option
->   cifs: Fix integer overflow while processing actimeo mount option
->   cifs: Fix integer overflow while processing closetimeo mount option
->
->  fs/smb/client/fs_context.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> --
-> 2.39.2
->
->
+	cifs: Bad value for 'password2'
 
+Fix this by handling empty string from password2= option as well.
 
---=20
-Thanks,
+Link: https://bbs.archlinux.org/viewtopic.php?id=303927
+Reported-by: Adam Williamson <awilliam@redhat.com>
+Closes: https://lore.kernel.org/r/83c00b5fea81c07f6897a5dd3ef50fd3b290f56c.camel@redhat.com
+Fixes: 35f834265e0d ("smb3: fix broken reconnect when password changing on the server by allowing password rotation")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/fs_context.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Steve
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index da5973c228ed..8c73d4d60d1a 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -171,6 +171,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_string("username", Opt_user),
+ 	fsparam_string("pass", Opt_pass),
+ 	fsparam_string("password", Opt_pass),
++	fsparam_string("pass2", Opt_pass2),
+ 	fsparam_string("password2", Opt_pass2),
+ 	fsparam_string("ip", Opt_ip),
+ 	fsparam_string("addr", Opt_ip),
+@@ -1131,6 +1132,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		} else if (!strcmp("user", param->key) || !strcmp("username", param->key)) {
+ 			skip_parsing = true;
+ 			opt = Opt_user;
++		} else if (!strcmp("pass2", param->key) || !strcmp("password2", param->key)) {
++			skip_parsing = true;
++			opt = Opt_pass2;
+ 		}
+ 	}
+ 
+-- 
+2.48.1
+
