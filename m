@@ -1,172 +1,148 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAEE12D758
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Mar 2025 01:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7667C78F44
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Mar 2025 01:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741742754; cv=none; b=eYPfXrnINJRTMlOriMU+ETujeYMxyI37fMA+gWbbTToHuB9ZxIXdB9A21qkN4BBdrxaxVqtzGgs9jBBsc98OHXCQQ6G0aNhJcYSRnbG+gT0FnApTWw3e1ngKlVXOkw1lP4v4n7p4+jOvgEzNUIpbm/y6ptlEE2bKFZt4HpbXvaM=
+	t=1741742931; cv=none; b=ITdN6ncQkYav8Uq98XsCZQYzQDSiIz8LwFc+khesvU6y8qb4reI937TTm7aAoB4HmZmt+MiEaHlAGA1Rh5lqXDOhkae3iwSKSCJ3ujBnx25OCK/6rsWnwiVgpoB5aAyhsztgb48tKBTkv/SgXq03OhmAKl8zFQe/VVxls/ZH5yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741742754; c=relaxed/simple;
-	bh=KQe7z8GQTnMNvehMLcLhBax4NrkuBtbpmlS2PGoTFn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rNSp0WbQ6vZWPyt4vHyPdZu6DSxza+08sNV466KX1r2dAh/qlg2ET8MtHfBxerTlkrfiKJH0lc1CeQQYK8KgcrlYuGgmyEyMWKjIVj92W9cDbqaMlb0RF79mAApjfVKFaTOCCysSZwyuVO6cZUpKT0C4ahagpTuD6YSdG43ucCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZCCcn0rG0z1cyhS;
-	Wed, 12 Mar 2025 09:25:45 +0800 (CST)
-Received: from kwepemg500017.china.huawei.com (unknown [7.202.181.81])
-	by mail.maildlp.com (Postfix) with ESMTPS id 157A51402C1;
-	Wed, 12 Mar 2025 09:25:49 +0800 (CST)
-Received: from [10.174.179.155] (10.174.179.155) by
- kwepemg500017.china.huawei.com (7.202.181.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 12 Mar 2025 09:25:48 +0800
-Message-ID: <c9382853-f06f-48bb-bdbe-bbb18f518f23@huawei.com>
-Date: Wed, 12 Mar 2025 09:25:47 +0800
+	s=arc-20240116; t=1741742931; c=relaxed/simple;
+	bh=2sqnU0JFa0x8LVfK/uOR4msCIUJyZa62DEiDswullgA=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RBug2maMeoBj5WKA/PhpZqQZviuEN9tcdQhpHmvqAy4jgyuuuhIst5EtclZ3eH+8ktSSbg10xJXzDIgESv19XWSRi12ZBy7GdCv9znYYXFGwUQfrdlJZY0RUbMLTkclBIH316sz37PTYQV3uz7ez9r2+2kbyRM/CSbxq4pYFawk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RXAqw5rM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXAqw5rM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741742928;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M0r84Ri62vMcihc9HdcYuIoC1yO+/C57B7Ff+eEFLaw=;
+	b=RXAqw5rMGgkSRq6DTFK3MklDxMGfo9601CFaGIGvC5DJCSMg/on+du05qHNIDLKJRRNZKc
+	RA8NpNJRfWwEh7u38hZ0PPpdr3JLJ5QlylObL0HgLBSHwP126Dbfkkn+uHzCseQQzAD9Jn
+	wUlKDInYGRQNRSC3+suK82V0svLL+V0=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-221-DY01e9rrPhCNVXjtOjujZg-1; Tue, 11 Mar 2025 21:28:46 -0400
+X-MC-Unique: DY01e9rrPhCNVXjtOjujZg-1
+X-Mimecast-MFC-AGG-ID: DY01e9rrPhCNVXjtOjujZg_1741742925
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ff798e8c90so8951119a91.1
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Mar 2025 18:28:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741742925; x=1742347725;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=M0r84Ri62vMcihc9HdcYuIoC1yO+/C57B7Ff+eEFLaw=;
+        b=LIMNdefYuvZrg2BwIUA1tMyiv0oAAVV2oU8xnodlX4OtUI4/HtGmmoKuPAMTF7Ddt1
+         fza0jY3GjkZBdU1RTE+aOOH6LkpZZeyCzCSU91lSRP8nXI4ehlgtDMwm488eapJdboxP
+         dvq6g4H7rX9bRQKQLSCts1QWPXwA+xHVMd7b6yHe+WbbrpyuUwrJ/wUuLobz2UuZQcyy
+         /IQCWGrCmQRAgJTh+oEbd7wvXDWTftbD70oIRPDGIcYY5FX25Wgrn8D1tioEnoWxPIVm
+         Nxel2n9rO4D+a+R+Czctlg9bLkOHLWRovHhJjLx0rEaOgpxEkSD2K1PnE6yfdOlgeTZk
+         fBWw==
+X-Forwarded-Encrypted: i=1; AJvYcCX5EfJdvWipVPKvf3kw4N/VEFsM5uzGku768ZfUKbseb3Yr3NwbUoePRM0fA203j8KGsjSzC9xo3iNg@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0S3eukwTIhA9zk1c2qbFU+1Iub1N7LN3jQEK7LQmu5IHaUcRh
+	GSB3AqL0LY5xscSZCo/YiCY6X06huNJv5jxaHodliryA6EWwcPnSv69VzDPiVHGQ6bHTDTLo4X8
+	Lpu6ADxmqYUg55MSUlCEuxQ2l2trl1qcoYQEtQmL8IRH3UWvlq9Swp2F0wA==
+X-Gm-Gg: ASbGncvTEzhrrmcrUXwaoDHYiYJ1TCfDqOXNlWC0jVDbFSeobMBTTefYx1h3r8uYS9F
+	IYXixN/uRI6QprNc1QPP/TIXjwtbFlgY88RBwpN6hEbYq4QM/YJ0zmXzTPznul5qWwq9QvelLBU
+	+8g9wkzMGATmLBd6ABw1uQQfhmowtPz7ovxgobM59Ar2IGjhMdgsGBgyGAsqNofOKdpKFRFzKuU
+	yZfdd0dy35aHboQ2WC8aHtjd1tmlUQ8Ca6cWcUWNPO1eockM+9WPMCs/yi0MRaVwRds/nfGIKyg
+	l++4QU6tpN2544uILsL82bS2X69DAeI7PR+t
+X-Received: by 2002:a17:90b:4a43:b0:2ee:8e75:4aeb with SMTP id 98e67ed59e1d1-2ff7ce89e00mr32970823a91.17.1741742925394;
+        Tue, 11 Mar 2025 18:28:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPuRpP2Gia0vpcvhLRdpfhJhd9G4f/RjwAXEDatzA9hquYo2knRaKs5/3U0TtS3ZZsguO3FQ==
+X-Received: by 2002:a17:90b:4a43:b0:2ee:8e75:4aeb with SMTP id 98e67ed59e1d1-2ff7ce89e00mr32970794a91.17.1741742925009;
+        Tue, 11 Mar 2025 18:28:45 -0700 (PDT)
+Received: from omnibook.happyassassin.net ([2001:569:7cd5:ea00:c6fc:c4e9:3726:7db0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30118230a91sm316231a91.11.2025.03.11.18.28.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 18:28:44 -0700 (PDT)
+Message-ID: <1f422c3745551dc1053e5de4857f9b123ec66889.camel@redhat.com>
+Subject: Re: Anonymous mount of CIFS shares fails with cifs-utils 7.2 unless
+ 'sec=none' is added to mount options
+From: Adam Williamson <awilliam@redhat.com>
+To: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+Date: Tue, 11 Mar 2025 18:28:43 -0700
+In-Reply-To: <e64f3f2231064e771423f32865361c10@manguebit.com>
+References: <83c00b5fea81c07f6897a5dd3ef50fd3b290f56c.camel@redhat.com>
+	 <e64f3f2231064e771423f32865361c10@manguebit.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41app1) 
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
-Subject: Re: [PATCH] nfs: Fix incorrect read-only status reporting in
- mountstats
-To: Steve French <smfrench@gmail.com>
-CC: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>,
-	yangerkun <yangerkun@huawei.com>, "zhangyi (F)" <yi.zhang@huawei.com>,
-	"yukuai (C)" <yukuai3@huawei.com>, Hou Tao <houtao1@huawei.com>
-References: <20250303143355.3821411-1-lilingfeng3@huawei.com>
- <CAH2r5mtYrSd6c3mwUd3yg0FZPemFmV_MpmDVNdFGF1sAiMQJXw@mail.gmail.com>
-From: Li Lingfeng <lilingfeng3@huawei.com>
-In-Reply-To: <CAH2r5mtYrSd6c3mwUd3yg0FZPemFmV_MpmDVNdFGF1sAiMQJXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemg500017.china.huawei.com (7.202.181.81)
 
-Apologies, I'm not well-versed in CIFS, but cifs_show_stats lacks the
-intended implementation. From my understanding, altering the parameter
-list of the show_stats callback does not affect CIFS.
+On Tue, 2025-03-11 at 17:12 -0300, Paulo Alcantara wrote:
+> Adam Williamson <awilliam@redhat.com> writes:
+>=20
+> > I have this line in my /etc/fstab to mount a local network CIFS share
+> > that requires no authentication:
+> >=20
+> > //192.168.1.9/Media		/mnt/data             cifs    noauto,nosuid,soft,g=
+uest,uid=3D99,gid=3D99,file_mode=3D0777,dir_mode=3D0777,users,vers=3D3.0	0 =
+0
+> >=20
+> > With cifs-utils 7.2, this suddenly doesn't work. I get an 'invalid
+> > argument' error, and in dmesg:
+> >=20
+> > cifs: Bad value for 'password2'
+>=20
+> Yes, this is a regression.  The problem is that cifs-utils-7.2 is now
+> passing an empty password2=3D for guest authentication and the kernel
+> can't handle it.
+>=20
+> Does the following fix your issue
+>=20
+> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+> index e9b286d9a7ba..456948d4f328 100644
+> --- a/fs/smb/client/fs_context.c
+> +++ b/fs/smb/client/fs_context.c
+> @@ -171,6 +171,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] =
+=3D {
+>  	fsparam_string("username", Opt_user),
+>  	fsparam_string("pass", Opt_pass),
+>  	fsparam_string("password", Opt_pass),
+> +	fsparam_string("pass2", Opt_pass2),
+>  	fsparam_string("password2", Opt_pass2),
+>  	fsparam_string("ip", Opt_ip),
+>  	fsparam_string("addr", Opt_ip),
+> @@ -1125,7 +1126,10 @@ static int smb3_fs_context_parse_param(struct fs_c=
+ontext *fc,
+>  	 * we will need special handling of them.
+>  	 */
+>  	if (param->type =3D=3D fs_value_is_string && param->string[0] =3D=3D 0)=
+ {
+> -		if (!strcmp("pass", param->key) || !strcmp("password", param->key)) {
+> +		if (!strcmp("pass2", param->key) || !strcmp("password2", param->key)) =
+{
+> +			skip_parsing =3D true;
+> +			opt =3D Opt_pass2;
+> +		} else if (!strcmp("pass", param->key) || !strcmp("password", param->k=
+ey)) {
+>  			skip_parsing =3D true;
+>  			opt =3D Opt_pass;
+>  		} else if (!strcmp("user", param->key) || !strcmp("username", param->k=
+ey)) {
+>=20
 
-Thanks.
+Yes, it does. Thanks.
+--=20
+Adam Williamson (he/him/his)
+Fedora QA
+Fedora Chat: @adamwill:fedora.im | Mastodon: @adamw@fosstodon.org
+https://www.happyassassin.net
 
-在 2025/3/12 6:08, Steve French 写道:
-> Do you have a repro scenario example of this for cifs.ko? the
-> suggested change seems plausible, but wondering about how to recreate
-> the case you mention where "mounting may generate multiple
-> superblocks" (are there DFS examples that this would help?)
->
-> On Mon, Mar 3, 2025 at 8:18 AM Li Lingfeng <lilingfeng3@huawei.com> wrote:
->> In the process of read-only mounting of NFS, only the first generated
->> superblock carries the ro flag passed from the user space.
->> However, NFS mounting may generate multiple superblocks, and the last
->> generated superblock is the one actually used. This leads to a situation
->> where the superblock of a read-only NFS file system may not have the ro
->> flag. Therefore, using s_flags to determine whether an NFS file system is
->> read-only is incorrect.
->>
->> Use mnt_flags instead of s_flags to decide whether the file system state
->> displayed by the /proc/self/mountstats interface is read-only or not.
->>
->> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
->> ---
->>   fs/nfs/internal.h      |  2 +-
->>   fs/nfs/super.c         | 12 ++++++------
->>   fs/proc_namespace.c    |  2 +-
->>   fs/smb/client/cifsfs.c |  2 +-
->>   include/linux/fs.h     |  2 +-
->>   5 files changed, 10 insertions(+), 10 deletions(-)
->>
->> diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
->> index fae2c7ae4acc..14076fc9b1e8 100644
->> --- a/fs/nfs/internal.h
->> +++ b/fs/nfs/internal.h
->> @@ -565,7 +565,7 @@ int  nfs_statfs(struct dentry *, struct kstatfs *);
->>   int  nfs_show_options(struct seq_file *, struct dentry *);
->>   int  nfs_show_devname(struct seq_file *, struct dentry *);
->>   int  nfs_show_path(struct seq_file *, struct dentry *);
->> -int  nfs_show_stats(struct seq_file *, struct dentry *);
->> +int  nfs_show_stats(struct seq_file *, struct vfsmount *);
->>   int  nfs_reconfigure(struct fs_context *);
->>
->>   /* write.c */
->> diff --git a/fs/nfs/super.c b/fs/nfs/super.c
->> index aeb715b4a690..62dfba216f7f 100644
->> --- a/fs/nfs/super.c
->> +++ b/fs/nfs/super.c
->> @@ -662,10 +662,10 @@ EXPORT_SYMBOL_GPL(nfs_show_path);
->>   /*
->>    * Present statistical information for this VFS mountpoint
->>    */
->> -int nfs_show_stats(struct seq_file *m, struct dentry *root)
->> +int nfs_show_stats(struct seq_file *m, struct vfsmount *mnt)
->>   {
->>          int i, cpu;
->> -       struct nfs_server *nfss = NFS_SB(root->d_sb);
->> +       struct nfs_server *nfss = NFS_SB(mnt->mnt_sb);
->>          struct rpc_auth *auth = nfss->client->cl_auth;
->>          struct nfs_iostats totals = { };
->>
->> @@ -675,10 +675,10 @@ int nfs_show_stats(struct seq_file *m, struct dentry *root)
->>           * Display all mount option settings
->>           */
->>          seq_puts(m, "\n\topts:\t");
->> -       seq_puts(m, sb_rdonly(root->d_sb) ? "ro" : "rw");
->> -       seq_puts(m, root->d_sb->s_flags & SB_SYNCHRONOUS ? ",sync" : "");
->> -       seq_puts(m, root->d_sb->s_flags & SB_NOATIME ? ",noatime" : "");
->> -       seq_puts(m, root->d_sb->s_flags & SB_NODIRATIME ? ",nodiratime" : "");
->> +       seq_puts(m, (mnt->mnt_flags & MNT_READONLY) ? "ro" : "rw");
->> +       seq_puts(m, mnt->mnt_sb->s_flags & SB_SYNCHRONOUS ? ",sync" : "");
->> +       seq_puts(m, mnt->mnt_sb->s_flags & SB_NOATIME ? ",noatime" : "");
->> +       seq_puts(m, mnt->mnt_sb->s_flags & SB_NODIRATIME ? ",nodiratime" : "");
->>          nfs_show_mount_options(m, nfss, 1);
->>
->>          seq_printf(m, "\n\tage:\t%lu", (jiffies - nfss->mount_time) / HZ);
->> diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
->> index e133b507ddf3..1310c655f33f 100644
->> --- a/fs/proc_namespace.c
->> +++ b/fs/proc_namespace.c
->> @@ -227,7 +227,7 @@ static int show_vfsstat(struct seq_file *m, struct vfsmount *mnt)
->>          /* optional statistics */
->>          if (sb->s_op->show_stats) {
->>                  seq_putc(m, ' ');
->> -               err = sb->s_op->show_stats(m, mnt_path.dentry);
->> +               err = sb->s_op->show_stats(m, mnt);
->>          }
->>
->>          seq_putc(m, '\n');
->> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
->> index 6a3bd652d251..f3bf2c62e195 100644
->> --- a/fs/smb/client/cifsfs.c
->> +++ b/fs/smb/client/cifsfs.c
->> @@ -836,7 +836,7 @@ static int cifs_freeze(struct super_block *sb)
->>   }
->>
->>   #ifdef CONFIG_CIFS_STATS2
->> -static int cifs_show_stats(struct seq_file *s, struct dentry *root)
->> +static int cifs_show_stats(struct seq_file *s, struct vfsmount *mnt)
->>   {
->>          /* BB FIXME */
->>          return 0;
->> diff --git a/include/linux/fs.h b/include/linux/fs.h
->> index 2788df98080f..94ad8bdb409b 100644
->> --- a/include/linux/fs.h
->> +++ b/include/linux/fs.h
->> @@ -2308,7 +2308,7 @@ struct super_operations {
->>          int (*show_options)(struct seq_file *, struct dentry *);
->>          int (*show_devname)(struct seq_file *, struct dentry *);
->>          int (*show_path)(struct seq_file *, struct dentry *);
->> -       int (*show_stats)(struct seq_file *, struct dentry *);
->> +       int (*show_stats)(struct seq_file *, struct vfsmount *);
->>   #ifdef CONFIG_QUOTA
->>          ssize_t (*quota_read)(struct super_block *, int, char *, size_t, loff_t);
->>          ssize_t (*quota_write)(struct super_block *, int, const char *, size_t, loff_t);
->> --
->> 2.31.1
->>
->>
->
+
+
+
