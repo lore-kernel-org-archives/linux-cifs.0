@@ -1,101 +1,98 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2875B1D5160
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Mar 2025 16:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BA31F03CE
+	for <linux-cifs@vger.kernel.org>; Thu, 13 Mar 2025 12:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741796605; cv=none; b=MlTvxy16qsXMFJBNyI3bjwVnskYPPP0G7d2LnAmJqlrQP5CLRaH+/NgKUido9tEBfKxhITn7kTZfVCflF295Kx3SmVobTOOkcOhktWTSZuRYL75zGRkxtfUjnhXEgtwhINOAZ44rANqed5Pdchq5RimOBdcvWFQjVt49s19tXfE=
+	t=1741867937; cv=none; b=Hw+pwQQW40PcXKYdezMKMK09X2JXsQCpseoi2KUYMJoWaUHthTje368unvpYsnjGR3uhhUFAiCJ0/lt1epZIXtQiEl5g6ZoRmV37H9VzxwlH+vaUUAGuYCrF7rGTrIi3l2juLHRJzzPsDASwnD++EvON9nOyoV5hYSDk6/rva1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741796605; c=relaxed/simple;
-	bh=ZJdmmloqUmXESNntu0dPSMF/s6AVO1iYbsvbHXL++0I=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=SW0LmOGqWXo/DPitDA1XoZ6sDG1MZzCBnbNgZh2SKFqxn4qTazhTffC7Nx6xGCpDGOhmp4VlLksq00eyNabzZEVRWkCKgF/AolixVQ71x2h7nIxCZbB1fcgCijYzHoB5oylFhNVO1wv8ee3IXe/kywQ9lrnYdu8HkUPPF1qlhLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=XasS+x1c; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1741867937; c=relaxed/simple;
+	bh=CmABCopn9hnAftYgQG7oCQ3D+PwyLCduLoDODPTQGQU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=SZp9vIQGwopxyOwbgYul8dVo+KFbNNvKLaueX/pxQeiOG11u9gD94ULvI0IvM8x/+4/Qv5jsZmt9DbFeIFZILy2JXldjumX9OifhA2q5hKCjQLjWZDHYhWx4y3ZQ+UrJpRER+UaChNg7i3ArabuXh6KK8E+Ga/HnGLoeUK1CLS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYMPUy1T; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XasS+x1c"
-Message-ID: <9ef1d7140c93877011e7ca5fdcd13ec4@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1741796602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iIximd9JyvbuS++2Uxw2IolvTCJM7tpFbI8oOmAvbw4=;
-	b=XasS+x1cCR90aor7am79FYv5Y88fIbyZ7sSgi8JhoOeShUKa5LP+1fj17jUdc+CycFeRqK
-	nU7Y8O3l8rl5lAEstaM936N3B2sEPzvpDLh2xaSx5pO7IN0EFhe4RxgXJvVofpbqHF5sMg
-	KPwO6uaFBkdIrHtkNWznl9r5CXO9l27Iu/mmci4Cl3rfJxgcxvjYBwr2s9eVsDSMLUyPxa
-	ep49wNg7r7jisaaWfElHPODXrQeo4SiwI8Z7x/GWQzMALT5cTl+boiUzh756JXiOKoYjSA
-	7bheb3U9+AjZCXkOKRH3hXH5ddudsqZEvuMFN6xdx7jEYJPuMYur5XGRpBQfJA==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Steve French <smfrench@gmail.com>, Meetakshi Setiya
- <meetakshisetiyaoss@gmail.com>
-Cc: Adam Williamson <awilliam@redhat.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: fix regression with guest option
-In-Reply-To: <CAH2r5mu5=nnBwibmARGoLepbQfU6qkXnez8whaWaSM7G7MEVXw@mail.gmail.com>
-References: <20250312135131.628756-1-pc@manguebit.com>
- <CAH2r5mtjtigJf7JKUiL3D5Lp8f4qTe4GUxQPXwz1o=SQMqiqdA@mail.gmail.com>
- <70d0157ac13725595d64978b11c4d3a91f417803.camel@redhat.com>
- <4cbaab94c2ba97a8d91b9f43ea8a3662@manguebit.com>
- <CAH2r5mu5=nnBwibmARGoLepbQfU6qkXnez8whaWaSM7G7MEVXw@mail.gmail.com>
-Date: Wed, 12 Mar 2025 13:23:19 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYMPUy1T"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3913d129c1aso692059f8f.0
+        for <linux-cifs@vger.kernel.org>; Thu, 13 Mar 2025 05:12:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741867933; x=1742472733; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CmABCopn9hnAftYgQG7oCQ3D+PwyLCduLoDODPTQGQU=;
+        b=FYMPUy1Ty/5Epz00l0ISxxsuPHYkZBH4cH5rNSqGZxr4g5WefBBqgF0m0a2EQaoU2v
+         QwVmOck8bMO/wqZOmV0TGemISpkkLeNRJ5eLK5e2fR7FLGrHFmEb4CwZEm4Y2VSTy07j
+         iVirlbPsVoltNvNTzWI0alf+YwzEFBvyujU7ZfcnC7yPkMNvXyT/8yIZA5aFAT9UCcQF
+         /C0dRZSTQ3Whq7KnWMuI6H816r6KDut3873KmznbQMc3D4Bjgdz8OUe6Y/8iYx8u+tAr
+         xUB/cbMHlgRqIZ+E13WSEsKH138413Y8C31O0Ouhf5r+CaBsbrOVUseLDZBJ4ARwUQUA
+         euEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741867933; x=1742472733;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CmABCopn9hnAftYgQG7oCQ3D+PwyLCduLoDODPTQGQU=;
+        b=NIMCUX9jZ8BPdZzYp/F/+b8Pe+1EL3Ef9A0GqwOqas35nbw0dUInAk6r7jS1ctYQ6n
+         rIu9XJaMUItGniOXDpc5PAMHFeD4YbVuWqGdi3vG+UsSYfveEIM7mfApSRRMw/IW2mE4
+         1limPMIvcaS4GG690aZhOIP3CwmEp5LOLLa859XdiQ891kFzH0Tvth0/zNc9atvdAe+C
+         NH8UgR2lAbjKFKEOQoy9Qsv3zY8AiGyRt6pimrzT+AZMo/9cMqiHyxeTnwXj4VRZam5o
+         LtckivmawQhWUWvbb+Au23QASeyzt/BQX1m+ahiLJuh92JeSuXEWlYhl2+6tU/j53mkF
+         kM5Q==
+X-Gm-Message-State: AOJu0YzEYuwLmIeKRs0Ztlr+OEviqJNCnry43SSiDm9GYuo5uxh8Jk28
+	sB8f8C6hqPFmjdFbDzZKz7L5GVSjGmsU0Nr9pH2uZBXpFI64naS/G9R70vx/SEuNVEn/FCOfg6K
+	0NfwPjioQz0d4t/AKTte6qwc7x8JeEUXr
+X-Gm-Gg: ASbGnct9bvBmeiybd5WZvzoh/Qv41i5XBFtHxDeHVNVLjCFcWRYZQz8LPFzLlwl4Nvj
+	8gldtCeaCKzs65IEbhHC1QYhy6NhJvPqkMWAzSp2zmF2uu+S2xS0CqprQtv1o3sD3c8hl4sISse
+	iYpVGXzM1gvG0ePZ68jT+ugMbJ
+X-Google-Smtp-Source: AGHT+IEysKzf5yVHBPPkjwC9HKeIn6kgQXZfqkBjv1XX384+jRWxAtQmK60ZInkECZwD9CJzohtLnVqoAzRXndDR7/o=
+X-Received: by 2002:a5d:64cb:0:b0:38f:23c4:208c with SMTP id
+ ffacd0b85a97d-395b954ea75mr1889894f8f.18.1741867933165; Thu, 13 Mar 2025
+ 05:12:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Jiadong Liu <jiadong.liu.cn@gmail.com>
+Date: Thu, 13 Mar 2025 14:12:02 +0200
+X-Gm-Features: AQ5f1JqGMmh1kHkFab5C26MMM7a42RfHOyx_KaUMRmJoV-pVEVGXHjysjhsZszc
+Message-ID: <CANrFC8U0FywyScrBUCVisKyXhO3h3G0XaJp4soSKOZgQNW82qw@mail.gmail.com>
+Subject: SMB Share Deleted Automatically
+To: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Steve French <smfrench@gmail.com> writes:
+Dear CIFS Experts,
 
-> Meetakshi sent a patch idea to try (to also fix this in cifs-utils) -
-> will take a look
+I hope you are all doing well.
 
-Where is the patch?
+I am currently running AWS Linux 2023 and using cifs-utils with SMB3
+to mount a share hosted on a Windows Server 2016. Recently, I
+encountered an issue after applying the February 2025 cumulative
+update to the Windows Server. Unfortunately, the update failed, and I
+reboot the server in a regular routine.
 
-Something like below would work
+After the reboot, I noticed that my Linux machine's journalctl logs
+contained the following messages:
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 7605130..16730c6 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -200,6 +200,7 @@ struct parsed_mount_info {
-        unsigned int got_domain:1;
-        unsigned int is_krb5:1;
-        unsigned int is_noauth:1;
-+       unsigned int is_guest:1;
-        uid_t sudo_uid;
- };
- 
-@@ -1161,6 +1162,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
-                        parsed_info->got_user = 1;
-                        parsed_info->got_password = 1;
-                        parsed_info->got_password2 = 1;
-+                       parsed_info->is_guest = 1;
-                        goto nocopy;
-                case OPT_RO:
-                        *filesys_flags |= MS_RDONLY;
-@@ -2334,7 +2336,9 @@ mount_retry:
-                fprintf(stderr, "%s kernel mount options: %s",
-                        thisprogram, options);
- 
--       if (parsed_info->got_password && !(parsed_info->is_krb5 || parsed_info->is_noauth)) {
-+       if (parsed_info->got_password &&
-+           !(parsed_info->is_krb5 || parsed_info->is_noauth ||
-+             parsed_info->is_guest)) {
-                /*
-                 * Commas have to be doubled, or else they will
-                 * look like the parameter separator
-@@ -2345,7 +2349,9 @@ mount_retry:
-                        fprintf(stderr, ",pass=********");
-        }
- 
--       if (parsed_info->got_password2 && !(parsed_info->is_krb5 || parsed_info->is_noauth)) {
-+       if (parsed_info->got_password2 &&
-+           !(parsed_info->is_krb5 || parsed_info->is_noauth ||
-+             parsed_info->is_guest)) {
-                strlcat(options, ",password2=", options_size);
-                strlcat(options, parsed_info->password2, options_size);
-                if (parsed_info->verboseflag)
+kernel:CIFS: Server share \\MyServer\Myshare deleted.
+kernel:CIFS: Server share \\MyServer\Myshare deleted.
+
+It appears that the mounted share was removed, and I am unsure how to
+proceed with troubleshooting this issue or what steps I can take to
+prevent similar occurrences in the future. My mount cmd options are
+"-t smb3 -o vers=3.0,rw,nocase,hard,file_mode=0700,dir_mode=0700" with
+other options about uid/gid, force them and login related.
+
+Would anyone be able to provide guidance or suggestions on how to
+diagnose and mitigate this problem? I would greatly appreciate any
+insights or recommendations you can share.
+In normal case, e.g if I shutdown the windows file server, the mount
+will remain and file access will be hung. And once the windows server
+is back, file access will be made again.
+
+Thank you in advance for your time and support.
+
+Best Regards,
+Jiadong
