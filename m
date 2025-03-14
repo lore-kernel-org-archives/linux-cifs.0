@@ -1,114 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C02204593
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Mar 2025 16:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9331632D3;
+	Fri, 14 Mar 2025 20:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741970558; cv=none; b=lTeEnXUU3hmZE56Uip6ZbAS9t/XNlMDZcvEmoeKAzPtOuGthqTfdDaLLQEOr06RZNUb6UTI5P1IUTK+PMKe5GLPy6HUjuGR3yLKIoSMfCgpag5BnMlfOI2AAuPCDkvBM4ykR9o7mvTmGwMQCJEHDgc7t+PPS72vyZjSg33N6xNo=
+	t=1741985072; cv=none; b=TPERX7cxCGnvKdDDdeRpgl+fTabCqgffCfOEPA/G5CnVdojH/T4bseTrYjSX5Ud9X0qZ9dtCidkSqStgs2+rWYtGzJmVbl1RQcjIorwKi5GGRc0+3fYkrWjCdo5QQx1lWbSP4sAE8PwcGRRpdctVJlICULZGaHMle8R1MWZpBZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741970558; c=relaxed/simple;
-	bh=7RfnCZTxnffbMtVXJbp1eKsFHKdpEKrmz3WERO38Qz4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jo0mEuOrUE3s1zlkqHwWJOF6KFeBreq9cBT6Gi11D71Y7BUhA1wqkvIAK+TQw1PRiB5smQfWo+aztgNvJxZzCR2WG4wPlOnXa0CsV8FDQO+91PqPMvmJWLEYpCyFnXuaviAjKuIfEVC1sRTiiGTfW3xvVjeh/VTT1Xjn1MFn6RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZQFvnHEK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741985072; c=relaxed/simple;
+	bh=JyG22rQanR20rroHpv7WbHnkxDMN0Sl/fGM84V0PFu8=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=sQzDN4wsSlWyaPYCEt8NceUmt8KNtUpfs6p16PAQqfdDKb5mF57/fq2Ew8105wod6JJLjHIdq6NQt70NuWWOyZC4wzvvnb+03faY6y+uvPAOY4CQ2DIzpe02i8GqKqN2gzR8454t/YwmVMI6ffMY9J3LG+FLOZVBWGpuV8J5Urw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=tFIgDYdA; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQFvnHEK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741970556;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="tFIgDYdA"
+Message-ID: <9a3639ed95490e40b62d364c09c24e3b@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1741985062;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KsqgtlbawqA1+pPoXDWlta38taI8Ws6UsIFBymdNjzI=;
-	b=ZQFvnHEKYuZkikAOXpkelGtYdB2hGXKeMvkTzIe1zHwG/0L2jnihik6k8Y2nfqAv1KyG95
-	4bZ4TCqPYuNNsptQbqf203Oz8xnDABKxsS03QaG43G/QpeWfUQKbkkIas/Nl36vGCojRyC
-	eIlMlk3+J3tLTXWolM/55r8e+4jITb8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-622-ABSHVzyUNcyxoKCf-bpvQg-1; Fri,
- 14 Mar 2025 12:42:31 -0400
-X-MC-Unique: ABSHVzyUNcyxoKCf-bpvQg-1
-X-Mimecast-MFC-AGG-ID: ABSHVzyUNcyxoKCf-bpvQg_1741970550
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E75A180AF50;
-	Fri, 14 Mar 2025 16:42:29 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.61])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DEF571944CE5;
-	Fri, 14 Mar 2025 16:42:24 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Max Kellermann <max.kellermann@ionos.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Alex Markuze <amarkuze@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>
-Subject: [PATCH 4/4] netfs: Fix netfs_unbuffered_read() to return ssize_t rather than int
-Date: Fri, 14 Mar 2025 16:41:59 +0000
-Message-ID: <20250314164201.1993231-5-dhowells@redhat.com>
+	bh=6lOZkNdUaYMusY2QeOlezuCxMiABAc9kVpuc6FXYat0=;
+	b=tFIgDYdAsoNcnjS3dkr1KhlaZYrnBfwnB7kuLEFjpk6j5sw9hEBSMUs9U4HXMXoAnVO2Pc
+	THVyUetr1klfBZwTEld/u6PkRVmXHG2uA1ta6CejWl2n4dv/7hguOB2Prjm8i1d/C5NfGo
+	O0VfMw0v9AiBr4ZfcdlLjtmYFNEdV4u6HWnxH7l+02PcbXGkl4TExaRB1lvDSbENQbm4Lx
+	wWyj2hTvFuP/5tl4s/jeDPkckHkp7CJgaN3gC5Za/vCg/22KRPBhOpW0IKr0TBmxI4KmjR
+	UhYLmFRhZ9oZYSMIng6M0dfvUp+IRfLOISjgOjApm/JWdprEJ+h+rTL/JT/2SA==
+From: Paulo Alcantara <pc@manguebit.com>
+To: David Howells <dhowells@redhat.com>, Christian Brauner
+ <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>, Max Kellermann
+ <max.kellermann@ionos.com>, Jeff Layton <jlayton@kernel.org>,
+ netfs@lists.linux.dev, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] netfs: Miscellaneous fixes
 In-Reply-To: <20250314164201.1993231-1-dhowells@redhat.com>
 References: <20250314164201.1993231-1-dhowells@redhat.com>
+Date: Fri, 14 Mar 2025 17:44:17 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain
 
-Fix netfs_unbuffered_read() to return an ssize_t rather than an int as
-netfs_wait_for_read() returns ssize_t and this gets implicitly truncated.
+David Howells <dhowells@redhat.com> writes:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Viacheslav Dubeyko <slava@dubeyko.com>
-cc: Alex Markuze <amarkuze@redhat.com>
-cc: Ilya Dryomov <idryomov@gmail.com>
-cc: ceph-devel@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/direct_read.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> Hi Christian,
+>
+> Here are some miscellaneous fixes and changes for netfslib, if you could
+> pull them:
+>
+>  (1) Fix the collection of results during a pause in transmission.
+>
+>  (2) Call ->invalidate_cache() only if provided.
+>
+>  (3) Fix the rolling buffer to not hammer atomic bit clears when loading
+>      from readahead.
+>
+>  (4) Fix netfs_unbuffered_read() to return ssize_t.
+>
+> The patches can also be found here:
+>
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+>
+> Thanks,
+> David
+>
+> David Howells (3):
+>   netfs: Fix collection of results during pause when collection
+>     offloaded
+>   netfs: Fix rolling_buffer_load_from_ra() to not clear mark bits
+>   netfs: Fix netfs_unbuffered_read() to return ssize_t rather than int
+>
+> Max Kellermann (1):
+>   netfs: Call `invalidate_cache` only if implemented
+>
+>  fs/netfs/direct_read.c    |  6 +++---
+>  fs/netfs/read_collect.c   | 18 ++++++++++--------
+>  fs/netfs/rolling_buffer.c |  4 ----
+>  fs/netfs/write_collect.c  |  3 ++-
+>  4 files changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
-index 0bf3c2f5a710..5e3f0aeb51f3 100644
---- a/fs/netfs/direct_read.c
-+++ b/fs/netfs/direct_read.c
-@@ -125,9 +125,9 @@ static int netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
-  * Perform a read to an application buffer, bypassing the pagecache and the
-  * local disk cache.
-  */
--static int netfs_unbuffered_read(struct netfs_io_request *rreq, bool sync)
-+static ssize_t netfs_unbuffered_read(struct netfs_io_request *rreq, bool sync)
- {
--	int ret;
-+	ssize_t ret;
- 
- 	_enter("R=%x %llx-%llx",
- 	       rreq->debug_id, rreq->start, rreq->start + rreq->len - 1);
-@@ -155,7 +155,7 @@ static int netfs_unbuffered_read(struct netfs_io_request *rreq, bool sync)
- 	else
- 		ret = -EIOCBQUEUED;
- out:
--	_leave(" = %d", ret);
-+	_leave(" = %zd", ret);
- 	return ret;
- }
- 
-
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
