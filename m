@@ -1,90 +1,108 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9331632D3;
-	Fri, 14 Mar 2025 20:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDB21DDA33;
+	Fri, 14 Mar 2025 23:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741985072; cv=none; b=TPERX7cxCGnvKdDDdeRpgl+fTabCqgffCfOEPA/G5CnVdojH/T4bseTrYjSX5Ud9X0qZ9dtCidkSqStgs2+rWYtGzJmVbl1RQcjIorwKi5GGRc0+3fYkrWjCdo5QQx1lWbSP4sAE8PwcGRRpdctVJlICULZGaHMle8R1MWZpBZo=
+	t=1741996082; cv=none; b=FT7lcFsux7Iy70i/HcDpunccc10J3dqphNaZ2mIxnUhb+r/YGeRpVHcNboeOj7URCvyleIEkVzNo5uTwi5OaGH8ILcaWs/cOSP+ihWivGGqBzuff2NmfnSxSu+9SSys/JqAlixeQMcSuvxpi4/nBYat542wXEZvOFSQenvZQNkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741985072; c=relaxed/simple;
-	bh=JyG22rQanR20rroHpv7WbHnkxDMN0Sl/fGM84V0PFu8=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=sQzDN4wsSlWyaPYCEt8NceUmt8KNtUpfs6p16PAQqfdDKb5mF57/fq2Ew8105wod6JJLjHIdq6NQt70NuWWOyZC4wzvvnb+03faY6y+uvPAOY4CQ2DIzpe02i8GqKqN2gzR8454t/YwmVMI6ffMY9J3LG+FLOZVBWGpuV8J5Urw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=tFIgDYdA; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1741996082; c=relaxed/simple;
+	bh=+7pU9FaVIxplM2QQXRjrSOQmrNpnTBXr6bVcvpaVm6s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=nd0krl0f0lZ934DytvrXMIdY2SSHrkBsx2Kph6gcl/V0+w7fkaArpHSFBgT8jG4uabzpVwgin1kZcksqpA4rVNQRthT46exqbulK9qlFmwZJfaeRk6W5pU+IssvNzssKBmjxOecKguQCBGivgPvrnWrHyp96nYdUugdHuSc91MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mifx5IhR; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="tFIgDYdA"
-Message-ID: <9a3639ed95490e40b62d364c09c24e3b@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1741985062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6lOZkNdUaYMusY2QeOlezuCxMiABAc9kVpuc6FXYat0=;
-	b=tFIgDYdAsoNcnjS3dkr1KhlaZYrnBfwnB7kuLEFjpk6j5sw9hEBSMUs9U4HXMXoAnVO2Pc
-	THVyUetr1klfBZwTEld/u6PkRVmXHG2uA1ta6CejWl2n4dv/7hguOB2Prjm8i1d/C5NfGo
-	O0VfMw0v9AiBr4ZfcdlLjtmYFNEdV4u6HWnxH7l+02PcbXGkl4TExaRB1lvDSbENQbm4Lx
-	wWyj2hTvFuP/5tl4s/jeDPkckHkp7CJgaN3gC5Za/vCg/22KRPBhOpW0IKr0TBmxI4KmjR
-	UhYLmFRhZ9oZYSMIng6M0dfvUp+IRfLOISjgOjApm/JWdprEJ+h+rTL/JT/2SA==
-From: Paulo Alcantara <pc@manguebit.com>
-To: David Howells <dhowells@redhat.com>, Christian Brauner
- <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>, Max Kellermann
- <max.kellermann@ionos.com>, Jeff Layton <jlayton@kernel.org>,
- netfs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/4] netfs: Miscellaneous fixes
-In-Reply-To: <20250314164201.1993231-1-dhowells@redhat.com>
-References: <20250314164201.1993231-1-dhowells@redhat.com>
-Date: Fri, 14 Mar 2025 17:44:17 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mifx5IhR"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-549b159c84cso2679272e87.3;
+        Fri, 14 Mar 2025 16:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741996078; x=1742600878; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XRGqHueSif0HYVzdCNbfrvXSSbqFDS5N49LVavrqwU8=;
+        b=Mifx5IhRvy1Ho4hjz2d91j6T+gPdd9Ww2WHdF8pIyfe5XUNrpwDyvMjVVscSajst3P
+         aT6H9JB4aQyxrxttLfuIsUop8Vhdv+Y8eXOcFBmtn+tJCauUZVbVWgLtsRJ19RjYwTYL
+         L7UUyTktPRFI0fCWnWMx8BrBHJh/gdfPUvIT19IEIAoxKUWzpWYJcKvwYVlSv8aAw5Y5
+         kJQbL1Jqoicwo8CPmmSztId0GMQ3V1N1a14lBKt7KR6Tdths0m7sgvUyzvWkjyTl1CmY
+         XHza8osZD53zQXXOpgDS37HCP8swfEKmWUDEefFJ6mjKd0O7Jdt0IZIPK4TLcvEM9NfX
+         LKAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741996078; x=1742600878;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XRGqHueSif0HYVzdCNbfrvXSSbqFDS5N49LVavrqwU8=;
+        b=S4oYozBABA7VaZjAOnjyfWFKdSNzgtS/OyLLxiKCmpNYkWcyG7uUPUduM2+6c/R28z
+         4bgfL4vGAv5I6EXeryFjaGf9tl6RE0056gGnQo9NFHGTri0kOxRyDaj4SKOiscuDODZz
+         CXfBU+0IUJ+3xDJLJhr706YIxcMbKMyBieQ6uF9E8QU2bS0vArAnQ/JzaxecIOwPpwqC
+         2FOz7684YsuToEhfrE/1CbPBi0sswaCTjgk3PNU2phqjibYDKfOy02W27ElBeoeRwE5X
+         HqJLi16M1o743lbWC+1u0PZnSmZF2+VQcqBOei6G+xl5elDfo/Pmxruyx5MbmPHQL4qt
+         H2eA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSJ5fbVmIBTeBcsDwCoDop9alSr4t3lrVWJHF1hWpt9K4njLUgXRiNAUnMyl8dQJ6emksI3pjKjg8R@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzUDnyob/CgUlK3b6dw7jJ5JLZ5Qlm9Hqrhvhy+E1t26g8I2J9
+	2MNCfRHMnMnb2qbQ5h3tvkOZOviCT1AeX9pBzVqoSyptL3SNFlzubuwWUci+6oAS6+nItKoo0W4
+	JhDdOjWpMHsCKlTkVe5op8NIMBq4O7g==
+X-Gm-Gg: ASbGncvkwN1bTLFg4P9OJU0d/gjNQOINXjJ6xK8DUWjZwxfBBsW3S57sg8BiwW5v2Z7
+	kg5U4OwjLgTY/vx0FiHWNDwN4cF0g9iDVS1DdR3j3/N0wkKnOBfDRndZ/OQvA1Lop2KrKxxRoVm
+	wqNdtTh3SVtVKdaNK7Qe8yk9oxv9GL+cUHpQp/MayaaLUrWRFzU+94UGN7e8WmtRpjDal0
+X-Google-Smtp-Source: AGHT+IFjH0tu9Z5mbfJnVOdn/zkjA4D8n9BGkB4gPSaO62QYh0tkgwDxtghfSoVG/MTku2E67UgjsfHjUtDH0FBMlQs=
+X-Received: by 2002:a05:6512:2250:b0:545:2fa9:8cf5 with SMTP id
+ 2adb3069b0e04-549c39aebb7mr1733347e87.49.1741996077992; Fri, 14 Mar 2025
+ 16:47:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 14 Mar 2025 18:47:46 -0500
+X-Gm-Features: AQ5f1JrR475Xc7TGBi9yUbuZ6288i0ZEr8NExxR-y7rl9ST4g9CCmvdARulT6jU
+Message-ID: <CAH2r5mtLERdeDNKxfDjHyHQuf82OOd-KXBq==5bOoBi8P7NrrA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-David Howells <dhowells@redhat.com> writes:
+Please pull the following changes since commit
+80e54e84911a923c40d7bee33a34c1b4be148d7a:
 
-> Hi Christian,
->
-> Here are some miscellaneous fixes and changes for netfslib, if you could
-> pull them:
->
->  (1) Fix the collection of results during a pause in transmission.
->
->  (2) Call ->invalidate_cache() only if provided.
->
->  (3) Fix the rolling buffer to not hammer atomic bit clears when loading
->      from readahead.
->
->  (4) Fix netfs_unbuffered_read() to return ssize_t.
->
-> The patches can also be found here:
->
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
->
-> Thanks,
-> David
->
-> David Howells (3):
->   netfs: Fix collection of results during pause when collection
->     offloaded
->   netfs: Fix rolling_buffer_load_from_ra() to not clear mark bits
->   netfs: Fix netfs_unbuffered_read() to return ssize_t rather than int
->
-> Max Kellermann (1):
->   netfs: Call `invalidate_cache` only if implemented
->
->  fs/netfs/direct_read.c    |  6 +++---
->  fs/netfs/read_collect.c   | 18 ++++++++++--------
->  fs/netfs/rolling_buffer.c |  4 ----
->  fs/netfs/write_collect.c  |  3 ++-
->  4 files changed, 15 insertions(+), 16 deletions(-)
+  Linux 6.14-rc6 (2025-03-09 13:45:25 -1000)
 
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.14-rc6-smb3-client-fixes
+
+for you to fetch changes up to 605b249ea96770ac4fac4b8510a99e0f8442be5e:
+
+  smb: client: Fix match_session bug preventing session reuse
+(2025-03-13 08:41:28 -0500)
+
+----------------------------------------------------------------
+Six small SMB3 client fixes, all also for stable
+- four mount parm validation fixes for incorrect upper bounds checks
+- fix for guest mounts when null alt password specified
+- fix session reuse bug
+----------------------------------------------------------------
+Henrique Carvalho (1):
+      smb: client: Fix match_session bug preventing session reuse
+
+Murad Masimov (4):
+      cifs: Fix integer overflow while processing acregmax mount option
+      cifs: Fix integer overflow while processing acdirmax mount option
+      cifs: Fix integer overflow while processing actimeo mount option
+      cifs: Fix integer overflow while processing closetimeo mount option
+
+Paulo Alcantara (1):
+      smb: client: fix regression with guest option
+
+ fs/smb/client/connect.c    | 16 ++++++++++++----
+ fs/smb/client/fs_context.c | 18 +++++++++++-------
+ 2 files changed, 23 insertions(+), 11 deletions(-)
+
+
+--
+Thanks,
+
+Steve
