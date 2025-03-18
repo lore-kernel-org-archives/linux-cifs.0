@@ -1,75 +1,60 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3832557A;
-	Tue, 18 Mar 2025 12:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1101EB5FB
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Mar 2025 12:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742299965; cv=none; b=cgvP8oHT0P2xkqQWP7GaHs6MfD/u+9UOK1xsSLUbmGdvB1oW5Y9d7NhR2oERzXaFJELn223a9fAgiEEeclskG+MA3jxTYPlJChy8UHdlqdfEUsxR4kOfHqB+7vXza+nCYMG3Vp778upgicXq31R0Q0NrXWoL7qOGJbLZNKEvcIs=
+	t=1742301550; cv=none; b=GvPyci5sRW4qerofL5/GbNT1TyUaIPpGNscWHpmPrpUnH86SNZiOQ2OFNMmB7TaX8ByIjFVoEuaYs3O2r2GQLleW12mXhBWC58UhF1d7RUovY+joxzVN7R0HP27j4oTt5w46XyIgh1zC8hGI4EBQFzZcx81HENJDgjCu+TWSUOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742299965; c=relaxed/simple;
-	bh=P96dYxrdOi6sLWI/M0pPc1fvCQWlrcWsqKcgyWQxGRg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iIIXgtTxLJSfNwnL6aDdWgfPSTcwlzfgO7PgVzbnPJbRMCQImkyCkUwinKLZ7OEP9a3FuujS6ZPy9ZL+AMkFN8OKofA/DXLw7yfqEHHucaCp2g9rzAU2I4BaRchH73dWi1GsFUvPcBFO6AjWwrrkVSQnJ5ac6+vzTP30RYSMr8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlFRe3Wv; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1742301550; c=relaxed/simple;
+	bh=Gni/hKt5lciXvNIj7D4VVPKydaax3uss3boRxJ/zf3Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f8amGBtNDGC00/M5BBxSHI07NZy/VSSpTZg+7AQhdnq5wPI/1QuMuBYOltRBxn0Jc0mD+9eqUryoaGUzUaukRajc5OYYSiZZF5MreZOvR77vICuoqxfnOGOn7C/76YXogXU9R3oP3NUu+ByDm7tvFriZIb+5yLGVzVv43J+dITw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlFRe3Wv"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2232aead377so122698815ad.0;
-        Tue, 18 Mar 2025 05:12:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742299963; x=1742904763; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFyutyMdC6sV2hhLQ6sHtqvXjBCr0iPXqZL/990k/z0=;
-        b=OlFRe3WvliWkccYAsg/J+n2mAyQ+t0irzIRqHGXx0pB5PaPxllHBukEitlaXtYsU0z
-         LpMDP8k5kCqT4CoTfg4jo4m+bkluDgTWEzJd/Shr726SyNEzL/7uWLJ8cTtKP+4c7lNl
-         Qvg9TIBNOn8R20LzHrmMxJVHiE7NsuEpGTOTWcbxj3AGKJuDyO9BDd6+NbLnUEuDE1Du
-         u9qmR+2pFfnAHMjQTRYo7uqFXfqCj3zNPyn5UX/6snld3CjR3GRl+MF+R3roFA/Du5PU
-         jSJ1QB6s1w3cSR00ziPAFNDKwnPPy9gonTfLh7KEwJmGk1uyJUKWBH+7Bmbt+myUiS6M
-         S6hg==
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3014ae35534so4084231a91.0
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Mar 2025 05:39:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742299963; x=1742904763;
+        d=1e100.net; s=20230601; t=1742301544; x=1742906344;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PFyutyMdC6sV2hhLQ6sHtqvXjBCr0iPXqZL/990k/z0=;
-        b=j9041aARXxlmjl1nq5CU/gXhjH7wIymxAnnrKm8U3pcs62uHnGmCUmHEXhq7slUwGc
-         2whAT7KS9XJV0e/lBLlA5mYeltTs/bwq4bQd4Sn09lr8EkoWxhz78TbwsFQy7hMm8m/3
-         EuI92XgPtXM4WVEMtNcpFZZm04ZxIavI+wlF7YZDPrHj7No1wMBvk1HmXp5JJidGXwhd
-         zSZRxDAOGZqBTumvns6pnuazF/YfpYk8Chrpqp25/94K5kQNzEo1GwZoEjZRfrkqnyop
-         Rod8PfBLFBC+WTlTceGpbmTr4nFh1LzuKIKO+Ah64YtvY/zfjyHxn2ythS6UJSmWMXSu
-         uzfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6aGRiVCky5nYu/dm9m2kUIXeLNEyjbsMmOyGjQoRQi8rpEm7SDsk/ydSYaiBVKBuc0otzEd6QEz/l0q1q@vger.kernel.org, AJvYcCWL+IQ6W2YgYTuQ978PpuV+cCTQ+a2a6xk5/7QDLCn7DbVibxGONlfS8rfBxYqkUEp6uY3/QDNh7A/I@vger.kernel.org
-X-Gm-Message-State: AOJu0YzechC7S/jXUP2DkaHYIc4l2hw+oWDLYtJJYO7KrHbrkSPZk6dh
-	+Ya0bJBXm8daijpcLtya9VKtsDCsFdij6fD66kF+kHXGrSwIccstygVDfrfBZvQdeQ==
-X-Gm-Gg: ASbGncvAn0M/DXrAVrqDNtJPtBJ+A8WffIVaKX3nNoput9yvC7/FBlDgb9rd1nF1vq9
-	bW6sLbSKUcVtpHS8eGL06Subuo6g3A6leX28UMGZp34IOyL10/5vAz3Nb54k554XpJ3BLGV5r7f
-	aTiD7TXRW2aj9ZGQxPuONdNh7wA60M/AXVZUYn88bTzh1kPMmtr0ziAmGxmyJRQYoMFZpGog4U7
-	W2XHQqt1jU4y3xp7RVVwVn3imGuqXjDLcoqzVQuWwtjurL2fjpwbwlizqfnMUg+8g6NbBoKpOpw
-	QicIZXe2c39ic250djSHzHJCNtxjwCBbC+c7510p9HnOQyVakH9dXRYecFzgYKFsCfwug99G9LK
-	eUic=
-X-Google-Smtp-Source: AGHT+IGgqhbBR9wCLur+GWhSdtnwdp3KjOTmLXU1/0McQmanHfCXy1ef1xowuS/wNO0EodYogrhWdQ==
-X-Received: by 2002:a17:903:22c8:b0:223:6436:72bf with SMTP id d9443c01a7336-225e0b0dad5mr199529705ad.44.1742299963288;
-        Tue, 18 Mar 2025 05:12:43 -0700 (PDT)
-Received: from localhost.localdomain ([183.242.254.176])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-225c68aa616sm92804235ad.93.2025.03.18.05.12.39
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 18 Mar 2025 05:12:42 -0700 (PDT)
-From: Miaoqian Lin <linmq006@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linmq006@gmail.com
-Subject: [PATCH] ksmbd: use aead_request_free to match aead_request_alloc
-Date: Tue, 18 Mar 2025 20:12:34 +0800
-Message-Id: <20250318121234.7756-1-linmq006@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        bh=oR6QSPLvl59TRhxtq4yNj2/Mtu/ImuGqKKpmoVE6sAQ=;
+        b=BtHcUj8moOKeBGQQWAd1rRPcTbGkROpuIbvQD0hn3fk4BUCGsaIxXpER0DOM8ocE36
+         TA9m5Yl67ouZIHdnhxWyinRd9weBCLrwxmKpPMG4I9I+hCzvRqLnEcgrrjNw8qboP08S
+         M3n1rTfE+TVb13LnMfv8DJeldL31rc93YifLGHmbSLydDF4iX53G84BGoqCl1vA8lYoO
+         iiBWRe8so7+5K+B8fJqRmVRPQ55G+SIGu+fHHWlCd+YYQwZn4+U5KGlx8ShZYGv3rriZ
+         IUoqwfrrTEuRJnOR4Um9IhkQbYLsqD7bGxlPdlx/CDkWX2bB/qZJXeJcVghxrZKovEoQ
+         +1Qw==
+X-Gm-Message-State: AOJu0Yxe0aPdh2arzWJofWzHxrEmyEYOfluHsxFDjbUDHLDXb77KrBHq
+	4eVfASpd0IZuLOw3MH59VbAdvpABWUhID2pWn/P4gl8Yl0MmJ06H/ZL5kw==
+X-Gm-Gg: ASbGncuNH3h1aWX5XezFDXa3OWNGz2+0AEa94F7f6irMFLQYzKhJZTSvlardtGhv2vh
+	xObtpporHcDqmjhU/W0lHqhxYqCH2eeZD52lcKQHeGZEyRVAUl6W47Fn4TVfRdg2JL6Xo74kIQr
+	w8McQjK3f044na5WPShKzAsxHNOFJVtxOb55/t/RSYArwnMldgn6OA6lcOkCqQE4WhIvKKB3MAG
+	+JVtcU+3CDg2ryuY1aLZQF+WwUfV9XCqR2PoRhxkvL3o4Qb3QA7H6WcVM50RpgS//yJQr38oIBH
+	yLjjkVEp2MKuTFrk22rxIHW5tFuu/wBQdVdttIbrnfW63Vzs3JZkZcSNcgU=
+X-Google-Smtp-Source: AGHT+IHiilynJbHODHmOU0QqfzinEO2GdrCaNqULPU2J9dZDN9P2vGrw7REWyBmbD/Nx5fAWDl0Gfg==
+X-Received: by 2002:a17:90b:3b86:b0:2ff:52e1:c4b4 with SMTP id 98e67ed59e1d1-301a5bb0a9cmr2832273a91.32.1742301544515;
+        Tue, 18 Mar 2025 05:39:04 -0700 (PDT)
+Received: from localhost.localdomain ([1.227.206.162])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301539ed069sm8096279a91.17.2025.03.18.05.39.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 05:39:04 -0700 (PDT)
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	atteh.mailbox@gmail.com,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Kangjing Huang <huangkangjing@gmail.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH] Revert "ksmbd: fix missing RDMA-capable flag for IPoIB device in ksmbd_rdma_capable_netdev()"
+Date: Tue, 18 Mar 2025 21:38:26 +0900
+Message-Id: <20250318123826.5406-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,29 +63,80 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use aead_request_free() instead of kfree() to properly free memory
-allocated by aead_request_alloc(). This ensures sensitive crypto data
-is zeroed before being freed.
+This reverts commit ecce70cf17d91c3dd87a0c4ea00b2d1387729701.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+Revert the GUID trick code causing the layering violation.
+I will try to allow the users to turn RDMA-capable on/off via sysfs later
+
+Cc: Kangjing Huang <huangkangjing@gmail.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/smb/server/auth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/server/transport_rdma.c | 40 +++++++++-------------------------
+ 1 file changed, 10 insertions(+), 30 deletions(-)
 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 2a5b4a96bf99..00b31cf86462 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -1218,7 +1218,7 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- free_sg:
- 	kfree(sg);
- free_req:
--	kfree(req);
-+	aead_request_free(req);
- free_ctx:
- 	ksmbd_release_crypto_ctx(ctx);
- 	return rc;
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 1b9f3aee8b4b..9837a41641ce 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -2142,7 +2142,8 @@ static int smb_direct_ib_client_add(struct ib_device *ib_dev)
+ 	if (ib_dev->node_type != RDMA_NODE_IB_CA)
+ 		smb_direct_port = SMB_DIRECT_PORT_IWARP;
+ 
+-	if (!rdma_frwr_is_supported(&ib_dev->attrs))
++	if (!ib_dev->ops.get_netdev ||
++	    !rdma_frwr_is_supported(&ib_dev->attrs))
+ 		return 0;
+ 
+ 	smb_dev = kzalloc(sizeof(*smb_dev), KSMBD_DEFAULT_GFP);
+@@ -2242,38 +2243,17 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
+ 		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
+ 			struct net_device *ndev;
+ 
+-			if (smb_dev->ib_dev->ops.get_netdev) {
+-				ndev = smb_dev->ib_dev->ops.get_netdev(
+-					smb_dev->ib_dev, i + 1);
+-				if (!ndev)
+-					continue;
++			ndev = smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
++							       i + 1);
++			if (!ndev)
++				continue;
+ 
+-				if (ndev == netdev) {
+-					dev_put(ndev);
+-					rdma_capable = true;
+-					goto out;
+-				}
++			if (ndev == netdev) {
+ 				dev_put(ndev);
+-			/* if ib_dev does not implement ops.get_netdev
+-			 * check for matching infiniband GUID in hw_addr
+-			 */
+-			} else if (netdev->type == ARPHRD_INFINIBAND) {
+-				struct netdev_hw_addr *ha;
+-				union ib_gid gid;
+-				u32 port_num;
+-				int ret;
+-
+-				netdev_hw_addr_list_for_each(
+-					ha, &netdev->dev_addrs) {
+-					memcpy(&gid, ha->addr + 4, sizeof(gid));
+-					ret = ib_find_gid(smb_dev->ib_dev, &gid,
+-							  &port_num, NULL);
+-					if (!ret) {
+-						rdma_capable = true;
+-						goto out;
+-					}
+-				}
++				rdma_capable = true;
++				goto out;
+ 			}
++			dev_put(ndev);
+ 		}
+ 	}
+ out:
 -- 
-2.39.5 (Apple Git-154)
+2.25.1
 
