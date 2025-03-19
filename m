@@ -1,124 +1,83 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B68C154425;
-	Tue, 18 Mar 2025 19:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E6F224889;
+	Wed, 19 Mar 2025 01:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742325815; cv=none; b=BNUm+K4hUZCnAOpk2BiheSPjbvGWmxrTyJtOz825oo4vduJCqV29IUlOALxuOLEExdCadM8AvWIwwXDbf8phlvNsU72t+Uw7uQiRFGhoy9Nir+Xhzwah+TCE+1h+/kWZM4IiyhvmIKn0oO1uVcQjqKHiUgPYLMK1eer2Sn0s4uk=
+	t=1742347560; cv=none; b=L5s1haucyhd0eyZK+/xNRhzOkK6ehE0F6EbGRwQi3b7jxxiiuj3d3+0TxcMrVi3fPrDCq5W001uHlzWFEVW2nI++ODzJs1CKShi23K/0awRr44yNnvIV8S8Cdczku+F4Mb61x7wVpab0qTAQrCi1nO6WwHdAaIw4Os98MvApqSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742325815; c=relaxed/simple;
-	bh=vo+Y9M5fZCnxMX7PnQT+6Jbu3+t4H/gTD3k63zpjt9k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sluI0uedTlay6CcABqg5PW1zj7St678Ooirewtn3e7zjlXZOVZU3wLcOTrtOIlqmboFi/tZhz8c6BpZzKVLsibfoit+Op20QX9c2fFzfi0xL7Fx8dTd4ldIxYNxzTKq7M1VKrSojBp49qFJNpKM7/KlYEJadnpX+z1McVqKiJaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mOkPv1b6; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOkPv1b6"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-549b116321aso6588530e87.3;
-        Tue, 18 Mar 2025 12:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742325812; x=1742930612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HcAQOZqccXx0I77tL5o+cupSfQdFfy6XH0pXLyfYY9g=;
-        b=mOkPv1b6RAoMRpcrEtO3If7rlU763ppeciBnW2DzU88B6irJYVpTIFPmOupxvyE3bG
-         TtkR/8Hp/HKY0exnw5lKyAJq7/O26qQs/WHvj2rm1SWEwyLZvHThjWEVgsC5o+RQUvlF
-         iDpR3NOx0UPMq8bE66k07+mB2Ub03rWElsgOSIOmiYxo3rBR2N1pqT+rAyDUKXT95a1m
-         5bXY94cjKvlhycem0Ni73cycA8efixJFbjP8zWXw32g7QMPbV1EXepZVlcR8RPk9KOKR
-         cbgD9GZwbv6DazGVljSLVjpXCsaLNMMhbaPLUS2cZ0MlpSRUJx62yA/S7PLwpTo06Uvi
-         WbqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742325812; x=1742930612;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HcAQOZqccXx0I77tL5o+cupSfQdFfy6XH0pXLyfYY9g=;
-        b=ObJM7nLF/P6zLg/gyvh2MoW9LcKf9MdyALRmJElwkQfEk3uTB50gbqsZj5iT8wGMLn
-         8N6Ez7c2j6R05Yla1Cfwt7wDk28OQ5V6hLczvekr7UUVh0fMzMDiLH8gSporgGZgFLHq
-         WeOrDJV3xEmLZ1oaTnnCHVqwy2BTM2RkcUhxyPHq9xR+Nz8MKvQFHAhtM3sce5EWalhL
-         z/IIqt1GGa6PhmrrfAeUBGcDJVrfkTiHSx5KdEbSsXOsoa7VoelElIn3HpinJGpSZozz
-         k+sXeWWzNP5czaHbU1dXrXhqyPYru2FCwudCickJaOfcwk/Gy4qD1+2rXQpO8BOTi1x1
-         9f/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUmby7ONOvWPZsyOMwfzLJYZTbzL211iGYfzb22CPC1/egmFFY8M6bzn8A4r5RjZG8l08aEmNFDvorN@vger.kernel.org, AJvYcCXj6Pw+l0S45jQ3wjN2qIoEVrOB18ebEpsgO2junoAmxIFO8qznApB6uEmaDHQHnhOJ0Iu1wdIW90hmZxkx@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMXjh8Q50aiHG32Oid5ffTmVj4q7LlCuXjiWYB6e836yvOioTE
-	wywTteqLL0XOn+gc5k9ZmVtQKK/CYY4mBMmQEs0FZXYRPQYmJDMbqeLPEr6+2mv6avZOK4Ru9uK
-	qysFDiogcTmmUl8hCmHCIy/iCUlEf9w==
-X-Gm-Gg: ASbGncuPRXs+Yqz+xb/SfWVtSM137C32TScUyl8e6ogLOoammBbwmekP3bYZHweT+r0
-	L+ZLRmwpq03sSHObNCMe1kmS+hJjMd2lTFQq9C9m3dKgxwkgAiaH+4jpFHGxF3sjps3RVLxRhgq
-	5Z2t7lMyaPXDHthc2bccMhvyG/
-X-Google-Smtp-Source: AGHT+IFOLhiQE/d6AlA+tjXhw7+XvaECaCbQ38+34V9DySHBXKzREfXr6Z8MxgWAeMNTdvXYO64bPwLzVzp5ZXLuGv4=
-X-Received: by 2002:a05:6512:282c:b0:549:39ca:13fc with SMTP id
- 2adb3069b0e04-54ac9cc1605mr128555e87.49.1742325811315; Tue, 18 Mar 2025
- 12:23:31 -0700 (PDT)
+	s=arc-20240116; t=1742347560; c=relaxed/simple;
+	bh=mjS5cN+X81H4fXdsTkqyF7Mt+ArgyzY9HRm+gUADz7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=c/Uanv/840WAc3wLlZo799ABDHw00lxH9aq4FNEa+BxPZqfIyeLYBPhMq9rwGgMIcyROcxpcENDl73aCBXAFLXsQ5jG9Cuqd3p2nBtQ1up0wDMsIOisZUN5r/SRzOBi+vAI5Pu3hVvR3KRf2L/i0Byb98Mj+2t6z8IkbofceVvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZHWCD319mzvWqy;
+	Wed, 19 Mar 2025 09:22:00 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id EA6CC180116;
+	Wed, 19 Mar 2025 09:25:53 +0800 (CST)
+Received: from [10.174.178.209] (10.174.178.209) by
+ kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 19 Mar 2025 09:25:44 +0800
+Message-ID: <10823e8a-8569-80e9-cea0-d8d7ac32a54d@huawei.com>
+Date: Wed, 19 Mar 2025 09:25:43 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250310140458.249202-1-i.abramov@mt-integration.ru>
-In-Reply-To: <20250310140458.249202-1-i.abramov@mt-integration.ru>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 18 Mar 2025 14:23:19 -0500
-X-Gm-Features: AQ5f1JrmmOMudtqyljKZ_6xAXW64rX_tC4AA0k3-HNQfvMGj1Gew5-5Qs2LWUm0
-Message-ID: <CAH2r5msSqt7iJ9rCFDWZqTbG5o85nbM3Ucx73w-YwBLKbr4cXw@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: Remove redundant check in smb2_is_path_accessible()
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [BUG REPORT] cifs: Deadlock due to network reconnection during
+ file writing
+To: Greg KH <gregkh@linuxfoundation.org>
+CC: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>,
+	<stable@vger.kernel.org>, <linux-cifs@vger.kernel.org>, yangerkun
+	<yangerkun@huawei.com>, yi zhang <yi.zhang@huawei.com>, Paulo Alcantara
+	<pc@manguebit.com>
+References: <CAH2r5mv4N9zFOKTxwdvk6ahAyjgpYULQp8iw2NMu3eB6FEXh0A@mail.gmail.com>
+ <3bd10acc-2d7f-019a-3182-82ab647bc15a@huawei.com>
+ <3049256.1739192701@warthog.procyon.org.uk>
+ <785a8d03-3ee6-4eb1-e72f-db05fc4fb49c@huawei.com>
+ <ee68f83b-6bc1-7334-b7bf-19415ee7c453@huawei.com>
+ <2025031821-ominous-sappy-18ad@gregkh>
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+In-Reply-To: <2025031821-ominous-sappy-18ad@gregkh>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-merged both patches into cifs-2.6.git for-next pending additional testing
+Apologies for the earlier context-less ping 🙏. Here's the
+situation:
 
-On Mon, Mar 10, 2025 at 9:05=E2=80=AFAM Ivan Abramov
-<i.abramov@mt-integration.ru> wrote:
->
-> There is an unnecessary NULL check of cifs_sb in smb2_is_path_accessible(=
-),
-> since cifs_sb is dereferenced multiple times prior to it.
->
-> It seems that there is no need to introduce any NULL checks of cifs_sb,
-> since arguments of smb2_is_path_accessible() are assumed to be non-NULL.
->
-> Therefore, this redundant check can be removed.
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
-> ---
->  fs/smb/client/smb2ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 4dd11eafb69d..6958825431af 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -969,7 +969,7 @@ smb2_is_path_accessible(const unsigned int xid, struc=
-t cifs_tcon *tcon,
->                         if (islink)
->                                 rc =3D -EREMOTE;
->                 }
-> -               if (rc =3D=3D -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCA=
-LL) && cifs_sb &&
-> +               if (rc =3D=3D -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCA=
-LL) &&
->                     (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS))
->                         rc =3D -EOPNOTSUPP;
->                 goto out;
-> --
-> 2.39.5
->
->
+I have been tracking the latest progress on fixing an issue
+involving a deadlock in the CIFS write file process caused by
+a network interruption. This problem affects LTS Linux kernel
+versions 5.4.y through 6.6.y. The reason it is limited to LTS
+versions is that the issue was avoided in the mainline 6.9
+version due to the netns-based code restructuring in the CIFS.
+
+In my previous email, I provided the code call flow of the issue,
+as well as the invasive method to modify the kernel for reproduction.
+If there is anything else I can provide to help move this
+forward, please let me know.
+
+Thank you for your time and support!
+
+Best regards,
+Wang Zhaolong
 
 
---=20
-Thanks,
 
-Steve
+> On Tue, Mar 18, 2025 at 09:50:25PM +0800, Wang Zhaolong wrote:
+>> Friendly ping.
+> 
+> Empty pings with no context are not good :(
+
