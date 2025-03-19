@@ -1,132 +1,104 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFF61F4164;
-	Wed, 19 Mar 2025 19:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E25C1CEADB
+	for <linux-cifs@vger.kernel.org>; Wed, 19 Mar 2025 23:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742413057; cv=none; b=Ar8kgir24Qa+4zUkEwuDez95dBUKHuJSsHoBUp1BU4dtJiwHHz37Xp6Ppzqa+hnJ9BjdhMzBsZ+PrMTdV4glr4gnSm0nxIkMS1yljcdOvDPWR6GIUrWbtTIYGozT95cttiEt6w37Qlx1JXYHV2X4TozN9AoqQhtLcA5FMjmLMrU=
+	t=1742426405; cv=none; b=FR7NnzSHgyXjOVXs5iEwpnPxONtKlzoLGfrfbKs1dhQVnsFIE9l5lki2gGFDMNqdFxpVcP689JIXdQhAEeNZOvT5SWt/lL+KlmBkjoB+KeqLN7xlaS/tgKJQKaQvZvuAKYWqC0b/PX/AR3VAMigCB8SSpENoNF/EOda/3hZtVhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742413057; c=relaxed/simple;
-	bh=8nGPnTW1eyGh3a0wLALqR7KIKnLgAktSfc2CBz5uc1s=;
+	s=arc-20240116; t=1742426405; c=relaxed/simple;
+	bh=iMAeC1Z/yoz3OQeicjPl98bnXp2TlwyzfvzR/npQNxY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JaZw+8MNDUwc4AjudZiFTUtS9Sd4gtpkc0KqwpnBNyP2pchoLxAYRyJHwnKF1bxdR/2wnsv9OGrxpddQVN6Zytu8r9v4tK7FVjJN41YFaH/35304WXdRd0qRHQvetyLIcGopoPEFrqwEwpfAv/U9Guy77FEIcpPwdMMU828952c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e0UWZA1d; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=pcj58tgrTGS25Cp62VOsCq3ri7I0Xq0MMcXHh15xNBa9uxeuvtFUr8Fb170+Ws9PxSGwEF20AhcrLXPvjqNIplLiYQVW5c/LS1/4FfwGhAWaJUhHjIRGsgYaSbgDzDuNeF3nAPUtBIkTO2LM6aOWcQ+L9hC6S7GfavcurM1Wag8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwKFQajK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e0UWZA1d"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5499659e669so64286e87.3;
-        Wed, 19 Mar 2025 12:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742413051; x=1743017851; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WelDcJYWQaS3l09AcZuppDXU1WugmJGhAokrLxNPCgE=;
-        b=e0UWZA1d8LNPWOLyT6YxiDakkPn5gPKmws+gNGaufI2R9ln/BFLk8yY52Lm1xIS1PB
-         JcVt/8pr80xlY7Ey7qG0b1S/4FqUzcZs30pi+fP8Ns5379MbOTQFlTzVq/Tbt3sIJxby
-         ixxsGHHZeT9EDnMSqIg7GVIH8ATHRGRgbQvpiJzFn8R3HZcJIMLLS8/3zgLxflzRfjh7
-         Ya/Vl1fJSIaBulahFjEdwszRyC/aV13O2DME/Cq/72Wwx4HNEYp80vTGAJyUrFQUzMsH
-         LJuIg+2JQE0+4W+PMJkJzOnlYbrep3fHcxY00Ucm/hmjn71SuNFm76kn/fd4RVAY0IGy
-         IGtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742413051; x=1743017851;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WelDcJYWQaS3l09AcZuppDXU1WugmJGhAokrLxNPCgE=;
-        b=blt7UMFl2qEB26HL3UUcA2+5Xsi3UYe2yuYilu7xS2lIFs6n4ZH0Rdjr/+Nt3R8JfB
-         01Q83rjmo/L6bhFNzq/EYRG2gYdMGW+yyPXlWgB9RZ2vWphSXMPrOXs20QQuNyowUfRN
-         B7u9R7GQ9J+jj3g2LACRzUNIYcZux63XPeu6Lc9VpiMsA3JKSBAawzuB0CoNOHJCjg0z
-         7zG+w36IL0112R7mj9ME+Co7fnQQiPRRW0kw41W7JbNpru7SNlbzDz97NRgwZ9tzDv30
-         aNUBe8dUhVGNlrQwat3TkRsm3UNp+XkgtucEo45RbJZ0Qb2pa4zs95RV4s71uJCSJVR9
-         H1sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9/sIHxO4EwhoKjvYqhwDpBCQZhcX7a4Clrm78QSoVKsspWN01uVRqXo+LW1A/rHypQIhgW6Hs03M2@vger.kernel.org, AJvYcCXXbknY0lgkq2OINP3BRmPMmvvqXuhxL0nTE4uVKQ8AK1C0NvnC5HbDXeG2lX6qaVvJIWIw/DTvHBc0I6p6@vger.kernel.org
-X-Gm-Message-State: AOJu0YynarzBlz4H5ajBRrgEoeZ4DrfAcqkMZk6IpviIKGvDG9lUa7/1
-	wieXc17U07osSb58gZgs7vFwk80R7gpJ544Exx+7+Mr4b9bfrhejZShFAraY+3K8+a6P1yn6ypW
-	cnvUhW9jRmNHEPLSN04/6fRyQ6NY=
-X-Gm-Gg: ASbGncufOxwUPhI1UtVLsShF/q1GhKmdc/i8kYqtoyT+xnbMPvVG5pCjNIafciwIWpU
-	vTQC7Q8POzBDNDvV51neo6MQQWpzWiwYymipXY0BNoVMqCvtqlQDHnCbNiUYDz6GPQSmTd1o+6u
-	b9RNLh6rgkwNlM7v8dHG474+j+UkxzKlPfwbaIBQfo1HDCichO57pOO28fe3ns
-X-Google-Smtp-Source: AGHT+IHrvWI3UoKXZQQSRHhL+gWni4iREVrtOgZThxYJkYpKtEfFcO9VBstPjZnI4CM4VdBfLrcZazPcLCorx1NKX8A=
-X-Received: by 2002:a05:6512:398e:b0:549:38eb:d694 with SMTP id
- 2adb3069b0e04-54acb1d23fbmr1449998e87.26.1742413051160; Wed, 19 Mar 2025
- 12:37:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwKFQajK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DDC1C4CEE4
+	for <linux-cifs@vger.kernel.org>; Wed, 19 Mar 2025 23:20:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742426404;
+	bh=iMAeC1Z/yoz3OQeicjPl98bnXp2TlwyzfvzR/npQNxY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nwKFQajKk3Lf7YxjwSGsxo2uZdxYkOi+7xLEEvx774WCbRqcyvXinHuhstTSDRonN
+	 dHrEZs9WbLVUjN0MwRGmbOGvWNjKoAPfZnntZEDm4k9Z5/DtsVryJOxtWyaTVUJYrK
+	 0ldUTFPB37KQBZnIyaAEvoAqqg5Ox9hAmn8Eakmwmn7RjjdcLkQJD2cS0NIMUoVQmG
+	 ed+6Y9at/1oN9PWzb8pcz60OGiOPJuH0my5a1hU+LqIsI16npLojFKg++pbt6/iYaE
+	 Aqft+P8bAc24I/yez1w9abn3KkqTaBBDTXyyWrh+U9sVXW63l4HgXQrj3d8A0nmh64
+	 +ihJk6l6VB1tg==
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2a9ef75a20dso189666fac.2
+        for <linux-cifs@vger.kernel.org>; Wed, 19 Mar 2025 16:20:04 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyzbYRFIn4OYa3ioKw5QTORr1/GTS2FD2ydOkPIo26fUqaInbh0
+	piKYPi2fxSRqGJKtKklvAcPbSrrWfK3uvloHdkfuN0z+HyWl+8EO7DzN8daKE3Yd/4N4mMA5tx+
+	TwFXO8O3ySP3VfKEo7A0nzEDP2Hc=
+X-Google-Smtp-Source: AGHT+IGdafFHrQBxEmYgI8EPxM99Rk2OkPMWgu4N1aAznOY04k/U87dBVYPPDb01+i2XJVaMK5ieJlNIi/1L9sUMQzI=
+X-Received: by 2002:a05:6870:d8c9:b0:2c2:37d2:c1d1 with SMTP id
+ 586e51a60fabf-2c7456fe684mr3542962fac.26.1742426403856; Wed, 19 Mar 2025
+ 16:20:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319142858.2166-1-adiupina@astralinux.ru>
-In-Reply-To: <20250319142858.2166-1-adiupina@astralinux.ru>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 19 Mar 2025 14:37:19 -0500
-X-Gm-Features: AQ5f1JrgLUDmVpAP0c4ldz7sUhuXdXJkM2JqC2VPQQoZqLCK0Q3aELpbc3alokw
-Message-ID: <CAH2r5mukVacAnksOjDE7k4UOSwzkkkA4PXEaKZAzZcFz78YBgQ@mail.gmail.com>
-Subject: Re: [PATCH v2] cifs: avoid NULL pointer dereference in dbg call
-To: Alexandra Diupina <adiupina@astralinux.ru>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Pavel Shilovsky <pshilov@microsoft.com>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org, =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>
+References: <20250318123826.5406-1-linkinjeon@kernel.org> <20250319091723.GI1322339@unreal>
+In-Reply-To: <20250319091723.GI1322339@unreal>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 20 Mar 2025 08:19:52 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_B08gXyUe1XG1+TwAAAUhCeYnrEkcu51Q-TWX7t7iYbg@mail.gmail.com>
+X-Gm-Features: AQ5f1JqNeW6BvPDk6bQkLafk4rH0R45kPBsj68rHKz8eDxRzbugWew4rEvmn9qw
+Message-ID: <CAKYAXd_B08gXyUe1XG1+TwAAAUhCeYnrEkcu51Q-TWX7t7iYbg@mail.gmail.com>
+Subject: Re: [PATCH] Revert "ksmbd: fix missing RDMA-capable flag for IPoIB
+ device in ksmbd_rdma_capable_netdev()"
+To: Leon Romanovsky <leon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
+	tom@talpey.com, atteh.mailbox@gmail.com, 
+	Kangjing Huang <huangkangjing@gmail.com>, Steve French <stfrench@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Added to cifs-2.6.git for-next
+On Wed, Mar 19, 2025 at 6:17=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> On Tue, Mar 18, 2025 at 09:38:26PM +0900, Namjae Jeon wrote:
+> > This reverts commit ecce70cf17d91c3dd87a0c4ea00b2d1387729701.
+> >
+> > Revert the GUID trick code causing the layering violation.
+> > I will try to allow the users to turn RDMA-capable on/off via sysfs lat=
+er
+> >
+> > Cc: Kangjing Huang <huangkangjing@gmail.com>
+> > Cc: Leon Romanovsky <leon@kernel.org>
+> > Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> > Signed-off-by: Steve French <stfrench@microsoft.com>
+> > ---
+> >  fs/smb/server/transport_rdma.c | 40 +++++++++-------------------------
+> >  1 file changed, 10 insertions(+), 30 deletions(-)
+> >
+> > diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_r=
+dma.c
+> > index 1b9f3aee8b4b..9837a41641ce 100644
+> > --- a/fs/smb/server/transport_rdma.c
+> > +++ b/fs/smb/server/transport_rdma.c
+> > @@ -2142,7 +2142,8 @@ static int smb_direct_ib_client_add(struct ib_dev=
+ice *ib_dev)
+> >       if (ib_dev->node_type !=3D RDMA_NODE_IB_CA)
+> >               smb_direct_port =3D SMB_DIRECT_PORT_IWARP;
+> >
+> > -     if (!rdma_frwr_is_supported(&ib_dev->attrs))
+> > +     if (!ib_dev->ops.get_netdev ||
+> > +         !rdma_frwr_is_supported(&ib_dev->attrs))
+>
+> <...>
+>
+> > +                     ndev =3D smb_dev->ib_dev->ops.get_netdev(smb_dev-=
+>ib_dev,
+> > +                                                            i + 1);
+>
+> Can you please use ib_device_get_netdev()?
+> ULPs are not supposed to call to ops.* directly.
+Okay, I will do that in another patch.
 
-On Wed, Mar 19, 2025 at 10:00=E2=80=AFAM Alexandra Diupina
-<adiupina@astralinux.ru> wrote:
+Thanks!
 >
-> cifs_server_dbg() implies server to be non-NULL so
-> move call under condition to avoid NULL pointer dereference.
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Fixes: e79b0332ae06 ("cifs: ignore cached share root handle closing error=
-s")
-> Signed-off-by: Alexandra Diupina <adiupina@astralinux.ru>
-> ---
-> v2: fix indentation
->  fs/smb/client/smb2misc.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-> index f3c4b70b77b9..c02aab58aade 100644
-> --- a/fs/smb/client/smb2misc.c
-> +++ b/fs/smb/client/smb2misc.c
-> @@ -816,11 +816,12 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon,=
- __u64 persistent_fid,
->                 WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative"=
-);
->                 spin_unlock(&cifs_tcp_ses_lock);
->
-> -               if (tcon->ses)
-> +               if (tcon->ses) {
->                         server =3D tcon->ses->server;
-> -
-> -               cifs_server_dbg(FYI, "tid=3D0x%x: tcon is closing, skippi=
-ng async close retry of fid %llu %llu\n",
-> -                               tcon->tid, persistent_fid, volatile_fid);
-> +                       cifs_server_dbg(FYI,
-> +                                       "tid=3D0x%x: tcon is closing, ski=
-pping async close retry of fid %llu %llu\n",
-> +                                       tcon->tid, persistent_fid, volati=
-le_fid);
-> +               }
->
->                 return 0;
->         }
-> --
-> 2.30.2
->
->
-
-
---=20
-Thanks,
-
-Steve
+> Thanks
