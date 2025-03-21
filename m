@@ -1,99 +1,89 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E981C174A;
-	Fri, 21 Mar 2025 04:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5271DE3CE
+	for <linux-cifs@vger.kernel.org>; Fri, 21 Mar 2025 10:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742532093; cv=none; b=nA74ITXiq2V+QuTpMCgrAinbucPgztGJzFhqEUHvIx9olaX2C9GO7EIcZlVZsILzVnNcyCqvpT8jP7YgxZIJiaYCvvYfLBBv8Tmqr3pnkpFPp0QmMJEqG6GZHqb3ks1tX5xiCWdG20MigGTxS+CVbO++da5kz5qFj12aXEIhBUY=
+	t=1742554332; cv=none; b=JurWdbWxW8QXyAsDqC4QW8GZef5MLskhCXj8rH6KGjvaLA0EjER+oSgWCqdQfDnK2P/8m+aGKwUOYU9bVMqqDdnaa2uvivngK1r9S+brY+q5N4I2zDtXruW3XqTyreTn1u+j15LSeK5SU6KfifMku/btdOue+wFWUcCJ+xA5dmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742532093; c=relaxed/simple;
-	bh=uGtyiqghnrPms/N1mxbBz8P8rp+aDTg9BWgFvMy4J2o=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=fV5U0DuugpsifXCm2LkiCW/LwzHlMZKq2mk2ngAiveXpJnjmnz6FHGFDyRN+heXhwhKTVNP2QGHW8OOaxn38eYQd4ZG84+JhUrSJRQPJDW7onOQOdVYvBTvtL2/LkTLQ0LoBiVE9C6hJIfoznAUxLQLyY+40v63dZ9ytyf949Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mBjERpOj; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742554332; c=relaxed/simple;
+	bh=N6zGvO285Ry6IhtrENtoLjB46GkvUMuVsQ6GZ6SUCDc=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gFSKO63ivOD6AA8y0o0k2fZJrGzAVWL/0fafBA7rbVVc8rCbp8G3wF1ql8NJ8RFsLV/PjFKmGrYK/I0i5A19Sp7DkLeJv7mom5Xk1KQx8sOaZgx8CPdxyd1cBKTuWvl+btGWCMjF2vC9DPrbTYRN3tfd9gq56iLAk262Kw7Don8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S+z/O0Fz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBjERpOj"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-549644ae382so2013483e87.1;
-        Thu, 20 Mar 2025 21:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742532085; x=1743136885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dqqlOuwgDqZzp9bz5GBCwhxF+fXIVL65riJZdwC7+6Y=;
-        b=mBjERpOjRWj4LJJCRTCOLKABkUIcaYP8VT+jTmXvsQ4lFm92ikYqTmSZI4z0CPA5yg
-         5VuDovKz0fesFrdXoDuSPFvte65Ta6sFGNFmMPYJCvlNJV7cNQb59HFrGo7O8Vsy4d7a
-         304FJJGR1tEJ67k/y/MSB0JtFug7NURsTOkK4Qw+VGYuAXQ1ZYvyCVn96WM9c4y2nCbP
-         LngcyWKKXBVq6xNVKvwcOqKp/W2dQoyqQwiuVhLlI+VUb0KE3gGLmFsVDhyn3Xnp9J9y
-         EjtNNljRC2suE1IQzO++q5GJgfq0CqNgrq8+gNxB/C5YcRdcgLewPleaMNk86O1l9G9R
-         OCFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742532085; x=1743136885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dqqlOuwgDqZzp9bz5GBCwhxF+fXIVL65riJZdwC7+6Y=;
-        b=qGwsE7pAcmLhu/UHey69HU0CGE0LHRa4SkGupdmWX1fO+AnJs4OjTH6WB4Oz0JWkrS
-         sWocMW+RYr0tA/UwwwbbCEMQYm2VmglOB4WX6/H4rfODhnSB14IGf0nBuSXKFGKsMMvh
-         G2Fy/yzD0P6GbVOrEX8Ki6b/VDtHFTupF46NAgS4gOHgzuxcrPrwadbMJgK2AAJPTwwg
-         WKs4eN3y5fKHtza+7cpD5cpf6LuWCZG2rNP7fsJBDLn090PMIiIteCV56eVSoBtxLMTd
-         r5b/w7BzWMX3mA9g3eUlLZ0XJp15D4SLsxFh4xVFY1IHJGiIacUFCuQk7zHsbNbTemT2
-         wmnA==
-X-Forwarded-Encrypted: i=1; AJvYcCWym+xjH7X57j1jbp1m7DobkAJeAUIYDiRpQKp4vHXZktqlXniE0WTr9a7BhgindNljnyigMFTpyr1Ckr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+dOWUwiaIMtDh7iY/ABmksMhc6/ScskOVQw+D6wfLtqlqrPnj
-	og2WcxAa5xZbNJftsY8Y7t3/OYIG6mkyHJWt2PoDrLx8bOR4KdNEWx605dpjZJuERs1HWuYkgAx
-	O3XyY6UR0eauoMc+beH0SI6SwQzzhh7rt
-X-Gm-Gg: ASbGnct2mGA/dfuZcpqzvWsZnXVqjsXZg+umCT4VXIZe/CtpEGc2Rls4j/aOKyn2lDE
-	bG6hEfIGc2hsjpsn+ium+kncNaEk1+BXJv033l/QoYhymeYDDqSLg1eFfy7csyTAvbv5mkmWMF4
-	8899Jjyj442URdvEZzDj4siwenZdlL66q9yzkqHZHhwZamNByeWD9FuJpSpMpf
-X-Google-Smtp-Source: AGHT+IH9Ctb8My0VZ3PKZcoJ3VCVnG95JCkGLLFwePI/PfbhY9yjdHxpreHd3SgkxzXTJUzjVG0OiwqWXBgVO3Q+odA=
-X-Received: by 2002:a05:6512:12cb:b0:54a:c4af:29 with SMTP id
- 2adb3069b0e04-54ad650348fmr674536e87.52.1742532085157; Thu, 20 Mar 2025
- 21:41:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+z/O0Fz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742554330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YdJsWvkJ3MvzPNK+Go2GX30hr/P60L3wxiP8eJjc2BY=;
+	b=S+z/O0FzrNSxyE6T1dobsfxqtfMTuVXk738SDawndjti7QOrIHVBNfqFOFIjcRIrXvvloa
+	6B9gFCWaWDATTZ9rKEzFZwKVf0wEUjiSlbedOtEuQEnnOlS0y69Ocb0oRpwdgfytmf5PAu
+	3wSZ4xyfaahRQJRA/AKumzp/USDtJds=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-Vs1aic-fNT-7jEREYUKmPw-1; Fri,
+ 21 Mar 2025 06:52:08 -0400
+X-MC-Unique: Vs1aic-fNT-7jEREYUKmPw-1
+X-Mimecast-MFC-AGG-ID: Vs1aic-fNT-7jEREYUKmPw_1742554327
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EEE91800361;
+	Fri, 21 Mar 2025 10:52:07 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A00C1180175B;
+	Fri, 21 Mar 2025 10:52:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAH2r5muHk=mUQo_SPk3DdzC7=0VCNiS3fDtotHxYUkT746RP=w@mail.gmail.com>
+References: <CAH2r5muHk=mUQo_SPk3DdzC7=0VCNiS3fDtotHxYUkT746RP=w@mail.gmail.com>
+To: Steve French <smfrench@gmail.com>
+Cc: dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: xfstest results
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 20 Mar 2025 23:41:13 -0500
-X-Gm-Features: AQ5f1JoP4_OIOZBwzf7C-v4c73Qz62SPygr11gWZ1F6iL8usKWg0jUqOex5kbJU
-Message-ID: <CAH2r5ms4nV+_+L_o8rhiAMhkF4u+SEThEQn5yfDn2fiLvXc_5w@mail.gmail.com>
-Subject: [ANNOUNCE] cifs-utils release 7.3
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, Pavel Shilovsky <piastryyy@gmail.com>, 
-	=?UTF-8?Q?Pavel_Filipensk=C3=BD?= <pfilipensky@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3211935.1742554325.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Mar 2025 10:52:05 +0000
+Message-ID: <3211936.1742554325@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-A new update, version 7.3, of cifs-utils has been released today.
-Users of cifs-utils version 7.2 are encouraged to update to 7.3
-since it includes a fix for a problem with "guest" mounts that
-was introduced by cifs-utils version 7.2
+Steve French <smfrench@gmail.com> wrote:
 
-Links:
+> But with all six current netfs patches (including the two additional bel=
+ow):
+> 68109110fec1 netfs: Fix wait/wake to be consistent about the waitqueue u=
+sed
+> 4f8443992c8c netfs: Fix the request's work item to not require a ref
+> =
 
-webpage: https://wiki.samba.org/index.php/LinuxCIFS_utils
-tarball: https://download.samba.org/pub/linux-cifs/cifs-utils/
-git: git://git.samba.org/cifs-utils.git
-gitweb: http://git.samba.org/?p=3Dcifs-utils.git;a=3Dsummary
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders=
+/5/builds/404
 
+The server is currently inaccessible.
 
-Detailed list of changes since version 7.1 was released
+> I see a hang early on e.g. in cifs/100 then in cifs/103 (and all
+> following cifs/105 generic/001 etc).  I don't see anything useful in
+> /var/log/messages
 
-Meetakshi Setiya (1):
-      Fix regression in mount.cifs with guest mount option
+Can you find out where it's hanging?
 
-Pavel Filipensk=C3=BD (2):
-      cldap_ping: Fix socket fd leak
-      resolve_host.c: Initialize site_name
+David
 
-Pavel Shilovsky (1):
-      cifs-utils: bump version to 7.3
---=20
-Thanks,
-
-Steve
