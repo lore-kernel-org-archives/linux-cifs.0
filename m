@@ -1,131 +1,121 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDFE26159A
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Mar 2025 17:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD16A1EE7C4;
+	Mon, 24 Mar 2025 21:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742836681; cv=none; b=d27MLg+qDwyZCRsIqpcb7W8NXIKXiI0BIR2V377vPUS26ZMJoX1OBJgBng/Q0Ttm62eCDdNd/WG3lYaaRDHVK06XgNS2yh21Zf6QOCWUs317SJJ2U7m45f5+fmxoIAjQfMT/09REY9KXJja7n438yf0k455QwvaZJndnVp1WiaY=
+	t=1742850472; cv=none; b=HxXgSuFjXXSXAu/1D5FENNK5+FeSwuZ3/GWqDdPfewz0Evm+PDyDVj/vDqnCODH7CXcJ+F41t2tEO2x0Zf+WqpV9v1BvHWmNYPfwcTf7/e8/0FIZfZt7rDRg1j9jvV45fnvJOU2cX252bG/DJUaN30xmR7RjsV8kMYJ3BNYxyWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742836681; c=relaxed/simple;
-	bh=xsyOfn5fKLq83W1krCJEz0KehmW3XdTh686BnGCbRmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r6XQL3Qsrpkn/lfWME5b3dfHFzAZ0M/69JM9cx4DK9/DhHwZpJPMokxZiOjgreIABxuHDc9hwHa0lNMVvkqo2AODjAXd9+hSLKxfmifydC/F1okiZqHQ9+B6RNvFIBeMejQqMN49+ajt4/13tpK9PeQMvSnxLY+ILBRnMDft8os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZL73dLE; arc=none smtp.client-ip=209.85.167.53
+	s=arc-20240116; t=1742850472; c=relaxed/simple;
+	bh=37sGBhOsw4bP+v4LQYWRdTvRompqepkc1tQkVxa12XE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PvS4+pOtEtoT0OMKXLb8jLlFFidokgIzAMEt8xMocTO2+RU047ejeDXP1zGnmVEeIO3zNFbwHfoK9q9xviEw2pgFl0a8L3x+ba85rFz5GWrsZtNtoMdNpCVY1g3UAFEfzkgDvzyrpIe6jH1W8GjixCRP70NGc/9EaOo/cYixyCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXz47oRP; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZL73dLE"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-549946c5346so5049802e87.2
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Mar 2025 10:17:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXz47oRP"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-399676b7c41so2593395f8f.3;
+        Mon, 24 Mar 2025 14:07:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742836678; x=1743441478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1742850469; x=1743455269; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fN67jBvQkzxhyXu8jXo1NKowdZorK6/Q6OUt2cD0LEQ=;
-        b=fZL73dLEgDpD9z1Jq2w5hO1akWeOL2nPyX6Ah9M7j8MZmQiptZo0dFbQIQZyS2Bcir
-         rjVRk+8gCp3bJ7AvI4zXDsYPt1Vcuj+erCmVpgLBg2OhEnNQ49kMw8lLv/3qPwGHf0pX
-         FvVRsAkChqQpgahuRyA74m2Kel3ENdbiFbB6WwGlt6+FN5OtXql3PdXcfzK7nPiFyJqk
-         GK+zOmrnfu8dGGTge0m0W+NB96j/DMDUIp0jLzL4coR4y/mCWUh6YYQTSeuJljrFRQGf
-         DVQb8h5r0bTBsPzvrkO0LoEOxSqweyk0X063JSb87XUpMKTzenF9LOU3axmKzTVFqkpP
-         PzUQ==
+        bh=bNLMtPGszyEgjRV8zOXLE9UQ5Tf8yvUAMYZZzFa01jo=;
+        b=EXz47oRPBCYRHcNAz/tD1mclTFqFQJiSPidkK4FHbo1P7zPey7LsPf0HGCQq5mxVav
+         S2xiiF+yMuE8rijjjzmD3TR+E0+tHgXDtTf5geOLT3PdBd4HCy6W6ulO3kqklfuLjMTo
+         hElWbeqB81rJGKmsyKZRCEe/JkzXU85ao99fGj+RRazleTJeNWyEeEMOnA2T0+rov+9x
+         LEOEtuDnjPYXXbrbjs1Jahlgv8GW4mPF1qPfxn06U9mLtSug4P4EE00gGFcKhosScvrQ
+         hDlHnp46elFxJiG1YQW0UZg11B5/Up2bZSl/cRD/1WsCn+sd9Iy/3mI50G81UelZmb40
+         5Jeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742836678; x=1743441478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1742850469; x=1743455269;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fN67jBvQkzxhyXu8jXo1NKowdZorK6/Q6OUt2cD0LEQ=;
-        b=FEup9QHGgsnM8YxPY0yN5hhV6ojoSXoa11+g6awj4pfGbloPhMPh1kElKPw8Cp/neq
-         EIr3liN4NW+5C9eCQlOP+eCxGKnmP7o6wqB2KNgFcO/JXmxRNKBkF1lgDH8P4rV+Gf8H
-         UeoaFisvMl7sOFad8EWIWmkCT7pw/0eCRxZrxJUK+gErUhIY+VBD23f4CeQ04xVlhzNn
-         Ay35xJTBKFKGATw+RsGuL6UcDIPH60MkUkVDsljxj5RkobdV19EPkRpTsg0JnSt0ifpG
-         iEkQLJasbWBN56AjxSrKUEmnehctlX/r3D4XYtGWxMdtntKYrXi7f8vkTLSKUGHpsDEB
-         zD3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqLfrnNgIbbUVk6YD/bNOp530kNo344yedj/XVFgKXfGBHLOZnlBnMPJcbgD+ZnS/V1DfGwqbwuHpy@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOMlmjtfak1g6bmW5HrtbwhaMq7LWKQW+4739BbDVMfqHF3wwO
-	m/R3zUmFFlnal59jpf10i/XGoiz5cz2gn8hGYTnDkKqkHTmlVeuW0zOWqkmeSjHF/GHbCnulz4d
-	NL2OSq+n1WF+L0LiogHC4W1oipcK+W0XY
-X-Gm-Gg: ASbGncuuIDujEgZxipY5QNIe8PbF8F9gl46+704gnjWkJUcYRgkfD48hARkoOrq/Y7b
-	MY4/qumjPtpxETHcbsd4mZOS6gy3gBicY2P0nNkvbegyN4Mvu5LYADzuaPZBbapn2Y5cDUu2Mej
-	WshsDXcdhRgI0rr/fI5Hb8Ur6X8gt6h3+YUdrvC7xLZ5WgQtooO42TCw7aVLoh
-X-Google-Smtp-Source: AGHT+IGJnoo0qbgiuvWSiwGtmvdKRogM434kGUsu77rjwQuvERPOPKKE8aSa/1qoOAMBl0T/KIlPAdGfhl6H75qDypU=
-X-Received: by 2002:a05:6512:2216:b0:549:39ca:13fc with SMTP id
- 2adb3069b0e04-54ad650bb80mr5804562e87.49.1742836677643; Mon, 24 Mar 2025
- 10:17:57 -0700 (PDT)
+        bh=bNLMtPGszyEgjRV8zOXLE9UQ5Tf8yvUAMYZZzFa01jo=;
+        b=XNcUaMPdZH0B9PJnuJ6fmgRiIecYn67hwwNckPag1Y7W6tN1TQmVRL0K7Ai9lXfIBC
+         kAaWSu5pLSz11v5iTPHy3qQKEd+23dcKt177fZ9OymGd6YKB8qLEHzla066Q3D2GfBgB
+         WYRGAKm5i5CDGFNdIZmmb/LB9QIHoAklK1AZKMp/KTvbSDRW1apDIT8dFXvV/epVU2LZ
+         soqtfXhK/xNiM3Eh0c2bMXgPsQSt2DNmBHwrMWsN6P3Gb0L7KI5mkd8EtymvPLwQarTa
+         w+FkTt/ic0syyrVsDskN2vLBrAGYxcsqWVcibYgf4fhglEKmaAsqsEZOba+ZB9p4tsVH
+         bjAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUiU30xH9yPIHV3mMrJnraVr6AKWSyHGtEYkcN/i/PyEPt846siCOSqU7AK04x2x3dnGN966Jqu28TEpJGd@vger.kernel.org, AJvYcCWcvR40YwrmPQ4pxXzLZHzEhsoZJCREF1Le/oEiypx6CZHsDZojecXH1wHl4Vlv7QiCZsuYEDbHytuZ@vger.kernel.org, AJvYcCXvPckH/c1zw7RPo/CBKfwth4DC6uOSUZ1M78griasaN5qoXHfYXt1Yj9cB7OSm0Pbzo/J3LONp@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGpWH6Hh8BvHjRpD9DIZbuSvlJOU0HBha7CnK5JEq4JXsR3871
+	wVYLsNEscFHAF5mekS90eXF1vp9sReBzJ6Fe5yuAFnBjk6SAIB/0
+X-Gm-Gg: ASbGnctlOPp3qkhPCZFiu4IrNI60c0EnJOvjYXbglskCiWhItcyReGKO5akIPyonG3G
+	fnDy6/0f7oI/L2cS1VyJ0TtOGoz4mW+duH4ci339m0xMhNtnELHnMCoGgWlTRAj5I+ssyutA4/H
+	QCmGONOuJLQSWvzO9PNjNu0//8xx1iDDmoskghSTnUcNmINeqnoKLu2rpXvQ6QixxNeM75n6tOz
+	qR1GkFUjy0zpISP9GFCayO3Kk7J/o3Y7L8kj65lXlLl0dgIkySi/XB1bXEbC70IKgC/ehiOeBXM
+	2sBfdwI8xv1Eg2k7pf5IOG1C4aitXudoZS2dybEi0KEvqviqPgLfobD8yWkwfOW2FySSNo8Xiyi
+	kSv1fSLSspJab6YHl0Q==
+X-Google-Smtp-Source: AGHT+IGT4BKuV7YDOj2O5u8BDxdWnIdabnTB3Mg4ZWsHzsCa72YOZvcYauJbOI4f+AlFZJRYw41viw==
+X-Received: by 2002:a05:6000:156f:b0:391:ffc:2413 with SMTP id ffacd0b85a97d-3997f92d5ccmr16502719f8f.40.1742850468674;
+        Mon, 24 Mar 2025 14:07:48 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9eff9asm12152488f8f.92.2025.03.24.14.07.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 14:07:48 -0700 (PDT)
+Date: Mon, 24 Mar 2025 21:07:47 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: chenxiaosong@chenxiaosong.com
+Cc: linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
+ tom@talpey.com, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>, netdev@vger.kernel.org
+Subject: Re: [PATCH] smb/server: use sock_create_kern() in create_socket()
+Message-ID: <20250324210747.3dc899b9@pumpkin>
+In-Reply-To: <20250324065155.665290-1-chenxiaosong@chenxiaosong.com>
+References: <20250324065155.665290-1-chenxiaosong@chenxiaosong.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2bdf635d3ebd000480226ee8568c32fb@manguebit.com>
- <20250212220743.a22f3mizkdcf53vv@pali> <92b554876923f730500a4dc734ef8e77@manguebit.com>
- <20250213184155.sqdkac7spzm437ei@pali> <CAH2r5ms5TMGrnFzb7o=cZ6h4savN2g1ru=wBfJyBHfjEDVuyEA@mail.gmail.com>
- <20250323103647.rsex63eilfdziqaj@pali> <02d5d5dccd2fa592baa2d16020d049cd@manguebit.com>
- <20250324082310.fbvnxo6cmuwv2clx@pali> <CAH2r5mvaM1y3xEL+yiFDMHRVZg2j48hwVaQa+BL8f+23Y7VwrQ@mail.gmail.com>
- <20250324170736.zcqqv3rv7ycjr4da@pali>
-In-Reply-To: <20250324170736.zcqqv3rv7ycjr4da@pali>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 24 Mar 2025 12:17:48 -0500
-X-Gm-Features: AQ5f1JrGuirHG5Hxk4G6ZwClzC7K6_Vn4RXu5FvXjUaRNV1L_bdUNHh9FHgbGPU
-Message-ID: <CAH2r5mvjL3-PqGqxbXrBKyR4DP++=2KjYj6Z-e5AqXNyB-yMog@mail.gmail.com>
-Subject: Re: Regression with getcifsacl(1) in v6.14-rc1
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> I just wanted to be sure that we have not forgot for something
+On Mon, 24 Mar 2025 06:51:55 +0000
+chenxiaosong@chenxiaosong.com wrote:
 
-On that subject, given the business of the week (LSF/MM/Storage
-summit) and merge window opening up, it is very possible we could miss
-patches (and over 40 of yours to still rereview as well, and decide
-what is safest to cherrypick of those) - so let me know if I have
-missed critical patches.   There are some very urgent ones (e.g.
-finding out why multichannel to ksmbd broke just before 6.13 kernel
-came out) and the directory lease fixes (and perf improvements)
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> 
+> The socket resides in kernel space, so use sock_create_kern()
+> instead of sock_create().
 
-On Mon, Mar 24, 2025 at 12:07=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> =
-wrote:
->
-> On Monday 24 March 2025 10:33:06 Steve French wrote:
-> > On Mon, Mar 24, 2025 at 3:23=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.or=
-g> wrote:
-> > >
-> > > On Sunday 23 March 2025 21:36:56 Paulo Alcantara wrote:
-> > > > Pali Roh=C3=A1r <pali@kernel.org> writes:
-> > > >
-> > > > > Hello, I would like to ask, how you handled this regression? Have=
- you
-> > > > > taken this my fix to address it? Or is it going to be addresses i=
-n other
-> > > > > way?
-> > > >
-> > > > It's already fixed in cifs-utils-7.2 by commit 8b4b6e459d2a
-> > > > ("getcifsacl: fix return code check for getting full ACL").
-> > >
-> > > Ok, and into kernel is not going to be addressed that regression for
-> > > older cifs-utils?
-> >
-> > I thought we had decided that it was risky to intentionally return the
-> > wrong return code to
-> > userspace, to workaround an app bug (especially since it is easier to u=
-pdate
-> > cifs-utils than update the kernel, and also since cifs-utils update to
-> > 7.3 is strongly
-> > encouraged for users due to multiple security issues fixed)
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
-> Ok, fine. I just wanted to be sure that we have not forgot for something.
+As in the other patches you need to worry about whether the socket
+holds a reference to the network namespace.
 
+	David
 
+> 
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> ---
+>  fs/smb/server/transport_tcp.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+> index 7f38a3c3f5bd..e5f46a91c3fc 100644
+> --- a/fs/smb/server/transport_tcp.c
+> +++ b/fs/smb/server/transport_tcp.c
+> @@ -429,12 +429,13 @@ static int create_socket(struct interface *iface)
+>  	struct socket *ksmbd_socket;
+>  	bool ipv4 = false;
+>  
+> -	ret = sock_create(PF_INET6, SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
+> +	ret = sock_create_kern(current->nsproxy->net_ns, PF_INET6, SOCK_STREAM,
+> +			       IPPROTO_TCP, &ksmbd_socket);
+>  	if (ret) {
+>  		if (ret != -EAFNOSUPPORT)
+>  			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
+> -		ret = sock_create(PF_INET, SOCK_STREAM, IPPROTO_TCP,
+> -				  &ksmbd_socket);
+> +		ret = sock_create_kern(current->nsproxy->net_ns, PF_INET,
+> +				       SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
+>  		if (ret) {
+>  			pr_err("Can't create socket for ipv4: %d\n", ret);
+>  			goto out_clear;
 
---=20
-Thanks,
-
-Steve
