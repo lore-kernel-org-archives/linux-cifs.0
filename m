@@ -1,38 +1,43 @@
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077B91DF975;
-	Mon, 24 Mar 2025 06:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8229224F599;
+	Mon, 24 Mar 2025 07:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742799321; cv=none; b=HbQPBppFW5wDjj2/pNeQqTU9h+yK4Tua1mmR+K4uLXhbkej0w0AZ5KW+K5VRQP3FYkz0AjOg6FFFSyzrIe9x8/YV5guoFfBvW8ijuAVPfTbM2rL9wlB/BIF2lerT9kT5iykEqZsjf+M9h9teC7gAtnUpJmLsorQVNFZfhy2Oowo=
+	t=1742800101; cv=none; b=dffSnVu9n8ObctKK/vNM29ZadXU0AK9ribNMEb9KW8CGIcK127OybTLMv2a7X73se/oRS6dBPQI8jRMRYUCxUkcrpPRX/CYJFPjGzO2M8nUa5sJb2OfnsgPWMKisLNGcsM/x957+ao7xKqIC7YWEjQ7sdKpJl1RR8gCPEO+GBkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742799321; c=relaxed/simple;
-	bh=g9XGUuTEQFnJGpulXykQgmwGsLbFGLfWBifqYbVibuQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SfeLV2okrFuF7xl/E9jy1I8TLF5hDdSoEZod56UxBEf5FHC5wZaM7E02cMFfJ+QCZDU91h+50ndvBE7R88sv9uIDaO5YZKoW5gqITtvySTUynKZDa0gm5a4Ugx7dSYSxqfvCRptfu+zxGURhSca77V1msO6k9vUkvoPas7B1H+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-X-QQ-mid: bizesmtpsz1t1742799160t5xj3ii
-X-QQ-Originating-IP: yHc2gHKafPJZLdKpG5LwwzyIMgkn1nGVmLlOMufgh1M=
-Received: from localhost.localdomain ( [116.128.244.171])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 24 Mar 2025 14:52:38 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2187205931425290801
-From: chenxiaosong@chenxiaosong.com
-To: linkinjeon@kernel.org,
-	sfrench@samba.org,
-	senozhatsky@chromium.org,
-	tom@talpey.com
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH] smb/server: use sock_create_kern() in create_socket()
-Date: Mon, 24 Mar 2025 06:51:55 +0000
-Message-Id: <20250324065155.665290-1-chenxiaosong@chenxiaosong.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742800101; c=relaxed/simple;
+	bh=lT/G5ebUQsfhVTZGeDZJIGq6e6SHkR/ih9Do+8d01Tw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lFxBWXhUdfpqAYMTp5kFbuvK+6ZXJdEIf3Dm2REiK/hOuS8DO7KDplsINuBZ9EzvBlD6HkU+bRp1Ta6iwtqnu08V0eOotNEn3OgcngTjpbmdWrUEWVsdga15icxaQpzqZ1QkOcWwTpuwIt+L4jx/2DHRxWCxl4/hOqsgCMfWOlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52O5NIpn006164;
+	Mon, 24 Mar 2025 07:07:30 GMT
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 45hje1htv9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 24 Mar 2025 07:07:29 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Mon, 24 Mar 2025 00:07:28 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Mon, 24 Mar 2025 00:07:25 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <gregkh@linuxfoundation.org>,
+        <linux-kernel@vger.kernel.org>, <jianqi.ren.cn@windriver.com>,
+        <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
+        <samba-technical@lists.samba.org>, <pc@manguebit.com>,
+        <stfrench@microsoft.com>
+Subject: [PATCH 5.15.y] smb: client: fix potential UAF in cifs_dump_full_key()
+Date: Mon, 24 Mar 2025 15:07:25 +0800
+Message-ID: <20250324070725.3795964-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,57 +45,56 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:chenxiaosong.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: Mx19VWqBs5mwul16bCqV705JsmB8YINSbxTSRXfHTAvXuyrEAQUJeHNp
-	N4z21FFbrAnJQYeJ9xQaJ6l6eGLKVqHs3P39uR3bP8eUpUxPebEQz6Hz+rC+kS/cNsw0POH
-	uR7obC99nIwAr64YbvNEUP9Wf54GHNLKGpDYg0HrBwonZa3KVHw/z+09j6EMm2n4kSfSi1h
-	k1ttfDAq7nDWG940afXY9OPFzidnc1123+QfuquHXdtA73jIt4nrlYgVGw6C8LpInv5Ele5
-	NMTF08AqKzJDKlMQj7xgyVnarmbHpE3zqIcjpb5+ohc408Dwdc7PnqzZskzx7sjMas7TYzb
-	P7x33cg6w+ujVDpIaaydbc4U0BVQt0K8d2AL55JWLLrTxdkavo5vjVtCGPRns2aUj7ykw5k
-	fSo4UXOppwyKV3aVpdS/zZJnDD5dtLZf6Vzx5w+8+h32PpHkWTN2osPCz4Jw6sQSb+VRxeZ
-	gFhrfDNi9i6b8RXoQzGyihQxJmgQgYB8vL81HaYPUhPxpTTNASsKE4SWOdmZd34kDOqFKE8
-	LuV2IjNZp9RHoz2s/nHDZLXQOOV2BkGaQ1SLfYRvTiWYfYZcbG/u2utpr4htIvJlzdL15Tk
-	IyLgopNF67OSgdLIMnJQ3JnYTD7PSML9xnXUOzVkehp/4ZXscgVjjlekbVOJ61o4gCpfxR/
-	RQOqKuC+mTOlHYrYjmsgjl7//JKgdm3FvGJtFxBiYQNvXUaP1RbRzWirP9o5vYtdCXzdFoE
-	o7RRJa75Eyn4rGKj430cdsuRtP9zL2hLa/ZlzAKsz3jj4dOzFrSsFan3pxSBYgdpt526u08
-	KKlPa6Ptxo2WwNdVe/cMFPkSuShAgLXwhnfxK5lCyHhpQup/jGyN3tZJ5t5aDuXqOJ7tqt1
-	ypLWbfv8JYfEVU6g+ZTvIYlWzZR4gvquuEtOZlg4OtATAMnIyzINTc/XCnlb7/YXr0TSKnb
-	MFU10BKEqTB4e2UYjaKsX2+PgCchVgoStyqx7ImUFioB6ycPtMU4QovY2
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=KPVaDEFo c=1 sm=1 tr=0 ts=67e104b1 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=Vs1iUdzkB0EA:10 a=Li1AiuEPAAAA:8 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8 a=t7CeM3EgAAAA:8 a=gpnyTqItCnq42K53HI0A:9
+ a=qGKPP_lnpMOaqR3bcYHU:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-GUID: jWlaP7A7xVBIQgn3nbhROLKWb8Vbiv5J
+X-Proofpoint-ORIG-GUID: jWlaP7A7xVBIQgn3nbhROLKWb8Vbiv5J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-24_03,2025-03-21_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ adultscore=0 impostorscore=0 mlxlogscore=971 malwarescore=0 spamscore=0
+ bulkscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
+ definitions=main-2503240051
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: Paulo Alcantara <pc@manguebit.com>
 
-The socket resides in kernel space, so use sock_create_kern()
-instead of sock_create().
+commit 58acd1f497162e7d282077f816faa519487be045 upstream.
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Skip sessions that are being teared down (status == SES_EXITING) to
+avoid UAF.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[This patch removes lock/unlock operation in routine cifs_dump_full_key()
+for ses_lock is not present in v5.15 and not ported yet. ses->status
+is protected by a global lock, cifs_tcp_ses_lock, in v5.15.]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
- fs/smb/server/transport_tcp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Verified the build test
+---
+ fs/cifs/ioctl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 7f38a3c3f5bd..e5f46a91c3fc 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -429,12 +429,13 @@ static int create_socket(struct interface *iface)
- 	struct socket *ksmbd_socket;
- 	bool ipv4 = false;
- 
--	ret = sock_create(PF_INET6, SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
-+	ret = sock_create_kern(current->nsproxy->net_ns, PF_INET6, SOCK_STREAM,
-+			       IPPROTO_TCP, &ksmbd_socket);
- 	if (ret) {
- 		if (ret != -EAFNOSUPPORT)
- 			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);
--		ret = sock_create(PF_INET, SOCK_STREAM, IPPROTO_TCP,
--				  &ksmbd_socket);
-+		ret = sock_create_kern(current->nsproxy->net_ns, PF_INET,
-+				       SOCK_STREAM, IPPROTO_TCP, &ksmbd_socket);
- 		if (ret) {
- 			pr_err("Can't create socket for ipv4: %d\n", ret);
- 			goto out_clear;
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 71883ba9e567..e846c18b71d2 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -232,7 +232,8 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon, struct smb3_full_key_debug
+ 		spin_lock(&cifs_tcp_ses_lock);
+ 		list_for_each_entry(server_it, &cifs_tcp_ses_list, tcp_ses_list) {
+ 			list_for_each_entry(ses_it, &server_it->smb_ses_list, smb_ses_list) {
+-				if (ses_it->Suid == out.session_id) {
++				if (ses_it->status != CifsExiting &&
++				    ses_it->Suid == out.session_id) {
+ 					ses = ses_it;
+ 					/*
+ 					 * since we are using the session outside the crit
 -- 
-2.34.1
+2.25.1
 
