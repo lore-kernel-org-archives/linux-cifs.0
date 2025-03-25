@@ -1,266 +1,91 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4599502B1
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Mar 2025 03:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECD5AD51
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Mar 2025 08:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742874832; cv=none; b=JfJ4lG1DbMS5eITSx+Kl8pRN49h9rnDGTEhcN5gKrKCHWSV0Rs4LNY6Ok/1Fgu5lJTtlWkMcRxjuO+6QJdgopEV8VGPd7iBjvJs757N4oCYZt2Hx31FHGlndlN642D8TGcRdrkaKj2YukbmgmDCix82w6hnPpJLYjlemJ9rPwGE=
+	t=1742892160; cv=none; b=W+uqm3yIkIrk6OvGZKWgmI3S86w3MJeoWfm9ocrvhsn9V3qxekfo4YEuq1cTDUwQrOXlaiekLcdPydSyNRy9QNQs+2LBQcEFi/y+9O6HTV1KQkPYsU29IarJnPys2JRp4nc7rSyUxkDYIf8wriGJ+cDLq72tvdVXrF/T7t3A6C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742874832; c=relaxed/simple;
-	bh=+tUlsmVHDgi4AksmUIsXnJxYvj2MzaVSvUmbuSdz0bQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Oo42pPN1TQ9Ii67tqMmvXZyMSoAy33zKkn0/dS5J9aMyME077pXy9wOsTCqX++bbkcuEx2aMeSo9474uWgoZU49cUI8c76oui+9xh5z168/MVZT80G6DDnc9EPSYqNgxrzShI6A99oF3HobClM1Jw1W563XZMj4TnYwUIRvpvFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzrkYe1n; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1742892160; c=relaxed/simple;
+	bh=WqUQ3rv6+sCu1j5lOlf51eMliL+tp440WyRxN17EN8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=irbC0fgTses+KFHgYe6DU6Ea2BAs9mlT9OBSe0Gs3wxAsoxX9CuKfmdxoPV8S0MT2+YHLHq0CeYXYQOziHGr6qvqEbw0dhZ4hVPaMg6k0LhZ7giWEnbmMHSfkCzgKzeXGyBGiQBvKmNbeysS1oCPRcER07DH5C/sqN2evTcfnuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afpuBVyh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzrkYe1n"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54acc0cd458so5502448e87.0
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Mar 2025 20:53:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742874829; x=1743479629; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=15MzDpEoVBSkE1ByK6WrdF7TY28Hvf+XpquhdzW9VwY=;
-        b=OzrkYe1nTf0UdGnKG2ZtS0Pc0x9o/W4TdtnirGv4lYmGiW3y1w3p9JNy3wT7h830Gq
-         kthQPErm3e81Q3d7x5ll2FSwmtLR2F4MPnVkSVXRoCW2TSHQqWlXKywpYu5r+ufR8jK9
-         UxD9kfl5Tpv7PNadPQvhTLoGyLE2jMYnx+cMbI+u17D9LAAVgn5C2VKQBP9QpGkAeb0j
-         aBGfp8W9pIrmYVZkSObyCftjI4/XKaJzavp8ldVh/8hjVmwI+if+iAS+qBQlgQ5TjMbS
-         2ni96Ej1LQH0ImnCsnczcPLey/aT1Do4+oQRjeaDaRe/gt+YHsWg8pY82nwb7mwcQ3/g
-         OXXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742874829; x=1743479629;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=15MzDpEoVBSkE1ByK6WrdF7TY28Hvf+XpquhdzW9VwY=;
-        b=ftt3oQdyzKyMYlk92xH0XItFGEQPmPQx/gb9WJK0bSr5Hhdr6jKiLpgYKrIO8TbsV1
-         fV5A9lifc7o/p4KEM92KtRu5Sf/5MAsQPPW+qPFIH3nTWv/pinHMGtCQ/iGTD1sNDr1F
-         f4TjFo5+Vy/MDPMQaYdezWep5Q9kfi4frSh7ik88u/KZasqcd7JoTbwMIiHOzQq1TlRF
-         30+SWal8C8Gp7r7rlNVeo3Z1wD8lEh/ZCE6HH/kAvHaFvV/vQ6mpLrSrnS8FyrDtEsPN
-         WpnraKOmfwI8YB9G/GDu+7vZNskN+wSBMbW3lVh/dyOyePx8gO4QbmzHICQdiSnbbiQo
-         rpFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVk6kZ4W8gPjYNNA5NvhessegdZY7c6qJ7nwaLYowq30/tx0lmXt6kd/D5P7zWZR5Ph7AJdSWJcu4Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiYWFGmsgwS9yBo7ZOOyP6ib5iCGjKPHazQvCfaTjUICFDCMN/
-	Z+W+ZGXasGiCdmWix0wM6AgfPIiwzrVLdBaAi6w6DoehC15bbfAHfw6bjdIC7UnDApbb/eZRJva
-	SBQ6I3sd6s5nBN9Sqqo0cMLnrQN9Vgg==
-X-Gm-Gg: ASbGncskL83C9v8fIRl2yGX5yWMYluQB9wy3giEsQfPCgSynwjcRnPQLBmaYEQw1OLa
-	pV+UUW0g+bCzpc5kc0guBamV7+eP2pT7IQXYaaT47bDlntoupOHHh7tf/n5j6ezJlr8bccGtXWF
-	7eLozfiTxZSLoEt4F9Cyi+0j2sDWjvuM5vkCAeK7DI+fA1p8vVbZcvdpcY8vnm
-X-Google-Smtp-Source: AGHT+IHYnPgog3cQ3F6Pgxs6twzXT/FH2993I2Ns4BN6pISkvR8nq91Cu7TLxpMuGzGdXBQGDAZvQw86+aUMEhRwouE=
-X-Received: by 2002:a05:6512:2301:b0:540:206b:c355 with SMTP id
- 2adb3069b0e04-54ad647d58emr5718953e87.19.1742874828456; Mon, 24 Mar 2025
- 20:53:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afpuBVyh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01CEEC4CEE4;
+	Tue, 25 Mar 2025 08:42:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742892160;
+	bh=WqUQ3rv6+sCu1j5lOlf51eMliL+tp440WyRxN17EN8g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=afpuBVyhQeXxPdMxeM/pYASSi5cH+ynrVU6CofC6ILkt07+apDmWiC08YOURZ7d/U
+	 Q7AbfSBDMi7tKkx4ePspQmfxKu5a82VHlZw2P8qyoXBnECrRGsTwshZOkwWjzPO7Oj
+	 pMCQE3Stf0IcwLZD8vujQCtYr8sc8UtoXCepfNfy3zECV4mpT77jV6jVJxiP4b5E8h
+	 1o1zL3iiMv+r7l7gKxIlIAZzG1Z8P68Az79f4UhnC9YEj49lvYyoHv/EtQmCkj0uBD
+	 3cHPyGWOXIXX3SQkkISUHycPZLhQ6HT7DrJV7d90XvBoIa7cTfsFFu8jhbfpXXaem+
+	 d4wGZq3pGFTYQ==
+Received: by pali.im (Postfix)
+	id D152C83D; Tue, 25 Mar 2025 09:42:24 +0100 (CET)
+Date: Tue, 25 Mar 2025 09:42:24 +0100
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] cifs: Improve SMB2+ stat() to work also for paths in
+ DELETE_PENDING state
+Message-ID: <20250325084224.fc7yoo4zsupojkco@pali>
+References: <CAH2r5msmKZA9-dX4G_uXujMuNLHxWUz1yprWRSabu-Bcdp7EOQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 24 Mar 2025 22:53:35 -0500
-X-Gm-Features: AQ5f1Jp6L1F1udAwjjzleg01mQuGgTyZkzVfYxwgfXR25WjpfnvKgTNzKtTklvw
-Message-ID: <CAH2r5msmKZA9-dX4G_uXujMuNLHxWUz1yprWRSabu-Bcdp7EOQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Improve SMB2+ stat() to work also for paths in
- DELETE_PENDING state
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000009e3e6063122ab97"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msmKZA9-dX4G_uXujMuNLHxWUz1yprWRSabu-Bcdp7EOQ@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
---00000000000009e3e6063122ab97
-Content-Type: text/plain; charset="UTF-8"
+Hello, this change is not reverse of what POSIX requires.
 
-In thinking about this patch, isn't it doing the reverse of what POSIX requires?
+Delete pending state is special thing in Windows and is just a temporary
+state, which may be reverted.
 
-When querying a file in delete pending state, shouldn't be invisible
-in the namespace on the client.  Wouldn't your patch do the opposite?
-ie Doesn't it allow stat to return information about a file which
-should be invisible to everyone except the app who has it open (and if
-possible we could make this easier via a "silly rename" strategy as
-some other protocols do)?
+In POSIX, the real unlink is the final state and once unlink finish, the
+directory entry is not in the parent directory anymore, and such
+directory can be removed.
 
-Thoughts?
+But on the other hand, if the file in the directory is in delete pending
+state, then the directory cannot be removed. Directory can be removed
+once all files are not in delete pending state anymore and are really
+removed.
 
+Any file in delete pending state is visible over SMB protocol to any
+application, not just to application which opened it.
 
+Silly rename is not an option here, because file can be put into delete
+pending state by windows server itself -- which does not do any silly
+rename strategy.
 
--- 
-Thanks,
+And for example msvcrt.dll stat() function on Windows is doing same
+thing. Stat is querying also files in delete pending state.
 
-Steve
-
---00000000000009e3e6063122ab97
-Content-Type: text/x-patch; charset="UTF-8"; 
-	name="0010-cifs-Improve-SMB2-stat-to-work-also-for-paths-in-DEL.patch"
-Content-Disposition: attachment; 
-	filename="0010-cifs-Improve-SMB2-stat-to-work-also-for-paths-in-DEL.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m8nyl0jw0>
-X-Attachment-Id: f_m8nyl0jw0
-
-RnJvbSBlZjRiMTkzZTE2NGE5OGNmZDBjMmRhZjViNDNiMjQ1MTgyMGM0NDExIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/UGFsaT0yMFJvaD1DMz1BMXI/PSA8cGFsaUBr
-ZXJuZWwub3JnPgpEYXRlOiBNb24sIDIzIERlYyAyMDI0IDE4OjU3OjEwICswMTAwClN1YmplY3Q6
-IFtQQVRDSCAxMC80MV0gY2lmczogSW1wcm92ZSBTTUIyKyBzdGF0KCkgdG8gd29yayBhbHNvIGZv
-ciBwYXRocyBpbgogREVMRVRFX1BFTkRJTkcgc3RhdGUKTUlNRS1WZXJzaW9uOiAxLjAKQ29udGVu
-dC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PVVURi04CkNvbnRlbnQtVHJhbnNmZXItRW5jb2Rp
-bmc6IDhiaXQKClBhdGhzIGluIERFTEVURV9QRU5ESU5HIHN0YXRlIGNhbm5vdCBiZSBvcGVuZWQg
-YXQgYWxsLiBTbyBzdGFuZGFyZCB3YXkgb2YKcXVlcnlpbmcgcGF0aCBhdHRyaWJ1dGVzIGZvciB0
-aGlzIGNhc2UgaXMgbm90IHBvc3NpYmxlLgoKVGhlcmUgaXMgYW4gYWx0ZXJuYXRpdmUgd2F5IGhv
-dyB0byBxdWVyeSBsaW1pdGVkIGluZm9ybWF0aW9uIGFib3V0IGZpbGUKb3ZlciBTTUIyKyBkaWFs
-ZWN0cyB3aXRob3V0IG9wZW5pbmcgZmlsZSBpdHNlbGYuIEl0IGlzIGJ5IG9wZW5pbmcgdGhlCnBh
-cmVudCBkaXJlY3RvcnksIHF1ZXJ5aW5nIHNwZWNpZmljIGNoaWxkIHdpdGggZmlsbGVkIHNlYXJj
-aCBmaWx0ZXIgYW5kCmFza2luZyBmb3IgYXR0cmlidXRlcyBmb3IgdGhhdCBjaGlsZC4KCkltcGxl
-bWVudCB0aGlzIGZhbGxiYWNrIHdoZW4gc3RhbmRhcmQgY2FzZSBpbiBzbWIyX3F1ZXJ5X3BhdGhf
-aW5mbyBmYWlscwp3aXRoIFNUQVRVU19ERUxFVEVfUEVORElORyBlcnJvciBhbmQgc3RhdCB3YXMg
-YXNrZWQgZm9yIHBhdGggd2hpY2ggaXMgbm90CnRvcCBsZXZlbCBvbmUgKGJlY2F1c2UgdG9wIGxl
-dmVsIGRvZXMgbm90IGhhdmUgcGFyZW50IGRpcmVjdG9yeSBhdCBhbGwpLgoKU2lnbmVkLW9mZi1i
-eTogUGFsaSBSb2jDoXIgPHBhbGlAa2VybmVsLm9yZz4KLS0tCiBmcy9zbWIvY2xpZW50L2NpZnNn
-bG9iLmggIHwgICAxICsKIGZzL3NtYi9jbGllbnQvc21iMmdsb2IuaCAgfCAgIDEgKwogZnMvc21i
-L2NsaWVudC9zbWIyaW5vZGUuYyB8IDE2NiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrLQogMyBmaWxlcyBjaGFuZ2VkLCAxNjUgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2NpZnNnbG9iLmggYi9mcy9zbWIvY2xpZW50
-L2NpZnNnbG9iLmgKaW5kZXggNmFlMTcwYTJhMDQyLi5mMGQ3NTE5OWQ0MzkgMTAwNjQ0Ci0tLSBh
-L2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaAorKysgYi9mcy9zbWIvY2xpZW50L2NpZnNnbG9iLmgK
-QEAgLTIzMjQsNiArMjMyNCw3IEBAIHN0cnVjdCBzbWIyX2NvbXBvdW5kX3ZhcnMgewogCXN0cnVj
-dCBzbWJfcnFzdCBycXN0W01BWF9DT01QT1VORF07CiAJc3RydWN0IGt2ZWMgb3Blbl9pb3ZbU01C
-Ml9DUkVBVEVfSU9WX1NJWkVdOwogCXN0cnVjdCBrdmVjIHFpX2lvdjsKKwlzdHJ1Y3Qga3ZlYyBx
-ZF9pb3ZbU01CMl9RVUVSWV9ESVJFQ1RPUllfSU9WX1NJWkVdOwogCXN0cnVjdCBrdmVjIGlvX2lv
-dltTTUIyX0lPQ1RMX0lPVl9TSVpFXTsKIAlzdHJ1Y3Qga3ZlYyBzaV9pb3ZbU01CMl9TRVRfSU5G
-T19JT1ZfU0laRV07CiAJc3RydWN0IGt2ZWMgY2xvc2VfaW92OwpkaWZmIC0tZ2l0IGEvZnMvc21i
-L2NsaWVudC9zbWIyZ2xvYi5oIGIvZnMvc21iL2NsaWVudC9zbWIyZ2xvYi5oCmluZGV4IDIyNDQ5
-NTMyMmEwNS4uMWNiMjE5NjA1ZTc1IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3NtYjJnbG9i
-LmgKKysrIGIvZnMvc21iL2NsaWVudC9zbWIyZ2xvYi5oCkBAIC0zOSw2ICszOSw3IEBAIGVudW0g
-c21iMl9jb21wb3VuZF9vcHMgewogCVNNQjJfT1BfR0VUX1JFUEFSU0UsCiAJU01CMl9PUF9RVUVS
-WV9XU0xfRUEsCiAJU01CMl9PUF9PUEVOX1FVRVJZLAorCVNNQjJfT1BfUVVFUllfRElSRUNUT1JZ
-LAogfTsKIAogLyogVXNlZCB3aGVuIGNvbnN0cnVjdGluZyBjaGFpbmVkIHJlYWQgcmVxdWVzdHMu
-ICovCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L3NtYjJpbm9kZS5jIGIvZnMvc21iL2NsaWVu
-dC9zbWIyaW5vZGUuYwppbmRleCA1N2Q5YmZiYWRkOTcuLmY0ZTJmZTg5OTFkMCAxMDA2NDQKLS0t
-IGEvZnMvc21iL2NsaWVudC9zbWIyaW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50L3NtYjJpbm9k
-ZS5jCkBAIC0xNzYsNiArMTc2LDggQEAgc3RhdGljIGludCBzbWIyX2NvbXBvdW5kX29wKGNvbnN0
-IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJCQkgICAgc3RydWN0
-IGt2ZWMgKm91dF9pb3YsIGludCAqb3V0X2J1ZnR5cGUsIHN0cnVjdCBkZW50cnkgKmRlbnRyeSkK
-IHsKIAorCXN0cnVjdCBzbWIyX3F1ZXJ5X2RpcmVjdG9yeV9yZXEgKnFkX3Jxc3QgPSBOVUxMOwor
-CXN0cnVjdCBzbWIyX3F1ZXJ5X2RpcmVjdG9yeV9yc3AgKnFkX3JzcCA9IE5VTEw7CiAJc3RydWN0
-IHNtYjJfY3JlYXRlX3JzcCAqY3JlYXRlX3JzcCA9IE5VTEw7CiAJc3RydWN0IHNtYjJfcXVlcnlf
-aW5mb19yc3AgKnFpX3JzcCA9IE5VTEw7CiAJc3RydWN0IHNtYjJfY29tcG91bmRfdmFycyAqdmFy
-cyA9IE5VTEw7CkBAIC0zNDQsNiArMzQ2LDM5IEBAIHN0YXRpYyBpbnQgc21iMl9jb21wb3VuZF9v
-cChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkJdHJh
-Y2Vfc21iM19wb3NpeF9xdWVyeV9pbmZvX2NvbXBvdW5kX2VudGVyKHhpZCwgdGNvbi0+dGlkLAog
-CQkJCQkJCQkgICBzZXMtPlN1aWQsIGZ1bGxfcGF0aCk7CiAJCQlicmVhazsKKwkJY2FzZSBTTUIy
-X09QX1FVRVJZX0RJUkVDVE9SWToKKwkJCXJxc3RbbnVtX3Jxc3RdLnJxX2lvdiA9ICZ2YXJzLT5x
-ZF9pb3ZbMF07CisJCQlycXN0W251bV9ycXN0XS5ycV9udmVjID0gU01CMl9RVUVSWV9ESVJFQ1RP
-UllfSU9WX1NJWkU7CisKKwkJCXJjID0gU01CMl9xdWVyeV9kaXJlY3RvcnlfaW5pdCh4aWQsCisJ
-CQkJCQkgICAgICAgdGNvbiwKKwkJCQkJCSAgICAgICBzZXJ2ZXIsCisJCQkJCQkgICAgICAgJnJx
-c3RbbnVtX3Jxc3RdLAorCQkJCQkJICAgICAgIGNmaWxlID8gY2ZpbGUtPmZpZC5wZXJzaXN0ZW50
-X2ZpZCA6IENPTVBPVU5EX0ZJRCwKKwkJCQkJCSAgICAgICBjZmlsZSA/IGNmaWxlLT5maWQudm9s
-YXRpbGVfZmlkIDogQ09NUE9VTkRfRklELAorCQkJCQkJICAgICAgIDAsCisJCQkJCQkgICAgICAg
-KGNpZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9TRVJWRVJfSU5VTSkgPworCQkJ
-CQkJICAgICAgICBTTUJfRklORF9GSUxFX0lEX0ZVTExfRElSX0lORk8gOgorCQkJCQkJICAgICAg
-ICBTTUJfRklORF9GSUxFX0ZVTExfRElSRUNUT1JZX0lORk8pOworCQkJaWYgKCFyYykgeworCQkJ
-CS8qCisJCQkJICogQ2hhbmdlIHRoZSBkZWZhdWx0IHNlYXJjaCB3aWxkY2FyZCBwYXR0ZXJuICcq
-JworCQkJCSAqIHRvIHRoZSByZXF1ZXN0ZWQgZmlsZSBuYW1lIHN0b3JlZCBpbiBpbl9pb3ZbaV0K
-KwkJCQkgKiBhbmQgcmVxdWVzdCBmb3Igb25seSBvbmUgc2luZ2xlIGVudHJ5LgorCQkJCSAqLwor
-CQkJCXFkX3Jxc3QgPSBycXN0W251bV9ycXN0XS5ycV9pb3ZbMF0uaW92X2Jhc2U7CisJCQkJcWRf
-cnFzdC0+RmxhZ3MgfD0gU01CMl9SRVRVUk5fU0lOR0xFX0VOVFJZOworCQkJCXFkX3Jxc3QtPkZp
-bGVOYW1lTGVuZ3RoID0gY3B1X3RvX2xlMTYoaW5faW92W2ldLmlvdl9sZW4pOworCQkJCXJxc3Rb
-bnVtX3Jxc3RdLnJxX2lvdlsxXSA9IGluX2lvdltpXTsKKwkJCX0KKwkJCWlmICghcmMgJiYgKCFj
-ZmlsZSB8fCBudW1fcnFzdCA+IDEpKSB7CisJCQkJc21iMl9zZXRfbmV4dF9jb21tYW5kKHRjb24s
-ICZycXN0W251bV9ycXN0XSk7CisJCQkJc21iMl9zZXRfcmVsYXRlZCgmcnFzdFtudW1fcnFzdF0p
-OworCQkJfSBlbHNlIGlmIChyYykgeworCQkJCWdvdG8gZmluaXNoZWQ7CisJCQl9CisJCQludW1f
-cnFzdCsrOworCQkJYnJlYWs7CiAJCWNhc2UgU01CMl9PUF9ERUxFVEU6CiAJCQl0cmFjZV9zbWIz
-X2RlbGV0ZV9lbnRlcih4aWQsIHRjb24tPnRpZCwgc2VzLT5TdWlkLCBmdWxsX3BhdGgpOwogCQkJ
-YnJlYWs7CkBAIC03MjgsNiArNzYzLDU1IEBAIHN0YXRpYyBpbnQgc21iMl9jb21wb3VuZF9vcChj
-b25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkJCXRyYWNl
-X3NtYjNfcG9zaXhfcXVlcnlfaW5mb19jb21wb3VuZF9kb25lKHhpZCwgdGNvbi0+dGlkLAogCQkJ
-CQkJCQkJICBzZXMtPlN1aWQpOwogCQkJYnJlYWs7CisJCWNhc2UgU01CMl9PUF9RVUVSWV9ESVJF
-Q1RPUlk6CisJCQlpZiAocmMgPT0gMCkgeworCQkJCXFkX3JzcCA9IChzdHJ1Y3Qgc21iMl9xdWVy
-eV9kaXJlY3RvcnlfcnNwICopCisJCQkJCXJzcF9pb3ZbaSArIDFdLmlvdl9iYXNlOworCQkJCXJj
-ID0gc21iMl92YWxpZGF0ZV9pb3YobGUxNl90b19jcHUocWRfcnNwLT5PdXRwdXRCdWZmZXJPZmZz
-ZXQpLAorCQkJCQkJICAgICAgIGxlMzJfdG9fY3B1KHFkX3JzcC0+T3V0cHV0QnVmZmVyTGVuZ3Ro
-KSwKKwkJCQkJCSAgICAgICAmcnNwX2lvdltpICsgMV0sCisJCQkJCQkgICAgICAgKGNpZnNfc2It
-Pm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9TRVJWRVJfSU5VTSkgPworCQkJCQkJICAgICAg
-ICBzaXplb2YoU0VBUkNIX0lEX0ZVTExfRElSX0lORk8pIDoKKwkJCQkJCSAgICAgICAgc2l6ZW9m
-KEZJTEVfRlVMTF9ESVJFQ1RPUllfSU5GTykpOworCQkJfQorCQkJaWYgKHJjID09IDApIHsKKwkJ
-CQkvKgorCQkJCSAqIEJvdGggU0VBUkNIX0lEX0ZVTExfRElSX0lORk8gYW5kIEZJTEVfRlVMTF9E
-SVJFQ1RPUllfSU5GTworCQkJCSAqIGhhdmUgc2FtZSBtZW1iZXIgb2Zmc2V0cyBleGNlcHQgdGhl
-IFVuaXF1ZUlkIGFuZCBGaWxlTmFtZS4KKwkJCQkgKi8KKwkJCQlTRUFSQ0hfSURfRlVMTF9ESVJf
-SU5GTyAqc2kgPSAoU0VBUkNIX0lEX0ZVTExfRElSX0lORk8gKilxZF9yc3AtPkJ1ZmZlcjsKKwkJ
-CQlpZGF0YSA9IGluX2lvdltpICsgMV0uaW92X2Jhc2U7CisJCQkJaWRhdGEtPmZpLkNyZWF0aW9u
-VGltZSA9IHNpLT5DcmVhdGlvblRpbWU7CisJCQkJaWRhdGEtPmZpLkxhc3RBY2Nlc3NUaW1lID0g
-c2ktPkxhc3RBY2Nlc3NUaW1lOworCQkJCWlkYXRhLT5maS5MYXN0V3JpdGVUaW1lID0gc2ktPkxh
-c3RXcml0ZVRpbWU7CisJCQkJaWRhdGEtPmZpLkNoYW5nZVRpbWUgPSBzaS0+Q2hhbmdlVGltZTsK
-KwkJCQlpZGF0YS0+ZmkuQXR0cmlidXRlcyA9IHNpLT5FeHRGaWxlQXR0cmlidXRlczsKKwkJCQlp
-ZGF0YS0+ZmkuQWxsb2NhdGlvblNpemUgPSBzaS0+QWxsb2NhdGlvblNpemU7CisJCQkJaWRhdGEt
-PmZpLkVuZE9mRmlsZSA9IHNpLT5FbmRPZkZpbGU7CisJCQkJaWRhdGEtPmZpLkVBU2l6ZSA9IHNp
-LT5FYVNpemU7CisJCQkJLyoKKwkJCQkgKiBVbmlxdWVJZCBpcyBwcmVzZW50IG9ubHkgaW4gc3Ry
-dWN0IFNFQVJDSF9JRF9GVUxMX0RJUl9JTkZPLgorCQkJCSAqIEl0IGlzIG5vdCBwcmVzZW50IGlu
-IHN0cnVjdCBGSUxFX0ZVTExfRElSRUNUT1JZX0lORk8uCisJCQkJICogc3RydWN0IFNFQVJDSF9J
-RF9GVUxMX0RJUl9JTkZPIHdhcyByZXF1ZXN0ZWQgb25seSB3aGVuCisJCQkJICogQ0lGU19NT1VO
-VF9TRVJWRVJfSU5VTSBpcyBzZXQuCisJCQkJICovCisJCQkJaWYgKGNpZnNfc2ItPm1udF9jaWZz
-X2ZsYWdzICYgQ0lGU19NT1VOVF9TRVJWRVJfSU5VTSkKKwkJCQkJaWRhdGEtPmZpLkluZGV4TnVt
-YmVyID0gc2ktPlVuaXF1ZUlkOworCQkJCWlmIChsZTMyX3RvX2NwdShpZGF0YS0+ZmkuTnVtYmVy
-T2ZMaW5rcykgPT0gMCkKKwkJCQkJaWRhdGEtPmZpLk51bWJlck9mTGlua3MgPSBjcHVfdG9fbGUz
-MigxKTsgLyogZHVtbXkgdmFsdWUgKi8KKwkJCQlpZGF0YS0+ZmkuRGVsZXRlUGVuZGluZyA9IDA7
-CisJCQkJaWRhdGEtPmZpLkRpcmVjdG9yeSA9ICEhKGxlMzJfdG9fY3B1KHNpLT5FeHRGaWxlQXR0
-cmlidXRlcykgJiBBVFRSX0RJUkVDVE9SWSk7CisJCQl9CisJCQlTTUIyX3F1ZXJ5X2RpcmVjdG9y
-eV9mcmVlKCZycXN0W251bV9ycXN0KytdKTsKKwkJCWlmIChyYykKKwkJCQl0cmFjZV9zbWIzX3F1
-ZXJ5X2Rpcl9lcnIoeGlkLAorCQkJCQkJCSBjZmlsZSA/IGNmaWxlLT5maWQucGVyc2lzdGVudF9m
-aWQgOiBDT01QT1VORF9GSUQsCisJCQkJCQkJIHRjb24tPnRpZCwgc2VzLT5TdWlkLCAwLCAwLCBy
-Yyk7CisJCQllbHNlCisJCQkJdHJhY2Vfc21iM19xdWVyeV9kaXJfZG9uZSh4aWQsCisJCQkJCQkJ
-ICBjZmlsZSA/IGNmaWxlLT5maWQucGVyc2lzdGVudF9maWQgOiBDT01QT1VORF9GSUQsCisJCQkJ
-CQkJICB0Y29uLT50aWQsIHNlcy0+U3VpZCwgMCwgMCk7CisJCQlicmVhazsKIAkJY2FzZSBTTUIy
-X09QX0RFTEVURToKIAkJCWlmIChyYykKIAkJCQl0cmFjZV9zbWIzX2RlbGV0ZV9lcnIoeGlkLCB0
-Y29uLT50aWQsIHNlcy0+U3VpZCwgcmMpOwpAQCAtMTA4Nyw5ICsxMTcxLDkgQEAgaW50IHNtYjJf
-cXVlcnlfcGF0aF9pbmZvKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsCiAJCWJyZWFrOwogCWNhc2Ug
-LUVSRU1PVEU6CiAJCWJyZWFrOwotCWRlZmF1bHQ6Ci0JCWlmIChoZHItPlN0YXR1cyAhPSBTVEFU
-VVNfT0JKRUNUX05BTUVfSU5WQUxJRCkKLQkJCWJyZWFrOworCX0KKworCWlmIChoZHItPlN0YXR1
-cyA9PSBTVEFUVVNfT0JKRUNUX05BTUVfSU5WQUxJRCkgewogCQlyYzIgPSBjaWZzX2ludmFsX25h
-bWVfZGZzX2xpbmtfZXJyb3IoeGlkLCB0Y29uLCBjaWZzX3NiLAogCQkJCQkJICAgICBmdWxsX3Bh
-dGgsICZpc2xpbmspOwogCQlpZiAocmMyKSB7CkBAIC0xMDk4LDYgKzExODIsODIgQEAgaW50IHNt
-YjJfcXVlcnlfcGF0aF9pbmZvKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsCiAJCX0KIAkJaWYgKGlz
-bGluaykKIAkJCXJjID0gLUVSRU1PVEU7CisJfSBlbHNlIGlmIChoZHItPlN0YXR1cyA9PSBTVEFU
-VVNfREVMRVRFX1BFTkRJTkcgJiYgZnVsbF9wYXRoWzBdKSB7CisJCS8qCisJCSAqIElmIFNNQjIg
-T1BFTi9DUkVBVEUgZmFpbHMgd2l0aCBTVEFUVVNfREVMRVRFX1BFTkRJTkcgZXJyb3IsCisJCSAq
-IGl0IG1lYW5zIHRoYXQgdGhlIHBhdGggaXMgaW4gZGVsZXRlIHBlbmRpbmcgc3RhdGUgYW5kIGl0
-IGlzCisJCSAqIG5vdCBwb3NzaWJsZSB0byBvcGVuIGl0IHVudGlsIHNvbWUgb3RoZXIgY2xpZW50
-IGNsZWFycyBkZWxldGUKKwkJICogcGVuZGluZyBzdGF0ZSBvciBhbGwgb3RoZXIgY2xpZW50cyBj
-bG9zZSBhbGwgb3BlbmVkIGhhbmRsZXMKKwkJICogdG8gdGhhdCBwYXRoLgorCQkgKgorCQkgKiBU
-aGVyZSBpcyBhbiBhbHRlcm5hdGl2ZSB3YXkgaG93IHRvIHF1ZXJ5IGxpbWl0ZWQgaW5mb3JtYXRp
-b24KKwkJICogYWJvdXQgcGF0aCB3aGljaCBpcyBpbiBkZWxldGUgcGVuZGluZyBzdGF0ZSBzdGls
-bCBzdWl0YWJsZQorCQkgKiBmb3IgdGhlIHN0YXQoKSBzeXNjYWxsLiBJdCBpcyBieSBvcGVuaW5n
-IHRoZSBwYXJlbnQgZGlyZWN0b3J5LAorCQkgKiBxdWVyeWluZyBzcGVjaWZpYyBjaGlsZCB3aXRo
-IGZpbGxlZCBzZWFyY2ggZmlsZXIgYW5kIGFza2luZworCQkgKiBmb3IgYXR0cmlidXRlcyBmb3Ig
-dGhhdCBjaGlsZC4KKwkJICovCisKKwkJY2hhciAqcGFyZW50X3BhdGg7CisJCWNvbnN0IGNoYXIg
-KmJhc2VuYW1lOworCQlfX2xlMTYgKmJhc2VuYW1lX3V0ZjE2OworCQlpbnQgYmFzZW5hbWVfdXRm
-MTZfbGVuOworCQlzdHJ1Y3QgY2lmc0ZpbGVJbmZvICpwYXJlbnRfY2ZpbGU7CisKKwkJYmFzZW5h
-bWUgPSBzdHJyY2hyKGZ1bGxfcGF0aCwgQ0lGU19ESVJfU0VQKGNpZnNfc2IpKTsKKwkJaWYgKGJh
-c2VuYW1lKSB7CisJCQlwYXJlbnRfcGF0aCA9IGtzdHJuZHVwKGZ1bGxfcGF0aCwgYmFzZW5hbWUg
-LSBmdWxsX3BhdGgsIEdGUF9LRVJORUwpOworCQkJYmFzZW5hbWUrKzsKKwkJfSBlbHNlIHsKKwkJ
-CXBhcmVudF9wYXRoID0ga3N0cmR1cCgiIiwgR0ZQX0tFUk5FTCk7CisJCQliYXNlbmFtZSA9IGZ1
-bGxfcGF0aDsKKwkJfQorCisJCWlmICghcGFyZW50X3BhdGgpIHsKKwkJCXJjID0gLUVOT01FTTsK
-KwkJCWdvdG8gb3V0OworCQl9CisKKwkJYmFzZW5hbWVfdXRmMTYgPSBjaWZzX2NvbnZlcnRfcGF0
-aF90b191dGYxNihiYXNlbmFtZSwgY2lmc19zYik7CisJCWlmICghYmFzZW5hbWVfdXRmMTYpIHsK
-KwkJCWtmcmVlKHBhcmVudF9wYXRoKTsKKwkJCXJjID0gLUVOT01FTTsKKwkJCWdvdG8gb3V0Owor
-CQl9CisKKwkJYmFzZW5hbWVfdXRmMTZfbGVuID0gMiAqIFVuaVN0cm5sZW4oKHdjaGFyX3QgKili
-YXNlbmFtZV91dGYxNiwgUEFUSF9NQVgpOworCityZXRyeV9xdWVyeV9kaXJlY3Rvcnk6CisJCW51
-bV9jbWRzID0gMTsKKwkJY21kc1swXSA9IFNNQjJfT1BfUVVFUllfRElSRUNUT1JZOworCQlpbl9p
-b3ZbMF0uaW92X2Jhc2UgPSBiYXNlbmFtZV91dGYxNjsKKwkJaW5faW92WzBdLmlvdl9sZW4gPSBi
-YXNlbmFtZV91dGYxNl9sZW47CisJCWluX2lvdlsxXS5pb3ZfYmFzZSA9IGRhdGE7CisJCWluX2lv
-dlsxXS5pb3ZfbGVuID0gc2l6ZW9mKCpkYXRhKTsKKwkJb3Bhcm1zID0gQ0lGU19PUEFSTVMoY2lm
-c19zYiwgdGNvbiwgcGFyZW50X3BhdGgsIEZJTEVfUkVBRF9EQVRBLAorCQkJCSAgICAgRklMRV9P
-UEVOLCBDUkVBVEVfTk9UX0ZJTEUsIEFDTF9OT19NT0RFKTsKKwkJY2lmc19nZXRfcmVhZGFibGVf
-cGF0aCh0Y29uLCBwYXJlbnRfcGF0aCwgJnBhcmVudF9jZmlsZSk7CisJCWZyZWVfcnNwX2lvdihv
-dXRfaW92LCBvdXRfYnVmdHlwZSwgQVJSQVlfU0laRShvdXRfaW92KSk7CisJCXJjID0gc21iMl9j
-b21wb3VuZF9vcCh4aWQsIHRjb24sIGNpZnNfc2IsIHBhcmVudF9wYXRoLAorCQkJCSAgICAgICZv
-cGFybXMsIGluX2lvdiwgY21kcywgbnVtX2NtZHMsCisJCQkJICAgICAgcGFyZW50X2NmaWxlLCBv
-dXRfaW92LCBvdXRfYnVmdHlwZSwgTlVMTCk7CisJCWlmIChyYyA9PSAtRU9QTk9UU1VQUCAmJiAo
-Y2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1NFUlZFUl9JTlVNKSkgeworCQkJ
-LyoKKwkJCSAqIElmIHF1ZXJ5aW5nIG9mIHNlcnZlciBpbm9kZSBudW1iZXJzIGlzIG5vdCBzdXBw
-b3J0ZWQKKwkJCSAqIGJ1dCBpcyBlbmFibGVkLCB0aGVuIGRpc2FibGUgaXQgYW5kIHRyeSBhZ2Fp
-bi4KKwkJCSAqLworCQkJY2lmc19hdXRvZGlzYWJsZV9zZXJ2ZXJpbm8oY2lmc19zYik7CisJCQln
-b3RvIHJldHJ5X3F1ZXJ5X2RpcmVjdG9yeTsKKwkJfQorCisJCWtmcmVlKHBhcmVudF9wYXRoKTsK
-KwkJa2ZyZWUoYmFzZW5hbWVfdXRmMTYpOworCisJCWhkciA9IG91dF9pb3ZbMF0uaW92X2Jhc2U7
-CisJCWlmICghaGRyIHx8IG91dF9idWZ0eXBlWzBdID09IENJRlNfTk9fQlVGRkVSKQorCQkJZ290
-byBvdXQ7CisKKwkJLyogQXMgd2UgYXJlIGluIGNvZGUgcGF0aCBmb3IgU1RBVFVTX0RFTEVURV9Q
-RU5ESU5HLCBzZXQgRGVsZXRlUGVuZGluZy4gKi8KKwkJZGF0YS0+ZmkuRGVsZXRlUGVuZGluZyA9
-IDE7CiAJfQogCiBvdXQ6Ci0tIAoyLjQzLjAKCg==
---00000000000009e3e6063122ab97--
+On Monday 24 March 2025 22:53:35 Steve French wrote:
+> In thinking about this patch, isn't it doing the reverse of what POSIX requires?
+> 
+> When querying a file in delete pending state, shouldn't be invisible
+> in the namespace on the client.  Wouldn't your patch do the opposite?
+> ie Doesn't it allow stat to return information about a file which
+> should be invisible to everyone except the app who has it open (and if
+> possible we could make this easier via a "silly rename" strategy as
+> some other protocols do)?
+> 
+> Thoughts?
+> 
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
