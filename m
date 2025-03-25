@@ -1,139 +1,280 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E62625DD12;
-	Tue, 25 Mar 2025 12:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D1C1ACEAF;
+	Tue, 25 Mar 2025 18:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742906411; cv=none; b=PnXjl+cLINmW+U+554978dD5liK9ULnI3jEjyazxQ7VuVcCTiBJsGz7s6nFMUVqb+FsoEZlS3nnlb6UmmkmmGuJ21jm2YPxSt/3k5kZcZnFihaQ7kRkCngX74VdjMzdGLziEkN1BZbTkfXbSfxxXXoaPNfrr2RoamHyhhb7okaw=
+	t=1742928148; cv=none; b=dF3CbUFXk/JoXctIV+dQdfHzroMQgqYA4aEFU+V3piLHyLdHPfKPhOcXLn18Bu9lpErPcJaPL1eaKiMl9NqWkDurW0SArBKp9PujKFn3jxSceyJPgEoPZqrhL6s+mxacRyq8iLinb55uyyi1xvclMSjQiS1uocbXCBBYy+l/w+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742906411; c=relaxed/simple;
-	bh=0GiKN6tISkpV4LvSTah7oJ/7zLYtwmACS2t+S7QGOMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NyrziWRnZHFZV7lfLphonw015qIM61ceexAEgimjjIx9JWS1MEox6vzEYuWPwsa16p3Dq8N8+/63jE2XGTBD2J+0hywq2FAcVDSgEaxI0/zX/DNFMmxHwiR0A9ZDFYuA/GiwtWSNbHqe8na6gEnKXBwyV0K0Fq12pdNu38Jbei8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wi0m3IVt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742928148; c=relaxed/simple;
+	bh=UuhNhHmsCai/OKW+CiwgEP7JQe/3sSD6DbKl78C/SFE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=LT7s7Uge1kHdu+rN5DSQJ+WCE3sNZYZBrBkLCSgZxmW0G6WVOSG4KoYTA4KWwMA9eXUIwGf75HSRfOhq241Xat2XIUr0NJOC85nESM+eZfWGmzuqpEzSy5cZFVnWN3pbPlxokSuf46z+ta2YiEjoL/ihuE1hUziUrGVoSbRCGd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7SPUZTZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wi0m3IVt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CF3C4CEE4;
-	Tue, 25 Mar 2025 12:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742906411;
-	bh=0GiKN6tISkpV4LvSTah7oJ/7zLYtwmACS2t+S7QGOMs=;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7SPUZTZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B7AC4CEE4;
+	Tue, 25 Mar 2025 18:42:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742928148;
+	bh=UuhNhHmsCai/OKW+CiwgEP7JQe/3sSD6DbKl78C/SFE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=wi0m3IVtZM4e8BB7n91udlGaZzucfF1nmO/zpkwZGnYnv36wGU0Gjy8/f0yfscGBM
-	 f9kFPuaNqoXAbtD+Fp3UmpHO1eEbyZLAsLNv5tAqq7eLnPspTeVWzPns+gAf5UdWpQ
-	 SF1Osm6Oqad+Qyde5TnVWxWhuDYi7pfjQif2BtFM=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Max Kellermann <max.kellermann@ionos.com>,
+	b=g7SPUZTZ0YeuwtVf9cjpleunSpATK+cQGkH0cdNJ5vRML247DY87PVJFMKYcidwHt
+	 5IQR4O7xkDpIjX/ZNKnig3WrKdSVbeNgGuzd5kvNNv2taamwR5bIxYY5azt3yxf8qS
+	 /IS4vsseZ2WBnhemIKqEjFYQ8AIYXLtm0JRNIkrsdcExhUySO+2wPqjWc4hLUWq/hV
+	 DGfN4wNC1giuxVbTvtCgNrcy1ktx86Hs4QaG8yT/67NVLuiOUHych5/z/qsDR7V4iu
+	 jObM8vjcDtIcZbIFKLy1FWy+6e3DabcRpi/vYQoAw14jwWhmpg5iW0aYVxFXp9qxzP
+	 B9mo0gPQ2B8PA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.com>,
 	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	netfs@lists.linux.dev,
+	Jay Shin <jaeshin@redhat.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>
-Subject: [PATCH 6.12 063/116] netfs: Call `invalidate_cache` only if implemented
-Date: Tue, 25 Mar 2025 08:22:30 -0400
-Message-ID: <20250325122150.824193812@linuxfoundation.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250325122149.207086105@linuxfoundation.org>
-References: <20250325122149.207086105@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.13 5/7] smb: client: don't retry IO on failed negprotos with soft mounts
+Date: Tue, 25 Mar 2025 14:42:13 -0400
+Message-Id: <20250325184215.2152123-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250325184215.2152123-1-sashal@kernel.org>
+References: <20250325184215.2152123-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.13.8
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+From: Paulo Alcantara <pc@manguebit.com>
 
-------------------
+[ Upstream commit 7643dbd9db09fffebb4a62cd27599f17f4148b17 ]
 
-From: Max Kellermann <max.kellermann@ionos.com>
+If @server->tcpStatus is set to CifsNeedReconnect after acquiring
+@ses->session_mutex in smb2_reconnect() or cifs_reconnect_tcon(), it
+means that a concurrent thread failed to negotiate, in which case the
+server is no longer responding to any SMB requests, so there is no
+point making the caller retry the IO by returning -EAGAIN.
 
-commit 344b7ef248f420ed4ba3a3539cb0a0fc18df9a6c upstream.
+Fix this by returning -EHOSTDOWN to the callers on soft mounts.
 
-Many filesystems such as NFS and Ceph do not implement the
-`invalidate_cache` method.  On those filesystems, if writing to the
-cache (`NETFS_WRITE_TO_CACHE`) fails for some reason, the kernel
-crashes like this:
-
- BUG: kernel NULL pointer dereference, address: 0000000000000000
- #PF: supervisor instruction fetch in kernel mode
- #PF: error_code(0x0010) - not-present page
- PGD 0 P4D 0
- Oops: Oops: 0010 [#1] SMP PTI
- CPU: 9 UID: 0 PID: 3380 Comm: kworker/u193:11 Not tainted 6.13.3-cm4all1-hp #437
- Hardware name: HP ProLiant DL380 Gen9/ProLiant DL380 Gen9, BIOS P89 10/17/2018
- Workqueue: events_unbound netfs_write_collection_worker
- RIP: 0010:0x0
- Code: Unable to access opcode bytes at 0xffffffffffffffd6.
- RSP: 0018:ffff9b86e2ca7dc0 EFLAGS: 00010202
- RAX: 0000000000000000 RBX: 0000000000000000 RCX: 7fffffffffffffff
- RDX: 0000000000000001 RSI: ffff89259d576a18 RDI: ffff89259d576900
- RBP: ffff89259d5769b0 R08: ffff9b86e2ca7d28 R09: 0000000000000002
- R10: ffff89258ceaca80 R11: 0000000000000001 R12: 0000000000000020
- R13: ffff893d158b9338 R14: ffff89259d576900 R15: ffff89259d5769b0
- FS:  0000000000000000(0000) GS:ffff893c9fa40000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: ffffffffffffffd6 CR3: 000000054442e003 CR4: 00000000001706f0
- Call Trace:
-  <TASK>
-  ? __die+0x1f/0x60
-  ? page_fault_oops+0x15c/0x460
-  ? try_to_wake_up+0x2d2/0x530
-  ? exc_page_fault+0x5e/0x100
-  ? asm_exc_page_fault+0x22/0x30
-  netfs_write_collection_worker+0xe9f/0x12b0
-  ? xs_poll_check_readable+0x3f/0x80
-  ? xs_stream_data_receive_workfn+0x8d/0x110
-  process_one_work+0x134/0x2d0
-  worker_thread+0x299/0x3a0
-  ? __pfx_worker_thread+0x10/0x10
-  kthread+0xba/0xe0
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork+0x30/0x50
-  ? __pfx_kthread+0x10/0x10
-  ret_from_fork_asm+0x1a/0x30
-  </TASK>
- Modules linked in:
- CR2: 0000000000000000
-
-This patch adds the missing `NULL` check.
-
-Fixes: 0e0f2dfe880f ("netfs: Dispatch write requests to process a writeback slice")
-Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
-Signed-off-by: Max Kellermann <max.kellermann@ionos.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/20250314164201.1993231-3-dhowells@redhat.com
-Acked-by: "Paulo Alcantara (Red Hat)" <pc@manguebit.com>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: stable@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: David Howells <dhowells@redhat.com>
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/netfs/write_collect.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/cifssmb.c | 46 ++++++++++++--------
+ fs/smb/client/smb2pdu.c | 96 ++++++++++++++++++-----------------------
+ 2 files changed, 69 insertions(+), 73 deletions(-)
 
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -576,7 +576,8 @@ void netfs_write_collection_worker(struc
- 	trace_netfs_rreq(wreq, netfs_rreq_trace_write_done);
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index a993d4ac58411..dd5211d268f48 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -114,19 +114,23 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
  
- 	if (wreq->io_streams[1].active &&
--	    wreq->io_streams[1].failed) {
-+	    wreq->io_streams[1].failed &&
-+	    ictx->ops->invalidate_cache) {
- 		/* Cache write failure doesn't prevent writeback completion
- 		 * unless we're in disconnected mode.
- 		 */
-
+ 	mutex_lock(&ses->session_mutex);
+ 	/*
+-	 * Recheck after acquire mutex. If another thread is negotiating
+-	 * and the server never sends an answer the socket will be closed
+-	 * and tcpStatus set to reconnect.
++	 * Handle the case where a concurrent thread failed to negotiate or
++	 * killed a channel.
+ 	 */
+ 	spin_lock(&server->srv_lock);
+-	if (server->tcpStatus == CifsNeedReconnect) {
++	switch (server->tcpStatus) {
++	case CifsExiting:
+ 		spin_unlock(&server->srv_lock);
+ 		mutex_unlock(&ses->session_mutex);
+-
+-		if (tcon->retry)
+-			goto again;
+-		rc = -EHOSTDOWN;
+-		goto out;
++		return -EHOSTDOWN;
++	case CifsNeedReconnect:
++		spin_unlock(&server->srv_lock);
++		mutex_unlock(&ses->session_mutex);
++		if (!tcon->retry)
++			return -EHOSTDOWN;
++		goto again;
++	default:
++		break;
+ 	}
+ 	spin_unlock(&server->srv_lock);
+ 
+@@ -152,16 +156,20 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	spin_unlock(&ses->ses_lock);
+ 
+ 	rc = cifs_negotiate_protocol(0, ses, server);
+-	if (!rc) {
+-		rc = cifs_setup_session(0, ses, server, ses->local_nls);
+-		if ((rc == -EACCES) || (rc == -EHOSTDOWN) || (rc == -EKEYREVOKED)) {
+-			/*
+-			 * Try alternate password for next reconnect if an alternate
+-			 * password is available.
+-			 */
+-			if (ses->password2)
+-				swap(ses->password2, ses->password);
+-		}
++	if (rc) {
++		mutex_unlock(&ses->session_mutex);
++		if (!tcon->retry)
++			return -EHOSTDOWN;
++		goto again;
++	}
++	rc = cifs_setup_session(0, ses, server, ses->local_nls);
++	if ((rc == -EACCES) || (rc == -EHOSTDOWN) || (rc == -EKEYREVOKED)) {
++		/*
++		 * Try alternate password for next reconnect if an alternate
++		 * password is available.
++		 */
++		if (ses->password2)
++			swap(ses->password2, ses->password);
+ 	}
+ 
+ 	/* do we need to reconnect tcon? */
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 7ece98c742bdb..23ae73c9c5e97 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -300,32 +300,23 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 
+ 	mutex_lock(&ses->session_mutex);
+ 	/*
+-	 * if this is called by delayed work, and the channel has been disabled
+-	 * in parallel, the delayed work can continue to execute in parallel
+-	 * there's a chance that this channel may not exist anymore
++	 * Handle the case where a concurrent thread failed to negotiate or
++	 * killed a channel.
+ 	 */
+ 	spin_lock(&server->srv_lock);
+-	if (server->tcpStatus == CifsExiting) {
++	switch (server->tcpStatus) {
++	case CifsExiting:
+ 		spin_unlock(&server->srv_lock);
+ 		mutex_unlock(&ses->session_mutex);
+-		rc = -EHOSTDOWN;
+-		goto out;
+-	}
+-
+-	/*
+-	 * Recheck after acquire mutex. If another thread is negotiating
+-	 * and the server never sends an answer the socket will be closed
+-	 * and tcpStatus set to reconnect.
+-	 */
+-	if (server->tcpStatus == CifsNeedReconnect) {
++		return -EHOSTDOWN;
++	case CifsNeedReconnect:
+ 		spin_unlock(&server->srv_lock);
+ 		mutex_unlock(&ses->session_mutex);
+-
+-		if (tcon->retry)
+-			goto again;
+-
+-		rc = -EHOSTDOWN;
+-		goto out;
++		if (!tcon->retry)
++			return -EHOSTDOWN;
++		goto again;
++	default:
++		break;
+ 	}
+ 	spin_unlock(&server->srv_lock);
+ 
+@@ -350,43 +341,41 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	spin_unlock(&ses->ses_lock);
+ 
+ 	rc = cifs_negotiate_protocol(0, ses, server);
+-	if (!rc) {
+-		/*
+-		 * if server stopped supporting multichannel
+-		 * and the first channel reconnected, disable all the others.
+-		 */
+-		if (ses->chan_count > 1 &&
+-		    !(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
+-			rc = cifs_chan_skip_or_disable(ses, server,
+-						       from_reconnect);
+-			if (rc) {
+-				mutex_unlock(&ses->session_mutex);
+-				goto out;
+-			}
+-		}
+-
+-		rc = cifs_setup_session(0, ses, server, ses->local_nls);
+-		if ((rc == -EACCES) || (rc == -EKEYEXPIRED) || (rc == -EKEYREVOKED)) {
+-			/*
+-			 * Try alternate password for next reconnect (key rotation
+-			 * could be enabled on the server e.g.) if an alternate
+-			 * password is available and the current password is expired,
+-			 * but do not swap on non pwd related errors like host down
+-			 */
+-			if (ses->password2)
+-				swap(ses->password2, ses->password);
+-		}
+-
+-		if ((rc == -EACCES) && !tcon->retry) {
+-			mutex_unlock(&ses->session_mutex);
+-			rc = -EHOSTDOWN;
+-			goto failed;
+-		} else if (rc) {
++	if (rc) {
++		mutex_unlock(&ses->session_mutex);
++		if (!tcon->retry)
++			return -EHOSTDOWN;
++		goto again;
++	}
++	/*
++	 * if server stopped supporting multichannel
++	 * and the first channel reconnected, disable all the others.
++	 */
++	if (ses->chan_count > 1 &&
++	    !(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
++		rc = cifs_chan_skip_or_disable(ses, server,
++					       from_reconnect);
++		if (rc) {
+ 			mutex_unlock(&ses->session_mutex);
+ 			goto out;
+ 		}
+-	} else {
++	}
++
++	rc = cifs_setup_session(0, ses, server, ses->local_nls);
++	if ((rc == -EACCES) || (rc == -EKEYEXPIRED) || (rc == -EKEYREVOKED)) {
++		/*
++		 * Try alternate password for next reconnect (key rotation
++		 * could be enabled on the server e.g.) if an alternate
++		 * password is available and the current password is expired,
++		 * but do not swap on non pwd related errors like host down
++		 */
++		if (ses->password2)
++			swap(ses->password2, ses->password);
++	}
++	if (rc) {
+ 		mutex_unlock(&ses->session_mutex);
++		if (rc == -EACCES && !tcon->retry)
++			return -EHOSTDOWN;
+ 		goto out;
+ 	}
+ 
+@@ -490,7 +479,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	case SMB2_IOCTL:
+ 		rc = -EAGAIN;
+ 	}
+-failed:
+ 	return rc;
+ }
+ 
+-- 
+2.39.5
 
