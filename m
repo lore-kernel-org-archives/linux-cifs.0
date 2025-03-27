@@ -1,431 +1,305 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eproxy.izw-berlin.de (eproxy.izw-berlin.de [62.141.164.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5C625EFAE
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Mar 2025 21:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54897158553
+	for <linux-cifs@vger.kernel.org>; Thu, 27 Mar 2025 10:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.141.164.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743023592; cv=none; b=Vr/V8RNxm4MpTVEIGYHSbxDllYte1R4+QBAcl34QtklVsq0nNlopmtUsZCSqa1O8/QnthIpYNimv8EqfI8t1jB87u27tjpvCx70SSvMhpPoLThdJQDYpvAomOQ5HuLwBVDe7+6bfQOIM8pJYxEKu4yOjlsKfKQKwHB9h8A+nqAU=
+	t=1743070195; cv=none; b=WX7/Aw2lxxdMiLaqXZ3hsyMoVPrycbqgPMZDV09jddEYfINXANmAt69EcvWCeZ0Jkk3O2fE5Hawg592m4Km/BhIifVZB8Ho1qrzdggR+WFSwdRZUYpNW3Q/D9K+vUDIrBwjGryQhtOt9K/1TTlEYoAcvWBlVyT4pyX5bVEvEKL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743023592; c=relaxed/simple;
-	bh=LnjPLJr6Wk/AsszqGK+kqhPTldzYfx38sU9ApEmdsf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ik5wliR2p+QSL57OgX3xZTV+ebwINE+woWdznXYiAZ6bpIVqGwf1KgVb5Vt258WeCn3Lbklnh5Ziw6SsUIW8TmmAyekn+oC9qiYCBxOcIZjqvxjakRh4IGmQNriAPsizz8VewDKoCGfad5wxvNCwD4rpRCOEK4y5Pbt5j67hGK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=M96pAzD4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kyLmyF+A; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zw1uqds/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JJpNAX74; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1743070195; c=relaxed/simple;
+	bh=KNq58Z7LoCocIIbnY1CphPXYO0p1FHPlgIyPCeBWrEw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MJjHLUh+47hSDDpqcvFN9YOmKmzrxiTbj9gpQm/aTaQhsbd8XkHRc3RdDaGSt1Pf9LTyOVo7WpnNPQcCV9P9NTKU6f6w11+WBDMvgIh3c84hV1wbaeJIKX5a3cXXpa3XKbXW0bjWwjzuEP8WqBPOj5bSECc9p/nRrbG+UuVfgwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de; spf=pass smtp.mailfrom=izw-berlin.de; dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b=gTX+cWYy; arc=none smtp.client-ip=62.141.164.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=izw-berlin.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="M96pAzD4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kyLmyF+A";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zw1uqds/";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JJpNAX74"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E37021F391;
-	Wed, 26 Mar 2025 21:13:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1743023588; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a0b6Qq1pz4JRK5PlMlVC2l+Cq5Qoz+kTOivR4+JV84Q=;
-	b=M96pAzD4g//DoIoACcUeIrXV8p1CHgzN71BKT2vZiyQdxW1a/+iMRozpyda2yg1ITJjw1k
-	4Se5X+zio7DYTQ4Zj99m5QtNykG1y3mXN0bWVr4+dVovg8rIJFOH/y/oE7Gzkym394pNrS
-	VMkye10BNOtKpAj1Sby5cMzAjBbswIM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1743023588;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a0b6Qq1pz4JRK5PlMlVC2l+Cq5Qoz+kTOivR4+JV84Q=;
-	b=kyLmyF+AAjBxDG+CrkuBcpaoYUNsWBZfCIIVfZte9NfLug2OIfu6IqCy15jtK5ad+MYr7w
-	w3TW+V8XK1xXcLBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1743023587; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a0b6Qq1pz4JRK5PlMlVC2l+Cq5Qoz+kTOivR4+JV84Q=;
-	b=zw1uqds/SlkYQTaWOFmCgi+pqlxK4SHs7bnaSnbeNmXtzZmeeF8+cZayA+wZ2AapZP/a00
-	LiwXVXLOkt/HSaoRYS5n2AR0rrXFhF6nagojqHHDFglByOda762geZwr5ux+N5N3Nfbmdm
-	uh87tNqvkZ2QdXOPPFxEpiWZA5rFoLg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1743023587;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a0b6Qq1pz4JRK5PlMlVC2l+Cq5Qoz+kTOivR4+JV84Q=;
-	b=JJpNAX74ULUrdRkPRfuMNK7xZagG7P6Qhu1Dy7YTnN/30SqQO9twmYsa+3NJgXwElcBY0N
-	bhszxHg7YpIKGfAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6E78D13927;
-	Wed, 26 Mar 2025 21:13:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id pU5TDuNt5GdWQQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 26 Mar 2025 21:13:07 +0000
-Date: Wed, 26 Mar 2025 18:13:05 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
+	dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b="gTX+cWYy"
+Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by eproxy.izw-berlin.de over TLS secured channel with Microsoft SMTPSVC(10.0.14393.4169);
+	 Thu, 27 Mar 2025 11:09:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; d=izw-berlin.de; s=p2024; c=simple/simple;
+	t=1743070187; h=from:subject:to:date:message-id;
+	bh=KNq58Z7LoCocIIbnY1CphPXYO0p1FHPlgIyPCeBWrEw=;
+	b=gTX+cWYyzNztz5R6MZWZYZtSdGoW7nv5BBdhW8uwdmfhD1grtqjCj1LmQ9BxK2r0PN0ATcSKrbO
+	jsegr7z0/zGEi7seGiE2AXglkqkTs+6HhwePkGov+9YCHAiAfvcV8j8vf/aUIK1MWxEN6dVxQVC6w
+	u87U5aM9VDdCByVx/54=
+Received: from izw-mail-3.izw-berlin.local (192.168.2.11) by
+ izw-mail-3.izw-berlin.local (192.168.2.11) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 27 Mar 2025 11:09:47 +0100
+Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by
+ izw-mail-3.izw-berlin.local ([192.168.2.11]) with mapi id 15.01.2507.044;
+ Thu, 27 Mar 2025 11:09:47 +0100
+From: "Heckmann, Ilja" <heckmann@izw-berlin.de>
 To: Steve French <smfrench@gmail.com>
-Cc: "Heckmann, Ilja" <heckmann@izw-berlin.de>, 
-	Mark A Whiting <whitingm@opentext.com>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	henrique.carvalho@suse.com
-Subject: Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing,
- x86_64, kernel 6.6.71
-Message-ID: <uildcjpqxzc5nckupgdeeifkrqwrau2qxuc2df2uxuyys3i2k2@iz2bmi6yojyu>
+CC: Mark A Whiting <whitingm@opentext.com>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>
+Subject: AW: [[ EXT ]] Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption
+ when writing, x86_64, kernel 6.6.71
+Thread-Topic: [[ EXT ]] Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption
+ when writing, x86_64, kernel 6.6.71
+Thread-Index: AdudzFmZYMLtC4Y+RNm+sf4/yE+hZgAZ/wojABEUuAAAIUWfaw==
+Date: Thu, 27 Mar 2025 10:09:47 +0000
+Message-ID: <63acb774f3204a26b9626968104c2d28@izw-berlin.de>
 References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de>
- <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
+ <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de>,<CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
+In-Reply-To: <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
+X-OriginalArrivalTime: 27 Mar 2025 10:09:47.0676 (UTC) FILETIME=[5ECB4DC0:01DB9F00]
 
-Hello,
-
-On 03/26, Steve French wrote:
->Were you able to confirm that the problem started after 6.6.0 but
->regressed before 6.6.9 - any chance of narrowing the regression down
->by bisection?
-
-This looks similar to a bug we found in our v6.4-based SLES products.
-
-Bisecting it indicated the regression is
-d08089f649a0 "cifs: Change the I/O paths to use an iterator rather than a p=
-age list".
-
-The first good commit we found is a395726cf823 "cifs: fix data
-corruption in read after invalidate", but it was probably a bit before
-that (we didn't check further because we couldn't afford to backport all
-netfs modifications).
-
-This is the fix we used (rebased on top of v6.6.71 tag):
-https://git.exis.tech/linux.git/commit/?h=3Ddata_corruption_v6.x&id=3D8d4c4=
-0e084f3d132434d5d3d068175c8db59ce65
-
-@Ilja @Mark could you test it with your reproducer please?
-@Steve can you try it with the reproducer mentioned in the commit
-message please?
-
-
-Cheers,
-
-Enzo
-
->On Wed, Mar 26, 2025 at 5:13=E2=80=AFAM Heckmann, Ilja <heckmann@izw-berli=
-n.de> wrote:
->>
->> We ran into what probably is the same problem with silent data corruptio=
-n that was only noticed thanks to using a data format with internal checksu=
-ms. It also went away when mounting a share with "cache=3Dnone" while runni=
-ng the kernel 6.6.9, but that had the side-effect that no executables could=
- be started from the share (I reported this in June 2024). This second prob=
-lem was fixed in 6.10, but at the same time mounting with "cache=3Dnone" st=
-opped helping against the data corruption issue. It persists until now, wit=
-h kernel 6.12.8, although the frequency at which the problem manifests went=
- down significantly.
->>
->> The way we test for it is by running a certain workload 100 times in a l=
-oop and counting the number of runs aborted because of errors. That number =
-went down from about 10 per 100 runs with kernel 6.6.9 to about 1 per 100 r=
-uns with 6.12.8. Its non-deterministic nature and the lack of in-house expe=
-rtise to investigate the issue at the same level as Mark did stopped us fro=
-m reporting it so far. And while there is no way of knowing that the issue =
-we observe in 6.12.8 is the same one, at least I can confirm that there is =
-a similar issue in more recent kernel versions as well.
->>
->> Best wishes,
->> Ilja Heckmann
->> ________________________________________
->> Von: Mark A Whiting <whitingm@opentext.com>
->> Gesendet: Dienstag, 25. M=C3=A4rz 2025 22:24:55
->> An: linux-cifs@vger.kernel.org
->> Betreff: [[ EXT ]] [BUG REPORT] cifs/smb data corruption when writing, x=
-86_64, kernel 6.6.71
->>
->> Hello,
->>
->> I have discovered a data corruption issue with our application writing t=
-o a CIFS share. I believe this issue may be related to another report I saw=
- on this mailing list, https://lore.kernel.org/linux-cifs/DFC1DAC5-5C6C-4DC=
-2-807A-DAF12E4B7882@gmail.com/. I understand that updating to a newer kerne=
-l would likely fix this issue. However, at the moment, that's not an option=
- for us. In the long term we are looking to upgrade to 6.12 but I'm hoping =
-to find a solution for our current 6.6 kernel.
->>
->> I have tested mounting with the "cache=3Dnone" option and that solves th=
-e problem, albeit with a very large performance hit.
->>
->> The platform is an embedded system. We're using an off-the-shelf COM Exp=
-ress Type 7 module with an Intel XEON D-1713NT processor. We're running a c=
-ustom Linux system built using Buildroot, currently running the 6.6.71 kern=
-el. I've tested the latest 6.6.84 kernel and the problem still exists there=
-=2E Our application is writing large amounts of compressed data (4+ GB) to =
-the network share. When I read back the data to verify it, I'm seeing small=
- portions of the file that have been replaced with zeros.
->>
->> I've attacked the issue from several angles. Starting with a TCP dump of=
- a complete operation from mounting, data transfer, to unmounting the netwo=
-rk share. Through Wireshark I can see that there is no write command to the=
- server covering the sections of the output that ends up as zeros. This ind=
-icated to me that the CIFS kernel driver is failing to write out portions o=
-f the file.
->>
->> I then enabled all the CIFS debug info I could via cifsFYI and the kerne=
-l dynamic debug controls and tweaked the code to not rate limit the pr_debu=
-g calls. I could trace through the resulting logs and find pairs of cifs_wr=
-ite_begin() / cifs_write_end() that covered all the data including the sect=
-ions that ultimately don't get written out. However, tracing through the sm=
-b2_async_writev() messages I again could not find any writes that covered t=
-he corrupt portions. At this point I began to suspect some kind of race con=
-dition within the cifs_writepages() function.
->>
->> I also analyzed the data corruption and noticed a pattern. It does not f=
-ail 100% of the time, and it does not always fail in the same place. This f=
-urthered my belief that it was some kind of non-deterministic data race. Th=
-e corrupt data region is always less than a page in size (<4096 bytes), it'=
-s always zeros, and it always ends on a page boundary. Because I knew the e=
-xpected format of the data, I could also tell that the corrupt data was alw=
-ays at the beginning of a write syscall by our application.
->>
->> I've attempted to read through the CIFS kernel code involved in this. Bu=
-t I've never worked in the VFS/filesystem layers before. And I'm having tro=
-uble following / understanding the intricacies of the page cache, page dirt=
-ying/cleaning, and writeback.
->>
->> My current best guess at what's happening is as follows:
->>     * Our application writes out a buffer of data to the file on a CIFS =
-share, this is compressed data that isn't nicely aligned, the data does not=
- end on a page boundary. This is a newly created file that we are writing t=
-o, so this write extends the files EOF to the end of the newly written data=
- which is in the middle of a page in the cache.
->>     * cifs_writepages() is invoked to write the cached data back to the =
-server, it scans the cached pages and prepares to write out all the dirty p=
-ages (including the final partial page).
->>     * Our application performs another write. This extends the file and =
-the beginning of this write falls into the end of the previous final partia=
-l cached page.
->>     * cifs_writepages() finishes writing out the dirty pages, including =
-the first portion of what it thought was the final partial page, and marks =
-all pages as clean.
->>     * On the next invocation of cifs_writepages(), it scans for dirty pa=
-ges and skips the beginning of the second write because it thinks that page=
- is clean. The following page is a completely new page and is dirty, so it =
-starts a new write from that page. This would explain why the corruption is=
- always at the beginning of our application's write and corrects itself at =
-the next page boundary.
->>
->> I have yet to really prove this, but this type of race between dirty/cle=
-an pages would explain all the behavior I'm seeing. I'm hoping someone much=
- more intimately familiar with the CIFS code can help point me in the right=
- direction.
->>
->> I did try one quick and dirty fix, assuming it was a race I applied the =
-following patch. This added a per inode mutex that completely serialized th=
-e cifs_write_begin(), cifs_write_end(), and cifs_writepages() functions. Th=
-is did seem to resolve the data corruption issue, but at the cost of occasi=
-onal deadlocks writing to CIFS files.
->>
->> > diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
->> > index bbb0ef18d7b8..6e2e273b9838 100644
->> > --- a/fs/smb/client/cifsfs.c
->> > +++ b/fs/smb/client/cifsfs.c
->> > @@ -1659,6 +1659,7 @@ cifs_init_once(void *inode)
->> >
->> >       inode_init_once(&cifsi->netfs.inode);
->> >       init_rwsem(&cifsi->lock_sem);
->> > +     mutex_init(&cifsi->tbl_write_mutex);
->>  > }
->>  >
->> >  static int __init
->> > diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
->> > index 43b42eca6780..4af4c5036d81 100644
->> > --- a/fs/smb/client/cifsglob.h
->> > +++ b/fs/smb/client/cifsglob.h
->> > @@ -1606,6 +1606,17 @@ struct cifsInodeInfo {
->> >       bool lease_granted; /* Flag to indicate whether lease or oplock =
-is granted. */
->> >       char *symlink_target;
->> >       __u32 reparse_tag;
->> > +
->> > +     /* During development we discovered what we believe to be a race=
- condition
->> > +      * in the write caching behavior of cifs. Setting cache=3Dnone s=
-olved the
->> > +      * issue but with an unacceptable performance hit. The following=
- mutex was
->> > +      * added to serialize the cifs_write_begin, cifs_write_end, and
->> > +      * cifs_writepages functions in file.c. This appears to solve th=
-e issue
->> > +      * without completely disabling caching.
->> > +      *
->> > +      * -Mark Whiting (whitingm@opentext.com)
->> > +      */
->> > +     struct mutex tbl_write_mutex;
->> >  };
->> >
->> >  static inline struct cifsInodeInfo *
->> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
->> > index cb75b95efb70..d3bc652a7e65 100644
->> > --- a/fs/smb/client/file.c
->> > +++ b/fs/smb/client/file.c
->> > @@ -3085,6 +3085,7 @@ static int cifs_writepages(struct address_space =
-*mapping,
->> >  {
->> >       loff_t start, end;
->> >       int ret;
->> > +     mutex_lock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> >
->> >       /* We have to be careful as we can end up racing with setattr()
->> >        * truncating the pagecache since the caller doesn't take a lock=
- here
->> > @@ -3119,6 +3120,7 @@ static int cifs_writepages(struct address_space =
-*mapping,
->> >       }
->> >
->> >  out:
->> > +     mutex_unlock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> >       return ret;
->> >  }
->> >
->> > @@ -3174,6 +3176,8 @@ static int cifs_write_end(struct file *file, str=
-uct address_space *mapping,
->> >       struct folio *folio =3D page_folio(page);
->> >       __u32 pid;
->> >
->> > +     mutex_lock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> > +
->> >       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
->> >               pid =3D cfile->pid;
->> >       else
->> > @@ -3233,6 +3237,7 @@ static int cifs_write_end(struct file *file, str=
-uct address_space *mapping,
->> >       /* Indication to update ctime and mtime as close is deferred */
->> >       set_bit(CIFS_INO_MODIFIED_ATTR, &CIFS_I(inode)->flags);
->> >
->> > +     mutex_unlock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> >       return rc;
->> >  }
->> >
->> > @@ -4905,6 +4910,7 @@ static int cifs_write_begin(struct file *file, s=
-truct address_space *mapping,
->> >       int rc =3D 0;
->> >
->> >       cifs_dbg(FYI, "write_begin from %lld len %d\n", (long long)pos, =
-len);
->> > +     mutex_lock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> >
->> >  start:
->> >       page =3D grab_cache_page_write_begin(mapping, index);
->> > @@ -4965,6 +4971,7 @@ static int cifs_write_begin(struct file *file, s=
-truct address_space *mapping,
->> >                  this will be written out by write_end so is fine */
->> >       }
->> >  out:
->> > +     mutex_unlock(&CIFS_I(mapping->host)->tbl_write_mutex);
->> >       *pagep =3D page;
->> >       return rc;
->> >  }
->>
->> Here are some of the log excerpts for one of my test cases. In this file=
- one of the corrupt regions starts at file offset 1,074,214,474 (0x4007364A=
-), and was corrupt for 2,486 bytes, ending on a page boundary. First there =
-is a section of the log trimmed to just the cifs_write_begin() / cifs_write=
-_end() functions. You can see that there is a write shown at the exact offs=
-et/length of the corrupted data.
->>
->> > Mar 25 15:25:39 TX2 kernel: [  124.080900] [1567] cifs_write_begin:490=
-7: CIFS: fs/smb/client/file.c: write_begin from 1074212864 len 1610
->> > Mar 25 15:25:39 TX2 kernel: [  124.080906] [1567] cifs_write_end:3182:=
- CIFS: fs/smb/client/file.c: write_end for page 0000000086519afd from pos 1=
-074212864 with 1610 bytes
->> > Mar 25 15:25:39 TX2 kernel: [  124.080911] [1567] cifs_write_begin:490=
-7: CIFS: fs/smb/client/file.c: write_begin from 1074214474 len 2486
->> > Mar 25 15:25:39 TX2 kernel: [  124.080916] [1567] cifs_write_end:3182:=
- CIFS: fs/smb/client/file.c: write_end for page 0000000086519afd from pos 1=
-074214474 with 2486 bytes
->> > Mar 25 15:25:39 TX2 kernel: [  124.080917] [1567] cifs_write_begin:490=
-7: CIFS: fs/smb/client/file.c: write_begin from 1074216960 len 846
->> > Mar 25 15:25:39 TX2 kernel: [  124.080924] [1567] cifs_write_end:3182:=
- CIFS: fs/smb/client/file.c: write_end for page 00000000880cee03 from pos 1=
-074216960 with 846 bytes
->>
->> Now here's a section of the log trimmed to just the smb2_async_writev() =
-function. You can see writes covering the data immediately before and after=
- the corrupted region, but there is no write to the corrupted region. I'm a=
-ssuming the corrupted region is always zeros because the server is extendin=
-g and zero-filling the file to the new write offset after the gap of the mi=
-ssing write.
->>
->> > Mar 25 15:25:39 TX2 kernel: [  123.829696] [1635] smb2_async_writev:49=
-45: CIFS: fs/smb/client/smb2pdu.c: async write at 1072214016 988260 bytes i=
-ter=3Df1464
->> > Mar 25 15:25:39 TX2 kernel: [  124.081016] [1636] smb2_async_writev:49=
-45: CIFS: fs/smb/client/smb2pdu.c: async write at 1073201152 1013322 bytes =
-iter=3Df764a
->> ** Missing write: 1073201152 + 1013322 =3D 1074214474 **
->> > Mar 25 15:25:39 TX2 kernel: [  124.083901] [1636] smb2_async_writev:49=
-45: CIFS: fs/smb/client/smb2pdu.c: async write at 1074216960 39564 bytes it=
-er=3D9a8c
->> > Mar 25 15:25:40 TX2 kernel: [  124.340557] [1637] smb2_async_writev:49=
-45: CIFS: fs/smb/client/smb2pdu.c: async write at 1074253824 1237843 bytes =
-iter=3D12e353
->>
->> I can very easily reproduce this with our application. If anyone has any=
- suggestions to try, additional logging / tracing they would like me to per=
-form, please let me know. I can provide more detailed, full logs if desired=
-, but they're quite large. I'll continue to read through the code and try t=
-o understand, if I find anything I will update you.
->>
->> Thanks,
->> Mark Whiting
->>
->>
->
->
->--=20
->Thanks,
->
->Steve
->
+Tm8sIHdlIG9ubHkgcmFuIHRlc3RzIG9uIHdoYXRldmVyIGtlcm5lbCB2ZXJzaW9uIHdhcyBhdmFp
+bGFibGUgYXQgdGhlIHRpbWUgb24gb3VyIEZlZG9yYSBtYWNoaW5lcy4gQXMgSSBtZW50aW9uZWQs
+IG91ciBsZXZlbCBvZiBleHBlcnRpc2UgaW4ga2VybmVsLWxldmVsIHN0dWZmIC4uLiBoYXMgcm9v
+bSBmb3IgaW1wcm92ZW1lbnQgOikgSSdtIG5vdCBleGFjdGx5IHN1cmUgaG93IHRvIHNldCB1cCBh
+IG1hY2hpbmUgZm9yIGJpc2VjdGlvbjogV2hhdCBkaXN0cm8gdG8gc3RhcnQgd2l0aD8gSG93IHRv
+IGluc3RhbGwgYSBsb2NhbGx5IGNvbXBpbGVkIGtlcm5lbD8gSG93IGZhciBpbiBrZXJuZWwgdmVy
+c2lvbiBoaXN0b3J5IGNvdWxkIEkgZ28gYmFjayB3aXRob3V0IHRoZSByZXN0IG9mIHRoZSBzeXN0
+ZW0gYnJlYWtpbmc/IEJ1dCBpZiBzb21lYm9keSBjb3VsZCBwcm92aWRlIG1lIHdpdGggaW5mb3Jt
+YXRpb24gb3IgbWF5YmUgZXZlbiBhIGNvbXBsZXRlIHN0ZXAtYnktc3RlcCBndWlkZSwgSSdkIGJl
+IHdpbGxpbmcgdG8gZ2l2ZSBpdCBhIHRyeS4NCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX18NClZvbjogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQpHZXNl
+bmRldDogTWl0dHdvY2gsIDI2LiBNw6RyeiAyMDI1IDE5OjU4OjIwDQpBbjogSGVja21hbm4sIEls
+amENCkNjOiBNYXJrIEEgV2hpdGluZzsgbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCkJldHJl
+ZmY6IFtbIEVYVCBdXSBSZTogW1sgRVhUIF1dIFtCVUcgUkVQT1JUXSBjaWZzL3NtYiBkYXRhIGNv
+cnJ1cHRpb24gd2hlbiB3cml0aW5nLCB4ODZfNjQsIGtlcm5lbCA2LjYuNzENCg0KV2VyZSB5b3Ug
+YWJsZSB0byBjb25maXJtIHRoYXQgdGhlIHByb2JsZW0gc3RhcnRlZCBhZnRlciA2LjYuMCBidXQN
+CnJlZ3Jlc3NlZCBiZWZvcmUgNi42LjkgLSBhbnkgY2hhbmNlIG9mIG5hcnJvd2luZyB0aGUgcmVn
+cmVzc2lvbiBkb3duDQpieSBiaXNlY3Rpb24/DQoNCk9uIFdlZCwgTWFyIDI2LCAyMDI1IGF0IDU6
+MTPigK9BTSBIZWNrbWFubiwgSWxqYSA8aGVja21hbm5AaXp3LWJlcmxpbi5kZT4gd3JvdGU6DQo+
+DQo+IFdlIHJhbiBpbnRvIHdoYXQgcHJvYmFibHkgaXMgdGhlIHNhbWUgcHJvYmxlbSB3aXRoIHNp
+bGVudCBkYXRhIGNvcnJ1cHRpb24gdGhhdCB3YXMgb25seSBub3RpY2VkIHRoYW5rcyB0byB1c2lu
+ZyBhIGRhdGEgZm9ybWF0IHdpdGggaW50ZXJuYWwgY2hlY2tzdW1zLiBJdCBhbHNvIHdlbnQgYXdh
+eSB3aGVuIG1vdW50aW5nIGEgc2hhcmUgd2l0aCAiY2FjaGU9bm9uZSIgd2hpbGUgcnVubmluZyB0
+aGUga2VybmVsIDYuNi45LCBidXQgdGhhdCBoYWQgdGhlIHNpZGUtZWZmZWN0IHRoYXQgbm8gZXhl
+Y3V0YWJsZXMgY291bGQgYmUgc3RhcnRlZCBmcm9tIHRoZSBzaGFyZSAoSSByZXBvcnRlZCB0aGlz
+IGluIEp1bmUgMjAyNCkuIFRoaXMgc2Vjb25kIHByb2JsZW0gd2FzIGZpeGVkIGluIDYuMTAsIGJ1
+dCBhdCB0aGUgc2FtZSB0aW1lIG1vdW50aW5nIHdpdGggImNhY2hlPW5vbmUiIHN0b3BwZWQgaGVs
+cGluZyBhZ2FpbnN0IHRoZSBkYXRhIGNvcnJ1cHRpb24gaXNzdWUuIEl0IHBlcnNpc3RzIHVudGls
+IG5vdywgd2l0aCBrZXJuZWwgNi4xMi44LCBhbHRob3VnaCB0aGUgZnJlcXVlbmN5IGF0IHdoaWNo
+IHRoZSBwcm9ibGVtIG1hbmlmZXN0cyB3ZW50IGRvd24gc2lnbmlmaWNhbnRseS4NCj4NCj4gVGhl
+IHdheSB3ZSB0ZXN0IGZvciBpdCBpcyBieSBydW5uaW5nIGEgY2VydGFpbiB3b3JrbG9hZCAxMDAg
+dGltZXMgaW4gYSBsb29wIGFuZCBjb3VudGluZyB0aGUgbnVtYmVyIG9mIHJ1bnMgYWJvcnRlZCBi
+ZWNhdXNlIG9mIGVycm9ycy4gVGhhdCBudW1iZXIgd2VudCBkb3duIGZyb20gYWJvdXQgMTAgcGVy
+IDEwMCBydW5zIHdpdGgga2VybmVsIDYuNi45IHRvIGFib3V0IDEgcGVyIDEwMCBydW5zIHdpdGgg
+Ni4xMi44LiBJdHMgbm9uLWRldGVybWluaXN0aWMgbmF0dXJlIGFuZCB0aGUgbGFjayBvZiBpbi1o
+b3VzZSBleHBlcnRpc2UgdG8gaW52ZXN0aWdhdGUgdGhlIGlzc3VlIGF0IHRoZSBzYW1lIGxldmVs
+IGFzIE1hcmsgZGlkIHN0b3BwZWQgdXMgZnJvbSByZXBvcnRpbmcgaXQgc28gZmFyLiBBbmQgd2hp
+bGUgdGhlcmUgaXMgbm8gd2F5IG9mIGtub3dpbmcgdGhhdCB0aGUgaXNzdWUgd2Ugb2JzZXJ2ZSBp
+biA2LjEyLjggaXMgdGhlIHNhbWUgb25lLCBhdCBsZWFzdCBJIGNhbiBjb25maXJtIHRoYXQgdGhl
+cmUgaXMgYSBzaW1pbGFyIGlzc3VlIGluIG1vcmUgcmVjZW50IGtlcm5lbCB2ZXJzaW9ucyBhcyB3
+ZWxsLg0KPg0KPiBCZXN0IHdpc2hlcywNCj4gSWxqYSBIZWNrbWFubg0KPiBfX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IFZvbjogTWFyayBBIFdoaXRpbmcgPHdoaXRp
+bmdtQG9wZW50ZXh0LmNvbT4NCj4gR2VzZW5kZXQ6IERpZW5zdGFnLCAyNS4gTcOkcnogMjAyNSAy
+MjoyNDo1NQ0KPiBBbjogbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCj4gQmV0cmVmZjogW1sg
+RVhUIF1dIFtCVUcgUkVQT1JUXSBjaWZzL3NtYiBkYXRhIGNvcnJ1cHRpb24gd2hlbiB3cml0aW5n
+LCB4ODZfNjQsIGtlcm5lbCA2LjYuNzENCj4NCj4gSGVsbG8sDQo+DQo+IEkgaGF2ZSBkaXNjb3Zl
+cmVkIGEgZGF0YSBjb3JydXB0aW9uIGlzc3VlIHdpdGggb3VyIGFwcGxpY2F0aW9uIHdyaXRpbmcg
+dG8gYSBDSUZTIHNoYXJlLiBJIGJlbGlldmUgdGhpcyBpc3N1ZSBtYXkgYmUgcmVsYXRlZCB0byBh
+bm90aGVyIHJlcG9ydCBJIHNhdyBvbiB0aGlzIG1haWxpbmcgbGlzdCwgaHR0cHM6Ly9sb3JlLmtl
+cm5lbC5vcmcvbGludXgtY2lmcy9ERkMxREFDNS01QzZDLTREQzItODA3QS1EQUYxMkU0Qjc4ODJA
+Z21haWwuY29tLy4gSSB1bmRlcnN0YW5kIHRoYXQgdXBkYXRpbmcgdG8gYSBuZXdlciBrZXJuZWwg
+d291bGQgbGlrZWx5IGZpeCB0aGlzIGlzc3VlLiBIb3dldmVyLCBhdCB0aGUgbW9tZW50LCB0aGF0
+J3Mgbm90IGFuIG9wdGlvbiBmb3IgdXMuIEluIHRoZSBsb25nIHRlcm0gd2UgYXJlIGxvb2tpbmcg
+dG8gdXBncmFkZSB0byA2LjEyIGJ1dCBJJ20gaG9waW5nIHRvIGZpbmQgYSBzb2x1dGlvbiBmb3Ig
+b3VyIGN1cnJlbnQgNi42IGtlcm5lbC4NCj4NCj4gSSBoYXZlIHRlc3RlZCBtb3VudGluZyB3aXRo
+IHRoZSAiY2FjaGU9bm9uZSIgb3B0aW9uIGFuZCB0aGF0IHNvbHZlcyB0aGUgcHJvYmxlbSwgYWxi
+ZWl0IHdpdGggYSB2ZXJ5IGxhcmdlIHBlcmZvcm1hbmNlIGhpdC4NCj4NCj4gVGhlIHBsYXRmb3Jt
+IGlzIGFuIGVtYmVkZGVkIHN5c3RlbS4gV2UncmUgdXNpbmcgYW4gb2ZmLXRoZS1zaGVsZiBDT00g
+RXhwcmVzcyBUeXBlIDcgbW9kdWxlIHdpdGggYW4gSW50ZWwgWEVPTiBELTE3MTNOVCBwcm9jZXNz
+b3IuIFdlJ3JlIHJ1bm5pbmcgYSBjdXN0b20gTGludXggc3lzdGVtIGJ1aWx0IHVzaW5nIEJ1aWxk
+cm9vdCwgY3VycmVudGx5IHJ1bm5pbmcgdGhlIDYuNi43MSBrZXJuZWwuIEkndmUgdGVzdGVkIHRo
+ZSBsYXRlc3QgNi42Ljg0IGtlcm5lbCBhbmQgdGhlIHByb2JsZW0gc3RpbGwgZXhpc3RzIHRoZXJl
+LiBPdXIgYXBwbGljYXRpb24gaXMgd3JpdGluZyBsYXJnZSBhbW91bnRzIG9mIGNvbXByZXNzZWQg
+ZGF0YSAoNCsgR0IpIHRvIHRoZSBuZXR3b3JrIHNoYXJlLiBXaGVuIEkgcmVhZCBiYWNrIHRoZSBk
+YXRhIHRvIHZlcmlmeSBpdCwgSSdtIHNlZWluZyBzbWFsbCBwb3J0aW9ucyBvZiB0aGUgZmlsZSB0
+aGF0IGhhdmUgYmVlbiByZXBsYWNlZCB3aXRoIHplcm9zLg0KPg0KPiBJJ3ZlIGF0dGFja2VkIHRo
+ZSBpc3N1ZSBmcm9tIHNldmVyYWwgYW5nbGVzLiBTdGFydGluZyB3aXRoIGEgVENQIGR1bXAgb2Yg
+YSBjb21wbGV0ZSBvcGVyYXRpb24gZnJvbSBtb3VudGluZywgZGF0YSB0cmFuc2ZlciwgdG8gdW5t
+b3VudGluZyB0aGUgbmV0d29yayBzaGFyZS4gVGhyb3VnaCBXaXJlc2hhcmsgSSBjYW4gc2VlIHRo
+YXQgdGhlcmUgaXMgbm8gd3JpdGUgY29tbWFuZCB0byB0aGUgc2VydmVyIGNvdmVyaW5nIHRoZSBz
+ZWN0aW9ucyBvZiB0aGUgb3V0cHV0IHRoYXQgZW5kcyB1cCBhcyB6ZXJvcy4gVGhpcyBpbmRpY2F0
+ZWQgdG8gbWUgdGhhdCB0aGUgQ0lGUyBrZXJuZWwgZHJpdmVyIGlzIGZhaWxpbmcgdG8gd3JpdGUg
+b3V0IHBvcnRpb25zIG9mIHRoZSBmaWxlLg0KPg0KPiBJIHRoZW4gZW5hYmxlZCBhbGwgdGhlIENJ
+RlMgZGVidWcgaW5mbyBJIGNvdWxkIHZpYSBjaWZzRllJIGFuZCB0aGUga2VybmVsIGR5bmFtaWMg
+ZGVidWcgY29udHJvbHMgYW5kIHR3ZWFrZWQgdGhlIGNvZGUgdG8gbm90IHJhdGUgbGltaXQgdGhl
+IHByX2RlYnVnIGNhbGxzLiBJIGNvdWxkIHRyYWNlIHRocm91Z2ggdGhlIHJlc3VsdGluZyBsb2dz
+IGFuZCBmaW5kIHBhaXJzIG9mIGNpZnNfd3JpdGVfYmVnaW4oKSAvIGNpZnNfd3JpdGVfZW5kKCkg
+dGhhdCBjb3ZlcmVkIGFsbCB0aGUgZGF0YSBpbmNsdWRpbmcgdGhlIHNlY3Rpb25zIHRoYXQgdWx0
+aW1hdGVseSBkb24ndCBnZXQgd3JpdHRlbiBvdXQuIEhvd2V2ZXIsIHRyYWNpbmcgdGhyb3VnaCB0
+aGUgc21iMl9hc3luY193cml0ZXYoKSBtZXNzYWdlcyBJIGFnYWluIGNvdWxkIG5vdCBmaW5kIGFu
+eSB3cml0ZXMgdGhhdCBjb3ZlcmVkIHRoZSBjb3JydXB0IHBvcnRpb25zLiBBdCB0aGlzIHBvaW50
+IEkgYmVnYW4gdG8gc3VzcGVjdCBzb21lIGtpbmQgb2YgcmFjZSBjb25kaXRpb24gd2l0aGluIHRo
+ZSBjaWZzX3dyaXRlcGFnZXMoKSBmdW5jdGlvbi4NCj4NCj4gSSBhbHNvIGFuYWx5emVkIHRoZSBk
+YXRhIGNvcnJ1cHRpb24gYW5kIG5vdGljZWQgYSBwYXR0ZXJuLiBJdCBkb2VzIG5vdCBmYWlsIDEw
+MCUgb2YgdGhlIHRpbWUsIGFuZCBpdCBkb2VzIG5vdCBhbHdheXMgZmFpbCBpbiB0aGUgc2FtZSBw
+bGFjZS4gVGhpcyBmdXJ0aGVyZWQgbXkgYmVsaWVmIHRoYXQgaXQgd2FzIHNvbWUga2luZCBvZiBu
+b24tZGV0ZXJtaW5pc3RpYyBkYXRhIHJhY2UuIFRoZSBjb3JydXB0IGRhdGEgcmVnaW9uIGlzIGFs
+d2F5cyBsZXNzIHRoYW4gYSBwYWdlIGluIHNpemUgKDw0MDk2IGJ5dGVzKSwgaXQncyBhbHdheXMg
+emVyb3MsIGFuZCBpdCBhbHdheXMgZW5kcyBvbiBhIHBhZ2UgYm91bmRhcnkuIEJlY2F1c2UgSSBr
+bmV3IHRoZSBleHBlY3RlZCBmb3JtYXQgb2YgdGhlIGRhdGEsIEkgY291bGQgYWxzbyB0ZWxsIHRo
+YXQgdGhlIGNvcnJ1cHQgZGF0YSB3YXMgYWx3YXlzIGF0IHRoZSBiZWdpbm5pbmcgb2YgYSB3cml0
+ZSBzeXNjYWxsIGJ5IG91ciBhcHBsaWNhdGlvbi4NCj4NCj4gSSd2ZSBhdHRlbXB0ZWQgdG8gcmVh
+ZCB0aHJvdWdoIHRoZSBDSUZTIGtlcm5lbCBjb2RlIGludm9sdmVkIGluIHRoaXMuIEJ1dCBJJ3Zl
+IG5ldmVyIHdvcmtlZCBpbiB0aGUgVkZTL2ZpbGVzeXN0ZW0gbGF5ZXJzIGJlZm9yZS4gQW5kIEkn
+bSBoYXZpbmcgdHJvdWJsZSBmb2xsb3dpbmcgLyB1bmRlcnN0YW5kaW5nIHRoZSBpbnRyaWNhY2ll
+cyBvZiB0aGUgcGFnZSBjYWNoZSwgcGFnZSBkaXJ0eWluZy9jbGVhbmluZywgYW5kIHdyaXRlYmFj
+ay4NCj4NCj4gTXkgY3VycmVudCBiZXN0IGd1ZXNzIGF0IHdoYXQncyBoYXBwZW5pbmcgaXMgYXMg
+Zm9sbG93czoNCj4gICAgICogT3VyIGFwcGxpY2F0aW9uIHdyaXRlcyBvdXQgYSBidWZmZXIgb2Yg
+ZGF0YSB0byB0aGUgZmlsZSBvbiBhIENJRlMgc2hhcmUsIHRoaXMgaXMgY29tcHJlc3NlZCBkYXRh
+IHRoYXQgaXNuJ3QgbmljZWx5IGFsaWduZWQsIHRoZSBkYXRhIGRvZXMgbm90IGVuZCBvbiBhIHBh
+Z2UgYm91bmRhcnkuIFRoaXMgaXMgYSBuZXdseSBjcmVhdGVkIGZpbGUgdGhhdCB3ZSBhcmUgd3Jp
+dGluZyB0bywgc28gdGhpcyB3cml0ZSBleHRlbmRzIHRoZSBmaWxlcyBFT0YgdG8gdGhlIGVuZCBv
+ZiB0aGUgbmV3bHkgd3JpdHRlbiBkYXRhIHdoaWNoIGlzIGluIHRoZSBtaWRkbGUgb2YgYSBwYWdl
+IGluIHRoZSBjYWNoZS4NCj4gICAgICogY2lmc193cml0ZXBhZ2VzKCkgaXMgaW52b2tlZCB0byB3
+cml0ZSB0aGUgY2FjaGVkIGRhdGEgYmFjayB0byB0aGUgc2VydmVyLCBpdCBzY2FucyB0aGUgY2Fj
+aGVkIHBhZ2VzIGFuZCBwcmVwYXJlcyB0byB3cml0ZSBvdXQgYWxsIHRoZSBkaXJ0eSBwYWdlcyAo
+aW5jbHVkaW5nIHRoZSBmaW5hbCBwYXJ0aWFsIHBhZ2UpLg0KPiAgICAgKiBPdXIgYXBwbGljYXRp
+b24gcGVyZm9ybXMgYW5vdGhlciB3cml0ZS4gVGhpcyBleHRlbmRzIHRoZSBmaWxlIGFuZCB0aGUg
+YmVnaW5uaW5nIG9mIHRoaXMgd3JpdGUgZmFsbHMgaW50byB0aGUgZW5kIG9mIHRoZSBwcmV2aW91
+cyBmaW5hbCBwYXJ0aWFsIGNhY2hlZCBwYWdlLg0KPiAgICAgKiBjaWZzX3dyaXRlcGFnZXMoKSBm
+aW5pc2hlcyB3cml0aW5nIG91dCB0aGUgZGlydHkgcGFnZXMsIGluY2x1ZGluZyB0aGUgZmlyc3Qg
+cG9ydGlvbiBvZiB3aGF0IGl0IHRob3VnaHQgd2FzIHRoZSBmaW5hbCBwYXJ0aWFsIHBhZ2UsIGFu
+ZCBtYXJrcyBhbGwgcGFnZXMgYXMgY2xlYW4uDQo+ICAgICAqIE9uIHRoZSBuZXh0IGludm9jYXRp
+b24gb2YgY2lmc193cml0ZXBhZ2VzKCksIGl0IHNjYW5zIGZvciBkaXJ0eSBwYWdlcyBhbmQgc2tp
+cHMgdGhlIGJlZ2lubmluZyBvZiB0aGUgc2Vjb25kIHdyaXRlIGJlY2F1c2UgaXQgdGhpbmtzIHRo
+YXQgcGFnZSBpcyBjbGVhbi4gVGhlIGZvbGxvd2luZyBwYWdlIGlzIGEgY29tcGxldGVseSBuZXcg
+cGFnZSBhbmQgaXMgZGlydHksIHNvIGl0IHN0YXJ0cyBhIG5ldyB3cml0ZSBmcm9tIHRoYXQgcGFn
+ZS4gVGhpcyB3b3VsZCBleHBsYWluIHdoeSB0aGUgY29ycnVwdGlvbiBpcyBhbHdheXMgYXQgdGhl
+IGJlZ2lubmluZyBvZiBvdXIgYXBwbGljYXRpb24ncyB3cml0ZSBhbmQgY29ycmVjdHMgaXRzZWxm
+IGF0IHRoZSBuZXh0IHBhZ2UgYm91bmRhcnkuDQo+DQo+IEkgaGF2ZSB5ZXQgdG8gcmVhbGx5IHBy
+b3ZlIHRoaXMsIGJ1dCB0aGlzIHR5cGUgb2YgcmFjZSBiZXR3ZWVuIGRpcnR5L2NsZWFuIHBhZ2Vz
+IHdvdWxkIGV4cGxhaW4gYWxsIHRoZSBiZWhhdmlvciBJJ20gc2VlaW5nLiBJJ20gaG9waW5nIHNv
+bWVvbmUgbXVjaCBtb3JlIGludGltYXRlbHkgZmFtaWxpYXIgd2l0aCB0aGUgQ0lGUyBjb2RlIGNh
+biBoZWxwIHBvaW50IG1lIGluIHRoZSByaWdodCBkaXJlY3Rpb24uDQo+DQo+IEkgZGlkIHRyeSBv
+bmUgcXVpY2sgYW5kIGRpcnR5IGZpeCwgYXNzdW1pbmcgaXQgd2FzIGEgcmFjZSBJIGFwcGxpZWQg
+dGhlIGZvbGxvd2luZyBwYXRjaC4gVGhpcyBhZGRlZCBhIHBlciBpbm9kZSBtdXRleCB0aGF0IGNv
+bXBsZXRlbHkgc2VyaWFsaXplZCB0aGUgY2lmc193cml0ZV9iZWdpbigpLCBjaWZzX3dyaXRlX2Vu
+ZCgpLCBhbmQgY2lmc193cml0ZXBhZ2VzKCkgZnVuY3Rpb25zLiBUaGlzIGRpZCBzZWVtIHRvIHJl
+c29sdmUgdGhlIGRhdGEgY29ycnVwdGlvbiBpc3N1ZSwgYnV0IGF0IHRoZSBjb3N0IG9mIG9jY2Fz
+aW9uYWwgZGVhZGxvY2tzIHdyaXRpbmcgdG8gQ0lGUyBmaWxlcy4NCj4NCj4gPiBkaWZmIC0tZ2l0
+IGEvZnMvc21iL2NsaWVudC9jaWZzZnMuYyBiL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMNCj4gPiBp
+bmRleCBiYmIwZWYxOGQ3YjguLjZlMmUyNzNiOTgzOCAxMDA2NDQNCj4gPiAtLS0gYS9mcy9zbWIv
+Y2xpZW50L2NpZnNmcy5jDQo+ID4gKysrIGIvZnMvc21iL2NsaWVudC9jaWZzZnMuYw0KPiA+IEBA
+IC0xNjU5LDYgKzE2NTksNyBAQCBjaWZzX2luaXRfb25jZSh2b2lkICppbm9kZSkNCj4gPg0KPiA+
+ICAgICAgIGlub2RlX2luaXRfb25jZSgmY2lmc2ktPm5ldGZzLmlub2RlKTsNCj4gPiAgICAgICBp
+bml0X3J3c2VtKCZjaWZzaS0+bG9ja19zZW0pOw0KPiA+ICsgICAgIG11dGV4X2luaXQoJmNpZnNp
+LT50Ymxfd3JpdGVfbXV0ZXgpOw0KPiAgPiB9DQo+ICA+DQo+ID4gIHN0YXRpYyBpbnQgX19pbml0
+DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaCBiL2ZzL3NtYi9jbGll
+bnQvY2lmc2dsb2IuaA0KPiA+IGluZGV4IDQzYjQyZWNhNjc4MC4uNGFmNGM1MDM2ZDgxIDEwMDY0
+NA0KPiA+IC0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaA0KPiA+ICsrKyBiL2ZzL3NtYi9j
+bGllbnQvY2lmc2dsb2IuaA0KPiA+IEBAIC0xNjA2LDYgKzE2MDYsMTcgQEAgc3RydWN0IGNpZnNJ
+bm9kZUluZm8gew0KPiA+ICAgICAgIGJvb2wgbGVhc2VfZ3JhbnRlZDsgLyogRmxhZyB0byBpbmRp
+Y2F0ZSB3aGV0aGVyIGxlYXNlIG9yIG9wbG9jayBpcyBncmFudGVkLiAqLw0KPiA+ICAgICAgIGNo
+YXIgKnN5bWxpbmtfdGFyZ2V0Ow0KPiA+ICAgICAgIF9fdTMyIHJlcGFyc2VfdGFnOw0KPiA+ICsN
+Cj4gPiArICAgICAvKiBEdXJpbmcgZGV2ZWxvcG1lbnQgd2UgZGlzY292ZXJlZCB3aGF0IHdlIGJl
+bGlldmUgdG8gYmUgYSByYWNlIGNvbmRpdGlvbg0KPiA+ICsgICAgICAqIGluIHRoZSB3cml0ZSBj
+YWNoaW5nIGJlaGF2aW9yIG9mIGNpZnMuIFNldHRpbmcgY2FjaGU9bm9uZSBzb2x2ZWQgdGhlDQo+
+ID4gKyAgICAgICogaXNzdWUgYnV0IHdpdGggYW4gdW5hY2NlcHRhYmxlIHBlcmZvcm1hbmNlIGhp
+dC4gVGhlIGZvbGxvd2luZyBtdXRleCB3YXMNCj4gPiArICAgICAgKiBhZGRlZCB0byBzZXJpYWxp
+emUgdGhlIGNpZnNfd3JpdGVfYmVnaW4sIGNpZnNfd3JpdGVfZW5kLCBhbmQNCj4gPiArICAgICAg
+KiBjaWZzX3dyaXRlcGFnZXMgZnVuY3Rpb25zIGluIGZpbGUuYy4gVGhpcyBhcHBlYXJzIHRvIHNv
+bHZlIHRoZSBpc3N1ZQ0KPiA+ICsgICAgICAqIHdpdGhvdXQgY29tcGxldGVseSBkaXNhYmxpbmcg
+Y2FjaGluZy4NCj4gPiArICAgICAgKg0KPiA+ICsgICAgICAqIC1NYXJrIFdoaXRpbmcgKHdoaXRp
+bmdtQG9wZW50ZXh0LmNvbSkNCj4gPiArICAgICAgKi8NCj4gPiArICAgICBzdHJ1Y3QgbXV0ZXgg
+dGJsX3dyaXRlX211dGV4Ow0KPiA+ICB9Ow0KPiA+DQo+ID4gIHN0YXRpYyBpbmxpbmUgc3RydWN0
+IGNpZnNJbm9kZUluZm8gKg0KPiA+IGRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2ZpbGUuYyBi
+L2ZzL3NtYi9jbGllbnQvZmlsZS5jDQo+ID4gaW5kZXggY2I3NWI5NWVmYjcwLi5kM2JjNjUyYTdl
+NjUgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvc21iL2NsaWVudC9maWxlLmMNCj4gPiArKysgYi9mcy9z
+bWIvY2xpZW50L2ZpbGUuYw0KPiA+IEBAIC0zMDg1LDYgKzMwODUsNyBAQCBzdGF0aWMgaW50IGNp
+ZnNfd3JpdGVwYWdlcyhzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywNCj4gPiAgew0KPiA+
+ICAgICAgIGxvZmZfdCBzdGFydCwgZW5kOw0KPiA+ICAgICAgIGludCByZXQ7DQo+ID4gKyAgICAg
+bXV0ZXhfbG9jaygmQ0lGU19JKG1hcHBpbmctPmhvc3QpLT50Ymxfd3JpdGVfbXV0ZXgpOw0KPiA+
+DQo+ID4gICAgICAgLyogV2UgaGF2ZSB0byBiZSBjYXJlZnVsIGFzIHdlIGNhbiBlbmQgdXAgcmFj
+aW5nIHdpdGggc2V0YXR0cigpDQo+ID4gICAgICAgICogdHJ1bmNhdGluZyB0aGUgcGFnZWNhY2hl
+IHNpbmNlIHRoZSBjYWxsZXIgZG9lc24ndCB0YWtlIGEgbG9jayBoZXJlDQo+ID4gQEAgLTMxMTks
+NiArMzEyMCw3IEBAIHN0YXRpYyBpbnQgY2lmc193cml0ZXBhZ2VzKHN0cnVjdCBhZGRyZXNzX3Nw
+YWNlICptYXBwaW5nLA0KPiA+ICAgICAgIH0NCj4gPg0KPiA+ICBvdXQ6DQo+ID4gKyAgICAgbXV0
+ZXhfdW5sb2NrKCZDSUZTX0kobWFwcGluZy0+aG9zdCktPnRibF93cml0ZV9tdXRleCk7DQo+ID4g
+ICAgICAgcmV0dXJuIHJldDsNCj4gPiAgfQ0KPiA+DQo+ID4gQEAgLTMxNzQsNiArMzE3Niw4IEBA
+IHN0YXRpYyBpbnQgY2lmc193cml0ZV9lbmQoc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRy
+ZXNzX3NwYWNlICptYXBwaW5nLA0KPiA+ICAgICAgIHN0cnVjdCBmb2xpbyAqZm9saW8gPSBwYWdl
+X2ZvbGlvKHBhZ2UpOw0KPiA+ICAgICAgIF9fdTMyIHBpZDsNCj4gPg0KPiA+ICsgICAgIG11dGV4
+X2xvY2soJkNJRlNfSShtYXBwaW5nLT5ob3N0KS0+dGJsX3dyaXRlX211dGV4KTsNCj4gPiArDQo+
+ID4gICAgICAgaWYgKGNpZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9SV1BJREZP
+UldBUkQpDQo+ID4gICAgICAgICAgICAgICBwaWQgPSBjZmlsZS0+cGlkOw0KPiA+ICAgICAgIGVs
+c2UNCj4gPiBAQCAtMzIzMyw2ICszMjM3LDcgQEAgc3RhdGljIGludCBjaWZzX3dyaXRlX2VuZChz
+dHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcsDQo+ID4gICAg
+ICAgLyogSW5kaWNhdGlvbiB0byB1cGRhdGUgY3RpbWUgYW5kIG10aW1lIGFzIGNsb3NlIGlzIGRl
+ZmVycmVkICovDQo+ID4gICAgICAgc2V0X2JpdChDSUZTX0lOT19NT0RJRklFRF9BVFRSLCAmQ0lG
+U19JKGlub2RlKS0+ZmxhZ3MpOw0KPiA+DQo+ID4gKyAgICAgbXV0ZXhfdW5sb2NrKCZDSUZTX0ko
+bWFwcGluZy0+aG9zdCktPnRibF93cml0ZV9tdXRleCk7DQo+ID4gICAgICAgcmV0dXJuIHJjOw0K
+PiA+ICB9DQo+ID4NCj4gPiBAQCAtNDkwNSw2ICs0OTEwLDcgQEAgc3RhdGljIGludCBjaWZzX3dy
+aXRlX2JlZ2luKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGlu
+ZywNCj4gPiAgICAgICBpbnQgcmMgPSAwOw0KPiA+DQo+ID4gICAgICAgY2lmc19kYmcoRllJLCAi
+d3JpdGVfYmVnaW4gZnJvbSAlbGxkIGxlbiAlZFxuIiwgKGxvbmcgbG9uZylwb3MsIGxlbik7DQo+
+ID4gKyAgICAgbXV0ZXhfbG9jaygmQ0lGU19JKG1hcHBpbmctPmhvc3QpLT50Ymxfd3JpdGVfbXV0
+ZXgpOw0KPiA+DQo+ID4gIHN0YXJ0Og0KPiA+ICAgICAgIHBhZ2UgPSBncmFiX2NhY2hlX3BhZ2Vf
+d3JpdGVfYmVnaW4obWFwcGluZywgaW5kZXgpOw0KPiA+IEBAIC00OTY1LDYgKzQ5NzEsNyBAQCBz
+dGF0aWMgaW50IGNpZnNfd3JpdGVfYmVnaW4oc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRy
+ZXNzX3NwYWNlICptYXBwaW5nLA0KPiA+ICAgICAgICAgICAgICAgICAgdGhpcyB3aWxsIGJlIHdy
+aXR0ZW4gb3V0IGJ5IHdyaXRlX2VuZCBzbyBpcyBmaW5lICovDQo+ID4gICAgICAgfQ0KPiA+ICBv
+dXQ6DQo+ID4gKyAgICAgbXV0ZXhfdW5sb2NrKCZDSUZTX0kobWFwcGluZy0+aG9zdCktPnRibF93
+cml0ZV9tdXRleCk7DQo+ID4gICAgICAgKnBhZ2VwID0gcGFnZTsNCj4gPiAgICAgICByZXR1cm4g
+cmM7DQo+ID4gIH0NCj4NCj4gSGVyZSBhcmUgc29tZSBvZiB0aGUgbG9nIGV4Y2VycHRzIGZvciBv
+bmUgb2YgbXkgdGVzdCBjYXNlcy4gSW4gdGhpcyBmaWxlIG9uZSBvZiB0aGUgY29ycnVwdCByZWdp
+b25zIHN0YXJ0cyBhdCBmaWxlIG9mZnNldCAxLDA3NCwyMTQsNDc0ICgweDQwMDczNjRBKSwgYW5k
+IHdhcyBjb3JydXB0IGZvciAyLDQ4NiBieXRlcywgZW5kaW5nIG9uIGEgcGFnZSBib3VuZGFyeS4g
+Rmlyc3QgdGhlcmUgaXMgYSBzZWN0aW9uIG9mIHRoZSBsb2cgdHJpbW1lZCB0byBqdXN0IHRoZSBj
+aWZzX3dyaXRlX2JlZ2luKCkgLyBjaWZzX3dyaXRlX2VuZCgpIGZ1bmN0aW9ucy4gWW91IGNhbiBz
+ZWUgdGhhdCB0aGVyZSBpcyBhIHdyaXRlIHNob3duIGF0IHRoZSBleGFjdCBvZmZzZXQvbGVuZ3Ro
+IG9mIHRoZSBjb3JydXB0ZWQgZGF0YS4NCj4NCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5l
+bDogWyAgMTI0LjA4MDkwMF0gWzE1NjddIGNpZnNfd3JpdGVfYmVnaW46NDkwNzogQ0lGUzogZnMv
+c21iL2NsaWVudC9maWxlLmM6IHdyaXRlX2JlZ2luIGZyb20gMTA3NDIxMjg2NCBsZW4gMTYxMA0K
+PiA+IE1hciAyNSAxNToyNTozOSBUWDIga2VybmVsOiBbICAxMjQuMDgwOTA2XSBbMTU2N10gY2lm
+c193cml0ZV9lbmQ6MzE4MjogQ0lGUzogZnMvc21iL2NsaWVudC9maWxlLmM6IHdyaXRlX2VuZCBm
+b3IgcGFnZSAwMDAwMDAwMDg2NTE5YWZkIGZyb20gcG9zIDEwNzQyMTI4NjQgd2l0aCAxNjEwIGJ5
+dGVzDQo+ID4gTWFyIDI1IDE1OjI1OjM5IFRYMiBrZXJuZWw6IFsgIDEyNC4wODA5MTFdIFsxNTY3
+XSBjaWZzX3dyaXRlX2JlZ2luOjQ5MDc6IENJRlM6IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3cml0
+ZV9iZWdpbiBmcm9tIDEwNzQyMTQ0NzQgbGVuIDI0ODYNCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgy
+IGtlcm5lbDogWyAgMTI0LjA4MDkxNl0gWzE1NjddIGNpZnNfd3JpdGVfZW5kOjMxODI6IENJRlM6
+IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3cml0ZV9lbmQgZm9yIHBhZ2UgMDAwMDAwMDA4NjUxOWFm
+ZCBmcm9tIHBvcyAxMDc0MjE0NDc0IHdpdGggMjQ4NiBieXRlcw0KPiA+IE1hciAyNSAxNToyNToz
+OSBUWDIga2VybmVsOiBbICAxMjQuMDgwOTE3XSBbMTU2N10gY2lmc193cml0ZV9iZWdpbjo0OTA3
+OiBDSUZTOiBmcy9zbWIvY2xpZW50L2ZpbGUuYzogd3JpdGVfYmVnaW4gZnJvbSAxMDc0MjE2OTYw
+IGxlbiA4NDYNCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MDkyNF0g
+WzE1NjddIGNpZnNfd3JpdGVfZW5kOjMxODI6IENJRlM6IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3
+cml0ZV9lbmQgZm9yIHBhZ2UgMDAwMDAwMDA4ODBjZWUwMyBmcm9tIHBvcyAxMDc0MjE2OTYwIHdp
+dGggODQ2IGJ5dGVzDQo+DQo+IE5vdyBoZXJlJ3MgYSBzZWN0aW9uIG9mIHRoZSBsb2cgdHJpbW1l
+ZCB0byBqdXN0IHRoZSBzbWIyX2FzeW5jX3dyaXRldigpIGZ1bmN0aW9uLiBZb3UgY2FuIHNlZSB3
+cml0ZXMgY292ZXJpbmcgdGhlIGRhdGEgaW1tZWRpYXRlbHkgYmVmb3JlIGFuZCBhZnRlciB0aGUg
+Y29ycnVwdGVkIHJlZ2lvbiwgYnV0IHRoZXJlIGlzIG5vIHdyaXRlIHRvIHRoZSBjb3JydXB0ZWQg
+cmVnaW9uLiBJJ20gYXNzdW1pbmcgdGhlIGNvcnJ1cHRlZCByZWdpb24gaXMgYWx3YXlzIHplcm9z
+IGJlY2F1c2UgdGhlIHNlcnZlciBpcyBleHRlbmRpbmcgYW5kIHplcm8tZmlsbGluZyB0aGUgZmls
+ZSB0byB0aGUgbmV3IHdyaXRlIG9mZnNldCBhZnRlciB0aGUgZ2FwIG9mIHRoZSBtaXNzaW5nIHdy
+aXRlLg0KPg0KPiA+IE1hciAyNSAxNToyNTozOSBUWDIga2VybmVsOiBbICAxMjMuODI5Njk2XSBb
+MTYzNV0gc21iMl9hc3luY193cml0ZXY6NDk0NTogQ0lGUzogZnMvc21iL2NsaWVudC9zbWIycGR1
+LmM6IGFzeW5jIHdyaXRlIGF0IDEwNzIyMTQwMTYgOTg4MjYwIGJ5dGVzIGl0ZXI9ZjE0NjQNCj4g
+PiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MTAxNl0gWzE2MzZdIHNtYjJf
+YXN5bmNfd3JpdGV2OjQ5NDU6IENJRlM6IGZzL3NtYi9jbGllbnQvc21iMnBkdS5jOiBhc3luYyB3
+cml0ZSBhdCAxMDczMjAxMTUyIDEwMTMzMjIgYnl0ZXMgaXRlcj1mNzY0YQ0KPiAqKiBNaXNzaW5n
+IHdyaXRlOiAxMDczMjAxMTUyICsgMTAxMzMyMiA9IDEwNzQyMTQ0NzQgKioNCj4gPiBNYXIgMjUg
+MTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MzkwMV0gWzE2MzZdIHNtYjJfYXN5bmNfd3Jp
+dGV2OjQ5NDU6IENJRlM6IGZzL3NtYi9jbGllbnQvc21iMnBkdS5jOiBhc3luYyB3cml0ZSBhdCAx
+MDc0MjE2OTYwIDM5NTY0IGJ5dGVzIGl0ZXI9OWE4Yw0KPiA+IE1hciAyNSAxNToyNTo0MCBUWDIg
+a2VybmVsOiBbICAxMjQuMzQwNTU3XSBbMTYzN10gc21iMl9hc3luY193cml0ZXY6NDk0NTogQ0lG
+UzogZnMvc21iL2NsaWVudC9zbWIycGR1LmM6IGFzeW5jIHdyaXRlIGF0IDEwNzQyNTM4MjQgMTIz
+Nzg0MyBieXRlcyBpdGVyPTEyZTM1Mw0KPg0KPiBJIGNhbiB2ZXJ5IGVhc2lseSByZXByb2R1Y2Ug
+dGhpcyB3aXRoIG91ciBhcHBsaWNhdGlvbi4gSWYgYW55b25lIGhhcyBhbnkgc3VnZ2VzdGlvbnMg
+dG8gdHJ5LCBhZGRpdGlvbmFsIGxvZ2dpbmcgLyB0cmFjaW5nIHRoZXkgd291bGQgbGlrZSBtZSB0
+byBwZXJmb3JtLCBwbGVhc2UgbGV0IG1lIGtub3cuIEkgY2FuIHByb3ZpZGUgbW9yZSBkZXRhaWxl
+ZCwgZnVsbCBsb2dzIGlmIGRlc2lyZWQsIGJ1dCB0aGV5J3JlIHF1aXRlIGxhcmdlLiBJJ2xsIGNv
+bnRpbnVlIHRvIHJlYWQgdGhyb3VnaCB0aGUgY29kZSBhbmQgdHJ5IHRvIHVuZGVyc3RhbmQsIGlm
+IEkgZmluZCBhbnl0aGluZyBJIHdpbGwgdXBkYXRlIHlvdS4NCj4NCj4gVGhhbmtzLA0KPiBNYXJr
+IFdoaXRpbmcNCj4NCj4NCg0KDQotLQ0KVGhhbmtzLA0KDQpTdGV2ZQ0K
