@@ -1,305 +1,321 @@
-Received: from eproxy.izw-berlin.de (eproxy.izw-berlin.de [62.141.164.2])
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54897158553
-	for <linux-cifs@vger.kernel.org>; Thu, 27 Mar 2025 10:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.141.164.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6CF1FF7BC;
+	Thu, 27 Mar 2025 11:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.129.21.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743070195; cv=none; b=WX7/Aw2lxxdMiLaqXZ3hsyMoVPrycbqgPMZDV09jddEYfINXANmAt69EcvWCeZ0Jkk3O2fE5Hawg592m4Km/BhIifVZB8Ho1qrzdggR+WFSwdRZUYpNW3Q/D9K+vUDIrBwjGryQhtOt9K/1TTlEYoAcvWBlVyT4pyX5bVEvEKL4=
+	t=1743074125; cv=none; b=MyM1H8Qt29tdmoDB8g1y9/BFerOQzzxXCnw8a0L8CyEigJBgS4eR2lA0QSaaE/AxlemhpT8u7a2/WIsGm7btd6VTGifLOAbqMrkIQ+KqqqDExEcaHEf3iF/iVeKKFxhVIxQG/PW45/+BpAdFCU4l4YrdCvDCNS0p5Y0voBSyHlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743070195; c=relaxed/simple;
-	bh=KNq58Z7LoCocIIbnY1CphPXYO0p1FHPlgIyPCeBWrEw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MJjHLUh+47hSDDpqcvFN9YOmKmzrxiTbj9gpQm/aTaQhsbd8XkHRc3RdDaGSt1Pf9LTyOVo7WpnNPQcCV9P9NTKU6f6w11+WBDMvgIh3c84hV1wbaeJIKX5a3cXXpa3XKbXW0bjWwjzuEP8WqBPOj5bSECc9p/nRrbG+UuVfgwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de; spf=pass smtp.mailfrom=izw-berlin.de; dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b=gTX+cWYy; arc=none smtp.client-ip=62.141.164.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=izw-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=izw-berlin.de
+	s=arc-20240116; t=1743074125; c=relaxed/simple;
+	bh=Mum7vPqFk3w8U9ruStP8/tuFAlR9zy/cKyuhzO9J+fc=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=igbO8m/wkpx7W9Y8tSaurEQ/MlvMTIUVZeoj3EbLLeiWXVmxFSDQsHFe0u3qJbKf2sJHpqQM8gk8YzYIAb702fz9qqBnOEEcpGXQ2Xr9F4AuWOQbUirtG7/FkKT5mj9oak79fGnPP4uAfGDfhmI7x5Rp8wL7yhokSoZ3fGVnclM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr; spf=pass smtp.mailfrom=3xo.fr; dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b=qs6rOep7; arc=none smtp.client-ip=212.129.21.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3xo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=izw-berlin.de header.i=@izw-berlin.de header.b="gTX+cWYy"
-Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by eproxy.izw-berlin.de over TLS secured channel with Microsoft SMTPSVC(10.0.14393.4169);
-	 Thu, 27 Mar 2025 11:09:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; d=izw-berlin.de; s=p2024; c=simple/simple;
-	t=1743070187; h=from:subject:to:date:message-id;
-	bh=KNq58Z7LoCocIIbnY1CphPXYO0p1FHPlgIyPCeBWrEw=;
-	b=gTX+cWYyzNztz5R6MZWZYZtSdGoW7nv5BBdhW8uwdmfhD1grtqjCj1LmQ9BxK2r0PN0ATcSKrbO
-	jsegr7z0/zGEi7seGiE2AXglkqkTs+6HhwePkGov+9YCHAiAfvcV8j8vf/aUIK1MWxEN6dVxQVC6w
-	u87U5aM9VDdCByVx/54=
-Received: from izw-mail-3.izw-berlin.local (192.168.2.11) by
- izw-mail-3.izw-berlin.local (192.168.2.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 27 Mar 2025 11:09:47 +0100
-Received: from izw-mail-3.izw-berlin.local ([192.168.2.11]) by
- izw-mail-3.izw-berlin.local ([192.168.2.11]) with mapi id 15.01.2507.044;
- Thu, 27 Mar 2025 11:09:47 +0100
-From: "Heckmann, Ilja" <heckmann@izw-berlin.de>
-To: Steve French <smfrench@gmail.com>
-CC: Mark A Whiting <whitingm@opentext.com>, "linux-cifs@vger.kernel.org"
-	<linux-cifs@vger.kernel.org>
-Subject: AW: [[ EXT ]] Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption
- when writing, x86_64, kernel 6.6.71
-Thread-Topic: [[ EXT ]] Re: [[ EXT ]] [BUG REPORT] cifs/smb data corruption
- when writing, x86_64, kernel 6.6.71
-Thread-Index: AdudzFmZYMLtC4Y+RNm+sf4/yE+hZgAZ/wojABEUuAAAIUWfaw==
-Date: Thu, 27 Mar 2025 10:09:47 +0000
-Message-ID: <63acb774f3204a26b9626968104c2d28@izw-berlin.de>
-References: <YT1PR01MB9451424C6870795133FB7C96B3A72@YT1PR01MB9451.CANPRD01.PROD.OUTLOOK.COM>
- <36fb31bf2c854cdc930a3415f5551dcd@izw-berlin.de>,<CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtNtyqZBpT8hL2xvZ8QYWAymrPR-5LmpZbeTHr_1ATPWg@mail.gmail.com>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b="qs6rOep7"
+Received: from localhost (mail.3xo.fr [212.129.21.66])
+	by mail.3xo.fr (Postfix) with ESMTP id 30530CB;
+	Thu, 27 Mar 2025 12:15:14 +0100 (CET)
+X-Virus-Scanned: Debian amavis at nxo2.3xo.fr
+Received: from mail.3xo.fr ([212.129.21.66])
+ by localhost (mail.3xo.fr [212.129.21.66]) (amavis, port 10024) with ESMTP
+ id yQPAkIiGtRPb; Thu, 27 Mar 2025 12:15:08 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.3xo.fr 20FF88D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3xo.fr; s=3xo;
+	t=1743074108; bh=GTQhFaE+IZsmK42SbrfiuQvcmYVy8y20OTUF1YrL+0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qs6rOep78yib+sqVGEkVxJQReX+7zhoBvNX9GeIYFhVQMjFtgefatu9UaRtlMwQ8i
+	 c6q1eGGvrOa+c9NOLuxujA19XHYat9zLwz44PLeDjPw2joRZl8QWQsb2Di9qzv7PrV
+	 IcBoWMb8MGPfzdHeD/wrZO0L/LUe8URiO+c/jwIAE4gw/KkNI1M9S3HRcy1C+xQktK
+	 +hv0kH5NqXAMssxGNssx/Kax0s+Z9III4wJ0q+ax3baZ3oXRLyQPrIDkxe/jnhW4Fh
+	 OMs9yz7JKM7yrT90LyN2gAsQsglVeDeLhoBjcpDSO3pSHr9ytfGGEQYQKYdSgqXll4
+	 ms/ehJpTNhECA==
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by mail.3xo.fr (Postfix) with ESMTPSA id 20FF88D;
+	Thu, 27 Mar 2025 12:15:08 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginalArrivalTime: 27 Mar 2025 10:09:47.0676 (UTC) FILETIME=[5ECB4DC0:01DB9F00]
+Date: Thu, 27 Mar 2025 12:15:07 +0100
+From: Nicolas Baranger <nicolas.baranger@3xo.fr>
+To: hch@lst.de, Christoph Hellwig <hch@infradead.org>, David Howells
+ <dhowells@redhat.com>, netfs@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>,
+ Christian Brauner <brauner@kernel.org>
+Subject: [netfs/cifs - Linux 6.14] loop on file cat + file copy when files are
+ on CIFS share
+In-Reply-To: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
+References: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
+Message-ID: <35940e6c0ed86fd94468e175061faeac@3xo.fr>
+X-Sender: nicolas.baranger@3xo.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 
-Tm8sIHdlIG9ubHkgcmFuIHRlc3RzIG9uIHdoYXRldmVyIGtlcm5lbCB2ZXJzaW9uIHdhcyBhdmFp
-bGFibGUgYXQgdGhlIHRpbWUgb24gb3VyIEZlZG9yYSBtYWNoaW5lcy4gQXMgSSBtZW50aW9uZWQs
-IG91ciBsZXZlbCBvZiBleHBlcnRpc2UgaW4ga2VybmVsLWxldmVsIHN0dWZmIC4uLiBoYXMgcm9v
-bSBmb3IgaW1wcm92ZW1lbnQgOikgSSdtIG5vdCBleGFjdGx5IHN1cmUgaG93IHRvIHNldCB1cCBh
-IG1hY2hpbmUgZm9yIGJpc2VjdGlvbjogV2hhdCBkaXN0cm8gdG8gc3RhcnQgd2l0aD8gSG93IHRv
-IGluc3RhbGwgYSBsb2NhbGx5IGNvbXBpbGVkIGtlcm5lbD8gSG93IGZhciBpbiBrZXJuZWwgdmVy
-c2lvbiBoaXN0b3J5IGNvdWxkIEkgZ28gYmFjayB3aXRob3V0IHRoZSByZXN0IG9mIHRoZSBzeXN0
-ZW0gYnJlYWtpbmc/IEJ1dCBpZiBzb21lYm9keSBjb3VsZCBwcm92aWRlIG1lIHdpdGggaW5mb3Jt
-YXRpb24gb3IgbWF5YmUgZXZlbiBhIGNvbXBsZXRlIHN0ZXAtYnktc3RlcCBndWlkZSwgSSdkIGJl
-IHdpbGxpbmcgdG8gZ2l2ZSBpdCBhIHRyeS4NCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18NClZvbjogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQpHZXNl
-bmRldDogTWl0dHdvY2gsIDI2LiBNw6RyeiAyMDI1IDE5OjU4OjIwDQpBbjogSGVja21hbm4sIEls
-amENCkNjOiBNYXJrIEEgV2hpdGluZzsgbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCkJldHJl
-ZmY6IFtbIEVYVCBdXSBSZTogW1sgRVhUIF1dIFtCVUcgUkVQT1JUXSBjaWZzL3NtYiBkYXRhIGNv
-cnJ1cHRpb24gd2hlbiB3cml0aW5nLCB4ODZfNjQsIGtlcm5lbCA2LjYuNzENCg0KV2VyZSB5b3Ug
-YWJsZSB0byBjb25maXJtIHRoYXQgdGhlIHByb2JsZW0gc3RhcnRlZCBhZnRlciA2LjYuMCBidXQN
-CnJlZ3Jlc3NlZCBiZWZvcmUgNi42LjkgLSBhbnkgY2hhbmNlIG9mIG5hcnJvd2luZyB0aGUgcmVn
-cmVzc2lvbiBkb3duDQpieSBiaXNlY3Rpb24/DQoNCk9uIFdlZCwgTWFyIDI2LCAyMDI1IGF0IDU6
-MTPigK9BTSBIZWNrbWFubiwgSWxqYSA8aGVja21hbm5AaXp3LWJlcmxpbi5kZT4gd3JvdGU6DQo+
-DQo+IFdlIHJhbiBpbnRvIHdoYXQgcHJvYmFibHkgaXMgdGhlIHNhbWUgcHJvYmxlbSB3aXRoIHNp
-bGVudCBkYXRhIGNvcnJ1cHRpb24gdGhhdCB3YXMgb25seSBub3RpY2VkIHRoYW5rcyB0byB1c2lu
-ZyBhIGRhdGEgZm9ybWF0IHdpdGggaW50ZXJuYWwgY2hlY2tzdW1zLiBJdCBhbHNvIHdlbnQgYXdh
-eSB3aGVuIG1vdW50aW5nIGEgc2hhcmUgd2l0aCAiY2FjaGU9bm9uZSIgd2hpbGUgcnVubmluZyB0
-aGUga2VybmVsIDYuNi45LCBidXQgdGhhdCBoYWQgdGhlIHNpZGUtZWZmZWN0IHRoYXQgbm8gZXhl
-Y3V0YWJsZXMgY291bGQgYmUgc3RhcnRlZCBmcm9tIHRoZSBzaGFyZSAoSSByZXBvcnRlZCB0aGlz
-IGluIEp1bmUgMjAyNCkuIFRoaXMgc2Vjb25kIHByb2JsZW0gd2FzIGZpeGVkIGluIDYuMTAsIGJ1
-dCBhdCB0aGUgc2FtZSB0aW1lIG1vdW50aW5nIHdpdGggImNhY2hlPW5vbmUiIHN0b3BwZWQgaGVs
-cGluZyBhZ2FpbnN0IHRoZSBkYXRhIGNvcnJ1cHRpb24gaXNzdWUuIEl0IHBlcnNpc3RzIHVudGls
-IG5vdywgd2l0aCBrZXJuZWwgNi4xMi44LCBhbHRob3VnaCB0aGUgZnJlcXVlbmN5IGF0IHdoaWNo
-IHRoZSBwcm9ibGVtIG1hbmlmZXN0cyB3ZW50IGRvd24gc2lnbmlmaWNhbnRseS4NCj4NCj4gVGhl
-IHdheSB3ZSB0ZXN0IGZvciBpdCBpcyBieSBydW5uaW5nIGEgY2VydGFpbiB3b3JrbG9hZCAxMDAg
-dGltZXMgaW4gYSBsb29wIGFuZCBjb3VudGluZyB0aGUgbnVtYmVyIG9mIHJ1bnMgYWJvcnRlZCBi
-ZWNhdXNlIG9mIGVycm9ycy4gVGhhdCBudW1iZXIgd2VudCBkb3duIGZyb20gYWJvdXQgMTAgcGVy
-IDEwMCBydW5zIHdpdGgga2VybmVsIDYuNi45IHRvIGFib3V0IDEgcGVyIDEwMCBydW5zIHdpdGgg
-Ni4xMi44LiBJdHMgbm9uLWRldGVybWluaXN0aWMgbmF0dXJlIGFuZCB0aGUgbGFjayBvZiBpbi1o
-b3VzZSBleHBlcnRpc2UgdG8gaW52ZXN0aWdhdGUgdGhlIGlzc3VlIGF0IHRoZSBzYW1lIGxldmVs
-IGFzIE1hcmsgZGlkIHN0b3BwZWQgdXMgZnJvbSByZXBvcnRpbmcgaXQgc28gZmFyLiBBbmQgd2hp
-bGUgdGhlcmUgaXMgbm8gd2F5IG9mIGtub3dpbmcgdGhhdCB0aGUgaXNzdWUgd2Ugb2JzZXJ2ZSBp
-biA2LjEyLjggaXMgdGhlIHNhbWUgb25lLCBhdCBsZWFzdCBJIGNhbiBjb25maXJtIHRoYXQgdGhl
-cmUgaXMgYSBzaW1pbGFyIGlzc3VlIGluIG1vcmUgcmVjZW50IGtlcm5lbCB2ZXJzaW9ucyBhcyB3
-ZWxsLg0KPg0KPiBCZXN0IHdpc2hlcywNCj4gSWxqYSBIZWNrbWFubg0KPiBfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IFZvbjogTWFyayBBIFdoaXRpbmcgPHdoaXRp
-bmdtQG9wZW50ZXh0LmNvbT4NCj4gR2VzZW5kZXQ6IERpZW5zdGFnLCAyNS4gTcOkcnogMjAyNSAy
-MjoyNDo1NQ0KPiBBbjogbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcNCj4gQmV0cmVmZjogW1sg
-RVhUIF1dIFtCVUcgUkVQT1JUXSBjaWZzL3NtYiBkYXRhIGNvcnJ1cHRpb24gd2hlbiB3cml0aW5n
-LCB4ODZfNjQsIGtlcm5lbCA2LjYuNzENCj4NCj4gSGVsbG8sDQo+DQo+IEkgaGF2ZSBkaXNjb3Zl
-cmVkIGEgZGF0YSBjb3JydXB0aW9uIGlzc3VlIHdpdGggb3VyIGFwcGxpY2F0aW9uIHdyaXRpbmcg
-dG8gYSBDSUZTIHNoYXJlLiBJIGJlbGlldmUgdGhpcyBpc3N1ZSBtYXkgYmUgcmVsYXRlZCB0byBh
-bm90aGVyIHJlcG9ydCBJIHNhdyBvbiB0aGlzIG1haWxpbmcgbGlzdCwgaHR0cHM6Ly9sb3JlLmtl
-cm5lbC5vcmcvbGludXgtY2lmcy9ERkMxREFDNS01QzZDLTREQzItODA3QS1EQUYxMkU0Qjc4ODJA
-Z21haWwuY29tLy4gSSB1bmRlcnN0YW5kIHRoYXQgdXBkYXRpbmcgdG8gYSBuZXdlciBrZXJuZWwg
-d291bGQgbGlrZWx5IGZpeCB0aGlzIGlzc3VlLiBIb3dldmVyLCBhdCB0aGUgbW9tZW50LCB0aGF0
-J3Mgbm90IGFuIG9wdGlvbiBmb3IgdXMuIEluIHRoZSBsb25nIHRlcm0gd2UgYXJlIGxvb2tpbmcg
-dG8gdXBncmFkZSB0byA2LjEyIGJ1dCBJJ20gaG9waW5nIHRvIGZpbmQgYSBzb2x1dGlvbiBmb3Ig
-b3VyIGN1cnJlbnQgNi42IGtlcm5lbC4NCj4NCj4gSSBoYXZlIHRlc3RlZCBtb3VudGluZyB3aXRo
-IHRoZSAiY2FjaGU9bm9uZSIgb3B0aW9uIGFuZCB0aGF0IHNvbHZlcyB0aGUgcHJvYmxlbSwgYWxi
-ZWl0IHdpdGggYSB2ZXJ5IGxhcmdlIHBlcmZvcm1hbmNlIGhpdC4NCj4NCj4gVGhlIHBsYXRmb3Jt
-IGlzIGFuIGVtYmVkZGVkIHN5c3RlbS4gV2UncmUgdXNpbmcgYW4gb2ZmLXRoZS1zaGVsZiBDT00g
-RXhwcmVzcyBUeXBlIDcgbW9kdWxlIHdpdGggYW4gSW50ZWwgWEVPTiBELTE3MTNOVCBwcm9jZXNz
-b3IuIFdlJ3JlIHJ1bm5pbmcgYSBjdXN0b20gTGludXggc3lzdGVtIGJ1aWx0IHVzaW5nIEJ1aWxk
-cm9vdCwgY3VycmVudGx5IHJ1bm5pbmcgdGhlIDYuNi43MSBrZXJuZWwuIEkndmUgdGVzdGVkIHRo
-ZSBsYXRlc3QgNi42Ljg0IGtlcm5lbCBhbmQgdGhlIHByb2JsZW0gc3RpbGwgZXhpc3RzIHRoZXJl
-LiBPdXIgYXBwbGljYXRpb24gaXMgd3JpdGluZyBsYXJnZSBhbW91bnRzIG9mIGNvbXByZXNzZWQg
-ZGF0YSAoNCsgR0IpIHRvIHRoZSBuZXR3b3JrIHNoYXJlLiBXaGVuIEkgcmVhZCBiYWNrIHRoZSBk
-YXRhIHRvIHZlcmlmeSBpdCwgSSdtIHNlZWluZyBzbWFsbCBwb3J0aW9ucyBvZiB0aGUgZmlsZSB0
-aGF0IGhhdmUgYmVlbiByZXBsYWNlZCB3aXRoIHplcm9zLg0KPg0KPiBJJ3ZlIGF0dGFja2VkIHRo
-ZSBpc3N1ZSBmcm9tIHNldmVyYWwgYW5nbGVzLiBTdGFydGluZyB3aXRoIGEgVENQIGR1bXAgb2Yg
-YSBjb21wbGV0ZSBvcGVyYXRpb24gZnJvbSBtb3VudGluZywgZGF0YSB0cmFuc2ZlciwgdG8gdW5t
-b3VudGluZyB0aGUgbmV0d29yayBzaGFyZS4gVGhyb3VnaCBXaXJlc2hhcmsgSSBjYW4gc2VlIHRo
-YXQgdGhlcmUgaXMgbm8gd3JpdGUgY29tbWFuZCB0byB0aGUgc2VydmVyIGNvdmVyaW5nIHRoZSBz
-ZWN0aW9ucyBvZiB0aGUgb3V0cHV0IHRoYXQgZW5kcyB1cCBhcyB6ZXJvcy4gVGhpcyBpbmRpY2F0
-ZWQgdG8gbWUgdGhhdCB0aGUgQ0lGUyBrZXJuZWwgZHJpdmVyIGlzIGZhaWxpbmcgdG8gd3JpdGUg
-b3V0IHBvcnRpb25zIG9mIHRoZSBmaWxlLg0KPg0KPiBJIHRoZW4gZW5hYmxlZCBhbGwgdGhlIENJ
-RlMgZGVidWcgaW5mbyBJIGNvdWxkIHZpYSBjaWZzRllJIGFuZCB0aGUga2VybmVsIGR5bmFtaWMg
-ZGVidWcgY29udHJvbHMgYW5kIHR3ZWFrZWQgdGhlIGNvZGUgdG8gbm90IHJhdGUgbGltaXQgdGhl
-IHByX2RlYnVnIGNhbGxzLiBJIGNvdWxkIHRyYWNlIHRocm91Z2ggdGhlIHJlc3VsdGluZyBsb2dz
-IGFuZCBmaW5kIHBhaXJzIG9mIGNpZnNfd3JpdGVfYmVnaW4oKSAvIGNpZnNfd3JpdGVfZW5kKCkg
-dGhhdCBjb3ZlcmVkIGFsbCB0aGUgZGF0YSBpbmNsdWRpbmcgdGhlIHNlY3Rpb25zIHRoYXQgdWx0
-aW1hdGVseSBkb24ndCBnZXQgd3JpdHRlbiBvdXQuIEhvd2V2ZXIsIHRyYWNpbmcgdGhyb3VnaCB0
-aGUgc21iMl9hc3luY193cml0ZXYoKSBtZXNzYWdlcyBJIGFnYWluIGNvdWxkIG5vdCBmaW5kIGFu
-eSB3cml0ZXMgdGhhdCBjb3ZlcmVkIHRoZSBjb3JydXB0IHBvcnRpb25zLiBBdCB0aGlzIHBvaW50
-IEkgYmVnYW4gdG8gc3VzcGVjdCBzb21lIGtpbmQgb2YgcmFjZSBjb25kaXRpb24gd2l0aGluIHRo
-ZSBjaWZzX3dyaXRlcGFnZXMoKSBmdW5jdGlvbi4NCj4NCj4gSSBhbHNvIGFuYWx5emVkIHRoZSBk
-YXRhIGNvcnJ1cHRpb24gYW5kIG5vdGljZWQgYSBwYXR0ZXJuLiBJdCBkb2VzIG5vdCBmYWlsIDEw
-MCUgb2YgdGhlIHRpbWUsIGFuZCBpdCBkb2VzIG5vdCBhbHdheXMgZmFpbCBpbiB0aGUgc2FtZSBw
-bGFjZS4gVGhpcyBmdXJ0aGVyZWQgbXkgYmVsaWVmIHRoYXQgaXQgd2FzIHNvbWUga2luZCBvZiBu
-b24tZGV0ZXJtaW5pc3RpYyBkYXRhIHJhY2UuIFRoZSBjb3JydXB0IGRhdGEgcmVnaW9uIGlzIGFs
-d2F5cyBsZXNzIHRoYW4gYSBwYWdlIGluIHNpemUgKDw0MDk2IGJ5dGVzKSwgaXQncyBhbHdheXMg
-emVyb3MsIGFuZCBpdCBhbHdheXMgZW5kcyBvbiBhIHBhZ2UgYm91bmRhcnkuIEJlY2F1c2UgSSBr
-bmV3IHRoZSBleHBlY3RlZCBmb3JtYXQgb2YgdGhlIGRhdGEsIEkgY291bGQgYWxzbyB0ZWxsIHRo
-YXQgdGhlIGNvcnJ1cHQgZGF0YSB3YXMgYWx3YXlzIGF0IHRoZSBiZWdpbm5pbmcgb2YgYSB3cml0
-ZSBzeXNjYWxsIGJ5IG91ciBhcHBsaWNhdGlvbi4NCj4NCj4gSSd2ZSBhdHRlbXB0ZWQgdG8gcmVh
-ZCB0aHJvdWdoIHRoZSBDSUZTIGtlcm5lbCBjb2RlIGludm9sdmVkIGluIHRoaXMuIEJ1dCBJJ3Zl
-IG5ldmVyIHdvcmtlZCBpbiB0aGUgVkZTL2ZpbGVzeXN0ZW0gbGF5ZXJzIGJlZm9yZS4gQW5kIEkn
-bSBoYXZpbmcgdHJvdWJsZSBmb2xsb3dpbmcgLyB1bmRlcnN0YW5kaW5nIHRoZSBpbnRyaWNhY2ll
-cyBvZiB0aGUgcGFnZSBjYWNoZSwgcGFnZSBkaXJ0eWluZy9jbGVhbmluZywgYW5kIHdyaXRlYmFj
-ay4NCj4NCj4gTXkgY3VycmVudCBiZXN0IGd1ZXNzIGF0IHdoYXQncyBoYXBwZW5pbmcgaXMgYXMg
-Zm9sbG93czoNCj4gICAgICogT3VyIGFwcGxpY2F0aW9uIHdyaXRlcyBvdXQgYSBidWZmZXIgb2Yg
-ZGF0YSB0byB0aGUgZmlsZSBvbiBhIENJRlMgc2hhcmUsIHRoaXMgaXMgY29tcHJlc3NlZCBkYXRh
-IHRoYXQgaXNuJ3QgbmljZWx5IGFsaWduZWQsIHRoZSBkYXRhIGRvZXMgbm90IGVuZCBvbiBhIHBh
-Z2UgYm91bmRhcnkuIFRoaXMgaXMgYSBuZXdseSBjcmVhdGVkIGZpbGUgdGhhdCB3ZSBhcmUgd3Jp
-dGluZyB0bywgc28gdGhpcyB3cml0ZSBleHRlbmRzIHRoZSBmaWxlcyBFT0YgdG8gdGhlIGVuZCBv
-ZiB0aGUgbmV3bHkgd3JpdHRlbiBkYXRhIHdoaWNoIGlzIGluIHRoZSBtaWRkbGUgb2YgYSBwYWdl
-IGluIHRoZSBjYWNoZS4NCj4gICAgICogY2lmc193cml0ZXBhZ2VzKCkgaXMgaW52b2tlZCB0byB3
-cml0ZSB0aGUgY2FjaGVkIGRhdGEgYmFjayB0byB0aGUgc2VydmVyLCBpdCBzY2FucyB0aGUgY2Fj
-aGVkIHBhZ2VzIGFuZCBwcmVwYXJlcyB0byB3cml0ZSBvdXQgYWxsIHRoZSBkaXJ0eSBwYWdlcyAo
-aW5jbHVkaW5nIHRoZSBmaW5hbCBwYXJ0aWFsIHBhZ2UpLg0KPiAgICAgKiBPdXIgYXBwbGljYXRp
-b24gcGVyZm9ybXMgYW5vdGhlciB3cml0ZS4gVGhpcyBleHRlbmRzIHRoZSBmaWxlIGFuZCB0aGUg
-YmVnaW5uaW5nIG9mIHRoaXMgd3JpdGUgZmFsbHMgaW50byB0aGUgZW5kIG9mIHRoZSBwcmV2aW91
-cyBmaW5hbCBwYXJ0aWFsIGNhY2hlZCBwYWdlLg0KPiAgICAgKiBjaWZzX3dyaXRlcGFnZXMoKSBm
-aW5pc2hlcyB3cml0aW5nIG91dCB0aGUgZGlydHkgcGFnZXMsIGluY2x1ZGluZyB0aGUgZmlyc3Qg
-cG9ydGlvbiBvZiB3aGF0IGl0IHRob3VnaHQgd2FzIHRoZSBmaW5hbCBwYXJ0aWFsIHBhZ2UsIGFu
-ZCBtYXJrcyBhbGwgcGFnZXMgYXMgY2xlYW4uDQo+ICAgICAqIE9uIHRoZSBuZXh0IGludm9jYXRp
-b24gb2YgY2lmc193cml0ZXBhZ2VzKCksIGl0IHNjYW5zIGZvciBkaXJ0eSBwYWdlcyBhbmQgc2tp
-cHMgdGhlIGJlZ2lubmluZyBvZiB0aGUgc2Vjb25kIHdyaXRlIGJlY2F1c2UgaXQgdGhpbmtzIHRo
-YXQgcGFnZSBpcyBjbGVhbi4gVGhlIGZvbGxvd2luZyBwYWdlIGlzIGEgY29tcGxldGVseSBuZXcg
-cGFnZSBhbmQgaXMgZGlydHksIHNvIGl0IHN0YXJ0cyBhIG5ldyB3cml0ZSBmcm9tIHRoYXQgcGFn
-ZS4gVGhpcyB3b3VsZCBleHBsYWluIHdoeSB0aGUgY29ycnVwdGlvbiBpcyBhbHdheXMgYXQgdGhl
-IGJlZ2lubmluZyBvZiBvdXIgYXBwbGljYXRpb24ncyB3cml0ZSBhbmQgY29ycmVjdHMgaXRzZWxm
-IGF0IHRoZSBuZXh0IHBhZ2UgYm91bmRhcnkuDQo+DQo+IEkgaGF2ZSB5ZXQgdG8gcmVhbGx5IHBy
-b3ZlIHRoaXMsIGJ1dCB0aGlzIHR5cGUgb2YgcmFjZSBiZXR3ZWVuIGRpcnR5L2NsZWFuIHBhZ2Vz
-IHdvdWxkIGV4cGxhaW4gYWxsIHRoZSBiZWhhdmlvciBJJ20gc2VlaW5nLiBJJ20gaG9waW5nIHNv
-bWVvbmUgbXVjaCBtb3JlIGludGltYXRlbHkgZmFtaWxpYXIgd2l0aCB0aGUgQ0lGUyBjb2RlIGNh
-biBoZWxwIHBvaW50IG1lIGluIHRoZSByaWdodCBkaXJlY3Rpb24uDQo+DQo+IEkgZGlkIHRyeSBv
-bmUgcXVpY2sgYW5kIGRpcnR5IGZpeCwgYXNzdW1pbmcgaXQgd2FzIGEgcmFjZSBJIGFwcGxpZWQg
-dGhlIGZvbGxvd2luZyBwYXRjaC4gVGhpcyBhZGRlZCBhIHBlciBpbm9kZSBtdXRleCB0aGF0IGNv
-bXBsZXRlbHkgc2VyaWFsaXplZCB0aGUgY2lmc193cml0ZV9iZWdpbigpLCBjaWZzX3dyaXRlX2Vu
-ZCgpLCBhbmQgY2lmc193cml0ZXBhZ2VzKCkgZnVuY3Rpb25zLiBUaGlzIGRpZCBzZWVtIHRvIHJl
-c29sdmUgdGhlIGRhdGEgY29ycnVwdGlvbiBpc3N1ZSwgYnV0IGF0IHRoZSBjb3N0IG9mIG9jY2Fz
-aW9uYWwgZGVhZGxvY2tzIHdyaXRpbmcgdG8gQ0lGUyBmaWxlcy4NCj4NCj4gPiBkaWZmIC0tZ2l0
-IGEvZnMvc21iL2NsaWVudC9jaWZzZnMuYyBiL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMNCj4gPiBp
-bmRleCBiYmIwZWYxOGQ3YjguLjZlMmUyNzNiOTgzOCAxMDA2NDQNCj4gPiAtLS0gYS9mcy9zbWIv
-Y2xpZW50L2NpZnNmcy5jDQo+ID4gKysrIGIvZnMvc21iL2NsaWVudC9jaWZzZnMuYw0KPiA+IEBA
-IC0xNjU5LDYgKzE2NTksNyBAQCBjaWZzX2luaXRfb25jZSh2b2lkICppbm9kZSkNCj4gPg0KPiA+
-ICAgICAgIGlub2RlX2luaXRfb25jZSgmY2lmc2ktPm5ldGZzLmlub2RlKTsNCj4gPiAgICAgICBp
-bml0X3J3c2VtKCZjaWZzaS0+bG9ja19zZW0pOw0KPiA+ICsgICAgIG11dGV4X2luaXQoJmNpZnNp
-LT50Ymxfd3JpdGVfbXV0ZXgpOw0KPiAgPiB9DQo+ICA+DQo+ID4gIHN0YXRpYyBpbnQgX19pbml0
-DQo+ID4gZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaCBiL2ZzL3NtYi9jbGll
-bnQvY2lmc2dsb2IuaA0KPiA+IGluZGV4IDQzYjQyZWNhNjc4MC4uNGFmNGM1MDM2ZDgxIDEwMDY0
-NA0KPiA+IC0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaA0KPiA+ICsrKyBiL2ZzL3NtYi9j
-bGllbnQvY2lmc2dsb2IuaA0KPiA+IEBAIC0xNjA2LDYgKzE2MDYsMTcgQEAgc3RydWN0IGNpZnNJ
-bm9kZUluZm8gew0KPiA+ICAgICAgIGJvb2wgbGVhc2VfZ3JhbnRlZDsgLyogRmxhZyB0byBpbmRp
-Y2F0ZSB3aGV0aGVyIGxlYXNlIG9yIG9wbG9jayBpcyBncmFudGVkLiAqLw0KPiA+ICAgICAgIGNo
-YXIgKnN5bWxpbmtfdGFyZ2V0Ow0KPiA+ICAgICAgIF9fdTMyIHJlcGFyc2VfdGFnOw0KPiA+ICsN
-Cj4gPiArICAgICAvKiBEdXJpbmcgZGV2ZWxvcG1lbnQgd2UgZGlzY292ZXJlZCB3aGF0IHdlIGJl
-bGlldmUgdG8gYmUgYSByYWNlIGNvbmRpdGlvbg0KPiA+ICsgICAgICAqIGluIHRoZSB3cml0ZSBj
-YWNoaW5nIGJlaGF2aW9yIG9mIGNpZnMuIFNldHRpbmcgY2FjaGU9bm9uZSBzb2x2ZWQgdGhlDQo+
-ID4gKyAgICAgICogaXNzdWUgYnV0IHdpdGggYW4gdW5hY2NlcHRhYmxlIHBlcmZvcm1hbmNlIGhp
-dC4gVGhlIGZvbGxvd2luZyBtdXRleCB3YXMNCj4gPiArICAgICAgKiBhZGRlZCB0byBzZXJpYWxp
-emUgdGhlIGNpZnNfd3JpdGVfYmVnaW4sIGNpZnNfd3JpdGVfZW5kLCBhbmQNCj4gPiArICAgICAg
-KiBjaWZzX3dyaXRlcGFnZXMgZnVuY3Rpb25zIGluIGZpbGUuYy4gVGhpcyBhcHBlYXJzIHRvIHNv
-bHZlIHRoZSBpc3N1ZQ0KPiA+ICsgICAgICAqIHdpdGhvdXQgY29tcGxldGVseSBkaXNhYmxpbmcg
-Y2FjaGluZy4NCj4gPiArICAgICAgKg0KPiA+ICsgICAgICAqIC1NYXJrIFdoaXRpbmcgKHdoaXRp
-bmdtQG9wZW50ZXh0LmNvbSkNCj4gPiArICAgICAgKi8NCj4gPiArICAgICBzdHJ1Y3QgbXV0ZXgg
-dGJsX3dyaXRlX211dGV4Ow0KPiA+ICB9Ow0KPiA+DQo+ID4gIHN0YXRpYyBpbmxpbmUgc3RydWN0
-IGNpZnNJbm9kZUluZm8gKg0KPiA+IGRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2ZpbGUuYyBi
-L2ZzL3NtYi9jbGllbnQvZmlsZS5jDQo+ID4gaW5kZXggY2I3NWI5NWVmYjcwLi5kM2JjNjUyYTdl
-NjUgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvc21iL2NsaWVudC9maWxlLmMNCj4gPiArKysgYi9mcy9z
-bWIvY2xpZW50L2ZpbGUuYw0KPiA+IEBAIC0zMDg1LDYgKzMwODUsNyBAQCBzdGF0aWMgaW50IGNp
-ZnNfd3JpdGVwYWdlcyhzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywNCj4gPiAgew0KPiA+
-ICAgICAgIGxvZmZfdCBzdGFydCwgZW5kOw0KPiA+ICAgICAgIGludCByZXQ7DQo+ID4gKyAgICAg
-bXV0ZXhfbG9jaygmQ0lGU19JKG1hcHBpbmctPmhvc3QpLT50Ymxfd3JpdGVfbXV0ZXgpOw0KPiA+
-DQo+ID4gICAgICAgLyogV2UgaGF2ZSB0byBiZSBjYXJlZnVsIGFzIHdlIGNhbiBlbmQgdXAgcmFj
-aW5nIHdpdGggc2V0YXR0cigpDQo+ID4gICAgICAgICogdHJ1bmNhdGluZyB0aGUgcGFnZWNhY2hl
-IHNpbmNlIHRoZSBjYWxsZXIgZG9lc24ndCB0YWtlIGEgbG9jayBoZXJlDQo+ID4gQEAgLTMxMTks
-NiArMzEyMCw3IEBAIHN0YXRpYyBpbnQgY2lmc193cml0ZXBhZ2VzKHN0cnVjdCBhZGRyZXNzX3Nw
-YWNlICptYXBwaW5nLA0KPiA+ICAgICAgIH0NCj4gPg0KPiA+ICBvdXQ6DQo+ID4gKyAgICAgbXV0
-ZXhfdW5sb2NrKCZDSUZTX0kobWFwcGluZy0+aG9zdCktPnRibF93cml0ZV9tdXRleCk7DQo+ID4g
-ICAgICAgcmV0dXJuIHJldDsNCj4gPiAgfQ0KPiA+DQo+ID4gQEAgLTMxNzQsNiArMzE3Niw4IEBA
-IHN0YXRpYyBpbnQgY2lmc193cml0ZV9lbmQoc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRy
-ZXNzX3NwYWNlICptYXBwaW5nLA0KPiA+ICAgICAgIHN0cnVjdCBmb2xpbyAqZm9saW8gPSBwYWdl
-X2ZvbGlvKHBhZ2UpOw0KPiA+ICAgICAgIF9fdTMyIHBpZDsNCj4gPg0KPiA+ICsgICAgIG11dGV4
-X2xvY2soJkNJRlNfSShtYXBwaW5nLT5ob3N0KS0+dGJsX3dyaXRlX211dGV4KTsNCj4gPiArDQo+
-ID4gICAgICAgaWYgKGNpZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9SV1BJREZP
-UldBUkQpDQo+ID4gICAgICAgICAgICAgICBwaWQgPSBjZmlsZS0+cGlkOw0KPiA+ICAgICAgIGVs
-c2UNCj4gPiBAQCAtMzIzMyw2ICszMjM3LDcgQEAgc3RhdGljIGludCBjaWZzX3dyaXRlX2VuZChz
-dHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcsDQo+ID4gICAg
-ICAgLyogSW5kaWNhdGlvbiB0byB1cGRhdGUgY3RpbWUgYW5kIG10aW1lIGFzIGNsb3NlIGlzIGRl
-ZmVycmVkICovDQo+ID4gICAgICAgc2V0X2JpdChDSUZTX0lOT19NT0RJRklFRF9BVFRSLCAmQ0lG
-U19JKGlub2RlKS0+ZmxhZ3MpOw0KPiA+DQo+ID4gKyAgICAgbXV0ZXhfdW5sb2NrKCZDSUZTX0ko
-bWFwcGluZy0+aG9zdCktPnRibF93cml0ZV9tdXRleCk7DQo+ID4gICAgICAgcmV0dXJuIHJjOw0K
-PiA+ICB9DQo+ID4NCj4gPiBAQCAtNDkwNSw2ICs0OTEwLDcgQEAgc3RhdGljIGludCBjaWZzX3dy
-aXRlX2JlZ2luKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGlu
-ZywNCj4gPiAgICAgICBpbnQgcmMgPSAwOw0KPiA+DQo+ID4gICAgICAgY2lmc19kYmcoRllJLCAi
-d3JpdGVfYmVnaW4gZnJvbSAlbGxkIGxlbiAlZFxuIiwgKGxvbmcgbG9uZylwb3MsIGxlbik7DQo+
-ID4gKyAgICAgbXV0ZXhfbG9jaygmQ0lGU19JKG1hcHBpbmctPmhvc3QpLT50Ymxfd3JpdGVfbXV0
-ZXgpOw0KPiA+DQo+ID4gIHN0YXJ0Og0KPiA+ICAgICAgIHBhZ2UgPSBncmFiX2NhY2hlX3BhZ2Vf
-d3JpdGVfYmVnaW4obWFwcGluZywgaW5kZXgpOw0KPiA+IEBAIC00OTY1LDYgKzQ5NzEsNyBAQCBz
-dGF0aWMgaW50IGNpZnNfd3JpdGVfYmVnaW4oc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRy
-ZXNzX3NwYWNlICptYXBwaW5nLA0KPiA+ICAgICAgICAgICAgICAgICAgdGhpcyB3aWxsIGJlIHdy
-aXR0ZW4gb3V0IGJ5IHdyaXRlX2VuZCBzbyBpcyBmaW5lICovDQo+ID4gICAgICAgfQ0KPiA+ICBv
-dXQ6DQo+ID4gKyAgICAgbXV0ZXhfdW5sb2NrKCZDSUZTX0kobWFwcGluZy0+aG9zdCktPnRibF93
-cml0ZV9tdXRleCk7DQo+ID4gICAgICAgKnBhZ2VwID0gcGFnZTsNCj4gPiAgICAgICByZXR1cm4g
-cmM7DQo+ID4gIH0NCj4NCj4gSGVyZSBhcmUgc29tZSBvZiB0aGUgbG9nIGV4Y2VycHRzIGZvciBv
-bmUgb2YgbXkgdGVzdCBjYXNlcy4gSW4gdGhpcyBmaWxlIG9uZSBvZiB0aGUgY29ycnVwdCByZWdp
-b25zIHN0YXJ0cyBhdCBmaWxlIG9mZnNldCAxLDA3NCwyMTQsNDc0ICgweDQwMDczNjRBKSwgYW5k
-IHdhcyBjb3JydXB0IGZvciAyLDQ4NiBieXRlcywgZW5kaW5nIG9uIGEgcGFnZSBib3VuZGFyeS4g
-Rmlyc3QgdGhlcmUgaXMgYSBzZWN0aW9uIG9mIHRoZSBsb2cgdHJpbW1lZCB0byBqdXN0IHRoZSBj
-aWZzX3dyaXRlX2JlZ2luKCkgLyBjaWZzX3dyaXRlX2VuZCgpIGZ1bmN0aW9ucy4gWW91IGNhbiBz
-ZWUgdGhhdCB0aGVyZSBpcyBhIHdyaXRlIHNob3duIGF0IHRoZSBleGFjdCBvZmZzZXQvbGVuZ3Ro
-IG9mIHRoZSBjb3JydXB0ZWQgZGF0YS4NCj4NCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5l
-bDogWyAgMTI0LjA4MDkwMF0gWzE1NjddIGNpZnNfd3JpdGVfYmVnaW46NDkwNzogQ0lGUzogZnMv
-c21iL2NsaWVudC9maWxlLmM6IHdyaXRlX2JlZ2luIGZyb20gMTA3NDIxMjg2NCBsZW4gMTYxMA0K
-PiA+IE1hciAyNSAxNToyNTozOSBUWDIga2VybmVsOiBbICAxMjQuMDgwOTA2XSBbMTU2N10gY2lm
-c193cml0ZV9lbmQ6MzE4MjogQ0lGUzogZnMvc21iL2NsaWVudC9maWxlLmM6IHdyaXRlX2VuZCBm
-b3IgcGFnZSAwMDAwMDAwMDg2NTE5YWZkIGZyb20gcG9zIDEwNzQyMTI4NjQgd2l0aCAxNjEwIGJ5
-dGVzDQo+ID4gTWFyIDI1IDE1OjI1OjM5IFRYMiBrZXJuZWw6IFsgIDEyNC4wODA5MTFdIFsxNTY3
-XSBjaWZzX3dyaXRlX2JlZ2luOjQ5MDc6IENJRlM6IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3cml0
-ZV9iZWdpbiBmcm9tIDEwNzQyMTQ0NzQgbGVuIDI0ODYNCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgy
-IGtlcm5lbDogWyAgMTI0LjA4MDkxNl0gWzE1NjddIGNpZnNfd3JpdGVfZW5kOjMxODI6IENJRlM6
-IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3cml0ZV9lbmQgZm9yIHBhZ2UgMDAwMDAwMDA4NjUxOWFm
-ZCBmcm9tIHBvcyAxMDc0MjE0NDc0IHdpdGggMjQ4NiBieXRlcw0KPiA+IE1hciAyNSAxNToyNToz
-OSBUWDIga2VybmVsOiBbICAxMjQuMDgwOTE3XSBbMTU2N10gY2lmc193cml0ZV9iZWdpbjo0OTA3
-OiBDSUZTOiBmcy9zbWIvY2xpZW50L2ZpbGUuYzogd3JpdGVfYmVnaW4gZnJvbSAxMDc0MjE2OTYw
-IGxlbiA4NDYNCj4gPiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MDkyNF0g
-WzE1NjddIGNpZnNfd3JpdGVfZW5kOjMxODI6IENJRlM6IGZzL3NtYi9jbGllbnQvZmlsZS5jOiB3
-cml0ZV9lbmQgZm9yIHBhZ2UgMDAwMDAwMDA4ODBjZWUwMyBmcm9tIHBvcyAxMDc0MjE2OTYwIHdp
-dGggODQ2IGJ5dGVzDQo+DQo+IE5vdyBoZXJlJ3MgYSBzZWN0aW9uIG9mIHRoZSBsb2cgdHJpbW1l
-ZCB0byBqdXN0IHRoZSBzbWIyX2FzeW5jX3dyaXRldigpIGZ1bmN0aW9uLiBZb3UgY2FuIHNlZSB3
-cml0ZXMgY292ZXJpbmcgdGhlIGRhdGEgaW1tZWRpYXRlbHkgYmVmb3JlIGFuZCBhZnRlciB0aGUg
-Y29ycnVwdGVkIHJlZ2lvbiwgYnV0IHRoZXJlIGlzIG5vIHdyaXRlIHRvIHRoZSBjb3JydXB0ZWQg
-cmVnaW9uLiBJJ20gYXNzdW1pbmcgdGhlIGNvcnJ1cHRlZCByZWdpb24gaXMgYWx3YXlzIHplcm9z
-IGJlY2F1c2UgdGhlIHNlcnZlciBpcyBleHRlbmRpbmcgYW5kIHplcm8tZmlsbGluZyB0aGUgZmls
-ZSB0byB0aGUgbmV3IHdyaXRlIG9mZnNldCBhZnRlciB0aGUgZ2FwIG9mIHRoZSBtaXNzaW5nIHdy
-aXRlLg0KPg0KPiA+IE1hciAyNSAxNToyNTozOSBUWDIga2VybmVsOiBbICAxMjMuODI5Njk2XSBb
-MTYzNV0gc21iMl9hc3luY193cml0ZXY6NDk0NTogQ0lGUzogZnMvc21iL2NsaWVudC9zbWIycGR1
-LmM6IGFzeW5jIHdyaXRlIGF0IDEwNzIyMTQwMTYgOTg4MjYwIGJ5dGVzIGl0ZXI9ZjE0NjQNCj4g
-PiBNYXIgMjUgMTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MTAxNl0gWzE2MzZdIHNtYjJf
-YXN5bmNfd3JpdGV2OjQ5NDU6IENJRlM6IGZzL3NtYi9jbGllbnQvc21iMnBkdS5jOiBhc3luYyB3
-cml0ZSBhdCAxMDczMjAxMTUyIDEwMTMzMjIgYnl0ZXMgaXRlcj1mNzY0YQ0KPiAqKiBNaXNzaW5n
-IHdyaXRlOiAxMDczMjAxMTUyICsgMTAxMzMyMiA9IDEwNzQyMTQ0NzQgKioNCj4gPiBNYXIgMjUg
-MTU6MjU6MzkgVFgyIGtlcm5lbDogWyAgMTI0LjA4MzkwMV0gWzE2MzZdIHNtYjJfYXN5bmNfd3Jp
-dGV2OjQ5NDU6IENJRlM6IGZzL3NtYi9jbGllbnQvc21iMnBkdS5jOiBhc3luYyB3cml0ZSBhdCAx
-MDc0MjE2OTYwIDM5NTY0IGJ5dGVzIGl0ZXI9OWE4Yw0KPiA+IE1hciAyNSAxNToyNTo0MCBUWDIg
-a2VybmVsOiBbICAxMjQuMzQwNTU3XSBbMTYzN10gc21iMl9hc3luY193cml0ZXY6NDk0NTogQ0lG
-UzogZnMvc21iL2NsaWVudC9zbWIycGR1LmM6IGFzeW5jIHdyaXRlIGF0IDEwNzQyNTM4MjQgMTIz
-Nzg0MyBieXRlcyBpdGVyPTEyZTM1Mw0KPg0KPiBJIGNhbiB2ZXJ5IGVhc2lseSByZXByb2R1Y2Ug
-dGhpcyB3aXRoIG91ciBhcHBsaWNhdGlvbi4gSWYgYW55b25lIGhhcyBhbnkgc3VnZ2VzdGlvbnMg
-dG8gdHJ5LCBhZGRpdGlvbmFsIGxvZ2dpbmcgLyB0cmFjaW5nIHRoZXkgd291bGQgbGlrZSBtZSB0
-byBwZXJmb3JtLCBwbGVhc2UgbGV0IG1lIGtub3cuIEkgY2FuIHByb3ZpZGUgbW9yZSBkZXRhaWxl
-ZCwgZnVsbCBsb2dzIGlmIGRlc2lyZWQsIGJ1dCB0aGV5J3JlIHF1aXRlIGxhcmdlLiBJJ2xsIGNv
-bnRpbnVlIHRvIHJlYWQgdGhyb3VnaCB0aGUgY29kZSBhbmQgdHJ5IHRvIHVuZGVyc3RhbmQsIGlm
-IEkgZmluZCBhbnl0aGluZyBJIHdpbGwgdXBkYXRlIHlvdS4NCj4NCj4gVGhhbmtzLA0KPiBNYXJr
-IFdoaXRpbmcNCj4NCj4NCg0KDQotLQ0KVGhhbmtzLA0KDQpTdGV2ZQ0K
+Dear maintener
+
+I get no answer from linux-cifs and netfs list so I'm sending this new 
+mail
+Today I've just download and build mainline kernel: Linux 6.14.0 (no 
+-rc)
+
+I still constat the bug describe in my previous mail.
+What can I do to be able to use CIFS share ?
+
+Thanks for help,
+
+Kind regard
+Nicolas Baranger
+
+Le 2025-03-24 11:40, Nicolas Baranger a écrit :
+
+> Hi Christoph, David
+> 
+> Sorry my last mail didn't arrive at the top of the list so I resend it 
+> with a new title
+> 
+> I don't know if it had already been reported but after building Linux 
+> 6.14-rc1 I constat the following behaviour:
+> 
+> 'cat' command is going on a loop when I cat a file which reside on cifs 
+> share
+> 
+> And so 'cp' command does the same: it copy the content of a file on 
+> cifs share and loop writing it to the destination
+> I did test with a file named 'toto' and containing only ascii string 
+> 'toto'.
+> 
+> When I started copying it from cifs share to local filesystem, I had to 
+> CTRL+C the copy of this 5 bytes file after some time because the 
+> destination file was using all the filesystem free space and containing 
+> billions of 'toto' lines
+> 
+> Here is an example with cat:
+> 
+> CIFS SHARE is mounted as /mnt/fbx/FBX-24T
+> 
+> CIFS mount options:
+> grep cifs /proc/mounts
+> //10.0.10.100/FBX24T /mnt/fbx/FBX-24T cifs 
+> rw,nosuid,nodev,noexec,relatime,vers=3.1.1,cache=none,upcall_target=app,username=fbx,domain=HOMELAN,uid=0,noforceuid,gid=0,noforcegid,addr=10.0.10.100,file_mode=0666,dir_mode=0755,iocharset=utf8,soft,nounix,serverino,mapposix,mfsymlinks,reparse=nfs,nativesocket,symlink=mfsymlinks,rsize=65536,wsize=65536,bsize=16777216,retrans=1,echo_interval=60,actimeo=1,closetimeo=1 
+> 0 0
+> 
+> KERNEL: uname -a
+> Linux 14RV-SERVER.14rv.lan 6.14.0.1-ast-rc2-amd64 #0 SMP 
+> PREEMPT_DYNAMIC Wed Feb 12 18:23:00 CET 2025 x86_64 GNU/Linux
+> 
+> To be reproduced:
+> echo toto >/mnt/fbx/FBX-24T/toto
+> 
+> ls -l /mnt/fbx/FBX-24T/toto
+> -rw-rw-rw- 1 root root 5 20 mars  09:20 /mnt/fbx/FBX-24T/toto
+> 
+> cat /mnt/fbx/FBX-24T/toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> ^C
+> 
+> strace cat /mnt/fbx/FBX-24T/toto
+> execve("/usr/bin/cat", ["cat", "/mnt/fbx/FBX-24T/toto"], 0x7ffc39b41848 
+> /* 19 vars */) = 0
+> brk(NULL)                               = 0x55755b1c1000
+> mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 
+> 0) = 0x7f55f95d6000
+> access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (Aucun fichier ou 
+> dossier de ce type)
+> openat(AT_FDCWD, "glibc-hwcaps/x86-64-v3/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "glibc-hwcaps/x86-64-v2/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "tls/haswell/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = 
+> -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "tls/haswell/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 
+> ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "tls/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 
+> ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "tls/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT 
+> (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "haswell/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 
+> ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "haswell/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT 
+> (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT 
+> (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun 
+> fichier ou dossier de ce type)
+> openat(AT_FDCWD, 
+> "/usr/local/cuda-12.6/lib64/glibc-hwcaps/x86-64-v3/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, 
+> "/usr/local/cuda-12.6/lib64/glibc-hwcaps/x86-64-v3", 0x7fff25937800, 0) 
+> = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, 
+> "/usr/local/cuda-12.6/lib64/glibc-hwcaps/x86-64-v2/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, 
+> "/usr/local/cuda-12.6/lib64/glibc-hwcaps/x86-64-v2", 0x7fff25937800, 0) 
+> = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, 
+> "/usr/local/cuda-12.6/lib64/tls/haswell/x86_64/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/haswell/x86_64", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/haswell/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/haswell", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/x86_64/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/x86_64", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/tls", 0x7fff25937800, 
+> 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/haswell/x86_64/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/haswell/x86_64", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/haswell/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/haswell", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/x86_64/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/x86_64", 
+> 0x7fff25937800, 0) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> openat(AT_FDCWD, "/usr/local/cuda-12.6/lib64/libc.so.6", 
+> O_RDONLY|O_CLOEXEC) = -1 ENOENT (Aucun fichier ou dossier de ce type)
+> newfstatat(AT_FDCWD, "/usr/local/cuda-12.6/lib64", 
+> {st_mode=S_IFDIR|S_ISGID|0755, st_size=4570, ...}, 0) = 0
+> openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+> newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=148466, ...}, 
+> AT_EMPTY_PATH) = 0
+> mmap(NULL, 148466, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f55f95b1000
+> close(3)                                = 0
+> openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) 
+> = 3
+> read(3, 
+> "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\20t\2\0\0\0\0\0"..., 
+> 832) = 832
+> pread64(3, 
+> "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 
+> 784, 64) = 784
+> newfstatat(3, "", {st_mode=S_IFREG|0755, st_size=1922136, ...}, 
+> AT_EMPTY_PATH) = 0
+> pread64(3, 
+> "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 
+> 784, 64) = 784
+> mmap(NULL, 1970000, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 
+> 0x7f55f93d0000
+> mmap(0x7f55f93f6000, 1396736, PROT_READ|PROT_EXEC, 
+> MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x26000) = 0x7f55f93f6000
+> mmap(0x7f55f954b000, 339968, PROT_READ, 
+> MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x17b000) = 0x7f55f954b000
+> mmap(0x7f55f959e000, 24576, PROT_READ|PROT_WRITE, 
+> MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1ce000) = 0x7f55f959e000
+> mmap(0x7f55f95a4000, 53072, PROT_READ|PROT_WRITE, 
+> MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f55f95a4000
+> close(3)                                = 0
+> mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 
+> 0) = 0x7f55f93cd000
+> arch_prctl(ARCH_SET_FS, 0x7f55f93cd740) = 0
+> set_tid_address(0x7f55f93cda10)         = 38427
+> set_robust_list(0x7f55f93cda20, 24)     = 0
+> rseq(0x7f55f93ce060, 0x20, 0, 0x53053053) = 0
+> mprotect(0x7f55f959e000, 16384, PROT_READ) = 0
+> mprotect(0x55754475e000, 4096, PROT_READ) = 0
+> mprotect(0x7f55f960e000, 8192, PROT_READ) = 0
+> prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, 
+> rlim_max=RLIM64_INFINITY}) = 0
+> munmap(0x7f55f95b1000, 148466)          = 0
+> getrandom("\x19\x6b\x9e\x55\x7e\x09\x74\x5f", 8, GRND_NONBLOCK) = 8
+> brk(NULL)                               = 0x55755b1c1000
+> brk(0x55755b1e2000)                     = 0x55755b1e2000
+> openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) 
+> = 3
+> newfstatat(3, "", {st_mode=S_IFREG|0644, st_size=3048928, ...}, 
+> AT_EMPTY_PATH) = 0
+> mmap(NULL, 3048928, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f55f9000000
+> close(3)                                = 0
+> newfstatat(1, "", {st_mode=S_IFCHR|0600, st_rdev=makedev(0x88, 0), 
+> ...}, AT_EMPTY_PATH) = 0
+> openat(AT_FDCWD, "/mnt/fbx/FBX-24T/toto", O_RDONLY) = 3
+> newfstatat(3, "", {st_mode=S_IFREG|0666, st_size=5, ...}, 
+> AT_EMPTY_PATH) = 0
+> fadvise64(3, 0, 0, POSIX_FADV_SEQUENTIAL) = 0
+> mmap(NULL, 16785408, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, 
+> -1, 0) = 0x7f55f7ffe000
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ) = 16711680
+> read(3, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16777216) = 16711680
+> write(1, 
+> "toto\n\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 
+> 16711680toto
+> ^Cstrace: Process 38427 detached
+> <detached ...>
+> 
+> Please let me know if it had already been fixed or reported and if 
+> you're able to reproduce this issue.
+> 
+> Thanks for help
+> 
+> Kind regards
+> Nicolas Baranger
