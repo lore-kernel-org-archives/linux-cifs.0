@@ -1,130 +1,67 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C838BE7
-	for <linux-cifs@vger.kernel.org>; Sun, 30 Mar 2025 03:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D4C1876
+	for <linux-cifs@vger.kernel.org>; Sun, 30 Mar 2025 10:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743307129; cv=none; b=UF9s1dFdfGVpcbnQkUVDawhMQtf/p28WJaFTGUTt9k+xm+R03WWDh4fhfDVaAMC8EP5fqiqWfmhWMfTbWvQi0p0zUf8bpCZnxGx+NCp7duPDgM353RGHvK0Ngn4YtE5hdZTEBxpUsbFDCRbt65Eo3g6UkdvXA3eouX4a2MV0ZOM=
+	t=1743330367; cv=none; b=EUeCrW1N1ZdEig4o05lH4TMbLrkD0fkVWCqsbU4L/sV8q1uCyohyKOqUb6x0O/yUMT1LzLmkHyIj9Xv2QUfluUVoKdT8aGgq60WdylwzkaQrCVMw6WiKxWg6BGkW8y7cgDFMiv4xGoLbBRZbeII/nAt0NFINYEvJYv0CrxoPj8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743307129; c=relaxed/simple;
-	bh=Okbz/aIkqwpMftdSZ4AWw0LKdoqE7ipPdCYwmW1ZWBs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=hmA/OKGfdFnlP0zzX6Y9h8y9F/Cj+P9RZyWVqLntlJJYh08F3cAHhpB3DW3PLK555hcSHmQrFt0ZXv0ot7Sv7yKbJQ+BQAupyQFQHocTqsatTRCjIrHJUPFoo6xFqKw583oSxO+eiUVjwPgOTOoW2TC5/8rXbQFGJ07IicQ85d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G5UhJ0n8; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1743330367; c=relaxed/simple;
+	bh=oTnQqhXdV7QocfWRH+9K2w4bu+IcoXhmiwhwJnkqXlo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1U3p2MhxcUpCLC+52TDKtACgh4B/KKH/w492oZ39IaO8+8YC1d/YpUiNI+4sgBehQ3pN3BLLYZ+GU8B+mwlHUxh0HCQOgIcLO6JcNAz06NX2nHU8xefKKGHw0+4Gf+dCZhuBjnwJ/ljgP8/9FHyWylgCugMlcWjlzVGxiG2rCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Olmw94w2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5UhJ0n8"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-30ddad694c1so16209331fa.2
-        for <linux-cifs@vger.kernel.org>; Sat, 29 Mar 2025 20:58:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743307125; x=1743911925; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nOVX48A4gIqA2iTKvPPBYWsP3A/DWX3ZHD+njMhbhOw=;
-        b=G5UhJ0n8sm3pVQ3XqnUUF6CyhVksPacS18a8M5yRRRP4OGXKH2p0dwuEG51RyrqZjA
-         l9Bj17RqSPG0hKcSosp1nTqCHAF+tqyUp+bCqDq6DjjTDFdDw2/x8YfjGcvk1nmhBoJ/
-         +Zlvx5dplMfA5Vove2Nv+4VF9cryOjJ60sA36CW/zn4siylKp7B25uLggHropI0eSrgF
-         8f13FQRFyXRw6ztVFL7TeY7/ZSomvPCTDqXJPuFSW5CXWk825T3/Su6RdEKniw0i9Zu5
-         oVW5fbOtg/26nDeNLZCo8HxPNH5wqhNbC16OY+9Fvw2P3c5rgICaL9XdRGVtzJb5mTad
-         Xt9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743307125; x=1743911925;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nOVX48A4gIqA2iTKvPPBYWsP3A/DWX3ZHD+njMhbhOw=;
-        b=wbKST0u6xv5J/FbzVii5t0mDKbzkEifpE1G6RC/qztb5PiQrn6vBH3G+3lJsJLTMPY
-         wMEYuKvtchY+E5eaq8JNMegoRMVAfeNXhJoGoXvqkQk8ko1tsZy9aw8LXcmEhdh9yTNX
-         KZNKb0ZKuiIvZTfrphrVWMhEg805p3DAi/zNtHAoVKssQBsOkXegI/U2XWCheq0FC3tO
-         YcLvgcNP3ozMTo4g7/eUdwD7Ejc0wS4zRiMlXhC696i86przRNQ7IEWVeFUTpxPuxoVV
-         aSU+vZDORVO+hlSHdpgPfvHhe2ZLhV7VZW0MNMG55QzEqbACqqq9M+73u9qntZZRTu5J
-         JRuw==
-X-Gm-Message-State: AOJu0YzZAaj6sOuPG6pkC7cHHGH3TlPNJZn+hO/0kRcp+NlBLu/uC0A4
-	CtBxDsZaqiM1LZMA5+azvwCFKmpFFMyDUDPwfdm/MY5FCGon+vYNUd+kma/GUgXM9rq92jcmvoa
-	CdAYzgDgow2GWqN1PoEMtk1exo+oihw==
-X-Gm-Gg: ASbGncs/a+opQTJEr6BtE/bYcSBLoMFQbDaI+dYo+OG7cHz4ihAWqctOGT8g4yCHlR8
-	z1Hxhrd5T8QjcSxuaUTKizpiLf8DvPUn/yL1fyEVbCnK2CVSc0HOrx11xjKxN172aXxVz9zsv+H
-	lBR+YoOhcTmFpwYe6tr8BBd66Jtfx5pMs88E+bM3PgjSqh4j7qeCQTWA3cG4U3
-X-Google-Smtp-Source: AGHT+IHMQ9cUBaPZ/XXX5BbXWNw/NFYnmFTEiku1WTwocwXlaAdZgDJw/oEFU2PAaR7OJ4ctkoMjnZAOllQQJ/4myjo=
-X-Received: by 2002:a2e:be09:0:b0:30b:ad2c:dfe4 with SMTP id
- 38308e7fff4ca-30de02fa546mr17366661fa.30.1743307125192; Sat, 29 Mar 2025
- 20:58:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Olmw94w2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E24C4CEDD;
+	Sun, 30 Mar 2025 10:26:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743330366;
+	bh=oTnQqhXdV7QocfWRH+9K2w4bu+IcoXhmiwhwJnkqXlo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Olmw94w2da3v3H+gt3vjjWuJQ3LwVc1NzfFkyLW1L963igscoaBtBCa19jgK4nEGQ
+	 ES95gnC7cA931CQZ2ArbA/5+kpiqhLlKorq60pTdTlUhubDwgOOorm66YahCXtPDAt
+	 6qW19UwcG4eO5EYpHYBP9iSBsFFlKguz6sgEDKsmTxXM0xVGrAo5riZ5CjnXerNPX+
+	 6Cb4t0wKLwT+EBvvV0m+zXttUq7KhUAhghOSpO2++FPV9POWiX5SvAFTxccRYhJYyt
+	 Rp2Ao07thdlGAJx9p8ZiW2xkB8FnYKGuHNT15s7RCXt2MkKKD7E2mEP3LX48yaaUwF
+	 /8YgLNisvaLTA==
+Received: by pali.im (Postfix)
+	id 266A65DF; Sun, 30 Mar 2025 12:25:51 +0200 (CEST)
+Date: Sun, 30 Mar 2025 12:25:51 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] cifs: Fix getting DACL-only xattr system.cifs_acl and
+ system.smb3_acl
+Message-ID: <20250330102551.27wmuly6cy7bpr66@pali>
+References: <CAH2r5muyUqkMbDxtPrb1zbQH5TKkaAc4Th-k_Dh7xATv6sEZVw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z66BwJnHAI8zDOzP@linuxbox.oloxx3b4wsrernbskgt3tooxxe.gx.internal.cloudapp.net>
- <20250328061312.3043039-1-aman1cifs@gmail.com> <CAH2r5mtmHNisb91cr4jSBjuTRJp-J2DOHDaYmSRTM8MbdKEG_g@mail.gmail.com>
-In-Reply-To: <CAH2r5mtmHNisb91cr4jSBjuTRJp-J2DOHDaYmSRTM8MbdKEG_g@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 29 Mar 2025 22:58:33 -0500
-X-Gm-Features: AQ5f1JoWB8xbjvUIQxNhr8ktwVu-eTIey0mot6QlVDAFf-qwkbCUiBYp_HT92eE
-Message-ID: <CAH2r5msN-mtDnjUMVYUp0KD=+G+TTZvY92v+7OqkGegRmdVBfw@mail.gmail.com>
-Subject: Fwd: [PATCH 1/2] CIFS: Propagate min offload along with other
- parameters from primary to secondary channels.
-To: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5muyUqkMbDxtPrb1zbQH5TKkaAc4Th-k_Dh7xATv6sEZVw@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-I have also verified that ignore_signature is not properly propagated
-across channels (the original patch , so am looking at the original
-patch to verify the remaining five fields (that are propagated across
-channels in the original patch).
+Ok, thank you for information. I did not know that there is some
+failure, I just spotted the DACL processing flags issue in the code and
+also I have triggered it against Windows SMB server.
 
-On Fri, Mar 28, 2025 at 1:13=E2=80=AFAM <aman1cifs@gmail.com> wrote:
->
-> From: Aman <aman1@microsoft.com>
->
-> In a multichannel setup, it was observed that a few fields were not being
-> copied over to the secondary channels, which impacted performance in case=
-s
-> where these options were relevant but not properly synchronized. To addre=
-ss
-> this, this patch introduces copying the following parameters from the
-> primary channel to the secondary channels:
->
-> - min_offload
-> - retrans
->
-> By copying these parameters, we ensure consistency across channels and
-> prevent performance degradation due to missing or outdated settings.
->
-> Signed-off-by: Aman <aman1@microsoft.com>
-> ---
->  fs/smb/client/sess.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index 91d4d409c..35ae7ad3b 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -522,6 +522,8 @@ cifs_ses_add_channel(struct cifs_ses *ses,
->         ctx->sockopt_tcp_nodelay =3D ses->server->tcp_nodelay;
->         ctx->echo_interval =3D ses->server->echo_interval / HZ;
->         ctx->max_credits =3D ses->server->max_credits;
-> +       ctx->min_offload =3D ses->server->min_offload;
-> +       ctx->retrans =3D ses->server->retrans;
->
->         /*
->          * This will be used for encoding/decoding user/domain/pw
-> --
-> 2.43.0
->
->
-
-
---=20
-Thanks,
-
-Steve
-
-
---=20
-Thanks,
-
-Steve
+On Saturday 29 March 2025 22:56:42 Steve French wrote:
+> Pali,
+> I noticed that your patch "cifs: Fix getting DACL-only xattr
+> system.cifs_acl and system.smb3_acl" fixed generic/598 (which I run
+> with idsfromsid and sfu in my test environment, and was failing with
+> mainline) - Good job.   Am working through your large set of cifs.ko
+> patches, and have been able to verify more than five of them so far,
+> so plan to send some of them upstream ASAP, and continue to work
+> through the others for the remainder of the merge window.
+> 
+> -- 
+> Thanks,
+> 
+> Steve
