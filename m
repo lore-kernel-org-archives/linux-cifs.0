@@ -1,61 +1,79 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11466FBF;
-	Fri, 28 Mar 2025 10:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A040EEB3
+	for <linux-cifs@vger.kernel.org>; Sun, 30 Mar 2025 03:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743158762; cv=none; b=h4kzbHa5ZqtbhJdcNbuG1Mu3xMOPkrLGc+TMLtbNrpLtONMUb+Q3YYfYf/Cj+C+clfuaBzvC5jH+YVT+XYcGdIX2KxzKFRCTIEUsOqar6+l0mQBGiprzyqGl84dk2EAifCitGQXFPBhp3kjleaLfiqWS+sFh3dzclQ4uI2SWm2o=
+	t=1743307017; cv=none; b=LG5x1RB5bmfL0T8nymwsAZmmInkWBoUCkYmMc0xOcnuvfVG8aCrAd7okXfjIO09bKGMDyN/g8yxgexw2xo9z6MO2+J0fb3ZlCFsZGJgZVSqAFsUI17KWmsQ2tXBX1Sz8b45emTj+Slfad9MkXcaPLmKVCRDOOVJd9XOJ4qNqGvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743158762; c=relaxed/simple;
-	bh=HX4L70QTi47Xyax4mvQKMiRVkvBpNvXUFLKXEnV2Uj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JeiW+lN+gdWdJV2jwT1Q3fIfaGpmleKGhVhMH0ejvYWi/4950rSY8PH2RR3MSTPv8J4gzzORLptFp0gd+wgT5VE7d92Lv6fOTH9b/bF65Rt4MHpJ0Z2mJd2aCSM98zbxVwzNgsvw6fePHUPDWitnkILjIf8KpJajic4tEk3oq/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eR8e3Klg; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1743307017; c=relaxed/simple;
+	bh=M4fkZJG4qlhD/5dS3drjgygHvGR/GooI+FwuQNcvmIU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=cSQU1XISWPQngnAmB2adToYwOngzx2tnv55ex5v0KNRu0BCjjPCrW9I2WUTgb2fDhPjNc6bpdH7dAxXBOAY2oU9NrzWEq/EGYrf64VJaWII7u2fIsTVS5qfkXpgRSvC9vWlUei55nB4vYl04je9uLAhg5WIm5BuSSGqLjbGU6RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OV7FfUwj; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eR8e3Klg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7/ZRM+Jgttx6GELXH1bXNxJMDypsQo+VPqHGzIsFl8M=; b=eR8e3KlgEmnGbaljZtyjvTSpwC
-	viEb0pV00OPfxmLrMiI9RdAWyl1+n1Q9oJSbw0PrN9npp7wbyii1AJ472t2B2CFCaflmwh0h3pdqj
-	pTIekseNHeyL3gd/TfubrhCe5ALNXisa010EP98HlJMtM5weBgxROsZAhRKWgxDcIWOoHrOvVbZ/K
-	PWbWqd3mPJC209QEVwetkq5baZzTmPGf0et5Abo/E5zxUJSQiqseWz3VEBb13U8DTgibtUW2Otr6G
-	iwwH9ZRyq5SOvrma3ZZ6hUkOadqGFzCG8AxbUTdA1A5be9OPqOu51m5iyhPLSkq6Ydi+Hli2Z90SL
-	PRKEgR2w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1ty7Dp-0000000DAUI-3wy4;
-	Fri, 28 Mar 2025 10:45:57 +0000
-Date: Fri, 28 Mar 2025 03:45:57 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Nicolas Baranger <nicolas.baranger@3xo.fr>
-Cc: hch@lst.de, Christoph Hellwig <hch@infradead.org>,
-	David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Steve French <smfrench@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [netfs/cifs - Linux 6.14] loop on file cat + file copy when
- files are on CIFS share
-Message-ID: <Z-Z95ePf3KQZ2MnB@infradead.org>
-References: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
- <35940e6c0ed86fd94468e175061faeac@3xo.fr>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OV7FfUwj"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54b10956398so1255030e87.0
+        for <linux-cifs@vger.kernel.org>; Sat, 29 Mar 2025 20:56:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743307014; x=1743911814; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Halz6VRqZKEu/B5+zZ/KhyzO5TUN9NKPT4FilTceNAo=;
+        b=OV7FfUwjew7wK8dP5iOxF8IZfp7uCpsjk9dFLMIZV6hzX6hJHPK1xRnS4UGFpxGqk3
+         uifAtSbOb+6j38ulUCMHt0/ou0kaI+iUDZjT/HzUHespdoHjb5tT3iL8z6gt5ixkmiWp
+         Bb6KvIpsoefazaz9QAOfpqHyLgBbyyGjnJ9iFBc3xqHw+yryMRC+EZ7GQKg5yzyQRk4U
+         +mXaVYMHljW5QD8Id+Kul8F4LPpLnV3F7uUjRo6ppVgpHbXbOUaXvy25A4wqZER3esON
+         rEpfJCX4YXfFfi1U46XsBpcp1IXHvxOqNUcYt2QcdYw3lVNxUMeEhNPK0L4/HSXn7BbF
+         ioXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743307014; x=1743911814;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Halz6VRqZKEu/B5+zZ/KhyzO5TUN9NKPT4FilTceNAo=;
+        b=sxlVe3KsGBq68hFUYAnyquHtzWtVgezyj+ExRkS10ew5qgkAi4vk4mTa4r5g5a4oKm
+         HiBQ3WaVNMNFMo0O71eSWdHjuGCP4IRhGsR1zOCQfy++Wig5dyr6NZmcTZDZo6xJ/S38
+         wITP8hXCd4Rav+F09GK8PFLnVuA7qE7PVdw88iMLzzVBQkoWfBbwvbs8hPO3FY6KEA9G
+         F5ZOb272wK2TRLI4Hk30ZpNQVD2lMQjqUSPS4yZ2lw8WMClEMRXcwtsgyo7FULQPhhIg
+         3rdk3N776KuSdGSzJLzQsLQvp9/LHGavbxidjc9vhqB/CBr7/7/4g3U2Ye7qUj4IwKaO
+         U2vg==
+X-Gm-Message-State: AOJu0YxyqX6SsiLAhwsxngwGDIupkYggMMsPF4ZDC8gwHqklNnbH837w
+	KSIcFJe+z8xV38nbJfGxGBNfyCFjqy3tqCWhYOAYH2tjeZNQKyinnazhzJi2atKvgYFU1CEQd0X
+	TI5FDc6bkrPvk32qcdOQCvHh7sTU=
+X-Gm-Gg: ASbGnctiG2I5PJyUR1ZTl/17v/UTEJiO3mmqgzUC7pCy1DfL82NsA5XR7vUk74EBwH/
+	IWLtBEJSBkYbDlpFsCJlvv07H/w27Zd3igSPbelhprN9opb/KZ/lv+QdsfghyDE4M/5A15Bf6JZ
+	NVE3Vcrl2jfbb72nXD4Fi1nKVto7+Uui7Osdi1pbNDWusHQIcpT1JCBhpM0QFW
+X-Google-Smtp-Source: AGHT+IGsQvchOL4L+bzFEpLaRovcp7/KPbV4Ni54RfHrB5KWlWqpI82Yxl1xtWIRQVzescM4kf1hu92MdmXtd0WMbcs=
+X-Received: by 2002:a05:6512:618f:b0:549:8d2f:86dd with SMTP id
+ 2adb3069b0e04-54b0acd156dmr3044296e87.20.1743307013579; Sat, 29 Mar 2025
+ 20:56:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35940e6c0ed86fd94468e175061faeac@3xo.fr>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 29 Mar 2025 22:56:42 -0500
+X-Gm-Features: AQ5f1JpBEBPG5llgZokYhcH2MUJxH8TIfvE2Qkj5O9m7wDFZd1NRSOcQdh2NiBQ
+Message-ID: <CAH2r5muyUqkMbDxtPrb1zbQH5TKkaAc4Th-k_Dh7xATv6sEZVw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix getting DACL-only xattr system.cifs_acl and system.smb3_acl
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Nicolas,
+Pali,
+I noticed that your patch "cifs: Fix getting DACL-only xattr
+system.cifs_acl and system.smb3_acl" fixed generic/598 (which I run
+with idsfromsid and sfu in my test environment, and was failing with
+mainline) - Good job.   Am working through your large set of cifs.ko
+patches, and have been able to verify more than five of them so far,
+so plan to send some of them upstream ASAP, and continue to work
+through the others for the remainder of the merge window.
 
-please wait a bit, many file system developers where at a conference
-this week. 
+-- 
+Thanks,
 
+Steve
