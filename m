@@ -1,38 +1,37 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145CD1DB12D;
-	Mon, 31 Mar 2025 08:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CED8472;
+	Mon, 31 Mar 2025 13:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743409426; cv=none; b=R1GDqqoquI14KoRUyixmWrFASLrN6j6dZ0srXvbFHnYJf2DDotdmirlNaP8PVAqhq3jSwyL0z2YW3I/wWQUPDMVdax+U+ELK6pbAg34trYcfagsTVuClbRSyMNeGTOykMGsZ7NFugWijN4/pOYUOcGqvCvsz/P/XeZyGeKI1Ygw=
+	t=1743428364; cv=none; b=qEIzY6qxGbh007fKOQQmlXd/LQ6A716QuQvoFDUqaeCxd8kQxSvGjsfaeD/sK0H8klt496FiksbqjOSWPu75QCbikCsP5GU3tmrZKxCM8KsIXSVGzuL/BZgjmFzT2N3lJRP2aVnOQPJPl7VYspChec02NiEReeBWJZvvrNIXWQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743409426; c=relaxed/simple;
-	bh=6xZI7M/xMltiZq1WTRGYM2XVR9GGLoDnoskC5hcPgWc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dWlpK/kx1QEVG4i9y2KeAI6ZhpJTa7I+0OCC0kGG6MBviUJXSBqkhO+K72Uf1yYe6VdbFX9fh1pOEVIlZqf/h3kMNPvTyWNG44D2iIPxSa0RPSvrN9x0/vAmmh7z9QcoXaXFHA77MYPdFe/QJ7YyReU3WRmSEPGUmUAJqsCJ/y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 31 Mar
- 2025 11:23:29 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
-	<sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
-	<bharathsm@microsoft.com>
-CC: Roman Smirnov <r.smirnov@omp.ru>, Sachin Prabhu <sprabhu@redhat.com>,
-	Shirish Pargaonkar <shirishpargaonkar@gmail.com>,
-	<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: [PATCH 2/2] cifs: remove unreachable code in cifs_get_tcp_session()
-Date: Mon, 31 Mar 2025 11:22:50 +0300
-Message-ID: <20250331082251.123381-3-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250331082251.123381-1-r.smirnov@omp.ru>
-References: <20250331082251.123381-1-r.smirnov@omp.ru>
+	s=arc-20240116; t=1743428364; c=relaxed/simple;
+	bh=NmmoYX2n2+ctopcsNgGDDbztCi1Hd/v13+789tHWlPs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gFL1JVLfzbTU3Raz5HGug6O3lQn2raGPFZCY46kg4DYJaHFz4fYLQX3HwyYFxMO81Lqzmyes8sO4ViQcefurdJ++bhDa7J3Lh4uqEc8czBkwFGivyG9+p+D+kzEby6JanAVOM2pxnVM3ETE6XzXzFXKO/q30IsUZChFEM2suZpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4ZRC185Wmkz27hRL;
+	Mon, 31 Mar 2025 21:39:56 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0C1E11A016C;
+	Mon, 31 Mar 2025 21:39:18 +0800 (CST)
+Received: from huawei.com (10.175.104.67) by kwepemg500010.china.huawei.com
+ (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 31 Mar
+ 2025 21:39:17 +0800
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+To: <sfrench@samba.org>, <linkinjeon@kernel.org>
+CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<linux-kernel@vger.kernel.org>, <chengzhihao1@huawei.com>,
+	<wangzhaolong1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
+Subject: [PATCH next 0/3] smb: client: Improve IO parameter resilience after reconnection
+Date: Mon, 31 Mar 2025 21:33:12 +0800
+Message-ID: <20250331133315.117666-1-wangzhaolong1@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,72 +40,83 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/31/2025 08:06:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 192231 [Mar 31 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
- 68896fb0083a027476849bf400a331a2d5d94398
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;inp1wst083.omp.ru:7.1.1;81.22.207.138:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/31/2025 08:08:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/31/2025 5:23:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-echo_interval is checked at mount time, the code has become
-unreachable.
+## Background
 
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
----
- fs/smb/client/connect.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+When a SMB client connection experiences a network disruption and reconnects
+to the server, several critical parameters are renegotiated with the server.
+However, in current code, the negotiated IO sizes (rsize/wsize) for existing
+mount points are not updated to reflect the server's potentially changed
+capabilities. This can lead to suboptimal performance or even failures.
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 73f93a35eedd..84efcb541ab2 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1729,12 +1729,8 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	 */
- 	tcp_ses->tcpStatus = CifsNew;
- 	++tcp_ses->srv_count;
-+	tcp_ses->echo_interval = ctx->echo_interval * HZ;
- 
--	if (ctx->echo_interval >= SMB_ECHO_INTERVAL_MIN &&
--		ctx->echo_interval <= SMB_ECHO_INTERVAL_MAX)
--		tcp_ses->echo_interval = ctx->echo_interval * HZ;
--	else
--		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
- 	if (tcp_ses->rdma) {
- #ifndef CONFIG_CIFS_SMB_DIRECT
- 		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
+## Problem Discovery
+
+I encountered a critical issue in the Linux 5.10 kernel where CIFS would crash
+due to rsize becoming zero, which led to a null pointer dereference in the
+file read path. This could happen when either:
+
+1. The server returned a MaxReadSize of 0 in a negotiation response, or
+2. During reconnection when server->max_read might be reset to 0
+
+While investigating, I noted that the MS-SMB2 specification (section 3.2.5.2
+"Receiving an SMB2 NEGOTIATE Response") states:
+
+  "The client SHOULD<175> disconnect the connection if the size, in bytes,
+   received in MaxTransactSize, MaxReadSize, or MaxWriteSize is less than 65536."
+
+However, current CIFS client implementations do not strictly enforce this
+recommended minimum and may even operate with smaller values. Nevertheless,
+it is evident that these values should not be set to zero.
+
+While subsequent kernel versions have addressed the null pointer dereference
+itself, the underlying issue of potentially zero or outdated IO sizes after
+reconnection remains. After reviewing the code, I discovered that the
+reconnection flow includes negotiation with the server but does not update
+the IO parameters for existing mounted filesystems.
+
+## Solution Approach
+
+This patch series implements a comprehensive solution by:
+
+1. Creating a bidirectional relationship between tree connections and
+   superblocks to locate all mounts using a specific connection
+2. Preserving original user-specified IO parameters separately from
+   negotiated values
+3. Adding safeguards against zero IO sizes
+4. Implementing automatic renegotiation of IO parameters after reconnection
+
+## Patch Breakdown
+
+- Patch 1: Adds bidirectional mapping between tcon and superblocks, enabling
+  efficient discovery of all filesystems using a specific tree connection
+- Patch 2: Stores original user-specified IO parameters and adds protection
+  against zero IO sizes by enforcing the MS-SMB2 specification minimum
+- Patch 3: Implements automatic renegotiation of IO parameters after
+  successful reconnection
+
+These changes make the CIFS client more resilient to network disruptions
+by ensuring all mounted filesystems maintain optimal and safe IO parameters
+that reflect current server capabilities.
+
+Wang Zhaolong (3):
+  smb:client: smb: client: Add reverse mapping from tcon to superblocks
+  smb: client: Store original IO parameters and prevent zero IO sizes
+  smb: client: Update IO sizes after reconnection
+
+ fs/smb/client/cifs_fs_sb.h |  1 +
+ fs/smb/client/cifsglob.h   |  3 ++-
+ fs/smb/client/connect.c    | 15 +++++++++++++++
+ fs/smb/client/fs_context.c |  2 ++
+ fs/smb/client/fs_context.h |  3 +++
+ fs/smb/client/misc.c       |  2 ++
+ fs/smb/client/smb1ops.c    |  6 +++---
+ fs/smb/client/smb2ops.c    | 27 +++++++++++++++++++--------
+ fs/smb/client/smb2pdu.c    | 24 ++++++++++++++++++++++--
+ fs/smb/common/smb2pdu.h    |  3 +++
+ 10 files changed, 72 insertions(+), 14 deletions(-)
+
 -- 
-2.34.1
+2.39.2
 
