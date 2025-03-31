@@ -1,37 +1,37 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6249B1DED56;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CCF1E5B67;
 	Mon, 31 Mar 2025 13:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743428365; cv=none; b=XuSoqQ9Ns3GcXOMzUZg7bDF8C7iJtopirAMgnu4Ak//FvVPe3Uj4oABJ44/168ITmp3omXQBEnZzvEctt7rYURhgFtYBP1pdx5fcS3VOme2RIVJfMhi4GMRa1VLiK5P/KZ/fg0geh6Se10NDwlIm2KJmqoXuQ3kuMHHbQkHNtdU=
+	t=1743428365; cv=none; b=Il3kSZeBF4cl6084gJZpdduxFnW2DbnR3WrzaZPQ6qrqfDCS5FSxMTo04v7aAP6FVbJemki1sZF3V4MMzRpYFiB/nGs1Ua0N/wB5qtEHSdGy8BYBTUDP3JZiyQpGttPMwUWGtOH1/25sjjLFHoEITnm8m1hbxWPhwfDnEsPOWU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743428365; c=relaxed/simple;
-	bh=NnIIxAPZjB45AedzB5iDuK2CXRyHaMj0kenjwfruh+E=;
+	bh=hwE5GiKE3zL2s2GG0JF3k9o7qrrnfq/qiZzBJzBHOHI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IrR44uBv3RLGf6zF+heIL2AWLE3fuYNiv2tUU3KrpgaLE4FlhjxWfbyI8El1wMMzKrwdd6VoqVLlYpObEx1/wE9pvwxHiSmbsUKQ0U5HdFBJJ3mURPec3J1TBQ5E9mOM3pb8WpIxD9zvwGK2985kgOJjjFq1ZdZL6N3PWKiahpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 MIME-Version:Content-Type; b=qfgQ8mbq6/uG1JlkbK+I598T1CcvGFIH9almnDsqlKIBKSVVYf6w/tVyKYYL/48EoKBZNuUuNIay58Qz8nejdmX756ilHGqc85afcut8VPJd1Ylh8NzT0/nk82Y8MwEP/S6woo/rVUBAND4JQXQiqsEZ9oK+ClvhOwDMa8vh7/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZRBtx5dVcz2TS53;
-	Mon, 31 Mar 2025 21:34:33 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZRBty074tz1f1gQ;
+	Mon, 31 Mar 2025 21:34:34 +0800 (CST)
 Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id B7B96140156;
-	Mon, 31 Mar 2025 21:39:19 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 894441A016C;
+	Mon, 31 Mar 2025 21:39:20 +0800 (CST)
 Received: from huawei.com (10.175.104.67) by kwepemg500010.china.huawei.com
  (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 31 Mar
- 2025 21:39:18 +0800
+ 2025 21:39:19 +0800
 From: Wang Zhaolong <wangzhaolong1@huawei.com>
 To: <sfrench@samba.org>, <linkinjeon@kernel.org>
 CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
 	<linux-kernel@vger.kernel.org>, <chengzhihao1@huawei.com>,
 	<wangzhaolong1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
-Subject: [PATCH next 2/3] smb: client: Store original IO parameters and prevent zero IO sizes
-Date: Mon, 31 Mar 2025 21:33:14 +0800
-Message-ID: <20250331133315.117666-3-wangzhaolong1@huawei.com>
+Subject: [PATCH next 3/3] smb: client: Update IO sizes after reconnection
+Date: Mon, 31 Mar 2025 21:33:15 +0800
+Message-ID: <20250331133315.117666-4-wangzhaolong1@huawei.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250331133315.117666-1-wangzhaolong1@huawei.com>
 References: <20250331133315.117666-1-wangzhaolong1@huawei.com>
@@ -46,245 +46,91 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemg500010.china.huawei.com (7.202.181.71)
 
-During mount option processing and negotiation with the server, the
-original user-specified rsize/wsize values were being modified directly.
-This makes it impossible to recover these values after a connection
-reset, leading to potential degraded performance after reconnection.
+When a SMB connection is reset and reconnected, the negotiated IO
+parameters (rsize/wsize) can become out of sync with the server's
+current capabilities. This can lead to suboptimal performance or
+even IO failures if the server's limits have changed.
 
-The other problem is that When negotiating read and write sizes, there are
-cases where the negotiated values might calculate to zero, especially
-during reconnection when server->max_read or server->max_write might be
-reset. In general, these values come from the negotiation response.
-According to MS-SMB2 specification, these values should be at least 65536
-bytes.
+This patch implements automatic IO size renegotiation:
+1. Adds cifs_renegotiate_iosize() function to update all superblocks
+   associated with a tree connection
+2. Updates each mount's rsize/wsize based on current server capabilities
+3. Calls this function after successful tree connection reconnection
 
-This patch improves IO parameter handling:
+With this change, all mount points will automatically maintain optimal
+and reliable IO parameters after network disruptions, using the
+bidirectional mapping added in previous patches.
 
-1. Adds vol_rsize and vol_wsize fields to store the original user-specified
-   values separately from the negotiated values
-2. Uses got_rsize/got_wsize flags to determine if values were
-   user-specified rather than checking for non-zero values, which is more
-   reliable
-3. Adds a prevent_zero_iosize() helper function to ensure IO sizes are
-   never negotiated down to zero, which could happen in edge cases like
-   when server->max_read/write is zero
-
-The changes make the CIFS client more resilient to unusual server
-responses and reconnection scenarios, preventing potential failures
-when IO sizes are calculated to be zero.
+This completes the series improving connection resilience by keeping
+mount parameters synchronized with server capabilities.
 
 Signed-off-by: Wang Zhaolong <wangzhaolong1@huawei.com>
 ---
- fs/smb/client/fs_context.c |  2 ++
- fs/smb/client/fs_context.h |  3 +++
- fs/smb/client/smb1ops.c    |  6 +++---
- fs/smb/client/smb2ops.c    | 27 +++++++++++++++++++--------
- fs/smb/common/smb2pdu.h    |  3 +++
- 5 files changed, 30 insertions(+), 11 deletions(-)
+ fs/smb/client/smb2pdu.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 8c73d4d60d1a..611299bcf6a4 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1325,10 +1325,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		ctx->rasize = result.uint_32;
- 		break;
- 	case Opt_rsize:
- 		ctx->rsize = result.uint_32;
- 		ctx->got_rsize = true;
-+		ctx->vol_rsize = ctx->rsize;
- 		break;
- 	case Opt_wsize:
- 		ctx->wsize = result.uint_32;
- 		ctx->got_wsize = true;
- 		if (ctx->wsize % PAGE_SIZE != 0) {
-@@ -1340,10 +1341,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 				cifs_dbg(VFS,
- 					 "wsize rounded down to %d to multiple of PAGE_SIZE %ld\n",
- 					 ctx->wsize, PAGE_SIZE);
- 			}
- 		}
-+		ctx->vol_wsize = ctx->wsize;
- 		break;
- 	case Opt_acregmax:
- 		if (result.uint_32 > CIFS_MAX_ACTIMEO / HZ) {
- 			cifs_errorf(fc, "acregmax too large\n");
- 			goto cifs_parse_mount_err;
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 881bfc08667e..7516ccdc69c7 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -277,10 +277,13 @@ struct smb3_fs_context {
- 	bool rdma:1;
- 	bool multichannel:1;
- 	bool use_client_guid:1;
- 	/* reuse existing guid for multichannel */
- 	u8 client_guid[SMB2_CLIENT_GUID_SIZE];
-+	/* User-specified original r/wsize value */
-+	unsigned int vol_rsize;
-+	unsigned int vol_wsize;
- 	unsigned int bsize;
- 	unsigned int rasize;
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	unsigned int min_offload;
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index d6e2fb669c40..398f1f4d5edb 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -442,12 +442,12 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int wsize;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index f9c521b3c65e..103319cdce00 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -41,10 +41,11 @@
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dfs_cache.h"
+ #endif
+ #include "cached_dir.h"
+ #include "compress.h"
++#include "fs_context.h"
  
- 	/* start with specified wsize, or default */
--	if (ctx->wsize)
--		wsize = ctx->wsize;
-+	if (ctx->got_wsize)
-+		wsize = ctx->vol_wsize;
- 	else if (tcon->unix_ext && (unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
- 		wsize = CIFS_DEFAULT_IOSIZE;
- 	else
- 		wsize = CIFS_DEFAULT_NON_POSIX_WSIZE;
+ /*
+  *  The following table defines the expected "StructureSize" of SMB2 requests
+  *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS requests.
+  *
+@@ -4089,10 +4090,28 @@ smb2_echo_callback(struct mid_q_entry *mid)
  
-@@ -495,11 +495,11 @@ cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 	else if (server->capabilities & CAP_LARGE_READ_X)
- 		defsize = CIFS_DEFAULT_NON_POSIX_RSIZE;
- 	else
- 		defsize = server->maxBuf - sizeof(READ_RSP);
- 
--	rsize = ctx->rsize ? ctx->rsize : defsize;
-+	rsize = ctx->got_rsize ? ctx->vol_rsize : defsize;
- 
- 	/*
- 	 * no CAP_LARGE_READ_X? Then MS-CIFS states that we must limit this to
- 	 * the client's MaxBufferSize.
- 	 */
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 4dd11eafb69d..4cd1a1f896bb 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -468,33 +468,44 @@ smb2_negotiate(const unsigned int xid,
- 	if (rc == -EAGAIN)
- 		rc = -EHOSTDOWN;
- 	return rc;
+ 	release_mid(mid);
+ 	add_credits(server, &credits, CIFS_ECHO_OP);
  }
  
-+static inline unsigned int
-+prevent_zero_iosize(unsigned int size, const char *type)
++static void cifs_renegotiate_iosize(struct TCP_Server_Info *server,
++				    struct cifs_tcon *tcon)
 +{
-+	if (size == 0) {
-+		cifs_dbg(VFS, "SMB: Zero %ssize calculated, using minimum value %u\n",
-+			 type, CIFS_MIN_DEFAULT_IOSIZE);
-+		return CIFS_MIN_DEFAULT_IOSIZE;
++	struct cifs_sb_info *cifs_sb;
++
++	if (server == NULL || tcon == NULL)
++		return;
++
++	spin_lock(&tcon->sb_list_lock);
++	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
++		cifs_sb->ctx->rsize =
++			server->ops->negotiate_rsize(tcon, cifs_sb->ctx);
++		cifs_sb->ctx->wsize =
++			server->ops->negotiate_wsize(tcon, cifs_sb->ctx);
 +	}
-+	return size;
++	spin_unlock(&tcon->sb_list_lock);
 +}
 +
- static unsigned int
- smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
+ void smb2_reconnect_server(struct work_struct *work)
  {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int wsize;
- 
- 	/* start with specified wsize, or default */
--	wsize = ctx->wsize ? ctx->wsize : CIFS_DEFAULT_IOSIZE;
-+	wsize = ctx->got_wsize ? ctx->vol_wsize : CIFS_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
- 
--	return wsize;
-+	return prevent_zero_iosize(wsize, "w");
- }
- 
- static unsigned int
- smb3_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int wsize;
- 
- 	/* start with specified wsize, or default */
--	wsize = ctx->wsize ? ctx->wsize : SMB3_DEFAULT_IOSIZE;
-+	wsize = ctx->got_wsize ? ctx->vol_wsize : SMB3_DEFAULT_IOSIZE;
- 	wsize = min_t(unsigned int, wsize, server->max_write);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (server->rdma) {
- 		if (server->sign)
- 			/*
-@@ -512,37 +523,37 @@ smb3_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
+ 	struct TCP_Server_Info *server = container_of(work,
+ 					struct TCP_Server_Info, reconnect.work);
+ 	struct TCP_Server_Info *pserver;
+@@ -4174,13 +4193,14 @@ void smb2_reconnect_server(struct work_struct *work)
  	}
- #endif
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
--	return wsize;
-+	return prevent_zero_iosize(wsize, "w");
- }
- 
- static unsigned int
- smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int rsize;
- 
- 	/* start with specified rsize, or default */
--	rsize = ctx->rsize ? ctx->rsize : CIFS_DEFAULT_IOSIZE;
-+	rsize = ctx->got_rsize ? ctx->vol_rsize : CIFS_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
- 
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
- 
--	return rsize;
-+	return prevent_zero_iosize(rsize, "r");
- }
- 
- static unsigned int
- smb3_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int rsize;
- 
- 	/* start with specified rsize, or default */
--	rsize = ctx->rsize ? ctx->rsize : SMB3_DEFAULT_IOSIZE;
-+	rsize = ctx->got_rsize ? ctx->vol_rsize : SMB3_DEFAULT_IOSIZE;
- 	rsize = min_t(unsigned int, rsize, server->max_read);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (server->rdma) {
- 		if (server->sign)
- 			/*
-@@ -561,11 +572,11 @@ smb3_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- #endif
- 
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
- 		rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
- 
--	return rsize;
-+	return prevent_zero_iosize(rsize, "r");
- }
- 
- /*
-  * compare two interfaces a and b
-  * return 0 if everything matches.
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index c7a0efda4403..764dca80c15c 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -93,10 +93,13 @@
-  * pages in a single call. With PAGE_SIZE == 4k, this means we can
-  * fill a single wsize request with a single call.
-  */
- #define SMB3_DEFAULT_IOSIZE (4 * 1024 * 1024)
- 
-+/* According to MS-SMB2 specification The minimum recommended value is 65536.*/
-+#define CIFS_MIN_DEFAULT_IOSIZE (65536)
-+
- /*
-  * SMB2 Header Definition
-  *
-  * "MBZ" :  Must be Zero
-  * "BB"  :  BugBug, Something to check/review/analyze later
+ 	list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
+ 		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true);
+-		if (!rc)
++		if (!rc) {
++			cifs_renegotiate_iosize(server, tcon);
+ 			cifs_reopen_persistent_handles(tcon);
+-		else
++		} else
+ 			resched = true;
+ 		list_del_init(&tcon->rlist);
+ 		if (tcon->ipc)
+ 			cifs_put_smb_ses(tcon->ses);
+ 		else
 -- 
 2.39.2
 
