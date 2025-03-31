@@ -1,23 +1,23 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224651D6188;
-	Mon, 31 Mar 2025 08:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145CD1DB12D;
+	Mon, 31 Mar 2025 08:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743409422; cv=none; b=GsibVqA4fcO2x0wrx97Ez/hA/82SUjX4MvqoNrMaGp40WbdYy4Zwgvws+grqs4SURMT5yXgdTCDOnVzT62J+iVx4dwErP3Nj9imFKhW++Fvu9d5c/oPZcnzUwQ9AET8ULm7MFxPHso6hNIfcXP2UQetPV1gix0pHW5yKZNxLtG8=
+	t=1743409426; cv=none; b=R1GDqqoquI14KoRUyixmWrFASLrN6j6dZ0srXvbFHnYJf2DDotdmirlNaP8PVAqhq3jSwyL0z2YW3I/wWQUPDMVdax+U+ELK6pbAg34trYcfagsTVuClbRSyMNeGTOykMGsZ7NFugWijN4/pOYUOcGqvCvsz/P/XeZyGeKI1Ygw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743409422; c=relaxed/simple;
-	bh=x84NS/1ZT95jjY0isj52iV2WkFHFER3U2eiQMbtf3uU=;
+	s=arc-20240116; t=1743409426; c=relaxed/simple;
+	bh=6xZI7M/xMltiZq1WTRGYM2XVR9GGLoDnoskC5hcPgWc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tS2n0oiAfyM4skOWjxH7f9KKIWDfA7zs/uwVGZRlJG7c3vonvxbOBqn4p13Ruc6KZTnkqZ18pRdXzEbHBN/V249A4ARU6GzKFXaHg2T4ba9YSGsTbqP+Rs51vni24viuE/SFagL9TyLG0iWzr4J2uA6j4fLKLxaeBkVbBqBDRGg=
+	 MIME-Version:Content-Type; b=dWlpK/kx1QEVG4i9y2KeAI6ZhpJTa7I+0OCC0kGG6MBviUJXSBqkhO+K72Uf1yYe6VdbFX9fh1pOEVIlZqf/h3kMNPvTyWNG44D2iIPxSa0RPSvrN9x0/vAmmh7z9QcoXaXFHA77MYPdFe/QJ7YyReU3WRmSEPGUmUAJqsCJ/y8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 31 Mar
- 2025 11:23:24 +0300
+ 2025 11:23:29 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
@@ -26,11 +26,10 @@ To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
 CC: Roman Smirnov <r.smirnov@omp.ru>, Sachin Prabhu <sprabhu@redhat.com>,
 	Shirish Pargaonkar <shirishpargaonkar@gmail.com>,
 	<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH 1/2] cifs: fix integer overflow in match_server()
-Date: Mon, 31 Mar 2025 11:22:49 +0300
-Message-ID: <20250331082251.123381-2-r.smirnov@omp.ru>
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH 2/2] cifs: remove unreachable code in cifs_get_tcp_session()
+Date: Mon, 31 Mar 2025 11:22:50 +0300
+Message-ID: <20250331082251.123381-3-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250331082251.123381-1-r.smirnov@omp.ru>
 References: <20250331082251.123381-1-r.smirnov@omp.ru>
@@ -82,38 +81,32 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-The echo_interval is not limited in any way during mounting,
-which makes it possible to write a large number to it. This can
-cause an overflow when multiplying ctx->echo_interval by HZ in
-match_server().
+echo_interval is checked at mount time, the code has become
+unreachable.
 
-Add constraints for echo_interval to smb3_fs_context_parse_param().
-
-Found by Linux Verification Center (linuxtesting.org) with Svace.
-
-Fixes: adfeb3e00e8e1 ("cifs: Make echo interval tunable")
-Cc: stable@vger.kernel.org
 Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
 ---
- fs/smb/client/fs_context.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/smb/client/connect.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 8c73d4d60d1a..e38521a713a6 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1377,6 +1377,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		ctx->closetimeo = HZ * result.uint_32;
- 		break;
- 	case Opt_echo_interval:
-+		if (result.uint_32 < SMB_ECHO_INTERVAL_MIN ||
-+		    result.uint_32 > SMB_ECHO_INTERVAL_MAX) {
-+			cifs_errorf(fc, "echo interval is out of bounds\n");
-+			goto cifs_parse_mount_err;
-+		}
- 		ctx->echo_interval = result.uint_32;
- 		break;
- 	case Opt_snapshot:
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 73f93a35eedd..84efcb541ab2 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1729,12 +1729,8 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 	 */
+ 	tcp_ses->tcpStatus = CifsNew;
+ 	++tcp_ses->srv_count;
++	tcp_ses->echo_interval = ctx->echo_interval * HZ;
+ 
+-	if (ctx->echo_interval >= SMB_ECHO_INTERVAL_MIN &&
+-		ctx->echo_interval <= SMB_ECHO_INTERVAL_MAX)
+-		tcp_ses->echo_interval = ctx->echo_interval * HZ;
+-	else
+-		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
+ 	if (tcp_ses->rdma) {
+ #ifndef CONFIG_CIFS_SMB_DIRECT
+ 		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
 -- 
 2.34.1
 
