@@ -1,63 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269F618F2DF;
-	Tue,  1 Apr 2025 02:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD4B131E2D;
+	Tue,  1 Apr 2025 06:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743472953; cv=none; b=YOZj64PcYEb/t5+6R18fcRR3DqQpGAbMjWoCa4wIxFdfxEebsVJBx6HFl4xHUc0fBMOZIAmIEc8GpNhTsSOOXT8nGfGjvYBOwVv1tYArcMkHL/5VOKpGRE64Hr5sKxqIlQSwSF3nozbH4X5Un33KAM2Q4fFIDKoFZ5e6+fWno6o=
+	t=1743488958; cv=none; b=Dvh5QfTwTV5HitwO+9fttueyWEAM6UO4BOOrWmjf+PuAAorPf1HLAa/G5e1XMp/y+lO/96ZtmJHQ3Ueh889M7UIjOQKyzE18tpUlqqEqGzFHNmRKoy6k3XLCTGRYSR9A/wH5QYDrSnr8t7noTZnZM4gqLJDoEgP5M3okSn7WaFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743472953; c=relaxed/simple;
-	bh=MnZDDuIkKLL1cTjqoiOjjjPCrcZdDkeP0012uQi52FU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fgyYIsYiOlSmFMTy6a2vDkU/cHtPiftU8C5oas7O5RbqrqpSVmqoJQn1SImG1ZLnOANB72vDf52CY9lLMa76Zto5p0XceajqqEkm81m2Bim9KOVbhDDWbOOngEser5lzZzY5KvZmPZ7+1u4xDrgpI96O0ZlneeJ024MS5LHZjHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bpn/ciOk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743488958; c=relaxed/simple;
+	bh=TVeq6PNEiePIMl+ttaOJNKTUK4jVxSm94Q1sT2OShj8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=E5/qVLKe9b3LzmubjzLeGvArovHrU8Ao0Z2MU6AbedxUDFbwPW0LCVHU2IPGI5Fc89KLE2T7K2WBfvVOsjFG3aC0oVncKu9q3wymUHEjR6L11TPMG0S7/H9ipVuLhsbeCFcc9G8yOEHI4suBu3AJZqSL+LzzCxiCFc2V6eWBW9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ay1vSseR; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bpn/ciOk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A13DC4CEE3;
-	Tue,  1 Apr 2025 02:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743472953;
-	bh=MnZDDuIkKLL1cTjqoiOjjjPCrcZdDkeP0012uQi52FU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Bpn/ciOk0VPGOkaIqqT8yxz2YCyvHvkUifqPqe5x7wKX1Knb3mQ+5amx/+QUHrlb6
-	 0tvV+hAkOccvN8BKU7oeaOoMDc8/QYazvlcvwsOGhsSvGNhpIfRvP7s2nkQnXWhcQ/
-	 IYWKXGFT4OtwR0V1B0c0S3/U3MM94F/AaZVLx5EL/ah5QAIRub7yrGf2KJUShTet7+
-	 j9M8kpaxI7apaffLi2iWOIZ80JusASzT+4/sOD+bWhtuj29WANeh8j768ikvLKcVA+
-	 EqZX+q3LtJDXJQ6XyMUMNhFPiKpcQsadzeJ0LLLs6NZ9XcXYG9IK6vGE3ht95Ry4T/
-	 uQvXNr1I79Zyw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB8380AA7A;
-	Tue,  1 Apr 2025 02:03:10 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtYV4wqDvgod+qrzv1+YQN_zzjvEh1TKTwPmtkBU5jC6g@mail.gmail.com>
-References: <CAH2r5mtYV4wqDvgod+qrzv1+YQN_zzjvEh1TKTwPmtkBU5jC6g@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtYV4wqDvgod+qrzv1+YQN_zzjvEh1TKTwPmtkBU5jC6g@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc-part1-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e14b64247438e5026b2fce8ffd7cdf80a87e2bfa
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8b175e2e189673643bf5b996335f0430faddf953
-Message-Id: <174347298961.206397.17938911236324954878.pr-tracker-bot@kernel.org>
-Date: Tue, 01 Apr 2025 02:03:09 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ay1vSseR"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-30bfb6ab47cso49798571fa.3;
+        Mon, 31 Mar 2025 23:29:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743488953; x=1744093753; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iNphk2i9eSGihLD4c/ofcPRkoFOwL4x5wS5sCwun4uQ=;
+        b=Ay1vSseRX3sXHw3vrVXZjaJPpdE5d8R4b51dc/GVakt3StvfgUlVrXqqZoBBYnmHNh
+         yqQbDI/Y5pdJZCYVxpaoZE6Ic9+sPjBuQjJfOk8x1HOc1/jGErp60ixtk4qsTc5ZJ4QC
+         fiWAh9EtRw21GV/HsUV2xxNh0UkNdQbiArTombIFgahsjo6VdDNCVtNCYf1rxgSwpodw
+         zfPIpmvuysvcdg/FR0xYBvrh0T5rHW8v9AwpPIdJfK8aWoVmGznLRwfmiKTB2M9FEkCp
+         av34MWgsf0MBx9yJeWa7WzHDy9Th9wIjkjjd3V/tplsyblPM199YXaY22/li+jQt6sJO
+         xy0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743488953; x=1744093753;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iNphk2i9eSGihLD4c/ofcPRkoFOwL4x5wS5sCwun4uQ=;
+        b=tkroVjuwBNpZyXqn0++hUb3aaSmyErpjENM57SBzD+jn1e8lIOfzbqr1xqVwyWH5+K
+         JW1+zC0S48OuWdCw+ZCTZKTaVp00O3PndVhsN5aaqYlLSsiim51/lGsXehXao9m+1CBe
+         wgOfk+CuFXG1qjNEIzZWpXosPBTXQQYQxpHhjLiLkGkdW/c+pQnHHlQVHjbySYo3CA45
+         Uug6po4ll1rLQg2qr2v93sqdmkR1b5zVCvSzrYWfqxBtY2Cd/1WW3fGOzqsU65O0F364
+         z4EECaIEnxDGxlv00Y8Vz05axX14DV+WwkLenElcHDFyxpIrYS15NMfzXzg1UfIrtVpN
+         AXsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmhse57UEygeMLn6ayQSEdOSj/oiCyN3BbAOV5CQRGGddckmZVDZ55HlPwJB72z6ohuNHdzYQuzi0RIaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxPv2FpJmrkZLE4eRbTjetDFI1K8At3JDzvkHB4GeIyBJmuy5d
+	XLnYW4lFr+lXrxswYNcVI80D/curI1x1dLtevwRTbZQU40tZKZhULbZ1LOQy3z+3NeCp6t3uPxA
+	zjXUnwAMHKhE6B+uqLsM+gW7dGi+UPw==
+X-Gm-Gg: ASbGncv7ocwwOEYhYfnqZcFGxJedebnqH6v7fAgHAlkDddZTRHay8mxIFWjrPe6WEG+
+	2MnogFSeJKnTPoSBfixN51dAqWSd5s724tiGIRZPKhE0G6i6iVc95DyHP4SrKiqdGscGuZ8NNTb
+	08qIrE8qRKQMzlE5ajakBOJ5WTWizHiabw9jU0QmTInD6p7WnspcAsA6V2KLWk
+X-Google-Smtp-Source: AGHT+IHHb33VIGfYVihNIXGdVHC752JKSHLPixUm9AyM/V+3XusGXkJRkjpV7z3RF2DVCGWi7oJJOKFLv5ekMkl21bA=
+X-Received: by 2002:a05:651c:2210:b0:30b:bb45:6616 with SMTP id
+ 38308e7fff4ca-30de0313c4fmr38698831fa.29.1743488952364; Mon, 31 Mar 2025
+ 23:29:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 1 Apr 2025 01:29:01 -0500
+X-Gm-Features: AQ5f1JrTpZiZZL9PwfxIh7sDKeUI2uOIEH5Ba6569lQs35KVPC0DdGGw8xtrPx4
+Message-ID: <CAH2r5muupgCHf99YziMCFrjYY0EJbT9W74TmUq74BtfR6kmOLA@mail.gmail.com>
+Subject: test generic/074 slowdown with current mainline
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Sun, 30 Mar 2025 18:19:09 -0500:
-
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc-part1-smb3-client-fixes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8b175e2e189673643bf5b996335f0430faddf953
-
-Thank you!
+I noticed that test generic/074 (which runs fstest with various
+options) runs almost twice as slow with current mainline, compared
+with 6.14 over smb3.1.1 mounts.  It doesn't appear to be related to
+changes to cifs.ko (as the cifs.ko code is almost identical in the
+test runs I did).  Anyone else noticing a perf regression for this?
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
