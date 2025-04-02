@@ -1,123 +1,85 @@
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB99205502;
-	Wed,  2 Apr 2025 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A2E1FC3;
+	Wed,  2 Apr 2025 15:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743598974; cv=none; b=cDW2FeQ5akZT/AV5Q1AN3dJiNci/H3yNOtfsCu2oqg9pBlCCQihUg6LROwnl+6+u+muXD4h9EPEhkidNPnaAVwEQX9HPBkYbhkDpB3HN0bKsc4zUm7v1EqHeLgXYIU6jCLRs03Auzo+OBCfDtz2xMfzbMAYTI6VquNxSXB0JZB8=
+	t=1743608014; cv=none; b=Zrg0Cb12VCWQVZxAWv5rpkiDfUwMN6xaAcmxfeIT9DVlLJHtMXXLUIl0HgT/5LiCppYYAM4Bs9DT2GiwREjxbQkKCkLavsZcoqnWdFLCdU1CE9KEG7AM+nSKoikJT4iqia1YFAKCXIAuhFy8onGkzTG5djyIfxeSUi0q2cuhwjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743598974; c=relaxed/simple;
-	bh=DCEPhaPz/eGeoDWdb6Wt6RXEe9b9SHkk/0lHMFgtrJw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=GwHZGIyehlHMq0ix3o7baKN8lBMEmoxoOyJl5ud0CuaNYc5gkDHhG1IfSmQgPRUMfCLXSDswGgTt9f5mcBjexeNvOO4jjV3EGmGyGBvIPtdcg71Wv9meeLXqLPrAy2F7GvREIsQv/xwdKmZLeXmSg9kN/zf6/7k+cr36m3+qyjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=gg6RUPXX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n78nMbbP; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1743608014; c=relaxed/simple;
+	bh=syfpsvuH5wQhbNS8WDq0kgGOJr6aNvZQnc8jHmVdMQU=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=rGn6ij54qI6YLU552+PcGkhKXkc99M//rZhhpxmfzYAI4XCAwlxW4PdL61R1uaHEJfPJy7CwE6GOCSbAasu6mi9MnVXggkwo4/5QWidb/r/A/BWU77budd7AcrlJWpP7J9VwIz1HXRkQ7wDflfZlhg8ARowGtnDTF7fwq2Ttm+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=hCNnZOBh; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="gg6RUPXX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n78nMbbP"
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 092981140120;
-	Wed,  2 Apr 2025 09:02:52 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-07.internal (MEProxy); Wed, 02 Apr 2025 09:02:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1743598972;
-	 x=1743685372; bh=fpqFrssur8XwzaX61qKCU1rsBl9PXbyHjQbc2KbZiY0=; b=
-	gg6RUPXXt3H3z8L8cmXCPtMBoyEnxaJFzuHjASmOTUQ+M9GlyUQru0hXh41oFKP2
-	dFxqjRfR4GsCU3hTndh3uV8MV9gj+uavPPv+EjXQNt6xHA8090cbxGLODU2L2v05
-	+3+GnpqEsBzm67jNpHUD1G1kcMyKMLobRwcG0p9B6u6OpxF648pAnXvDEpk2zeKZ
-	nEcJExcz/6PClokw8X49JtMMioNymK3ICVBD4WliTeWQ4qpPr06v45lSQUh0yUH9
-	oYs9GWq49tB9dnfLdRvQcE4dk0eiNtzdNOlr3RcZg4QeRP71t39ww8R8ZW2jdYsE
-	kHxOOLocuzu2Clp4ZpFsCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1743598972; x=
-	1743685372; bh=fpqFrssur8XwzaX61qKCU1rsBl9PXbyHjQbc2KbZiY0=; b=n
-	78nMbbPtE46JMldQeHEXrxRqA+SmvqqlDOlSWSZuaEKGZSoIfmz3WDIV74UvXqjg
-	7o6qANRtJ4E/mGd535EW5krWHEj+S/nHHb0h2cRAqcp47UcbjkLFC19lx3sT5Q/o
-	ziSt59wqjxlvhB7ggLxScg5bTjDHubrtKSTOIcEhLzvsverk2BKjFVdZm/3ejboU
-	5F9elXkDNLiTTpe87NYPKK6mV2rt5SECFE27nHGyDb7eEe3SN4Jsgb5wwc4nLyky
-	VwfnGpgJSKVwhXnH/ttlPrG78uN5fDJ0RCOMOJ7ipntXP/ZGiTyz5vBw/Wod87wr
-	bVrFrt/VHgJ2M6Rp3iYIA==
-X-ME-Sender: <xms:ezXtZ6sDCpW9FyCUSQTXNandTpb9tgG3W3mja7hq1S554mwWeC8lyQ>
-    <xme:ezXtZ_dNKWh-_EfibN9NxlOcJTeaKAcr6vrNE54sTxChc3LmCMu4E5LOvvvNH6-bs
-    OF0I8YvrkeKxKxDcAA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeehjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
-    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
-    gsrdguvgeqnecuggftrfgrthhtvghrnhepfefhheetffduvdfgieeghfejtedvkeetkeej
-    feekkeelffejteevvdeghffhiefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnuges
-    rghrnhgusgdruggvpdhnsggprhgtphhtthhopeduiedpmhhouggvpehsmhhtphhouhhtpd
-    hrtghpthhtohepnhgrthhhrghnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgu
-    vghrshdrrhhogigvlhhlsehlihhnrghrohdrohhrghdprhgtphhtthhopegurghnrdgtrg
-    hrphgvnhhtvghrsehlihhnrghrohdrohhrghdprhgtphhtthhopehnrghrvghshhdrkhgr
-    mhgsohhjuheslhhinhgrrhhordhorhhgpdhrtghpthhtohepthhorhhvrghlughssehlih
-    hnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehgrhgvghhkhheslhhi
-    nhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqd
-    hkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehl
-    khhfthdqthhrihgrghgvsehlihhsthhsrdhlihhnrghrohdrohhrghdprhgtphhtthhope
-    hllhhvmheslhhishhtshdrlhhinhhugidruggvvh
-X-ME-Proxy: <xmx:ezXtZ1x0tn7ltpGTDYGifQyNGRwv05HQhp7VrRtfOYJERIsYFU5jDA>
-    <xmx:ezXtZ1Of7TE_gxWrJ9c7KR2LYhhzet4wNAtbTSz6jf4tXfLOFRPmbw>
-    <xmx:ezXtZ68sGdYz2vnEQ6TnUK9X4QGhn2liLK4occMVE2styVeDxOwdsA>
-    <xmx:ezXtZ9XcFzt4U54KRH7UKrG6STA-h_Ug_wweIkJej96LpAu49GYE5A>
-    <xmx:ezXtZzN6BS9dQtVWxt3yAmWJ7-RuOF4CsSi15WszlIkVW3qMZzB9w9x6>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 4E1562220072; Wed,  2 Apr 2025 09:02:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="hCNnZOBh"
+Message-ID: <bac53deae60fbf5dbcb19feb403d9e9f@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1743607433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FawFq1pnlpgkOhxfSYjHGUQvx87dCGjnpIvU2tRWtLc=;
+	b=hCNnZOBhOpJXFp6DW1Enxrx/rOhffbmqXEUTtHWGRP4PcPMqMH1H/wgD1SNQBAvGxOfln2
+	VrU5UJtP7bhhD/jecJGW6/6w5a7j1vRPG7LrwZuhTZk1BVw8DDfaDnW9+VAnqWKhLcIOFu
+	wQEzFQYDTvNInXNmNSCvQE+3QKPw6Ur7t+6hAobgHhu+wK6OXafzugOJ7PKsVrjZXp4yP3
+	mnoaBk53KQOlQhJtL3MAUfkLYU+3AswWadZh3dbW5jbbsawacB6jlTdzMsiH4t0HLcjr0y
+	xr2b2OX4lt4dCXPOT/bjxWo+QQ8ShDhd5JMu4h+EN2122HLPSZQIbIi3Mp7a0w==
+From: Paulo Alcantara <pc@manguebit.com>
+To: David Howells <dhowells@redhat.com>, Steve French <stfrench@microsoft.com>
+Cc: dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+ linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] cifs: Remove cifs_truncate_page() as it should be
+ superfluous
+In-Reply-To: <559573.1743519662@warthog.procyon.org.uk>
+References: <559573.1743519662@warthog.procyon.org.uk>
+Date: Wed, 02 Apr 2025 12:23:48 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: T1e4eead9af4a5be9
-Date: Wed, 02 Apr 2025 15:02:29 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Naresh Kamboju" <naresh.kamboju@linaro.org>,
- clang-built-linux <llvm@lists.linux.dev>,
- "Linux ARM" <linux-arm-kernel@lists.infradead.org>,
- linux-s390@vger.kernel.org, "open list" <linux-kernel@vger.kernel.org>,
- lkft-triage@lists.linaro.org, samba-technical@lists.samba.org,
- linux-cifs@vger.kernel.org, "Nathan Chancellor" <nathan@kernel.org>
-Cc: "Steve French" <sfrench@samba.org>, bharathsm@microsoft.com,
- "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Dan Carpenter" <dan.carpenter@linaro.org>,
- "Anders Roxell" <anders.roxell@linaro.org>,
- "Shyam Prasad N" <sprasad@microsoft.com>
-Message-Id: <3ad96ab5-72a3-48ee-8ab3-e68d066169a4@app.fastmail.com>
-In-Reply-To: 
- <CA+G9fYuQHeGicnEx1d=XBC0p1LCsndi5q0p86V7pCZ02d8Fv_w@mail.gmail.com>
-References: 
- <CA+G9fYuQHeGicnEx1d=XBC0p1LCsndi5q0p86V7pCZ02d8Fv_w@mail.gmail.com>
-Subject: Re: clang-nightly: ERROR: modpost: "wcslen" [fs/smb/client/cifs.ko] undefined!
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 2, 2025, at 14:21, Naresh Kamboju wrote:
-> Build regression: arm powerpc s390 modpost "wcslen" fs smb client
-> cifs.ko undefined
+David Howells <dhowells@redhat.com> writes:
+
+> The calls to cifs_truncate_page() should be superfluous as the places that
+> call it also call truncate_setsize() or cifs_setsize() and therefore
+> truncate_pagecache() which should also clear the tail part of the folio
+> containing the EOF marker.
 >
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Further, smb3_simple_falloc() calls both cifs_setsize() and
+> truncate_setsize() in addition to cifs_truncate_page().
 >
-> ## Build log
+> Remove the superfluous calls.
 >
-> ERROR: modpost: "wcslen" [fs/smb/client/cifs.ko] undefined!
+> This gets rid of another function referring to struct page.
+>
+> [Should cifs_setsize() also set inode->i_blocks?]
 
-This is from the latest clang release, and Nathan already sent a fix:
+I don't think that's necessary as the current inode will be marked for
+revalidation (e.g. cifsInodeInfo::time is set to 0), so next call to
+cifs_fattr_to_inode() will update inode->i_blocks.  If it isn't being
+updated, then I'm missing something else.
 
-https://lore.kernel.org/lkml/20250328-string-add-wcslen-for-llvm-opt-v3-1-a180b4c0c1c4@kernel.org/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <stfrench@microsoft.com>
+> cc: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/smb/client/cifsfs.h  |    1 -
+>  fs/smb/client/inode.c   |   19 -------------------
+>  fs/smb/client/smb2ops.c |    2 --
+>  3 files changed, 22 deletions(-)
 
-     Arnd
+Looks good,
+
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
