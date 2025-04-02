@@ -1,46 +1,47 @@
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32D41F1516
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Apr 2025 20:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440DE1F1317;
+	Wed,  2 Apr 2025 20:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743625659; cv=none; b=s6CcC2ADWgiTjMvc/nzE8Rtg2nEzHZ0q4zcEfDHLPfsAkm0CHwr///3550Q9IJtcAWHJMfUKyUEQ2Om4CXhojbBT7l0q6ggTx2DOMJsxgDeu0f8Q0GAHF0AwE6pOEIXlFaWy8Wkuv7z9abJhLEOowLYk7AhK7uB8P6HIcAmToyI=
+	t=1743625687; cv=none; b=kkcPaBQFqRsv+NUQ29h9Ku1o9TYE3O4y6cwgUbglNt0ZT20GlvDhqh6EzYjr8fevy7mIN4oMMgyindN3LPf5q+b354QmndU35u0AogGFe8B1eXoOzjSOz6XZYbT083cqzWNkffWWhXGT6B0opVm8N1DA5/Z7oj3E4XzHkOEDcPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743625659; c=relaxed/simple;
-	bh=9TaHJWi5ZXxJEnPXI4DgSpsWvMm76OeDtTEXoL4p37s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=loO+/nAwmBjlK7eVLB0iclW6n4xf3RSXiLOG28WwNbHQdJaDY1+mFHUwLzuuyolkm4ACwekg1IfAXoEXI5lecrDlTfKxfxzp73PqmdnNZIqkaVHIdbKYqL5Do59LjyHUXFCq+9FRzrVWWDTQxwlk/Yscu4GiQojAgrlHNp8Ecaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=reChPIpg; arc=none smtp.client-ip=72.21.196.25
+	s=arc-20240116; t=1743625687; c=relaxed/simple;
+	bh=pMI4VvrhdHCySyXCh3UEy27QIl3KjZTJ74eGiusFQ3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z88XDW/1BjaS4YR2gCeeaXfhBh62m6xlDbKillwWCz6PQ7kTbL7ibiShPHFna4fs7JIZLEhmAQmdgsKnr/MK3zFHq6jjoEqVhuV7jhaYZvxd14M6N+EsahnjUOXfzJvQdxN0m3W98Z+TorscxIQFu5mwXPnPhuAvcdJP9d0IMew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dwG9Tynz; arc=none smtp.client-ip=99.78.197.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="reChPIpg"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dwG9Tynz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743625658; x=1775161658;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0Dl4ambqgSK3qM215BGRBpDMgSBFL9HlOScw7yRKL4M=;
-  b=reChPIpgpRY4exPeT/bJq1bJ8V8VjjuiywC3todmvEd+9a02WZa1V85P
-   +4eAlvoBfh2HMhhr/Ok26sBUFLczbc7U5B+yOmCzd3fpvAmXlyAI37MXH
-   MvODmjWgOPcPgIaKKtnp5QE6FG854GkDqS5cBNM1drBTGG8MYONPUZr+A
-   c=;
+  t=1743625685; x=1775161685;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Ti6s4TIDQavVBsdtxADl8QYz9QBjQ5A0z4Mg7FW8S0I=;
+  b=dwG9Tynz3VHlapsl/sxadefXGRrxTHRhB7OuLfQFv/ZhkOUSN0UJDT+E
+   NAPEoJcMB0c/2xcXLRF8qxCWTYxLIDwGK2HaIarmOQbH+swxFqaLRyGeG
+   CdkpfLzrHwKrxJr+jplRuBpLB11ds42OqeD9I6/MINIPPRveT+hnUrEwp
+   g=;
 X-IronPort-AV: E=Sophos;i="6.15,183,1739836800"; 
-   d="scan'208";a="479816170"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 20:27:33 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:30648]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.46:2525] with esmtp (Farcaster)
- id 4e2d6a44-b7a0-4257-8fa5-e305116ceb8b; Wed, 2 Apr 2025 20:27:32 +0000 (UTC)
-X-Farcaster-Flow-ID: 4e2d6a44-b7a0-4257-8fa5-e305116ceb8b
+   d="scan'208";a="392332186"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 20:28:02 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:1643]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.18:2525] with esmtp (Farcaster)
+ id 1e781972-352e-4290-b038-58ec050c9ede; Wed, 2 Apr 2025 20:28:02 +0000 (UTC)
+X-Farcaster-Flow-ID: 1e781972-352e-4290-b038-58ec050c9ede
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 20:27:31 +0000
+ Wed, 2 Apr 2025 20:27:57 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.101.8) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 20:27:28 +0000
+ Wed, 2 Apr 2025 20:27:54 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: Steve French <sfrench@samba.org>
 CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
@@ -49,11 +50,13 @@ CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
  Matsumiya <ematsumiya@suse.de>, Wang Zhaolong <wangzhaolong1@huawei.com>,
 	"Kuniyuki Iwashima" <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <linux-cifs@vger.kernel.org>,
-	<samba-technical@lists.samba.org>
-Subject: [PATCH v2 0/2] cifs: Revert bogus fix for CVE-2024-54680 and its followup commit.
-Date: Wed, 2 Apr 2025 13:26:46 -0700
-Message-ID: <20250402202714.6799-1-kuniyu@amazon.com>
+	<samba-technical@lists.samba.org>, <stable@vger.kernel.org>
+Subject: [PATCH v2 1/2] Revert "smb: client: Fix netns refcount imbalance causing leaks and use-after-free"
+Date: Wed, 2 Apr 2025 13:26:47 -0700
+Message-ID: <20250402202714.6799-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250402202714.6799-1-kuniyu@amazon.com>
+References: <20250402202714.6799-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,31 +65,79 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+X-ClientProxiedBy: EX19D037UWB001.ant.amazon.com (10.13.138.123) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit e9f2517a3e18 ("smb: client: fix TCP timers deadlock after
-rmmod") was not only a bogus fix for LOCKDEP issue but also
-introduced a real TCP socket leak.
+This reverts commit 4e7f1644f2ac6d01dc584f6301c3b1d5aac4eaef.
 
-I'm working on the LOCKDEP fix on the networking side, so let's
-revert the commit and its followup fix.
+The commit e9f2517a3e18 ("smb: client: fix TCP timers deadlock after
+rmmod") is not only a bogus fix for LOCKDEP null-ptr-deref but also
+introduces a real issue, TCP sockets leak, which will be explained in
+detail in the next revert.
 
-For details, please see each commit.
+Also, CNA assigned CVE-2024-54680 to it but is rejecting it. [0]
 
+Thus, we are reverting the commit and its follow-up commit 4e7f1644f2ac
+("smb: client: Fix netns refcount imbalance causing leaks and
+use-after-free").
 
-Changes:
-  v2: Add Cc: stable
+Link: https://lore.kernel.org/all/2025040248-tummy-smilingly-4240@gregkh/ #[0]
+Fixes: 4e7f1644f2ac ("smb: client: Fix netns refcount imbalance causing leaks and use-after-free")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/connect.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-
-Kuniyuki Iwashima (2):
-  Revert "smb: client: Fix netns refcount imbalance causing leaks and
-    use-after-free"
-  Revert "smb: client: fix TCP timers deadlock after rmmod"
-
- fs/smb/client/connect.c | 34 +++++++++-------------------------
- 1 file changed, 9 insertions(+), 25 deletions(-)
-
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 10a7c28d2d44..137a611c5ab0 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -300,7 +300,6 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+ 			 server->ssocket->flags);
+ 		sock_release(server->ssocket);
+ 		server->ssocket = NULL;
+-		put_net(cifs_net_ns(server));
+ 	}
+ 	server->sequence_number = 0;
+ 	server->session_estab = false;
+@@ -3367,12 +3366,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 		/*
+ 		 * Grab netns reference for the socket.
+ 		 *
+-		 * This reference will be released in several situations:
+-		 * - In the failure path before the cifsd thread is started.
+-		 * - In the all place where server->socket is released, it is
+-		 *   also set to NULL.
+-		 * - Ultimately in clean_demultiplex_info(), during the final
+-		 *   teardown.
++		 * It'll be released here, on error, or in clean_demultiplex_info() upon server
++		 * teardown.
+ 		 */
+ 		get_net(net);
+ 
+@@ -3388,8 +3383,10 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 	}
+ 
+ 	rc = bind_socket(server);
+-	if (rc < 0)
++	if (rc < 0) {
++		put_net(cifs_net_ns(server));
+ 		return rc;
++	}
+ 
+ 	/*
+ 	 * Eventually check for other socket options to change from
+@@ -3444,6 +3441,9 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 	    (server->rfc1001_sessinit == -1 && sport == htons(RFC1001_PORT)))
+ 		rc = ip_rfc1001_connect(server);
+ 
++	if (rc < 0)
++		put_net(cifs_net_ns(server));
++
+ 	return rc;
+ }
+ 
 -- 
 2.48.1
 
