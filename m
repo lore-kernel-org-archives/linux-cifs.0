@@ -1,47 +1,46 @@
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2EB19CCEC
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Apr 2025 20:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32D41F1516
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Apr 2025 20:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743624270; cv=none; b=A04Du5rkLaht9hmhIrsTbgjLgIXHDAoyei12B25sXVCqaxOjjk/uc0C4j2VnXNocAxJsGyn/LL3ASsW3F3OU9a0n39dhmU6vBZwgoHNi9QG8j+q9GfAAOcPtCrrang9YwHmNzm+nWRjEvfLMAMu8UVmc4AK+X5Fni7bkVANN1Fc=
+	t=1743625659; cv=none; b=s6CcC2ADWgiTjMvc/nzE8Rtg2nEzHZ0q4zcEfDHLPfsAkm0CHwr///3550Q9IJtcAWHJMfUKyUEQ2Om4CXhojbBT7l0q6ggTx2DOMJsxgDeu0f8Q0GAHF0AwE6pOEIXlFaWy8Wkuv7z9abJhLEOowLYk7AhK7uB8P6HIcAmToyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743624270; c=relaxed/simple;
-	bh=dFhFTz1oXnCDs8BFOCYTHoS0IdKK5MY8bwwifagE0iQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PFalLTXYolvyY4yn5EUUbUnhCD2cuq6psID5L8N73qhwrFjUyTfksiBuHwF7XvrqvTYXeYvAFDmKvn2Noy+X+snk2gA3CrxKnJU3SapBCZNdYfNnN9oZxWK7EsG/EOFo9Zw8iuLBh//k+R+M0o2lCWr1jOecTH8urQlGO0csNOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vOX0zc/r; arc=none smtp.client-ip=52.119.213.154
+	s=arc-20240116; t=1743625659; c=relaxed/simple;
+	bh=9TaHJWi5ZXxJEnPXI4DgSpsWvMm76OeDtTEXoL4p37s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=loO+/nAwmBjlK7eVLB0iclW6n4xf3RSXiLOG28WwNbHQdJaDY1+mFHUwLzuuyolkm4ACwekg1IfAXoEXI5lecrDlTfKxfxzp73PqmdnNZIqkaVHIdbKYqL5Do59LjyHUXFCq+9FRzrVWWDTQxwlk/Yscu4GiQojAgrlHNp8Ecaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=reChPIpg; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vOX0zc/r"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="reChPIpg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743624268; x=1775160268;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NLRSctUwpCysQ83it1Vo+SFeYO+J4rsD9OoA212HCa4=;
-  b=vOX0zc/rN70GKPMNj81YmMIw6yBsUK02cGPnlknDNTjeipQBSExYRr8A
-   bdrdbjRGUCUjZ1oWseE/uJTMLsvX92vRmygZtJDF3w10kTx9+unWVMBOH
-   tEi5rxRMU9GnKffNRjUx+NCzxFWzgl8dvPA+WSfewwuge/Dt30jAh/V4s
-   M=;
+  t=1743625658; x=1775161658;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0Dl4ambqgSK3qM215BGRBpDMgSBFL9HlOScw7yRKL4M=;
+  b=reChPIpgpRY4exPeT/bJq1bJ8V8VjjuiywC3todmvEd+9a02WZa1V85P
+   +4eAlvoBfh2HMhhr/Ok26sBUFLczbc7U5B+yOmCzd3fpvAmXlyAI37MXH
+   MvODmjWgOPcPgIaKKtnp5QE6FG854GkDqS5cBNM1drBTGG8MYONPUZr+A
+   c=;
 X-IronPort-AV: E=Sophos;i="6.15,183,1739836800"; 
-   d="scan'208";a="285082235"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 20:04:25 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:11611]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.138:2525] with esmtp (Farcaster)
- id 8092cb88-905c-45e6-9e44-d0c8adaaf448; Wed, 2 Apr 2025 20:04:24 +0000 (UTC)
-X-Farcaster-Flow-ID: 8092cb88-905c-45e6-9e44-d0c8adaaf448
+   d="scan'208";a="479816170"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 20:27:33 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:30648]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.46:2525] with esmtp (Farcaster)
+ id 4e2d6a44-b7a0-4257-8fa5-e305116ceb8b; Wed, 2 Apr 2025 20:27:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 4e2d6a44-b7a0-4257-8fa5-e305116ceb8b
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 20:04:23 +0000
+ Wed, 2 Apr 2025 20:27:31 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.101.8) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 20:04:20 +0000
+ Wed, 2 Apr 2025 20:27:28 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: Steve French <sfrench@samba.org>
 CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
@@ -51,12 +50,10 @@ CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
 	"Kuniyuki Iwashima" <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <linux-cifs@vger.kernel.org>,
 	<samba-technical@lists.samba.org>
-Subject: [PATCH 2/2] Revert "smb: client: fix TCP timers deadlock after rmmod"
-Date: Wed, 2 Apr 2025 13:02:47 -0700
-Message-ID: <20250402200319.2834-3-kuniyu@amazon.com>
+Subject: [PATCH v2 0/2] cifs: Revert bogus fix for CVE-2024-54680 and its followup commit.
+Date: Wed, 2 Apr 2025 13:26:46 -0700
+Message-ID: <20250402202714.6799-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250402200319.2834-1-kuniyu@amazon.com>
-References: <20250402200319.2834-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -65,194 +62,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-This reverts commit e9f2517a3e18a54a3943c098d2226b245d488801.
-
 Commit e9f2517a3e18 ("smb: client: fix TCP timers deadlock after
-rmmod") is intended to fix a null-ptr-deref in LOCKDEP, which is
-mentioned as CVE-2024-54680, but is actually did not fix anything;
-The issue can be reproduced on top of it. [0]
+rmmod") was not only a bogus fix for LOCKDEP issue but also
+introduced a real TCP socket leak.
 
-Also, it reverted the change by commit ef7134c7fc48 ("smb: client:
-Fix use-after-free of network namespace.") and introduced a real
-issue by reviving the kernel TCP socket.
+I'm working on the LOCKDEP fix on the networking side, so let's
+revert the commit and its followup fix.
 
-When a reconnect happens for a CIFS connection, the socket state
-transitions to FIN_WAIT_1.  Then, inet_csk_clear_xmit_timers_sync()
-in tcp_close() stops all timers for the socket.
+For details, please see each commit.
 
-If an incoming FIN packet is lost, the socket will stay at FIN_WAIT_1
-forever, and such sockets could be leaked up to net.ipv4.tcp_max_orphans.
 
-Usually, FIN can be retransmitted by the peer, but if the peer aborts
-the connection, the issue comes into reality.
+Changes:
+  v2: Add Cc: stable
 
-I warned about this privately by pointing out the exact report [1],
-but the bogus fix was finally merged.
 
-So, we should not stop the timers to finally kill the connection on
-our side in that case, meaning we must not use a kernel socket for
-TCP whose sk->sk_net_refcnt is 0.
+Kuniyuki Iwashima (2):
+  Revert "smb: client: Fix netns refcount imbalance causing leaks and
+    use-after-free"
+  Revert "smb: client: fix TCP timers deadlock after rmmod"
 
-The kernel socket does not have a reference to its netns to make it
-possible to tear down netns without cleaning up every resource in it.
+ fs/smb/client/connect.c | 34 +++++++++-------------------------
+ 1 file changed, 9 insertions(+), 25 deletions(-)
 
-For example, tunnel devices use a UDP socket internally, but we can
-destroy netns without removing such devices and let it complete
-during exit.  Otherwise, netns would be leaked when the last application
-died.
-
-However, this is problematic for TCP sockets because TCP has timers to
-close the connection gracefully even after the socket is close()d.  The
-lifetime of the socket and its netns is different from the lifetime of
-the underlying connection.
-
-If the socket user does not maintain the netns lifetime, the timer could
-be fired after the socket is close()d and its netns is freed up, resulting
-in use-after-free.
-
-Actually, we have seen so many similar issues and converted such sockets
-to have a reference to netns.
-
-That's why I converted the CIFS client socket to have a reference to
-netns (sk->sk_net_refcnt == 1), which is somehow mentioned as out-of-scope
-of CIFS and technically wrong in e9f2517a3e18, but **is in-scope and right
-fix**.
-
-Regarding the LOCKDEP issue, we can prevent the module unload by
-bumping the module refcount when switching the LOCKDDEP key in
-sock_lock_init_class_and_name(). [2]
-
-For a while, let's revert the bogus fix.
-
-Note that now we can use sk_net_refcnt_upgrade() for the socket
-conversion, but I'll do so later separately to make backport easy.
-
-Link: https://lore.kernel.org/all/20250402020807.28583-1-kuniyu@amazon.com/ #[0]
-Link: https://lore.kernel.org/netdev/c08bd5378da647a2a4c16698125d180a@huawei.com/ #[1]
-Link: https://lore.kernel.org/lkml/20250402005841.19846-1-kuniyu@amazon.com/ #[2]
-Fixes: e9f2517a3e18 ("smb: client: fix TCP timers deadlock after rmmod")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- fs/smb/client/connect.c | 36 ++++++++++--------------------------
- 1 file changed, 10 insertions(+), 26 deletions(-)
-
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 137a611c5ab0..989d8808260b 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1073,13 +1073,9 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
- 	msleep(125);
- 	if (cifs_rdma_enabled(server))
- 		smbd_destroy(server);
--
- 	if (server->ssocket) {
- 		sock_release(server->ssocket);
- 		server->ssocket = NULL;
--
--		/* Release netns reference for the socket. */
--		put_net(cifs_net_ns(server));
- 	}
- 
- 	if (!list_empty(&server->pending_mid_q)) {
-@@ -1127,7 +1123,6 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
- 		 */
- 	}
- 
--	/* Release netns reference for this server. */
- 	put_net(cifs_net_ns(server));
- 	kfree(server->leaf_fullpath);
- 	kfree(server->hostname);
-@@ -1773,8 +1768,6 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 
- 	tcp_ses->ops = ctx->ops;
- 	tcp_ses->vals = ctx->vals;
--
--	/* Grab netns reference for this server. */
- 	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
- 
- 	tcp_ses->sign = ctx->sign;
-@@ -1902,7 +1895,6 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- out_err_crypto_release:
- 	cifs_crypto_secmech_release(tcp_ses);
- 
--	/* Release netns reference for this server. */
- 	put_net(cifs_net_ns(tcp_ses));
- 
- out_err:
-@@ -1911,10 +1903,8 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 			cifs_put_tcp_session(tcp_ses->primary_server, false);
- 		kfree(tcp_ses->hostname);
- 		kfree(tcp_ses->leaf_fullpath);
--		if (tcp_ses->ssocket) {
-+		if (tcp_ses->ssocket)
- 			sock_release(tcp_ses->ssocket);
--			put_net(cifs_net_ns(tcp_ses));
--		}
- 		kfree(tcp_ses);
- 	}
- 	return ERR_PTR(rc);
-@@ -3356,20 +3346,20 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 		socket = server->ssocket;
- 	} else {
- 		struct net *net = cifs_net_ns(server);
-+		struct sock *sk;
- 
--		rc = sock_create_kern(net, sfamily, SOCK_STREAM, IPPROTO_TCP, &server->ssocket);
-+		rc = __sock_create(net, sfamily, SOCK_STREAM,
-+				   IPPROTO_TCP, &server->ssocket, 1);
- 		if (rc < 0) {
- 			cifs_server_dbg(VFS, "Error %d creating socket\n", rc);
- 			return rc;
- 		}
- 
--		/*
--		 * Grab netns reference for the socket.
--		 *
--		 * It'll be released here, on error, or in clean_demultiplex_info() upon server
--		 * teardown.
--		 */
--		get_net(net);
-+		sk = server->ssocket->sk;
-+		__netns_tracker_free(net, &sk->ns_tracker, false);
-+		sk->sk_net_refcnt = 1;
-+		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
-+		sock_inuse_add(net, 1);
- 
- 		/* BB other socket options to set KEEPALIVE, NODELAY? */
- 		cifs_dbg(FYI, "Socket created\n");
-@@ -3383,10 +3373,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	}
- 
- 	rc = bind_socket(server);
--	if (rc < 0) {
--		put_net(cifs_net_ns(server));
-+	if (rc < 0)
- 		return rc;
--	}
- 
- 	/*
- 	 * Eventually check for other socket options to change from
-@@ -3423,7 +3411,6 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	if (rc < 0) {
- 		cifs_dbg(FYI, "Error %d connecting to server\n", rc);
- 		trace_smb3_connect_err(server->hostname, server->conn_id, &server->dstaddr, rc);
--		put_net(cifs_net_ns(server));
- 		sock_release(socket);
- 		server->ssocket = NULL;
- 		return rc;
-@@ -3441,9 +3428,6 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	    (server->rfc1001_sessinit == -1 && sport == htons(RFC1001_PORT)))
- 		rc = ip_rfc1001_connect(server);
- 
--	if (rc < 0)
--		put_net(cifs_net_ns(server));
--
- 	return rc;
- }
- 
 -- 
 2.48.1
 
