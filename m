@@ -1,124 +1,151 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C322E339D
-	for <linux-cifs@vger.kernel.org>; Thu,  3 Apr 2025 03:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BA32AE9A;
+	Thu,  3 Apr 2025 03:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743650180; cv=none; b=By5OkByEM4lvpQhCrDEW/dAdC8e0aPQ4vbAfdw3+x8aowGG9SNf5f913S4Brf4yb1M33f/48/gsAccw0kTy2N+tOJF1BquKte7FZWBmIuFLp1bOb/u4r6Fbn7GXDGt06ZpcOhM6QzwTsSrEGFD2oUvw1lYp2HWiEIpMAP0Y4WNQ=
+	t=1743650391; cv=none; b=lWbY4XW5kHb+0/cied7xmDvDmGa3CSDl6PtyzfYwLxmhXKiB5EmCpFv09ufqKHrSSpjlOiQSaGeqRKb/UD6Ku2JPDAbf87Uf3x8QmN0nFKD+Gs1TexJ6ApjZ6vTsLN2jWZLhBtKulcx098AfCFEPoePccpK7uWCM7VzeLYuRZlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743650180; c=relaxed/simple;
-	bh=sCEZ4a6VF3r3yhGhXIYN8S05UMd2vyujKlVLbbltbhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ux/q6/o0r2cum4NfqhcVIYp6okljOFtBjxCZx5KN3Px2VHJKpwiQx/FRcvT7UwerN0aI4Em+SxuTWWXKsNfnookt8HxQHm0J9pEK8M6sXiP+4/SWwm9Et2lNtADiFHFwPyJCK2PL5/tRiFx1TzpmSAg5OBvZrFQ3pvd/DkF5sJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZSmwX258mz2RTZt;
-	Thu,  3 Apr 2025 11:11:24 +0800 (CST)
-Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 777F9140259;
-	Thu,  3 Apr 2025 11:16:13 +0800 (CST)
-Received: from [10.174.178.209] (10.174.178.209) by
- kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Apr 2025 11:16:12 +0800
-Message-ID: <28287f44-ad1c-4ed2-bb60-ed9209b719b1@huawei.com>
-Date: Thu, 3 Apr 2025 11:16:11 +0800
+	s=arc-20240116; t=1743650391; c=relaxed/simple;
+	bh=dPhV2Dx1i7TPqqgN/SJxdgFanj5RQBOWwZ7zfw1NMBM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hg+e/+bwJF6O8vgJS4UGrAJeJ7XyZlj0WPJd+/WGypcbvgjMG7d/Tk7XdOp1IuhwDTnDmiA4JEPo0ptP3cFWOtx3uLKdNzYSfiAmuxkat5I0VRVs/kTHWDTPmDQySBAq+mJRbaO6SKmhNXc5dsilrBOh1DDtNg4f025MIH3IfLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VijD7vg3; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VijD7vg3"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30bf8632052so3577251fa.0;
+        Wed, 02 Apr 2025 20:19:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743650388; x=1744255188; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CiIkKQKIy0XxhkSJxnoNEJ2UClSeAt3PNfoi3TRl3cM=;
+        b=VijD7vg3pwKq9UEpwXDUhke8Xwj1f6i9ta32gJFnNrhZ8gqH4YLDQEZMnPQOIZSbOA
+         MXGHFHYgu1EHNKnXOwMjihQapdX5tIBcBG7EHOYqirUkqHc/1UTB0f8sJIqMiBFcOkEv
+         aItR5Gi9bVhR84x8YOADWWgIrd9QGDVse8hLOLwi/9kUXSwAbVx1NSTpX3gFa/kMh1S+
+         dkG+UmQ4ywx2mTdNMeqYaItqIAyXRqO3wIJU8i/y/2ZOgR7zBtutp8tOiiGs/QluXmry
+         r8uGtSWUYKdjUwcfisK7CJ+ENYIM4N7SCTA2GGZ0574oZbHrVnzjkyskc9Ro1TlBKOhj
+         SPfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743650388; x=1744255188;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CiIkKQKIy0XxhkSJxnoNEJ2UClSeAt3PNfoi3TRl3cM=;
+        b=YPE2dwkBdw1oZap3u0C9zKzcVyxJVJOmFoP6Gbluscp0kmcQyqZ+I/ahV4chYvgSgz
+         Gcv1BH9JHZUfxOC9dU5lNCwwSrstvUIH0pxHZCHOcmoirEPLCJte/1gksy/wOYa6GoVN
+         xiKv8+Ggu/5oY7FRPraTnMgpKlO1vh/b/IwU7MWjSJD/cRCqZOVfEDTWAnJ7bWuY4QQ6
+         6tMLUAGEqwEV8Umdq13ZQyIoGReZpUVLYdOEgAkBeyylD5ZToZusvEqCoHy4dPFv0hqL
+         LECJpM3+0/lciTLyGho1uvdNoAFYox2h4qtzTR85yCl/9Tt465v5n8l9xUef6IABskMp
+         NnEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1icdh21jFacffxGkpbJFj9yJRmaKcqcVbDGrzTPy80yyAF/s6Rn7kXVqDK7z6kUXU9PNbJD/bLQ3d@vger.kernel.org, AJvYcCValdvW9qSSay5rHYl5LJ7M4n13iFQ9a49Er6UQG0KRaOhqE2CCLs643dFFXMZweA1wxf160VrWbHz2@vger.kernel.org, AJvYcCXEFufuAFrmDnMNjPfiSzNv8H4JzGmc8XlPdulS3BLuAJb7sF1emRu7QneKvNws0Nk2Id+Eiacq22f1zxnY@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxQCCmqbNtKyLVACnjoy48j5+IUy8er3BH09RLVDax94DXPd9l
+	YjA5uL3/xO9oyhafoWK/ObqriUtcD7sQE/Fv1whYKAWTgLsIfk1VKqXBsj9IbAbTuvwdEJCAjZ4
+	vRh78B8yuPka7Pw065gt0nTFkqAE=
+X-Gm-Gg: ASbGnctEpbpf2y218imnzZZoZImY0SGLNRL483wg7lI71xt8gAPSNM+jhJTeeA9T0Zw
+	uOl2FoU0QX3hR7oUArM0I3+7ijOUPf7C47NXMb+0sWh7VkowTVG9IWnvHtXC3sERFOuRjZ9RFH3
+	qhi9aC4Z1gxuQN4EqaIJ3/CpzHhEVrz50fxG2yvI4QXGjHQjdilw5H3+QHShk=
+X-Google-Smtp-Source: AGHT+IG7rjnTU1EgqlwK9adNKeontRlIOfXsSHl79G4extA/wzUM9snPQg2SrcXYgVwKmIOraELNxs0lWw8/ls0tLXg=
+X-Received: by 2002:a05:651c:1592:b0:30b:9813:b002 with SMTP id
+ 38308e7fff4ca-30de02cef5fmr73548441fa.30.1743650387488; Wed, 02 Apr 2025
+ 20:19:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] Revert "smb: client: Fix netns refcount imbalance
- causing leaks and use-after-free"
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Steve French <sfrench@samba.org>
-CC: Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg
-	<ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, Enzo Matsumiya
-	<ematsumiya@suse.de>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>
-References: <20250402200319.2834-1-kuniyu@amazon.com>
- <20250402200319.2834-2-kuniyu@amazon.com>
-From: Wang Zhaolong <wangzhaolong1@huawei.com>
-In-Reply-To: <20250402200319.2834-2-kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemg500010.china.huawei.com (7.202.181.71)
+References: <CAH2r5mt68AFyJGdBcPB+eqzdAdbx=0QXC_U8MY-te26Wb0ye5w@mail.gmail.com>
+ <20250403021927.53033-1-kuniyu@amazon.com>
+In-Reply-To: <20250403021927.53033-1-kuniyu@amazon.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 2 Apr 2025 22:19:36 -0500
+X-Gm-Features: AQ5f1Jp24pzOmXXL0bKtHYtfuJLDcOpHeDOjaRGnmENco1TJg0napsX5Suc74pI
+Message-ID: <CAH2r5mu7Wf0n9ZmnhAAWetKRiUczHv+odYHj5bBg6a=G1y2kcQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] cifs: Revert bogus fix for CVE-2024-54680 and its
+ followup commit.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: bharathsm@microsoft.com, ematsumiya@suse.de, kuni1840@gmail.com, 
+	linux-cifs@vger.kernel.org, pc@manguebit.com, samba-technical@lists.samba.org, 
+	sprasad@microsoft.com, tom@talpey.com, wangzhaolong1@huawei.com, 
+	linux-net@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Wang Zhaolong <wangzhaolong1@huawei.com>
+I can run some regression tests with these two patches, but it would
+be very helpful if the original patch authors could comment (Wang and
+Enzo), and since this apparently relies on a fix to the network stack
+(the LOCKDEP fix) it would be helpful if any opinions from the network
+devs.
 
-> This reverts commit 4e7f1644f2ac6d01dc584f6301c3b1d5aac4eaef.
-> 
-> The commit e9f2517a3e18 ("smb: client: fix TCP timers deadlock after
-> rmmod") is not only a bogus fix for LOCKDEP null-ptr-deref but also
-> introduces a real issue, TCP sockets leak, which will be explained in
-> detail in the next revert.
-> 
-> Also, CNA assigned CVE-2024-54680 to it but is rejecting it. [0]
-> 
-> Thus, we are reverting the commit and its follow-up commit 4e7f1644f2ac
-> ("smb: client: Fix netns refcount imbalance causing leaks and
-> use-after-free").
-> 
-> Link: https://lore.kernel.org/all/2025040248-tummy-smilingly-4240@gregkh/ #[0]
-> Fixes: 4e7f1644f2ac ("smb: client: Fix netns refcount imbalance causing leaks and use-after-free")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->   fs/smb/client/connect.c | 16 ++++++++--------
->   1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 10a7c28d2d44..137a611c5ab0 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -300,7 +300,6 @@ cifs_abort_connection(struct TCP_Server_Info *server)
->   			 server->ssocket->flags);
->   		sock_release(server->ssocket);
->   		server->ssocket = NULL;
-> -		put_net(cifs_net_ns(server));
->   	}
->   	server->sequence_number = 0;
->   	server->session_estab = false;
-> @@ -3367,12 +3366,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
->   		/*
->   		 * Grab netns reference for the socket.
->   		 *
-> -		 * This reference will be released in several situations:
-> -		 * - In the failure path before the cifsd thread is started.
-> -		 * - In the all place where server->socket is released, it is
-> -		 *   also set to NULL.
-> -		 * - Ultimately in clean_demultiplex_info(), during the final
-> -		 *   teardown.
-> +		 * It'll be released here, on error, or in clean_demultiplex_info() upon server
-> +		 * teardown.
->   		 */
->   		get_net(net);
->   
-> @@ -3388,8 +3383,10 @@ generic_ip_connect(struct TCP_Server_Info *server)
->   	}
->   
->   	rc = bind_socket(server);
-> -	if (rc < 0)
-> +	if (rc < 0) {
-> +		put_net(cifs_net_ns(server));
->   		return rc;
-> +	}
->   
->   	/*
->   	 * Eventually check for other socket options to change from
-> @@ -3444,6 +3441,9 @@ generic_ip_connect(struct TCP_Server_Info *server)
->   	    (server->rfc1001_sessinit == -1 && sport == htons(RFC1001_PORT)))
->   		rc = ip_rfc1001_connect(server);
->   
-> +	if (rc < 0)
-> +		put_net(cifs_net_ns(server));
-> +
->   	return rc;
->   }
->   
+For a complex issue like this it is important to have at least some
+Tested-by or Reviewed-by for these two, because I was having trouble
+reproducing the various reported problems on Ubuntu (or our Fedora
+test VMs), and the refcount issues are more complicated they seem.
+Let me know if anyone has reviewed these two patches or tested them.
 
+
+On Wed, Apr 2, 2025 at 9:19=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Steve French <smfrench@gmail.com>
+> Date: Wed, 2 Apr 2025 20:14:03 -0500
+> > might be helpful if there were eBPF tracepoints for some of this that
+> > would be able to log warnings optionally if refcount issue on
+> > sock_release and/or rmmod
+>
+> I just posted a fix and there explained that the socket and module
+> refcnt discrepancy is totally fine without LOCKDEP.
+>
+> https://lore.kernel.org/netdev/20250403020837.51664-1-kuniyu@amazon.com/
+>
+> So, in this case, the helpful warning is one logged by hlock_class().
+>
+> As it returns NULL and triggers null-ptr-derf, it means something went
+> wrong, and I guess it was acceptable because LOCKDEP is not enabled in
+> production.
+>
+> Btw, I posted v2 with Cc: stable tags as requested by Greg, so please
+> drop this v1.
+>
+> https://lore.kernel.org/linux-cifs/20250402202714.6799-1-kuniyu@amazon.co=
+m/
+>
+> Thanks!
+>
+> >
+> >
+> > On Wed, Apr 2, 2025 at 3:03=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > Commit e9f2517a3e18 ("smb: client: fix TCP timers deadlock after
+> > > rmmod") was not only a bogus fix for the LOCKDEP issue but also
+> > > introduced a real TCP socket leak.
+> > >
+> > > I'm working on the LOCKDEP fix on the networking side, so let's
+> > > revert the commit and its followup fix.
+> > >
+> > > For details, please see each commit.
+> > >
+> > >
+> > > Kuniyuki Iwashima (2):
+> > >   Revert "smb: client: Fix netns refcount imbalance causing leaks and
+> > >     use-after-free"
+> > >   Revert "smb: client: fix TCP timers deadlock after rmmod"
+> > >
+> > >  fs/smb/client/connect.c | 34 +++++++++-------------------------
+> > >  1 file changed, 9 insertions(+), 25 deletions(-)
+> > >
+> > > --
+> > > 2.48.1
+
+
+
+--=20
+Thanks,
+
+Steve
