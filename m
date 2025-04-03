@@ -1,82 +1,118 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282F71F12EF;
-	Thu,  3 Apr 2025 10:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2728251783
+	for <linux-cifs@vger.kernel.org>; Thu,  3 Apr 2025 17:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743675274; cv=none; b=oP8M8OevmPv5/JLqx0dIuQEdY0O3XWrm2A7jrwPHIf1Mzy/fiYkZSgpPt4KHG/S5Zi1WlyenZZRKKDniXsF3wXTnGjXUKjdu3JZlnhhMAs2gRlz+pLf1odYUsCWdbNb1XGMoWNjHzMvMS14MA92BFQYJ3dIiguf/J0l/9FbGvI8=
+	t=1743701269; cv=none; b=MocvG6o5demeUNHTlgZtok5hkd98V0Vx7KIf2dziogXeE4SUg+Bog0miwjxuWS25HosKQyPw/TdaTCE4+vLmaTpiLzzNmESRDZy2v3XIT5wyi3MwkhramYbqEvloDxdW/ipSriPQJt5sWzO6uYhgfylhmKzRbyaffWG18qYLfMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743675274; c=relaxed/simple;
-	bh=sjeoKwvNnAErTTB2TVWghFi+HJtqzrkEia5y2ZVSlwc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LVABq1Ejug2yl6Rt3OYlr+kfpQ5wZjSxZ0g/UWLuRgQ80aqOadx451DAjDHgwYPtcmMdfGApMB7MRQMJ+7lVYNLWXk/uiCD56skgLjfJy295naZAEJzxiZmEY4KxIUjgUEKgqD1OrlulRL1RuEKTIG1pK1fGk4kAsaLeZAswqpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZSyCx604bzvWql;
-	Thu,  3 Apr 2025 18:10:21 +0800 (CST)
-Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2A73B1800E4;
-	Thu,  3 Apr 2025 18:14:22 +0800 (CST)
-Received: from [10.174.178.209] (10.174.178.209) by
- kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Apr 2025 18:14:21 +0800
-Message-ID: <0520d98d-8289-4cd8-bf37-57bf00750e63@huawei.com>
-Date: Thu, 3 Apr 2025 18:14:19 +0800
+	s=arc-20240116; t=1743701269; c=relaxed/simple;
+	bh=pvJh44ZQxnKOZqN1gChSSa/J9gexfgkD8Tulm65i8aY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=juyYlPBjT/VcdY0D0JRFI9GGtcEKPeAzfb5w80jD1mGIW/G4Wt+0BeAzSrGB5TjWLsh4GMMc+guEI7s+P5eRF0Mo+VF7dGtTAfrJ7qBQbg/pqELZ6Nh7qxRqlyT42PDNOqmy2JF6pHKtzTjwXh2WwIbMna1nwEbH5Omve20lcMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PaYq9bP/; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PaYq9bP/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1743701267; x=1775237267;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Ua3pksczn5JrLI/TR0iVKuelZ15cEIgvLKtswP1k610=;
+  b=PaYq9bP/S3P1au2PsIIp7FKw/DI7lkK2S0/hXd9cLpUspdKe54QtRDSj
+   3AdQPGtxYxKqEP0z/NDj5LuvTeScoWho+0u44gcNtLoBdBijv5g7vVCD6
+   a8jheBweF0a1+T/1f7vhVP6kt3Tr9QKfkwjZeX64XZC8t7754OCSQo1zE
+   4=;
+X-IronPort-AV: E=Sophos;i="6.15,184,1739836800"; 
+   d="scan'208";a="392767783"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 17:27:21 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:64124]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.147:2525] with esmtp (Farcaster)
+ id 3e4e472c-3ac4-4d18-8e4d-fae441999a30; Thu, 3 Apr 2025 17:27:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 3e4e472c-3ac4-4d18-8e4d-fae441999a30
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 3 Apr 2025 17:27:21 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 3 Apr 2025 17:27:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <wangzhaolong1@huawei.com>
+CC: <bharathsm@microsoft.com>, <ematsumiya@suse.de>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <linux-cifs@vger.kernel.org>, <pc@manguebit.com>,
+	<ronniesahlberg@gmail.com>, <samba-technical@lists.samba.org>,
+	<sfrench@samba.org>, <sprasad@microsoft.com>, <tom@talpey.com>
+Subject: Re: [PATCH 1/2] Revert "smb: client: Fix netns refcount imbalance causing leaks and use-after-free"
+Date: Thu, 3 Apr 2025 10:26:47 -0700
+Message-ID: <20250403172709.92329-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <1e95b93f-7632-441a-a4ba-aecd7e640383@huawei.com>
+References: <1e95b93f-7632-441a-a4ba-aecd7e640383@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] cifs: Revert bogus fix for CVE-2024-54680 and its
- followup commit.
-To: Steve French <smfrench@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <bharathsm@microsoft.com>, <ematsumiya@suse.de>, <kuni1840@gmail.com>,
-	<linux-cifs@vger.kernel.org>, <pc@manguebit.com>,
-	<samba-technical@lists.samba.org>, <sprasad@microsoft.com>, <tom@talpey.com>,
-	<linux-net@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-References: <CAH2r5mt68AFyJGdBcPB+eqzdAdbx=0QXC_U8MY-te26Wb0ye5w@mail.gmail.com>
- <20250403021927.53033-1-kuniyu@amazon.com>
- <CAH2r5mu7Wf0n9ZmnhAAWetKRiUczHv+odYHj5bBg6a=G1y2kcQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC003.ant.amazon.com (10.13.139.240) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+
 From: Wang Zhaolong <wangzhaolong1@huawei.com>
-In-Reply-To: <CAH2r5mu7Wf0n9ZmnhAAWetKRiUczHv+odYHj5bBg6a=G1y2kcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemg500010.china.huawei.com (7.202.181.71)
-
-
-
-> For a complex issue like this it is important to have at least some
-> Tested-by or Reviewed-by for these two, because I was having trouble
-> reproducing the various reported problems on Ubuntu (or our Fedora
-> test VMs), and the refcount issues are more complicated they seem.
-> Let me know if anyone has reviewed these two patches or tested them.
+Date: Thu, 3 Apr 2025 17:59:20 +0800
+> Hi Kuniyuki,
 > 
+> When testing this patch on the latest mainline, I found that the following
+> snippet has a conflict:
 
-Hi Steve,
+I guess it's because I used for-next branch of the cifs.git.
 
-I can confirm these issues on my test environment. I'm currently using
-Debian Testing (Trixie) for my development work. I've also observed the
-unexpected phenomenon on Ubuntu 16.04 LTS when running the test cases.
+Steve:
 
-I suspect the difficulty in reproducing might be related to rootfs image
-versions - particularly with older distros like Ubuntu 16.04, as the
-test case involves numerous dependent packages.
+What branch should be used to send reverts for -rcX ?
 
-The issue of net_ns reference count leakage is not fully resolved yet.
-Based on that use case, the net_ns count leakage problem can still be
-constructed by adding various network faults.
 
-I'm currently modernizing my development environment and working on
-automating it. In the future, I will try to provide more comprehensive
-reproduction steps when reporting problems, including detailed
-instructions for setting up the environment.
-
-Best regards,
-Wang Zhaolong
+> 
+> 
+> > @@ -3444,6 +3441,9 @@ generic_ip_connect(struct TCP_Server_Info *server)
+> >   	    (server->rfc1001_sessinit == -1 && sport == htons(RFC1001_PORT)))
+> >   		rc = ip_rfc1001_connect(server);
+> >   
+> > +	if (rc < 0)
+> > +		put_net(cifs_net_ns(server));
+> > +
+> >   	return rc;
+> >   }
+> >   
+> 
+> Specifically, it is this line:
+> 
+> >   	    (server->rfc1001_sessinit == -1 && sport == htons(RFC1001_PORT)))
+> 
+> In my code, it corresponds to the following snippet:
+> 
+> ```
+> @@ -3333,10 +3330,13 @@ generic_ip_connect(struct TCP_Server_Info *server)
+>   	}
+>   	trace_smb3_connect_done(server->hostname, server->conn_id, &server->dstaddr);
+>   	if (sport == htons(RFC1001_PORT))
+>   		rc = ip_rfc1001_connect(server);
+>   
+> +	if (rc < 0)
+> +		put_net(cifs_net_ns(server));
+> +
+>   	return rc;
+>   }
+> ```
+> 
+> Looks like V3 needs to be sent?
+> 
+> Best regards,
+> Wang Zhaolong
