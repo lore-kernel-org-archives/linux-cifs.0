@@ -1,82 +1,108 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD9E253F01
-	for <linux-cifs@vger.kernel.org>; Thu,  3 Apr 2025 17:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC7F15575C;
+	Thu,  3 Apr 2025 23:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743702445; cv=none; b=HVWyX9UUliSWLUa2jVIjivjNj3hwVA+SZqaV1AIDKhFHmXBlZddWAjkYA8iEeiBJV+FlKPTKRPDwgJjhAj1KI8eCzUOykmt6Qh1o2KsJXcFbxvLeeTdkLOyl+127GKB//sQw8zjdFZnoCrbWuwZHOWoDCkXU/2C1K3tPUg5+8lo=
+	t=1743722001; cv=none; b=Adxap7aj0bZga0f/QARFx5aG0UWwqj5P8XF2lXj9jmRm8bvzlZlfBrs1j+jQQzEFbSZqzzhtgEJAtgcz38PPVOKvCmJbHzcIFmuYrCN7IBRlrvf0z5tzI/O7staVTqjmpv1Sd8nOnq56nohLl1T1k8pcFSaX4FzCW/YBbzVE1I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743702445; c=relaxed/simple;
-	bh=Iu3+YSJOmRcMjkgw5HwAAi2UidCNk0KpbkI+tnvg+GE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pnNCM2s+O0pbMzcxBtT5Xd8h1URRoY2EUahxoqjbp4Z0SXIF85YHbTvh6LkuAkRrCR6rrJxnxtDQysNyUl2oprIs4BX1igDguRh0ovRFEMgvaKd+jHtI0lm0axu02wj00DBG1HWzPVCNbei2T31tTqzoBRWNGGuoJn5y0wPy2cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ry6lZkk+; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1743722001; c=relaxed/simple;
+	bh=e3nY7G1MnkqvZI4wdI4XXWDUwIsle1hoW3aHxtZgBek=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k9jtsoXD50ZpQ2swPg5ao1t0ZslvDTPiVoji9sLzU8eRxMhCUAc2EJvPoQkE8nZq12bT9sISWwKGbv/TzVerexqxuSfVOLlfBUEhExthRreBeTptweNXMcnHGGnGIZiVlbrW69RO0c6OPtp1gLKILM9cj2FxX+TKbTkZga/erwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bhxgSiGN; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ry6lZkk+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhxgSiGN"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-549b116321aso1643908e87.3;
+        Thu, 03 Apr 2025 16:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743702444; x=1775238444;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ItqibUDue/nvXJeFGIlrYkT9DaDOwFbB4zbDCJzYPS4=;
-  b=ry6lZkk+dlLDZEPjyPFAZTuxgzSGITyeOsewj+53rql5oUgLIS5XWCHl
-   0TKsVWO2I+Hs484oOSOx0srEWzHawmXsVn0tDyD/3BJkP+3tTfbEOsxMT
-   stTo5XDEgFLogblXmy9NWnr0zRcdW152XaeJ7xhpfJE/Dl2Mvbn5zbnFc
-   4=;
-X-IronPort-AV: E=Sophos;i="6.15,186,1739836800"; 
-   d="scan'208";a="80577388"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 17:46:56 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:35396]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.63:2525] with esmtp (Farcaster)
- id 3124faff-37ef-4d37-a782-1af507d1d671; Thu, 3 Apr 2025 17:46:55 +0000 (UTC)
-X-Farcaster-Flow-ID: 3124faff-37ef-4d37-a782-1af507d1d671
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 3 Apr 2025 17:46:54 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.41) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 3 Apr 2025 17:46:50 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <smfrench@gmail.com>
-CC: <bharathsm@microsoft.com>, <ematsumiya@suse.de>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <linux-cifs@vger.kernel.org>, <pc@manguebit.com>,
-	<ronniesahlberg@gmail.com>, <samba-technical@lists.samba.org>,
-	<sfrench@samba.org>, <sprasad@microsoft.com>, <tom@talpey.com>,
-	<wangzhaolong1@huawei.com>
-Subject: Re: [PATCH 1/2] Revert "smb: client: Fix netns refcount imbalance causing leaks and use-after-free"
-Date: Thu, 3 Apr 2025 10:46:38 -0700
-Message-ID: <20250403174642.96094-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <CAH2r5mtvkAAEur6_jPMtvpKa8q9fWufwV7VG+fXkATXs_jZv0w@mail.gmail.com>
-References: <CAH2r5mtvkAAEur6_jPMtvpKa8q9fWufwV7VG+fXkATXs_jZv0w@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1743721997; x=1744326797; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=75t25IppdmPk7Flb4RStCXZL6ax8PX9bZxFUqFFVCRc=;
+        b=bhxgSiGN3Yw+wZmU6FzWXftdGt4C+NB8EQ9uyLu5KOqqAXQNyOJpeEFfLn1tMqTMWT
+         jWIxmD88Ctim0A2jqssJAvtNdA+EyNUKovmBO+3U3ogGGwur17/QQu/+obRCZtCda0aV
+         nWuANvh6L+ciKOCDJ5W8udmrnLhFoaiqm3UdN2aXHtCUkGpeAnFOiF4vAURkwvRvpL2F
+         PxuI5JCs/1oghh8973fI/IzNBNFxsT4FgvQRY8iB4Yl6HpgIx8iqyn6+gLm4nULJ+5Ya
+         MISNWW04rCyQXcsXTBd7otxCHTvnPrjsyCaBvRH+XUHTrpa/zOD/AQn2iTGrFrxMZdka
+         Hp+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743721997; x=1744326797;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=75t25IppdmPk7Flb4RStCXZL6ax8PX9bZxFUqFFVCRc=;
+        b=rzOx9Or+hN72aB5WUPY01RYgHoc/gq+oISt1VKfVolItcn3H3/U6KiKIMteR5/AV81
+         kFrEOjN4euui9VhhkntjGKiLONjm1OB9j9AAakkGGZ/7gnONNWnvA9aR3gKfVTywnJd8
+         IY+z/p+krktdCUq24gFKFHaDvTYaK0PZodk4LOa9Yd8WSzBj+38GWJrDz8WxCXOG20PC
+         7IH7b4rotrVXy7cw9BsrCuU8GQTk7TJI0aYFv/6JTbDGAu4QAL0BJvzNYDnn+Jh1Lgfh
+         PjXfp+PKEz7+kvd7g3qivMJBpplzYCoKfzoxoISZq+i6Ci4gh94xNepd7DY+8YROmdio
+         W91w==
+X-Forwarded-Encrypted: i=1; AJvYcCUZGNZDYPFnBdl7BXJRSbYZHBPbwo9G2gvHL2i36fUyHWK7Cr9AHdcpvYA+Nnq/UpKnOgYIEszIIWD6@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfBjxsp4zidzUu8yYSgwjoIWaIfbWm3oeUwKlV6eMRvAXSi1+E
+	8N1d4ydMpksdiRd2gwJDBtcgIfBVUQYkcoQ1K52BcISYIX5+dzk3omDBQb/9mkTOIVu2SomAdUB
+	rxyvDCJ4ykMn1pyc37oIhUW2zYpM=
+X-Gm-Gg: ASbGncsIvCB3TJ/Nki5YSxZR5fpcnR8E5ixL6KvhgSGwu5gC6euK3ZkEvb81mNUNZcp
+	uQvVRjHQYRwJLQCJvkAXtM9uBeaHnJWQQBiprxFKbV13U9i2P6jp3rgqstQdVcEzXDSAwLv/e+w
+	b46+ZgfHNnx57Di+01PiXiVa2nM3BJSRhu6vdY/7Q1IAPuswfUiKFioMGtght5
+X-Google-Smtp-Source: AGHT+IGBf0w8rFulXBQj7/kYTyuyUjqPntBQYLIUddiMFsXgfVckjcKBPtV9eoNlMZBwrYGk7ehp+VUNPVL8VltCUU8=
+X-Received: by 2002:ac2:4e0b:0:b0:549:39d8:51ef with SMTP id
+ 2adb3069b0e04-54c22767e8fmr256125e87.6.1743721996769; Thu, 03 Apr 2025
+ 16:13:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 3 Apr 2025 12:32:35 -0500
-> > What branch should be used to send reverts for -rcX ?
-> 
-> cifs-2.6.git for-next
-> 
-> But probably won't be an issue in a few days (since mainline then will
-> likely include the conflicting patch - which fortunately is unrelated
-> to this discussion, just fixes an RFC1001 bug)
+Date: Thu, 3 Apr 2025 18:13:05 -0500
+X-Gm-Features: ATxdqUF03A5YwM4j0Y943KSqXPeRdhdzMJYXJnpm7aTB6sFMIrvzhCdsY7gJYFc
+Message-ID: <CAH2r5mufSJAwwbVgNTy5eFLtEUNZGuRt9K8-LnKBTKd8A+Cu2w@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks, then I'd leave v2 as is for now.
+Please pull the following changes since commit
+f64a72bc767f6e9ddb18fdacaeb99708c4810ada:
 
+  Merge tag 'v6.15rc-part1-ksmbd-server-fixes' of
+git://git.samba.org/ksmbd (2025-03-31 17:42:26 -0700)
 
+are available in the Git repository at:
 
+  git://git.samba.org/ksmbd.git tags/v6.15rc-part2-ksmbd-server-fixes
+
+for you to fetch changes up to c8b5b7c5da7d0c31c9b7190b4a7bba5281fc4780:
+
+  ksmbd: fix null pointer dereference in alloc_preauth_hash()
+(2025-04-01 23:02:20 -0500)
+
+----------------------------------------------------------------
+4 ksmbd SMB3 server fixes, all also for stable
+- FIx two ACL bounds check issues
+- Fix two important session setup issues: one for malformed negprot
+and one for race with session destroy
+----------------------------------------------------------------
+Namjae Jeon (2):
+      ksmbd: fix session use-after-free in multichannel connection
+      ksmbd: fix null pointer dereference in alloc_preauth_hash()
+
+Norbert Szetei (2):
+      ksmbd: fix overflow in dacloffset bounds check
+      ksmbd: validate zero num_subauth before sub_auth is accessed
+
+ fs/smb/server/auth.c              |  4 ++--
+ fs/smb/server/connection.h        | 11 +++++++++++
+ fs/smb/server/mgmt/user_session.c | 18 ++++++++++--------
+ fs/smb/server/smb2pdu.c           | 21 +++++++++++++++------
+ fs/smb/server/smbacl.c            | 21 +++++++++++++++++----
+ 5 files changed, 55 insertions(+), 20 deletions(-)
+
+-- 
+Thanks,
+
+Steve
