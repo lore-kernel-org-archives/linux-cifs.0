@@ -1,63 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA1018DB29;
-	Thu,  3 Apr 2025 23:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E719D081;
+	Fri,  4 Apr 2025 08:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.129.21.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743722644; cv=none; b=Ay0y7MJAGouCr+PwnmrPotiuO2BjU0QMOc4MzZkhoicJu81JKv1HI8biAuCAJ3UGHtv4xJqCR/UkvLUK0yJ0KdKU27MVYEuGSsqXwRCkA8KUImKAaRM/GAcvUBlSTMWVlhIoDlOMPuTbmXh/+i9R1+ytUlvUiTgn555MxrYN51o=
+	t=1743757071; cv=none; b=jW+yyNWOsMhFFA4VHdgK/Bom4FR0CzXtamNO1p6w3BQxjbvR4uqQ5jVUIRQJJg+JgRX/MX3ZQ1djy1TsD98FPhZSiFqgld4wHdf2w82Gv+FOH3vDvlcu9gNd0z3hp3rJLfyKUZqfYFItptu1zU4awtIvTNhJOIermpYIHm1oHJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743722644; c=relaxed/simple;
-	bh=225QhKbWqeDMrkWI+TUb7k9GhuP8VuhonRSgQFXPplQ=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qep+RCZJ4d5ldpNhqBfwAd14vibv2/qjywGmJoIvfJXIWxK9pRH2seSuk9Tf62pn8al8TR7vJ0IIivDcDFP/gJdKOqfzFOQaEZ6UdKJI1feh7VutOpoOzJoH+3EcPUcC03nO424iNQbkDwNNLrmSxv5Ev1lSzgs//X4IU+ouBuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsLaJ/e4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1743757071; c=relaxed/simple;
+	bh=qGpiBlKk4gUz7SGt4N7XSRFqC2Dp6ovYU5+SiSPQizM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=oSRHVbAWEB4F7MrU7nN8kjBM2Z3OAH1vOv/0Q5zy7EjHUbWOt7wT0/gkBnQGjQv6tf0LJHyHyUpbyDzi4DdKMxdPcESE9I+taXUrlVM14RC7YWj9u9FBmXfJ5x5+yRhOtWfqyOR+tr/J18TXcvcRhCBZqsugQHc/+hKSuglo0K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr; spf=pass smtp.mailfrom=3xo.fr; dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b=lb20VlKf; arc=none smtp.client-ip=212.129.21.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3xo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsLaJ/e4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D39C4CEE3;
-	Thu,  3 Apr 2025 23:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743722644;
-	bh=225QhKbWqeDMrkWI+TUb7k9GhuP8VuhonRSgQFXPplQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=MsLaJ/e4vVBSYqDFHQYK2Qy10EQFhi2IvredQrBg6o1JbMMXp6dCrMMfV6+rnQgzt
-	 EnWklH+WoSf5lc8Yr8F7SBpUOA6tKXE/CtgfSDbdIR3X+tUPB7y/g9XmFIxbuotHr6
-	 16+mDKD7KMKaeokgbTZqoMIc2D/5jWIjF7Db/1fUxKpPtaMFeQ2BpjqTIg1CIEPNiY
-	 PJcmpaq2G3BudYVFjIfbf6zmoR/4GphQBfJqJ44JllvhuZuWiU+TRHXrS0j2oKEfzw
-	 9JGjcYVOlpn6eage1Rq8PxSP4PYzvx7LYoc8NmkwtTtqQ8tFHUSpGZq1VnIHuYpTx6
-	 rwl2dpzeh0MJA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F45380664C;
-	Thu,  3 Apr 2025 23:24:42 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mufSJAwwbVgNTy5eFLtEUNZGuRt9K8-LnKBTKd8A+Cu2w@mail.gmail.com>
-References: <CAH2r5mufSJAwwbVgNTy5eFLtEUNZGuRt9K8-LnKBTKd8A+Cu2w@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mufSJAwwbVgNTy5eFLtEUNZGuRt9K8-LnKBTKd8A+Cu2w@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.15rc-part2-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: c8b5b7c5da7d0c31c9b7190b4a7bba5281fc4780
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 06a22366d6a11ca8ed03c738171822ac9b714cfd
-Message-Id: <174372268062.2720155.8074107293907031995.pr-tracker-bot@kernel.org>
-Date: Thu, 03 Apr 2025 23:24:40 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b="lb20VlKf"
+Received: from localhost (mail.3xo.fr [212.129.21.66])
+	by mail.3xo.fr (Postfix) with ESMTP id 98EECCD;
+	Fri,  4 Apr 2025 10:50:29 +0200 (CEST)
+X-Virus-Scanned: Debian amavis at nxo2.3xo.fr
+Received: from mail.3xo.fr ([212.129.21.66])
+ by localhost (mail.3xo.fr [212.129.21.66]) (amavis, port 10024) with ESMTP
+ id 8mSLMhAe8CKe; Fri,  4 Apr 2025 10:50:27 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.3xo.fr 83FED8D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3xo.fr; s=3xo;
+	t=1743756627; bh=CRAJN8+XEA5p31GSsFqFuEJaey0yqN9dDs07tGG1jQA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lb20VlKfcjY8a7J/mtS3DUFvklSqJjYHbNOpvr5mvDuUiTcUAZTrS4jvwIYi8pDbd
+	 jngz7iyj2q4qcYbEo0GDpo08Z9QRGAjpQdVAP4VFFDrkW8nKXq1Eo/bYXKZQyW/m7B
+	 XtHudX59MBoF8M+9EXMuM/86MpKMuPEiXhr+YP1CU432PwUleI3pWhJKH/mAgcVGfr
+	 mdDYTpedNVvrT51XQzQsffn4Jv0RJ4oEF+cxyX+4fVC8705kTxtdIRIKH8XCDQCNsY
+	 a6gvuy2X4ZE69DNF8SCmUBX3heBPxYDV9qklLKzRt+nmF+63iq/i6DC6LOg1J4dW24
+	 aayyaaredgRCQ==
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by mail.3xo.fr (Postfix) with ESMTPSA id 83FED8D;
+	Fri,  4 Apr 2025 10:50:27 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Date: Fri, 04 Apr 2025 10:50:27 +0200
+From: Nicolas Baranger <nicolas.baranger@3xo.fr>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: hch@lst.de, David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Steve French <smfrench@gmail.com>, Jeff Layton
+ <jlayton@kernel.org>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [netfs/cifs - Linux 6.14] loop on file cat + file copy when files
+ are on CIFS share
+In-Reply-To: <Z-Z95ePf3KQZ2MnB@infradead.org>
+References: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
+ <35940e6c0ed86fd94468e175061faeac@3xo.fr> <Z-Z95ePf3KQZ2MnB@infradead.org>
+Message-ID: <48685a06c2608b182df3b7a767520c1d@3xo.fr>
+X-Sender: nicolas.baranger@3xo.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Thu, 3 Apr 2025 18:13:05 -0500:
+Hi Christoph
 
-> git://git.samba.org/ksmbd.git tags/v6.15rc-part2-ksmbd-server-fixes
+Thanks for answer and help
+Did someone reproduced the issue (very easy) ?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/06a22366d6a11ca8ed03c738171822ac9b714cfd
 
-Thank you!
+CIFS SHARE is mounted as /mnt/fbx/FBX-24T
+echo toto >/mnt/fbx/FBX-24T/toto
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+ls -l /mnt/fbx/FBX-24T/toto
+-rw-rw-rw- 1 root root 5 20 mars  09:20 /mnt/fbx/FBX-24T/toto
+
+cat /mnt/fbx/FBX-24T/toto
+toto
+toto
+toto
+toto
+toto
+toto
+toto
+^C
+
+
+CIFS mount options:
+grep cifs /proc/mounts
+//10.0.10.100/FBX24T /mnt/fbx/FBX-24T cifs 
+rw,nosuid,nodev,noexec,relatime,vers=3.1.1,cache=none,upcall_target=app,username=fbx,domain=HOMELAN,uid=0,noforceuid,gid=0,noforcegid,addr=10.0.10.100,file_mode=0666,dir_mode=0755,iocharset=utf8,soft,nounix,serverino,mapposix,mfsymlinks,reparse=nfs,nativesocket,symlink=mfsymlinks,rsize=65536,wsize=65536,bsize=16777216,retrans=1,echo_interval=60,actimeo=1,closetimeo=1 
+0 0
+
+KERNEL: uname -a
+Linux 14RV-SERVER.14rv.lan 6.14.0-rc2-amd64 #0 SMP PREEMPT_DYNAMIC Wed 
+Feb 12 18:23:00 CET 2025 x86_64 GNU/Linux
+
+
+Kind regards
+Nicolas Baranger
+
+
+Le 2025-03-28 11:45, Christoph Hellwig a écrit :
+
+> Hi Nicolas,
+> 
+> please wait a bit, many file system developers where at a conference
+> this week.
