@@ -1,156 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B24253B65;
-	Tue,  8 Apr 2025 22:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9C6254872
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Apr 2025 22:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744151403; cv=none; b=H4MbDTs27n2pIXfVvAWY9t1hODmLfsh1rNI31sMK//SC0XzeNTUN4bSDMs+UsSiiqJibGpO6sh/5CQ5Yq1m/SrbWNDCdqU0RqXhcY+WbW0pqVSkl59suH4ITZjQz0mTvZVAsPvGthfFD1geXg+d2ObdRAXag847XZwe9sWOtZQw=
+	t=1744152193; cv=none; b=mQQhDgeAKkHS7b5hZMKx/UgnN6HJRoCuXEBsHVepouYsiBKGthnVOZTy/Gth1CnTaErf8KPHc7OZE5244ojQQVovm5YBrxctOPOtkmKxKTauyaXGAgXRbWNltxMLX143uoD3Km/9KptNDyre04o2rggOWzzjnTq7jN73440x9EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744151403; c=relaxed/simple;
-	bh=hlugUo1L7n2ZEpibyxatVdZ+3CCdhHbHYfCeaNjQIac=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Eu3PDFRjE7vAoiegpCiMcpkDcPXsXyACwdwDTMaJCmgkbItNbVig1rS8/8HMtxGtZQIPqPP/GUTzQAsXHO25uLLKIe/kSyn8Kmd1Fgf6jmXp6OWe7+vQmNocANW2nMbTl8SmaAdlxu2aotaZMEF73NUESSAsCRe8118c5zaAniA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZC0+UeM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744152193; c=relaxed/simple;
+	bh=cLu5FHYBc/nQWl4l4GviLPMQtV7JFVbTS8r/c7JnRTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k34ru6i7Z+MV3jyJxXIyC0Gj9xcJeVwXAizvAAgKy6Zti95VAY419n5FgLr8x2f8pU4DM8rT1Sq+WWyuPgPZwgrK8i+ZLibbRakduV8PkK4fCwwdoHvXF77MggU6tBBDM8Z4t93Qh4VXJARhh6DMgkTVbmJeqs3+ERlLHG8MYHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CqF5P50l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZC0+UeM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32EA5C4CEE7;
-	Tue,  8 Apr 2025 22:30:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CqF5P50l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B540C4CEE5;
+	Tue,  8 Apr 2025 22:43:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744151402;
-	bh=hlugUo1L7n2ZEpibyxatVdZ+3CCdhHbHYfCeaNjQIac=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rZC0+UeM3MNnbhnEgmQz9IXUlsF5rH93vI2Cpza1wNz11+FqzPzUEEm4wfnMVopg3
-	 VmCbeeIdoepRx1n6undnG/UPtz8Thmhte00G6jCzdXhzBaS4bJ7cF1hHVnGm7Z3Cdu
-	 /c56UY73+qQk2OjeTTcssxRUPwu6PN+PborqmM8YQJfHC+4jeOesOaIZysAyAfRoMY
-	 ToaSJogsuESzIXzVsFOfwoFYpMAQ8KwO3/EgxQBcGmoTqKKJm3o0qSUWUYR48Z4Hbl
-	 kmOOLOImQrnfGHpTkZ5hQRkBtH2meA+zhP75uZVfo6SWnsAUBNLD6cE95zVFtGEqYF
-	 7H47bb7RoiY8g==
+	s=k20201202; t=1744152192;
+	bh=cLu5FHYBc/nQWl4l4GviLPMQtV7JFVbTS8r/c7JnRTw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CqF5P50lsbOQb7emC46J7nXmQrRTTNyaLGIsPsIJw9+i2lTLgQP2GVJmPC52/bM9F
+	 xsMwMRpmXOWhg6UkD6jvNkKXBE70C7RJwDHAd8x+mkBDkiR2y8xe1KYQXU28t/AaZt
+	 v1dszBgbyI55iWTVryyFBGendRzPBdSQ7tJhS9uM8zA3nkUTLqYcKce0tglh24rS0N
+	 9PakZGibg3JJo0IUTCrtlxxcoIUJvt/zqXBrv/mrZ4gd/z2bawGhgzk0rqH5OKKBo7
+	 vRtWkzXfqdqh5WlkKPHvSPmamQu4vCNdk9uXn15IDfZkSQqKcO/ei/OsEnqLSjolB4
+	 hlAX2taDcMhOw==
 Received: by pali.im (Postfix)
-	id 5095D968; Wed,  9 Apr 2025 00:29:59 +0200 (CEST)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix support for WSL-style symlinks
-Date: Wed,  9 Apr 2025 00:29:49 +0200
-Message-Id: <20250408222949.5041-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	id C871D968; Wed,  9 Apr 2025 00:43:09 +0200 (CEST)
+Date: Wed, 9 Apr 2025 00:43:09 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Namjae Jeon <linkinjeon@kernel.org>, Ralph Boehme <slow@samba.org>
+Subject: Re: SMB2 DELETE vs UNLINK
+Message-ID: <20250408224309.kscufcpvgiedx27v@pali>
+References: <20241006103127.4f3mix7lhbgqgutg@pali>
+ <20241225144742.zef64foqrc6752o7@pali>
+ <76c28623-b255-4589-8bad-7e576cd1687c@talpey.com>
+ <20241227163202.ihp3cxmhe2sehxoh@pali>
+ <749690fc-4647-487b-ba21-d208d72f754e@talpey.com>
+ <20241227185130.idio6hh7w4pcpqfo@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241227185130.idio6hh7w4pcpqfo@pali>
+User-Agent: NeoMutt/20180716
 
-MS-FSCC in section 2.1.2.7 LX SYMLINK REPARSE_DATA_BUFFER now contains
-documentation about WSL symlink reparse point buffers.
+On Friday 27 December 2024 19:51:30 Pali Rohár wrote:
+> On Friday 27 December 2024 11:43:58 Tom Talpey wrote:
+> > On 12/27/2024 11:32 AM, Pali Rohár wrote:
+> > > On Friday 27 December 2024 11:21:49 Tom Talpey wrote:
+> > > > Feel free to raise the issue yourself! Simply email "dochelp@microsoft.com".
+> > > > Send as much supporting evidence as you have gathered.
+> > > > 
+> > > > Tom.
+> > > 
+> > > Ok. I can do it. Should I include somebody else into copy?
+> > 
+> > Sure, you may include me, tell them I sent you. :)
+> > 
+> > Tom.
+> > 
+> 
+> Just note for others that I have already sent email to dochelp.
 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/68337353-9153-4ee1-ac6b-419839c3b7ad
+Hello, I have good news!
 
-Fix the struct reparse_wsl_symlink_data_buffer to reflect buffer fields
-according to the MS-FSCC documentation.
+dochelp on 04/07/2025 updated MS-FSCC documentation and now it contains
+the structures to issue the POSIX UNLINK and RENAME operations.
 
-Fix the Linux SMB client to correctly fill the WSL symlink reparse point
-buffer when creaing new WSL-style symlink. There was a mistake during
-filling the data part of the reparse point buffer. It should starts with
-bytes "\x02\x00\x00\x00" (which represents version 2) but this constant was
-written as number 0x02000000 encoded in little endian, which resulted bytes
-"\x00\x00\x00\x02". This change is fixing this mistake.
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/f1f88b22-15c6-4081-a899-788511ae2ed9
+MS-FSCC 7 Change Tracking
 
-Fixes: 4e2043be5c14 ("cifs: Add support for creating WSL-style symlinks")
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
- fs/smb/client/reparse.c | 25 ++++++++++++++++---------
- fs/smb/common/smb2pdu.h |  6 +++---
- 2 files changed, 19 insertions(+), 12 deletions(-)
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/2e860264-018a-47b3-8555-565a13b35a45
+MS-FSCC 2.4.12 FileDispositionInformationEx has FILE_DISPOSITION_POSIX_SEMANTICS
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 7cefe903edb5..dbd3dd9b678f 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -520,12 +520,12 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
- 			kfree(symname_utf16);
- 			return -ENOMEM;
- 		}
--		/* Flag 0x02000000 is unknown, but all wsl symlinks have this value */
--		symlink_buf->Flags = cpu_to_le32(0x02000000);
--		/* PathBuffer is in UTF-8 but without trailing null-term byte */
-+		/* Version field must be set to 2 (MS-FSCC 2.1.2.7) */
-+		symlink_buf->Version = cpu_to_le32(2);
-+		/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
- 		symname_utf8_len = utf16s_to_utf8s((wchar_t *)symname_utf16, symname_utf16_len/2,
- 						   UTF16_LITTLE_ENDIAN,
--						   symlink_buf->PathBuffer,
-+						   symlink_buf->Target,
- 						   symname_utf8_maxlen);
- 		*buf = (struct reparse_data_buffer *)symlink_buf;
- 		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
-@@ -995,29 +995,36 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
- 				     struct cifs_open_info_data *data)
- {
- 	int len = le16_to_cpu(buf->ReparseDataLength);
-+	int data_offset = offsetof(typeof(*buf), Target) - offsetof(typeof(*buf), Version);
- 	int symname_utf8_len;
- 	__le16 *symname_utf16;
- 	int symname_utf16_len;
- 
--	if (len <= sizeof(buf->Flags)) {
-+	if (len <= data_offset) {
- 		cifs_dbg(VFS, "srv returned malformed wsl symlink buffer\n");
- 		return -EIO;
- 	}
- 
--	/* PathBuffer is in UTF-8 but without trailing null-term byte */
--	symname_utf8_len = len - sizeof(buf->Flags);
-+	/* MS-FSCC 2.1.2.7 defines layout of the Target field only for Version 2. */
-+	if (le32_to_cpu(buf->Version) != 2) {
-+		cifs_dbg(VFS, "srv returned unsupported wsl symlink version %u\n", le32_to_cpu(buf->Version));
-+		return -EIO;
-+	}
-+
-+	/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
-+	symname_utf8_len = len - data_offset;
- 	/*
- 	 * Check that buffer does not contain null byte
- 	 * because Linux cannot process symlink with null byte.
- 	 */
--	if (strnlen(buf->PathBuffer, symname_utf8_len) != symname_utf8_len) {
-+	if (strnlen(buf->Target, symname_utf8_len) != symname_utf8_len) {
- 		cifs_dbg(VFS, "srv returned null byte in wsl symlink target location\n");
- 		return -EIO;
- 	}
- 	symname_utf16 = kzalloc(symname_utf8_len * 2, GFP_KERNEL);
- 	if (!symname_utf16)
- 		return -ENOMEM;
--	symname_utf16_len = utf8s_to_utf16s(buf->PathBuffer, symname_utf8_len,
-+	symname_utf16_len = utf8s_to_utf16s(buf->Target, symname_utf8_len,
- 					    UTF16_LITTLE_ENDIAN,
- 					    (wchar_t *) symname_utf16, symname_utf8_len * 2);
- 	if (symname_utf16_len < 0) {
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index 764dca80c15c..f79a5165a7cc 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1567,13 +1567,13 @@ struct reparse_nfs_data_buffer {
- 	__u8	DataBuffer[];
- } __packed;
- 
--/* For IO_REPARSE_TAG_LX_SYMLINK */
-+/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 */
- struct reparse_wsl_symlink_data_buffer {
- 	__le32	ReparseTag;
- 	__le16	ReparseDataLength;
- 	__u16	Reserved;
--	__le32	Flags;
--	__u8	PathBuffer[]; /* Variable Length UTF-8 string without nul-term */
-+	__le32	Version; /* Always 2 */
-+	__u8	Target[]; /* Variable Length UTF-8 string without nul-term */
- } __packed;
- 
- struct validate_negotiate_info_req {
--- 
-2.20.1
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/4217551b-d2c0-42cb-9dc1-69a716cf6d0c
+MS-FSCC 2.4.43 FileRenameInformationEx has FILE_RENAME_REPLACE_IF_EXISTS + FILE_RENAME_POSIX_SEMANTICS
 
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/ebc7e6e5-4650-4e54-b17c-cf60f6fbeeaa
+MS-FSCC 2.5.1 FileFsAttributeInformation has FILE_SUPPORTS_POSIX_UNLINK_RENAME
+
+So now both classic Windows DELETE and POSIX UNLINK is available and
+documented.
