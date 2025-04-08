@@ -1,99 +1,156 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E722185BC
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Apr 2025 22:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B24253B65;
+	Tue,  8 Apr 2025 22:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744150102; cv=none; b=nI7uJ0Jex2YJ4JBJax7hp6uRusZSPKo5irDoQza/EAAvzipc3GkelMITsqjzm8CbkIomR7hxl8NV1TZvJ8mNYTFyUNT7BxcJz7fdXoghUGmr2RtDLs/M8vq98/Ah+YCI7jpHXPS6JdjwUYOYAbCoqwThUBrQC/lfaLuR1dNT/sM=
+	t=1744151403; cv=none; b=H4MbDTs27n2pIXfVvAWY9t1hODmLfsh1rNI31sMK//SC0XzeNTUN4bSDMs+UsSiiqJibGpO6sh/5CQ5Yq1m/SrbWNDCdqU0RqXhcY+WbW0pqVSkl59suH4ITZjQz0mTvZVAsPvGthfFD1geXg+d2ObdRAXag847XZwe9sWOtZQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744150102; c=relaxed/simple;
-	bh=WQBN5BFFk0whPtg5z+x8VMnaBtS758+y9LKBNOv7iZU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SnT5fAv+2GkkeXnR1daSBf/Q9wEsm5Trk47VMcl3Lx1vz9FjFTdSOjrLanlPgcm053xFpXYpZqZlDZFSTvNCYTKcLBWzSZVtTjAxqa+W42vxHOwTu8meqDm4+Ivy9TXeZXkSU6G1e2FqjRrZW16FoyZyaPBD07/PKPf/o19FCe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEFrlthg; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744151403; c=relaxed/simple;
+	bh=hlugUo1L7n2ZEpibyxatVdZ+3CCdhHbHYfCeaNjQIac=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Eu3PDFRjE7vAoiegpCiMcpkDcPXsXyACwdwDTMaJCmgkbItNbVig1rS8/8HMtxGtZQIPqPP/GUTzQAsXHO25uLLKIe/kSyn8Kmd1Fgf6jmXp6OWe7+vQmNocANW2nMbTl8SmaAdlxu2aotaZMEF73NUESSAsCRe8118c5zaAniA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZC0+UeM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEFrlthg"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30bee1cb370so54130801fa.1
-        for <linux-cifs@vger.kernel.org>; Tue, 08 Apr 2025 15:08:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744150094; x=1744754894; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RGGGrrn8dkMW8Ig/LN/TRCJZBhhvtDzsXxmdoNkJsX4=;
-        b=GEFrlthgyTN7CLxyRkfDDeqCXeSXbmgHa+zGHWVFfRrYWWR4qw4ly4APYhi4S1P+2Q
-         EU6fHQbGvGkNn8gEBar9mDGstdaIN2/vSO7o+YvcoRQBRDcy2/8XU2GrBYRHdTTsXALk
-         GFjI6ld5eSraQ77cBFlOknqi2BUh4Zy6SfaOZnTeQeDc5J3h5lE3AqmCsfNKPGnRsjvK
-         EF3lztPNh7CD5TPsAKht4lAETMMhTT73cATxAy73K0MlygQI1GeJjfCi7CtyHyRLBWrh
-         btv+Wr3ZggT2jbZtWCddTXjobJ75sTxvZDuhRi7xSzwbBfZiXytA+rE0jpJoKT5Hnvob
-         33XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744150094; x=1744754894;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RGGGrrn8dkMW8Ig/LN/TRCJZBhhvtDzsXxmdoNkJsX4=;
-        b=utJv6il8Al6Rd69RzzkR0mralx9xOr5WeM9jW86CpRAIfu5dM+lt9cPjxinS4fMhtH
-         HjOcyDBHBGIlUcXRExg9W6jBJGi6RDTEVX+EAINQdbSBMBBcEKXwdb81LGpWPw9WBRo0
-         KV8rTmTjoE+0W/8qFI9fYyRApw7Eyldigwor4TF7Ezmsv+mtqpU0iucblT95kzOouljD
-         mbAsVX6R3m8NRR7oDL9KB4jGmvCw88d+XBDpqyyAoeoUSl9c/01jwnlFiPNrQBkvMhXg
-         /2zC7CqjU3gw7C8cBSuQizNOPkrMmJPMdZnEfX/PuZvNo3wj2BaWEVmVAYcmYcmj8IWq
-         84gQ==
-X-Gm-Message-State: AOJu0Yyk9uRIwJO+S9//mZjchDsy2p7EsiuggevWkHwoDvPzZA58FOJ+
-	CR3Bu642jSd3NMNFZ+4NH3C2MsH/1F7Jtaxa5sD0/0DPrVUFbKqifVo+XxEr2ASPu7FyLnKzyz9
-	quylPtJdRMhxjeSFBxFueJ1YM9tXRNQQa
-X-Gm-Gg: ASbGncsrVibokmtE5fXBgqwG+1GYhvXwMH4vNpcb9jzchvpEpXbmTBTDi3o5lQ1N99m
-	7u/VfngcwJv1DWVfTYKZDDB96HvWUSvHgubXOoYsK2PObVdltAxLd0nziDCMuYGOKp4uEJ/e06i
-	eLU7R0Fvu3o+2Vx5dKv9maeQ5yR/jc7xOJwivl1YX7xCVw6QmeDkLc1x5m4oIL
-X-Google-Smtp-Source: AGHT+IHu8l7CaCpd5GAL8kGUXhKhWVdfUzypYrBa0WwrOr5FX0Uy9xH1gMkQ7cH1VzLDDlY+Za2wgq7zJ4/8gYsdtvs=
-X-Received: by 2002:a2e:ad07:0:b0:30d:b328:8394 with SMTP id
- 38308e7fff4ca-30f437e7456mr1704991fa.13.1744150094228; Tue, 08 Apr 2025
- 15:08:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZC0+UeM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32EA5C4CEE7;
+	Tue,  8 Apr 2025 22:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744151402;
+	bh=hlugUo1L7n2ZEpibyxatVdZ+3CCdhHbHYfCeaNjQIac=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rZC0+UeM3MNnbhnEgmQz9IXUlsF5rH93vI2Cpza1wNz11+FqzPzUEEm4wfnMVopg3
+	 VmCbeeIdoepRx1n6undnG/UPtz8Thmhte00G6jCzdXhzBaS4bJ7cF1hHVnGm7Z3Cdu
+	 /c56UY73+qQk2OjeTTcssxRUPwu6PN+PborqmM8YQJfHC+4jeOesOaIZysAyAfRoMY
+	 ToaSJogsuESzIXzVsFOfwoFYpMAQ8KwO3/EgxQBcGmoTqKKJm3o0qSUWUYR48Z4Hbl
+	 kmOOLOImQrnfGHpTkZ5hQRkBtH2meA+zhP75uZVfo6SWnsAUBNLD6cE95zVFtGEqYF
+	 7H47bb7RoiY8g==
+Received: by pali.im (Postfix)
+	id 5095D968; Wed,  9 Apr 2025 00:29:59 +0200 (CEST)
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix support for WSL-style symlinks
+Date: Wed,  9 Apr 2025 00:29:49 +0200
+Message-Id: <20250408222949.5041-1-pali@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 8 Apr 2025 17:08:02 -0500
-X-Gm-Features: ATxdqUF1Nr0rQIHpQKAkGqI_Gwi0EX5Kt_SUVKjDg3nTWwz8gTY8ztm1PrqnuUE
-Message-ID: <CAH2r5mvSBqF1uW+hZ+1syN=bZsqn6RPPfDgsho6FxpMgJRBHzw@mail.gmail.com>
-Subject: directory lease handling perf bug
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>, =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>, 
-	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, Enzo Matsumiya <ematsumiya@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-In doing some additional testing of directory leases to Samba, I
-noticed that to various servers (not just Samba) we are not caching
-directory contents (e.g. a pattern like "ls /mnt ; ls /mnt") even
-though we are getting the directory lease.   Digging deeper into this,
-I noticed a performance bug -
-e.g. look at this function in readdir.c: called from cifs_readdir() for "ls"
+MS-FSCC in section 2.1.2.7 LX SYMLINK REPARSE_DATA_BUFFER now contains
+documentation about WSL symlink reparse point buffers.
 
-static void finished_cached_dirents_count(struct cached_dirents *cde,
-                                        struct dir_context *ctx)
-{
-        if (cde->ctx != ctx)
-                return;
-        if (cde->is_valid || cde->is_failed)
-                return;
-        if (ctx->pos != cde->pos)
-                return;
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/68337353-9153-4ee1-ac6b-419839c3b7ad
 
-        cde->is_valid = 1;
-}
+Fix the struct reparse_wsl_symlink_data_buffer to reflect buffer fields
+according to the MS-FSCC documentation.
 
-The dir_context passed into cifs_readdir() never seems to match the
-cached dir_ctxt pointer so we won't set cde->is_valid. On each call to
-cifs_readdir (for the same directory) it looks like ctx is different.
- This doesn't break any tests but it seems like a huge hit for
-performance that we are incorrectly checking whether to cache the
-directory.   I couldn't find a recent change that broke this, but it
-looks like it will be a HUGE help to perf when we fix this.
+Fix the Linux SMB client to correctly fill the WSL symlink reparse point
+buffer when creaing new WSL-style symlink. There was a mistake during
+filling the data part of the reparse point buffer. It should starts with
+bytes "\x02\x00\x00\x00" (which represents version 2) but this constant was
+written as number 0x02000000 encoded in little endian, which resulted bytes
+"\x00\x00\x00\x02". This change is fixing this mistake.
 
---
-Thanks,
+Fixes: 4e2043be5c14 ("cifs: Add support for creating WSL-style symlinks")
+Signed-off-by: Pali Rohár <pali@kernel.org>
+---
+ fs/smb/client/reparse.c | 25 ++++++++++++++++---------
+ fs/smb/common/smb2pdu.h |  6 +++---
+ 2 files changed, 19 insertions(+), 12 deletions(-)
 
-Steve
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 7cefe903edb5..dbd3dd9b678f 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -520,12 +520,12 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
+ 			kfree(symname_utf16);
+ 			return -ENOMEM;
+ 		}
+-		/* Flag 0x02000000 is unknown, but all wsl symlinks have this value */
+-		symlink_buf->Flags = cpu_to_le32(0x02000000);
+-		/* PathBuffer is in UTF-8 but without trailing null-term byte */
++		/* Version field must be set to 2 (MS-FSCC 2.1.2.7) */
++		symlink_buf->Version = cpu_to_le32(2);
++		/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
+ 		symname_utf8_len = utf16s_to_utf8s((wchar_t *)symname_utf16, symname_utf16_len/2,
+ 						   UTF16_LITTLE_ENDIAN,
+-						   symlink_buf->PathBuffer,
++						   symlink_buf->Target,
+ 						   symname_utf8_maxlen);
+ 		*buf = (struct reparse_data_buffer *)symlink_buf;
+ 		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
+@@ -995,29 +995,36 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
+ 				     struct cifs_open_info_data *data)
+ {
+ 	int len = le16_to_cpu(buf->ReparseDataLength);
++	int data_offset = offsetof(typeof(*buf), Target) - offsetof(typeof(*buf), Version);
+ 	int symname_utf8_len;
+ 	__le16 *symname_utf16;
+ 	int symname_utf16_len;
+ 
+-	if (len <= sizeof(buf->Flags)) {
++	if (len <= data_offset) {
+ 		cifs_dbg(VFS, "srv returned malformed wsl symlink buffer\n");
+ 		return -EIO;
+ 	}
+ 
+-	/* PathBuffer is in UTF-8 but without trailing null-term byte */
+-	symname_utf8_len = len - sizeof(buf->Flags);
++	/* MS-FSCC 2.1.2.7 defines layout of the Target field only for Version 2. */
++	if (le32_to_cpu(buf->Version) != 2) {
++		cifs_dbg(VFS, "srv returned unsupported wsl symlink version %u\n", le32_to_cpu(buf->Version));
++		return -EIO;
++	}
++
++	/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
++	symname_utf8_len = len - data_offset;
+ 	/*
+ 	 * Check that buffer does not contain null byte
+ 	 * because Linux cannot process symlink with null byte.
+ 	 */
+-	if (strnlen(buf->PathBuffer, symname_utf8_len) != symname_utf8_len) {
++	if (strnlen(buf->Target, symname_utf8_len) != symname_utf8_len) {
+ 		cifs_dbg(VFS, "srv returned null byte in wsl symlink target location\n");
+ 		return -EIO;
+ 	}
+ 	symname_utf16 = kzalloc(symname_utf8_len * 2, GFP_KERNEL);
+ 	if (!symname_utf16)
+ 		return -ENOMEM;
+-	symname_utf16_len = utf8s_to_utf16s(buf->PathBuffer, symname_utf8_len,
++	symname_utf16_len = utf8s_to_utf16s(buf->Target, symname_utf8_len,
+ 					    UTF16_LITTLE_ENDIAN,
+ 					    (wchar_t *) symname_utf16, symname_utf8_len * 2);
+ 	if (symname_utf16_len < 0) {
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 764dca80c15c..f79a5165a7cc 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1567,13 +1567,13 @@ struct reparse_nfs_data_buffer {
+ 	__u8	DataBuffer[];
+ } __packed;
+ 
+-/* For IO_REPARSE_TAG_LX_SYMLINK */
++/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 */
+ struct reparse_wsl_symlink_data_buffer {
+ 	__le32	ReparseTag;
+ 	__le16	ReparseDataLength;
+ 	__u16	Reserved;
+-	__le32	Flags;
+-	__u8	PathBuffer[]; /* Variable Length UTF-8 string without nul-term */
++	__le32	Version; /* Always 2 */
++	__u8	Target[]; /* Variable Length UTF-8 string without nul-term */
+ } __packed;
+ 
+ struct validate_negotiate_info_req {
+-- 
+2.20.1
+
