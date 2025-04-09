@@ -1,153 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9242253E4
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Apr 2025 13:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B053D265CA7
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Apr 2025 14:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744206693; cv=none; b=O2JMJ6neqDOUgFRRiNdchEAPltUZ8iX1idyCPxYSdT4z3fJ4NbymAZ6xUA7xFTsnQ9fnOnkR4u8M+MCpMKYXr42LpezXFlButptHJ1BimtocOZwX1qGqoMRi2JCT7wZUVN6m1XAcVb+D5twXExX20m9DYJLOpPnWAG8bMZ3A9Rs=
+	t=1744208076; cv=none; b=oZdxwfnXVT/pK/IqWXtgtCo8f/5sACFGD8FqAx0+VUZV0Uow5uLHzh3J+9mTGVEa++CMQoG33Dgx1qeI4GBI7Ht2Xa517mQwyIBKqMx2iiBjV0+MWcgq7kI0vBLsEcGPvS7p1ULXtYDyQEhay/v/32VKAPdp6X/TCXa4sOo4FKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744206693; c=relaxed/simple;
-	bh=AU2wPGZZ5+pgfbiAqkCQeJuw04Py2z0rb0AoQNc2IOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RtFgwH/mejhoZvfaBS6OU1vuU7zLff70BCeIDiYOoZVBdfPJ/phC629Jtl156Ycgo6Joi47LRqF64ZK6H6QCfwZhZJl9mLZp++rTJdOG7gJ4hlvUqpPq4TvscBgDyBYXF05FX96aLl1ymOPjF47x5gjxzJKGyRbZCpE/mgTZzSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WoRv/L5q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744208076; c=relaxed/simple;
+	bh=ig/89DMxUZRoTTfVGmtoJ+4FqXgsPG3h3p/esxtGHTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BXctV7KPwvPIyGoCke/7MHketL5LoDkCi5zpLEHe4aXaDSmAWQ35rRcb/ghfvoSq+oUi1PYIud8DMS19Qpgv261KqMO8ISCLyjIdYob+LV/K5JGfp+5urlX9mmnroikigrYkKRcsXxiAkYWWhjJ4ralf6cNPdZKXa/zIusb1vww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=TRQcbWVl; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WoRv/L5q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD74C4CEE3;
-	Wed,  9 Apr 2025 13:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744206691;
-	bh=AU2wPGZZ5+pgfbiAqkCQeJuw04Py2z0rb0AoQNc2IOk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WoRv/L5qOpBK2pP/hPlyKynJm9ecLLI4l7FmAdDjxCMwTQBJM1p2fnFSit/7GoU+a
-	 QJ0xIM7TIJdd37qN1RbV83yLAKb4/VjXikVgryBjWlidNx6RaHlh7nxix8SwhHAIi1
-	 ZqWD+PMK/FANrYtmknysgrJ5o/NZy7qbapNBYqAJ2ecnE0TDKVX5uJI5KLrL/REzsA
-	 zjDx/5gCKKFNxp7dowgFpt5unR2qVyIzojT5oXy1dWAXc+eUFa6V1g+19U2KrOlgX6
-	 rcaenvOLZKmo8xBC4zZ6l0KXIl1ITiluiXShr1iqpmO8lsCoFBWo41F8KH6UYwjoYw
-	 nB6azrFqQuuAA==
-Received: by pali.im (Postfix)
-	id 4BBBD4B3; Wed,  9 Apr 2025 15:51:28 +0200 (CEST)
-Date: Wed, 9 Apr 2025 15:51:28 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	Tom Talpey <tom@talpey.com>
-Subject: Re: Handling deleted files which are still open on the Linux client
-Message-ID: <20250409135128.mzwcyakxg22fk2xw@pali>
-References: <CAH2r5muEV7=ygqdCe+mrDgXXXtoEEF69HxgeWkD05Z1KY1jJ-A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="TRQcbWVl"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1744208067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=X8fPUdhjYgOjhWDJfJDEIZ7jjB6gfcKWpw4EW8m6D9I=;
+	b=TRQcbWVlLtcoW8RZyAfhhfuPakFExMNrJsgrKjX8rF5w+77XxG+KUQbv3l2qhI0/yR2LpE
+	z5FKu2yDOq10hp/GTaPtJvvxVADrjPuvFP3mBh8O0W0uP/fHIJ/wtJ+Y6C68/twxMVSzH+
+	MzihSdE7SSoYYn0zaCLZDbl6nL280qSVbm8FZQ2kl5QrABeq/Jv5rjT1EK2rqX7AlcUqgO
+	gRvWJV1xqMxT2kQQsvU2P6qocE7ZCrOZhoMiu7wQ+idKZhCHC2ZWBMKS7vxJ6FycsWiUQq
+	5pFwE72m7fzHAUuA4xaN8LX9AyetaenUXC+HiRhk/nN94bLc+HA7LyZtc1mHig==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH] smb: client: fix UAF in decryption with multichannel
+Date: Wed,  9 Apr 2025 11:14:21 -0300
+Message-ID: <20250409141421.154510-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5muEV7=ygqdCe+mrDgXXXtoEEF69HxgeWkD05Z1KY1jJ-A@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
 
-Hello,
+After commit f7025d861694 ("smb: client: allocate crypto only for
+primary server") and commit b0abcd65ec54 ("smb: client: fix UAF in
+async decryption"), the channels started reusing AEAD TFM from primary
+channel to perform synchronous decryption, but that can't done as
+there could be multiple cifsd threads (one per channel) simultaneously
+accessing it to perform decryption.
 
-On Wednesday 09 April 2025 08:13:19 Steve French wrote:
-> There was a suggestion (see attached patch) to change how we report
-> errors on a file which is deleted (usually by the same Linux client)
-> but still open (so "STATUS_DELETE_PENDING" if another process or
-> client tries to open it).   It can be confusing when an open file is
-> deleted to see it in "ls" output (until the file is closed and removed
-> from the namespace).   This is not an issue when using the SMB3.1.1
-> POSIX/Linux extensions but if the server were e.g. Windows it can be
-> confusing.
+This fixes the following KASAN splat when running fstest generic/249
+with 'vers=3.1.1,multichannel,max_channels=4,seal' against Windows
+Server 2022:
 
-This is related only to the Windows SMB server (or other servers which
-implements only the Windows behavior; not POSIX).
+BUG: KASAN: slab-use-after-free in gf128mul_4k_lle+0xba/0x110
+Read of size 8 at addr ffff8881046c18a0 by task cifsd/986
+CPU: 3 UID: 0 PID: 986 Comm: cifsd Not tainted 6.15.0-rc1 #1
+PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-3.fc41
+04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x5d/0x80
+ print_report+0x156/0x528
+ ? gf128mul_4k_lle+0xba/0x110
+ ? __virt_addr_valid+0x145/0x300
+ ? __phys_addr+0x46/0x90
+ ? gf128mul_4k_lle+0xba/0x110
+ kasan_report+0xdf/0x1a0
+ ? gf128mul_4k_lle+0xba/0x110
+ gf128mul_4k_lle+0xba/0x110
+ ghash_update+0x189/0x210
+ shash_ahash_update+0x295/0x370
+ ? __pfx_shash_ahash_update+0x10/0x10
+ ? __pfx_shash_ahash_update+0x10/0x10
+ ? __pfx_extract_iter_to_sg+0x10/0x10
+ ? ___kmalloc_large_node+0x10e/0x180
+ ? __asan_memset+0x23/0x50
+ crypto_ahash_update+0x3c/0xc0
+ gcm_hash_assoc_remain_continue+0x93/0xc0
+ crypt_message+0xe09/0xec0 [cifs]
+ ? __pfx_crypt_message+0x10/0x10 [cifs]
+ ? _raw_spin_unlock+0x23/0x40
+ ? __pfx_cifs_readv_from_socket+0x10/0x10 [cifs]
+ decrypt_raw_data+0x229/0x380 [cifs]
+ ? __pfx_decrypt_raw_data+0x10/0x10 [cifs]
+ ? __pfx_cifs_read_iter_from_socket+0x10/0x10 [cifs]
+ smb3_receive_transform+0x837/0xc80 [cifs]
+ ? __pfx_smb3_receive_transform+0x10/0x10 [cifs]
+ ? __pfx___might_resched+0x10/0x10
+ ? __pfx_smb3_is_transform_hdr+0x10/0x10 [cifs]
+ cifs_demultiplex_thread+0x692/0x1570 [cifs]
+ ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+ ? rcu_is_watching+0x20/0x50
+ ? rcu_lockdep_current_cpu_online+0x62/0xb0
+ ? find_held_lock+0x32/0x90
+ ? kvm_sched_clock_read+0x11/0x20
+ ? local_clock_noinstr+0xd/0xd0
+ ? trace_irq_enable.constprop.0+0xa8/0xe0
+ ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+ kthread+0x1fe/0x380
+ ? kthread+0x10f/0x380
+ ? __pfx_kthread+0x10/0x10
+ ? local_clock_noinstr+0xd/0xd0
+ ? ret_from_fork+0x1b/0x60
+ ? local_clock+0x15/0x30
+ ? lock_release+0x29b/0x390
+ ? rcu_is_watching+0x20/0x50
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x31/0x60
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
 
-> Currently we return "ENOENT" which is more accurate (since the file
-> should not be displayed in directory listings, and attempts to open
-> such a file should fail in order to obey POSIX/Linux semantics), but
-> the suggestion in attached patch is to change that to "EBUSY" which
-> may imply that the file will be accessible in the future (which in
-> POSIX/Linux would not be the case so could be confusing).
+Cc: David Howells <dhowells@redhat.com>
+Reported-by: Steve French <stfrench@microsoft.com>
+Closes: https://lore.kernel.org/r/CAH2r5mu6Yc0-RJXM3kFyBYUB09XmXBrNodOiCVR4EDrmxq5Szg@mail.gmail.com
+Fixes: f7025d861694 ("smb: client: allocate crypto only for primary server")
+Fixes: b0abcd65ec54 ("smb: client: fix UAF in async decryption")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+---
+ fs/smb/client/cifsencrypt.c | 16 +++++-----------
+ fs/smb/client/smb2ops.c     |  6 +++---
+ fs/smb/client/smb2pdu.c     | 11 ++---------
+ 3 files changed, 10 insertions(+), 23 deletions(-)
 
-My point is that the directory entry in the STATUS_DELETE_PENDING state
-is not deleted. The directory entry when is in this state it still
-exists. And Windows application (or Windows SMB client) can change this
-STATUS_DELETE_PENDING state to the normal state at any time. Basically
-it is like transaction. After changing directory entry into the
-STATUS_DELETE_PENDING you need to either "confirm" this deletion or to
-"cancel" it.
-
-The Linux SMB client does not support this "cancel" functionality but
-any other clients can support it and Windows one is example.
-
-So in my opinion I think that on Windows the directory entry in the
-STATUS_DELETE_PENDING is not removed and hence I think that reporting
-"ENOENT" on Linux to userspace is not correct. The entry still exists.
-
-On POSIX/Linux there is unlink syscall which completely removes the
-directory entry. This is opposite of the STATUS_DELETE_PENDING which
-just puts the directory entry into some temporary / pending state.
-The unlink cannot be "cancelled".
-
-> There may be better ways to handle this as well (e.g. simply filter
-> out from query dir responses any files which we know are in delete
-> pending state - since one common scenario is getting this error when
-> doing an ls of a directory which contains an open file which has been
-> deleted).
-
-I think that filtering out directory entries which are in
-STATUS_DELETE_PENDING from the readdir() is not a good idea. Because in
-this case the readdir() on directory which has only STATUS_DELETE_PENDING
-children would return empty list of entries, but the rmmdir() would fail
-on it with error ENOTEMPTY. This is because entries in
-STATUS_DELETE_PENDING still exists in that directory and Windows really
-does not allow to remove directory which contain child entries (and it
-does not matter if the child entries are in normal state or in
-STATUS_DELETE_PENDING state).
-
-So I think it would be very confusing if Linux readdir() would report
-that directory is empty but rmdir() will fail with ENOTEMPTY error.
-I think that this would be less accurate with POSIX behavior.
-
-> One of my concerns is that with this change "stat
-> /mnt/deleted-but-still-open-file" could return EBUSY which implies the
-> filename still exists (which violates the whole point of delete in
-> POSIX), and a simpler fix is to just make sure we don't show any files
-> (e.g. in readdir) in delete pending state and make sure their dentries
-> are gone.
-
-My other patches in that series are improving SMB client to allow
-calling "stat /mnt/deleted-but-still-open-file" and fill stat buffer
-without EBUSY error. Just opening a file for reading or writing would
-fail with EBUSY.
-
-On Windows and also over SMB it is possible to do "stat" also for
-directory entries which are in STATUS_DELETE_PENDING.
-
-And important is that Windows C stat() function in msvcrt.dll and UCRT
-libraries is already allowing it and working fine also with files in
-STATUS_DELETE_PENDING.
-
-Note that NFS3 (client) has similar problem. Its unlink syscall is
-implemented as silly-rename, it just rename file and disallow opening
-it. But the directory entry still exists, other users can call "stat" on
-it, just cannot open it.
-
-So I think that returning EBUSY, which implies that the filename still
-exists is a correct thing to do. Because the file really still exists.
-It was not removed / unlinked from the directory yet. And hence also the
-directory cannot be removed yet because it contains child entries.
-
-Note that this whole thing is only for Windows SMB behavior, not the
-Samba or other POSIX implementation where the real unlink happens.
-
-> Any thoughts?
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
-
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index e69968e88fe7..35892df7335c 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -704,18 +704,12 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ 	cifs_free_hash(&server->secmech.md5);
+ 	cifs_free_hash(&server->secmech.sha512);
+ 
+-	if (!SERVER_IS_CHAN(server)) {
+-		if (server->secmech.enc) {
+-			crypto_free_aead(server->secmech.enc);
+-			server->secmech.enc = NULL;
+-		}
+-
+-		if (server->secmech.dec) {
+-			crypto_free_aead(server->secmech.dec);
+-			server->secmech.dec = NULL;
+-		}
+-	} else {
++	if (server->secmech.enc) {
++		crypto_free_aead(server->secmech.enc);
+ 		server->secmech.enc = NULL;
++	}
++	if (server->secmech.dec) {
++		crypto_free_aead(server->secmech.dec);
+ 		server->secmech.dec = NULL;
+ 	}
+ }
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 41d8cd20b25f..3f7fe74688a9 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4555,9 +4555,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ 			return rc;
+ 		}
+ 	} else {
+-		if (unlikely(!server->secmech.dec))
+-			return -EIO;
+-
++		rc = smb3_crypto_aead_allocate(server);
++		if (unlikely(rc))
++			return rc;
+ 		tfm = server->secmech.dec;
+ 	}
+ 
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 81e05db8e4d5..c4d52bebd37d 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -1252,15 +1252,8 @@ SMB2_negotiate(const unsigned int xid,
+ 			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
+ 	}
+ 
+-	if (server->cipher_type && !rc) {
+-		if (!SERVER_IS_CHAN(server)) {
+-			rc = smb3_crypto_aead_allocate(server);
+-		} else {
+-			/* For channels, just reuse the primary server crypto secmech. */
+-			server->secmech.enc = server->primary_server->secmech.enc;
+-			server->secmech.dec = server->primary_server->secmech.dec;
+-		}
+-	}
++	if (server->cipher_type && !rc)
++		rc = smb3_crypto_aead_allocate(server);
+ neg_exit:
+ 	free_rsp_buf(resp_buftype, rsp);
+ 	return rc;
+-- 
+2.49.0
 
