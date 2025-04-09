@@ -1,144 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BF21F873E
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Apr 2025 19:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2645210F53
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Apr 2025 22:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744227717; cv=none; b=Kvc5JCkvBv97IAxCHUKOP2LTwSG0v64kUkhbVX769JPOCWzDR6mlogX5UAxNUvoFTepJQ+SJtO9RExYXNqSay+Fx7+FB1DTPMHemyCpxzVrdxw0LhSboeajcb4WhbHTglQAZ4iTWsrSkUYVGCqQwId9ywd6TwQTyqPMWWLCf73g=
+	t=1744238615; cv=none; b=l9P+iCS0dYkA56TV2NDMCVa9ZPn7ZlHpHRGMzGYEYXeGBX1TCXhPQYbBXUFX0wAMMrp0rUmH53rIo1OmO5H5nenEXkGUI5G/mqWF/6PBtywvwKmiV76/TBZ8NAKUWoW80o7DgoXvlCJ3GU/M6tLQsFhFOTKQ+xGWRziaDdPmdnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744227717; c=relaxed/simple;
-	bh=u9qzPVSgnzorBlRJcyYVAY6h3lFot1k4jdFM9mPNHsg=;
+	s=arc-20240116; t=1744238615; c=relaxed/simple;
+	bh=mo/Fdrk2V/sFnORqRxXt7pqJxhKvZ3ifma+gpd4TJ8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BPw9RkqjOhr04bVC4/ZxBxwxpoMvi6tKDtzTZjgcxDBAiS+RK42jQUy+mzAnXuq5bE+NfPJh3bZPDBTRueBzMy41YZmPrhyEvfGzJxzVNG+cEuFecIOqz6sFssueVS6qYQq94Qm40YRxiH23udQYcEoXcwrH6b+WtrdtWP1gjL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=quBJ0aR8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=fKVpmGxC4C2XaYH+UkFj3hWSH8FuOdSKuWxKigbr2LyFGtLUzSYAeNf/NCoutoRSc5fHcg2XDB0JOxztHTqSxGYzj6rS0w1j+WnKcyBMRLoUQPmd2vCVBq3dI1CIWMA+tT7skm5ZuY7ZOLg0mWry0oOqm1DpELQRhR2blUz/oPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NjO+r+FQ; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quBJ0aR8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CBB9C4CEE2;
-	Wed,  9 Apr 2025 19:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744227716;
-	bh=u9qzPVSgnzorBlRJcyYVAY6h3lFot1k4jdFM9mPNHsg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=quBJ0aR88Y/BnMVvMitZQRNjrifbZUnFeEgCOzlvxr+bMJ5cdkz7TTfdZ6Am0+o7H
-	 eDWr2kRGQI63d9H8eGEHOiQtcYTgaWz4Zorrk94DZg93Jcd5B2paOWsxAU6tsYcNcy
-	 BKkcfGWyJ0VBWkevSf2HKAlVbDc8yjjC/AR7C8nrH+oaAgAxmwDAXBdNGFG7q/lH+o
-	 5FwRQI8HFABSVIF6GVyPqFXlD8kyKocUyhfn3dZzkT6DSZKoH3mg2xdaJG6nxm/4eh
-	 oFcFeP0Y0jSM6xRBYabtolTaAvB80q0pZpHSz+gaAoS/ZIx+Adjf24Mq/ywW+RLC3W
-	 stGu4ziW7ZAHg==
-Received: by pali.im (Postfix)
-	id 66E0F4B3; Wed,  9 Apr 2025 21:41:52 +0200 (CEST)
-Date: Wed, 9 Apr 2025 21:41:52 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH 03/25] cifs: Add support for SMB1 Session Setup NTLMSSP
-Message-ID: <20250409194152.yf5u3ufw4ucknpxt@pali>
-References: <CAH2r5msKV9ChZr6-2tQ3ZLSmS9D5s1SiOWGfbhCnVPMEKoDf_Q@mail.gmail.com>
- <20250409192208.eihyv566ralpl4zg@pali>
- <CAH2r5mug12QDNinQtSZHM4phzoVADwvsrL-a6f0iHXeJCj+qdg@mail.gmail.com>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NjO+r+FQ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Cc:To:From:Date;
+	bh=K3tqpFwotlUoBuBNXzOmYbqoL5by+YgGBst/pSlaevw=; b=NjO+r+FQWxFBnBgGOfcc1VjSJ+
+	/SLR7Umpai3G/2NUDqRlqaSiZoZWaq2anFL4jCt7axFqK2ia+Aaqo8gPLPWaC9RVmFGnGlpo4Igb1
+	rZr896WAfWf70eRpeAMmdDKqmF01MTz49vE4+PZSMjrIWVsqa2R88FpUGcZGEbGobDaCgC74QoXdP
+	s69WRT/hU6P1bIiQvVKb7eQ66ku0+TnnoR1oTR2J8DeqY1b8ijssNWRGwak28A261mE/ot5UuFW4G
+	OuQL1b/0Vaca4SB6kiU26uQkdFz/9NdD5YaUGgMgIfkrjN8d6/4St59kKgbfW7R/fD4XSK+o2Fcdy
+	YhMdu5DeRGWzMvegOAnUhVRvgwafHpEl738Tbgup+RAJmZ67MJNoqmkeHBIjx6lTcKVRAKHR6nZX6
+	ZwlyKaSqrIIhPoNdz+OVo3qtiZWhbK1Vw2G4uTuQQ4zvrioVDd1D+P5lSBuYtSXS3G/efO2/vxf8e
+	srV4atPZgG/15xskgBSTJnrs;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1u2e8n-008z4R-1D;
+	Wed, 09 Apr 2025 22:43:29 +0000
+Date: Wed, 9 Apr 2025 15:43:25 -0700
+From: Jeremy Allison <jra@samba.org>
+To: Ralph Boehme <slow@samba.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>,
+	samba-technical <samba-technical@lists.samba.org>,
+	Tom Talpey <tom@talpey.com>,
+	Steven French <Steven.French@microsoft.com>,
+	"vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
+Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
+Message-ID: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mug12QDNinQtSZHM4phzoVADwvsrL-a6f0iHXeJCj+qdg@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
 
-I could try to check some older OS/2 server.
+On Wed, Apr 09, 2025 at 08:18:22PM +0200, Ralph Boehme wrote:
+>Hi folks,
+>
+>what should be the behavior with SMB3 POSIX when a POSIX client tries 
+>to delete a file that has FILE_ATTRIBUTE_READONLY set?
+>
+>The major question that we must answer is, if this we would want to 
+>allow for POSIX clients to ignore this in some way: either completely 
+>ignore it on POSIX handles or first check if the handle has requested 
+>and been granted WRITE_ATTRIBUTES access.
+>
+>Checking WRITE_ATTRIBUTES first means we would correctly honor 
+>permissions and the client could have removed FILE_ATTRIBUTE_READONLY 
+>anyway to then remove the file.
+>
+>Windows has some new bits FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE 
+>to handle this locally (!) and it seems to be doing it without 
+>checking WRITE_ATTRIBUTES on the server.
+>
+><https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/2e860264-018a-47b3-8555-565a13b35a45>
+>
+>Thoughts?
 
-On Wednesday 09 April 2025 14:27:32 Steve French wrote:
-> Are you aware of any servers which support NTLMSSP but not Unicode?
-> 
-> On Wed, Apr 9, 2025 at 2:22 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > I have tested it against Windows Server 2022 with new -o nounicode
-> > option which turned off the Unicode support. Without this fix,
-> > the mount with -o nounicode option and NTLMSSP was failing.
-> >
-> > On Wednesday 09 April 2025 13:39:58 Steve French wrote:
-> > > Pali,
-> > > Have you been able to verify this (your patch, attached) to any
-> > > (presumably ancient?) server that actually wouldn't support Unicode
-> > > and would support NTLMSSP? or was this only emulated by turning off
-> > > Unicode (and if so which servers did you test it against?)
-> > >
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> > > From 1d789f0843075395945aa30528fb17d6c517d054 Mon Sep 17 00:00:00 2001
-> > > From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-> > > Date: Sun, 6 Oct 2024 19:24:29 +0200
-> > > Subject: [PATCH 03/25] cifs: Add support for SMB1 Session Setup NTLMSSP
-> > >  Request in non-UNICODE mode
-> > > MIME-Version: 1.0
-> > > Content-Type: text/plain; charset=UTF-8
-> > > Content-Transfer-Encoding: 8bit
-> > >
-> > > SMB1 Session Setup NTLMSSP Request in non-UNICODE mode is similar to
-> > > UNICODE mode, just strings are encoded in ASCII and not in UTF-16.
-> > >
-> > > With this change it is possible to setup SMB1 session with NTLM
-> > > authentication in non-UNICODE mode with Windows SMB server.
-> > >
-> > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > ---
-> > >  fs/smb/client/sess.c | 20 ++++++++++----------
-> > >  1 file changed, 10 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> > > index b3fa9ee26912..0f51d136cf23 100644
-> > > --- a/fs/smb/client/sess.c
-> > > +++ b/fs/smb/client/sess.c
-> > > @@ -1684,22 +1684,22 @@ _sess_auth_rawntlmssp_assemble_req(struct sess_data *sess_data)
-> > >       pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
-> > >
-> > >       capabilities = cifs_ssetup_hdr(ses, server, pSMB);
-> > > -     if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) {
-> > > -             cifs_dbg(VFS, "NTLMSSP requires Unicode support\n");
-> > > -             return -ENOSYS;
-> > > -     }
-> > > -
-> > >       pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
-> > >       capabilities |= CAP_EXTENDED_SECURITY;
-> > >       pSMB->req.Capabilities |= cpu_to_le32(capabilities);
-> > >
-> > >       bcc_ptr = sess_data->iov[2].iov_base;
-> > > -     /* unicode strings must be word aligned */
-> > > -     if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
-> > > -             *bcc_ptr = 0;
-> > > -             bcc_ptr++;
-> > > +
-> > > +     if (pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) {
-> > > +             /* unicode strings must be word aligned */
-> > > +             if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
-> > > +                     *bcc_ptr = 0;
-> > > +                     bcc_ptr++;
-> > > +             }
-> > > +             unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
-> > > +     } else {
-> > > +             ascii_oslm_strings(&bcc_ptr, sess_data->nls_cp);
-> > >       }
-> > > -     unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
-> > >
-> > >       sess_data->iov[2].iov_len = (long) bcc_ptr -
-> > >                                       (long) sess_data->iov[2].iov_base;
-> > > --
-> > > 2.43.0
-> > >
-> >
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+Does Windows ever send FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE over
+the wire ? What happens if smbclient does ?
