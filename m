@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C162138F80
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 08:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAC12045B3
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 08:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744273931; cv=none; b=mV9YxwW3AMLDMz7o1rdh+gE2k9/St7A8atixc6cMmGrtaxzuVmRPAZ6mp3VuLdILKgmhsA9/76kG+fziz5+b36Mple7vkZt5GQaT/CSwX/gJhsiMV3nh3qYlW/WyDIuaKRw6HpvybiUHWk1RK+8fH3vpLDPjk69bSXCYBjFD+Jg=
+	t=1744274039; cv=none; b=k6ZZ4ZpqBjA0Uf6W0HXTxsNebRIrstmLA5wDZrYrEldBHcgp5VBgJGkPy9SehI/m4E4/WlyLs7zW2CQ6XlJX/SetPWCw2WkL4lhwRzWXNOjpZjknAY/eTE1h3qTa2qZ86Try0cmqXkM7BQig92/4lWfMNuuy272v+MZ6d0q2WAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744273931; c=relaxed/simple;
-	bh=MUPrFxy1OY4M37SJZ3j1CQ7mxTbB3uFy1xFtAvpL15Y=;
+	s=arc-20240116; t=1744274039; c=relaxed/simple;
+	bh=uipzv4lbUp1HDr06giaCBYq5HoKcMQO+vUXhUyohBu0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pyxnF92pZCAQqHnij1yBoZmSeFJViUTsjEudxZANiLY4cIseribz1wGJcuLXYxMetG6+HE39FukpGz6X25tF9Drll7GgWrSqJHDCpgX4rO+DLzq90LUK3gBinU+X9n8dJ4tKKqxR+klWyOMnuyeJoRLnlqsgCeOxrhI4QyP96RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=fF4c+tfz; arc=none smtp.client-ip=144.76.82.148
+	 In-Reply-To:Content-Type; b=RTSZpQYLxHswNXMpE0X2Whd1FQQdSWtKsI3jAnF/rFPXOalL+w8EffsNfe/C/iednjJJXw/fs34bhbRB3Jr28ve8+NgOLAK8rdnhZVjJEvwaGsXnaTMLlHfCNtrwXXCZfFhly3jELj9VbURVaUK5zwi8AWaMvlZeqJiPuZHJzVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uj/1vv63; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="fF4c+tfz"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uj/1vv63"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=MUPrFxy1OY4M37SJZ3j1CQ7mxTbB3uFy1xFtAvpL15Y=; b=fF4c+tfzTjvLPPOzbP03vqCqYg
-	czF+Ua48VjlOBon96WZhawyuVtRrTDKO1r0L46sQFGC8xdkvCrfCJ61kAlyzMAppy/fdH9EGqpVE3
-	QPP61eSbsfMmgsrVDQuMso37BnVY+epHGrD3G5qeYgoAsUBGpeG7lbXdCiVDGNSUWQXnrJKCB8i8D
-	CKnQm1SOr/6ImvWZX83LeVZNWoOrhUF+KMN2B+K38piN1Cu4DHLK/XAnhBhcv/CD3RBbEwduSQGHf
-	lrr/xFgTq2LdxovoZf0T1+ieCcqFqEniLN7S7aJll2081At8YIX3ZDcSxFwziKgn5c4IHwk6zfBUJ
-	oW8t0AWtlyHJCyb7hAeYcnDmPB7ICtfped9QJwFIhxFmoIzt4R2ZSteFRNg/f7Pbpe/VwWh5YP4Wc
-	QqK4Ar5qzWSOkcngVyI0yxwPRr406YKAApUUJXMFf9ift5E9QXcl3X/kU7wnyDZvviDliOFBb3Q4B
-	OeNUNhN5NkJ/FTG1+vR15HSv;
+	bh=uipzv4lbUp1HDr06giaCBYq5HoKcMQO+vUXhUyohBu0=; b=uj/1vv63Wse2tdsTeuo3sv5YWf
+	14V3fV1JfUDiFR3NPXZeLK0iIs3Yh59/Ve3sF4ZInFMy1ytRfs5pp/ANbHoonSFphWws+BHU5Ra8y
+	gs68D59Xbr+x4MYbpA0pfgff02Xipku+108lUchVQMi+BzotILnhTVJKYuV1BHwLR/5Win212bRE+
+	fa1Yf6NiNVehf+lTuvUn9//fuWEoK9ecx91O0dKBzepFaXlAPsFmp4zEXsyxWTkMnTJMAuKwTsbST
+	GtiqagYkAgzIgBjU7Blgta8VmkIIDuClR8Vd9jsY01yxZmkEmOghtDwGjNvNXNhzMvpfU/GoqqSj3
+	hBHopi1Bmw56+MK5qkhk7At4e7ostF+4V7KecQH/aXw4xAJzn2YWo8uLJTMAuMYBO4aDXFu8jCRhj
+	V42jJNr13GlnM7SBAG8tRJcQeQ4nzCvj/vh9HxYfEcO/1JIWKcc7ukCMEzgRxeOa4oEns4lXy3I0B
+	lcio9xpbQnakF7VIpF2cx1IX;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1u2nKJ-0094Ry-2c;
-	Thu, 10 Apr 2025 08:31:59 +0000
-Message-ID: <085204d2-22e6-4de6-aeec-620dba38280b@samba.org>
-Date: Thu, 10 Apr 2025 10:31:59 +0200
+	id 1u2nMB-0094Ul-0o;
+	Thu, 10 Apr 2025 08:33:55 +0000
+Message-ID: <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
+Date: Thu, 10 Apr 2025 10:33:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,15 +41,13 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
-To: Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>
+To: Jeremy Allison <jra@samba.org>
 Cc: CIFS <linux-cifs@vger.kernel.org>,
  samba-technical <samba-technical@lists.samba.org>,
- Steven French <Steven.French@microsoft.com>, Jeremy Allison <jra@samba.org>,
+ Tom Talpey <tom@talpey.com>, Steven French <Steven.French@microsoft.com>,
  "vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
 References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
- <CAH2r5mt2032HC_yLrqGoAY-J6JZfP_2zjOjoKiY92YUrxBiqnA@mail.gmail.com>
- <a5c81acc-1e85-463d-925e-eb5b05af9ee7@samba.org>
- <a60852f5-cb90-4614-b35c-91d6507aee0a@talpey.com>
+ <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
 Content-Language: en-US, de-DE
 From: Ralph Boehme <slow@samba.org>
 Autocrypt: addr=slow@samba.org; keydata=
@@ -96,28 +94,26 @@ Autocrypt: addr=slow@samba.org; keydata=
  Bermm52f/BRm7Gl3ug8lfcuxselVCV68Qam6Q1IGwcr5XvLowbY1P/FrW+fj1b4J9IfES+a4
  /AC+Dps65h2qebPL72KNjf9vFilTzNNpng4Z4O72Yve5XT0hr2ISwHKGmkuKuK+iS9k7QfXD
  R3NApzHw2ZqQDtSdciR9og==
-In-Reply-To: <a60852f5-cb90-4614-b35c-91d6507aee0a@talpey.com>
+In-Reply-To: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------C8fZul9XqU1hVCQwPdZVY0JY"
+ boundary="------------C093IENLqWg8z5ajy0KARBUG"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------C8fZul9XqU1hVCQwPdZVY0JY
-Content-Type: multipart/mixed; boundary="------------VvpdYyyneIx03bIKMqPMuqDE";
+--------------C093IENLqWg8z5ajy0KARBUG
+Content-Type: multipart/mixed; boundary="------------FKN8XcEw0esKQXnTSwJXMhZU";
  protected-headers="v1"
 From: Ralph Boehme <slow@samba.org>
-To: Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>
+To: Jeremy Allison <jra@samba.org>
 Cc: CIFS <linux-cifs@vger.kernel.org>,
  samba-technical <samba-technical@lists.samba.org>,
- Steven French <Steven.French@microsoft.com>, Jeremy Allison <jra@samba.org>,
+ Tom Talpey <tom@talpey.com>, Steven French <Steven.French@microsoft.com>,
  "vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
-Message-ID: <085204d2-22e6-4de6-aeec-620dba38280b@samba.org>
+Message-ID: <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
 Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
 References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
- <CAH2r5mt2032HC_yLrqGoAY-J6JZfP_2zjOjoKiY92YUrxBiqnA@mail.gmail.com>
- <a5c81acc-1e85-463d-925e-eb5b05af9ee7@samba.org>
- <a60852f5-cb90-4614-b35c-91d6507aee0a@talpey.com>
-In-Reply-To: <a60852f5-cb90-4614-b35c-91d6507aee0a@talpey.com>
+ <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
+In-Reply-To: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
 Autocrypt-Gossip: addr=jra@samba.org; keydata=
  xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
  97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
@@ -137,51 +133,39 @@ Autocrypt-Gossip: addr=jra@samba.org; keydata=
  3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
  AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
 
---------------VvpdYyyneIx03bIKMqPMuqDE
+--------------FKN8XcEw0esKQXnTSwJXMhZU
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gNC8xMC8yNSA3OjIzIEFNLCBUb20gVGFscGV5IHdyb3RlOg0KPiBPbiA0LzkvMjAyNSA5
-OjA2IFBNLCBSYWxwaCBCb2VobWUgd3JvdGU6DQo+PiBPbiA0LzkvMjUgODo0MyBQTSwgU3Rl
-dmUgRnJlbmNoIHdyb3RlOg0KPj4+IE9uIFdlZCwgQXByIDksIDIwMjUgYXQgMToxOOKAr1BN
-IFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+IHdyb3RlOg0KPj4+PiB3aGF0IHNob3Vs
-ZCBiZSB0aGUgYmVoYXZpb3Igd2l0aCBTTUIzIFBPU0lYIHdoZW4gYSBQT1NJWCBjbGllbnQg
-DQo+Pj4+IHRyaWVzIHRvDQo+Pj4+IGRlbGV0ZSBhIGZpbGUgdGhhdCBoYXMgRklMRV9BVFRS
-SUJVVEVfUkVBRE9OTFkgc2V0Pw0KPj4+Pg0KPj4+PiBUaGUgbWFqb3IgcXVlc3Rpb24gdGhh
-dCB3ZSBtdXN0IGFuc3dlciBpcywgaWYgdGhpcyB3ZSB3b3VsZCB3YW50IHRvDQo+Pj4+IGFs
-bG93IGZvciBQT1NJWCBjbGllbnRzIHRvIGlnbm9yZSB0aGlzIGluIHNvbWUgd2F5OiBlaXRo
-ZXIgY29tcGxldGVseQ0KPj4+PiBpZ25vcmUgaXQgb24gUE9TSVggaGFuZGxlcyBvciBmaXJz
-dCBjaGVjayBpZiB0aGUgaGFuZGxlIGhhcyByZXF1ZXN0ZWQNCj4+Pj4gYW5kIGJlZW4gZ3Jh
-bnRlZCBXUklURV9BVFRSSUJVVEVTIGFjY2Vzcy4NCj4+Pg0KPj4+IEkgYWdyZWUgdGhhdCB0
-byBkZWxldGUgYSBmaWxlIHdpdGggUkVBRF9PTkxZIHNldCBzaG91bGQgYnkgZGVmYXVsdCAN
-Cj4+PiByZXF1aXJlDQo+Pj4gV1JJVEVfQVRUUklCVVRFUyAoYW5kIGRlbGV0ZSkNCj4gDQo+
-IFNpbmNlIHdoZW4gZG9lcyBQb3NpeCByZXF1aXJlIHRoaXM/Pw0KDQpPYnZpb3VzbHkgaXQg
-ZG9lc24ndC4NCg0KTGV0IG1lIHRyeSB0byBhc2sgaXQgZGlmZmVyZW50bHk6IGRvIHdlIHdh
-bnQgdG8gcmVsYXggV2luZG93cyBzZWN1cml0eSANCm1vZGVsIG9uIGEgUE9TSVggaGFuZGxl
-IGZvciB0aGlzIG9wZXJhdGlvbiwgZXZlbiBpZiB3ZSBjYW4gYnVpbGQgc2FuZSANCnNlbWFu
-dGljcyBpbnRvIHRoZSBwcm90b2NvbCB0aGF0IGRvZXNuJ3QgcmVxdWlyZSB0aGlzPw0K
+T24gNC8xMC8yNSAxMjo0MyBBTSwgSmVyZW15IEFsbGlzb24gd3JvdGU6DQo+IERvZXMgV2lu
+ZG93cyBldmVyIHNlbmQgRklMRV9ESVNQT1NJVElPTl9JR05PUkVfUkVBRE9OTFlfQVRUUklC
+VVRFIG92ZXINCj4gdGhlIHdpcmUgPw0KDQpObywgaXQncyBsb2NhbCBvbmx5LCBjZiBNUy1G
+U0NDIGFuZCB0aGUgdGhyZWFkICJTTUIyIERFTEVURSB2cyBVTkxJTksiIA0Kb24gdGhlIExp
+bnV4IGNpZnMgbWFpbGluZyBsaXN0Lg0KDQo8aHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29t
+L2VuLXVzL29wZW5zcGVjcy93aW5kb3dzX3Byb3RvY29scy9tcy1mc2NjLzQ3MThmYzQwLWU1
+MzktNDAxNC04ZTMzLWI2NzVhZjc0ZTNlMT4NCg0KDQo=
 
---------------VvpdYyyneIx03bIKMqPMuqDE--
+--------------FKN8XcEw0esKQXnTSwJXMhZU--
 
---------------C8fZul9XqU1hVCQwPdZVY0JY
+--------------C093IENLqWg8z5ajy0KARBUG
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmf3gf8FAwAAAAAACgkQqh6bcSY5nkaF
-XA/9F7AepJ0eZNIUC1Aj1UrXXi0Gk7zXxUr+h6t/Bonkqr6mD35iWsYXlwD5S1JsFgtmkLZPH/RK
-YL5v8uPZfIky8lEA293YKt3MgQ2tIzM7DodKEu5wWDngf/MIbmtM167VFaAa8NaGG05xVIMdqpiJ
-A6jnXgfmu0K21g1GbGpb9H23qznAL2+LoJgP4VVuoJSIfApggZUukiNFE2ty9NkfH3QzKIAbKN2L
-rb9OaH0nuNfjzwRCzijIvT1t6KEEY8gkhk7e3xJow0JBasiFcz5hRHsdXYk0SOwFX2+79Mt6mINF
-HzVDrfq47uYrgXbU7UpBYL3U7hK+6naKVB5ZMpAkZta53Q1owTxEJOPeldjyaTl1qpWd1w/DymNY
-gHaFGfziw9sKpNpGbLBLYL3uEEqpsEtPUgj66yrAtzWXHDwn6Pb/nNP3qNZqfTkOe+BondtsOXxj
-fEQN796o/of8+LTjoRVOcH/QoXPrpFeRnjR1DUpOTdocBMNGaJxn5N0BFHcPFGAC+/ryV2JOyJ+p
-oc5Su8yH6gC5VnM9uua1M8VKEP3ecT8RFvGzXHtMG1hYH4wi4UgQTz/6sTeGpfAAxRkJ5mFxKoYu
-tfJjjNj3tcBmSihD5f8fi7hRv2HF5S6GRooDsa7dEisYyz37W/WqfHuZdHUmVneg9jvhsRcbrsZi
-7F4=
-=Her/
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmf3gnIFAwAAAAAACgkQqh6bcSY5nkax
+jg/9GNF1fezg8f7GIjf4djyu78H181afc7GUBWUWefJc1nBn+eysjyI/dtLq99PtaQLml4y2PBOM
+iZXsnSKhz4lqHistW6JinrrX8m/v3KeKpi/zAaCdYL5HFSBFNaLAxDMklvH5KnAR5/zmFqW6pBZJ
+oHjXGGj9zklMaXMEmMnNgwNtSJq4qZaFAhuAUFin+RCreVMuT2b5uemvv451BiK77k3W8mlupSrw
+Gw5Ocr2+DpMUTHomFjd6gXca6QkPXjLJ20JZkuAtjqq31mjJvO+WgXcLdvQT7pM/VmGUTQMuE5Pl
+VEx4JERbqmOjt5dAbRJoI/3jlgIDk2K9H/CF6wwV9YP9rN4W9ah3n1iXkMO1E4qdBXsnjjoVLwG9
+3NHstF2SEx9pr7HPctEicGGAYD9iv9+xbFuXZRBwitryYEdmPhur+XbIJEdKgy8OwzukI4DjYouP
+loitIjpe/c24CHQc+uN7mHvjwrBcIaqFriDvtJeLCUmQa9QXvkX622YISOfYI1eDnvH4OX/y0I0I
+PuFV3oA6pIZYmLsCQidwrW+gf+Z+eRSlGaDJU6j/1LfHCFkirQGFNpU4fTRIGEKDscT9IO8mWS/N
+NY932eDvV0I8wjP6koLZYibwH3MDjg5HtW9atfNMdcwzNuLfq1eFPnhUCdFE8R3R0EEsvjhH5EgU
+mec=
+=nIDK
 -----END PGP SIGNATURE-----
 
---------------C8fZul9XqU1hVCQwPdZVY0JY--
+--------------C093IENLqWg8z5ajy0KARBUG--
