@@ -1,71 +1,121 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4657B1D88A6
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 15:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738191E5702
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 16:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744297352; cv=none; b=uKuN28W9LLiBFr1PSP/3VwW8Ucc8elLnXdsut93mTW6pjrBADAKEZZh51MoEG9kWRx2Y19/Bzx1iLWOX8CipdRpJtHiEETSM6FjSQlAl1viBkjVOt1I2o1VS6UsAOqHt4AvTF4bNU4cTOfmpvi+iRpbYpTdrCJ7W8TGZrWGNQwM=
+	t=1744301264; cv=none; b=Zm6WtG8uB1EKqnDMqw1t+mD1RUYAQzNur8cNjRClPzs/EdXjnCqwO+4IZL+P1IbjOrUb0L74OkHdLtMKokv09YwrQZnm8CJ3fOaThY+SheLBKb9tXA1GTwTFQk8+grftH0k+VvOxhTYWZa1MKmDn+NGp/LVjlbRfP8aptRGu6e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744297352; c=relaxed/simple;
-	bh=MeqDpneSj5GuXh1uibcbAuj2zRk9kDLvMGZaCdCzQlI=;
+	s=arc-20240116; t=1744301264; c=relaxed/simple;
+	bh=cHSQ8XUpHP4UzHpNX2W1HbttojbwL+CIL15/E5ApSK4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PphB15+gy8abnTjiV3L8/aVys4Ukl//8k812Q4lOal4XHd1pHR8NQYXUeFd9Rez01+poXR7Frk9Bc+G667dHTQMnHPoaZvZ05NmnsM2YxRdr2QISmDaqvhMkPnUV2UKePzbFXSXjhK6t8S5lyxSX4eHRi4d6q6IZksAtWVkTp08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1ufWrTx7; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=scc+FcdlbCOdB9k51+7BOSADiF9a4HarTso+XhODXaGYZocqOfYVCGtM2dBPLg6Fw7TUeFgdFB3BJcy2LGFkV5xbsp7vcWm6kKBeq+ZoXdA+afJHP2xSUHYap1Qr5yfUnaF6oJHzWjx7N6uLjUw/w+WubGoZc+BkxenBIxOK1dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVClqiAT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1ufWrTx7"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=UwLvtdGW0+sL/zbgtCjIPaBj4FugKsVwphwbmdxGHtE=; b=1ufWrTx78bPwf3jKa0YdRu8GRl
-	HicTdbiqeViH3i+ZiDXYymJL5aHDE5lOA0J/6COzwW7/ajsUIABtJ4CYH035vrMgEbnwU4QLcUosv
-	qffkTpA9jQ0I3jTLWXQRG51B3XrIDvu4dw4dBArLtFt3vP3oZLd1j0JSaQ6LMq3ccOE2M6stE3iRF
-	ZAzicV7O+TOgPXtp0Dbx/HslbBQ3PKM7NFPo9MYv0V3rCGhYnTwtCpTf2JKapbQWPXxXAm0isqY4d
-	10tfIyLPdcJ67v8UY5q7He97hBEChLaPBZRzSEURqkfYYJ9BB39mBwF6thCIpaF3O/OvHBuzt1r7I
-	1hQvw6oo/ZQLKPEvXsIrn3dZetIRYARPCe/C+8iWE3gwVvOqW74GQvLDBXiGcQ9Ro8Pknaax3YUK0
-	gOOLoHMZj2CeFFLQ1K6IHA2447irkgXQc7pHiN9iOpwiiTysNTkT9Ny3W9tdgOODOsWaO+urUaGU+
-	h+ob2Ey28p1Z8bzb5Fr4LEEO;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1u2tQ9-0098HC-1s;
-	Thu, 10 Apr 2025 15:02:26 +0000
-Date: Thu, 10 Apr 2025 08:02:22 -0700
-From: Jeremy Allison <jra@samba.org>
-To: Ralph Boehme <slow@samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVClqiAT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAABAC4CEDD;
+	Thu, 10 Apr 2025 16:07:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744301263;
+	bh=cHSQ8XUpHP4UzHpNX2W1HbttojbwL+CIL15/E5ApSK4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KVClqiATAyKVC2UIm2pr9lVAHH3j59u3ukwTj+EPDL1+8I6ViSiGb9yWX/y/Ldm/j
+	 NJKbhUZfYL9Z2UXy3YQHrzAVy2v9sD4gF7GcbB2fbDgU7GfXcYCMsIE3IaA2btjqk0
+	 m6Zuq7e3jtZrD+dRd90aD67/btZdntUhUhJKDH0/UdET3ZDYLSmepT6tAwCCART0HS
+	 q4OQ0hGEQEhTi14dnIt1CP2gKmC/9Ei6X8U/+Khl8eva0palQoGe6dkBZiSBX0t1Z3
+	 lrOTSRSx6RqFtuQyoXHisL4JshQoRjdJ2bxZVR26Vsz1FAmH97EfG0W6Sawr1R4NQW
+	 UolSiXNF5d6hg==
+Received: by pali.im (Postfix)
+	id A6409598; Thu, 10 Apr 2025 18:07:40 +0200 (CEST)
+Date: Thu, 10 Apr 2025 18:07:40 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>,
 	Tom Talpey <tom@talpey.com>,
-	Steven French <Steven.French@microsoft.com>,
-	"vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
-Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
-Message-ID: <Z_fdfszysLKt4Xij@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
- <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
- <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
+	samba-technical <samba-technical@lists.samba.org>
+Subject: Re: Handling deleted files which are still open on the Linux client
+Message-ID: <20250410160740.nxad4kqwikhsp7xt@pali>
+References: <CAH2r5muEV7=ygqdCe+mrDgXXXtoEEF69HxgeWkD05Z1KY1jJ-A@mail.gmail.com>
+ <CAN05THQGpzKTLXzFh8sc=h=rFQACBgFDhSzqNacrOp-50vGSOA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
+In-Reply-To: <CAN05THQGpzKTLXzFh8sc=h=rFQACBgFDhSzqNacrOp-50vGSOA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-On Thu, Apr 10, 2025 at 10:33:54AM +0200, Ralph Boehme wrote:
->On 4/10/25 12:43 AM, Jeremy Allison wrote:
->>Does Windows ever send FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE over
->>the wire ?
->
->No, it's local only, cf MS-FSCC and the thread "SMB2 DELETE vs UNLINK" 
->on the Linux cifs mailing list.
->
-><https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/4718fc40-e539-4014-8e33-b675af74e3e1>
+On Thursday 10 April 2025 16:18:17 ronnie sahlberg wrote:
+> On Wed, 9 Apr 2025 at 23:14, Steve French via samba-technical <
+> samba-technical@lists.samba.org> wrote:
+> 
+> > There was a suggestion (see attached patch) to change how we report
+> > errors on a file which is deleted (usually by the same Linux client)
+> > but still open (so "STATUS_DELETE_PENDING" if another process or
+> > client tries to open it).   It can be confusing when an open file is
+> > deleted to see it in "ls" output (until the file is closed and removed
+> > from the namespace).   This is not an issue when using the SMB3.1.1
+> > POSIX/Linux extensions but if the server were e.g. Windows it can be
+> > confusing.
+> >
+> > Currently we return "ENOENT" which is more accurate (since the file
+> > should not be displayed in directory listings, and attempts to open
+> > such a file should fail in order to obey POSIX/Linux semantics), but
+> > the suggestion in attached patch is to change that to "EBUSY" which
+> > may imply that the file will be accessible in the future (which in
+> > POSIX/Linux would not be the case so could be confusing).
+> >
+> > There may be better ways to handle this as well (e.g. simply filter
+> > out from query dir responses any files which we know are in delete
+> > pending state - since one common scenario is getting this error when
+> > doing an ls of a directory which contains an open file which has been
+> > deleted).
+> >
+> 
+> This is an area where it is impossible to match semantics exactly because
+> the semantics are just different.
+> 
+> Filtering the readdir results feels like the wrong thing to do. It is just
+> trading one
+> bad experience for another.
+> For example, if it is filtered out  and a client tries to create a new file
+> with the same
+> filename,   should they see "EEXIST"?
+> According to readdir() the object does not exist but if you try to create
+> it you can't because EEXIST.
 
-OK, but does the Windows SMB3 server filter it out ?
+Exactly, this is another case where the filtering or returning ENOENT is
+causing problems.
 
-Can a Linux client send it over the wire and does
-it have the desired effect ?
+> IMHO the least bad option is probably to let the object show up in
+> readdir() but
+> return an error to applications that want to operate on it.
+> Maybe consiider such files as having the same behaviour as a "chattr +i"
+> file that has mode 0000
+> and can not be opened for reading neither data not attributes.
+
+This is what I already suggested. To return EBUSY from open(), instead
+of ENOENT. Some other suggestions which I receive was to return ESTALE.
+
+> 
+> 
+> >
+> > One of my concerns is that with this change "stat
+> > /mnt/deleted-but-still-open-file" could return EBUSY which implies the
+> > filename still exists (which violates the whole point of delete in
+> > POSIX), and a simpler fix is to just make sure we don't show any files
+> > (e.g. in readdir) in delete pending state and make sure their dentries
+> > are gone.
+> >
+> > Any thoughts?
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+> >
