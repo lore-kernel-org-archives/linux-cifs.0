@@ -1,121 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738191E5702
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 16:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311974503B
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 18:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744301264; cv=none; b=Zm6WtG8uB1EKqnDMqw1t+mD1RUYAQzNur8cNjRClPzs/EdXjnCqwO+4IZL+P1IbjOrUb0L74OkHdLtMKokv09YwrQZnm8CJ3fOaThY+SheLBKb9tXA1GTwTFQk8+grftH0k+VvOxhTYWZa1MKmDn+NGp/LVjlbRfP8aptRGu6e4=
+	t=1744310279; cv=none; b=snUlMxnCdIykmFBS1xlO3uD8EFM2Pn4gIHceETWt8rviJxekWq3LTFwMJDdjVzVlVfem6kks/wOgcPNZNBeCwaSQxT6BLPeu6x8WD+EetenhTkb9uMobRBteVQa3sF3t6sF8AcB8WKkKvx930nyAPXkxQQORwZSjKj4mgsNZSIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744301264; c=relaxed/simple;
-	bh=cHSQ8XUpHP4UzHpNX2W1HbttojbwL+CIL15/E5ApSK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=scc+FcdlbCOdB9k51+7BOSADiF9a4HarTso+XhODXaGYZocqOfYVCGtM2dBPLg6Fw7TUeFgdFB3BJcy2LGFkV5xbsp7vcWm6kKBeq+ZoXdA+afJHP2xSUHYap1Qr5yfUnaF6oJHzWjx7N6uLjUw/w+WubGoZc+BkxenBIxOK1dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVClqiAT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1744310279; c=relaxed/simple;
+	bh=Y3GAObyOFGSDS+Xw4GgXyeEFbO2rwufo1uCKvwkNg80=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iUzy+hL15BDFYBn4rMWPoEs5p9Mvv3Xrh5YJBOp8Ru2jks7Mtxn88fSXSGNuaqyzVrLwDgG7NCQFJcv7sfspSja4jy6F2bSIUWwzMcNkpB9CeYxxMcfWqx9JxmqHDSWGl4C/JgbBL9cHwEn9oWQ/aBy+PxVJRXJx63vjBEe9cWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iJol/+6G; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVClqiAT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAABAC4CEDD;
-	Thu, 10 Apr 2025 16:07:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744301263;
-	bh=cHSQ8XUpHP4UzHpNX2W1HbttojbwL+CIL15/E5ApSK4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KVClqiATAyKVC2UIm2pr9lVAHH3j59u3ukwTj+EPDL1+8I6ViSiGb9yWX/y/Ldm/j
-	 NJKbhUZfYL9Z2UXy3YQHrzAVy2v9sD4gF7GcbB2fbDgU7GfXcYCMsIE3IaA2btjqk0
-	 m6Zuq7e3jtZrD+dRd90aD67/btZdntUhUhJKDH0/UdET3ZDYLSmepT6tAwCCART0HS
-	 q4OQ0hGEQEhTi14dnIt1CP2gKmC/9Ei6X8U/+Khl8eva0palQoGe6dkBZiSBX0t1Z3
-	 lrOTSRSx6RqFtuQyoXHisL4JshQoRjdJ2bxZVR26Vsz1FAmH97EfG0W6Sawr1R4NQW
-	 UolSiXNF5d6hg==
-Received: by pali.im (Postfix)
-	id A6409598; Thu, 10 Apr 2025 18:07:40 +0200 (CEST)
-Date: Thu, 10 Apr 2025 18:07:40 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>,
-	Tom Talpey <tom@talpey.com>,
-	samba-technical <samba-technical@lists.samba.org>
-Subject: Re: Handling deleted files which are still open on the Linux client
-Message-ID: <20250410160740.nxad4kqwikhsp7xt@pali>
-References: <CAH2r5muEV7=ygqdCe+mrDgXXXtoEEF69HxgeWkD05Z1KY1jJ-A@mail.gmail.com>
- <CAN05THQGpzKTLXzFh8sc=h=rFQACBgFDhSzqNacrOp-50vGSOA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJol/+6G"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54b166fa41bso1395681e87.0
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 11:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744310276; x=1744915076; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y3GAObyOFGSDS+Xw4GgXyeEFbO2rwufo1uCKvwkNg80=;
+        b=iJol/+6GNPLpVDOyQqhNbuMcbtiUd+wgtSIybGnacdDbhIOBKg+BIYtmrQ0l8V1hSv
+         sTa7JMYEXjTRaUFhiOuqzbzfVjlrGhlD0IGM+5z7oS4QxPo/NppBX5xw1ahESXUDh3ba
+         X5wQttDiyIzzSBKkKwR4qGqcm/fFP8ujshGJrDh/uXZNro8jrBd1jqrS9JU1a7m9SjVY
+         9MLFjhxi0EMMEewSPrJpD61qF5X5H3bcUxlBoaA+1C84Oxo/yqECKjHnGNxqxOc5xpBf
+         jrJoZn5P07gwFd+lozdvF4UzPFtuhEywlVp32wK8tBDeehLMEz9Yl+JHEVSKUrEK+0ZP
+         7ibQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744310276; x=1744915076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y3GAObyOFGSDS+Xw4GgXyeEFbO2rwufo1uCKvwkNg80=;
+        b=neD/m1tHEHRp+PZP3D4pI+GzO8nXvWkRnyv8+PTtbCMii3MUV46WOQpKq7LmX9oyfX
+         t/9XfCsrpXBnqlqOnnlM/P832HQAu3eHwVi1E0a6/+N3xOno34SDjQTeDM/6GnQilqJg
+         86UQnYDPqybqn7tqbH1p7nRiaAou9pCukJ7MNNocnDBkPrTbXRX369JZHIw1rf3WRT7k
+         NrPOOcGzjurbzFHJoJ0qlSJYKKYaofcOPCnGyoTXsk/FCn3xs9FeTcxDl+Q8iiWybSbh
+         ka+Yv0wKvBZgGYWU2SyjWRwaWquwTKFi4s5A0wEe4pflSoLqhpteDwFSaUUIvD7dcVI6
+         EwJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgl9KifIWeGPuF+ItJhrcISwb2S1jG/cm1AzcgXzhsJU38/Lpt55ZaxEp9OajapHijfK/JSbAOudlV@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpRBdfCK/XoeAfuVNGCUwTMltr0bXfk8cCTOOC7ATPl6IR8PmY
+	e240jktiDeq+V2eqL1D/l1IWHJ71QPLGC2ziD7ygNWiVfKFCe0fbQhritccPcS0N9vvD359AVvg
+	gtEGpBU4HmIFZQbFHX3rhA+UkOBM=
+X-Gm-Gg: ASbGncuKx2oqNS7nq428crZ0sC1Fq3YZtJSIPA18OJnO6LLWiIDrgpvG+Am2+ozs33+
+	pxRFzo6B+cbEbpzDwbmTEjFEPW89FdMK1+Z8rzqytQFUUUpWcPVQY4QAKwH8h4OnRgVN3aHe/yd
+	Ctxqu8/R8o1hIShEXTEmQvhZWINnUek28bRoFyO0siyf4GQMHbMsgXmUhq
+X-Google-Smtp-Source: AGHT+IGIPyKwAAreodyN6vVGJbh2ZobqpBvExETMq6i7L79uNw7TvmIO5fbwHo/74cz3OO8kQs6+n54d1Qm16vW7re0=
+X-Received: by 2002:a05:6512:3f05:b0:545:f0a:bf50 with SMTP id
+ 2adb3069b0e04-54d3c62ef13mr1371323e87.35.1744310275992; Thu, 10 Apr 2025
+ 11:37:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAN05THQGpzKTLXzFh8sc=h=rFQACBgFDhSzqNacrOp-50vGSOA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
+ <CAH2r5mt2032HC_yLrqGoAY-J6JZfP_2zjOjoKiY92YUrxBiqnA@mail.gmail.com>
+ <a5c81acc-1e85-463d-925e-eb5b05af9ee7@samba.org> <a60852f5-cb90-4614-b35c-91d6507aee0a@talpey.com>
+ <085204d2-22e6-4de6-aeec-620dba38280b@samba.org>
+In-Reply-To: <085204d2-22e6-4de6-aeec-620dba38280b@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 10 Apr 2025 13:37:44 -0500
+X-Gm-Features: ATxdqUGBKtzTsQKqy3ci9KeEdCz0oDkmM3tAH_MMGshL-7BoNDKgnFu-dS5gBl4
+Message-ID: <CAH2r5msKR+CGgOHxCU+TfYPakQxbQJQnsVPyq6ANhSnON+vSWQ@mail.gmail.com>
+Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
+To: Ralph Boehme <slow@samba.org>
+Cc: Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>, 
+	Steven French <Steven.French@microsoft.com>, Jeremy Allison <jra@samba.org>, 
+	"vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thursday 10 April 2025 16:18:17 ronnie sahlberg wrote:
-> On Wed, 9 Apr 2025 at 23:14, Steve French via samba-technical <
-> samba-technical@lists.samba.org> wrote:
-> 
-> > There was a suggestion (see attached patch) to change how we report
-> > errors on a file which is deleted (usually by the same Linux client)
-> > but still open (so "STATUS_DELETE_PENDING" if another process or
-> > client tries to open it).   It can be confusing when an open file is
-> > deleted to see it in "ls" output (until the file is closed and removed
-> > from the namespace).   This is not an issue when using the SMB3.1.1
-> > POSIX/Linux extensions but if the server were e.g. Windows it can be
-> > confusing.
+On Thu, Apr 10, 2025 at 3:32=E2=80=AFAM Ralph Boehme <slow@samba.org> wrote=
+:
+>
+> On 4/10/25 7:23 AM, Tom Talpey wrote:
+> > On 4/9/2025 9:06 PM, Ralph Boehme wrote:
+> >> On 4/9/25 8:43 PM, Steve French wrote:
+> >>> On Wed, Apr 9, 2025 at 1:18=E2=80=AFPM Ralph Boehme <slow@samba.org> =
+wrote:
+> >>>> what should be the behavior with SMB3 POSIX when a POSIX client
+> >>>> tries to
+> >>>> delete a file that has FILE_ATTRIBUTE_READONLY set?
+> >>>>
+> >>>> The major question that we must answer is, if this we would want to
+> >>>> allow for POSIX clients to ignore this in some way: either completel=
+y
+> >>>> ignore it on POSIX handles or first check if the handle has requeste=
+d
+> >>>> and been granted WRITE_ATTRIBUTES access.
+> >>>
+> >>> I agree that to delete a file with READ_ONLY set should by default
+> >>> require
+> >>> WRITE_ATTRIBUTES (and delete)
 > >
-> > Currently we return "ENOENT" which is more accurate (since the file
-> > should not be displayed in directory listings, and attempts to open
-> > such a file should fail in order to obey POSIX/Linux semantics), but
-> > the suggestion in attached patch is to change that to "EBUSY" which
-> > may imply that the file will be accessible in the future (which in
-> > POSIX/Linux would not be the case so could be confusing).
-> >
-> > There may be better ways to handle this as well (e.g. simply filter
-> > out from query dir responses any files which we know are in delete
-> > pending state - since one common scenario is getting this error when
-> > doing an ls of a directory which contains an open file which has been
-> > deleted).
-> >
-> 
-> This is an area where it is impossible to match semantics exactly because
-> the semantics are just different.
-> 
-> Filtering the readdir results feels like the wrong thing to do. It is just
-> trading one
-> bad experience for another.
-> For example, if it is filtered out  and a client tries to create a new file
-> with the same
-> filename,   should they see "EEXIST"?
-> According to readdir() the object does not exist but if you try to create
-> it you can't because EEXIST.
+> > Since when does Posix require this??
+>
+> Obviously it doesn't.
+>
+> Let me try to ask it differently: do we want to relax Windows security
+> model on a POSIX handle for this operation, even if we can build sane
+> semantics into the protocol that doesn't require this?
 
-Exactly, this is another case where the filtering or returning ENOENT is
-causing problems.
+If in doubt, better to be "more secure" unless case is very strong to relax
+this check.
 
-> IMHO the least bad option is probably to let the object show up in
-> readdir() but
-> return an error to applications that want to operate on it.
-> Maybe consiider such files as having the same behaviour as a "chattr +i"
-> file that has mode 0000
-> and can not be opened for reading neither data not attributes.
+--=20
+Thanks,
 
-This is what I already suggested. To return EBUSY from open(), instead
-of ENOENT. Some other suggestions which I receive was to return ESTALE.
-
-> 
-> 
-> >
-> > One of my concerns is that with this change "stat
-> > /mnt/deleted-but-still-open-file" could return EBUSY which implies the
-> > filename still exists (which violates the whole point of delete in
-> > POSIX), and a simpler fix is to just make sure we don't show any files
-> > (e.g. in readdir) in delete pending state and make sure their dentries
-> > are gone.
-> >
-> > Any thoughts?
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-> >
+Steve
