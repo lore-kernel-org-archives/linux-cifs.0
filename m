@@ -1,80 +1,129 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2645210F53
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Apr 2025 22:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB261E5734
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 03:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744238615; cv=none; b=l9P+iCS0dYkA56TV2NDMCVa9ZPn7ZlHpHRGMzGYEYXeGBX1TCXhPQYbBXUFX0wAMMrp0rUmH53rIo1OmO5H5nenEXkGUI5G/mqWF/6PBtywvwKmiV76/TBZ8NAKUWoW80o7DgoXvlCJ3GU/M6tLQsFhFOTKQ+xGWRziaDdPmdnI=
+	t=1744257333; cv=none; b=ohyBblgUhIe7VMBBkPlgXwP6YhI+UwJfuc3wyxt4Szmx0Qz5g0ygpPCr7rdVouw0RoD9GwWccN2uAlowRzBr0znjK7QyWyYfME6TEKHJjEm2TEzbr3LxBbuZUma91pk/YJnOYvpp0EowhpaPFL/jTFQzwtaFgmJpofXnq+FaEnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744238615; c=relaxed/simple;
-	bh=mo/Fdrk2V/sFnORqRxXt7pqJxhKvZ3ifma+gpd4TJ8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fKVpmGxC4C2XaYH+UkFj3hWSH8FuOdSKuWxKigbr2LyFGtLUzSYAeNf/NCoutoRSc5fHcg2XDB0JOxztHTqSxGYzj6rS0w1j+WnKcyBMRLoUQPmd2vCVBq3dI1CIWMA+tT7skm5ZuY7ZOLg0mWry0oOqm1DpELQRhR2blUz/oPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NjO+r+FQ; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1744257333; c=relaxed/simple;
+	bh=eXp1QKN8SAMiI4Jva68w2X4dbNml5Vfhiry0esOfals=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OkVsADsGGiOwkf7krvKkBUG9WDnLpr5IV+dG+U2vU6bcp/MKCo/vF1L8N//h977S03NgtgGdk4zi3OqGfiP/afIaanjsemgfu7BV+N1iEP28G549+n4xkwctIWLCMbL21AtW2xAcsAoEyDOocVdIHM/FBLZ9Sqiiaa+6hAiWnUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CL1Sp+zR; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NjO+r+FQ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=K3tqpFwotlUoBuBNXzOmYbqoL5by+YgGBst/pSlaevw=; b=NjO+r+FQWxFBnBgGOfcc1VjSJ+
-	/SLR7Umpai3G/2NUDqRlqaSiZoZWaq2anFL4jCt7axFqK2ia+Aaqo8gPLPWaC9RVmFGnGlpo4Igb1
-	rZr896WAfWf70eRpeAMmdDKqmF01MTz49vE4+PZSMjrIWVsqa2R88FpUGcZGEbGobDaCgC74QoXdP
-	s69WRT/hU6P1bIiQvVKb7eQ66ku0+TnnoR1oTR2J8DeqY1b8ijssNWRGwak28A261mE/ot5UuFW4G
-	OuQL1b/0Vaca4SB6kiU26uQkdFz/9NdD5YaUGgMgIfkrjN8d6/4St59kKgbfW7R/fD4XSK+o2Fcdy
-	YhMdu5DeRGWzMvegOAnUhVRvgwafHpEl738Tbgup+RAJmZ67MJNoqmkeHBIjx6lTcKVRAKHR6nZX6
-	ZwlyKaSqrIIhPoNdz+OVo3qtiZWhbK1Vw2G4uTuQQ4zvrioVDd1D+P5lSBuYtSXS3G/efO2/vxf8e
-	srV4atPZgG/15xskgBSTJnrs;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1u2e8n-008z4R-1D;
-	Wed, 09 Apr 2025 22:43:29 +0000
-Date: Wed, 9 Apr 2025 15:43:25 -0700
-From: Jeremy Allison <jra@samba.org>
-To: Ralph Boehme <slow@samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
-	samba-technical <samba-technical@lists.samba.org>,
-	Tom Talpey <tom@talpey.com>,
-	Steven French <Steven.French@microsoft.com>,
-	"vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
-Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
-Message-ID: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CL1Sp+zR"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-54963160818so458317e87.2
+        for <linux-cifs@vger.kernel.org>; Wed, 09 Apr 2025 20:55:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744257329; x=1744862129; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+YLBy+c7rlobD2v0xr3ok/BHui3xNByHOuO6KapeFiw=;
+        b=CL1Sp+zRXNxmgYe0lUlDeM9oczdKRMWJI9iNFzllSy5B6gQzkQSeleHSeO/SPLvSYQ
+         DTuChfUZL5aSP0iQBOeTBNXxp/GAmzp6ub4F7f/DhrglJfdeBwJ0+CzIXqgBHEfZzJe2
+         X9DLtxEjyloZeXyxyl12Lx0YExbX95U5X1gjTygXKOKHwxt2LydXzkNYBqNWKvWEGBzc
+         ujVnSdwNWtxH4JXY083VkiP+B/rSsEfJfguNt/WM4Idve2MY8Kv2+H6MtS4Vu0AXsDNS
+         F8GAoGsPCUCdcp2mNhz0No8TTnzF262St7YADMNAPMcWQGIwELIrpofQOr52GGEWGNjn
+         M4qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744257329; x=1744862129;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+YLBy+c7rlobD2v0xr3ok/BHui3xNByHOuO6KapeFiw=;
+        b=ZoPwuRB1akSwtqXcjJKVmoPW9rva03ltLbOo9bGKZ3HhJKot0p3aQTCxbpC2ESfgyO
+         kI3BrdnELnjbLxljdnkGYRNxCT2jHPkh5p5FKFy5pluo6ZRWNBeqJNsJa9jiivjugqQ/
+         oKDCgUwYjMZeOPySM7GBnThnpz6s8s/yTgbi93pLz3zevKBLB2VfcqHDRKQFscHa0Chg
+         JYOzEcLdZUEiV3IS5g6wZqDepr914GfnhcPpN/aQBBiFTXDlJYMVZPajUaIc4+laKHrM
+         mYXiL20LxfB+GQGfDp1IXMZgoX9/RVoNCL0xLu8Vh82zuH+SRSkMVE0rbDphtwoyIMvq
+         Ys8g==
+X-Gm-Message-State: AOJu0YyXa5+Ma9UezNRoRGDyewPNA1ONPtjiLoqCNhW3uYQTt6qOHb6i
+	MpOQmSDBQcXBdhLt2FG2efoCi35qySmZmK4lXMMiGW5j8oY+erutv+ng3/ptGrEr/vQetuMNYJg
+	WB+QgtUnYkmt8AIypEtctfQeldZEnwV7i
+X-Gm-Gg: ASbGncv8ZP22ndRjW5cZnsD3Bq2urFVpKdLMBRlecmhVlJTJq6hHba39AC9kpOdbO7T
+	4pX9fB2P5YLzocKnqOdQtyj6eRuBNgXSAtsZXKJB5h5g1iyUV01D4WEdCX8tg3S1nhfQugw+6cW
+	BJscw1Ztm+pxYbLcFlZVIB9rkYAZAIsEvvGkCZNCJppaAq1AclTjdVQVM=
+X-Google-Smtp-Source: AGHT+IFerYVIXiGtqKbBSpCYYSNZT25E67fS51X90afaowH38gXlrOvjPEx6H0akkp4MoF+UXy9KOvYv6qBa2wB8/HY=
+X-Received: by 2002:a05:6512:158d:b0:545:ee3:f3c5 with SMTP id
+ 2adb3069b0e04-54d3c5a800amr173350e87.17.1744257329184; Wed, 09 Apr 2025
+ 20:55:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 9 Apr 2025 22:55:17 -0500
+X-Gm-Features: ATxdqUHwk1qFsQAj_o5txSLEti67-Gvq-7FcadmxhUTZapiStP2Hpw1XJocCRPc
+Message-ID: <CAH2r5mtHccZDP-QdWsb508iNpjeaCPsC8bxrpUgXk3y77aEcfg@mail.gmail.com>
+Subject: [PATCH] Add missing defines for new File System Attributes
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: multipart/mixed; boundary="00000000000080e56b0632648e41"
 
-On Wed, Apr 09, 2025 at 08:18:22PM +0200, Ralph Boehme wrote:
->Hi folks,
->
->what should be the behavior with SMB3 POSIX when a POSIX client tries 
->to delete a file that has FILE_ATTRIBUTE_READONLY set?
->
->The major question that we must answer is, if this we would want to 
->allow for POSIX clients to ignore this in some way: either completely 
->ignore it on POSIX handles or first check if the handle has requested 
->and been granted WRITE_ATTRIBUTES access.
->
->Checking WRITE_ATTRIBUTES first means we would correctly honor 
->permissions and the client could have removed FILE_ATTRIBUTE_READONLY 
->anyway to then remove the file.
->
->Windows has some new bits FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE 
->to handle this locally (!) and it seems to be doing it without 
->checking WRITE_ATTRIBUTES on the server.
->
-><https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/2e860264-018a-47b3-8555-565a13b35a45>
->
->Thoughts?
+--00000000000080e56b0632648e41
+Content-Type: text/plain; charset="UTF-8"
 
-Does Windows ever send FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE over
-the wire ? What happens if smbclient does ?
+Trivial patch to add the two new defines for FileSystemAttributes
+
+
+Two new file system attributes were recently added. See MS-FSCC 2.5.1:
+           FILE_SUPPORTS_POSIX_UNLINK_RENAME and
+           FILE_RETURNS_CLEANUP_RESULT_INFO
+
+Update the missing defines for ksmbd.ko and cifs.ko
+
+See attached
+
+
+-- 
+Thanks,
+
+Steve
+
+--00000000000080e56b0632648e41
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-Add-defines-for-two-new-FileSystemAttributes.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-Add-defines-for-two-new-FileSystemAttributes.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m9atrmy90>
+X-Attachment-Id: f_m9atrmy90
+
+RnJvbSA1ZDE0Njk4YmJjMDE4MGFkNTZlOGExY2JkNzk2YmVhYWNmMDhhOWQ5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgOSBBcHIgMjAyNSAyMjo0NTowNSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
+YjM6IEFkZCBkZWZpbmVzIGZvciB0d28gbmV3IEZpbGVTeXN0ZW1BdHRyaWJ1dGVzCgpUd28gbmV3
+IGZpbGUgc3lzdGVtIGF0dHJpYnV0ZXMgd2VyZSByZWNlbnRseSBhZGRlZC4gU2VlIE1TLUZTQ0Mg
+Mi41LjE6CiAgICAgICBGSUxFX1NVUFBPUlRTX1BPU0lYX1VOTElOS19SRU5BTUUgYW5kCiAgICAg
+ICBGSUxFX1JFVFVSTlNfQ0xFQU5VUF9SRVNVTFRfSU5GTwoKVXBkYXRlIHRoZSBtaXNzaW5nIGRl
+ZmluZXMgZm9yIGtzbWJkIGFuZCBjaWZzLmtvCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2gg
+PHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9jaWZzcGR1LmggICAg
+fCAyICsrCiBmcy9zbWIvc2VydmVyL3NtYl9jb21tb24uaCB8IDIgKysKIDIgZmlsZXMgY2hhbmdl
+ZCwgNCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzcGR1Lmgg
+Yi9mcy9zbWIvY2xpZW50L2NpZnNwZHUuaAppbmRleCA0OGQwZDZmNDM5Y2YuLjE4ZDY3YWIxMTNm
+MCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzcGR1LmgKKysrIGIvZnMvc21iL2NsaWVu
+dC9jaWZzcGR1LmgKQEAgLTIyNTYsNiArMjI1Niw4IEBAIHR5cGVkZWYgc3RydWN0IHsKICNkZWZp
+bmUgRklMRV9TVVBQT1JUU19FTkNSWVBUSU9OCTB4MDAwMjAwMDAKICNkZWZpbmUgRklMRV9TVVBQ
+T1JUU19PQkpFQ1RfSURTCTB4MDAwMTAwMDAKICNkZWZpbmUgRklMRV9WT0xVTUVfSVNfQ09NUFJF
+U1NFRAkweDAwMDA4MDAwCisjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUE9TSVhfVU5MSU5LX1JFTkFN
+RSAweDAwMDAwNDAwCisjZGVmaW5lIEZJTEVfUkVUVVJOU19DTEVBTlVQX1JFU1VMVF9JTkZPICAw
+eDAwMDAwMjAwCiAjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUkVNT1RFX1NUT1JBR0UJMHgwMDAwMDEw
+MAogI2RlZmluZSBGSUxFX1NVUFBPUlRTX1JFUEFSU0VfUE9JTlRTCTB4MDAwMDAwODAKICNkZWZp
+bmUgRklMRV9TVVBQT1JUU19TUEFSU0VfRklMRVMJMHgwMDAwMDA0MApkaWZmIC0tZ2l0IGEvZnMv
+c21iL3NlcnZlci9zbWJfY29tbW9uLmggYi9mcy9zbWIvc2VydmVyL3NtYl9jb21tb24uaAppbmRl
+eCBhM2Q4YTkwNWIwN2UuLmQ3NDJiYTc1NDM0OCAxMDA2NDQKLS0tIGEvZnMvc21iL3NlcnZlci9z
+bWJfY29tbW9uLmgKKysrIGIvZnMvc21iL3NlcnZlci9zbWJfY29tbW9uLmgKQEAgLTcyLDYgKzcy
+LDggQEAKICNkZWZpbmUgRklMRV9TVVBQT1JUU19FTkNSWVBUSU9OCTB4MDAwMjAwMDAKICNkZWZp
+bmUgRklMRV9TVVBQT1JUU19PQkpFQ1RfSURTCTB4MDAwMTAwMDAKICNkZWZpbmUgRklMRV9WT0xV
+TUVfSVNfQ09NUFJFU1NFRAkweDAwMDA4MDAwCisjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUE9TSVhf
+VU5MSU5LX1JFTkFNRSAweDAwMDAwNDAwCisjZGVmaW5lIEZJTEVfUkVUVVJOU19DTEVBTlVQX1JF
+U1VMVF9JTkZPICAweDAwMDAwMjAwCiAjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUkVNT1RFX1NUT1JB
+R0UJMHgwMDAwMDEwMAogI2RlZmluZSBGSUxFX1NVUFBPUlRTX1JFUEFSU0VfUE9JTlRTCTB4MDAw
+MDAwODAKICNkZWZpbmUgRklMRV9TVVBQT1JUU19TUEFSU0VfRklMRVMJMHgwMDAwMDA0MAotLSAK
+Mi40My4wCgo=
+--00000000000080e56b0632648e41--
