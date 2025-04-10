@@ -1,129 +1,79 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB261E5734
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 03:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D98829A2
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 04:04:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744257333; cv=none; b=ohyBblgUhIe7VMBBkPlgXwP6YhI+UwJfuc3wyxt4Szmx0Qz5g0ygpPCr7rdVouw0RoD9GwWccN2uAlowRzBr0znjK7QyWyYfME6TEKHJjEm2TEzbr3LxBbuZUma91pk/YJnOYvpp0EowhpaPFL/jTFQzwtaFgmJpofXnq+FaEnU=
+	t=1744257895; cv=none; b=XsmAOE5Pb/3Pu23wYNycDVZjSA5FOmSIi4qshqw5ouBYZ9g/bvr1GKBnJSHvkNgvY2bSxPZj/gTOH2+kppce/9qkFDP/y4Lu4QKsZc875Xe/hNNydChBKrYe0+siJpPbc+sKOB7CesqePckYfSk8MPeWUiFs4AMqNrT05Tb2q+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744257333; c=relaxed/simple;
-	bh=eXp1QKN8SAMiI4Jva68w2X4dbNml5Vfhiry0esOfals=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OkVsADsGGiOwkf7krvKkBUG9WDnLpr5IV+dG+U2vU6bcp/MKCo/vF1L8N//h977S03NgtgGdk4zi3OqGfiP/afIaanjsemgfu7BV+N1iEP28G549+n4xkwctIWLCMbL21AtW2xAcsAoEyDOocVdIHM/FBLZ9Sqiiaa+6hAiWnUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CL1Sp+zR; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1744257895; c=relaxed/simple;
+	bh=0E3g6a7VU39tX4orEaXaCrW/m/DxKNviAA7Os2YbDYg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tCkZqLdoZ74UdvTgSJkACwiKmmbbwdCVM+rnPMyXZYSlXpt8Bt9vJNqArihMN5oOIEV+xu9HJ02d5XKlR0RRNXmZXlKX4SPpWJ8hjenxVmIlMsLbfY/6lJCTAtB7LWnXWpcRJ4358F0RqtP1Q/4OyiyDPf/4Utv4sNdFmj5JQFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8y/vKdg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CL1Sp+zR"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-54963160818so458317e87.2
-        for <linux-cifs@vger.kernel.org>; Wed, 09 Apr 2025 20:55:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744257329; x=1744862129; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+YLBy+c7rlobD2v0xr3ok/BHui3xNByHOuO6KapeFiw=;
-        b=CL1Sp+zRXNxmgYe0lUlDeM9oczdKRMWJI9iNFzllSy5B6gQzkQSeleHSeO/SPLvSYQ
-         DTuChfUZL5aSP0iQBOeTBNXxp/GAmzp6ub4F7f/DhrglJfdeBwJ0+CzIXqgBHEfZzJe2
-         X9DLtxEjyloZeXyxyl12Lx0YExbX95U5X1gjTygXKOKHwxt2LydXzkNYBqNWKvWEGBzc
-         ujVnSdwNWtxH4JXY083VkiP+B/rSsEfJfguNt/WM4Idve2MY8Kv2+H6MtS4Vu0AXsDNS
-         F8GAoGsPCUCdcp2mNhz0No8TTnzF262St7YADMNAPMcWQGIwELIrpofQOr52GGEWGNjn
-         M4qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744257329; x=1744862129;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+YLBy+c7rlobD2v0xr3ok/BHui3xNByHOuO6KapeFiw=;
-        b=ZoPwuRB1akSwtqXcjJKVmoPW9rva03ltLbOo9bGKZ3HhJKot0p3aQTCxbpC2ESfgyO
-         kI3BrdnELnjbLxljdnkGYRNxCT2jHPkh5p5FKFy5pluo6ZRWNBeqJNsJa9jiivjugqQ/
-         oKDCgUwYjMZeOPySM7GBnThnpz6s8s/yTgbi93pLz3zevKBLB2VfcqHDRKQFscHa0Chg
-         JYOzEcLdZUEiV3IS5g6wZqDepr914GfnhcPpN/aQBBiFTXDlJYMVZPajUaIc4+laKHrM
-         mYXiL20LxfB+GQGfDp1IXMZgoX9/RVoNCL0xLu8Vh82zuH+SRSkMVE0rbDphtwoyIMvq
-         Ys8g==
-X-Gm-Message-State: AOJu0YyXa5+Ma9UezNRoRGDyewPNA1ONPtjiLoqCNhW3uYQTt6qOHb6i
-	MpOQmSDBQcXBdhLt2FG2efoCi35qySmZmK4lXMMiGW5j8oY+erutv+ng3/ptGrEr/vQetuMNYJg
-	WB+QgtUnYkmt8AIypEtctfQeldZEnwV7i
-X-Gm-Gg: ASbGncv8ZP22ndRjW5cZnsD3Bq2urFVpKdLMBRlecmhVlJTJq6hHba39AC9kpOdbO7T
-	4pX9fB2P5YLzocKnqOdQtyj6eRuBNgXSAtsZXKJB5h5g1iyUV01D4WEdCX8tg3S1nhfQugw+6cW
-	BJscw1Ztm+pxYbLcFlZVIB9rkYAZAIsEvvGkCZNCJppaAq1AclTjdVQVM=
-X-Google-Smtp-Source: AGHT+IFerYVIXiGtqKbBSpCYYSNZT25E67fS51X90afaowH38gXlrOvjPEx6H0akkp4MoF+UXy9KOvYv6qBa2wB8/HY=
-X-Received: by 2002:a05:6512:158d:b0:545:ee3:f3c5 with SMTP id
- 2adb3069b0e04-54d3c5a800amr173350e87.17.1744257329184; Wed, 09 Apr 2025
- 20:55:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8y/vKdg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17F1C4AF09
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 04:04:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744257894;
+	bh=0E3g6a7VU39tX4orEaXaCrW/m/DxKNviAA7Os2YbDYg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=S8y/vKdgiMzTS64aRvtn9zHgJ/uQXrtHMcEb71Vur1crITVb4h7bZIvZPaMFYVY9U
+	 mRNu6nFIHgQyHEAEFtXp8EuAKJOcdSWfDCkxAGiOquLDgytc3Gt0AJ3mOvcs92bnaC
+	 CYlSvqiYEaeAOO99s2HByPnW5PTmUAlROlUx4X0ufaqbYdYQ+3uUiJvMNhfGkbNK4U
+	 zEsZ+07GWKegBerCbRxFSAezd4lQtcrtipVXxRlTKysM0Q6ZEUdEuXPL7jtXD4s2pP
+	 GH8Q4VDbah/N4TrCRASJibS4LT3q7QpjEQyxL5RF9NfetzywT8Ou9FCq8hqHyoORQa
+	 lCidzIsJ48mzQ==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-2c818343646so218746fac.3
+        for <linux-cifs@vger.kernel.org>; Wed, 09 Apr 2025 21:04:54 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxKqovlP/W67ut4h+Z9KwHH0tq17ClBG4URqH5KsJH//LtCKq8A
+	P4+xpXd+/6ZoepcSZgdowbmavW6+XBJnF4PtCC+ssJ910txlSUwIydPHPjXRqWUbcMnP7fBnK90
+	7kHy0RMg8N4aI2d34GfmSlcKFCpo=
+X-Google-Smtp-Source: AGHT+IFYnyrAHsAH/wwBWUWeV6+zdS++LQaHBq33b2XuUbkgGwmSTtI6n/I9yma2lDqUlhHYGZyuUgavDIL0ATLYwxc=
+X-Received: by 2002:a05:6871:71c5:b0:2b8:3c87:b491 with SMTP id
+ 586e51a60fabf-2d0b5e370b4mr531321fac.26.1744257893982; Wed, 09 Apr 2025
+ 21:04:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 9 Apr 2025 22:55:17 -0500
-X-Gm-Features: ATxdqUHwk1qFsQAj_o5txSLEti67-Gvq-7FcadmxhUTZapiStP2Hpw1XJocCRPc
-Message-ID: <CAH2r5mtHccZDP-QdWsb508iNpjeaCPsC8bxrpUgXk3y77aEcfg@mail.gmail.com>
-Subject: [PATCH] Add missing defines for new File System Attributes
-To: CIFS <linux-cifs@vger.kernel.org>, 
+References: <CAH2r5mtHccZDP-QdWsb508iNpjeaCPsC8bxrpUgXk3y77aEcfg@mail.gmail.com>
+In-Reply-To: <CAH2r5mtHccZDP-QdWsb508iNpjeaCPsC8bxrpUgXk3y77aEcfg@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 10 Apr 2025 13:04:43 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-4DUOKDHKKxO0rrTCeMCfMrxzRwzMzdSf3ZY6BBUMrPw@mail.gmail.com>
+X-Gm-Features: ATxdqUF-pnGzPiRnutQkRbHYArYewg0nASIQIZ69WO0YMWrBHgnBgp6iEJ0VutA
+Message-ID: <CAKYAXd-4DUOKDHKKxO0rrTCeMCfMrxzRwzMzdSf3ZY6BBUMrPw@mail.gmail.com>
+Subject: Re: [PATCH] Add missing defines for new File System Attributes
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
 	samba-technical <samba-technical@lists.samba.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000080e56b0632648e41"
-
---00000000000080e56b0632648e41
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Trivial patch to add the two new defines for FileSystemAttributes
-
-
-Two new file system attributes were recently added. See MS-FSCC 2.5.1:
-           FILE_SUPPORTS_POSIX_UNLINK_RENAME and
-           FILE_RETURNS_CLEANUP_RESULT_INFO
-
-Update the missing defines for ksmbd.ko and cifs.ko
-
-See attached
-
-
--- 
-Thanks,
-
-Steve
-
---00000000000080e56b0632648e41
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-Add-defines-for-two-new-FileSystemAttributes.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-Add-defines-for-two-new-FileSystemAttributes.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_m9atrmy90>
-X-Attachment-Id: f_m9atrmy90
-
-RnJvbSA1ZDE0Njk4YmJjMDE4MGFkNTZlOGExY2JkNzk2YmVhYWNmMDhhOWQ5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgOSBBcHIgMjAyNSAyMjo0NTowNSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IEFkZCBkZWZpbmVzIGZvciB0d28gbmV3IEZpbGVTeXN0ZW1BdHRyaWJ1dGVzCgpUd28gbmV3
-IGZpbGUgc3lzdGVtIGF0dHJpYnV0ZXMgd2VyZSByZWNlbnRseSBhZGRlZC4gU2VlIE1TLUZTQ0Mg
-Mi41LjE6CiAgICAgICBGSUxFX1NVUFBPUlRTX1BPU0lYX1VOTElOS19SRU5BTUUgYW5kCiAgICAg
-ICBGSUxFX1JFVFVSTlNfQ0xFQU5VUF9SRVNVTFRfSU5GTwoKVXBkYXRlIHRoZSBtaXNzaW5nIGRl
-ZmluZXMgZm9yIGtzbWJkIGFuZCBjaWZzLmtvCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2gg
-PHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9jaWZzcGR1LmggICAg
-fCAyICsrCiBmcy9zbWIvc2VydmVyL3NtYl9jb21tb24uaCB8IDIgKysKIDIgZmlsZXMgY2hhbmdl
-ZCwgNCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzcGR1Lmgg
-Yi9mcy9zbWIvY2xpZW50L2NpZnNwZHUuaAppbmRleCA0OGQwZDZmNDM5Y2YuLjE4ZDY3YWIxMTNm
-MCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzcGR1LmgKKysrIGIvZnMvc21iL2NsaWVu
-dC9jaWZzcGR1LmgKQEAgLTIyNTYsNiArMjI1Niw4IEBAIHR5cGVkZWYgc3RydWN0IHsKICNkZWZp
-bmUgRklMRV9TVVBQT1JUU19FTkNSWVBUSU9OCTB4MDAwMjAwMDAKICNkZWZpbmUgRklMRV9TVVBQ
-T1JUU19PQkpFQ1RfSURTCTB4MDAwMTAwMDAKICNkZWZpbmUgRklMRV9WT0xVTUVfSVNfQ09NUFJF
-U1NFRAkweDAwMDA4MDAwCisjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUE9TSVhfVU5MSU5LX1JFTkFN
-RSAweDAwMDAwNDAwCisjZGVmaW5lIEZJTEVfUkVUVVJOU19DTEVBTlVQX1JFU1VMVF9JTkZPICAw
-eDAwMDAwMjAwCiAjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUkVNT1RFX1NUT1JBR0UJMHgwMDAwMDEw
-MAogI2RlZmluZSBGSUxFX1NVUFBPUlRTX1JFUEFSU0VfUE9JTlRTCTB4MDAwMDAwODAKICNkZWZp
-bmUgRklMRV9TVVBQT1JUU19TUEFSU0VfRklMRVMJMHgwMDAwMDA0MApkaWZmIC0tZ2l0IGEvZnMv
-c21iL3NlcnZlci9zbWJfY29tbW9uLmggYi9mcy9zbWIvc2VydmVyL3NtYl9jb21tb24uaAppbmRl
-eCBhM2Q4YTkwNWIwN2UuLmQ3NDJiYTc1NDM0OCAxMDA2NDQKLS0tIGEvZnMvc21iL3NlcnZlci9z
-bWJfY29tbW9uLmgKKysrIGIvZnMvc21iL3NlcnZlci9zbWJfY29tbW9uLmgKQEAgLTcyLDYgKzcy
-LDggQEAKICNkZWZpbmUgRklMRV9TVVBQT1JUU19FTkNSWVBUSU9OCTB4MDAwMjAwMDAKICNkZWZp
-bmUgRklMRV9TVVBQT1JUU19PQkpFQ1RfSURTCTB4MDAwMTAwMDAKICNkZWZpbmUgRklMRV9WT0xV
-TUVfSVNfQ09NUFJFU1NFRAkweDAwMDA4MDAwCisjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUE9TSVhf
-VU5MSU5LX1JFTkFNRSAweDAwMDAwNDAwCisjZGVmaW5lIEZJTEVfUkVUVVJOU19DTEVBTlVQX1JF
-U1VMVF9JTkZPICAweDAwMDAwMjAwCiAjZGVmaW5lIEZJTEVfU1VQUE9SVFNfUkVNT1RFX1NUT1JB
-R0UJMHgwMDAwMDEwMAogI2RlZmluZSBGSUxFX1NVUFBPUlRTX1JFUEFSU0VfUE9JTlRTCTB4MDAw
-MDAwODAKICNkZWZpbmUgRklMRV9TVVBQT1JUU19TUEFSU0VfRklMRVMJMHgwMDAwMDA0MAotLSAK
-Mi40My4wCgo=
---00000000000080e56b0632648e41--
+On Thu, Apr 10, 2025 at 12:55=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> Trivial patch to add the two new defines for FileSystemAttributes
+>
+>
+> Two new file system attributes were recently added. See MS-FSCC 2.5.1:
+>            FILE_SUPPORTS_POSIX_UNLINK_RENAME and
+>            FILE_RETURNS_CLEANUP_RESULT_INFO
+>
+> Update the missing defines for ksmbd.ko and cifs.ko
+>
+> See attached
+Looks good to me:)
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
+>
+>
+> --
+> Thanks,
+>
+> Steve
