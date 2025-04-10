@@ -1,171 +1,153 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAC12045B3
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Apr 2025 08:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE60202990;
+	Thu, 10 Apr 2025 08:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.129.21.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744274039; cv=none; b=k6ZZ4ZpqBjA0Uf6W0HXTxsNebRIrstmLA5wDZrYrEldBHcgp5VBgJGkPy9SehI/m4E4/WlyLs7zW2CQ6XlJX/SetPWCw2WkL4lhwRzWXNOjpZjknAY/eTE1h3qTa2qZ86Try0cmqXkM7BQig92/4lWfMNuuy272v+MZ6d0q2WAs=
+	t=1744274643; cv=none; b=CLSMW1bo1TdeBx3lRrCQlRi1ufZerGSK5aJvVrATgQcc3TonUM6Q8YrFp+YEXBzp8+XvcM4Dt6b5n0TsGPGPiHNmQ019bAtjmJRaaWTbE2uxSA0V1s0nWvM1kVOkG7gbe2R9R1weQqGBqX3b8ez+XcsGdp02KyoxHSZtnIxl6ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744274039; c=relaxed/simple;
-	bh=uipzv4lbUp1HDr06giaCBYq5HoKcMQO+vUXhUyohBu0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RTSZpQYLxHswNXMpE0X2Whd1FQQdSWtKsI3jAnF/rFPXOalL+w8EffsNfe/C/iednjJJXw/fs34bhbRB3Jr28ve8+NgOLAK8rdnhZVjJEvwaGsXnaTMLlHfCNtrwXXCZfFhly3jELj9VbURVaUK5zwi8AWaMvlZeqJiPuZHJzVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uj/1vv63; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1744274643; c=relaxed/simple;
+	bh=Vpk8nplB1wj9E13TXADDvPqFxzaBerQ86uW89U5RWo8=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=tcTWBHmEYMHz/ZIjCoXhQxGFCny0bTg7YP4VdQhvD91U9zCnUlH7XQ3GaWXcMSyGX23WQf1Cg9WP6R7vYGZVDp2FG6XZj4rEuwrum5BMpwVrRXU2s+C5CywOkqhHRuK6FuptC7wAtA0RtyMJ5uY/gUAqZHKMaoocFsT3sa75eTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr; spf=pass smtp.mailfrom=3xo.fr; dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b=Wwv6qlzo; arc=none smtp.client-ip=212.129.21.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=3xo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3xo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uj/1vv63"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=uipzv4lbUp1HDr06giaCBYq5HoKcMQO+vUXhUyohBu0=; b=uj/1vv63Wse2tdsTeuo3sv5YWf
-	14V3fV1JfUDiFR3NPXZeLK0iIs3Yh59/Ve3sF4ZInFMy1ytRfs5pp/ANbHoonSFphWws+BHU5Ra8y
-	gs68D59Xbr+x4MYbpA0pfgff02Xipku+108lUchVQMi+BzotILnhTVJKYuV1BHwLR/5Win212bRE+
-	fa1Yf6NiNVehf+lTuvUn9//fuWEoK9ecx91O0dKBzepFaXlAPsFmp4zEXsyxWTkMnTJMAuKwTsbST
-	GtiqagYkAgzIgBjU7Blgta8VmkIIDuClR8Vd9jsY01yxZmkEmOghtDwGjNvNXNhzMvpfU/GoqqSj3
-	hBHopi1Bmw56+MK5qkhk7At4e7ostF+4V7KecQH/aXw4xAJzn2YWo8uLJTMAuMYBO4aDXFu8jCRhj
-	V42jJNr13GlnM7SBAG8tRJcQeQ4nzCvj/vh9HxYfEcO/1JIWKcc7ukCMEzgRxeOa4oEns4lXy3I0B
-	lcio9xpbQnakF7VIpF2cx1IX;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1u2nMB-0094Ul-0o;
-	Thu, 10 Apr 2025 08:33:55 +0000
-Message-ID: <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
-Date: Thu, 10 Apr 2025 10:33:54 +0200
+	dkim=pass (2048-bit key) header.d=3xo.fr header.i=@3xo.fr header.b="Wwv6qlzo"
+Received: from localhost (mail.3xo.fr [212.129.21.66])
+	by mail.3xo.fr (Postfix) with ESMTP id 0B10ECB;
+	Thu, 10 Apr 2025 10:43:52 +0200 (CEST)
+X-Virus-Scanned: Debian amavis at nxo2.3xo.fr
+Received: from mail.3xo.fr ([212.129.21.66])
+ by localhost (mail.3xo.fr [212.129.21.66]) (amavis, port 10024) with ESMTP
+ id ST9nfpKQCXh0; Thu, 10 Apr 2025 10:43:49 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.3xo.fr ABFAE8D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3xo.fr; s=3xo;
+	t=1744274629; bh=gpkc/Zuf1WpbTIAUiJ2w1zOFyK70naPcUp8Y7Qf8Rks=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wwv6qlzo797zVLcsFEVhEgyNU5WA0ftIIq7sRw1Vu0WUatXNcyOH308kJ/7gwF1Dv
+	 u8L1xk1W7EaC6HEJyLMFGmdAv9NykvD/HnVgCqd5HhQNbYWgfyHFkXvMBS8I0rgnlG
+	 8tAqiJuQ/XDrKGrMo+77ReTMe4U3LF/jiPbgLO2xVbwPSC0CRHc27LlPxNCqKkmKmY
+	 16QwBhUPQ6S9/Ps1bSKPEnM4+yaFmYTbZRbGIZIkRyARC46eYaLeIwg6K/DsWAAmb7
+	 tnfWqMI24Zegf/+W42lHj0YH/tUCbJPI+zqY/ImlCjWauxAfhZhOusDNo7A3XuldlI
+	 I2RD4XgqQacsQ==
+Received: from mail.3xo.fr (mail.3xo.fr [212.129.21.66])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by mail.3xo.fr (Postfix) with ESMTPSA id ABFAE8D;
+	Thu, 10 Apr 2025 10:43:49 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
-To: Jeremy Allison <jra@samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>,
- Tom Talpey <tom@talpey.com>, Steven French <Steven.French@microsoft.com>,
- "vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
-References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
- <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
-Content-Language: en-US, de-DE
-From: Ralph Boehme <slow@samba.org>
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- R3NApzHw2ZqQDtSdciR9og==
-In-Reply-To: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------C093IENLqWg8z5ajy0KARBUG"
+Date: Thu, 10 Apr 2025 10:43:49 +0200
+From: Nicolas Baranger <nicolas.baranger@3xo.fr>
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: Christoph Hellwig <hch@infradead.org>, hch@lst.de, David Howells
+ <dhowells@redhat.com>, netfs@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, Steve French
+ <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>, Christian Brauner
+ <brauner@kernel.org>
+Subject: Re: [netfs/cifs - Linux 6.14] loop on file cat + file copy when files
+ are on CIFS share
+In-Reply-To: <F89FD4A3-FE54-4DB2-BA08-3BCC8843C60E@manguebit.com>
+References: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
+ <35940e6c0ed86fd94468e175061faeac@3xo.fr> <Z-Z95ePf3KQZ2MnB@infradead.org>
+ <48685a06c2608b182df3b7a767520c1d@3xo.fr>
+ <F89FD4A3-FE54-4DB2-BA08-3BCC8843C60E@manguebit.com>
+Message-ID: <5087f9cb3dc1487423de34725352f57c@3xo.fr>
+X-Sender: nicolas.baranger@3xo.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------C093IENLqWg8z5ajy0KARBUG
-Content-Type: multipart/mixed; boundary="------------FKN8XcEw0esKQXnTSwJXMhZU";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Jeremy Allison <jra@samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>,
- Tom Talpey <tom@talpey.com>, Steven French <Steven.French@microsoft.com>,
- "vl@samba.org" <vl@samba.org>, Stefan Metzmacher <metze@samba.org>
-Message-ID: <9f7da486-5d85-4ef3-8fcf-14b408d78700@samba.org>
-Subject: Re: SMB3 POSIX and deleting files with FILE_ATTRIBUTE_READONLY
-References: <32f7a0c2-32cd-4ccd-b471-7cba98cc30f3@samba.org>
- <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
-In-Reply-To: <Z_b4DS3kOpbCI4pG@jeremy-HP-Z840-Workstation>
-Autocrypt-Gossip: addr=jra@samba.org; keydata=
- xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
- 97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
- forHV13gB3B6S/ZWHpf/owKnJMwu8ozQpjnMnqOiVwCg8QnSX2AFCMd3HLQsqVaMdlO+jBEE
- AKrMu2Pavmyc/eoNfrjgeRoNRkwHCINWO5u93o92dngWK/hN1QOOCQfAzqZ1JwS5Q+E2gGug
- 4OVaZI1vZGsAzb06TSnS4fmrOfwHqltSDsCHhwd+pyWkIvi96Swx00e1NEwNExEBo5NrGunf
- fONGlfRc+WhMLIk0u2e2V14R+ebDA/42T+cQZtUR6EdBReHVpmckQXXcE8cIqsu6UpZCsdEP
- N6YjxQKgTKWQWoxE2k4lYl9KsDK1BaF6rLNz/yt2RAVb1qZVaOqpITZWwzykzH60dMaX/G1S
- GWuN28by9ghI2LIsxcXHiDhG2CZxyfogBDDXoTPXlVMdk55IwAJny8Wj4s0eSmVyZW15IEFs
- bGlzb24gPGpyYUBzYW1iYS5vcmc+wlcEExECABcFAjxEcLsFCwcKAwQDFQMCAxYCAQIXgAAK
- CRCl3XhJ1sA2rDHZAKDwxfxpGuCOAuDHaN3ULDrIzKw9DQCdHb3Sq5WKfeqeaY2ZKXT3AmXl
- Fq7OwE0EPERwvhAEAIY1K5TICtxmFOeoRMW39jtF8DNSXl/se6HBe3Wy5Cz43lMZ6NvjDATa
- 1w3JlkmjUyIDP29ApqmMu78Tv4UUxAh1PhyTttX1/aorTlIdVYFjey/yW4mSDXUBhPvMpq52
- TncLRmK9HC6mIxJqS0vi6W9IqGOqDRZph3GzVzJN7WvLAAMGA/sGAyg2rVsBzs77WH0jPO+A
- QZDj+Hf/RFHOwmcyG7/XgmV6LOcQP4HfQHH3DGYihu5cZj3BeWKPDJnjOjB2qmr+FTjYEsjw
- LDBNG7rjRye412rUbNwmEtcD2/dw4xNyu5h2u+1++KVBPf4SqG/a10gDqGJXDHA1Os5MmnQl
- 3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
- AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
+Hi Paulo
 
---------------FKN8XcEw0esKQXnTSwJXMhZU
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Thanks for answer and help
 
-T24gNC8xMC8yNSAxMjo0MyBBTSwgSmVyZW15IEFsbGlzb24gd3JvdGU6DQo+IERvZXMgV2lu
-ZG93cyBldmVyIHNlbmQgRklMRV9ESVNQT1NJVElPTl9JR05PUkVfUkVBRE9OTFlfQVRUUklC
-VVRFIG92ZXINCj4gdGhlIHdpcmUgPw0KDQpObywgaXQncyBsb2NhbCBvbmx5LCBjZiBNUy1G
-U0NDIGFuZCB0aGUgdGhyZWFkICJTTUIyIERFTEVURSB2cyBVTkxJTksiIA0Kb24gdGhlIExp
-bnV4IGNpZnMgbWFpbGluZyBsaXN0Lg0KDQo8aHR0cHM6Ly9sZWFybi5taWNyb3NvZnQuY29t
-L2VuLXVzL29wZW5zcGVjcy93aW5kb3dzX3Byb3RvY29scy9tcy1mc2NjLzQ3MThmYzQwLWU1
-MzktNDAxNC04ZTMzLWI2NzVhZjc0ZTNlMT4NCg0KDQo=
+> I'll look into it as soon as I recover from my illness.
+Hope you're doing better
 
---------------FKN8XcEw0esKQXnTSwJXMhZU--
+I had to rollback to linux 6.13.8 to be able to use the SMB share and 
+here is what I constat
+(don't know if it's a normal behavior but if yes, SMB seems to be a very 
+very unefficient protocol)
 
---------------C093IENLqWg8z5ajy0KARBUG
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+I think the issue can be buffer related:
+On Linux 6.13.8 the copy and cat of the 5 bytes 'toto' file containing 
+only ascii string 'toto' is working fine but here is what I capture with 
+tcpdump during transfert of toto file:
+https://xba.soartist.net/t6.pcap
+131 tcp packets to transfer a 5 byte file...
+Isn't there a problem ?
+Openning the pcap file with wireshark show a lot of lines:
+25	0.005576	10.0.10.100	10.0.10.25	SMB2	1071	Read Response, Error: 
+STATUS_END_OF_FILE
+It seems that those lines appears after the 5 bytes 'toto' file had been 
+transferred, and it continue until the last ACK recieved
 
------BEGIN PGP SIGNATURE-----
+I will try to reboot on Linux 6.14.0 mainline to see if I have the same 
+behavior or to see what I get in the packet capture
+(system is in production, I cannot reboot on a failing kernel when I 
+want, it should be organised... sorry)
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmf3gnIFAwAAAAAACgkQqh6bcSY5nkax
-jg/9GNF1fezg8f7GIjf4djyu78H181afc7GUBWUWefJc1nBn+eysjyI/dtLq99PtaQLml4y2PBOM
-iZXsnSKhz4lqHistW6JinrrX8m/v3KeKpi/zAaCdYL5HFSBFNaLAxDMklvH5KnAR5/zmFqW6pBZJ
-oHjXGGj9zklMaXMEmMnNgwNtSJq4qZaFAhuAUFin+RCreVMuT2b5uemvv451BiK77k3W8mlupSrw
-Gw5Ocr2+DpMUTHomFjd6gXca6QkPXjLJ20JZkuAtjqq31mjJvO+WgXcLdvQT7pM/VmGUTQMuE5Pl
-VEx4JERbqmOjt5dAbRJoI/3jlgIDk2K9H/CF6wwV9YP9rN4W9ah3n1iXkMO1E4qdBXsnjjoVLwG9
-3NHstF2SEx9pr7HPctEicGGAYD9iv9+xbFuXZRBwitryYEdmPhur+XbIJEdKgy8OwzukI4DjYouP
-loitIjpe/c24CHQc+uN7mHvjwrBcIaqFriDvtJeLCUmQa9QXvkX622YISOfYI1eDnvH4OX/y0I0I
-PuFV3oA6pIZYmLsCQidwrW+gf+Z+eRSlGaDJU6j/1LfHCFkirQGFNpU4fTRIGEKDscT9IO8mWS/N
-NY932eDvV0I8wjP6koLZYibwH3MDjg5HtW9atfNMdcwzNuLfq1eFPnhUCdFE8R3R0EEsvjhH5EgU
-mec=
-=nIDK
------END PGP SIGNATURE-----
+Let me know if you reproduced the issue
 
---------------C093IENLqWg8z5ajy0KARBUG--
+Kind regards
+Nicolas Baranger
+
+
+
+Le 2025-04-04 15:54, Paulo Alcantara a écrit :
+
+> Hi Nicolas,
+> 
+> I'll look into it as soon as I recover from my illness.  Sorry for the 
+> delay.
+> 
+> On 4 April 2025 08:50:27 UTC, Nicolas Baranger 
+> <nicolas.baranger@3xo.fr> wrote: Hi Christoph
+> 
+> Thanks for answer and help
+> Did someone reproduced the issue (very easy) ?
+> 
+> CIFS SHARE is mounted as /mnt/fbx/FBX-24T
+> echo toto >/mnt/fbx/FBX-24T/toto
+> 
+> ls -l /mnt/fbx/FBX-24T/toto
+> -rw-rw-rw- 1 root root 5 20 mars  09:20 /mnt/fbx/FBX-24T/toto
+> 
+> cat /mnt/fbx/FBX-24T/toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> toto
+> ^C
+> 
+> CIFS mount options:
+> grep cifs /proc/mounts
+> //10.0.10.100/FBX24T /mnt/fbx/FBX-24T cifs 
+> rw,nosuid,nodev,noexec,relatime,vers=3.1.1,cache=none,upcall_target=app,username=fbx,domain=HOMELAN,uid=0,noforceuid,gid=0,noforcegid,addr=10.0.10.100,file_mode=0666,dir_mode=0755,iocharset=utf8,soft,nounix,serverino,mapposix,mfsymlinks,reparse=nfs,nativesocket,symlink=mfsymlinks,rsize=65536,wsize=65536,bsize=16777216,retrans=1,echo_interval=60,actimeo=1,closetimeo=1 
+> 0 0
+> 
+> KERNEL: uname -a
+> Linux 14RV-SERVER.14rv.lan 6.14.0-rc2-amd64 #0 SMP PREEMPT_DYNAMIC Wed 
+> Feb 12 18:23:00 CET 2025 x86_64 GNU/Linux
+> 
+> Kind regards
+> Nicolas Baranger
+> 
+> Le 2025-03-28 11:45, Christoph Hellwig a écrit :
+> 
+> Hi Nicolas,
+> 
+> please wait a bit, many file system developers where at a conference
+> this week.
