@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294792E62DC;
-	Mon, 14 Apr 2025 13:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB3A2522BA;
+	Mon, 14 Apr 2025 13:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637391; cv=none; b=Wax93FSusjyf1sv2MqAsJ/z03SN4gtUIFZQO40zNJ0qPhzzIQ61EdV3Gp2OQkvmXoctLqwUk5cJU/s0ajmuiPzdcWC7sQYoAfX417k5XBZP1aH+i5g3SeCMKizq10U2kDHA1+KAyp8Wohwn5IQn3zb+otFzCdRW6UYOZJAkZocM=
+	t=1744637441; cv=none; b=H1BWq2WesZqEd4P/tJFEpcr/3zOBDoTYhf2bn+MqQWskxLX0SYraSrOtjxC6Bh9gRinxD1fGCo6QoMks55LpizMJOBVO+HTFc3Q1DnwchlZt0FKH9KpH0Ujc50SiKUjAUszXvFBUT6p+8/CMUm1Kn6M3fjC9Ett4A7SMwsN/6sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637391; c=relaxed/simple;
-	bh=dByaXTsfwiBh8dWHjGZAuH4OEsIXcsEUBHnNOKSQ440=;
+	s=arc-20240116; t=1744637441; c=relaxed/simple;
+	bh=sSAtZwxG5X3bFvVz9tUFVOkam+TRxP5iDoJCHouIU3Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qg8UXRD4V+CbPBp6GtQ5710RXnjuXMvNpD/uAi22IPA4AzAciGt2iO44y7hMLcAQ7A32A4timenCxZpje6NUN9DO0Nxv7lSQVKUy/E00w4fI75LQ+aPHn4Pl9vb47Qn87VRJkIJc1q//AiVjJAIqGRITAS3PzGXFFa5N1C9WpeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEZA7+0R; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Nh+nOEcNQ0TZPRyYa3tak7OUvuqt1+7KS+OqTKnjVgCKwpkAOcbv12omkDAREcXgkaABYfGDMNtRvUgENjqoQuP+DIGIjrFnfpJkctUi/23RUdzrxQXt/reacktmswMGdfjyCkoW2wqAjPuuAgDzvJvh4a09tCmbkvofEfoYtEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9Y5gTmB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEZA7+0R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7174AC4CEE9;
-	Mon, 14 Apr 2025 13:29:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9Y5gTmB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E643C4CEE9;
+	Mon, 14 Apr 2025 13:30:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744637390;
-	bh=dByaXTsfwiBh8dWHjGZAuH4OEsIXcsEUBHnNOKSQ440=;
+	s=k20201202; t=1744637441;
+	bh=sSAtZwxG5X3bFvVz9tUFVOkam+TRxP5iDoJCHouIU3Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oEZA7+0R16cZMmzkYxqt2x01pf7wMujY2DHdhlPq16cBcZBiWVW9EMBMjghAB7laM
-	 4TH/mBTyChkjEQk4eoPdvi8B+Br8x8Z0cThGvnkW85zu7dxCsS1iHfFPQvEljBtGxp
-	 xGdwi5TdP2Ajf7WijzcyTPuxk/47+7j2z8SeYP4qweq+4u1rJcafRMydr1lBMrCpjT
-	 PhRVvD/3rlj4mc7enBlEUI0WRx6W9TVXtKnAmDigRbTp11OccIgamreqtniYF/96NR
-	 xp3xkbIHzzlaNwQxhMSjKsVY3Cm404k9pKWhYRIO935fFeJ3yLVyC6sVMi1avoqWgq
-	 VUsMVJsbDPOiQ==
+	b=Q9Y5gTmBbdagV6zIn+c8Nzh/PqOtvTwt7MeCDAZuiA2MVYEY0PIPIGhHGVC18bvyq
+	 snBy8lp8CG+kSS0lgaq14wXHbn3Nxeju45mZM4U7Mo78HBCEHQfjXT/B9XdwCIKVr4
+	 5Kj/FdLHbdGmeSYvay+GlUBFy9ZQ7BQ7exRLhX+ivsF6AD7QWX0ARe6AMsWRnQJaQe
+	 6MWvmMOja3RPSr9v/ZKen9XzAyeBFObueGxdqXeejQC++G5/FkQ22IUUPEyWCycc5I
+	 +ukMI8JXffUkX2zXLQpkesCJH+SKrNOKLltVlWausX6vyJeI1mUDwC7yYB7xxw+Cmf
+	 28uWyyrc4tumA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.12 27/30] cifs: Fix querying of WSL CHR and BLK reparse points over SMB1
-Date: Mon, 14 Apr 2025 09:28:44 -0400
-Message-Id: <20250414132848.679855-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 21/24] cifs: Fix encoding of SMB1 Session Setup Kerberos Request in non-UNICODE mode
+Date: Mon, 14 Apr 2025 09:29:54 -0400
+Message-Id: <20250414132957.680250-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250414132848.679855-1-sashal@kernel.org>
-References: <20250414132848.679855-1-sashal@kernel.org>
+In-Reply-To: <20250414132957.680250-1-sashal@kernel.org>
+References: <20250414132957.680250-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,74 +50,132 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.23
+X-stable-base: Linux 6.6.87
 Content-Transfer-Encoding: 8bit
 
 From: Pali Rohár <pali@kernel.org>
 
-[ Upstream commit ef86ab131d9127dfbfa8f06e12441d05fdfb090b ]
+[ Upstream commit 16cb6b0509b65ac89187e9402e0b7a9ddf1765ef ]
 
-When reparse point in SMB1 query_path_info() callback was detected then
-query also for EA $LXDEV. In this EA are stored device major and minor
-numbers used by WSL CHR and BLK reparse points. Without major and minor
-numbers, stat() syscall does not work for char and block devices.
+Like in UNICODE mode, SMB1 Session Setup Kerberos Request contains oslm and
+domain strings.
 
-Similar code is already in SMB2+ query_path_info() callback function.
+Extract common code into ascii_oslm_strings() and ascii_domain_string()
+functions (similar to unicode variants) and use these functions in
+non-UNICODE code path in sess_auth_kerberos().
+
+Decision if non-UNICODE or UNICODE mode is used is based on the
+SMBFLG2_UNICODE flag in Flags2 packed field, and not based on the
+capabilities of server. Fix this check too.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smb1ops.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ fs/smb/client/sess.c | 60 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 40 insertions(+), 20 deletions(-)
 
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index bd791aa54681f..55cceb8229323 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -597,6 +597,42 @@ static int cifs_query_path_info(const unsigned int xid,
- 			CIFSSMBClose(xid, tcon, fid.netfid);
- 	}
- 
-+#ifdef CONFIG_CIFS_XATTR
-+	/*
-+	 * For WSL CHR and BLK reparse points it is required to fetch
-+	 * EA $LXDEV which contains major and minor device numbers.
-+	 */
-+	if (!rc && data->reparse_point) {
-+		struct smb2_file_full_ea_info *ea;
-+
-+		ea = (struct smb2_file_full_ea_info *)data->wsl.eas;
-+		rc = CIFSSMBQAllEAs(xid, tcon, full_path, SMB2_WSL_XATTR_DEV,
-+				    &ea->ea_data[SMB2_WSL_XATTR_NAME_LEN + 1],
-+				    SMB2_WSL_XATTR_DEV_SIZE, cifs_sb);
-+		if (rc == SMB2_WSL_XATTR_DEV_SIZE) {
-+			ea->next_entry_offset = cpu_to_le32(0);
-+			ea->flags = 0;
-+			ea->ea_name_length = SMB2_WSL_XATTR_NAME_LEN;
-+			ea->ea_value_length = cpu_to_le16(SMB2_WSL_XATTR_DEV_SIZE);
-+			memcpy(&ea->ea_data[0], SMB2_WSL_XATTR_DEV, SMB2_WSL_XATTR_NAME_LEN + 1);
-+			data->wsl.eas_len = sizeof(*ea) + SMB2_WSL_XATTR_NAME_LEN + 1 +
-+					    SMB2_WSL_XATTR_DEV_SIZE;
-+			rc = 0;
-+		} else if (rc >= 0) {
-+			/* It is an error if EA $LXDEV has wrong size. */
-+			rc = -EINVAL;
-+		} else {
-+			/*
-+			 * In all other cases ignore error if fetching
-+			 * of EA $LXDEV failed. It is needed only for
-+			 * WSL CHR and BLK reparse points and wsl_to_fattr()
-+			 * handle the case when EA is missing.
-+			 */
-+			rc = 0;
-+		}
-+	}
-+#endif
-+
- 	return rc;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index c2a98b2736645..f04922eb45d4c 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -732,6 +732,22 @@ unicode_oslm_strings(char **pbcc_area, const struct nls_table *nls_cp)
+ 	*pbcc_area = bcc_ptr;
  }
  
++static void
++ascii_oslm_strings(char **pbcc_area, const struct nls_table *nls_cp)
++{
++	char *bcc_ptr = *pbcc_area;
++
++	strcpy(bcc_ptr, "Linux version ");
++	bcc_ptr += strlen("Linux version ");
++	strcpy(bcc_ptr, init_utsname()->release);
++	bcc_ptr += strlen(init_utsname()->release) + 1;
++
++	strcpy(bcc_ptr, CIFS_NETWORK_OPSYS);
++	bcc_ptr += strlen(CIFS_NETWORK_OPSYS) + 1;
++
++	*pbcc_area = bcc_ptr;
++}
++
+ static void unicode_domain_string(char **pbcc_area, struct cifs_ses *ses,
+ 				   const struct nls_table *nls_cp)
+ {
+@@ -756,6 +772,25 @@ static void unicode_domain_string(char **pbcc_area, struct cifs_ses *ses,
+ 	*pbcc_area = bcc_ptr;
+ }
+ 
++static void ascii_domain_string(char **pbcc_area, struct cifs_ses *ses,
++				const struct nls_table *nls_cp)
++{
++	char *bcc_ptr = *pbcc_area;
++	int len;
++
++	/* copy domain */
++	if (ses->domainName != NULL) {
++		len = strscpy(bcc_ptr, ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
++		if (WARN_ON_ONCE(len < 0))
++			len = CIFS_MAX_DOMAINNAME_LEN - 1;
++		bcc_ptr += len;
++	} /* else we send a null domain name so server will default to its own domain */
++	*bcc_ptr = 0;
++	bcc_ptr++;
++
++	*pbcc_area = bcc_ptr;
++}
++
+ static void unicode_ssetup_strings(char **pbcc_area, struct cifs_ses *ses,
+ 				   const struct nls_table *nls_cp)
+ {
+@@ -801,25 +836,10 @@ static void ascii_ssetup_strings(char **pbcc_area, struct cifs_ses *ses,
+ 	*bcc_ptr = 0;
+ 	bcc_ptr++; /* account for null termination */
+ 
+-	/* copy domain */
+-	if (ses->domainName != NULL) {
+-		len = strscpy(bcc_ptr, ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
+-		if (WARN_ON_ONCE(len < 0))
+-			len = CIFS_MAX_DOMAINNAME_LEN - 1;
+-		bcc_ptr += len;
+-	} /* else we send a null domain name so server will default to its own domain */
+-	*bcc_ptr = 0;
+-	bcc_ptr++;
+-
+ 	/* BB check for overflow here */
+ 
+-	strcpy(bcc_ptr, "Linux version ");
+-	bcc_ptr += strlen("Linux version ");
+-	strcpy(bcc_ptr, init_utsname()->release);
+-	bcc_ptr += strlen(init_utsname()->release) + 1;
+-
+-	strcpy(bcc_ptr, CIFS_NETWORK_OPSYS);
+-	bcc_ptr += strlen(CIFS_NETWORK_OPSYS) + 1;
++	ascii_domain_string(&bcc_ptr, ses, nls_cp);
++	ascii_oslm_strings(&bcc_ptr, nls_cp);
+ 
+ 	*pbcc_area = bcc_ptr;
+ }
+@@ -1622,7 +1642,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 	sess_data->iov[1].iov_len = msg->secblob_len;
+ 	pSMB->req.SecurityBlobLength = cpu_to_le16(sess_data->iov[1].iov_len);
+ 
+-	if (ses->capabilities & CAP_UNICODE) {
++	if (pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) {
+ 		/* unicode strings must be word aligned */
+ 		if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
+ 			*bcc_ptr = 0;
+@@ -1631,8 +1651,8 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 		unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
+ 		unicode_domain_string(&bcc_ptr, ses, sess_data->nls_cp);
+ 	} else {
+-		/* BB: is this right? */
+-		ascii_ssetup_strings(&bcc_ptr, ses, sess_data->nls_cp);
++		ascii_oslm_strings(&bcc_ptr, sess_data->nls_cp);
++		ascii_domain_string(&bcc_ptr, ses, sess_data->nls_cp);
+ 	}
+ 
+ 	sess_data->iov[2].iov_len = (long) bcc_ptr -
 -- 
 2.39.5
 
