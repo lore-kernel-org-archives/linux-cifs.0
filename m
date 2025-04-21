@@ -1,63 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3225475E;
-	Sat, 19 Apr 2025 03:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE35126BF1;
+	Mon, 21 Apr 2025 23:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745033400; cv=none; b=tik87CEqNExcNZibVlz01K4vsuxk0IDN45a1rC6GpNthHn4AW/aaAdALcVHm46sNOsK3t5aBq5Ss0JnbJ4KgqNNmmGmMLT7cAKPA69zZy9aJcNqcqMAwjAAfuKWrgB7flrT9NVnB+XvGlDNc5Rmkl6nr/tJGum5gtKBRMjAJwPY=
+	t=1745279118; cv=none; b=ciEVIKNDgw5I2fIEF9FdJbXRPIowNLocXYmunw2ho4STq49Z0MFparfB1APbWHsvr8BnpYaZ5bIkmcgXJ0IRtqNQr4QoRvG0BBEZl5ys8njYv51LVYq6ySoSlFm9bbjPn88PxkXTNp9TbmFH+li9kyKNrc0r/LYddmkK/Kw4QG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745033400; c=relaxed/simple;
-	bh=GJA2IZkMBMWW8If3gOGLjX0xuApQQ+Jn3/E/O/UMfjs=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=lB7mP4rdwQ4jz8uEuufZTKazyMq2pWqMo53ATO/OCNTGARvfuac8imhqx6KNXqq7Hj4MhooDASktwLibwtwpYvvyR5yqOkj/4eg1rTrSe/4tfBKzfkvowMoCYVK6HXq6+P+BHEMa+qTnECeUUYSE3ik9veRFThbBPaV66HI5E68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZdN9lpRJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1745279118; c=relaxed/simple;
+	bh=dj+7ywLfjANsmePgmSvClDrZkt4qpwdzzeGNtOFPhn8=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=XNkT7B2WmDlP9CAF6OjXCZ7azJslZh+RAHi0nbg1MizfkgWYyhWyFfYc3SkLZq5Pq+2vBq7VJNo857P2Yym6WRCijEgl9h00XFFu5njzbIYdMdIAfC8AdNW3YFt9XbU0zF6jYlahub4IsV1rKzpPysb4AMTrzB2luip930uk37Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=VZKCxIE1; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZdN9lpRJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DADFC4CEE2;
-	Sat, 19 Apr 2025 03:30:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745033400;
-	bh=GJA2IZkMBMWW8If3gOGLjX0xuApQQ+Jn3/E/O/UMfjs=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ZdN9lpRJuPFQYrLRKOO/BLHjoX7XrZ3Na60adCBQ6XsGSuuErW7zDH4kExYAWHPMi
-	 yU8hucdbMrgVdRd/RYIoIZa27H1BpYBU9jRjh7Sjg0kUFdTHw3tSiIC5NQau5w2v1b
-	 nh14cys4tMuvzhA49z1+QYk4ypr5v1/yCAmkkWJQMvY7HZ9oQLdv5eGeSAiS6uMRyO
-	 lC0R7skw/H0aaIED+weVJJZeDJMFJ6IKdqWTlU4wNaWCAO22KS583UKkhWacVnTpyd
-	 CeuhVe1s2cy1Lc05b4vVe4U4kfvMWAfE9BSRFZgUZXepXrs2hST6HKRsswwp94sTIo
-	 sxFMQTjpXtAkg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7478B3806642;
-	Sat, 19 Apr 2025 03:30:39 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msf5GpS_RV3-apwDGuVMVDWsiWfeKfRy55xnTbjMvPCXw@mail.gmail.com>
-References: <CAH2r5msf5GpS_RV3-apwDGuVMVDWsiWfeKfRy55xnTbjMvPCXw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msf5GpS_RV3-apwDGuVMVDWsiWfeKfRy55xnTbjMvPCXw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 95d2b9f693ff2a1180a23d7d59acc0c4e72f4c41
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8560697b23dc2f405cb463af2b17256a9888129d
-Message-Id: <174503343822.382492.14831471178986691172.pr-tracker-bot@kernel.org>
-Date: Sat, 19 Apr 2025 03:30:38 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="VZKCxIE1"
+Message-ID: <53697288e2891aea51061c54a2e42595@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1745279107;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9o5XLEyuOIwgGpG/sATH1xHXsQN9/52ZRpOOGo34RIw=;
+	b=VZKCxIE1ZNfdou1GVm8PI3ljYZk/A/QjSLSE3zHVyhL8+KBYNrGIumKFDzRzB8h0F+Os8U
+	FOEVGPDmKZrfYLSZjAqM+X/FSBWOuh50Zx4LMlE/AkfQksO7iqk9K0MZKyxIDtejCDckRa
+	RU+ZSx0cY6vuemq8cdUYQgTRhgd8UF6NCik0+28Ra3rfMS+MI3Pnr7eRfmPwgCRbS42DzT
+	ZqO+UOIoB81zUvdfvKUj6vMB5eAc1hnfv3akeUTFqxYW4DW5bEw7hnRwRrJ7ieQqbIqDIN
+	d7p37pZNhrODOt31nxZDuHUFyACOWmLBR2FLdRSTHC6bNo111HeHSsEkdsDvlQ==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Nicolas Baranger <nicolas.baranger@3xo.fr>
+Cc: Christoph Hellwig <hch@infradead.org>, hch@lst.de, David Howells
+ <dhowells@redhat.com>, netfs@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, Steve French
+ <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>, Christian Brauner
+ <brauner@kernel.org>
+Subject: Re: [netfs/cifs - Linux 6.14] loop on file cat + file copy when
+ files are on CIFS share
+In-Reply-To: <e63e7c7ec32e3014eb758fd6f8679f93@3xo.fr>
+References: <10bec2430ed4df68bde10ed95295d093@3xo.fr>
+ <35940e6c0ed86fd94468e175061faeac@3xo.fr> <Z-Z95ePf3KQZ2MnB@infradead.org>
+ <48685a06c2608b182df3b7a767520c1d@3xo.fr>
+ <F89FD4A3-FE54-4DB2-BA08-3BCC8843C60E@manguebit.com>
+ <5087f9cb3dc1487423de34725352f57c@3xo.fr>
+ <f12973bcf533a40ca7d7ed78846a0a10@manguebit.com>
+ <e63e7c7ec32e3014eb758fd6f8679f93@3xo.fr>
+Date: Mon, 21 Apr 2025 20:45:04 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-The pull request you sent on Fri, 18 Apr 2025 21:57:17 -0500:
+Nicolas Baranger <nicolas.baranger@3xo.fr> writes:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc2-smb3-client-fixes
+> If you need more traces or details on (both?) issues :
+>
+> - 1) infinite loop issue during 'cat' or 'copy' since Linux 6.14.0
+>
+> - 2) (don't know if it's related) the very high number of several bytes 
+> TCP packets transmitted in SMB transaction (more than a hundred) for a 5 
+> bytes file transfert under Linux 6.13.8
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8560697b23dc2f405cb463af2b17256a9888129d
+According to your mount options and network traces, cat(1) is attempting
+to read 16M from 'toto' file, in which case netfslib will create 256
+subrequests to handle 64K (rsize=65536) reads from 'toto' file.
 
-Thank you!
+The first 64K read at offset 0 succeeds and server returns 5 bytes, the
+client then sets NETFS_SREQ_HIT_EOF to indicate that this subrequest hit
+the EOF.  The next subrequests will still be processed by netfslib and
+sent to the server, but they all fail with STATUS_END_OF_FILE.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+So, the problem is with short DIO reads in netfslib that are not being
+handled correctly.  It is returning a fixed number of bytes read to
+every read(2) call in your cat command, 16711680 bytes which is the
+offset of last subrequest.  This will make cat(1) retry forever as
+netfslib is failing to return the correct number of bytes read,
+including EOF.
+
+While testing a potential fix, I also found other problems with DIO in
+cifs.ko, so I'm working with Dave to get the proper fixes for both
+netfslib and cifs.ko.
+
+I've noticed that you disabled caching with 'cache=none', is there any
+particular reason for that?
+
+Have you also set rsize, wsize and bsize mount options?  If so, why?
+
+If you want to keep 'cache=none', then a possible workaround for you
+would be making rsize and wsize always greater than bsize.  The default
+values (rsize=4194304,wsize=4194304,bsize=1048576) would do it.
