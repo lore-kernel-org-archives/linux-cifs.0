@@ -1,42 +1,40 @@
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8251FC7D2;
-	Tue, 22 Apr 2025 09:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B352B28FFCE;
+	Tue, 22 Apr 2025 15:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745313776; cv=none; b=dKSBRkQpXInMeg0c1PxcTRxLRuAjO3zdOxODlBI81nLOzEcy8LQ7X9BvCIa9CBLpvlZTjEOD5bF48bBNO7uBC7MNcBl4y1/4hIEwpySZe7b3dChZ1vmk96BqzdnicSTSVaGMdyo2xFnkMgY3a/jvGt5cLnl26otabd2fsXwsdlU=
+	t=1745337476; cv=none; b=JZ0AlqqZgmfNfnWr7wcL3bjZYqAP0hOEMJvH4NgELZrAJxn6qNK6Aoq+nrfDUJipUOVAU/Fetiwqm19qH8Bowx7JaXTgIIm+UqFL+t9ZPHnuX3VLX4pYuHz21kR/byP2r3sKXSpDDRd3/T1e5f4ry2cO+RbNxMKtOFOBHa7DP8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745313776; c=relaxed/simple;
-	bh=uWGbVysPajOQKohcpqrBOTow6Y2Kf/05/SAN9CvbHQE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hNTWm3/WEJtlKCbAHm6/ehuZwLxWj0z6FP6tmqXtSBKcFXWiyO1vZ8YbVwfYnPRA2bDaTytcHhPeUPAh2Q2Np787e4b1eP+u9c6XiN2Xit06PLtOikx8Rb3RSP8wjQ5tmOeAinCXUkF0po4PmSnDufL7Elat8BFRcc0ERXuatSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53M5A60G022725;
-	Tue, 22 Apr 2025 09:22:22 GMT
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4642t8ts58-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 22 Apr 2025 09:22:22 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Tue, 22 Apr 2025 02:22:21 -0700
-Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Tue, 22 Apr 2025 02:22:18 -0700
-From: <jianqi.ren.cn@windriver.com>
-To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
-CC: <ematsumiya@suse.de>, <stfrench@microsoft.com>, <sfrench@samba.org>,
-        <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <jianqi.ren.cn@windriver.com>
-Subject: [PATCH 5.10.y 1/2] smb: client: fix UAF in async decryption
-Date: Tue, 22 Apr 2025 17:22:17 +0800
-Message-ID: <20250422092217.3645955-1-jianqi.ren.cn@windriver.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1745337476; c=relaxed/simple;
+	bh=nOVpKy3jqx62b5bOmiRTyMPuQ10tlaPUBxG7nY/4zF0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bVylgalTqkpeTL+djmy6up/mNLFobWL4Mbf1OFPaiMoySVrkegB6XAgSPBgtfyPv/GyU6RxTTXUVmHf3ORxYv8vQFUnUpmznZZiGxLaOz+LfanKkFZk2AxA2khXVfPydZ3Trhd9Jgn25crLIy1GLPkaKqMTCRcqBh5t5swquxWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=qSTBfM5M; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="qSTBfM5M"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1745337472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zpPkMc+aX6PvkAKJO9eveJu/BgjOWzCS8iVQd+mjHdE=;
+	b=qSTBfM5MgmyRaoB3Y3yK4RUzGGbTTs6ZxohlW4DgErw50Iih5+cVDGRN7kQm+FYkxyeQ4V
+	7uFOpeevBStdpDJ2sDCE2BAITyDKZ4C5bFhvheLkajNh+4tv3tldP4QMjW6rrQkrbqCIuc
+	t5Fndq/L8jCii6HmyIuHSEv4EDIU3bEs7zNNtW4YsKchCTg7h5BWx+n+P11m62GOu/TSxN
+	jP6C5dADJcW7FZRQ9PUJCWGroSGpP3PRMllXEWb9ZpYKspTIqkgvfh0t+HLPp/hAuK60Hf
+	CgWgK4Tx2FuGXTXnxF+LZyJZWPeCZQVAKvwwIKZrYiW106ocmG+PO3dOW9jMpg==
+To: brauner@kernel.org
+Cc: netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	Nicolas Baranger <nicolas.baranger@3xo.fr>
+Subject: [PATCH] netfs: Fix setting of transferred bytes with short DIO reads
+Date: Tue, 22 Apr 2025 12:57:49 -0300
+Message-ID: <20250422155749.344136-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -44,211 +42,111 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 8FepGy-MgCw9yDvo-P9ocXYlmXF0e0L4
-X-Proofpoint-GUID: 8FepGy-MgCw9yDvo-P9ocXYlmXF0e0L4
-X-Authority-Analysis: v=2.4 cv=TJ9FS0la c=1 sm=1 tr=0 ts=68075fce cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=XR8D0OoHHMoA:10 a=ID6ng7r3AAAA:8 a=yMhMjlubAAAA:8 a=t7CeM3EgAAAA:8 a=DEdtFxlGgKspwUSy9V0A:9 a=AkheI1RvQwOzcTXhi5f4:22
- a=FdTzh2GWekK77mhwV6Dw:22
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-22_04,2025-04-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- priorityscore=1501 clxscore=1015 suspectscore=0 lowpriorityscore=0
- malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
- definitions=main-2504220070
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+A netfslib request comprises an ordered stream of subrequests that,
+when doing an unbuffered/DIO read, are contiguous.  The subrequests
+may be performed in parallel, but may not be fully completed.
 
-commit b0abcd65ec545701b8793e12bc27dc98042b151a upstream.
+For instance, if we try and make a 256KiB DIO read from a 3-byte file
+with a 64KiB rsize and 256KiB bsize, netfslib will attempt to make a
+read of 256KiB, broken up into four 64KiB subreads, with the
+expectation that the first will be short and the subsequent three be
+completely devoid - but we do all four on the basis that the file may
+have been changed by a third party.
 
-Doing an async decryption (large read) crashes with a
-slab-use-after-free way down in the crypto API.
+The read-collection code, however, walks through all the subreqs and
+advances the notion of how much data has been read in the stream to
+the start of each subreq plus its amount transferred (which are 3, 0,
+0, 0 for the example above) - which gives an amount apparently read of
+3*64KiB - which is incorrect.
 
-Reproducer:
-    # mount.cifs -o ...,seal,esize=1 //srv/share /mnt
-    # dd if=/mnt/largefile of=/dev/null
-    ...
-    [  194.196391] ==================================================================
-    [  194.196844] BUG: KASAN: slab-use-after-free in gf128mul_4k_lle+0xc1/0x110
-    [  194.197269] Read of size 8 at addr ffff888112bd0448 by task kworker/u77:2/899
-    [  194.197707]
-    [  194.197818] CPU: 12 UID: 0 PID: 899 Comm: kworker/u77:2 Not tainted 6.11.0-lku-00028-gfca3ca14a17a-dirty #43
-    [  194.198400] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.2-3-gd478f380-prebuilt.qemu.org 04/01/2014
-    [  194.199046] Workqueue: smb3decryptd smb2_decrypt_offload [cifs]
-    [  194.200032] Call Trace:
-    [  194.200191]  <TASK>
-    [  194.200327]  dump_stack_lvl+0x4e/0x70
-    [  194.200558]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.200809]  print_report+0x174/0x505
-    [  194.201040]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-    [  194.201352]  ? srso_return_thunk+0x5/0x5f
-    [  194.201604]  ? __virt_addr_valid+0xdf/0x1c0
-    [  194.201868]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.202128]  kasan_report+0xc8/0x150
-    [  194.202361]  ? gf128mul_4k_lle+0xc1/0x110
-    [  194.202616]  gf128mul_4k_lle+0xc1/0x110
-    [  194.202863]  ghash_update+0x184/0x210
-    [  194.203103]  shash_ahash_update+0x184/0x2a0
-    [  194.203377]  ? __pfx_shash_ahash_update+0x10/0x10
-    [  194.203651]  ? srso_return_thunk+0x5/0x5f
-    [  194.203877]  ? crypto_gcm_init_common+0x1ba/0x340
-    [  194.204142]  gcm_hash_assoc_remain_continue+0x10a/0x140
-    [  194.204434]  crypt_message+0xec1/0x10a0 [cifs]
-    [  194.206489]  ? __pfx_crypt_message+0x10/0x10 [cifs]
-    [  194.208507]  ? srso_return_thunk+0x5/0x5f
-    [  194.209205]  ? srso_return_thunk+0x5/0x5f
-    [  194.209925]  ? srso_return_thunk+0x5/0x5f
-    [  194.210443]  ? srso_return_thunk+0x5/0x5f
-    [  194.211037]  decrypt_raw_data+0x15f/0x250 [cifs]
-    [  194.212906]  ? __pfx_decrypt_raw_data+0x10/0x10 [cifs]
-    [  194.214670]  ? srso_return_thunk+0x5/0x5f
-    [  194.215193]  smb2_decrypt_offload+0x12a/0x6c0 [cifs]
+Fix the collection code to cut short the calculation of the
+transferred amount with the first short subrequest in an unbuffered
+read; everything beyond that must be ignored as there's a hole that
+cannot be filled.  This applies both to shortness due to hitting the
+EOF and shortness due to an error.
 
-This is because TFM is being used in parallel.
+This is achieved by setting a flag on the request when we collect the
+first short subrequest (collection is done in ascending order).
 
-Fix this by allocating a new AEAD TFM for async decryption, but keep
-the existing one for synchronous READ cases (similar to what is done
-in smb3_calc_signature()).
+This can be tested by mounting a cifs volume with
+rsize=65536,bsize=262144 and doing a 256k DIO read of a very small
+file (e.g. 3 bytes).  read() should return 3, not >3.
 
-Also remove the calls to aead_request_set_callback() and
-crypto_wait_req() since it's always going to be a synchronous operation.
+This problem came in when netfs_read_collection() set
+rreq->transferred to stream->transferred, even for DIO.  Prior to
+that, netfs_rreq_assess_dio() just went over the list and added up the
+subreqs till it met a short one - but now the subreqs are discarded
+earlier.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[In linux-5.10, dec and enc fields are named ccmaesdecrypt and ccmaesencrypt.]
-Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
-Signed-off-by: He Zhe <zhe.he@windriver.com>
+Cc: netfs@lists.linux.dev
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-cifs@vger.kernel.org
+Reported-by: Nicolas Baranger <nicolas.baranger@3xo.fr>
+Closes: https://lore.kernel.org/all/10bec2430ed4df68bde10ed95295d093@3xo.fr/
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
-Verified the build test
----
- fs/cifs/smb2ops.c | 48 +++++++++++++++++++++++++++--------------------
- fs/cifs/smb2pdu.c |  6 ++++++
- 2 files changed, 34 insertions(+), 20 deletions(-)
+ fs/netfs/read_collect.c | 21 +++++----------------
+ include/linux/netfs.h   |  1 +
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 70a4d101b542..aa1acc698caa 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -4291,7 +4291,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index 23c75755ad4e..d3cf27b2697c 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -280,9 +280,13 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
+ 			stream->need_retry = true;
+ 			notes |= NEED_RETRY | MADE_PROGRESS;
+ 			break;
++		} else if (test_bit(NETFS_RREQ_SHORT_TRANSFER, &rreq->flags)) {
++			notes |= MADE_PROGRESS;
+ 		} else {
+ 			if (!stream->failed)
+-				stream->transferred = stream->collected_to - rreq->start;
++				stream->transferred += transferred;
++			if (front->transferred < front->len)
++				set_bit(NETFS_RREQ_SHORT_TRANSFER, &rreq->flags);
+ 			notes |= MADE_PROGRESS;
+ 		}
+ 
+@@ -342,23 +346,8 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
   */
- static int
- crypt_message(struct TCP_Server_Info *server, int num_rqst,
--	      struct smb_rqst *rqst, int enc)
-+	      struct smb_rqst *rqst, int enc, struct crypto_aead *tfm)
+ static void netfs_rreq_assess_dio(struct netfs_io_request *rreq)
  {
- 	struct smb2_transform_hdr *tr_hdr =
- 		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
-@@ -4302,8 +4302,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	u8 key[SMB3_ENC_DEC_KEY_SIZE];
- 	struct aead_request *req;
- 	u8 *iv;
--	DECLARE_CRYPTO_WAIT(wait);
--	struct crypto_aead *tfm;
- 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
- 	void *creq;
+-	struct netfs_io_subrequest *subreq;
+-	struct netfs_io_stream *stream = &rreq->io_streams[0];
+ 	unsigned int i;
  
-@@ -4314,15 +4312,6 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 		return rc;
- 	}
- 
--	rc = smb3_crypto_aead_allocate(server);
--	if (rc) {
--		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
--		return rc;
+-	/* Collect unbuffered reads and direct reads, adding up the transfer
+-	 * sizes until we find the first short or failed subrequest.
+-	 */
+-	list_for_each_entry(subreq, &stream->subrequests, rreq_link) {
+-		rreq->transferred += subreq->transferred;
+-
+-		if (subreq->transferred < subreq->len ||
+-		    test_bit(NETFS_SREQ_FAILED, &subreq->flags)) {
+-			rreq->error = subreq->error;
+-			break;
+-		}
 -	}
 -
--	tfm = enc ? server->secmech.ccmaesencrypt :
--						server->secmech.ccmaesdecrypt;
--
- 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
- 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
- 		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
-@@ -4361,11 +4350,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
- 	aead_request_set_ad(req, assoc_data_len);
- 
--	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  crypto_req_done, &wait);
--
--	rc = crypto_wait_req(enc ? crypto_aead_encrypt(req)
--				: crypto_aead_decrypt(req), &wait);
-+	rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
- 
- 	if (!rc && enc)
- 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
-@@ -4454,7 +4439,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
- 	/* fill the 1st iov with a transform header */
- 	fill_transform_hdr(tr_hdr, orig_len, old_rq, server->cipher_type);
- 
--	rc = crypt_message(server, num_rqst, new_rq, 1);
-+	rc = crypt_message(server, num_rqst, new_rq, 1, server->secmech.ccmaesencrypt);
- 	cifs_dbg(FYI, "Encrypt message returned %d\n", rc);
- 	if (rc)
- 		goto err_free;
-@@ -4480,8 +4465,9 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
- 		 unsigned int npages, unsigned int page_data_size,
- 		 bool is_offloaded)
- {
--	struct kvec iov[2];
-+	struct crypto_aead *tfm;
- 	struct smb_rqst rqst = {NULL};
-+	struct kvec iov[2];
- 	int rc;
- 
- 	iov[0].iov_base = buf;
-@@ -4496,9 +4482,31 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
- 	rqst.rq_pagesz = PAGE_SIZE;
- 	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
- 
--	rc = crypt_message(server, 1, &rqst, 0);
-+	if (is_offloaded) {
-+		if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
-+		    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
-+			tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
-+		else
-+			tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
-+		if (IS_ERR(tfm)) {
-+			rc = PTR_ERR(tfm);
-+			cifs_server_dbg(VFS, "%s: Failed alloc decrypt TFM, rc=%d\n", __func__, rc);
-+
-+			return rc;
-+		}
-+	} else {
-+		if (unlikely(!server->secmech.ccmaesdecrypt))
-+			return -EIO;
-+
-+		tfm = server->secmech.ccmaesdecrypt;
-+	}
-+
-+	rc = crypt_message(server, 1, &rqst, 0, tfm);
- 	cifs_dbg(FYI, "Decrypt message returned %d\n", rc);
- 
-+	if (is_offloaded)
-+		crypto_free_aead(tfm);
-+
- 	if (rc)
- 		return rc;
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 03651cc6b7a5..245e2dd5a194 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -998,6 +998,12 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		else
- 			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
- 	}
-+
-+	if (server->cipher_type && !rc) {
-+		rc = smb3_crypto_aead_allocate(server);
-+		if (rc)
-+			cifs_server_dbg(VFS, "%s: crypto alloc failed, rc=%d\n", __func__, rc);
-+	}
- neg_exit:
- 	free_rsp_buf(resp_buftype, rsp);
- 	return rc;
+ 	if (rreq->origin == NETFS_DIO_READ) {
+ 		for (i = 0; i < rreq->direct_bv_count; i++) {
+ 			flush_dcache_page(rreq->direct_bv[i].bv_page);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index c86a11cfc4a3..497c4f4698f6 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -279,6 +279,7 @@ struct netfs_io_request {
+ #define NETFS_RREQ_USE_IO_ITER		12	/* Use ->io_iter rather than ->i_pages */
+ #define NETFS_RREQ_ALL_QUEUED		13	/* All subreqs are now queued */
+ #define NETFS_RREQ_RETRYING		14	/* Set if we're in the retry path */
++#define NETFS_RREQ_SHORT_TRANSFER	15	/* Set if we have a short transfer */
+ #define NETFS_RREQ_USE_PGPRIV2		31	/* [DEPRECATED] Use PG_private_2 to mark
+ 						 * write to cache on read */
+ 	const struct netfs_request_ops *netfs_ops;
 -- 
-2.34.1
+2.49.0
 
