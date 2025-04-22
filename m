@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A044922B8AC;
-	Tue, 22 Apr 2025 02:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE2A25D539;
+	Tue, 22 Apr 2025 02:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745288179; cv=none; b=kEgEsw7+vxZVpZ3D1njpMc2cXxM6CHX/Kk+CB2ioOCJJrh67oEhJdnjI5k8MD9fWswoHBGuJBFd44RKrcgy6fr8D2cogxpSriswt2WfcXIs7gnQVPXnZZkS4/DExSckCpfLzRG4eEGfqRvjZlPaQyQ+ROCJ8yTppnJHxHZu4StI=
+	t=1745288244; cv=none; b=O8eW36rG1IqRwiz+GFwpP7YgeYA0L4Gz+nBzR300kce2DRRsP8p0qyT94VF2HihUT24qs9H/8ywe02UagB0DGGgQbRDTRlZr3zUN1QD8+LqqWfUwex5ySu3IsLoHiZBeaavOKcZuI3f8JkQFs6bpLc9i5WfL7f+ZarxO6W/Kk+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745288179; c=relaxed/simple;
-	bh=FJMgANxdsDgKGAn/rJiLB9bthwkY2F8ru5xRoHJDE7A=;
+	s=arc-20240116; t=1745288244; c=relaxed/simple;
+	bh=jjLRC7SqUn3P6gxPbFOGJfP6RXj0oceVDJWU6lA0vIw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eXtRFIoqSyvCsJ1L/UO2dy/EyHUb4rfQ5LI9rUuFdSKdQOxAfO27wDxGurMDTQkijPHHAEcIrN8HP/Fa9EA1KJwHKSwJsp8wNBpwe++RDzDpjqU6Se1/3e5FcDzGT+lplyPImW5+lmato1zCDLlhXcoR8yPEMzkybOb8bT6OZbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SJ1aHFCK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PMyJVBrteQo7oP0MP68b5PneL6j4DQ43VNZk20lVNvRlgs8BcLanllD/mwUS2arF+PiVHMN8sT6MYmFKfPm7U/eMJt2pC4tGpYUHESmiZqTcLRw0QgYrQ56W423x6+ueRUTx0Z6PvV9duCjTSNq91ExKfvZf+RGbSBVTps6OW3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vw4VO1sL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SJ1aHFCK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2BCCC4CEEC;
-	Tue, 22 Apr 2025 02:16:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vw4VO1sL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AABEC4CEE4;
+	Tue, 22 Apr 2025 02:17:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745288179;
-	bh=FJMgANxdsDgKGAn/rJiLB9bthwkY2F8ru5xRoHJDE7A=;
+	s=k20201202; t=1745288244;
+	bh=jjLRC7SqUn3P6gxPbFOGJfP6RXj0oceVDJWU6lA0vIw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SJ1aHFCKW7q06BfOoI9IEC+UdXX+VfRJxbRmAxRQ+3xE903vs99ccIc0BOvDi9Bnp
-	 UMn3RrBtymV12EN9egnz610Ty6s81yaYTe0h8i/JVttCX+YujnhPa49MbyimR13akn
-	 pI/shCD1ECToOBTTTeXAKfYIsoUrXvHSatmcgd4jXhtOkomZNjBZUy9X1kuNsjnS82
-	 t7RMHNs5q/MDHp4B+Q1QU9/GIkTDddKWYr6nbreyQOBLL0vkzw+yzi956IM7opeTKm
-	 t0mXMva836rTfiro0YMCiE49imtPiuX/b6VPbXAHEhkIVm6sFsOgdB1RItB1YkuzPx
-	 h65PXDKhyYWjQ==
+	b=Vw4VO1sLyjEwHQh68lY7KfKjAcej77hz9Qw5eSiUAAHMZ9GnzOZJMzKlEqke5E6fW
+	 nBlhVR2LPF19VliMpo6u05vWnEPe8Qhfq9MPUYhY8gwWQ2FlHj+IOovuCcdcvr3UKd
+	 nGlWIKhSsufQ/LmT6xDSSH7RzuD+lp4W1LlCsID5RFZF0Mhcaj1kVpSVfAz+HW7uKB
+	 kOBuKvuYAvbL+UJ6g7gLT2QaL6V1eCAAtMOOd9wle0QT9On/X/N1CX76AEagFTg/Sl
+	 uzrDNu1qWjK/oOsuSI20x7YtN18iJKYytZRbzVBVWQsnRcujMtl8tTAKoBfDBOWt43
+	 l15q6XAJ04VAQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -34,12 +34,12 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 15/30] ksmbd: fix WARNING "do not call blocking ops when !TASK_RUNNING"
-Date: Mon, 21 Apr 2025 22:15:35 -0400
-Message-Id: <20250422021550.1940809-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 12/23] ksmbd: fix WARNING "do not call blocking ops when !TASK_RUNNING"
+Date: Mon, 21 Apr 2025 22:16:52 -0400
+Message-Id: <20250422021703.1941244-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250422021550.1940809-1-sashal@kernel.org>
-References: <20250422021550.1940809-1-sashal@kernel.org>
+In-Reply-To: <20250422021703.1941244-1-sashal@kernel.org>
+References: <20250422021703.1941244-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,7 +48,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.3
+X-stable-base: Linux 6.12.24
 Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
@@ -75,7 +75,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 8d1f30dcba7e8..1f8fa3468173a 100644
+index a19f4e563c7e5..73577f868a00b 100644
 --- a/fs/smb/server/vfs_cache.c
 +++ b/fs/smb/server/vfs_cache.c
 @@ -713,12 +713,8 @@ static bool tree_conn_fd_check(struct ksmbd_tree_connect *tcon,
