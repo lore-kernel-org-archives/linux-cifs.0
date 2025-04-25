@@ -1,93 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14732356CD
-	for <linux-cifs@vger.kernel.org>; Fri, 25 Apr 2025 09:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A0F2CCC1;
+	Fri, 25 Apr 2025 17:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745574235; cv=none; b=sm+EDjc1Jws+NQhC1pCaA84UzC52tyx8qivg9vlabpJPWSfIKqz4CcZw/XM639u0VZtjaobI7EFPBtLLI912nu82puiqyIBoLak523T2z9DK/hWqfDmaBIdwoqfZnR8c07BbzbWWLgg7YffU5zfqju1IkPZ3R1lhcP1u7afxZXQ=
+	t=1745601247; cv=none; b=n7adftFCt5zT2iCdpxCrcAtePTi2XmyqDpusARVIYh0kwEqcpVXxON/bGccAHDDlp9wCN63XfHhNCOuURDxQP5Kdo8n94eSgtkL1OtXuz35bMmhLvDM92jUMQrTp8tee3XiTpOfZ0RoQ9TOAHqC6WgjXnTkTIC2hDrU5T1tMoho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745574235; c=relaxed/simple;
-	bh=bOHZCU29aYU2ruSDQcNzuiOVNPD3DC1c1fbQCYrTXaY=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=alQsJq4km/ED1LcDeutMjTYssCGuhcb9eGrKDU4SSRyQ5lvv/NvRQFJgGoiiQ5jk2fEU/63zHkbxa+zfTFHaBngzbhujyPpn4+gx6NUD8uCKZyNl+BBpKDkd7VYPhuStio6qQ9OflPmp4LmRVMmFPdyiovdCwt3uvMi/LJLq4G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d+234xXU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+234xXU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745574232;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9FpU9yg73MLhDi4cgcJs60rCajnYVaSA96rYIRaVBKA=;
-	b=d+234xXUirwJAVKDp3n2X64CsaXG0egQE+tca7Zb5E9qhKauHtWX3TaLZmkJwn4P4s97+A
-	TIYuoyqkt5AdWAgUFGu3siAFH9Xh9Ek8smtmKqrB4BStg+q7NjMNY4hS95qnkbom98YK78
-	zF72qfqpA68em8SOj0kiQigf4osBzwo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441--HVbqfltNde2DXDlyeasXg-1; Fri,
- 25 Apr 2025 05:43:49 -0400
-X-MC-Unique: -HVbqfltNde2DXDlyeasXg-1
-X-Mimecast-MFC-AGG-ID: -HVbqfltNde2DXDlyeasXg_1745574228
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D567D1800877;
-	Fri, 25 Apr 2025 09:43:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0336419560A3;
-	Fri, 25 Apr 2025 09:43:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
+	s=arc-20240116; t=1745601247; c=relaxed/simple;
+	bh=X9TjP51L1gcCH8zQYlWIeUnFmHKTLoICB255JpYXPNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V5fVhB0JHgxC63RzTZR0q3xLzmdt+9mMIMmPMNsmyO4GF+rFjWxeJd06j16Fbb4GW/VxaSHwQySzQuajdYzjhxnywoMzGMgZOrRgt31MiwmZxwA2fUw+O7gMNyS+iO00Q0bqTsU9WA9T50yM4lP7hF/FCftmm6KoeiY/tYzCBdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AA45C4CEE4;
+	Fri, 25 Apr 2025 17:14:06 +0000 (UTC)
+Date: Fri, 25 Apr 2025 13:16:04 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+ David Howells <dhowells@redhat.com>, linux-nfs@vger.kernel.org, Miklos
+ Szeredi <miklos@szeredi.hu>, linux-cifs@vger.kernel.org
+Subject: Re: [RFC][PATCH] saner calling conventions for ->d_automount()
+Message-ID: <20250425131604.777d4dc1@gandalf.local.home>
 In-Reply-To: <20250424060845.GG2023217@ZenIV>
 References: <20250424060845.GG2023217@ZenIV>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-    Christian Brauner <brauner@kernel.org>, linux-nfs@vger.kernel.org,
-    Steven Rostedt <rostedt@goodmis.org>,
-    Miklos Szeredi <miklos@szeredi.hu>, linux-cifs@vger.kernel.org
-Subject: Re: [RFC][PATCH] saner calling conventions for ->d_automount()
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3616486.1745574223.1@warthog.procyon.org.uk>
-Date: Fri, 25 Apr 2025 10:43:43 +0100
-Message-ID: <3616487.1745574223@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 24 Apr 2025 07:08:45 +0100
 Al Viro <viro@zeniv.linux.org.uk> wrote:
 
-> Currently the calling conventions for ->d_automount() instances have
-> an odd wart - returned new mount to be attached is expected to have
-> refcount 2.
-> 
-> That kludge is intended to make sure that mark_mounts_for_expiry() called
-> before we get around to attaching that new mount to the tree won't decide
-> to take it out.  finish_automount() drops the extra reference after it's
-> done with attaching mount to the tree - or drops the reference twice in
-> case of error.  ->d_automount() instances have rather counterintuitive
-> boilerplate in them.
-> 
-> There's a much simpler approach: have mark_mounts_for_expiry() skip the
-> mounts that are yet to be mounted.  And to hell with grabbing/dropping
-> those extra references.  Makes for simpler correctness analysis, at that...
->     
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> index 8ddf6b17215c..fa488721019f 100644
+> --- a/kernel/trace/trace.c
+> +++ b/kernel/trace/trace.c
+> @@ -10085,8 +10085,6 @@ static struct vfsmount *trace_automount(struct dentry *mntpt, void *ingore)
+>  	put_filesystem(type);
+>  	if (IS_ERR(mnt))
+>  		return NULL;
+> -	mntget(mnt);
+> -
+>  	return mnt;
+>  }
 
-You can test this by installing the kafs-client package, telling systemd to
-start afs.mount and then doing "ls /afs/openafs.org/doc", say.
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-Acked-by: David Howells <dhowells@redhat.com>
-Tested-by: David Howells <dhowells@redhat.com>
-
+-- Steve
