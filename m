@@ -1,133 +1,93 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D8E18BBB0
-	for <linux-cifs@vger.kernel.org>; Thu, 24 Apr 2025 15:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14732356CD
+	for <linux-cifs@vger.kernel.org>; Fri, 25 Apr 2025 09:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745507101; cv=none; b=aX3vfFmp/uOQqNBEFOeM1p8uIAQ1zoptrZwOFiLJKgtC/M6W/wJAaqynl9JzkeWYlgyG2+w3WCSJ4/jgUc2n4+JgefYHFKc0BB97qHP5Hb4WqXWZng1xd4qaj2Oa/fOO6IR/CaFF06dwyMrOZuvRgZdyq4kUFdSvLCux7jd35gA=
+	t=1745574235; cv=none; b=sm+EDjc1Jws+NQhC1pCaA84UzC52tyx8qivg9vlabpJPWSfIKqz4CcZw/XM639u0VZtjaobI7EFPBtLLI912nu82puiqyIBoLak523T2z9DK/hWqfDmaBIdwoqfZnR8c07BbzbWWLgg7YffU5zfqju1IkPZ3R1lhcP1u7afxZXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745507101; c=relaxed/simple;
-	bh=/exFxDk8UUCPx5iCgfXBWGQN5ob8iA+WNf5MlrDS2nI=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ReXzYT18gKUq6IHPiQhtm18dhAzNKpGm2Zwmpm4nsTyQ9wbqK+w1eHegszOqBfneqqpET0GZkw3th7VJoi1EhaWW7j9q1w0n3+OxMkor9Ilz8du3vhQBWH5Em6I0kTSOaVBNM00hW4iYwYr/xHQuukpCzZjc7rrsC3QlNl5Xef8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gsMtucg0; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1745574235; c=relaxed/simple;
+	bh=bOHZCU29aYU2ruSDQcNzuiOVNPD3DC1c1fbQCYrTXaY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=alQsJq4km/ED1LcDeutMjTYssCGuhcb9eGrKDU4SSRyQ5lvv/NvRQFJgGoiiQ5jk2fEU/63zHkbxa+zfTFHaBngzbhujyPpn4+gx6NUD8uCKZyNl+BBpKDkd7VYPhuStio6qQ9OflPmp4LmRVMmFPdyiovdCwt3uvMi/LJLq4G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d+234xXU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gsMtucg0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=QdaEnh440KuOkVWxvPUuQOVVV+9fv0zxTqjxWn5kwvQ=; b=gsMtucg0UdXLYJITh+f+UwcKaY
-	iP8/PiVTqIOuw1qkv9Ckxvp19palSKP5dE9tU96DRtvI5hHLRHbIvxah6iY0d8xtGkQLIPX3o/w1p
-	xXYOsfpuM/YLeu+VzibuNQ2pa+bX5+P91wLmLMsxdOJQ+DoBxYEd98cdX/YFty84gZkufyJBDwvip
-	jswKiyrXzhvoaNmEeHnzezYlgl+gJmnBBIJxh5cYbeDym+pepErH1z6q2js2m3T4dRRYsc5jvizSr
-	a45FYuoYHZY4+/Wxr2+JZVP1r9rayIDY0WUjERZRLFH1ubl8TCoYA0F5v7EUQSMSy5lgPipsrWd9H
-	rk1zNy1g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1u7y8E-000jeg-1Z;
-	Thu, 24 Apr 2025 23:04:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Apr 2025 23:04:54 +0800
-Date: Thu, 24 Apr 2025 23:04:54 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: cifs: Do not include crypto/internal header files
-Message-ID: <aApTFgDKVzgS_HFZ@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+234xXU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1745574232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9FpU9yg73MLhDi4cgcJs60rCajnYVaSA96rYIRaVBKA=;
+	b=d+234xXUirwJAVKDp3n2X64CsaXG0egQE+tca7Zb5E9qhKauHtWX3TaLZmkJwn4P4s97+A
+	TIYuoyqkt5AdWAgUFGu3siAFH9Xh9Ek8smtmKqrB4BStg+q7NjMNY4hS95qnkbom98YK78
+	zF72qfqpA68em8SOj0kiQigf4osBzwo=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-441--HVbqfltNde2DXDlyeasXg-1; Fri,
+ 25 Apr 2025 05:43:49 -0400
+X-MC-Unique: -HVbqfltNde2DXDlyeasXg-1
+X-Mimecast-MFC-AGG-ID: -HVbqfltNde2DXDlyeasXg_1745574228
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D567D1800877;
+	Fri, 25 Apr 2025 09:43:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0336419560A3;
+	Fri, 25 Apr 2025 09:43:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250424060845.GG2023217@ZenIV>
+References: <20250424060845.GG2023217@ZenIV>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
+    Christian Brauner <brauner@kernel.org>, linux-nfs@vger.kernel.org,
+    Steven Rostedt <rostedt@goodmis.org>,
+    Miklos Szeredi <miklos@szeredi.hu>, linux-cifs@vger.kernel.org
+Subject: Re: [RFC][PATCH] saner calling conventions for ->d_automount()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3616486.1745574223.1@warthog.procyon.org.uk>
+Date: Fri, 25 Apr 2025 10:43:43 +0100
+Message-ID: <3616487.1745574223@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Any files under crypto/internal should not be included by users
-outside of the Crypto API.
+Al Viro <viro@zeniv.linux.org.uk> wrote:
 
-Remove crypto/internal/hash.h from cifsglob.h and add crypto/hash.h
-to the files where the hash API is actually used.
+> Currently the calling conventions for ->d_automount() instances have
+> an odd wart - returned new mount to be attached is expected to have
+> refcount 2.
+> 
+> That kludge is intended to make sure that mark_mounts_for_expiry() called
+> before we get around to attaching that new mount to the tree won't decide
+> to take it out.  finish_automount() drops the extra reference after it's
+> done with attaching mount to the tree - or drops the reference twice in
+> case of error.  ->d_automount() instances have rather counterintuitive
+> boilerplate in them.
+> 
+> There's a much simpler approach: have mark_mounts_for_expiry() skip the
+> mounts that are yet to be mounted.  And to hell with grabbing/dropping
+> those extra references.  Makes for simpler correctness analysis, at that...
+>     
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+You can test this by installing the kafs-client package, telling systemd to
+start afs.mount and then doing "ls /afs/openafs.org/doc", say.
 
-diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index e69968e88fe7..dd143f6e629b 100644
---- a/fs/smb/client/cifsencrypt.c
-+++ b/fs/smb/client/cifsencrypt.c
-@@ -24,6 +24,7 @@
- #include <linux/iov_iter.h>
- #include "../common/arc4.h"
- #include <crypto/aead.h>
-+#include <crypto/hash.h>
- 
- static size_t cifs_shash_step(void *iter_base, size_t progress, size_t len,
- 			      void *priv, void *priv2)
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 07c4688ec4c9..167a42f190c5 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -22,7 +22,6 @@
- #include <linux/netfs.h>
- #include "cifs_fs_sb.h"
- #include "cifsacl.h"
--#include <crypto/internal/hash.h>
- #include <uapi/linux/cifs/cifs_mount.h>
- #include "../common/smb2pdu.h"
- #include "smb2pdu.h"
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index 769752ad2c5c..e13671869e0c 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -5,6 +5,7 @@
-  *   Author(s): Steve French (sfrench@us.ibm.com)
-  *
-  */
-+#include <crypto/hash.h>
- #include <linux/fs.h>
- #include <linux/stat.h>
- #include <linux/slab.h>
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 7b6ed9b23e71..b283ed0f46e2 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -6,6 +6,7 @@
-  *
-  */
- 
-+#include <crypto/hash.h>
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/mempool.h>
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index cddf273c14ae..caf06548657d 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -7,6 +7,7 @@
-  *              Pavel Shilovsky (pshilovsky@samba.org) 2012
-  *
-  */
-+#include <crypto/hash.h>
- #include <linux/ctype.h>
- #include "cifsglob.h"
- #include "cifsproto.h"
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 475b36c27f65..304370befcd4 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -19,6 +19,7 @@
- #include <linux/mempool.h>
- #include <linux/highmem.h>
- #include <crypto/aead.h>
-+#include <crypto/hash.h>
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "smb2proto.h"
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: David Howells <dhowells@redhat.com>
+Tested-by: David Howells <dhowells@redhat.com>
+
