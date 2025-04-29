@@ -1,347 +1,162 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E47E1EB5CE
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Apr 2025 15:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144978BEE
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Apr 2025 16:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745941059; cv=none; b=J/MFkbdQdmPPOcrI31ebuCQGD/8uJLv+0vgTqv+bHJjm1rar6qsyFbpRuw3Ec0DY9z4JKQp2bb3QMTEK19FR35AEqHJqGWgvxrkOgMjFiUat919zc0Ht9yj454B6EGAtx5VMaj87MZ6VVl8i5HV7BA7pnCO+MK6k402yPplMSOA=
+	t=1745943630; cv=none; b=Yaba+L2bV6zp2aBsn5Q1KuI/5OQgTkYShk6N4hx15QQI2cOC1SR612t6ZT9O/IolRIPShgyK1CoiIQnCtSC47U8rxQBzBhf6cCgKylcLxnPWLJnP36gnMKy6qvP4es1drEq8Fn0YDeKhLxa+XDK9xau03iq9mS/qShwhei8CDiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745941059; c=relaxed/simple;
-	bh=6+xRLjF5VXF/KaNVVkp3ej3YioWLr1gPTI5nM9lUy7A=;
+	s=arc-20240116; t=1745943630; c=relaxed/simple;
+	bh=avDUL9osy76tEbsx8E6KS4YJn2RDPkgXuVhgj0i8qlQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pAJx960FENihkCFCmCIZRyhtWsfbk02FF0Bjrpmzj8VawtjV5ebdN33E6raDZZnZizN8dabqRdYjIF+eAQJeNB8OlMIxDyQ4ON+vHJguZ6tbgva19StaofnDvVxeFlSl/y3XT7x5tD4aK9agEtrhiahTukORGcuBUA9Qeezrljo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPlIY7Tp; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=IAOzb9KEmRQphxPvfTaeX17SrkBmvVs81wgRx/UXteHIvGDS/KtxJkPGRgY2aPuP2yWaIdoI6airBMdbfG3L5+1UyeaUggxI0/sdFSTpSE5HYx+VqLQdrql1JYaCCO0ZkJeebhoTRHcatxUqFTM0zGWX+2BbDqFlh3Aw6ceJWuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MYitToqh; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPlIY7Tp"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-317f68d0dffso66277401fa.2
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Apr 2025 08:37:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYitToqh"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3105ef2a08dso58676651fa.0
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Apr 2025 09:20:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745941056; x=1746545856; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1745943627; x=1746548427; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FL3wZlS8B1ZLTzV0nKmmfl2l7OguUKLVmyJdeeoK/VA=;
-        b=RPlIY7Tp8yWtvOYfEYciOaa3W/Rot1KGiw111LYSXHBwbfoplkGSeVbTeDXalK86VK
-         1wMw4RDf9b+EQ9LI54KplX1lJKP3+Aytc1NWjoiNX6WOJfSQmDR2NrvgHgp3iFZNYPA1
-         +vcW+lKcW5UPwanbjUWmDo884aDhBWRumYRWcvhIEK1zmhxl0eRzwTCEEyj8csKbXpSn
-         IzSEd5w1YxKUreeEdC6Qg/xhb3EXRWlMmyJ5puiHKSe99tbfFVeJctgq8av3m8D59UTj
-         Q7ExzEy0hi3w5sHcNEO3xlerj7Znje3iQz3qU6My1icYGgGvIojsOZ2vu2Co+jg1TGkp
-         kweQ==
+        bh=uid5tg2WKagkoZW8ahMEAIIKaurQ/GgeHOIGBZrjfMI=;
+        b=MYitToqhH/pX5qyz08LuKX4f8jhxyhJHsHMsjLBLZS4yyEb0UrfuIHd7zoE0ikmXRM
+         NpdPbQjS7f6MX5V/Q/9p6LekGQmeiTTeGkU+wHuYR1LNIIclSPwPeGbRiZ/AwJnJqpeL
+         aK+HBojrNT1xqG4oEQEJXGlTAAFSZXlGTgnivaCAA45z4JVWYXEq/iosW4xQhYbFgnqk
+         F4VIgmo3e0hNY1gwTzEk+/cIkc6E/Wco3WzLU94Uw42jpaNcenJ5Riw7MgFzOIa/tB0/
+         KJQ2sUWqo0f4j1x5J8jqtgfxMkSsVWWd4921pLHqEGmELdRLRVJ2M78MftcjY3no/8fI
+         1+8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745941056; x=1746545856;
+        d=1e100.net; s=20230601; t=1745943627; x=1746548427;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FL3wZlS8B1ZLTzV0nKmmfl2l7OguUKLVmyJdeeoK/VA=;
-        b=Mviv70MpcMgrlEcwQpMqq8oozYQ7ANCr0bTbnDdK1Iq1QC5z1Ob3sBxtnRlaVYnnt9
-         Dlp58vLINHLJr42fomvov+H4TYyfrNp5qLlwF1s8ebEOpZi63096MReirVxdeD1F/tIe
-         /2uY3QlEfee4my0oKzurHG+jcUC/LmXXIXqYjl2D5OBD616970rN+MSGg9VOpzsvBWcw
-         aG8VkCRH5nXrvcdQFe0QmlIgEP/LOue1GSZvae/yZiXVLAnPbbNi6/EouAX3EqjU9ykF
-         dsOdErhBib6PpE942ih7w/1KQGAf0Q5cAQW+y8lpQhQk5YtJ0yCBriliwNwkeN1KK/4f
-         Tzow==
-X-Gm-Message-State: AOJu0Yx/b15DF9M8x1agYVXZ1XI/SzoADft/HiBzk+phH1WuMioSOyLK
-	IC/tO9CVimrQIJMPuGAeX7XKewJg1B+ljMvjVoBW4L5PdRnsLO/EyU0JBu2EIOsZUieQEIBJApj
-	STX6gPJFa4//UaAC0Pg6TbvA8o5KflQ==
-X-Gm-Gg: ASbGncufnKmXQkTv18wtUCutqGdgySGLv8I5zup6xaNj+BrjbURTM2kUzdR7Xr1SkU5
-	BgDUVQ479GA8zi+oVr8PVJ42aaasxcH2gTtKKpPoua7/4i7K1iTVpAAFgCXVsuUWjINZkZx/0VK
-	PyA7+keppA/I8IxSNrsquqZGWWdsRuP9acgWUFYel1GlR8WckHpH3WCjZ6
-X-Google-Smtp-Source: AGHT+IG1rKl06uJQ9sc92CR1YPL/JdlZm5EDIx5x7pbVf2adwjKCOt0RUtblDEvOQQLZ0olqQQhK2jEFtlXJSB9UKKc=
-X-Received: by 2002:a2e:a5c2:0:b0:30d:b309:21b6 with SMTP id
- 38308e7fff4ca-31d5a732658mr11564461fa.6.1745941055275; Tue, 29 Apr 2025
- 08:37:35 -0700 (PDT)
+        bh=uid5tg2WKagkoZW8ahMEAIIKaurQ/GgeHOIGBZrjfMI=;
+        b=esTcrV08vf+pf3Cq2C5pYE5xMNEQ/YzzkV4xIyayEnrGvdoju1PffkpMZPJMz6NqAJ
+         1o3fQEkEHWAgwwYq7btkfn97qPFhVK+dndnmTnteEUuKQJRZMPnivYYJxYmPj3jnKqDC
+         MsrdeM27zrZfEL91YjdD8XnRkWH7Z7+HDdqCSixvdukTumqp76aAxNec8R/zRZddkvSR
+         bvx2trsUhkUZ3sIHMgwa7BGa5IpKNN5IdSeml00D2ud1Lw9kHwmiQbhUUOhO01JjaflU
+         cy6ZXpwtLEngNHm3dh8yLdhq/NW+ig71MnHA++JtNJEelTcbw50vgMbtVUXV2oEI+4oT
+         TQUA==
+X-Gm-Message-State: AOJu0Yzwnv33PF1aLVnysSd/7FFh0GYF6icGsL5RrSn4Ao75Nl0uP7Ph
+	XL2/0UtpH34JGsQJz/cqS17rbnzX6TtaxcBoOaBIfRQe2LzqlW54ptsw5PjMXlEgTTxzhr7Jwd9
+	4lvzFLyoEL49ZjbVfQcpz/YtI/smdIvC4
+X-Gm-Gg: ASbGnctvfzmadIRayRHKUoG1xOq+eoedx1xzuSAKprHFuPAd4vuU8n7izJKlaqKxmQP
+	VF+fPW7mdr7s+0pvsM8wqI3m+QFVkKWNJvlGYlR6hrVcmhch5VP4LeVWu8jclBaleWUALw2aNoB
+	cJ6CzPe9Swvdw/pXuiYhhP1onFvu2kgjoZSgqLmHKY9/wbgdjU+mZvRaQi
+X-Google-Smtp-Source: AGHT+IGcmzOe4ooum0VgSQDbgCwGIc6+9kCfQRumX2wBC7b8sYs0N4QmX6vP5KnX+x4vjdkQzw/VCnJ9lMzSMaHPjyM=
+X-Received: by 2002:a2e:be06:0:b0:30b:d156:9e97 with SMTP id
+ 38308e7fff4ca-31d33ec36f6mr17449611fa.8.1745943626619; Tue, 29 Apr 2025
+ 09:20:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250429151827.1677612-1-pc@manguebit.com>
-In-Reply-To: <20250429151827.1677612-1-pc@manguebit.com>
+References: <20250430005915.5e1f3c82@deetop.local.jro.nz>
+In-Reply-To: <20250430005915.5e1f3c82@deetop.local.jro.nz>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 29 Apr 2025 10:37:22 -0500
-X-Gm-Features: ATxdqUEp9TPRQhvds6sZ2kE0UIvt1q95QevHfkTtVvxOCUU-RpyZ9A53fFIA-Qc
-Message-ID: <CAH2r5mt_jzayXwXG6R5P1cPv5McSKATW6va6Ei=xghD-swB=Rw@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: ensure aligned IO sizes
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>
+Date: Tue, 29 Apr 2025 11:20:14 -0500
+X-Gm-Features: ATxdqUFaAZeGlEEMhjAdhmuIw1kpGSjmwQ4WjCxKnWeTHLbLEGBpz-3jrYAtG7A
+Message-ID: <CAH2r5mvi+N7w=EmzSgH9YxEEbDLn0HXZ8cni1PKC+3d6qaS4XA@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix zero length for mkdir POSIX create context
+To: Jethro Donaldson <devel@jro.nz>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, 
+	"Volker.Lendecke@sernet.de" <Volker.Lendecke@sernet.de>, 
+	samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Do you have a repro example?
+Good catch.  I did verify that this fixes posix mkdir to ksmbd.  It
+didn't fail to Samba with posix extensions because Samba didn't check
+for the incorrect length field.   The fix also avoids another problem,
+an rmmod crash.  See below.
 
-Could this have negative performance impact to some servers?
+I added Cc: stable, and added the patch to cifs-2.6.git for-next
 
-On Tue, Apr 29, 2025 at 10:18=E2=80=AFAM Paulo Alcantara <pc@manguebit.com>=
- wrote:
+
+[ 1249.919717] RIP: 0010:__slab_err+0x1d/0x30
+[ 1249.919719] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44
+00 00 55 48 89 e5 e8 72 ff ff ff be 01 00 00 00 bf 05 00 00 00 e8 33
+b2 1c 00 <0f> 0b 5d 31 f6 31 ff c3 cc cc cc cc 0f 1f 80 00 00 00 00 90
+90 90
+[ 1249.919721] RSP: 0018:ffffcf3041b0bab8 EFLAGS: 00010046
+[ 1249.919723] RAX: 0000000000000000 RBX: ffffcf3041b0bb00 RCX: 00000000000=
+00000
+[ 1249.919724] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000000=
+00000
+[ 1249.919725] RBP: ffffcf3041b0bab8 R08: 0000000000000000 R09: 00000000000=
+00000
+[ 1249.919727] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8c1b664=
+fed00
+[ 1249.919728] R13: ffff8c1b9cda6600 R14: dead000000000122 R15: ffff8c1b9cd=
+a6600
+[ 1249.919729] FS:  00007d4b43e26080(0000) GS:ffff8c2312c9b000(0000)
+knlGS:0000000000000000
+[ 1249.919730] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1249.919732] CR2: 0000634aa6374a88 CR3: 00000002b21fe006 CR4: 00000000003=
+726f0
+[ 1249.919733] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[ 1249.919734] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[ 1249.919735] Call Trace:
+[ 1249.919737]  <TASK>
+[ 1249.919739]  free_partial.cold+0x137/0x191
+[ 1249.919743]  __kmem_cache_shutdown+0x46/0xa0
+[ 1249.919746]  kmem_cache_destroy+0x3e/0x1c0
+[ 1249.919750]  cifs_destroy_request_bufs+0x39/0x50 [cifs]
+[ 1249.919814]  exit_cifs+0x3a/0xcc0 [cifs]
+[ 1249.919873]  __do_sys_delete_module.isra.0+0x19d/0x2e0
+[ 1249.919877]  __x64_sys_delete_module+0x12/0x20
+
+On Tue, Apr 29, 2025 at 8:17=E2=80=AFAM Jethro Donaldson <devel@jro.nz> wro=
+te:
 >
-> Make all IO sizes multiple of PAGE_SIZE, either negotiated by the
-> server or passed through rsize, wsize and bsize mount options, to
-> prevent from breaking DIO reads and writes against servers that
-> enforce alignment as specified in MS-FSA 2.1.5.3 and 2.1.5.4.
+> smb: client: fix zero length for mkdir POSIX create context
 >
-> Cc: linux-cifs@vger.kernel.org
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> SMB create requests issued via smb311_posix_mkdir() have an incorrect
+> length of zero bytes for the POSIX create context data. A ksmbd server
+> rejects such requests and logs "cli req too short" causing mkdir to fail
+> with "invalid argument" on the client side.
+>
+> Inspection of packets sent by cifs.ko using wireshark show valid data for
+> the SMB2_POSIX_CREATE_CONTEXT is appended with the correct offset, but
+> with an incorrect length of zero bytes. Fails with ksmbd+cifs.ko only as
+> Windows server/client does not use POSIX extensions.
+>
+> Fix smb311_posix_mkdir() to set req->CreateContextsLength as part of
+> appending the POSIX creation context to the request.
+>
+> Signed-off-by: Jethro Donaldson <devel@jro.nz>
 > ---
->  fs/smb/client/cifsglob.h   |  2 ++
->  fs/smb/client/connect.c    | 23 +----------------------
->  fs/smb/client/file.c       |  6 ++----
->  fs/smb/client/fs_context.c | 25 ++++++-------------------
->  fs/smb/client/fs_context.h | 32 ++++++++++++++++++++++++++++++++
->  fs/smb/client/smb1ops.c    |  8 ++++----
->  fs/smb/client/smb2pdu.c    |  8 ++------
->  7 files changed, 49 insertions(+), 55 deletions(-)
 >
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 3b32116b0b49..24c2cd9532a9 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1024,6 +1024,8 @@ compare_mid(__u16 mid, const struct smb_hdr *smb)
->  #define CIFS_DEFAULT_NON_POSIX_RSIZE (60 * 1024)
->  #define CIFS_DEFAULT_NON_POSIX_WSIZE (65536)
+> Tested as far as mkdir now works as expected.
 >
-> +#define CIFS_IO_ALIGN(v) umax(round_down((v), PAGE_SIZE), PAGE_SIZE)
-> +
->  /*
->   * Macros to allow the TCP_Server_Info->net field and related code to dr=
-op out
->   * when CONFIG_NET_NS isn't set.
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index df976ce6aed9..6bf04d9a5491 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -3753,28 +3753,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt=
-_ctx)
->                 }
->         }
+> Patch is against stable tree at v6.14.4 tag (first patch - unsure if I've
+> correctly done the base-commit thing, sorry).
 >
-> -       /*
-> -        * Clamp the rsize/wsize mount arguments if they are too big for =
-the server
-> -        * and set the rsize/wsize to the negotiated values if not passed=
- in by
-> -        * the user on mount
-> -        */
-> -       if ((cifs_sb->ctx->wsize =3D=3D 0) ||
-> -           (cifs_sb->ctx->wsize > server->ops->negotiate_wsize(tcon, ctx=
-))) {
-> -               cifs_sb->ctx->wsize =3D
-> -                       round_down(server->ops->negotiate_wsize(tcon, ctx=
-), PAGE_SIZE);
-> -               /*
-> -                * in the very unlikely event that the server sent a max =
-write size under PAGE_SIZE,
-> -                * (which would get rounded down to 0) then reset wsize t=
-o absolute minimum eg 4096
-> -                */
-> -               if (cifs_sb->ctx->wsize =3D=3D 0) {
-> -                       cifs_sb->ctx->wsize =3D PAGE_SIZE;
-> -                       cifs_dbg(VFS, "wsize too small, reset to minimum =
-ie PAGE_SIZE, usually 4096\n");
-> -               }
-> -       }
-> -       if ((cifs_sb->ctx->rsize =3D=3D 0) ||
-> -           (cifs_sb->ctx->rsize > server->ops->negotiate_rsize(tcon, ctx=
-)))
-> -               cifs_sb->ctx->rsize =3D server->ops->negotiate_rsize(tcon=
-, ctx);
-> -
-> +       cifs_negotiate_iosize(server, cifs_sb->ctx, tcon);
->         /*
->          * The cookie is initialized from volume info returned above.
->          * Inside cifs_fscache_get_super_cookie it checks
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index 9e8f404b9e56..851b74f557c1 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -160,10 +160,8 @@ static int cifs_prepare_read(struct netfs_io_subrequ=
-est *subreq)
->         server =3D cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
->         rdata->server =3D server;
->
-> -       if (cifs_sb->ctx->rsize =3D=3D 0)
-> -               cifs_sb->ctx->rsize =3D
-> -                       server->ops->negotiate_rsize(tlink_tcon(req->cfil=
-e->tlink),
-> -                                                    cifs_sb->ctx);
-> +       cifs_negotiate_rsize(server, cifs_sb->ctx,
-> +                            tlink_tcon(req->cfile->tlink));
->
->         rc =3D server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
->                                            &size, &rdata->credits);
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index 2980941b9667..f8fef852a9fb 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -1021,6 +1021,7 @@ static int smb3_reconfigure(struct fs_context *fc)
->         struct dentry *root =3D fc->root;
->         struct cifs_sb_info *cifs_sb =3D CIFS_SB(root->d_sb);
->         struct cifs_ses *ses =3D cifs_sb_master_tcon(cifs_sb)->ses;
-> +       unsigned int rsize =3D ctx->rsize, wsize =3D ctx->wsize;
->         char *new_password =3D NULL, *new_password2 =3D NULL;
->         bool need_recon =3D false;
->         int rc;
-> @@ -1103,11 +1104,8 @@ static int smb3_reconfigure(struct fs_context *fc)
->         STEAL_STRING(cifs_sb, ctx, iocharset);
->
->         /* if rsize or wsize not passed in on remount, use previous value=
-s */
-> -       if (ctx->rsize =3D=3D 0)
-> -               ctx->rsize =3D cifs_sb->ctx->rsize;
-> -       if (ctx->wsize =3D=3D 0)
-> -               ctx->wsize =3D cifs_sb->ctx->wsize;
-> -
-> +       ctx->rsize =3D !rsize ? cifs_sb->ctx->rsize : CIFS_IO_ALIGN(rsize=
-);
-> +       ctx->wsize =3D !wsize ? cifs_sb->ctx->wsize : CIFS_IO_ALIGN(wsize=
-);
->
->         smb3_cleanup_fs_context_contents(cifs_sb->ctx);
->         rc =3D smb3_fs_context_dup(cifs_sb->ctx, ctx);
-> @@ -1312,7 +1310,7 @@ static int smb3_fs_context_parse_param(struct fs_co=
-ntext *fc,
->                                 __func__);
->                         goto cifs_parse_mount_err;
->                 }
-> -               ctx->bsize =3D result.uint_32;
-> +               ctx->bsize =3D CIFS_IO_ALIGN(result.uint_32);
->                 ctx->got_bsize =3D true;
->                 break;
->         case Opt_rasize:
-> @@ -1336,24 +1334,13 @@ static int smb3_fs_context_parse_param(struct fs_=
-context *fc,
->                 ctx->rasize =3D result.uint_32;
->                 break;
->         case Opt_rsize:
-> -               ctx->rsize =3D result.uint_32;
-> +               ctx->rsize =3D CIFS_IO_ALIGN(result.uint_32);
->                 ctx->got_rsize =3D true;
->                 ctx->vol_rsize =3D ctx->rsize;
->                 break;
->         case Opt_wsize:
-> -               ctx->wsize =3D result.uint_32;
-> +               ctx->wsize =3D CIFS_IO_ALIGN(result.uint_32);
->                 ctx->got_wsize =3D true;
-> -               if (ctx->wsize % PAGE_SIZE !=3D 0) {
-> -                       ctx->wsize =3D round_down(ctx->wsize, PAGE_SIZE);
-> -                       if (ctx->wsize =3D=3D 0) {
-> -                               ctx->wsize =3D PAGE_SIZE;
-> -                               cifs_dbg(VFS, "wsize too small, reset to =
-minimum %ld\n", PAGE_SIZE);
-> -                       } else {
-> -                               cifs_dbg(VFS,
-> -                                        "wsize rounded down to %d to mul=
-tiple of PAGE_SIZE %ld\n",
-> -                                        ctx->wsize, PAGE_SIZE);
-> -                       }
-> -               }
->                 ctx->vol_wsize =3D ctx->wsize;
->                 break;
->         case Opt_acregmax:
-> diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-> index d1d29249bcdb..6ae51e27b4ce 100644
-> --- a/fs/smb/client/fs_context.h
-> +++ b/fs/smb/client/fs_context.h
-> @@ -361,4 +361,36 @@ static inline void cifs_mount_unlock(void)
->         mutex_unlock(&cifs_mount_mutex);
->  }
->
-> +static inline void cifs_negotiate_rsize(struct TCP_Server_Info *server,
-> +                                       struct smb3_fs_context *ctx,
-> +                                       struct cifs_tcon *tcon)
-> +{
-> +       unsigned int size;
-> +
-> +       size =3D umax(server->ops->negotiate_rsize(tcon, ctx), PAGE_SIZE)=
-;
-> +       if (ctx->rsize)
-> +               size =3D umax(umin(ctx->rsize, size), PAGE_SIZE);
-> +       ctx->rsize =3D round_down(size, PAGE_SIZE);
-> +}
-> +
-> +static inline void cifs_negotiate_wsize(struct TCP_Server_Info *server,
-> +                                       struct smb3_fs_context *ctx,
-> +                                       struct cifs_tcon *tcon)
-> +{
-> +       unsigned int size;
-> +
-> +       size =3D umax(server->ops->negotiate_wsize(tcon, ctx), PAGE_SIZE)=
-;
-> +       if (ctx->wsize)
-> +               size =3D umax(umin(ctx->wsize, size), PAGE_SIZE);
-> +       ctx->wsize =3D round_down(size, PAGE_SIZE);
-> +}
-> +
-> +static inline void cifs_negotiate_iosize(struct TCP_Server_Info *server,
-> +                                        struct smb3_fs_context *ctx,
-> +                                        struct cifs_tcon *tcon)
-> +{
-> +       cifs_negotiate_rsize(server, ctx, tcon);
-> +       cifs_negotiate_wsize(server, ctx, tcon);
-> +}
-> +
->  #endif
-> diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-> index 0adeec652dc1..b5c9915a97c8 100644
-> --- a/fs/smb/client/smb1ops.c
-> +++ b/fs/smb/client/smb1ops.c
-> @@ -432,7 +432,7 @@ cifs_negotiate(const unsigned int xid,
->  }
->
->  static unsigned int
-> -cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx=
-)
-> +smb1_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx=
-)
->  {
->         __u64 unix_cap =3D le64_to_cpu(tcon->fsUnixInfo.Capability);
->         struct TCP_Server_Info *server =3D tcon->ses->server;
-> @@ -467,7 +467,7 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct s=
-mb3_fs_context *ctx)
->  }
->
->  static unsigned int
-> -cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx=
-)
-> +smb1_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx=
-)
->  {
->         __u64 unix_cap =3D le64_to_cpu(tcon->fsUnixInfo.Capability);
->         struct TCP_Server_Info *server =3D tcon->ses->server;
-> @@ -1161,8 +1161,8 @@ struct smb_version_operations smb1_operations =3D {
->         .check_trans2 =3D cifs_check_trans2,
->         .need_neg =3D cifs_need_neg,
->         .negotiate =3D cifs_negotiate,
-> -       .negotiate_wsize =3D cifs_negotiate_wsize,
-> -       .negotiate_rsize =3D cifs_negotiate_rsize,
-> +       .negotiate_wsize =3D smb1_negotiate_wsize,
-> +       .negotiate_rsize =3D smb1_negotiate_rsize,
->         .sess_setup =3D CIFS_SessSetup,
->         .logoff =3D CIFSSMBLogoff,
->         .tree_connect =3D CIFSTCon,
 > diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index c4d52bebd37d..4590beb549e9 100644
+> index 163b8fea47e8..e7118501fdcc 100644
 > --- a/fs/smb/client/smb2pdu.c
 > +++ b/fs/smb/client/smb2pdu.c
-> @@ -4092,12 +4092,8 @@ static void cifs_renegotiate_iosize(struct TCP_Ser=
-ver_Info *server,
->                 return;
+> @@ -2920,6 +2920,7 @@ int smb311_posix_mkdir(const unsigned int xid, stru=
+ct inode *inode,
+>                 req->CreateContextsOffset =3D cpu_to_le32(
+>                         sizeof(struct smb2_create_req) +
+>                         iov[1].iov_len);
+> +               le32_add_cpu(&req->CreateContextsLength, iov[n_iov-1].iov=
+_len);
+>                 pc_buf =3D iov[n_iov-1].iov_base;
+>         }
 >
->         spin_lock(&tcon->sb_list_lock);
-> -       list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
-> -               cifs_sb->ctx->rsize =3D
-> -                       server->ops->negotiate_rsize(tcon, cifs_sb->ctx);
-> -               cifs_sb->ctx->wsize =3D
-> -                       server->ops->negotiate_wsize(tcon, cifs_sb->ctx);
-> -       }
-> +       list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link)
-> +               cifs_negotiate_iosize(server, cifs_sb->ctx, tcon);
->         spin_unlock(&tcon->sb_list_lock);
->  }
 >
+> base-commit: ea061bad207e1ba693b5488ba64c663f7ca03f50
 > --
 > 2.49.0
 >
