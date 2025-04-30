@@ -1,43 +1,45 @@
 Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141E01E4928
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 19:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356941F09A7
+	for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 19:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746040495; cv=none; b=pTAvEmHQr+Oymi7cVg7CF0pJgi1YODTlaQdiaQs1RNnazqVMb2FaZVpHd7eLF5IttnYyIm1eyVEveAYjIziocV9WyKm1g+8y2w+sSh49QVkGELl5U+Vi3D79bXo/1Nvkb/MVYWAJ45L4A9K9CBepplmTvFKPjCYtj+E98gETLC4=
+	t=1746042291; cv=none; b=VtEtAhZ3EAXXKw8AzMR1BrtlycZMlaL7Jn+X2ysJMNeTqiTrNBFf1TWFNWj6ZsSk8S275ZnoJ1bupsiW8LoLnD7HtJIM5TKL0Atq/Z3a8XHUk7G9IJTWjIaKZWp5VdzUTySZT1EOUNNNDfprQVGENoyfCAntBOFrpsqL0W8KCHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746040495; c=relaxed/simple;
-	bh=Wiq1XZgCNw6ng1CwHSMSnagcLIpLQ8xoP7WZnntMbE4=;
+	s=arc-20240116; t=1746042291; c=relaxed/simple;
+	bh=2pAffM+GOSbj5pJtW7Lr7363yXbodqdZaPrIQNWcsx4=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=loyjZWFcDtxhYCF3rhcCGX4Pxn+BCL4UraesK/ulKV86GN46J/V1X5OWlzUazypOrhcBueyyke1G9tiBCPOgBGs/RGiXyHTIPhOhq8o8q6+JuzNMWsZ/WEIvxXtNml3vZNoxyuHS75nWcEjQoflg+JhnN+Y3oM/xuVARA79RsXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=cohxyXfH; arc=none smtp.client-ip=167.235.159.17
+	 MIME-Version:Content-Type; b=QKNH4VJbKMdkZiq5pHHkYelhW0Kp5rswNKh7wjxA/qhmadH5oYw/DRdAYae5h+8ZmjPkNodo+Zrn59MFIn2cYo1cwaxwoffeCSGrccZtEcv2abjzY/HMw4E1YQkNmgfdgbiiFAW/YyxyAinQCU8PxFcR67W0DQWOtEYCre/rDiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=QawxLtne; arc=none smtp.client-ip=167.235.159.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="cohxyXfH"
-Message-ID: <2f76f9b0b3e5ca99fce360d19b0d6218@manguebit.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="QawxLtne"
+Message-ID: <5d0f085859348bbd37fa2ec3b34426eb@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1746040486;
+	s=dkim; t=1746042287;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RCZgqHCWJogvZA748Ja3JB5jVegfNyv+JJkPqsKqgKQ=;
-	b=cohxyXfHO1lKUedYMohbeIYG7rmGmV5QmpLBzvaCTpvkXyYFt3CucBsdqn0kOp/W9V1PKB
-	VnRNUkAb1CvzhWBKyeB2HwPac9Gf8VSU9/98kuesOxtV4uO65eM/4x0/sTR3ysUis0M7g9
-	xrTn1NxPkfrjxpN4rc2vDtUXqFqKqRifOiMcmevBZ6wGyLzO8vRnzTJj/LVXTZshV02/Uj
-	NCLcYCosWeaT6mHaGHkvCMY20jZm4sbBhMLew53OaJP0seaH/Jl6O+1i3boWEYh1xnK3B6
-	/mBwOIBs7wIlzAwgKWoBidCw3eD+WVfl5VRkKRTIdtJB5jBR6ILZynelSQCBKA==
+	bh=ELHYoQ5yrh6EuliN9dTxbJsjLEZYTdF2pzgOjoGZwJ4=;
+	b=QawxLtne83hzxPwh+hWojwCM8qwMqXgeoR7pXGskLTuwL4e+j0EIijizccWN4twAvHkycL
+	n1iW9PbhoSTFCVnyuQEPW/FjrSsF/0fzDtcRz2d949R3zifbOXyEzFVaGyaiMglOczdkGD
+	QhY/BhLU6Qofzw7rpsBkYXIL1wcrFL5D3jkra/YP27ipFA6a5edRvhAZyRAtEvGa2ayUBK
+	bWXU3rwfvMx5E/UZHVo3MkgCv5/Pc9WHB+7dMrLeSJC+Ccpej/ZQbaQ5VV4W+JmBKnOMIp
+	acB6RZEuQtvUduSUOjp4Ea2rFB54SxFFcP4Zj9ZUZ0yI8guEYDKyEryleA7LdQ==
 From: Paulo Alcantara <pc@manguebit.com>
 To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>,
+Cc: CIFS <linux-cifs@vger.kernel.org>, David Howells <dhowells@redhat.com>,
  Pierguido Lambri <plambri@redhat.com>, Bharath S M
  <bharathsm@microsoft.com>
 Subject: Re: [PATCH] smb: client: fix delay on concurrent opens
-In-Reply-To: <CAH2r5muGNUp9UqQZ_mPVoLiw9+xocV8OZ8hubGyQG=oTd=-BXQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mu74CbSKRVi0P7LD57j3t=KxqLX_M6V+qvi-aRE2t9YTw@mail.gmail.com>
 References: <20250428140500.1462107-1-pc@manguebit.com>
  <CAH2r5muGNUp9UqQZ_mPVoLiw9+xocV8OZ8hubGyQG=oTd=-BXQ@mail.gmail.com>
-Date: Wed, 30 Apr 2025 16:14:42 -0300
+ <2f76f9b0b3e5ca99fce360d19b0d6218@manguebit.com>
+ <CAH2r5mu74CbSKRVi0P7LD57j3t=KxqLX_M6V+qvi-aRE2t9YTw@mail.gmail.com>
+Date: Wed, 30 Apr 2025 16:44:44 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,23 +50,12 @@ Content-Type: text/plain
 
 Steve French <smfrench@gmail.com> writes:
 
-> Did you mean
->
-> downgraded "RWH to RW"  or downgraded from "RWH to RH"
+> What causes it to lose handle lease but still have read and write?
 
-Downgraded from RWH to RW.
+We don't know what caused it from the network traces we have.  I was
+able to reproduce the downgrade from RWH to RW against Windows Server
+2022 by mounting a share twice with 'nosharesock' and then having one
+client writing to a file and the other client remaning the file's parent
+directory.
 
-> But it is puzzling why file would still be open if not in openfile list
-
-The server is breaking the H lease.  cifs_close_deferred_file() will put
-all cifsFileInfo references from deferred closes in the inode, meaning
-that _cifsFileInfo_put() call in cifs_oplock_break() will effectively
-put the last reference and then closing the open handle.
-
-The check for a non-empty list after that makes no sense as we already
-closed all open handles.  As I understand it, the implicit ACK would
-work if we have no open handles at the time we receive the lease break,
-but that couldn't work as we always get an active reference of the open
-handle before processing the lease break.
-
-What am I missing?
+For more information, see MS-SMB2 3.3.1.4.
