@@ -1,175 +1,81 @@
-Received: from mta-outp-cfd-1.case.edu (mta-outp-cfd-1.case.edu [129.22.103.35])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102E22DC797
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 15:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=129.22.103.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746026204; cv=pass; b=XilEMBO/OvcyOu+IzbWPkFNe4X6Xg5EJeEmWL6pPqVu7z3sKisUjN4pD3Hl1sckb7XoGxc4f18DpW7zqfzFvUbkrs+l09jiqtG9tuq/r0z6u3/2cf5oVdHYfstqTXk+pb7TJ3cOKY8AiSJs9TtGTgFk2QaDCrKHXUOI0SxB0PBw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746026204; c=relaxed/simple;
-	bh=AzjcWtzCo+O8MqZEFAe+xbB7xQLkIglom2B10pFpT6o=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Ct0ObESoOKix8tn1P8vVnmLLbTRYIMXyAgeCbdBx07q/uE+wvQji8vn2x0trSDXLQvX6h+L2uLeUv4r1HvI/GYzGdy2exZmkIb5lP+O8EdN/whY7AcQjnF6P3r+EaNMRDhcRzcJ+9RbVk2ocXPXMH26jqiI9kZ6PodsRN2MiPcc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=case.edu; spf=pass smtp.mailfrom=case.edu; dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b=I4Dr7AYL; arc=pass smtp.client-ip=129.22.103.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=case.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=case.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2877D25F7AE
+	for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 16:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746029694; cv=none; b=BXgD7lQycL6KGg6l/Rd051hxdkO87Fe0vSzVxhJKcrxc2tmd+w5Q2fasnkDsJWYbGbWIWRboTJehHjoG1K7aUs8kbzffUSjDNZkaRVNDu8bgEBNFywWhD7RPAIcNqkm4hSRYdRPjJsG0fCYRJ4EcwO3cAK/7ELwU74VPY4vjBaQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746029694; c=relaxed/simple;
+	bh=qs92COqpC4pCd3KIbcBy7O9vgKzWZA/ZaUTJSh7536g=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=BvdASFK4CjlFAxZh+LM01P2j/eygM/zhvFPLMW1fV/K5sG8ZPyO7kxV5DNqQNhborAXJtLhBV0Nvg3Ut82ew35umoOIbEH68934d03A0TwsTUMBRL9QQu+ourzMg6xE1EhNTcj2x/kutva/gwAmIzozoblyi4uGUD9zIAVKH9A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HgQE3mMm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b="I4Dr7AYL"
-Authentication-Results: mta-outp-cfd-1;
-       spf=pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.160.198 as permitted sender) smtp.mailfrom=case.edu ;
-       dkim=pass (Good 2048 bit rsa-sha256 signature) header.d=case.edu header.i=None header.s=g-case;
-       dmarc=pass (p=REJECT sp=Undefined pct=100 dis=NONE) header.from=case.edu;
-ARC-Filter: OpenARC Filter v1.0.0 mta-outp-cfd-1.case.edu 415C717D1
-Authentication-Results: mta-outp-cfd-1; arc=none smtp.remote-ip=129.22.103.196
-ARC-Seal: i=1; a=rsa-sha256; d=case.edu; s=cwru-mta; t=1746025789; cv=none;
-	b=DpqyyHrc2bycreCnKpcPKnuYqKR90hLAqLd4SnBgDBXtcwgDyDJTD6oT48m8FZDm4foizVQNS2teN/KIT35vHPBQ/LLtNchfsgXcqvbuavvBXtgqQro0tXT3MdOgL16kkHnvS9gvRjzn8uQ3CNldk1K42M0pzmOVVAEmfbL1lHB0uR2apIohnu2IslcWGaUZiKRG60EfK//IVuv8vi0s+6RTWkXvZnwH6nNM/VwNdNtBnvycL27jBbxqYFPoGF/ifI+c6UirTToCo3IXomK1PtJqNiZPZfpOa9+nyxadLFd8nPVRDxSwKqIWKlPQGIu8YRaq3enC008JO9Fpv1Sugg==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=case.edu; s=cwru-mta;
-	t=1746025789; c=relaxed/simple;
-	bh=AzjcWtzCo+O8MqZEFAe+xbB7xQLkIglom2B10pFpT6o=;
-	h=DKIM-Signature:Message-ID:Date:MIME-Version:Subject:To:From:to:
-	 subject:message-id:date:from:mime-version:dkim-signature; b=LjwyeTznc7BRPGA3e8fhFd9U4mWVtn8KDAc/dupUd7sUlloA7cNtkrWeuxo3qStJF8qGT1LF0LG+iVpx9IdxTwDCUffHZmTJ9MsXZKlEdT1WFcRg3kP0aroXb1lkq/XwGEhSk9c7Qx7nW+UFM2IWFq8hH6UZBSSA/8feVQD4WQbb4KWZbf6Wlv7a0HnpOPIHSENKW+RCXoYaVtWMfmYmv02ShxZp3sbt3ClQ93S+/+W/QP5+/zwhlTTqtcP+g+fmPCCfXs4lSpz2Fjxrnj7/PC6cEEsnsMkaJyPN0OMTo3jIu1pSVdpBYwjHEVSY1RemHHHmp/ljmNCuBcCpbdgqqA==
-ARC-Authentication-Results: i=1; mta-outp-cfd-1; spf=pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.160.198 as permitted sender) smtp.mailfrom=case.edu; dkim=pass (Good 2048 bit rsa-sha256 signature) header.d=case.edu header.i=None header.s=g-case; dmarc=pass (p=REJECT sp=Undefined pct=100 dis=NONE) header.from=case.edu
-Received-SPF: Pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.160.198 as permitted sender) client-ip=209.85.160.198
-Received: from mpv-out-cfd-1.case.edu (mpv-out-cfd-1.case.edu [129.22.103.196])
-	by mta-outp-cfd-1.case.edu (Postfix) with ESMTPS id 415C717D1
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 11:09:49 -0400 (EDT)
-Received: from mpv-local-cfd-1.case.edu (EHLO mpv-local-cfd-1.case.edu) ([129.22.103.203])
-	by mpv-out-cfd-1.case.edu (MOS 4.4.8-GA FastPath queued)
-	with ESMTP id DDI91464;
-	Wed, 30 Apr 2025 11:09:49 -0400 (EDT)
-Received: from mail-qt1-f198.google.com (EHLO mail-qt1-f198.google.com) ([209.85.160.198])
-	by mpv-local-cfd-1.case.edu (MOS 4.4.8-GA FastPath queued)
-	with ESMTP id EHU28308;
-	Wed, 30 Apr 2025 11:09:48 -0400 (EDT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-47ae87b5182so137320071cf.2
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Apr 2025 08:09:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=case.edu; s=g-case; t=1746025788; x=1746630588; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:cc:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SlRUNotoyOPrZmtBHdOmGWaPKtm8Fs35t7kqSSKlfjM=;
-        b=I4Dr7AYLMDxdkSVGt4mygoeL8/ANzESYNAuDv6mY+KY1Ool44oZN8VuRopFI2FDhBb
-         asKGyCItta2OIXlvEkIFmBXhNljlVVIUHUbTlJ2gl/wejfOTwj6dN3BKyYXfds5UEQTS
-         wCnQLST7uOy4C6se1+MZMmy7Rq3nnclkrj0CBE6Wtyq71C0j/WD1Jgo8t9mGTMRP1CaI
-         zpQnvoh7Btc9uHuhS69ILIi+2ojINeNOVrcZBSkNBh4J5a5yR9A5FJp8a/4kxl1HkcLU
-         PDmfQUV/tzdhNP0U1VUBI2yDB/geYDkcF0cfEqc5AsImCsfu1BPDhiGpHuGXD1s+SVTh
-         /yPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746025788; x=1746630588;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:cc:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SlRUNotoyOPrZmtBHdOmGWaPKtm8Fs35t7kqSSKlfjM=;
-        b=ap63Ak5ao0ET8LjwNEccpzp7cL5YZgid9PO8oZ3TUOPUbeEZG7gfQO/m8EARWZfpbM
-         u1c/Wa4R4gv3xNM4L9LNgVYUnjXFBDkU84JR7FMxwJTFiyc0BNrKcFZ2Qzr1dJqbFe3p
-         kjdgLJyPilnMD4uO/feeyO/iemu9ED5cidbgO7B1xJGdGAh4GbHsvdinfVrMUaRLS36q
-         rr7/chSDiSrNdvPUT/IyeTlD6lyw8X9Ra7S7ai5LSLDfW2oI7RZO5tBgdCR0bT9D+vjF
-         Re+38VdI8ZjT0/dsBi36Rjdy3u+pWGfh9V/V17WiAanmrC8EriBKW6Dq4wvBzHAFAH0E
-         TZLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWitoIWWpy854UA+aL0z3vqp2rRT1MqwMZDJEAvuPUgkJxxMS5Au+ji5maQVY+XAHgbzuUxgzU20qot@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAk5jh0DHeZNeXgDseMQVjWNAvyNlWGJlZWI0jwUt0Kq7D9n/6
-	LMVIEq/JndBqty10hLy0bgvPZGTpzgNftrB73b+a6jNBk+rTj6Rr0EoJ018LAtQN9qh/Ly6faQt
-	nmElu89zIXreg2C2l/CK1rRD2w+5asM8cDwwBuxesHcU4O6ton1GAVPvwhPx+
-X-Gm-Gg: ASbGnctae7bma26iLdAIm+VN9/z2qSHmVOcEhzqXsVwBaG/46hrawPMO8wutKP3OM9i
-	LHikrTuvykNc0nSQ5BMC9AnJuUelkga92CN6BzpKCsY7FH6sUP+Mp75rhDdXyIC1Va84eTdsVTg
-	DdCGlMHIneYFAiW1trrgZ4hktaHXLbN+vXTKTyQ/Uo6NPIB3nmgHSwmpIp51NWARb8xpFnb//+8
-	TM9opowlAy396UViuOtu/PZpXYDnvX//zZH1n/obqWBlLNm04KBN7dbjceNZtbEl+NXTgykrI1M
-	eql4Ta2fLu4U1pzVI4Ls3Os+GG86j17/PFtycS0=
-X-Received: by 2002:a05:622a:1f10:b0:477:1ee2:1260 with SMTP id d75a77b69052e-489c38ae0e4mr59729451cf.1.1746025787937;
-        Wed, 30 Apr 2025 08:09:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHwc3yOTaObmu1NRdEPUxNDIHKFCkwt05nWczHxLVmvt32NfqQFV7+6fNq30eCQf4mlEKzUXg==
-X-Received: by 2002:a05:622a:1f10:b0:477:1ee2:1260 with SMTP id d75a77b69052e-489c38ae0e4mr59728861cf.1.1746025787490;
-        Wed, 30 Apr 2025 08:09:47 -0700 (PDT)
-Received: from [129.22.8.211] (caleb.INS.CWRU.Edu. [129.22.8.211])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47e9f0d231csm94370501cf.29.2025.04.30.08.09.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 08:09:46 -0700 (PDT)
-Message-ID: <473bad0c-9e38-4f8b-9939-c70c52890cd2@case.edu>
-Date: Wed, 30 Apr 2025 11:09:44 -0400
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgQE3mMm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746029692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/VAYR5mvAk9M7BK/RzMAURMsugmQJ8HxsAPL+QsOA3Q=;
+	b=HgQE3mMmXaYPKX0aoKdRNsrFn8gdh7Zu7/8NX5XDpvnZnKW3odrvrrwE/QMorhbjlla23l
+	Tvmx7LfAei13FIOJI8+MnBrOl3HZuRymM4pJLjduPD5pDg1jAGodhZLdufcM8iv3AwXqOz
+	QsE/FEqygirifKAqRtiMD9K+sOKjOfc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-9S4uJLLmMsOIofyzCCL7gQ-1; Wed,
+ 30 Apr 2025 12:14:48 -0400
+X-MC-Unique: 9S4uJLLmMsOIofyzCCL7gQ-1
+X-Mimecast-MFC-AGG-ID: 9S4uJLLmMsOIofyzCCL7gQ_1746029686
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 36EA318001E0;
+	Wed, 30 Apr 2025 16:14:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E9C1E18001D5;
+	Wed, 30 Apr 2025 16:14:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <473bad0c-9e38-4f8b-9939-c70c52890cd2@case.edu>
+References: <473bad0c-9e38-4f8b-9939-c70c52890cd2@case.edu> <433928.1745944651@warthog.procyon.org.uk> <3d19dc03-72aa-46de-a6cc-4426cc84eb51@auristor.com>
+To: chet.ramey@case.edu
+Cc: dhowells@redhat.com, Jeffrey E Altman <jaltman@auristor.com>,
+    Alexander Viro <viro@zeniv.linux.org.uk>,
+    Christian Brauner <brauner@kernel.org>,
+    Etienne Champetier <champetier.etienne@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Steve French <sfrench@samba.org>, linux-afs@lists.infradead.org,
+    openafs-devel@openafs.org, linux-cifs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] afs, bash: Fix open(O_CREAT) on an extant AFS file in a sticky dir
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: chet.ramey@case.edu
-Cc: chet.ramey@case.edu, Etienne Champetier <champetier.etienne@gmail.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>, linux-afs@lists.infradead.org,
-        openafs-devel@openafs.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] afs, bash: Fix open(O_CREAT) on an extant AFS file in a
- sticky dir
-Content-Language: en-US
-To: Jeffrey E Altman <jaltman@auristor.com>,
-        David Howells <dhowells@redhat.com>,
-        Alexander Viro
- <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-References: <433928.1745944651@warthog.procyon.org.uk>
- <3d19dc03-72aa-46de-a6cc-4426cc84eb51@auristor.com>
-From: Chet Ramey <chet.ramey@case.edu>
-Autocrypt: addr=chet.ramey@case.edu; keydata=
- xsDiBEEOsGwRBACFa0A1oa71HSZLWxAx0svXzhOZNQZOzqHmSuGOG92jIpQpr8DpvgRh40Yp
- AwdcXb8QG1J5yGAKeevNE1zCFaA725vGSdHUyypHouV0xoWwukYO6qlyyX+2BZU+okBUqoWQ
- koWxiYaCSfzB2Ln7pmdys1fJhcgBKf3VjWCjd2XJTwCgoFJOwyBFJdugjfwjSoRSwDOIMf0D
- /iQKqlWhIO1LGpMrGX0il0/x4zj0NAcSwAk7LaPZbN4UPjn5pqGEHBlf1+xDDQCkAoZ/VqES
- GZragl4VqJfxBr29Ag0UDvNbUbXoxQsARdero1M8GiAIRc50hj7HXFoERwenbNDJL86GPLAQ
- OTGOCa4W2o29nFfFjQrsrrYHzVtyA/9oyKvTeEMJ7NA3VJdWcmn7gOu0FxEmSNhSoV1T4vP2
- 1Wf7f5niCCRKQLNyUy0wEApQi4tSysdz+AbgAc0b/bHYVzIf2uO2lIEZQNNt+3g2bmXgloWm
- W5fsm/di50Gm1l1Na63d3RZ00SeFQos6WEwLUHEB0yp6KXluXLLIZitEJM0gQ2hldCBSYW1l
- eSA8Y2hldC5yYW1leUBjYXNlLmVkdT7CYQQTEQIAIQIbAwYLCQgHAwIDFQIDAxYCAQIeAQIX
- gAUCRX3FIgIZAQAKCRC7WGnwZOp0q069AKCNDRn+zzN/AHbaynls/Lvq1kH/RQCgkLvF8bDs
- maUHSxSIPqzlGuKWDxbOwE0EQQ6wbxAEAJCukwDigRDPhAuI+lf+6P64lWanIFOXIndqhvU1
- 3cDbQ/Wt5LwPzm2QTvd7F+fcHOgZ8KOFScbDpjJaRqwIybMTcIN0B2pBLX/C10W1aY+cUrXZ
- gXUGVISEMmpaP9v02auToo7XXVEHC+XLO9IU7/xaU98FL69l6/K4xeNSBRM/AAMHA/wNAmRB
- pcyK0+VggZ5esQaIP/LyolAm2qwcmrd3dZi+g24s7yjV0EUwvRP7xHRDQFgkAo6++QbuecU/
- J90lxrVnQwucZmfz9zgWDkT/MpfB/CNRSKLFjhYq2yHmHWT6vEjw9Ry/hF6Pc0oh1a62USdf
- aKAiim0nVxxQmPmiRvtCmcJJBBgRAgAJBQJBDrBvAhsMAAoJELtYafBk6nSr43AAn2ZZFQg8
- Gs/zUzvXMt7evaFqVTzcAJ0cHtKpP1i/4H4R9+OsYeQdxxWxTQ==
-In-Reply-To: <3d19dc03-72aa-46de-a6cc-4426cc84eb51@auristor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Mirapoint-Received-SPF: 209.85.160.198 mail-qt1-f198.google.com chet.ramey@case.edu 5 none
-X-Mirapoint-Received-SPF: 129.22.103.203 mpv-local-cfd-1.case.edu chet.ramey@case.edu 5 none
-X-Junkmail-Status: score=10/90, host=mpv-out-cfd-1.case.edu
-X-Junkmail-Signature-Raw: score=unknown,
-	refid=str=0001.0A006397.68123D3C.009D,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0,
-	ip=0.0.0.0,
-	so=2016-11-06 16:00:04,
-	dmn=2013-03-21 17:37:32,
-	mode=single engine
-X-Junkmail-IWF: false
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <666532.1746029681.1@warthog.procyon.org.uk>
+Date: Wed, 30 Apr 2025 17:14:41 +0100
+Message-ID: <666533.1746029681@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 4/29/25 1:35 PM, Jeffrey E Altman wrote:
+Chet Ramey <chet.ramey@case.edu> wrote:
 
-> I think its worth clarifying the purpose of this fallback logic and why it 
-> exists.  The fallback
-> logic was added to bash 1.14.7 as part of the introduction of support for 
-> IBM/Transarc AFS 3.4.
+> Well, except for CMU's report.
 
-The chronology is wrong. The workaround came in in January, 1992, when
-bash-1.11 was current and IBM released AFS 3.1. (The bug was actually
-encountered with bash-1.08.)
+Do you know of any link for that?  I'm guessing that is it was 1992, there may
+be no online record of it.
 
-The old code, without the workaround, caused widespread mail delivery
-failures at CMU, who reported the problem to me and (they claimed at the
-time) IBM, and provided the patch.
+David
 
-
-> It was noted that sometimes EEXIST would be returned from open(filename, 
-> flags | O_CREAT)
-> but would succeed if open(filename, flags & ~O_CREAT) was called.  There is 
-> no evidence that
-> the AFS developers were aware of the problem.
-
-Well, except for CMU's report.
-
--- 
-``The lyf so short, the craft so long to lerne.'' - Chaucer
-		 ``Ars longa, vita brevis'' - Hippocrates
-Chet Ramey, UTech, CWRU    chet@case.edu    http://tiswww.cwru.edu/~chet/
