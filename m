@@ -1,91 +1,103 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA3F4C97
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Apr 2025 22:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143DE10942;
+	Wed, 30 Apr 2025 03:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745964034; cv=none; b=CGO/oV9apluqSjigY/VNC72aYipv9MuXoOddxvK6ZOh16wVSXkOwC2txVU4feUn15D6u2CxvEuWU9im7VlNJt3WIsRmPa29UK4o8U8/v1z06lgu0amWdJ52NhxiynqNIeK9/qaFSkeTXXjC2PN96IwYctWHr0XVMg5ibCPTQ4oE=
+	t=1745982990; cv=none; b=ZPFulVVHBRVW1RykjspRbBoU0XkCTHlW+wD1+N0vC+GTPAWRA452akfbwHpInwqu8/ls7ZDoyVrlnzlTd5z/Ez8XbG5OhWaaxQYXuWJZ2yuKgUxO/wDgHBGjRUNRN34/eDyfTt6nTsOeux0UO7fIIyj9fAkXQZxFWm/YXYcRWfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745964034; c=relaxed/simple;
-	bh=rIJgNNc0qzTn5nzHs42MuGFPNU7kX29OGVdI+qSj1Nc=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=uUZmBDpHz2W9iSJ8tIe38h7gPsPFNCEsMLpzgTZo0NMyWkKs8m7l7jIP2AByzKPQtDWOzw/nCo3sFpy4Xs0LVHt0XncF5ppXKgwX+PrmxDGerc7CAWfwVSc7vjUehyBBqrqwzNxNNfiAKtNoFolBYEyDkAuhAWOO4HJ6VBjPTd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=WDtAC8Yt; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="WDtAC8Yt"
-Message-ID: <20ffc6424e8715005893a56c24a64a76@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1745964031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1kVpaGKjaUOjRa0iQw+kUzzsFtgyuhxSAKY8cHvESh0=;
-	b=WDtAC8YtXpdkUnZvy1s6FiUt2nVXob6DII4iiZpODowUyNwJn4NROGZFaWDwmVp1Vtvyn5
-	Ko8QFoyZOhhweq6Xi7+QlDDDxbQZTEQRcu3H99VPUg4vY804q4Jh0DPPgbuun7zU1Ae4wb
-	sHMhUvFjq03ThOZRJQbhV7d41f4+qRUJYK+5JbdGQEVYh/ow9KbH6eJ2NadeQHHnYuCRXo
-	w86myswvOU6/tpS0wfxqqHs4syxVtM8T/dtVRjGWji5YmJkRFkwQGM2fptsm0wtQOSViVx
-	sjKePK9ddBR4bjbeYTx+0BpGar4izkaVO4+ELJjVUo79fjtuc34kAbG5dwuahQ==
-From: Paulo Alcantara <pc@manguebit.com>
-To: David Howells <dhowells@redhat.com>
-Cc: dhowells@redhat.com, smfrench@gmail.com, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smb: client: ensure aligned IO sizes
-In-Reply-To: <442319.1745962381@warthog.procyon.org.uk>
-References: <20250429151827.1677612-1-pc@manguebit.com>
- <442319.1745962381@warthog.procyon.org.uk>
-Date: Tue, 29 Apr 2025 19:00:27 -0300
+	s=arc-20240116; t=1745982990; c=relaxed/simple;
+	bh=IKsZp9Rxn59bDLOwH2Vdp5ajC2h0CdrZLU3p3xxDh9s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ueZ0PqljHj64/M6LXmeGbm+uBrEotZTw/zairbxrvDR80FDNMpTW6IeQLgArdlVCHLNOcTacLbFe9J5PafE4jfBv5xd6n0XH0BO8HVQN15AVwWj9DfynzK7jPop6ymKyzLjfJkGuxJCUi/W1ZGR+NsJjZ8FjvkRbnI2480T2D44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZnMkY3s8Nz13LVd;
+	Wed, 30 Apr 2025 11:15:17 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4085E140134;
+	Wed, 30 Apr 2025 11:16:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg500010.china.huawei.com
+ (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 30 Apr
+ 2025 11:16:24 +0800
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+To: <linkinjeon@kernel.org>, <smfrench@gmail.com>, <norbert@doyensec.com>
+CC: <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<wangzhaolong1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>,
+	<chengzhihao1@huawei.com>
+Subject: [PATCH] ksmbd: fix memory leak in parse_lease_state()
+Date: Wed, 30 Apr 2025 11:16:23 +0800
+Message-ID: <20250430031623.744547-1-wangzhaolong1@huawei.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-David Howells <dhowells@redhat.com> writes:
+The previous patch that added bounds check for create lease context
+introduced a memory leak. When the bounds check fails, the function
+returns NULL without freeing the previously allocated lease_ctx_info
+structure.
 
-> Paulo Alcantara <pc@manguebit.com> wrote:
->
->> -	if (ctx->rsize == 0)
->> -		ctx->rsize = cifs_sb->ctx->rsize;
->> -	if (ctx->wsize == 0)
->> -		ctx->wsize = cifs_sb->ctx->wsize;
->> -
->> +	ctx->rsize = !rsize ? cifs_sb->ctx->rsize : CIFS_IO_ALIGN(rsize);
->> +	ctx->wsize = !wsize ? cifs_sb->ctx->wsize : CIFS_IO_ALIGN(wsize);
->
-> I would flip the logic:
->
-> 	ctx->rsize = rsize ? CIFS_IO_ALIGN(rsize) : cifs_sb->ctx->rsize;
-> 	ctx->wsize = wsize ? CIFS_IO_ALIGN(wsize) : cifs_sb->ctx->wsize;
->
-> that puts the default last.
+This patch fixes the issue by adding kfree(lreq) before returning NULL
+in both boundary check cases.
 
-Sounds good.  Will change.
+Fixes: bab703ed8472 ("ksmbd: add bounds check for create lease context")
+Signed-off-by: Wang Zhaolong <wangzhaolong1@huawei.com>
+---
+ fs/smb/server/oplock.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
->
->>  	case Opt_wsize:
->> -		ctx->wsize = result.uint_32;
->> +		ctx->wsize = CIFS_IO_ALIGN(result.uint_32);
->>  		ctx->got_wsize = true;
->> -		if (ctx->wsize % PAGE_SIZE != 0) {
->> -			ctx->wsize = round_down(ctx->wsize, PAGE_SIZE);
->> -			if (ctx->wsize == 0) {
->> -				ctx->wsize = PAGE_SIZE;
->> -				cifs_dbg(VFS, "wsize too small, reset to minimum %ld\n", PAGE_SIZE);
->> -			} else {
->> -				cifs_dbg(VFS,
->> -					 "wsize rounded down to %d to multiple of PAGE_SIZE %ld\n",
->> -					 ctx->wsize, PAGE_SIZE);
->> -			}
->> -		}
->>  		ctx->vol_wsize = ctx->wsize;
->>  		break;
->
-> Are you sure you want to get rid of the warning for the misconfiguration?
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 81a29857b1e3..03f606afad93 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -1494,11 +1494,11 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
+ 	if (sizeof(struct lease_context_v2) == le32_to_cpu(cc->DataLength)) {
+ 		struct create_lease_v2 *lc = (struct create_lease_v2 *)cc;
+ 
+ 		if (le16_to_cpu(cc->DataOffset) + le32_to_cpu(cc->DataLength) <
+ 		    sizeof(struct create_lease_v2) - 4)
+-			return NULL;
++			goto err_out;
+ 
+ 		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+ 		lreq->req_state = lc->lcontext.LeaseState;
+ 		lreq->flags = lc->lcontext.LeaseFlags;
+ 		lreq->epoch = lc->lcontext.Epoch;
+@@ -1510,19 +1510,22 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
+ 	} else {
+ 		struct create_lease *lc = (struct create_lease *)cc;
+ 
+ 		if (le16_to_cpu(cc->DataOffset) + le32_to_cpu(cc->DataLength) <
+ 		    sizeof(struct create_lease))
+-			return NULL;
++			goto err_out;
+ 
+ 		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+ 		lreq->req_state = lc->lcontext.LeaseState;
+ 		lreq->flags = lc->lcontext.LeaseFlags;
+ 		lreq->duration = lc->lcontext.LeaseDuration;
+ 		lreq->version = 1;
+ 	}
+ 	return lreq;
++err_out:
++	kfree(lreq);
++	return NULL;
+ }
+ 
+ /**
+  * smb2_find_context_vals() - find a particular context info in open request
+  * @open_req:	buffer containing smb2 file open(create) request
+-- 
+2.34.3
 
-I just found it annoying when mounting the share multiple times with an
-unaligned wsize value.  I'll keep it but I'll have to warn for the other
-IO sizes as well.  Printing them once with VFS|ONCE should be better.
