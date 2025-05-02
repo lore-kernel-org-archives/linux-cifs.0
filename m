@@ -1,414 +1,119 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E86376
-	for <linux-cifs@vger.kernel.org>; Fri,  2 May 2025 19:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E024A146A68;
+	Fri,  2 May 2025 20:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746215895; cv=none; b=gWHvKl0Pq83KyuBkAkokSNOihhaKRuNmAznmmxcCHXUxAossEdbg44OMeLsQofeQgDujuPrGXXPJuLBJp97uiLkCS4pxDLXRGOgsbpikXpGaeuo5KOc7qKZQh0xhOcfeUtPZfVY7Xmxh8hD/KvTDOG+vAISdxOhipBcX4nb0PeI=
+	t=1746217079; cv=none; b=AKrAW4FAToXpC6SaERwMbORX7X/czuQ8e24AfFF5PyZRB6Q+dONyn+ap6pQKqpJJ/q045UkNyqlBdV3ST3xnywiBGqjlix1h2PdxfrZ+dT+4ICaY/4saoKUpePMT1L4OQj8UpCOe2B1l1w7lPvCbqXTYkeslPivQkdjU7YNGlBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746215895; c=relaxed/simple;
-	bh=/re5hbM5YQoAmmbtyJwcyIws4L3mMikI04GfQT2mAgE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d5gdmahsxPAo1kMKJKBgTGaIDJMdFqbyqWdMHC2TLN7a6iO1F18v0TwRtgEKi7ifZF/nROWzfyY9nWw/QTtbFfit8QdWFqiLTnUd3jLTwzbSAm132G0eIsOKkzJ3pcvlSbhjr8+KCldDvXoqKzunPzvhVsU7975r9ePlXb3j5II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WadZLGej; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8AFHgy3g; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=WadZLGej; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8AFHgy3g; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1746217079; c=relaxed/simple;
+	bh=E5gwB1+Hj5oqS1YcS2EpyRAcex38Ij8qcYJuEEvjAHw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=h8E9rM+nuHZWCJ2BnM3id0Ou1vbdzoug3SLiSwbG9MyBs3nc74UlLGqqX35irMh50AhX4oG/ZBe7qt+t9oLBNBwDEwqf4vuxdlghWnB92XQUYKXLNLvMlY8QLqJoKtTW9raYxFULfRIg2ho82PDszxxPishraKDZXMiHVa+k30E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByyXYM2V; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WadZLGej";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8AFHgy3g";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="WadZLGej";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8AFHgy3g"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 84AE91F385;
-	Fri,  2 May 2025 19:58:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1746215890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jR37bEjYFu0KReEjsHPDysVr0q4o6ARRTasO0h9ylmU=;
-	b=WadZLGejuISsC275wpVaIvGAEiIXIV2TEy+/YhlJr90lPEsdAQ8sAFBv1/TIgiyB+UuwPT
-	OAnr+0uTuKBu1QI6to7p6Nj6O+tBcSwvVBC3KOVM9ApawLTuBIUVWAbiOIOCYv4kCAfznF
-	FMBIoRtnhwFIz1RtoQU6aM2LOgFDBO0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1746215890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jR37bEjYFu0KReEjsHPDysVr0q4o6ARRTasO0h9ylmU=;
-	b=8AFHgy3guuV+OydpIYSsJRGKMJqygdkuMPnB+JZpWl8cczin/HwTcyq6lP3r/XZpMG15BJ
-	F+Y0swc9SxvZc5AA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1746215890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jR37bEjYFu0KReEjsHPDysVr0q4o6ARRTasO0h9ylmU=;
-	b=WadZLGejuISsC275wpVaIvGAEiIXIV2TEy+/YhlJr90lPEsdAQ8sAFBv1/TIgiyB+UuwPT
-	OAnr+0uTuKBu1QI6to7p6Nj6O+tBcSwvVBC3KOVM9ApawLTuBIUVWAbiOIOCYv4kCAfznF
-	FMBIoRtnhwFIz1RtoQU6aM2LOgFDBO0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1746215890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jR37bEjYFu0KReEjsHPDysVr0q4o6ARRTasO0h9ylmU=;
-	b=8AFHgy3guuV+OydpIYSsJRGKMJqygdkuMPnB+JZpWl8cczin/HwTcyq6lP3r/XZpMG15BJ
-	F+Y0swc9SxvZc5AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3424F1372E;
-	Fri,  2 May 2025 19:58:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Snk6Os8jFWhweAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Fri, 02 May 2025 19:58:07 +0000
-Date: Fri, 2 May 2025 16:58:00 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Steve French <smfrench@gmail.com>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, paul@darkrain42.org, 
-	bharathsm@microsoft.com, linux-cifs@vger.kernel.org, 
-	Meetakshi Setiya <msetiya@microsoft.com>
-Subject: Re: [PATCH] smb: cached_dir.c: fix race in cfid release
-Message-ID: <fh2ose2otti5opro6jmpoo6dr4uhc2nfdrlgo3e2ikim4y4gqq@7zxtxyyhphah>
-References: <20250502180136.192407-1-henrique.carvalho@suse.com>
- <CAH2r5msw0gCUH29up7D5p2eH5LLGtmwu9E5PJagUi3S2trPHrA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByyXYM2V"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30bf3f3539dso25209651fa.1;
+        Fri, 02 May 2025 13:17:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746217076; x=1746821876; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SaIqjq9KpAJ/+nEjnkzbnEUUUTwKcNBa7HBXrlZhXUI=;
+        b=ByyXYM2VAKpbeHN0s3yWGbZPFbdS0viJPaMFVdn6VU414szNCJYzxGIFbjjpin9E4g
+         7VmODe2GPP748mJCw9/vn2EKpopVq544iXOsnSCWY/npD+6PERg1dQ1MMImQnaPu7+cx
+         uJ6SjkxFkNYxv3KB4V88mLC30etXyJVrstRGPjZmEnq9/3eYXcINvB2PrEtyY7aKWx/3
+         bfLitrTGOejIX6I05kKdLSqf2hBfwmFR/+FWEyJWdWX+Kve0u+LXh0XvKh/IJ/5+najA
+         XbGD4T2/3LCyEO431eN/873oXbTLIEpPOaiUzfDtQ0arU1eWas0N3NJxuC/2hB6RRn5M
+         DzRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746217076; x=1746821876;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SaIqjq9KpAJ/+nEjnkzbnEUUUTwKcNBa7HBXrlZhXUI=;
+        b=B0UgX2lzfK8kb7f36C+cZKlfCZ2FkskWPzeOl/zqvIYV5rJtK/Obhk1E4mDGue9JhT
+         rRdyr4irW8ZvvOwebgTb5pEoObiVDQnHjR2dH5NP/NS1gJutznKQXkxxO5j3rsWT0ydk
+         x+zLZD/fBjBKQ3Xjyq0yTX1Rwcnvu4CgwT0I/2NYegshVbWL/wATosGHoh30BbMYU8O3
+         KG8rEJdutyrdQorruxlSoSmgqpbfXZT8XDgHJHX3O/uFEBp/+lZDy+mo9iQ1zrbcGOey
+         dAd7KbcVYrmIELEdQymFym0dNowSBE1zzP5x0/+85gkeob2oMuMR+idmtL9/cwvoWwGY
+         QIew==
+X-Forwarded-Encrypted: i=1; AJvYcCVGFj3+bpqR2mmsglLX5vaO2LroYjemSv3AIQVpqRf9w3m/JXYHsL0ZLn6+cgbmrBcZqZKa5qqbCAGx@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2Sd4L2w1/UNev9p8zcGvaCPEC/bVa6YZ1owO6VKpsle/pgcZG
+	LtO5GodoZULufmTO0KjwqQljwc61XsTO81Pjy9+mxOkbKbKx1+z6VSJqKaHHR+ZFw+fH/8VfECS
+	IFHrkN22wMM5vO5vu/JNCZPL3ZBVAAPdM
+X-Gm-Gg: ASbGncsWvL930uCWDj/3fg5ny8AFoqFSfrcH2qGNANlRj7uCwSJLvcMQ1Yn+CfEBQk7
+	vIsKsgiFU1L73ZvDdeCwaMwUS/YgpwTURHC0FR9fJdcRgBoj8YaqtX38036KMaU7jOlXDEYkG3g
+	IKH4qE1oO2nY31ItfOF5IHlmGmPkafwjqDGZu/azRr3yWLT3u++P0JmV7m
+X-Google-Smtp-Source: AGHT+IGUIpUOwOcjH8Jb2We6DvKK+Y9vC3VbvRom4zxzK8kuLQbrpp4eguR5QpLbs6UKaD39zSQNimjKImedo4vnQJ4=
+X-Received: by 2002:a2e:bc81:0:b0:30b:aaca:9b2e with SMTP id
+ 38308e7fff4ca-31fb8f0440bmr23267921fa.0.1746217075658; Fri, 02 May 2025
+ 13:17:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 2 May 2025 15:17:44 -0500
+X-Gm-Features: ATxdqUHhe8LA-u1SUoZI1t1lKuVpSxdtHJ51mjP2n5B4HdsAv7qKe-L79Iba8hs
+Message-ID: <CAH2r5mvFmxyPuxTOzGVvDOq1N3nYwh2ogj7yA-rrABdXgGpjbQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5msw0gCUH29up7D5p2eH5LLGtmwu9E5PJagUi3S2trPHrA@mail.gmail.com>
-X-Spam-Score: -3.79
-X-Spamd-Result: default: False [-3.79 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.19)[-0.970];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,manguebit.com,gmail.com,microsoft.com,darkrain42.org,vger.kernel.org];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
 
-On 05/02, Steve French wrote:
->I fixed a minor checkpatch warning but also noticed this compile
->warning - is there a missing lock call?
->
->cached_dir.c:429:20: warning: context imbalance in 'cfid_release' -
->unexpected unlock
+Please pull the following changes since commit
+b4432656b36e5cc1d50a1f2dc15357543add530e:
 
-The lock is taken (inside kref_put_lock) if count =3D=3D 0 (i.e. when the
-release function is called) and must be released from within the
-release function (which is done here).
+  Linux 6.15-rc4 (2025-04-27 15:19:23 -0700)
 
-However, sparse can't recognize this and also there doesn't seem to
-exist an annotation to indicate so.
+are available in the Git repository at:
 
-@Henrique do you think you could rework the patch to something like:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc4-smb3-client-fixes
 
-cfid_release() {
-	list_del();
-	on_list =3D false;
-	num_entries--;
-}
+for you to fetch changes up to c59f7c9661b9d3ee33a21d7b4f1dd4b77079e3e7:
 
-cfid_put() {
-	lock();
-	if (kref_put(..., cfid_release)) {
-		unlock();
-		dput();
-		SMB2_close();
-		free_cached_dir();
-		return;
-	}
-	unlock();
-}
+  smb: client: ensure aligned IO sizes (2025-05-01 08:35:58 -0500)
 
+----------------------------------------------------------------
+Four client fixes:
+- fix posix mkdir error to ksmbd (also avoids crash in
+cifs_destroy_request_bufs)
+- two smb1 fixes: fixing querypath info and setpathinfo to old servers
+- fix rsize/wsize when not multiple of page size to address DIO reads/write=
+s
 
-Cheers,
+----------------------------------------------------------------
+Jethro Donaldson (1):
+      smb: client: fix zero length for mkdir POSIX create context
 
-Enzo
+Pali Roh=C3=A1r (2):
+      cifs: Fix and improve cifs_query_path_info() and cifs_query_file_info=
+()
+      cifs: Fix changing times and read-only attr over SMB1
+smb_set_file_info() function
 
->On Fri, May 2, 2025 at 1:04=E2=80=AFPM Henrique Carvalho
-><henrique.carvalho@suse.com> wrote:
->>
->> find_or_create_cached_dir() could grab a new reference after kref_put()
->> had seen the refcount drop to zero but before cfid_list_lock is acquired
->> in smb2_close_cached_fid(), leading to use-after-free.
->>
->> Switch to kref_put_lock() so cfid_release() runs with cfid_list_lock
->> held, closing that gap.
->>
->> While we are at it:
->> * rename the functions smb2_close_cached_fid() and close_cached_dir()
->>   for clarity;
->> * replace the calls to kref_put() for cfid_put().
->>
->> Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
->> ---
->>  fs/smb/client/cached_dir.c | 28 ++++++++++++++++------------
->>  fs/smb/client/cached_dir.h |  2 +-
->>  fs/smb/client/inode.c      |  4 ++--
->>  fs/smb/client/readdir.c    |  4 ++--
->>  fs/smb/client/smb2inode.c  |  2 +-
->>  fs/smb/client/smb2ops.c    |  8 ++++----
->>  6 files changed, 26 insertions(+), 22 deletions(-)
->>
->> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->> index fe738623cf1b..ff4f9f8150cf 100644
->> --- a/fs/smb/client/cached_dir.c
->> +++ b/fs/smb/client/cached_dir.c
->> @@ -14,7 +14,7 @@
->>
->>  static struct cached_fid *init_cached_dir(const char *path);
->>  static void free_cached_dir(struct cached_fid *cfid);
->> -static void smb2_close_cached_fid(struct kref *ref);
->> +static void cfid_release(struct kref *ref);
->>  static void cfids_laundromat_worker(struct work_struct *work);
->>
->>  struct cached_dir_dentry {
->> @@ -370,11 +370,13 @@ int open_cached_dir(unsigned int xid, struct cifs_=
-tcon *tcon,
->>                          * lease. Release one here, and the second below.
->>                          */
->>                         cfid->has_lease =3D false;
->> -                       kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +
->> +                       /* If this cfid_put calls back cfid_release the =
-code is wrong anyway. */
->> +                       cfid_put(cfid);
->>                 }
->>                 spin_unlock(&cfids->cfid_list_lock);
->>
->> -               kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +               cfid_put(cfid);
->>         } else {
->>                 *ret_cfid =3D cfid;
->>                 atomic_inc(&tcon->num_remote_opens);
->> @@ -413,13 +415,12 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tc=
-on,
->>  }
->>
->>  static void
->> -smb2_close_cached_fid(struct kref *ref)
->> +cfid_release(struct kref *ref)
->>  {
->>         struct cached_fid *cfid =3D container_of(ref, struct cached_fid,
->>                                                refcount);
->>         int rc;
->>
->> -       spin_lock(&cfid->cfids->cfid_list_lock);
->>         if (cfid->on_list) {
->>                 list_del(&cfid->entry);
->>                 cfid->on_list =3D false;
->> @@ -454,16 +455,19 @@ void drop_cached_dir_by_name(const unsigned int xi=
-d, struct cifs_tcon *tcon,
->>         spin_lock(&cfid->cfids->cfid_list_lock);
->>         if (cfid->has_lease) {
->>                 cfid->has_lease =3D false;
->> -               kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +
->> +               /* If this cfid_put calls back cfid_release the code is =
-wrong anyway. */
->> +               cfid_put(cfid);
->>         }
->>         spin_unlock(&cfid->cfids->cfid_list_lock);
->> -       close_cached_dir(cfid);
->> +       cfid_put(cfid);
->>  }
->>
->>
->> -void close_cached_dir(struct cached_fid *cfid)
->> +void cfid_put(struct cached_fid *cfid)
->>  {
->> -       kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +       struct cached_fids *cfids =3D cfid->tcon->cfids;
->> +       kref_put_lock(&cfid->refcount, cfid_release, &cfids->cfid_list_l=
-ock);
->>  }
->>
->>  /*
->> @@ -564,7 +568,7 @@ cached_dir_offload_close(struct work_struct *work)
->>
->>         WARN_ON(cfid->on_list);
->>
->> -       kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +       cfid_put(cfid);
->>         cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cached_close);
->>  }
->>
->> @@ -688,7 +692,7 @@ static void cfids_invalidation_worker(struct work_st=
-ruct *work)
->>         list_for_each_entry_safe(cfid, q, &entry, entry) {
->>                 list_del(&cfid->entry);
->>                 /* Drop the ref-count acquired in invalidate_all_cached_=
-dirs */
->> -               kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +               cfid_put(cfid);
->>         }
->>  }
->>
->> @@ -741,7 +745,7 @@ static void cfids_laundromat_worker(struct work_stru=
-ct *work)
->>                          * Drop the ref-count from above, either the lea=
-se-ref (if there
->>                          * was one) or the extra one acquired.
->>                          */
->> -                       kref_put(&cfid->refcount, smb2_close_cached_fid);
->> +                       cfid_put(cfid);
->>         }
->>         queue_delayed_work(cfid_put_wq, &cfids->laundromat_work,
->>                            dir_cache_timeout * HZ);
->> diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
->> index 1dfe79d947a6..f4fc7818dda5 100644
->> --- a/fs/smb/client/cached_dir.h
->> +++ b/fs/smb/client/cached_dir.h
->> @@ -73,7 +73,7 @@ extern int open_cached_dir(unsigned int xid, struct ci=
-fs_tcon *tcon,
->>  extern int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
->>                                      struct dentry *dentry,
->>                                      struct cached_fid **cfid);
->> -extern void close_cached_dir(struct cached_fid *cfid);
->> +extern void cfid_put(struct cached_fid *cfid);
->>  extern void drop_cached_dir_by_name(const unsigned int xid,
->>                                     struct cifs_tcon *tcon,
->>                                     const char *name,
->> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
->> index 75be4b46bc6f..c3ef1f93a80d 100644
->> --- a/fs/smb/client/inode.c
->> +++ b/fs/smb/client/inode.c
->> @@ -2610,10 +2610,10 @@ cifs_dentry_needs_reval(struct dentry *dentry)
->>
->>         if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
->>                 if (cfid->time && cifs_i->time > cfid->time) {
->> -                       close_cached_dir(cfid);
->> +                       cfid_put(cfid);
->>                         return false;
->>                 }
->> -               close_cached_dir(cfid);
->> +               cfid_put(cfid);
->>         }
->>         /*
->>          * depending on inode type, check if attribute caching disabled =
-for
->> diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
->> index 50f96259d9ad..1e1768152803 100644
->> --- a/fs/smb/client/readdir.c
->> +++ b/fs/smb/client/readdir.c
->> @@ -1093,7 +1093,7 @@ int cifs_readdir(struct file *file, struct dir_con=
-text *ctx)
->>          * find_cifs_entry in case there will be reconnects during
->>          * query_directory.
->>          */
->> -       close_cached_dir(cfid);
->> +       cfid_put(cfid);
->>         cfid =3D NULL;
->>
->>   cache_not_found:
->> @@ -1199,7 +1199,7 @@ int cifs_readdir(struct file *file, struct dir_con=
-text *ctx)
->>
->>  rddir2_exit:
->>         if (cfid)
->> -               close_cached_dir(cfid);
->> +               cfid_put(cfid);
->>         free_dentry_path(page);
->>         free_xid(xid);
->>         return rc;
->> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
->> index 57d9bfbadd97..f805d71a8d19 100644
->> --- a/fs/smb/client/smb2inode.c
->> +++ b/fs/smb/client/smb2inode.c
->> @@ -975,7 +975,7 @@ int smb2_query_path_info(const unsigned int xid,
->>                                                      cfid->fid.volatile_=
-fid,
->>                                                      &data->fi);
->>                         }
->> -                       close_cached_dir(cfid);
->> +                       cfid_put(cfid);
->>                         return rc;
->>                 }
->>                 cmds[num_cmds++] =3D SMB2_OP_QUERY_INFO;
->> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->> index 2fe8eeb98535..97c4d44c9a69 100644
->> --- a/fs/smb/client/smb2ops.c
->> +++ b/fs/smb/client/smb2ops.c
->> @@ -889,7 +889,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tc=
-on *tcon,
->>         if (cfid =3D=3D NULL)
->>                 SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_f=
-id);
->>         else
->> -               close_cached_dir(cfid);
->> +               cfid_put(cfid);
->>  }
->>
->>  static void
->> @@ -940,10 +940,10 @@ smb2_is_path_accessible(const unsigned int xid, st=
-ruct cifs_tcon *tcon,
->>         rc =3D open_cached_dir(xid, tcon, full_path, cifs_sb, true, &cfi=
-d);
->>         if (!rc) {
->>                 if (cfid->has_lease) {
->> -                       close_cached_dir(cfid);
->> +                       cfid_put(cfid);
->>                         return 0;
->>                 }
->> -               close_cached_dir(cfid);
->> +               cfid_put(cfid);
->>         }
->>
->>         utf16_path =3D cifs_convert_path_to_utf16(full_path, cifs_sb);
->> @@ -2804,7 +2804,7 @@ smb2_query_info_compound(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->>         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
->>         free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
->>         if (cfid)
->> -               close_cached_dir(cfid);
->> +               cfid_put(cfid);
->>         kfree(vars);
->>  out_free_path:
->>         kfree(utf16_path);
->> --
->> 2.47.0
->>
->>
->
->
->--=20
->Thanks,
->
->Steve
->
+Paulo Alcantara (1):
+      smb: client: ensure aligned IO sizes
+
+ fs/smb/client/cifspdu.h    |   5 +-
+ fs/smb/client/cifsproto.h  |   4 +
+ fs/smb/client/cifssmb.c    |  57 ++++++++++++
+ fs/smb/client/connect.c    |  23 +----
+ fs/smb/client/file.c       |   6 +-
+ fs/smb/client/fs_context.c |  25 ++----
+ fs/smb/client/fs_context.h |  47 ++++++++++
+ fs/smb/client/smb1ops.c    | 223 +++++++++++++++++++++++++++++++++++++++++=
+-----
+ fs/smb/client/smb2pdu.c    |   9 +-
+ 9 files changed, 324 insertions(+), 75 deletions(-)
+
+--=20
+Thanks,
+
+Steve
