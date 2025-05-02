@@ -1,94 +1,102 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356B443169
-	for <linux-cifs@vger.kernel.org>; Fri,  2 May 2025 15:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F724255F57
+	for <linux-cifs@vger.kernel.org>; Fri,  2 May 2025 15:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746198869; cv=none; b=MG3mHFzz49TtKN8Kfsz4/n6Ml6ZXySS5JxjAQO3laJ/9v0WGR2NEyDRc7481/PH/usqtyMfUGRhYbB75EvLoZNCZhZR2Ky6LUpGd1cvDfKCY07GPMXoQB198Iff7PGXmSydnTLFeGND7FA9AtxOw3ft75riXj9bjo0+XFxRV/6E=
+	t=1746199409; cv=none; b=jX1ejzWaCbJI4sd0pDmAQtO6TxO3JPNYK9b2jwt9vXc6CsD0I5px4ICv1oYP6xjyGKUKYIGX1/2T3EhTGYoZQhCI2WzYZQkVcgTCgeCqj+WNEmdKd4rAfNveOzwe45PYWtqtO0J8szXCKaaY3wPmbgfK0Y6ff7/R78sFbr9rxLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746198869; c=relaxed/simple;
-	bh=2MZhHw06gm21gX1GvtfkiLrkxBaAtgFe7lhWiUbpkLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WkQQ7mrPK8T5dUGQIsiK/HGoPIsniaDxblnF9rzMGpLJAd8jW5zFltf0/4xamgN2PdfD8H+w0q9CtTNsoK2UTY320W9Eld9cYRU/kAregNSd5N2kcpf1uXfByqbPdkI49Gt73g3nZiebOsNKtG7tP7BKdCxsY+Mq0/D0oj4XSfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=F3t5AVRt; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1746199409; c=relaxed/simple;
+	bh=iS14L5C3OQqyBc3MEklvLNcrfrUFp9jpIG62B0vOY1o=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=nK5j/bi7vrSV5ATxMMbnB2CQ6UN0pTfSrZx76/U1A9KZWav7kB+T7GIdRR1mxy16pY1Ya66IGvQalI9Vb3beazOY2jDU0HMuMzCGpl6DlK99UO9O8rxtAHZW/OmzcF9KeUW2iheqQbZvQgKlc7/lseqTpPFNvvPpbcskiV1ZF9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LInXBq9F; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="F3t5AVRt"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ac6e8cf9132so399604766b.2
-        for <linux-cifs@vger.kernel.org>; Fri, 02 May 2025 08:14:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LInXBq9F"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5f624291db6so3280567a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 02 May 2025 08:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1746198865; x=1746803665; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7gq8hseqwi/gHQx1r6qoqGp2kSpWCXdI95m+XKWMWr0=;
-        b=F3t5AVRteRqApBsiC8ALVyLPF0uxx3zv5Eb/zVT5v2WoW7xDKRzo12HoEEjmDA81XY
-         FUMEpfmVqctaVlwrvQNQLqbmItViGNuduPo9mHN/TCQ+m/LIm/I/crMyO6jpfFSpHCMB
-         eD1BljkFiqY5kyg0c7oxmh843axrYijnHiVHSCBXXeQzuuUhbVArCCLam2dfezsN1/x2
-         s7JSgLn7Q/0el2bzhcBaHqr1x5ZrkFKkEpJyqaNcKZmRP6AX6ky2c8tD2WMEdt+xlLRn
-         fCG4jT++2a80eOcBxH2SDJ9EU4NlX8c3A7tdh2ieS0jn6vaBBe66DGaqfIQd01dktgBo
-         zb5A==
+        d=gmail.com; s=20230601; t=1746199405; x=1746804205; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=P5cd9A3VHg7JI+OhsdG5qw4MqQOLu1cbY7d4omPpn2U=;
+        b=LInXBq9FOyhp5nUZXdYreJZvFVvdJmyaqFouvsmDxBoGAGmtKbI5Ba7y9F0V1I6wzR
+         u0je4NoBI77H41h+ImwRajckb0yqGqp1bBA0cZexcutM0o8npdtHRegi+Jmm0KjIQxE1
+         hIC+aPFjarlzhQFQ90q1ZTAXw3ML4VBOmOl3bgw0NKcARMesv4qYY6Odqf/bUB3ECJd1
+         cXNVeENBBlxJ4xEBqpML2EfxGRTeZuq2sMAmVfOHPtz7gh2QY20xY72LZ6SSw+w0EAGR
+         3/a2aPLHjc5nfadMmxSJXvhiw2laCeZ+MNwPhWpuw1h/fZm8RPmOpIRDQvuaCXMJut1+
+         Db2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746198865; x=1746803665;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7gq8hseqwi/gHQx1r6qoqGp2kSpWCXdI95m+XKWMWr0=;
-        b=X33UdnbBnBK/Sg0VNog5N+45CVxo9+sCtnMeOYGBrgpjgGBEv5icSal6V+OGEdSEg3
-         PQTeT7bXP/3hBNQKR4ELVjgoyDp/Efe80rDrJD49QP5A7wLIVbNyGVJAZfMsfHkJXP4I
-         DMXfCj4tOAVU1KgUaBtwM+MyqZfOngKBNZLyhHWz1QBTD4Ln53I1Z4y95u1944jpevRQ
-         x/ryCGWzh99Ng59ddKUaL+4nuxIDRSs71QAZT/O2fLU2FQWiY4NhjPF/t2Jh/GPlyRkf
-         +UKowhQEsh3uWiZ8qkgCtPvIdFd+xPnN/JbaD7AjKLLuveJG/ZBsMkhojd7Hz+q5om88
-         89uw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSmxCZkaroJQ0aLcFeHedDAqSrw5pKLhIGUb7/pT8QNYBCOZCZSGQvoeQIn/wv2XNWgMCabRY+uaZF@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpf1Htii2zWb0Ojpww06AnxUXJyocG9MHcOojeH29cz6yxOppZ
-	DXbiyrqp2XpRl83eDTN8YoSnfinjP5LN4KCLcrO2of1vlBQDTXqQN2+U0Ef0NvI=
-X-Gm-Gg: ASbGncta3a5Cj12iSB/r1rWHGpfPuM4ybi4NzJ3oPJscA5ErFbLdS0Otgyzs0tcRuCY
-	7j1/0EawJT93XpugYHS+ekgI33G2/zGFUOJ6qITjchtK2b1kf1wODz9NwqJG5gdLXGicpfTYka8
-	gkK1w9ZILqQlcYGlJNDH/sAkRjXWCZ5bYfVyZTKiVDkpyCDlxZp0JZmf0+6OxSmtUpdGvhTar+K
-	EVtkW3ZyOkYDE93mVAZXqr9vPJjOGMusY8DFjbRZw5zksd+uWLMvvsAo8pfb07QygqquviBuz3S
-	mEteokjU/Hir9il/Zchw9bgbbBrVvCwqf4hDoVyC+BrX/Yq5
-X-Google-Smtp-Source: AGHT+IHPBL5YU4UBo8WIJMp5ICD5akUjvbaf8bLoOGaSknWPpGmhxDjNJTFbSLzF2QHGZFncXgRuQQ==
-X-Received: by 2002:a17:907:9620:b0:ace:9d90:cdd3 with SMTP id a640c23a62f3a-ad17b8630e7mr288683866b.49.1746198865421;
-        Fri, 02 May 2025 08:14:25 -0700 (PDT)
-Received: from precision ([138.121.131.123])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a3480ea02sm5883938a91.33.2025.05.02.08.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 08:14:24 -0700 (PDT)
-Date: Fri, 2 May 2025 12:12:44 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: nspmangalore@gmail.com
-Cc: smfrench@gmail.com, bharathsm.hsk@gmail.com, ematsumiya@suse.de,
-	pc@manguebit.com, paul@darkrain42.org, ronniesahlberg@gmail.com,
-	linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 3/5] cifs: serialize initialization and cleanup of cfid
-Message-ID: <aBTg7K778dLsIFXS@precision>
-References: <20250502051517.10449-1-sprasad@microsoft.com>
- <20250502051517.10449-3-sprasad@microsoft.com>
- <aBTgTCnAn4S-UT9V@precision>
+        d=1e100.net; s=20230601; t=1746199405; x=1746804205;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P5cd9A3VHg7JI+OhsdG5qw4MqQOLu1cbY7d4omPpn2U=;
+        b=q78Q0io3CRakjJBZ//6Zelb9AXJYZCQ1GUTKSuGEPNsE2uKsp0+eJ1ad0rOdMrhVmo
+         VTv/JUeejcgf0VCs25dKTIJ1ffIG8pePOpDwamod8f4f12jmwXT9GchFq/BlgNSfbl4o
+         cvvRHh8jwOfsvOueDDh5v6BNlzhUNBLC1If5iRlGAhflWfxuK0CmxcIQhtNWT/xFrP1r
+         r2DUVr4JP73wgQa1tH4ZIzx/5dm/om9BYWBtAL56UzxyZyxP4UHDyLahRKzc5zCm1zWS
+         wXBMyepOO94fr1jo56xBPoapwhCz4sRkZ9twPuq8rtMfe+yfxJ1nMoWNvR1lfPvNfejI
+         9CVg==
+X-Gm-Message-State: AOJu0YxlWwBNijniAFFIbTWBSHoR3jPxYxJec3y0/BXcFkU9Kovpol+Q
+	hps7MLMeR5pFGzGo8M9p5U9oYKMKjPD2n6rBHwwjZZkzY6xMn+YyvKfccItKvd98epSfsmqucYA
+	dK9Ok789cy64De4HNGPimJNkBHXXpDziulwUFXA==
+X-Gm-Gg: ASbGncvMGJ/Ec8j0DIMDDaGFTX1dXpfmED7ujlGQProcZZjSuVdhL7v8qxkqNezlL2+
+	BEgV7fmAWvzeL6USvBeCKsqZvKXbHa/SUvrilntenLRiMflNwyDUeWXwX/dRAd3kAPfccY3c8MQ
+	ySXtdZSIStQQ9JoUu/TsNT/vw=
+X-Google-Smtp-Source: AGHT+IGvGZES4UeSweu3vOg2EtEdsTTxEh7IKyzG6hyijJb51eeLShfzx03+RA9whl/Iq0QRTwguvjtRUl4Z+DLLE6g=
+X-Received: by 2002:a05:6402:50d4:b0:5dc:c9ce:b01b with SMTP id
+ 4fb4d7f45d1cf-5fa78008ac0mr2566069a12.8.1746199405023; Fri, 02 May 2025
+ 08:23:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBTgTCnAn4S-UT9V@precision>
+From: Zhixu Liu <zhixu.liu@gmail.com>
+Date: Fri, 2 May 2025 23:22:47 +0800
+X-Gm-Features: ATxdqUEmm4n-us4nduw4VYH7TXz0VSGqPv10hrWrMCJX4VOZZPl5-9XoZmt1j6s
+Message-ID: <CALMA0xaVdk3qwkb-92QqF2+6z+=oxbBWDR1hYEoE2WUc7jVGkw@mail.gmail.com>
+Subject: [PATCH] getcifsacl, setcifsacl: use <libgen.h> for basename
+To: linux-cifs@vger.kernel.org
+Content-Type: multipart/mixed; boundary="0000000000003e8aa9063428bbe8"
 
-On Fri, May 02, 2025 at 12:10:04PM -0300, Henrique Carvalho wrote:
-> 
-> Second, I am not fully convinced that we need a mutex there. :/ I have
-> thought about it many times and I could not get a proof that there is a
-> race happening there.
-> 
-> Third, (referencing PATCH 2) even if we have a mutex there, shouldn't we
-> just let the thread that just acquired the mutex retry to acquire the
-> lease (which I believe is the current behavior).
+--0000000000003e8aa9063428bbe8
+Content-Type: text/plain; charset="UTF-8"
 
-Here "there" means open_cached_dir.
+basename() is defined in <libgen.h> only in musl, while glibc defines it
+in <string.h> too, which is not standard behavior.
 
-> 
-> Thanks,
-> Henrique
+please see attachment for the patch, thanks.
+-- 
+Z. Liu
+
+--0000000000003e8aa9063428bbe8
+Content-Type: application/octet-stream; 
+	name="0001-getcifsacl-setcifsacl-use-libgen.h-for-basename.patch"
+Content-Disposition: attachment; 
+	filename="0001-getcifsacl-setcifsacl-use-libgen.h-for-basename.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_ma6xzzuf0>
+X-Attachment-Id: f_ma6xzzuf0
+
+RnJvbSBhYmQzZDlhMmQ0ZjhhNWRjNGQ5MGRhZGRjN2NmMGM2MmQ5NTRmMDNhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiAiWi4gTGl1IiA8emhpeHUubGl1QGdtYWlsLmNvbT4KRGF0ZTog
+RnJpLCAyIE1heSAyMDI1IDIzOjA4OjQxICswODAwClN1YmplY3Q6IFtQQVRDSF0gZ2V0Y2lmc2Fj
+bCwgc2V0Y2lmc2FjbDogdXNlIDxsaWJnZW4uaD4gZm9yIGJhc2VuYW1lCgpiYXNlbmFtZSgpIGlz
+IGRlZmluZWQgaW4gPGxpYmdlbi5oPiBvbmx5IGluIG11c2wsIHdoaWxlIGdsaWJjIGRlZmluZXMg
+aXQKaW4gPHN0cmluZy5oPiB0b28sIHdoaWNoIGlzIG5vdCBzdGFuZGFyZCBiZWhhdmlvci4KClNp
+Z25lZC1vZmYtYnk6IFouIExpdSA8emhpeHUubGl1QGdtYWlsLmNvbT4KCmRpZmYgLS1naXQgYS9n
+ZXRjaWZzYWNsLmMgYi9nZXRjaWZzYWNsLmMKaW5kZXggOTc0NzFlOS4uNmM2MzU2ZiAxMDA2NDQK
+LS0tIGEvZ2V0Y2lmc2FjbC5jCisrKyBiL2dldGNpZnNhY2wuYwpAQCAtMzMsNiArMzMsNyBAQAog
+I2luY2x1ZGUgPHN0ZGxpYi5oPgogI2luY2x1ZGUgPHN0ZGRlZi5oPgogI2luY2x1ZGUgPGVycm5v
+Lmg+CisjaW5jbHVkZSA8bGliZ2VuLmg+CiAjaW5jbHVkZSA8bGltaXRzLmg+CiAjaW5jbHVkZSA8
+Y3R5cGUuaD4KICNpbmNsdWRlIDxsaW51eC9saW1pdHMuaD4KZGlmZiAtLWdpdCBhL3NldGNpZnNh
+Y2wuYyBiL3NldGNpZnNhY2wuYwppbmRleCBiMTk5MTE4Li4zY2I2MDNjIDEwMDY0NAotLS0gYS9z
+ZXRjaWZzYWNsLmMKKysrIGIvc2V0Y2lmc2FjbC5jCkBAIC00Nyw2ICs0Nyw3IEBACiAjaW5jbHVk
+ZSA8c3RkaW8uaD4KICNpbmNsdWRlIDxzdGRsaWIuaD4KICNpbmNsdWRlIDxlcnJuby5oPgorI2lu
+Y2x1ZGUgPGxpYmdlbi5oPgogI2luY2x1ZGUgPGxpbWl0cy5oPgogI2luY2x1ZGUgPGN0eXBlLmg+
+CiAjaW5jbHVkZSA8bGludXgvbGltaXRzLmg+Ci0tIAoyLjQ1LjIKCg==
+--0000000000003e8aa9063428bbe8--
