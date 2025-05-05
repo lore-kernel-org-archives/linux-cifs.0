@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB05D280CCD;
-	Mon,  5 May 2025 22:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D81280CF6;
+	Mon,  5 May 2025 22:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483318; cv=none; b=G9QfNUAp45FXpYtItD4HBsI8/odEeS8cQO6UR+znWkN0NnadrAVGhI1waTosLF2BNmewvmadABkNYu7lRgOfznkYreaEYr9XdqKZ794ubwux0QkH8jDuJFyjiV+Lim2xiTWrQjS/By5WKSNqp91upHMm4eIEa8AAIyBeCdIAV7Y=
+	t=1746483319; cv=none; b=PJHXGLLwfFt3gWMlKe4pHG9R75tMYTEV4BaCZq7bvaE+X3NJ0tcMHlc+M9RT2wXfocvfYCk2LgkCeWTgXdFOm0qnwyc7BzKYFNQFnn3RR2vW3pLy/tgKW2/if5tblq/I5YBik089PRNXj7+po5ig0yZQeGarZBpgUiO9rk7okHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483318; c=relaxed/simple;
-	bh=ZS8EgfsbfHjVhDfmasW+ql8bQYFdF4SSZ3iTCN+6ZVo=;
+	s=arc-20240116; t=1746483319; c=relaxed/simple;
+	bh=ORxGjFZHTBdKZjdWk+4Ls/NkXY4ai1J1HNwWoQyQhmo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I9Ta2KEtAnYQ5PybOCN1fL0prPeJGYepLYkJOpOGgcjBj2+jZ9nMAFCRgG1tF0ipyp1bGSGfUXxpCo/EIB6XWlp3GCI03nnm83DO6Rtq7r0V6t/3Yu+v45pNKb10ILutfh1k724JLfSRWTntepRtxJ9V20vx4BJIdYaAPshvRB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/emPI4Q; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mhr8IxXJMw6tIj/Qy08vtUc0snN2JEHTsNN8L9ZkzoziOo5Yzbj3QxOI87GQPhmWwjJk6VszWznTxmgpLyBhS//wTQAhTkW8SFq6T7nN0bG32hXs1Jv0Ptt236TcjngmGHjES4AxbhPJLVBZ3QYW4PKGd2DJfJvXFowBNvf+VIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VluthK+x; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/emPI4Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A5C9C4CEED;
-	Mon,  5 May 2025 22:15:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VluthK+x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28683C4CEEE;
+	Mon,  5 May 2025 22:15:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483316;
-	bh=ZS8EgfsbfHjVhDfmasW+ql8bQYFdF4SSZ3iTCN+6ZVo=;
+	s=k20201202; t=1746483319;
+	bh=ORxGjFZHTBdKZjdWk+4Ls/NkXY4ai1J1HNwWoQyQhmo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K/emPI4QcFhrLgdIuY+ufRJ4++ALBqUp1Zu9GXYfjg04MyG5aDx/hDbWFVS1u/yGm
-	 kOfy0HgKpSWhbkSA2s7UVcof657P485ZiJx1Xhbikxze5mw+U/agaAE8gclREfsieR
-	 WP5xOD7q6X92JQKrhOZVSauK/02SlldTE70tSJjENHLJ84KLYEO7bB1tbi1FsCRLs3
-	 vtC3yX4E8dXk3ADykmMhTcc7Gnj4SsFEoyvbOQmVySsRm750fI76vQMYmqHtPMrhvR
-	 QZ+OyUj7BWY+I1J0DXNFiVGgZNTPj/MhqaNxcdM35CwkIsCMZEgvxTLj6UuyiAotg+
-	 Fk++5pNPswKJA==
+	b=VluthK+xPqu39sOimL4Rbs8ymhuDaoO1xlFD2T0HnSMrQgNeNSUQUbGPxglV3SCIQ
+	 IRRhKvCBXLryQ2C8RhP7sdxJoGo0z4khrQSyCIBXoKDaLFo0owMUXfzVeLCXA1rXs/
+	 AsPAlnUn3xpl3Yfnu9P/oorKu69nc+4JJP+kCx5vY1mqz19Ye6G4P+9ImzYlnwrC6e
+	 VEfzrpHwKDXdj0f5hcy2Gc8TefLJWD6IOXuGZwpKx6UAa3eWgl7fD6Hptq0XV2UVZr
+	 bUJXoTnlaRA7CTRoY647XRaa+LKM4xS8pF0LWgoNjNNt64ZqI4ucURjGGKt6xc1xC/
+	 g62xPr7Kn167Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.14 028/642] cifs: add validation check for the fields in smb_aces
-Date: Mon,  5 May 2025 18:04:04 -0400
-Message-Id: <20250505221419.2672473-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 030/642] cifs: Fix getting DACL-only xattr system.cifs_acl and system.smb3_acl
+Date: Mon,  5 May 2025 18:04:06 -0400
+Message-Id: <20250505221419.2672473-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -47,61 +47,117 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Pali Rohár <pali@kernel.org>
 
-[ Upstream commit eeb827f2922eb07ffbf7d53569cc95b38272646f ]
+[ Upstream commit ad9364a6835c45c52f47587ffbe0577bb7cd4c5b ]
 
-cifs.ko is missing validation check when accessing smb_aces.
-This patch add validation check for the fields in smb_aces.
+Currently ->get_acl() callback always create request for OWNER, GROUP and
+DACL, even when only DACLs was requested by user. Change API callback to
+request only information for which the caller asked. Therefore when only
+DACLs requested, then SMB client will prepare and send DACL-only request.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+This change fixes retrieving of "system.cifs_acl" and "system.smb3_acl"
+xattrs to contain only DACL structure as documented.
+
+Note that setting/changing of "system.cifs_acl" and "system.smb3_acl"
+xattrs already takes only DACL structure and ignores all other fields.
+
+Signed-off-by: Pali Rohár <pali@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsacl.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsacl.c |  4 ++--
+ fs/smb/client/cifssmb.c |  3 +--
+ fs/smb/client/smb2pdu.c |  4 +---
+ fs/smb/client/xattr.c   | 15 +++++++++++----
+ 4 files changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 64bd68f750f84..f9d577f2d59bb 100644
+index f9d577f2d59bb..63b3b1290bed2 100644
 --- a/fs/smb/client/cifsacl.c
 +++ b/fs/smb/client/cifsacl.c
-@@ -811,7 +811,23 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
- 			return;
+@@ -1565,7 +1565,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ 	int rc = 0;
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 	struct smb_version_operations *ops;
+-	const u32 info = 0;
++	const u32 info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
  
- 		for (i = 0; i < num_aces; ++i) {
-+			if (end_of_acl - acl_base < acl_size)
-+				break;
-+
- 			ppace[i] = (struct smb_ace *) (acl_base + acl_size);
-+			acl_base = (char *)ppace[i];
-+			acl_size = offsetof(struct smb_ace, sid) +
-+				offsetof(struct smb_sid, sub_auth);
-+
-+			if (end_of_acl - acl_base < acl_size ||
-+			    ppace[i]->sid.num_subauth == 0 ||
-+			    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
-+			    (end_of_acl - acl_base <
-+			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
-+			    (le16_to_cpu(ppace[i]->size) <
-+			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth))
-+				break;
-+
- #ifdef CONFIG_CIFS_DEBUG2
- 			dump_ace(ppace[i], end_of_acl);
- #endif
-@@ -855,7 +871,6 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
- 				(void *)ppace[i],
- 				sizeof(struct smb_ace)); */
+ 	cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
  
--			acl_base = (char *)ppace[i];
- 			acl_size = le16_to_cpu(ppace[i]->size);
+@@ -1619,7 +1619,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
+ 	struct tcon_link *tlink;
+ 	struct smb_version_operations *ops;
+ 	bool mode_from_sid, id_from_sid;
+-	const u32 info = 0;
++	const u32 info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
+ 	bool posix;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index c2abe79f0dd3b..e90811f321944 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -3416,8 +3416,7 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
+ 	/* BB TEST with big acls that might need to be e.g. larger than 16K */
+ 	pSMB->MaxSetupCount = 0;
+ 	pSMB->Fid = fid; /* file handle always le */
+-	pSMB->AclFlags = cpu_to_le32(CIFS_ACL_OWNER | CIFS_ACL_GROUP |
+-				     CIFS_ACL_DACL | info);
++	pSMB->AclFlags = cpu_to_le32(info);
+ 	pSMB->ByteCount = cpu_to_le16(11); /* 3 bytes pad + 8 bytes parm */
+ 	inc_rfc1001_len(pSMB, 11);
+ 	iov[0].iov_base = (char *)pSMB;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 163b8fea47e8a..044ace0bcde74 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3909,12 +3909,10 @@ SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ 	       u64 persistent_fid, u64 volatile_fid,
+ 	       void **data, u32 *plen, u32 extra_info)
+ {
+-	__u32 additional_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
+-				extra_info;
+ 	*plen = 0;
+ 
+ 	return query_info(xid, tcon, persistent_fid, volatile_fid,
+-			  0, SMB2_O_INFO_SECURITY, additional_info,
++			  0, SMB2_O_INFO_SECURITY, extra_info,
+ 			  SMB2_MAX_BUFFER_SIZE, MIN_SEC_DESC_LEN, data, plen);
+ }
+ 
+diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
+index 58a584f0b27e9..7d49f38f01f3e 100644
+--- a/fs/smb/client/xattr.c
++++ b/fs/smb/client/xattr.c
+@@ -320,10 +320,17 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 		if (pTcon->ses->server->ops->get_acl == NULL)
+ 			goto out; /* rc already EOPNOTSUPP */
+ 
+-		if (handler->flags == XATTR_CIFS_NTSD_FULL) {
+-			extra_info = SACL_SECINFO;
+-		} else {
+-			extra_info = 0;
++		switch (handler->flags) {
++		case XATTR_CIFS_NTSD_FULL:
++			extra_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO | SACL_SECINFO;
++			break;
++		case XATTR_CIFS_NTSD:
++			extra_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO;
++			break;
++		case XATTR_CIFS_ACL:
++		default:
++			extra_info = DACL_SECINFO;
++			break;
  		}
- 
+ 		pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
+ 				inode, full_path, &acllen, extra_info);
 -- 
 2.39.5
 
