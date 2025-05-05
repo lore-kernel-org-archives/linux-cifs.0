@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C02227816A;
-	Mon,  5 May 2025 22:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE9D279325;
+	Mon,  5 May 2025 22:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483270; cv=none; b=LamQ8s7tZAbCF2VEw9YT5snyE45HCjh7yiDqIPeycaeEBkMvGyyQf9b7QkZS82R1dWYopj+fxNNClog/AsRlzQmypCPBKfpZlJfHqxNq46Y4zFuQamqfIJaEiHQGnSNfVFO28MYCfMPi3eYDNFfxeG66ErxivqZCUF3hP8r9rtg=
+	t=1746483271; cv=none; b=N+0YPkUl0rPxuC3gJfSuguP0BSzCuYjlRj7Y1NsAdi4wup6hRfv8pBL7+hMtSjeQDm/44MrMHUJznnEcBnJUckoqkXwGtNDdWG12RWaOMmBjCgSNT9+ERvisaWUMNgk5nYJmijrbueeawBp7LLOJfzg6+srBo6wt1J3rvhgM3TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483270; c=relaxed/simple;
-	bh=2XHimpyvXkPhZGPEz1/0A/fPcGVF0YD9RQQzTTSloFY=;
+	s=arc-20240116; t=1746483271; c=relaxed/simple;
+	bh=/P+my4y0q9Q4XIY2GjPQUkqXcXiVng231bnVt4DlsUk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Emp4902TibQBHjdz7Q+9aMtocyN6SG3qNrfewnfhFh3GkBFmg1BVBMx0DIHGqFbAD/0k6F47VlBK2u4BSXrXYLIS8BBXx7PYxghgPFkmZiaBU4XMfMre+ETGVcObY+BaDuXPdnp3RDgZP0lyro4adnkSj8u6iTxInv9tLXU7YJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oy3bR+FD; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=EPwCINEVzq7Y9c3KtM0ZlK47FHvRyaIw7BXwIqatWiggd+t+LsNAldtvn94PTfgLpJSosu7VDBvAOWwoZXx4/SyCtfw2Kz3HskEe26NstSWuKuk+qy2TwHfZpljZ/CBrHmLipMB1kGPyqfTpelxpfpLeqAp8Y5OVaZxk3ti4Faw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3HvHw5o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oy3bR+FD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A6EC4CEEE;
-	Mon,  5 May 2025 22:14:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3HvHw5o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA7AFC4CEE4;
+	Mon,  5 May 2025 22:14:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483269;
-	bh=2XHimpyvXkPhZGPEz1/0A/fPcGVF0YD9RQQzTTSloFY=;
+	s=k20201202; t=1746483270;
+	bh=/P+my4y0q9Q4XIY2GjPQUkqXcXiVng231bnVt4DlsUk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oy3bR+FDMPEpCYCzvyl8JGbY5JZ0W06hVfAIRRtfCUjQo1oLarENsShuCvSlHiV3G
-	 1XdYv7btlekFdtEc+cQv/JXzJjvyGYeX9LvkpyPlbU1dispaQb4WdBYmDHFTvzl+uz
-	 QuLz2jCUgJlHKbCPNGiRLl0/tB8C4734YvjPhms9v5nz1M2wPAtkQCLoaQCa/ikQ7l
-	 V5GSJhiO5y2Sl4W0blmBCqx4CYmo9iOWATXDGAQ1rj7gnLdzWnuDTJtZaz7Ov7BziG
-	 d9Wr4KzhA/5em+3hX9+YjtdDg7kGApadb2zZLtp3XJXEB2vehtxKVx4Ex/byqy75aI
-	 ztVtFje/pF1rA==
+	b=i3HvHw5orsrAOMCzqnyn1dzRqwauPeacZGd9Dh01T1EGySdaC5eF9UbhLbllKQVLx
+	 Q/UmvTFm4tZHBWjwp3Cnv/eruE5c9eKUwwaHyifYyvvd5efwcxoJ1eir/KL/mu5i+j
+	 kKnKO5Da5dgMxgqF14dgjkUoBAhn1rQp8MKQ0OEqlyZyO55mshOZhlncUxoWY/qLI8
+	 fFVqHj/4GHfChPlxVWQ3aHWjbCHBvpsfDzut80VP0aegYZ40XSEcJ4WYU1hwxb+1Va
+	 4eoLGJRyDey3/Ln4aPoMHOvYs7xSFN12RzwFfMfQ7XbNlo+38/caGr/5KWVvgE+yNR
+	 wr8xLfprpoQ8g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,9 +35,9 @@ Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.14 004/642] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES
-Date: Mon,  5 May 2025 18:03:40 -0400
-Message-Id: <20250505221419.2672473-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 005/642] cifs: Fix querying and creating MF symlinks over SMB1
+Date: Mon,  5 May 2025 18:03:41 -0400
+Message-Id: <20250505221419.2672473-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -55,57 +55,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Pali Rohár <pali@kernel.org>
 
-[ Upstream commit e255612b5ed9f179abe8196df7c2ba09dd227900 ]
+[ Upstream commit 4236ac9fe5b8b42756070d4abfb76fed718e87c2 ]
 
-Some operations, like WRITE, does not require FILE_READ_ATTRIBUTES access.
+Old SMB1 servers without CAP_NT_SMBS do not support CIFS_open() function
+and instead SMBLegacyOpen() needs to be used. This logic is already handled
+in cifs_open_file() function, which is server->ops->open callback function.
 
-So when FILE_READ_ATTRIBUTES is not explicitly requested for
-smb2_open_file() then first try to do SMB2 CREATE with FILE_READ_ATTRIBUTES
-access (like it was before) and then fallback to SMB2 CREATE without
-FILE_READ_ATTRIBUTES access (less common case).
+So for querying and creating MF symlinks use open callback function instead
+of CIFS_open() function directly.
 
-This change allows to complete WRITE operation to a file when it does not
-grant FILE_READ_ATTRIBUTES permission and its parent directory does not
-grant READ_DATA permission (parent directory READ_DATA is implicit grant of
-child FILE_READ_ATTRIBUTES permission).
+This change fixes querying and creating new MF symlinks on Windows 98.
+Currently cifs_query_mf_symlink() is not able to detect MF symlink and
+cifs_create_mf_symlink() is failing with EIO error.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smb2file.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ fs/smb/client/link.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index d609a20fb98a9..2d726e9b950cf 100644
---- a/fs/smb/client/smb2file.c
-+++ b/fs/smb/client/smb2file.c
-@@ -152,16 +152,25 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
- 	int err_buftype = CIFS_NO_BUFFER;
- 	struct cifs_fid *fid = oparms->fid;
- 	struct network_resiliency_req nr_ioctl_req;
-+	bool retry_without_read_attributes = false;
+diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
+index 6e6c09cc5ce7a..34a026243287f 100644
+--- a/fs/smb/client/link.c
++++ b/fs/smb/client/link.c
+@@ -258,7 +258,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms = {0};
+ 	int buf_type = CIFS_NO_BUFFER;
+-	FILE_ALL_INFO file_info;
++	struct cifs_open_info_data query_data;
  
- 	smb2_path = cifs_convert_path_to_utf16(oparms->path, oparms->cifs_sb);
- 	if (smb2_path == NULL)
- 		return -ENOMEM;
+ 	oparms = (struct cifs_open_parms) {
+ 		.tcon = tcon,
+@@ -270,11 +270,11 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 		.fid = &fid,
+ 	};
  
--	oparms->desired_access |= FILE_READ_ATTRIBUTES;
-+	if (!(oparms->desired_access & FILE_READ_ATTRIBUTES)) {
-+		oparms->desired_access |= FILE_READ_ATTRIBUTES;
-+		retry_without_read_attributes = true;
-+	}
- 	smb2_oplock = SMB2_OPLOCK_LEVEL_BATCH;
+-	rc = CIFS_open(xid, &oparms, &oplock, &file_info);
++	rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, &query_data);
+ 	if (rc)
+ 		return rc;
  
- 	rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
- 		       &err_buftype);
-+	if (rc == -EACCES && retry_without_read_attributes) {
-+		oparms->desired_access &= ~FILE_READ_ATTRIBUTES;
-+		rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
-+			       &err_buftype);
-+	}
- 	if (rc && data) {
- 		struct smb2_hdr *hdr = err_iov.iov_base;
+-	if (file_info.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE)) {
++	if (query_data.fi.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE)) {
+ 		rc = -ENOENT;
+ 		/* it's not a symlink */
+ 		goto out;
+@@ -313,7 +313,7 @@ cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 		.fid = &fid,
+ 	};
+ 
+-	rc = CIFS_open(xid, &oparms, &oplock, NULL);
++	rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
+ 	if (rc)
+ 		return rc;
  
 -- 
 2.39.5
