@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8450278E77;
-	Mon,  5 May 2025 22:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB05D280CCD;
+	Mon,  5 May 2025 22:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483317; cv=none; b=sJUlh5xWNQVEbVvy/XxzWcww6pt3tgkOPrY+yvc5WcW+zfLowu4TCaTSI5CY3dcy99IDguZAoGVJxIPKvLd+rqBGwVSyGqQOjBboC1BMWR3HSJtQ2K45qNDD3em5TmgCDTzs1CpeLuPIZ0IgvFYWY97gmDaU62Uotnop0iOGY34=
+	t=1746483318; cv=none; b=G9QfNUAp45FXpYtItD4HBsI8/odEeS8cQO6UR+znWkN0NnadrAVGhI1waTosLF2BNmewvmadABkNYu7lRgOfznkYreaEYr9XdqKZ794ubwux0QkH8jDuJFyjiV+Lim2xiTWrQjS/By5WKSNqp91upHMm4eIEa8AAIyBeCdIAV7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483317; c=relaxed/simple;
-	bh=zxr0J4xp4Dcqt7uOJXpi3aRweK/Q+xJ6vt2zaX8YPlA=;
+	s=arc-20240116; t=1746483318; c=relaxed/simple;
+	bh=ZS8EgfsbfHjVhDfmasW+ql8bQYFdF4SSZ3iTCN+6ZVo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bp0FJgAZ+eVBcIArSQEaT2JFuu08Q2QZACZ8HeG7zVp2qW0ZOechKf1sBMNet9qJ9zktwYKUvo0j74oBdWV7zsz1p1LPmj3JZGlZnsCLHlSRDi1esiLhjJL0ammW7EUvczFxPi5trBlTnFv+TTt9OTTGFbDaYvXl1M/qe5zmtiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pyIS9dX0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=I9Ta2KEtAnYQ5PybOCN1fL0prPeJGYepLYkJOpOGgcjBj2+jZ9nMAFCRgG1tF0ipyp1bGSGfUXxpCo/EIB6XWlp3GCI03nnm83DO6Rtq7r0V6t/3Yu+v45pNKb10ILutfh1k724JLfSRWTntepRtxJ9V20vx4BJIdYaAPshvRB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/emPI4Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pyIS9dX0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4791C4CEEE;
-	Mon,  5 May 2025 22:15:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/emPI4Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A5C9C4CEED;
+	Mon,  5 May 2025 22:15:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483317;
-	bh=zxr0J4xp4Dcqt7uOJXpi3aRweK/Q+xJ6vt2zaX8YPlA=;
+	s=k20201202; t=1746483316;
+	bh=ZS8EgfsbfHjVhDfmasW+ql8bQYFdF4SSZ3iTCN+6ZVo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pyIS9dX066JaUDqDPQ1Lo9V20iUiFk9gzAAG5xbvwQB6WJjGQFAbuSnnTob1lkW8G
-	 xGbJMsKc3okLaf7WoITfHhzp9cDRgo+tsQc//HLWh00soHS3gmtqVEnez7olqnYtxh
-	 pmPRQiNEJKTfv4YOqfI7rkyFAV8iYnqR2uRw6BtRbLJ+BcYr5Uz9GO0LuXq3ujqNV4
-	 1wmuQC/7AJtAXciqvYgFkJSZ+W+5aPGLyxxrCuFMG82TZWHqgW0bXnDUENy57QrnNi
-	 i7F2lcMsHqcz2gHfM7+sgwN3Y455s/DM/IArjzvVo9kzKxWMm2M9RKNUiOFsKmI/pV
-	 wD5Q5Ke8sdKSQ==
+	b=K/emPI4QcFhrLgdIuY+ufRJ4++ALBqUp1Zu9GXYfjg04MyG5aDx/hDbWFVS1u/yGm
+	 kOfy0HgKpSWhbkSA2s7UVcof657P485ZiJx1Xhbikxze5mw+U/agaAE8gclREfsieR
+	 WP5xOD7q6X92JQKrhOZVSauK/02SlldTE70tSJjENHLJ84KLYEO7bB1tbi1FsCRLs3
+	 vtC3yX4E8dXk3ADykmMhTcc7Gnj4SsFEoyvbOQmVySsRm750fI76vQMYmqHtPMrhvR
+	 QZ+OyUj7BWY+I1J0DXNFiVGgZNTPj/MhqaNxcdM35CwkIsCMZEgvxTLj6UuyiAotg+
+	 Fk++5pNPswKJA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.14 029/642] cifs: Fix establishing NetBIOS session for SMB2+ connection
-Date: Mon,  5 May 2025 18:04:05 -0400
-Message-Id: <20250505221419.2672473-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 028/642] cifs: add validation check for the fields in smb_aces
+Date: Mon,  5 May 2025 18:04:04 -0400
+Message-Id: <20250505221419.2672473-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -47,121 +47,61 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Pali Rohár <pali@kernel.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 781802aa5a5950f99899f13ff9d760f5db81d36d ]
+[ Upstream commit eeb827f2922eb07ffbf7d53569cc95b38272646f ]
 
-Function ip_rfc1001_connect() which establish NetBIOS session for SMB
-connections, currently uses smb_send() function for sending NetBIOS Session
-Request packet. This function expects that the passed buffer is SMB packet
-and for SMB2+ connections it mangles packet header, which breaks prepared
-NetBIOS Session Request packet. Result is that this function send garbage
-packet for SMB2+ connection, which SMB2+ server cannot parse. That function
-is not mangling packets for SMB1 connections, so it somehow works for SMB1.
+cifs.ko is missing validation check when accessing smb_aces.
+This patch add validation check for the fields in smb_aces.
 
-Fix this problem and instead of smb_send(), use smb_send_kvec() function
-which does not mangle prepared packet, this function send them as is. Just
-API of this function takes struct msghdr (kvec) instead of packet buffer.
-
-[MS-SMB2] specification allows SMB2 protocol to use NetBIOS as a transport
-protocol. NetBIOS can be used over TCP via port 139. So this is a valid
-configuration, just not so common. And even recent Windows versions (e.g.
-Windows Server 2022) still supports this configuration: SMB over TCP port
-139, including for modern SMB2 and SMB3 dialects.
-
-This change fixes SMB2 and SMB3 connections over TCP port 139 which
-requires establishing of NetBIOS session. Tested that this change fixes
-establishing of SMB2 and SMB3 connections with Windows Server 2022.
-
-Signed-off-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsproto.h |  3 +++
- fs/smb/client/connect.c   | 20 +++++++++++++++-----
- fs/smb/client/transport.c |  2 +-
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ fs/smb/client/cifsacl.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 278092a15f890..1609ca825d825 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -31,6 +31,9 @@ extern void cifs_small_buf_release(void *);
- extern void free_rsp_buf(int, void *);
- extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
- 			unsigned int /* length */);
-+extern int smb_send_kvec(struct TCP_Server_Info *server,
-+			 struct msghdr *msg,
-+			 size_t *sent);
- extern unsigned int _get_xid(void);
- extern void _free_xid(unsigned int);
- #define get_xid()							\
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 92685fc675b59..22f29d2725928 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3028,8 +3028,10 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
- 	 * sessinit is sent but no second negprot
- 	 */
- 	struct rfc1002_session_packet req = {};
--	struct smb_hdr *smb_buf = (struct smb_hdr *)&req;
-+	struct msghdr msg = {};
-+	struct kvec iov = {};
- 	unsigned int len;
-+	size_t sent;
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index 64bd68f750f84..f9d577f2d59bb 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -811,7 +811,23 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
+ 			return;
  
- 	req.trailer.session_req.called_len = sizeof(req.trailer.session_req.called_name);
+ 		for (i = 0; i < num_aces; ++i) {
++			if (end_of_acl - acl_base < acl_size)
++				break;
++
+ 			ppace[i] = (struct smb_ace *) (acl_base + acl_size);
++			acl_base = (char *)ppace[i];
++			acl_size = offsetof(struct smb_ace, sid) +
++				offsetof(struct smb_sid, sub_auth);
++
++			if (end_of_acl - acl_base < acl_size ||
++			    ppace[i]->sid.num_subauth == 0 ||
++			    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
++			    (end_of_acl - acl_base <
++			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
++			    (le16_to_cpu(ppace[i]->size) <
++			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth))
++				break;
++
+ #ifdef CONFIG_CIFS_DEBUG2
+ 			dump_ace(ppace[i], end_of_acl);
+ #endif
+@@ -855,7 +871,6 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
+ 				(void *)ppace[i],
+ 				sizeof(struct smb_ace)); */
  
-@@ -3058,10 +3060,18 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
- 	 * As per rfc1002, @len must be the number of bytes that follows the
- 	 * length field of a rfc1002 session request payload.
- 	 */
--	len = sizeof(req) - offsetof(struct rfc1002_session_packet, trailer.session_req);
-+	len = sizeof(req.trailer.session_req);
-+	req.type = RFC1002_SESSION_REQUEST;
-+	req.flags = 0;
-+	req.length = cpu_to_be16(len);
-+	len += offsetof(typeof(req), trailer.session_req);
-+	iov.iov_base = &req;
-+	iov.iov_len = len;
-+	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, len);
-+	rc = smb_send_kvec(server, &msg, &sent);
-+	if (rc < 0 || len != sent)
-+		return (rc == -EINTR || rc == -EAGAIN) ? rc : -ECONNABORTED;
+-			acl_base = (char *)ppace[i];
+ 			acl_size = le16_to_cpu(ppace[i]->size);
+ 		}
  
--	smb_buf->smb_buf_length = cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | len);
--	rc = smb_send(server, smb_buf, len);
- 	/*
- 	 * RFC1001 layer in at least one server requires very short break before
- 	 * negprot presumably because not expecting negprot to follow so fast.
-@@ -3070,7 +3080,7 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
- 	 */
- 	usleep_range(1000, 2000);
- 
--	return rc;
-+	return 0;
- }
- 
- static int
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 0dc80959ce488..03434dbe9374c 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -179,7 +179,7 @@ delete_mid(struct mid_q_entry *mid)
-  * Our basic "send data to server" function. Should be called with srv_mutex
-  * held. The caller is responsible for handling the results.
-  */
--static int
-+int
- smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
- 	      size_t *sent)
- {
 -- 
 2.39.5
 
