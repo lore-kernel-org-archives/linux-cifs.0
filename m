@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4D6396ED1;
-	Mon,  5 May 2025 23:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86ABC36BA41;
+	Mon,  5 May 2025 22:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486393; cv=none; b=tjahWzzAArRlkYK82it+zmuuaGlq5FdGN/D7owcGqWFp+/DTnn6QZ6Rxdj4LOcc+JGNEjY64+RKeFE/pHkpo45qEYk5W6lT19hoBCFASqH3ntjH/nqOVILUY10dID2geSA4GrB8VwzgnJREtPfZhwTkfzCvo90qCCvM1SANSh7A=
+	t=1746485802; cv=none; b=P/8cPmXZ4wwBlav3jR37KwNjHws5I0/bhxHbg/TKKdVq2dEwBYBdHelkeARp2d1fkCkecd6E+Az/lqJK5aE2OR3o+mCrbaJAwSJyLj6RR/kYmWOj3bBfYwofWansbrqU0kQY7500kG+mDyD7HUzVvnREDjfprKak3lT9FcIqzUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486393; c=relaxed/simple;
-	bh=3hwOv7gbaxyRN3tOB36daa+Al+L5PlzqQYd3rpcfSx8=;
+	s=arc-20240116; t=1746485802; c=relaxed/simple;
+	bh=NExX+sV9c7ACCiBDLWmSOzI/gw/YZSqNC7438RfxQeI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eu/29mGyaHXGY+CIh9tbn4jKwGYm81OW9QjelqHejzK0Sczkf9HGtZBrXsrWn4/5kKAVv+T006pXZed+vXe+JCMfRiHJOLvM/A3N9Yh7ii7Y/uDoyLGRxuoNQRHMBEUlCJd0EyJRLsirsQH5iSLgNVLcllOfHf8bxVzgnY+eVeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HsOG7yLM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LCZy4PjSOOQtIFY0iQpLvcyKVikeuYPcVBlpEOpt222ZmyXRieGICWcNffqYmWecPDTS+rQfeh1biTr92BbqwcD4/WHnyEGfGjWn93tGbh2qVnFoj4lm8IIH33rHJ4J8FulvL1N5mcLit7pgV/hvRonU/qxjfJI2PzxS2VjwWm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4cbeU3y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HsOG7yLM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1689DC4CEF1;
-	Mon,  5 May 2025 23:06:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4cbeU3y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7259AC4CEE4;
+	Mon,  5 May 2025 22:56:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486392;
-	bh=3hwOv7gbaxyRN3tOB36daa+Al+L5PlzqQYd3rpcfSx8=;
+	s=k20201202; t=1746485802;
+	bh=NExX+sV9c7ACCiBDLWmSOzI/gw/YZSqNC7438RfxQeI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HsOG7yLMrt2CuCIV77LlcJhFQ/1DuBZJB2AfXmI1XaMe6ZEKz8AdJEbe+WZKmTeDr
-	 M/qqJsQ5Dp6cpjEQ7GgB4QRuM2eMKYlnPxdSiY5fRa2v/eWfmSdtPVdri72Uy/o8j5
-	 kmxwK+gFtvk7cfcK/NDSE6lTX2nhzEDyIW3uGCXpA7AoVr+m7hfamfZzmigs7tdHQd
-	 1JXV2nhMaEINFkzynuFy67uU1Sy1S3/eEpk4/wMzExwtn/HD0YbXjbwbgulipHwj2c
-	 9WURxPTqsGm4eZKwjFnnHcCe2J5ZA5ar0v+dpAajAJfvqECUWeka9/cpS1iiE0oxDP
-	 n8k7AKADEae9Q==
+	b=I4cbeU3ymR6DE08hFGPSZSfpxPospX9YA+tfcHy8u6xrjhdeUc+AY89CJ9Q9IuctB
+	 T6B18El1GAx9M72vmpjrFLeUuYImsER9gOumsyehpSAJuYJWL8uqp0P7V3CbpsWYVL
+	 IaDQ86+bGyHtP5YMGSD4u4v8CiZEYyA+V0v1bi6j1JrJHEq/bzrcnFCI7x7s3eQT0a
+	 WrMtMuGiDzIUuDQv9Sl+syt7rsV7wd9ehywezYEYw50ApUR1MDM/lzKwb1oLqxruxk
+	 hbpEnf2U39/olu1tGJ5VLgJ8mwzzEF9Y72Tmfy+OxvhQSNHKC16zO6PsCRZ9WJ/VPr
+	 cyUSvUWjvW+ig==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 003/212] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES
-Date: Mon,  5 May 2025 19:02:55 -0400
-Message-Id: <20250505230624.2692522-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 003/294] cifs: Add fallback for SMB2 CREATE without FILE_READ_ATTRIBUTES
+Date: Mon,  5 May 2025 18:51:43 -0400
+Message-Id: <20250505225634.2688578-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
-References: <20250505230624.2692522-1-sashal@kernel.org>
+In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
+References: <20250505225634.2688578-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,7 +50,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.136
+X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
 From: Pali Rohár <pali@kernel.org>
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index a7475bc05cac0..afdc78e92ee9b 100644
+index db9c807115c60..d7f2835e0b1cc 100644
 --- a/fs/smb/client/smb2file.c
 +++ b/fs/smb/client/smb2file.c
-@@ -108,16 +108,25 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
+@@ -107,16 +107,25 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
  	int err_buftype = CIFS_NO_BUFFER;
  	struct cifs_fid *fid = oparms->fid;
  	struct network_resiliency_req nr_ioctl_req;
