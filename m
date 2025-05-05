@@ -1,118 +1,157 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E73017578
-	for <linux-cifs@vger.kernel.org>; Sun,  4 May 2025 23:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DE823BE
+	for <linux-cifs@vger.kernel.org>; Mon,  5 May 2025 00:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746401733; cv=none; b=OmFCe1Rp8S9I5I9LHNhjfKf7BXH2rdZufiULG1iy/wg96S/aXDtbvfF/V6F4om/RDtrQLD7ZYsJL+0rn7X9TYlfr5jHcSCiUYHCzACqrj8Ax1+Wls3BruB3zYBka3Qnfi/zYLJgUc4uFWTmkzfppvDajylsR9m1sx/gjZOLEZPk=
+	t=1746404825; cv=none; b=OCmTzRotETdxzBbQ7sEgB3M/GRh495eWMhDIumdMsSQ2ScA8zTRCR7n/Bxo5Gfv7z6zHjk6etcFpwXt5Io5Xm6iiXmL60woAxVXiznlAr8/qNjy8adHGvwjJXiFt9tSKsHjyzUE8/o6PseCt9mnLwgIabaehzyq8qTa/MzMb78A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746401733; c=relaxed/simple;
-	bh=lDXDDor34lQr5QixuMbx2mZgplEuXAMQXecaCXSNhhY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=fWJXCtE6mXOCxHB2nWG7upvEW5ooaCowJ94thuRr50XiEMd1TsfFZT1r9gT9/3NTTtsGb5uZ9lk0rTw/KtPELeoJ85PS8SprofVv19PAO2vFSfltFi+/2AwIxRbWYIL05kf4U1T5578iA9sOxcgrfNF6PT14vu1nHARmoJuovDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGwqpjuG; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746404825; c=relaxed/simple;
+	bh=yXLbLOVZDa6sYTmSIemzAgaGfQYehNUtiSjx2EQJ4EY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KiUDehEB0F/16NmGyYWumsMDLpZUZn9JFNgXgi/ZaarsWiM157xsEDgYxkXDCflLWYewf0GMI7XKO/GXucoSfwMjSZMoaJPUnbEnUNdL0hMvXob1cljCGNyQmgmh+DudLE85XkSVXSPPYyp/In8FM/x+b5W1mN12oy+P7u9MgiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=R6lbtead; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGwqpjuG"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-317f68d0dffso43119681fa.2
-        for <linux-cifs@vger.kernel.org>; Sun, 04 May 2025 16:35:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="R6lbtead"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39ee5ac4321so4653928f8f.1
+        for <linux-cifs@vger.kernel.org>; Sun, 04 May 2025 17:27:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746401729; x=1747006529; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9iCBwcvUiEGu9BAFYNfEKi/Fh0hunjz4OjB2hIR2g1k=;
-        b=NGwqpjuGb3gt+XNZDPeP9u6wPdcyAJIJzupGltYzmM227HppmgFKwJMCsbMK7q/eua
-         WBA0p/hFmzIXoIhvNm47e+hrlXarChP2aoVjOxzSAoLRUsskUrjZk/0K2BkU0lH+Nqqh
-         uAvMM3XK3qwSpasC9SjzwoMPTPQFanAzJGq004DYqWjsTXXeqazlAtDSy0vFye7B9Sbw
-         4u/yxj9a5ZkdDq82stV8D6rsnVYo/N9sqb9SJOzeUZhnAFvKnpL1Ex4xIeQ8jHNcqVTg
-         sG2OnTmsEBGk+aM1mvBPvyU4TbIAZ8fgXcZmM0sOBlbMYAMfZnTyTT1ZJ2qu74/Uu7zl
-         mE6w==
+        d=suse.com; s=google; t=1746404821; x=1747009621; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=c636V7sNa5BkSF14ehm3IrFwHmW+7lD7iJmuPiJZUU4=;
+        b=R6lbteadpiHurbEQZoR5yfzsZfU1+iFhtTYY915iOt+vYpQH5xK56W8hWsEBGaa82r
+         T0fDpgyu+vUSrE3kzetXHSvOUsl5GVpNZrZ0suv0bLCS8oLaP/PVwzRTB2kRrKBWG1ak
+         amnkETx0XuqiekvB8izGOstSGU5D76wT0gggbMAdSvy3/LEzcOR/M0vYJU8dK6L4b3TA
+         RYJE9T9Eo2BI+Bh5PRebVMzfRy7sJ4JoIK2OfxahnGAFd54Eotj4C6RJCsZqPYigJn3r
+         XSA3b+t0KaftqpgTary6xgfevGM41zkWVoy6DeDO8nEsD2XTD5/tGpsTqA1LxMEIHI5c
+         BC8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746401729; x=1747006529;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9iCBwcvUiEGu9BAFYNfEKi/Fh0hunjz4OjB2hIR2g1k=;
-        b=xT1ICHPauBrVzCDvWm8yK1jOcd+j5KogClglQlGv3A0IwZIAEjCtSUgJsuxsvYT2KG
-         S2PTiM3H9sZreNY1qNWiLKeNzA522Ow0R8Wgq5ghV5x1Yk+0qGk6Phmj0bipSQiPIAQP
-         t3mGXzEJueV1ZjQry34xHn/PPafIqiyGCCdQXVPY0qyVQ6BZzNETnsNoxZAYSvCgxclu
-         5wOZNcHDDI2EVYIFXPDiUU2wR8N7MICz/F7hJ6Yf6B0NNP4toHejcY9mCbs0D77SEbmX
-         jaBltSf++YKvIG98GDRIBgZ5g1ifSoC9b8twFOdWglVIh6s5eTP94YPOJyfQN4LX7bki
-         9DyQ==
-X-Gm-Message-State: AOJu0YyWW9b1/hvTj/Z/8thEmkGw1o6LbUWnSUhYMgav9BdXlPqjimkT
-	r5vC8AXE9GQeLe6y6BmWFtGEf82a+FXz4ebD41Vjkyh8hCJ/VUBOpzyZp7fadweMb2WE7riBgWD
-	djjZ9FAMvFZnHeIHuGVwktf3pCi8Cre8y
-X-Gm-Gg: ASbGncvI0a0GvIAEorrjTa46gjQMvRJlKLoF2GcKrz0N2UR3HCsdU3q71H74WuCzHJE
-	FhtfLa48giI2+gPSTgP8U4VIOsBLARAm/1vDAgcJM7xPm50WkHPulUr2YFx6yGa1eQUnFR0J+pu
-	pNNrm9olnWPVeOllRNi6t7yvk=
-X-Google-Smtp-Source: AGHT+IHn2olXlLwlRQFBWVwu5hFDbuKvuFTq/2m56PcTCeoWzKJKMkzBaqPgORkhi6sSNZGOnEkwCg9urWAz4z2LBQY=
-X-Received: by 2002:a05:651c:1695:b0:31a:1e23:a46e with SMTP id
- 38308e7fff4ca-321db0c90demr9698911fa.14.1746401728520; Sun, 04 May 2025
- 16:35:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746404821; x=1747009621;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c636V7sNa5BkSF14ehm3IrFwHmW+7lD7iJmuPiJZUU4=;
+        b=CH0Pq+poRP/tf2h4Zv5+IsqDlBJGUS6YDPJrvNPBcGbzzDv/GDG+dAdLTzCzs+vR/v
+         qAfBia/3HXjD/GhxaD7PEVPATKkOzV9jsycyjziFufx2q5RoEHqj8G7am1BiHZ9f2aiF
+         ZSXQlD9oQwTvEps5dFAP9/yMUX1qPyad5h8BPhJX+tdMSy7Qg0cC1w9CNRh239eHo/Nu
+         bmg2EWA5dEOOJLKi39i1qf71QG5CfBVu8K/e23BR9WIkRUo6vOakErre6uHoXnDfovp/
+         aPfajA5+of9UGalHJFKj6YcGBeFm4MtPxmBjBuJH6f+e9aHT6jNa4qksDpZFpRiKljR3
+         8tyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVr0b4AkgmjWRr1qc3VWMS9CZOg7pvB9NmqwlJrejSGOqKwiboyOdcZS+GKWjIck6nReDf/Nb7NBv57@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxs+BPJl7B5WG1orcSQ2QHfmnmMn2QAqMg+UmHFZhJae3MOOmL4
+	dduqYB+rYezHmnonv4txJeRz90nPFYEWMPvNkMpBuShzp585gmdewVBvVFlgeRU=
+X-Gm-Gg: ASbGnct+9eZ7wn1QGyFsKyS9wzcwAzsTtcCalbmCew1gJQUpjZ1tD6TOHtnvp2ikNMj
+	86iFWj92wrloRMBZ//TxwX9TRTHs0V3INbcD2rPeErV1XWcvBONaCUwWSPV6G2NXeCrhOR1YGjE
+	RSXzOJq2zzeoRj3VIv3ou+pQpeYrA25XrwxdWos3p72RoczVkQe0ZMtb9fdvGJ0CsWcAfvdT2s9
+	XXpLqPXLyKgR3H9QdAyKgiqbeFe6sZkbPolDCsFmW+dmd5+F2WMSU7rgP18SqMVcmjGcnq1D6EE
+	FsaSQ/njnz3tXVDiwVa6ljavkMZhSBNqwXLycmjwAJPDBlRt
+X-Google-Smtp-Source: AGHT+IHnLAvAYVMeUCrvWX+OGgw8MZOc4aK6zXB4JRfdk4wx+uvFMgND4ssZpBnL7L9txXtPv9aDGw==
+X-Received: by 2002:a05:6000:186c:b0:39f:9f:a177 with SMTP id ffacd0b85a97d-3a09fd88c00mr3664672f8f.17.1746404820907;
+        Sun, 04 May 2025 17:27:00 -0700 (PDT)
+Received: from precision ([2804:7f0:bc00:f1b9:dda:9d01:f4c5:2ed4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e150eb6e8sm42971925ad.26.2025.05.04.17.26.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 May 2025 17:27:00 -0700 (PDT)
+Date: Sun, 4 May 2025 21:25:21 -0300
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: smfrench@gmail.com, bharathsm.hsk@gmail.com, ematsumiya@suse.de,
+	pc@manguebit.com, paul@darkrain42.org, ronniesahlberg@gmail.com,
+	linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 1/5] cifs: protect cfid accesses with fid_lock
+Message-ID: <aBgFcc9SPRPOUFHw@precision>
+References: <20250502051517.10449-1-sprasad@microsoft.com>
+ <aBS8jg4bcmh6EdwT@precision>
+ <CANT5p=qGspYwczDEnp6oy6F1UQJZKJ9vYw_3pKdipcByqjjuTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 4 May 2025 18:35:16 -0500
-X-Gm-Features: ATxdqUH1RX7rsHdR6CznsVY6C7HJAB_6aeUSVfUmtKHPO8TGMqumpDp2Mch4GeQ
-Message-ID: <CAH2r5msR0K_gbiwy0+7PU0iSrRGyUpXzABVisBiHoVF3CrgV4w@mail.gmail.com>
-Subject: [PATCH][smb3 client] warn when parse contexts returns error on
- compounded operation
-To: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000aa0190063457d637"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANT5p=qGspYwczDEnp6oy6F1UQJZKJ9vYw_3pKdipcByqjjuTQ@mail.gmail.com>
 
---000000000000aa0190063457d637
-Content-Type: text/plain; charset="UTF-8"
+On Sat, May 03, 2025 at 08:24:13AM +0530, Shyam Prasad N wrote:
+> On Fri, May 2, 2025 at 6:09 PM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > Hi Shyam,
+> >
+> > On Fri, May 02, 2025 at 05:13:40AM +0000, nspmangalore@gmail.com wrote:
+> > > From: Shyam Prasad N <sprasad@microsoft.com>
+> > >
+> > > There are several accesses to cfid structure today without
+> > > locking fid_lock. This can lead to race conditions that are
+> > > hard to debug.
+> > >
+> > > With this change, I'm trying to make sure that accesses to cfid
+> > > struct members happen with fid_lock held.
+> > >
+> > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > > ---
+> > >  fs/smb/client/cached_dir.c | 87 ++++++++++++++++++++++----------------
+> > >  1 file changed, 50 insertions(+), 37 deletions(-)
+> > >
+> >
+> > You are calling dput() here with a lock held, both in path_to_dentry and
+> > in smb2_close_cached_fid. Is this correct?
+> 
+> Hi Henrique,
+> Thanks for reviewing the patches.
+> 
+> Do you see any obvious problem with it?
+> dput would call into VFS layer and might end up calling
+> cifs_free_inode. But that does not take any of the competing locks.
+> 
 
-Coverity noticed that the rc on smb2_parse_contexts() was not being checked
-in the case of compounded operations.  Since we don't want to stop parsing
-the following compounded responses which are likely valid, we can't easily
-error out here, but at least print a warning message if server has a bug
-causing us to skip parsing the open response contexts.
+Hi Shyam,
 
-Addresses-Coverity: 1639191
+Yes, dput() starts with might_sleep(), which means it may preemp (e.g.,
+due to disk I/O), so it must not be called while holding a spinlock.
 
-See attached.
+If you compile the kernel with CONFIG_DEBUG_ATOMIC_SLEEP=y you will see
+this kind of stack dump.
 
--- 
-Thanks,
+[  305.667062][  T940] BUG: sleeping function called from invalid context at security/selinux/hooks.c:283
+[  305.668291][  T940] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 940, name: ls
+[  305.669199][  T940] preempt_count: 1, expected: 0
+[  305.669493][  T940] RCU nest depth: 0, expected: 0
+[  305.670092][  T940] 3 locks held by ls/940:
+[  305.670362][  T940]  #0: ffff8881099b8f08 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x18a/0x1c0
+[  305.671009][  T940]  #1: ffff88811c490158 (&type->i_mutex_dir_key#7){.+.+}-{4:4}, at: iterate_dir+0x85/0x270
+[  305.671615][  T940]  #2: ffff88810cc620b0 (&cfid->fid_lock){+.+.}-{3:3}, at: open_cached_dir+0x1098/0x14a0 [cifs]
+[ ... stack trace continues ... ]
 
-Steve
+> >
+> > Also, the lock ordering here is lock(fid_lock) -> lock(cifs_tcp_ses_lock) ->
+> > unlock(cifs_tcp_ses_lock) -> unlock(fid_lock), won't this blow up in
+> > another path?
+> 
+> Can you please elaborate which code path will result in this lock ordering?
 
---000000000000aa0190063457d637
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-client-warn-when-parse-contexts-returns-error-o.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-client-warn-when-parse-contexts-returns-error-o.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_maaaghxr0>
-X-Attachment-Id: f_maaaghxr0
+I was referring to the following pattern in cifs_laundromat_worker():
 
-RnJvbSA5MWI3ZTNmYjIwNjYwMTE1ZjM0NTdkZjhlMjNhN2I0NzFjNzI2YWM0IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgNCBNYXkgMjAyNSAxODoyNjo0NSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjMgY2xpZW50OiB3YXJuIHdoZW4gcGFyc2UgY29udGV4dHMgcmV0dXJucyBlcnJvciBvbgogY29t
-cG91bmRlZCBvcGVyYXRpb24KCkNvdmVyaXR5IG5vdGljZWQgdGhhdCB0aGUgcmMgb24gc21iMl9w
-YXJzZV9jb250ZXh0cygpIHdhcyBub3QgYmVpbmcgY2hlY2tlZAppbiB0aGUgY2FzZSBvZiBjb21w
-b3VuZGVkIG9wZXJhdGlvbnMuICBTaW5jZSB3ZSBkb24ndCB3YW50IHRvIHN0b3AgcGFyc2luZwp0
-aGUgZm9sbG93aW5nIGNvbXBvdW5kZWQgcmVzcG9uc2VzIHdoaWNoIGFyZSBsaWtlbHkgdmFsaWQs
-IHdlIGNhbid0IGVhc2lseQplcnJvciBvdXQgaGVyZSwgYnV0IGF0IGxlYXN0IHByaW50IGEgd2Fy
-bmluZyBtZXNzYWdlIGlmIHNlcnZlciBoYXMgYSBidWcKY2F1c2luZyB1cyB0byBza2lwIHBhcnNp
-bmcgdGhlIG9wZW4gcmVzcG9uc2UgY29udGV4dHMuCgpBZGRyZXNzZXMtQ292ZXJpdHk6IDE2Mzkx
-OTEKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgot
-LS0KIGZzL3NtYi9jbGllbnQvc21iMmlub2RlLmMgfCAyICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBp
-bnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIyaW5vZGUuYyBiL2Zz
-L3NtYi9jbGllbnQvc21iMmlub2RlLmMKaW5kZXggNTdkOWJmYmFkZDk3Li4yYTNlNDZiOGUxNWEg
-MTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMmlub2RlLmMKKysrIGIvZnMvc21iL2NsaWVu
-dC9zbWIyaW5vZGUuYwpAQCAtNjY2LDYgKzY2Niw4IEBAIHN0YXRpYyBpbnQgc21iMl9jb21wb3Vu
-ZF9vcChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkv
-KiBzbWIyX3BhcnNlX2NvbnRleHRzKCkgZmlsbHMgaWRhdGEtPmZpLkluZGV4TnVtYmVyICovCiAJ
-CXJjID0gc21iMl9wYXJzZV9jb250ZXh0cyhzZXJ2ZXIsICZyc3BfaW92WzBdLCAmb3Bhcm1zLT5m
-aWQtPmVwb2NoLAogCQkJCQkgb3Bhcm1zLT5maWQtPmxlYXNlX2tleSwgJm9wbG9jaywgJmlkYXRh
-LT5maSwgTlVMTCk7CisJCWlmIChyYykKKwkJCWNpZnNfZGJnKFZGUywgInJjOiAlZCBwYXJzaW5n
-IGNvbnRleHQgb2YgY29tcG91bmQgb3BcbiIsIHJjKTsKIAl9CiAKIAlmb3IgKGkgPSAwOyBpIDwg
-bnVtX2NtZHM7IGkrKykgewotLSAKMi40My4wCgo=
---000000000000aa0190063457d637--
+  spin_lock(&cfid->fid_lock);
+  ...
+  spin_lock(&cifs_tcp_ses_lock);
+  spin_unlock(&cifs_tcp_ses_lock);
+  ...
+  spin_unlock(&cfid->fid_lock);
+
+This was more of an open question. I am not certain this causes any issues,
+and I could not find any concrete problem with it.
+
+I brought it up because cifs_tcp_ses_lock is a more global lock than 
+cfid->fid_lock.
+
+
+Best,
+Henrique
