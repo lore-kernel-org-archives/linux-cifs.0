@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD41296FBE;
-	Mon,  5 May 2025 22:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47DB3430B1;
+	Mon,  5 May 2025 22:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484814; cv=none; b=pNl+mFHgldR7Jt3xA9+Pho8Kdt0Ts3v84IVwyYz+xQ6kr9JXz7V98Z4bX4yk0pg0YJ90zobzQrgWro2SKRG7SsgkIIccRnyWEOPn9ugDhnp01nGLZpLVWP3OTp76NxRrh/LdZGBkZ8U42rPQ2prIR36OG+Kqhkd55zUL6nYMFW4=
+	t=1746484814; cv=none; b=tG4jbPC60ERUETW1pUcdIRgctO8t2+z0Y0QtjbfBXwPhd86Dg+OLxId2tU36T8KJGpGZFKi1SMlcheY8S6Emg96TDCNwMa6MAzL9xhUGAnkCdC5qivn1AY0KpRXiF54P+deOCq062fWFV59zJMM910AN3gqji6WWjVoU2o2XuMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746484814; c=relaxed/simple;
-	bh=a/g9tbQUy99bGFVa/jbFGQ7/OzXkiGl+liVmBwJvrF0=;
+	bh=pwIXTziwCHzbUkNjvjKYbolOdJTQBSjZYXQSbpIJteE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YhHDx6d/pS1Cew4f6/8Ossj33TTXuQmQBBEej6GheAtxkXJaruNmgl0H+o3IPDpaj1MZkv/f/+O80fav476iRWm/72Cz8KKjA1txUaexQTPF5Iig82icQrGFGZBcDwWctiBC6O1I9iEV6dPwm+jQa8jbTpAwM2qE88NgCu4DhhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RSbXjCOG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=LV+eYG6R50DldVcv+Lyzof80n2MQRASC69P1w4bQAhCdb1UvizlkOjk7LDt7fQyy9c4oyT2LIYYf+ErtAl0Qr1mrbMqhtUSI+qPs8h6sKCQ7cTXnB1nBfvdtHPHicxsM4Nxqkdvs19A0KtnTwXOMMvDjewhtP/XcZ7i4Kz9bR+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HhqdXUbi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RSbXjCOG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C888C4CEEE;
-	Mon,  5 May 2025 22:40:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HhqdXUbi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C76FBC4CEE4;
+	Mon,  5 May 2025 22:40:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484813;
-	bh=a/g9tbQUy99bGFVa/jbFGQ7/OzXkiGl+liVmBwJvrF0=;
+	s=k20201202; t=1746484814;
+	bh=pwIXTziwCHzbUkNjvjKYbolOdJTQBSjZYXQSbpIJteE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RSbXjCOGmMQoq3GFkfeKVh4H37gOIGWzpN8bCN13IEkJdaenbcPoK6Qu/ooDrawDc
-	 CXNyNY5TrFhXVsr97ZpGZbS46PEpMVBO77bAmdDuhqACJv8ZrQW+VSmeyajoAk2LS+
-	 zSYWAzxsCKCbJamPr+Jga1jm+7YJ1Cc/mqJTGovXSRYwo3RI/pp8D2uuDbp1IVBjUx
-	 vBGK6+6NDxTj3M+NhxUFqLfePpXT/ekH8Ty+7LRmQ+6Mh4Bnh1mL+jjCr3HqQbAAHf
-	 jt2YKZjf7dgcqFLKJZlwoVPtaITZ2BAO8xJNoV5GBeyF3w0xw7hA+J5Oh+5nulhc51
-	 +Yboq6YoJK2Mw==
+	b=HhqdXUbi0WBexC79WaIVeSwAtnQnkNbPxx4t84EQ4vdYThEMSVFhLjmAe81StMUfS
+	 lR4+z6zll9ClfQ6OI7JP+SbF59BAjRpWX3aC8nTIkv8PwQ6PwmoBl9z0U8UfccVhYK
+	 Z7GppcgQjbaMEvTH8Dlp3fb3dZfsA4NA1wpzZP4wrZJJPp1abDzGiYbgDWElLc9Bqm
+	 JD4omvJAyBMseKthoEIXNOKy+fX/z/sWyXRU7HilzE25V37Uoh+RWF6hrQ/MdlZqc7
+	 Q3KeLftTmYTdOi7c8pbqdcMIFdG/QwqahkoJMb+AzpINb+VU57oTSJbWLxWaakdxnu
+	 40/big9tj4tWg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.12 025/486] cifs: Set default Netbios RFC1001 server name to hostname in UNC
-Date: Mon,  5 May 2025 18:31:41 -0400
-Message-Id: <20250505223922.2682012-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 026/486] cifs: add validation check for the fields in smb_aces
+Date: Mon,  5 May 2025 18:31:42 -0400
+Message-Id: <20250505223922.2682012-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -47,60 +47,61 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Pali Rohár <pali@kernel.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit be786e509c1af9b2dcf25c3d601f05c8c251f482 ]
+[ Upstream commit eeb827f2922eb07ffbf7d53569cc95b38272646f ]
 
-Windows SMB servers (including SMB2+) which are working over RFC1001
-require that Netbios server name specified in RFC1001 Session Request
-packet is same as the UNC host name. Netbios server name can be already
-specified manually via -o servern= option.
+cifs.ko is missing validation check when accessing smb_aces.
+This patch add validation check for the fields in smb_aces.
 
-With this change the RFC1001 server name is set automatically by extracting
-the hostname from the mount source.
-
-Signed-off-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/fs_context.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ fs/smb/client/cifsacl.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 66d872d63f839..d6685679f84da 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1028,6 +1028,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	int i, opt;
- 	bool is_smb3 = !strcmp(fc->fs_type->name, "smb3");
- 	bool skip_parsing = false;
-+	char *hostname;
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index e36f0e2d7d21e..9a73478e00688 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -811,7 +811,23 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
+ 			return;
  
- 	cifs_dbg(FYI, "CIFS: parsing cifs mount option '%s'\n", param->key);
+ 		for (i = 0; i < num_aces; ++i) {
++			if (end_of_acl - acl_base < acl_size)
++				break;
++
+ 			ppace[i] = (struct smb_ace *) (acl_base + acl_size);
++			acl_base = (char *)ppace[i];
++			acl_size = offsetof(struct smb_ace, sid) +
++				offsetof(struct smb_sid, sub_auth);
++
++			if (end_of_acl - acl_base < acl_size ||
++			    ppace[i]->sid.num_subauth == 0 ||
++			    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
++			    (end_of_acl - acl_base <
++			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
++			    (le16_to_cpu(ppace[i]->size) <
++			     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth))
++				break;
++
+ #ifdef CONFIG_CIFS_DEBUG2
+ 			dump_ace(ppace[i], end_of_acl);
+ #endif
+@@ -855,7 +871,6 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
+ 				(void *)ppace[i],
+ 				sizeof(struct smb_ace)); */
  
-@@ -1360,6 +1361,16 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 			cifs_errorf(fc, "OOM when copying UNC string\n");
- 			goto cifs_parse_mount_err;
+-			acl_base = (char *)ppace[i];
+ 			acl_size = le16_to_cpu(ppace[i]->size);
  		}
-+		hostname = extract_hostname(ctx->UNC);
-+		if (IS_ERR(hostname)) {
-+			cifs_errorf(fc, "Cannot extract hostname from UNC string\n");
-+			goto cifs_parse_mount_err;
-+		}
-+		/* last byte, type, is 0x20 for servr type */
-+		memset(ctx->target_rfc1001_name, 0x20, RFC1001_NAME_LEN_WITH_NULL);
-+		for (i = 0; i < RFC1001_NAME_LEN && hostname[i] != 0; i++)
-+			ctx->target_rfc1001_name[i] = toupper(hostname[i]);
-+		kfree(hostname);
- 		break;
- 	case Opt_user:
- 		kfree(ctx->username);
+ 
 -- 
 2.39.5
 
