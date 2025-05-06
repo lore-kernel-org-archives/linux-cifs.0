@@ -1,44 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1729C222580;
-	Tue,  6 May 2025 21:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB5B22A80D;
+	Tue,  6 May 2025 21:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746567381; cv=none; b=Z6ipgdyCZVvmk/xjfWgBqrYdKkmmJGiAc/WsllCcmWWuKhWLSv4MLQ9aILMny4VDo1EYEkWvlibHO/jV8nBMzusxZZPURiUhFC4z2KjL8B4LcefMG9SFdaBxQ0OUJl1u8J/WBtaxrYfiVHAQRWMa2x+pBOyIH+d6afjugOVQyOw=
+	t=1746567401; cv=none; b=I7DF6GCYZSdWUclC3DmfOTxxZtA8JWHAclCTckoDgPqAIDnyvVF1VbHZzZhAMJ9V4aXSgwPhjn14w9XicWUKK5Aw0nQM+mmHExDMYxIdJeuW/qDxEWHGch8vv3W/0v+NaEVRSmZgmMZgKrY26hWO8b7yAOBcpZ2l92/ztlGJTK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746567381; c=relaxed/simple;
-	bh=n75AxjRaIh79fMF9r3kZtrqsvJ5Y/8iHAjDLx/mYGG4=;
+	s=arc-20240116; t=1746567401; c=relaxed/simple;
+	bh=gVu8blDee8K1Efvx9r54MF9GyKtjUZE18nmqxtlUO+U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=li7iHSFpAY/fYXqZN0lWQJvLeO++xUYb763DKMlWQnjZS5NOUD8hFKuXh73xOsaJy5Nn1xC2EV4F8nfxnqGptWuWFJ2smX5eYMno3iBGM5itEIPWOPYfwlOkq4tbHmVszH6NtEcFFtPd7qesCQzIqI2O3xVZspvnymbE8yru4sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DemWjyKH; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=lVzjvIPVfVmH0n+NJemTgaMxWsJ0j7dixm/m3Lar9fxnySgU2zEsild29Rm/i5i+lROA41abjmFGbCHiYlxQiS32LfpZGryzBUCgT/WaZCqleQmaapBSiee4yc2n2+flyOqS8WoWSZdMPwGCMkJguYrtSrNrcOMQAWypjdRQ/c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dToOLYc/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DemWjyKH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92559C4CEE4;
-	Tue,  6 May 2025 21:36:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dToOLYc/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 998B1C4CEF0;
+	Tue,  6 May 2025 21:36:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746567380;
-	bh=n75AxjRaIh79fMF9r3kZtrqsvJ5Y/8iHAjDLx/mYGG4=;
+	s=k20201202; t=1746567401;
+	bh=gVu8blDee8K1Efvx9r54MF9GyKtjUZE18nmqxtlUO+U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DemWjyKH8FGnBNtb8lFvZ7V+lCMS2M4XmADB3V18DFBxnUoo8P98WjHBc49Fe3zY0
-	 CUeB3jvpRYLDl3WSjux4HKCggherHZVbTatatrhHdy32uC3cbz9SjtFnE3hmoNdgz2
-	 83GqnoEXCBK1ImXTWp+Wvb+bbTZ9vs9n3J8pEAnpBRrfH+a+3sxeH4LE2xk9mwEC1v
-	 saZpNLfYbyTkcQDF2JFRyApR2nvb68JcH0RDDGsyTO8X/cUTSQjJusb8lXs+ZDp2SF
-	 aMhekQz1mZCD8A5cugFD7Um8pLTDcLeXu3tJSPNL23uk6G4RkEk9+HQwcECAFzcIDo
-	 /xP5dYX9kEG6w==
+	b=dToOLYc/QfOPxCgtJe2yiPVFIjl2Lhjv5ZRjrtVY3rD/Q5I+8RCJ3dGVG75n6na7H
+	 9exIPzGReJVC/EZLBR2Dnjt8pUDh3byb+mZfc6aKzqlrHL5Zs78Ib4ydW4PjHKsm0k
+	 CtYy18XtmdIlc6AhVbLTccoNbhepFnsq4kKiodq7cPXGQkJHFzT1tFTZlHCXQ4mFDG
+	 B6Bbjc6SCDSskhWh7prVqZyRsIvwJ3G58Zd3VzOIClY5Mg9EKWFYdw89RGDGZF9XW6
+	 4S8PsFr+9AgWJXZr16J0gORM+JLPTdZuPmuStL7CLZQjBuj3WGqeekF1eZFJt1oOxw
+	 d7+lNkmfA0ozA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Salah Triki <salah.triki@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
-	smfrench@gmail.com,
+	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 04/18] smb: server: smb2pdu: check return value of xa_store()
-Date: Tue,  6 May 2025 17:35:56 -0400
-Message-Id: <20250506213610.2983098-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 16/18] cifs: Fix and improve cifs_query_path_info() and cifs_query_file_info()
+Date: Tue,  6 May 2025 17:36:08 -0400
+Message-Id: <20250506213610.2983098-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250506213610.2983098-1-sashal@kernel.org>
 References: <20250506213610.2983098-1-sashal@kernel.org>
@@ -48,53 +48,183 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.27
 Content-Transfer-Encoding: 8bit
 
-From: Salah Triki <salah.triki@gmail.com>
+From: Pali Rohár <pali@kernel.org>
 
-[ Upstream commit af5226abb40cae959f424f7ca614787a1c87ce48 ]
+[ Upstream commit 1041c117a2c33cdffc4f695ac4b469e9124d24d5 ]
 
-xa_store() may fail so check its return value and return error code if
-error occurred.
+When CAP_NT_SMBS was not negotiated then do not issue CIFSSMBQPathInfo()
+and CIFSSMBQFileInfo() commands. CIFSSMBQPathInfo() is not supported by
+non-NT Win9x SMB server and CIFSSMBQFileInfo() returns from Win9x SMB
+server bogus data in Attributes field (for example lot of files are marked
+as reparse points, even Win9x does not support them and read-only bit is
+not marked for read-only files). Correct information is returned by
+CIFSFindFirst() or SMBQueryInformation() command.
 
-Signed-off-by: Salah Triki <salah.triki@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+So as a fallback in cifs_query_path_info() function use CIFSFindFirst()
+with SMB_FIND_FILE_FULL_DIRECTORY_INFO level which is supported by both NT
+and non-NT servers and as a last option use SMBQueryInformation() as it was
+before.
+
+And in function cifs_query_file_info() immediately returns -EOPNOTSUPP when
+not communicating with NT server. Client then revalidate inode entry by the
+cifs_query_path_info() call, which is working fine. So fstat() syscall on
+already opened file will receive correct information.
+
+Note that both fallback functions in non-UNICODE mode expands wildcards.
+Therefore those fallback functions cannot be used on paths which contain
+SMB wildcard characters (* ? " > <).
+
+CIFSFindFirst() returns all 4 time attributes as opposite of
+SMBQueryInformation() which returns only one.
+
+With this change it is possible to query all 4 times attributes from Win9x
+server and at the same time, client minimize sending of unsupported
+commands to server.
+
+Signed-off-by: Pali Rohár <pali@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ fs/smb/client/smb1ops.c | 103 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 95 insertions(+), 8 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 6b9286c963439..f52afb01175dd 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1443,7 +1443,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 55cceb8229323..2f85272948b90 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -548,24 +548,104 @@ static int cifs_query_path_info(const unsigned int xid,
+ 				const char *full_path,
+ 				struct cifs_open_info_data *data)
  {
- 	struct ksmbd_conn *conn = work->conn;
- 	struct ksmbd_session *sess = work->sess;
--	struct channel *chann = NULL;
-+	struct channel *chann = NULL, *old;
- 	struct ksmbd_user *user;
- 	u64 prev_id;
- 	int sz, rc;
-@@ -1555,7 +1555,12 @@ static int ntlm_authenticate(struct ksmbd_work *work,
- 				return -ENOMEM;
+-	int rc;
++	int rc = -EOPNOTSUPP;
+ 	FILE_ALL_INFO fi = {};
++	struct cifs_search_info search_info = {};
++	bool non_unicode_wildcard = false;
  
- 			chann->conn = conn;
--			xa_store(&sess->ksmbd_chann_list, (long)conn, chann, KSMBD_DEFAULT_GFP);
-+			old = xa_store(&sess->ksmbd_chann_list, (long)conn, chann,
-+					KSMBD_DEFAULT_GFP);
-+			if (xa_is_err(old)) {
-+				kfree(chann);
-+				return xa_err(old);
+ 	data->reparse_point = false;
+ 	data->adjust_tz = false;
+ 
+-	/* could do find first instead but this returns more info */
+-	rc = CIFSSMBQPathInfo(xid, tcon, full_path, &fi, 0 /* not legacy */, cifs_sb->local_nls,
+-			      cifs_remap(cifs_sb));
+ 	/*
+-	 * BB optimize code so we do not make the above call when server claims
+-	 * no NT SMB support and the above call failed at least once - set flag
+-	 * in tcon or mount.
++	 * First try CIFSSMBQPathInfo() function which returns more info
++	 * (NumberOfLinks) than CIFSFindFirst() fallback function.
++	 * Some servers like Win9x do not support SMB_QUERY_FILE_ALL_INFO over
++	 * TRANS2_QUERY_PATH_INFORMATION, but supports it with filehandle over
++	 * TRANS2_QUERY_FILE_INFORMATION (function CIFSSMBQFileInfo(). But SMB
++	 * Open command on non-NT servers works only for files, does not work
++	 * for directories. And moreover Win9x SMB server returns bogus data in
++	 * SMB_QUERY_FILE_ALL_INFO Attributes field. So for non-NT servers,
++	 * do not even use CIFSSMBQPathInfo() or CIFSSMBQFileInfo() function.
++	 */
++	if (tcon->ses->capabilities & CAP_NT_SMBS)
++		rc = CIFSSMBQPathInfo(xid, tcon, full_path, &fi, 0 /* not legacy */,
++				      cifs_sb->local_nls, cifs_remap(cifs_sb));
++
++	/*
++	 * Non-UNICODE variant of fallback functions below expands wildcards,
++	 * so they cannot be used for querying paths with wildcard characters.
+ 	 */
+-	if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
++	if (rc && !(tcon->ses->capabilities & CAP_UNICODE) && strpbrk(full_path, "*?\"><"))
++		non_unicode_wildcard = true;
++
++	/*
++	 * Then fallback to CIFSFindFirst() which works also with non-NT servers
++	 * but does not does not provide NumberOfLinks.
++	 */
++	if ((rc == -EOPNOTSUPP || rc == -EINVAL) &&
++	    !non_unicode_wildcard) {
++		if (!(tcon->ses->capabilities & tcon->ses->server->vals->cap_nt_find))
++			search_info.info_level = SMB_FIND_FILE_INFO_STANDARD;
++		else
++			search_info.info_level = SMB_FIND_FILE_FULL_DIRECTORY_INFO;
++		rc = CIFSFindFirst(xid, tcon, full_path, cifs_sb, NULL,
++				   CIFS_SEARCH_CLOSE_ALWAYS | CIFS_SEARCH_CLOSE_AT_END,
++				   &search_info, false);
++		if (rc == 0) {
++			if (!(tcon->ses->capabilities & tcon->ses->server->vals->cap_nt_find)) {
++				FIND_FILE_STANDARD_INFO *di;
++				int offset = tcon->ses->server->timeAdj;
++
++				di = (FIND_FILE_STANDARD_INFO *)search_info.srch_entries_start;
++				fi.CreationTime = cpu_to_le64(cifs_UnixTimeToNT(cnvrtDosUnixTm(
++						di->CreationDate, di->CreationTime, offset)));
++				fi.LastAccessTime = cpu_to_le64(cifs_UnixTimeToNT(cnvrtDosUnixTm(
++						di->LastAccessDate, di->LastAccessTime, offset)));
++				fi.LastWriteTime = cpu_to_le64(cifs_UnixTimeToNT(cnvrtDosUnixTm(
++						di->LastWriteDate, di->LastWriteTime, offset)));
++				fi.ChangeTime = fi.LastWriteTime;
++				fi.Attributes = cpu_to_le32(le16_to_cpu(di->Attributes));
++				fi.AllocationSize = cpu_to_le64(le32_to_cpu(di->AllocationSize));
++				fi.EndOfFile = cpu_to_le64(le32_to_cpu(di->DataSize));
++			} else {
++				FILE_FULL_DIRECTORY_INFO *di;
++
++				di = (FILE_FULL_DIRECTORY_INFO *)search_info.srch_entries_start;
++				fi.CreationTime = di->CreationTime;
++				fi.LastAccessTime = di->LastAccessTime;
++				fi.LastWriteTime = di->LastWriteTime;
++				fi.ChangeTime = di->ChangeTime;
++				fi.Attributes = di->ExtFileAttributes;
++				fi.AllocationSize = di->AllocationSize;
++				fi.EndOfFile = di->EndOfFile;
++				fi.EASize = di->EaSize;
 +			}
- 		}
++			fi.NumberOfLinks = cpu_to_le32(1);
++			fi.DeletePending = 0;
++			fi.Directory = !!(le32_to_cpu(fi.Attributes) & ATTR_DIRECTORY);
++			cifs_buf_release(search_info.ntwrk_buf_start);
++		} else if (!full_path[0]) {
++			/*
++			 * CIFSFindFirst() does not work on root path if the
++			 * root path was exported on the server from the top
++			 * level path (drive letter).
++			 */
++			rc = -EOPNOTSUPP;
++		}
++	}
++
++	/*
++	 * If everything failed then fallback to the legacy SMB command
++	 * SMB_COM_QUERY_INFORMATION which works with all servers, but
++	 * provide just few information.
++	 */
++	if ((rc == -EOPNOTSUPP || rc == -EINVAL) && !non_unicode_wildcard) {
+ 		rc = SMBQueryInformation(xid, tcon, full_path, &fi, cifs_sb->local_nls,
+ 					 cifs_remap(cifs_sb));
+ 		data->adjust_tz = true;
++	} else if ((rc == -EOPNOTSUPP || rc == -EINVAL) && non_unicode_wildcard) {
++		/* Path with non-UNICODE wildcard character cannot exist. */
++		rc = -ENOENT;
  	}
  
+ 	if (!rc) {
+@@ -662,6 +742,13 @@ static int cifs_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int rc;
+ 	FILE_ALL_INFO fi = {};
+ 
++	/*
++	 * CIFSSMBQFileInfo() for non-NT servers returns bogus data in
++	 * Attributes fields. So do not use this command for non-NT servers.
++	 */
++	if (!(tcon->ses->capabilities & CAP_NT_SMBS))
++		return -EOPNOTSUPP;
++
+ 	if (cfile->symlink_target) {
+ 		data->symlink_target = kstrdup(cfile->symlink_target, GFP_KERNEL);
+ 		if (!data->symlink_target)
 -- 
 2.39.5
 
