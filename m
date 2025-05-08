@@ -1,110 +1,168 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2484B1E7A;
-	Thu,  8 May 2025 03:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EF226D4EE
+	for <linux-cifs@vger.kernel.org>; Thu,  8 May 2025 15:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746675270; cv=none; b=eFa9ULB3q4oKZLE8TNxqb44gX1nTXjl7t2LACyj2DU6TFr13NgKYtQpmzQ2v7yE1eTHUqqXTSMPcuTmVNJZfLfXOJB8cNq1VrdzjE+VBfMUl9bGnGCkSLyY9rrJIMmMJ8dHM849Npvoaaveg3i0vcKFtbpECRBhHBCAPNP3mOm8=
+	t=1746717889; cv=none; b=fOMYf0H8dBYxhK/XU95aJ2k3VIxPe0UiNoy1jUX+mJft0Jx+/g8tbdTP2wNSvt+mjDyp7LCfebwqAXnB7BXpSjmej6mBvCF2W8XpcIj9gYWo3U3QyoEQv0woMm5WH+dz9aiuGinW6zIPRIQe+lHr17mKwDA7cGPbDPQCaP9ev4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746675270; c=relaxed/simple;
-	bh=uXdkj+hTkdojfqIvqdoklrPedAqevSz+dSVNtv+pZw8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qbaLgNKljBT5DxeXX0Xcbokc36YQIYv+nZd1TAxiOMBs7iP1iU8MGe1axwiohmPGoUndoabNEwX0PH2nmrCsZBH0iAkmjJi6fLQmCFtGnWnNhW0li4eZk+OFF8eE112sxSmNUb/LU5UK45RmKpHHuBz+9sYczVLAe64wP2hUJPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iKWrZ6NQ; arc=none smtp.client-ip=209.85.167.51
+	s=arc-20240116; t=1746717889; c=relaxed/simple;
+	bh=163m5tNF6eGkddGv+1VrVyaNymXKl4bnqQpiVKPcNFg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=L6uJzbbAT1Fm+izNXl5OSOBnuzeMunIjYP0v3lyNoLMkpEbyTXlu4OSxT/6eDkL3a2m80hInRAGXv6Sjtbc669pMhpqQNjW+HT/4tcw0xzyVqHET/bw8wwbMS9AtQ9c15NnvuHWboj9mrbPaK5rZDXD+BrEvmxvqDA6ZkxYg//0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VA+JS69/; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKWrZ6NQ"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-54fc36323c5so9611e87.0;
-        Wed, 07 May 2025 20:34:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VA+JS69/"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5e22e6ed2so1750625a12.3
+        for <linux-cifs@vger.kernel.org>; Thu, 08 May 2025 08:24:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746675266; x=1747280066; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Vs79sT1z9pcn5mqMpa25QtZJuWH27z2drEI50rV/J2g=;
-        b=iKWrZ6NQl29bZWZRMGcQsvzpSgmg0h0+x4uRfgF7qsA1caqIf318WjqRNdCeXSAWow
-         ywS0KGGa2/CD58WoPWM78gtCBhAkDzg5IrQCrpazQcJdW6AKy2vyMp0MxMkz6GfLG80T
-         qzyJWyk6bNl+AI7PTKQsKKIWznzFT0xU8+YVJCLI1gIBIpNuYMoKvwox/cgB8dr5ExKB
-         7IAjaTpz8fAURM2YclpVE9AmXIjcXPk1ZIgrLV0fgDkpYZ2enlwBZJowxBgTGTcyZd7D
-         s4XV9fctIAvcEMWaKcqQBhMZg8GkLQzSVl4KjFEghxQAHwTERk4yFxIqccCFgNuI4ekA
-         ok9Q==
+        d=gmail.com; s=20230601; t=1746717886; x=1747322686; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OWo2tTuVLb3xyulnw9ET1EeYifED6n9Je3QmfzOGh2w=;
+        b=VA+JS69/lSg8FQ7sV3dkaWrHu1IW7o6Gtsd8HqfRjDVdbDCBeiyVYegW12QxxUu9Wi
+         z0zXwQgbqas02RinO3mg0Hg+zpStVaNnknY0jbzuLG9GwwLQkc+XMc397cQxCnCWq+En
+         IShJij+uLDiP5o3aydgATPqFY0zDA6cAXw6r03TY2ASLnuBZPBGLVP+VDJspLPTdXdd1
+         LCxSXSDyGA5XjzB0FdL48Y8DkxEIjIFuyocS8bPve6ieTRz5SSl1ZdsFZZ+N0CNfvMms
+         +BIxOgsn1WmN54tHgO9cz00HH2/8kRJcqBkuKOtbHfzzQcQorSjM2zBJSX5gO3cQs6Kf
+         3ugA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746675266; x=1747280066;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vs79sT1z9pcn5mqMpa25QtZJuWH27z2drEI50rV/J2g=;
-        b=IkU5mGrvG/QQRfAnGozyZMgplws2F9oY/wRdsjE0ZUJ9qOhD9NgayfWGPeT/gZR3Zm
-         AKUS7J22TEJYjsqFGy0mA1PS/V8jWOpFvhVqBB3iojs4gxHVckPAbXoOrGdFXDRbAVAh
-         kpWRPGOjGk/8G2NUF/G9wUIgQWSJwFQXO03M0AYwxquYzUyNFmG/mOm1eBANOnD73DHs
-         SxzniG0MNsxqMCv4CWzvZwYFjluegeVLVtXSu25rh6nBah2ljGPTpmC48ynW4bysRv20
-         l7ixvxpcfliKCrr8RfrbPSnfQ/vmApNMmFgxsW7zwLlQLp7dKsQUFa4fyjk+53Y2ua0S
-         TGEg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7d4OdwNNg158+vgrlgXzHlxj0XDMWkqhZ+U8p36gtg080hxpvfPoSxyDT+EjVpclMgDA9ZPSRMgUnTTOF@vger.kernel.org, AJvYcCXXWzAGXk0SNN8fn/aL4Yo6ugXFmM2M23ci4hecZw0BVMhh+yS1IUBWwA5z+VP6zBaPDk6TvXMNaSfO@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhZZNg9qkcHyNXzVJiasvUaC93sJRFsxJAh2nGARRSKn92akc2
-	q3+z1/RpfpZpUazYQQwzCog3DZu3N2bNXblpO9Dr7PmHdzc0ay1whze6HzJpOyt4ISq1Lw8z+Ji
-	iM3GvLqS8nVIpycyueQOZB9x34vg6IKRs
-X-Gm-Gg: ASbGncsjfnPxqUCNeuIAvK3Dglx5NXfZ3b+2F5BBqm/D6S3pxAGTrOdDdUxeUbhuqla
-	bycjnRETjx3zV2r1Gk9B7a+BzBZuzQGIkCUl5rFDOGev/wPpoYDyKdcqLZjrEXCc5CqBQgQgKI8
-	FB+I8OlZhwPEDAAzSrqd2M9P4=
-X-Google-Smtp-Source: AGHT+IFqdlXOoADn1dUreyEoDR3eL0pLNDbnFfRkc3P4LZdSrEXB4VzDHAxFfv9TfhdzPZ+wa3Z7HRzNKUSrRNzlSpQ=
-X-Received: by 2002:a05:6512:104a:b0:54e:784e:541 with SMTP id
- 2adb3069b0e04-54fbe41e56amr592572e87.14.1746675266286; Wed, 07 May 2025
- 20:34:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746717886; x=1747322686;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OWo2tTuVLb3xyulnw9ET1EeYifED6n9Je3QmfzOGh2w=;
+        b=SwayMLt0Yt0md7X+DWg9/hma5cvgIoBIHIivpTGwgHLTlGzI8Hof6gpXKY/fc8+xAo
+         1RLZyQm0JBbjU+TeByQhxsLsDdR76/IgeoTt06wyUOiV2xacVu7r2PERzhVf/VT0LnO8
+         aQJ0ccm3yr4VTQffavQ3pFLmV2mBU/feOKbiFBFKjtGcctMRTZjq4rG3IexPDDkZO+OC
+         QQA0YmyTgiYLhFsGlSbvdZ89zERB/3grcJ/izNayj3VllpWRHDIvqEy4zfz1Wu+EaWg1
+         xHJ0DI2YC1vHVocx7yRjZn76eBcczC68SO1SwNNbOyknWCgEDm2LmKl2Ny0bzDkuG1PE
+         ryGg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3a3Z1zjDYbwSVsaf6lk+jdsPSLDH95XLX/+Y+etMpz6BD+ajhEYSShPf5FzKABFpSPXptm0XIcmn8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys3zzetBHV0K22Z0M9Otc4rCDCB8J56ij01mXUr4N0LtIO/Nmx
+	4JxIjL1EiA4pqg0T6aGP3K3mKw7bBks0DOM1b+KRu04btF6a2xmGDzF8qJUEiMNoYMUtcHVC5RF
+	QV/0D2KJvM04FHkgI0GiKQqrAVsI=
+X-Gm-Gg: ASbGncuoxEsvIeHmucmUNxYp07/RMu9MRrdpOJdBI04Ey42bbrWroylWFoLKsKPivkw
+	uBMXBwIjO5wWSCbZbVQR3ZFSaHbE66VEqEPceh1VG7C3d2PlUd3dEAIqT48p+9t8TWGFeUzdxjo
+	vF7DVVky4zsqj1Mh0pqeL432qk
+X-Google-Smtp-Source: AGHT+IHrd9/s4vgfgglv+xNDjixdm3a9IOh+wkiL8QK2pG+BBmRKvN/zL17474JdNnzuImCwjg4zyYa8S8YXmLud6H0=
+X-Received: by 2002:a05:6402:27d3:b0:5e6:616f:42e4 with SMTP id
+ 4fb4d7f45d1cf-5fc35808499mr4151941a12.27.1746717885440; Thu, 08 May 2025
+ 08:24:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 7 May 2025 22:34:15 -0500
-X-Gm-Features: ATxdqUF8pqJhrhpfqZJwWnmu5w6ANJvVwe4AwgVBbrR3xAJbThyFwTaiJ0wVX6k
-Message-ID: <CAH2r5mv5iu20LFsASnA=G3OUtrUAkp0CnKvckT+fbsYWzSAaLA@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+References: <20250506223156.121141-1-henrique.carvalho@suse.com> <aBr6zohhW9Akuu3a@redcloak.home.arpa>
+In-Reply-To: <aBr6zohhW9Akuu3a@redcloak.home.arpa>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 8 May 2025 20:54:34 +0530
+X-Gm-Features: ATxdqUFZPdC7ht5RaYTXQ3huwKcfTLcmP_DEu7zd1xoXMkcisdUjR74gF2FQdTQ
+Message-ID: <CANT5p=pHLh-8fDbJ2OCdNa_eHR5T=BVJAOSYy4zs_Lk6FzR9=A@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: avoid dentry leak by not overwriting cfid->dentry
+To: Henrique Carvalho <henrique.carvalho@suse.com>, ematsumiya@suse.de, sfrench@samba.org, 
+	smfrench@gmail.com, pc@manguebit.com, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-ca91b9500108d4cf083a635c2e11c884d5dd20ea:
+On Wed, May 7, 2025 at 11:56=E2=80=AFAM Paul Aurich <paul@darkrain42.org> w=
+rote:
+>
+> On 2025-05-06 19:31:56 -0300, Henrique Carvalho wrote:
+> >A race, likely between lease break and open, can cause cfid->dentry to
+> >be valid when open_cached_dir() tries to set it again. This overwrites
+> >the old dentry without dput(), leaking it.
+> >
+> >Skip assignment if cfid->dentry is already set.
+> >
+> >Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> >---
+> > fs/smb/client/cached_dir.c | 23 +++++++++++++++--------
+> > 1 file changed, 15 insertions(+), 8 deletions(-)
+> >
+> >diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+> >index 43228ec2424d..8c1f00a3fc29 100644
+> >--- a/fs/smb/client/cached_dir.c
+> >+++ b/fs/smb/client/cached_dir.c
+> >@@ -219,16 +219,23 @@ int open_cached_dir(unsigned int xid, struct cifs_=
+tcon *tcon,
+> >               goto out;
+> >       }
+> >
+> >-      if (!npath[0]) {
+> >-              dentry =3D dget(cifs_sb->root);
+> >-      } else {
+> >-              dentry =3D path_to_dentry(cifs_sb, npath);
+> >-              if (IS_ERR(dentry)) {
+> >-                      rc =3D -ENOENT;
+> >-                      goto out;
+> >+      /*
+> >+       * BB: cfid->dentry should be NULL here; if not, we're likely rac=
+ing with
+> >+       * a lease break. This is a temporary workaround to avoid overwri=
+ting
+> >+       * a valid dentry. Needs proper fix.
+> >+       */
+>
+> Ah ha. I think this is trying to address the same race as Shyam's 'cifs: =
+do
+> not return an invalidated cfid' [1].
 
-  Merge tag 'v6.15-rc4-ksmbd-server-fixes' of
-git://git.samba.org/ksmbd (2025-04-28 16:56:01 -0700)
 
-are available in the Git repository at:
+Hi Paul,
+Yes. One of my patch did this check to avoid leaking dentry.
+However, without serializing threads in this codepath, it is not
+possible to rule out all such races.
 
-  git://git.samba.org/ksmbd.git tags/v6.15-rc5-ksmbd-server-fixes
+>
+> What about modifying open_cached_dir to hold cfid_list_lock across the ca=
+ll to
+> find_or_create_cached_dir through where it tests for validity, and then
+> dropping the locking in find_or_create_cached_dir itself (see attached in=
+ case
+> my text description isn't clear)?
 
-for you to fetch changes up to 36991c1ccde2d5a521577c448ffe07fcccfe104d:
+We can do that. But holding a spinlock till the response comes back
+from the server is not a good idea.
+We could see high CPU utilization if response from the server takes longer.
+My other patch introduced a mutex just for this purpose.
 
-  ksmbd: Fix UAF in __close_file_table_ids (2025-05-06 08:37:02 -0500)
+>
+> That's the only way I can see that a pre-existing cfid could escape to th=
+e
+> rest of open_cached_dir. I think.
+>
+> ~Paul
+>
+> [1] https://lore.kernel.org/linux-cifs/20250502051517.10449-2-sprasad@mic=
+rosoft.com/T/#u
+>
+> >+      if (!cfid->dentry) {
+> >+              if (!npath[0]) {
+> >+                      dentry =3D dget(cifs_sb->root);
+> >+              } else {
+> >+                      dentry =3D path_to_dentry(cifs_sb, npath);
+> >+                      if (IS_ERR(dentry)) {
+> >+                              rc =3D -ENOENT;
+> >+                              goto out;
+> >+                      }
+> >               }
+> >+              cfid->dentry =3D dentry;
+> >       }
+> >-      cfid->dentry =3D dentry;
+> >       cfid->tcon =3D tcon;
+> >
+> >       /*
+> >--
+> >2.47.0
 
-----------------------------------------------------------------
-4 ksmbd SMB3 server fixes, most also for stable
-- Fix UAF closing file table (e.g. in tree disconnect)
-- Fix potential out of bounds write
-- Fix potential memory leak parsing lease state in open
-- Fix oops in rename with empty target
-----------------------------------------------------------------
-Namjae Jeon (1):
-      ksmbd: prevent rename with empty string
-
-Norbert Szetei (1):
-      ksmbd: prevent out-of-bounds stream writes by validating *pos
-
-Sean Heelan (1):
-      ksmbd: Fix UAF in __close_file_table_ids
-
-Wang Zhaolong (1):
-      ksmbd: fix memory leak in parse_lease_state()
-
- fs/smb/server/oplock.c    |  7 +++++--
- fs/smb/server/smb2pdu.c   |  5 +++++
- fs/smb/server/vfs.c       |  7 +++++++
- fs/smb/server/vfs_cache.c | 33 ++++++++++++++++++++++++++-------
-
--- 
-Thanks,
-
-Steve
+--=20
+Regards,
+Shyam
