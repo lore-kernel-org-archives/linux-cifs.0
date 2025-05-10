@@ -1,75 +1,75 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F168E2405E8
-	for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 16:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7367218F2FC
+	for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 16:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746893785; cv=none; b=n/Kmrq62+0Ki6O8MggUgmbAOQw+RQCGb/+H0K7HlVEw+0d7tHoKxuL5JjnRYnM3U2rpZ7IhUqVioOTUaZLTGEMyXNLkHYrgcFEfA1zENFRJBAaXMtF0JrstoycYbXj7/zWdM4crvmXzEI/KnxEEbzEg/fHWXiBoDzCXLwI7c4Qw=
+	t=1746893794; cv=none; b=ARbxKlXEsjm32KBZrmDNo6Ltc8bNjwIDdfF1pqxKn7R8FTE5U0wcVVWHqHyC1pUosqG+fdHRbJo+mM7Pe+5KXMGfsqFeWMW6ixNDmA8YV+cCzEZj2ApA7S0wCYHH8LdLZwpSfCrcZVxDQEezspPRgGTNlMQd2o0Qou1uY21FjWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746893785; c=relaxed/simple;
-	bh=XwFOmzIfEzxC54C+WvK0vFMiEmspPWSkCQQ2bP2Bi3g=;
+	s=arc-20240116; t=1746893794; c=relaxed/simple;
+	bh=r28iAOOAikriFtZ0oQAGbICr+jQieZfce3q2GS2nZMI=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GEtFhtEIV/VARo6efyi2nO2MaVVu76NlITU3RI8GlLQ60xsdfG8OP6fIoDKbDAtuaybsGEJPjzFHXPAdgCXABEPWyCITewIwwjCN1mJETo+ezVmJEBGgjkgiYK4vy6jhLSefM0c10yM59VArYtYDD/vMfRuf9ivqTtw/50m9KtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SBBh7NVU; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=jbEWWVWFpDYGLziyDZvzl/LS+sGE6UqdtMG0Erk5V8N6TQsbhZCmsVjPiIk2I3VBGCG8L4/gq2nnv9dLIhUJ3vJnKrll1d98nN6MdvTx2C3Tw3s27wE+oNlGpccBTmCEmy6zcgf9Cwwm2bV9btFQYmWIhY4nHftlOFGoNGp/W8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E2UeINuh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBBh7NVU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2UeINuh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746893783;
+	s=mimecast20190719; t=1746893791;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kyghqtQvyqmRDSnXARSQ4gcaRBJZ2IDYa/8SeTh2h9Y=;
-	b=SBBh7NVU9eRjO8x3/Wv/zRWbxt/TdTIeywXUBipFk84HZ/y6OZU/ILJYHDXVn6mFYVEwDL
-	E1puFJTsf02+FqePaXdAAaiVBf2ZtgLkCMUcKmK2D11rRCOwpaZNHL56QaFZ0/XV01TS9/
-	o8gnncdbKoXapfAiWIcYBd8R0tsoMWw=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kcXEgajFsKLm+epm9RNZ9F83nNKrUNJz3GGb7s7oHqE=;
+	b=E2UeINuh08koefxvdKZTC8sxVy64rHyEpTf3TNGKZ2/fvv5tz66kZFpSlyzpUcnyS04Iej
+	ue5FwXrODwtcv4EahrbwX+RvWUuP+ElwsN0eSUW+CPc9JpeL571QOrgFFvekl3PvXvXCrj
+	MJcfjp57ws53R16NQdYnIzJkHWuCHxc=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-PgaQ9mEENx-PNW_cFdE81w-1; Sat, 10 May 2025 12:16:21 -0400
-X-MC-Unique: PgaQ9mEENx-PNW_cFdE81w-1
-X-Mimecast-MFC-AGG-ID: PgaQ9mEENx-PNW_cFdE81w_1746893781
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4768f9fea35so77325481cf.2
-        for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 09:16:21 -0700 (PDT)
+ us-mta-380-Ig-mx6yFPCaBLMyK68MhMg-1; Sat, 10 May 2025 12:16:30 -0400
+X-MC-Unique: Ig-mx6yFPCaBLMyK68MhMg-1
+X-Mimecast-MFC-AGG-ID: Ig-mx6yFPCaBLMyK68MhMg_1746893790
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-72bc266dc24so3922471a34.2
+        for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 09:16:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746893781; x=1747498581;
+        d=1e100.net; s=20230601; t=1746893789; x=1747498589;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kyghqtQvyqmRDSnXARSQ4gcaRBJZ2IDYa/8SeTh2h9Y=;
-        b=ZZrLe0uIgGrIHcc0dAMW42fUXCTpWCfstDB0J9FMIzrWDUhjId3YHm05WKnfd5luU6
-         VRhOcEP9SYCyTGXC1sfvB0eGvtARioquEAbpOEAutQu9TcyiFaPtchpYerDTY2KaA+iA
-         ZIn//O2aWfmaSeijEB1+BFN/SeXjBbepGl2kYaJF2MfzWrjob92GdKT1mHgx2y+wcbDU
-         sWyl5qyDBxjZ1sw0hh6ItqdvHOd0Ck1fw7jBiP6pnF0VaYCr0RCfo1TyQXXHzaEJIGLd
-         KIoaDVtlgoKNeoYwl/oj9RscPlswixbx6FOhR+Ifu0Es5FC6ApK7hVs60xg92BJAiDlR
-         x2RA==
-X-Gm-Message-State: AOJu0YytG1pcnTw4dioAitX62IWzCxdoFSTDTApcHnv4Rs1KxE76L+Ag
-	+lp+gfSV7JwEipJDEHPTALAl+Y0zbrkCtbftcXgXnVbxslVawTk6tRihkFWKAXzCOJilFKDIg7s
-	fmp+sKFLtla3vgb/S1jVATi/GBVKKwbaGveIbvzVnX6Rz7e/Ap1TO12v1MQQO/hJzat4kYqdOC5
-	+hmSBSZRCP1eb0YZzvipH6mwAHC+qkDYi3zdR6YMOxKC8=
-X-Gm-Gg: ASbGnctonphyYTCgpCAXmoLwuCgTJKMyhEM/Q/04TT8ejqRSONV8ueFpIm0wVqe/kyy
-	ygSJEdcOSHKFTFNnXD+X1KQOONx/dzjP8gFYpUUOTjvAUIehykh/wVAJVZp+BJJfoozZRfovUHm
-	4l8RL8SFIIbuzyJtbPIE55k0o9qRM2fz2N7+ziqh1QyR69rk7P1lQBRPrvsFEIB0kuMUrWzj5oe
-	14slXiQTvatQcSOx1B9X/blXPXlYNy8R1v8jy5F7x1BtmeLFZS5HsOOJncEpIxY8Gf9OTrtEDmj
-	TXay48krPf47d8BP3hxytZxiLI1PwEWBJWdUrAJpEyCtulweGLKfXGJzEfxTfEpZDpi/8DQ=
-X-Received: by 2002:a05:622a:6206:b0:476:95dd:521c with SMTP id d75a77b69052e-494527dde3dmr125155711cf.45.1746893781138;
-        Sat, 10 May 2025 09:16:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHryV7+kC1B3OqcpWTzqXpUWSrvRcNH2nx3T3Dp7YhxNNmQjDFXz6PkH77VtTdp1cR0TdCdkA==
-X-Received: by 2002:a05:622a:6206:b0:476:95dd:521c with SMTP id d75a77b69052e-494527dde3dmr125155291cf.45.1746893780609;
-        Sat, 10 May 2025 09:16:20 -0700 (PDT)
+        bh=kcXEgajFsKLm+epm9RNZ9F83nNKrUNJz3GGb7s7oHqE=;
+        b=Nh8FFLTl3fZeRhKZ+ix2NF8KIB705xO2KkommTD/GS3klLMcQZ4H0SR50X6ZDYcGR1
+         COSDDuqh44VsCCVf/T9OqLbB2agUMNiUTsKWgMGim31gto7fkG360AlaIteql9YOA9D4
+         cbY8aQIR6AX/5uJlILI+7+yFskeAUGy5tWyghLXpofC/SGz6Sa5fNR0zaHUmMiHAOOuf
+         EV1mf31aajipAB76ZdA6awH5fJ6zqSqqk91/lU8dL79EU75zvfS1DUr9PSV6j+6ZG5AV
+         bIr+ff1jAZx5eaUkoF2U5YDEoOZoidVtB6D04n1jk7ZVWn+kyPUsvXbtUQ+v6WjG5lTg
+         2DoA==
+X-Gm-Message-State: AOJu0YyJ/Or0WJUnWCpIbb+ktIZXxVs+9b/yylcS0g0zWgw0IMA6oZIP
+	WHRhW71Qs7v2FUn7bndqXoujJjPlnI+Yt4rfjVtbsJNvbAvVKq5GAzcKBwYUMPeaWa2sILVvx8h
+	Dl5+ixZXLY3lJzA4jKhMCxAW3VEBHsMXn3Z1gDImHd7h330xDLLdqHwdhpZT62ZkpkiluOWtmH5
+	4IAGhVLkGVoVFVaYArARkL3yErebgaa9SGe4tAMrF2Bk4=
+X-Gm-Gg: ASbGnctEXlMFksKCWogUZ9uEu13vTw/LugNSnXVJwO8bilOHTuWfXNZUoP7pDxHV0Qa
+	uCw+WTTkZKKvnnLoZz+VP6ebS87N9yEer9ut83K271R1DdlwvjQub6bpA+4WU68Edty2jkpfn4A
+	3AsGFogLHFIu+MxBHIhfMUkHR7pHZk+PnQ6y+BK/CK6/6gPaIrgevtxvOGbVXF+5csW/j0Gs93t
+	sWEPJP2OOWW995V2yHdoRTb+29YA/MydMnGDNr1XQf4i0+mF48S3pkLUd0/sCIniCH5CsxBNFuu
+	agFl7/4+17V+TBjNFOE/zfrhkpfBkTWOBnpwYKo2bNZEivuYNCF/b17z5soRzpY7f6Mb0Ww=
+X-Received: by 2002:a05:6830:6503:b0:72b:8974:e3db with SMTP id 46e09a7af769-73226b14f21mr5308784a34.25.1746893789434;
+        Sat, 10 May 2025 09:16:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEKYXouDAYJDvLaLUZf6NmbbzAeMKG8/ZHvJCcHHzHNrzfrE5iyTpj6BhN8/vTepeeKCNm3/Q==
+X-Received: by 2002:ac8:5894:0:b0:478:f8bb:b5e with SMTP id d75a77b69052e-49452736318mr131437651cf.13.1746893778288;
+        Sat, 10 May 2025 09:16:18 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4945248d051sm27002431cf.29.2025.05.10.09.16.19
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4945248d051sm27002431cf.29.2025.05.10.09.16.17
         for <linux-cifs@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 May 2025 09:16:20 -0700 (PDT)
+        Sat, 10 May 2025 09:16:17 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org
-Subject: [cifs-utils RFC PATCH 12/12] upcall-helper: add IP address comparisons
-Date: Sat, 10 May 2025 11:16:09 -0500
-Message-ID: <20250510161609.2615639-13-sorenson@redhat.com>
+Subject: [cifs-utils RFC PATCH 09/12] upcall-helper: replace macros in upcall argument strings
+Date: Sat, 10 May 2025 11:16:06 -0500
+Message-ID: <20250510161609.2615639-10-sorenson@redhat.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250510161609.2615639-1-sorenson@redhat.com>
 References: <20250510161609.2615639-1-sorenson@redhat.com>
@@ -81,129 +81,64 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add IPv4 comparisons for matching IP addresses, IP ranges,
-network/netmask, etc.:
-    <ip_address>
-    <ip_address>-<ip_address>
-    <network_address>/<netmask>
-    <network_address>/<prefix>
-
-For IPv6, use string matching; TODO: enhance ip6 matching.
+Replace any macros in the upcall argument strings with values
+of the key variables.
 
 Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 ---
- contrib/upcall-helper/cifs-upcall-helper | 84 ++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
+ contrib/upcall-helper/cifs-upcall-helper | 33 +++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
 
 diff --git a/contrib/upcall-helper/cifs-upcall-helper b/contrib/upcall-helper/cifs-upcall-helper
-index 2379914..90b416f 100755
+index 18e41df..fdd0c9c 100755
 --- a/contrib/upcall-helper/cifs-upcall-helper
 +++ b/contrib/upcall-helper/cifs-upcall-helper
-@@ -52,6 +52,14 @@ my $split_char = '[,;]'; # separator for match and options fields
- my $string_comparison_re = qr/^(host|user|sec|upcall_target)(=|==|!=|~|!~)(.+)/;
- my $uid_comparison_re = qr/^(uid|creduid)(<|<=|=|==|>=|>|!=)(0x[0-9a-f]+|[0-9]+)$/;
- 
-+my $octet_re = qr/\d{1,2}|[01]\d{2}|2[0-4]\d|25[0-5]/;
-+my $ip4_re = qr/(?:$octet_re\.){3}$octet_re/;
-+my $ip4_range_re = qr/($ip4_re)-($ip4_re)/;
-+my $ip4_nm_re = qr/($ip4_re)\/($ip4_re)/;
-+my $ip4_cidr_re = qr/($ip4_re)\/(\d+)/;
-+my $ip4_comparison_re = qr/^ip4(=|==|!=)(\*|$ip4_re|$ip4_range_re|$ip4_nm_re|$ip4_cidr_re)$/;
-+my $ip6_comparison_re = qr/^ip6(=|==|!=|~|!~)(.+)/; # TODO: enhance ip6 comparator
-+
- sub log_msg {
- 	my $msg_level = shift;
- 
-@@ -210,6 +218,78 @@ sub check_uid_match {
- 	return 1 if (eval $comparison_string);
- 	return 0;
+@@ -66,15 +66,42 @@ sub log_msg {
+ 		syslog($syslog_level, $msg);
+ 	}
  }
-+sub ip4_to_decimal {
-+	my $ip4 = shift;
++sub replace_macros {
++	my %macros = (
++		'%h' => 'host',
++		'%i' => 'ip',
++		'%s' => 'sec',
++		'%U' => 'uid',
++		'%c' => 'creduid',
++		'%u' => 'user',
++	);
++	my $str = shift;
++	my $result = '';
++	my $len = length $str;
 +
-+	my @bytes = split /\./, $ip4;
-+	return $bytes[0] * 2**24 + $bytes[1] * 2**16 + $bytes[2] * 2**8 + $bytes[3];
-+}
-+sub check_ip4_match {
-+	my $key_ip4 = shift;
-+	my $comparator = shift;
-+	my $match_str = shift;
-+
-+	log_msg 2, sprintf("check_ip4_match(key_ip: %s, comparator: %s, match_str: %s)", $key_ip4, $comparator, $match_str);
-+
-+	my $negate = ($comparator eq '!=') ? 1 : 0;
-+	log_msg 2, "negating match in check_ip4_match" if $negate;
-+
-+	my ($ip4_net_addr, $ret);
-+
-+	if ($match_str eq '*') {
-+	log_msg 2, "ip4 match is '*' (always true)%s",
-+		($negate ? " but negated" : "");
-+		return $negate ? 0 : 1;
-+	} elsif ((my $ip4_addr) = $match_str =~ "^($ip4_re)\$") {
-+		log_msg 2, "ip4 match is a simple ip";
-+
-+		$ret = ($key_ip4 eq $ip4_addr) ? 1 : 0;
-+		return $ret ^ $negate;
-+	} elsif ((my $ip4_range_low, my $ip4_range_high) = $match_str =~ "^($ip4_range_re)\$") {
-+		log_msg 2, "ip4 match is an ip range";
-+
-+		$ip4_range_low = ip4_to_decimal $ip4_range_low;
-+		$ip4_range_high = ip4_to_decimal $ip4_range_high;
-+		$key_ip4 = ip4_to_decimal $key_ip4;
-+
-+		$ret = ($key_ip4 >= $ip4_range_low and $key_ip4 <= $ip4_range_high) ? 1 : 0;
-+		return $ret ^ $negate;
-+	} elsif (($ip4_net_addr, my $ip4_netmask) = $match_str =~ "^($ip4_nm_re)\$") {
-+		log_msg 2, "ip4 match is an ip/netmask";
-+
-+		# validate that netmask is valid: bits of 1s, followed by bits of zeros
-+		$ip4_netmask = ip4_to_decimal $ip4_netmask;
-+		my $ip4_netmask_str = sprintf("%032b", $ip4_netmask);
-+
-+		# invalid netmask results in 'not a match', regardless of comparator
-+		log_msg 0, "invalid netmask in ip4 match: '$ip4_netmask_str'" if ($ip4_netmask_str !~ /^1*0*$/);
-+		return 0 if ($ip4_netmask_str !~ /^1*0*$/);
-+
-+		$key_ip4 = ip4_to_decimal $key_ip4;
-+		my $ip4_range_low = ip4_to_decimal($ip4_net_addr) & $ip4_netmask;
-+		my $ip4_range_high = $ip4_range_low | ($ip4_netmask ^ 0xffffffff);
-+
-+		$ret = ($key_ip4 >= $ip4_range_low and $key_ip4 <= $ip4_range_high) ? 1 : 0;
-+		return $ret ^ $negate;
-+	} elsif (($ip4_net_addr, my $prefix) = $match_str =~ "^($ip4_cidr_re)\$") {
-+		log_msg 2, "ip4 match is ip/prefix (cidr)";
-+
-+		# invalid prefix results in 'not a match', regardless of comparator
-+		log_msg 0, "invalid prefix in ip4 match: $prefix" if $prefix > 32;
-+		return 0 if $prefix > 32;
-+
-+		$key_ip4 = ip4_to_decimal $key_ip4;
-+		my $ip4_range_low = ip4_to_decimal $ip4_net_addr;
-+		my $bits_remaining = 32 - $prefix;
-+		my $ip4_range_high = $ip4_range_low + 2**$bits_remaining - 1;
-+
-+		$ret = ($key_ip4 >= $ip4_range_low and $key_ip4 <= $ip4_range_high) ? 1 : 0;
-+		return $ret ^ $negate;
++	for (my $i = 0 ; $i < $len ; $i++) {
++		my $chars = substr $str, $i, 2;
++		if (defined $macros{$chars}) {
++			$result .= $key_vars{$macros{$chars}};
++			$i += 1;
++		} elsif ($chars eq '%%') {
++			$result .= '%';
++			$i += 1;
++		} else {
++			$result .= substr $chars, 0, 1;
++		}
 +	}
-+	log_msg 0, "ip4 match didn't match any known format";
-+
-+	return 0;
++	return $result;
 +}
- sub match_criterion {
- 	my $criterion = shift;
- 
-@@ -220,6 +300,10 @@ sub match_criterion {
- 		return 0 if (! check_string_match($key_vars{$field}, $comparator, $match_pattern));
- 	} elsif (($field, $comparator, $match_pattern) = $criterion =~ $uid_comparison_re) {
- 		return 0 if (! check_uid_match($key_vars{$field}, $comparator, $match_pattern));
-+	} elsif (($comparator, $match_pattern) = $criterion =~ $ip4_comparison_re) {
-+		return 0 if (! check_ip4_match($key_vars{'ip'}, $comparator, $match_pattern));
-+	} elsif (($field, $comparator, $match_pattern) = $criterion =~ $ip6_comparison_re) { #
-+		return 0 if (! check_string_match($key_vars{'ip'}, $comparator, $match_pattern));
- 	} else {
- 		log_msg 0, "unrecognized match string: $criterion";
- 		return 0;
+ sub exec_upcall {
+ 	my @upcall_args = ( '/usr/sbin/cifs.upcall' );
+ 	foreach my $opt (keys %upcall_opts) {
+ 		if ($opt eq 'keytab') {
+-			push @upcall_args, ('-K', $upcall_opts{$opt});
++			push @upcall_args, ('-K', replace_macros($upcall_opts{$opt}));
+ 		} elsif ($opt eq 'krb5conf') {
+-			push @upcall_args, ('-k', $upcall_opts{$opt});
++			push @upcall_args, ('-k', replace_macros($upcall_opts{$opt}));
+ 		} elsif ($opt eq 'krb5_trace') {
+-			$ENV{'KRB5_TRACE'} = $upcall_opts{$opt};
++			$ENV{'KRB5_TRACE'} = replace_macros($upcall_opts{$opt});
+ 		} elsif ($opt eq 'use_proxy') {
+ 			$ENV{'GSS_USE_PROXY'} = 'yes';
+ 		} elsif ($opt eq 'legacy_uid') {
 -- 
 2.49.0
 
