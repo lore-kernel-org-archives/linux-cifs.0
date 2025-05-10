@@ -1,58 +1,58 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A038C22257D
-	for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 14:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BB929A0
+	for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 14:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746885808; cv=none; b=X47CuuG0WjD/Shyz6LYCqSl0/mJtfhPeNvk+yYqHJDs7zntNym3v8Hg3WOEHMlf4nJLv1HiCl+0mBqXC/dVajBuUbBlqoRpctrvqmP7jA0OsGzTk+2ZNyvugrrW+gw7el0tU9+3O4YUOWvrxLmxo7rXfJ9OZ7rnpq5C8L5INXlc=
+	t=1746885874; cv=none; b=jlyU0jX4Kid6grUHnQgCbdqPAf5xx9eTmElDh/djGi3EBW56TkGb3cx3E1E1InM1qF4avDKSgX4O5W/gzlhAXDuJ2rqd+0Gf1KRjfV7Nu9OnNxxX22rxcsAh1kbgwCUhhZ1haVd2bZXzoi9njHkkEHmRrX4PYDqwgvKJQGki5pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746885808; c=relaxed/simple;
-	bh=UCyhJ3iJ6ju9lWuSdod09k62lS9RFSbeseoYZsBx0eo=;
+	s=arc-20240116; t=1746885874; c=relaxed/simple;
+	bh=bzzw+lzAFeQwRB5P0tjlLI0dbnHVe1JE69BZ+lcmWt0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hVVnpJqoeF5OzRRGNuc1n+/X6qRicC7QL3KPBh1ORDVZ3/t4RtCq0Rj4IG+wXqdcgmS3RD1hMxWAoKI1cX32qH6nYVomEsQ7oA/EYtDjJMauVsFKoGqeGw7rUfVSL5okERlabq0cyMMPR2iQPOEMiI8xTBxPq5liAQqWdmSMDBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iv81Batu; arc=none smtp.client-ip=209.85.218.53
+	 To:Cc:Content-Type; b=fcwo1QAPyHGGvNnt/bo3d+O76GaNN6FcBKarYQZrNChejEFnGCjVnrkQS5kRr4QXIVzUuSW1DhpAPBcDD7SBZ7Kylwnuhw8R2zczaiQAjTa4QIlB+Fd7E+oyqOyTX2qin2B5D9iRK5YzV6a1znwDAfmwZDTcGZGT09kQ+l1VcTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=STJ7nngu; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iv81Batu"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ad221e3e5a2so234030566b.1
-        for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 07:03:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STJ7nngu"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5f4d0da2d2cso5474169a12.3
+        for <linux-cifs@vger.kernel.org>; Sat, 10 May 2025 07:04:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746885805; x=1747490605; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746885871; x=1747490671; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TrddfAsrr4Rz8zPE1iYKrfy4a3Y7XwNeI+yEr7qQ+WU=;
-        b=Iv81Batu1/l/YCOIrrDdh+KE1IL2x5VHxAxiP5u0nL0mYgl0m7/zG8tQNwPeVeLX4T
-         W4fSbysRKCSTDxqObhoDCpibTUwdx928YHIhHKNJqXQMjf0Q95euV/NwZBlTADLx/F/p
-         qREr2Wkd4J1Jfl+hJH8RgUakdM2nL3LjBUlwABVsyL3+53OeUK92u3z6SiryQAtF7JpS
-         zZD3Jh6wbqDj66DurY2J2frMUfnaPzlLCxE7CMwdTeFXxCyTgPOt2zdjqrWUlzKtFoX4
-         MZQkgtzzzt8YAO6vOXaenJXoT5djbv4aqmPFBsBBqbyDYtWnpqu5mui74vwi7mDXNjeK
-         SjqQ==
+        bh=yCTqjx7T3JMGRbhFwgfL+zwkkS3H+vgeaXj/Hi8aWIA=;
+        b=STJ7nngusEFGViucPqTe5h4lfr3/a2TspXCv13be+4MND+JxkffMlVyZKaTDVPXgL/
+         cO3Kt0qkzYsPnNoUaAh7Flv5oP2FyvvNudwJgZ04SGe08Wk27D3aLfIqzk7frkzvKi4o
+         nXwU9h32HUzobftAYeeQtkLjc6ix8vbsE7mya/8+G2vVJxATf8OTRqbr8HcX+zpzFTYz
+         6RTLoK90sqVqkXHNjmmPklu16xpd0viZlRrBOKo6yM5SbsLNnAp2ieb/xgzHw5X6OrHb
+         Nm8GZ8H5Bnwn6OREj9TBWNygLbnzLbwA/ku8cPdvlj2/Wudhw1ec/5IevAFDFU3eiFty
+         ZUNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746885805; x=1747490605;
+        d=1e100.net; s=20230601; t=1746885871; x=1747490671;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TrddfAsrr4Rz8zPE1iYKrfy4a3Y7XwNeI+yEr7qQ+WU=;
-        b=O2GLDn/BYsuf9x5O9J5m6hefjsuJmPKG+4xaR5UvP42BiY/6yXhpddIYEZJEGsbDcl
-         KPTcMyOqrDX2Be9JoLbUAvBDhYqwNIYJ43TE1yhFACCIrqE2gUD6ByR1eMKyzoo6yzLW
-         yhm+XEFXGfOZAAgNzM+KJZiu0Zftx20kllK7vG9w+KtCXHkWojsrUfebQ6aAmek2/qlQ
-         JCt+p36rk9uDDVl88+smUNaTn/gSGfDbVUCUljB0QkGPuOAeVkrKSV1ZPoFRfTIytKp1
-         wmhiBtUapkgeMAF1z+Tk4w1zdjkwJn042SGCV2kcXAqKYeB8eY3eIs6gB5t8MYcrjv4W
-         X/Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXCaxOUjZORT/NDIVpPpk0FXnJM14hOLG9vO75/OzDTlqWpG1P6pkndWt+tPzNkBNYHxi4QGo2lukPM@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk6qUUjDyXr43pb1lGV+vQLttQ4iMwbUMdOQKVwWVu2zXty/Wo
-	7wtyHNxz7I6oldNe1m3iM61uYnz2LQgAYjiGsekCyBMYwkB3kcwezb+//+UfXACUwxKFZnIC0Gz
-	WHLu2+hFBHnnaSVZ9lwh73ZObjtbUoA==
-X-Gm-Gg: ASbGncvjRrMx7WQ6XMMoIS14g4O9te0T2zQoaxF+wF8ThTFkArXObkDWGzzcYW/nOD0
-	xUCAxOAUEgclfJ/zchjGOHdJ53irLhxnyJgeRoinP144imsP4Fx33HC2q12BdXBU129zehm8TfR
-	brzok0GMS33u19mc0922ipIxlg8p28zRt/N+j+Y+gp70Y6AJEYkLX+kweSbciOMRs=
-X-Google-Smtp-Source: AGHT+IEthodbc5YPYzOHZlBsjlXLI3gWoC6WjHk3ELFqusaqMvdhUnVeBmwveiAdu0aIo9lpzyik9Sm6ZHuruI1rXEk=
-X-Received: by 2002:a17:907:d106:b0:ad2:39f2:3aa8 with SMTP id
- a640c23a62f3a-ad239f24184mr238404266b.38.1746885804569; Sat, 10 May 2025
- 07:03:24 -0700 (PDT)
+        bh=yCTqjx7T3JMGRbhFwgfL+zwkkS3H+vgeaXj/Hi8aWIA=;
+        b=NRLnqTfkKRPQDuQkixQhfdpmOm+d0hJRSS3/HTLVskS4CrnLj/GHCCfM+G5Ab95mIT
+         S6W9REJ4/CSveQ/tv1xJ+NCjpHodP7BYfInvD5xQ8tWpq4fInSHeNmznf1oWgtv0f05S
+         29vKY1H06aaHyENtbyh5T/8FdmrJXoRMALYbh632aSyZ5x/abyypi26jK8WmQy8eObdS
+         lJ+Shvubr5LisQYcNdBNbb46UjvBx1qdIKyYMtZQ78jaXsNvD5uOfXirFSyeLU8kf81s
+         8KXghg4hTQTRh6OQX+GAn+JgH57UqpeUkKkCeIqFPVbwWdy15Y8qGzUfy4Mpt3OycjHB
+         liPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbQyxm2P5DRKQzB6s8322m07eQDBpLy6Uftt5tVeryKEwVDLkAUneg6xPBJsQX3PMTVLe5XYAodQz/@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKK1+KMauTDbKiZ+48wAh/0764o+GB/NxtELwg01LZOQkl45EY
+	ZIap+OMwCh/dEg0sW84TRfMTU9olMcks7EkKx11K+sSGuX/cDUEpEt09s/khOqGuNhfpjQM3uNn
+	/285iFEt18hqS7hxRJw0T+B0bwvw=
+X-Gm-Gg: ASbGnctqBNM73eC/omdk4k3aLCY5Dku8OEy6lZrf4dt8y0fX3PZNr128vtrJfb9Xr2p
+	prRwP6mB0e2PFVMoMzgvsdAvaoKrTMW3vOSjePvqqZ/DT2AMV6rEbCoFcFMRyvvO7+9KzxN4Qub
+	KU+8S3OEJhdDo1sl4b2SpVe4Dp1gg9ZKbBwPJMFY0Ji7JSF6vpMHU9EiL6aDNj6js=
+X-Google-Smtp-Source: AGHT+IF6qf/SmPAJ1RoeamuQskoMGUtgv843mFb1xbbqezWQOYbgnMJqydwfywJU/NNc7Kw2e1Q9pjWX59DWvNzWav8=
+X-Received: by 2002:a17:907:7fa6:b0:ad2:40f4:c251 with SMTP id
+ a640c23a62f3a-ad240f4cad2mr112204466b.35.1746885870452; Sat, 10 May 2025
+ 07:04:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,79 +60,114 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250502051517.10449-1-sprasad@microsoft.com> <aBS8jg4bcmh6EdwT@precision>
- <CANT5p=qGspYwczDEnp6oy6F1UQJZKJ9vYw_3pKdipcByqjjuTQ@mail.gmail.com>
- <aBgFcc9SPRPOUFHw@precision> <CAH2r5mv5T4LM6FPGtma-w7StY_vi96qutEYX5AMAgbFEiMYHmg@mail.gmail.com>
-In-Reply-To: <CAH2r5mv5T4LM6FPGtma-w7StY_vi96qutEYX5AMAgbFEiMYHmg@mail.gmail.com>
+ <CANT5p=qGspYwczDEnp6oy6F1UQJZKJ9vYw_3pKdipcByqjjuTQ@mail.gmail.com> <aBgFcc9SPRPOUFHw@precision>
+In-Reply-To: <aBgFcc9SPRPOUFHw@precision>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Sat, 10 May 2025 19:33:13 +0530
-X-Gm-Features: AX0GCFs_JHusLsbqeaSNgIO5k22QiUepcyoj7g3G_hMHPBlr52IOLt7pPpEYiPI
-Message-ID: <CANT5p=rkspaP5ucOq4RacjC4E6aVarTEAZ98_kRKaYfx1=rB1A@mail.gmail.com>
+Date: Sat, 10 May 2025 19:34:19 +0530
+X-Gm-Features: AX0GCFtUi9EzJ7og-IzZwz3fiaZdWy_-As1N5Rnw2TD38jbCSyD9fVXawyfANLg
+Message-ID: <CANT5p=p2Y2m7ELymv94n=GBkzX7eW2Us2r0zw=XkfNA-aNZcbw@mail.gmail.com>
 Subject: Re: [PATCH 1/5] cifs: protect cfid accesses with fid_lock
-To: Steve French <smfrench@gmail.com>
-Cc: Henrique Carvalho <henrique.carvalho@suse.com>, bharathsm.hsk@gmail.com, ematsumiya@suse.de, 
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: smfrench@gmail.com, bharathsm.hsk@gmail.com, ematsumiya@suse.de, 
 	pc@manguebit.com, paul@darkrain42.org, ronniesahlberg@gmail.com, 
 	linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 5, 2025 at 6:18=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
-ote:
+On Mon, May 5, 2025 at 5:57=E2=80=AFAM Henrique Carvalho
+<henrique.carvalho@suse.com> wrote:
 >
-> On Sun, May 4, 2025 at 7:27=E2=80=AFPM Henrique Carvalho
-> <henrique.carvalho@suse.com> wrote:
-> <snip>
-> > > > Also, the lock ordering here is lock(fid_lock) -> lock(cifs_tcp_ses=
-_lock) ->
-> > > > unlock(cifs_tcp_ses_lock) -> unlock(fid_lock), won't this blow up i=
-n
-> > > > another path?
+> On Sat, May 03, 2025 at 08:24:13AM +0530, Shyam Prasad N wrote:
+> > On Fri, May 2, 2025 at 6:09=E2=80=AFPM Henrique Carvalho
+> > <henrique.carvalho@suse.com> wrote:
 > > >
-> > > Can you please elaborate which code path will result in this lock ord=
-ering?
+> > > Hi Shyam,
+> > >
+> > > On Fri, May 02, 2025 at 05:13:40AM +0000, nspmangalore@gmail.com wrot=
+e:
+> > > > From: Shyam Prasad N <sprasad@microsoft.com>
+> > > >
+> > > > There are several accesses to cfid structure today without
+> > > > locking fid_lock. This can lead to race conditions that are
+> > > > hard to debug.
+> > > >
+> > > > With this change, I'm trying to make sure that accesses to cfid
+> > > > struct members happen with fid_lock held.
+> > > >
+> > > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > > > ---
+> > > >  fs/smb/client/cached_dir.c | 87 ++++++++++++++++++++++------------=
+----
+> > > >  1 file changed, 50 insertions(+), 37 deletions(-)
+> > > >
+> > >
+> > > You are calling dput() here with a lock held, both in path_to_dentry =
+and
+> > > in smb2_close_cached_fid. Is this correct?
 > >
-> > I was referring to the following pattern in cifs_laundromat_worker():
+> > Hi Henrique,
+> > Thanks for reviewing the patches.
 > >
-> >   spin_lock(&cfid->fid_lock);
-> >   ...
-> >   spin_lock(&cifs_tcp_ses_lock);
-> >   spin_unlock(&cifs_tcp_ses_lock);
-> >   ...
-> >   spin_unlock(&cfid->fid_lock);
+> > Do you see any obvious problem with it?
+> > dput would call into VFS layer and might end up calling
+> > cifs_free_inode. But that does not take any of the competing locks.
 > >
-> > This was more of an open question. I am not certain this causes any iss=
-ues,
-> > and I could not find any concrete problem with it.
-> >
-> > I brought it up because cifs_tcp_ses_lock is a more global lock than
-> > cfid->fid_lock.
 >
-> That does look like a good catch
+> Hi Shyam,
 >
-> In the lock ordering list (see cifsglob.h line 1980ff)
->    cached_fid->fid_lock
-> is almost at the end of the list so is after
->    cifs_tcp_ses_lock
+> Yes, dput() starts with might_sleep(), which means it may preemp (e.g.,
+> due to disk I/O), so it must not be called while holding a spinlock.
 >
-> "if two locks are to be held together, the lock that appears higher in
-> this list needs to be taken before the other" so this does look like
-> the wrong locking order in the example you pointed out.
+> If you compile the kernel with CONFIG_DEBUG_ATOMIC_SLEEP=3Dy you will see
+> this kind of stack dump.
 >
-> The updated lock ordering list with the proposed ordering for the new
-> locks fid_lock and cfid_mutex is in Shyam's patch:
-> "[PATCH 4/8] cifs: update the lock ordering comments with new mutex"
+> [  305.667062][  T940] BUG: sleeping function called from invalid context=
+ at security/selinux/hooks.c:283
+> [  305.668291][  T940] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, =
+pid: 940, name: ls
+> [  305.669199][  T940] preempt_count: 1, expected: 0
+> [  305.669493][  T940] RCU nest depth: 0, expected: 0
+> [  305.670092][  T940] 3 locks held by ls/940:
+> [  305.670362][  T940]  #0: ffff8881099b8f08 (&f->f_pos_lock){+.+.}-{4:4}=
+, at: fdget_pos+0x18a/0x1c0
+> [  305.671009][  T940]  #1: ffff88811c490158 (&type->i_mutex_dir_key#7){.=
++.+}-{4:4}, at: iterate_dir+0x85/0x270
+> [  305.671615][  T940]  #2: ffff88810cc620b0 (&cfid->fid_lock){+.+.}-{3:3=
+}, at: open_cached_dir+0x1098/0x14a0 [cifs]
+> [ ... stack trace continues ... ]
 >
-> --
-> Thanks,
->
-> Steve
+That's a good point. I'll make sure to dput outside spinlocks.
 
-cifs_tcp_ses_lock is not the right lock to use here in the first place.
-These large locks have caused us plenty of problems in the past with deadlo=
-cks.
-We later decided to break it up into smaller locks for protecting
-individual fields. cifs_tcp_ses_lock is meant to protect
-cifs_tcp_ses_list only.
-tc_count should be protected by tc_lock. I'll make the changes here.
+> > >
+> > > Also, the lock ordering here is lock(fid_lock) -> lock(cifs_tcp_ses_l=
+ock) ->
+> > > unlock(cifs_tcp_ses_lock) -> unlock(fid_lock), won't this blow up in
+> > > another path?
+> >
+> > Can you please elaborate which code path will result in this lock order=
+ing?
+>
+> I was referring to the following pattern in cifs_laundromat_worker():
+>
+>   spin_lock(&cfid->fid_lock);
+>   ...
+>   spin_lock(&cifs_tcp_ses_lock);
+>   spin_unlock(&cifs_tcp_ses_lock);
+>   ...
+>   spin_unlock(&cfid->fid_lock);
+>
+> This was more of an open question. I am not certain this causes any issue=
+s,
+> and I could not find any concrete problem with it.
+>
+> I brought it up because cifs_tcp_ses_lock is a more global lock than
+> cfid->fid_lock.
+>
+>
+> Best,
+> Henrique
+
+
 
 --=20
 Regards,
