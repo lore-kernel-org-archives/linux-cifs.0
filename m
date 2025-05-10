@@ -1,103 +1,89 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486C325F96B;
-	Fri,  9 May 2025 21:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34E5846F;
+	Sat, 10 May 2025 03:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746826734; cv=none; b=FBiBMF9tGkR4lRAGoGJTn1wUMNaEthqz6A9B+7jaHJDvnsWuYPGafZBvehtcmjtZd8cZyGlvfPr6j0YdMd4v7z6ATKEdCX92met+A6Wl7OtIrxYUZgpEtQoXbZYDc7t+BBrdgoG62VbHd1hp8fj756vFY/lpjmKVu3MsgUSrl5U=
+	t=1746846327; cv=none; b=Tieh1PZYqo8Aq4QA4jZxiPvB8dJmaSQ/4smWjLi4M4KBvOVMzA5MUxiv0M3setrWa1Ypmc9dsIeji0h6a+teyqAomMyeIXWxbP6qeqHPX+dFnGqvHgxgF4igIpaClsOtXgb4FM+S+5BWoKMb1/2z7mE5PONuhH1BF5+wxSL8vjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746826734; c=relaxed/simple;
-	bh=91W7ueLS5HdVm1Clt1QkBDNDRP4JzBN7wYYf77hdg04=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hxwoIMy7aOUTq/31HQN/Xj68sqSbnAw1GGDqhTYNF/AyyR98muET7e4fWRr4o7FfJCEEtG74mo1P/bC3vAkFP4TgE+oyqEa9lhfUdXcKX0QkmAnx0GVkwblZsdYEqzSSuPGFlcQX5x2a7mDPhlD7Q1LxaS6uT/mpxCwICIzeAsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNU90x5e; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1746846327; c=relaxed/simple;
+	bh=0Y5jtXbkzPHbi+33JLX/GRAnmyxVtbBj1SF8BU/aAA0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CCDTf6N7AXQUFsC18by2UJobblvi3XEFH8HCPMTIkcBTM2ZAMmE5ZSubqgeku/UYTi4r/Is6GcU55jivlRIQviozmDN4npZYej+IMCg0bQXO04LdPN4VI0GBX91mpxn2/pSEIn0Q5ShIloCv7JYg5xijbY2R90CUKMQUpiWBibc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=L9u12xnT; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNU90x5e"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54d6f93316dso3129981e87.2;
-        Fri, 09 May 2025 14:38:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="L9u12xnT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746826730; x=1747431530; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Pqeg5Kbolg0TbSLK5TiwNzMW4HjK1zUJYay4xctNtEI=;
-        b=LNU90x5eS1hiMe4Of3COazw//c/AzdRrI3Q21SF2voDLI/SEIFGhxhKc60WaLYbyER
-         8rqsaYnozpuz5u/j1/0EgzVgA8ptkfPvkhhk4YLkgu2XzWlvMrLfoKvBrWuQr7WeQDGT
-         k1rWpK51whANQsHj5QkUat3auI9dYJgu5MhPp8O/XnCSytnhVJJOSq21CrqhkgMzL3wL
-         YXmEpTTfSZEoXVG2EF6COh78frn18rifjHJtqPYTEz+4WqoOZJpUILgHYuOYdfmYtZq1
-         ypd5UxhpSrQwHZUqAkbVQyP7OIylzlUSkzfOl/6RscfafXg2RrGN3TWGgQ7ddF3+bvcz
-         +2xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746826730; x=1747431530;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pqeg5Kbolg0TbSLK5TiwNzMW4HjK1zUJYay4xctNtEI=;
-        b=UO72BxRAbx2hjfklMqaZNU9V38wrFf/nuAUo4wGJA634qg0YjMwUyx3DtF9RCsonv5
-         kAD0jlhQNBXnDyLce/Y0tM/x0lw1HXF+MY196bHkUAyTHK9dyrUGM1qdK97pGleSajRi
-         aO8gEjzF5qZgrnJjRr3BHRvj6RK6Cz6zEUJfxlvqzdwsYQjXZIuWU016S3NVFuD4ULYK
-         48dWj4zyQTTk6rvaAub5hJEpRP27lAo7/lelsZwR8ym6ILIaBJaJ1491TJK9oS7TKaYa
-         tXKaSejd4cu9ozN/3Ze4LTrR7QIQ6P//aQwRr2CQptwGmxGjniJhNLh+iCdDy6TcwNcz
-         /f6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXR3Cc7hhOO/7RnkTgPdiHva8pbCHjuxLNXz7CJ0ht69wnbXLewWvOpTVlq/4zdJX7+dgV7A/BHYk8x@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4cPW/l0hR8UwRYmO6UuojLZSIwdQtjwr/pJGcVBUgGepjEda/
-	X2Ka3d1E4j2SByrpPwn1BHEEQRS+wocmr2NomOEuuf1goJgib6YKWYD1WWESbN2Af2NRJPHiRyc
-	EXezte4rEcC/4HFjKTtnL32LWGGyDOLmc
-X-Gm-Gg: ASbGncunxKxMK6Q1MsTCbffrG/Muzsy788A4K6yadBi3crCW3kB7/yYjsrC+BhOmd5Q
-	tpun3jiVVdp+SyASPkjG9jJ7QIDWlJ+gUWeTxxX2MNnruWRfd40KUpoD1E6CWwUpXPUIIYXy+Ij
-	nT4jWLhNYfjVSaSzKpy+8WRmHMq+H0EaACIIrTa5vgGAFwQikvLVsT7s9xySwqhgPevrBH+JRmY
-	+DR2Q==
-X-Google-Smtp-Source: AGHT+IFKch58Oxm0Zd3Mdu5vSnuibffWdeDnh6KbU28wpAArKT46hsD7FE302nVCsk8zxurDBq4Ia/39NHHcNMgeA38=
-X-Received: by 2002:a05:6512:4389:b0:545:60b:f381 with SMTP id
- 2adb3069b0e04-54fc67cd721mr1403053e87.29.1746826729864; Fri, 09 May 2025
- 14:38:49 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1746846326; x=1778382326;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0Y5jtXbkzPHbi+33JLX/GRAnmyxVtbBj1SF8BU/aAA0=;
+  b=L9u12xnT25QYNASFTXh159xICCHvNBI/FWuuO+WaYffwIW8m8h7KtII2
+   CwzjAQOsn5U7IGUYkIhS/57H4LKu67BT7C7U5dDR1ukgEMRmyWvuRYMOZ
+   jE51ANbdTtZzWfkt1GRu02toEHwjRU83fp/ruJsaYZnlhn+rTlD+0g0SO
+   NMiznEq5YjMLncPGQQXYVzArgf91EFBf//4UlbmlCimSLJFL2GLwQ0wT6
+   vd4LFFVUNieqGHIKYCe3KQ9oIQNXYDDzr/dCY3V+9VlOAM17yqDWhPFeS
+   fKSmSMHkXq4t4T9jtN+X8NgTxHIT6i4tbySsoBFBaVKfaCAQ7Ae01MAHJ
+   w==;
+X-IronPort-AV: E=Sophos;i="6.15,276,1739836800"; 
+   d="scan'208";a="296299169"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2025 03:05:23 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:40195]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.229:2525] with esmtp (Farcaster)
+ id bf756ada-ce60-45e5-bac3-f1e19ee65d09; Sat, 10 May 2025 03:05:21 +0000 (UTC)
+X-Farcaster-Flow-ID: bf756ada-ce60-45e5-bac3-f1e19ee65d09
+Received: from EX19D026EUB004.ant.amazon.com (10.252.61.64) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 10 May 2025 03:05:20 +0000
+Received: from 3c06303d853a.ant.amazon.com (10.135.223.133) by
+ EX19D026EUB004.ant.amazon.com (10.252.61.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 10 May 2025 03:05:18 +0000
+Date: Fri, 9 May 2025 20:05:13 -0700
+From: Andrew Paniakin <apanyaki@amazon.com>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+CC: Christian Heusel <christian@heusel.eu>, <pc@cjr.nz>,
+	<stfrench@microsoft.com>, <sashal@kernel.org>, <pc@manguebit.com>,
+	<stable@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+	<abuehaze@amazon.com>, <simbarb@amazon.com>, <benh@amazon.com>,
+	<gregkh@linuxfoundation.org>
+Subject: Re: [REGRESSION][BISECTED][STABLE] Commit 60e3318e3e900 in
+ stable/linux-6.1.y breaks cifs client failover to another server in DFS
+ namespace
+Message-ID: <aB7CaTP-jwYhDROJ@3c06303d853a.ant.amazon.com>
+References: <210b1da5-6b22-4dd9-a25f-8b24ba4723d4@heusel.eu>
+ <ZnyRlEUqgZ_m_pu-@3c06303d853a>
+ <a58625e7-8245-4963-b589-ad69621cb48a@heusel.eu>
+ <7c8d1ec1-7913-45ff-b7e2-ea58d2f04857@leemhuis.info>
+ <ZpHy4V6P-pawTG2f@3c06303d853a.ant.amazon.com>
+ <Zp7-gl5mMFCb4UWa@3c06303d853a.ant.amazon.com>
+ <fb4c481d-91ba-46b8-b11a-534597a2b467@leemhuis.info>
+ <ZxAm4rvmWp2MMt4b@3c06303d853a.ant.amazon.com>
+ <ZzD0cW4gbQnbI9Gm@3c06303d853a>
+ <Z9cZuBxOscqybcMy@3c06303d853a.ant.amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 9 May 2025 16:38:38 -0500
-X-Gm-Features: AX0GCFuuAL9nz40cy802jNJhELepR98AAkSqEkzNu0xtAZ5gZw3CC_KYBNH4XoU
-Message-ID: <CAH2r5mtRj=+xk4bt74j=pzbOF8=BxJNp2L3nr_VzvtZY5tLW0g@mail.gmail.com>
-Subject: [GIT PULL] smb3 cilent fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Z9cZuBxOscqybcMy@3c06303d853a.ant.amazon.com>
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D026EUB004.ant.amazon.com (10.252.61.64)
 
-Please pull the following changes since commit
-92a09c47464d040866cf2b4cd052bc60555185fb:
+On 16/03/2025, Andrew Paniakin wrote:
+> My next step is to resend 7ad54b98fc1f1 ("cifs: use origin fullpath for
+> automounts") with required comments and send an update to this thread once it
+> merged.
 
-  Linux 6.15-rc5 (2025-05-04 13:55:04 -0700)
+Backport with a fix was released in v6.1.135.
 
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc5-smb3-client-fixes
-
-for you to fetch changes up to 3ca02e63edccb78ef3659bebc68579c7224a6ca2:
-
-  smb: client: Avoid race in open_cached_dir with lease breaks
-(2025-05-07 15:24:46 -0500)
-
-----------------------------------------------------------------
-Two smb3 client fixes
-- Fix dentry leak which can cause umount crash
-- Add warn for parse contexts error on compounded operation
-----------------------------------------------------------------
-Paul Aurich (1):
-      smb: client: Avoid race in open_cached_dir with lease breaks
-
-Steve French (1):
-      smb3 client: warn when parse contexts returns error on
-compounded operation
-
- fs/smb/client/cached_dir.c | 10 ++--------
- fs/smb/client/smb2inode.c  |  2 ++
- 2 files changed, 4 insertions(+), 8 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+#regzbot fix: 7d8bb979f627 ("cifs: use origin fullpath for automounts")
