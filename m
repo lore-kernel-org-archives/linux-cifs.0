@@ -1,95 +1,95 @@
-Received: from mta-outp-cfd-1.case.edu (mta-outp-cfd-1.case.edu [129.22.103.35])
+Received: from mta-outp-cfd-2.case.edu (mta-outp-cfd-2.case.edu [129.22.103.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922BE278E40
-	for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 12:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=129.22.103.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EF28C11
+	for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 12:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=129.22.103.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747227077; cv=pass; b=ksRAhaU8a26/Sfc3GV7cmkvqZWk1z/PZ92Oxvv+qXMOG+PbpQZgg/TQpd/uWjAdmKvVsOUG6aUeXVI+R6/vMYRcpzb9/Q029L0OWOa0DoOhUmMq3l0o4gGFPWtJPq1flZoFWMJEPtfMwN6S/3RKXz53A5k/21VFliadm88J/cFk=
+	t=1747227279; cv=pass; b=lM30xMDipgT/+TQlA++3btPKrEN+19NBAiIjvzqB3lQUisJLkg0/C8fv+pEULoUOP7eegJXDBec9kmf39V5orynKw5i62OXdocBASjNGjJrPF0h4ojPl+m1hwujk7H/BTXWoz+/edKay5Czpp8NLNLQIQpmlbBhRxYh8sNnSHiY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747227077; c=relaxed/simple;
-	bh=ziBnVImEQka1k/5ArPVUpuK5Uv55pJxDufSS4gEWcPs=;
+	s=arc-20240116; t=1747227279; c=relaxed/simple;
+	bh=H23KFw/6YBiqbHRBAplGutuAWNOTYRKqsZ37/mbJohk=;
 	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=pa7O7h7X2rG4W80wNBW6jd0ddpUlQf6pjK1uQ3ACgqMTtOkiUJQgqpbsWb7TXJlh2OQJx2JHo1qYtV4/mhqyX0MxdYgfcq1o2Kq/gbR2Fqmp0e1u3oiyJlGiIYzo9HTW9i+1T50X+vl4u19TilJkZmpNsRM/+VrKImGfepGIums=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=case.edu; spf=pass smtp.mailfrom=case.edu; dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b=CCKy4DG9; arc=pass smtp.client-ip=129.22.103.35
+	 In-Reply-To:Content-Type; b=DDJ0UlR/uRoz9b/rHWTLo4X7thLJ3K7MhRcsD76MNm6+z68Y1FrUoPaGm8rXGRc54rQrAacktkEn2cjxCAA/UjlCQ+rL1TzmbjbU9INEKLyKb4YAv4YycTOBECugbHhaI7m3t8qoevrQBMRNDxnkhs4QLmhTLwuvDVjf+K8huXo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=case.edu; spf=pass smtp.mailfrom=case.edu; dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b=SYoT6DTf; arc=pass smtp.client-ip=129.22.103.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=case.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=case.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b="CCKy4DG9"
-Authentication-Results: mta-outp-cfd-1;
-       spf=pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) smtp.mailfrom=case.edu ;
+	dkim=pass (2048-bit key) header.d=case.edu header.i=@case.edu header.b="SYoT6DTf"
+Authentication-Results: mta-outp-cfd-2;
+       spf=pass (mta-outp-cfd-2.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) smtp.mailfrom=case.edu ;
        dkim=pass (Good 2048 bit rsa-sha256 signature) header.d=case.edu header.i=None header.s=g-case;
        dmarc=pass (p=REJECT sp=Undefined pct=100 dis=NONE) header.from=case.edu;
-ARC-Filter: OpenARC Filter v1.0.0 mta-outp-cfd-1.case.edu 8D5DE11CF
-Authentication-Results: mta-outp-cfd-1; arc=none smtp.remote-ip=129.22.103.196
-ARC-Seal: i=1; a=rsa-sha256; d=case.edu; s=cwru-mta; t=1747227074; cv=none;
-	b=DsFlCdMpwKQfMb+EowC9VUazZVACkemZbS4YTWQg17XxcnUusUpYCOH2lTGs3l1eMWnfOabb5WQ5xq4zjbBMOp7xveQmzscgc15nn8nebiyYWETK6bRfE2Q9w0GkusWQcENd6XzfnBc45+Ak8HVhvrk+zDGyZL6XuEVaHRTmLEkfWBY1kETmhN6r3GezR3+svolyEpe9gidJPTv56YDOUclUCJZxhXK0iyxK6txkyYtfasSF6z0CqSqpOtvJJiSFRsJPl5cWfHyhfm2kqpdiHRg3M4U/dPtjiy6HRE/ZdIB+mwxsKoIET++nt/eppDHCdrJ4zGJy4JJyazAtLa19HQ==
+ARC-Filter: OpenARC Filter v1.0.0 mta-outp-cfd-2.case.edu 7E75C3480545
+Authentication-Results: mta-outp-cfd-2; arc=none smtp.remote-ip=129.22.103.196
+ARC-Seal: i=1; a=rsa-sha256; d=case.edu; s=cwru-mta; t=1747226945; cv=none;
+	b=Vqib6U9QrhQchBO3CoQKYnUsHC6qnG9saoBGXPUDraxgKNyWrwBHyNgP4s+nB0zPbbM2/JNXsgwaN5eyHWp6/hCukQjjEMej6p6oBWSWjrQurAp4NEYJASpvBfFOIooB4hzAfEUhEA+n32tNlQ3i7NWuxHOxCxm1tX8k6jjLrtR3qpueY6Ji4bIA63zN4YFISsNy7PabdBHxrfr7qkTMar0jzDBEUMZjvO8TD/+WBACACZjjdNpNjaDcUemMLnFuX1WhUfsnWC5WhKILmLVjHbyjIJZAvtOe4FctLb3chntx3a9W+sGo7ITRX/JPcs6gKkQZH9fSiDuH3+O3tdnAOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; d=case.edu; s=cwru-mta;
-	t=1747227074; c=relaxed/simple;
-	bh=ziBnVImEQka1k/5ArPVUpuK5Uv55pJxDufSS4gEWcPs=;
+	t=1747226945; c=relaxed/simple;
+	bh=H23KFw/6YBiqbHRBAplGutuAWNOTYRKqsZ37/mbJohk=;
 	h=DKIM-Signature:Message-ID:Date:MIME-Version:Subject:To:From:to:
-	 subject:message-id:date:from:mime-version:dkim-signature; b=ouyVpeti4ntDRNVLq3s6lFaPPHt9f6KrBkUT8Qr2nuB9BdvLPcFzbCudCGbdQN9/o0ThNOtowMF7I9sRKRyLzjXk8zxhg+DzTTFUgWlXrXlp+tNWA5xx/SRIz2JSkucujJbgCIwbFWy683Eu2nqbVCajb9QV0O+eDiqeyeFYIAnxP6Gg5nu2B/GuVKRdYe433xvk+06aqKgFFKhriNbVHSL+aBXp97yUZKXWN8ZyNWQ4CoU1M5CQ+lC8EqA5YKU6n4zJ6npWAFJ9D4JRbsB1bhw9M97jARju8vHKWQO4y10grnxdzxtyaldUyOYL653d5Ki7WJg+Bouu8rdWHAcDhw==
-ARC-Authentication-Results: i=1; mta-outp-cfd-1; spf=pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) smtp.mailfrom=case.edu; dkim=pass (Good 2048 bit rsa-sha256 signature) header.d=case.edu header.i=None header.s=g-case; dmarc=pass (p=REJECT sp=Undefined pct=100 dis=NONE) header.from=case.edu
-Received-SPF: Pass (mta-outp-cfd-1.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) client-ip=209.85.219.71
+	 subject:message-id:date:from:mime-version:dkim-signature; b=T+7kloZzX5qYpvbP3z7u4usP/vFHptKceL1bgPC91dT28XSO1vmNxSxJx20ksenwey8MD6+qJ0gmPUDv79MixNR72PsmlcsIdMR4u5HwXXbKNbeqRPFpEP2f960se6seEZ6NbrYE/dPsbd4h2gnFXgS+i2jfPgGhZD37EaYZ3DoCGpFVJfjgU5WY4QfEKnD1KWEMIKiDdDW5T61Y/tra0l5I06zH+/e7dLZ0lSyHtI+2OeMXtGTAt5ImJtA2j9a4sGf0cXHMQXjYlUVwc2FNqnoZcLGmEY3AZy54y2FI9GIdQ9LltFNXWcYLdX/PEaizNFfU1KcpKYC4fN0m58GqEw==
+ARC-Authentication-Results: i=1; mta-outp-cfd-2; spf=pass (mta-outp-cfd-2.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) smtp.mailfrom=case.edu; dkim=pass (Good 2048 bit rsa-sha256 signature) header.d=case.edu header.i=None header.s=g-case; dmarc=pass (p=REJECT sp=Undefined pct=100 dis=NONE) header.from=case.edu
+Received-SPF: Pass (mta-outp-cfd-2.case.edu: domain of case.edu designates 209.85.219.71 as permitted sender) client-ip=209.85.219.71
 Received: from mpv-out-cfd-1.case.edu (mpv-out-cfd-1.case.edu [129.22.103.196])
-	by mta-outp-cfd-1.case.edu (Postfix) with ESMTPS id 8D5DE11CF
-	for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 08:51:14 -0400 (EDT)
+	by mta-outp-cfd-2.case.edu (Postfix) with ESMTPS id 7E75C3480545
+	for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 08:49:05 -0400 (EDT)
 Received: from mpv-local-ksl-1.case.edu (EHLO mpv-local-ksl-1.case.edu) ([129.22.103.235])
 	by mpv-out-cfd-1.case.edu (MOS 4.4.8-GA FastPath queued)
-	with ESMTP id DED33713;
-	Wed, 14 May 2025 08:51:14 -0400 (EDT)
+	with ESMTP id DED33493;
+	Wed, 14 May 2025 08:49:05 -0400 (EDT)
 Received: from mail-qv1-f71.google.com (EHLO mail-qv1-f71.google.com) ([209.85.219.71])
 	by mpv-local-ksl-1.case.edu (MOS 4.4.8-GA FastPath queued)
-	with ESMTP id EKB30384;
-	Wed, 14 May 2025 08:51:13 -0400 (EDT)
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f53d97079aso226009936d6.0
-        for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 05:51:13 -0700 (PDT)
+	with ESMTP id EKB30036;
+	Wed, 14 May 2025 08:49:04 -0400 (EDT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f50edda19eso104573826d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 05:49:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=case.edu; s=g-case; t=1747227071; x=1747831871; darn=vger.kernel.org;
+        d=case.edu; s=g-case; t=1747226944; x=1747831744; darn=vger.kernel.org;
         h=in-reply-to:organization:autocrypt:from:references:to
          :content-language:subject:cc:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ziBnVImEQka1k/5ArPVUpuK5Uv55pJxDufSS4gEWcPs=;
-        b=CCKy4DG9qAi8npFSU4KYpiJdM7VctWjY/ia0ogbHh21SjhbPdbSHjyqnYg4mCqg2PB
-         BDFdPgbOxMwg5xB3ZiH/SjNRuttEJcz8M7Ahd/AY6hP/rfdvsNsNS6rFXBGRx3tkkFgw
-         WxJkSUnYgH6Rsy/op/aJjiM56f5ZqKhCOWz1TItcKwUnu2AAdCCndmy4H25fL14w8HWS
-         4t75mpKuhqusS5tl2qEXdGloIin1mtFpZhABYSFoXcuGxCS1m8dpz3NNY3yTS+ZFXDDU
-         ldrq1bKU9Yw15jB62GA/Z2O3K1+68JQvDjaAC6lJNOaGjOj8VqTOWigKi1tf9rY5pcJe
-         gsmw==
+        bh=H23KFw/6YBiqbHRBAplGutuAWNOTYRKqsZ37/mbJohk=;
+        b=SYoT6DTfysavWjIBb5ibSZYNCh1E8E9G8hIFAkGPvK45Vyxr09CV33+fleEX2vw5/z
+         Q2j+yVXpv4HK65hVWtOEyNrKZO2c54TeOk3zeiAhn8hbn3/vZ7li9lQm1nsptDWqgA3w
+         DBGhMN3gRyhHV6Lxe7wqulqgBYuENlLMd7JGanvyTh5uloVqQK/gjcLsSmWLoToTvEs6
+         P1Frn+rYK+yqI1RIeoAB+aUOrljczehSwLPvSZmycR8urRKTHO3FITe9bEvWssAlVdxu
+         jzIODkD90fd5k7vtA4ph7N437XiIRLXfAnKCdvb9jdyYWyFJsL1HVrnMM7yxc+8d3aIA
+         rR8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747227071; x=1747831871;
+        d=1e100.net; s=20230601; t=1747226944; x=1747831744;
         h=in-reply-to:organization:autocrypt:from:references:to
          :content-language:subject:cc:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ziBnVImEQka1k/5ArPVUpuK5Uv55pJxDufSS4gEWcPs=;
-        b=TTY0TcVl1gd9D4arKZoPP4bRLOfdSxz4PU2jrKvkD9ukNxmjCN0y24Uyuunrz3Lwo8
-         chkduShKDoter5x7lTyHIBK9XUaWEYFIT41wmwNHogJ44esgyoWlA86IkuimuccJutsQ
-         1JJ+dtql/+/mL73Cy+p5OSJF1TPp9kqU/6QgVY9xDRCt3KMxmqrKSMJUEHgyqDOtskpd
-         w6guPLy0OTAldV4Tojkr2ZqZ36w7q/6fx+HpKrVkyQK/2kxmTIIWsjMA/dXqKRMGSibX
-         tbphoh/YunXbjkuQrf0nM9sbhYzPng4jazlJ7+5+4muOfPxnPyRx5hLy7LmF8H/MO67W
-         UMmg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6BbfOGswg59T+Raua2DE4jxlUObEHoSgllL5CwX9liPxPqAu5b0sH6R1HzAHrpxRfqDSeNwrgwNeD@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze98MoHjPK8TPePl33oN4CRXZbL4HdCv0FAWfzhgl327Ja8W+t
-	VNxh06B+RAHUvgSn6CDxK8uMwZOSmFFGdfaotAa/gw5+RSLhc2xXp0qvFIzTFiPx23tYugZZrWu
-	mrqC0lgJGlYEDeEeYaHd0lb4duZg9+4I2O+r92YbNR4QTYu5phgXhAUmQ1pNbmWx2Baak
-X-Gm-Gg: ASbGncs/9pVJT/oy5/YTo+o5BWjWKGq+pkakZHsDbgatJ8coCNDS4QnGMbP1gGQemNv
-	1KhHyouQx0rUaRLpWUBKKsiGUyJRrf9La18mVpv0FK25fcdJIrJzYBZhiLDH7WbwqptZ4qMTfNk
-	0wCg+MgiPBYPmReKx9grDHoJWZS3/U3b6IEoZDJbfTJOsE2prKy9Riw6qWacwl7M70t4rIi6Rek
-	2MBk0FtM2fZbmbWz/m4K1xQLhSanqMFLadG1CmTNsYiTtT0BJHXc7087D0KfvT7Ige104cGjHUF
-	CVOqcW3IuKQ6xWvEzXyDzVBcYcP+Ozt3vVpJUgkIpQUzpk8p9hbapnhaqzX4TFdPUwPA0kHskw=
+        bh=H23KFw/6YBiqbHRBAplGutuAWNOTYRKqsZ37/mbJohk=;
+        b=v1u8uIvd9FzEcU7GqC/zUHFqqhbpsEkKLft41WIJ4ZGV/Ir++Djfozb8MRVB3Dq3ML
+         qLKsshUunUqYjpAqd15ZQZc1o2+T4npkv+kg312GA/ow5ilb6ibrDW5UQH53nAGbf/Ht
+         cgwL262my3s1VmV9R384c4DL8b+V7WI/Cu10HMCiJ8rQb9CZ7BVGTv7Jzsmd/EEfS2Cm
+         fyl0fgwe37Ka/huLyQ2oAVNkR7KcXmzPeZvYloVrMNSv+83WfWTpYaKHVxoeqitn9xTY
+         +akHWLF+e/jObiHzF0xK9Dgr0jYMRaQcNBjlxoO6n0JYOTxcieiRtTDq1WyMwjfHOozi
+         u4uA==
+X-Forwarded-Encrypted: i=1; AJvYcCVyZzNafKstVu9Uowm4Z6fobE4EJyZFd5Mm7AthRbuWhzKGYRy9QqRHQCP034Wzh2PZzmWjZDjpIF98@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7ae/+WayQxrzC2kfo63qGMjjHuKq604j0IhvR8m203Wvbe+cY
+	6UCXyRMHl5tGQ3JWEZCyvgxmnuHsg4pSXhAq4qC5PjoBK9R2Ab5euoStpW5AxIiLhiVYUZeWUO2
+	8fTEux8sjPFTmazsclDSagMVAqpasVcmMcF1nPoI0cG11mF/OF80O2DAXGV/g
+X-Gm-Gg: ASbGncs3BcYjLU5GjPeDL7vG68MpWPUGlLjMejTLB/PHULDLlBljhzJX7Emq2aeaVy9
+	BvgsTURFdCZJ9rf1XNzTDiyEKcSRCay/SiCUPeAQ0Pp8CCY/nYO0yf1JMZ3rDHNf5tvMPcplckU
+	/w6JnTW3co+O/zpi6Qr72pBxPr3n+/NKBD1GyVCWFAk/BNm/43iE8EejJcyicDUUU3yHD8N7U3/
+	IEUwY2WdYb3gkyNhLeZMDyf0nyaSItNp0s7mx+6Tn+UPBiJoNexZNuWR4Ka8z2+S7h5SCh/Ifyc
+	+QaG01in/qxbGwSCMxXy/hy3AwoNZor42xRz/1di2LNN2sqap4A9YKKlW589WgfR2pma1SIlYQ=
 	=
-X-Received: by 2002:a05:620a:27c7:b0:7c5:4c49:769c with SMTP id af79cd13be357-7cd287c542amr715131885a.6.1747227061258;
-        Wed, 14 May 2025 05:51:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHzQHI2rEryjYi08itQLGH9hVhvibYUYkKurYuspAd1v6/xkb8OjQbB/Q3z9M0RpvvTMatudg==
-X-Received: by 2002:ad4:5bae:0:b0:6e8:f470:2b11 with SMTP id 6a1803df08f44-6f896e566cdmr50454446d6.23.1747227049536;
-        Wed, 14 May 2025 05:50:49 -0700 (PDT)
+X-Received: by 2002:a05:6214:21ad:b0:6f4:c602:806e with SMTP id 6a1803df08f44-6f896e3fec2mr50868696d6.13.1747226943607;
+        Wed, 14 May 2025 05:49:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEtwlQ14DtF6O3cZcsGZzgP2A9K/NUkdK5N8BNr+YLd1S14ZNfvBQa1BEnvTAza0IpLemntQ==
+X-Received: by 2002:a05:6214:21ad:b0:6f4:c602:806e with SMTP id 6a1803df08f44-6f896e3fec2mr50868286d6.13.1747226943210;
+        Wed, 14 May 2025 05:49:03 -0700 (PDT)
 Received: from ?IPV6:2603:6010:dc00:1e:f5e5:3614:5780:f83d? ([2603:6010:dc00:1e:f5e5:3614:5780:f83d])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f6e39e0b8bsm80792476d6.20.2025.05.14.05.50.47
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f6e3a52382sm80386186d6.94.2025.05.14.05.49.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 May 2025 05:50:48 -0700 (PDT)
-Message-ID: <ad62849c-1728-4bae-b0d5-7d87dc94825f@case.edu>
-Date: Wed, 14 May 2025 08:50:47 -0400
+        Wed, 14 May 2025 05:49:02 -0700 (PDT)
+Message-ID: <63dd526c-20cb-4493-8ac5-e87a44c74419@case.edu>
+Date: Wed, 14 May 2025 08:49:00 -0400
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -98,23 +98,21 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: chet.ramey@case.edu
-Cc: chet.ramey@case.edu, David Howells <dhowells@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+Cc: chet.ramey@case.edu, Alexander Viro <viro@zeniv.linux.org.uk>,
+        Etienne Champetier <champetier.etienne@gmail.com>,
         Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>, linux-fsdevel@vger.kernel.org,
-        Linux AFS mailing list <linux-afs@lists.infradead.org>,
-        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        "openafs-devel@openafs.org" <openafs-devel@openafs.org>
+        Jeffrey Altman
+ <jaltman@auristor.com>,
+        Steve French <sfrench@samba.org>, linux-afs@lists.infradead.org,
+        openafs-devel@openafs.org, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] afs, bash: Fix open(O_CREAT) on an extant AFS file in a
  sticky dir
 Content-Language: en-US
-To: Jeffrey E Altman <jaltman@auristor.com>,
-        Etienne Champetier <champetier.etienne@gmail.com>,
-        Christian Brauner <brauner@kernel.org>
+To: Christian Brauner <brauner@kernel.org>,
+        David Howells <dhowells@redhat.com>
 References: <433928.1745944651@warthog.procyon.org.uk>
  <20250505-erproben-zeltlager-4c16f07b96ae@brauner>
- <CAOdf3grbDQ-Fh2bV7XfoYvVBhgBAh7-hZyyxTNt1RfGekrA-nA@mail.gmail.com>
- <66c958db-0408-451d-b362-fed1f56d7c6d@auristor.com>
 From: Chet Ramey <chet.ramey@case.edu>
 Autocrypt: addr=chet.ramey@case.edu; keydata=
  xsDiBEEOsGwRBACFa0A1oa71HSZLWxAx0svXzhOZNQZOzqHmSuGOG92jIpQpr8DpvgRh40Yp
@@ -135,15 +133,15 @@ Autocrypt: addr=chet.ramey@case.edu; keydata=
  HL+EXo9zSiHVrrZRJ19ooCKKbSdXHFCY+aJG+0KZwkkEGBECAAkFAkEOsG8CGwwACgkQu1hp
  8GTqdKvjcACfZlkVCDwaz/NTO9cy3t69oWpVPNwAnRwe0qk/WL/gfhH346xh5B3HFbFN
 Organization: ITS, Case Western Reserve University
-In-Reply-To: <66c958db-0408-451d-b362-fed1f56d7c6d@auristor.com>
+In-Reply-To: <20250505-erproben-zeltlager-4c16f07b96ae@brauner>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------L5LSTY5M39gWnvMqVGp47caB"
+ boundary="------------85Jz5FfALLMAEBt32OGUtd5w"
 X-Mirapoint-Received-SPF: 209.85.219.71 mail-qv1-f71.google.com chet.ramey@case.edu 5 none
 X-Mirapoint-Received-SPF: 129.22.103.235 mpv-local-ksl-1.case.edu chet.ramey@case.edu 5 none
 X-Junkmail-Status: score=10/90, host=mpv-out-cfd-1.case.edu
 X-Junkmail-Signature-Raw: score=unknown,
-	refid=str=0001.0A006399.682491D0.0051,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0,
+	refid=str=0001.0A002124.6824914A.0020,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0,
 	ip=0.0.0.0,
 	so=2016-11-06 16:00:04,
 	dmn=2013-03-21 17:37:32,
@@ -151,61 +149,64 @@ X-Junkmail-Signature-Raw: score=unknown,
 X-Junkmail-IWF: false
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------L5LSTY5M39gWnvMqVGp47caB
-Content-Type: multipart/mixed; boundary="------------frKCS23FeCmgMLcTNF0WGjn4";
+--------------85Jz5FfALLMAEBt32OGUtd5w
+Content-Type: multipart/mixed; boundary="------------pZEuYk6TQBKl8aeUUzadh7Ih";
  protected-headers="v1"
 From: Chet Ramey <chet.ramey@case.edu>
 Reply-To: chet.ramey@case.edu
-To: Jeffrey E Altman <jaltman@auristor.com>,
+To: Christian Brauner <brauner@kernel.org>,
+ David Howells <dhowells@redhat.com>
+Cc: chet.ramey@case.edu, Alexander Viro <viro@zeniv.linux.org.uk>,
  Etienne Champetier <champetier.etienne@gmail.com>,
- Christian Brauner <brauner@kernel.org>
-Cc: chet.ramey@case.edu, David Howells <dhowells@redhat.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Marc Dionne <marc.dionne@auristor.com>, Steve French <sfrench@samba.org>,
- linux-fsdevel@vger.kernel.org,
- Linux AFS mailing list <linux-afs@lists.infradead.org>,
- linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
- "openafs-devel@openafs.org" <openafs-devel@openafs.org>
-Message-ID: <ad62849c-1728-4bae-b0d5-7d87dc94825f@case.edu>
+ Marc Dionne <marc.dionne@auristor.com>, Jeffrey Altman
+ <jaltman@auristor.com>, Steve French <sfrench@samba.org>,
+ linux-afs@lists.infradead.org, openafs-devel@openafs.org,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <63dd526c-20cb-4493-8ac5-e87a44c74419@case.edu>
 Subject: Re: [PATCH] afs, bash: Fix open(O_CREAT) on an extant AFS file in a
  sticky dir
 References: <433928.1745944651@warthog.procyon.org.uk>
  <20250505-erproben-zeltlager-4c16f07b96ae@brauner>
- <CAOdf3grbDQ-Fh2bV7XfoYvVBhgBAh7-hZyyxTNt1RfGekrA-nA@mail.gmail.com>
- <66c958db-0408-451d-b362-fed1f56d7c6d@auristor.com>
-In-Reply-To: <66c958db-0408-451d-b362-fed1f56d7c6d@auristor.com>
+In-Reply-To: <20250505-erproben-zeltlager-4c16f07b96ae@brauner>
 
---------------frKCS23FeCmgMLcTNF0WGjn4
+--------------pZEuYk6TQBKl8aeUUzadh7Ih
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-T24gNS81LzI1IDEwOjQyIEFNLCBKZWZmcmV5IEUgQWx0bWFuIHdyb3RlOg0KDQo+Pj4gU28g
-dGhlbiBqdXN0IGRvbid0IHJlbW92ZSBpdC4gSSBkb24ndCBzZWUgYSByZWFzb24gZm9yIHVz
-IHRvIHdvcmthcm91bmQNCj4+PiB1c2Vyc3BhY2UgY3JlYXRpbmcgYSBidWcgZm9yIGl0c2Vs
-ZiBhbmQgZm9yY2luZyB1cyB0byBhZGQgdHdvIG5ldyBpbm9kZQ0KPj4+IG9wZXJhdGlvbnMg
-dG8gd29yayBhcm91bmQgaXQuDQo+PiBUaGlzIGJhc2ggd29ya2Fyb3VuZCBpbnRyb2R1Y2Vk
-IGFnZXMgYWdvIGZvciBBRlMgYnlwYXNzIGZzLnByb3RlY3RlZF9yZWd1bGFyDQo+IA0KPiBD
-aGV0LCBJIGRvbid0IHRoaW5rIHRoaXMgaGlzdG9yeSBpcyBjb3JyZWN0LiANCg0KSSB0aGlu
-ayBFdGllbm5lJ3MgdGVyc2UgY29tbWVudCBhY2N1cmF0ZWx5IHN1bW1hcml6ZXMgdGhlIGN1
-cnJlbnQgcHJvYmxlbQ0KKGFuZCBtYXliZSBpdCB3b3VsZCByZWFkIG1vcmUgY2xlYXJseSBp
-ZiBoZSBoYWQgdXNlZCBgYnlwYXNzZXMnKS4NCg0KLS0gDQpgYFRoZSBseWYgc28gc2hvcnQs
-IHRoZSBjcmFmdCBzbyBsb25nIHRvIGxlcm5lLicnIC0gQ2hhdWNlcg0KCQkgYGBBcnMgbG9u
-Z2EsIHZpdGEgYnJldmlzJycgLSBIaXBwb2NyYXRlcw0KQ2hldCBSYW1leSwgVVRlY2gsIENX
-UlUgICAgY2hldEBjYXNlLmVkdSAgICBodHRwOi8vdGlzd3d3LmN3cnUuZWR1L35jaGV0Lw0K
+T24gNS81LzI1IDk6MTQgQU0sIENocmlzdGlhbiBCcmF1bmVyIHdyb3RlOg0KDQo+PiBUaGlz
+IHdvcmtzIGFyb3VuZCB0aGUga2VybmVsIG5vdCBiZWluZyBhYmxlIHRvIHZhbGlkbHkgY2hl
+Y2sgdGhlDQo+PiBjdXJyZW50X2ZzdWlkKCkgYWdhaW5zdCBpX3VpZCBvbiB0aGUgZmlsZSBv
+ciB0aGUgZGlyZWN0b3J5IGJlY2F1c2UgdGhlDQo+PiB1aWRzcGFjZXMgb2YgdGhlIHN5c3Rl
+bSBhbmQgb2YgQUZTIG1heSB3ZWxsIGJlIGRpc2pvaW50LiAgVGhlIHByb2JsZW0gbGllcw0K
+Pj4gd2l0aCB0aGUgdWlkIGNoZWNrcyBpbiBtYXlfY3JlYXRlX2luX3N0aWNreSgpLg0KPj4N
+Cj4+IEhvd2V2ZXIsIHRoZSBiYXNoIHdvcmsgYXJvdW5kIGlzIGdvaW5nIHRvIGJlIHJlbW92
+ZWQ6DQo+IA0KPiBXaHkgaXMgaXQgcmVtb3ZlZD8gVGhhdCdzIGEgdmVyeSBzdHJhbmdlIGNv
+bW1lbnQ6DQoNCkkgdGhpbmsgdGhpcyBxdWVzdGlvbiBoYXMgYmVlbiBhZGVxdWF0ZWx5IGFu
+c3dlcmVkLg0KDQoNCj4gU28gdGhlbiBqdXN0IGRvbid0IHJlbW92ZSBpdC4gSSBkb24ndCBz
+ZWUgYSByZWFzb24gZm9yIHVzIHRvIHdvcmthcm91bmQNCj4gdXNlcnNwYWNlIGNyZWF0aW5n
+IGEgYnVnIGZvciBpdHNlbGYgYW5kIGZvcmNpbmcgdXMgdG8gYWRkIHR3byBuZXcgaW5vZGUN
+Cj4gb3BlcmF0aW9ucyB0byB3b3JrIGFyb3VuZCBpdC4NCg0KSSB0aGluayB0aGlzIHNob3dz
+IHRoYXQgdXNlcnNwYWNlIGFwcGxpY2F0aW9ucyBzaG91bGQgYmUgdmVyeSBjYXV0aW91cw0K
+YWJvdXQgcHV0dGluZyBpbiB3b3JrYXJvdW5kcyBmb3Iga2VybmVsIGJ1Z3MsIGFuZCBtYWtp
+bmcgdGhlbSBhcyBsaW1pdGVkDQppbiBzY29wZSBhcyBwb3NzaWJsZS4NCg0KDQotLSANCmBg
+VGhlIGx5ZiBzbyBzaG9ydCwgdGhlIGNyYWZ0IHNvIGxvbmcgdG8gbGVybmUuJycgLSBDaGF1
+Y2VyDQoJCSBgYEFycyBsb25nYSwgdml0YSBicmV2aXMnJyAtIEhpcHBvY3JhdGVzDQpDaGV0
+IFJhbWV5LCBVVGVjaCwgQ1dSVSAgICBjaGV0QGNhc2UuZWR1ICAgIGh0dHA6Ly90aXN3d3cu
+Y3dydS5lZHUvfmNoZXQvDQo=
 
+--------------pZEuYk6TQBKl8aeUUzadh7Ih--
 
---------------frKCS23FeCmgMLcTNF0WGjn4--
-
---------------L5LSTY5M39gWnvMqVGp47caB
+--------------85Jz5FfALLMAEBt32OGUtd5w
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-wmMEABEIACMWIQR8ATX7CIqvbGbGULm7WGnwZOp0qwUCaCSRpwUDAAAAAAAKCRC7WGnwZOp0q8F+
-AJ9LqPEdLlhWqcMgSVEfvfVvQQaLUQCeJ3uT3ggHKj9klGbE8GZKsHHVarM=
-=1TNa
+wmMEABEIACMWIQR8ATX7CIqvbGbGULm7WGnwZOp0qwUCaCSRPAUDAAAAAAAKCRC7WGnwZOp0q/cd
+AJ0YC9WUqxzUhmZxvvlNd+VRUfB+aACeK1+oHx4Wpo53yFc78F/fFnTazM8=
+=JIZz
 -----END PGP SIGNATURE-----
 
---------------L5LSTY5M39gWnvMqVGp47caB--
+--------------85Jz5FfALLMAEBt32OGUtd5w--
