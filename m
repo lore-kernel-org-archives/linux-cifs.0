@@ -1,57 +1,58 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1A752F88
-	for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 15:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1E91862A
+	for <linux-cifs@vger.kernel.org>; Thu, 15 May 2025 00:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747237496; cv=none; b=SuvRxT2DCZ9hX0bjmmdNWgc1KNVsVg+JZIWzP7YvAZZKKBukp9ZlrA8F8nFv+WR6Pm+7x5CRrWBI0vEOu0UE8ar3Spd4P0b37dNwaizfyiOCogTTx9WnHXfNJ9txMhosE94x6Kt74nqiK0Apl9fOpZ+nUuU5YchHqwC/WSoO/NI=
+	t=1747268902; cv=none; b=UTtOfpm1r+biKHfFkb90NL6EZ9cYUV9lvldmCpm29n04H6tjIiN72YLcsy3ewfacC3XIe8hlBVyeVlzIuiEetDF5jiRkICV6Irz094wOH6uolb8Kfooh5EXzKFaNOF3KvVZJTFIFQTH67K1K+WwfFgaQajIYhJGdGxBv1tHpqbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747237496; c=relaxed/simple;
-	bh=Vffh6vcaaEFvrKwHS4j0CJ6y15UnwgbfiBs/VghroE8=;
+	s=arc-20240116; t=1747268902; c=relaxed/simple;
+	bh=GPIiN8Z7eX+rJSl4PTdwxmBifh028wCDy+HrI2QR+cM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MEFxQU9AkKHMOvpVhj5ZvW6lv55/inr47wl7GzNogSbVAg7q1HCKG5VBnCxBtA5ALuJLBsMXkQwwqIb+vG94XX33ypvOKV2ZSwRJawXyehuLhcQjT4rJVi71Jlu5I5lvMeQ/0QjNHkp8FUPkGzMu7cT6v3azQeohCIyQmnQy0tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBFit60y; arc=none smtp.client-ip=209.85.208.177
+	 To:Cc:Content-Type; b=LpPMe5QE4TZjRh1zX9k3THdIQ7Gt8/RPd37vhCmd6pg1hb/BYU+WPGVFdLXQHf3E8ho+UVk4/spyxWoQACCuvt6PDi+nsxxKAAevCpEQuwIxs81OCXgNfEAG9oVfTkDWX39GB3tMemGAEOXdI23hU0ugci+aiV54bV0w0bPA9ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jASLV1dy; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBFit60y"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30db1bd3bddso65295391fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 08:44:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jASLV1dy"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-550d7afa0c7so369409e87.1
+        for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 17:28:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747237493; x=1747842293; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747268899; x=1747873699; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zj2EY+tSLG21oTzdSM+dLvMFhkVFk0PiE2hJYjWUEKY=;
-        b=UBFit60yMibVoN0oftROK1mNItlh10mzndxHY8F+g1c8LT94JDhiXzjdbT0tGnk8tk
-         8P9ezGRnGNjveq9jcRAXpcv4rJW5BY3G3XU/tzXt8IUe7E7vBg1hyYuwzOUdwlWMRzWt
-         DYVcMNpzccTXEXLJ2lXffCuOuWW9W1ukeSYCoj37OlCexhXijQ3/TPVEUS1TOQjygOWE
-         IyvR3p2KWsYbPshOH3GXptFczJv2ZnBaIbWJazCXV4HmKGD87s2sv5FopidLHhLBNgNz
-         yctcqtAYfrgsFj8iE2nkZmfZhTFPTp8jZXt3vZLVeGDYMELJk5om7u6CN8NJRBVQEzZf
-         aYnQ==
+        bh=NjocJHYuW7JgE1msvkXieiusqzAbE/x8QvGg6n7sLKQ=;
+        b=jASLV1dy4yH32HiUj/Dm2oMctCZ9Z3muzXfD2A+YjXsNCIsQ2epEnSWKvryNhLqXzn
+         QbeuQ9bo5uZQ2RtjujpOWPNn/d6jjD9+STYC+TvWfUFypfMOdXj5AaSbHOOZY0xF3v0T
+         ZI13fQQROeYe2PwOnCeePzMQi0oC7OAfIi3qlqTLMKG+j6JuLKnltRvCmTR+mAsh6D/w
+         Gm/fVNK8gDF8I0nfTu9U+ETh+0SmocrLOFfiJnzWhFjTc+HXM4zZ2yJ2QK7Uht/t1QEI
+         zyE2Hfj6hZJD3y4p1xZW6mDxCNunNArgI7V+7ix4mJ8/nog8D+rc4oquhefD4y7tdUxz
+         /bjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747237493; x=1747842293;
+        d=1e100.net; s=20230601; t=1747268899; x=1747873699;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zj2EY+tSLG21oTzdSM+dLvMFhkVFk0PiE2hJYjWUEKY=;
-        b=IAtzXbEg046e+7CZrkzTKdBSQWXhk92X/FRJR+FSML8EgsOBMktS4RqkNgMFslDr7L
-         EY7inCvAtUNll2QjrTeJOrOeD4k6kWuM7uSPDDnluGlotmZmCVwpFAktcDt1HoIUU51u
-         MOzdIoFi59GWm1z2DVZzBu8MfhcSCS9eNkhBZvDIR8ZUtVfHMR8Ph4hAghZLQ6JA69Mi
-         7hULDCrbzJbhyfct0IQDYdTZG8PhLipiml/lhm7e9DseRaFaC+ETO1k6HCg2gsuU4sOd
-         qiIFCrPzm4gWmcODW/iAEcmniFUIRaYyWnNhVwmk8zG3kRyNnyvoOLAZPkGePH0JOK1H
-         bSnA==
-X-Gm-Message-State: AOJu0YwVkq158KWwhLmVGBCckDGi8xbdfml0QBrkmDXkKocN2vNvjYeO
-	mfSkP76FQFB5nzdsLETh5uPT1/pFCwmuLKSssAYsnKk6JN3dfgE1sd9j47mrkodmyu7I78l4swa
-	DnCBhBWSRuzJbDLdtSF1QsNW8Jr0=
-X-Gm-Gg: ASbGnctDV7Vk9+mqAX9+MJIBMgt3JVCVSA5F+XhqnNVAmkX2h0Zh8uCh52584HfJBYs
-	xazKxvlXiE1ReECfuqqm8EpEa9khkbcFy1heIMJ6zHyPxJIo1ZOjs0JggwFQFX2YXhyulwjyNEe
-	skwp0wubxxkCAR1deSts4lfiT3fqDR2j/04De3uHDKeeAgVn/mxQlZ6CHZX3eIs1F9mFg=
-X-Google-Smtp-Source: AGHT+IGb6HOPg1CgDGWVro/njAlyDE7OlWqd7IvyHG5qar1Pg31AJlFGPhjr/Mot8DSEgJrKUKspu8ZOfzYo8MV+VFo=
-X-Received: by 2002:a05:651c:502:b0:30c:50ff:1a4e with SMTP id
- 38308e7fff4ca-327ed1020a0mr15405351fa.18.1747237492583; Wed, 14 May 2025
- 08:44:52 -0700 (PDT)
+        bh=NjocJHYuW7JgE1msvkXieiusqzAbE/x8QvGg6n7sLKQ=;
+        b=dzH7KmcLKeBaW+j3Zp3DzoO39Clc/iBEbp670VTszZ+5oiylgrmA0+MoRSBUxixOVM
+         nnb5GCBUNsE0MQO/fWZMGbu8RPB3AfW1J8+WarT+k1i6fC+FfuPdlUSv1EadoHGqUMMy
+         IcZZRhpK7AA3CRJEXeAMmi5GPF4kEVxRZ5KzMU+GvU61QOI1ZCeFW5axFqXxmMUCaJOA
+         Kfvvq9U9Zr5VgTtHK6hJVtPrhS6GhLGWMLHXypMCWTNGG33jnjD4qJAVBJKIC+BUWnCt
+         zC4e9SZlnwdjA9TGwH3NYz9h7V3PXjK6xOB7XJJkl2bP3PgX96razr6/R7lp1rxWBJgC
+         RE2Q==
+X-Gm-Message-State: AOJu0Yw+VObhsXfctxZTgfhuJrlmqGVx9ud9RI5eJBFVhvydnPDCCRS3
+	k+7HTfIPQ3Ay4K/f+eb3uDsR5P7BBb/DYd6+Vrmqf+u8Il/4vX+oIiH0ELuzwVVP7NjoOrNeS+6
+	jGfnengCruPlKMYY0X5O89Qfh4I7d0g==
+X-Gm-Gg: ASbGncsna7oaekJGdIikSPo6scWmYdVKkD6ZecOkyZpwkgSUsssWSsUrMUiya7f43UO
+	84Ok4eLtkmi6iqbPRtMIpGNDIHbeXvk2+dsnbGqvdrYogzgZnYd+3onljp3tpc/yu5Xq+k68j6K
+	UrZyST3DZwrY/oA+zJQvlL+2MR90El8Djbsg10DC1LAqoKFcgSTJkZHXMAzKDgVn777bzXYRMjl
+	n2QgQ==
+X-Google-Smtp-Source: AGHT+IGg7a3d/DLGvAp7pjKEZeUGBHtwNXZOnwexxPknJpPdK7srbzQZ/Kf/YMWpcGx8Bds+pFlSR8qtVQyoG0lLkcY=
+X-Received: by 2002:a2e:bd87:0:b0:30d:e104:b795 with SMTP id
+ 38308e7fff4ca-327ed210058mr21996481fa.39.1747268898636; Wed, 14 May 2025
+ 17:28:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -61,26 +62,17 @@ MIME-Version: 1.0
 References: <20250515012323.28f38839@deetop.local.jro.nz>
 In-Reply-To: <20250515012323.28f38839@deetop.local.jro.nz>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 14 May 2025 10:44:40 -0500
-X-Gm-Features: AX0GCFvFb_vi4IXMLV8Glpi9Pbjz1Za-GWHNoyWFUES63mQi2YJ2wMTyPOPyEDQ
-Message-ID: <CAH2r5ms-tRqbGSWP1ih5J8oNkVdKwLOh3_ZP5D0YDKi=Tn78Wg@mail.gmail.com>
+Date: Wed, 14 May 2025 19:28:07 -0500
+X-Gm-Features: AX0GCFvCTew1b_QU65zpD2OQQxe-n26ZeGtA9q3OtaXW9FwO-JKmt5o2cQL_iQc
+Message-ID: <CAH2r5mvsdGwF7XPb38dMSpK5NVApQL75wsOHyHAt_nS1MZwaEA@mail.gmail.com>
 Subject: Re: [PATCH] smb: client: fix memory leak during error handling for
  POSIX mkdir
 To: Jethro Donaldson <devel@jro.nz>
-Cc: linux-cifs@vger.kernel.org, sfrench@samba.org, pc@manguebit.com
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> Am tempted to change all the other calls to free_rsp_buf() in smb2pdu.c
-> to pass rsp_iov.iov_base, even though none of the other cases where *rsp =
-is
-> passed seem to exhibit the above problem.
-<>
-> If that sounds like a good idea, please advise if a separate patch is pre=
-ferred or a v2 of this one.
-
-The larger change is too late to go in 6.15 so larger patch would be
-best to do separately
+Good catch. Merged into cifs-2.6.git for-next
 
 On Wed, May 14, 2025 at 8:37=E2=80=AFAM Jethro Donaldson <devel@jro.nz> wro=
 te:
