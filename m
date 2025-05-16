@@ -1,25 +1,25 @@
 Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2E322DA07;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B281224223;
 	Fri, 16 May 2025 09:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747387311; cv=none; b=H9H2AUkxDV2y2pcuPH+BEK0+XazE0tsVfD2g51kbryDzFvUtiGRCPmlrEKLwWn+rENbll6KfgDTYsIYMwrTTut6ycFOP/SQZsAsqFxyyAzk4oKlqua3cTIIAs25pz7oukWaIFhtkUUi3jnmKRO8qn1TVgcPvr2GsEutFCbZH6H0=
+	t=1747387311; cv=none; b=gby3ztSmThh666DM3n8j00pB6Tec5N5n1u5y4nfFA4UgN627TMYdYXnUfip6JPN4ImSxorJfmmjOrSrCeYw1Ou8GuE0VktCcXuC9oyMO5S05Kwktl5hBrSGTUlxjh0nA0NkIBDMB+W03yUjx4/RCfPl1eRBOVO1Thh08SYc8FfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747387311; c=relaxed/simple;
-	bh=LCRkojFXW3npo30sHbjFTCo9FEh0VftKeTU++mHTC0E=;
+	bh=L5pns+qjxW3rb1Y1Qik/3PrX4MA7QxkBTHiPuYtGRQM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q6NuU85aRiKU1txJ7Bo6hMI/lkPD4xEBD7KuwHDoKVD5Vl36QoSOZWKmQLRcMg4vRpcaAntz8OgcqZ9Sc2vNRNc9GiayGux8zWbTdRsybj18p7dKd+cjUmzJ73QWX4D8twOgrjUlGsY6IDTD07DtV+hWAAyIX4WwNdkrMZ4xs7k=
+	 MIME-Version:Content-Type; b=ZpzoWuiFv1yoPvh5FYCNmhPKMwmITT6+xwFC0UR7ufb9MOYApc6O+ujEQrpQUdChVUEV1qTzhtiofPBoSnpWeKjQwng6O7M37le72UtsyeC9yL/bBzVRCeDApAI/kTfFzMJ2iT52qkjwYrHbWJS3YsGVWqp6uQHrVAtYlKIXTQE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZzM4K13D8z1d1CT;
-	Fri, 16 May 2025 17:20:17 +0800 (CST)
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZzM4J2LGZz1d186;
+	Fri, 16 May 2025 17:20:16 +0800 (CST)
 Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id C32101800B3;
-	Fri, 16 May 2025 17:21:45 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id EEBD51800B3;
+	Fri, 16 May 2025 17:21:44 +0800 (CST)
 Received: from huawei.com (10.175.104.67) by kwepemg500010.china.huawei.com
  (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 16 May
@@ -29,9 +29,9 @@ To: <sfrench@samba.org>, <sfrench@us.ibm.com>
 CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
 	<linux-kernel@vger.kernel.org>, <chengzhihao1@huawei.com>,
 	<wangzhaolong1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
-Subject: [PATCH V2 2/2] smb: client: Reset all search buffer pointers when releasing buffer
-Date: Fri, 16 May 2025 17:12:56 +0800
-Message-ID: <20250516091256.2756826-3-wangzhaolong1@huawei.com>
+Subject: [PATCH V2 1/2] smb: client: Fix use-after-free in cifs_fill_dirent
+Date: Fri, 16 May 2025 17:12:55 +0800
+Message-ID: <20250516091256.2756826-2-wangzhaolong1@huawei.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
 References: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
@@ -46,40 +46,169 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemg500010.china.huawei.com (7.202.181.71)
 
-Multiple pointers in struct cifs_search_info (ntwrk_buf_start,
-srch_entries_start, and last_entry) point to the same allocated buffer.
-However, when freeing this buffer, only ntwrk_buf_start was set to NULL,
-while the other pointers remained pointing to freed memory.
+There is a race condition in the readdir concurrency process, which may
+access the rsp buffer after it has been released, triggering the
+following KASAN warning.
 
-This is defensive programming to prevent potential issues with stale
-pointers. While the active UAF vulnerability is fixed by the previous
-patch, this change ensures consistent pointer state and more robust error
-handling.
+ ==================================================================
+ BUG: KASAN: slab-use-after-free in cifs_fill_dirent+0xb03/0xb60 [cifs]
+ Read of size 4 at addr ffff8880099b819c by task a.out/342975
 
+ CPU: 2 UID: 0 PID: 342975 Comm: a.out Not tainted 6.15.0-rc6+ #240 PREEMPT(full)
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.1-2.fc37 04/01/2014
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x53/0x70
+  print_report+0xce/0x640
+  kasan_report+0xb8/0xf0
+  cifs_fill_dirent+0xb03/0xb60 [cifs]
+  cifs_readdir+0x12cb/0x3190 [cifs]
+  iterate_dir+0x1a1/0x520
+  __x64_sys_getdents+0x134/0x220
+  do_syscall_64+0x4b/0x110
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ RIP: 0033:0x7f996f64b9f9
+ Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89
+ f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01
+ f0 ff ff  0d f7 c3 0c 00 f7 d8 64 89 8
+ RSP: 002b:00007f996f53de78 EFLAGS: 00000207 ORIG_RAX: 000000000000004e
+ RAX: ffffffffffffffda RBX: 00007f996f53ecdc RCX: 00007f996f64b9f9
+ RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+ RBP: 00007f996f53dea0 R08: 0000000000000000 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000207 R12: ffffffffffffff88
+ R13: 0000000000000000 R14: 00007ffc8cd9a500 R15: 00007f996f51e000
+  </TASK>
+
+ Allocated by task 408:
+  kasan_save_stack+0x20/0x40
+  kasan_save_track+0x14/0x30
+  __kasan_slab_alloc+0x6e/0x70
+  kmem_cache_alloc_noprof+0x117/0x3d0
+  mempool_alloc_noprof+0xf2/0x2c0
+  cifs_buf_get+0x36/0x80 [cifs]
+  allocate_buffers+0x1d2/0x330 [cifs]
+  cifs_demultiplex_thread+0x22b/0x2690 [cifs]
+  kthread+0x394/0x720
+  ret_from_fork+0x34/0x70
+  ret_from_fork_asm+0x1a/0x30
+
+ Freed by task 342979:
+  kasan_save_stack+0x20/0x40
+  kasan_save_track+0x14/0x30
+  kasan_save_free_info+0x3b/0x60
+  __kasan_slab_free+0x37/0x50
+  kmem_cache_free+0x2b8/0x500
+  cifs_buf_release+0x3c/0x70 [cifs]
+  cifs_readdir+0x1c97/0x3190 [cifs]
+  iterate_dir+0x1a1/0x520
+  __x64_sys_getdents64+0x134/0x220
+  do_syscall_64+0x4b/0x110
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+ The buggy address belongs to the object at ffff8880099b8000
+  which belongs to the cache cifs_request of size 16588
+ The buggy address is located 412 bytes inside of
+  freed 16588-byte region [ffff8880099b8000, ffff8880099bc0cc)
+
+ The buggy address belongs to the physical page:
+ page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x99b8
+ head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+ anon flags: 0x80000000000040(head|node=0|zone=1)
+ page_type: f5(slab)
+ raw: 0080000000000040 ffff888001e03400 0000000000000000 dead000000000001
+ raw: 0000000000000000 0000000000010001 00000000f5000000 0000000000000000
+ head: 0080000000000040 ffff888001e03400 0000000000000000 dead000000000001
+ head: 0000000000000000 0000000000010001 00000000f5000000 0000000000000000
+ head: 0080000000000003 ffffea0000266e01 00000000ffffffff 00000000ffffffff
+ head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+ page dumped because: kasan: bad access detected
+
+ Memory state around the buggy address:
+  ffff8880099b8080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8880099b8100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ >ffff8880099b8180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                             ^
+  ffff8880099b8200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8880099b8280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ==================================================================
+
+POC is available in the link [1].
+
+The problem triggering process is as follows:
+
+Process 1                       Process 2
+-----------------------------------------------------------------
+cifs_readdir
+  /* file->private_data == NULL */
+  initiate_cifs_search
+    cifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
+    smb2_query_dir_first ->query_dir_first()
+      SMB2_query_directory
+        SMB2_query_directory_init
+        cifs_send_recv
+        smb2_parse_query_directory
+          srch_inf->ntwrk_buf_start = (char *)rsp;
+          srch_inf->srch_entries_start = (char *)rsp + ...
+          srch_inf->last_entry = (char *)rsp + ...
+          srch_inf->smallBuf = true;
+  find_cifs_entry
+    /* if (cfile->srch_inf.ntwrk_buf_start) */
+    cifs_small_buf_release(cfile->srch_inf // free
+
+                        cifs_readdir  ->iterate_shared()
+                          /* file->private_data != NULL */
+                          find_cifs_entry
+                            /* in while (...) loop */
+                            smb2_query_dir_next  ->query_dir_next()
+                              SMB2_query_directory
+                                SMB2_query_directory_init
+                                cifs_send_recv
+                                  compound_send_recv
+                                    smb_send_rqst
+                                    __smb_send_rqst
+                                      rc = -ERESTARTSYS;
+                                      /* if (fatal_signal_pending()) */
+                                      goto out;
+                                      return rc
+                            /* if (cfile->srch_inf.last_entry) */
+                            cifs_save_resume_key()
+                              cifs_fill_dirent // UAF
+                            /* if (rc) */
+                            return -ENOENT;
+
+Fix this by ensuring the return code is checked before using pointers
+from the srch_inf.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220131 [1]
+Fixes: a364bc0b37f1 ("[CIFS] fix saving of resume key before CIFSFindNext")
+Cc: stable@vger.kernel.org
 Signed-off-by: Wang Zhaolong <wangzhaolong1@huawei.com>
 ---
- fs/smb/client/readdir.c | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/smb/client/readdir.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 67d7dd64b5e2..787d6bcb5d1d 100644
+index 50f96259d9ad..67d7dd64b5e2 100644
 --- a/fs/smb/client/readdir.c
 +++ b/fs/smb/client/readdir.c
-@@ -731,11 +731,14 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
- 				cifs_small_buf_release(cfile->srch_inf.
- 						ntwrk_buf_start);
- 			else
- 				cifs_buf_release(cfile->srch_inf.
- 						ntwrk_buf_start);
-+			/* Reset all pointers to the network buffer to prevent stale references */
- 			cfile->srch_inf.ntwrk_buf_start = NULL;
-+			cfile->srch_inf.srch_entries_start = NULL;
-+			cfile->srch_inf.last_entry = NULL;
- 		}
- 		rc = initiate_cifs_search(xid, file, full_path);
- 		if (rc) {
- 			cifs_dbg(FYI, "error %d reinitiating a search on rewind\n",
- 				 rc);
+@@ -754,15 +754,15 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+ 	       (rc == 0) && !cfile->srch_inf.endOfSearch) {
+ 		cifs_dbg(FYI, "calling findnext2\n");
+ 		rc = server->ops->query_dir_next(xid, tcon, &cfile->fid,
+ 						 search_flags,
+ 						 &cfile->srch_inf);
++		if (rc)
++			return -ENOENT;
+ 		/* FindFirst/Next set last_entry to NULL on malformed reply */
+ 		if (cfile->srch_inf.last_entry)
+ 			cifs_save_resume_key(cfile->srch_inf.last_entry, cfile);
+-		if (rc)
+-			return -ENOENT;
+ 	}
+ 	if (index_to_find < cfile->srch_inf.index_of_last_entry) {
+ 		/* we found the buffer that contains the entry */
+ 		/* scan and find it */
+ 		int i;
 -- 
 2.39.2
 
