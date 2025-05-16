@@ -1,140 +1,72 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1E91862A
-	for <linux-cifs@vger.kernel.org>; Thu, 15 May 2025 00:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DA21A83E5;
+	Fri, 16 May 2025 03:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747268902; cv=none; b=UTtOfpm1r+biKHfFkb90NL6EZ9cYUV9lvldmCpm29n04H6tjIiN72YLcsy3ewfacC3XIe8hlBVyeVlzIuiEetDF5jiRkICV6Irz094wOH6uolb8Kfooh5EXzKFaNOF3KvVZJTFIFQTH67K1K+WwfFgaQajIYhJGdGxBv1tHpqbM=
+	t=1747365571; cv=none; b=pKbamidFct7op1h5L2F209x/2YMLEe71osZUqG2nI+q5vxz5yLsXTPA4LcLEiyNBqYZJmMRav4sxZW7zphQojWAoAyP+R17C1YzB6cMAQNki508xdMTVhVJvvZKY5w9X8fdMsTNA+zowTZAO9U3NyjlKqv02Uc6f5hrkNQ1wGIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747268902; c=relaxed/simple;
-	bh=GPIiN8Z7eX+rJSl4PTdwxmBifh028wCDy+HrI2QR+cM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LpPMe5QE4TZjRh1zX9k3THdIQ7Gt8/RPd37vhCmd6pg1hb/BYU+WPGVFdLXQHf3E8ho+UVk4/spyxWoQACCuvt6PDi+nsxxKAAevCpEQuwIxs81OCXgNfEAG9oVfTkDWX39GB3tMemGAEOXdI23hU0ugci+aiV54bV0w0bPA9ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jASLV1dy; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jASLV1dy"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-550d7afa0c7so369409e87.1
-        for <linux-cifs@vger.kernel.org>; Wed, 14 May 2025 17:28:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747268899; x=1747873699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NjocJHYuW7JgE1msvkXieiusqzAbE/x8QvGg6n7sLKQ=;
-        b=jASLV1dy4yH32HiUj/Dm2oMctCZ9Z3muzXfD2A+YjXsNCIsQ2epEnSWKvryNhLqXzn
-         QbeuQ9bo5uZQ2RtjujpOWPNn/d6jjD9+STYC+TvWfUFypfMOdXj5AaSbHOOZY0xF3v0T
-         ZI13fQQROeYe2PwOnCeePzMQi0oC7OAfIi3qlqTLMKG+j6JuLKnltRvCmTR+mAsh6D/w
-         Gm/fVNK8gDF8I0nfTu9U+ETh+0SmocrLOFfiJnzWhFjTc+HXM4zZ2yJ2QK7Uht/t1QEI
-         zyE2Hfj6hZJD3y4p1xZW6mDxCNunNArgI7V+7ix4mJ8/nog8D+rc4oquhefD4y7tdUxz
-         /bjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747268899; x=1747873699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NjocJHYuW7JgE1msvkXieiusqzAbE/x8QvGg6n7sLKQ=;
-        b=dzH7KmcLKeBaW+j3Zp3DzoO39Clc/iBEbp670VTszZ+5oiylgrmA0+MoRSBUxixOVM
-         nnb5GCBUNsE0MQO/fWZMGbu8RPB3AfW1J8+WarT+k1i6fC+FfuPdlUSv1EadoHGqUMMy
-         IcZZRhpK7AA3CRJEXeAMmi5GPF4kEVxRZ5KzMU+GvU61QOI1ZCeFW5axFqXxmMUCaJOA
-         Kfvvq9U9Zr5VgTtHK6hJVtPrhS6GhLGWMLHXypMCWTNGG33jnjD4qJAVBJKIC+BUWnCt
-         zC4e9SZlnwdjA9TGwH3NYz9h7V3PXjK6xOB7XJJkl2bP3PgX96razr6/R7lp1rxWBJgC
-         RE2Q==
-X-Gm-Message-State: AOJu0Yw+VObhsXfctxZTgfhuJrlmqGVx9ud9RI5eJBFVhvydnPDCCRS3
-	k+7HTfIPQ3Ay4K/f+eb3uDsR5P7BBb/DYd6+Vrmqf+u8Il/4vX+oIiH0ELuzwVVP7NjoOrNeS+6
-	jGfnengCruPlKMYY0X5O89Qfh4I7d0g==
-X-Gm-Gg: ASbGncsna7oaekJGdIikSPo6scWmYdVKkD6ZecOkyZpwkgSUsssWSsUrMUiya7f43UO
-	84Ok4eLtkmi6iqbPRtMIpGNDIHbeXvk2+dsnbGqvdrYogzgZnYd+3onljp3tpc/yu5Xq+k68j6K
-	UrZyST3DZwrY/oA+zJQvlL+2MR90El8Djbsg10DC1LAqoKFcgSTJkZHXMAzKDgVn777bzXYRMjl
-	n2QgQ==
-X-Google-Smtp-Source: AGHT+IGg7a3d/DLGvAp7pjKEZeUGBHtwNXZOnwexxPknJpPdK7srbzQZ/Kf/YMWpcGx8Bds+pFlSR8qtVQyoG0lLkcY=
-X-Received: by 2002:a2e:bd87:0:b0:30d:e104:b795 with SMTP id
- 38308e7fff4ca-327ed210058mr21996481fa.39.1747268898636; Wed, 14 May 2025
- 17:28:18 -0700 (PDT)
+	s=arc-20240116; t=1747365571; c=relaxed/simple;
+	bh=S9hNRYZGBtGHnYh+1TJ2cA7pQVIF2TmPgmAfd2x3vSo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Iam8lScw/8U+/KrxRBg0nWG9s/MYgjCh/pRdNZR18B29bBfglb9lrJLBoAFLkwJ61BSNLPJxd0Bx/gNtT/k63eAUbzq/0ws89in8JiLsk+3zhGrXWRQ0ML3uTnI3ld3L+fdqHz/dX1ejCS63olycsERVFEoomJcVpYbL7vJ60ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZzBzH5ptwzQkRL;
+	Fri, 16 May 2025 11:15:23 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 466BE180B41;
+	Fri, 16 May 2025 11:19:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg500010.china.huawei.com
+ (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 16 May
+ 2025 11:19:24 +0800
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+To: <sfrench@samba.org>, <sfrench@us.ibm.com>
+CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<linux-kernel@vger.kernel.org>, <wangzhaolong1@huawei.com>,
+	<yi.zhang@huawei.com>, <yangerkun@huawei.com>, <chengzhihao1@huawei.com>
+Subject: [PATCH -next 0/2] smb: client: Fix use-after-free in readdir
+Date: Fri, 16 May 2025 11:19:21 +0800
+Message-ID: <20250516031923.159247-1-wangzhaolong1@huawei.com>
+X-Mailer: git-send-email 2.34.3
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515012323.28f38839@deetop.local.jro.nz>
-In-Reply-To: <20250515012323.28f38839@deetop.local.jro.nz>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 14 May 2025 19:28:07 -0500
-X-Gm-Features: AX0GCFvCTew1b_QU65zpD2OQQxe-n26ZeGtA9q3OtaXW9FwO-JKmt5o2cQL_iQc
-Message-ID: <CAH2r5mvsdGwF7XPb38dMSpK5NVApQL75wsOHyHAt_nS1MZwaEA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix memory leak during error handling for
- POSIX mkdir
-To: Jethro Donaldson <devel@jro.nz>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-Good catch. Merged into cifs-2.6.git for-next
+This patch series addresses a use-after-free vulnerability in the SMB/CIFS
+client readdir implementation that can be triggered during concurrent
+directory reads when a signal interrupts directory enumeration.
 
-On Wed, May 14, 2025 at 8:37=E2=80=AFAM Jethro Donaldson <devel@jro.nz> wro=
-te:
->
-> smb: client: fix memory leak during error handling for POSIX mkdir
->
-> The response buffer for the CREATE request handled by smb311_posix_mkdir(=
-)
-> is leaked on the error path (goto err_free_rsp_buf) because the structure
-> pointer *rsp passed to free_rsp_buf() is not assigned until *after* the
-> error condition is checked.
->
-> As *rsp is initialised to NULL, free_rsp_buf() becomes a no-op and the le=
-ak
-> is instead reported by __kmem_cache_shutdown() upon subsequent rmmod of
-> cifs.ko if (and only if) the error path has been hit.
->
-> Pass rsp_iov.iov_base to free_rsp_buf() instead, similar to the code in
-> other functions in smb2pdu.c for which *rsp is assigned late.
->
-> Signed-off-by: Jethro Donaldson <devel@jro.nz>
-> ---
->
-> Follow up on "smb: client: fix zero length for mkdir POSIX create context=
-"
->
-> Am tempted to change all the other calls to free_rsp_buf() in smb2pdu.c
-> to pass rsp_iov.iov_base, even though none of the other cases where *rsp =
-is
-> passed seem to exhibit the above problem. Reasoning:
->
->  a) more robust to re-ordering during future change,
->  b) easier to follow (acquire/release via same pointer), and
->  c) more consistent
->
-> If that sounds like a good idea, please advise if a separate patch is
-> preferred or a v2 of this one.
->
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index e7118501fdcc..ed3ffcb80aef 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -2967,7 +2967,7 @@ int smb311_posix_mkdir(const unsigned int xid, stru=
-ct inode *inode,
->         /* Eventually save off posix specific response info and timestamp=
-s */
->
->  err_free_rsp_buf:
-> -       free_rsp_buf(resp_buftype, rsp);
-> +       free_rsp_buf(resp_buftype, rsp_iov.iov_base);
->         kfree(pc_buf);
->  err_free_req:
->         cifs_small_buf_release(req);
->
->
-> base-commit: e2d3e1fdb530198317501eb7ded4f3a5fb6c881c
-> --
-> 2.49.0
->
+The root cause is in the operation sequence in find_cifs_entry():
+1. When query_dir_next() fails due to signal interruption (ERESTARTSYS)
+2. The code continues to access last_entry pointer before checking the return code
+3. This can access freed memory since the buffer may have been released
 
+The race condition can be triggered by processes accessing the same directory
+with concurrent readdir operations, especially when signals are involved.
 
---=20
-Thanks,
+The fix is straightforward:
+1. First patch ensures we check the return code before using any pointers
+2. Second patch improves defensiveness by resetting all related buffer pointers
+   when freeing the network buffer
 
-Steve
+Wang Zhaolong (2):
+  smb: client: Fix use-after-free in cifs_fill_dirent
+  cifs: Reset all search buffer pointers when releasing buffer
+
+ fs/smb/client/readdir.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+-- 
+2.34.3
+
