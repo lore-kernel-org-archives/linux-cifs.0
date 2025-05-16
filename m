@@ -1,155 +1,99 @@
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C3918DF6D
-	for <linux-cifs@vger.kernel.org>; Fri, 16 May 2025 15:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147CA227B9A;
+	Fri, 16 May 2025 23:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747408956; cv=none; b=FYxs1aHgBdwlUSNvvrUipsrsKw2Fho8yOeXfNK9lQ9+TF5wYxDcfJfvHI9IRN0r+j0B5c0ufj/fddQVtIy7F9zEoUA6bJMDXGfrVw7fgYgVZbB5JupT/hvcwd+CTFDabpJBJDVEjrRX4oRHwXIm8FZtqEgvL100SL6UWMJci7mY=
+	t=1747438955; cv=none; b=c0MNpUqugw+Dlv0r1IiFT2P5UOYi6AW9tFJED8cjNQLYh1IWnDwAeMSXXwiIykz92mrebEkFW3b4eKxGJgRyScB8qSUd7x2k9vuki+yXY/eHcRTvNeDC4kM0QPjZxM7rOJtdexvQH/G/WWYX3H+mKgc8j4Pz+cRAUthY+nYX7xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747408956; c=relaxed/simple;
-	bh=aADVUwF4leSkw560T6QGOFHoWPfxdIYw+hWriDneMO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fFNpYbSto0NE6Fgl3PN/1cBhD5M+KCH0KGQhPb5wSs9Fy7nvVBbFEFUqdtWUKBwYP6EmmoI/YTey3xKCNiUygaZaL7iS/e1HQ7K7Tybp6vIIFodhqk82ibAXtF/pYtbstCA4sgZSWXN84tXgepGlE7hk2x17AN/jMjUNQdADqR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from lenovo-93812.smb.basealt.ru (unknown [193.43.9.250])
-	(Authenticated sender: alekseevamo)
-	by air.basealt.ru (Postfix) with ESMTPSA id 3CDF22337B;
-	Fri, 16 May 2025 18:22:32 +0300 (MSK)
-From: Maria Alexeeva <alxvmr@altlinux.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	sfrench@samba.org,
-	pc@manguebit.com
-Cc: Maria Alexeeva <alxvmr@altlinux.org>,
-	Ivan Volchenko <ivolchenko86@gmail.com>
-Subject: [PATCH] fs/smb/client/fs_context: Add hostname option for CIFS module to work with domain-based dfs resources with Kerberos authentication
-Date: Fri, 16 May 2025 19:22:01 +0400
-Message-ID: <20250516152201.201385-1-alxvmr@altlinux.org>
-X-Mailer: git-send-email 2.42.2
+	s=arc-20240116; t=1747438955; c=relaxed/simple;
+	bh=enhUdYLZNGuxjvV2Ouo1ieQ/uQBsaB2W9PP8wdHqgjk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=en0etCTSbxETnkNxymUkH2O5csNbG48B8tpnKRISnDGVZhs31qQmpr4h1+F+7fyiLjrtzU9fIRMoGWVyOgKVzwXGuekUpZZbUT8VYG3S1tZtBfx3OATo81DdVAw37P3X7iwfH2Y+4cPAeBgx95e068FaIeJApsklPkJHBhr+HEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I6XuD7X5; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6XuD7X5"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-30bf7d0c15eso23730691fa.0;
+        Fri, 16 May 2025 16:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747438952; x=1748043752; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xLZr7VPDkLZEOG2In4Hkybds2QcDTETRuyHOMbZn0I0=;
+        b=I6XuD7X5LQTLk9YlaNyizK71YWGu58XD4lSgFcBSYNqnJ6y3xShemrqn4ZHTwR4IYm
+         eAx4GOseKWVlPsAZB98CWvJyWnOxgkKY/9IFOhuJH/9FP5hQPsQ8nra7EI4quY13qaHW
+         j2+eFXeEFNdUpHEs1lQlfzewe497kc/LwcydcWcgjDAt/c1mUPj+y3ZY2JoyYQi2hjcM
+         7KrO8RowU8XcXf8bsk0By71E7s5d2vZi+4yH13m8c88rXqfQF+E7L6IGUeqR2GXsAfWF
+         X2TFG548qpBwqSAPAQS7JUh77gQ4LVUOaBcGtCz1i9JHpl53E8N8xvDXlKhiTdln+9Bw
+         mUmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747438952; x=1748043752;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xLZr7VPDkLZEOG2In4Hkybds2QcDTETRuyHOMbZn0I0=;
+        b=cdIdGZ+P9Qncp5ikjTce+BU49dOi3dei6sONQ344PGnRhDSxd9A5VuGiIn+ciTFzFO
+         oeRh4SvnyGNmE3PIxy0dTXpGJ8vrsdaZEb3X0VcOYuJ2eyxwXOVMpVFWlvcudYWbTOKW
+         JsD5N7MTDsllzDwm9NrwLtb+q47RqjlvPgaGNMCZDIzrUt6Oy9nmywSVkQZNviTyC+p1
+         WsKe08ux0txWXHtehNvCTMrZ/NF6x1OdFTIgpq6fS9zK2VmdjxiIl/oqcq4HsU9tYRYW
+         5yTK6EysDWMFei8PDhYTMF86i9PsjyUfLKGboHz6w9hhCxnyXw8OmdJ1Ev1sTbnw7yYL
+         hOFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXA599CjJ8sd2NfWOcVo+eCjyZFqHTKRrJyboVc70pGlBHbVCp8k9WT1vmE3a5vVU2myyH919DwOw8qsS8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEEEJkDGtBKpuUpTSFOqZOnzng1ZTiyxzq5LGUTQFqwbQW8SBT
+	LPlJFRLCuooGOGaO8yL+tB5I8dDcLcapPhcULYpHDC+r1ILiEXt0UO1kRpW25Qs4Clg3oxR8rag
+	BRiWtr6FWExR+7bcGqVPCGxFJLOJfilghbu3f
+X-Gm-Gg: ASbGncsIF5PrJZx29E3pibjdDNHLfw5fEdUISx6/f+6LzpzmedvBOCMVBzu4XF66K+K
+	EROgtepHeimKwKaVPvNQZGfoDgFtCzHEzVvpwdlDE2Tw9jdnHYmDioeGoNOpJqjjwdFrblMCEhC
+	M4mSmsjijRFD/HCtqWzhRGJPtDuTbQ453FyPd3eFje2bT6S5OouCc33vDzJ04awM4=
+X-Google-Smtp-Source: AGHT+IHWA0Q42Yme9yar+nJKETqGN6P6XPgO5dgbsqiCW7CZnmvrdQJh1/OATeYw3Dk1Wp5wXUDmiePYru76htQVZGc=
+X-Received: by 2002:a2e:8a88:0:b0:30c:b2c:edb6 with SMTP id
+ 38308e7fff4ca-328096cee8amr12394851fa.18.1747438951796; Fri, 16 May 2025
+ 16:42:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 16 May 2025 18:42:19 -0500
+X-Gm-Features: AX0GCFvohLs-QQrzZlsilxheGT-EDcZhxA3HzyLs6TaG3uT-eoyVlqE2sQ2H3bo
+Message-ID: <CAH2r5mu7-vNnVE+1fdESnV4kJ-sr3gV4YnAQJ==BuXve2QOjpQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Paths to domain-based dfs resources are defined using the domain name
-of the server in the format:
-\\DOMAIN.NAME>\<dfsroot>\<path>
+Please pull the following changes since commit
+82f2b0b97b36ee3fcddf0f0780a9a0825d52fec3:
 
-The CIFS module, when requesting a TGS, uses the server name
-(<DOMAIN.NAME>) it obtained from the UNC for the initial connection.
-It then composes an SPN that does not match any entities
-in the domain because it is the domain name itself.
+  Linux 6.15-rc6 (2025-05-11 14:54:11 -0700)
 
-To eliminate this behavior, a hostname option is added, which is
-the name of the server to connect to and is used in composing the SPN.
-In the future this option will be used in the cifs-utils development.
+are available in the Git repository at:
 
-Suggested-by: Ivan Volchenko <ivolchenko86@gmail.com>
-Signed-off-by: Maria Alexeeva <alxvmr@altlinux.org>
----
- fs/smb/client/fs_context.c | 35 +++++++++++++++++++++++++++++------
- fs/smb/client/fs_context.h |  3 +++
- 2 files changed, 32 insertions(+), 6 deletions(-)
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc6-smb3-client-fixes
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index a634a34d4086..74de0a9de664 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -177,6 +177,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_string("password2", Opt_pass2),
- 	fsparam_string("ip", Opt_ip),
- 	fsparam_string("addr", Opt_ip),
-+	fsparam_string("hostname", Opt_hostname),
- 	fsparam_string("domain", Opt_domain),
- 	fsparam_string("dom", Opt_domain),
- 	fsparam_string("srcaddr", Opt_srcaddr),
-@@ -825,16 +826,23 @@ static int smb3_fs_context_validate(struct fs_context *fc)
- 		return -ENOENT;
- 	}
- 
-+	if (ctx->got_opt_hostname) {
-+		kfree(ctx->server_hostname);
-+		ctx->server_hostname = ctx->opt_hostname;
-+		pr_notice("changing server hostname to name provided in hostname= option\n");
-+	}
-+
- 	if (!ctx->got_ip) {
- 		int len;
--		const char *slash;
- 
--		/* No ip= option specified? Try to get it from UNC */
--		/* Use the address part of the UNC. */
--		slash = strchr(&ctx->UNC[2], '\\');
--		len = slash - &ctx->UNC[2];
-+		/*
-+		 * No ip= option specified? Try to get it from server_hostname
-+		 * Use the address part of the UNC parsed into server_hostname
-+		 * or hostname= option if specified.
-+		 */
-+		len = strlen(ctx->server_hostname);
- 		if (!cifs_convert_address((struct sockaddr *)&ctx->dstaddr,
--					  &ctx->UNC[2], len)) {
-+					  ctx->server_hostname, len)) {
- 			pr_err("Unable to determine destination address\n");
- 			return -EHOSTUNREACH;
- 		}
-@@ -1518,6 +1526,21 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		}
- 		ctx->got_ip = true;
- 		break;
-+	case Opt_hostname:
-+		if (strnlen(param->string, CIFS_NI_MAXHOST) == CIFS_NI_MAXHOST) {
-+			pr_warn("host name too long\n");
-+			goto cifs_parse_mount_err;
-+		}
-+
-+		kfree(ctx->opt_hostname);
-+		ctx->opt_hostname = kstrdup(param->string, GFP_KERNEL);
-+		if (ctx->opt_hostname == NULL) {
-+			cifs_errorf(fc, "OOM when copying hostname string\n");
-+			goto cifs_parse_mount_err;
-+		}
-+		cifs_dbg(FYI, "Host name set\n");
-+		ctx->got_opt_hostname = true;
-+		break;
- 	case Opt_domain:
- 		if (strnlen(param->string, CIFS_MAX_DOMAINNAME_LEN)
- 				== CIFS_MAX_DOMAINNAME_LEN) {
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 9e83302ce4b8..cf0478b1eff9 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -184,6 +184,7 @@ enum cifs_param {
- 	Opt_pass,
- 	Opt_pass2,
- 	Opt_ip,
-+	Opt_hostname,
- 	Opt_domain,
- 	Opt_srcaddr,
- 	Opt_iocharset,
-@@ -214,6 +215,7 @@ struct smb3_fs_context {
- 	bool gid_specified;
- 	bool sloppy;
- 	bool got_ip;
-+	bool got_opt_hostname;
- 	bool got_version;
- 	bool got_rsize;
- 	bool got_wsize;
-@@ -226,6 +228,7 @@ struct smb3_fs_context {
- 	char *domainname;
- 	char *source;
- 	char *server_hostname;
-+	char *opt_hostname;
- 	char *UNC;
- 	char *nodename;
- 	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
+for you to fetch changes up to 3965c23773e81c476f6de30ccc5d201c59ff9714:
 
-base-commit: bec6f00f120ea68ba584def5b7416287e7dd29a7
+  smb: client: fix zero rsize error messages (2025-05-14 19:26:38 -0500)
+
+----------------------------------------------------------------
+Two smb3 client fixes
+- Fix memory leak in mkdir error path
+- Fix max rsize miscalculation after channel reconnect
+----------------------------------------------------------------
+Jethro Donaldson (1):
+      smb: client: fix memory leak during error handling for POSIX mkdir
+
+Paulo Alcantara (1):
+      smb: client: fix zero rsize error messages
+
+ fs/smb/client/file.c    | 6 ++++--
+ fs/smb/client/smb2pdu.c | 2 +-
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
 -- 
-2.42.2
+Thanks,
 
+Steve
