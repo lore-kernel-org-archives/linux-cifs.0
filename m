@@ -1,214 +1,128 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B281224223;
-	Fri, 16 May 2025 09:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2511018C008
+	for <linux-cifs@vger.kernel.org>; Fri, 16 May 2025 11:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747387311; cv=none; b=gby3ztSmThh666DM3n8j00pB6Tec5N5n1u5y4nfFA4UgN627TMYdYXnUfip6JPN4ImSxorJfmmjOrSrCeYw1Ou8GuE0VktCcXuC9oyMO5S05Kwktl5hBrSGTUlxjh0nA0NkIBDMB+W03yUjx4/RCfPl1eRBOVO1Thh08SYc8FfM=
+	t=1747393594; cv=none; b=dfeMkq+vTTDJUawI5cnD+JoNcNUOQS4v5c+cYemaY14LNUpmkI86AAjBO0PK5LGlP2joVxaUmBgQDNaa6g2Aw1am6dDvnQeWpbO8JZRLMfXxephRnNFPfD860xf54WAesXmneN5COHsGtkjGBOoUYqd7oMpbj0M4t3JIsE/ydxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747387311; c=relaxed/simple;
-	bh=L5pns+qjxW3rb1Y1Qik/3PrX4MA7QxkBTHiPuYtGRQM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZpzoWuiFv1yoPvh5FYCNmhPKMwmITT6+xwFC0UR7ufb9MOYApc6O+ujEQrpQUdChVUEV1qTzhtiofPBoSnpWeKjQwng6O7M37le72UtsyeC9yL/bBzVRCeDApAI/kTfFzMJ2iT52qkjwYrHbWJS3YsGVWqp6uQHrVAtYlKIXTQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZzM4J2LGZz1d186;
-	Fri, 16 May 2025 17:20:16 +0800 (CST)
-Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id EEBD51800B3;
-	Fri, 16 May 2025 17:21:44 +0800 (CST)
-Received: from huawei.com (10.175.104.67) by kwepemg500010.china.huawei.com
- (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 16 May
- 2025 17:21:44 +0800
-From: Wang Zhaolong <wangzhaolong1@huawei.com>
-To: <sfrench@samba.org>, <sfrench@us.ibm.com>
-CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-	<linux-kernel@vger.kernel.org>, <chengzhihao1@huawei.com>,
-	<wangzhaolong1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
-Subject: [PATCH V2 1/2] smb: client: Fix use-after-free in cifs_fill_dirent
-Date: Fri, 16 May 2025 17:12:55 +0800
-Message-ID: <20250516091256.2756826-2-wangzhaolong1@huawei.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
-References: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
+	s=arc-20240116; t=1747393594; c=relaxed/simple;
+	bh=+1XivsRl1JIa6M/n8N42RYkLJ2q7E1T28ByAMCmtGoY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mMNZR/ZlC1Cvvdqc8Mw+IXoQYqYsKpfNKmnaBXJytXAIXFy5D7PXzS1v3nbcG2lJC7LVGwiQBMVzGvoIL/EZM/iOFbQ2IIrlIdrwF0lKo0yd6XzbQxbIf2Nnb1Dj0yfHFGDGLNH8MgbidVOrfAWmYxKR19p75/N+p93lodIPGMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HulBzA0h; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HulBzA0h"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ad5273c1fd7so238489766b.1
+        for <linux-cifs@vger.kernel.org>; Fri, 16 May 2025 04:06:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747393591; x=1747998391; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GAPtVMIAwfK1eyG3xhj0bht/aC4rQhuyI/jhs1Ah5IE=;
+        b=HulBzA0hupS3GnskllygjyolHRRTp4zS2WE+p26runmnI09FjsJBVjoo6Yw3rAhuRS
+         kqJzytuWz0HIH+CWv8g5OIKDIueGwfrntFziMPRxKyyd/onHUjtsm/D7TTGBTlEdyuaI
+         oT7jcbikwvqJTlCwsjPG+jzOIrUwETSuT6spEbcir/GqyrdK/ysz97DdNdLw5qEflXBi
+         mgB0bUoJ88l3ZB5q8ADuN29KJAdVjzKGkIVTyGGw4PTWKYbFJa8Aadh0lwtgxL95i9Yg
+         DEdA31hQQmHRrH/s/1zP4zbv9uSPjuSovUEU2vONtAdhuHxIYKIANiW6293aI3vEKN5H
+         ooJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747393591; x=1747998391;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GAPtVMIAwfK1eyG3xhj0bht/aC4rQhuyI/jhs1Ah5IE=;
+        b=Vzu5vdTExPcDQ/tRlRclG5DhrSUyttDmXxP29xg3rmHgiDlr44GoqlqkPqiXxVDFIc
+         JVmfrlrnIWHTan1aEqijMFcPYrU5Qhu5PtR5g1SAABOQVZWMyBp+YGIO6lHbfGrSKu1J
+         B+bd92+bumzT0Mg/opMACYbSoACtTfCmeu2A6Ff27KK5pq36pWB12qYS54kOd91z4Ds6
+         ctR0Q0aB9oSDOgK2k84z6zuo5AMyymeLtX8ReSKkuAhN69QqkdeuJqjrqv0MijSZhHdC
+         Lihnfh65P+Ut+JW4PdrFxQb/cPkJUQhCAeReJTkQ34m6izFZQO4Svfc7LYfVZ/7nCn4q
+         7o+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUS2hTef4X7b9iaHZOAKWe2vQQ3Z7CTUCjwPrynYgKIsSj7WjWBN/0iiWQI+Ftjwm6Ai3q7slf/DBHv@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOvRI9VqIS+YxsfHKXxy6lK8Wj9XfzBeMm3dKH4mqJDX9qmbCg
+	u8fnBEmNlDiTyH+u9KdJI6QMuMZm/ihnKzg4HdPV60oMlzoNeshpXbj7NmOcpSpau5Tj/eF9fII
+	4fDI/s+K9LTKwj25B1cQEGzJa9ujX1JjAZg==
+X-Gm-Gg: ASbGncuhupHoC7qrt6iaAyCG+EjLnP9wQeBMRBPIF83YYeZLIfnFaxk+8uCfbC+52zQ
+	w/656qasgblyb+TzHX+Iu3ct+Z5aqDu94MfE0W5mBsIpip2weooMF7AdHaarPPN9vHg79E0nh4E
+	gTdh1cTk7V5NikE0VN0U+d9u3Z8QQ9Qxhmb001Qk1najOnYS4h9+vNOB51TwBebeU=
+X-Google-Smtp-Source: AGHT+IFSg9m/F1vGldbeuEbpAbKoJ96zw3KuTeoohiai93JcaoirljSf8Up6uW3E9goGwL3G9dpew3j6TBGst6/CcgI=
+X-Received: by 2002:a17:906:6a09:b0:ad4:d00f:b4ca with SMTP id
+ a640c23a62f3a-ad536fee29dmr153572966b.50.1747393591167; Fri, 16 May 2025
+ 04:06:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemg500010.china.huawei.com (7.202.181.71)
+References: <aBjK1G1igZ0UWaRk@stanley.mountain>
+In-Reply-To: <aBjK1G1igZ0UWaRk@stanley.mountain>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Fri, 16 May 2025 16:36:19 +0530
+X-Gm-Features: AX0GCFvpdtSAhss7Qg0z-2SSCv0vyForORdXLtmUFWIaxiSF5eOnTitEwOjyaZw
+Message-ID: <CANT5p=qEc3wcuzXTRbDogA=j0Tpe6NHhigVpY-nuWUVJXwMc4g@mail.gmail.com>
+Subject: Re: [bug report] cifs: serialize initialization and cleanup of cfid
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is a race condition in the readdir concurrency process, which may
-access the rsp buffer after it has been released, triggering the
-following KASAN warning.
+On Mon, May 5, 2025 at 7:57=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
+org> wrote:
+>
+> Hello Shyam Prasad N,
+>
+> Commit 62adfb82c199 ("cifs: serialize initialization and cleanup of
+> cfid") from Apr 29, 2025 (linux-next), leads to the following Smatch
+> static checker warning:
+>
+>         fs/smb/client/cached_dir.c:492 drop_cached_dir_by_name()
+>         warn: sleeping in atomic context
+>
+> fs/smb/client/cached_dir.c
+>     476 void drop_cached_dir_by_name(const unsigned int xid, struct cifs_=
+tcon *tcon,
+>     477                              const char *name, struct cifs_sb_inf=
+o *cifs_sb)
+>     478 {
+>     479         struct cached_fid *cfid =3D NULL;
+>     480         int rc;
+>     481
+>     482         rc =3D open_cached_dir(xid, tcon, name, cifs_sb, true, &c=
+fid);
+>     483         if (rc) {
+>     484                 cifs_dbg(FYI, "no cached dir found for rmdir(%s)\=
+n", name);
+>     485                 return;
+>     486         }
+>     487         spin_lock(&cfid->fid_lock);
+>                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>     488         if (cfid->has_lease) {
+>     489                 /* mark as invalid */
+>     490                 cfid->has_lease =3D false;
+>     491                 kref_put(&cfid->refcount, smb2_close_cached_fid);
+>                                                   ^^^^^^^^^^^^^^^^^^^^^^
+> The patch adds mutex but the issue is that drop_cached_dir_by_name()
+> is holding a spinlock and we can't take a mutex if we're already holding
+> a spinlock.
+>
+> --> 492         }
+>     493         spin_unlock(&cfid->fid_lock);
+>     494         close_cached_dir(cfid);
+>     495 }
+>
+> regards,
+> dan carpenter
+>
 
- ==================================================================
- BUG: KASAN: slab-use-after-free in cifs_fill_dirent+0xb03/0xb60 [cifs]
- Read of size 4 at addr ffff8880099b819c by task a.out/342975
+Hi Dan,
 
- CPU: 2 UID: 0 PID: 342975 Comm: a.out Not tainted 6.15.0-rc6+ #240 PREEMPT(full)
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.1-2.fc37 04/01/2014
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x53/0x70
-  print_report+0xce/0x640
-  kasan_report+0xb8/0xf0
-  cifs_fill_dirent+0xb03/0xb60 [cifs]
-  cifs_readdir+0x12cb/0x3190 [cifs]
-  iterate_dir+0x1a1/0x520
-  __x64_sys_getdents+0x134/0x220
-  do_syscall_64+0x4b/0x110
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
- RIP: 0033:0x7f996f64b9f9
- Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89
- f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01
- f0 ff ff  0d f7 c3 0c 00 f7 d8 64 89 8
- RSP: 002b:00007f996f53de78 EFLAGS: 00000207 ORIG_RAX: 000000000000004e
- RAX: ffffffffffffffda RBX: 00007f996f53ecdc RCX: 00007f996f64b9f9
- RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
- RBP: 00007f996f53dea0 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000000 R11: 0000000000000207 R12: ffffffffffffff88
- R13: 0000000000000000 R14: 00007ffc8cd9a500 R15: 00007f996f51e000
-  </TASK>
+Good catches. I'll fix them both.
 
- Allocated by task 408:
-  kasan_save_stack+0x20/0x40
-  kasan_save_track+0x14/0x30
-  __kasan_slab_alloc+0x6e/0x70
-  kmem_cache_alloc_noprof+0x117/0x3d0
-  mempool_alloc_noprof+0xf2/0x2c0
-  cifs_buf_get+0x36/0x80 [cifs]
-  allocate_buffers+0x1d2/0x330 [cifs]
-  cifs_demultiplex_thread+0x22b/0x2690 [cifs]
-  kthread+0x394/0x720
-  ret_from_fork+0x34/0x70
-  ret_from_fork_asm+0x1a/0x30
-
- Freed by task 342979:
-  kasan_save_stack+0x20/0x40
-  kasan_save_track+0x14/0x30
-  kasan_save_free_info+0x3b/0x60
-  __kasan_slab_free+0x37/0x50
-  kmem_cache_free+0x2b8/0x500
-  cifs_buf_release+0x3c/0x70 [cifs]
-  cifs_readdir+0x1c97/0x3190 [cifs]
-  iterate_dir+0x1a1/0x520
-  __x64_sys_getdents64+0x134/0x220
-  do_syscall_64+0x4b/0x110
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
- The buggy address belongs to the object at ffff8880099b8000
-  which belongs to the cache cifs_request of size 16588
- The buggy address is located 412 bytes inside of
-  freed 16588-byte region [ffff8880099b8000, ffff8880099bc0cc)
-
- The buggy address belongs to the physical page:
- page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x99b8
- head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
- anon flags: 0x80000000000040(head|node=0|zone=1)
- page_type: f5(slab)
- raw: 0080000000000040 ffff888001e03400 0000000000000000 dead000000000001
- raw: 0000000000000000 0000000000010001 00000000f5000000 0000000000000000
- head: 0080000000000040 ffff888001e03400 0000000000000000 dead000000000001
- head: 0000000000000000 0000000000010001 00000000f5000000 0000000000000000
- head: 0080000000000003 ffffea0000266e01 00000000ffffffff 00000000ffffffff
- head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
- page dumped because: kasan: bad access detected
-
- Memory state around the buggy address:
-  ffff8880099b8080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8880099b8100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- >ffff8880099b8180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                             ^
-  ffff8880099b8200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8880099b8280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ==================================================================
-
-POC is available in the link [1].
-
-The problem triggering process is as follows:
-
-Process 1                       Process 2
------------------------------------------------------------------
-cifs_readdir
-  /* file->private_data == NULL */
-  initiate_cifs_search
-    cifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
-    smb2_query_dir_first ->query_dir_first()
-      SMB2_query_directory
-        SMB2_query_directory_init
-        cifs_send_recv
-        smb2_parse_query_directory
-          srch_inf->ntwrk_buf_start = (char *)rsp;
-          srch_inf->srch_entries_start = (char *)rsp + ...
-          srch_inf->last_entry = (char *)rsp + ...
-          srch_inf->smallBuf = true;
-  find_cifs_entry
-    /* if (cfile->srch_inf.ntwrk_buf_start) */
-    cifs_small_buf_release(cfile->srch_inf // free
-
-                        cifs_readdir  ->iterate_shared()
-                          /* file->private_data != NULL */
-                          find_cifs_entry
-                            /* in while (...) loop */
-                            smb2_query_dir_next  ->query_dir_next()
-                              SMB2_query_directory
-                                SMB2_query_directory_init
-                                cifs_send_recv
-                                  compound_send_recv
-                                    smb_send_rqst
-                                    __smb_send_rqst
-                                      rc = -ERESTARTSYS;
-                                      /* if (fatal_signal_pending()) */
-                                      goto out;
-                                      return rc
-                            /* if (cfile->srch_inf.last_entry) */
-                            cifs_save_resume_key()
-                              cifs_fill_dirent // UAF
-                            /* if (rc) */
-                            return -ENOENT;
-
-Fix this by ensuring the return code is checked before using pointers
-from the srch_inf.
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=220131 [1]
-Fixes: a364bc0b37f1 ("[CIFS] fix saving of resume key before CIFSFindNext")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wang Zhaolong <wangzhaolong1@huawei.com>
----
- fs/smb/client/readdir.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 50f96259d9ad..67d7dd64b5e2 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -754,15 +754,15 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
- 	       (rc == 0) && !cfile->srch_inf.endOfSearch) {
- 		cifs_dbg(FYI, "calling findnext2\n");
- 		rc = server->ops->query_dir_next(xid, tcon, &cfile->fid,
- 						 search_flags,
- 						 &cfile->srch_inf);
-+		if (rc)
-+			return -ENOENT;
- 		/* FindFirst/Next set last_entry to NULL on malformed reply */
- 		if (cfile->srch_inf.last_entry)
- 			cifs_save_resume_key(cfile->srch_inf.last_entry, cfile);
--		if (rc)
--			return -ENOENT;
- 	}
- 	if (index_to_find < cfile->srch_inf.index_of_last_entry) {
- 		/* we found the buffer that contains the entry */
- 		/* scan and find it */
- 		int i;
--- 
-2.39.2
-
+--=20
+Regards,
+Shyam
