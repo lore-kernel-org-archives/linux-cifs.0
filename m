@@ -1,128 +1,79 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2511018C008
-	for <linux-cifs@vger.kernel.org>; Fri, 16 May 2025 11:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF3D72601;
+	Fri, 16 May 2025 13:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747393594; cv=none; b=dfeMkq+vTTDJUawI5cnD+JoNcNUOQS4v5c+cYemaY14LNUpmkI86AAjBO0PK5LGlP2joVxaUmBgQDNaa6g2Aw1am6dDvnQeWpbO8JZRLMfXxephRnNFPfD860xf54WAesXmneN5COHsGtkjGBOoUYqd7oMpbj0M4t3JIsE/ydxc=
+	t=1747403415; cv=none; b=sYNI/5Qjw62UeyYGbdXLXYccEs1nhV+JJCK8CKGSOcy63uIqd4BEe8Q+lV5ee7NSFc6Zk+w8GCX/MZpswaULIKyRNVd8ySym50c74LwRjqkOBvVxXqPS6RRP7sDuIyfP38EQ32ZdSF5ZfZy8KAjwQOw7DCvzaS6mT3jWhWnRyWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747393594; c=relaxed/simple;
-	bh=+1XivsRl1JIa6M/n8N42RYkLJ2q7E1T28ByAMCmtGoY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mMNZR/ZlC1Cvvdqc8Mw+IXoQYqYsKpfNKmnaBXJytXAIXFy5D7PXzS1v3nbcG2lJC7LVGwiQBMVzGvoIL/EZM/iOFbQ2IIrlIdrwF0lKo0yd6XzbQxbIf2Nnb1Dj0yfHFGDGLNH8MgbidVOrfAWmYxKR19p75/N+p93lodIPGMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HulBzA0h; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1747403415; c=relaxed/simple;
+	bh=EHqziaXxgZ35+O1nOFw6ZeKiJTPk/sgxKRz+uIqS31k=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=LV9hUeyeWzfEpWcGn3lORnyHCpBSGhWsolg/2LeGcx93/m3OyyoqygpSD/s1pCpe/M3FSfEYepQ73aHDYSEMrpKROgCoY56W8HeDJaLZBF7jHfx5om/KQP1yHFUjLJ48iJArVYrCBp9Y794WNuD+OhtOyJBIkIW+M2aR6K/ntjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=j41yxktd; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HulBzA0h"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ad5273c1fd7so238489766b.1
-        for <linux-cifs@vger.kernel.org>; Fri, 16 May 2025 04:06:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747393591; x=1747998391; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GAPtVMIAwfK1eyG3xhj0bht/aC4rQhuyI/jhs1Ah5IE=;
-        b=HulBzA0hupS3GnskllygjyolHRRTp4zS2WE+p26runmnI09FjsJBVjoo6Yw3rAhuRS
-         kqJzytuWz0HIH+CWv8g5OIKDIueGwfrntFziMPRxKyyd/onHUjtsm/D7TTGBTlEdyuaI
-         oT7jcbikwvqJTlCwsjPG+jzOIrUwETSuT6spEbcir/GqyrdK/ysz97DdNdLw5qEflXBi
-         mgB0bUoJ88l3ZB5q8ADuN29KJAdVjzKGkIVTyGGw4PTWKYbFJa8Aadh0lwtgxL95i9Yg
-         DEdA31hQQmHRrH/s/1zP4zbv9uSPjuSovUEU2vONtAdhuHxIYKIANiW6293aI3vEKN5H
-         ooJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747393591; x=1747998391;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GAPtVMIAwfK1eyG3xhj0bht/aC4rQhuyI/jhs1Ah5IE=;
-        b=Vzu5vdTExPcDQ/tRlRclG5DhrSUyttDmXxP29xg3rmHgiDlr44GoqlqkPqiXxVDFIc
-         JVmfrlrnIWHTan1aEqijMFcPYrU5Qhu5PtR5g1SAABOQVZWMyBp+YGIO6lHbfGrSKu1J
-         B+bd92+bumzT0Mg/opMACYbSoACtTfCmeu2A6Ff27KK5pq36pWB12qYS54kOd91z4Ds6
-         ctR0Q0aB9oSDOgK2k84z6zuo5AMyymeLtX8ReSKkuAhN69QqkdeuJqjrqv0MijSZhHdC
-         Lihnfh65P+Ut+JW4PdrFxQb/cPkJUQhCAeReJTkQ34m6izFZQO4Svfc7LYfVZ/7nCn4q
-         7o+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUS2hTef4X7b9iaHZOAKWe2vQQ3Z7CTUCjwPrynYgKIsSj7WjWBN/0iiWQI+Ftjwm6Ai3q7slf/DBHv@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOvRI9VqIS+YxsfHKXxy6lK8Wj9XfzBeMm3dKH4mqJDX9qmbCg
-	u8fnBEmNlDiTyH+u9KdJI6QMuMZm/ihnKzg4HdPV60oMlzoNeshpXbj7NmOcpSpau5Tj/eF9fII
-	4fDI/s+K9LTKwj25B1cQEGzJa9ujX1JjAZg==
-X-Gm-Gg: ASbGncuhupHoC7qrt6iaAyCG+EjLnP9wQeBMRBPIF83YYeZLIfnFaxk+8uCfbC+52zQ
-	w/656qasgblyb+TzHX+Iu3ct+Z5aqDu94MfE0W5mBsIpip2weooMF7AdHaarPPN9vHg79E0nh4E
-	gTdh1cTk7V5NikE0VN0U+d9u3Z8QQ9Qxhmb001Qk1najOnYS4h9+vNOB51TwBebeU=
-X-Google-Smtp-Source: AGHT+IFSg9m/F1vGldbeuEbpAbKoJ96zw3KuTeoohiai93JcaoirljSf8Up6uW3E9goGwL3G9dpew3j6TBGst6/CcgI=
-X-Received: by 2002:a17:906:6a09:b0:ad4:d00f:b4ca with SMTP id
- a640c23a62f3a-ad536fee29dmr153572966b.50.1747393591167; Fri, 16 May 2025
- 04:06:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="j41yxktd"
+Message-ID: <860a4f7600814b17e48dbabe1ae19f68@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1747403405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmzWBrBQb2s1Dtr15zDCHkAoFy2O5uJ5sgPONiWBjy8=;
+	b=j41yxktdbr+Dm7gUXSMeKrfnhWxRgh/SeO1Y/ee64tjOHEYFeZNONI1qllTLKU7j88OV52
+	TT2XZ3jem65KVGA9dZXCU6yxl6SZf8AdyKoedDIEZSWTwmtnxwMBx/zxMrifb9hwKti6e7
+	/S18liezDjx/MXxaAzvP5bpDqiqDmtcv+2rUdKJqohWzQ4i4fAo71f5kRE2fw3W5ezt5w4
+	ZglMenOH+DMzm388dIwvseQH45mtuGWmtBt+LLcCoqJULCeAvlYVbPnBBtVuf216Mrxrz7
+	2RlxeH2vjXFCWL6Czr8/jnT8m0T10UkXShHN9bfnsGOHU6BFNh1q5mgi9o3Rnw==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Wang Zhaolong <wangzhaolong1@huawei.com>, sfrench@samba.org,
+ sfrench@us.ibm.com
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, chengzhihao1@huawei.com,
+ wangzhaolong1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH V2 0/2] smb: client: Fix use-after-free in readdir
+In-Reply-To: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
+References: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
+Date: Fri, 16 May 2025 10:49:59 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aBjK1G1igZ0UWaRk@stanley.mountain>
-In-Reply-To: <aBjK1G1igZ0UWaRk@stanley.mountain>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 16 May 2025 16:36:19 +0530
-X-Gm-Features: AX0GCFvpdtSAhss7Qg0z-2SSCv0vyForORdXLtmUFWIaxiSF5eOnTitEwOjyaZw
-Message-ID: <CANT5p=qEc3wcuzXTRbDogA=j0Tpe6NHhigVpY-nuWUVJXwMc4g@mail.gmail.com>
-Subject: Re: [bug report] cifs: serialize initialization and cleanup of cfid
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Shyam Prasad N <sprasad@microsoft.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, May 5, 2025 at 7:57=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
-org> wrote:
->
-> Hello Shyam Prasad N,
->
-> Commit 62adfb82c199 ("cifs: serialize initialization and cleanup of
-> cfid") from Apr 29, 2025 (linux-next), leads to the following Smatch
-> static checker warning:
->
->         fs/smb/client/cached_dir.c:492 drop_cached_dir_by_name()
->         warn: sleeping in atomic context
->
-> fs/smb/client/cached_dir.c
->     476 void drop_cached_dir_by_name(const unsigned int xid, struct cifs_=
-tcon *tcon,
->     477                              const char *name, struct cifs_sb_inf=
-o *cifs_sb)
->     478 {
->     479         struct cached_fid *cfid =3D NULL;
->     480         int rc;
->     481
->     482         rc =3D open_cached_dir(xid, tcon, name, cifs_sb, true, &c=
-fid);
->     483         if (rc) {
->     484                 cifs_dbg(FYI, "no cached dir found for rmdir(%s)\=
-n", name);
->     485                 return;
->     486         }
->     487         spin_lock(&cfid->fid_lock);
->                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
->     488         if (cfid->has_lease) {
->     489                 /* mark as invalid */
->     490                 cfid->has_lease =3D false;
->     491                 kref_put(&cfid->refcount, smb2_close_cached_fid);
->                                                   ^^^^^^^^^^^^^^^^^^^^^^
-> The patch adds mutex but the issue is that drop_cached_dir_by_name()
-> is holding a spinlock and we can't take a mutex if we're already holding
-> a spinlock.
->
-> --> 492         }
->     493         spin_unlock(&cfid->fid_lock);
->     494         close_cached_dir(cfid);
->     495 }
->
-> regards,
-> dan carpenter
->
+Wang Zhaolong <wangzhaolong1@huawei.com> writes:
 
-Hi Dan,
+> V2:
+>   - Correct spelling mistakes in the commit message, such as 'lopp' -> 'loop'.
+>   - The titles of patches follow the same style.
+>
+> This patch series addresses a use-after-free vulnerability in the SMB/CIFS
+> client readdir implementation that can be triggered during concurrent
+> directory reads when a signal interrupts directory enumeration.
+>
+> The root cause is in the operation sequence in find_cifs_entry():
+> 1. When query_dir_next() fails due to signal interruption (ERESTARTSYS)
+> 2. The code continues to access last_entry pointer before checking the return code
+> 3. This can access freed memory since the buffer may have been released
+>
+> The race condition can be triggered by processes accessing the same directory
+> with concurrent readdir operations, especially when signals are involved.
+>
+> The fix is straightforward:
+> 1. First patch ensures we check the return code before using any pointers
+> 2. Second patch improves defensiveness by resetting all related buffer pointers
+>    when freeing the network buffer
+>
+> Wang Zhaolong (2):
+>   smb: client: Fix use-after-free in cifs_fill_dirent
+>   smb: client: Reset all search buffer pointers when releasing buffer
+>
+>  fs/smb/client/readdir.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-Good catches. I'll fix them both.
-
---=20
-Regards,
-Shyam
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
