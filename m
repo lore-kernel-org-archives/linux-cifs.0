@@ -1,31 +1,31 @@
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14B77D098;
-	Thu, 22 May 2025 12:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C40212E7E;
+	Thu, 22 May 2025 14:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747918391; cv=none; b=fEhB2sRDl8Zy2i7Yv1W//j84YMWatDNr20M+fhXuTozd2CbYRBnWVOWLbPCidQ1AzxBz3KJ2TtTYchYvTNry5eYqJJaTCijscp3jDQtgP4icpPZDKJ8n9z5IzXTTCFIQit5cWRYMW1dJj6qDMCtqyV42HzAiX8MVBbLiRMCgYX0=
+	t=1747922456; cv=none; b=Ra1Y2w8v8JktEHF7c5VK+8yLAOGVvucLkVF2bzjj8A0yCSEwk1ANygL0Swlw45xZ9VVNcQZmkEezomcJ0U431MEAjtum9LUNmTTVYS5PeHPm63+k9IS7wMdm1YcOKlHjJfi42j1JMNLSb6i0tQxs2BfQVoSeZ/+Mr3r7AQSbdJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747918391; c=relaxed/simple;
-	bh=v0j7BCEBYHwYpjXQ14egKJnzntDYAwSddW3wCQPWE7k=;
+	s=arc-20240116; t=1747922456; c=relaxed/simple;
+	bh=t0lrShx3zKX4kXA3C07PviiBVqkICTFgt/ZHOrPCMoY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=peN+W0zdSJuT941fIPIBurFTli80AbKynvTcsTFNPF53EBmAvfpBNdkGdsLMYZAPAWmYWifSeGEUcyi6NGAQ8uHY6mOPZed9bu5afiQ8TUAY1qTmTOHwbVXjrqMYfvw304tualU5B8gs6phdtt/WwqKJyIlRWkuI6PcjCU2Eovo=
+	 In-Reply-To:Content-Type; b=GUstEm6JEyxXrLyM5AxkYHyydtED/ORaLduNZVJJJriPPg78YGs4b5OGKDebhraXnzufViRy5ua0WjkcJXwtBfW0nvE+jY/0faaetd/4V9UgjnEZFbFd1vvUyDkljt4UIC/LC3Fa4my1aa7nPxAquZV8Fk6TI2kSHIFHAu0BsGo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4b37V33sZwz1jBXD;
-	Thu, 22 May 2025 20:52:11 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4b38yg3ZhTz1R7yQ;
+	Thu, 22 May 2025 21:58:35 +0800 (CST)
 Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id DC8B3140109;
-	Thu, 22 May 2025 20:53:04 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3B0621A016C;
+	Thu, 22 May 2025 22:00:48 +0800 (CST)
 Received: from [10.174.178.209] (10.174.178.209) by
  kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 22 May 2025 20:53:04 +0800
-Message-ID: <353dfc63-2495-4874-a19f-ee124e075888@huawei.com>
-Date: Thu, 22 May 2025 20:53:03 +0800
+ 15.2.1544.11; Thu, 22 May 2025 22:00:47 +0800
+Message-ID: <f03b6422-eac8-4998-b516-a3ba34070f0d@huawei.com>
+Date: Thu, 22 May 2025 22:00:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,7 +48,7 @@ From: Wang Zhaolong <wangzhaolong1@huawei.com>
 In-Reply-To: <CAH2r5mvoS8Py_M95+i0hB2iP06Uqz5JQbb13schBfdmJ6NzL3g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemg500010.china.huawei.com (7.202.181.71)
 
 
@@ -56,11 +56,6 @@ X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
 
 
 > I was able to reproduce it by running the reproducer poc much longer
-
-
-I was able to reproduce the issue described in the patch within 1-3 minutes by
-running POC on a virtual machine with 4 CPU cores, under the CONFIG_KASAN=y.
-
 > 
 > [189335.643181] Key type cifs.idmap unregistered
 > [189335.643203] Key type cifs.spnego unregistered
@@ -77,76 +72,97 @@ running POC on a virtual machine with 4 CPU cores, under the CONFIG_KASAN=y.
 > fp=0x0000000090941d36
 > flags=0x17ffffc0000240(workingset|head|node=0|zone=2|lastcpupid=0x1fffff)
 > [189335.656334] ------------[ cut here ]------------
-> [189335.656335] WARNING: CPU: 1 PID: 84118 at mm/slub.c:1135
-> __slab_err+0x1d/0x30
-> ....
-> [189335.656512]  [last unloaded: cifs(OE)]
-> [189335.656516] CPU: 1 UID: 0 PID: 84118 Comm: rmmod Tainted: G    B
-> W  OE       6.15.0-061500rc4-generic #202504272253 PREEMPT(voluntary)
-> [189335.656520] Tainted: [B]=BAD_PAGE, [W]=WARN, [O]=OOT_MODULE,
-> [E]=UNSIGNED_MODULE
-> [189335.656521] Hardware name: LENOVO 20MAS08500/20MAS08500, BIOS
-> N2CET70W (1.53 ) 03/11/2024
-> [189335.656522] RIP: 0010:__slab_err+0x1d/0x30
-> [189335.656525] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44
-> 00 00 55 48 89 e5 e8 72 ff ff ff be 01 00 00 00 bf 05 00 00 00 e8 33
-> b2 1c 00 <0f> 0b 5d 31 f6 31 ff c3 cc cc cc cc 0f 1f 80 00 00 00 00 90
-> 90 90
-> [189335.656527] RSP: 0018:ffffcf3041b33a18 EFLAGS: 00010046
-> [189335.656529] RAX: 0000000000000000 RBX: ffffcf3041b33a60 RCX:
-> 0000000000000000
-> [189335.656530] RDX: 0000000000000000 RSI: 0000000000000000 RDI:
-> 0000000000000000
-> [189335.656531] RBP: ffffcf3041b33a18 R08: 0000000000000000 R09:
-> 0000000000000000
-> [189335.656533] R10: 0000000000000000 R11: 0000000000000000 R12:
-> ffff8c1b49eb7600
-> [189335.656534] R13: ffff8c1b4ccd9580 R14: dead000000000122 R15:
-> ffff8c1b4ccd9580
-> [189335.656535] FS:  00007d912677e080(0000) GS:ffff8c2312b1b000(0000)
-> knlGS:0000000000000000
-> [189335.656537] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [189335.656538] CR2: 000061c8bedf4778 CR3: 00000003f2b4a001 CR4:
-> 00000000003726f0
-> [189335.656540] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-> 0000000000000000
-> [189335.656541] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-> 0000000000000400
-> [189335.656542] Call Trace:
-> [189335.656543]  <TASK>
-> [189335.656546]  free_partial.cold+0x137/0x191
-> [189335.656550]  __kmem_cache_shutdown+0x46/0xa0
-> [189335.656553]  kmem_cache_destroy+0x3e/0x1c0
-> [189335.656558]  cifs_destroy_request_bufs+0x5c/0x70 [cifs]
-> [189335.656618]  exit_cifs+0x3a/0xef0 [cifs]
-> [189335.656666]  __do_sys_delete_module.isra.0+0x19d/0x2e0
-> [189335.656671]  __x64_sys_delete_module+0x12/0x20
-> [189335.656674]  x64_sys_call+0x1765/0x2320
-> [189335.656677]  do_syscall_64+0x7e/0x210
-> [189335.656679]  ? __fput+0x1a2/0x2d0
-> [189335.656681]  ? kmem_cache_free+0x408/0x470
-> [189335.656684]  ? __fput+0x1a2/0x2d0
-> [189335.656686]  ? arch_exit_to_user_mode_prepare.isra.0+0x22/0xd0
-> [189335.656689]  ? syscall_exit_to_user_mode+0x38/0x1d0
-> [189335.656692]  ? do_syscall_64+0x8a/0x210
-> [189335.656695]  ? do_read_fault+0xfb/0x230
-> [189335.656698]  ? do_fault+0x15d/0x220
-> [189335.656699]  ? handle_pte_fault+0x140/0x210
-> [189335.656702]  ? __handle_mm_fault+0x3cd/0x790
-> [189335.656705]  ? __count_memcg_events+0xd3/0x1a0
-> [189335.656708]  ? count_memcg_events.constprop.0+0x2a/0x50
-> [189335.656710]  ? handle_mm_fault+0x1ca/0x2e0
-> [189335.656713]  ? do_user_addr_fault+0x2f8/0x830
-> [189335.656716]  ? arch_exit_to_user_mode_prepare.isra.0+0x22/0xd0
-> [189335.656719]  ? irqentry_exit_to_user_mode+0x2d/0x1d0
-> [189335.656722]  ? irqentry_exit+0x43/0x50
-> [189335.656724]  ? exc_page_fault+0x96/0x1e0
-> [189335.656727]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [189335.656729] RIP: 0033:0x7d9125f2ac9b
 
-This call trace seems to look like a memory leak or a reference
-counting management issue. Can it still be reproduced even after my
-patch is applied?
+After disabling KASAN, I encountered two memory leak issues after
+running the POC for half-hour:
+
+Phenomenon 1:
+
+[ 2175.037198] ------------[ cut here ]------------
+[ 2175.038447] WARNING: CPU: 2 PID: 425 at fs/smb/client/smb2ops.c:104 smb2_add_credits+0x2ac/0x6c0 [cifs]
+[ 2175.041927] Modules linked in: cifs cifs_arc4 nls_ucs2_utils cifs_md4
+[ 2175.043736] CPU: 2 UID: 0 PID: 425 Comm: cifsd Not tainted 6.15.0-rc6+ #241 PREEMPT(full)
+[ 2175.046082] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.1-2.fc37 04/01/2014
+[ 2175.048680] RIP: 0010:smb2_add_credits+0x2ac/0x6c0 [cifs]
+[ 2175.050432] Code: ff ff 4c 89 e7 e8 d4 8e ff ff 41 89 c5 e9 99 fe ff ff c7
+43 08 02 00 00 00 45 8b 8c 24 d8 01 00 00 45 85 c9 0f 85 48 fe ff ff <0f> 0b 80 3d
+41 6a eb ff 00 0f 84 dc 03 00 00 0f 1f 44 00 00 f
+[ 2175.054563] RSP: 0018:ffffa9a94043fca8 EFLAGS: 00010246
+[ 2175.055716] RAX: 0000000000001ffe RBX: ffffa9a94043fcf0 RCX: 0000000000000000
+[ 2175.057236] RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff90b807432a34
+[ 2175.058760] RBP: 0000000000000000 R08: ffff90b80ce60188 R09: 0000000000000000
+[ 2175.060268] R10: 0000000000000000 R11: 0000000000000001 R12: ffff90b807432800
+[ 2175.061730] R13: 0000000000000000 R14: 0000000000000001 R15: ffff90b8074329d0
+[ 2175.063210] FS:  0000000000000000(0000) GS:ffff90b8a9e84000(0000) knlGS:0000000000000000
+[ 2175.064422] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2175.065455] CR2: 00005643543896f8 CR3: 000000000192c000 CR4: 00000000000006f0
+[ 2175.066519] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 2175.067561] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 2175.068658] Call Trace:
+[ 2175.069068]  <TASK>
+[ 2175.069402]  cifs_compound_callback+0x77/0xb0 [cifs]
+[ 2175.070214]  cifs_cancelled_callback+0x12/0x40 [cifs]
+[ 2175.071058]  clean_demultiplex_info+0x206/0x420 [cifs]
+[ 2175.071935]  cifs_demultiplex_thread+0x1a6/0xcb0 [cifs]
+[ 2175.072815]  ? dl_server_update_idle_time+0x60/0xa0
+[ 2175.073579]  ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+[ 2175.074550]  kthread+0x10d/0x200
+[ 2175.075051]  ? __pfx_kthread+0x10/0x10
+[ 2175.075631]  ret_from_fork+0x34/0x50
+[ 2175.076197]  ? __pfx_kthread+0x10/0x10
+[ 2175.076683]  ret_from_fork_asm+0x1a/0x30
+[ 2175.077143]  </TASK>
+[ 2175.077398] ---[ end trace 0000000000000000 ]---
+[ 2175.077919] CIFS: rreq R=00000000[0] Zero in_flight
+[ 2175.285771] ------------[ cut here ]------------
+
+
+Phenomenon 2
+
+[ 2175.287049] kmem_cache_destroy cifs_request: Slab cache still has objects when called from exit_cifs+0x43/0x560 [cifs]
+[ 2175.287205] WARNING: CPU: 0 PID: 3207738 at mm/slab_common.c:525 kmem_cache_destroy+0xfd/0x160
+[ 2175.292071] Modules linked in: cifs(-) cifs_arc4 nls_ucs2_utils cifs_md4
+[ 2175.293796] CPU: 0 UID: 0 PID: 3207738 Comm: modprobe Tainted: G        W           6.15.0-rc6+ #241 PREEMPT(full)
+[ 2175.296519] Tainted: [W]=WARN
+[ 2175.297339] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.1-2.fc37 04/01/2014
+[ 2175.299559] RIP: 0010:kmem_cache_destroy+0xfd/0x160
+[ 2175.300836] Code: de 5b e9 86 bf 05 00 e8 b1 db e4 ff eb b2 48 8b 53 60 48 8b
+4c 24 08 48 c7 c6 a0 be a2 93 48 c7 c7 10 2e fb 93 e8 a3 9d da ff <0f> 0b 48 8b 53 68
+48 8b 43 70 48 c7 c7 80 8a 37 94 48 89 42 8
+[ 2175.304313] RSP: 0018:ffffa9a94328beb8 EFLAGS: 00010286
+[ 2175.305261] RAX: 0000000000000000 RBX: ffff90b801c63a00 RCX: 0000000000000000
+[ 2175.306544] RDX: 0000000000000002 RSI: 0000000000000001 RDI: 00000000ffffffff
+[ 2175.307815] RBP: 0000000000000800 R08: 0000000000004ffb R09: 00000000ffffefff
+[ 2175.309077] R10: 00000000ffffefff R11: ffffffff94265060 R12: 0000000000000000
+[ 2175.310353] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+[ 2175.311632] FS:  00007fa76803b440(0000) GS:ffff90b8a9d84000(0000) knlGS:0000000000000000
+[ 2175.313063] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2175.314098] CR2: 0000560b6ad2e850 CR3: 000000000deac000 CR4: 00000000000006f0
+[ 2175.315221] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 2175.316137] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 2175.317091] Call Trace:
+[ 2175.317433]  <TASK>
+[ 2175.317734]  exit_cifs+0x43/0x560 [cifs]
+[ 2175.318316]  __x64_sys_delete_module+0x1ad/0x2a0
+[ 2175.318958]  ? fpregs_assert_state_consistent+0x25/0x50
+[ 2175.319656]  do_syscall_64+0x4b/0x110
+[ 2175.320184]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 2175.320856] RIP: 0033:0x7fa767927977
+[ 2175.321359] Code: 73 01 c3 48 8b 0d a9 94 0c 00 f7 d8 64 89 01 48 83 c8 ff c3
+66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff
+ff 73 01 c3 48 8b 0d 79 94 0c 00 f7 d8 64 89 8
+[ 2175.323766] RSP: 002b:00007ffd9f24c6f8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+[ 2175.324766] RAX: ffffffffffffffda RBX: 000056460f617e30 RCX: 00007fa767927977
+[ 2175.325721] RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000056460f617e98
+[ 2175.326580] RBP: 0000000000000000 R08: 1999999999999999 R09: 0000000000000000
+[ 2175.327329] R10: 00007fa767999ac0 R11: 0000000000000206 R12: 0000000000000000
+[ 2175.328086] R13: 0000000000000000 R14: 00007ffd9f24c730 R15: 00007ffd9f24dbe8
+[ 2175.328832]  </TASK>
+[ 2175.329090] ---[ end trace 0000000000000000 ]---
+
+
+These should be new issues. I'll get to the bottom of them as soon as I can.
 
 Best regards,
 Wang Zhaolong
+
