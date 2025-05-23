@@ -1,63 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556CB1DF975;
-	Thu, 22 May 2025 19:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D62DCBE7;
+	Fri, 23 May 2025 02:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747943005; cv=none; b=FMrffTY9Km0G/wyMjUKtaqdU93II17fGrLv4UOg4I9X+XdbV8zFq/OI58Y22ELBczbNNDjLmo3PvTuSSHG6hhybB8vSPlhFzhZy4/tVOlCtlorJI+SSchNanV4yE0zA/vfKbzB1vl+HUB9Eop11DOglJOFKYtvBvjK4hmE45CH8=
+	t=1747967616; cv=none; b=WirXCYkeZ9OislhcyYDx3C/7v03pQ5KoqRbJ7qgSJPJbWHZvBmXJnaKfO+ROi9xnqvHRvH6HYdd9aRZ49wlbQzAJQTScQijeqg1fOJxt50IzwioDO1lPVC0wI0fcwKA2C2B4DNCWe3K7lSQFjmzMrPn7eyHrhii0H11I7rFr1+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747943005; c=relaxed/simple;
-	bh=8IudL4hGWVD1khQJexukEFpHMqBqEpJK/Eq4PRG3uwY=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=F7p5B3Ki/WmhfWp8/SOnmd/bPTwGEruFPMm1Sjf92w/0rZmzUqvIMgJi3fHnbtfyFgXJ9YGmsPuB3bCRpfzK5xcLzQ9csBd0Az+XOLkxly6/BaA9RdfbtWnSfZsGaWmlEsJqumAmY2m07UPM2EQUdLNSDSQnIG1rE1zzit3iXkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d2a9WfJf; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d2a9WfJf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9076C4CEE4;
-	Thu, 22 May 2025 19:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747943004;
-	bh=8IudL4hGWVD1khQJexukEFpHMqBqEpJK/Eq4PRG3uwY=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=d2a9WfJf2ZWsS2PqINJYELgFqrAphx+/uxoNUyzxqotVu4ANdk/1lj7D6WOxzk7b9
-	 Dezqh6A/kd+HqGv8M38tjnS5YF2Cp/YmRp9MGZxp0K9Vn9NxVOrzwt8egXaGhHFiF6
-	 GjIv4V43jg5Xdu8ubhIwHa6cWuSszZfCwKmVR4Mj5rDdCrA2jlxdkHJQLPt4zCsHKI
-	 WxwJdpyCMqxaHuJawrD9HCtqyRpRnlArpD8J+9xU32rGpbt+14ElnlxuB4JXFR1j5r
-	 /1Yy0VJGkfkbwC6pYoNx8zG2y7qGF2bRJVJRZgr4CphcejStsV1sCz1a8e7EC8RGzG
-	 5GNDVWRoN8Umg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 779403805D89;
-	Thu, 22 May 2025 19:44:01 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvC+E8L719+MGf1C+mj0One1kn=VZbSAiF2mGCqgPvqYQ@mail.gmail.com>
-References: <CAH2r5mvC+E8L719+MGf1C+mj0One1kn=VZbSAiF2mGCqgPvqYQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvC+E8L719+MGf1C+mj0One1kn=VZbSAiF2mGCqgPvqYQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc8-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e48f9d849bfdec276eebf782a84fd4dfbe1c14c0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e85dea591fbf900330c796579314bfb7cc399d31
-Message-Id: <174794304025.2998623.6831008393741467322.pr-tracker-bot@kernel.org>
-Date: Thu, 22 May 2025 19:44:00 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	s=arc-20240116; t=1747967616; c=relaxed/simple;
+	bh=ZW12LtuT98vxP6z4Rf5zqaKgoIbXQUaaks0B5W9ntG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IQ/DcxUWqiaqLAb9iTxHRPz2zPBdF85slwhX9FnkTXZ4S7naNMLkEpl3II+PUHIUtMXNaM2oEtorRWBm2R7HSnGMamomxVDzUyWaEx0K5XdOyFSNIYvXKWA7vevSpJV6zmfguPFG6Fa2eXOP66hUJQGiWt27FVQqIP4kgIatKK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4b3Thg3gjDz1f1pl;
+	Fri, 23 May 2025 10:32:35 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id B6C38180044;
+	Fri, 23 May 2025 10:33:30 +0800 (CST)
+Received: from [10.174.178.209] (10.174.178.209) by
+ kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 23 May 2025 10:33:30 +0800
+Message-ID: <3c49876d-e4ae-4f70-9944-86de1c8ce035@huawei.com>
+Date: Fri, 23 May 2025 10:33:29 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/2] smb: client: Fix use-after-free in readdir
+To: Steve French <smfrench@gmail.com>
+CC: Paulo Alcantara <pc@manguebit.com>, <linux-cifs@vger.kernel.org>,
+	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
+	<chengzhihao1@huawei.com>, <yi.zhang@huawei.com>, <yangerkun@huawei.com>
+References: <20250516091256.2756826-1-wangzhaolong1@huawei.com>
+ <860a4f7600814b17e48dbabe1ae19f68@manguebit.com>
+ <CAH2r5mvo1e3034LpCWUAuE0=dDBb7R0bMCmt80dGRWKMegRV+Q@mail.gmail.com>
+ <c1e693c6-573f-49d4-b6cf-cc308c339f06@huawei.com>
+ <CAH2r5mvoS8Py_M95+i0hB2iP06Uqz5JQbb13schBfdmJ6NzL3g@mail.gmail.com>
+ <f03b6422-eac8-4998-b516-a3ba34070f0d@huawei.com>
+ <CAH2r5msPC3fE1tjkw_GA+sT-AMLmKM=R6BGLnt2pccjGXQHk6w@mail.gmail.com>
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+In-Reply-To: <CAH2r5msPC3fE1tjkw_GA+sT-AMLmKM=R6BGLnt2pccjGXQHk6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-The pull request you sent on Thu, 22 May 2025 13:42:47 -0500:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.15-rc8-smb3-client-fixes
+> Since your patches both clearly fix problems, and look
+> non-controversial (and reviewed by multiple people).  I plan to send
+> them upstream today, let me know if any objections.
+> 
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e85dea591fbf900330c796579314bfb7cc399d31
+Thank you for your confirmation and for sending the patches upstream.
 
-Thank you!
+Much appreciated!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Best regards,
+Wang Zhaolong
