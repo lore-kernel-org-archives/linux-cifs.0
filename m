@@ -1,89 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88592143748;
-	Fri, 23 May 2025 08:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF40128819;
+	Fri, 23 May 2025 15:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747989330; cv=none; b=ECG2GLzMGIYgI/0R4y4ASJo0c46ZY/d7NvsYRcQMVG8CjXlwG9vGqPWQKtQ7cPEVQe6q3zQ4nftoTyIa98jQuqOy5uiNlm6GtuiizoKmqpzDNaEOGOYdoiDp/t+yOJR1hld7UGsx65KOHPXEcTvM46DPhC+HZ+/MYJqTYNHfAB4=
+	t=1748013849; cv=none; b=EGGGTMk0vjp+Az++GrkypqRTNf0oyOstSJOW6vu9BHFGgJBaAAVAMwulGGCPIAOUvyNbZ0gYtKtCmwJT+W7S8x2zSG5SwjRT/QLUE4norySQvyFJT6xTRbeB4Fhj9gl2eu7H7D1QL9S10dTOiv8S78N4Exbzuda64nkOUhFD3Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747989330; c=relaxed/simple;
-	bh=aaYZ1roJQALwLOCDStlA1iSIFgYsVkGtdj7Sg7WhRg0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LNGbd0sJe6Jxm+7jeyQKc9YFcrztnYLp6BSPsAa3SQoAoVahZMdVJxPYlovXfs19iB8PrlkAsTT+LARL93sAV1k7Slr9s7J6d/3TnmL+SXup25Ssaz1SwB3ZJ8E6b99cKcfVi+WuuT7J8HTLmevBpEji4lbquH480xzPCBjIJsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcRl5Kfk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748013849; c=relaxed/simple;
+	bh=aybk4ZTu2CHB13ywbeiIrf4tZ1CKFZ8NXxl51xMTjls=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=sXyLJ4DE2ZIfgc7TdbQvxOUKmbBCpAf8PEr36BsMzzHgXX1UTqvGlitCCCrtwMbntoGiPYPErk5KSPFpmuKAhca3eCMtfa7QnvSAKhHLn5Dm5bpnZsJDlUqFvAG2ARksVvT8NYhdXuFneydz14/p/KQ4VTSHjD/ngVVVaG0J708=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cd72XMMS; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcRl5Kfk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2820AC4CEE9;
-	Fri, 23 May 2025 08:35:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747989330;
-	bh=aaYZ1roJQALwLOCDStlA1iSIFgYsVkGtdj7Sg7WhRg0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XcRl5Kfk0LErS6d8DWAJDv0260N7QeO09U2nEFy+/POSGuCKNcjXuTRL0y6iQAms+
-	 gufkd6wsGs2pwGAfTTTeqykAQJSG3C9QMqDlczk12XUK8b+gnUv39dzAs+z+h0L9KU
-	 dFmNH9hN4SUxUnrSmfRCxsKQPdLr6cCcoy656aBC1W/wE/N9u+bAtp071aSh5VFXrz
-	 WJtXbFOeZWq0QZdlLbFa8iWq98vVMUNbRD5mf5u12jUsRXe1g45rdOeEwXKTllwLpA
-	 3PSQLEBw3ZwbknFRHyf2d/jwQlcLoLv/+KHFE3+7KsGGW2+zCXKKLsn6xXRMvWEl13
-	 YalaMnrvpCNlg==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Steve French <sfrench@samba.org>,
-	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
-	netfs@lists.linux.dev,
-	v9fs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfs: Fix undifferentiation of DIO reads from unbuffered reads
-Date: Fri, 23 May 2025 10:35:21 +0200
-Message-ID: <20250523-audienz-brotkrumen-039bac60ea9c@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <3444961.1747987072@warthog.procyon.org.uk>
-References: <3444961.1747987072@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cd72XMMS"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-3292aad800aso723571fa.0;
+        Fri, 23 May 2025 08:24:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748013845; x=1748618645; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8JJ66wIohXcLESISEjoolqhH9fgMI2jr1X4zSiAvmzM=;
+        b=Cd72XMMSnFdLLw1fNwrwxcFclsNl+gR2C8jt2qQ+Kp/E5dq7emsMTZc5VHLeN3DDhl
+         CUIfpLweGiBkFO6AMHMfpXuIwbF7FF/lIZiRhNlLX/LS5xbE9XPMYyFI3wCcscNSmNW6
+         VpdT4xNSsUzniEC8JBUNF9s+9Lxy6i9+c79I0oenavHTyTlApIBnghOkyQKQ2VonjVdk
+         18MYYE+a0e3nwd0QEQDaL31btQ2y5ShIPAYV0ttR7cgUIK8+8+QLPw5puDpmwOY6VMPd
+         HdaMydFNR4VtV8Kb11uIZLxpPIGl/ctABFjsz9Jcje+lQFdAMYy70+5FFu1yC9Ixrp6j
+         RLUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748013845; x=1748618645;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8JJ66wIohXcLESISEjoolqhH9fgMI2jr1X4zSiAvmzM=;
+        b=BqpZlHI3pUp+yQ1sRegPEVM9kkaSIssOD5pmXzVKPjFJeOHVNNesDqv7nqyMdC4oC7
+         vui0gJDhKjgcDtZv39MEDrgJcrAU+eoTk9mYn2qmzK8ksfxvJDTucpkJIR/kId8Us+kd
+         WwULFvpAg7Bv4mhiHF0unJvCMQKyPi4s+vHAmyed7DiJ8txNDzETmHwvebWTRiccPWo3
+         GHMfzD+20VQoXWEY9cSbP/QHdmSymZjNXTPRG4cRa30M4c51DxG5aimRVPOWmWMPCU/C
+         ONKilEUfJUPAjh1vkGygGABc5o1yuJvvYcS7vslrK6HBUj2KpN5m2+rb0K86DqWhxKvP
+         SgpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtLSfJ6XunYAGk8FkMsNaAUbt4k26COICK+2+IE0528GybEBJIzY6GakBUm1uV0908gnzf1KqDZmtOIsyG@vger.kernel.org, AJvYcCX8KUU0IfMLGMJ79LVJ4E6ho93vNSu05Zmn5hYExAB9lf53AjcXgxQqKKqakx/yeSn1bydJgqRW2bNB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRFxiOq3p1+wIhZoBgrAwOvtNKSwbDe1BXmHH+DBJz0Cc6lq5V
+	GYdk/Hcq2hVOKNeD8cH8XLpZBGqZK7hJVsZTw3tIp/BGDFx3VfYgojiByg2H8lDbcJEK62/oO7X
+	Xh1vxv2OAAmk5GEY/F/1X1OqrTXeDk+A=
+X-Gm-Gg: ASbGncvvIZ0TSpLeg8oqd8dNBzofLhxoi6ju18giD3m/7QkOQi8tQNBdOlOFXcEBtg4
+	SI50YTz9tB3Kj0gKTt0YdQL/UIgLfTwZolRHirDKqidgxzTwKpueNLBrrb6UCuvSVy6PuhtcYZa
+	s1EzIV1QQlbnwUmDgooRJb9VpPz4nLMvRR0uvj/eMNcnmgkLVBtRtDRjW3Icy3QTZAWnA=
+X-Google-Smtp-Source: AGHT+IFETx+XnLeGryEGTIHXcggMM1QEBwgHv5SM/hnhJunXtePjyQxDPwfMdeHdcHcjhcz5S7e6OaLvxNXG6RLZ0VM=
+X-Received: by 2002:a05:651c:2223:b0:329:c65:eae8 with SMTP id
+ 38308e7fff4ca-3294f7a3566mr13460661fa.13.1748013844987; Fri, 23 May 2025
+ 08:24:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1377; i=brauner@kernel.org; h=from:subject:message-id; bh=aaYZ1roJQALwLOCDStlA1iSIFgYsVkGtdj7Sg7WhRg0=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQYGHu/SDHY357Z8Vnt0kvnnd5Pl3f7Mby3s230lQmyW iYw5/2CjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIks38vwT0H9fHuqkaemTEaT jfn5xW8rPt7zu6F+QEBTKqFnj+vLKQz/C9Xiw1OmmKf0fDXx/Lpto3rrw5Pspt38p9YeZml/+/0 cNwA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 23 May 2025 10:23:53 -0500
+X-Gm-Features: AX0GCFtaqsBKPBeQ98kMeSxLBW6aT3ewKIPavkorTrFRFRzJ12ngoqnSfHwIlOk
+Message-ID: <CAH2r5mud60X1UsmL0OiF6OQhA-wW8WzfP7SyOZBmDEG-hfD4QQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 23 May 2025 08:57:52 +0100, David Howells wrote:
-> On cifs, "DIO reads" (specified by O_DIRECT) need to be differentiated from
-> "unbuffered reads" (specified by cache=none in the mount parameters).  The
-> difference is flagged in the protocol and the server may behave
-> differently: Windows Server will, for example, mandate that DIO reads are
-> block aligned.
-> 
-> Fix this by adding a NETFS_UNBUFFERED_READ to differentiate this from
-> NETFS_DIO_READ, parallelling the write differentiation that already exists.
-> cifs will then do the right thing.
-> 
-> [...]
+Please pull the following changes since commit
+a5806cd506af5a7c19bcd596e4708b5c464bfd21:
 
-Applied to the vfs-6.16.netfs branch of the vfs/vfs.git tree.
-Patches in the vfs-6.16.netfs branch should appear in linux-next soon.
+  Linux 6.15-rc7 (2025-05-18 13:57:29 -0700)
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+are available in the Git repository at:
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+  git://git.samba.org/ksmbd.git tags/v6.15-rc8-ksmbd-server-fixes
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
+for you to fetch changes up to 10379171f346e6f61d30d9949500a8de4336444a:
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.16.netfs
+  ksmbd: use list_first_entry_or_null for opinfo_get_list()
+(2025-05-21 22:30:39 -0500)
 
-[1/1] netfs: Fix undifferentiation of DIO reads from unbuffered reads
-      https://git.kernel.org/vfs/vfs/c/db26d62d79e4
+----------------------------------------------------------------
+3 ksmbd SMB3 server fixes
+- Fix for rename regression due to the recent VFS lookup changes
+- Fix write failure
+- locking fix for oplock handling
+----------------------------------------------------------------
+Namjae Jeon (3):
+      ksmbd: fix stream write failure
+      ksmbd: fix rename failure
+      ksmbd: use list_first_entry_or_null for opinfo_get_list()
+
+ fs/smb/server/oplock.c |  7 ++-----
+ fs/smb/server/vfs.c    | 16 +++++++---------
+ 2 files changed, 9 insertions(+), 14 deletions(-)
+
+-- 
+Thanks,
+
+Steve
