@@ -1,63 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BECF2063F0;
-	Fri, 23 May 2025 16:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C38238F91
+	for <linux-cifs@vger.kernel.org>; Sat, 24 May 2025 21:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748019060; cv=none; b=EJoMqTL4cFaH25bwXAEvYYCGJrtTVkLsl5HjJz2HN7b/nxdoP5K7BMuiOVtHdNaIvg+At1O5u5csRdpAV5x6ULutbtRERQEuzwmzIgQkRNh1FwUeW0YHCO/oieRMEyqiSQMnX/VQE913GgGCjAY75D/enYKZps+Lqq/A0NDE/oY=
+	t=1748123833; cv=none; b=TVjLdTP35Bb0dTNcRS30SofVSlphBCxEtfywpO4tggd8hsxXfRofEmkvwGPn93kDf2z7haTKni8bsl9cmIu7ueRIAhKe1adcQ8qdIQ0n/EChH8YxSMM/TBTQjfWNMT1GG5cThL+wbFgjbsox850WQn8Ba91Lk+m167GtXM6UQqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748019060; c=relaxed/simple;
-	bh=6CiA/dI+9hc98ym5mhyRTZeJoWyaHXWJHbSan/vnN30=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OeRHKcUMDQRtgaUvRxyGaSCSoBKPSeqH9ZPBBsWsFVJXkzPfVzXZcK+La326MWxqiQKVFpAL+7yOPLCtXlWMmpi0PjZ/mYJExsn+pUEAOhAzxg+zdGfpvmkzW4wLYteHyg/PHffExkfMCIDJhQn8m6wptYwhhlGpQMI08JqoAGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mkzqvywf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748123833; c=relaxed/simple;
+	bh=6S8HVkDy/Hy48JZuWKtuz+8N7CCZW20ipKfyu7IUO9w=;
+	h=Message-Id:Subject:From:To:Date:Content-Type:MIME-Version; b=tiG/Os16w725CD+M8wH/OjfGmWOpuTJdsPtYppUjCKrLDTI/SR8eYwGmzGhCalREkkRaXZ3yzfSIfjXoUOaSivl0qqzcLMx7q9DoxuQjdneMbnJOsfJQVs3zV+5I9mYNnqjn4XPVASdYpc1hrV1QFbQNS0h2rTdGFsydd1htYII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=u6KGlz9e; arc=none smtp.client-ip=176.96.139.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mkzqvywf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1B92C4CEE9;
-	Fri, 23 May 2025 16:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748019060;
-	bh=6CiA/dI+9hc98ym5mhyRTZeJoWyaHXWJHbSan/vnN30=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=MkzqvywfDRXwafiZJNBVfHgYaRbeAXbMTVto1/v/KE05phXSjJVLW9eLG+IArRTs7
-	 XnVc+iE0N/+/oEPUu35ZSE6MwMsh+QNFFgzPiv/e4ttneK7dxJY5OMphhwiPAoqLz8
-	 X6SWxOHW2tTYyhIlkXL+ul3OPHYDbO+q0GqQckTub8j2t8kxl9W4hKeu0gA86JQCvY
-	 j0APpnYKA46WGQE7PD6DfIW4XIAQ3WBwAd7jKzD1VBhzK4XOeMvpWRC344hcrfAPbO
-	 4UgWH4PSTQuh54XHJHdf4PprGAle9w1fGIaTqkc5uyFN3hkZfxBEDvrLLAxVm29Jbu
-	 jHEKhRoIMpUFg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 711D1380DBEB;
-	Fri, 23 May 2025 16:51:36 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mud60X1UsmL0OiF6OQhA-wW8WzfP7SyOZBmDEG-hfD4QQ@mail.gmail.com>
-References: <CAH2r5mud60X1UsmL0OiF6OQhA-wW8WzfP7SyOZBmDEG-hfD4QQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mud60X1UsmL0OiF6OQhA-wW8WzfP7SyOZBmDEG-hfD4QQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.15-rc8-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 10379171f346e6f61d30d9949500a8de4336444a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e0f8e1a7c18bfbb203122e98dbd08e0e68dcbd76
-Message-Id: <174801909512.3663029.3450981754455219794.pr-tracker-bot@kernel.org>
-Date: Fri, 23 May 2025 16:51:35 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="u6KGlz9e"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
+	t=1748123262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ukIIzOS2lBTFJ3rGana2HJU7jAsN0oW6KE0Zmp6fmNM=;
+	b=u6KGlz9erS8LBU6CQ4ktvHaXlwU37gbx8WURwlAHVdtp6XpzMmCSr59cCWlRQ3rRPydjSy
+	FBxCX6ROuwDyV2q2mTvnYfKS3BJyXPn/FtJOqMF89iFgirY9pYtTjecjSk0HUJWdVRU+oP
+	53gS27pX3BU0zj0zzKz+bpBoaJqsLhSKnkuehWjOdW63fAbqPOZEjmTfwrF1SOTdTNm9S7
+	LnVHymLk51p3m2L5Fr5Fj9CHr6O2vam8NvJLrsPiD1Y24LixtoumNtFR+wfgBxwaVGt6zP
+	T7vrlFW+ZDIp7YcQwN8v0tcWgc+9ih9sJJpi+C/KgVsTPFG9GtCMOlnQxR9dTA==
+Message-Id: <d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
+Subject: ksmbd and special characters in file names
+From: Philipp Kerling <pkerling@casix.org>
+To: linux-cifs@vger.kernel.org
+Date: Sat, 24 May 2025 23:47:41 +0200
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-The pull request you sent on Fri, 23 May 2025 10:23:53 -0500:
+Hi!
 
-> git://git.samba.org/ksmbd.git tags/v6.15-rc8-ksmbd-server-fixes
+I've been reading a lot about the SAMBA 3.1.1 POSIX extensions and had
+(perhaps wrongly?) hoped that they would allow native support for all
+file names valid in POSIX if the server and client agree, so I could
+continue to access my files that contain colons or quotes as I did
+using nfs. I know there are remapping options for the reserved
+characters, but they are very annoying to use if you want to have
+direct access to the files on the server machine as well or want to
+serve a directory that already exists and has "problematic" file names.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e0f8e1a7c18bfbb203122e98dbd08e0e68dcbd76
+I have been playing with this on Linux 6.14.6 with ksmbd as server and
+Linux cifs as client. Unfortunately, I was not able to access any
+file/folder containing, for example, a double quote character ("). From
+what I can tell in the logs, this is due to ksmbd validating the name
+and failing:
 
-Thank you!
+   May 24 22:25:15 takaishi kernel: ksmbd: converted name =3D Jazz/SOIL&"PI=
+MP" SESSIONS                                 =20
+   May 24 22:25:15 takaishi kernel: ksmbd: File name validation failed: 0x2=
+2        =20
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+This seems to be an explicit and intentional check for various
+characters including ?"<>|* [1]. If not for that check, I could access
+my files just fine (mounting with -o nomapposix of course). I've
+patched it out locally to test and it's working great. Even smbclient
+and gvfs are happy with it. Is this something that would make sense
+(even if only as an option), or are there other restrictions/security
+concerns in the SMB protocol that prevent having the special characters
+be treated as valid?
+
+Best regards
+Philipp
+
+[1] https://elixir.bootlin.com/linux/v6.15-rc7/source/fs/smb/server/misc.c#=
+L80-L84
