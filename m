@@ -1,79 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9834A433B3
-	for <linux-cifs@vger.kernel.org>; Mon, 26 May 2025 14:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D25B1D6195;
+	Tue, 27 May 2025 02:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748269499; cv=none; b=Amn+iWP8UDp5AHN72QziX+d5LC8ODrCPl73yV+z9lhFDSsPxGae/0hCmNv9k5rD95/M+kBGoWKNJZwDr+MoKhunhmoXJYNHJo2TRP64J8FtOFvDgxlI6voJEJACm8Veb7XTHwuEk6b1VcWEkRL1JIJAM+cDNaA1dwvPiaAiBd2A=
+	t=1748313465; cv=none; b=ijA+zBxp7VjyIX+mKMUOUg8joFUiNK1YLony8wUVtDsmSMmd/3pnqd7IDM9qdm8N6IqQUpOEtJSdp+LIo1aRuY7EwHFNTSJ1TATtjStwx+mo6jF/Shh/kr9KegYluMxk5dD3biCsilPwTyS2gay0e49gRXBsh58+ACybY1ViBjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748269499; c=relaxed/simple;
-	bh=FzyTQIlVdzNv5jN0hyPdpBp66ZxU5HNQjzsHODOBwQw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M27zVYQHyM5p6gYglISOjH7GC0T/sQCB/3SdfjXQfJkjhZAUVmAG7P2PJ/2fkxFBdhABM93Ax23WsNCBUDU9/OumBg/TUoyhWaxzFlyaorKie1JZuiEIUVzAg2IZIVycCAc4hIaEW3rBf0VInnFY12Zk0ONVBvpAiO8aLQbZuC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T75m/g1w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748313465; c=relaxed/simple;
+	bh=+lT2LEuNni8ViqKn05Nza/0ZecgImC+iyyjaB0KCjJE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=skKruGbIpxoDbLYbSY78V8pU4MavNTmzsZvQWUvD3eaQTeGvLgThY8Vt/au+y0KNSfP2QIf0CeX84bACpanPJAv2ubbLGBCNzg+abFV9M414eaU76lLVhTsDvYbH0opwW8OSbB5/A3T9Lxud0Eno4TgCdz6acM3btLnOuVpFCO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmxThTx9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T75m/g1w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07665C4CEED
-	for <linux-cifs@vger.kernel.org>; Mon, 26 May 2025 14:24:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmxThTx9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7096CC4AF09;
+	Tue, 27 May 2025 02:37:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748269499;
-	bh=FzyTQIlVdzNv5jN0hyPdpBp66ZxU5HNQjzsHODOBwQw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=T75m/g1wVRn1JP90TSNtqzwdu7VDDehnaacqyKkZnwT7jOedDNLpL6W15j1jgaZgv
-	 Xa2kU3ebqq8hW26olz4O/x9CGb4se9WHvepRarb5/Ql7iNBEkJ8wrN1J/w7dXhRuut
-	 cGLnA3DGGBu2u4BuqyeYuK+g/yZwyGKFqmpagp9awajXuuxLdbmOo+abMIIpfM5m0+
-	 nF8CYRoB06YbK6e3ODYxjAZMxjubvLWRn2gBQ/oyS/w3sNvgqSRG13PkfW/HDC+GRb
-	 wTS4aXBAAcxAMVs2OgNUysL35TAlM2kvlcy0Gz/ajbAM5e9yK9t70lw23o3pa3Sv9x
-	 Z0aZm6ypAlLcA==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ad883afdf0cso75456266b.0
-        for <linux-cifs@vger.kernel.org>; Mon, 26 May 2025 07:24:58 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUdznnDjYAOlFWQz27gHjhlbs+RSkHfVWWg+r4YWeOUFTp5mpzkjNFiR0T2RYF0PBRmk8spkUm4gKLf@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrBZabWcm1gdVlU3riMzWkyYQ8Gt8GkrZ2QhEKpPiLhDFY1SHc
-	VNQi9AZWnz20+ubS6X578IdJTupuHE0GEA9R8Qvy063cjItk08JBx/Z6UEnKUxAQ4zuxEukYg2N
-	4Bgerod5KB6EfbIreJyaNkoo5uSTvJu0=
-X-Google-Smtp-Source: AGHT+IGKl7ROsCJlvH1K5Rsgo3qSrt0koyKUqSjUn3O70mFL2s51stLIp4sXP8kYzb8euOpFToM4BX+oVqov3BWdVQE=
-X-Received: by 2002:a17:907:1c19:b0:ad2:2569:697c with SMTP id
- a640c23a62f3a-ad85b050483mr747361666b.8.1748269497617; Mon, 26 May 2025
- 07:24:57 -0700 (PDT)
+	s=k20201202; t=1748313465;
+	bh=+lT2LEuNni8ViqKn05Nza/0ZecgImC+iyyjaB0KCjJE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LmxThTx9b/OWS5rhoOY14SLw4xxdVaRg/6zugvcW1kYPMf7KNSWyhdLi+oyIC27aY
+	 1GNmXX6379LOG+ZrKl8yni0+FmdYE7SpJQS3xMEF13Z1Of3c80qUNzouZauy2gd00x
+	 SYA9+dy+3M5V9woN0u5zkDtYo+BUX2pi6F5IF+//7y5k3G00B/d3H4H6p5axkLIZYc
+	 IgCa8V0dwvaK211vWSa96fVN81USmdM/e2y/pkPYiVx4h4gVtrBWNMdArdNTpAQ6Cl
+	 Uns+rzDMAusXiwoUuzC5b03NgYP+kIGS+w9IrwbuWljaBB+v0MDFU6J02XVlFhTTP8
+	 9L9OSAAGBwFTg==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	kernel test robot <lkp@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	smfrench@gmail.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 5/5] ksmbd: use list_first_entry_or_null for opinfo_get_list()
+Date: Mon, 26 May 2025 22:37:34 -0400
+Message-Id: <20250527023734.1017073-5-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250527023734.1017073-1-sashal@kernel.org>
+References: <20250527023734.1017073-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
- <CAKYAXd-t27uzNLdXjPRuvbaaBnA-Z8qVqd_1W7v=97vp2Sd+rw@mail.gmail.com>
- <CAH2r5ms-v=UwFzXZpZ-5KBgiRPkvSqQyJnLBhxP5YaAuqMAG5A@mail.gmail.com>
- <CAKYAXd8rN+RVJB8ak_SPNX07L8BeastngMhQsXVGdUW0D0QLSw@mail.gmail.com> <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org>
-In-Reply-To: <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 26 May 2025 23:24:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
-X-Gm-Features: AX0GCFtkBpSIQDgjI-JZo6BFUzzrZGEBUqfUi9fluYlsbSNe4BPpKkKcSyifTCI
-Message-ID: <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
-Subject: Re: ksmbd and special characters in file names
-To: Ralph Boehme <slow@samba.org>
-Cc: Steve French <smfrench@gmail.com>, Philipp Kerling <pkerling@casix.org>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.14.8
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 26, 2025 at 9:39=E2=80=AFPM Ralph Boehme <slow@samba.org> wrote=
-:
->
-> On 5/26/25 1:37 PM, Namjae Jeon wrote:
-> > On Mon, May 26, 2025 at 7:45=E2=80=AFAM Steve French <smfrench@gmail.co=
-m> wrote:
-> >> If the POSIX/Linux context is included in the SMB3.1.1 open then we
-> >> mounted with ("linux" or "posix")
-> > Such a context could be created in smb2_create context like apple conte=
-xt(AAPL).
-> > However, I wonder if there is any plan to add it to SMB3.1.1 posix
-> > extension specification.
-> It's been part of the spec since the beginning. You can find it here:
-Right, I found it.
-Thanks for your reply.
->
-> https://gitlab.com/samba-team/smb3-posix-spec/-/releases
->
-> POSIX-SMB2 2.2.13.2.16 SMB2_CREATE_POSIX_CONTEXT
+From: Namjae Jeon <linkinjeon@kernel.org>
+
+[ Upstream commit 10379171f346e6f61d30d9949500a8de4336444a ]
+
+The list_first_entry() macro never returns NULL.  If the list is
+empty then it returns an invalid pointer.  Use list_first_entry_or_null()
+to check if the list is empty.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/r/202505080231.7OXwq4Te-lkp@intel.com/
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/server/oplock.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 03f606afad93a..d7a8a580d0136 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -146,12 +146,9 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci)
+ {
+ 	struct oplock_info *opinfo;
+ 
+-	if (list_empty(&ci->m_op_list))
+-		return NULL;
+-
+ 	down_read(&ci->m_lock);
+-	opinfo = list_first_entry(&ci->m_op_list, struct oplock_info,
+-					op_entry);
++	opinfo = list_first_entry_or_null(&ci->m_op_list, struct oplock_info,
++					  op_entry);
+ 	if (opinfo) {
+ 		if (opinfo->conn == NULL ||
+ 		    !atomic_inc_not_zero(&opinfo->refcount))
+-- 
+2.39.5
+
