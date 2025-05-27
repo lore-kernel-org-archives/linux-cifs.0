@@ -1,51 +1,74 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BEB27E7E1
-	for <linux-cifs@vger.kernel.org>; Tue, 27 May 2025 16:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467B3280322
+	for <linux-cifs@vger.kernel.org>; Tue, 27 May 2025 18:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362475; cv=none; b=L/EFnIvFXlkusOjZio3hMsbuVbrVA9AXPbLAIfkv/dxeXcQaFGDMqzmK95Sim9ZWssn6LesEpYE8RL4OL/BiA7TJzK+7zecZpBsMbKnYjRXklWnK5gmDBFnhlgnek/UcRYsOS04pgUIRyszSorAYcE0nJOijXP+fNvsnMQ+CD9M=
+	t=1748371447; cv=none; b=ewItBn6VcjCFNrry8oum3l+gizH6GfTnu0f6YG66XuFVLBGl/eH/ZJyn54kyT7cALnDHxqWlSU6KKMzCS3nIAgIe2yvbwY7nO/OaAknv6WF5n8On1plxXahisglv0nPx4G7yxNrTj2m4R9QxzRH4QSBKVwv7xeFNvqrTBOLywgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362475; c=relaxed/simple;
-	bh=szCZUu+zz1PhCc+LBZDP0gyAjxyfhXsgUnLPvBK22xU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fyrcrZZxE4yNaoZus4X/M2FKHcwljAVCprRcXzS6Lshum4h/ZNsMUlGK2UZQrFDEOde6m14VJHIKJx/MTuy7u9f6B00wE+4hnqITjPr+8mwidz9JStpLVlaHSzdek0tXFAF3SPjsZB1QmChOyRbMcjjqyCaAdT+zRsv0lhHGBoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VF7Pfwxk; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1748371447; c=relaxed/simple;
+	bh=VokCtBa1kLY0vOm42wV46Evt0IdZRJoRYG8K6QxUCi8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ni8nemPGMfygjI4Xn157Q+bn5uncmGpEcgcBgMhINdt5S5xVdy9UQ3jgZ1RoQBUduBaqMDQgmJiZWLWRZQkxdUFJ5JnxKZUSmCEj/B6/yx0fCBrs9x7AiLex8VvRaGeo6GATlodqxTkBfTS3aLFdpmqLunUx9rnC/yCfBE3ZJno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YBk8xzXy; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VF7Pfwxk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-Id:Date:Cc:To:From;
-	bh=iztxBZ9OXHHl2Xv4xbOjU6tQM8zWvrNP2iWxZbG4q0o=; b=VF7PfwxknLYorI3feldCbVD7S+
-	sl+YxhEsejlsLrbGJ2y5S54SW5VfM4EBh2engarzBCI2rjpzm5zbmRPmNA1gb5+VZZ4KjsIkRpjdK
-	DssoeYMCuPIpXOSk4G+q1C1+hVYB6uNFXjhZLX2b2io7K7CeX+KNQEQ2zJlp3guyAKTLFQmd3wtL3
-	lKauKGYxTchxHBU04qYTTWbYvQuRYgTjKxhNWRgRfqJr4it8J480bw5ZtqIb17hKte1MOtOSzZq2i
-	H9qMc33q4xYXLQXtSzTF3YU/I48n5qCPaDdxyOYXKPZ6ayJiBqSVBEd9ll+nWKMxvM8I2ViLuxjqo
-	NEl7sCjMWi7wQzc3Bgh2A2ym+FdtkQfllBTMSWRXawQ4zBzsGSoxvD/fHn2sLt8ew91wBzs669Uai
-	lAfkcoA+4Gb3KiwLMSKP19E1MR5qnN7gfcWTJCm2BwSVp8/hNH+9wxGrxHPdxvexrdEc1cKtkEmz1
-	x7lcBG7pT2WngI66+nUS342F;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uJwwh-007VqK-0Q;
-	Tue, 27 May 2025 16:14:31 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org
-Cc: metze@samba.org,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	samba-technical@lists.samba.org
-Subject: [PATCH 5/5] smb: server: make use of common smb_direct_buffer_descriptor_v1
-Date: Tue, 27 May 2025 18:13:02 +0200
-Message-Id: <59bd3b193af3897478c9c8c5158e04c29705278a.1748362221.git.metze@samba.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1748362221.git.metze@samba.org>
-References: <cover.1748362221.git.metze@samba.org>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YBk8xzXy"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a4e742dc97so96779f8f.0
+        for <linux-cifs@vger.kernel.org>; Tue, 27 May 2025 11:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1748371442; x=1748976242; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HigszQqUCsYMquf6b3nev9gsaao67T0NCIFgOW6Bhyc=;
+        b=YBk8xzXyB607/GFA0IHAvjyTdlUArmWbNH1D3Vjs4TBxqJY9nrjXQfMqD6cr/xkKHV
+         yOD15mGEQdfdcf3Zbj843vcPek53TAOjIgvkNNX40kWVJ4P9J3Quh3CGKxhsXOww3Yt7
+         P8rIv5ItcvgoBD74Ewm6UMnVYu21KhKdjWBTvTCLnm9MlSh0NKppL+i3kbk5GvFHEzUc
+         ynuI0r6R/40x4uUPO2I4GagwV/P8ScSOaEXzV6UU8be3/Rpl1jXgKU40g/MSN6IsxY0q
+         czpAN8dXfez+zryanO+trTG2fL2x2g6wIrims8TezC1cSsEJZSMAqoztA/62LjkRCZ/o
+         Gmvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748371442; x=1748976242;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HigszQqUCsYMquf6b3nev9gsaao67T0NCIFgOW6Bhyc=;
+        b=tMnAnLfxeArkjLqBbIbW25KfrDVN4QeQ7qGBs+z6DzsXAyOdaNsbIaYkgRzQEnGAm0
+         anzwpdX5jhAwzAw/upALX2eM47jcFfnt0pJ4UOfIYlGW9GbAmba6eg4du5+jRuezyMnx
+         xN96ePsQ2+W3FATlvPz/CxiqLmlm0/x0qNqRlGcJExbvsi7+SsGqLoJ0ioUKSptNB1aL
+         SxJuMDeLBo2Rdiv1NJbY0joU037IgL1o5UJqjPAzbzWh7EIAzdQ+y5TWDQopGvqZxkb5
+         +Cou/69ehRzQVLezdDCihl87G/Z6RjoHzIAvAuIhh9hKbjbzOSemYAGESuSWBvKXj48Z
+         1Q9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW8t5mIDj9teq6rs6BfVZVva7annBwJE7bH0RKsDsuCamdGQTWaYLuP1h+3OCAEjjhP6y5RIlncDiuu@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGmP4FmpZc75ti1JkuurALL0KXF9HRmLnRj4yQLP2CwgIKzwP/
+	R93dn2s+22zdRaCB8P1smf7bA4/sl+P6MNRSHOTbbjlf1i/BWQ1MeZ3dxWIrpht2aAo=
+X-Gm-Gg: ASbGncvsu/KrHD2buqvEfAUxYIFxREW2/vEnXitqyUQoUcGOhShDl3eMUFT86EP8w3s
+	HbB2TkryoBAQSac6dVjgVRAEWW88HMQnd2PQxXewJl52jF8vt5kBbAWPz9C7IEfXzktmSDeVmX4
+	LshaFzTTTXadG5hucpqw8YKKQr+2N8UPMWkOKvYVgsrLRb0nVo5bCipDXXVEnULqdxkLeuTYD+F
+	lr+F3CftPRY1s7L67p6DKqm5HYHq25eJU77sXc9E7pMCIEO+KHPbygCtD6WdJ7ysuHRokZ2kexC
+	640sPsPtlXRsMQyQbdSWRUhHHegjtuDK/mX8d846LXrfOAi3wA2OtPtGPDLqQ73Uqrc5hYX1biF
+	3
+X-Google-Smtp-Source: AGHT+IGDmf8wErKg52er0rpJ6x3QMMltNHBqhEi0kEAztGL0LtvqlxSsDbk2VASwl+LSmoVp1+vyYQ==
+X-Received: by 2002:a5d:5f55:0:b0:3a4:d685:3de7 with SMTP id ffacd0b85a97d-3a4e5e5d6d4mr1900935f8f.8.1748371442397;
+        Tue, 27 May 2025 11:44:02 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f0:bc00:cf9d:7dfb:3497:3dc2:8e58])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e56758d2bbsm2422511137.9.2025.05.27.11.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 11:44:02 -0700 (PDT)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: smfrench@gmail.com
+Cc: ematsumiya@suse.de,
+	pc@manguebit.com,
+	sprasad@microsoft.com,
+	paul@darkrain42.org,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH v3] smb: client: fix race in smb2_close_cached_fid()
+Date: Tue, 27 May 2025 15:42:13 -0300
+Message-ID: <20250527184213.101642-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,196 +77,99 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/server/connection.c     |  4 ++--
- fs/smb/server/connection.h     |  8 ++++----
- fs/smb/server/smb2pdu.c        | 10 +++++-----
- fs/smb/server/smb2pdu.h        |  8 ++------
- fs/smb/server/transport_rdma.c |  6 +++---
- fs/smb/server/transport_rdma.h |  2 --
- 6 files changed, 16 insertions(+), 22 deletions(-)
+find_or_create_cached_dir() could grab a new reference after kref_put()
+had seen the refcount drop to zero but before cfid_list_lock is acquired
+in smb2_close_cached_fid(), leading to use-after-free.
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 83764c230e9d..0f576edda6c1 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -243,7 +243,7 @@ int ksmbd_conn_write(struct ksmbd_work *work)
+Switch to kref_put_lock() so cfid_release() runs with cfid_list_lock
+held, closing that gap.
+
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+V2 -> V3: rebase, remove unneeded comments, modify commit subject
+V1 -> V2: kept the original function names and added __releases annotation
+to silence sparse warning
+
+ fs/smb/client/cached_dir.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 89d2dbbb742c..09daf9500baf 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -365,11 +365,11 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			 * lease. Release one here, and the second below.
+ 			 */
+ 			cfid->has_lease = false;
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
++			close_cached_dir(cfid);
+ 		}
+ 		spin_unlock(&cfids->cfid_list_lock);
  
- int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
- 			 void *buf, unsigned int buflen,
--			 struct smb2_buffer_desc_v1 *desc,
-+			 struct smb_direct_buffer_descriptor_v1 *desc,
- 			 unsigned int desc_len)
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		close_cached_dir(cfid);
+ 	} else {
+ 		*ret_cfid = cfid;
+ 		atomic_inc(&tcon->num_remote_opens);
+@@ -409,12 +409,12 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ 
+ static void
+ smb2_close_cached_fid(struct kref *ref)
++__releases(&cfid->cfids->cfid_list_lock)
  {
- 	int ret = -EINVAL;
-@@ -257,7 +257,7 @@ int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
+ 	struct cached_fid *cfid = container_of(ref, struct cached_fid,
+ 					       refcount);
+ 	int rc;
  
- int ksmbd_conn_rdma_write(struct ksmbd_conn *conn,
- 			  void *buf, unsigned int buflen,
--			  struct smb2_buffer_desc_v1 *desc,
-+			  struct smb_direct_buffer_descriptor_v1 *desc,
- 			  unsigned int desc_len)
+-	spin_lock(&cfid->cfids->cfid_list_lock);
+ 	if (cfid->on_list) {
+ 		list_del(&cfid->entry);
+ 		cfid->on_list = false;
+@@ -449,7 +449,7 @@ void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
+ 	spin_lock(&cfid->cfids->cfid_list_lock);
+ 	if (cfid->has_lease) {
+ 		cfid->has_lease = false;
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		close_cached_dir(cfid);
+ 	}
+ 	spin_unlock(&cfid->cfids->cfid_list_lock);
+ 	close_cached_dir(cfid);
+@@ -458,7 +458,7 @@ void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ void close_cached_dir(struct cached_fid *cfid)
  {
- 	int ret = -EINVAL;
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 14620e147dda..f6f1952f796b 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -126,11 +126,11 @@ struct ksmbd_transport_ops {
- 		      unsigned int remote_key);
- 	int (*rdma_read)(struct ksmbd_transport *t,
- 			 void *buf, unsigned int len,
--			 struct smb2_buffer_desc_v1 *desc,
-+			 struct smb_direct_buffer_descriptor_v1 *desc,
- 			 unsigned int desc_len);
- 	int (*rdma_write)(struct ksmbd_transport *t,
- 			  void *buf, unsigned int len,
--			  struct smb2_buffer_desc_v1 *desc,
-+			  struct smb_direct_buffer_descriptor_v1 *desc,
- 			  unsigned int desc_len);
- };
- 
-@@ -155,11 +155,11 @@ bool ksmbd_conn_lookup_dialect(struct ksmbd_conn *c);
- int ksmbd_conn_write(struct ksmbd_work *work);
- int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
- 			 void *buf, unsigned int buflen,
--			 struct smb2_buffer_desc_v1 *desc,
-+			 struct smb_direct_buffer_descriptor_v1 *desc,
- 			 unsigned int desc_len);
- int ksmbd_conn_rdma_write(struct ksmbd_conn *conn,
- 			  void *buf, unsigned int buflen,
--			  struct smb2_buffer_desc_v1 *desc,
-+			  struct smb_direct_buffer_descriptor_v1 *desc,
- 			  unsigned int desc_len);
- void ksmbd_conn_enqueue_request(struct ksmbd_work *work);
- void ksmbd_conn_try_dequeue_request(struct ksmbd_work *work);
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 8d414239b3fe..9428f9e08a93 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -6617,7 +6617,7 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
++	kref_put_lock(&cfid->refcount, smb2_close_cached_fid, &cfid->cfids->cfid_list_lock);
  }
  
- static int smb2_set_remote_key_for_rdma(struct ksmbd_work *work,
--					struct smb2_buffer_desc_v1 *desc,
-+					struct smb_direct_buffer_descriptor_v1 *desc,
- 					__le32 Channel,
- 					__le16 ChannelInfoLength)
- {
-@@ -6653,7 +6653,7 @@ static ssize_t smb2_read_rdma_channel(struct ksmbd_work *work,
- 	int err;
+ /*
+@@ -559,7 +559,7 @@ cached_dir_offload_close(struct work_struct *work)
  
- 	err = ksmbd_conn_rdma_write(work->conn, data_buf, length,
--				    (struct smb2_buffer_desc_v1 *)
-+				    (struct smb_direct_buffer_descriptor_v1 *)
- 				    ((char *)req + le16_to_cpu(req->ReadChannelInfoOffset)),
- 				    le16_to_cpu(req->ReadChannelInfoLength));
- 	if (err)
-@@ -6724,7 +6724,7 @@ int smb2_read(struct ksmbd_work *work)
- 			goto out;
- 		}
- 		err = smb2_set_remote_key_for_rdma(work,
--						   (struct smb2_buffer_desc_v1 *)
-+						   (struct smb_direct_buffer_descriptor_v1 *)
- 						   ((char *)req + ch_offset),
- 						   req->Channel,
- 						   req->ReadChannelInfoLength);
-@@ -6919,7 +6919,7 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
- 		return -ENOMEM;
+ 	WARN_ON(cfid->on_list);
  
- 	ret = ksmbd_conn_rdma_read(work->conn, data_buf, length,
--				   (struct smb2_buffer_desc_v1 *)
-+				   (struct smb_direct_buffer_descriptor_v1 *)
- 				   ((char *)req + le16_to_cpu(req->WriteChannelInfoOffset)),
- 				   le16_to_cpu(req->WriteChannelInfoLength));
- 	if (ret < 0) {
-@@ -6984,7 +6984,7 @@ int smb2_write(struct ksmbd_work *work)
- 			goto out;
- 		}
- 		err = smb2_set_remote_key_for_rdma(work,
--						   (struct smb2_buffer_desc_v1 *)
-+						   (struct smb_direct_buffer_descriptor_v1 *)
- 						   ((char *)req + ch_offset),
- 						   req->Channel,
- 						   req->WriteChannelInfoLength);
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index 17a0b18a8406..be79eeef540b 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -10,6 +10,8 @@
- #include "ntlmssp.h"
- #include "smbacl.h"
+-	kref_put(&cfid->refcount, smb2_close_cached_fid);
++	close_cached_dir(cfid);
+ 	cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cached_close);
+ }
  
-+#include "../common/smb_direct/smb_direct.h"
-+
- /*Create Action Flags*/
- #define FILE_SUPERSEDED                0x00000000
- #define FILE_OPENED            0x00000001
-@@ -133,12 +135,6 @@ struct create_posix_rsp {
- 	u8 SidBuffer[44];
- } __packed;
+@@ -683,7 +683,7 @@ static void cfids_invalidation_worker(struct work_struct *work)
+ 	list_for_each_entry_safe(cfid, q, &entry, entry) {
+ 		list_del(&cfid->entry);
+ 		/* Drop the ref-count acquired in invalidate_all_cached_dirs */
+-		kref_put(&cfid->refcount, smb2_close_cached_fid);
++		close_cached_dir(cfid);
+ 	}
+ }
  
--struct smb2_buffer_desc_v1 {
--	__le64 offset;
--	__le32 token;
--	__le32 length;
--} __packed;
--
- #define SMB2_0_IOCTL_IS_FSCTL 0x00000001
- 
- struct smb_sockaddr_in {
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 4998df04ab95..642d419d9a52 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -1354,7 +1354,7 @@ static void write_done(struct ib_cq *cq, struct ib_wc *wc)
- 
- static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
- 				void *buf, int buf_len,
--				struct smb2_buffer_desc_v1 *desc,
-+				struct smb_direct_buffer_descriptor_v1 *desc,
- 				unsigned int desc_len,
- 				bool is_read)
- {
-@@ -1484,7 +1484,7 @@ static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
- 
- static int smb_direct_rdma_write(struct ksmbd_transport *t,
- 				 void *buf, unsigned int buflen,
--				 struct smb2_buffer_desc_v1 *desc,
-+				 struct smb_direct_buffer_descriptor_v1 *desc,
- 				 unsigned int desc_len)
- {
- 	return smb_direct_rdma_xmit(smb_trans_direct_transfort(t), buf, buflen,
-@@ -1493,7 +1493,7 @@ static int smb_direct_rdma_write(struct ksmbd_transport *t,
- 
- static int smb_direct_rdma_read(struct ksmbd_transport *t,
- 				void *buf, unsigned int buflen,
--				struct smb2_buffer_desc_v1 *desc,
-+				struct smb_direct_buffer_descriptor_v1 *desc,
- 				unsigned int desc_len)
- {
- 	return smb_direct_rdma_xmit(smb_trans_direct_transfort(t), buf, buflen,
-diff --git a/fs/smb/server/transport_rdma.h b/fs/smb/server/transport_rdma.h
-index 71909b6d8021..0fb692c40e21 100644
---- a/fs/smb/server/transport_rdma.h
-+++ b/fs/smb/server/transport_rdma.h
-@@ -7,8 +7,6 @@
- #ifndef __KSMBD_TRANSPORT_RDMA_H__
- #define __KSMBD_TRANSPORT_RDMA_H__
- 
--#include "../common/smb_direct/smb_direct.h"
--
- #define SMBD_DEFAULT_IOSIZE (8 * 1024 * 1024)
- #define SMBD_MIN_IOSIZE (512 * 1024)
- #define SMBD_MAX_IOSIZE (16 * 1024 * 1024)
+@@ -736,7 +736,7 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 			 * Drop the ref-count from above, either the lease-ref (if there
+ 			 * was one) or the extra one acquired.
+ 			 */
+-			kref_put(&cfid->refcount, smb2_close_cached_fid);
++			close_cached_dir(cfid);
+ 	}
+ 	queue_delayed_work(cfid_put_wq, &cfids->laundromat_work,
+ 			   dir_cache_timeout * HZ);
 -- 
-2.34.1
+2.47.0
 
