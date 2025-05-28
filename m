@@ -1,35 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F713234
-	for <linux-cifs@vger.kernel.org>; Wed, 28 May 2025 16:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7703234
+	for <linux-cifs@vger.kernel.org>; Wed, 28 May 2025 16:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748448117; cv=none; b=NUKui70KUB9gOmo5cuPnOz37sHpR6uZIREuBWcKVyuwJQdJgCFtMY17LYspk8o9tpNIRePhNZqv+gPziChGVJ1ZaXYlYUgqozAWMB9tNjysosQ28kpl3+Zp0UgQ7h0z/3YzdjAQn3ycwj+WBK1+T09Q1X0Up46nhZ5dPWS5SZo4=
+	t=1748448125; cv=none; b=igPZWSefHL12KaS4VhJtxw15ytKreCupFK5K79pc27F6QSDQ9Ucnv4pxwG0EOeyNsBDkAp09CztTSoNUaex73SdbZxexdy6FWYsXmXim7GF2LSo7wFBZMweBlOZlw3Rw4xig7mX7xMYa50+cGMgmiGgqjXwtXdLwLmYQ5izwzwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748448117; c=relaxed/simple;
-	bh=rCtiwIsz8DsOaaXiYVkBTcKhJrWnV0Vvn0DitYEx7A8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AhwQ+u9Y7TdvcCTxvI29yYJYYjS0H63buB+pUx4wUotVirdoomHaJOMvTlheoogmYr9MHwqD9mWy0uUof+979abRf+vdigD3fOEeDRRqCYYuglCGro1AvqhXMmaahkIw5D1wGlYXfNAnc/msNrY4OODPtKnQBX3uXDDSlPWIxnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=YmVVKcp4; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1748448125; c=relaxed/simple;
+	bh=ptw+nBADGJTejwv38wfHF0vF7mnUbcqPDiI1U8fTBjE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=P/OA7inV4zVhqJ6QgUEFBqCVUb1lDexlCqgfvjEmyyXJ4vytXuy/wMcKkqIG7TB9Qr0Mseh97DIiNS1jfOhdGPdQt0bfMtVUkCar8ryqP+ztbHbz3hrBg5lUHW9URHfDMQfC6Q5Se5SUmAOvkSOkK/Vpf2t5OIL6dOgPrXdao/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=erD8bbbU; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="YmVVKcp4"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="erD8bbbU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-Id:Date:Cc:To:From;
-	bh=zH8YBsvV1hICAGAzX1LdL/LRTV58yov6883I8zebeJI=; b=YmVVKcp4o9ZvcOSb9FfERcjQut
-	7Dzng8cg5Xfw0lYNvo88OSrHs90zrDkNn0/0U7B1h2SGzeZY2RAduOW5xE8MH+vOkDUFJK0dvEn0r
-	cSJJllitNy+aOWSgvRvD03xQPolu+cpiIPa27dfUp6xIl9u72V+w055I1z7ms6i/QpSV5KXFQ+Tjj
-	JRzwhir3pmBRe9Nyz0+HkrPIa/5wYUrc9pxC/uieXmnv+ikVWOxMvKlyOiwBd7BDi0Y60xC/2GGHu
-	d9uTfXnIQC+jeZYf2LS9L/UzgZaQVYjLYAkFEjZmAAws+12j+0A2gJj1KgT5ZhjGbLr3/hCjMdUgz
-	jWJiL5oxpmAawwajoVGCGlyeizC//e9qQYaDVSE0i4mOMqLr8pWlU/RXBXk56m3MgTTzCbDf+vM7k
-	AovG5zXk5DaSbeElPrBOdT7Gg3Os3R6TC3/BE/UQw5uNxy8KhkHWpiUbe59sJDhKsMTSU8WLtgkBc
-	iK8zF67e6OjjkPM/jo9Vg/JR;
+	bh=N0h/3pLVEke8r15CZcuBdoGauKbz3Rij7+uIytPOFG0=; b=erD8bbbU+6dMyuTZzx8vUaBBA8
+	k8gwQpttGJNqjVFwpZ47IDgncgSi7uCWDk/vNB+QlhgnYD6vcm3UbyeOxh/cJh23/MqUizdSrr0mX
+	4E/cUPoOAzKFPVnBHykKZw6hbUmMPucVJLB6Qa2wNkIpholoDcGqJpr0OmQEwGBO1O/faz7WAxmm2
+	0xjQeOlU75VHfE0AfR70bt3IkeszpGYzmQ4ZG+NA5lMUwLjlOOQbjTwAjKpo3dj3eOKiDh0LWkR4a
+	PeLI9x0MegbRfCVYdMgGSnQOnllHgiscg/MfCuCCdjO/ZY5ezIFMDiAjfHuIpbXIb5sIPWaBHphwA
+	OJ2WkRJAyXWonKwXmhOMtleUUoiHo2rAup4dHcb0flPKknrdgZFM5yml313Lb625cOVKxzJRbf8kM
+	Xr355ml7ig9rIJUwY1bbiNqZGxOv8M/Wj9S3QRKnNXm7+qGWyiX1+g9AP0GKBBHxZBwkWRMUe3rur
+	ZbZn8zBUCuo1uCeMJ4aBE3j2;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uKJDz-007hGi-0x;
-	Wed, 28 May 2025 16:01:51 +0000
+	id 1uKJE9-007hGw-0E;
+	Wed, 28 May 2025 16:02:01 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org
 Cc: metze@samba.org,
@@ -40,10 +41,12 @@ Cc: metze@samba.org,
 	Hyunchul Lee <hyc.lee@gmail.com>,
 	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
 	samba-technical@lists.samba.org
-Subject: [PATCH v2 00/12] smb:common: introduce and use common smbdirect headers/structures (step1)
-Date: Wed, 28 May 2025 18:01:29 +0200
-Message-Id: <cover.1748446473.git.metze@samba.org>
+Subject: [PATCH v2 01/12] smb: smbdirect: add smbdirect_pdu.h with protocol definitions
+Date: Wed, 28 May 2025 18:01:30 +0200
+Message-Id: <b43ee94c3db13291156e70d37a3e843ad7d08b31.1748446473.git.metze@samba.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1748446473.git.metze@samba.org>
+References: <cover.1748446473.git.metze@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,61 +55,85 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+This is just a start moving into a common smbdirect layer.
 
-in preparation of a having a common smb_direct layer I started
-to move things into common header files and added the first
-step in using shared structues like struct smbdirect_socket.
+It will be used in the next commits...
 
-Currently only simple things are shared and there is no
-intended behaviour change (even if I found some things
-I'd like to change, but I'll defer them in order to
-make the review easier).
-
-I'll work on this the next few months in order to
-unify the in kernel client and server layers
-and expose the result to userspace too.
-So that Samba can also use it.
-
-v2:
-  - change smb_direct into smbdirect
-  - make usage of header files just as needed
-  - also introduce struct smbdirect_socket[_parameters]
-    as shared structures
-
-Stefan Metzmacher (12):
-  smb: smbdirect: add smbdirect_pdu.h with protocol definitions
-  smb: client: make use of common smbdirect_pdu.h
-  smb: server: make use of common smbdirect_pdu.h
-  smb: smbdirect: add smbdirect.h with public structures
-  smb: client: make use of common smbdirect.h
-  smb: server: make use of common smbdirect.h
-  smb: smbdirect: add smbdirect_socket.h
-  smb: client: make use of common smbdirect_socket
-  smb: server: make use of common smbdirect_socket
-  smb: smbdirect: introduce smbdirect_socket_parameters
-  smb: client: make use of common smbdirect_socket_parameters
-  smb: server: make use of common smbdirect_socket_parameters
-
- fs/smb/client/cifs_debug.c                 |  23 +-
- fs/smb/client/smb2ops.c                    |  14 +-
- fs/smb/client/smb2pdu.c                    |  17 +-
- fs/smb/client/smbdirect.c                  | 389 +++++++++++----------
- fs/smb/client/smbdirect.h                  |  71 +---
- fs/smb/common/smbdirect/smbdirect.h        |  37 ++
- fs/smb/common/smbdirect/smbdirect_pdu.h    |  55 +++
- fs/smb/common/smbdirect/smbdirect_socket.h |  43 +++
- fs/smb/server/connection.c                 |   4 +-
- fs/smb/server/connection.h                 |  10 +-
- fs/smb/server/smb2pdu.c                    |  11 +-
- fs/smb/server/smb2pdu.h                    |   6 -
- fs/smb/server/transport_rdma.c             | 385 +++++++++++---------
- fs/smb/server/transport_rdma.h             |  41 ---
- 14 files changed, 613 insertions(+), 493 deletions(-)
- create mode 100644 fs/smb/common/smbdirect/smbdirect.h
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/common/smbdirect/smbdirect_pdu.h | 55 +++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
  create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
- create mode 100644 fs/smb/common/smbdirect/smbdirect_socket.h
 
+diff --git a/fs/smb/common/smbdirect/smbdirect_pdu.h b/fs/smb/common/smbdirect/smbdirect_pdu.h
+new file mode 100644
+index 000000000000..ae9fdb05ce23
+--- /dev/null
++++ b/fs/smb/common/smbdirect/smbdirect_pdu.h
+@@ -0,0 +1,55 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *   Copyright (c) 2017 Stefan Metzmacher
++ */
++
++#ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__
++#define __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__
++
++#define SMBDIRECT_V1 0x0100
++
++/* SMBD negotiation request packet [MS-SMBD] 2.2.1 */
++struct smbdirect_negotiate_req {
++	__le16 min_version;
++	__le16 max_version;
++	__le16 reserved;
++	__le16 credits_requested;
++	__le32 preferred_send_size;
++	__le32 max_receive_size;
++	__le32 max_fragmented_size;
++} __packed;
++
++/* SMBD negotiation response packet [MS-SMBD] 2.2.2 */
++struct smbdirect_negotiate_resp {
++	__le16 min_version;
++	__le16 max_version;
++	__le16 negotiated_version;
++	__le16 reserved;
++	__le16 credits_requested;
++	__le16 credits_granted;
++	__le32 status;
++	__le32 max_readwrite_size;
++	__le32 preferred_send_size;
++	__le32 max_receive_size;
++	__le32 max_fragmented_size;
++} __packed;
++
++#define SMBDIRECT_DATA_MIN_HDR_SIZE 0x14
++#define SMBDIRECT_DATA_OFFSET       0x18
++
++#define SMBDIRECT_FLAG_RESPONSE_REQUESTED 0x0001
++
++/* SMBD data transfer packet with payload [MS-SMBD] 2.2.3 */
++struct smbdirect_data_transfer {
++	__le16 credits_requested;
++	__le16 credits_granted;
++	__le16 flags;
++	__le16 reserved;
++	__le32 remaining_data_length;
++	__le32 data_offset;
++	__le32 data_length;
++	__le32 padding;
++	__u8 buffer[];
++} __packed;
++
++#endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__ */
 -- 
 2.34.1
 
