@@ -1,155 +1,112 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BA81367;
-	Wed, 28 May 2025 07:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F713234
+	for <linux-cifs@vger.kernel.org>; Wed, 28 May 2025 16:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748417182; cv=none; b=a8k3NqfR1V1h67Ip4t9fS6UwVSHHuPVawIdKRvCS/zZYgk4NnRmhbAE+BCrorze+V62Zlhl8e8I/4klnHYwu4BYg5kFTemu6P5+pUmriKi1AeB8AnCN8jcSF+ZHr/0ZiJe2hAZyKufgl1IWIGYriKwR5RMYlWVEi9rMqMbFchLY=
+	t=1748448117; cv=none; b=NUKui70KUB9gOmo5cuPnOz37sHpR6uZIREuBWcKVyuwJQdJgCFtMY17LYspk8o9tpNIRePhNZqv+gPziChGVJ1ZaXYlYUgqozAWMB9tNjysosQ28kpl3+Zp0UgQ7h0z/3YzdjAQn3ycwj+WBK1+T09Q1X0Up46nhZ5dPWS5SZo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748417182; c=relaxed/simple;
-	bh=lwmrJEY5WsLS1UvqABzKOknlzeEFM2wNdRqM8lp38+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FJkFGh4eeB5/S7tQmVw6Yt6BYer2NonoQ81L+mwEn7SWymlU4foSRVnMKb0O1/twdByavpAgInQj5MNBxOO8scYAbUyLRe3AVcHinwCLeP6EP8gUcvqY+48CHXzpnEbv46ICwCPpmOEuqrNMPm7nwTypTfzHs3ZypReOXzCDnPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsEqO/Rn; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748448117; c=relaxed/simple;
+	bh=rCtiwIsz8DsOaaXiYVkBTcKhJrWnV0Vvn0DitYEx7A8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AhwQ+u9Y7TdvcCTxvI29yYJYYjS0H63buB+pUx4wUotVirdoomHaJOMvTlheoogmYr9MHwqD9mWy0uUof+979abRf+vdigD3fOEeDRRqCYYuglCGro1AvqhXMmaahkIw5D1wGlYXfNAnc/msNrY4OODPtKnQBX3uXDDSlPWIxnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=YmVVKcp4; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsEqO/Rn"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-442eb5d143eso44420875e9.0;
-        Wed, 28 May 2025 00:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748417178; x=1749021978; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YkfWKZJIfL0XCEmcdjSVWnaS0MJDkdIq6iKveQpAWPw=;
-        b=nsEqO/RnNqV6fU5IqV9WODwwJyPiAmaG7xBTyK2/F8YK5ZF/QMJjYrkZIzkH6WiUsa
-         eX2Hj/ctx0xGt6nzMItGnbVQLPMDT9/CEKcnLDcaQkz0YNQZelSFl08JXTAmRsGJ1BkH
-         YWmSZRLIUJtRJqtzdKMVS6cQXvuCAOe7i2Jcgj02RD2Y3lv211jUXZs9FOV4GNKjqP4U
-         yOsM0dfP4LEcl7emxWGC5RyjhxXmLpdOfjAbIC2nN3cST9iuaukwp0FqApKKQ8otZfoq
-         +fRJZs7hzqS1LW+qt+NUUUNMn/XK+V48e9eBtGAP8LLtHmqhvrU4jsJeQqXfvx1GD40m
-         +cow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748417178; x=1749021978;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YkfWKZJIfL0XCEmcdjSVWnaS0MJDkdIq6iKveQpAWPw=;
-        b=tmT0M7mfwM2O0h7qKuSwoQUInnHwkyQBc17nmNSOyl5mye20yjGWzCEx6Zbgn4CgVg
-         itjI4uUCsN03qekP3oZQMlBnx4Al90f2JfrRehU9kqMaaVT+A5J+t1MrEgNYTPdWvU/I
-         5BVVfUamIKMDfdd8NWRquudF66O4LmqKe9CHRoNr6brFQfBnlJSYlv2X9fuhcnHdk6zf
-         o2svq5h4oR7Xw4F9SimRLlmExGh2LN0aGpvEhWOi+ZjNpFhoJ1kWtHiPotEaALHJYvBa
-         fdZ71Zy8cbckrz7obDwXRD9XPKhLMwPhGbx5lCOuvoBASyy6e/pECz2dPhj+b1zHgzM7
-         xMWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUctbisSUUp/YhCotbX37Ks5X0sMWijRXlxrWrAjwCzF1MnQngDcXJ70G9hf77jJiVZzuFs9TPyd42m4wGO@vger.kernel.org, AJvYcCWa74+agDz6lNWMiGg+uSYG1HqMmzFMPt0RAeMEO6LBjJTJSgdi6tAtiJ7F8sKqFht6rI4G8SQikAk2@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPBbIAC2VrOaNlV7BZEWEmxoQVU1YIViQpSLHQ285bjHDHa+f6
-	KUagcRhEdtf9GsbFvFonh3YL65Wve8np4e9zLhk+PKMpZW3XOgfc7Ea4
-X-Gm-Gg: ASbGncsBFi+Na4gkhlXaxKQB+D5q7WZAEUkaw/hyLXAb+8DWov+y5BerjnaJhb+qxpM
-	tSt2AhKi+nHCjMtzfVjYiaYtzYhWakegBinJwpndLGug6Bx+0VYfEdwnM/taMmcqhA+6X/bnyj5
-	uTEMh0oTOB0GF2uuGtnj7NOYNJlAYoSuNbqKb67o/lG+CRrdEYfAJvhEEHK9eyB0dCLBqIJHr4A
-	zgZmejO524rfGUsl8VClpODt7YEFYvx3C4KNTEYU0TIkZGzW9o18mQSyYOQ8zVCbb2n5CToK1Fi
-	nEhLII80pqgD61lPyPj6kEZjHN5KA2/elOylh+BMhc0FjDdEbGAd+W8w7DrGPKn0kinVfR+n8mI
-	Q+A61zRVr8HzQsw==
-X-Google-Smtp-Source: AGHT+IGrRxtjywdSrwG18d4jZWZ2n2ZZGLg+MufrljT6xq4RFcU3buVDPseRz2yhWFDrqogGyddaRg==
-X-Received: by 2002:a05:600c:698e:b0:441:b698:3431 with SMTP id 5b1f17b1804b1-44c932f9329mr120201165e9.28.1748417177340;
-        Wed, 28 May 2025 00:26:17 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4500e1d85b5sm11918585e9.32.2025.05.28.00.26.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 00:26:17 -0700 (PDT)
-Date: Wed, 28 May 2025 08:26:14 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: Steve French <smfrench@gmail.com>, Kuniyuki Iwashima
- <kuniyu@amazon.com>, pc@manguebit.com, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, ChenXiaoSong
- <chenxiaosong@kylinos.cn>, Wang Zhaolong <wangzhaolong1@huawei.com>, Enzo
- Matsumiya <ematsumiya@suse.de>
-Subject: Re: [PATCH] smb/client: use sock_create_kern() in
- generic_ip_connect()
-Message-ID: <20250528082614.5ee971d1@pumpkin>
-In-Reply-To: <01BDDAE323133ED0+e7d23f35-c6d8-48a3-8fe6-c23e3a9c64dc@chenxiaosong.com>
-References: <20250528031531.171356-1-chenxiaosong@chenxiaosong.com>
-	<CAH2r5mtAYV925FbL-5GPGvk3wMG5u0027_icNtUw6uZ9yOBqyw@mail.gmail.com>
-	<01BDDAE323133ED0+e7d23f35-c6d8-48a3-8fe6-c23e3a9c64dc@chenxiaosong.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="YmVVKcp4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-Id:Date:Cc:To:From;
+	bh=zH8YBsvV1hICAGAzX1LdL/LRTV58yov6883I8zebeJI=; b=YmVVKcp4o9ZvcOSb9FfERcjQut
+	7Dzng8cg5Xfw0lYNvo88OSrHs90zrDkNn0/0U7B1h2SGzeZY2RAduOW5xE8MH+vOkDUFJK0dvEn0r
+	cSJJllitNy+aOWSgvRvD03xQPolu+cpiIPa27dfUp6xIl9u72V+w055I1z7ms6i/QpSV5KXFQ+Tjj
+	JRzwhir3pmBRe9Nyz0+HkrPIa/5wYUrc9pxC/uieXmnv+ikVWOxMvKlyOiwBd7BDi0Y60xC/2GGHu
+	d9uTfXnIQC+jeZYf2LS9L/UzgZaQVYjLYAkFEjZmAAws+12j+0A2gJj1KgT5ZhjGbLr3/hCjMdUgz
+	jWJiL5oxpmAawwajoVGCGlyeizC//e9qQYaDVSE0i4mOMqLr8pWlU/RXBXk56m3MgTTzCbDf+vM7k
+	AovG5zXk5DaSbeElPrBOdT7Gg3Os3R6TC3/BE/UQw5uNxy8KhkHWpiUbe59sJDhKsMTSU8WLtgkBc
+	iK8zF67e6OjjkPM/jo9Vg/JR;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uKJDz-007hGi-0x;
+	Wed, 28 May 2025 16:01:51 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
+	samba-technical@lists.samba.org
+Subject: [PATCH v2 00/12] smb:common: introduce and use common smbdirect headers/structures (step1)
+Date: Wed, 28 May 2025 18:01:29 +0200
+Message-Id: <cover.1748446473.git.metze@samba.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, 28 May 2025 12:09:01 +0800
-ChenXiaoSong <chenxiaosong@chenxiaosong.com> wrote:
-> =E5=9C=A8 2025/5/28 11:39, Steve French =E5=86=99=E9=81=93:
-> > Weren't there issues brought up earlier with using sock_create_kern
-> > due to network namespaces and refcounts?
+Hi,
 
-> This patch is simply a cleanup that wraps the original code for=20
-> explicitness, the last argument of __sock_create(..., 1) specifies that=20
-> the socket is created in kernel space.
+in preparation of a having a common smb_direct layer I started
+to move things into common header files and added the first
+step in using shared structues like struct smbdirect_socket.
 
-Except that 'kernel space' doesn't really mean anything.
-IIRC it does two separate things:
-1) Skips some 'permission' checks on the current process.
-2) Doesn't 'hold' the network namespace.
+Currently only simple things are shared and there is no
+intended behaviour change (even if I found some things
+I'd like to change, but I'll defer them in order to
+make the review easier).
 
-The extra permission checks might be relevant even if the socket is
-only indirectly accessible from a process.
+I'll work on this the next few months in order to
+unify the in kernel client and server layers
+and expose the result to userspace too.
+So that Samba can also use it.
 
-But code like smb doesn't want the extra checks but does need the
-namespace held (or it has to go through 'hoops' to request a callback
-when the namespace is removed and delete the connection from the
-callback).
+v2:
+  - change smb_direct into smbdirect
+  - make usage of header files just as needed
+  - also introduce struct smbdirect_socket[_parameters]
+    as shared structures
 
-Maybe there should be a 'kernel_socket()' (cf kernel_sendmsg()) that
-code like smb should use.
+Stefan Metzmacher (12):
+  smb: smbdirect: add smbdirect_pdu.h with protocol definitions
+  smb: client: make use of common smbdirect_pdu.h
+  smb: server: make use of common smbdirect_pdu.h
+  smb: smbdirect: add smbdirect.h with public structures
+  smb: client: make use of common smbdirect.h
+  smb: server: make use of common smbdirect.h
+  smb: smbdirect: add smbdirect_socket.h
+  smb: client: make use of common smbdirect_socket
+  smb: server: make use of common smbdirect_socket
+  smb: smbdirect: introduce smbdirect_socket_parameters
+  smb: client: make use of common smbdirect_socket_parameters
+  smb: server: make use of common smbdirect_socket_parameters
 
-	David
+ fs/smb/client/cifs_debug.c                 |  23 +-
+ fs/smb/client/smb2ops.c                    |  14 +-
+ fs/smb/client/smb2pdu.c                    |  17 +-
+ fs/smb/client/smbdirect.c                  | 389 +++++++++++----------
+ fs/smb/client/smbdirect.h                  |  71 +---
+ fs/smb/common/smbdirect/smbdirect.h        |  37 ++
+ fs/smb/common/smbdirect/smbdirect_pdu.h    |  55 +++
+ fs/smb/common/smbdirect/smbdirect_socket.h |  43 +++
+ fs/smb/server/connection.c                 |   4 +-
+ fs/smb/server/connection.h                 |  10 +-
+ fs/smb/server/smb2pdu.c                    |  11 +-
+ fs/smb/server/smb2pdu.h                    |   6 -
+ fs/smb/server/transport_rdma.c             | 385 +++++++++++---------
+ fs/smb/server/transport_rdma.h             |  41 ---
+ 14 files changed, 613 insertions(+), 493 deletions(-)
+ create mode 100644 fs/smb/common/smbdirect/smbdirect.h
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_socket.h
 
-
->=20
-> >=20
-> > On Tue, May 27, 2025 at 10:18=E2=80=AFPM <chenxiaosong@chenxiaosong.com=
-> wrote: =20
-> >>
-> >> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> >>
-> >> Change __sock_create() to sock_create_kern() for explicitness.
-> >>
-> >> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> >> ---
-> >>   fs/smb/client/connect.c | 3 +--
-> >>   1 file changed, 1 insertion(+), 2 deletions(-)
-> >>
-> >> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> >> index 6bf04d9a5491..3275f2ff84cb 100644
-> >> --- a/fs/smb/client/connect.c
-> >> +++ b/fs/smb/client/connect.c
-> >> @@ -3350,8 +3350,7 @@ generic_ip_connect(struct TCP_Server_Info *serve=
-r)
-> >>                  struct net *net =3D cifs_net_ns(server);
-> >>                  struct sock *sk;
-> >>
-> >> -               rc =3D __sock_create(net, sfamily, SOCK_STREAM,
-> >> -                                  IPPROTO_TCP, &server->ssocket, 1);
-> >> +               rc =3D sock_create_kern(net, sfamily, SOCK_STREAM, IPP=
-ROTO_TCP, &server->ssocket);
-> >>                  if (rc < 0) {
-> >>                          cifs_server_dbg(VFS, "Error %d creating socke=
-t\n", rc);
-> >>                          return rc;
-> >> --
-> >> 2.34.1
-> >>
-> >> =20
-> >=20
-> >  =20
->=20
->=20
+-- 
+2.34.1
 
