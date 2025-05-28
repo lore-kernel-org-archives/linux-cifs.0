@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF0B244670
-	for <linux-cifs@vger.kernel.org>; Wed, 28 May 2025 16:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9819244670
+	for <linux-cifs@vger.kernel.org>; Wed, 28 May 2025 16:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748448214; cv=none; b=pfLWqIWOSYH9vb5IkdJbdHzf4AkQrkwU6NS3kf2t8gBnVfK4zo55T36/ZPUobwXBG01wXkqtuHg6A9JCLVAYrawWAyxBNokQqfbdhcQd2OQMoTDnIL4rumPcl8dgZuhIrJ+aeuJ6oMQM/WGA4W1aYzGAvB8xqclhKfnESGo6uXU=
+	t=1748448229; cv=none; b=hFK2rhivYnnQMczPUnMNjU0FI6RB/+aXFbeh9V1NOhiUta5m8VNMZ7NaEEQRy0QUjlPiJ+ZmY3GwnG3rIPCnm+VjtIHBMozeZ0Vn/ZBAeahS10hItocHBioewhpuAdtm3Vqm+umY9lmCPMobzxYZ6fxzkpOJjhKwhFoKrgcqcQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748448214; c=relaxed/simple;
-	bh=/ALAqFBvK3cWxEhEb8Dx8X1YYvHEp4k0ePvNxAz+TYw=;
+	s=arc-20240116; t=1748448229; c=relaxed/simple;
+	bh=0wIafDRUXBj9xbinJcy9Hxzvx1bkyivnd8LJl93aqlY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ylz2+vCQ9TZ/IsYoXTK4WP9U8K9dZi6hQklom2rPI0t+DFfO/THa/XKWyJEWk6TVx5eakM5IylJ0MYn1ysDkurRiXFnkvfUUn0EXqwqaupa/UVe7+BgHafCAp12X4v1cdOqqh2QPotR3Oh/3QLD4GmG1nuiiO0H1J+exIBCbnQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=MuUZYdZz; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=YUmTcYTGdq0xx0vuly9+chJVOwrxyels2o5CuOs7iFDx3RgJhz+OZmvzEZ1rlmIM5meb9OsKxlHS/oGmSX88U11Q7dM6C1VZpslADkpuvXbcdZVmPpiV7zWeI2Yg7I4buDW90aiNtfc3ZJjdtPYnaY4VaufUA6Lu3fbvsDibVCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ahQnj+gk; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="MuUZYdZz"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ahQnj+gk"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-Id:Date:Cc:To:From;
-	bh=bSgUDazWITLvb2ljMIyza+Hfje1af9jR4GQ4eniAk28=; b=MuUZYdZzd9BcUR0erisqu9yHKj
-	Kpv6a/27JxAaQyn6NvvUbor7kGvA9TyO45L0sQw+eHpFEIC5q2fAlrQ3rnvbhKT2IeagDBlB2FjP9
-	/ESNwGwJEn33mFh2JSmYD52xo/oRuVjRN2k04ubFMBSdmkw2GctNCHMy96neSDFTe1fYpXVWTUUlS
-	DVy3ug39kTRXYiTXcmPCBKDBwX9Q0RnhDhKh8IbeLjNJj1lGAjYaF8U+n2GBr5BmWM6iYi8+Gl3cA
-	LcovamBhHBLt4R8DTE7xYBzNpCnFJ2cweCCxqxGNG1DqSoyT/AZjmEsXoR/DojNv3XUlE3S0D1FVW
-	IYfGnbEebTZ05X7d1CAzBYBeRcd1j660mdon0/mSpIyQScuN10w7ns7aaEEZXyDLGZO938e/QR+NA
-	msyjUjBIgZd8VORc+B3+I7vRpcreTUv6W8bghhO9rT/Z1cDhhXwhQY30avxG7Y6jFHJcGG7CbAhxG
-	NvV+6G/mdS+eL3MI4kqK++vm;
+	bh=USK5gI7c2cmSgt+o+TQjSkfl3q3Ba+/nwHKHiweUOfM=; b=ahQnj+gkJF3k3lV8SmR9cP4ZaA
+	CW5unMlLV7FAo8ZE65GnnLDJNCn3FQ0+6CvBOYvr/CYxLR1Lh08UgWWdDxKHkTU6rPG6rxxTmalpg
+	JjX90a3pzX1xq/OrxJKZxNqRwn8Q4cT3He2QVqfDUekZ5UDRUBFt2gs1dymbzWuoI0sxMnLXP5dtJ
+	t2FSL6YbKmXC8hF92Ci5+RDtA2EC0VSXWuLOMoR1w2RmuFirDC1dsSqA7KTL1ELoBBifftq9pnNWN
+	peuiCypOaam/P0Qeb/kVgP5FcVegOzLP387k9C+B3SNJUM078uQ31t2AXMWOd2b1hVYtY4bf+67t8
+	xof3qgPNOaJrNC/dbf6yLEqmKUz1oGGDWWmkb/eI0FNO2Mfxa4vh7ejbBdahRJwGjk5m/P6D2FGlq
+	B8YsOVZiYf+4JzcozHOjTmdNb2o6s29UC57bVGcycmUkGnYdhXMaOy/EsyIaSdnJ+M6GEcPjeZ1sd
+	HrGrl+3JlRbjKa608y7fr9Fq;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uKJFW-007hUZ-2I;
-	Wed, 28 May 2025 16:03:26 +0000
+	id 1uKJFm-007hXG-36;
+	Wed, 28 May 2025 16:03:43 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org
 Cc: metze@samba.org,
@@ -41,9 +41,9 @@ Cc: metze@samba.org,
 	Hyunchul Lee <hyc.lee@gmail.com>,
 	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
 	samba-technical@lists.samba.org
-Subject: [PATCH v2 11/12] smb: client: make use of common smbdirect_socket_parameters
-Date: Wed, 28 May 2025 18:01:40 +0200
-Message-Id: <e7af7efe4aa05a6a0ab3340dcbfd32777a375737.1748446473.git.metze@samba.org>
+Subject: [PATCH v2 12/12] smb: server: make use of common smbdirect_socket_parameters
+Date: Wed, 28 May 2025 18:01:41 +0200
+Message-Id: <cd2bf77b8d82240ce25b7325871b18a88c37b8b2.1748446473.git.metze@samba.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1748446473.git.metze@samba.org>
 References: <cover.1748446473.git.metze@samba.org>
@@ -65,475 +65,301 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/cifs_debug.c | 21 +++++----
- fs/smb/client/smb2ops.c    | 14 ++++--
- fs/smb/client/smbdirect.c  | 91 ++++++++++++++++++++++----------------
- fs/smb/client/smbdirect.h  | 10 +----
- 4 files changed, 77 insertions(+), 59 deletions(-)
+ fs/smb/server/transport_rdma.c | 85 ++++++++++++++++++----------------
+ 1 file changed, 44 insertions(+), 41 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 56b0b5c82dd1..c0196be0e65f 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -362,6 +362,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 	c = 0;
- 	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+		struct smbdirect_socket_parameters *sp;
-+#endif
-+
- 		/* channel info will be printed as a part of sessions below */
- 		if (SERVER_IS_CHAN(server))
- 			continue;
-@@ -383,6 +387,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			seq_printf(m, "\nSMBDirect transport not available");
- 			goto skip_rdma;
- 		}
-+		sp = &server->smbd_conn->socket.parameters;
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 16044d473c34..ceedf4e45c60 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -105,12 +105,6 @@ struct smb_direct_transport {
+ 	bool			full_packet_received;
+ 	wait_queue_head_t	wait_status;
  
- 		seq_printf(m, "\nSMBDirect (in hex) protocol version: %x "
- 			"transport status: %x",
-@@ -390,18 +395,18 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			server->smbd_conn->socket.status);
- 		seq_printf(m, "\nConn receive_credit_max: %x "
- 			"send_credit_target: %x max_send_size: %x",
--			server->smbd_conn->receive_credit_max,
--			server->smbd_conn->send_credit_target,
--			server->smbd_conn->max_send_size);
-+			sp->recv_credit_max,
-+			sp->send_credit_target,
-+			sp->max_send_size);
- 		seq_printf(m, "\nConn max_fragmented_recv_size: %x "
- 			"max_fragmented_send_size: %x max_receive_size:%x",
--			server->smbd_conn->max_fragmented_recv_size,
--			server->smbd_conn->max_fragmented_send_size,
--			server->smbd_conn->max_receive_size);
-+			sp->max_fragmented_recv_size,
-+			sp->max_fragmented_send_size,
-+			sp->max_recv_size);
- 		seq_printf(m, "\nConn keep_alive_interval: %x "
- 			"max_readwrite_size: %x rdma_readwrite_threshold: %x",
--			server->smbd_conn->keep_alive_interval,
--			server->smbd_conn->max_readwrite_size,
-+			sp->keepalive_interval_msec * 1000,
-+			sp->max_read_write_size,
- 			server->smbd_conn->rdma_readwrite_threshold);
- 		seq_printf(m, "\nDebug count_get_receive_buffer: %x "
- 			"count_put_receive_buffer: %x count_send_empty: %x",
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 2fe8eeb98535..8ee7b3dde12f 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -504,6 +504,9 @@ smb3_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 	wsize = min_t(unsigned int, wsize, server->max_write);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (server->rdma) {
-+		struct smbdirect_socket_parameters *sp =
-+			&server->smbd_conn->socket.parameters;
-+
- 		if (server->sign)
- 			/*
- 			 * Account for SMB2 data transfer packet header and
-@@ -511,12 +514,12 @@ smb3_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 			 */
- 			wsize = min_t(unsigned int,
- 				wsize,
--				server->smbd_conn->max_fragmented_send_size -
-+				sp->max_fragmented_send_size -
- 					SMB2_READWRITE_PDU_HEADER_SIZE -
- 					sizeof(struct smb2_transform_hdr));
- 		else
- 			wsize = min_t(unsigned int,
--				wsize, server->smbd_conn->max_readwrite_size);
-+				wsize, sp->max_read_write_size);
- 	}
- #endif
- 	if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
-@@ -552,6 +555,9 @@ smb3_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 	rsize = min_t(unsigned int, rsize, server->max_read);
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (server->rdma) {
-+		struct smbdirect_socket_parameters *sp =
-+			&server->smbd_conn->socket.parameters;
-+
- 		if (server->sign)
- 			/*
- 			 * Account for SMB2 data transfer packet header and
-@@ -559,12 +565,12 @@ smb3_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- 			 */
- 			rsize = min_t(unsigned int,
- 				rsize,
--				server->smbd_conn->max_fragmented_recv_size -
-+				sp->max_fragmented_recv_size -
- 					SMB2_READWRITE_PDU_HEADER_SIZE -
- 					sizeof(struct smb2_transform_hdr));
- 		else
- 			rsize = min_t(unsigned int,
--				rsize, server->smbd_conn->max_readwrite_size);
-+				rsize, sp->max_read_write_size);
- 	}
- #endif
+-	int			max_send_size;
+-	int			max_recv_size;
+-	int			max_fragmented_send_size;
+-	int			max_fragmented_recv_size;
+-	int			max_rdma_rw_size;
+-
+ 	spinlock_t		reassembly_queue_lock;
+ 	struct list_head	reassembly_queue;
+ 	int			reassembly_data_length;
+@@ -121,7 +115,6 @@ struct smb_direct_transport {
+ 	spinlock_t		receive_credit_lock;
+ 	int			recv_credits;
+ 	int			count_avail_recvmsg;
+-	int			recv_credit_max;
+ 	int			recv_credit_target;
  
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 608ecd2149ed..5ae847919da5 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -320,6 +320,8 @@ static bool process_negotiation_response(
- 		struct smbd_response *response, int packet_length)
+ 	spinlock_t		recvmsg_queue_lock;
+@@ -130,7 +123,6 @@ struct smb_direct_transport {
+ 	spinlock_t		empty_recvmsg_queue_lock;
+ 	struct list_head	empty_recvmsg_queue;
+ 
+-	int			send_credit_target;
+ 	atomic_t		send_credits;
+ 	spinlock_t		lock_new_recv_credits;
+ 	int			new_recv_credits;
+@@ -655,16 +647,18 @@ static int smb_direct_post_recv(struct smb_direct_transport *t,
+ 				struct smb_direct_recvmsg *recvmsg)
  {
- 	struct smbd_connection *info = response->info;
-+	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket *sc = &t->socket;
 +	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_negotiate_resp *packet = smbd_response_payload(response);
+ 	struct ib_recv_wr wr;
+ 	int ret;
  
- 	if (packet_length < sizeof(struct smbdirect_negotiate_resp)) {
-@@ -349,20 +351,20 @@ static bool process_negotiation_response(
+ 	recvmsg->sge.addr = ib_dma_map_single(sc->ib.dev,
+-					      recvmsg->packet, t->max_recv_size,
++					      recvmsg->packet,
++					      sp->max_recv_size,
+ 					      DMA_FROM_DEVICE);
+ 	ret = ib_dma_mapping_error(sc->ib.dev, recvmsg->sge.addr);
+ 	if (ret)
+ 		return ret;
+-	recvmsg->sge.length = t->max_recv_size;
++	recvmsg->sge.length = sp->max_recv_size;
+ 	recvmsg->sge.lkey = sc->ib.pd->local_dma_lkey;
+ 	recvmsg->cqe.done = recv_done;
  
- 	atomic_set(&info->receive_credits, 0);
- 
--	if (le32_to_cpu(packet->preferred_send_size) > info->max_receive_size) {
-+	if (le32_to_cpu(packet->preferred_send_size) > sp->max_recv_size) {
- 		log_rdma_event(ERR, "error: preferred_send_size=%d\n",
- 			le32_to_cpu(packet->preferred_send_size));
- 		return false;
- 	}
--	info->max_receive_size = le32_to_cpu(packet->preferred_send_size);
-+	sp->max_recv_size = le32_to_cpu(packet->preferred_send_size);
- 
- 	if (le32_to_cpu(packet->max_receive_size) < SMBD_MIN_RECEIVE_SIZE) {
- 		log_rdma_event(ERR, "error: max_receive_size=%d\n",
- 			le32_to_cpu(packet->max_receive_size));
- 		return false;
- 	}
--	info->max_send_size = min_t(int, info->max_send_size,
--					le32_to_cpu(packet->max_receive_size));
-+	sp->max_send_size = min_t(u32, sp->max_send_size,
-+				  le32_to_cpu(packet->max_receive_size));
- 
- 	if (le32_to_cpu(packet->max_fragmented_size) <
- 			SMBD_MIN_FRAGMENTED_SIZE) {
-@@ -370,18 +372,18 @@ static bool process_negotiation_response(
- 			le32_to_cpu(packet->max_fragmented_size));
- 		return false;
- 	}
--	info->max_fragmented_send_size =
-+	sp->max_fragmented_send_size =
- 		le32_to_cpu(packet->max_fragmented_size);
- 	info->rdma_readwrite_threshold =
--		rdma_readwrite_threshold > info->max_fragmented_send_size ?
--		info->max_fragmented_send_size :
-+		rdma_readwrite_threshold > sp->max_fragmented_send_size ?
-+		sp->max_fragmented_send_size :
- 		rdma_readwrite_threshold;
- 
- 
--	info->max_readwrite_size = min_t(u32,
-+	sp->max_read_write_size = min_t(u32,
- 			le32_to_cpu(packet->max_readwrite_size),
- 			info->max_frmr_depth * PAGE_SIZE);
--	info->max_frmr_depth = info->max_readwrite_size / PAGE_SIZE;
-+	info->max_frmr_depth = sp->max_read_write_size / PAGE_SIZE;
- 
- 	return true;
- }
-@@ -689,6 +691,7 @@ static int smbd_ia_open(
- static int smbd_post_send_negotiate_req(struct smbd_connection *info)
+@@ -1039,6 +1033,7 @@ static int smb_direct_create_header(struct smb_direct_transport *t,
+ 				    struct smb_direct_sendmsg **sendmsg_out)
  {
- 	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket *sc = &t->socket;
 +	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct ib_send_wr send_wr;
- 	int rc = -ENOMEM;
- 	struct smbd_request *request;
-@@ -704,11 +707,11 @@ static int smbd_post_send_negotiate_req(struct smbd_connection *info)
- 	packet->min_version = cpu_to_le16(SMBDIRECT_V1);
- 	packet->max_version = cpu_to_le16(SMBDIRECT_V1);
- 	packet->reserved = 0;
--	packet->credits_requested = cpu_to_le16(info->send_credit_target);
--	packet->preferred_send_size = cpu_to_le32(info->max_send_size);
--	packet->max_receive_size = cpu_to_le32(info->max_receive_size);
-+	packet->credits_requested = cpu_to_le16(sp->send_credit_target);
-+	packet->preferred_send_size = cpu_to_le32(sp->max_send_size);
-+	packet->max_receive_size = cpu_to_le32(sp->max_recv_size);
- 	packet->max_fragmented_size =
--		cpu_to_le32(info->max_fragmented_recv_size);
-+		cpu_to_le32(sp->max_fragmented_recv_size);
- 
- 	request->num_sge = 1;
- 	request->sge[0].addr = ib_dma_map_single(
-@@ -800,6 +803,7 @@ static int smbd_post_send(struct smbd_connection *info,
- 		struct smbd_request *request)
- {
- 	struct smbdirect_socket *sc = &info->socket;
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct ib_send_wr send_wr;
- 	int rc, i;
- 
-@@ -831,7 +835,7 @@ static int smbd_post_send(struct smbd_connection *info,
- 	} else
- 		/* Reset timer for idle connection after packet is sent */
- 		mod_delayed_work(info->workqueue, &info->idle_timer_work,
--			info->keep_alive_interval*HZ);
-+			msecs_to_jiffies(sp->keepalive_interval_msec));
- 
- 	return rc;
- }
-@@ -841,6 +845,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
- 			       int *_remaining_data_length)
- {
- 	struct smbdirect_socket *sc = &info->socket;
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	int i, rc;
+ 	struct smb_direct_sendmsg *sendmsg;
+ 	struct smbdirect_data_transfer *packet;
  	int header_length;
- 	int data_length;
-@@ -868,7 +873,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
- 
- wait_send_queue:
- 	wait_event(info->wait_post_send,
--		atomic_read(&info->send_pending) < info->send_credit_target ||
-+		atomic_read(&info->send_pending) < sp->send_credit_target ||
- 		sc->status != SMBDIRECT_SOCKET_CONNECTED);
- 
- 	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
-@@ -878,7 +883,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
- 	}
- 
- 	if (unlikely(atomic_inc_return(&info->send_pending) >
--				info->send_credit_target)) {
-+				sp->send_credit_target)) {
- 		atomic_dec(&info->send_pending);
- 		goto wait_send_queue;
- 	}
-@@ -917,7 +922,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+@@ -1050,7 +1045,7 @@ static int smb_direct_create_header(struct smb_direct_transport *t,
  
  	/* Fill in the packet header */
- 	packet = smbd_request_payload(request);
--	packet->credits_requested = cpu_to_le16(info->send_credit_target);
+ 	packet = (struct smbdirect_data_transfer *)sendmsg->packet;
+-	packet->credits_requested = cpu_to_le16(t->send_credit_target);
 +	packet->credits_requested = cpu_to_le16(sp->send_credit_target);
+ 	packet->credits_granted = cpu_to_le16(manage_credits_prior_sending(t));
  
- 	new_credits = manage_credits_prior_sending(info);
- 	atomic_add(new_credits, &info->receive_credits);
-@@ -1017,16 +1022,17 @@ static int smbd_post_recv(
- 		struct smbd_connection *info, struct smbd_response *response)
+ 	packet->flags = 0;
+@@ -1251,9 +1246,10 @@ static int smb_direct_writev(struct ksmbd_transport *t,
  {
- 	struct smbdirect_socket *sc = &info->socket;
+ 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
+ 	struct smbdirect_socket *sc = &st->socket;
 +	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct ib_recv_wr recv_wr;
- 	int rc = -EIO;
- 
- 	response->sge.addr = ib_dma_map_single(
- 				sc->ib.dev, response->packet,
--				info->max_receive_size, DMA_FROM_DEVICE);
-+				sp->max_recv_size, DMA_FROM_DEVICE);
- 	if (ib_dma_mapping_error(sc->ib.dev, response->sge.addr))
- 		return rc;
- 
--	response->sge.length = info->max_receive_size;
-+	response->sge.length = sp->max_recv_size;
- 	response->sge.lkey = sc->ib.pd->local_dma_lkey;
- 
- 	response->cqe.done = recv_done;
-@@ -1274,6 +1280,8 @@ static void idle_connection_timer(struct work_struct *work)
- 	struct smbd_connection *info = container_of(
- 					work, struct smbd_connection,
- 					idle_timer_work.work);
-+	struct smbdirect_socket *sc = &info->socket;
-+	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 
- 	if (info->keep_alive_requested != KEEP_ALIVE_NONE) {
- 		log_keep_alive(ERR,
-@@ -1288,7 +1296,7 @@ static void idle_connection_timer(struct work_struct *work)
- 
- 	/* Setup the next idle timeout work */
- 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
--			info->keep_alive_interval*HZ);
-+			msecs_to_jiffies(sp->keepalive_interval_msec));
- }
- 
- /*
-@@ -1300,6 +1308,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 	int remaining_data_length;
+ 	int start, i, j;
+-	int max_iov_size = st->max_send_size -
++	int max_iov_size = sp->max_send_size -
+ 			sizeof(struct smbdirect_data_transfer);
+ 	int ret;
+ 	struct kvec vec;
+@@ -1383,6 +1379,7 @@ static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
+ 				bool is_read)
  {
- 	struct smbd_connection *info = server->smbd_conn;
- 	struct smbdirect_socket *sc;
-+	struct smbdirect_socket_parameters *sp;
- 	struct smbd_response *response;
- 	unsigned long flags;
- 
-@@ -1308,6 +1317,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 		return;
- 	}
- 	sc = &info->socket;
-+	sp = &sc->parameters;
- 
- 	log_rdma_event(INFO, "destroying rdma session\n");
- 	if (sc->status != SMBDIRECT_SOCKET_DISCONNECTED) {
-@@ -1349,7 +1359,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 	log_rdma_event(INFO, "free receive buffers\n");
- 	wait_event(info->wait_receive_queues,
- 		info->count_receive_queue + info->count_empty_packet_queue
--			== info->receive_credit_max);
-+			== sp->recv_credit_max);
- 	destroy_receive_buffers(info);
- 
- 	/*
-@@ -1437,6 +1447,8 @@ static void destroy_caches_and_workqueue(struct smbd_connection *info)
- #define MAX_NAME_LEN	80
- static int allocate_caches_and_workqueue(struct smbd_connection *info)
- {
-+	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket *sc = &t->socket;
 +	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	char name[MAX_NAME_LEN];
- 	int rc;
+ 	struct smb_direct_rdma_rw_msg *msg, *next_msg;
+ 	int i, ret;
+ 	DECLARE_COMPLETION_ONSTACK(completion);
+@@ -1395,7 +1392,7 @@ static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
+ 	if (sc->status != SMBDIRECT_SOCKET_CONNECTED)
+ 		return -ENOTCONN;
  
-@@ -1451,7 +1463,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
- 		return -ENOMEM;
+-	if (buf_len > t->max_rdma_rw_size)
++	if (buf_len > sp->max_read_write_size)
+ 		return -EINVAL;
  
- 	info->request_mempool =
--		mempool_create(info->send_credit_target, mempool_alloc_slab,
-+		mempool_create(sp->send_credit_target, mempool_alloc_slab,
- 			mempool_free_slab, info->request_cache);
- 	if (!info->request_mempool)
- 		goto out1;
-@@ -1461,13 +1473,13 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
- 		kmem_cache_create(
- 			name,
- 			sizeof(struct smbd_response) +
--				info->max_receive_size,
-+				sp->max_recv_size,
- 			0, SLAB_HWCACHE_ALIGN, NULL);
- 	if (!info->response_cache)
- 		goto out2;
- 
- 	info->response_mempool =
--		mempool_create(info->receive_credit_max, mempool_alloc_slab,
-+		mempool_create(sp->recv_credit_max, mempool_alloc_slab,
- 		       mempool_free_slab, info->response_cache);
- 	if (!info->response_mempool)
- 		goto out3;
-@@ -1477,7 +1489,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
- 	if (!info->workqueue)
- 		goto out4;
- 
--	rc = allocate_receive_buffers(info, info->receive_credit_max);
-+	rc = allocate_receive_buffers(info, sp->recv_credit_max);
- 	if (rc) {
- 		log_rdma_event(ERR, "failed to allocate receive buffers\n");
- 		goto out5;
-@@ -1505,6 +1517,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	int rc;
- 	struct smbd_connection *info;
- 	struct smbdirect_socket *sc;
-+	struct smbdirect_socket_parameters *sp;
- 	struct rdma_conn_param conn_param;
- 	struct ib_qp_init_attr qp_attr;
- 	struct sockaddr_in *addr_in = (struct sockaddr_in *) dstaddr;
-@@ -1515,6 +1528,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	if (!info)
- 		return NULL;
- 	sc = &info->socket;
-+	sp = &sc->parameters;
- 
- 	sc->status = SMBDIRECT_SOCKET_CONNECTING;
- 	rc = smbd_ia_open(info, dstaddr, port);
-@@ -1541,12 +1555,12 @@ static struct smbd_connection *_smbd_get_connection(
- 		goto config_failed;
+ 	/* calculate needed credits */
+@@ -1609,6 +1606,7 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
+ 					      int failed)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	struct smb_direct_sendmsg *sendmsg;
+ 	struct smbdirect_negotiate_resp *resp;
+ 	int ret;
+@@ -1630,13 +1628,13 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
+ 		resp->negotiated_version = SMB_DIRECT_VERSION_LE;
+ 		resp->reserved = 0;
+ 		resp->credits_requested =
+-				cpu_to_le16(t->send_credit_target);
++				cpu_to_le16(sp->send_credit_target);
+ 		resp->credits_granted = cpu_to_le16(manage_credits_prior_sending(t));
+-		resp->max_readwrite_size = cpu_to_le32(t->max_rdma_rw_size);
+-		resp->preferred_send_size = cpu_to_le32(t->max_send_size);
+-		resp->max_receive_size = cpu_to_le32(t->max_recv_size);
++		resp->max_readwrite_size = cpu_to_le32(sp->max_read_write_size);
++		resp->preferred_send_size = cpu_to_le32(sp->max_send_size);
++		resp->max_receive_size = cpu_to_le32(sp->max_recv_size);
+ 		resp->max_fragmented_size =
+-				cpu_to_le32(t->max_fragmented_recv_size);
++				cpu_to_le32(sp->max_fragmented_recv_size);
  	}
  
--	info->receive_credit_max = smbd_receive_credit_max;
--	info->send_credit_target = smbd_send_credit_target;
--	info->max_send_size = smbd_max_send_size;
--	info->max_fragmented_recv_size = smbd_max_fragmented_recv_size;
--	info->max_receive_size = smbd_max_receive_size;
--	info->keep_alive_interval = smbd_keep_alive_interval;
-+	sp->recv_credit_max = smbd_receive_credit_max;
-+	sp->send_credit_target = smbd_send_credit_target;
-+	sp->max_send_size = smbd_max_send_size;
-+	sp->max_fragmented_recv_size = smbd_max_fragmented_recv_size;
-+	sp->max_recv_size = smbd_max_receive_size;
-+	sp->keepalive_interval_msec = smbd_keep_alive_interval * 1000;
- 
- 	if (sc->ib.dev->attrs.max_send_sge < SMBDIRECT_MAX_SEND_SGE ||
- 	    sc->ib.dev->attrs.max_recv_sge < SMBDIRECT_MAX_RECV_SGE) {
-@@ -1561,7 +1575,7 @@ static struct smbd_connection *_smbd_get_connection(
- 
- 	sc->ib.send_cq =
- 		ib_alloc_cq_any(sc->ib.dev, info,
--				info->send_credit_target, IB_POLL_SOFTIRQ);
-+				sp->send_credit_target, IB_POLL_SOFTIRQ);
- 	if (IS_ERR(sc->ib.send_cq)) {
- 		sc->ib.send_cq = NULL;
- 		goto alloc_cq_failed;
-@@ -1569,7 +1583,7 @@ static struct smbd_connection *_smbd_get_connection(
- 
- 	sc->ib.recv_cq =
- 		ib_alloc_cq_any(sc->ib.dev, info,
--				info->receive_credit_max, IB_POLL_SOFTIRQ);
-+				sp->recv_credit_max, IB_POLL_SOFTIRQ);
- 	if (IS_ERR(sc->ib.recv_cq)) {
- 		sc->ib.recv_cq = NULL;
- 		goto alloc_cq_failed;
-@@ -1578,8 +1592,8 @@ static struct smbd_connection *_smbd_get_connection(
- 	memset(&qp_attr, 0, sizeof(qp_attr));
- 	qp_attr.event_handler = smbd_qp_async_error_upcall;
- 	qp_attr.qp_context = info;
--	qp_attr.cap.max_send_wr = info->send_credit_target;
--	qp_attr.cap.max_recv_wr = info->receive_credit_max;
-+	qp_attr.cap.max_send_wr = sp->send_credit_target;
-+	qp_attr.cap.max_recv_wr = sp->recv_credit_max;
- 	qp_attr.cap.max_send_sge = SMBDIRECT_MAX_SEND_SGE;
- 	qp_attr.cap.max_recv_sge = SMBDIRECT_MAX_RECV_SGE;
- 	qp_attr.cap.max_inline_data = 0;
-@@ -1654,7 +1668,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	init_waitqueue_head(&info->wait_send_queue);
- 	INIT_DELAYED_WORK(&info->idle_timer_work, idle_connection_timer);
- 	queue_delayed_work(info->workqueue, &info->idle_timer_work,
--		info->keep_alive_interval*HZ);
-+		msecs_to_jiffies(sp->keepalive_interval_msec));
- 
- 	init_waitqueue_head(&info->wait_send_pending);
- 	atomic_set(&info->send_pending, 0);
-@@ -1971,6 +1985,7 @@ int smbd_send(struct TCP_Server_Info *server,
+ 	sendmsg->sge[0].addr = ib_dma_map_single(sc->ib.dev,
+@@ -1743,6 +1741,7 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 				  struct ib_qp_cap *cap)
  {
- 	struct smbd_connection *info = server->smbd_conn;
- 	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket *sc = &t->socket;
 +	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smb_rqst *rqst;
- 	struct iov_iter iter;
- 	unsigned int remaining_data_length, klen;
-@@ -1988,10 +2003,10 @@ int smbd_send(struct TCP_Server_Info *server,
- 	for (i = 0; i < num_rqst; i++)
- 		remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
- 
--	if (unlikely(remaining_data_length > info->max_fragmented_send_size)) {
-+	if (unlikely(remaining_data_length > sp->max_fragmented_send_size)) {
- 		/* assertion: payload never exceeds negotiated maximum */
- 		log_write(ERR, "payload size %d > max size %d\n",
--			remaining_data_length, info->max_fragmented_send_size);
-+			remaining_data_length, sp->max_fragmented_send_size);
+ 	struct ib_device *device = sc->ib.dev;
+ 	int max_send_sges, max_rw_wrs, max_send_wrs;
+ 	unsigned int max_sge_per_wr, wrs_per_credit;
+@@ -1750,10 +1749,10 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 	/* need 3 more sge. because a SMB_DIRECT header, SMB2 header,
+ 	 * SMB2 response could be mapped.
+ 	 */
+-	t->max_send_size = smb_direct_max_send_size;
+-	max_send_sges = DIV_ROUND_UP(t->max_send_size, PAGE_SIZE) + 3;
++	sp->max_send_size = smb_direct_max_send_size;
++	max_send_sges = DIV_ROUND_UP(sp->max_send_size, PAGE_SIZE) + 3;
+ 	if (max_send_sges > SMB_DIRECT_MAX_SEND_SGES) {
+-		pr_err("max_send_size %d is too large\n", t->max_send_size);
++		pr_err("max_send_size %d is too large\n", sp->max_send_size);
  		return -EINVAL;
  	}
  
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index 3d325d73364a..75b3f491c3ad 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -69,15 +69,7 @@ struct smbd_connection {
- 	spinlock_t lock_new_credits_offered;
- 	int new_credits_offered;
+@@ -1764,9 +1763,9 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 	 * are needed for MR registration, RDMA R/W, local & remote
+ 	 * MR invalidation.
+ 	 */
+-	t->max_rdma_rw_size = smb_direct_max_read_write_size;
++	sp->max_read_write_size = smb_direct_max_read_write_size;
+ 	t->pages_per_rw_credit = smb_direct_get_max_fr_pages(t);
+-	t->max_rw_credits = DIV_ROUND_UP(t->max_rdma_rw_size,
++	t->max_rw_credits = DIV_ROUND_UP(sp->max_read_write_size,
+ 					 (t->pages_per_rw_credit - 1) *
+ 					 PAGE_SIZE);
  
--	/* Connection parameters defined in [MS-SMBD] 3.1.1.1 */
--	int receive_credit_max;
--	int send_credit_target;
--	int max_send_size;
--	int max_fragmented_recv_size;
--	int max_fragmented_send_size;
--	int max_receive_size;
--	int keep_alive_interval;
--	int max_readwrite_size;
-+	/* dynamic connection parameters defined in [MS-SMBD] 3.1.1.1 */
- 	enum keep_alive_status keep_alive_requested;
- 	int protocol;
- 	atomic_t send_credits;
+@@ -1807,20 +1806,20 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 	t->recv_credits = 0;
+ 	t->count_avail_recvmsg = 0;
+ 
+-	t->recv_credit_max = smb_direct_receive_credit_max;
++	sp->recv_credit_max = smb_direct_receive_credit_max;
+ 	t->recv_credit_target = 10;
+ 	t->new_recv_credits = 0;
+ 
+-	t->send_credit_target = smb_direct_send_credit_target;
++	sp->send_credit_target = smb_direct_send_credit_target;
+ 	atomic_set(&t->send_credits, 0);
+ 	atomic_set(&t->rw_credits, t->max_rw_credits);
+ 
+-	t->max_send_size = smb_direct_max_send_size;
+-	t->max_recv_size = smb_direct_max_receive_size;
+-	t->max_fragmented_recv_size = smb_direct_max_fragmented_recv_size;
++	sp->max_send_size = smb_direct_max_send_size;
++	sp->max_recv_size = smb_direct_max_receive_size;
++	sp->max_fragmented_recv_size = smb_direct_max_fragmented_recv_size;
+ 
+ 	cap->max_send_wr = max_send_wrs;
+-	cap->max_recv_wr = t->recv_credit_max;
++	cap->max_recv_wr = sp->recv_credit_max;
+ 	cap->max_send_sge = max_sge_per_wr;
+ 	cap->max_recv_sge = SMB_DIRECT_MAX_RECV_SGES;
+ 	cap->max_inline_data = 0;
+@@ -1852,6 +1851,8 @@ static void smb_direct_destroy_pools(struct smb_direct_transport *t)
+ 
+ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ {
++	struct smbdirect_socket *sc = &t->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	char name[80];
+ 	int i;
+ 	struct smb_direct_recvmsg *recvmsg;
+@@ -1864,7 +1865,7 @@ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ 	if (!t->sendmsg_cache)
+ 		return -ENOMEM;
+ 
+-	t->sendmsg_mempool = mempool_create(t->send_credit_target,
++	t->sendmsg_mempool = mempool_create(sp->send_credit_target,
+ 					    mempool_alloc_slab, mempool_free_slab,
+ 					    t->sendmsg_cache);
+ 	if (!t->sendmsg_mempool)
+@@ -1873,27 +1874,27 @@ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ 	snprintf(name, sizeof(name), "smb_direct_resp_%p", t);
+ 	t->recvmsg_cache = kmem_cache_create(name,
+ 					     sizeof(struct smb_direct_recvmsg) +
+-					      t->max_recv_size,
++					     sp->max_recv_size,
+ 					     0, SLAB_HWCACHE_ALIGN, NULL);
+ 	if (!t->recvmsg_cache)
+ 		goto err;
+ 
+ 	t->recvmsg_mempool =
+-		mempool_create(t->recv_credit_max, mempool_alloc_slab,
++		mempool_create(sp->recv_credit_max, mempool_alloc_slab,
+ 			       mempool_free_slab, t->recvmsg_cache);
+ 	if (!t->recvmsg_mempool)
+ 		goto err;
+ 
+ 	INIT_LIST_HEAD(&t->recvmsg_queue);
+ 
+-	for (i = 0; i < t->recv_credit_max; i++) {
++	for (i = 0; i < sp->recv_credit_max; i++) {
+ 		recvmsg = mempool_alloc(t->recvmsg_mempool, KSMBD_DEFAULT_GFP);
+ 		if (!recvmsg)
+ 			goto err;
+ 		recvmsg->transport = t;
+ 		list_add(&recvmsg->list, &t->recvmsg_queue);
+ 	}
+-	t->count_avail_recvmsg = t->recv_credit_max;
++	t->count_avail_recvmsg = sp->recv_credit_max;
+ 
+ 	return 0;
+ err:
+@@ -1905,6 +1906,7 @@ static int smb_direct_create_qpair(struct smb_direct_transport *t,
+ 				   struct ib_qp_cap *cap)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	int ret;
+ 	struct ib_qp_init_attr qp_attr;
+ 	int pages_per_rw;
+@@ -1928,7 +1930,7 @@ static int smb_direct_create_qpair(struct smb_direct_transport *t,
+ 	}
+ 
+ 	sc->ib.recv_cq = ib_alloc_cq(sc->ib.dev, t,
+-				 t->recv_credit_max, 0, IB_POLL_WORKQUEUE);
++				     sp->recv_credit_max, 0, IB_POLL_WORKQUEUE);
+ 	if (IS_ERR(sc->ib.recv_cq)) {
+ 		pr_err("Can't create RDMA recv CQ\n");
+ 		ret = PTR_ERR(sc->ib.recv_cq);
+@@ -1955,7 +1957,7 @@ static int smb_direct_create_qpair(struct smb_direct_transport *t,
+ 	sc->ib.qp = sc->rdma.cm_id->qp;
+ 	sc->rdma.cm_id->event_handler = smb_direct_cm_handler;
+ 
+-	pages_per_rw = DIV_ROUND_UP(t->max_rdma_rw_size, PAGE_SIZE) + 1;
++	pages_per_rw = DIV_ROUND_UP(sp->max_read_write_size, PAGE_SIZE) + 1;
+ 	if (pages_per_rw > sc->ib.dev->attrs.max_sgl_rd) {
+ 		ret = ib_mr_pool_init(sc->ib.qp, &sc->ib.qp->rdma_mrs,
+ 				      t->max_rw_credits, IB_MR_TYPE_MEM_REG,
+@@ -1992,6 +1994,7 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ {
+ 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
+ 	struct smbdirect_socket *sc = &st->socket;
++	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	struct smb_direct_recvmsg *recvmsg;
+ 	struct smbdirect_negotiate_req *req;
+ 	int ret;
+@@ -2013,14 +2016,14 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ 		goto out;
+ 
+ 	req = (struct smbdirect_negotiate_req *)recvmsg->packet;
+-	st->max_recv_size = min_t(int, st->max_recv_size,
++	sp->max_recv_size = min_t(int, sp->max_recv_size,
+ 				  le32_to_cpu(req->preferred_send_size));
+-	st->max_send_size = min_t(int, st->max_send_size,
++	sp->max_send_size = min_t(int, sp->max_send_size,
+ 				  le32_to_cpu(req->max_receive_size));
+-	st->max_fragmented_send_size =
++	sp->max_fragmented_send_size =
+ 		le32_to_cpu(req->max_fragmented_size);
+-	st->max_fragmented_recv_size =
+-		(st->recv_credit_max * st->max_recv_size) / 2;
++	sp->max_fragmented_recv_size =
++		(sp->recv_credit_max * sp->max_recv_size) / 2;
+ 
+ 	ret = smb_direct_send_negotiate_response(st, ret);
+ out:
 -- 
 2.34.1
 
