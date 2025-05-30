@@ -1,102 +1,105 @@
-Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5D254652
-	for <linux-cifs@vger.kernel.org>; Fri, 30 May 2025 09:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD9A192B75
+	for <linux-cifs@vger.kernel.org>; Fri, 30 May 2025 15:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748598458; cv=none; b=PtEEnC6M1hL/ExZNTxTDOw5F4S2befi2Dmd4qjOS4KncI3RvCQoPQXTlxRJr9HW2q//5beyHpvEH31oePSgMsfmopxqOR9n3u5k57NRq0pjdlEQpqExbAprwa7HuO+UXhQxNLIuR6mlYzax7bkoL6Wp74W7OUSHkQNYbtlgDBsM=
+	t=1748619165; cv=none; b=OWeIGCL7tBuZ0+cf1sCiJoE/3K7PuKX9LDJYIrFMX4LR4ePbuI2xD4ZEfFptp6VZCFD6tVsfHf+2Xlv2jlJR4sgbDq0EmSLXsCuE6UX8eR7+SpSvq4xyplo+40w6Ntg4OZYh+PHRi5sKk8kNkY5m4TABZhK2yLaQ1IH4MBOMijY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748598458; c=relaxed/simple;
-	bh=Yi+nj61jzEXGuCyT76NCaTTzBkQxWTCsM7nPWJU9e7Q=;
-	h=Message-Id:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Qwz+NOT4xaFUnp7MpDntLnees3iBJBhcUdfI1YavuQZrkc5yP8SkDPDnFcMtrObOSviCV3Y+aFaRGj1YIHaX5V2O0l7geqlLym9YBMnbHVRnnFFNoOTGAQ4y34bXsCHNfftkW1yG0H45l7tuDVI0Qfo+McR+IHDEckjTPoAnm3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=qqR1YKgg; arc=none smtp.client-ip=176.96.139.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
+	s=arc-20240116; t=1748619165; c=relaxed/simple;
+	bh=GK7P+vZyz30KNzf11hGejyYW+FLQL75DVuglhuIK4AQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ej9nAj3WW7F1mKtTiL0AovdoysMs1djoIi1m+o5enrlDoPa3nMR9MyZeaVuihhUeIltIlciJjeO8wvCR0U1scIN5WcBtJEkiKlBtSHOaxchsWxCsIhGl6cdkGSuDdP9uh+fMLv7jsjlrku2BGTBhgFziIo8E2Oo784zR1vXPqM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=RohiUF6F; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="qqR1YKgg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
-	t=1748598442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O1KtjHRJC3uJtzBJhVZNHoy6obntKuc4YyDaHlsW0uw=;
-	b=qqR1YKggXa89jdOW9uzbFsLKYY1flg3Q+K74rwP1GGumNUzJwU+qApiThymaY7qI0SzTH4
-	asf1sKABstzEFJISdUsGnr7Y2tT+xRKAxodBgauAVVg9agxv4yYBwDDMtYT1UGRTDSTOc4
-	P2O2FibPZ31gC8yq3WqMb3z8PNMmp8ZT6QUf8TxkqVHYnysHj7ZZnE8yY10/rGXB6JCAAe
-	NJ6I4HokkCpxw6y4iDxOSYt+dGGgz09hoGgCGjycQVX1wPO8flbkb5zL21cJix2/QeXBCV
-	U1OM166IDNGLfttoKq867u6nHroAjYKkUgiW61YkTKoo2YUjzo/NmLBnKvST5A==
-Message-Id: <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
-Subject: Re: ksmbd and special characters in file names
-From: Philipp Kerling <pkerling@casix.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, Ralph
- =?ISO-8859-1?Q?B=F6hme?=
-	 <slow@samba.org>
-Date: Fri, 30 May 2025 11:47:21 +0200
-In-Reply-To: <CAKYAXd9BPqg=0QKrpsOHaVDQkM8=Q6fragLmpTPve=pJdNjovw@rx2.rx-server.de>
-References: 
-	<d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
-	 <CAKYAXd-t27uzNLdXjPRuvbaaBnA-Z8qVqd_1W7v=97vp2Sd+rw@mail.gmail.com>
-	 <CAH2r5ms-v=UwFzXZpZ-5KBgiRPkvSqQyJnLBhxP5YaAuqMAG5A@mail.gmail.com>
-	 <CAKYAXd8rN+RVJB8ak_SPNX07L8BeastngMhQsXVGdUW0D0QLSw@mail.gmail.com>
-	 <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org>
-	 <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
-	 <CAKYAXd9BPqg=0QKrpsOHaVDQkM8=Q6fragLmpTPve=pJdNjovw@rx2.rx-server.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="RohiUF6F"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-450cfb790f7so14650615e9.0
+        for <linux-cifs@vger.kernel.org>; Fri, 30 May 2025 08:32:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1748619161; x=1749223961; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8zCsjB5LAd21BdKq6uyGhcO7X8vr/cT92bwbPnsgauA=;
+        b=RohiUF6F4OLat1xVt2dDRxYak6dDUKyCX/I4Kn1KkJiFFIdtJ10Dq4Y5RDFJClFHB1
+         pi39NYA/x3/aEvrP1362nOPDizij3qI5AFxD8aJUJpWgWltz3Pzv/rmnLSPL3zxe1ZX+
+         nIfM5EbElwLPc8jNwa14GJMWXU6peGdJJUZwJ020IWHT3SBcYZ1z6/lBF05Rol6MnCer
+         CoJS0Eq6QZ+E05kmXsTzj0RZ/QQaEsPo0qM+51QzSU2cbICW3lvxr+rTrUS996re1QfM
+         dcF5giJ79FRfBf0nEtTK3nc7xAjql56xd9NdSKpQILswEvfxHMz5GXcAAD4E9pwNJl6V
+         RXQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748619161; x=1749223961;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8zCsjB5LAd21BdKq6uyGhcO7X8vr/cT92bwbPnsgauA=;
+        b=cWmejIxiIsVtlqmAKvMRR2uDZYud8ynzwV2DNzU03h0sBGdajO2rhqIlNOn/ZMzsBW
+         ssYozd00VEoIQ3JmPDogNm++Mck9yLdB9JJAudGRHyBCr+2PqL04vpFdRzG/vgTxdv4U
+         GziIolPJy9BhqWH1Sqv/UH+KjT6N4sICIC0Kmoq9s/8fB5zjkUqd4sAHEBr1Mya0SuUJ
+         njEDWyLJ3pzVEzb5YfjqdOH8CivlcmbIq94EPQT1ZvqWQ3Xvi4HPOcxQg3xsHGWzC/Cp
+         otliM1DWvFkP8KWct/QZquNovBVInZBJ7J04HO/5fkRhk5AderUPvfc2hjfqgs9nj83r
+         2cVQ==
+X-Gm-Message-State: AOJu0Yw3bdyCXjtUXq3myTEDG/OnMuIsnL12bh9REoTAGZSAnN0pt+cK
+	eWnyLnInNggRp+B+y30MymU/+ZZ1EyspiCi/hFKMd9PdIQRvGpcQzU+VMCzMmuosktc0d/eJ8St
+	buIgtu9E=
+X-Gm-Gg: ASbGnctlhivkO06l2ldFwdwflYlc5/N3AYEvSqQN2VvkbtSyugQ4eXeI4Y5cpQfiyt4
+	ym2EuJ+w/jXBpcv6bGKFQrpoW0lbkl6clxhgXaphqg960VVPg4yR9TVI9Ab5Z9mJFaARZb6/cmZ
+	cGJP7nzlIv+7RVOZyotd35edv6iJp4HxxlVcsMnkqyITJZR9SSTThwRksb2uOejv1EyeuWp7dxN
+	NCKk0E9ytTl/BJjHpK234jVH35VIgXQXGtkywdnAC3r3aswH4DvgpkerQzqREKbvY1uBlmFnb8b
+	l2kumd9SW+/43D4YLQkLrdOO8tKSJkjqTC5lmuMPuRZll9KnjcX4rws6EPh9saNcecyjoVjBdMA
+	U
+X-Google-Smtp-Source: AGHT+IHrUgb/gGi0Fk+42kigWUxjTGw3rD5y9P7B445mEYqaPm2tiAkhEc+w37pCEXk3paaHtilgXg==
+X-Received: by 2002:a5d:5f52:0:b0:3a4:ea9a:1656 with SMTP id ffacd0b85a97d-3a4f7a3e4ecmr3300258f8f.10.1748619160579;
+        Fri, 30 May 2025 08:32:40 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f0:bc01:c875:de1c:c3e7:18dc:eefb])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87e2a38f77dsm2818398241.22.2025.05.30.08.32.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 May 2025 08:32:40 -0700 (PDT)
+From: Henrique Carvalho <henrique.carvalho@suse.com>
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Henrique Carvalho <henrique.carvalho@suse.com>
+Subject: [PATCH] cifs.upcall: correctly treat UPTARGET_UNSPECIFIED as UPTARGET_APP
+Date: Fri, 30 May 2025 12:28:14 -0300
+Message-ID: <20250530152814.1592508-1-henrique.carvalho@suse.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi!
+Kernels lacking commit db363b0a1d9e ("CIFS: New mount option for
+cifs.upcall namespace resolution") omit the field upcall_target from the
+key description sent to cifs.upcall, leaving args->upcall_target as
+UPTARGET_UNSPECIFIED. That makes get_cachename_from_process_env() search
+root's environment instead of the applications's environment (default
+behavior), breaking some mounts.
 
-2025-05-27 (=E7=81=AB) =E3=81=AE 11:57 +0900 =E3=81=AB Namjae Jeon =E3=81=
-=95=E3=82=93=E3=81=AF=E6=9B=B8=E3=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
-> On Mon, May 26, 2025 at 11:24=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.o=
-rg>
-> wrote:
-> >=20
-> > > It's been part of the spec since the beginning. You can find it
-> > > here:
-> > Right, I found it.
-> > Thanks for your reply.
-> > >=20
-> > > https://gitlab.com/samba-team/smb3-posix-spec/-/releases
-> > >=20
-> > > POSIX-SMB2 2.2.13.2.16 SMB2_CREATE_POSIX_CONTEXT
-> Philipp,
->=20
-> Can you confirm if your issue is fixed with the attached patch ?
->=20
-> Thanks!
-I can confirm the following behavior after applying the patch:
- * Path with "&" is not accessible with mount.smb3 and default options
- * Path with "&" is not accessible with mount.smb3 and "nomapposix"
-   option
- * Path with "&" is not accessible with mount.smb3 and "unix" option
- * Path with "&" is accessible with mount.smb3 and "unix,nomapposix"
-   options
-Perhaps "nomapposix" should be the default for the client when "unix"
-is enabled? Tough call though, might break some backwards
-compatibility.
+Explicitly set arg->upcall_target to UPTARGET_APP.
 
-Furthermore, in the last case in which the file is accessible, I can
-only access the file as root. This is because enabling the "unix" mount
-option leads to the origin UIDs and GIDs being taken over from the
-host, which do not correspond to anything on my client. I usually set
-"forceuid,forcegid,uid=3D...,gid=3D...,file_mode=3D0640,dir_mode=3D0750" on=
- the
-mount but, for whatever reason (might be intentional? might not be?),
-these options do nothing at all when combined with "unix". I can sort
-of get around this by setting "noperm", but it does seem odd that I
-would have to disable any and all permission checking just to get
-special characters in my paths working.
+Fixes: 89b679228cc1 ("CIFS.upcall to accommodate new namespace mount opt")
+Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+---
+ cifs.upcall.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Philipp
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 678b140..dbffb0f 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -1515,6 +1515,7 @@ int main(const int argc, char *const argv[])
+ 	 */
+ 	if (arg->upcall_target == UPTARGET_APP || arg->upcall_target == UPTARGET_UNSPECIFIED) {
+ 		syslog(LOG_INFO, "upcall_target=app, switching namespaces to application thread");
++		arg->upcall_target = UPTARGET_APP;
+ 		rc = switch_to_process_ns(arg->pid);
+ 		if (rc == -1) {
+ 			syslog(LOG_ERR, "unable to switch to process namespace: %s", strerror(errno));
+-- 
+2.47.0
+
