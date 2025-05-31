@@ -1,63 +1,94 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AB413CA97
-	for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 18:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4845513790B
+	for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 19:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748717414; cv=none; b=cfrOf5+wK1LSG7TYibfqjw9UWM+TAtxmIgB4inkJaBrUzODi04R+IkmJzO8i6S+ONRYOvPYC4WvSW8U0ma/Kcyp25DoRBhXddJG8qoHvEyN0QnvSXpYvS4f8smU+UCFfJZdELMDMYA4XfGrlyVCb1bWILVdthxEGzNPGUYUQ+LE=
+	t=1748720243; cv=none; b=oBSWJ0SRqHYjU2+eCcW0LYZeyHdFA6lja/0j4QI7BaB6P52kDWUVDNBodgsZlFYQxIYGdFhQ+B20IsFPhCk8nCMZHsyJuJJTiL8cFHBMJrUDBe79iiNsuChEfCulKo2NcPC5iRP5Oeeg9sTUCboJu/uFvWLxnAUpMR3wxBx+8Oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748717414; c=relaxed/simple;
-	bh=LNNz6RQq+yJSJyrqGHYeHd4lIwOVcSdsshPAJPmP/2A=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=awWGTU29trYd3I4SDB6LEz5Dc1HwErDJE0Zka2Yx27SK1bO11kU4wDO7J/+1UJqnpBZj78p9+ZxvD8/sknwqLCCMTsvjI3Qpl4sIqs8QEG28KrJpj1LLXeZo34UrBlbhQmv/0vVTnHJo04A5yUFss24DxGUPpRb8UVvaylpKnjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=fDDgCRmB; arc=none smtp.client-ip=167.235.159.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	s=arc-20240116; t=1748720243; c=relaxed/simple;
+	bh=8MDNwx+Q/pMv/7+iBrypXo9VmYaRGxBsBQQhIJLhwXg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rXIrBLcWpIQsMUJlY8qF6E6RH/dPm+7lgO98Zg4cFTFTqte6qvP9ILQNzT7iUpqZXQ0gBYdQKbeIgq6ZF0Y+JWPEbbLdS6hrBGw63K7/m07gPVGubo+3VecfoVlN+SbjlgqTkfeB26KT0S9ONSzpcR7wwPb21aZ44BiFTRGAjGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lAIGDf3I; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="fDDgCRmB"
-Message-ID: <088096eba2d038bce2f73e6519d11ce9@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1748717403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L5XNyCacvsECkV8OPMUggCJaFwEvY2kqdPe+35lKuQU=;
-	b=fDDgCRmBbLHoXvm71nJlo4XwDgfEqx24dCvXV3o5NRZrQssKtIGT+jKpbSx6eHwg5Ulvbh
-	k5PYQ7mc0jYNnSkNQMOUUs58BYSFj5MXt8QVLSntvEc9UkK7wF2aePYMW6cuHrQoFeD5T1
-	RPuunO5JUzhW3GMbuhcnEevDspQ1nWyl3RqeBJC6M1goeWNZcaB4pPZGjG+N7XNmUqGkZ9
-	0YXa0ae44MselLcaSIXPhByLea7yotCp+cUVUMIJ/JhZIbpnKAkG6W3uLxnFAd3lHJ+bx0
-	npxpT8LNNYxs9v1cjK2UhMsN+J7E1Fg4ofRTvAx4guL48wfz7vuEQuQJWCRGXg==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Steve French <smfrench@gmail.com>, Linus Walleij <linus.walleij@linaro.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Sergey Senozhatsky
- <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- linux-cifs@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Rosen Penev <rosenp@gmail.com>
-Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
-In-Reply-To: <CAH2r5msU-45Up+BovgpwQ2eV5o5aRz+j+zh6jZLvn=ZsmNuNeQ@mail.gmail.com>
-References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org>
- <CAH2r5msU-45Up+BovgpwQ2eV5o5aRz+j+zh6jZLvn=ZsmNuNeQ@mail.gmail.com>
-Date: Sat, 31 May 2025 15:49:47 -0300
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lAIGDf3I"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32a61af11ffso35043871fa.1
+        for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 12:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1748720239; x=1749325039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vDs8u8vb9kPfwkxfjdGAtSvoJK8yBI8BB/W2yi05NU8=;
+        b=lAIGDf3Ik4j3buq2DVCGrF9B/NB3uYxM+xAfQd0rpWOqTKnq1OVHm7sYbykXfmPmf/
+         JaObQSr+qk41r9a5r2+dtCWIxqk90lWW3jpoe7qFgv9KmPLU2AiCgIG1zc4v3SykNEeB
+         V4wqksL/0uFpq4G+nCgA5lb8D1a6IomtNBpApVlmU6dCi8aEmfY9FA+vCQUcthovQ2PL
+         J8yE2m2hnkTvKmxw+nYWUwsGASJ/KUiYYhFlQPYWkc9alD5B5wFjk2Wvq5y75si1rvuc
+         /c6DRFlwUCeKp/0Q37D+6MUBznQiLc7z9TPskxooBCgYOgvp6OfHpxc0TnfoHus44apV
+         171A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748720239; x=1749325039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vDs8u8vb9kPfwkxfjdGAtSvoJK8yBI8BB/W2yi05NU8=;
+        b=DSERjUhMrWVVt7jjr1sQFTSKOBGhn8X++m4cw9dV1RmK5oawJ1zv5h83zyHkwQTR1Q
+         q7T4TZYZy0CxAlCmUZ+GHA3UcdDlnADPTaLjMQPqIN+e8vZ+D+g31O6PM1HkjfCFYVHn
+         lLQe7e6OSGhIaf1zhmlkA0hmse2vhh0VTS7KF5PhnSiK5nsO1javB5OPeXFIzFZuOdsq
+         dtr+u5qBQSD+vBFk1qUm/DKTRmk1nRy+MMU2AbF2xbQGNhsSYfTUH/8PCVVMIEBi4JWn
+         FqKtkfuzbgieqGzMp9G82VQlo0xXf16SoH1YV3fQ527KBp44TuoonGiHJZjBiCs/m9v2
+         HTjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKY44SPo9tMSsocptNCIETH1Arhl5hAnf1jVLsDtZlfhmY2fWNYZCSDD5JY0+is6ozlUEYGkr/PDJc@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQLOmNvi6g1NPtmhKG6FwMUNToNh5y+lCsdbPe/JvTjGa7wWqc
+	gq0BBlk9IXLJui650nmgg7WgNrk64EIyM9BD6SRVi256SmtgTmZNlW+OxgLw2XhrCXYF45q6Hx+
+	zhHR/U0NVhCqY36W3uN+Z3sNMFwrdvdb4a4f4wv+lLw==
+X-Gm-Gg: ASbGncvasphZAKdccF3gMoSpmfub/SVWqn0Nmod5uvuoW4goBoGNNeklTx/wcn3YnOv
+	wQgEryhF1VsQ+B7eC1iEZ0rfsBHdQ2u38Ar2V9kmGMUK/uMbrWgGv1PAz/UzaOFAeAoevn3FycL
+	4T+oDfmbuiQkChbIYQ4VJjSadHBuZ2WjkG
+X-Google-Smtp-Source: AGHT+IHES6IUsoZhu4WrIkaM6eEWU+XxP+2wnwa5zWwWBOz2xRCNacD158U6lyIVsz/xhKHXkHIYuH0kSDat0ndtZyA=
+X-Received: by 2002:a2e:b8c3:0:b0:30b:f0da:3ae7 with SMTP id
+ 38308e7fff4ca-32a8dbd6f26mr27306381fa.14.1748720239213; Sat, 31 May 2025
+ 12:37:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org> <2025053156-gilled-mangy-e8b9@gregkh>
+In-Reply-To: <2025053156-gilled-mangy-e8b9@gregkh>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 31 May 2025 21:37:07 +0200
+X-Gm-Features: AX0GCFvnZg-kfPLzEAbEMy-_yy_nWNUNyv8-Ak-xoXkDEsbpsOB7mGAxJQhcxgw
+Message-ID: <CACRpkdYpjWMNbmj6-A_3XEbS0W6Y+UaMuAc2Sra_qebtJvBSbA@mail.gmail.com>
+Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
+	Rosen Penev <rosenp@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Steve French <smfrench@gmail.com> writes:
+On Sat, May 31, 2025 at 8:56=E2=80=AFAM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Sat, May 31, 2025 at 08:42:44AM +0200, Linus Walleij wrote:
 
-> It is interesting that almost 700 kernel modules define
-> MODULE_VERSION() for their module, but only 4 filesystems (including
-> cifs.ko).  I find it useful mainly for seeing which fixes are in
-> (since some distros do 'full backports' so easier to look at the
-> module version sometimes to see what fixes are likely in the module
-> when someone reports a problem).   I am curious why few fs use it
-> though since it is apparently very widely used for other module types.
+> > Adding MODULE_VERSION("1.0") to ksmbd makes /sys/modules/ksmbd
+> > appear even when ksmbd is compiled into the kernel.
+> >
+> > Adding a version as a way to get a module name is documented in
+> > Documentation/ABI/stable/sysfs-module.
+>
+> MODULE_VERSIONS() mean nothing and should be removed entirely from the
+> kernel tree.  The only "version" that is an issue is the kernel version.
 
-I find cifs.ko version quite useless, especially for distro and stable
-kernels which take fixes from newer versions while not backporting the
-commit that bumps cifs.ko version.  So relying on that version becomes
-pointless, IMO.
+I get it, I need to think of some better way to handle this.
+(Adding a random module parameter just to get this dir is probably a
+bad idea too.)
+
+Yours,
+Linus Walleij
