@@ -1,115 +1,113 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8576C35893
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 19:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B84197A7A
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 20:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748807975; cv=none; b=SpGZYMbkk1JC4rAUDEWvnTquaKrEX8PgVm1Nms+qVG9UVzkQRj/vaGqht33egPgj4TQvrXyctvB0thO7rhs/23NTQxd+wVZuR4xyelpcAOPbz6vKuRI5t3SxgdVnHOl5C9w03OZkKTWbsjy1nEo0czdnfDLXVixVGhufN3Zz8k0=
+	t=1748808840; cv=none; b=ReUTWrQEZ2CYZrNoM8b4h42+UEyB5PvM+EvyXBEjd++IeE8KxyGzxBrLIOqNGXlJtw5ufy1cxQmwxe6onIY9od+W7Z5HDvK8oBIFCx/h+47hjY3wpilVc2hDy6dzL4xtj61me15qV3zDujaVBk88x7Qz3H1zdY0nQGi+Zmvr9xE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748807975; c=relaxed/simple;
-	bh=l30Z+FLW9M3nm/k+1zSm7ehEEPvThO5b/vzMA8BOLAo=;
+	s=arc-20240116; t=1748808840; c=relaxed/simple;
+	bh=o0z1W4ujPM52pooC5hlNfB5KfPxLthEpR82z8uZUH3o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F2rEGHWN9mRW3j77SSXuzSdj5rl8KGTDU53c+LsT8tI2nCs4lBAbw9M/W9SqY+3SbJrLuI4YsNRQl1Acf64uX9G0SOJhvShcHN0uYUhbAITX2jjpmhduCx3UNRwUaxRAYNVC2F6Esn1KZ0nMYDJyAXoDF1QCdhpEVLKkJ7gqyqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kX0C3gFB; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=BvcpNS0RhyNBBnByeGHhRdRvugTp75sIuqcNrZcabPDqmGuZArYaUNWWrFCsRyjcFv03Tn9l/qnzebz/zzGaMATvxPaYN10aLTgXZq2G6CO2ViC6Ycu5+Gl6QIJwhTTYhbjjeV4wiBvCTHIHDQsvlXXJtLD+quARneZNBoyfyjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MprchEwO; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kX0C3gFB"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-3292aad800aso40731951fa.0
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 12:59:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MprchEwO"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32934448e8bso36648401fa.3
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 13:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748807971; x=1749412771; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748808837; x=1749413637; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+/7qnIAcZPZrnPGeCLYuUrS9f0kVeFRjxJpjdAxiX/Y=;
-        b=kX0C3gFB18+jhjqyp5RSXhwzjbeavwbqqF3/pZCfi9J+XOX2DJ4hF702CFJcyrR9QA
-         bEsB7hUjicQq89bSl19l+rj/Vh1CZF32dXPhVwJybOtgAZ1dPt04k4vC1vJQmsdIQv7m
-         lnL5ZYthXXkG0JGmHMOvr/tUepFwsC6DeasTVXXds/pj0VwvXcEz4M3VTtaFb1/Db5vO
-         yRb3K5lV/h8t1e2y/ic5DbRNyz8O0ZG0f3F3Z4DAVnVjVZmDfIfupGYI7j0c5tY4+th3
-         nP3W2ifWHjMuLzTObGziir/KwyDJqF32A/IGHTwhqV3+nM85pO9iZ5KV0X7m3bh7njsv
-         YjVA==
+        bh=ZTJlW85qNH5CkCI0lFTdZGoyhQLe1AYCsUsIixz7t8U=;
+        b=MprchEwOFJnGD5ssRAs63u9+urhrf9lgc2gkf2oh5koXjVN5QbNJrrTR7ihhjxV+bd
+         Vg7mJZcVPvIVXGSqyPwrU7A5kdBbu6XI6X2xCVFI39EavKw/v1JJMPYKrTT/Ov4lwm0Y
+         K36J4oQY7QdhFFdt+wXuEQqlVo3ZNxgOANQPWO4POwVP4GtTqRPOURfvx5QKp/trGJGY
+         y5Cjc2P5hsniYYCtYxckTyLU3gimkintwVL8/xDGs7cUP3pKNu3nB1CEUcMPgIDQuRaH
+         2H+GUA71k9r9ZG/s7lE051KA+OGXdQ1r2iNeBM5rCbuu+x++oC0AU5wXxE4r8NwxXBtI
+         y14g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748807971; x=1749412771;
+        d=1e100.net; s=20230601; t=1748808837; x=1749413637;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+/7qnIAcZPZrnPGeCLYuUrS9f0kVeFRjxJpjdAxiX/Y=;
-        b=gDPdUWGLhDGrQHZaSLQ/DAMmcEkQCICtYXF2I6N5N2YuHGQAXqJCTdgx9+HhWqfEDC
-         /fhota5tyHchJhM77Ca6XGww5AndR175DWJSGBLiaIAgKykPKoketSyLj+xXCyjPgq0p
-         vcY0UZiXiOJXfj7F8pUZbtdSLCrQuCxXrEc3aZuW1DqZm9Osfz6ZLFPoeScq0hvronjo
-         HkxM29j8a6wjC/v0mTxEOfRJlTVxQ5hZX9vbZ/dcK4GFc4v6WKu4JkqZ4ep78vEQzQZu
-         AsmLKvI4DoLz1WkvWpVlt9xs+Ex3zl2qWKJZcr17QM/ATw+Afw6qSlkb9c+eqdfQrKA7
-         loVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcZIYbfSOrQ0A/aDa+QBRmhwkrmSW8Hk2J1zSFjf5CSZuecIr0CaCibgyYWjkzhHAH43m6pDALYGzb@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMhasiM1txIJz5lBSNnmXVtxk8mYnMWUlYq8iEtxk0zcBrtI9O
-	3qBXzfAX99L47oue6fhAbW0SiPSP/UJVbL2vcpO9j77Oz1/+Dsr+pjecKROC4y1kfJ3j7ov9778
-	2ZYE6Uj4gv+yau0dxbqr01EViQKGqJeI=
-X-Gm-Gg: ASbGncuB2TQU+pWHIqXicU93iI4D1DMX9DNigWJdlV/yA2SyA3yUaouCkaOdeigLYXS
-	D/a4J2W7IzjQbpHRYHm9thODlUoBSsFexV2yQnPzwVrODi/L7HITedVYn0I1aL86qn7jBE0Qb/y
-	EmlkEMv5V2NYc6AIK+5oPbH4+mv6OaJd9LbwkrPygqqIgdsCAD5wShl4v/03Ujc8vmC4GRg//2Q
-	9F8
-X-Google-Smtp-Source: AGHT+IFXq0Mu2OTg5OlHUs6RkSH7/rvgr/UEENIN2GJ7snWjDpPqdN2P+TUnfQ4sZHjLdGuTs67fKngseT+b+fQaVI4=
-X-Received: by 2002:a2e:bc24:0:b0:32a:6c39:8939 with SMTP id
- 38308e7fff4ca-32a8dbfc226mr35925691fa.19.1748807971168; Sun, 01 Jun 2025
- 12:59:31 -0700 (PDT)
+        bh=ZTJlW85qNH5CkCI0lFTdZGoyhQLe1AYCsUsIixz7t8U=;
+        b=ozHpKNtI20n5UHycy1zEjjzKvXE9cJffOO44aQhXb+G/h27rp1u4Lf/9U21LoOnFYc
+         JHFyJAN0jMs6N0q/nCldwmtV8SMXjUtsUCBa1jnV6P2ndKJyXIxnDXv3EKp319Pu0uUb
+         AsNpj5ESHIktEe2UI/AhWzpbZzKBk1g5jNGLS2eeB4KSoavGe3Gq7686YNHLZa9yVKLt
+         vYiRM9vgKNtIumWJOEk4EOn6okg42ZQ+pOJnPQ1X5cM6BBCUkxPfKHkAOWBg63LEPe2m
+         pM2WXBI2XXa2DPC6uJpHBKJRkC+F1wc3jPF7TNkj/hDoApmtK9b1ZE03sQfPeiufCXRG
+         WKyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfL8uzht+Cy2mlmiFDTI7mpmjYaRRGBndIi2D2dPUvTkynYCJ20PxIPmzqRQ+1cLgL8ue0fch5R9TE@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAeA2MnPkzkqQtxHNswSCXo4TXZK9Z8KUggSwJ8OZpNcXyc1GV
+	xkdz3cRD3lzR09W+5m5y04CnGS8bJnsLC6XWv1q0pcU3GqGcLG/8Dw298z8g3sEY+f0XMNS4pVr
+	0nD5MEzi1y1cJ3ds3WiBIg3NAsVcfC7bJbQ==
+X-Gm-Gg: ASbGncvjYlidnzJ7Ap9wM5Yk/X0IwNMf7bjCuNUS60whorxiL1WTNHWSUtOWRvo1hzl
+	RCjqIoqUkYKXFOvzhafj3EeGF/Dq/FHlLVduPnhPmGNPlifSp9cwPNuXujqTJbP+nhnUCk5C5zM
+	cn847lJF1JIuAuXfJJJu+ZC5T8LsIsra/VrmhYhV4/8zyd7akHkZFUdjW849ggfr0ZSB1n+Sey2
+	WVl
+X-Google-Smtp-Source: AGHT+IGakqWpiQWcaG8I2t9Xaxggx4BxoH9CygWlFwbbdNTJewR13ywZJ5Ngl528BsqR8nH/NThHe28lBN9h25OTRjU=
+X-Received: by 2002:a05:651c:b25:b0:32a:847c:a1c0 with SMTP id
+ 38308e7fff4ca-32a8cd2bc75mr36696341fa.6.1748808837029; Sun, 01 Jun 2025
+ 13:13:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org>
- <CAH2r5msU-45Up+BovgpwQ2eV5o5aRz+j+zh6jZLvn=ZsmNuNeQ@mail.gmail.com>
- <088096eba2d038bce2f73e6519d11ce9@manguebit.com> <2025060107-anatomist-squander-d073@gregkh>
- <be8026cec8f645de3409433fe15e690a@manguebit.com>
-In-Reply-To: <be8026cec8f645de3409433fe15e690a@manguebit.com>
+References: <20250601171855.12268-1-devosruben6@gmail.com>
+In-Reply-To: <20250601171855.12268-1-devosruben6@gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 1 Jun 2025 14:59:20 -0500
-X-Gm-Features: AX0GCFtqdK2JgZuhkIZvJzwcyN6k9gCaTwRryOLT3WfVn9d3mvfEC-07vGdR4K0
-Message-ID: <CAH2r5mtm1FjgtzgM0p=2Q0QWifqZwZ2ZjCG6Rry04xQQ7rX4TA@mail.gmail.com>
-Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Walleij <linus.walleij@linaro.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, Rosen Penev <rosenp@gmail.com>
+Date: Sun, 1 Jun 2025 15:13:45 -0500
+X-Gm-Features: AX0GCFsyPF3ZKZrWRZ4KThAG5x4sszM2JJiLUyigC33DPLsIeEz9Jnqd_zzeUBM
+Message-ID: <CAH2r5mvu0CeEaqYjUT43m6Vj=dQ81SMfAQduXT-Ca52D6uBacg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: add NULL check in automount_fullpath
+To: Ruben Devos <devosruben6@gmail.com>
+Cc: pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
+	tom@talpey.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 1, 2025 at 2:56=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> w=
-rote:
->
-> Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
->
-> > On Sat, May 31, 2025 at 03:49:47PM -0300, Paulo Alcantara wrote:
-> >> Steve French <smfrench@gmail.com> writes:
-> >>
-> >> > It is interesting that almost 700 kernel modules define
-> >> > MODULE_VERSION() for their module, but only 4 filesystems (including
-> >> > cifs.ko).  I find it useful mainly for seeing which fixes are in
-> >> > (since some distros do 'full backports' so easier to look at the
-> >> > module version sometimes to see what fixes are likely in the module
-> >> > when someone reports a problem).   I am curious why few fs use it
-> >> > though since it is apparently very widely used for other module type=
-s.
-> >>
-> >> I find cifs.ko version quite useless, especially for distro and stable
-> >> kernels which take fixes from newer versions while not backporting the
-> >> commit that bumps cifs.ko version.  So relying on that version becomes
-> >> pointless, IMO.
-> >
-> > Yes, it is pointless, which is why it really should just be removed.
-> > I'll do a sweep of the tree after -rc1 is out and start sending out
-> > patches...
->
-> Sounds good.  Kernel version and git tree are just enough to figure out
-> what a filesystem or driver has in terms of features or fixes.
+good catch.  Added to cifs-2.6.git for-next, and added Cc: stable
 
-I ran into weird kernel versions a few times where module version was
-useful, so the external "features wiki" for cifs.ko lists both module versi=
-on
-and kernel version in the list of features.
+On Sun, Jun 1, 2025 at 12:25=E2=80=AFPM Ruben Devos <devosruben6@gmail.com>=
+ wrote:
+>
+> page is checked for null in __build_path_from_dentry_optional_prefix
+> when tcon->origin_fullpath is not set. However, the check is missing when
+> it is set.
+> Add a check to prevent a potential NULL pointer dereference.
+>
+> Signed-off-by: Ruben Devos <devosruben6@gmail.com>
+> ---
+>  fs/smb/client/namespace.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/fs/smb/client/namespace.c b/fs/smb/client/namespace.c
+> index e3f9213131c4..a6655807c086 100644
+> --- a/fs/smb/client/namespace.c
+> +++ b/fs/smb/client/namespace.c
+> @@ -146,6 +146,9 @@ static char *automount_fullpath(struct dentry *dentry=
+, void *page)
+>         }
+>         spin_unlock(&tcon->tc_lock);
+>
+> +       if (unlikely(!page))
+> +               return ERR_PTR(-ENOMEM);
+> +
+>         s =3D dentry_path_raw(dentry, page, PATH_MAX);
+>         if (IS_ERR(s))
+>                 return s;
+> --
+> 2.49.0
+>
+>
+
 
 --=20
 Thanks,
