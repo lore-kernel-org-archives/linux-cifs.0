@@ -1,116 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD7A2DCC1E
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 14:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB91C1F4C90
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 17:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748788271; cv=none; b=j8sRH2xiSHL2SvJnK6BQzRkKCzwfTPSBPdiuZqjmA34EgjD/qD7LWU/am5yLvUwjB8EyDAcftYQrM+i3ms5D/y7XJMVWihPRDrRVK0S4QHcMQPWFVfTVZvh011NP+RLYy5Wpl0jNuj615ey2SKsRrjqfuBl605HYLtE1fleFx08=
+	t=1748798555; cv=none; b=Gj2eHJJwEX0hVM47TwjauuQW7IDrCVaOzG/1CXIRgZ9T0mgoQGJSBgetKfHh2ptT2NMDvGfZmTUynSGOWmBO8/swl5M4VB+HfJcniCZgO4FfeLSZJGIoUpkDrbtRWditJBRBKn+JbyG8oyoe9xxAJ/RrgWmn7VTLInVbDEyodcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748788271; c=relaxed/simple;
-	bh=41RDBcCdaeVsf7h3L7tNDuc7CPEzoPSLdIsM/LTqlWE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PMi1zpaNB4tZo1U1HefF9TfamM+W14UdJRksdJcG3wnABxXVucLLXWQ08VwYJE9pr9z9wjOKjljQ3rGuhUjwh8uuFfI7cz2cqdz/V8hzZf5CKPKerej2dJ5EImXV3hXsZD+WfjbP5rOarYD2N6jiX4EbcDQOa9c8r8g5LpeC//g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iF3zUNRO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748798555; c=relaxed/simple;
+	bh=QmtvthWHMpl0SbbV2cqJtc9tdM7X+QI3BEO4MBmIE8c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fQk3G57qDtjUrLZiLsv19ZK+ziWjWPHGYwfx966m1hRaoOO2KnMEqDq4W3gKbGaZbmJD9Bvc389Ab3XvbJ/Q5JuofzQM3cfVaJ1k0/mKadCn2wimuEqZn/bplDsRN71lIxEe+9XXJkHbODxoJh6t+c7MijbFI1+e/SfwORL9Nwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y5rVN2Ou; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iF3zUNRO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D3CC4CEF2
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 14:31:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748788270;
-	bh=41RDBcCdaeVsf7h3L7tNDuc7CPEzoPSLdIsM/LTqlWE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=iF3zUNROECR+epL+12G+fYPofBXeaqRqTf49UZQh54xtyxgpZxIPlJos1FsGRim6c
-	 p62GcOQDaxuJipcGRbRVq1L1HA5VQcTJVkoZzpYJWo+h4Pge9TPrCv96Lz8EsybnRN
-	 i02Oni4OcWDSzBgJQS84BTS3X8k/GgWm0lcn6yyjJJC1AwySlWXVFJ0xlXCpL4mME+
-	 POl7x9PUFMM53qqbs8gKFyd+6zSlkKRxU967MF1H427Chuum7vkDlYQJF4UXd3KfGk
-	 mizPo0CAFPgb/YiZPErzn2Ym6x5ZPY0CVIivmVrxnCG4W9AXDhrBl5OfN9a8ry6FpI
-	 vND3IRDHg7bQw==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6055f106811so4563293a12.0
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 07:31:10 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyhcNRfpKXR+Oo6XBfn1x4I2YS1lwpKpcw2yN+ijFLaQ2koFWlv
-	cIlEKKVKSgPsMFj6eM8wGnE2oKXvBj/2aX54JuSVuUUIP1ybi5EAuGb3rMKm71WgmlQDXbOwvBM
-	N69fKh3175wKtkZDcRUNXkwNNxBdIglg=
-X-Google-Smtp-Source: AGHT+IEVs1K5d4tPyrZIgvkgNJcTTljNQWLNR+lTQ2cf2aU0ejl8OSMREcMERjTi0lkLpP+mFlUVcl4xAtPqAU/HDBE=
-X-Received: by 2002:a17:907:7290:b0:adb:156e:990b with SMTP id
- a640c23a62f3a-adb494c51a3mr471115366b.30.1748788269472; Sun, 01 Jun 2025
- 07:31:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5rVN2Ou"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6020ff8d35dso2315232a12.0
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 10:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748798552; x=1749403352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KWUixeIdl1/vUcoyOrFOPqiz+H0sA5DDf9cCQ0Qcqik=;
+        b=Y5rVN2OuPaxksctN8asqGSopZsdq3FHnT/B8yqGd/y6j7yW4hmeWIDQBhqFs2IPH5M
+         gWAFdsIDRgHyWjOWYbu8kYMhlsA5ufHZD3aNkOBWLygC9O9SEXG5f3cgw1+r3FhWtOk4
+         y2YAVMKK8NJL795yeUtIbRNUkoL027YO7XJIoJoAh57zrSQTHJ2hU7DngQv1gDc4Y7N/
+         owECFNDbtCyR0gV63OqvorM/zvpIR4xkUJbzd4HLeJXXWF9NQKoKa/mVbd/Q5S3OB9a0
+         WZEqmKchm1zAHa1IsajIvEJxATuNDxLP2pM6EG41dci4gkP6MJk6dpvzPGxTudCl3MaC
+         +KFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748798552; x=1749403352;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KWUixeIdl1/vUcoyOrFOPqiz+H0sA5DDf9cCQ0Qcqik=;
+        b=X6oWKtV4C6RhoegIvQp984zMWhZu+GAHNed7p+aSQDM6wCioHMZmNqaLYz8LgYiq1f
+         UhY8JaH4/RuOXSBu59lZaBGuf7Yf5lbanhoVFq+x9OoAuZihPzayTGXVke6LIvXM2Rnr
+         jeVGgEZgtxcCHvafaQ8MDVDaYW3CrQ4wnoz6SyJYEsQdJAGKlb70j3AB+1Xqs94B0lmQ
+         wj+Y2l/oQOulKLmaU7F8Wwd159pD6L/CKGoyNxvvNpMPkLexHPB0k/CHnAo68oBRL3wR
+         N3P0Ggd4SjWmsGsk5+nSufWymUvaK8cAtBvzW1JNbXhg73u6oL2S+iXCWx/FJdsH1dcF
+         rRpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJyWA6c/FLJfaxat0BDn8lBSmdEmNw+KTud5Gqoln8rt/wRvV8PDcMQJxyr2kUdPFv1urHEorbbaGa@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPmzMKgGhFvqr1LNrBAz7NX4iq1iJLcxB+j+PIhNiAxInzwZ0O
+	RPyUEG9IHvK8T5DL7+bMncRj6E40VR4zNlEOo4VccPLMaeiH7aPB7PJO
+X-Gm-Gg: ASbGnctHsuXfmYFxuyvFfoYFjiUFFwJFZUvvJPYAkOjlwNYKI9U0ppzKLGAPLi+np20
+	Gx808Omz0p6UBNvWkfovbRexR7qmE7YAcWOVpaQ2D1PqcG7s3bP9IfnR01io0rVeke/Asu6ecRi
+	s6CXFTc2QnOCssXuAEAtBztLMFH+t3YuVJFvuDJW04jlcwYECS26zfMWbXTMIu1YSGfHpy4i7ea
+	5lEz7cZqABMbl1G7CtT4KdrAu7zHIXcajWxPPSP8ZVuRoyxFDpe9JQ0cjtNUBouDmqMiQkFYtl1
+	DqIptLQL1c6Ul5YQLE9nHT268Jw1Xmg+hzJIGf8SR8ESWoAW88sHviLJ9dUPors+2kmorA==
+X-Google-Smtp-Source: AGHT+IHG+aMIRUd8i9W9aQa4gYCTc8AyBhoMUFZ79K3T8BHWN6mCYXkKpUrOEfxLXLxJ8zFOLY7fCQ==
+X-Received: by 2002:a17:907:d649:b0:adb:301e:9fab with SMTP id a640c23a62f3a-adb328ecaa9mr978228566b.2.1748798551887;
+        Sun, 01 Jun 2025 10:22:31 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:a03f:e6d8:fc01:121f:74ff:fe57:106])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60567169cdfsm4832010a12.70.2025.06.01.10.22.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Jun 2025 10:22:31 -0700 (PDT)
+From: Ruben Devos <devosruben6@gmail.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	Ruben Devos <devosruben6@gmail.com>
+Subject: [PATCH] smb: client: add NULL check in automount_fullpath
+Date: Sun,  1 Jun 2025 19:18:55 +0200
+Message-ID: <20250601171855.12268-1-devosruben6@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
- <CAKYAXd-t27uzNLdXjPRuvbaaBnA-Z8qVqd_1W7v=97vp2Sd+rw@mail.gmail.com>
- <CAH2r5ms-v=UwFzXZpZ-5KBgiRPkvSqQyJnLBhxP5YaAuqMAG5A@mail.gmail.com>
- <CAKYAXd8rN+RVJB8ak_SPNX07L8BeastngMhQsXVGdUW0D0QLSw@mail.gmail.com>
- <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org> <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
- <CAKYAXd9BPqg=0QKrpsOHaVDQkM8=Q6fragLmpTPve=pJdNjovw@rx2.rx-server.de> <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
-In-Reply-To: <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 1 Jun 2025 23:30:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@mail.gmail.com>
-X-Gm-Features: AX0GCFuW2pFFS00HzfW9XuPAGT7M1DQ1nHX-LGjkUMzaxLkHtw--XWc7Xw6WI1c
-Message-ID: <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@mail.gmail.com>
-Subject: Re: ksmbd and special characters in file names
-To: Philipp Kerling <pkerling@casix.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	=?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 30, 2025 at 6:47=E2=80=AFPM Philipp Kerling <pkerling@casix.org=
-> wrote:
->
-> Hi!
->
-> 2025-05-27 (=E7=81=AB) =E3=81=AE 11:57 +0900 =E3=81=AB Namjae Jeon =E3=81=
-=95=E3=82=93=E3=81=AF=E6=9B=B8=E3=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
-> > On Mon, May 26, 2025 at 11:24=E2=80=AFPM Namjae Jeon <linkinjeon@kernel=
-.org>
-> > wrote:
-> > >
-> > > > It's been part of the spec since the beginning. You can find it
-> > > > here:
-> > > Right, I found it.
-> > > Thanks for your reply.
-> > > >
-> > > > https://gitlab.com/samba-team/smb3-posix-spec/-/releases
-> > > >
-> > > > POSIX-SMB2 2.2.13.2.16 SMB2_CREATE_POSIX_CONTEXT
-> > Philipp,
-> >
-> > Can you confirm if your issue is fixed with the attached patch ?
-> >
-> > Thanks!
-> I can confirm the following behavior after applying the patch:
->  * Path with "&" is not accessible with mount.smb3 and default options
->  * Path with "&" is not accessible with mount.smb3 and "nomapposix"
->    option
->  * Path with "&" is not accessible with mount.smb3 and "unix" option
->  * Path with "&" is accessible with mount.smb3 and "unix,nomapposix"
->    options
-> Perhaps "nomapposix" should be the default for the client when "unix"
-> is enabled? Tough call though, might break some backwards
-> compatibility.
-I agree that "nomapposix" should be enabled along with "unix" option.
-You can try to submit a patch for this.
->
-> Furthermore, in the last case in which the file is accessible, I can
-> only access the file as root. This is because enabling the "unix" mount
-> option leads to the origin UIDs and GIDs being taken over from the
-> host, which do not correspond to anything on my client. I usually set
-> "forceuid,forcegid,uid=3D...,gid=3D...,file_mode=3D0640,dir_mode=3D0750" =
-on the
-> mount but, for whatever reason (might be intentional? might not be?),
-> these options do nothing at all when combined with "unix". I can sort
-> of get around this by setting "noperm", but it does seem odd that I
-> would have to disable any and all permission checking just to get
-> special characters in my paths working.
-Please tell me the steps to reproduce it.
+page is checked for null in __build_path_from_dentry_optional_prefix
+when tcon->origin_fullpath is not set. However, the check is missing when
+it is set.
+Add a check to prevent a potential NULL pointer dereference.
 
-Thanks!
->
-> Thanks,
-> Philipp
+Signed-off-by: Ruben Devos <devosruben6@gmail.com>
+---
+ fs/smb/client/namespace.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/smb/client/namespace.c b/fs/smb/client/namespace.c
+index e3f9213131c4..a6655807c086 100644
+--- a/fs/smb/client/namespace.c
++++ b/fs/smb/client/namespace.c
+@@ -146,6 +146,9 @@ static char *automount_fullpath(struct dentry *dentry, void *page)
+ 	}
+ 	spin_unlock(&tcon->tc_lock);
+ 
++	if (unlikely(!page))
++		return ERR_PTR(-ENOMEM);
++
+ 	s = dentry_path_raw(dentry, page, PATH_MAX);
+ 	if (IS_ERR(s))
+ 		return s;
+-- 
+2.49.0
+
