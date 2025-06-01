@@ -1,58 +1,58 @@
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7A0199BC
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 18:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885D82C859
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 19:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748804066; cv=none; b=Fu0CrfWggFm3WUAmJs+QDSh7nlOd9tNzcc9SxuTO4aMkAZJKb0sp9RI74l4qWlX6OMdpfB1Kf3zIjUHUPpNP9tPQwS30uFbpFRmRgbNSblOKb9x8TmMXXfiFwlroueEch4x1zjk4eLirp/lw1EDALN0TRJ/HVMSC2w8kAefkca8=
+	t=1748805517; cv=none; b=R4tdlQmjVirkFHG9EgJmwsH6Eehmh8myE1QS5k2C4qGnEb1BaIL2g/MFAXOAA8DWENtv+tVO8R9IYoIGZGamy30t0kbJCXxiZPNWGanV4nO5357TttxknBmXeFHlrMlj/W6BlYsoXtKQOJbAajkJ5cr4BnsxC0t88qUUCAL0V+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748804066; c=relaxed/simple;
-	bh=g2BxiKR4sYZm9epK271ZfvrGZAhn/QsoSbgKvPENZ/4=;
+	s=arc-20240116; t=1748805517; c=relaxed/simple;
+	bh=n2HpojCTFOKo1pbj/mbXQlNfvJbNXOb6WKZdlz4WI6g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pp8D+e16016ylgqYtKBOGY6n0HfKJkqvz1YVJXPH2MbjQ0W6TRBjR27P8rw4wxAtN0ZuTerra/Z8q7a9e12n8/MLubGUC9B2Gd+/ov/7nWHIYk5wtyibYfV6xk2XgFt0FnvL7KtTGu7YtVNposgQR0YrrudJeORJgLUvEDyfyZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sibQbJBN; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=sf7HqIk/YCgO0ofE6ynNvS/KrBRtVEhKjqx3DG3T7V2aTYHhXvcGI+2UsWh8WTV4chpg1+Lj+7KkZw5glF5/jO0SrLIMPwsj9CHdXRAy33WQdd8wjKMsTHIeKOTXMyDkwtSvPpMSmfO/fUagoSE0f+f0VU212ouwNWONoFpEB/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtjCGvHk; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sibQbJBN"
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-54b0d638e86so5688698e87.1
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 11:54:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtjCGvHk"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32a6b34acd9so28995571fa.1
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 12:18:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748804062; x=1749408862; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748805514; x=1749410314; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HQc6vmO0BC0hUo1BQ392EcyBQ5GD4LC5NIpIZutnApI=;
-        b=sibQbJBNsPXKkLDAfWsC3wQQEMQRuaC/adbr/3gc767AOZOBsT9pI0X+IH+XKs+oqQ
-         7tHHxAVphJFLxdScAYdlaWO417FEb7QunlLx8Du4cpP6O5HK0mxSdv94FXxTuIeLD4cD
-         WC8L9RqZgJtvyoPUADWmAsQEHE6D3TnMbarF8hOugUfe626YhLYauiBLRDinSTmq+LEs
-         EQT9cxWhK6XrnQYm250/gxKdJDFUVV85qiTj1S0U1Wt+gKOV2Pt++qv8San07gfxO03B
-         XTZrLnY1kVISHp+mni1oqMiv5Z+FVCzYPA749ru6G4geaYt366USI9jS6AVVymh2/6jk
-         tLaA==
+        bh=JMEgOS3+jin/RsJA5GQA8Qu5iXJ5j75neDGebwblTfM=;
+        b=EtjCGvHk4o3uuNEJiByGHPUWWS4NsynzXWZHjIuzIvNbMBFYNbuFvaXYuyTQQgMQQd
+         MLs3fgBiZXGol510cLD/8ew51Hn4aLL9LCv6CIYGXbpDYtF0JoJl8Ej109GLxOnl6d//
+         9Tekm+r4pEn+kjHFOQlrskemWSG5JMcpCd0wLxtX9wXV9hLWZluLi0bx+/EX8ifFSZc0
+         w5F4F9BL64LP3dOkvoluKzSoPVg2ecgQ3DR6ir4f36Is8yJLpGUw3xvuawQAddgL94LW
+         2qnP6SmVlXWYZb64W0d2oyk07LCG++lDG6255J/XJ4itDOcL/79qG4Qv2MnqNtTeS6Wo
+         XyKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748804062; x=1749408862;
+        d=1e100.net; s=20230601; t=1748805514; x=1749410314;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HQc6vmO0BC0hUo1BQ392EcyBQ5GD4LC5NIpIZutnApI=;
-        b=QKIVXhzpCWU1zkuUnZXyRg0ah0yxNj5v1O9YrznxjYXrczHpTa4WeFhtaxPqKN06z9
-         LKpnGzhs9P9VSJqTH192IhhYuaSCgxlTBm6zwckA7kU3afaVgqVy5xlcKhATxgAH2TNm
-         GRHW+q7nG0InmqYUdZMj45yizMWs1SshZoFG6dlP4FcIiTOFehdZgazZLOIpp9eka6Bp
-         LXyYrHpSCvRrnN9Z9sh86+JkfVAw1+JMCMGzRjTc+CD+cjJiylx3C5f2jc/btVJM3hX3
-         3VVONmj6RzvuKo3Pt8PiYMKsom487NcaA3NeA0VM46adqdkgv0mem7XfrIksZxJymyC4
-         4Imw==
-X-Forwarded-Encrypted: i=1; AJvYcCVED9YpEHoFpT4ynn79Sg3UHgxw9TmYB2h5F+JD40b9cLbnnHA1ihzy3d72mESiKjCulzzcpaMonvRg@vger.kernel.org
-X-Gm-Message-State: AOJu0YwifSB3W7iCNXz51EWwlR7TcZLaK1ZbmptIUv+HQd98qOAMlhWy
-	YbOG3GHZqteGR2sGx9NR6GUIGeRNxwqeUyOXzpeW3risjviUqKiHVkTPZs0JfXZGMLBV08YRzBD
-	u4Vq3lWbEPOKZxFuk33atfr8ZfgqojoMxH0xCO2O1Aw==
-X-Gm-Gg: ASbGncvdZCUKAG4S7O8F1n0YqxMFBs4qqIxrhfu7+B/MdEMznG9SelXDCGRMm4ArKpH
-	iTzhXYqmcE82W9CY3EtbCk5BRKvdqrjROOOpASZKbzdytSX/hjcESXGqlal8UmUkkNXjDhWXK+N
-	BdKxwIfmxpoCyIr5Bo1FOugyb05QUD9hyk
-X-Google-Smtp-Source: AGHT+IGCUoma5i89qOJDa+SylyAQOCBINqmczmza4TubGWetjoITioVbRUDfP2otKGv9KXqR8EWE9XkDoxFub4qtuLQ=
-X-Received: by 2002:ac2:4c45:0:b0:553:358e:72a8 with SMTP id
- 2adb3069b0e04-5533d1aa8f5mr3054369e87.38.1748804061951; Sun, 01 Jun 2025
- 11:54:21 -0700 (PDT)
+        bh=JMEgOS3+jin/RsJA5GQA8Qu5iXJ5j75neDGebwblTfM=;
+        b=F7nRLoC6rOrVGn3p5ZoKESGj65OlGiItWRSnP9CoKcjpxkldLFIFzRija0vw3ri8zm
+         409LcmdVVo3BoSBRl+kVi5u6g1XVsZaG2+BEH7Yyhi8TBoPlBn8HJ1QHKCF50NxajF3D
+         Q9NSiDcq2yPRDVw2WACBqLYjgQ58o7ZYp6WS/17VmDH7A6xPsVE0PS/NuJmShYnIVOIZ
+         PEOv4tt9ZPPAwlwgo2y7Re6CL6zsM1WD6dO7xg/khAWdJGwlBQv79xXR77CLs/y+80SB
+         xua40jDDl8DlXSN9NyAMFNgl8uYzshRPL26wWEQlFVLVA7aO8UKG4VYnNUaTWwB8knZT
+         Lybg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOGkJUtLVbESSHGRWv+wpf7rl4HFegzKFGcMTuBg511IuP7Sf8r5W1Up6gbc+HYB8+yDiYDh2fHK2I@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnrPvuG+J8XESmw5a6djelzIKZ/ahlnAxmKE/akNcGZNo5pJUY
+	/5ULMdygY7+0vdqG3z+kvnUXRX6A7whX/4XFH3iJ/Lp55me0L+hDfn1bXuzeGsDrreSVbQ/et+0
+	HVh8foqE8D37mxiQRUrRbQCdPM5MmDnU=
+X-Gm-Gg: ASbGnctRJmK1y1A9TszkEUYPfbRoIqlt8hwq2xsZnGAOxTDqCthhyOpmAJslmEGqbm9
+	0FbVlwmerGiZ+Hy5NDev2+jsD4mrtkpj2Dl5/nYfsKlsZ4RXklvGssXKWrGJGkKPznupj4Vujsr
+	s460HH8auNIkw1cA88jb+2YNotN5QizdKLDsE/8NQ+v8bYKgZFTRtwdEdz3bENfVFPubM=
+X-Google-Smtp-Source: AGHT+IEZfUQgY8zWqpZet+A6X9XyLervHmVY3noaE0owcla0vpEtgX9tjaglq3F45WFPBQ8Pp0Rc/YZOrEaikWWH72E=
+X-Received: by 2002:a05:651c:904:b0:32a:864a:46eb with SMTP id
+ 38308e7fff4ca-32a9e7897a7mr13386311fa.0.1748805513283; Sun, 01 Jun 2025
+ 12:18:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -62,39 +62,47 @@ MIME-Version: 1.0
 References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org>
  <CAH2r5msU-45Up+BovgpwQ2eV5o5aRz+j+zh6jZLvn=ZsmNuNeQ@mail.gmail.com>
  <088096eba2d038bce2f73e6519d11ce9@manguebit.com> <2025060107-anatomist-squander-d073@gregkh>
-In-Reply-To: <2025060107-anatomist-squander-d073@gregkh>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 1 Jun 2025 20:54:10 +0200
-X-Gm-Features: AX0GCFtBAdhF_4Sf_caMJDdT2bdU1Vr7ikQccVFV5Y-YqZWFw1np-OuFEttoGGo
-Message-ID: <CACRpkdZ0w85ecgtjbiypG8K37eBF9hk-7oqSq8E9K6_+SE+nUQ@mail.gmail.com>
+ <CACRpkdZ0w85ecgtjbiypG8K37eBF9hk-7oqSq8E9K6_+SE+nUQ@mail.gmail.com>
+In-Reply-To: <CACRpkdZ0w85ecgtjbiypG8K37eBF9hk-7oqSq8E9K6_+SE+nUQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 1 Jun 2025 14:18:22 -0500
+X-Gm-Features: AX0GCFsCMPCVmPqQW2joNOOvvHnz4RjVBOmFye62l2tUlgT4oD9jcNtoW4GfE_s
+Message-ID: <CAH2r5mtqfQhQuGFW+XK37U9Q-qCSuKrGTtmNTue5uWNf-coXgA@mail.gmail.com>
 Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Paulo Alcantara <pc@manguebit.com>, Steve French <smfrench@gmail.com>, 
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Paulo Alcantara <pc@manguebit.com>, 
 	Namjae Jeon <linkinjeon@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
 	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, Rosen Penev <rosenp@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 1, 2025 at 9:41=E2=80=AFAM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Sat, May 31, 2025 at 03:49:47PM -0300, Paulo Alcantara wrote:
-> >  So relying on that version becomes
-> > pointless, IMO.
+On Sun, Jun 1, 2025 at 1:54=E2=80=AFPM Linus Walleij <linus.walleij@linaro.=
+org> wrote:
 >
-> Yes, it is pointless, which is why it really should just be removed.
-> I'll do a sweep of the tree after -rc1 is out and start sending out
-> patches...
+> On Sun, Jun 1, 2025 at 9:41=E2=80=AFAM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> > On Sat, May 31, 2025 at 03:49:47PM -0300, Paulo Alcantara wrote:
+> > >  So relying on that version becomes
+> > > pointless, IMO.
+> >
+> > Yes, it is pointless, which is why it really should just be removed.
+> > I'll do a sweep of the tree after -rc1 is out and start sending out
+> > patches...
+>
+> In a way I'm happy with that result :D
+>
+> But what do you think about the original problem of making
+> the dir /sys/modules/foo appear for a compiled-in module?
+>
+> So as to detect "functionality of module foo is present".
 
-In a way I'm happy with that result :D
+Yes, and also (at least in my example), I find it sometimes helpful to
+look at module version number since it can give a rough idea of what
+"features" are in that version of the cifs.ko module (especially if
+tricky to access the git tree for that kernel build).  Seems harmless
+to keep it
 
-But what do you think about the original problem of making
-the dir /sys/modules/foo appear for a compiled-in module?
+--=20
+Thanks,
 
-So as to detect "functionality of module foo is present".
-
-Is that something we could allow (I have a patch using just
-lookup_or_create_module_kobject()) or something userspace
-needs to figure out another way?
-
-Yours,
-Linus Walleij
+Steve
