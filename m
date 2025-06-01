@@ -1,94 +1,151 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4845513790B
-	for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 19:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152A2625
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 00:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748720243; cv=none; b=oBSWJ0SRqHYjU2+eCcW0LYZeyHdFA6lja/0j4QI7BaB6P52kDWUVDNBodgsZlFYQxIYGdFhQ+B20IsFPhCk8nCMZHsyJuJJTiL8cFHBMJrUDBe79iiNsuChEfCulKo2NcPC5iRP5Oeeg9sTUCboJu/uFvWLxnAUpMR3wxBx+8Oo=
+	t=1748736105; cv=none; b=u8CWtQ3a5H9plVcDnFtYJrDXk4iZjiTAV/u/Lb/0Zgdp4UAcsJQqxlwH29h6ABBy/4Lj4Lyp/hSLAwFcUClqvxJFsFgCaKRhpCK39nBPl+rW0xmnxJWxaXm1yXyQtxKhUEEjzn96rQBYeT3PhqybxMpvXMIEwQJIuJVf6KAmsL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748720243; c=relaxed/simple;
-	bh=8MDNwx+Q/pMv/7+iBrypXo9VmYaRGxBsBQQhIJLhwXg=;
+	s=arc-20240116; t=1748736105; c=relaxed/simple;
+	bh=7N9hoi9D9+7rJ9bK4htUXWXyIIc3cgyWmv6TtmoD6/0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rXIrBLcWpIQsMUJlY8qF6E6RH/dPm+7lgO98Zg4cFTFTqte6qvP9ILQNzT7iUpqZXQ0gBYdQKbeIgq6ZF0Y+JWPEbbLdS6hrBGw63K7/m07gPVGubo+3VecfoVlN+SbjlgqTkfeB26KT0S9ONSzpcR7wwPb21aZ44BiFTRGAjGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lAIGDf3I; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=G6WVC+rqvp1VGKoMEJ9Gb12pAnYrX7nDN8lBUswCCTombkiNLk4GvjOfO3Smo+OwULpfrLoWkkBcgoXg1+85Ayk457FbglLOQX3Z7BeH5yA1IbzzB0W+kVblKz+B8Jbx1b0Xb6O13oVDlqUPOpYDdYFd8rQWh557EVZxCzlzYTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=maxXABHk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lAIGDf3I"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-32a61af11ffso35043871fa.1
-        for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 12:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748720239; x=1749325039; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vDs8u8vb9kPfwkxfjdGAtSvoJK8yBI8BB/W2yi05NU8=;
-        b=lAIGDf3Ik4j3buq2DVCGrF9B/NB3uYxM+xAfQd0rpWOqTKnq1OVHm7sYbykXfmPmf/
-         JaObQSr+qk41r9a5r2+dtCWIxqk90lWW3jpoe7qFgv9KmPLU2AiCgIG1zc4v3SykNEeB
-         V4wqksL/0uFpq4G+nCgA5lb8D1a6IomtNBpApVlmU6dCi8aEmfY9FA+vCQUcthovQ2PL
-         J8yE2m2hnkTvKmxw+nYWUwsGASJ/KUiYYhFlQPYWkc9alD5B5wFjk2Wvq5y75si1rvuc
-         /c6DRFlwUCeKp/0Q37D+6MUBznQiLc7z9TPskxooBCgYOgvp6OfHpxc0TnfoHus44apV
-         171A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748720239; x=1749325039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vDs8u8vb9kPfwkxfjdGAtSvoJK8yBI8BB/W2yi05NU8=;
-        b=DSERjUhMrWVVt7jjr1sQFTSKOBGhn8X++m4cw9dV1RmK5oawJ1zv5h83zyHkwQTR1Q
-         q7T4TZYZy0CxAlCmUZ+GHA3UcdDlnADPTaLjMQPqIN+e8vZ+D+g31O6PM1HkjfCFYVHn
-         lLQe7e6OSGhIaf1zhmlkA0hmse2vhh0VTS7KF5PhnSiK5nsO1javB5OPeXFIzFZuOdsq
-         dtr+u5qBQSD+vBFk1qUm/DKTRmk1nRy+MMU2AbF2xbQGNhsSYfTUH/8PCVVMIEBi4JWn
-         FqKtkfuzbgieqGzMp9G82VQlo0xXf16SoH1YV3fQ527KBp44TuoonGiHJZjBiCs/m9v2
-         HTjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKY44SPo9tMSsocptNCIETH1Arhl5hAnf1jVLsDtZlfhmY2fWNYZCSDD5JY0+is6ozlUEYGkr/PDJc@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQLOmNvi6g1NPtmhKG6FwMUNToNh5y+lCsdbPe/JvTjGa7wWqc
-	gq0BBlk9IXLJui650nmgg7WgNrk64EIyM9BD6SRVi256SmtgTmZNlW+OxgLw2XhrCXYF45q6Hx+
-	zhHR/U0NVhCqY36W3uN+Z3sNMFwrdvdb4a4f4wv+lLw==
-X-Gm-Gg: ASbGncvasphZAKdccF3gMoSpmfub/SVWqn0Nmod5uvuoW4goBoGNNeklTx/wcn3YnOv
-	wQgEryhF1VsQ+B7eC1iEZ0rfsBHdQ2u38Ar2V9kmGMUK/uMbrWgGv1PAz/UzaOFAeAoevn3FycL
-	4T+oDfmbuiQkChbIYQ4VJjSadHBuZ2WjkG
-X-Google-Smtp-Source: AGHT+IHES6IUsoZhu4WrIkaM6eEWU+XxP+2wnwa5zWwWBOz2xRCNacD158U6lyIVsz/xhKHXkHIYuH0kSDat0ndtZyA=
-X-Received: by 2002:a2e:b8c3:0:b0:30b:f0da:3ae7 with SMTP id
- 38308e7fff4ca-32a8dbd6f26mr27306381fa.14.1748720239213; Sat, 31 May 2025
- 12:37:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maxXABHk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B6AEC4AF09
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 00:01:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748736104;
+	bh=7N9hoi9D9+7rJ9bK4htUXWXyIIc3cgyWmv6TtmoD6/0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=maxXABHkjCL+y3sJ3DWx9oKA0De4CmpFBZRrIvEqasdmbG42uNNjNDemi9qEQAF77
+	 ek/8MQcqJbJ1PmZf1lii5kR5M5E68Bmoh4YK0GDnu1pNADPXo0ZzRdRRMJMTnKrn8D
+	 acWwqRMgQAsPKn77NJ3kPsKw01bDs6BVOOafVVKXGdAeXo4RA1EiGHEEZw+raCCz1y
+	 pU7g0t1PBa9W3cl8WANwigg5H+PI4omHFStipP6RAf1Tw8/iWjhUkb8OGGJtj7WjV+
+	 7cy96cNzeUkCsAzHRiako2oy3WjqCxzICMwAgcMlPrr+ZuErjK95pgN7scwDYpvoWd
+	 mQsJypu4nLVBw==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ad89333d603so618276866b.2
+        for <linux-cifs@vger.kernel.org>; Sat, 31 May 2025 17:01:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXiNc1v3Xqof7IvWDvXXHfyJitth3PTb2W4eQgcvsb7l03X0+NKQYne8rdq8v2KCB3KyrB9efYOq9/g@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOMEUcQgfbrsuYTXxUfdj151/9ifu3sjsFZjU8WT87sX9VDxNy
+	nO0UDiN93sTrNlQ+U7ejTaXi+JLDtoxC89utR5FGz3NuoVIvgsjeKX7zShJV7mbOiFNkKXn61BM
+	G83YaSOB8xPQGeiuSSfIZGPuDJYrFefc=
+X-Google-Smtp-Source: AGHT+IGUks0gx7vn1CETHtFOfTjkJNMoEW3DezYuieuHwvWpsEO/KUWQ9n0Wo/kp0uItyAD5/Im8jvwbqNmQL440mEE=
+X-Received: by 2002:a17:907:d90:b0:ad5:3055:a025 with SMTP id
+ a640c23a62f3a-adb32248ccemr808741866b.6.1748736103035; Sat, 31 May 2025
+ 17:01:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org> <2025053156-gilled-mangy-e8b9@gregkh>
-In-Reply-To: <2025053156-gilled-mangy-e8b9@gregkh>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 31 May 2025 21:37:07 +0200
-X-Gm-Features: AX0GCFvnZg-kfPLzEAbEMy-_yy_nWNUNyv8-Ak-xoXkDEsbpsOB7mGAxJQhcxgw
-Message-ID: <CACRpkdYpjWMNbmj6-A_3XEbS0W6Y+UaMuAc2Sra_qebtJvBSbA@mail.gmail.com>
-Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
-	Rosen Penev <rosenp@gmail.com>
+References: <cover.1748446473.git.metze@samba.org> <b43ee94c3db13291156e70d37a3e843ad7d08b31.1748446473.git.metze@samba.org>
+ <CAKYAXd_df0mwgAbJb3w_r_8JmJOAZjPfhjoFpWgTkWJFdMWUMA@mail.gmail.com>
+ <096f20e9-3e59-4e80-8eeb-8a51f214c6f1@samba.org> <CAKYAXd86mLGAaAEUFcp1Vv+6p2O3MSJcwoor8MmjEypUo+Ofrg@mail.gmail.com>
+ <CAH2r5mvQbL_R9wrFRHF9_3XwM3e-=2vK=i1uaSCk37-FZmJq9g@mail.gmail.com>
+In-Reply-To: <CAH2r5mvQbL_R9wrFRHF9_3XwM3e-=2vK=i1uaSCk37-FZmJq9g@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 1 Jun 2025 09:01:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9T81En40i3OigiTAmJabMr8yuCX9E1LT_JfaTmyefTag@mail.gmail.com>
+X-Gm-Features: AX0GCFvyiO_QsNb12aLyqhWjxv7hr6witTjdvmtGLMm57pqSHq_DJ5HswpiiSWg
+Message-ID: <CAKYAXd9T81En40i3OigiTAmJabMr8yuCX9E1LT_JfaTmyefTag@mail.gmail.com>
+Subject: Re: [PATCH v2 01/12] smb: smbdirect: add smbdirect_pdu.h with
+ protocol definitions
+To: Steve French <smfrench@gmail.com>
+Cc: Stefan Metzmacher <metze@samba.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, 
+	samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 31, 2025 at 8:56=E2=80=AFAM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Sat, May 31, 2025 at 08:42:44AM +0200, Linus Walleij wrote:
-
-> > Adding MODULE_VERSION("1.0") to ksmbd makes /sys/modules/ksmbd
-> > appear even when ksmbd is compiled into the kernel.
-> >
-> > Adding a version as a way to get a module name is documented in
-> > Documentation/ABI/stable/sysfs-module.
+On Sun, Jun 1, 2025 at 8:23=E2=80=AFAM Steve French <smfrench@gmail.com> wr=
+ote:
 >
-> MODULE_VERSIONS() mean nothing and should be removed entirely from the
-> kernel tree.  The only "version" that is an issue is the kernel version.
+> I do like the small, relatively safe steps he is doing these in.
+Small is okay, but I wonder when he will send the rest.
+What if he just separates it like this and doesn't send the rest of
+patches later?
+I've never seen a case where the headers are separated first,
+And send the main if it's implemented later. This is not a personal reposit=
+ory.
 
-I get it, I need to think of some better way to handle this.
-(Adding a random module parameter just to get this dir is probably a
-bad idea too.)
-
-Yours,
-Linus Walleij
+Thanks.
+>
+> Thanks,
+>
+> Steve
+>
+> On Fri, May 30, 2025, 5:29=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>>
+>> On Sat, May 31, 2025 at 4:03=E2=80=AFAM Stefan Metzmacher <metze@samba.o=
+rg> wrote:
+>> >
+>> > Am 29.05.25 um 01:28 schrieb Namjae Jeon:
+>> > > On Thu, May 29, 2025 at 1:02=E2=80=AFAM Stefan Metzmacher <metze@sam=
+ba.org> wrote:
+>> > >>
+>> > >> This is just a start moving into a common smbdirect layer.
+>> > >>
+>> > >> It will be used in the next commits...
+>> > >>
+>> > >> Cc: Steve French <smfrench@gmail.com>
+>> > >> Cc: Tom Talpey <tom@talpey.com>
+>> > >> Cc: Long Li <longli@microsoft.com>
+>> > >> Cc: Namjae Jeon <linkinjeon@kernel.org>
+>> > >> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+>> > >> Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+>> > >> Cc: linux-cifs@vger.kernel.org
+>> > >> Cc: samba-technical@lists.samba.org
+>> > >> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>> > >> ---
+>> > >>   fs/smb/common/smbdirect/smbdirect_pdu.h | 55 ++++++++++++++++++++=
++++++
+>> > >>   1 file changed, 55 insertions(+)
+>> > >>   create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
+>> > >>
+>> > >> diff --git a/fs/smb/common/smbdirect/smbdirect_pdu.h b/fs/smb/commo=
+n/smbdirect/smbdirect_pdu.h
+>> > >> new file mode 100644
+>> > >> index 000000000000..ae9fdb05ce23
+>> > >> --- /dev/null
+>> > >> +++ b/fs/smb/common/smbdirect/smbdirect_pdu.h
+>> > >> @@ -0,0 +1,55 @@
+>> > >> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>> > >> +/*
+>> > >> + *   Copyright (c) 2017 Stefan Metzmacher
+>> > > Isn't it 2025? It looks like a typo.
+>> >
+>> > I took it from here:
+>> > https://git.samba.org/?p=3Dmetze/linux/smbdirect.git;a=3Dblob;f=3Dsmbd=
+irect_private.h;hb=3D284ad8ea768c06e3cc70d6f2754929a6abbd2719
+>> >
+>> > > And why do you split the existing one into multiple header
+>> > > files(smbdirect_pdu.h, smbdirect_socket.h, smbdirect.h)?
+>> >
+>> > In the end smbdirect.h will be the only header used outside
+>> > of fs/smb/common/smbdirect, it will be the public api, to be used
+>> > by the smb layer.
+>> >
+>> > smbdirect_pdu.h holds protocol definitions, while smbdirect_socket.h
+>> > will be some kind of internal header that holds structures shared betw=
+een multiple .c files.
+>> >
+>> > But we'll see I think this is a start in the correct direction.
+>> When will you send the patches for multiple .c files?
+>> I'm not sure if this is the right direction when I check only this patch=
+-set.
+>> I don't prefer to change the headers like this in advance without a body=
+.
+>> When you're ready, how about sending the patches including the body all =
+at once?
+>> >
+>> > I try to focus on doing tiny steps avoiding doing to much at the same =
+time
+>> > or even try to avoid thinking about the next step already...
+>> >
+>> > metze
