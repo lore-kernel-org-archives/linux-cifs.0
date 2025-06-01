@@ -1,72 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630F32DCC0D
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 07:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD7A2DCC1E
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 14:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748763698; cv=none; b=FR/XaCcHh/XH15tCBGHFLwlP1po0/7CmLelgJZ6wGMrzS5yDAVhmj+ouZDnaTrP/ad27DLcEx52W8zKNBpJk3kLuXtq8+C92QJzSEbZjD73/on7k8GrOfQjrp0lEqFQsG1IYx8TKkMIcU3HF3TogYdwAwUTi/RuhA14wxNblAP8=
+	t=1748788271; cv=none; b=j8sRH2xiSHL2SvJnK6BQzRkKCzwfTPSBPdiuZqjmA34EgjD/qD7LWU/am5yLvUwjB8EyDAcftYQrM+i3ms5D/y7XJMVWihPRDrRVK0S4QHcMQPWFVfTVZvh011NP+RLYy5Wpl0jNuj615ey2SKsRrjqfuBl605HYLtE1fleFx08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748763698; c=relaxed/simple;
-	bh=7ZVYcv7HRB2JP+iDfZrYOsxhY/4ROy3O6J/9mzautgY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D4CBQCSXvrUiet3wbuGBG9QLBdSIEkOx55P7qqz6OVk9Ea3GBFKTrT0DYh5YDjut2XfZDuDMdRO2i+LjgUz5cErn2x2bwt1qjMzRFOeyFWFsABujNZu/e8cycfhT8jNZBBnXBfCMx+chyZeWZ932ghFrOLGeee2E0H14pz/hP7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FRd9Fxkb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748788271; c=relaxed/simple;
+	bh=41RDBcCdaeVsf7h3L7tNDuc7CPEzoPSLdIsM/LTqlWE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PMi1zpaNB4tZo1U1HefF9TfamM+W14UdJRksdJcG3wnABxXVucLLXWQ08VwYJE9pr9z9wjOKjljQ3rGuhUjwh8uuFfI7cz2cqdz/V8hzZf5CKPKerej2dJ5EImXV3hXsZD+WfjbP5rOarYD2N6jiX4EbcDQOa9c8r8g5LpeC//g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iF3zUNRO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FRd9Fxkb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84301C4CEE7;
-	Sun,  1 Jun 2025 07:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1748763697;
-	bh=7ZVYcv7HRB2JP+iDfZrYOsxhY/4ROy3O6J/9mzautgY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FRd9FxkbbG5zPovyF2TJIRwAtIlc0pybqhz9wjorOMQ+dABg7zuICzLV/8u5bYtTm
-	 G3+yoISWvG5WoXc4Ib3gp7YF45+8Bs1rXvcJCLCe8IwhT0zySll3X97qte6qjpwXQG
-	 /4hgTA5kG31q4mvMVARC5KHj54j6i9cU3oBv3Dr0=
-Date: Sun, 1 Jun 2025 09:41:35 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: Steve French <smfrench@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-	Rosen Penev <rosenp@gmail.com>
-Subject: Re: [PATCH] RFC: ksmbd: provide MODULE_VERSION()
-Message-ID: <2025060107-anatomist-squander-d073@gregkh>
-References: <20250531-ksmbd-sysfs-module-v1-1-248cf10fa87d@linaro.org>
- <CAH2r5msU-45Up+BovgpwQ2eV5o5aRz+j+zh6jZLvn=ZsmNuNeQ@mail.gmail.com>
- <088096eba2d038bce2f73e6519d11ce9@manguebit.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iF3zUNRO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D3CC4CEF2
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 14:31:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748788270;
+	bh=41RDBcCdaeVsf7h3L7tNDuc7CPEzoPSLdIsM/LTqlWE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=iF3zUNROECR+epL+12G+fYPofBXeaqRqTf49UZQh54xtyxgpZxIPlJos1FsGRim6c
+	 p62GcOQDaxuJipcGRbRVq1L1HA5VQcTJVkoZzpYJWo+h4Pge9TPrCv96Lz8EsybnRN
+	 i02Oni4OcWDSzBgJQS84BTS3X8k/GgWm0lcn6yyjJJC1AwySlWXVFJ0xlXCpL4mME+
+	 POl7x9PUFMM53qqbs8gKFyd+6zSlkKRxU967MF1H427Chuum7vkDlYQJF4UXd3KfGk
+	 mizPo0CAFPgb/YiZPErzn2Ym6x5ZPY0CVIivmVrxnCG4W9AXDhrBl5OfN9a8ry6FpI
+	 vND3IRDHg7bQw==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6055f106811so4563293a12.0
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 07:31:10 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyhcNRfpKXR+Oo6XBfn1x4I2YS1lwpKpcw2yN+ijFLaQ2koFWlv
+	cIlEKKVKSgPsMFj6eM8wGnE2oKXvBj/2aX54JuSVuUUIP1ybi5EAuGb3rMKm71WgmlQDXbOwvBM
+	N69fKh3175wKtkZDcRUNXkwNNxBdIglg=
+X-Google-Smtp-Source: AGHT+IEVs1K5d4tPyrZIgvkgNJcTTljNQWLNR+lTQ2cf2aU0ejl8OSMREcMERjTi0lkLpP+mFlUVcl4xAtPqAU/HDBE=
+X-Received: by 2002:a17:907:7290:b0:adb:156e:990b with SMTP id
+ a640c23a62f3a-adb494c51a3mr471115366b.30.1748788269472; Sun, 01 Jun 2025
+ 07:31:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <088096eba2d038bce2f73e6519d11ce9@manguebit.com>
+References: <d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
+ <CAKYAXd-t27uzNLdXjPRuvbaaBnA-Z8qVqd_1W7v=97vp2Sd+rw@mail.gmail.com>
+ <CAH2r5ms-v=UwFzXZpZ-5KBgiRPkvSqQyJnLBhxP5YaAuqMAG5A@mail.gmail.com>
+ <CAKYAXd8rN+RVJB8ak_SPNX07L8BeastngMhQsXVGdUW0D0QLSw@mail.gmail.com>
+ <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org> <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
+ <CAKYAXd9BPqg=0QKrpsOHaVDQkM8=Q6fragLmpTPve=pJdNjovw@rx2.rx-server.de> <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
+In-Reply-To: <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 1 Jun 2025 23:30:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@mail.gmail.com>
+X-Gm-Features: AX0GCFuW2pFFS00HzfW9XuPAGT7M1DQ1nHX-LGjkUMzaxLkHtw--XWc7Xw6WI1c
+Message-ID: <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@mail.gmail.com>
+Subject: Re: ksmbd and special characters in file names
+To: Philipp Kerling <pkerling@casix.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
+	=?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 31, 2025 at 03:49:47PM -0300, Paulo Alcantara wrote:
-> Steve French <smfrench@gmail.com> writes:
-> 
-> > It is interesting that almost 700 kernel modules define
-> > MODULE_VERSION() for their module, but only 4 filesystems (including
-> > cifs.ko).  I find it useful mainly for seeing which fixes are in
-> > (since some distros do 'full backports' so easier to look at the
-> > module version sometimes to see what fixes are likely in the module
-> > when someone reports a problem).   I am curious why few fs use it
-> > though since it is apparently very widely used for other module types.
-> 
-> I find cifs.ko version quite useless, especially for distro and stable
-> kernels which take fixes from newer versions while not backporting the
-> commit that bumps cifs.ko version.  So relying on that version becomes
-> pointless, IMO.
+On Fri, May 30, 2025 at 6:47=E2=80=AFPM Philipp Kerling <pkerling@casix.org=
+> wrote:
+>
+> Hi!
+>
+> 2025-05-27 (=E7=81=AB) =E3=81=AE 11:57 +0900 =E3=81=AB Namjae Jeon =E3=81=
+=95=E3=82=93=E3=81=AF=E6=9B=B8=E3=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
+> > On Mon, May 26, 2025 at 11:24=E2=80=AFPM Namjae Jeon <linkinjeon@kernel=
+.org>
+> > wrote:
+> > >
+> > > > It's been part of the spec since the beginning. You can find it
+> > > > here:
+> > > Right, I found it.
+> > > Thanks for your reply.
+> > > >
+> > > > https://gitlab.com/samba-team/smb3-posix-spec/-/releases
+> > > >
+> > > > POSIX-SMB2 2.2.13.2.16 SMB2_CREATE_POSIX_CONTEXT
+> > Philipp,
+> >
+> > Can you confirm if your issue is fixed with the attached patch ?
+> >
+> > Thanks!
+> I can confirm the following behavior after applying the patch:
+>  * Path with "&" is not accessible with mount.smb3 and default options
+>  * Path with "&" is not accessible with mount.smb3 and "nomapposix"
+>    option
+>  * Path with "&" is not accessible with mount.smb3 and "unix" option
+>  * Path with "&" is accessible with mount.smb3 and "unix,nomapposix"
+>    options
+> Perhaps "nomapposix" should be the default for the client when "unix"
+> is enabled? Tough call though, might break some backwards
+> compatibility.
+I agree that "nomapposix" should be enabled along with "unix" option.
+You can try to submit a patch for this.
+>
+> Furthermore, in the last case in which the file is accessible, I can
+> only access the file as root. This is because enabling the "unix" mount
+> option leads to the origin UIDs and GIDs being taken over from the
+> host, which do not correspond to anything on my client. I usually set
+> "forceuid,forcegid,uid=3D...,gid=3D...,file_mode=3D0640,dir_mode=3D0750" =
+on the
+> mount but, for whatever reason (might be intentional? might not be?),
+> these options do nothing at all when combined with "unix". I can sort
+> of get around this by setting "noperm", but it does seem odd that I
+> would have to disable any and all permission checking just to get
+> special characters in my paths working.
+Please tell me the steps to reproduce it.
 
-Yes, it is pointless, which is why it really should just be removed.
-I'll do a sweep of the tree after -rc1 is out and start sending out
-patches...
-
-thanks,
-
-greg k-h
+Thanks!
+>
+> Thanks,
+> Philipp
