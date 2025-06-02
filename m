@@ -1,62 +1,62 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB33224882
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Jun 2025 17:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094D12248A0
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Jun 2025 17:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748884148; cv=none; b=iieHo/zAkGA/SlkZDoliJ3cebIoMZHykqMUGoXB6WjCA1vtC/PpE2bJ22wvHmZkZuaLQDOIkzxWZ3af3zZq1r7jrzqiTA3ET43MuhIBosN+ZqM9a+UotcIS5hoHUIT3Ixoy+nLMYF3rplMFLBO5lfmhwKS6LUHx48kM2u40bk70=
+	t=1748884149; cv=none; b=HduKyVvLhn825cx/4S/fZ9QMFazxFLsJBO7WmqEG1/dKfZt1EAmGr00nmKIWN12Z0NhgpU7wAYctqPUMQ0tgLIts9nktgTVvibAMk/fWFmI+PMAogRdq4I7vpP/DMJRQML/1EZdHfe+7XRTxiZEbRcPgrqYWuWUCumByqjjFF78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748884148; c=relaxed/simple;
-	bh=1a+buuJ/yu53BkMP+WxoRmPsqdbkjv6LnkOh/AtKsr8=;
+	s=arc-20240116; t=1748884149; c=relaxed/simple;
+	bh=aFIrwscsM3f/OsknSi22nX6hN0mT+0iDN+pEtxzjGRs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tPBJrd8AGWyn3DoFM7rY1TpiH1uKCyaNtYKI64rlgFmGKkwYKfY/otHfmaGpWTSTE7oRwkePLYQ2zhkksFbI0/qArmJcegc6t2zxJR20f9BRchFl0+RJ9jHG2Nmzm+PZXPrrrAsVLYHQ1+Hie1YJKX+wijbgRAEGUomI1p2ms1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YOWl4zee; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=GWCqz6tLR5wwdykUQglm5lmc/yOAgg1rmet0H5aCma0yDfMpMwHOkUrn4BcagxAB3vo/Mn6mJSBWUlkUx41mMchubSoGX28Tpv1jFstGPxkbJGxEbeN9eL4Ybi+QCOUWkVc1DV8T9iuu39KpUT3OH6BhpkxWqLRviUssTeujvJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J35FzHre; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOWl4zee"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-231e98e46c0so43009535ad.3
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Jun 2025 10:09:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J35FzHre"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23228b9d684so49378845ad.1
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Jun 2025 10:09:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748884145; x=1749488945; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748884147; x=1749488947; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mvgppn4KrR1ccS7/98n6E9hBw93UfkiPqXyBWZIB5kw=;
-        b=YOWl4zeeTGrQ3WYw+OTBnvOC76/PFTQ3tssjhYRNSFZA/7uJOACMsLfajeox2hdkVY
-         +DHbFuGNrmBmyv23U6tR3jYGvBQ3i8jQbs/nx5y0Z3AX6mSUMd0ywKYVzL4gCIC+rS1f
-         +NqVLsLHEGOrxBppXekWqXZ6Iwzg6igzIcegvcZkkASdT9txv998tDk9D99DTF0P99qu
-         kJ2HmseH7G9Q9lbpCWd+7mZ1hkavm3+VE8TodL8krse6wMb1v5Hsd0Almv3thl+AlUTG
-         YJAMF000VHjlzOkPmGqVSp5RHmXO8OaGxwuCm/5xfaWmQubZ6RR4TRe0h9sLqxUh/trv
-         DUbQ==
+        bh=pbeMydlpBKnJriiyQjoZXbaCDjFrTu85VLS3ZQbl5Os=;
+        b=J35FzHrek0jhfZBiIf6bAHF8AOmjkeHyxfTuDfnn0DPLrv/uEqufugpfTRR3qp6FgX
+         1Lq4KxozG2lYQMRywf6tO+U1+8jAkiOV1WlmVUStFyTwBKI2OWdZ4tN2l45nNbq9Sz4F
+         qtWQWYL9J3avi/3b1SSDZ03jaMDDTPme2kXleowWCdtksKanNm4R7HQyUiRV9t+Zhppy
+         mjpf4rRCRwy4uhioWZ45tgojpHSaequoMezxondbNrGGE6zKtGf9uTuGlifCSwRiUXo+
+         eEntiXqRvnvzbgIHWXWlfB4/Wb/qB8qSY7HfsmoQ6NWBeQI3LUt2B43oVRW9B8aPcHOe
+         yLuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748884145; x=1749488945;
+        d=1e100.net; s=20230601; t=1748884147; x=1749488947;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mvgppn4KrR1ccS7/98n6E9hBw93UfkiPqXyBWZIB5kw=;
-        b=IgRvK9u/lSLuxNmfshZCGxmf8CUyc86ZxEOM391Yn29G2UHtINVZWwvyzlT6akjPsN
-         60gDUN8iahCPS4s9KlGHwuNzxo3Izzp3K0KYM6G8/fWh9TrCwepKFhJT5Tlz0IIw3cR9
-         XAhhfLmgXugFSWtJqDFcbMIsmrOSC5wtcRc4TJAED6xqqtWRtlEWctj1AkS6nJ6yVodu
-         QcTlKBZvIlhIsoaGGVcZj6f7sMO02qubj2DNgstRjPExVPixKrnyCbPmDjFA0YNR4oOg
-         ECYJFTE7dfedh5yE/qBQ5Zq1+CdHvymXKjMHm7k/NQn+k4mxdLf+OpygFBotXZRG2fOF
-         eWDA==
-X-Gm-Message-State: AOJu0YxeA+M6Ep/zlSNA74CcWlWw8x6zwYaQDN0RHqZe5LpqBtCD1Vcw
-	rmQEXG0m2nAsjxmYD9KeM2C6oNneQoioE71NLh9hc8GSwv9rImlh/YKpFdRM/w==
-X-Gm-Gg: ASbGncs7E0d07qkH9Jkkv+ifsf2hqaRPAyr7PrSWiQBj4q8wJTfmh4GvWsqruR1uTQT
-	nW+P6ozva4MBaivCBa2Y/D/3v9lKubXZV+Q3BSBL1YQKm93iBDbslwOz1d9f0annSBxPRQzUHxK
-	EGii12KfmDL8prCMsRvpEz0yMcHg7CZOxACnJQfsMYzAZSZupL0vneyceyTCyoM0eZU7CVqbmIc
-	IfNro17UVWslOluZHweX9hx28ELzK2YKILM3JMdgMX8MsnRv8djelNOflnTwv6fSp0Yeq4zss0h
-	AtGF2BiYTxv74wTcmtRXhO+u5E9jALsQwk0x/tADuk98SbFKtdh0XBabr8lCy2ab7X9Z0VMSVqh
-	J5gdGmA==
-X-Google-Smtp-Source: AGHT+IE/ncbNKJffqsMB2qdmoehy2txwD2ZPe4Nm5WfEd57BBbIKJtZPt9Kz6jm8AIK1FLJWYqosiw==
-X-Received: by 2002:a17:903:94d:b0:234:8e78:ce8a with SMTP id d9443c01a7336-2355f79c7aemr149722325ad.48.1748884144938;
-        Mon, 02 Jun 2025 10:09:04 -0700 (PDT)
+        bh=pbeMydlpBKnJriiyQjoZXbaCDjFrTu85VLS3ZQbl5Os=;
+        b=DVUJAXbVFJwVE86CeAYuh5+RXj5rk0eeolEYyZ5mBDtEANugPhU1sthEtUKSOMCLwF
+         /X61kDT997awQ2QwWHgVbZFtV8JUzeiZJMASZHZ+KKpxyMylIOhQnDFxHq/Gm+xqmWJJ
+         s+FIPcHdX148LfZ5TR+z3rHf2bFFglG8GQckyvYHVSck2y1Hzbdf7mKtlfXj7/BC0sZx
+         w9DOlozNMfDdlxmm9emEtUfdxzcmRcMi6pLDocR2qI+S0PxRtfs3SjeHY5hB7KLWvsLL
+         vYkSqKtqCwQasApb9uXi3uUDTiUKmThCUaei6b8sIVPI15di8J4CPrs2T/Vx4fc+xxUe
+         c8UA==
+X-Gm-Message-State: AOJu0Ywprk/N7d5ol4fvlW0CLE1VWsAwgz9EQpP3kwT/u6fUczZyLApz
+	PH68CaP4PWuFyEbNoGDIIMiNSVULAB1uqRHGnq7h6TBFbv9nkaAlhyLGsiJfIQ==
+X-Gm-Gg: ASbGncuUU+sj1r/vnEDzN7MjfW6FdznXVFkN0lsQ3Y+1zCNsQhq7NSZ9q/yJrOHGpu8
+	pPUiJTtexHc4TqdBv3ooDXOFfpyMHNgFCGkrcptaUksav481EbZwDMNSvvhd35vvcSgilOMiEqz
+	/pKwWZcVo+Rc5NGGofVKH1lL/+aULKpZ/lAAv1DvCzoUp/NJNIUybASksW4xPr5SNSm5iPjnlfF
+	ttOmJxc6SgC54R3VKsUdPWv7jB0bm2eFoFpT3Kdl8TTw6QZXClhAiK6qJ+fIGZV2zuAad9dCkxL
+	cUt+0GD+hfOvMXVaCzv1pu0KKKCQw1D0dEcwyLKBVO/5MS4fxrxGHRad0rEy9kmL3Ylf+1ndVAd
+	ucPCCGA==
+X-Google-Smtp-Source: AGHT+IGfNTvYUgj97FGT/L1fwaVdfyxxOmsHHVcoj7bt59ulZOx1yeAowJ+i8tBWIs1MhDw8gIPt1w==
+X-Received: by 2002:a17:902:dacd:b0:234:8ac5:3f50 with SMTP id d9443c01a7336-235395a1964mr190882675ad.33.1748884146835;
+        Mon, 02 Jun 2025 10:09:06 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.136])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2355c58ecd0sm40319625ad.25.2025.06.02.10.09.04
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2355c58ecd0sm40319625ad.25.2025.06.02.10.09.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 10:09:04 -0700 (PDT)
+        Mon, 02 Jun 2025 10:09:06 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -65,9 +65,9 @@ To: linux-cifs@vger.kernel.org,
 	meetakshisetiyaoss@gmail.com,
 	pc@manguebit.com
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 4/6] cifs: serialize other channels when query server interfaces is pending
-Date: Mon,  2 Jun 2025 22:37:15 +0530
-Message-ID: <20250602170842.809099-4-sprasad@microsoft.com>
+Subject: [PATCH 6/6] cifs: do not disable interface polling on failure
+Date: Mon,  2 Jun 2025 22:37:17 +0530
+Message-ID: <20250602170842.809099-6-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250602170842.809099-1-sprasad@microsoft.com>
 References: <20250602170842.809099-1-sprasad@microsoft.com>
@@ -81,84 +81,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-Today, during smb2_reconnect, session_mutex is released as soon as
-the tcon is reconnected and is in a good state. However, in case
-multichannel is enabled, there is also a query of server interfaces that
-follows. We've seen that this query can race with reconnects of other
-channels, causing them to step on each other with reconnects.
+When a server has multichannel enabled, we keep polling the server
+for interfaces periodically. However, when this query fails, we
+disable the polling. This can be problematic as it takes away the
+chance for the server to start advertizing again.
 
-This change extends the hold of session_mutex till after the query of
-server interfaces is complete. In order to avoid recursive smb2_reconnect
-checks during query ioctl, this change also introduces a session flag
-for sessions where such a query is in progress.
+This change reschedules the delayed work, even if the current call
+failed. That way, multichannel sessions can recover.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/smb2pdu.c  | 24 ++++++++++++++++++------
- 2 files changed, 19 insertions(+), 6 deletions(-)
+ fs/smb/client/connect.c | 6 +-----
+ fs/smb/client/smb2pdu.c | 9 +++++----
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 3b32116b0b49..0c80ca352f3f 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1084,6 +1084,7 @@ struct cifs_chan {
- };
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 024817d40c5f..28bc33496623 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -116,13 +116,9 @@ static void smb2_query_server_interfaces(struct work_struct *work)
+ 	rc = server->ops->query_server_interfaces(xid, tcon, false);
+ 	free_xid(xid);
  
- #define CIFS_SES_FLAG_SCALE_CHANNELS (0x1)
-+#define CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES (0x2)
+-	if (rc) {
+-		if (rc == -EOPNOTSUPP)
+-			return;
+-
++	if (rc)
+ 		cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
+ 				__func__, rc);
+-	}
  
- /*
-  * Session structure.  One of these for each uid session with a particular host
+ 	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+ 			   (SMB_INTERFACE_POLL_INTERVAL * HZ));
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4e28632b5fd6..59a6b86c3786 100644
+index 59a6b86c3786..50c9e7ba15b0 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -411,14 +411,19 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	if (!rc &&
- 	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL) &&
- 	    server->ops->query_server_interfaces) {
--		mutex_unlock(&ses->session_mutex);
--
- 		/*
--		 * query server network interfaces, in case they change
-+		 * query server network interfaces, in case they change.
-+		 * Also mark the session as pending this update while the query
-+		 * is in progress. This will be used to avoid calling
-+		 * smb2_reconnect recursively.
- 		 */
-+		ses->flags |= CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
- 		xid = get_xid();
- 		rc = server->ops->query_server_interfaces(xid, tcon, false);
+@@ -423,6 +423,10 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
  		free_xid(xid);
-+		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
+ 		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
+ 
++		/* regardless of rc value, setup polling */
++		queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
++				   (SMB_INTERFACE_POLL_INTERVAL * HZ));
 +
-+		mutex_unlock(&ses->session_mutex);
+ 		mutex_unlock(&ses->session_mutex);
  
  		if (rc == -EOPNOTSUPP && ses->chan_count > 1) {
- 			/*
-@@ -560,11 +565,18 @@ static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
- 			       struct TCP_Server_Info *server,
- 			       void **request_buf, unsigned int *total_len)
- {
--	/* Skip reconnect only for FSCTL_VALIDATE_NEGOTIATE_INFO IOCTLs */
--	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO) {
-+	/*
-+	 * Skip reconnect in one of the following cases:
-+	 * 1. For FSCTL_VALIDATE_NEGOTIATE_INFO IOCTLs
-+	 * 2. For FSCTL_QUERY_NETWORK_INTERFACE_INFO IOCTL when called from
-+	 * smb2_reconnect (indicated by CIFS_SES_FLAG_SCALE_CHANNELS ses flag)
-+	 */
-+	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO ||
-+	    (opcode == FSCTL_QUERY_NETWORK_INTERFACE_INFO &&
-+	     (tcon->ses->flags & CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES)))
- 		return __smb2_plain_req_init(SMB2_IOCTL, tcon, server,
- 					     request_buf, total_len);
--	}
-+
- 	return smb2_plain_req_init(SMB2_IOCTL, tcon, server,
- 				   request_buf, total_len);
- }
+@@ -443,11 +447,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		if (ses->chan_max > ses->chan_count &&
+ 		    ses->iface_count &&
+ 		    !SERVER_IS_CHAN(server)) {
+-			if (ses->chan_count == 1) {
++			if (ses->chan_count == 1)
+ 				cifs_server_dbg(VFS, "supports multichannel now\n");
+-				queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+-						 (SMB_INTERFACE_POLL_INTERVAL * HZ));
+-			}
+ 
+ 			cifs_try_adding_channels(ses);
+ 		}
 -- 
 2.43.0
 
