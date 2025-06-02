@@ -1,63 +1,62 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348711DF25C;
-	Mon,  2 Jun 2025 17:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0AA1DF25C
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Jun 2025 17:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748884146; cv=none; b=dERUGgQ6RdcCz4rOeChen3bzExbZ0XX/obfiJ4jM/RsegmC+M7p+8ZG4U3H5NPOXBDW0T8NjLxfO95yu4BFnuEGvCr5vJYh9h/lc7DgRK0aCWdOMSj6X1F4eoO22EyWx1POCJbHDWfxGMtuDKxYwA6dTYYujSsmX/YEyQLyElGs=
+	t=1748884148; cv=none; b=SVT2R88ZaRO2AM+comuFr6DV6x8tGbOHsuuuhEtFt6mzkFVIipIVHGvq6qA5zcJdRIp7IeCpCB1Jo9ceWSM7d1kY/1mBzHdopKUrSDehpeNTx3mRE+/sSN4ZaEoAd/YPomotobTXlV6V/1gPKU6SjF1zI8T110t4X2nMjutX+9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748884146; c=relaxed/simple;
-	bh=SeRLmnedyQVO1lFYSbJyRT/ZmZYp3vu259zrp7HWxbU=;
+	s=arc-20240116; t=1748884148; c=relaxed/simple;
+	bh=iAPi68D8iukZS9quqnL3fO0fKwueioQ2RodZzIB21Sc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q9cwcwRq7qI5LCVkb1Y4Ay3EmPIjwG3e+oky+W6tTplSItkLxOby9zHD2URV+oNxbqT8tRGFPZw4Vc9MuiVsSUYyufPaykptzs+2j769OU6WJOxVa8H8RNQfqQAJ2j3NwB5Y3ThUAL3cfSH9MDYTkDpnNd0OIx3yFet/RoN2aoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nuyy82ja; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=cuyYpdozdw0X+T+h7QbKdc2AY9Te1vwab/Iwwr8rvshh0IJI8JKJfle5OgmjjXX67f9KChlL2S2Z4WasVCVJlSakJmlBBQuFRC3tfA5sr/bCTYz6DJ5TOrP+Mtb6MjWc3Gwu0+RM/wOmcEbEn5qMwnxhi/yYpXADxC9pXLASkNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOcPBpfN; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nuyy82ja"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23035b3edf1so41911945ad.3;
-        Mon, 02 Jun 2025 10:09:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOcPBpfN"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22c336fcdaaso37913305ad.3
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Jun 2025 10:09:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748884144; x=1749488944; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748884146; x=1749488946; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J1YmnswpBA3f69D6V64cHcVKokKeo5eAqEaEDmfkaqc=;
-        b=Nuyy82ja4ohpHMjGa93D2D7hVELUDYN16AlWjebvYTkAAgaZm0ihX+ySIpxLchqiU5
-         wKSWEEbO2mQOhjZSkcngcuFpb/NbPM1VCMS+Vr0k4gP728pz5BJiNo60NFxM4n7g3LqP
-         M7n0KXcgCR+obdbtBwdb1Xso9M1rsnGecMjCZxmBt4JJ5DFIcAbIlTeFW36J6KdD5oNS
-         cairevhMEabvOVq7/LndjkO0+Se2XyFB57bA5bhp0Db20A+PQT3vHUKP/HbeKooZGBlj
-         iTW1+nv54MhYjV/MeNoXTKYdmr3JcdVubEIm8JqHI1UZJG7Bz0VVCo23m3dHvS1QkVR4
-         aflA==
+        bh=upTZoLbxqvA91SITxeWTmTzDYrShPQ4RneJfiCESnQ8=;
+        b=kOcPBpfN3B7ktLwKLTmnRwcT9UDQ1qCsD/RuqgWnBrYcsvVJvF8PWmT8BYI4wQ5PcW
+         GPw+fGkBJC2xVjNrHQYMGHeQ+/rHPqYzwYfGOdJr6fmofwUj+fLC+GR6YaXeMom1DpRo
+         IeF0f6r9mGExN5NUxCDvibclUSwgA1zuonkYkiFY4/AErDxZxBXYJIqX2gHzbGk3i566
+         3eFXA4xOV2WfFmWgucUDWe13qs+wvMibH4EmiesYhqMlJLWXEylGoz3wlL9FBO0H5Uza
+         D2/EPf4qUfUy+OtDlco5WrbHh51NVr/GAj16mGm1B1+OzCfjKjHl5xVbTri2Ij0FwEMf
+         d7jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748884144; x=1749488944;
+        d=1e100.net; s=20230601; t=1748884146; x=1749488946;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J1YmnswpBA3f69D6V64cHcVKokKeo5eAqEaEDmfkaqc=;
-        b=A7rKSroxLaMqXWmZej1gFUh7NA/BQIP3fNMhfSMTJUL2DsAe0XYAEew2kvbctwx5id
-         DwFyz/UjKEl0/dsO4zeidOke5TdunrYTHQ83YyMOx1CCEMHIVwjYy5XWHV2E6KYny2nj
-         Tgwi3lYvGYS8o81vJvdrsgIBftX+BWnsLqkKoOYD17W/VXw9BflTri05rQ/saiNvPM63
-         b0n9ToagCviGkxgsmoSIPOlx9helWK+nn+7mD+kr2kRL9sdK+cI5qrfhfDCBhK8NlOvG
-         7n4kX3bFQgcMTufzAdNMrPeIfuVtEqrFKcN5o/Yz7Cgu+TRoHejG0DEZ77evkFBT50+D
-         rS5w==
-X-Forwarded-Encrypted: i=1; AJvYcCW7IHEaT0F2oH+MPBg8YmTKLUcwpp5b3tgJmfpoRiZ7N5LroehnEUbhbF+SComn7WgXFqofM2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMtqZBuVyPoFZ9BWoKt4XQnlY+0mEzk4s3pNK/1hOanAVGUp9c
-	k+yoRKj48Sl6udmI2Llo68Akv0X23zU4WvjqJ2wKx2NbDRtin7IS5APmO3C49g==
-X-Gm-Gg: ASbGncu+S0RovtpqwMLWn150h45FukUk0xrBMPEgRY7Y6Y8y+qxxRjMyOqdys4lpiU6
-	p964gLU/CKEEpMDenqgM+dPJiCkrDwaVjS1+tVlLhtKo0LCOfnJLobXJ4mvFfsMyCejJB/ZJ7AB
-	LJV8sRxXpMXiEotcLM/UCLtEtMtPWbH0Ah/F6CEukoz2/N+XTp3Nv4KG+otiNO0/YRha00YEGQ1
-	u0NmsCavm1ZMjtDyu/AykocI8ZJOhW/glqJ0LN/gxlLKIlT410oaG0rjHad1k/+19opPN91hFO0
-	f7IbFgq6M0aTOaeipCnxj358KM+S4cfVkmkvh+0shS6yNiFO2kH4BfM0TRO+NQ8gHNSU71Rr1+v
-	MfR9KHw==
-X-Google-Smtp-Source: AGHT+IElkDvLcFo4rTM9/jnbj8UakkD8XgGk9o8PJjZR7qCRtKzA2BLuaXR5ZogKh5modX+xI6bAHw==
-X-Received: by 2002:a17:902:ea08:b0:234:a063:e2ac with SMTP id d9443c01a7336-23528fedd7bmr212808885ad.2.1748884143981;
-        Mon, 02 Jun 2025 10:09:03 -0700 (PDT)
+        bh=upTZoLbxqvA91SITxeWTmTzDYrShPQ4RneJfiCESnQ8=;
+        b=faRibh2W/8njSnp9u0kPW88iwMtVau3SNfMRsGdSr3RKWYuJQp+dQ6ioTyz2I0FN5N
+         FJ5vcug2Ey6Qctd5f33XDKyvFbXu7Z0Ooh5Y+P1gErLPLAk4moWln4hlGszZ0KZtJvLb
+         mnoYjpLX38DVtR3HPo8IGcPcj1nimcfJIxm5aKYcf9Wq96Utv9rQorBDFEDiaXks8fK0
+         h6wJyVEHiNeYSk1mijz7+vNbpcX4a3hud7W9uhAoITZEIBJa2n76MnW0jHVWCeQpt4px
+         87uydhXVy9l1qD2wcjZHHFTL+Af/1yPNYMOlw2Yf4HwFDGzMrJgaS4EyuIUqvdNRy2+x
+         HIeA==
+X-Gm-Message-State: AOJu0YzMTmck75ycQzOiTDxuLkLpINdGTAIg8QM7u5biWSTFcPDEfwd/
+	27xBO+CakKxsKUQeDqzZONYoftBAuq3cyixhp7RCrox3SsQd7vRcynIOuxbvKQ==
+X-Gm-Gg: ASbGncsOtGAxdv33SMw4d3n6RinoIoVs33V9xh2D1Ol2frjeRemEBYlqgQZ4vghUCvJ
+	3yVftHlkLMiHAmIzwJjO33TZbDdLpIZiYEWJDcD+sMhg0uKWDkjRDxoLJLUtaH5StL7PY+3+ZCh
+	NIllVkHTm2FJx7SrwYkX+AZB2pMBlica/IGO0gVXlFxFmYfT76SgImpVHmKzuCpilOPG3cfxZYF
+	IA7q6DEMtyt6nk71UPdWHrECmLyfriUQT56WLegZnL9BrtKn7pfaQh0aYPOLtyPf9PnIdERtiP4
+	s86HtJ2Q2OLiFmvBmbtJJlaKSNwVzMhpj5f43esg7yUBoVOeAwn83OnlTz0cndfIgipcWtoEX9w
+	LKIn9Ww==
+X-Google-Smtp-Source: AGHT+IE9f6hBJo11afMZLyYG0PbnzcXK+YZJ0kvLnQ7YAaO2ONDxLAKT4a9SBwoCDJZyAwVCQn0U8A==
+X-Received: by 2002:a17:902:e5d2:b0:235:779:edfa with SMTP id d9443c01a7336-2355f74fdafmr140990905ad.32.1748884145923;
+        Mon, 02 Jun 2025 10:09:05 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.136])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2355c58ecd0sm40319625ad.25.2025.06.02.10.09.03
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2355c58ecd0sm40319625ad.25.2025.06.02.10.09.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 10:09:03 -0700 (PDT)
+        Mon, 02 Jun 2025 10:09:05 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -65,11 +64,10 @@ To: linux-cifs@vger.kernel.org,
 	bharathsm.hsk@gmail.com,
 	meetakshisetiyaoss@gmail.com,
 	pc@manguebit.com
-Cc: Shyam Prasad N <sprasad@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/6] cifs: update dstaddr whenever channel iface is updated
-Date: Mon,  2 Jun 2025 22:37:14 +0530
-Message-ID: <20250602170842.809099-3-sprasad@microsoft.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH 5/6] cifs: dns resolution is needed only for primary channel
+Date: Mon,  2 Jun 2025 22:37:16 +0530
+Message-ID: <20250602170842.809099-5-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250602170842.809099-1-sprasad@microsoft.com>
 References: <20250602170842.809099-1-sprasad@microsoft.com>
@@ -83,33 +81,34 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-When the server interface info changes (more common in clustered
-servers like Azure Files), the per-channel iface gets updated.
-However, this did not update the corresponding dstaddr. As a result
-these channels will still connect (or try connecting) to older addresses.
+When calling cifs_reconnect, before the connection to the
+server is reestablished, the code today does a DNS resolution and
+updates server->dstaddr.
 
-Fixes: b54034a73baf ("cifs: during reconnect, update interface if necessary")
-Cc: <stable@vger.kernel.org>
+However, this is not necessary for secondary channels. Secondary
+channels use the interface list returned by the server to decide
+which address to connect to. And that happens after tcon is reconnected
+and server interfaces are requested.
+
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/sess.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/smb/client/connect.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index b3fa9ee26912..8add3ba14e9f 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -445,6 +445,10 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index ca1cb01c6ef8..024817d40c5f 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -392,7 +392,8 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
+ 		try_to_freeze();
+ 		cifs_server_lock(server);
  
- 	ses->chans[chan_index].iface = iface;
- 	spin_unlock(&ses->chan_lock);
-+
-+	spin_lock(&server->srv_lock);
-+	memcpy(&server->dstaddr, &iface->sockaddr, sizeof(server->dstaddr));
-+	spin_unlock(&server->srv_lock);
- }
- 
- static int
+-		if (!cifs_swn_set_server_dstaddr(server)) {
++		if (!cifs_swn_set_server_dstaddr(server) &&
++		    !SERVER_IS_CHAN(server)) {
+ 			/* resolve the hostname again to make sure that IP address is up-to-date */
+ 			rc = reconn_set_ipaddr_from_hostname(server);
+ 			cifs_dbg(FYI, "%s: reconn_set_ipaddr_from_hostname: rc=%d\n", __func__, rc);
 -- 
 2.43.0
 
