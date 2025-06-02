@@ -1,153 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FDF2405FD;
-	Mon,  2 Jun 2025 14:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44446ADD;
+	Mon,  2 Jun 2025 17:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748873002; cv=none; b=TIoc6I/ZzqkYEKwje6n3Cz1wbi7ayECZmVejbztFer6fZFwy4cJJIcevudxMdr248sGx6bj9gH16sXsXJavgTOA7uQMbtkI70oTwJEf8LJZK3GPTKarBRbXyzlb45s5XsSQeUoWqRlRo11Cn8/xghapa0smATkGgNkvHMOvEer4=
+	t=1748884145; cv=none; b=her7Fk4V3AVyMfakt6HNWiDMT9mzCAC+lrBcl6K6MXHg68taXBHKyTJOZvaYQZKvHACcNDUpXCiNVbshepJlgcLg2MuR4bnaSptOJBlR8i8P3oBBwBelXx3d2DZn98vT41mrcl5EMCG7lDZLoCAhTehJM5M28MAIQiVHn3uVAwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748873002; c=relaxed/simple;
-	bh=WRTUFe5zAa4ehyUDpuZU2A396vCsORsejbqIXvfw4eM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Nb4VGUEJAOHQsg0VsNjeVJzcSPxpOMThnFWWyHJPBYLXv0wejvSm86t9Qig5FEpSPbY0i2Ddx2eYsMUPzS9h61h+o+TV04cVaV8MUVcz+wlIj1ZGvExfvk8A5auFY3hl9bmHLtdG0uyr+DsxbinAAHR9BtfEGn7t8TedRlu/Rns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4O0muln; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748884145; c=relaxed/simple;
+	bh=hjkBk3HMiGwwCbb/hmIBEOedCZP4RWeS84JP3EYNaJU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q8kTN1WskxjTeAhAIenW+dB7ea17q3hnTXU5A1yCflP+EqLXJhzrXWeVkEoWWNfkHcuW1ddzFF4LK829W9hDkS0HuQwAhLUPoMdwROz3TG40lc9sdaORmuP3xD23hBDDdOIPDzxWXm+UIh1p/XeCZ1nqbWLX1uhuS2fdf+jEDD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JI84mQjR; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4O0muln"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54F5C4CEF6;
-	Mon,  2 Jun 2025 14:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748873001;
-	bh=WRTUFe5zAa4ehyUDpuZU2A396vCsORsejbqIXvfw4eM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=d4O0mulna5zpsC6abaqW7ZzC6op2McHxHnBQVPqnQwhFOlxMsWRGVVWKLUXcf8a9c
-	 ohFTvdxrxc7Mw85ldB9a5qQBhmlJxwyhnI3A2zQS2IwOxh1AqxlItPsdXlfHF9ulzu
-	 yZjj/k8bPLr0m9dlKgzUOFoIHWUg7nPX5mPdQam6R5qUbEsyJjbdzRH7Kd5fCmDO1g
-	 ImOxd8OSI1VJKt5JelTrmpxO82lN+wO7Ddskf308gJgCtkZWMUf40TMHO5LBvSdWXa
-	 n88yEb3aCDXEDuEH26sbPdu8rmrtCoVVIHmhmaMURopXs2VOEuq283oc1xJH5V32Yj
-	 8ardsieZOx80w==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Mon, 02 Jun 2025 10:02:11 -0400
-Subject: [PATCH RFC v2 28/28] nfsd: add support for NOTIFY4_RENAME_ENTRY
- events
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JI84mQjR"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2351ffb669cso36376215ad.2;
+        Mon, 02 Jun 2025 10:09:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748884143; x=1749488943; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gkYA4rHxMq/jjiQgQozusK4XdfpLMf/SmvgSi3FtQ3o=;
+        b=JI84mQjRAfycAJtZMFZQknkTmgHiFgLCHR7ouENidC0CsKhTm/xVWcnHpmUKahuR64
+         a4C6GVTIrlsGsmNkK2g/4JtJ7IT/V+7csBtDTLUo0x47ZzZZGVuRLmX9/5kFE8adsj+q
+         nTUwYHgyXTehJzTi8DMePCcGz1XexOVBd0yjHGQEHbxdAbZE8gpwV8PticSS3NTSpVW5
+         AdKvDk9Ou8qxKIf9ucaVfBOqNElc+/lI+i7fiaUjl18SB6Q4qJojKYTNPEAC0HPwovRx
+         gOEvD/HN8Z6GDilnn3qC/JEnP9Ylse2JFIIHVt25imtJqf56HbxHCHm7Q+HiPrkv61xY
+         EF8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748884143; x=1749488943;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gkYA4rHxMq/jjiQgQozusK4XdfpLMf/SmvgSi3FtQ3o=;
+        b=iv3FfR7kkqshO7hs3oJgzXXMFBk5wLZtSwiHHlEMCZl9F/7mWVsKdMZkVKbev3yno2
+         sYU6Sa7yJN4BGjwXxEBtNBRaihj5W2PQwhjCVKvxXLI4D1vm2Icm/II4tpv8kQ/Lw0nd
+         TYVZm0GYLG6kTu4ygnUU/KZR7N0hVCvBQATb9NviUpLb0tc5FJWhrUQYkGy/4IpoZKXg
+         wyRDf8sRuwM7r+QlO8C31CimGDwFvYeGijKGOWwjhn3JGqAB5m2E7vgTwhTaPkCXb0PC
+         ROPYGwryuJUCv/zJkaSsMVJqBg2qSdHedLMRkJHf5cJ+rMPvvbF4NINNCRPTiaJ/olW1
+         nQzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUImNx+QRf3s8oPssbFxEjkAZtxIAgj0bDLeNFdy4ZDQgoC9qHGzZ7duRX+8HL1yeUGnjas1RQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP2oHZ6EwY6Xr0vMUavNDu0VJKbxw5Ybhty07Y7vf804gC9FFj
+	CNtJHO6b4liCoJkWrtcTHG4C5huCqmZBwgMAqWDR957z32jvO0qzOOMa7HTGyg==
+X-Gm-Gg: ASbGncvtsairKlyOiSfyMv9e4QEszdUTwxBnk6Uttd3mR1zrWBQZJ0Q98Nbmqb+U2F/
+	lHjYYjNN9Ey4CjG5XtJD14QWQwEUJkoMtZBB3dwNpPzb49IyiVaHrLl4ta0Hk+7FVgugc4YYKN9
+	RLBqlVvZzkPzBwR3vT90TRJ1dexALROKSOD9C99uCpoaHku7TIP+KGaAjlTMlcgPoxY52c2LUNs
+	R+IGEBec9UVQeXUAd7v/bwoaWCtPjW57V6YVC7flG5ohHvvwJkZfdAff666GLV5iiJKCKX1mAVr
+	5TuWsPy2l9O0GzKqd/Vb5NVifOTXuUuX2shF0xV14O5A2U0t4GDSCRhljQecGz5ZNsSB/G5q0z1
+	6+K9QvA==
+X-Google-Smtp-Source: AGHT+IFg2wRIPNTdCGh2lqiEs6hjTG8115wEG2gPgqQRQLgy3mJMsd1LcMRiPFSfpBA3JPUVg2imRQ==
+X-Received: by 2002:a17:903:22c4:b0:220:d257:cdbd with SMTP id d9443c01a7336-2355f783273mr134114445ad.48.1748884142527;
+        Mon, 02 Jun 2025 10:09:02 -0700 (PDT)
+Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.136])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2355c58ecd0sm40319625ad.25.2025.06.02.10.09.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 10:09:02 -0700 (PDT)
+From: nspmangalore@gmail.com
+X-Google-Original-From: sprasad@microsoft.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	bharathsm.hsk@gmail.com,
+	meetakshisetiyaoss@gmail.com,
+	pc@manguebit.com
+Cc: Shyam Prasad N <sprasad@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/6] cifs: deal with the channel loading lag while picking channels
+Date: Mon,  2 Jun 2025 22:37:12 +0530
+Message-ID: <20250602170842.809099-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250602-dir-deleg-v2-28-a7919700de86@kernel.org>
-References: <20250602-dir-deleg-v2-0-a7919700de86@kernel.org>
-In-Reply-To: <20250602-dir-deleg-v2-0-a7919700de86@kernel.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, NeilBrown <neil@brown.name>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Jonathan Corbet <corbet@lwn.net>, Amir Goldstein <amir73il@gmail.com>, 
- Miklos Szeredi <miklos@szeredi.hu>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, linux-doc@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2877; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=WRTUFe5zAa4ehyUDpuZU2A396vCsORsejbqIXvfw4eM=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoPa7rYWh5WPyBqmd/mpYouoAaeCmO7iYpghNrL
- 2FZXSv49syJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaD2u6wAKCRAADmhBGVaC
- FRLAD/9Nrz7K/6BZh3J7GzB7TSD3Iu8DHCsSAkiig2bJ4KYuyJdr/v9vr7B1pSdCR+UN7OFPToX
- Cm6Lbv3HaVp1569JJ5aYfDQoaZhxDg0IQIajjWvorce9w+r9GbvoOvWAAe5BWBJugD1asZSxQqI
- wiB9z2fvE0r2MQwvvooV7GfDANY0anAIEkbYzEWIN4fecGqDWn9Frk/3sichSwRgrrOQuYz+o5d
- zVb+QPivMvVfFmkfe9v8NbGkSFuB40v84Ab3uWvui0QTRbag79oAdWGoo+EYsACgW8fPGxMiPad
- byakNt0nXAuGnwBKf8zV3emFCUt/PcIcK7soVpY1b5UAXn7lJ2Rn3TKIORKcLJEtIZwXmRxG78a
- WzbYtyBOGJie63ytKV43ixhN0S8UghXP0Spi7OB2nn7NxwqjT3E52Cb23yNABtf4fbkVKqd0aMm
- GEnYGTeTvDnC6gzAOYqd0lBVRwPURcrqbWe1kKqJ8fqTjRjJNTJQYtpEyKGWwGrsdpYMtG0AaFj
- QxE+AnC27WCcQlSJ6dk00isFmg8Sl9aFtZ/anoVk75oIoztNAr+3gbhRNzEs/XNEQV5iIfwWD07
- P4nOoepshUDmBrvKd/rsdpJLAH/J8sdZqByh/vnJfaGnhpB5RhXUSakmBErmo95bsnfmRExVT1j
- IS0rm0gaUtKGXmA==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Transfer-Encoding: 8bit
 
-Add support for RENAME events. Marshal the event into the notifylist4
-buffer and kick the callback handler.
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Our current approach to select a channel for sending requests is this:
+1. iterate all channels to find the min and max queue depth
+2. if min and max are not the same, pick the channel with min depth
+3. if min and max are same, round robin, as all channels are equally loaded
+
+The problem with this approach is that there's a lag between selecting
+a channel and sending the request (that increases the queue depth on the channel).
+While these numbers will eventually catch up, there could be a skew in the
+channel usage, depending on the application's I/O parallelism and the server's
+speed of handling requests.
+
+With sufficient parallelism, this lag can artificially increase the queue depth,
+thereby impacting the performance negatively.
+
+This change will change the step 1 above to start the iteration from the last
+selected channel. This is to reduce the skew in channel usage even in the presence
+of this lag.
+
+Fixes: ea90708d3cf3 ("cifs: use the least loaded channel for sending requests")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/nfsd/nfs4proc.c  |  2 +-
- fs/nfsd/nfs4state.c | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 40 insertions(+), 1 deletion(-)
+ fs/smb/client/transport.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index a2996343fa0db33e014731f62aaa4e7c72506a76..4573c0651aa49df6089bcc4e5d40f45d46b1c499 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -2292,7 +2292,7 @@ nfsd4_verify(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate,
- 	return status == nfserr_same ? nfs_ok : status;
- }
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 266af17aa7d9..191783f553ce 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -1018,14 +1018,16 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
+ 	uint index = 0;
+ 	unsigned int min_in_flight = UINT_MAX, max_in_flight = 0;
+ 	struct TCP_Server_Info *server = NULL;
+-	int i;
++	int i, start, cur;
  
--#define SUPPORTED_NOTIFY_MASK BIT(NOTIFY4_REMOVE_ENTRY|NOTIFY4_ADD_ENTRY)
-+#define SUPPORTED_NOTIFY_MASK BIT(NOTIFY4_REMOVE_ENTRY|NOTIFY4_ADD_ENTRY|NOTIFY4_RENAME_ENTRY)
+ 	if (!ses)
+ 		return NULL;
  
- static __be32
- nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 9dc607e355d5839d80946d4983205c15ece6a71e..6333e95c075259af0c160eb130149c776e55f5a8 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -9722,6 +9722,45 @@ nfsd_handle_dir_event(u32 mask, const struct inode *dir, const void *data,
- 			ent->notify_vals.data = p;
- 			++nns->nns_idx;
+ 	spin_lock(&ses->chan_lock);
++	start = atomic_inc_return(&ses->chan_seq);
+ 	for (i = 0; i < ses->chan_count; i++) {
+-		server = ses->chans[i].server;
++		cur = (start + i) % ses->chan_count;
++		server = ses->chans[cur].server;
+ 		if (!server || server->terminate)
+ 			continue;
+ 
+@@ -1042,17 +1044,15 @@ struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses)
+ 		 */
+ 		if (server->in_flight < min_in_flight) {
+ 			min_in_flight = server->in_flight;
+-			index = i;
++			index = cur;
  		}
-+		if (mask & FS_RENAME) {
-+			struct dentry *new_dentry = fsnotify_data_dentry(data, data_type);
-+			static uint32_t notify_rename_bitmap = BIT(NOTIFY4_RENAME_ENTRY);
-+			struct notify4 *ent = &nns->nns_ent[nns->nns_idx];
-+			struct notify_rename4 nr = { };
-+			u8 *p = (u8 *)(stream->p);
-+			struct name_snapshot n;
-+			bool ret;
-+
-+			if (!(flc->flc_flags & FL_IGN_DIR_RENAME))
-+				continue;
-+
-+			/* FIXME: warn? */
-+			if (!new_dentry)
-+				continue;
-+
-+			nr.nrn_old_entry.nrm_old_entry.ne_file.len = name->len;
-+			nr.nrn_old_entry.nrm_old_entry.ne_file.data = (char *)name->name;
-+			nr.nrn_old_entry.nrm_old_entry.ne_attrs.attrmask.count = 1;
-+			nr.nrn_old_entry.nrm_old_entry.ne_attrs.attrmask.element = &zerobm;
-+			take_dentry_name_snapshot(&n, new_dentry);
-+			nr.nrn_new_entry.nad_new_entry.ne_file.len = n.name.len;
-+			nr.nrn_new_entry.nad_new_entry.ne_file.data = (char *)n.name.name;
-+			nr.nrn_new_entry.nad_new_entry.ne_attrs.attrmask.count = 1;
-+			nr.nrn_new_entry.nad_new_entry.ne_attrs.attrmask.element = &zerobm;
-+			ret = xdrgen_encode_notify_rename4(stream, &nr);
-+			release_dentry_name_snapshot(&n);
-+			if (!ret) {
-+				pr_warn("nfsd: unable to marshal notify_rename4 to xdr stream\n");
-+				continue;
-+			}
-+
-+			/* grab a notify4 in the buffer and set it up */
-+			ent->notify_mask.count = 1;
-+			ent->notify_mask.element = &notify_rename_bitmap;
-+			ent->notify_vals.len = (u8 *)stream->p - p;
-+			ent->notify_vals.data = p;
-+			++nns->nns_idx;
-+		}
+ 		if (server->in_flight > max_in_flight)
+ 			max_in_flight = server->in_flight;
+ 	}
  
- 		if (nns->nns_idx)
- 			nfsd4_run_cb_notify(ncn);
-
+ 	/* if all channels are equally loaded, fall back to round-robin */
+-	if (min_in_flight == max_in_flight) {
+-		index = (uint)atomic_inc_return(&ses->chan_seq);
+-		index %= ses->chan_count;
+-	}
++	if (min_in_flight == max_in_flight)
++		index = (uint)start % ses->chan_count;
+ 
+ 	server = ses->chans[index].server;
+ 	spin_unlock(&ses->chan_lock);
 -- 
-2.49.0
+2.43.0
 
