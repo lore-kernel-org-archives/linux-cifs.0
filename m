@@ -1,112 +1,208 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B84197A7A
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Jun 2025 20:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3669E2C3272
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Jun 2025 01:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748808840; cv=none; b=ReUTWrQEZ2CYZrNoM8b4h42+UEyB5PvM+EvyXBEjd++IeE8KxyGzxBrLIOqNGXlJtw5ufy1cxQmwxe6onIY9od+W7Z5HDvK8oBIFCx/h+47hjY3wpilVc2hDy6dzL4xtj61me15qV3zDujaVBk88x7Qz3H1zdY0nQGi+Zmvr9xE=
+	t=1748829421; cv=none; b=UFs46h8hD3QPqHGzPGGiAKvaKFRxddeNm4q9Sc64+A7+dycHcxRpuoKJRkOTn21VvvmO5fzqA3TiAx16ep73vb9hfLYC5HXiE6VWEmdBvW1qNkb2GMYZa84dzNorTzUY1ELLHcIjmEw2ONUPA27a4zT/Bjr+n4vcd7Rcchjt6Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748808840; c=relaxed/simple;
-	bh=o0z1W4ujPM52pooC5hlNfB5KfPxLthEpR82z8uZUH3o=;
+	s=arc-20240116; t=1748829421; c=relaxed/simple;
+	bh=1J6E88rvPYFAL2ImewEdS2w0ABBmVlF5stHiyz0f+QU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BvcpNS0RhyNBBnByeGHhRdRvugTp75sIuqcNrZcabPDqmGuZArYaUNWWrFCsRyjcFv03Tn9l/qnzebz/zzGaMATvxPaYN10aLTgXZq2G6CO2ViC6Ycu5+Gl6QIJwhTTYhbjjeV4wiBvCTHIHDQsvlXXJtLD+quARneZNBoyfyjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MprchEwO; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=WEgj3SoPbq6CgxKDe5I7oNbQn8Cp79QoMlHkAdIdS6Z7Ep1u8kofG4UYmuXjZrix7JVBp+f2ywHxdDemDTOwrxwREcbD95qkMSWchoRY644s/G1M3ORIlh8FU7/hm/g4tweSeGJHxOsEJ/to0Jv27wBgmSY3a2aPZTEjUCVbvQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQvxqe2Y; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MprchEwO"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32934448e8bso36648401fa.3
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 13:13:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQvxqe2Y"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32a826ad3e0so40354461fa.2
+        for <linux-cifs@vger.kernel.org>; Sun, 01 Jun 2025 18:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748808837; x=1749413637; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748829417; x=1749434217; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZTJlW85qNH5CkCI0lFTdZGoyhQLe1AYCsUsIixz7t8U=;
-        b=MprchEwOFJnGD5ssRAs63u9+urhrf9lgc2gkf2oh5koXjVN5QbNJrrTR7ihhjxV+bd
-         Vg7mJZcVPvIVXGSqyPwrU7A5kdBbu6XI6X2xCVFI39EavKw/v1JJMPYKrTT/Ov4lwm0Y
-         K36J4oQY7QdhFFdt+wXuEQqlVo3ZNxgOANQPWO4POwVP4GtTqRPOURfvx5QKp/trGJGY
-         y5Cjc2P5hsniYYCtYxckTyLU3gimkintwVL8/xDGs7cUP3pKNu3nB1CEUcMPgIDQuRaH
-         2H+GUA71k9r9ZG/s7lE051KA+OGXdQ1r2iNeBM5rCbuu+x++oC0AU5wXxE4r8NwxXBtI
-         y14g==
+        bh=ZHGTRI4OoccGkRynWoGInJUpFy17mwKB39OxXBmCuH8=;
+        b=FQvxqe2YL7RzS3YoGyRNsVWJssSbfqdTBvSVccdFaYwz3lhZmQvck0wnjb3BuoxjTD
+         qMmSnnkT/4LmXbzAA61ziVP3ieAr7Sx+6BzXnK+0BIjzYSbvalKBRX7IhnudE6Zxj5Ys
+         liKXCgDwvW9FmJYs9qAbYzEWincAnwkClAf72Y8Cd++1JnjbhYd6u3Ixj6Cf993o7N6M
+         9PIpdKOL5zIXXAApM//gvq+HuqP98ao0OkPcBB/9Yf/CMI7ccnLPEetEkQpNyhzGQyL1
+         bUOw4BZYhp7kPDElxGcvpMCPysU1GxllMuTOpX6ZQATnNg6grjVVRuHUUWollSZ3lnrv
+         LVRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748808837; x=1749413637;
+        d=1e100.net; s=20230601; t=1748829417; x=1749434217;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZTJlW85qNH5CkCI0lFTdZGoyhQLe1AYCsUsIixz7t8U=;
-        b=ozHpKNtI20n5UHycy1zEjjzKvXE9cJffOO44aQhXb+G/h27rp1u4Lf/9U21LoOnFYc
-         JHFyJAN0jMs6N0q/nCldwmtV8SMXjUtsUCBa1jnV6P2ndKJyXIxnDXv3EKp319Pu0uUb
-         AsNpj5ESHIktEe2UI/AhWzpbZzKBk1g5jNGLS2eeB4KSoavGe3Gq7686YNHLZa9yVKLt
-         vYiRM9vgKNtIumWJOEk4EOn6okg42ZQ+pOJnPQ1X5cM6BBCUkxPfKHkAOWBg63LEPe2m
-         pM2WXBI2XXa2DPC6uJpHBKJRkC+F1wc3jPF7TNkj/hDoApmtK9b1ZE03sQfPeiufCXRG
-         WKyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfL8uzht+Cy2mlmiFDTI7mpmjYaRRGBndIi2D2dPUvTkynYCJ20PxIPmzqRQ+1cLgL8ue0fch5R9TE@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAeA2MnPkzkqQtxHNswSCXo4TXZK9Z8KUggSwJ8OZpNcXyc1GV
-	xkdz3cRD3lzR09W+5m5y04CnGS8bJnsLC6XWv1q0pcU3GqGcLG/8Dw298z8g3sEY+f0XMNS4pVr
-	0nD5MEzi1y1cJ3ds3WiBIg3NAsVcfC7bJbQ==
-X-Gm-Gg: ASbGncvjYlidnzJ7Ap9wM5Yk/X0IwNMf7bjCuNUS60whorxiL1WTNHWSUtOWRvo1hzl
-	RCjqIoqUkYKXFOvzhafj3EeGF/Dq/FHlLVduPnhPmGNPlifSp9cwPNuXujqTJbP+nhnUCk5C5zM
-	cn847lJF1JIuAuXfJJJu+ZC5T8LsIsra/VrmhYhV4/8zyd7akHkZFUdjW849ggfr0ZSB1n+Sey2
-	WVl
-X-Google-Smtp-Source: AGHT+IGakqWpiQWcaG8I2t9Xaxggx4BxoH9CygWlFwbbdNTJewR13ywZJ5Ngl528BsqR8nH/NThHe28lBN9h25OTRjU=
-X-Received: by 2002:a05:651c:b25:b0:32a:847c:a1c0 with SMTP id
- 38308e7fff4ca-32a8cd2bc75mr36696341fa.6.1748808837029; Sun, 01 Jun 2025
- 13:13:57 -0700 (PDT)
+        bh=ZHGTRI4OoccGkRynWoGInJUpFy17mwKB39OxXBmCuH8=;
+        b=ONVRKIIKGVchFt8pW2RGQZAThvV0gK2aMD/1ZVf4lDH+glJdus+u3sTMWN2scwL8lK
+         g0gFyyXL78LDw7BlybrUKW04ghEp+7fUYsdzbyrpwyPO7FVH00PFxGr0e2tyAxC04nms
+         +emNFfeXSBoKaBXD+Lx1lAH3iuciQjdETTv8X/o3d+jsrhDQ3qpl1Lg1vBMfyexIhckc
+         s+se7jAZgJSpwb1UL0JudFwknI2s0pwg/WDptCKjwWi8+XZNAXZIlQ3gXiyHKQOV7vjy
+         G3+RRLPOXLlIHUOhScbW5YQPn4TDPW/ZiDYZGCHV2xZihIIZ/BvGfb2lQpHtj7uZlafJ
+         jM+g==
+X-Forwarded-Encrypted: i=1; AJvYcCW49Cq84P7+MYEAotv8NIw8N9NeumXsjDJLGzbcn9EFf75bG/oKC2NsShL3t846R7tR0siLIhJ33rN5@vger.kernel.org
+X-Gm-Message-State: AOJu0YymivviEpoUKHs6AH8g5zbgGbIhoFYTYszaFGqLudexY25Jzb3Z
+	z0uvak+xxtXzBRpQK1ews5jJMzqTcNzH1EPsQx6kbx7mI5UZYaySHTw7w/phWJjaQQ+l8Ulc1Vd
+	suSCYmMCCKFbWqmwbbVIpbR9zSi59uAI=
+X-Gm-Gg: ASbGnct9XMB9DjTTqgcykAr1bC/JZaV4N5+Gxzsxmjmwhf+buY4VMCPBwEZXdr4Gf6E
+	Vo9WykHm97q1IzCzfRPIwcWqrr6lcjSojapgUeKnwuAaIiuGK1IniKhzyfYhefS+aY5Zf0XYjnD
+	9/9RVJsHwSppjJmeteFYbeqT9AjFxcLKtgqzPAtUS5mroLpuCyPQI/B1mT8hfoVfPPK0TR2fDgn
+	aWc
+X-Google-Smtp-Source: AGHT+IEJVs0h6mmYJxZYvbe5X10CMO2Kyt68ftrFl6gVFuRA5aY8nZgVqa8fLfU9yQzt/nFb3Hvuu43oMkpzwc6APYY=
+X-Received: by 2002:a05:651c:221a:b0:32a:6b16:3a20 with SMTP id
+ 38308e7fff4ca-32a8ce3871amr38651951fa.29.1748829416867; Sun, 01 Jun 2025
+ 18:56:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250601171855.12268-1-devosruben6@gmail.com>
-In-Reply-To: <20250601171855.12268-1-devosruben6@gmail.com>
+References: <cover.1748446473.git.metze@samba.org> <b43ee94c3db13291156e70d37a3e843ad7d08b31.1748446473.git.metze@samba.org>
+ <CAKYAXd_df0mwgAbJb3w_r_8JmJOAZjPfhjoFpWgTkWJFdMWUMA@mail.gmail.com>
+ <096f20e9-3e59-4e80-8eeb-8a51f214c6f1@samba.org> <CAKYAXd86mLGAaAEUFcp1Vv+6p2O3MSJcwoor8MmjEypUo+Ofrg@mail.gmail.com>
+ <CAH2r5mvQbL_R9wrFRHF9_3XwM3e-=2vK=i1uaSCk37-FZmJq9g@mail.gmail.com>
+ <CAKYAXd9T81En40i3OigiTAmJabMr8yuCX9E1LT_JfaTmyefTag@mail.gmail.com>
+ <CAH2r5mso54sXPcoJWDSU4E--XMH44wFY-cdww6_6yx5CxrFtdg@mail.gmail.com> <CAKYAXd_BVHPA8Jj6mtc_nsbby1HizZFEmCft20B_wcTM3pDUVg@mail.gmail.com>
+In-Reply-To: <CAKYAXd_BVHPA8Jj6mtc_nsbby1HizZFEmCft20B_wcTM3pDUVg@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 1 Jun 2025 15:13:45 -0500
-X-Gm-Features: AX0GCFsyPF3ZKZrWRZ4KThAG5x4sszM2JJiLUyigC33DPLsIeEz9Jnqd_zzeUBM
-Message-ID: <CAH2r5mvu0CeEaqYjUT43m6Vj=dQ81SMfAQduXT-Ca52D6uBacg@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: add NULL check in automount_fullpath
-To: Ruben Devos <devosruben6@gmail.com>
-Cc: pc@manguebit.com, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	tom@talpey.com, bharathsm@microsoft.com, linux-cifs@vger.kernel.org
+Date: Sun, 1 Jun 2025 20:56:45 -0500
+X-Gm-Features: AX0GCFsrkFzp3OvWJF63SovgSoF5lPD082yGsAPlfjTR_bDrLK5Z8cNbb9dt3lc
+Message-ID: <CAH2r5mvygcy0-WwZNu6NvjXGrMtB5ZFLK7_w0rc6rVpaVDeBxA@mail.gmail.com>
+Subject: Re: [PATCH v2 01/12] smb: smbdirect: add smbdirect_pdu.h with
+ protocol definitions
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Stefan Metzmacher <metze@samba.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, 
+	samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-good catch.  Added to cifs-2.6.git for-next, and added Cc: stable
+> Can you explain why he has split it into smbdirect_socket.h?
 
-On Sun, Jun 1, 2025 at 12:25=E2=80=AFPM Ruben Devos <devosruben6@gmail.com>=
+The three header names seem plausible, but would be useful to have
+Metze's clarification/explanation:
+- the "protocol" related header info for smbdirect goes in
+smb/common/smbdirect/smbdirect_pdu.h   (we use similar name smb2pdu.h
+for the smb2/smb3 protocol related wire definitions)
+- smbdirect.h for internal smbdirect structure definitions
+- smbdirect_socket.h for things related to exporting it as a socket
+(since one of the goals is to make smbdirect useable by Samba
+userspace tools)
+
+On Sun, Jun 1, 2025 at 12:00=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
  wrote:
 >
-> page is checked for null in __build_path_from_dentry_optional_prefix
-> when tcon->origin_fullpath is not set. However, the check is missing when
-> it is set.
-> Add a check to prevent a potential NULL pointer dereference.
->
-> Signed-off-by: Ruben Devos <devosruben6@gmail.com>
-> ---
->  fs/smb/client/namespace.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/fs/smb/client/namespace.c b/fs/smb/client/namespace.c
-> index e3f9213131c4..a6655807c086 100644
-> --- a/fs/smb/client/namespace.c
-> +++ b/fs/smb/client/namespace.c
-> @@ -146,6 +146,9 @@ static char *automount_fullpath(struct dentry *dentry=
-, void *page)
->         }
->         spin_unlock(&tcon->tc_lock);
->
-> +       if (unlikely(!page))
-> +               return ERR_PTR(-ENOMEM);
-> +
->         s =3D dentry_path_raw(dentry, page, PATH_MAX);
->         if (IS_ERR(s))
->                 return s;
-> --
-> 2.49.0
->
->
+> On Sun, Jun 1, 2025 at 12:49=E2=80=AFPM Steve French <smfrench@gmail.com>=
+ wrote:
+> >
+> > Moving to use common headers is something I did multiple times with ksm=
+bd and cifs.ko already, not a bad first step
+> This is not simply moved to the common header. He splits the header
+> into smaller pieces for some unknown reason.
+> Can you explain why he has split it into smbdirect_socket.h?
+> We doesn't need to do it now if he's thinking of creating a
+> smbdirect_socket.c file later.
+> >
+> > Thanks,
+> >
+> > Steve
+> >
+> > On Sat, May 31, 2025, 7:01=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.or=
+g> wrote:
+> >>
+> >> On Sun, Jun 1, 2025 at 8:23=E2=80=AFAM Steve French <smfrench@gmail.co=
+m> wrote:
+> >> >
+> >> > I do like the small, relatively safe steps he is doing these in.
+> >> Small is okay, but I wonder when he will send the rest.
+> >> What if he just separates it like this and doesn't send the rest of
+> >> patches later?
+> >> I've never seen a case where the headers are separated first,
+> >> And send the main if it's implemented later. This is not a personal re=
+pository.
+> >>
+> >> Thanks.
+> >> >
+> >> > Thanks,
+> >> >
+> >> > Steve
+> >> >
+> >> > On Fri, May 30, 2025, 5:29=E2=80=AFPM Namjae Jeon <linkinjeon@kernel=
+.org> wrote:
+> >> >>
+> >> >> On Sat, May 31, 2025 at 4:03=E2=80=AFAM Stefan Metzmacher <metze@sa=
+mba.org> wrote:
+> >> >> >
+> >> >> > Am 29.05.25 um 01:28 schrieb Namjae Jeon:
+> >> >> > > On Thu, May 29, 2025 at 1:02=E2=80=AFAM Stefan Metzmacher <metz=
+e@samba.org> wrote:
+> >> >> > >>
+> >> >> > >> This is just a start moving into a common smbdirect layer.
+> >> >> > >>
+> >> >> > >> It will be used in the next commits...
+> >> >> > >>
+> >> >> > >> Cc: Steve French <smfrench@gmail.com>
+> >> >> > >> Cc: Tom Talpey <tom@talpey.com>
+> >> >> > >> Cc: Long Li <longli@microsoft.com>
+> >> >> > >> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> >> >> > >> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+> >> >> > >> Cc: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+> >> >> > >> Cc: linux-cifs@vger.kernel.org
+> >> >> > >> Cc: samba-technical@lists.samba.org
+> >> >> > >> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+> >> >> > >> ---
+> >> >> > >>   fs/smb/common/smbdirect/smbdirect_pdu.h | 55 +++++++++++++++=
+++++++++++
+> >> >> > >>   1 file changed, 55 insertions(+)
+> >> >> > >>   create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
+> >> >> > >>
+> >> >> > >> diff --git a/fs/smb/common/smbdirect/smbdirect_pdu.h b/fs/smb/=
+common/smbdirect/smbdirect_pdu.h
+> >> >> > >> new file mode 100644
+> >> >> > >> index 000000000000..ae9fdb05ce23
+> >> >> > >> --- /dev/null
+> >> >> > >> +++ b/fs/smb/common/smbdirect/smbdirect_pdu.h
+> >> >> > >> @@ -0,0 +1,55 @@
+> >> >> > >> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> >> >> > >> +/*
+> >> >> > >> + *   Copyright (c) 2017 Stefan Metzmacher
+> >> >> > > Isn't it 2025? It looks like a typo.
+> >> >> >
+> >> >> > I took it from here:
+> >> >> > https://git.samba.org/?p=3Dmetze/linux/smbdirect.git;a=3Dblob;f=
+=3Dsmbdirect_private.h;hb=3D284ad8ea768c06e3cc70d6f2754929a6abbd2719
+> >> >> >
+> >> >> > > And why do you split the existing one into multiple header
+> >> >> > > files(smbdirect_pdu.h, smbdirect_socket.h, smbdirect.h)?
+> >> >> >
+> >> >> > In the end smbdirect.h will be the only header used outside
+> >> >> > of fs/smb/common/smbdirect, it will be the public api, to be used
+> >> >> > by the smb layer.
+> >> >> >
+> >> >> > smbdirect_pdu.h holds protocol definitions, while smbdirect_socke=
+t.h
+> >> >> > will be some kind of internal header that holds structures shared=
+ between multiple .c files.
+> >> >> >
+> >> >> > But we'll see I think this is a start in the correct direction.
+> >> >> When will you send the patches for multiple .c files?
+> >> >> I'm not sure if this is the right direction when I check only this =
+patch-set.
+> >> >> I don't prefer to change the headers like this in advance without a=
+ body.
+> >> >> When you're ready, how about sending the patches including the body=
+ all at once?
+> >> >> >
+> >> >> > I try to focus on doing tiny steps avoiding doing to much at the =
+same time
+> >> >> > or even try to avoid thinking about the next step already...
+> >> >> >
+> >> >> > metze
+
 
 
 --=20
