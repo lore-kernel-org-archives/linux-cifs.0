@@ -1,148 +1,139 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A568723BCF0
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Jun 2025 15:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3227823C512;
+	Tue,  3 Jun 2025 15:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748963270; cv=none; b=Fjr2wZYNV1MOGHTmcComtZvnFlKA+inhwDJmTvIY/5NuiFS8I2STiRa77jzjLimc3tgddUuOY7KRsN7+UZU0fp7HruiWAbKjCJwxtFhtAfMqnIUbfvbQKBMgOvE3oAYu70gmmQj45tfQMgbCtLuw4KxlgpPG4Vg+efvSdNBqaCs=
+	t=1748965030; cv=none; b=P6kOHu//iAtYecrvQOzBgUJAHuY8lU2chSL0QgUBRu0pvDZEsPTYmYBF5pFdd8lvG7wbhyAL3K9DWusJsJfVT0fvOe65GZdZD278zyAnw/12ERZ+Um5uBXkIGxNqK7qCQgFAGbRgAF4TKbhCZQyCy4/UY1WIyQLNwK7UBauWbco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748963270; c=relaxed/simple;
-	bh=Ini34z1F5WEKDGzQceDghW6XHhdeROoOIsbqigAqroA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nmkQJid3LYX60WCyMuwEs5NUPhIL0oKYprN8Ko62v0xYDTE3G2Z4A0Dwo77n/GsZgypS+BWnKWf2QzTVGi11/xICVBbOrza3/HexPkYgGUoQ+jVfWxxznd83lP4gCKQJ+3ogY8vqzT1hAGIPjs/rX11bLJzN13JplP0sDU0fpPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LQ73fSVN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j7EeZ7l0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LQ73fSVN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j7EeZ7l0; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1748965030; c=relaxed/simple;
+	bh=A+N9Sjw4CEgKOE3hQqQYS6tprbBqwfSbP4hSwUUtpx0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QApIMgMFGWaM9BpgoVDMoFOlY0VVmn0l4QUMXouuqRaw0eDdgeV/6unDpYGnQ679f+UpkScVNh2iK+khSLSRp0eGktb3uvY+vghRz97IQqsVBD9gBi3EoSyNiukPssXT90TujNmgpQWJGILm6h/N7RmkQDvCsgLrWPIYzef97i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdQ08Pbc; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LQ73fSVN";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j7EeZ7l0";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LQ73fSVN";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j7EeZ7l0"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8D9B121BA9;
-	Tue,  3 Jun 2025 15:07:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1748963266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=f+sULT1C92ZFGki4Cs7phG6NDqXEMK5wh3qz48h0MXs=;
-	b=LQ73fSVNTik78uHADiu6zaiUdRkIcePyQYP1FwkNlfP0OpA7vxtL1Goegv3DM85fwvNVww
-	JyhbCQELoSyXlbLB7TendIX3F33yohLVMRY6AR+iv83Vom37K1S4RtTEYFXaY5cCWsZ1/o
-	vhLEntZibht1+KN9z66Z1Vl2nNWZDDU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1748963266;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=f+sULT1C92ZFGki4Cs7phG6NDqXEMK5wh3qz48h0MXs=;
-	b=j7EeZ7l0BnurCURp4VIpzwzui1WZ1xW/AAtjaRNBL+C5hK7kSUo/oTdCjFbSaUDpCiV3+y
-	w+ALEQBhdWtm59AA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=LQ73fSVN;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=j7EeZ7l0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1748963266; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=f+sULT1C92ZFGki4Cs7phG6NDqXEMK5wh3qz48h0MXs=;
-	b=LQ73fSVNTik78uHADiu6zaiUdRkIcePyQYP1FwkNlfP0OpA7vxtL1Goegv3DM85fwvNVww
-	JyhbCQELoSyXlbLB7TendIX3F33yohLVMRY6AR+iv83Vom37K1S4RtTEYFXaY5cCWsZ1/o
-	vhLEntZibht1+KN9z66Z1Vl2nNWZDDU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1748963266;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=f+sULT1C92ZFGki4Cs7phG6NDqXEMK5wh3qz48h0MXs=;
-	b=j7EeZ7l0BnurCURp4VIpzwzui1WZ1xW/AAtjaRNBL+C5hK7kSUo/oTdCjFbSaUDpCiV3+y
-	w+ALEQBhdWtm59AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0D96E13A1D;
-	Tue,  3 Jun 2025 15:07:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id d86AMcEPP2jUMAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 03 Jun 2025 15:07:45 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com
-Subject: [PATCH cifs-utils] mount.cifs: retry mount on -EINPROGRESS
-Date: Tue,  3 Jun 2025 12:07:36 -0300
-Message-ID: <20250603150736.134709-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdQ08Pbc"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5534edc6493so2517247e87.1;
+        Tue, 03 Jun 2025 08:37:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748965027; x=1749569827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XbUKE5e8Q4R9kfrxIhCex4mb7JnX4VitZz0U7TY3fus=;
+        b=kdQ08PbcN37DHG38e1xTKhOJVI9ts5WcwMaqZcohOWOBbq1nTmCeehH2zvSgUitokp
+         BU9FMZkAjE984poyIHy1tC0S+6CuiZb/gZreAZcpD1jbFmMtCHZkgzWzdprB45nhGqKs
+         a+liLeNHDr/AAjNEVRci0M8FDl0SPBfBlmaI9QZRuZc7eNbRmIbWLnsOnocwoZFSskZD
+         eFiTp1pAAA76CAYTgT4O4CewKam8cdCVOAwHJcRctbEf/GGJLj3Cf3IZQPuRxyr6yGJk
+         u1hadguIozo0i8FwF4P8ItMlqv1A3bQ3kFcBEHpFwTuAvTV5BqNvSsfxUs5Zun7IxIwc
+         GlBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748965027; x=1749569827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XbUKE5e8Q4R9kfrxIhCex4mb7JnX4VitZz0U7TY3fus=;
+        b=pMBe63JM9FNKAZrfooJCpxVDXUz2bBVZXYLJaOJjAjqQNwYDk0bOkw/NvhnTXVthYb
+         zub2bVF/5pdY7ezhpjuSkJKel5p57KpQgEVxKI3YdX3iRdvGGgFHRdq27CdpL2lY8HnG
+         PfgEmRYuIaOAaQLMhOirYVWbCPMuicxL/xwsbfhN/zc5OnnBnHhltI9zvhgExXHawudu
+         sQWTJUtY6uPgjRNjeSaArIUTRmZXXh1/Q4PKCc+DSQCrPOuqxOMQzpghIeqRybxCjsWd
+         3mJvyliAhMTngZWLRdDG5APe7Vcf3BTPBug3Afn3TT8PO0O1Qd+98s7bNxJYTTz2ixfi
+         av/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUIlsnTPpdX+yt4ehFOnfdQIAoshvfjEWGyfd635LdnBXqA/1HshwD+JRc2YodsaDdCjGt5Ssr4qlJoRD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydAPP5P+/F+3CgkRpGEohQKftJHOF650PEmHg+NpMhWT4TdFLF
+	JDApGnUgZu32h/IdKh2wapaR1aCUFVhNWr6fVuGDq7iyRZRJxtbgvBEfletVop/nahgL0WPRXvz
+	QzoKMhubZs2Bvq4ip6i9a3kVQSon7N4ew21Os
+X-Gm-Gg: ASbGncsIfEmDWdfutTzhfSBK02pQZuOhSlHkQ3aswJKBq3WPTTHnYEkcakB1mT3Y6Pi
+	7AL5U2x+zAkHd5jvT4taWRaeP9JD9NSihTP24XkhPr8ix7wqhWA4Qx1WuCIJW3jeIYt8jT1oAra
+	7y9D1Eqswv9POUKKnsbNZTNxhQzd0tVE8=
+X-Google-Smtp-Source: AGHT+IG8GQ3fkMyAGygfawqTQLU0dAk643bBV6QMXfq0kLiio12HD26H4s8imQXHiKUaue/4i1bpkRaVAwfFo5fAdMA=
+X-Received: by 2002:a05:651c:1113:b0:32a:6ccf:a455 with SMTP id
+ 38308e7fff4ca-32a906e79camr42334891fa.16.1748965026873; Tue, 03 Jun 2025
+ 08:37:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid,suse.de:email];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 8D9B121BA9
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -3.01
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 3 Jun 2025 10:36:55 -0500
+X-Gm-Features: AX0GCFtsMqWkZHR6KEk5EtELGZqXB3BWxldJN0ZVyOUtD0NmyqGOWJO2D2G1E9E
+Message-ID: <CAH2r5mt-jcxLBK96EiF_w_QtOM1-2DHH4QAYKhikWSOkD1t-mA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-cifs.ko mount might return -EINPROGRESS even for blocking sockets.
+Please pull the following changes since commit
+0ff41df1cb268fc69e703a08a57ee14ae967d0ca:
 
-This patch makes mount.cifs retry mount when DNS resolution
-returns >1 IP addresses for a server and such error occurs.
+  Linux 6.15 (2025-05-25 16:09:23 -0700)
 
-It's ok to retry because cifs.ko will consider it a hard error and abort
-the mount anyway, so there's no risk of duplicate mounts.
+are available in the Git repository at:
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- mount.cifs.c | 1 +
- 1 file changed, 1 insertion(+)
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.16-rc-part1-smb-client-f=
+ixes
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 6edd96eb222a..192391360bca 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -2373,6 +2373,7 @@ mount_retry:
- 		switch (errno) {
- 		case ECONNREFUSED:
- 		case EHOSTUNREACH:
-+		case EINPROGRESS:
- 			if (currentaddress) {
- 				fprintf(stderr, "mount error(%d): could not connect to %s",
- 					errno, currentaddress);
--- 
-2.49.0
+for you to fetch changes up to 8a5ebd2be99a1f4630d0382f7fdf581561d317cd:
 
+  cifs: update the lock ordering comments with new mutex (2025-06-02
+17:13:06 -0500)
+
+----------------------------------------------------------------
+13 smb3/cifs client fixes
+- Three multichannel fixes (mostly reconnect related), and
+clarification of locking documentation
+- automount null pointer check fix
+- Three fixes to add support for ParentLeaseKey
+- Minor cleanup
+- Four smb1/cifs fixes
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      smb: client: Remove an unused function and variable
+
+Henrique Carvalho (3):
+      smb: client: add ParentLeaseKey support
+      smb: client: use ParentLeaseKey in open_cached_dir
+      smb: client: use ParentLeaseKey in cifs_do_create
+
+Pali Roh=C3=A1r (4):
+      cifs: Fix encoding of SMB1 Session Setup NTLMSSP Request in
+non-UNICODE mode
+      cifs: Correctly set SMB1 SessionKey field in Session Setup Request
+      cifs: Fix validation of SMB1 query reparse point response
+      cifs: Fix cifs_query_path_info() for Windows NT servers
+
+Ruben Devos (1):
+      smb: client: add NULL check in automount_fullpath
+
+Shyam Prasad N (4):
+      cifs: reset connections for all channels when reconnect requested
+      cifs: update dstaddr whenever channel iface is updated
+      cifs: dns resolution is needed only for primary channel
+      cifs: update the lock ordering comments with new mutex
+
+ fs/smb/client/cached_dir.c | 24 ++++++++++++++-
+ fs/smb/client/cifsfs.c     |  1 -
+ fs/smb/client/cifsglob.h   | 18 +++++++----
+ fs/smb/client/cifspdu.h    |  6 ++--
+ fs/smb/client/cifssmb.c    | 21 +++++++++++--
+ fs/smb/client/connect.c    | 10 ++++++-
+ fs/smb/client/dir.c        | 23 ++++++++++++++
+ fs/smb/client/misc.c       |  8 +++++
+ fs/smb/client/namespace.c  |  3 ++
+ fs/smb/client/sess.c       | 25 +++++++++-------
+ fs/smb/client/smb2ops.c    |  7 +++--
+ fs/smb/client/smb2pdu.c    | 78
++++++++-----------------------------------------
+ fs/smb/client/smb2proto.h  |  3 --
+ 13 files changed, 130 insertions(+), 97 deletions(-)
+
+
+--=20
+Thanks,
+
+Steve
