@@ -1,139 +1,174 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3227823C512;
-	Tue,  3 Jun 2025 15:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0CC1F12F4
+	for <linux-cifs@vger.kernel.org>; Tue,  3 Jun 2025 20:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748965030; cv=none; b=P6kOHu//iAtYecrvQOzBgUJAHuY8lU2chSL0QgUBRu0pvDZEsPTYmYBF5pFdd8lvG7wbhyAL3K9DWusJsJfVT0fvOe65GZdZD278zyAnw/12ERZ+Um5uBXkIGxNqK7qCQgFAGbRgAF4TKbhCZQyCy4/UY1WIyQLNwK7UBauWbco=
+	t=1748981645; cv=none; b=AUAZytNYIVxmTz3CfUkKRHz13EWtW+VOcPUGxz195uwf7xhhRdqc37EVzdqQjprl2BUwQqiel8vlFfa0shouYnskmrcGiFUS9USqYNSmAqz7gimEfU6i4I8UAL0vbT8rvsfMOOn9LcRZ7JyFch8TJa1UdrJvPeJhvSsVIGJ5mSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748965030; c=relaxed/simple;
-	bh=A+N9Sjw4CEgKOE3hQqQYS6tprbBqwfSbP4hSwUUtpx0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QApIMgMFGWaM9BpgoVDMoFOlY0VVmn0l4QUMXouuqRaw0eDdgeV/6unDpYGnQ679f+UpkScVNh2iK+khSLSRp0eGktb3uvY+vghRz97IQqsVBD9gBi3EoSyNiukPssXT90TujNmgpQWJGILm6h/N7RmkQDvCsgLrWPIYzef97i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdQ08Pbc; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1748981645; c=relaxed/simple;
+	bh=/FE5D318lVBmJGkBSXZqasxXjKKZ++8Idk6bKIwi1GY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lCd7WdrgrIhkEyrtDudLnWjbXa9ldva9dRNqmbT0VZTQHKe914GOfrYO+Zw8JFg6RuSJvg042loL1jAOGMbqbRunHAYMPSPdvSa5G5u1tbJMExIb5rlqHgXVBDerTbbaQo2UOFiYddBToFiVEFWi7KCe6HVwRL/5GjrTm+eSI6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=N9Kbvcl1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=BB4lK6RI; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=N9Kbvcl1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=BB4lK6RI; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdQ08Pbc"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5534edc6493so2517247e87.1;
-        Tue, 03 Jun 2025 08:37:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748965027; x=1749569827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XbUKE5e8Q4R9kfrxIhCex4mb7JnX4VitZz0U7TY3fus=;
-        b=kdQ08PbcN37DHG38e1xTKhOJVI9ts5WcwMaqZcohOWOBbq1nTmCeehH2zvSgUitokp
-         BU9FMZkAjE984poyIHy1tC0S+6CuiZb/gZreAZcpD1jbFmMtCHZkgzWzdprB45nhGqKs
-         a+liLeNHDr/AAjNEVRci0M8FDl0SPBfBlmaI9QZRuZc7eNbRmIbWLnsOnocwoZFSskZD
-         eFiTp1pAAA76CAYTgT4O4CewKam8cdCVOAwHJcRctbEf/GGJLj3Cf3IZQPuRxyr6yGJk
-         u1hadguIozo0i8FwF4P8ItMlqv1A3bQ3kFcBEHpFwTuAvTV5BqNvSsfxUs5Zun7IxIwc
-         GlBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748965027; x=1749569827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XbUKE5e8Q4R9kfrxIhCex4mb7JnX4VitZz0U7TY3fus=;
-        b=pMBe63JM9FNKAZrfooJCpxVDXUz2bBVZXYLJaOJjAjqQNwYDk0bOkw/NvhnTXVthYb
-         zub2bVF/5pdY7ezhpjuSkJKel5p57KpQgEVxKI3YdX3iRdvGGgFHRdq27CdpL2lY8HnG
-         PfgEmRYuIaOAaQLMhOirYVWbCPMuicxL/xwsbfhN/zc5OnnBnHhltI9zvhgExXHawudu
-         sQWTJUtY6uPgjRNjeSaArIUTRmZXXh1/Q4PKCc+DSQCrPOuqxOMQzpghIeqRybxCjsWd
-         3mJvyliAhMTngZWLRdDG5APe7Vcf3BTPBug3Afn3TT8PO0O1Qd+98s7bNxJYTTz2ixfi
-         av/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUIlsnTPpdX+yt4ehFOnfdQIAoshvfjEWGyfd635LdnBXqA/1HshwD+JRc2YodsaDdCjGt5Ssr4qlJoRD0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydAPP5P+/F+3CgkRpGEohQKftJHOF650PEmHg+NpMhWT4TdFLF
-	JDApGnUgZu32h/IdKh2wapaR1aCUFVhNWr6fVuGDq7iyRZRJxtbgvBEfletVop/nahgL0WPRXvz
-	QzoKMhubZs2Bvq4ip6i9a3kVQSon7N4ew21Os
-X-Gm-Gg: ASbGncsIfEmDWdfutTzhfSBK02pQZuOhSlHkQ3aswJKBq3WPTTHnYEkcakB1mT3Y6Pi
-	7AL5U2x+zAkHd5jvT4taWRaeP9JD9NSihTP24XkhPr8ix7wqhWA4Qx1WuCIJW3jeIYt8jT1oAra
-	7y9D1Eqswv9POUKKnsbNZTNxhQzd0tVE8=
-X-Google-Smtp-Source: AGHT+IG8GQ3fkMyAGygfawqTQLU0dAk643bBV6QMXfq0kLiio12HD26H4s8imQXHiKUaue/4i1bpkRaVAwfFo5fAdMA=
-X-Received: by 2002:a05:651c:1113:b0:32a:6ccf:a455 with SMTP id
- 38308e7fff4ca-32a906e79camr42334891fa.16.1748965026873; Tue, 03 Jun 2025
- 08:37:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="N9Kbvcl1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="BB4lK6RI";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="N9Kbvcl1";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="BB4lK6RI"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0A09B1F443;
+	Tue,  3 Jun 2025 20:14:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748981642; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tWmBnvptzNYs4R0MZ3Uo0OTy6lzicOFPfnKUeZLec7k=;
+	b=N9Kbvcl1o+W8mnAV52zBhxxyYHA97Cb9y96xWViRy3Yzan5mZrTcZW4eDHM+PDAJTz6E6N
+	qoYcq5rOWPG+jlGqOMtgP4auf8TMckeLsezSaiWM+dn3D02fPUEyzQI3AS8wZGeQh0sTqW
+	wVVj71wp9xcn1BGy/t0w8V9bMx0wFsk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748981642;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tWmBnvptzNYs4R0MZ3Uo0OTy6lzicOFPfnKUeZLec7k=;
+	b=BB4lK6RIU1ic1WRsD45tpMjFD1GpBqLcSKDtMJp9C60Whrnl6cXeo9AGiXcRfjhu8+mWDV
+	KFXHeyv2/WXiGLDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1748981642; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tWmBnvptzNYs4R0MZ3Uo0OTy6lzicOFPfnKUeZLec7k=;
+	b=N9Kbvcl1o+W8mnAV52zBhxxyYHA97Cb9y96xWViRy3Yzan5mZrTcZW4eDHM+PDAJTz6E6N
+	qoYcq5rOWPG+jlGqOMtgP4auf8TMckeLsezSaiWM+dn3D02fPUEyzQI3AS8wZGeQh0sTqW
+	wVVj71wp9xcn1BGy/t0w8V9bMx0wFsk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1748981642;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tWmBnvptzNYs4R0MZ3Uo0OTy6lzicOFPfnKUeZLec7k=;
+	b=BB4lK6RIU1ic1WRsD45tpMjFD1GpBqLcSKDtMJp9C60Whrnl6cXeo9AGiXcRfjhu8+mWDV
+	KFXHeyv2/WXiGLDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E7FFB13A92;
+	Tue,  3 Jun 2025 20:14:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TamiOIlXP2itDgAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 03 Jun 2025 20:14:01 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 89AB6A08DD; Tue,  3 Jun 2025 22:13:53 +0200 (CEST)
+Date: Tue, 3 Jun 2025 22:13:53 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Amir Goldstein <amir73il@gmail.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC v2 21/28] fsnotify: export fsnotify_recalc_mask()
+Message-ID: <ssbrsekgkssixxq4wiybw6k7n24efg64ozh6vrzxuft2sdz2w7@3tfmzfnqdwbu>
+References: <20250602-dir-deleg-v2-0-a7919700de86@kernel.org>
+ <20250602-dir-deleg-v2-21-a7919700de86@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 3 Jun 2025 10:36:55 -0500
-X-Gm-Features: AX0GCFtsMqWkZHR6KEk5EtELGZqXB3BWxldJN0ZVyOUtD0NmyqGOWJO2D2G1E9E
-Message-ID: <CAH2r5mt-jcxLBK96EiF_w_QtOM1-2DHH4QAYKhikWSOkD1t-mA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602-dir-deleg-v2-21-a7919700de86@kernel.org>
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RL63fqwwx8ot6gmekemcs76f9d)];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,manguebit.com,microsoft.com,talpey.com,brown.name,redhat.com,lwn.net,szeredi.hu,vger.kernel.org,lists.samba.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
 
-Please pull the following changes since commit
-0ff41df1cb268fc69e703a08a57ee14ae967d0ca:
+On Mon 02-06-25 10:02:04, Jeff Layton wrote:
+> nfsd needs to call this when new directory delegations are set or unset.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-  Linux 6.15 (2025-05-25 16:09:23 -0700)
+So fsnotify_recalc_mask() is not a great API to export because it depends
+on lifetime rules of mark connector - in particular the caller has to make
+sure the connector stays alive while fsnotify_recalc_mask() is running. So
+far the knowledge was internal in fsnotify subsystem but now NFSD needs to
+know as well.
 
-are available in the Git repository at:
+Generally you need to recalculate the mask when you modify events you
+listen to in a mark. So perhaps we should provide an API like:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.16-rc-part1-smb-client-f=
-ixes
+int fsnotify_modify_mark_mask(struct fsnotify_mark *mark, __u32 mask_clear,
+			      __u32 mask_set);
 
-for you to fetch changes up to 8a5ebd2be99a1f4630d0382f7fdf581561d317cd:
+which could be used to modify mark mask without having to care about
+details like cached masks and connector locking rules?
 
-  cifs: update the lock ordering comments with new mutex (2025-06-02
-17:13:06 -0500)
+								Honza
 
-----------------------------------------------------------------
-13 smb3/cifs client fixes
-- Three multichannel fixes (mostly reconnect related), and
-clarification of locking documentation
-- automount null pointer check fix
-- Three fixes to add support for ParentLeaseKey
-- Minor cleanup
-- Four smb1/cifs fixes
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (1):
-      smb: client: Remove an unused function and variable
-
-Henrique Carvalho (3):
-      smb: client: add ParentLeaseKey support
-      smb: client: use ParentLeaseKey in open_cached_dir
-      smb: client: use ParentLeaseKey in cifs_do_create
-
-Pali Roh=C3=A1r (4):
-      cifs: Fix encoding of SMB1 Session Setup NTLMSSP Request in
-non-UNICODE mode
-      cifs: Correctly set SMB1 SessionKey field in Session Setup Request
-      cifs: Fix validation of SMB1 query reparse point response
-      cifs: Fix cifs_query_path_info() for Windows NT servers
-
-Ruben Devos (1):
-      smb: client: add NULL check in automount_fullpath
-
-Shyam Prasad N (4):
-      cifs: reset connections for all channels when reconnect requested
-      cifs: update dstaddr whenever channel iface is updated
-      cifs: dns resolution is needed only for primary channel
-      cifs: update the lock ordering comments with new mutex
-
- fs/smb/client/cached_dir.c | 24 ++++++++++++++-
- fs/smb/client/cifsfs.c     |  1 -
- fs/smb/client/cifsglob.h   | 18 +++++++----
- fs/smb/client/cifspdu.h    |  6 ++--
- fs/smb/client/cifssmb.c    | 21 +++++++++++--
- fs/smb/client/connect.c    | 10 ++++++-
- fs/smb/client/dir.c        | 23 ++++++++++++++
- fs/smb/client/misc.c       |  8 +++++
- fs/smb/client/namespace.c  |  3 ++
- fs/smb/client/sess.c       | 25 +++++++++-------
- fs/smb/client/smb2ops.c    |  7 +++--
- fs/smb/client/smb2pdu.c    | 78
-+++++++-----------------------------------------
- fs/smb/client/smb2proto.h  |  3 --
- 13 files changed, 130 insertions(+), 97 deletions(-)
-
-
---=20
-Thanks,
-
-Steve
+> ---
+>  fs/notify/mark.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/notify/mark.c b/fs/notify/mark.c
+> index 798340db69d761dd05c1b361c251818dee89b9cf..ff21409c3ca3ad948557225afc586da3728f7cbe 100644
+> --- a/fs/notify/mark.c
+> +++ b/fs/notify/mark.c
+> @@ -308,6 +308,7 @@ void fsnotify_recalc_mask(struct fsnotify_mark_connector *conn)
+>  	if (update_children)
+>  		fsnotify_conn_set_children_dentry_flags(conn);
+>  }
+> +EXPORT_SYMBOL_GPL(fsnotify_recalc_mask);
+>  
+>  /* Free all connectors queued for freeing once SRCU period ends */
+>  static void fsnotify_connector_destroy_workfn(struct work_struct *work)
+> 
+> -- 
+> 2.49.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
