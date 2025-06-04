@@ -1,191 +1,113 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C69212F94
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 10:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E19224AF2;
+	Wed,  4 Jun 2025 23:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749032328; cv=none; b=hFgGIyJkkByZ2kfzMUZZ3V0tWG8bjIGyvOhBSAKJdZNEf2qAXRae9Bs/OvQ0ZDoNzrocetOyWVex04aDgvNf2yPXr3Ge24/tXKCB5+DuULYoHr7ZACs4MM/fZVl6gGYElStoksoNaHpSyBnaIjSPNIbRjaTmBaJeY4k1LBrKxGQ=
+	t=1749079262; cv=none; b=OgsB6gisj+bC9iQZhBLe2vuN4qYzo0LmUwo+pxFaL4VWELKB96ZyGw1bIBBveS9SWihmS0l5HCFicrhg3dFvUJzIi22AD1uini652M2GPZhbUFwbyGAamisA7d60m92BuojPVV70G+0jjcHD1YgA0qjPoAKcoiQo8uI/qKo5NVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749032328; c=relaxed/simple;
-	bh=jUSXwZ2JU5BfvyGxISsNxAJNOcBzyuz6dvu40OfpaqU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qv4cziV5Fr4YaTVhKphmuB9izeR4WFDqmI160QQ4xQtiVmH+Tx2VTq8SnujZNBiT4wnny/lP75VVyDGCrlPtYuSfQLe6GrTR0JuTqtZyK1AUdUZuP/qfJjbt2o4PQoxN5dKDFAVmAN4Ei9sofjx1e7oYZHXE4ElIniqZgMqMvNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7fYV6lw; arc=none smtp.client-ip=209.85.210.182
+	s=arc-20240116; t=1749079262; c=relaxed/simple;
+	bh=6BGMLTyI9Ec3Kg+cz9cQUC2Bo3OQ73n6D16zPOw6tag=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=bzm9aUee7XTeLFonSlx1b99u7UxuHJ2fml2IZEFi2DWiR9tRivdQk4T+uzLfO0bnfpeC4gk6s3I4KG4IIyNK85k/4YEpLPITDz7kNEQFIarFWtpYsomFbmG9TiyU7bk/GMhJsJfpfsI658wy9BWkF/IZrCos8sO+W1kWnF+vCcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Neb5tKoA; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7fYV6lw"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-742c3d06de3so7153333b3a.0
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Jun 2025 03:18:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Neb5tKoA"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32aabfd3813so3410191fa.3;
+        Wed, 04 Jun 2025 16:21:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749032326; x=1749637126; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qw3PtZiVdnv/vW6tX1csKF7nxGGb2pEKG6KpB6qgCZ0=;
-        b=l7fYV6lwzWvLxpN6P/MSIJjIY2O2iHAF8207WkwOU63qzN+Zh56JgndQrSRbMRxrOH
-         mp0intzYZXZE3Ay310Ql9Dx3rt7S7OuRZXoDahubzBpmdDUvX9Gk9ovajVwNvx3Ig9Ge
-         oJazccW471Tjoyy5fmF7RmAVUY5bT1CYnOA4Sje6EbA1naTb5nfJvQix3Qam3U3csJZE
-         RLJz3MdPoXDZJ3eqVfNJdZRuboCNPC7mPfBkVGn2IKslInidVL3z5hx9sQbs+MWqM+BI
-         eK1FW6zTwzDRz8XrFUeGBrh6YuonfuvatYyOOvFJJzMzo/FqeAbVvp+LfDc5M3cVerJM
-         nJow==
+        d=gmail.com; s=20230601; t=1749079258; x=1749684058; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UcMlhn223WOqcIHrp/y1AR8lknYH1/5nhJEfUOf9IMI=;
+        b=Neb5tKoAVeSdJ6gKM6u/QX7Bg2/6Mv6EMJ229sjeWjwCe3QRdXznsARtscO3KLyV2j
+         r7SambjyclkPWKt5vIwALVP3dwo2DJmXPZ8RvODaXiPw2vDWmQW4hfnwZT3zZTC4rTnp
+         ugDl/N56U/O48GEAJmquyTtEd7SGB1M1ptEwA4cUWWY6rwGiogMncOhxy8DEnQFzcVo4
+         Qa0rEmrUF5wmzMoFId5zHafUtWi/6kcsZmJ2YNAxwqW4X1yF1g09yBl1tvVjfhEBnK8a
+         0N9uTUhtW7DqsIUwMKeqvYSZa5Qn7ohWj+D+y7ziHBSI6pamw76dAdK2RNyJUah5gNzp
+         DbWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749032326; x=1749637126;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qw3PtZiVdnv/vW6tX1csKF7nxGGb2pEKG6KpB6qgCZ0=;
-        b=asm8NUipFN5f6zn4ZTfyYeAslrgfb8lYTjJ5PH1hW5KOQIHMZDb0DiqJs8dtUXpTLQ
-         +H139bKLLkAvvVdKlxCnkbLhA1mBpqgPT1WGdwRC2LfuyiIDn9yBsoQuNCTBgWnv6W0R
-         zQt+2caAuC8aPO+tmO/aU4mRAbtm6Qn50ljtrcIg8zYFGI0uV29XVzSbrsenmRABKHzp
-         KnsFjjCU1NrwsoEkPs6hKPvmZkFIN5aFx6Qny1hNot1fPlu9n4wqwOfj89GrncLPX9i9
-         nxSj4og2k3XpzkTdZVbRQOGjAmD05K6m0t+CXx6Bu9VFuAzEQzfFT6AH+RrFO3jpErQS
-         45JQ==
-X-Gm-Message-State: AOJu0YzTp3zyRb6jhnMYAyvUBgtobtQ975hiuKZ6apuTNVgvbPV26H1/
-	RDv7KfZv67O+lpYyWE1pjY+6PZg64amEKoAaAVUdTTYM5ONgnRvAoRxFmR241ArztBk=
-X-Gm-Gg: ASbGnctXXgmYBe+6YpIZ34fowGhzzhDhC4cpA+3l26BcBmiljC4l/d2aHDEGMwGTRIY
-	qkCnteC7+JEiucmCdg49gs4wIZvtQGjFMFWZmelBvPNZRWWfaDhjs4aXOJd2vd/Q3hyBDKuVveE
-	amkYKW1ihN0PLx3MzEmSNdIMLes7th1QbScldcDhMZJEnT/szFALJZoxCK2bGS93IhOL9cZdbAo
-	HBUvOgjscpBdqDCQ+ih0D1453HaL0d2cZEC/r8RnSm4qe4vFHh3Opf11ueghqjmTa1MTU/RSIDX
-	7EcDcI8B32jYtq83PP+yIJQrVfPQNgp/VqiC1A/aTCNS2sJQTGgtDKA48Pl9i8qzOuxSXktEWAk
-	kdfQ=
-X-Google-Smtp-Source: AGHT+IGeKFOnEHPTHRUko+guia9EmB94vKNL8bHm+swr3hnPxvulr6l7xYFjtVnfUozX5GiopJZH9w==
-X-Received: by 2002:a17:902:f64d:b0:234:d292:be95 with SMTP id d9443c01a7336-235e1201291mr31773275ad.42.1749032314906;
-        Wed, 04 Jun 2025 03:18:34 -0700 (PDT)
-Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bf8132sm100563625ad.106.2025.06.04.03.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jun 2025 03:18:34 -0700 (PDT)
-From: nspmangalore@gmail.com
-X-Google-Original-From: sprasad@microsoft.com
-To: linux-cifs@vger.kernel.org,
-	smfrench@gmail.com,
-	bharathsm.hsk@gmail.com,
-	meetakshisetiyaoss@gmail.com,
-	pc@manguebit.com,
-	paul@darkrain42.org,
-	henrique.carvalho@suse.com,
-	ematsumiya@suse.de
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 4/7] cifs: serialize initialization and cleanup of cfid
-Date: Wed,  4 Jun 2025 15:48:13 +0530
-Message-ID: <20250604101829.832577-4-sprasad@microsoft.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250604101829.832577-1-sprasad@microsoft.com>
-References: <20250604101829.832577-1-sprasad@microsoft.com>
+        d=1e100.net; s=20230601; t=1749079258; x=1749684058;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UcMlhn223WOqcIHrp/y1AR8lknYH1/5nhJEfUOf9IMI=;
+        b=BFeL459vKQUJRMpV+NgQjIEHGKuVAXVHRx7/dQ8iRv0IIsRBZP34JbdkA+Ui3d02YI
+         SyU49NlxH8hCxs2WTRFLK7ydq5oRd4xAbfS69t+SE7qOeAkOOJYLZCj2p0XjN21RViQN
+         pEjn56xBYbDRiLtx5JPum4GB0c4Pn3czTYvwjPngjPzPOV4HYDr9GTor1xnwLs6pnu8Y
+         oQOM6QdBu31BFldYz2JK+gzGkvom5howDP4qRH/bK19F/hUbOTP3t6jY4O8APDhnbM2s
+         prquLyEKFGYJwQi3M1KCu+cWcfDEljQ59T9pdVoMw3QMXpFQ1KuniBIe9n4cFJzu9rfQ
+         Kg7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWMpvBaFRBpzcqUWVCtgQ2RCuWbvJvZ/zUbogYK0mRPUAMG9HRBN5AUM/6J268Og/nX6+cg0RpqRM8U@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+pldaXSYRj2H4O/Y5o13jmNjn99Ewyfql7sqUkO9sQu71KCXM
+	HlnTQkOqQfQwyqT3z5ExNcDeRkS5BWJSwUFv+z5biYyeFniTJtU8kY8VMZ9QZGQMuClybErHLhx
+	CqEK4tyvmrAo45v3CL9TUvhtY9F6hfBsgUzEK
+X-Gm-Gg: ASbGnctrPsYSPLmeLG1uoWAa/kI66/fKRoKNBG1YXS7Il3lVph0fdlouwYF9YE4+gE4
+	jP9sAO6Jb2R9gLnIx3a7zmhCQP2wbMe0kXQeG0e9eSacmyUTGU+Xc5Qf60wuTLSCstUu38AICpi
+	6cthsD1xdmE20bh25gK2HiGCl8TmamQuZXEvt5jyQph9SYpSBH5K0eshc1NUjXup7Fsdg=
+X-Google-Smtp-Source: AGHT+IFL2Qw6EsGAEuRXuJAmoNr5yp53DHvRWgBZPHf+Ix91ruEjntk+8gIX1QcwGtGYq7Hoaf+2qRbanUVs+n+qBwI=
+X-Received: by 2002:a05:651c:221a:b0:32a:739d:fac with SMTP id
+ 38308e7fff4ca-32ac71f622emr15383591fa.36.1749079258404; Wed, 04 Jun 2025
+ 16:20:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 4 Jun 2025 18:20:46 -0500
+X-Gm-Features: AX0GCFuI4gwd-C54TyFnZ12WsmWNzGe6gNjA5_gF8xWRTIxrxe0mf7oAXH5PbUM
+Message-ID: <CAH2r5muDAU9fFmkDERtE_Dvrt2HgC4s9t1wH-uHG6B4vQH39iw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd sever fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+Please pull the following changes since commit
+0ff41df1cb268fc69e703a08a57ee14ae967d0ca:
 
-Today we can have multiple processes calling open_cached_dir
-and other workers freeing the cached dir all in parallel.
-Although small sections of this code is locked to protect
-individual fields, there can be races between these threads
-which can be hard to debug.
+  Linux 6.15 (2025-05-25 16:09:23 -0700)
 
-This patch serializes all initialization and cleanup of
-the cfid struct and the associated resources: dentry and
-the server handle.
+are available in the Git repository at:
 
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
----
- fs/smb/client/cached_dir.c | 16 ++++++++++++++++
- fs/smb/client/cached_dir.h |  1 +
- 2 files changed, 17 insertions(+)
+  git://git.samba.org/ksmbd.git tags/6.16-rc-ksmbd-server-fixes
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 94538f52dfc8..2746d693d80a 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -198,6 +198,12 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		return -ENOENT;
- 	}
- 
-+	/*
-+	 * the following is a critical section. We need to make sure that the
-+	 * callers are serialized per-cfid
-+	 */
-+	mutex_lock(&cfid->cfid_mutex);
-+
- 	/*
- 	 * check again that the cfid is valid (with mutex held this time).
- 	 * Return cached fid if it is valid (has a lease and has a time).
-@@ -208,11 +214,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	spin_lock(&cfid->fid_lock);
- 	if (cfid->has_lease && cfid->time) {
- 		spin_unlock(&cfid->fid_lock);
-+		mutex_unlock(&cfid->cfid_mutex);
- 		*ret_cfid = cfid;
- 		kfree(utf16_path);
- 		return 0;
- 	} else if (!cfid->has_lease) {
- 		spin_unlock(&cfid->fid_lock);
-+		mutex_unlock(&cfid->cfid_mutex);
- 		/* drop the ref that we have */
- 		kref_put(&cfid->refcount, smb2_close_cached_fid);
- 		kfree(utf16_path);
-@@ -229,6 +237,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	 */
- 	npath = path_no_prefix(cifs_sb, path);
- 	if (IS_ERR(npath)) {
-+		mutex_unlock(&cfid->cfid_mutex);
- 		rc = PTR_ERR(npath);
- 		goto out;
- 	}
-@@ -389,6 +398,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
- 	}
-+	mutex_unlock(&cfid->cfid_mutex);
-+
- 	kfree(utf16_path);
- 
- 	if (is_replayable_error(rc) &&
-@@ -432,6 +443,9 @@ smb2_close_cached_fid(struct kref *ref)
- 					       refcount);
- 	int rc;
- 
-+	/* make sure not to race with server open */
-+	mutex_lock(&cfid->cfid_mutex);
-+
- 	spin_lock(&cfid->cfids->cfid_list_lock);
- 	if (cfid->on_list) {
- 		list_del(&cfid->entry);
-@@ -452,6 +466,7 @@ smb2_close_cached_fid(struct kref *ref)
- 		if (rc) /* should we retry on -EBUSY or -EAGAIN? */
- 			cifs_dbg(VFS, "close cached dir rc %d\n", rc);
- 	}
-+	mutex_unlock(&cfid->cfid_mutex);
- 
- 	free_cached_dir(cfid);
- }
-@@ -666,6 +681,7 @@ static struct cached_fid *init_cached_dir(const char *path)
- 	INIT_LIST_HEAD(&cfid->entry);
- 	INIT_LIST_HEAD(&cfid->dirents.entries);
- 	mutex_init(&cfid->dirents.de_mutex);
-+	mutex_init(&cfid->cfid_mutex);
- 	spin_lock_init(&cfid->fid_lock);
- 	kref_init(&cfid->refcount);
- 	return cfid;
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 1dfe79d947a6..93c936af2253 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -42,6 +42,7 @@ struct cached_fid {
- 	struct kref refcount;
- 	struct cifs_fid fid;
- 	spinlock_t fid_lock;
-+	struct mutex cfid_mutex;
- 	struct cifs_tcon *tcon;
- 	struct dentry *dentry;
- 	struct work_struct put_work;
+for you to fetch changes up to dc3e0f17f74558e8a2fce00608855f050de10230:
+
+  ksmbd: allow a filename to contain special characters on SMB3.1.1
+posix extension (2025-05-27 10:25:12 -0500)
+
+----------------------------------------------------------------
+four smb3 server fixes
+- Fix for special character handling when mounting with "posix"
+- Fix for mounts from Mac for fs that don't provide unique inode numbers
+- Two cleanup patches (e.g. for crypto calls)
+-----------------------------------------------------------------
+Eric Biggers (2):
+      ksmbd: use SHA-256 library API instead of crypto_shash API
+      ksmbd: remove unnecessary softdep on crc32
+
+Namjae Jeon (2):
+      ksmbd: provide zero as a unique ID to the Mac client
+      ksmbd: allow a filename to contain special characters on
+SMB3.1.1 posix extension
+
+ fs/smb/server/Kconfig      |  1 +
+ fs/smb/server/auth.c       | 34 ---------------------
+ fs/smb/server/auth.h       |  2 --
+ fs/smb/server/connection.h |  1 +
+ fs/smb/server/crypto_ctx.c |  8 -----
+ fs/smb/server/crypto_ctx.h |  4 ---
+ fs/smb/server/server.c     |  1 -
+ fs/smb/server/smb2pdu.c    | 72 +++++++++++++++++++++++++++------------------
+ fs/smb/server/smb2pdu.h    |  3 ++
+ fs/smb/server/vfs.c        | 20 +++----------
+ 10 files changed, 53 insertions(+), 93 deletions(-)
+
 -- 
-2.43.0
+Thanks,
 
+Steve
