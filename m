@@ -1,224 +1,208 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A2472601
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 03:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E3D25E82D
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 03:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749008383; cv=none; b=OJXq/vQkwpJmjzTRkDUxbBW+KwccPrpRqc5wkiJxtyb+9bn7wfdxu1Rk3d272Ra+Kgp9YpPSRn7W1mBZT0raABL7Bbke5V4IUPWATJq2Yxy+2wV9H/uF0jr/0Rd8khJ16FOpFOPCUiSEjhc2SLKdJepkEoaRIPTKim/3mdf6QXQ=
+	t=1749008642; cv=none; b=GSvaSQcQm9ZK35U6V68fDW1Lzx/jBKogVEgePgbuBFwa3h6h3J/NatE8AFda9e9OR4pq2OJLv8h0rVKVjJ14SophwJsyjmE+74vJHQsQvGO1JcRiIm5jfH+Hp1CecqCAlI8OFMuowFCef+HgKQiDKKnH3rqkno3YuXcnxkI7k00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749008383; c=relaxed/simple;
-	bh=ocnFmj4ccnuhFB/PWBQ+grzXWgtZHlaUM9QXn5evFZQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=COtS73sjubJyRPWDMbMRBVuZmCQTjvqBj0KTSWmMkOZZBh8hj0Suep0KhvuL1dQOjr1XLzu7j1VXwJX3UMknLAtuSgfBaEsxH2h9KZiVNjxvKT3ODdqI4j22qscXiNYZ01zmj9NImEcKSSnJmbWWhCKhsperDp9sH8dmEPwzzJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HquEa+eg; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1749008642; c=relaxed/simple;
+	bh=JaIgk1XkjHmjFb8YOvhs5UtUbJaFTu7ac7t5nJnML9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NgKY0q90LFt4TnomD3mwU44lTq15BrvTNBHwTRvTeNiZzZQA4ENJdCK3txQvI3giHSaSFv5itNz4CDiF7e8fZcMlNNAc6b0VL717IboeZcwNe5TMT3hz1TxNXYjgBhVsA4uFuxxQ945MwlNsWGsqU9dumDu9JjF35/eqd6sn5kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdI3orkR; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HquEa+eg"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-606b6dbe316so2047721a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Jun 2025 20:39:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdI3orkR"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74264d1832eso7066659b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Jun 2025 20:43:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749008380; x=1749613180; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1749008639; x=1749613439; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rxHhSWI3V11JsYfcFd2h7co8CQI0ir49Vl80qQmLFGU=;
-        b=HquEa+eg+wPN0i2llhTJAJEnpvAynRc+gWIcXK6SWqFM576oF++vBp0gnDbEbnAlnv
-         s6B4RVpwS+Vyp6AOVEM2S5RpKnE1dQyfQYBDK8uj1BVQVrTpqBdJ31xLrDtJ4rRiqaMn
-         pzaeXYriNlHTpX3WjvhIwKwgsgwv1aa1AcnNnw/6BL9nCm73Tg3DzQV8SXLDsdUU2/6S
-         PDmf2psFznWv9YwoQGISGcRoo2NSaDqsVMKVyMF6qLD/JHCYTRAmzsmXd9Hcs9dM65X8
-         FTIUysq86vOnzcv2vVKQgff/n1LYJJGSzywrqs6a+TZbNzsyUWF2cYUaVlZulFF2ghbd
-         7djA==
+        bh=zfrF/OpubEc6sXhdgOlGR8JNuqqW5Z6XON9XjCu13q0=;
+        b=IdI3orkROGhKxDppl93ALydMsM4LovhTErNCX/O4yEOZgsY2unJycb1ECtY0PlDhhp
+         A1wtBTpz1bok4A/Ad+AmYUeG1fuMz8PBdmlC8TaVpBw7XHkHerj2N5iMt7+37jh40QYM
+         L3MecG72UNYhZYdjk8gM/tCZ+Ef5/trIvLEOYOP1xKPpdh2PKgEKnMDWE+1MAM5Pd7+7
+         TsxlvMaPu1JXBf+fcZMZLUe4wQJwEJJBXSKOpGxmvFxbSSp8QRRMN1VmSLSc/rTAcYQu
+         edYnac5MtKjexJKOp4t1X1IiqYWWrxXR9t0G9l6ZPvOa1x4Rx8XfR39QQ4YYISIe0IH9
+         H3Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749008380; x=1749613180;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1749008639; x=1749613439;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rxHhSWI3V11JsYfcFd2h7co8CQI0ir49Vl80qQmLFGU=;
-        b=ieu919UtFfULrCNtZ+x3AL8o0mOrSSTuMPDpgS5GzhBzH6JS2ZheIVT0/HzQiaZ2Sr
-         YEopcFI12lLCodnYkVixbkNk3JpWoZ09cdNeuw4BOa4MyhAdz0H+x/5Aal7RLOyrdDt7
-         Ip4zqpzl1UWC8+aeBSBqNjcmK33+REPMMrv2r1/yRKLLuc76/u53QgiQn5sv3thlng5J
-         PeopRzm56S3WEkKFlFkwEqi9WbjwQD4kInvdK5PsBmzK0jLDUEVq0STP8JOPdSER1FHQ
-         VjGhYM+qTzYmZ7N/LI1ORhlZho2uQkD2pA1kztmM8cWfKooy3crOn8jOFkYD2GRU9Ez6
-         gNdQ==
-X-Gm-Message-State: AOJu0Yygt6BNk76bnBqL7fybAXCgnby/miMVacJ5b9MCf4Qol7dMKcpV
-	tSrQ+J1/sGNcDtsN77bXAzjhpJUjZwwY4zaIR7d50teLz7+OAoqL3vfwCSsvAInCbZsMFOjbXK5
-	L0pGMCHZvCMJi4hEVJlYojd3vZvu5EaE=
-X-Gm-Gg: ASbGncuGuLy/6tBxMtQVvOv4zsHYpKab/L+QMwjHEvg2/ibrqBmAUimSb7D1Lz9ba/6
-	yHGf6mXsrgJwTuF7sUWUH/h38wXahd9TFNc7hly3icFi0XvSTKz3wuxyAiFJuBSAzvUnYqjacgC
-	2tjEItiEOdAf455uYro5R3ufPZBvCcSJD2BtcbJEp2Wmf6Nez5wAPHcZX1NviWysk=
-X-Google-Smtp-Source: AGHT+IES1AwBCkGmI/Ar/vAzRUb3nToOuOv7Dr8EEFcBafNGiiIEbmYQJBxINr3Ann5qzGlnMRtJsKE/MBdkSw+Wfm8=
-X-Received: by 2002:a17:907:60ca:b0:ad8:89c7:2735 with SMTP id
- a640c23a62f3a-addf8fe2d0bmr96157966b.58.1749008379653; Tue, 03 Jun 2025
- 20:39:39 -0700 (PDT)
+        bh=zfrF/OpubEc6sXhdgOlGR8JNuqqW5Z6XON9XjCu13q0=;
+        b=DBiNew8LUv2MxCTulBD1NaEsZUyQI7zm1/JoziI+GDo1w+ZgknNJbdQE7NmVbD7zMy
+         tdunCXPUbOW3IE8exjj38+pW10W2qL6zdM80Z3BzyW6YweJTs19+wLyZnSxbmP7FrPGg
+         0hM43PVD5UcTQNWS0xlMVC9587ab78lqroMtsc/fnKnk/zsg23w5ixL3GgCf2588WXiW
+         z0p5pFO4MV23tO6tW0JCJAbOD0MWvR/VBLRkqhu89rz9HByqU7ChVa4T6jqkOT2/AwpB
+         IEq9O2MP9eWF1SM8PyS4kL6eSiRPqUkbLuFpO/ECQ+FLVXJm5Oz7D1X3FaEtbKSajpCC
+         /B8w==
+X-Gm-Message-State: AOJu0Yz+kD9ddvx5xn81PSiTG4KkgiajZxmpSbe8iZ3Rgg5beaqeI8JI
+	6yEGStVud4rlR8uuk9t3ssiHAPzYMulE4H3y/EdEDiJyakE0y4SZafg1qvYqrap9
+X-Gm-Gg: ASbGnctCSkMYDCx1j10a7unQ5GoAH27AwHlY0htTh3d/CE0oSppjh7U9LYO9MDMep2g
+	9Z018LVrKCaslrCt5wlwmRccuLIIxwM0N5W4f2X00v+yRH5m9yCX89G/tvo8O2CaWFVZKgyPFP3
+	8vwHYKUee3n9mVBRsYMiqXQSw/PEZyzcqtDBfwire9G7M5XzKfmwlLbkRKp3KTiWcMb0AsIidNT
+	9UFiayPdHhkncJPxZS4wpGCHIJRV3FgDxCFHsG1hkp08GAinqr5Z0gzkrqu120DPg2EUDdbK9W7
+	1NzIO8zEMvPnz5ZWkY3g6ZGvguzE9bpJq2GsKnDjLIXo0+mAeY/NvntvFffPg1vXo8O7LISPLRC
+	uaA==
+X-Google-Smtp-Source: AGHT+IG8EPiSMhHlOTbOIKRkGqJPkC06XyyO6VAgrDJfYIyFwbUDFt3M2LsJyrOMsXQKX2YnKhkmkg==
+X-Received: by 2002:a05:6a20:1583:b0:215:d565:3026 with SMTP id adf61e73a8af0-21d22bcb05cmr1923155637.20.1749008638930;
+        Tue, 03 Jun 2025 20:43:58 -0700 (PDT)
+Received: from met-Virtual-Machine.. ([167.220.110.169])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2eceb02a7csm7809400a12.10.2025.06.03.20.43.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jun 2025 20:43:58 -0700 (PDT)
+From: meetakshisetiyaoss@gmail.com
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	nspmangalore@gmail.com,
+	bharathsm.hsk@gmail.com,
+	pc@manguebit.com,
+	lsahlber@redhat.com,
+	tom@talpey.com,
+	sfrench@samba.org,
+	linkinjeon@kernel.org,
+	metze@samba.org
+Cc: Meetakshi Setiya <msetiya@microsoft.com>
+Subject: [PATCH v2] cifs: add documentation for smbdirect setup
+Date: Tue,  3 Jun 2025 23:43:52 -0400
+Message-ID: <20250604034355.15875-1-meetakshisetiyaoss@gmail.com>
+X-Mailer: git-send-email 2.46.0.46.g406f326d27
+In-Reply-To: <CAFTVevUpjG0uQXs4Stj2OggqfGoc8X_6iLgzaVf2V6oTa8eqTA@mail.gmail.com>
+References: <CAFTVevUpjG0uQXs4Stj2OggqfGoc8X_6iLgzaVf2V6oTa8eqTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603042958.9862-1-meetakshisetiyaoss@gmail.com> <CAKYAXd8LSN6ux1C_kzEaBgN-zA9jF05_BU0gGLQjv=yUBGdGiA@mail.gmail.com>
-In-Reply-To: <CAKYAXd8LSN6ux1C_kzEaBgN-zA9jF05_BU0gGLQjv=yUBGdGiA@mail.gmail.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Wed, 4 Jun 2025 09:09:27 +0530
-X-Gm-Features: AX0GCFssN8CXLZ-wSWO51g6NyngI65SY5o4Duev_b7Uc_l9h1Ao5Ozve2Neig4E
-Message-ID: <CAFTVevUpjG0uQXs4Stj2OggqfGoc8X_6iLgzaVf2V6oTa8eqTA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add documentation for smbdirect setup
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, nspmangalore@gmail.com, 
-	bharathsm.hsk@gmail.com, pc@manguebit.com, lsahlber@redhat.com, 
-	tom@talpey.com, sfrench@samba.org, metze@samba.org, 
-	Meetakshi Setiya <msetiya@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Namjae,
+From: Meetakshi Setiya <msetiya@microsoft.com>
 
-Thanks for the review. Sending an updated patch.
+Document steps to use SMB over RDMA using the linux SMB client and
+KSMBD server
 
-On Tue, Jun 3, 2025 at 12:05=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
- wrote:
->
-> On Tue, Jun 3, 2025 at 1:30=E2=80=AFPM <meetakshisetiyaoss@gmail.com> wro=
-te:
-> >
-> > From: Meetakshi Setiya <msetiya@microsoft.com>
-> >
-> > Document steps to use SMB over RDMA using the linux SMB client and
-> > KSMBD server
-> >
-> > Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> > ---
-> >  Documentation/filesystems/smb/smbdirect.rst | 91 +++++++++++++++++++++
-> >  1 file changed, 91 insertions(+)
-> >  create mode 100644 Documentation/filesystems/smb/smbdirect.rst
-> >
-> > diff --git a/Documentation/filesystems/smb/smbdirect.rst b/Documentatio=
-n/filesystems/smb/smbdirect.rst
-> > new file mode 100644
-> > index 000000000000..98dec004a058
-> > --- /dev/null
-> > +++ b/Documentation/filesystems/smb/smbdirect.rst
-> > @@ -0,0 +1,91 @@
-> > +.. SPDX-License-Identifier: GPL-2.0
-> > +
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> > +SMB Direct - SMB3 over RDMA
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> > +
-> > +This document describes how to set up the Linux SMB client and server =
-to
-> > +use RDMA.
-> > +
-> > +Overview
-> > +=3D=3D=3D=3D=3D=3D=3D=3D
-> > +The Linux SMB kernel client supports SMB Direct, which is a transport
-> > +scheme for SMB3 that uses RDMA (Remote Direct Memory Access) to provid=
-e
-> > +high throughput and low latencies by bypassing the traditional TCP/IP
-> > +stack.
-> > +SMB Direct on the Linux SMB client can be tested against KSMBD - a
-> > +kernel-space SMB server.
-> > +
-> > +Installation
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +- Install an RDMA device. As long as the RDMA device driver is support=
-ed
-> > +  by the kernel, it should work. This includes both software emulators=
- (soft
-> > +  RoCE, soft iWARP) and hardware devices (InfiniBand, RoCE, iWARP).
-> > +
-> > +- Install a kernel with SMB Direct support. The first kernel release t=
-o
-> > +  support SMB Direct on both the client and server side is 5.15. There=
-fore,
-> > +  a distribution compatible with kernel 5.15 or later is required.
-> > +
-> > +- Install cifs-utils, which provides the `mount.cifs` command to mount=
- SMB
-> > +  shares.
-> > +
-> > +- Configure the RDMA stack
-> > +
-> > +  Make sure that your kernel configuration has RDMA support enabled. U=
-nder
-> > +  Device Drivers -> Infiniband support, update the kernel configuratio=
-n to
-> > +  enable Infiniband support.
-> Hi Meetakshi,
->
-> Looks good:)
-> > +
-> > +  Enable the appropriate IB HCA support or iWARP adapter support,
-> > +  depending on your setup.
-> You can refer to nfs rdma setup wiki for soft iWARP.
->
-> https://wiki.linux-nfs.org/wiki/index.php/NFS_over_soft_iWARP_setup
-> > +
-> > +  If you are using InfiniBand, enable IP-over-InfiniBand support.
-> > +
-> > +- Enable SMB Direct support for both the server and the client in the
-> > +  kernel configuration.
-> > +
-> > +    Server Setup
-> > +
-> > +    .. code-block:: text
-> > +
-> > +        Network File Systems  --->
-> > +            <M> SMB3 server support
-> > +                [*] Support for SMB Direct protocol
-> > +
-> > +    Client Setup
-> > +
-> > +    .. code-block:: text
-> > +
-> > +        Network File Systems  --->
-> > +            <M> SMB3 and CIFS support (advanced network filesystem)
-> > +                [*] SMB Direct support
-> > +
-> > +- Build and install the kernel. SMB Direct support will be enabled in =
-the
-> > +  cifs.ko and ksmbd.ko modules.
-> > +
-> > +Setup and Usage
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +- Set up and start a KSMBD server as described in the `KSMBD documenta=
-tion
-> > +  <https://www.kernel.org/doc/Documentation/filesystems/smb/ksmbd.rst>=
-`_.
-> We need to add "server multi channel support =3D yes" parameter to ksmbd.=
-conf.
-> Could you please mention this?
->
-> Thanks!
-> > +
-> > +- On the client, mount the share with `rdma` mount option to use SMB D=
-irect
-> > +  (specify a SMB version 3.0 or higher using `vers`).
-> > +
-> > +  For example:
-> > +
-> > +    .. code-block:: bash
-> > +
-> > +        mount -t cifs //server/share /mnt/point -o vers=3D3.1.1,rdma
-> > +
-> > +- To verify that the mount is using SMB Direct, you can check dmesg fo=
-r the
-> > +  following log line after mounting:
-> > +
-> > +    .. code-block:: text
-> > +
-> > +        CIFS: VFS: RDMA transport established
-> > +
-> > +  Or, verify `rdma` mount option for the share in `/proc/mounts`:
-> > +
-> > +    .. code-block:: bash
-> > +
-> > +        cat /proc/mounts | grep cifs
-> > --
-> > 2.46.0.46.g406f326d27
-> >
+Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
+---
+ Documentation/filesystems/smb/smbdirect.rst | 103 ++++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+ create mode 100644 Documentation/filesystems/smb/smbdirect.rst
+
+diff --git a/Documentation/filesystems/smb/smbdirect.rst b/Documentation/filesystems/smb/smbdirect.rst
+new file mode 100644
+index 000000000000..ca6927c0b2c0
+--- /dev/null
++++ b/Documentation/filesystems/smb/smbdirect.rst
+@@ -0,0 +1,103 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++===========================
++SMB Direct - SMB3 over RDMA
++===========================
++
++This document describes how to set up the Linux SMB client and server to
++use RDMA.
++
++Overview
++========
++The Linux SMB kernel client supports SMB Direct, which is a transport
++scheme for SMB3 that uses RDMA (Remote Direct Memory Access) to provide
++high throughput and low latencies by bypassing the traditional TCP/IP
++stack.
++SMB Direct on the Linux SMB client can be tested against KSMBD - a
++kernel-space SMB server.
++
++Installation
++=============
++- Install an RDMA device. As long as the RDMA device driver is supported
++  by the kernel, it should work. This includes both software emulators (soft
++  RoCE, soft iWARP) and hardware devices (InfiniBand, RoCE, iWARP).
++
++- Install a kernel with SMB Direct support. The first kernel release to
++  support SMB Direct on both the client and server side is 5.15. Therefore,
++  a distribution compatible with kernel 5.15 or later is required.
++
++- Install cifs-utils, which provides the `mount.cifs` command to mount SMB
++  shares.
++
++- Configure the RDMA stack
++
++  Make sure that your kernel configuration has RDMA support enabled. Under
++  Device Drivers -> Infiniband support, update the kernel configuration to
++  enable Infiniband support.
++
++  Enable the appropriate IB HCA support or iWARP adapter support,
++  depending on your hardware.
++
++  If you are using InfiniBand, enable IP-over-InfiniBand support.
++
++  For soft RDMA, enable either the soft iWARP (`RDMA _SIW`) or soft RoCE
++  (`RDMA_RXE`) module. Install the `iproute2` package and use the
++  `rdma link add` command to load the module and create an
++  RDMA interface.
++
++  e.g. if your local ethernet interface is `eth0`, you can use:
++
++    .. code-block:: bash
++
++        sudo rdma link add siw0 type siw netdev eth0
++
++- Enable SMB Direct support for both the server and the client in the kernel
++  configuration.
++
++    Server Setup
++
++    .. code-block:: text
++
++        Network File Systems  --->
++            <M> SMB3 server support
++                [*] Support for SMB Direct protocol
++
++    Client Setup
++
++    .. code-block:: text
++
++        Network File Systems  --->
++            <M> SMB3 and CIFS support (advanced network filesystem)
++                [*] SMB Direct support
++
++- Build and install the kernel. SMB Direct support will be enabled in the
++  cifs.ko and ksmbd.ko modules.
++
++Setup and Usage
++================
++
++- Set up and start a KSMBD server as described in the `KSMBD documentation
++  <https://www.kernel.org/doc/Documentation/filesystems/smb/ksmbd.rst>`_.
++  Also add the "server multi channel support = yes" parameter to ksmbd.conf.
++
++- On the client, mount the share with `rdma` mount option to use SMB Direct
++  (specify a SMB version 3.0 or higher using `vers`).
++
++  For example:
++
++    .. code-block:: bash
++
++        mount -t cifs //server/share /mnt/point -o vers=3.1.1,rdma
++
++- To verify that the mount is using SMB Direct, you can check dmesg for the
++  following log line after mounting:
++
++    .. code-block:: text
++
++        CIFS: VFS: RDMA transport established
++
++  Or, verify `rdma` mount option for the share in `/proc/mounts`:
++
++    .. code-block:: bash
++
++        cat /proc/mounts | grep cifs
+-- 
+2.46.0.46.g406f326d27
+
