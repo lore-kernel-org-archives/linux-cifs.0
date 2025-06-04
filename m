@@ -1,62 +1,62 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05507081F
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 10:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C69212F94
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 10:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749032321; cv=none; b=nxjvSr9uP9OV8o6CQdKk0je9ANPVaX9oiiNlMc4KtmwrW64+ArgK17nhF+YjNpHu5B7Z09XhqegKyoZcpalazfEqAmW89tWcf/782fdHwmPkNbtm02TM8dI7DXp4ihAAzIlNCQKoCVJilZiTS2CCjIm3+I6Mo0n5m6afg4Ik/2w=
+	t=1749032328; cv=none; b=hFgGIyJkkByZ2kfzMUZZ3V0tWG8bjIGyvOhBSAKJdZNEf2qAXRae9Bs/OvQ0ZDoNzrocetOyWVex04aDgvNf2yPXr3Ge24/tXKCB5+DuULYoHr7ZACs4MM/fZVl6gGYElStoksoNaHpSyBnaIjSPNIbRjaTmBaJeY4k1LBrKxGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749032321; c=relaxed/simple;
-	bh=IPj9u7dGaYETeW7dX1SNlOyX9Ol1NPhozZGLyinkLco=;
+	s=arc-20240116; t=1749032328; c=relaxed/simple;
+	bh=jUSXwZ2JU5BfvyGxISsNxAJNOcBzyuz6dvu40OfpaqU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TJLBS8+U/jklIoaC2OazqwammWq7BujJFLoOyTDrYzioDSekeracOcaI0nw/T3Rv+bdo+UBhdpa/+vO2z8dXpv78+zirqKcOVGdGNgij4AKCMuh6YX0IV2eSt1o/8D4ZrYqumXnhJJOg3UPv06y0On/EfY6VsWFw4/W+ZHs+kxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLxxjFsu; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=Qv4cziV5Fr4YaTVhKphmuB9izeR4WFDqmI160QQ4xQtiVmH+Tx2VTq8SnujZNBiT4wnny/lP75VVyDGCrlPtYuSfQLe6GrTR0JuTqtZyK1AUdUZuP/qfJjbt2o4PQoxN5dKDFAVmAN4Ei9sofjx1e7oYZHXE4ElIniqZgMqMvNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7fYV6lw; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLxxjFsu"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235ea292956so1373665ad.1
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Jun 2025 03:18:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7fYV6lw"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-742c3d06de3so7153333b3a.0
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Jun 2025 03:18:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749032317; x=1749637117; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749032326; x=1749637126; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SMGQPDcFr59LjLvr6Tvg4uIejOoy+nc/9tdvuibx8fw=;
-        b=VLxxjFsupsXBARmZt3pxS3YfT4VLtNt/qLOIHQaobJzfX+Uwz9v0giGscOHavLf+2J
-         Roxn2GJuGBaGk+B1RGp2+fn2tCc1uyT+X2KK+vzSWs8VzLnqUijh9fu1PqL4JtxoLTzO
-         v6crTjRACvjrI/MrZkXew+thNP7/YOFuvc+YQ4Cejmsf3LxB0sll11yikAn9G7mr8b0I
-         PRoXRibPCTe5bK5O9O5LeS0HjM5CfSzhTZOUVQ0SdeH2Pd5SO7LO/J2LqrKrlk2cFuZ2
-         IhAvydliwCKU1tEhxvpqhrxN8zmfLFPOYLuOGyBpj496HVE1G2b7hwAU6c/28AyA+oBE
-         rI5A==
+        bh=Qw3PtZiVdnv/vW6tX1csKF7nxGGb2pEKG6KpB6qgCZ0=;
+        b=l7fYV6lwzWvLxpN6P/MSIJjIY2O2iHAF8207WkwOU63qzN+Zh56JgndQrSRbMRxrOH
+         mp0intzYZXZE3Ay310Ql9Dx3rt7S7OuRZXoDahubzBpmdDUvX9Gk9ovajVwNvx3Ig9Ge
+         oJazccW471Tjoyy5fmF7RmAVUY5bT1CYnOA4Sje6EbA1naTb5nfJvQix3Qam3U3csJZE
+         RLJz3MdPoXDZJ3eqVfNJdZRuboCNPC7mPfBkVGn2IKslInidVL3z5hx9sQbs+MWqM+BI
+         eK1FW6zTwzDRz8XrFUeGBrh6YuonfuvatYyOOvFJJzMzo/FqeAbVvp+LfDc5M3cVerJM
+         nJow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749032317; x=1749637117;
+        d=1e100.net; s=20230601; t=1749032326; x=1749637126;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SMGQPDcFr59LjLvr6Tvg4uIejOoy+nc/9tdvuibx8fw=;
-        b=q+UukpJsPzSHr8jlT+tJUrnuQo4Fc/oql2Onn/M37fqaDRJ7uvVAZIF3WZB4rwvS25
-         qRFLXNH+VcAR6gkDv+3u992MAd9+yGFQ6mz3TI5LzUfd4JjuRAyCl5H/FWq5urSFOTDJ
-         nhhM1NPvG7AwNndIx4kVpr/uuey/5MmgwIke5Ca93HByPwDIBbz7Dc86Ip1vjbuZo0bI
-         yKwCLazqDmGttFAWLKE5u44HxRQXZFaM1PxpHST/XglopZ6S/2fT8pTUxv8PLNoQXHmH
-         fMzVRcde2VYfiDZpzHDbFQg+uOT9hICQfVRoIpjqnmk7F9mlbZRtELChWTfkpyO9xigo
-         oNDw==
-X-Gm-Message-State: AOJu0YzUYccf7xqIjyU6Z9aiG63rVTdCgjLGRHLD01itzhYkukitxmEr
-	Zcd/ILqpTQUs43OZdX5g0xAh889sCPyfAkU+ddThZlS5BHCs7ZsVWLATYW/91MhslgY=
-X-Gm-Gg: ASbGncsroY70ilndL3Qe1W97DMem3Ot87baMctCRJHYscp9hExjRC5kexFGfpwXhmWf
-	YEwvu5u7rHXUdoTanBTSUsIzbpEorSKrzHt9psWdbnjxI77vpbmoduNBSkFvrNCX3FACrdHvrAC
-	0PIGiOulFY2TVzpoVoDZ7ek0DgVSeeinFkkP/ARcgsLvbhIHIqCCg1apUBXpuuA2T5MFCOCp+rc
-	PR7G+QWS4cu0S9ewCFbIUN00//QOTdPsrp15zwD5/DdrPeKRzPh0sAv31NbFllRPWAbasPw1t1c
-	YxIHVs5YXLoR325S6+u/eLFVIOEwRI77Ua3vo9actUg3xpZKQYSNZtB4CGqiC6OxPNCKJAf+t7j
-	FfTI=
-X-Google-Smtp-Source: AGHT+IEDzTgh4yVAUaM9S8O3WygY079J+XW1FqFH9Yvivbp8HFxks96cNGILoVFgW54Ui5v2wZSFYQ==
-X-Received: by 2002:a17:903:1a30:b0:234:d431:ec9d with SMTP id d9443c01a7336-235e1015a0cmr37399355ad.5.1749032317416;
-        Wed, 04 Jun 2025 03:18:37 -0700 (PDT)
+        bh=Qw3PtZiVdnv/vW6tX1csKF7nxGGb2pEKG6KpB6qgCZ0=;
+        b=asm8NUipFN5f6zn4ZTfyYeAslrgfb8lYTjJ5PH1hW5KOQIHMZDb0DiqJs8dtUXpTLQ
+         +H139bKLLkAvvVdKlxCnkbLhA1mBpqgPT1WGdwRC2LfuyiIDn9yBsoQuNCTBgWnv6W0R
+         zQt+2caAuC8aPO+tmO/aU4mRAbtm6Qn50ljtrcIg8zYFGI0uV29XVzSbrsenmRABKHzp
+         KnsFjjCU1NrwsoEkPs6hKPvmZkFIN5aFx6Qny1hNot1fPlu9n4wqwOfj89GrncLPX9i9
+         nxSj4og2k3XpzkTdZVbRQOGjAmD05K6m0t+CXx6Bu9VFuAzEQzfFT6AH+RrFO3jpErQS
+         45JQ==
+X-Gm-Message-State: AOJu0YzTp3zyRb6jhnMYAyvUBgtobtQ975hiuKZ6apuTNVgvbPV26H1/
+	RDv7KfZv67O+lpYyWE1pjY+6PZg64amEKoAaAVUdTTYM5ONgnRvAoRxFmR241ArztBk=
+X-Gm-Gg: ASbGnctXXgmYBe+6YpIZ34fowGhzzhDhC4cpA+3l26BcBmiljC4l/d2aHDEGMwGTRIY
+	qkCnteC7+JEiucmCdg49gs4wIZvtQGjFMFWZmelBvPNZRWWfaDhjs4aXOJd2vd/Q3hyBDKuVveE
+	amkYKW1ihN0PLx3MzEmSNdIMLes7th1QbScldcDhMZJEnT/szFALJZoxCK2bGS93IhOL9cZdbAo
+	HBUvOgjscpBdqDCQ+ih0D1453HaL0d2cZEC/r8RnSm4qe4vFHh3Opf11ueghqjmTa1MTU/RSIDX
+	7EcDcI8B32jYtq83PP+yIJQrVfPQNgp/VqiC1A/aTCNS2sJQTGgtDKA48Pl9i8qzOuxSXktEWAk
+	kdfQ=
+X-Google-Smtp-Source: AGHT+IGeKFOnEHPTHRUko+guia9EmB94vKNL8bHm+swr3hnPxvulr6l7xYFjtVnfUozX5GiopJZH9w==
+X-Received: by 2002:a17:902:f64d:b0:234:d292:be95 with SMTP id d9443c01a7336-235e1201291mr31773275ad.42.1749032314906;
+        Wed, 04 Jun 2025 03:18:34 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bf8132sm100563625ad.106.2025.06.04.03.18.36
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bf8132sm100563625ad.106.2025.06.04.03.18.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jun 2025 03:18:36 -0700 (PDT)
+        Wed, 04 Jun 2025 03:18:34 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -68,9 +68,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 7/7] cifs: add new field to track the last access time of cfid
-Date: Wed,  4 Jun 2025 15:48:16 +0530
-Message-ID: <20250604101829.832577-7-sprasad@microsoft.com>
+Subject: [PATCH 4/7] cifs: serialize initialization and cleanup of cfid
+Date: Wed,  4 Jun 2025 15:48:13 +0530
+Message-ID: <20250604101829.832577-4-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250604101829.832577-1-sprasad@microsoft.com>
 References: <20250604101829.832577-1-sprasad@microsoft.com>
@@ -84,65 +84,108 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-The handlecache code today tracks the time at which dir lease was
-acquired and the laundromat thread uses that to check for old
-entries to cleanup.
+Today we can have multiple processes calling open_cached_dir
+and other workers freeing the cached dir all in parallel.
+Although small sections of this code is locked to protect
+individual fields, there can be races between these threads
+which can be hard to debug.
 
-However, if a directory is actively accessed, it should not
-be chosen to expire first.
-
-This change adds a new last_access_time field to cfid and
-uses that to decide expiry of the cfid.
+This patch serializes all initialization and cleanup of
+the cfid struct and the associated resources: dentry and
+the server handle.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 6 ++++--
- fs/smb/client/cached_dir.h | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ fs/smb/client/cached_dir.c | 16 ++++++++++++++++
+ fs/smb/client/cached_dir.h |  1 +
+ 2 files changed, 17 insertions(+)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 4abf5bbd8baf..d432a40f902e 100644
+index 94538f52dfc8..2746d693d80a 100644
 --- a/fs/smb/client/cached_dir.c
 +++ b/fs/smb/client/cached_dir.c
-@@ -213,6 +213,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	 */
+@@ -198,6 +198,12 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 		return -ENOENT;
+ 	}
+ 
++	/*
++	 * the following is a critical section. We need to make sure that the
++	 * callers are serialized per-cfid
++	 */
++	mutex_lock(&cfid->cfid_mutex);
++
+ 	/*
+ 	 * check again that the cfid is valid (with mutex held this time).
+ 	 * Return cached fid if it is valid (has a lease and has a time).
+@@ -208,11 +214,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
  	spin_lock(&cfid->fid_lock);
  	if (cfid->has_lease && cfid->time) {
-+		cfid->last_access_time = jiffies;
  		spin_unlock(&cfid->fid_lock);
- 		mutex_unlock(&cfid->cfid_mutex);
++		mutex_unlock(&cfid->cfid_mutex);
  		*ret_cfid = cfid;
-@@ -365,6 +366,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	cfid->tcon = tcon;
- 	cfid->is_open = true;
- 	cfid->time = jiffies;
-+	cfid->last_access_time = jiffies;
- 	spin_unlock(&cfid->fid_lock);
+ 		kfree(utf16_path);
+ 		return 0;
+ 	} else if (!cfid->has_lease) {
+ 		spin_unlock(&cfid->fid_lock);
++		mutex_unlock(&cfid->cfid_mutex);
+ 		/* drop the ref that we have */
+ 		kref_put(&cfid->refcount, smb2_close_cached_fid);
+ 		kfree(utf16_path);
+@@ -229,6 +237,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	 */
+ 	npath = path_no_prefix(cifs_sb, path);
+ 	if (IS_ERR(npath)) {
++		mutex_unlock(&cfid->cfid_mutex);
+ 		rc = PTR_ERR(npath);
+ 		goto out;
+ 	}
+@@ -389,6 +398,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 		*ret_cfid = cfid;
+ 		atomic_inc(&tcon->num_remote_opens);
+ 	}
++	mutex_unlock(&cfid->cfid_mutex);
++
+ 	kfree(utf16_path);
  
- oshr_free:
-@@ -741,8 +743,8 @@ static void cfids_laundromat_worker(struct work_struct *work)
- 	spin_lock(&cfids->cfid_list_lock);
- 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
- 		spin_lock(&cfid->fid_lock);
--		if (cfid->time &&
--		    time_after(jiffies, cfid->time + HZ * dir_cache_timeout)) {
-+		if (cfid->last_access_time &&
-+		    time_after(jiffies, cfid->last_access_time + HZ * dir_cache_timeout)) {
- 			cfid->on_list = false;
- 			list_move(&cfid->entry, &entry);
- 			cfids->num_entries--;
+ 	if (is_replayable_error(rc) &&
+@@ -432,6 +443,9 @@ smb2_close_cached_fid(struct kref *ref)
+ 					       refcount);
+ 	int rc;
+ 
++	/* make sure not to race with server open */
++	mutex_lock(&cfid->cfid_mutex);
++
+ 	spin_lock(&cfid->cfids->cfid_list_lock);
+ 	if (cfid->on_list) {
+ 		list_del(&cfid->entry);
+@@ -452,6 +466,7 @@ smb2_close_cached_fid(struct kref *ref)
+ 		if (rc) /* should we retry on -EBUSY or -EAGAIN? */
+ 			cifs_dbg(VFS, "close cached dir rc %d\n", rc);
+ 	}
++	mutex_unlock(&cfid->cfid_mutex);
+ 
+ 	free_cached_dir(cfid);
+ }
+@@ -666,6 +681,7 @@ static struct cached_fid *init_cached_dir(const char *path)
+ 	INIT_LIST_HEAD(&cfid->entry);
+ 	INIT_LIST_HEAD(&cfid->dirents.entries);
+ 	mutex_init(&cfid->dirents.de_mutex);
++	mutex_init(&cfid->cfid_mutex);
+ 	spin_lock_init(&cfid->fid_lock);
+ 	kref_init(&cfid->refcount);
+ 	return cfid;
 diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 93c936af2253..6d4b9413aa67 100644
+index 1dfe79d947a6..93c936af2253 100644
 --- a/fs/smb/client/cached_dir.h
 +++ b/fs/smb/client/cached_dir.h
-@@ -39,6 +39,7 @@ struct cached_fid {
- 	bool on_list:1;
- 	bool file_all_info_is_valid:1;
- 	unsigned long time; /* jiffies of when lease was taken */
-+	unsigned long last_access_time; /* jiffies of when last accessed */
+@@ -42,6 +42,7 @@ struct cached_fid {
  	struct kref refcount;
  	struct cifs_fid fid;
  	spinlock_t fid_lock;
++	struct mutex cfid_mutex;
+ 	struct cifs_tcon *tcon;
+ 	struct dentry *dentry;
+ 	struct work_struct put_work;
 -- 
 2.43.0
 
