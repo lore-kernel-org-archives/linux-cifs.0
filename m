@@ -1,60 +1,60 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC8E224B1E
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 10:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05507081F
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Jun 2025 10:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749032319; cv=none; b=KOL3PHXnuxUMpW6bu2XjFIrptlXDEdpEykZ3cI0aFzX0iDo1mpV1W3ip1+40mJLZ6fafhqoVDwLHZUSwvPm5hbvl22YrSZEleSwEeBB+iI5L+gBIJx//anpYMhAaRqkaAhDBV92ARKtWX6Zq56QSqIjZFq4VMGBskvC18GSlM3c=
+	t=1749032321; cv=none; b=nxjvSr9uP9OV8o6CQdKk0je9ANPVaX9oiiNlMc4KtmwrW64+ArgK17nhF+YjNpHu5B7Z09XhqegKyoZcpalazfEqAmW89tWcf/782fdHwmPkNbtm02TM8dI7DXp4ihAAzIlNCQKoCVJilZiTS2CCjIm3+I6Mo0n5m6afg4Ik/2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749032319; c=relaxed/simple;
-	bh=ABYn1sMyJ7uujizmA6GI0gKWAHxlKNtZyGYpWnh0rp0=;
+	s=arc-20240116; t=1749032321; c=relaxed/simple;
+	bh=IPj9u7dGaYETeW7dX1SNlOyX9Ol1NPhozZGLyinkLco=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ad+mSJab15gD0OfQGtAgsVNtba7vwh/hHdwL2IulYUG+fWcZn1hYvQHK+lKNpkA6oNfsGQh1wguraBn095lr/yDHuYlJdZXuHe1aTBqzXlwJ6iIAxjKYAq+qoJTfQtBceFJk3+9L4o4qajiZMnoUSvDWHyfKq5Bg05BgESD78qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NIic+ToQ; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=TJLBS8+U/jklIoaC2OazqwammWq7BujJFLoOyTDrYzioDSekeracOcaI0nw/T3Rv+bdo+UBhdpa/+vO2z8dXpv78+zirqKcOVGdGNgij4AKCMuh6YX0IV2eSt1o/8D4ZrYqumXnhJJOg3UPv06y0On/EfY6VsWFw4/W+ZHs+kxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLxxjFsu; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIic+ToQ"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-234e48b736aso78429735ad.3
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Jun 2025 03:18:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLxxjFsu"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235ea292956so1373665ad.1
+        for <linux-cifs@vger.kernel.org>; Wed, 04 Jun 2025 03:18:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749032316; x=1749637116; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749032317; x=1749637117; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=n9CjUb9vOs5POtU25rCaaN3b6Y1xuJ1kJ0I4yX8hOC4=;
-        b=NIic+ToQxWZ9YtDFT24kmzS967IHvzDrctW1SNb649pO92Q/E+v/QTeBUxsWYSf8D5
-         5whTtaslg+QZLO01dbk4/hmWOnGiGWHwrfd94Af1q+mQySTcJoEMNXA144ubRL9HBXd2
-         AXOkm0DlWOvIet+32RY2MPTM4Bl4El8rIi8I6ni4QOf6SGsL/hFsRSu//QlL6kx5BzIF
-         jpSQv0KbEQmQFK4UyhQU+RiAluiXFaQ568n3q9nQrqSLP2EFSA4ytXa3Q1/DoQSsbN/o
-         LU2uxlkoxI+tn93tw15fL1KSBi9yWfPk6ulLlTYDdsFd9KQkmIVD80R4YkoTHEnd9Zja
-         QJ7g==
+        bh=SMGQPDcFr59LjLvr6Tvg4uIejOoy+nc/9tdvuibx8fw=;
+        b=VLxxjFsupsXBARmZt3pxS3YfT4VLtNt/qLOIHQaobJzfX+Uwz9v0giGscOHavLf+2J
+         Roxn2GJuGBaGk+B1RGp2+fn2tCc1uyT+X2KK+vzSWs8VzLnqUijh9fu1PqL4JtxoLTzO
+         v6crTjRACvjrI/MrZkXew+thNP7/YOFuvc+YQ4Cejmsf3LxB0sll11yikAn9G7mr8b0I
+         PRoXRibPCTe5bK5O9O5LeS0HjM5CfSzhTZOUVQ0SdeH2Pd5SO7LO/J2LqrKrlk2cFuZ2
+         IhAvydliwCKU1tEhxvpqhrxN8zmfLFPOYLuOGyBpj496HVE1G2b7hwAU6c/28AyA+oBE
+         rI5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749032316; x=1749637116;
+        d=1e100.net; s=20230601; t=1749032317; x=1749637117;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n9CjUb9vOs5POtU25rCaaN3b6Y1xuJ1kJ0I4yX8hOC4=;
-        b=khLVdN9bzxL/7FWXSkyrfCbVnuHm9uEwV4e8kMCDuM7q7T75jR9ZsD0l3jJPkDBujI
-         4q6JQOqP59JZwj9Jqp4fSmeSwKfMdi9gtlLC8vEgjO2s0FSKzjwQF+aUS+m/mSI8yOOR
-         VhHoQlPBg61i3wh14kZC31brLxkIvz80MAIDQojhxZ0p5ZM/t7jj9Xup5znL18B0aJkP
-         OA4D5zJTazHCbca4y5/WXJOjf2bCKFx08bj035uWsiZLyLw4YFJ0TuHulSJ0mdTAwUdY
-         c0CprHDp+j4ffx5wvd5ebT6H6oIscJyZ9P0I3gVABd66ErKuYgYOCxwUnnLbNYHD9sZb
-         c4Yg==
-X-Gm-Message-State: AOJu0Ywp1PGn6O1gD3CBP2YiAOe6UcdL/HmDLjoaG+wv1RLsg71xWVne
-	4LvngRRPb3Dc6apWzalHeCUKAaq16N8ILWX93mCnhLa9QyBu3sZTJfSmIhnOeB73mtc=
-X-Gm-Gg: ASbGncuo56bPbiQMFEvTl8YS1sTwqdPaeW0DjVZzGIJ16Dgv+eMqnzIFh0AN2yjDkRF
-	VznHItzATWxYe2y1s462rqbyrOzSOe0Xzmvugp991RvmvVsWcRNJ/Wyu5qBolbSgRIbWyiHgeR7
-	F65l4jE0RUW4YOOFl4zdADUwBYGIAsJ/SCw8/qUmNf5dYV2dLoTpI7y0EDjlWwqwba3IpzDg+MQ
-	EjoHChZHOqnqcjNNHVPMOvEgazlFWXa7gEzoOMCOomoeMyIIkmEKRI/E6IQkXVSIPOA27wCEhbU
-	+GxxaFGN9q3XHzvrAewJsndo7GQaQu5gWoOd1OQQCcrT4mrEDmWYw1KxLoyZkxsvaCSOq0NoOel
-	pI5I=
-X-Google-Smtp-Source: AGHT+IH8CCfKyYbuc3AxvpPoW31UP4We/c2ccYggIIA86EziMpckiDtccQM820Wp+/AQ6XNT4vf6ig==
-X-Received: by 2002:a17:902:e951:b0:235:779:edfe with SMTP id d9443c01a7336-235e1255989mr34255355ad.43.1749032316523;
-        Wed, 04 Jun 2025 03:18:36 -0700 (PDT)
+        bh=SMGQPDcFr59LjLvr6Tvg4uIejOoy+nc/9tdvuibx8fw=;
+        b=q+UukpJsPzSHr8jlT+tJUrnuQo4Fc/oql2Onn/M37fqaDRJ7uvVAZIF3WZB4rwvS25
+         qRFLXNH+VcAR6gkDv+3u992MAd9+yGFQ6mz3TI5LzUfd4JjuRAyCl5H/FWq5urSFOTDJ
+         nhhM1NPvG7AwNndIx4kVpr/uuey/5MmgwIke5Ca93HByPwDIBbz7Dc86Ip1vjbuZo0bI
+         yKwCLazqDmGttFAWLKE5u44HxRQXZFaM1PxpHST/XglopZ6S/2fT8pTUxv8PLNoQXHmH
+         fMzVRcde2VYfiDZpzHDbFQg+uOT9hICQfVRoIpjqnmk7F9mlbZRtELChWTfkpyO9xigo
+         oNDw==
+X-Gm-Message-State: AOJu0YzUYccf7xqIjyU6Z9aiG63rVTdCgjLGRHLD01itzhYkukitxmEr
+	Zcd/ILqpTQUs43OZdX5g0xAh889sCPyfAkU+ddThZlS5BHCs7ZsVWLATYW/91MhslgY=
+X-Gm-Gg: ASbGncsroY70ilndL3Qe1W97DMem3Ot87baMctCRJHYscp9hExjRC5kexFGfpwXhmWf
+	YEwvu5u7rHXUdoTanBTSUsIzbpEorSKrzHt9psWdbnjxI77vpbmoduNBSkFvrNCX3FACrdHvrAC
+	0PIGiOulFY2TVzpoVoDZ7ek0DgVSeeinFkkP/ARcgsLvbhIHIqCCg1apUBXpuuA2T5MFCOCp+rc
+	PR7G+QWS4cu0S9ewCFbIUN00//QOTdPsrp15zwD5/DdrPeKRzPh0sAv31NbFllRPWAbasPw1t1c
+	YxIHVs5YXLoR325S6+u/eLFVIOEwRI77Ua3vo9actUg3xpZKQYSNZtB4CGqiC6OxPNCKJAf+t7j
+	FfTI=
+X-Google-Smtp-Source: AGHT+IEDzTgh4yVAUaM9S8O3WygY079J+XW1FqFH9Yvivbp8HFxks96cNGILoVFgW54Ui5v2wZSFYQ==
+X-Received: by 2002:a17:903:1a30:b0:234:d431:ec9d with SMTP id d9443c01a7336-235e1015a0cmr37399355ad.5.1749032317416;
+        Wed, 04 Jun 2025 03:18:37 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bf8132sm100563625ad.106.2025.06.04.03.18.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bf8132sm100563625ad.106.2025.06.04.03.18.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 04 Jun 2025 03:18:36 -0700 (PDT)
 From: nspmangalore@gmail.com
@@ -68,9 +68,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 6/7] cifs: tc_count updates should be done with tc_lock
-Date: Wed,  4 Jun 2025 15:48:15 +0530
-Message-ID: <20250604101829.832577-6-sprasad@microsoft.com>
+Subject: [PATCH 7/7] cifs: add new field to track the last access time of cfid
+Date: Wed,  4 Jun 2025 15:48:16 +0530
+Message-ID: <20250604101829.832577-7-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250604101829.832577-1-sprasad@microsoft.com>
 References: <20250604101829.832577-1-sprasad@microsoft.com>
@@ -84,48 +84,65 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-We had problems with deadlocks using the cifs_tcp_ses_lock for
-protecting a lot of structures. So we broke it down into smaller
-spinlocks. cifs_tcon struct fields are protected by tc_lock now.
-Hence we should stick to using that.
+The handlecache code today tracks the time at which dir lease was
+acquired and the laundromat thread uses that to check for old
+entries to cleanup.
 
-Fixes: 3fa640d035e5 ("smb: During unmount, ensure all cached dir instances drop their dentry")
+However, if a directory is actively accessed, it should not
+be chosen to expire first.
+
+This change adds a new last_access_time field to cfid and
+uses that to decide expiry of the cfid.
+
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
  fs/smb/client/cached_dir.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ fs/smb/client/cached_dir.h | 1 +
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 2746d693d80a..4abf5bbd8baf 100644
+index 4abf5bbd8baf..d432a40f902e 100644
 --- a/fs/smb/client/cached_dir.c
 +++ b/fs/smb/client/cached_dir.c
-@@ -650,10 +650,12 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
- 			spin_unlock(&cfid->fid_lock);
+@@ -213,6 +213,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	 */
+ 	spin_lock(&cfid->fid_lock);
+ 	if (cfid->has_lease && cfid->time) {
++		cfid->last_access_time = jiffies;
+ 		spin_unlock(&cfid->fid_lock);
+ 		mutex_unlock(&cfid->cfid_mutex);
+ 		*ret_cfid = cfid;
+@@ -365,6 +366,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	cfid->tcon = tcon;
+ 	cfid->is_open = true;
+ 	cfid->time = jiffies;
++	cfid->last_access_time = jiffies;
+ 	spin_unlock(&cfid->fid_lock);
+ 
+ oshr_free:
+@@ -741,8 +743,8 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+ 		spin_lock(&cfid->fid_lock);
+-		if (cfid->time &&
+-		    time_after(jiffies, cfid->time + HZ * dir_cache_timeout)) {
++		if (cfid->last_access_time &&
++		    time_after(jiffies, cfid->last_access_time + HZ * dir_cache_timeout)) {
+ 			cfid->on_list = false;
+ 			list_move(&cfid->entry, &entry);
  			cfids->num_entries--;
- 
-+			spin_lock(&cfid->tcon->tc_lock);
- 			++tcon->tc_count;
- 			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 					    netfs_trace_tcon_ref_get_cached_lease_break);
- 			queue_work(cfid_put_wq, &cfid->put_work);
-+			spin_unlock(&cfid->tcon->tc_lock);
- 			spin_unlock(&cfids->cfid_list_lock);
- 			return true;
- 		}
-@@ -767,11 +769,11 @@ static void cfids_laundromat_worker(struct work_struct *work)
- 		dput(dentry);
- 
- 		if (cfid->is_open) {
--			spin_lock(&cifs_tcp_ses_lock);
-+			spin_lock(&cfid->tcon->tc_lock);
- 			++cfid->tcon->tc_count;
- 			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
- 					    netfs_trace_tcon_ref_get_cached_laundromat);
--			spin_unlock(&cifs_tcp_ses_lock);
-+			spin_unlock(&cfid->tcon->tc_lock);
- 			queue_work(serverclose_wq, &cfid->close_work);
- 		} else
- 			/*
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index 93c936af2253..6d4b9413aa67 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -39,6 +39,7 @@ struct cached_fid {
+ 	bool on_list:1;
+ 	bool file_all_info_is_valid:1;
+ 	unsigned long time; /* jiffies of when lease was taken */
++	unsigned long last_access_time; /* jiffies of when last accessed */
+ 	struct kref refcount;
+ 	struct cifs_fid fid;
+ 	spinlock_t fid_lock;
 -- 
 2.43.0
 
