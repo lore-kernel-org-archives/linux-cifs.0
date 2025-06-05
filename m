@@ -1,102 +1,115 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E492E40E;
-	Thu,  5 Jun 2025 13:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1754C19CD1B;
+	Thu,  5 Jun 2025 15:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749130981; cv=none; b=WvMMEtaEVjqZevbzMdcHXT9bHHabEReyGgOpmBDBBDUc7xfUDNyeKOaDqlkgnkN/60OkNO5Ugmsfkxos1KKvmsC9TlXpgTPoVgozUnWBrhutClCYIVs6+BnWuoxqs7FxhjihnRl1KqVvvtQeWEk0RkoC2pd3aUpO11cnamQkTB8=
+	t=1749137942; cv=none; b=JsWKi/4w14duWnIalVnljXjFS99lcCbzQBVc2mJg/igayx2HGkQ6QQE78nGH/c5oNxHo83ps7siedV/RkEyf/a7WppCxAeaEA62d9gdByECYZIHMC6e7+Qjgs+KKDe/DowIlBG/gzzZSvqvR3+TvFB2nO9IQ9GaeWqb8jRGpqcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749130981; c=relaxed/simple;
-	bh=ZDaTLbspWsJYkFMbFVDMSx2aSEZZOtQzFXBqHuYVc+E=;
+	s=arc-20240116; t=1749137942; c=relaxed/simple;
+	bh=22wUPzgezYcFsR3CCShhwuc+dBaYwqkkVxHF3Zv3MRU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eNI5e5QQR8Lhol3jcs2+HQVdVNIY7sVPUavY6DYlDTA3cI9ST5V2jYj5kk5eRr1GY1nYB5lKR/JTqz4baDIsf4df2BIX8OZ4oQhD3k1b3VvqE4gGBOAP4Ddy9QQmfR9iZjNWFjGTNaDWUwNMCuSdRr5MSmj45QbrDXes824MNgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjjXWxbt; arc=none smtp.client-ip=209.85.208.48
+	 To:Cc:Content-Type; b=HztwwA3xImQufJW7uAtB8KAHJEn4SSFPDC8n7Jcf+06NQT1F4caq3VAo0OC3SPL0GjdLYkjIzUfiVbA57CxKcvrllMd5RSydVZOD1zaBWdQ2JICO1HNXZQCyOSmkRhQhmaW8iX5SOjXxycNpySrBR0CgBIpaZ6HHv3XxACTfLA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WHknZPi2; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjjXWxbt"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-60707b740a6so1322974a12.0;
-        Thu, 05 Jun 2025 06:42:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WHknZPi2"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5534edc646dso1241470e87.1;
+        Thu, 05 Jun 2025 08:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749130977; x=1749735777; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749137938; x=1749742738; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NNYkE3zwLLRZ/mwyxlP9oruoQDkKk7uF9dI/PyYXEU4=;
-        b=kjjXWxbtDc8WNOJ70DJAHIaq2nZ9CoUo8dfm+xOigS5QK1lMuTPQFDRc2lk6bdg8Mt
-         iJvRpDghDlJ8dWoeXYjNz+9qLRYIGGLsPxgJYsawBQL3Pbcr5l0OBZln9KDGkisjaw6k
-         W47ZEqQJH8N2BKBD/xNo6USRjFaRPlINAu7VMiB/JreMrWlZl3EoU4VwSxgZzp051Ece
-         vdduecSahLJD3/xILGXD/3HV+ghQPcv7bIe04nCnh2SaEI6zsESOIq+dRmMrGb8uj7OP
-         NSoFD6yDRZ1rxluh/sqAHcmmClNjBpTYfi2rvj3P9qa+gj1v4/BFc9vA8I9+bgUo3vrR
-         KjGQ==
+        bh=HcB+2uO+DiEejeTdCfelQfnF/TNIo8w7ThbXV9Hz9O4=;
+        b=WHknZPi2vDjOXGypxJ7n4r7mjKqytKVOK81xoiVTGbn+XUOxRbR8r9Xdc71ZKAs7Dj
+         EvwSoQe8iybdxszVScYlj1Sa1UQIm8PBS+DlExMteWCttimU0KoLcxy3m4n4eJod/haU
+         ZP5jelT0EKiwzVngB8NF2gxtiakjj0QtK6CoCM+EfxJZYO9yCeAtXUyaEBx1vZlaUrin
+         RjS6dw3aH3wYJi1RseOJgFsVLEGJLOnIMnuMcGSH5Zx9KqXIZzV3UYaIwEHNIkypU3sf
+         ZACIHCg1tPIfN05T1+p/ZNpbsPz2bQWQTM0CeGnIbgEIVU39nv1bahSWvJA5cNQIjNaj
+         Ka2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749130977; x=1749735777;
+        d=1e100.net; s=20230601; t=1749137938; x=1749742738;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NNYkE3zwLLRZ/mwyxlP9oruoQDkKk7uF9dI/PyYXEU4=;
-        b=H6E0RVWfP54aWFvbkM+Qg8NaRtryBHs1K1pnjdi8b4bDHViADUllIzio0GTNhc8DjL
-         cUd/IAq7VlM0ord6QxwsbQvWmX+H9s+BL7OkL/ByqxA3Dbl2a0WGMroRHtDKk1OhJc0S
-         E9TCHZQ2Orb3NZKE60YyyEu4y+Mr59LZLQMy/BDpryUt6MgDeKSvc2aC5wdSZ8K6tM7Y
-         ikOkTpiHN8MLbxb0xdXKfYxy6GWUzT03ZdE54n7C2p8w6jENsPpgLXP6d7C6hGueuhD0
-         1VI5lbJHGLPHWgnW2H1/CnZQnoBg8vaOs754/kRHObh7YaLvD8+iIT9DwB/kzLNYdfrd
-         44uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVL0ix5GcvAv9fwaSnaVK+jCd7LvRxw3ksZGb48L33yHdCBMcdSuULEoifgYntwOyIXWGeBov4nPV0ywg==@vger.kernel.org, AJvYcCWgZ4zl8K0uPCWj72K8+ZwzM9KTuDIf1OstdNsC+8sV70YbgrEzs8KK1D6co69fvwKkWY4fUX9k4cPqROtG@vger.kernel.org, AJvYcCXKpv/hvAI1fGKp5fcrnKFiHv9P6cPxKOVrRcKNNW6bQWUjQpy0Yj/LEEanX4LHTwzFj7iSoFRJqPx6@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK0JSkLSVWwAErSXtOADkop2aUVJf39qcNY6MDy+tWsOwGXW/D
-	AbXy3N/itcg2coe4bD9GM4GAuQP9oq5C+U+6Q1UMHhaIWSIJMbm33vHhRSlbUl5we8qbIFRHV9T
-	0MI+Oh9FYe3gvi6wD0f5sC4yj3ZZBcPg=
-X-Gm-Gg: ASbGnct/U0KVDrNDYUcH0BRCfedYAyuUITzDRY5d28a8mTeiOFcg0lPEm9rJx9PLPxq
-	NF1iwPn4PxTGdwt8aDcaSpZLgtwO34PVAYWOh88KDoEcuK8/7glI7v2JviXgUL1borzefe2PQOJ
-	ldHMkXMIxkFJqsVPFZBJbEkiVo+XrgBbS+L4g7cPjx6+GYT3YNiV705+CttTnZPz4=
-X-Google-Smtp-Source: AGHT+IEGRIDZrXauu6JWYOGuZQNfpCjgy9EHpgz/7KTxXLdbQljcB0PFB5wDQdDR+S6eZZxj94P0wdB3S/Cv8wNgC8w=
-X-Received: by 2002:a17:907:c15:b0:ad8:9257:5733 with SMTP id
- a640c23a62f3a-addf8ce46c4mr631367266b.20.1749130977178; Thu, 05 Jun 2025
- 06:42:57 -0700 (PDT)
+        bh=HcB+2uO+DiEejeTdCfelQfnF/TNIo8w7ThbXV9Hz9O4=;
+        b=CE+gynuVz0C8abEM2rtxLLYsLnJwKgqjmUZxizt5t1mIwww3m9QsZAE8KaGQ+2jPlS
+         41S63PRUzNu3n2CySE9wAgddC6B5x6tU3Q2W3fUr2VxkTW4DvphHtXxbiJtBnIeE9UAi
+         lYq8/FA7NyBeDboErjVQUDp6N1IRO+r+ptIFGEM5vbBBhr9OblZdS2TT1xHRkhanv4MO
+         lUBSVMFnGcnwVlR6fYD1+4vSzJiom9RD+O5a8/GLYT68R6vHONPsHc3ouiCh8o1MTxQM
+         M50dUVG90XDG/f5s/C9VmrQ3MZi3w7fXxUYMihheco7LPrsdeCy+CfdNxYRS5hPp4hN3
+         jPqw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8+SpH+lpQoCltGTyZP4yE8CHYedQDSv87ZU/Wqjr25zJ/qFXmT+C1m7R6bhrwy8O18QGFeaWgSAupqIvQ@vger.kernel.org, AJvYcCX4bUKKtzgy+DRRuzgWCjtUGTDASau1SbZ4nhigI1TJoxd2Z0kCFlAHG9f9iYL1fTCWlq6eOdsATHIGYA==@vger.kernel.org, AJvYcCXFZzDAZCeFCSNs4KdiXbfzSO4ueWi0i8iOneRXwl66zgWoDPFg648I3VpVb51X8aNCtCcqty/eFHSC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx6P6FVb0NK7RsWEXME+L1edBmGZliFfoYy+YZ7KRLTcV6O8Lv
+	EfKFMV94ufjMhd2UISINJcSzhjws/mEYOvjSg2yOwEE6xM2T4kApERHIiaeiig9Zs2rvkeVIUOi
+	sho0Tx1l69NtM8ZXgAqC7uWks5qFtD4F6pQ==
+X-Gm-Gg: ASbGncvk8cWBe4rsd9h6y54EzRsvyg+zorL5dJMrMRRtZ8x1/4uQV/zLeMASqKv4mYy
+	CA02Rksegb8DpGPXC8+1G2NYkKuRtxQ8StT5FiObRenbJDz8Pe4NJ0TPZi2T9N8Ov+bmz3iInzy
+	86QFGboffmxrd5QAw6CmDgGaCM2WdHk829m2/OC32cSV4oxv/vXZT7ni4iL0jsTh5nxqE=
+X-Google-Smtp-Source: AGHT+IHC0f5GGqfgNYGwYwSJIeCwEeKdUI2gdyPCvWXWvqUIECUup6LHJyV7c8AwxFYEGPiNja450oF/CxkrpZQrfjk=
+X-Received: by 2002:a05:6512:3b1f:b0:553:358e:72a8 with SMTP id
+ 2adb3069b0e04-55356df1d2fmr2286769e87.38.1749137937811; Thu, 05 Jun 2025
+ 08:38:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605160540.76a4c651@canb.auug.org.au>
-In-Reply-To: <20250605160540.76a4c651@canb.auug.org.au>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Thu, 5 Jun 2025 19:12:44 +0530
-X-Gm-Features: AX0GCFvTtwlzLe3ShBatCkGpgZEQMQYDIp7QZYz6BwjTcXKR31Yiwtz2L-cwk5I
-Message-ID: <CAFTVevUGg-HVfd1EBq3BXazLqTbHwALGknFLfyN-rGZv_0UfRQ@mail.gmail.com>
+References: <20250605160540.76a4c651@canb.auug.org.au> <CAFTVevUGg-HVfd1EBq3BXazLqTbHwALGknFLfyN-rGZv_0UfRQ@mail.gmail.com>
+In-Reply-To: <CAFTVevUGg-HVfd1EBq3BXazLqTbHwALGknFLfyN-rGZv_0UfRQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 5 Jun 2025 10:38:45 -0500
+X-Gm-Features: AX0GCFsqAAgN59eyU8C93ApSPcobAOUpcdCsm_vNaegjBecArEq0Qzg7Gga9mJk
+Message-ID: <CAH2r5mt1cQnAUQVbKmkM5CQq+XCvbQJiQNH9F6vsJdQw7ZHyTA@mail.gmail.com>
 Subject: Re: linux-next: build warning after merge of the cifs tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Steve French <smfrench@gmail.com>, Meetakshi Setiya <msetiya@microsoft.com>, 
+To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Meetakshi Setiya <msetiya@microsoft.com>, 
 	Steve French <stfrench@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>, 
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
 	Linux Next Mailing List <linux-next@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Stephen
+cifs-2.6.git for-next updated with the fixed patch
 
-Thanks for letting me know. I have sent a patch to fix it.
+On Thu, Jun 5, 2025 at 8:42=E2=80=AFAM Meetakshi Setiya
+<meetakshisetiyaoss@gmail.com> wrote:
+>
+> Hi Stephen
+>
+> Thanks for letting me know. I have sent a patch to fix it.
+>
+> Best
+>
+> Meetakshi
+>
+> On Thu, Jun 5, 2025 at 11:35=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.o=
+rg.au> wrote:
+> >
+> > Hi all,
+> >
+> > After merging the cifs tree, today's linux-next build (htmldocs) produc=
+ed
+> > this warning:
+> >
+> > Documentation/filesystems/smb/smbdirect.rst: WARNING: document isn't in=
+cluded in any toctree
+> >
+> > Introduced by commit
+> >
+> >   b94d1b9e07ba ("cifs: add documentation for smbdirect setup")
+> >
+> > --
+> > Cheers,
+> > Stephen Rothwell
 
-Best
 
-Meetakshi
 
-On Thu, Jun 5, 2025 at 11:35=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (htmldocs) produced
-> this warning:
->
-> Documentation/filesystems/smb/smbdirect.rst: WARNING: document isn't incl=
-uded in any toctree
->
-> Introduced by commit
->
->   b94d1b9e07ba ("cifs: add documentation for smbdirect setup")
->
-> --
-> Cheers,
-> Stephen Rothwell
+--=20
+Thanks,
+
+Steve
