@@ -1,63 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2278462;
-	Thu,  5 Jun 2025 03:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D7586337;
+	Thu,  5 Jun 2025 06:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749092602; cv=none; b=BifIZDOKmqJhIe3jrSiRxBHpS9d3UL2shyw8KXjPp+kTM0Rvr9CwE1AXiC/GvVZufhsxSPBDGBdc3VxOOj5UE5uKTvCb7DbO6Cz7eizzv4BoUXY4TcIhdKNpxB+n1BdCSs1v9PS0Q6gVMaGCueXzbFQQFoLDcu3C9BEWoXDMGOg=
+	t=1749103551; cv=none; b=RoR9eNRmTNlaS/+y2WqJS3I52N8IRy/CJOIRLk8Bgiovr3+tqcVxL8h2z8hWMtseysx4npm8h9ah49rQ7F+mOAFlulOJ6XvDeND7eRbVhcIee4bwjJz2WiOgIG/WWGtzCiNRG63I5qq/Jv+bARvhUbktl7wQdFu/iDMQ2stuLO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749092602; c=relaxed/simple;
-	bh=puViIcy0fLmx48qFkHTXomeoMb2W/ioS2AUHaXZ54eA=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Ff2cpH/+M+ibU1ESKx/9hbXi8XKcGsySfJbBtXqR69XoQmYDQgveS2O08dg4OOE5sBpSKwEg5PXyAqzWH0CqKYeNGVzbHn5aj3qkyYAUTUCAM3+dq8R6IzWUzcKSMJQUYxwJinPHo4VT/5vkbZTME0AgFYz6xXonsVfb1/IRiNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHKN0hlE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749103551; c=relaxed/simple;
+	bh=sqgDfnN4N0J3wueLo9uBRnQ3TdtwpgSzJhcKSr1k4kk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=i/Upk0ay4/OJlFhkvxuIxtY5Q8XZXIPdyJyjHxbZhytM8/hKmM6t3yXKTTZXLw/erseiQEVt4t6pVXIydOA7Bi3VnxXFQQaVpUlYNwVdxF+qw3oK3/xTGi7qEH34Bgsx4Bg+vSWhrd3mOmSOCAfcKZYyVZTWYRfG0SUL2FjTAbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=QGSUpdN0; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHKN0hlE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A3C9C4CEE4;
-	Thu,  5 Jun 2025 03:03:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749092602;
-	bh=puViIcy0fLmx48qFkHTXomeoMb2W/ioS2AUHaXZ54eA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=ZHKN0hlEVfsOXvnmvvpqHgxmMWtvIFW1pTGWoHQb+Q9dxHU4zIBSQVw/OpKL7JaLK
-	 UdmPB85jWmIz0vsMqd39pzf9uyzoI/RJlWKLCB2sUKOsUyyDxFtWfSpydxGOOcFbCz
-	 tsVuCxjydyXUNBuSV3yHjC7BnJr9JhE3G+qbd6fzfrZlpQLVzexALfJTTa/A8hHy/W
-	 CKerneXb9/gXyGM6NZ3aTtiTEF7Y7gICyUesm6grBZKRjqiZkBhuGSJgPQtJCdkZAi
-	 dXTlz6Crm9bbegE3pCkteecWnEURvtd37OyxQ34sIlAYLG7ZvZZ3AfQ04Dj5/Zu8vV
-	 uyIfM3mhwINZw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0C1380CED9;
-	Thu,  5 Jun 2025 03:03:55 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd sever fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muDAU9fFmkDERtE_Dvrt2HgC4s9t1wH-uHG6B4vQH39iw@mail.gmail.com>
-References: <CAH2r5muDAU9fFmkDERtE_Dvrt2HgC4s9t1wH-uHG6B4vQH39iw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muDAU9fFmkDERtE_Dvrt2HgC4s9t1wH-uHG6B4vQH39iw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.16-rc-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: dc3e0f17f74558e8a2fce00608855f050de10230
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d2fec01e89447729c7b9d722a8e7ef9d1184c7be
-Message-Id: <174909263420.2554386.1610719925903832578.pr-tracker-bot@kernel.org>
-Date: Thu, 05 Jun 2025 03:03:54 +0000
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="QGSUpdN0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1749103541;
+	bh=FBf32aloc4DGnuQVM6vOKg22DnQbQHJTGpi+iyZQLjQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=QGSUpdN0x93Vhp/ouJLRw8PHZ91FHqR719A/sILSPKBnpGpGTeMKnANd9Vp17umBB
+	 hcBBl0/aQ79HG8Z3O/Q73znw3WLkI/GvXwMU/guqgOkEKDC9aFO+ldGDwI4mvKQ42F
+	 RQqdGkM9d7AN1PQpCZfiwdj1x5AK0JXHgi0+XxYvc67yQbjfAYvkLgF2BjtnwpbKBR
+	 jIqCNAb+3hF7J7m+vwjAZ2r1v/8VChAbE9wdiczvtj/OkdjBYvxO39VSAI79BSlcXl
+	 FfQ3qmLjc4ht2/YNcwxORZqtkQdtfLl3g+lR7XSDojQrc7ZEekid66sPaIR+NDGnOF
+	 w6vxmlxwadb9Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bCYpY492Sz4x7j;
+	Thu,  5 Jun 2025 16:05:41 +1000 (AEST)
+Date: Thu, 5 Jun 2025 16:05:40 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+Cc: Meetakshi Setiya <msetiya@microsoft.com>, Steve French
+ <stfrench@microsoft.com>, CIFS <linux-cifs@vger.kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the cifs tree
+Message-ID: <20250605160540.76a4c651@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/EX/gxNEihzoWEfJCUPI6oAa";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-The pull request you sent on Wed, 4 Jun 2025 18:20:46 -0500:
+--Sig_/EX/gxNEihzoWEfJCUPI6oAa
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> git://git.samba.org/ksmbd.git tags/6.16-rc-ksmbd-server-fixes
+Hi all,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d2fec01e89447729c7b9d722a8e7ef9d1184c7be
+After merging the cifs tree, today's linux-next build (htmldocs) produced
+this warning:
 
-Thank you!
+Documentation/filesystems/smb/smbdirect.rst: WARNING: document isn't includ=
+ed in any toctree
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Introduced by commit
+
+  b94d1b9e07ba ("cifs: add documentation for smbdirect setup")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/EX/gxNEihzoWEfJCUPI6oAa
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhBM7QACgkQAVBC80lX
+0GzgPQf/fzMUypV5BngavlSqlHxMFB6N7CcQVD7KhiPDMvA76ZH3tXxK81CWqkO/
+T5QP4jrZspJO7HQx7DOFmMX/df/vG7T6Y+9NEDGq/7O9vj6Hzn1w2wkAnnAU6cdG
+rJ/V5WKaJQeVh2KroYOz13WttRUz19NP0sHuGVXbmcwUZPNTfE+d8bN2ygssYtx3
+9pH8LK/J9IgWlVdmIQl6Zcuzyc0luYd1GcTP2ZlNJur8/eT4VLYylocR0oL6AOsr
+Y9f3eZyEVb1r+GC59FVlNvZmJkJMpVJ5XfiS2DDpOvCiRaClJ6ED3dpSJZqNu42I
+zw70TaiPDlIfn5h7OP44XStwqZefDQ==
+=N/+H
+-----END PGP SIGNATURE-----
+
+--Sig_/EX/gxNEihzoWEfJCUPI6oAa--
