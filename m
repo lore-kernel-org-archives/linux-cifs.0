@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2BDEEB5;
-	Fri,  6 Jun 2025 15:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8235F13DBA0;
+	Fri,  6 Jun 2025 15:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749224550; cv=none; b=ceu8lHq18Dx21fmY7+yBtECVSYk78rE4srr2o69Mgz5hoxwMZ2eXMro9ethKYKDI5iqErC0TETrDjUoQ4KAS4S9WHGrBXO59GjemFyhRwH6maISEMBhK2uHWHR0ephiSjTbUw4q4QFSrXjPxJMJsFLJUcuHYQ3mJtyRzBWwPVv0=
+	t=1749224552; cv=none; b=POp/qqGDdZcfAvJr+89wXtHRzm31SIhBszm1ovuHNLYCbHLP1Z7QE78dmbgmvKHon15lZ4YKfgZddIpGWZOV9WhWjoUYNLvgCKi0zxTMkfCtArqn5IU+HAn7dmn3LrdNss4ZvgG4WIauphIXkfHy9PiH2eBU8m+KLFXdG676lqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749224550; c=relaxed/simple;
-	bh=/daKLeljhQCLwFbUpg+T3BXnm4eP/oSDyNjs1VvwAKQ=;
+	s=arc-20240116; t=1749224552; c=relaxed/simple;
+	bh=LmMvFhf8P7fOBvG+R2n/nIKbi0RmKtwrnlZjO/Y/6+s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T61g/Xu6IAXvV7wnYABxXTKWTz7gDV2E2ZH9aYlOI46lrqJ/D96bMv4pwwSj9mDlqoM5L2CDAdiV1RBEchacEdL2/XlZ5ZqEeoBrVW9EHejuG+PlJ0S5+l72hHsnXcsz0v4fD0Bf9cpvnxBJrqIT5Fd/CrnfH8eFLU2B2l4vDL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxrQ4EWb; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=NLJTyclm349JE9BgsPajqq7iAl1JR2rdBqvcr1E48u/z+3KEgZLhw6jXlWWiXF/7TT7H7SZE79ZHwhlgnhkZcT7XbbonB+8SXjg5Kqd0r1iLjKBUm2/1yGYGbd7BTVb4EqPOXGq+DLf30YWl7aC3s1V8cqBlhu3m7V1Qlb2FWeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MU1fF88j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxrQ4EWb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9077CC4CEED;
-	Fri,  6 Jun 2025 15:42:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MU1fF88j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B65C4CEEB;
+	Fri,  6 Jun 2025 15:42:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749224549;
-	bh=/daKLeljhQCLwFbUpg+T3BXnm4eP/oSDyNjs1VvwAKQ=;
+	s=k20201202; t=1749224551;
+	bh=LmMvFhf8P7fOBvG+R2n/nIKbi0RmKtwrnlZjO/Y/6+s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qxrQ4EWb4uH3gsJL5SL9Ca9VqhQCr6LJGMHOhubUjQnuBQUuFeaA50fqWkUPElF54
-	 s2/t9sKV0bwGrw+67JgvhbMrWuHpK6z89ZZhIfGJOmomZ8fsGWsYpeXmRwj1qE18oi
-	 2ktF4l7XiJH9oJ2yEaQAQq8TCCrNlV809PyRfUN2PbRImr2A/0Uisndv+AX7snxvdr
-	 Wb9afnea4f2wuLhiPuxyneIfDWUQM3AACpW7rrdoa8Ta8gv29t02SDIvtb3dCNNx8k
-	 WiDep42/PQrJXrK8DzWuU4vlfaPkE4LzM5RepojJJJj3bWQbQvifhzgNw5UzGWIjgJ
-	 p0L3xZkg7QoRA==
+	b=MU1fF88jSkq/H/8oE1HdiZxazpS6jQRj3dtKvpDtfB1mMUtuD2uK2bB15EUfnEvnA
+	 GWRKnL5S8Hmmj+p+UkVCDDeDn586Hi48tPJeRxiS8eqZSnf2oT4teXpz8g011rn8it
+	 AoXQF6PUtljOQ4ItpyzOrHjkHVBCqIqPwpuQMaHIGUdYciftijIzS4C24TqM4PndJN
+	 qF1dN1W5aeDxrfSmo9+0LV+LxfELCEb+rxD6WGJoVG1irtp2CJFCwS8M7m3VN2uHhp
+	 z9lANML8mDuQ9pHqgfvjFTY6fqjUP0ZH+A669TYzua5EY7G6vGYv/kshHvM213mCZC
+	 VMyILyQQFVUDw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,9 +35,9 @@ Cc: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.14 02/19] cifs: Fix cifs_query_path_info() for Windows NT servers
-Date: Fri,  6 Jun 2025 11:42:08 -0400
-Message-Id: <20250606154225.546969-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 03/19] cifs: Fix encoding of SMB1 Session Setup NTLMSSP Request in non-UNICODE mode
+Date: Fri,  6 Jun 2025 11:42:09 -0400
+Message-Id: <20250606154225.546969-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250606154225.546969-1-sashal@kernel.org>
 References: <20250606154225.546969-1-sashal@kernel.org>
@@ -55,107 +55,118 @@ Content-Transfer-Encoding: 8bit
 
 From: Pali Rohár <pali@kernel.org>
 
-[ Upstream commit a3e771afbb3bce91c8296828304903e7348003fe ]
+[ Upstream commit 6510ef4230b68c960309e0c1d6eb3e32eb785142 ]
 
-For TRANS2 QUERY_PATH_INFO request when the path does not exist, the
-Windows NT SMB server returns error response STATUS_OBJECT_NAME_NOT_FOUND
-or ERRDOS/ERRbadfile without the SMBFLG_RESPONSE flag set. Similarly it
-returns STATUS_DELETE_PENDING when the file is being deleted. And looks
-like that any error response from TRANS2 QUERY_PATH_INFO does not have
-SMBFLG_RESPONSE flag set.
+SMB1 Session Setup NTLMSSP Request in non-UNICODE mode is similar to
+UNICODE mode, just strings are encoded in ASCII and not in UTF-16.
 
-So relax check in check_smb_hdr() for detecting if the packet is response
-for this special case.
+With this change it is possible to setup SMB1 session with NTLM
+authentication in non-UNICODE mode with Windows SMB server.
 
-This change fixes stat() operation against Windows NT SMB servers and also
-all operations which depends on -ENOENT result from stat like creat() or
-mkdir().
+This change fixes mounting SMB1 servers with -o nounicode mount option
+together with -o sec=ntlmssp mount option (which is the default sec=).
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** This commit should be backported to stable kernel trees. Here's
-my extensive analysis: ## Backport Recommendation: YES ### Nature of the
-Fix This is a **targeted bug fix** that addresses a specific protocol
-compliance issue with Windows NT SMB servers. The commit fixes a
-fundamental problem where basic file operations (`stat()`, `creat()`,
-`mkdir()`) fail against Windows NT servers due to overly strict SMB
-header validation. ### Code Change Analysis The fix is remarkably
-**simple and contained** - only 8 lines of code in a single function:
-```c /bin /bin.usr-is-merged /boot /dev /etc /home /init /lib /lib.usr-
-is-merged /lib64 /lost+found /media /mnt /opt /proc /root /run /sbin
-/sbin.usr-is-merged /snap /srv /sys /tmp /usr /var * Windows NT server
-returns error resposne (e.g. STATUS_DELETE_PENDING * or
-STATUS_OBJECT_NAME_NOT_FOUND or ERRDOS/ERRbadfile or any other) * for
-some TRANS2 requests without the RESPONSE flag set in header. */ if
-(smb->Command == SMB_COM_TRANSACTION2 && smb->Status.CifsError != 0)
-return 0; ``` The change is in the `check_smb_hdr()` function in
-`fs/smb/client/misc.c`, which validates SMB packet headers. The fix
-**relaxes validation** only for a very specific case: TRANS2 commands
-returning errors from Windows NT servers. ### Risk Assessment: LOW 1.
-**Surgical precision**: Only affects SMB1 TRANS2 error responses,
-leaving normal operation paths untouched 2. **Conservative approach**:
-The condition `smb->Status.CifsError != 0` ensures this only applies to
-actual error responses 3. **No behavioral changes** for compliant
-servers that properly set the RESPONSE flag 4. **Well-established code
-path**: The `check_smb_hdr()` function is mature and stable ### Impact
-Assessment: HIGH 1. **Fixes broken functionality**: Without this fix,
-basic file operations fail completely against Windows NT servers 2.
-**Backward compatibility**: Restores support for legacy but still-used
-server environments 3. **User-visible improvement**: Directly fixes
-`stat()`, `creat()`, and `mkdir()` operations 4. **No regressions**:
-Modern SMB servers continue to work as before ### Comparison with
-Similar Commits Looking at the provided similar commits: - **Similar
-Commit #2** (Status: YES): Also adds new status code mappings for better
-server compatibility - **Similar Commit #3** (Status: YES): Reduces
-unnecessary network roundtrips by improving error handling - **Similar
-Commit #4** (Status: YES): Fixes WSL reparse point querying over SMB1 -
-**Similar Commit #5** (Status: YES): Fixes missing resource cleanup This
-commit follows the **same pattern** as these approved backports: small,
-targeted fixes that improve compatibility and fix real-world issues
-without introducing new features or architectural changes. ### Technical
-Justification The Windows NT server behavior described in the commit is
-**non-compliant but real**: these servers return error responses for
-TRANS2 QUERY_PATH_INFO requests without setting the `SMBFLG_RESPONSE`
-flag. The current strict validation incorrectly treats these as invalid
-packets, causing the CIFS client to fail when it should handle the
-errors properly. The fix is **protocol-aware** and **conservative** - it
-only relaxes validation for the specific case where we know Windows NT
-behaves differently, ensuring no impact on standard-compliant servers.
-### Stable Tree Suitability This commit perfectly fits stable tree
-criteria: - ✅ **Important bug fix** affecting real-world usage - ✅
-**Minimal and contained** change with clear scope - ✅ **No new
-features** - purely fixes existing broken functionality - ✅ **Low
-regression risk** due to targeted nature - ✅ **Production-ready** code
-following established patterns This should be backported to all stable
-kernels that support SMB1 client functionality, as it fixes a
-fundamental compatibility issue without any meaningful risk of
-regression.
+Based on my analysis of both the commit and the kernel source code, I
+can now provide a comprehensive assessment: **YES** This commit should
+be backported to stable kernel trees. Here's my extensive analysis: ##
+Bug Fix Analysis This commit fixes a **functional bug** that prevents
+SMB1 sessions from being established when using specific mount options.
+The code changes address a critical logic error in the NTLMSSP session
+setup for non-UNICODE mode. ### Problem Being Fixed The original code in
+`_sess_auth_rawntlmssp_assemble_req()` contains this problematic check:
+```c if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) { cifs_dbg(VFS,
+"NTLMSSP requires Unicode support\n"); return -ENOSYS; } ``` This check
+**incorrectly rejects** all non-UNICODE sessions for NTLMSSP
+authentication, making it impossible to mount SMB1 servers with: - `-o
+nounicode` (non-UNICODE mode) - `-o sec=ntlmssp` (default security mode)
+### Technical Solution The fix removes this incorrect validation and
+implements proper dual-path handling: ```c if (pSMB->req.hdr.Flags2 &
+SMBFLG2_UNICODE) { /bin /bin.usr-is-merged /boot /dev /etc /home /init
+/lib /lib.usr-is-merged /lib64 /lost+found /media /mnt /opt /proc /root
+/run /sbin /sbin.usr-is-merged /snap /srv /sys /tmp /usr /var unicode
+strings must be word aligned */ if
+(!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2))
+{ *bcc_ptr = 0; bcc_ptr++; } unicode_oslm_strings(&bcc_ptr,
+sess_data->nls_cp); } else { ascii_oslm_strings(&bcc_ptr,
+sess_data->nls_cp); } ``` This correctly handles both UNICODE and non-
+UNICODE modes by: 1. **UNICODE path**: Uses UTF-16 encoding with proper
+alignment 2. **Non-UNICODE path**: Uses ASCII encoding without alignment
+requirements ### Why This Qualifies for Backporting 1. **User-Affecting
+Bug**: The bug prevents legitimate SMB1 connections with common mount
+options, causing mount failures that users would expect to work. 2.
+**Small, Contained Fix**: The change is minimal (removes 4 lines, adds 8
+lines) and confined to a single function. Risk of regression is very
+low. 3. **No Architectural Changes**: This fix doesn't modify the
+NTLMSSP protocol implementation or introduce new features—it simply
+corrects existing logic. 4. **Similar Pattern to Accepted Backports**:
+This closely matches "Similar Commit #1" which was marked "YES" for
+backporting. Both commits: - Fix SMB1 Session Setup encoding issues -
+Handle UNICODE vs non-UNICODE mode correctly - Extract common code
+patterns for consistency - Are small, targeted bugfixes 5. **Legacy
+Protocol Support**: While SMB1 is deprecated, it's still supported in
+the kernel under `CONFIG_CIFS_ALLOW_INSECURE_LEGACY`, and users who
+explicitly enable it deserve working functionality. ### Code Correctness
+Verification The fix is technically sound because: -
+**`ascii_oslm_strings()`** and **`unicode_oslm_strings()`** are
+established functions already used elsewhere in the codebase for
+Kerberos authentication (`sess_auth_kerberos()`) - The same dual-path
+pattern exists in other session setup functions - The NTLMSSP protocol
+itself still uses UNICODE internally (for username/domain encoding), but
+the session setup strings can be ASCII - The alignment logic is
+correctly applied only to UNICODE mode where it's needed ### Risk
+Assessment **Very Low Risk**: - Fix is isolated to SMB1 NTLMSSP session
+setup - Only affects the non-UNICODE code path that was previously
+broken - No changes to the core NTLMSSP authentication logic - Pattern
+matches existing working code in the same file This is a clear bugfix
+that restores intended functionality without introducing new features or
+architectural changes, making it an ideal candidate for stable tree
+backporting.
 
- fs/smb/client/misc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/smb/client/sess.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index b328dc5c7988d..2d8ea4d6488ae 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -324,6 +324,14 @@ check_smb_hdr(struct smb_hdr *smb)
- 	if (smb->Command == SMB_COM_LOCKING_ANDX)
- 		return 0;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index 6d6491e035718..0eced71808966 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -1684,22 +1684,22 @@ _sess_auth_rawntlmssp_assemble_req(struct sess_data *sess_data)
+ 	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
  
-+	/*
-+	 * Windows NT server returns error resposne (e.g. STATUS_DELETE_PENDING
-+	 * or STATUS_OBJECT_NAME_NOT_FOUND or ERRDOS/ERRbadfile or any other)
-+	 * for some TRANS2 requests without the RESPONSE flag set in header.
-+	 */
-+	if (smb->Command == SMB_COM_TRANSACTION2 && smb->Status.CifsError != 0)
-+		return 0;
+ 	capabilities = cifs_ssetup_hdr(ses, server, pSMB);
+-	if ((pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) == 0) {
+-		cifs_dbg(VFS, "NTLMSSP requires Unicode support\n");
+-		return -ENOSYS;
+-	}
+-
+ 	pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+ 	capabilities |= CAP_EXTENDED_SECURITY;
+ 	pSMB->req.Capabilities |= cpu_to_le32(capabilities);
+ 
+ 	bcc_ptr = sess_data->iov[2].iov_base;
+-	/* unicode strings must be word aligned */
+-	if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
+-		*bcc_ptr = 0;
+-		bcc_ptr++;
 +
- 	cifs_dbg(VFS, "Server sent request, not response. mid=%u\n",
- 		 get_mid(smb));
- 	return 1;
++	if (pSMB->req.hdr.Flags2 & SMBFLG2_UNICODE) {
++		/* unicode strings must be word aligned */
++		if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
++			*bcc_ptr = 0;
++			bcc_ptr++;
++		}
++		unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
++	} else {
++		ascii_oslm_strings(&bcc_ptr, sess_data->nls_cp);
+ 	}
+-	unicode_oslm_strings(&bcc_ptr, sess_data->nls_cp);
+ 
+ 	sess_data->iov[2].iov_len = (long) bcc_ptr -
+ 					(long) sess_data->iov[2].iov_base;
 -- 
 2.39.5
 
