@@ -1,89 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C2BD530
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Jun 2025 23:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C0D283FE6
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Jun 2025 07:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749165362; cv=none; b=naAzqzC8HTh6sd8c917BYn1qNQnlCTShRk41i0hI4W8UagRVNPqzLyIlJVDwISZZ+6nyxq6UsTqzixL8ahnR3f39f5unQhZcGr2Qjwb5j0dlTSC/3eX6yZipDye0Z2eKO+GCmWQ7qiLjHZm8Rr6+jip+CGEByNScqahQhCBKVvU=
+	t=1749193841; cv=none; b=BkjA8S6THJ9KMp7zlE3+w8Dx2Yqh2scuKF7065diN/7xPcyUID+RSpLzKUbdLJB5UbMNM18vrglXnWZeQsOAqjX3KqihlsNo+zaWsxoRASwug9pzWRYNWKWYaoTXAadorozxcCh9tnt1nMsSnijE29zjE/2qn6omhbDMBR8dbRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749165362; c=relaxed/simple;
-	bh=ybdAGYmB13OCWNJgHoE15+edqTI4VIaNRCfI9e9pArQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YnR6DhXk+X1hIGpdoHfgJ3O+Acg1GQ6gG1Qo5n7gVMtgaxwEMJ+R4TzoBe2+bnuxQas7xmYajCty0WXyL8NXv6TAedV+HiOvWbnUVcbAgCRfsfr8NC9yOXcAzgzITa99daH4LosoJ4h14rCjujIFWOmWbzRvpvYaHl14lbs292Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=umPd0X3R; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umPd0X3R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE565C4CEEE
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Jun 2025 23:16:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749165362;
-	bh=ybdAGYmB13OCWNJgHoE15+edqTI4VIaNRCfI9e9pArQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=umPd0X3RNbTpMjR+C3TCqqe5ywVCuBEG63u9HdeKSPD7RJKWhkK6MQSV9ddeHuR1f
-	 V5snJBOBR0YIVd5wOTgL0c8r3YemEjCaJjDf8itGGodIOhi6ihJvi2+evUgz+CksLa
-	 cRWCbUhyqy6Xept0GDAWhh0Rn8Ef55bSkPdGx+bTSmFyGR6Fz7SkzWxXFdQ/SQd0OH
-	 A+vRBKmgEQyuCgFLM9YnjybqWne97P43BIzm4u97fw54Z4VDNdiyrV1tX8Ju9HieOi
-	 EN7MaXVl+ZXx8WAA6XeOmA/Cb0aul3+b4mYvfPBt74SVqtAmQacxG/pxVLdg7F9aI/
-	 iccIqw8zSTUrw==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-acb39c45b4eso237546366b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Jun 2025 16:16:01 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yx2zVsVCJYt5aS1elJMy2ljc8fduSGInQILoJo6Cp9/wYXeOP1H
-	mNrVeO1WSOQflIrPSeusF1YnnsGLgzhUxOTqesgqoMICgnYVR3fINsr1UWe73WefIwHuFQe31c+
-	vsk218w/R4xFQSnPMYOr21F5VCCI4xfg=
-X-Google-Smtp-Source: AGHT+IHptR2E3icHQ9iZLhj9C+89w7ZINpMMjoyIa3IjufiSDNGfMBApRg+fX0cUwzdwJWA9LJTwF3QFekK7COF3cVo=
-X-Received: by 2002:a17:907:96a8:b0:ad2:46b2:78b2 with SMTP id
- a640c23a62f3a-ade1aa4dd5dmr96585266b.18.1749165360507; Thu, 05 Jun 2025
- 16:16:00 -0700 (PDT)
+	s=arc-20240116; t=1749193841; c=relaxed/simple;
+	bh=UiDqCiYupZchjvUWUfD2xitU5eq4IlyPeM7J5hk1gQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Kl4c4uJ7Do9NsHlLlfRDqvT58CWKK5lvv/i0EyWZuJkPjtFNxH5d75dnvnrZ6PDgfLslPzSyZSXgDIHwkH9IwxzoacpZf/knwCywp9eB1SnWWAJar0t655JnpTSGyKLnAJnDcsl4TxRyh526qWbeewi+q0F2JZQWJqdLTMLKC90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bDBjv6B4SzRk3f
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Jun 2025 14:48:51 +0800 (CST)
+Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id BEAD41402FC
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Jun 2025 14:53:02 +0800 (CST)
+Received: from [10.174.178.209] (10.174.178.209) by
+ kwepemg500010.china.huawei.com (7.202.181.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 6 Jun 2025 14:53:02 +0800
+Message-ID: <35a57e9c-e5d5-4e78-93d7-83fc147080fb@huawei.com>
+Date: Fri, 6 Jun 2025 14:53:01 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605134118.31162-1-meetakshisetiyaoss@gmail.com>
-In-Reply-To: <20250605134118.31162-1-meetakshisetiyaoss@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 6 Jun 2025 08:15:49 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_vMAOcTKirmnqMxVYuZyZ-BXkESaCyojPnb-GNj9Ecxw@mail.gmail.com>
-X-Gm-Features: AX0GCFtwADtaWTbPMX2v5JIJDGROEH6qWHSEE-nc-SYlQbborJySaXe-BbClbZ4
-Message-ID: <CAKYAXd_vMAOcTKirmnqMxVYuZyZ-BXkESaCyojPnb-GNj9Ecxw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add smbdirect.rst to toctree
-To: meetakshisetiyaoss@gmail.com
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, nspmangalore@gmail.com, 
-	bharathsm.hsk@gmail.com, pc@manguebit.com, lsahlber@redhat.com, 
-	tom@talpey.com, sfrench@samba.org, metze@samba.org, 
-	Meetakshi Setiya <msetiya@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG REPORT] smb: client: find_cifs_entry() suppresses some
+ errors
+To: Maxim Suhanov <dfirblog@gmail.com>, <linux-cifs@vger.kernel.org>
+References: <CAKeu6dXUhLP2cjagz_+YB2Esf-rnj3RQHWaX96R2bEBOk0C6dg@mail.gmail.com>
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+In-Reply-To: <CAKeu6dXUhLP2cjagz_+YB2Esf-rnj3RQHWaX96R2bEBOk0C6dg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemg500010.china.huawei.com (7.202.181.71)
 
-On Thu, Jun 5, 2025 at 10:41=E2=80=AFPM <meetakshisetiyaoss@gmail.com> wrot=
-e:
->
-> From: Meetakshi Setiya <msetiya@microsoft.com>
->
-> This patch fixes the warning thrown on building htmldocs by
-> including the new document added in Commit b94d1b9e07ba ("cifs:
-> add documentation for smbdirect setup") to the toctree.
->
-> Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> ---
->  Documentation/filesystems/smb/index.rst | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Documentation/filesystems/smb/index.rst b/Documentation/file=
-systems/smb/index.rst
-> index 1c8597a679ab..6df23b0e45c8 100644
-> --- a/Documentation/filesystems/smb/index.rst
-> +++ b/Documentation/filesystems/smb/index.rst
-> @@ -8,3 +8,4 @@ CIFS
->
->     ksmbd
->     cifsroot
-> +   smbdirect
-If b94d1b9e07ba ("cifs: add documentation for smbdirect setup") patch
-is not merged to Linus's tree yet,
-You can send v3 patch instead of this patch.
-> --
-> 2.46.0.46.g406f326d27
->
+Hi Maxim,
+
+The behavior you observed—returning -ENOENT instead of the original error
+code—is likely intentional. In the Linux kernel, the readdir system call
+(documented in man 2 readdir) expects specific error codes to signal certain
+conditions to userspace programs. For example:
+
+ERRORS
+        EBADF  Invalid file descriptor fd.
+
+        EFAULT Argument points outside the calling process's address space.
+
+        EINVAL Result buffer is too small.
+
+        ENOENT No such directory.
+
+        ENOTDIR
+               File descriptor does not refer to a directory.
+
+CONFORMING TO
+        This system call is Linux-specific.
+
+If the original error (e.g., -512/ERESTARTSYS) were propagated directly,
+it might result in unexpected behavior in userspace applications, as
+these programs typically do not handle raw SMB-level errors.
+
+Let me know your thoughts on this. I'm happy to explore further if needed.
+
+Best regards,
+Wang Zhaolong
+
+> Hello.
+> 
+>  From fs/smb/client/readdir.c, in find_cifs_entry():
+> 
+> 
+> cifs_dbg(FYI, "calling findnext2\n");
+> rc = server->ops->query_dir_next(xid, tcon, &cfile->fid,
+>                                                        search_flags,
+>                                                        &cfile->srch_inf);
+> if (rc)
+>    return -ENOENT;
+> 
+> 
+> If 'rc' is non-zero (e.g., EIO), the error is turned into ENOENT. This
+> means that:
+> - If the SMB server encounters an error while querying a directory,
+> the corresponding error code (i.e., STATUS_FILE_CORRUPT_ERROR) is
+> delivered to the client.
+> - But the client "translates" that error into ENOENT, which
+> effectively suppresses it.
+> - A userspace reader is left unaware of this error condition on the
+> server while listing the directory.
+> 
+> I suppose that we can change 'return -ENOENT;' to 'return rc;', but
+> I'm not sure.
+> 
+
