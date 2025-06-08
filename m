@@ -1,23 +1,24 @@
 Received: from neil.brown.name (neil.brown.name [103.29.64.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9354220E6EB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DDA1EF363;
 	Sun,  8 Jun 2025 23:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.29.64.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749426529; cv=none; b=b9M6m+DQ5S3TFx+2cdlCLcJEf07Zw64jIdTbwEOTErNqnz1bsiu9iJKay2j+C9c5JccxpGASwxslsNcUuAitkLSxkDCpXCaGEsgkqETX0iT22RoqTZmJetrORmCZRAkio+TSM02Bpjtp4h9nmpQ/W8OI+lM/a6HPkWy9wLMZRQk=
+	t=1749426529; cv=none; b=lDgOv4fAlxUie/0HzOkxU6ffnBxwfGk/SvoxwrbLCW6SZLqVRLzWDAvWlcUgfUbpWl8gI/qGE4IidBHi1Nw63/2sP89SBTY/QCPjMgdytmo2X9Pl/TeHknIa3jR2w2F5KHN3Y1WUDx5VYdD/nY8Tv9dtFJ2k7slwVm0rbPLTeOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749426529; c=relaxed/simple;
-	bh=9/DdTCyKYZE+kM6yV5SFSUmqNwarhro5a9t+8xRTfak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sDIf6m5IWjZO0J4Y9HXb/6H19BTXL2aHxai1Gj8GDFk+a6k3i6X7eIlBu/YKe2lOc0VFxbfPigSK4FuuKZbX37mWtBGulDzdFNPmVbs9/9kXzO9a1rFFflO+4UNOJBJYmARnMn3H3IJylUCN6CF8gpItCcxt3RA2J1z3PhUIfGM=
+	bh=1KRsAQ4QTsMbC2HaPlaJVoduG3ZAU7EMo57dIsKXSkE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HxI52u7C9KbG7GquE8VmX8beAnyWJWO+kXDCYlJrDxNB7YeWpLmPrNvVU2hpzGGzwY9hdmRUcxmKQJHqYmWdG/mT3vsUMM2ZRjJtbyiZkPiRvFkqzD1dYQxqQ+y+9/Zigk63Gl+az4zE4hQ7xjBpbJCOHJyADk1rwCfkTLzWYNo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name; spf=pass smtp.mailfrom=neil.brown.name; arc=none smtp.client-ip=103.29.64.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=neil.brown.name
 Received: from 196.186.233.220.static.exetel.com.au ([220.233.186.196] helo=home.neil.brown.name)
 	by neil.brown.name with esmtp (Exim 4.95)
 	(envelope-from <mr@neil.brown.name>)
-	id 1uOPko-005xqi-CE;
-	Sun, 08 Jun 2025 23:48:42 +0000
+	id 1uOPkq-005xqw-74;
+	Sun, 08 Jun 2025 23:48:44 +0000
 From: NeilBrown <neil@brown.name>
 To: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
@@ -29,10 +30,12 @@ Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
 	linux-fsdevel@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/4] smb/server: various clean-ups
-Date: Mon,  9 Jun 2025 09:35:06 +1000
-Message-ID: <20250608234108.30250-1-neil@brown.name>
+Subject: [PATCH 3/4] smb/server: avoid deadlock when linking with ReplaceIfExists
+Date: Mon,  9 Jun 2025 09:35:09 +1000
+Message-ID: <20250608234108.30250-4-neil@brown.name>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250608234108.30250-1-neil@brown.name>
+References: <20250608234108.30250-1-neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,23 +44,73 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I am working towards making some changes to how locking is managed for
-directory operations.  Prior to attempting to land these changes I am
-reviewing code that requests directory operations and cleaning up things
-that might cause me problems later.
+If smb2_create_link() is called with ReplaceIfExists set and the name
+does exist then a deadlock will happen.
 
-These 4 patches are the result of my review of smb/server.  Note that
-patch 3 fixes what appears to be a real deadlock that should be trivial
-to hit if the client can actually set the flag which, as mentioned in
-the patch, can trigger the deadlock.
+ksmbd_vfs_kern_path_locked() will return with success and the parent
+directory will be locked.  ksmbd_vfs_remove_file() will then remove the
+file.  ksmbd_vfs_link() will then be called while the parent is still
+locked.  It will try to lock the same parent and will deadlock.
 
-Patch 1 is trivial but the others deserve careful review by someone who
-knows the code.  I think they are correct, but I've been wrong before.
+This patch moves the ksmbd_vfs_kern_path_unlock() call to *before*
+ksmbd_vfs_link() and then simplifies the code, removing the file_present
+flag variable.
 
-Thanks,
-NeilBrown
+Signed-off-by: NeilBrown <neil@brown.name>
+---
+ fs/smb/server/smb2pdu.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
- [PATCH 1/4] smb/server: use lookup_one_unlocked()
- [PATCH 2/4] smb/server: simplify ksmbd_vfs_kern_path_locked()
- [PATCH 3/4] smb/server: avoid deadlock when linking with
- [PATCH 4/4] smb/server: add ksmbd_vfs_kern_path()
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 0013052f5d98..2e98717a0268 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6009,7 +6009,6 @@ static int smb2_create_link(struct ksmbd_work *work,
+ {
+ 	char *link_name = NULL, *target_name = NULL, *pathname = NULL;
+ 	struct path path, parent_path;
+-	bool file_present = false;
+ 	int rc;
+ 
+ 	if (buf_len < (u64)sizeof(struct smb2_file_link_info) +
+@@ -6042,11 +6041,8 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 	if (rc) {
+ 		if (rc != -ENOENT)
+ 			goto out;
+-	} else
+-		file_present = true;
+-
+-	if (file_info->ReplaceIfExists) {
+-		if (file_present) {
++	} else {
++		if (file_info->ReplaceIfExists) {
+ 			rc = ksmbd_vfs_remove_file(work, &path);
+ 			if (rc) {
+ 				rc = -EINVAL;
+@@ -6054,21 +6050,17 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 					    link_name);
+ 				goto out;
+ 			}
+-		}
+-	} else {
+-		if (file_present) {
++		} else {
+ 			rc = -EEXIST;
+ 			ksmbd_debug(SMB, "link already exists\n");
+ 			goto out;
+ 		}
++		ksmbd_vfs_kern_path_unlock(&parent_path, &path);
+ 	}
+-
+ 	rc = ksmbd_vfs_link(work, target_name, link_name);
+ 	if (rc)
+ 		rc = -EINVAL;
+ out:
+-	if (file_present)
+-		ksmbd_vfs_kern_path_unlock(&parent_path, &path);
+ 
+ 	if (!IS_ERR(link_name))
+ 		kfree(link_name);
+-- 
+2.49.0
+
