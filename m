@@ -1,142 +1,135 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90D8BA3F;
-	Sun,  8 Jun 2025 01:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E48179BD
+	for <linux-cifs@vger.kernel.org>; Sun,  8 Jun 2025 07:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749344609; cv=none; b=N4dWvewT04BwskSDQqbd4GYMWNs/qNYTqXx1j5VnIfPlioNiop+4ydzqut5M0bwx4iyqqcQ8jZ15YF8Aze0yRQmf1QpFfV7L9Wt3A63Vp+kOYg3liZjeFsTBKAUXBTof2MuJC0HUIutUEeNMWTcJz48aG5JkOSV383fasWKgOag=
+	t=1749367643; cv=none; b=DT9IkBrQsiySV+L9jSfnwUeQlhTM3CxwdfkEki6MAu1vVRzyOpaHosH7SgYn4WatB0OgCcqQ9sHRW8LrU+CAX5YqvxPmc4yVxkMRGwrzY/Yo/WhaV5C82zogtG0OEglUG0yvVIDCq8FjpcUYOkofl34+Hb/7VwDqNF/28ZEq6Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749344609; c=relaxed/simple;
-	bh=1DBk1/3hW6AD0jC2kHKQB4BwxaYpmiMAJ2x9dIk/uEQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=eKsK8TeNk7h7JjJjGjJqr7jEIrq/wy92bbqV51keFj7fub6xJgm9uLx3Vi6myCw44hjdYt8bxJCf321Na0cZcWqqyhKgYXaFt1hz8pDdlAxzIU0fpCeQ1RNNHDmfljNAHuRRVWrb2aR+G4hridfMhopAsWJum6aHwdkO7Zv1L5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zi8AW5Bc; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749367643; c=relaxed/simple;
+	bh=6V0DUrzm9d+K0WpCvj9AdmKSoOQO+Wk/Vi/8DvOxY1E=;
+	h=Message-Id:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TkUn257BoFVkGc3Q+swMaqskqNWvNp/ghzRwt4OHGRHsPMSVd1CQonqKwmtWq0E1/OzwebyWIptOhtQRoI6EUm8NGDCYXbZR6i4i3kS5ygDmuQNVj6URb4Mt/Q/a+Ae6kOP40ue6vpu0Uz5ZhOntwTwyGmNXQP3IABcy/SDTJc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=ioy+CIWX; arc=none smtp.client-ip=176.96.139.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zi8AW5Bc"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-553543ddfc7so3241006e87.0;
-        Sat, 07 Jun 2025 18:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749344604; x=1749949404; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eOno41Y5407AxKrCDHPBscevc6cncFpgsXyyghp6mJw=;
-        b=Zi8AW5BczqzIaD1YRPXVpq99xVl/dgJK63007IysjOWYkDo2CNJ3kM8GZXuuco6K4J
-         6XsYLZ7RbijJAwfoGz9mIP76VbQpHtNv3/gID5gwRXa56kWpeyduSI1wLKonfM5O6zI+
-         HXTdZ6XqMcsoEwZm0QCeKtippBKR+pDc+j9mANBSHuqW7Y0M96eVQMbDq7MHk1UcrZRk
-         g9r0FO+fRR1Vx4arzkfIO9icJVD2NRPvIQy377cBvmRbWnYCJLQhx8rxLBgQ7US9r0P4
-         xnscUm6SMkdTTfJOeLxSmRRdIilBwCl71s8raz4bWFWrburrpwgWOFIL6SOJVjghKVgn
-         I+rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749344604; x=1749949404;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eOno41Y5407AxKrCDHPBscevc6cncFpgsXyyghp6mJw=;
-        b=goK5xPDaSaN94yu6wqHIu/4ABDyegEJbG8hEgu3lUSQ0WbzQNuI4v4vV4jSUqemBxv
-         QkGsaPYY5i8HGTVMo6UN0Ws02eUU/yU/J5nuFRYZoDCRH9GZ6ZcqIsfUHE0aKw1lsSfb
-         TxETRfttVz3uY6S4qByI+tsHGMxvm6GidpVsFjijiz84rE8BEk+/ZhbcQrrh6yruuYF4
-         dH9yIGZIGXO5Kh5oO/45XYEdkWVw5L0RlPYD0kRF3XM7CwLUf1FiQS0QGFCb60DFqOrE
-         lRjrVmi8VoxkJ67U6jQi+LgfAX3N2W3vGygi2l/F4ISanzY8Z0hhmnPI72nuksdHghev
-         eSxg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTU2sjsq594md9JNzR/5A8SaQvCrY21ZbfbvOajXSz1BAwQ/botgsjelcpOko6dfYlhUcFFnflfVU2CwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfE9H93x6VS+iXVKcyF0Uap2V0eNxBm+X13iiJPuunL462iRDI
-	tyBtW3wgrPscyawR31hCTHGuww41rvgAitBiMOUQZyqpZRawlu1fKaxD9e1PVajov2PDZTU+UjF
-	QdcDY2jIA2AbKVioDFRX+QQbc4+3QGSkSpKqp
-X-Gm-Gg: ASbGncvokGDdt9s+8Ur8ISepqBQAy8BDbJ8pdTWx559tIWedPx1NbvPvR84AoJIRG87
-	T67Tl+PPRFw/KxIpkeDeWNt9brTyjUayuOm2n4Sekb0Kmj5FPg8cc0OZr6HF+aL9k54D5Z5r/N4
-	D4G89jxt715N9QqSPpf5FChpzAWnOBmCMrQJwrplF9/ouDdavlMGCKUd3ga5Tx23aZtfqFPEzMW
-	pAi
-X-Google-Smtp-Source: AGHT+IFI24gvQuV0lGx4sjAUCwKgKFqloJT6lRkQB3DiJjy7Sbt6+T7udpvVwKHBE6p6TYUV5b4G5Xv14XpUvwbyjdg=
-X-Received: by 2002:a05:651c:1545:b0:30b:b987:b6a7 with SMTP id
- 38308e7fff4ca-32adf92f552mr22704691fa.0.1749344604123; Sat, 07 Jun 2025
- 18:03:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="ioy+CIWX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
+	t=1749367212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xEipkHLZKPlGk1PXe4qG4Rb+7eczR/qvtGRq/xYyBwk=;
+	b=ioy+CIWXkib9gZ7tlGpulJTXry6O2yqL11ZJrbK3hen+gqTvcXkVRKGIW7h6iF455epiTT
+	aAMA+7VjD+CIhUfeFeIoXvnZD3uGiaMeMonEL6FZYwYnvIJoz+pZd8iArEyIdoLB1uNqrq
+	2yIiz3VYuBIUCwDeyGRMtVlNkCRZ62sR3MPp0K1EHP0b9JOwHUsgAitc5jafjWN+R22lHV
+	8WpsLbTdMPBOPt5Watj8ogRVtoKt1KdbH/QSekH7QqeGAsHqiJXoMC3nUd7WxS5pX30i/G
+	g2NbTC9JiIN6fRUjZg2VXehSZEldrg9jYOpF+A/RFECeh2OtLshys9ld4ctKxg==
+Message-Id: <5891ee55f912ceab918019f59e6cd35f809132d9.camel@rx2.rx-server.de>
+Subject: Re: ksmbd and special characters in file names
+From: Philipp Kerling <pkerling@casix.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, Ralph
+ =?ISO-8859-1?Q?B=F6hme?=
+	 <slow@samba.org>
+Date: Sun, 08 Jun 2025 09:20:09 +0200
+In-Reply-To: <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@rx2.rx-server.de>
+References: 
+	<d0df2b2556fac975c764c0c7c914c6e3c42f16a1.camel@rx2.rx-server.de>
+	 <CAKYAXd-t27uzNLdXjPRuvbaaBnA-Z8qVqd_1W7v=97vp2Sd+rw@mail.gmail.com>
+	 <CAH2r5ms-v=UwFzXZpZ-5KBgiRPkvSqQyJnLBhxP5YaAuqMAG5A@mail.gmail.com>
+	 <CAKYAXd8rN+RVJB8ak_SPNX07L8BeastngMhQsXVGdUW0D0QLSw@mail.gmail.com>
+	 <4fb764ff-f229-4827-9f45-0f54ed3b9771@samba.org>
+	 <CAKYAXd8FJcfFpGBkevgZaymcHiicJgs-time4r7fbD6n2hBg7w@mail.gmail.com>
+	 <CAKYAXd9BPqg=0QKrpsOHaVDQkM8=Q6fragLmpTPve=pJdNjovw@rx2.rx-server.de>
+	 <4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de>
+	 <CAKYAXd9OQW9oOfjUDWSGmh+b7QtHSc7M=rHhCW6QEsFpEkVFVw@rx2.rx-server.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 7 Jun 2025 20:03:12 -0500
-X-Gm-Features: AX0GCFuWRQgqxBkBM-zybVWhjF-NUFhn8WNZ4Cl-lGBCqaHjgXLlWyhZgXTZ500
-Message-ID: <CAH2r5muDjjJVcngtDHa87ZWKGD_uZPV7KVO=Fg7g57-OyudMxQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-6d9b5f6b81ace1b2b0830271ad46628d6fad31bb:
+2025-06-01 (=E6=97=A5) =E3=81=AE 23:30 +0900 =E3=81=AB Namjae Jeon =E3=81=
+=95=E3=82=93=E3=81=AF=E6=9B=B8=E3=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
+> On Fri, May 30, 2025 at 6:47=E2=80=AFPM Philipp Kerling <pkerling@casix.o=
+rg>
+> wrote:
+> >=20
+> > Hi!
+> >=20
+> > 2025-05-27 (=E7=81=AB) =E3=81=AE 11:57 +0900 =E3=81=AB Namjae Jeon =E3=
+=81=95=E3=82=93=E3=81=AF=E6=9B=B8=E3=81=8D=E3=81=BE=E3=81=97=E3=81=9F:
+> > > On Mon, May 26, 2025 at 11:24=E2=80=AFPM Namjae Jeon
+> > > <linkinjeon@kernel.org>
+> > > wrote:
+> > > >=20
+> > > > > It's been part of the spec since the beginning. You can find
+> > > > > it
+> > > > > here:
+> > > > Right, I found it.
+> > > > Thanks for your reply.
+> > > > >=20
+> > > > > https://gitlab.com/samba-team/smb3-posix-spec/-/releases
+> > > > >=20
+> > > > > POSIX-SMB2 2.2.13.2.16 SMB2_CREATE_POSIX_CONTEXT
+> > > Philipp,
+> > >=20
+> > > Can you confirm if your issue is fixed with the attached patch ?
+> > >=20
+> > > Thanks!
+> > I can confirm the following behavior after applying the patch:
+> > =C2=A0* Path with "&" is not accessible with mount.smb3 and default
+> > options
+> > =C2=A0* Path with "&" is not accessible with mount.smb3 and "nomapposix=
+"
+> > =C2=A0=C2=A0 option
+> > =C2=A0* Path with "&" is not accessible with mount.smb3 and "unix"
+> > option
+> > =C2=A0* Path with "&" is accessible with mount.smb3 and
+> > "unix,nomapposix"
+> > =C2=A0=C2=A0 options
+> > Perhaps "nomapposix" should be the default for the client when
+> > "unix"
+> > is enabled? Tough call though, might break some backwards
+> > compatibility.
+> I agree that "nomapposix" should be enabled along with "unix" option.
+> You can try to submit a patch for this.
+OK, I will try.
 
-  Merge tag 'v6.16-rc-part1-smb-client-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2025-06-03 16:04:29 -0700)
+> > Furthermore, in the last case in which the file is accessible, I
+> > can
+> > only access the file as root. This is because enabling the "unix"
+> > mount
+> > option leads to the origin UIDs and GIDs being taken over from the
+> > host, which do not correspond to anything on my client. I usually
+> > set
+> > "forceuid,forcegid,uid=3D...,gid=3D...,file_mode=3D0640,dir_mode=3D0750=
+" on
+> > the
+> > mount but, for whatever reason (might be intentional? might not
+> > be?),
+> > these options do nothing at all when combined with "unix". I can
+> > sort
+> > of get around this by setting "noperm", but it does seem odd that I
+> > would have to disable any and all permission checking just to get
+> > special characters in my paths working.
+> Please tell me the steps to reproduce it.
 
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.16-rc-part2-smb3-client-fixes
-
-for you to fetch changes up to 8e9d6efccdd728fb1193e4faada45dff03773608:
-
-  cifs: update internal version number (2025-06-05 10:21:17 -0500)
-
-----------------------------------------------------------------
-Fourteen smb3 client fixes
-- 3 multichannel/reconnect fixes
-- 8 fixes to move smbdirect (smb over RDMA) defines to fs/smb/common
-so they will be able to be used in the future more broadly, and a
-documentation update explaining setting up smbdirect mounts
-- Update email address for Paulo
-
-----------------------------------------------------------------
-Meetakshi Setiya (1):
-      cifs: add documentation for smbdirect setup
-
-Paulo Alcantara (1):
-      MAINTAINERS, mailmap: Update Paulo Alcantara's email address
-
-Shyam Prasad N (3):
-      cifs: deal with the channel loading lag while picking channels
-      cifs: serialize other channels when query server interfaces is pending
-      cifs: do not disable interface polling on failure
-
-Stefan Metzmacher (8):
-      smb: smbdirect: add smbdirect_pdu.h with protocol definitions
-      smb: client: make use of common smbdirect_pdu.h
-      smb: smbdirect: add smbdirect.h with public structures
-      smb: client: make use of common smbdirect.h
-      smb: smbdirect: add smbdirect_socket.h
-      smb: client: make use of common smbdirect_socket
-      smb: smbdirect: introduce smbdirect_socket_parameters
-      smb: client: make use of common smbdirect_socket_parameters
-
-Steve French (1):
-      cifs: update internal version number
-
- .mailmap                                    |   6 +
- Documentation/filesystems/smb/index.rst     |   1 +
- Documentation/filesystems/smb/smbdirect.rst | 103 ++++++++
- MAINTAINERS                                 |   4 +-
- fs/smb/client/cifs_debug.c                  |  23 +-
- fs/smb/client/cifsfs.h                      |   4 +-
- fs/smb/client/cifsglob.h                    |   1 +
- fs/smb/client/connect.c                     |   6 +-
- fs/smb/client/smb2ops.c                     |  14 +-
- fs/smb/client/smb2pdu.c                     |  50 ++--
- fs/smb/client/smbdirect.c                   | 389 ++++++++++++++++-------------
- fs/smb/client/smbdirect.h                   |  71 +-----
- fs/smb/client/transport.c                   |  14 +-
- fs/smb/common/smbdirect/smbdirect.h         |  37 +++
- fs/smb/common/smbdirect/smbdirect_pdu.h     |  55 ++++
- fs/smb/common/smbdirect/smbdirect_socket.h  |  43 ++++
- 16 files changed, 533 insertions(+), 288 deletions(-)
- create mode 100644 Documentation/filesystems/smb/smbdirect.rst
- create mode 100644 fs/smb/common/smbdirect/smbdirect.h
- create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
- create mode 100644 fs/smb/common/smbdirect/smbdirect_socket.h
-
-
--- 
-Thanks,
-
-Steve
+   1. Create a folder on the server and put a file owned by UID 1000,
+      GID 1000 with mode 0640 into it.
+   2. Export this folder using ksmbd. For the record, I am using "force
+      user =3D <user with uid 1000>", but I don't think the options on
+      the server matter much.
+   3. On the client, mount using "mount -t smb3 -o
+      vers=3D3.1.1,forceuid,forcegid,uid=3D1001,gid=3D1001" and list the
+      folder -> file will be owned by 1001:1001
+   4. Unmount and mount with ",unix" option added -> file will be owned
+      by 1000:1000; most likely forceuid/forcegid is not applied with
+      3.1.1 POSIX extensions (tested on Linux 6.14.6)
