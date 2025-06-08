@@ -1,42 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4191171D2;
-	Sun,  8 Jun 2025 12:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8552629C;
+	Sun,  8 Jun 2025 16:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749387345; cv=none; b=rfiv51DLZgu7ts8oMaZuVJrYyM3E8JsCi9srCQPv+Qf9wpywScTGj5CkVxtpP7O52a49lhg9IDnp5Wm9dP8a3Ahkr8dnjM8KDPXsQqCtoSnixghZ6tJ9R8S7jy3QU1KGZDMVnjnpVTsC81sHfUM8qTkmAwz9IBC+9bFAzhi6RJA=
+	t=1749401136; cv=none; b=sbKF1KnXVTFjUf4MZ8BexT1Z1Hqxwyug5LflzuQLcbMGHWImpuFVWvxVu+r9+J/RRvZRZuvD/cwBasYJlUGnpZfqPXIzwChA3uCYpXwRaL+9JLCZ0sTXf42tP7eh0/oW42w2KVDBgU9/sgd9KQJU8iU1K+CG6HnF9gE7mvhjkkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749387345; c=relaxed/simple;
-	bh=Nm0SR63hGTWOJ+B2MikhCpn8b7FIl0+dd/Zt0asFPpk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PxTArdfbznR+t2d+0cejWQVnibzDKMf8w3rIq9AnbREj4f5zUvaQZmM4Z41Yi7/h7Px9cnZ6OrZ5N/hEg7PZQ1s6IDhMz5HfRk1aJ2pSyOLrzXpB1lvIH479WbYptgejrjW+aCrJAzTudfiRJJ3YeeonAPrbNm24Ux69PsrvbPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHPRivjo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749401136; c=relaxed/simple;
+	bh=DPipyBuXhIpIRDJR0fuQ/48mDMw26l2N7liiCYvvMTw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bPww1YoDNCalbv2OxAcrfovSoDAeaZ/nR4HF+XSErV8vduHHiIVwLw2SLIKcsL/PYEhU9ci+aMOJwQUS2093zkQuXeAPsOM5ily1SMZcIXKrX8VnhMi+b7bqt1w54EjYrj0GzLMLyatMBcFdI/XJNU9ExTsiwZ+Tqf0B++5hlJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Awyc7Jwl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHPRivjo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A41C4CEEE;
-	Sun,  8 Jun 2025 12:55:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Awyc7Jwl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14918C4CEEE;
+	Sun,  8 Jun 2025 16:45:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749387345;
-	bh=Nm0SR63hGTWOJ+B2MikhCpn8b7FIl0+dd/Zt0asFPpk=;
+	s=k20201202; t=1749401136;
+	bh=DPipyBuXhIpIRDJR0fuQ/48mDMw26l2N7liiCYvvMTw=;
 	h=From:To:Cc:Subject:Date:From;
-	b=VHPRivjoY8FNKqzB7ouMEAm6PLr356BABM5ipyGtDGliRpNrTrnVqecGzOM9vpPLt
-	 u8CvMsctpJTvOI1hV02lliA99CFqvrfvQHP9zwlUTf4a9RbBY+zazwM0wXwixZ2HeG
-	 74QESWgvj0v4HjFgr2tLUz17Ng/pPWEH9OQwbtU212LuYzp+UvS7BB/U9fjM06TnJI
-	 z34b1poRz75UDJ8+pLKdNu6X/Yi/Uo6voqyYCkph2Nb0jaTgW/77DS0TJ5xGFzBiZF
-	 sD37S37JC8vZLq1/iO/mBFY37uA1JwQ9raa+3Wpwx/Yqalb8e/ZufExeDqctOcIv47
-	 PlPSMKWbfuiDw==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Philipp Kerling <pkerling@casix.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	smfrench@gmail.com,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 1/5] ksmbd: allow a filename to contain special characters on SMB3.1.1 posix extension
-Date: Sun,  8 Jun 2025 08:55:39 -0400
-Message-Id: <20250608125543.934436-1-sashal@kernel.org>
+	b=Awyc7JwlGkDFsMa96I/hWugqkSE/jBe9p1St16pzRZodLPAupKDMXES3ooJVj88kS
+	 XEAsCZ2glmFPBMzYxAJYQiMKrrIFmULHJpCbojbYAnBJfAJbBzCw5crDRqVoDsWGN/
+	 Aqx1xwougmOnB0dy1C7qWrZTtVEDcM0rHlMOzyEEZXJaM4oqwO8SmMD03nm0IB8TNg
+	 3sDlrjCCrG3thNUcc1v+7PFGk66KfDCO6oDeAPqv+lLvYArY/N++8HY/o7t4SnPaz4
+	 na0YUdyVAc+DENK7PxtEjvOJp+pcmM+RZiJNypB1NJonlrZHM5rxINJroFiSQXj7TK
+	 l6G5kEVCaKf2A==
+Received: by pali.im (Postfix)
+	id 83C2055E; Sun,  8 Jun 2025 18:45:33 +0200 (CEST)
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Show reason why autodisabling serverino support
+Date: Sun,  8 Jun 2025 18:44:53 +0200
+Message-Id: <20250608164453.6699-1-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -44,190 +42,99 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.141
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+Before calling cifs_autodisable_serverino() function, show reason why it
+has to be called.
 
-[ Upstream commit dc3e0f17f74558e8a2fce00608855f050de10230 ]
+This change allows to debug issues why cifs.ko decide to turn off server
+inode number support and hence disable support for detection of hardlinks.
 
-If client send SMB2_CREATE_POSIX_CONTEXT to ksmbd, Allow a filename
-to contain special characters.
-
-Reported-by: Philipp Kerling <pkerling@casix.org>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Pali Rohár <pali@kernel.org>
+Cc: stable@vger.kernel.org
 ---
+ fs/smb/client/connect.c   | 2 ++
+ fs/smb/client/dfs_cache.c | 2 ++
+ fs/smb/client/inode.c     | 3 +++
+ fs/smb/client/readdir.c   | 3 +++
+ 4 files changed, 10 insertions(+)
 
-Based on my analysis of both the commit message and code changes,
-examining the Linux kernel repository context:
-
-**YES**
-
-This commit should be backported to stable kernel trees. Here's my
-extensive analysis:
-
-## Nature of the Change
-
-This is a **legitimate bug fix** that addresses a functional issue where
-SMB3.1.1 POSIX extension clients cannot create files with characters
-that are valid in POSIX filesystems but blocked by ksmbd's Windows-
-centric filename validation.
-
-## Code Analysis
-
-### Key Changes:
-1. **Early POSIX context detection** (lines 2906-2925): The code now
-   checks for SMB2_CREATE_POSIX_CONTEXT early in the function
-2. **Conditional validation bypass**: The critical change at lines
-   3161-3164 where `ksmbd_validate_filename(name)` is only called when
-   `posix_ctxt == false`
-3. **Structural improvement**: Moving POSIX context parsing before
-   filename validation, which is the logical order
-
-### What Gets Bypassed:
-The `ksmbd_validate_filename()` function normally blocks characters like
-`"`, `<`, `>`, `|`, `?`, `*`, and control characters. For POSIX
-extensions, these restrictions are inappropriate since POSIX filesystems
-can safely handle most of these characters.
-
-## Security Assessment
-
-### Low Security Risk:
-1. **Limited Scope**: Only affects clients explicitly using SMB3.1.1
-   POSIX extensions (`tcon->posix_extensions` must be enabled)
-2. **VFS Protection**: Linux VFS layer provides underlying security
-   validation
-3. **No Path Traversal**: Higher-level path validation still prevents
-   `../` sequences
-4. **Standards Compliance**: Aligns with Microsoft's SMB3.1.1 POSIX
-   extension specification
-
-### Justification for the Change:
-- **User Report**: Philipp Kerling reported this as a functional issue
-- **Interoperability**: Essential for proper POSIX-aware SMB client
-  functionality
-- **Standards Adherence**: SMB3.1.1 POSIX extensions are designed to
-  allow POSIX filename semantics
-
-## Comparison with Similar Commits
-
-This follows the pattern of other backported ksmbd commits:
-- **Similar to Commit #4**: Another filename validation fix that was
-  backported (moving leading slash check)
-- **Similar scope**: Limited, well-contained change to specific
-  subsystem
-- **Bug fix nature**: Addresses functional issue rather than adding new
-  features
-
-## Stable Tree Criteria Compliance
-
-✅ **Fixes important bug**: Enables legitimate POSIX client functionality
-✅ **Small and contained**: Changes only affect POSIX extension code path
-✅ **Minimal regression risk**: Protected by existing VFS validation
-✅ **Clear side effects**: Well-understood behavior change
-✅ **No architectural changes**: Simple conditional logic modification
-
-## Recommendation
-
-This commit represents a **low-risk bug fix** that enables proper
-SMB3.1.1 POSIX extension functionality without introducing significant
-security vulnerabilities. The change is well-scoped, addresses a
-legitimate user issue, and maintains appropriate security boundaries
-through existing VFS-level protections.
-
- fs/smb/server/smb2pdu.c | 53 +++++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 26 deletions(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 9b1ba4aedbce7..c591255335058 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2685,7 +2685,7 @@ int smb2_open(struct ksmbd_work *work)
- 	int req_op_level = 0, open_flags = 0, may_flags = 0, file_info = 0;
- 	int rc = 0;
- 	int contxt_cnt = 0, query_disk_id = 0;
--	int maximal_access_ctxt = 0, posix_ctxt = 0;
-+	bool maximal_access_ctxt = false, posix_ctxt = false;
- 	int s_type = 0;
- 	int next_off = 0;
- 	char *name = NULL;
-@@ -2712,6 +2712,27 @@ int smb2_open(struct ksmbd_work *work)
- 		return create_smb2_pipe(work);
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 6bf04d9a5491..e2dbf7eaf32a 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3908,6 +3908,8 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
+ 	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
+ 	 */
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
++		cifs_dbg(VFS, "Reconnecting to different server, inode numbers won't match anymore\n");
+ 	cifs_autodisable_serverino(cifs_sb);
+ 	/*
+ 	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
+diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+index 4dada26d56b5..bb5bf9f45557 100644
+--- a/fs/smb/client/dfs_cache.c
++++ b/fs/smb/client/dfs_cache.c
+@@ -1289,6 +1289,8 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
+ 	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
+ 	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
+ 	 */
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
++		cifs_dbg(VFS, "Reconnecting to different server, inode numbers won't match anymore\n");
+ 	cifs_autodisable_serverino(cifs_sb);
+ 	/*
+ 	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index cd06598eacbd..c6da25520f29 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -1077,6 +1077,7 @@ static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_blo
+ 			fattr->cf_uniqueid = CIFS_I(*inode)->uniqueid;
+ 		else {
+ 			fattr->cf_uniqueid = iunique(sb, ROOT_I);
++			cifs_dbg(VFS, "Cannot retrieve inode number for %s: %d\n", full_path, rc);
+ 			cifs_autodisable_serverino(cifs_sb);
+ 		}
+ 		return;
+@@ -1530,6 +1531,7 @@ cifs_iget(struct super_block *sb, struct cifs_fattr *fattr)
+ 			fattr->cf_flags &= ~CIFS_FATTR_INO_COLLISION;
+ 
+ 			if (inode_has_hashed_dentries(inode)) {
++				cifs_dbg(VFS, "Inode number collision detected\n");
+ 				cifs_autodisable_serverino(CIFS_SB(sb));
+ 				iput(inode);
+ 				fattr->cf_uniqueid = iunique(sb, ROOT_I);
+@@ -1597,6 +1599,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
+ 	if (!rc) {
+ 		if (fattr.cf_flags & CIFS_FATTR_JUNCTION) {
+ 			fattr.cf_flags &= ~CIFS_FATTR_JUNCTION;
++			cifs_dbg(VFS, "Cannot retrieve attributes for junction point %s: %d\n", path, rc);
+ 			cifs_autodisable_serverino(cifs_sb);
+ 		}
+ 		inode = cifs_iget(sb, &fattr);
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index 787d6bcb5d1d..1235b5bf9814 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -413,6 +413,7 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+ 		cifsFile->invalidHandle = false;
+ 	} else if ((rc == -EOPNOTSUPP) &&
+ 		   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
++		cifs_dbg(VFS, "Cannot retrieve inode number for entries in dir %s: %d\n", full_path, rc);
+ 		cifs_autodisable_serverino(cifs_sb);
+ 		goto ffirst_retry;
+ 	}
+@@ -1007,6 +1008,8 @@ static int cifs_filldir(char *find_entry, struct file *file,
+ 		fattr.cf_uniqueid = de.ino;
+ 	} else {
+ 		fattr.cf_uniqueid = iunique(sb, ROOT_I);
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
++			cifs_dbg(VFS, "Cannot retrieve inode number for dir entry %.*s\n", name.len, name.name);
+ 		cifs_autodisable_serverino(cifs_sb);
  	}
  
-+	if (req->CreateContextsOffset && tcon->posix_extensions) {
-+		context = smb2_find_context_vals(req, SMB2_CREATE_TAG_POSIX, 16);
-+		if (IS_ERR(context)) {
-+			rc = PTR_ERR(context);
-+			goto err_out2;
-+		} else if (context) {
-+			struct create_posix *posix = (struct create_posix *)context;
-+
-+			if (le16_to_cpu(context->DataOffset) +
-+				le32_to_cpu(context->DataLength) <
-+			    sizeof(struct create_posix) - 4) {
-+				rc = -EINVAL;
-+				goto err_out2;
-+			}
-+			ksmbd_debug(SMB, "get posix context\n");
-+
-+			posix_mode = le32_to_cpu(posix->Mode);
-+			posix_ctxt = true;
-+		}
-+	}
-+
- 	if (req->NameLength) {
- 		if ((req->CreateOptions & FILE_DIRECTORY_FILE_LE) &&
- 		    *(char *)req->Buffer == '\\') {
-@@ -2743,9 +2764,11 @@ int smb2_open(struct ksmbd_work *work)
- 				goto err_out2;
- 		}
- 
--		rc = ksmbd_validate_filename(name);
--		if (rc < 0)
--			goto err_out2;
-+		if (posix_ctxt == false) {
-+			rc = ksmbd_validate_filename(name);
-+			if (rc < 0)
-+				goto err_out2;
-+		}
- 
- 		if (ksmbd_share_veto_filename(share, name)) {
- 			rc = -ENOENT;
-@@ -2860,28 +2883,6 @@ int smb2_open(struct ksmbd_work *work)
- 			rc = -EBADF;
- 			goto err_out2;
- 		}
--
--		if (tcon->posix_extensions) {
--			context = smb2_find_context_vals(req,
--							 SMB2_CREATE_TAG_POSIX, 16);
--			if (IS_ERR(context)) {
--				rc = PTR_ERR(context);
--				goto err_out2;
--			} else if (context) {
--				struct create_posix *posix =
--					(struct create_posix *)context;
--				if (le16_to_cpu(context->DataOffset) +
--				    le32_to_cpu(context->DataLength) <
--				    sizeof(struct create_posix) - 4) {
--					rc = -EINVAL;
--					goto err_out2;
--				}
--				ksmbd_debug(SMB, "get posix context\n");
--
--				posix_mode = le32_to_cpu(posix->Mode);
--				posix_ctxt = 1;
--			}
--		}
- 	}
- 
- 	if (ksmbd_override_fsids(work)) {
 -- 
-2.39.5
+2.20.1
 
