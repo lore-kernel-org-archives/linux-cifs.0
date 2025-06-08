@@ -1,49 +1,44 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F29D6A33B;
-	Sun,  8 Jun 2025 20:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7DD10FD;
+	Sun,  8 Jun 2025 21:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.235.159.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749416260; cv=none; b=m6PtDCQrQ3JWFpAPnEX4w+ZClIbOfwc5cY3gKvws/t7RsXY2tg05ILQ52GRinOdpzxWQ4GEc1gdqz9EpYthUEVpkLMc4B8XyvpFv5QDG0UyCE6xEwQoJFLm/kKA8HqCG0x0XU3sNY0WbzEouVxxh/ISImY39jApIIVhHo4xxS7A=
+	t=1749419415; cv=none; b=h1b44Fm3HrTFuvnDTr1V0byh1GJdbLzXIbxgtT3SgE2ME5neCXjdleROE922VbB3B2ZB4FE3NmmeI1WxOJl+toHhXA5dAYqQoU14Mdx/XXGIdDUbNBmwQqdgFOw5lhhRR1nlEf6vCfa+qez+f8BuH/+GCog9k35lBRC5xUg70R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749416260; c=relaxed/simple;
-	bh=u2MZw3pClp1MRW4Nbk+nGm7LeEO/N3yqnbXgFKwLz+s=;
+	s=arc-20240116; t=1749419415; c=relaxed/simple;
+	bh=DvPnn+CHzAzRysDOc9328M3MrGvmtkscnu4qSnt6GVk=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=hkLbD1qFK7N8SiIfr/X8F0sHdJUtR8l6Ho/4jJj5nTQCs6fjoN7ZJ5IujRPUdWWjSgRTkTAEPb1swz9qO711LXPG2b2J7dYd9fS7FSpNdnEeLWRb/Pe4u5w7luZkLC4CmV4ldBEx0fXbGiVml1gENma/48VLLyyIDoxTsnkJPws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=zSzv/iJd; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	 MIME-Version:Content-Type; b=uyD/2z2Ruawyu1Nz53lcuJ9M5xthMKtg5Q+lwIw5owjgZSG6dJAAsOLWraVSzkiIf6MMaUORx86Q6dou9Lo/l+F2ItzF0cyK+EOfVa1AIeDMgTAyrsVGWQtwSxLMsvOli1U59iOra+u/RNhaK/Rp7hewx2O+OZyceTVb05FKzxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com; spf=pass smtp.mailfrom=manguebit.com; dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b=fC9xoVnC; arc=none smtp.client-ip=167.235.159.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="zSzv/iJd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Dq43dfN04jWbyKmSP11Ig+96MG5IrJm0+KB2nuqj4d0=; b=zSzv/iJdIAdNKK/d4QszXETQea
-	3aX+cdBG8sza99Ay2BBfs5+r3sy2Acarjqn5koSnvpEymlft6g3wmabLgFN2BRSijElTzzHJIExY8
-	G9aMcRjtNMFZf1j+DzF3MJDZsXi3Rvk0+iDZQz3I2aI8b5ADkSYFz8i7eMY6WSpP5OVEcT9Vt7M7d
-	Hrl85BFo8ELwmx5nA0D/Y2NEu7Kcb18TpCwPmI9mAjj/tBtaJTr1iNG2ntmxpm8N1yzthiBPhad6/
-	aMG114VTBFwtEY//M7Jh4Wd6e1fiNYWAg0rCgDde+OHZ+0j6qzbpnxh98oTkaWkiXpwV1sBx7P1sl
-	QVjBXpgw==;
-Authentication-Results: mx1.manguebit.org;
-	iprev=fail smtp.remote-ip=143.255.12.172;
-	auth=pass (LOGIN) smtp.auth=pc;
-	dmarc=skipped
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1uON5A-00000000500-374B;
-	Sun, 08 Jun 2025 17:57:34 -0300
-Message-ID: <3d644c3f8acb3dbcef395bd96e7e957c@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="fC9xoVnC"
+Message-ID: <1bde0a162a5905828806e0993ba9e524@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1749419405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d7K6Tfinx4/Z11bP3ZXBA1pTegEGY/siB4o4+g9gwKE=;
+	b=fC9xoVnCCgzFo8ko6kdZBGjZ8rlDfpxbV+PsaUwy18NKGjqWaJoEjNhSIJPw97f1T+FgR8
+	tsNC2nH3fXNLG8mvErujw7QpwFmna54YdqrDlyOuzKyalhO318esxmISH4gC/pvOUYnOGa
+	MElsinQOWrm72xz+gG70e6I0Ybf4YFyUmVqZ1VkIui4s/m1w+Y/I7zzj8kkr2O0NtdGZA+
+	8/AZv/KKiYFwiKdfVUFbAPsZZ93V+AOBIvtSrXJEVS30Y8/NuIhYzAym29Xd6NGDuA3V+H
+	1uptaD9lSB2+618oTWEWjlQERRZtxnwE2LBcIyxrFbpfn5gmd9hPGQt/h5u3vA==
+From: Paulo Alcantara <pc@manguebit.com>
 To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>, Steve French
  <sfrench@samba.org>
 Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Show reason why autodisabling serverino support
-In-Reply-To: <20250608164453.6699-1-pali@kernel.org>
-References: <20250608164453.6699-1-pali@kernel.org>
-Date: Sun, 08 Jun 2025 17:57:32 -0300
+Subject: Re: [PATCH 3/5] cifs: Fix validation of SMB2_OP_QUERY_WSL_EA
+ response size
+In-Reply-To: <20250608170119.6813-4-pali@kernel.org>
+References: <20250608170119.6813-1-pali@kernel.org>
+ <20250608170119.6813-4-pali@kernel.org>
+Date: Sun, 08 Jun 2025 18:49:43 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,23 +47,33 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 1.1 (+)
 
 Pali Roh=C3=A1r <pali@kernel.org> writes:
 
-> Before calling cifs_autodisable_serverino() function, show reason why it
-> has to be called.
+> Currently the SMB2_OP_QUERY_WSL_EA checks that response buffer has at lea=
+st
+> size SMB2_WSL_MIN_QUERY_EA_RESP_SIZE and maximally it is
+> SMB2_WSL_MAX_QUERY_EA_RESP_SIZE.
 >
-> This change allows to debug issues why cifs.ko decide to turn off server
-> inode number support and hence disable support for detection of hardlinks.
+> Constant SMB2_WSL_MIN_QUERY_EA_RESP_SIZE is defined wrongly because it
+> expects that the there are at least 3 EAs. But WSL subsystem has only one
+> mandatory EA: $LXMOD. So fix the SMB2_WSL_MIN_QUERY_EA_RESP_SIZE to be si=
+ze
+> of the structure of one EA.
 >
+> Relax also SMB2_WSL_MAX_QUERY_EA_RESP_SIZE, calculate maximum size from t=
+he
+> size of the largest EA which is 8 bytes for $LXDEV.
+>
+> This change allows to recognize WSL CHR and BLK reparse points which have
+> only $LXMOD and $LXDEV EAs (no $LXUID or $LXGID). WSL subsystem recognize
+> such reparse points too.
+>
+> Fixes: ea41367b2a60 ("smb: client: introduce SMB2_OP_QUERY_WSL_EA")
 > Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
-> Cc: stable@vger.kernel.org
 > ---
->  fs/smb/client/connect.c   | 2 ++
->  fs/smb/client/dfs_cache.c | 2 ++
->  fs/smb/client/inode.c     | 3 +++
->  fs/smb/client/readdir.c   | 3 +++
->  4 files changed, 10 insertions(+)
+>  fs/smb/client/smb2pdu.h | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 
-NACK.
+If we're querying all those EAs and the file has only $LXMOD, wouldn't
+the server return empty EAs except for $LXMOD?
