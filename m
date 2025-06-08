@@ -1,93 +1,102 @@
-Received: from rx2.rx-server.de (rx2.rx-server.de [176.96.139.238])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7531B78F3
-	for <linux-cifs@vger.kernel.org>; Sun,  8 Jun 2025 18:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.96.139.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E551372
+	for <linux-cifs@vger.kernel.org>; Sun,  8 Jun 2025 20:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749409169; cv=none; b=nyKwWsIzJ7tDpsbssLdQHFRBH1BWHxhs1EAg3fEboX79wmahft3MhsMbXrDNGvYhsrLwvMTLX6vAZ/uBi6dEXqZcLEjFJwtzwpoJ+DsSCMSeQ0nTXpVh1ML1464y9REUpk/77SIOJB7Cfiz7V15mlFJiOjRLVkAkcS68zqcU1/4=
+	t=1749415330; cv=none; b=rtTMnCx8i0RToIhLIPlFKzpzIHIZS86cvTpE/X/yofyyzfaGsZZHmMdrzDWJLzGW542qD6G35kpxQ/4i1q83bcetqQ4PgjDlRP8xOSq0tiHkOjMyRqBt+xXj7+iEwhByhvXnnotO9wvN9L36Lx8MVOnVIlffdZ60EdN7oLbVUh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749409169; c=relaxed/simple;
-	bh=uWGR2gO0KIDV5+ZztU4lRWEStbbHLxNZ5238W0A/EL8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TYNzeR4SjuBZkZG7m9NsCqtHCi/dhsYSlYSVuVmGuxEXG4H8CbRTGYXLkJxibOUl3/elNJ7LyXM8Ne8x+pURfZ6CHttby5vMoKX6WVHglWIYxsglyrxEPOQbS2GqgA97heF7aV7p0DQ5n8bFd/0+oDjGWI4iYvBEO9EsHl8JAeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org; spf=pass smtp.mailfrom=casix.org; dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b=bfT0VYU8; arc=none smtp.client-ip=176.96.139.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=casix.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=casix.org
+	s=arc-20240116; t=1749415330; c=relaxed/simple;
+	bh=32T8Zesb2yLE2XORxk11/97qMdcWO4H8/uaAwvnnlqU=;
+	h=Message-ID:From:To:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=Ci/98Vl31jhVyPS0owwx14B7MaWSVZY/wDYObG48rRFhHeLPrZ85DPo3Zb1GK+RvN2EENrixKHPzA808Nczn3MknLpEFF+DnHpBAGwpmHJry4yCyfrmv+H4g88mgotkoxujKFPpPG/SPzLFC99tFH3KYg39LMdokhvenYv7CFy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=AG4MdpJ3; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=casix.org header.i=@casix.org header.b="bfT0VYU8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=casix.org; s=rx2;
-	t=1749409159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gQs/B2CZZt2/jVY/NZsNvyBss+k2o0CL73Cpnxr/SoE=;
-	b=bfT0VYU8awDXK2AtDm4g7QUGotOBvK31KbXXelMBm0K3BGesqmSDZnCidywvsiN1YSebfz
-	dc4XdajbD5v9eylbkTtr9iEdxx+srJC5/isfaLSM9sU1A/kfWAKQraT3OYve0xdlbDziRa
-	mSyB6w3SgDJ9a60hi4+bSWI40aM5wDteg74sJmDKgeDrSgBsqy1vLOrQX9Qtd7cPPvsOV5
-	h4rS/YJIT8WRbgxIpY50i5d79TJBN3RnEv+4spfXAUDioVKBG+bk+RSTZU3duaXAhhh0qb
-	iA9Il00fix3wS8HeDGKEr3Z78HKrcaGQgCsH8QxAzsqPPWE/oHSIcLKGrYfs+w==
-From: Philipp Kerling <pkerling@casix.org>
-To: linux-cifs@vger.kernel.org
-Cc: linkinjeon@kernel.org,
-	Philipp Kerling <pkerling@casix.org>
-Subject: [PATCH] smb: client: disable path remapping with POSIX extensions
-Date: Sun,  8 Jun 2025 20:59:00 +0200
-Message-Id: <20250608185900.439023-1-pkerling@rx2.rx-server.de>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="AG4MdpJ3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:To:From:Message-ID:Sender:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=d6NLlmS27LUhKCc1G9gqe0KQxexXlLXTM5B1qCij0FY=; b=AG4MdpJ33pB+PzcWDgx8OJQkcr
+	WxJQ5Fxi9fkXy9q5hUFS5LYEva04z60UQmi+0UKq7SfN80fi7KeKPPV6YQrHip/0hchdJZwlyXFix
+	a4ONXnsWUNY4i5ByiMZtdq7ZGq20rpzfo0ZdrYbCaQ8I67ahNZN/IIvaQRushvAVMNMDV/b/XCr9/
+	ja62vvavvaTEP+RJ2/nPzzrUpOVIP/GH7sNUnqQFVahcRIs7lsO2ck9aI4+3sO9OjfszbLxdGodp6
+	tKwEXAWLWpXakZLniuaDHlYrl5GVrPgH9T5eFVJ0GitkBY6GDj+1wQ7N41WYzSM76V3QBPMKrP7fr
+	MGBXw5gA==;
+Authentication-Results: mx1.manguebit.org;
+	iprev=fail smtp.remote-ip=143.255.12.172;
+	auth=pass (LOGIN) smtp.auth=pc;
+	dmarc=skipped
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1uOMq6-000000004xA-05V4;
+	Sun, 08 Jun 2025 17:41:59 -0300
+Message-ID: <ce7b2c2b1c7f070b5c64c8bd4064ed8e@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Remy Monsen <monsen@monsen.cc>, linux-cifs@vger.kernel.org
+Subject: Re: CIFS 7.1 causes I/O-errors when encountering directory
+ junctions on remote windows machine
+In-Reply-To: <CAN+tdP7y=jqw3pBndZAGjQv0ObFq8Q=+PUDHgB36HdEz9QA6FQ@mail.gmail.com>
+References: <CAN+tdP7y=jqw3pBndZAGjQv0ObFq8Q=+PUDHgB36HdEz9QA6FQ@mail.gmail.com>
+Date: Sun, 08 Jun 2025 17:41:57 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Score: 1.1 (+)
 
-If SMB 3.1.1 POSIX Extensions are available and negotiated, the client
-should be able to use all characters and not remap anything. Currently, the
-user has to explicitly request this behavior by specifying the "nomapposix"
-mount option.
+Hi Remy,
 
-Link: https://lore.kernel.org/4195bb677b33d680e77549890a4f4dd3b474ceaf.camel@rx2.rx-server.de
-Signed-off-by: Philipp Kerling <pkerling@casix.org>
----
- Documentation/admin-guide/cifs/usage.rst |  2 ++
- fs/smb/client/connect.c                  | 10 ++++++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+Thanks for the report.
 
-diff --git a/Documentation/admin-guide/cifs/usage.rst b/Documentation/admin-guide/cifs/usage.rst
-index c09674a75a9e..d989ae5778ba 100644
---- a/Documentation/admin-guide/cifs/usage.rst
-+++ b/Documentation/admin-guide/cifs/usage.rst
-@@ -270,6 +270,8 @@ configured for Unix Extensions (and the client has not disabled
- illegal Windows/NTFS/SMB characters to a remap range (this mount parameter
- is the default for SMB3). This remap (``mapposix``) range is also
- compatible with Mac (and "Services for Mac" on some older Windows).
-+When POSIX Extensions for SMB 3.1.1 are negotiated, remapping is automatically
-+disabled.
- 
- CIFS VFS Mount Options
- ======================
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 024817d40c5f..4e60ceb7455d 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3722,9 +3722,15 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
- 		goto out;
- 	}
- 
--	/* if new SMB3.11 POSIX extensions are supported do not remap / and \ */
--	if (tcon->posix_extensions)
-+	/*
-+	 * if new SMB3.11 POSIX extensions are supported, do not change anything in the
-+	 * path (i.e., do not remap / and \ and do not map any special characters)
-+	 */
-+	if (tcon->posix_extensions) {
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_POSIX_PATHS;
-+		cifs_sb->mnt_cifs_flags &= ~(CIFS_MOUNT_MAP_SFM_CHR |
-+					     CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	}
- 
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	/* tell server which Unix caps we support */
--- 
-2.49.0
+Remy Monsen <monsen@monsen.cc> writes:
 
+> Background:
+> I use an Alma Linux machine to take backup of the file system on a
+> couple of Windows servers via CIFS/SMB3. Recently, I upgraded the
+> machine to Alma Linux 9.6 (from 9.5) and suddenly my backups started
+> to throw error messages.
+> I investigated a bit, and since I had a recent backup of the old
+> setup, testing revealed that the old setup (alma 9.5) still works
+> perfectly fine, while the updated one (Alma 9.6) was throwing errors.
+>
+> The errors seem to be down to the way it handles directory junctions.
+> My NTFS file system contains a couple of those, pointing to a
+> completely different computer on the network. Under Alma 9.5, these
+> junctions are just reported to the file system as links without a
+> valid target, leading to this output from ls:
+> root@backup [575]> ls -l /mnt/fileserver/Data/JunctionTest
+> total 0
+> lrw-r-----. 1 monsen monsen 25 Jun  6 20:41 TestJunction ->
+> '/??/UNC/web.monsen.cc/Web'
+>
+> No error messages are shown anywhere, including dmesg/console.
+>
+>
+> Now, if I instead run the same thing on the machine updated to Alma
+> 9.6, i get an io-error thrown (which is what causes issues for my
+> backups, it can't verify consistency when the FS throws i/o-errors on
+> it)
+> ls -l /mnt/fileserver/Data/JunctionTest
+> ls: cannot access '/mnt/fileserver/Data/JunctionTest/TestJunction':
+> Input/output error
+> total 0
+> l????????? ? ? ? ?            ? TestJunction
+>
+> In addition to that, the following error is logged to the console:
+> [   76.407630] CIFS: VFS: absolute symlink '\??\UNC\web.monsen.cc\Web'
+> cannot be converted from NT format because points to unknown target
+
+Yes, this is a regression and seems to be introduced by
+
+        12b466eb52d9 ("cifs: Fix creating and resolving absolute NT-style symlinks")
+
+This check should probably be enforced only when the client needs to
+follow the symlink target (e.g. !AT_SYMLINK_NOFOLLOW).
