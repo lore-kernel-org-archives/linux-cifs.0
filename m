@@ -1,72 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D21610D
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Jun 2025 05:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548773D544;
+	Mon,  9 Jun 2025 07:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749448316; cv=none; b=u2BCUg1MQyrg5c9y1eEYgVoGRX1YqtaLYhKbs/HV8RFaB2oH1FDFL4v0Nj5P3C4oklMMjP0bNcT3A6r/1jIrUJGiwyysq0Fcotsq1vvHhXPS0y0GC79Yn1B/yf5bZPVtOD+NLODZH1GvRuy16VFiS+7Zdb41pPKjeKgDNtyrTLk=
+	t=1749454614; cv=none; b=dnD67tTu6bxyas4ckYvoMgWpQ0ORROhCE/Rn418znwlp5UO+XRSBHYssLlHwwprVnYlXt8pptQmc/9rNeOY12P3Ob1FKklYVir6B+gn4Om1Kg798SrlKzEZtVA+/dKP/xoTOIVQCqOJmjzR6YEe96rnz2Cqz2r1NUZ9b1ayEJyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749448316; c=relaxed/simple;
-	bh=46u5AMRec64g4NvRp7uRTHkq2XlrgamLn2XNL8R3kvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HYvNnqssi8KaRsp4TkY7PiASQRMmT2cFHk8ATD6++jgfaT2GL4E5k3U0/5U6MzUpa0oJVhEujuWL2x28MNGIFTagAjDMQTrGiZFmo22andNSHI7+9l9UbBaLH/oy7bZN9A9Qa64i15jJ8KuFk1rDGLZMWmfu/Na/NVecGbWzCN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmTyXax2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749454614; c=relaxed/simple;
+	bh=QD50IMlcQ1GH3mNhqbad601Rfmh7cADft1xxz1dg+Ec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SEOcuftFzE6XVgRudczx+3+ijwmkDk/a3KVn0y2gvaXn9jJsjWszYm+Ig4hZpymsJeul+CJXDfENFL0M3Hqy2P6YVmITyG/3OOxRtmarLBdQr/yIWWVyGcH2ENvBq2h/Ez8Tv2SWPQRgNn21OsYtDPqQKk2grLZl3NNOdZGKzVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHxXgC+5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmTyXax2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 987BAC4CEEB
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Jun 2025 05:51:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHxXgC+5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95B0EC4CEEB;
+	Mon,  9 Jun 2025 07:36:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749448315;
-	bh=46u5AMRec64g4NvRp7uRTHkq2XlrgamLn2XNL8R3kvg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rmTyXax21B+uZVU0pCo/pF8dAKBvcUw0xn1hhIx33uNdQLTdlgzpWCifg0xkB61WX
-	 Ey2JtVQwImU24yHjfYfGFbty2r0+A9BFkF5gC5o62pZ/Asnbc9/K5yeIT/cYPfLW4V
-	 Is+kCbTlU0SPTdg5MIgH7xOlaC4C2hqIqJHULWIEL2SnCQJLc0VqIMsZiZGgKsLpOT
-	 FYjkfjqg124qKhEEoYWHZLLwcoyZjlaqnW6fkbIZA2oRfF0R4lUirTGxItJqJ5Ic4G
-	 qeeePJNySg0zHGSMsJkzDZFXw9myB26h+1eBNUYnwbA6JaPx8WIRg65B7vzSc9c6fx
-	 UzHs5NIeSxJSQ==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ad89ee255easo716886966b.3
-        for <linux-cifs@vger.kernel.org>; Sun, 08 Jun 2025 22:51:55 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yy1TgjCTISyekPzNHLHBYzIZZ3A1dLgK6xTBZGjDlWlijZrQDuE
-	tkdSax0qIyfPTpjg5mEYGubPjrRIRuYhajuLqhKJuUnaTJGXhBqX+qwkKV9RYPqlqnn7Vy92CR3
-	5W3Za1nbAZfRGQSB5rFck+9KuvOVq810=
-X-Google-Smtp-Source: AGHT+IFAtPrVSGRIrZf/fvDSDs1RGQa17LqGENfmZUrrVJaEYKpQy55lyFAVvUlvVIf2C0Yo9IC0eKQSL7IZf+bCCG4=
-X-Received: by 2002:a17:907:2885:b0:ade:409c:2cb6 with SMTP id
- a640c23a62f3a-ade409c385amr515112866b.59.1749448314263; Sun, 08 Jun 2025
- 22:51:54 -0700 (PDT)
+	s=k20201202; t=1749454613;
+	bh=QD50IMlcQ1GH3mNhqbad601Rfmh7cADft1xxz1dg+Ec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rHxXgC+5F2HM0tZIbnla8noPw3L5U6rSmRemUD4oLRGCnA0FlSX1BgciaLKbluQa/
+	 JXloYkwGODTxdB8CpiugLkZsQZoyt7Vno3NWw7iYubuFD9r3RJBDF4PzfffFNfBYtv
+	 tXgK/NBeOb/9DUo/DIfIhnBHrl0g/wFHoagGAxpKG2xrBLNCp8Ubz8JGw7Irm3M0Kr
+	 68du+HTjWq58+UhOC+j34JWnnu5qpLltYN3DWmIKZ+G/bFqXXz6nh5TSzzn4fX2i/e
+	 QNq0Vx3pt6JibJul37e0GdSISpAsYKpKh7IFElF+TKMT/S4fPcQEuSo7Nmn+Ri4BlL
+	 eqHnrL0MR6txw==
+Received: by pali.im (Postfix)
+	id D14D2C75; Mon,  9 Jun 2025 09:36:50 +0200 (CEST)
+Date: Mon, 9 Jun 2025 09:36:50 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] cifs: Show reason why autodisabling serverino support
+Message-ID: <20250609073650.kj6lxrykguhb7nuo@pali>
+References: <20250608164453.6699-1-pali@kernel.org>
+ <3d644c3f8acb3dbcef395bd96e7e957c@manguebit.org>
+ <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250608185900.439023-1-pkerling@rx2.rx-server.de>
-In-Reply-To: <20250608185900.439023-1-pkerling@rx2.rx-server.de>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 9 Jun 2025 14:51:42 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
-X-Gm-Features: AX0GCFtME7xzsQtztlZYqHC4TgCrnWTUd69ExARIXP05xWjzCDdofmgx6-ZdTho
-Message-ID: <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: disable path remapping with POSIX extensions
-To: Philipp Kerling <pkerling@casix.org>, Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 
-On Mon, Jun 9, 2025 at 3:59=E2=80=AFAM Philipp Kerling <pkerling@casix.org>=
- wrote:
->
-> If SMB 3.1.1 POSIX Extensions are available and negotiated, the client
-> should be able to use all characters and not remap anything. Currently, t=
-he
-> user has to explicitly request this behavior by specifying the "nomapposi=
-x"
-> mount option.
->
-> Link: https://lore.kernel.org/4195bb677b33d680e77549890a4f4dd3b474ceaf.ca=
-mel@rx2.rx-server.de
-> Signed-off-by: Philipp Kerling <pkerling@casix.org>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+cifs_autodisable_serverino() is already printing at the VFS level
+information that it is disabling the serverino. It is one time thing as
+once it is disabled, it is not printing it second time. So it does not
+flood logs.
 
-Thanks.
+In this change I have just extended this existing logging to print also reason.
+
+On Sunday 08 June 2025 22:40:21 Steve French wrote:
+> Since this could flood logs (e.g. in some DFS cases), probably better
+> to do these via the usual dynamic trace points (and can document a
+> simple "trace-cmd -e smb3_disable_serverino" script to avoid risk of
+> flooding logs.    cifsFYI is an alternative but the world has moved to
+> the dynamic tracing (eBPF etc.)
+> 
+> On Sun, Jun 8, 2025 at 3:57 PM Paulo Alcantara <pc@manguebit.org> wrote:
+> >
+> > Pali Rohár <pali@kernel.org> writes:
+> >
+> > > Before calling cifs_autodisable_serverino() function, show reason why it
+> > > has to be called.
+> > >
+> > > This change allows to debug issues why cifs.ko decide to turn off server
+> > > inode number support and hence disable support for detection of hardlinks.
+> > >
+> > > Signed-off-by: Pali Rohár <pali@kernel.org>
+> > > Cc: stable@vger.kernel.org
+> > > ---
+> > >  fs/smb/client/connect.c   | 2 ++
+> > >  fs/smb/client/dfs_cache.c | 2 ++
+> > >  fs/smb/client/inode.c     | 3 +++
+> > >  fs/smb/client/readdir.c   | 3 +++
+> > >  4 files changed, 10 insertions(+)
+> >
+> > NACK.
+> >
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
