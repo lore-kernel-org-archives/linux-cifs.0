@@ -1,91 +1,104 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D7A21B8EC;
-	Mon,  9 Jun 2025 17:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA3193062
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Jun 2025 21:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749488799; cv=none; b=GqwCKqeQiKDkRFUA6eA441JzXOwXKZ8ePoVOrBuOi/PLxWpQBbifEZeH1GuEVCgwWEfgB29EoCLCw6jiTFeCV4Ub9nHbDBHL/WTTqB/LZix3sEHpQqWka/77FNQWkkn7X1ewz/zm6gbdQa/5NFzcElyEpGYF8BQDw61xrJOf6NM=
+	t=1749502918; cv=none; b=HA9TskmfjtzrndzCLMD8SQ13PRR01yHoW7oFKAKjgaLCjeIrI5k1coUoGunsi9G0GSgKOlxYp8//BUKvNObLGmTB7A8Q2qGfcSQTBB0YDlyNBtKyA0Gc408GFwXu4C8C4CxtDHMKGT4vscznIS5dZ6wxJIY8Uo5s9J67KAyZ/kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749488799; c=relaxed/simple;
-	bh=xj2K0Hn1KyDlFCEgp/1ceXvAVXo0W7st5XQzYhwKR9I=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=CnxxmDJxSwdxJVO982rTo1Ue8+XmFMovcIpQzWt+/PTdDM5DXADKosCDomChdsCXPWC2xRTsECPLQeeVboA/SFU7nMxbu9qATo/kLAeiZEw2B5cpdGJh7SOrYCupxIEnEBXARBt2nJWAk1JBPNMyAotUWm/JsuMfzNZuIXuxlVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLNzjMer; arc=none smtp.client-ip=209.85.208.175
+	s=arc-20240116; t=1749502918; c=relaxed/simple;
+	bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NsHkFHZL56SQUs2jFt7MMA/7ZCiy+G+mYXh8cAJ1/+HTbnBxFzgaBcYiiZ3vUbjxS0drcpgo3zSa5uXdQK87KjbF5rYkFGzfEbzsq+dgxfnoHxD9FCPTYSuax+udumgnp3Bu6iAhN2OPknsGMg37VlQBP+GnoqC3KUEwC6lzYIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHogn+oI; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLNzjMer"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32a72cb7e4dso41897251fa.0;
-        Mon, 09 Jun 2025 10:06:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHogn+oI"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3105ef2a071so51043961fa.1
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Jun 2025 14:01:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749488795; x=1750093595; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1B9jz9bzgcDaYUJYbUm/nwrrVlRYLDHkUIDUm7vm5gA=;
-        b=hLNzjMermV94bnjLDJWzFAkJeDRFiEbkvtoBWR9ReOLFuccxI3nJIJabYAWY7xYHKg
-         iDsw5JoY2BtQpzobdMOycFhhBvcYaLcAahWcc1rEvAJ3LfhvEOlsNFDN+O8hj0bL3lhr
-         HE920a38VZqO0TAvzHrql2lWA3OybBPAlYVBP34ir5iLJz+UFz/nl1Al4xFlOVlc6IEZ
-         STUChNJM/mSAUZaVw0QJ+cvmx9NWAwoPVyLi60RNp1QRsfsTBrmZbgxxUgljbc77KCKN
-         VF/7VrTR1uufdf9NTwTneGWdgIsipNy+O1ScD024x1tnoO9Dr1gW021BgkHZ7bZewhoy
-         K3ug==
+        d=gmail.com; s=20230601; t=1749502915; x=1750107715; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
+        b=dHogn+oINTThP9YpsDhTuK7B58GgtwRdvqNKZ8VZgrThNEwKcAD9hMyqNlO3Cu0pp9
+         S62Cad4vnqy0oEcfQ3DKCRZCI/99ji4+wTMpBLsjqyzDW2LfStbU3VBUj4c+6LAupxff
+         1eXFK6s2DgdfkFb6Cp02An8RJcWAN0qRkvu6NFLKMDrlcBC3324nH/QO1QY0occxZ7ZW
+         hMXBUjWMccKM+GPBuvVdJrXuR3SVYuVnB83wAS7GQBAnD8N7QKYkt9eRIv9GgsZh1H4m
+         N6Kv0JQKMXJf6UgafTRlNiTz823cNZGxEH6pmDgIFvTOCKvmlnlyGfh6Tez59hUIG9rv
+         gzlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749488795; x=1750093595;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1B9jz9bzgcDaYUJYbUm/nwrrVlRYLDHkUIDUm7vm5gA=;
-        b=b3Xax8+PLimCKAjH1hlgexxHDONMaL5iLZG3k06bGg5gVWSD8UM7X2HVwgqZA8BFEa
-         z/s7G02bjiKzHaAlk/158AWe5mb0c09vBvx8LsE4UwubIweVh0Yd8mPmMjbR3nxfiqhw
-         oEeR5GfEbCPW0mBjXLoMyiAZCMXJykbv5C6AbJUM0VwlPSjYdZ4z2CrHM+zeLyZFqTyU
-         UOOgVesgeAnNYg7mtHSNdUMCIDetxC1OqsdUNfCoGnoBuwG7BmvtIU/22Z8OAfrdiUuZ
-         QgK4m0KjnP7Vb0JrCdwL4c7UiW8fIdW7hUSVVvxQmY+aIerSV2qfCGwAnoAJ2CcLnr34
-         gKMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV90mtvXjiGzsaBNLcs/fjI751r1g+q8zRlbXHUPpOCYzughP68jBPduKSrFRspLbpGX2M3OWlruascxMJXsQ==@vger.kernel.org, AJvYcCVHPmDerc4bCUmd8ffcpDJ4lhwuPjj3CZ/acwLmUgDmmhUqkTJ4c1h/ryBluEhNMnCjFydNJF/CsOmm@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJgHUA4BoSDj3u4M5EDBfTzwnAh6BVfsFin9SRlDDwUE5Q77R7
-	EasSz/LFHsnNWobXFhJfY7Fzzq/Vd3Qh5ppUYp+3PWxdE/wCHNQOdxqd7BFtu0MOq+Ku0+ZyhVR
-	FZ5dKYpyFqyk4nuLkp06xKDQJzQanf90=
-X-Gm-Gg: ASbGnct0t5XWrT/HB/ByrKWVwwx1AKXNi1MVk/4BBWX9y2bpJ9XlrG9BlkAgl0BOQsk
-	tPs29DRpaQKvQXdIHm+f3SfcA64h8NcRCCVSpJ+jCbORfysrIeQrXYSN0WuNrYVGbzCjjTg7nCH
-	8kg1xJJjDeshtphoXUnr/DqhjMqnUKeNGj2DxXqx0PJh0NcVRbY0SW7WXOjqXirJUnkQ8=
-X-Google-Smtp-Source: AGHT+IHs3x7MiIxf+cWKc7abiJCC9IsvRO7Ev/Vbmo9eLh43sdlNK0JojZJXE291FuxIFOvUsBhv2t2laasYz3xT+VM=
-X-Received: by 2002:a05:651c:b12:b0:30b:f469:47ef with SMTP id
- 38308e7fff4ca-32adfd207bbmr39463521fa.23.1749488795292; Mon, 09 Jun 2025
- 10:06:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749502915; x=1750107715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
+        b=NB0BKZLE7X+bY3U09WiAtZAfpp2VORvBQfgT5IRW8/oezWmlpKXJ9E6yNPv1L7Udq6
+         hCOUDjNRIBKH6PgzWzVtSFg2E8FQysR+61Fk++ZAVpnttl8F0Wyaanl96jppR5jV4ofb
+         z94qIo4i2vlYzqGvcP4ZwBv/G6yT/drqL3k/I+B+9fnVj+eIBAiocFgOLmrajxB2QNGa
+         XVOijwgA/MAFC/DKOQuSkKoFZSDv6YWjaRJl9hDXFMCxYosZPrFQp7GM9UC5N1nCus05
+         A/fqp+VvXZEdCdazsHo+g8agxVvcVo9kkj37v2XOMkjqsijgAEp0VqBQU9dO2ee6IZX5
+         CgkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVl0tn9IUAr10yrIU5fkacX/0M69Do8u54nH/Yy6Oa7DkEu3tevRqAB012/H2Tc5whHFq6Rp9zvboxn@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrJaKrtQFfJAAEDaX25z8at3S6GjaWyNWfvX1+JhOMGfQz7xKQ
+	M+TWozfUVk9NByih40qauwKEOvNTvYYaMhrBIeYxxYRaOe0zlryJVHaP1IlIa/1prhNMC+GQh2b
+	oRuTep72Rlv7hVsTj2TjDYV59eZ9B5fHDrg==
+X-Gm-Gg: ASbGncumLC6W0k+PDz/unwSbIVIjW44OzzhiogiHUG6nQjHyx853tdRZCwUgwAFRRmy
+	ctRcYkIL6NxF2WPAp/B5kjsZZFyPgCaU/8QUwle6PdF7pz8tSrP54X9a7Rsji6yuk3Yb+i9o5aE
+	2Iv7HOz9OYjycDwTYKWCXWfS7B5NBksZy8ufw7sn3tEB6mPvKKg3UHWZO3LHdLUlIkQCU06AMp/
+	LrlCBNpjji2sM9l
+X-Google-Smtp-Source: AGHT+IHsCNHegqYNX+NPCF7HkCmAPSw+rq6dTGq/CFkeKLnS5BehJ6U+698wb4S2U1xIj2rKm2kqH5fsLFXEE+/PhoM=
+X-Received: by 2002:a05:651c:108:b0:32a:66f7:8a15 with SMTP id
+ 38308e7fff4ca-32adfed5cd4mr27233801fa.39.1749502914351; Mon, 09 Jun 2025
+ 14:01:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250608185900.439023-1-pkerling@rx2.rx-server.de> <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
+In-Reply-To: <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 9 Jun 2025 12:06:23 -0500
-X-Gm-Features: AX0GCFsrRONFJpE2z-GNlrMZuis3d387b0I5W2Mqd7Xzluc394ppvLGirmBiFtE
-Message-ID: <CAH2r5mu5SfBrdc2CFHwzft8=n9koPMk+Jzwpy-oUMx-wCRCesQ@mail.gmail.com>
-Subject: Perf regression in 6.16-rc1 in generic/676 (readdir related)
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
-	NeilBrown <neil@brown.name>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Bharath S M <bharathsm@microsoft.com>
+Date: Mon, 9 Jun 2025 16:01:42 -0500
+X-Gm-Features: AX0GCFu2a_Ne83XmZE7MAd372CX3Rsa0q3FW0YPqFq5S-WkG8GWgwsyOi4GGSgo
+Message-ID: <CAH2r5mv+3xhiD+CdKOdnSNSz_TuR4i=9s0rViHm_ObhxDyd50w@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: disable path remapping with POSIX extensions
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Philipp Kerling <pkerling@casix.org>, linux-cifs@vger.kernel.org, 
+	samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Instead of the usual 10 to 12 minutes to run generic/676 (on all
-kernels up to 6.15), we are now seeing 23-30 minutes to run
-generic/676, much more than twice as slow.   It looks like this is due
-to unnecessary revalidates now being sent to the fs (starting with
-6.16-rc1 kernels) on every file in a directory, and is caused by
-readdir.   Bharath was trying to isolate the commit that caused this,
-but this recently merged series could be related:
+tentatively merged into cifs-2.6.git for-next pending additional
+testing and review
 
-06c567403ae5 Use try_lookup_noperm() instead of d_hash_and_lookup()
-outside of VFS
-fa6fe07d1536 VFS: rename lookup_one_len family to lookup_noperm and
-remove permission check
+On Mon, Jun 9, 2025 at 12:51=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Mon, Jun 9, 2025 at 3:59=E2=80=AFAM Philipp Kerling <pkerling@casix.or=
+g> wrote:
+> >
+> > If SMB 3.1.1 POSIX Extensions are available and negotiated, the client
+> > should be able to use all characters and not remap anything. Currently,=
+ the
+> > user has to explicitly request this behavior by specifying the "nomappo=
+six"
+> > mount option.
+> >
+> > Link: https://lore.kernel.org/4195bb677b33d680e77549890a4f4dd3b474ceaf.=
+camel@rx2.rx-server.de
+> > Signed-off-by: Philipp Kerling <pkerling@casix.org>
+> Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+>
+> Thanks.
 
-Has anyone else noticed this perf regression?
 
-For the case of cifs.ko mounts, it is easy to repro with generic/676.
-And also could be reproduced with simple "ls" of large directories.
 
--- 
+--=20
 Thanks,
 
 Steve
