@@ -1,93 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548773D544;
-	Mon,  9 Jun 2025 07:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFB443ABC;
+	Mon,  9 Jun 2025 10:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749454614; cv=none; b=dnD67tTu6bxyas4ckYvoMgWpQ0ORROhCE/Rn418znwlp5UO+XRSBHYssLlHwwprVnYlXt8pptQmc/9rNeOY12P3Ob1FKklYVir6B+gn4Om1Kg798SrlKzEZtVA+/dKP/xoTOIVQCqOJmjzR6YEe96rnz2Cqz2r1NUZ9b1ayEJyE=
+	t=1749463863; cv=none; b=vAWYygdSWgbV/vIsvg7IdC1MM95hT3XBvx1GlwIonycer0Hz/ZrKC95rxTr/MHqyC2+pLjlcZAoo4tWsgdm6TS0CZXKw+ZU7ENdN5YqkeYObUuuD/3OSJficcyEa5KEVDfVfgxz2hxjJdLx7ZzxkK0/LwHLaI9Ms+slNQrfgBOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749454614; c=relaxed/simple;
-	bh=QD50IMlcQ1GH3mNhqbad601Rfmh7cADft1xxz1dg+Ec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SEOcuftFzE6XVgRudczx+3+ijwmkDk/a3KVn0y2gvaXn9jJsjWszYm+Ig4hZpymsJeul+CJXDfENFL0M3Hqy2P6YVmITyG/3OOxRtmarLBdQr/yIWWVyGcH2ENvBq2h/Ez8Tv2SWPQRgNn21OsYtDPqQKk2grLZl3NNOdZGKzVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHxXgC+5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749463863; c=relaxed/simple;
+	bh=JzvgjZLv5cGW6fc6fGEDZj9SR+1de/3cdl56xIRTnG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H+A/ROiyQ08joF+9hd1xbzZ/eeEj6frVaPS9SMOMd4vM5fKeGO5AB68X5F7fpm8yIGXwa4BDB9F2zJAwaJMgh7kBtvpYcmKM35/pckemJfjgspA0dKBGOK+sLF8cqTnQ46FtRs7hTIM4FX3i6YEeVWnhOU+QY9N21GPinX2RbFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=p1SZvt52; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHxXgC+5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95B0EC4CEEB;
-	Mon,  9 Jun 2025 07:36:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749454613;
-	bh=QD50IMlcQ1GH3mNhqbad601Rfmh7cADft1xxz1dg+Ec=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rHxXgC+5F2HM0tZIbnla8noPw3L5U6rSmRemUD4oLRGCnA0FlSX1BgciaLKbluQa/
-	 JXloYkwGODTxdB8CpiugLkZsQZoyt7Vno3NWw7iYubuFD9r3RJBDF4PzfffFNfBYtv
-	 tXgK/NBeOb/9DUo/DIfIhnBHrl0g/wFHoagGAxpKG2xrBLNCp8Ubz8JGw7Irm3M0Kr
-	 68du+HTjWq58+UhOC+j34JWnnu5qpLltYN3DWmIKZ+G/bFqXXz6nh5TSzzn4fX2i/e
-	 QNq0Vx3pt6JibJul37e0GdSISpAsYKpKh7IFElF+TKMT/S4fPcQEuSo7Nmn+Ri4BlL
-	 eqHnrL0MR6txw==
-Received: by pali.im (Postfix)
-	id D14D2C75; Mon,  9 Jun 2025 09:36:50 +0200 (CEST)
-Date: Mon, 9 Jun 2025 09:36:50 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Show reason why autodisabling serverino support
-Message-ID: <20250609073650.kj6lxrykguhb7nuo@pali>
-References: <20250608164453.6699-1-pali@kernel.org>
- <3d644c3f8acb3dbcef395bd96e7e957c@manguebit.org>
- <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="p1SZvt52"
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1749463856;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jKiJ4waegiA05TQ0OciBg5LgGP0hIGFJmfYuEnY1Jr8=;
+	b=p1SZvt529KNd0gCyudk3Gboa3ubKpTi5yCZXMEsoun04RD1qMHtkXY37a/h63lWwMTgTHl
+	XH9cNyMkM1A9n/0m9XaBg1yQmqtF4qoNt8393WdumcTqAhCEPq1bLcC9a0LVJRuBMesR3P
+	OGkOAPx8GaoB2G5X+SbXlOEDJlAEc9s=
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Paulo Alcantara <pc@cjr.nz>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 5.10] cifs: fix potential memory leaks in session setup
+Date: Mon,  9 Jun 2025 13:10:54 +0300
+Message-ID: <20250609101056.36485-1-arefev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
-User-Agent: NeoMutt/20180716
 
-cifs_autodisable_serverino() is already printing at the VFS level
-information that it is disabling the serverino. It is one time thing as
-once it is disabled, it is not printing it second time. So it does not
-flood logs.
+From: Paulo Alcantara <pc@cjr.nz>
 
-In this change I have just extended this existing logging to print also reason.
+commit 2fe58d977ee05da5bb89ef5dc4f5bf2dc15db46f upstream.
 
-On Sunday 08 June 2025 22:40:21 Steve French wrote:
-> Since this could flood logs (e.g. in some DFS cases), probably better
-> to do these via the usual dynamic trace points (and can document a
-> simple "trace-cmd -e smb3_disable_serverino" script to avoid risk of
-> flooding logs.    cifsFYI is an alternative but the world has moved to
-> the dynamic tracing (eBPF etc.)
-> 
-> On Sun, Jun 8, 2025 at 3:57 PM Paulo Alcantara <pc@manguebit.org> wrote:
-> >
-> > Pali Rohár <pali@kernel.org> writes:
-> >
-> > > Before calling cifs_autodisable_serverino() function, show reason why it
-> > > has to be called.
-> > >
-> > > This change allows to debug issues why cifs.ko decide to turn off server
-> > > inode number support and hence disable support for detection of hardlinks.
-> > >
-> > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > Cc: stable@vger.kernel.org
-> > > ---
-> > >  fs/smb/client/connect.c   | 2 ++
-> > >  fs/smb/client/dfs_cache.c | 2 ++
-> > >  fs/smb/client/inode.c     | 3 +++
-> > >  fs/smb/client/readdir.c   | 3 +++
-> > >  4 files changed, 10 insertions(+)
-> >
-> > NACK.
-> >
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+Make sure to free cifs_ses::auth_key.response before allocating it as
+we might end up leaking memory in reconnect or mounting.
+
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+[Denis: minor fix to resolve merge conflict.]                                           
+Signed-off-by: Denis Arefev <arefev@swemel.ru>                                    
+---
+Backport fix for CVE-2023-53008
+Link: https://nvd.nist.gov/vuln/detail/CVE-2023-53008
+---
+ fs/cifs/cifsencrypt.c | 1 +
+ fs/cifs/sess.c        | 2 ++
+ fs/cifs/smb2pdu.c     | 1 +
+ 3 files changed, 4 insertions(+)
+
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 9daa256f69d4..c75bcdc987e0 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -371,6 +371,7 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	 * ( for NTLMSSP_AV_NB_DOMAIN_NAME followed by NTLMSSP_AV_EOL ) +
+ 	 * unicode length of a netbios domain name
+ 	 */
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.len = size + 2 * dlen;
+ 	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
+ 	if (!ses->auth_key.response) {
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index cf6fd138d8d5..d4e215674597 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -601,6 +601,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 		return -EINVAL;
+ 	}
+ 	if (tilen) {
++		kfree_sensitive(ses->auth_key.response);
+ 		ses->auth_key.response = kmemdup(bcc_ptr + tioffset, tilen,
+ 						 GFP_KERNEL);
+ 		if (!ses->auth_key.response) {
+@@ -1335,6 +1336,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 		goto out_put_spnego_key;
+ 	}
+ 
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
+ 					 GFP_KERNEL);
+ 	if (!ses->auth_key.response) {
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 4197096e7fdb..15f9faa1e20a 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1360,6 +1360,7 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ 
+ 	/* keep session key if binding */
+ 	if (!ses->binding) {
++		kfree_sensitive(ses->auth_key.response);
+ 		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
+ 						 GFP_KERNEL);
+ 		if (!ses->auth_key.response) {
+-- 
+2.43.0
+
