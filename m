@@ -1,104 +1,94 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA3193062
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Jun 2025 21:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F91B2868B;
+	Mon,  9 Jun 2025 22:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749502918; cv=none; b=HA9TskmfjtzrndzCLMD8SQ13PRR01yHoW7oFKAKjgaLCjeIrI5k1coUoGunsi9G0GSgKOlxYp8//BUKvNObLGmTB7A8Q2qGfcSQTBB0YDlyNBtKyA0Gc408GFwXu4C8C4CxtDHMKGT4vscznIS5dZ6wxJIY8Uo5s9J67KAyZ/kI=
+	t=1749509344; cv=none; b=hys/EOQmQshleW8yU/dOKNH4NdcROfncE4W2ar1QACtEi0JY9unsHHF9cJoSwiWc/bIl3Vl2Lo5TYnIA3uxlt6ikF4BVZpiaDZxpvzUb6eaXKx3/xNeVXKlAzsZ07uGoP54ao1h2TYcUUr+OnV8jNrl4bm0jzIDHpoyjhNzEq8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749502918; c=relaxed/simple;
-	bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NsHkFHZL56SQUs2jFt7MMA/7ZCiy+G+mYXh8cAJ1/+HTbnBxFzgaBcYiiZ3vUbjxS0drcpgo3zSa5uXdQK87KjbF5rYkFGzfEbzsq+dgxfnoHxD9FCPTYSuax+udumgnp3Bu6iAhN2OPknsGMg37VlQBP+GnoqC3KUEwC6lzYIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHogn+oI; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749509344; c=relaxed/simple;
+	bh=mfvml8txlEjBQ+hcaKBN5iiZJ9Lm5MZE1rXwYquHDt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RGRclF7VcJsa/5vQacDDfOgWmsLHxhTKswxzFDhsg6vKRHXuDIAaQu+8XOII+uD20s15WCCxNQuTcuTi4R7W0Bt2jQEVDcI0pscjcBcLSIupukpkmLHtrMsjbn2F20A0UPIIciyySdtDaIUXG9GAnuyZcJLsEgYoWQHEi7LWT6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpnbM21B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHogn+oI"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3105ef2a071so51043961fa.1
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Jun 2025 14:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749502915; x=1750107715; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
-        b=dHogn+oINTThP9YpsDhTuK7B58GgtwRdvqNKZ8VZgrThNEwKcAD9hMyqNlO3Cu0pp9
-         S62Cad4vnqy0oEcfQ3DKCRZCI/99ji4+wTMpBLsjqyzDW2LfStbU3VBUj4c+6LAupxff
-         1eXFK6s2DgdfkFb6Cp02An8RJcWAN0qRkvu6NFLKMDrlcBC3324nH/QO1QY0occxZ7ZW
-         hMXBUjWMccKM+GPBuvVdJrXuR3SVYuVnB83wAS7GQBAnD8N7QKYkt9eRIv9GgsZh1H4m
-         N6Kv0JQKMXJf6UgafTRlNiTz823cNZGxEH6pmDgIFvTOCKvmlnlyGfh6Tez59hUIG9rv
-         gzlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749502915; x=1750107715;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J4DkXTYwW5Ep8DUHJ5uF89cdrUl3k3cbZQbOzQO0YiM=;
-        b=NB0BKZLE7X+bY3U09WiAtZAfpp2VORvBQfgT5IRW8/oezWmlpKXJ9E6yNPv1L7Udq6
-         hCOUDjNRIBKH6PgzWzVtSFg2E8FQysR+61Fk++ZAVpnttl8F0Wyaanl96jppR5jV4ofb
-         z94qIo4i2vlYzqGvcP4ZwBv/G6yT/drqL3k/I+B+9fnVj+eIBAiocFgOLmrajxB2QNGa
-         XVOijwgA/MAFC/DKOQuSkKoFZSDv6YWjaRJl9hDXFMCxYosZPrFQp7GM9UC5N1nCus05
-         A/fqp+VvXZEdCdazsHo+g8agxVvcVo9kkj37v2XOMkjqsijgAEp0VqBQU9dO2ee6IZX5
-         CgkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVl0tn9IUAr10yrIU5fkacX/0M69Do8u54nH/Yy6Oa7DkEu3tevRqAB012/H2Tc5whHFq6Rp9zvboxn@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrJaKrtQFfJAAEDaX25z8at3S6GjaWyNWfvX1+JhOMGfQz7xKQ
-	M+TWozfUVk9NByih40qauwKEOvNTvYYaMhrBIeYxxYRaOe0zlryJVHaP1IlIa/1prhNMC+GQh2b
-	oRuTep72Rlv7hVsTj2TjDYV59eZ9B5fHDrg==
-X-Gm-Gg: ASbGncumLC6W0k+PDz/unwSbIVIjW44OzzhiogiHUG6nQjHyx853tdRZCwUgwAFRRmy
-	ctRcYkIL6NxF2WPAp/B5kjsZZFyPgCaU/8QUwle6PdF7pz8tSrP54X9a7Rsji6yuk3Yb+i9o5aE
-	2Iv7HOz9OYjycDwTYKWCXWfS7B5NBksZy8ufw7sn3tEB6mPvKKg3UHWZO3LHdLUlIkQCU06AMp/
-	LrlCBNpjji2sM9l
-X-Google-Smtp-Source: AGHT+IHsCNHegqYNX+NPCF7HkCmAPSw+rq6dTGq/CFkeKLnS5BehJ6U+698wb4S2U1xIj2rKm2kqH5fsLFXEE+/PhoM=
-X-Received: by 2002:a05:651c:108:b0:32a:66f7:8a15 with SMTP id
- 38308e7fff4ca-32adfed5cd4mr27233801fa.39.1749502914351; Mon, 09 Jun 2025
- 14:01:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpnbM21B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DD1BC4CEEB;
+	Mon,  9 Jun 2025 22:49:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749509343;
+	bh=mfvml8txlEjBQ+hcaKBN5iiZJ9Lm5MZE1rXwYquHDt0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qpnbM21B+pDx6E+5Ta9AdJTwVXW1DkA3Y3BOZlADIqFnxqYWLbmuHGij7T/5uPaTy
+	 /K2Nk1oDReIe1pmB3kEaAOQiF6jVEXi8ZXDAFqiOIPU6dceBwFDDMV/2YHL7kPNplo
+	 qBUQW6PpE3Dyz8rq8T7ZuWMGtBxJfmun/mprl2+3h9XZ99kGSDQ1MaAOkToFBX60PO
+	 WnKwWpfAyG/rHFufli44FLSz9w/ENkOrQcgY0CIy+9w20VqA9rQUROUV9KgvMqiKKr
+	 xJzuEtGNvdYSaF/p0ol0VoGQ/IZ4Z+PNXjnr1ZDxo0u47H30nC35Ualzav9BAX6AWX
+	 XI3tt1M9fIPvQ==
+Received: by pali.im (Postfix)
+	id F2809C75; Tue, 10 Jun 2025 00:49:00 +0200 (CEST)
+Date: Tue, 10 Jun 2025 00:49:00 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] cifs: Fix validation of SMB2_OP_QUERY_WSL_EA
+ response size
+Message-ID: <20250609224900.zlocskau3pgg4itz@pali>
+References: <20250608170119.6813-1-pali@kernel.org>
+ <20250608170119.6813-4-pali@kernel.org>
+ <1bde0a162a5905828806e0993ba9e524@manguebit.com>
+ <20250608221536.fdwxexewsntxs3em@pali>
+ <17c70afea9476e5a2ebb0ed37ea780ca@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250608185900.439023-1-pkerling@rx2.rx-server.de> <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
-In-Reply-To: <CAKYAXd-SjnnTtYp2NNvRuMWp39-MhcPa-+8xVCYKxDpGHLGsCQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 9 Jun 2025 16:01:42 -0500
-X-Gm-Features: AX0GCFu2a_Ne83XmZE7MAd372CX3Rsa0q3FW0YPqFq5S-WkG8GWgwsyOi4GGSgo
-Message-ID: <CAH2r5mv+3xhiD+CdKOdnSNSz_TuR4i=9s0rViHm_ObhxDyd50w@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: disable path remapping with POSIX extensions
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Philipp Kerling <pkerling@casix.org>, linux-cifs@vger.kernel.org, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <17c70afea9476e5a2ebb0ed37ea780ca@manguebit.com>
+User-Agent: NeoMutt/20180716
 
-tentatively merged into cifs-2.6.git for-next pending additional
-testing and review
-
-On Mon, Jun 9, 2025 at 12:51=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
- wrote:
->
-> On Mon, Jun 9, 2025 at 3:59=E2=80=AFAM Philipp Kerling <pkerling@casix.or=
-g> wrote:
+On Sunday 08 June 2025 20:10:24 Paulo Alcantara wrote:
+> Pali Rohár <pali@kernel.org> writes:
+> 
+> > On Sunday 08 June 2025 18:49:43 Paulo Alcantara wrote:
+> >> Pali Rohár <pali@kernel.org> writes:
+> >> 
+> >> If we're querying all those EAs and the file has only $LXMOD, wouldn't
+> >> the server return empty EAs except for $LXMOD?
 > >
-> > If SMB 3.1.1 POSIX Extensions are available and negotiated, the client
-> > should be able to use all characters and not remap anything. Currently,=
- the
-> > user has to explicitly request this behavior by specifying the "nomappo=
-six"
-> > mount option.
-> >
-> > Link: https://lore.kernel.org/4195bb677b33d680e77549890a4f4dd3b474ceaf.=
-camel@rx2.rx-server.de
-> > Signed-off-by: Philipp Kerling <pkerling@casix.org>
-> Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
->
-> Thanks.
+> > We are using FILE_FULL_EA_INFORMATION for querying EAs, which means that
+> > always all stored EAs are returned. It is not 4 calls (one by one), but
+> > rather one call to return everything at once.
+> 
+> Yes.
+> 
+> > Windows server in this case returns just one EA in its response: $LXMOD EA.
+> > And SMB2_WSL_MIN_QUERY_EA_RESP_SIZE specifies that at least 3 EAs must
+> > be returned, otherwise check_wsl_eas() throws error and do not try to
+> > parse response.
+> 
+> Can you share a trace of the server returning only a single EA in the
+> response when we query $LXUID, $LXGID, $LXMOD and $LXDEV?
+> 
+> What I mean is that we query all those EAs when we find reparse points
+> on non-POSIX mounts, and if the file doesn't have them, the server still
+> returns the EAs but with a zero smb2_file_full_ea_info::ea_value_len.
+> check_wsl_eas() skips the EA when is @vlen zero.
 
+I started recording of tcpdump and I'm not able to reproduce it anymore.
+That is stupid. So I started investigation what happened there...
 
+And the result is that I have more changes related to EAs on my disk,
+and I did some tests on all of them. And due to bug in dissector of
+older wireshark version which I used, I wrongly interpreted the format
+of network EA buffer. So based on this I calculated all sizes wrongly
+and introduced bug in my WIP code on my disk. So it my mistake here.
 
---=20
-Thanks,
-
-Steve
+So please drop this one "PATCH 3/5". I re-checked the size limits and
+they should be correct.
