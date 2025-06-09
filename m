@@ -1,114 +1,91 @@
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFB443ABC;
-	Mon,  9 Jun 2025 10:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D7A21B8EC;
+	Mon,  9 Jun 2025 17:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749463863; cv=none; b=vAWYygdSWgbV/vIsvg7IdC1MM95hT3XBvx1GlwIonycer0Hz/ZrKC95rxTr/MHqyC2+pLjlcZAoo4tWsgdm6TS0CZXKw+ZU7ENdN5YqkeYObUuuD/3OSJficcyEa5KEVDfVfgxz2hxjJdLx7ZzxkK0/LwHLaI9Ms+slNQrfgBOM=
+	t=1749488799; cv=none; b=GqwCKqeQiKDkRFUA6eA441JzXOwXKZ8ePoVOrBuOi/PLxWpQBbifEZeH1GuEVCgwWEfgB29EoCLCw6jiTFeCV4Ub9nHbDBHL/WTTqB/LZix3sEHpQqWka/77FNQWkkn7X1ewz/zm6gbdQa/5NFzcElyEpGYF8BQDw61xrJOf6NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749463863; c=relaxed/simple;
-	bh=JzvgjZLv5cGW6fc6fGEDZj9SR+1de/3cdl56xIRTnG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H+A/ROiyQ08joF+9hd1xbzZ/eeEj6frVaPS9SMOMd4vM5fKeGO5AB68X5F7fpm8yIGXwa4BDB9F2zJAwaJMgh7kBtvpYcmKM35/pckemJfjgspA0dKBGOK+sLF8cqTnQ46FtRs7hTIM4FX3i6YEeVWnhOU+QY9N21GPinX2RbFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=p1SZvt52; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+	s=arc-20240116; t=1749488799; c=relaxed/simple;
+	bh=xj2K0Hn1KyDlFCEgp/1ceXvAVXo0W7st5XQzYhwKR9I=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=CnxxmDJxSwdxJVO982rTo1Ue8+XmFMovcIpQzWt+/PTdDM5DXADKosCDomChdsCXPWC2xRTsECPLQeeVboA/SFU7nMxbu9qATo/kLAeiZEw2B5cpdGJh7SOrYCupxIEnEBXARBt2nJWAk1JBPNMyAotUWm/JsuMfzNZuIXuxlVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLNzjMer; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="p1SZvt52"
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1749463856;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jKiJ4waegiA05TQ0OciBg5LgGP0hIGFJmfYuEnY1Jr8=;
-	b=p1SZvt529KNd0gCyudk3Gboa3ubKpTi5yCZXMEsoun04RD1qMHtkXY37a/h63lWwMTgTHl
-	XH9cNyMkM1A9n/0m9XaBg1yQmqtF4qoNt8393WdumcTqAhCEPq1bLcC9a0LVJRuBMesR3P
-	OGkOAPx8GaoB2G5X+SbXlOEDJlAEc9s=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Paulo Alcantara <pc@cjr.nz>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 5.10] cifs: fix potential memory leaks in session setup
-Date: Mon,  9 Jun 2025 13:10:54 +0300
-Message-ID: <20250609101056.36485-1-arefev@swemel.ru>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLNzjMer"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32a72cb7e4dso41897251fa.0;
+        Mon, 09 Jun 2025 10:06:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749488795; x=1750093595; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1B9jz9bzgcDaYUJYbUm/nwrrVlRYLDHkUIDUm7vm5gA=;
+        b=hLNzjMermV94bnjLDJWzFAkJeDRFiEbkvtoBWR9ReOLFuccxI3nJIJabYAWY7xYHKg
+         iDsw5JoY2BtQpzobdMOycFhhBvcYaLcAahWcc1rEvAJ3LfhvEOlsNFDN+O8hj0bL3lhr
+         HE920a38VZqO0TAvzHrql2lWA3OybBPAlYVBP34ir5iLJz+UFz/nl1Al4xFlOVlc6IEZ
+         STUChNJM/mSAUZaVw0QJ+cvmx9NWAwoPVyLi60RNp1QRsfsTBrmZbgxxUgljbc77KCKN
+         VF/7VrTR1uufdf9NTwTneGWdgIsipNy+O1ScD024x1tnoO9Dr1gW021BgkHZ7bZewhoy
+         K3ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749488795; x=1750093595;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1B9jz9bzgcDaYUJYbUm/nwrrVlRYLDHkUIDUm7vm5gA=;
+        b=b3Xax8+PLimCKAjH1hlgexxHDONMaL5iLZG3k06bGg5gVWSD8UM7X2HVwgqZA8BFEa
+         z/s7G02bjiKzHaAlk/158AWe5mb0c09vBvx8LsE4UwubIweVh0Yd8mPmMjbR3nxfiqhw
+         oEeR5GfEbCPW0mBjXLoMyiAZCMXJykbv5C6AbJUM0VwlPSjYdZ4z2CrHM+zeLyZFqTyU
+         UOOgVesgeAnNYg7mtHSNdUMCIDetxC1OqsdUNfCoGnoBuwG7BmvtIU/22Z8OAfrdiUuZ
+         QgK4m0KjnP7Vb0JrCdwL4c7UiW8fIdW7hUSVVvxQmY+aIerSV2qfCGwAnoAJ2CcLnr34
+         gKMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV90mtvXjiGzsaBNLcs/fjI751r1g+q8zRlbXHUPpOCYzughP68jBPduKSrFRspLbpGX2M3OWlruascxMJXsQ==@vger.kernel.org, AJvYcCVHPmDerc4bCUmd8ffcpDJ4lhwuPjj3CZ/acwLmUgDmmhUqkTJ4c1h/ryBluEhNMnCjFydNJF/CsOmm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJgHUA4BoSDj3u4M5EDBfTzwnAh6BVfsFin9SRlDDwUE5Q77R7
+	EasSz/LFHsnNWobXFhJfY7Fzzq/Vd3Qh5ppUYp+3PWxdE/wCHNQOdxqd7BFtu0MOq+Ku0+ZyhVR
+	FZ5dKYpyFqyk4nuLkp06xKDQJzQanf90=
+X-Gm-Gg: ASbGnct0t5XWrT/HB/ByrKWVwwx1AKXNi1MVk/4BBWX9y2bpJ9XlrG9BlkAgl0BOQsk
+	tPs29DRpaQKvQXdIHm+f3SfcA64h8NcRCCVSpJ+jCbORfysrIeQrXYSN0WuNrYVGbzCjjTg7nCH
+	8kg1xJJjDeshtphoXUnr/DqhjMqnUKeNGj2DxXqx0PJh0NcVRbY0SW7WXOjqXirJUnkQ8=
+X-Google-Smtp-Source: AGHT+IHs3x7MiIxf+cWKc7abiJCC9IsvRO7Ev/Vbmo9eLh43sdlNK0JojZJXE291FuxIFOvUsBhv2t2laasYz3xT+VM=
+X-Received: by 2002:a05:651c:b12:b0:30b:f469:47ef with SMTP id
+ 38308e7fff4ca-32adfd207bbmr39463521fa.23.1749488795292; Mon, 09 Jun 2025
+ 10:06:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Mon, 9 Jun 2025 12:06:23 -0500
+X-Gm-Features: AX0GCFsrRONFJpE2z-GNlrMZuis3d387b0I5W2Mqd7Xzluc394ppvLGirmBiFtE
+Message-ID: <CAH2r5mu5SfBrdc2CFHwzft8=n9koPMk+Jzwpy-oUMx-wCRCesQ@mail.gmail.com>
+Subject: Perf regression in 6.16-rc1 in generic/676 (readdir related)
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	NeilBrown <neil@brown.name>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Bharath S M <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Paulo Alcantara <pc@cjr.nz>
+Instead of the usual 10 to 12 minutes to run generic/676 (on all
+kernels up to 6.15), we are now seeing 23-30 minutes to run
+generic/676, much more than twice as slow.   It looks like this is due
+to unnecessary revalidates now being sent to the fs (starting with
+6.16-rc1 kernels) on every file in a directory, and is caused by
+readdir.   Bharath was trying to isolate the commit that caused this,
+but this recently merged series could be related:
 
-commit 2fe58d977ee05da5bb89ef5dc4f5bf2dc15db46f upstream.
+06c567403ae5 Use try_lookup_noperm() instead of d_hash_and_lookup()
+outside of VFS
+fa6fe07d1536 VFS: rename lookup_one_len family to lookup_noperm and
+remove permission check
 
-Make sure to free cifs_ses::auth_key.response before allocating it as
-we might end up leaking memory in reconnect or mounting.
+Has anyone else noticed this perf regression?
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[Denis: minor fix to resolve merge conflict.]                                           
-Signed-off-by: Denis Arefev <arefev@swemel.ru>                                    
----
-Backport fix for CVE-2023-53008
-Link: https://nvd.nist.gov/vuln/detail/CVE-2023-53008
----
- fs/cifs/cifsencrypt.c | 1 +
- fs/cifs/sess.c        | 2 ++
- fs/cifs/smb2pdu.c     | 1 +
- 3 files changed, 4 insertions(+)
+For the case of cifs.ko mounts, it is easy to repro with generic/676.
+And also could be reproduced with simple "ls" of large directories.
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 9daa256f69d4..c75bcdc987e0 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -371,6 +371,7 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	 * ( for NTLMSSP_AV_NB_DOMAIN_NAME followed by NTLMSSP_AV_EOL ) +
- 	 * unicode length of a netbios domain name
- 	 */
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.len = size + 2 * dlen;
- 	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index cf6fd138d8d5..d4e215674597 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -601,6 +601,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 		return -EINVAL;
- 	}
- 	if (tilen) {
-+		kfree_sensitive(ses->auth_key.response);
- 		ses->auth_key.response = kmemdup(bcc_ptr + tioffset, tilen,
- 						 GFP_KERNEL);
- 		if (!ses->auth_key.response) {
-@@ -1335,6 +1336,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
- 		goto out_put_spnego_key;
- 	}
- 
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
- 					 GFP_KERNEL);
- 	if (!ses->auth_key.response) {
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 4197096e7fdb..15f9faa1e20a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1360,6 +1360,7 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 
- 	/* keep session key if binding */
- 	if (!ses->binding) {
-+		kfree_sensitive(ses->auth_key.response);
- 		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
- 						 GFP_KERNEL);
- 		if (!ses->auth_key.response) {
 -- 
-2.43.0
+Thanks,
 
+Steve
