@@ -1,215 +1,364 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6991D23A993;
-	Tue, 10 Jun 2025 18:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384622472B9
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Jun 2025 18:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749579311; cv=none; b=fiFakbd6QNRgkfra6qdgcwahGBntRPnp718uKJBWhBiNR5e6n1jDpnJLjKWtnEfPp5Sm3y1+q/1f3u3c3dS6w0I/h6AA6uxG2r0vPKvYXIpU1TyBZXRfyEG2BY6Lc8Bz6sFPRPSZM6FXnWd61j3sFDfAw0P6Js7ERVGNXSWRFB0=
+	t=1749579584; cv=none; b=GKlKWmZIRL5qCJryplY/Oe5/uikQtg+rmaePwr+TnFV0eH5gb+KODrgDtA1CGmDTUTPxwnNoD/SoFdGx7oCbl9+5xCeC1zqbuCYYhNK5FUkYD3AyqR2vj9O1ax91VmwWpVvWknsDggHU1L6/1OGCIVvg3uYvtxZVYGUjR46EObI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749579311; c=relaxed/simple;
-	bh=mL4bjzx4+LiYoVCmPebXQFcmiHtDaruNtlb215BQcb0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L0gQDGDTxFCoBlaXjqSI6sdP9kzyKHYIaG2607lystfdAZEhTcIYL6cc83N7CvI/KfDYghSMr6Z15IklZHBSp8iK9+p5Gz508AjQ5ypBGTPSzsTF83S7zBCdDbfrg9ek/CD7ggLw8fWGjwZ0+8rhaNDmdGih42XdxSKi2eGoPTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ir7AKMgd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749579584; c=relaxed/simple;
+	bh=ba76+BU6/MkUaZ9GKzgpisn+hy/KPqdxdiyA+Vl+WSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BJ+cGBwTR1IhPKVJyFNJadtEsalpS6YdTMwPfAW4pvLXS3ocKIaE1pJSCRuTJc05kxH0NT9VuvSPrVIjV9L73sDzF6oqhiPA0mlTRugLZ0EBaxMvktMcconueE2rR+aELf0a1kbA0ZyUAARm94g7JahDnbYgEV5aIBWr1hzIuWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=A9qGjo9H; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HcwUHIjV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AJgQdOic; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IgjRysL0; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ir7AKMgd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A45BC4CEED;
-	Tue, 10 Jun 2025 18:15:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749579309;
-	bh=mL4bjzx4+LiYoVCmPebXQFcmiHtDaruNtlb215BQcb0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ir7AKMgdfT7Ag0B78irRVqOgGX9tfN2NxzxTrifLgUH4aHa6zBo7Ezhbu9JhZd9fi
-	 3C6eoFAYDaJbSj77j0jslXWr2sz1OuapecwE97i7lGtEfqbkIoTnsloPPKsQflKWqK
-	 VE1NpN99wQgJtbRS013S9UeKdfiMu2dR16Ve9MK4YBN+B+ESUdHSNNXCYFGXKA7cHU
-	 zBLiFfpDUDqBQ5ENkcInvai1OhRQorJbNoOo12sPSFR4SZOLW6ANaUbQMqBKpPLy3Q
-	 xE7X/OYNTuScllG3UnktakTaNr/lOSyWtnC4j+qRyDG0vsTUtpz2Ht5IAfUHp4VgdO
-	 0/PeqriqUsgYQ==
-Received: by pali.im (Postfix)
-	id 457C84F1; Tue, 10 Jun 2025 20:15:07 +0200 (CEST)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] cifs: Show reason why autodisabling serverino support
-Date: Tue, 10 Jun 2025 20:15:02 +0200
-Message-Id: <20250610181502.15839-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250610172221.ihsrjrikbiijyb4n@pali>
-References: <20250610172221.ihsrjrikbiijyb4n@pali>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="A9qGjo9H";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HcwUHIjV";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AJgQdOic";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IgjRysL0"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1168921952;
+	Tue, 10 Jun 2025 18:19:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749579580; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=XI9/jolonswTQ44yxAlRkg/gR45/zOlAdewp11zD7YY=;
+	b=A9qGjo9HAwpGl/cwAg19k56JcGhOqVhZElgFFjbCZ/t8f+IdjovtIZDQwtcH1r9BNoooFT
+	PDXmcUVwQeOqc96SDnIsaC79JjZ0Y31H0+8A7SWbzq0y0ARn1m5W3c7yAfka3INHOFeBoj
+	fO8HO8GJK+NWohCYDzo8KxN4HS3X5jM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749579580;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=XI9/jolonswTQ44yxAlRkg/gR45/zOlAdewp11zD7YY=;
+	b=HcwUHIjVb+oobVB1wa0O+1a1vWMIFzAk1SF0vbiW3MPoRc5c0dDaguhs2csgyGb2U3S7St
+	fvnWmf1yT2DrlRBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=AJgQdOic;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=IgjRysL0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749579579; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=XI9/jolonswTQ44yxAlRkg/gR45/zOlAdewp11zD7YY=;
+	b=AJgQdOicYPvHTmCc4qQ6ZDy+ZmehO2II1xGVyAZAzrXzL6o/+LMh+GGeIdXZN+e8tcfvCl
+	DXgZRPifK6CufvKNRzwBA23Lk0MxHve7Jt7QRmlGW++6AKjOgYyIthUd690kf6XZfgektX
+	fQJqfR1noOGLzWlUF3FG1Ws8uEPp9Yk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749579579;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=XI9/jolonswTQ44yxAlRkg/gR45/zOlAdewp11zD7YY=;
+	b=IgjRysL0UyAoHXDZrFQitL57z0KztMwug0ldn70eHzO7GLN36R1FdLddx/XC+tBawl+xS0
+	dVzql9ThUXJrOjAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 91111139E2;
+	Tue, 10 Jun 2025 18:19:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 7yIDFjp3SGiJAwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 10 Jun 2025 18:19:38 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com
+Subject: [PATCH] smb: client: fix crypto buffers in non-linear memory
+Date: Tue, 10 Jun 2025 15:19:29 -0300
+Message-ID: <20250610181929.607075-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 1168921952
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
+	DKIM_TRACE(0.00)[suse.de:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_NONE(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email,qemu.org:url,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Score: -3.01
+X-Spam-Level: 
 
-Extend cifs_autodisable_serverino() function to print also text message why
-the function was called.
+The crypto API, through the scatterlist API, expects input buffers to be
+in linear memory.  We handle this with the cifs_sg_set_buf() helper
+that converts vmalloc'd memory to their corresponding pages.
 
-The text message is printed just once for mount then autodisabling
-serverino support. Once the serverino support is disabled for mount it will
-not be re-enabled. So those text messages do not cause flooding logs.
+However, when we allocate our aead_request buffer (@creq in
+smb2ops.c::crypt_message()), we do so with kvzalloc(), which possibly
+puts aead_request->__ctx in vmalloc area.
 
-This change allows to debug issues why cifs.ko decide to turn off server
-inode number support and hence disable support for detection of hardlinks.
+AEAD algorithm then uses ->__ctx for its private/internal data and
+operations, and uses sg_set_buf() for such data on a few places.
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
+This works fine as long as @creq falls into kmalloc zone (small
+requests) or vmalloc'd memory is still within linear range.
+
+Tasks' stacks are vmalloc'd by default (CONFIG_VMAP_STACK=y), so too
+many tasks will increment the base stacks' addresses to a point where
+virt_addr_valid(buf) will fail (BUG() in sg_set_buf()) when that
+happens.
+
+In practice: too many parallel reads and writes on an encrypted mount
+will trigger this bug.
+
+To fix this, allocate @creq with kzalloc() and allocate the input
+scatterlist separately with kvcalloc().  To prevent future occurrences
+also allocate @iv and @sign with kzalloc().
+
+Also drop smb2_aead_req_alloc() since we no longer need to align a
+monolithic pointer.
+
+Backtrace:
+
+[  945.272081] ------------[ cut here ]------------
+[  945.272774] kernel BUG at include/linux/scatterlist.h:209!
+[  945.273520] Oops: invalid opcode: 0000 [#1] SMP DEBUG_PAGEALLOC NOPTI
+[  945.274412] CPU: 7 UID: 0 PID: 56 Comm: kworker/u33:0 Kdump: loaded Not tainted 6.15.0-lku-11779-g8e9d6efccdd7-dirty #1 PREEMPT(voluntary)
+[  945.275736] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.3-2-gc13ff2cd-prebuilt.qemu.org 04/01/2014
+[  945.276877] Workqueue: writeback wb_workfn (flush-cifs-2)
+[  945.277457] RIP: 0010:crypto_gcm_init_common+0x1f9/0x220
+[  945.278018] Code: b0 00 00 00 48 83 c4 08 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 48 c7 c0 00 00 00 80 48 2b 05 5c 58 e5 00 e9 58 ff ff ff <0f> 0b 0f 0b 0f 0b 0f 0b 0f 0b 0f 0b 48 c7 04 24 01 00 00 00 48 8b
+[  945.279992] RSP: 0018:ffffc90000a27360 EFLAGS: 00010246
+[  945.280578] RAX: 0000000000000000 RBX: ffffc90001d85060 RCX: 0000000000000030
+[  945.281376] RDX: 0000000000080000 RSI: 0000000000000000 RDI: ffffc90081d85070
+[  945.282145] RBP: ffffc90001d85010 R08: ffffc90001d85000 R09: 0000000000000000
+[  945.282898] R10: ffffc90001d85090 R11: 0000000000001000 R12: ffffc90001d85070
+[  945.283656] R13: ffff888113522948 R14: ffffc90001d85060 R15: ffffc90001d85010
+[  945.284407] FS:  0000000000000000(0000) GS:ffff8882e66cf000(0000) knlGS:0000000000000000
+[  945.285262] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  945.285884] CR2: 00007fa7ffdd31f4 CR3: 000000010540d000 CR4: 0000000000350ef0
+[  945.286683] Call Trace:
+[  945.286952]  <TASK>
+[  945.287184]  ? crypt_message+0x33f/0xad0 [cifs]
+[  945.287719]  crypto_gcm_encrypt+0x36/0xe0
+[  945.288152]  crypt_message+0x54a/0xad0 [cifs]
+[  945.288724]  smb3_init_transform_rq+0x277/0x300 [cifs]
+[  945.289300]  smb_send_rqst+0xa3/0x160 [cifs]
+[  945.289944]  cifs_call_async+0x178/0x340 [cifs]
+[  945.290514]  ? __pfx_smb2_writev_callback+0x10/0x10 [cifs]
+[  945.291177]  smb2_async_writev+0x3e3/0x670 [cifs]
+[  945.291759]  ? find_held_lock+0x32/0x90
+[  945.292212]  ? netfs_advance_write+0xf2/0x310
+[  945.292723]  netfs_advance_write+0xf2/0x310
+[  945.293210]  netfs_write_folio+0x346/0xcc0
+[  945.293689]  ? __pfx__raw_spin_unlock_irq+0x10/0x10
+[  945.294250]  netfs_writepages+0x117/0x460
+[  945.294724]  do_writepages+0xbe/0x170
+[  945.295152]  ? find_held_lock+0x32/0x90
+[  945.295600]  ? kvm_sched_clock_read+0x11/0x20
+[  945.296103]  __writeback_single_inode+0x56/0x4b0
+[  945.296643]  writeback_sb_inodes+0x229/0x550
+[  945.297140]  __writeback_inodes_wb+0x4c/0xe0
+[  945.297642]  wb_writeback+0x2f1/0x3f0
+[  945.298069]  wb_workfn+0x300/0x490
+[  945.298472]  process_one_work+0x1fe/0x590
+[  945.298949]  worker_thread+0x1ce/0x3c0
+[  945.299397]  ? __pfx_worker_thread+0x10/0x10
+[  945.299900]  kthread+0x119/0x210
+[  945.300285]  ? __pfx_kthread+0x10/0x10
+[  945.300729]  ret_from_fork+0x119/0x1b0
+[  945.301163]  ? __pfx_kthread+0x10/0x10
+[  945.301601]  ret_from_fork_asm+0x1a/0x30
+[  945.302055]  </TASK>
+
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
-Paulo and Tom, could you check if this change is better now for you?
-It should address problems with logs flooding and also information about
-harlinks (it is already printed as can be seen also in this diff).
-I would like to get your ACK, so I'm trying to improve it.
----
- fs/smb/client/cifsproto.h | 2 +-
- fs/smb/client/connect.c   | 2 +-
- fs/smb/client/dfs_cache.c | 2 +-
- fs/smb/client/inode.c     | 6 +++---
- fs/smb/client/misc.c      | 6 +++++-
- fs/smb/client/readdir.c   | 4 ++--
- 6 files changed, 13 insertions(+), 9 deletions(-)
+ fs/smb/client/smb2ops.c | 95 +++++++++++++++++------------------------
+ 1 file changed, 40 insertions(+), 55 deletions(-)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index d550662b4e72..07a67c8c37ce 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -586,9 +586,9 @@ extern int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 			   const struct nls_table *nls_codepage, int remap);
- extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
- 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
- #endif /* CIFS_ALLOW_INSECURE_LEGACY */
--extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
-+extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char *reason, int rc);
- extern bool couldbe_mf_symlink(const struct cifs_fattr *fattr);
- extern int check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 			      struct cifs_sb_info *cifs_sb,
- 			      struct cifs_fattr *fattr,
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 6bf04d9a5491..819721dfd5bb 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3907,9 +3907,9 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 	/*
- 	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
- 	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
- 	 */
--	cifs_autodisable_serverino(cifs_sb);
-+	cifs_autodisable_serverino(cifs_sb, "Reconnecting to different server, inode numbers won't match anymore", 0);
- 	/*
- 	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
- 	 * that have different prefix paths.
- 	 */
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index 4dada26d56b5..c3fe85c31e2b 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -1288,9 +1288,9 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
- 	/*
- 	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
- 	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
- 	 */
--	cifs_autodisable_serverino(cifs_sb);
-+	cifs_autodisable_serverino(cifs_sb, "Reconnecting to different server, inode numbers won't match anymore", 0);
- 	/*
- 	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
- 	 * that have different prefix paths.
- 	 */
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cd06598eacbd..b1c6e3986278 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1076,9 +1076,9 @@ static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_blo
- 		if (*inode)
- 			fattr->cf_uniqueid = CIFS_I(*inode)->uniqueid;
- 		else {
- 			fattr->cf_uniqueid = iunique(sb, ROOT_I);
--			cifs_autodisable_serverino(cifs_sb);
-+			cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number via get_srv_inum", rc);
- 		}
- 		return;
- 	}
- 
-@@ -1529,9 +1529,9 @@ cifs_iget(struct super_block *sb, struct cifs_fattr *fattr)
- 		if (fattr->cf_flags & CIFS_FATTR_INO_COLLISION) {
- 			fattr->cf_flags &= ~CIFS_FATTR_INO_COLLISION;
- 
- 			if (inode_has_hashed_dentries(inode)) {
--				cifs_autodisable_serverino(CIFS_SB(sb));
-+				cifs_autodisable_serverino(CIFS_SB(sb), "Inode number collision detected", 0);
- 				iput(inode);
- 				fattr->cf_uniqueid = iunique(sb, ROOT_I);
- 				goto retry_iget5_locked;
- 			}
-@@ -1596,9 +1596,9 @@ struct inode *cifs_root_iget(struct super_block *sb)
- iget_root:
- 	if (!rc) {
- 		if (fattr.cf_flags & CIFS_FATTR_JUNCTION) {
- 			fattr.cf_flags &= ~CIFS_FATTR_JUNCTION;
--			cifs_autodisable_serverino(cifs_sb);
-+			cifs_autodisable_serverino(cifs_sb, "Cannot retrieve attributes for junction point", rc);
- 		}
- 		inode = cifs_iget(sb, &fattr);
- 	}
- 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index e77017f47084..409277883e8a 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -551,9 +551,9 @@ dump_smb(void *buf, int smb_buf_length)
- 		       smb_buf_length, true);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 1468c16ea9b8..f3ea5ebd89fc 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4185,54 +4185,30 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
+ 	memcpy(&tr_hdr->SessionId, &shdr->SessionId, 8);
  }
  
- void
--cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
-+cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char *reason, int rc)
+-static void *smb2_aead_req_alloc(struct crypto_aead *tfm, const struct smb_rqst *rqst,
+-				 int num_rqst, const u8 *sig, u8 **iv,
+-				 struct aead_request **req, struct sg_table *sgt,
+-				 unsigned int *num_sgs, size_t *sensitive_size)
+-{
+-	unsigned int req_size = sizeof(**req) + crypto_aead_reqsize(tfm);
+-	unsigned int iv_size = crypto_aead_ivsize(tfm);
+-	unsigned int len;
+-	u8 *p;
+-
+-	*num_sgs = cifs_get_num_sgs(rqst, num_rqst, sig);
+-	if (IS_ERR_VALUE((long)(int)*num_sgs))
+-		return ERR_PTR(*num_sgs);
+-
+-	len = iv_size;
+-	len += crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment() - 1);
+-	len = ALIGN(len, crypto_tfm_ctx_alignment());
+-	len += req_size;
+-	len = ALIGN(len, __alignof__(struct scatterlist));
+-	len += array_size(*num_sgs, sizeof(struct scatterlist));
+-	*sensitive_size = len;
+-
+-	p = kvzalloc(len, GFP_NOFS);
+-	if (!p)
+-		return ERR_PTR(-ENOMEM);
+-
+-	*iv = (u8 *)PTR_ALIGN(p, crypto_aead_alignmask(tfm) + 1);
+-	*req = (struct aead_request *)PTR_ALIGN(*iv + iv_size,
+-						crypto_tfm_ctx_alignment());
+-	sgt->sgl = (struct scatterlist *)PTR_ALIGN((u8 *)*req + req_size,
+-						   __alignof__(struct scatterlist));
+-	return p;
+-}
+-
+-static void *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
+-			       int num_rqst, const u8 *sig, u8 **iv,
+-			       struct aead_request **req, struct scatterlist **sgl,
+-			       size_t *sensitive_size)
++/* Caller must free returned aead_request, @sig, @iv, and @sgl. */
++static struct aead_request *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
++					      int num_rqst, u8 **sig, struct scatterlist **sgl)
  {
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 		struct cifs_tcon *tcon = NULL;
++	struct aead_request *req;
+ 	struct sg_table sgtable = {};
+ 	unsigned int skip, num_sgs, i, j;
+ 	ssize_t rc;
+-	void *p;
  
-@@ -561,8 +561,12 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
- 			tcon = cifs_sb_master_tcon(cifs_sb);
+-	p = smb2_aead_req_alloc(tfm, rqst, num_rqst, sig, iv, req, &sgtable,
+-				&num_sgs, sensitive_size);
+-	if (IS_ERR(p))
+-		return ERR_CAST(p);
++	*sig = kzalloc(SMB2_SIGNATURE_SIZE, GFP_NOFS);
++	if (!*sig)
++		return NULL;
++
++	num_sgs = cifs_get_num_sgs(rqst, num_rqst, *sig);
++	if (num_sgs <= 0)
++		return NULL;
++
++	req = aead_request_alloc(tfm, GFP_NOFS);
++	if (!req)
++		return NULL;
++
++	sgtable.sgl = kvcalloc(num_sgs, sizeof(struct scatterlist), GFP_NOFS);
++	if (!sgtable.sgl)
++		return NULL;
  
- 		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
- 		cifs_sb->mnt_cifs_serverino_autodisabled = true;
-+		if (rc)
-+			cifs_dbg(VFS, "%s: %d\n", reason, rc);
-+		else
-+			cifs_dbg(VFS, "%s\n", reason);
- 		cifs_dbg(VFS, "Autodisabling the use of server inode numbers on %s\n",
- 			 tcon ? tcon->tree_name : "new server");
- 		cifs_dbg(VFS, "The server doesn't seem to support them properly or the files might be on different servers (DFS)\n");
- 		cifs_dbg(VFS, "Hardlinks will not be recognized on this mount. Consider mounting with the \"noserverino\" option to silence this message.\n");
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 787d6bcb5d1d..06e90921f751 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -412,9 +412,9 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
- 	if (rc == 0) {
- 		cifsFile->invalidHandle = false;
- 	} else if ((rc == -EOPNOTSUPP) &&
- 		   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
--		cifs_autodisable_serverino(cifs_sb);
-+		cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number via query_dir_first", rc);
- 		goto ffirst_retry;
- 	}
- error_exit:
- 	cifs_put_tlink(tlink);
-@@ -1006,9 +1006,9 @@ static int cifs_filldir(char *find_entry, struct file *file,
- 	if (de.ino && (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
- 		fattr.cf_uniqueid = de.ino;
- 	} else {
- 		fattr.cf_uniqueid = iunique(sb, ROOT_I);
--		cifs_autodisable_serverino(cifs_sb);
-+		cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number", 0);
+ 	sg_init_marker(sgtable.sgl, num_sgs);
+ 
+@@ -4262,10 +4238,11 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
+ 		sgtable.orig_nents = sgtable.nents;
  	}
  
- 	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) &&
- 	    couldbe_mf_symlink(&fattr))
+-	cifs_sg_set_buf(&sgtable, sig, SMB2_SIGNATURE_SIZE);
++	cifs_sg_set_buf(&sgtable, *sig, SMB2_SIGNATURE_SIZE);
+ 	sg_mark_end(&sgtable.sgl[sgtable.nents - 1]);
+ 	*sgl = sgtable.sgl;
+-	return p;
++
++	return req;
+ }
+ 
+ static int
+@@ -4311,14 +4288,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
+ 	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
+ 	int rc = 0;
+-	struct scatterlist *sg;
+-	u8 sign[SMB2_SIGNATURE_SIZE] = {};
++	struct scatterlist *sg = NULL;
+ 	u8 key[SMB3_ENC_DEC_KEY_SIZE];
+ 	struct aead_request *req;
+-	u8 *iv;
++	u8 *iv = NULL, *sign = NULL;
+ 	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
+-	void *creq;
+-	size_t sensitive_size;
+ 
+ 	rc = smb2_get_enc_key(server, le64_to_cpu(tr_hdr->SessionId), enc, key);
+ 	if (rc) {
+@@ -4344,16 +4318,23 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 		return rc;
+ 	}
+ 
+-	creq = smb2_get_aead_req(tfm, rqst, num_rqst, sign, &iv, &req, &sg,
+-				 &sensitive_size);
+-	if (IS_ERR(creq))
+-		return PTR_ERR(creq);
++	req = smb2_get_aead_req(tfm, rqst, num_rqst, &sign, &sg);
++	if (!req) {
++		rc = -ENOMEM;
++		goto err_free;
++	}
+ 
+ 	if (!enc) {
+ 		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
+ 		crypt_len += SMB2_SIGNATURE_SIZE;
+ 	}
+ 
++	iv = kzalloc(crypto_aead_ivsize(tfm), GFP_NOFS);
++	if (!iv) {
++		rc = -ENOMEM;
++		goto err_free;
++	}
++
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
+ 	    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+ 		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
+@@ -4370,8 +4351,12 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 
+ 	if (!rc && enc)
+ 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
++err_free:
++	kfree(iv);
++	kfree(sign);
++	kvfree(sg);
++	aead_request_free(req);
+ 
+-	kvfree_sensitive(creq, sensitive_size);
+ 	return rc;
+ }
+ 
 -- 
-2.20.1
+2.49.0
 
