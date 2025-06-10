@@ -1,113 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081E020EB;
-	Tue, 10 Jun 2025 16:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E224293F;
+	Tue, 10 Jun 2025 17:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749574559; cv=none; b=hjOQYpOyv9JTvZZG3MhqlFGeFXX0RkaPQ0c57iGSkYvDKjG+tWoBf1w64PuCl8npbDrS00h79l2/6crrjdzgSK0kiSGHAhTvYFh9/7CI8sS1V3Cdmt+kYf6+cuSA1EpzH2J+K5LifSyWhWwHUre+6cMJaXdrx7IyuURToyj8vkU=
+	t=1749575232; cv=none; b=H+ZSw6qNjlPJYBOfkw5HTwyIZ1WrTyqjzB7ttPsNXV3TrpFG9hqLIMC6V3FTIYEYllpNIy5XMWHoFK8qSFzRwK5paDgpZjJRUt1hLNnhZk+1RTyppwqob4nY1UG+6vb+JxY2x2m2glF4iMF0VPJplhX1yaE3b19BmKJ0mvcbqYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749574559; c=relaxed/simple;
-	bh=IU9Fgqop975ZuM3T85byHeBxqf+hSpv65MYGR2Itz2Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ay7w74LLKZ1+yytC51mPJhd0DH0eS8NcPrJggxr6BZxWFYb0AKLQk41VPPhgZqbt27/k+4GJAfZoFbeGsjXC+u/B7ypXbx4HVqcBQlYVIt4GQy9M8p9GoqIXla7MBZlMuyXQEeRl6uKF/kUL8j0pgx0frEjtyqAaOBJnIq6tEl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+G2SiSJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1749575232; c=relaxed/simple;
+	bh=46zR+ZR50XcleClVyr4cP8nJe5FVa5UX1au6OYPIudw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uKlbxR24LcG1T8CZhpEzXwbFc0A9ftVLppqxcom598RCnNaIuS0hm1te5sdoTDsOtridZkTjpC5NU6IW/HpfdWfJqyC8tOZlCf2Htl0+DX8hmxsMCzviJqJGPwPQRu6rcp87evRb0MmoZZ9lnnJKCoEj1FyP6JroiR0zyRgosdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eLEobg4z; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+G2SiSJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB4BC4CEED;
-	Tue, 10 Jun 2025 16:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749574558;
-	bh=IU9Fgqop975ZuM3T85byHeBxqf+hSpv65MYGR2Itz2Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R+G2SiSJCBDBzN9DWXwF7dU+N5KctyzcrAqDzfuKb1Tq72WUtMdHJfcDYCAoFo64i
-	 oSHQlPvgiA7+jL/citQ1j2lhexQKFpKHLKwaCcERTlMQpQdZAhA8wNEFqb8YnAe6Kr
-	 WNZRpONntXV7ihRBWNLelHo+cWnaxKibPNXuS+iVG/jEsL5zrOs5J6EsE9j7WyrQ4x
-	 urD4hG+Bjcic6O4h/mTwWwRkXxhJGQ2x0VmapY+ag1E7c1tm3OS/DK2QK9pkCmXg5V
-	 xbTz2FkdinbRkljKwH3WVn0pnjNGD9iv9LniiwVVdjoXTFfrk5Muymi/zMpO21L8lW
-	 d+pALGN8OC5YQ==
-Received: by pali.im (Postfix)
-	id D2FB94F1; Tue, 10 Jun 2025 18:55:55 +0200 (CEST)
-Date: Tue, 10 Jun 2025 18:55:55 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Tom Talpey <tom@talpey.com>
-Cc: Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>,
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Show reason why autodisabling serverino support
-Message-ID: <20250610165555.sekma4ybcl63flnw@pali>
-References: <20250608164453.6699-1-pali@kernel.org>
- <3d644c3f8acb3dbcef395bd96e7e957c@manguebit.org>
- <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
- <20250609073650.kj6lxrykguhb7nuo@pali>
- <ac80cb46-5787-4fc9-a405-fd38a505c613@talpey.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eLEobg4z"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32a81344ae9so59736801fa.0;
+        Tue, 10 Jun 2025 10:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749575229; x=1750180029; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E3WVKJVLsC72+25+NT9c5Ak83GPqKH0nfsEur1vtPag=;
+        b=eLEobg4zdQx1X/9v+tFozZOPPZfsCZPfVO6YGwTBL+gjmdSlo0jB3tvDi+A9/b4Emo
+         9L2oh0MYdBsErXnSyuVfgwHxCoMDDo4+CpJrj5lKd2qq1uCfXiwFHAFhSXRmUXCWXUEH
+         L12sEhgjzr5QzCybd86d6x4DVADRiiynnh7TxpXFrM3v1Jy5PnIwf7E6kc2lJb05oH8a
+         0SnPJ5FgfvH6rH7c3RAP9stfzCxefijUpHHQPO/qDNBZ9lOZ2aqWZV8ECL2SS2W1ciAa
+         gEdSq12Wt3WE9mDhw2DrgNimQdDnVpg/AEAdVuqFpQ2YjoNVsYEzF2Bi86FR+OEwJVtN
+         D+qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749575229; x=1750180029;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E3WVKJVLsC72+25+NT9c5Ak83GPqKH0nfsEur1vtPag=;
+        b=rpaB290k3elqeTibBzyBRfy9DNb6a7HZSFUwhwiIng+a4X95umI5js7paEr+9DQfiI
+         8bak6LmnIZHv1KmPSvNXqjUGd0ygIISP0hIcYnkZJQpzZUO6ya1Shz1q/t0bKF7Abky7
+         L7EEe2L5SmJkthzl/9wsmPb327tG318lWmhzXCUGS3hDuq7zhEWHE5eOPO1TSMe3SzfM
+         +8uyifvdC4xFsfPzm8v8EsUKiNNCZxSbCgxzxepz2Y/cPI/Xw53k6WDZ7Iw2AwpQ46al
+         aVXY6Gps8O4gOIyjAOChXvjVldCpX6L1yLVT5Q3oe54fonldwgFbwEJFHu6NV9r087ly
+         nsjg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3ign3nj1b7CPLIFaXPh4RBEcR+A0fSJlsjf2t1RITnnH7DDJzmpprVwimubswPLgfs0YrlFJinNauC+nG@vger.kernel.org, AJvYcCW5GCy6NRWWPhYAB8fHBOt/D7TKhkHZnoyiuJJbOrhAU6Fa8GCbmAXjcLmF65F91OmWZYeUPT56ocEo@vger.kernel.org, AJvYcCXqyfF3H8I+swyA43tji5ATnYepvaKew+aUlWctT49fGJniPPYX2UsoHeMG+6dvrIZKH/UwP4qBY6BF6fjC9A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjBsuQeLp0V5RpC7j5RnuAcXI/F4JCMxQqWXdov2ecpOpVCo/I
+	KVkXvWkqH6GbepSzn1EVaA64OeWkLPZd8KoS/x+71qz42Smbb3qlxR7iSzRLtq7MZ+9LqQnDq/x
+	TrZA8F6MrDJaN/aYBV8/wAgP3rnp60xFvGALW
+X-Gm-Gg: ASbGncv5W9NYzIVJTqVndpTiwb5PvfUxGxZD2/dhi0zx6IrNwWfa0Uw2zwgeT9NNskZ
+	97NJHgRIjzyHQEr14K65gocTMQpqZPB082LaysL7acU20336Ui0PShIBi29UwnEVZBRBGoPRSVD
+	/puiC0rgJoGHET2SOft57K34pnAjG/LyFp+rq4eAlLvlZaN7XwBi17RKHNJXaOxlR6N9YYfalM/
+	2UDTA==
+X-Google-Smtp-Source: AGHT+IHj14OlWbkJdXRqC0T1Ze5gzdUiLPGZS7cDMtXasmwQwA1hhSMY2Ega9w6NMi0lya9r+ehXQRq7EAQ2VhZfklU=
+X-Received: by 2002:a05:651c:19a7:b0:30b:f52d:148f with SMTP id
+ 38308e7fff4ca-32b202588a2mr2097211fa.18.1749575228385; Tue, 10 Jun 2025
+ 10:07:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ac80cb46-5787-4fc9-a405-fd38a505c613@talpey.com>
-User-Agent: NeoMutt/20180716
+References: <174951744454.608730.18354002683881684261@noble.neil.brown.name>
+In-Reply-To: <174951744454.608730.18354002683881684261@noble.neil.brown.name>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 10 Jun 2025 12:06:56 -0500
+X-Gm-Features: AX0GCFtIGiwQTKeGFcZKlbCtKzdoo3Qt-Wx67IUVp1GdHgRsejHkKeWgnEhS2to
+Message-ID: <CAH2r5mvJdA4hcnnWinNThWFUTEWHOt9wMa2-PVHDVAjM02fAzQ@mail.gmail.com>
+Subject: Re: [PATCH] VFS: change try_lookup_noperm() to skip revalidation
+To: NeilBrown <neil@brown.name>
+Cc: Christian Brauner <brauner@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.com>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Bharath S M <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-For sure I can improve also existing text message. But Tom already sent
-NACK so I'm not sure if I should continue with improvement or discard it.
+Tested-by: Steve French <stfrench@microsoft.com>
 
-On Tuesday 10 June 2025 11:36:30 Tom Talpey wrote:
-> The message text is pretty cryptic: "inode numbers won't match anymore".
-> Can this be stated in a more actionable way? The primary consumer of
-> the log is the sysadmin, after all.
-> 
-> At a minimum, stating that hardlink detection won't work, as noted in
-> the commit. Perhaps more helpfully, state that it's not a client issue.
-> 
-> Tom.
-> 
-> On 6/9/2025 3:36 AM, Pali Rohár wrote:
-> > cifs_autodisable_serverino() is already printing at the VFS level
-> > information that it is disabling the serverino. It is one time thing as
-> > once it is disabled, it is not printing it second time. So it does not
-> > flood logs.
-> > 
-> > In this change I have just extended this existing logging to print also reason.
-> > 
-> > On Sunday 08 June 2025 22:40:21 Steve French wrote:
-> > > Since this could flood logs (e.g. in some DFS cases), probably better
-> > > to do these via the usual dynamic trace points (and can document a
-> > > simple "trace-cmd -e smb3_disable_serverino" script to avoid risk of
-> > > flooding logs.    cifsFYI is an alternative but the world has moved to
-> > > the dynamic tracing (eBPF etc.)
-> > > 
-> > > On Sun, Jun 8, 2025 at 3:57 PM Paulo Alcantara <pc@manguebit.org> wrote:
-> > > > 
-> > > > Pali Rohár <pali@kernel.org> writes:
-> > > > 
-> > > > > Before calling cifs_autodisable_serverino() function, show reason why it
-> > > > > has to be called.
-> > > > > 
-> > > > > This change allows to debug issues why cifs.ko decide to turn off server
-> > > > > inode number support and hence disable support for detection of hardlinks.
-> > > > > 
-> > > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > > > Cc: stable@vger.kernel.org
-> > > > > ---
-> > > > >   fs/smb/client/connect.c   | 2 ++
-> > > > >   fs/smb/client/dfs_cache.c | 2 ++
-> > > > >   fs/smb/client/inode.c     | 3 +++
-> > > > >   fs/smb/client/readdir.c   | 3 +++
-> > > > >   4 files changed, 10 insertions(+)
-> > > > 
-> > > > NACK.
-> > > > 
-> > > 
-> > > 
-> > > -- 
-> > > Thanks,
-> > > 
-> > > Steve
-> > 
-> > 
-> 
+I verified that it fixed the performance regression in generic/676
+(see e.g. a full test run this morning with the patch on 6.16-rc1
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/3/=
+builds/497),
+the test took 10:48 vs. 23 to 30 minutes without the patch.
+
+I also saw similar performance yesterday with 6.16-rc1 with reverting
+the patch ("Use try_lookup_noperm() instead of d_hash_and_lookup()
+outside of VFS"
+) For that run test generic/676 took 9:32.
+
+On Mon, Jun 9, 2025 at 8:04=E2=80=AFPM NeilBrown <neil@brown.name> wrote:
+>
+>
+> The recent change from using d_hash_and_lookup() to using
+> try_lookup_noperm() inadvertently introduce a d_revalidate() call when
+> the lookup was successful.  Steven French reports that this resulted in
+> worse than halving of performance in some cases.
+>
+> Prior to the offending patch the only caller of try_lookup_noperm() was
+> autofs which does not need the d_revalidate().  So it is safe to remove
+> the d_revalidate() call providing we stop using try_lookup_noperm() to
+> implement lookup_noperm().
+>
+> The "try_" in the name is strongly suggestive that the caller isn't
+> expecting much effort, so it seems reasonable to avoid the effort of
+> d_revalidate().
+>
+> Fixes: 06c567403ae5 ("Use try_lookup_noperm() instead of d_hash_and_looku=
+p() outside of VFS")
+> Reported-by: Steve French <smfrench@gmail.com>
+> Link: https://lore.kernel.org/all/CAH2r5mu5SfBrdc2CFHwzft8=3Dn9koPMk+Jzwp=
+y-oUMx-wCRCesQ@mail.gmail.com/
+> Signed-off-by: NeilBrown <neil@brown.name>
+> ---
+>  fs/namei.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/namei.c b/fs/namei.c
+> index 4bb889fc980b..f761cafaeaad 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -2917,7 +2917,8 @@ static int lookup_one_common(struct mnt_idmap *idma=
+p,
+>   * @base:      base directory to lookup from
+>   *
+>   * Look up a dentry by name in the dcache, returning NULL if it does not
+> - * currently exist.  The function does not try to create a dentry.
+> + * currently exist.  The function does not try to create a dentry and if=
+ one
+> + * is found it doesn't try to revalidate it.
+>   *
+>   * Note that this routine is purely a helper for filesystem usage and sh=
+ould
+>   * not be called by generic code.  It does no permission checking.
+> @@ -2933,7 +2934,7 @@ struct dentry *try_lookup_noperm(struct qstr *name,=
+ struct dentry *base)
+>         if (err)
+>                 return ERR_PTR(err);
+>
+> -       return lookup_dcache(name, base, 0);
+> +       return d_lookup(base, name);
+>  }
+>  EXPORT_SYMBOL(try_lookup_noperm);
+>
+> @@ -3057,14 +3058,22 @@ EXPORT_SYMBOL(lookup_one_positive_unlocked);
+>   * Note that this routine is purely a helper for filesystem usage and sh=
+ould
+>   * not be called by generic code. It does no permission checking.
+>   *
+> - * Unlike lookup_noperm, it should be called without the parent
+> + * Unlike lookup_noperm(), it should be called without the parent
+>   * i_rwsem held, and will take the i_rwsem itself if necessary.
+> + *
+> + * Unlike try_lookup_noperm() it *does* revalidate the dentry if it alre=
+ady
+> + * existed.
+>   */
+>  struct dentry *lookup_noperm_unlocked(struct qstr *name, struct dentry *=
+base)
+>  {
+>         struct dentry *ret;
+> +       int err;
+>
+> -       ret =3D try_lookup_noperm(name, base);
+> +       err =3D lookup_noperm_common(name, base);
+> +       if (err)
+> +               return ERR_PTR(err);
+> +
+> +       ret =3D lookup_dcache(name, base, 0);
+>         if (!ret)
+>                 ret =3D lookup_slow(name, base, 0);
+>         return ret;
+> --
+> 2.49.0
+>
+
+
+--=20
+Thanks,
+
+Steve
