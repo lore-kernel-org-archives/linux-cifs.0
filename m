@@ -1,163 +1,208 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2133.outbound.protection.outlook.com [40.107.92.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A4C28B50C
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Jun 2025 10:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749549856; cv=none; b=tZeG17x6S4FJcJn2lE/VGHYjCMUQMpblhvs9xd48k852EHuxRm9hVqksliMSP3YsQTQn7Vvm6W6ViGO3HvTfrR2GGGK/gYqupz7QYdmQqHbSoKjQSJu6pd6bVd4rzXvGVy5506TmGyg+lgvtpAITG15Qlpg+fTUtbPMyd5BIUk4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749549856; c=relaxed/simple;
-	bh=27CXEgFPcLX2zEE6Iugyh7BtruL8sHO9pVzZJThMvCw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=odTcG+eIOmzI2aJEU7/7qi/m9qZBMmW9plKHsidCI/A7WY6PdXA3/MsTRm/J5QxUMRTac38JxEbAwwpPXwHNzvCrrHTp3zM2wVS1RnuWKVQlCdyFOzPjqk2tdJ6rsNwN50SrYzxqORB8Pvlc8IlPapTMmRBuFLIyUi0mDEJ/kFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2363e973db1so346555ad.0
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jun 2025 03:04:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749549853; x=1750154653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nEOD07NBLos6gOufP6TE7lKsogwEBj93N+O7WO/7lfw=;
-        b=obh67BdZR4LloTOSxcQnL04KSVr7JIF/r8UGk6iqmBhCRpsN0BT+42vIUIf08iyS8Z
-         kiNNA3tdQ+yWrxQR/wXO1PZnkZvI7jCPB3bdmYnwAwLYsApaQRJXAxC0MsTV8UB2Vd59
-         x6wvkjzqkLaHwhqrT8TWNCqEEMLGQ63hCTiHkMRgLtBW5zSKr6YrWFWVG+CUdQPBOmpo
-         1sHDYReXlIESCJldr4xAQ2qHcX2zRStSrwThQwXgpsD5YM47V+nAIeE97s2R47fNWIFZ
-         OFtlQ0JCI9up0o2n9k7bCyLZ6ZwxcysXhKigr3eQifqn8YynRbKRSAl6yAKCp+z4pYc4
-         uDnQ==
-X-Gm-Message-State: AOJu0YwhMMr/GezFOh+bgkjbdzZ4vJe8EMgxU8PU/tY5hbfZ+0yuZxx1
-	A9oWBaukZwI5hK7bwuhhxgMdwnLRyBO622bCp3EDhKyV/n7KuoRYoeiB3Vw3mhJy
-X-Gm-Gg: ASbGncudm5YgISJrbfW3yonD8x3b7jCxt+8uSTJubeWE/bohMolr2byUj3ZNp3QCZOX
-	CGzThsZw+xBZM+4MO7zoOAj1OcBbrTXxD+b0fBedVcdK6E1wKXvmqAlX4ktJ9fpcSG2FMs8L8Mb
-	TLz31YHszDvDVr6lFtroQ1Kme6w3Oxs5Zu20VAwf7tBvOVka9oYb8E9B5FbBXzk1fKqQp6FdbbR
-	zxPvb1tkGypKecTBrb5cazWGWu9QVeAHAwmrMcF4H3uZjYwguCNQRf3GJTMcI6TBz3c5VoyrSc9
-	j/aey0FGwswAeDzEZgeWd64QVt0rp7mJVRLJIcJUbLHR7WQ/xol290vppWRpyklCiwwTwLMcCR3
-	P
-X-Google-Smtp-Source: AGHT+IFBBhf9R3UzZ+9EanknUgbBTpw7CJDD6h68tpQ/picA8Yy/HWE5l7ku19UgskHM7V3W7pEJmQ==
-X-Received: by 2002:a17:903:3ba5:b0:236:10b1:50cb with SMTP id d9443c01a7336-23635c7725dmr40016255ad.26.1749549853455;
-        Tue, 10 Jun 2025 03:04:13 -0700 (PDT)
-Received: from localhost.localdomain ([1.227.206.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23603092ee2sm68068045ad.82.2025.06.10.03.04.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 03:04:12 -0700 (PDT)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: add free_transport ops in ksmbd connection
-Date: Tue, 10 Jun 2025 19:04:05 +0900
-Message-Id: <20250610100405.9367-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFF9211A1E;
+	Tue, 10 Jun 2025 15:36:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.133
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749569807; cv=fail; b=fZ7iZOvzDDUziCazpE5lx0GH2J5nwV7FcjPKWjjCJeHZ2W/ubqowLVj1ZJGTbq6APbeCAvSjydWi/VZ0PF6jJiZPxt7U/jk85aInipKF60BOd6vrWDt579/ohWvebIeAStZIjXtrcfq+ouw7VNVDPx53WzlfPwGI6XOXf/H/0J8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749569807; c=relaxed/simple;
+	bh=U0kELZWXqs+fgByrs91IBLEheLonhUh4ghSR7G1NJa8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z0FLGzCZshfEvXFZKEI1t8yTWnDl+ul2EW/Fq8klmVLZ8fRgrJ4E2oAkcMU6Sw4Pn2QlxQpXzD6lMs++fg4uxMM2ScT7tt0Ff+5+DhOwbkAlpZrmajtFhfuuD02dL0OmHd5xL/rCIVWDn/zOry5g7wRnVkTSboeJ2oEUaPA3U9A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=40.107.92.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iKDUAXvSI7WQxbNIV6CZPf4QRhM26w2tJFVbKPDdb1CbmmElHoGQM/MQEifISsYB72XoNxeDfgwHb9eWk4TWM7vowdYOO6dHOw1Xa5p0I7gRQdlaEqBryTnGwUTRQP1P7B9d/+79TUVjopSPCfzUnxKZ8BsiVYw/y7Fo+yH/c5BlWi6eKpZ9EB1+6QY9dp/WEv0yND/8XcX0nY1KWCkdFl3NQzxpHqW31m3RsgbvD5S+mvkIfMzTcgg8iLCZlHUAVSeWqK6dbAYCwI+XY4fUthTJctaMflLPQv1MeB1b9Jl5+TFiDfeGJFZpNi8+ck/ujxzuFG642bp2gzExjfP8dA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x2ktkkXzCmcDkGI19WD0yymTyWVguarMpNAzc3LNCrs=;
+ b=i89DHxJe33M5NTPR673DWyxc24pkNeHXGufjJAZUOVGFxC4RQFM+JUhOD21m85yJYCTwz8aV0Xq01Q0YQHAIK2/XzCPHlzeAe4remfYDRKLyAiCVAff/yKuKAoJWBdJfghLirBzeH2zdn1I3dk/0+sjWn85R+bK7g0XLCCFvDh2l7edQAn2fw+mjfng7HxFkoTv2r4TWf2ESAM9+p06JYT49AhrRxHLV2qgFw496bMixeZrYwDFro2+LO6X9Mlisq3N6vtXuESPIRjR1sHwWYw0hQrumZ9rbpjfDuwNiCxTau0theknMZb9YSQnT7+mPE8eNSLcUNH5aNeS9Iia5Fw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB3854.prod.exchangelabs.com (2603:10b6:805:19::20) by
+ LV8PR01MB9356.prod.exchangelabs.com (2603:10b6:408:2a0::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8813.29; Tue, 10 Jun 2025 15:36:39 +0000
+Received: from SN6PR01MB3854.prod.exchangelabs.com
+ ([fe80::66af:6788:adc5:f856]) by SN6PR01MB3854.prod.exchangelabs.com
+ ([fe80::66af:6788:adc5:f856%6]) with mapi id 15.20.8813.024; Tue, 10 Jun 2025
+ 15:36:32 +0000
+Message-ID: <ac80cb46-5787-4fc9-a405-fd38a505c613@talpey.com>
+Date: Tue, 10 Jun 2025 11:36:30 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] cifs: Show reason why autodisabling serverino support
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+ Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, Steve French <sfrench@samba.org>,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250608164453.6699-1-pali@kernel.org>
+ <3d644c3f8acb3dbcef395bd96e7e957c@manguebit.org>
+ <CAH2r5muuanOgjzQ8wgd+QoyrU_ZM4tATrfYYQj=b7MapGLMh5A@mail.gmail.com>
+ <20250609073650.kj6lxrykguhb7nuo@pali>
+Content-Language: en-US
+From: Tom Talpey <tom@talpey.com>
+In-Reply-To: <20250609073650.kj6lxrykguhb7nuo@pali>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BL1PR13CA0209.namprd13.prod.outlook.com
+ (2603:10b6:208:2be::34) To SN6PR01MB3854.prod.exchangelabs.com
+ (2603:10b6:805:19::20)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB3854:EE_|LV8PR01MB9356:EE_
+X-MS-Office365-Filtering-Correlation-Id: d78d1bfa-2589-486a-6c44-08dda83493ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cmJtSUZnUU9CRFBWWFk4NnBZZGpJaGJBdk9Ja01KcHB5ckdST1FrQllWakxO?=
+ =?utf-8?B?K2xLeVFJZHVXeVFYZlgvRGRhaVYrTnIvemtHdEs0a0dxSUJPcmdreFUxdHQy?=
+ =?utf-8?B?NEZObmRWc3FTcE9xZW5xVUxIMXhXdGdCbW1Xc2UvT0lqdko1ckZsajk2enBi?=
+ =?utf-8?B?dnhRUFhWVXpSUUh3cGk0K09XaVZ3UFF2K2tEYUpwN3YzN1VqS0VQZlpVZTVT?=
+ =?utf-8?B?QkhqSld1OURyZWxaTW1VeldLaUV5Y2lRRVZkZ1h3d1NUV2NzellkbE1sTlZm?=
+ =?utf-8?B?cVRFMzlXSzhGcjdibzU2RStDanNmZG1qU0pUOEpGT3VvNk13YUttNGVKWjdJ?=
+ =?utf-8?B?blg5NnNCS3B1Q2tjMjM2TU5mRnZScGNlQ3diMTk0dmZZRG8yTVROMmRGTW8z?=
+ =?utf-8?B?Qm5iZU15SXJaTms5SmZVS0FTSXhzZEM4aERGSEVhd01ZSmxYV2RtOFk5SHFY?=
+ =?utf-8?B?bXhDSmFVL1E3bFdCTHcxZmJsdUxnM2tXMElQUnhicG1jbmJ0UnNYUjhrb1Vm?=
+ =?utf-8?B?TVA2VWNWaUdKTTNqOUFxRVdlNHdUVngwREEzY1paOGhQTHU3czJDRFRxV3BJ?=
+ =?utf-8?B?bkp6TEQ3SG1vcWRnUER5N1VtUHN3Zk5tcHhTUGk3cWtucnY2VUhIck16Rk1j?=
+ =?utf-8?B?S3dlSWtXRFFYQmhCWm5FVHlsb0M4MWxTaWo1bEhKaEphc2dPN0xwd1EzQnA5?=
+ =?utf-8?B?aCtiNjl4KzluSFpwY1o2cWNoUzJCYnNNWFF5VFZrLy90OHgzNjl2Ny95OCtU?=
+ =?utf-8?B?OUhrTDBKc0s0dUZFKzN1dmdPL2xoU1R6Z2NtNy9mdjJzTlNFOG5hRmhNTFZp?=
+ =?utf-8?B?ZVkvdktkdzFuSWJPandsdFJUdDdDL2pSUDJVVUIwM3lhTDlhQ2pUbnJlQURR?=
+ =?utf-8?B?NFl0VWQ1a0pzWEE3YjBoc0lNVmFGbkxkMjhxWllFZGh0Sm4rS2lxN2NLS3F3?=
+ =?utf-8?B?U1BEVytycHhYMzhXUjZ6TUVQVk9YNjhqRUV5NDJvTjFjb0FTZk51L3pXOE9o?=
+ =?utf-8?B?Wm03UnJIN2szZDFxNElZTUFYd0Y3NnBuUjBLeHdiTmlRbStDUXBZaWdHd3Vh?=
+ =?utf-8?B?RjFaZ2RnYTdrSHp0UENHZDZXWCtQUHQzNmVBTjJBajcrelpJMGhMeUtXRWx5?=
+ =?utf-8?B?TVYxdEJRS3QwekhGRi9WL216b0g5V2VacWZFWG1KenVjYWdHRWRSSExvSUl3?=
+ =?utf-8?B?Q0VCVDhSQmxIN3lPVExjME9yTVRKd1o1THhaVzRmYVJUZ3h3RytLSW16RE13?=
+ =?utf-8?B?c1Y0alY5Q1RPeGNsTHVadDYrTktOS1Rvd2RBZzhTMXZFbVNBNnJOcmpPYUZz?=
+ =?utf-8?B?ZDBSSUVqRnRKRGo0WXg5QlU5YUIwR2taUWJEMHlpZ1N0OU9rcmdWQ051U3p1?=
+ =?utf-8?B?OCs4U0JrVkxxcGNpMUUwZ0tlZ2RoRFFiZ1A4YU5mdzE1ejNhWEpaK0pKaUhn?=
+ =?utf-8?B?N1JseExDRmU4Mm4xZjlWS3Q5eDIwaWszckF2MlAwWktyQktOTlk0TGdUOHly?=
+ =?utf-8?B?amFvT0daSXZOdHFTRmFoM2xDWlpYSE9ZTk9HOVk0WFY4bDl6aGtFcE1PamlI?=
+ =?utf-8?B?bk84SUEwNWo4aEpwQ3dVaUxwQnVPeVdhRTErQlZaWlU0bkpVRlI3Z1hGMmdJ?=
+ =?utf-8?B?bVRWczcrR1RXaFhvaDluaW9oZllQVHQvL2djc0pUeHhRTE13d3UrdFkzY0VY?=
+ =?utf-8?B?V3I3MGVwbjM1VDRYVko2ckdJeFRQc0xrS3owSVVqaU5YUEEzVzhPejF3NXRX?=
+ =?utf-8?B?OEpHMHRFMC9hK1dzczVCUXI4b3RCN2lNVG12VzZMVlJSeUZzeGtSOGk2UlVM?=
+ =?utf-8?B?RDZoUnVRZ25uOTgrLytydmN1OS9oRFdjbVVJNzBKSHVvT0lObnJ4NW94UXIw?=
+ =?utf-8?B?RUJRTzlFMTllWjd2b2VraVNXVE00RThGOEFiVDF0Q3RBRVo2TlBSbU8wY0k0?=
+ =?utf-8?Q?FEFkr/EbZBc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB3854.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RVpiNXhVVGNGUXFHRmptdGpudnhraWxlVjhhR0k0RkVhREI2cVJPbUNLVHha?=
+ =?utf-8?B?Y1YzcktyUWNOUGljUzVPdk96aWZrbEdwcEtmVzFKRW94eUp2eE1hOGZGdy9Y?=
+ =?utf-8?B?Q3dJMU4rMXgwNUpVcG9OV3dQcU15S1VtUGFER2ZNUU12MnVVMzczckw4Sk5O?=
+ =?utf-8?B?MGl5TURCeTBwZ1B4VFlBVFpmRk1QWmVuWWZXUUZNRTBPQUxlNGZjVVFEQ2VC?=
+ =?utf-8?B?Z0xsNnRMNk5kYVhrczZGNnRvcGNUMzB2RkEwbG80eDhvalFzT2VXUW9RTzQr?=
+ =?utf-8?B?VndJR0FtdWpXdnhocXBUZTEvekg1SmRqcEZpd3F4Y1luL24xSHArcjBkMmZ3?=
+ =?utf-8?B?ZW9kWVhJS0xUalNMOHJqK0pmTlFrV042cXpsU2trQ0NidXh2Q0hDdnBPUVdR?=
+ =?utf-8?B?V2JEbkY1OTBzbW9aOTdycjcwMHhnM2t5Q0wwWEJLVm1ibkNqTll3TzRyWVJD?=
+ =?utf-8?B?NHRoVW9DdWVkM3l3elpkbEJaWGMyUnBVZk1XU1dSOGN3cEJqWHRpaktYZC9p?=
+ =?utf-8?B?MUVEQTNxVG5WaEVnWHlmdVRUVjBzRFVTYkRxWjZObDFjWEtZRE0vb0ppK0po?=
+ =?utf-8?B?YkRYTHBva3J1dGovd0taRjJjNUZDWjhRUnN2bWZSaFZPSzdYeHVTaFZYbzJC?=
+ =?utf-8?B?YWdVODZxSFJtamRHODY4ejBKcWpCYUZid3ROOFZEcWFTd1h2c2FoMGdvZm1u?=
+ =?utf-8?B?OVUxVW4xeHgrSjUyQXk1Q0lOb3JoSTA1bldYZFhpME5TNjdYVUhtNjZudDZE?=
+ =?utf-8?B?bTdGV1JmTUhWRUJRakJoZVNlMHVIdkVQczI2ZUJRM0ZvSDdGZmRmVUFwejJW?=
+ =?utf-8?B?REczd3lHdWozelBhekJhbFdOUE1tUGhKMG14OC9tUnkycUc0N1JaNnVQSHRp?=
+ =?utf-8?B?cWc0V2VuSzdyZy8yTTlKa0t4cERhcUw4bFJ3b29tb2xmRWFqSy9GaUlaeEkv?=
+ =?utf-8?B?aklSTzJDa052MHRWSCs3dElWUXArVnpMbkI5QVBwTVhXT0hnZFVjenhybUpv?=
+ =?utf-8?B?TUZkN0xXSENCRlpFY09UOE9oWGg0VnJsQ3Q3OHJ4N1Z4RFZ4cDRDMHJQSS9W?=
+ =?utf-8?B?aHJQM0crMm1LZkVSVUppVGh2czRtdE9ldUdwNG0wejgzczl1KzZyZzk0YkJK?=
+ =?utf-8?B?bFdFL09NNy9nZFhjOFFGMTVpUENVRWszdkhhKzJFcTRtaEVuM1M3Q21PWm5G?=
+ =?utf-8?B?RVp0MVRLczhEM0paYmxYNSsrakFhM3gzekYxVXQ0Y3dicGhneW9RSTJLcUpL?=
+ =?utf-8?B?ZmxPK3lzZ2MveVNXdGtBUFNlNC9IdDl4NzRZdWYrWjQrRkJsamZERkxNOFQr?=
+ =?utf-8?B?Y2ZVUVpVUnJHcHc4Rm1tQ3FpQUdUQTA2SU5PYmcyQXVpVnRpOWRISFRpVVpl?=
+ =?utf-8?B?UlFGSWVzc0ZMckdmQTRVR3p6eHp4NTY2a3Z4dkJWV3NrUGNDL2RSZ3l1QnA5?=
+ =?utf-8?B?Sm5NV1ZtVlpJYkV4ekwwQUZNVTg3TGNCL1dTL0cwOFVkOWIzdUR4cGRHcEZu?=
+ =?utf-8?B?Nzdqc3R2QXpEeXdZTVlWSmJUYkdDTng4SnFER0hLZC9xcnR6SnhDc0Jhc1Bv?=
+ =?utf-8?B?L0Zxdlc1WkFaVmxTVWV3RE9zQktaRHh5Q0VvR2Y2WkhWSmN3WURrSTR5VEFp?=
+ =?utf-8?B?SG9NSXNzNk8vcjhzUVM2MHVpUFg1SDVoOXp4bFg5UlNpa0IvbWJqM3pZeWtv?=
+ =?utf-8?B?YWRwNXZnTWZzUm9VT3hpUEduM3lsVjBCS2l2T0tKbEFIWWtMaDdYM3NyWGNa?=
+ =?utf-8?B?bUxWRUhzL1VhODFyaUhTT09RcnVMbVNyK0VtWFhkQTJIZzRYUjlFTWdWVVJ0?=
+ =?utf-8?B?RVNkcHVuSzBlbUxNUy9SeFkwWmhWYmd2aVFIL05icWtGdWw2WkQ2SHBnRUVM?=
+ =?utf-8?B?anR2QlpxM0xiQnJ6amFGblI1ano1Ui9Rem9DekRIU3BmalFPczg1M0hTTUl2?=
+ =?utf-8?B?MjRQa3JLclBFaTh1dTYxS1dEamdXbm9QeFg1V21ZaWNBaGpkL1lJaGgzU3pr?=
+ =?utf-8?B?a2ZTNDI1TGZPU2M2NjhaaDZHaU5CaG13MkV5aDVreDM5cm01TjhPVWswbTgr?=
+ =?utf-8?B?bWpVQzc3cmdRdUV1Ty9OWWg1aGxvbEV2VW1ua2VncEszVk1oWTNVRldCT0o0?=
+ =?utf-8?Q?ZKXQ=3D?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d78d1bfa-2589-486a-6c44-08dda83493ab
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB3854.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 15:36:32.7572
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1CkiqCJFkcLQm38BsWzJbmAvBOYA+5UGhOdt2wDYaI7jRYimU7HzJXRC+sISmuc9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR01MB9356
 
-free_transport function for tcp connection can be called from smbdirect.
-It will cause kernel oops. This patch add free_transport ops in ksmbd
-connection, and add each free_transports for tcp and smbdirect.
+The message text is pretty cryptic: "inode numbers won't match anymore".
+Can this be stated in a more actionable way? The primary consumer of
+the log is the sysadmin, after all.
 
-Fixes: 21a4e47578d4 ("ksmbd: fix use-after-free in __smb2_lease_break_noti()")
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/connection.c     |  2 +-
- fs/smb/server/connection.h     |  1 +
- fs/smb/server/transport_rdma.c | 10 ++++++++--
- fs/smb/server/transport_tcp.c  |  3 ++-
- 4 files changed, 12 insertions(+), 4 deletions(-)
+At a minimum, stating that hardlink detection won't work, as noted in
+the commit. Perhaps more helpfully, state that it's not a client issue.
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 83764c230e9d..3f04a2977ba8 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -40,7 +40,7 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
- 	kvfree(conn->request_buf);
- 	kfree(conn->preauth_info);
- 	if (atomic_dec_and_test(&conn->refcnt)) {
--		ksmbd_free_transport(conn->transport);
-+		conn->transport->ops->free_transport(conn->transport);
- 		kfree(conn);
- 	}
- }
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 6efed923bd68..dd3e0e3f7bf0 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -133,6 +133,7 @@ struct ksmbd_transport_ops {
- 			  void *buf, unsigned int len,
- 			  struct smb2_buffer_desc_v1 *desc,
- 			  unsigned int desc_len);
-+	void (*free_transport)(struct ksmbd_transport *kt);
- };
- 
- struct ksmbd_transport {
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 4998df04ab95..64a428a06ace 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -159,7 +159,8 @@ struct smb_direct_transport {
- };
- 
- #define KSMBD_TRANS(t) ((struct ksmbd_transport *)&((t)->transport))
--
-+#define SMBD_TRANS(t)	((struct smb_direct_transport *)container_of(t, \
-+				struct smb_direct_transport, transport))
- enum {
- 	SMB_DIRECT_MSG_NEGOTIATE_REQ = 0,
- 	SMB_DIRECT_MSG_DATA_TRANSFER
-@@ -410,6 +411,11 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
- 	return NULL;
- }
- 
-+static void smb_direct_free_transport(struct ksmbd_transport *kt)
-+{
-+	kfree(SMBD_TRANS(kt));
-+}
-+
- static void free_transport(struct smb_direct_transport *t)
- {
- 	struct smb_direct_recvmsg *recvmsg;
-@@ -455,7 +461,6 @@ static void free_transport(struct smb_direct_transport *t)
- 
- 	smb_direct_destroy_pools(t);
- 	ksmbd_conn_free(KSMBD_TRANS(t)->conn);
--	kfree(t);
- }
- 
- static struct smb_direct_sendmsg
-@@ -2281,4 +2286,5 @@ static const struct ksmbd_transport_ops ksmbd_smb_direct_transport_ops = {
- 	.read		= smb_direct_read,
- 	.rdma_read	= smb_direct_rdma_read,
- 	.rdma_write	= smb_direct_rdma_write,
-+	.free_transport = smb_direct_free_transport,
- };
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index abedf510899a..4e9f98db9ff4 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -93,7 +93,7 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
- 	return t;
- }
- 
--void ksmbd_free_transport(struct ksmbd_transport *kt)
-+static void ksmbd_tcp_free_transport(struct ksmbd_transport *kt)
- {
- 	struct tcp_transport *t = TCP_TRANS(kt);
- 
-@@ -656,4 +656,5 @@ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
- 	.read		= ksmbd_tcp_read,
- 	.writev		= ksmbd_tcp_writev,
- 	.disconnect	= ksmbd_tcp_disconnect,
-+	.free_transport = ksmbd_tcp_free_transport,
- };
--- 
-2.25.1
+Tom.
+
+On 6/9/2025 3:36 AM, Pali Rohár wrote:
+> cifs_autodisable_serverino() is already printing at the VFS level
+> information that it is disabling the serverino. It is one time thing as
+> once it is disabled, it is not printing it second time. So it does not
+> flood logs.
+> 
+> In this change I have just extended this existing logging to print also reason.
+> 
+> On Sunday 08 June 2025 22:40:21 Steve French wrote:
+>> Since this could flood logs (e.g. in some DFS cases), probably better
+>> to do these via the usual dynamic trace points (and can document a
+>> simple "trace-cmd -e smb3_disable_serverino" script to avoid risk of
+>> flooding logs.    cifsFYI is an alternative but the world has moved to
+>> the dynamic tracing (eBPF etc.)
+>>
+>> On Sun, Jun 8, 2025 at 3:57 PM Paulo Alcantara <pc@manguebit.org> wrote:
+>>>
+>>> Pali Rohár <pali@kernel.org> writes:
+>>>
+>>>> Before calling cifs_autodisable_serverino() function, show reason why it
+>>>> has to be called.
+>>>>
+>>>> This change allows to debug issues why cifs.ko decide to turn off server
+>>>> inode number support and hence disable support for detection of hardlinks.
+>>>>
+>>>> Signed-off-by: Pali Rohár <pali@kernel.org>
+>>>> Cc: stable@vger.kernel.org
+>>>> ---
+>>>>   fs/smb/client/connect.c   | 2 ++
+>>>>   fs/smb/client/dfs_cache.c | 2 ++
+>>>>   fs/smb/client/inode.c     | 3 +++
+>>>>   fs/smb/client/readdir.c   | 3 +++
+>>>>   4 files changed, 10 insertions(+)
+>>>
+>>> NACK.
+>>>
+>>
+>>
+>> -- 
+>> Thanks,
+>>
+>> Steve
+> 
+> 
 
