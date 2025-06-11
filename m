@@ -1,94 +1,85 @@
-Received: from sonic315-8.consmr.mail.gq1.yahoo.com (sonic315-8.consmr.mail.gq1.yahoo.com [98.137.65.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28949220F33
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Jun 2025 05:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.65.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A8127057D;
+	Wed, 11 Jun 2025 10:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749620655; cv=none; b=te0TPMSJuLQJrVkg/JKdRkFLFop8i2MNQ5WezrFUUgznxtvPI6dWb9YXiGshSGoPXZLs22R5AWt5w7NrE+D5v+Lmu0QtOr7toH3iaeK8whwI9U10P8dVdw37Syl8u0snJsOym4d/cKKeYU5xaL0H3en2m6uoutySDmi52oKgeYs=
+	t=1749636246; cv=none; b=FtRNFPRsI5W4gDxn0no/pcueuEf2PvV63sEOnz3F6RFwqA1mHuT9tCXQQ9HNUa3nD14DaMN3SWWP5RiMeYxfmFJGMTEW4L/bV3Uhbbi//ZfxO3/tjg5k3qel+VQy928G9Zy/yx1HkwP5LmqL8TGPLsBxfbLFjtyvGQsvSdha2yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749620655; c=relaxed/simple;
-	bh=xkz+rLYWwQ9Bbu0AhHhdohwE5vGavb+AD7Swv9LJt7g=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type:
-	 References; b=YPeVrMp51cFoSnRtvs4SlUeHSs/ksJw3nIxdJeuRY6ziwiwS3J9L5gBNj+rsfzoHwGmLAbnlCUyh+3VPSD6MNm+zv5t2Fik6vXYxhzxUi6Xt0wZrgM+O0oLrO/2oJm06+1CKpdd7ExdeS/LNE78EbpZU9juKyYNFOe89+B/qtgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com; spf=pass smtp.mailfrom=aol.com; dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b=SS/Ee1qu; arc=none smtp.client-ip=98.137.65.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aol.com
+	s=arc-20240116; t=1749636246; c=relaxed/simple;
+	bh=T1ppAz1VzmH29y9/d6Z6oorRiK8qdvAxomNpsVpA7tY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LyPyj20TaksDCBz1T4ITADG0hKM4EKkXHR0pjMveOV+wcKXDR/M0uZN94Qq4eqjz/bmqI6T5Q0cd/fPrF1uGUanCDvD+UlmgiO4eVGmFkioPZJPSc2S8Vgw59Wx0vVysc2MbChwaipYpK2HHlLmiptSPcaGbQgZ6NMTuFY5BlkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vJclE1To; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aol.com header.i=@aol.com header.b="SS/Ee1qu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aol.com; s=a2048; t=1749620653; bh=xkz+rLYWwQ9Bbu0AhHhdohwE5vGavb+AD7Swv9LJt7g=; h=Date:From:To:Cc:Subject:References:From:Subject:Reply-To; b=SS/Ee1quRWGDWQjWFvx1ouL7ojAMSXbOVv/vAsqYmqxXcaW5EWCYaf/xjAV81lsDfx0hALnwGLFLEZdbEufOtDjQpUDgvESCgAfSg5LaeQirOZJ5NnEeGzu0+ZDkK25Nwck+MRDl1dnnSKcn2flM5838pdIp9bnQIRDOpPMMH5AD5gkfQOCb7VBLijwtUcgHWFbHHvLD7Crd9dovYQcIUe7b6H4O3IOf9zIKhYrL/CgEtrLasU24jrycJKo5fM1pReKXbsVMUncHr5reLiONo+mbs+3jNjuWBeSGi5mLkwAnkhder6cDRMRnbB5rjt3q2Ipio3c5SSNzXuRfb455dA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1749620653; bh=7Vqp/txxSYljkjf2cup8AMbd0AnOgfbqMQUq/7e6VeY=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=a96j5tprsb9/CR0OtcdpfBFXrQBmljSkEwalFfXsxrUH1g507utor2yW6LrFOM9hGudcEJx3sITdCE+bCSoHMR6+pBJAc3l8FU4ss/jb+KB50GcIxRcDFW9lKWmJVph+FmdMm37UH83366wWe5cYS1QC16HpeJwlyrTCpS5LdD17dNk8Yq6nF0TqZfQyleqG+wYQxjiPpNynKvubNrp8cWUfbhiKJDEl2tl4BV7UnemP6GkGAByzE5lAz2hu0W/cH1eRIer/oRwDAG0d6QAbhXlIWBtLg0arMo3sH7ba+36eTYaPYlvP14kajrAXeJbdEY19+pAKXGF0q3hnfSdGdQ==
-X-YMail-OSG: Hg9fmO4VM1mOT2uMECq.cQBp6GixzQGTuEEeOCEV_8bejyEWjISAmK4yXGNBUHC
- aKay7dXUxAXMNFUJQl8D.xIp6QKTMnuWfc_zPMGr.MBzVEKOrKkBtvBHEynWU5c4OQDOXdaGb6o1
- 1bXDtQV8s6rf5ub7hWhWw8_52mNVqHY_ViuDk3ub9D.iwGQkFxBSX5gycRCqpJdgi4Yb5QD63znh
- fA7H4CU5QYiSpmZa2pFkGS.JYl4avxyyESBGYGqME6KAWk37vGIkDPJ9gURXRVzDdeKpFYMf5.ve
- jE8Qve0Csv6_6xfLyPG9uAEE6pL0rO9BlPAz73qxC2JLF.XdNrvhaed4qvznQGzcevFd4QVNduzc
- pQ7E0rlsMdlg8GbOV_3Ekw5gW8UE_4OPA_mrj_5Bk.4yKFbRAGvVU4BQz.mQZ_88NlNj1zsr20cl
- td54e21ya2xx9AoQO3WynPhbycjpEnfCCwCxoX.e04rq.QFWZUTUmUhZj0Sad1ZKSgdhy1j2FgQf
- yroDqgknFLch0eZqliLuhknewckSUSLhVq5vH0MksSxcXX_M1139GpFMcLXIHD8hODxcmNwhaw8v
- 0sZq4x1KPSmGiqvoJTKEVm42wqJFNlCW3I9ja8SHPw61kzHI9PrpLmsZy41Q2XcAYjMff5nQvlhT
- PeQdrO00c_Ni3DqnMGVOMAe1caTvmkzK0xI0zg4Xg43SK9gXu5vqQWPg7RDpOZoF3iMRJJBDEFDu
- PZ9X0AsrXTfWHkt5HsYA5tR5x5ucOYjA4jyuj8IWkbriqyW5PcOadyMnBLN7oIr.xjR19dtwrFiM
- pyqNMQFZaHEbkycDMnXYqxE9Anw6ISjwpz38yvt_yqpAaG51zGea1tFxdY0nAjKcHfPdgoa.96wM
- deumCG1UsjjaGby_xINEEgdnO47W4FxKrbv21fksaUsWkRlWOAH7Sws78EIJCa2gHbT9a_m1S2uR
- e8lXscLB9P4LlNs2gXoOYctRYygio.so0ShztNKTqBGhRAZBJBXyc8Y_ocUKpSHv8Vd7LCPRfuBs
- c9CC.QFHz9u.PUc.Jg06xRNVK5fTSBxKmlAC.OiOLbHnZxOLaulATbLVN7lyaY6yIGynVjJAO7R8
- 5Mp1QtUzsDH03CaAIpus2vPVOVgtCI5UemqAWc54cbW_zRGVkp2dwuWvn.AngnYeevRvBCw4RVpc
- E6XXdOQUuTOh6G2SerMr4lZaNDjE93VBB7XS8HBYKVr9YZkWkSCyGSm5SfprrklZYmse1yy_QJDE
- ZwTnImfKofGkUqOfGcIPmbM315ax.E6zrlkkL5IWxVzQ.Lp41qy0ya3NHCL7IO7orvRRQ5Ox39CC
- pxJLvBbOT8OCSSL.LZ5NSM81WBB7vPWUx83sR9HO_EjZmGShuAjb3o6cRXcNXQ6F8K1oRKCG3lEv
- pHU6U0MclHWG8lzbZCVmmkRhbvczoJMFndSFZV4aITyzM4evFZBmeZAGO2eqbpAjgwRH14otNeMq
- cnLjfZu1ZNzFzrVK4PDdkgEGMItzREPwXJ_OyKSdFAzMSJKqOjMfCoQrUkkxLyHebguI6.Ezt7Xk
- ndgvmV1vk3GWlIhtj_sIj6V0uZ.Oj_yCZiUeRs7VV5jORsiZcdo5yPFdnxF8D94XuwnlJzLgzmn3
- RdSMeok.c9P.WKeLkjv5C27wooiV524nIJNEq2iFJ66T8EE99BYpGDi.wRSF9lDQtroNtjB_SoG_
- 9rBiX6SAZBqrShPixJTSnWKor7lZUmWMiuwvJJe_O40EQuMgbT__VK7xhdhCmFDRBVZkK2VkAmZU
- xjpi8SXFIKT5Kl_Vv9H9DjF2dXzHNr1IzoN8ottRswhE2zRyPOMGYLNvxEexshJijx_GEMY_MV5_
- VrVndZCEpPZxz.xs9rsX0rVUZpp18cYR3TVA7qQL.erFcw3XiJw..Xui9MxByqZyuM01Mxa7NB1q
- BN8Nl2544_Y.GK7ld8IkPCF.yulEZus_SHevq_PprUwYi30RYYLNWHI0DaZpTCqnmhT8g9Uw6sd7
- 6gIPgIOBHPR2S17rkftg.F2a0_b3O3hegxrc6qI33WPU_v7YbPLDEH9WbudorkGFQnFSga.XbcKt
- Uw.MnQHMdVPKJulFmjpbQ2ygLNtna1c4xVMYgv558TCeJc6BQXZBTBcIOPi51OUZ.Ui2tpjqAqjv
- _Pk.mGbCEzss_W4IF.xwa6FTmW9dpkurfpVgOw7q1YSMFtNrXzSfcWsEO2U8ebjk45Ibsi3Y-
-X-Sonic-MF: <canghousehold@aol.com>
-X-Sonic-ID: 49902f7a-024f-4a91-8672-a018bea0d946
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.gq1.yahoo.com with HTTP; Wed, 11 Jun 2025 05:44:13 +0000
-Date: Wed, 11 Jun 2025 04:33:25 +0000 (UTC)
-From: Household Cang <canghousehold@aol.com>
-To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Cc: "sfrench@samba.org" <sfrench@samba.org>, 
-	"stfrench@microsoft.com" <stfrench@microsoft.com>, 
-	"sashal@kernel.org" <sashal@kernel.org>, 
-	"pali@kernel.org" <pali@kernel.org>, 
-	Rowland Penny <rpenny@samba.org>
-Message-ID: <1192550962.455023.1749616405217@mail.yahoo.com>
-Subject: Userspace mount.cifs -o cifsacl Mechanism
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vJclE1To"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D09C4CEEE;
+	Wed, 11 Jun 2025 10:04:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749636245;
+	bh=T1ppAz1VzmH29y9/d6Z6oorRiK8qdvAxomNpsVpA7tY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vJclE1Tok3zWmw469WgTJ5EfN7AFHXEMryPejVbjnnZNaiOSr7EoH6hpXn7+i6RmK
+	 qgvgnPXbilI5n9p/ZyasBvgpz6QJ3moasqcwrb/ErkU9BP8nunnL8WR1BIgMIK2ce9
+	 1oBQdITqAp07Ub5tWDyQ3vjl5SQeWukc4KdwWi5uEldxsyzGXw5Nexvfbcy+gVCMab
+	 qERo1+l/2KjgQu4n4rCnS1f2aHiV8hr1U5J2alOAC9g/7G3LkPZ9SGuhRy3gCLnm3s
+	 b5s4Q7W80x5EtTLfywawKOOktcD/jZM2lM00BiJnDzZFJC2RbfaidJxrZyp7CTz9ku
+	 I6AOY5oQ2yh/A==
+From: Christian Brauner <brauner@kernel.org>
+To: NeilBrown <neil@brown.name>
+Cc: Christian Brauner <brauner@kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	CIFS <linux-cifs@vger.kernel.org>,
+	Bharath S M <bharathsm@microsoft.com>,
+	Steve French <smfrench@gmail.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.com>
+Subject: Re: [PATCH] VFS: change try_lookup_noperm() to skip revalidation
+Date: Wed, 11 Jun 2025 12:03:53 +0200
+Message-ID: <20250611-leisten-vokal-55db13cc534e@brauner>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <174951744454.608730.18354002683881684261@noble.neil.brown.name>
+References: <174951744454.608730.18354002683881684261@noble.neil.brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1192550962.455023.1749616405217.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.23956 AolMailNorrin
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1354; i=brauner@kernel.org; h=from:subject:message-id; bh=T1ppAz1VzmH29y9/d6Z6oorRiK8qdvAxomNpsVpA7tY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWR4hkwo6tjEvjbwxlf9mlOnrq59dEKKU6j3reh2q/66k 9ZlHR53OkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbiGcbwT9c71+gEu/T3hhyl SKYd7ef4fszk5fuzpXfJQsbGZN3TKxgZNtS0v3X6sqWQ+1EQ+8c8/ocrn2xQY3265+pjo7rz5gd t2QA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-I am trying to grasp the mechanism of cifsacl in mount.cifs.
-I fought my way from joining a Debian to AD, using sssd, doing dyn_dns to heed Windows Server's RFC 2136 (found systemd-resolved is incompatible), reusing krb5 ticket for mount.cifs, piping sss idmap to cifs-idmap, now currently stuck at cifsacl.
+On Tue, 10 Jun 2025 11:04:04 +1000, NeilBrown wrote:
+> The recent change from using d_hash_and_lookup() to using
+> try_lookup_noperm() inadvertently introduce a d_revalidate() call when
+> the lookup was successful.  Steven French reports that this resulted in
+> worse than halving of performance in some cases.
+> 
+> Prior to the offending patch the only caller of try_lookup_noperm() was
+> autofs which does not need the d_revalidate().  So it is safe to remove
+> the d_revalidate() call providing we stop using try_lookup_noperm() to
+> implement lookup_noperm().
+> 
+> [...]
 
-I am doing this
-export KRB5CCNAME=/tmp/krb5cc_10001_xxxxx
-mount -t cifs //nas.domain /mnt/drive -o sec=krb5,cruid=10001,cifsacl
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-Something is wrong with the cifs.upcall that it does not like extra xxxxx unique identifiers being appended after uid. I can blame sssd for doing this.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-/etc/cifs-utils/idmap-plugin --> /usr/lib/.../cifs_idmap_sss.so
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Once mounted, I could use getcifsacl to look at the DACLs with the resolved name from sss.so
-But the permission is not enforced through the ACL.
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-I am seeing OWNER in cifsacl is set as the uid on files.
-But all ACLs on Windows AD groups are not translated into ACL. So unless I go do -o uid and gid at mount.cifs, they all remain at root.
-Is this the current limitations of cifs or I am doing something wrong?
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
 
-Many thanks.
-Lucas Cang.
+[1/1] VFS: change try_lookup_noperm() to skip revalidation
+      https://git.kernel.org/vfs/vfs/c/ad5a0351064c
