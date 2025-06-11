@@ -1,250 +1,127 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D161C20CCD3
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Jun 2025 15:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C61DFF7
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Jun 2025 20:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749654742; cv=none; b=NXnLyse5QtG+d1uxF0EUet4oXK4aCX+hD2dk7gaLsRtCmNG8TtfjAGU3aKudM8btOJpyFtPvca4KUdXeY5QSOFNwzX5oYH+3rmdUe3oUXEkiIL4rVUrYabWiUGHdd/DADuVdTJB8+2nZ4t8WqTeAGaWstPauFOJBdxLwjshjwvU=
+	t=1749674374; cv=none; b=DCM0ngAyihVF/9sg6Us7kgbzIyRs9DZVF08/EK3w3VmFfHEDF+pdXqW8JRK82liDUeNeYpWo+IB97TVPucqU8UiIBHLjdvcrOz8YZlANqfL2ckXS4liCeV4NaIr+7pW8B7f6XyqQ7lp6uVdT1jmq/H4eYiDW2d7CGxkouyuJ31A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749654742; c=relaxed/simple;
-	bh=yqnq/8THBSrKJCwxxuAgAa2TMGEjkrqUGTt7fvq0CtM=;
+	s=arc-20240116; t=1749674374; c=relaxed/simple;
+	bh=N1p0P8xCIoSLFisVC9kN3qAkPGkdhQ2AYeoDrpCQ2GQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cLmFHDbYgefo3amDct+JqRXXxXHRacSMpglXiGsPpbwainVZw2xAfpVsd0nj55TcLsFzCf3KxKvblFywhJqjoQdQfpLo8gBNH01erFx/oRnJDU/IwBoq3cqXfqUvgwRktS9Si/oG88zsq+UqAQy9UCWqwco5LCkq6jDWc7gD4eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lc05O14A; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=oigML6MgziwMEZKEmurx5evEJC8nNxK9whPW6ElKyz/ZJK1+XMCiN1LHrLXsF6E2KbH8dQcWnpscqFAhIcg8WVG4Cs/cqb0DGJ91Y8v2JV03nXkYJ6XVIXV61ls1HbRG2OpMCnOsLwj/pRDXCkpwZlvJEeFdzeQVk5SGH4MxPv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b4/7c1xp; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lc05O14A"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-32a7a12955eso32312631fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Jun 2025 08:12:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4/7c1xp"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32b019bdea3so2139751fa.2
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Jun 2025 13:39:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749654739; x=1750259539; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749674371; x=1750279171; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5d4rQ7j/tpr5QKroSCDl0E2qZSLxiAsShxNtEN6jKek=;
-        b=Lc05O14AWmwfUZUbI604WzwQKLCghz5WRuJVqBf1H9T9q7J5MzxusOgB/Fu4f002nC
-         F2Mgqnfz4O3JYROjPHJN2/xSW+ttLcfBOG7orppn0TFMoUDeI8ViiTQUCZj7TrAbzs/r
-         DiEkyeQUXYaJEBJrZCnqwlhaycdmDYVdWgfecB05k52ib42XcYMm0cphxcdwuxzk12cp
-         PlELLg7acvDaYwC9keFn9+fQ/wW454VSN3Brf5/jbL1QFN5WNdniMBgS7tx/pAqaDQJE
-         WXw3EpBDWSEbkSgszR3fQJq6WlOMi4bM2Awb8svOXIDc60brNVdpwMrvtZQhWR+g1PCb
-         ntuA==
+        bh=47yCjaLiY6lVOnRrUbub5nVe1q6mFs9ovRFUcJ5sUig=;
+        b=b4/7c1xp0pP45N924oQvlSdmt36Nqej0jdPX/Fa6jP30rzkD4pm0Zdl1oBfff8UKQf
+         Visr5syv55fkwbImTfr7YhJtn3q3hWir5NNcxcinnAmgG+3ujgChYTsFz6elyxMoKj4U
+         Z2a/Bw32Y9xrZ2/4S6YRYK9jiomUQdVPxM3Cdh9epsCooXTPS8rVRdNcfHwzgg6xYEOz
+         oyT8ZaXb8E9osYbMgfSsVW3oOlvGHxnbQ01Wwes45pmH5WCNiN4vVio2uY0qAlTqOafL
+         XcffCvu3Um2xVtrcy4XpC6e5bJhiYm+eIqpPo48T2jqvO6IF/hlE0n0bl7rc6XDVsi0N
+         nTOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749654739; x=1750259539;
+        d=1e100.net; s=20230601; t=1749674371; x=1750279171;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5d4rQ7j/tpr5QKroSCDl0E2qZSLxiAsShxNtEN6jKek=;
-        b=gEcW2SG54CGSSbKPDHpozPHC4Z+4SrUV6e3G9jEMq3M0CimfOvJsdWPMHFfARNmn4U
-         IqX/4MRRTIH80llzIL/jYUQ/9lrsyeLt1HeBfPpjG9StlgRCxqtcpPF8cv2yDBMlvyVS
-         KHQ4mCNk8jl63rYuQNr0Kd+UaTNCmpCQQ8HV7JhyMxlcX52WuZ+IZXYiGFeZABAN7D/v
-         z2hVfn8fiOUW7+pS3QsCIs5quT5v6XqHdWhxKpWlNYaXSK2xE1H9DfnfqiFggQz2Wh0t
-         S5XO7YJwZl0ieJWiSJacTNrB19FI3d654ls9YlbmomDR72UtZ0mkiEekFgPR6cbACWZp
-         LM7Q==
-X-Gm-Message-State: AOJu0YwpMoqRyqu5yJ14rUSuHd+8wgUh/GXtySODrox2aOfxNd2RQg4z
-	df+euEewPyp73bsXHyv95jYNbsrGWIhSb4QAOkumRjATmrjqGtJF6mNHdhdHMqW3GJI4NSOAGCM
-	hoIcPI6bRCv4ES7i7N9J84vW3meXTlV5xnw==
-X-Gm-Gg: ASbGnctkEG1YUxgS1tpso7XeXSKRlKI3XFy2N1J4AULzDTWhUsawTDDdYJbcw2mP+og
-	QMCNwUiel97A4ug72dFAS89evD4Q6GNm0gqZJlxiIs/M2hzmlb+zJNbzgtuGmqiblvcVUdAa9uK
-	NQe1R+wnYVz9IFoeNiETygC6udgTBgdDgo6Zg0j24WBjvb84WWkiA6v9cXVH904CbyEENwTpUB5
-	oAibQ==
-X-Google-Smtp-Source: AGHT+IFszMwNbQOCxLYs447Esu6qG70KcmNWlNBnyPZ1yAO4cpvg7wgpGE8lTuKNZIyYQGWkQcLuCCxfOrwW4HkGyK4=
-X-Received: by 2002:a05:651c:1548:b0:32a:710f:5a0 with SMTP id
- 38308e7fff4ca-32b222c7d03mr10075481fa.11.1749654738677; Wed, 11 Jun 2025
- 08:12:18 -0700 (PDT)
+        bh=47yCjaLiY6lVOnRrUbub5nVe1q6mFs9ovRFUcJ5sUig=;
+        b=c/7Hc+tKD3sDS/2cU0UxaQwbt/KZAINy7YzkY+QPwHv+aKdfTMrGUBHxObhXSsBIX8
+         rkKTQPz12diinDi5Jwi6Fc5u6vSYNCl7Z0r4S4P+apGptzwNFEfY1JesMWngoK9IaFAF
+         gYer0No8Ez/aVkeMj0A+52J+HK/SZgp3ivjwFCZB40LDG2l/xZQUW3E0GSUA+0UIE3Wx
+         F1FNUmk4WxHH6zydMv+lmNq2MNv21wHkwVQ3/3ywyCINkTcIOGERmYJbbBEmhnWrj6Jb
+         dnLezyPCpmlDeNijY3HRoWdxPIVQlTi05U3+IyAVpsU5xqlf7aYy0hhYB2PaJ5oW5kpL
+         QPgg==
+X-Forwarded-Encrypted: i=1; AJvYcCXdH4gaXEz5wGWVby7OH1fMKuj1/Y8jv9NdRRErX21SIVRfU2BnTF3dki1eL2TS8j0ehAdrmOcitwjE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/gImK4wUZkRipoxMNKy2tMkNL68wKbnEGVM6SjmmqQvlxwELG
+	FuZitiilfPkjtLTTvVrKqsN4/jP4yuEIpF/m6orVaH14CM6rdlrLm2MGAOyIiyVw/V4RquktGdD
+	t0P8X2AHOdpC8mYK3D3uxMSukHlqPPBc=
+X-Gm-Gg: ASbGncsvW89ns8QuIKfr+mTfWh48TmCaq4bj7J0ODC//tozBJbtCduNPEC/dERGBh7V
+	QAqZjSvXCisTznVl1MjRi6aT58ofhhp8mIJP/tJ3KtCDOfBkk3lxPNBwb8FWuIfSd8xSMTCfWb+
+	leoOQkuWpItGavys6pW1QDRk7Q3eDmJITrH+hErdgcksQZjqUD/zHc63/qhH+CedMLnd7u4eCK6
+	QHnBA==
+X-Google-Smtp-Source: AGHT+IHN3vMtHKcjTJffwGhC7e+5d15JUG5BeDzQ7JcTvwOYUnavoLEpqyn3uuBeDDR5qrtgw2q/hyqeI+unK3Z9EIM=
+X-Received: by 2002:a2e:a781:0:b0:32b:2d54:962 with SMTP id
+ 38308e7fff4ca-32b2d540bd6mr7018051fa.30.1749674370690; Wed, 11 Jun 2025
+ 13:39:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611112902.60071-1-bharathsm@microsoft.com>
-In-Reply-To: <20250611112902.60071-1-bharathsm@microsoft.com>
+References: <CAH2r5muQB8CgN7r8SE8okujV2rpvQoKYAP=yD95a_R1hLjKWqA@mail.gmail.com>
+In-Reply-To: <CAH2r5muQB8CgN7r8SE8okujV2rpvQoKYAP=yD95a_R1hLjKWqA@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 11 Jun 2025 10:12:07 -0500
-X-Gm-Features: AX0GCFtw4ZL5H3ESFLIgEc4QBM2Y_lSXiLUunkjaEMIXSJz4XxyRURpq4BmwYyc
-Message-ID: <CAH2r5munktDK1VstQRZ6VcRWyYMasHnR53VM+3i=cz1JYpcpaA@mail.gmail.com>
-Subject: Re: [PATCH] smb: improve directory cache reuse for readdir operations
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: linux-cifs@vger.kernel.org, sprasad@microsoft.com, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, paul@darkrain42.org, 
-	Bharath SM <bharathsm@microsoft.com>, samba-technical <samba-technical@lists.samba.org>
+Date: Wed, 11 Jun 2025 15:39:19 -0500
+X-Gm-Features: AX0GCFupN_Ac74A7xvbuO_qRC4Ug9qyk8gdEjoj4MMv6SiwwtcZBFMktyWWIoe0
+Message-ID: <CAH2r5mvCrHJQDYM8ZO-QmWioCtwFS4isUT0Mo4TMa4nRSrHTdw@mail.gmail.com>
+Subject: Re: netfs hang in xfstest generic/013
+To: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Bharath S M <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged this updated patch into cifs-2.6.git for-next, running xfstests
-on it now.
+It repeated when I retried the test run (the hang in generic/013)
 
-Looks very promising, and we have a couple more dir lease
-optimizations to try out that should also help a lot with perf, and
-reducing load on servers by sending fewer metadata ops over the wire
+http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/=
+builds/488
 
-On Wed, Jun 11, 2025 at 6:29=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.com=
-> wrote:
+On Wed, Jun 11, 2025 at 9:53=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> Currently, cached directory contents were not reused across subsequent
-> 'ls' operations because the cache validity check relied on comparing
-> the ctx pointer, which changes with each readdir invocation. As a
-> result, the cached dir entries was not marked as valid and the cache was
-> not utilized for subsequent 'ls' operations.
+> I saw a hang in xfstest generic/013 once today (with 6.16-rc1 and a
+> directory lease patch from Bharath and the fix for the readdir
+> regression from Neil which look unrelated to the hang).
 >
-> This change uses the file pointer, which remains consistent across all
-> readdir calls for a given directory instance, to associate and validate
-> the cache. As a result, cached directory contents can now be
-> correctly reused, improving performance for repeated directory listings.
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/=
+5/builds/487/steps/29/logs/stdio
 >
-> Performance gains with local windows SMB server:
+> There were no requests in flight, and the share worked fine (could
+> e.g. ls /mnt/test) but fsstress was hung so looks like a locking leak,
+> or lock ordering issue with netfs. Any thoughts?
 >
-> Without the patch and default actimeo=3D1:
->  1000 directory enumeration operations on dir with 10k files took 135.0s
->
-> With this patch and actimeo=3D0:
->  1000 directory enumeration operations on dir with 10k files took just 5.=
-1s
->
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> ---
->  fs/smb/client/cached_dir.h |  8 ++++----
->  fs/smb/client/readdir.c    | 28 +++++++++++++++-------------
->  2 files changed, 19 insertions(+), 17 deletions(-)
->
-> diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-> index 1dfe79d947a6..bc8a812ff95f 100644
-> --- a/fs/smb/client/cached_dir.h
-> +++ b/fs/smb/client/cached_dir.h
-> @@ -21,10 +21,10 @@ struct cached_dirent {
->  struct cached_dirents {
->         bool is_valid:1;
->         bool is_failed:1;
-> -       struct dir_context *ctx; /*
-> -                                 * Only used to make sure we only take e=
-ntries
-> -                                 * from a single context. Never derefere=
-nced.
-> -                                 */
-> +       struct file *file; /*
-> +                           * Used to associate the cache with a single
-> +                           * open file instance.
-> +                           */
->         struct mutex de_mutex;
->         int pos;                 /* Expected ctx->pos */
->         struct list_head entries;
-> diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-> index f9f11cbf89be..ba0193cf9033 100644
-> --- a/fs/smb/client/readdir.c
-> +++ b/fs/smb/client/readdir.c
-> @@ -851,9 +851,9 @@ static bool emit_cached_dirents(struct cached_dirents=
- *cde,
->  }
->
->  static void update_cached_dirents_count(struct cached_dirents *cde,
-> -                                       struct dir_context *ctx)
-> +                                       struct file *file)
->  {
-> -       if (cde->ctx !=3D ctx)
-> +       if (cde->file !=3D file)
->                 return;
->         if (cde->is_valid || cde->is_failed)
->                 return;
-> @@ -862,9 +862,9 @@ static void update_cached_dirents_count(struct cached=
-_dirents *cde,
->  }
->
->  static void finished_cached_dirents_count(struct cached_dirents *cde,
-> -                                       struct dir_context *ctx)
-> +                                       struct dir_context *ctx, struct f=
-ile *file)
->  {
-> -       if (cde->ctx !=3D ctx)
-> +       if (cde->file !=3D file)
->                 return;
->         if (cde->is_valid || cde->is_failed)
->                 return;
-> @@ -877,11 +877,12 @@ static void finished_cached_dirents_count(struct ca=
-ched_dirents *cde,
->  static void add_cached_dirent(struct cached_dirents *cde,
->                               struct dir_context *ctx,
->                               const char *name, int namelen,
-> -                             struct cifs_fattr *fattr)
-> +                             struct cifs_fattr *fattr,
-> +                                 struct file *file)
->  {
->         struct cached_dirent *de;
->
-> -       if (cde->ctx !=3D ctx)
-> +       if (cde->file !=3D file)
->                 return;
->         if (cde->is_valid || cde->is_failed)
->                 return;
-> @@ -911,7 +912,8 @@ static void add_cached_dirent(struct cached_dirents *=
-cde,
->  static bool cifs_dir_emit(struct dir_context *ctx,
->                           const char *name, int namelen,
->                           struct cifs_fattr *fattr,
-> -                         struct cached_fid *cfid)
-> +                         struct cached_fid *cfid,
-> +                         struct file *file)
->  {
->         bool rc;
->         ino_t ino =3D cifs_uniqueid_to_ino_t(fattr->cf_uniqueid);
-> @@ -923,7 +925,7 @@ static bool cifs_dir_emit(struct dir_context *ctx,
->         if (cfid) {
->                 mutex_lock(&cfid->dirents.de_mutex);
->                 add_cached_dirent(&cfid->dirents, ctx, name, namelen,
-> -                                 fattr);
-> +                                 fattr, file);
->                 mutex_unlock(&cfid->dirents.de_mutex);
->         }
->
-> @@ -1023,7 +1025,7 @@ static int cifs_filldir(char *find_entry, struct fi=
-le *file,
->         cifs_prime_dcache(file_dentry(file), &name, &fattr);
->
->         return !cifs_dir_emit(ctx, name.name, name.len,
-> -                             &fattr, cfid);
-> +                             &fattr, cfid, file);
->  }
+> root@fedora29:~# cat /proc/fs/cifs/open_files
+> # Version:1
+> # Format:
+> # <tree id> <ses id> <persistent fid> <flags> <count> <pid> <uid>
+> <filename> <mid>
+> 0x5 0x234211540000091 0x5c5698c8 0xc000 2 32005 0
+> f24XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 6928
 >
 >
-> @@ -1074,8 +1076,8 @@ int cifs_readdir(struct file *file, struct dir_cont=
-ext *ctx)
->          * we need to initialize scanning and storing the
->          * directory content.
->          */
-> -       if (ctx->pos =3D=3D 0 && cfid->dirents.ctx =3D=3D NULL) {
-> -               cfid->dirents.ctx =3D ctx;
-> +       if (ctx->pos =3D=3D 0 && cfid->dirents.file =3D=3D NULL) {
-> +               cfid->dirents.file =3D file;
->                 cfid->dirents.pos =3D 2;
->         }
->         /*
-> @@ -1143,7 +1145,7 @@ int cifs_readdir(struct file *file, struct dir_cont=
-ext *ctx)
->         } else {
->                 if (cfid) {
->                         mutex_lock(&cfid->dirents.de_mutex);
-> -                       finished_cached_dirents_count(&cfid->dirents, ctx=
-);
-> +                       finished_cached_dirents_count(&cfid->dirents, ctx=
-, file);
->                         mutex_unlock(&cfid->dirents.de_mutex);
->                 }
->                 cifs_dbg(FYI, "Could not find entry\n");
-> @@ -1184,7 +1186,7 @@ int cifs_readdir(struct file *file, struct dir_cont=
-ext *ctx)
->                 ctx->pos++;
->                 if (cfid) {
->                         mutex_lock(&cfid->dirents.de_mutex);
-> -                       update_cached_dirents_count(&cfid->dirents, ctx);
-> +                       update_cached_dirents_count(&cfid->dirents, file)=
-;
->                         mutex_unlock(&cfid->dirents.de_mutex);
->                 }
+>
+> root@fedora29:~# ps 32005
+>     PID TTY      STAT   TIME COMMAND
+>   32005 ?        Dl     0:01 ./ltp/fsstress -p 20 -r -v -m 8 -n 1000
+> -d /mnt/test/fsstress.31810.2
+>
+> root@fedora29:~# cat /proc/32005/stack
+> [<0>] netfs_wait_for_request+0x100/0x2e0 [netfs]
+> [<0>] netfs_unbuffered_read_iter_locked+0x87e/0x9d0 [netfs]
+> [<0>] netfs_unbuffered_read_iter+0x6d/0x90 [netfs]
+> [<0>] vfs_read+0x46a/0x590
+> [<0>] ksys_read+0xb6/0x140
+> [<0>] do_syscall_64+0x75/0x3a0
+> [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
 >
 > --
-> 2.43.0
+> Thanks,
 >
+> Steve
+
 
 
 --=20
