@@ -1,240 +1,208 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205DF23BCFF
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 11:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD9D130E58
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 12:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749727546; cv=none; b=MjfrmwcnMoJDVwxOmd3yszlCgxu1u85+mpr8s/ofz6iRvnSeNqeJ0VwIccI3FSQTYU1kBprREsErXjuhCDHQpF39eST+UqtOZ9PFY2x+OSZQHNGD/ZsQD0O95KF9/eJpbecr0ApVXM7gV4gVMu1H7NUV7AD0i5ztGrPid09OoG8=
+	t=1749731825; cv=none; b=fFKGhjBWAsWRAf4Ef2zslqJu2wOzvSRDjnZ4QKOlni7E2P0xPAySoxyhrMWc3fPVu355K9pf6HACr9I+IdWPG+/fOHdC/k4il5Aud7TTFAp6u8eZC3fIsZV0OmWJofX0nuG/1yhytJLQkHTlJY+wO3MZnkbeun7c+0TiRFjUfKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749727546; c=relaxed/simple;
-	bh=kiOyGdzOdU+OP/Xow4B8REW5JdXMJ8RYFh1FbTaAYTk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hs46HvtOq+Xwx8/y5pVwdP9jUSZigPHQdLY/L1Gaqt6x5b3wnUxjeVeWPp8SNua3zgtBmo0FP06AOjRXfyMcNtOae8Ex6b9t1RAKfLSLX+dNxCOOidd7s4EzI37CxnQiKp1KKnFHj0eWBeij+NAIluB/z+DH4OXrhOKwMqi1bHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTxHDeNv; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749731825; c=relaxed/simple;
+	bh=8AFhk+xM+ccWdq6s7fDK5DBd/Hbfx8V0/cEk4s6If3s=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=ZPlfRUFDtMvuwdUoQEZmfh/rTiYBFuQH753zLSEQ1r0qiMkO0ngZ9GlVASL4vcj8YAKlRLRhCku0FL64b5lDxUmBI3I24YSN79Wu0u3Jp1bxuKMW3lOjqmCe+qzf1Z0xy0Mb0V/vJJF6O9CEDDKJNvzOfx5rewlGOFYkp3m2Ayk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITKgo1iX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTxHDeNv"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a3db0666f2so19439641cf.1
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 04:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749727543; x=1750332343; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tPZxYD67UtVxppvUO7WX7Db7finKYvqbTH8UdFO7cXo=;
-        b=PTxHDeNvhuFl62RQJmIMJYs5JArgFPKdxLYHkDIDwNb8jW0DaHBrtIH1TOzK4bguZB
-         SiJzu0cFG+hNSwU3P2vFaGahUuyHwf6ZyRyPMn4Kvlf2YfUlvJDUJtxlvo7HAaTeZNse
-         yOfr/pefajzwhRtYFdjMM+ZiKHTPFRJemRuxqHOVJo33xExe11cUTqqcognuBPHXWxkm
-         SvsgvbURSAW/TgMPi2tMj2yRjnqTVhCMQXBa5/MTrpRxO5iW0KeviUEo4xDt825tEry7
-         S5hP4hOeygZCInnmAP2evSupOXzpq4YUVrxzuzY028WIAwxLIOlDzyINHTQDP7sO1Hh8
-         JHYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749727543; x=1750332343;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tPZxYD67UtVxppvUO7WX7Db7finKYvqbTH8UdFO7cXo=;
-        b=IPGUzudARn77ZLtizNMpWo/twac/E+lORAnkAUgqONiNrrzZnexTaxRtWNhpthC0lC
-         16RLxguk1vswTEabYNitBV25tkbHBkdqB528c0w5MV92oxoqocINgchZN4ZdR/Qp/Jkp
-         DpCSkhILjHuTMkByHyyO21M/+1ntV/VBPdU3w7NwR3NRcPBcKTiVnzvPs27j79yParlK
-         bQzWsX2S+peM8fk2ciwkd+ATPDoOZ2JeARJCJpFHzGVqKXPQBq9O2pZauVoDi+d4zzGg
-         fsIEo4ZXVlRzDJX49JyyfyEjpcu56SLO7rmfZI6DXfFUyCWZByhGfhilhjcySYhnI2W1
-         YKWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJuykb0qKnKKIpf06Huob0+o7K00lz0fGfxnzNvPDfM3rvu1smWkiKGr+E0wDUqOKKQPixZzYiukpG@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuB5uy5RheHuSLYoRs7babCmWqpWz6l223qTw5mBm0C6QaZHXS
-	zLAKLuHUOA5BTScTmiwr20mYvB6haN3wulyuFb9LucwSuQRwcD7Df2zaP7KL+iKe9yzI9rhty/n
-	hpbgD3zT/DjbhzeaSuKPZu08H/UFhEBEfeM3mHbE=
-X-Gm-Gg: ASbGncuUoDvpDFlLE5vkAcjCbQRarwV5cGWZ9Dt1O0ars7A8LWJVJkTTBx3fsfya7wu
-	NNCR1nt2bBmAS7iUw9U85zWa5SKDkUmRQh1ArFeVGLlVtRhlpZ+ic88goXNRzqNiYncophkkm7x
-	bX0gMZbzUgbe0wEkutnl9dlL2WOvknk4vcN++tILmFxvA=
-X-Google-Smtp-Source: AGHT+IHN4QWWPNvxYWKe9dR+gFlpAGAO1g+NItA1azT6cG/RN5dPlt+WzJg5TzVH1Ige1RV8GRq+e022wiMKLSqT7Ms=
-X-Received: by 2002:a05:690c:312:b0:70d:ed5d:b4bf with SMTP id
- 00721157ae682-7114ed3fee8mr44172687b3.24.1749727531191; Thu, 12 Jun 2025
- 04:25:31 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITKgo1iX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749731822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=Yn83hBseogD5ikMpjR5nAA28nJER1I8C3igW2mcZWe8=;
+	b=ITKgo1iX/s5IAfDdG+gyxNERhVJ94Dx9DkDd6JSD9xTWM8SqHDtFvgzMMW4Sov8OUvBLMA
+	bsY089/QXyVB8B4nPewbm4yDVz4o7SF5/QFW5ZmL3eSLLVmc2KsisPyXgcnvBbsftNtikt
+	2qSFm1o1mFJb+7ncCWi5jQ0FhU/iGUk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-671-iUrsCtDSOweJCslnb-BYaQ-1; Thu,
+ 12 Jun 2025 08:36:59 -0400
+X-MC-Unique: iUrsCtDSOweJCslnb-BYaQ-1
+X-Mimecast-MFC-AGG-ID: iUrsCtDSOweJCslnb-BYaQ_1749731816
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 320BD18011CD;
+	Thu, 12 Jun 2025 12:36:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4236E195609D;
+	Thu, 12 Jun 2025 12:36:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
+    Steve French <sfrench@samba.org>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Mimi Zohar <zohar@linux.ibm.com>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Jeffrey Altman <jaltman@auristor.com>, hch@infradead.org,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC] Keyrings: How to make them more useful
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMHwNVv-B+Q6wa0FEXrAuzdchzcJRsPKDDRrNaYZJd6X-+iJzw@mail.gmail.com>
- <54a46d0e05c754fbc5643af2b576e876@manguebit.com> <CAMHwNVvAT-qeRvJ0jV2+5byHQnwzW9-YFj13ovXFC+M8hAfmyQ@mail.gmail.com>
- <CAACuyFU2va16OGn7_i-Ur-TEic7AW7pQj3c3xrPT1P2HJts9bg@mail.gmail.com>
- <CAACuyFWrejfaYiFU8REzj=uTFg88qi7guL1oQg3zqnDWY-vR_w@mail.gmail.com>
- <CAH2r5mv-V=H0QF205oZTc0Y3yfUchEyk4Y-QqFvVJgpJhxPWRw@mail.gmail.com>
- <CAMHwNVtLS91okXnESNrja2OWJoN1gebeB1hHeuvMbmHD2Y0uMw@mail.gmail.com> <CAH2r5msidsBxCuDwjE0o3ZD4ZFGrN962svLTwb9o=uzpe=fodg@mail.gmail.com>
-In-Reply-To: <CAH2r5msidsBxCuDwjE0o3ZD4ZFGrN962svLTwb9o=uzpe=fodg@mail.gmail.com>
-From: Marc <1marc1@gmail.com>
-Date: Thu, 12 Jun 2025 21:25:20 +1000
-X-Gm-Features: AX0GCFuhD7jyAfQX0ZyWqW61IGQIO605Av6KZCCJ3_SOZd7xbT7Zx5wSPLGF3rk
-Message-ID: <CAMHwNVu+NK=XixCwoSVK6QOq3H=m=ML4k_aXYs2mDCGwNMReGQ@mail.gmail.com>
-Subject: Re: Issue with kernel 6.8.0-40-generic?
-To: Steve French <smfrench@gmail.com>
-Cc: Anthony Nandaa <profnandaa@gmail.com>, Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <462885.1749731810.1@warthog.procyon.org.uk>
+Date: Thu, 12 Jun 2025 13:36:50 +0100
+Message-ID: <462886.1749731810@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Dear all,
+Hi Jarkko, Steve, Chuck, Mimi, et al.,
 
-Not sure if this is the correct way to respond. Please direct me
-somewhere else if required.
+I think work needs to be done on the keyrings subsystem to make them more
+useful for network filesystems and other kernel services such as TLS and
+crypto.
 
-Following the incorporation of the patch into the mainstream Ubuntu
-kernel, I noticed that I cannot open PDF files. With all PDF files I
-attempt to open I get a message saying the file is corrupted. If I
-revert back from 6.8.x-xx to kernel version 6.5.0.45 the problem goes
-away.
+There are a number of issues that I think need addressing:
 
-To be clear, the patch did resolve the issue of me being unable to
-mount a shared OneDrive directory. Opening other files (like text
-files and .XLSX spreadsheets) is no problem.
+ (1) One of the flaws in the initial design is that whilst keys have a type
+     (which is necessary), this has to be specified as part of the lookup or
+     the search, which is overly restrictive.
 
-Regards, /|/|arc.
+     It probably would have been better to search by description alone and
+     then, if a key is found, have any type of key with that description
+     returned and let the app/service investigate the key to find the type.
 
-Op vr 23 aug 2024 om 12:39 schreef Steve French <smfrench@gmail.com>:
->
-> I plan to send it upstream this week, so should make it into some
-> distros fairly soon after that.
->
-> On Thu, Aug 22, 2024 at 7:06=E2=80=AFPM Marc <1marc1@gmail.com> wrote:
-> >
-> > Thank you all for working on this and resolving this issue so quickly.
-> > Am I correct to assume that this update will eventually flow through
-> > in an update on my Ubuntu desktop?
-> >
-> > Regards, /|/|arc.
-> >
-> > Op do 22 aug 2024 om 03:58 schreef Steve French <smfrench@gmail.com>:
-> > >
-> > > thx for testing this.  Have added your tested-by.  Let me know if any
-> > > followon patches or issues.
-> > >
-> > > On Wed, Aug 21, 2024 at 12:43=E2=80=AFPM Anthony Nandaa <profnandaa@g=
-mail.com> wrote:
-> > > >
-> > > > I have now tested the patch.
-> > > >
-> > > > On Wed, 21 Aug 2024 at 18:55, Anthony Nandaa <profnandaa@gmail.com>=
- wrote:
-> > > > >
-> > > > > I can help with this. Marc, if you can help me with the minimal r=
-epro steps, is OneDrive needed?
-> > > > >
-> > > > >
-> > > > > On Wed, Aug 21, 2024, 15:15 Marc <1marc1@gmail.com> wrote:
-> > > > >>
-> > > > >> Happy to help and assist where I can, but I have no idea how I w=
-ould
-> > > > >> try this updated code. I think it involves compiling a kernel an=
-d
-> > > > >> applying the patch to it. This is not something I have ever done=
- or
-> > > > >> have an idea on how to go about it.
-> > > > >>
-> > > > >>
-> > > > >> Op wo 21 aug 2024 om 09:45 schreef Paulo Alcantara <pc@manguebit=
-.com>:
-> > > > >> >
-> > > > >> > Marc <1marc1@gmail.com> writes:
-> > > > >> >
-> > > > >> > > This has been working great for many years. Yesterday, this =
-stopped
-> > > > >> > > working. When I tried mounting the share, I would get the fo=
-llowing
-> > > > >> > > error: "mount error(95): Operation not supported". In dmesg =
-I see:
-> > > > >> > > "VFS: parse_reparse_point: unhandled reparse tag: 0x9000601a=
-" and
-> > > > >> > > "VFS: cifs_read_super: get root inode failed".
-> > > > >> >
-> > > > >> > Can you try the following changes?  Thanks.
-> > > > >> >
-> > > > I see that the patch is in
-> > > > for-next@80dd92d6ac7d1bc4b95d0a9f4d7730fe5ee42162, so I have just u=
-sed
-> > > > that to build a new module.
-> > > >
-> > > > I created a share from one of the directories in my OneDrive:
-> > > >
-> > > >     sudo mount -t cifs //WIN-31GSG2M9E6N/Users/Usa/OneDrive/Shuttle
-> > > > /mnt/shuttle -o username=3D...,password=3D...
-> > > >
-> > > > Before the patch, the mounting was failing but after building with =
-the
-> > > > patch, it mounted successfully.
-> > > >
-> > > > Aug 21 17:25:32 ubuntu-test-2 kernel: CIFS: VFS: parse_reparse_poin=
-t:
-> > > > unhandled reparse tag: 0x9000601a
-> > > > Aug 21 17:25:32 ubuntu-test-2 kernel: CIFS: VFS: cifs_read_super: g=
-et
-> > > > root inode failed <~~~~ FAIL
-> > > > ...
-> > > > Aug 21 17:31:22 ubuntu-test-2 kernel: CIFS: Attempting to mount
-> > > > //WIN-31GSG2M9E6N/Users/Administrator/OneDrive/Shuttle
-> > > > ...
-> > > > Aug 21 17:31:22 ubuntu-test-2 kernel: CIFS: VFS:
-> > > > \\WIN-31GSG2M9E6N\Users unhandled reparse tag: 0x9000601a
-> > > > ^^^ SUCCESS.
-> > > >
-> > > > >> > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> > > > >> > index 689d8a506d45..48c27581ec51 100644
-> > > > >> > --- a/fs/smb/client/reparse.c
-> > > > >> > +++ b/fs/smb/client/reparse.c
-> > > > >> > @@ -378,6 +378,8 @@ int parse_reparse_point(struct reparse_dat=
-a_buffer *buf,
-> > > > >> >                         u32 plen, struct cifs_sb_info *cifs_sb=
-,
-> > > > >> >                         bool unicode, struct cifs_open_info_da=
-ta *data)
-> > > > >> >  {
-> > > > >> > +       struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb=
-);
-> > > > >> > +
-> > > > >> >         data->reparse.buf =3D buf;
-> > > > >> >
-> > > > >> >         /* See MS-FSCC 2.1.2 */
-> > > > >> > @@ -394,12 +396,13 @@ int parse_reparse_point(struct reparse_d=
-ata_buffer *buf,
-> > > > >> >         case IO_REPARSE_TAG_LX_FIFO:
-> > > > >> >         case IO_REPARSE_TAG_LX_CHR:
-> > > > >> >         case IO_REPARSE_TAG_LX_BLK:
-> > > > >> > -               return 0;
-> > > > >> > +               break;
-> > > > >> >         default:
-> > > > >> > -               cifs_dbg(VFS, "%s: unhandled reparse tag: 0x%0=
-8x\n",
-> > > > >> > -                        __func__, le32_to_cpu(buf->ReparseTag=
-));
-> > > > >> > -               return -EOPNOTSUPP;
-> > > > >> > +               cifs_tcon_dbg(VFS | ONCE, "unhandled reparse t=
-ag: 0x%08x\n",
-> > > > >> > +                             le32_to_cpu(buf->ReparseTag));
-> > > > >> > +               break;
-> > > > >> >         }
-> > > > >> > +       return 0;
-> > > > >> >  }
-> > > > >> >
-> > > > >> >  int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
-> > > > >>
-> > > >
-> > > >
-> > > > --
-> > > > ___
-> > > > Nandaa Anthony
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+     Now, this is still possible to implement on top of the existing API: just
+     allow a NULL type to be passed in - but we might need some way to
+     enumerate all the keys with that description, but of different types.
+     Possibly, the search function should return all the matching keys.
+
+     Possibly, within the kernel, for each keyring, all the keys of the same
+     description can be stored within a group structure, and the search
+     returns the group.  This could also have the added benefit of maybe
+     making it easier to handle updates.
+
+ (2) For certain applications, keys need versioning - and we need to be able
+     to get access to older versions (at least to some extent) of the keys.
+     An example of this is cifs where (if I understand it correctly) the key
+     version gets cranked, but not all servers may have caught up yet, so we
+     need to be able to try the keys in descending order of version.
+
+     This could also work within the group idea mentioned above.
+
+ (3) For certain applications, such as AFS and AF_RXRPC, we may need to be
+     able to keep a number of keys around that have the same description
+     (e.g. cell name) and basic type (e.g. rxrpc) and version, but that have
+     different crypto types (e.g. Rx security classes and Kerberos types, such
+     as RxGK+aes256-cts-hmac-sha1-96, RxGK+aes128-cts-hmac-sha256-128 or
+     RxKAD) as different servers in the same cell might not support all or we
+     might be implementing a server that is offering multiple crypto types.
+
+     So we might need a "subtype" as well as a version.
+
+ (4) I think the keyring ACLs idea need to be revived.  We have a whole bunch
+     of different keyrings, each with a specific 'domain' of usage for the
+     keys contained therein for checking signatures on things.  Can we reduce
+     this to one keyring and use ACLs to declare the specific purposes for
+     which a key may be used or the specific tasks that may use it?  Use
+     special subject IDs (ie. not simply UIDs/GIDs) to mark this.
+
+ (5) Replace the upcall mechanism with a listenable service channel, so that a
+     userspace service (possibly part of systemd or driven from systemd) can
+     listen on it and perform key creation/maintenance services.
+
+     From previous discussions with the systemd maintainer, it would be a lot
+     easier for them to manage if the key is attached to a file descriptor -
+     at least for the duration of the maintenance operation.
+
+     Further, this needs to be containerised in some way so that requests from
+     different containers can be handled separately - and can be
+     distinguished.
+
+ (6) Move away from keeping DNS records in a keyring, but rather keep them in
+     some sort of shrinkable list.  They could still be looked up over a
+     secure channel.
+
+To aid with at least (1), (2) and (3) and possibly (4), I think it might be
+worth adding an extended add_key() system call that takes an additional
+parameter string:
+
+	key_serial_t add_key2(const char *type,
+			      const char *description,
+			      const char *parameters,
+			      const void payload, size_t plen,
+			      key_serial_t keyring);
+
+The parameters would get passed to the key type driver for it to extract
+things like version number and subtype from without the need to try and fold
+it into the payload (which may, for example, be a binary ticket obtained from
+kerberos).  Though possibly that is a bad example as the kerberos ticket may
+contain multiple keys.
+
+Also, maybe add a multi-key adding syscall for when the payload may contain
+multiple keys, each to be added separately:
+
+	int add_keys(const char *type,
+		     const char *description,
+		     const char *parameters,
+		     const void payload, size_t plen,
+		     key_serial_t keyring);
+
+When it comes to keyrings, I'm thinking that the keyring needs to change such
+that the index holds CoW groups of keys of the same description, but of
+different type, version and subtype, e.g.:
+
+	struct key_group {
+		struct rcu_head		rcu;
+		struct key_group	*replacement;
+		char			*description;
+		unsigned int		seq;
+		refcount_t		ref;
+		int			nr_keys;
+		struct {
+			unsigned long	version;
+			struct key __rcu *key;
+		} key_list[];
+	};
+
+and that these groups should be made available to kernel services upon
+searching.  I'm tempted to put the version as part of the group as a whole,
+making it easier to ditch a set of the same version, but that could make RCU
+CoW-ness tricky.
+
+I could then add two new keyctls, one to unlink all the keys in a keyring that
+match description and, optionally, type and parameters (e.g. of a particular
+version):
+
+	int keyctl_scrub(const char *type, /* can be NULL */
+			 const char *description,
+			 const char *parameters, /* can be NULL */
+			 key_serial_t keyring);
+
+and one to list all the keys matching a description and, optionally, type and
+parameters:
+
+	int list_keys(const char *type, /* can be NULL */
+		      const char *description,
+		      const char *parameters, /* can be NULL */
+		      key_serial_t keyring,
+		      key_serial_t *list,
+		      size_t list_size);
+
+Thoughts?
+
+Thanks,
+David
+
