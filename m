@@ -1,166 +1,215 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EE02F4334
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 17:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6110519B3CB
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 17:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749748682; cv=none; b=YB+bp07PpqNykhzqqW2qWVz4u88lY/e+JKqZiaLGgjq1KK+Eqm/C7u9v7WSX+Ka63ZfzcWBdbN9RZ7uTEbwwFmZplzthqrfASE0gsmcyYrtvorSARTP2qTERzvIo2D4cLJDPd8BDHkwcBT777M311p/YyqOV+FtKNhYIx8LJeGc=
+	t=1749749291; cv=none; b=WDAmyByOIRHjrdzLh9pRZlszlvarhmx1pAJba5Nxuh/0YApdp6MmB9OJbQg3hyxXf7168AGAx+a3kEop2QBDIWKMdQz5MVKV6H40LKPQlQKbCvD4ArpjjdlVpHdhUxnxUYrvaLo1MAVHuqv5G9WMbTrtVgc7Y7UGeggJZM/xoiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749748682; c=relaxed/simple;
-	bh=bw03RNOnKa4cvZDy49m2knX/CzqcmfgAEtkur2taWiY=;
+	s=arc-20240116; t=1749749291; c=relaxed/simple;
+	bh=WZhop1YERcX997E+c3qVwBRYLGpfGoRCq9o/Qh0dYwg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FvqfIWG29HPnkWcWW4gKRMOCWxumSuvZ7DSEWA56ci8CU0gh743ww8SPIhYhmmBMTsqLmEV0s4WQT+gyJG0KSvxtan8Dlg/OsBO6e5vb3fOHFQ0MliCxab1pIoYIISqK/zpd8He0R523MbSnqycxiCVT2jxN62fLw3GYOTr/ASM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKx584Cj; arc=none smtp.client-ip=209.85.208.180
+	 To:Cc:Content-Type; b=jfsgww7/4OEgf2NScmtC58uDfh6iw3LFcUsIkw2Bug9dXgLPXKaHPKs3ZF4WQgPEnAvl+WtvnSsdywx94Zes/TBc5NhprZNihE0r2fW6JpUrltFrAChXXS53UAIxtCxHoGjnBFonjsdOzNbRSNnflT4OyCq6h/xtnMPS07fh5yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXVcZUzT; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKx584Cj"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32a658c4cc4so10363331fa.2
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 10:17:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXVcZUzT"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60700a745e5so2832316a12.3
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 10:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749748678; x=1750353478; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749749288; x=1750354088; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E5nTnU9/LbbSFYeSSw5vx6TfddosqJk4Bo5Q4HhlLCk=;
-        b=LKx584CjQKtHAAl6w5wV4YiFIqHKZV2B+/2ZXcFcWVXMr7eDhCDymHzrxlLboBCbR6
-         Xpy4iQufyirD9LGt8fs18aRFXa55uLHLWVV/NAkvZZfmTLok4I8b1QqvNY99r9r0Cmy/
-         VCtzpD2LQkvazn2XxkbNHCh88Y1fxkFhSk3jVyxUfjC9vLlo2/iXM6PaceYz/e15/uHr
-         aBSIaG0x1x19PdLkSnmCWaXaBBC5dSylnpy56ABy2DzWrkWozxf1RZ8as1+6ydLujQw1
-         TpzHcsFnVPBNAxbAlFFMsllCJWyv+CeMsDwLk8LXy6rCIxK4Lj+IgMkLNyUc0JEgTRf3
-         lw3g==
+        bh=yxyarbdSY2J5PiefhCbtRfuR9hDa8cQW32zW7iXDPtk=;
+        b=WXVcZUzTF6HMpbE7Y568lH1+dk9U6r6tmnd3/BcqGC+Crf+DGAOWATSfGNOrEOYnC6
+         o/2Bk4tvIKFD92AtuaTAyqBhZ7jVE/VslwzLFwO7F37qbvCdk5sNjCyrGaeRu/7nvRnA
+         AtDtScE3LSRJYaq27rk5r30nMAuYMeNMeZotXHL9EzMz1HjjBJ8YNqavDUcyeTc2+Y4F
+         Wkofhd6j8pA56wGTl2SYRiosqU+a9H75fSN0LF0n5RZLHRpVlbdaoR6BoCh/Lk2TNoGs
+         96CY/LKvE22xxNrfjVUrl3GsNSU3mYnfRDP7vOTDk0TR5KqoL1QjLh1ktPkjTiroiiuV
+         obDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749748678; x=1750353478;
+        d=1e100.net; s=20230601; t=1749749288; x=1750354088;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E5nTnU9/LbbSFYeSSw5vx6TfddosqJk4Bo5Q4HhlLCk=;
-        b=LU8dKIqTssQl9nA9iT2yPBm5hQZWr1PpQViVVMN0RKKjtiTKVLuy/Do/gPjobyG6cI
-         tKdXJ0ASoJiK/BD+RoAsHsFHViFEy1JJjaDd78akrVRvCIaaiPLo13mio/XlAhFioPXo
-         O/yOBJ7gLttGzghH9CDQO5CRBl3/N3lgh+Qa/nP+VZjywcgPjDhNWH/IJmTD0koXJt1h
-         E2KH1dkZn/Xdv5RFPWUfTgF4xSmXpaajb6vXpaiP381cpqDWiIXSarddAq43K+RCVBG8
-         axN6ILMvzmM+X7wsGTepwRL9tRcpd/8mErbkPG3QcHejullMvaV5fOExhFLNfuehySs4
-         RGOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWgBNktctXs+YpmnxSv/mQWIJYxbmpDGbiBKJUuEatm+DuXiuF3tdK5Zyp24jv5fZz+zO1Pr2TJDPLO@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyiy/2v2/hExX5waubu5J7faK5R5Rjc+vLD+0WAap533aVIhmiQ
-	KWUl1XPZS+17VlyXmiRuXGTQI/BgPm27ZSskOjbtlc5ZjaUDCLQDUIofRoj2eX/D4kW94dzjk2g
-	nGY0+qvTuGeiw7+kyye69sN/Rb83z0Vk+yW5A
-X-Gm-Gg: ASbGnctf1U4+CTdIrWXJLms1SJ3wY+xuzqd5ey5Kc3f3HeM4cg0741hMgCINsopIig5
-	9VXkW6/NGXog4q501/h5b/UCCbRDTXUy42ehqrwAgzNN5YWUdmUjhaNh6zKXHITl6g+OJm1CbHE
-	+VPzVNZ3qAUHO+vjg055zgDyS+lg3PAFl0ZFKnMJevcQ==
-X-Google-Smtp-Source: AGHT+IGU2xRs2qOEkzNkpcTHNRuhkzFtHt7KwAyCt8waktUwNPrUS/AxK4WX7aIPx8CPd6iF95OgD/AF2xPAdfvypNU=
-X-Received: by 2002:a2e:b88e:0:b0:32a:61cd:81f6 with SMTP id
- 38308e7fff4ca-32b3cc3c6demr2656481fa.19.1749748678203; Thu, 12 Jun 2025
- 10:17:58 -0700 (PDT)
+        bh=yxyarbdSY2J5PiefhCbtRfuR9hDa8cQW32zW7iXDPtk=;
+        b=DekE4cG4w0vNh+jU/L3BAzsxVtZPWM/Kz8aowTKTSvCre8ZvPAep6MNcJLHIYwzubZ
+         BZQTiB1+sJZCMa6ANT0IszYumkQPV9vcOZTzsEP1BI3PiUywlHS0HBEvh7dD9omglC/G
+         SdkzoMUiwNBdtx/KbMhYUcmifvQQenz/e8sqSPaAg1zSYn6ZDUeF4F1HDqbviXV7wu1P
+         AzPJolqIvREf8tYGN4QwTxueEjs7srsazF16n2rZ+4i3y3ghcc+ROfCqaHHqLSVcOenH
+         BtjHo/dgMv6AxF33t2A7NODLnW3uEX34vnVl2LBd+iEtjsbKdtdi+GEn34Hz8Q0R+H+K
+         hNEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKJ5kBQ+j0w8eFqq5vxKzoLZDY7ScnqDzZTrAvd4Pe3BvVySvnr6w8QDxrXujfOTrSIk6lGkG/gLth@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8gWJbnzAKP4skGLgf2e6cajMsR4p5Wpx9wWDnFwg8xKm+k7sZ
+	rDm5oS5TUtZ99EN4rTsDY5G2Zhssv2IdQw1vWIV34U6UyyzvBm3yqHF+Xj1KQLEQzQyo/3BVqpX
+	h/q8BsT/nau+6n9SjYgKMSKNUP/LsGFAbHHGJ
+X-Gm-Gg: ASbGnctPL7H40E7TbcXcYedYSC+6epIqBG9FnPjUgtcpsYMCIzm/PaALDbFBfl/7AV8
+	Vw+9F3c+nN2cezKvIl/hWpQPIfQeNtM8lMylxQMsXpJEMdgLu1uc3GXWZAg9nWUiezUWjRd5VGy
+	u6Y796/mmKtc2+389mstqrDxQwn1hGjpMUr1xn3FNVRw==
+X-Google-Smtp-Source: AGHT+IEjXcozh2Rb0LebaVnLpFlJnKCv3JcSTNiMe/z0WvTzIm4/wb52Li5F6mYFcDlS7gElsIt3uyndAe3dhspA66o=
+X-Received: by 2002:a05:6402:2694:b0:607:783e:5970 with SMTP id
+ 4fb4d7f45d1cf-608af556ec6mr633466a12.8.1749749287577; Thu, 12 Jun 2025
+ 10:28:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muQB8CgN7r8SE8okujV2rpvQoKYAP=yD95a_R1hLjKWqA@mail.gmail.com>
- <466171.1749738030@warthog.procyon.org.uk> <ecuf27sge23drhun5h3gckvzibwuienqwnyvvzxn4aong5ovd5@rlsymwdyrxk4>
-In-Reply-To: <ecuf27sge23drhun5h3gckvzibwuienqwnyvvzxn4aong5ovd5@rlsymwdyrxk4>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 12 Jun 2025 12:17:45 -0500
-X-Gm-Features: AX0GCFsENBSXBgTdCe2P5hhYSWTfYSxPbmKoh2GOSM_5YiAcfBBSbhIUdLCpCx0
-Message-ID: <CAH2r5mtp7brd5pzBd7Dxy8pK3Kp5Eg1wuoveC2S1JgEEkFoPLA@mail.gmail.com>
-Subject: Re: netfs hang in xfstest generic/013
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: David Howells <dhowells@redhat.com>, CIFS <linux-cifs@vger.kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Bharath S M <bharathsm@microsoft.com>
+References: <20250612154504.246390-1-pc@manguebit.org> <CAH2r5mvh7VC_fVp0QQ2ACJohuEvWriJp+zc8HSW6Z6GQTeH2-w@mail.gmail.com>
+In-Reply-To: <CAH2r5mvh7VC_fVp0QQ2ACJohuEvWriJp+zc8HSW6Z6GQTeH2-w@mail.gmail.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 12 Jun 2025 22:57:56 +0530
+X-Gm-Features: AX0GCFvEKuhi5RjO_rhPhVqVNlYeDEl6JbhuZF23YKa5VGsBdqkOjB3hXsiMFU0
+Message-ID: <CANT5p=rGbHfXiHYyQE6bXxka0o299ZhgZ8oajrwYw7f147k_Zg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix perf regression with deferred closes
+To: Steve French <smfrench@gmail.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
+	David Howells <dhowells@redhat.com>, Jay Shin <jaeshin@redhat.com>, 
+	Pierguido Lambri <plambri@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-My best theory so far is that it is related to recent netfs changes
-(and oddly doesn't affect non-multichannel, at least I can't repro it
-to that) e.g.
-
-commit 2b1424cd131cfaba4cf7040473133d26cddac088
-Author: David Howells <dhowells@redhat.com>
-Date:   Mon May 19 10:07:04 2025 +0100
-
-    netfs: Fix wait/wake to be consistent about the waitqueue used
-
-    Fix further inconsistencies in the use of waitqueues
-    (clear_and_wake_up_bit() vs private waitqueue).
-
-    Move some of this stuff from the read and write sides into common code =
-so
-    that it can be done in fewer places.
-
-    To make this work, async I/O needs to set NETFS_RREQ_OFFLOAD_COLLECTION=
- to
-    indicate that a workqueue will do the collecting and places that call t=
-he
-    wait function need to deal with it returning the amount transferred.
-
-    Fixes: e2d46f2ec332 ("netfs: Change the read result collector to
-only use one work item")
-
-On Thu, Jun 12, 2025 at 9:48=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
+On Thu, Jun 12, 2025 at 9:56=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> I'm not sure this is the same issue I saw a while ago...
+> tentatively merged into cifs-2.6.git for-next pending testing and any
+> additional review
 >
-> generic/013 sends a lot of ioctls (copychunk writes and set zero data)
-> which can take a good amount of time to process (~10s each on my test
-> machine, for example).
->
-> When/if the server gets too busy processing them, it starts responding
-> with STATUS_PENDING (mostly for reads and writes, AFAICS).
->
-> Currently we just release the mid for such responses, this means:
-> - write callbacks are not reached:
->    mostly dangling/wrong metadata left on cifs side, but netfs
->    reqs/subreqs are not terminated (probably leaking)
-> - for reads, similarly, mid ("metadata") is gone now, but netfs keeps
->    waiting for the data (because of unterminated reqs/subreqs too)
->
-> I have a WIP patch for that, I'll test and send to the list later.
->
->
-> Cheers,
->
-> enzo
->
-> On 06/12, David Howells wrote:
-> >Steve French <smfrench@gmail.com> wrote:
+> On Thu, Jun 12, 2025 at 10:45=E2=80=AFAM Paulo Alcantara <pc@manguebit.or=
+g> wrote:
 > >
-> >> I saw a hang in xfstest generic/013 once today (with 6.16-rc1 and a
-> >> directory lease patch from Bharath and the fix for the readdir
-> >> regression from Neil which look unrelated to the hang).
-> >>
-> >> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builde=
-rs/5/builds/487/steps/29/logs/stdio
-> >>
-> >> There were no requests in flight, and the share worked fine (could
-> >> e.g. ls /mnt/test) but fsstress was hung so looks like a locking leak,
-> >> or lock ordering issue with netfs. Any thoughts?
-> >>
-> >> root@fedora29:~# cat /proc/fs/cifs/open_files
-> >> # Version:1
-> >> # Format:
-> >> # <tree id> <ses id> <persistent fid> <flags> <count> <pid> <uid>
-> >> <filename> <mid>
-> >> 0x5 0x234211540000091 0x5c5698c8 0xc000 2 32005 0
-> >> f24XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 6928
+> > Customer reported that one of their applications started failing to
+> > open files with STATUS_INSUFFICIENT_RESOURCES due to NetApp server
+> > hitting the maximum number of opens to same file that it would allow
+> > for a single client connection.
 > >
-> >Can you grab the contents of /proc/fs/netfs/{stats,requests} ?
+> > It turned out the client was failing to reuse open handles with
+> > deferred closes because matching ->f_flags directly without masking
+> > off O_CREAT|O_EXCL|O_TRUNC bits first broke the comparision and then
+> > client ended up with thousands of deferred closes to same file.  Those
+> > bits are already satisfied on the original open, so no need to check
+> > them against existing open handles.
 > >
-> >I presume you're running without a cache?
+> > Reproducer:
 > >
-> >Would you be able to try reproducing it with some netfs tracing on?
+> >  #include <stdio.h>
+> >  #include <stdlib.h>
+> >  #include <string.h>
+> >  #include <unistd.h>
+> >  #include <fcntl.h>
+> >  #include <pthread.h>
 > >
-> >David
+> >  #define NR_THREADS      4
+> >  #define NR_ITERATIONS   2500
+> >  #define TEST_FILE       "/mnt/1/test/dir/foo"
 > >
+> >  static char buf[64];
 > >
+> >  static void *worker(void *arg)
+> >  {
+> >          int i, j;
+> >          int fd;
+> >
+> >          for (i =3D 0; i < NR_ITERATIONS; i++) {
+> >                  fd =3D open(TEST_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666=
+);
+> >                  for (j =3D 0; j < 16; j++)
+> >                          write(fd, buf, sizeof(buf));
+> >                  close(fd);
+> >          }
+> >  }
+> >
+> >  int main(int argc, char *argv[])
+> >  {
+> >          pthread_t t[NR_THREADS];
+> >          int fd;
+> >          int i;
+> >
+> >          fd =3D open(TEST_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+> >          close(fd);
+> >          memset(buf, 'a', sizeof(buf));
+> >          for (i =3D 0; i < NR_THREADS; i++)
+> >                  pthread_create(&t[i], NULL, worker, NULL);
+> >          for (i =3D 0; i < NR_THREADS; i++)
+> >                  pthread_join(t[i], NULL);
+> >          return 0;
+> >  }
+> >
+> > Before patch:
+> >
+> > $ mount.cifs //srv/share /mnt/1 -o ...
+> > $ mkdir -p /mnt/1/test/dir
+> > $ gcc repro.c && ./a.out
+> > ...
+> > number of opens: 1391
+> >
+> > After patch:
+> >
+> > $ mount.cifs //srv/share /mnt/1 -o ...
+> > $ mkdir -p /mnt/1/test/dir
+> > $ gcc repro.c && ./a.out
+> > ...
+> > number of opens: 1
+> >
+> > Cc: linux-cifs@vger.kernel.org
+> > Cc: David Howells <dhowells@redhat.com>
+> > Cc: Jay Shin <jaeshin@redhat.com>
+> > Cc: Pierguido Lambri <plambri@redhat.com>
+> > Fixes: b8ea3b1ff544 ("smb: enable reuse of deferred file handles for wr=
+ite operations")
+> > Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+> > ---
+> >  fs/smb/client/file.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> > index d2df10b8e6fd..9835672267d2 100644
+> > --- a/fs/smb/client/file.c
+> > +++ b/fs/smb/client/file.c
+> > @@ -999,15 +999,18 @@ int cifs_open(struct inode *inode, struct file *f=
+ile)
+> >                 rc =3D cifs_get_readable_path(tcon, full_path, &cfile);
+> >         }
+> >         if (rc =3D=3D 0) {
+> > -               if (file->f_flags =3D=3D cfile->f_flags) {
+> > +               unsigned int oflags =3D file->f_flags & ~(O_CREAT|O_EXC=
+L|O_TRUNC);
+> > +               unsigned int cflags =3D cfile->f_flags & ~(O_CREAT|O_EX=
+CL|O_TRUNC);
+> > +
+> > +               if (cifs_convert_flags(oflags, 0) =3D=3D cifs_convert_f=
+lags(cflags, 0) &&
+> > +                   (oflags & (O_SYNC|O_DIRECT)) =3D=3D (cflags & (O_SY=
+NC|O_DIRECT))) {
+> >                         file->private_data =3D cfile;
+> >                         spin_lock(&CIFS_I(inode)->deferred_lock);
+> >                         cifs_del_deferred_close(cfile);
+> >                         spin_unlock(&CIFS_I(inode)->deferred_lock);
+> >                         goto use_cache;
+> > -               } else {
+> > -                       _cifsFileInfo_put(cfile, true, false);
+> >                 }
+> > +               _cifsFileInfo_put(cfile, true, false);
+> >         } else {
+> >                 /* hard link on the defeered close file */
+> >                 rc =3D cifs_get_hardlink_path(tcon, inode, file);
+> > --
+> > 2.49.0
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
 
+Looks okay to me.
 
-
---
-Thanks,
-
-Steve
+--=20
+Regards,
+Shyam
