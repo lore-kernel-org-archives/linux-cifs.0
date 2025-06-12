@@ -1,64 +1,64 @@
 Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAD410957
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 03:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207EE10957
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 03:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749698728; cv=none; b=MWvHYbiLLYAAgb6BsR/SR3tvUBy/lbpko65wgjeInUpwBJKnKXW5JrfnSheUL7Oo91Zd65bGg5IOJKuBypDQBrZ8X328JhJLrLo69SYf9yMIqRD5wgvd8NPYCqV2/aYPsNR29yibarRyfnx5TUWAiNswS2hDf2fKrccd/CG6uNU=
+	t=1749698798; cv=none; b=GnE9WwCHn4FLWhvhuPJQzEdt/lDRyYWyeG2//P+XdJDdb5B80qvbQL8q4uwNErARaQ0zwcHvllUlKHvbMiORGJO6dxAYcLcdQwISTefTKKVqByzNi7tc+wg6PRQ6wtZx9NtLOOqDKabi2DIsaKsHMrE+gj/KAeztA63nlYhBo/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749698728; c=relaxed/simple;
-	bh=hiJuwYcigNyX/u6PQToQR214Mv/c6T8BZtMowqgvInY=;
+	s=arc-20240116; t=1749698798; c=relaxed/simple;
+	bh=a79qoluoy1srk151sjKF3ZJYIeFU5H1W4VrjbSvhIEE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YXQGFFWi6rMCDkuwefDPVeMsw31Ij86gF4W2+q5OEeksT4Uc9Erps9Do2E+QS+JqjoejISh6c1b3VEGq2DcGIUZ+yqxQtn9Qm+m2lVRK+Z5TkX4EBXwJvcic9fASmqF2YFIjUZMOdSAGv3u3Cu1iZZHX+ZSkBkhr7MHR3IpB6XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=NbGHHGrF; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=qX3jX+Zg; arc=none smtp.client-ip=74.207.241.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=czUk98GFhZJ6dBiGgqmri6TlvyEv9l/oVfc+3J0l8q3XL3f+YJ4QWtqV+k+mZ+2WFoxMLCsYL4GbsrxWGaCh7YgVbQ/zuk5hOaCxtC4Cugnv7/pawPkgpEKyGg9czNuqJxzM9gg5YqTkPBFgVpdQETIMnJ8lR468OTkebY+dfEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=5d6xbEy+; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=s/H+Xz4h; arc=none smtp.client-ip=74.207.241.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="NbGHHGrF";
-	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="qX3jX+Zg"
+	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="5d6xbEy+";
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="s/H+Xz4h"
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
  d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
- t=1749698726; h=date : from : to : cc : subject : message-id :
+ t=1749698669; h=date : from : to : cc : subject : message-id :
  references : mime-version : content-type : in-reply-to : from;
- bh=KY/xsiZHgHVbKJ3+pd7YuM5b8S8bvaONm5n27vToJyo=;
- b=NbGHHGrFTt/5UfqKuOsCYNxOozIhTZf/ENnDT+Uma9kKiWqW+2Km5n+QrRiOh2GaV0+rj
- fVSDB+9hUvTFBp6BA==
+ bh=vsa2CuuEm4AyAqI7a1Qurdo+dQWvL4EXfFXRtNM5698=;
+ b=5d6xbEy+aEM+V3Lq/fPEBMjMHJPeEzb1poknr9Oa78L2T/vpz8Mk/ma1/0sqM1N717Djq
+ VPlD6fYVAe7EMFbDQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
- i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1749698726; h=date :
+ i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1749698669; h=date :
  from : to : cc : subject : message-id : references : mime-version :
  content-type : in-reply-to : from;
- bh=KY/xsiZHgHVbKJ3+pd7YuM5b8S8bvaONm5n27vToJyo=;
- b=qX3jX+ZgmE2M2/H4ZxwR7AET/+9GEci2ZClalO7IWP+MLgsyI6n2DG2PgeUoWqXz7IVgN
- zTrABTnSB/cE0iTk4jjmCWwATXUZ/TAmhEaDgWT+ETrJz2gAvmmtgALibtRdt9S1n5qxl60
- H5+bAzfH3OFpoLbSetVMJIud7aZTp2ti9vs0Bd6ayIqZ6PxO863hdQR3XKhIKn/5qPTacEf
- uf9rLMnNjpKKlZ1GJiXpphT/3RQvNz9PuqdHFhBOz88HyaA8D7A3INXFi2xtMzlGUrboAdz
- wffzXRz56lIw2WeUfU5hC7HdC3ZHZNvkaFtp+O2NWC6/FPUCCVf+lnSmjEgA==
+ bh=vsa2CuuEm4AyAqI7a1Qurdo+dQWvL4EXfFXRtNM5698=;
+ b=s/H+Xz4hAr6m8ct0bnszYgtQgOHTcobKAzRvDO65j9habzvFGSdAB5mIbQd/VNlxyjddi
+ Kx1xKO8sM5K2XNKKoNP/sRFM5S67kO92THsVS6fMVV3nOukqtVfXAe12smFCIUWYCGFxIni
+ 31SPYtiWRWHUIm91zFOoZ9LPCkZCzavjbOXDOeUTw9E3O7lvIsFAqPDmYsnZnHW3TXNjkfC
+ mPfJ2MQF4rAIQVvvU8TN8KLNhAYFObzVLwfoIlwHNLGBq1hyR+tMmCTxoxK4V1NoYcsGkzC
+ wxkB6iaUH0spLqTQpYKY5ca9Xqads0unmBEJR4vmwRarOpGyUAFuCP4uwlqw==
 Received: from [127.0.0.1] (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256
 	 client-signature ED25519)
 	(Client CN "otters", Issuer "otters" (not verified))
-	by o-chul.darkrain42.org (Postfix) with ESMTPS id E5C508303;
-	Wed, 11 Jun 2025 20:25:26 -0700 (PDT)
+	by o-chul.darkrain42.org (Postfix) with ESMTPS id D6BC78186;
+	Wed, 11 Jun 2025 20:24:29 -0700 (PDT)
 Received: by vaarsuvius.home.arpa (Postfix, from userid 1000)
-	id E8C358C1E05; Wed, 11 Jun 2025 20:25:25 -0700 (PDT)
-Date: Wed, 11 Jun 2025 20:25:25 -0700
+	id DE8378C1E05; Wed, 11 Jun 2025 20:24:28 -0700 (PDT)
+Date: Wed, 11 Jun 2025 20:24:28 -0700
 From: Paul Aurich <paul@darkrain42.org>
 To: nspmangalore@gmail.com
 Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, bharathsm.hsk@gmail.com,
 	meetakshisetiyaoss@gmail.com, pc@manguebit.com,
 	henrique.carvalho@suse.com, ematsumiya@suse.de,
 	Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 4/7] cifs: serialize initialization and cleanup of cfid
-Message-ID: <aEpIpa3gbbz-nk86@vaarsuvius.home.arpa>
+Subject: Re: [PATCH 6/7] cifs: tc_count updates should be done with tc_lock
+Message-ID: <aEpIbMKyUh-6eqsR@vaarsuvius.home.arpa>
 Mail-Followup-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org,
 	smfrench@gmail.com, bharathsm.hsk@gmail.com,
 	meetakshisetiyaoss@gmail.com, pc@manguebit.com,
 	henrique.carvalho@suse.com, ematsumiya@suse.de,
 	Shyam Prasad N <sprasad@microsoft.com>
 References: <20250604101829.832577-1-sprasad@microsoft.com>
- <20250604101829.832577-4-sprasad@microsoft.com>
+ <20250604101829.832577-6-sprasad@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -67,119 +67,63 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250604101829.832577-4-sprasad@microsoft.com>
+In-Reply-To: <20250604101829.832577-6-sprasad@microsoft.com>
 
-On 2025-06-04 15:48:13 +0530, nspmangalore@gmail.com wrote:
+On 2025-06-04 15:48:15 +0530, nspmangalore@gmail.com wrote:
 >From: Shyam Prasad N <sprasad@microsoft.com>
 >
->Today we can have multiple processes calling open_cached_dir
->and other workers freeing the cached dir all in parallel.
->Although small sections of this code is locked to protect
->individual fields, there can be races between these threads
->which can be hard to debug.
->
->This patch serializes all initialization and cleanup of
->the cfid struct and the associated resources: dentry and
->the server handle.
->
+>We had problems with deadlocks using the cifs_tcp_ses_lock for
+>protecting a lot of structures. So we broke it down into smaller
+>spinlocks. cifs_tcon struct fields are protected by tc_lock now.
+>Hence we should stick to using that.
+
+Is it really safe to adjust this to tc_lock?
+
+There are a number of other points in the smb client that (AFAICT) only hold 
+cifs_tcp_ses_lock while adjusting the tc_count (which is why I used that 
+here).  See smb2_handle_cancelled_close, smb2_get_dfs_refer, 
+smb2_reconnect_server, smb2_find_smb_tcon.
+
+~Paul
+
+>Fixes: 3fa640d035e5 ("smb: During unmount, ensure all cached dir instances drop their dentry")
 >Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 >---
-> fs/smb/client/cached_dir.c | 16 ++++++++++++++++
-> fs/smb/client/cached_dir.h |  1 +
-> 2 files changed, 17 insertions(+)
+> fs/smb/client/cached_dir.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 >
 >diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->index 94538f52dfc8..2746d693d80a 100644
+>index 2746d693d80a..4abf5bbd8baf 100644
 >--- a/fs/smb/client/cached_dir.c
 >+++ b/fs/smb/client/cached_dir.c
->@@ -198,6 +198,12 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> 		return -ENOENT;
-> 	}
+>@@ -650,10 +650,12 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+> 			spin_unlock(&cfid->fid_lock);
+> 			cfids->num_entries--;
 >
->+	/*
->+	 * the following is a critical section. We need to make sure that the
->+	 * callers are serialized per-cfid
->+	 */
->+	mutex_lock(&cfid->cfid_mutex);
->+
-> 	/*
-> 	 * check again that the cfid is valid (with mutex held this time).
-> 	 * Return cached fid if it is valid (has a lease and has a time).
->@@ -208,11 +214,13 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> 	spin_lock(&cfid->fid_lock);
-> 	if (cfid->has_lease && cfid->time) {
-> 		spin_unlock(&cfid->fid_lock);
->+		mutex_unlock(&cfid->cfid_mutex);
-> 		*ret_cfid = cfid;
-> 		kfree(utf16_path);
-> 		return 0;
-> 	} else if (!cfid->has_lease) {
-> 		spin_unlock(&cfid->fid_lock);
->+		mutex_unlock(&cfid->cfid_mutex);
-> 		/* drop the ref that we have */
-> 		kref_put(&cfid->refcount, smb2_close_cached_fid);
-> 		kfree(utf16_path);
->@@ -229,6 +237,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> 	 */
-> 	npath = path_no_prefix(cifs_sb, path);
-> 	if (IS_ERR(npath)) {
->+		mutex_unlock(&cfid->cfid_mutex);
-
-Double mutex_unlock?  (It's also unlocked unconditionally in the 'out' path)
-
-> 		rc = PTR_ERR(npath);
-> 		goto out;
-> 	}
->@@ -389,6 +398,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> 		*ret_cfid = cfid;
-> 		atomic_inc(&tcon->num_remote_opens);
-> 	}
->+	mutex_unlock(&cfid->cfid_mutex);
->+
-> 	kfree(utf16_path);
+>+			spin_lock(&cfid->tcon->tc_lock);
+> 			++tcon->tc_count;
+> 			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+> 					    netfs_trace_tcon_ref_get_cached_lease_break);
+> 			queue_work(cfid_put_wq, &cfid->put_work);
+>+			spin_unlock(&cfid->tcon->tc_lock);
+> 			spin_unlock(&cfids->cfid_list_lock);
+> 			return true;
+> 		}
+>@@ -767,11 +769,11 @@ static void cfids_laundromat_worker(struct work_struct *work)
+> 		dput(dentry);
 >
-> 	if (is_replayable_error(rc) &&
->@@ -432,6 +443,9 @@ smb2_close_cached_fid(struct kref *ref)
-> 					       refcount);
-> 	int rc;
->
->+	/* make sure not to race with server open */
->+	mutex_lock(&cfid->cfid_mutex);
->+
-> 	spin_lock(&cfid->cfids->cfid_list_lock);
-> 	if (cfid->on_list) {
-> 		list_del(&cfid->entry);
->@@ -452,6 +466,7 @@ smb2_close_cached_fid(struct kref *ref)
-> 		if (rc) /* should we retry on -EBUSY or -EAGAIN? */
-> 			cifs_dbg(VFS, "close cached dir rc %d\n", rc);
-> 	}
->+	mutex_unlock(&cfid->cfid_mutex);
->
-> 	free_cached_dir(cfid);
-> }
->@@ -666,6 +681,7 @@ static struct cached_fid *init_cached_dir(const char *path)
-> 	INIT_LIST_HEAD(&cfid->entry);
-> 	INIT_LIST_HEAD(&cfid->dirents.entries);
-> 	mutex_init(&cfid->dirents.de_mutex);
->+	mutex_init(&cfid->cfid_mutex);
-> 	spin_lock_init(&cfid->fid_lock);
-> 	kref_init(&cfid->refcount);
-> 	return cfid;
->diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
->index 1dfe79d947a6..93c936af2253 100644
->--- a/fs/smb/client/cached_dir.h
->+++ b/fs/smb/client/cached_dir.h
->@@ -42,6 +42,7 @@ struct cached_fid {
-> 	struct kref refcount;
-> 	struct cifs_fid fid;
-> 	spinlock_t fid_lock;
->+	struct mutex cfid_mutex;
-> 	struct cifs_tcon *tcon;
-> 	struct dentry *dentry;
-> 	struct work_struct put_work;
+> 		if (cfid->is_open) {
+>-			spin_lock(&cifs_tcp_ses_lock);
+>+			spin_lock(&cfid->tcon->tc_lock);
+> 			++cfid->tcon->tc_count;
+> 			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
+> 					    netfs_trace_tcon_ref_get_cached_laundromat);
+>-			spin_unlock(&cifs_tcp_ses_lock);
+>+			spin_unlock(&cfid->tcon->tc_lock);
+> 			queue_work(serverclose_wq, &cfid->close_work);
+> 		} else
+> 			/*
 >-- 
 >2.43.0
 >
-
-~Paul
 
