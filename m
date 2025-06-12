@@ -1,162 +1,223 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501B42C3755
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 15:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3B729C344
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 15:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749741820; cv=none; b=jV61Q3wdBObtereP36pgTFzF51oyCwGEkSo8nP1IGFASupJt2t4vB9Vsmc6a7N276I+q3zHg2Vsvq9mavVQDfBM6eqskigGRdeaeIgr0sJ/YucpIzERviaGOsY9ifhrB7N/US8j90g7K1TXp6Vqs5Mh0ldhMm/lM+9Mh1hdvogs=
+	t=1749742143; cv=none; b=Kown1SLh+6FcHAOPTt57Tky79+dZT9KSvLkmnbokLYnUfOA2TYdxo1NXh6bubXGtMGRYQAtCIEh+dAiHZz9jO1E4PzFprHzln0pbp6Kbqv5a/36IHS23vGGXlfsB9puUGWB43d8DTTMerldN6TuOd9GdnVP8a2dLgyrAlM6z7Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749741820; c=relaxed/simple;
-	bh=vl+fUDKb+WV4cOO8HwCHI9JCyFeny1pkpyF5bZJKfsk=;
+	s=arc-20240116; t=1749742143; c=relaxed/simple;
+	bh=9Wcz0EgAvBuq7skMcbu3TqJWuN9aavtWwlkmVbJJabc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WGlb0OYLzH3N9ZgFaYj1kYUoouqdjK5p7ytkCAVrHX+jik1x0cZIcGwFsrXPWm7ntOI2OaFNmuaWy36xgrwoxTjmdcGKJNY3gZ6yTk6Xe5INkxiqsaor5XKiOrQ+LR1RL8v0pXW0phjly/MzhXdvsgY8LPvvRFD0Z4ZxZKWgenU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPbwP+qX; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=DdBWZ/h2XIaWiYwAnEVFlRYWL1ukOruXgenvsUMcYSnLUgorMect4SZYMk04l3PasVHRuTSI31tFAID3k+jLG7gHxWNVeJjNV+5HMHUYxznkXoM/pP4gc/sI8forpJ7355QCWPC2f4sH46UylCEHlDbnpkioSJHalYF6HwB4i6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9LNxISg; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPbwP+qX"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-32a72cb7e4dso11908411fa.0
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 08:23:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9LNxISg"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-55350d0eedeso1023585e87.2
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 08:29:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749741816; x=1750346616; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749742139; x=1750346939; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vnsKiVj47NVRzY4n461D0keXJb+XUeZ99rzGMYOWXoc=;
-        b=DPbwP+qXWQ8Ink9sZJ9RDqD7OM8L2MOykBBOJ2/CWo6RJLopfwiqh37Y/tPcQFYXoJ
-         qLj/LG9pbcnNkR0Q7gK7jPq/nhuRrdupGbIqcmkoK1JF1y+F7S4v7GbLgF/7gQgGza8O
-         ZBOsH6n0iYGmiw+zwu+VybfRBtHAQjGoeaRBLe52giX6Ohk9dZH0yIOMf92pUu2j13CR
-         P7slP+fSBgqIZ8zNhvS6FYJiSg4ORZAR8xttM6bzXA8ScvdpEnUFqxZFcNWJL3afGUmw
-         DjBTwbsSwvJzMevue1zOvJg7vM9NEv6/6z5DKEvHAteIuotFwdCTnRbz1EHCh8OF08mo
-         XH3g==
+        bh=g80HoXcjmH9pJp+7YdyycmiK/uaTtj0/EEMvAUdEQlA=;
+        b=Z9LNxISgQ2O5heagS25icC04iRt6pXhpPCrfX5fsZIeXE+Kn2WgSZKG8cDJ00/ajqZ
+         d1vqKtKQMuLN6MWDpoHw7NO5hI5ahhZb1Yi9XqfPqhv6lRBX35GYDOirGJr82SOYIqAs
+         PYmLUX9Nu775WrRJPLimsCVx5aTkOPPhvwvq8jGIHN4/V8SJF23f+HqsLEqtBkSyuFDJ
+         h+mHcHfxls5MLc6xyh6p8yh1Qjr5JVRNZFpgsd8bu7kQ5CBAnrOJxZpFaXbZlFV+PNRT
+         XpWFouZZv1yao5pY8ccEIz2UNXqTiFhI52IvKtEpKSBIKtC1UY7Pe3S3exfxuVt5wvq6
+         pHIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749741816; x=1750346616;
+        d=1e100.net; s=20230601; t=1749742139; x=1750346939;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vnsKiVj47NVRzY4n461D0keXJb+XUeZ99rzGMYOWXoc=;
-        b=DcwZlJaZ0qnSu0qEtQsmkIk7oqLQ3aV8GX4J55qcWjo2GhFyTDkcQk3+nEat0L9YoZ
-         PlqRPaVQm2pdotuczlryfTEMQnOiJNfjynXOeE4+ypYnECS6cYuilu0mWevorrJb7Ozm
-         o+ZqwOEm3T7DWES8ZWAjUiGhH7P5BD+0jasGNIyxLtmLaAi0/D9L2MIDqbVafjj2eK/I
-         Z7VIVZ3e2W5gUWgy8Wd3DB0pO4KbCtvPfkabHFbJJq50jsJv3yuqzyPC/+YhNigsSSWA
-         mMRtFH2Y2CGaEFytkVZUjZuXa/cvL70xkKGgwRulf6wAm1UaVdMogBA1Jr7YtecDdLSm
-         Qerg==
-X-Gm-Message-State: AOJu0YzkbkVIU/jrat1L/KRC9OzyyAbYBMhDDhvgaQOGU2asESvz7Blp
-	msTfi2ORUI5Dwe/3ywAm46eqMbvlaQ+2/HaF7q+ORQQrkasFrtDVuoPxEkD9a7Ry7e0IRGZVk/A
-	jwyaFrPnvOqQ/sYJheCwopWWwjG06hTU=
-X-Gm-Gg: ASbGnctxqmatmk8uNEq+pbZ47Th8v4cSkJYPvn7NqkoWpJfMJrBx3WeXrnAOYwKMM3H
-	rcAD1MX5hTuYu+ZrWFLeJnV+uw1j6BlSISxKpTnPdKJG9wVu41EgyLbtBVkaOmqoiO8g//tQORH
-	sqxE6WsuI6XZi0Kz3l9zKIIi31BR27xjKQjE5FhjZwFA==
-X-Google-Smtp-Source: AGHT+IE+RAqyRLCX5/++7kVi9l5pjPP7oGSMoRah65rMpqZmfLWQQviAtDh5oDXGiP4VnELejRBqzNTJKEljT52aeek=
-X-Received: by 2002:a2e:be1f:0:b0:32a:83b5:34ba with SMTP id
- 38308e7fff4ca-32b30701949mr11160141fa.20.1749741815910; Thu, 12 Jun 2025
- 08:23:35 -0700 (PDT)
+        bh=g80HoXcjmH9pJp+7YdyycmiK/uaTtj0/EEMvAUdEQlA=;
+        b=TYJ5jMePh9FFzS1Bw/Z8N5E1p6o6r0sP6wpw7Spo/QL9gsiiH1GqwnZ2/zyjWHZlvd
+         0Bw2R/gw7gCx2D1snrHyH8h85j/KMUzJqySjdxyVwJrYk/R3Cxs+qKHbtjOktaEgg3yE
+         9Gs0mPC82dK4gctBfJ1iuCkntEiKFJQaoaxHwENQMhnWVRTm+JXikhOVM9REJw35gIkX
+         xZosH4vEM81oXpq3hfTRm5R21/r1cFAH6b0EQUagARSW4SUVz+cTV4ht5T4PNiRm9Y2Y
+         cDwPFegTN37kf1+J4NMKY7xECDdFH7vxShbbh3v4HL/HSRV/ZB8ffJGgtGDdwL2nt6yR
+         OBmw==
+X-Gm-Message-State: AOJu0YzWftpLzf9Aq+j6uxECs1ojBqbh6GPh2roqX/22HL8is5DyPJa5
+	gJaT8ClWjLN2t+i6xe3xRRsLZ6B4acZzgYd1wi8pQco5hjL8Cq9wiW97AJ9PJyTZljZ3jXmoZGo
+	p5Sk2zDn2strxP/51zOCvqJfREg0Pa7E=
+X-Gm-Gg: ASbGncuZQbkmfWxOc/VHhkTE424fbfxuteXIF5YkYR3wzv6LARqtAjTj4MTOsAHZBLh
+	q33NPlxgOrShTFGGGxyeGO/5YZyU9yeggobTAS+l/UWJxsu5VWIYAhfazxRjRhOuL85IaenJOD/
+	4a+m7fbzTAr5KnzNbgC37DiROIXZ4otbeEAOoAa/cO9A==
+X-Google-Smtp-Source: AGHT+IHzBbSFJEZTEfwVdm88ETLkif4NbkyXC1BZ94UH1IOg/bre90wb1+hgWTSdryvAqYAsvH5VydRvkXXkr0MKgI4=
+X-Received: by 2002:a05:6512:3b23:b0:553:2f25:3b46 with SMTP id
+ 2adb3069b0e04-553a5647a6bmr1079519e87.57.1749742139067; Thu, 12 Jun 2025
+ 08:28:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5muQB8CgN7r8SE8okujV2rpvQoKYAP=yD95a_R1hLjKWqA@mail.gmail.com>
- <466171.1749738030@warthog.procyon.org.uk> <CAH2r5msdNx3ADkr2+AGqtWWW1x2v9p7x0JdDbh8NrA1qAs5gqw@mail.gmail.com>
-In-Reply-To: <CAH2r5msdNx3ADkr2+AGqtWWW1x2v9p7x0JdDbh8NrA1qAs5gqw@mail.gmail.com>
+References: <20250604101829.832577-1-sprasad@microsoft.com>
+ <20250604101829.832577-4-sprasad@microsoft.com> <aEpIpa3gbbz-nk86@vaarsuvius.home.arpa>
+ <CANT5p=qp_+s4Q42J8TyuAwQmPEpY4g+SYAGsgcBmQkipsLiXrg@mail.gmail.com>
+In-Reply-To: <CANT5p=qp_+s4Q42J8TyuAwQmPEpY4g+SYAGsgcBmQkipsLiXrg@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 12 Jun 2025 10:23:25 -0500
-X-Gm-Features: AX0GCFu6n4k7Q6FprKjeYpfzudDeWNXJ0rcEc9CxIzd4r3xSWFaE7fJBJelyUuA
-Message-ID: <CAH2r5mv2iKPkFa8xaAL7dR+8RjA99GLE139fKtrYF0pNr=-isw@mail.gmail.com>
-Subject: Re: netfs hang in xfstest generic/013
-To: David Howells <dhowells@redhat.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Bharath S M <bharathsm@microsoft.com>
+Date: Thu, 12 Jun 2025 10:28:48 -0500
+X-Gm-Features: AX0GCFsG8xohAmovYAHI9BQp2eRuq0SFpti8NVw3SvJKAoxv41mCy_sY7K5qhbU
+Message-ID: <CAH2r5msJYghVKpHsDiNzSGSVq_GzLM5zzPco7gqC4FWmHP29gA@mail.gmail.com>
+Subject: Re: [PATCH 4/7] cifs: serialize initialization and cleanup of cfid
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-cifs@vger.kernel.org, bharathsm.hsk@gmail.com, 
+	meetakshisetiyaoss@gmail.com, pc@manguebit.com, henrique.carvalho@suse.com, 
+	ematsumiya@suse.de, Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I do see one suspicious thing in the dmesg log (invalidate inode
-error) for generic/013:
+> Steve: Do you want me to submit a v2? Or submit another patch to fix this=
+?
 
-Jun 12 09:48:46 fedora29 systemd[1]: Started fstests-generic-013.scope
-- /usr/bin/bash -c "test -w /proc/self/oom_score_adj && echo 250 >
-/proc/self/oom_score_adj; exec ./tests/generic/013".
-                                                   Jun 12 09:48:47
-fedora29 kernel: CIFS: Server share
-\\linuxsmb3testsharesmc.file.core.windows.net\test does not support
-copy rangeJun 12 09:48:49 fedora29 kernel: CIFS: VFS:
-cifs_revalidate_mapping: invalidate inode 000000002916a2e4 failed with
-rc -5
-Jun 12 09:49:01 fedora29 kernel: CIFS: VFS: cifs_revalidate_mapping:
-invalidate inode 000000002c7fa8ec failed with rc -5          Jun 12
-09:49:02 fedora29 kernel: CIFS: VFS: cifs_revalidate_mapping:
-invalidate inode 000000002c7fa8ec failed with rc -5
+For patches that are not in mainline yet, then better to send a v2, yes
 
-On Thu, Jun 12, 2025 at 10:03=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
+On Thu, Jun 12, 2025 at 4:38=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
+com> wrote:
 >
-> Reads  : DR=3D948 RA=3D6257 RF=3D1303 RS=3D0 WB=3D0 WBZ=3D0
-> Writes : BW=3D14322 WT=3D0 DW=3D2111 WP=3D7265 2C=3D0
-> ZeroOps: ZR=3D4241 sh=3D0 sk=3D0
-> DownOps: DL=3D8492 ds=3D8492 df=3D6 di=3D0
-> CaRdOps: RD=3D0 rs=3D0 rf=3D0
-> UpldOps: UL=3D9387 us=3D9394 uf=3D73
-> CaWrOps: WR=3D0 ws=3D0 wf=3D0
-> Retries: rq=3D0 rs=3D0 wq=3D7 ws=3D7
-> Objs   : rr=3D1 sr=3D0 foq=3D1 wsc=3D0
-> WbLock : skip=3D25 wait=3D20
-> -- FS-Cache statistics --
-> Cookies: n=3D0 v=3D0 vcol=3D0 voom=3D0
-> Acquire: n=3D0 ok=3D0 oom=3D0
-> LRU    : n=3D0 exp=3D0 rmv=3D0 drp=3D0 at=3D0
-> Invals : n=3D0
-> Updates: n=3D0 rsz=3D0 rsn=3D0
-> Relinqs: n=3D0 rtr=3D0 drop=3D0
-> NoSpace: nwr=3D0 ncr=3D0 cull=3D0
-> IO     : rd=3D0 wr=3D0 mis=3D0
+> On Thu, Jun 12, 2025 at 8:55=E2=80=AFAM Paul Aurich <paul@darkrain42.org>=
+ wrote:
+> >
+> > On 2025-06-04 15:48:13 +0530, nspmangalore@gmail.com wrote:
+> > >From: Shyam Prasad N <sprasad@microsoft.com>
+> > >
+> > >Today we can have multiple processes calling open_cached_dir
+> > >and other workers freeing the cached dir all in parallel.
+> > >Although small sections of this code is locked to protect
+> > >individual fields, there can be races between these threads
+> > >which can be hard to debug.
+> > >
+> > >This patch serializes all initialization and cleanup of
+> > >the cfid struct and the associated resources: dentry and
+> > >the server handle.
+> > >
+> > >Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > >---
+> > > fs/smb/client/cached_dir.c | 16 ++++++++++++++++
+> > > fs/smb/client/cached_dir.h |  1 +
+> > > 2 files changed, 17 insertions(+)
+> > >
+> > >diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+> > >index 94538f52dfc8..2746d693d80a 100644
+> > >--- a/fs/smb/client/cached_dir.c
+> > >+++ b/fs/smb/client/cached_dir.c
+> > >@@ -198,6 +198,12 @@ int open_cached_dir(unsigned int xid, struct cifs=
+_tcon *tcon,
+> > >               return -ENOENT;
+> > >       }
+> > >
+> > >+      /*
+> > >+       * the following is a critical section. We need to make sure th=
+at the
+> > >+       * callers are serialized per-cfid
+> > >+       */
+> > >+      mutex_lock(&cfid->cfid_mutex);
+> > >+
+> > >       /*
+> > >        * check again that the cfid is valid (with mutex held this tim=
+e).
+> > >        * Return cached fid if it is valid (has a lease and has a time=
+).
+> > >@@ -208,11 +214,13 @@ int open_cached_dir(unsigned int xid, struct cif=
+s_tcon *tcon,
+> > >       spin_lock(&cfid->fid_lock);
+> > >       if (cfid->has_lease && cfid->time) {
+> > >               spin_unlock(&cfid->fid_lock);
+> > >+              mutex_unlock(&cfid->cfid_mutex);
+> > >               *ret_cfid =3D cfid;
+> > >               kfree(utf16_path);
+> > >               return 0;
+> > >       } else if (!cfid->has_lease) {
+> > >               spin_unlock(&cfid->fid_lock);
+> > >+              mutex_unlock(&cfid->cfid_mutex);
+> > >               /* drop the ref that we have */
+> > >               kref_put(&cfid->refcount, smb2_close_cached_fid);
+> > >               kfree(utf16_path);
+> > >@@ -229,6 +237,7 @@ int open_cached_dir(unsigned int xid, struct cifs_=
+tcon *tcon,
+> > >        */
+> > >       npath =3D path_no_prefix(cifs_sb, path);
+> > >       if (IS_ERR(npath)) {
+> > >+              mutex_unlock(&cfid->cfid_mutex);
+> >
+> > Double mutex_unlock?  (It's also unlocked unconditionally in the 'out' =
+path)
 >
-> root@fedora29:~# cat /proc/fs/netfs/requests
-> REQUEST  OR REF FL ERR  OPS COVERAGE
-> =3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=3D=3D =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> 00003699 DW   2 3120    0   0 @16200000 0/100000
+> Good catch!
+> Steve: Do you want me to submit a v2? Or submit another patch to fix this=
+?
 >
-> On Thu, Jun 12, 2025 at 9:20=E2=80=AFAM David Howells <dhowells@redhat.co=
-m> wrote:
 > >
-> > Steve French <smfrench@gmail.com> wrote:
-> >
-> > > I saw a hang in xfstest generic/013 once today (with 6.16-rc1 and a
-> > > directory lease patch from Bharath and the fix for the readdir
-> > > regression from Neil which look unrelated to the hang).
+> > >               rc =3D PTR_ERR(npath);
+> > >               goto out;
+> > >       }
+> > >@@ -389,6 +398,8 @@ int open_cached_dir(unsigned int xid, struct cifs_=
+tcon *tcon,
+> > >               *ret_cfid =3D cfid;
+> > >               atomic_inc(&tcon->num_remote_opens);
+> > >       }
+> > >+      mutex_unlock(&cfid->cfid_mutex);
+> > >+
+> > >       kfree(utf16_path);
 > > >
-> > > http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/build=
-ers/5/builds/487/steps/29/logs/stdio
+> > >       if (is_replayable_error(rc) &&
+> > >@@ -432,6 +443,9 @@ smb2_close_cached_fid(struct kref *ref)
+> > >                                              refcount);
+> > >       int rc;
 > > >
-> > > There were no requests in flight, and the share worked fine (could
-> > > e.g. ls /mnt/test) but fsstress was hung so looks like a locking leak=
-,
-> > > or lock ordering issue with netfs. Any thoughts?
+> > >+      /* make sure not to race with server open */
+> > >+      mutex_lock(&cfid->cfid_mutex);
+> > >+
+> > >       spin_lock(&cfid->cfids->cfid_list_lock);
+> > >       if (cfid->on_list) {
+> > >               list_del(&cfid->entry);
+> > >@@ -452,6 +466,7 @@ smb2_close_cached_fid(struct kref *ref)
+> > >               if (rc) /* should we retry on -EBUSY or -EAGAIN? */
+> > >                       cifs_dbg(VFS, "close cached dir rc %d\n", rc);
+> > >       }
+> > >+      mutex_unlock(&cfid->cfid_mutex);
 > > >
-> > > root@fedora29:~# cat /proc/fs/cifs/open_files
-> > > # Version:1
-> > > # Format:
-> > > # <tree id> <ses id> <persistent fid> <flags> <count> <pid> <uid>
-> > > <filename> <mid>
-> > > 0x5 0x234211540000091 0x5c5698c8 0xc000 2 32005 0
-> > > f24XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 6928
+> > >       free_cached_dir(cfid);
+> > > }
+> > >@@ -666,6 +681,7 @@ static struct cached_fid *init_cached_dir(const ch=
+ar *path)
+> > >       INIT_LIST_HEAD(&cfid->entry);
+> > >       INIT_LIST_HEAD(&cfid->dirents.entries);
+> > >       mutex_init(&cfid->dirents.de_mutex);
+> > >+      mutex_init(&cfid->cfid_mutex);
+> > >       spin_lock_init(&cfid->fid_lock);
+> > >       kref_init(&cfid->refcount);
+> > >       return cfid;
+> > >diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+> > >index 1dfe79d947a6..93c936af2253 100644
+> > >--- a/fs/smb/client/cached_dir.h
+> > >+++ b/fs/smb/client/cached_dir.h
+> > >@@ -42,6 +42,7 @@ struct cached_fid {
+> > >       struct kref refcount;
+> > >       struct cifs_fid fid;
+> > >       spinlock_t fid_lock;
+> > >+      struct mutex cfid_mutex;
+> > >       struct cifs_tcon *tcon;
+> > >       struct dentry *dentry;
+> > >       struct work_struct put_work;
+> > >--
+> > >2.43.0
+> > >
 > >
-> > Can you grab the contents of /proc/fs/netfs/{stats,requests} ?
-> >
-> > I presume you're running without a cache?
-> >
-> > Would you be able to try reproducing it with some netfs tracing on?
-> >
-> > David
+> > ~Paul
 > >
 >
 >
 > --
-> Thanks,
->
-> Steve
+> Regards,
+> Shyam
 
 
 
