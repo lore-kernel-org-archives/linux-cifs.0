@@ -1,129 +1,81 @@
-Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
+Received: from neil.brown.name (neil.brown.name [103.29.64.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207EE10957
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 03:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C839128382;
+	Thu, 12 Jun 2025 04:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.29.64.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749698798; cv=none; b=GnE9WwCHn4FLWhvhuPJQzEdt/lDRyYWyeG2//P+XdJDdb5B80qvbQL8q4uwNErARaQ0zwcHvllUlKHvbMiORGJO6dxAYcLcdQwISTefTKKVqByzNi7tc+wg6PRQ6wtZx9NtLOOqDKabi2DIsaKsHMrE+gj/KAeztA63nlYhBo/I=
+	t=1749702640; cv=none; b=Hnai8BSU45j/g1GJDFAp4opnzRhWarNI2gLyvqECSLgu1JUd1AhkKmi++BkrQYlDkIwi5JKo2wVmoCD5unwM9/o28rwbwhSK6St+A2RcBlfVWfopZRZc5bekrzRZq2cYPfWnMAcde9IQMJOssCgUz5RwoBSg7kVNsfC7dyjCkJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749698798; c=relaxed/simple;
-	bh=a79qoluoy1srk151sjKF3ZJYIeFU5H1W4VrjbSvhIEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=czUk98GFhZJ6dBiGgqmri6TlvyEv9l/oVfc+3J0l8q3XL3f+YJ4QWtqV+k+mZ+2WFoxMLCsYL4GbsrxWGaCh7YgVbQ/zuk5hOaCxtC4Cugnv7/pawPkgpEKyGg9czNuqJxzM9gg5YqTkPBFgVpdQETIMnJ8lR468OTkebY+dfEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=5d6xbEy+; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=s/H+Xz4h; arc=none smtp.client-ip=74.207.241.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="5d6xbEy+";
-	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="s/H+Xz4h"
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
- d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
- t=1749698669; h=date : from : to : cc : subject : message-id :
- references : mime-version : content-type : in-reply-to : from;
- bh=vsa2CuuEm4AyAqI7a1Qurdo+dQWvL4EXfFXRtNM5698=;
- b=5d6xbEy+aEM+V3Lq/fPEBMjMHJPeEzb1poknr9Oa78L2T/vpz8Mk/ma1/0sqM1N717Djq
- VPlD6fYVAe7EMFbDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
- i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1749698669; h=date :
- from : to : cc : subject : message-id : references : mime-version :
- content-type : in-reply-to : from;
- bh=vsa2CuuEm4AyAqI7a1Qurdo+dQWvL4EXfFXRtNM5698=;
- b=s/H+Xz4hAr6m8ct0bnszYgtQgOHTcobKAzRvDO65j9habzvFGSdAB5mIbQd/VNlxyjddi
- Kx1xKO8sM5K2XNKKoNP/sRFM5S67kO92THsVS6fMVV3nOukqtVfXAe12smFCIUWYCGFxIni
- 31SPYtiWRWHUIm91zFOoZ9LPCkZCzavjbOXDOeUTw9E3O7lvIsFAqPDmYsnZnHW3TXNjkfC
- mPfJ2MQF4rAIQVvvU8TN8KLNhAYFObzVLwfoIlwHNLGBq1hyR+tMmCTxoxK4V1NoYcsGkzC
- wxkB6iaUH0spLqTQpYKY5ca9Xqads0unmBEJR4vmwRarOpGyUAFuCP4uwlqw==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256
-	 client-signature ED25519)
-	(Client CN "otters", Issuer "otters" (not verified))
-	by o-chul.darkrain42.org (Postfix) with ESMTPS id D6BC78186;
-	Wed, 11 Jun 2025 20:24:29 -0700 (PDT)
-Received: by vaarsuvius.home.arpa (Postfix, from userid 1000)
-	id DE8378C1E05; Wed, 11 Jun 2025 20:24:28 -0700 (PDT)
-Date: Wed, 11 Jun 2025 20:24:28 -0700
-From: Paul Aurich <paul@darkrain42.org>
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, bharathsm.hsk@gmail.com,
-	meetakshisetiyaoss@gmail.com, pc@manguebit.com,
-	henrique.carvalho@suse.com, ematsumiya@suse.de,
-	Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 6/7] cifs: tc_count updates should be done with tc_lock
-Message-ID: <aEpIbMKyUh-6eqsR@vaarsuvius.home.arpa>
-Mail-Followup-To: nspmangalore@gmail.com, linux-cifs@vger.kernel.org,
-	smfrench@gmail.com, bharathsm.hsk@gmail.com,
-	meetakshisetiyaoss@gmail.com, pc@manguebit.com,
-	henrique.carvalho@suse.com, ematsumiya@suse.de,
-	Shyam Prasad N <sprasad@microsoft.com>
-References: <20250604101829.832577-1-sprasad@microsoft.com>
- <20250604101829.832577-6-sprasad@microsoft.com>
+	s=arc-20240116; t=1749702640; c=relaxed/simple;
+	bh=KtZUjJAg2eQN1hqERrYkxxQnWfsOhN7ohu1dvZH3944=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=VdI+UWobTeui35G0tPUdUXD0jGS2LmPkrIGCSVrVmTlaYqjn7n2IPT1Cum157umVzOA8n2rSkJY3K7k9eYbvy1FIPGIhmDGe+Ffhr6hB0y8xyC8RC2xLRyMUZaY2YI2Ou6XsUUyHy3L5DSVFzEbnvPgmh/a7THZ1x2/62Jay7Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name; spf=pass smtp.mailfrom=neil.brown.name; arc=none smtp.client-ip=103.29.64.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=neil.brown.name
+Received: from 196.186.233.220.static.exetel.com.au ([220.233.186.196] helo=home.neil.brown.name)
+	by neil.brown.name with esmtp (Exim 4.95)
+	(envelope-from <mr@neil.brown.name>)
+	id 1uPZa0-008YSz-KI;
+	Thu, 12 Jun 2025 04:30:20 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250604101829.832577-6-sprasad@microsoft.com>
+From: "NeilBrown" <neil@brown.name>
+To: "Al Viro" <viro@zeniv.linux.org.uk>
+Cc: "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
+ "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
+ "Miklos Szeredi" <miklos@szeredi.hu>, "Amir Goldstein" <amir73il@gmail.com>,
+ "Kees Cook" <kees@kernel.org>, "Joel Granados" <joel.granados@kernel.org>,
+ "Namjae Jeon" <linkinjeon@kernel.org>, "Steve French" <smfrench@gmail.com>,
+ "Sergey Senozhatsky" <senozhatsky@chromium.org>, netfs@lists.linux.dev,
+ linux-kernel@vger.kernel.org, ecryptfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 2/2] fs/proc: take rcu_read_lock() in proc_sys_compare()
+In-reply-to: <20250611233306.GA1647736@ZenIV>
+References: <>, <20250611233306.GA1647736@ZenIV>
+Date: Thu, 12 Jun 2025 14:30:20 +1000
+Message-id: <174970262010.608730.16666030974664097741@noble.neil.brown.name>
 
-On 2025-06-04 15:48:15 +0530, nspmangalore@gmail.com wrote:
->From: Shyam Prasad N <sprasad@microsoft.com>
->
->We had problems with deadlocks using the cifs_tcp_ses_lock for
->protecting a lot of structures. So we broke it down into smaller
->spinlocks. cifs_tcon struct fields are protected by tc_lock now.
->Hence we should stick to using that.
+On Thu, 12 Jun 2025, Al Viro wrote:
+> On Thu, Jun 12, 2025 at 08:57:03AM +1000, NeilBrown wrote:
+> 
+> > However there is no guarantee that this lock is held by d_same_name()
+> > (the caller of ->d_compare).  In particularly d_alloc_parallel() calls
+> > d_same_name() after rcu_read_unlock().
+> 
+> d_alloc_parallel() calls d_same_name() with dentry being pinned;
+> if it's positive, nothing's going to happen to its inode,
+> rcu_read_lock() or not.  It can go from negative to positive,
+> but that's it.
+> 
+> Why is it needed?  We do care about possibly NULL inode (basically,
+> when RCU dcache lookup runs into a dentry getting evicted right
+> under it), but that's not relevant here.
+> 
 
-Is it really safe to adjust this to tc_lock?
+Maybe it isn't needed.  Maybe I could fix the warning by removing the
+rcu_dereference() (and the RCU_INIT_POINTER() in inode.c).  But then I
+might have to pretend that I understand the code - and it makes no
+sense.
 
-There are a number of other points in the smb client that (AFAICT) only hold 
-cifs_tcp_ses_lock while adjusting the tc_count (which is why I used that 
-here).  See smb2_handle_cancelled_close, smb2_get_dfs_refer, 
-smb2_reconnect_server, smb2_find_smb_tcon.
+If a second d_alloc_parallel() is called while there is already a
+d_in_lookup() dentry, then ->d_compare will return 1 so a second
+d_in_lookup() will be created and ->lookup will be called twice
+(possibly concurrently) and both will be added to the dcache.  Probably
+not harmful but not really wanted.
 
-~Paul
+And I'm having trouble seeing how sysctl_is_seen() is useful.  If it
+reports that the sysctl is not visible to this process, it'll just
+create a new dentry/inode which is that same as any other that would be
+created... 
 
->Fixes: 3fa640d035e5 ("smb: During unmount, ensure all cached dir instances drop their dentry")
->Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
->---
-> fs/smb/client/cached_dir.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
->
->diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
->index 2746d693d80a..4abf5bbd8baf 100644
->--- a/fs/smb/client/cached_dir.c
->+++ b/fs/smb/client/cached_dir.c
->@@ -650,10 +650,12 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
-> 			spin_unlock(&cfid->fid_lock);
-> 			cfids->num_entries--;
->
->+			spin_lock(&cfid->tcon->tc_lock);
-> 			++tcon->tc_count;
-> 			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-> 					    netfs_trace_tcon_ref_get_cached_lease_break);
-> 			queue_work(cfid_put_wq, &cfid->put_work);
->+			spin_unlock(&cfid->tcon->tc_lock);
-> 			spin_unlock(&cfids->cfid_list_lock);
-> 			return true;
-> 		}
->@@ -767,11 +769,11 @@ static void cfids_laundromat_worker(struct work_struct *work)
-> 		dput(dentry);
->
-> 		if (cfid->is_open) {
->-			spin_lock(&cifs_tcp_ses_lock);
->+			spin_lock(&cfid->tcon->tc_lock);
-> 			++cfid->tcon->tc_count;
-> 			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
-> 					    netfs_trace_tcon_ref_get_cached_laundromat);
->-			spin_unlock(&cifs_tcp_ses_lock);
->+			spin_unlock(&cfid->tcon->tc_lock);
-> 			queue_work(serverclose_wq, &cfid->close_work);
-> 		} else
-> 			/*
->-- 
->2.43.0
->
-
+NeilBrown
