@@ -1,203 +1,159 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from o-chul.darkrain42.org (o-chul.darkrain42.org [74.207.241.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBDD298991
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 16:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990FB2222A6
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 16:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.207.241.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749745342; cv=none; b=DHzGfzJ4da2yNZTQ6ESc7h1KQuSXZE/SZkSF0zVFCsgDitIaPz7Tt7qVyEL3HZDj2dzkEUDkXKQ2eatFul0ESg+SnuSkya4v7E1Q2++8lET7KegRRL7iO608ccmuwfvzIsPjjHo4vD43sNX+gf2ir8bwT6Ep9It66mxbRTLvODw=
+	t=1749746009; cv=none; b=uzep2b4FHI+H3j4+fCu929mrmUjszzS4x6DPx17VqBha5VlVB135IwqcnqAS2gJ/J8zEP6QdpD/agXWwxgc6SQYG6NRFGK0xApc7XREP4NCPXd7Cb+yrhzCIc+38ev8OVJlNloUwmz62AYgV2PTuOsC5bblCAsTElyBgLkYUraQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749745342; c=relaxed/simple;
-	bh=l9uCHsxvCAmDHDSzqd5IzhQuVwDCJXpa7qjYD3EXutY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oUT3dv0uc84k4xWB78dOz23o8hE7ndiJVSclawAE6oh2DskuHEU/IDMQLR6+ByNDr3PtS964ap1b2zugTcKX4ZAD/Mqbsll+7oZntmXCXXjd4v8H9X1gub65WtbaEuUyXaG9CTikZlJmb4wf/OXDQK0PPSp2VCPzHK10xwNqJnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLk6eTiV; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1749746009; c=relaxed/simple;
+	bh=MQg3IBjs4r/gsXhQispUCCvpn9lgpMjgrQhqv4JwyFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rlflAsFc8b9/NgdgFrHiLn5y/FKaJxaueMngBkX7yWEcKsaSSxtjJSfwGci6BBZbonlUYth2+E2Cjemz4YVBhhPPKyXr9fTqlPZyKxE2ga3uC+bwSNdL6FI9DCGl/z8ywv0pTstiOEzMB0KY2IlNQkdMAmhhnewJX++Vs7g1uaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org; spf=pass smtp.mailfrom=darkrain42.org; dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=UqQs0Xli; dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b=cIRM8zhm; arc=none smtp.client-ip=74.207.241.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=darkrain42.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkrain42.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLk6eTiV"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-54b09cb06b0so1226312e87.1
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jun 2025 09:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749745337; x=1750350137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nT1byXFKTbL3YnlZ03XO9d4vTBW9MbKTx1RMTGQ6pAA=;
-        b=nLk6eTiViWRzggifjFPNKyktxcSIcE/pUk1SiEhKYO/mqwVNXUi7RonoKbP/JNHZQr
-         dughgY5BuaFr2kbP856YY7tv8VZ7Ddl1n2w3RQhsU0zfXUAtJt/qNY+8abjYa1iqb7pv
-         /UVvbOHl/BkoKjpuJ+LtugApQeQ5k6WH2aT6qMkaHZGwpmmHYC6UoOf2qGDgL4jcj/th
-         52LduFIXBw3SsBWoQwOdVAlE3LHDj5BkSa5p6eFD5OU5+AXN7DYmqb8TE95RJBkw/kMD
-         PR/9A2eP0NWVo70zignaFU/msGjRKa8jJdAcJ0DoPTY2Ovj9bUUznII2096jQR9z/EaM
-         zpMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749745337; x=1750350137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nT1byXFKTbL3YnlZ03XO9d4vTBW9MbKTx1RMTGQ6pAA=;
-        b=eDnEWvdyNpAClq1jC3U3q+1hywcfXmzvYDS21SiYqyDdi5Lwjkg+rnUIPKDfT19HWZ
-         iH+0/u84RjI4LjvsVa+MZkUG3C1osyTsHgheOf9EZpT3RhI+jVQ26iWizHzDktjAYH27
-         QBdLeFvmMGZFUT7Jc0pwrtU7LxXEeTiuNk/WbNnvEM8HTLPDb4/FKZqGYxY8KeF55DPm
-         xSlvnQHGQB55DD6yRvno9tHGwgNs9hjo3vQPfzbVZA/32+uIjD9jCLvegTJS4Mrea7R/
-         WJQWnnAIik3TJfgA5TdSv9/CneNC8Pb4B9/xqqeeW7IFvdTAOMyT826LAFmHUB7EKrQO
-         6Rvw==
-X-Gm-Message-State: AOJu0Yx3VUOMHF/CCkrUuUQT/uHZ9u2hWt7gLaFRcro1BdjXVo5deGRM
-	0gYcN192Es9IKHxrd1ElfYUy4JW+StWYW5rN5mSatcO+ECguScTGuuDXYlNdlTiDk3jdAgGRPlp
-	VLn4HM6wnDpZansw5Gjtui13zUXW9QHtXDg==
-X-Gm-Gg: ASbGncu7UQsrSTJvu0/dP/FyspvFH9krsdAmRUMKcYMZx58Kfe5PVFFPDhcwz3e+yv9
-	fedxIJy1JK27hxYdJ960Fyi32PJC7PQF1XEMu+fnOYYS3NQT73xiJ+ussIfDgz7HYpGRpiHCVcq
-	1cabJaU2Vmzh/FAjDkyub0OaKqtd0tHD18OkV0f3V7jQr1kgDcBALzs3hTMbb1ywDuRmch8VI3n
-	NDs
-X-Google-Smtp-Source: AGHT+IFO1Vu000QcOgTG7+mUF3MYs41Dx8B3rojauJd5MkcrIPVjLHyERZyDFAJnoFZfF4/YoZchjfpSUHIqifEdDc4=
-X-Received: by 2002:ac2:4545:0:b0:553:24bb:daa1 with SMTP id
- 2adb3069b0e04-553af033661mr47265e87.11.1749745337147; Thu, 12 Jun 2025
- 09:22:17 -0700 (PDT)
+	dkim=permerror (0-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="UqQs0Xli";
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="cIRM8zhm"
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+ d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2022-03;
+ t=1749746006; h=date : from : to : cc : subject : message-id :
+ references : mime-version : content-type : content-transfer-encoding :
+ in-reply-to : from; bh=t8sv7zJ6SmhI0iL7ToCBzKP/dYrg2KLS02wNS88rS9M=;
+ b=UqQs0XligkUOObKMarwRjV2GR4BAJ2pfgM6Y+LIbK8/m2qJ2LS/7hMmcc3VtOtaZy+7aD
+ G2nKFt1n01HZ8ONBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
+ i=@darkrain42.org; q=dns/txt; s=rsa-2022-03; t=1749746006; h=date :
+ from : to : cc : subject : message-id : references : mime-version :
+ content-type : content-transfer-encoding : in-reply-to : from;
+ bh=t8sv7zJ6SmhI0iL7ToCBzKP/dYrg2KLS02wNS88rS9M=;
+ b=cIRM8zhm5ZeiiQkTogVQSfiop9tFtBsUDXu3VgQkFmxXxTui31B1YjKgfKnggj0tKD8tu
+ TYL7XcFjuWrmh9chUm0nJkJ52EbvTGIuVg02sHbyAxm0GKflvTFRUJNpJZ7LAhem2NDzHXZ
+ tcgHtuoMcW0d+KUNgDJ6VCbw4qF7JYJnQ8oguCIeleBqfCOicxPY9RiP8dsTfr8I6slnRK/
+ J8qL6r4sarO5u+btq0tBxW7INnVy8YnE+lj0TJxpuF16Grxp7dKrp9AGqfVt5mYTAc4Wz1Z
+ 2pMNCxv5ZJTfnIwN2KVs3oF+8dLq2Nc9i7R3IVQwHsGCVecQtk2q+ciLcvhQ==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256
+	 client-signature ED25519)
+	(Client CN "otters", Issuer "otters" (not verified))
+	by o-chul.darkrain42.org (Postfix) with ESMTPS id C37E68186;
+	Thu, 12 Jun 2025 09:33:26 -0700 (PDT)
+Received: by redcloak.home.arpa (Postfix, from userid 1000)
+	id A5DE7480AD0; Thu, 12 Jun 2025 09:33:20 -0700 (PDT)
+Date: Thu, 12 Jun 2025 09:33:20 -0700
+From: Paul Aurich <paul@darkrain42.org>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, bharathsm.hsk@gmail.com,
+	meetakshisetiyaoss@gmail.com, pc@manguebit.com,
+	henrique.carvalho@suse.com, ematsumiya@suse.de,
+	Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 2/7] cifs: protect cfid accesses with fid_lock
+Message-ID: <aEsBUL0c4wuErOjc@redcloak.home.arpa>
+Mail-Followup-To: Shyam Prasad N <nspmangalore@gmail.com>,
+	linux-cifs@vger.kernel.org, smfrench@gmail.com,
+	bharathsm.hsk@gmail.com, meetakshisetiyaoss@gmail.com,
+	pc@manguebit.com, henrique.carvalho@suse.com, ematsumiya@suse.de,
+	Shyam Prasad N <sprasad@microsoft.com>
+References: <20250604101829.832577-1-sprasad@microsoft.com>
+ <20250604101829.832577-2-sprasad@microsoft.com>
+ <aEpIiybxbTbIbDBP@vaarsuvius.home.arpa>
+ <CANT5p=oV8SoYT9AWBCBU5uVFaboeWFyGw8jj9rckLn1eyOj3Cg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250612154504.246390-1-pc@manguebit.org>
-In-Reply-To: <20250612154504.246390-1-pc@manguebit.org>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 12 Jun 2025 11:22:05 -0500
-X-Gm-Features: AX0GCFvWkQ4IUN56h-x84QAtp53m9H9_C0dyuRsQstrpzUE53AJUJGaS_44zSDE
-Message-ID: <CAH2r5mvh7VC_fVp0QQ2ACJohuEvWriJp+zc8HSW6Z6GQTeH2-w@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix perf regression with deferred closes
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	Jay Shin <jaeshin@redhat.com>, Pierguido Lambri <plambri@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANT5p=oV8SoYT9AWBCBU5uVFaboeWFyGw8jj9rckLn1eyOj3Cg@mail.gmail.com>
 
-tentatively merged into cifs-2.6.git for-next pending testing and any
-additional review
+On 2025-06-12 18:35:13 +0530, Shyam Prasad N wrote:
+>On Thu, Jun 12, 2025 at 8:55 AM Paul Aurich <paul@darkrain42.org> wrote:
+>>
+>> On 2025-06-04 15:48:11 +0530, nspmangalore@gmail.com wrote:
+>> >From: Shyam Prasad N <sprasad@microsoft.com>
+>> >
+>> >@@ -220,17 +225,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>> >               goto out;
+>> >       }
+>> >
+>> >-      if (!npath[0]) {
+>> >-              dentry = dget(cifs_sb->root);
+>> >-      } else {
+>> >-              dentry = path_to_dentry(cifs_sb, npath);
+>> >-              if (IS_ERR(dentry)) {
+>> >-                      rc = -ENOENT;
+>> >-                      goto out;
+>> >-              }
+>> >-      }
+>> >-      cfid->dentry = dentry;
+>> >-      cfid->tcon = tcon;
+>>
+>> I think moving this down below to after the "At this point the directory
+>> handle is fully cached" comment is going to regress c353ee4fb119 ("smb:
+>> Initialize cfid->tcon before performing network ops").
+>
+>Hi Paul,
+>
+>Are you referring to the tcon reference?
+>If so, I think the way to fix that is to get a reference (tc_count++)
+>on tcon right when we add it to the cfid->tcon, and put the reference
+>in smb2_close_cached_fid.
+>I think that should take care of any concerns of race. Let me know if
+>you disagree.
 
-On Thu, Jun 12, 2025 at 10:45=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
- wrote:
+I don't think that is sufficient.  cfid->tcon needs to be initialized prior to 
+the network operations in open_cached_dir.  If we receive a lease break from 
+the server and the delayed work involved in that runs *before* cfid->tcon is 
+initialized, it leaks a ref.  (cached_dir_lease_break has a direct copy of the 
+tcon passed as an arg and takes a ref from that, but cfid->tcon is still NULL)
+
+T1                 T2
+
+open_cached_dir
+   <open+lease acquisition>
+   (gets far enough along that the file is open and lease key initialized)
+
+                    // receives a lease break from the server
+                    cached_dir_lease_break
+                      // takes a ref on tcon (via arg to function, not cfid->tcon)
+                    cached_dir_put_work
+                    cached_dir_offload_close
+                      // cifs_put_tcon on cfid->tcon, which is still NULL
+
+open_cached_dir continues on at this point
+
+Another reason you need to initialize cfid->tcon earlier is that in the error 
+paths, cfid->tcon needs to be valid so that smb2_close_cached_fid can actually 
+close it.  Before c353ee4fb119, the tcon was initialized at the same time 
+cfid->is_open was set.
+
+>>
+>> >       /*
+>> >        * We do not hold the lock for the open because in case
+>> >@@ -302,9 +296,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>> >               }
+>> >               goto oshr_free;
+>> >       }
+>> >-      cfid->is_open = true;
+>>
+>> Moving this down below is going to regress part of 66d45ca1350a ("cifs: Check
+>> the lease context if we actually got a lease"), I think. If parsing the lease
+>> fails, the cfid is disposed, but since `is_open` is false, the code won't call
+>> SMB2_close.
 >
-> Customer reported that one of their applications started failing to
-> open files with STATUS_INSUFFICIENT_RESOURCES due to NetApp server
-> hitting the maximum number of opens to same file that it would allow
-> for a single client connection.
->
-> It turned out the client was failing to reuse open handles with
-> deferred closes because matching ->f_flags directly without masking
-> off O_CREAT|O_EXCL|O_TRUNC bits first broke the comparision and then
-> client ended up with thousands of deferred closes to same file.  Those
-> bits are already satisfied on the original open, so no need to check
-> them against existing open handles.
->
-> Reproducer:
->
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
->  #include <unistd.h>
->  #include <fcntl.h>
->  #include <pthread.h>
->
->  #define NR_THREADS      4
->  #define NR_ITERATIONS   2500
->  #define TEST_FILE       "/mnt/1/test/dir/foo"
->
->  static char buf[64];
->
->  static void *worker(void *arg)
->  {
->          int i, j;
->          int fd;
->
->          for (i =3D 0; i < NR_ITERATIONS; i++) {
->                  fd =3D open(TEST_FILE, O_WRONLY|O_CREAT|O_APPEND, 0666);
->                  for (j =3D 0; j < 16; j++)
->                          write(fd, buf, sizeof(buf));
->                  close(fd);
->          }
->  }
->
->  int main(int argc, char *argv[])
->  {
->          pthread_t t[NR_THREADS];
->          int fd;
->          int i;
->
->          fd =3D open(TEST_FILE, O_WRONLY|O_CREAT|O_TRUNC, 0666);
->          close(fd);
->          memset(buf, 'a', sizeof(buf));
->          for (i =3D 0; i < NR_THREADS; i++)
->                  pthread_create(&t[i], NULL, worker, NULL);
->          for (i =3D 0; i < NR_THREADS; i++)
->                  pthread_join(t[i], NULL);
->          return 0;
->  }
->
-> Before patch:
->
-> $ mount.cifs //srv/share /mnt/1 -o ...
-> $ mkdir -p /mnt/1/test/dir
-> $ gcc repro.c && ./a.out
-> ...
-> number of opens: 1391
->
-> After patch:
->
-> $ mount.cifs //srv/share /mnt/1 -o ...
-> $ mkdir -p /mnt/1/test/dir
-> $ gcc repro.c && ./a.out
-> ...
-> number of opens: 1
->
-> Cc: linux-cifs@vger.kernel.org
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Jay Shin <jaeshin@redhat.com>
-> Cc: Pierguido Lambri <plambri@redhat.com>
-> Fixes: b8ea3b1ff544 ("smb: enable reuse of deferred file handles for writ=
-e operations")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> ---
->  fs/smb/client/file.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index d2df10b8e6fd..9835672267d2 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -999,15 +999,18 @@ int cifs_open(struct inode *inode, struct file *fil=
-e)
->                 rc =3D cifs_get_readable_path(tcon, full_path, &cfile);
->         }
->         if (rc =3D=3D 0) {
-> -               if (file->f_flags =3D=3D cfile->f_flags) {
-> +               unsigned int oflags =3D file->f_flags & ~(O_CREAT|O_EXCL|=
-O_TRUNC);
-> +               unsigned int cflags =3D cfile->f_flags & ~(O_CREAT|O_EXCL=
-|O_TRUNC);
-> +
-> +               if (cifs_convert_flags(oflags, 0) =3D=3D cifs_convert_fla=
-gs(cflags, 0) &&
-> +                   (oflags & (O_SYNC|O_DIRECT)) =3D=3D (cflags & (O_SYNC=
-|O_DIRECT))) {
->                         file->private_data =3D cfile;
->                         spin_lock(&CIFS_I(inode)->deferred_lock);
->                         cifs_del_deferred_close(cfile);
->                         spin_unlock(&CIFS_I(inode)->deferred_lock);
->                         goto use_cache;
-> -               } else {
-> -                       _cifsFileInfo_put(cfile, true, false);
->                 }
-> +               _cifsFileInfo_put(cfile, true, false);
->         } else {
->                 /* hard link on the defeered close file */
->                 rc =3D cifs_get_hardlink_path(tcon, inode, file);
-> --
-> 2.49.0
+>That's a good point. I'll submit a patch to fix this.
 >
 
+>-- 
+>Regards,
+>Shyam
 
---=20
-Thanks,
+-- 
+~Paul
 
-Steve
