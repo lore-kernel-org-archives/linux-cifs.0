@@ -1,68 +1,92 @@
-Received: from neil.brown.name (neil.brown.name [103.29.64.221])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759271632DD;
-	Fri, 13 Jun 2025 07:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.29.64.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CCB2C159E;
+	Fri, 13 Jun 2025 10:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749798509; cv=none; b=bpKNFuGdpm4txVDCharWdQOMjLuzfjdq5VlJ+t69PnMM/HAv9h6v3cw1PeFpxdEkitAOn1Y36K+xL+SZuzq+0O+aJsC+JmMfcfQmlfP1mMZWfMzyz6cZlbBNcflcLvG3qlmUgBbf6t4oL84pV9jTFLnXv5ZE4wmHXD4uXua0WFo=
+	t=1749810266; cv=none; b=N1+EyBTb49oFDL+0D+iaKtq2lgMuNfa5Gc2Q3rcfsNdu8ZZTZYAqdW8VEH4ixJokmWESaxEiLAYPFO7hMp+NtvWaqXmkXPhcXFHF+NTaVqvYjjRhzyN+sTruO7tvPH5iyA265hDUQkVmFErpSVVxXroZuZnja9i2FEcJSdpXvuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749798509; c=relaxed/simple;
-	bh=D0lbE0R+FUdn+WoBoKcNI9HgS1w92fraWDayJ3fxKs0=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=F4hxhdbRZUjY0Xu4292DTRJumzs2r81UEzVzJIA0U/9n+GUfAF1N/44T9Ricrxu1yFnQ6qKrPpcNRAymO+OIUGWyyw6Z5YTjrRK1dYSic8GDD5H1c8AVzfpzmn3IJ2mEGO3arAORrdYJYlxu+nBT5M/egmt7MJ7A6zXRHe7mBYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name; spf=pass smtp.mailfrom=neil.brown.name; arc=none smtp.client-ip=103.29.64.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=neil.brown.name
-Received: from 196.186.233.220.static.exetel.com.au ([220.233.186.196] helo=home.neil.brown.name)
-	by neil.brown.name with esmtp (Exim 4.95)
-	(envelope-from <mr@neil.brown.name>)
-	id 1uPyWN-00A9fw-3B;
-	Fri, 13 Jun 2025 07:08:15 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1749810266; c=relaxed/simple;
+	bh=r+Pw6OGjSvqJZafVknM0ZS/MfQV9KMjPB2PYzFWvCQo=;
+	h=Message-ID:Date:MIME-Version:From:CC:To:Subject:Content-Type; b=Ic8yNSfDFiQo+RXfpiT/LXNZmqQnsUeMA5MMWtpqNMsYakReKRKPjDhQMUOQ58bY3aGhOqbtvGzUrv7McovNhngJ7rCdidphxkX/EuKeQpBmjNDe0gvrwo9r8cSY1zkALamN3y0I/xqgoUBXgq9VCj7cMlP8ZkNUII68PPn+VmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bJb7k3ptVz2TRxs;
+	Fri, 13 Jun 2025 18:22:58 +0800 (CST)
+Received: from kwepemp200004.china.huawei.com (unknown [7.202.195.99])
+	by mail.maildlp.com (Postfix) with ESMTPS id 710621A016C;
+	Fri, 13 Jun 2025 18:24:20 +0800 (CST)
+Received: from [10.174.186.66] (10.174.186.66) by
+ kwepemp200004.china.huawei.com (7.202.195.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 13 Jun 2025 18:24:19 +0800
+Message-ID: <32686cd5-f149-4ea4-a13f-8b1fbb2cca44@huawei.com>
+Date: Fri, 13 Jun 2025 18:24:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neil@brown.name>
-To: "Miklos Szeredi" <miklos@szeredi.hu>
-Cc: "Al Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- "Amir Goldstein" <amir73il@gmail.com>, "Kees Cook" <kees@kernel.org>,
- "Joel Granados" <joel.granados@kernel.org>,
- "Namjae Jeon" <linkinjeon@kernel.org>, "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>, netfs@lists.linux.dev,
- linux-kernel@vger.kernel.org, ecryptfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
- linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 1/2] VFS: change old_dir and new_dir in struct renamedata
- to dentrys
-In-reply-to:
- <CAJfpeguiOZJ4dZU-mc0V8bwvWoJ-Q0JubYvYPpmr-f8uguF2LQ@mail.gmail.com>
-References:
- <>, <CAJfpeguiOZJ4dZU-mc0V8bwvWoJ-Q0JubYvYPpmr-f8uguF2LQ@mail.gmail.com>
-Date: Fri, 13 Jun 2025 17:08:13 +1000
-Message-id: <174979849395.608730.16231142843321576358@noble.neil.brown.name>
+User-Agent: Mozilla Thunderbird
+From: "zhangjian (CG)" <zhangjian496@huawei.com>
+CC: <linux-cifs-client@lists.samba.org>, <linux-kernel@vger.kernel.org>,
+	<linux-cifs@vger.kernel.org>
+To: <stfrench@microsoft.com>, <smfrench@gmail.com>, <longli@microsoft.com>,
+	<wangzhaolong1@huawei.com>, <metze@samba.org>, <dhowells@redhat.com>,
+	<pc@manguebit.org>
+Subject: [PATCH] smb: client: fix first failure in negotiation after server
+ reboot
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemp200004.china.huawei.com (7.202.195.99)
 
-On Thu, 12 Jun 2025, Miklos Szeredi wrote:
-> On Thu, 12 Jun 2025 at 01:38, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> 
-> > Umm...  No objections, as long as overlayfs part is correct; it seems
-> > to be, but I hadn't checked every chunk there...
-> 
-> Overlayfs parts looks okay too.
-> 
-> A followup would be nice (e.g. make ovl_cleanup() take a dentry for
-> the directory as well, etc) so that there's no need to have local
-> variables for both the inode and dentry of the directory.
+after fabc4ed200f9, server_unresponsive add a condition to check whether
+ client need to reconnect depending on server->lstrp. When client failed 
+to reconnect in 180s, client will abort connection and update server-
+>lstrp for the last time. In the following scene, server->lstrp is too 
+old, which may cause failure for the first negotiation.
 
-I am planning some followups and will include that in them.
-I'll also be sure to test with fs-tests after consulting README.overlay
-as you suggest elsewhere - thanks.
+client                                         | server
+-----------------------------------------------+-----------
+mount to cifs server                           |
+ls                                             |
+                                               | reboot
+    stuck for 180s and return EHOSTDOWN        |
+    abort connection and update server->lstrp  |
+                                               | service smb restart
+ls                                             |
+    smb_negotiate                              |
+        server_unresponsive is true [in cifsd] |
+        cifs_sync_mid_result return EAGAIN     |
+    smb_negotiate return EHOSTDOWN             |
+ls failed                                      |
 
-NeilBrown
+we update server->lstrp before last switching into CifsInNegotiate state 
+to avoid this failure.
+
+Fixes: fabc4ed200f9 ("smb: client: fix hang in wait_for_response() for 
+negproto")
+Signed-off-by: zhangjian <zhangjian496@huawei.com>
+---
+ fs/smb/client/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 28bc33496..f9aef60f1 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -4193,6 +4193,7 @@ cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses,
+ 		return 0;
+ 	}
+ 
++	server->lstrp = jiffies;
+ 	server->tcpStatus = CifsInNegotiate;
+ 	spin_unlock(&server->srv_lock);
+ 
+-- 
+2.33.0
