@@ -1,161 +1,135 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8107323A6;
-	Mon, 16 Jun 2025 02:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5C7280308
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Jun 2025 11:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750040136; cv=none; b=X552mKhGvRkx/Eyw3cHIXADW+g4IUZj9FGUEekOjtAU+qxRT36xi+i5y4EC7xyThbRG1BYOVYABjP63DnHuV6VE3xg2hKWK488bn6o+HOBuaEIoZTgpn8mJluPebDAifUWBrHFb0ACTkMdWkwMWQD7StJhLzVylHEzNZIiFlHjs=
+	t=1750073767; cv=none; b=ZQ4Whei60u5BiuOATCRqyg6pPMhuR5aecHuVbOJjDvGbk65SkbUNz54pmjjE0F7cavVdKaPB1j+sVMgPXU9C49beicLuuDrITP3c7CFnmxqIsfdCHeCECQwMJWCLZbIGdE+JJLbYIOYtf8V8InfrJjeKsT/tsx8UQEd3b9RsTeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750040136; c=relaxed/simple;
-	bh=T8y7tazk1u9sC49flh8XDM30QBf2ammv89G3xlUrfh4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:CC:
-	 In-Reply-To:Content-Type; b=Iw2wk5JY6XFSHFJiGPWL/k2m4Qd4DHYlhHwjtLanLYgmNbOzLuWMJHoyycsPxMYQ4voXq3fA3l8IWBbU3V+FLAOlNPnFtORNCBknJFeBf9zr3Yq4Pd+2h99ocmpOy3rUgw1MkSKNDutW4kogfNkOR88LR8fTmrccXhS7PG/x+RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bLD8775hpz2sCyt;
-	Mon, 16 Jun 2025 10:13:59 +0800 (CST)
-Received: from kwepemp200004.china.huawei.com (unknown [7.202.195.99])
-	by mail.maildlp.com (Postfix) with ESMTPS id D538F1400CB;
-	Mon, 16 Jun 2025 10:15:24 +0800 (CST)
-Received: from [10.174.186.66] (10.174.186.66) by
- kwepemp200004.china.huawei.com (7.202.195.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 16 Jun 2025 10:15:24 +0800
-Message-ID: <a759b723-05f4-4f47-b9c6-55ea2739da72@huawei.com>
-Date: Mon, 16 Jun 2025 10:15:23 +0800
+	s=arc-20240116; t=1750073767; c=relaxed/simple;
+	bh=cH1mdebi7kDJEeg0Wb5HT6Owhw8PFAmNDyCQqE/rqOc=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=jdm6pKrvxmX6wNtJKkffucniRsBFNevbsRQ936Dk8QD76Xc3RtMRFrs8pen5/+YwvV33g0NqhIN4T5locmLI/WE/hofr872ZuO5nn6rONk9XbL8UvkNahEJaicGWqNulApIQ/JFE96GRYigo0bS2lsZHwA6L2AJ/+9D7nXxxZWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K+Q06WUp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+Q06WUp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750073765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nf0+ogMmdaKGYBzbk4mOB841JGfIQ7imOaaevAHK9Zk=;
+	b=K+Q06WUp3SUJukPnTRbhCNLhgj7Edn2xKpWRwmI/kaSJ5iaD5TDYSdbfWuEAVqnyibwauc
+	9LR+2VLWu26Bg93wqeiqVZzZbDBe+tI+oQZk7jvPGfDCr3Kq0yE/bO5lJnxYdSN0u0t9Tv
+	32gcxTSTRDe5fbRJWmDzchvDlzUy58k=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-619-CcDyKh_qNOe3bhhPj8MzuQ-1; Mon,
+ 16 Jun 2025 07:36:02 -0400
+X-MC-Unique: CcDyKh_qNOe3bhhPj8MzuQ-1
+X-Mimecast-MFC-AGG-ID: CcDyKh_qNOe3bhhPj8MzuQ_1750073761
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B02DF1800368;
+	Mon, 16 Jun 2025 11:36:00 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B9B91195608F;
+	Mon, 16 Jun 2025 11:35:58 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    linux-cifs@vger.kernel.org, netfs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] netfs: Fix hang due to missing case in final DIO read result collection
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH] smb: client: fix first failure in
- negotiation after server reboot
-From: "zhangjian (CG)" <zhangjian496@huawei.com>
-To: "Shyam Prasad (Azure Files)" <Shyam.Prasad@microsoft.com>
-References: <32686cd5-f149-4ea4-a13f-8b1fbb2cca44@huawei.com>
- <a4435153-eb55-4160-9b46-aa937cffa575@huawei.com>
- <CAH2r5mshSVCms8hwJepT25jyYmF-qEKFp3mDdwYG1e7nXfs_2g@mail.gmail.com>
- <TYPP153MB14907291155DA3320C8F6A909471A@TYPP153MB1490.APCP153.PROD.OUTLOOK.COM>
- <186d442d-69db-4a52-b65b-f67370547c45@huawei.com>
-CC: <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-In-Reply-To: <186d442d-69db-4a52-b65b-f67370547c45@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemp200004.china.huawei.com (7.202.195.99)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <583791.1750073757.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Jun 2025 12:35:57 +0100
+Message-ID: <583792.1750073757@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In addition, If negotiation received no response, there are two possible
-actions:
-1. server_unresponsive may trigger reconnecting again and return true.
-2. server_unresponsive may return false and client falls back to
-CifsNeedNegotiate state and trigger reconnecting in SMB2_echo.
+When doing a DIO read, if the subrequests we issue fail and cause the
+request PAUSE flag to be set to put a pause on subrequest generation, we
+may complete collection of the subrequests (possibly discarding them) prio=
+r
+to the ALL_QUEUED flags being set.
 
-There two conditions are similar to the stage when first mounting to
-cifs server.
+In such a case, netfs_read_collection() doesn't see ALL_QUEUED being set
+after netfs_collect_read_results() returns and will just return to the app
+(the collector can be seen unpausing the generator in the trace log).
 
-On 2025/6/16 10:01, zhangjian (CG) wrote:
-> 
-> 
-> 
-> 
-> On 2025/6/15 21:08, Shyam Prasad (Azure Files) wrote:
->> Can we have a situation where we just got the sock_recvmsg just timed out, and before we loop back to server_unresponsive, if another parallel negotiate updates lstrp?
-> 
-> Negotiation only comes when connection is touchable. Client will send a
-> negotiation message to server. If we just got the sock_recvmsg timeout
-> and loop back to server_unresponsive, it will return false. Client calls
-> sock_recvmsg again and wait for negotiation response. Everything is Ok.
-> 
->> That will cause us to not detect the server unresponsive situation, even if that did happen.
->> server->lstrp is meant to store the last "response" time from the server.
-> 
-> server->lstrp is also updated during setting up and aborting connection
-> even when there is no response. These can be regarded as initial value
-> for server->lstrp.
-> I think server->lstrp needs an initial value before negotiation rather
-> than connection.
-> 
->>
->>
->> Regards,
->>
->> Shyam
->>
->>
->>
->>
->> ________________________________
->> From: Steve French <smfrench@gmail.com>
->> Sent: Friday, June 13, 2025 20:53
->> To: zhangjian (CG) <zhangjian496@huawei.com>
->> Cc: Shyam Prasad (Azure Files) <Shyam.Prasad@microsoft.com>; Paulo Alcantara <pc@manguebit.com>
->> Subject: [EXTERNAL] Re: [PATCH] smb: client: fix first failure in negotiation after server reboot
->>
->> Could you clarify the reproduction scenario? It was a little hard to read
->>
->> On Fri, Jun 13, 2025 at 5:44 AM zhangjian (CG) <zhangjian496@huawei.com> wrote:
->>>
->>> After fabc4ed200f9, server_unresponsive add a condition to check whether
->>> client need to reconnect depending on server->lstrp. When client failed
->>> to reconnect in 180s, client will abort connection and update server->lstrp
->>> for the last time. In the following scene, server->lstrp is too
->>> old, which may cause failure for the first negotiation.
->>>
->>> client                                                 | server
->>> -------------------------------------------------------+------------------
->>> mount to cifs server                                   |
->>> ls                                                     |
->>>                                                        | reboot
->>>     stuck for 180s and return EHOSTDOWN                |
->>>     abort connection and update server->lstrp          |
->>>                                                        | sleep 21s
->>>                                                        | service smb restart
->>> ls                                                     |
->>>     smb_negotiate                                      |
->>>         server_unresponsive cause reconnect [in cifsd] |
->>>         ( tcpStatus == CifsInNegotiate &&              |
->>>                     jiffies > server->lstrp + 20s )        |
->>>         cifs_sync_mid_result return EAGAIN             |
->>>     smb_negotiate return EHOSTDOWN                     |
->>> ls failed                                              |
->>>
->>> The condition (tcpStatus == CifsInNegotiate && jiffies > server->lstrp + 20s)
->>> expect client stay in CifsInNegotiate state for more than 20s. So we update
->>> server->lstrp before last switching into CifsInNegotiate state to avoid
->>> this failure.
->>>
->>> Fixes: fabc4ed200f9 ("smb: client: fix hang in wait_for_response() for
->>> negproto")
->>> Signed-off-by: zhangjian <zhangjian496@huawei.com>
->>> ---
->>>  fs/smb/client/connect.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
->>> index 28bc33496..f9aef60f1 100644
->>> --- a/fs/smb/client/connect.c
->>> +++ b/fs/smb/client/connect.c
->>> @@ -4193,6 +4193,7 @@ cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses,
->>>                 return 0;
->>>         }
->>>
->>> +       server->lstrp = jiffies;
->>>         server->tcpStatus = CifsInNegotiate;
->>>         spin_unlock(&server->srv_lock);
->>>
->>> --
->>> 2.33.0
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
-> 
+The subrequest generator can then set ALL_QUEUED and the app thread reache=
+s
+netfs_wait_for_request().  This causes netfs_collect_in_app() to be called
+to see if we're done yet, but there's missing case here.
+
+netfs_collect_in_app() will see that a thread is active and set inactive t=
+o
+false, but won't see any subrequests in the read stream, and so won't set
+need_collect to true.  The function will then just return 0, indicating
+that the caller should just sleep until further activity (which won't be
+forthcoming) occurs.
+
+Fix this by making netfs_collect_in_app() check to see if an active thread
+is complete - i.e. that ALL_QUEUED is set and the subrequests list is empt=
+y
+- and to skip the sleep return path.  The collector will then be called
+which will clear the request IN_PROGRESS flag, allowing the app to
+progress.
+
+Fixes: 2b1424cd131c ("netfs: Fix wait/wake to be consistent about the wait=
+queue used")
+Reported-by: Steve French <sfrench@samba.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index 43b67a28a8fa..1966dfba285e 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -381,7 +381,7 @@ void netfs_wait_for_in_progress_stream(struct netfs_io=
+_request *rreq,
+ static int netfs_collect_in_app(struct netfs_io_request *rreq,
+ 				bool (*collector)(struct netfs_io_request *rreq))
+ {
+-	bool need_collect =3D false, inactive =3D true;
++	bool need_collect =3D false, inactive =3D true, done =3D true;
+ =
+
+ 	for (int i =3D 0; i < NR_IO_STREAMS; i++) {
+ 		struct netfs_io_subrequest *subreq;
+@@ -400,9 +400,11 @@ static int netfs_collect_in_app(struct netfs_io_reque=
+st *rreq,
+ 			need_collect =3D true;
+ 			break;
+ 		}
++		if (subreq || test_bit(NETFS_RREQ_ALL_QUEUED, &rreq->flags))
++			done =3D false;
+ 	}
+ =
+
+-	if (!need_collect && !inactive)
++	if (!need_collect && !inactive && !done)
+ 		return 0; /* Sleep */
+ =
+
+ 	__set_current_state(TASK_RUNNING);
 
