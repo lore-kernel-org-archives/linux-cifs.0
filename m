@@ -1,117 +1,111 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A071FC0F0
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 11:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA961A9B24;
+	Tue, 17 Jun 2025 11:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750158314; cv=none; b=H5v/ty1aGKXPNwXPENoVRmuSA67v2mfDnO5BTJi5WRU9CukmyyVN7d5TxZqmdz37lqDIQ2T+6wRTItpAEZvOIU+/JiuJ3p6Dg7F74IoWux3J5blxooLXBRoCpw91lhqKah4xTVrCV3+uVEFXrAJ9HS19SLxse+F/rsUx2BvtfSM=
+	t=1750159904; cv=none; b=QAtG+z9EN52V9/Bu3WmthB8fNhMRNaWU+HYKj5fkl8WESEXUw5pu1QnNkzhusTwNAZw3q1+7O3wqMRw4f/I2lZB2kpLpTjQEbrbeo541V/2h+yx1EdmUYqY1iwC5u2gMVrpzqjcdoCvvUQMJy+PC5T1S2kPTDKCX0P7WMwZ4ZpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750158314; c=relaxed/simple;
-	bh=5kIKMpqcNlABohjlDP+xOmd4LsKG1TbBvsNOissh7sY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uZfZWHBRnwnH4pT2P+4on5Id9iy6tnh03/Hb03vay+8rFmIhsJbBqwh4J54VMUZn07fZvagYAs2k1JMZ10H8o/6n084z79n3024g32km1EWCx7o29KGy4qDLmFfezkgQpnZiJ8RNOP5RxCI2ymJwym562DlP5HIyjWS+J9XtPw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LcGlAIIf; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750159904; c=relaxed/simple;
+	bh=9Mw48Zg0cv0dF4bSYaCiGS8ZVAaR/yW9yOs0j/Ch5ps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b5K+tHE2jCpmcRzunofFAPRvS7xiTY9JTwm2yGWdJgac9NFlLZ5bwbOnuQp4AOfO06yp4y1R5Zw9vig5ATEuzISaVgt2zD0tBmFK2nugD7yTRMFoC50XSTmmaOw4Oel+LtVRKte6QklFg4955lLFZUWYaoGFbvgGr/SowOdZZqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UDGH4viT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcGlAIIf"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-606b6dbe316so11679353a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 04:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750158311; x=1750763111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J3rBZCJNePUHW031fNrAegLXQS8pJ3X0u5RnIk4tcoQ=;
-        b=LcGlAIIfnntceprhTs1M2EPx515skjj2P7eKDZwHCGdJvzfAtqZm+kNN0fO+hDL1sM
-         51CjGsND1g3AhhMH1yf3JnsNI/MaZzJCvrRJBqoM8cKiEjcGo0j+pjGex84b4zwCILQP
-         8s6q6Au6azKfWdSauGEmDqZpeo90WflzBsSRBRfMS3SXoqgGyEKh/T5Zhw7+YV9YJtRe
-         dMM1Z+YFXV3AMEIDg9lhXkZ4Keg/CwXrSscSSXNKVZZOIu3PiuhQ+cApGQfK03o21cHw
-         M4BfIeaUHKTlcw0eUsJzzMr20ZvXqQxIBuxuWT1q4bJCCy7C6teXz9leBM2TDWcYiDl+
-         h/Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750158311; x=1750763111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J3rBZCJNePUHW031fNrAegLXQS8pJ3X0u5RnIk4tcoQ=;
-        b=bU/+ZTgoGXpHrR1fXqwTodRQo1KCerIOTDawDAgWM/5t8lpprk3CIeR+N8JFLNfX7N
-         J+EasDM0wJ+LQgdmV7UbSHjyZfxi8j6ZouGpWYURCFBnPiP5i+DoXNE1Pm5eCJA91+tu
-         Uhx4CeRsOf1WBMp/oe2Gb5QMWyMWzYvCbO/3MOmNjMUmC0/JjYA0VUhgAZenxxBjoGVs
-         LoBWv9jHOMoRrNG4oVrTs8kEiDeiWdanRjlKoW+/whUKDF8mofw/B744+lkRQyNtZ6D6
-         pNdOIB6Y6EMaXflwhNgDYxaYiwXhatnMp7K9dEzPLxx5T/68NMd5Nzib6CTC7VAIRWgg
-         T0FA==
-X-Gm-Message-State: AOJu0Yx2pOas/RGt3y1xZgtSmasr/r+AF4xdkcpqYv+iMQ11fxlGl4tq
-	IrIffonCgG5rO6vCZ8oiCec+sCl9CYetOPQErXYABJBhkIUX9HbTmcC8vGLNSz0KOVhG8jueVpp
-	bV0968oTg2LQ5lPM70MMBS8Dp+7zBZHm6Wi71
-X-Gm-Gg: ASbGncsjhJI2RNTrUR4DEnrThQ+Neh1T/aMAiG1/zMuxGCoyorVgCd15PSSUcKFu7Ni
-	QWz9ifNWd8NirSKSykyhBSfNhlqdziiFVHjmvPwhf7Su+ZSxUhyxL+OWL3qK81lS6vBzh5u1b9F
-	mexrJN14MMLvLH6SijbVLI6lXSB/UvrF2ddNn6x13hyjJXmA0Jw+kW
-X-Google-Smtp-Source: AGHT+IFOn3UrsH4gaDWUEsgiCspcp0lQ/w10XN7o0PbmIV/Pbjbj4Em+2zXuNUaMqd08qUbMhmMuqcAj3rTF9rgMsvM=
-X-Received: by 2002:a05:6402:1eca:b0:607:f5ce:4c01 with SMTP id
- 4fb4d7f45d1cf-608d085345dmr12945427a12.3.1750158311083; Tue, 17 Jun 2025
- 04:05:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UDGH4viT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA97EC4CEE3;
+	Tue, 17 Jun 2025 11:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750159903;
+	bh=9Mw48Zg0cv0dF4bSYaCiGS8ZVAaR/yW9yOs0j/Ch5ps=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UDGH4viTAriSsrD4EJMESxN56NOG3wDwakAG2dKKMuWb1Xf4Fvs8de+SewHJNBeF+
+	 W7cf9OOF3XlqlLjV4xjZHyAAIl+2Hmaf5shgfntuUPqxmNZSHVcvSybrEGy/Zs0Sz5
+	 lO5GkdOvkm1p5S1WQdyq44321SulB2Rp0CZfmTegP6pro4gigdlM+qKa2ZDLoXUg2A
+	 qvTS5EICV1TbjXcD1R7gC7TpnfC2RGg+nDK9hvxG4rTP40zQO9iKvwbcyGTSCZCNX2
+	 7Q47oH6NqNjWiMfBYDtaI4poxHP5TZNgcAaAQkxjOwdM6JDXsX/uiM5uicv0SA0HR+
+	 XZly4CVAyOHBw==
+Date: Tue, 17 Jun 2025 13:31:17 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>, 
+	Jani Nikula <jani.nikula@linux.intel.com>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>, 
+	David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>, 
+	Marc Dionne <marc.dionne@auristor.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, Benjamin LaHaise <bcrl@kvack.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Amir Goldstein <amir73il@gmail.com>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, "Tigran A . Aivazian" <aivazian.tigran@gmail.com>, 
+	Kees Cook <kees@kernel.org>, Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+	Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Tyler Hicks <code@tyhicks.com>, 
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>, 
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>, 
+	Hongbo Li <lihongbo22@huawei.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Sungjong Seo <sj1557.seo@samsung.com>, Yuezhang Mo <yuezhang.mo@sony.com>, 
+	Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Viacheslav Dubeyko <slava@dubeyko.com>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
+	Yangtao Li <frank.li@vivo.com>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>, David Woodhouse <dwmw2@infradead.org>, 
+	Dave Kleikamp <shaggy@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Ryusuke Konishi <konishi.ryusuke@gmail.com>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
+	Joseph Qi <joseph.qi@linux.alibaba.com>, Bob Copeland <me@bobcopeland.com>, 
+	Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg <martin@omnibond.com>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Zhihao Cheng <chengzhihao1@huawei.com>, Hans de Goede <hdegoede@redhat.com>, 
+	Carlos Maiolino <cem@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, 
+	Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox <willy@infradead.org>, 
+	Vlastimil Babka <vbabka@suse.cz>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-afs@lists.infradead.org, linux-aio@kvack.org, linux-unionfs@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-mm@kvack.org, linux-btrfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-um@lists.infradead.org, linux-mtd@lists.infradead.org, 
+	jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org, 
+	ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
+	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-xfs@vger.kernel.org, nvdimm@lists.linux.dev
+Subject: Re: [PATCH 00/10] convert the majority of file systems to
+ mmap_prepare
+Message-ID: <20250617-ansetzen-mathematik-08f6d9b51f3d@brauner>
+References: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
+ <20250616161111.74e10321c4c421674f78d689@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317102727.176918-1-bharathsm@microsoft.com> <20250317102727.176918-3-bharathsm@microsoft.com>
-In-Reply-To: <20250317102727.176918-3-bharathsm@microsoft.com>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 17 Jun 2025 16:34:59 +0530
-X-Gm-Features: AX0GCFu0QZECaoBikvulT5AW4wjqCsC5BacCchJ_U3A7drDwJPRr31me6tET0i0
-Message-ID: <CANT5p=pmsUx8FGxZARcOdWXCVQo5V6zZV8k5pn7AZPt+6bGj9A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] smb: fix secondary channel creation issue with
- kerberos by populating hostname when adding channels
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, sprasad@microsoft.com, 
-	pc@manguebit.com, Bharath SM <bharathsm@microsoft.com>, xfuren <xfuren@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250616161111.74e10321c4c421674f78d689@linux-foundation.org>
 
-On Mon, Mar 17, 2025 at 4:04=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.com=
-> wrote:
->
-> When mounting a share with kerberos authentication with multichannel
-> support, share mounts correctly, but fails to create secondary
-> channels. This occurs because the hostname is not populated when
-> adding the channels. The hostname is necessary for the userspace
-> cifs.upcall program to retrieve the required credentials and pass
-> it back to kernel, without hostname secondary channels fails
-> establish.
->
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> Reported-by: xfuren <xfuren@gmail.com>
-> Link: https://bugzilla.samba.org/show_bug.cgi?id=3D15824
-> ---
->  fs/smb/client/sess.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index b45b46b1b792..f2ab8513c3ed 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -494,8 +494,7 @@ cifs_ses_add_channel(struct cifs_ses *ses,
->         ctx->domainauto =3D ses->domainAuto;
->         ctx->domainname =3D ses->domainName;
->
-> -       /* no hostname for extra channels */
-> -       ctx->server_hostname =3D "";
-> +       ctx->server_hostname =3D ses->server->hostname;
->
->         ctx->username =3D ses->user_name;
->         ctx->password =3D ses->password;
-> --
-> 2.43.0
->
->
-Looks good to me.
-This one depends on one of the patches I submitted recently:
-"cifs: dns resolution is needed only for primary channel"
+On Mon, Jun 16, 2025 at 04:11:11PM -0700, Andrew Morton wrote:
+> On Mon, 16 Jun 2025 20:33:19 +0100 Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
+> 
+> > I am basing this on the mm-new branch in Andrew's tree, so let me know if I
+> > should rebase anything here. Given the mm bits touched I did think perhaps
+> > we should take it through the mm tree, however it may be more sensible to
+> > take it through an fs tree - let me know!
+> 
+> It's more fs/ than mm/ purely from a footprint point of view.  But
+> there any expectation that there will be additional patches which build
+> on this?
+> 
+> I'll scoop it into mm-new for now, see what happens.
 
---=20
-Regards,
-Shyam
+I'm going to carry this in the vfs-6.17.mmap_prepare branch after fixing
+up the various minor issues spotted in the series.
