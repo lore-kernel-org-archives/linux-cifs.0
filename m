@@ -1,155 +1,226 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4756D2EFDB5
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 20:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDD31DDC28
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 21:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750191915; cv=none; b=WUZstA4YLJEcPq8foirotJgqZhSLfFxYgWQOhYhewcG9CqGvQJu92nJqOh7BxExSvgTHKH602OoYYq8XAnQNlNd/yADvTyDHYdmOSnIZReLyxtepxY29tn73Lc9OcJuLAzGE65UhiliWDb0VUi0U2xp2BYiW1QwfcjOU2Wndigg=
+	t=1750195468; cv=none; b=iIPcHH4hFvje1AKZnyh08FfWFyOqh9CWKcYfTGbWPUSEnXssHltkRJb5NTelx3T8dmXcavq6g7Q/xi4N6m3SrBFVaOYjpVN4zLxoHgTAEuijoS7Rx1NVFE3jmnuE4GX1Ul1BElTWz2vCBD+nnKgvKHH1f9fkyntUqZiT8WOvlwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750191915; c=relaxed/simple;
-	bh=GqnNTXVndRWI0PiUNLLEgHd6YnRr20qoT2O2RMi6Y9I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NjWHri1FXebo1/UnyZPD7V2HuATuigiz3FIDJwPFgXOVeCh/d5F5Zxd88KQ8R73v1zXDoseX8mMDNAo8uEwGgmOHKBJFD7mN381/h/80hpYIK0XYX+0JK3MJa/p1T6kV2uUUW6qrKoVekqXtzoSLE0u3OLs6BZtc5ukMmCGOEQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=GS9eTwia; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1750195468; c=relaxed/simple;
+	bh=GPCbpN50iSLDGV4O5YmianT8HoLfN99V+Ze9RBsNJM0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=mWM70oUNIvChXzv3KTjQnSBF3iLgZLRLO2Yln2wA+evwkWqIR3VD15Nwe+DHdD/0envaJUlU9JBElywJZOa8GeHrg//lrqrWId/b8zZ7rjjP2lT3hfWnFYeki64vuByajk/tqkdRJQ2V73eYUikJGfUUE3O8qfX9gW8glW5RglA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jY2GrUUK; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="GS9eTwia"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=HagecfYwoT+tuXv3QdbeL8glXW9WWuC85+3o60bnf9s=; b=GS9eTwiaU4ArZNr7TD0DV759Xw
-	pmLZAyisUrl95bIY5OvqjMGlFcPtxwn1JnNpxIFFg0DRZzJo5gSQ7VCwdctqk4Qnbc/OETS4YZDHF
-	NW4DkTisNaKj2QohUEz2P712Q/uWQgo+xWNT57DTCYP6lPq8WoAM/eH44M6sXr2wh+WcgrTb1zMem
-	PlLWJBLsuDTSrA4NBzZJhXaGY/OySU7AHYx0wDVlZAb3zV4Gw0bUv7JKLFQ3/QBC6LIrniOtZQRx9
-	DolaTUDIvA+R7DgHIscnPup/qBQbP5kWyFE2PL2V0jePaRzS3GiQggKyAItK5ldqSirJhxshz8eW/
-	GQ98mT5P4BY0EcgX7sSwV3kB11uJtz43vYwgvoWH3+SV4AZk+veuuSjsybd8gh3EdH1mEMQV5NsOx
-	S8/N28qWOGLcA9c3R/Od1Cq7za/L7jmxNr1ydSItzttC7IP/HoeQxrPVGX9WTw2GnW4dKat8Ph9za
-	f3VpFdw4tQ3VLItvXejzk/ho;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uRchW-00B9x4-0d;
-	Tue, 17 Jun 2025 20:14:34 +0000
-Message-ID: <2e660165-b071-4239-b52d-bcd4a9b45f24@samba.org>
-Date: Tue, 17 Jun 2025 22:14:32 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jY2GrUUK"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32934448e8bso51947621fa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 14:24:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750195464; x=1750800264; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JuLt0GGKgFyX2XRmAg725NFu0qIHEn0MTXrZHQEojQ4=;
+        b=jY2GrUUKmqVT8OIU6eQu7cxPRuRbWt5J3eqmMnXZ2gnd7WOEesrRjgThhPrbQjedci
+         JBUBmrHcFX2YzaTecAcIW2DWHBp+x/VGjiX1HJEoHgn2hiU3dE8UBJtuCCgmT+Hxqz3L
+         8IwJAt87EeT2Bt84My9i1t2fGFafv7eHASyoYPeZi/bY8DJ7w6xYbLoj2QmI/Nd23gVr
+         da+ut3VAoNJGTPSoooqp9qliVCql058300Y4FW/waiD1GLjhFD7Dymb1BahaT1SavALF
+         y1yyOrvPfwnUVtsazJC0U22tXmeOyqMKQq0zYYkK+QMohNvVOkH05k0AUwnEdbWPvbV7
+         1pjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750195464; x=1750800264;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JuLt0GGKgFyX2XRmAg725NFu0qIHEn0MTXrZHQEojQ4=;
+        b=SN7BxtLDAIu3kFHlZJIJzqb975r5dZXOfb9K7d/YPguh7X8l4fuHPJ0lUhpj/FhgiU
+         MbkGae+/0Rplqa1s0gYlJcwLXrXMfPS4u3EhKTDrz0cqAX9yS+5DvTHqDA1yd32F5xOH
+         7w7zgyen3mMHDStfIQIWM1K91U/jBgttFYkppCTqnPoqLW54sElCXxUnNSRfIqh/Zghb
+         A9ee7mLMqgi0Q83aWaHGAdOPThy6I7RC6BXPiH5x4NrXd5dx/Q9avfjgD4k1YvmnQtjq
+         ma1QalgmZyD7qj/ZWB8/b4x1fbBGIG1377HzjFBUL/PtlF/5CIYSC7QS8prpEKdqKs6c
+         6y7g==
+X-Gm-Message-State: AOJu0Yz2iEfG9NRZYIqZfEP+CF/lOMuFsoGzOwg0GawBoGMNsZIQ81I+
+	yoVMuJkG3xnZxgvdjG+Ijo3wdBPt3f3EsDjot0bAnOkN9vruvKKoFq5K7YsZxWLet1bZG5Iza40
+	nM70pnNpAX5A3fBfwibKQUu4gu3akF1xE95ZG
+X-Gm-Gg: ASbGncuiqDJRg1YMoW16mekJVpSGmLs+cy1NKWJYzxbK31BJbQbNgMFqqist7T4nizA
+	7bg8JhhbrzxB9WZUwaYXN49I+0Et5jsRrEbhI+iLM89YZ7dHHuxI0/TBq3fAYQEZhLvhGFKiBFo
+	Sn+nXXHPkDwmDR6cCmlJ0YPi66rimBnBHtb/Dm66xtL1GtjKmV5beTCiqDrRE74vbC/tuzQbg54
+	5U=
+X-Google-Smtp-Source: AGHT+IGtS53+vo6DKNQkHrBa42D4sXeg19XeHIwHWRMRoUUK2qaBeFAvkzGhN7Bl7zuvJscUU2h6nSVps78X4Tn4O5M=
+X-Received: by 2002:a2e:be83:0:b0:32b:3689:8d80 with SMTP id
+ 38308e7fff4ca-32b4a2ddceemr34242211fa.18.1750195463713; Tue, 17 Jun 2025
+ 14:24:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ksmbd: add free_transport ops in ksmbd connection
-To: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
- atteh.mailbox@gmail.com
-References: <20250610100405.9367-1-linkinjeon@kernel.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250610100405.9367-1-linkinjeon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 17 Jun 2025 16:24:10 -0500
+X-Gm-Features: AX0GCFvzH0ZKK4BzcANpfjAREEc8Srr3CpFEgEuBpNlzDHWEmjSDM2-Yieq4Adg
+Message-ID: <CAH2r5mvc1A-3Ph1GKdffpRMc6BpDXMqpK7NrvR8ThW0Lc2chbg@mail.gmail.com>
+Subject: [PATCH][SMB3 client] cifs: Show reason why autodisabling serverino support
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>, =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000e7493d0637cb2293"
 
-Am 10.06.25 um 12:04 schrieb Namjae Jeon:
-> free_transport function for tcp connection can be called from smbdirect.
-> It will cause kernel oops. This patch add free_transport ops in ksmbd
-> connection, and add each free_transports for tcp and smbdirect.
-> 
-> Fixes: 21a4e47578d4 ("ksmbd: fix use-after-free in __smb2_lease_break_noti()")
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+--000000000000e7493d0637cb2293
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Stefan Metzmacher <metze@samba.org>
+Looks like Pali's updated patch (see attached) addressed the concerns
+brought up by Tom and Paulo, and does not result in logging any extra
+messages, just improving what is logged.   Let me know if any
+objections (or acked-by etc. that you want me to add).  Merged into
+cifs-2.6.git for-next pending additional testing.
 
-> ---
->   fs/smb/server/connection.c     |  2 +-
->   fs/smb/server/connection.h     |  1 +
->   fs/smb/server/transport_rdma.c | 10 ++++++++--
->   fs/smb/server/transport_tcp.c  |  3 ++-
->   4 files changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-> index 83764c230e9d..3f04a2977ba8 100644
-> --- a/fs/smb/server/connection.c
-> +++ b/fs/smb/server/connection.c
-> @@ -40,7 +40,7 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
->   	kvfree(conn->request_buf);
->   	kfree(conn->preauth_info);
->   	if (atomic_dec_and_test(&conn->refcnt)) {
-> -		ksmbd_free_transport(conn->transport);
-> +		conn->transport->ops->free_transport(conn->transport);
->   		kfree(conn);
->   	}
->   }
-> diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-> index 6efed923bd68..dd3e0e3f7bf0 100644
-> --- a/fs/smb/server/connection.h
-> +++ b/fs/smb/server/connection.h
-> @@ -133,6 +133,7 @@ struct ksmbd_transport_ops {
->   			  void *buf, unsigned int len,
->   			  struct smb2_buffer_desc_v1 *desc,
->   			  unsigned int desc_len);
-> +	void (*free_transport)(struct ksmbd_transport *kt);
->   };
->   
->   struct ksmbd_transport {
-> diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-> index 4998df04ab95..64a428a06ace 100644
-> --- a/fs/smb/server/transport_rdma.c
-> +++ b/fs/smb/server/transport_rdma.c
-> @@ -159,7 +159,8 @@ struct smb_direct_transport {
->   };
->   
->   #define KSMBD_TRANS(t) ((struct ksmbd_transport *)&((t)->transport))
-> -
-> +#define SMBD_TRANS(t)	((struct smb_direct_transport *)container_of(t, \
-> +				struct smb_direct_transport, transport))
->   enum {
->   	SMB_DIRECT_MSG_NEGOTIATE_REQ = 0,
->   	SMB_DIRECT_MSG_DATA_TRANSFER
-> @@ -410,6 +411,11 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
->   	return NULL;
->   }
->   
-> +static void smb_direct_free_transport(struct ksmbd_transport *kt)
-> +{
-> +	kfree(SMBD_TRANS(kt));
-> +}
-> +
->   static void free_transport(struct smb_direct_transport *t)
->   {
->   	struct smb_direct_recvmsg *recvmsg;
-> @@ -455,7 +461,6 @@ static void free_transport(struct smb_direct_transport *t)
->   
->   	smb_direct_destroy_pools(t);
->   	ksmbd_conn_free(KSMBD_TRANS(t)->conn);
-> -	kfree(t);
->   }
->   
->   static struct smb_direct_sendmsg
-> @@ -2281,4 +2286,5 @@ static const struct ksmbd_transport_ops ksmbd_smb_direct_transport_ops = {
->   	.read		= smb_direct_read,
->   	.rdma_read	= smb_direct_rdma_read,
->   	.rdma_write	= smb_direct_rdma_write,
-> +	.free_transport = smb_direct_free_transport,
->   };
-> diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-> index abedf510899a..4e9f98db9ff4 100644
-> --- a/fs/smb/server/transport_tcp.c
-> +++ b/fs/smb/server/transport_tcp.c
-> @@ -93,7 +93,7 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
->   	return t;
->   }
->   
-> -void ksmbd_free_transport(struct ksmbd_transport *kt)
-> +static void ksmbd_tcp_free_transport(struct ksmbd_transport *kt)
->   {
->   	struct tcp_transport *t = TCP_TRANS(kt);
->   
-> @@ -656,4 +656,5 @@ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
->   	.read		= ksmbd_tcp_read,
->   	.writev		= ksmbd_tcp_writev,
->   	.disconnect	= ksmbd_tcp_disconnect,
-> +	.free_transport = ksmbd_tcp_free_transport,
->   };
+    Extend cifs_autodisable_serverino() function to print also text message=
+ why
+    the function was called.
 
+    The text message is printed just once for mount then autodisabling
+    serverino support. Once the serverino support is disabled for mount it =
+will
+    not be re-enabled. So those text messages do not cause flooding logs.
+
+    This change allows to debug issues why cifs.ko decide to turn off serve=
+r
+    inode number support and hence disable support for detection of hardlin=
+ks.
+
+    Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+
+
+
+--=20
+Thanks,
+
+Steve
+
+--000000000000e7493d0637cb2293
+Content-Type: text/x-patch; charset="UTF-8"; 
+	name="0001-cifs-Show-reason-why-autodisabling-serverino-support.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-Show-reason-why-autodisabling-serverino-support.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mc1163xc0>
+X-Attachment-Id: f_mc1163xc0
+
+RnJvbSA0YjdkYjYzZWQ3YWEwZjBkOGU0NmRiYjA3MTU3MjJiYWZlZDY4ZTdkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/UGFsaT0yMFJvaD1DMz1BMXI/PSA8cGFsaUBr
+ZXJuZWwub3JnPgpEYXRlOiBTYXQsIDcgSnVuIDIwMjUgMTg6MTc6MTUgKzAyMDAKU3ViamVjdDog
+W1BBVENIXSBjaWZzOiBTaG93IHJlYXNvbiB3aHkgYXV0b2Rpc2FibGluZyBzZXJ2ZXJpbm8gc3Vw
+cG9ydApNSU1FLVZlcnNpb246IDEuMApDb250ZW50LVR5cGU6IHRleHQvcGxhaW47IGNoYXJzZXQ9
+VVRGLTgKQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzogOGJpdAoKRXh0ZW5kIGNpZnNfYXV0b2Rp
+c2FibGVfc2VydmVyaW5vKCkgZnVuY3Rpb24gdG8gcHJpbnQgYWxzbyB0ZXh0IG1lc3NhZ2Ugd2h5
+CnRoZSBmdW5jdGlvbiB3YXMgY2FsbGVkLgoKVGhlIHRleHQgbWVzc2FnZSBpcyBwcmludGVkIGp1
+c3Qgb25jZSBmb3IgbW91bnQgdGhlbiBhdXRvZGlzYWJsaW5nCnNlcnZlcmlubyBzdXBwb3J0LiBP
+bmNlIHRoZSBzZXJ2ZXJpbm8gc3VwcG9ydCBpcyBkaXNhYmxlZCBmb3IgbW91bnQgaXQgd2lsbApu
+b3QgYmUgcmUtZW5hYmxlZC4gU28gdGhvc2UgdGV4dCBtZXNzYWdlcyBkbyBub3QgY2F1c2UgZmxv
+b2RpbmcgbG9ncy4KClRoaXMgY2hhbmdlIGFsbG93cyB0byBkZWJ1ZyBpc3N1ZXMgd2h5IGNpZnMu
+a28gZGVjaWRlIHRvIHR1cm4gb2ZmIHNlcnZlcgppbm9kZSBudW1iZXIgc3VwcG9ydCBhbmQgaGVu
+Y2UgZGlzYWJsZSBzdXBwb3J0IGZvciBkZXRlY3Rpb24gb2YgaGFyZGxpbmtzLgoKU2lnbmVkLW9m
+Zi1ieTogUGFsaSBSb2jDoXIgPHBhbGlAa2VybmVsLm9yZz4KU2lnbmVkLW9mZi1ieTogU3RldmUg
+RnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY2lmc3By
+b3RvLmggfCAyICstCiBmcy9zbWIvY2xpZW50L2Nvbm5lY3QuYyAgIHwgMiArLQogZnMvc21iL2Ns
+aWVudC9kZnNfY2FjaGUuYyB8IDIgKy0KIGZzL3NtYi9jbGllbnQvaW5vZGUuYyAgICAgfCA2ICsr
+Ky0tLQogZnMvc21iL2NsaWVudC9taXNjLmMgICAgICB8IDYgKysrKystCiBmcy9zbWIvY2xpZW50
+L3JlYWRkaXIuYyAgIHwgNCArKy0tCiA2IGZpbGVzIGNoYW5nZWQsIDEzIGluc2VydGlvbnMoKyks
+IDkgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzcHJvdG8uaCBi
+L2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKaW5kZXggNjYwOTNmYTc4YWVkLi5jY2Q0MmI4MmM3
+MTEgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKKysrIGIvZnMvc21iL2Ns
+aWVudC9jaWZzcHJvdG8uaApAQCAtNTc5LDcgKzU3OSw3IEBAIGV4dGVybiBpbnQgY2lmc19kb19z
+ZXRfYWNsKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiBl
+eHRlcm4gaW50IENJRlNHZXRFeHRBdHRyKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBj
+aWZzX3Rjb24gKnRjb24sCiAJCQljb25zdCBpbnQgbmV0ZmlkLCBfX3U2NCAqcEV4dEF0dHJCaXRz
+LCBfX3U2NCAqcE1hc2spOwogI2VuZGlmIC8qIENJRlNfQUxMT1dfSU5TRUNVUkVfTEVHQUNZICov
+Ci1leHRlcm4gdm9pZCBjaWZzX2F1dG9kaXNhYmxlX3NlcnZlcmlubyhzdHJ1Y3QgY2lmc19zYl9p
+bmZvICpjaWZzX3NiKTsKK2V4dGVybiB2b2lkIGNpZnNfYXV0b2Rpc2FibGVfc2VydmVyaW5vKHN0
+cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IsIGNvbnN0IGNoYXIgKnJlYXNvbiwgaW50IHJjKTsK
+IGV4dGVybiBib29sIGNvdWxkYmVfbWZfc3ltbGluayhjb25zdCBzdHJ1Y3QgY2lmc19mYXR0ciAq
+ZmF0dHIpOwogZXh0ZXJuIGludCBjaGVja19tZl9zeW1saW5rKHVuc2lnbmVkIGludCB4aWQsIHN0
+cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJCQkgICAgICBzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZz
+X3NiLApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jb25uZWN0LmMgYi9mcy9zbWIvY2xpZW50
+L2Nvbm5lY3QuYwppbmRleCBjNDg4NjljMjllMTUuLmNlMmM0Y2Y5ODI2ZSAxMDA2NDQKLS0tIGEv
+ZnMvc21iL2NsaWVudC9jb25uZWN0LmMKKysrIGIvZnMvc21iL2NsaWVudC9jb25uZWN0LmMKQEAg
+LTM5MTgsNyArMzkxOCw3IEBAIGludCBjaWZzX21vdW50KHN0cnVjdCBjaWZzX3NiX2luZm8gKmNp
+ZnNfc2IsIHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCkKIAkgKiBBZnRlciByZWNvbm5lY3Rp
+bmcgdG8gYSBkaWZmZXJlbnQgc2VydmVyLCB1bmlxdWUgaWRzIHdvbid0IG1hdGNoIGFueW1vcmUs
+IHNvIHdlIGRpc2FibGUKIAkgKiBzZXJ2ZXJpbm8uIFRoaXMgcHJldmVudHMgZGVudHJ5IHJldmFs
+aWRhdGlvbiB0byB0aGluayB0aGUgZGVudHJ5IGFyZSBzdGFsZSAoRVNUQUxFKS4KIAkgKi8KLQlj
+aWZzX2F1dG9kaXNhYmxlX3NlcnZlcmlubyhjaWZzX3NiKTsKKwljaWZzX2F1dG9kaXNhYmxlX3Nl
+cnZlcmlubyhjaWZzX3NiLCAiUmVjb25uZWN0aW5nIHRvIGRpZmZlcmVudCBzZXJ2ZXIsIGlub2Rl
+IG51bWJlcnMgd29uJ3QgbWF0Y2ggYW55bW9yZSIsIDApOwogCS8qCiAJICogRm9yY2UgdGhlIHVz
+ZSBvZiBwcmVmaXggcGF0aCB0byBzdXBwb3J0IGZhaWxvdmVyIG9uIERGUyBwYXRocyB0aGF0IHJl
+c29sdmUgdG8gdGFyZ2V0cwogCSAqIHRoYXQgaGF2ZSBkaWZmZXJlbnQgcHJlZml4IHBhdGhzLgpk
+aWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9kZnNfY2FjaGUuYyBiL2ZzL3NtYi9jbGllbnQvZGZz
+X2NhY2hlLmMKaW5kZXggNGRhZGEyNmQ1NmI1Li5jM2ZlODVjMzFlMmIgMTAwNjQ0Ci0tLSBhL2Zz
+L3NtYi9jbGllbnQvZGZzX2NhY2hlLmMKKysrIGIvZnMvc21iL2NsaWVudC9kZnNfY2FjaGUuYwpA
+QCAtMTI4OSw3ICsxMjg5LDcgQEAgaW50IGRmc19jYWNoZV9yZW1vdW50X2ZzKHN0cnVjdCBjaWZz
+X3NiX2luZm8gKmNpZnNfc2IpCiAJICogQWZ0ZXIgcmVjb25uZWN0aW5nIHRvIGEgZGlmZmVyZW50
+IHNlcnZlciwgdW5pcXVlIGlkcyB3b24ndCBtYXRjaCBhbnltb3JlLCBzbyB3ZSBkaXNhYmxlCiAJ
+ICogc2VydmVyaW5vLiBUaGlzIHByZXZlbnRzIGRlbnRyeSByZXZhbGlkYXRpb24gdG8gdGhpbmsg
+dGhlIGRlbnRyeSBhcmUgc3RhbGUgKEVTVEFMRSkuCiAJICovCi0JY2lmc19hdXRvZGlzYWJsZV9z
+ZXJ2ZXJpbm8oY2lmc19zYik7CisJY2lmc19hdXRvZGlzYWJsZV9zZXJ2ZXJpbm8oY2lmc19zYiwg
+IlJlY29ubmVjdGluZyB0byBkaWZmZXJlbnQgc2VydmVyLCBpbm9kZSBudW1iZXJzIHdvbid0IG1h
+dGNoIGFueW1vcmUiLCAwKTsKIAkvKgogCSAqIEZvcmNlIHRoZSB1c2Ugb2YgcHJlZml4IHBhdGgg
+dG8gc3VwcG9ydCBmYWlsb3ZlciBvbiBERlMgcGF0aHMgdGhhdCByZXNvbHZlIHRvIHRhcmdldHMK
+IAkgKiB0aGF0IGhhdmUgZGlmZmVyZW50IHByZWZpeCBwYXRocy4KZGlmZiAtLWdpdCBhL2ZzL3Nt
+Yi9jbGllbnQvaW5vZGUuYyBiL2ZzL3NtYi9jbGllbnQvaW5vZGUuYwppbmRleCA3NWJlNGI0NmJj
+NmYuLmVhZDFiZTg3MTJmNCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9pbm9kZS5jCisrKyBi
+L2ZzL3NtYi9jbGllbnQvaW5vZGUuYwpAQCAtMTEzMiw3ICsxMTMyLDcgQEAgc3RhdGljIHZvaWQg
+Y2lmc19zZXRfZmF0dHJfaW5vKGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sIHN0cnVj
+dCBzdXBlcl9ibG8KIAkJCWZhdHRyLT5jZl91bmlxdWVpZCA9IENJRlNfSSgqaW5vZGUpLT51bmlx
+dWVpZDsKIAkJZWxzZSB7CiAJCQlmYXR0ci0+Y2ZfdW5pcXVlaWQgPSBpdW5pcXVlKHNiLCBST09U
+X0kpOwotCQkJY2lmc19hdXRvZGlzYWJsZV9zZXJ2ZXJpbm8oY2lmc19zYik7CisJCQljaWZzX2F1
+dG9kaXNhYmxlX3NlcnZlcmlubyhjaWZzX3NiLCAiQ2Fubm90IHJldHJpZXZlIGlub2RlIG51bWJl
+ciB2aWEgZ2V0X3Nydl9pbnVtIiwgcmMpOwogCQl9CiAJCXJldHVybjsKIAl9CkBAIC0xNjI3LDcg
+KzE2MjcsNyBAQCBjaWZzX2lnZXQoc3RydWN0IHN1cGVyX2Jsb2NrICpzYiwgc3RydWN0IGNpZnNf
+ZmF0dHIgKmZhdHRyKQogCQkJZmF0dHItPmNmX2ZsYWdzICY9IH5DSUZTX0ZBVFRSX0lOT19DT0xM
+SVNJT047CiAKIAkJCWlmIChpbm9kZV9oYXNfaGFzaGVkX2RlbnRyaWVzKGlub2RlKSkgewotCQkJ
+CWNpZnNfYXV0b2Rpc2FibGVfc2VydmVyaW5vKENJRlNfU0Ioc2IpKTsKKwkJCQljaWZzX2F1dG9k
+aXNhYmxlX3NlcnZlcmlubyhDSUZTX1NCKHNiKSwgIklub2RlIG51bWJlciBjb2xsaXNpb24gZGV0
+ZWN0ZWQiLCAwKTsKIAkJCQlpcHV0KGlub2RlKTsKIAkJCQlmYXR0ci0+Y2ZfdW5pcXVlaWQgPSBp
+dW5pcXVlKHNiLCBST09UX0kpOwogCQkJCWdvdG8gcmV0cnlfaWdldDVfbG9ja2VkOwpAQCAtMTY5
+NCw3ICsxNjk0LDcgQEAgc3RydWN0IGlub2RlICpjaWZzX3Jvb3RfaWdldChzdHJ1Y3Qgc3VwZXJf
+YmxvY2sgKnNiKQogCWlmICghcmMpIHsKIAkJaWYgKGZhdHRyLmNmX2ZsYWdzICYgQ0lGU19GQVRU
+Ul9KVU5DVElPTikgewogCQkJZmF0dHIuY2ZfZmxhZ3MgJj0gfkNJRlNfRkFUVFJfSlVOQ1RJT047
+Ci0JCQljaWZzX2F1dG9kaXNhYmxlX3NlcnZlcmlubyhjaWZzX3NiKTsKKwkJCWNpZnNfYXV0b2Rp
+c2FibGVfc2VydmVyaW5vKGNpZnNfc2IsICJDYW5ub3QgcmV0cmlldmUgYXR0cmlidXRlcyBmb3Ig
+anVuY3Rpb24gcG9pbnQiLCByYyk7CiAJCX0KIAkJaW5vZGUgPSBjaWZzX2lnZXQoc2IsICZmYXR0
+cik7CiAJfQpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9taXNjLmMgYi9mcy9zbWIvY2xpZW50
+L21pc2MuYwppbmRleCBlNzcwMTdmNDcwODQuLjQwOTI3Nzg4M2U4YSAxMDA2NDQKLS0tIGEvZnMv
+c21iL2NsaWVudC9taXNjLmMKKysrIGIvZnMvc21iL2NsaWVudC9taXNjLmMKQEAgLTU1Miw3ICs1
+NTIsNyBAQCBkdW1wX3NtYih2b2lkICpidWYsIGludCBzbWJfYnVmX2xlbmd0aCkKIH0KIAogdm9p
+ZAotY2lmc19hdXRvZGlzYWJsZV9zZXJ2ZXJpbm8oc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19z
+YikKK2NpZnNfYXV0b2Rpc2FibGVfc2VydmVyaW5vKHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNf
+c2IsIGNvbnN0IGNoYXIgKnJlYXNvbiwgaW50IHJjKQogewogCWlmIChjaWZzX3NiLT5tbnRfY2lm
+c19mbGFncyAmIENJRlNfTU9VTlRfU0VSVkVSX0lOVU0pIHsKIAkJc3RydWN0IGNpZnNfdGNvbiAq
+dGNvbiA9IE5VTEw7CkBAIC01NjIsNiArNTYyLDEwIEBAIGNpZnNfYXV0b2Rpc2FibGVfc2VydmVy
+aW5vKHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IpCiAKIAkJY2lmc19zYi0+bW50X2NpZnNf
+ZmxhZ3MgJj0gfkNJRlNfTU9VTlRfU0VSVkVSX0lOVU07CiAJCWNpZnNfc2ItPm1udF9jaWZzX3Nl
+cnZlcmlub19hdXRvZGlzYWJsZWQgPSB0cnVlOworCQlpZiAocmMpCisJCQljaWZzX2RiZyhWRlMs
+ICIlczogJWRcbiIsIHJlYXNvbiwgcmMpOworCQllbHNlCisJCQljaWZzX2RiZyhWRlMsICIlc1xu
+IiwgcmVhc29uKTsKIAkJY2lmc19kYmcoVkZTLCAiQXV0b2Rpc2FibGluZyB0aGUgdXNlIG9mIHNl
+cnZlciBpbm9kZSBudW1iZXJzIG9uICVzXG4iLAogCQkJIHRjb24gPyB0Y29uLT50cmVlX25hbWUg
+OiAibmV3IHNlcnZlciIpOwogCQljaWZzX2RiZyhWRlMsICJUaGUgc2VydmVyIGRvZXNuJ3Qgc2Vl
+bSB0byBzdXBwb3J0IHRoZW0gcHJvcGVybHkgb3IgdGhlIGZpbGVzIG1pZ2h0IGJlIG9uIGRpZmZl
+cmVudCBzZXJ2ZXJzIChERlMpXG4iKTsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvcmVhZGRp
+ci5jIGIvZnMvc21iL2NsaWVudC9yZWFkZGlyLmMKaW5kZXggYmEwMTkzY2Y5MDMzLi5lNWYxMjcz
+OWVlMTQgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvcmVhZGRpci5jCisrKyBiL2ZzL3NtYi9j
+bGllbnQvcmVhZGRpci5jCkBAIC00MTQsNyArNDE0LDcgQEAgX2luaXRpYXRlX2NpZnNfc2VhcmNo
+KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBmaWxlICpmaWxlLAogCQljaWZzRmlsZS0+
+aW52YWxpZEhhbmRsZSA9IGZhbHNlOwogCX0gZWxzZSBpZiAoKHJjID09IC1FT1BOT1RTVVBQKSAm
+JgogCQkgICAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1NFUlZFUl9JTlVN
+KSkgewotCQljaWZzX2F1dG9kaXNhYmxlX3NlcnZlcmlubyhjaWZzX3NiKTsKKwkJY2lmc19hdXRv
+ZGlzYWJsZV9zZXJ2ZXJpbm8oY2lmc19zYiwgIkNhbm5vdCByZXRyaWV2ZSBpbm9kZSBudW1iZXIg
+dmlhIHF1ZXJ5X2Rpcl9maXJzdCIsIHJjKTsKIAkJZ290byBmZmlyc3RfcmV0cnk7CiAJfQogZXJy
+b3JfZXhpdDoKQEAgLTEwMTAsNyArMTAxMCw3IEBAIHN0YXRpYyBpbnQgY2lmc19maWxsZGlyKGNo
+YXIgKmZpbmRfZW50cnksIHN0cnVjdCBmaWxlICpmaWxlLAogCQlmYXR0ci5jZl91bmlxdWVpZCA9
+IGRlLmlubzsKIAl9IGVsc2UgewogCQlmYXR0ci5jZl91bmlxdWVpZCA9IGl1bmlxdWUoc2IsIFJP
+T1RfSSk7Ci0JCWNpZnNfYXV0b2Rpc2FibGVfc2VydmVyaW5vKGNpZnNfc2IpOworCQljaWZzX2F1
+dG9kaXNhYmxlX3NlcnZlcmlubyhjaWZzX3NiLCAiQ2Fubm90IHJldHJpZXZlIGlub2RlIG51bWJl
+ciIsIDApOwogCX0KIAogCWlmICgoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5U
+X01GX1NZTUxJTktTKSAmJgotLSAKMi40My4wCgo=
+--000000000000e7493d0637cb2293--
