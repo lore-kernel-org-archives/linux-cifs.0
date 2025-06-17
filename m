@@ -1,210 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B6E2E2EED;
-	Tue, 17 Jun 2025 12:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700C42E3AE3
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 13:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750161613; cv=none; b=Fs/uJGexitASToujes1COkDDwMnIFxKXTlqTMadwGmfb29cEmJv8owNZX9WBdmKu+sNbe8h+3trujKTezUZjlRIDokDYzgNRUjrCCHe8n6cPuqaw2YjnOuxeIW7UVu2tH1bQJH0m3RqVtYBd2aEwYGI+rapOZgXFkSsq1I7XVxE=
+	t=1750166373; cv=none; b=RbrA/QEkM2WLbX3T7ul+nehFfCBywxGqST8o0RtlVbIS7NdZG5qTHjmBcisXJbqnq+/9M55XiOgq2Wg3kxZREWQQpj1NQhrw5rtiG+at+J4nAVcSHB/V+6UMAH3OraCEJvQhyHq2f1hgjiXu1jixUraWV1J/NugCEWc3h70E2L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750161613; c=relaxed/simple;
-	bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TpoxnDu7k7Zh0jsZP89zkOSHC40Q6MNfKBXNp4X8xu/Oka5Ml1WdAuFLBzDzXGrl1pr7xPq7TTxS1KxiplImQK3YFc5/N1j5wty6mzbfdkSHtnv2Xse7GJVbzCv6PJ6NvdJUKHZBepvCPjY3D1DYVDr2WZxIB9R/36VlehvrqW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbm6eSpO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750166373; c=relaxed/simple;
+	bh=03GAEg6zsfTuDne01wHNaeMc2CmT17CyAcQPd0eLXFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bJl4YR8LZ/K6A+qa2wBzc5KiKD9sAJGgFQM2B1Na0eyY5lVdpWAsHqIBRptTm4hsgSFmWBD2k8420aycSWMCo3YJL9uFHrUjcrPFP0KWYO4Lxw+aBl55wOjJ4M0tHqcj7o+1TQfxLaAEK5Xg4KBMcrn1RsO60IxOkOCn2ZIP5K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlgkVmyZ; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbm6eSpO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F729C4CEE3;
-	Tue, 17 Jun 2025 11:59:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750161613;
-	bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cbm6eSpOXnYTKVf24fD5wSecYeYAtaJSPLtzA/cg7YuA4PJRPYSNZqoHGrOB9vedO
-	 xE+Kw4QDbA/4jdsP7oXbPhVrMP5XKHSj57b+LizHRuDadEPqGBM+ZxF2QhTJG4KKld
-	 niMYuWEWwMHm5apCVpkqg1uA/sm57a3OJs6XP47Q03JuvcLdBMJ4BZLJME8mGFpquF
-	 OAV54y1YNZFqwgygvgnolLyQkxdfAP1bT54VMRT4yd/LwvYOK0H78h2s/9FU+jHgJZ
-	 /1P5yb/ScvLTgMkRASvu83CdtUFgXaGEFmmqSgC4JGFIOk41SmtzQEJEUL45wKXKIE
-	 copUCuL9W6X/w==
-From: Christian Brauner <brauner@kernel.org>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Tigran A . Aivazian" <aivazian.tigran@gmail.com>,
-	Kees Cook <kees@kernel.org>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu,
-	Tyler Hicks <code@tyhicks.com>,
-	Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Yangtao Li <frank.li@vivo.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-aio@kvack.org,
-	linux-unionfs@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	ecryptfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-xfs@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 00/10] convert the majority of file systems to mmap_prepare
-Date: Tue, 17 Jun 2025 13:58:21 +0200
-Message-ID: <20250617-neugliederung-erarbeiten-58c2ad93db83@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
-References: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlgkVmyZ"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-32ae3e94e57so50464801fa.1
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Jun 2025 06:19:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750166370; x=1750771170; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rErtEAvy+GbL2WFWOKGCJbHi9YowFZb0ep0jKvo2Udg=;
+        b=GlgkVmyZd9huhL3E1EwbZE1CZkodapwmyrq+9FDcrTijhupdspXOfECh1GZV6DTC5t
+         BafE4hKfiJC4xf/j4VrGL5yJnIhkl+YhsEtkq+rORxJ3TBKmjziVouxzGFEBFCCw/ObH
+         fNc+aReIbi4aoxUq8QRsN0jlwFYdoisqXjdtZeC578uEhHqyGaFPmZ7HZdAuHZIAFGJ4
+         LXmF3irTinpNJ/5dVrbsosqfGV3vKt6Tb0gcksivNshhpr7C3ZmFn5XCvI4Mr3Fk+eym
+         Zzi0DO7xVrRTT0r/cS4zGSxGQ/IpeHJWGW6E4+dsJQe07CSP1spPuHXDsKjVBtqwzM2S
+         4Syg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750166370; x=1750771170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rErtEAvy+GbL2WFWOKGCJbHi9YowFZb0ep0jKvo2Udg=;
+        b=LlAaeB5B7eV1o7wczWoKUUk6vtdNn5mXOL4ThDL61UhkLxMBHUTMopJjB8RdxaKR2J
+         h6XB3Bj9Jq4zJCUAPsUn3e2mQdzzxDgAprFK5T+PxQPU7FB4EPzOHuRXRMoZD8Q0vt5a
+         JIo8ypUTdkYM+kNn8q/AGprb0tOhWDZpGFMynC9rzTJ9BIRuFjyeVjbKJt+UYL/NkM6d
+         PiJJynhREq8wVbvuD2+sVJIsHHAdcEev7+47xDnQUGc8ZfgruFvKcBeFvmwpXQT/Z4/t
+         tczGLzQ0y/KMx25DVogGRIHmT+O9PH76RKCeT8Sxep2lmFuZVj5cEyUCfP2B7bXkcc7H
+         6frg==
+X-Forwarded-Encrypted: i=1; AJvYcCWpVRJTroAuKTPCfGprWXsa0dp1XjlNlzh5rngjnk2ArYFLLbVxcXuwOUxQe+ik91vgYS5UlLsFlEtl@vger.kernel.org
+X-Gm-Message-State: AOJu0YyssXkz8WQxB3UbFJi0dO2B74S4I8LmLPEJTq17SgdSSt84tmad
+	vNNBMxYcmBcMIyy4Mo2xWmNokn9je0etC3PtSDpjWgIW1kh0jAO491mrVfOIzHG5/GZOCxf3CSO
+	ZuBEht4awMS/M8BlMscpbsZtIHaCjiz4Sug==
+X-Gm-Gg: ASbGnct+BExZfYerb5zXyK3BmzGMVixI0ZCoz7nV2Y2zEi/qNp2JL1Q4iLSm/nLaoFf
+	Miv6hyf9+ikMvpOHpwECDVQNi5Fy0zKUXl5IDxOwqVTtBVF5b7HiW9RdYLz2Pu6fC/G07MvRKK/
+	Fzao8/Q/CdnfU/gsKbtOoQDquiBgoYWmyRV+LgRxlu96KZ8LHYyfCp
+X-Google-Smtp-Source: AGHT+IEr5q3KPJXRn2o0RRP23hrJN/mAQHvChCi11JVCr78+Rnkq5ACoGrRGWeosBj96GkbITAykpCFELQYsMaqz/fg=
+X-Received: by 2002:a2e:b8c2:0:b0:32a:81a2:8aa3 with SMTP id
+ 38308e7fff4ca-32b4a658deamr38123681fa.23.1750166369274; Tue, 17 Jun 2025
+ 06:19:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2454; i=brauner@kernel.org; h=from:subject:message-id; bh=d7N8Br27sigUm6RwJ6QKDyuMIfLKb482gs0GJECdYqY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQERqz1Wd3by3g/duuF6rmP/N/MPRV+t8Tf5qpaV67t4 jKOJ7rXO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACaysIiRYfKb1+w2vf8O/mdg vPFO8PHqRzML+F0vTZYp4bqm1fwkeyXDP4PuJqblPl9UmcRtf/n65jge6ap97PLc+43T4+kid/k fMgMA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+References: <20250317102727.176918-1-bharathsm@microsoft.com>
+ <20250317102727.176918-3-bharathsm@microsoft.com> <CANT5p=pmsUx8FGxZARcOdWXCVQo5V6zZV8k5pn7AZPt+6bGj9A@mail.gmail.com>
+In-Reply-To: <CANT5p=pmsUx8FGxZARcOdWXCVQo5V6zZV8k5pn7AZPt+6bGj9A@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 17 Jun 2025 08:19:18 -0500
+X-Gm-Features: AX0GCFsFVnQAPVkVA-2q1Lh7AoPmEXJiZ2sFEoDOEOUJfqne9-ZY_gYdkssDUBw
+Message-ID: <CAH2r5mvbBsGnjo--+0b20BBpjuwGEebOx4=-6KjyTsQTnfP9nw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] smb: fix secondary channel creation issue with
+ kerberos by populating hostname when adding channels
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: Bharath SM <bharathsm.hsk@gmail.com>, linux-cifs@vger.kernel.org, 
+	sprasad@microsoft.com, pc@manguebit.com, Bharath SM <bharathsm@microsoft.com>, 
+	xfuren <xfuren@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 16 Jun 2025 20:33:19 +0100, Lorenzo Stoakes wrote:
-> REVIEWER'S NOTES
-> ================
-> 
-> I am basing this on the mm-new branch in Andrew's tree, so let me know if I
-> should rebase anything here. Given the mm bits touched I did think perhaps
-> we should take it through the mm tree, however it may be more sensible to
-> take it through an fs tree - let me know!
-> 
-> [...]
+added to cifs-2.6.git for-next
 
-This looks good. I fixed up the minor review comments.
-Looking forward to further cleanups in this area.
+On Tue, Jun 17, 2025 at 6:05=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
+com> wrote:
+>
+> On Mon, Mar 17, 2025 at 4:04=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.c=
+om> wrote:
+> >
+> > When mounting a share with kerberos authentication with multichannel
+> > support, share mounts correctly, but fails to create secondary
+> > channels. This occurs because the hostname is not populated when
+> > adding the channels. The hostname is necessary for the userspace
+> > cifs.upcall program to retrieve the required credentials and pass
+> > it back to kernel, without hostname secondary channels fails
+> > establish.
+> >
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > Reported-by: xfuren <xfuren@gmail.com>
+> > Link: https://bugzilla.samba.org/show_bug.cgi?id=3D15824
+> > ---
+> >  fs/smb/client/sess.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> > index b45b46b1b792..f2ab8513c3ed 100644
+> > --- a/fs/smb/client/sess.c
+> > +++ b/fs/smb/client/sess.c
+> > @@ -494,8 +494,7 @@ cifs_ses_add_channel(struct cifs_ses *ses,
+> >         ctx->domainauto =3D ses->domainAuto;
+> >         ctx->domainname =3D ses->domainName;
+> >
+> > -       /* no hostname for extra channels */
+> > -       ctx->server_hostname =3D "";
+> > +       ctx->server_hostname =3D ses->server->hostname;
+> >
+> >         ctx->username =3D ses->user_name;
+> >         ctx->password =3D ses->password;
+> > --
+> > 2.43.0
+> >
+> >
+> Looks good to me.
+> This one depends on one of the patches I submitted recently:
+> "cifs: dns resolution is needed only for primary channel"
+>
+> --
+> Regards,
+> Shyam
 
----
 
-Applied to the vfs-6.17.mmap_prepare branch of the vfs/vfs.git tree.
-Patches in the vfs-6.17.mmap_prepare branch should appear in linux-next soon.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+--=20
+Thanks,
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.17.mmap_prepare
-
-[01/10] mm: rename call_mmap/mmap_prepare to vfs_mmap/mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/20ca475d9860
-[02/10] mm/nommu: use file_has_valid_mmap_hooks() helper
-        https://git.kernel.org/vfs/vfs/c/c6900f227f89
-[03/10] fs: consistently use file_has_valid_mmap_hooks() helper
-        https://git.kernel.org/vfs/vfs/c/b013ed403197
-[04/10] fs/dax: make it possible to check dev dax support without a VMA
-        https://git.kernel.org/vfs/vfs/c/0335f6afd348
-[05/10] fs/ext4: transition from deprecated .mmap hook to .mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/8c90ae8fe5e3
-[06/10] fs/xfs: transition from deprecated .mmap hook to .mmap_prepare
-        https://git.kernel.org/vfs/vfs/c/6528d29b46d8
-[07/10] mm/filemap: introduce generic_file_*_mmap_prepare() helpers
-        https://git.kernel.org/vfs/vfs/c/5b44297bcfa4
-[08/10] fs: convert simple use of generic_file_*_mmap() to .mmap_prepare()
-        https://git.kernel.org/vfs/vfs/c/951ea2f4844c
-[09/10] fs: convert most other generic_file_*mmap() users to .mmap_prepare()
-        https://git.kernel.org/vfs/vfs/c/a5ee9a82981d
-[10/10] fs: replace mmap hook with .mmap_prepare for simple mappings
-        https://git.kernel.org/vfs/vfs/c/a1e5b36c4034
+Steve
