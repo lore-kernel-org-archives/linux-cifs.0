@@ -1,249 +1,110 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827EE2ED863
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 17:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FE427726
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 21:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750266373; cv=none; b=fGg/5X/T4FXAfWVpsGde2iiBWzUB7C/v57/QKfoJEXlfr2FFASMA/fNr0gSJcLbG6M3SCiE81RF3MyvLHRivNqnDSUgOwrK/2LLEcT4TdmhAFNvx/R19T32G9PfWL07xHVAvk9Vxn/DbK3H+1lqZFhtT+TRgUsjD6GMRDea6YBw=
+	t=1750283030; cv=none; b=MS4iJ6B8MfssMe3tIwHwawGnQXcQ/Y8x6yezVA91rEO07HTm1T0IJHC+UoJf5pfceXYjtlLKMBCuGIMlxklit9OVjWVkbw7wJaLtqy8ekXhaHyZ5kgjFdYIaK0W7+TYhSGnwur7cdaGFBBOIl9mc40zSumEmyKJCbrKlr7S7C6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750266373; c=relaxed/simple;
-	bh=u/MUMNb60uBK+vsx1qODNxoJrBOmSeznx6yE9JyHvlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eD77hF/22nEUHH191Ll0CggiYLfNDvJz77AeG8tmGaOjjy/A+iDD1VsNnaovx6Sa4ozU7jC22JrrwvTeHjJhs/yfIarjuVW8ITwTwl4HCVE1b2o2/zGCOymS5ZUz63cHecAnDdZcU+3ivXZ4zAfnClz7pNh3+KDFPjJdYDQ8c84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NHroZLiP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=G3RePS1F; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NHroZLiP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=G3RePS1F; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1750283030; c=relaxed/simple;
+	bh=KvHFEg1Hn7jb7RciXQx/WBVrWLfLd+IbMGST/WrDgKU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=UFDp6BpdxChWy/cypmBlDa/lCnlCRGjWw1NAYQChcqscq/8NPygeboMm8Vff9II4KyO4IW+tHyNo2i4gzwDgwj0WuNeUeGYknRCIjVzu5Xq1/MrPX42tKnTkCc7G+gwmr2L4jzCXar9cFScSOXgOC19EX+7HQBU45K8YGSIOF7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OcewLYEv; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NHroZLiP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="G3RePS1F";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NHroZLiP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="G3RePS1F"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 86D521F7C8;
-	Wed, 18 Jun 2025 17:06:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750266368;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SAxHe4/SFOgVVfwP/YkVikw5O0UdBvLzL0DaWVhZNTM=;
-	b=NHroZLiPV+1/rO8sD9qZX/5PHN5D5Rfo5Zb5aOHdYXCyTajLXhRkymKkUo6NqEKT1i51Wq
-	3jzRv5I50TsK881TQSExVKFBTV1uPJb21aJuIaeXllkCTjwU0SL7U9SX534GcVuTrf9MkN
-	z5adrX6FKDM+9HUfScghJAj+d4/N4Kw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750266368;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SAxHe4/SFOgVVfwP/YkVikw5O0UdBvLzL0DaWVhZNTM=;
-	b=G3RePS1FfsxZPpVKpINLhWACefVqXMozYLP/NJ+59JpdNLld0DBJsRsQUOr6wb7MNlldLN
-	KfEZjWEX4nPtmqCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=NHroZLiP;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=G3RePS1F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750266368;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SAxHe4/SFOgVVfwP/YkVikw5O0UdBvLzL0DaWVhZNTM=;
-	b=NHroZLiPV+1/rO8sD9qZX/5PHN5D5Rfo5Zb5aOHdYXCyTajLXhRkymKkUo6NqEKT1i51Wq
-	3jzRv5I50TsK881TQSExVKFBTV1uPJb21aJuIaeXllkCTjwU0SL7U9SX534GcVuTrf9MkN
-	z5adrX6FKDM+9HUfScghJAj+d4/N4Kw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750266368;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SAxHe4/SFOgVVfwP/YkVikw5O0UdBvLzL0DaWVhZNTM=;
-	b=G3RePS1FfsxZPpVKpINLhWACefVqXMozYLP/NJ+59JpdNLld0DBJsRsQUOr6wb7MNlldLN
-	KfEZjWEX4nPtmqCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D50B313721;
-	Wed, 18 Jun 2025 17:06:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4kJvM//xUmgeMgAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Wed, 18 Jun 2025 17:06:07 +0000
-Date: Wed, 18 Jun 2025 19:06:06 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Tigran A . Aivazian" <aivazian.tigran@gmail.com>,
-	Kees Cook <kees@kernel.org>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu, Tyler Hicks <code@tyhicks.com>,
-	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Hongbo Li <lihongbo22@huawei.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Yuezhang Mo <yuezhang.mo@sony.com>, Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Yangtao Li <frank.li@vivo.com>, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-	linux-aio@kvack.org, linux-unionfs@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org, linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-xfs@vger.kernel.org, nvdimm@lists.linux.dev
-Subject: Re: [PATCH 10/10] fs: replace mmap hook with .mmap_prepare for
- simple mappings
-Message-ID: <20250618170606.GI4037@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <cover.1750099179.git.lorenzo.stoakes@oracle.com>
- <f528ac4f35b9378931bd800920fee53fc0c5c74d.1750099179.git.lorenzo.stoakes@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcewLYEv"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-553241d30b3so57498e87.3
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 14:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750283026; x=1750887826; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QYEMlC9bTeP0hHRvZwDzfoFyfHJMioTvzv+ybFjWLZ8=;
+        b=OcewLYEv/NsEa7bp6My8adjlelm/omA2cZYP+0ViNiZxFNg0RLa3+UhW0LmxDO5vo1
+         Lu0s+SKNaMciWKuzPeQcDeGsfC0nIShat/FZSvGhY/7yP4fNP0ser7bjaPYj/pMqkGCK
+         DeIN48R5QQosi2y9AdvNpoRaOuBwfEQ8qxBqE7zofCFbpIfeX0s7iadwopmGAtmdYJ3V
+         lRuxLdzM3R7Uns2yFYJic0bgx9sll+veG5vGV1Lc75+pHB7AtOsXdWjkZgvWvFXbblug
+         DxKKHS4jcfRMGhvGo+YetWvKVjqmPgQ7eXKtr8xQwx/Z4r2HUOcE8a6P43+VVuZsAwLN
+         KjqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750283026; x=1750887826;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QYEMlC9bTeP0hHRvZwDzfoFyfHJMioTvzv+ybFjWLZ8=;
+        b=rnFTp8EHwwX5GUaftnSoyGkXJN55LHHLk5xCcL8rRJF/6XlmGTQf9m7KNsmUAMa0NC
+         J0X77OFCJzxLatMA08zg9o3omZy3xOs9g018i7xjmDPhHISc3n0qgNfIcKzLSEqgP4rX
+         7A+FQNToN58VbBtgJoJrN+dfRsF8iTqMECp69ndNrYc33ulmWGeuDi/G4GIUaE1MjRuz
+         e/lZRPjjUnqUr6pwiAhhajGn6w3UHsopYn1lZOZEuURF5oHsSbOnxfNpwUFgR2VlrtqK
+         Q1lqlW0CCcNCBoWQWQdvWCenYQurSN8hVToYGrZgoHkmIIfH7bH8w/7TUu5rhs5NJTiE
+         N6ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6qYLgE3VdaobQLRBvu6to4OJv1ALkhZ3CmSOQaDj+QCS30kdp6800KN/IRMC1x9Frji+WnHmOCxbr@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlwB5Lan53jZzkAg6K/jPyAFMoqzTI3zJJsR+ekjzxSRVvQP0E
+	ji+ngKFMNEovh+xKtnDaot82aKhOgFIe9CLCFtoLQIfgNmUhBLUbGWjbv/mofuw0F3EyIFi+G9Z
+	shVVWoBSVTofIZg7BJqv5gP0dIZ0LsszX3nky
+X-Gm-Gg: ASbGnct5YA7KbVZMOWsMNTJ/rQfai39Z24eCN7YsrLxnaLQndLGKeajVFbkLRkrrbmW
+	QG/yzuWcGEIiAAVkwAG+YI50jhYCFgKpOrlSiWp9NxdbsMoSqktEyasPfjku2PuEX4dJfqlgSeg
+	89vbDqEofjSqkALF+2P4CVd6CZLezokUhX2FOa9umXpy8oDOZyhMVgVXGjq+wwiW6wrht7X4vOP
+	emWhA==
+X-Google-Smtp-Source: AGHT+IHJgVriBh1ZpBb0J8HC3Iy4eEqh0C49gzQ6zXemBR3ice3Ylqlcb6NVye3WwUsS6+224muxj3xW8LaGYMrPHxo=
+X-Received: by 2002:a05:6512:3da3:b0:553:2882:d79b with SMTP id
+ 2adb3069b0e04-553b6f16f92mr5510248e87.32.1750283026360; Wed, 18 Jun 2025
+ 14:43:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f528ac4f35b9378931bd800920fee53fc0c5c74d.1750099179.git.lorenzo.stoakes@oracle.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 86D521F7C8
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-2.71 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,oracle.com,kernel.dk,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,kernel.org,ionkov.net,codewreck.org,crudebyte.com,suse.com,redhat.com,auristor.com,zeniv.linux.org.uk,suse.cz,kvack.org,szeredi.hu,linux.dev,fb.com,toxicpanda.com,cs.cmu.edu,tyhicks.com,linux.alibaba.com,google.com,huawei.com,samsung.com,sony.com,mit.edu,dilger.ca,mail.parknet.co.jp,dubeyko.com,physik.fu-berlin.de,vivo.com,nod.at,cambridgegreys.com,sipsolutions.net,artax.karlin.mff.cuni.cz,infradead.org,paragon-software.com,fasheh.com,evilplan.org,bobcopeland.com,omnibond.com,samba.org,manguebit.org,microsoft.com,talpey.com,wdc.com,suse.de,vger.kernel.org,lists.freedesktop.org,lists.linux.dev,lists.infradead.org,coda.cs.cmu.edu,lists.ozlabs.org,lists.sourceforge.net,lists.orangefs.org,lists.samba.org];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[113];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,oracle.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.cz:mid,suse.cz:dkim,suse.cz:replyto]
-X-Spam-Score: -2.71
-X-Spam-Level: 
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 18 Jun 2025 16:43:35 -0500
+X-Gm-Features: AX0GCFvcXsRZ_O1Wo7xt7HwLc7P6x4LTONUOBStMghnJHPcrKR7EUuKAcp3Mn4E
+Message-ID: <CAH2r5msnY6PR5GGjfheMjd4WJN4ewt06qe5MCZ-4qrtSmxi5eg@mail.gmail.com>
+Subject: mount.cifs help missing some newer mount options
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jun 16, 2025 at 08:33:29PM +0100, Lorenzo Stoakes wrote:
-> Since commit c84bf6dd2b83 ("mm: introduce new .mmap_prepare() file
-> callback"), the f_op->mmap() hook has been deprecated in favour of
-> f_op->mmap_prepare().
-> 
-> This callback is invoked in the mmap() logic far earlier, so error handling
-> can be performed more safely without complicated and bug-prone state
-> unwinding required should an error arise.
-> 
-> This hook also avoids passing a pointer to a not-yet-correctly-established
-> VMA avoiding any issues with referencing this data structure.
-> 
-> It rather provides a pointer to the new struct vm_area_desc descriptor type
-> which contains all required state and allows easy setting of required
-> parameters without any consideration needing to be paid to locking or
-> reference counts.
-> 
-> Note that nested filesystems like overlayfs are compatible with an
-> .mmap_prepare() callback since commit bb666b7c2707 ("mm: add mmap_prepare()
-> compatibility layer for nested file systems").
-> 
-> In this patch we apply this change to file systems with relatively simple
-> mmap() hook logic - exfat, ceph, f2fs, bcachefs, zonefs, btrfs, ocfs2,
-> orangefs, nilfs2, romfs, ramfs and aio.
-> 
-> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> ---
+I noticed that "mount.cifs --help" is missing some mount options
 
-For
 
->  fs/btrfs/file.c       |  7 ++++---
+Usage:  mount.cifs <remotetarget> <dir> -o <options>
 
-Acked-by: David Sterba <dsterba@suse.com>
+Mount the remote target, specified as a UNC name, to a local directory.
+
+Options:
+user=<arg>
+pass=<arg>
+dom=<arg>
+
+Less commonly used options:
+credentials=<filename>,guest,perm,noperm,setuids,nosetuids,rw,ro,
+sep=<char>,iocharset=<codepage>,suid,nosuid,exec,noexec,serverino,
+noserverino,mapchars,nomapchars,nolock,servernetbiosname=<SRV_RFC1001NAME>
+cache=<strict|none|loose>,nounix,cifsacl,sec=<authentication mechanism>,
+sign,seal,fsc,snapshot=<token|time>,nosharesock,persistenthandles,
+resilienthandles,rdma,vers=<smb_dialect>,cruid
+
+Options not needed for servers supporting CIFS Unix extensions
+(e.g. unneeded for mounts to most Samba versions):
+uid=<uid>,gid=<gid>,dir_mode=<mode>,file_mode=<mode>,sfu,
+mfsymlinks,idsfromsid
+
+Rarely used options:
+port=<tcpport>,rsize=<size>,wsize=<size>,unc=<unc_name>,ip=<ip_address>,
+dev,nodev,nouser_xattr,netbiosname=<OUR_RFC1001NAME>,hard,soft,intr,
+nointr,ignorecase,noposixpaths,noacl,prefixpath=<path>,nobrl,
+echo_interval=<seconds>,actimeo=<seconds>,max_credits=<credits>,
+bsize=<size>
+
+Options are described in more detail in the manual page
+man 8 mount.cifs
+
+To display the version number of the mount helper:
+mount.cifs -V
+
+----
+Thanks,
+
+Steve
