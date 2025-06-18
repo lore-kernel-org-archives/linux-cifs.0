@@ -1,110 +1,291 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FE427726
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 21:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE1828682;
+	Wed, 18 Jun 2025 21:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750283030; cv=none; b=MS4iJ6B8MfssMe3tIwHwawGnQXcQ/Y8x6yezVA91rEO07HTm1T0IJHC+UoJf5pfceXYjtlLKMBCuGIMlxklit9OVjWVkbw7wJaLtqy8ekXhaHyZ5kgjFdYIaK0W7+TYhSGnwur7cdaGFBBOIl9mc40zSumEmyKJCbrKlr7S7C6U=
+	t=1750283618; cv=none; b=GWY4SgDZm9QRf/bCjfGHmYuBb3DKjcat7c46kEDh7lWyyRc6gKc0WZ3pV2xt9ZcbQoWSuXQrrshRGkW7dqZ0MxP4gNadkZsperKLLN+rTUtw+OK/vZMvesvtgqkJBN0RdGKQhengekNlzfkojUtxBedWX2OldZlttkByV1J6HCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750283030; c=relaxed/simple;
-	bh=KvHFEg1Hn7jb7RciXQx/WBVrWLfLd+IbMGST/WrDgKU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=UFDp6BpdxChWy/cypmBlDa/lCnlCRGjWw1NAYQChcqscq/8NPygeboMm8Vff9II4KyO4IW+tHyNo2i4gzwDgwj0WuNeUeGYknRCIjVzu5Xq1/MrPX42tKnTkCc7G+gwmr2L4jzCXar9cFScSOXgOC19EX+7HQBU45K8YGSIOF7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OcewLYEv; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750283618; c=relaxed/simple;
+	bh=ksFLCIxQthA6yak1zBNbns+au1Myu0zbJWlyE8aWy5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1NVBrdTo1zJVXsphMmwihw9BhXkjTyoV1+a8qEyi5teyCDj5oqE+FYtB8i5vToFn2SQt9P1Q/nMD+fYZpik0wlAFhGwCeJEWHePoKGsAGZ8R5hKPnetiAxtMO2o+rD9ykUiXq4VfuwV02Yeu9OQT9CU+kdTArH+U3xLmIiPhsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiX5cYs4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcewLYEv"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-553241d30b3so57498e87.3
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 14:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750283026; x=1750887826; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QYEMlC9bTeP0hHRvZwDzfoFyfHJMioTvzv+ybFjWLZ8=;
-        b=OcewLYEv/NsEa7bp6My8adjlelm/omA2cZYP+0ViNiZxFNg0RLa3+UhW0LmxDO5vo1
-         Lu0s+SKNaMciWKuzPeQcDeGsfC0nIShat/FZSvGhY/7yP4fNP0ser7bjaPYj/pMqkGCK
-         DeIN48R5QQosi2y9AdvNpoRaOuBwfEQ8qxBqE7zofCFbpIfeX0s7iadwopmGAtmdYJ3V
-         lRuxLdzM3R7Uns2yFYJic0bgx9sll+veG5vGV1Lc75+pHB7AtOsXdWjkZgvWvFXbblug
-         DxKKHS4jcfRMGhvGo+YetWvKVjqmPgQ7eXKtr8xQwx/Z4r2HUOcE8a6P43+VVuZsAwLN
-         KjqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750283026; x=1750887826;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QYEMlC9bTeP0hHRvZwDzfoFyfHJMioTvzv+ybFjWLZ8=;
-        b=rnFTp8EHwwX5GUaftnSoyGkXJN55LHHLk5xCcL8rRJF/6XlmGTQf9m7KNsmUAMa0NC
-         J0X77OFCJzxLatMA08zg9o3omZy3xOs9g018i7xjmDPhHISc3n0qgNfIcKzLSEqgP4rX
-         7A+FQNToN58VbBtgJoJrN+dfRsF8iTqMECp69ndNrYc33ulmWGeuDi/G4GIUaE1MjRuz
-         e/lZRPjjUnqUr6pwiAhhajGn6w3UHsopYn1lZOZEuURF5oHsSbOnxfNpwUFgR2VlrtqK
-         Q1lqlW0CCcNCBoWQWQdvWCenYQurSN8hVToYGrZgoHkmIIfH7bH8w/7TUu5rhs5NJTiE
-         N6ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6qYLgE3VdaobQLRBvu6to4OJv1ALkhZ3CmSOQaDj+QCS30kdp6800KN/IRMC1x9Frji+WnHmOCxbr@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlwB5Lan53jZzkAg6K/jPyAFMoqzTI3zJJsR+ekjzxSRVvQP0E
-	ji+ngKFMNEovh+xKtnDaot82aKhOgFIe9CLCFtoLQIfgNmUhBLUbGWjbv/mofuw0F3EyIFi+G9Z
-	shVVWoBSVTofIZg7BJqv5gP0dIZ0LsszX3nky
-X-Gm-Gg: ASbGnct5YA7KbVZMOWsMNTJ/rQfai39Z24eCN7YsrLxnaLQndLGKeajVFbkLRkrrbmW
-	QG/yzuWcGEIiAAVkwAG+YI50jhYCFgKpOrlSiWp9NxdbsMoSqktEyasPfjku2PuEX4dJfqlgSeg
-	89vbDqEofjSqkALF+2P4CVd6CZLezokUhX2FOa9umXpy8oDOZyhMVgVXGjq+wwiW6wrht7X4vOP
-	emWhA==
-X-Google-Smtp-Source: AGHT+IHJgVriBh1ZpBb0J8HC3Iy4eEqh0C49gzQ6zXemBR3ice3Ylqlcb6NVye3WwUsS6+224muxj3xW8LaGYMrPHxo=
-X-Received: by 2002:a05:6512:3da3:b0:553:2882:d79b with SMTP id
- 2adb3069b0e04-553b6f16f92mr5510248e87.32.1750283026360; Wed, 18 Jun 2025
- 14:43:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiX5cYs4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D495FC4CEE7;
+	Wed, 18 Jun 2025 21:53:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750283617;
+	bh=ksFLCIxQthA6yak1zBNbns+au1Myu0zbJWlyE8aWy5k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JiX5cYs4txgjhNQokXW2MUSdzftv/yYR5ncmSE7lZg9Foa7WxEV7ixuUnFsizzoZp
+	 rmcafsKAqRlHBnkW7A2NkBTGmSaEvEd72O06HJlY0SwQK97Tqw8mtgvS/4Rk+Aez2M
+	 Ib7mVT1JIiXE6EkOMc881qKciEXoscwUDm7RESVqgXiXISSE6R9zrww4AjYHRFlPtX
+	 DRB9CKK95bZuhJPshGtt39ld5Nv1jdYm4SWIsxExS5RQRFi1dUjQeZYlhtLe8YPJTy
+	 5YbmnK/GUGPVbuoZIMKIEk1auroIIr07EA+l5LPf3D+kDs6s03bfQZ5gpNdoaSTn+Z
+	 m7AATL/yGST3g==
+Received: by pali.im (Postfix)
+	id EC93B54D; Wed, 18 Jun 2025 23:53:34 +0200 (CEST)
+Date: Wed, 18 Jun 2025 23:53:34 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] cifs: Show reason why autodisabling serverino support
+Message-ID: <20250618215334.ydefakmcvfpqx4dn@pali>
+References: <20250610172221.ihsrjrikbiijyb4n@pali>
+ <20250610181502.15839-1-pali@kernel.org>
+ <470d6baeb8e569aa1587de19c46f43c2@manguebit.org>
+ <20250617230142.ol3rc76uamwsd4rk@pali>
+ <6dd60d4365ed96f472c9b59dc8fca6bf@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 18 Jun 2025 16:43:35 -0500
-X-Gm-Features: AX0GCFvcXsRZ_O1Wo7xt7HwLc7P6x4LTONUOBStMghnJHPcrKR7EUuKAcp3Mn4E
-Message-ID: <CAH2r5msnY6PR5GGjfheMjd4WJN4ewt06qe5MCZ-4qrtSmxi5eg@mail.gmail.com>
-Subject: mount.cifs help missing some newer mount options
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6dd60d4365ed96f472c9b59dc8fca6bf@manguebit.org>
+User-Agent: NeoMutt/20180716
 
-I noticed that "mount.cifs --help" is missing some mount options
+On Tuesday 17 June 2025 20:48:00 Paulo Alcantara wrote:
+> Pali Rohár <pali@kernel.org> writes:
+> 
+> > On Tuesday 17 June 2025 19:23:15 Paulo Alcantara wrote:
+> >> Pali Rohár <pali@kernel.org> writes:
+> >> 
+> >> > Extend cifs_autodisable_serverino() function to print also text message why
+> >> > the function was called.
+> >> >
+> >> > The text message is printed just once for mount then autodisabling
+> >> > serverino support. Once the serverino support is disabled for mount it will
+> >> > not be re-enabled. So those text messages do not cause flooding logs.
+> >> >
+> >> > This change allows to debug issues why cifs.ko decide to turn off server
+> >> > inode number support and hence disable support for detection of hardlinks.
+> >> >
+> >> > Signed-off-by: Pali Rohár <pali@kernel.org>
+> >> > ---
+> >> > Paulo and Tom, could you check if this change is better now for you?
+> >> > It should address problems with logs flooding and also information about
+> >> > harlinks (it is already printed as can be seen also in this diff).
+> >> > I would like to get your ACK, so I'm trying to improve it.
+> >> > ---
+> >> >  fs/smb/client/cifsproto.h | 2 +-
+> >> >  fs/smb/client/connect.c   | 2 +-
+> >> >  fs/smb/client/dfs_cache.c | 2 +-
+> >> >  fs/smb/client/inode.c     | 6 +++---
+> >> >  fs/smb/client/misc.c      | 6 +++++-
+> >> >  fs/smb/client/readdir.c   | 4 ++--
+> >> >  6 files changed, 13 insertions(+), 9 deletions(-)
+> >> >
+> >> > diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+> >> > index d550662b4e72..07a67c8c37ce 100644
+> >> > --- a/fs/smb/client/cifsproto.h
+> >> > +++ b/fs/smb/client/cifsproto.h
+> >> > @@ -586,9 +586,9 @@ extern int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+> >> >  			   const struct nls_table *nls_codepage, int remap);
+> >> >  extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
+> >> >  			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+> >> >  #endif /* CIFS_ALLOW_INSECURE_LEGACY */
+> >> > -extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
+> >> > +extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char *reason, int rc);
+> >> >  extern bool couldbe_mf_symlink(const struct cifs_fattr *fattr);
+> >> >  extern int check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+> >> >  			      struct cifs_sb_info *cifs_sb,
+> >> >  			      struct cifs_fattr *fattr,
+> >> > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> >> > index 6bf04d9a5491..819721dfd5bb 100644
+> >> > --- a/fs/smb/client/connect.c
+> >> > +++ b/fs/smb/client/connect.c
+> >> > @@ -3907,9 +3907,9 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+> >> >  	/*
+> >> >  	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
+> >> >  	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
+> >> >  	 */
+> >> > -	cifs_autodisable_serverino(cifs_sb);
+> >> > +	cifs_autodisable_serverino(cifs_sb, "Reconnecting to different server, inode numbers won't match anymore", 0);
+> >> 
+> >> We are mounting an DFS share, not reconnecting.  The message is
+> >> misleading.
+> >
+> > I mostly copied the comment above the cifs_autodisable_serverino() call.
+> > Does it mean that the existing comment about reconnecting is wrong too?
+> 
+> The comment is trying to say why it disabled 'serverino'.  DFS failover
+> may potentially connect to a different server and share, hence the inode
+> numbers will no longer be valid.  The function is also called
+> cifs_mount().
 
+Ok. What do you suggest to put into the message? It would be good to not
+have it too long, but also to be useful.
 
-Usage:  mount.cifs <remotetarget> <dir> -o <options>
+> >> >  	/*
+> >> >  	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
+> >> >  	 * that have different prefix paths.
+> >> >  	 */
+> >> > diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+> >> > index 4dada26d56b5..c3fe85c31e2b 100644
+> >> > --- a/fs/smb/client/dfs_cache.c
+> >> > +++ b/fs/smb/client/dfs_cache.c
+> >> > @@ -1288,9 +1288,9 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
+> >> >  	/*
+> >> >  	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
+> >> >  	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
+> >> >  	 */
+> >> > -	cifs_autodisable_serverino(cifs_sb);
+> >> > +	cifs_autodisable_serverino(cifs_sb, "Reconnecting to different server, inode numbers won't match anymore", 0);
+> >> 
+> >> Ditto.
+> >> 
+> >> >  	/*
+> >> >  	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
+> >> >  	 * that have different prefix paths.
+> >> >  	 */
+> >> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+> >> > index cd06598eacbd..b1c6e3986278 100644
+> >> > --- a/fs/smb/client/inode.c
+> >> > +++ b/fs/smb/client/inode.c
+> >> > @@ -1076,9 +1076,9 @@ static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_blo
+> >> >  		if (*inode)
+> >> >  			fattr->cf_uniqueid = CIFS_I(*inode)->uniqueid;
+> >> >  		else {
+> >> >  			fattr->cf_uniqueid = iunique(sb, ROOT_I);
+> >> > -			cifs_autodisable_serverino(cifs_sb);
+> >> > +			cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number via get_srv_inum", rc);
+> >> 
+> >> Looks good.
+> >> 
+> >> >  		}
+> >> >  		return;
+> >> >  	}
+> >> >  
+> >> > @@ -1529,9 +1529,9 @@ cifs_iget(struct super_block *sb, struct cifs_fattr *fattr)
+> >> >  		if (fattr->cf_flags & CIFS_FATTR_INO_COLLISION) {
+> >> >  			fattr->cf_flags &= ~CIFS_FATTR_INO_COLLISION;
+> >> >  
+> >> >  			if (inode_has_hashed_dentries(inode)) {
+> >> > -				cifs_autodisable_serverino(CIFS_SB(sb));
+> >> > +				cifs_autodisable_serverino(CIFS_SB(sb), "Inode number collision detected", 0);
+> >> 
+> >> Looks good.
+> >> 
+> >> >  				iput(inode);
+> >> >  				fattr->cf_uniqueid = iunique(sb, ROOT_I);
+> >> >  				goto retry_iget5_locked;
+> >> >  			}
+> >> > @@ -1596,9 +1596,9 @@ struct inode *cifs_root_iget(struct super_block *sb)
+> >> >  iget_root:
+> >> >  	if (!rc) {
+> >> >  		if (fattr.cf_flags & CIFS_FATTR_JUNCTION) {
+> >> >  			fattr.cf_flags &= ~CIFS_FATTR_JUNCTION;
+> >> > -			cifs_autodisable_serverino(cifs_sb);
+> >> > +			cifs_autodisable_serverino(cifs_sb, "Cannot retrieve attributes for junction point", rc);
+> >> 
+> >> This has nothing to do with not being able to retrieve attributes.  It
+> >> is simply disabling 'serverino' to prevent inode collisions with
+> >> surrogate reparse points (automounts).  This should also printed with
+> >> FYI.
+> >
+> > Ok. So then I misunderstood the code around. Do you know when exactly
+> > can this case happen? And it is really a problem? Because name surrogate
+> > reparse point already creates a new mount hierarchy for which is
+> > generated new st_dev major and minor numbers and hence inode collisions
+> > should not happen (they do not share st_dev anymore).
+> 
+> There was a bug report of someone having inode collisions in a share
+> that had a reparse mount point, so the server was returning duplicate
+> inode numbers for files inside that share.  That is why we set those
+> directories as automounts and then disable 'serverino' only for them, so
+> the parent mount can still rely on the inode numbers from the server and
+> having hardlinks working.
+> 
+> Note that disabling 'serverino' means that the client won't trust the
+> inode numbers from the server and it will generate its own inode
+> numbers.  I don't understand why st_dev is relevant here.
 
-Mount the remote target, specified as a UNC name, to a local directory.
+Different st_dev values means that they are different filesystem / mounts
+So e.g. /dev/ has different st_dev value than the /mnt/smb. And hence
+the same inode number can be in /dev/ and /mnt/smb, and they will not
+conflict.
 
-Options:
-user=<arg>
-pass=<arg>
-dom=<arg>
+And same applies for name surrogate reparse points. Linux for more major
+versions is reporting different st_dev value for name surrogate reparse
+points, so their inode number would not conflict with the parent / main
+mount point.
 
-Less commonly used options:
-credentials=<filename>,guest,perm,noperm,setuids,nosetuids,rw,ro,
-sep=<char>,iocharset=<codepage>,suid,nosuid,exec,noexec,serverino,
-noserverino,mapchars,nomapchars,nolock,servernetbiosname=<SRV_RFC1001NAME>
-cache=<strict|none|loose>,nounix,cifsacl,sec=<authentication mechanism>,
-sign,seal,fsc,snapshot=<token|time>,nosharesock,persistenthandles,
-resilienthandles,rdma,vers=<smb_dialect>,cruid
+> >
+> >> >  		}
+> >> >  		inode = cifs_iget(sb, &fattr);
+> >> >  	}
+> >> >  
+> >> > diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+> >> > index e77017f47084..409277883e8a 100644
+> >> > --- a/fs/smb/client/misc.c
+> >> > +++ b/fs/smb/client/misc.c
+> >> > @@ -551,9 +551,9 @@ dump_smb(void *buf, int smb_buf_length)
+> >> >  		       smb_buf_length, true);
+> >> >  }
+> >> >  
+> >> >  void
+> >> > -cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
+> >> > +cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char *reason, int rc)
+> >> >  {
+> >> >  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+> >> >  		struct cifs_tcon *tcon = NULL;
+> >> >  
+> >> > @@ -561,8 +561,12 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
+> >> >  			tcon = cifs_sb_master_tcon(cifs_sb);
+> >> >  
+> >> >  		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
+> >> >  		cifs_sb->mnt_cifs_serverino_autodisabled = true;
+> >> > +		if (rc)
+> >> > +			cifs_dbg(VFS, "%s: %d\n", reason, rc);
+> >> > +		else
+> >> > +			cifs_dbg(VFS, "%s\n", reason);
+> >> >  		cifs_dbg(VFS, "Autodisabling the use of server inode numbers on %s\n",
+> >> >  			 tcon ? tcon->tree_name : "new server");
+> >> >  		cifs_dbg(VFS, "The server doesn't seem to support them properly or the files might be on different servers (DFS)\n");
+> >> >  		cifs_dbg(VFS, "Hardlinks will not be recognized on this mount. Consider mounting with the \"noserverino\" option to silence this message.\n");
+> >> > diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+> >> > index 787d6bcb5d1d..06e90921f751 100644
+> >> > --- a/fs/smb/client/readdir.c
+> >> > +++ b/fs/smb/client/readdir.c
+> >> > @@ -412,9 +412,9 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+> >> >  	if (rc == 0) {
+> >> >  		cifsFile->invalidHandle = false;
+> >> >  	} else if ((rc == -EOPNOTSUPP) &&
+> >> >  		   (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
+> >> > -		cifs_autodisable_serverino(cifs_sb);
+> >> > +		cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number via query_dir_first", rc);
+> >> 
+> >> Looks good.
+> >> 
+> >> >  		goto ffirst_retry;
+> >> >  	}
+> >> >  error_exit:
+> >> >  	cifs_put_tlink(tlink);
+> >> > @@ -1006,9 +1006,9 @@ static int cifs_filldir(char *find_entry, struct file *file,
+> >> >  	if (de.ino && (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
+> >> >  		fattr.cf_uniqueid = de.ino;
+> >> >  	} else {
+> >> >  		fattr.cf_uniqueid = iunique(sb, ROOT_I);
+> >> > -		cifs_autodisable_serverino(cifs_sb);
+> >> > +		cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inode number", 0);
+> >> 
+> >> Perhaps also mention which function it wasn't able to retrieve inode
+> >> number from like above?
+> >
+> > I quickly look at this code around and I was not able to figure out what
+> > is that function which was not able to retrieve inode. So I did not
+> > write it into the message. Do you know, or could you figure out what is
+> > that function / callback?
+> 
+> "Cannot retrieve inode number from readdir"
 
-Options not needed for servers supporting CIFS Unix extensions
-(e.g. unneeded for mounts to most Samba versions):
-uid=<uid>,gid=<gid>,dir_mode=<mode>,file_mode=<mode>,sfu,
-mfsymlinks,idsfromsid
-
-Rarely used options:
-port=<tcpport>,rsize=<size>,wsize=<size>,unc=<unc_name>,ip=<ip_address>,
-dev,nodev,nouser_xattr,netbiosname=<OUR_RFC1001NAME>,hard,soft,intr,
-nointr,ignorecase,noposixpaths,noacl,prefixpath=<path>,nobrl,
-echo_interval=<seconds>,actimeo=<seconds>,max_credits=<credits>,
-bsize=<size>
-
-Options are described in more detail in the manual page
-man 8 mount.cifs
-
-To display the version number of the mount helper:
-mount.cifs -V
-
-----
-Thanks,
-
-Steve
+Ok. But what is the callback which caused this issue for readdir here?
+In the previous one, it was server->ops->query_dir_first.
