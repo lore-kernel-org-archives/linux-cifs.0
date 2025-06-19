@@ -1,70 +1,70 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB27231852
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB15823535E
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347383; cv=none; b=MyZWVSGr5EFLbmLFKxGRBrByvkKNCx4h3QWisx1m8yOyT02IwTDROJy3v43Y1sYz03BNPEOLwBGqZkxf2SleKd/RUTxTNml83xJAjRnKYWSa4l1yb03LtssH7r8tfQBd6qgpNDorlvDrUIuUX7oajFeiR/kXzhRGkM//eXbcwxs=
+	t=1750347386; cv=none; b=ut74Q2mKU4aMmBzUYZwDJ4HiL8O3ukxCGhI0x+elBhkY/xzXTJ8HQMcStCP4Y3jZAHedsUeiQANTs6nA3nNxM5wXI/oOuSPAaFeZgC2Y14zbW7NYxJDo5tzqZhGPRxUOr7umP+GZZN7L7H0MVzf/te7wVmuCD4de6QFr/VHQBvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750347383; c=relaxed/simple;
-	bh=i08G6XxFX698LTQopL3CS6LfdAPwWG6PNHnY72RvNzg=;
+	s=arc-20240116; t=1750347386; c=relaxed/simple;
+	bh=eRg8yWcSOB10BQUhMP6qpoz3ieRx9eFvq112afoH+oE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AM6kuJaUs5FKMFTRVPS4OpKnSl+t5OR82wsmZ2UJ9Qvz+0CXKKd20QaAdqfowjiOcUDC6G+HLrvsUrxJ7aYsRZdfmuZD6uKA5RYRW5WOZKYnrn6gpSK8IbTu51Vq+T/v3+LVzeZyHL0O7DL8Idb7Fead9qU9f4eNYnC3NS6YENI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CcVvuC0B; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version; b=GYr4JJGEc+Si9tPI70VaLXtzVYUaorcGINMLU5b+yn23tV+9D5yy9C5RwhnYuAjQ3DX9A9fxaAd/cUkXkd3G37Prw6SaCQElbqNqFUB1vg9fC8nfbKRwuMwazfDFmogR7AoiPJoJh3QyTWdU12z1Kmzbfu9Q2LsVRhjshflTbNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A81jXhyn; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CcVvuC0B"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-747e41d5469so850595b3a.3
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A81jXhyn"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-747ef5996edso681862b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750347381; x=1750952181; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750347384; x=1750952184; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jArwfQnuzA3I5dcOvgPmxM9YVGZwzEZcMG9aXRb7zOs=;
-        b=CcVvuC0BpJPUp8HAF/FADiWqy5mFiH6dHBR52bEtniefZaAVOr+ugvR6kddDCZjIrX
-         8wb9LAaFZYYrlYLKZYjM+f9YHXHtS8SaHB/KE2PUgbeH7C4CWs9mILUx59gg2qa15re4
-         e8X3umaWRTSisUtJhfrbzt2/281IJvrErf9qhm/maAR06Y2zK3m7qu2jqazDUXyzZkKE
-         UAs7rrCt7dDjDHNDebyUs1tMMoHOblJmqAUySJ5/TwGNso/BIV8QRJXsTw5DddV5P8xk
-         3h+7fALz86pA9ygBS8fRmCqWM2u4SYvjkwHBRLLT1IM1M/PhD4dgdsUpcdNhDbRGk0Xv
-         2rrg==
+        bh=U2twxSZ5hBORl6YWt57p2bhVYfwkadsuc5ITfdBN7+Q=;
+        b=A81jXhyn1svCD+BVSxKMsICPosktWueVrgs+Ppo6/N6sOCevEp5qSL5uPmPjzjxbkq
+         nIYZcoDzCNlaDMT7LGYqJSmx1AO0dh+nx0sKSWpjKvvSZ74oxu4ceDF9O0LbdKs2v0VY
+         zAUM2thNJ7RQg5u+SejtI99MyBsn3/9jGke629HqkpwlUc7POamWgoiqvDjPKppxcSCH
+         VMTLCq+zVv+0Tq1fVuw1UqPP6xJPfLQucNtatLXhLqQtj1s/a+9hPrjP7ojzoW29D3qD
+         QNgf+ejZQjhZe0NAYfBypgzF+Vg7qAdKYG2xZLhddTWV87i1tPpgotLrXO0v5GhzSg1H
+         aunQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750347381; x=1750952181;
+        d=1e100.net; s=20230601; t=1750347384; x=1750952184;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jArwfQnuzA3I5dcOvgPmxM9YVGZwzEZcMG9aXRb7zOs=;
-        b=WD18v90yukkG5UB3LVU9xfefwkiNI/6QU2NDBhPuIM4MaHSq+r6B0f9TmWlSXKPffI
-         uDH+C0Rnoho1eaMYmAQ/74DVry7g0qm/1DbOVKZWNInWfBX4J826Kf+cNhsi4mS0a+Md
-         3UsXyFgR3tKNvhWBPfcC04evyQiScOyN/uHXWuqGJ37EKRozi+YcMtsgq8WpkcKSp4ov
-         oqtC0qXS0qtvCLjfz3uAkb7P4wbQUM/XuwLWPq7B5WBOpbuXMXSR0gGisuA2mLcyG0lw
-         9P3FIxHeUZ5uZv19UE3ry4AjCAZnqEyxjOZ33P6E5b6X5BiJWB66ZSkoO/HqtdI1kDL6
-         Rg1g==
-X-Gm-Message-State: AOJu0YzBCMd+EQmnTE8FnJ48UNmXS9kP0GiB0LYzE9C8wkJE10GU8JnF
-	3IHRSBhtpz2zZBCf/gjIe6VMbzr742qF8/OPEz37qrBL7BI43yFZZvCwHLuz3QT0
-X-Gm-Gg: ASbGncsDaL6amLKzqf3TWq9HK2Zly/dld0vMqlToos5jC4EN6TXCE1H6oVPKxOHRMFu
-	TPK/FnvQpiCNCyeENgrq1zJ2xO06DE+tVlALiUS68/7QvN5n2tlwqhoVK6JvYqfhKv6OihnZ1VE
-	5bYeBwm66/sycsRVsyZprKBbT5AHjCKwv2pZlJKh99WRMurlDKcKM1MggGuQKaj+m2zZ7jBjj75
-	N09Akbr+Kzs3kLVWheaVBjfa/D8RA4OzPV+jV8kQDJwbEiSaKJrD0ZlOFILkJRr7YlhLzP70X87
-	ZI7wI9dcsD27bPgNh3p9mI7afAU1hY1ujOMYMO+Uthwj53trrGKSg+iX/Xr53crEp7DidTUSJKJ
-	RBMBpbRTCI/8j
-X-Google-Smtp-Source: AGHT+IG2kSBkrnyhIQRQNpLOMPG4k01ujUrfzNmMQLEYzPU4jBqFeaO1FSV2iMNRIYBEiGx2uBJqRw==
-X-Received: by 2002:a05:6a00:4f88:b0:747:ee09:1fd2 with SMTP id d2e1a72fcca58-7489cfcb1d3mr31198258b3a.12.1750347381086;
-        Thu, 19 Jun 2025 08:36:21 -0700 (PDT)
+        bh=U2twxSZ5hBORl6YWt57p2bhVYfwkadsuc5ITfdBN7+Q=;
+        b=fN9bBoN5yW9ig/W5Tkn9sL3dOAG8fmi6x1S05KSpxR2A166WTL8jDpk0cXqWkm7eF7
+         RHp2S9PMLd/exm5pGRuhOsyRQDetVdPJS0n/oLwRh5iAvYFenRVd6Hn1tfxXWEbKP7k8
+         AGm6v6xA18hJ/RIQA/5RcnwUNQL7r1qHtYZDHLX+mhuduDo6mBWuRmsMKLD8sk26UvLa
+         DMpBCQKRtlgCBrYj6yqw50Y72sRgZ9NwI7UU1JWx6+HC0t4AznFBRu2QqTfF9Rec7nz1
+         QonJyOnZyq6PkEzmpX4MWHkaiGbdzihKockes0YiOBtRRMnC3YfaJhQe33UkbWVuonB+
+         RP7w==
+X-Gm-Message-State: AOJu0YzRdPnF0Uvfpr+UhPNfGLZZhRHJGrObQJzL7ybuTwbPRlSow3wv
+	QdNKWYVICuQgAZFGOTss0Xy5TRN2FKfV+4GqJN2TYMJCVmwBH6993RjPB91rcc8w
+X-Gm-Gg: ASbGncuJVFZ7HFIBwZ5kKCx07bvPAEFwKIK+giuksUWebARjBjXLAH3JPnVIUFYLEDR
+	lY8I//qIcUd2A9Wfum6S9aoQ7aUTtnJN0y9+tR3tCTsRnLPRaSBNyhqZNiTOxJaVGSHrDc6XJ3H
+	kZ4NyeJTo1PwJFLrN9TrbK6cR799ijZkGShJImmJPCULvtnz6+JoXgbLma1GcRgXKwkGkFZEpiQ
+	lJWoGqhLP81wHVKB9o/hQxMmcJTc6PDus/ioZNopWbNNZglUoVbZTm8FzsInn2wESoWKloS5qSO
+	iBfjVKU3i8/jk/Xo79XzVLfG78IIm4zUExHGUvFbkFNTedLdEKOerAHQkjzIWN5FBGoVP35mkU+
+	EkA+CLrIctx5G
+X-Google-Smtp-Source: AGHT+IEVePuFsqsWz2GosnSWxWd8Nw10m8WSej25VdqjyZ32Zgi0YwiwKINW+eNBM5ndVYCH/P3Tbg==
+X-Received: by 2002:a05:6a21:329e:b0:215:f656:6632 with SMTP id adf61e73a8af0-21fbd588616mr37678024637.29.1750347383566;
+        Thu, 19 Jun 2025 08:36:23 -0700 (PDT)
 Received: from bharathsm-Virtual-Machine.. ([131.107.1.253])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.20
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 08:36:20 -0700 (PDT)
+        Thu, 19 Jun 2025 08:36:23 -0700 (PDT)
 From: Bharath SM <bharathsm.hsk@gmail.com>
 X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To: linux-cifs@vger.kernel.org,
 	smfrench@gmail.com
 Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 6/7] smb: Fix potential divide-by-zero issue when iface_min_speed is 0
-Date: Thu, 19 Jun 2025 21:05:37 +0530
-Message-ID: <20250619153538.1600500-6-bharathsm@microsoft.com>
+Subject: [PATCH 7/7] smb: Fix memory allocation and ACL handling in cifs_xattr_set
+Date: Thu, 19 Jun 2025 21:05:38 +0530
+Message-ID: <20250619153538.1600500-7-bharathsm@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250619153538.1600500-1-bharathsm@microsoft.com>
 References: <20250619153538.1600500-1-bharathsm@microsoft.com>
@@ -76,50 +76,37 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Address potential divide-by-zero issue when iface_min_speed is 0
-by adding proper handling to prevent undefined behavior.
+If set_acl is NULL, then there is a chance that memory allocated
+for pacl memory doesn't get freed. Ensure proper memory deallocation
+for pacl in `cifs_xattr_set` to avoid leaks.
 
 Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/cifs_debug.c | 2 +-
- fs/smb/client/sess.c       | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/client/xattr.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 3fdf75737d43..bc56f315e2e0 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -599,7 +599,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 				seq_printf(m, "\n\t%d)", ++j);
- 				cifs_dump_iface(m, iface);
- 
--				iface_weight = iface->speed / iface_min_speed;
-+				iface_weight = iface_min_speed ? (iface->speed / iface_min_speed) : 0;
- 				seq_printf(m, "\t\tWeight (cur,total): (%zu,%zu)"
- 					   "\n\t\tAllocated channels: %u\n",
- 					   iface->weight_fulfilled,
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index ec0db32c7d98..697170be6591 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -218,7 +218,7 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
- 				continue;
- 
- 			/* check if we already allocated enough channels */
--			iface_weight = iface->speed / iface_min_speed;
-+			iface_weight = iface_min_speed ? (iface->speed / iface_min_speed) : 0;
- 
- 			if (iface->weight_fulfilled >= iface_weight)
- 				continue;
-@@ -387,7 +387,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
+index b88fa04f5792..4d2b70020776 100644
+--- a/fs/smb/client/xattr.c
++++ b/fs/smb/client/xattr.c
+@@ -174,6 +174,7 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 		pacl = kmalloc(size, GFP_KERNEL);
+ 		if (!pacl) {
+ 			rc = -ENOMEM;
++			goto out;
+ 		} else {
+ 			memcpy(pacl, value, size);
+ 			if (pTcon->ses->server->ops->set_acl) {
+@@ -211,8 +212,8 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 			}
+ 			if (rc == 0) /* force revalidate of the inode */
+ 				CIFS_I(inode)->time = 0;
+-			kfree(pacl);
  		}
- 
- 		/* check if we already allocated enough channels */
--		iface_weight = iface->speed / iface_min_speed;
-+		iface_weight = iface_min_speed ? (iface->speed / iface_min_speed) : 0;
- 
- 		if (iface->weight_fulfilled >= iface_weight)
- 			continue;
++		kfree(pacl);
+ 		break;
+ 	}
+ 	}
 -- 
 2.43.0
 
