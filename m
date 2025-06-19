@@ -1,69 +1,73 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B15818024
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62754230D2B
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347366; cv=none; b=eoLyBQckFJBPG8NhWihYILS/V6yN7PyHC66pHEJ2SNADwA0mzbHInMfLNjx73+tyZxBNdZQMly9Ap/6y/0Smc/W+ZDiA6NE9AytQ74xi1YQx1cCFjey5IfqQw52CmoL0fbDn3Ft6nJi3UrFH4hdtihEupDG5SwZE3599DyCVc7o=
+	t=1750347366; cv=none; b=H/bsEy3v8bBt2UCSrP0P39JFQFzAh6W8q6bsQcw7qX38tlauABb3jCIeMHKgXUhNrTQLGuKpQGOmgh28DHJjCH2lmhfbAFI6sdQHmT8WRByDVBA7JR0Cl32adXbzxRE6xqEngiYtjaPDB39K7YKTDEqDOZI3SXllC1/LJN1Ngqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750347366; c=relaxed/simple;
-	bh=0cWZVh1DnDmgtRRclO/Rq8SYgkk8Z9YOtu7IV9etMkI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XV/TnEb/7Iicp351e1LdEIxKKQd1LcKQfl6YeF1we7/VI7AFxjCYHe/EFVZ2ci+l76MHT6ZTVrNlHY3Yst1MtYk1JTPE2XFvnHDhLKxiM9zE6a2B+2umcKUNQyidzrWkO69mT5cgz4qEfTTd9NbgtURGQRCH31OBUy2XW5x7ug8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cJWVO7gC; arc=none smtp.client-ip=209.85.210.174
+	bh=xwk0eTDAOpZyUNjApNyy22uEAgjpbHpUiEGETFADd38=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=seweEPWIZyvDXOUvfnpSkyge0K5l5xoaWgbwqfvaVostl1QNWZXtAzFtMHq0ZyeByOtizUeOlaQW3trY0g1GzxFwvSCOxR4XA18UwqUeJwhjVbgUcddTExjUi7/kb8wHZZipXGBLPNaNDNZKGCtptsu81Wfv8krQYsihtg1XKFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bc9u/OiF; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cJWVO7gC"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-748e378ba4fso1150792b3a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bc9u/OiF"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-748ece799bdso560157b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1750347364; x=1750952164; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTJnJaUuZ2xHV0DzJu8wPKdEDEt5tRdn+2X5Ga6KcwA=;
-        b=cJWVO7gClWSDFdBw6kWajh7HfkyRbVNHaKFssxHvZ+Qpoz7yAbmvKi9BLeniSyuWJF
-         wAi0v1veXpfWf/d583t9D5F0ydVm47Tm4bNYZish2GCJfUn3LskpwQW7jNcd2br/EUUG
-         U5gExNMUdX8KEzXGTPwxQ/Bwn239VC58ISZb0YiGk873iSX1TQ/9ibyLnUK+aQwatVOF
-         xqS1zYyJ8hJGuNOPi94yldG2qfHnj09gTNCmYi21A9+xLUxsJWNhXmHCQuK85RENHVM6
-         avbeoI5NuR5E4rPPv7dGV5UTKLk5sq6ZHmwagv2X99D5LfiYFqKQN6jjaslIHSmRZqcx
-         Znkg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kRS5Kyl2q3cLJLihzFRkXSQVn55eac134r7059wCugI=;
+        b=Bc9u/OiFf0DUvXyAtcpQ1IEuvNZ6jZ6WTNbv0nUOML4sLhstClFHhICcbKzJRj+yBO
+         0CWQ2cA14uc6QPBwloE+niwINtQB5MYFpIxlmTj5Lb+lfNPrMqnI5X/qcdVv/8i7Lt9Y
+         t+xGnJOyR8DeWO8i1uS0RyxIKFBKlbE33UiCcdb+K1OeuTKIElIy6E5gL+6pl/kkqM1S
+         mPdLtDq1E67vwCwBzIPzz/sxl58kks+AUB0UdNvuJQp856lcpMjXNE0ec9gc5tLPBfCL
+         bJoOswHWqdQorgA17L9S7ouLbJqwP9wb0K4ywQQZpHmnLj5Rv+wqdEwzOuCfArgqJ4d2
+         aipA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1750347364; x=1750952164;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CTJnJaUuZ2xHV0DzJu8wPKdEDEt5tRdn+2X5Ga6KcwA=;
-        b=JTJPO9weMFq3fonU1LcLfmchVHquzd6oK3lLh6dkf9VpgIV1P9djFFSpgiDqDD+mUm
-         LeXK8jgRwSUoZaMJqbfqjgWltWlgEWMyMGN2CkZ+f1kiTfftQ877OhJaCtdq35Ps6J4u
-         4zIEFlwTGk2dewyov2AbQbOageuWzEzSPAfMhqVGsnUPWva0Gvrby//Yi8XP7W0sireX
-         QcYaRsL2a6dy1scoRC4RF0eVlzC+zHMkO9RDvEYHm3HOK3cniaUpKU6jdXl8yyDrlLuq
-         b+dkGzrlfyaPdA4D0jvp6qoaYuOBmWv/5M4IG26FHRXNsk+ay2Zlk0eX6nFmv+D1HpgP
-         pvdg==
-X-Gm-Message-State: AOJu0YySeIqs6XwzM1rJrq+elJYMmZDCoD/tfX5wo2Qobr1KKgIzn7tN
-	Aq/p9wONDlPllcCeZLiikkFcNjXw/jWlc/fPI4Y5iAp77OK27edWM3x8D5TcPtNE
-X-Gm-Gg: ASbGnct4fgB+3gnuwQ+SY+Oil0FEoFA9fVD8Pyjevmg+N9jJd9+9ki8AL2WlgSWMyvJ
-	azQ0kX5NDdyToYy1I+qYy2F/v9nfJrWmI463QYrYawYMNE48DoE2aPpitMh5+C9GtXLfxV2OUmE
-	8ETMMbXnLbRrRCiIIN+84ctrU9DZJaqEnWyiZ3lWcsdbp+ogKoWwuAEXH814k0XuD2KRjtPTZvF
-	GyAXBmN0P8E2lRTyq2Hi7Zo79TxDEYYWFUxVaGk6o9WajDpVc6nMMdEbtpafk0qrvCTxMsdWpnG
-	iqV573VmwCQrBZBKiGAxNsGY5UcytuJh3UHGxpxeMhtAsmmvgPAV/74c8Sbq5jHpq7o+hbV2jL7
-	1pDce8HOLetd33Ca+zCpEh4o=
-X-Google-Smtp-Source: AGHT+IHmWYvz2qvQYJDl2c9cLnQDcXPafp9kXwWuNqU3Cwx0oyYS49QDQIoaaoJsawlJflq2QViMrg==
-X-Received: by 2002:a05:6a21:9ccb:b0:215:eafc:abda with SMTP id adf61e73a8af0-21fbd4d48f6mr30825024637.18.1750347363956;
-        Thu, 19 Jun 2025 08:36:03 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kRS5Kyl2q3cLJLihzFRkXSQVn55eac134r7059wCugI=;
+        b=R+BlVJ88sSKoGtvYYVa0pPmEYc4DgZ1X3Jabm37HzXODmcCq/zZ0JtnOowHOAsz9V0
+         glkB7hxoFKepZC0KUUImRhvTQygyqoGIFhgCGKpKYC5V5P95wMS8HwAtgwxr3XOAm45k
+         v+g/QIFMHttao2mWrvdza0HVsJFk2opDQh+KP3pKqe52XZ/o2eV7SCG9t+rWbPAhjQpQ
+         1jIenIGUDqFN0/7m89L87hJeQlP/19XE915F1zQOLlxEi7w/p6ZgTZYBYHLxIhogM/sF
+         2Bkmp4p780lV8ecynYQTvI/iMdQhCUlM/2zZDdqFWDn9qjZsatIvHIwYHiLAAazqTBTU
+         YOLA==
+X-Gm-Message-State: AOJu0YyxE+3XRMe7PnvBsfH9piKPzQwoJCECTnquZQ49ylyvj7iidAXl
+	kW7LM/M7JaSFUu+DpxYcuzn1EgZ7ySDwLlg5sJ8ejkYJtxTXlYhDbH1gf1fEiotM
+X-Gm-Gg: ASbGncuI8F+NBcggbrHmQh+ewRf7yU3lhdm7wvqq1IeWTRwbeQduY+fav8iX4jrahFG
+	r62L2mikerrLAXvBFoIyeIIt1ZHe+XCIN27/LwtLxGCN8ku+L8Oc9rWvETp96j257xC2/g7V5tG
+	nRmrHn0mgBlYss+rqBzlhsGR4tg4uspYopfhVi9xWOnAhIcLbWc4BypUe1VhrKvDCACq91UiN/+
+	1TcPKPApBOsVXro0QZE+Z1WLtI3w8RGlDgM7ZEhJWL5nHvViLrPj029/UxU41tiIx6orNyfuzmf
+	M+dtW0TS+kdU0E6t238NRjkmF2mg/0jR86A3nPPpqeWA5/4FGVlI275vDKsCLDUf7bhonbSt/Ja
+	uadF/yEr2nvuXvrgRkxL1pZE=
+X-Google-Smtp-Source: AGHT+IHvEbwRWzkBa4jNkGjsaohL9fWQtyAhGdCGMktjxLrlTpcNMUxZzW6arRRuU1zY4SnbfgGLYQ==
+X-Received: by 2002:a05:6a00:35cc:b0:748:e1e4:71e7 with SMTP id d2e1a72fcca58-748e1e477d8mr11860237b3a.23.1750347364523;
+        Thu, 19 Jun 2025 08:36:04 -0700 (PDT)
 Received: from bharathsm-Virtual-Machine.. ([131.107.1.253])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.03
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 08:36:03 -0700 (PDT)
+        Thu, 19 Jun 2025 08:36:04 -0700 (PDT)
 From: Bharath SM <bharathsm.hsk@gmail.com>
 X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To: linux-cifs@vger.kernel.org,
 	smfrench@gmail.com
 Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 1/7] smb: Use loff_t for directory position in cached_dirents
-Date: Thu, 19 Jun 2025 21:05:32 +0530
-Message-ID: <20250619153538.1600500-1-bharathsm@microsoft.com>
+Subject: [PATCH 2/7] smb: minor fix to use sizeof to initialize flags_string buffer
+Date: Thu, 19 Jun 2025 21:05:33 +0530
+Message-ID: <20250619153538.1600500-2-bharathsm@microsoft.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250619153538.1600500-1-bharathsm@microsoft.com>
+References: <20250619153538.1600500-1-bharathsm@microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -72,28 +76,26 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Change the pos field in struct cached_dirents from int to loff_t
-to support large directory offsets. This avoids overflow and
-matches kernel conventions for directory positions.
+Replaced hardcoded length with sizeof(flags_string).
 
 Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/cached_dir.h | 2 +-
+ fs/smb/client/cifs_debug.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index bc8a812ff95f..a28f7cae3caa 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -26,7 +26,7 @@ struct cached_dirents {
- 			    * open file instance.
- 			    */
- 	struct mutex de_mutex;
--	int pos;		 /* Expected ctx->pos */
-+	loff_t pos;		 /* Expected ctx->pos */
- 	struct list_head entries;
- };
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index c0196be0e65f..3fdf75737d43 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -1105,7 +1105,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 	if ((count < 1) || (count > 11))
+ 		return -EINVAL;
  
+-	memset(flags_string, 0, 12);
++	memset(flags_string, 0, sizeof(flags_string));
+ 
+ 	if (copy_from_user(flags_string, buffer, count))
+ 		return -EFAULT;
 -- 
 2.43.0
 
