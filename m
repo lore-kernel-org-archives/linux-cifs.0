@@ -1,70 +1,70 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F3A18024
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6E02343C9
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 15:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750347373; cv=none; b=FX2LQsisJX/WxSmfFTubopqJpJAnt9gvj88kPSiDn7A2YI9A0iDZN29W63GjPzPq3l7xsMamFVtqpqRl29jslGEMkkP60pNcoDbczAmGiAr2ZZZ2FFOtXf6wyyTX9UbNJOds3B9KDm7Skq+//WP+mKySTWhwr/tAjPZwybeZz8A=
+	t=1750347375; cv=none; b=EHMfbHbQ9naDmDib0V90CyCa5ri3kGE5lNjqfqri7P0nLnTV4bmRN9SlHwcinuy1ZwiyAHyjbSR/rpkkSLn9ULL9Xm5AHkyreSQEYb++5VUWHBiCRj/nQtaqiqBRsQq0XUDTyXWJhnhQVN0+jfJ3DuP5E9artztHebNXcbc6Yh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750347373; c=relaxed/simple;
-	bh=UrGPVM+t8nLQQrvWXbocuoEIRqp/w7c+EkOLHnLwrtM=;
+	s=arc-20240116; t=1750347375; c=relaxed/simple;
+	bh=UZAJLORmMQ+VPiHPCuSghMrQnYqnP8Wrf6bFkwdkl3k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H5y8RnSlTcIw4iZko4lvGdammQJtvMZ3VbnTRo/omuyxnw/cxNG8V42GGiRyd7SGi9TxYpruzyCEAIXa2BM4s5U1iPUP3kCwLC2tGQHmaJ8j0+LG1muwUeQDfnS23MPZXzDQnbss91t5R+Kh1OhN4iiUNuB2RAhO0T9o90iL7oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PR1h507s; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version; b=OGiJHdrNEhk3a4vPSk4j4A5X5muHRhP8rrul8zIknaVrx7oaw6qZYK4y2DIbjOqjlgBPJuEbvLUliTZmB21SdJBMjqKUV5FA0eR7c/COXLVrT5SvSoWQRyu+vufEaBF6nSLzWoub+iQUq1HhqEclGdS6TVBt2rCKudynvyLoIqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hzubxLSu; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PR1h507s"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-747fc7506d4so660455b3a.0
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzubxLSu"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso955529b3a.2
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 08:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750347371; x=1750952171; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750347373; x=1750952173; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1OHaW5w9SedKqw2AWXSNKSBXgzvsmnqQo+FRbmC4P/8=;
-        b=PR1h507s/+TgUV0Nt9tqaFg8nH48wwYCJkLrDHPhRSK0+9pvxIw0RjXsZGVw2WS2PM
-         yiCr8t1C8wtPFpvMphJryNiDjqk6Jdj9RMaaZ9LXMhbOaB6oFlCD4jGAPiJvcP2kON5Y
-         ybz7TcDQ3tYpxxdS/Y4r9QfSf5dCFmzpTva3j5SLh7Xw3IY8HQR9Hxtn8GwgE6JwzbKr
-         k42acby1fZ2OL+pRQAcqSVMOpeXXFs4x27CRj4Ml8zvMawJFrhQ2yKbYh7hrcq7oeFIK
-         fijNnJNu4cQORZDZXBBuKC5/D3enir784xxhl23gHOaKC9H70uZ4dOblMcko9vEGirbi
-         aPTQ==
+        bh=1Tw9GjVq0m6igbM1IXs1HSDtvLN0hWKPC2IU3RYNl5M=;
+        b=hzubxLSu0IobhZoMHjVd7J2Btj7iibjJPQvuWlrZeRT4WVl6rVHwJsmnga9kp/4R26
+         9vF8GzyMvtPe0+civiybwGJZhMdRF8uyts+FbycD42MWcNCEL88VModQAM9MpbmKhmIv
+         Bt6M+UiNDPfk0y8JbEoF3tPUzfc+46Ino4gQxnAyTCUZ4+XxQWJWRwsiR0Ut9IsZ41rW
+         J40Rkee6Ah2Qih69Qz8Jz3/ijlq5TZenQV3y6bxe7woaA+EOdo7uFeU5jI2bmpHhlSk/
+         7gSv1EFaKxlQuGvC/jrnHx1kxjxp3ATfXVZu6uX5WFAS5cokAnXoDzTs8mGo8h//NocR
+         qO4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750347371; x=1750952171;
+        d=1e100.net; s=20230601; t=1750347373; x=1750952173;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1OHaW5w9SedKqw2AWXSNKSBXgzvsmnqQo+FRbmC4P/8=;
-        b=r0SDHI8dwS1dvL/9IjjoY7CPIN9FFbwMgwNCNvxuNb6g73P61fjPTYt95jyIrok8PP
-         ZPawQ5WEp0xWTZ5Lljb5g3hzwTiRq7j8c80dWR2dcRmV68q0o+FuM9vBlwEl1VkmCXl3
-         zN+GGMg0bvGs/53skWGWV9c0+DugC0UwLIpHbNFbOrdxDIDH7IDMyQYP9CsNfAvy8wKX
-         1w4L7OI+UiFayhpfSla5v3Hk0W+L+yymeHfaGhzoFZJSOxig55fDPrpG2HryKfIMCv1J
-         Efxrsb5e9OCsaPJQGdDOxmoBneKPn6G5rzAd20da7BILuV8HTh1gfDHyJVP3YS+piADC
-         mEFw==
-X-Gm-Message-State: AOJu0Ywjw9Ek5I02ugeJJbzTXceNZNw2MH+2UCMeRIj8N1XDN4Ti+Rl3
-	xQw9KhQoF3+4UjiZ9dHV0tON1LlfvLLPGYE3UuBCcnmLH0eWQbcrsEzxWigL7ikZ
-X-Gm-Gg: ASbGncsKEUIFahgEoM0e4Hh3X1GOLX9vBRexPn3NiT63x78Y+5WOPRMgBJBttqe+UDj
-	B1VjK9CatDeuZ/EzB2B3M9fNISi1KDmibg1VVttXDy/8H+/cnVxD0uGwydrDxQJNuTVv6eN6S59
-	5/QoYzpERIRBUFPOZzO1lyQXEdpqzuZZZoAvj9ndlDGPQ51IAA1ax6Utpl1801NmeoLyNlo/s8L
-	AsvT4TzDIPrVVNzQgxSKwBvwMFICT5EJ1EDMOPAtqRak84lH799VJBCwVPEOs9X82PkpUhUrJS0
-	bmDHo2sjS5hg2rkH2Qm86BasQp6ARAwtsw/YXp0ixEFXlCO0kjbtYvAST2EQLuL0UIrwd8A9NUp
-	p3jlQXo5eTBK4
-X-Google-Smtp-Source: AGHT+IGvNyiYwV+WovH2X3OweI+ykpgZB7UAWzFAftCglL56ATqpxxVIkuvCvhWiyABoIzuLfWx5fg==
-X-Received: by 2002:a05:6a00:2286:b0:73e:23be:11fc with SMTP id d2e1a72fcca58-7489d0556fbmr25501409b3a.22.1750347371035;
-        Thu, 19 Jun 2025 08:36:11 -0700 (PDT)
+        bh=1Tw9GjVq0m6igbM1IXs1HSDtvLN0hWKPC2IU3RYNl5M=;
+        b=tjUaHFRmVvOzz4Pes05Iu3XLQ833OYbdFYyDTuuqmr5IgYjtGz0Njy5Untor8T4zgn
+         aqdehbJChO1oXy1Adlk8B8nAKTIGy3FFzTI+vtJOJ65x3LlfXjFZ4W2WywZbZmscZfZ4
+         dneCC0PdoLOiHoH+hKNkdXOwTY0G2SsVI669t8teYDCZQeEF8mLJ9rwcp1CgMA9eA84m
+         s8GZrbbBKcJ0BtsnvKMm8tqwAEnccaWi3Coa40ca76HfXwPIn2lH3ZHczsjN6Yp6XIaf
+         K5+TaB1K1/kmk4D4KIW0ihdVkcJK+/GtozQkAtkLN1c+81BOxv5X+QLcfMA6npEpxdYv
+         M0qw==
+X-Gm-Message-State: AOJu0YxHwfyIEydDJrL1oq9wAmTt9/GYFrq8a141C55/8LmgwFE3fT1F
+	SFjjPWGutBzGo9j85SrXN21RkMEDsnqXAEwEh7DlDnUC3bUgJnx5SH8ifnuJWMBB
+X-Gm-Gg: ASbGncuIduWhsXgkwhkhM6NMhGdZNvx8t69sZIsrm7muXAiwphI7jKdjXf1CkXca9u5
+	35sFpIWE+W9uSXem3R3eeRB+Fa+LW1pdFcOj0GeEUSBHm5vVmZEy0jcqV8QvowFk4tzhIbg6/nP
+	KP4McLnliPcwv4GvbnufYYg3ASv3t2FwHV+jpJUIr1g2wdh4oqlnsH8Bm2VrnXB+DKSgEN/WUe0
+	xCc9VaaRTa1fYttHAir5AGBPjHkNGqU9YQbAuEkV5HxH9ceL6veIwnWM6cdxh7eTQXgEcW7Lkgk
+	lB7atLe55X20b+X9TFYX2uuZL0nEtSBWW4zLp0qqrSxV7vTWQDZdk+EIq0MGj9UxGTWnkRxyj+K
+	eb9k+Vp7RCkQx
+X-Google-Smtp-Source: AGHT+IGt0wnxnEC9aBZQyEWVepXCUdl4Q0gHmvPYCj4dHPblWVPPhHfEvpS1GtpcatxcwYW1TapTHQ==
+X-Received: by 2002:a05:6a00:13a9:b0:740:9c57:3907 with SMTP id d2e1a72fcca58-7489d175260mr31160605b3a.19.1750347373397;
+        Thu, 19 Jun 2025 08:36:13 -0700 (PDT)
 Received: from bharathsm-Virtual-Machine.. ([131.107.1.253])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.10
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7490a46b574sm162838b3a.15.2025.06.19.08.36.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 08:36:10 -0700 (PDT)
+        Thu, 19 Jun 2025 08:36:13 -0700 (PDT)
 From: Bharath SM <bharathsm.hsk@gmail.com>
 X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To: linux-cifs@vger.kernel.org,
 	smfrench@gmail.com
 Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 3/7] smb: minor fix to use SMB2_NTLMV2_SESSKEY_SIZE for auth_key size
-Date: Thu, 19 Jun 2025 21:05:34 +0530
-Message-ID: <20250619153538.1600500-3-bharathsm@microsoft.com>
+Subject: [PATCH 4/7] smb: add NULL check after kzalloc in cifsConvertToUTF16
+Date: Thu, 19 Jun 2025 21:05:35 +0530
+Message-ID: <20250619153538.1600500-4-bharathsm@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250619153538.1600500-1-bharathsm@microsoft.com>
 References: <20250619153538.1600500-1-bharathsm@microsoft.com>
@@ -76,41 +76,26 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replaced hardcoded value 16 with SMB2_NTLMV2_SESSKEY_SIZE
-in the auth_key definition and memcpy call.
+Added a check to return -ENOMEM if kzalloc for wchar_to fails
 
 Signed-off-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/cifs_ioctl.h | 2 +-
- fs/smb/client/ioctl.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifs_unicode.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/smb/client/cifs_ioctl.h b/fs/smb/client/cifs_ioctl.h
-index 26327442e383..b51ce64fcccf 100644
---- a/fs/smb/client/cifs_ioctl.h
-+++ b/fs/smb/client/cifs_ioctl.h
-@@ -61,7 +61,7 @@ struct smb_query_info {
- struct smb3_key_debug_info {
- 	__u64	Suid;
- 	__u16	cipher_type;
--	__u8	auth_key[16]; /* SMB2_NTLMV2_SESSKEY_SIZE */
-+	__u8	auth_key[SMB2_NTLMV2_SESSKEY_SIZE];
- 	__u8	smb3encryptionkey[SMB3_SIGN_KEY_SIZE];
- 	__u8	smb3decryptionkey[SMB3_SIGN_KEY_SIZE];
- } __packed;
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 56439da4f119..0a9935ce05a5 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -506,7 +506,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 				le16_to_cpu(tcon->ses->server->cipher_type);
- 			pkey_inf.Suid = tcon->ses->Suid;
- 			memcpy(pkey_inf.auth_key, tcon->ses->auth_key.response,
--					16 /* SMB2_NTLMV2_SESSKEY_SIZE */);
-+				  SMB2_NTLMV2_SESSKEY_SIZE);
- 			memcpy(pkey_inf.smb3decryptionkey,
- 			      tcon->ses->smb3decryptionkey, SMB3_SIGN_KEY_SIZE);
- 			memcpy(pkey_inf.smb3encryptionkey,
+diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
+index 4cc6e0896fad..7bc2268d6881 100644
+--- a/fs/smb/client/cifs_unicode.c
++++ b/fs/smb/client/cifs_unicode.c
+@@ -466,6 +466,8 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
+ 		return cifs_strtoUTF16(target, source, PATH_MAX, cp);
+ 
+ 	wchar_to = kzalloc(6, GFP_KERNEL);
++	if (wchar_to == NULL)
++		return -ENOMEM;
+ 
+ 	for (i = 0; i < srclen; j++) {
+ 		src_char = source[i];
 -- 
 2.43.0
 
