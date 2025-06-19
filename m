@@ -1,171 +1,110 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AC8634
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 03:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBA123C4F5
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 05:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750304223; cv=none; b=kfMdTTb7eMUPJkCKhczpd9ugqSJ1aVNfCILzO+EeWwW6SckPnRq3kk8oYMoFo5923wdFfw+OirCqN9Mjx5auHYYXo9TxNuZaROxWDfGh5QYfLLJHGnVKuk2IYvc+yOqhOchDWPyUMQ/vktIGH7LSZ78Xc00CTUO6CFEQTUV2zOs=
+	t=1750309423; cv=none; b=HMWdINOUTAWO/LRJxdc4S66byLHSkZ6pyhpi9GHce6dszSm0duNn5AfKlmOZcYY+19wkplsRobloA9ZNvI50PbFzcpmipFmpPiCHGDWByUQ7UucJvazR1bw32BpU3u+TQh0iIyV8INxzkPptvQditMsogZuBAlhBltIKva7qoq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750304223; c=relaxed/simple;
-	bh=C5eMBje9jYDRwYqJsWH7SrAV5uBdYG46z97z1y6dZfw=;
+	s=arc-20240116; t=1750309423; c=relaxed/simple;
+	bh=lru0IbGZxb3U5mZGpSxa7YlYMFAof9n0AqZn50Mafv8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T8nneYrcBkWTfUpFz9ANaA/rYYj9mRdxFObFLeKFbhVX7lVIEQsn4e/r9uQ/AUxbuyfn1eGZmw0gq8YVWHW2B0s6L4oa3l/vcP6sm5EQuvNDo/UdXDes9tpw8uZ7UYMnQj5w8aD+omKvxnsu8XhBi0VtryvMkxKkmGSDm+jkoaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZT18Przm; arc=none smtp.client-ip=209.85.219.49
+	 To:Cc:Content-Type; b=qkGKQVIIRrMvSqwA5wQTEuaVMF29U+6I9EB0mmGCqN/rI1Dl2VXvWBUt70QbTBPSKmHd91RyyzXWu55nw+Ey9/48x/doVRVpDxaWQMqJ8O0u1GaUSnxQjZQnE2zVzBvlY+916E5qL43A/NtyNax/Tu7OECH5jcxx8CSRWpGLgOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WwiUUj8X; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZT18Przm"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6f8aa9e6ffdso2801506d6.3
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 20:37:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwiUUj8X"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ff4faf858cso2924897b3.2
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Jun 2025 22:03:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750304220; x=1750909020; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750309421; x=1750914221; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bBmbvA0xtke10wNQMefD1CFB0PPWLAXTf3SwAQUJOXs=;
-        b=ZT18PrzmrOAAQx6GVTQ8CFxFCJU9OIXpwVWCfeAFacRLCakmWMFNXiTArrFhW1GoDr
-         VzMFjUU1ocdMAH8eYz/tVaqC4B/R6ILy4KJZbfqUi5PW1zugsulGv8IORNKFw+YXqHSz
-         bplZjVBUDKaOqiz0FZuPQNBwNmbGNTDdM0BLhkNDng/dD28LiDFrvxEeCH8y0PMFxf1e
-         R31X2dA0h27NPDtyXw7mYvWkrux9W+wD20+RdVTvrolpfDFuxqMfHPVzO9wo78dop6C8
-         YXJ55laIS0yFAuTNeX1EilYORwzk8v12rWZzlVFGklNHEVB1qIUxB9j9ulGzrCaP8dv5
-         0/RQ==
+        bh=cq47FPO29057fAy/gbCwE7jHTZ3mLnZJzvRXeD6jC1c=;
+        b=WwiUUj8XgrWgRe7hNd/B6ihTNpAm2tZYmxa/88CzKsOF4PcEyum0C5paxHK+LviiUz
+         w2WzYDjDB9XEwLnQlcZGn5LPDYv5dBH6eClCkyFbks1WfNaM0Z9yJIy4b8100lBrX4Mi
+         Stv0dW+6iSnJYhPy9VUoKDE8DmwYeYicFsNh/mReEFRX+0pI0COekdo++rLUi0Sc+I22
+         jgOO2Sq30xw3YpuSDdZ+DcxCIc8O7nUjirJoW1MrhtJzmBwcVVQPSgNHRUpg/aneiVlU
+         wG7plQreDJm8IAoXDQ9KlA85IFU1JM9suUjpP5r38x2NmtkRm4p9L5zbhWtIHqlptjX9
+         im/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750304220; x=1750909020;
+        d=1e100.net; s=20230601; t=1750309421; x=1750914221;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bBmbvA0xtke10wNQMefD1CFB0PPWLAXTf3SwAQUJOXs=;
-        b=jxmaFFoCQBn/TrXfvSZwAyhQvdQN9Id+SSia0D9YvOlXr19L96T2l3c5C6C+PremgX
-         2dTSirYRMiyIs4KlWWXa3ZgIVqW42PAryWgufSsn3YA1b5e6EJMeTSnF3PqzoAI5k92L
-         UKFQkTnu//EelxvIJdo5PnmnV+ru/PItYXY/90D0b9KVblBDvM+gaACiXpaYXUMd1Myb
-         0wy4tk01bzRjmQRq3+gL1iM5FxfweUsgTCzANNo0HWxEx7HtZ4bPXM8BTGkpONoqQfEh
-         24Ad0Dzf4dxvmujaIsNrTpqs2MR0kX35X8t2/TDSqv6ZvPLqtwIZA1+pjnrC0QYrq8jP
-         Tojw==
-X-Gm-Message-State: AOJu0YxTyly4Gx8eTJKXPTtNA8fOpuBwAyKC0K+87y5wrnk91E+ny+7E
-	MGTcuRJCvVOMTf8rNWXoKdO8IcZxFzIj6pho7BT1B+/v8pLywg13yfnlngbtBAkJ9goSNGuKG3x
-	O2nfjS6tkEdsXMubVH1fbES7R8HjykIEQJQ==
-X-Gm-Gg: ASbGncv+ZU9n0UBmIfY+nGiKAxQ0ADOaB1Tk6tqSTzpQ3aJjfaE4pt7+Nb7F97GVOvy
-	Kr2vQvl6U2NGPOd0Bnvl7n1H0H+upxUXyyMMWF45fus7eZJJ2acWzxi42ZUSaqkWGAJOsiNbY8g
-	KuAr3IYVR3Dus4ZLWAbH0qd/J+tgau06Qlw0jSlzsboe6+zrGw9lfbZ91RMBcJ0SbPFcSxnBKyP
-	2BQKg==
-X-Google-Smtp-Source: AGHT+IGD9nYVL9aTMsAxvTREGKA4EswhH4EiSiqat9M73Lf3JzqtnFVoEa9KqHDwT6AqR4xuM4PpVtXW5a0Zk+WG5fM=
-X-Received: by 2002:a05:6214:2024:b0:6e8:f3af:ed59 with SMTP id
- 6a1803df08f44-6fb477703admr351246766d6.22.1750304220092; Wed, 18 Jun 2025
- 20:37:00 -0700 (PDT)
+        bh=cq47FPO29057fAy/gbCwE7jHTZ3mLnZJzvRXeD6jC1c=;
+        b=MDZr/OG1gEluB82vBrHnxm6CQcLRSiAAUH7wFBxbwZcfc5maJxvB+CQ4jXy8WuAYKx
+         nuBvZA1vu9Yk6rec1gSqJ0vv+ZhQUrSzL6dL9jYUF4ZFRMYPVZb1NdJIQK6MD470bnFz
+         uAharh75QVpuRDVG3861IuC3B7Cd+VkvpI2OGW00WtO2oIjRLSKNTE0bd3YcLbfrwnll
+         aSY4bbAvlBRfjRpfzb2uIiQVoSfxQeqSn1qZ4qA/JorJabqAc73bpjRPgzaf88uEdCWA
+         udbO+X4C22tWvJX5hoRSaRHT6qehEXtSmbzJIhm9i4RcbhdYMABq0Bl3089j8DZCVs/x
+         HeDw==
+X-Gm-Message-State: AOJu0YzmN0q7bC2fJhJmtiwCjrf0t4QVhE1QyKm54B+wvgrAmQgpOvM7
+	B3A2skcSmf3IHTnEPVR70PE4pbNtS3imMZV4uhPvRhfIrRD+mIP5VEJfdYu6tKj2zdeS+yilbbX
+	Ur7xYmh4z56avvIGFJpYWXhumXiMy24k=
+X-Gm-Gg: ASbGncvRodYVsh9esmCt2E0IPADaq6aB5EUKEmufFlSbVK99X/T9dZ5jhXtAlRBi7gz
+	0P1UvLwQwl6lAVf2WUxsLxWHSY2ttbgefEpPcxflzo4PxAXK5FwylFkIrJ1cwHHH92cvbIQOgKZ
+	hfoPEN7q84yLoIGyoVs0wzeLjeRsoycsu1R9pH/6hcDqI=
+X-Google-Smtp-Source: AGHT+IHwnTAquqKniLPNVOBWKMKHKjR0VfdkKWyAWmBtlAhpJPc4wHoNNVc3IZQZp7UVx2nwoxFQr4OjofPXfA9eK9U=
+X-Received: by 2002:a05:690c:680d:b0:70e:143:b82f with SMTP id
+ 00721157ae682-71175459cebmr297612927b3.32.1750309421144; Wed, 18 Jun 2025
+ 22:03:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241120160154.1502662-1-paul@darkrain42.org>
-In-Reply-To: <20241120160154.1502662-1-paul@darkrain42.org>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 18 Jun 2025 22:36:48 -0500
-X-Gm-Features: Ac12FXxCsQU4pg3S5gVNtrcF5sLkRZqbS9Jk9RV_zg8NQX7FBDejVoI04-J47YI
-Message-ID: <CAH2r5mtY8nGN_TFdGZoDAq4ks++bv1K+YhbkrmX5sS8So3+ZvQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: Log an error when close_all_cached_dirs fails
-To: Paul Aurich <paul@darkrain42.org>
-Cc: linux-cifs@vger.kernel.org, Ruben Devos <rdevos@oxya.com>, 
-	Paulo Alcantara <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Henrique Carvalho <henrique.carvalho@suse.com>
+References: <CAH2r5mtipm8KB+FwzYKAvNqH4ECAv+1+SUqyZ0ur6k6Sy8KoAA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtipm8KB+FwzYKAvNqH4ECAv+1+SUqyZ0ur6k6Sy8KoAA@mail.gmail.com>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Wed, 18 Jun 2025 22:03:30 -0700
+X-Gm-Features: Ac12FXyhZvXVM32u-9lMJwmWUjCqLNnIRVfJPHkad0PXQxNxP45DSiIz7YKPOV0
+Message-ID: <CAGypqWy_kDNvDmHzphFUQCbahiKjt2qJNmur3Ehibm+a1-wZJA@mail.gmail.com>
+Subject: Re: smb 3.1.1 client dir lease performance
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>, Bharath S M <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Was looking through old patches and noticed this dir_lease patch
-wasn't merged.  Any thoughts on whether it is still valid and worth
-merging?
+Good points.
+I am currently working on performance measurements related to
+directory leases to enhance their benefits. Based on my findings, I
+will be submitting improvements patches on cache policy adjustments
+and performance tuning.
 
-Could be important given the recent work on dir leases
-
-
-On Wed, Nov 20, 2024 at 10:02=E2=80=AFAM Paul Aurich <paul@darkrain42.org> =
-wrote:
->
-> Under low-memory conditions, close_all_cached_dirs() can't move the
-> dentries to a separate list to dput() them once the locks are dropped.
-> This will result in a "Dentry still in use" error, so add an error
-> message that makes it clear this is what happened:
->
-> [  495.281119] CIFS: VFS: \\otters.example.com\share Out of memory while =
-dropping dentries
-> [  495.281595] ------------[ cut here ]------------
-> [  495.281887] BUG: Dentry ffff888115531138{i=3D78,n=3D/}  still in use (=
-2) [unmount of cifs cifs]
-> [  495.282391] WARNING: CPU: 1 PID: 2329 at fs/dcache.c:1536 umount_check=
-+0xc8/0xf0
->
-> Also, bail out of looping through all tcons as soon as a single
-> allocation fails, since we're already in trouble, and kmalloc() attempts
-> for subseqeuent tcons are likely to fail just like the first one did.
->
-> Signed-off-by: Paul Aurich <paul@darkrain42.org>
-> Suggested-by: Ruben Devos <rdevos@oxya.com>
-> Cc: stable@vger.kernel.org
-> ---
->
-> This could also be folded directly into "smb: During unmount, ensure all
-> cached dir instances drop their dentry".
->
-> ---
->  fs/smb/client/cached_dir.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> index 004349a7ab69..8b510c858f4f 100644
-> --- a/fs/smb/client/cached_dir.c
-> +++ b/fs/smb/client/cached_dir.c
-> @@ -488,12 +488,21 @@ void close_all_cached_dirs(struct cifs_sb_info *cif=
-s_sb)
->                 if (cfids =3D=3D NULL)
->                         continue;
->                 spin_lock(&cfids->cfid_list_lock);
->                 list_for_each_entry(cfid, &cfids->entries, entry) {
->                         tmp_list =3D kmalloc(sizeof(*tmp_list), GFP_ATOMI=
-C);
-> -                       if (tmp_list =3D=3D NULL)
-> -                               break;
-> +                       if (tmp_list =3D=3D NULL) {
-> +                               /*
-> +                                * If the malloc() fails, we won't drop a=
-ll
-> +                                * dentries, and unmounting is likely to =
-trigger
-> +                                * a 'Dentry still in use' error.
-> +                                */
-> +                               cifs_tcon_dbg(VFS, "Out of memory while d=
-ropping dentries\n");
-> +                               spin_unlock(&cfids->cfid_list_lock);
-> +                               spin_unlock(&cifs_sb->tlink_tree_lock);
-> +                               goto done;
-> +                       }
->                         spin_lock(&cfid->fid_lock);
->                         tmp_list->dentry =3D cfid->dentry;
->                         cfid->dentry =3D NULL;
->                         spin_unlock(&cfid->fid_lock);
->
-> @@ -501,10 +510,11 @@ void close_all_cached_dirs(struct cifs_sb_info *cif=
-s_sb)
->                 }
->                 spin_unlock(&cfids->cfid_list_lock);
->         }
->         spin_unlock(&cifs_sb->tlink_tree_lock);
->
-> +done:
->         list_for_each_entry_safe(tmp_list, q, &entry, entry) {
->                 list_del(&tmp_list->entry);
->                 dput(tmp_list->dentry);
->                 kfree(tmp_list);
->         }
-> --
-> 2.45.2
->
->
-
-
---=20
 Thanks,
+Bharath
 
-Steve
+On Wed, Jun 18, 2025 at 3:24=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> Bharath,
+> I noticed that with your patch we are caching directories (when server
+> supports directory leases) well for successive readdirs which is a
+> great perf improvement but I also noticed that they time out at 30
+> seconds from when the first readdir was issued (when the dir lease was
+> first acquired) and not delayed if the directory is requeried every
+> few seconds.
+>
+> Thoughts about bumping the timeout on a directory lease
+> experimentation to when it was last accessed instead of when it was
+> acquired?
+>
+> I also noticed that when we hit the limit on max_cached_dirs (16 by
+> default) instead of evicting the oldest entries in the cache to use
+> the newest dir leases we give up adding cached_dir for that
+> when we hit the limit, even though some of the older dir leases in the
+> cache may be about to expire?  Maybe we should replace the oldest
+> entry in dir cache with one from newest dir lease
+>
+> Thoughts?
+> --
+> Thanks,
+>
+> Steve
+>
