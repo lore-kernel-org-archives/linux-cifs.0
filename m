@@ -1,89 +1,80 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from cat-porwal-prod-mail11.catalyst.net.nz (cat-porwal-prod-mail11.catalyst.net.nz [202.49.243.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3087230E83F
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Jun 2025 22:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A156679C0
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Jun 2025 00:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.49.243.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750372304; cv=none; b=Wg36I8gjeqkAuEDHdh+h7S8DYW78B0FRF8ovzmh5cU99msFDRxzexIOSKu855DJddOIEsoW6u98a8Yvy+GixUjj46mzya3YVQ4Mc3Lkcw0GhO7qEUIofWgefhYHj7mVXZ1kzJ2hP58OJ126YqzFR2gEzpWc74cVOfKz0S74ZOF4=
+	t=1750379458; cv=none; b=nXfiSNb3B/4WY9WsRVwqFS9wlMW2Vb3W+u8dEhTKj7AOpMIM2Gzwj6RnQeL0xe77L3mLEXRXSBwcYp0YGGu19MVQX4QOz1wZs0vquqqTHu9CoB+QQ9YcFsti/+g9EcFDwBzTgKqHw2XJ45QnMrmymd91dIL1a/eeVtUJfhFrjjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750372304; c=relaxed/simple;
-	bh=FHIszSV3tMAr1tXnsr+bBkILf3jRaqNdmflJuCFEihw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=KbKBnv5miHzAe0hjOq5T0KcFRdvD6M28nM4NxCNmeAIGdgjq2/db40+6OVF5p3ufuOJvPzQeACZFAXoeMdXqDQRy+AfEim3PM2LR0Qq0r/8tvGgp8G4bUiUUG/WC75dTO2uP8NR/2xmFAvz+wqbQO+7HrxYmE88jAi+aYdX/moo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QyV8MZ2J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750379458; c=relaxed/simple;
+	bh=DEIvpIAjVRdSagdlQAEplwqmxyNM6y8DVDqIIZbYk6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gaD7BeSuMiua4LGyJtllUntpTDuLubfPeFDCjtWhbodqNr450xyc+PXznhDzasfmzLbuECPHVRzllvUadVhzEHkfwUNlbGJZJXQgxb04M3jn71TBibfbOzcf5M/1zSItZeie1KhnYqo6sstX2O4xhN7+W8nE415X7wPDQ4H2RB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=catalyst.net.nz; spf=pass smtp.mailfrom=catalyst.net.nz; dkim=pass (2048-bit key) header.d=catalyst.net.nz header.i=@catalyst.net.nz header.b=sapr8kGM; arc=none smtp.client-ip=202.49.243.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=catalyst.net.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=catalyst.net.nz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QyV8MZ2J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750372301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FHIszSV3tMAr1tXnsr+bBkILf3jRaqNdmflJuCFEihw=;
-	b=QyV8MZ2JKw0icUERGdCjsDDfGLmpivlKSB5rImOA8lnskem/WEW0/Y3e1YiY86d7UKSKGS
-	NkVkl3uL3dDroPtxIWDmNIo+CdLItJfWE76MIxUKcbG3t8BTnPqNdkHUgBEVcUNxdz4PXp
-	IXkvA7liEDs9l1Bm9C/M0x6urgzMm/k=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-368-N1J1aw97N-uBtjSDyW1tcA-1; Thu,
- 19 Jun 2025 18:31:38 -0400
-X-MC-Unique: N1J1aw97N-uBtjSDyW1tcA-1
-X-Mimecast-MFC-AGG-ID: N1J1aw97N-uBtjSDyW1tcA_1750372297
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	dkim=pass (2048-bit key) header.d=catalyst.net.nz header.i=@catalyst.net.nz header.b="sapr8kGM"
+Received: from [192.168.1.219] (unknown [114.23.142.188])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4633180028D;
-	Thu, 19 Jun 2025 22:31:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.18])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9E09D195609D;
-	Thu, 19 Jun 2025 22:31:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <869961.1750344431@warthog.procyon.org.uk>
-References: <869961.1750344431@warthog.procyon.org.uk>
-To: Jeremy Allison <jra@samba.org>, Steve French <sfrench@samba.org>,
-    samba-technical@lists.samba.org
-Cc: dhowells@redhat.com, paalcant@redhat.com, linux-cifs@vger.kernel.org
-Subject: Re: Seeing lots of coredumps from samba when using upstream cifs
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: douglasb@catalyst.net.nz)
+	by cat-porwal-prod-mail11.catalyst.net.nz (Postfix) with ESMTPSA id 03D78BA;
+	Fri, 20 Jun 2025 12:21:27 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=catalyst.net.nz;
+	s=default; t=1750378888;
+	bh=DEIvpIAjVRdSagdlQAEplwqmxyNM6y8DVDqIIZbYk6k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sapr8kGMEL7Sb1m6QzeeroSAmKVVewsfiCTzS+/kFxoFtCc+fCVcsiG1IEWqHd9JH
+	 w69s9dKr9rV/mjIFLeBp2KM9xBOmZprG3XqGQGRJfYnczsuuk6Ga29AZFld4pe/2o6
+	 wRhcqrtJDojsai0beRjoiX5TBRQ7nNOhLCWPBZ5G5TUmNhMOJcP/wwbhASIbL6RmZT
+	 GWROv/ZIg82auvEfUTu+cR+KR56Ni+1PgvPV4nomrnIyzB85RZU7cDsdXwjgyCqWCX
+	 3Bx/VvUW1nZAzDlX8RSCUbfUp7rVj1uzsdZL4m2Npc4cOnpRa7ZtTu6wocHE8H+Ih2
+	 nuQwZCLMFMrFQ==
+Message-ID: <2532598d-9525-4ca9-b37f-fb3582ea60ac@catalyst.net.nz>
+Date: Fri, 20 Jun 2025 12:21:25 +1200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <882335.1750372293.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 19 Jun 2025 23:31:33 +0100
-Message-ID: <882336.1750372293@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: Seeing lots of coredumps from samba when using upstream cifs
+To: David Howells <dhowells@redhat.com>, Jeremy Allison <jra@samba.org>,
+ Steve French <sfrench@samba.org>, samba-technical@lists.samba.org
+Cc: linux-cifs@vger.kernel.org, paalcant@redhat.com
+References: <869961.1750344431@warthog.procyon.org.uk>
+ <882336.1750372293@warthog.procyon.org.uk>
+From: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Content-Language: en-NZ
+In-Reply-To: <882336.1750372293@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-David Howells <dhowells@redhat.com> wrote:
+On 20/06/25 10:31 am, David Howells via samba-technical wrote:
+> David Howells <dhowells@redhat.com> wrote:
+> 
+>> Hi Jeremy, Steve,
+>>
+>> I've been trying to investigate all the reconnection issues cifs is seeing in
+>> the currently upstream kernel from running the generic/013 xfstest against it,
+>> and I've realised Samba is coredumping a lot (attached is one example, at
+>> lease several others look similar).
+>>
+>> The version of the Fedora Samba RPM I'm using is: samba-4.21.4-1.fc41.x86_64
+> 
+> The problem seems to be fixed in samba-4.22.2-1.fc42.x86_64.
+> 
 
-> Hi Jeremy, Steve,
-> =
+It looks a bit like
 
-> I've been trying to investigate all the reconnection issues cifs is seei=
-ng in
-> the currently upstream kernel from running the generic/013 xfstest again=
-st it,
-> and I've realised Samba is coredumping a lot (attached is one example, a=
-t
-> lease several others look similar).
-> =
+https://bugzilla.samba.org/show_bug.cgi?id=15803
 
-> The version of the Fedora Samba RPM I'm using is: samba-4.21.4-1.fc41.x8=
-6_64
+which was fixed in 4.22 by patches for
 
-The problem seems to be fixed in samba-4.22.2-1.fc42.x86_64.
+https://bugzilla.samba.org/show_bug.cgi?id=15608
 
-David
-
+Douglas
