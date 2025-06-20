@@ -1,79 +1,94 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E7E13790B
-	for <linux-cifs@vger.kernel.org>; Fri, 20 Jun 2025 14:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD3430E85E
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Jun 2025 15:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750431431; cv=none; b=FD2UYBkPQfMBUHZo3/+UTNukpg41nMKqy1QS8QOvJHKAfNriONCrvbh2j6NzuwZw6q/QAOWD3KbJzjpv6G05AvR4iy4nOWoDVwPW/80S3hra45n5bf7EfHs1tTw2oXg8CwH3pv/dNgQodm4Iwh/8Fo+yXKUWnJMkqNV5ULQQYVE=
+	t=1750431854; cv=none; b=NIKRLkfK5J2A4JpOj3CCsNRpzutB/Vp3OKwAcKrQnR6FSsowbVanfN8Nfja5Y1M3+um2eW91uZvkIVcvfixK8V+trcBIa336NRv6F82/K5bNTkuhr9vZdcsx4o/X3wZwdzDIJbk0ezxzerJkv6ncwxghsb4JrLOOoBiandvrFJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750431431; c=relaxed/simple;
-	bh=BHnGtCOG1TuIRLb4gFjkY2lll8tOR59dJZQCzp9VMZE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=e83zMoZxrvGKBwcJWr2bbw9AoHROEH3iWOVJTO0P+XsGP6kYXq13ySszfflfvzXhAUzKKUhrKYNQe7UcKHhNit5G7+N+YDbrAVfdwNAeprQbbrsgaFkiSK/H98YdbkCXlvsgkCgDVQHmSdfadU9G0n+ba5DCOheEGN9727JkhLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SfjdWvfl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750431854; c=relaxed/simple;
+	bh=qFXauZoyI8kmF/hN9UO4dqoA0DZw6yUaA0W7xe/t9Nk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KbXDuU3HnLSg6qFRNaigZIlSQJ0ReBG6C6uai/+lt08pJjPyNqeFd4859tH4odg8Ccf/2v9yhjvJl3CltyF3QclRTXhR8zmVMxL5qYQZFsuzLSxGQ7kSDF9FLemSsFWZT+P4L/WQqxusq0hB8OSCvVj2cevXwNtwKkU18ho8eP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FNfirscD; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SfjdWvfl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750431428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5fM9mX/U1lIPSzZz8ULPINyANLFwXqvdj3ejss2AyLs=;
-	b=SfjdWvfllAFM/nWg2rtO0Ebpca6C7BmqsKNAtUuwrNaacZQE1Oj/MC+tIgdufIBQdBjCIP
-	TFHGs2zz6U7dAkBe/5640J4CDzNijmijHtOgPw0z7tvx/SYpyafsI0K7yG3GBCs2eiILRR
-	3avgOZ/n7x28fPVdO6lQZ86Y3scWfd0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-668-e4MD5WCJNeq6DSuwl_vlcQ-1; Fri,
- 20 Jun 2025 10:57:03 -0400
-X-MC-Unique: e4MD5WCJNeq6DSuwl_vlcQ-1
-X-Mimecast-MFC-AGG-ID: e4MD5WCJNeq6DSuwl_vlcQ_1750431422
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D8E0B19560B0;
-	Fri, 20 Jun 2025 14:57:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.211])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ED4E51956094;
-	Fri, 20 Jun 2025 14:56:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1a05a3ed-87ae-453c-a205-f621262e4fea@talpey.com>
-References: <1a05a3ed-87ae-453c-a205-f621262e4fea@talpey.com> <e07c9bab-5750-4a50-8b38-4ce8c1a214d6@talpey.com> <cover.1750264849.git.metze@samba.org> <8ecf5dc585af7abb37f3fabac6eb0f9f3273da85.1750264849.git.metze@samba.org> <962036.1750422586@warthog.procyon.org.uk>
-To: Tom Talpey <tom@talpey.com>
-Cc: dhowells@redhat.com, Stefan Metzmacher <metze@samba.org>,
-    linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: Re: [PATCH 2/2] smb: client: let smbd_post_send_iter() respect the peers max_send_size and transmit all data
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNfirscD"
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70e23e9aeefso16399497b3.2
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Jun 2025 08:04:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750431851; x=1751036651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C866tPD99EZ3vGO+Vmv81GcObEtv8Y4ixVsJYIz8a1Q=;
+        b=FNfirscDMgj/oqIO+/DqQlU+rMETEL+D6EbptNFvbRVWW737y59K8cn68BjgGhDt4N
+         THfLjidNxgA7qHUM9n7IWYYUDMkyutSklrPTYnkN4r8moQxYFsqb2AujuvB0NXfiU5HO
+         D+etpNy7d8tIqkyXIet+94w/H11Z6aNp+EVaK5w+J9B5jyLSB39JoXkLP/V3E+laKO7j
+         FdA7BsWWLqeJ9YRSboQxrLeCKzR3tRknsbXngp6GlL8LbJGN8ArqtYoe0Z1sUse70T62
+         0Ajg5Ab9x09ZJHRCrpamiA6jXOrMcrcssczgIeWYPrpKNA/YffSVC8SbRj0RjnnkQM4U
+         ++mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750431851; x=1751036651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C866tPD99EZ3vGO+Vmv81GcObEtv8Y4ixVsJYIz8a1Q=;
+        b=h/S4saY8xa+C906HsHN8Ag5YhQm12OAeuvI9632AG+IIPd9dlkBrDuzF34C+BAj6bj
+         cewX+53NWLCsZz1ZKUJSN8bB6otgegboUHwGcMDAYfbutLzNWkXEMZYwAOYsZNR7DR6u
+         Qa1sKw+y4uqmpxmcfGxz7gyrBdT08zIpV/osR7OWJpHSvSVUORZymQDC72+x9vNLNcNa
+         +5LJGM4d7v6UL+HYsnmYNixBQEKG+ucVGCpN3l4tKP7sx9J/RLD6xGvyv0z4msYuY9fU
+         dtulAl+HP7TddmQ60n5fVg7odRnFlEpo04nmHL6W1STr4/SCnfijB093RG6GgwMODil9
+         QcdA==
+X-Gm-Message-State: AOJu0YwjEFptussl5H/jBh9Otri9cwj7or/RdNrCru/8tsN43NWk9nPe
+	nOHREyQLUdjI7fz2tGYsz/uO+elRgGXODlmDL4F0LurctdFXg++BisyD0mdtkWFP5Pl2B117zVx
+	fSmdx0xrrD6GQ6olLWhvMMbvS4EttlEQ=
+X-Gm-Gg: ASbGncuN2AahaDz1t6wccStVnD/k/RW2Tx8CkvrCyaE1OoYL0m8gzB7N4m9V8gyGzgN
+	eE1N81YN1K4hzJCXsXaijwMj7jhajABORQ1wt5UotOK2EgBwn6/Cc85ooIiKBSFVDEQ0j+Hmdt4
+	gnNIZ3rJmZXIRO5x07C1yDXFUP1ntaq0dttSTzYYsHxbhWRA==
+X-Google-Smtp-Source: AGHT+IG9W11LrcQwxo8yLqTNQwxgoZbU0xRoJkZOZ7IQpJN+JCTPDefMJgOetI9BkYJnQ8DhJNkV8xx84BOC35XKo58=
+X-Received: by 2002:a05:690c:6209:b0:702:52fb:4649 with SMTP id
+ 00721157ae682-712c675e8d2mr47825027b3.27.1750431851487; Fri, 20 Jun 2025
+ 08:04:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <965635.1750431418.1@warthog.procyon.org.uk>
-Date: Fri, 20 Jun 2025 15:56:58 +0100
-Message-ID: <965636.1750431418@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+References: <20250619153538.1600500-1-bharathsm@microsoft.com>
+ <20250619153538.1600500-6-bharathsm@microsoft.com> <804a52779d6988d1d434680002ca4d64@manguebit.org>
+In-Reply-To: <804a52779d6988d1d434680002ca4d64@manguebit.org>
+From: Bharath SM <bharathsm.hsk@gmail.com>
+Date: Fri, 20 Jun 2025 08:04:00 -0700
+X-Gm-Features: Ac12FXyor6PPmppOZ3iMTVRHMVf57AZaxAhlA197ipfPdA2lhvBabAjTMyk6leE
+Message-ID: <CAGypqWzgOpsTo01619qY1pjLJt-z0kci9AfEHkGGwsTbwJhoOA@mail.gmail.com>
+Subject: Re: [PATCH 6/7] smb: Fix potential divide-by-zero issue when
+ iface_min_speed is 0
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, 
+	Bharath SM <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tom Talpey <tom@talpey.com> wrote:
+On Thu, Jun 19, 2025 at 9:01=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
+wrote:
+>
+> Bharath SM <bharathsm.hsk@gmail.com> writes:
+>
+> > Address potential divide-by-zero issue when iface_min_speed is 0
+> > by adding proper handling to prevent undefined behavior.
+> >
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > ---
+> >  fs/smb/client/cifs_debug.c | 2 +-
+> >  fs/smb/client/sess.c       | 4 ++--
+> >  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> Isn't be7a6a776695 ("smb: client: fix oops due to unset link speed")
+> enough to prevent that already?
 
-> My comment on the layering was because the code did not used to do
-> this, therefore it seems this is a fundamental change, which I'd greatly
-> prefer to avoid.
-
-Yeah.  Ideally, we'd have each netfs subrequest corresponding to one RDMA
-operation.  I try to size the subreqs appropriately, both in terms of the
-maximum size in bytes and the maximum number of segments in
-cifs_prepare_read() and cifs_prepare_write().
-
-David
-
+Right, I didn't notice this check. I think this fix should take of the issu=
+e.
