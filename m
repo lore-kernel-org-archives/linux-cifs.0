@@ -1,190 +1,98 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E672AE8D;
-	Sat, 21 Jun 2025 15:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3DB2E62C
+	for <linux-cifs@vger.kernel.org>; Sat, 21 Jun 2025 15:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750520321; cv=none; b=cSmFC03Y2kRp/IEgUvHAZbvsNhdha7ei2lrSNRPE22MwlArqE7871Qfn82DaFgU7OXuAOlByuQ9DgT32UCJwTHuv597hrqjgaZBdsvmYClAFUS9NIAp3qXns3ErtznIYsyaJpofetMj9ciRDjMIQni2JrQsAhmM0RuLORVObUX0=
+	t=1750521305; cv=none; b=mWm5ot2S7zNqOlF2EcJSbrm1F9biQ05LYPn9N7xjoq49ntAsZg2p5Uch9Ba9SFrPdAsZZwb36GrUT+4BbOaZ9DDGLyVLydQdW/G6Qy1QMo9NAttlj1zkjwrHQv82nK6r82cHRLJ2czGzoEXd0bxburPQF8OQ8f9fmMXT19bw2p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750520321; c=relaxed/simple;
-	bh=LeDpyYSR6p+/K41s/GHHCawtvnbpcs6sOzpl7rZSVfE=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=lGtiRFtU97bzFQExLcA/8vswapvpJVRgGYlaDI2b2wEqFqdph6CmygMJZCDHDou6IXptAzHCij0Qfhz/MHwiVcv5P/LnrD2N/40ML4xRdbgwblaMi5QkYOAM9I89dzccZa81IaXLeG1rfsfrvw6aCvhNvsZrcFC+qDdTgb87e5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Y0wTNBvk; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1750521305; c=relaxed/simple;
+	bh=CIn4Wr9BsGwm4DDKvO6sAJbx+1WscStWd1swyiS/SOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JFyn9YJu4YJ/wc/3FNKaCI30qvHylMuEttfQiKaQ+LFFDpT9nS0aYRjVAzhWKndbq+IAWR+bN8UuvtGFqo/hUaSZ/IYsM8DNdN47x7puEepqGDC76+B30MWgS9x2wfiqOGSOx23cNOMKpFJcK7Ayj1K4EVVOeQ6MsTjU4kREqb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ePfTn0GV; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Y0wTNBvk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=U2ZsFZSJxpetuM39KNMl2GJu7AoJ2Q1cr/uPrANJIyo=; b=Y0wTNBvkGB5oRX4OPVlQNf1J/v
-	tIyhKnQsiPxkssvSkM/XZTVuOY7v4FOXv/jujcAfLGq6NBfZLo8s0nT+zq2r86EyC1TSKmvXPZl0A
-	b98cwFDI23Y6nKNA70Pi1txlytkWA+QgZXngCuAcZCVsZTlstbQQMUZboThGXWMEYkZdHY5BZRRTv
-	NIbnMEWyOaIvCAuYCRJ79zEgulAGNf16bbHP/ocbJcO8sIkDuBGzN+w/JPJjNOoojlE0zT+u5sY5O
-	Ww9wmxkdQJ9/NGJcGNjtm7hkYMQH/mzbxsSKxtVckTLoc/lpEgBU2UbRObEYz81cJL1m2mnpPANOE
-	2SS/p5Aw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1uT0Id-00000000NPZ-3kAc;
-	Sat, 21 Jun 2025 12:38:35 -0300
-Message-ID: <82bf746b2c44f9cccd7e3f4ca349d145@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Remy Monsen <monsen@monsen.cc>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix lstat() and AT_SYMLINK_NOFOLLOW to work on
- broken symlink nodes
-In-Reply-To: <20250621122139.3xq675cbs5kgkd7t@pali>
-References: <20250610213404.16288-1-pali@kernel.org>
- <26e59412fa2c70efad5f9c585bfc198f@manguebit.org>
- <20250621122139.3xq675cbs5kgkd7t@pali>
-Date: Sat, 21 Jun 2025 12:38:34 -0300
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ePfTn0GV"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-addda47ebeaso585499166b.1
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Jun 2025 08:55:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1750521302; x=1751126102; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=s2+CEQ8KLOqllFWOyXKexOZmK5IQz1uq7JRBj/abZLs=;
+        b=ePfTn0GVGc8hoGHmWbFURKrpxYFq62VFBTzRHLVKJuSHAXgB8d6DiDme2vOFVk9c0T
+         EktofxK4UARB+rVGE0p90uh8vIEcQOR6KlKWy7w757uc2qcYZfgmd4/yKsUrfGcYQnlE
+         iyzn0D/aA93FH/VwYscjCaK4xdF7+nP+62+zY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750521302; x=1751126102;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s2+CEQ8KLOqllFWOyXKexOZmK5IQz1uq7JRBj/abZLs=;
+        b=AzcTQhkWBk+DZ/BIehb81bz3eG8Q3WpRScnSTH34/HcRwVowVdY9k/UjJhtVWOOpbg
+         GLr3Px034/BfspCvQYddl2Do0qAJVsjY77mTN9XKXoprAyDh4kfIrNXlHkmnQY50gtWr
+         asQp+tmtz/wICZOPvxvtW3YrnxlhyHgT+RWYpkbiMBw2EwySv+UCHpBmxaxQwFZSXh2A
+         76v0x7rl+ibfH3IBOgDL1wX+4FJc1Zmr11OtP1qgGR0JsTfolEifgaqK4TrWBU7+5ZO4
+         MVIrwowFekFFqDUIHySmySeQwHptPyoNmMJc7mtLqtuxFx4TUFQyDxjMnMPokWgoSHBG
+         b0CA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJtesMUt0x+GcMyydEdvK1xCPTh9OmptYqsme+Xgql50wmDsSVo62G+TXps9neF1HdN0gDCAray7vW@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTIlpTlvApDZWpQ1UkQM/BsC16Z3AlZfGMM9UQRTRBJ7RUH/EZ
+	xSZ9oFyYQxw4Qt7s5AS8CEjWwCzv6mhmdQZlMkLZJ+QthBG0ft7RaOyK4VxnJRViFOUnVmPS0no
+	a82dMCNE=
+X-Gm-Gg: ASbGncufK6tYXxLm3oL7IhTy/Wlx4LVEN3PCe9WYrdFelbULgnJVHRttXzOmQ+0lNQE
+	dfm7xPCK7i+WqCJYKM2eAwF6AWi5UF/puyiihh9UZO+ifSsFA5gWuP4o+9Hod6SnqiVhh7PsJqw
+	K0SbD58MUVYE9ufYX+aGJcmPLgfVrsKpZ59H4SnkI6rqOyvjKeVgmhrVDWwUGLozSKJxeGkQKna
+	5ApSpb7smLayxFAdsfX8TNPZWQQ8ZFaFzHqLaUTDNkPiC/BAgchOyYrgYns0MXTnzo2C4IGPU+l
+	PDYPhX9VLR4VK+JkKeOFDZtQ9WCHioShWxcSHOaG34IpRUG1QD4BpORxM+8/FCdjlxZNcveEzii
+	uVS2JZ6dkQ6nkQ+52FWS7k/8zdZ543IQsLbUo
+X-Google-Smtp-Source: AGHT+IFJdWzTNOSQ40dOtYVk8EX/x5mdcbsTbbR7zKwsnrAQaiLUirzi2yM9aYUe3x6UdvxDN3QCbg==
+X-Received: by 2002:a17:907:2d9f:b0:ae0:68a8:bd6a with SMTP id a640c23a62f3a-ae068a8bfb3mr381152766b.15.1750521301666;
+        Sat, 21 Jun 2025 08:55:01 -0700 (PDT)
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com. [209.85.208.53])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae054080a98sm393949366b.90.2025.06.21.08.55.00
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Jun 2025 08:55:01 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6097b404f58so4990320a12.3
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Jun 2025 08:55:00 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV8FpFOJLRyU5ZSDdzidtZCLZTmmgUaBTCzfXpu2l4Wr9/IQQ66ttC88EwJp0tLxnIXzFN+sk4dXVz4@vger.kernel.org
+X-Received: by 2002:a05:6402:35d4:b0:607:4500:2841 with SMTP id
+ 4fb4d7f45d1cf-60a1cd33098mr5862983a12.25.1750521300614; Sat, 21 Jun 2025
+ 08:55:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <CAH2r5mtz1-JLM8PEZngKOd4bwESBLU+bw8T=ap5aMmJ6LOaNiA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtz1-JLM8PEZngKOd4bwESBLU+bw8T=ap5aMmJ6LOaNiA@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 21 Jun 2025 08:54:44 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjZXRvTnAwO-EcheuHkjOmq2YMua9YC3sbaXYBQ+FC8og@mail.gmail.com>
+X-Gm-Features: AX0GCFt9mVG_2r2gp_woN01q6-UhURhH801th1fVHPSJET8cZsUmhNVPCYqf_ko
+Message-ID: <CAHk-=wjZXRvTnAwO-EcheuHkjOmq2YMua9YC3sbaXYBQ+FC8og@mail.gmail.com>
+Subject: Re: [GIT PULL] smb3 client fixes
+To: Steve French <smfrench@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Pali Roh=C3=A1r <pali@kernel.org> writes:
+On Fri, 20 Jun 2025 at 15:57, Steve French <smfrench@gmail.com> wrote:
+>
+> - Fix reparse points (special file handling) for SMB1
 
-> On Friday 20 June 2025 20:44:37 Paulo Alcantara wrote:
->> Pali Roh=C3=A1r <pali@kernel.org> writes:
->>=20
->> > Currently Linux SMB client returns EIO for lstat() and AT_SYMLINK_NOFO=
-LLOW
->> > calls on symlink node when the symlink target location is broken or ca=
-nnot
->> > be read or parsed.
->> >
->> > Fix this problem by relaxing the errors from various locations which p=
-arses
->> > information about symlink file node (UNIX SMB1, native SMB2+, NFS-styl=
-e,
->> > WSL-style) and let readlink() syscall to return EIO when the symlink t=
-arget
->> > location is not available.
->>=20
->> Please, don't.  We still want those validations for the other types of
->> symlinks.
->
-> Well, validation was not removed. Validation is still there, just the
-> error is signalled by the readlink() syscall instead of the lstat() or
-> AT_SYMLINK_NOFOLLOW syscalls.
->
-> My opinion is that the lstat() or AT_SYMLINK_NOFOLLOW should work on
-> symlink node independently of where the symlink points (and whether the
-> symlink target is valid POSIX path or not). That is because the lstat()
-> and AT_SYMLINK_NOFOLLOW says that the symlink target location must not
-> be used and must not be resolved.
->
-> But still the invalid / incorrect / broken or non-representable symlink
-> target path in POSIX notation should be reported as an issue and the
-> readlink() is the correct syscall which should report these errors.
+I'm not seeing this being a fix at all. This seems to be entirely new
+functionality, with not even a whiff of "this fixes Xyz".
 
-The only issue is breaking existing customer or user applications that
-really don't care if cifs.ko could follow those kind of symlinks.
+I pulled and then unpulled again. Because WTF?
 
-Samba create symlinks to represent DFS links with targets like
-'msdfs:srv1\share,srv2\share', which are not valid POSIX paths.  Does
-that mean the filesystem should not allow readlink(2) to succeed just
-because it is not a valid POSIX path?  Is that what you mean?
+If it's a real fix for a real problem, it needs to be explained as such.
 
->> The problem is just that cifs.ko can't handle absolute
->> symlink targets in the form of '\??\UNC\srv\share\foo', while Windows
->> client can.  They are still valid symlink targets, but cifs.ko doesn't
->> know how to follow them.
->
-> Windows client can represent and follow such symlink because the symlink
-> is in the NT style format and Windows kernel uses NT style of paths
-> internally. Linux kernel uses POSIX paths and POSIX does not contain any
-> GLOBAL?? namespace for NT object hierarchy.
->
-> Leaking raw NT object hierarchy from SMB to POSIX userspace via
-> readlink() syscall is a bad idea. Applications are really not expecting
-> that the readlink() syscall will return NT kernel internals (exported
-> over SMB protocol and passed to cifs.ko).
->
-> For UNC paths encoded in NT object hierarchy, which is just some subset
-> of all possible NT paths, I had an idea that we could convert these
-> paths to some format like:
->
->    <prefix>/server/share/path...
->
-> Where <prefix> would be specified by the string mount option. So user
-> could say that wants all UNC symlinks pointing to /mnt/unc/.
->
-> And in the same way if user would want to create symlink pointing to
-> /mnt/unc/server/share/path... then cifs.ko will transform it into valid
-> NT UNC path and create a symlink to this location.
+And if it is what it looks like and the explanation says it is, then
+it damn well shouldn't be hidden in a "fixes" pull and tried to be
+sneaked in with the pull request dressing it up as anything else.
 
-That's really a terrible idea.  The symlink targets in the form of
-'\??\UNC\...' could be resolved by cifs.ko.  The ones that refer to a
-file outside the mounted share, we would set those as automounts.
-
-> But this would solve only problem with UNC symlink, not symlinks
-> pointing to NT object hierarchy in general.
->
->> The following should do it and then restore old behavior
->>=20
->> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
->> index bb25e77c5540..11d44288e75a 100644
->> --- a/fs/smb/client/reparse.c
->> +++ b/fs/smb/client/reparse.c
->> @@ -875,15 +875,8 @@ int smb2_parse_native_symlink(char **target, const =
-char *buf, unsigned int len,
->>  			abs_path +=3D sizeof("\\DosDevices\\")-1;
->>  		else if (strstarts(abs_path, "\\GLOBAL??\\"))
->>  			abs_path +=3D sizeof("\\GLOBAL??\\")-1;
->> -		else {
->> -			/* Unhandled absolute symlink, points outside of DOS/Win32 */
->> -			cifs_dbg(VFS,
->> -				 "absolute symlink '%s' cannot be converted from NT format "
->> -				 "because points to unknown target\n",
->> -				 smb_target);
->> -			rc =3D -EIO;
->> -			goto out;
->> -		}
->> +		else
->> +			goto out_unhandled_target;
->>=20=20
->>  		/* Sometimes path separator after \?? is double backslash */
->>  		if (abs_path[0] =3D=3D '\\')
->> @@ -910,13 +903,7 @@ int smb2_parse_native_symlink(char **target, const =
-char *buf, unsigned int len,
->>  			abs_path++;
->>  			abs_path[0] =3D drive_letter;
->>  		} else {
->> -			/* Unhandled absolute symlink. Report an error. */
->> -			cifs_dbg(VFS,
->> -				 "absolute symlink '%s' cannot be converted from NT format "
->> -				 "because points to unknown target\n",
->> -				 smb_target);
->> -			rc =3D -EIO;
->> -			goto out;
->> +			goto out_unhandled_target;
->>  		}
->>=20=20
->>  		abs_path_len =3D strlen(abs_path)+1;
->> @@ -966,6 +953,7 @@ int smb2_parse_native_symlink(char **target, const c=
-har *buf, unsigned int len,
->>  		 * These paths have same format as Linux symlinks, so no
->>  		 * conversion is needed.
->>  		 */
->> +out_unhandled_target:
->>  		linux_target =3D smb_target;
->>  		smb_target =3D NULL;
->>  	}
->
-> I'm really not sure if removing the messages and error reporting about
-> symlinks which cannot be represented in POSIX system is a good idea.
-
-Those messages are just useless and noisy.  Do you think it's useful
-printing that message for _every_ symlink when someone is calling
-readdir(2) in a directory that contain such files?
+                 Linus
