@@ -1,143 +1,221 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9130825A2CC;
-	Mon, 23 Jun 2025 14:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B93FB31
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Jun 2025 15:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750688080; cv=none; b=RQFrA3+Zemm7i2ZNo95xZLscaSVhOPVbKeoUo9z5EbyULTI8Yr9iDrIG50GKd7A23GvbnBEhhrJ7SklDjT/vq/gMARPZthBkh1mx3CsVnjuwHymEJVM6HQwg9nTTBf4ebCn3lqkAvexRAzAsIKtZUQAxt/iMLvjzfmWoPmtCfCI=
+	t=1750693583; cv=none; b=IIKImS2hdDDRBjI2d32Ppx5417ASjdkbDs0Jqtq0lfVwWipIKPzZpDoKB3g8JmpzLlEdsCUtA07FA89RYxhTTNP4nuXM2b3ikgC0IkNknRw8ifcQCI9aKyJusqZmYm2MtyFu1BHXDR79+B/ECobF5eXJfkOsMUjzzHekFTqZnc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750688080; c=relaxed/simple;
-	bh=DrUgJmz9mv9oNuENjezJvKTNsknS0G1u9sssb8hLjWw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PULrFJLE185cUl37ZMea0zPnZU5BSoat7lQnO7OQtyX+NVpD6vtVrZKJR9Nb9YTXQtE3d+utuTZj0Cg+xNOT7uuz1RQWKGQ6qm4CO3imXZNx46SctrKV2vR0ra53ncNCs4PY5kLKznjLLbdfzzDpDSHAECJ68LTkQvxBQeTf0do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N1WnqFvL; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1750693583; c=relaxed/simple;
+	bh=oEDM6e+2uQFzwI7qsAya0bWnjC7g7+wBKlU87uxkdzQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dGbht4GEVTuFKoKoHpX+kMKx7qM1Sa2ZXYiwqHmi4ZM4W8Mox41quORTRzlzMvuBH35P446HosfNtJKe7c/bmLcG57ZdnJ5koJ1ACTeG8AkK9IrzSx3pI3Sqml9zNacJn0ggNIoypIqwqhzZRJYENeI42w4q9FwBAFVXLCBj/NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=kXAqeIvj; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1WnqFvL"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6faf66905adso23864016d6.2;
-        Mon, 23 Jun 2025 07:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750688077; x=1751292877; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gB5mz+FxMOMtnMLrI/M5PI/QmYx/AfyqX4qBVvMef0s=;
-        b=N1WnqFvLnbBCT0kovRXdy7nzs8hBUdmV00V9WyYO0N2ZeNr41r6eKDRlK9TJl7bo4N
-         VAJBCbizvqCOJoqAGPUWbdQhN1IyxwyAe/fwtL1lXl/3VRx3t3AIL9iHm3E1MNQXdzq8
-         zlabO77362dP4GmMbf3HPxwKvs20ypsnMLCODN6OvfmZCbLJSKZwHKB+LM7WGucjkk9T
-         vQZ8YTtoYDEuhaeAaeZdPj4cuxLKBxM/qbf5ZSXbnF3mNz84ONhRd3Rsd2emaVw81f7a
-         ARYD8w3ua4QB+ykqNZDaGXR1hS+Z8VxP7pcErPSOuG+lMwqpMgurMuAHsLbrlBcULXVd
-         qgnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750688077; x=1751292877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gB5mz+FxMOMtnMLrI/M5PI/QmYx/AfyqX4qBVvMef0s=;
-        b=CGwvtkqcXaswxELeW8wVdEKjyu3Oa6FpgNcbbON6Vj70bUQ1FKRU9SGe/h+wjRUKFX
-         9ui8nCl7oyoMhwaZrhaiHd64VCrwk2a0o+2UaxdO/0NyLwkt5sAB5jLhfqgYFl8wRE+C
-         jEvlLK1F7sTPF5jPnxwZpiA/1KF8lQfvk7A7iILFt7SYp+4LfPgcdna90p7lwRqaP4oM
-         pUs6Dw8gdlsvmXa5IO2GOdyXsS35PUX6GYqfqQ8wyenrVBalPynj03lTgqa62yHG18bh
-         dW75o73uSP/0HbwI0tWhJ74S4mF6Vf0h1c11prtHHLTSztl21+mx6wUdC3Mevz8nSIVU
-         26Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCVXYQSD72oRBjhEWqB+CcPsuK6k7JJQFBwtYlqiGNk2ZG3BMJZ7TyNNih80wJ2WPCKeyvcMriQba5ZY@vger.kernel.org, AJvYcCVdFEIZ7cToLgc1KiDtn1Kny63LmjBvPd/FJj1RBOtAsJmDA3aA6B6RU8Q44NTfNVXtqfPkYAcZX4GVNWPW@vger.kernel.org, AJvYcCWdFY9rp5SjiHJ51Qne7CD/JNGVfll/rYeJ5ojqwAPoVff71tgpVtQC5X1iL9As1Wdu2sq0dKjHndC5nk7jbw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt3rut28WZ+S1voJRBn77/7uzB9H0Aplo/FsSbCxN2Ia7V3I/8
-	7EhSLYXHz2efBiVNvjyRQ2CWAVHC0GrlhL8NkqeI0RV+xAC5n+EoUfvlWGpP7oklEGtGv4G3PVc
-	ZjatK78Dp23gnDxD1W055+BvjtPNduMA=
-X-Gm-Gg: ASbGncvUd6FRP6Drv89W6blhoumGOPyqku+oSNe5p+jHsgEn3yStZeknWS3mejWHz12
-	Qe6estXbNZet2DDsMXN6lCN36XQafH7OEFJKF0LxPoCXEA+lxt9AaerYbLbER3BpTZQsK3UQHdX
-	6ptuwG9he2/tXMV7xpOD7F8/qwJEMworYp2H3MkVQMZlyUjvq+HD9XaD9lnEs6cE6a737OLfnjK
-	J39/g==
-X-Google-Smtp-Source: AGHT+IEkXBzeNkvGlr+MIWstDnY8eKrXwYunCgNIcOP48vnJi9qyAPRtIff07B7nuxNo4Y6YB9GTJmQfZ5jk980sLjE=
-X-Received: by 2002:a05:6214:4885:b0:6fb:6778:e205 with SMTP id
- 6a1803df08f44-6fd0a535472mr220001536d6.25.1750688076986; Mon, 23 Jun 2025
- 07:14:36 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="kXAqeIvj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=iyT1es1Jq+Kyrq+ymwC6gZP3VOiyebriAL+whDAi6NU=; b=kXAqeIvjyp5Q6+IOa4YmQFwhj9
+	RWjJF3FSjjSP9cKVXsRilB2C6yjyg1tVY698OxZa4VeGxvr7beGDt2clUGLYHW7Eu3e+f4hTudpD2
+	g0HsWtoDIhqQiBi7dmnCFVD/w2TFJlQA3oi+Fm4mMtoAfGcgdsmKf/r5/VGZOJ0UI4FQbNJH7ruqi
+	q0S2Nf6PTSZW8vV8XiaYkxNpihExVXKGCCq2ry21+FOVYdi8KBqjgkzyWYqLeAzCcopoifNdZxQ6R
+	wcRreQpd/rsGAOkx0u387E6o0eYJXMPHj+xoTWGadunujD0DVlV3/QDFBJBzkYmqeisbVrGOVbB2p
+	dyY7NGiliDn9K+YD8PHbAzm967k0bpzjmDcznytO6J5XhbvH/vJP4c+GRzhn8WJuxexNHPd8zg9Le
+	STlrSZl4U5NiUsvXk666emFuxANRMKqkExUgLca6nn9IZX0tMUAFPqlh+WEy2GpzWk4dyzsbehHmy
+	TG/gGO5H1DDXXeDobm11ECcS;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uTjN6-00C7Kl-0A;
+	Mon, 23 Jun 2025 15:46:12 +0000
+Message-ID: <a3073003-7f07-449d-8abf-dbe125ca3779@samba.org>
+Date: Mon, 23 Jun 2025 17:46:11 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250623124835.1106414-1-dhowells@redhat.com> <20250623124835.1106414-7-dhowells@redhat.com>
-In-Reply-To: <20250623124835.1106414-7-dhowells@redhat.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 23 Jun 2025 09:14:25 -0500
-X-Gm-Features: Ac12FXxLQPaj9HruER9vjDaDjWQT2gVo6q7LARadtOuRo6Y6TxV_q72wukZRZKQ
-Message-ID: <CAH2r5mv5jjtNJmLAcaa7EbXpftuC04F+b_g6YZxkNDTNYnm7sg@mail.gmail.com>
-Subject: Re: [PATCH 06/11] cifs: Fix prepare_write to negotiate wsize if needed
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev, linux-cifs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paulo Alcantara <pc@manguebit.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] smb: client: let smbd_post_send_iter() respect the
+ peers max_send_size and transmit all data
+To: Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>, David Howells <dhowells@redhat.com>
+References: <cover.1750264849.git.metze@samba.org>
+ <8ecf5dc585af7abb37f3fabac6eb0f9f3273da85.1750264849.git.metze@samba.org>
+ <e07c9bab-5750-4a50-8b38-4ce8c1a214d6@talpey.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <e07c9bab-5750-4a50-8b38-4ce8c1a214d6@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-This patch is already merged into mainline.
+Hi Tom,
 
-On Mon, Jun 23, 2025 at 7:50=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Fix cifs_prepare_write() to negotiate the wsize if it is unset.
->
-> Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Paulo Alcantara <pc@manguebit.org>
-> cc: Steve French <sfrench@samba.org>
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-cifs@vger.kernel.org
-> ---
->  fs/smb/client/file.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index 9835672267d2..e9212da32f01 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -52,6 +52,7 @@ static void cifs_prepare_write(struct netfs_io_subreque=
-st *subreq)
->         struct netfs_io_stream *stream =3D &req->rreq.io_streams[subreq->=
-stream_nr];
->         struct TCP_Server_Info *server;
->         struct cifsFileInfo *open_file =3D req->cfile;
-> +       struct cifs_sb_info *cifs_sb =3D CIFS_SB(wdata->rreq->inode->i_sb=
-);
->         size_t wsize =3D req->rreq.wsize;
->         int rc;
->
-> @@ -63,6 +64,10 @@ static void cifs_prepare_write(struct netfs_io_subrequ=
-est *subreq)
->         server =3D cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
->         wdata->server =3D server;
->
-> +       if (cifs_sb->ctx->wsize =3D=3D 0)
-> +               cifs_negotiate_wsize(server, cifs_sb->ctx,
-> +                                    tlink_tcon(req->cfile->tlink));
-> +
->  retry:
->         if (open_file->invalidHandle) {
->                 rc =3D cifs_reopen_file(open_file, false);
-> @@ -160,10 +165,9 @@ static int cifs_prepare_read(struct netfs_io_subrequ=
-est *subreq)
->         server =3D cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
->         rdata->server =3D server;
->
-> -       if (cifs_sb->ctx->rsize =3D=3D 0) {
-> +       if (cifs_sb->ctx->rsize =3D=3D 0)
->                 cifs_negotiate_rsize(server, cifs_sb->ctx,
->                                      tlink_tcon(req->cfile->tlink));
-> -       }
->
->         rc =3D server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
->                                            &size, &rdata->credits);
->
->
+> On 6/18/2025 12:51 PM, Stefan Metzmacher wrote:
+>> We should not send smbdirect_data_transfer messages larger than
+>> the negotiated max_send_size, typically 1364 bytes, which means
+>> 24 bytes of the smbdirect_data_transfer header + 1340 payload bytes.
+>>
+>> This happened when doing an SMB2 write with more than 1340 bytes
+>> (which is done inline as it's below rdma_readwrite_threshold).
+>>
+>> It means the peer resets the connection.
+> 
+> Obviously needs fixing but I'm unclear on the proposed change.
+> See below.
+> 
+>> Note for stable sp->max_send_size needs to be info->max_send_size:
+> 
+> So this is important and maybe needs more than this comment, which
+> is not really something that should go upstream since future stable
+> kernels won't apply. Recommend deleting this and sending a separate
+> patch.
+
+I can skip it, but I think it might be very useful for
+the one who needs to do the conflict resolution for the backport.
+
+Currently master is the only branch that has 'sp->',
+so all current backports will need the change.
+
+@Steve what would you prefer? Should I remove the hint and
+conflict resolution diff? In the past I saw something similar
+in merge requests send to Linus in order to make it easier for
+him to resolve the git conflicts.
+
+As it's preferred to backport fixes from master, I don't
+think it's a good idea to send a separate patch for the backports.
+
+>>    @@ -895,7 +895,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+>>                            .direction      = DMA_TO_DEVICE,
+>>                    };
+>>                    size_t payload_len = min_t(size_t, *_remaining_data_length,
+>>    -                                          sp->max_send_size - sizeof(*packet));
+>>    +                                          info->max_send_size - sizeof(*packet));
+>>
+>>                    rc = smb_extract_iter_to_rdma(iter, payload_len,
+>>                                                  &extract);
+>>
+>> cc: Steve French <sfrench@samba.org>
+>> cc: David Howells <dhowells@redhat.com>
+>> cc: Tom Talpey <tom@talpey.com>
+>> cc: linux-cifs@vger.kernel.org
+>> Fixes: 3d78fe73fa12 ("cifs: Build the RDMA SGE list directly from an iterator")
+>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>> ---
+>>   fs/smb/client/smbdirect.c | 18 ++++++++++++++----
+>>   1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+>> index cbc85bca006f..3a41dcbbff81 100644
+>> --- a/fs/smb/client/smbdirect.c
+>> +++ b/fs/smb/client/smbdirect.c
+>> @@ -842,7 +842,7 @@ static int smbd_post_send(struct smbd_connection *info,
+>>   static int smbd_post_send_iter(struct smbd_connection *info,
+>>                      struct iov_iter *iter,
+>> -                   int *_remaining_data_length)
+>> +                   unsigned int *_remaining_data_length)
+>>   {
+>>       struct smbdirect_socket *sc = &info->socket;
+>>       struct smbdirect_socket_parameters *sp = &sc->parameters;
+>> @@ -907,8 +907,10 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+>>               .local_dma_lkey    = sc->ib.pd->local_dma_lkey,
+>>               .direction    = DMA_TO_DEVICE,
+>>           };
+>> +        size_t payload_len = min_t(size_t, *_remaining_data_length,
+>> +                       sp->max_send_size - sizeof(*packet));
+>> -        rc = smb_extract_iter_to_rdma(iter, *_remaining_data_length,
+>> +        rc = smb_extract_iter_to_rdma(iter, payload_len,
+>>                             &extract);
+>>           if (rc < 0)
+>>               goto err_dma;
+>> @@ -970,8 +972,16 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+>>       request->sge[0].lkey = sc->ib.pd->local_dma_lkey;
+>>       rc = smbd_post_send(info, request);
+>> -    if (!rc)
+>> +    if (!rc) {
+>> +        if (iter && iov_iter_count(iter) > 0) {
+>> +            /*
+>> +             * There is more data to send
+>> +             */
+>> +            goto wait_credit;
+> 
+> But, shouldn't the caller have done this overflow check, and looped on
+> the fragments and credits? It seems wrong to push the credit check down
+> to this level.
+
+At least for the caller I guess we want a function that sends
+the whole iter and smbd_post_send_iter() only gets the iter as argument
+with an implicit length.
+
+To avoid this 'goto wait_credit', we could something like this in
+the caller:
+
+  fs/smb/client/smbdirect.c | 11 +++++++++--
+  1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 3a41dcbbff81..e0ba9395ff42 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -2042,17 +2042,24 @@ int smbd_send(struct TCP_Server_Info *server,
+  			klen += rqst->rq_iov[i].iov_len;
+  		iov_iter_kvec(&iter, ITER_SOURCE, rqst->rq_iov, rqst->rq_nvec, klen);
+
+-		rc = smbd_post_send_iter(info, &iter, &remaining_data_length);
++		while (iov_iter_count(&iter) > 0) {
++			rc = smbd_post_send_iter(info, &iter,
++						 &remaining_data_length);
++			if (rc < 0)
++				break;
++		}
+  		if (rc < 0)
+  			break;
+
+-		if (iov_iter_count(&rqst->rq_iter) > 0) {
++		while (iov_iter_count(&rqst->rq_iter) > 0) {
+  			/* And then the data pages if there are any */
+  			rc = smbd_post_send_iter(info, &rqst->rq_iter,
+  						 &remaining_data_length);
+  			if (rc < 0)
+  				break;
+  		}
++		if (rc < 0)
++			break;
+
+  	} while (++rqst_idx < num_rqst);
 
 
---=20
-Thanks,
+But to me that also doesn't look pretty.
 
-Steve
+Or we rename the current smbd_post_send_iter() to smbd_post_send_iter_chunk()
+and implement smbd_post_send_iter() as a loop over smbd_post_send_iter_chunk().
+
+I think currently we want a small patch to actually fix the regression.
+
+>> +        }
+>> +
+>>           return 0;
+>> +    }
+>>   err_dma:
+>>       for (i = 0; i < request->num_sge; i++)
+>> @@ -1007,7 +1017,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+>>    */
+>>   static int smbd_post_send_empty(struct smbd_connection *info)
+>>   {
+>> -    int remaining_data_length = 0;
+>> +    unsigned int remaining_data_length = 0;
+> 
+> Does this fix something??
+
+I guess if I use umin() (as proposed by David) we don't strictly need that
+change.
+
+So I'd prefer to go with skipping the int vs unsigned change and use
+umin() and keep the of the patch as is.
+
+Thanks!
+metze
