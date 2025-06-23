@@ -1,498 +1,283 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF012580DE
-	for <linux-cifs@vger.kernel.org>; Mon, 23 Jun 2025 12:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D2A246BAC
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Jun 2025 13:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750682994; cv=none; b=chqLCY07hD/agshYlh2lJv2bgHLy/boKmIjysJnK2EtAiOhCc8pDYl1NiEsU30sgOGe5vdIfdE9fvE0Mi20tGEMkTW2zXAPpVbGn8IhQOtXDAMn9RmlWTwuNtXadII30BVh2FWtOTN1VKAins+jUV8b8/k3v6onYWmooJub29Uk=
+	t=1750683911; cv=none; b=H6HmI3FrzAihufzzBM2OsTJ5I+c9AS8FYbbZaJu9XVthsTBowaXYyZJKZA04b5tiphwwXV+71Ktjk3OsSVdDPr9L/mKvHufuu8443IBVwPjThMR+N9hC3O/GEy6vQskaB1PDULFP9ImK42JEqHG4hLPgmkLhZc78GzcsT4GxEuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750682994; c=relaxed/simple;
-	bh=oCthaTSlKeRVHmOBNEH7eqZzOGsyawZils3bh9GqBfk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QYt3UOocvXsDV0I/3axS1TcsvCsQG4yedmep2u2Dn4WxwzqdHnpP2Y4XI9g2RvBST1xu462oByXU6oCrDF0i3MtS4uXoMOhZP+4cuNRrYtqUGKjXDy+b5Y38yeQjQA/q36ds3EMBBsqK2l3TynjMQY01E0ktljyQtpuVSbb6t0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SrG/hO2Z; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1750683911; c=relaxed/simple;
+	bh=ghi6qa9R1EmGSJvlju+LgziByPgW1fEZ07xu3qszDtA=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=A+6YucqnZ8756v2LFePCrnd7sMiip0wo9PeQgrswScNkUrgivCLhp8zHj48U6abaEDw24q+Zdvjy+tYxUSLKLd2yXiIC6O/UqNidya88or/3smPS+ffYQ+JrhRJ6uVnnJBBrqIDp0ER3zqRDjL06TQdsG/EhC5EDD5de9RV8Y1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O74sCd1j; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SrG/hO2Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O74sCd1j"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750682991;
+	s=mimecast20190719; t=1750683905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=30JOm3WHwq4PToSA7+AabqrKHKJ051hYzw4hYdUxsoQ=;
-	b=SrG/hO2Zl7qECkV5y9gyuoZ45/X57Quu13p72K16V+hFYXKFeLgCVNtY+PE4sf7i01Gga8
-	pUz+ErTIzl7U0iZ3nB87rS6efFsqKTUVhUgqBXuGgTFtQX3hcYGyqhiANUPEiFO+Q2AyTF
-	SdgFrSSAjp7Vdq5N/HCORZRyAzAb3Sw=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0jx1yAJHWToP2OfjrBAmR+S+N3PMqq+Lkg4mJ5sNOGY=;
+	b=O74sCd1j2PxZlNO2iotHiD2hJsJepOOXOLbmE17KlRpmwPTr6BYSi40OcWY1NbBiOKMPRj
+	746kpa0x1wkvbnQ2ipbuIOR91HHEabsvHvtvG5TQ7RLXDyMV8mphk497l1DGMeEPyxb0xp
+	9eG6MIh7PrGXkFhOnClUgAVA2jCD5tE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-533--Utz4PgUMJW6xjSHJUiXiw-1; Mon,
- 23 Jun 2025 08:49:44 -0400
-X-MC-Unique: -Utz4PgUMJW6xjSHJUiXiw-1
-X-Mimecast-MFC-AGG-ID: -Utz4PgUMJW6xjSHJUiXiw_1750682982
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-UyOhfOAvP_iIv5TwVkfx7g-1; Mon,
+ 23 Jun 2025 09:05:02 -0400
+X-MC-Unique: UyOhfOAvP_iIv5TwVkfx7g-1
+X-Mimecast-MFC-AGG-ID: UyOhfOAvP_iIv5TwVkfx7g_1750683900
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D53B1809C8B;
-	Mon, 23 Jun 2025 12:49:42 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D62C0180045B;
-	Mon, 23 Jun 2025 12:49:38 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C99E19560A3;
+	Mon, 23 Jun 2025 13:05:00 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2BC41195608D;
+	Mon, 23 Jun 2025 13:04:56 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <sfrench@samba.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>
-Subject: [PATCH 11/11] netfs: Update tracepoints in a number of ways
-Date: Mon, 23 Jun 2025 13:48:31 +0100
-Message-ID: <20250623124835.1106414-12-dhowells@redhat.com>
-In-Reply-To: <20250623124835.1106414-1-dhowells@redhat.com>
-References: <20250623124835.1106414-1-dhowells@redhat.com>
+To: Tom Talpey <tom@talpey.com>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Steve French <sfrench@samba.org>,
+    Stefan Metzmacher <metze@samba.org>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    CIFS <linux-cifs@vger.kernel.org>
+Subject: [PATCH] cifs: Collapse smbd_recv_*() into smbd_recv() and just use copy_to_iter()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1107689.1750683895.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Jun 2025 14:04:55 +0100
+Message-ID: <1107690.1750683895@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Make a number of updates to the netfs tracepoints:
+    =
 
- (1) Remove a duplicate trace from netfs_unbuffered_write_iter_locked().
-
- (2) Move the trace in netfs_wake_rreq_flag() to after the flag is cleared
-     so that the change appears in the trace.
-
- (3) Differentiate the use of netfs_rreq_trace_wait/woke_queue symbols.
-
- (4) Don't do so many trace emissions in the wait functions as some of them
-     are redundant.
-
- (5) In netfs_collect_read_results(), differentiate a subreq that's being
-     abandoned vs one that has been consumed in a regular way.
-
- (6) Add a tracepoint to indicate the call to ->ki_complete().
-
- (7) Don't double-increment the subreq_counter when retrying a write.
-
- (8) Move the netfs_sreq_trace_io_progress tracepoint within cifs code to
-     just MID_RESPONSE_RECEIVED and add different tracepoints for other MID
-     states and note check failure.
+Collapse smbd_recv_buf() and smbd_recv_page() into smbd_recv() and just us=
+e
+copy_to_iter() instead of memcpy().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Co-developed-by: Paulo Alcantara <pc@manguebit.org>
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-cc: Steve French <sfrench@samba.org>
+cc: Steve French <stfrench@microsoft.com>
+cc: Tom Talpey <tom@talpey.com>
+cc: Stefan Metzmacher <metze@samba.org>
+cc: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
 ---
- fs/netfs/direct_write.c      |  1 -
- fs/netfs/internal.h          |  2 +-
- fs/netfs/misc.c              | 14 ++++++--------
- fs/netfs/read_collect.c      | 12 +++++++++---
- fs/netfs/write_collect.c     |  4 +++-
- fs/netfs/write_retry.c       |  1 -
- fs/smb/client/cifssmb.c      | 20 ++++++++++++++++++++
- fs/smb/client/smb2pdu.c      | 26 ++++++++++++++++++++++----
- include/trace/events/netfs.h | 26 ++++++++++++++++++--------
- 9 files changed, 79 insertions(+), 27 deletions(-)
+ fs/smb/client/smbdirect.c |  116 +++++++---------------------------------=
+------
+ 1 file changed, 20 insertions(+), 96 deletions(-)
 
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index fa9a5bf3c6d5..c0797d6c72c9 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -106,7 +106,6 @@ ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *
- 	}
- 
- 	if (!async) {
--		trace_netfs_rreq(wreq, netfs_rreq_trace_wait_ip);
- 		ret = netfs_wait_for_write(wreq);
- 		if (ret > 0)
- 			iocb->ki_pos += ret;
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index d6656d2b54ab..e13ed767aec0 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -267,9 +267,9 @@ static inline void netfs_wake_rreq_flag(struct netfs_io_request *rreq,
- 					enum netfs_rreq_trace trace)
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 5ae847919da5..dc64c337aae0 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1747,35 +1747,39 @@ struct smbd_connection *smbd_get_connection(
+ }
+ =
+
+ /*
+- * Receive data from receive reassembly queue
++ * Receive data from the transport's receive reassembly queue
+  * All the incoming data packets are placed in reassembly queue
+- * buf: the buffer to read data into
++ * iter: the buffer to read data into
+  * size: the length of data to read
+  * return value: actual data read
+- * Note: this implementation copies the data from reassebmly queue to rec=
+eive
++ *
++ * Note: this implementation copies the data from reassembly queue to rec=
+eive
+  * buffers used by upper layer. This is not the optimal code path. A bett=
+er way
+  * to do it is to not have upper layer allocate its receive buffers but r=
+ather
+  * borrow the buffer from reassembly queue, and return it after data is
+  * consumed. But this will require more changes to upper layer code, and =
+also
+  * need to consider packet boundaries while they still being reassembled.
+  */
+-static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+-		unsigned int size)
++int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
  {
- 	if (test_bit(rreq_flag, &rreq->flags)) {
--		trace_netfs_rreq(rreq, trace);
- 		clear_bit_unlock(rreq_flag, &rreq->flags);
- 		smp_mb__after_atomic(); /* Set flag before task state */
-+		trace_netfs_rreq(rreq, trace);
- 		wake_up(&rreq->waitq);
- 	}
- }
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index 127a269938bb..20748bcfbf59 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -359,7 +359,7 @@ void netfs_wait_for_in_progress_stream(struct netfs_io_request *rreq,
- 		if (!netfs_check_subreq_in_progress(subreq))
- 			continue;
- 
--		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_queue);
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_quiesce);
- 		for (;;) {
- 			prepare_to_wait(&rreq->waitq, &myself, TASK_UNINTERRUPTIBLE);
- 
-@@ -368,10 +368,10 @@ void netfs_wait_for_in_progress_stream(struct netfs_io_request *rreq,
- 
- 			trace_netfs_sreq(subreq, netfs_sreq_trace_wait_for);
- 			schedule();
--			trace_netfs_rreq(rreq, netfs_rreq_trace_woke_queue);
- 		}
- 	}
- 
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_waited_quiesce);
- 	finish_wait(&rreq->waitq, &myself);
- }
- 
-@@ -437,7 +437,6 @@ static ssize_t netfs_wait_for_in_progress(struct netfs_io_request *rreq,
- 	ssize_t ret;
- 
- 	for (;;) {
--		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_queue);
- 		prepare_to_wait(&rreq->waitq, &myself, TASK_UNINTERRUPTIBLE);
- 
- 		if (!test_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &rreq->flags)) {
-@@ -457,11 +456,12 @@ static ssize_t netfs_wait_for_in_progress(struct netfs_io_request *rreq,
- 		if (!netfs_check_rreq_in_progress(rreq))
- 			break;
- 
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_ip);
- 		schedule();
--		trace_netfs_rreq(rreq, netfs_rreq_trace_woke_queue);
- 	}
- 
- all_collected:
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_waited_ip);
- 	finish_wait(&rreq->waitq, &myself);
- 
- 	ret = rreq->error;
-@@ -504,10 +504,8 @@ static void netfs_wait_for_pause(struct netfs_io_request *rreq,
- {
- 	DEFINE_WAIT(myself);
- 
--	trace_netfs_rreq(rreq, netfs_rreq_trace_wait_pause);
--
- 	for (;;) {
--		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_queue);
-+		trace_netfs_rreq(rreq, netfs_rreq_trace_wait_pause);
- 		prepare_to_wait(&rreq->waitq, &myself, TASK_UNINTERRUPTIBLE);
- 
- 		if (!test_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &rreq->flags)) {
-@@ -530,10 +528,10 @@ static void netfs_wait_for_pause(struct netfs_io_request *rreq,
- 			break;
- 
- 		schedule();
--		trace_netfs_rreq(rreq, netfs_rreq_trace_woke_queue);
- 	}
- 
- all_collected:
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_waited_pause);
- 	finish_wait(&rreq->waitq, &myself);
- }
- 
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index cceed9d629c6..3e804da1e1eb 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -293,7 +293,9 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
- 		spin_lock(&rreq->lock);
- 
- 		remove = front;
--		trace_netfs_sreq(front, netfs_sreq_trace_discard);
-+		trace_netfs_sreq(front,
-+				 notes & ABANDON_SREQ ?
-+				 netfs_sreq_trace_abandoned : netfs_sreq_trace_consumed);
- 		list_del_init(&front->rreq_link);
- 		front = list_first_entry_or_null(&stream->subrequests,
- 						 struct netfs_io_subrequest, rreq_link);
-@@ -353,9 +355,11 @@ static void netfs_rreq_assess_dio(struct netfs_io_request *rreq)
- 
- 	if (rreq->iocb) {
- 		rreq->iocb->ki_pos += rreq->transferred;
--		if (rreq->iocb->ki_complete)
-+		if (rreq->iocb->ki_complete) {
-+			trace_netfs_rreq(rreq, netfs_rreq_trace_ki_complete);
- 			rreq->iocb->ki_complete(
- 				rreq->iocb, rreq->error ? rreq->error : rreq->transferred);
-+		}
- 	}
- 	if (rreq->netfs_ops->done)
- 		rreq->netfs_ops->done(rreq);
-@@ -379,9 +383,11 @@ static void netfs_rreq_assess_single(struct netfs_io_request *rreq)
- 
- 	if (rreq->iocb) {
- 		rreq->iocb->ki_pos += rreq->transferred;
--		if (rreq->iocb->ki_complete)
-+		if (rreq->iocb->ki_complete) {
-+			trace_netfs_rreq(rreq, netfs_rreq_trace_ki_complete);
- 			rreq->iocb->ki_complete(
- 				rreq->iocb, rreq->error ? rreq->error : rreq->transferred);
-+		}
- 	}
- 	if (rreq->netfs_ops->done)
- 		rreq->netfs_ops->done(rreq);
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 2ac85a819b71..dedfdf80eccc 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -419,9 +419,11 @@ bool netfs_write_collection(struct netfs_io_request *wreq)
- 	if (wreq->iocb) {
- 		size_t written = min(wreq->transferred, wreq->len);
- 		wreq->iocb->ki_pos += written;
--		if (wreq->iocb->ki_complete)
-+		if (wreq->iocb->ki_complete) {
-+			trace_netfs_rreq(wreq, netfs_rreq_trace_ki_complete);
- 			wreq->iocb->ki_complete(
- 				wreq->iocb, wreq->error ? wreq->error : written);
-+		}
- 		wreq->iocb = VFS_PTR_POISON;
- 	}
- 
-diff --git a/fs/netfs/write_retry.c b/fs/netfs/write_retry.c
-index 7158657061e9..fc9c3e0d34d8 100644
---- a/fs/netfs/write_retry.c
-+++ b/fs/netfs/write_retry.c
-@@ -146,7 +146,6 @@ static void netfs_retry_write_stream(struct netfs_io_request *wreq,
- 			subreq = netfs_alloc_subrequest(wreq);
- 			subreq->source		= to->source;
- 			subreq->start		= start;
--			subreq->debug_index	= atomic_inc_return(&wreq->subreq_counter);
- 			subreq->stream_nr	= to->stream_nr;
- 			subreq->retry_count	= 1;
- 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 0e509a0433fb..75142f49d65d 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1334,7 +1334,11 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
- 		break;
- 	case MID_REQUEST_SUBMITTED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_req_submitted);
-+		goto do_retry;
- 	case MID_RETRY_NEEDED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_retry_needed);
-+do_retry:
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &rdata->subreq.flags);
- 		rdata->result = -EAGAIN;
- 		if (server->sign && rdata->got_bytes)
-@@ -1344,8 +1348,14 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		task_io_account_read(rdata->got_bytes);
- 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
- 		break;
-+	case MID_RESPONSE_MALFORMED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_malformed);
-+		rdata->result = -EIO;
-+		break;
- 	default:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_unknown);
- 		rdata->result = -EIO;
-+		break;
- 	}
- 
- 	if (rdata->result == -ENODATA) {
-@@ -1714,11 +1724,21 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 		}
- 		break;
- 	case MID_REQUEST_SUBMITTED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
-+		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		result = -EAGAIN;
-+		break;
- 	case MID_RETRY_NEEDED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
-+	case MID_RESPONSE_MALFORMED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_malformed);
-+		result = -EIO;
-+		break;
- 	default:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_unknown);
- 		result = -EIO;
- 		break;
- 	}
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 084ee66e73fd..7f6186c2e60d 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4567,7 +4567,11 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
- 		break;
- 	case MID_REQUEST_SUBMITTED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_req_submitted);
-+		goto do_retry;
- 	case MID_RETRY_NEEDED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_retry_needed);
-+do_retry:
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &rdata->subreq.flags);
- 		rdata->result = -EAGAIN;
- 		if (server->sign && rdata->got_bytes)
-@@ -4578,11 +4582,15 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
- 		break;
- 	case MID_RESPONSE_MALFORMED:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_malformed);
- 		credits.value = le16_to_cpu(shdr->CreditRequest);
- 		credits.instance = server->reconnect_instance;
--		fallthrough;
-+		rdata->result = -EIO;
-+		break;
- 	default:
-+		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_unknown);
- 		rdata->result = -EIO;
-+		break;
- 	}
- #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	struct smbdirect_socket *sc =3D &info->socket;
+ 	struct smbd_response *response;
+ 	struct smbdirect_data_transfer *data_transfer;
++	size_t size =3D msg->msg_iter.count;
+ 	int to_copy, to_read, data_read, offset;
+ 	u32 data_length, remaining_data_length, data_offset;
+ 	int rc;
+ =
+
++	if (WARN_ON_ONCE(iov_iter_rw(&msg->msg_iter) =3D=3D WRITE))
++		return -EINVAL; /* It's a bug in upper layer to get there */
++
+ again:
  	/*
-@@ -4835,11 +4843,14 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 
- 	switch (mid->mid_state) {
- 	case MID_RESPONSE_RECEIVED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_progress);
- 		credits.value = le16_to_cpu(rsp->hdr.CreditRequest);
- 		credits.instance = server->reconnect_instance;
- 		result = smb2_check_receive(mid, server, 0);
--		if (result != 0)
-+		if (result != 0) {
-+			trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_bad);
- 			break;
-+		}
- 
- 		written = le32_to_cpu(rsp->DataLength);
- 		/*
-@@ -4861,15 +4872,23 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 		}
- 		break;
- 	case MID_REQUEST_SUBMITTED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
-+		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		result = -EAGAIN;
-+		break;
- 	case MID_RETRY_NEEDED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_malformed);
- 		credits.value = le16_to_cpu(rsp->hdr.CreditRequest);
- 		credits.instance = server->reconnect_instance;
--		fallthrough;
-+		result = -EIO;
-+		break;
- 	default:
-+		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_unknown);
- 		result = -EIO;
- 		break;
+ 	 * No need to hold the reassembly queue lock all the time as we are
+ 	 * the only one reading from the front of the queue. The transport
+ 	 * may add more entries to the back of the queue at the same time
+ 	 */
+-	log_read(INFO, "size=3D%d info->reassembly_data_length=3D%d\n", size,
++	log_read(INFO, "size=3D%zd info->reassembly_data_length=3D%d\n", size,
+ 		info->reassembly_data_length);
+ 	if (info->reassembly_data_length >=3D size) {
+ 		int queue_length;
+@@ -1811,9 +1815,12 @@ static int smbd_recv_buf(struct smbd_connection *in=
+fo, char *buf,
+ 			 * transport layer is added
+ 			 */
+ 			if (response->first_segment && size =3D=3D 4) {
+-				unsigned int rfc1002_len =3D
++				unsigned int len =3D
+ 					data_length + remaining_data_length;
+-				*((__be32 *)buf) =3D cpu_to_be32(rfc1002_len);
++				__be32 rfc1002_len =3D cpu_to_be32(len);
++				if (copy_to_iter(&rfc1002_len, sizeof(rfc1002_len),
++						 &msg->msg_iter) !=3D sizeof(rfc1002_len))
++					return -EFAULT;
+ 				data_read =3D 4;
+ 				response->first_segment =3D false;
+ 				log_read(INFO, "returning rfc1002 length %d\n",
+@@ -1822,10 +1829,9 @@ static int smbd_recv_buf(struct smbd_connection *in=
+fo, char *buf,
+ 			}
+ =
+
+ 			to_copy =3D min_t(int, data_length - offset, to_read);
+-			memcpy(
+-				buf + data_read,
+-				(char *)data_transfer + data_offset + offset,
+-				to_copy);
++			if (copy_to_iter((char *)data_transfer + data_offset + offset,
++					 to_copy, &msg->msg_iter) !=3D to_copy)
++				return -EFAULT;
+ =
+
+ 			/* move on to the next buffer? */
+ 			if (to_copy =3D=3D data_length - offset) {
+@@ -1870,6 +1876,8 @@ static int smbd_recv_buf(struct smbd_connection *inf=
+o, char *buf,
+ 			 data_read, info->reassembly_data_length,
+ 			 info->first_entry_offset);
+ read_rfc1002_done:
++		/* SMBDirect will read it all or nothing */
++		msg->msg_iter.count =3D 0;
+ 		return data_read;
  	}
-@@ -4909,7 +4928,6 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 			      server->credits, server->in_flight,
- 			      0, cifs_trace_rw_credits_write_response_clear);
- 	wdata->credits.value = 0;
--	trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_progress);
- 	cifs_write_subrequest_terminated(wdata, result ?: written);
- 	release_mid(mid);
- 	trace_smb3_rw_credits(rreq_debug_id, subreq_debug_index, 0,
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index c2d581429a7b..73e96ccbe830 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -50,12 +50,13 @@
- 
- #define netfs_rreq_traces					\
- 	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
--	EM(netfs_rreq_trace_copy,		"COPY   ")	\
- 	EM(netfs_rreq_trace_collect,		"COLLECT")	\
- 	EM(netfs_rreq_trace_complete,		"COMPLET")	\
-+	EM(netfs_rreq_trace_copy,		"COPY   ")	\
- 	EM(netfs_rreq_trace_dirty,		"DIRTY  ")	\
- 	EM(netfs_rreq_trace_done,		"DONE   ")	\
- 	EM(netfs_rreq_trace_free,		"FREE   ")	\
-+	EM(netfs_rreq_trace_ki_complete,	"KI-CMPL")	\
- 	EM(netfs_rreq_trace_recollect,		"RECLLCT")	\
- 	EM(netfs_rreq_trace_redirty,		"REDIRTY")	\
- 	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
-@@ -64,13 +65,15 @@
- 	EM(netfs_rreq_trace_unlock,		"UNLOCK ")	\
- 	EM(netfs_rreq_trace_unlock_pgpriv2,	"UNLCK-2")	\
- 	EM(netfs_rreq_trace_unmark,		"UNMARK ")	\
-+	EM(netfs_rreq_trace_unpause,		"UNPAUSE")	\
- 	EM(netfs_rreq_trace_wait_ip,		"WAIT-IP")	\
--	EM(netfs_rreq_trace_wait_pause,		"WT-PAUS")	\
--	EM(netfs_rreq_trace_wait_queue,		"WAIT-Q ")	\
-+	EM(netfs_rreq_trace_wait_pause,		"--PAUSED--")	\
-+	EM(netfs_rreq_trace_wait_quiesce,	"WAIT-QUIESCE")	\
-+	EM(netfs_rreq_trace_waited_ip,		"DONE-IP")	\
-+	EM(netfs_rreq_trace_waited_pause,	"--UNPAUSED--")	\
-+	EM(netfs_rreq_trace_waited_quiesce,	"DONE-QUIESCE")	\
- 	EM(netfs_rreq_trace_wake_ip,		"WAKE-IP")	\
- 	EM(netfs_rreq_trace_wake_queue,		"WAKE-Q ")	\
--	EM(netfs_rreq_trace_woke_queue,		"WOKE-Q ")	\
--	EM(netfs_rreq_trace_unpause,		"UNPAUSE")	\
- 	E_(netfs_rreq_trace_write_done,		"WR-DONE")
- 
- #define netfs_sreq_sources					\
-@@ -83,6 +86,7 @@
- 	E_(NETFS_WRITE_TO_CACHE,		"WRIT")
- 
- #define netfs_sreq_traces					\
-+	EM(netfs_sreq_trace_abandoned,		"ABNDN")	\
- 	EM(netfs_sreq_trace_add_donations,	"+DON ")	\
- 	EM(netfs_sreq_trace_added,		"ADD  ")	\
- 	EM(netfs_sreq_trace_cache_nowrite,	"CA-NW")	\
-@@ -90,6 +94,7 @@
- 	EM(netfs_sreq_trace_cache_write,	"CA-WR")	\
- 	EM(netfs_sreq_trace_cancel,		"CANCL")	\
- 	EM(netfs_sreq_trace_clear,		"CLEAR")	\
-+	EM(netfs_sreq_trace_consumed,		"CONSM")	\
- 	EM(netfs_sreq_trace_discard,		"DSCRD")	\
- 	EM(netfs_sreq_trace_donate_to_prev,	"DON-P")	\
- 	EM(netfs_sreq_trace_donate_to_next,	"DON-N")	\
-@@ -97,7 +102,12 @@
- 	EM(netfs_sreq_trace_fail,		"FAIL ")	\
- 	EM(netfs_sreq_trace_free,		"FREE ")	\
- 	EM(netfs_sreq_trace_hit_eof,		"EOF  ")	\
--	EM(netfs_sreq_trace_io_progress,	"IO   ")	\
-+	EM(netfs_sreq_trace_io_bad,		"I-BAD")	\
-+	EM(netfs_sreq_trace_io_malformed,	"I-MLF")	\
-+	EM(netfs_sreq_trace_io_unknown,		"I-UNK")	\
-+	EM(netfs_sreq_trace_io_progress,	"I-OK ")	\
-+	EM(netfs_sreq_trace_io_req_submitted,	"I-RSB")	\
-+	EM(netfs_sreq_trace_io_retry_needed,	"I-RTR")	\
- 	EM(netfs_sreq_trace_limited,		"LIMIT")	\
- 	EM(netfs_sreq_trace_need_clear,		"N-CLR")	\
- 	EM(netfs_sreq_trace_partial_read,	"PARTR")	\
-@@ -143,8 +153,8 @@
- 
- #define netfs_sreq_ref_traces					\
- 	EM(netfs_sreq_trace_get_copy_to_cache,	"GET COPY2C ")	\
--	EM(netfs_sreq_trace_get_resubmit,	"GET RESUBMIT")	\
--	EM(netfs_sreq_trace_get_submit,		"GET SUBMIT")	\
-+	EM(netfs_sreq_trace_get_resubmit,	"GET RESUBMT")	\
-+	EM(netfs_sreq_trace_get_submit,		"GET SUBMIT ")	\
- 	EM(netfs_sreq_trace_get_short_read,	"GET SHORTRD")	\
- 	EM(netfs_sreq_trace_new,		"NEW        ")	\
- 	EM(netfs_sreq_trace_put_abandon,	"PUT ABANDON")	\
+ =
+
+@@ -1890,90 +1898,6 @@ static int smbd_recv_buf(struct smbd_connection *in=
+fo, char *buf,
+ 	goto again;
+ }
+ =
+
+-/*
+- * Receive a page from receive reassembly queue
+- * page: the page to read data into
+- * to_read: the length of data to read
+- * return value: actual data read
+- */
+-static int smbd_recv_page(struct smbd_connection *info,
+-		struct page *page, unsigned int page_offset,
+-		unsigned int to_read)
+-{
+-	struct smbdirect_socket *sc =3D &info->socket;
+-	int ret;
+-	char *to_address;
+-	void *page_address;
+-
+-	/* make sure we have the page ready for read */
+-	ret =3D wait_event_interruptible(
+-		info->wait_reassembly_queue,
+-		info->reassembly_data_length >=3D to_read ||
+-			sc->status !=3D SMBDIRECT_SOCKET_CONNECTED);
+-	if (ret)
+-		return ret;
+-
+-	/* now we can read from reassembly queue and not sleep */
+-	page_address =3D kmap_atomic(page);
+-	to_address =3D (char *) page_address + page_offset;
+-
+-	log_read(INFO, "reading from page=3D%p address=3D%p to_read=3D%d\n",
+-		page, to_address, to_read);
+-
+-	ret =3D smbd_recv_buf(info, to_address, to_read);
+-	kunmap_atomic(page_address);
+-
+-	return ret;
+-}
+-
+-/*
+- * Receive data from transport
+- * msg: a msghdr point to the buffer, can be ITER_KVEC or ITER_BVEC
+- * return: total bytes read, or 0. SMB Direct will not do partial read.
+- */
+-int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+-{
+-	char *buf;
+-	struct page *page;
+-	unsigned int to_read, page_offset;
+-	int rc;
+-
+-	if (iov_iter_rw(&msg->msg_iter) =3D=3D WRITE) {
+-		/* It's a bug in upper layer to get there */
+-		cifs_dbg(VFS, "Invalid msg iter dir %u\n",
+-			 iov_iter_rw(&msg->msg_iter));
+-		rc =3D -EINVAL;
+-		goto out;
+-	}
+-
+-	switch (iov_iter_type(&msg->msg_iter)) {
+-	case ITER_KVEC:
+-		buf =3D msg->msg_iter.kvec->iov_base;
+-		to_read =3D msg->msg_iter.kvec->iov_len;
+-		rc =3D smbd_recv_buf(info, buf, to_read);
+-		break;
+-
+-	case ITER_BVEC:
+-		page =3D msg->msg_iter.bvec->bv_page;
+-		page_offset =3D msg->msg_iter.bvec->bv_offset;
+-		to_read =3D msg->msg_iter.bvec->bv_len;
+-		rc =3D smbd_recv_page(info, page, page_offset, to_read);
+-		break;
+-
+-	default:
+-		/* It's a bug in upper layer to get there */
+-		cifs_dbg(VFS, "Invalid msg type %d\n",
+-			 iov_iter_type(&msg->msg_iter));
+-		rc =3D -EINVAL;
+-	}
+-
+-out:
+-	/* SMBDirect will read it all or nothing */
+-	if (rc > 0)
+-		msg->msg_iter.count =3D 0;
+-	return rc;
+-}
+-
+ /*
+  * Send data to transport
+  * Each rqst is transported as a SMBDirect payload
 
