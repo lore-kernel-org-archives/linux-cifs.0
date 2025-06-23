@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948FA24DD08
-	for <linux-cifs@vger.kernel.org>; Mon, 23 Jun 2025 12:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C39256C88
+	for <linux-cifs@vger.kernel.org>; Mon, 23 Jun 2025 12:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750682974; cv=none; b=kEXHof74aLrbJhlaaIj6B9+MFYAfML2bhSC+Ma0I9YYzD3XM/ZIQALwooTHm195K9WrHSyJ4EuBosTdOWxhdkS8goEuZg7+af3egi9RABrbagV84sRW0WBNDsal+OVzVyvJ/b4szu5nysuUSRgDut36bTjtQpq8u9Y7wRsT4XI4=
+	t=1750682978; cv=none; b=umsSU5kSjs99Qt2ErgEUiMWMtEBYecrxGo92gPOdH5EgMfp/in/ANTBGHZdEwMlz/ca+Jza+IXrhzP7pZ1j9O5suIhPo6RgoQH6sbYYm21DC8syyTo9rJ3Z1/XiHQIK1TaLkKPlVQisRVk7eGGAGH9WcQdTtWbQW4wRO5iLcBkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750682974; c=relaxed/simple;
-	bh=BDqZJMf82SywwJcLdMnj/PJsVeb3njdthrnYfQvyQGA=;
+	s=arc-20240116; t=1750682978; c=relaxed/simple;
+	bh=Ynqc+JaLEgmHa7UoXc62ltP7Rd2llOzFUZOZer8qBBg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rflfQGx6/pASaDYG+pAlPx0fcCY68kNA/+ROmK8Ho66+h/AisQE1s6l5zNnAxOhh2ab3j3AM17XamzgcCp5VYqda+Y3iC0KiBMMGnriYqNR1m4iHtK7CvvxaI5tw73GrVbxtb7y1LFl0gWvrmP+K67cXpo/UulTmrYztBPwm/jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QlcSW1M6; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Ldz6e9xSD0H4GSgMKbEkL3UwqzUM6T5aLSQKeYIJeaJB/eieI+v21BgMbSsUmgREVAO0YwbGacJqxWO1WCixZBtriMQwPGEtGO5s8ECA4Ofai1nxzc7mjP0c3zBNK8t9eKPIlIAO6xgdaHze3RLBFqHd1bVsiaFmo1mid0bg51g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R9hyIEYK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlcSW1M6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9hyIEYK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750682971;
+	s=mimecast20190719; t=1750682976;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8Kk2Txa5pB/2k7XWxoJja6+fQWJTWnkbovo0Xo0GCoU=;
-	b=QlcSW1M6eYB/FunlnKTsRqWt5m0n31rbAM6eZdXzya+VT/m5uUyppYgr0wICdX0upcr35A
-	4lWrV0tJ4tv1oGwcCs/2/F/mrn+R4uJ3sA4RGHezJsi8u5UfJBbnOGZBCMraIhDo7R5V75
-	/ZayMYmc/lcAp1FkdHKf7cermnNWmWA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=9NXWDABj5NyKjctFkfbdE94f4ZG/vaH3QTHnLzhErNo=;
+	b=R9hyIEYK39a2uEpbW9iTa5N4+EK5vbS1g4c6HD300vpOvvPwUZvRPYoGurIKseqeIT9oC3
+	QynrLLvJpOLRVQHgicWU8vPC2CMe/hOorTnwb8K/HuRqCjughjjsRzMBRiZEs3tDOqV80A
+	sJ7Z+U0t/zQGhj37ykZvT3Uzuz9nKI4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-84-YnXg1Qa1NEO8N3FySMqf8w-1; Mon,
- 23 Jun 2025 08:49:27 -0400
-X-MC-Unique: YnXg1Qa1NEO8N3FySMqf8w-1
-X-Mimecast-MFC-AGG-ID: YnXg1Qa1NEO8N3FySMqf8w_1750682966
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-pHqeMS9wMf6JhCSgPIdCXQ-1; Mon,
+ 23 Jun 2025 08:49:33 -0400
+X-MC-Unique: pHqeMS9wMf6JhCSgPIdCXQ-1
+X-Mimecast-MFC-AGG-ID: pHqeMS9wMf6JhCSgPIdCXQ_1750682971
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 002CC180120C;
-	Mon, 23 Jun 2025 12:49:26 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 761451809C83;
+	Mon, 23 Jun 2025 12:49:31 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B0591800284;
-	Mon, 23 Jun 2025 12:49:21 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AD5E71956096;
+	Mon, 23 Jun 2025 12:49:27 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Steve French <sfrench@samba.org>
@@ -56,9 +56,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.org>
-Subject: [PATCH 08/11] smb: client: set missing retry flag in cifs_readv_callback()
-Date: Mon, 23 Jun 2025 13:48:28 +0100
-Message-ID: <20250623124835.1106414-9-dhowells@redhat.com>
+Subject: [PATCH 09/11] smb: client: set missing retry flag in cifs_writev_callback()
+Date: Mon, 23 Jun 2025 13:48:29 +0100
+Message-ID: <20250623124835.1106414-10-dhowells@redhat.com>
 In-Reply-To: <20250623124835.1106414-1-dhowells@redhat.com>
 References: <20250623124835.1106414-1-dhowells@redhat.com>
 Precedence: bulk
@@ -68,7 +68,7 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
 From: Paulo Alcantara <pc@manguebit.org>
 
@@ -86,15 +86,15 @@ Cc: netfs@lists.linux.dev
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 7216fcec79e8..f9ccae5de5b8 100644
+index f9ccae5de5b8..0e509a0433fb 100644
 --- a/fs/smb/client/cifssmb.c
 +++ b/fs/smb/client/cifssmb.c
-@@ -1335,6 +1335,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+@@ -1715,6 +1715,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
  		break;
  	case MID_REQUEST_SUBMITTED:
  	case MID_RETRY_NEEDED:
-+		__set_bit(NETFS_SREQ_NEED_RETRY, &rdata->subreq.flags);
- 		rdata->result = -EAGAIN;
- 		if (server->sign && rdata->got_bytes)
- 			/* reset bytes number since we can not check a sign */
++		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
+ 		result = -EAGAIN;
+ 		break;
+ 	default:
 
