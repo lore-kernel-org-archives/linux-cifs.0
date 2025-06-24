@@ -1,423 +1,276 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3282222B2;
-	Mon, 23 Jun 2025 22:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A28326A1BE;
+	Tue, 24 Jun 2025 12:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750717631; cv=none; b=H/jh84PcYyzEH5Lncw/M1RJSRX9GYl6iXsZ8WxWfmQjsyTiNIoR4zWZ8k+WLyO89hwxfRqQYctaMRwf8gZVooKbfxG6rFnN1Bp9bn3JC+6u72VtFxuadwvcN1j/dIC/Am9rkmtx0A8Wxy7U6X+M0g+br1tt01f6DXDlA/Ff62uY=
+	t=1750767950; cv=none; b=uwEtvW5dQtQ4Qf1saP+++efqVeCNX0Q6u3woY/muFsLTKjawqHwR1DxFQMfH3v+UF9PuGJePPIVQZ3RZVBPt1wwdrkQjG2whzd66drijckwUSCmZkXMAXKlKF5pYpxNYQ7zGy8fIlJ4RLjJ7Dk0rXWirRxoolz7/t5rOpOvx4rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750717631; c=relaxed/simple;
-	bh=nbyXaY11SjSFH5esKAJIMHMkRQx/CBCNZZC4dEaxAf4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y8zVBYYee8NxvCjtrgw3oDw+wntMMwGPnl6v+SY4dUgi5PC8Cde8/n048ckp93jBixcKhkFq6GJvqIK3NIHI9VhaWM5zq8pB3SMcW6eNnMEeQIa4nztEtGVpCUQ5RV51aKkZofz3tFufWJ2xrxN8mbCd+Np+5CQTg7Z66CNKFZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=2hd8L7oS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1750767950; c=relaxed/simple;
+	bh=wTLaR4VYrf3zgK6pYGS1E1AJ8s984B/ZjIvbRKdvDJw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=J0YHnFoBI3CgisJhh7bXe0TnWm9Y/BszpgU/Y6ldx/YXZkaJWdyqF92yj7zE13PzTDZPKiuuJduaSSDQqYh+4htqnjvG3SZhiKgtvg1RYYIF8+X8Gap7A0lhdYo0mxlBksiRcooHW3yeA9ouuWZcKnq4yd9j0vr3JntNKabzisg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=rVG4KUtB; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="2hd8L7oS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DDA4C4CEEA;
-	Mon, 23 Jun 2025 22:27:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1750717631;
-	bh=nbyXaY11SjSFH5esKAJIMHMkRQx/CBCNZZC4dEaxAf4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=2hd8L7oSAx3Uz0h8W+J1e3Y/fkQg0p5RYXev/JONXZborzA686L5CRNObsnuiv3Bx
-	 6wUpIgzaDEvA71+vHjiLm8PP3Pp4BgeAEUKbn1gTpKWRLUVbXuoCCtWQtdzuchsTzK
-	 y5qcDrlA1gSLJ4Lebeu4npGYrDG3iuSfr8qJN6AU=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 401/414] smb: client: fix max_sge overflow in smb_extract_folioq_to_rdma()
-Date: Mon, 23 Jun 2025 15:08:58 +0200
-Message-ID: <20250623130651.964310587@linuxfoundation.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250623130642.015559452@linuxfoundation.org>
-References: <20250623130642.015559452@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="rVG4KUtB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:From:To:Date:Message-ID;
+	bh=I3KmHlmqOnW0lhikbJ+z6WduwdirlanHNTVZ76iQfFo=; b=rVG4KUtBvOJhhgRDrX9n8tzUIp
+	a5zdELywCAQtlwKEr20CvLOaz8IjCTwvXxPEJ2ihV/X9M11emcf3LZO5w7TKtH4LtzAPXDYiJOdV5
+	wCDc7NjybJ74HPgDnpgfb6CKiCaUvlfQifTKhnaZZBs6kG6VxpTm5QA8pnTbplvwiItSDRl5xgumu
+	tDl0/Bi+cwnkZ9CB+B18qBDCWy2fCj0hMO+vZS9JKGvpxmkxoJ6VBh27JjhL+H4qK31cZQgUUSAD0
+	BpWm8mx4M9b28BP5IVuBtDZaZLuPEqgz4a/mK8LIQRWyYxAoA3aQC84UGQU8fJCeTeB5/GW4SeXHS
+	1ZoRVMjRgtVwVBpd5mS9T7j9bKHCvlSUIpr9xB3b6URC2v8A3WocF/8QDiigh4aFw3xUOkECkGVao
+	0XaS3oz60djFSw4vIOQlnpMQrgaEzBg2P0zPY9/ZBHgOs/IBGEAWDojnYfMInswfFDXWLUdRn0D6n
+	RT3Kby3aIH8POFJPQc2zKdr8;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uU2if-00CFv3-1d;
+	Tue, 24 Jun 2025 12:25:45 +0000
+Message-ID: <f448a729-ca2e-40a8-be67-3334f47a3916@samba.org>
+Date: Tue, 24 Jun 2025 14:25:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-6.12-stable review patch.  If anyone has any objections, please let me know.
-
-------------------
-
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] cifs: Collapse smbd_recv_*() into smbd_recv() and just
+ use copy_to_iter()
+To: David Howells <dhowells@redhat.com>
+References: <1107690.1750683895@warthog.procyon.org.uk>
+Content-Language: en-US
 From: Stefan Metzmacher <metze@samba.org>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ netfs@lists.linux.dev, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Steve French <stfrench@microsoft.com>
+In-Reply-To: <1107690.1750683895@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-commit a379a8a2a0032e12e7ef397197c9c2ad011588d6 upstream.
+Hi David,
 
-This fixes the following problem:
+this looks very useful! Just a few comments below...
 
-[  749.901015] [   T8673] run fstests cifs/001 at 2025-06-17 09:40:30
-[  750.346409] [   T9870] ==================================================================
-[  750.346814] [   T9870] BUG: KASAN: slab-out-of-bounds in smb_set_sge+0x2cc/0x3b0 [cifs]
-[  750.347330] [   T9870] Write of size 8 at addr ffff888011082890 by task xfs_io/9870
-[  750.347705] [   T9870]
-[  750.348077] [   T9870] CPU: 0 UID: 0 PID: 9870 Comm: xfs_io Kdump: loaded Not tainted 6.16.0-rc2-metze.02+ #1 PREEMPT(voluntary)
-[  750.348082] [   T9870] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
-[  750.348085] [   T9870] Call Trace:
-[  750.348086] [   T9870]  <TASK>
-[  750.348088] [   T9870]  dump_stack_lvl+0x76/0xa0
-[  750.348106] [   T9870]  print_report+0xd1/0x640
-[  750.348116] [   T9870]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[  750.348120] [   T9870]  ? kasan_complete_mode_report_info+0x26/0x210
-[  750.348124] [   T9870]  kasan_report+0xe7/0x130
-[  750.348128] [   T9870]  ? smb_set_sge+0x2cc/0x3b0 [cifs]
-[  750.348262] [   T9870]  ? smb_set_sge+0x2cc/0x3b0 [cifs]
-[  750.348377] [   T9870]  __asan_report_store8_noabort+0x17/0x30
-[  750.348381] [   T9870]  smb_set_sge+0x2cc/0x3b0 [cifs]
-[  750.348496] [   T9870]  smbd_post_send_iter+0x1990/0x3070 [cifs]
-[  750.348625] [   T9870]  ? __pfx_smbd_post_send_iter+0x10/0x10 [cifs]
-[  750.348741] [   T9870]  ? update_stack_state+0x2a0/0x670
-[  750.348749] [   T9870]  ? cifs_flush+0x153/0x320 [cifs]
-[  750.348870] [   T9870]  ? cifs_flush+0x153/0x320 [cifs]
-[  750.348990] [   T9870]  ? update_stack_state+0x2a0/0x670
-[  750.348995] [   T9870]  smbd_send+0x58c/0x9c0 [cifs]
-[  750.349117] [   T9870]  ? __pfx_smbd_send+0x10/0x10 [cifs]
-[  750.349231] [   T9870]  ? unwind_get_return_address+0x65/0xb0
-[  750.349235] [   T9870]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-[  750.349242] [   T9870]  ? arch_stack_walk+0xa7/0x100
-[  750.349250] [   T9870]  ? stack_trace_save+0x92/0xd0
-[  750.349254] [   T9870]  __smb_send_rqst+0x931/0xec0 [cifs]
-[  750.349374] [   T9870]  ? kernel_text_address+0x173/0x190
-[  750.349379] [   T9870]  ? kasan_save_stack+0x39/0x70
-[  750.349382] [   T9870]  ? kasan_save_track+0x18/0x70
-[  750.349385] [   T9870]  ? __kasan_slab_alloc+0x9d/0xa0
-[  750.349389] [   T9870]  ? __pfx___smb_send_rqst+0x10/0x10 [cifs]
-[  750.349508] [   T9870]  ? smb2_mid_entry_alloc+0xb4/0x7e0 [cifs]
-[  750.349626] [   T9870]  ? cifs_call_async+0x277/0xb00 [cifs]
-[  750.349746] [   T9870]  ? cifs_issue_write+0x256/0x610 [cifs]
-[  750.349867] [   T9870]  ? netfs_do_issue_write+0xc2/0x340 [netfs]
-[  750.349900] [   T9870]  ? netfs_advance_write+0x45b/0x1270 [netfs]
-[  750.349929] [   T9870]  ? netfs_write_folio+0xd6c/0x1be0 [netfs]
-[  750.349958] [   T9870]  ? netfs_writepages+0x2e9/0xa80 [netfs]
-[  750.349987] [   T9870]  ? do_writepages+0x21f/0x590
-[  750.349993] [   T9870]  ? filemap_fdatawrite_wbc+0xe1/0x140
-[  750.349997] [   T9870]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.350002] [   T9870]  smb_send_rqst+0x22e/0x2f0 [cifs]
-[  750.350131] [   T9870]  ? __pfx_smb_send_rqst+0x10/0x10 [cifs]
-[  750.350255] [   T9870]  ? local_clock_noinstr+0xe/0xd0
-[  750.350261] [   T9870]  ? kasan_save_alloc_info+0x37/0x60
-[  750.350268] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.350271] [   T9870]  ? _raw_spin_lock+0x81/0xf0
-[  750.350275] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.350278] [   T9870]  ? smb2_setup_async_request+0x293/0x580 [cifs]
-[  750.350398] [   T9870]  cifs_call_async+0x477/0xb00 [cifs]
-[  750.350518] [   T9870]  ? __pfx_smb2_writev_callback+0x10/0x10 [cifs]
-[  750.350636] [   T9870]  ? __pfx_cifs_call_async+0x10/0x10 [cifs]
-[  750.350756] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.350760] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.350763] [   T9870]  ? __smb2_plain_req_init+0x933/0x1090 [cifs]
-[  750.350891] [   T9870]  smb2_async_writev+0x15ff/0x2460 [cifs]
-[  750.351008] [   T9870]  ? sched_clock_noinstr+0x9/0x10
-[  750.351012] [   T9870]  ? local_clock_noinstr+0xe/0xd0
-[  750.351018] [   T9870]  ? __pfx_smb2_async_writev+0x10/0x10 [cifs]
-[  750.351144] [   T9870]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[  750.351150] [   T9870]  ? _raw_spin_unlock+0xe/0x40
-[  750.351154] [   T9870]  ? cifs_pick_channel+0x242/0x370 [cifs]
-[  750.351275] [   T9870]  cifs_issue_write+0x256/0x610 [cifs]
-[  750.351554] [   T9870]  ? cifs_issue_write+0x256/0x610 [cifs]
-[  750.351677] [   T9870]  netfs_do_issue_write+0xc2/0x340 [netfs]
-[  750.351710] [   T9870]  netfs_advance_write+0x45b/0x1270 [netfs]
-[  750.351740] [   T9870]  ? rolling_buffer_append+0x12d/0x440 [netfs]
-[  750.351769] [   T9870]  netfs_write_folio+0xd6c/0x1be0 [netfs]
-[  750.351798] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.351804] [   T9870]  netfs_writepages+0x2e9/0xa80 [netfs]
-[  750.351835] [   T9870]  ? __pfx_netfs_writepages+0x10/0x10 [netfs]
-[  750.351864] [   T9870]  ? exit_files+0xab/0xe0
-[  750.351867] [   T9870]  ? do_exit+0x148f/0x2980
-[  750.351871] [   T9870]  ? do_group_exit+0xb5/0x250
-[  750.351874] [   T9870]  ? arch_do_signal_or_restart+0x92/0x630
-[  750.351879] [   T9870]  ? exit_to_user_mode_loop+0x98/0x170
-[  750.351882] [   T9870]  ? do_syscall_64+0x2cf/0xd80
-[  750.351886] [   T9870]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.351890] [   T9870]  do_writepages+0x21f/0x590
-[  750.351894] [   T9870]  ? __pfx_do_writepages+0x10/0x10
-[  750.351897] [   T9870]  filemap_fdatawrite_wbc+0xe1/0x140
-[  750.351901] [   T9870]  __filemap_fdatawrite_range+0xba/0x100
-[  750.351904] [   T9870]  ? __pfx___filemap_fdatawrite_range+0x10/0x10
-[  750.351912] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.351916] [   T9870]  filemap_write_and_wait_range+0x7d/0xf0
-[  750.351920] [   T9870]  cifs_flush+0x153/0x320 [cifs]
-[  750.352042] [   T9870]  filp_flush+0x107/0x1a0
-[  750.352046] [   T9870]  filp_close+0x14/0x30
-[  750.352049] [   T9870]  put_files_struct.part.0+0x126/0x2a0
-[  750.352053] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.352058] [   T9870]  exit_files+0xab/0xe0
-[  750.352061] [   T9870]  do_exit+0x148f/0x2980
-[  750.352065] [   T9870]  ? __pfx_do_exit+0x10/0x10
-[  750.352069] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.352072] [   T9870]  ? _raw_spin_lock_irq+0x8a/0xf0
-[  750.352076] [   T9870]  do_group_exit+0xb5/0x250
-[  750.352080] [   T9870]  get_signal+0x22d3/0x22e0
-[  750.352086] [   T9870]  ? __pfx_get_signal+0x10/0x10
-[  750.352089] [   T9870]  ? fpregs_assert_state_consistent+0x68/0x100
-[  750.352101] [   T9870]  ? folio_add_lru+0xda/0x120
-[  750.352105] [   T9870]  arch_do_signal_or_restart+0x92/0x630
-[  750.352109] [   T9870]  ? __pfx_arch_do_signal_or_restart+0x10/0x10
-[  750.352115] [   T9870]  exit_to_user_mode_loop+0x98/0x170
-[  750.352118] [   T9870]  do_syscall_64+0x2cf/0xd80
-[  750.352123] [   T9870]  ? __kasan_check_read+0x11/0x20
-[  750.352126] [   T9870]  ? count_memcg_events+0x1b4/0x420
-[  750.352132] [   T9870]  ? handle_mm_fault+0x148/0x690
-[  750.352136] [   T9870]  ? _raw_spin_lock_irq+0x8a/0xf0
-[  750.352140] [   T9870]  ? __kasan_check_read+0x11/0x20
-[  750.352143] [   T9870]  ? fpregs_assert_state_consistent+0x68/0x100
-[  750.352146] [   T9870]  ? irqentry_exit_to_user_mode+0x2e/0x250
-[  750.352151] [   T9870]  ? irqentry_exit+0x43/0x50
-[  750.352154] [   T9870]  ? exc_page_fault+0x75/0xe0
-[  750.352160] [   T9870]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.352163] [   T9870] RIP: 0033:0x7858c94ab6e2
-[  750.352167] [   T9870] Code: Unable to access opcode bytes at 0x7858c94ab6b8.
-[  750.352175] [   T9870] RSP: 002b:00007858c9248ce8 EFLAGS: 00000246 ORIG_RAX: 0000000000000022
-[  750.352179] [   T9870] RAX: fffffffffffffdfe RBX: 00007858c92496c0 RCX: 00007858c94ab6e2
-[  750.352182] [   T9870] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[  750.352184] [   T9870] RBP: 00007858c9248d10 R08: 0000000000000000 R09: 0000000000000000
-[  750.352185] [   T9870] R10: 0000000000000000 R11: 0000000000000246 R12: fffffffffffffde0
-[  750.352187] [   T9870] R13: 0000000000000020 R14: 0000000000000002 R15: 00007ffc072d2230
-[  750.352191] [   T9870]  </TASK>
-[  750.352195] [   T9870]
-[  750.395206] [   T9870] Allocated by task 9870 on cpu 0 at 750.346406s:
-[  750.395523] [   T9870]  kasan_save_stack+0x39/0x70
-[  750.395532] [   T9870]  kasan_save_track+0x18/0x70
-[  750.395536] [   T9870]  kasan_save_alloc_info+0x37/0x60
-[  750.395539] [   T9870]  __kasan_slab_alloc+0x9d/0xa0
-[  750.395543] [   T9870]  kmem_cache_alloc_noprof+0x13c/0x3f0
-[  750.395548] [   T9870]  mempool_alloc_slab+0x15/0x20
-[  750.395553] [   T9870]  mempool_alloc_noprof+0x135/0x340
-[  750.395557] [   T9870]  smbd_post_send_iter+0x63e/0x3070 [cifs]
-[  750.395694] [   T9870]  smbd_send+0x58c/0x9c0 [cifs]
-[  750.395819] [   T9870]  __smb_send_rqst+0x931/0xec0 [cifs]
-[  750.395950] [   T9870]  smb_send_rqst+0x22e/0x2f0 [cifs]
-[  750.396081] [   T9870]  cifs_call_async+0x477/0xb00 [cifs]
-[  750.396232] [   T9870]  smb2_async_writev+0x15ff/0x2460 [cifs]
-[  750.396359] [   T9870]  cifs_issue_write+0x256/0x610 [cifs]
-[  750.396492] [   T9870]  netfs_do_issue_write+0xc2/0x340 [netfs]
-[  750.396544] [   T9870]  netfs_advance_write+0x45b/0x1270 [netfs]
-[  750.396576] [   T9870]  netfs_write_folio+0xd6c/0x1be0 [netfs]
-[  750.396608] [   T9870]  netfs_writepages+0x2e9/0xa80 [netfs]
-[  750.396639] [   T9870]  do_writepages+0x21f/0x590
-[  750.396643] [   T9870]  filemap_fdatawrite_wbc+0xe1/0x140
-[  750.396647] [   T9870]  __filemap_fdatawrite_range+0xba/0x100
-[  750.396651] [   T9870]  filemap_write_and_wait_range+0x7d/0xf0
-[  750.396656] [   T9870]  cifs_flush+0x153/0x320 [cifs]
-[  750.396787] [   T9870]  filp_flush+0x107/0x1a0
-[  750.396791] [   T9870]  filp_close+0x14/0x30
-[  750.396795] [   T9870]  put_files_struct.part.0+0x126/0x2a0
-[  750.396800] [   T9870]  exit_files+0xab/0xe0
-[  750.396803] [   T9870]  do_exit+0x148f/0x2980
-[  750.396808] [   T9870]  do_group_exit+0xb5/0x250
-[  750.396813] [   T9870]  get_signal+0x22d3/0x22e0
-[  750.396817] [   T9870]  arch_do_signal_or_restart+0x92/0x630
-[  750.396822] [   T9870]  exit_to_user_mode_loop+0x98/0x170
-[  750.396827] [   T9870]  do_syscall_64+0x2cf/0xd80
-[  750.396832] [   T9870]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.396836] [   T9870]
-[  750.397150] [   T9870] The buggy address belongs to the object at ffff888011082800
-                           which belongs to the cache smbd_request_0000000008f3bd7b of size 144
-[  750.397798] [   T9870] The buggy address is located 0 bytes to the right of
-                           allocated 144-byte region [ffff888011082800, ffff888011082890)
-[  750.398469] [   T9870]
-[  750.398800] [   T9870] The buggy address belongs to the physical page:
-[  750.399141] [   T9870] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x11082
-[  750.399148] [   T9870] flags: 0xfffffc0000000(node=0|zone=1|lastcpupid=0x1fffff)
-[  750.399155] [   T9870] page_type: f5(slab)
-[  750.399161] [   T9870] raw: 000fffffc0000000 ffff888022d65640 dead000000000122 0000000000000000
-[  750.399165] [   T9870] raw: 0000000000000000 0000000080100010 00000000f5000000 0000000000000000
-[  750.399169] [   T9870] page dumped because: kasan: bad access detected
-[  750.399172] [   T9870]
-[  750.399505] [   T9870] Memory state around the buggy address:
-[  750.399863] [   T9870]  ffff888011082780: fb fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[  750.400247] [   T9870]  ffff888011082800: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[  750.400618] [   T9870] >ffff888011082880: 00 00 fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[  750.400982] [   T9870]                          ^
-[  750.401370] [   T9870]  ffff888011082900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[  750.401774] [   T9870]  ffff888011082980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[  750.402171] [   T9870] ==================================================================
-[  750.402696] [   T9870] Disabling lock debugging due to kernel taint
-[  750.403202] [   T9870] BUG: unable to handle page fault for address: ffff8880110a2000
-[  750.403797] [   T9870] #PF: supervisor write access in kernel mode
-[  750.404204] [   T9870] #PF: error_code(0x0003) - permissions violation
-[  750.404581] [   T9870] PGD 5ce01067 P4D 5ce01067 PUD 5ce02067 PMD 78aa063 PTE 80000000110a2021
-[  750.404969] [   T9870] Oops: Oops: 0003 [#1] SMP KASAN PTI
-[  750.405394] [   T9870] CPU: 0 UID: 0 PID: 9870 Comm: xfs_io Kdump: loaded Tainted: G    B               6.16.0-rc2-metze.02+ #1 PREEMPT(voluntary)
-[  750.406510] [   T9870] Tainted: [B]=BAD_PAGE
-[  750.406967] [   T9870] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
-[  750.407440] [   T9870] RIP: 0010:smb_set_sge+0x15c/0x3b0 [cifs]
-[  750.408065] [   T9870] Code: 48 83 f8 ff 0f 84 b0 00 00 00 48 ba 00 00 00 00 00 fc ff df 4c 89 e1 48 c1 e9 03 80 3c 11 00 0f 85 69 01 00 00 49 8d 7c 24 08 <49> 89 04 24 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 0f
-[  750.409283] [   T9870] RSP: 0018:ffffc90005e2e758 EFLAGS: 00010246
-[  750.409803] [   T9870] RAX: ffff888036c53400 RBX: ffffc90005e2e878 RCX: 1ffff11002214400
-[  750.410323] [   T9870] RDX: dffffc0000000000 RSI: dffffc0000000000 RDI: ffff8880110a2008
-[  750.411217] [   T9870] RBP: ffffc90005e2e798 R08: 0000000000000001 R09: 0000000000000400
-[  750.411770] [   T9870] R10: ffff888011082800 R11: 0000000000000000 R12: ffff8880110a2000
-[  750.412325] [   T9870] R13: 0000000000000000 R14: ffffc90005e2e888 R15: ffff88801a4b6000
-[  750.412901] [   T9870] FS:  0000000000000000(0000) GS:ffff88812bc68000(0000) knlGS:0000000000000000
-[  750.413477] [   T9870] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  750.414077] [   T9870] CR2: ffff8880110a2000 CR3: 000000005b0a6005 CR4: 00000000000726f0
-[  750.414654] [   T9870] Call Trace:
-[  750.415211] [   T9870]  <TASK>
-[  750.415748] [   T9870]  smbd_post_send_iter+0x1990/0x3070 [cifs]
-[  750.416449] [   T9870]  ? __pfx_smbd_post_send_iter+0x10/0x10 [cifs]
-[  750.417128] [   T9870]  ? update_stack_state+0x2a0/0x670
-[  750.417685] [   T9870]  ? cifs_flush+0x153/0x320 [cifs]
-[  750.418380] [   T9870]  ? cifs_flush+0x153/0x320 [cifs]
-[  750.419055] [   T9870]  ? update_stack_state+0x2a0/0x670
-[  750.419624] [   T9870]  smbd_send+0x58c/0x9c0 [cifs]
-[  750.420297] [   T9870]  ? __pfx_smbd_send+0x10/0x10 [cifs]
-[  750.420936] [   T9870]  ? unwind_get_return_address+0x65/0xb0
-[  750.421456] [   T9870]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-[  750.421954] [   T9870]  ? arch_stack_walk+0xa7/0x100
-[  750.422460] [   T9870]  ? stack_trace_save+0x92/0xd0
-[  750.422948] [   T9870]  __smb_send_rqst+0x931/0xec0 [cifs]
-[  750.423579] [   T9870]  ? kernel_text_address+0x173/0x190
-[  750.424056] [   T9870]  ? kasan_save_stack+0x39/0x70
-[  750.424813] [   T9870]  ? kasan_save_track+0x18/0x70
-[  750.425323] [   T9870]  ? __kasan_slab_alloc+0x9d/0xa0
-[  750.425831] [   T9870]  ? __pfx___smb_send_rqst+0x10/0x10 [cifs]
-[  750.426548] [   T9870]  ? smb2_mid_entry_alloc+0xb4/0x7e0 [cifs]
-[  750.427231] [   T9870]  ? cifs_call_async+0x277/0xb00 [cifs]
-[  750.427882] [   T9870]  ? cifs_issue_write+0x256/0x610 [cifs]
-[  750.428909] [   T9870]  ? netfs_do_issue_write+0xc2/0x340 [netfs]
-[  750.429425] [   T9870]  ? netfs_advance_write+0x45b/0x1270 [netfs]
-[  750.429882] [   T9870]  ? netfs_write_folio+0xd6c/0x1be0 [netfs]
-[  750.430345] [   T9870]  ? netfs_writepages+0x2e9/0xa80 [netfs]
-[  750.430809] [   T9870]  ? do_writepages+0x21f/0x590
-[  750.431239] [   T9870]  ? filemap_fdatawrite_wbc+0xe1/0x140
-[  750.431652] [   T9870]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.432041] [   T9870]  smb_send_rqst+0x22e/0x2f0 [cifs]
-[  750.432586] [   T9870]  ? __pfx_smb_send_rqst+0x10/0x10 [cifs]
-[  750.433108] [   T9870]  ? local_clock_noinstr+0xe/0xd0
-[  750.433482] [   T9870]  ? kasan_save_alloc_info+0x37/0x60
-[  750.433855] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.434214] [   T9870]  ? _raw_spin_lock+0x81/0xf0
-[  750.434561] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.434903] [   T9870]  ? smb2_setup_async_request+0x293/0x580 [cifs]
-[  750.435394] [   T9870]  cifs_call_async+0x477/0xb00 [cifs]
-[  750.435892] [   T9870]  ? __pfx_smb2_writev_callback+0x10/0x10 [cifs]
-[  750.436388] [   T9870]  ? __pfx_cifs_call_async+0x10/0x10 [cifs]
-[  750.436881] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.437237] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.437579] [   T9870]  ? __smb2_plain_req_init+0x933/0x1090 [cifs]
-[  750.438062] [   T9870]  smb2_async_writev+0x15ff/0x2460 [cifs]
-[  750.438557] [   T9870]  ? sched_clock_noinstr+0x9/0x10
-[  750.438906] [   T9870]  ? local_clock_noinstr+0xe/0xd0
-[  750.439293] [   T9870]  ? __pfx_smb2_async_writev+0x10/0x10 [cifs]
-[  750.439786] [   T9870]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[  750.440143] [   T9870]  ? _raw_spin_unlock+0xe/0x40
-[  750.440495] [   T9870]  ? cifs_pick_channel+0x242/0x370 [cifs]
-[  750.440989] [   T9870]  cifs_issue_write+0x256/0x610 [cifs]
-[  750.441492] [   T9870]  ? cifs_issue_write+0x256/0x610 [cifs]
-[  750.441987] [   T9870]  netfs_do_issue_write+0xc2/0x340 [netfs]
-[  750.442387] [   T9870]  netfs_advance_write+0x45b/0x1270 [netfs]
-[  750.442969] [   T9870]  ? rolling_buffer_append+0x12d/0x440 [netfs]
-[  750.443376] [   T9870]  netfs_write_folio+0xd6c/0x1be0 [netfs]
-[  750.443768] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.444145] [   T9870]  netfs_writepages+0x2e9/0xa80 [netfs]
-[  750.444541] [   T9870]  ? __pfx_netfs_writepages+0x10/0x10 [netfs]
-[  750.444936] [   T9870]  ? exit_files+0xab/0xe0
-[  750.445312] [   T9870]  ? do_exit+0x148f/0x2980
-[  750.445672] [   T9870]  ? do_group_exit+0xb5/0x250
-[  750.446028] [   T9870]  ? arch_do_signal_or_restart+0x92/0x630
-[  750.446402] [   T9870]  ? exit_to_user_mode_loop+0x98/0x170
-[  750.446762] [   T9870]  ? do_syscall_64+0x2cf/0xd80
-[  750.447132] [   T9870]  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.447499] [   T9870]  do_writepages+0x21f/0x590
-[  750.447859] [   T9870]  ? __pfx_do_writepages+0x10/0x10
-[  750.448236] [   T9870]  filemap_fdatawrite_wbc+0xe1/0x140
-[  750.448595] [   T9870]  __filemap_fdatawrite_range+0xba/0x100
-[  750.448953] [   T9870]  ? __pfx___filemap_fdatawrite_range+0x10/0x10
-[  750.449336] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.449697] [   T9870]  filemap_write_and_wait_range+0x7d/0xf0
-[  750.450062] [   T9870]  cifs_flush+0x153/0x320 [cifs]
-[  750.450592] [   T9870]  filp_flush+0x107/0x1a0
-[  750.450952] [   T9870]  filp_close+0x14/0x30
-[  750.451322] [   T9870]  put_files_struct.part.0+0x126/0x2a0
-[  750.451678] [   T9870]  ? __pfx__raw_spin_lock+0x10/0x10
-[  750.452033] [   T9870]  exit_files+0xab/0xe0
-[  750.452401] [   T9870]  do_exit+0x148f/0x2980
-[  750.452751] [   T9870]  ? __pfx_do_exit+0x10/0x10
-[  750.453109] [   T9870]  ? __kasan_check_write+0x14/0x30
-[  750.453459] [   T9870]  ? _raw_spin_lock_irq+0x8a/0xf0
-[  750.453787] [   T9870]  do_group_exit+0xb5/0x250
-[  750.454082] [   T9870]  get_signal+0x22d3/0x22e0
-[  750.454406] [   T9870]  ? __pfx_get_signal+0x10/0x10
-[  750.454709] [   T9870]  ? fpregs_assert_state_consistent+0x68/0x100
-[  750.455031] [   T9870]  ? folio_add_lru+0xda/0x120
-[  750.455347] [   T9870]  arch_do_signal_or_restart+0x92/0x630
-[  750.455656] [   T9870]  ? __pfx_arch_do_signal_or_restart+0x10/0x10
-[  750.455967] [   T9870]  exit_to_user_mode_loop+0x98/0x170
-[  750.456282] [   T9870]  do_syscall_64+0x2cf/0xd80
-[  750.456591] [   T9870]  ? __kasan_check_read+0x11/0x20
-[  750.456897] [   T9870]  ? count_memcg_events+0x1b4/0x420
-[  750.457280] [   T9870]  ? handle_mm_fault+0x148/0x690
-[  750.457616] [   T9870]  ? _raw_spin_lock_irq+0x8a/0xf0
-[  750.457925] [   T9870]  ? __kasan_check_read+0x11/0x20
-[  750.458297] [   T9870]  ? fpregs_assert_state_consistent+0x68/0x100
-[  750.458672] [   T9870]  ? irqentry_exit_to_user_mode+0x2e/0x250
-[  750.459191] [   T9870]  ? irqentry_exit+0x43/0x50
-[  750.459600] [   T9870]  ? exc_page_fault+0x75/0xe0
-[  750.460130] [   T9870]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  750.460570] [   T9870] RIP: 0033:0x7858c94ab6e2
-[  750.461206] [   T9870] Code: Unable to access opcode bytes at 0x7858c94ab6b8.
-[  750.461780] [   T9870] RSP: 002b:00007858c9248ce8 EFLAGS: 00000246 ORIG_RAX: 0000000000000022
-[  750.462327] [   T9870] RAX: fffffffffffffdfe RBX: 00007858c92496c0 RCX: 00007858c94ab6e2
-[  750.462653] [   T9870] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-[  750.462969] [   T9870] RBP: 00007858c9248d10 R08: 0000000000000000 R09: 0000000000000000
-[  750.463290] [   T9870] R10: 0000000000000000 R11: 0000000000000246 R12: fffffffffffffde0
-[  750.463640] [   T9870] R13: 0000000000000020 R14: 0000000000000002 R15: 00007ffc072d2230
-[  750.463965] [   T9870]  </TASK>
-[  750.464285] [   T9870] Modules linked in: siw ib_uverbs ccm cmac nls_utf8 cifs cifs_arc4 nls_ucs2_utils rdma_cm iw_cm ib_cm ib_core cifs_md4 netfs softdog vboxsf vboxguest cpuid intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_class intel_pmc_ssram_telemetry intel_vsec polyval_clmulni ghash_clmulni_intel sha1_ssse3 aesni_intel rapl i2c_piix4 i2c_smbus joydev input_leds mac_hid sunrpc binfmt_misc kvm_intel kvm irqbypass sch_fq_codel efi_pstore nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci dmi_sysfs ip_tables x_tables autofs4 hid_generic vboxvideo usbhid drm_vram_helper psmouse vga16fb vgastate drm_ttm_helper serio_raw hid ahci libahci ttm pata_acpi video wmi [last unloaded: vboxguest]
-[  750.467127] [   T9870] CR2: ffff8880110a2000
+> Collapse smbd_recv_buf() and smbd_recv_page() into smbd_recv() and just use
+> copy_to_iter() instead of memcpy().
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <stfrench@microsoft.com>
+> cc: Tom Talpey <tom@talpey.com>
+> cc: Stefan Metzmacher <metze@samba.org>
+> cc: Paulo Alcantara (Red Hat) <pc@manguebit.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>   fs/smb/client/smbdirect.c |  116 +++++++---------------------------------------
+>   1 file changed, 20 insertions(+), 96 deletions(-)
+> 
+> diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+> index 5ae847919da5..dc64c337aae0 100644
+> --- a/fs/smb/client/smbdirect.c
+> +++ b/fs/smb/client/smbdirect.c
+> @@ -1747,35 +1747,39 @@ struct smbd_connection *smbd_get_connection(
+>   }
+>   
+>   /*
+> - * Receive data from receive reassembly queue
+> + * Receive data from the transport's receive reassembly queue
+>    * All the incoming data packets are placed in reassembly queue
+> - * buf: the buffer to read data into
+> + * iter: the buffer to read data into
+>    * size: the length of data to read
+>    * return value: actual data read
+> - * Note: this implementation copies the data from reassebmly queue to receive
+> + *
+> + * Note: this implementation copies the data from reassembly queue to receive
+>    * buffers used by upper layer. This is not the optimal code path. A better way
+>    * to do it is to not have upper layer allocate its receive buffers but rather
+>    * borrow the buffer from reassembly queue, and return it after data is
+>    * consumed. But this will require more changes to upper layer code, and also
+>    * need to consider packet boundaries while they still being reassembled.
+>    */
+> -static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+> -		unsigned int size)
+> +int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+>   {
+>   	struct smbdirect_socket *sc = &info->socket;
+>   	struct smbd_response *response;
+>   	struct smbdirect_data_transfer *data_transfer;
+> +	size_t size = msg->msg_iter.count;
 
-cc: Tom Talpey <tom@talpey.com>
-cc: linux-cifs@vger.kernel.org
-Reviewed-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Tom Talpey <tom@talpey.com>
-Fixes: c45ebd636c32 ("cifs: Provide the capability to extract from ITER_FOLIOQ to RDMA SGEs")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/smbdirect.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I think this should be iov_iter_count()?
 
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -2552,13 +2552,14 @@ static ssize_t smb_extract_folioq_to_rdm
- 		size_t fsize = folioq_folio_size(folioq, slot);
- 
- 		if (offset < fsize) {
--			size_t part = umin(maxsize - ret, fsize - offset);
-+			size_t part = umin(maxsize, fsize - offset);
- 
- 			if (!smb_set_sge(rdma, folio_page(folio, 0), offset, part))
- 				return -EIO;
- 
- 			offset += part;
- 			ret += part;
-+			maxsize -= part;
- 		}
- 
- 		if (offset >= fsize) {
-@@ -2573,7 +2574,7 @@ static ssize_t smb_extract_folioq_to_rdm
- 				slot = 0;
- 			}
- 		}
--	} while (rdma->nr_sge < rdma->max_sge || maxsize > 0);
-+	} while (rdma->nr_sge < rdma->max_sge && maxsize > 0);
- 
- 	iter->folioq = folioq;
- 	iter->folioq_slot = slot;
+>   	int to_copy, to_read, data_read, offset;
+>   	u32 data_length, remaining_data_length, data_offset;
+>   	int rc;
+>   
+> +	if (WARN_ON_ONCE(iov_iter_rw(&msg->msg_iter) == WRITE))
+> +		return -EINVAL; /* It's a bug in upper layer to get there */
+> +
+>   again:
+>   	/*
+>   	 * No need to hold the reassembly queue lock all the time as we are
+>   	 * the only one reading from the front of the queue. The transport
+>   	 * may add more entries to the back of the queue at the same time
+>   	 */
+> -	log_read(INFO, "size=%d info->reassembly_data_length=%d\n", size,
+> +	log_read(INFO, "size=%zd info->reassembly_data_length=%d\n", size,
+>   		info->reassembly_data_length);
+>   	if (info->reassembly_data_length >= size) {
+>   		int queue_length;
+> @@ -1811,9 +1815,12 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+>   			 * transport layer is added
+>   			 */
+>   			if (response->first_segment && size == 4) {
+> -				unsigned int rfc1002_len =
+> +				unsigned int len =
+>   					data_length + remaining_data_length;
+> -				*((__be32 *)buf) = cpu_to_be32(rfc1002_len);
+> +				__be32 rfc1002_len = cpu_to_be32(len);
+> +				if (copy_to_iter(&rfc1002_len, sizeof(rfc1002_len),
+> +						 &msg->msg_iter) != sizeof(rfc1002_len))
+> +					return -EFAULT;
+>   				data_read = 4;
+>   				response->first_segment = false;
+>   				log_read(INFO, "returning rfc1002 length %d\n",
+> @@ -1822,10 +1829,9 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+>   			}
+>   
+>   			to_copy = min_t(int, data_length - offset, to_read);
+> -			memcpy(
+> -				buf + data_read,
+> -				(char *)data_transfer + data_offset + offset,
+> -				to_copy);
+> +			if (copy_to_iter((char *)data_transfer + data_offset + offset,
+> +					 to_copy, &msg->msg_iter) != to_copy)
+> +				return -EFAULT;
+>   
+>   			/* move on to the next buffer? */
+>   			if (to_copy == data_length - offset) {
+> @@ -1870,6 +1876,8 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+>   			 data_read, info->reassembly_data_length,
+>   			 info->first_entry_offset);
+>   read_rfc1002_done:
+> +		/* SMBDirect will read it all or nothing */
+> +		msg->msg_iter.count = 0;
 
+And this iov_iter_truncate(0);
+
+While I'm wondering why we had this at all.
+
+It seems all callers of cifs_read_iter_from_socket()
+don't care and the code path via sock_recvmsg() doesn't
+truncate it just calls copy_to_iter() via this chain:
+->inet_recvmsg->tcp_recvmsg->skb_copy_datagram_msg->skb_copy_datagram_iter
+->simple_copy_to_iter->copy_to_iter()
+
+I think the old code should have called
+iov_iter_advance(rc) instead of msg->msg_iter.count = 0.
+
+But the new code doesn't need it as copy_to_iter()
+calls iterate_and_advance().
+
+>   		return data_read;
+>   	}
+>   
+> @@ -1890,90 +1898,6 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+>   	goto again;
+>   }
+>   
+> -/*
+> - * Receive a page from receive reassembly queue
+> - * page: the page to read data into
+> - * to_read: the length of data to read
+> - * return value: actual data read
+> - */
+> -static int smbd_recv_page(struct smbd_connection *info,
+> -		struct page *page, unsigned int page_offset,
+> -		unsigned int to_read)
+> -{
+> -	struct smbdirect_socket *sc = &info->socket;
+> -	int ret;
+> -	char *to_address;
+> -	void *page_address;
+> -
+> -	/* make sure we have the page ready for read */
+> -	ret = wait_event_interruptible(
+> -		info->wait_reassembly_queue,
+> -		info->reassembly_data_length >= to_read ||
+> -			sc->status != SMBDIRECT_SOCKET_CONNECTED);
+> -	if (ret)
+> -		return ret;
+> -
+> -	/* now we can read from reassembly queue and not sleep */
+> -	page_address = kmap_atomic(page);
+> -	to_address = (char *) page_address + page_offset;
+> -
+> -	log_read(INFO, "reading from page=%p address=%p to_read=%d\n",
+> -		page, to_address, to_read);
+> -
+> -	ret = smbd_recv_buf(info, to_address, to_read);
+> -	kunmap_atomic(page_address);
+> -
+> -	return ret;
+> -}
+> -
+> -/*
+> - * Receive data from transport
+> - * msg: a msghdr point to the buffer, can be ITER_KVEC or ITER_BVEC
+> - * return: total bytes read, or 0. SMB Direct will not do partial read.
+> - */
+> -int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+> -{
+> -	char *buf;
+> -	struct page *page;
+> -	unsigned int to_read, page_offset;
+> -	int rc;
+> -
+> -	if (iov_iter_rw(&msg->msg_iter) == WRITE) {
+> -		/* It's a bug in upper layer to get there */
+> -		cifs_dbg(VFS, "Invalid msg iter dir %u\n",
+> -			 iov_iter_rw(&msg->msg_iter));
+> -		rc = -EINVAL;
+> -		goto out;
+> -	}
+> -
+> -	switch (iov_iter_type(&msg->msg_iter)) {
+> -	case ITER_KVEC:
+> -		buf = msg->msg_iter.kvec->iov_base;
+> -		to_read = msg->msg_iter.kvec->iov_len;
+> -		rc = smbd_recv_buf(info, buf, to_read);
+> -		break;
+> -
+> -	case ITER_BVEC:
+> -		page = msg->msg_iter.bvec->bv_page;
+> -		page_offset = msg->msg_iter.bvec->bv_offset;
+> -		to_read = msg->msg_iter.bvec->bv_len;
+> -		rc = smbd_recv_page(info, page, page_offset, to_read);
+> -		break;
+> -
+> -	default:
+> -		/* It's a bug in upper layer to get there */
+> -		cifs_dbg(VFS, "Invalid msg type %d\n",
+> -			 iov_iter_type(&msg->msg_iter));
+> -		rc = -EINVAL;
+> -	}
+
+I guess this is actually a real fix as I just saw
+CIFS: VFS: Invalid msg type 4
+in logs while running the cifs/001 test.
+And 4 is ITER_FOLIOQ.
+
+So there might be something broken when ITER_FOLIOQ was
+introduced, but I wasn't able to find a specific commit.
+Maybe it was also already broken when using
+smb3 encryption over smbdirect, when ITER_XARRAY was still used.
+
+metze
 
