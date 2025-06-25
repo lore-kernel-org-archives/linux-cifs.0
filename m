@@ -1,151 +1,189 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203592BF00C
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Jun 2025 16:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573E026C3B2;
+	Wed, 25 Jun 2025 16:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750868295; cv=none; b=T1faqKHz0COwPDuQanticKFvKhzp285G0LMK64ZpeAfZ9x5hTe8lgtfKzjbB6k2FG+cNcCZ5aLr3JXJ3obsHBP19xe5UXysqbUHiXjmb3lwWAGjqR4P3lmtLMe+ENsV/gPrvUKMV5f3+zizD2yzdQXdjF2dZ8o/79Rwoekk/s3k=
+	t=1750868475; cv=none; b=u61oD7eXk+mOBnPiFr1LgN0h6/5lit3its691PMu3pYXII0up7Ea32vDElAygxVyKy7ETjm2Xrz9AShjm//0emLLKadadODd8V0SdtMHPF0ueXhEgxqLRSnMOCMhHNeieE4QFECEL6DRlPi46ivY4lM3fToMadGVeOayCTcKnAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750868295; c=relaxed/simple;
-	bh=GP8QyAtyVq11TlTI8xtrp09rkmw9qeGsNkJ+6QEEVmw=;
+	s=arc-20240116; t=1750868475; c=relaxed/simple;
+	bh=XMP6ERBXfxV519EBoe1Y/mZ/m+8At/oi36qL9USyJ5s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UiM3mwH0GmgY6oE7b+Qww352EOUWIgtcW6vocvMIo/h+tCgyqK2l7g2rDSldojTsaL1T4qp5oEdC4rwDJkn3HC8LTG5WyvctOH6k3m5XUGq43t3mxkzP+Nwp8ZPNl1m3dUzp2PWKNxCNmdTJh25zja2RNhu0Q5f7mnDQKikN5y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZMMNi+YN; arc=none smtp.client-ip=209.85.219.51
+	 To:Cc:Content-Type; b=juUUXwyK5WuJs95+f+RURZt6fgvIdnD1LbffjH0czGcTYqinNqBcKewnVIjOoNGOgkf0N97tRt+vnJqyfDFLaTyV4KV4eEXn5na/4Amxr0KULirIAOy1CvNATWgaWx49GXl6VQaRP7wXBN7se9Wtzvx9OYDOOcjY7SHhSmUhg7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKHS7PKh; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZMMNi+YN"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6fadb9a0325so954266d6.2
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jun 2025 09:18:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKHS7PKh"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6fb3bba0730so13928566d6.0;
+        Wed, 25 Jun 2025 09:21:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750868292; x=1751473092; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750868472; x=1751473272; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WfT2F4WO2WkloBm9pwG8+Zygrf5do3v691T8Lv7s6Gs=;
-        b=ZMMNi+YNtdqqJuocj/gmiTyG9L9ExdQPUXQJFTAscalkIUFccqgtiuiipHrqpIJhzK
-         8Qg35FD2NoIcOTYcJP59GxpxEzJ+kXJuiGwqP9Cn6fQI+Hqu9zQnpuP40SAx4FiPK/PA
-         PlsJHUPXexFi0YByo7Hj6+z/8d+LUa5+/F0VPoI9yJasxYB9V1fIceWvVa67TulDwRra
-         RaQA3gydluvRMO5MBSHq9t9tR8382IboKtvPeOriUzMiYvs532ZTavnG52iT92R77h0q
-         e5p5og3DQk7yNeELvLNdWBrFpBHhUD2/RQ9l/fqkScAnVP3vRNvRZWObUe2pHCf3yvK0
-         zb9A==
+        bh=9NVslBr1xkJaej9KYSvp2pb98xkmIaEpx8AR8MBWA3Y=;
+        b=KKHS7PKh1Tzi/umPFc5fZ06crDgdRXEIWlhStq7JSGeAVz7/qrt9SLqChBWXHmZ22V
+         keGme5bnlSsc2k5nHggKOmhlEIp7hGAyPHS8U9UqPCKFo0C1ODiTngwRGd1mdTElhksy
+         P7TTHUR1OxKu2FQGjEguHiZTPBpTA0w4/8n/hyDfbUMbCqNHooZ8LoMoXaBqusoQSaMt
+         GvnoVU0W2SIHuUzuBk3MsYve3jPVgtOncq+7NkU4jfsEH/eJ+O7pvWn7+mFGZ5tfxmFA
+         bJXoi7IIpxZAL96EtHA9SFCu2pzcAx0uCEy+MHxlkvCZuAQwLCTIETOw+UlsK2rYiUMX
+         YMvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750868292; x=1751473092;
+        d=1e100.net; s=20230601; t=1750868472; x=1751473272;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WfT2F4WO2WkloBm9pwG8+Zygrf5do3v691T8Lv7s6Gs=;
-        b=L7xalfoHGMH9w14mmQ0GzVFLeS6tsY3IfNpfZHZv7+qyOUs1cJje/3+R8lJRspp6M0
-         50PHqR20QyKyraePmw0LoFejSktxwfHn3yjr+F+6HESzlToxMduLYwtw2QFw/BT8SIOA
-         NJNigI6drJ31nV3s0kdhJ650giz/ZWrBS5w+liaatDhcAitQUKIx3oOBeUpxwzsm2u9N
-         CkNM3WsVzqyr7yDfUoUwzogV1oxYtfBPikwhpsWta7sOduZJCv/zOugtsLQT8SrbUeWr
-         srC9vcbMdI9PIxj3lrPC+eLGug+TohCuN8SFol99no+O9W4o6YhhXGdJCGsxPUQBqZq9
-         86Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQFQiz+pqE4etDWi0mCfDClUcm8lA4/RDpjdUfhf0WeVIIntIwLU8HTCmueOl6Nuf4iDfU2FYuhp00@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEfWshG7U/YySFNRFMJnSeIRYA8wgI84SAQ6Pnzy8rxgKJczCb
-	WrLK8MlWmi8Pe4fzSSByX+3FMhMqcnzC6sIFaKFkjSYriYVxcXRrn2Jyev2B+6YLQVTLMqxf9kq
-	TyZYK2RtDZAI9nIZqXAlhIGu+NhiQo+0=
-X-Gm-Gg: ASbGncsQSFxT20gHGQkTEEX3/mm04oHpyIoSPmuLbpQnwK3TUZghJU8b84iu5Js3McX
-	5mbqghp4Fqxi6Zr+tmGyTLKq/0n9Q17jHiQxp9eDRj3WPyLoLzL1w79AehLi7jRpuP7ypHAQErR
-	07ky1yv+mn7mVdmjJNO+lKvWjkK33c+ZCZ+C1FDltQA8SpoA7T6NER8l4wVb2cSOIhiSztxI01w
-	k/xOlkJ0QbXmsM=
-X-Google-Smtp-Source: AGHT+IELVnY9tWrfOK3EsALn6P8OmKArGPKfHIvcM+6sdbam/jdoARe6b70fUsDAprc8WsO3jhu7dqTc4yo34L1olQk=
-X-Received: by 2002:a05:6214:319e:b0:6fa:fddf:7343 with SMTP id
- 6a1803df08f44-6fd5efac289mr66108346d6.23.1750868291450; Wed, 25 Jun 2025
- 09:18:11 -0700 (PDT)
+        bh=9NVslBr1xkJaej9KYSvp2pb98xkmIaEpx8AR8MBWA3Y=;
+        b=Aw6eixF4SVSE3Z2ScabJL/1fPhLCWQicIC4v2RAkO9S5HL7GDYakewRpbqSOtoDkbf
+         8+Ysn1P+1uFsGH/Fh1yzjIDDDz6Wf8JE9+uRR/acyBe95+s/wMHS66tUwqjHUTVXv4Xl
+         iUxBwSU5V2nC+Cq69kHxIxnZe+xwACin4sxnXuY0PBXSG7p9QEXzOVLaq8zypXYfObV4
+         1ghbObD+cw7w4yGKNkXSwVua9VIFhWzGADMm6PMe3qwdMr3EO+0I/4fL7dhMDUyZQ4gc
+         xP6HQHm9As0LwmQ14XS6NJdC24HyOxUP0gf5MqM6mYbwQARFbKic8Fe3cKo12T2QoIKE
+         zjDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUm27OPwp+6fijOIR1K8EHjRl0X1e1CCsbTYxw6fjYUe6jDYH+23BlzHm3yJRpw+tWSZcCpqDAa+ci@vger.kernel.org, AJvYcCVU9vV0Znvp3jzD8lHU4NDKvzGPWqRlUmZTwKi2uOiY1PDc0TbfgJnRXrtVYEg7zpxhV8YGaevSoh2MmHfxdQ==@vger.kernel.org, AJvYcCW+c9Gfhnln1GEFf0QLaqyMaHZsQoWWijer5kSJVEn3Y1whaa+TlxcySFCKtWV6s5ytIAQESL3iJuLSnC8n@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1S9/j1HjlBrfGb8FoawmG9PfP8xarrrKi/BrJH0LSrMFHhs6V
+	x4eBRcGcPCW7EgRA4CHezGJHryOeU54XAq1poMTTO2CsXcs6mxSwReRbDsQJrIwMnQlx+xkYTFd
+	Bj0AI2r4tpe2Wb4sKxYjQBby2HRrNKPo=
+X-Gm-Gg: ASbGncv9pfIuTX0082yYkNDONwmhKky098dkZKtC2GChiHSIXEDfzXRJ/H0EaosX3eP
+	U1EnXl5TNf91P8rqe5JMyhEuTmpAmuBsGAgVtNL562jzZ7K3kYBwfTrREl9da0JlFsyYsYWR0H6
+	ky8KHPUSsJqBJcF3qnXHo6whqSJFJ2dYo5BKOF5XbWyg1TfwaajiWhfUNgdwj+HAP2NEYz50//T
+	kjQ
+X-Google-Smtp-Source: AGHT+IF0E2ADWqAWPU392h4IO+FZ/wRsjmuf7c03br6vhyt8kFz6PcUB5E7QjpVnFsCxdOzBZ17XM3vfqbwilSgcRb4=
+X-Received: by 2002:a05:6214:419e:b0:6fa:ad2a:7998 with SMTP id
+ 6a1803df08f44-6fd753a870emr3103946d6.18.1750868472164; Wed, 25 Jun 2025
+ 09:21:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625081638.944583-1-metze@samba.org> <1288833.1750842098@warthog.procyon.org.uk>
-In-Reply-To: <1288833.1750842098@warthog.procyon.org.uk>
+References: <1372501.1750858644@warthog.procyon.org.uk> <1382992.1750862802@warthog.procyon.org.uk>
+ <011ec23b-d151-4ef8-bbe7-ba79e3678ae7@samba.org>
+In-Reply-To: <011ec23b-d151-4ef8-bbe7-ba79e3678ae7@samba.org>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 25 Jun 2025 11:17:59 -0500
-X-Gm-Features: Ac12FXzxnQoEVJkG624DXsVcwyPbnW2_OyENvdllI_HLO4Jis4ayKMsY_20entg
-Message-ID: <CAH2r5mutiF0D6_SGSguYD2zbJCtZj454DQQMGO8JmJ9VtyqSmA@mail.gmail.com>
-Subject: Re: [PATCH v2] smb: client: let smbd_post_send_iter() respect the
- peers max_send_size and transmit all data
-To: David Howells <dhowells@redhat.com>
-Cc: Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, Tom Talpey <tom@talpey.com>, 
-	stable+noautosel@kernel.org, Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Date: Wed, 25 Jun 2025 11:21:00 -0500
+X-Gm-Features: Ac12FXwJI9fijUzybZTm6c-W7y-I5jTYEiHnpSWQL96V5yQo6-_Q8OXO622L3v8
+Message-ID: <CAH2r5mtzPKaiOmwQsaSTRWy1YdWygvVBdOPrhLLGbEfNAWXvEQ@mail.gmail.com>
+Subject: Re: [PATCH v2] cifs: Fix the smbd_request and smbd_reponse slabs to
+ allow usercopy
+To: Stefan Metzmacher <metze@samba.org>
+Cc: David Howells <dhowells@redhat.com>, Steve French <stfrench@microsoft.com>, 
+	Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Added to cifs-2.6.git for-next and updated with rb and tested-by from
-David and tested-by from Meetakshi
+added to cifs-2.6.git for-next and added RB and tested-by
 
-On Wed, Jun 25, 2025 at 4:03=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
+On Wed, Jun 25, 2025 at 10:55=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
 >
-> Stefan Metzmacher <metze@samba.org> wrote:
+> reviewed-by and tested-by: Stefan Metzmacher <metze@samba.org>
 >
-> > We should not send smbdirect_data_transfer messages larger than
-> > the negotiated max_send_size, typically 1364 bytes, which means
-> > 24 bytes of the smbdirect_data_transfer header + 1340 payload bytes.
+> Am 25.06.25 um 16:46 schrieb David Howells:
 > >
-> > This happened when doing an SMB2 write with more than 1340 bytes
-> > (which is done inline as it's below rdma_readwrite_threshold).
+> > The handling of received data in the smbdirect client code involves usi=
+ng
+> > copy_to_iter() to copy data from the smbd_reponse struct's packet trail=
+er
+> > to a folioq buffer provided by netfslib that encapsulates a chunk of
+> > pagecache.
 > >
-> > It means the peer resets the connection.
+> > If, however, CONFIG_HARDENED_USERCOPY=3Dy, this will result in the chec=
+ks
+> > then performed in copy_to_iter() oopsing with something like the follow=
+ing:
 > >
-> > When testing between cifs.ko and ksmbd.ko something like this
-> > is logged:
+> >   CIFS: Attempting to mount //172.31.9.1/test
+> >   CIFS: VFS: RDMA transport established
+> >   usercopy: Kernel memory exposure attempt detected from SLUB object 's=
+mbd_response_0000000091e24ea1' (offset 81, size 63)!
+> >   ------------[ cut here ]------------
+> >   kernel BUG at mm/usercopy.c:102!
+> >   ...
+> >   RIP: 0010:usercopy_abort+0x6c/0x80
+> >   ...
+> >   Call Trace:
+> >    <TASK>
+> >    __check_heap_object+0xe3/0x120
+> >    __check_object_size+0x4dc/0x6d0
+> >    smbd_recv+0x77f/0xfe0 [cifs]
+> >    cifs_readv_from_socket+0x276/0x8f0 [cifs]
+> >    cifs_read_from_socket+0xcd/0x120 [cifs]
+> >    cifs_demultiplex_thread+0x7e9/0x2d50 [cifs]
+> >    kthread+0x396/0x830
+> >    ret_from_fork+0x2b8/0x3b0
+> >    ret_from_fork_asm+0x1a/0x30
 > >
-> > client:
+> > The problem is that the smbd_response slab's packet field isn't marked =
+as
+> > being permitted for usercopy.
 > >
-> >     CIFS: VFS: RDMA transport re-established
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     CIFS: VFS: \\carina Send error in SessSetup =3D -11
-> >     smb2_reconnect: 12 callbacks suppressed
-> >     CIFS: VFS: reconnect tcon failed rc =3D -11
-> >     CIFS: VFS: reconnect tcon failed rc =3D -11
-> >     CIFS: VFS: reconnect tcon failed rc =3D -11
-> >     CIFS: VFS: SMB: Zero rsize calculated, using minimum value 65536
+> > Fix this by passing parameters to kmem_slab_create() to indicate that
+> > copy_to_iter() is permitted from the packet region of the smbd_response
+> > slab objects, less the header space.
 > >
-> > and:
+> > Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
+> > Reported-by: Stefan Metzmacher <metze@samba.org>
+> > Link: https://lore.kernel.org/r/acb7f612-df26-4e2a-a35d-7cd040f513e1@sa=
+mba.org/
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Steve French <stfrench@microsoft.com>
+> > cc: Paulo Alcantara <pc@manguebit.com>
+> > cc: linux-cifs@vger.kernel.org
+> > cc: netfs@lists.linux.dev
+> > cc: linux-fsdevel@vger.kernel.org
+> > ---
+> >   fs/smb/client/smbdirect.c |   18 +++++++++++++-----
+> >   1 file changed, 13 insertions(+), 5 deletions(-)
 > >
-> >     CIFS: VFS: RDMA transport re-established
-> >     siw: got TERMINATE. layer 1, type 2, code 2
-> >     CIFS: VFS: smbd_recv:1894 disconnected
-> >     siw: got TERMINATE. layer 1, type 2, code 2
+> > diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+> > index ef6bf8d6808d..f9773cc0d562 100644
+> > --- a/fs/smb/client/smbdirect.c
+> > +++ b/fs/smb/client/smbdirect.c
+> > @@ -1475,6 +1475,9 @@ static int allocate_caches_and_workqueue(struct s=
+mbd_connection *info)
+> >       char name[MAX_NAME_LEN];
+> >       int rc;
 > >
-> > The ksmbd dmesg is showing things like:
+> > +     if (WARN_ON_ONCE(sp->max_recv_size < sizeof(struct smbdirect_data=
+_transfer)))
+> > +             return -ENOMEM;
+> > +
+> >       scnprintf(name, MAX_NAME_LEN, "smbd_request_%p", info);
+> >       info->request_cache =3D
+> >               kmem_cache_create(
+> > @@ -1492,12 +1495,17 @@ static int allocate_caches_and_workqueue(struct=
+ smbd_connection *info)
+> >               goto out1;
 > >
-> >     smb_direct: Recv error. status=3D'local length error (1)' opcode=3D=
-128
-> >     smb_direct: disconnected
-> >     smb_direct: Recv error. status=3D'local length error (1)' opcode=3D=
-128
-> >     ksmbd: smb_direct: disconnected
-> >     ksmbd: sock_read failed: -107
+> >       scnprintf(name, MAX_NAME_LEN, "smbd_response_%p", info);
+> > +
+> > +     struct kmem_cache_args response_args =3D {
+> > +             .align          =3D __alignof__(struct smbd_response),
+> > +             .useroffset     =3D (offsetof(struct smbd_response, packe=
+t) +
+> > +                                sizeof(struct smbdirect_data_transfer)=
+),
+> > +             .usersize       =3D sp->max_recv_size - sizeof(struct smb=
+direct_data_transfer),
+> > +     };
+> >       info->response_cache =3D
+> > -             kmem_cache_create(
+> > -                     name,
+> > -                     sizeof(struct smbd_response) +
+> > -                             sp->max_recv_size,
+> > -                     0, SLAB_HWCACHE_ALIGN, NULL);
+> > +             kmem_cache_create(name,
+> > +                               sizeof(struct smbd_response) + sp->max_=
+recv_size,
+> > +                               &response_args, SLAB_HWCACHE_ALIGN);
+> >       if (!info->response_cache)
+> >               goto out2;
 > >
-> > As smbd_post_send_iter() limits the transmitted number of bytes
-> > we need loop over it in order to transmit the whole iter.
-> >
-> > Cc: Steve French <sfrench@samba.org>
-> > Cc: David Howells <dhowells@redhat.com>
-> > Cc: Tom Talpey <tom@talpey.com>
-> > Cc: linux-cifs@vger.kernel.org
-> > Cc: <stable+noautosel@kernel.org> # sp->max_send_size should be info->m=
-ax_send_size in backports
-> > Fixes: 3d78fe73fa12 ("cifs: Build the RDMA SGE list directly from an it=
-erator")
-> > Signed-off-by: Stefan Metzmacher <metze@samba.org>
->
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Tested-by: David Howells <dhowells@redhat.com>
 >
 >
 
