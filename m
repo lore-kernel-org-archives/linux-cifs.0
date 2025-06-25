@@ -1,146 +1,195 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EB428BA82
-	for <linux-cifs@vger.kernel.org>; Wed, 25 Jun 2025 09:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8A02BCF4D;
+	Wed, 25 Jun 2025 10:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750842110; cv=none; b=piE9CAXSkGen03dO8yWlYmnHoAqg0oVspNYSoq++aCa3bFprdeCWHJrACh/WBOY92XIe4XRn+UTITGMVbNSpSNJk0sFcmvxw339c6adg6SM/fdttXkLJ6wyU1b9fH6eye3uiPQLr97ubUEYfExuOV0Bu4KqchxgnCYe3764+I2o=
+	t=1750846246; cv=none; b=GeVlSea+aNoIrt8Ytx9ZjG7dLgi4ksacCMBF8ZaYnoe87HpCkltQzCL1ICurKSChN360ZSgtlVsVlAU2Sx+v40F70IaU8/+V5Lu2VcyWC9vrIHmVStX3srZtO2lPZhaCgdvIcuM2n86OftCCwSBkUyuZUbE+5pj+5QXs+sRlYps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750842110; c=relaxed/simple;
-	bh=6PrUleXUYGJkrglYnDgm87U2trHxdb3gchAW/qkmpuk=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ZVfUwKIB6VIVw9sGXSztlL2esZyZ2XXV1wKjp4IlfQcOlca0uJ8F0b/IJ3FjDkHq3fp0aCipaSk7jL9I4mmf6CwB5LRlt5+zSeVOkCIp4R/vbDKjyb03gRUYf+qJ6efJHGZ4GnMTXKOEhP4pwbKwWmZs3ANjBqt4ANb3lbH0KSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aIP/7rLj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1750846246; c=relaxed/simple;
+	bh=LkUIUuxvI9+pSOrM8fBaunPMfvu0A7Df8v7u8k0hgL4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=h9/ECqPotC3g11I5seU4jldo1R3PnvqGxGgOQ9NL+BogEEq1+K1V2lsdolmp0QeRKWvC72spJHKBoRgzdKi4CqBezYWVf6RQlW6sXilFNw9xUXXcxZxSC2RCNYLPeX/hMMWNlSACQPhp4besKaGm2HQLGWGYhf0d1VD+0+OsuEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3kUpTaWJ; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIP/7rLj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750842108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qBwag9gY//+sYzvvjqRvddZnoX/x2SeT9w+Hu1KXyic=;
-	b=aIP/7rLjm34n+/zCz8PNhbQyrNZrwimW/Ko+LodDN+atpQnO7uxpYH5fmw+pNu54+k9VVP
-	Msa+ybee9Qv9dcMd6aARRcmjVA51zF5Rx3gI13AUY5VKWtH29eXU2eMFWDNrA4dOP8EKsp
-	PxWKqS9VeGALvkML1Flhrn5UqmxqczA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-363-BBYgFwb4MEeM1WinOA2_0Q-1; Wed,
- 25 Jun 2025 05:01:44 -0400
-X-MC-Unique: BBYgFwb4MEeM1WinOA2_0Q-1
-X-Mimecast-MFC-AGG-ID: BBYgFwb4MEeM1WinOA2_0Q_1750842101
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 648DE1808984;
-	Wed, 25 Jun 2025 09:01:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 737AD180045B;
-	Wed, 25 Jun 2025 09:01:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250625081638.944583-1-metze@samba.org>
-References: <20250625081638.944583-1-metze@samba.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org,
-    samba-technical@lists.samba.org, Steve French <sfrench@samba.org>,
-    Tom Talpey <tom@talpey.com>, stable+noautosel@kernel.org
-Subject: Re: [PATCH v2] smb: client: let smbd_post_send_iter() respect the peers max_send_size and transmit all data
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3kUpTaWJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Cc:To:From:Date:Message-ID;
+	bh=I3JIQN87DhAmoN/r06JPMh2tWfRpL1kRv0heGpkhbBM=; b=3kUpTaWJ1rZ88rj1OYca6ayMzk
+	YbrnyXoEV3eNPbk/zeXBexKjC6LeP3XEelU39BxPj+dJNNMR4gPHH6PrehllsGMB2+8s3mfq/zyD3
+	JfS0y4bRwKDbIjvJX7LcAiTqEx6RQTWkeULcqnlmztVUA8goPGIEjb5fn7Ns3oXF83dJ84IWvGbdc
+	soVeqVWcHdl7TyJ8N2C1dO0FHFwMNiRkzRH/T2e/4VkAs6Um+4sRU1ZVES3ZDrTHtg1qojW9/ursQ
+	KJasMsRfbg7sCiQtSqoNho/xZx8tn+lmG4eHV8syaJFPul85MkTGVUv6R1EkVSe0XxeEf7rpFvQWy
+	55pslHw6gofDg0D6I7vrc+Y+MDg3bGn1Rh90b/Pvcof3Y+MfLpR5toCULoB+FzCuiOkpxct3tsWxt
+	56txvhfGwLvCf3mVo++xTF3L43bPseOBhb/srQTD5RSiZ9q7Vo9an/r0g+oNPaqErdVjHEzfsjOLd
+	4ps7PLr33J3W3hqASSxDRlxu;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uUN5W-00COeD-0V;
+	Wed, 25 Jun 2025 10:10:42 +0000
+Message-ID: <6b69eef7-781d-42d3-9ce0-973ff9152dd5@samba.org>
+Date: Wed, 25 Jun 2025 12:10:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1288832.1750842098.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Jun 2025 10:01:38 +0100
-Message-ID: <1288833.1750842098@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] cifs: Collapse smbd_recv_*() into smbd_recv() and just
+ use copy_to_iter()
+From: Stefan Metzmacher <metze@samba.org>
+To: David Howells <dhowells@redhat.com>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ netfs@lists.linux.dev, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Steve French <stfrench@microsoft.com>
+References: <f448a729-ca2e-40a8-be67-3334f47a3916@samba.org>
+ <1107690.1750683895@warthog.procyon.org.uk>
+ <1156127.1750774971@warthog.procyon.org.uk>
+ <acb7f612-df26-4e2a-a35d-7cd040f513e1@samba.org>
+Content-Language: en-US
+In-Reply-To: <acb7f612-df26-4e2a-a35d-7cd040f513e1@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Stefan Metzmacher <metze@samba.org> wrote:
+Am 25.06.25 um 10:07 schrieb Stefan Metzmacher:
+> Am 24.06.25 um 16:22 schrieb David Howells:
+>> Stefan Metzmacher <metze@samba.org> wrote:
+>>
+>>>>    read_rfc1002_done:
+>>>> +        /* SMBDirect will read it all or nothing */
+>>>> +        msg->msg_iter.count = 0;
+>>>
+>>> And this iov_iter_truncate(0);
+>>
+>> Actually, it should probably have been iov_iter_advance().
+>>
+>>> While I'm wondering why we had this at all.
+>>>
+>>> It seems all callers of cifs_read_iter_from_socket()
+>>> don't care and the code path via sock_recvmsg() doesn't
+>>> truncate it just calls copy_to_iter() via this chain:
+>>> ->inet_recvmsg->tcp_recvmsg->skb_copy_datagram_msg->skb_copy_datagram_iter
+>>> ->simple_copy_to_iter->copy_to_iter()
+>>>
+>>> I think the old code should have called
+>>> iov_iter_advance(rc) instead of msg->msg_iter.count = 0.
+>>>
+>>> But the new code doesn't need it as copy_to_iter()
+>>> calls iterate_and_advance().
+>>
+>> Yeah, it should.  I seem to remember that there were situations in which it
+>> didn't, but it's possible I managed to get rid of them.
+>>
+>>>> -    default:
+>>>> -        /* It's a bug in upper layer to get there */
+>>>> -        cifs_dbg(VFS, "Invalid msg type %d\n",
+>>>> -             iov_iter_type(&msg->msg_iter));
+>>>> -        rc = -EINVAL;
+>>>> -    }
+>>>
+>>> I guess this is actually a real fix as I just saw
+>>> CIFS: VFS: Invalid msg type 4
+>>> in logs while running the cifs/001 test.
+>>> And 4 is ITER_FOLIOQ.
+>>
+>> Ah... Were you using "-o seal"?  The encrypted data is held in a buffer formed
+>> from a folioq with a series of folios in it.
+> 
+> I know tested it standalone in this tree:
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=46a31189b8b059b3595a9586714761e6e76ba7c4
 
-> We should not send smbdirect_data_transfer messages larger than
-> the negotiated max_send_size, typically 1364 bytes, which means
-> 24 bytes of the smbdirect_data_transfer header + 1340 payload bytes.
-> =
+It also happens with this:
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=442dcd18dc1bf8d1e39f53d20810ca0a4958d139
 
-> This happened when doing an SMB2 write with more than 1340 bytes
-> (which is done inline as it's below rdma_readwrite_threshold).
-> =
+Which contains your netfs fixes...
 
-> It means the peer resets the connection.
-> =
-
-> When testing between cifs.ko and ksmbd.ko something like this
-> is logged:
-> =
-
-> client:
-> =
-
->     CIFS: VFS: RDMA transport re-established
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     siw: got TERMINATE. layer 1, type 2, code 2
->     CIFS: VFS: \\carina Send error in SessSetup =3D -11
->     smb2_reconnect: 12 callbacks suppressed
->     CIFS: VFS: reconnect tcon failed rc =3D -11
->     CIFS: VFS: reconnect tcon failed rc =3D -11
->     CIFS: VFS: reconnect tcon failed rc =3D -11
->     CIFS: VFS: SMB: Zero rsize calculated, using minimum value 65536
-> =
-
-> and:
-> =
-
->     CIFS: VFS: RDMA transport re-established
->     siw: got TERMINATE. layer 1, type 2, code 2
->     CIFS: VFS: smbd_recv:1894 disconnected
->     siw: got TERMINATE. layer 1, type 2, code 2
-> =
-
-> The ksmbd dmesg is showing things like:
-> =
-
->     smb_direct: Recv error. status=3D'local length error (1)' opcode=3D1=
-28
->     smb_direct: disconnected
->     smb_direct: Recv error. status=3D'local length error (1)' opcode=3D1=
-28
->     ksmbd: smb_direct: disconnected
->     ksmbd: sock_read failed: -107
-> =
-
-> As smbd_post_send_iter() limits the transmitted number of bytes
-> we need loop over it in order to transmit the whole iter.
-> =
-
-> Cc: Steve French <sfrench@samba.org>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: <stable+noautosel@kernel.org> # sp->max_send_size should be info->ma=
-x_send_size in backports
-> Fixes: 3d78fe73fa12 ("cifs: Build the RDMA SGE list directly from an ite=
-rator")
-> Signed-off-by: Stefan Metzmacher <metze@samba.org>
-
-Reviewed-by: David Howells <dhowells@redhat.com>
-Tested-by: David Howells <dhowells@redhat.com>
+> Doing following mount:
+> 
+> mount -t cifs -ousername=administrator,password=...,rdma,noperm,vers=3.0,mfsymlinks,actimeo=0 //172.31.9.1/test /mnt/test/
+> 
+> It's using the siw driver (with modifications to work against the chelsio t404-bt card on windows) from
+> here:
+> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=5b89ff89f440ec36cf2c5ed2212be0d8523a4c9b
+> 
+> But the siw difference should not really matter.
+> 
+> This realiable generates this:
+> 
+> [  922.048997] [   T6639] CIFS: Attempting to mount //172.31.9.1/test
+> [  922.188445] [   T6639] CIFS: VFS: RDMA transport established
+> [  922.217974] [   T6642] usercopy: Kernel memory exposure attempt detected from SLUB object 'smbd_response_0000000091e24ea1' (offset 81, size 63)!
+> [  922.218221] [   T6642] ------------[ cut here ]------------
+> [  922.218230] [   T6642] kernel BUG at mm/usercopy.c:102!
+> [  922.218299] [   T6642] Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+> [  922.218439] [   T6642] CPU: 1 UID: 0 PID: 6642 Comm: cifsd Kdump: loaded Tainted: G           OE       6.16.0-rc3-metze.01+ #1 PREEMPT(voluntary)
+> [  922.218585] [   T6642] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [  922.218635] [   T6642] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+> [  922.218704] [   T6642] RIP: 0010:usercopy_abort+0x6c/0x80
+> [  922.218783] [   T6642] Code: fa 91 51 48 c7 c2 c0 d4 fa 91 41 52 48 c7 c7 40 d5 fa 91 48 0f 45 d6 48 c7 c6 00 d5 fa 91 48 89 c1 49 0f 45 f3 e8 84 aa 6b ff <0f> 0b 49 c7 
+> c1 c0 d3 fa 91 4d 89 ca 4d 89 c8 eb a8 0f 1f 00 90 90
+> [  922.218925] [   T6642] RSP: 0018:ffffc90001887820 EFLAGS: 00010246
+> [  922.218983] [   T6642] RAX: 0000000000000079 RBX: 0000000000000051 RCX: 0000000000000000
+> [  922.219046] [   T6642] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> [  922.219108] [   T6642] RBP: ffffc90001887838 R08: 0000000000000000 R09: 0000000000000000
+> [  922.219201] [   T6642] R10: 0000000000000000 R11: 0000000000000000 R12: 000000000000003f
+> [  922.219261] [   T6642] R13: ffff88801f579280 R14: 0000000000000001 R15: ffffea0000163340
+> [  922.219323] [   T6642] FS:  0000000000000000(0000) GS:ffff8881466e8000(0000) knlGS:0000000000000000
+> [  922.219415] [   T6642] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  922.219469] [   T6642] CR2: 000075a216d19bb8 CR3: 000000000f5f6004 CR4: 00000000000726f0
+> [  922.219560] [   T6642] Call Trace:
+> [  922.219591] [   T6642]  <TASK>
+> [  922.219624] [   T6642]  __check_heap_object+0xe3/0x120
+> [  922.221090] [   T6642]  __check_object_size+0x4dc/0x6d0
+> [  922.222547] [   T6642]  smbd_recv+0x77f/0xfe0 [cifs]
+> [  922.224416] [   T6642]  ? __pfx_smbd_recv+0x10/0x10 [cifs]
+> [  922.226195] [   T6642]  ? __kasan_check_write+0x14/0x30
+> [  922.227722] [   T6642]  ? _raw_spin_lock+0x81/0xf0
+> [  922.229190] [   T6642]  ? __pfx__raw_spin_lock+0x10/0x10
+> [  922.230699] [   T6642]  ? sched_clock_noinstr+0x9/0x10
+> [  922.232248] [   T6642]  cifs_readv_from_socket+0x276/0x8f0 [cifs]
+> [  922.234149] [   T6642]  ? __pfx_cifs_readv_from_socket+0x10/0x10 [cifs]
+> [  922.236222] [   T6642]  ? mempool_alloc_slab+0x15/0x20
+> [  922.237705] [   T6642]  cifs_read_from_socket+0xcd/0x120 [cifs]
+> [  922.239559] [   T6642]  ? __pfx_cifs_read_from_socket+0x10/0x10 [cifs]
+> [  922.241403] [   T6642]  ? __pfx_mempool_alloc_noprof+0x10/0x10
+> [  922.242827] [   T6642]  ? __kasan_check_write+0x14/0x30
+> [  922.244141] [   T6642]  ? cifs_small_buf_get+0x62/0x90 [cifs]
+> [  922.245500] [   T6642]  ? allocate_buffers+0x216/0x390 [cifs]
+> [  922.246810] [   T6642]  cifs_demultiplex_thread+0x7e9/0x2d50 [cifs]
+> [  922.248150] [   T6642]  ? _raw_spin_lock_irqsave+0x95/0x100
+> [  922.249143] [   T6642]  ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+> [  922.250163] [   T6642]  ? __pfx___schedule+0x10/0x10
+> [  922.250977] [   T6642]  ? _raw_spin_lock_irqsave+0x95/0x100
+> [  922.251715] [   T6642]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+> [  922.252415] [   T6642]  ? __pfx_try_to_wake_up+0x10/0x10
+> [  922.253094] [   T6642]  ? __kasan_check_read+0x11/0x20
+> [  922.253766] [   T6642]  ? __kthread_parkme+0xa0/0x190
+> [  922.254344] [   T6642]  ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+> [  922.255073] [   T6642]  kthread+0x396/0x830
+> [  922.255584] [   T6642]  ? __pfx__raw_spin_lock_irq+0x10/0x10
+> [  922.256070] [   T6642]  ? __pfx_kthread+0x10/0x10
+> [  922.256568] [   T6642]  ? __kasan_check_write+0x14/0x30
+> [  922.257047] [   T6642]  ? recalc_sigpending+0x180/0x210
+> [  922.257535] [   T6642]  ? _raw_spin_unlock_irq+0xe/0x50
+> [  922.258015] [   T6642]  ? calculate_sigpending+0x84/0xb0
+> [  922.258509] [   T6642]  ? __pfx_kthread+0x10/0x10
+> [  922.258976] [   T6642]  ret_from_fork+0x2b8/0x3b0
+> [  922.259377] [   T6642]  ? __pfx_kthread+0x10/0x10
+> [  922.259757] [   T6642]  ret_from_fork_asm+0x1a/0x30
+> [  922.260133] [   T6642]  </TASK>
+> [  922.260514] [   T6642] Modules linked in: cifs(OE) ccm cmac nls_utf8 cifs_arc4 nls_ucs2_utils rdma_cm iw_cm ib_cm cifs_md4 netfs siw(OE) ib_uverbs ib_core softdog vboxsf 
+> vboxguest intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_class intel_pmc_ssram_telemetry intel_vsec polyval_clmulni 
+> ghash_clmulni_intel sha1_ssse3 aesni_intel rapl i2c_piix4 i2c_smbus input_leds joydev mac_hid sunrpc binfmt_misc kvm_intel kvm irqbypass sch_fq_codel efi_pstore nfnetlink 
+> vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci dmi_sysfs ip_tables x_tables autofs4 hid_generic vboxvideo drm_vram_helper usbhid 
+> drm_ttm_helper vga16fb hid vgastate ahci ttm libahci video pata_acpi psmouse serio_raw wmi [last unloaded: cifs(OE)]
+> 
+> 
+> Reverting it fixes it again.
+> 
+> metze
 
