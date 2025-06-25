@@ -1,73 +1,156 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912B225D213;
-	Wed, 25 Jun 2025 11:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8252125BEE2
+	for <linux-cifs@vger.kernel.org>; Wed, 25 Jun 2025 12:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750852280; cv=none; b=dniso7rj6d6ZKriErPJXQnt7o0VzcBF42rjEKvC7bBbJvRksHDRiii0s2fZj7s6569379zpyPUJXjuKg7qiRdKaCwuSbYRywkeOsRYACHhmP1b+EMJHg2Cb+6tANOzj3UOCaMiK9pnZi9JC6aKMkb8hh4aEXfvzUSz0shYxo7hs=
+	t=1750855649; cv=none; b=Twal7w9GBJKQVacgmnWVaZW7HRJsf03e/lxKEbNTnmsu00A1UUr/3MC8hpZLbnLHxEoM7G/fjXtTxVog2PsFXiihfsu0kql3/gQkXfjXgk5fGcGMqP51yutXzh3T0yJ3F2cR+Kk+CT3fKzSs3MM6AZfkj660OpGWEFarbF0cq/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750852280; c=relaxed/simple;
-	bh=y3NNDejVQJ1CgTfZFcADg6wM2IwtjjH7Xcu8RJxVMEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z4RwGJVS2lIgEG5t/lIWHX71fRYOGEpt3Dls5xX9Ue/gK5lEi7LAEHriRJmkyOH0Wp4ASB6My+fy7BOHT5KIm9CL2J4huTGJ0shAKtN9NrwtMBmCeCFPifbJY6f9K4LTqOhuINdIZ4V6ckP2GtEEhOaGHq3utvVvUV663jSe/kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=icpCHs1G; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1750855649; c=relaxed/simple;
+	bh=H+Ct5E6gqE1GqrxKKgsI88KcM25+Ev2zEH3FOvDCw7Y=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=iLz0Iuq6spIQMKs9kcsT1WGYIgjO9a34QhcdmZJ+9sz0IrEGWVjVoG6hdAOvdOVzbtkSOLO77hiqJdDt3lrCK+lnDnGnUEU/dDieuyZXjKgx68XPTWxsdPn9euR/BKxY8G2qNzAIPqpTCTWf+U1D1hEPL5by7y4fRQR8+Vvq8FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I2H+hXvH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="icpCHs1G"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=xMUsiXvQEf69tnf2W3tpfU1jFomrgiuQ867Hr3ffK1U=; b=icpCHs1GSsI+E16fhWdGBiRuZE
-	vUNAQ/2j1/VWj9z6DAMTuExUZQp63lQOeb5M6mug8a79RMkook19AryUmXRSmstUvZkUJ4jm45T/1
-	Uv2KeMTWLhWtqJVal1VgocV9I9Du8zGWYAgpYQekOmMsQFP6Pt+1nUuRV3xN22QWrvsOZJzvBgCww
-	JX9hTHLlmdF9MD2FrA8rECOi4rM7mwA/0xUPF8mZtJ7v7KSIM/F3oCq26qOvCmD4pzdlRR5qpquLH
-	0Ji90VrFatLIbBJyT8EKdJYPlOgccSk151zG2f1tTgl6Xg6bAA4Kt+BDdt8+ibAv9hMAnV1AnPTtW
-	SSVyuRdoDqCksT6bi4Pq6Rjhf493WWV5HheJk4fRMnN4QixUFvJrEAyQSit+WeLpsQv3MS5sw87EE
-	19bxuq9L8IA80u4XNypFkrYfpsyOqME7ROk4on1s/oPBUT8YdbnaKXmPpLPSLOaSKMxBok2LfxEh8
-	LxB4GECDjOUipqB6vgIr8pQ7;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uUOep-00CPIo-0c;
-	Wed, 25 Jun 2025 11:51:15 +0000
-Message-ID: <e867b6c0-c468-4fc8-a30f-215b5dd18bdb@samba.org>
-Date: Wed, 25 Jun 2025 13:51:14 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I2H+hXvH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750855646;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/oWVGyRSPW0/HYVoKtdUnTRZXeUfPLeoGNr3XlUaLrQ=;
+	b=I2H+hXvH5HBEjBRgKP/IcuxZ0kloICxHYiyAn+PSjAY7PLHDqU8leK63Sd0Ntz+bQHeANJ
+	LQ6/vhm7Mj+bbaortXJUb83z962hvE6SXgxzxE3G+6nzwGtmKjaBk4OIpMzcsfO7Z8k+FF
+	WXIzxQMHEbOARRtKgfgi+iwMLW2+Pwk=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-470-NFK1xPgHPCWFefj36B08xw-1; Wed,
+ 25 Jun 2025 08:47:23 -0400
+X-MC-Unique: NFK1xPgHPCWFefj36B08xw-1
+X-Mimecast-MFC-AGG-ID: NFK1xPgHPCWFefj36B08xw_1750855642
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E3DD91956089;
+	Wed, 25 Jun 2025 12:47:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4302419560AF;
+	Wed, 25 Jun 2025 12:47:20 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1156127.1750774971@warthog.procyon.org.uk>
+References: <1156127.1750774971@warthog.procyon.org.uk> <f448a729-ca2e-40a8-be67-3334f47a3916@samba.org> <1107690.1750683895@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Stefan Metzmacher <metze@samba.org>,
+    "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+    netfs@lists.linux.dev, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+    Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH] cifs: Collapse smbd_recv_*() into smbd_recv() and just use copy_to_iter()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] cifs: Collapse smbd_recv_*() into smbd_recv() and just
- use copy_to_iter()
-To: David Howells <dhowells@redhat.com>
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- netfs@lists.linux.dev, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
- Steve French <stfrench@microsoft.com>
-References: <6b69eef7-781d-42d3-9ce0-973ff9152dd5@samba.org>
- <f448a729-ca2e-40a8-be67-3334f47a3916@samba.org>
- <1107690.1750683895@warthog.procyon.org.uk>
- <1156127.1750774971@warthog.procyon.org.uk>
- <acb7f612-df26-4e2a-a35d-7cd040f513e1@samba.org>
- <1341840.1750850709@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <1341840.1750850709@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1362539.1750855639.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Jun 2025 13:47:19 +0100
+Message-ID: <1362540.1750855639@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Am 25.06.25 um 13:25 schrieb David Howells:
-> Stefan Metzmacher <metze@samba.org> wrote:
-> 
->>> [  922.218230] [   T6642] kernel BUG at mm/usercopy.c:102!
-> 
-> Ah, I don't have that config option enabled.  With it, I can reproduce that.
+David Howells <dhowells@redhat.com> wrote:
 
-Ah, allocate_caches_and_workqueue() needs to use kmem_cache_create_usercopy/KMEM_CACHE_USERCOPY...
+> > And 4 is ITER_FOLIOQ.
 
-I was already using that in my old wip smbdirect code.
+I dumped some of the fields from the MID involved:
 
-metze
+   CIFS: VFS: Invalid msg type 4 (mid=3Da4 optype=3D0 command=3D8)
+   CIFS: VFS:  - rcv=3Dcifs_readv_receive+0x0/0x270 cb=3Dsmb2_readv_callba=
+ck+0x0/0x480 hand=3Dsmb3_handle_read_data+0x0/0x40
+
+So the ITER_FOLIOQ is from netfslib.  I've attached corresponding trace lo=
+g,
+edited down a bit to remove some columns.  Note that the EINVAL error gets
+discarded by cifs_demultiplex_thread() and replaced with EAGAIN by netfsli=
+b.
+
+David
+---
+         diff-6828: netfs_rreq_ref: R=3D0000000c NEW         r=3D2
+         diff-6828: netfs_read: R=3D0000000c READPAGE  c=3D00000000 ni=3D1=
+d4072 s=3D0 l=3D1000 sz=3D400
+         diff-6828: netfs_rreq_ref: R=3D0000000c GET SUBREQ  r=3D3
+         diff-6828: smb3_rw_credits: R=3D0000000c[1] rd-submit   cred=3D16=
+ chg=3D0 pool=3D1688 ifl=3D1
+         diff-6828: netfs_sreq: R=3D0000000c[1] DOWN PREP  f=3D000 s=3D0 0=
+/400 s=3D0 e=3D0
+         diff-6828: smb3_rw_credits: R=3D0000000c[1] rd-issu-adj cred=3D16=
+ chg=3D-15 pool=3D1688 ifl=3D1
+         diff-6828: netfs_sreq: R=3D0000000c[1] DOWN SUBMT f=3D102 s=3D0 0=
+/400 s=3D0 e=3D0
+         diff-6828: netfs_rreq_ref: R=3D0000000c GET SUBREQ  r=3D4
+         diff-6828: netfs_sreq: R=3D0000000c[2] ZERO SUBMT f=3D000 s=3D400=
+ 0/c00 s=3D0 e=3D0
+         diff-6828: netfs_sreq: R=3D0000000c[2] ZERO TERM  f=3D102 s=3D400=
+ c00/c00 s=3D1 e=3D0
+         diff-6828: netfs_collect_stream: R=3D0000000c[0:] cto=3D0 frn=3D0
+         diff-6828: netfs_rreq: R=3D0000000c RP WAIT-IP f=3D03
+        cifsd-6506: netfs_sreq: R=3D0000000c[1] DOWN I-RTR f=3D102 s=3D0 0=
+/400 s=3D0 e=3D0
+        cifsd-6506: smb3_read_err:       R=3D0000000c[1] xid=3D200 sid=3D0=
+x8 tid=3D0x2 fid=3D0xa0952 offset=3D0x0 len=3D0x400 rc=3D-11
+        cifsd-6506: smb3_rw_credits: R=3D0000000c[1] rd-resp-clr cred=3D1 =
+chg=3D0 pool=3D1703 ifl=3D1
+        cifsd-6506: netfs_sreq: R=3D0000000c[1] DOWN I-OK  f=3D302 s=3D0 0=
+/400 s=3D0 e=3D-11
+        cifsd-6506: netfs_failure: R=3D0000000c[1] DOWN f=3D302 s=3D0 0/40=
+0 read e=3D-11
+        cifsd-6506: netfs_rreq: R=3D0000000c RP PAUSE   f=3D03
+        cifsd-6506: netfs_sreq: R=3D0000000c[1] DOWN TERM  f=3D702 s=3D0 0=
+/400 s=3D0 e=3D-11
+        cifsd-6506: netfs_rreq: R=3D0000000c RP WAKE-Q  f=3D07
+        cifsd-6506: smb3_rw_credits: R=3D0000000c[1] rd-resp-add cred=3D0 =
+chg=3D0 pool=3D1703 ifl=3D1
+         diff-6828: netfs_collect_stream: R=3D0000000c[0:] cto=3D0 frn=3D0
+         diff-6828: netfs_rreq: R=3D0000000c RP COLLECT f=3D07
+         diff-6828: netfs_collect: R=3D0000000c s=3D0-1000
+         diff-6828: netfs_collect_sreq: R=3D0000000c[0:01] s=3D0 t=3D0/400
+         diff-6828: netfs_rreq: R=3D0000000c RP S-ABNDN f=3D07
+         diff-6828: netfs_sreq: R=3D0000000c[1] DOWN ABNDN f=3D602 s=3D0 4=
+00/400 s=3D0 e=3D-11
+         diff-6828: netfs_sreq: R=3D0000000c[1] DOWN FREE  f=3D602 s=3D0 4=
+00/400 s=3D0 e=3D-11
+         diff-6828: netfs_rreq_ref: R=3D0000000c PUT SUBREQ  r=3D3
+         diff-6828: netfs_collect_sreq: R=3D0000000c[0:02] s=3D400 t=3Dc00=
+/c00
+         diff-6828: netfs_sreq: R=3D0000000c[2] ZERO ABNDN f=3D002 s=3D400=
+ c00/c00 s=3D1 e=3D0
+         diff-6828: netfs_sreq: R=3D0000000c[2] ZERO FREE  f=3D002 s=3D400=
+ c00/c00 s=3D1 e=3D0
+         diff-6828: netfs_rreq_ref: R=3D0000000c PUT SUBREQ  r=3D2
+         diff-6828: netfs_collect_stream: R=3D0000000c[0:] cto=3D1000 frn=3D=
+ffffffff
+         diff-6828: netfs_collect_state: R=3D0000000c col=3D1000 cln=3D100=
+0 n=3D8c
+         diff-6828: netfs_rreq: R=3D0000000c RP UNPAUSE f=3D0b
+         diff-6828: netfs_collect_stream: R=3D0000000c[0:] cto=3D1000 frn=3D=
+ffffffff
+         diff-6828: netfs_collect_state: R=3D0000000c col=3D1000 cln=3D100=
+0 n=3D8
+         diff-6828: netfs_rreq: R=3D0000000c RP COMPLET f=3D0b
+         diff-6828: netfs_rreq: R=3D0000000c RP WAKE-IP f=3D0a
+         diff-6828: netfs_rreq: R=3D0000000c RP DONE    f=3D0a
+         diff-6828: netfs_rreq_ref: R=3D0000000c PUT WORK IP  r=3D1
+         diff-6828: netfs_rreq: R=3D0000000c RP DONE-IP f=3D0a
+         diff-6828: netfs_rreq_ref: R=3D0000000c PUT RETURN  r=3D0
+kworker/u16:0-12  : netfs_rreq: R=3D0000000c RP FREE    f=3D0a
 
