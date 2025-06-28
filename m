@@ -1,63 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B612142AA6;
-	Sat, 28 Jun 2025 03:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D2A18FDA5;
+	Sat, 28 Jun 2025 05:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751082830; cv=none; b=YJcMJ+yE+BAoUxJjYNNEM1YaNdq4tOCi8gWXDqiiCb65ax83wddnHqG5rTJhXRBQnPlA7x6pQUY1BqYaDLLzDIgrD587GqRKgk1wxl7ypZkIWFB1bvX//gvtReLfGqYeyvUwLbLx1r7byvTdSRnCJcRhY3zlJDZ2OmaAGebQPWA=
+	t=1751087778; cv=none; b=uvapKOPFoe+dTGSeIdsPC+bytMQ+J27bCGFZONbD4vyc73L/rtSe1//pcYb99XpRZTbTt4RUtCu6es9AxbIIE7ug/iYbBTZeDDGOshOwM2oH4VRLjd+T2fo0OherDLTOsNHsrPakxVyb1KyaZy0lrjUgNilSvbDWE2iupRaPy/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751082830; c=relaxed/simple;
-	bh=R8DBgXSYVmnE/2qNcMDNEWDxiBZAD06vdY6tyHSYaGI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=brMbZwAZOCAZrYCP0Cy2ZGApW7CWW5+eD7VZX0QZ/DE1GJZrBv1sNyM3S/Jr15MJyuYL9ustN45tt1+78Z5WVmYEBhD17geAy0are507czCe2TD5x2sLi6mgTaMpm2Fc6+GhS1VOucNinv6cWyfIMvZ/y+fFjmSekyAlktfvyfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHuyWM5+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1751087778; c=relaxed/simple;
+	bh=kmUNxobeB0njNMzwF7LrNaylmg8DHAlPL5J+TyxuS5U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jfkQcVjzgoKTWFq+coIyGqJaoMgG43VlRvarmjGRo/eOkDjNY3/+BJw56TM76kZbgI44VET5VNfNdMILEXtiV/eGxPOzvu96nBMYJed7jl8wQ8NLdXWKDvB+w6H3GZFIJKfnM9CV8q0HfDxayVxenUG63hyWrobV1+jkKEbPBTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/XuTb0s; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHuyWM5+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 513D0C4CEEA;
-	Sat, 28 Jun 2025 03:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751082830;
-	bh=R8DBgXSYVmnE/2qNcMDNEWDxiBZAD06vdY6tyHSYaGI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=mHuyWM5+k0K3DX7YZsFV2JjTT0LHtMM+WpOX120a46DeVpAH+jMtdw5DoYLdqYXJW
-	 tv4BiGnOsBWElVipy60c3eJVSeUvy329XE0D1sEXD3E3Rbmn9AY5Uz4/8BeyAkuK0K
-	 3ezgN2hQzwfcGeiboT1tPAfuBGAHlCtwtgLY/IT88ILB9ZY8WNawE58/H4f/76Pk1l
-	 xRbcJrIyR0JKiMn3Rn8q6eDkHaNOzBpTkFClYbGWjKhktqeRK1B0SlN3uoLiMw46ss
-	 0h8v58Vp9V1+vCN8JnMlbMiLKleQGwlO+nqmZSx25D8+uprjUUD5lPbU/Qyv6MhAbH
-	 xWnsLgfhWkPmw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2D38111CE;
-	Sat, 28 Jun 2025 03:54:17 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muAE5KvodJSk9VuFOF1fAHWPdnG3NsSgOZONqge06k65g@mail.gmail.com>
-References: <CAH2r5muAE5KvodJSk9VuFOF1fAHWPdnG3NsSgOZONqge06k65g@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muAE5KvodJSk9VuFOF1fAHWPdnG3NsSgOZONqge06k65g@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/v6.16-rc3-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 263debecb4aa7cec0a86487e6f409814f6194a21
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: aaf724ed69264719550ec4f194d3ab17b886af9a
-Message-Id: <175108285614.2130122.13154392429987223620.pr-tracker-bot@kernel.org>
-Date: Sat, 28 Jun 2025 03:54:16 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/XuTb0s"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6fb3bba0730so44114606d6.0;
+        Fri, 27 Jun 2025 22:16:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751087776; x=1751692576; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DZzuLz3ZdZm/BXeBE3Uu6Q075nf+/ZJsx7az6Vf24W8=;
+        b=W/XuTb0sL3m2qM2XUzOp9zZAt9LpnGOGPW+eKPKRcSFpyRsq8ifMkPcJvPSpd52N7q
+         ogQJfLOFTiTtmO2uJVPEg8v4L4hDHVfjFibLJcsjRICsLDnMo5hRN/SnYDFg3PCJbUC0
+         800jmMh3BX7FlkA/JxxSb5yGXJjDupRJKTajtsDOVMMdFlnq8Pfe0AgxRh5X7spPb6Na
+         40/IxuQjAYcKlluUIz7tHfXjaSMormbismePsUDOti/uEMgooieLUiZSPYbXsZg1a95F
+         SzA3NRSITGE5CTPTXI6r3Bh9gLKrUhVKExtaiY5fu8YOaYTDPnQhZz73b2glA89PibRU
+         AZkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751087776; x=1751692576;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DZzuLz3ZdZm/BXeBE3Uu6Q075nf+/ZJsx7az6Vf24W8=;
+        b=KI7n/g/x4FN6yZbuTQGki3DJ5ul0NmiEX/w9X8LpprjihgqYI+U763krQyk2yCqhGB
+         OchlKauds7/J4XAKnCDK98FP1M2YyOArSzpZ2VjBENIkx40axG+oObjiTze4h6Ll7BjK
+         kvSmRvQQUR26NbFI2731FPW6jHTuuut6qggcrl7j/NgGeExTpV5OU8sX+r1bVTtC00t5
+         kUm+y/o62QHFVeC9BvjIBfawKciYIwN0oDd5VEOkW/+MbNysD//tTJBuB5B35uBpziJl
+         LxxC5tqXWMXMz72COgJFUjg96Xu9YFgnPqNEwU2rALSyZeInKS4cW3GUx1/UOEeFq/AL
+         1GCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUlbWs26uqN1UUSkUxEZaYMzMVp0JFA+UsHeDuVK22oaFf253v99DN/QQyVY8gj3qalTO0nEB/hdhSMdY8cyw==@vger.kernel.org, AJvYcCW7muEbhjCyghkM7YLg8q0dYi52ZgobKH+hVUd/65ACn0FK/Dq78j9LNzUnOpBwCQewAfDzYiQJNGYAiw==@vger.kernel.org, AJvYcCWIbkeXD8CZG3Q9GoB3pMswwzO7KjuaE4IJaA9uOORodWFHPSpMHQpbTM53RhzSCPI0BRAMJE+1+LDo@vger.kernel.org, AJvYcCWS0El6SmHZ7mMtSeSIaBUcS9bia5y1Z/cQ3tD9j7N0l84K66o6lnSMiKsIfeD8/0vdCDkTAvoNa9YB1DPz@vger.kernel.org, AJvYcCXltXwkBwTDWawhkW5P22vqHHWwF47rPYo0CL5xh8cLMYLsXUZsitAD1Yam4ugfGNEYXJyXjucSrzz4@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNKeM14n/z1jxFoCZ9Qto6wqLZ0sP4/hH4waN97ZjoOA+BZ85q
+	QZHv0HTwDJAB/HkhEu+Gc4+9vgbwFU9V/bBiPq4RtGC9ofprYUjexYL1F5JztoD57E/h/K+npxr
+	Dsuxyeq0KDgj0UNcJGXmZ04+HwHJyZFE=
+X-Gm-Gg: ASbGncvL6rdgsnQ0ro1iuBwS/yavBCn9GD/dBm9f5ve9wqmkQwti2C509je+WoNfPd0
+	3lN30ShnBBxKEnWcffHgImt3Xv1MoLrJ28SwjLDs0+fM7ZXOL3NwVhkwlpiTOe2kFT5NfKMeofu
+	fOwiSXKbIrKY5wTJ4HKmeIaLwf8fVQGI2H/Ru5L/GwyKIia2v/hrh/awK8KZss8Qw9byc+ByduY
+	4Y3
+X-Google-Smtp-Source: AGHT+IE3pV2VIZ8GVDu8D3pAn+xP9KrFnsfkAKfJDtc+HIgTfF3yrwoj4qZhhy4gTbGbHZchNndWk9tFbBpQfYxX40s=
+X-Received: by 2002:a05:6214:c26:b0:6fb:265:a2c3 with SMTP id
+ 6a1803df08f44-7009ec17fcbmr75209046d6.17.1751087775584; Fri, 27 Jun 2025
+ 22:16:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20250625164213.1408754-1-dhowells@redhat.com> <20250625164213.1408754-2-dhowells@redhat.com>
+In-Reply-To: <20250625164213.1408754-2-dhowells@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 28 Jun 2025 00:16:04 -0500
+X-Gm-Features: Ac12FXwcDHZq4ogM0eCqt7A4iCsu0Kuzvz-14NRnkkfT6DFtusqJyok4ECDYnws
+Message-ID: <CAH2r5mv2m3z+PHC_t1AaFAoV0+tU3fHU+HvX1HeK5S11u_KspA@mail.gmail.com>
+Subject: Re: [PATCH v2 01/16] netfs: Fix hang due to missing case in final DIO
+ read result collection
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev, 
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paulo Alcantara <pc@manguebit.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Fri, 27 Jun 2025 18:19:17 -0500:
+You can add my tested by to the first 11 in the series.  I have
+verified that they fix the netfs regression (e.g. hangs in xfstest
+generic/013 etc.).  The series appears important to make sure gets in
+6.16
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/v6.16-rc3-smb3-client-fixes
+On Wed, Jun 25, 2025 at 11:44=E2=80=AFAM David Howells <dhowells@redhat.com=
+> wrote:
+>
+> When doing a DIO read, if the subrequests we issue fail and cause the
+> request PAUSE flag to be set to put a pause on subrequest generation, we
+> may complete collection of the subrequests (possibly discarding them) pri=
+or
+> to the ALL_QUEUED flags being set.
+>
+> In such a case, netfs_read_collection() doesn't see ALL_QUEUED being set
+> after netfs_collect_read_results() returns and will just return to the ap=
+p
+> (the collector can be seen unpausing the generator in the trace log).
+>
+> The subrequest generator can then set ALL_QUEUED and the app thread reach=
+es
+> netfs_wait_for_request().  This causes netfs_collect_in_app() to be calle=
+d
+> to see if we're done yet, but there's missing case here.
+>
+> netfs_collect_in_app() will see that a thread is active and set inactive =
+to
+> false, but won't see any subrequests in the read stream, and so won't set
+> need_collect to true.  The function will then just return 0, indicating
+> that the caller should just sleep until further activity (which won't be
+> forthcoming) occurs.
+>
+> Fix this by making netfs_collect_in_app() check to see if an active threa=
+d
+> is complete - i.e. that ALL_QUEUED is set and the subrequests list is emp=
+ty
+> - and to skip the sleep return path.  The collector will then be called
+> which will clear the request IN_PROGRESS flag, allowing the app to
+> progress.
+>
+> Fixes: 2b1424cd131c ("netfs: Fix wait/wake to be consistent about the wai=
+tqueue used")
+> Reported-by: Steve French <sfrench@samba.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Paulo Alcantara <pc@manguebit.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>  fs/netfs/misc.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+> index 43b67a28a8fa..0a54b1203486 100644
+> --- a/fs/netfs/misc.c
+> +++ b/fs/netfs/misc.c
+> @@ -381,7 +381,7 @@ void netfs_wait_for_in_progress_stream(struct netfs_i=
+o_request *rreq,
+>  static int netfs_collect_in_app(struct netfs_io_request *rreq,
+>                                 bool (*collector)(struct netfs_io_request=
+ *rreq))
+>  {
+> -       bool need_collect =3D false, inactive =3D true;
+> +       bool need_collect =3D false, inactive =3D true, done =3D true;
+>
+>         for (int i =3D 0; i < NR_IO_STREAMS; i++) {
+>                 struct netfs_io_subrequest *subreq;
+> @@ -400,9 +400,11 @@ static int netfs_collect_in_app(struct netfs_io_requ=
+est *rreq,
+>                         need_collect =3D true;
+>                         break;
+>                 }
+> +               if (subreq || !test_bit(NETFS_RREQ_ALL_QUEUED, &rreq->fla=
+gs))
+> +                       done =3D false;
+>         }
+>
+> -       if (!need_collect && !inactive)
+> +       if (!need_collect && !inactive && !done)
+>                 return 0; /* Sleep */
+>
+>         __set_current_state(TASK_RUNNING);
+>
+>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/aaf724ed69264719550ec4f194d3ab17b886af9a
 
-Thank you!
+--=20
+Thanks,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Steve
