@@ -1,172 +1,112 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55AC2F4A;
-	Mon, 30 Jun 2025 18:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C30319F130
+	for <linux-cifs@vger.kernel.org>; Mon, 30 Jun 2025 18:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751307373; cv=none; b=hFSbrC6dJB/hSRWN3uxpIPGug/lVxKbWebQy134Cu2tbqqc/DVm7wzbAy5dljDp6AysxAC1kniWdr8xWNC2/kmNhzvkMcRZLZ46O2apK1WFTaGbx7P7/X/QNvpHt350lYbJjgomED2DEibbhCmlJXB0AqroXf1Kfg0ZQYPhzkW0=
+	t=1751309455; cv=none; b=L6aY0x9ryAhj7O4MsATkWfjLfTq7fncEvqe9pCcX40aN5a2ln3hzhovvJAptc80YMuz8Ag6nCn0vFmhpz3VVJtjndEtLr2+tjCJBMiPvLRp+q+e0NgbH9LiXkOb3jOwh652w+iyqxVlt5wh6EMy1Xk5Bt+94KqtU3TgdwwPZbHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751307373; c=relaxed/simple;
-	bh=5b4zwQbI3TfVEvNHB8JL8VNLntaKp1XIOCDCu5Vi6uo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ksvfam7/Gqmqz7mUHuLXcL5N/q/lDDKrU007RYL315O1I4/+Jusm9z1aJSRyTQxD2vw5SZLdNv/olWaAS0TekWfxciAS98d9N4Z4Yq0Ux6/lM8xrtC51F+QI+I1ptA7BU9wGdBvbExEudFtwqZzkGblCT8O08Pxj4/vLX4/D20s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blIXrso/; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1751309455; c=relaxed/simple;
+	bh=JVg+LGkQJLiGd0vkD1vYmONMUqm/OpaKsOYYUa2N9Zs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OfvEuqRs759gAsz/zZfa7txc81m08uTPmREuPyo54qHaodhxPFL/JqfHQdDSvaLbWpliHnfx/3qyF/QrTflV8/oLcWjMIPGrYysbmXzobMgyFaA2b0+sQkhHxS5ecv3jQtFfKAiO5U1xbPPpD1INlLGv+KDdTf5gQciYJi4tRwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JDhcyctk; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blIXrso/"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4a8244e897fso8632081cf.1;
-        Mon, 30 Jun 2025 11:16:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JDhcyctk"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-74af4af04fdso3499811b3a.1
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jun 2025 11:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751307370; x=1751912170; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=onS6VXjtFeDdt7uVgfHVvrBvKC3QofJ8cD4ZNlDeikw=;
-        b=blIXrso/YduSDXc/r2jcu1VLPA/ESFa4Rb1jNzLUw+IjSE8uevgs/uqp7otYon5sbN
-         FekMdiVDGG1gWg/ZrmkmPmrowaoXcE4WWlBemWbT/EP2thoqdTreqMxpXlrYRuUqsHfT
-         7AqaxY1osJ2yKFrojjEi5fhnDacFeth1RnaAWOfnZp+EjT7PmRsDc3NmKbLb9xQeUzM7
-         CaDstAkS0Ppp+p9Zebephufc8w6sWSSjif9wGdNrMA+cUbdIt4z6UkQWHVIlmEeAJFJG
-         iljDncJxtk++rUgjwRK5oogUKbP2TMug8QXprohLocaWikliMzhobbjRhQXMNOE+jznd
-         C6tw==
+        d=gmail.com; s=20230601; t=1751309453; x=1751914253; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=flGgDAQfpc5Dlq2D8RMKPGCUgASqDg2cf6ecShzqFRc=;
+        b=JDhcyctkGNKjNHFl6cFHgZqptXTDYV70UH8wfK6gFZh98KPq9kAVHJcEGElfcobwps
+         ttiSQ48VZTbJ2jFye72DELrNRvF37kIiY7s2VnSYPl8RjkBI664s6VigNz7+sob4sLuA
+         jW4SnOkunfBLldfw7EPdytbOuFcnun0b6jYZ+Rf2TQh1dzS1k5uBqqvzcHNesZdyHl4y
+         8cwOX8YEEi/GVFvC4FsCzJqMUQVkBz3TqtUTaFBWxiHEUs8+CZsqAIubDbVsgGxgF+sR
+         FzbPzyPuOwzmMzWvf5pQMLyzzZpQwPDo7G4b58cvipHu6hkz/yXfV+T5kdm09bsvOpAz
+         vZcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751307370; x=1751912170;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=onS6VXjtFeDdt7uVgfHVvrBvKC3QofJ8cD4ZNlDeikw=;
-        b=VYIdKwcpArfhlKQWT9TdOc1hVhly1XFDlYxAmACiguEquK6NA9jYRuO47jCbGUT99o
-         HcFxxlicPtdVyXcOAT9kUkSKSY60XNh4+zVwM2CJlTsQCuvA189yfpG7ZM4HspiEer9S
-         z4gBqm27vvLXXqaWKXzlzlPrIgW7lYYZG/QKOijEkGK6zAhwCZE07gsNK/Eap9rlXziY
-         ++pBVZc5t9BfDpRaDpCnuG6GtK4T34nUlpuQjifE4MYhnrnibdiU9C+OjqzbZvWaUFdE
-         VyQDeC7KrM9QcfX5U6aWjtc5m0ONoiiRVOVDeRR+D76UG4QFXItzR7MtHQm0aB9+r4E8
-         ZbSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdraxRmsW9p5c6L9DEY/8zMxNtHAwhfaWYkUVB5aabml6lKe0BpwjrJRCHZ2dSqnsdRjO+a2Qz9Irs@vger.kernel.org, AJvYcCXrnHkL4JWryF45Rxw4JMOSPwuw79cug3yQ5OdXtqcGYHg7uF/S0zVsvU/6PhdjKDSIWqobh6bU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0dvLS+sXJhIkfXcpvoX+QEeQsT3IB74vK2t54CcKI+Vc2jK21
-	SYrVMBbrhAUfEG0VG2xg5B2Y/sCdo/TdEr7hTSF6TxgbJ7BGV/7piMMpx4zidoikMvi8DbFpzH9
-	EWL7zR78OsIY6n3QLMtA5TGmXZxdPDbE=
-X-Gm-Gg: ASbGnctO0tp/lI5MeXAn1TgZwikinlMP8mJOWelTJf6zsUT1SEQZVWg5PNQjf7eFVDC
-	kwcCWmUdOGOGxnpdXP4vDCh/QHawA4ejWklzG6odX0qzWC1j2dNR2qNfR4Ufkr6qd8iSszvhlL3
-	oTt7uP6ojN5U3IvEFX1wp5e1sprOipSsNQhYj9ksk7eqpUspGeE6Vs0uqvYPPekJzPt2YYfdNKB
-	mKKEg==
-X-Google-Smtp-Source: AGHT+IF/g5OcPBpXJn0tRofPUL6K88XIxmCFBcHsdCC1nvD12ujpqKLQthAS63T4t+rxN44V9o6qfiDWZHP2C1W0LqE=
-X-Received: by 2002:a05:6214:2581:b0:6fa:bbb7:602c with SMTP id
- 6a1803df08f44-700134a7130mr191906136d6.29.1751307370466; Mon, 30 Jun 2025
- 11:16:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751309453; x=1751914253;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=flGgDAQfpc5Dlq2D8RMKPGCUgASqDg2cf6ecShzqFRc=;
+        b=nyRMs+o2WSM0LBg3gWAki8U32tBX1JSvkyuNxwFGnCl237Do1Wm013ux69rfBJqlrE
+         gWimsLbiPExsUzjJeE0h0Ad4sVlJinYZhQniZYEzhoC7rxQ6yjiD8ErNahwK0LvGYuJI
+         ivFOCTJMtWY4btPIh4wjddQ3SzLOX+pybPlPSfie2QowYRZO/lWBbwn9r8gyQgcaDCYN
+         bSemPu7R8FAbS+tg3qrxLvqWPf1ueqCm0xJy9JVwfUtEuDAdCraW1yY5nc9jShrWKTes
+         jTvAXpDEtp3+0v9P69E7fPm+zwtue6L5he+M4ssE4uXwZm0cICQDUwxjZGa0Uf6zL3Q1
+         62TA==
+X-Gm-Message-State: AOJu0Yzy9r48iKxaPGqp+9EaqpbUiz2ch/tOOmWeZ9ZLbCD+1maD0wca
+	LXR/aUgFc3E5qnckCxNXugFqiCOJrAcWIi3iYRAfQ0Yd6cymClvLkVv4+4wEj2sp
+X-Gm-Gg: ASbGncvvX83bdg5TAyZpB7zG2yqWY+0+mzKhPktutRYdNF2IHypu22g7t7YDs8+WCpB
+	6FdcMjt0Zcl8pvTKOMj4Ax/lz/tce2O+xk+GpFE1MknfF0KeVRXPjksTIyg5hBvB1ckNleubfpy
+	8HbrZa5ubwgEch4tpWDBK+xlqpxpS2Quz9RoIYTwEGrlXFxLay1Bzmyctf1VdsHAARrIU50nfk7
+	h5zBZt0Nn9HQhlpgcKUJPrx60a1G4TMWF9rQGr4QUbOEw/ND9uXOL50Xv0hVnKd0hK2hJFy0yFy
+	eNVB4f/JyTUNemhJ7BH5wDAlbpKnUGIXwgLHzwnl87CLwgq66dLFUSR7S9ZvymwSLRtDIJNOXYf
+	CfGeZRw7bICwd
+X-Google-Smtp-Source: AGHT+IES5mP2WbaDDQ3xjSyf7bWxEPH+Ti0q18uMv9Hb8qX5waeH3f/G5j92nn0EZMhaeTGvcRNHsw==
+X-Received: by 2002:a05:6a20:3ca3:b0:220:9512:9213 with SMTP id adf61e73a8af0-222c9a1b938mr834041637.15.1751309453486;
+        Mon, 30 Jun 2025 11:50:53 -0700 (PDT)
+Received: from bharathsm-Virtual-Machine.. ([167.220.2.189])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-74af541cc81sm9626090b3a.58.2025.06.30.11.50.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 11:50:53 -0700 (PDT)
+From: Bharath SM <bharathsm.hsk@gmail.com>
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
+To: linux-cifs@vger.kernel.org,
+	smfrench@gmail.com
+Cc: Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH 1/2] smb: change return type of cached_dir_lease_break() to bool
+Date: Tue,  1 Jul 2025 00:19:32 +0530
+Message-ID: <20250630184932.12067-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630174049.887492-1-sprasad@microsoft.com>
-In-Reply-To: <20250630174049.887492-1-sprasad@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 30 Jun 2025 13:15:58 -0500
-X-Gm-Features: Ac12FXwzFmbpisUUIKnYUmEkGiRFBLaYzV7iMJCNHmyuvdjU7DdYmMGGBay7vfM
-Message-ID: <CAH2r5ms8UkxqGt=5YfnEbnXz35bTgEkXZQdJy3HNWa4NkoL4YQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: all initializations for tcon should happen in tcon_info_alloc
-To: nspmangalore@gmail.com
-Cc: pc@manguebit.org, linux-cifs@vger.kernel.org, dhowells@redhat.com, 
-	Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-tentatively merged into cifs-2.6.git for-next pending testing and more revi=
-ew
+cached_dir_lease_break() has return type as int but only
+returning true or false. change return type of this function
+to bool for clarity.
 
-On Mon, Jun 30, 2025 at 12:40=E2=80=AFPM <nspmangalore@gmail.com> wrote:
->
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> Today, a few work structs inside tcon are initialized inside
-> cifs_get_tcon and not in tcon_info_alloc. As a result, if a tcon
-> is obtained from tcon_info_alloc, but not called as a part of
-> cifs_get_tcon, we may trip over.
->
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/cifsproto.h | 1 +
->  fs/smb/client/connect.c   | 8 +-------
->  fs/smb/client/misc.c      | 6 ++++++
->  3 files changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 66093fa78aed..045227ed4efc 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -136,6 +136,7 @@ extern int SendReceiveBlockingLock(const unsigned int=
- xid,
->                         struct smb_hdr *out_buf,
->                         int *bytes_returned);
->
-> +void smb2_query_server_interfaces(struct work_struct *work);
->  void
->  cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
->                                       bool all_channels);
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index c48869c29e15..16c4f7fa1f34 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -97,7 +97,7 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_S=
-erver_Info *server)
->         return rc;
->  }
->
-> -static void smb2_query_server_interfaces(struct work_struct *work)
-> +void smb2_query_server_interfaces(struct work_struct *work)
->  {
->         int rc;
->         int xid;
-> @@ -2866,20 +2866,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_f=
-s_context *ctx)
->         tcon->max_cached_dirs =3D ctx->max_cached_dirs;
->         tcon->nodelete =3D ctx->nodelete;
->         tcon->local_lease =3D ctx->local_lease;
-> -       INIT_LIST_HEAD(&tcon->pending_opens);
->         tcon->status =3D TID_GOOD;
->
-> -       INIT_DELAYED_WORK(&tcon->query_interfaces,
-> -                         smb2_query_server_interfaces);
->         if (ses->server->dialect >=3D SMB30_PROT_ID &&
->             (ses->server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) =
-{
->                 /* schedule query interfaces poll */
->                 queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
->                                    (SMB_INTERFACE_POLL_INTERVAL * HZ));
->         }
-> -#ifdef CONFIG_CIFS_DFS_UPCALL
-> -       INIT_DELAYED_WORK(&tcon->dfs_cache_work, dfs_cache_refresh);
-> -#endif
->         spin_lock(&cifs_tcp_ses_lock);
->         list_add(&tcon->tcon_list, &ses->tcon_list);
->         spin_unlock(&cifs_tcp_ses_lock);
-> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> index e77017f47084..da23cc12a52c 100644
-> --- a/fs/smb/client/misc.c
-> +++ b/fs/smb/client/misc.c
-> @@ -151,6 +151,12 @@ tcon_info_alloc(bool dir_leases_enabled, enum smb3_t=
-con_ref_trace trace)
->  #ifdef CONFIG_CIFS_DFS_UPCALL
->         INIT_LIST_HEAD(&ret_buf->dfs_ses_list);
->  #endif
-> +       INIT_LIST_HEAD(&ret_buf->pending_opens);
-> +       INIT_DELAYED_WORK(&ret_buf->query_interfaces,
-> +                         smb2_query_server_interfaces);
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +       INIT_DELAYED_WORK(&ret_buf->dfs_cache_work, dfs_cache_refresh);
-> +#endif
->
->         return ret_buf;
->  }
-> --
-> 2.43.0
->
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/smb/client/cached_dir.c | 2 +-
+ fs/smb/client/cached_dir.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 373e6b688fe3..211a6f35541b 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -613,7 +613,7 @@ static void cached_dir_put_work(struct work_struct *work)
+ 	queue_work(serverclose_wq, &cfid->close_work);
+ }
+ 
+-int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
++bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ {
+ 	struct cached_fids *cfids = tcon->cfids;
+ 	struct cached_fid *cfid;
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index bc8a812ff95f..650d727bcea8 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -80,6 +80,6 @@ extern void drop_cached_dir_by_name(const unsigned int xid,
+ 				    struct cifs_sb_info *cifs_sb);
+ extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
+ extern void invalidate_all_cached_dirs(struct cifs_tcon *tcon);
+-extern int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
++extern bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
+ 
+ #endif			/* _CACHED_DIR_H */
+-- 
+2.43.0
 
---=20
-Thanks,
-
-Steve
