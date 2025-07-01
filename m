@@ -1,46 +1,41 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7DFA47;
-	Tue,  1 Jul 2025 02:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3B22737F0;
+	Tue,  1 Jul 2025 11:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751338032; cv=none; b=piVacwq5+d9rJIIlkDfoC6duQ8yicRVI/cSZRlNOj/zCOu00ANyA616l7ED8VJ0WEmj2N3bo0IDoPhYn5fQBguegtdAf4fYfg1QnTKuTLEFFk/ydRcCVS4JnFb5aUUfW6BowWwUI/f+BPSp5eNxd0oK/y3Uw1NX4awgzpQ/Xxgw=
+	t=1751370071; cv=none; b=Pe2eK4i0l16sUHL+aoHpZfpFB8v1EZPL2phLFA+ISS9VV1srbPQkPQNCwOr1GobB8s736ifBXvWgOYiKQUY23qD01kYClnxIzh45aQiDZe4r3DgudToazDdKe7v5jvFK5cu1HrvGWFKl28UEroejB0pXxjP2/xbzVGB+lD1+3BQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751338032; c=relaxed/simple;
-	bh=DkG2aaHUWHfi5yLVXDRdljJw7ma6mEP8Bd7Kuu8sGN8=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=eUGkeeC+tcoTC1EPMXkyNkSZrrwHtiZzwcVITPmThhEdRiL5x65jR3Uy00EeVFsRZ+QNQFEFAhYPy1Nl4F8h0AlUgO/oRCnZ0SsfqdCqOEbaaQ8a0jpn4pChkMq6un4ey+9ZE9YBhP/Gg3GDeksFFe2cEOQu9nGpvVTtj6+wQSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=tyrfv7QB; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1751370071; c=relaxed/simple;
+	bh=m6pSYy0tOJNXW7ylgEySqJmEjacZzj22J0Usd7Xsnhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tm3I8Xynm5dQNqP8O7H+s5+bx6IZykbaeXg1MhV5O7+8c199+/r/+HJ/+f3EnXz+4VEdzsCZJqW8SnowZBnTgtXXi8KaQA61d++a79UqAhYX8aEhfdVxnO7mY8adkztQU5hpdDFswSH8t8dhpud8JAWyYf+riP/DFUMqU7TyLY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XYmJfDQg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="tyrfv7QB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=Q7gZI+6aYsSICM1KaklLGjt/CHuu9Nr7jOaDeOPViBo=; b=tyrfv7QBeLA56ONN19R1VVZSYb
-	BQDbSLMyOdJmXEsnvVaiY68bXzFUZ1D1E/dAlSkeD3TLsiRXltsscYzb3rduKd2ArHqH330C8mR3g
-	nPmz9LegpZic1fCZ0oNGa8lz/X5XITjj4u+LyhLuPNurMe6PPtWioHzDTJH6gg0AjwUSnMhXXbTGI
-	AT6TqMRQD143c/F7XDHkzEwQRrZTFiVxu9+S1AE5ucLq/xvm8RrWajCtR66WI757WfwGJ7nIeXZYy
-	LbDcXOGpPe9uox6L/BC+ZSBkqq1Ytu41fDC8Z3IxI0dafJnLfmcqrZkTj5qK7gOfXNlxBDiTpB6+F
-	Aeege8ug==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1uWR1V-00000000tCg-2Dm1;
-	Mon, 30 Jun 2025 23:47:05 -0300
-Message-ID: <4c85a34838de199e09e68c1eff3c46c6@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org, dhowells@redhat.com,
- Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] cifs: all initializations for tcon should happen in
- tcon_info_alloc
-In-Reply-To: <CANT5p=rEUppfa5E_ySYnXtB8cq5x=V-Yhia6c+1W8a9b7ctLWg@mail.gmail.com>
-References: <20250630174049.887492-1-sprasad@microsoft.com>
- <87104723045d2e07849384ba8e3b4cc0@manguebit.org>
- <CANT5p=rEUppfa5E_ySYnXtB8cq5x=V-Yhia6c+1W8a9b7ctLWg@mail.gmail.com>
-Date: Mon, 30 Jun 2025 23:47:04 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XYmJfDQg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 400B6C4CEEB;
+	Tue,  1 Jul 2025 11:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751370071;
+	bh=m6pSYy0tOJNXW7ylgEySqJmEjacZzj22J0Usd7Xsnhk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XYmJfDQgjwW/irh721f6asrwGaTLKzGybVLOL4ZXYAzXr0d4N33s7zjaGDn3H4SYg
+	 gQ4rajHiARf3HX/cV6soZIXSONNHEXy0EYAPFjuH+bONtrKOhsAVRbACUKVbryfY4O
+	 5UJCxlSzteDBYnE1gJVHvdLNGshMnNYGeKXSgCfe43rHNWWW+6RiqLfImMVOaoVEzf
+	 W4xZafS8kDa2dT45nEMt5BDAp0YO+cVLEuASMtc7hKao37mvUql/ZRjX/pAW2Wq/04
+	 OfC1xi3iaNldsfCrjLkg5aEVSfkkpQHoM5aeDagiu1LEheCFO8sJamPVOkvikgN2S0
+	 xSRQo9PqSEXwQ==
+Date: Tue, 1 Jul 2025 13:41:06 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	linux-cifs@vger.kernel.org, netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfs: Merge i_size update functions
+Message-ID: <20250701-weswegen-wippt-089188706c33@brauner>
+References: <1576470.1750941177@warthog.procyon.org.uk>
+ <1587239.1750941876@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,37 +43,37 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <1587239.1750941876@warthog.procyon.org.uk>
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+On Thu, Jun 26, 2025 at 01:44:36PM +0100, David Howells wrote:
+> Here's a follow up patch to the previous one, though this would be for next -
+> and assuming it's okay to do the i_blocks update in the DIO case which it
+> currently lacks.
+> 
+> David
+> ---
+> Netfslib has two functions for updating the i_size after a write: one for
+> buffered writes into the pagecache and one for direct/unbuffered writes.
+> However, what needs to be done is much the same in both cases, so merge
+> them together.
+> 
+> This does raise one question, though: should updating the i_size after a
+> direct write do the same estimated update of i_blocks as is done for
+> buffered writes.
+> 
+> Also get rid of the cleanup function pointer from netfs_io_request as it's
+> only used for direct write to update i_size; instead do the i_size setting
+> directly from write collection.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Paulo Alcantara <pc@manguebit.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: netfs@lists.linux.dev
+> cc: linux-fsdevel@vger.kernel.org
+> ---
 
-> On Tue, Jul 1, 2025 at 1:06=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
- wrote:
->>
->> nspmangalore@gmail.com writes:
->>
->> > From: Shyam Prasad N <sprasad@microsoft.com>
->> >
->> > Today, a few work structs inside tcon are initialized inside
->> > cifs_get_tcon and not in tcon_info_alloc. As a result, if a tcon
->> > is obtained from tcon_info_alloc, but not called as a part of
->> > cifs_get_tcon, we may trip over.
->> >
->> > Cc: <stable@vger.kernel.org>
->>
->> stable?  Makes no sense.
->
-> I feel this is a serious one. If some code were to use
-> tcon_info_alloc, they'd expect that it's fully initialized, but they'd
-> end up with the problem that you and David saw.
-
-Yes, I understand you want to be safe.  But you're not fixing any
-existing problem with this patch, hence Cc stable didn't make sense to
-me.
-
-> I feel that this is the correct fix to that problem (although that
-> addresses the problem of unnecessary scheduling of work).
-
-You'd just mask the real problem with this.  Without the WARN_ON() on
-the uninitialized delayed worker we wouldn't have found the actual bug,
-though.
+I have one big ask. Please please please put your comments after the
+commit message --- separator. Otherwise git/b4 will take your top
+comment as the commmit message and discard the actual commit message.
