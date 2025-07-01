@@ -1,113 +1,84 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AF91917F1;
-	Tue,  1 Jul 2025 02:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7DFA47;
+	Tue,  1 Jul 2025 02:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751336459; cv=none; b=JgLWlrbYGAm+KXnhRpBnYC3AhSdgKcC3i1ZdRDYKBl/g1JYveAZHhQbskGSp+2OSiXsT9zyxcL7ueiHpb1aRys9pEGevgtB1MqqSgXEMJJZFT+0YpD/deBOcm/I6GtsWj9trPRnP8KStKKauvAP7+8AN+zCzE0r5NUpaqsAiPFw=
+	t=1751338032; cv=none; b=piVacwq5+d9rJIIlkDfoC6duQ8yicRVI/cSZRlNOj/zCOu00ANyA616l7ED8VJ0WEmj2N3bo0IDoPhYn5fQBguegtdAf4fYfg1QnTKuTLEFFk/ydRcCVS4JnFb5aUUfW6BowWwUI/f+BPSp5eNxd0oK/y3Uw1NX4awgzpQ/Xxgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751336459; c=relaxed/simple;
-	bh=UQK1K/8AjN/ed7zGRgmjFNcMMKvnbu3QZaVDcn1BSMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c+OZptn/pYE7YWCuYJxUs/28FAZKFN665TfI3zrN6g7OA8XRBIOdILqCBGhERxXU5GehwMh9cXAeaaYVqC91zWZSfUmfBxBa2pssR9CVXmVHwKEhKGGgYgE0ZxKr5qGPDMnhIpY/czs7kVsln4a6gu5aP5kkFFwGaDpLBNpP2kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aRk/C3dh; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1751338032; c=relaxed/simple;
+	bh=DkG2aaHUWHfi5yLVXDRdljJw7ma6mEP8Bd7Kuu8sGN8=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=eUGkeeC+tcoTC1EPMXkyNkSZrrwHtiZzwcVITPmThhEdRiL5x65jR3Uy00EeVFsRZ+QNQFEFAhYPy1Nl4F8h0AlUgO/oRCnZ0SsfqdCqOEbaaQ8a0jpn4pChkMq6un4ey+9ZE9YBhP/Gg3GDeksFFe2cEOQu9nGpvVTtj6+wQSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=tyrfv7QB; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aRk/C3dh"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60bf5a08729so5926842a12.0;
-        Mon, 30 Jun 2025 19:20:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751336455; x=1751941255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8c2vbb9gJxCkMktav4zEHdcZ05yBTFdozTdnnSMg7+M=;
-        b=aRk/C3dh7Qqm034ZthNf/3gEtTOlugVpFVhhyp+FWhmymw+rpUqSDIddnU1D56UI5q
-         QIDVvnDkBsifc9T811id6hjHy3qC7MckEUeoMqQwlFiWopGKeyuOPVIA0MqWY8qQy+dU
-         /9mx5aph8UPA2a7qzWr+rBp3rnRi5VGW0WuB8uiqOxnONLjjKMIm6kc/iV7QuQjueHG9
-         /tPD45iU9sbFbr7+cXvqDcKRwcNEQmtZU7HQMZ7KhI12tqDlMlZw0Hk2Ahb/hrSZgglr
-         fknR0YvBCCxMweMq1DOt1sbwcoPEvNXyCCzQhRjr+IJszUCd9+rpl8YZDboorfctb11V
-         ikLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751336455; x=1751941255;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8c2vbb9gJxCkMktav4zEHdcZ05yBTFdozTdnnSMg7+M=;
-        b=DbrEOGYMTU7wUa99nGz9TTh8lSp3elBe471nmfgUndSVMIoNq/FRiTYzqGPdTXqCwe
-         GofdNQCpPduzsEfVO54/qwpuTBTM9KX9TelS/k0Rt5Qy/k1wIW84jV0nF1txftSGLcgd
-         rzPOzMM4uTS9MTNsrkJko3s7fo6chjbQkyTI/uB+kDFOkWli7JqVwE2/4o6Jkge5MiHj
-         bbby85JaGySl9d0x7zkNC8AxPtd8yzUbvzoZg8Nf00V9UMCp8wMYLlYlZssh6RDbQb8n
-         ikx406slWHgAsLlLMWMEYq1YDw3kKWZuAvhKYz7PHHDW51zGT4WckfNczOfZMkvfM8mA
-         1n8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUXIvq1TUFWYBFVXWiIGjKh56uOfqcHo6nGnROPiIbcGqKAvflLmgiiIqr6dMk+5/EVzodhi0xX4P3T@vger.kernel.org, AJvYcCVmZoe81Sap+aOaRM0RkZFVXoTciUJ2wD+Mvji5aVpqFp+ov96HveMWZevfQiUBOmFRuBxL4U8j@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTt1Bb8BPXLwt40CtvcZlxqNr08DO+8CXdEdvY6WTeCZEuiWjn
-	yVjs+QHZXC13gcnvMgon7aZPMqBt/DSUD43hjW+P9sefplwe/pk6uVNSgbO+6sE7WQOMcdg0k+1
-	fFDInFGu4ooxFZ06XXu8ZiG1D/gRUxauwvjbe
-X-Gm-Gg: ASbGncvojFRwPeV7tz6VneiGOC9q+xgR8ORXltwGJzeepvQcHUrcd9Hy+qP69rnMFok
-	ReKkHkjFxUm6e6kWkqh19Z28hxUWdHwfnEKOqIMD0Nf3t6f5yRyKigyB84zPRCBIWhqmqQW0O0r
-	qealrGMTYDCFa4xX/QhVATRdd8rYjYVVcH+zj+XuLC0w==
-X-Google-Smtp-Source: AGHT+IGNFNbhilCOJJyOdnpcryO/IwqMwWsq8uviPHqQSqZ3ZmdRNOS/jFE13ob7OMFpCRdZmtmLA9ZWfxqfYLwsb54=
-X-Received: by 2002:a05:6402:354e:b0:609:7ed1:c791 with SMTP id
- 4fb4d7f45d1cf-60c88e4d734mr14468736a12.32.1751336454511; Mon, 30 Jun 2025
- 19:20:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="tyrfv7QB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=Q7gZI+6aYsSICM1KaklLGjt/CHuu9Nr7jOaDeOPViBo=; b=tyrfv7QBeLA56ONN19R1VVZSYb
+	BQDbSLMyOdJmXEsnvVaiY68bXzFUZ1D1E/dAlSkeD3TLsiRXltsscYzb3rduKd2ArHqH330C8mR3g
+	nPmz9LegpZic1fCZ0oNGa8lz/X5XITjj4u+LyhLuPNurMe6PPtWioHzDTJH6gg0AjwUSnMhXXbTGI
+	AT6TqMRQD143c/F7XDHkzEwQRrZTFiVxu9+S1AE5ucLq/xvm8RrWajCtR66WI757WfwGJ7nIeXZYy
+	LbDcXOGpPe9uox6L/BC+ZSBkqq1Ytu41fDC8Z3IxI0dafJnLfmcqrZkTj5qK7gOfXNlxBDiTpB6+F
+	Aeege8ug==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1uWR1V-00000000tCg-2Dm1;
+	Mon, 30 Jun 2025 23:47:05 -0300
+Message-ID: <4c85a34838de199e09e68c1eff3c46c6@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Shyam Prasad N <nspmangalore@gmail.com>
+Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org, dhowells@redhat.com,
+ Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] cifs: all initializations for tcon should happen in
+ tcon_info_alloc
+In-Reply-To: <CANT5p=rEUppfa5E_ySYnXtB8cq5x=V-Yhia6c+1W8a9b7ctLWg@mail.gmail.com>
+References: <20250630174049.887492-1-sprasad@microsoft.com>
+ <87104723045d2e07849384ba8e3b4cc0@manguebit.org>
+ <CANT5p=rEUppfa5E_ySYnXtB8cq5x=V-Yhia6c+1W8a9b7ctLWg@mail.gmail.com>
+Date: Mon, 30 Jun 2025 23:47:04 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630174049.887492-1-sprasad@microsoft.com> <87104723045d2e07849384ba8e3b4cc0@manguebit.org>
-In-Reply-To: <87104723045d2e07849384ba8e3b4cc0@manguebit.org>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Tue, 1 Jul 2025 07:50:42 +0530
-X-Gm-Features: Ac12FXwmrqFJRoWmaDbzkfDUnJAZVDZ9hhcl_fvg71UCXQwWFfC_fUs6YM7ck9E
-Message-ID: <CANT5p=rEUppfa5E_ySYnXtB8cq5x=V-Yhia6c+1W8a9b7ctLWg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: all initializations for tcon should happen in tcon_info_alloc
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org, dhowells@redhat.com, 
-	Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 1, 2025 at 1:06=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> w=
-rote:
->
-> nspmangalore@gmail.com writes:
->
-> > From: Shyam Prasad N <sprasad@microsoft.com>
-> >
-> > Today, a few work structs inside tcon are initialized inside
-> > cifs_get_tcon and not in tcon_info_alloc. As a result, if a tcon
-> > is obtained from tcon_info_alloc, but not called as a part of
-> > cifs_get_tcon, we may trip over.
-> >
-> > Cc: <stable@vger.kernel.org>
->
-> stable?  Makes no sense.
+Shyam Prasad N <nspmangalore@gmail.com> writes:
 
-I feel this is a serious one. If some code were to use
-tcon_info_alloc, they'd expect that it's fully initialized, but they'd
-end up with the problem that you and David saw.
-I feel that this is the correct fix to that problem (although that
-addresses the problem of unnecessary scheduling of work).
-
+> On Tue, Jul 1, 2025 at 1:06=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
+ wrote:
+>>
+>> nspmangalore@gmail.com writes:
+>>
+>> > From: Shyam Prasad N <sprasad@microsoft.com>
+>> >
+>> > Today, a few work structs inside tcon are initialized inside
+>> > cifs_get_tcon and not in tcon_info_alloc. As a result, if a tcon
+>> > is obtained from tcon_info_alloc, but not called as a part of
+>> > cifs_get_tcon, we may trip over.
+>> >
+>> > Cc: <stable@vger.kernel.org>
+>>
+>> stable?  Makes no sense.
 >
-> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > ---
-> >  fs/smb/client/cifsproto.h | 1 +
-> >  fs/smb/client/connect.c   | 8 +-------
-> >  fs/smb/client/misc.c      | 6 ++++++
-> >  3 files changed, 8 insertions(+), 7 deletions(-)
->
-> Otherwise, looks good:
->
-> Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+> I feel this is a serious one. If some code were to use
+> tcon_info_alloc, they'd expect that it's fully initialized, but they'd
+> end up with the problem that you and David saw.
 
-Thanks.
+Yes, I understand you want to be safe.  But you're not fixing any
+existing problem with this patch, hence Cc stable didn't make sense to
+me.
 
---=20
-Regards,
-Shyam
+> I feel that this is the correct fix to that problem (although that
+> addresses the problem of unnecessary scheduling of work).
+
+You'd just mask the real problem with this.  Without the WARN_ON() on
+the uninitialized delayed worker we wouldn't have found the actual bug,
+though.
