@@ -1,133 +1,207 @@
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8FA1DACB1
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Jul 2025 16:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDC42F5095
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Jul 2025 17:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751475518; cv=none; b=LaVD4bnWSB1OKShBSJ9IBxxGM+o589tZUOAQMQOZn827OJsK8wnvB2pfjsxuOfDRrtlBrREKpzGAWPOLwnejpytmqYLtgQfsA4RZwiYZ+uCAQQ1kYRWkw6MKG19zJOGMbpGzzud29SfqIsQJQxH7GdTdC+jCTtcd79GFN4RQ650=
+	t=1751478013; cv=none; b=HGzwUdRYLnrJbUKJmgeWjMRFfUATdrJoDBH+c1RzbQMDpuTfIWzYtUtQ6KawnUzg/EE8+up2LjOM1FU2p6agbkb07e0TWX9optP7U6SWm/KA1Cz5k9al+RWMuA13ZmIGmH3B9wzfJV5NWR9YsuMQCsr7qSZvSfWIfgcr4TsAuKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751475518; c=relaxed/simple;
-	bh=NrFQix9JKRWhdVhFAASa2lVFMF/owDzHAD1AuPt4rf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Np7XOWPJJ9023jNVxkVXT0JQt/0XTlE1/6PyeGwv+uHS4jJUFG6/dka/IzuYU7Uxp+ErCO+5Lh6kdoPB5C+0vaYYZd2AftcUR9TefIwIkQA2aHRrULyMQa0hQ9FEcWqF57bGsdZFjBUeN6vBtTkyK6J0OQmPKbdzEcd0GWVog0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XjSdCdRl; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1751478013; c=relaxed/simple;
+	bh=xFsuWI2eCuvnBuAZc1WxLx5r8Sak/UAxs9LjmlpRGeE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNDM/wW2GkJ2OuXNUyTtSXotZJqaCzWV63aARc7xkC88CvGUFG+hEm4vQP7wMwzOyOMm5n1X6ntkmWnUqO+mLZLjiNLMJFi/wag7Cdt/HBh+jeaAONKg2i0Maub87/lcThCuhXXVpmBjtseY4B5Cm9T9HWv19FNmuqEGPuD2LQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=DJomQ5Sd; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XjSdCdRl"
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-3a6d1369d4eso3953452f8f.2
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Jul 2025 09:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1751475514; x=1752080314; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CCK4GH47/qZS8k592FStcjtjSEYqGvfvMdMtR9Y7PjQ=;
-        b=XjSdCdRlOdbAkQA99HFtostjSA4wTh2e//C/Kmv7S6fzopQYME1c/6A9HbhmCN9njp
-         Ox3FoHaH9v/IBmHZpevRMO8H1CnNMX+Jf3I0Evwub6Uj7TEeP+vWRtOcz6pkgt+0OqP6
-         /Pno98Cgi1+OxosMiSV2gWkASt/wOaLKy38+A6gr1//vrQzkJAzEoK1/LAoPn2mFWV4o
-         x+s5Z9OdhyUYg5ufYpz43/y92z45djN3it3QyEWRA0pGXXX+/9Sod1MXg900ABylXg9o
-         L3Rk4Sqil4itJK8mMqnZ4OjdAgvvM9kWvcYYnAk+3sdvGJiwr8Qbgia1t0lKXh9EIgze
-         rQew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751475514; x=1752080314;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CCK4GH47/qZS8k592FStcjtjSEYqGvfvMdMtR9Y7PjQ=;
-        b=kz/V7jCHiCjT1ohVEs1y/N5u2LKhZAwt0EUwitTp4TAvCqhRVF7O/rMnucIny/iGUM
-         k7u5C/Jc02j1TA/7TeeG1rvfpQj4NMkGOYU0i8FuVvCWpWxunsxmfFHDK+7YcGqI8yDc
-         98OKjHmTnmEy+WKSiKP7MX7tMzdXdqeycU+Sdy6AdaDKgMUuEa6ojiTXKhvtgMSX8IYK
-         f6diUegioSmRKdBjTN87QuVqKaWl5kKlNgGMInaASg0daXW9TJRzejt0ORyFa+qD5rLG
-         a0Toq7Z4I0/MKeE7Cg4AdRWoMG+YWVUZxzAKbZAQddpuQ0nzyCCGlKA/ddgXtlpSiWAS
-         VQ8g==
-X-Gm-Message-State: AOJu0YwGGkPhOepc3TYtNFfljxsZr5MvT3+XzRyB5RFuEKdM5HegbO45
-	vCIsTE9G6LfS8VGeRzvSMAEqNuoB+0dJDvqem83kvHak3AIFQ+/mzWz/17iwe8ppGEWErML0qMd
-	XMIrfR/8ZCA==
-X-Gm-Gg: ASbGncs1JrVQZs5ZXX8QiUKSTa4RzFCuoZSzvU5lp06hx5b75bYGfxhHWoU1PuLeIxw
-	ItrQT3L+bHxt9Yd8fry3pAlAxYaFiE6lKckC0xBqXXKOZgtcDi4dHdEMJ1e5F6JKCIA8OTlU5Xr
-	/3gon4xfsexbotrderH7jcM9xoTK5e2Mwl8HygH6CphxLFHYgYhtx1G641vawtuJe/Ev6XHWLki
-	Zlqq8kEZ5f5DVcKt74njpT7dQSzmaZbIVJ+HFq6e98qoZUqpBCOchPZ0W3xpgkN1tKLNZfy/S+z
-	uWwS502c3YJHipW2CjWPG/xNnzd8U+i5ZSVOPikkvy7qtOchgxmhbIxJoEGJVXw1pGU=
-X-Google-Smtp-Source: AGHT+IHgXBVIFLwJvjPJXTi6QDqtXqw+6CcWDngIXix860AQraAi/n9xgb+GXIVxbgQt3buJMFwhVA==
-X-Received: by 2002:a05:6000:21c8:b0:3a4:e672:deef with SMTP id ffacd0b85a97d-3b2000b0a5cmr1959325f8f.36.1751475513976;
-        Wed, 02 Jul 2025 09:58:33 -0700 (PDT)
-Received: from precision ([189.79.155.93])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af57ee760sm14114767b3a.155.2025.07.02.09.58.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 09:58:32 -0700 (PDT)
-Date: Wed, 2 Jul 2025 13:55:47 -0300
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: Bharath SM <bharathsm.hsk@gmail.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com,
-	sprasad@microsoft.com, paul@darkrain42.org,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH 2/2] smb: invalidate and close cached directory when
- creating child entries
-Message-ID: <aGVkk8LT_RSwElO1@precision>
-References: <20250630185303.12087-1-bharathsm@microsoft.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="DJomQ5Sd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:In-Reply-To:Content-Type:References:Reply-To:
+	Content-ID:Content-Description;
+	bh=StxU5GDN6DukLcpSirv/LC9ZOwmt+/INH1M0VUw7CRw=; b=DJomQ5SdptNVnQ2YzZ8J3wyNgK
+	y4fFVAPwhWOPKBgA/Ea6X12E1TTLFrndUJmBh15kUrRG6T63xXBitNTi8yVv8X3vrdEd2QF50I3jV
+	kXJbxZakGzEj07tGEPpwb/6wmzooPb/v8oDOBBxBuuHcbAS4XXbjo9+5qSkFGXTQ2Y7+ifqJQEnwR
+	zSF0VjuhkXxqRRhXi0zNouBAGefKIyAACHSphZvssPdq/G5qFO1QAm7czEu3HM25+rfgMRkh5BQG4
+	7kNeRP0YtUsNn7LI6FHWPmYNRvUknoyARzHr3xadCswcnae9N41mFGFcqBfg47JPM93KRvkONggYX
+	t3fRV+ow==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1uX1RC-000000010HY-2PU5;
+	Wed, 02 Jul 2025 14:40:02 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Pierguido Lambri <plambri@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>
+Subject: [PATCH] smb: client: fix native SMB symlink traversal
+Date: Wed,  2 Jul 2025 14:40:01 -0300
+Message-ID: <20250702174001.911761-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630185303.12087-1-bharathsm@microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Bharath,
+We've seen customers having shares mounted in paths like /??/C:/ or
+/??/UNC/foo.example.com/share in order to get their native SMB
+symlinks successfully followed from different mounts.
 
-On Tue, Jul 01, 2025 at 12:23:03AM +0530, Bharath SM wrote:
-> @@ -190,6 +190,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  	int disposition;
->  	struct TCP_Server_Info *server = tcon->ses->server;
->  	struct cifs_open_parms oparms;
-> +	struct cached_fid *parent_cfid = NULL;
->  	int rdwr_for_fscache = 0;
->  	__le32 lease_flags = 0;
->
-> @@ -313,10 +314,10 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
->  		create_options |= CREATE_OPTION_READONLY;
->  
-> +
->  retry_open:
->  	if (tcon->cfids && direntry->d_parent && server->dialect >= SMB30_PROT_ID) {
-> -		struct cached_fid *parent_cfid;
-> -
-> +		parent_cfid = NULL;
+After commit 12b466eb52d9 ("cifs: Fix creating and resolving absolute NT-style symlinks"),
+the client would then convert absolute paths from /??/C:/ to "/mnt/c/"
+by default.  The absolute paths would vary depending on the value of
+symlink= mount option.
 
-I believe setting to NULL here is unnecessary, no?
+Fix this by restoring old behavior of not trying to convert absolute
+paths by default.  Only do this if symlinkroot= was _explicitly_ set.
 
->  		spin_lock(&tcon->cfids->cfid_list_lock);
->  		list_for_each_entry(parent_cfid, &tcon->cfids->entries, entry) {
->  			if (parent_cfid->dentry == direntry->d_parent) {
-> @@ -327,6 +328,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  					memcpy(fid->parent_lease_key,
->  					       parent_cfid->fid.lease_key,
->  					       SMB2_LEASE_KEY_SIZE);
-> +					parent_cfid->dirents.is_valid = false;
+Before patch:
 
-Shouldn't we set dirents.is_valid to false only after the open is
-successful?
+  $ mount.cifs //w22-fs0/test2 /mnt/1 -o vers=3.1.1,username=xxx,password=yyy
+  $ ls -l /mnt/1/symlink2
+  lrwxr-xr-x 1 root root 15 Jun 20 14:22 /mnt/1/symlink2 -> /mnt/c/testfile
+  $ mkdir -p /??/C:; echo foo > //??/C:/testfile
+  $ cat /mnt/1/symlink2
+  cat: /mnt/1/symlink2: No such file or directory
 
->  				}
->  				break;
->  			}
-> @@ -355,6 +357,10 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
->  		}
->  		goto out;
->  	}
-> +
-> +	if (parent_cfid && !parent_cfid->dirents.is_valid)
-> +		close_cached_dir(parent_cfid);
-> +
->  	if (rdwr_for_fscache == 2)
->  		cifs_invalidate_cache(inode, FSCACHE_INVAL_DIO_WRITE);
->
+After patch:
 
-Apart from the above,
+  $ mount.cifs //w22-fs0/test2 /mnt/1 -o vers=3.1.1,username=xxx,password=yyy
+  $ ls -l /mnt/1/symlink2
+  lrwxr-xr-x 1 root root 15 Jun 20 14:22 /mnt/1/symlink2 -> '/??/C:/testfile'
+  $ mkdir -p /??/C:; echo foo > //??/C:/testfile
+  $ cat /mnt/1/symlink2
+  foo
 
-Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: Pierguido Lambri <plambri@redhat.com>
+Cc: David Howells <dhowells@redhat.com>
+Fixes: 12b466eb52d9 ("cifs: Fix creating and resolving absolute NT-style symlinks")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+---
+ fs/smb/client/fs_context.c | 13 ++++---------
+ fs/smb/client/reparse.c    | 22 +++++++++++++---------
+ 2 files changed, 17 insertions(+), 18 deletions(-)
+
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index a634a34d4086..d8d2d4a739e8 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1825,9 +1825,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			goto cifs_parse_mount_err;
+ 		}
+ 		kfree(ctx->symlinkroot);
+-		ctx->symlinkroot = kstrdup(param->string, GFP_KERNEL);
+-		if (!ctx->symlinkroot)
++		ctx->symlinkroot = kstrndup(param->string, PATH_MAX, GFP_KERNEL);
++		if (!ctx->symlinkroot) {
++			cifs_errorf(fc, "OOM when copying symlinkroot string\n");
+ 			goto cifs_parse_mount_err;
++		}
+ 		break;
+ 	}
+ 	/* case Opt_ignore: - is ignored as expected ... */
+@@ -1837,13 +1839,6 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		goto cifs_parse_mount_err;
+ 	}
+ 
+-	/*
+-	 * By default resolve all native absolute symlinks relative to "/mnt/".
+-	 * Same default has drvfs driver running in WSL for resolving SMB shares.
+-	 */
+-	if (!ctx->symlinkroot)
+-		ctx->symlinkroot = kstrdup("/mnt/", GFP_KERNEL);
+-
+ 	return 0;
+ 
+  cifs_parse_mount_err:
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 1c40e42e4d89..5fa29a97ac15 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -57,6 +57,7 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 	struct reparse_symlink_data_buffer *buf = NULL;
+ 	struct cifs_open_info_data data = {};
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	const char *symroot = cifs_sb->ctx->symlinkroot;
+ 	struct inode *new;
+ 	struct kvec iov;
+ 	__le16 *path = NULL;
+@@ -82,7 +83,8 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 		.symlink_target = symlink_target,
+ 	};
+ 
+-	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) && symname[0] == '/') {
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) &&
++	    symroot && symname[0] == '/') {
+ 		/*
+ 		 * This is a request to create an absolute symlink on the server
+ 		 * which does not support POSIX paths, and expects symlink in
+@@ -92,7 +94,7 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 		 * ensure compatibility of this symlink stored in absolute form
+ 		 * on the SMB server.
+ 		 */
+-		if (!strstarts(symname, cifs_sb->ctx->symlinkroot)) {
++		if (!strstarts(symname, symroot)) {
+ 			/*
+ 			 * If the absolute Linux symlink target path is not
+ 			 * inside "symlinkroot" location then there is no way
+@@ -101,12 +103,12 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 			cifs_dbg(VFS,
+ 				 "absolute symlink '%s' cannot be converted to NT format "
+ 				 "because it is outside of symlinkroot='%s'\n",
+-				 symname, cifs_sb->ctx->symlinkroot);
++				 symname, symroot);
+ 			rc = -EINVAL;
+ 			goto out;
+ 		}
+-		len = strlen(cifs_sb->ctx->symlinkroot);
+-		if (cifs_sb->ctx->symlinkroot[len-1] != '/')
++		len = strlen(symroot);
++		if (symroot[len - 1] != '/')
+ 			len++;
+ 		if (symname[len] >= 'a' && symname[len] <= 'z' &&
+ 		    (symname[len+1] == '/' || symname[len+1] == '\0')) {
+@@ -782,6 +784,7 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
+ 			      const char *full_path,
+ 			      struct cifs_sb_info *cifs_sb)
+ {
++	const char *symroot = cifs_sb->ctx->symlinkroot;
+ 	char sep = CIFS_DIR_SEP(cifs_sb);
+ 	char *linux_target = NULL;
+ 	char *smb_target = NULL;
+@@ -815,7 +818,8 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
+ 		goto out;
+ 	}
+ 
+-	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) && !relative) {
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) &&
++	    symroot && !relative) {
+ 		/*
+ 		 * This is an absolute symlink from the server which does not
+ 		 * support POSIX paths, so the symlink is in NT-style path.
+@@ -907,15 +911,15 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
+ 		}
+ 
+ 		abs_path_len = strlen(abs_path)+1;
+-		symlinkroot_len = strlen(cifs_sb->ctx->symlinkroot);
+-		if (cifs_sb->ctx->symlinkroot[symlinkroot_len-1] == '/')
++		symlinkroot_len = strlen(symroot);
++		if (symroot[symlinkroot_len - 1] == '/')
+ 			symlinkroot_len--;
+ 		linux_target = kmalloc(symlinkroot_len + 1 + abs_path_len, GFP_KERNEL);
+ 		if (!linux_target) {
+ 			rc = -ENOMEM;
+ 			goto out;
+ 		}
+-		memcpy(linux_target, cifs_sb->ctx->symlinkroot, symlinkroot_len);
++		memcpy(linux_target, symroot, symlinkroot_len);
+ 		linux_target[symlinkroot_len] = '/';
+ 		memcpy(linux_target + symlinkroot_len + 1, abs_path, abs_path_len);
+ 	} else if (smb_target[0] == sep && relative) {
+-- 
+2.50.0
 
