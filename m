@@ -1,112 +1,72 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mail.growora.pl (mail.growora.pl [51.254.119.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFB632C85
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Jul 2025 07:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E810211F
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Jul 2025 08:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.254.119.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751440702; cv=none; b=SiRN6FcvlH8Yz9bLHVPUiv6qupl0uQcn3JLjM6pwY5Z64feC1LPXHYBAq5KLI/3GVKG6UE4XwrnJGnSpPFe7HGwhaVAAeUTyPQEt1WPs2elEd/bJK41wc03/Nag3LW6xu+8Qfe9tZ09yHIWcTYaaxwjDtSxjQvHzi+HsCIuKgpw=
+	t=1751444102; cv=none; b=oCZMmpunz80Fuzs++oKbOMdOSywbotmmLeVxqtGJOnjUlOSAXLrHbtfSDZ3E6oU3DYxqKiYWW9gKlarn0t1ReE2xXPkiil1k4MnbVkOyNEZB7nIhSFZAxIsYDRurhiC9cud7AIbXBWAK6jYOVBTsh2OIYIw/VAN2ZvQ22q6c/rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751440702; c=relaxed/simple;
-	bh=Bl1IGVPfjgc+Mn+yaC04zS2rbSCC95LKW9UjcNeHnpA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Kfola7/fi13CHmougHPowbTGLOoTfVJ/LXWfc1u9VsdA6YLWLOFauKkMt3H9Rq0Xmf6zYfI78B9LJVQExWuLcJZBg44uHRHTmoCg7d1Rav/LDCjJ3B4YYbMrI7GANO7V1H2NpQqW7ryZnjwraXipdZf1tmToWaBDa86eQaDitGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=AOMek+sn; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1751444102; c=relaxed/simple;
+	bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
+	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=O9fHe3DdLqwCHOvAvYs35/sw51fuuP0OK2EDtEn2aHi5Vq2Xm2TVFmzWAzGSc53pD6XV26jLdr5PveYsNuk+lclM25nKv7nYFeVmk1dF1gNry/XgYlj7htKXIdIOLtop2VM8DBHhjBd4gKdsp9o1mWGr7Ve+9R9lMfA0FzJCEnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl; spf=pass smtp.mailfrom=growora.pl; dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b=QIMlUlvC; arc=none smtp.client-ip=51.254.119.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=growora.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="AOMek+sn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-Id:Date:Cc:To:From;
-	bh=VZLx/loH14Yx5Zd2sekAGIwetpGqLRxVgkW0h+1ZlMc=; b=AOMek+snl/IAIeY6roaucHfJHd
-	936mDZpw7jjD0MtXM9+Bk98UcleNbuW+M4Kr3uhTcazbCYR73nQ/8lpiVimuSXjsvntE83AXWUqvJ
-	3ZVL3dxRiPghqUbSTz16e3fqrTyPDUmHP+Di8IvRHuUhu8oVPGkRkwaEQ14/d8ZyhfcqlVwewePXq
-	F6ii8oaL/yyuNzhSNUiGJrAICElF/2FVOjVCD/KKvyrtFR0N9NHpDG+txRmRzlVAPBkrqhAoWs0qB
-	a3OY6lNS59FvBJ9QKjOlHBSM99OtvC9arznVBnigTSCbBj8Okm7FviY2Gkz5zHq/Tlzd2sojFD1DE
-	oih0GZCn+BwRtnNHwIu3hPwRgKa9yKoeNt074q/2j5ikHBUq40XPIo98eZS197YXb6NBKr7URqRG9
-	QudLDET20P2FuXn/kDU2+ud+9AlxPHyOhA/dwlZytAQVgApAOtN7n1rwzaRx5eMlzH12vJvlkpAcb
-	yQTBLsH1M7hElelsL2KeqVx6;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uWrjN-00DTrq-2J;
-	Wed, 02 Jul 2025 07:18:09 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH] smb: server: make use of rdma_destroy_qp()
-Date: Wed,  2 Jul 2025 09:18:05 +0200
-Message-Id: <20250702071805.2540741-1-metze@samba.org>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b="QIMlUlvC"
+Received: by mail.growora.pl (Postfix, from userid 1002)
+	id A3BC3247E0; Wed,  2 Jul 2025 10:10:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=growora.pl; s=mail;
+	t=1751443867; bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
+	h=Date:From:To:Subject:From;
+	b=QIMlUlvCsisPc/DTgw2nCxk6hnPjzVMeQeXyYJ7Kvk4psEls/4QlC5M6/iAn9Nd+T
+	 VbmopHOWDVvby87XSPFv0boqwzzUNjBm+gDs+PWbi2YzIaua7UmxOGJFq3ZAh54z1j
+	 GR/0P/FkpbMVlx7fVOp7SUUJS984fNmqk69tcpn7WSEbp8nraau8T+mqcNmJ/NrTXw
+	 vV61OhyirsChadaiY/hQvsHdj0j/qLVXtFgx7OCvYbesFq6VrV9lK0zuJomaXUyUa+
+	 nvRjWQ0OwO0YgCd8OhD39+csdlt3awmRTUhsXyK38isGRo7olGOjRGzo0sf25etXFN
+	 YjK2QyhgVjT0A==
+Received: by mail.growora.pl for <linux-cifs@vger.kernel.org>; Wed,  2 Jul 2025 08:10:24 GMT
+Message-ID: <20250702084500-0.1.kd.23my9.0.bjf2v14dr2@growora.pl>
+Date: Wed,  2 Jul 2025 08:10:24 GMT
+From: "Mateusz Hopczak" <mateusz.hopczak@growora.pl>
+To: <linux-cifs@vger.kernel.org>
+Subject: Wsparcie programistyczne - termin spotkania 
+X-Mailer: mail.growora.pl
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The qp is created by rdma_create_qp() as t->cm_id->qp
-and t->qp is just a shortcut.
+Szanowni Pa=C5=84stwo,
 
-rdma_destroy_qp() also calls ib_destroy_qp(cm_id->qp) internally,
-but it is protected by a mutex, clears the cm_id and also calls
-trace_cm_qp_destroy().
+czy w Pa=C5=84stwa firmie rozwa=C5=BCaj=C4=85 Pa=C5=84stwo rozw=C3=B3j no=
+wego oprogramowania lub potrzebuj=C4=85 zaufanego zespo=C5=82u, kt=C3=B3r=
+y przejmie odpowiedzialno=C5=9B=C4=87 za stron=C4=99 technologiczn=C4=85 =
+projektu?
 
-This should make the tracing more useful as both
-rdma_create_qp() and rdma_destroy_qp() are traces and it makes
-the code look more sane as functions from the same layer are used
-for the specific qp object.
+Jeste=C5=9Bmy butikowym software housem z 20-osobowym zespo=C5=82em in=C5=
+=BCynier=C3=B3w. Specjalizujemy si=C4=99 w projektach high-tech i deeptec=
+h =E2=80=93 od zaawansowanych system=C3=B3w AI/ML, przez blockchain i IoT=
+, a=C5=BC po aplikacje mobilne, webowe i symulacyjne (m.in. Unreal Engine=
+).
 
-trace-cmd stream -e rdma_cma:cm_qp_create -e rdma_cma:cm_qp_destroy
-shows this now while doing a mount and unmount from a client:
+Wspieramy firmy technologiczne oraz startupy na r=C3=B3=C5=BCnych etapach=
+: od koncepcji, przez development, po skalowanie i optymalizacj=C4=99. Dz=
+ia=C5=82amy elastycznie =E2=80=93 jako partnerzy, podwykonawcy lub ventur=
+e builderzy.
 
-  <...>-80   [002] 378.514182: cm_qp_create:  cm.id=1 src=172.31.9.167:5445 dst=172.31.9.166:37113 tos=0 pd.id=0 qp_type=RC send_wr=867 recv_wr=255 qp_num=1 rc=0
-  <...>-6283 [001] 381.686172: cm_qp_destroy: cm.id=1 src=172.31.9.167:5445 dst=172.31.9.166:37113 tos=0 qp_num=1
+Je=C5=9Bli szukaj=C4=85 Pa=C5=84stwo zespo=C5=82u, kt=C3=B3ry rozumie z=C5=
+=82o=C5=BCono=C5=9B=C4=87 projekt=C3=B3w i wnosi realn=C4=85 warto=C5=9B=C4=
+=87 technologiczn=C4=85 =E2=80=93 ch=C4=99tnie porozmawiamy.
 
-Before we only saw the first line.
+Czy mogliby=C5=9Bmy um=C3=B3wi=C4=87 si=C4=99 na kr=C3=B3tk=C4=85 rozmow=C4=
+=99, by sprawdzi=C4=87 potencja=C5=82 wsp=C3=B3=C5=82pracy?
 
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <stfrench@microsoft.com>
-Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/server/transport_rdma.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 64a428a06ace..c6cbe0d56e32 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -433,7 +433,8 @@ static void free_transport(struct smb_direct_transport *t)
- 	if (t->qp) {
- 		ib_drain_qp(t->qp);
- 		ib_mr_pool_destroy(t->qp, &t->qp->rdma_mrs);
--		ib_destroy_qp(t->qp);
-+		t->qp = NULL;
-+		rdma_destroy_qp(t->cm_id);
- 	}
- 
- 	ksmbd_debug(RDMA, "drain the reassembly queue\n");
-@@ -1940,8 +1941,8 @@ static int smb_direct_create_qpair(struct smb_direct_transport *t,
- 	return 0;
- err:
- 	if (t->qp) {
--		ib_destroy_qp(t->qp);
- 		t->qp = NULL;
-+		rdma_destroy_qp(t->cm_id);
- 	}
- 	if (t->recv_cq) {
- 		ib_destroy_cq(t->recv_cq);
--- 
-2.34.1
-
+Z pozdrowieniami
+Mateusz Hopczak
