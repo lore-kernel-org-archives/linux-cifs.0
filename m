@@ -1,95 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5620023AB86
-	for <linux-cifs@vger.kernel.org>; Thu,  3 Jul 2025 13:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2F2C148;
+	Thu,  3 Jul 2025 13:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548020; cv=none; b=EhmTkIxFR9w8tksflwlIHtVlwNtw7CEyFImLisQB7nf+1qhISRvR3X1TmlhL5qOLJHQi+ijaEPOdDJ5AHZ1zlTCV/hZWldTRwIBYoYFdVyOhHKe7zMPzvnaIuDagcho6F6KZ2d9tE7iLfJrVMvoDJrzr03DcR81i98ZCucKuCqQ=
+	t=1751549244; cv=none; b=Bj9nenL5cq0iSi11LCNuKF12PeOpmtnRX+BU5AdPpbm9mRZW1rIy/1q7ALdtSQn+4KChFNCaoYC7qBHtnk7q5MM3C37CJuu3zBGczkJwHJGKFbVOeA0riGjkj6oQrWjqiiu0ibnYKxhGFAQr16St067HejlLbqAiZWaakzYhURw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548020; c=relaxed/simple;
-	bh=Z4w5m5CpgHFF6Tkqd9q7I7U3lx/nZIgUpB3h4mvQxNU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D78iFVoGnCja29zH1Qoa2jfjOuUfHNG5ZKNlGmq8ndJO1SjY07s9O5l3zNMBMziv5xL6jqHi13oYbsv7tBT+lA387SeK9/n1+zzWy1nPUUyxUYlCtJ0IPC2aeovqba58YvrMRYsZO+XNW+iooCO6d/oG+F7HQTHopooTPyKtDVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2NuhnTD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2NuhnTD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF45C4CEF1
-	for <linux-cifs@vger.kernel.org>; Thu,  3 Jul 2025 13:06:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751548019;
-	bh=Z4w5m5CpgHFF6Tkqd9q7I7U3lx/nZIgUpB3h4mvQxNU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=U2NuhnTDicer7wc5fwHHe2J+HiSWBwmyQ3nw95GM/LmRgIRPCkFq/VwXKH+5jqWZl
-	 6CveNIsQwUYQztslBy0OAuO3j7UIXA7Y6AsdT6WtkwI+/y9TzO3mfEiY3pyw8dWOGT
-	 zShu7zm5xg71UnW/t50id4cDqq3hhDTxBO4F80FhLe6DqWn4g4j/Y9rfGPNPOa7v65
-	 e1Ud9yiwUh7yY5g03lUd41iVlH6Yzx2/SUfFp9Sb2nJuuMIED1HC16o4228MWpKcbL
-	 VWUtqDhhPNX+vQW+9cNqFgnjLp2fKOmF/tWmH8IQ1FfAYyQEtDDn8hGFB+LGmt2SzM
-	 ii75oLhniSbAw==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-60c4521ae2cso14074503a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Jul 2025 06:06:59 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzsXyNJgb75HkUkQqihKFXpnnQC8Gg6yYnn/VBRaA3YSkl2iMmg
-	rJaOiozSIiLCEWCGSXYcXvHx5bUeVvvq9o1PXOD/9LXMb6miKGxdlGJt2F8S1nDbkGuXVEvgkbQ
-	BK7deioaC/uJMWfj0YttnU07H8I3mfa8=
-X-Google-Smtp-Source: AGHT+IE3D9KLkoCi8UAoCLGcElF1OMy8eyJvYPFsLyKB1+RZTcGKRRnlAb+qEZ8UReMSgYiAfduEIoS1QOjdQUZeSCc=
-X-Received: by 2002:a05:6402:1e8c:b0:608:64ef:3807 with SMTP id
- 4fb4d7f45d1cf-60e6ca8f86bmr3149298a12.0.1751548018392; Thu, 03 Jul 2025
- 06:06:58 -0700 (PDT)
+	s=arc-20240116; t=1751549244; c=relaxed/simple;
+	bh=h9Lj1Kr+0dRjXxXHU3VKmCLHLTiQTtjJXR5BpFXLhq8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gQdH8Fz2Afl47ykpPf++vnBmLkGOSNU1c1T67yk/8/+KrxDn5hjtEYTpxUA2MegrwYgamzR3QjbkVH41u+7OWbAUo5UUjPgNyZGHr0HCyNstw9Ag2TLX7x6hhl3s7a7F+f/YjPFwjqqW+/OmJFmeVLw0tYJ4l24T+NJ5w+jmQeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bXyHD1PSYzKHLxK;
+	Thu,  3 Jul 2025 21:27:20 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 980F81A14CD;
+	Thu,  3 Jul 2025 21:27:18 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP3 (Coremail) with SMTP id _Ch0CgA3mSYzhWZoVG4eAg--.12632S4;
+	Thu, 03 Jul 2025 21:27:17 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pshilov@microsoft.com,
+	aaptel@suse.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	chengzhihao1@huawei.com,
+	wangzhaolong1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] smb: client: fix use-after-free in cifs_oplock_break
+Date: Thu,  3 Jul 2025 21:20:02 +0800
+Message-Id: <20250703132002.627709-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702071805.2540741-1-metze@samba.org>
-In-Reply-To: <20250702071805.2540741-1-metze@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 3 Jul 2025 22:06:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_KjT5qd3amwKr3p6v0nC2wURdODqHSyS6AY=KXeaR93w@mail.gmail.com>
-X-Gm-Features: Ac12FXyT9zgAz8TIEGHjE4HVyLzYvH2IZvEQO7uDNJ5bIZDJeOmBtbsn2WtIpYc
-Message-ID: <CAKYAXd_KjT5qd3amwKr3p6v0nC2wURdODqHSyS6AY=KXeaR93w@mail.gmail.com>
-Subject: Re: [PATCH] smb: server: make use of rdma_destroy_qp()
-To: Stefan Metzmacher <metze@samba.org>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	Steve French <stfrench@microsoft.com>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, 
-	Hyunchul Lee <hyc.lee@gmail.com>, Tom Talpey <tom@talpey.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgA3mSYzhWZoVG4eAg--.12632S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF4kGF4kuFy5uFW5JFyxXwb_yoW5CFWUpF
+	13Kr15Wr45GryUuwsaqF4ru3W3t3WkWa1F9ry8Ww1Sy343J3ySgF4rKr129F4SqFWkAr1q
+	gF4jg3yqvF1UArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
+	0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
+	tVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
+	CY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU17KsUUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-On Wed, Jul 2, 2025 at 4:18=E2=80=AFPM Stefan Metzmacher <metze@samba.org> =
-wrote:
->
-> The qp is created by rdma_create_qp() as t->cm_id->qp
-> and t->qp is just a shortcut.
->
-> rdma_destroy_qp() also calls ib_destroy_qp(cm_id->qp) internally,
-> but it is protected by a mutex, clears the cm_id and also calls
-> trace_cm_qp_destroy().
->
-> This should make the tracing more useful as both
-> rdma_create_qp() and rdma_destroy_qp() are traces and it makes
-> the code look more sane as functions from the same layer are used
-> for the specific qp object.
->
-> trace-cmd stream -e rdma_cma:cm_qp_create -e rdma_cma:cm_qp_destroy
-> shows this now while doing a mount and unmount from a client:
->
->   <...>-80   [002] 378.514182: cm_qp_create:  cm.id=3D1 src=3D172.31.9.16=
-7:5445 dst=3D172.31.9.166:37113 tos=3D0 pd.id=3D0 qp_type=3DRC send_wr=3D86=
-7 recv_wr=3D255 qp_num=3D1 rc=3D0
->   <...>-6283 [001] 381.686172: cm_qp_destroy: cm.id=3D1 src=3D172.31.9.16=
-7:5445 dst=3D172.31.9.166:37113 tos=3D0 qp_num=3D1
->
-> Before we only saw the first line.
->
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Steve French <stfrench@microsoft.com>
-> Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-> Cc: Hyunchul Lee <hyc.lee@gmail.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
-d tranport layers")
-> Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+A race condition can occur in cifs_oplock_break() leading to a
+use-after-free of the cinode structure when unmounting:
+
+  cifs_oplock_break()
+    spin_lock(&cinode->open_file_lock)  <- OK
+    _cifsFileInfo_put(cfile)
+      cifsFileInfo_put_final()
+        cifs_sb_deactive()
+          [last ref, start releasing sb]
+            kill_sb()
+              kill_anon_super()
+                generic_shutdown_super()
+                  evict_inodes()
+                    dispose_list()
+                      evict()
+                        destroy_inode()
+                          call_rcu(&inode->i_rcu, i_callback)
+                            [later] i_callback()
+                              cifs_free_inode()
+                                kmem_cache_free(cinode)
+    spin_unlock(&cinode->open_file_lock)  <- UAF
+    cifs_done_oplock_break(cinode)       <- UAF
+
+The issue occurs when umount has already released its reference to the
+superblock. When _cifsFileInfo_put() calls cifs_sb_deactive(), this
+releases the last reference, triggering the immediate cleanup of all
+inodes under RCU. However, cifs_oplock_break() continues to access the
+cinode after this point, resulting in use-after-free.
+
+Fix this by holding an extra reference to the superblock during the
+entire oplock break operation. This ensures that the superblock and
+its inodes remain valid until the oplock break completes.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220309
+Fixes: b98749cac4a6 ("CIFS: keep FileInfo handle live during oplock break")
+Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+---
+ fs/smb/client/file.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index e9212da32f01..1421bde045c2 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -3086,20 +3086,27 @@ bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file,
+ void cifs_oplock_break(struct work_struct *work)
+ {
+ 	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
+ 						  oplock_break);
+ 	struct inode *inode = d_inode(cfile->dentry);
+-	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct super_block *sb = inode->i_sb;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	struct tcon_link *tlink;
+ 	int rc = 0;
+ 	bool purge_cache = false, oplock_break_cancelled;
+ 	__u64 persistent_fid, volatile_fid;
+ 	__u16 net_fid;
+ 
++	/*
++	 * Hold a reference to the superblock to prevent it and its inodes from
++	 * being freed while we are accessing cinode. Otherwise, _cifsFileInfo_put()
++	 * may release the last reference to the sb and trigger inode eviction.
++	 */
++	cifs_sb_active(sb);
+ 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+ 			TASK_UNINTERRUPTIBLE);
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -3168,10 +3175,11 @@ void cifs_oplock_break(struct work_struct *work)
+ 		spin_unlock(&cinode->open_file_lock);
+ 
+ 	cifs_put_tlink(tlink);
+ out:
+ 	cifs_done_oplock_break(cinode);
++	cifs_sb_deactive(sb);
+ }
+ 
+ static int cifs_swap_activate(struct swap_info_struct *sis,
+ 			      struct file *swap_file, sector_t *span)
+ {
+-- 
+2.39.2
+
