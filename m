@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD85E126BFF;
-	Thu,  3 Jul 2025 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14C42EE281;
+	Thu,  3 Jul 2025 14:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751554220; cv=none; b=gIBo/wyX38JWm04/kTwQB7XYZH4UncDQmLk9tyeKH/e0KRue0+FCR5mfc388RrURQZRvnRI5j10kQMceYsrNh1a5/Tk4lUunnumgOrbUWANfrTP35jgatEejf7g3SVFfD6239rhzQEJt4ASzf7K27I87bGOhCWHnKxofar5A85M=
+	t=1751554223; cv=none; b=Q0bV8m5/W3nRhyUtS81DNWFeSE78s5A2SGQJJfPk06skReQGtP6gge4JS9MTJN9kaAljOrt+NgFNEH/23QSyw5Ha4XiU5UhCWQS5hAY784DhQwUP1rilzptdPcGwQFsfWy2VnNbmavqHogc9xS09BZYZ62Xa5DuCIxH04OICubc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751554220; c=relaxed/simple;
-	bh=2n+AKnp0746EWkbHGtxyq1yMV4U7H6CaUoTPNdNZTXU=;
+	s=arc-20240116; t=1751554223; c=relaxed/simple;
+	bh=86yCD1BacEn7P5GjwB1XMH/yH113F1WwUpPFBFawj9E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oOUZI9UKX6ysh1TNeSqQlHOQwBU60LPK1M2wvZ2zLK3E8jHA+m9LrUFObvqYltNnR6iKj48go8+yclQN+/hD+C1FnN2uoyO8/XMTgBWNpxWPNOPH8GY/n0IJgdBl+ZVnqdlxK5v4XvaR/KeUWf+5VgH5eht99Q2Kq9CCFDgaK5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Xy3GxlZq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ifjm1IsaiNODLR8FZ3pk0LkdpKBpHmMr7B6zspzzppQghoMlRbJA0Jyqum9gLmF2oOF9+u4oTCPh1jUnjJlIzWKdESGYEW4I9bFjskUivPfoZjoajOY/9Z8vOG2SxFzAwqvDohEqAM16nQ9WV9HClBRQA1SbtAp6aeawUQgut28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=C4bRhUhY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Xy3GxlZq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2DAEC4CEE3;
-	Thu,  3 Jul 2025 14:50:19 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="C4bRhUhY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0851C4CEE3;
+	Thu,  3 Jul 2025 14:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751554220;
-	bh=2n+AKnp0746EWkbHGtxyq1yMV4U7H6CaUoTPNdNZTXU=;
+	s=korg; t=1751554223;
+	bh=86yCD1BacEn7P5GjwB1XMH/yH113F1WwUpPFBFawj9E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Xy3GxlZqw6kgGojNSIeeunfSXFdGHccIGQqACAioTlg/cCSQaZ645fmXcTHZLhm3H
-	 YJhNqPaC3MXsf8ZPm709/r01bBPsuYd6KRbG3O6LJE8Hyz8muGnOPcGpcjqDX07qmJ
-	 L45KNatZAaiQylB4qFGXI6r/955YBq+YMb/yUoEk=
+	b=C4bRhUhYjjJwk4llEWXQ4lUMg0C5W1rkrQxznP3vU4rmuE82tut2Sw4gtTMn/r+0j
+	 QJbHxk5pgR3+v8Yxc8yYrb2iY1ocMNHWXpeKFAqqHDjow4cB+4wC14KvmrT+PnYGP0
+	 WNdQirzXn0y631G6muU1Q1Whu05KJ0vv6n7TMvtA=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,9 +38,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 118/218] smb: smbdirect: add smbdirect_pdu.h with protocol definitions
-Date: Thu,  3 Jul 2025 16:41:06 +0200
-Message-ID: <20250703144000.660120631@linuxfoundation.org>
+Subject: [PATCH 6.12 119/218] smb: client: make use of common smbdirect_pdu.h
+Date: Thu,  3 Jul 2025 16:41:07 +0200
+Message-ID: <20250703144000.697564497@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250703143955.956569535@linuxfoundation.org>
 References: <20250703143955.956569535@linuxfoundation.org>
@@ -61,11 +61,7 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 00fab6cf323fa5850e6cbe283b23e605e6e97912 ]
-
-This is just a start moving into a common smbdirect layer.
-
-It will be used in the next commits...
+[ Upstream commit 64946d5be665ddac6b5bf11f5b5ff319aae0f4c6 ]
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -80,71 +76,221 @@ Signed-off-by: Steve French <stfrench@microsoft.com>
 Stable-dep-of: 43e7e284fc77 ("cifs: Fix the smbd_response slab to allow usercopy")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/common/smbdirect/smbdirect_pdu.h | 55 +++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
- create mode 100644 fs/smb/common/smbdirect/smbdirect_pdu.h
+ fs/smb/client/smbdirect.c | 40 ++++++++++++++++++--------------------
+ fs/smb/client/smbdirect.h | 41 ---------------------------------------
+ 2 files changed, 19 insertions(+), 62 deletions(-)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_pdu.h b/fs/smb/common/smbdirect/smbdirect_pdu.h
-new file mode 100644
-index 0000000000000..ae9fdb05ce231
---- /dev/null
-+++ b/fs/smb/common/smbdirect/smbdirect_pdu.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *   Copyright (c) 2017 Stefan Metzmacher
-+ */
-+
-+#ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__
-+#define __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__
-+
-+#define SMBDIRECT_V1 0x0100
-+
-+/* SMBD negotiation request packet [MS-SMBD] 2.2.1 */
-+struct smbdirect_negotiate_req {
-+	__le16 min_version;
-+	__le16 max_version;
-+	__le16 reserved;
-+	__le16 credits_requested;
-+	__le32 preferred_send_size;
-+	__le32 max_receive_size;
-+	__le32 max_fragmented_size;
-+} __packed;
-+
-+/* SMBD negotiation response packet [MS-SMBD] 2.2.2 */
-+struct smbdirect_negotiate_resp {
-+	__le16 min_version;
-+	__le16 max_version;
-+	__le16 negotiated_version;
-+	__le16 reserved;
-+	__le16 credits_requested;
-+	__le16 credits_granted;
-+	__le32 status;
-+	__le32 max_readwrite_size;
-+	__le32 preferred_send_size;
-+	__le32 max_receive_size;
-+	__le32 max_fragmented_size;
-+} __packed;
-+
-+#define SMBDIRECT_DATA_MIN_HDR_SIZE 0x14
-+#define SMBDIRECT_DATA_OFFSET       0x18
-+
-+#define SMBDIRECT_FLAG_RESPONSE_REQUESTED 0x0001
-+
-+/* SMBD data transfer packet with payload [MS-SMBD] 2.2.3 */
-+struct smbdirect_data_transfer {
-+	__le16 credits_requested;
-+	__le16 credits_granted;
-+	__le16 flags;
-+	__le16 reserved;
-+	__le32 remaining_data_length;
-+	__le32 data_offset;
-+	__le32 data_length;
-+	__le32 padding;
-+	__u8 buffer[];
-+} __packed;
-+
-+#endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_PDU_H__ */
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 9d8be034f103f..d506ab259e082 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -7,6 +7,7 @@
+ #include <linux/module.h>
+ #include <linux/highmem.h>
+ #include <linux/folio_queue.h>
++#include "../common/smbdirect/smbdirect_pdu.h"
+ #include "smbdirect.h"
+ #include "cifs_debug.h"
+ #include "cifsproto.h"
+@@ -50,9 +51,6 @@ struct smb_extract_to_rdma {
+ static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
+ 					struct smb_extract_to_rdma *rdma);
+ 
+-/* SMBD version number */
+-#define SMBD_V1	0x0100
+-
+ /* Port numbers for SMBD transport */
+ #define SMB_PORT	445
+ #define SMBD_PORT	5445
+@@ -299,7 +297,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	mempool_free(request, request->info->request_mempool);
+ }
+ 
+-static void dump_smbd_negotiate_resp(struct smbd_negotiate_resp *resp)
++static void dump_smbdirect_negotiate_resp(struct smbdirect_negotiate_resp *resp)
+ {
+ 	log_rdma_event(INFO, "resp message min_version %u max_version %u negotiated_version %u credits_requested %u credits_granted %u status %u max_readwrite_size %u preferred_send_size %u max_receive_size %u max_fragmented_size %u\n",
+ 		       resp->min_version, resp->max_version,
+@@ -318,15 +316,15 @@ static bool process_negotiation_response(
+ 		struct smbd_response *response, int packet_length)
+ {
+ 	struct smbd_connection *info = response->info;
+-	struct smbd_negotiate_resp *packet = smbd_response_payload(response);
++	struct smbdirect_negotiate_resp *packet = smbd_response_payload(response);
+ 
+-	if (packet_length < sizeof(struct smbd_negotiate_resp)) {
++	if (packet_length < sizeof(struct smbdirect_negotiate_resp)) {
+ 		log_rdma_event(ERR,
+ 			"error: packet_length=%d\n", packet_length);
+ 		return false;
+ 	}
+ 
+-	if (le16_to_cpu(packet->negotiated_version) != SMBD_V1) {
++	if (le16_to_cpu(packet->negotiated_version) != SMBDIRECT_V1) {
+ 		log_rdma_event(ERR, "error: negotiated_version=%x\n",
+ 			le16_to_cpu(packet->negotiated_version));
+ 		return false;
+@@ -448,7 +446,7 @@ static void smbd_post_send_credits(struct work_struct *work)
+ /* Called from softirq, when recv is done */
+ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ {
+-	struct smbd_data_transfer *data_transfer;
++	struct smbdirect_data_transfer *data_transfer;
+ 	struct smbd_response *response =
+ 		container_of(wc->wr_cqe, struct smbd_response, cqe);
+ 	struct smbd_connection *info = response->info;
+@@ -474,7 +472,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	switch (response->type) {
+ 	/* SMBD negotiation response */
+ 	case SMBD_NEGOTIATE_RESP:
+-		dump_smbd_negotiate_resp(smbd_response_payload(response));
++		dump_smbdirect_negotiate_resp(smbd_response_payload(response));
+ 		info->full_packet_received = true;
+ 		info->negotiate_done =
+ 			process_negotiation_response(response, wc->byte_len);
+@@ -531,7 +529,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		/* Send a KEEP_ALIVE response right away if requested */
+ 		info->keep_alive_requested = KEEP_ALIVE_NONE;
+ 		if (le16_to_cpu(data_transfer->flags) &
+-				SMB_DIRECT_RESPONSE_REQUESTED) {
++				SMBDIRECT_FLAG_RESPONSE_REQUESTED) {
+ 			info->keep_alive_requested = KEEP_ALIVE_PENDING;
+ 		}
+ 
+@@ -686,7 +684,7 @@ static int smbd_post_send_negotiate_req(struct smbd_connection *info)
+ 	struct ib_send_wr send_wr;
+ 	int rc = -ENOMEM;
+ 	struct smbd_request *request;
+-	struct smbd_negotiate_req *packet;
++	struct smbdirect_negotiate_req *packet;
+ 
+ 	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
+ 	if (!request)
+@@ -695,8 +693,8 @@ static int smbd_post_send_negotiate_req(struct smbd_connection *info)
+ 	request->info = info;
+ 
+ 	packet = smbd_request_payload(request);
+-	packet->min_version = cpu_to_le16(SMBD_V1);
+-	packet->max_version = cpu_to_le16(SMBD_V1);
++	packet->min_version = cpu_to_le16(SMBDIRECT_V1);
++	packet->max_version = cpu_to_le16(SMBDIRECT_V1);
+ 	packet->reserved = 0;
+ 	packet->credits_requested = cpu_to_le16(info->send_credit_target);
+ 	packet->preferred_send_size = cpu_to_le32(info->max_send_size);
+@@ -774,10 +772,10 @@ static int manage_credits_prior_sending(struct smbd_connection *info)
+ /*
+  * Check if we need to send a KEEP_ALIVE message
+  * The idle connection timer triggers a KEEP_ALIVE message when expires
+- * SMB_DIRECT_RESPONSE_REQUESTED is set in the message flag to have peer send
++ * SMBDIRECT_FLAG_RESPONSE_REQUESTED is set in the message flag to have peer send
+  * back a response.
+  * return value:
+- * 1 if SMB_DIRECT_RESPONSE_REQUESTED needs to be set
++ * 1 if SMBDIRECT_FLAG_RESPONSE_REQUESTED needs to be set
+  * 0: otherwise
+  */
+ static int manage_keep_alive_before_sending(struct smbd_connection *info)
+@@ -837,7 +835,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+ 	int header_length;
+ 	int data_length;
+ 	struct smbd_request *request;
+-	struct smbd_data_transfer *packet;
++	struct smbdirect_data_transfer *packet;
+ 	int new_credits = 0;
+ 
+ wait_credit:
+@@ -919,7 +917,7 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+ 
+ 	packet->flags = 0;
+ 	if (manage_keep_alive_before_sending(info))
+-		packet->flags |= cpu_to_le16(SMB_DIRECT_RESPONSE_REQUESTED);
++		packet->flags |= cpu_to_le16(SMBDIRECT_FLAG_RESPONSE_REQUESTED);
+ 
+ 	packet->reserved = 0;
+ 	if (!data_length)
+@@ -938,10 +936,10 @@ static int smbd_post_send_iter(struct smbd_connection *info,
+ 		     le32_to_cpu(packet->remaining_data_length));
+ 
+ 	/* Map the packet to DMA */
+-	header_length = sizeof(struct smbd_data_transfer);
++	header_length = sizeof(struct smbdirect_data_transfer);
+ 	/* If this is a packet without payload, don't send padding */
+ 	if (!data_length)
+-		header_length = offsetof(struct smbd_data_transfer, padding);
++		header_length = offsetof(struct smbdirect_data_transfer, padding);
+ 
+ 	request->sge[0].addr = ib_dma_map_single(info->id->device,
+ 						 (void *)packet,
+@@ -1432,7 +1430,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ 		kmem_cache_create(
+ 			name,
+ 			sizeof(struct smbd_request) +
+-				sizeof(struct smbd_data_transfer),
++				sizeof(struct smbdirect_data_transfer),
+ 			0, SLAB_HWCACHE_ALIGN, NULL);
+ 	if (!info->request_cache)
+ 		return -ENOMEM;
+@@ -1735,7 +1733,7 @@ static int smbd_recv_buf(struct smbd_connection *info, char *buf,
+ 		unsigned int size)
+ {
+ 	struct smbd_response *response;
+-	struct smbd_data_transfer *data_transfer;
++	struct smbdirect_data_transfer *data_transfer;
+ 	int to_copy, to_read, data_read, offset;
+ 	u32 data_length, remaining_data_length, data_offset;
+ 	int rc;
+diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
+index c08e3665150d7..4da0974ce7305 100644
+--- a/fs/smb/client/smbdirect.h
++++ b/fs/smb/client/smbdirect.h
+@@ -177,47 +177,6 @@ enum smbd_message_type {
+ 	SMBD_TRANSFER_DATA,
+ };
+ 
+-#define SMB_DIRECT_RESPONSE_REQUESTED 0x0001
+-
+-/* SMBD negotiation request packet [MS-SMBD] 2.2.1 */
+-struct smbd_negotiate_req {
+-	__le16 min_version;
+-	__le16 max_version;
+-	__le16 reserved;
+-	__le16 credits_requested;
+-	__le32 preferred_send_size;
+-	__le32 max_receive_size;
+-	__le32 max_fragmented_size;
+-} __packed;
+-
+-/* SMBD negotiation response packet [MS-SMBD] 2.2.2 */
+-struct smbd_negotiate_resp {
+-	__le16 min_version;
+-	__le16 max_version;
+-	__le16 negotiated_version;
+-	__le16 reserved;
+-	__le16 credits_requested;
+-	__le16 credits_granted;
+-	__le32 status;
+-	__le32 max_readwrite_size;
+-	__le32 preferred_send_size;
+-	__le32 max_receive_size;
+-	__le32 max_fragmented_size;
+-} __packed;
+-
+-/* SMBD data transfer packet with payload [MS-SMBD] 2.2.3 */
+-struct smbd_data_transfer {
+-	__le16 credits_requested;
+-	__le16 credits_granted;
+-	__le16 flags;
+-	__le16 reserved;
+-	__le32 remaining_data_length;
+-	__le32 data_offset;
+-	__le32 data_length;
+-	__le32 padding;
+-	__u8 buffer[];
+-} __packed;
+-
+ /* The packet fields for a registered RDMA buffer */
+ struct smbd_buffer_descriptor_v1 {
+ 	__le64 offset;
 -- 
 2.39.5
 
