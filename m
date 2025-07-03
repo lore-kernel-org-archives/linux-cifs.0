@@ -1,154 +1,214 @@
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
+Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70DE2DE701;
-	Thu,  3 Jul 2025 09:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B0FB67A
+	for <linux-cifs@vger.kernel.org>; Thu,  3 Jul 2025 13:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751534161; cv=none; b=WbTj7EQFE2i2RzNogMIAEbAx463LsAkZsNa/fiF25vvgcN+l1c1fvyhkbQ7/yatGsDJRyLGPxiHHYOJL281ndbUUbs7FylCgMgVFO98C5qQa7ORSC2zsKE32OtXopDE62af5uJphOt9kY0KLBcUYDwGJuEPO8QJL2rKwDJ4vDrM=
+	t=1751547907; cv=none; b=bTl85CiN8ZakFbu0G35LM6TS55ogZwlS14cY2kY/VFYbDBOw0Z9bcr4PkNc4toK+NbqkNKzIPvXHeDj2nH3/kIQneh7NAf4ZOVyFINZCtmEehHIy7ewV14WJEQdNvjBE73b+L0B4RMgmKYnjO2bC0P7X1jCpmo7ERfPvzgmWQFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751534161; c=relaxed/simple;
-	bh=IXGjNYrCCJ7z//O8GYBQaRJVFFgl9rp2iE2vE4wR4HM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bBo2KSRrzsAyuE8f+uKbEdQtETcUqhMqrvoaMqUfHz42TR9nbJ33nvuDnYYXTTyvIvklbqeiV2eBzzd7GPJVkmZWSo/r6EdYtHnaN1OmHJR5eYuYQTAdwPS1F7N+56t+ZbYsP3FFALKEhgVU8ClkswxlXzG++Zfgl+QHXMgU6ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=apgLy2d+; arc=none smtp.client-ip=93.188.205.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="apgLy2d+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1751534152;
-	bh=IXGjNYrCCJ7z//O8GYBQaRJVFFgl9rp2iE2vE4wR4HM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=apgLy2d+CCDpyBhkSBMPO9MoRvsMvL//U5NfSIqC/B7MuKLu0kPh7SZd318nhY5Tz
-	 SkXrt17d2ZWrxzyLJWxEFDHmfJ4+RRPezHoaSXCAZ2OYm3pscQQyQaXw8s+Uuf7i8C
-	 mwvsMZDL3N29Rib5j5Kiy7cHBoQR+8U2L0FeyHqg1t2/PNVi0kARCDutT1fPLIt/Rs
-	 +qkS6VcFKmSQMC+D793ZOg5IiPbmuZ8jujUTjrFuqgs64895UNKWmULSce2laQPUW0
-	 34fS2CnrkbwB9Q2ZQmguYbDB3PErMjINHTdylAyWeecDyo1txWyIZSdeYaPd9ppDC5
-	 jW1cIDKkIr2Fg==
-Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id D2AF41F707;
-	Thu,  3 Jul 2025 12:15:52 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.177.185.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Thu,  3 Jul 2025 12:15:50 +0300 (MSK)
-Received: from localhost.localdomain (unknown [10.190.6.76])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4bXrhy3qHMz16Hnq;
-	Thu,  3 Jul 2025 12:15:45 +0300 (MSK)
-From: Anastasia Belova <abelova@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
-	Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 5.10] cifs: fix small mempool leak in SMB2_negotiate()
-Date: Thu,  3 Jul 2025 12:15:28 +0300
-Message-ID: <20250703091529.129846-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1751547907; c=relaxed/simple;
+	bh=2vVYB0sTOj/Biqrp8wdfLAIK8S2bNIxIoTIE2ZBwob0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WsXZW9EBbCUKxo4njzSjtrICuSgKDgIVDjVDW/NVi99LSvYIdrvJYeaeYqU4VPHRa/2lxm64IcHwFLNivSz9/d9Ewrvj6YXWnFlniUZb1zK89B94gVVYfyihD7KPzn8Hf6h654csY15DUnDoL6qscL0h34S3Doq4wpUzKfzZkpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from [10.64.129.108] (unknown [193.43.9.250])
+	(Authenticated sender: alekseevamo)
+	by air.basealt.ru (Postfix) with ESMTPSA id 86EA8233B3;
+	Thu,  3 Jul 2025 15:59:32 +0300 (MSK)
+Message-ID: <3d3160fd-e29d-495d-a02e-e28558cfec1a@altlinux.org>
+Date: Thu, 3 Jul 2025 16:59:32 +0400
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: alxvmr@altlinux.org
+Subject: Re: [PATCH] fs/smb/client/fs_context: Add hostname option for CIFS
+ module to work with domain-based dfs resources with Kerberos authentication
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ sfrench@samba.org, pc@manguebit.com, Ivan Volchenko <ivolchenko86@gmail.com>
+References: <20250516152201.201385-1-alxvmr@altlinux.org>
+ <43os6kphihnry2wggqykiwmusz@pony.office.basealt.ru>
+Content-Language: en-US, ru
+From: Maria Alexeeva <alxvmr@altlinux.org>
+In-Reply-To: <43os6kphihnry2wggqykiwmusz@pony.office.basealt.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 63 0.3.63 9cc2b4b18bf16653fda093d2c494e542ac094a39, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 194515 [Jul 03 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/07/03 05:31:00 #27614197
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+On 6/14/25 07:42, Vitaly Chikunov wrote:
+> Maria,
+>
+> On Fri, May 16, 2025 at 07:22:01PM +0400, Maria Alexeeva wrote:
+>> Paths to domain-based dfs resources are defined using the domain name
+>> of the server in the format:
+>> \\DOMAIN.NAME>\<dfsroot>\<path>
+>>
+>> The CIFS module, when requesting a TGS, uses the server name
+>> (<DOMAIN.NAME>) it obtained from the UNC for the initial connection.
+>> It then composes an SPN that does not match any entities
+>> in the domain because it is the domain name itself.
+> For a casual reader like me it's hard to understand (this abbreviation
+> filled message) what it's all about. And why we can't just change system
+> hostname for example.
 
-commit 27893dfc1285f80f80f46b3b8c95f5d15d2e66d0 upstream.
+This option is needed to transfer the real name of the server to which 
+the connection is taking place,
+when using the UNC path in the form of domain-based DFS. The system 
+hostname has nothing to do with it.
 
-In some cases of failure (dialect mismatches) in SMB2_negotiate(), after
-the request is sent, the checks would return -EIO when they should be
-rather setting rc = -EIO and jumping to neg_exit to free the response
-buffer from mempool.
+> Also, the summary (subject) message is 180 character which is way above
+> 75 characters suggested in submitting-patches.rst.
+>
+>> To eliminate this behavior, a hostname option is added, which is
+>> the name of the server to connect to and is used in composing the SPN.
+>> In the future this option will be used in the cifs-utils development.
+>>
+>> Suggested-by: Ivan Volchenko <ivolchenko86@gmail.com>
+>> Signed-off-by: Maria Alexeeva <alxvmr@altlinux.org>
+>> ---
+>>   fs/smb/client/fs_context.c | 35 +++++++++++++++++++++++++++++------
+>>   fs/smb/client/fs_context.h |  3 +++
+>>   2 files changed, 32 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+>> index a634a34d4086..74de0a9de664 100644
+>> --- a/fs/smb/client/fs_context.c
+>> +++ b/fs/smb/client/fs_context.c
+>> @@ -177,6 +177,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+>>   	fsparam_string("password2", Opt_pass2),
+>>   	fsparam_string("ip", Opt_ip),
+>>   	fsparam_string("addr", Opt_ip),
+>> +	fsparam_string("hostname", Opt_hostname),
+>>   	fsparam_string("domain", Opt_domain),
+>>   	fsparam_string("dom", Opt_domain),
+>>   	fsparam_string("srcaddr", Opt_srcaddr),
+>> @@ -825,16 +826,23 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+>>   		return -ENOENT;
+>>   	}
+>>   
+>> +	if (ctx->got_opt_hostname) {
+>> +		kfree(ctx->server_hostname);
+>> +		ctx->server_hostname = ctx->opt_hostname;
+> I am not familiar with the smb codebase but are you sure this will not
+> cause a race?
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: stable@vger.kernel.org
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
----
-Backport fix for CVE-2022-49938
- fs/cifs/smb2pdu.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+The race condition will not occur.
+ctx->server_hostname is also used in smb3_parse_devname inside 
+smb3_fs_context_parse_param.
+smb3_fs_context_parse_param is called earlier than the updated 
+smb3_fs_context_validate, which is called inside smb3_get_tree:
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 4197096e7fdb..fa75dc0a372d 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -883,23 +883,24 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	} else if (rc != 0)
- 		goto neg_exit;
- 
-+	rc = -EIO;
- 	if (strcmp(server->vals->version_string,
- 		   SMB3ANY_VERSION_STRING) == 0) {
- 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
- 			cifs_server_dbg(VFS,
- 				"SMB2 dialect returned but not requested\n");
--			return -EIO;
-+			goto neg_exit;
- 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
- 			cifs_server_dbg(VFS,
- 				"SMB2.1 dialect returned but not requested\n");
--			return -EIO;
-+			goto neg_exit;
- 		}
- 	} else if (strcmp(server->vals->version_string,
- 		   SMBDEFAULT_VERSION_STRING) == 0) {
- 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
- 			cifs_server_dbg(VFS,
- 				"SMB2 dialect returned but not requested\n");
--			return -EIO;
-+			goto neg_exit;
- 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
- 			/* ops set to 3.0 by default for default so update */
- 			server->ops = &smb21_operations;
-@@ -913,7 +914,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		/* if requested single dialect ensure returned dialect matched */
- 		cifs_server_dbg(VFS, "Invalid 0x%x dialect returned: not requested\n",
- 				le16_to_cpu(rsp->DialectRevision));
--		return -EIO;
-+		goto neg_exit;
- 	}
- 
- 	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
-@@ -931,9 +932,10 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	else {
- 		cifs_server_dbg(VFS, "Invalid dialect returned by server 0x%x\n",
- 				le16_to_cpu(rsp->DialectRevision));
--		rc = -EIO;
- 		goto neg_exit;
- 	}
-+
-+	rc = 0;
- 	server->dialect = le16_to_cpu(rsp->DialectRevision);
- 
- 	/*
--- 
-2.43.0
+static const struct fs_context_operations smb3_fs_context_ops = {
+  .free   = smb3_fs_context_free,
+  .parse_param  = smb3_fs_context_parse_param,
+  .parse_monolithic = smb3_fs_context_parse_monolithic,
+  .get_tree  = smb3_get_tree,
+  .reconfigure  = smb3_reconfigure,
+};
 
+>> +		pr_notice("changing server hostname to name provided in hostname= option\n");
+>> +	}
+>> +
+>>   	if (!ctx->got_ip) {
+>>   		int len;
+>> -		const char *slash;
+>>   
+>> -		/* No ip= option specified? Try to get it from UNC */
+>> -		/* Use the address part of the UNC. */
+>> -		slash = strchr(&ctx->UNC[2], '\\');
+>> -		len = slash - &ctx->UNC[2];
+>> +		/*
+>> +		 * No ip= option specified? Try to get it from server_hostname
+>> +		 * Use the address part of the UNC parsed into server_hostname
+>> +		 * or hostname= option if specified.
+>> +		 */
+>> +		len = strlen(ctx->server_hostname);
+>>   		if (!cifs_convert_address((struct sockaddr *)&ctx->dstaddr,
+>> -					  &ctx->UNC[2], len)) {
+>> +					  ctx->server_hostname, len)) {
+>>   			pr_err("Unable to determine destination address\n");
+>>   			return -EHOSTUNREACH;
+>>   		}
+>> @@ -1518,6 +1526,21 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+>>   		}
+>>   		ctx->got_ip = true;
+>>   		break;
+>> +	case Opt_hostname:
+>> +		if (strnlen(param->string, CIFS_NI_MAXHOST) == CIFS_NI_MAXHOST) {
+>> +			pr_warn("host name too long\n");
+>> +			goto cifs_parse_mount_err;
+>> +		}
+>> +
+>> +		kfree(ctx->opt_hostname);
+>> +		ctx->opt_hostname = kstrdup(param->string, GFP_KERNEL);
+>> +		if (ctx->opt_hostname == NULL) {
+>> +			cifs_errorf(fc, "OOM when copying hostname string\n");
+>> +			goto cifs_parse_mount_err;
+>> +		}
+>> +		cifs_dbg(FYI, "Host name set\n");
+>> +		ctx->got_opt_hostname = true;
+>> +		break;
+>>   	case Opt_domain:
+>>   		if (strnlen(param->string, CIFS_MAX_DOMAINNAME_LEN)
+>>   				== CIFS_MAX_DOMAINNAME_LEN) {
+>> diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+>> index 9e83302ce4b8..cf0478b1eff9 100644
+>> --- a/fs/smb/client/fs_context.h
+>> +++ b/fs/smb/client/fs_context.h
+>> @@ -184,6 +184,7 @@ enum cifs_param {
+>>   	Opt_pass,
+>>   	Opt_pass2,
+>>   	Opt_ip,
+>> +	Opt_hostname,
+>>   	Opt_domain,
+>>   	Opt_srcaddr,
+>>   	Opt_iocharset,
+>> @@ -214,6 +215,7 @@ struct smb3_fs_context {
+>>   	bool gid_specified;
+>>   	bool sloppy;
+>>   	bool got_ip;
+>> +	bool got_opt_hostname;
+>>   	bool got_version;
+>>   	bool got_rsize;
+>>   	bool got_wsize;
+>> @@ -226,6 +228,7 @@ struct smb3_fs_context {
+>>   	char *domainname;
+>>   	char *source;
+>>   	char *server_hostname;
+>> +	char *opt_hostname;
+> Perhaps, smb3_fs_context_dup and smb3_cleanup_fs_context_contents should
+> be aware of these new fields too.
+
+smb3_cleanup_fs_context_contents should be aware of these new fields too.
+
+Clearing in smb3_cleanup_fs_context_contents is not necessary, because 
+if opt_hostname != NULL,
+then the pointer in server_hostname is replaced (it is pre-cleared by 
+kfree), respectively, everything
+will be cleared by itself with the current code.
+
+In smb3_fs_context_dup, opt_hostname does not need to be processed, 
+since this variable is
+essentially temporary. Immediately after parsing with the parameter, its 
+value goes to
+server_hostname and it is no longer needed by itself.
+
+> Thanks,
+>
+>>   	char *UNC;
+>>   	char *nodename;
+>>   	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
+>>
+>> base-commit: bec6f00f120ea68ba584def5b7416287e7dd29a7
+>> -- 
+>> 2.42.2
+>>
+
+Apologies for the overly long subject line and unclear description.
+Thanks.
