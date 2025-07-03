@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3258E2EE99C;
-	Thu,  3 Jul 2025 14:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1522EE983;
+	Thu,  3 Jul 2025 14:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751554233; cv=none; b=Jca5oI6Zhtz7V6RMZWikwUOkNqsLxabGMGGL5+bu/MssGClLVY0GRUGr1K8o4pspiuoX17kFWIRuqxY7s0/BiCnPfw4yhTZgrxkyyGK9VAl8O8ulwDay66dIGpycsO/VZLSjcMC5ITy4QeAcbcRjsApPFwFjH3AoN/fNtgCuEOE=
+	t=1751554260; cv=none; b=jvOfzPl9Uj1wJ9YoydqQ5i/DN+nBB9ZYp7pxI+1NpVf4KISEAv+vYRh0O+eMFYxsUyZGXXP6BC3KsV9Haa0Y9LJCSw9/tMmb2p3AxRLHX7pGD5V1ysL/JcbEvKr86SKwbQJoh4rZtYRfZsMbxpQl01omYgN1TrsFOOi2jGZKBBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751554233; c=relaxed/simple;
-	bh=Wz/UHFMKLhlswTESC90CzmPM2fdNvMk8fiFo0jWttuo=;
+	s=arc-20240116; t=1751554260; c=relaxed/simple;
+	bh=9//XgK8MpM24VHUZ0kdQr3e0vMJ+u1SF4ffvTD9tuzI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SPnvuHmejU9cYlhlrrz6pCRkmINKqroZGyt2l7y6jhPkZBr/ytvgO825OEc/flogigz7waxGV5mcz09FCqvDTd+0yr4yapgcTZFEZs3jeackdNfyOPIMBsYUS8tJjrDwOEXsOsN6m5TKGEDT9EQNpozIWH913zn5+SuIbpstF9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BGzKQkuI; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aNtSTezzT2xkrSeHEBtLELG5EpZHTQPkndLikSNC+6oKw/rBQkM6FF+ZxMMkS7f+r9JGl2eHfVjX105xG0cnwpJXN/ZlDByA4geLpNd2n1XoIdqRnCidm+SnJOeB5874ahKXztECRQfxiqF7UG9NSAy/s1twdakWf6bybsHbVBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uYW6EmTe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BGzKQkuI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D6CCC4CEE3;
-	Thu,  3 Jul 2025 14:50:32 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uYW6EmTe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5151C4CEE3;
+	Thu,  3 Jul 2025 14:50:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751554233;
-	bh=Wz/UHFMKLhlswTESC90CzmPM2fdNvMk8fiFo0jWttuo=;
+	s=korg; t=1751554259;
+	bh=9//XgK8MpM24VHUZ0kdQr3e0vMJ+u1SF4ffvTD9tuzI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BGzKQkuIW4IlmKyqJrCHqlQ9sl7qtdEcb4YlCs9NFjE5vBe1AVNJ2c1GL8F7L4795
-	 B8sOzlzMiAQdYmDpMd/xMXFtzq2aQxJk4VX7ggbvnqitqSGGibqUiaC7GBwS7gyZ8m
-	 4jvZQLpJ1pEUqhQdFOYhy6Icd+Vh+QKw7oyHI9wU=
+	b=uYW6EmTeDPwD04PERQIvVSsebO4PJgVIEwx7UuTYnIgomCGPpDINeMUsqFJdGUsk1
+	 xVqkj9atjRrRtAh3s7US+KRE8+RJ2f0lKxc+93DhetNqeCwexY9f3Ke7w9Ske9v+sL
+	 V4XrYcZllC9hWcJvCBtjAHQ+PR8TDhxNiZLhj6hg=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -38,9 +38,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 121/218] smb: smbdirect: add smbdirect_socket.h
-Date: Thu,  3 Jul 2025 16:41:09 +0200
-Message-ID: <20250703144000.775347106@linuxfoundation.org>
+Subject: [PATCH 6.12 123/218] smb: smbdirect: introduce smbdirect_socket_parameters
+Date: Thu,  3 Jul 2025 16:41:11 +0200
+Message-ID: <20250703144001.031907692@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250703143955.956569535@linuxfoundation.org>
 References: <20250703143955.956569535@linuxfoundation.org>
@@ -61,15 +61,9 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 22234e37d7e97652cb53133009da5e14793d3c10 ]
+[ Upstream commit dce8047f4725d4469c0813ff50c4115fc2d0b628 ]
 
-This abstracts the common smbdirect layer.
-
-Currently with just a few things in it,
-but that will change over time until everything is
-in common.
-
-Will be used in client and server in the next commits
+This is the next step in the direction of a common smbdirect layer.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -84,57 +78,65 @@ Signed-off-by: Steve French <stfrench@microsoft.com>
 Stable-dep-of: 43e7e284fc77 ("cifs: Fix the smbd_response slab to allow usercopy")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/common/smbdirect/smbdirect_socket.h | 41 ++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
- create mode 100644 fs/smb/common/smbdirect/smbdirect_socket.h
+ fs/smb/client/smbdirect.h                  |  1 +
+ fs/smb/common/smbdirect/smbdirect.h        | 20 ++++++++++++++++++++
+ fs/smb/common/smbdirect/smbdirect_socket.h |  2 ++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
-new file mode 100644
-index 0000000000000..69a55561f91ae
---- /dev/null
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
+diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
+index ffc38a48b6140..4b559a4147af1 100644
+--- a/fs/smb/client/smbdirect.h
++++ b/fs/smb/client/smbdirect.h
+@@ -15,6 +15,7 @@
+ #include <rdma/rdma_cm.h>
+ #include <linux/mempool.h>
+ 
++#include "../common/smbdirect/smbdirect.h"
+ #include "../common/smbdirect/smbdirect_socket.h"
+ 
+ extern int rdma_readwrite_threshold;
+diff --git a/fs/smb/common/smbdirect/smbdirect.h b/fs/smb/common/smbdirect/smbdirect.h
+index eedbdf0d04337..b9a385344ff31 100644
+--- a/fs/smb/common/smbdirect/smbdirect.h
++++ b/fs/smb/common/smbdirect/smbdirect.h
+@@ -14,4 +14,24 @@ struct smbdirect_buffer_descriptor_v1 {
+ 	__le32 length;
+ } __packed;
+ 
 +/*
-+ *   Copyright (c) 2025 Stefan Metzmacher
++ * Connection parameters mostly from [MS-SMBD] 3.1.1.1
++ *
++ * These are setup and negotiated at the beginning of a
++ * connection and remain constant unless explicitly changed.
++ *
++ * Some values are important for the upper layer.
 + */
++struct smbdirect_socket_parameters {
++	__u16 recv_credit_max;
++	__u16 send_credit_target;
++	__u32 max_send_size;
++	__u32 max_fragmented_send_size;
++	__u32 max_recv_size;
++	__u32 max_fragmented_recv_size;
++	__u32 max_read_write_size;
++	__u32 keepalive_interval_msec;
++	__u32 keepalive_timeout_msec;
++} __packed;
 +
-+#ifndef __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__
-+#define __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__
+ #endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_H__ */
+diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
+index 69a55561f91ae..e5b15cc44a7ba 100644
+--- a/fs/smb/common/smbdirect/smbdirect_socket.h
++++ b/fs/smb/common/smbdirect/smbdirect_socket.h
+@@ -36,6 +36,8 @@ struct smbdirect_socket {
+ 		struct ib_qp *qp;
+ 		struct ib_device *dev;
+ 	} ib;
 +
-+enum smbdirect_socket_status {
-+	SMBDIRECT_SOCKET_CREATED,
-+	SMBDIRECT_SOCKET_CONNECTING,
-+	SMBDIRECT_SOCKET_CONNECTED,
-+	SMBDIRECT_SOCKET_NEGOTIATE_FAILED,
-+	SMBDIRECT_SOCKET_DISCONNECTING,
-+	SMBDIRECT_SOCKET_DISCONNECTED,
-+	SMBDIRECT_SOCKET_DESTROYED
-+};
-+
-+struct smbdirect_socket {
-+	enum smbdirect_socket_status status;
-+
-+	/* RDMA related */
-+	struct {
-+		struct rdma_cm_id *cm_id;
-+	} rdma;
-+
-+	/* IB verbs related */
-+	struct {
-+		struct ib_pd *pd;
-+		struct ib_cq *send_cq;
-+		struct ib_cq *recv_cq;
-+
-+		/*
-+		 * shortcuts for rdma.cm_id->{qp,device};
-+		 */
-+		struct ib_qp *qp;
-+		struct ib_device *dev;
-+	} ib;
-+};
-+
-+#endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__ */
++	struct smbdirect_socket_parameters parameters;
+ };
+ 
+ #endif /* __FS_SMB_COMMON_SMBDIRECT_SMBDIRECT_SOCKET_H__ */
 -- 
 2.39.5
 
