@@ -1,63 +1,63 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DDE21CC62;
-	Sat,  5 Jul 2025 19:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B172248B3;
+	Sat,  5 Jul 2025 19:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751744339; cv=none; b=O2sub84yavReIAyyR306Ztp42zva+wqOB3tgErgWimdXSkg/zc5REN0ONL8dpjp3YNPoxC1nzi1GWA+cRHAWGF+0z41XhimU0kfpyV24xnFJQAk0fYF/ocmmJhivJe5iugXPCOXJSvmTfThTdOhX1EKgMyCqHmVjcA+IQ4pWYr8=
+	t=1751744340; cv=none; b=erxwUn/juKFJnA/DTnciVEaShfIkVyqopN0OCI06A0UjKPcW+AKUZvTUYu8ooeBKDa6xvlaKXKpXbho8NtyM7ik+qtbp5BoW5opXJhIPgn0j9kPV6N7N5UC/lY4qYdjKXbBFqlMbhMx9Hb3RgmzLW7mqdW9WZfn9Y0RfgEw/zjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751744339; c=relaxed/simple;
-	bh=jR05Kr6n1quMlcVHY9HYP0eCFVVxkZ7a7Gx5G4NeXHA=;
+	s=arc-20240116; t=1751744340; c=relaxed/simple;
+	bh=Y6u8lmhW14RqeGQ0EGUPebBjkWXlmGlOv4SFCVHiI3M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PQi+RhQTz/ItgqgmBJcB8CPu1xEaEO6kNp6CQqq5kbvnulvYcELbht7+trvqaRl/6nscEE+68YQiySpwAGjJwmp12qj0PzYv0Z/E7cTCEkDdWOYfCKNwb8xR97gwWCgwDN2yDeMP5ttgbpmKpf4mrn7Mw48kG18x/Qh98FXaY88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kWhPCUJZ; arc=none smtp.client-ip=209.85.219.41
+	 MIME-Version:Content-Type; b=KsEqEzQ7aHjq5BWB6GcCNwNCFy2VCCPxA86ajzHmnbClLddmzCnM7zFKmeJnrR9biblJPsQqeaQi8IiCxQ4pAZEFjQBa6+pVhO3d0D9U7ctVwfJ4cjnWc7cqeZMhnmj1dSDCdTOykg2XfQjpvft6WjheuqpRnyDZ8FyOxCTDOW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jlR473xl; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kWhPCUJZ"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fafdd322d3so23861916d6.3;
-        Sat, 05 Jul 2025 12:38:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlR473xl"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6fadd3ad18eso21622946d6.2;
+        Sat, 05 Jul 2025 12:38:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751744335; x=1752349135; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751744337; x=1752349137; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h6WZcNSJ33r950DCnrEqmLxk6/WVf6JJAfk+h2XGpjY=;
-        b=kWhPCUJZ+HB5im56GGrB6x6bpOee7yluO835tabJxaox46b3+arGK0CEdAtTrkiXD4
-         ktwN6QcqsFnzG9TSuABdvQ1/Cq3EzuxjCfibQnEw/9WmcAbJsHICHex/zZ6xUtMUWBVe
-         uk6/jY5P8hgO/AIpU+ubAonulfwBCpERX/UVlT6H7I/AaIMtFEZX+6uX8YpBG1LPc+QH
-         avvg0PBpwVf+FTqT9UMfg+4yg9sIQXwZ7jfxuX2HEbPjmhW1vRhy9O15AOFesl34y37v
-         vm+8qzZBjEfrequxIkJjtfj3lw41W3yMVzNc68CxJcc1N+WDqctdHE1KAwJsR5diS3yG
-         p+GA==
+        bh=488ko8aOrv7qpnsvVfPwqBYeLIzYu8jZzenSZtAqKoA=;
+        b=jlR473xllEAHu8tdudNCqNo0FLA6cORdna5UCMvnulAnqp2HIukqPGSxD7VvqJmLyd
+         bhGiHoUk2nUlZy6r0L3wSYCXqYbf5AObe41W2udOPDQzGg8SrewygkkBXxoRxh/nXHpF
+         GcGbAK/mR1c4lOzZRR32eRY0dqX8DyEptN+rO0FRokmk0/X3Cm17KZZchvYYsa/vJMxh
+         nqsIkjmWdAyOqJCZhHA8B1xUvP6m/NXor5wtPDLYWLXyRiCb+rP3jPqajbV3qnyaaNK2
+         A5NymjJIiDHdtaZbjIUmL2jv5RY7q+r4l6BqWcK1lQ1B1j2meIqSganSWtPp3m/nrR95
+         gP/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751744335; x=1752349135;
+        d=1e100.net; s=20230601; t=1751744337; x=1752349137;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h6WZcNSJ33r950DCnrEqmLxk6/WVf6JJAfk+h2XGpjY=;
-        b=emSvo+R8nW98btq620KKwe8j+UOSxlqIMTAkUxuvk7qL92/R6FMuFlLwW6RgSaJI9K
-         sagbrhIN6IvN1+gekjXkyELFMfiVewDLIxsSuA3GRCRnGcK7A4wCpHbkp5x//R7K/gZl
-         P/S+IQCmMMGCGT0OpPBpevugElEYuz8Sogna5TIvYytaPUdcAPYF1Q0vCaVnqWoWh9F+
-         YVe/6HKCMqDJV+4zAhW8GGvqLjTG8SiDqJzePdg4L9hfj2M82kEvyexCM3Nwmqtp1lSe
-         TxboFOCOTeBU57Blx0oVnEfgp38cRWwHie8nIFBGnpH8VuYx0T1+SClkt/neaqKtL6+f
-         cNoA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBenN+4s3hHCovh3616bDXB2y4uglXfead0bBtwFbRGOPKGbgqbS2aCwHHLqMNepXvchftTGwu5a4C@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvMiLDGMxXtypunThdChBvDATwPpkpDIe7qiBdTt07zxh2xzrQ
-	/a+ApwLN6qyySA+bVp/2/SQMgJ3ZgghnAtYoHfkqr/gKUK1ZPAPleIdMiUpZwN0OFm0=
-X-Gm-Gg: ASbGncuX4N2FS+AKpzsx1cTD4J+LZ0475VCykGTY5WPO3wbpwHjsqfuFavlHjX8SpBu
-	PSN7Sd7yxfRBZ2BuTIY032rP5/7MCgJIsvp0vo6ZOIcNQ4nYkJEXLKdklEbNAuryhhGYZ1bZUGe
-	TLL8I47c7Rv/jxVs3mODhQhvl8UhA7IUtqcaFMEjHdmr8VPtVxKEcOjvT8CI6qMJ4e/rtmaGu01
-	ABJjjH0Aa7yznpxSQBm7ApEa+bTGlfE7CJXPthYgj8LIJrhY1YWrfpBM4PVmEa/QSPe1spjUyQW
-	BEhymVmuHvCpzUYMqDrQ9A7bsvf7UjTnXS23C9hYQIRWdwsEe8xKSw07H1ba8mDpfsJSeStG5fF
-	9y5kdkhsglpe6pAoq+9HpIaJ016Q=
-X-Google-Smtp-Source: AGHT+IFQI/iH/XIxqZEnphabbrnIy9vGbljW/jMVZjNKuHL6jM+xqZ45PKF8+MBiizHz+H5/roje/A==
-X-Received: by 2002:a05:6214:398f:b0:702:d7e1:9a61 with SMTP id 6a1803df08f44-702d7e19b8bmr24666106d6.32.1751744335265;
-        Sat, 05 Jul 2025 12:38:55 -0700 (PDT)
+        bh=488ko8aOrv7qpnsvVfPwqBYeLIzYu8jZzenSZtAqKoA=;
+        b=wJ86+KoJCyWK41CcjiS5+cYfX0zJ6xdtrOuCvU42gYihAP7xKIXmKaEwG8UFr+Ddza
+         oF6psEkGTOo3/qitR2cSIm5PuaYwzFfU0dny9Zsx7tOWV4vs0VFeXqUd4iIMleGp2djU
+         yPyhZJI/UZFIanh2xAqPUYUwdqFJcehc57pa0FSIW1IT41futQKSjNld/rJ7Vi/s+ATR
+         7I1xEI0wstaaOaVezU9hmQv3wrrdYU9CLpehQ8oUS1OMa/g/cFeRfcJ/odLgpl9qn6z8
+         9mfUgBEVJUWYBeV6hlps7H5RT3zarHksFeGMjoEdHWaYjzkAqedqvGgkJ/zHADnFT+K7
+         Tkzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUn3cktxItgwjUzki1+ki7flfLndIWqahuHaIIlcxE/lM8VaV+JV5GbpPqLtnSuMGa6ifbftC/HGTvO@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcxkP14Zs/994+JA6gE3/yt2khWs9nUhqkX2jVZMCJ43nnUpqd
+	OpzO4Q/XQfzuwdU98VruDzWaGKs5X95Tr07E0oc0LCFVu+1xFQEpujC34UBV3oq4KcI=
+X-Gm-Gg: ASbGncvwCXoFM/sa9DvD1XQEfU0cjIe7qnRNRpTaLyoCv+XsrNeUNui959Cfk1qBpGF
+	KnVzem+01ZVchDyePbAFIbVgcYq+kf55CfGlB60oFxcyHon6WWX/0fVLkbRUUX0TRO9yBM4hv99
+	kihrHeOmXNsQ3yzcEGI9q5NcXfn/Ns+KCvXgL1bgcmDYObzoiwFDCTT6yPQKE/b5yRC4VH4Hxmb
+	Pz8P5aSyRFrHoY0xUoMs0wlanyk9l4ETolCOOWaKgOdPlRaYEjY+CfHl29lSZt3QQ4ssLZ3RUfs
+	sCq35bU09iJRRw50ZVSR9SeZtGbhz+4tGmQDLkIpWuQpMjgj65+tlcExuavIKiKeOsAAOwGy/jy
+	LV0DbeVRl06vfSfkT0c29uepk1X0=
+X-Google-Smtp-Source: AGHT+IEXye35jv0WDrwVs2ccEv/oRywM4mX0jh+afdg2ShfdUTLudmXqTY9wpcGyXa6mm1ZgEnrx4Q==
+X-Received: by 2002:ad4:5aa2:0:b0:6fa:c99a:cdba with SMTP id 6a1803df08f44-702d1531226mr49070116d6.14.1751744336434;
+        Sat, 05 Jul 2025 12:38:56 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d6019csm32999146d6.106.2025.07.05.12.38.54
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d6019csm32999146d6.106.2025.07.05.12.38.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Jul 2025 12:38:54 -0700 (PDT)
+        Sat, 05 Jul 2025 12:38:55 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>
 Cc: davem@davemloft.net,
@@ -89,9 +89,9 @@ Cc: davem@davemloft.net,
 	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
 	Daniel Stenberg <daniel@haxx.se>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next 08/15] quic: add path management
-Date: Sat,  5 Jul 2025 15:31:47 -0400
-Message-ID: <5ec86fef7178bc8506e43dd3adcb221be659f96e.1751743914.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next 09/15] quic: add congestion control
+Date: Sat,  5 Jul 2025 15:31:48 -0400
+Message-ID: <6968d20d31af7aa32d8007f5689cd3ccbc279893.1751743914.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1751743914.git.lucien.xin@gmail.com>
 References: <cover.1751743914.git.lucien.xin@gmail.com>
@@ -101,76 +101,62 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'quic_path_group' for managing paths, represented
-by 'struct quic_path'. A connection may use two paths simultaneously
-for connection migration.
+This patch introduces 'quic_cong' for RTT measurement and congestion
+control. The 'quic_cong_ops' is added to define the congestion
+control algorithm.
 
-Each path is associated with a UDP tunnel socket (sk), and a single
-UDP tunnel socket can be related to multiple paths from different sockets.
-These UDP tunnel sockets are wrapped in 'quic_udp_sock' structures and
-stored in a hash table.
+It implements a congestion control state machine with slow start,
+congestion avoidance, and recovery phases, and introduces the New
+Reno and CUBIC algorithms.
 
-It includes mechanisms to bind and unbind paths, detect alternative paths
-for migration, and swap paths to support seamless transition between
-networks.
+The implementation updates RTT estimates when packets are acknowledged,
+reacts to loss and ECN signals, and adjusts the congestion window
+accordingly during packet transmission and acknowledgment processing.
 
-- quic_path_bind(): Bind a path to a port and associate it with a UDP sk.
+- quic_cong_rtt_update(): Performs RTT measurement, invoked when a
+  packet is acknowledged by the largest number in the ACK frame.
 
-- quic_path_free(): Unbind a path from a port and disassociate it from a
-  UDP sk.
+- quic_cong_on_packet_acked(): Invoked when a packet is acknowledged.
 
-- quic_path_swap(): Swap two paths to facilitate connection migration.
+- quic_cong_on_packet_lost(): Invoked when a packet is marked as lost.
 
-- quic_path_detect_alt(): Determine if a packet is using an alternative
-  path, used for connection migration.
+- quic_cong_on_process_ecn(): Invoked when an ACK_ECN frame is received.
 
- It also integrates basic support for Packetization Layer Path MTU
-Discovery (PLPMTUD), using PING frames and ICMP feedback to adjust path
-MTU and handle probe confirmation or resets during routing changes.
+- quic_cong_on_packet_sent(): Invoked when a packet is transmitted.
 
-- quic_path_pl_recv(): state transition and pmtu update after the probe
-  packet is acked.
+- quic_cong_on_ack_recv(): Invoked when an ACK frame is received.
 
-- quic_path_pl_toobig(): state transition and pmtu update after
-  receiving a toobig or needfrag icmp packet.
-
-- quic_path_pl_send(): state transition and pmtu update after sending a
-  probe packet.
-
-- quic_path_pl_reset(): restart the probing when path routing changes.
-
-- quic_path_pl_confirm(): check if probe packet gets acked.
-
-Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
- net/quic/Makefile |   2 +-
- net/quic/path.c   | 507 ++++++++++++++++++++++++++++++++++++++++++++++
- net/quic/path.h   | 162 +++++++++++++++
- net/quic/socket.c |   3 +
- net/quic/socket.h |  21 +-
- 5 files changed, 692 insertions(+), 3 deletions(-)
- create mode 100644 net/quic/path.c
- create mode 100644 net/quic/path.h
+ net/quic/Makefile |   3 +-
+ net/quic/cong.c   | 700 ++++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/cong.h   | 120 ++++++++
+ net/quic/socket.c |   1 +
+ net/quic/socket.h |   7 +
+ 5 files changed, 830 insertions(+), 1 deletion(-)
+ create mode 100644 net/quic/cong.c
+ create mode 100644 net/quic/cong.h
 
 diff --git a/net/quic/Makefile b/net/quic/Makefile
-index eee7501588d3..1565fb5cef9d 100644
+index 1565fb5cef9d..4d4a42c6d565 100644
 --- a/net/quic/Makefile
 +++ b/net/quic/Makefile
-@@ -5,4 +5,4 @@
+@@ -5,4 +5,5 @@
  
  obj-$(CONFIG_IP_QUIC) += quic.o
  
--quic-y := common.o family.o protocol.o socket.o stream.o connid.o
-+quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
-diff --git a/net/quic/path.c b/net/quic/path.c
+-quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
++quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o \
++	  cong.o
+diff --git a/net/quic/cong.c b/net/quic/cong.c
 new file mode 100644
-index 000000000000..426d34bcb016
+index 000000000000..d598cc14b15e
 --- /dev/null
-+++ b/net/quic/path.c
-@@ -0,0 +1,507 @@
++++ b/net/quic/cong.c
+@@ -0,0 +1,700 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -183,507 +169,700 @@ index 000000000000..426d34bcb016
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#include <net/udp_tunnel.h>
++#include <linux/jiffies.h>
 +#include <linux/quic.h>
++#include <net/sock.h>
 +
 +#include "common.h"
-+#include "family.h"
-+#include "path.h"
++#include "cong.h"
 +
-+static int (*quic_path_rcv)(struct sk_buff *skb, u8 err);
-+static struct workqueue_struct *quic_wq __read_mostly;
++/* CUBIC APIs */
++struct quic_cubic {
++	/* Variables of Interest in rfc9438#section-4.1.2 */
++	u32 pending_w_add;		/* Accumulate fractional increments to W_est */
++	u32 origin_point;		/* W_max */
++	u32 epoch_start;		/* t_epoch */
++	u32 pending_add;		/* Accumulates fractional additions to W_cubic */
++	u32 w_last_max;			/* last W_max */
++	u32 w_tcp;			/* W_est */
++	u64 k;				/* K */
 +
-+static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
-+{
-+	if (skb_linearize(skb))
-+		return 0;
-+
-+	memset(skb->cb, 0, sizeof(skb->cb));
-+	QUIC_SKB_CB(skb)->seqno = -1;
-+	QUIC_SKB_CB(skb)->udph_offset = skb->transport_header;
-+	QUIC_SKB_CB(skb)->time = jiffies_to_usecs(jiffies);
-+	skb_set_transport_header(skb, sizeof(struct udphdr));
-+	quic_path_rcv(skb, 0);
-+	return 0;
-+}
-+
-+static int quic_udp_err(struct sock *sk, struct sk_buff *skb)
-+{
-+	if (skb_linearize(skb))
-+		return 0;
-+
-+	QUIC_SKB_CB(skb)->udph_offset = skb->transport_header;
-+	return quic_path_rcv(skb, 1);
-+}
-+
-+static void quic_udp_sock_put_work(struct work_struct *work)
-+{
-+	struct quic_udp_sock *us = container_of(work, struct quic_udp_sock, work);
-+	struct quic_hash_head *head;
-+
-+	head = quic_udp_sock_head(sock_net(us->sk), ntohs(us->addr.v4.sin_port));
-+	mutex_lock(&head->m_lock);
-+	__hlist_del(&us->node);
-+	udp_tunnel_sock_release(us->sk->sk_socket);
-+	mutex_unlock(&head->m_lock);
-+	kfree(us);
-+}
-+
-+static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk, union quic_addr *a)
-+{
-+	struct udp_tunnel_sock_cfg tuncfg = {};
-+	struct udp_port_cfg udp_conf = {};
-+	struct net *net = sock_net(sk);
-+	struct quic_hash_head *head;
-+	struct quic_udp_sock *us;
-+	struct socket *sock;
-+
-+	us = kzalloc(sizeof(*us), GFP_KERNEL);
-+	if (!us)
-+		return NULL;
-+
-+	quic_udp_conf_init(sk, &udp_conf, a);
-+	if (udp_sock_create(net, &udp_conf, &sock)) {
-+		pr_debug("%s: failed to create udp sock\n", __func__);
-+		kfree(us);
-+		return NULL;
-+	}
-+
-+	tuncfg.encap_type = 1;
-+	tuncfg.encap_rcv = quic_udp_rcv;
-+	tuncfg.encap_err_lookup = quic_udp_err;
-+	setup_udp_tunnel_sock(net, sock, &tuncfg);
-+
-+	refcount_set(&us->refcnt, 1);
-+	us->sk = sock->sk;
-+	memcpy(&us->addr, a, sizeof(*a));
-+
-+	head = quic_udp_sock_head(net, ntohs(a->v4.sin_port));
-+	hlist_add_head(&us->node, &head->head);
-+	INIT_WORK(&us->work, quic_udp_sock_put_work);
-+
-+	return us;
-+}
-+
-+static bool quic_udp_sock_get(struct quic_udp_sock *us)
-+{
-+	return (us && refcount_inc_not_zero(&us->refcnt));
-+}
-+
-+static void quic_udp_sock_put(struct quic_udp_sock *us)
-+{
-+	if (us && refcount_dec_and_test(&us->refcnt))
-+		queue_work(quic_wq, &us->work);
-+}
-+
-+/* Lookup a quic_udp_sock in the global hash table. If not found, creates and returns a new one
-+ * associated with the given kernel socket.
-+ */
-+static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk, union quic_addr *a, u16 port)
-+{
-+	struct net *net = sock_net(sk);
-+	struct quic_hash_head *head;
-+	struct quic_udp_sock *us;
-+
-+	head = quic_udp_sock_head(net, port);
-+	hlist_for_each_entry(us, &head->head, node) {
-+		if (net != sock_net(us->sk))
-+			continue;
-+		if (a) {
-+			if (quic_cmp_sk_addr(us->sk, &us->addr, a))
-+				return us;
-+			continue;
-+		}
-+		if (ntohs(us->addr.v4.sin_port) == port)
-+			return us;
-+	}
-+	return NULL;
-+}
-+
-+/* Binds a QUIC path to a local port and sets up a UDP socket. */
-+int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path)
-+{
-+	union quic_addr *a = quic_path_saddr(paths, path);
-+	int rover, low, high, remaining;
-+	struct net *net = sock_net(sk);
-+	struct quic_hash_head *head;
-+	struct quic_udp_sock *us;
-+	u16 port;
-+
-+	port = ntohs(a->v4.sin_port);
-+	if (port) {
-+		head = quic_udp_sock_head(net, port);
-+		mutex_lock(&head->m_lock);
-+		us = quic_udp_sock_lookup(sk, a, port);
-+		if (!quic_udp_sock_get(us)) {
-+			us = quic_udp_sock_create(sk, a);
-+			if (!us) {
-+				mutex_unlock(&head->m_lock);
-+				return -EINVAL;
-+			}
-+		}
-+		mutex_unlock(&head->m_lock);
-+
-+		quic_udp_sock_put(paths->path[path].udp_sk);
-+		paths->path[path].udp_sk = us;
-+		return 0;
-+	}
-+
-+	inet_get_local_port_range(net, &low, &high);
-+	remaining = (high - low) + 1;
-+	rover = (int)(((u64)get_random_u32() * remaining) >> 32) + low;
-+	do {
-+		rover++;
-+		if (rover < low || rover > high)
-+			rover = low;
-+		port = (u16)rover;
-+		if (inet_is_local_reserved_port(net, port))
-+			continue;
-+
-+		head = quic_udp_sock_head(net, port);
-+		mutex_lock(&head->m_lock);
-+		if (quic_udp_sock_lookup(sk, NULL, port)) {
-+			mutex_unlock(&head->m_lock);
-+			cond_resched();
-+			continue;
-+		}
-+		a->v4.sin_port = htons(port);
-+		us = quic_udp_sock_create(sk, a);
-+		if (!us) {
-+			a->v4.sin_port = 0;
-+			mutex_unlock(&head->m_lock);
-+			return -EINVAL;
-+		}
-+		mutex_unlock(&head->m_lock);
-+
-+		quic_udp_sock_put(paths->path[path].udp_sk);
-+		paths->path[path].udp_sk = us;
-+		__sk_dst_reset(sk);
-+		return 0;
-+	} while (--remaining > 0);
-+
-+	return -EADDRINUSE;
-+}
-+
-+/* Swaps the active and alternate QUIC paths.
-+ *
-+ * Promotes the alternate path (path[1]) to become the new active path (path[0]).  If the
-+ * alternate path has a valid UDP socket, the entire path is swapped.  Otherwise, only the
-+ * destination address is exchanged, assuming the source address is the same and no rebind is
-+ * needed.
-+ *
-+ * This is typically used during path migration or alternate path promotion.
-+ */
-+void quic_path_swap(struct quic_path_group *paths)
-+{
-+	struct quic_path path = paths->path[0];
-+
-+	paths->alt_probes = 0;
-+	paths->alt_state = QUIC_PATH_ALT_SWAPPED;
-+
-+	if (paths->path[1].udp_sk) {
-+		paths->path[0] = paths->path[1];
-+		paths->path[1] = path;
-+		return;
-+	}
-+
-+	paths->path[0].daddr = paths->path[1].daddr;
-+	paths->path[1].daddr = path.daddr;
-+}
-+
-+/* Frees resources associated with a QUIC path.
-+ *
-+ * This is used for cleanup during error handling or when the path is no longer needed.
-+ */
-+void quic_path_free(struct sock *sk, struct quic_path_group *paths, u8 path)
-+{
-+	paths->alt_probes = 0;
-+	paths->alt_state = QUIC_PATH_ALT_NONE;
-+
-+	quic_udp_sock_put(paths->path[path].udp_sk);
-+	paths->path[path].udp_sk = NULL;
-+	memset(quic_path_daddr(paths, path), 0, sizeof(union quic_addr));
-+	memset(quic_path_saddr(paths, path), 0, sizeof(union quic_addr));
-+}
-+
-+/* Detects and records a potential alternate path.
-+ *
-+ * If the new source or destination address differs from the active path, and alternate path
-+ * detection is not disabled, the function pdates the alternate path slot (path[1]) with the
-+ * new addresses.
-+ *
-+ * This is typically called on packet receive to detect new possible network paths (e.g., NAT
-+ * rebinding, mobility).
-+ *
-+ * Returns 1 if a new alternate path was detected and updated, 0 otherwise.
-+ */
-+int quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa, union quic_addr *da,
-+			 struct sock *sk)
-+{
-+	if ((!quic_cmp_sk_addr(sk, quic_path_saddr(paths, 0), sa) && !paths->disable_saddr_alt) ||
-+	    (!quic_cmp_sk_addr(sk, quic_path_daddr(paths, 0), da) && !paths->disable_daddr_alt)) {
-+		if (!quic_path_saddr(paths, 1)->v4.sin_port)
-+			quic_path_set_saddr(paths, 1, sa);
-+
-+		if (!quic_cmp_sk_addr(sk, quic_path_saddr(paths, 1), sa))
-+			return 0;
-+
-+		if (!quic_path_daddr(paths, 1)->v4.sin_port)
-+			quic_path_set_daddr(paths, 1, da);
-+
-+		return quic_cmp_sk_addr(sk, quic_path_daddr(paths, 1), da);
-+	}
-+	return 0;
-+}
-+
-+void quic_path_get_param(struct quic_path_group *paths, struct quic_transport_param *p)
-+{
-+	if (p->remote) {
-+		p->disable_active_migration = paths->disable_saddr_alt;
-+		return;
-+	}
-+	p->disable_active_migration = paths->disable_daddr_alt;
-+}
-+
-+void quic_path_set_param(struct quic_path_group *paths, struct quic_transport_param *p)
-+{
-+	if (p->remote) {
-+		paths->disable_saddr_alt = p->disable_active_migration;
-+		return;
-+	}
-+	paths->disable_daddr_alt = p->disable_active_migration;
-+}
-+
-+/* State Machine defined in rfc8899#section-5.2 */
-+enum quic_plpmtud_state {
-+	QUIC_PL_DISABLED,
-+	QUIC_PL_BASE,
-+	QUIC_PL_SEARCH,
-+	QUIC_PL_COMPLETE,
-+	QUIC_PL_ERROR,
++	/* HyStart++ variables in rfc9406#section-4.2 */
++	u32 current_round_min_rtt;	/* currentRoundMinRTT */
++	u32 css_baseline_min_rtt;	/* cssBaselineMinRtt */
++	u32 last_round_min_rtt;		/* lastRoundMinRTT */
++	u16 rtt_sample_count;		/* rttSampleCount */
++	u16 css_rounds;			/* Counter for consecutive rounds showing RTT increase */
++	s64 window_end;			/* End of current CSS round (packet number) */
 +};
 +
-+#define QUIC_BASE_PLPMTU        1200
-+#define QUIC_MAX_PLPMTU         9000
-+#define QUIC_MIN_PLPMTU         512
++/* HyStart++ constants in rfc9406#section-4.3 */
++#define QUIC_HS_MIN_SSTHRESH		16
++#define QUIC_HS_N_RTT_SAMPLE		8
++#define QUIC_HS_MIN_ETA			4000
++#define QUIC_HS_MAX_ETA			16000
++#define QUIC_HS_MIN_RTT_DIVISOR		8
++#define QUIC_HS_CSS_GROWTH_DIVISOR	4
++#define QUIC_HS_CSS_ROUNDS		5
 +
-+#define QUIC_MAX_PROBES         3
-+
-+#define QUIC_PL_BIG_STEP        32
-+#define QUIC_PL_MIN_STEP        4
-+
-+/* Handle PLPMTUD probe failure on a QUIC path.
-+ *
-+ * Called immediately after sending a probe packet in QUIC Path MTU Discovery.  Tracks probe
-+ * count and manages state transitions based on the number of probes sent and current PLPMTUD
-+ * state (BASE, SEARCH, COMPLETE, ERROR).  Detects probe failures and black holes, adjusting
-+ * PMTU and probe sizes accordingly.
-+ *
-+ * Return: New PMTU value if updated, else 0.
-+ */
-+u32 quic_path_pl_send(struct quic_path_group *paths, s64 number)
++static u64 cubic_root(u64 n)
 +{
-+	u32 pathmtu = 0;
++	u64 a, d;
 +
-+	paths->pl.number = number;
-+	if (paths->pl.probe_count < QUIC_MAX_PROBES)
-+		goto out;
++	if (!n)
++		return 0;
 +
-+	paths->pl.probe_count = 0;
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		if (paths->pl.probe_size == QUIC_BASE_PLPMTU) { /* BASE_PLPMTU Confirming Failed */
-+			paths->pl.state = QUIC_PL_ERROR; /* Base -> Error */
++	d = (64 - __builtin_clzll(n)) / 3;
++	a = BIT_ULL(d + 1);
 +
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
++	for (; a * a * a > n;) {
++		d = div64_ul(n, a * a);
++		a = div64_ul(2 * a + d, 3);
++	}
++	return a;
++}
++
++/* rfc9406#section-4: HyStart++ Algorithm */
++static void cubic_slow_start(struct quic_cong *cong, u32 bytes, s64 number)
++{
++	struct quic_cubic *cubic = quic_cong_priv(cong);
++	u32 eta;
++
++	if (cubic->window_end <= number)
++		cubic->window_end = -1;
++
++	/* cwnd = cwnd + (min(N, L * SMSS) / CSS_GROWTH_DIVISOR) */
++	if (cubic->css_baseline_min_rtt != U32_MAX)
++		bytes = bytes / QUIC_HS_CSS_GROWTH_DIVISOR;
++	cong->window = min_t(u32, cong->window + bytes, cong->max_window);
++
++	if (cubic->css_baseline_min_rtt != U32_MAX) {
++		/* If CSS_ROUNDS rounds are complete, enter congestion avoidance. */
++		if (++cubic->css_rounds > QUIC_HS_CSS_ROUNDS) {
++			cubic->css_baseline_min_rtt = U32_MAX;
++			cubic->w_last_max = cong->window;
++			cong->ssthresh = cong->window;
++			cubic->css_rounds = 0;
 +		}
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (paths->pl.pmtu == paths->pl.probe_size) { /* Black Hole Detected */
-+			paths->pl.state = QUIC_PL_BASE;  /* Search -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_high = 0;
-+
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		} else { /* Normal probe failure. */
-+			paths->pl.probe_high = paths->pl.probe_size;
-+			paths->pl.probe_size = paths->pl.pmtu;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		if (paths->pl.pmtu == paths->pl.probe_size) { /* Black Hole Detected */
-+			paths->pl.state = QUIC_PL_BASE;  /* Search Complete -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		}
++		return;
 +	}
 +
-+out:
-+	pr_debug("%s: dst: %p, state: %d, pmtu: %d, size: %d, high: %d\n", __func__, paths,
-+		 paths->pl.state, paths->pl.pmtu, paths->pl.probe_size, paths->pl.probe_high);
-+	paths->pl.probe_count++;
-+	return pathmtu;
++	/* if ((rttSampleCount >= N_RTT_SAMPLE) AND
++	 *     (currentRoundMinRTT != infinity) AND
++	 *     (lastRoundMinRTT != infinity))
++	 *   RttThresh = max(MIN_RTT_THRESH,
++	 *     min(lastRoundMinRTT / MIN_RTT_DIVISOR, MAX_RTT_THRESH))
++	 *   if (currentRoundMinRTT >= (lastRoundMinRTT + RttThresh))
++	 *     cssBaselineMinRtt = currentRoundMinRTT
++	 *     exit slow start and enter CSS
++	 */
++	if (cubic->last_round_min_rtt != U32_MAX &&
++	    cubic->current_round_min_rtt != U32_MAX &&
++	    cong->window >= QUIC_HS_MIN_SSTHRESH * cong->mss &&
++	    cubic->rtt_sample_count >= QUIC_HS_N_RTT_SAMPLE) {
++		eta = cubic->last_round_min_rtt / QUIC_HS_MIN_RTT_DIVISOR;
++		if (eta < QUIC_HS_MIN_ETA)
++			eta = QUIC_HS_MIN_ETA;
++		else if (eta > QUIC_HS_MAX_ETA)
++			eta = QUIC_HS_MAX_ETA;
++
++		pr_debug("%s: current_round_min_rtt: %u, last_round_min_rtt: %u, eta: %u\n",
++			 __func__, cubic->current_round_min_rtt, cubic->last_round_min_rtt, eta);
++
++		/* Delay increase triggers slow start exit and enter CSS. */
++		if (cubic->current_round_min_rtt >= cubic->last_round_min_rtt + eta)
++			cubic->css_baseline_min_rtt = cubic->current_round_min_rtt;
++	}
 +}
 +
-+/* Handle successful reception of a PMTU probe.
-+ *
-+ * Called when a probe packet is acknowledged. Updates probe size and transitions state if
-+ * needed (e.g., from SEARCH to COMPLETE).  Expands PMTU using binary or linear search
-+ * depending on state.
-+ *
-+ * Return: New PMTU to apply if search completes, or 0 if no change.
-+ */
-+u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer, bool *complete)
++/* rfc9438#section-4: CUBIC Congestion Control */
++static void cubic_cong_avoid(struct quic_cong *cong, u32 bytes)
 +{
-+	u32 pathmtu = 0;
++	struct quic_cubic *cubic = quic_cong_priv(cong);
++	u64 tx, kx, time_delta, delta, t;
++	u64 target_add, tcp_add = 0;
++	u64 target, cwnd_thres, m;
 +
-+	pr_debug("%s: dst: %p, state: %d, pmtu: %d, size: %d, high: %d\n", __func__, paths,
-+		 paths->pl.state, paths->pl.pmtu, paths->pl.probe_size, paths->pl.probe_high);
-+
-+	*raise_timer = false;
-+	paths->pl.number = 0;
-+	paths->pl.pmtu = paths->pl.probe_size;
-+	paths->pl.probe_count = 0;
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		paths->pl.state = QUIC_PL_SEARCH; /* Base -> Search */
-+		paths->pl.probe_size += QUIC_PL_BIG_STEP;
-+	} else if (paths->pl.state == QUIC_PL_ERROR) {
-+		paths->pl.state = QUIC_PL_SEARCH; /* Error -> Search */
-+
-+		paths->pl.pmtu = paths->pl.probe_size;
-+		pathmtu = (u32)paths->pl.pmtu;
-+		paths->pl.probe_size += QUIC_PL_BIG_STEP;
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (!paths->pl.probe_high) {
-+			if (paths->pl.probe_size < QUIC_MAX_PLPMTU) {
-+				paths->pl.probe_size =
-+					(u16)min(paths->pl.probe_size + QUIC_PL_BIG_STEP,
-+						 QUIC_MAX_PLPMTU);
-+				*complete = false;
-+				return pathmtu;
-+			}
-+			paths->pl.probe_high = QUIC_MAX_PLPMTU;
++	if (cubic->epoch_start == U32_MAX) {
++		cubic->epoch_start = cong->time;
++		if (cong->window < cubic->w_last_max) {
++			/*
++			 *        ┌────────────────┐
++			 *     3  │W    - cwnd
++			 *     ╲  │ max       epoch
++			 * K =  ╲ │────────────────
++			 *       ╲│       C
++			 */
++			cubic->k = cubic->w_last_max - cong->window;
++			cubic->k = cubic_root(div64_ul(cubic->k * 10, (u64)cong->mss * 4));
++			cubic->origin_point = cubic->w_last_max;
++		} else {
++			cubic->k = 0;
++			cubic->origin_point = cong->window;
 +		}
-+		paths->pl.probe_size += QUIC_PL_MIN_STEP;
-+		if (paths->pl.probe_size >= paths->pl.probe_high) {
-+			paths->pl.probe_high = 0;
-+			paths->pl.state = QUIC_PL_COMPLETE; /* Search -> Search Complete */
-+
-+			paths->pl.probe_size = paths->pl.pmtu;
-+			pathmtu = (u32)paths->pl.pmtu;
-+			*raise_timer = true;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		/* Raise probe_size again after 30 * interval in Search Complete */
-+		paths->pl.state = QUIC_PL_SEARCH; /* Search Complete -> Search */
-+		paths->pl.probe_size = (u16)min(paths->pl.probe_size + QUIC_PL_MIN_STEP,
-+						QUIC_MAX_PLPMTU);
++		cubic->w_tcp = cong->window;
++		cubic->pending_add = 0;
++		cubic->pending_w_add = 0;
 +	}
 +
-+	*complete = (paths->pl.state == QUIC_PL_COMPLETE);
-+	return pathmtu;
++	/*
++	 * t = t        - t
++	 *      current    epoch
++	 */
++	t = cong->time - cubic->epoch_start;
++	tx = div64_ul(t << 10, USEC_PER_SEC);
++	kx = (cubic->k << 10);
++	if (tx > kx)
++		time_delta = tx - kx;
++	else
++		time_delta = kx - tx;
++	/*
++	 *                        3
++	 * W     (t) = C * (t - K)  + W
++	 *  cubic                      max
++	 */
++	delta = cong->mss * ((((time_delta * time_delta) >> 10) * time_delta) >> 10);
++	delta = div64_ul(delta * 4, 10) >> 10;
++	if (tx > kx)
++		target = cubic->origin_point + delta;
++	else
++		target = cubic->origin_point - delta;
++
++	/*
++	 * W     (t + RTT)
++	 *  cubic
++	 */
++	cwnd_thres = (div64_ul((t + cong->smoothed_rtt) << 10, USEC_PER_SEC) * target) >> 10;
++	pr_debug("%s: tgt: %llu, thres: %llu, delta: %llu, t: %llu, srtt: %u, tx: %llu, kx: %llu\n",
++		 __func__, target, cwnd_thres, delta, t, cong->smoothed_rtt, tx, kx);
++	/*
++	 *          ⎧
++	 *          ⎪cwnd            if  W     (t + RTT) < cwnd
++	 *          ⎪                     cubic
++	 *          ⎨1.5 * cwnd      if  W     (t + RTT) > 1.5 * cwnd
++	 * target = ⎪                     cubic
++	 *          ⎪W     (t + RTT) otherwise
++	 *          ⎩ cubic
++	 */
++	if (cwnd_thres < cong->window)
++		target = cong->window;
++	else if (cwnd_thres * 2 > (u64)cong->window * 3)
++		target = cong->window * 3 / 2;
++	else
++		target = cwnd_thres;
++
++	/*
++	 * target - cwnd
++	 * ─────────────
++	 *      cwnd
++	 */
++	if (target > cong->window) {
++		target_add = cubic->pending_add + cong->mss * (target - cong->window);
++		cubic->pending_add = do_div(target_add, cong->window);
++	} else {
++		target_add = cubic->pending_add + cong->mss;
++		cubic->pending_add = do_div(target_add, 100 * cong->window);
++	}
++
++	pr_debug("%s: target: %llu, window: %u, target_add: %llu\n",
++		 __func__, target, cong->window, target_add);
++
++	/*
++	 *                        segments_acked
++	 * W    = W    + α      * ──────────────
++	 *  est    est    cubic        cwnd
++	 */
++	m = cubic->pending_w_add + cong->mss * bytes;
++	cubic->pending_w_add = do_div(m, cong->window);
++	cubic->w_tcp += m;
++
++	if (cubic->w_tcp > cong->window)
++		tcp_add = div64_ul((u64)cong->mss * (cubic->w_tcp - cong->window), cong->window);
++
++	pr_debug("%s: w_tcp: %u, window: %u, tcp_add: %llu\n",
++		 __func__, cubic->w_tcp, cong->window, tcp_add);
++
++	/* W_cubic(_t_) or _W_est_, whichever is bigger. */
++	cong->window += max(tcp_add, target_add);
 +}
 +
-+/* Handle ICMP "Packet Too Big" messages.
-+ *
-+ * Responds to an incoming ICMP error by reducing the probe size or falling back to a safe
-+ * baseline PMTU depending on current state.  Also handles cases where the PMTU hint lies
-+ * between probe and current PMTU.
-+ *
-+ * Return: New PMTU to apply if state changes, or 0 if no change.
-+ */
-+u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu, bool *reset_timer)
++static void cubic_recovery(struct quic_cong *cong)
 +{
-+	u32 pathmtu = 0;
++	struct quic_cubic *cubic = quic_cong_priv(cong);
 +
-+	pr_debug("%s: dst: %p, state: %d, pmtu: %d, size: %d, ptb: %d\n", __func__, paths,
-+		 paths->pl.state, paths->pl.pmtu, paths->pl.probe_size, pmtu);
++	cong->recovery_time = cong->time;
++	cubic->epoch_start = U32_MAX;
 +
-+	*reset_timer = false;
-+	if (pmtu < QUIC_MIN_PLPMTU || pmtu >= (u32)paths->pl.probe_size)
-+		return pathmtu;
++	/* rfc9438#section-3.4:
++	 *   CUBIC sets the multiplicative window decrease factor (β__cubic_) to 0.7,
++	 *   whereas Reno uses 0.5.
++	 *
++	 * rfc9438#section-4.6:
++	 *   ssthresh =  flight_size * β      new  ssthresh
++	 *
++	 *   Some implementations of CUBIC currently use _cwnd_ instead of _flight_size_ when
++	 *   calculating a new _ssthresh_.
++	 *
++	 * rfc9438#section-4.7:
++	 *
++	 *          ⎧       1 + β
++	 *          ⎪            cubic
++	 *          ⎪cwnd * ────────── if  cwnd < W_max and fast convergence
++	 *   W    = ⎨           2
++	 *    max   ⎪                  enabled, further reduce  W_max
++	 *          ⎪
++	 *          ⎩cwnd             otherwise, remember cwnd before reduction
++	 */
++	if (cong->window < cubic->w_last_max)
++		cubic->w_last_max = cong->window * 17 / 10 / 2;
++	else
++		cubic->w_last_max = cong->window;
 +
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		if (pmtu >= QUIC_MIN_PLPMTU && pmtu < QUIC_BASE_PLPMTU) {
-+			paths->pl.state = QUIC_PL_ERROR; /* Base -> Error */
++	cong->ssthresh = cong->window * 7 / 10;
++	cong->ssthresh = max(cong->ssthresh, cong->min_window);
++	cong->window = cong->ssthresh;
++}
 +
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
++static int quic_cong_check_persistent_congestion(struct quic_cong *cong, u32 time)
++{
++	u32 ssthresh;
++
++	/* rfc9002#section-7.6.1:
++	 *   (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
++	 *      kPersistentCongestionThreshold
++	 */
++	ssthresh = cong->smoothed_rtt + max(4 * cong->rttvar, QUIC_KGRANULARITY);
++	ssthresh = (ssthresh + cong->max_ack_delay) * QUIC_KPERSISTENT_CONGESTION_THRESHOLD;
++	if (cong->time - time <= ssthresh)
++		return 0;
++
++	pr_debug("%s: permanent congestion, cwnd: %u, ssthresh: %u\n",
++		 __func__, cong->window, cong->ssthresh);
++	cong->min_rtt_valid = 0;
++	cong->window = cong->min_window;
++	cong->state = QUIC_CONG_SLOW_START;
++	return 1;
++}
++
++static void quic_cubic_on_packet_lost(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	if (quic_cong_check_persistent_congestion(cong, time))
++		return;
++
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		pr_debug("%s: slow_start -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		return;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		pr_debug("%s: cong_avoid -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++
++	cong->state = QUIC_CONG_RECOVERY_PERIOD;
++	cubic_recovery(cong);
++}
++
++static void quic_cubic_on_packet_acked(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		cubic_slow_start(cong, bytes, number);
++		if (cong->window >= cong->ssthresh) {
++			cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++			pr_debug("%s: slow_start -> cong_avoid, cwnd: %u, ssthresh: %u\n",
++				 __func__, cong->window, cong->ssthresh);
 +		}
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
-+			paths->pl.state = QUIC_PL_BASE;  /* Search -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_count = 0;
-+
-+			paths->pl.probe_high = 0;
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		} else if (pmtu > (u32)paths->pl.pmtu && pmtu < (u32)paths->pl.probe_size) {
-+			paths->pl.probe_size = (u16)pmtu;
-+			paths->pl.probe_count = 0;
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		if (cong->recovery_time < time) {
++			cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++			pr_debug("%s: recovery -> cong_avoid, cwnd: %u, ssthresh: %u\n",
++				 __func__, cong->window, cong->ssthresh);
 +		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
-+			paths->pl.state = QUIC_PL_BASE;  /* Complete -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_count = 0;
++		break;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		cubic_cong_avoid(cong, bytes);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++}
 +
-+			paths->pl.probe_high = 0;
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+			*reset_timer = true;
++static void quic_cubic_on_process_ecn(struct quic_cong *cong)
++{
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		pr_debug("%s: slow_start -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		return;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		pr_debug("%s: cong_avoid -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++
++	cong->state = QUIC_CONG_RECOVERY_PERIOD;
++	cubic_recovery(cong);
++}
++
++static void quic_cubic_on_init(struct quic_cong *cong)
++{
++	struct quic_cubic *cubic = quic_cong_priv(cong);
++
++	cubic->epoch_start = U32_MAX;
++	cubic->origin_point = 0;
++	cubic->w_last_max = 0;
++	cubic->w_tcp = 0;
++	cubic->k = 0;
++
++	cubic->current_round_min_rtt = U32_MAX;
++	cubic->css_baseline_min_rtt = U32_MAX;
++	cubic->last_round_min_rtt = U32_MAX;
++	cubic->rtt_sample_count = 0;
++	cubic->window_end = -1;
++	cubic->css_rounds = 0;
++}
++
++static void quic_cubic_on_packet_sent(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	struct quic_cubic *cubic = quic_cong_priv(cong);
++
++	if (cubic->window_end != -1)
++		return;
++
++	/* rfc9406#section-4.2:
++	 *   lastRoundMinRTT = currentRoundMinRTT
++	 *   currentRoundMinRTT = infinity
++	 *   rttSampleCount = 0
++	 */
++	cubic->window_end = number;
++	cubic->last_round_min_rtt = cubic->current_round_min_rtt;
++	cubic->current_round_min_rtt = U32_MAX;
++	cubic->rtt_sample_count = 0;
++
++	pr_debug("%s: last_round_min_rtt: %u\n", __func__, cubic->last_round_min_rtt);
++}
++
++static void quic_cubic_on_rtt_update(struct quic_cong *cong)
++{
++	struct quic_cubic *cubic = quic_cong_priv(cong);
++
++	if (cubic->window_end == -1)
++		return;
++
++	pr_debug("%s: current_round_min_rtt: %u, latest_rtt: %u\n",
++		 __func__, cubic->current_round_min_rtt, cong->latest_rtt);
++
++	/* rfc9406#section-4.2:
++	 *   currentRoundMinRTT = min(currentRoundMinRTT, currRTT)
++	 *   rttSampleCount += 1
++	 */
++	if (cubic->current_round_min_rtt > cong->latest_rtt) {
++		cubic->current_round_min_rtt = cong->latest_rtt;
++		if (cubic->current_round_min_rtt < cubic->css_baseline_min_rtt) {
++			cubic->css_baseline_min_rtt = U32_MAX;
++			cubic->css_rounds = 0;
 +		}
 +	}
-+	return pathmtu;
++	cubic->rtt_sample_count++;
 +}
 +
-+/* Reset PLPMTUD state for a path.
++/* NEW RENO APIs */
++static void quic_reno_on_packet_lost(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	if (quic_cong_check_persistent_congestion(cong, time))
++		return;
++
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		pr_debug("%s: slow_start -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		return;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		pr_debug("%s: cong_avoid -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++
++	cong->recovery_time = cong->time;
++	cong->state = QUIC_CONG_RECOVERY_PERIOD;
++	cong->ssthresh = max(cong->window >> 1U, cong->min_window);
++	cong->window = cong->ssthresh;
++}
++
++static void quic_reno_on_packet_acked(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		cong->window = min_t(u32, cong->window + bytes, cong->max_window);
++		if (cong->window >= cong->ssthresh) {
++			cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++			pr_debug("%s: slow_start -> cong_avoid, cwnd: %u, ssthresh: %u\n",
++				 __func__, cong->window, cong->ssthresh);
++		}
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		if (cong->recovery_time < time) {
++			cong->state = QUIC_CONG_CONGESTION_AVOIDANCE;
++			pr_debug("%s: recovery -> cong_avoid, cwnd: %u, ssthresh: %u\n",
++				 __func__, cong->window, cong->ssthresh);
++		}
++		break;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		cong->window += cong->mss * bytes / cong->window;
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++}
++
++static void quic_reno_on_process_ecn(struct quic_cong *cong)
++{
++	switch (cong->state) {
++	case QUIC_CONG_SLOW_START:
++		pr_debug("%s: slow_start -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	case QUIC_CONG_RECOVERY_PERIOD:
++		return;
++	case QUIC_CONG_CONGESTION_AVOIDANCE:
++		pr_debug("%s: cong_avoid -> recovery, cwnd: %u, ssthresh: %u\n",
++			 __func__, cong->window, cong->ssthresh);
++		break;
++	default:
++		pr_debug("%s: wrong congestion state: %d\n", __func__, cong->state);
++		return;
++	}
++
++	cong->recovery_time = cong->time;
++	cong->state = QUIC_CONG_RECOVERY_PERIOD;
++	cong->ssthresh = max(cong->window >> 1U, cong->min_window);
++	cong->window = cong->ssthresh;
++}
++
++static void quic_reno_on_init(struct quic_cong *cong)
++{
++}
++
++static struct quic_cong_ops quic_congs[] = {
++	{ /* QUIC_CONG_ALG_RENO */
++		.on_packet_acked = quic_reno_on_packet_acked,
++		.on_packet_lost = quic_reno_on_packet_lost,
++		.on_process_ecn = quic_reno_on_process_ecn,
++		.on_init = quic_reno_on_init,
++	},
++	{ /* QUIC_CONG_ALG_CUBIC */
++		.on_packet_acked = quic_cubic_on_packet_acked,
++		.on_packet_lost = quic_cubic_on_packet_lost,
++		.on_process_ecn = quic_cubic_on_process_ecn,
++		.on_init = quic_cubic_on_init,
++		.on_packet_sent = quic_cubic_on_packet_sent,
++		.on_rtt_update = quic_cubic_on_rtt_update,
++	},
++};
++
++/* COMMON APIs */
++void quic_cong_on_packet_lost(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	cong->ops->on_packet_lost(cong, time, bytes, number);
++}
++
++void quic_cong_on_packet_acked(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
++{
++	cong->ops->on_packet_acked(cong, time, bytes, number);
++}
++
++void quic_cong_on_process_ecn(struct quic_cong *cong)
++{
++	cong->ops->on_process_ecn(cong);
++}
++
++/* Update Probe Timeout (PTO) and loss detection delay based on RTT stats. */
++static void quic_cong_pto_update(struct quic_cong *cong)
++{
++	u32 pto, loss_delay;
++
++	/* rfc9002#section-6.2.1:
++	 *   PTO = smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay
++	 */
++	pto = cong->smoothed_rtt + max(4 * cong->rttvar, QUIC_KGRANULARITY);
++	cong->pto = pto + cong->max_ack_delay;
++
++	/* rfc9002#section-6.1.2:
++	 *   max(kTimeThreshold * max(smoothed_rtt, latest_rtt), kGranularity)
++	 */
++	loss_delay = QUIC_KTIME_THRESHOLD(max(cong->smoothed_rtt, cong->latest_rtt));
++	cong->loss_delay = max(loss_delay, QUIC_KGRANULARITY);
++
++	pr_debug("%s: update pto: %u\n", __func__, pto);
++}
++
++/* Update pacing timestamp after sending 'bytes' bytes.
 + *
-+ * Resets all PLPMTUD-related state to its initial configuration.  Called when a new path is
-+ * initialized or when recovering from errors.
++ * This function tracks when the next packet is allowed to be sent based on pacing rate.
 + */
-+void quic_path_pl_reset(struct quic_path_group *paths)
++static void quic_cong_update_pacing_time(struct quic_cong *cong, u32 bytes)
 +{
-+	paths->pl.number = 0;
-+	paths->pl.state = QUIC_PL_BASE;
-+	paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+	paths->pl.probe_size = QUIC_BASE_PLPMTU;
++	unsigned long rate = READ_ONCE(cong->pacing_rate);
++	u64 prior_time, credit, len_ns;
++
++	if (!rate)
++		return;
++
++	prior_time = cong->pacing_time;
++	cong->pacing_time = max(cong->pacing_time, ktime_get_ns());
++	credit = cong->pacing_time - prior_time;
++
++	/* take into account OS jitter */
++	len_ns = div64_ul((u64)bytes * NSEC_PER_SEC, rate);
++	len_ns -= min_t(u64, len_ns / 2, credit);
++	cong->pacing_time += len_ns;
 +}
 +
-+/* Check if a packet number confirms PLPMTUD probe.
-+ *
-+ * Checks whether the last probe (tracked by .number) has been acknowledged.  If the probe
-+ * number lies within the ACK range, confirmation is successful.
-+ *
-+ * Return: true if probe is confirmed, false otherwise.
-+ */
-+bool quic_path_pl_confirm(struct quic_path_group *paths, s64 largest, s64 smallest)
++/* Compute and update the pacing rate based on congestion window and smoothed RTT. */
++static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes, u32 max_rate)
 +{
-+	return paths->pl.number && paths->pl.number >= smallest && paths->pl.number <= largest;
++	u64 rate;
++
++	/* rate = N * congestion_window / smoothed_rtt */
++	rate = (u64)cong->window * USEC_PER_SEC * 2;
++	if (likely(cong->smoothed_rtt))
++		rate = div64_ul(rate, cong->smoothed_rtt);
++
++	WRITE_ONCE(cong->pacing_rate, min_t(u64, rate, max_rate));
++	pr_debug("%s: update pacing rate: %u, max rate: %u, srtt: %u\n",
++		 __func__, cong->pacing_rate, max_rate, cong->smoothed_rtt);
 +}
 +
-+int quic_path_init(int (*rcv)(struct sk_buff *skb, u8 err))
++void quic_cong_on_packet_sent(struct quic_cong *cong, u32 time, u32 bytes, s64 number)
 +{
-+	quic_wq = create_workqueue("quic_workqueue");
-+	if (!quic_wq)
-+		return -ENOMEM;
-+
-+	quic_path_rcv = rcv;
-+	return 0;
++	if (!bytes)
++		return;
++	if (cong->ops->on_packet_sent)
++		cong->ops->on_packet_sent(cong, time, bytes, number);
++	quic_cong_update_pacing_time(cong, bytes);
 +}
 +
-+void quic_path_destroy(void)
++void quic_cong_on_ack_recv(struct quic_cong *cong, u32 bytes, u32 max_rate)
 +{
-+	destroy_workqueue(quic_wq);
++	if (!bytes)
++		return;
++	if (cong->ops->on_ack_recv)
++		cong->ops->on_ack_recv(cong, bytes, max_rate);
++	quic_cong_pace_update(cong, bytes, max_rate);
 +}
-diff --git a/net/quic/path.h b/net/quic/path.h
++
++/* rfc9002#section-5: Estimating the Round-Trip Time */
++void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_delay)
++{
++	u32 adjusted_rtt, rttvar_sample;
++
++	/* Ignore RTT sample if ACK delay is suspiciously large. */
++	if (ack_delay > cong->max_ack_delay * 2)
++		return;
++
++	/* rfc9002#section-5.1: latest_rtt = ack_time - send_time_of_largest_acked */
++	cong->latest_rtt = cong->time - time;
++
++	/* rfc9002#section-5.2: Estimating min_rtt */
++	if (!cong->min_rtt_valid) {
++		cong->min_rtt = cong->latest_rtt;
++		cong->min_rtt_valid = 1;
++	}
++	if (cong->min_rtt > cong->latest_rtt)
++		cong->min_rtt = cong->latest_rtt;
++
++	if (!cong->is_rtt_set) {
++		/* rfc9002#section-5.3:
++		 *   smoothed_rtt = latest_rtt
++		 *   rttvar = latest_rtt / 2
++		 */
++		cong->smoothed_rtt = cong->latest_rtt;
++		cong->rttvar = cong->smoothed_rtt / 2;
++		quic_cong_pto_update(cong);
++		cong->is_rtt_set = 1;
++		return;
++	}
++
++	/* rfc9002#section-5.3:
++	 *   adjusted_rtt = latest_rtt
++	 *   if (latest_rtt >= min_rtt + ack_delay):
++	 *     adjusted_rtt = latest_rtt - ack_delay
++	 *   smoothed_rtt = 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
++	 *   rttvar_sample = abs(smoothed_rtt - adjusted_rtt)
++	 *   rttvar = 3/4 * rttvar + 1/4 * rttvar_sample
++	 */
++	adjusted_rtt = cong->latest_rtt;
++	if (cong->latest_rtt >= cong->min_rtt + ack_delay)
++		adjusted_rtt = cong->latest_rtt - ack_delay;
++
++	cong->smoothed_rtt = (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
++	if (cong->smoothed_rtt >= adjusted_rtt)
++		rttvar_sample = cong->smoothed_rtt - adjusted_rtt;
++	else
++		rttvar_sample = adjusted_rtt - cong->smoothed_rtt;
++	cong->rttvar = (cong->rttvar * 3 + rttvar_sample) / 4;
++	quic_cong_pto_update(cong);
++
++	if (cong->ops->on_rtt_update)
++		cong->ops->on_rtt_update(cong);
++}
++
++void quic_cong_set_algo(struct quic_cong *cong, u8 algo)
++{
++	if (algo >= QUIC_CONG_ALG_MAX)
++		algo = QUIC_CONG_ALG_RENO;
++
++	cong->state = QUIC_CONG_SLOW_START;
++	cong->ssthresh = U32_MAX;
++	cong->ops = &quic_congs[algo];
++	cong->ops->on_init(cong);
++}
++
++void quic_cong_set_srtt(struct quic_cong *cong, u32 srtt)
++{
++	/* rfc9002#section-5.3:
++	 *   smoothed_rtt = kInitialRtt
++	 *   rttvar = kInitialRtt / 2
++	 */
++	cong->latest_rtt = srtt;
++	cong->smoothed_rtt = cong->latest_rtt;
++	cong->rttvar = cong->smoothed_rtt / 2;
++	quic_cong_pto_update(cong);
++}
++
++void quic_cong_init(struct quic_cong *cong)
++{
++	cong->max_ack_delay = QUIC_DEF_ACK_DELAY;
++	cong->max_window = S32_MAX / 2;
++	quic_cong_set_algo(cong, QUIC_CONG_ALG_RENO);
++	quic_cong_set_srtt(cong, QUIC_RTT_INIT);
++}
+diff --git a/net/quic/cong.h b/net/quic/cong.h
 new file mode 100644
-index 000000000000..a1d0370bf281
+index 000000000000..cb83c00a554f
 --- /dev/null
-+++ b/net/quic/path.h
-@@ -0,0 +1,162 @@
++++ b/net/quic/cong.h
+@@ -0,0 +1,120 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -694,231 +873,160 @@ index 000000000000..a1d0370bf281
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_PATH_MIN_PMTU	1200U
-+#define QUIC_PATH_MAX_PMTU	65536U
++#define QUIC_KPERSISTENT_CONGESTION_THRESHOLD	3
++#define QUIC_KPACKET_THRESHOLD			3
++#define QUIC_KTIME_THRESHOLD(rtt)		((rtt) * 9 / 8)
++#define QUIC_KGRANULARITY			1000U
 +
-+#define QUIC_MIN_UDP_PAYLOAD	1200
-+#define QUIC_MAX_UDP_PAYLOAD	65527
++#define QUIC_RTT_INIT		333000U
++#define QUIC_RTT_MAX		2000000U
++#define QUIC_RTT_MIN		QUIC_KGRANULARITY
 +
-+#define QUIC_PATH_ENTROPY_LEN	8
-+
-+/* Connection Migration State Machine:
++/* rfc9002#section-7.3: Congestion Control States
 + *
-+ * +--------+      recv non-probing, free old path    +----------+
-+ * |  NONE  | <-------------------------------------- | SWAPPED  |
-+ * +--------+                                         +----------+
-+ *      |   ^ \                                            ^
-+ *      |    \ \                                           |
-+ *      |     \ \   new path detected,                     | recv
-+ *      |      \ \  has another DCID,                      | Path
-+ *      |       \ \ snd Path Challenge                     | Response
-+ *      |        \ -------------------------------         |
-+ *      |         ------------------------------- \        |
-+ *      | new path detected,            Path     \ \       |
-+ *      | has no other DCID,            Challenge \ \      |
-+ *      | request a new DCID            failed     \ \     |
-+ *      v                                           \ v    |
-+ * +----------+                                       +----------+
-+ * | PENDING  | ------------------------------------> | PROBING  |
-+ * +----------+  recv a new DCID, snd Path Challenge  +----------+
++ *                  New path or      +------------+
++ *             persistent congestion |   Slow     |
++ *         (O)---------------------->|   Start    |
++ *                                   +------------+
++ *                                         |
++ *                                 Loss or |
++ *                         ECN-CE increase |
++ *                                         v
++ *  +------------+     Loss or       +------------+
++ *  | Congestion |  ECN-CE increase  |  Recovery  |
++ *  | Avoidance  |------------------>|   Period   |
++ *  +------------+                   +------------+
++ *            ^                            |
++ *            |                            |
++ *            +----------------------------+
++ *               Acknowledgment of packet
++ *                 sent during recovery
 + */
-+enum {
-+	QUIC_PATH_ALT_NONE,	/* No alternate path (migration complete or aborted) */
-+	QUIC_PATH_ALT_PENDING,	/* Waiting for a new destination CID for migration */
-+	QUIC_PATH_ALT_PROBING,	/* Validating the alternate path (PATH_CHALLENGE) */
-+	QUIC_PATH_ALT_SWAPPED,	/* Alternate path is now active; roles swapped */
++enum quic_cong_state {
++	QUIC_CONG_SLOW_START,
++	QUIC_CONG_RECOVERY_PERIOD,
++	QUIC_CONG_CONGESTION_AVOIDANCE,
 +};
 +
-+struct quic_udp_sock {
-+	struct work_struct work;	/* Workqueue to destroy UDP tunnel socket */
-+	struct hlist_node node;		/* Entry in address-based UDP socket hash table */
-+	union quic_addr addr;
-+	refcount_t refcnt;
-+	struct sock *sk;		/* Underlying UDP tunnel socket */
++struct quic_cong {
++	/* RTT tracking */
++	u32 smoothed_rtt;	/* Smoothed RTT */
++	u32 latest_rtt;		/* Latest RTT sample */
++	u32 min_rtt;		/* Lowest observed RTT */
++	u32 rttvar;		/* RTT variation */
++	u32 loss_delay;		/* Time before marking loss */
++	u32 pto;		/* Probe timeout */
++
++	/* Timing & pacing */
++	u32 max_ack_delay;	/* max_ack_delay from rfc9000#section-18.2 */
++	u32 recovery_time;	/* Recovery period start */
++	u32 pacing_rate;	/* Packet sending speed Bytes/sec */
++	u64 pacing_time;	/* Next send time */
++	u32 time;		/* Cached time */
++
++	/* Congestion window */
++	u32 max_window;		/* Max growth cap */
++	u32 min_window;		/* Min window limit */
++	u32 ssthresh;		/* Slow start threshold */
++	u32 window;		/* Bytes in flight allowed */
++	u32 mss;		/* QUIC MSS (excl. UDP) */
++
++	/* Algorithm-specific */
++	struct quic_cong_ops *ops;
++	u64 priv[8];		/* Algo private data */
++
++	/* Flags & state */
++	u8 min_rtt_valid;	/* min_rtt initialized */
++	u8 is_rtt_set;		/* RTT samples exist */
++	u8 state;		/* State machine in rfc9002#section-7.3 */
 +};
 +
-+struct quic_path {
-+	union quic_addr daddr;		/* Destination address */
-+	union quic_addr saddr;		/* Source address */
-+	struct quic_udp_sock *udp_sk;	/* Wrapped UDP socket used to receive QUIC packets */
++/* Hooks for congestion control algorithms */
++struct quic_cong_ops {
++	void (*on_packet_acked)(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++	void (*on_packet_lost)(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++	void (*on_process_ecn)(struct quic_cong *cong);
++	void (*on_init)(struct quic_cong *cong);
++
++	/* Optional callbacks */
++	void (*on_packet_sent)(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++	void (*on_ack_recv)(struct quic_cong *cong, u32 bytes, u32 max_rate);
++	void (*on_rtt_update)(struct quic_cong *cong);
 +};
 +
-+struct quic_path_group {
-+	/* Connection ID validation during handshake (rfc9000#section-7.3) */
-+	struct quic_conn_id retry_dcid;		/* Source CID from Retry packet */
-+	struct quic_conn_id orig_dcid;		/* Destination CID from first Initial */
-+
-+	/* Path validation (rfc9000#section-8.2) */
-+	u8 entropy[QUIC_PATH_ENTROPY_LEN];	/* Entropy for PATH_CHALLENGE */
-+	struct quic_path path[2];		/* Active path (0) and alternate path (1) */
-+	struct flowi fl;			/* Flow info from routing decisions */
-+
-+	/* Anti-amplification limit (rfc9000#section-8) */
-+	u16 ampl_sndlen;	/* Bytes sent before address is validated */
-+	u16 ampl_rcvlen;	/* Bytes received to lift amplification limit */
-+
-+	/* MTU discovery handling */
-+	u32 mtu_info;		/* PMTU value from received ICMP, pending apply */
-+	struct {		/* PLPMTUD probing (rfc8899) */
-+		s64 number;	/* Packet number used for current probe */
-+		u16 pmtu;	/* Confirmed path MTU */
-+
-+		u16 probe_size;	/* Current probe packet size */
-+		u16 probe_high;	/* Highest failed probe size */
-+		u8 probe_count;	/* Retry count for current probe_size */
-+		u8 state;	/* Probe state machine (rfc8899#section-5.2) */
-+	} pl;
-+
-+	/* Connection Migration (rfc9000#section-9) */
-+	u8 disable_saddr_alt:1;	/* Remote disable_active_migration (rfc9000#section-18.2) */
-+	u8 disable_daddr_alt:1;	/* Local disable_active_migration (rfc9000#section-18.2) */
-+	u8 pref_addr:1;		/* Preferred address offered (rfc9000#section-18.2) */
-+	u8 alt_probes;		/* Number of PATH_CHALLENGE probes sent */
-+	u8 alt_state;		/* State for alternate path migration logic (see above) */
-+
-+	u8 ecn_probes;		/* ECN probe counter */
-+	u8 validated:1;		/* Path validated with PATH_RESPONSE */
-+	u8 blocked:1;		/* Blocked by anti-amplification limit */
-+	u8 retry:1;		/* Retry used in initial packet */
-+	u8 serv:1;		/* Indicates server side */
-+};
-+
-+static inline union quic_addr *quic_path_saddr(struct quic_path_group *paths, u8 path)
++static inline void quic_cong_set_mss(struct quic_cong *cong, u32 mss)
 +{
-+	return &paths->path[path].saddr;
++	if (cong->mss == mss)
++		return;
++
++	/* rfc9002#section-7.2: Initial and Minimum Congestion Window */
++	cong->mss = mss;
++	cong->min_window = max(min(mss * 10, 14720U), mss * 2);
++
++	if (cong->window < cong->min_window)
++		cong->window = cong->min_window;
 +}
 +
-+static inline void quic_path_set_saddr(struct quic_path_group *paths, u8 path,
-+				       union quic_addr *addr)
++static inline void *quic_cong_priv(struct quic_cong *cong)
 +{
-+	memcpy(quic_path_saddr(paths, path), addr, sizeof(*addr));
++	return (void *)cong->priv;
 +}
 +
-+static inline union quic_addr *quic_path_daddr(struct quic_path_group *paths, u8 path)
-+{
-+	return &paths->path[path].daddr;
-+}
++void quic_cong_on_packet_acked(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++void quic_cong_on_packet_lost(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++void quic_cong_on_process_ecn(struct quic_cong *cong);
 +
-+static inline void quic_path_set_daddr(struct quic_path_group *paths, u8 path,
-+				       union quic_addr *addr)
-+{
-+	memcpy(quic_path_daddr(paths, path), addr, sizeof(*addr));
-+}
++void quic_cong_on_packet_sent(struct quic_cong *cong, u32 time, u32 bytes, s64 number);
++void quic_cong_on_ack_recv(struct quic_cong *cong, u32 bytes, u32 max_rate);
++void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_delay);
 +
-+static inline union quic_addr *quic_path_uaddr(struct quic_path_group *paths, u8 path)
-+{
-+	return &paths->path[path].udp_sk->addr;
-+}
-+
-+static inline bool quic_path_alt_state(struct quic_path_group *paths, u8 state)
-+{
-+	return paths->alt_state == state;
-+}
-+
-+static inline void quic_path_set_alt_state(struct quic_path_group *paths, u8 state)
-+{
-+	paths->alt_state = state;
-+}
-+
-+/* Returns the destination Connection ID (DCID) used for identifying the connection.
-+ * Per rfc9000#section-7.3, handshake packets are considered part of the same connection
-+ * if their DCID matches the one returned here.
-+ */
-+static inline struct quic_conn_id *quic_path_orig_dcid(struct quic_path_group *paths)
-+{
-+	return paths->retry ? &paths->retry_dcid : &paths->orig_dcid;
-+}
-+
-+int quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa, union quic_addr *da,
-+			 struct sock *sk);
-+int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path);
-+void quic_path_free(struct sock *sk, struct quic_path_group *paths, u8 path);
-+void quic_path_swap(struct quic_path_group *paths);
-+
-+u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer, bool *complete);
-+u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu, bool *reset_timer);
-+u32 quic_path_pl_send(struct quic_path_group *paths, s64 number);
-+
-+void quic_path_get_param(struct quic_path_group *paths, struct quic_transport_param *p);
-+void quic_path_set_param(struct quic_path_group *paths, struct quic_transport_param *p);
-+bool quic_path_pl_confirm(struct quic_path_group *paths, s64 largest, s64 smallest);
-+void quic_path_pl_reset(struct quic_path_group *paths);
-+
-+int quic_path_init(int (*rcv)(struct sk_buff *skb, u8 err));
-+void quic_path_destroy(void);
++void quic_cong_set_srtt(struct quic_cong *cong, u32 srtt);
++void quic_cong_set_algo(struct quic_cong *cong, u8 algo);
++void quic_cong_init(struct quic_cong *cong);
 diff --git a/net/quic/socket.c b/net/quic/socket.c
-index f03e19c6f73c..5fe0a83c63ba 100644
+index 5fe0a83c63ba..901288b1776a 100644
 --- a/net/quic/socket.c
 +++ b/net/quic/socket.c
-@@ -61,6 +61,9 @@ static int quic_init_sock(struct sock *sk)
+@@ -44,6 +44,7 @@ static int quic_init_sock(struct sock *sk)
  
- static void quic_destroy_sock(struct sock *sk)
- {
-+	quic_path_free(sk, quic_paths(sk), 0);
-+	quic_path_free(sk, quic_paths(sk), 1);
-+
- 	quic_conn_id_set_free(quic_source(sk));
- 	quic_conn_id_set_free(quic_dest(sk));
+ 	quic_conn_id_set_init(quic_source(sk), 1);
+ 	quic_conn_id_set_init(quic_dest(sk), 0);
++	quic_cong_init(quic_cong(sk));
  
+ 	if (quic_stream_init(quic_streams(sk)))
+ 		return -ENOMEM;
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index 20101de43638..1471c525a871 100644
+index 1471c525a871..93a6322a12c9 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -18,6 +18,7 @@
- #include "family.h"
+@@ -19,6 +19,7 @@
  #include "stream.h"
  #include "connid.h"
-+#include "path.h"
+ #include "path.h"
++#include "cong.h"
  
  #include "protocol.h"
  
-@@ -43,6 +44,7 @@ struct quic_sock {
- 	struct quic_stream_table	streams;
+@@ -45,6 +46,7 @@ struct quic_sock {
  	struct quic_conn_id_set		source;
  	struct quic_conn_id_set		dest;
-+	struct quic_path_group		paths;
+ 	struct quic_path_group		paths;
++	struct quic_cong		cong;
  };
  
  struct quic6_sock {
-@@ -95,6 +97,16 @@ static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
- 	return &quic_sk(sk)->dest;
+@@ -107,6 +109,11 @@ static inline bool quic_is_serv(const struct sock *sk)
+ 	return quic_paths(sk)->serv;
  }
  
-+static inline struct quic_path_group *quic_paths(const struct sock *sk)
++static inline struct quic_cong *quic_cong(const struct sock *sk)
 +{
-+	return &quic_sk(sk)->paths;
-+}
-+
-+static inline bool quic_is_serv(const struct sock *sk)
-+{
-+	return quic_paths(sk)->serv;
++	return &quic_sk(sk)->cong;
 +}
 +
  static inline bool quic_is_establishing(struct sock *sk)
  {
  	return sk->sk_state == QUIC_SS_ESTABLISHING;
-@@ -118,14 +130,19 @@ static inline bool quic_is_closed(struct sock *sk)
- static inline void quic_set_state(struct sock *sk, int state)
- {
- 	struct net *net = sock_net(sk);
-+	int mib;
- 
- 	if (sk->sk_state == state)
- 		return;
- 
--	if (state == QUIC_SS_ESTABLISHED)
-+	if (state == QUIC_SS_ESTABLISHED) {
-+		mib = quic_is_serv(sk) ? QUIC_MIB_CONN_PASSIVEESTABS
-+				       : QUIC_MIB_CONN_ACTIVEESTABS;
-+		QUIC_INC_STATS(net, mib);
- 		QUIC_INC_STATS(net, QUIC_MIB_CONN_CURRENTESTABS);
--	else if (quic_is_established(sk))
-+	} else if (quic_is_established(sk)) {
- 		QUIC_DEC_STATS(net, QUIC_MIB_CONN_CURRENTESTABS);
-+	}
- 
- 	if (state == QUIC_SS_CLOSED)
- 		sk->sk_prot->unhash(sk);
 -- 
 2.47.1
 
