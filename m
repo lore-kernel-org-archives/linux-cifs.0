@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE54C289E2C;
-	Tue,  8 Jul 2025 16:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACCFF9E8;
+	Tue,  8 Jul 2025 16:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751992767; cv=none; b=JIKrgOHDsEVVtlD/JP6dwVhXNBh192XvhrGuvJ9Y4bs5FzaNsSeUgziDAVT2IvaeymXYuqyALHIrNI0NPxtEwl/Gq5abbDjC+ocem8++uuUdz0y+Pf6eTUHa8vM0vptFPgme2iX+zwMfuYArN5siPMK7IeLORn7Pu22KDzgPQvA=
+	t=1751992788; cv=none; b=TA9Vs9lvKv37Q3Fr82iTUlgp8tmnGnrTlzWC/YIO1zvS78VcUEd40cdAJKLk7iVG+bv9NOtnUbLBtuT8u0uWdDIQxLHHuAi6/wYeRRGE9Lr+i3RAVNX8cy8/EVWE90/sGmbAS/hyij9xgiltwGbN9tfEarEGzBVfg+zRkqutKNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751992767; c=relaxed/simple;
-	bh=LtgKvg67uNF79qLg+wFSsv3WcGBYCSxFp5Kv2kuGr24=;
+	s=arc-20240116; t=1751992788; c=relaxed/simple;
+	bh=mc1527awR/yCeE2gxr/wRZEOb1D2fRNoLwSaQ35//y8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bq4NGu1uBlQJ9N4oQQOJBXOkigOoKc7GTCpdevsreoC+wpRSiyh/9RO810Q3J22Yt+9MGzUSAexn4nKnGXtIaw6YUZtjOJXBK0urmOmYuAX/Agg+M1zs0bnYnQZTHhgd7aU/onXO0UvAyePeDBH5ZsychpMMV1ryaayHfltojJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Zg3XJbA6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aBqYkrbRfwm22SQ4/pLUvivimQwPpkFH6w6NC1t6dgec4xUbjsZ8EpGI3CmY3XGcoGlmdTVoPE4FO90IbEXSqzU40n3WlrfMGNTnmlNeGMQSMlUtcPkAciQd9IuZgLRl/IZPEHzFlhV4yt79lLSpVWUOxNGYOVwt5s0X/wLYyPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=RDTEsd6z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Zg3XJbA6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374E2C4CEED;
-	Tue,  8 Jul 2025 16:39:27 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RDTEsd6z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6112FC4CEED;
+	Tue,  8 Jul 2025 16:39:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751992767;
-	bh=LtgKvg67uNF79qLg+wFSsv3WcGBYCSxFp5Kv2kuGr24=;
+	s=korg; t=1751992787;
+	bh=mc1527awR/yCeE2gxr/wRZEOb1D2fRNoLwSaQ35//y8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zg3XJbA6vXSkp3pANRhBf9qnAwEOp+9/dKKMEFGdoo7vcX5WIW7pSbL3vQHLEbXHf
-	 VbzFXT9Iomkc2yRLbM87bFUHbys3owVrEP7OwcUDd/yJ9MVQ/cQuzoMdRvlFVsxquI
-	 mk4qE8JWMc0oGYi56lWKbGrB61rtg/G84OyB9PxI=
+	b=RDTEsd6zQJQrxl3uwB2gOIU8m6wZXMqneIE7AVXVQPHbr0u7PAjiEfAvcreey4Ywp
+	 +J9UEUMKIU+EW+1Bfw4zMCN+LGjNqSqkRd6U7qqszmvAcqp0Ab9j4ZXxpI7xBP/7WJ
+	 SzwfIr4DGNzrtGjHU2hqUCeNyId7Ct3oGoF04eTU=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
 	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Steve French <stfrench@microsoft.com>,
+	David Howells <dhowells@redhat.com>,
+	Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	Christian Brauner <brauner@kernel.org>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 074/232] smb: client: fix warning when reconnecting channel
-Date: Tue,  8 Jul 2025 18:21:10 +0200
-Message-ID: <20250708162243.386847613@linuxfoundation.org>
+Subject: [PATCH 6.12 081/232] smb: client: set missing retry flag in smb2_writev_callback()
+Date: Tue,  8 Jul 2025 18:21:17 +0200
+Message-ID: <20250708162243.571907644@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250708162241.426806072@linuxfoundation.org>
 References: <20250708162241.426806072@linuxfoundation.org>
@@ -56,125 +57,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Paulo Alcantara <pc@manguebit.org>
 
-[ Upstream commit 3bbe46716092d8ef6b0df4b956f585c5cd0fc78e ]
+[ Upstream commit e67e75edeb88022c04f8e0a173e1ff6dc688f155 ]
 
-When reconnecting a channel in smb2_reconnect_server(), a dummy tcon
-is passed down to smb2_reconnect() with ->query_interface
-uninitialized, so we can't call queue_delayed_work() on it.
+Set NETFS_SREQ_NEED_RETRY flag to tell netfslib that the subreq needs
+to be retried.
 
-Fix the following warning by ensuring that we're queueing the delayed
-worker from correct tcon.
-
-WARNING: CPU: 4 PID: 1126 at kernel/workqueue.c:2498 __queue_delayed_work+0x1d2/0x200
-Modules linked in: cifs cifs_arc4 nls_ucs2_utils cifs_md4 [last unloaded: cifs]
-CPU: 4 UID: 0 PID: 1126 Comm: kworker/4:0 Not tainted 6.16.0-rc3 #5 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-4.fc42 04/01/2014
-Workqueue: cifsiod smb2_reconnect_server [cifs]
-RIP: 0010:__queue_delayed_work+0x1d2/0x200
-Code: 41 5e 41 5f e9 7f ee ff ff 90 0f 0b 90 e9 5d ff ff ff bf 02 00
-00 00 e8 6c f3 07 00 89 c3 eb bd 90 0f 0b 90 e9 57 f> 0b 90 e9 65 fe
-ff ff 90 0f 0b 90 e9 72 fe ff ff 90 0f 0b 90 e9
-RSP: 0018:ffffc900014afad8 EFLAGS: 00010003
-RAX: 0000000000000000 RBX: ffff888124d99988 RCX: ffffffff81399cc1
-RDX: dffffc0000000000 RSI: ffff888114326e00 RDI: ffff888124d999f0
-RBP: 000000000000ea60 R08: 0000000000000001 R09: ffffed10249b3331
-R10: ffff888124d9998f R11: 0000000000000004 R12: 0000000000000040
-R13: ffff888114326e00 R14: ffff888124d999d8 R15: ffff888114939020
-FS:  0000000000000000(0000) GS:ffff88829f7fe000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffe7a2b4038 CR3: 0000000120a6f000 CR4: 0000000000750ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- queue_delayed_work_on+0xb4/0xc0
- smb2_reconnect+0xb22/0xf50 [cifs]
- smb2_reconnect_server+0x413/0xd40 [cifs]
- ? __pfx_smb2_reconnect_server+0x10/0x10 [cifs]
- ? local_clock_noinstr+0xd/0xd0
- ? local_clock+0x15/0x30
- ? lock_release+0x29b/0x390
- process_one_work+0x4c5/0xa10
- ? __pfx_process_one_work+0x10/0x10
- ? __list_add_valid_or_report+0x37/0x120
- worker_thread+0x2f1/0x5a0
- ? __kthread_parkme+0xde/0x100
- ? __pfx_worker_thread+0x10/0x10
- kthread+0x1fe/0x380
- ? kthread+0x10f/0x380
- ? __pfx_kthread+0x10/0x10
- ? local_clock_noinstr+0xd/0xd0
- ? ret_from_fork+0x1b/0x1f0
- ? local_clock+0x15/0x30
- ? lock_release+0x29b/0x390
- ? rcu_is_watching+0x20/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x15b/0x1f0
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-irq event stamp: 1116206
-hardirqs last  enabled at (1116205): [<ffffffff8143af42>] __up_console_sem+0x52/0x60
-hardirqs last disabled at (1116206): [<ffffffff81399f0e>] queue_delayed_work_on+0x6e/0xc0
-softirqs last  enabled at (1116138): [<ffffffffc04562fd>] __smb_send_rqst+0x42d/0x950 [cifs]
-softirqs last disabled at (1116136): [<ffffffff823d35e1>] release_sock+0x21/0xf0
-
-Cc: linux-cifs@vger.kernel.org
-Reported-by: David Howells <dhowells@redhat.com>
-Fixes: 42ca547b13a2 ("cifs: do not disable interface polling on failure")
-Reviewed-by: David Howells <dhowells@redhat.com>
-Tested-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Shyam Prasad N <nspmangalore@gmail.com>
+Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
+Link: https://lore.kernel.org/20250701163852.2171681-7-dhowells@redhat.com
+Tested-by: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org
+Cc: netfs@lists.linux.dev
+Signed-off-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/smb2pdu.c  | 10 ++++------
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ fs/smb/client/smb2pdu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index c66655adecb2c..e77c0b3e49624 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1275,6 +1275,7 @@ struct cifs_tcon {
- 	bool use_persistent:1; /* use persistent instead of durable handles */
- 	bool no_lease:1;    /* Do not request leases on files or directories */
- 	bool use_witness:1; /* use witness protocol */
-+	bool dummy:1; /* dummy tcon used for reconnecting channels */
- 	__le32 capabilities;
- 	__u32 share_flags;
- 	__u32 maximal_access;
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index c6ae395a46925..3e501da62880c 100644
+index 3e501da62880c..d514f95deb7e7 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -440,9 +440,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		free_xid(xid);
- 		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
- 
--		/* regardless of rc value, setup polling */
--		queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
--				   (SMB_INTERFACE_POLL_INTERVAL * HZ));
-+		if (!tcon->ipc && !tcon->dummy)
-+			queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
-+					   (SMB_INTERFACE_POLL_INTERVAL * HZ));
- 
- 		mutex_unlock(&ses->session_mutex);
- 
-@@ -4234,10 +4234,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 		}
- 		goto done;
- 	}
--
- 	tcon->status = TID_GOOD;
--	tcon->retry = false;
--	tcon->need_reconnect = false;
-+	tcon->dummy = true;
- 
- 	/* now reconnect sessions for necessary channels */
- 	list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
+@@ -4869,6 +4869,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 		break;
+ 	case MID_REQUEST_SUBMITTED:
+ 	case MID_RETRY_NEEDED:
++		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
+ 		result = -EAGAIN;
+ 		break;
+ 	case MID_RESPONSE_MALFORMED:
 -- 
 2.39.5
 
