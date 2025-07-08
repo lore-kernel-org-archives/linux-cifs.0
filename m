@@ -1,46 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F319E23A98D;
-	Tue,  8 Jul 2025 16:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39292DD5EF;
+	Tue,  8 Jul 2025 16:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751992799; cv=none; b=DeFLysoNBgDuQyeNBTl7GxUK3TIbL1pC5hux3HbXM57oZjvZgTzrtKE1KEim29pSozeX/Nmyhym/5ILu6zuybBiFyyA13Am16EoL7CwyOlYame6RMH2t2Ub+u9ngCnBqKWdRc4Da02NGZ/hCNpsv0hzOhRVFRnxT/YlTtpe7nqI=
+	t=1751993476; cv=none; b=sx81oYwCCHgkQovNNUyPEZDoI+sd5CPrmTLcMgmAllmWSTsqEo+o3MHNECXMpYSZaG2qkrDdULF7sIdcWP/s92+4UC5oD3h0nXz2nedr9NYEHX9mVUVSVSyGEq6G510DCKeWDA9lx7VxBi02peJn+jZPGtS2C5WtQJSSyaZ7HcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751992799; c=relaxed/simple;
-	bh=f6K/Daqx6q/WwY4okpNJSRysLXFPQ7n+5l/14UgM1QI=;
+	s=arc-20240116; t=1751993476; c=relaxed/simple;
+	bh=dfMLcG+HdZ9aQC4IGsv3Z5rix+af/8bxlbvGeaOQk9g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KGnzMF0isfaXlt/aOmTChGoMZtxsaZEJW2gfAouEVv7gKvNcyRvUk9CHNYsym8WVD1Z1F0/7P+LNgF8/wATQ0vfZCxov2bd492uC8KEeMVaUqhlsk0QxVzBU0CVEO8RwE/ackyeMaNtc0jBFRJUYjqxUlMPFOq7nFJ/Y5FQcTxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=os05mZPC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RQXYDHyNz0bfWrqIgEk8d8j7UO/JLGUvyA5fAHvYw9iop9wdHNlKkO6nzsl8AgYcHdwuEDADMqGwoj56BGQY0kYQJdN1yplDnpeXQsgmrvH7oECaPFqkSxRGGFKYVjq4gdf2VYlPQDfp3FU+fOKsQhpPVdNWPrkudtkIhpxm5mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bhk0iVTi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="os05mZPC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85E3AC4CEF6;
-	Tue,  8 Jul 2025 16:39:58 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bhk0iVTi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19BB6C4CEED;
+	Tue,  8 Jul 2025 16:51:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751992798;
-	bh=f6K/Daqx6q/WwY4okpNJSRysLXFPQ7n+5l/14UgM1QI=;
+	s=korg; t=1751993475;
+	bh=dfMLcG+HdZ9aQC4IGsv3Z5rix+af/8bxlbvGeaOQk9g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=os05mZPCG3V11eOQ0KuE48uyhBxDN80xcPDAb0/kWb7AiEcutT0R0U2n9o9pJuk/I
-	 vha+3Cs8SmbMvIAyDBRG16xbOHUOECZs6RTylHteZYmROLzp/QXz1JpDkzb5gUvGOI
-	 rP4kY/X0x8alP6hx4QPrSTU5+LI3nwUfke0+61XI=
+	b=bhk0iVTiS+nCfdlon/TcJpe9epiSdjjnElgpvq3/6drLQoXcPbwyd5pcrZq3vF8av
+	 JAPFp9VwFSuagSlTVl2gYuHqSs76nI5sfRQ90xCDIU4SsQA6Oa+E3d897Zb7IFGd5a
+	 B1CXAoXGwGF36WsEMApPvidUs/ogaQrPpVJCYxg8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Steve French <sfrench@samba.org>,
 	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Shyam Prasad N <nspmangalore@gmail.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 084/232] netfs: Fix i_size updating
-Date: Tue,  8 Jul 2025 18:21:20 +0200
-Message-ID: <20250708162243.647578407@linuxfoundation.org>
+Subject: [PATCH 6.15 087/178] smb: client: fix warning when reconnecting channel
+Date: Tue,  8 Jul 2025 18:22:04 +0200
+Message-ID: <20250708162238.950048843@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250708162241.426806072@linuxfoundation.org>
-References: <20250708162241.426806072@linuxfoundation.org>
+In-Reply-To: <20250708162236.549307806@linuxfoundation.org>
+References: <20250708162236.549307806@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,88 +50,131 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+6.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-From: David Howells <dhowells@redhat.com>
+From: Paulo Alcantara <pc@manguebit.org>
 
-[ Upstream commit 2e0658940d90a3dc130bb3b7f75bae9f4100e01f ]
+[ Upstream commit 3bbe46716092d8ef6b0df4b956f585c5cd0fc78e ]
 
-Fix the updating of i_size, particularly in regard to the completion of DIO
-writes and especially async DIO writes by using a lock.
+When reconnecting a channel in smb2_reconnect_server(), a dummy tcon
+is passed down to smb2_reconnect() with ->query_interface
+uninitialized, so we can't call queue_delayed_work() on it.
 
-The bug is triggered occasionally by the generic/207 xfstest as it chucks a
-bunch of AIO DIO writes at the filesystem and then checks that fstat()
-returns a reasonable st_size as each completes.
+Fix the following warning by ensuring that we're queueing the delayed
+worker from correct tcon.
 
-The problem is that netfs is trying to do "if new_size > inode->i_size,
-update inode->i_size" sort of thing but without a lock around it.
+WARNING: CPU: 4 PID: 1126 at kernel/workqueue.c:2498 __queue_delayed_work+0x1d2/0x200
+Modules linked in: cifs cifs_arc4 nls_ucs2_utils cifs_md4 [last unloaded: cifs]
+CPU: 4 UID: 0 PID: 1126 Comm: kworker/4:0 Not tainted 6.16.0-rc3 #5 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-4.fc42 04/01/2014
+Workqueue: cifsiod smb2_reconnect_server [cifs]
+RIP: 0010:__queue_delayed_work+0x1d2/0x200
+Code: 41 5e 41 5f e9 7f ee ff ff 90 0f 0b 90 e9 5d ff ff ff bf 02 00
+00 00 e8 6c f3 07 00 89 c3 eb bd 90 0f 0b 90 e9 57 f> 0b 90 e9 65 fe
+ff ff 90 0f 0b 90 e9 72 fe ff ff 90 0f 0b 90 e9
+RSP: 0018:ffffc900014afad8 EFLAGS: 00010003
+RAX: 0000000000000000 RBX: ffff888124d99988 RCX: ffffffff81399cc1
+RDX: dffffc0000000000 RSI: ffff888114326e00 RDI: ffff888124d999f0
+RBP: 000000000000ea60 R08: 0000000000000001 R09: ffffed10249b3331
+R10: ffff888124d9998f R11: 0000000000000004 R12: 0000000000000040
+R13: ffff888114326e00 R14: ffff888124d999d8 R15: ffff888114939020
+FS:  0000000000000000(0000) GS:ffff88829f7fe000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffe7a2b4038 CR3: 0000000120a6f000 CR4: 0000000000750ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ queue_delayed_work_on+0xb4/0xc0
+ smb2_reconnect+0xb22/0xf50 [cifs]
+ smb2_reconnect_server+0x413/0xd40 [cifs]
+ ? __pfx_smb2_reconnect_server+0x10/0x10 [cifs]
+ ? local_clock_noinstr+0xd/0xd0
+ ? local_clock+0x15/0x30
+ ? lock_release+0x29b/0x390
+ process_one_work+0x4c5/0xa10
+ ? __pfx_process_one_work+0x10/0x10
+ ? __list_add_valid_or_report+0x37/0x120
+ worker_thread+0x2f1/0x5a0
+ ? __kthread_parkme+0xde/0x100
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0x1fe/0x380
+ ? kthread+0x10f/0x380
+ ? __pfx_kthread+0x10/0x10
+ ? local_clock_noinstr+0xd/0xd0
+ ? ret_from_fork+0x1b/0x1f0
+ ? local_clock+0x15/0x30
+ ? lock_release+0x29b/0x390
+ ? rcu_is_watching+0x20/0x50
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x15b/0x1f0
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+irq event stamp: 1116206
+hardirqs last  enabled at (1116205): [<ffffffff8143af42>] __up_console_sem+0x52/0x60
+hardirqs last disabled at (1116206): [<ffffffff81399f0e>] queue_delayed_work_on+0x6e/0xc0
+softirqs last  enabled at (1116138): [<ffffffffc04562fd>] __smb_send_rqst+0x42d/0x950 [cifs]
+softirqs last disabled at (1116136): [<ffffffff823d35e1>] release_sock+0x21/0xf0
 
-This can be seen with cifs, but shouldn't be seen with kafs because kafs
-serialises modification ops on the client whereas cifs sends the requests
-to the server as they're generated and lets the server order them.
-
-Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+Cc: linux-cifs@vger.kernel.org
+Reported-by: David Howells <dhowells@redhat.com>
+Fixes: 42ca547b13a2 ("cifs: do not disable interface polling on failure")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Tested-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Shyam Prasad N <nspmangalore@gmail.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/20250701163852.2171681-11-dhowells@redhat.com
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
+Tested-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/netfs/buffered_write.c | 2 ++
- fs/netfs/direct_write.c   | 8 ++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/smb2pdu.c  | 10 ++++------
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index b3910dfcb56d3..896d1d4219ed9 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -64,6 +64,7 @@ static void netfs_update_i_size(struct netfs_inode *ctx, struct inode *inode,
- 		return;
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 56381cbb63990..b89db44e0a8e3 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1303,6 +1303,7 @@ struct cifs_tcon {
+ 	bool use_persistent:1; /* use persistent instead of durable handles */
+ 	bool no_lease:1;    /* Do not request leases on files or directories */
+ 	bool use_witness:1; /* use witness protocol */
++	bool dummy:1; /* dummy tcon used for reconnecting channels */
+ 	__le32 capabilities;
+ 	__u32 share_flags;
+ 	__u32 maximal_access;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 72903265b1706..c3b212175b2bf 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -423,9 +423,9 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		free_xid(xid);
+ 		ses->flags &= ~CIFS_SES_FLAGS_PENDING_QUERY_INTERFACES;
+ 
+-		/* regardless of rc value, setup polling */
+-		queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+-				   (SMB_INTERFACE_POLL_INTERVAL * HZ));
++		if (!tcon->ipc && !tcon->dummy)
++			queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
++					   (SMB_INTERFACE_POLL_INTERVAL * HZ));
+ 
+ 		mutex_unlock(&ses->session_mutex);
+ 
+@@ -4221,10 +4221,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 		}
+ 		goto done;
  	}
+-
+ 	tcon->status = TID_GOOD;
+-	tcon->retry = false;
+-	tcon->need_reconnect = false;
++	tcon->dummy = true;
  
-+	spin_lock(&inode->i_lock);
- 	i_size_write(inode, pos);
- #if IS_ENABLED(CONFIG_FSCACHE)
- 	fscache_update_cookie(ctx->cache, NULL, &pos);
-@@ -77,6 +78,7 @@ static void netfs_update_i_size(struct netfs_inode *ctx, struct inode *inode,
- 					DIV_ROUND_UP(pos, SECTOR_SIZE),
- 					inode->i_blocks + add);
- 	}
-+	spin_unlock(&inode->i_lock);
- }
- 
- /**
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 26cf9c94deebb..8fbfaf71c154c 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -14,13 +14,17 @@ static void netfs_cleanup_dio_write(struct netfs_io_request *wreq)
- 	struct inode *inode = wreq->inode;
- 	unsigned long long end = wreq->start + wreq->transferred;
- 
--	if (!wreq->error &&
--	    i_size_read(inode) < end) {
-+	if (wreq->error || end <= i_size_read(inode))
-+		return;
-+
-+	spin_lock(&inode->i_lock);
-+	if (end > i_size_read(inode)) {
- 		if (wreq->netfs_ops->update_i_size)
- 			wreq->netfs_ops->update_i_size(inode, end);
- 		else
- 			i_size_write(inode, end);
- 	}
-+	spin_unlock(&inode->i_lock);
- }
- 
- /*
+ 	/* now reconnect sessions for necessary channels */
+ 	list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
 -- 
 2.39.5
 
