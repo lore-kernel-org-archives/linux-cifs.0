@@ -1,144 +1,117 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41E8224227;
-	Wed,  9 Jul 2025 17:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488A122256F
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Jul 2025 19:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752080754; cv=none; b=LIlTMDAp6ldE02CoZnMVfPrtKNXawCluSfhDH7pZjm3FN9jEqqb/JYqmKFLY5opciIzmO0/JjgAQDn6gYEVqpgIldbq6v0J0bE3VwM6PD9EvJVpPRIxXeRaJ54IxylJkAMbGcqbulbmKbJUkv1wD82pr9xayub4XYapG9mZI7Xk=
+	t=1752087888; cv=none; b=XXqgR4/qsUGEVuPuqHxF6YyKjvjNaA9YtuGQ/kjsLYptLnPSwqQuEhGOWLoKFoYwhNEoi2fir6m+pf9spv4M9D5bqMAKj8jjtpAazD1hD+1EVgaNIZf9bD22fi3etClER1vIZw+n2rH8ypP8pTKHfBIHe7HdlHmWE1acs3qpzVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752080754; c=relaxed/simple;
-	bh=cFmMmbNOZ2lQJhyooZRxqPMgpHehUky7qeBgN96eCfc=;
+	s=arc-20240116; t=1752087888; c=relaxed/simple;
+	bh=oRGJxOoY6Sb9QvNhIjZ1ZJhSnfSKCQdsXzj4pLtR8xc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sNs3tRG2cP4FwP2aB2fv4KOgI5RVQ41v5LnqT06ZiXT/EMoFjyFgXvT8ozGYzyQrViMOWPoCLm4JyRz+ILGJ8KafL/WZ/A0HzOGXb7S8P2c76hHaFVuMXGs7dm6KCLJqtkIivSn5/TkaEdRsVcCg8uB19LJqovl47R6dwOXXDa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V892Zdg8; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=IFpdQNqOOUX+LhbD/VhU4PwJgRK/t+yczcZNN+cBY2DuhXRO9bheYM7VOuTV6+BjPjEw1QOFgzl82HHvoF5qsjRapU6OsLlOtraMrvUbb75lcIz4wP1052v0IWan7hIfHEGuPHfTb9M8wIZuAUQGhj7GX7vS7LUi5PSorP639CY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=gNSh2cAx; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V892Zdg8"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3e05c718bedso611565ab.0;
-        Wed, 09 Jul 2025 10:05:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="gNSh2cAx"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6077dea37easo216740a12.3
+        for <linux-cifs@vger.kernel.org>; Wed, 09 Jul 2025 12:04:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752080752; x=1752685552; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1752087885; x=1752692685; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fGs7uOkUqSiWd98cc20bhkdpAwjdYLKrg86sS4UNbPk=;
-        b=V892Zdg8fsjyI89B0xMvGLjV18vVU9AvWE+4hFA3XhUI/+c9d6QsnUNp0fw7d3L1mb
-         Ita4u48xGVkJg5UJRpZzG97DG2FIlOh1/zIIl/jziqPfHC7vnf7WyScs1aFYifAE5jCi
-         +Fb251l4pCPhFJmHMdmTgsMZeREa5Z/yeeREyhhVmLKRHfDbDBEGzDdY8C/D2Q8JDjAV
-         gjOC5Wi16mRe6K/T55ivuNxGtZzm5be7cGUzj1qsSG+6FcgwoTcrH2bUK/2Kxmn6ZUcj
-         jTmGkI5L35GhNRKoohd/gUyYpeGgamOLWwmugmFcTLD2aC5resbE3adpS3M1Ju6UQ019
-         +DqQ==
+        bh=3oMoCHTAV5NeIpZMq+DMEKC+TktfxuQeI3NG81ytBeE=;
+        b=gNSh2cAxDTBJoHztwizWyZZ3DiFKTi3wxKyznQsDnWmd1QbZGN06zsxFOINFhEp7IB
+         yfLbtqYSVkGMDhyxZGxjcQN0jFYGzFPHVc2AZqXty9tL0Ju71UroMih9Mr3iu6qqV7nj
+         lw3c1trpU/sgXaZdW46x5q3VycvC+Kx/pxnQQXN9w6q3xMS7sKadXvuhVHVnzfWr63rJ
+         u3NymWMMO1a7A8hAtX4WzUdkDKBocrk80U9+CLlbQYfVpTVOE9lLlTSmGtusmKB//WrA
+         AnSkmEGx+FU8/5DPnl1aVOIkMS+Pl+t1jRpA/y/1wOVURm5tvoZL7W7LiTNKp7/jsU5m
+         hanw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752080752; x=1752685552;
+        d=1e100.net; s=20230601; t=1752087885; x=1752692685;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fGs7uOkUqSiWd98cc20bhkdpAwjdYLKrg86sS4UNbPk=;
-        b=Mvo4vHiqIG3NsO28Kw1IPhspoeuUsXV2R5aVHJgL2zwVzblQ4XLepam3E7YdfLvp04
-         dbcCdL7OY0BuZiDpxu0Fs0HjH7T1yXXtlocQeXRqujZzH0Xr4dtYe9gSAe5mhdC2pYQG
-         kdDHwGV7FI07X7e1O8FdZ0fYj+YKTyhW/+l6hCf+VE4O8i0Coh4WV0rpXXJcZmHJxwOf
-         7r1aj2eN1+7YHhe6eJ3RhiWALbnxRR+qcAWzmMIatpeBKOBxDS+ML+Ad4OvhQVpkfxCq
-         hV2lvfuyoOkLKKYcl8T/4LxQnIkywZp+A2fY9CfrWyt2xZ/ffaU+hnU5k8/aNoJ24Fsi
-         SszA==
-X-Forwarded-Encrypted: i=1; AJvYcCUb1GwvxkCeYL47T9uHin8zTBF94IZ9X5JzAxVDquFPfOBm9a1KHY8+jON9yAwyEXQOqa7jjzNiLP4Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdOy+JlkMKcsRLAUgIna3ug3/mYHHEwJ4yw9OAysDgORkNLsMn
-	+3Z2VbsIbyu9h4xhwtUGSKWiQVnqRItxQiwkGuFle/ezCePdRnFJnWA50VJiTKRuEh25t3Q5rE0
-	uG3nnIqnbxR0IV6qGr5xf7tc82a9qqYQ=
-X-Gm-Gg: ASbGncs8Wvd2kpuz6Rshxu9gJaGIybdENuzenU3UGTpYC+RQVfgd5jdiP/Hs8t/cpgx
-	eK1wvly1eYriMalvM/4DaWrp7anLGMgivOby8W8qN12umpWWq+WuISrv70xrJm4hWNfy/8mVQOq
-	2CUhyxtvwRwEs59yZeIQX4MmI0CHSheddtzPj0ArkLfq90y8pql+CNq/6zTDr3UhbO83yY7rleC
-	t8eCQ==
-X-Google-Smtp-Source: AGHT+IHkC8eqHXDge3FF4Xvot2aMbjbR7sKK8tVlJ313IzZe9U21AnU/z/HqEzLBntqyUltgr5L5GDqFvSXbBSlJJjc=
-X-Received: by 2002:a05:6e02:744:b0:3d6:cbad:235c with SMTP id
- e9e14a558f8ab-3e243f93c4amr7234935ab.6.1752080751927; Wed, 09 Jul 2025
- 10:05:51 -0700 (PDT)
+        bh=3oMoCHTAV5NeIpZMq+DMEKC+TktfxuQeI3NG81ytBeE=;
+        b=Vul3DpG+xXmn/XdziiWso6ipFNDI68+WX7SdHdg9AOuGQavLeAVdgdNILqZ5Kh4c1p
+         kLn5BH3/8YRmpcP0ZckbyGVq+BzSiutgSILmaGPIc+2U5H1nKKR1LD7UYOqoYDpYFTW0
+         0hjm8MkqWdBq9MKer4sZNkq3ExlIFH6pSk8O3AoZHiqUU5I6mXAYHRw0Nfdd7E46eT3b
+         34EvCpyiuQVR1pXshi8GZ+IrcD+AFxW+Ou3RwbSkYQ3qc5+oVMNIwPEgY+yEh7EURxaf
+         cLqCyU1ZQKMfR46zGRLHh7bsPNKZMQVzr0jxbP4apa5K63mOR7zymv+EJVFPwCsuXV41
+         S1yw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQjl2DxOOkjnQp3pZ1iHcfDmoYAFV5XGuuHuoU0r2FiQHtXP4SIaF1qLDcdt00XJfHjxvtb1XQZFDp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2qojMfVihcyEZzJDDR419I67/tIzv1wTW7aVqjoB8w7/VGJZU
+	fyinje7zn9qBUThusDa3znpSSc8r2Z9XQfSx2oHXU84NHRvtTLePbvq7qMfBfzjF/XrmgIjoMGn
+	FHKiSM4UfM+wDxFsH/gximoIObxrMztmKbAMzp0ioCg==
+X-Gm-Gg: ASbGnctAMlpIeNFxukz5FS4JUmXNJ6FjjMmZv9+ijU1PPe3WjHzICfduKWYxZolQLdG
+	KLeo8ZhGMZB6M2IGWN/NDgMu+r6uRB4QRIHvt+jHUTQvctJ9yAG24zsP6lNqxJ7x/SncLumM5dx
+	wl2ezUrqcuFB0hsdSpkwPjJOzgdpJW7boNClLcMnVhQnfl27sKGqGW0BN30e84zdiUfv0MmpAPu
+	THq/V2X3A==
+X-Google-Smtp-Source: AGHT+IHHFatUYcYPUIaiNLDpnLA9ZJlzI11FgOes6AgoJS9tnoz2rAKkdasV4aiimfA44DVTmm7JJ+DkAfN2TlJGB04=
+X-Received: by 2002:a17:906:c116:b0:ade:450a:695a with SMTP id
+ a640c23a62f3a-ae6cfbea8f3mr343461166b.61.1752087884599; Wed, 09 Jul 2025
+ 12:04:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1751743914.git.lucien.xin@gmail.com> <74b62316e4a265bf2e5c0b3cf7061b4a6fde68b1.1751743914.git.lucien.xin@gmail.com>
- <2641256.1751992436@warthog.procyon.org.uk>
-In-Reply-To: <2641256.1751992436@warthog.procyon.org.uk>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 9 Jul 2025 13:05:40 -0400
-X-Gm-Features: Ac12FXw-Gy78wqwOzpg95VzRYPTCTxXs-MQSS5qJzV_rAfy_j3TuOneN8vlxOwI
-Message-ID: <CADvbK_dDbzdxdfZT43M17hG6TKFfoQZ+YuZGR6q6E5s7eRUr4A@mail.gmail.com>
-Subject: Re: [PATCH net-next 05/15] quic: provide quic.h header files for
- kernel and userspace
+References: <20250701163852.2171681-1-dhowells@redhat.com> <CAKPOu+8z_ijTLHdiCYGU_Uk7yYD=shxyGLwfe-L7AV3DhebS3w@mail.gmail.com>
+ <2724318.1752066097@warthog.procyon.org.uk>
+In-Reply-To: <2724318.1752066097@warthog.procyon.org.uk>
+From: Max Kellermann <max.kellermann@ionos.com>
+Date: Wed, 9 Jul 2025 21:04:31 +0200
+X-Gm-Features: Ac12FXxBjj4Q8rQSAFMTvxq4Dux5Rk-Aycgaq2Qj_9vYK8pVlc0gHVgIsMegDWo
+Message-ID: <CAKPOu+_ZXJqftqFj6fZ=hErPMOuEEtjhnQ3pxMr9OAtu+sw=KQ@mail.gmail.com>
+Subject: Re: [PATCH 00/13] netfs, cifs: Fixes to retry-related code
 To: David Howells <dhowells@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: Christian Brauner <christian@brauner.io>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 8, 2025 at 12:34=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Xin Long <lucien.xin@gmail.com> wrote:
->
-> > +#ifndef __uapi_quic_h__
-> > +#define __uapi_quic_h__
->
-> I think capital letters are preferred for system headers, e.g.:
-> _UAPI_LINUX_QUIC_H.
->
-Looks better, will update.
+On Wed, Jul 9, 2025 at 3:01=E2=80=AFPM David Howells <dhowells@redhat.com> =
+wrote:
+> If you keep an eye on /proc/fs/netfs/requests you should be able to see a=
+ny
+> tasks in there that get stuck.  If one gets stuck, then:
 
-> > +enum quic_crypto_level {
-> > +     QUIC_CRYPTO_APP,
-> > +     QUIC_CRYPTO_INITIAL,
-> > +     QUIC_CRYPTO_HANDSHAKE,
-> > +     QUIC_CRYPTO_EARLY,
-> > +     QUIC_CRYPTO_MAX,
-> > +};
->
-> I would recommend that you assign explicit values to enums in uapi header=
-s to
-> avoid accidental changes if someone tries inserting in the middle of the =
-list.
->
-That doesn't sound like an easy mistake to make. Assigning explicit values
-to zero-based, continuous enums isn=E2=80=99t commonly seen in other header=
- files
-either.
+After one got stuck, this is what I see in /proc/fs/netfs/requests:
 
-But I will make such a change for QUIC_TRANSPORT_ enums, as their values
-are actually defined in:
-https://datatracker.ietf.org/doc/html/rfc9000#section-20.1
+REQUEST  OR REF FL ERR  OPS COVERAGE
+=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=3D=3D =3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+00000065 2C   2 80002020    0   0 @0000 0/0
 
-> > +struct quic_transport_param {
-> > +     uint8_t         remote;
-> > +     uint8_t         disable_active_migration;
-> > +     uint8_t         grease_quic_bit;
+> Looking in /proc/fs/netfs/requests, you should be able to see the debug I=
+D of
+> the stuck request.  If you can try grepping the trace log for that:
 >
-> I believe use of __u8, __u16, __s32 and similar is preferred to uint8_t,
-> uint16_t, int32_t, etc. in UAPI headers.
->
-Make sense, will update.
+> grep "R=3D<8-digit-hex-id>" /sys/kernel/debug/tracing/trace
 
-Thanks for the suggestions.
+   kworker/u96:4-455     [008] ...1.   107.145222: netfs_sreq:
+R=3D00000065[1] WRIT PREP  f=3D00 s=3D0 0/0 s=3D0 e=3D0
+   kworker/u96:4-455     [008] ...1.   107.145292: netfs_sreq:
+R=3D00000065[1] WRIT SUBMT f=3D100 s=3D0 0/29e1 s=3D0 e=3D0
+   kworker/u96:4-455     [008] ...1.   107.145311: netfs_sreq:
+R=3D00000065[1] WRIT CA-PR f=3D100 s=3D0 0/3000 s=3D0 e=3D0
+   kworker/u96:4-455     [008] ...1.   107.145457: netfs_sreq:
+R=3D00000065[1] WRIT CA-WR f=3D100 s=3D0 0/3000 s=3D0 e=3D0
+     kworker/8:1-437     [008] ...1.   107.149530: netfs_sreq:
+R=3D00000065[1] WRIT TERM  f=3D100 s=3D0 3000/3000 s=3D2 e=3D0
+     kworker/8:1-437     [008] ...1.   107.149531: netfs_rreq:
+R=3D00000065 2C WAKE-Q  f=3D80002020
 
-> > +enum {
-> > +     QUIC_TRANSPORT_ERROR_NONE,
-> > +     QUIC_TRANSPORT_ERROR_INTERNAL,
-> > +     QUIC_TRANSPORT_ERROR_CONNECTION_REFUSED,
->
-> Again, recommend assigning actual values.
->
-> David
->
+I can reproduce this easily - it happens every time I log out of that
+machine when bash tries to write the bash_history file - the write()
+always gets stuck.
+
+(The above was 6.15.5 plus all patches in this PR.)
