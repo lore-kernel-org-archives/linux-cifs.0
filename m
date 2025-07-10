@@ -1,76 +1,129 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B9F24728C
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Jul 2025 04:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C03E2E0939
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Jul 2025 10:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752121343; cv=none; b=NoSLqGSPMsNXzN/2AgZmqHziqtCkbkkBmfXQ1Bo1NjFWsOKyX3cyJt1eoj+/rf4ET6fRZkRAeNhi6ZlE4zdX/rTm6qub2VXCSyyjeDR5pkNscYAhQUC8pkdTnSCb2a0k72a2BBFOprz8D+urPv3ox/b1KnSaFPQ6uoCgJjmhEzE=
+	t=1752144441; cv=none; b=YH848zbyx06H+MKaw1gtW33wnzTpaXbctH1l/tRUVY1jYLzgAMcNu29pamskfBuxiS8Etp4Ouyw2Zm8MEz1ag3zr0k+XOrVuU3wAU+R2ntxYKiK+XTYWGho723A60kcyveYnisEkIjspFei78MkzfNuRzUEDaorTjHEDGyAiLak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752121343; c=relaxed/simple;
-	bh=crlk6CRTGZKMpbG9maBTXRpXWjqZTZDk2QTbY4wE/80=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=jmj7h1oXpAX6oc2upVHdQIqm5JYlprZlBP5lJM0y4PJX4qN8pvzUkBHOpyX221v6uEKzIAx2taR4FNSCd+9yvMkDtaU8zn1LwgVCXPHtqRRFti/hwTBKELNz7g7kxCXhsR2Snfw6ME7sl8GosX5dCHlpU53wYK/E1vicmm2RYGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrZbNaTE; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752144441; c=relaxed/simple;
+	bh=SOep39LCruQJ5eUJmcxYU0zPt7Rxb5VZwOl88D+y7tQ=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=grochlNozvh/56U3aCb4yOwr5yVpKViGzB8vYGwmsTEB3Y2O9WbdJ+MWJjJmRaPhqeq5pDkCiYTdwCjH3MM9M+L3TJoap8W+QEFJvdpHRNKlIQiwTADm0Eo9DqLbdifwxUbDYiHOt0YLDsENPDDBNn0uBflqiNQisfXFu1Hm5Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BKk6Jbww; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrZbNaTE"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6fad4e6d949so3262616d6.0
-        for <linux-cifs@vger.kernel.org>; Wed, 09 Jul 2025 21:22:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752121340; x=1752726140; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7gnPIUyT3f1G2z+TzAB8N1WPDBtbEShVAyaMW0dB0nA=;
-        b=VrZbNaTEy+qqbJyhXwx/fy7nN78laJq0sNBCQaeNk6QyW6pYT6ZC7IHvolwSjlu74E
-         jofQIjNs8xx9mAvdmYh3f3ZLUZWQcBY1o1WN/lIpCqM1h3pBeZavODJavIkPc86AXdwv
-         qGPhGdcm52utlgPwGMo11SiDFzD3kBN+seUuHM5gm5yEtQgKKdp7lqtrdQ82MXwy3LGz
-         4ZFVQtalF8Y4mfVC5Phgx3SeTK4aBAt4qCkjgLfWui/SnHYvwA52m57DRguO0eyIwk3w
-         d3kKI1EzReqk+XfyrnGjgvCXMu72cKqE/2b8kj9+XQl+Wdbr79MuIVdeIslZosYqJBSV
-         JqNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752121340; x=1752726140;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7gnPIUyT3f1G2z+TzAB8N1WPDBtbEShVAyaMW0dB0nA=;
-        b=V7zYu5E9xEa0JPSqZZxQNTghV83s/+YGCLRNQRwPN3XBy9kVmD6MPh4KvJCEXIJ/tK
-         UBoJFhJ5zUHP2sTbbRtqwXXLZfsbotn0KsLAeFISbziPZNxeLJNhJwgV9Ap6pSOYS/Kk
-         h0T09ICzEuJJ9kKyWNKu799YYDJMxuA6zrdY6lxDiNK/WSf1MGeIdnc/OElncsYI3a/3
-         3NLCGq+glFGi3A9PNYUSU8s4dJ8EcoNuV5yMrPW6+9Gp+i4ABikSxqt5ajRszhDBfr0I
-         GQwaKLfzmHF9SEHQboCiZCn3DY81+hit7XbB6y1HODYhxshA4CoZEhfaV3N3Xkilr6Op
-         3RKg==
-X-Gm-Message-State: AOJu0Yy8HyA7JejVK1BqV3QOncwuhdB92A7wA8aovj/fTwD/bDm/NbpG
-	b7rXY7MGjupy3In2LE0QV0+pDKRWhfPbhtbVsuyE0HUXYWCgvMRAr+Pb/ANR2yjpaj4LUQC9Jd8
-	/g+0uWFcFP050Q5N2A7NqjfQgFnDZHchg7fjbkZM=
-X-Gm-Gg: ASbGncseHyCKG8SvGS3CVgTvsdYsM4t/iyvUmtihZIruz8M2VfronMxY/l5QB0JH6P9
-	eGEkWq6/VGFTN/Mi9gwMGCSPV1wHs+xdUS4sgJE4gvU8QRfHevwiI0pOgcrvqa+AJ9ptsd4C6rV
-	CoF84dsTCt0Cqk4wswBShH07oA4TJhiKfw6IZXG5mam39H6ZmmruoQ7Aspk+JH/eesq3afSBEIs
-	ESh
-X-Google-Smtp-Source: AGHT+IFkseOjnkKcTR57OiQdfEqXh8rELuejv3VpTeBXiW50cV6spcrlrGdTmobtcXAsH8eHzOu6Nc1XBbBT/BmS18s=
-X-Received: by 2002:a05:6214:21ce:b0:702:c8dc:c4a8 with SMTP id
- 6a1803df08f44-7049801cf0emr12229686d6.11.1752121339986; Wed, 09 Jul 2025
- 21:22:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKk6Jbww"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752144439;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0u3HIoTZyqgg631O8XZeTrysi+dlK3ZJXgoQ/uYQ84=;
+	b=BKk6Jbww2FSrepC5BeSV/XFncmwRmMhgnhmgTd7M6V+y0Cfv53s1qBnI0dfw5iNsxOvxjy
+	4CRZJ1ypVF3lPJFGe3oml2St1AFYiBPvOUw/I8wgjmrXrzNb1pOvRJUvI8liGyCBvsv4mp
+	yMI7fW12/dStW9Eqfuz8Z8M6JK418is=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-408-Qs5apeF0MfKwPreNiR2KRQ-1; Thu,
+ 10 Jul 2025 06:47:16 -0400
+X-MC-Unique: Qs5apeF0MfKwPreNiR2KRQ-1
+X-Mimecast-MFC-AGG-ID: Qs5apeF0MfKwPreNiR2KRQ_1752144434
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D985519560B0;
+	Thu, 10 Jul 2025 10:47:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 488C719373D8;
+	Thu, 10 Jul 2025 10:47:09 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAKPOu+-qYtC0iFWv856JZinO-0E=SEoQ6pOLvc0bZfsbSakR8w@mail.gmail.com>
+References: <CAKPOu+-qYtC0iFWv856JZinO-0E=SEoQ6pOLvc0bZfsbSakR8w@mail.gmail.com> <20250701163852.2171681-1-dhowells@redhat.com> <CAKPOu+8z_ijTLHdiCYGU_Uk7yYD=shxyGLwfe-L7AV3DhebS3w@mail.gmail.com> <2724318.1752066097@warthog.procyon.org.uk> <CAKPOu+_ZXJqftqFj6fZ=hErPMOuEEtjhnQ3pxMr9OAtu+sw=KQ@mail.gmail.com> <2738562.1752092552@warthog.procyon.org.uk>
+To: Max Kellermann <max.kellermann@ionos.com>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Viacheslav Dubeyko <slava@dubeyko.com>,
+    Alex Markuze <amarkuze@redhat.com>, Steve French <sfrench@samba.org>,
+    Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 00/13] netfs, cifs: Fixes to retry-related code
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 9 Jul 2025 23:22:08 -0500
-X-Gm-Features: Ac12FXwNDfL5mMjafd4KxudDm6D8aIY7bj-OLAcKGBstzeGelxEnqNtFeWSE4Wk
-Message-ID: <CAH2r5muf4eFPiVjT53Zbqirs8DTsLsjnTpGJV1sA_DYj+98x5Q@mail.gmail.com>
-Subject: regression tests for SMB3.1.1 POSIX Extensions - many tests added
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2807749.1752144428.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 10 Jul 2025 11:47:08 +0100
+Message-ID: <2807750.1752144428@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-I have updated the buildbot (now over 250 xfstests successfully run
-from current cifs.ko to Samba with "linux" mount option, there are 17+
-test failures to debug).  Very good progress.
+Hi Max,
 
-   http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/11
--- 
-Thanks,
+I managed to reproduce it on my test machine with ceph + fscache.
 
-Steve
+Does this fix the problem for you?
+
+David
+---
+netfs: Fix copy-to-cache so that it performs collection with ceph+fscache
+
+The netfs copy-to-cache that is used by Ceph with local caching sets up a
+new request to write data just read to the cache.  The request is started
+and then left to look after itself whilst the app continues.  The request
+gets notified by the backing fs upon completion of the async DIO write, bu=
+t
+then tries to wake up the app because NETFS_RREQ_OFFLOAD_COLLECTION isn't
+set - but the app isn't waiting there, and so the request just hangs.
+
+Fix this by setting NETFS_RREQ_OFFLOAD_COLLECTION which causes the
+notification from the backing filesystem to put the collection onto a work
+queue instead.
+
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use =
+one work item")
+Reported-by: Max Kellermann <max.kellermann@ionos.com>
+Link: https://lore.kernel.org/r/CAKPOu+8z_ijTLHdiCYGU_Uk7yYD=3DshxyGLwfe-L=
+7AV3DhebS3w@mail.gmail.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Viacheslav Dubeyko <slava@dubeyko.com>
+cc: Alex Markuze <amarkuze@redhat.com>
+cc: Ilya Dryomov <idryomov@gmail.com>
+cc: netfs@lists.linux.dev
+cc: ceph-devel@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: stable@vger.kernel.org
+---
+ fs/netfs/read_pgpriv2.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/netfs/read_pgpriv2.c b/fs/netfs/read_pgpriv2.c
+index 5bbe906a551d..080d2a6a51d9 100644
+--- a/fs/netfs/read_pgpriv2.c
++++ b/fs/netfs/read_pgpriv2.c
+@@ -110,6 +110,7 @@ static struct netfs_io_request *netfs_pgpriv2_begin_co=
+py_to_cache(
+ 	if (!creq->io_streams[1].avail)
+ 		goto cancel_put;
+ =
+
++	__set_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &creq->flags);
+ 	trace_netfs_write(creq, netfs_write_trace_copy_to_cache);
+ 	netfs_stat(&netfs_n_wh_copy_to_cache);
+ 	rreq->copy_to_cache =3D creq;
+
