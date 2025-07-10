@@ -1,125 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB3A2FCFC6;
-	Thu, 10 Jul 2025 18:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621A12749C1;
+	Thu, 10 Jul 2025 23:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752172702; cv=none; b=dwm0b3PsxTbpMwEVKiXmYN0KTJED9IX4CacNLnTT6GTCXv5csUSMbxPRjjfhGmU5fGBdntZ6A6VeF/UmYX7jH6L1/kSxiEff44u3/BBXhOOMRXsXjvC6MWrTcfTsa7vIen1A70/2LJs/75O2hG39LFmbcIxgv9j/8QTXIF1ju6I=
+	t=1752189512; cv=none; b=Dy8v3YKRsJ7IyQVjqMVqjouFmLlcjX3IaauxWk1IxKjQzPwAn3YMCgVVTwkrGAFVoiEiTVux1fdiG7eNl9A0PPru9ctUOtsFL9KLwe0XduY6D0TXr8UEwSQAtOQnOWKtREg8RD1F4kUYcONeIGLMbpO6mGPCSo3ZPdgJKhglHZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752172702; c=relaxed/simple;
-	bh=JZCEG40vmHdyDVxTyrSF4qC4VT4033mC0LmdRSjg7OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qnwb8M3IpMYDBFsmXDUakC1CS5SsNJMcizg69shl/e9MplFX10jF29wMRAbquML+J3u23UK4FA61JoNxWT5BwMvSLbAhDvk0RKAxLbVzwrXFfXF98YrTlyWcMfse+3mQPHfDTTe8D7bwErdkxb25ZscGv4J2WTpsRk1sv2iWCDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cKpCvUu2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752189512; c=relaxed/simple;
+	bh=aodGrJ/fTeAXeqty12g3ynGJwycpDTx4HpYmcMWtMl4=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=B7cbJ3jmtPiadpODi4KJtCnOuWQNv9PbN3FQD9YZEq5lfqAZfcVhiLqB+/C5A9Ly1Q5S6O5zJdvxDsSF41oY5P/JuGdfTcCeovVuoYwKbD7oBmA2tCUnCEO9C3Nl9fg7znnCAaGN1qTurmL/esvIakSnIubdukcjovWnZ3s0i/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=HLZ0BNO7; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cKpCvUu2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E44C4CEE3;
-	Thu, 10 Jul 2025 18:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752172701;
-	bh=JZCEG40vmHdyDVxTyrSF4qC4VT4033mC0LmdRSjg7OU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cKpCvUu2BItmecSIdUd6M3Bt3izHBlkBCm0rECexrSlLMDMUHkLctgAtiETS5R2T3
-	 0xC9vpACRwGNCWroX2u8CuRChE5QEEo19BoJuwvxmpdm8oCaV3qVATXa3kJJ4NxtH/
-	 S+/S99O8vIdFXrVLfblrx4gJSuWU4b9hhPHgzQ8gcYTATCLJ0nro5YUeBCULPNfYKC
-	 CSK7xj+o5kf0Othk7d6r7AouSxyhAn2SaOpYYi2OJvKCwHgeOmUgBbaT1psODlRck9
-	 zCz21B7/mzl9tZh33rEGsmeHgcqnDU3cvaoW79txpX29gyfjHoGTycfHuhG6ebfHun
-	 Qri8uB0sdijJA==
-Date: Thu, 10 Jul 2025 20:38:17 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: "G. Branden Robinson" <g.branden.robinson@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	linux-man <linux-man@vger.kernel.org>
-Subject: Re: Missing man pages
-Message-ID: <m66rzkwcmvgs4eeqeu2ms3dqsowanhoazukgqw7tcxse6wkzss@rtau33yxxwpu>
-References: <CAH2r5mtwv16LtkbXywgA=LMe71=jY64j6qUr38nqV=mKgOUTgg@mail.gmail.com>
- <d37b4e97-bac7-44c0-901b-e7b686c985b2@redhat.com>
- <20250710160347.vi25bnpwmvof3yl4@illithid>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="HLZ0BNO7"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=hkTY2Grgv3lxoA658Ko78kXLgI7Ac/QSzydWzjTrTvM=; b=HLZ0BNO7VxUIIj7URIpk/LQIlv
+	Y4DEH0kmjHX5x2lw/7+gV6odgnHKLGjOB1V/tYS6NcE27U7pgwd3sFI064VqV2V6+RXYxnoxz5BG1
+	VlsFOfnF5t0p2i0nB0xEuXNJvELanRW0JzQXc0lWEsOzh133dTxdjSm/4D7P7k4GsPfctaowXEfxy
+	QQ7vu3FWF60klTZZNyAPe44yTibVRSKwOwdVtPJXxzrvHaM3pLZSPVZNhbf/DPuZJo567SlK8VJGu
+	HbhTsxlTE2QrnjByaXQfZoLJxW3hpYde/wIZ4MYAEVOEjOl5xbesU2XvD9p8PuO+Po8IsL2zg/qEV
+	10pT5P3A==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1ua0Wv-0000000090R-1Prn;
+	Thu, 10 Jul 2025 20:18:17 -0300
+Message-ID: <bb5dba5b431172ae8b268470d6e37419@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Wang Zhaolong <wangzhaolong@huaweicloud.com>, sfrench@samba.org,
+ ematsumiya@suse.de
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, wangzhaolong1@huawei.com,
+ yi.zhang@huawei.com, yangerkun@huawei.com, chengzhihao1@huawei.com
+Subject: Re: [PATCH] smb: client: fix use-after-free in crypt_message when
+ using async crypto
+In-Reply-To: <20250705025118.48080-1-wangzhaolong@huaweicloud.com>
+References: <20250705025118.48080-1-wangzhaolong@huaweicloud.com>
+Date: Thu, 10 Jul 2025 20:18:15 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ga3fzdvilxofaec6"
-Content-Disposition: inline
-In-Reply-To: <20250710160347.vi25bnpwmvof3yl4@illithid>
+Content-Type: text/plain
 
+Wang Zhaolong <wangzhaolong@huaweicloud.com> writes:
 
---ga3fzdvilxofaec6
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: "G. Branden Robinson" <g.branden.robinson@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	linux-man <linux-man@vger.kernel.org>
-Subject: Re: Missing man pages
-References: <CAH2r5mtwv16LtkbXywgA=LMe71=jY64j6qUr38nqV=mKgOUTgg@mail.gmail.com>
- <d37b4e97-bac7-44c0-901b-e7b686c985b2@redhat.com>
- <20250710160347.vi25bnpwmvof3yl4@illithid>
-MIME-Version: 1.0
-In-Reply-To: <20250710160347.vi25bnpwmvof3yl4@illithid>
+> The CVE-2024-50047 fix removed asynchronous crypto handling from
+> crypt_message(), assuming all crypto operations are synchronous.
+> However, when hardware crypto accelerators are used, this can cause
+> use-after-free crashes:
+>
+>   crypt_message()
+>     // Allocate the creq buffer containing the req
+>     creq = smb2_get_aead_req(..., &req);
+>
+>     // Async encryption returns -EINPROGRESS immediately
+>     rc = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
+>
+>     // Free creq while async operation is still in progress
+>     kvfree_sensitive(creq, ...);
+>
+> Hardware crypto modules often implement async AEAD operations for
+> performance. When crypto_aead_encrypt/decrypt() returns -EINPROGRESS,
+> the operation completes asynchronously. Without crypto_wait_req(),
+> the function immediately frees the request buffer, leading to crashes
+> when the driver later accesses the freed memory.
+>
+> This results in a use-after-free condition when the hardware crypto
+> driver later accesses the freed request structure, leading to kernel
+> crashes with NULL pointer dereferences.
+>
+> The issue occurs because crypto_alloc_aead() with mask=0 doesn't
+> guarantee synchronous operation. Even without CRYPTO_ALG_ASYNC in
+> the mask, async implementations can be selected.
+>
+> Fix by restoring the async crypto handling:
+> - DECLARE_CRYPTO_WAIT(wait) for completion tracking
+> - aead_request_set_callback() for async completion notification
+> - crypto_wait_req() to wait for operation completion
+>
+> This ensures the request buffer isn't freed until the crypto operation
+> completes, whether synchronous or asynchronous, while preserving the
+> CVE-2024-50047 fix.
+>
+> Fixes: b0abcd65ec54 ("smb: client: fix UAF in async decryption")
+> Link: https://lore.kernel.org/all/8b784a13-87b0-4131-9ff9-7a8993538749@huaweicloud.com/
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+> ---
+>  fs/smb/client/smb2ops.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Hi Carlos, Branden,
-
-On Thu, Jul 10, 2025 at 11:03:47AM -0500, G. Branden Robinson wrote:
-> At 2025-07-10T11:55:13-0400, Carlos O'Donell wrote:
-> > Since Michael started adding a curated set of man pages to man7.org
-> > from other projects in 2013... how are those sources kept up to date?
->=20
-> By some script(s) he has.  I've corresponded with him about it, briefly,
-> over the years regarding his copies of the groff man pages.
->=20
-> > Is man7.org a part of the Linux Man Pages project or just Michael's
-> > own published collection of man pages?
->=20
-> The latter, I'm pretty sure.
-
-The latter, I confirm.
-
-The official online manual pages of this project are only served as a
-PDF book, the latest released version of which can be found here:
-<https://kernel.org/pub/linux/docs/man-pages/book/man-pages-6.14.pdf>.
-
-I also provide a PDF of git HEAD in my personal server, updated by a
-script on every git-push(1) to my own git server:
-<https://www.alejandro-colomar.es/share/dist/man-pages/git/HEAD/man-pages-H=
-EAD.pdf>
-
-
-Have a lovely day!
-Alex
-
->=20
-> Regards,
-> Branden
-
-
-
---=20
-<https://www.alejandro-colomar.es/>
-
---ga3fzdvilxofaec6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEES7Jt9u9GbmlWADAi64mZXMKQwqkFAmhwCJkACgkQ64mZXMKQ
-wqnorw//a1UR2JytzMaJlAF7FHjC8nAIug1pSJTJm/QCtvX8tyzq7Y75OGV9kaWD
-PJvRbWCdjF/aruiEJyvM/r0uH4X1ffCgrW2yDdoMQlvmrAkHord8usu9XnUPeKd2
-eHPXHY9gG24NonyX3A6p5Wv41i/H36QS3VRQp3l8JO0WpigI7ExOQ0PRXGljKySR
-+cfOeclblIxYS67gN/1RmA2tzZE4N5LRcORJb1hNIGRwQeqncQAYSpLIjc+/yGZO
-1V/mwuDWePZ/mj67Dft0nwPdrYOpJjfruBgR3iqRNY2BXjDmIpJFYBgbtWH59bMk
-bzg/f0THybBi1tde4IpKKMyrb02CcDMjpN4jWyrjGNOUeyijt1zDTx/LcGkZ6V6M
-q9kGMqNoE64MUwBJBCKTIaYpmO78wFCUT8mZkLkNs7cXGEUZOLeJqWhml8PA0iYK
-D8VwML4rmCe9yJgTSI02oktqG0pihZ1v0mxjYDrcNvldV2Gb6AcZfbKzoA+ezuUM
-9Hp5qwPe9jp+CjKuSDHo5kuZgUHzBYW91jnvuGD5l3/UkLUwwmcKY1TR3GThMhFG
-odlF6iFB4EEoVMFD9uuwmJMSFzz5gud0lPzEH0AjCdQi6/T90lVIG4UMtvgLT47+
-xnyu0L77axn/sWgtmBWS+Au6CtqUJQCv+E+AbqcKwtIGKaSnV44=
-=Vaqm
------END PGP SIGNATURE-----
-
---ga3fzdvilxofaec6--
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
