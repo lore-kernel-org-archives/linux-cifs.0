@@ -1,90 +1,86 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744F8262FD3
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Jul 2025 13:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB0A173;
+	Thu, 10 Jul 2025 15:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752154901; cv=none; b=fsGsjXtDc6I2oYJx1rgCWwDcMfCrB/upczphS704Pt9xWMk4dDYFYBogaGwxJd5rUq3DelJ9On+qkh1Z3U9Gjn0fku9X8i+EGIbamdhAeo1dnK202q48v3IAw8/lGV7c2WD5Z8mmmX21GXoup8Eb3Bp7xLU78b5fgMjwVeikItM=
+	t=1752160041; cv=none; b=E4y4fIGFioRv2AkrNFRA3WnGJIpX9EvCLvCyqavnzZKywFeZAbH0PGnukFDP1yLY791IL8UmFL5/0t9J0H7YILuYm3IL9MbfXBoI1Mud+BSMB/nYUdeSvzKc9fWLaCLdvuXrC0qEVL/xRwRChcVmwrvGzTPUmXxUd/lsklVG1Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752154901; c=relaxed/simple;
-	bh=Y2cPTKyp8+pa4kvRMd2DbHQIqkwHAegaMbr/kZOwiA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eENW4UYTtAWu2ru+7eBymGdXej3dPXQCn4pu1ZAAomkOofq7DZJFPDhoV/7ENrREpV/6avb/KHr2lt9IFhS6lS3aZQPYgDDWJMaEMS+GkfpOIBdvLGqO0I6NCb3ChaRsNbTGeUzSSQrUKV/x0EZWytPeg4f8gwCe9ox0RT8uYgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=XEgfwOn6; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	s=arc-20240116; t=1752160041; c=relaxed/simple;
+	bh=9U1epZLZQM7hFmBfZgNPaqm8MR6dRz37kDOZKH4yF4s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=LEEBsrlxxHAtW/1oIszv4j8nNTb2zwNm9H0nj24D5yM0LRFe2WT7TdEdb0vynW0N3mMUHqsEj7foQ1gE8nnuhXOgr+lZm/RV4ZoRNB/MGzRI6+ngJjZ+CsKV1+wUzMJi2PB39UG85QNb4IFccHlE9FJDHJir9e8byy3QDh9cpVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XajMpbR+; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="XEgfwOn6"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae0c4945c76so152733766b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Jul 2025 06:41:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XajMpbR+"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7da6ca0f1acso117952685a.1;
+        Thu, 10 Jul 2025 08:07:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1752154897; x=1752759697; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y2cPTKyp8+pa4kvRMd2DbHQIqkwHAegaMbr/kZOwiA8=;
-        b=XEgfwOn6lEE9/qgA61ga1NXFOke9ca1L74o1p+WZjkWJ/CM8+cXLpM0vWp4RAJlLmt
-         E8/aZmPgy+LXVRv48r6krjog3A0x17OhAewlZxL7OkaVnj856GbgLsg2QB1/aszz39oz
-         BuY+cNeHTRWSvj0R0JYI/b7eQdDRE+7TgV0Li1xTF+K9owuvbD/axBa6hxrc6Q9cFS3n
-         4q6nkCk8BMNizCuUGd07o5psDhI48EXo+KMKRTMof/QYIrsbZGFdKDjw4hsPqpt/0OH5
-         NCfpXVYRoeOdWeXWxUuAsZ3kndaSvJICAtqmuRNWcPry50hpsC+ldjdkaBZ9kBt8vJ5X
-         OxYg==
+        d=gmail.com; s=20230601; t=1752160038; x=1752764838; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Atql6nVfi6fDKHIUJVvTbc4Me8TMOZVeEvM0dpNfZG8=;
+        b=XajMpbR+2iaXGcyyWI8rqY7ji1iKuo+DqOlGCpSte/sVhOQ69iT+gnckdk9PQR8MEu
+         GfTXGS75EKm+yG/LI9LzZFYS0yazZw2ke2ZodbXDXloNIiFKQWdvkYS3Qf/jmKNIHswY
+         S6we82Q3WikSVCJsGeOfmp/BMxqZCodAa6Effyay+5NqdgNuY117UXYpL8Erl5NrqG1r
+         BWOkbrwcD3f7BHACS3ou1gZMjS1fZ7XKdPBs1yx3gdPN+7GTqaYAAKarOAZ4Dkfx0jwP
+         qAzFkHjVhgBcRtn+itO23oOnh09YInS8kqb9Z36zcif15H8xUExfdQKIGAyiHRAIlk2p
+         bi1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752154897; x=1752759697;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y2cPTKyp8+pa4kvRMd2DbHQIqkwHAegaMbr/kZOwiA8=;
-        b=AlW+zfmd0k6T6BQC3RfT5IKwLFWE8SzRz+23C/8I16JpOY0hF16fTEv9FU2j1L+i12
-         PrN/HPtwLcus0OYQlvj2i/0he1ai2qXj+vmhhfOYj+n4ZD3LQ0+ItFilr35qxJBwpVid
-         jfA9pHxbalJ104Fj63xdBgvW/lAEVuE2UlA9OI9lYRsMy+6rjl5jDZ8kBy2Cx1heemPw
-         iCxM9HduI9O+o55590iXP7ZusUmzKiZ/eYZOQmqYm/AhKGVMsqn+sqYdXfLV5Q+hMTn5
-         lb07ASRfhTXil/C5nicZntVUo/2c5W1RWHtzXkUuod53KEz5QZRm6wX7EuWAuDS29n+3
-         7jCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmkoJXp7CEo9+n1d3aTYgXRd58ecmdEfvTc64dzrFqJQ3AZ8Wr0IRQZlwGNPEgDvwjQjputYr48xiy@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywr0aTjMmN9hRSjZIfSLOi2GykocG3fmKx7UG9l2yj/5XoLhYEx
-	JCfICU8IV2NM+0afTynRm1OqqwPSQpVY8uJi8X1bbhOcDeBkgDe2hzTxj/gdblA8HDUKGxjlvAz
-	Dh+7ylhG7vHp9F+mDCOx6N/Lh/fptCk6vxb999d2PeA==
-X-Gm-Gg: ASbGncsq2/m3+khhQPtmaTD+p3PMUmM2aSEEPVG6Y/W37RMeW9usILExcgD2YQbE+zJ
-	Q1kDinam7BADOx4i325uAj8tKz1a/ON+ZIXwaViCtG7uyfttcRMULV+n46ZJhce2LFKPqBb7epi
-	74g0xDy/J2Vegb1p9FzS4YZ5I9pH3hqxbv5HbEADtlEyPFAYAGmeBctQG3+1bKZGgg4Sbm19Q=
-X-Google-Smtp-Source: AGHT+IEUfIhpap/ErtxncROC/XukLmMNwnnCP5z2dolLnhei5TAHwMgshdrm44CHSjNOH/5s8BRS/dOJLaexhl9LvyA=
-X-Received: by 2002:a17:907:d93:b0:ae3:6390:6ad3 with SMTP id
- a640c23a62f3a-ae6e6ea0035mr262408366b.22.1752154896676; Thu, 10 Jul 2025
- 06:41:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752160038; x=1752764838;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Atql6nVfi6fDKHIUJVvTbc4Me8TMOZVeEvM0dpNfZG8=;
+        b=htjlC7m+oHsXCswhFINTPNWJD8if35ckHbLPVJDLu0g/OA1qXl5jDL3LhRrg8XGQTk
+         MGmTPk/Xs/50l0WKNaDq2Q46+sCUC+m5rd1JYothnE0snzehaRz3G1OpapvvIFnkVJA9
+         MURHfIY1wuVdrk3F+u63hOtLO/tlXZtQIA4ldfIz+JVqsgtc/eYE0v9Lh+1WzeHxR29Y
+         T3Sj+zbW9SSHXIqNaS7ysYQiZ0j8ULQCAmxxJD3pRje00uTBBNygpEi1nsH+aGfEnmCB
+         rDVefpSj42S6WjEzEHprPz8qsToyPNb5jhREDklhBocj4c5ScW+TYFvln30oaCpjnhxd
+         FG7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSeu/6YMEi3PByvG1x8aeCzmCYpgGwARBh6pMpOGLiboGM9pCcDhnZNOTrF0i5gC+yPaFVuZvIemw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO7SZdbZItPYWqGH2bWhuAN1JRV4Bq/9ZOjTepu3ywtmkEemWJ
+	mcLDWpFnzgfA6eUzmHpK1hV7pZ6q+NC8cOYNWSKnamGc6c0i5v2d/B/895XIiQ+intukrv91cXW
+	9T/qnMbABabikdbQX9uWK6/oW3hMdQNdT/bsaf2Y=
+X-Gm-Gg: ASbGnct1RClc+0WzywOisPPIALPi4n3cYh5ahFgHVu7tg97NMmzb+efhBhdRp3kLdbX
+	+OmGVyH8H591ycPAUidEgicnZ+6S5yVLkIBsStxOzk7DPA6qjqOAeym6iuUrCJFmfwHM/W2l/l0
+	OaGa/dNbqqwmaCENfzOBE8sx0ybtpeilLadLmwWWLEHIAz1uvnjw5ZWa909q2zpCawL8zz+hTEN
+	gk=
+X-Google-Smtp-Source: AGHT+IHzY3HZjbdx7ILFWP9PZmywEbG8PwpyEyfni/qAyCCIhEv3Kk+vzekVF9OKAl5m+oQpNDLr23HmZzG5iYxpBVs=
+X-Received: by 2002:a05:620a:4052:b0:7d3:a7a7:27ad with SMTP id
+ af79cd13be357-7db7cead91fmr1059458085a.37.1752160037566; Thu, 10 Jul 2025
+ 08:07:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250701163852.2171681-1-dhowells@redhat.com> <CAKPOu+8z_ijTLHdiCYGU_Uk7yYD=shxyGLwfe-L7AV3DhebS3w@mail.gmail.com>
- <2724318.1752066097@warthog.procyon.org.uk> <CAKPOu+_ZXJqftqFj6fZ=hErPMOuEEtjhnQ3pxMr9OAtu+sw=KQ@mail.gmail.com>
- <2738562.1752092552@warthog.procyon.org.uk> <CAKPOu+-qYtC0iFWv856JZinO-0E=SEoQ6pOLvc0bZfsbSakR8w@mail.gmail.com>
- <2807750.1752144428@warthog.procyon.org.uk>
-In-Reply-To: <2807750.1752144428@warthog.procyon.org.uk>
-From: Max Kellermann <max.kellermann@ionos.com>
-Date: Thu, 10 Jul 2025 15:41:25 +0200
-X-Gm-Features: Ac12FXzl_JlkX217YnsQK9NDpeOWbIXCejwCEnw4V1qbmZHn5mJ_E34Ih5jkMNQ
-Message-ID: <CAKPOu+9TN4hza48+uT_9W5wEYhZGLc2F57xxKDiyhy=pay5XAw@mail.gmail.com>
-Subject: Re: [PATCH 00/13] netfs, cifs: Fixes to retry-related code
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>, Viacheslav Dubeyko <slava@dubeyko.com>, 
-	Alex Markuze <amarkuze@redhat.com>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 10 Jul 2025 10:07:05 -0500
+X-Gm-Features: Ac12FXwSQKvwCgLt0BXm7eGL9c21p3d_ONylHlm-8LuwW63IfLX0kvFBGlvs54E
+Message-ID: <CAH2r5mtwv16LtkbXywgA=LMe71=jY64j6qUr38nqV=mKgOUTgg@mail.gmail.com>
+Subject: Missing man pages
+To: Alejandro Colomar <alx@kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, linux-man <linux-man@vger.kernel.org>, 
+	Bharath SM <bharathsm.hsk@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 10, 2025 at 12:47=E2=80=AFPM David Howells <dhowells@redhat.com=
-> wrote:
-> I managed to reproduce it on my test machine with ceph + fscache.
->
-> Does this fix the problem for you?
+How can we get missing man page (mount.cifs) added to man7.org?
 
-Yes! I can no longer reproduce my problem.
-Thanks, David.
+https://git.samba.org/?p=cifs-utils.git;a=blob;f=mount.cifs.rst;h=d4890706a0fed73f05b3a228971756b57efcb9ba;hb=refs/heads/master
+
+I noticed today that mount.cifs man page is missing from your site
+(and presumably the user space tools man pages are also missing
+cifscreds.rst   cifs.upcall.rst  idmapwb.rst     pam_cifscreds.rst
+smb2-quota.rst cifs.idmap.rst  getcifsacl.rst  setcifsacl.rst
+smbinfo.rst)
+
+
+
+
+-- 
+Thanks,
+
+Steve
