@@ -1,94 +1,107 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5ED21507C
-	for <linux-cifs@vger.kernel.org>; Fri, 11 Jul 2025 09:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526E4225409;
+	Fri, 11 Jul 2025 13:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752224530; cv=none; b=d3Myv6qoKURfzQaAi7wo8Bht2I4fuqh4N9FONH1lSYHMbxYwOK8rKuY1MwthesdOPvn3wtYYSB+ZFOJmIVdRe+ByBUq5vXzKZCxHYwqw0LHUPfVd0JW4leScncGEmblHGLaRKWbzBq+dpFmND0Y/vyI8BSKxImXdMmwJjgn83uA=
+	t=1752240101; cv=none; b=NKuPKGF8E04Vj8+ak9JZd0Odtwvoy5FTR9BKV16yglkF6ZsKZ+TRFheJqp95Vfi2JETEkTRplJrBpKA0R1FARHsou0YJiLdkB81eguoC9ZauB727zFCz+jq3nGxT/u/IVp7dvQsOYLeN+9lOMsu/aLYRwYDYYqpXJnatwcTID8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752224530; c=relaxed/simple;
-	bh=cto3EzGQZzW73ugCld0nMZaHD1j8pd8ICo4AwYB7fdA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=QIAP8vVXcMScDHLfdf8bza4vxr+4pobTTXRSiScONIplw/04G2Z45YQdZF+XyKAQ63zMRDXUnooJJzSYhk8LZn9Qfgvzoz18uQBNbwPf/k4C/LivtE7A2V6IIqNQtzcKqnRpKmWA7knn4+UL5F9ANfBOIOFRNjb3iAcXh6qQptA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y+f+vC/3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1752240101; c=relaxed/simple;
+	bh=dSNAMnuv+BkI95d4Dm8/FiNySCqZ9pAGdkc7mtVgEZ0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=m3qgEaPk3R1BOzayPCZCkku4ZtZo16U3/zD47hLuo1Emj2n89xqTmPNJK3vFtLMSY0eXpe1rKJqUZklYmHJhDw5QLDC2zslulgw1HQ13r4zdHloGL9h38FobR/LE1GeB11CKtSMERQ+7wTpZWrCYUfkWO3Phx9rsuYOdOdTdR8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Job6neyJ; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+f+vC/3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752224527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o1jZHyMv/IfsPFuzxj8R0DksAkT3xvNU/ruvopmewh4=;
-	b=Y+f+vC/3KdE2OJRYUMJCkV2DxDpJCTWzKIiREt1gmc0SR8aMBP/FcBEEY1k4QAXYSpwIzQ
-	HAtR548Pm/GIGKZoeu1ErBsEREtMMn/t4sPL2iCksneXcGT9GwokFKRn8fFH63U4xE5x6p
-	urQfAAxmJhL95MI07N6LDMNbVOEvNbw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-rivJtzP0M4KrE81clFfU_Q-1; Fri,
- 11 Jul 2025 05:02:04 -0400
-X-MC-Unique: rivJtzP0M4KrE81clFfU_Q-1
-X-Mimecast-MFC-AGG-ID: rivJtzP0M4KrE81clFfU_Q_1752224521
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A262819560A5;
-	Fri, 11 Jul 2025 09:02:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E349030001A1;
-	Fri, 11 Jul 2025 09:01:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250710165040.3525304-1-henrique.carvalho@suse.com>
-References: <20250710165040.3525304-1-henrique.carvalho@suse.com>
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: dhowells@redhat.com, stable@vger.kernel.org, smfrench@gmail.com,
-    linux-cifs@vger.kernel.org, Laura Kerner <laura.kerner@ichaus.de>
-Subject: Re: [PATCH 6.6.y] smb: client: support kvec iterators in async read path
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Job6neyJ"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6facba680a1so24743486d6.3;
+        Fri, 11 Jul 2025 06:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752240099; x=1752844899; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EuX3ICAYnUTpsZWVFSGh4CguXQXupO9Qh6aMnKpy4og=;
+        b=Job6neyJYNTbG7SP8ICGIB/3EtP+gldt68BP8mX8i7rvZIhL4aArMeBadfUHEP0PY/
+         32v4MGPB2lQhv50rZIIL/6rDLYIwGIU9uq/FuneXA8RkCfiUr3oLDmSZBk1lLDV3KpRk
+         Xg//p8Mri2SmHMoDjUPaSnFbc2kR7kkIGHm5ZC5rJWOHQVSMIuqHb4Q3EGRHdl0MkcMa
+         jG5zeGwIPoKaI2lT3uekyBMksoWz297z95bLv1OxF13E3ohWGfbhtumklJK4GN2QBWEJ
+         rL5jt1vWLJwig6yeLxdZhEidwumGxb3VEAj2sTI8dfEZfvjZQn3a1hkYrNBWePhW9gVw
+         7PRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752240099; x=1752844899;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EuX3ICAYnUTpsZWVFSGh4CguXQXupO9Qh6aMnKpy4og=;
+        b=LhwMExnKIKLnRlRCZ5rDl0GNCN69GpabJZIb6bt7asFy4RdrWFKFvDNrUFdtmEaFnl
+         X9oJXa7X0PYCeyWBz2S/wtMX2Q3SFYFZ0683vRsZFVI5QS01HXzbNiIbSHX6fx0gXnG/
+         uxaHmcMzbSnz29ojPncOTV9drJx6WAnrEvujcgFDbLMdT+wdGjw2cJey3U4e24Wag5xm
+         pHSDLsh3gJLvIAnOjNR33R8InemR8EE5R4gCSVzNKS5zyQcWWWAKRN9tRjHglzj9v8aU
+         JoyxyWrtGQ0QlBgO0hIboet3uuKDgDh3By5gXh+tn/5juPTm1XTgKYygDVP8m2I1YxVf
+         51ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBbzyzpyBAbIZon7T20XNy0NftKv+bYEpXWNc1mA6GMwKDIBPXqQoNiQ7n03oQ7ds3vLhH6HMz+x0V@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsuekWEgg8sU/5bgGZ0NxMlipirKjEoHas6nZunx2cVlZwC4Ik
+	iSfrLhjzcY9rKuxaCXlbra+pvPRfc7INFKhSSEzy46XK/R1bfAucHqG0mxh9x0GDfTgKitPt7FW
+	NFrnk9XrHyfdLvJOq7JbLJ2IM6HOo0g4=
+X-Gm-Gg: ASbGncugGpbEOo8HzIon2+XunZIfeURfaGueBC0VOwA1Y66Dt4ujLdPvajrccaEwzyj
+	ucgZaFv5hQQAwaoxfFV/3/9A+/YRimd+pJmoS0UDaGhyDO+V1AQ2JoTrqnt/oAh3eyf2OSGawI5
+	Wi4JiGqTP+tTuyQqBQiksaH3tZrlGBUtsbF6dOkgZkHz5u1jCP9hMvH9TZcWQVm30b3NVjKER/9
+	EMfeVV0S45ytIf6eT9BGpmqK57tJIdkZmloJZEd
+X-Google-Smtp-Source: AGHT+IGm5UFwGN+IqEb9j/2jjIxWU24Nptwg28TwetWgtXr2Ofq9kPhrZzWZgzFxysg3OmZFNeVAW3hATnNP7aGRqCk=
+X-Received: by 2002:a05:6214:1d2d:b0:704:8916:dbc5 with SMTP id
+ 6a1803df08f44-704a4084244mr54191016d6.12.1752240099144; Fri, 11 Jul 2025
+ 06:21:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2944135.1752224518.1@warthog.procyon.org.uk>
-Date: Fri, 11 Jul 2025 10:01:58 +0100
-Message-ID: <2944136.1752224518@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 11 Jul 2025 08:21:27 -0500
+X-Gm-Features: Ac12FXynEwK470HqD-sPgNDYwSbpIEiGKBvZ7NK9L9Vz4cMZWpeAFoXdS_4b4GY
+Message-ID: <CAH2r5mvKVofnEbFwtqAMcA=R6Q3Prp9hzqzBPEoAdyvJGgL06Q@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Henrique Carvalho <henrique.carvalho@suse.com> wrote:
+Please pull the following changes since commit
+d7b8f8e20813f0179d8ef519541a3527e7661d3a:
 
-> Add cifs_limit_kvec_subset() and select the appropriate limiter in
-> cifs_send_async_read() to handle kvec iterators in async read path,
-> fixing the EIO bug when running executables in cifs shares mounted
-> with nolease.
-> 
-> This patch -- or equivalent patch, does not exist upstream, as the
-> upstream code has suffered considerable API changes. The affected path
-> is currently handled by netfs lib and located under netfs/direct_read.c.
+  Linux 6.16-rc5 (2025-07-06 14:10:26 -0700)
 
-Are you saying that you do see this upstream too?
+are available in the Git repository at:
 
-> Reproducer:
-> 
-> $ mount.cifs //server/share /mnt -o nolease
-> $ cat - > /mnt/test.sh <<EOL
-> echo hallo
-> EOL
-> $ chmod +x /mnt/test.sh
-> $ /mnt/test.sh
-> bash: /mnt/test.sh: /bin/bash: Defekter Interpreter: Eingabe-/Ausgabefehler
-> $ rm -f /mnt/test.sh
+  git://git.samba.org/ksmbd.git tags/v6.16-rc5-ksmbd-server-fixes
 
-Is this what you are expecting to see when it works or when it fails?
+for you to fetch changes up to 50f930db22365738d9387c974416f38a06e8057e:
 
-David
+  ksmbd: fix potential use-after-free in oplock/lease break ack
+(2025-07-08 11:25:44 -0500)
 
+----------------------------------------------------------------
+Three ksmbd server fixes
+- fix use after free in lease break
+- small fix for freeing rdma transport (fixes missing logging of cm_qp_destroy)
+- fix write count leak
+----------------------------------------------------------------
+Al Viro (1):
+      ksmbd: fix a mount write count leak in ksmbd_vfs_kern_path_locked()
+
+Namjae Jeon (1):
+      ksmbd: fix potential use-after-free in oplock/lease break ack
+
+Stefan Metzmacher (1):
+      smb: server: make use of rdma_destroy_qp()
+
+ fs/smb/server/smb2pdu.c        | 29 +++++++++--------------------
+ fs/smb/server/transport_rdma.c |  5 +++--
+ fs/smb/server/vfs.c            |  1 +
+ 3 files changed, 13 insertions(+), 22 deletions(-)
+
+-- 
+Thanks,
+
+Steve
