@@ -1,107 +1,92 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526E4225409;
-	Fri, 11 Jul 2025 13:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83AEB2E975D;
+	Fri, 11 Jul 2025 14:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752240101; cv=none; b=NKuPKGF8E04Vj8+ak9JZd0Odtwvoy5FTR9BKV16yglkF6ZsKZ+TRFheJqp95Vfi2JETEkTRplJrBpKA0R1FARHsou0YJiLdkB81eguoC9ZauB727zFCz+jq3nGxT/u/IVp7dvQsOYLeN+9lOMsu/aLYRwYDYYqpXJnatwcTID8M=
+	t=1752245397; cv=none; b=iH7nyhtDOUUcUUdaLftam1r1ejXPiO0YgA1ipuG32g4q4Fun8EQ9Zy4LAjVOX1r2C6tjJDsptBrGlZcrtt0HFSNj8xGsR4XJoBvnD8IHkv6gv+cepnGwxymJwvqXhRL/fRLO4ulKLjGdWKjWWQ5ijT06bCMzZ1Ao4mZxqgmS94M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752240101; c=relaxed/simple;
-	bh=dSNAMnuv+BkI95d4Dm8/FiNySCqZ9pAGdkc7mtVgEZ0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=m3qgEaPk3R1BOzayPCZCkku4ZtZo16U3/zD47hLuo1Emj2n89xqTmPNJK3vFtLMSY0eXpe1rKJqUZklYmHJhDw5QLDC2zslulgw1HQ13r4zdHloGL9h38FobR/LE1GeB11CKtSMERQ+7wTpZWrCYUfkWO3Phx9rsuYOdOdTdR8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Job6neyJ; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752245397; c=relaxed/simple;
+	bh=d/G5Np4BjWAyQHDBYeRVvI+dHxs0oAifCvJZ7nhqN4I=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=IZZIpvkUvyL7hxY3nJUIpOoJg4NOPbVsCpRVbEXWL0tBmZwokbJiIiSBnxMsM24kMSft9DRVK+EndVjcEW/8td7Z+g+4rAGYrL7ZSRNQI4r7oHj9V5AJ5d13pyrALrY2ZYFlfs8I42DmcDGujSLD7XCFaTMoXZY9nf0SBddadHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=87E+xoiU; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Job6neyJ"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6facba680a1so24743486d6.3;
-        Fri, 11 Jul 2025 06:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752240099; x=1752844899; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EuX3ICAYnUTpsZWVFSGh4CguXQXupO9Qh6aMnKpy4og=;
-        b=Job6neyJYNTbG7SP8ICGIB/3EtP+gldt68BP8mX8i7rvZIhL4aArMeBadfUHEP0PY/
-         32v4MGPB2lQhv50rZIIL/6rDLYIwGIU9uq/FuneXA8RkCfiUr3oLDmSZBk1lLDV3KpRk
-         Xg//p8Mri2SmHMoDjUPaSnFbc2kR7kkIGHm5ZC5rJWOHQVSMIuqHb4Q3EGRHdl0MkcMa
-         jG5zeGwIPoKaI2lT3uekyBMksoWz297z95bLv1OxF13E3ohWGfbhtumklJK4GN2QBWEJ
-         rL5jt1vWLJwig6yeLxdZhEidwumGxb3VEAj2sTI8dfEZfvjZQn3a1hkYrNBWePhW9gVw
-         7PRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752240099; x=1752844899;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EuX3ICAYnUTpsZWVFSGh4CguXQXupO9Qh6aMnKpy4og=;
-        b=LhwMExnKIKLnRlRCZ5rDl0GNCN69GpabJZIb6bt7asFy4RdrWFKFvDNrUFdtmEaFnl
-         X9oJXa7X0PYCeyWBz2S/wtMX2Q3SFYFZ0683vRsZFVI5QS01HXzbNiIbSHX6fx0gXnG/
-         uxaHmcMzbSnz29ojPncOTV9drJx6WAnrEvujcgFDbLMdT+wdGjw2cJey3U4e24Wag5xm
-         pHSDLsh3gJLvIAnOjNR33R8InemR8EE5R4gCSVzNKS5zyQcWWWAKRN9tRjHglzj9v8aU
-         JoyxyWrtGQ0QlBgO0hIboet3uuKDgDh3By5gXh+tn/5juPTm1XTgKYygDVP8m2I1YxVf
-         51ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBbzyzpyBAbIZon7T20XNy0NftKv+bYEpXWNc1mA6GMwKDIBPXqQoNiQ7n03oQ7ds3vLhH6HMz+x0V@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsuekWEgg8sU/5bgGZ0NxMlipirKjEoHas6nZunx2cVlZwC4Ik
-	iSfrLhjzcY9rKuxaCXlbra+pvPRfc7INFKhSSEzy46XK/R1bfAucHqG0mxh9x0GDfTgKitPt7FW
-	NFrnk9XrHyfdLvJOq7JbLJ2IM6HOo0g4=
-X-Gm-Gg: ASbGncugGpbEOo8HzIon2+XunZIfeURfaGueBC0VOwA1Y66Dt4ujLdPvajrccaEwzyj
-	ucgZaFv5hQQAwaoxfFV/3/9A+/YRimd+pJmoS0UDaGhyDO+V1AQ2JoTrqnt/oAh3eyf2OSGawI5
-	Wi4JiGqTP+tTuyQqBQiksaH3tZrlGBUtsbF6dOkgZkHz5u1jCP9hMvH9TZcWQVm30b3NVjKER/9
-	EMfeVV0S45ytIf6eT9BGpmqK57tJIdkZmloJZEd
-X-Google-Smtp-Source: AGHT+IGm5UFwGN+IqEb9j/2jjIxWU24Nptwg28TwetWgtXr2Ofq9kPhrZzWZgzFxysg3OmZFNeVAW3hATnNP7aGRqCk=
-X-Received: by 2002:a05:6214:1d2d:b0:704:8916:dbc5 with SMTP id
- 6a1803df08f44-704a4084244mr54191016d6.12.1752240099144; Fri, 11 Jul 2025
- 06:21:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="87E+xoiU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8brX1+ag4+ShccAgZ35yztbKtdrd3eYqr5p3qU932G8=; b=87E+xoiUbkW4T9VHu+od/ykDc7
+	fYwtJXCxYpana3HDwI+mHxGjag1LlCyK1wJDmqeJAZ6UYCcQ4IrFWO2N1PFqqF3UMOdO2XpC39Nb3
+	5BXM6tJx3GM+fnKEG3+NDIC5r/TKrjtGeVSgDFsc6OoSXgWQfGsSkIL6P1skGOrmPUilrJ97NRrM+
+	jfM1I9jp0BCbn80p+zj6+Fo6nG3qhsX/vpTPufZDgJZAzpuNU4vDYIdSb5PAIss4C8b6D2H0bf96N
+	nS73wmRSP4JWeUH8vvCBm/Lxt+Fl76hCjoVgAi+74nirgK0b9HnYWQ8SDCrIb/JLTOMGiClvlsmrU
+	aM+wpxgA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1uaF4Q-00000000BFH-29H4;
+	Fri, 11 Jul 2025 11:49:50 -0300
+Message-ID: <aa4ecd85deb859ad32ba7f649321084b@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Wang Zhaolong <wangzhaolong@huaweicloud.com>, sfrench@samba.org,
+ pshilov@microsoft.com, aaptel@suse.com
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2] smb: client: fix use-after-free in cifs_oplock_break
+In-Reply-To: <20250707010926.31623-1-wangzhaolong@huaweicloud.com>
+References: <20250707010926.31623-1-wangzhaolong@huaweicloud.com>
+Date: Fri, 11 Jul 2025 11:49:49 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 11 Jul 2025 08:21:27 -0500
-X-Gm-Features: Ac12FXynEwK470HqD-sPgNDYwSbpIEiGKBvZ7NK9L9Vz4cMZWpeAFoXdS_4b4GY
-Message-ID: <CAH2r5mvKVofnEbFwtqAMcA=R6Q3Prp9hzqzBPEoAdyvJGgL06Q@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Please pull the following changes since commit
-d7b8f8e20813f0179d8ef519541a3527e7661d3a:
+Wang Zhaolong <wangzhaolong@huaweicloud.com> writes:
 
-  Linux 6.16-rc5 (2025-07-06 14:10:26 -0700)
+> A race condition can occur in cifs_oplock_break() leading to a
+> use-after-free of the cinode structure when unmounting:
+>
+>   cifs_oplock_break()
+>     _cifsFileInfo_put(cfile)
+>       cifsFileInfo_put_final()
+>         cifs_sb_deactive()
+>           [last ref, start releasing sb]
+>             kill_sb()
+>               kill_anon_super()
+>                 generic_shutdown_super()
+>                   evict_inodes()
+>                     dispose_list()
+>                       evict()
+>                         destroy_inode()
+>                           call_rcu(&inode->i_rcu, i_callback)
+>     spin_lock(&cinode->open_file_lock)  <- OK
+>                             [later] i_callback()
+>                               cifs_free_inode()
+>                                 kmem_cache_free(cinode)
+>     spin_unlock(&cinode->open_file_lock)  <- UAF
+>     cifs_done_oplock_break(cinode)       <- UAF
+>
+> The issue occurs when umount has already released its reference to the
+> superblock. When _cifsFileInfo_put() calls cifs_sb_deactive(), this
+> releases the last reference, triggering the immediate cleanup of all
+> inodes under RCU. However, cifs_oplock_break() continues to access the
+> cinode after this point, resulting in use-after-free.
+>
+> Fix this by holding an extra reference to the superblock during the
+> entire oplock break operation. This ensures that the superblock and
+> its inodes remain valid until the oplock break completes.
+>
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=220309
+> Fixes: b98749cac4a6 ("CIFS: keep FileInfo handle live during oplock break")
+> Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+> ---
+>  fs/smb/client/file.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://git.samba.org/ksmbd.git tags/v6.16-rc5-ksmbd-server-fixes
-
-for you to fetch changes up to 50f930db22365738d9387c974416f38a06e8057e:
-
-  ksmbd: fix potential use-after-free in oplock/lease break ack
-(2025-07-08 11:25:44 -0500)
-
-----------------------------------------------------------------
-Three ksmbd server fixes
-- fix use after free in lease break
-- small fix for freeing rdma transport (fixes missing logging of cm_qp_destroy)
-- fix write count leak
-----------------------------------------------------------------
-Al Viro (1):
-      ksmbd: fix a mount write count leak in ksmbd_vfs_kern_path_locked()
-
-Namjae Jeon (1):
-      ksmbd: fix potential use-after-free in oplock/lease break ack
-
-Stefan Metzmacher (1):
-      smb: server: make use of rdma_destroy_qp()
-
- fs/smb/server/smb2pdu.c        | 29 +++++++++--------------------
- fs/smb/server/transport_rdma.c |  5 +++--
- fs/smb/server/vfs.c            |  1 +
- 3 files changed, 13 insertions(+), 22 deletions(-)
-
--- 
-Thanks,
-
-Steve
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
