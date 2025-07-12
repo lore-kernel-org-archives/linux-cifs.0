@@ -1,41 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC0617A2EB;
-	Sat, 12 Jul 2025 16:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174BF17A2EB;
+	Sat, 12 Jul 2025 16:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752336871; cv=none; b=CVBxbN9SLNEh8D+LKjgfXPDofrRf46BcqsqPZnlGVe032anIHH2j1fhQrGysdgmz+uj2sqdqpnXeGFHur+vDcvDdE8YE9O3/K+xc3sA1YoxkpvI7AQX4Idmlr44AQJPr4N4StRwzKEsKoNKuzvWnszvVut7vs32lS7w9PNRVhPE=
+	t=1752336876; cv=none; b=GSy3FvKfUJ7Nfxptiw4QGJUgzYb6t9kqNcoQY3Sv+BISPhDJTPupIzVb7/rxmG+B+ZhtRlc927jK0lPg8HnK7kIatS4fdccTg7/SDgi1Y/Xh35VdOflzdG45D7dB8ThjuWtIHx/FzsdLJSeKdBk8BMZGwa0h45J1bqp41WgpeBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752336871; c=relaxed/simple;
-	bh=b/LDe/TV0ON4PQciDavdw16/cmFlkqcX7pcKs/BUq5M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=adglHOEG4mNr76s/AFwBRxzf43AuSwMDch6ICWyr25QTy7dZ8juVL+XXlxe95wF5pOg1oare682DHl2B6dByDjRcpXTiBFlaq2YV0gKSUXasPM5gAWbSKgosXfWsIVKIQa2AGd6A3uHMJv4fK0Hk5Pygo6DB6cPBzSqHbtTZ1fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijSvuj2t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752336876; c=relaxed/simple;
+	bh=1LLRllrX+3HiXT5tKArnhOLsIFsJXctJVyCg9gE96Xo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dpgR6sjN5Slu+rSSqcqFDO4v053NQ/PVresVfFQJnZcv1ID9QMENTfCc6KRfa0Bwv3jzhvPeoDYZdolsjob/zLHkGAwgnLV38gmQHDc5fcJLYmcDq+EBmJSa5KdAA+eAhFc6ErrEkOFDDTEpvZ11GSU0KnUAhlrr7O+uDzlwuyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VcssHG8j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijSvuj2t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92427C4CEEF;
-	Sat, 12 Jul 2025 16:14:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcssHG8j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E22AC4CEEF;
+	Sat, 12 Jul 2025 16:14:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752336870;
-	bh=b/LDe/TV0ON4PQciDavdw16/cmFlkqcX7pcKs/BUq5M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ijSvuj2t8gvlLGvz+Qtdx28lRi7mhHf1xDply9ZsriM77ZxiNGpTSVt4s2YyMKY9t
-	 98HdnINgYwh7W3X5bh9CfYLk2UvySR8I9dGwuXncohWK8zcwsgtuGeBd6kh6NtmEB8
-	 Neq42z9BfskAzu/UiWOsuMyT7BD1ktl1s4am3aR/V3keUlv6E1oOQDxWi2NidDTNeX
-	 IDXFeThhaxEmgc/MQqKjB6HSzLAhXB2vUr6ABVouK1z8yEuoeN3/7wKga/qWceog7W
-	 ORtcqJPqiZaGeFo/EeXipdHbJ6imgSbSdHSRTefPKIGItLQD4EA5iohLIUgFgJlCjX
-	 cjzF9Z2SWWh9A==
+	s=k20201202; t=1752336875;
+	bh=1LLRllrX+3HiXT5tKArnhOLsIFsJXctJVyCg9gE96Xo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VcssHG8jmyh8ELzvJxHGLbAXtMelwI7p93dFvwzRnuzY9KlIqhJdfVrrO05bG9T8Q
+	 fhj8/XAvf0CpadOSq8Q8J5aEsCbRsEX9teuEntPKeHn5Ygn41Cg9r0uL9PRMXke/Kd
+	 vzME+KZNFosWtFAK0MRPI3PBHm7NixiuQaVhNwglrluGs2AdKcC/rs8izsZtourMC6
+	 wdl79VAyOnUL+FDeP3WW4SpIUzUBEPGGn0199vhtPlH/do8mN0BuhdD7I1tNBUpleC
+	 UDJ0W9knKKv1iphSVvN9bX7bdfGd4Uhfm+0zy1ueEJQSN1lIzJh49OstCHVCLvnkfS
+	 bwM3v1bjA6LKA==
 Received: by pali.im (Postfix)
-	id EE3F17E2; Sat, 12 Jul 2025 18:14:28 +0200 (CEST)
+	id 84E8C7E2; Sat, 12 Jul 2025 18:14:34 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] cifs: Add support for parsing WSL symlinks in version 1 format
-Date: Sat, 12 Jul 2025 18:14:17 +0200
-Message-Id: <20250712161418.17696-1-pali@kernel.org>
+Subject: [PATCH 2/2] cifs: Add support for creating WSL symlinks in version 1 format
+Date: Sat, 12 Jul 2025 18:14:18 +0200
+Message-Id: <20250712161418.17696-2-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250712161418.17696-1-pali@kernel.org>
+References: <20250712161418.17696-1-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,233 +48,251 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-MS-FSCC 2.1.2.7 for IO_REPARSE_TAG_LX_SYMLINK reparse points currently
-documents only layout version 2 format.
+Add a new mount option -o symlink=wsl1 which cause that all newly created
+symlinks would be of WSL style in layout version 1 format. This type of
+symlinks is supported by all WSL versions.
 
-IO_REPARSE_TAG_LX_SYMLINK reparse point buffer of layout version 1 format
-is documented in the newly released Microsoft WSL source code at github:
-https://github.com/microsoft/WSL/blob/2.5.8/test/windows/DrvFsTests.cpp#L775-L815
-
-Difference between version 1 and version 2 is that version 1 stores the
-symlink target location into data section of the file, but version 2 stores
-it directly into the reparse point buffer.
-
-This change implements support for parsing WSL symlinks in this layout
-version 1 format by Linux SMB client and so allow to recognize these type
-of symlinks like Windows WSL.
+Existing mount option -o symlink=wsl will be now an alias to -o
+symlink=wsl2 which creates symlinks in layour version 2 format.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsproto.h |  5 ++-
- fs/smb/client/inode.c     |  1 +
- fs/smb/client/reparse.c   | 94 ++++++++++++++++++++++++++++++++++-----
- fs/smb/common/smb2pdu.h   |  5 ++-
- 4 files changed, 92 insertions(+), 13 deletions(-)
+ fs/smb/client/cifsglob.h   |  9 +++--
+ fs/smb/client/fs_context.c | 11 ++++--
+ fs/smb/client/fs_context.h |  3 +-
+ fs/smb/client/link.c       |  3 +-
+ fs/smb/client/reparse.c    | 73 ++++++++++++++++++++++++++++++++------
+ 5 files changed, 81 insertions(+), 18 deletions(-)
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index e449b33d9bdc..ec70f52ff002 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -669,7 +669,10 @@ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix);
- char *extract_hostname(const char *unc);
- char *extract_sharename(const char *unc);
- int parse_reparse_point(struct reparse_data_buffer *buf,
--			u32 plen, struct cifs_sb_info *cifs_sb,
-+			u32 plen,
-+			unsigned int xid,
-+			struct cifs_tcon *tcon,
-+			struct cifs_sb_info *cifs_sb,
- 			const char *full_path,
- 			struct cifs_open_info_data *data);
- int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 762cd194946a..d32fc0dd6d1c 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1170,6 +1170,7 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 6a84d5eae578..758129ab1302 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -189,7 +189,8 @@ enum cifs_symlink_type {
+ 	CIFS_SYMLINK_TYPE_MFSYMLINKS,
+ 	CIFS_SYMLINK_TYPE_SFU,
+ 	CIFS_SYMLINK_TYPE_NFS,
+-	CIFS_SYMLINK_TYPE_WSL,
++	CIFS_SYMLINK_TYPE_WSL1,
++	CIFS_SYMLINK_TYPE_WSL2,
+ };
  
- 			reparse_buf = server->ops->get_reparse_point_buffer(iov, &reparse_len);
- 			rc = parse_reparse_point(reparse_buf, reparse_len,
-+						 xid, tcon,
- 						 cifs_sb, full_path, data);
- 			/*
- 			 * If the reparse point was not handled but it is the
+ static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
+@@ -207,8 +208,10 @@ static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
+ 		return "sfu";
+ 	case CIFS_SYMLINK_TYPE_NFS:
+ 		return "nfs";
+-	case CIFS_SYMLINK_TYPE_WSL:
+-		return "wsl";
++	case CIFS_SYMLINK_TYPE_WSL1:
++		return "wsl1";
++	case CIFS_SYMLINK_TYPE_WSL2:
++		return "wsl2";
+ 	default:
+ 		return "unknown";
+ 	}
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index a634a34d4086..7808cb224d8c 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -377,7 +377,9 @@ static const match_table_t symlink_flavor_tokens = {
+ 	{ Opt_symlink_mfsymlinks,	"mfsymlinks" },
+ 	{ Opt_symlink_sfu,		"sfu" },
+ 	{ Opt_symlink_nfs,		"nfs" },
+-	{ Opt_symlink_wsl,		"wsl" },
++	{ Opt_symlink_wsl1,		"wsl1" },
++	{ Opt_symlink_wsl2,		"wsl2" },
++	{ Opt_symlink_wsl2,		"wsl" }, /* wsl - alias for wsl2 */
+ 	{ Opt_symlink_err,		NULL },
+ };
+ 
+@@ -408,8 +410,11 @@ static int parse_symlink_flavor(struct fs_context *fc, char *value,
+ 	case Opt_symlink_nfs:
+ 		ctx->symlink_type = CIFS_SYMLINK_TYPE_NFS;
+ 		break;
+-	case Opt_symlink_wsl:
+-		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL;
++	case Opt_symlink_wsl1:
++		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL1;
++		break;
++	case Opt_symlink_wsl2:
++		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL2;
+ 		break;
+ 	default:
+ 		cifs_errorf(fc, "bad symlink= option: %s\n", value);
+diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+index 9e83302ce4b8..0b289237cc81 100644
+--- a/fs/smb/client/fs_context.h
++++ b/fs/smb/client/fs_context.h
+@@ -72,7 +72,8 @@ enum cifs_symlink_parm {
+ 	Opt_symlink_mfsymlinks,
+ 	Opt_symlink_sfu,
+ 	Opt_symlink_nfs,
+-	Opt_symlink_wsl,
++	Opt_symlink_wsl1,
++	Opt_symlink_wsl2,
+ 	Opt_symlink_err
+ };
+ 
+diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
+index 2ecd705e9e8c..c27da4a9a74c 100644
+--- a/fs/smb/client/link.c
++++ b/fs/smb/client/link.c
+@@ -641,7 +641,8 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
+ 
+ 	case CIFS_SYMLINK_TYPE_NATIVE:
+ 	case CIFS_SYMLINK_TYPE_NFS:
+-	case CIFS_SYMLINK_TYPE_WSL:
++	case CIFS_SYMLINK_TYPE_WSL1:
++	case CIFS_SYMLINK_TYPE_WSL2:
+ 		if (le32_to_cpu(pTcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_REPARSE_POINTS) {
+ 			rc = create_reparse_symlink(xid, inode, direntry, pTcon,
+ 						    full_path, symname);
 diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 74a36957e8cb..51e476cd4bc9 100644
+index 51e476cd4bc9..9c78f217c037 100644
 --- a/fs/smb/client/reparse.c
 +++ b/fs/smb/client/reparse.c
-@@ -1067,36 +1067,104 @@ static int parse_reparse_native_symlink(struct reparse_symlink_data_buffer *sym,
- }
+@@ -22,7 +22,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+ static int mknod_wsl(unsigned int xid, struct inode *inode,
+ 		     struct dentry *dentry, struct cifs_tcon *tcon,
+ 		     const char *full_path, umode_t mode, dev_t dev,
+-		     const char *symname);
++		     const char *symname, int symver);
  
- static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf,
-+				     unsigned int xid,
-+				     struct cifs_tcon *tcon,
- 				     struct cifs_sb_info *cifs_sb,
-+				     const char *full_path,
- 				     struct cifs_open_info_data *data)
+ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 				 struct dentry *dentry, struct cifs_tcon *tcon,
+@@ -43,8 +43,10 @@ int create_reparse_symlink(const unsigned int xid, struct inode *inode,
+ 		return create_native_symlink(xid, inode, dentry, tcon, full_path, symname);
+ 	case CIFS_SYMLINK_TYPE_NFS:
+ 		return mknod_nfs(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
+-	case CIFS_SYMLINK_TYPE_WSL:
+-		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
++	case CIFS_SYMLINK_TYPE_WSL1:
++		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 1);
++	case CIFS_SYMLINK_TYPE_WSL2:
++		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 2);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -534,6 +536,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
+ 
+ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
+ 			       mode_t mode, const char *symname,
++			       int symver,
+ 			       struct cifs_sb_info *cifs_sb,
+ 			       struct kvec *iov)
  {
- 	int len = le16_to_cpu(buf->ReparseDataLength);
- 	int data_offset = offsetof(typeof(*buf), Target) - offsetof(typeof(*buf), Version);
--	int symname_utf8_len;
-+	bool free_symname_utf8 = false;
+@@ -569,15 +572,20 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
+ 			kfree(symname_utf16);
+ 			return -ENOMEM;
+ 		}
+-		/* Version field must be set to 2 (MS-FSCC 2.1.2.7) */
+-		symlink_buf->Version = cpu_to_le32(2);
+-		/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
++		symlink_buf->Version = cpu_to_le32(symver);
++		/* Target is in UTF-8 but without trailing null-term byte */
+ 		symname_utf8_len = utf16s_to_utf8s((wchar_t *)symname_utf16, symname_utf16_len/2,
+ 						   UTF16_LITTLE_ENDIAN,
+ 						   symlink_buf->Target,
+ 						   symname_utf8_maxlen);
+ 		*buf = (struct reparse_data_buffer *)symlink_buf;
+-		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
++		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer);
++		/*
++		 * Layout version 2 stores the symlink target in the reparse point buffer.
++		 * Layout version 1 stores the symlink target in the data section of the file.
++		 */
++		if (symver == 2)
++			buf_len += symname_utf8_len;
+ 		kfree(symname_utf16);
+ 		break;
+ 	default:
+@@ -678,7 +686,7 @@ static int wsl_set_xattrs(struct inode *inode, umode_t _mode,
+ static int mknod_wsl(unsigned int xid, struct inode *inode,
+ 		     struct dentry *dentry, struct cifs_tcon *tcon,
+ 		     const char *full_path, umode_t mode, dev_t dev,
+-		     const char *symname)
++		     const char *symname, int symver)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifs_open_info_data data;
+@@ -687,6 +695,12 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
+ 	struct inode *new;
+ 	unsigned int len;
+ 	struct kvec reparse_iov, xattr_iov;
 +	struct cifs_open_parms oparms;
 +	struct cifs_io_parms io_parms;
-+	unsigned int symname_utf8_len;
-+	char *symname_utf8 = NULL;
- 	__le16 *symname_utf16;
- 	int symname_utf16_len;
++	unsigned int bytes_written;
++	struct kvec symv1_iov[2];
 +	struct cifs_fid fid;
 +	__u32 oplock;
-+	int buf_type;
- 	int rc = 0;
+ 	int rc;
  
--	if (len <= data_offset) {
-+	if (len < data_offset) {
- 		cifs_dbg(VFS, "srv returned malformed wsl symlink buffer\n");
- 		rc = -EIO;
- 		goto out;
- 	}
+ 	/*
+@@ -696,7 +710,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
+ 	if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
+ 		return -EOPNOTSUPP;
  
--	/* MS-FSCC 2.1.2.7 defines layout of the Target field only for Version 2. */
--	if (le32_to_cpu(buf->Version) != 2) {
-+	switch (le32_to_cpu(buf->Version)) {
-+	case 1:
+-	rc = wsl_set_reparse_buf(&buf, mode, symname, cifs_sb, &reparse_iov);
++	rc = wsl_set_reparse_buf(&buf, mode, symname, symver, cifs_sb, &reparse_iov);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -721,6 +735,45 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
+ 				     &data, inode->i_sb,
+ 				     xid, tcon, full_path, false,
+ 				     &reparse_iov, &xattr_iov);
++	if (!IS_ERR(new) && mode == S_IFLNK && symver == 1) {
 +		/*
-+		 * Layout version 1 stores the symlink target in the data section of
-+		 * the file encoded in UTF-8 without trailing null-term byte.
++		 * WSL symlink layout version 1 stores the symlink target
++		 * location into the data section of the file.
++		 * Store it now after the reparse point file was created.
++		 * The target location was allocated into the buf but iov
++		 * size filled in reparse_iov by wsl_set_reparse_buf() was
++		 * set to smaller so the created reparse point does not
++		 * contain it.
 +		 */
-+
-+		oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_READ_DATA,
++		oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_WRITE_DATA,
 +				     FILE_OPEN, CREATE_NOT_DIR | OPEN_REPARSE_POINT,
 +				     ACL_NO_MODE);
 +		oparms.fid = &fid;
 +		oplock = tcon->ses->server->oplocks ? REQ_OPLOCK : 0;
 +		rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
-+		if (rc)
-+			goto out;
-+
-+		free_symname_utf8 = true;
-+		symname_utf8_len = le64_to_cpu(data->fi.EndOfFile);
-+		symname_utf8 = kmalloc(symname_utf8_len, GFP_KERNEL);
-+		if (!symname_utf8) {
-+			rc = -ENOMEM;
-+			goto out;
++		if (!rc) {
++			symv1_iov[1].iov_base = ((struct reparse_wsl_symlink_data_buffer *)buf)->Target;
++			symv1_iov[1].iov_len = strlen((const char *)symv1_iov[1].iov_base);
++			io_parms = (struct cifs_io_parms) {
++				.netfid = fid.netfid,
++				.pid = current->tgid,
++				.tcon = tcon,
++				.offset = 0,
++				.length = symv1_iov[1].iov_len,
++			};
++			rc = tcon->ses->server->ops->sync_write(xid, &fid, &io_parms,
++								&bytes_written,
++								symv1_iov,
++								ARRAY_SIZE(symv1_iov)-1);
++			if (bytes_written != symv1_iov[1].iov_len)
++				rc = -EIO;
++			tcon->ses->server->ops->close(xid, tcon, &fid);
 +		}
-+
-+		buf_type = CIFS_NO_BUFFER;
-+		io_parms = (struct cifs_io_parms) {
-+			.netfid = fid.netfid,
-+			.pid = current->tgid,
-+			.tcon = tcon,
-+			.offset = 0,
-+			.length = symname_utf8_len,
-+		};
-+		rc = tcon->ses->server->ops->sync_read(xid, &fid, &io_parms,
-+						       &symname_utf8_len,
-+						       &symname_utf8,
-+						       &buf_type);
-+		if (!rc && symname_utf8_len != le64_to_cpu(data->fi.EndOfFile))
-+			rc = -EIO;
-+
-+		tcon->ses->server->ops->close(xid, tcon, &fid);
-+
 +		if (rc) {
-+			cifs_dbg(VFS, "cannot read wsl symlink target location: %d\n", rc);
-+			goto out;
++			tcon->ses->server->ops->unlink(xid, tcon, full_path, cifs_sb, NULL);
++			new = ERR_PTR(rc);
 +		}
-+
-+		break;
-+	case 2:
-+		/*
-+		 * Layout version 2 stores the symlink target in the reparse buffer
-+		 * field Target encoded in UTF-8 without trailing null-term byte.
-+		 */
-+		symname_utf8_len = len - data_offset;
-+		symname_utf8 = buf->Target;
-+		break;
-+	default:
- 		cifs_dbg(VFS, "srv returned unsupported wsl symlink version %u\n", le32_to_cpu(buf->Version));
- 		rc = -EIO;
- 		goto out;
- 	}
- 
--	/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
--	symname_utf8_len = len - data_offset;
-+	if (symname_utf8_len == 0) {
-+		cifs_dbg(VFS, "srv returned empty wsl symlink target location\n");
-+		rc = -EIO;
-+		goto out;
 +	}
-+
- 	/*
- 	 * Check that buffer does not contain null byte
- 	 * because Linux cannot process symlink with null byte.
- 	 */
--	if (strnlen(buf->Target, symname_utf8_len) != symname_utf8_len) {
-+	if (strnlen(symname_utf8, symname_utf8_len) != symname_utf8_len) {
- 		cifs_dbg(VFS, "srv returned null byte in wsl symlink target location\n");
- 		rc = -EIO;
- 		goto out;
-@@ -1106,7 +1174,7 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
- 		rc = -ENOMEM;
- 		goto out;
+ 	if (!IS_ERR(new))
+ 		d_instantiate(dentry, new);
+ 	else
+@@ -744,7 +797,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
+ 	case CIFS_REPARSE_TYPE_NFS:
+ 		return mknod_nfs(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
+ 	case CIFS_REPARSE_TYPE_WSL:
+-		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
++		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL, 0);
+ 	default:
+ 		return -EOPNOTSUPP;
  	}
--	symname_utf16_len = utf8s_to_utf16s(buf->Target, symname_utf8_len,
-+	symname_utf16_len = utf8s_to_utf16s(symname_utf8, symname_utf8_len,
- 					    UTF16_LITTLE_ENDIAN,
- 					    (wchar_t *) symname_utf16, symname_utf8_len * 2);
- 	if (symname_utf16_len < 0) {
-@@ -1126,6 +1194,9 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
- 	}
- 
- out:
-+	if (free_symname_utf8)
-+		kfree(symname_utf8);
-+
- 	/*
- 	* Convert -EIO to 0. This let lstat() success and
- 	* empty data->symlink_target triggers readlink() to fail with -EIO.
-@@ -1137,7 +1208,10 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
- }
- 
- int parse_reparse_point(struct reparse_data_buffer *buf,
--			u32 plen, struct cifs_sb_info *cifs_sb,
-+			u32 plen,
-+			unsigned int xid,
-+			struct cifs_tcon *tcon,
-+			struct cifs_sb_info *cifs_sb,
- 			const char *full_path,
- 			struct cifs_open_info_data *data)
- {
-@@ -1155,7 +1229,7 @@ int parse_reparse_point(struct reparse_data_buffer *buf,
- 	case IO_REPARSE_TAG_LX_SYMLINK:
- 		return parse_reparse_wsl_symlink(
- 			(struct reparse_wsl_symlink_data_buffer *)buf,
--			cifs_sb, data);
-+			xid, tcon, cifs_sb, full_path, data);
- 	case IO_REPARSE_TAG_AF_UNIX:
- 	case IO_REPARSE_TAG_LX_FIFO:
- 	case IO_REPARSE_TAG_LX_CHR:
-diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
-index f79a5165a7cc..32438f4904b3 100644
---- a/fs/smb/common/smb2pdu.h
-+++ b/fs/smb/common/smb2pdu.h
-@@ -1567,12 +1567,13 @@ struct reparse_nfs_data_buffer {
- 	__u8	DataBuffer[];
- } __packed;
- 
--/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 */
-+/* For IO_REPARSE_TAG_LX_SYMLINK - see MS-FSCC 2.1.2.7 and
-+ * https://github.com/microsoft/WSL/blob/2.5.8/test/windows/DrvFsTests.cpp#L775-L815 */
- struct reparse_wsl_symlink_data_buffer {
- 	__le32	ReparseTag;
- 	__le16	ReparseDataLength;
- 	__u16	Reserved;
--	__le32	Version; /* Always 2 */
-+	__le32	Version; /* 1 - stores symlink path in file data section; 2 - stores symlink path in Target[] field */
- 	__u8	Target[]; /* Variable Length UTF-8 string without nul-term */
- } __packed;
- 
 -- 
 2.20.1
 
