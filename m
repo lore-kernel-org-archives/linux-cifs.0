@@ -1,63 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24FA28DEF9;
-	Sat, 12 Jul 2025 18:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9663D1FDE02
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Jul 2025 22:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752344102; cv=none; b=trn8HYRMDc2OGSEsgjVJ/P2yn81hT+W9A790ycUY+Ggtz+1brClJ0GKaUMKsSwUkwtNBUEXEQqbFKhAmCcPIOZ5Yl0RLlrG23y7WGsjY8fD+GgBc99lsdTYptASEWuZaqrO0FMy03CJT1Vc2hmeROO1wkj+m3AECSR27enxiCAQ=
+	t=1752447531; cv=none; b=at2Nl4xYJPdQKrKXkTlGs88N/7WI9kgDcM6Cu/vlsnLXTP+50duWAbtrWWNgF8DWG3G+bvvi98qZYqK/C/UfpQjzX7JGYn//2/l2R8f7GqRmfXITsPlRQP+1J1QJF1eRn3nL5opIBhUJRJWG2jCpiMjCmwlkqzP3uylmi0HSs3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752344102; c=relaxed/simple;
-	bh=egDcbf57dEKvG3c6oq0Igd27xsa71dlhLzuggU6pcDU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=cizrNbfKAqIDmc0kaPGx14nrmwB+/fAFoBiSvRrRkDKQE3oZj4u5Bqpou/vgl5gzUOXj69maAsYpAOueSPv6vsCxRGeTzqWfRuVlzBBHWZ2zhYxz17u4n8wtUlcyaG34fFqu/9x3TdTASb7R4SxaDVBJxf63/QobPdaH9WNWD3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jP0MfRdA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1752447531; c=relaxed/simple;
+	bh=rMDMR2MjkdzP9jy2JA8WsYWiGCHu+UiD1yTwZI0+NPg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=lPqM4u4zPAG0BywJMiqXY50jjVrZkDu/Ahn4oKTwI4eaWch+bukD06oLNO05rcNvq0v6q/Ndlw2hCwenhiLCjEGnJeUHEjgZyesSEEayLyjGCuqv3Dk64u4BdxIeq1PdMHftB2NLdLsJwyFQsguUTQtpGCI9tmbhdPkp1R3U1SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lq2ztnJ+; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jP0MfRdA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C5DC4CEEF;
-	Sat, 12 Jul 2025 18:15:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752344102;
-	bh=egDcbf57dEKvG3c6oq0Igd27xsa71dlhLzuggU6pcDU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=jP0MfRdAHtOmQ9k8uBBVjQzlOqpC6fJ3lXRX/nz7i+PZ8w6eBWwxDA4I6B1yWoar6
-	 2vF51BG6jUozs3D7kgoQEYqGePTY5yy9p6Ovffz2BY+38orTyYGHMfLg513IAIeQSy
-	 f0t9/IW5s1sVuRb5KSALolWmMlhUPp0WSVHv4kcLufjv8rH63GoY2YTRO2+84VmPnn
-	 cJq2KczChoJ/LkhLjjFlo5f9JV0U9e/1MbTDSdQDgtomDvdgWMbuXTlmUOORQjTzHn
-	 1QPyXcdhcQuQJYOjgdFwM0j02y+m/swYP+TLz+4ffw+09IQklonerSHk4Wu2p15YLO
-	 s/mutXrT3xy/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7E383B276;
-	Sat, 12 Jul 2025 18:15:25 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvKVofnEbFwtqAMcA=R6Q3Prp9hzqzBPEoAdyvJGgL06Q@mail.gmail.com>
-References: <CAH2r5mvKVofnEbFwtqAMcA=R6Q3Prp9hzqzBPEoAdyvJGgL06Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvKVofnEbFwtqAMcA=R6Q3Prp9hzqzBPEoAdyvJGgL06Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v6.16-rc5-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 50f930db22365738d9387c974416f38a06e8057e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2632d81f5a02b65e6131cd57ba092bd321446e91
-Message-Id: <175234412400.2616006.8098294838324972766.pr-tracker-bot@kernel.org>
-Date: Sat, 12 Jul 2025 18:15:24 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lq2ztnJ+"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-701046cfeefso58159006d6.2
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Jul 2025 15:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752447528; x=1753052328; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JvLWzpHBGFzQ5EWWs1pWlh/lpVeF9I6Yr6OiXDw0Dks=;
+        b=Lq2ztnJ+gBENC6OMtRvfYbSzBXxRwlhJ0ILoNT13yZQg+J2nBHeusdCDA+c2xbq3iY
+         xMlHo9qk74Vw3+ASBOBB2oODEUCt3kAC6+W5puuop0hIUn1mY9k8yQqhl5eHFBPB+La+
+         9Fnj6R887AgOjbASGfAr60IE+OlMEJCpbgEBc7wuNKnIAwrPo9PdcjUR4ape787p5Lde
+         80572w+F3t62igXZXMhj70j0gyXr5H85yBrBY7NWf96rvjcGXK5Oelzt3586U09qJF86
+         ZwkyNRb5WQtz2TKuW5xwibFcsVSoARhb0feTQElGu8ehaARg0S2FM16PxV9afUwz6Mhk
+         KwMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752447528; x=1753052328;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JvLWzpHBGFzQ5EWWs1pWlh/lpVeF9I6Yr6OiXDw0Dks=;
+        b=Ax4YBNXkydgqCuU1CWIQm4eYelmT675sr5Iq4KLXjNLCI5qu128/53m0m/+/C3L4Kt
+         tkN692FNTa/p/6X3hPh+OCVz4uhGMQK62NCubwsCLja+ldARqZn/NnLrVirNWff7VR2m
+         rMgvpzs8Nbf0lEUE462cNTvmAUa1zPGqs3l7aBdrddKT+E8nPfjpjFgSAaYNt+jeSZsV
+         QoWgK4aUIMDMPwWHPifg4yvKlib/cA0BO9nRhEN/xlUcNZG1kFWcf6e1ZsIRWqAwVEYk
+         DfMMbvyr9wd438rbptrZ+p01vo+LUfvJkK/aYjVAIF6ppJ5nuXa5+8UZiPQnk7LidgwE
+         /+7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWSpHXDV91g5Sa1pJtPckmqRVaqQAs5+5EKYoY91hLpNlXj3dVeAYhZOP7o318F2nT/l45jHs+HeJDk@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZvDSiLfyc9/m1M4ntpcUf1e4nHbfXoloywHcweGaLXf/RWu6s
+	RVDYtWhK1wm/D9dNVSaCu6PeY5/5xlk8cd0qrZP0wiK7trCY+v5GletFXgjiNwFs3xJnmT2cYyB
+	Yw6qC8RIjszr7NbWRIQV0UmgTuiR7xoc=
+X-Gm-Gg: ASbGncufTgKdt39fCDko9Xcd/7zaOMnvAjdbgMchh1406u3MPSQK5nILekJzJ7e6AQm
+	Jrk1G+pfXbmyYWpCcZH/KZOMHgbBRsO9LM1UZ6QOYAwfxlv4hsUsJwZvZJMSvH5zGU60qU9DTtw
+	Ty/KVafklNMXeuA93U6Vu2RJ3JEjHijL7tdmo0aqntOyREXdJVVCE9/qBpzSJnwv8Zrv2YqsKoy
+	Q7+X46K8qSMiV4bNf1NG5uTdXUDuDHZariIO+XfAw==
+X-Google-Smtp-Source: AGHT+IEgzEdGYPN8Dss7qVm5oGqkUZ2L/OVlPwZ599Oa99opzklSNjznYDdXtf4fmpV5VyWjgqLCFYuKXk53vZgFhVk=
+X-Received: by 2002:a05:6214:598b:b0:702:d30f:80dc with SMTP id
+ 6a1803df08f44-704a338aadbmr200041406d6.11.1752447528398; Sun, 13 Jul 2025
+ 15:58:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 13 Jul 2025 17:58:37 -0500
+X-Gm-Features: Ac12FXxXU9V5Km2u8NvpOgDisezgfAsw5O6A8G_ecHdP4Xmx5bK8ctuh7bfaM3Q
+Message-ID: <CAH2r5muQGDkaHL78JOcgsfjL_=A64Xm9CrCBSKgOMABOjcg44w@mail.gmail.com>
+Subject: Samba support for creating special files (via reparse points)
+To: samba-technical <samba-technical@lists.samba.org>
+Cc: =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>, 
+	=?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The pull request you sent on Fri, 11 Jul 2025 08:21:27 -0500:
+I was trying to test out creating special files to Samba (with and
+without the SMB3.1.1 POSIX Extensions) and noticed that although Samba
+reports special files properly (as reparse points) it does not allow
+creating them (it does not set the filesystem capability
+FILE_SUPPORTS_REPARSE_POINTS except in a very narrow case for offline
+files, so clients won't attempt to send create requests for special
+files to Samba).
 
-> git://git.samba.org/ksmbd.git tags/v6.16-rc5-ksmbd-server-fixes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2632d81f5a02b65e6131cd57ba092bd321446e91
-
-Thank you!
+Is this intentional that Samba server does not allow creating special
+files via reparse points?
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
