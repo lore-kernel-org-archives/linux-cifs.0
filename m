@@ -1,118 +1,160 @@
-Received: from mail.pre-sense.de (mail.pre-sense.de [213.238.39.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B7B24888F
-	for <linux-cifs@vger.kernel.org>; Mon, 14 Jul 2025 12:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.238.39.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF57429408
+	for <linux-cifs@vger.kernel.org>; Mon, 14 Jul 2025 16:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752497043; cv=none; b=aumd1f7rl26dBP6qRNgwrZprlLXoBjSAquj9k9zYeDL4A2nwulBmWkN2bwawqyyYxXMl6dhv+wrySEW7qLg6ZVHgsoJP7cQAdXtCM6edmvi3zfrvKseOcGJcYhkQrIn7/zKExNxSP1yW0XDly1Hhh6nkwI72UMfutOIFbT2WOYo=
+	t=1752512328; cv=none; b=aS8B1v1fLACaY2utafoRxCYoZ9+G9OCanUQdgGjkWcLVL3W1qA1JcPtv+aVQ3hxnNyh9Qj1Vg3U9heH6j5CbVZ20wGla+ZV1lPdIs2LCjEB4mPx31z0Bcv9fvir8CINqNMbu+D39IRGbdYbbvizgCbc/cGN19jeFpocWwyWbmVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752497043; c=relaxed/simple;
-	bh=g4vWKShiSgAOLA8lqa6hYzoIOp7K+2/F57yTZ1emxtw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=aWBRe5gVhYeng90pwaGLo/Dxp5OWxsVEhhNIez5UxNok8EQaNc5G05KUhbX4iXcUgvgJLH8sG6nmjMk0ZoGy404if6plGoA4NJZUHdly9rwL6qywGlLLA4VD58pGduF4QQ3JvU9Gr7ewcsg57BRyIq9tqEvTFnl4ZRDzfReM4EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pre-sense.de; spf=pass smtp.mailfrom=pre-sense.de; dkim=pass (3072-bit key) header.d=pre-sense.de header.i=@pre-sense.de header.b=EIWXpylE; arc=none smtp.client-ip=213.238.39.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pre-sense.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pre-sense.de
+	s=arc-20240116; t=1752512328; c=relaxed/simple;
+	bh=UW6yWvELi+HzUFrzvIvQLQRJBEcwK58IBq3dkW+aSYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a6HlU6Z6MEaV8jHV96bYSJjEhsadeiXnfKtHeKOHZum7PtpPNS7VPDqu0jraZAKlxAFzWLurx46r7V2Hh6MUxqeUkcP3IX01wsRoOfLkzAMTftE7MAmTYrxSxL2uKR6X6yTR97whAjr331ekLDVaUD8n61pkHZbf15p8DfL5Pq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XdHsLvuL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=pre-sense.de header.i=@pre-sense.de header.b="EIWXpylE"
-Received: from smtp.pre-sense.de (tetris_b.pre-sense.de [10.9.0.76])
-	by mail.pre-sense.de (Postfix) with ESMTP id 91E2C5E03A
-	for <linux-cifs@vger.kernel.org>; Mon, 14 Jul 2025 14:43:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pre-sense.de;
-	s=202407; t=1752497037;
-	bh=g4vWKShiSgAOLA8lqa6hYzoIOp7K+2/F57yTZ1emxtw=;
-	h=Date:From:Subject:To;
-	b=EIWXpylEtDucH/PoO1NsSUb9mp9EnB+IWCLnH7stocat+yxEac/2ayhnVmz+8930z
-	 8/HXWG3UefbemTfsVh/6vzdLYqgjiiJKCjdFQ6souwYpN1+73NChorfQPTB8bqGmfs
-	 GMR6MEX+24G58UNzw63/eeWWkzzB40tcltnUtWTJIEyThoWW5HLOnwSk1oERfoztGt
-	 mN6mp/j63WvChmqeYrt3gNDXPIw1DI4uq6mfJo3b0f7HCBFmvDF/MAkIKZZldmi0zW
-	 OijeDX+C0OGvcJFnrgbhfXxOopindIw75vrmzH0eg63nklyE/xfsrW1fXutiBwdk0H
-	 Dyj/NMslMHhvj5dBophAD3eCfHbwEyu97iwQREgh7cW7h85oXLZyz3Uiw83/erz4BD
-	 P6Ig9uCHltCXB19boplb3gSTeu31yd5lgYe74+1tEK/+oYyi9GfdaorP5ERKoZwCIR
-	 CmSZwup7J96R5FJXg+WFwF6d+n/xZd2IGjAvnAg7muzYO1Atden
-Message-ID: <a97b22e8-144e-45ed-8850-c3fd18769a6c@pre-sense.de>
-Date: Mon, 14 Jul 2025 14:43:57 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XdHsLvuL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC10C4CEED;
+	Mon, 14 Jul 2025 16:58:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752512327;
+	bh=UW6yWvELi+HzUFrzvIvQLQRJBEcwK58IBq3dkW+aSYo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XdHsLvuL8NJj9CdBnEXwp0/ERwOQpJ1VsVpnhouZY+IuZf3st55Vd8RkY2LlGb78V
+	 SfFIukcm+I9k7hHx8YQH58o/ZMs0l0HnJTX6WZYXZKtRih2tYALo4pheajb3x5muL4
+	 PV1Z8MCwtuU6GKrC2MA8G5XI09edY6pXgapPaooozuLAUVLlFozjwMXx51MF+Cx4qI
+	 goS+04Dz3v/qFaZGpxE0M5le118e954G8+v2DdOOQ224h5jN4ZcYhSoAEwBcZfcTSU
+	 3AmJiXn2k3WrgKvyWQPJ7GnB+FR0RfIMsZDkDKCTbQi1AVM/90MQHz9oQG0kHekrqM
+	 EqvW1WPd5LlNg==
+Received: by pali.im (Postfix)
+	id BF007963; Mon, 14 Jul 2025 18:58:44 +0200 (CEST)
+Date: Mon, 14 Jul 2025 18:58:44 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Ralph Boehme <slow@samba.org>
+Cc: Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
+	vl@samba.org, samba-technical <samba-technical@lists.samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Samba support for creating special files (via reparse points)
+Message-ID: <20250714165844.4hctlrwegfspiius@pali>
+References: <CAH2r5muQGDkaHL78JOcgsfjL_=A64Xm9CrCBSKgOMABOjcg44w@mail.gmail.com>
+ <CAH2r5msdLbvGMARXJ=V9wt0pvXJOrc=zh3eUfeF9AXEeshtByg@mail.gmail.com>
+ <aHRo9VfMDIfK5MR6@jeremy-HP-Z840-Workstation>
+ <42e549c1-0f92-4b95-b62b-3e0efab9aa10@samba.org>
+ <5519b2d9-600c-4a3f-b44f-594877417df7@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?Q?Till_D=C3=B6rges?= <doerges@pre-sense.de>
-Subject: Using UPN with mount.cifs?
-To: linux-cifs <linux-cifs@vger.kernel.org>
-Content-Language: de-DE, en-US
-Autocrypt: addr=doerges@pre-sense.de; keydata=
- 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
-Organization: PRESENSE Technologies GmbH
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5519b2d9-600c-4a3f-b44f-594877417df7@samba.org>
+User-Agent: NeoMutt/20180716
 
-Hello everyone,
+On Monday 14 July 2025 10:23:17 Ralph Boehme wrote:
+> On 7/14/25 8:01 AM, Ralph Boehme via samba-technical wrote:
+> > On 7/14/25 4:18 AM, Jeremy Allison wrote:
+> > > It's an oversight I'm afraid.
+> > 
+> > hm... it seems reparse points support is mandatory for SMB3 POSIX so I
+> > wonder what this additional checks buys us.
+
+No. It is not mandatory. Getting or setting of reparse points is done
+via IOCTLs which are optional. Also fs attribute for reparse points is
+optional.
+
+And that make sense as there are still lot of filesystems which do not
+support reparse points (e.g. FAT) and this fs attribute is exactly what
+server announce for clients and applications to tell feature support.
+So application would know what features are provided and which not on
+particular share. Server can support reparse points on share A but does
+not have to support it on share B. E.g. when A is NTFS and B is FAT.
+
+> > While I agree that generally we should likely set this, for SMB3 POSIX
+> > the client should probably not check this and we should keep it out of
+> > the spec.
+> 
+> one additional thought: it seems like a valid scenario to be able to support
+> SMB3 POSIX on a server that does not support xattrs on the backing
+> filesystem and hence may not have a way of storing arbitrary reparse points.
+
+xattrs and reparse points are two completely different things, and they
+should not be mixed or exchanged.
+
+For example FAT on older Windows versions supported xattrs (I'm not sure
+if recent Windows version still support them), but does not and never
+supported reparse points.
+
+For checking if xattrs (in MS terminology called Extended Attributes or
+abbrev EAs) there is a fs attribute FILE_SUPPORTS_EXTENDED_ATTRIBUTES.
+
+Again, application can check if server share supports xattrs by this
+fs attribute and decide what to do next.
+
+> In SMB3 POSIX we're just using them as a wire transport, not necessarily
+> expecting full support from the server.
+> 
+> Hence, for Samba I see the following change
+> 
+>     smbd: announce support for FILE_SUPPORTS_REPARSE_POINTS if the share
+> supports EAs
+
+FILE_SUPPORTS_EXTENDED_ATTRIBUTES (0x00800000) != FILE_SUPPORTS_REPARSE_POINTS (0x80)
+
+> ---
+>  source3/smbd/vfs.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/source3/smbd/vfs.c b/source3/smbd/vfs.c
+> index 76895f52e039..ea3fa4c8784f 100644
+> --- a/source3/smbd/vfs.c
+> +++ b/source3/smbd/vfs.c
+> @@ -1345,6 +1345,9 @@ uint32_t vfs_get_fs_capabilities(struct
+> connection_struct *conn,
+>         if (lp_nt_acl_support(SNUM(conn))) {
+>                 caps |= FILE_PERSISTENT_ACLS;
+>         }
+> +       if (lp_ea_support(SNUM(conn))) {
+> +               caps |= FILE_SUPPORTS_REPARSE_POINTS;
+> +       }
+> 
+>         caps |= lp_parm_int(SNUM(conn), "share", "fake_fscaps", 0);
+> 
+> https://gitlab.com/samba-team/samba/-/merge_requests/4104
+> 
+> For the client this would mean, it must allow reparse points for the special
+> files if SMB3 POSIX is negotiated.
+> 
+> Makes sense?
+> 
+> -slow
+
+I do not think that this is a good idea at all. It would just complicate
+things, make more incompatibilities and prevent using FAT or any other
+filesystem without mknod support, including cases when server itself is
+configured to not support mknod for e.g. security reasons.
+
+FILE_SUPPORTS_REPARSE_POINTS is per-share fs attribute which says if the
+reparse point of any type are supported. If it was decided that special
+files, like fifos or character devices are represented as reparse points
+then for share/filesystem on which are special files supported, server
+has to announce the FILE_SUPPORTS_REPARSE_POINTS fs attribute.
+
+And if the server itself supports special files, but particular
+filesystem like FAT does not support it, then server should not announce
+the FILE_SUPPORTS_REPARSE_POINTS fs attribute.
+
+This is how it was designed and how it is used.
+
+It does not matter if the client or server is POSIX or not. Also on
+POSIX systems there are filesystems without the support for special
+files and it is common scenario on more UNIX systems that for particular
+mount are special files completely disabled for security reasons.
 
 
-I'm wondering whether it is possible to use User Principal Names (UPN) instead of 
-accountnames + workgroup/domain, when mounting a share with mount.cifs?
-
-
-The man page for mount.cifs does not mention UPN. A quick grep through the latest 
-sources (cifs-utils-7.4) doesn't mention UPN either.
-
-Searching the ML in particular and the web in general came up emtpy, too.
-
-
-So, is there a way to do it?
-
-
-Thanks and regards -- Till
-
--- 
-Dipl.-Inform. Till Dörges                  doerges@pre-sense.de
-
-                                         www.pre-sense.de/fcknzs
-
-PRESENSE Technologies GmbH             Nagelsweg 41, D-20097 HH
-Geschäftsführer/Managing Director        AG Hamburg, HRB 107844
-Till Dörges                              USt-IdNr.: DE263765024
+So the result is that also when POSIX extensions are negotiated, it is
+important and required to know by POSIX client whether particular
+exported share supports reparse points / special files or not.
+And FILE_SUPPORTS_REPARSE_POINTS is already there for it.
