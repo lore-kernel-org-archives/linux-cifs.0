@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442CF28C01C;
-	Mon, 14 Jul 2025 23:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B959E292B5D;
+	Mon, 14 Jul 2025 23:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752534395; cv=none; b=D36g8wtzAnsayAbmgSNnUdnh3z/1L6RC1ZzocryPevOE3pASvazaj2kUkZBCAkdm4m1n95ywjTE4XCd6v6n1fh/jL41MFTkru2nU5pZFY6mhwV1xkxh2NtiwP5/ftQtjEcJA5DXl+rPlCvuzLzeitejJBe5x64UTkQkXmrQnz58=
+	t=1752534452; cv=none; b=HkWmqiordYlo4eaF/Rj0JcTbP9Fey/5kVzcZKjBz9murJ1DOZ2qUmRH9LSJ9pZsQSI4JK2uzuB5UATxsmQ9Qic9tKtlrU26wDCkeIGv9fGvLgZ5by4k+BoH0iPNVSypzd31Wk+z1bMMAxBLGHVJKoV4C7P/CNdffH4FFL6soloY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752534395; c=relaxed/simple;
-	bh=Q9laU8u8o/o/hYgzMcPM0W6xLkogyliHcux3hJjDXuM=;
+	s=arc-20240116; t=1752534452; c=relaxed/simple;
+	bh=VSGgKy7CKq9N01hf1600cDEzaGt31fZ/DGmwPuj5G4o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rbxX1UyzkCJWJ9M7IlUut6dovOQlbPyi9ZJwJz7fDBLH9/NT1XjwYTudQOQ7AyOhW4ss3X+VXVkVX3PTXohHrJIRMPXDY4YAyJxUGU55IZ9iLW33oJ0iGuyDBxP4I+ACnXyLH/FpCxt3KZt0qijPZL/4cuPZks2TMp+yolyCWkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mF+saykt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=s2cXxPWriXfRK+OBUknOmASXOfWW+lziT3ItGOx0effB0GahIDxXz7T25pd7z5q0iR2TYI5ggJ4xSg/sPzhsObW1WFFIjIdigXu92/tXAixU3rFRhW9DfdA89wCsO5xnHVAzAca9vQLPob2Mho5/E0Lfycq+H/16SrPyG+2/fc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJt3tOjm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mF+saykt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D1B5C4CEF0;
-	Mon, 14 Jul 2025 23:06:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJt3tOjm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48594C4CEED;
+	Mon, 14 Jul 2025 23:07:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752534395;
-	bh=Q9laU8u8o/o/hYgzMcPM0W6xLkogyliHcux3hJjDXuM=;
+	s=k20201202; t=1752534452;
+	bh=VSGgKy7CKq9N01hf1600cDEzaGt31fZ/DGmwPuj5G4o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mF+sayktg8KgkwvxXJ8T9havypL8quBcsQ2Q4vrvl/4zd/UkA/TZjwQeignDFnKsq
-	 cv8Td89SEEmv4LMdfQH8XLe5t3jvn31fdGX/vGj+2MnFsuOVzLUHxXg6xrkOgzvdTX
-	 vqvnhyislB5jFoMTWPRPko14fXD7/FJNDtjOjS1Z/Go9f2qd8dfE0/VD8G/OMro8tq
-	 7zkhhCiLAepYq7J98r9PAzaI9GHePcPPm8hFV7ORZGmtRR6IWEXLs4/dAOJhsvAL90
-	 gGyNt7pyeGGXZp1a2Dt+YyDiApq9gSFsI+lTxjaxifEko7g+7Rg5M61bAKyK/IO4Kg
-	 VLGGH5LH+y8vQ==
+	b=JJt3tOjmGUy53LN3kxljgQ6r1/FpU6m3AYKy4hKFvmYIt4LHROF0zWe9AK0udX9/r
+	 J+ZtnBhXLtXqiULkYXs3Lwb8AxxTihM07d7r83SAT40tZxlSamyEnZMOQnilAjg2s2
+	 E1ggab3s4iIlUSyCnsvLQQKyfoGtRYl6xhOKGrt2AkQFmH4Eu/IVdsiMxiAWDazCJB
+	 pQH01MfkV8+ESSFYhBUwdRzBpT2f+sQD0U4O20RzhZW09ZNeElsd+gcw1cVv4OcmFo
+	 BpHURHUep+V3/2BJjYd7sD7rjH2vlfigIhfD7GPU3v8PAIWg5H9009cFUv+4p+haop
+	 vobgm0ACMCeSQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.15 09/15] ksmbd: fix potential use-after-free in oplock/lease break ack
-Date: Mon, 14 Jul 2025 19:06:10 -0400
-Message-Id: <20250714230616.3709521-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 08/12] ksmbd: fix potential use-after-free in oplock/lease break ack
+Date: Mon, 14 Jul 2025 19:07:11 -0400
+Message-Id: <20250714230715.3710039-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250714230616.3709521-1-sashal@kernel.org>
-References: <20250714230616.3709521-1-sashal@kernel.org>
+In-Reply-To: <20250714230715.3710039-1-sashal@kernel.org>
+References: <20250714230715.3710039-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.15.6
+X-stable-base: Linux 6.12.38
 Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
@@ -173,10 +173,10 @@ modifications.
  1 file changed, 9 insertions(+), 20 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ad2b15ec3b561..f1c7ed1a6ca59 100644
+index 5d2324c09a070..a97a2885730da 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8535,11 +8535,6 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
+@@ -8517,11 +8517,6 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
  		goto err_out;
  	}
  
@@ -188,7 +188,7 @@ index ad2b15ec3b561..f1c7ed1a6ca59 100644
  	rsp->StructureSize = cpu_to_le16(24);
  	rsp->OplockLevel = rsp_oplevel;
  	rsp->Reserved = 0;
-@@ -8547,16 +8542,15 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
+@@ -8529,16 +8524,15 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
  	rsp->VolatileFid = volatile_id;
  	rsp->PersistentFid = persistent_id;
  	ret = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_oplock_break));
@@ -209,7 +209,7 @@ index ad2b15ec3b561..f1c7ed1a6ca59 100644
  }
  
  static int check_lease_state(struct lease *lease, __le32 req_state)
-@@ -8686,11 +8680,6 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
+@@ -8668,11 +8662,6 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
  	}
  
  	lease_state = lease->state;
@@ -221,7 +221,7 @@ index ad2b15ec3b561..f1c7ed1a6ca59 100644
  
  	rsp->StructureSize = cpu_to_le16(36);
  	rsp->Reserved = 0;
-@@ -8699,16 +8688,16 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
+@@ -8681,16 +8670,16 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
  	rsp->LeaseState = lease_state;
  	rsp->LeaseDuration = 0;
  	ret = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_lease_ack));
