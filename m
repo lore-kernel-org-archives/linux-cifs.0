@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F092E8DED;
-	Tue, 15 Jul 2025 13:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7AA26D4F2;
+	Tue, 15 Jul 2025 13:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752586213; cv=none; b=b/m1x0p83fqoJV1Qz5MOMx15M7c1WKNAjpLUq2tWUJri7wVVeDG6nsHU7Ed6yDmWvAeXUBRbRyGmGGJ4iUNKOX3L7xZQ/oOirrybpmGCr1CSASFVbKzl0V+N2Z4O7/I9lbKmRvy8kcAKni4l6efpF+UsS2iihO8U7MXG88Scthk=
+	t=1752586979; cv=none; b=B7xRr1ZvcA6R2wgcA7hMq1EkE/pDZdsBSUY6mL6mO4eDtbvh8KNOrZ9udX4Pg7+zZf4CJemtKDehYnMrbTxwuB+aI4RMvfKqLbJdoWsxBt64ez8CW71Ml8O3YV12xK3zeQMQ8Km5Wm0Komc+ovQGD9Wrb8O1gLGKMIWZnMLWCSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752586213; c=relaxed/simple;
-	bh=07p/tU9vqJ6zMZ4aA0BxmG0TwquGFfGfmrFSId/XYok=;
+	s=arc-20240116; t=1752586979; c=relaxed/simple;
+	bh=dzAD5IRDnweDKX7utVEkexM2eEOIPdWp0Jo6C1sUI4Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M8SasUbN6MCmnXB/EBaK4SIP6Y+lspIEkzEQjwZnEZBRyXqV4FLSvBEy6JUe5b4zevElKPOtfXj+RIPjWddnqcJ6ue9sLj5i4r8nj834dUvWwDgIpfhxhqaqT5PLwHuxpKMTidLk9ukkZFSzyll7Dq0+hD5TDEsY/YArr/YRTJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bxutz4zZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cE/n4uOM2uQe3ZM4t25kQKKSkb2uoIOtd94NoYHgG5yVFU0bwRa+igsUg12Gks7bgmlhD5l5MPp2RjAhtkYpxqvNmrV40mF/uKfTe/uofIvY/8ceIeJYJSMqLoxCqi/AUxh0Zd3+uUOA6OSr0gW54O1c2IOFXzIw86yFjLyj0+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=tezsGdj/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bxutz4zZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2983AC4CEF1;
-	Tue, 15 Jul 2025 13:30:12 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="tezsGdj/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CB89C4CEE3;
+	Tue, 15 Jul 2025 13:42:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1752586213;
-	bh=07p/tU9vqJ6zMZ4aA0BxmG0TwquGFfGfmrFSId/XYok=;
+	s=korg; t=1752586978;
+	bh=dzAD5IRDnweDKX7utVEkexM2eEOIPdWp0Jo6C1sUI4Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bxutz4zZv39og93gdAMKftODnarAsMJ3nVixBEkJ371YYn4lgMCStiDEn/wwq75x9
-	 25K7rKiT0KBWLYjOeTUmyMSb9Jhj7UcShwwwxnUzhnTDlP6NQdzh4RLQfNxd2I/5Z2
-	 LKrmYwPkMS2dQt7qSDcX9O9pvagX+SVvYk0k6dKs=
+	b=tezsGdj/4J3FSeT3w7rJGnd8S3KNMDME4rCt4Kj8Qscx9Jzj/PbnvkpC0iARGsuO0
+	 dx7S6oW++MzrAMvfrqaBF+jXNjXzGwlN6+O9pWtE9mFrM92RH2x/pgS9Iok2ISfw9N
+	 97L0Lk2ntfiSYXec3D2ZkBisKtGHGWB5d1N/KAbo=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,14 +33,13 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Hyunchul Lee <hyc.lee@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15 58/77] smb: server: make use of rdma_destroy_qp()
-Date: Tue, 15 Jul 2025 15:13:57 +0200
-Message-ID: <20250715130754.055823553@linuxfoundation.org>
+	Stefan Metzmacher <metze@samba.org>
+Subject: [PATCH 6.15 119/192] smb: server: make use of rdma_destroy_qp()
+Date: Tue, 15 Jul 2025 15:13:34 +0200
+Message-ID: <20250715130819.665683443@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250715130751.668489382@linuxfoundation.org>
-References: <20250715130751.668489382@linuxfoundation.org>
+In-Reply-To: <20250715130814.854109770@linuxfoundation.org>
+References: <20250715130814.854109770@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,13 +51,13 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+6.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 0c2b53997e8f5e2ec9e0fbd17ac0436466b65488 ]
+commit 0c2b53997e8f5e2ec9e0fbd17ac0436466b65488 upstream.
 
 The qp is created by rdma_create_qp() as t->cm_id->qp
 and t->qp is just a shortcut.
@@ -91,16 +90,14 @@ Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Reviewed-by: Tom Talpey <tom@talpey.com>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/ksmbd/transport_rdma.c | 5 +++--
+ fs/smb/server/transport_rdma.c |    5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 355673f2830be..91e663d5d5bc1 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -426,7 +426,8 @@ static void free_transport(struct smb_direct_transport *t)
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -433,7 +433,8 @@ static void free_transport(struct smb_di
  	if (t->qp) {
  		ib_drain_qp(t->qp);
  		ib_mr_pool_destroy(t->qp, &t->qp->rdma_mrs);
@@ -110,7 +107,7 @@ index 355673f2830be..91e663d5d5bc1 100644
  	}
  
  	ksmbd_debug(RDMA, "drain the reassembly queue\n");
-@@ -1934,8 +1935,8 @@ static int smb_direct_create_qpair(struct smb_direct_transport *t,
+@@ -1940,8 +1941,8 @@ static int smb_direct_create_qpair(struc
  	return 0;
  err:
  	if (t->qp) {
@@ -120,8 +117,5 @@ index 355673f2830be..91e663d5d5bc1 100644
  	}
  	if (t->recv_cq) {
  		ib_destroy_cq(t->recv_cq);
--- 
-2.39.5
-
 
 
