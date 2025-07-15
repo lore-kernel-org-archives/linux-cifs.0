@@ -1,160 +1,144 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6671C1487F4
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Jul 2025 03:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BDD2D130B
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Jul 2025 05:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752550331; cv=none; b=gwnNCubbEYyJEenR+/mX7/I5aKpeuZBEtAD8IvX6NOWK7byUWBVpjFOZNQZCN3FMgiDE6VM23ytMcfdkUjDEd9kJXtxMq60+BY4JHC2X9YoTq4XQNt9Retgvljq4krF6+TYf5QnlRvK7rSeJVkkRmpoSQ03hvyexK+FZgqc3j0A=
+	t=1752556722; cv=none; b=StVePvrk2DQnRg6qKi8V7/391b27y+4/wFa8VQM7kGa/Jh5PBAxoVbzxf1wLRirIHynDk0HW4IvZcBIecF1lNJJ1Xy8gGeBLs+cCJKLW5RMWobpRDShfTHQ6IJF+pHJp4Z5u3PVdi20VIiJ9IxGUMOpSiGVGOPczEjLevEtpLdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752550331; c=relaxed/simple;
-	bh=3XH4+o2veW+WdFpMpxvm/SNkP3QBcd31Vk35YsAJ3Do=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=d5y4ZsSA+d978ma1b5WspvcK8J5b3pGdbHLxO18prGQGSQwWZCTj08jEriMpAmIYIRmCX0jEkWo1HGwvnCYkD4z0MSZRcrJvE1R1IZhbQ5Kul1HDSYYE6Pmp2cbisztpqTBFoV3pLNWHyeCyhswtxytaMfOF37rtLczxmLv2F1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X49OA6rF; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1752556722; c=relaxed/simple;
+	bh=PbP2GN4qJMHbZFPap5fEa9/a3tNi7tUkHera2I51/TU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uqKzoAwEpBRJixuxwA01aq9mMa1HfsiQm6J3JZ+mLbzZzbSyvu/cbjSLdR7ffU8EsGJYSFGKH23NZZnhomqSuQLuaeeq7EuTzPMTudF7EWTDlunpBCJ0PnaGnmaoBgNGiZ3x/wlUa/3SvdMdYc/jgf6fuITbio60cU7aMlER3QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Gk1TkwrU; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X49OA6rF"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7e0d65a87e8so234530985a.0
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Jul 2025 20:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752550328; x=1753155128; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GFmgWQvpMxPBtBq1ucsn2DJRdhKAVc7fWWLoKmb9WvQ=;
-        b=X49OA6rFTN7S2qToyBdjl67AvyxVgINKtdK9EvjnW+Fn3Izhx+q2x9DxwBhkJ92bz+
-         3sDavH9jZInBocHmIM788tRrqGAFXAUeLVrKz42JdEQL5k50N8fc/B04NSb/igsBSRBl
-         G567ZhrHoJyx+jiVXPf5s4cIft5XTYPP7ALAk7UOhxAzKYVXpmb/kR4+UHSDo74Upqel
-         Mki3d0VmFBUAICtwwZFQGqYAT2UzTMnEF4ddsUWrqfrXwjuhnkKQNe/ZOYV9ym3gLma2
-         iPBCmIAlRa+NuNN8ZtmIwMQpAjfINcLmnrNJL20qr0uthutFsvwGIScW3AWDg/x5U660
-         DjiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752550328; x=1753155128;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GFmgWQvpMxPBtBq1ucsn2DJRdhKAVc7fWWLoKmb9WvQ=;
-        b=HnyvNkkX6So9EHy8qKTyxVOWBRPse1zw1cst5U+QmmtKeUKdy06OxXN4uV0723fWEi
-         fvx0YjLRUS6EW3kJN4Zw79Y51hKTlhpyuKGfupe5e6GI7QHHhLuJZbjt8sp/T7sKPrXO
-         hS1PrWN+n8VdPA57TdJ7LFD2R5LEFFDVfIAVo38pTatKYTni2X7n5jdli+lP9F48ylIk
-         +NmE+UtRTluSRQ5BC7lZWQm+YkfccQ9urG782cyqp2ivBeu6zmj7LEgen6YGrF8WFd7h
-         GxIy00jV2qE+7bikhZIrbG0ShjvrO196iF0Djvo3JfaUICIbFwQIehCGGqUeKPZJ57vU
-         cxog==
-X-Gm-Message-State: AOJu0YzmLi6auVyaKCp5MiGYIQuBGoWre2tkkC/LdlJXR004qh7jywyJ
-	+EouX2QAZKz8KxsOZbMcDIFIU9f3h9xgkXZELbV+RxrUXu29bN8dYplOn+ts4En9FwUu5f26Vr4
-	CVU8wAT7Wo2tgJyxVlokPCnjUjJmfx3OiTmrxPAc=
-X-Gm-Gg: ASbGnctPvpiyOzA0jJsoc5S/LV6gEvbILomXfWWI8wAGjkcec5x/IMA/PnMEihq9IR2
-	wRTvLrktE5ttW//3vOsCn/JgUdksUrV4LNp9a6zuJGTFY1gayWY/d91gul+oMek9P+3Y/fxVgML
-	Qb7NS92Owsay65J6T9r5UdFNINRptB81YwPmVeIwK0SZuX3FtMrXfblGKnaLqUmQrZi/3sdnP5+
-	h09USGoL5HQoXLhcsXfYUcns2Hv9DgkImKzrpNyrg==
-X-Google-Smtp-Source: AGHT+IGQ5BHrkgFepzjYp8mbMNtIeAqn2WTYFkhaulaKCik4qxPc1MCd4Z9Rx/r3PX1ClwHSUqEicDhYskcA9Yc3DaQ=
-X-Received: by 2002:a05:620a:4549:b0:7e2:a47:e50e with SMTP id
- af79cd13be357-7e20a47e7cdmr1158579185a.30.1752550327833; Mon, 14 Jul 2025
- 20:32:07 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Gk1TkwrU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=PbP2GN4qJMHbZFPap5fEa9/a3tNi7tUkHera2I51/TU=; b=Gk1TkwrUxPZCjWzBppW2fmDzcO
+	1Km9bmR89Eigx8zfj8abXsWpmJ3yFarSX/sw/ndK9jx2q/cCOsI3zROsGpRCb7DywA5qU75yawMfY
+	jPECQnN1caIlVU4JuHI7YMy3glOe0BvnvKfx21wLdpNTSO5a8DU444/U1p38DmmqXaWMlJbo/NniT
+	I7YEiR/Wy31VKSk+38/EMJV8+o5gEqZ7IV2XvQrSUQPMhQhiycvZsc3DA3l6iQJ2X+sgPirsjDdF4
+	4G79TAGFv5hfQ7QA3KfdEo1zMCX8dhSdKKzprQ9KpfJtjAAIlVeBAaoe415nbJnw4OeuCSvzExlsS
+	+wZE6Tff28iaeD/quxjTpf5qBpznvZEPtFqj0oaj5n2pp+l1285iEbEZNPIIGfgkIO5IULeCdeJMn
+	vr+UTjga6oXIrvG72hnTEqPzX2o6oJ5xdLk/Nakft+G8uwIuCtGoJ7hV0LCxrTNG1KCq0W8y31sFY
+	Ss0lywN1I23AZg5NmZ5wfZ3e;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1ubY3j-00FOzm-1y;
+	Tue, 15 Jul 2025 05:18:31 +0000
+Message-ID: <f0fa321e-921f-40f5-b202-9cc751f2268f@samba.org>
+Date: Tue, 15 Jul 2025 07:18:30 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 14 Jul 2025 22:31:56 -0500
-X-Gm-Features: Ac12FXzrmLboga7OWI2YMuucTsXiG3AXGz7CTDK1uPmxzV-1mpI-ggSRZkqiFq8
-Message-ID: <CAH2r5mvA3NQp8BDj_v-k3YRUR9Xe7u5XmaM_XQBP4xJts0R6bA@mail.gmail.com>
-Subject: [PATCH][SMB3 client] Fix SMB311 posix special file creation to
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][SMB3 client] Fix SMB311 posix special file creation to
  servers which do not advertise reparse support
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>, Paulo Alcantara <pc@manguebit.org>
-Content-Type: multipart/mixed; boundary="000000000000bdf9050639ef6b0b"
+To: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ Paulo Alcantara <pc@manguebit.org>
+References: <CAH2r5mvA3NQp8BDj_v-k3YRUR9Xe7u5XmaM_XQBP4xJts0R6bA@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <CAH2r5mvA3NQp8BDj_v-k3YRUR9Xe7u5XmaM_XQBP4xJts0R6bA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------8fp6l08Q2ug7TRK0IgoZDlQi"
 
---000000000000bdf9050639ef6b0b
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------8fp6l08Q2ug7TRK0IgoZDlQi
+Content-Type: multipart/mixed; boundary="------------sLdlVrOgOPr2QQRPYaiE2r40";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ Paulo Alcantara <pc@manguebit.org>
+Message-ID: <f0fa321e-921f-40f5-b202-9cc751f2268f@samba.org>
+Subject: Re: [PATCH][SMB3 client] Fix SMB311 posix special file creation to
+ servers which do not advertise reparse support
+References: <CAH2r5mvA3NQp8BDj_v-k3YRUR9Xe7u5XmaM_XQBP4xJts0R6bA@mail.gmail.com>
+In-Reply-To: <CAH2r5mvA3NQp8BDj_v-k3YRUR9Xe7u5XmaM_XQBP4xJts0R6bA@mail.gmail.com>
 
-Some servers (including Samba), support the SMB3.1.1 POSIX Extensions
-(which use reparse
-points for handling special files) but do not properly advertise file
-system attribute
-FILE_SUPPORTS_REPARSE_POINTS.  Although we don't check for this
-attribute flag when
-querying special file information, we do check it when creating
-special files which
-causes them to fail unnecessarily.   If we have negotiated SMB3.1.1
-POSIX Extensions
-with the server we can expect the server to support creating special files via
-reparse points, and even if the server fails the operation due to
-really forbidding
-creating special files, then it should be no problem and is more
-likely to return a
-more accurate rc in any case (e.g. EACCES instead of EOPNOTSUPP).
-
-Allow creating special files as long as the server supports either
-reparse points
-or the SMB3.1.1 POSIX Extensions (note that if the "sfu" mount option
-is specified
-it uses a different way of storing special files that does not rely on
-reparse points).
-
-See attached patch
-
--- 
-Thanks,
-
-Steve
-
---000000000000bdf9050639ef6b0b
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-Fix-SMB311-posix-special-file-creation-to-servers-wh.patch"
-Content-Disposition: attachment; 
-	filename="0001-Fix-SMB311-posix-special-file-creation-to-servers-wh.patch"
+--------------sLdlVrOgOPr2QQRPYaiE2r40
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
-Content-ID: <f_md3z6nfo0>
-X-Attachment-Id: f_md3z6nfo0
 
-RnJvbSA0ZTFjOTExOGVhNjJjNTJmNzBjYTJjMzk0OWQwOTUwOTZjNGViNjY2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMTQgSnVsIDIwMjUgMjI6MTY6MTkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBG
-aXggU01CMzExIHBvc2l4IHNwZWNpYWwgZmlsZSBjcmVhdGlvbiB0byBzZXJ2ZXJzIHdoaWNoIGRv
-CiBub3QgYWR2ZXJ0aXNlIHJlcGFyc2Ugc3VwcG9ydAoKU29tZSBzZXJ2ZXJzIChpbmNsdWRpbmcg
-U2FtYmEpLCBzdXBwb3J0IHRoZSBTTUIzLjEuMSBQT1NJWCBFeHRlbnNpb25zICh3aGljaCB1c2Ug
-cmVwYXJzZQpwb2ludHMgZm9yIGhhbmRsaW5nIHNwZWNpYWwgZmlsZXMpIGJ1dCBkbyBub3QgcHJv
-cGVybHkgYWR2ZXJ0aXNlIGZpbGUgc3lzdGVtIGF0dHJpYnV0ZQpGSUxFX1NVUFBPUlRTX1JFUEFS
-U0VfUE9JTlRTLiAgQWx0aG91Z2ggd2UgZG9uJ3QgY2hlY2sgZm9yIHRoaXMgYXR0cmlidXRlIGZs
-YWcgd2hlbgpxdWVyeWluZyBzcGVjaWFsIGZpbGUgaW5mb3JtYXRpb24sIHdlIGRvIGNoZWNrIGl0
-IHdoZW4gY3JlYXRpbmcgc3BlY2lhbCBmaWxlcyB3aGljaApjYXVzZXMgdGhlbSB0byBmYWlsIHVu
-bmVjZXNzYXJpbHkuICAgSWYgd2UgaGF2ZSBuZWdvdGlhdGVkIFNNQjMuMS4xIFBPU0lYIEV4dGVu
-c2lvbnMKd2l0aCB0aGUgc2VydmVyIHdlIGNhbiBleHBlY3QgdGhlIHNlcnZlciB0byBzdXBwb3J0
-IGNyZWF0aW5nIHNwZWNpYWwgZmlsZXMgdmlhCnJlcGFyc2UgcG9pbnRzLCBhbmQgZXZlbiBpZiB0
-aGUgc2VydmVyIGZhaWxzIHRoZSBvcGVyYXRpb24gZHVlIHRvIHJlYWxseSBmb3JiaWRkaW5nCmNy
-ZWF0aW5nIHNwZWNpYWwgZmlsZXMsIHRoZW4gaXQgc2hvdWxkIGJlIG5vIHByb2JsZW0gYW5kIGlz
-IG1vcmUgbGlrZWx5IHRvIHJldHVybiBhCm1vcmUgYWNjdXJhdGUgcmMgaW4gYW55IGNhc2UgKGUu
-Zy4gRUFDQ0VTIGluc3RlYWQgb2YgRU9QTk9UU1VQUCkuCgpBbGxvdyBjcmVhdGluZyBzcGVjaWFs
-IGZpbGVzIGFzIGxvbmcgYXMgdGhlIHNlcnZlciBzdXBwb3J0cyBlaXRoZXIgcmVwYXJzZSBwb2lu
-dHMKb3IgdGhlIFNNQjMuMS4xIFBPU0lYIEV4dGVuc2lvbnMgKG5vdGUgdGhhdCBpZiB0aGUgInNm
-dSIgbW91bnQgb3B0aW9uIGlzIHNwZWNpZmllZAppdCB1c2VzIGEgZGlmZmVyZW50IHdheSBvZiBz
-dG9yaW5nIHNwZWNpYWwgZmlsZXMgdGhhdCBkb2VzIG5vdCByZWx5IG9uIHJlcGFyc2UgcG9pbnRz
-KS4KCkNjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJl
-bmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvc21iMmlub2Rl
-LmMgfCAzICsrLQogZnMvc21iL2NsaWVudC9zbWIyb3BzLmMgICB8IDMgKystCiAyIGZpbGVzIGNo
-YW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9z
-bWIvY2xpZW50L3NtYjJpbm9kZS5jIGIvZnMvc21iL2NsaWVudC9zbWIyaW5vZGUuYwppbmRleCAy
-YTNlNDZiOGUxNWEuLmExMWEyYTY5M2M1MSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIy
-aW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50L3NtYjJpbm9kZS5jCkBAIC0xMzQ2LDcgKzEzNDYs
-OCBAQCBzdHJ1Y3QgaW5vZGUgKnNtYjJfZ2V0X3JlcGFyc2VfaW5vZGUoc3RydWN0IGNpZnNfb3Bl
-bl9pbmZvX2RhdGEgKmRhdGEsCiAJICogZW1wdHkgb2JqZWN0IG9uIHRoZSBzZXJ2ZXIuCiAJICov
-CiAJaWYgKCEobGUzMl90b19jcHUodGNvbi0+ZnNBdHRySW5mby5BdHRyaWJ1dGVzKSAmIEZJTEVf
-U1VQUE9SVFNfUkVQQVJTRV9QT0lOVFMpKQotCQlyZXR1cm4gRVJSX1BUUigtRU9QTk9UU1VQUCk7
-CisJCWlmICghdGNvbi0+cG9zaXhfZXh0ZW5zaW9ucykKKwkJCXJldHVybiBFUlJfUFRSKC1FT1BO
-T1RTVVBQKTsKIAogCW9wYXJtcyA9IENJRlNfT1BBUk1TKGNpZnNfc2IsIHRjb24sIGZ1bGxfcGF0
-aCwKIAkJCSAgICAgU1lOQ0hST05JWkUgfCBERUxFVEUgfApkaWZmIC0tZ2l0IGEvZnMvc21iL2Ns
-aWVudC9zbWIyb3BzLmMgYi9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYwppbmRleCBjYjY1OTI1NmQy
-MTkuLjkzOGE4YTdjNWQyMSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIyb3BzLmMKKysr
-IGIvZnMvc21iL2NsaWVudC9zbWIyb3BzLmMKQEAgLTUyNjAsNyArNTI2MCw4IEBAIHN0YXRpYyBp
-bnQgc21iMl9tYWtlX25vZGUodW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlub2RlICppbm9kZSwK
-IAlpZiAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1VOWF9FTVVMKSB7CiAJ
-CXJjID0gY2lmc19zZnVfbWFrZV9ub2RlKHhpZCwgaW5vZGUsIGRlbnRyeSwgdGNvbiwKIAkJCQkJ
-ZnVsbF9wYXRoLCBtb2RlLCBkZXYpOwotCX0gZWxzZSBpZiAobGUzMl90b19jcHUodGNvbi0+ZnNB
-dHRySW5mby5BdHRyaWJ1dGVzKSAmIEZJTEVfU1VQUE9SVFNfUkVQQVJTRV9QT0lOVFMpIHsKKwl9
-IGVsc2UgaWYgKChsZTMyX3RvX2NwdSh0Y29uLT5mc0F0dHJJbmZvLkF0dHJpYnV0ZXMpICYgRklM
-RV9TVVBQT1JUU19SRVBBUlNFX1BPSU5UUykKKwkJfHwgKHRjb24tPnBvc2l4X2V4dGVuc2lvbnMp
-KSB7CiAJCXJjID0gc21iMl9ta25vZF9yZXBhcnNlKHhpZCwgaW5vZGUsIGRlbnRyeSwgdGNvbiwK
-IAkJCQkJZnVsbF9wYXRoLCBtb2RlLCBkZXYpOwogCX0KLS0gCjIuNDMuMAoK
---000000000000bdf9050639ef6b0b--
+T24gNy8xNS8yNSA1OjMxIEFNLCBTdGV2ZSBGcmVuY2ggd3JvdGU6DQo+IFNlZSBhdHRhY2hl
+ZCBwYXRjaA0KDQphY2tlZCBieSBtZS4NCg0KVGhhbmtzIQ0KLXNsb3cNCg==
+
+--------------sLdlVrOgOPr2QQRPYaiE2r40--
+
+--------------8fp6l08Q2ug7TRK0IgoZDlQi
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmh15KYFAwAAAAAACgkQqh6bcSY5nka+
+rBAAm3DEnr/Lwi9bPx08E0+adlnisXoEzBGnUzREzpy0AggC3ZlhgKAz+/16uUUmyv5DjphG0bHY
+Z8zIyfsUTTNm0SQre2eofydzxYNZG2/fNlGRq1LmOD3COcGvjUI3Qiy9ZhfOuqmEYcmny70G+yob
+UJ5WycPLbTxN3Vpx0RgEOmTy8ePR6RaKfLhSqVlTMXcpebU3XRRCb145cP/2JInhu/VpBFPYbOtt
+idCz+Xxe6hNRKQfCqsCkgDXuLMEwNO07cvwFVbqS61QEroUFhCT9RuEMvPD1cnOVZjQasJx/c5t6
+r6fSaXAoIfFjRBRnmyLOdJBuEjQYeaOvdOR09cC3q9n75rRnuWQ7tF8jRXvKiEaNhb5be54vssbE
+hsjJYIs+DqtRobw4+zZlqKQxuDWSVaCcb7d2T9aSYvcIJS94vb2ozBApInAPcIQAGkvxbEey59pg
+2uRIMBpP7aKtpc1Tt7T+xykOGS5nLCJ7utcNrLed4rIl+8M0CktdhBQf1lTDnvwCi9L5jn5sQWf0
+7FQj4VB7tjaXqzPttkGJC8i1uKlNOAfr0dTI05SfevUbIz7hgR+yLLpBeZonFzJfYSO+iS6kT0td
+iIn/lkG92iTSUo+fKfjkLFxTmFMcGfsbu7Q0IqWVq8a3H4jq6teXDegVmz4TJk3zo760iHVx+GCH
+Nrg=
+=RjSN
+-----END PGP SIGNATURE-----
+
+--------------8fp6l08Q2ug7TRK0IgoZDlQi--
