@@ -1,31 +1,38 @@
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.pre-sense.de (mail.pre-sense.de [213.238.39.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390EE48CFC;
-	Wed, 16 Jul 2025 05:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB07946C
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Jul 2025 06:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.238.39.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752644412; cv=none; b=DbQE0fNRm6jT1MfVKaYHKgbF7y1Ob0DFvQRyDb+1LeEVhlNtlUyJjE0APtvJrQbF3Mt+oTk3Y8uCf3YdCom1zC5Pj190CoE5Oj/+2vicUHaOQskabfHSLWpL0AEr+CrGbljUG21cFIK+Jpf3oJlEQA8aeE7EPlg4/EZn7WixUtw=
+	t=1752648350; cv=none; b=swbkSFl0QYselkBdmPlVPcY8ug7vKqhahDUkCkY1ZRE1ZXo7r3ASoCNXwrlkHM+Zd+CgCuvOzZdiZNVDWLKLRiBDVlHhnKTnqQfaun05UZPJP0uLpoCPRuzqpSGwcaJrsVpm4p3nHLuCCmF4rJXEa/VabRmRjHBr5cKW51qUz3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752644412; c=relaxed/simple;
-	bh=rZBG7DQM33GlZMGKj4mp03qZwHVbPzsqeifBB1LM3js=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=rWZsIOkzysITSSuYJJP3g8AVpV1HVDvoVhRStDEnKePaYDxgBtWqOidT9n+qxE7nNTE8nNguKhghVXJE9PzqV83j24Vv09+ypBopsh2FTPImPx9yZdO/PATCyc35ilvIrlTZg+uXnttLiTm+QiW179GUW/I+iFndLt8WYEztWRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=oeT1Nyqj; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1752648350; c=relaxed/simple;
+	bh=JVnsMskd5W+DiHivDnw0g22YJcZLMre3LXucevp3YCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KNrqLpM1X9cgeeE7tUuDycS21AJYav2xCva9k2NjU4DnnqLH6sGzyU6L81Nt8osw/cnV2uMYVvm12Fz2tFxvVJb7mAeGDPkJaRuNmiNjYCY0pSMZ3HUDxel+ReqeA2M3wCIN9pl+rtHRjxCX3ys8zGAv+5S/m6wfEAvLcPgSi1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pre-sense.de; spf=pass smtp.mailfrom=pre-sense.de; dkim=pass (3072-bit key) header.d=pre-sense.de header.i=@pre-sense.de header.b=OCQzgAp+; arc=none smtp.client-ip=213.238.39.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pre-sense.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pre-sense.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="oeT1Nyqj"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1752644406; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=/qADFoeOXBnAEHP6o81g96cI4IF1HJRJHWKwBGouJpA=;
-	b=oeT1NyqjfjzJ2YmhyWz+Hq0lkl9JUfQCtaQFx8hH6YXWYCgfH64BMXKh8sJpQGi7JInaf2W6P8tWyemCvsUmbktNUNpPOSD3n6jok1RgbrHkKsZ2LA/TR9xnJfl9YduELmT8pgwEOO0pEYWw+VT/gXQJwNw/XyDLIlKYYzYw3Hs=
-Received: from 30.221.131.131(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wj2mLXU_1752644403 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 16 Jul 2025 13:40:04 +0800
-Message-ID: <e143f730-6ae7-491e-985e-cc021411edd8@linux.alibaba.com>
-Date: Wed, 16 Jul 2025 13:40:02 +0800
+	dkim=pass (3072-bit key) header.d=pre-sense.de header.i=@pre-sense.de header.b="OCQzgAp+"
+Received: from smtp.pre-sense.de (tetris_b.pre-sense.de [10.9.0.76])
+	by mail.pre-sense.de (Postfix) with ESMTP id 6B1005E057;
+	Wed, 16 Jul 2025 08:45:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pre-sense.de;
+	s=202407; t=1752648338;
+	bh=JVnsMskd5W+DiHivDnw0g22YJcZLMre3LXucevp3YCo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=OCQzgAp+aQUlalYi4QabDIgQdoKWhuQ2VEiDHUBLI3F/Q4dqKUlxacnAOmf45xR+r
+	 0HOn/2YAGBxBpMOii48mDluOBCNZYKpmPWFh9x5jB0aGD9X1RIkkyJLhIkz/lz6A5h
+	 Fdm2LumANxkWpsmBiXYgGzuPEhPDGPTGWYLW0GfBnK1A+wb55qh96nr0bLjeoVDccT
+	 SUJq24USg7gXeOek/pK0c7TZF4ao9bbnwsjV7KLEwO15yh/GWBHhYKY9w64Qcb2wEw
+	 6M6S0Ci3a85WwIVLdxgJQjSHzNsvsnAgZL7AldydhMPRRUCTn9GeY13Qb1/aC5WVTL
+	 glBhkvzQlN1EYwo19jDthhiJugDfCs/Al0UYUiv6n0fjvxZ36Zgr78aKBY9zgTvuOh
+	 B8Ud0aGzCz/VYcDh6cyjDIOnYXdPWw71BNWEriFmpKm2CipmkrzFAsiQ2qwHnV8vT5
+	 dDN1Q+5OxRbQClxhTzqgXonbg3Ikj07G1MIXt+AkGIZdNl3e0mD
+Message-ID: <26a52d1e-f829-4264-a39b-a9591a5d9eb1@pre-sense.de>
+Date: Wed, 16 Jul 2025 08:45:37 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -33,116 +40,168 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Compressed files & the page cache
-To: Qu Wenruo <wqu@suse.com>, Matthew Wilcox <willy@infradead.org>,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
- Nicolas Pitre <nico@fluxnic.net>, Gao Xiang <xiang@kernel.org>,
- Chao Yu <chao@kernel.org>, linux-erofs@lists.ozlabs.org,
- Jaegeuk Kim <jaegeuk@kernel.org>, linux-f2fs-devel@lists.sourceforge.net,
- Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
- David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>,
- linux-mtd@lists.infradead.org, David Howells <dhowells@redhat.com>,
- netfs@lists.linux.dev, Paulo Alcantara <pc@manguebit.org>,
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
- ntfs3@lists.linux.dev, Steve French <sfrench@samba.org>,
- linux-cifs@vger.kernel.org, Phillip Lougher <phillip@squashfs.org.uk>
-References: <aHa8ylTh0DGEQklt@casper.infradead.org>
- <2806a1f3-3861-49df-afd4-f7ac0beae43c@suse.com>
- <eeee0704-9e76-4152-bb8e-b5a0e096ec18@linux.alibaba.com>
- <b43fe06d-204b-4f47-a7ff-0c405365bc48@suse.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <b43fe06d-204b-4f47-a7ff-0c405365bc48@suse.com>
+Subject: Re: Using UPN with mount.cifs?
+To: Alexander Bokovoy <ab@samba.org>, Steve French <smfrench@gmail.com>
+Cc: linux-cifs <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
+References: <a97b22e8-144e-45ed-8850-c3fd18769a6c@pre-sense.de>
+ <CAH2r5mtgWfxQtoy2gwnMiWM3HXno2icuWmiuhMJ64yTAi_jsyQ@mail.gmail.com>
+ <aHXuSKMsQsPWd5NC@toolbx>
+Content-Language: de-DE, en-US
+From: =?UTF-8?Q?Till_D=C3=B6rges?= <doerges@pre-sense.de>
+Autocrypt: addr=doerges@pre-sense.de; keydata=
+ xsFNBFf3cXkBEAC5LdEcPeHSvMw94QTRs9fdasHpCm5qrVlvZhSeJLmz8bjxkhwzyNmQUCyT
+ ZPA3CTjDgevt9Bf55QFJsm5PIEw7XKdz0TyLt5RkefM87wzny0zuKRwY+8hi+wZ72cYwJomQ
+ O667x+/khboagQos5GInp8UrAL33eoN7N/1z9NnZpLf1Yq0Gcy1MfeGsYNxeosVoeZG0iW8p
+ mUe+bAR7brKFuZhl/JNQzkn6xIKJ4jA7xZBIHqRtZ/KrwPskDWO5Pa5X3Kp37JjFnSPqeCW1
+ gdHLJUjl78mK2wzuDTXam1vidFgrtHS1oNeZ0AGjTaK88Din1DprAPj3TeVrSVff60diMO3w
+ JoxsAJ1wJCjEIi3VfCf/KQAMBEm//+UuuvHg+PNY7VOzMIqwnOa+D9gtUbM/YPthK+hHHKXE
+ /yKH7w+1sTgiPZUD0LSXwZ+K+SXXHEtSZsm9BHn1+TX4ik8fWPuQHfd1Tu9L83iEnQyi1twS
+ pVCBKgwJ7rnMRGat5u2icpAlPJMWtF9GF/2IZL1KcRAMRk/ckxfR9rpdm6722kTzGDRQcZ8S
+ 1JjkBysKpCmSw0ukhNgtpSAGeAu3Rdc1wFKUuTcvXekPsCARuBfkwjav+LFXy22LKw9j9IZS
+ L2khi3/14XEYkb3Em4mYDX+DHpepJ0kNH+VGiA8kgIWWS+hOVQARAQABzSNUaWxsIERvZXJn
+ ZXMgPGRvZXJnZXNAcHJlLXNlbnNlLmRlPsLBjwQTAQoAOQIbAwMLCQMCFQoFFgIDAQACHgEC
+ F4AWIQTvEOSugkiJrfgUnlBO9SfZ885jpgUCZow3KgUJFKceMQAKCRBO9SfZ885jpoz6EACv
+ Du2mWYKAEmq/UkgSe2RfVL/pSllIvip5dinzIVzZOaVedMuN475DaXTqrvPXxDty47WQSK5J
+ 9+n2vgWndLQ+eFnWFdLDlGc+BSFdoGdGXvS8z3semmh5/oyHnYYP/hW/MWCGIPMBW92mwfXo
+ CzhxHFob3yCjIBdSsqOjvrRbMfR33wbZ0GXlUuISpt5kRxszCQ/z4Wy7W+LGlVgBwfeqLUxS
+ b2wXpXf1Z2AzP5qGcWDvgc1vDNXcbTiTIlta6JywvTBjnL+7ZKJ8f87lqm/0FnB2MwsBM0bF
+ WFnuk/JpmXA/mp2RqltXfvXOLDxqe2LcQ4CQ3ikTp+iepb3oJs8j88259DTqwCt0Txv87hG2
+ yPpToEXNC8aa+d5LQDh+Tj4XnJ2NIlH0tMcboobX7aE7yWRk4SCAiMyvwYkcTtKZXfjj2BX+
+ SDNANXBWnN+WJ+ekmhJsc9VsEO6amQo0l0X0+u0UpH+W6UBPdoguqw1cmDWxSJ9NqHJkE8Ij
+ /BgZCBWG6HvCUf8n9LWnBkcGZlGO/sGJghiSGzQvEICI5xlevp9pC/Eftontr6m6ep4ZxeeH
+ THdQ7R73sotogbSz6UzFJC81j96iCH8F4S5nBt6NhP6Im5HFLVHwj7TBWesUrMwgCQRO4vZb
+ EqJpgxiKsUwsI5sxL/oi3olApFA/YY51f87BTQRX93F5ARAA6dly+oLaOa1axW7Kf6ml832D
+ gioB2/lsATLtkm8P1tKkC/tx3Heg6FUyjkE7UoYf5rTEqCHtsQbSqHovvRLs25lJx23Tmn7z
+ cV4EU28lXtEDtVGQ8qqsdpEv2S4nszgcSUvTKYzubG+P26lL7Ra0bMSDz8T0/ccFErWV3PiS
+ Z4gsvV5fCQGzn+9ivDvLYBoIhI021Vfg6Y8vFm928a4Evb9vLp3n/7TtUADljcsKzYEJgtqI
+ B1Xa32B4J2JQc8znIDYm3sWD3D84cR5GosQjOLQ0i/mhDQjYK4tQbzwuwP1amz/9TU7MCJGe
+ 3rDdz7t5jYHTYz9uQPY923YSEDET1CQ0PrK2ancVUwPWMdR5wf/WP4NtCgcXyqVwsAVkfFKz
+ eugQyMsYcM0B/QFuFGytz4Fghv5XWiFjmX7ddMSTe01wp1Jm30vBJpgTHI2/yBtmlJXhLwFa
+ KWOp298dibCgbVKqBkXPYgGtFAiVv22HMttB62ToEEart+BDo2uIYeHWXjDTmm2kIdPK5sdo
+ acaJVKVzyioRc/JCIyNUv1+Buv8q3F/S9JAnOfWRmCLqyUDBs8XjUxb9J0gSpPXcXNG/m6Vk
+ dXiHGzIaflWwjFYJo2xeB/uEsaxPKo/MaRIq8eIfy7TueaIq7AH1nwZtl4jpXBkBB7IklTuI
+ 1l/Ml/9Ao7kAEQEAAcLBfAQYAQoAJgIbDBYhBO8Q5K6CSImt+BSeUE71J9nzzmOmBQJmjDdK
+ BQkUpx5RAAoJEE71J9nzzmOmgnMP/0Z0139Q/5zcoxjV78XUfrg4HoBoFEFEZlLMfnDpj3NH
+ qrAfwON5Y0O3rqi5AHXmQCl1jqAB/9stjDdTOIjY2mZz0QGjMXyF2FY6nkmjGqb/iLczAAd2
+ kDR0W2YunKcLD16TgjbIGcRVdjGtjRqRjAL8P71eeFUfxaKbr+cKvw/6mFLeAyVUMSHPIUPj
+ 5wXXJChcPbOcH6LEnf5VnUxPIG0HTa7zw3N5zjQeSXiulEB2c8jHxcj+jsFiCwP3WOB/ZvCs
+ Y7JgpSc5ZLHF9FVTPcmJOlUPCIIZ6nq2+D6bQrf0SYl7npZmLlHBg//YQpO4U/hVwyNPlPk9
+ n+AfOseprP2ndBpI/hp3KOQksPKE5lpWN7adZj5LVC0hY1ydv2CDu4736a5AxmmToS4Fkwbn
+ Ih7ZHt/Q1IGVzq5ZSwTom6q0dM+ojGAP2jjr/KTitUxRGnceFy+1ysQRIXR0ImsOJdL97WIY
+ 2tLDf1AQ5eNvNT9e7AfWD7QrQKgtKd8+vP6pGnoZx2SHJW2cwwcXYj2owilkbAJpjU3kDBwV
+ JBUNZ0GUfpfHCVLfApz7+GNGtbb7+IWCgNCITBygU8mVLeYzV7gA1aP6O+8ad3L0XvpTOGRt
+ 9x4OZONNHB4tPEl/6n2+TBYFEiNl8PexdVXOs9AJjooSaMZ4L0v2n9J+rVoUpGyX
+Organization: PRESENSE Technologies GmbH
+In-Reply-To: <aHXuSKMsQsPWd5NC@toolbx>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Hello,
+
+thanks for your answers.
+
+In our setup we use NTLMSSP and a NetApp.
+
+If I understand you correctly, mount.cifs basically cannot use the UPN to 
+authenticate - or at least not reliably.
+
+Simply splitting up the UPN (<user>@<domain>) for mount.cifs doesn't work either, 
+because the SAM account name has a different domain and also a different username scheme.
+
+Is there a canonical way (with Linux) to map a given UPN to its SAM account name?
+
+Thanks -- Till
 
 
-On 2025/7/16 12:54, Qu Wenruo wrote:
-> 
-> 
-> 在 2025/7/16 10:46, Gao Xiang 写道:
->> ...
+On 15.07.25 07:59, Alexander Bokovoy wrote:
+> On Пан, 14 ліп 2025, Steve French via samba-technical wrote:
+>> This is an interesting question.
 >>
+>> mount.cifs will pass it (the UPN) down to cifs.ko so it will get sent
+>> on the wire, so behavior will vary by server.
+> 
+> Is this with GSSAPI krb5 or NTLMSSP?
+> 
+> For GSSAPI we either expect already existing credential or initialize it
+> from a keytab. In the first case cifs.upcall is not doing anything to
+> enable enteprise principal because it is not handling the initial ticket
+> acquisition. In the second case it doesn't do anything to mark the
+> client principal as an enteprise one.
+> 
+> The difference is by how that client principal is marked down in GSSAPI
+> negotiation. It needs two parts:
+> 
+>   - a client name should be an enterprise principal,
+>   - client code should make sure it sets a flag to accept rewrites of
+>     its own client principal name by the KDC in the returned ticket
+>     (principal canonicalization).
+> 
+> Neither is done by the cifs.upcall. More to that, for GSSAPI krb5 the
+> username passed to the cifs.upcall is pretty much ignored except for the
+> keytab initialization.
+> 
+> With NTLMSSP you don't really have 'enterprise principals', as it is up
+> to the SMB server to interpret the name you passed.
+> 
+> The client has nothing to indicate that. A server may consider
+> interpreting it as a local machine-provided one (username=testuser), or
+> consider to map it into the local one even if it has domain name
+> explicitly set (such as with IAKERB case on a standalone Windows).
+> 
+>>
+>> I tried it to current Samba (passing "username=testuser" and also
+>> "username=testuser@somedomain" and also for
+>> "username=testuser,domain=somedomain") and it worked fine for all
+>> three cases (with and without UPN, with and without "domain=").
+>>
+>> Trying it to Windows though:
+>> 1) "username=testuser" worked
+>> 2) "username=testuser,domain=somedomain"  worked
+>> 3) "username=testuser@somedomain"  did not work to Windows server
+>>
+>> So looks like the behavior varies by server, but safest way is to
+>> specify the UPN as "username=" and "domain=" rather than
+>> username=someuser@somedomain
+>>
+>> On Mon, Jul 14, 2025 at 7:44 AM Till Dörges <doerges@pre-sense.de> wrote:
 >>>
->>>>
->>>> There's some discrepancy between filesystems whether you need scratch
->>>> space for decompression.  Some filesystems read the compressed data into
->>>> the pagecache and decompress in-place, while other filesystems read the
->>>> compressed data into scratch pages and decompress into the page cache.
+>>> Hello everyone,
 >>>
->>> Btrfs goes the scratch pages way. Decompression in-place looks a little tricky to me. E.g. what if there is only one compressed page, and it decompressed to 4 pages.
->>
->> Decompression in-place mainly optimizes full decompression (so that CPU
->> cache line won't be polluted by temporary buffers either), in fact,
->> EROFS supports the hybird way.
->>
 >>>
->>> Won't the plaintext over-write the compressed data halfway?
+>>> I'm wondering whether it is possible to use User Principal Names (UPN) instead of
+>>> accountnames + workgroup/domain, when mounting a share with mount.cifs?
+>>>
+>>>
+>>> The man page for mount.cifs does not mention UPN. A quick grep through the latest
+>>> sources (cifs-utils-7.4) doesn't mention UPN either.
+>>>
+>>> Searching the ML in particular and the web in general came up emtpy, too.
+>>>
+>>>
+>>> So, is there a way to do it?
+>>>
+>>>
+>>> Thanks and regards -- Till
+>>>
+>>> --
+>>>                                           www.pre-sense.de/fcknzs
+>>>
+>>> PRESENSE Technologies GmbH             Nagelsweg 41, D-20097 HH
+>>> Geschäftsführer/Managing Director        AG Hamburg, HRB 107844
+>>> Till Dörges                              USt-IdNr.: DE263765024
+>>>
 >>
->> Personally I'm very familiar with LZ4, LZMA, and DEFLATE
->> algorithm internals, and I also have experience to build LZMA,
->> DEFLATE compressors.
 >>
->> It's totally workable for LZ4, in short it will read the compressed
->> data at the end of the decompressed buffers, and the proper margin
->> can make this almost always succeed.
-> 
-> I guess that's why btrfs can not go that way.
-> 
-> Due to data COW, we're totally possible to hit a case that we only want to read out one single plaintext block from a compressed data extent (the compressed size can even be larger than one block).
-> 
-> In that case such in-place decompression will definitely not work.
-
-Ok, I think it's mainly due to btrfs compression design.  Another point
-is that decompression inplace can also be used for multi-shot interfaces
-(as you said, "swapping input/ output buffer when one of them is full")
-like deflate, lzma and zstd. Because you can know when the decompressed
-buffers and compressed buffers are overlapped since APIs are multi-shot,
-and only copy the overlapped compressed data to some additional temprary
-buffers (and they can be shared among multiple compressed extents).
-
-It has less overhead than allocating temporary buffers to keep compressed
-data during the whole I/O process (again, because it just uses very small
-number buffers during decompression process), especially for slow (even
-network) storage devices.
-
-I do understand Btrfs may not consider this because of different target
-users, but one of EROFS main use cases is low overhead decompression
-under the memory pressure (maybe + cheap storage), LZ4 + inplace
-decompression is useful.
-
-Anyway, I'm not advocating inplace decompression in any case.  I think
-unlike plain text, encoded data has various approaches to organize
-on disk and utilize page cache.  Due to different on-disk design and
-target users, there will be different usage mode.
-
-As for EROFS, we already natively supports compressed large folios
-since 6.11, and order-0 folio is always our use cases, so I don't
-think this will give extra benefits to users.
-
-> 
-> [...]
-> 
->>> All the decompression/compression routines all support swapping input/ output buffer when one of them is full.
->>> So kmap_local() is completely feasible.
+>> -- 
+>> Thanks,
 >>
->> I think one of the btrfs supported algorithm LZO is not,
+>> Steve
+>>
 > 
-> It is, the tricky part is btrfs is implementing its own TLV structure for LZO compression.
-> 
-> And btrfs does extra padding to ensure no TLV (compressed data + header) structure will cross block boundary.
-> 
-> So btrfs LZO compression is still able to swap out input/output halfway, mostly due to the btrfs' specific design.
+-- 
+                                         www.pre-sense.de/fcknzs
 
-Ok, it seems much like a btrfs-specific design, because it's much
-like per-block compression for LZO instead, and it will increase
-the compressed size, I know btrfs may not care, but it's not the
-EROFS case anyway.
-
-Thanks,
-Gao Xiang
-
-> 
-> Thanks,
-> Qu
+PRESENSE Technologies GmbH             Nagelsweg 41, D-20097 HH
+Geschäftsführer/Managing Director        AG Hamburg, HRB 107844
+Till Dörges                              USt-IdNr.: DE263765024
