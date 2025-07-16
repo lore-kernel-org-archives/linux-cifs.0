@@ -1,101 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sxb1plsmtpa01-04.prod.sxb1.secureserver.net (sxb1plsmtpa01-04.prod.sxb1.secureserver.net [188.121.53.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D1224111D;
-	Wed, 16 Jul 2025 06:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1028B2D77F8
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Jul 2025 22:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.121.53.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752649168; cv=none; b=fuwdM/xACvY7H40Jp4kBTVja46WzgErNeXuXgmmpMAp2b8sGR4df9ATCVN/7/igl/9VCIqNvZ4Z2NjF4Q3o1SPSe683/Sb99i+vusxrJcuRSVco0ozu3AixwkCRmc3CdfzPXDveWn+Tv/VKIAf+gOvJX4Ra3x8yStBQHD3gjG78=
+	t=1752706641; cv=none; b=KyyTiKA+Ns9k5/warQVSMRysDXm9RzvsTXLW5ywT1wohVgtO1JFSB+k/fLluJMrFAaXcg2dGndEe41xIQuRhnGKNtJHB1fSReqG0+KuSPf29JZMb4z4C+8fqWvh5VL98kVW5yZcKCX8C/knL0aiQ8r/ZTyez6tPmzwNTKnnjKdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752649168; c=relaxed/simple;
-	bh=1YT65WZi+HoNOGQs+MzMBsXQZvYrDhOQEHRhKgQWf5U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mIu9YApWGUJVasYqbyWM+HKlsm7cDfC6tryR7TqWHF9PfZHcKF+e9c+gORq/FVMWuJfMiA4wZKb41ph8LRvEM1MfgMUFMunLnVsuHf/ztOtjxnndKN6P2f17qNAgJZXawA6cTpc0XbUGQg/S3cwoaK5nxp3FICLBl0NydZkCAuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF5Pck/k; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF5Pck/k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33485C4CEF9;
-	Wed, 16 Jul 2025 06:59:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752649168;
-	bh=1YT65WZi+HoNOGQs+MzMBsXQZvYrDhOQEHRhKgQWf5U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=LF5Pck/k/d8S9DCX0kbMVToPVEonFH+xQNHM++N6QwzI3vmpUOz3CB7/3hITAsK/m
-	 wIToOrUVHmz0LivDXlcRb930EeEATqKyaxYXMuDvPpD9bECoXB/bGEBfmfOJPbTzG1
-	 yzHeUPBAKoD2xbjr/Gk2VzhJWHQrGDcQ54qlOrAvYFnrRfIZJUlAm+EegGjB8Pd1hp
-	 u+FySfV+owrGOFlZpA5ODo9QwP3SBz8llchEo/V0ijPesESM0HKCg0x3daJKsrzyas
-	 upNcWEXdR+FF9gX5QZEQkZVGTyAE3dqW+ovaMoWAVCKgzH7KfBCR4Og/w7gTFq0d/i
-	 rLZdzlrhJgTZA==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-608acb0a27fso8782105a12.0;
-        Tue, 15 Jul 2025 23:59:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVUyjr17EiJkurphvl/wVjnrVL+DuKJxGPaWyIM/imLfeRotbxAKIp/BYW1f3eadPWzM0/Ps2t1/ZP+@vger.kernel.org, AJvYcCWIFyMYsIL8w96A3RqMZDIkkqElvsIuaKdI2gRhs8qgBZCNnNsrISktIDP5LoBbOw6yJDk3MvFZcyvwUHl3@vger.kernel.org, AJvYcCX0+u3h/N+Vv3N2E6wSW9fviQRumwMe8czoZC3GL5s1kay/Q9YQJfz4zszLY9m3uv3bFy5SwerPdabte8xxFA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXhjYB9smNT5mohaMv0et+a5jj2tHIm5cu2F2rrRAaQYJHOkw7
-	Rx5dr13mvSPWx4C1de+Ahf7fKrk/8fNRvgGYAGYjoZAQSCQo423Do3iFe0Xhf33rLhQj+2IeUVS
-	Brx1fDKSnTY9oW9BXIZlTb0HqEzaOG74=
-X-Google-Smtp-Source: AGHT+IGKo3S3B0Tw6XffFhBWZNoPLgGk8VvqoIudUlX7wPELD3zTsnE0xlx5Ew1W4zsHG++4r7Y1iPeGJUV3+0jv41Q=
-X-Received: by 2002:a17:906:ef09:b0:ae0:e123:605f with SMTP id
- a640c23a62f3a-ae9ce0a4611mr134926966b.39.1752649166624; Tue, 15 Jul 2025
- 23:59:26 -0700 (PDT)
+	s=arc-20240116; t=1752706641; c=relaxed/simple;
+	bh=NMP9084JD75v2eU5pfqTbg/2XaSNjwAG/rAMydJ3TiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=O74zkUkF3XyYvXu95XqjP0cMrvVb0JAPOPldwY1Wazka6pjPDu2Sfac6VgT5xdPIW2T9IgE/bNRO7nDixLPSDssyToljNI+6R5MM21RPxzqaQ+2vxPytnK8Ic3lo++UH43b3DOXlwA5JXUzflOFpT7Jj4+ftNf8PU5WmFObemqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squashfs.org.uk; spf=pass smtp.mailfrom=squashfs.org.uk; arc=none smtp.client-ip=188.121.53.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squashfs.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=squashfs.org.uk
+Received: from [192.168.178.95] ([82.69.79.175])
+	by :SMTPAUTH: with ESMTPSA
+	id cAlKuoVr96J4FcAlNu4Dmt; Wed, 16 Jul 2025 15:38:10 -0700
+X-CMAE-Analysis: v=2.4 cv=TYmWtQQh c=1 sm=1 tr=0 ts=687829d2
+ a=84ok6UeoqCVsigPHarzEiQ==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
+ a=IkcTkHD0fZMA:10 a=Z9je9KOXq8erZ9ix0VAA:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: phillip@squashfs.org.uk
+Message-ID: <f4b9faf9-8efd-4396-b080-e712025825ab@squashfs.org.uk>
+Date: Wed, 16 Jul 2025 23:37:28 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250608234108.30250-1-neil@brown.name> <175264334224.2234665.14956053645355864817@noble.neil.brown.name>
-In-Reply-To: <175264334224.2234665.14956053645355864817@noble.neil.brown.name>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 16 Jul 2025 15:59:15 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-KhOYk_fdKFV-ZbtSeX+Afc65ArnfSVrAqVxL6hMXoCQ@mail.gmail.com>
-X-Gm-Features: Ac12FXwfZS2wHAoghNhMxbN-f_A8hoFnoQoeBr1SIRvTZILbUOAaB-G9Mh3M82s
-Message-ID: <CAKYAXd-KhOYk_fdKFV-ZbtSeX+Afc65ArnfSVrAqVxL6hMXoCQ@mail.gmail.com>
-Subject: Re: [PATCH 0/4] smb/server: various clean-ups
-To: NeilBrown <neil@brown.name>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Compressed files & the page cache
+To: Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
+ Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
+ linux-btrfs@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>,
+ Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+ linux-erofs@lists.ozlabs.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+ linux-f2fs-devel@lists.sourceforge.net, Jan Kara <jack@suse.cz>,
+ linux-fsdevel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
+ Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
+ David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
+ Paulo Alcantara <pc@manguebit.org>,
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+ ntfs3@lists.linux.dev, Steve French <sfrench@samba.org>,
+ linux-cifs@vger.kernel.org
+References: <aHa8ylTh0DGEQklt@casper.infradead.org>
+Content-Language: en-US
+From: Phillip Lougher <phillip@squashfs.org.uk>
+In-Reply-To: <aHa8ylTh0DGEQklt@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfF7PhqfDTvf0GLbE+ZqPgfM1AhwOJlHSpsMzx6XOcDZuT9YqsTaq8QVlGaLYbZSCACkmupuX6+moDnsLw8z6oXo/oW+NBiLgU6y5TBJWXg6tV88e5Euj
+ 1giZ2fZsoopVdzm/v4Tlp3z0KvSwDUxO6m0SnvjOtH9zvReYNZLA2FNMM+DrFEJFaiIkCvRrmoBmbv4h3OnUHX5sclo1/Wezm+BEj6dLaDXAyuKVHku8Kvy6
+ 3A9SkS3ZtrCtIQcuDoAamTotabkyq8u+NbETcu+wgZcHz79D2Cqa4hBUqSAxUGPLdjqjvKdz0Y+w0IVDS3aE1LUKcnIDytVIxDas6bwTbJD2/Yz7PsjwtKtl
+ JoRL1DOXscuVOLxBvw+0xQnpDotzu0Vo1GrTRn1rfHJKD4Exmb3wOCyCD+h2AYMKaGBCjBVgXvf5G6DK3/s3MVbkLRjH09uolqpyyQAsKggrC2Moa3qwKWia
+ tBwCIdLZWPpQOFc2HOlLjv7vmcMVwr97TODyoKXcYSBdRG5Aj19H80t7Vc1kPbVELOFd5EDHNfQ8ATDugkZBq2J/V21dERsOluc2pak7RNmbJyOzrPcIwalB
+ Nf6fEekDRHicDoV2q2tew6sPotWewTjdjMw9iwbRhZpamiZqsp/XI9f5XhZcOQoUdsCy/ey/U995vHBeMMo6H0yRk9BNVCMpINAVKCtQmjIv7xNp+Ioo2Sxs
+ gPnTBcUD++qhM8KfplNiTcJXoQ96eTIssdBe+BMWUXv1qhpWQ9GKojXGcX8mKMvEG7sKSgFMNrc3J5Xm28GieZWCzy/+ZDv2I7VwecP2j5T1w/WLBfHEUgk5
+ gufg4AqEMh/tWtnL4rvSfpFcA6zbEUbuBjvPEzIYLlyjogb7n+266BU1vQZO72XCtgIJOh/KDHsuteA4LS7mxuWjWepHBR+R1mjV5Mwu
 
-On Wed, Jul 16, 2025 at 2:22=E2=80=AFPM NeilBrown <neil@brown.name> wrote:
->
->
-> Hi,
-Hi Neil,
->  did anyone have a chance to look at these - no replies and they don't
->  appear in linux-next ??
-Sorry, these patches are not in my mailbox for some reason I don't know...
-I guess I missed these ones. I will check and apply the patches now.
 
-Thanks.
->
-> Thanks,
-> NeilBrown
->
->
-> On Mon, 09 Jun 2025, NeilBrown wrote:
-> > I am working towards making some changes to how locking is managed for
-> > directory operations.  Prior to attempting to land these changes I am
-> > reviewing code that requests directory operations and cleaning up thing=
-s
-> > that might cause me problems later.
-> >
-> > These 4 patches are the result of my review of smb/server.  Note that
-> > patch 3 fixes what appears to be a real deadlock that should be trivial
-> > to hit if the client can actually set the flag which, as mentioned in
-> > the patch, can trigger the deadlock.
-> >
-> > Patch 1 is trivial but the others deserve careful review by someone who
-> > knows the code.  I think they are correct, but I've been wrong before.
-> >
-> > Thanks,
-> > NeilBrown
-> >
-> >  [PATCH 1/4] smb/server: use lookup_one_unlocked()
-> >  [PATCH 2/4] smb/server: simplify ksmbd_vfs_kern_path_locked()
-> >  [PATCH 3/4] smb/server: avoid deadlock when linking with
-> >  [PATCH 4/4] smb/server: add ksmbd_vfs_kern_path()
-> >
-> >
->
+
+On 15/07/2025 21:40, Matthew Wilcox wrote:
+> I've started looking at how the page cache can help filesystems handle
+> compressed data better.  Feedback would be appreciated!  I'll probably
+> say a few things which are obvious to anyone who knows how compressed
+> files work, but I'm trying to be explicit about my assumptions.
+> 
+> First, I believe that all filesystems work by compressing fixed-size
+> plaintext into variable-sized compressed blocks.  This would be a good
+> point to stop reading and tell me about counterexamples.
+
+For Squashfs Yes.
+
+> 
+>>From what I've been reading in all your filesystems is that you want to
+> allocate extra pages in the page cache in order to store the excess data
+> retrieved along with the page that you're actually trying to read.  That's
+> because compressing in larger chunks leads to better compression.
+> 
+
+Yes.
+
+> There's some discrepancy between filesystems whether you need scratch
+> space for decompression.  Some filesystems read the compressed data into
+> the pagecache and decompress in-place, while other filesystems read the
+> compressed data into scratch pages and decompress into the page cache.
+> 
+
+Squashfs uses scratch pages.
+
+> There also seems to be some discrepancy between filesystems whether the
+> decompression involves vmap() of all the memory allocated or whether the
+> decompression routines can handle doing kmap_local() on individual pages.
+> 
+
+Squashfs does both, and this depends on whether the decompression
+algorithm implementation in the kernel is multi-shot or single-shot.
+
+The zlib/xz/zstd decompressors are multi-shot, in that you can call them
+multiply, giving them an extra input or output buffer when it runs out.
+This means you can get them to output into a 4K page at a time, without
+requiring the pages to be contiguous.  kmap_local() can be called on each
+page before passing it to the decompressor.
+
+The lzo/lz4 decompressors are single-shot, they expect to be called once,
+with a single contiguous input buffer containing the data to be
+decompressed, and a single contiguous output buffer large enough to hold
+all the uncompressed data.
+
+> So, my proposal is that filesystems tell the page cache that their minimum
+> folio size is the compression block size.  That seems to be around 64k,
+> so not an unreasonable minimum allocation size.  That removes all the
+> extra code in filesystems to allocate extra memory in the page cache.
+> It means we don't attempt to track dirtiness at a sub-folio granularity
+> (there's no point, we have to write back the entire compressed bock
+> at once).  We also get a single virtually contiguous block ... if you're
+> willing to ditch HIGHMEM support.  Or there's a proposal to introduce a
+> vmap_file() which would give us a virtually contiguous chunk of memory
+> (and could be trivially turned into a noop for the case of trying to
+> vmap a single large folio).
+> 
+
+The compression block size in Squashfs can be 4K to 1M in size.
+
+Phillip
