@@ -1,156 +1,148 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5922912B94
-	for <linux-cifs@vger.kernel.org>; Fri, 18 Jul 2025 04:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C0E1B4257;
+	Fri, 18 Jul 2025 04:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752811646; cv=none; b=MqXHFNN15MMmjftW+HzvGWX31rH12ssiiwHEM1EFWXwBC6YrcUhdxnzxI1rodotvpBnIY9oyri1lsPbOw6h0eBh8p70J68odt05g+OYKSs5LB1RwoPvxn5Mgc+TYS6XPzMYqGtgU87OF+/mzpOfv5iQlCp4Z5vuWBO+DfiwuxUw=
+	t=1752811850; cv=none; b=pDWTUJ/voM7kMV1UWIfa/42zpgkrZitTTqXFMOm3oCiwAqyq/P05V+8zq5C0WgpH3/1KvRRn2NBfeS7wVO6e0xqjLUqsLGRterPkRaLtp5l6nHKe9mM4X6cKUJT3Wtpanivxmb0xhc/FgkYRpTbwi53XOjeoSaaKEB+r0jbGtIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752811646; c=relaxed/simple;
-	bh=LsAypbFYyQFl8qP6SdysyoeiL1TPs6OBreFzA5J2mrY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dgh2M+o6jJmoLOF4GinXS9IjXp+yBC5IWhNDaXbB0SmO9VjCD6OssvEosP3C00D2G305TNYkS9cbXXPUvuL6zAWsCA8hUC8VEjcEy6x68veRVyKtRuwZHY9EdFAStV6uFIUKVAjoLhbP6ci4FAwcSQDYVaMHJznAJ4lrs6+wzO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3W3mqtk; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1752811850; c=relaxed/simple;
+	bh=0kG+z2/LJCfSnSV7UBYxQFmnrO9me+wV/mZOX+SXjJw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hCqbdc2f5oZKkX3a0qssTR+PchQQhKA2821SSSGsa9DCh0sCmpB4UQjh80+dydS854ceLZVCDvQozg/Bx5f1hqh3UeZ1FWSq3MX3uBeddiYwXfmySHqB4ki6nVJ2kUMTGbNfC24UUSU2NhtrjUU39VjwbqKaeocq4i4Oy5n0MRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PU6pRLBG; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3W3mqtk"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d95b08634fso101677585a.2
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Jul 2025 21:07:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PU6pRLBG"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fabb948e5aso18121156d6.1;
+        Thu, 17 Jul 2025 21:10:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752811644; x=1753416444; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7u7PuI8e8MoaiFGfxTPRTE+KFsuIEbSKe5QQLRuKvL0=;
-        b=O3W3mqtkcnKJlNmxYRrPaRwtBFqngGJKEmDo8xC3nA9tUVC4KwX22MtvNQYMCOM2/Q
-         KzEpnkwjXy/ZWknYSOGkI5cQT2FnR9AJWL+M6Oti5YxtLJ5TXrulbz4jHL2cTWHP23O+
-         Txoqfam/9W8tZ8M8SQZ06bfBB/tqlF8XGeL+2EZw0TB0PjG+ZzPlG7ri+82TF3piXBQI
-         eGOj8cGwi4q60vQ0k9XUQXicdte0oRKsfspaGs/Rk/74M77KiljnOGUq6V2bmEjFZnA6
-         IMcSHvNa3brY+NU7KJLLOEN2Ppqj0MlazAnKSsR3XpYCaucp0Owfo8cGTb0f32t7k9O5
-         UA2w==
+        d=gmail.com; s=20230601; t=1752811848; x=1753416648; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6dRyzcJTSxiNH+JE+i8uz41OReOTdbs1ekB4pJU70Bs=;
+        b=PU6pRLBG2g40kww0cJOI3Pf5SWnO5GTtzdnrRo+MqNnWKuJa0+QZsQiopzmuv6JfYW
+         Rx0p/ZqWMp2MIOQQrqC6aR6EDeKl0j0njC04YC9y9rpFe7NYVWhJy4tYwCS532ECm6rF
+         9AGaN7T7ZwRIxllbpRNf/opsUy0uiuVBYtr/YQz4oUOXjc755OXDHCXQuKLWmDB7MDYS
+         adJBRCw/JdmzIEa+QuvI2mhBIySq3dLv+KzeYTwkipMqfj+mquvzPdh77DsCMiG4DKvc
+         5wMfpGAv6/z/DwSb2+KFPF5RCfT1lBffyJP9rLwuQA4RX6yLbQ9w7EDy2ZhgD2BMLs1Z
+         hHaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752811644; x=1753416444;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7u7PuI8e8MoaiFGfxTPRTE+KFsuIEbSKe5QQLRuKvL0=;
-        b=P0lQjk133+XbqTot/FG/BWIk3UxVtEVWYJs95f/L9vhIczc167fPRNWTVZITvJEidK
-         IIDyH+3kTu51CXVI5mxnbL/EjV4Sg1SAAuyV5OccsOb9RLRDQ4/ivVs+T35d2cd/l1OI
-         RX2YkRAU7CUCi3kOjetDoPbP0WZn3UUXV32r/+eE1rU9+JQsNDam49y1mmJJSrvigO+r
-         YpodjaH00mdvZdiAmYZbFt3eNeuq4/ThL2ydyAhJTiKsWlpJ0YkEBNIcH5zM8Uj1bVN5
-         2yjIK2Jvjge1IsjMhTz8tK8Qz35FSNME3tCp795exM+OKadybQtEQBqUt5EOSd75JoKY
-         GL/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXUJPWPtt1tdFZlIlxdJ6RvEZ36XVPNNoFeDkKbw3k6fIz9N1LAKQ19oEPuMTkqmh7OwFymcftnvzpx@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/S8GUBgRNboDE66d/rKUqmrQWqrVn8fnW1RMKtsmnf9Y2mKiz
-	aUzQM8s7kOneWGXSP6n2JWN5XlIShASloPZasN0AvlzjxP/KP5zmVJtDs5XNHgoGKx49xFBANi5
-	Lrax6q0GVtgCCA59vPVgH8HMMEJ9VqpQ=
-X-Gm-Gg: ASbGnctTpavvyzivV1+RGRGh43lDckLS3UyWPXs4nhDcoW5QnHvZ03nqnJZdt41SHX5
-	IwgJVqEjXXH4yTaHayvqcJ9KWVMK/+R0Euxu9Wt290H3Tl84GVnE+yQQEHpjXngkC5Rj4hTvDQf
-	BzuhRU0RAZNPvzGgoLzRXZO3Nbpy2DPD4OnVBuQ0G1O/HmTvKvGAoWcLkqyDZmgZSt/3fJ3IR3u
-	y9vob1k8/4rs0/X9G6SjqCBVTJbG+TXiFOLZbPV
-X-Google-Smtp-Source: AGHT+IFwZbOi1gEoQz4VgkUNCzg2hbfaS2P4CJYuTHkfMM5Hla3encwAcg+kuJV3MQn43SwQ5B/L2MGpgiELlw0I9UQ=
-X-Received: by 2002:a05:6214:2b8d:b0:705:1175:6165 with SMTP id
- 6a1803df08f44-70511756168mr60275066d6.37.1752811644124; Thu, 17 Jul 2025
- 21:07:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752811848; x=1753416648;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6dRyzcJTSxiNH+JE+i8uz41OReOTdbs1ekB4pJU70Bs=;
+        b=Y9gHu0+f5FKaYKPFVWwGmG4d92PHh1ifk6j/QIU2zhiSD1117uNxiOJvOW6z84jHvn
+         4VsPcu03ivFEB84tCtDRVurkgCTv9hfpHVWEJODInPzY0crD9Z2Ps++YonyGSGiEbwTK
+         8zHaMTzwzs5odmAvvYxUgkuiZGc0jszWgqOLMr1+D1C8dzTi0Oa/f/0jgs8bY0e8qRiJ
+         6fSzGyo2YmF1wshpa9ab9OlYLqmYibfQ0Khi+osqlYy9qTukVMzqoDL207bgdU4yyiZN
+         0twfU0LOdFpXsgUo3INZGcbn/9OvqZ/3R8ww1mymDavDJ3mBPFye4F6H5FDYss+TbFnc
+         tzqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWW3O0mcVYR4PYRIGY/sCtA9bJn9EJdczFOtsTSNSSrtPWuwEznvHkRpy0t01dNzWnLdZ6YvD8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMSIqHmfAV6DU/gAMZ67oELcMYCberCUpJ74PIZx1rpEQ8osEb
+	hozWiFPEjUE4mgfH450ZLj6iBiWDxU75Q4ZcZw8LiG9mL4IARxWYqzYZ8g7EKjSgYFu2CEq7s1O
+	iSvHbxlEwHxOdENy5WjYYsrU+iBoD1Zk=
+X-Gm-Gg: ASbGncvElGPSf56/0YqNQ5PhYVb3/2o4drU6ps1knbiIYelF84VwFn17aN5xIcHSD9O
+	pNZFsAQQusccy5mYboUfRfn728DGU5yGxl3Te0NrMO62DxODWKXOFD7Vcih6SA7GdUIfIihTpvC
+	OLhvRvHdFsw3wBd3A5kXF00sVc1pQEMwqOeK8iRM8xk2rGMwdsHQng3BeSOdyXhmKJzaBayAggG
+	HJfW9aphzRYdA7079oIq+lY3xC7rm+m8P1iQmoD
+X-Google-Smtp-Source: AGHT+IET/V1XYF8JgnXMYmpFBHfWr+BbeRgOXfteBZls2NqtVBKQLyn1/NdCZshWfFdmZ2NvCk8Alek3+W2dry3SXC4=
+X-Received: by 2002:a05:6214:33c1:b0:704:7b9a:8515 with SMTP id
+ 6a1803df08f44-704f6b525bfmr165640006d6.38.1752811847523; Thu, 17 Jul 2025
+ 21:10:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250717120653.821375-1-sprasad@microsoft.com>
+In-Reply-To: <20250717120653.821375-1-sprasad@microsoft.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 17 Jul 2025 23:07:12 -0500
-X-Gm-Features: Ac12FXyAEhW1rPj00V9u9r5Dx8jB_Cy_lPKM5LxmTO4wwGqsSmD0H8YhYYFM_bY
-Message-ID: <CAH2r5msVdabcDudGyR47StT_VoKazD_A0kdAaGMRh+UD060PhQ@mail.gmail.com>
-Subject: Updated SMB3.1.1 POSIX testing results to Samba
-To: samba-technical <samba-technical@lists.samba.org>, CIFS <linux-cifs@vger.kernel.org>
-Cc: =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>
-Content-Type: multipart/mixed; boundary="0000000000006817cb063a2c4343"
-
---0000000000006817cb063a2c4343
+Date: Thu, 17 Jul 2025 23:10:36 -0500
+X-Gm-Features: Ac12FXzDPGpi3fYiM_K-CMhTUptL_mqzq41-Qhi0Plvgn_IJWK_vXdJ8A_kWAFc
+Message-ID: <CAH2r5mt7O=e531xfLB8-7jyyoOm_Hj+7akzCHFX9EcOhQ_uyDA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: reset iface weights when we cannot find a candidate
+To: nspmangalore@gmail.com
+Cc: linux-cifs@vger.kernel.org, bharathsm.hsk@gmail.com, 
+	meetakshisetiyaoss@gmail.com, pc@manguebit.com, 
+	Shyam Prasad N <sprasad@microsoft.com>, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I have done a detailed update of the passing and failing and skipped
-(e.g. when test only relevant to local filesystems) tests, and updated
-the wiki page so others can add their observations etc.  See below:
+applied to cifs-2.6.git for-next pending additional testing and review
 
-    https://wiki.samba.org/index.php/Xfstest-results-Samba-Linux
+On Thu, Jul 17, 2025 at 7:06=E2=80=AFAM <nspmangalore@gmail.com> wrote:
+>
+> From: Shyam Prasad N <sprasad@microsoft.com>
+>
+> We now do a weighted selection of server interfaces when allocating
+> new channels. The weights are decided based on the speed advertised.
+> The fulfilled weight for an interface is a counter that is used to
+> track the interface selection. It should be reset back to zero once
+> all interfaces fulfilling their weight.
+>
+> In cifs_chan_update_iface, this reset logic was missing. As a result
+> when the server interface list changes, the client may not be able
+> to find a new candidate for other channels after all interfaces have
+> been fulfilled.
+>
+> Fixes: a6d8fb54a515 ("cifs: distribute channels across interfaces based o=
+n speed")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/sess.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> index 330bc3d25bad..0a8c2fcc9ded 100644
+> --- a/fs/smb/client/sess.c
+> +++ b/fs/smb/client/sess.c
+> @@ -332,6 +332,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct T=
+CP_Server_Info *server)
+>         struct cifs_server_iface *old_iface =3D NULL;
+>         struct cifs_server_iface *last_iface =3D NULL;
+>         struct sockaddr_storage ss;
+> +       int retry =3D 0;
+>
+>         spin_lock(&ses->chan_lock);
+>         chan_index =3D cifs_ses_get_chan_index(ses, server);
+> @@ -360,6 +361,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct T=
+CP_Server_Info *server)
+>                 return;
+>         }
+>
+> +try_again:
+>         last_iface =3D list_last_entry(&ses->iface_list, struct cifs_serv=
+er_iface,
+>                                      iface_head);
+>         iface_min_speed =3D last_iface->speed;
+> @@ -397,6 +399,13 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct =
+TCP_Server_Info *server)
+>         }
+>
+>         if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
+> +               list_for_each_entry(iface, &ses->iface_list, iface_head)
+> +                       iface->weight_fulfilled =3D 0;
+> +
+> +               /* see if it can be satisfied in second attempt */
+> +               if (!retry++)
+> +                       goto try_again;
+> +
+>                 iface =3D NULL;
+>                 cifs_dbg(FYI, "unable to find a suitable iface\n");
+>         }
+> --
+> 2.43.0
+>
 
-There are 231 currently passing xfstests from current Linux client to
-current Samba which is very good news.
 
-Attached is a script ("run-smb311-linux-tests) which will run all 231
-passing tests.
-
-The failing tests are listed clearly in the wiki, and likely many of
-them are going to be easy fixes (especially those failing with
-incorrect mode bits or unexpected access denied).  Fixes welcome,
-since there are about 140 tests to dig into more (many of which may
-eventually turn out not to be relevant).
-
-As we fix additional of these, I plan to remove the "experimental"
-warning that log during mount with "linux" (or "posix") for smb3.1.1
-client mounts, since I am seeing huge benefits with the SMB3.1.1
-Linux/POSIX extensions already.
-
--- 
+--=20
 Thanks,
 
 Steve
-
---0000000000006817cb063a2c4343
-Content-Type: application/octet-stream; name=run-smb311-linux-tests
-Content-Disposition: attachment; filename=run-smb311-linux-tests
-Content-Transfer-Encoding: base64
-Content-ID: <f_md8anti60>
-X-Attachment-Id: f_md8anti60
-
-Li9jaGVjayAtY2lmcyBjaWZzLzAwMSBnZW5lcmljLzAwMSBnZW5lcmljLzAwMiBnZW5lcmljLzAw
-NSBnZW5lcmljLzAwNiBnZW5lcmljLzAwNyBnZW5lcmljLzAwOCBnZW5lcmljLzAxMCBnZW5lcmlj
-LzAxMSBnZW5lcmljLzAxMiBnZW5lcmljLzAxMyBnZW5lcmljLzAxNCBnZW5lcmljLzAxNiBnZW5l
-cmljLzAyMCBnZW5lcmljLzAyMSBnZW5lcmljLzAyMiBnZW5lcmljLzAyMyBnZW5lcmljLzAyNCBn
-ZW5lcmljLzAyOCBnZW5lcmljLzAyOSBnZW5lcmljLzAzMCBnZW5lcmljLzAzMSBnZW5lcmljLzAz
-MiBnZW5lcmljLzAzMyBnZW5lcmljLzAzNiBnZW5lcmljLzAzNyBnZW5lcmljLzA0MyBnZW5lcmlj
-LzA0NCBnZW5lcmljLzA0NSBnZW5lcmljLzA0NiBnZW5lcmljLzA0NyBnZW5lcmljLzA0OCBnZW5l
-cmljLzA0OSBnZW5lcmljLzA1MSBnZW5lcmljLzA2NCBnZW5lcmljLzA2OCBnZW5lcmljLzA2OSBn
-ZW5lcmljLzA3MCBnZW5lcmljLzA3MSBnZW5lcmljLzA3MiBnZW5lcmljLzA3NCBnZW5lcmljLzA3
-NSBnZW5lcmljLzA4MCBnZW5lcmljLzA4NCBnZW5lcmljLzA4NiBnZW5lcmljLzA5MSBnZW5lcmlj
-LzA5NSBnZW5lcmljLzA5OCBnZW5lcmljLzEwMCBnZW5lcmljLzEwMyBnZW5lcmljLzEwOSBnZW5l
-cmljLzExMCBnZW5lcmljLzExMSBnZW5lcmljLzExMiBnZW5lcmljLzExMyBnZW5lcmljLzExNSBn
-ZW5lcmljLzExNiBnZW5lcmljLzExNyBnZW5lcmljLzExOCBnZW5lcmljLzExOSBnZW5lcmljLzEy
-NCBnZW5lcmljLzEyNSBnZW5lcmljLzEyNyBnZW5lcmljLzEyOSBnZW5lcmljLzEzMCBnZW5lcmlj
-LzEzMiBnZW5lcmljLzEzMyBnZW5lcmljLzEzNCBnZW5lcmljLzEzNSBnZW5lcmljLzEzOCBnZW5l
-cmljLzEzOSBnZW5lcmljLzE0MCBnZW5lcmljLzE0MSBnZW5lcmljLzE0MiBnZW5lcmljLzE0MyBn
-ZW5lcmljLzE0NCBnZW5lcmljLzE0NSBnZW5lcmljLzE0NiBnZW5lcmljLzE0NyBnZW5lcmljLzE0
-OCBnZW5lcmljLzE0OSBnZW5lcmljLzE1MCBnZW5lcmljLzE1MSBnZW5lcmljLzE1MiBnZW5lcmlj
-LzE1MyBnZW5lcmljLzE1NCBnZW5lcmljLzE1NSBnZW5lcmljLzE2OSBnZW5lcmljLzE3OCBnZW5l
-cmljLzE3OSBnZW5lcmljLzE4MCBnZW5lcmljLzE4MSBnZW5lcmljLzE4NCBnZW5lcmljLzE5OCBn
-ZW5lcmljLzIwNyBnZW5lcmljLzIwOCBnZW5lcmljLzIwOSBnZW5lcmljLzIxMCBnZW5lcmljLzIx
-MiBnZW5lcmljLzIxNCBnZW5lcmljLzIxNSBnZW5lcmljLzIyMSBnZW5lcmljLzIyNSBnZW5lcmlj
-LzIyOCBnZW5lcmljLzIzNiBnZW5lcmljLzIzOSBnZW5lcmljLzI0MSBnZW5lcmljLzI0NSBnZW5l
-cmljLzI0NiBnZW5lcmljLzI0NyBnZW5lcmljLzI0OCBnZW5lcmljLzI0OSBnZW5lcmljLzI1NSBn
-ZW5lcmljLzI1NyBnZW5lcmljLzI1OCBnZW5lcmljLzI2MyBnZW5lcmljLzI5NCBnZW5lcmljLzMw
-NiBnZW5lcmljLzMwOCBnZW5lcmljLzMwOSBnZW5lcmljLzMxMCBnZW5lcmljLzMxMyBnZW5lcmlj
-LzMxNSBnZW5lcmljLzMxNiBnZW5lcmljLzMyMyBnZW5lcmljLzMzNyBnZW5lcmljLzMzOSBnZW5l
-cmljLzM0MCBnZW5lcmljLzM0NCBnZW5lcmljLzM0NSBnZW5lcmljLzM0NiBnZW5lcmljLzM1NCBn
-ZW5lcmljLzM2MCBnZW5lcmljLzM2MiBnZW5lcmljLzM2NCBnZW5lcmljLzM2NiBnZW5lcmljLzM3
-NyBnZW5lcmljLzM5MCBnZW5lcmljLzM5MSBnZW5lcmljLzM5MiBnZW5lcmljLzM5MyBnZW5lcmlj
-LzM5NCBnZW5lcmljLzQwNiBnZW5lcmljLzQwNyBnZW5lcmljLzQxMiBnZW5lcmljLzQxNyBnZW5l
-cmljLzQyMCBnZW5lcmljLzQyMiBnZW5lcmljLzQyMyBnZW5lcmljLzQyOCBnZW5lcmljLzQzMCBn
-ZW5lcmljLzQzMSBnZW5lcmljLzQzMiBnZW5lcmljLzQzMyBnZW5lcmljLzQzNCBnZW5lcmljLzQz
-NiBnZW5lcmljLzQzNyBnZW5lcmljLzQzOCBnZW5lcmljLzQzOSBnZW5lcmljLzQ0MyBnZW5lcmlj
-LzQ0NSBnZW5lcmljLzQ0NiBnZW5lcmljLzQ0OCBnZW5lcmljLzQ1MSBnZW5lcmljLzQ1MiBnZW5l
-cmljLzQ2MCBnZW5lcmljLzQ2MSBnZW5lcmljLzQ2MyBnZW5lcmljLzQ2NCBnZW5lcmljLzQ2NSBn
-ZW5lcmljLzQ2OSBnZW5lcmljLzQ3MSBnZW5lcmljLzQ3NCBnZW5lcmljLzQ3NiBnZW5lcmljLzQ5
-MSBnZW5lcmljLzQ5OSBnZW5lcmljLzUwNCBnZW5lcmljLzUyMyBnZW5lcmljLzUyNCBnZW5lcmlj
-LzUyNSBnZW5lcmljLzUyOCBnZW5lcmljLzUzMiBnZW5lcmljLzUzMyBnZW5lcmljLzU1MSBnZW5l
-cmljLzU2NCBnZW5lcmljLzU2NSBnZW5lcmljLzU2NyBnZW5lcmljLzU2OCBnZW5lcmljLzU3MSBn
-ZW5lcmljLzU4NiBnZW5lcmljLzU5MCBnZW5lcmljLzU5MSBnZW5lcmljLzU5OSBnZW5lcmljLzYw
-NCBnZW5lcmljLzYwOSBnZW5lcmljLzYxMCBnZW5lcmljLzYxMiBnZW5lcmljLzYxNSBnZW5lcmlj
-LzYxNiBnZW5lcmljLzYxNyBnZW5lcmljLzYxOCBnZW5lcmljLzYyMyBnZW5lcmljLzYzMiBnZW5l
-cmljLzYzOCBnZW5lcmljLzYzOSBnZW5lcmljLzY0MiBnZW5lcmljLzY0NiBnZW5lcmljLzY0NyBn
-ZW5lcmljLzY1MCBnZW5lcmljLzY3NiBnZW5lcmljLzY3OCBnZW5lcmljLzY4MCBnZW5lcmljLzY5
-NCBnZW5lcmljLzcwMSBnZW5lcmljLzcwNSBnZW5lcmljLzcwNiBnZW5lcmljLzcwOCBnZW5lcmlj
-LzcyOCBnZW5lcmljLzcyOSBnZW5lcmljLzczNiBnZW5lcmljLzczNyBnZW5lcmljLzc0MiBnZW5l
-cmljLzc0OCBnZW5lcmljLzc0OSBnZW5lcmljLzc1MSBnZW5lcmljLzc1NSBnZW5lcmljLzc1OCBn
-ZW5lcmljLzc1OSBnZW5lcmljLzc2MCBnZW5lcmljLzc2MSBnZW5lcmljLzc2MyAK
---0000000000006817cb063a2c4343--
