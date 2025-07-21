@@ -1,106 +1,72 @@
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from mail.growora.pl (mail.growora.pl [51.254.119.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61F11E0DEA;
-	Mon, 21 Jul 2025 03:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554C3283FE8
+	for <linux-cifs@vger.kernel.org>; Mon, 21 Jul 2025 07:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.254.119.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753067659; cv=none; b=H2cgxKbHqh7C6JaOSHdysJ1er/5xnnMWDzw9mJ0gBWBQ0NLSwpU5kZezwE2wsUcKrlm4WVcHRRKJQPyNQdrxWZSGzBJB79rm/KvG93i/Kpk5khno0CcUKYj1nLitl1Hif5fmIhqZ+G0tGCZ38O23+FRTHJd162bNQ9LISfuQru4=
+	t=1753083324; cv=none; b=XphYAtqVBRconYFQGpTW1hUK3zrucQaHzqhPHHC/zZCjEoWL5cdvF/DnBUBOieofQvy41paEqFU/lrLpo0VK2S2H/Q9SuxtQl02Z1WYQZdAImxFs+6c7e+f58zOuoZ809tmXnnv/CZ+qGXiaqrVi4NC3L+HrRp6vTL93AKXvNuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753067659; c=relaxed/simple;
-	bh=KcIuPHoEk9AuwbE4824NkZYgCzpBO0ssry4Gl0Uvdlg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nvKwJkVNSpNb5D90CdxVUlHDBaIhPc97RUK6mVP/sBqnGlXojqUzutS+sXz4NpR8Y2WnUU2P3EXbKQ1xO2fSPvmpNqN3w5RKDGT991sqmfrLE9Hwa68ezZIGan9GkJz/PC7hozfKuQ7ytKZCXBgU8NznT2Wk96vOeDv6clROKtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WIlMh/K4; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1753083324; c=relaxed/simple;
+	bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
+	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=D1gdhH5Gx7BPYfaG72QpXmkkkl/IwmgVBXbrOWE3QkYzsfVQHKlsEJwIqVtQMcsckWiu9pk8rsk940qVk58xC4wLNyW1Yx8cZGnTkU8CJAZFYXqotc3M2YcrvyFTj/rRzn3UITab280pUr8YgzMou/3OAzStom3jB2lbQQGxSCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl; spf=pass smtp.mailfrom=growora.pl; dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b=pG4jl6p6; arc=none smtp.client-ip=51.254.119.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=growora.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WIlMh/K4"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1753067649; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=lCr7ru8zjyenyzhIwOzkZiA0apFYT5PO1pQKlR1f6Gw=;
-	b=WIlMh/K4n+3t+sVE+jy0ALadodWkNQy8OAtmzfR8Ss184gs6ZnsxY/onLFH5kIM24BWM72cX42JJXu0BAYGEHTd8VYqwiU2L7aYgGUIPxQELw3gF/Af3hhrM17g/bOlFjxODPJ54TDKEnKM9KyugPesZxcb70OLews/+Bce16nw=
-Received: from 30.221.132.193(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WjIdN4u_1753067645 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 21 Jul 2025 11:14:06 +0800
-Message-ID: <7ea73f49-df4b-4f88-8b23-c917b4a9bd8a@linux.alibaba.com>
-Date: Mon, 21 Jul 2025 11:14:02 +0800
+	dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b="pG4jl6p6"
+Received: by mail.growora.pl (Postfix, from userid 1002)
+	id 7DB4D2283F; Mon, 21 Jul 2025 09:31:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=growora.pl; s=mail;
+	t=1753083200; bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
+	h=Date:From:To:Subject:From;
+	b=pG4jl6p64wsnxbLqz3swtt0RzxTe2RUZyTym7tUq9PnOG1L+hLUqZ2wr6D448ZQQV
+	 WJ2GI6kQNRZ0NeKMasNqQlnehJMpap87BBOj0Maacbgl9FPFK9bDWN6H9LnblFGcVO
+	 scoRpQqrbhyA5dGeZXwKaZTUDkQU38n1PzOdWa+CHKg3u1o0r/21/JOOnAkmii/2NQ
+	 A2ALbpaLZbT0AQaezk9Q8OgDbQQZsVWu221d8mmA1g4G53W3+JnD9NOIBWSF9EUthB
+	 dqr3ozT/ZoOHgLRVCY+H2RjIU5+zTCvELy8dUeYYxqKLisotvS1jrw1rijaD6dsDtG
+	 VWSlRrAQ4YPYg==
+Received: by mail.growora.pl for <linux-cifs@vger.kernel.org>; Mon, 21 Jul 2025 07:31:04 GMT
+Message-ID: <20250721084500-0.1.kq.29pit.0.17fxr5qbo1@growora.pl>
+Date: Mon, 21 Jul 2025 07:31:04 GMT
+From: "Mateusz Hopczak" <mateusz.hopczak@growora.pl>
+To: <linux-cifs@vger.kernel.org>
+Subject: Wsparcie programistyczne - termin spotkania 
+X-Mailer: mail.growora.pl
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Compressed files & the page cache
-To: Barry Song <21cnbao@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
- linux-btrfs@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>,
- Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
- linux-erofs@lists.ozlabs.org, Jaegeuk Kim <jaegeuk@kernel.org>,
- linux-f2fs-devel@lists.sourceforge.net, Jan Kara <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
- Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
- David Howells <dhowells@redhat.com>, netfs@lists.linux.dev,
- Paulo Alcantara <pc@manguebit.org>,
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
- ntfs3@lists.linux.dev, Steve French <sfrench@samba.org>,
- linux-cifs@vger.kernel.org, Phillip Lougher <phillip@squashfs.org.uk>,
- Hailong Liu <hailong.liu@oppo.com>, Qu Wenruo <quwenruo.btrfs@gmx.com>
-References: <aHa8ylTh0DGEQklt@casper.infradead.org>
- <e5165052-ead3-47f4-88f6-84eb23dc34df@linux.alibaba.com>
- <b61c4b7f-4bb1-4551-91ba-a0e0ffd19e75@linux.alibaba.com>
- <CAGsJ_4xJjwsvMpeBV-QZFoSznqhiNSFtJu9k6da_T-T-a6VwNw@mail.gmail.com>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <CAGsJ_4xJjwsvMpeBV-QZFoSznqhiNSFtJu9k6da_T-T-a6VwNw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Barry,
+Szanowni Pa=C5=84stwo,
 
-On 2025/7/21 09:02, Barry Song wrote:
-> On Wed, Jul 16, 2025 at 8:28 AM Gao Xiang <hsiangkao@linux.alibaba.com> wrote:
->>
+czy w Pa=C5=84stwa firmie rozwa=C5=BCaj=C4=85 Pa=C5=84stwo rozw=C3=B3j no=
+wego oprogramowania lub potrzebuj=C4=85 zaufanego zespo=C5=82u, kt=C3=B3r=
+y przejmie odpowiedzialno=C5=9B=C4=87 za stron=C4=99 technologiczn=C4=85 =
+projektu?
 
-...
+Jeste=C5=9Bmy butikowym software housem z 20-osobowym zespo=C5=82em in=C5=
+=BCynier=C3=B3w. Specjalizujemy si=C4=99 w projektach high-tech i deeptec=
+h =E2=80=93 od zaawansowanych system=C3=B3w AI/ML, przez blockchain i IoT=
+, a=C5=BC po aplikacje mobilne, webowe i symulacyjne (m.in. Unreal Engine=
+).
 
->>
->> ... high-order folios can cause side effects on embedded devices
->> like routers and IoT devices, which still have MiBs of memory (and I
->> believe this won't change due to their use cases) but they also use
->> Linux kernel for quite long time.  In short, I don't think enabling
->> large folios for those devices is very useful, let alone limiting
->> the minimum folio order for them (It would make the filesystem not
->> suitable any more for those users.  At least that is what I never
->> want to do).  And I believe this is different from the current LBS
->> support to match hardware characteristics or LBS atomic write
->> requirement.
-> 
-> Given the difficulty of allocating large folios, it's always a good
-> idea to have order-0 as a fallback. While I agree with your point,
-> I have a slightly different perspective — enabling large folios for
-> those devices might be beneficial, but the maximum order should
-> remain small. I'm referring to "small" large folios.
+Wspieramy firmy technologiczne oraz startupy na r=C3=B3=C5=BCnych etapach=
+: od koncepcji, przez development, po skalowanie i optymalizacj=C4=99. Dz=
+ia=C5=82amy elastycznie =E2=80=93 jako partnerzy, podwykonawcy lub ventur=
+e builderzy.
 
-Yeah, agreed. Having a way to limit the maximum order for those small
-devices (rather than disabling it completely) would be helpful.  At
-least "small" large folios could still provide benefits when memory
-pressure is light.
+Je=C5=9Bli szukaj=C4=85 Pa=C5=84stwo zespo=C5=82u, kt=C3=B3ry rozumie z=C5=
+=82o=C5=BCono=C5=9B=C4=87 projekt=C3=B3w i wnosi realn=C4=85 warto=C5=9B=C4=
+=87 technologiczn=C4=85 =E2=80=93 ch=C4=99tnie porozmawiamy.
 
-Thanks,
-Gao Xiang
+Czy mogliby=C5=9Bmy um=C3=B3wi=C4=87 si=C4=99 na kr=C3=B3tk=C4=85 rozmow=C4=
+=99, by sprawdzi=C4=87 potencja=C5=82 wsp=C3=B3=C5=82pracy?
 
-> 
-> Still, even with those, allocation can be difficult — especially
-> since so many other allocations (which aren't large folios) can cause
-> fragmentation. So having order-0 as a fallback remains important.
-> 
-> It seems we're missing a mechanism to enable "small" large folios
-> for files. For anon large folios, we do have sysfs knobs—though they
-> don’t seem to be universally appreciated. :-)
-> 
-> Thanks
-> Barry
 
+Z pozdrowieniami
+Mateusz Hopczak
