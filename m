@@ -1,156 +1,186 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5C928B7D4;
-	Tue, 22 Jul 2025 03:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580382C9A;
+	Tue, 22 Jul 2025 14:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753156468; cv=none; b=VLnUEGDxn8GSnK00zNlMElOcNg3TniJ+ZLtv0s2pRTrymkXs6b7ABFKUfMpBF8wB2oJGydmiCe6BBjO6QRnqt+JHiR0HYaZFpwwYPaJNmPdK6Xux/HwdD3pElHDX6Z7rWFIKekuAixKyGO1nGDYkYdFj4dnr5bA9gTp0uaEyxws=
+	t=1753193129; cv=none; b=nW41QH2sW0fyAx9V2vwX0AGEuilm5r2hycSyETCBMjVati636bc2i9sYAwcyc4dY8kGt0xHZZfw+Gr0JOeGqaBaHQZhe+aOfFpgckNVpXXVd6DxWgt1AZj0jp4xAH2Gx/M3v05Rh2i1/AB0GPun6LeLWb2k5ti+PmdIEMIDbBHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753156468; c=relaxed/simple;
-	bh=pMF5pqseEWjPYxGMLMeAr2jDTsuh1B1VIVqreXIt6BU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GiRQ87qDB9IBgEgXadOap6MiVXPOdNFrlbU5HaSfCM4/ioKVtLzBH7P4Ry0X8DtbwwJRO+GCjvif9+j+zYNWTMn5k1AzrlrgHaJTnVWbsNijw4x46e4SodABAGsw4C9J90CudwbXBaSR19ywUhQGIT98PlxK6MLrkHDon1EcFYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHNMSlmv; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1753193129; c=relaxed/simple;
+	bh=xzvSeHrPGh2XlznE+GlKpmSmENqkZILt9kxSivrFbt0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HTENVJ3jbkXVag9cVNTQo7lhe41k2vYGdsxFamjXJIc+kyvr63lVIoBCngIOOZm8djHIkBu/pmaCKiqtaqMAfTX9zgJ+p6R7N/W6jpByjdIxhIB8EGJQvSg4uHaTCu2k1uNQlv78cLNwRa/g2SXtByHFwCTVNWwbJdp/O8dt/IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gdktgeao; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHNMSlmv"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5313eff2649so1307251e0c.0;
-        Mon, 21 Jul 2025 20:54:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753156466; x=1753761266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sAAlykKu642VPrQqfIgQ/sSqAoZceoQZhIURS8zROzA=;
-        b=HHNMSlmvGp0O5Wi8BNwT/aC7xyoErxCcQXEaZin/5pMrGvYKZJeeRB9naW4m+b6J8k
-         iSrDa6ZD083TbxAFMkj/maiwQjoVzJNIxUxn1Uh31nJUziKCa2Z0UPLnSY+kdbpAu9nB
-         J5Kf/u/tUkguYF4UVb0KAg2/WFvO/jixT4F1CCdOQlsszqwy6dGtYxXoHSZ0S9o8U8Fs
-         9pq4sXYZ+Ug+bt20UloMPj5MJQOmYrKIQDgqNZvCJaV14eDnLNrP3WHTSbo6MlE1sjyc
-         4lPYfit+BjaZWh5oNHNNGZIFOK4qSAXx3wgLyqQ7w71Hy3czhrvugpmpLHQdwAM7bRTg
-         JoHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753156466; x=1753761266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sAAlykKu642VPrQqfIgQ/sSqAoZceoQZhIURS8zROzA=;
-        b=KRkw4sg54nq/F9w1UazxcvId78FgVWJXrGSiJ7FGmhyhhJtD7va7Haf9TCe6Gqrd4p
-         BpBdYcpouOVZzdop/U5U5vkgWdGK3lPlelJZCPp7XU5rFfhmYuFsOxtdNvbM3uM5OGYB
-         2I3Wnl126nB0yKeAmU6Du5fdGSu/H7VYlpEFWG0Zzo7LCnCaP/f+uHxyBURnlsFDjLJ3
-         QuFpngno7P3+ix+/Bl0+2RY5ST44zoTl1yMeW6iYMXRhiKPP+zvmwjSrbQMWCzVvIJky
-         WVbzV58/UcQkbp+v3KyP8IXdBsiGcZw2ixzjnwINgakem0xmbxpMqoXY/5hxu/0jYstO
-         QgDg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+bZdVUqxCQ57nBJK/V68DedEw2GXSYYgrjPy3RqRfZZVFfImKt0/LlaPn0rd1+mgi5+QGJt5FdYZzZcSURw==@vger.kernel.org, AJvYcCW45UszouiKkzx8fOfCZI/g8IksQ8QkI9IaVQhcs4PJSRvuekH8w8A8jXydoib1Qb6fzvZwR4Q9ZbP9Zw==@vger.kernel.org, AJvYcCXWO4oA7ggtWapZe+qiDyqxDwuB3Zd60LpwEFiMqOskc+WNbrZqrlD6hCjvNd5FvWw6vxAq4duKjnQi/Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu8UI5a5Why1BTH2OxrlqgKIIxluLYOsoV2suEuO1cRVxu3Tao
-	R196S2/fE9Tb+xL1qPIh3jznF6oTzM0PehXS/owJn7JEGvS0/KXmj+sSjLuqNNTMGIlzNYND8NY
-	7qYvmagU9BOEarwGm+vyN1EtKSkH2Lmk=
-X-Gm-Gg: ASbGncscKRGHE5rxpywx2kh1VTEfftFniKxm+ddCu7OAq7xdseaNETKFsM3u5XJwXsz
-	9TtijKP8qypZltbo+vKBmN4wX4FdnII153rsSpBplkFUcIlLxQsOAojiGBAJCYbsxmEotaFbWgC
-	cDRbrhxfooH76WCGPkEX5tbLEYUlyRWJd4A56/pwTsS65MaTKE+iuNYZg9Db+m0tKuRByMjvF/4
-	L/j0lA=
-X-Google-Smtp-Source: AGHT+IFdEM3sDnKSU7djtnY2X77gIkWr33PBhDuXfdQIDGEOAUgRW6b8nyrGT5SpWkQFjiRSNtgM+8Lmi+axf63N/6M=
-X-Received: by 2002:a05:6122:4d0f:b0:531:236f:1295 with SMTP id
- 71dfb90a1353d-5373fbda52dmr10043238e0c.5.1753156466033; Mon, 21 Jul 2025
- 20:54:26 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gdktgeao"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF8DC4CEEB;
+	Tue, 22 Jul 2025 14:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1753193128;
+	bh=xzvSeHrPGh2XlznE+GlKpmSmENqkZILt9kxSivrFbt0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gdktgeaoYOz3VSTzHFliA9m/q8afnYNmHO1/O8jVfAH48G69RRy6OD2twPQ3klIgL
+	 tshJy3Gj9OgKmUNQZhqCPanqLau6qQ78p0uyqUwUCdpPL6ozOqAXObjaNscQSwcMpI
+	 msqEKJ1kZoceofqAIvtKwk/W0v4rbJUrT5DZ5abA=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Meetakshi Setiya <msetiya@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Steve French <stfrench@microsoft.com>,
+	stable+noautosel@kernel.org
+Subject: [PATCH 6.12 158/158] smb: client: let smbd_post_send_iter() respect the peers max_send_size and transmit all data
+Date: Tue, 22 Jul 2025 15:45:42 +0200
+Message-ID: <20250722134346.605211690@linuxfoundation.org>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250722134340.596340262@linuxfoundation.org>
+References: <20250722134340.596340262@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aHa8ylTh0DGEQklt@casper.infradead.org> <e5165052-ead3-47f4-88f6-84eb23dc34df@linux.alibaba.com>
- <b61c4b7f-4bb1-4551-91ba-a0e0ffd19e75@linux.alibaba.com> <CAGsJ_4xJjwsvMpeBV-QZFoSznqhiNSFtJu9k6da_T-T-a6VwNw@mail.gmail.com>
- <7ea73f49-df4b-4f88-8b23-c917b4a9bd8a@linux.alibaba.com> <z2ule3ilnnpoevo5mvt3intvjtuyud7vg3pbfauon47fhr4owa@giaehpbie4a5>
- <85946346-8bfd-4164-a49d-594b4a158588@gmx.com>
-In-Reply-To: <85946346-8bfd-4164-a49d-594b4a158588@gmx.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 22 Jul 2025 11:54:14 +0800
-X-Gm-Features: Ac12FXykbYYT14P53wpCeHJw2yoMEcQU-j3E43IYKsTdPACdf43QFDrlblVigVM
-Message-ID: <CAGsJ_4ySQFzSbXZzecH9oy53KFpVsoaqXThPiJxfYUJF3_Y+Hg@mail.gmail.com>
-Subject: Re: Compressed files & the page cache
-To: Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc: Jan Kara <jack@suse.cz>, Gao Xiang <hsiangkao@linux.alibaba.com>, 
-	Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, 
-	David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org, 
-	Nicolas Pitre <nico@fluxnic.net>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
-	linux-erofs@lists.ozlabs.org, Jaegeuk Kim <jaegeuk@kernel.org>, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org, 
-	David Woodhouse <dwmw2@infradead.org>, Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org, 
-	David Howells <dhowells@redhat.com>, netfs@lists.linux.dev, 
-	Paulo Alcantara <pc@manguebit.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, ntfs3@lists.linux.dev, 
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
-	Phillip Lougher <phillip@squashfs.org.uk>, Hailong Liu <hailong.liu@oppo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 21, 2025 at 7:37=E2=80=AFPM Qu Wenruo <quwenruo.btrfs@gmx.com> =
-wrote:
->
->
->
-> =E5=9C=A8 2025/7/21 19:55, Jan Kara =E5=86=99=E9=81=93:
-> > On Mon 21-07-25 11:14:02, Gao Xiang wrote:
-> >> Hi Barry,
-> >>
-> >> On 2025/7/21 09:02, Barry Song wrote:
-> >>> On Wed, Jul 16, 2025 at 8:28=E2=80=AFAM Gao Xiang <hsiangkao@linux.al=
-ibaba.com> wrote:
-> [...]
-> >>> Given the difficulty of allocating large folios, it's always a good
-> >>> idea to have order-0 as a fallback. While I agree with your point,
-> >>> I have a slightly different perspective =E2=80=94 enabling large foli=
-os for
-> >>> those devices might be beneficial, but the maximum order should
-> >>> remain small. I'm referring to "small" large folios.
-> >>
-> >> Yeah, agreed. Having a way to limit the maximum order for those small
-> >> devices (rather than disabling it completely) would be helpful.  At
-> >> least "small" large folios could still provide benefits when memory
-> >> pressure is light.
-> >
-> > Well, in the page cache you can tune not only the minimum but also the
-> > maximum order of a folio being allocated for each inode. Btrfs and ext4
-> > already use this functionality. So in principle the functionality is th=
-ere,
-> > it is "just" a question of proper user interfaces or automatic logic to
-> > tune this limit.
-> >
-> >                                                               Honza
->
-> And enabling large folios doesn't mean all fs operations will grab an
-> unnecessarily large folio.
->
-> For buffered write, all those filesystem will only try to get folios as
-> large as necessary, not overly large.
->
-> This means if the user space program is always doing buffered IO in a
-> power-of-two unit (and aligned offset of course), the folio size will
-> match the buffer size perfectly (if we have enough memory).
->
-> So for properly aligned buffered writes, large folios won't really cause
->   unnecessarily large folios, meanwhile brings all the benefits.
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
-I don't think this captures the full picture. For example, in memory
-reclamation, if any single subpage is hot, the entire large folio is
-treated as hot and cannot be reclaimed. So I=E2=80=99m not convinced that
-"filesystems will only try to get folios as large as necessary" is the
-right policy.
+------------------
 
-Large folios are a good idea, but the lack of control over their maximum
-size limits their practical applicability. When an embedded device enables
-large folios and only observes performance regressions, the immediate
-reaction is often to disable the feature entirely. This, in turn, harms the
-adoption and development of large folios.
+From: Stefan Metzmacher <metze@samba.org>
 
->
-> Although I'm not familiar enough with filemap to comment on folio read
-> and readahead...
->
-> Thanks,
-> Qu
+commit 1944f6ab4967db7ad8d4db527dceae8c77de76e9 upstream.
 
-Best Regards
-Barry
+We should not send smbdirect_data_transfer messages larger than
+the negotiated max_send_size, typically 1364 bytes, which means
+24 bytes of the smbdirect_data_transfer header + 1340 payload bytes.
+
+This happened when doing an SMB2 write with more than 1340 bytes
+(which is done inline as it's below rdma_readwrite_threshold).
+
+It means the peer resets the connection.
+
+When testing between cifs.ko and ksmbd.ko something like this
+is logged:
+
+client:
+
+    CIFS: VFS: RDMA transport re-established
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    siw: got TERMINATE. layer 1, type 2, code 2
+    CIFS: VFS: \\carina Send error in SessSetup = -11
+    smb2_reconnect: 12 callbacks suppressed
+    CIFS: VFS: reconnect tcon failed rc = -11
+    CIFS: VFS: reconnect tcon failed rc = -11
+    CIFS: VFS: reconnect tcon failed rc = -11
+    CIFS: VFS: SMB: Zero rsize calculated, using minimum value 65536
+
+and:
+
+    CIFS: VFS: RDMA transport re-established
+    siw: got TERMINATE. layer 1, type 2, code 2
+    CIFS: VFS: smbd_recv:1894 disconnected
+    siw: got TERMINATE. layer 1, type 2, code 2
+
+The ksmbd dmesg is showing things like:
+
+    smb_direct: Recv error. status='local length error (1)' opcode=128
+    smb_direct: disconnected
+    smb_direct: Recv error. status='local length error (1)' opcode=128
+    ksmbd: smb_direct: disconnected
+    ksmbd: sock_read failed: -107
+
+As smbd_post_send_iter() limits the transmitted number of bytes
+we need loop over it in order to transmit the whole iter.
+
+Reviewed-by: David Howells <dhowells@redhat.com>
+Tested-by: David Howells <dhowells@redhat.com>
+Tested-by: Meetakshi Setiya <msetiya@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: <stable+noautosel@kernel.org> # sp->max_send_size should be info->max_send_size in backports
+Fixes: 3d78fe73fa12 ("cifs: Build the RDMA SGE list directly from an iterator")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/client/smbdirect.c |   31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
+
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -907,8 +907,10 @@ wait_send_queue:
+ 			.local_dma_lkey	= sc->ib.pd->local_dma_lkey,
+ 			.direction	= DMA_TO_DEVICE,
+ 		};
++		size_t payload_len = umin(*_remaining_data_length,
++					  sp->max_send_size - sizeof(*packet));
+ 
+-		rc = smb_extract_iter_to_rdma(iter, *_remaining_data_length,
++		rc = smb_extract_iter_to_rdma(iter, payload_len,
+ 					      &extract);
+ 		if (rc < 0)
+ 			goto err_dma;
+@@ -1013,6 +1015,27 @@ static int smbd_post_send_empty(struct s
+ 	return smbd_post_send_iter(info, NULL, &remaining_data_length);
+ }
+ 
++static int smbd_post_send_full_iter(struct smbd_connection *info,
++				    struct iov_iter *iter,
++				    int *_remaining_data_length)
++{
++	int rc = 0;
++
++	/*
++	 * smbd_post_send_iter() respects the
++	 * negotiated max_send_size, so we need to
++	 * loop until the full iter is posted
++	 */
++
++	while (iov_iter_count(iter) > 0) {
++		rc = smbd_post_send_iter(info, iter, _remaining_data_length);
++		if (rc < 0)
++			break;
++	}
++
++	return rc;
++}
++
+ /*
+  * Post a receive request to the transport
+  * The remote peer can only send data when a receive request is posted
+@@ -1962,14 +1985,14 @@ int smbd_send(struct TCP_Server_Info *se
+ 			klen += rqst->rq_iov[i].iov_len;
+ 		iov_iter_kvec(&iter, ITER_SOURCE, rqst->rq_iov, rqst->rq_nvec, klen);
+ 
+-		rc = smbd_post_send_iter(info, &iter, &remaining_data_length);
++		rc = smbd_post_send_full_iter(info, &iter, &remaining_data_length);
+ 		if (rc < 0)
+ 			break;
+ 
+ 		if (iov_iter_count(&rqst->rq_iter) > 0) {
+ 			/* And then the data pages if there are any */
+-			rc = smbd_post_send_iter(info, &rqst->rq_iter,
+-						 &remaining_data_length);
++			rc = smbd_post_send_full_iter(info, &rqst->rq_iter,
++						      &remaining_data_length);
+ 			if (rc < 0)
+ 				break;
+ 		}
+
+
