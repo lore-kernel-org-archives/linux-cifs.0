@@ -1,286 +1,280 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85381F91C5;
-	Wed, 23 Jul 2025 15:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F22326CE28
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Jul 2025 21:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753285020; cv=none; b=MXNEj9RffLwwbj8x5LvFsTXVChYC+XtG5BuVRLi0HKWtcmYg1DJPRioPUUgsGP1sw8wM3HwyAQZ8hVVniI+LnXSHn8trmoUtXKV0Hre5zOwZNGxx8CTIX8GoBvnDM0pA5VJ37qpDqbXVxsuUF/Hzx0Yap20ThVOdkhkOh0CUUkw=
+	t=1753306121; cv=none; b=FY8K5g5uaSZVHG7vwVVa7UFdr9P8quWoxS1qFkEAxSg/+gEkqwpnkknLzmgH3DuhOTMiY2sIQ9GjfmddOvIDJAcsX+0fQlwpQz/l6HYp4COttRbGXRG/Q/mGubDSFKE6OSqPVCz1aMODDYMJpPBS882DUIvIVxBDrCntj03g9yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753285020; c=relaxed/simple;
-	bh=nJrciQ0W4LHd/KfLrUWAqookh+RqhvINSCMZ3GN8r1s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qvzBDYkzg7uLbg21zsVniMCyYcUUO5l0bj/kIeGRRNJ2EaJQVvNhkVEmXf/q+dr6WmoPWhkilVOkTe5oln05zUivV5eC3bSFh44uEuCBm0gSWQKyJ6slz9LUgvdeIF86c/pOXf+nnFV5ofCZdhcGg5fCaTJOK7FpLXgijX/VUF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=08FJtUnl; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1753306121; c=relaxed/simple;
+	bh=RK40e9cWOTLzuKZU3c7gO/nzgGBIY1wLr+lO5lVfUi4=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Vo1nNtoBWyOdWtdC6O19NEsQxXseWD/K02rcfO5fjsdbLLacAQ/1/3/MSAb+W/Zs6EidIIiS7L3hcbmgQTdgsmTt7RU4NjSuBMzorQKlDR2LlSaRUjxbAO8lKjZaLccsXMJMd4jgBfzp8bGsvyvFZ/f2wCmbXwJzoQddzFVZszM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GF9tUqyE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="08FJtUnl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=zXfMX4jMPOxLxHOpwp9n8iGtzZyPibxzsWfQBEx2rpA=; b=08FJtUnlA26A9j91e51SK6apvV
-	8+WtYRpXsBdh/3oBxs8rnXR3eZj77/XvzoWS+QYe98fmgFGJ+sH+eZTJKfBf1nutKeNy7LlHhXCaH
-	bNXYp3rqaTO57vUA0DzgPpNh+nYVaBAOdGl9gZ6Y2yocfcpUYAkWZk64G2hJqbByM0lbc9I61zZXs
-	9O9nKxNnk/rHlhcMAAC5tYCT+JxM32faU4rPirMicTJPTEP7+p2FUG1CzT9SZefK5PeLzGCemKBuZ
-	KQH+Mac01z5b20IfR47QwgDXVKoLrHHYsgOmIf/zqTJzTv+EblvE0JihCGcGUq2A36+Uhp8g9oekG
-	JIVtB4dWaH4eWEya+eDYnY9nMlW+MyjqeWoIyCus/zyd3oKQOh9QApvmdlW4eY/plCNrqa85D9Xwy
-	Qt7cINLLYEt6SadDdiOZ1XBmym84xbfsdE5eIr5Yc3WqBHsjZbNeLPpmQvKfLsNyUYXb9FI2qniLK
-	+B7lBMYlxHplWyIHMawyFL6f;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uebWS-00GdeK-29;
-	Wed, 23 Jul 2025 15:36:48 +0000
-Message-ID: <8ae2444f-e33e-4d78-9349-429b32f129d5@samba.org>
-Date: Wed, 23 Jul 2025 17:36:35 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GF9tUqyE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1753306118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=GN7k9/itngbw1cdkbniNR6CYtStGF3ZBNnPAXdahFQQ=;
+	b=GF9tUqyEtxd/eeHn7fpyyEGYt4gaqU+SAI/dNmnhQiD2gta3zLV6W7O3P6VzgBWtHyFeT6
+	PCvQaK0ehw6K+ecWYio7HYvB67f3P65JBojMKocGAusmdO2qDDq426TabcheM/aqhSvxme
+	hguYiYw/fF1I1bc21CQQrGPW5JhdFqU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-29-lSeVHNPUMFKgyUaQ3G-5jQ-1; Wed,
+ 23 Jul 2025 17:28:34 -0400
+X-MC-Unique: lSeVHNPUMFKgyUaQ3G-5jQ-1
+X-Mimecast-MFC-AGG-ID: lSeVHNPUMFKgyUaQ3G-5jQ_1753306113
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9DA9C195608B;
+	Wed, 23 Jul 2025 21:28:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.8])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B51630001A4;
+	Wed, 23 Jul 2025 21:28:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Namjae Jeon <linkinjeon@kernel.org>
+cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    linux-cifs@vger.kernel.org
+Subject: Probable ksmbd bug causing Create Response to show bad timestamps
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] smb/server: add ksmbd_vfs_kern_path()
-To: NeilBrown <neil@brown.name>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <smfrench@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250608234108.30250-1-neil@brown.name>
- <20250608234108.30250-5-neil@brown.name>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250608234108.30250-5-neil@brown.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="=-=-="
+Date: Wed, 23 Jul 2025 22:28:30 +0100
+Message-ID: <317462.1753306110@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Neil,
+--=-=-=
+Content-Type: text/plain
 
-for me this reliable generates the following problem, just doing a simple:
-mount -t cifs -ousername=root,password=test,noperm,vers=3.1.1,mfsymlinks,actimeo=0 //172.31.9.167/test /mnt/test/
 
-[ 2213.234061] [   T1972] ==================================================================
-[ 2213.234607] [   T1972] BUG: KASAN: slab-use-after-free in lookup_noperm_common+0x237/0x2b0
-[ 2213.235122] [   T1972] Read of size 1 at addr ffff88801c95b326 by task kworker/2:0/1972
-[ 2213.235635] [   T1972]
-[ 2213.235806] [   T1972] CPU: 2 UID: 0 PID: 1972 Comm: kworker/2:0 Kdump: loaded Tainted: G        W  OE       6.16.0-rc7-metze-kasan.01+ #1 PREEMPT(voluntary)
-[ 2213.235820] [   T1972] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-[ 2213.235824] [   T1972] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
-[ 2213.235829] [   T1972] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
-[ 2213.235871] [   T1972] Call Trace:
-[ 2213.235875] [   T1972]  <TASK>
-[ 2213.235880] [   T1972]  dump_stack_lvl+0x76/0xa0
-[ 2213.235893] [   T1972]  print_report+0xd1/0x600
-[ 2213.235909] [   T1972]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[ 2213.235920] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.235929] [   T1972]  ? kasan_complete_mode_report_info+0x72/0x210
-[ 2213.235937] [   T1972]  kasan_report+0xe7/0x130
-[ 2213.235944] [   T1972]  ? lookup_noperm_common+0x237/0x2b0
-[ 2213.235952] [   T1972]  ? lookup_noperm_common+0x237/0x2b0
-[ 2213.235963] [   T1972]  __asan_report_load1_noabort+0x14/0x30
-[ 2213.235976] [   T1972]  lookup_noperm_common+0x237/0x2b0
-[ 2213.235984] [   T1972]  lookup_noperm_unlocked+0x1d/0xa0
-[ 2213.235991] [   T1972]  ? putname+0xfa/0x150
-[ 2213.235998] [   T1972]  __ksmbd_vfs_kern_path+0x376/0xa80 [ksmbd]
-[ 2213.236024] [   T1972]  ? local_clock+0x15/0x30
-[ 2213.236039] [   T1972]  ? kasan_save_track+0x27/0x70
-[ 2213.236047] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236054] [   T1972]  ? __entry_text_end+0x10257a/0x10257d
-[ 2213.236066] [   T1972]  ? __pfx___ksmbd_vfs_kern_path+0x10/0x10 [ksmbd]
-[ 2213.236097] [   T1972]  ? groups_alloc+0x41/0xe0
-[ 2213.236106] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236114] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236122] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236128] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.236134] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236140] [   T1972]  ? __ksmbd_override_fsids+0x340/0x630 [ksmbd]
-[ 2213.236188] [   T1972]  ? smb2_open+0x40b/0x9db0 [ksmbd]
-[ 2213.236223] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236233] [   T1972]  ksmbd_vfs_kern_path+0x15/0x30 [ksmbd]
-[ 2213.236260] [   T1972]  smb2_open+0x2de6/0x9db0 [ksmbd]
-[ 2213.236292] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236299] [   T1972]  ? stack_depot_save_flags+0x28/0x840
-[ 2213.236315] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236321] [   T1972]  ? enqueue_hrtimer+0x10b/0x230
-[ 2213.236338] [   T1972]  ? ksm_scan_thread+0x480/0x59b0
-[ 2213.236345] [   T1972]  ? ksm_scan_thread+0x480/0x59b0
-[ 2213.236357] [   T1972]  ? __pfx_smb2_open+0x10/0x10 [ksmbd]
-[ 2213.236401] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236407] [   T1972]  ? xas_load+0x19/0x300
-[ 2213.236423] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236429] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.236435] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236441] [   T1972]  ? down_read_killable+0x120/0x290
-[ 2213.236458] [   T1972]  handle_ksmbd_work+0x3fb/0xfe0 [ksmbd]
-[ 2213.236489] [   T1972]  process_one_work+0x629/0xf80
-[ 2213.236498] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236504] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.236526] [   T1972]  worker_thread+0x87f/0x1570
-[ 2213.236534] [   T1972]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[ 2213.236541] [   T1972]  ? __pfx_try_to_wake_up+0x10/0x10
-[ 2213.236552] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236558] [   T1972]  ? kasan_print_address_stack_frame+0x227/0x280
-[ 2213.236567] [   T1972]  ? __pfx_worker_thread+0x10/0x10
-[ 2213.236581] [   T1972]  kthread+0x396/0x830
-[ 2213.236589] [   T1972]  ? __pfx__raw_spin_lock_irq+0x10/0x10
-[ 2213.236598] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.236604] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.236610] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236616] [   T1972]  ? recalc_sigpending+0x180/0x210
-[ 2213.236624] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236630] [   T1972]  ? _raw_spin_unlock_irq+0xe/0x50
-[ 2213.236643] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.236649] [   T1972]  ? calculate_sigpending+0x84/0xb0
-[ 2213.236656] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.236664] [   T1972]  ret_from_fork+0x2b8/0x3b0
-[ 2213.236671] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.236679] [   T1972]  ret_from_fork_asm+0x1a/0x30
-[ 2213.236694] [   T1972]  </TASK>
-[ 2213.236704] [   T1972]
-[ 2213.269993] [   T1972] Allocated by task 1972 on cpu 2 at 2213.234048s:
-[ 2213.270550] [   T1972]  kasan_save_stack+0x39/0x70
-[ 2213.270569] [   T1972]  kasan_save_track+0x18/0x70
-[ 2213.270578] [   T1972]  kasan_save_alloc_info+0x37/0x60
-[ 2213.270587] [   T1972]  __kasan_slab_alloc+0x9d/0xa0
-[ 2213.270606] [   T1972]  kmem_cache_alloc_noprof+0x13c/0x3f0
-[ 2213.270619] [   T1972]  getname_kernel+0x55/0x390
-[ 2213.270629] [   T1972]  __ksmbd_vfs_kern_path+0x1cf/0xa80 [ksmbd]
-[ 2213.270712] [   T1972]  ksmbd_vfs_kern_path+0x15/0x30 [ksmbd]
-[ 2213.270747] [   T1972]  smb2_open+0x2de6/0x9db0 [ksmbd]
-[ 2213.270784] [   T1972]  handle_ksmbd_work+0x3fb/0xfe0 [ksmbd]
-[ 2213.270814] [   T1972]  process_one_work+0x629/0xf80
-[ 2213.270826] [   T1972]  worker_thread+0x87f/0x1570
-[ 2213.270835] [   T1972]  kthread+0x396/0x830
-[ 2213.270852] [   T1972]  ret_from_fork+0x2b8/0x3b0
-[ 2213.270862] [   T1972]  ret_from_fork_asm+0x1a/0x30
-[ 2213.270873] [   T1972]
-[ 2213.271183] [   T1972] Freed by task 1972 on cpu 2 at 2213.234058s:
-[ 2213.271707] [   T1972]  kasan_save_stack+0x39/0x70
-[ 2213.271716] [   T1972]  kasan_save_track+0x18/0x70
-[ 2213.271724] [   T1972]  kasan_save_free_info+0x3b/0x60
-[ 2213.271732] [   T1972]  __kasan_slab_free+0x52/0x80
-[ 2213.271741] [   T1972]  kmem_cache_free+0x316/0x560
-[ 2213.271750] [   T1972]  putname+0xfa/0x150
-[ 2213.271768] [   T1972]  __ksmbd_vfs_kern_path+0x20b/0xa80 [ksmbd]
-[ 2213.271795] [   T1972]  ksmbd_vfs_kern_path+0x15/0x30 [ksmbd]
-[ 2213.271829] [   T1972]  smb2_open+0x2de6/0x9db0 [ksmbd]
-[ 2213.271857] [   T1972]  handle_ksmbd_work+0x3fb/0xfe0 [ksmbd]
-[ 2213.271891] [   T1972]  process_one_work+0x629/0xf80
-[ 2213.271901] [   T1972]  worker_thread+0x87f/0x1570
-[ 2213.271910] [   T1972]  kthread+0x396/0x830
-[ 2213.271918] [   T1972]  ret_from_fork+0x2b8/0x3b0
-[ 2213.271926] [   T1972]  ret_from_fork_asm+0x1a/0x30
-[ 2213.271935] [   T1972]
-[ 2213.272236] [   T1972] The buggy address belongs to the object at ffff88801c95b300
-                            which belongs to the cache names_cache of size 4096
-[ 2213.273326] [   T1972] The buggy address is located 38 bytes inside of
-                            freed 4096-byte region [ffff88801c95b300, ffff88801c95c300)
-[ 2213.274374] [   T1972]
-[ 2213.274671] [   T1972] The buggy address belongs to the physical page:
-[ 2213.275233] [   T1972] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1c958
-[ 2213.275249] [   T1972] head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-[ 2213.275259] [   T1972] anon flags: 0xfffffc0000040(head|node=0|zone=1|lastcpupid=0x1fffff)
-[ 2213.275270] [   T1972] page_type: f5(slab)
-[ 2213.275280] [   T1972] raw: 000fffffc0000040 ffff888001367c80 0000000000000000 dead000000000001
-[ 2213.275289] [   T1972] raw: 0000000000000000 0000000080070007 00000000f5000000 0000000000000000
-[ 2213.275304] [   T1972] head: 000fffffc0000040 ffff888001367c80 0000000000000000 dead000000000001
-[ 2213.275316] [   T1972] head: 0000000000000000 0000000080070007 00000000f5000000 0000000000000000
-[ 2213.275326] [   T1972] head: 000fffffc0000003 ffffea0000725601 00000000ffffffff 00000000ffffffff
-[ 2213.275334] [   T1972] head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-[ 2213.275341] [   T1972] page dumped because: kasan: bad access detected
-[ 2213.275348] [   T1972]
-[ 2213.275652] [   T1972] Memory state around the buggy address:
-[ 2213.276139] [   T1972]  ffff88801c95b200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[ 2213.276920] [   T1972]  ffff88801c95b280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[ 2213.277700] [   T1972] >ffff88801c95b300: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2213.278482] [   T1972]                                ^
-[ 2213.278933] [   T1972]  ffff88801c95b380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2213.279723] [   T1972]  ffff88801c95b400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[ 2213.280496] [   T1972] ==================================================================
-[ 2213.281383] [   T1972] Kernel panic - not syncing: KASAN: panic_on_warn set ...
-[ 2213.281988] [   T1972] CPU: 2 UID: 0 PID: 1972 Comm: kworker/2:0 Kdump: loaded Tainted: G        W  OE       6.16.0-rc7-metze-kasan.01+ #1 PREEMPT(voluntary)
-[ 2213.283165] [   T1972] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-[ 2213.283749] [   T1972] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
-[ 2213.284595] [   T1972] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
-[ 2213.285146] [   T1972] Call Trace:
-[ 2213.285510] [   T1972]  <TASK>
-[ 2213.285840] [   T1972]  dump_stack_lvl+0x27/0xa0
-[ 2213.286276] [   T1972]  dump_stack+0x10/0x20
-[ 2213.286700] [   T1972]  panic+0x538/0x610
-[ 2213.287098] [   T1972]  ? __pfx_panic+0x10/0x10
-[ 2213.287719] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.288223] [   T1972]  ? vprintk_default+0x1d/0x30
-[ 2213.288682] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.289181] [   T1972]  ? sysvec_apic_timer_interrupt+0xa6/0xd0
-[ 2213.289697] [   T1972]  ? asm_sysvec_apic_timer_interrupt+0x1b/0x20
-[ 2213.290228] [   T1972]  check_panic_on_warn+0x6f/0x90
-[ 2213.290691] [   T1972]  end_report+0xe6/0x100
-[ 2213.291101] [   T1972]  kasan_report+0xf9/0x130
-[ 2213.291537] [   T1972]  ? lookup_noperm_common+0x237/0x2b0
-[ 2213.292013] [   T1972]  ? lookup_noperm_common+0x237/0x2b0
-[ 2213.292524] [   T1972]  __asan_report_load1_noabort+0x14/0x30
-[ 2213.293014] [   T1972]  lookup_noperm_common+0x237/0x2b0
-[ 2213.293498] [   T1972]  lookup_noperm_unlocked+0x1d/0xa0
-[ 2213.293961] [   T1972]  ? putname+0xfa/0x150
-[ 2213.294397] [   T1972]  __ksmbd_vfs_kern_path+0x376/0xa80 [ksmbd]
-[ 2213.294935] [   T1972]  ? local_clock+0x15/0x30
-[ 2213.295361] [   T1972]  ? kasan_save_track+0x27/0x70
-[ 2213.295823] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.296328] [   T1972]  ? __entry_text_end+0x10257a/0x10257d
-[ 2213.296822] [   T1972]  ? __pfx___ksmbd_vfs_kern_path+0x10/0x10 [ksmbd]
-[ 2213.297389] [   T1972]  ? groups_alloc+0x41/0xe0
-[ 2213.297829] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.298318] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.298808] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.299322] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.299790] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.300277] [   T1972]  ? __ksmbd_override_fsids+0x340/0x630 [ksmbd]
-[ 2213.300839] [   T1972]  ? smb2_open+0x40b/0x9db0 [ksmbd]
-[ 2213.301333] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.301834] [   T1972]  ksmbd_vfs_kern_path+0x15/0x30 [ksmbd]
-[ 2213.302358] [   T1972]  smb2_open+0x2de6/0x9db0 [ksmbd]
-[ 2213.302841] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.303332] [   T1972]  ? stack_depot_save_flags+0x28/0x840
-[ 2213.303829] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.304323] [   T1972]  ? enqueue_hrtimer+0x10b/0x230
-[ 2213.304786] [   T1972]  ? ksm_scan_thread+0x480/0x59b0
-[ 2213.305238] [   T1972]  ? ksm_scan_thread+0x480/0x59b0
-[ 2213.305702] [   T1972]  ? __pfx_smb2_open+0x10/0x10 [ksmbd]
-[ 2213.306225] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.306718] [   T1972]  ? xas_load+0x19/0x300
-[ 2213.307141] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.307846] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.308330] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.308834] [   T1972]  ? down_read_killable+0x120/0x290
-[ 2213.309319] [   T1972]  handle_ksmbd_work+0x3fb/0xfe0 [ksmbd]
-[ 2213.309853] [   T1972]  process_one_work+0x629/0xf80
-[ 2213.310308] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.310800] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.311262] [   T1972]  worker_thread+0x87f/0x1570
-[ 2213.311700] [   T1972]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[ 2213.312204] [   T1972]  ? __pfx_try_to_wake_up+0x10/0x10
-[ 2213.312691] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.313183] [   T1972]  ? kasan_print_address_stack_frame+0x227/0x280
-[ 2213.313728] [   T1972]  ? __pfx_worker_thread+0x10/0x10
-[ 2213.314192] [   T1972]  kthread+0x396/0x830
-[ 2213.314599] [   T1972]  ? __pfx__raw_spin_lock_irq+0x10/0x10
-[ 2213.315097] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.315536] [   T1972]  ? __kasan_check_write+0x14/0x30
-[ 2213.315993] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.316485] [   T1972]  ? recalc_sigpending+0x180/0x210
-[ 2213.316954] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.317455] [   T1972]  ? _raw_spin_unlock_irq+0xe/0x50
-[ 2213.317921] [   T1972]  ? srso_alias_return_thunk+0x5/0xfbef5
-[ 2213.318409] [   T1972]  ? calculate_sigpending+0x84/0xb0
-[ 2213.318883] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.319311] [   T1972]  ret_from_fork+0x2b8/0x3b0
-[ 2213.319750] [   T1972]  ? __pfx_kthread+0x10/0x10
-[ 2213.320188] [   T1972]  ret_from_fork_asm+0x1a/0x30
-[ 2213.320656] [   T1972]  </TASK>
+Hi Namjae,
 
-Can you please have a look?
+I think I've found a bug in ksmbd.  Using the attached program to create a
+file, stat it, do a DIO write to it and stat it again:
 
-Thanks!
-metze
+	~/write /xfstest.test/foo 0 4K
+	sleep 1
+	stat /xfstest.test/foo
+	~/write -d /xfstest.test/foo 0 4K
+	stat /xfstest.test/foo
+
+and having mounted a ksmbd share with cache=strict and actimeo=1, I see mtime
+and ctime getting corrupted:
+
+  File: /xfstest.test/foo
+  Size: 4096            Blocks: 8          IO Block: 1048576 regular file
+Device: 0,65    Inode: 2033391     Links: 1
+Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: system_u:object_r:cifs_t:s0
+Access: 2025-07-23 22:15:30.136051900 +0100
+Modify: 2025-07-23 22:15:30.136051900 +0100
+Change: 2025-07-23 22:15:30.136051900 +0100
+ Birth: 2025-07-23 22:15:30.136051900 +0100
+  File: /xfstest.test/foo
+  Size: 4096            Blocks: 8          IO Block: 1048576 regular file
+Device: 0,65    Inode: 2033391     Links: 1
+Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: system_u:object_r:cifs_t:s0
+Access: 2025-07-23 22:15:30.136051900 +0100
+Modify: 1970-01-01 01:00:00.000000000 +0100
+Change: 1970-01-01 01:00:00.000000000 +0100
+ Birth: 2025-07-23 22:15:30.136051900 +0100
+
+I've also attached a PCAP file.  Frames 16 and 19 show Create Response
+messages with bad Last Write and Last Change timestamps and I think this is
+being reflected in the stat output, possibly due to deferred close.  Doing
+another stat a bit later shows the correct timestamps:
+
+Access: 2025-07-23 22:15:32.279094100 +0100
+Modify: 2025-07-23 22:15:32.279094100 +0100
+Change: 2025-07-23 22:15:32.279094100 +0100
+ Birth: 2025-07-23 22:15:30.136051900 +0100
+
+I've also added a kernel trace as requested by Steve.
+
+David
+
+
+--=-=-=
+Content-Type: text/x-c
+Content-Disposition: attachment; filename=write.c
+Content-Description: Simple file writing program
+
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <getopt.h>
+#include <sys/fcntl.h>
+#include <sys/mman.h>
+
+#define OSERROR(X, Y) do { if ((long)(X) == -1) { perror(Y); exit(1); } } while(0)
+
+static unsigned long parseval(char *p)
+{
+	unsigned long val;
+	char *end;
+
+	val = strtoul(p, &end, 0);
+	switch (*end) {
+	case 0: break;
+	case 'k': case 'K': val *= 1024; break;
+	case 'm': case 'M': val *= 1024 * 1024; break;
+	case 'p': case 'P': val *= 4096; break;
+	}
+	return val;
+}
+
+static void format(void)
+{
+	printf("Format: write [-dD] <file> <off> <len> [<off> <len>]*\n");
+	exit(2);
+}
+
+int main(int argc, char *argv[])
+{
+	const char *filename;
+	unsigned int flags = O_CREAT|O_WRONLY;
+	ssize_t wrote;
+	size_t size;
+	off_t pos;
+	void *buf = NULL;
+	int fd, opt;
+
+	while ((opt = getopt(argc, argv, "dD")) && opt != -1) {
+		switch (opt) {
+		case 'd':
+			flags |= O_DIRECT;
+			break;
+		case 'D':
+			flags |= O_DSYNC;
+			break;
+		}
+	}
+
+	argc -= optind;
+	argv += optind;
+	if (argc < 3)
+		format();
+	filename = argv[0];
+	argc--;
+	argv++;
+
+	if (argc & 1)
+		format();
+
+	fd = open(filename, flags, 0666);
+	OSERROR(fd, filename);
+
+	do {
+		pos = parseval(argv[0]);
+		size = parseval(argv[1]);
+		if (size) {
+			buf = mmap(NULL, size, PROT_READ|PROT_WRITE,
+				   MAP_PRIVATE|MAP_ANON, -1, 0);
+			OSERROR(buf, "mmap");
+		} else {
+			buf = "";
+		}
+
+		wrote = pwrite(fd, buf, size, pos);
+		argv += 2;
+		argc -= 2;
+
+		OSERROR(wrote, filename);
+		if (wrote < size)
+			fprintf(stderr, "Wrote %zx not %zx\n", wrote, size);
+
+		if (size)
+			OSERROR(munmap(buf, size), "munmap");
+	} while (argc >= 2);
+
+	OSERROR(close(fd), "close");
+	return 0;
+}
+
+--=-=-=
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=pcap.gz
+Content-Transfer-Encoding: base64
+
+H4sICGhPgWgCA3BjYXAA7Vt9bBNlGH+udGNrmHQyQrFDDmW4SbZ0bDAmaOo22AhMxzak3fiDfXSs
+snXdFxYYWBHcmBlOooIK00HKh8KABQyJEsoUE42LAwaBAMoi0kAI0QWNRnS+z32sd9f21g3+0HA/
+cn3vPXr3e97n9/Q98vyCJiJCcxgAsudOf4wi4wAHFcyEBbY6S0VsbhydXlVjic3PjqOtSfHJiSkG
+Oj1nCW2kkxJSDJlZa+jYV6x15XRe3rzkhBlx5BmjQAeLrLZ6Bz0rIXFWgiG+piQlvrjeWlGaNF0N
+SZBRX2kvKbLTsUutNZba8qKalXF0ckJyQgodm2mto0uqKivJYJldNMtQVjSjrCwxBZ8KgHFijFnc
+CKAGFYSCxWZPrDUAhJOr4eTqGBl+4O4PJUc5sGj8O1/35Pc/Xcsk53iAfsrnNwzM54EwmAeQmtFj
+BGNkeat7XyhFDpXepDdDzNNHyVo9IEGEmj8r53gcbLDQRHhM757pfonM8WAZWDbkobI86wlP6FdX
+kQO5OlupE47+g6fbo9pNTh0s2LKFrJwK0zRklJipcXPmkJn2n7zsNCOXjxDQDMZh5UZTNJAsAYSB
+f6QS0VV+rjsBjDiOZhRlJw6yHnIdWslRBlXkD0AOObSAi9ZBMvnMrV5Ui/ddLJgaPXb9i2f2/Xau
+8lBUQexoCA6xgudpyWdGlm1xoO+y32OxeL61lD3DfGPemwR5H5d6pbuMzMsoX30pk2Eb5n3tMV5f
+6kRnK+bc0d9xyamjbnccYvNOjeu4hrknM1qad2qYeTfDAPP3X7tCfh9/7zLFj+B87vwPR3Z6Rwlo
+TqwIm54ZJ3PXt+NKH6AelE+edUAL8nwnlGVWBXxCE6dDKXh1ONF4pTuNnKeBb/1DsudV1OH0L+L6
+77jUHrWrwamFBS1rBuu/ALVgn40cF7VejitTfuz+jMzxkHJo93mcyHFsrV8O8hvbeUfKobULtQ5n
+9hgWLwepdSLYAbSCPUKinQIFChQoUKBAgQIFChQoUKDgYQT2M7CvcZybY1/jKfX17vfIOR4+Pcom
+w3bsazRsFPewdjU4+k9mYw/rk8LBHlYf9jbIM3KkfQ2+5xNsXyMSP7TCKxivtOdz66y1R6bn8xrT
+87kj7seczCax90h6Ppswdm/Px81xbCYcn345SdNGztv8cbR6NjAcb/vl0BGOCzzHimyWA0zC3IQK
++qoruXEGyOdGx93r2+txc/FfF8S/+uZUTRc57/Kn7VHD+4y2SyXa9pA17EdtLV28tp29uAbyjAZp
+/NQw45/L3SHtT174TjwO6s+NbH/yuqQOcI0VO2I0MnXwOqPRbYlG+9ujdueI6wA16uz11kG5gONG
+pO15UR9fyJGKXWxj5MHlPIferC+EmJbmN7eqb0vX79vHF/LsXThMHtPIeKoWhecG9iXyxiBPQf7I
+fAkhz5+jc+R4IhievJHxuCkvj23+BFcbmbf58z9aPRsZ/+MtvzWA/sfg77S6nq0ByuTP/8BeeAUX
+hXlo/wMC+B8MsE/O/3Z4/0MHXv+DLX1fH0IYl5bEpeYyUhlkXHFAPWqhfa8PSCD9nfOR2ILk0QV4
+Lqsb6mdXefU79+w01wtkjoe0TlRGwweo35pvxfvU7hxH/6kQ3KeeWMHvU1/cQw1JZGFi/dhc9wxD
+PzN3z5A+it99CuARbn/mU421M1uk6/B8D7Hu7JqOD0P3cMhi1j7UvsvHL10XX6t8nMJaFgL5lwmq
+WFxHjzNxD6eO5t73v3mwzqTvjL82T3PJvDM2Me+MW+L94lRIe5RrmfidUb0Ka877znAI9qTiCZku
+GU/2DWZPOu+XQ+TJVjtYjsCeLL9fFDwgTzYL/q+eLOZ9yZ6FLhlP9kPGkz0i3ktcyxz9XRNxL7FH
+DO4lA5h7OU822LyjJ3s/e8lYbi+ZIthL/pueLO+Xog5b+7NdMn5pI+OX1onrv2tie9Qep9gvZep/
+QM4vtQepg9QvleZVgQIFChQoUKBAgQIFChQoUPAwQuqXYl9j5rZcl4xfuoPx1Jzi/tIep6P/bAv2
+l2yXpf2lwH5psH2Nof1SjPubj3/dK9PzbGJ6nh5xP+ZsC4m9V9LzdLH9GH9+6bkNrj4Zv3Qzw9Hs
+l0Pkl9ZXshyB/dJqbtyiDs4v9e31uMHXL6VzDvTJ+KU7GW3zJNr2kjXcRG2Tsnht3XdxDSDjlwYb
+fyC/dF16/B/CMXi/dLLmYJ9MHTQzGv0s0ehme9TefHEdoEbuu/790oH6ex4Z3+8Q+n7mIyPz/Rq4
+eTPhca8bry0k54USnjeuLh8TUwwxkUaaCjtMvcPciKAkc467pEqeGznRueDdo4+eCYW6Y2mTKIiG
+9Kp6W52lppa211StspZaSuni1XQp+5/RVERX/G5jeXz0KO5cT+5Tk3M996wQifbI8S9sIkb9QDcA
+AA==
+--=-=-=
+Content-Type: application/x-bzip2
+Content-Disposition: attachment; filename=trace.bz2
+Content-Transfer-Encoding: base64
+
+QlpoOTFBWSZTWfV2p4wACXzfgHzQQAP/8gEgEA6////gYAb/b5YBti2BkNAAALxjQ0NABkNAAAAA
+BKBMkTImgAAAAAANKekEwJhMRgBGmmhpgQMaGhoAMhoAAAAAIpRpqZoQQaAAaNGgAPUCoogQEI9R
+PU0E09I0PUD1PUeU3CTqWRKSwidu/ljR6ey5znx7s3RjbfPjjW5LxA63UZBahnVlWXByD0drw7Oz
+PbERBEGQ1jxK74MIDCizW4YEtFnWNqs02F3UqBCi2EyChcoSS+kU2HwbiZqtJ69ebFrFnjPLOpuw
+5MiqWKOPrECS5iIXLjsNDlbhi6c8Yxm9MHRs6MSlYYa5t5TfNu2y8IZ1Zy3bbttc+ySDnA9Bgqwq
+/mcktSl9IPak+hLJPm/6r3DvEeUngh2k0ieQdfO4xfPXS4zjNxicJWs1dzGX2K0bENTBkn7SQY0i
+TayJUnE55kmSYKG8xVtRjXEFuvTb9UsSckkTai2G84TjLHjRWHxOqG7xE3MnCaprGg6+yMAxZIrE
+XC+y7c9rz9+NcZ5xqUdIOInSDTDSSvQIUKYV4SRzJOQyprVgbOkZ0AhxlSKL2iy0zLg+QiROBsOY
+bsLW/MkYk3rlU9ZIPbiNNzEzWJWcTLN53Nx0umuLJP7SQac98XQnQ6aFYNGruqm0wcpi6ZmD+URe
+2TGSyy4OjWzgoqQRiiIBDhcVMNWjOsZMmGcZnREWps3rImXomgYWzEYIQghBvqamcyUqoTlXDVTR
+vJoZcKVXLVnpJtnFkgqOl7MLnGzhtyd0ZyQ34LZHKDO+U4ddLqiWyS85tdWOuGluE3LvjHLbpnZr
+eGHeBxJ+hma85OW+104yxMRFksmFIWWSy2riMWxzrbbTGmJbO410g33kzuLWN8Zzrj/z1WRVPupc
+W1LCksmI89216Y6h87GWipKKdlyuq2JMKWZwu+E3utS7vhUJUk4TEOqsLU/RxaV0jK47rmJoEmEP
+UUsicgw75E0NEOCyI9BYGX0Wrbattw3KDTRiMYVVRVMNGmcyQwpuwwYfOdUNWr8I99i/gn7FqxCp
+ZJy1tttqvWeZ6VFi0KngxUWLgxRaBWpBkaBDcSVNpWbbxiHID6TEbE97WRkwxDiS2MIdFQ6NkPo0
+angw6ssKOSyVThD6HxWFV2k/+9UPkdUOxPJmbn2kg8I+T6vVD/RzN0PgK+/5y2rUMHo0kMRF/H8m
+LbLcVivnhJNESkPN6werukkVYh6KiWJgp6JrDCPusLq85HJyOEkmTKR8HuiT9UcRGLf4ofF2TJ3V
+XNwiHqbFMIc5I8mE+0TiSPwQ5IfBsbH3mWhlxH6RxH8D2o8DVD2H2mGYk3PzGqGUOJ1RPCH3OEOE
+awO0DSIf4RPDsOUSYQ+rKHmhzfk9qHwco1kGIyExE/Em/ceB6Mm7RDsnlJBUhs1dasqrKqUqyrMP
+vJwh7UKh72iRh9nRDKG0iLOhyMDw6PJIqGs+A7E+MT3GXmdDpOgo973OTQ6YNnJzGJB2WQ1O5Ug7
+PCHc/26nRuhzkHWJ7UOiGo6sKSeZSNOrQsibHmhgvx+ttq1VVbcERqPcr7E5ujsTHS38ZNiyN4T1
+Q1JiSTZTMkWMTlAru0aInsKISJn5BkGo1iGZwNYjoXsRzgeCLWPmCIgSBD6MhSZgkGZBBrkFwP4u
+5IpwoSHq7U8Y
+--=-=-=--
+
