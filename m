@@ -1,115 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93305111BF;
-	Wed, 23 Jul 2025 23:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F0F256D
+	for <linux-cifs@vger.kernel.org>; Thu, 24 Jul 2025 00:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753312802; cv=none; b=FvPD0tRVo+FVTAGBDZmhFGmOpOO4S8caT3bYpe60Pc7ytWsScKTWtHQO3rETtl2GJz557hAFy7Ti1uksHQ0RPnHEsbHK9GyG9Gh4a6WFbShgb0giaG0BMpTghkca4lwr2dlUHKw8ytDel7CsQ7XviROOemJjS+/QQ+ZAyTSMxII=
+	t=1753317208; cv=none; b=haaV5tbjyWgkQAYZ40YTP9vfrSD3NExeQnnRBFCAbnRuEFkI6/F6AYXCCxIImkC1LSASV5QrqBLT5b3abBzyHg4bRE0/deKADQmcvURnFs4kJZ8srCjCluvWXh/E+TWn79+y01Uam+MbNmbYjl0s52r+4OuASKxdeitvHtee0o8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753312802; c=relaxed/simple;
-	bh=xz3SCdYArmCgq4jlaMS7xwpbTnpvdfXY4z3+utwpCWM=;
+	s=arc-20240116; t=1753317208; c=relaxed/simple;
+	bh=YTXR1/okUpnILmWGv+An6JiRsH5JdTLJSPGgm9JT4Rk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R0pTgRmiK4c8zSXvKESI0Qgh5wsYrz30LTnGlP4X/bgpAP/7Nh7ubdnQInv2MKlFH2wuHDYd4qmUZQeAXu4Wj0yAkhdAEEshYwLpvkjQWHqoHmZirLudZAjobUH/Y2K9X38c6wq1Uc8bo5D0ccHueFVsXSN+RhSDDP3YxpeTdFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xl/B8NRW; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=XcpfLvFgApSx3VVzR3X1kIdfVHs7vliT0EiP1VgcdpQh7cshNQw5oSTJqvQERneLWaasaTKglEA/Pv/WLDOkMJrekpEywg1VT0I1Jou1hZ6R7yq9/OBW5l4nKRvAiY9SlySBvEerCU2fQAg6mzQ+awC7Hl1SwEYsDRUWtHZn6SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NDEjprxu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xl/B8NRW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71D36C4CEEF;
-	Wed, 23 Jul 2025 23:20:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDEjprxu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1936EC4CEEF
+	for <linux-cifs@vger.kernel.org>; Thu, 24 Jul 2025 00:33:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1753312802;
-	bh=xz3SCdYArmCgq4jlaMS7xwpbTnpvdfXY4z3+utwpCWM=;
+	s=k20201202; t=1753317208;
+	bh=YTXR1/okUpnILmWGv+An6JiRsH5JdTLJSPGgm9JT4Rk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Xl/B8NRWKQ2fwl4L51YHeNMG5t7GbHqkjYGm6I5z71rlfNwfEAqElnDTjwyTkX3xC
-	 y/w4v0POkpQUw5ab2NaKSocdFnuhsf0f6gs7B18Pg273vLsjduHQz8H3jqDoj9MDoh
-	 zvBQq3zbB1kFX7uz/2yoq7WNm25YdMnWqadbge5ax4aNRzbf4yUMptp9oph1u5h63b
-	 yqV8nASq+H2xgpaLEM6/XCWJ/PzZhstgZewwHljUO29hCAJYnl827a04X9Y9d09YAz
-	 mknXs7HvDH92ZrCPpDNQwXTi9HV33Jk01mQbKaKs2jxHBAPcu6VpVRR52mcb1ZDU8o
-	 euduJ1/YZoQcg==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ae0bde4d5c9so63866866b.3;
-        Wed, 23 Jul 2025 16:20:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVMB0wKCFqvw+Utkxjb0K8KdJwgw3/mlfuCOE2meEa49UB7UaVn/xqW51wYcOPQW6Y8KBtP3T+Nc6vJtTbdzw==@vger.kernel.org, AJvYcCVreHtLCxLxyPpxFUaCRHVG+GAC4OuQfWjg2ey7EJG/3Q4Ii7FKw5JI9Bd30ZtW6jcpGT6DRe9DEvdB@vger.kernel.org, AJvYcCWkTwq++cOCKJ59nmrRJo8NPZ2jk6AfflL8TWihH4L3fEIL0dZJtPho+PFgRNkgovAScRrIfox3SARJkpQ4@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4g7bkk9wKQ+uitDX7bvnWNSXlxJ8xIizG/WQl8q8wcGn7Abp7
-	HChvygFsfQHNds1g8WVIoithANX3A3ktB6K2ErKg1y9ci+l5IQ+ZDGKhVCyrvGU2k+T7Z/0CA2M
-	i5jPSb2BMhl5dwmxQkLHFXvK2Ue4RbqQ=
-X-Google-Smtp-Source: AGHT+IFoA9riQGNTIBDVXbIV9GPqC5eg9LjgBJz/bsYhFEgKgA/j1vQGQFSok4b6j8j4HtNG497FHj1Ylrq6wCe++iI=
-X-Received: by 2002:a17:907:9494:b0:ae3:e378:159e with SMTP id
- a640c23a62f3a-af2f7475defmr432412866b.26.1753312801072; Wed, 23 Jul 2025
- 16:20:01 -0700 (PDT)
+	b=NDEjprxu9GNB5myQm5sBKZNYbZvrkCuK2BR5qNP6x9fOC8/cg+mw+pfZj7Oq+BUna
+	 DEu7zOqQqCFzk7Rdlrj1q99mGjJsAcyLTVgVcwa76TuCjFzFEU5nYZ7OVWUPOvk7YI
+	 BackBn3IKXS60LRjmbOrDC/L1dw93aP7kNA40CImN26UggB4eog5l7tjSdaU8/oTE6
+	 mPWvlhZ4ziQbr9qW5IrisDLmIcmoXdwPU7ez2Sn21bKhk/hN/f7+1+DQc47falR5op
+	 erU+/kuLCbeS3n2SAVITeXV0DGctEe5hEFMTvHC+jr1KvUYCjzhVit6Ec0CVS/SOnC
+	 HkhbmTDNT14hQ==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c4f796446so798193a12.1
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Jul 2025 17:33:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWl/MrLPIWaMb7a8u3WR35r5Ope5eDXtPQBr7KwTzzTVsfsMOsN3OON3/6L7/tafWQoFhT/h8o+jsmX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZr1/MhqNdbkoO//BH2oL9HKKTAe2l2MtlNOifiMzJNGJMfDp5
+	OesPqFTWBEcrwOXLS6Dj53c+JjIAXdmi9mKLWS08b5/G0fFgSgfUNv5BX/qNESOToRImWC1iT9l
+	/ao7USsydYyA9Wqs6GBfoBohXXgaYwfc=
+X-Google-Smtp-Source: AGHT+IHMAj0L+5TXhtQj55fdhvrNbSD/Tj3g4T3z9jJ1uo7Qpk7YiAmldt7gMOB8My5sdKqPHOKW2QK6l1fzY7aW/hE=
+X-Received: by 2002:a17:907:6e93:b0:ae0:4410:47e3 with SMTP id
+ a640c23a62f3a-af2f8c52657mr460622766b.51.1753317206696; Wed, 23 Jul 2025
+ 17:33:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <8ae2444f-e33e-4d78-9349-429b32f129d5@samba.org> <175331183374.2234665.16356100340389738205@noble.neil.brown.name>
-In-Reply-To: <175331183374.2234665.16356100340389738205@noble.neil.brown.name>
+References: <317462.1753306110@warthog.procyon.org.uk>
+In-Reply-To: <317462.1753306110@warthog.procyon.org.uk>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 24 Jul 2025 08:19:49 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_0kqhD9mYNxO_m8NzN4N=s2ReMrMNJxys89DQ_1uo+fQ@mail.gmail.com>
-X-Gm-Features: Ac12FXzCZTA9mUrC76URH0EdJ2hZg6tovlY3jXHYWDpnc2IlOJejnk4lFohG6pM
-Message-ID: <CAKYAXd_0kqhD9mYNxO_m8NzN4N=s2ReMrMNJxys89DQ_1uo+fQ@mail.gmail.com>
-Subject: Re: [PATCH 4/4] smb/server: add ksmbd_vfs_kern_path()
-To: NeilBrown <neil@brown.name>
-Cc: Stefan Metzmacher <metze@samba.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Thu, 24 Jul 2025 09:33:15 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_H-VgJ+0PuyjUQs8LbqQcMA__Sgu=FFvAwkoE-EBhpFw@mail.gmail.com>
+X-Gm-Features: Ac12FXweNQlC2SRxTARDXtoNa1FFH5ZgmFfefrkl-qoJm23t4sM2S7szuVLqiKU
+Message-ID: <CAKYAXd_H-VgJ+0PuyjUQs8LbqQcMA__Sgu=FFvAwkoE-EBhpFw@mail.gmail.com>
+Subject: Re: Probable ksmbd bug causing Create Response to show bad timestamps
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 24, 2025 at 8:04=E2=80=AFAM NeilBrown <neil@brown.name> wrote:
+On Thu, Jul 24, 2025 at 6:28=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
 >
-> On Thu, 24 Jul 2025, Stefan Metzmacher wrote:
-> > Hi Neil,
-> >
-> > for me this reliable generates the following problem, just doing a simp=
-le:
-> > mount -t cifs -ousername=3Droot,password=3Dtest,noperm,vers=3D3.1.1,mfs=
-ymlinks,actimeo=3D0 //172.31.9.167/test /mnt/test/
-> >
-> > [ 2213.234061] [   T1972] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> > [ 2213.234607] [   T1972] BUG: KASAN: slab-use-after-free in lookup_nop=
-erm_common+0x237/0x2b0
 >
-> Hi,
->  thanks for testing and reporting.  Sorry about this obvious bug...
+> Hi Namjae,
+Hi David,
 >
-> I called putname() too early.  The following should fix it.  Please test
-> and support.
-> Namjae: it would be good to squash this into the offending patch before
-> submitting upstream.  Can you do that?  Do you want me to resend the
-> whole patch?
-You don't need to resend the patch. I will directly update and test it.
-Thanks!
-
+> I think I've found a bug in ksmbd.  Using the attached program to create =
+a
+> file, stat it, do a DIO write to it and stat it again:
+Okay, I will take a look:)
+Thanks for your report!
 >
-> Thanks,
-> NeilBrown
+>         ~/write /xfstest.test/foo 0 4K
+>         sleep 1
+>         stat /xfstest.test/foo
+>         ~/write -d /xfstest.test/foo 0 4K
+>         stat /xfstest.test/foo
 >
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -53,7 +53,7 @@ static int ksmbd_vfs_path_lookup(struct ksmbd_share_con=
-fig *share_conf,
->                                  struct path *path, bool do_lock)
->  {
->         struct qstr last;
-> -       struct filename *filename;
-> +       struct filename *filename __free(putname) =3D NULL;
->         struct path *root_share_path =3D &share_conf->vfs_path;
->         int err, type;
->         struct dentry *d;
-> @@ -72,7 +72,6 @@ static int ksmbd_vfs_path_lookup(struct ksmbd_share_con=
-fig *share_conf,
->         err =3D vfs_path_parent_lookup(filename, flags,
->                                      path, &last, &type,
->                                      root_share_path);
-> -       putname(filename);
->         if (err)
->                 return err;
+> and having mounted a ksmbd share with cache=3Dstrict and actimeo=3D1, I s=
+ee mtime
+> and ctime getting corrupted:
 >
+>   File: /xfstest.test/foo
+>   Size: 4096            Blocks: 8          IO Block: 1048576 regular file
+> Device: 0,65    Inode: 2033391     Links: 1
+> Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+> Context: system_u:object_r:cifs_t:s0
+> Access: 2025-07-23 22:15:30.136051900 +0100
+> Modify: 2025-07-23 22:15:30.136051900 +0100
+> Change: 2025-07-23 22:15:30.136051900 +0100
+>  Birth: 2025-07-23 22:15:30.136051900 +0100
+>   File: /xfstest.test/foo
+>   Size: 4096            Blocks: 8          IO Block: 1048576 regular file
+> Device: 0,65    Inode: 2033391     Links: 1
+> Access: (0755/-rwxr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+> Context: system_u:object_r:cifs_t:s0
+> Access: 2025-07-23 22:15:30.136051900 +0100
+> Modify: 1970-01-01 01:00:00.000000000 +0100
+> Change: 1970-01-01 01:00:00.000000000 +0100
+>  Birth: 2025-07-23 22:15:30.136051900 +0100
+>
+> I've also attached a PCAP file.  Frames 16 and 19 show Create Response
+> messages with bad Last Write and Last Change timestamps and I think this =
+is
+> being reflected in the stat output, possibly due to deferred close.  Doin=
+g
+> another stat a bit later shows the correct timestamps:
+>
+> Access: 2025-07-23 22:15:32.279094100 +0100
+> Modify: 2025-07-23 22:15:32.279094100 +0100
+> Change: 2025-07-23 22:15:32.279094100 +0100
+>  Birth: 2025-07-23 22:15:30.136051900 +0100
+>
+> I've also added a kernel trace as requested by Steve.
+>
+> David
 >
