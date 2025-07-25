@@ -1,42 +1,46 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53312746A
-	for <linux-cifs@vger.kernel.org>; Fri, 25 Jul 2025 03:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F831E4BE
+	for <linux-cifs@vger.kernel.org>; Fri, 25 Jul 2025 03:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753413420; cv=none; b=Bdop8iZVQqoYiydfT9sEGXehe4po3kc18u/6ePNlqluw4zWZc4Ye9mPM5ZWmBzgghqqnlAlMBByJQlI/Us/asX2GRWHhJSdA7r+kDJI4gGKS7ofWl/b6atO/hrHMvKTtXQYrKxbT6VNHhxxnLT9HP6RitVKdbNR2FvFgtJgyVnQ=
+	t=1753413440; cv=none; b=lcNRVqWntYoJEhkQaM/WPCDlRbP8MJKEImo3QGoe3GvDaf0YBHgBNysWuZuWLNYtU4LOpgVYr5+7xNwrDcO0vrV2rn9Owit+zdca7ZlzZFaM5sIJzOjOqXSv8zUv11dZIVa0kx4LZFIHuyDcfcITT6uowTwP6eAq3cUiaKtl1Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753413420; c=relaxed/simple;
-	bh=kfdChQQHLGUL2G2Sb8SZE7oEyrCzY99V23ztJtnbJyw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FsL9OgcAxevJPzxGHTP/E33RYue49/R0S025Q3QVAgGEbSqya7jFvJsryervmkqIvtO07/YUFBZq4O95IXI9hGBDh7Su9ejZHSuf+w8OkldegbjV/3E4g6DsMSORQvPv8o1rOTPmXpenmNhCW88BkXAOL38gZ+0lOqG+0OXTrg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Am0QDMD9; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1753413440; c=relaxed/simple;
+	bh=lpQM7U7tVI9UYBKX33+1qXrghOVzojAGnup+VqhwW8o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W8+o91qvQE+GEf8+3deUuXmvIBTFwnZfc8wJnNbHop/iA7CRHlh4BHJ5M5+QEDUQNPPoajS2/u20pcWC+0/MxqMOQ18uzVsMwWdU7Qwn4ZNHJSnLyo4IrXV42ck/SrmbhjcmLcYR9nSoqCZp/nR8SmdYXXCUMVjwCzcRGS+ts7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=rCDyuK80; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Am0QDMD9"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="rCDyuK80"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=kaM+JQFCGz98074Z9CtHRnvkUcVFwWRUIqqLLiYB9eo=; b=Am0QDMD984F8mowfd4qZA+Qkl4
-	LO1MUZhOTv/LhuMDttePo/Fbv1TF4hC0Kim6yPsuj4DVSDrEurrbqh12COYNMcOUCycC2xLoyKIiz
-	0RTM4jO/uUDz9H8cNcZFbAdQEsyDzq5DEMqZV76zxvrJmPUlCLwONNnIg+8TItNTpEGbU9RKha+Zs
-	wtlImw/NNJOpq+VAGQuBZJHqS6OhCcL83qUUO/Xm3etXwuRmSitJ/E9Mdr4bMA5Yp/EmtUIqTIDso
-	mqxWPxozHVaihAT8U9nDZ59OQjs4gawMJ51qeFj3bv24vGm55WlE15kLfwZG5GAY+zXgy9f7i+0cl
-	tPgI5+WQ==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=3gUUDdvpYnUcCVbZmsVeJHxAUaJv4ezkw8u1FPvgv9Q=; b=rCDyuK80IVwmY5TJ90ehlLU5ew
+	9ONyRSMtkS9MKBL4DEZfsl0PJUxdV82glVtMbAKYHvWwrFIGZV3lOkJI2m7UQVDhUJwsLEs904SMH
+	/DvvHkCTxFHFbAkFBiuN9b/H+eiT9/8LZ964jijjhnb3m8tI9nRrBM9G+gJLwT5JIw+JqCB3QmiYv
+	2/sIu8CTwOC277pBTvJBF9hxDY1jF0o7XHB3xnjonJcGeBZgIgK/qTKV1BKYpc+aVEQLRXryWCm5I
+	RU0kWtVBogNK5+dK5FYhSnbQvxw0rJjrx7/Cmd97YdqplHoeSPCnVhIRz7CVx+7FPhpQ3Di8hHDcF
+	Q5Os4ClQ==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1uf8js-00000000Mlp-2RxJ;
-	Fri, 25 Jul 2025 00:04:52 -0300
+	id 1uf8k0-00000000Mlw-1OhH;
+	Fri, 25 Jul 2025 00:05:00 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	David Howells <dhowells@redhat.com>,
+	Pierguido Lambri <plambri@redhat.com>,
 	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>
-Subject: [PATCH 1/2] smb: client: allow parsing zero-length AV pairs
-Date: Fri, 25 Jul 2025 00:04:43 -0300
-Message-ID: <20250725030444.1851761-1-pc@manguebit.org>
+Subject: [PATCH 2/2] smb: client: fix session setup against servers that require SPN
+Date: Fri, 25 Jul 2025 00:04:44 -0300
+Message-ID: <20250725030444.1851761-2-pc@manguebit.org>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250725030444.1851761-1-pc@manguebit.org>
+References: <20250725030444.1851761-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,39 +49,137 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Zero-length AV pairs should be considered as valid target infos.
-Don't skip the next AV pairs that follow them.
+Some servers might enforce the SPN to be set in the target info
+blob (AV pairs) when sending NTLMSSP_AUTH message.  In Windows Server,
+this could be enforced with SmbServerNameHardeningLevel set to 2.
+
+Fix this by always appending SPN (cifs/<hostname>) to the existing
+list of target infos when setting up NTLMv2 response blob.
 
 Cc: linux-cifs@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>
-Fixes: 0e8ae9b953bc ("smb: client: parse av pair type 4 in CHALLENGE_MESSAGE")
+Reported-by: Pierguido Lambri <plambri@redhat.com>
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 ---
- fs/smb/client/cifsencrypt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsencrypt.c | 79 ++++++++++++++++++++++++++++---------
+ 1 file changed, 61 insertions(+), 18 deletions(-)
 
 diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 35892df7335c..6be850d2a346 100644
+index 6be850d2a346..3cc686246908 100644
 --- a/fs/smb/client/cifsencrypt.c
 +++ b/fs/smb/client/cifsencrypt.c
-@@ -343,7 +343,7 @@ static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
- 	len = AV_LEN(av);
- 	if (AV_TYPE(av) == NTLMSSP_AV_EOL)
- 		return NULL;
--	if (!len || (u8 *)av + sizeof(*av) + len > end)
-+	if ((u8 *)av + sizeof(*av) + len > end)
- 		return NULL;
- 	return av;
+@@ -532,17 +532,67 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash, struct shash_
+ 	return rc;
  }
-@@ -363,7 +363,7 @@ static int find_av_name(struct cifs_ses *ses, u16 type, char **name, u16 maxlen)
  
- 	av_for_each_entry(ses, av) {
- 		len = AV_LEN(av);
--		if (AV_TYPE(av) != type)
-+		if (AV_TYPE(av) != type || !len)
- 			continue;
- 		if (!IS_ALIGNED(len, sizeof(__le16))) {
- 			cifs_dbg(VFS | ONCE, "%s: bad length(%u) for type %u\n",
++/*
++ * Set up NTLMv2 response blob with SPN (cifs/<hostname>) appended to the
++ * existing list of AV pairs.
++ */
++static int set_auth_key_response(struct cifs_ses *ses)
++{
++	size_t baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
++	size_t len, spnlen, tilen = 0, num_avs = 2 /* SPN + EOL */;
++	struct TCP_Server_Info *server = ses->server;
++	char *spn __free(kfree) = NULL;
++	struct ntlmssp2_name *av;
++	char *rsp = NULL;
++	int rc;
++
++	spnlen = strlen(server->hostname);
++	len = sizeof("cifs/") + spnlen;
++	spn = kmalloc(len, GFP_KERNEL);
++	if (!spn) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	spnlen = scnprintf(spn, len, "cifs/%.*s",
++			   (int)spnlen, server->hostname);
++
++	av_for_each_entry(ses, av)
++		tilen += sizeof(*av) + AV_LEN(av);
++
++	len = baselen + tilen + spnlen * sizeof(__le16) + num_avs * sizeof(*av);
++	rsp = kmalloc(len, GFP_KERNEL);
++	if (!rsp) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	memcpy(rsp + baselen, ses->auth_key.response, tilen);
++	av = (void *)(rsp + baselen + tilen);
++	av->type = cpu_to_le16(NTLMSSP_AV_TARGET_NAME);
++	av->length = cpu_to_le16(spnlen * sizeof(__le16));
++	cifs_strtoUTF16((__le16 *)av->data, spn, spnlen, ses->local_nls);
++	av = (void *)((__u8 *)av + sizeof(*av) + AV_LEN(av));
++	av->type = cpu_to_le16(NTLMSSP_AV_EOL);
++	av->length = 0;
++
++	rc = 0;
++	ses->auth_key.len = len;
++out:
++	ses->auth_key.response = rsp;
++	return rc;
++}
++
+ int
+ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ {
+ 	struct shash_desc *hmacmd5 = NULL;
+-	int rc;
+-	int baselen;
+-	unsigned int tilen;
++	unsigned char *tiblob = NULL; /* target info blob */
+ 	struct ntlmv2_resp *ntlmv2;
+ 	char ntlmv2_hash[16];
+-	unsigned char *tiblob = NULL; /* target info blob */
+ 	__le64 rsp_timestamp;
++	__u64 cc;
++	int rc;
+ 
+ 	if (nls_cp == NULL) {
+ 		cifs_dbg(VFS, "%s called with nls_cp==NULL\n", __func__);
+@@ -588,32 +638,25 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	 * (as Windows 7 does)
+ 	 */
+ 	rsp_timestamp = find_timestamp(ses);
++	get_random_bytes(&cc, sizeof(cc));
++
++	cifs_server_lock(ses->server);
+ 
+-	baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
+-	tilen = ses->auth_key.len;
+ 	tiblob = ses->auth_key.response;
+-
+-	ses->auth_key.response = kmalloc(baselen + tilen, GFP_KERNEL);
+-	if (!ses->auth_key.response) {
+-		rc = -ENOMEM;
++	rc = set_auth_key_response(ses);
++	if (rc) {
+ 		ses->auth_key.len = 0;
+-		goto setup_ntlmv2_rsp_ret;
++		goto unlock;
+ 	}
+-	ses->auth_key.len += baselen;
+ 
+ 	ntlmv2 = (struct ntlmv2_resp *)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+ 	ntlmv2->time = rsp_timestamp;
+-
+-	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
++	ntlmv2->client_chal = cc;
+ 	ntlmv2->reserved2 = 0;
+ 
+-	memcpy(ses->auth_key.response + baselen, tiblob, tilen);
+-
+-	cifs_server_lock(ses->server);
+-
+ 	rc = cifs_alloc_hash("hmac(md5)", &hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "Could not allocate HMAC-MD5, rc=%d\n", rc);
 -- 
 2.50.1
 
