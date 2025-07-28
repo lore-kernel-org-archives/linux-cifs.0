@@ -1,204 +1,175 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887711FF603
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Jul 2025 18:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A219274B53
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Jul 2025 17:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753640618; cv=none; b=o+vp2/HUmDM9bgug7gLPiB2Eo2GiSHQRqklWsa5ntDJAFcF+WqVXlLV92cv9OwX2d008ZY4Lzmoz8xKJMjRTZiimYD1Pji3ipAbkePgkxAy6vImwy3w8KZcXV8IGJAVykIZhji+r0g9JqpCsrocPIvaL2lbnZDuu8G4yQTz6PM8=
+	t=1753724248; cv=none; b=KDgcMkK7/hnxAHeG7gvfCztm895yYHsXDOnqpu6OuGFngjGgo37BIx8013aU0HDjArsHlf50rortAHxCWcJJWI1ND27Iwxsp2hdbF+KJKFYhKSC6F9+DAtZc9A8sMR7JZV+yt8lPXA0YkL1QU1FFzCm77UBdl175fMJo03zhiHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753640618; c=relaxed/simple;
-	bh=jJAJ/oLlW3VhHtx7lxswQ6+1kTLpQ6EFMadVBalnerY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f4Pwv/DTAjTJ3LLWkjciX7t7ytE9m/ONdOsNytgdsFdE7npHIaDi3euvwCL7OjUQmBaZLzaUV177uW8lceNkeAGx9YaPfe3wTVb9GzmPP4sMlYizPB+o25Ke7QEDFWBQL3g9SFoiBPWQttdKQpcNhDz1wt1+2LWNxJJO8Bv53so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L7iCdj6X; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1753724248; c=relaxed/simple;
+	bh=fottRo6fuvHWN0jSiajGgI+LH/8lJAE6yS2m8GnE/tU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=F+J9Yzox2tjtj5n4MEqQe5LlIytWm0QYR6P5QLwK5ELWDtaULSi3LbPvlRAxzZ4GUL1JjwwdXMNmtL2o98935NgQSe+wRH+eDeHIJ0l2ZPrY3i3AxPCgsLkF/+Da3iDvC2NzoviWadHo8RuGlsP61AOvTtMoIh1QZfMY0ehq85s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/B4lryj; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7iCdj6X"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6f8aa9e6ffdso34400306d6.3
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Jul 2025 11:23:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/B4lryj"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-702cbfe860cso39399976d6.1
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Jul 2025 10:37:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1753640615; x=1754245415; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8zKTNeUJEqSL440AOY+0PCgsp0MrqpEf6oTNYz2XFqw=;
-        b=L7iCdj6XWDlijPSrjfAdN51OBrx99zHKch9qQ7I4m+zgubsDSjpTSsizKrWLIx1IfF
-         0+a93F1zN6MqKEbo3tUK4FcaKJ7vb7SqOW0KEdJVNmwsaZG2kBKGDumrBIJvtQbJFX+/
-         ViVVgof+mXWdIX1VWnxV/t6YoixZza4Mvtu9zFQNqLnnFDs1JOna1n+p72U0GMfiz2yp
-         r2kprCjROUqL2XdggGhUp/0djKTQpm1TyufwwwoaqKWQO3WfbPM8E3og+11KWbJb9PbB
-         o3CB2ZjNx1xcVRub8wqJuncZ0McdiUYkN7ciUn9KUMpS4hy8kkDPE7cENE65Dvnhyyua
-         uibA==
+        d=gmail.com; s=20230601; t=1753724245; x=1754329045; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zjysJ+Wmx3VAfCQ/zZ7a9pBQD5yaulKDzspwdDkFPlQ=;
+        b=R/B4lryjEkrWtxee27OgiNi46zLHbxncNiGK6HS4zVMh2ZTioJeEbAEAKYnnwNkP5t
+         C3Dh4SsI4ePdRntgpj2DuJzzbCKjtedmxggb7sxWj3zkdSXh+cYxqNGdtdTv3NFbzaNf
+         cWBek+Kl95DgiALXaykUcyatDAQo96/kPMbLiLUA0FOyHAScuLuY0xef+rhBdnjl8wg5
+         rwkQVB6lYDQCnZsRzHU48khMNxqul6mUq8CHEjZ0CeqTxOq+/zury8c1ffM5p6bzndkC
+         C28SQ7yZpeEoDt2FK7x5SCA5TRboSz5r9y3Uutq9OPtDazxS1EnwFU6TD1tr4PwGGj02
+         QYAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1753640615; x=1754245415;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8zKTNeUJEqSL440AOY+0PCgsp0MrqpEf6oTNYz2XFqw=;
-        b=RcLQYOsODnEUdcqOle1heElpfegyKr4wZFDMWbt47Qf25S1uVrdd4qzT6tR7IIc+v9
-         I/j175BbHG2ebxbQ9jiGf4cn7sQrQhBs78uWLIr+VkIt+BQo/MCAVJk5tiFDd5B1Xgs5
-         vd4axksgdAKP8KdKNJ7Vkvv+xvomyTC/wqvSBr587w/cQ4M5LcYg8JnZOtXtUuR66NjH
-         lI9+7x1Lr7k6g5Lznsfpsd2iajitfI3CH0b1A+w4zuPpGdeyFn8OW/TmkAwJGMpcqZWg
-         UAGljCxXJmli2Pt+Tiw9/58Lw4Vx+imu+YddLbi5SWeEj5C2O6LXbpvw4yKJ7sMv25rJ
-         ucDA==
-X-Gm-Message-State: AOJu0Yx3D68EfOjYQrNnh23l1AEEatWUDMoQPQWhffniLCfA2icJSSWX
-	nymmZ+/UO7XXvAAOqa8EoNGyIaioY+UL974AQqBS4QEIZpGM6WSn39JlBhXEJ6/p0pdmfXdtHSM
-	EgvXgN6oIRk419IDesh4vG1v7O/xmI54=
-X-Gm-Gg: ASbGncuJXLnoMlijLjVYHgZSMjWWBBuzo7dnyVwD0t0Zj6r7i4c84mK1L49FbusywwA
-	F6g/WIO/IkE2gQNLPoBJbO3LVZkRaZXtfpFEcCW0cZpEz4dXTNs9pVqkISMPyV3eJ81x7TX3Ysa
-	l1qdTUgLKXZ8pf2M+p9Pp8YemTRpmg/2ZUS6PHuvZSZXKUqXnbYDKtcll8SYb/k15WubpCLTVqp
-	KiauPAaxDajLoV5Ipz6sS0OAV8QHRmHOJWg+PabTQIVjtQG8BhN
-X-Google-Smtp-Source: AGHT+IF6gifLg1EZi3AR7ZOHQ5I4on/Pi8NsIjnjBpFAvfznftBUNk+lz706PxvGZuaafxBumndldO+bKbTWvp6QOUo=
+        d=1e100.net; s=20230601; t=1753724245; x=1754329045;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zjysJ+Wmx3VAfCQ/zZ7a9pBQD5yaulKDzspwdDkFPlQ=;
+        b=qRgm3j69V3B48Ka9l744wyd7NTBijRtShDQWwaamKwfAgZ0lhvm9oce5oCo2osIj4j
+         nmCwlBI5Hhn9SVdt9KMA4g4WEoGp/wzZPlku6T/mmlGFIbJEMCqmM58b4d+/k833V722
+         23To/HQWgbd8KkiTUG5YagzPLGg1IDIfkOcEMMbrhaRoGhttmIENchc4ZAcVQvsac0Na
+         Z07MoDuMZWqSs5hFKJBynzRFA4vZGdCpmPYcVtlq0ew637MhExwsIO/6NXQWJtKKqx1T
+         I5Ghx802MXK8376F0uBhTt0OJHN8uwvXJEiYDdCVsOAcyxZ7nBYc/boA8t8LRCBshnbW
+         bEAw==
+X-Gm-Message-State: AOJu0YwYLHC9Z9jwerWZpowOr8wz3hbn2pvi6PCLZcoX/AkSvGU2ZAuJ
+	JaBDalOWvFDp/fd+ulOsl0+CQN/qW1npCK/7uWXf1jbDAMsZsA1qF7Nagj5dKRcy9rGKbIYOwvr
+	lqbBMfCQdGZ/DotVRYze3kkZrmWhbFjII8W25j6w=
+X-Gm-Gg: ASbGnctNN4/NPsltkM9WsJlpm3OtJ5AV+nPr8mK5qNleq7LiFINtycmHPSRA2Xlvm+r
+	L3X4lhpIQ78KxirjcRDYwCwvns4w8hDR0dkce6f5zHSByyfb70ksi6tFtZZnwPqt7Eb9KeufRVi
+	Xlv0b9xA1X28LqyHMGtKY3cf36z1d7Dkfbq2QeOGX72CfB4vpu9PziRREJuOs/Ffbwos/QV8kyX
+	PipTzHcFT9a0tDrMrtg4+Novs9uLCf7x9FCBi2M3A==
+X-Google-Smtp-Source: AGHT+IGQOZmeIK6IGMsPsPBNZIEgWFjmp/cP1ww3qtTjGE1AOBsemK+elxYJD+GNAg3+2MO8REeYLl7CHbyZ6LjA6oc=
 X-Received: by 2002:ad4:5de6:0:b0:704:f7d8:edfe with SMTP id
- 6a1803df08f44-7072060de4emr115948286d6.51.1753640615160; Sun, 27 Jul 2025
- 11:23:35 -0700 (PDT)
+ 6a1803df08f44-7072060de4emr157880136d6.51.1753724244810; Mon, 28 Jul 2025
+ 10:37:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250604101829.832577-1-sprasad@microsoft.com>
- <20250604101829.832577-7-sprasad@microsoft.com> <CAH2r5mvHV8Y2tO156TmQ7ymrgaiFPZSsZdzSNWvEreDq2p-G=A@mail.gmail.com>
- <CAH2r5muix9VFHpoVmDvUbZnwEeT94zXw7SrGKRf+Crgj8vgS5Q@mail.gmail.com>
-In-Reply-To: <CAH2r5muix9VFHpoVmDvUbZnwEeT94zXw7SrGKRf+Crgj8vgS5Q@mail.gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 27 Jul 2025 13:23:22 -0500
-X-Gm-Features: Ac12FXz6qRsHZGa0m_IDJRX0kQl-hy0RejwoBei5axCVW7_BwpXIYRehjvyJCrY
-Message-ID: <CAH2r5mszxU9KSWkTBc58Zz_vZGCw50Td-MfeNoJKFFaH2KoMJw@mail.gmail.com>
-Subject: Re: [PATCH 7/7] cifs: add new field to track the last access time of cfid
-To: nspmangalore@gmail.com
-Cc: linux-cifs@vger.kernel.org, bharathsm.hsk@gmail.com, 
-	meetakshisetiyaoss@gmail.com, pc@manguebit.com, paul@darkrain42.org, 
-	henrique.carvalho@suse.com, ematsumiya@suse.de, 
-	Shyam Prasad N <sprasad@microsoft.com>
+Date: Mon, 28 Jul 2025 12:37:13 -0500
+X-Gm-Features: Ac12FXwP0oGDocTGq_crO4Gmi3J2T6jzzs0Fisac37meN_gLF9Bm4v4QepHDp_g
+Message-ID: <CAH2r5msG+FxsTBot9RAz-tALK3S49nDpsfzigGTKaBaQtwheng@mail.gmail.com>
+Subject: [PATCH][SMB3 client] add way to show directory leases for improved debugging
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>, 
+	Henrique Carvalho <henrique.carvalho@suse.com>, Bharath S M <bharathsm@microsoft.com>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Content-Type: multipart/mixed; boundary="000000000000a5b637063b00be26"
+
+--000000000000a5b637063b00be26
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-One minor improvement we could do - I noticed that this helps workloads lik=
-e:
+When looking at performance issues around directory caching, or debugging
+directory lease issues, it is helpful to be able to display the current
+directory leases (as we can e.g. or open files).  Create pseudo-file
+/proc/fs/cifs/open_dirs that displays current directory leases.  Here
+is sample output:
 
-"ls /mnt/somedir ; do stuff ; ls /mnt/somedir (uses cached data from
-first) ; ... "ls /mnt/somedir"
+ cat /proc/fs/cifs/open_dirs
+   Version:1
+   Format:
+   <tree id> <sess id> <persistent fid> <path>
+  Num entries: 3
+  0xce4c1c68 0x7176aa54 0xd95ef58e     \dira      valid file info, valid dirents
+  0xce4c1c68 0x7176aa54 0xd031e211     \dir5      valid file info, valid dirents
+  0xce4c1c68 0x7176aa54 0x96533a90     \dir1      valid file info
 
-but it doesn't help
-
-"ls /mnt/somedir ; do stuff ; stat /mnt/somedir ; do stuff ; stat
-/mnt/somedir ; etc."
-
-When "ls" is repeated then we bump up the timeout for that directory
-lease, but if ls is instead only followed by "stat" or "revalidate"
-(not ls/query_dir) of the directory (stat/revalidate is much more
-common than ls) then it doesn't bump up the timeout for the directory
-lease.
-
-Maybe followon patch can determine when to bump up the timeout when
-revalidate/stat is frequently accessing the cached directory metadata
-
-On Thu, Jul 24, 2025 at 10:26=E2=80=AFPM Steve French <smfrench@gmail.com> =
-wrote:
->
-> Updated patch with description
->
->
-> On Thu, Jul 24, 2025 at 6:05=E2=80=AFPM Steve French <smfrench@gmail.com>=
- wrote:
-> >
-> > Rebased version of patch attached. See attached. Let me know if any
-> > objections.  It solves an obvious important issue (we shouldn't be
-> > timing out directory leases if they are the most recently used ones)
-> >
-> >
-> > On Wed, Jun 4, 2025 at 5:18=E2=80=AFAM <nspmangalore@gmail.com> wrote:
-> > >
-> > > From: Shyam Prasad N <sprasad@microsoft.com>
-> > >
-> > > The handlecache code today tracks the time at which dir lease was
-> > > acquired and the laundromat thread uses that to check for old
-> > > entries to cleanup.
-> > >
-> > > However, if a directory is actively accessed, it should not
-> > > be chosen to expire first.
-> > >
-> > > This change adds a new last_access_time field to cfid and
-> > > uses that to decide expiry of the cfid.
-> > >
-> > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > > ---
-> > >  fs/smb/client/cached_dir.c | 6 ++++--
-> > >  fs/smb/client/cached_dir.h | 1 +
-> > >  2 files changed, 5 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> > > index 4abf5bbd8baf..d432a40f902e 100644
-> > > --- a/fs/smb/client/cached_dir.c
-> > > +++ b/fs/smb/client/cached_dir.c
-> > > @@ -213,6 +213,7 @@ int open_cached_dir(unsigned int xid, struct cifs=
-_tcon *tcon,
-> > >          */
-> > >         spin_lock(&cfid->fid_lock);
-> > >         if (cfid->has_lease && cfid->time) {
-> > > +               cfid->last_access_time =3D jiffies;
-> > >                 spin_unlock(&cfid->fid_lock);
-> > >                 mutex_unlock(&cfid->cfid_mutex);
-> > >                 *ret_cfid =3D cfid;
-> > > @@ -365,6 +366,7 @@ int open_cached_dir(unsigned int xid, struct cifs=
-_tcon *tcon,
-> > >         cfid->tcon =3D tcon;
-> > >         cfid->is_open =3D true;
-> > >         cfid->time =3D jiffies;
-> > > +       cfid->last_access_time =3D jiffies;
-> > >         spin_unlock(&cfid->fid_lock);
-> > >
-> > >  oshr_free:
-> > > @@ -741,8 +743,8 @@ static void cfids_laundromat_worker(struct work_s=
-truct *work)
-> > >         spin_lock(&cfids->cfid_list_lock);
-> > >         list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
-> > >                 spin_lock(&cfid->fid_lock);
-> > > -               if (cfid->time &&
-> > > -                   time_after(jiffies, cfid->time + HZ * dir_cache_t=
-imeout)) {
-> > > +               if (cfid->last_access_time &&
-> > > +                   time_after(jiffies, cfid->last_access_time + HZ *=
- dir_cache_timeout)) {
-> > >                         cfid->on_list =3D false;
-> > >                         list_move(&cfid->entry, &entry);
-> > >                         cfids->num_entries--;
-> > > diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-> > > index 93c936af2253..6d4b9413aa67 100644
-> > > --- a/fs/smb/client/cached_dir.h
-> > > +++ b/fs/smb/client/cached_dir.h
-> > > @@ -39,6 +39,7 @@ struct cached_fid {
-> > >         bool on_list:1;
-> > >         bool file_all_info_is_valid:1;
-> > >         unsigned long time; /* jiffies of when lease was taken */
-> > > +       unsigned long last_access_time; /* jiffies of when last acces=
-sed */
-> > >         struct kref refcount;
-> > >         struct cifs_fid fid;
-> > >         spinlock_t fid_lock;
-> > > --
-> > > 2.43.0
-> > >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
-
-
-
---=20
+See attached patch
+-- 
 Thanks,
 
 Steve
+
+--000000000000a5b637063b00be26
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-client-add-way-to-show-directory-leases-for-imp.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-client-add-way-to-show-directory-leases-for-imp.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mdne4h0q0>
+X-Attachment-Id: f_mdne4h0q0
+
+RnJvbSA3OGQyMDI0Yzk2NzZlZDdkNTNkMmVkN2YyZWUyYTQ2MjYxYzBkNzYwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMjggSnVsIDIwMjUgMTI6MzI6NTMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzIGNsaWVudDogYWRkIHdheSB0byBzaG93IGRpcmVjdG9yeSBsZWFzZXMgZm9yIGltcHJvdmVk
+CiBkZWJ1Z2dpbmcKCldoZW4gbG9va2luZyBhdCBwZXJmb3JtYW5jZSBpc3N1ZXMgYXJvdW5kIGRp
+cmVjdG9yeSBjYWNoaW5nLCBvciBkZWJ1Z2dpbmcKZGlyZWN0b3J5IGxlYXNlIGlzc3VlcywgaXQg
+aXMgaGVscGZ1bCB0byBiZSBhYmxlIHRvIGRpc3BsYXkgdGhlIGN1cnJlbnQKZGlyZWN0b3J5IGxl
+YXNlcyAoYXMgd2UgY2FuIGUuZy4gb3Igb3BlbiBmaWxlcykuICBDcmVhdGUgcHNldWRvLWZpbGUK
+L3Byb2MvZnMvY2lmcy9vcGVuX2RpcnMgdGhhdCBkaXNwbGF5cyBjdXJyZW50IGRpcmVjdG9yeSBs
+ZWFzZXMuICBIZXJlCmlzIHNhbXBsZSBvdXRwdXQ6CgpjYXQgL3Byb2MvZnMvY2lmcy9vcGVuX2Rp
+cnMKIFZlcnNpb246MQogRm9ybWF0OgogPHRyZWUgaWQ+IDxzZXNzIGlkPiA8cGVyc2lzdGVudCBm
+aWQ+IDxwYXRoPgpOdW0gZW50cmllczogMwoweGNlNGMxYzY4IDB4NzE3NmFhNTQgMHhkOTVlZjU4
+ZSAgICAgXGRpcmEgICAgICB2YWxpZCBmaWxlIGluZm8sIHZhbGlkIGRpcmVudHMKMHhjZTRjMWM2
+OCAweDcxNzZhYTU0IDB4ZDAzMWUyMTEgICAgIFxkaXI1ICAgICAgdmFsaWQgZmlsZSBpbmZvLCB2
+YWxpZCBkaXJlbnRzCjB4Y2U0YzFjNjggMHg3MTc2YWE1NCAweDk2NTMzYTkwICAgICBcZGlyMSAg
+ICAgIHZhbGlkIGZpbGUgaW5mbwoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5j
+aEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5oIHwgIDEgLQog
+ZnMvc21iL2NsaWVudC9jaWZzX2RlYnVnLmMgfCA1MyArKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCA1MyBpbnNlcnRpb25zKCspLCAxIGRlbGV0
+aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jYWNoZWRfZGlyLmggYi9mcy9zbWIv
+Y2xpZW50L2NhY2hlZF9kaXIuaAppbmRleCAyYzI2Mjg4MWI3YjEuLjQ2YjVhMmZkZjE1YiAxMDA2
+NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jYWNoZWRfZGlyLmgKKysrIGIvZnMvc21iL2NsaWVudC9j
+YWNoZWRfZGlyLmgKQEAgLTE0LDcgKzE0LDYgQEAgc3RydWN0IGNhY2hlZF9kaXJlbnQgewogCWNo
+YXIgKm5hbWU7CiAJaW50IG5hbWVsZW47CiAJbG9mZl90IHBvczsKLQogCXN0cnVjdCBjaWZzX2Zh
+dHRyIGZhdHRyOwogfTsKIApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9jaWZzX2RlYnVnLmMg
+Yi9mcy9zbWIvY2xpZW50L2NpZnNfZGVidWcuYwppbmRleCAzZmRmNzU3MzdkNDMuLmYxY2VhMzY1
+YjZmMSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzX2RlYnVnLmMKKysrIGIvZnMvc21i
+L2NsaWVudC9jaWZzX2RlYnVnLmMKQEAgLTI2LDYgKzI2LDcgQEAKICNpbmNsdWRlICJzbWJkaXJl
+Y3QuaCIKICNlbmRpZgogI2luY2x1ZGUgImNpZnNfc3duLmgiCisjaW5jbHVkZSAiY2FjaGVkX2Rp
+ci5oIgogCiB2b2lkCiBjaWZzX2R1bXBfbWVtKGNoYXIgKmxhYmVsLCB2b2lkICpkYXRhLCBpbnQg
+bGVuZ3RoKQpAQCAtMjgwLDYgKzI4MSw1NCBAQCBzdGF0aWMgaW50IGNpZnNfZGVidWdfZmlsZXNf
+cHJvY19zaG93KHN0cnVjdCBzZXFfZmlsZSAqbSwgdm9pZCAqdikKIAlyZXR1cm4gMDsKIH0KIAor
+c3RhdGljIGludCBjaWZzX2RlYnVnX2RpcnNfcHJvY19zaG93KHN0cnVjdCBzZXFfZmlsZSAqbSwg
+dm9pZCAqdikKK3sKKwlzdHJ1Y3QgbGlzdF9oZWFkICpzdG1wLCAqdG1wLCAqdG1wMTsKKwlzdHJ1
+Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXI7CisJc3RydWN0IGNpZnNfc2VzICpzZXM7CisJc3Ry
+dWN0IGNpZnNfdGNvbiAqdGNvbjsKKwlzdHJ1Y3QgY2FjaGVkX2ZpZHMgKmNmaWRzOworCXN0cnVj
+dCBjYWNoZWRfZmlkICpjZmlkOworCUxJU1RfSEVBRChlbnRyeSk7CisKKwlzZXFfcHV0cyhtLCAi
+IyBWZXJzaW9uOjFcbiIpOworCXNlcV9wdXRzKG0sICIjIEZvcm1hdDpcbiIpOworCXNlcV9wdXRz
+KG0sICIjIDx0cmVlIGlkPiA8c2VzcyBpZD4gPHBlcnNpc3RlbnQgZmlkPiA8cGF0aD5cbiIpOwor
+CisJc3Bpbl9sb2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7CisJbGlzdF9mb3JfZWFjaChzdG1wLCAm
+Y2lmc190Y3Bfc2VzX2xpc3QpIHsKKwkJc2VydmVyID0gbGlzdF9lbnRyeShzdG1wLCBzdHJ1Y3Qg
+VENQX1NlcnZlcl9JbmZvLAorCQkJCSAgICB0Y3Bfc2VzX2xpc3QpOworCQlsaXN0X2Zvcl9lYWNo
+KHRtcCwgJnNlcnZlci0+c21iX3Nlc19saXN0KSB7CisJCQlzZXMgPSBsaXN0X2VudHJ5KHRtcCwg
+c3RydWN0IGNpZnNfc2VzLCBzbWJfc2VzX2xpc3QpOworCQkJbGlzdF9mb3JfZWFjaCh0bXAxLCAm
+c2VzLT50Y29uX2xpc3QpIHsKKwkJCQl0Y29uID0gbGlzdF9lbnRyeSh0bXAxLCBzdHJ1Y3QgY2lm
+c190Y29uLCB0Y29uX2xpc3QpOworCQkJCWNmaWRzID0gdGNvbi0+Y2ZpZHM7CisJCQkJc3Bpbl9s
+b2NrKCZjZmlkcy0+Y2ZpZF9saXN0X2xvY2spOyAvKiBjaGVjayBsb2NrIG9yZGVyaW5nICovCisJ
+CQkJc2VxX3ByaW50ZihtLCAiTnVtIGVudHJpZXM6ICVkXG4iLCBjZmlkcy0+bnVtX2VudHJpZXMp
+OworCQkJCWxpc3RfZm9yX2VhY2hfZW50cnkoY2ZpZCwgJmNmaWRzLT5lbnRyaWVzLCBlbnRyeSkg
+eworCQkJCQlzZXFfcHJpbnRmKG0sICIweCV4IDB4JWxseCAweCVsbHggICAgICVzIiwKKwkJCQkJ
+CXRjb24tPnRpZCwKKwkJCQkJCXNlcy0+U3VpZCwKKwkJCQkJCWNmaWQtPmZpZC5wZXJzaXN0ZW50
+X2ZpZCwKKwkJCQkJCWNmaWQtPnBhdGgpOworCQkJCQlpZiAoY2ZpZC0+ZmlsZV9hbGxfaW5mb19p
+c192YWxpZCkKKwkJCQkJCXNlcV9wcmludGYobSwgIlx0dmFsaWQgZmlsZSBpbmZvIik7CisJCQkJ
+CWlmIChjZmlkLT5kaXJlbnRzLmlzX3ZhbGlkKQorCQkJCQkJc2VxX3ByaW50ZihtLCAiLCB2YWxp
+ZCBkaXJlbnRzIik7CisJCQkJCXNlcV9wcmludGYobSwgIlxuIik7CisJCQkJfQorCQkJCXNwaW5f
+dW5sb2NrKCZjZmlkcy0+Y2ZpZF9saXN0X2xvY2spOworCisKKwkJCX0KKwkJfQorCX0KKwlzcGlu
+X3VubG9jaygmY2lmc190Y3Bfc2VzX2xvY2spOworCXNlcV9wdXRjKG0sICdcbicpOworCXJldHVy
+biAwOworfQorCiBzdGF0aWMgX19hbHdheXNfaW5saW5lIGNvbnN0IGNoYXIgKmNvbXByZXNzaW9u
+X2FsZ19zdHIoX19sZTE2IGFsZykKIHsKIAlzd2l0Y2ggKGFsZykgewpAQCAtODYzLDYgKzkxMiw5
+IEBAIGNpZnNfcHJvY19pbml0KHZvaWQpCiAJcHJvY19jcmVhdGVfc2luZ2xlKCJvcGVuX2ZpbGVz
+IiwgMDQwMCwgcHJvY19mc19jaWZzLAogCQkJY2lmc19kZWJ1Z19maWxlc19wcm9jX3Nob3cpOwog
+CisJcHJvY19jcmVhdGVfc2luZ2xlKCJvcGVuX2RpcnMiLCAwNDAwLCBwcm9jX2ZzX2NpZnMsCisJ
+CQljaWZzX2RlYnVnX2RpcnNfcHJvY19zaG93KTsKKwogCXByb2NfY3JlYXRlKCJTdGF0cyIsIDA2
+NDQsIHByb2NfZnNfY2lmcywgJmNpZnNfc3RhdHNfcHJvY19vcHMpOwogCXByb2NfY3JlYXRlKCJj
+aWZzRllJIiwgMDY0NCwgcHJvY19mc19jaWZzLCAmY2lmc0ZZSV9wcm9jX29wcyk7CiAJcHJvY19j
+cmVhdGUoInRyYWNlU01CIiwgMDY0NCwgcHJvY19mc19jaWZzLCAmdHJhY2VTTUJfcHJvY19vcHMp
+OwpAQCAtOTA3LDYgKzk1OSw3IEBAIGNpZnNfcHJvY19jbGVhbih2b2lkKQogCiAJcmVtb3ZlX3By
+b2NfZW50cnkoIkRlYnVnRGF0YSIsIHByb2NfZnNfY2lmcyk7CiAJcmVtb3ZlX3Byb2NfZW50cnko
+Im9wZW5fZmlsZXMiLCBwcm9jX2ZzX2NpZnMpOworCXJlbW92ZV9wcm9jX2VudHJ5KCJvcGVuX2Rp
+cnMiLCBwcm9jX2ZzX2NpZnMpOwogCXJlbW92ZV9wcm9jX2VudHJ5KCJjaWZzRllJIiwgcHJvY19m
+c19jaWZzKTsKIAlyZW1vdmVfcHJvY19lbnRyeSgidHJhY2VTTUIiLCBwcm9jX2ZzX2NpZnMpOwog
+CXJlbW92ZV9wcm9jX2VudHJ5KCJTdGF0cyIsIHByb2NfZnNfY2lmcyk7Ci0tIAoyLjQzLjAKCg==
+--000000000000a5b637063b00be26--
