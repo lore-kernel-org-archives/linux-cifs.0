@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C558D218E8B;
-	Sun,  3 Aug 2025 21:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5A120F076;
+	Sun,  3 Aug 2025 21:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754256049; cv=none; b=e0YLKXA2actUc480qXcRbz0Vf5KjiyVAOAz3wcHrIyCDFvoqPEF/+wSChuOyMVuzrVvsdiysj7AvBH4ZHnphC5zqYm7SzuMSjedqw8wJy9v37+vNvpXMe52DEw1ODDaPH3UJ9BZ3v+Eo8qCoVjihx0gb1z0Z2RKIzSddzDXoFV4=
+	t=1754256103; cv=none; b=eL5g5L0Qmuqqw+ZH4WcGrYn3o6VrKx59/iqrbfBNNIph+5OCQP7DbMe7Da87U5xWUw+WrUsRZtBvQETyXVXKWSJaQmPrRzVPt3A2ch08XzhvyBbc+sx0JaHJQra+wpb3QyP06oDm50ndXyLABnNTwvV1QmHr3iFDwTKY1gKSftc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754256049; c=relaxed/simple;
-	bh=wchJIbgzd8vih7GoyDll7R6EvS3jABSmhg/DZLuQFXw=;
+	s=arc-20240116; t=1754256103; c=relaxed/simple;
+	bh=o7LNMXG5wsUTLLMrhOYXm6RvzrNO5p37SSGbgKbQFEA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WypVN7rXSRgBIEs0VnaAsTzuyACzFJjqSKKASefuvK45HFGCgRB0cfuCbPKVH8Ep57L2V0xUHMM9RQIGu6c3wgI2NRS4WI5NdOrnY51JmJpXe+LZGjYadBn+68mJP0GqLkHZ0ceMXaPBcU9q0wHHHVzYQF56jPTwrerEvfR4sdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ct7mgWFX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=TzL7rfGdsa+alDIO7A9XljJSI4jPlS9agZaG/nZNhGodCsNIPs8bQGt9DtbmnTMSNzoP1f90eOR8M3DChfZOsh8mAUFS2MIFoHvE1FlcAX84SKHTtloJTx1uEyx/cDP8H35tL8BxMVt+H4Pmi1yewB8IPTTpADiifp1lqQJYuos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOioW1lX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ct7mgWFX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BA6C4CEF0;
-	Sun,  3 Aug 2025 21:20:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOioW1lX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20261C4CEEB;
+	Sun,  3 Aug 2025 21:21:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754256049;
-	bh=wchJIbgzd8vih7GoyDll7R6EvS3jABSmhg/DZLuQFXw=;
+	s=k20201202; t=1754256103;
+	bh=o7LNMXG5wsUTLLMrhOYXm6RvzrNO5p37SSGbgKbQFEA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ct7mgWFXWpBhMupuQ2xgV7R6vs5yjO0LE25J8JPXFDP+T0S9rR6DHjEkuPsJf/1rG
-	 yrByplVBX70XXyyhgeITwpfV9rPHgNbc1bPtwuDC893ysos+thZyFB27wTPKP1XlZN
-	 K1tbq9DYuJ8+qtlNhBYFKp3uKBkZqr+wyI8JblvkxDsf33Mln+o9ZnE2BBbPuzMuef
-	 KXN1Dl70vMrPJZYeiJQSh6fUHhnzEAW8xP1v3qa7KhrJYGCsJ/BwRV45C68Xm+0WwD
-	 qBEaRKSbSw48C2w9aCifxD/wdmlxSatmmcALgGjsxnz15c7t/+OJBFd87d/MRNQSMn
-	 ubQbxPqDC9+sg==
+	b=HOioW1lXlz0Vm67RnFAnetLwxR6IwxocE+kHT3f1Iv9qoofzzIMvRzoo2bJBeuDmU
+	 n9TbabnSchUY3UW61ACFZiylMg+BsfDz9+U+GKCQvfVN3A+X5eSWX6kmZvIyoPZ8Ah
+	 UsBtcR9ILyX3vtcHs4DHlrd36Lo+C8NFk4AGFTpLvHNM63EawjHwAi+OcUBb9/LQ8P
+	 ee8BjaG/dLRo7yaoE3hDT2lRPA6JiYPcX+YDI3vNr4y54UKbpFwhySZE8YqLGlStSd
+	 XWiUcvYJ3RbIz819mXHxO8EdwpGgPKSAEd8RRNPb9cgbBRlVuA+zKMjObD8eobV0WU
+	 GXL5gUlnG2Xvw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: NeilBrown <neil@brown.name>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 07/23] smb/server: avoid deadlock when linking with ReplaceIfExists
-Date: Sun,  3 Aug 2025 17:20:14 -0400
-Message-Id: <20250803212031.3547641-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 06/16] smb/server: avoid deadlock when linking with ReplaceIfExists
+Date: Sun,  3 Aug 2025 17:21:16 -0400
+Message-Id: <20250803212127.3548367-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250803212031.3547641-1-sashal@kernel.org>
-References: <20250803212031.3547641-1-sashal@kernel.org>
+In-Reply-To: <20250803212127.3548367-1-sashal@kernel.org>
+References: <20250803212127.3548367-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.101
+X-stable-base: Linux 6.1.147
 Content-Transfer-Encoding: 8bit
 
 From: NeilBrown <neil@brown.name>
@@ -140,10 +140,10 @@ regression, and improves system stability.
  1 file changed, 4 insertions(+), 12 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index e25c2ca56461..f8640c94e1a7 100644
+index a04413095b23..cfc48223b74e 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -6001,7 +6001,6 @@ static int smb2_create_link(struct ksmbd_work *work,
+@@ -5638,7 +5638,6 @@ static int smb2_create_link(struct ksmbd_work *work,
  {
  	char *link_name = NULL, *target_name = NULL, *pathname = NULL;
  	struct path path, parent_path;
@@ -151,7 +151,7 @@ index e25c2ca56461..f8640c94e1a7 100644
  	int rc;
  
  	if (buf_len < (u64)sizeof(struct smb2_file_link_info) +
-@@ -6034,11 +6033,8 @@ static int smb2_create_link(struct ksmbd_work *work,
+@@ -5671,11 +5670,8 @@ static int smb2_create_link(struct ksmbd_work *work,
  	if (rc) {
  		if (rc != -ENOENT)
  			goto out;
@@ -165,7 +165,7 @@ index e25c2ca56461..f8640c94e1a7 100644
  			rc = ksmbd_vfs_remove_file(work, &path);
  			if (rc) {
  				rc = -EINVAL;
-@@ -6046,21 +6042,17 @@ static int smb2_create_link(struct ksmbd_work *work,
+@@ -5683,21 +5679,17 @@ static int smb2_create_link(struct ksmbd_work *work,
  					    link_name);
  				goto out;
  			}
