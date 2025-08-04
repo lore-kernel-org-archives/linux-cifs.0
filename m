@@ -1,49 +1,46 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FDE15E8B
-	for <linux-cifs@vger.kernel.org>; Mon,  4 Aug 2025 12:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4237017332C
+	for <linux-cifs@vger.kernel.org>; Mon,  4 Aug 2025 12:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754309532; cv=none; b=dGmWsDp9UFli3A1EtlZCD0ljbniUZaXJyUI4TXtfrMzIEDiGyZ1IEvoMfYWenInBJkMpTLb4TLIDWVCiItXsXVzL/SG12xZXoq6qn2LyhKUp5ly3NH1FU/YZHJi/dPsITVVeHRe1Yzhz8Ds/dBI+jZOifbC2D1qYD433wxuSzDQ=
+	t=1754309779; cv=none; b=D0EDNl4tQITfOr6WxZXCcUHiS+xMaepYbfVabP/bLNgo/0EpCC7FcpwWxJl1XtQEzMr/SZMmA+qriHkbGmJJObeCu8iiwDheNxDkbjPa4Wd9ll6IRAkzCT1s3kn+dZPqCehIkapFSUHgz16Fde5EJ9+11HTr6AqyoV2tOCSBIHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754309532; c=relaxed/simple;
-	bh=6j9mXZux+pmBKkhXrNTKSl8mHeroTe6/frfRljKBjBE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aic3JhmBtPRrQsAxe+FkZuf1hHUXU1MaHIJLkCxWUmSVN8SXGgPzqnqCXjuxw642IYIli0GjJnSg1+pCfpn8NzXpAvl5C+TfuHnFuPpZJcezbX7N7HwD4iGkbo+uD0EF/HrgqcxtaKU+prJEcX7vg6HINCbWMxwo7lTIu3MsWpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=bdf0vcbN; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1754309779; c=relaxed/simple;
+	bh=T/kQyHFxXfk6mtA7BY5MeBBx1qUDkliyhqap9r2CuMI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NRYsOHw+t6u8IfQ8BtridFq+ujCNIbHtJAAsXUvjBroPqcX6lQmeLaM3Ib6tkYqdb6oA1Aalwk8TqPZgBmDu//iTg/rIiCcy5TztUPWtWhfsy42HRZTY7oaR8yLd/GP25hOXmb89H8fkLNth8EW81rCUACcbg9j6XP2FVYCKsyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uLTYsGOm; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="bdf0vcbN"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uLTYsGOm"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=86PQTTD/8vIal3LVRgKzMafkOkFA0tsZeqaHvjLdiYg=; b=bdf0vcbNuGYj5WTKZrDm0nQl+G
-	Nm98iy+NBCMwRcNiZAT7NI8WEapLlSdIeEKPtcb4lClpCfAdJRoujcrYcpdvw/xzPpKyGqLQMtXPj
-	+o/QBclTTaeeriBWCn8G1VtNLZhDWxRdHwIgZOkXcXtebiNCb6UFQcn/A2mVIoNOPHfdhbAi7PIAS
-	yT7YCs5w636nmSGviVCspdHnB3hdzsQoh57iVvPwSU0qQ080wdazA5RY6v8FMDlzpoGh6FKjB09mz
-	iKgcJKCLCNUGu8bDTCxHZ+0ML/rkS/HVyZRbDZQz3xpwzsRevQ5YSeUsSauSsRWqaBcsYMJZnAUdV
-	OC8otxckEmycHXjfTF+Bqxi5/Z+biR/WoUrhRLBv6tr/G6R5YteMaz77bB/Z5DNKVLLE3gzTWqYeB
-	G7aSGF40NkcZO/XxChhffa+yn/aYPyXCMJMvL0VSIqjzy2HlK+RSGpn8JdBqqimzljkld5OLbylUL
-	93wlr9uVO9+k24gXo+hhWsOU;
+	bh=eora2fqI5chQvxkEuD6zk0R5R0d8Ri8Smny+KGFtbIU=; b=uLTYsGOmYLRuZA7FakALmPNLCE
+	zVWatNwIMhoyhk1spc1ijad6MWJOB+clHCCNe32NtUZdrvY9cpmULfrghG7VGg/aASP+85iuyXgEm
+	3W6zLJ+BiOuZ6t/kFRstehfLZ2YufRs2fiQvsSbbIwGD74c+AOALyL79FH5pMSmJ3Pkff19zz8N7c
+	csHA4wDORk3RF/FNwNOLNKgYeTtELUnyHwXaKGWNqyKImvGQcNG0GzpA1Y8C6Hx830CVVfU2koOY9
+	x8pk4wwpFKqN12Gp0KlHzzW0iqtBBfmLPqVKwQIKp6VEAYb1691ANirwYx0RV3k8H69Xl+a7ng4VT
+	+0UH1eH4F/rS48JHwvXml6Pf+08VT/hX0nuoyqdLby4N1I6yNNlLqaoFGWPB9t1uW2YA8bgec6Q2T
+	Qfu/tZyFl5s9IXvnql5uanJE9PCtjbqQVah96RSfdnsGSERaEiQX4mxoC6CfNZnY74uPQCy2qABL7
+	3E9ttXKhX2+93vmPn7FN0+c5;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uiu2x-000vyn-1H;
-	Mon, 04 Aug 2025 12:12:07 +0000
+	id 1uiu6w-000wCL-2P;
+	Mon, 04 Aug 2025 12:16:14 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>
-Subject: [PATCH 5/5] smb: client: let recv_done() avoid touching data_transfer after cleanup/move
-Date: Mon,  4 Aug 2025 14:10:16 +0200
-Message-ID: <64cb50961182cd17ac9bdda2913986f322a5acac.1754308712.git.metze@samba.org>
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH 0/4] smb:server: fix possible use after free problems
+Date: Mon,  4 Aug 2025 14:15:49 +0200
+Message-ID: <cover.1754309565.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1754308712.git.metze@samba.org>
-References: <cover.1754308712.git.metze@samba.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,72 +49,28 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Calling enqueue_reassembly() and wake_up_interruptible(&info->wait_reassembly_queue)
-or put_receive_buffer() means the reponse/data_transfer pointer might
-get re-used by another thread, which means these should be
-the last operations before calling return.
+While refactoring the client and server smbdirect code I
+noticed a few problems where we might hit use after free
+style problems.
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/client/smbdirect.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+In order to allow backports I decided to fix the problems
+before trying to move things to common code.
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 21a12e08082f..58321e483a1a 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -479,10 +479,6 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		data_transfer = smbd_response_payload(response);
- 		data_length = le32_to_cpu(data_transfer->data_length);
- 
--		/*
--		 * If this is a packet with data playload place the data in
--		 * reassembly queue and wake up the reading thread
--		 */
- 		if (data_length) {
- 			if (info->full_packet_received)
- 				response->first_segment = true;
-@@ -491,16 +487,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 				info->full_packet_received = false;
- 			else
- 				info->full_packet_received = true;
--
--			enqueue_reassembly(
--				info,
--				response,
--				data_length);
--		} else
--			put_receive_buffer(info, response);
--
--		if (data_length)
--			wake_up_interruptible(&info->wait_reassembly_queue);
-+		}
- 
- 		atomic_dec(&info->receive_credits);
- 		info->receive_credit_target =
-@@ -528,6 +515,16 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 			info->keep_alive_requested = KEEP_ALIVE_PENDING;
- 		}
- 
-+		/*
-+		 * If this is a packet with data playload place the data in
-+		 * reassembly queue and wake up the reading thread
-+		 */
-+		if (data_length) {
-+			enqueue_reassembly(info, response, data_length);
-+			wake_up_interruptible(&info->wait_reassembly_queue);
-+		} else
-+			put_receive_buffer(info, response);
-+
- 		return;
- 	}
- 
+The client has similar problems, I've sent a separate
+patchset for the client already.
+
+Stefan Metzmacher (4):
+  smb: server: remove separate empty_recvmsg_queue
+  smb: server: make sure we call ib_dma_unmap_single() only if we called
+    ib_dma_map_single already
+  smb: server: let recv_done() consitently call
+    put_recvmsg/smb_direct_disconnect_rdma_connection
+  smb: server: let recv_done() avoid touching data_transfer after
+    cleanup/move
+
+ fs/smb/server/transport_rdma.c | 97 ++++++++++++----------------------
+ 1 file changed, 35 insertions(+), 62 deletions(-)
+
 -- 
 2.43.0
 
