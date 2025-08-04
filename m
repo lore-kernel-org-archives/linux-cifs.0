@@ -1,49 +1,41 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2452580E1
-	for <linux-cifs@vger.kernel.org>; Mon,  4 Aug 2025 12:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2681EE7D5;
+	Mon,  4 Aug 2025 13:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754309813; cv=none; b=uDXNVsq4iu1+/cSWzdbnd/ic8CwN0MuA8mTFSgNIIbKe+P8w0NldEExwiMgLStWtZCu4mUGOSKPP1hmi+M4anoLnOkKZJpqyyiluvoO0wRTj5GjSpBtx/+amdWjzyZGCBFx7WYT1tZ4xdToHkZ7Frj4P1Y6X9ujwCrFp+eoKoIs=
+	t=1754315246; cv=none; b=HorgUDX0N97j/caSqMSVede8ZMOpLbFboWsg9qwYyRZ/lEGq6ICW+fP/6RG1ID0EnD50X0WDVh0byzF8LgLkKjR+qUOM58b30zMrX2CfoipRRkYiolwzEVVPZCEmK8SVYGBYWpnUuw0CDa6cnwEWAk8oBoVAJzuk/8iipaQ5uBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754309813; c=relaxed/simple;
-	bh=D5vyEZdQ9GHri8zu2xpG1i1CyKfkf2H5G3+mYxKL9bs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t6x/wv10/97N59cDqvQ8Xx7Mf53eRhDP2Onev/bjG2dGpg87xxRmL9CeUz8ALuXm4pk3DGVNUr2BDFx3VyuMTm1M4k7Is8UmglyZ2sDAuqbW8lYrOT9byTz0cptS84PcH3A64Oc0y7GfTls1xgmLOBj5Tfae3kIZW+V0PjBbcNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=EeswnoR/; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="EeswnoR/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=vpYNfHJCm2TKf3k81xlz/NPMEPzdDJamDlwUAHDZ3Aw=; b=EeswnoR/dQjL0ZIIYmNJmvpxLw
-	5wYKObylEhgAh7gb9igoz7WFSn+zONY2s6Am+Krt8Ic6ncvPmEpra4BULYM4vb0LrIeQnmXVzMfN1
-	MinyHpWGhwc7MoUIdjHEOifolktD3LginFK3azRQoM1LRARwP/g9FT954+9s7Jl5SRJcSMv0DHrD4
-	hLY/zGzPDx2EBRex09Kf+WDEKGAlJhmrfgvPlgUve3g3f0Jm8BwEBwWQ/8z0ON6zv5GFH6fwMbTGz
-	cQJs6UqXe97QSEklcSPkVluMOnT3uvbXutbsvzCjfQsg3GealZrMGAH349U4OSDyVa79z1UqCH6qE
-	QBqmv1vE2/GUC3KkuOWELaDeHwRAPhLIbTVGnLLuan/jEjhPAJe/z2OdqgVStIih1pPf1Rs1fFD84
-	94SFnv9qY+gzZi4/jtMVhIgMysDD6zzJMnvl9wANyV2pbo0h6RRcqWuxhDq9dL6lAIJcSyfMTQuSf
-	dnpg5kAOj9oPbsfYeml4DOSN;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uiu7U-000wHH-1t;
-	Mon, 04 Aug 2025 12:16:48 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH 4/4] smb: server: let recv_done() avoid touching data_transfer after cleanup/move
-Date: Mon,  4 Aug 2025 14:15:53 +0200
-Message-ID: <111d25fd9256d158e9521db36b6196972bd68b9d.1754309565.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1754309565.git.metze@samba.org>
-References: <cover.1754309565.git.metze@samba.org>
+	s=arc-20240116; t=1754315246; c=relaxed/simple;
+	bh=gvn2x9hOtJ2VolVLuFcGrVA90rDghqIZVjCylDB+ofk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k0b+x0zRKEp/rOfok527NhddLJV7UpJshs5gBmHrpBmq1WGcAb7MvPs0NgO4MX+vy590e2UHs7tAhOO/FDLJ6aGrMwsmiD2dxI3IiJ8XIX9qMYWYGSGIKX2niEPism9Ps2VBGnFD9+HWw1dsJZEVtrHt3v0ZTbgf+dXG5ar0n34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bwdCY12tVzKHMml;
+	Mon,  4 Aug 2025 21:47:21 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 2B3581A0B8F;
+	Mon,  4 Aug 2025 21:47:20 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAHgxPjuZBoXT8zCg--.8001S4;
+	Mon, 04 Aug 2025 21:47:16 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pshilov@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	chengzhihao1@huawei.com,
+	wangzhaolong@huaweicloud.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH 0/4] Fix mid_q_entry memory leaks in SMB client
+Date: Mon,  4 Aug 2025 21:40:02 +0800
+Message-Id: <20250804134006.3609555-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,58 +43,124 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHgxPjuZBoXT8zCg--.8001S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr1rGr48ur4kWFy8JF4fXwb_yoWrWw4UpF
+	Waga43Gw18Jr93Zwn3Jay8Aa4rAwn5CF13GFW7Kw1Sy3W5uF1Fqrn7tr1FgFWxArWkXr1j
+	qw4jyr4j93WDZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
+	UUU
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-Calling enqueue_reassembly() and wake_up_interruptible(&t->wait_reassembly_queue)
-or put_receive_buffer() means the recvmsg/data_transfer pointer might
-get re-used by another thread, which means these should be
-the last operations before calling return.
+I've been investigating a pretty nasty memory leak in the SMB client. When
+compound requests get interrupted by signals, we end up with mid_q_entry
+structures and server buffers that never get freed[1].
 
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- fs/smb/server/transport_rdma.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+User foreground process                    cifsd
+cifs_readdir
+ open_cached_dir
+  cifs_send_recv
+   compound_send_recv
+    smb2_setup_request
+     smb2_mid_entry_alloc
+      smb2_get_mid_entry
+       smb2_mid_entry_alloc
+        mempool_alloc // alloc mid
+        kref_init(&temp->refcount); // refcount = 1
+     mid[0]->callback = cifs_compound_callback;
+     mid[1]->callback = cifs_compound_last_callback;
+     smb_send_rqst
+     rc = wait_for_response
+      wait_event_state TASK_KILLABLE
+                                  cifs_demultiplex_thread
+                                    allocate_buffers
+                                      server->bigbuf = cifs_buf_get()
+                                    standard_receive3
+                                      ->find_mid()
+                                        smb2_find_mid
+                                          __smb2_find_mid
+                                           kref_get(&mid->refcount) // +1
+                                      cifs_handle_standard
+                                        handle_mid
+                                         /* bigbuf will also leak */
+                                         mid->resp_buf = server->bigbuf
+                                         server->bigbuf = NULL;
+                                         dequeue_mid
+                                     /* in for loop */
+                                    mids[0]->callback
+                                      cifs_compound_callback
+    /* Signal interrupts wait: rc = -ERESTARTSYS */
+    /* if (... || midQ[i]->mid_state == MID_RESPONSE_RECEIVED) *?
+    midQ[0]->callback = cifs_cancelled_callback;
+    cancelled_mid[i] = true;
+                                       /* The change comes too late */
+                                       mid->mid_state = MID_RESPONSE_READY
+                                    release_mid  // -1
+    /* cancelled_mid[i] == true causes mid won't be released
+       in compound_send_recv cleanup */
+    /* cifs_cancelled_callback won't executed to release mid */
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index cd8a92fe372b..8d366db5f605 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -581,16 +581,11 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 			else
- 				t->full_packet_received = true;
- 
--			enqueue_reassembly(t, recvmsg, (int)data_length);
--			wake_up_interruptible(&t->wait_reassembly_queue);
--
- 			spin_lock(&t->receive_credit_lock);
- 			receive_credits = --(t->recv_credits);
- 			avail_recvmsg_count = t->count_avail_recvmsg;
- 			spin_unlock(&t->receive_credit_lock);
- 		} else {
--			put_recvmsg(t, recvmsg);
--
- 			spin_lock(&t->receive_credit_lock);
- 			receive_credits = --(t->recv_credits);
- 			avail_recvmsg_count = ++(t->count_avail_recvmsg);
-@@ -612,6 +607,13 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		if (is_receive_credit_post_required(receive_credits, avail_recvmsg_count))
- 			mod_delayed_work(smb_direct_wq,
- 					 &t->post_recv_credits_work, 0);
-+
-+		if (data_length) {
-+			enqueue_reassembly(t, recvmsg, (int)data_length);
-+			wake_up_interruptible(&t->wait_reassembly_queue);
-+		} else
-+			put_recvmsg(t, recvmsg);
-+
- 		return;
- 	}
- 	}
+The core issue is a race condition where cifs_cancelled_callback never
+gets a chance to run, so cleanup never happens. I've spent quite a bit
+of time trying to understand how to fix this safely.
+
+Honestly, my first instinct was to just patch the callback assignment
+logic directly. But the more I dug into it, the more I realized that
+the current locking scheme makes this really tricky to do safely. We
+have one big lock protecting multiple different things, and trying to
+fix the race condition directly felt like playing with fire.
+
+I kept running into scenarios where a "simple" fix could introduce
+deadlocks or new race conditions. After looking at this from different
+angles, I came to the conclusion that I needed to refactor the locking
+first to create a safe foundation for the actual fix.
+
+Patches 1-3 are foundational refactoring. These three patches rename
+locks for clarity, separate counter protection from queue operations,
+and replace the confusing mid_flags bitmask with explicit boolean
+fields. Basically, they untangle the current locking mess so I can
+implement the real fix without breaking anything.
+
+The 4th patch in the series is where the real fix happens. With
+the previous refactoring in place, I could safely add a lock to each
+mid_q_entry and implement atomic callback execution. This eliminates
+the race condition that was causing the leaks.
+
+In summary, my approach to the fix is to use smaller-grained locking to
+avoid race conditions. However, during the implementation process,
+this approach involves more changes than I initially hoped for. If
+there's a simpler or more elegant way to fix this race condition that
+I've missed, I'd love to hear about it. I've tried to be thorough in
+my analysis, but I know there are folks with more experience in this
+codebase who might see a better path.
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220404 [1]
+
+Wang Zhaolong (4):
+  smb: client: rename server mid_lock to mid_queue_lock
+  smb: client: add mid_counter_lock to protect the mid counter counter
+  smb: client: smb: client: eliminate mid_flags field
+  smb: client: fix mid_q_entry memleak leak with per-mid locking
+
+ fs/smb/client/cifs_debug.c    | 12 ++++--
+ fs/smb/client/cifsglob.h      | 23 +++++++-----
+ fs/smb/client/connect.c       | 57 +++++++++++++++++-----------
+ fs/smb/client/smb1ops.c       | 23 ++++++++----
+ fs/smb/client/smb2ops.c       | 69 ++++++++++++++++++----------------
+ fs/smb/client/smb2transport.c |  5 ++-
+ fs/smb/client/transport.c     | 71 +++++++++++++++++++----------------
+ 7 files changed, 150 insertions(+), 110 deletions(-)
+
 -- 
-2.43.0
+2.39.2
 
