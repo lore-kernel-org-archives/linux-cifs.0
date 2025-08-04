@@ -1,27 +1,27 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1961BEF7E;
-	Mon,  4 Aug 2025 13:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AF426E712;
+	Mon,  4 Aug 2025 13:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754315247; cv=none; b=qF3YkLc+hBIddV4/27dPCyjXaktutddpcusWuyuTJCmwg6mt75trgNAsiyXcpe6cU94V0QojXaX9hk51pc5buZ/qpmXQbzCiEsjehlop6qzP7nwOTVvGwQ4JQPNY4VCKCYM2+9Qz00NbHE6V2Jpwt6WZSatae3KUPsp7HGTRXmM=
+	t=1754315253; cv=none; b=JHlcxaOyQqhzKafSkqnWUXCUDcLAsGZqzbuDOh+lCiszLrxWGIKUT4uYu3HjOHXkllmxgMyzekkk4rXJcLp/NMtFVP7znTCnVCORI1kBVMaSpMwP71v9RqwdBFLTEaMChrLE3fyI91Y5kH6Oa0gJmBVNlefK/PB1+7x9YmQUk2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754315247; c=relaxed/simple;
-	bh=f4wtnMuK7prSopOjB6a/p2BQqQ+I/8XSkFa6dJ/6B98=;
+	s=arc-20240116; t=1754315253; c=relaxed/simple;
+	bh=OHchsDxfLI6H/RcBK530VV2th9TllWlysNrU6v5xvU4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=joRLIZCOqEUdsTGnXaa8AcRux/PiECdr+BbMLd+aV4v47f8UL7LwWhKJBxp2vCBlKWAh/Kk6rqJpiLcgaN+D4kNUnlKRaJ3tY0u2qCZJvYa+vqS1sloUAPdiEvhsgwYXLbRti6y+binnYv50qEToeyKIe2lV+g574B4O/1XU9bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+	 MIME-Version; b=QqGCYxtKjIDC/thQF39tu/jcXZb+eMX2PbBae8h6WS0/6LEw4GmW0T5/dCwm8519w5qjXbMLVjsnOcRfm2MQxZfAT6kyg/Ek0VWhdpIc7Mb8ggLDyUKmUQV+pH0xlG4Bht/2WEr0AR8NUZjI/GrNq7l40tVLrCcCjajbBilj/UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
 Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4bwdCY4FM4zKHMnj;
-	Mon,  4 Aug 2025 21:47:21 +0800 (CST)
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4bwdCZ2l5KzYQv6Y;
+	Mon,  4 Aug 2025 21:47:22 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 979F61A0B93;
-	Mon,  4 Aug 2025 21:47:20 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 0B3691A0B97;
+	Mon,  4 Aug 2025 21:47:21 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgAHgxPjuZBoXT8zCg--.8001S5;
+	by APP4 (Coremail) with SMTP id gCh0CgAHgxPjuZBoXT8zCg--.8001S6;
 	Mon, 04 Aug 2025 21:47:20 +0800 (CST)
 From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
 To: sfrench@samba.org,
@@ -33,9 +33,9 @@ Cc: linux-cifs@vger.kernel.org,
 	wangzhaolong@huaweicloud.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH 1/4] smb: client: rename server mid_lock to mid_queue_lock
-Date: Mon,  4 Aug 2025 21:40:03 +0800
-Message-Id: <20250804134006.3609555-2-wangzhaolong@huaweicloud.com>
+Subject: [PATCH 2/4] smb: client: add mid_counter_lock to protect the mid counter counter
+Date: Mon,  4 Aug 2025 21:40:04 +0800
+Message-Id: <20250804134006.3609555-3-wangzhaolong@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250804134006.3609555-1-wangzhaolong@huaweicloud.com>
 References: <20250804134006.3609555-1-wangzhaolong@huaweicloud.com>
@@ -46,13 +46,13 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHgxPjuZBoXT8zCg--.8001S5
-X-Coremail-Antispam: 1UD129KBjvAXoW3ur1UtF18GF45Xw1ruw1Dtrb_yoW8Zr4xKo
-	Z7X3s5Zr4UWryktryFyrn3tF18Xa4DKayUJrsYkr15Aasaka4jvrWUtw15JFWYv39rArsF
-	v34xJFnYga4DJF1kn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUY_7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20EY4v20xva
-	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r18M28IrcIa0x
-	kI8VCY1x0267AKxVWUCVW8JwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84AC
+X-CM-TRANSID:gCh0CgAHgxPjuZBoXT8zCg--.8001S6
+X-Coremail-Antispam: 1UD129KBjvAXoW3ury5tFW7Jw4Dtw1kCw47twb_yoW8Ar15Go
+	Wvqw13uw4UJryUKr98trn3JF1xX348tFWUJFWjqF1Uua4Fk34UAa48Zr15tFWa93y5tr4Y
+	v3yxJa97uas3Ja97n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYE7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20EY4v20xva
+	j40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r15M28IrcIa0x
+	kI8VCY1x0267AKxVW8JVW5JwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84AC
 	jcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr
 	1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1l
 	e2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI
@@ -62,571 +62,443 @@ X-Coremail-Antispam: 1UD129KBjvAXoW3ur1UtF18GF45Xw1ruw1Dtrb_yoW8Zr4xKo
 	JVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7V
 	AKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j
 	6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42
-	IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU5a0mUUUUU
+	IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUj5Ef7UUUUU=
+	=
 X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-This is step 1/4 of a patch series to fix mid_q_entry memory leaks
+This is step 2/4 of a patch series to fix mid_q_entry memory leaks
 caused by race conditions in callback execution.
 
-The current mid_lock name is somewhat ambiguous about what it protects.
-To prepare for splitting this lock into separate, more granular locks,
-this patch renames mid_lock to mid_queue_lock to clearly indicate its
-specific responsibility for protecting the pending_mid_q list and
-related queue operations.
+Add a dedicated mid_counter_lock to protect current_mid counter,
+separating it from mid_queue_lock which protects pending_mid_q
+operations. This reduces lock contention and prepares for finer-
+grained locking in subsequent patches.
 
-No functional changes are made in this patch - it only prepares the
-codebase for the lock splitting that follows.
+Changes:
+- Add TCP_Server_Info->mid_counter_lock spinlock
+- Rename CurrentMid to current_mid for consistency
+- Use mid_counter_lock to protect current_mid access
+- Update locking documentation in cifsglob.h
 
-- mid_queue_lock for queue operations
-- mid_counter_lock for mid counter operations
-- per-mid locks for individual mid state management
+This separation allows mid allocation to proceed without blocking
+queue operations, improving performance under heavy load.
 
 Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
 ---
- fs/smb/client/cifs_debug.c    |  8 ++++----
- fs/smb/client/cifsglob.h      |  4 ++--
- fs/smb/client/connect.c       | 20 +++++++++----------
- fs/smb/client/smb1ops.c       | 10 +++++-----
- fs/smb/client/smb2ops.c       | 26 ++++++++++++-------------
- fs/smb/client/smb2transport.c |  4 ++--
- fs/smb/client/transport.c     | 36 +++++++++++++++++------------------
- 7 files changed, 54 insertions(+), 54 deletions(-)
+ fs/smb/client/cifsglob.h  |  5 +++--
+ fs/smb/client/connect.c   |  5 +++--
+ fs/smb/client/smb1ops.c   | 11 ++++++-----
+ fs/smb/client/smb2ops.c   | 40 +++++++++++++++++++--------------------
+ fs/smb/client/transport.c | 12 ++++++------
+ 5 files changed, 38 insertions(+), 35 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index f1cea365b6f1..80d6a51b8c11 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -58,11 +58,11 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- 
- 	if (server == NULL)
- 		return;
- 
- 	cifs_dbg(VFS, "Dump pending requests:\n");
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
- 		cifs_dbg(VFS, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %llu\n",
- 			 mid_entry->mid_state,
- 			 le16_to_cpu(mid_entry->command),
- 			 mid_entry->pid,
-@@ -81,11 +81,11 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- 			cifs_dump_detail(mid_entry->resp_buf, server);
- 			cifs_dump_mem("existing buf: ",
- 				mid_entry->resp_buf, 62);
- 		}
- 	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- #endif /* CONFIG_CIFS_DEBUG2 */
- }
- 
- #ifdef CONFIG_PROC_FS
- static void cifs_debug_tcon(struct seq_file *m, struct cifs_tcon *tcon)
-@@ -670,20 +670,20 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 				if (list_empty(&chan_server->pending_mid_q))
- 					continue;
- 
- 				seq_printf(m, "\n\tServer ConnectionId: 0x%llx",
- 					   chan_server->conn_id);
--				spin_lock(&chan_server->mid_lock);
-+				spin_lock(&chan_server->mid_queue_lock);
- 				list_for_each_entry(mid_entry, &chan_server->pending_mid_q, qhead) {
- 					seq_printf(m, "\n\t\tState: %d com: %d pid: %d cbdata: %p mid %llu",
- 						   mid_entry->mid_state,
- 						   le16_to_cpu(mid_entry->command),
- 						   mid_entry->pid,
- 						   mid_entry->callback_data,
- 						   mid_entry->mid);
- 				}
--				spin_unlock(&chan_server->mid_lock);
-+				spin_unlock(&chan_server->mid_queue_lock);
- 			}
- 			spin_unlock(&ses->chan_lock);
- 			seq_puts(m, "\n--\n");
- 		}
- 		if (i == 0)
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 19dd901fe8ab..ecd568793ce7 100644
+index ecd568793ce7..1844afdf1e41 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -730,11 +730,11 @@ struct TCP_Server_Info {
- #ifdef CONFIG_NET_NS
+@@ -731,10 +731,11 @@ struct TCP_Server_Info {
  	struct net *net;
  #endif
  	wait_queue_head_t response_q;
  	wait_queue_head_t request_q; /* if more than maxmpx to srvr must block*/
--	spinlock_t mid_lock;  /* protect mid queue and it's entries */
-+	spinlock_t mid_queue_lock;  /* protect mid queue */
+ 	spinlock_t mid_queue_lock;  /* protect mid queue */
++	spinlock_t mid_counter_lock;
  	struct list_head pending_mid_q;
  	bool noblocksnd;		/* use blocking sendmsg */
  	bool noautotune;		/* do not autotune send buf sizes */
  	bool nosharesock;
  	bool tcp_nodelay;
-@@ -2005,11 +2005,11 @@ require use of the stronger protocol */
-  * cifs_tcp_ses_lock		cifs_tcp_ses_list		sesInfoAlloc
+@@ -768,11 +769,11 @@ struct TCP_Server_Info {
+ 	unsigned int max_rw;	/* maxRw specifies the maximum */
+ 	/* message size the server can send or receive for */
+ 	/* SMB_COM_WRITE_RAW or SMB_COM_READ_RAW. */
+ 	unsigned int capabilities; /* selective disabling of caps by smb sess */
+ 	int timeAdj;  /* Adjust for difference in server time zone in sec */
+-	__u64 CurrentMid;         /* multiplex id - rotating counter, protected by GlobalMid_Lock */
++	__u64 current_mid;	/* multiplex id - rotating counter, protected by mid_counter_lock */
+ 	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+ 	/* 16th byte of RFC1001 workstation name is always null */
+ 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+ 	__u32 sequence_number; /* for signing, protected by srv_mutex */
+ 	__u32 reconnect_instance; /* incremented on each reconnect */
+@@ -2006,12 +2007,12 @@ require use of the stronger protocol */
   * GlobalMid_Lock		GlobalMaxActiveXid		init_cifs
   *				GlobalCurrentXid
   *				GlobalTotalActiveXid
   * TCP_Server_Info->srv_lock	(anything in struct not protected by another lock and can change)
-- * TCP_Server_Info->mid_lock	TCP_Server_Info->pending_mid_q	cifs_get_tcp_session
-+ * TCP_Server_Info->mid_queue_lock	TCP_Server_Info->pending_mid_q	cifs_get_tcp_session
-  *				->CurrentMid
+  * TCP_Server_Info->mid_queue_lock	TCP_Server_Info->pending_mid_q	cifs_get_tcp_session
+- *				->CurrentMid
   *				(any changes in mid_q_entry fields)
++ * TCP_Server_Info->mid_counter_lock    TCP_Server_Info->current_mid    cifs_get_tcp_session
   * TCP_Server_Info->req_lock	TCP_Server_Info->in_flight	cifs_get_tcp_session
   *				->credits
   *				->echo_credits
+  *				->oplock_credits
+  *				->reconnect_instance
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 5eec8957f2a9..e4b577ca48d5 100644
+index e4b577ca48d5..74ad5881ee45 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -319,19 +319,19 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 	server->lstrp = jiffies;
- 
- 	/* mark submitted MIDs for retry and issue callback */
- 	INIT_LIST_HEAD(&retry_list);
- 	cifs_dbg(FYI, "%s: moving mids to private list\n", __func__);
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_for_each_entry_safe(mid, nmid, &server->pending_mid_q, qhead) {
- 		kref_get(&mid->refcount);
- 		if (mid->mid_state == MID_REQUEST_SUBMITTED)
- 			mid->mid_state = MID_RETRY_NEEDED;
- 		list_move(&mid->qhead, &retry_list);
- 		mid->mid_flags |= MID_DELETED;
+@@ -356,11 +356,11 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
+ 		wake_up(&server->response_q);
+ 		return false;
  	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- 	cifs_server_unlock(server);
  
- 	cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
- 	list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
- 		list_del_init(&mid->qhead);
-@@ -882,17 +882,17 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
- 			 * server, so reconnect would not signal connection
- 			 * aborted error to mid's callbacks. Note that for this
- 			 * server there should be exactly one pending mid
- 			 * corresponding to SMB1/SMB2 Negotiate packet.
- 			 */
--			spin_lock(&server->mid_lock);
-+			spin_lock(&server->mid_queue_lock);
- 			list_for_each_entry_safe(mid, nmid, &server->pending_mid_q, qhead) {
- 				kref_get(&mid->refcount);
- 				list_move(&mid->qhead, &dispose_list);
- 				mid->mid_flags |= MID_DELETED;
- 			}
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
+ 	cifs_dbg(FYI, "Mark tcp session as need reconnect\n");
+-	trace_smb3_reconnect(server->CurrentMid, server->conn_id,
++	trace_smb3_reconnect(server->current_mid, server->conn_id,
+ 			     server->hostname);
+ 	server->tcpStatus = CifsNeedReconnect;
  
- 			/* Now try to reconnect once with NetBIOS session. */
- 			server->with_rfc1001 = true;
- 			rc = cifs_reconnect_once(server);
+ 	spin_unlock(&server->srv_lock);
+ 	return true;
+@@ -1240,11 +1240,11 @@ smb2_add_credits_from_hdr(char *buffer, struct TCP_Server_Info *server)
+ 		scredits = server->credits;
+ 		in_flight = server->in_flight;
+ 		spin_unlock(&server->req_lock);
+ 		wake_up(&server->request_q);
  
-@@ -955,26 +955,26 @@ void
- dequeue_mid(struct mid_q_entry *mid, bool malformed)
- {
- #ifdef CONFIG_CIFS_STATS2
- 	mid->when_received = jiffies;
- #endif
--	spin_lock(&mid->server->mid_lock);
-+	spin_lock(&mid->server->mid_queue_lock);
- 	if (!malformed)
- 		mid->mid_state = MID_RESPONSE_RECEIVED;
- 	else
- 		mid->mid_state = MID_RESPONSE_MALFORMED;
- 	/*
- 	 * Trying to handle/dequeue a mid after the send_recv()
- 	 * function has finished processing it is a bug.
- 	 */
- 	if (mid->mid_flags & MID_DELETED) {
--		spin_unlock(&mid->server->mid_lock);
-+		spin_unlock(&mid->server->mid_queue_lock);
- 		pr_warn_once("trying to dequeue a deleted mid\n");
- 	} else {
- 		list_del_init(&mid->qhead);
- 		mid->mid_flags |= MID_DELETED;
--		spin_unlock(&mid->server->mid_lock);
-+		spin_unlock(&mid->server->mid_queue_lock);
- 	}
- }
- 
- static unsigned int
- smb2_get_credits_from_hdr(char *buffer, struct TCP_Server_Info *server)
-@@ -1099,20 +1099,20 @@ clean_demultiplex_info(struct TCP_Server_Info *server)
- 	if (!list_empty(&server->pending_mid_q)) {
- 		struct mid_q_entry *mid_entry;
- 		struct list_head *tmp, *tmp2;
- 		LIST_HEAD(dispose_list);
- 
--		spin_lock(&server->mid_lock);
-+		spin_lock(&server->mid_queue_lock);
- 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
- 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
- 			cifs_dbg(FYI, "Clearing mid %llu\n", mid_entry->mid);
- 			kref_get(&mid_entry->refcount);
- 			mid_entry->mid_state = MID_SHUTDOWN;
- 			list_move(&mid_entry->qhead, &dispose_list);
- 			mid_entry->mid_flags |= MID_DELETED;
- 		}
--		spin_unlock(&server->mid_lock);
-+		spin_unlock(&server->mid_queue_lock);
- 
- 		/* now walk dispose list and issue callbacks */
- 		list_for_each_safe(tmp, tmp2, &dispose_list) {
- 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
- 			cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
-@@ -1820,11 +1820,11 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	tcp_ses->reconnect_instance = 1;
+-		trace_smb3_hdr_credits(server->CurrentMid,
++		trace_smb3_hdr_credits(server->current_mid,
+ 				server->conn_id, server->hostname, scredits,
+ 				le16_to_cpu(shdr->CreditRequest), in_flight);
+ 		cifs_server_dbg(FYI, "%s: added %u credits total=%d\n",
+ 				__func__, le16_to_cpu(shdr->CreditRequest),
+ 				scredits);
+@@ -1821,10 +1821,11 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
  	tcp_ses->lstrp = jiffies;
  	tcp_ses->compression.requested = ctx->compress;
  	spin_lock_init(&tcp_ses->req_lock);
  	spin_lock_init(&tcp_ses->srv_lock);
--	spin_lock_init(&tcp_ses->mid_lock);
-+	spin_lock_init(&tcp_ses->mid_queue_lock);
+ 	spin_lock_init(&tcp_ses->mid_queue_lock);
++	spin_lock_init(&tcp_ses->mid_counter_lock);
  	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
  	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
  	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
  	INIT_DELAYED_WORK(&tcp_ses->reconnect, smb2_reconnect_server);
  	mutex_init(&tcp_ses->reconnect_mutex);
 diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index e364b6515af3..a1442f697706 100644
+index a1442f697706..13f600a3d0c4 100644
 --- a/fs/smb/client/smb1ops.c
 +++ b/fs/smb/client/smb1ops.c
-@@ -93,21 +93,21 @@ static struct mid_q_entry *
- cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
- {
- 	struct smb_hdr *buf = (struct smb_hdr *)buffer;
- 	struct mid_q_entry *mid;
- 
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
- 		if (compare_mid(mid->mid, buf) &&
- 		    mid->mid_state == MID_REQUEST_SUBMITTED &&
- 		    le16_to_cpu(mid->command) == buf->Command) {
- 			kref_get(&mid->refcount);
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
- 			return mid;
- 		}
- 	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- 	return NULL;
- }
- 
- static void
- cifs_add_credits(struct TCP_Server_Info *server,
-@@ -167,11 +167,11 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
+@@ -167,14 +167,13 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
  {
  	__u64 mid = 0;
  	__u16 last_mid, cur_mid;
  	bool collision, reconnect = false;
  
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 
+-	spin_lock(&server->mid_queue_lock);
+-
++	spin_lock(&server->mid_counter_lock);
  	/* mid is 16 bit only for CIFS/SMB */
- 	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
+-	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
++	cur_mid = (__u16)((server->current_mid) & 0xffff);
  	/* we do not want to loop forever */
  	last_mid = cur_mid;
-@@ -226,11 +226,11 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
- 			server->CurrentMid = mid;
+ 	cur_mid++;
+ 	/* avoid 0xFFFF MID */
+ 	if (cur_mid == 0xffff)
+@@ -196,19 +195,21 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
+ 		collision = false;
+ 		if (cur_mid == 0)
+ 			cur_mid++;
+ 
+ 		num_mids = 0;
++		spin_lock(&server->mid_queue_lock);
+ 		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
+ 			++num_mids;
+ 			if (mid_entry->mid == cur_mid &&
+ 			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* This mid is in use, try a different one */
+ 				collision = true;
+ 				break;
+ 			}
+ 		}
++		spin_unlock(&server->mid_queue_lock);
+ 
+ 		/*
+ 		 * if we have more than 32k mids in the list, then something
+ 		 * is very wrong. Possibly a local user is trying to DoS the
+ 		 * box by issuing long-running calls and SIGKILL'ing them. If
+@@ -221,16 +222,16 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
+ 		if (num_mids > 32768)
+ 			reconnect = true;
+ 
+ 		if (!collision) {
+ 			mid = (__u64)cur_mid;
+-			server->CurrentMid = mid;
++			server->current_mid = mid;
  			break;
  		}
  		cur_mid++;
  	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
+-	spin_unlock(&server->mid_queue_lock);
++	spin_unlock(&server->mid_counter_lock);
  
  	if (reconnect) {
  		cifs_signal_cifsd_for_reconnect(server, false);
  	}
  
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 1b4a31894f43..c714707249c7 100644
+index c714707249c7..da2cb9585404 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
+@@ -89,11 +89,11 @@ smb2_add_credits(struct TCP_Server_Info *server,
+ 		reconnect_detected = true;
+ 
+ 	if (*val > 65000) {
+ 		*val = 65000; /* Don't get near 64K credits, avoid srv bugs */
+ 		pr_warn_once("server overflowed SMB3 credits\n");
+-		trace_smb3_overflow_credits(server->CurrentMid,
++		trace_smb3_overflow_credits(server->current_mid,
+ 					    server->conn_id, server->hostname, *val,
+ 					    add, server->in_flight);
+ 	}
+ 	if (credits->in_flight_check > 1) {
+ 		pr_warn_once("rreq R=%08x[%x] Credits not in flight\n",
+@@ -134,19 +134,19 @@ smb2_add_credits(struct TCP_Server_Info *server,
+ 	in_flight = server->in_flight;
+ 	spin_unlock(&server->req_lock);
+ 	wake_up(&server->request_q);
+ 
+ 	if (reconnect_detected) {
+-		trace_smb3_reconnect_detected(server->CurrentMid,
++		trace_smb3_reconnect_detected(server->current_mid,
+ 			server->conn_id, server->hostname, scredits, add, in_flight);
+ 
+ 		cifs_dbg(FYI, "trying to put %d credits from the old server instance %d\n",
+ 			 add, instance);
+ 	}
+ 
+ 	if (reconnect_with_invalid_credits) {
+-		trace_smb3_reconnect_with_invalid_credits(server->CurrentMid,
++		trace_smb3_reconnect_with_invalid_credits(server->current_mid,
+ 			server->conn_id, server->hostname, scredits, add, in_flight);
+ 		cifs_dbg(FYI, "Negotiate operation when server credits is non-zero. Optype: %d, server credits: %d, credits added: %d\n",
+ 			 optype, scredits, add);
+ 	}
+ 
+@@ -174,11 +174,11 @@ smb2_add_credits(struct TCP_Server_Info *server,
+ 	default:
+ 		/* change_conf rebalanced credits for different types */
+ 		break;
+ 	}
+ 
+-	trace_smb3_add_credits(server->CurrentMid,
++	trace_smb3_add_credits(server->current_mid,
+ 			server->conn_id, server->hostname, scredits, add, in_flight);
+ 	cifs_dbg(FYI, "%s: added %u credits total=%d\n", __func__, add, scredits);
+ }
+ 
+ static void
+@@ -201,11 +201,11 @@ smb2_set_credits(struct TCP_Server_Info *server, const int val)
+ 	}
+ 	scredits = server->credits;
+ 	in_flight = server->in_flight;
+ 	spin_unlock(&server->req_lock);
+ 
+-	trace_smb3_set_credits(server->CurrentMid,
++	trace_smb3_set_credits(server->current_mid,
+ 			server->conn_id, server->hostname, scredits, val, in_flight);
+ 	cifs_dbg(FYI, "%s: set %u credits\n", __func__, val);
+ 
+ 	/* don't log while holding the lock */
+ 	if (val == 1)
+@@ -286,11 +286,11 @@ smb2_wait_mtu_credits(struct TCP_Server_Info *server, size_t size,
+ 	}
+ 	scredits = server->credits;
+ 	in_flight = server->in_flight;
+ 	spin_unlock(&server->req_lock);
+ 
+-	trace_smb3_wait_credits(server->CurrentMid,
++	trace_smb3_wait_credits(server->current_mid,
+ 			server->conn_id, server->hostname, scredits, -(credits->value), in_flight);
+ 	cifs_dbg(FYI, "%s: removed %u credits total=%d\n",
+ 			__func__, credits->value, scredits);
+ 
+ 	return rc;
+@@ -314,11 +314,11 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+ 				      subreq->subreq.debug_index,
+ 				      credits->value,
+ 				      server->credits, server->in_flight,
+ 				      new_val - credits->value,
+ 				      cifs_trace_rw_credits_no_adjust_up);
+-		trace_smb3_too_many_credits(server->CurrentMid,
++		trace_smb3_too_many_credits(server->current_mid,
+ 				server->conn_id, server->hostname, 0, credits->value - new_val, 0);
+ 		cifs_server_dbg(VFS, "R=%x[%x] request has less credits (%d) than required (%d)",
+ 				subreq->rreq->debug_id, subreq->subreq.debug_index,
+ 				credits->value, new_val);
+ 
+@@ -336,11 +336,11 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+ 				      subreq->subreq.debug_index,
+ 				      credits->value,
+ 				      server->credits, server->in_flight,
+ 				      new_val - credits->value,
+ 				      cifs_trace_rw_credits_old_session);
+-		trace_smb3_reconnect_detected(server->CurrentMid,
++		trace_smb3_reconnect_detected(server->current_mid,
+ 			server->conn_id, server->hostname, scredits,
+ 			credits->value - new_val, in_flight);
+ 		cifs_server_dbg(VFS, "R=%x[%x] trying to return %d credits to old session\n",
+ 				subreq->rreq->debug_id, subreq->subreq.debug_index,
+ 				credits->value - new_val);
+@@ -356,11 +356,11 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+ 	scredits = server->credits;
+ 	in_flight = server->in_flight;
+ 	spin_unlock(&server->req_lock);
+ 	wake_up(&server->request_q);
+ 
+-	trace_smb3_adj_credits(server->CurrentMid,
++	trace_smb3_adj_credits(server->current_mid,
+ 			server->conn_id, server->hostname, scredits,
+ 			credits->value - new_val, in_flight);
+ 	cifs_dbg(FYI, "%s: adjust added %u credits total=%d\n",
+ 			__func__, credits->value - new_val, scredits);
+ 
 @@ -372,23 +372,23 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
  static __u64
  smb2_get_next_mid(struct TCP_Server_Info *server)
  {
  	__u64 mid;
  	/* for SMB2 we need the current value */
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	mid = server->CurrentMid++;
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
+-	spin_lock(&server->mid_queue_lock);
+-	mid = server->CurrentMid++;
+-	spin_unlock(&server->mid_queue_lock);
++	spin_lock(&server->mid_counter_lock);
++	mid = server->current_mid++;
++	spin_unlock(&server->mid_counter_lock);
  	return mid;
  }
  
  static void
  smb2_revert_current_mid(struct TCP_Server_Info *server, const unsigned int val)
  {
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	if (server->CurrentMid >= val)
- 		server->CurrentMid -= val;
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
+-	spin_lock(&server->mid_queue_lock);
+-	if (server->CurrentMid >= val)
+-		server->CurrentMid -= val;
+-	spin_unlock(&server->mid_queue_lock);
++	spin_lock(&server->mid_counter_lock);
++	if (server->current_mid >= val)
++		server->current_mid -= val;
++	spin_unlock(&server->mid_counter_lock);
  }
  
  static struct mid_q_entry *
  __smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
  {
-@@ -399,25 +399,25 @@ __smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
- 	if (shdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM) {
- 		cifs_server_dbg(VFS, "Encrypted frame parsing not supported yet\n");
- 		return NULL;
- 	}
- 
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
- 		if ((mid->mid == wire_mid) &&
- 		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
- 		    (mid->command == shdr->Command)) {
- 			kref_get(&mid->refcount);
- 			if (dequeue) {
- 				list_del_init(&mid->qhead);
- 				mid->mid_flags |= MID_DELETED;
- 			}
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
- 			return mid;
- 		}
- 	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- 	return NULL;
- }
- 
- static struct mid_q_entry *
- smb2_find_mid(struct TCP_Server_Info *server, char *buf)
 @@ -458,13 +458,13 @@ smb2_negotiate(const unsigned int xid,
  	       struct cifs_ses *ses,
  	       struct TCP_Server_Info *server)
  {
  	int rc;
  
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	server->CurrentMid = 0;
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
+-	spin_lock(&server->mid_queue_lock);
+-	server->CurrentMid = 0;
+-	spin_unlock(&server->mid_queue_lock);
++	spin_lock(&server->mid_counter_lock);
++	server->current_mid = 0;
++	spin_unlock(&server->mid_counter_lock);
  	rc = SMB2_negotiate(xid, ses, server);
  	return rc;
  }
  
  static inline unsigned int
-@@ -4807,22 +4807,22 @@ static void smb2_decrypt_offload(struct work_struct *work)
+@@ -2496,11 +2496,11 @@ smb2_is_status_pending(char *buf, struct TCP_Server_Info *server)
+ 		scredits = server->credits;
+ 		in_flight = server->in_flight;
+ 		spin_unlock(&server->req_lock);
+ 		wake_up(&server->request_q);
  
- 			mid->callback(mid);
- 		} else {
- 			spin_lock(&dw->server->srv_lock);
- 			if (dw->server->tcpStatus == CifsNeedReconnect) {
--				spin_lock(&dw->server->mid_lock);
-+				spin_lock(&dw->server->mid_queue_lock);
- 				mid->mid_state = MID_RETRY_NEEDED;
--				spin_unlock(&dw->server->mid_lock);
-+				spin_unlock(&dw->server->mid_queue_lock);
- 				spin_unlock(&dw->server->srv_lock);
- 				mid->callback(mid);
- 			} else {
--				spin_lock(&dw->server->mid_lock);
-+				spin_lock(&dw->server->mid_queue_lock);
- 				mid->mid_state = MID_REQUEST_SUBMITTED;
- 				mid->mid_flags &= ~(MID_DELETED);
- 				list_add_tail(&mid->qhead,
- 					&dw->server->pending_mid_q);
--				spin_unlock(&dw->server->mid_lock);
-+				spin_unlock(&dw->server->mid_queue_lock);
- 				spin_unlock(&dw->server->srv_lock);
- 			}
- 		}
- 		release_mid(mid);
+-		trace_smb3_pend_credits(server->CurrentMid,
++		trace_smb3_pend_credits(server->current_mid,
+ 				server->conn_id, server->hostname, scredits,
+ 				le16_to_cpu(shdr->CreditRequest), in_flight);
+ 		cifs_dbg(FYI, "%s: status pending add %u credits total=%d\n",
+ 				__func__, le16_to_cpu(shdr->CreditRequest), scredits);
  	}
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 475b36c27f65..ff9ef7fcd010 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -838,13 +838,13 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct TCP_Server_Info *server,
- 	spin_unlock(&ses->ses_lock);
- 
- 	*mid = smb2_mid_entry_alloc(shdr, server);
- 	if (*mid == NULL)
- 		return -ENOMEM;
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_add_tail(&(*mid)->qhead, &server->pending_mid_q);
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- 
- 	return 0;
- }
- 
- int
 diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 191783f553ce..12dc927aa4a2 100644
+index 12dc927aa4a2..8037accc3987 100644
 --- a/fs/smb/client/transport.c
 +++ b/fs/smb/client/transport.c
-@@ -158,16 +158,16 @@ void __release_mid(struct kref *refcount)
- }
- 
- void
- delete_mid(struct mid_q_entry *mid)
- {
--	spin_lock(&mid->server->mid_lock);
-+	spin_lock(&mid->server->mid_queue_lock);
- 	if (!(mid->mid_flags & MID_DELETED)) {
- 		list_del_init(&mid->qhead);
- 		mid->mid_flags |= MID_DELETED;
+@@ -395,11 +395,11 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 		 * If we have only sent part of an SMB then the next SMB could
+ 		 * be taken as the remainder of this one. We need to kill the
+ 		 * socket so the server throws away the partial SMB
+ 		 */
+ 		cifs_signal_cifsd_for_reconnect(server, false);
+-		trace_smb3_partial_send_reconnect(server->CurrentMid,
++		trace_smb3_partial_send_reconnect(server->current_mid,
+ 						  server->conn_id, server->hostname);
  	}
--	spin_unlock(&mid->server->mid_lock);
-+	spin_unlock(&mid->server->mid_queue_lock);
- 
- 	release_mid(mid);
- }
- 
- /*
-@@ -714,13 +714,13 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
- 	spin_unlock(&ses->ses_lock);
- 
- 	*ppmidQ = alloc_mid(in_buf, ses->server);
- 	if (*ppmidQ == NULL)
- 		return -ENOMEM;
--	spin_lock(&ses->server->mid_lock);
-+	spin_lock(&ses->server->mid_queue_lock);
- 	list_add_tail(&(*ppmidQ)->qhead, &ses->server->pending_mid_q);
--	spin_unlock(&ses->server->mid_lock);
-+	spin_unlock(&ses->server->mid_queue_lock);
- 	return 0;
- }
- 
- static int
- wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
-@@ -817,13 +817,13 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 	mid->callback_data = cbdata;
- 	mid->handle = handle;
- 	mid->mid_state = MID_REQUEST_SUBMITTED;
- 
- 	/* put it on the pending_mid_q */
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	list_add_tail(&mid->qhead, &server->pending_mid_q);
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
- 
+ smbd_done:
  	/*
- 	 * Need to store the time in mid before calling I/O. For call_async,
- 	 * I/O response may come back and free the mid entry on another thread.
- 	 */
-@@ -878,14 +878,14 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- 	int rc = 0;
+ 	 * there's hardly any use for the layers above to know the
+@@ -507,11 +507,11 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
+ 		*instance = server->reconnect_instance;
+ 		scredits = *credits;
+ 		in_flight = server->in_flight;
+ 		spin_unlock(&server->req_lock);
  
- 	cifs_dbg(FYI, "%s: cmd=%d mid=%llu state=%d\n",
- 		 __func__, le16_to_cpu(mid->command), mid->mid, mid->mid_state);
+-		trace_smb3_nblk_credits(server->CurrentMid,
++		trace_smb3_nblk_credits(server->current_mid,
+ 				server->conn_id, server->hostname, scredits, -1, in_flight);
+ 		cifs_dbg(FYI, "%s: remove %u credits total=%d\n",
+ 				__func__, 1, scredits);
  
--	spin_lock(&server->mid_lock);
-+	spin_lock(&server->mid_queue_lock);
- 	switch (mid->mid_state) {
- 	case MID_RESPONSE_READY:
--		spin_unlock(&server->mid_lock);
-+		spin_unlock(&server->mid_queue_lock);
- 		return rc;
- 	case MID_RETRY_NEEDED:
- 		rc = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
-@@ -900,17 +900,17 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- 	default:
- 		if (!(mid->mid_flags & MID_DELETED)) {
- 			list_del_init(&mid->qhead);
- 			mid->mid_flags |= MID_DELETED;
- 		}
--		spin_unlock(&server->mid_lock);
-+		spin_unlock(&server->mid_queue_lock);
- 		cifs_server_dbg(VFS, "%s: invalid mid state mid=%llu state=%d\n",
- 			 __func__, mid->mid, mid->mid_state);
- 		rc = -EIO;
- 		goto sync_mid_done;
- 	}
--	spin_unlock(&server->mid_lock);
-+	spin_unlock(&server->mid_queue_lock);
+ 		return 0;
+@@ -540,11 +540,11 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
+ 				spin_lock(&server->req_lock);
+ 				scredits = *credits;
+ 				in_flight = server->in_flight;
+ 				spin_unlock(&server->req_lock);
  
- sync_mid_done:
- 	release_mid(mid);
- 	return rc;
- }
-@@ -1211,19 +1211,19 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	if (rc != 0) {
- 		for (; i < num_rqst; i++) {
- 			cifs_server_dbg(FYI, "Cancelling wait for mid %llu cmd: %d\n",
- 				 midQ[i]->mid, le16_to_cpu(midQ[i]->command));
- 			send_cancel(server, &rqst[i], midQ[i]);
--			spin_lock(&server->mid_lock);
-+			spin_lock(&server->mid_queue_lock);
- 			midQ[i]->mid_flags |= MID_WAIT_CANCELLED;
- 			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED ||
- 			    midQ[i]->mid_state == MID_RESPONSE_RECEIVED) {
- 				midQ[i]->callback = cifs_cancelled_callback;
- 				cancelled_mid[i] = true;
- 				credits[i].value = 0;
+-				trace_smb3_credit_timeout(server->CurrentMid,
++				trace_smb3_credit_timeout(server->current_mid,
+ 						server->conn_id, server->hostname, scredits,
+ 						num_credits, in_flight);
+ 				cifs_server_dbg(VFS, "wait timed out after %d ms\n",
+ 						timeout);
+ 				return -EBUSY;
+@@ -583,11 +583,11 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
+ 					scredits = *credits;
+ 					in_flight = server->in_flight;
+ 					spin_unlock(&server->req_lock);
+ 
+ 					trace_smb3_credit_timeout(
+-							server->CurrentMid,
++							server->current_mid,
+ 							server->conn_id, server->hostname,
+ 							scredits, num_credits, in_flight);
+ 					cifs_server_dbg(VFS, "wait timed out after %d ms\n",
+ 							timeout);
+ 					return -EBUSY;
+@@ -613,11 +613,11 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int num_credits,
  			}
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
- 		}
- 	}
+ 			scredits = *credits;
+ 			in_flight = server->in_flight;
+ 			spin_unlock(&server->req_lock);
  
- 	for (i = 0; i < num_rqst; i++) {
- 		if (rc < 0)
-@@ -1421,20 +1421,20 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		goto out;
- 
- 	rc = wait_for_response(server, midQ);
- 	if (rc != 0) {
- 		send_cancel(server, &rqst, midQ);
--		spin_lock(&server->mid_lock);
-+		spin_lock(&server->mid_queue_lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED ||
- 		    midQ->mid_state == MID_RESPONSE_RECEIVED) {
- 			/* no longer considered to be "in-flight" */
- 			midQ->callback = release_mid;
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
- 			add_credits(server, &credits, 0);
- 			return rc;
- 		}
--		spin_unlock(&server->mid_lock);
-+		spin_unlock(&server->mid_queue_lock);
- 	}
- 
- 	rc = cifs_sync_mid_result(midQ, server);
- 	if (rc != 0) {
- 		add_credits(server, &credits, 0);
-@@ -1603,19 +1603,19 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		}
- 
- 		rc = wait_for_response(server, midQ);
- 		if (rc) {
- 			send_cancel(server, &rqst, midQ);
--			spin_lock(&server->mid_lock);
-+			spin_lock(&server->mid_queue_lock);
- 			if (midQ->mid_state == MID_REQUEST_SUBMITTED ||
- 			    midQ->mid_state == MID_RESPONSE_RECEIVED) {
- 				/* no longer considered to be "in-flight" */
- 				midQ->callback = release_mid;
--				spin_unlock(&server->mid_lock);
-+				spin_unlock(&server->mid_queue_lock);
- 				return rc;
- 			}
--			spin_unlock(&server->mid_lock);
-+			spin_unlock(&server->mid_queue_lock);
- 		}
- 
- 		/* We got the response - restart system call. */
- 		rstart = 1;
- 		spin_lock(&server->srv_lock);
+-			trace_smb3_waitff_credits(server->CurrentMid,
++			trace_smb3_waitff_credits(server->current_mid,
+ 					server->conn_id, server->hostname, scredits,
+ 					-(num_credits), in_flight);
+ 			cifs_dbg(FYI, "%s: remove %u credits total=%d\n",
+ 					__func__, num_credits, scredits);
+ 			break;
+@@ -664,11 +664,11 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
+ 		 * Return immediately if no requests in flight since we will be
+ 		 * stuck on waiting for credits.
+ 		 */
+ 		if (server->in_flight == 0) {
+ 			spin_unlock(&server->req_lock);
+-			trace_smb3_insufficient_credits(server->CurrentMid,
++			trace_smb3_insufficient_credits(server->current_mid,
+ 					server->conn_id, server->hostname, scredits,
+ 					num, in_flight);
+ 			cifs_dbg(FYI, "%s: %d requests in flight, needed %d total=%d\n",
+ 					__func__, in_flight, num, scredits);
+ 			return -EDEADLK;
 -- 
 2.39.2
 
