@@ -1,133 +1,145 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7B522A1E1
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 21:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA4754279
+	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 23:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754516062; cv=none; b=g/hyROMVym4RJam+TY+nVU5ImT3IyupFe2XLgX0ci4dP9DdkCdWySOp8Ozp2p92xfXyjHVCn0/0ewz9t01lN0aqE3+U9HLpbaX4bMxA5lTNI5loc7hABrSK1WuGWw4StiVsE+3EwRFt0kt+q00eoL9Y7dmLDuLt79jvLwISP4Fg=
+	t=1754522543; cv=none; b=hynIRvnuu7lB9P2D5oiaLGJfadmyktRrZt83M5ImaZ4KCnY7msoCE5oDlMvV9MjpjIY/XjTaSrmZgX/w7DmDHvS0cyDE1l5k7XRF/4wl6vt/CFkRag8NE0ntMJ7KoLc24BwhB3m8Z8P5qF8pdcYUI3z4VwaxaHG/XxnDrqr78oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754516062; c=relaxed/simple;
-	bh=qLodcPBa/Sn0fQGQ2RFvl62cvjRzOzF3euxD8Zpw/dY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sEXfo+wg+Ekq3BGXEWCMvXFSfYtTqMtVLysdIQZlyhyUOMNQ6uIvnyXTknlCP+679DhKe74stcIcAzWlhhWRvQqjt58Uah7mcozrpxoAtHyrpgXRd+RTX8ToEBpyPBfrp2x9MpKykBcCZ6z247fyHSNl/WI15dO+ekSrwMGyN/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ej/jYa64; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1754522543; c=relaxed/simple;
+	bh=7aWaiXE0py29tA8En1hYvigqPqqaFb/k8TM6dH8BMLg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Ng6V8zXR/dLuVzYnAJhkQNfu7+NvkOufeh8nQCQWBcTcIyomMwUBotlgu1vHiw95CtR3ZCIVvA7T3W2oSZ3GmdXkuN6oy3WPPo/kAcg/WWxJe+pK1BX9xTm6P1CeNYF1VP11yaGtpwbd4X6uq0Jqr/vT5ghAi9KP0kot147soIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bme+ffq9; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ej/jYa64"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754516057;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=um36FIteZbpN+9FvU2uxmQ00AfZur1L+jdys6L8kSUI=;
-	b=ej/jYa64fkxtzFyPCGaTii9pY1YfQyCvUmGi1EbGl8ynmAuXsjZfH98DrBRLQbYVwG6e7h
-	lCHKoNdskO9Lv3/bvlcQZJQDBwt2e2UyQspN+9J4pDkSd+G8+qTzwbjaiVwe/qJeO67Oya
-	axRvsbCj6RHk/eBO7PMAogkmy4CDkLg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472--_kkZdHwMH-gddaqLXUGYg-1; Wed, 06 Aug 2025 17:34:15 -0400
-X-MC-Unique: -_kkZdHwMH-gddaqLXUGYg-1
-X-Mimecast-MFC-AGG-ID: -_kkZdHwMH-gddaqLXUGYg_1754516055
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-478f78ff9beso10018141cf.1
-        for <linux-cifs@vger.kernel.org>; Wed, 06 Aug 2025 14:34:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bme+ffq9"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4b0a2dd3a75so2053971cf.0
+        for <linux-cifs@vger.kernel.org>; Wed, 06 Aug 2025 16:22:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754522540; x=1755127340; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mDfCd6PGBB8BTWPHFwkSQWIAaQVTMSPzbC5dPCcammc=;
+        b=Bme+ffq9iqPlb88OGOYZDcUfKUw/3LbeCrVWhMKMMyIFHbTr7m9q9tKJGm1hpXhDmP
+         nwfOpcMAJOF4r3y2qRMw1bMuMyo/qBy0hZM+d6UND1vAsTZQShn85Kso9G9qUSwakPGd
+         1Bd2zllKaA1IVnpB7GBfEH9E0cKDf8Z99zPD5YxhIrBxc4N6/Xg1ke/yEBAYJuWYxKvm
+         AXx2HpORDVA2MErKzd9Q+AO9Pvvef2S9XBSkf5k0Sd/l/M987Dh5Sh6zOWTngomu+4gt
+         OfpY6gmmUzkiPtBoPoG4Oq9PePnUkWymsmQgQ2iwIi91JGR4Qj1Wz1k31pXWFTRhrNjS
+         bbTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754516055; x=1755120855;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=um36FIteZbpN+9FvU2uxmQ00AfZur1L+jdys6L8kSUI=;
-        b=JTVKuYDu4u2FV1OhQQCOkG2XlZhxG2S6rVi01hXt75705Kl/vPQubVI9rYrTQQA6+o
-         8diUkX3CZLyvnEnM3w2K8c/C+kbSesonya//ZO03pVIyzzK4Lm008gzx8rFtZI5rCkyB
-         ZfjCYhxoh4Ftw1WIFeAKHmrLmiCrglB913kgEZmETyxTDUy9kKn3dswRSXKS/bi/vh6+
-         xDslJk2Kn0/O+iojROjUuxuYT/hE2xWl0o4vIypbgNV5Ipy+XLJ7sWCfU4J18d/2fKN4
-         oD1/1j63cIGmUzG3HNyhM3XNyVqmcFzF1vbfDTkUaKr5J+IaSLacjiVUwRoqywQlfaAe
-         2VCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRoyBhJSehQTxUa7kTx+4NEm849y0CGfms4jr2NCmALOaLkgtBLXuDg5ZVltbWAnS8MBAFzPxBr16a@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf2pWsiN+aLby88BEzs3aHRFz+YLq8VHQGOSLAmvrlPSh2Vbe9
-	T3quFUP0FdBtILs0AgnrHTq+xbZB3J+l0/6TvRY2NvGDEQJuReNkdjbV1OV+/WD477ZRy8qqk9g
-	kvYEeiOWq5KMD8xg1xUzvaZqh3/95G7TdhxpcYJ2t/PtLiT71hb4RKDv/agte68A=
-X-Gm-Gg: ASbGnctnUBcFMNwtuAdYEiHPz+ZjBP9TULzhRj174f3xoHpfTimFeIpAOsN4uNjbiSc
-	FohzUHrNhT1JPvJnnK0Uerod0kaD7+dasgdp9AQRDqdBPe85kmg6UejpF++HDii44ppmfpGxJNp
-	ZtuhjCNS0Wd6efcm0k9R7I+lsH5PJmfbvY2Lhz3hr4dE/so18QMT+ofgE+CUF3YPSPNpLvXBj9/
-	T2wz7o7XmIXLhPLFeOksqbTHhKx818nQrO6hvPmBPw8zGxxzmtV4ALIDA8Cu5+A1JnAMwE4WAog
-	9Lt7uGdH7DFtRCo1YtJS1UlSoOew2zca5benF8SLHzeuIonrxidtTU3brIN1tqX6RL5MLLXnKl2
-	el2c=
-X-Received: by 2002:ac8:5a4b:0:b0:4a7:189a:7580 with SMTP id d75a77b69052e-4b091403909mr67584401cf.26.1754516054985;
-        Wed, 06 Aug 2025 14:34:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGapniQB0fSFWxRBBmtOsRSPwI5YaTVdX/oEAXr2F0Y0BydffJP9WqzafzJTRlT1rEZaxjk1w==
-X-Received: by 2002:ac8:5a4b:0:b0:4a7:189a:7580 with SMTP id d75a77b69052e-4b091403909mr67583851cf.26.1754516054166;
-        Wed, 06 Aug 2025 14:34:14 -0700 (PDT)
-Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-7093dd53d58sm62219376d6.13.2025.08.06.14.34.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Aug 2025 14:34:13 -0700 (PDT)
-Message-ID: <96e06395-c610-40d8-91c4-63774b66aaf4@redhat.com>
-Date: Wed, 6 Aug 2025 16:34:12 -0500
+        d=1e100.net; s=20230601; t=1754522540; x=1755127340;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mDfCd6PGBB8BTWPHFwkSQWIAaQVTMSPzbC5dPCcammc=;
+        b=gjK262F6Dx5/P3zn4/obYDtBinSQvHleg8DoDTKedLTCi1HsjWx3GQOb74U09MuCMk
+         AYHptdR6feG9eXBWoo+x5bbTGjY5E8VfsdG9qC58nWr0xZVX9B2zbPStmFGwFyPhSaHa
+         qD2eIVLngCtUWLT4ExwnjjYnQ2cJexuihi7Gz0hlklaoJ/NSie3rpOpUPxJ0VmoJY4Sx
+         SSAsmQN9tflIM8IAr5ZxDpuFb+7s4/uJUlqmSAj+il2skIhvJtp9aQL9ABrVzihdGejd
+         17YNsyFxZRv0Mgd6RSUDzNt31Zd5pwvbKLJmb1J9xNpRlwScg7XF4Bm0UZCkezGO7mTK
+         0S8g==
+X-Gm-Message-State: AOJu0YxM9UBAZ6U1Qb+SJeZ2QPMaUc+8rXz8UkSpfkOeSLhT+i2JZHxT
+	Zm/jeEkMZGBeWU9kfo1pvkSTxKMIDQtgLGFX4KCur0thgKeHPdQv3dibAG4qrt793rkx2uUMf6Z
+	NA3tGAR342WlKvCR2eqovvew7f6H1tIdX7cYg
+X-Gm-Gg: ASbGncvLUXjzsx247zSWzEZhmlOoguiPSb1N4p5joFr5SYN9tb4cXVV7ncVxkJSC+7W
+	hLYJcL4QdjgX8lc8im+X1407GOiLTTGcvzLX9fMFvQ4zGDu/fb+/icxcDwyqDWjgDsxKb6+ulu4
+	H6z4ytRL7Tj5iod6dd1lt07izMWYtjiWDmTkYEy9j+CStRs5jZEud9MibOWwLErnar3H6Re4jxV
+	LaTiE1n6zThQ4+o+Red9GRTxdiY1m6YUAFlrynwBEEd3Q3uLrk=
+X-Google-Smtp-Source: AGHT+IECAjkWTTc82RakZ/gSG69VuqUpDeCkZl4mqP6b2femcSjLQLPISMniCb//L5/04D+tVvbsMWcd/JyT9MtRjzs=
+X-Received: by 2002:a05:6214:dcc:b0:704:b09a:9525 with SMTP id
+ 6a1803df08f44-7098a801687mr15357646d6.29.1754522540314; Wed, 06 Aug 2025
+ 16:22:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: sorenson@redhat.com
-Subject: Re: [Samba] Sequence of actions resulting in data loss
-To: Ralph Boehme <slow@samba.org>, Jean-Baptiste Denis <jbdenis@pasteur.fr>,
- Steve French <smfrench@gmail.com>
-Cc: "samba@lists.samba.org" <samba@lists.samba.org>,
- CIFS <linux-cifs@vger.kernel.org>
-References: <16aeb380-30d4-4551-9134-4e7d1dc833c0@pasteur.fr>
- <a70fe80e-5563-467a-8c1f-9fd635662be4@samba.org>
- <fac383c2-2835-448c-a3fc-561f8aec02fa@pasteur.fr>
- <dd2f2bf1-f68d-496d-bca6-3f68672952aa@pasteur.fr>
- <6309360d-088e-49c1-b2db-9ef3169a32d4@pasteur.fr>
- <39705f0a-eb2d-42a1-a135-8751c8c851b0@samba.org>
- <86ae837a-3d30-4450-b91c-3186098178ca@pasteur.fr>
- <20250801121517.32376ad4@devstation.samdom.example.com>
- <62884dd9-0667-4111-afe6-f22ea7468d8e@pasteur.fr>
- <2d2289d7-f536-462f-9505-0ba700ad40b7@samba.org>
- <20250801134029.28a4d9a9@devstation.samdom.example.com>
- <fa99ce33-4eb7-4928-bdb8-8ff162f79856@pasteur.fr>
- <50971413-289b-46af-8f74-b77ca7e94d22@samba.org>
- <d6ff088e-21b1-4cae-bb9f-289f37979f02@pasteur.fr>
- <165cbcb9-f93d-481d-b974-17349311d1ea@samba.org>
- <4f20c584-aa44-4c8f-a3bd-6a7d72abf5e2@redhat.com>
- <37ac126a-c241-4e1c-86d7-3669b8ad42ff@samba.org>
-From: Frank Sorenson <sorenson@redhat.com>
-Content-Language: en-US
-In-Reply-To: <37ac126a-c241-4e1c-86d7-3669b8ad42ff@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 6 Aug 2025 18:22:08 -0500
+X-Gm-Features: Ac12FXxMuTJkyLH8PZuDS8hncJSFQ6cBmGpD9RTSYc7hfoT6vMf4KMARULp0LjY
+Message-ID: <CAH2r5mtQ1Bqpd==fi2f2GMWZU9o6OC-Vuj96TiTRW16Tp1Dagw@mail.gmail.com>
+Subject: [PATCH][SMB3 client] cifs: Don't need state locking in smb2_get_mid_entry()
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: David Howells <dhowells@redhat.com>
+Content-Type: multipart/mixed; boundary="000000000000c438f1063bba9cfb"
 
+--000000000000c438f1063bba9cfb
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/6/25 3:06 PM, Ralph Boehme wrote:
-> On 8/6/25 9:48 PM, Frank Sorenson wrote:
->>> If I understand correctly, SMB has no atomic operation to replace/
->> overwrite a file through a SetInfo FILE_INFO/SMB2_FILE_RENAME_INFO 
->> operation,
->
-> it has.
->
->> so it's accomplished by the two-step process of 1) removing the 
->> target file; and 2) renaming the source filename to the target filename.
->
-> no. This is not needed.
->
-> -slow
->
-Okay, thanks for correcting me.
+An attempt to rebase one of David's patches to current for-next.
+There might be value in this cleanup.   Any opinions?  See attached.
 
+There's no need to get ->srv_lock or ->ses_lock in smb2_get_mid_entry() as
+all that happens of relevance (to the lock) inside the locked sections is
+the reading of one status value in each.
 
+Replace the locking with READ_ONCE() and use a switch instead of a chain of
+if-statements.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
 
 -- 
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer, filesystems
-Red Hat
+Thanks,
 
+Steve
+
+--000000000000c438f1063bba9cfb
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-Don-t-need-state-locking-in-smb2_get_mid_entry.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-Don-t-need-state-locking-in-smb2_get_mid_entry.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_me0lefqy0>
+X-Attachment-Id: f_me0lefqy0
+
+RnJvbSA0Njk0NjRiYThlMjI1YWE3MTU2NzdlYjYzMmZhZTkyZWJhMGJkMjg4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgNiBBdWcgMjAyNSAxODoxNzowNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
+ZnM6IERvbid0IG5lZWQgc3RhdGUgbG9ja2luZyBpbiBzbWIyX2dldF9taWRfZW50cnkoKQoKVGhl
+cmUncyBubyBuZWVkIHRvIGdldCAtPnNydl9sb2NrIG9yIC0+c2VzX2xvY2sgaW4gc21iMl9nZXRf
+bWlkX2VudHJ5KCkgYXMKYWxsIHRoYXQgaGFwcGVucyBvZiByZWxldmFuY2UgKHRvIHRoZSBsb2Nr
+KSBpbnNpZGUgdGhlIGxvY2tlZCBzZWN0aW9ucyBpcwp0aGUgcmVhZGluZyBvZiBvbmUgc3RhdHVz
+IHZhbHVlIGluIGVhY2guCgpSZXBsYWNlIHRoZSBsb2NraW5nIHdpdGggUkVBRF9PTkNFKCkgYW5k
+IHVzZSBhIHN3aXRjaCBpbnN0ZWFkIG9mIGEgY2hhaW4gb2YKaWYtc3RhdGVtZW50cy4KClNpZ25l
+ZC1vZmYtYnk6IERhdmlkIEhvd2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+CmNjOiBQYXVsbyBB
+bGNhbnRhcmEgPHBjQG1hbmd1ZWJpdC5vcmc+CmNjOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBt
+aWNyb3NvZnQuY29tPgpjYzogVG9tIFRhbHBleSA8dG9tQHRhbHBleS5jb20+CmNjOiBsaW51eC1j
+aWZzQHZnZXIua2VybmVsLm9yZwpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNo
+QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9zbWIydHJhbnNwb3J0LmMgfCA0NCAr
+KysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDE4IGlu
+c2VydGlvbnMoKyksIDI2IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
+c21iMnRyYW5zcG9ydC5jIGIvZnMvc21iL2NsaWVudC9zbWIydHJhbnNwb3J0LmMKaW5kZXggZmY5
+ZWY3ZmNkMDEwLi45NTYxNzNhOTMwYjcgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnRy
+YW5zcG9ydC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvc21iMnRyYW5zcG9ydC5jCkBAIC03OTksNDMg
+Kzc5OSwzNSBAQCBzdGF0aWMgaW50CiBzbWIyX2dldF9taWRfZW50cnkoc3RydWN0IGNpZnNfc2Vz
+ICpzZXMsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwKIAkJICAgc3RydWN0IHNtYjJf
+aGRyICpzaGRyLCBzdHJ1Y3QgbWlkX3FfZW50cnkgKiptaWQpCiB7Ci0Jc3Bpbl9sb2NrKCZzZXJ2
+ZXItPnNydl9sb2NrKTsKLQlpZiAoc2VydmVyLT50Y3BTdGF0dXMgPT0gQ2lmc0V4aXRpbmcpIHsK
+LQkJc3Bpbl91bmxvY2soJnNlcnZlci0+c3J2X2xvY2spOworCXN3aXRjaCAoUkVBRF9PTkNFKHNl
+cnZlci0+dGNwU3RhdHVzKSkgeworCWNhc2UgQ2lmc0V4aXRpbmc6CiAJCXJldHVybiAtRU5PRU5U
+OwotCX0KLQotCWlmIChzZXJ2ZXItPnRjcFN0YXR1cyA9PSBDaWZzTmVlZFJlY29ubmVjdCkgewot
+CQlzcGluX3VubG9jaygmc2VydmVyLT5zcnZfbG9jayk7CisJY2FzZSBDaWZzTmVlZFJlY29ubmVj
+dDoKIAkJY2lmc19kYmcoRllJLCAidGNwIHNlc3Npb24gZGVhZCAtIHJldHVybiB0byBjYWxsZXIg
+dG8gcmV0cnlcbiIpOwogCQlyZXR1cm4gLUVBR0FJTjsKKwljYXNlIENpZnNOZWVkTmVnb3RpYXRl
+OgorCQlpZiAoc2hkci0+Q29tbWFuZCAhPSBTTUIyX05FR09USUFURSkKKwkJCXJldHVybiAtRUFH
+QUlOOworCQlicmVhazsKKwlkZWZhdWx0OgorCQlicmVhazsKIAl9CiAKLQlpZiAoc2VydmVyLT50
+Y3BTdGF0dXMgPT0gQ2lmc05lZWROZWdvdGlhdGUgJiYKLQkgICBzaGRyLT5Db21tYW5kICE9IFNN
+QjJfTkVHT1RJQVRFKSB7Ci0JCXNwaW5fdW5sb2NrKCZzZXJ2ZXItPnNydl9sb2NrKTsKLQkJcmV0
+dXJuIC1FQUdBSU47Ci0JfQotCXNwaW5fdW5sb2NrKCZzZXJ2ZXItPnNydl9sb2NrKTsKLQotCXNw
+aW5fbG9jaygmc2VzLT5zZXNfbG9jayk7Ci0JaWYgKHNlcy0+c2VzX3N0YXR1cyA9PSBTRVNfTkVX
+KSB7CisJc3dpdGNoIChSRUFEX09OQ0Uoc2VzLT5zZXNfc3RhdHVzKSkgeworCWNhc2UgU0VTX05F
+VzoKIAkJaWYgKChzaGRyLT5Db21tYW5kICE9IFNNQjJfU0VTU0lPTl9TRVRVUCkgJiYKLQkJICAg
+IChzaGRyLT5Db21tYW5kICE9IFNNQjJfTkVHT1RJQVRFKSkgewotCQkJc3Bpbl91bmxvY2soJnNl
+cy0+c2VzX2xvY2spOworCQkgICAgKHNoZHItPkNvbW1hbmQgIT0gU01CMl9ORUdPVElBVEUpKQog
+CQkJcmV0dXJuIC1FQUdBSU47Ci0JCX0KIAkJLyogZWxzZSBvayAtIHdlIGFyZSBzZXR0aW5nIHVw
+IHNlc3Npb24gKi8KLQl9Ci0KLQlpZiAoc2VzLT5zZXNfc3RhdHVzID09IFNFU19FWElUSU5HKSB7
+Ci0JCWlmIChzaGRyLT5Db21tYW5kICE9IFNNQjJfTE9HT0ZGKSB7Ci0JCQlzcGluX3VubG9jaygm
+c2VzLT5zZXNfbG9jayk7CisJCWJyZWFrOworCWNhc2UgU0VTX0VYSVRJTkc6CisJCWlmIChzaGRy
+LT5Db21tYW5kICE9IFNNQjJfTE9HT0ZGKQogCQkJcmV0dXJuIC1FQUdBSU47Ci0JCX0KIAkJLyog
+ZWxzZSBvayAtIHdlIGFyZSBzaHV0dGluZyBkb3duIHRoZSBzZXNzaW9uICovCisJCWJyZWFrOwor
+CWRlZmF1bHQ6CisJCWJyZWFrOwogCX0KLQlzcGluX3VubG9jaygmc2VzLT5zZXNfbG9jayk7CiAK
+IAkqbWlkID0gc21iMl9taWRfZW50cnlfYWxsb2Moc2hkciwgc2VydmVyKTsKIAlpZiAoKm1pZCA9
+PSBOVUxMKQotLSAKMi40My4wCgo=
+--000000000000c438f1063bba9cfb--
