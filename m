@@ -1,124 +1,208 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CED723E358
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 14:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957E228C5BF;
+	Wed,  6 Aug 2025 14:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754491151; cv=none; b=e9N3NJk7TsndxbjxvynME/Pbfr2iqW+TGk0XOe+NOCy++rEgl/zaHDAieQo0cJcG5hMuy8gOPPnNqfYUUkVXXWw+PEFPXmF0DMSldi4t05tONBNkVpWhQmr1uft0kTFyxqmGkay+r8LZttVluJKjOQdKt4k2CZ4axqh2RgOWBIY=
+	t=1754491263; cv=none; b=baDMbQ/j3vd3WfJaXFVCnN2gpyEe4QnXDRVuE+gXa8YutADcjL/3Alg4v0teyRUdVu06WvrjT8FOESQMBNB+f8BKZbRNEnjKQ0CcqPOcDWKjz0uS0yl32oxIvzZHkKsGOmsHpahfobcUGPJcTegP31bLjO+xnOLXi+KHtO4IXQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754491151; c=relaxed/simple;
-	bh=YJ6mdEgeBoXcjvgJA/CR/fmtrg1zaUe1je1DWvu5qcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oFfnmjuMoevadi6nyPOdAw3puvzMMBpc0XOODpovOH2lBTqim0KHWURUULsH3vZjLigjStdquc8jbJvb2nooV+e3jNqpkh8WZ9hROWZq44QZpbIHgV32gSHr07V4pOau2ErFFRvsVb1XSpZwRge6ELRjBP2fozcUgNvOpNMUZw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GWVUKym0; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GWVUKym0"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3b78310b296so4106287f8f.2
-        for <linux-cifs@vger.kernel.org>; Wed, 06 Aug 2025 07:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754491148; x=1755095948; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t3HkDKyjugPotQJhu78AmOt2Qiqge9F0DpeQ381Qjek=;
-        b=GWVUKym0fCODMVtov2Htiy382ptU09zcLmRrnQzQZng39OCVTQad3dv8dta3vohayf
-         ch06WjgG+bm88zVBmGc0XuWVH9HU45ht1Gz00tV0XtGcA8YsjnE5rZwrInXI9CLqv/VW
-         vx3C9olGUNxjq7Mnyoyv7m+nGalu2hx+0PkLjhB/SVxG7YD7Jb0tv7dDEhak7f+lwsNs
-         +ohH+xBal9kRVFOFkt4FYFwKzOy2a4t7RikGnlyUrZ1mTxGvNBY3CNJkPuedQlGA2DE2
-         2p0jt2RkHO8N52ey+BUApiuXncZ3jFu4nz3C4HTkIblcSrVUh4BO1c3Yd+5Z20NHfqR8
-         0DRg==
+	s=arc-20240116; t=1754491263; c=relaxed/simple;
+	bh=DUrtWE8w60cUrEBMPI4sXJxMrkOvHiZk/N1yViMIaRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bm/k4+Eorf3rYhOhHD/a3GYboJwfalyesop2hr4vDWe/6kMiaWcPMRYVB+AQ/l6ANYOA09/JyxNyDTEOzjf/t4yfdWMZWBelWuYSuNI+0JrGYXh3yNW56kb66gHva2h5fx7K4iPwzisuWPkUWDxI8eUCAyh1PYyz7q6++Zek+98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-31ec291f442so1783a91.1;
+        Wed, 06 Aug 2025 07:41:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754491148; x=1755095948;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t3HkDKyjugPotQJhu78AmOt2Qiqge9F0DpeQ381Qjek=;
-        b=ACuwrIEvaCrPdeTLH7xqOHKRg9wVVu6+Ok6iyqUhqTPbILZ2HGorQzXE3v0h1oFx4D
-         LfqVZwEk1xPOU9B5GG35KZdbPe1oYrsEpciIHbXnBjxbzpkiqNDxi39lBWLAFe4woLJT
-         mTHdI6nmArn4Q04Qs7taO2nsCjw1VKIfyA5dMXXYvXQxgQIuCIomio5vpxD50/YfBG4d
-         O6x1g8uotvP6u1SbWzuglITQuuKuCfzdCKFlClj0lQqJBjlkS9r9A5EWVfN+WyS3y/Jq
-         9FLE9yHdjj0/sPVdUKOrPAVpLDumIsUnTq9LoVqrFuws0EGM+QwIdkT7KxSuGBWWTkXB
-         chlA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9y6K6tQ7nzHha2jKQZ5E/VQYjB9bXFwcWoTqcr+AKzY9UVYoyCaty1/9XwIaKgywIIAtsCk0DuuEx@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/CkKTRZsxBtcXKKCEsynq9ZO5YtLjYsq8l7kj/dx3g3M4eyGb
-	sDV6DPT9soNEFDkkGQB+mlG9+HxPtsNv8LnrVNjpGd5hgfc6a8uq3cp329uldsM5rf4wNcdc6AL
-	BxbRy
-X-Gm-Gg: ASbGncuSP3CpLUMq6ydpZLULtmeKmZhpu3Lkex7CxLTHeVC82s6Ff6qvH5VeW3o4U7R
-	shHIz+9cX8HuScYn/i18KVnSUN1yOWIBSnm6tWEIalU/S95VWSWgyaifZQanVwsBXnlBWH14MAB
-	C8vQsBbBrQQCPO6xYLvyxmhR+ZD0Q5Hi3VqIfSltPJC7iuB03yilgVsKqQJtkrPnySKKmlAUBaa
-	3MxyjLRR92xV6oxszN+uWTenu9gA9okkOA0LH89by4ec5cKU1gSMHozjV/LgEDFFXHwr7SwUQz6
-	88lFVSs8r5608nGTA+/yQzHJF/jJkzsNdH+9p482KmmjbBJyDK9H0QHiwZNU9AQ4AKQSW6dMyCM
-	9Up4kHjX6xAu3rHejapw43DYB2D+T33r2ZJdWRg==
-X-Google-Smtp-Source: AGHT+IFXtbxOaD74GotqT9R0CD1sqY91sieSs3SIFRrIbH0jr4lRcbg1q493FHWof4NReZYFSRDp7g==
-X-Received: by 2002:a05:6000:24c6:b0:3a4:cfbf:51a0 with SMTP id ffacd0b85a97d-3b8f41bbb72mr2459659f8f.21.1754491147334;
-        Wed, 06 Aug 2025 07:39:07 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e583f9fcsm50543105e9.4.2025.08.06.07.39.06
+        d=1e100.net; s=20230601; t=1754491261; x=1755096061;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F08hZsevekdSZCocnoE12EBoNB3pI1zChMqieF5ghrY=;
+        b=qImesxpjaINqGNTOEXip4cFnz8+RMi+Qd9bKN8+0l0CocMbAYh2ZGqS0HYgFhIxYuP
+         w1n97/jF3UcFNYh2B++DxeQlz62xUTaw2c5525ael8hEte2P5CzsqDbOafo6E22vzP/c
+         sb9kdikX33y5t7XFAugI4ooz1NFu8Pk22rez3ysE1wKNzX5lIb0DLOwjbfqxguokSsvs
+         4CuWCXgWDGrJDxT3bzA2jzKu7qRtOmgYJB+OoIszfHtttnl9mP1mW1OGWTaFmJr7DPxf
+         aBawnQx0T9V2LmQyb0C6QpemHp869yYy/dFqv7uNg6NP/vWwfAgaY3HvWQNp8MT4ukT8
+         ThIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUleB1YOb08Mza8yUOnS0Am+RisyGjWbpc5SxRb/UiwOU3lBPNwWadJx/aYy3dK/Pv5E713Zohk82wa@vger.kernel.org, AJvYcCWrpOkmrrs+kf9/kuBCogmoMgcUBS5EXJHfNoRbuaSz0wrZPtq4YrYEA5Ym4Vr2OQpdmaQONV/eHoppuU3x@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGQxpNQbEBoK8vz8KyFaxvEkfpPMeqru3YTBOL4odmifBPcFpN
+	0CAh2L1tdQVRZhQ8TOT7fCuCuSOasOYDtGPGtavEovWJ1BXileKcpnt9
+X-Gm-Gg: ASbGnctCVERudfZ2qnUtNPIzFCsexdYPZTfmRP67FbYV8aw5FVAZfkyCmd4sLYn0uzm
+	2wfqbWmH5tKjWCd1hDP/eh6RdFOy+gdJnm2R10xWEEoGqWtr34AvTAAhJef7pHuMv0lypxcXzTn
+	miRxcGHDisezxIqITtHVr/MkWE85+i0bRQuKxXDYX3yaYE0/YZiJyIfgZNH0b9n3oVpTIjPg4U1
+	lXLsbPMlXNkXeCBMqW5tpNC6JlNgC77wyBePINy2wUI0avwb3VL4k9Ms/nIQ2lfyx1HMSiXh1iG
+	hHfrGUKH4TD3yUfiRD7YCdtOM6VAv6wAvzXoX3J0wCxepPIBAdZFPcSn4d8ywJPaTenviah2Due
+	5IWJizdwHpT7n
+X-Google-Smtp-Source: AGHT+IFmn5Bk81y6ZMDAcgo+VIHfOH12f8k0LVa12jVhmpe0TppCkQyp0W/7neMNg32Rmj5yWh4qoQ==
+X-Received: by 2002:a17:90b:1c0d:b0:312:e9d:4001 with SMTP id 98e67ed59e1d1-32166d1ed4amr1870004a91.8.1754491260892;
+        Wed, 06 Aug 2025 07:41:00 -0700 (PDT)
+Received: from localhost ([218.152.98.97])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31f63ee4f42sm20025929a91.23.2025.08.06.07.40.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Aug 2025 07:39:06 -0700 (PDT)
-Date: Wed, 6 Aug 2025 17:39:04 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH next] smb: client: Fix use after free in send_done()
-Message-ID: <a1a0046c-f47f-4e8a-ae3c-85db58a6cb2f@suswa.mountain>
-References: <aJNASZzOWtg8aljM@stanley.mountain>
- <ad2e9d94-2d95-4351-b800-627f20672209@samba.org>
- <87646c67-78b8-41c5-9b72-361cb3b733d1@suswa.mountain>
- <e291d925-bfd9-4202-b5d4-de5bf30ab870@samba.org>
+        Wed, 06 Aug 2025 07:41:00 -0700 (PDT)
+From: Yunseong Kim <ysk@kzalloc.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Stefan Metzmacher <metze@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	syzkaller@googlegroups.com,
+	linux-kernel@vger.kernel.org,
+	Yunseong Kim <ysk@kzalloc.com>,
+	notselwyn@pwning.tech
+Subject: [PATCH v3] ksmbd: add kcov remote coverage support via ksmbd_conn
+Date: Wed,  6 Aug 2025 14:39:56 +0000
+Message-ID: <20250806143955.122816-2-ysk@kzalloc.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e291d925-bfd9-4202-b5d4-de5bf30ab870@samba.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 06, 2025 at 04:17:41PM +0200, Stefan Metzmacher wrote:
-> > > What was the test that triggered the problem?
-> > > Or did you only noticed it by looking at the code?
-> > 
-> > This was a Smatch static checker warning.  You need to have the cross
-> > function DB to detect it.
-> 
-> Ok, I'll try to integrate it into my build flow...
-> 
-> Does it replace sparse or does it run in addition?
+KSMBD processes SMB requests on per-connection threads and then hands
+off work items to a kworker pool for actual command processing by
+handle_ksmbd_work(). Because each connection may enqueue multiple
+struct ksmbd_work instances, attaching the kcov handle to the work
+itself is not sufficient: we need a stable, per-connection handle.
 
-In addition.  I find the Sparse endianness checks especially useful.
+Introduce a kcov_handle field on struct ksmbd_conn (under CONFIG_KCOV)
+and initialize it when the connection is set up. In both
+ksmbd_conn_handler_loop() which only receives a struct ksmbd_conn*
+and handle_ksmbd_work() which receives a struct ksmbd_work*, start
+kcov_remote with the per-connection handle before processing and stop
+it afterward. This ensures coverage collection remains active across
+the entire asynchronous path of each SMB request.
 
-> If it replaces sparse I guess a small script would
-> run them both?
-> 
-> $ cat mychecker.sh:
-> #!/bin/bash
-> set -e
-> sparse $@
-> smatch $@
-> 
-> And maybe all others from
-> https://gautammenghani.com/linux,/c/2022/05/19/static-analysis-tools-linux-kernel.html
-> 
-> How often do I need to run smatch_scripts/build_kernel_data.sh on the whole kernel?
+The kcov context tied to the connection itself, correctly supporting
+multiple outstanding work items per connection.
 
-The cross function database is really useful for just information
-purposes and looking at how functions are called.  You probably
-would need to rebuild it four or five times to get useful
-information, unfortunately.  I rebuild my every night on the latest
-linux-next.
+In patch v2, I added the missing initialization of kcov_handle. In v3,
+I fixed an kcov_hanlde argument was previously unused on
+ksmbd_conn_set_kcov_handle().
 
-But for other people, I normally say don't bother with the cross
-function DB.  It takes a long time to build and it only slightly
-improves the output.
+The related work for syzkaller support is currently being developed
+in the following GitHub PR:
+Link: https://github.com/google/syzkaller/pull/5524
 
-regards,
-dan carpenter
+Based on earlier work by Lau.
+Link: https://pwning.tech/ksmbd-syzkaller/
+
+Cc: linux-cifs@vger.kernel.org
+Cc: notselwyn@pwning.tech
+Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
+---
+ fs/smb/server/connection.c |  7 ++++++-
+ fs/smb/server/connection.h | 22 ++++++++++++++++++++++
+ fs/smb/server/server.c     |  4 ++++
+ 3 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 3f04a2977ba8..21352f37384f 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -93,6 +93,9 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+ 	down_write(&conn_list_lock);
+ 	list_add(&conn->conns_list, &conn_list);
+ 	up_write(&conn_list_lock);
++
++	ksmbd_conn_set_kcov_handle(conn, kcov_common_handle());
++
+ 	return conn;
+ }
+ 
+@@ -322,6 +325,8 @@ int ksmbd_conn_handler_loop(void *p)
+ 	if (t->ops->prepare && t->ops->prepare(t))
+ 		goto out;
+ 
++	kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
++
+ 	max_req = server_conf.max_inflight_req;
+ 	conn->last_active = jiffies;
+ 	set_freezable();
+@@ -412,7 +417,7 @@ int ksmbd_conn_handler_loop(void *p)
+ 			break;
+ 		}
+ 	}
+-
++	kcov_remote_stop();
+ out:
+ 	ksmbd_conn_set_releasing(conn);
+ 	/* Wait till all reference dropped to the Server object*/
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index dd3e0e3f7bf0..a90bd1b3e1df 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -15,6 +15,7 @@
+ #include <linux/kthread.h>
+ #include <linux/nls.h>
+ #include <linux/unicode.h>
++#include <linux/kcov.h>
+ 
+ #include "smb_common.h"
+ #include "ksmbd_work.h"
+@@ -109,6 +110,9 @@ struct ksmbd_conn {
+ 	bool				binding;
+ 	atomic_t			refcnt;
+ 	bool				is_aapl;
++#ifdef CONFIG_KCOV
++	u64				kcov_handle;
++#endif
+ };
+ 
+ struct ksmbd_conn_ops {
+@@ -246,4 +250,22 @@ static inline void ksmbd_conn_set_releasing(struct ksmbd_conn *conn)
+ }
+ 
+ void ksmbd_all_conn_set_status(u64 sess_id, u32 status);
++
++static inline void ksmbd_conn_set_kcov_handle(struct ksmbd_conn *conn,
++				       const u64 kcov_handle)
++{
++#ifdef CONFIG_KCOV
++	conn->kcov_handle = kcov_handle;
++#endif
++}
++
++static inline u64 ksmbd_conn_get_kcov_handle(struct ksmbd_conn *conn)
++{
++#ifdef CONFIG_KCOV
++	return conn->kcov_handle;
++#else
++	return 0;
++#endif
++}
++
+ #endif /* __CONNECTION_H__ */
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 8c9c49c3a0a4..0757cd6ef4f7 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -264,6 +264,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+ 	struct ksmbd_work *work = container_of(wk, struct ksmbd_work, work);
+ 	struct ksmbd_conn *conn = work->conn;
+ 
++	kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
++
+ 	atomic64_inc(&conn->stats.request_served);
+ 
+ 	__handle_ksmbd_work(work, conn);
+@@ -271,6 +273,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+ 	ksmbd_conn_try_dequeue_request(work);
+ 	ksmbd_free_work_struct(work);
+ 	ksmbd_conn_r_count_dec(conn);
++
++	kcov_remote_stop();
+ }
+ 
+ /**
+-- 
+2.50.0
+
