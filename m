@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E747A2BD031
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 20:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3208D2BD5BC
+	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 20:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754512661; cv=none; b=rclkkaxHZ+tf2zLBgnoaZUea8nBND5mlCAijm/blNNDkjFi4vEkFg5OU7aQnPK5GW3KdKF+xwL6sn7eNGp0CRAHryMS+anfZ+Y+oQfJzoz5k6H515JiVGQfOdF7jIni/W1qzwRYNmnriFjTbIEtVY5hTRQwe2eqmDtRWmEOFyfo=
+	t=1754512672; cv=none; b=RqjvaxWG+XX+3MnIyADq3FvRfzdmcTJdE7iWw0nYNRvHdw9/FZ3u6G13mQRu+ocJHGkfTXcrmpxBd1PkeUiGd3A9Wct59kAJrjAFhn1nWYZJlj7HUHv+iHVpi87sXpbzvUbSM3zftwAy07a1nXCp5zkV0+OajFfYsKC4jkwhOeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754512661; c=relaxed/simple;
-	bh=Cz7mmpHuGqCeQqdDmoKo+SSe5T0TEhmQR5v3P1DDHuo=;
+	s=arc-20240116; t=1754512672; c=relaxed/simple;
+	bh=ppNcHhXRisKv01c9cZ1qnAtYlgHVNCWEVHkzlLJLWGA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tOw5uPg5pkWx5cANNb1oQGi2pmjjVyIJCD55tCYzzPmhfVJGsb1m2S4zh3IbUaXvNQlqnFluFpHdEZJvkmAujVuRzH/c9BVCXSyvsTfiYgXIqM8BFSZAczMYzxyaZLrvY6eN7tR9/+1w1qk50oHC3Q/WmuufqLFnlmRfZ0djEf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbknG9am; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ZrQFAEm1aeyOELtGBkHV94J/nIr8QW1oIcqi0B+5HqOwK23gmx5bmmz+MSUeiMKWs2c7RwivxAih87Z5K2eKvZ8lqEfm9+LYb3fX95nRPWHaCPkLukL0/80HrNfiVvLuFyiUNbopWLiH0MdOStPyJwMBTxMt1wNzf1qwBX61698=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WVhK5kIV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbknG9am"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVhK5kIV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754512659;
+	s=mimecast20190719; t=1754512668;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Pgw2HEBWL/o6lds7Ytffz5iXDstSedUrccIm0ypOU1Q=;
-	b=CbknG9amWVGNDUPV0Qhdl5hKxmotJobDe1SXW3J5w3K0eoLmw1uUZMgk9u/bbw0zkFYxse
-	kke5+1FsHXL+we61VEqMBR+USzeDH5FETdKLs2c11rQagpEFgSyyiEekZE3IJVr5irQ5Ga
-	I6ST+w8+aY700Av+aC1cJS9JN4RDec8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=emfO1GPlFwZIV8t+Z04vg+2LWJzChrqCHQ/rDncitC0=;
+	b=WVhK5kIVmPfZBog3DEeKO/5RIeLt/vNbKaedS9RSb/X9kZB3RyCcSYDggk6scFs4wrgu0c
+	g0qscQUslDveE3JVBKDKyoQTPYq864EOwYS+Rh0zDWf4pHrbhoisEtabaq3AKFPFUmwgPx
+	1A5e+6e/cApmKDjx9OqiqlDoe15wOcA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-203-39d-sI9KMkumubDWD5AxSg-1; Wed,
- 06 Aug 2025 16:37:35 -0400
-X-MC-Unique: 39d-sI9KMkumubDWD5AxSg-1
-X-Mimecast-MFC-AGG-ID: 39d-sI9KMkumubDWD5AxSg_1754512654
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-307-szfcuH63M1iJfTs8avUUlQ-1; Wed,
+ 06 Aug 2025 16:37:43 -0400
+X-MC-Unique: szfcuH63M1iJfTs8avUUlQ-1
+X-Mimecast-MFC-AGG-ID: szfcuH63M1iJfTs8avUUlQ_1754512659
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A1A218002B4;
-	Wed,  6 Aug 2025 20:37:34 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D8FBC1956095;
+	Wed,  6 Aug 2025 20:37:38 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.17])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAE81180047F;
-	Wed,  6 Aug 2025 20:37:30 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9B7211800446;
+	Wed,  6 Aug 2025 20:37:35 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Steve French <sfrench@samba.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -55,9 +55,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	netfs@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 04/31] cifs, nls: Provide unicode size determination func
-Date: Wed,  6 Aug 2025 21:36:25 +0100
-Message-ID: <20250806203705.2560493-5-dhowells@redhat.com>
+Subject: [RFC PATCH 05/31] cifs: Introduce an ALIGN8() macro
+Date: Wed,  6 Aug 2025 21:36:26 +0100
+Message-ID: <20250806203705.2560493-6-dhowells@redhat.com>
 In-Reply-To: <20250806203705.2560493-1-dhowells@redhat.com>
 References: <20250806203705.2560493-1-dhowells@redhat.com>
 Precedence: bulk
@@ -69,6 +69,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
+The PDU generation seems to do ALIGN(x, 8) a lot, so make a macro for that.
+
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
 cc: Paulo Alcantara <pc@manguebit.org>
@@ -78,129 +80,177 @@ cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/nls/nls_base.c            | 33 ++++++++++++++++++++++++++++++
- fs/smb/client/cifs_unicode.c | 39 ++++++++++++++++++++++++++++++++++++
- fs/smb/client/cifs_unicode.h |  2 ++
- include/linux/nls.h          |  1 +
- 4 files changed, 75 insertions(+)
+ fs/smb/client/cifsglob.h |  2 ++
+ fs/smb/client/reparse.c  |  2 +-
+ fs/smb/client/smb2file.c |  2 +-
+ fs/smb/client/smb2misc.c |  2 +-
+ fs/smb/client/smb2pdu.c  | 28 ++++++++++++++--------------
+ 5 files changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/fs/nls/nls_base.c b/fs/nls/nls_base.c
-index 18d597e49a19..f6927c7d9fe1 100644
---- a/fs/nls/nls_base.c
-+++ b/fs/nls/nls_base.c
-@@ -171,6 +171,39 @@ int utf8s_to_utf16s(const u8 *s, int inlen, enum utf16_endian endian,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 89160bc34d35..67c1a63a08ba 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -2375,4 +2375,6 @@ static inline bool cifs_netbios_name(const char *name, size_t namelen)
+ 	return ret;
  }
- EXPORT_SYMBOL(utf8s_to_utf16s);
  
-+/**
-+ * utf8s_to_len_utf16s - Determine the length of a conversion of UTF8 to UTF16.
-+ * @s: The source utf8 string
-+ * @inlen: The length of the string
-+ */
-+ssize_t utf8s_to_len_utf16s(const u8 *s, int inlen)
-+{
-+	unicode_t u;
-+	size_t outcount = 0;
-+	int size;
++#define ALIGN8(x) ALIGN((x), 8)
 +
-+	while (inlen > 0 && *s) {
-+		if (*s & 0x80) {
-+			size = utf8_to_utf32(s, inlen, &u);
-+			if (size < 0)
-+				return -EINVAL;
-+			s += size;
-+			inlen -= size;
-+
-+			if (u >= PLANE_SIZE)
-+				outcount += 2;
-+			else
-+				outcount++;
-+		} else {
-+			s++;
-+			outcount++;
-+			inlen--;
-+		}
-+	}
-+	return outcount * sizeof(wchar_t);
-+}
-+EXPORT_SYMBOL(utf8s_to_len_utf16s);
-+
- static inline unsigned long get_utf16(unsigned c, enum utf16_endian endian)
+ #endif	/* _CIFS_GLOB_H */
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 5fa29a97ac15..2622f90ebc92 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -571,7 +571,7 @@ static struct smb2_create_ea_ctx *ea_create_context(u32 dlen, size_t *cc_len)
  {
- 	switch (endian) {
-diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
-index 4cc6e0896fad..ba4b361613f6 100644
---- a/fs/smb/client/cifs_unicode.c
-+++ b/fs/smb/client/cifs_unicode.c
-@@ -290,6 +290,45 @@ cifs_strtoUTF16(__le16 *to, const char *from, int len,
- 	return i;
+ 	struct smb2_create_ea_ctx *cc;
+ 
+-	*cc_len = round_up(sizeof(*cc) + dlen, 8);
++	*cc_len = ALIGN8(sizeof(*cc) + dlen);
+ 	cc = kzalloc(*cc_len, GFP_KERNEL);
+ 	if (!cc)
+ 		return ERR_PTR(-ENOMEM);
+diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+index a7f629238830..1c8fc06cd46f 100644
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -48,7 +48,7 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+ 			cifs_dbg(FYI, "%s: skipping unhandled error context: 0x%x\n",
+ 				 __func__, le32_to_cpu(p->ErrorId));
+ 
+-			len = ALIGN(le32_to_cpu(p->ErrorDataLength), 8);
++			len = ALIGN8(le32_to_cpu(p->ErrorDataLength));
+ 			p = (struct smb2_error_context_rsp *)(p->ErrorContextData + len);
+ 		} while (p < end);
+ 	} else if (le32_to_cpu(err->ByteCount) >= sizeof(*sym) &&
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index cddf273c14ae..93ce9fc7b4a4 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -252,7 +252,7 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 		 * Some windows servers (win2016) will pad also the final
+ 		 * PDU in a compound to 8 bytes.
+ 		 */
+-		if (ALIGN(calc_len, 8) == len)
++		if (ALIGN8(calc_len) == len)
+ 			return 0;
+ 
+ 		/*
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 2df93a75e3b8..96df4aa7a7af 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -619,14 +619,14 @@ build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
+ 	/*
+ 	 * Context Data length must be rounded to multiple of 8 for some servers
+ 	 */
+-	pneg_ctxt->DataLength = cpu_to_le16(ALIGN(sizeof(struct smb2_signing_capabilities) -
++	pneg_ctxt->DataLength = cpu_to_le16(ALIGN8(sizeof(struct smb2_signing_capabilities) -
+ 					    sizeof(struct smb2_neg_context) +
+-					    (num_algs * sizeof(u16)), 8));
++					    (num_algs * sizeof(u16))));
+ 	pneg_ctxt->SigningAlgorithmCount = cpu_to_le16(num_algs);
+ 	pneg_ctxt->SigningAlgorithms[0] = cpu_to_le16(SIGNING_ALG_AES_CMAC);
+ 
+ 	ctxt_len += sizeof(__le16) * num_algs;
+-	ctxt_len = ALIGN(ctxt_len, 8);
++	ctxt_len = ALIGN8(ctxt_len);
+ 	return ctxt_len;
+ 	/* TBD add SIGNING_ALG_AES_GMAC and/or SIGNING_ALG_HMAC_SHA256 */
+ }
+@@ -663,7 +663,7 @@ build_netname_ctxt(struct smb2_netname_neg_context *pneg_ctxt, char *hostname)
+ 	/* copy up to max of first 100 bytes of server name to NetName field */
+ 	pneg_ctxt->DataLength = cpu_to_le16(2 * cifs_strtoUTF16(pneg_ctxt->NetName, hostname, 100, cp));
+ 	/* context size is DataLength + minimal smb2_neg_context */
+-	return ALIGN(le16_to_cpu(pneg_ctxt->DataLength) + sizeof(struct smb2_neg_context), 8);
++	return ALIGN8(le16_to_cpu(pneg_ctxt->DataLength) + sizeof(struct smb2_neg_context));
  }
  
-+/*
-+ * Work out how long a string will be once converted to UTF16 in bytes.  This
-+ * does not include a NUL terminator.
-+ */
-+size_t cifs_size_strtoUTF16(const char *from, int len,
-+			    const struct nls_table *codepage)
-+{
-+	wchar_t wchar_to; /* needed to quiet sparse */
-+	ssize_t out_len = 0;
-+	int charlen;
-+
-+	/* special case for utf8 to handle no plane0 chars */
-+	if (strcmp(codepage->charset, "utf8") == 0) {
-+		out_len = utf8s_to_len_utf16s(from, len);
-+		if (out_len >= 0)
-+			goto success;
-+		/*
-+		 * On failure, fall back to UCS encoding as this function
-+		 * should not return negative values currently can fail only if
-+		 * source contains invalid encoded characters
-+		 */
-+	}
-+
-+	for (; len && *from; len -= charlen) {
-+		charlen = codepage->char2uni(from, len, &wchar_to);
-+		if (charlen < 1) {
-+			cifs_dbg(VFS, "strtoUTF16: char2uni of 0x%x returned %d\n",
-+				 *from, charlen);
-+			/* Replace with a question mark */
-+			charlen = 1;
-+		}
-+		from += charlen;
-+		out_len += 2;
-+	}
-+
-+success:
-+	return out_len;
-+}
-+
- /*
-  * cifs_utf16_bytes - how long will a string be after conversion?
-  * @utf16 - pointer to input string
-diff --git a/fs/smb/client/cifs_unicode.h b/fs/smb/client/cifs_unicode.h
-index e137a0dfbbe9..c3519a46a2b5 100644
---- a/fs/smb/client/cifs_unicode.h
-+++ b/fs/smb/client/cifs_unicode.h
-@@ -60,6 +60,8 @@ int cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
- int cifs_utf16_bytes(const __le16 *from, int maxbytes,
- 		     const struct nls_table *codepage);
- int cifs_strtoUTF16(__le16 *, const char *, int, const struct nls_table *);
-+size_t cifs_size_strtoUTF16(const char *from, int len,
-+			    const struct nls_table *codepage);
- char *cifs_strndup_from_utf16(const char *src, const int maxlen,
- 			      const bool is_unicode,
- 			      const struct nls_table *codepage);
-diff --git a/include/linux/nls.h b/include/linux/nls.h
-index e0bf8367b274..026da1d5ffaa 100644
---- a/include/linux/nls.h
-+++ b/include/linux/nls.h
-@@ -56,6 +56,7 @@ extern int utf8_to_utf32(const u8 *s, int len, unicode_t *pu);
- extern int utf32_to_utf8(unicode_t u, u8 *s, int maxlen);
- extern int utf8s_to_utf16s(const u8 *s, int len,
- 		enum utf16_endian endian, wchar_t *pwcs, int maxlen);
-+ssize_t utf8s_to_len_utf16s(const u8 *s, int inlen);
- extern int utf16s_to_utf8s(const wchar_t *pwcs, int len,
- 		enum utf16_endian endian, u8 *s, int maxlen);
+ static void
+@@ -709,18 +709,18 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+ 	 * round up total_len of fixed part of SMB3 negotiate request to 8
+ 	 * byte boundary before adding negotiate contexts
+ 	 */
+-	*total_len = ALIGN(*total_len, 8);
++	*total_len = ALIGN8(*total_len);
  
+ 	pneg_ctxt = (*total_len) + (char *)req;
+ 	req->NegotiateContextOffset = cpu_to_le32(*total_len);
+ 
+ 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt);
+-	ctxt_len = ALIGN(sizeof(struct smb2_preauth_neg_context), 8);
++	ctxt_len = ALIGN8(sizeof(struct smb2_preauth_neg_context));
+ 	*total_len += ctxt_len;
+ 	pneg_ctxt += ctxt_len;
+ 
+ 	build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt);
+-	ctxt_len = ALIGN(sizeof(struct smb2_encryption_neg_context), 8);
++	ctxt_len = ALIGN8(sizeof(struct smb2_encryption_neg_context));
+ 	*total_len += ctxt_len;
+ 	pneg_ctxt += ctxt_len;
+ 
+@@ -749,7 +749,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+ 	if (server->compression.requested) {
+ 		build_compression_ctxt((struct smb2_compression_capabilities_context *)
+ 				pneg_ctxt);
+-		ctxt_len = ALIGN(sizeof(struct smb2_compression_capabilities_context), 8);
++		ctxt_len = ALIGN8(sizeof(struct smb2_compression_capabilities_context));
+ 		*total_len += ctxt_len;
+ 		pneg_ctxt += ctxt_len;
+ 		neg_context_count++;
+@@ -940,7 +940,7 @@ static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
+ 		 * aligned offset following the previous negotiate context.
+ 		 */
+ 		if (i + 1 != ctxt_cnt)
+-			clen = ALIGN(clen, 8);
++			clen = ALIGN8(clen);
+ 		if (clen > len_of_ctxts)
+ 			break;
+ 
+@@ -2631,7 +2631,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+ 	unsigned int group_offset = 0;
+ 	struct smb3_acl acl = {};
+ 
+-	*len = round_up(sizeof(struct crt_sd_ctxt) + (sizeof(struct smb_ace) * 4), 8);
++	*len = ALIGN8(sizeof(struct crt_sd_ctxt) + (sizeof(struct smb_ace) * 4));
+ 
+ 	if (set_owner) {
+ 		/* sizeof(struct owner_group_sids) is already multiple of 8 so no need to round */
+@@ -2706,7 +2706,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+ 	memcpy(aclptr, &acl, sizeof(struct smb3_acl));
+ 
+ 	buf->ccontext.DataLength = cpu_to_le32(ptr - (__u8 *)&buf->sd);
+-	*len = round_up((unsigned int)(ptr - (__u8 *)buf), 8);
++	*len = ALIGN8((unsigned int)(ptr - (__u8 *)buf));
+ 
+ 	return buf;
+ }
+@@ -2799,7 +2799,7 @@ alloc_path_with_tree_prefix(__le16 **out_path, int *out_size, int *out_len,
+ 	 * final path needs to be 8-byte aligned as specified in
+ 	 * MS-SMB2 2.2.13 SMB2 CREATE Request.
+ 	 */
+-	*out_size = round_up(*out_len * sizeof(__le16), 8);
++	*out_size = ALIGN8(*out_len * sizeof(__le16));
+ 	*out_path = kzalloc(*out_size + sizeof(__le16) /* null */, GFP_KERNEL);
+ 	if (!*out_path)
+ 		return -ENOMEM;
+@@ -3064,7 +3064,7 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 		uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
+ 		/* MUST set path len (NameLength) to 0 opening root of share */
+ 		req->NameLength = cpu_to_le16(uni_path_len - 2);
+-		copy_size = round_up(uni_path_len, 8);
++		copy_size = ALIGN8(uni_path_len);
+ 		copy_path = kzalloc(copy_size, GFP_KERNEL);
+ 		if (!copy_path)
+ 			return -ENOMEM;
+@@ -4490,7 +4490,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	if (request_type & CHAINED_REQUEST) {
+ 		if (!(request_type & END_OF_CHAIN)) {
+ 			/* next 8-byte aligned request */
+-			*total_len = ALIGN(*total_len, 8);
++			*total_len = ALIGN8(*total_len);
+ 			shdr->NextCommand = cpu_to_le32(*total_len);
+ 		} else /* END_OF_CHAIN */
+ 			shdr->NextCommand = 0;
 
