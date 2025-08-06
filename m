@@ -1,63 +1,63 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0122D7BF;
-	Wed,  6 Aug 2025 13:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224BCC8EB;
+	Wed,  6 Aug 2025 13:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754486633; cv=none; b=GGl8myhNlQBpH2MnHf9PwuI8wynEzxB6epSPt65E7hw3F6B48gkzOG3deAAieVDBDEYeqbaEgC1dTXZL9lQY47HR5uofJfBJwtuEB8NPZohLTyOzPG0+sD5OExMXnR/QZtBSx6U7CROUSkgzrl3UPPyQZW8Bk8li5KfmAFNY/ng=
+	t=1754488411; cv=none; b=WpuTS15fCPNPwjJmzcFgr5zN01pwbTs6o/3rnfaMWRwTEyoCpx6bP/Z5Ea1fghdihlkCucyTyV5PLsyE/DQtSt+vWQtmalnRY6rHHfOHmqJbO/vaQPp0ls87GVkTRun5QjamzFG6x2eb/RryGqbzLaEcirvzlRJrp889LyalHA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754486633; c=relaxed/simple;
-	bh=yp2hRT4Xo+ztxRvI7HeplkR/VFn3RG+IanX7yIuTJKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KKRhkrUF/tVLmoMC08Gy4x4XG39PjTTY86ag4nHlCldf5X/5jbfFIPdlcjOGTaOf2hwJ04Zeo2EUAEOLNeF0kc+IRh1YGhdZs9Gbkjh1pZrjLywaC58jNzeri6AMZwMFOUAH+PTRKHNKLEhupchR7IMxCIT1NdN5m1IBGMyxAsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1754488411; c=relaxed/simple;
+	bh=4tk6NnU3d3nHsMbrPT3szZG4xcdNqUYkmbWKu9AP8N0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=USBdQkSlycQLlTuI7Gvet8Gee0Sw57XBg41VGOSTtxMra1B6MnrM1kmhlwS/8hZwkcYXIz1Igz95D5pWG4XagCDKn1ybg0Lc4vRHdZCffjx3j7tFre7fVVqyVecDYyAgD+WNkPUYK/lz/pw1R4DGhyMoeaKNwnEsduk3PwdWUfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-24050da1b9eso8126815ad.3;
-        Wed, 06 Aug 2025 06:23:50 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-73de140046eso547897b3a.1;
+        Wed, 06 Aug 2025 06:53:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754486630; x=1755091430;
+        d=1e100.net; s=20230601; t=1754488409; x=1755093209;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8BaH77pTATgomb0f+TIsMr75eWE+v8rXetnzgd5rHns=;
-        b=JRqntDyAcBql07+do4MoFWQVH1NlJJIfU6kESFW4l8Vlzc2z5PHdEURMS6vMcUPrgI
-         ocuG97mI9CxUXduRCLTfEDw+V0LKZrAx9lDTFOy0K2qUFz5xFePlMT2zR9J/AU+hTbrd
-         6/YOAIs88Anf/lTCOLVpAQfDR5pE+WiHUjtHrMvLAMztPcGqVae+z97up46hzTKt0ZIC
-         5trseKk6qP8cCt4uBEgrv0wUy8R+UMWcd3gv9VPj9tLn2yncgftfEjazcqNpv/umL3qr
-         /MV5dtiU+RJ6AtCkWR7fyD0Lb2uLzrzRI3xBl+Li841hlrlzzK9hD33H6gtQeoJ9aVoN
-         MGLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnQBmQWLOXxO4hdvtwJ0SGppBlxp8EXVw57zc2ZIH6GxlcVjB7Nr09iV4eSpddTnKzGaqQnsSfjE/p@vger.kernel.org, AJvYcCX60tHezYTcbWjhP5atqylhlZ2nqoTvK5jqtU657iIJ8IzM/cT35SZXGv0T0xhP37BZSqSKet/dCbMt1X/n@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvhkpwVLaIiKP+z+ofb9In38km4i24D6B8IZzKro7PguPI97U5
-	CGrrW/gs9hF3n4DYK6jchtLHCtjLU54Zx8tRhNSj33vKNcGk90u1mLBC
-X-Gm-Gg: ASbGncviVLl6qFrBlwCHsuMLTCbNJ3VcdAUpclTfiVAQmnOAjvrJZmpxUfkrq6TmhVq
-	ZNwEBR5O4F9GEBoWDWFLSoLsLI165GmXyMLhT8imFUJ61EH9bOtfyDWkcT0BZv8urjVcFD/hRaW
-	+Mq0BV8N/hgtwWbCErPxWsKV6vdcHxNexXEYu+4oiKrqlwknLfF3lEhKeyTJqMUPod9xr9VS5jo
-	EOgO0Z6tAq06S6e09ShWAJzHlO7N0fg68XXgZmSicRbK+VgYjeQGiR/L+pdUEz0dzVVjh/Hvh6T
-	by9emVwagnn8gnUZ57jayqsfbSF6mEnzx8SlxECzDqhszabP2XSDWKlx8gaYAAR7dIWqd9U6A5R
-	kubSiBXme35ul
-X-Google-Smtp-Source: AGHT+IE4TcwdrU6bM5i5hIrrZz+iLVM3raL5GuRMMILGR4J/MfMACcLYUJrF6k1kLQwalUqcEQ7tpg==
-X-Received: by 2002:a17:902:c40c:b0:240:4cf6:b07b with SMTP id d9443c01a7336-2429f5c32e8mr22341975ad.9.1754486629916;
-        Wed, 06 Aug 2025 06:23:49 -0700 (PDT)
+        bh=eXVVW+/eUuU4SVgr/LVm9ictIC2YN1aVDlWxGhihbS0=;
+        b=Z2RAEL70yh6uQccVb54JRDdoJv+699z53qlOAas7B2YH2ekpB0CJav2amATrD4y7Wt
+         AwjQ0arUlkGNtz3SIXi+rQQOAAt2NDaIloZFmvIJ45ahQSRMxsi67SKW4m/a2LEAFJtH
+         z0adt8hjlpj2rbglc51t7qIhVVDR/UWhOQDhSu4jnBZ+Fx7k72aa55i6WCTD54S2JyvE
+         7l+2f7PfRpWF4xvQBlILe2HSh2EJxsMDMGBB3ogycPWVaDHt3avwPKXpbYfjB8pIjT8B
+         thNSYQ19X5dZFn0khfZqRIbZpxmESpEKjsa7iZ/zLULgKPH/P7r7wGksHWhghQW36LBx
+         eU6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUM0dAKlh3hPRo+Cp2R7p3u5jQNHUDjLqUfQKPIsv81bYKy4RfxJokMuQMbmTb/L6ygsWHpzNTBar3B@vger.kernel.org, AJvYcCXRgsfcTZjMXSrPzXglKCb9rFjAT/M6ylgsD8qEIKm65VOYISmc9sD4ftN0/q66ZNdTMEjapYb8j10hzdD8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yznazh7MS/XDy2Gkd3P3XMPqOheelwDTzMifLjZMAWiZN/VXu4T
+	1/pTvRPMk3T9OM696u0h2D9rqi1aZSqEPXew9UK/uQizvl0LLsjp5E6U
+X-Gm-Gg: ASbGncvF5YLXmj5edjspYndXlgolhPy/QjSY6yUPD6hEY2JPQ0ORS+tb4kWs262oR9e
+	74l+ToTAqFqVURInd1O6pOIp9WMd19whUU69dONfjbW1qjPayn5ylIymkjbpmi5eYJvVfEFYPhG
+	NCS4iZf3xreEvOdnOBkXbuB9AmLwhT5lt9XSCXco85uJa5gLyNG9XnNrhYhM4V2Ibxy7mI23i40
+	3VJSt/4GukJ9aKPbMIpmTjhkvk7lyXXAdEXaPwizl/hUNQ7U6nMgWE4wSG4cJejmdYqwF/AyzA8
+	SHV75C0Kb5sB3oPwicM5ofwRHfYp2n3jJ9vv5rk1o5uACYZ1sdRaBd9A8WzkUKe5ELBuIXN0Bvp
+	m6xPElwPMgk9D
+X-Google-Smtp-Source: AGHT+IGDjFRv/TdNKCeuh9p8W9Kqj4kzRHGaV40cP01GTluWlo8FIEiwxVxGKtEIcffl56f6Tq+VrQ==
+X-Received: by 2002:a05:6a21:6d96:b0:222:d794:62fb with SMTP id adf61e73a8af0-2403145b4f0mr2050935637.3.1754488409253;
+        Wed, 06 Aug 2025 06:53:29 -0700 (PDT)
 Received: from localhost ([218.152.98.97])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-241d1ef7557sm158126335ad.19.2025.08.06.06.23.46
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b422bafcce2sm13534289a12.52.2025.08.06.06.53.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Aug 2025 06:23:49 -0700 (PDT)
+        Wed, 06 Aug 2025 06:53:28 -0700 (PDT)
 From: Yunseong Kim <ysk@kzalloc.com>
-To: Steve French <sfrench@samba.org>,
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Stefan Metzmacher <metze@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
+	syzkaller@googlegroups.com,
 	linux-kernel@vger.kernel.org,
-	Yunseong Kim <ysk@kzalloc.com>
-Subject: [PATCH] cifs: Fix null-ptr-deref by static initializing global lock
-Date: Wed,  6 Aug 2025 13:22:12 +0000
-Message-ID: <20250806132211.94686-2-ysk@kzalloc.com>
+	Yunseong Kim <ysk@kzalloc.com>,
+	notselwyn@pwning.tech
+Subject: [PATCH v2] ksmbd: add kcov remote coverage support via ksmbd_conn
+Date: Wed,  6 Aug 2025 13:52:25 +0000
+Message-ID: <20250806135224.116724-2-ysk@kzalloc.com>
 X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -65,114 +65,143 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-A kernel panic can be triggered by reading /proc/fs/cifs/debug_dirs.
-The crash is a null-ptr-deref inside spin_lock(), caused by the use of the
-uninitialized global spinlock cifs_tcp_ses_lock.
+KSMBD processes SMB requests on per-connection threads and then hands
+off work items to a kworker pool for actual command processing by
+handle_ksmbd_work(). Because each connection may enqueue multiple
+struct ksmbd_work instances, attaching the kcov handle to the work
+itself is not sufficient: we need a stable, per-connection handle.
 
-init_cifs()
- └── cifs_proc_init()
-      └── // User can access /proc/fs/cifs/debug_dirs here
-           └── cifs_debug_dirs_proc_show()
-                └── spin_lock(&cifs_tcp_ses_lock); // Uninitialized!
+Introduce a kcov_handle field on struct ksmbd_conn (under CONFIG_KCOV)
+and initialize it when the connection is set up. In both
+ksmbd_conn_handler_loop() which only receives a struct ksmbd_conn*
+and handle_ksmbd_work() which receives a struct ksmbd_work*, start
+kcov_remote with the per-connection handle before processing and stop
+it afterward. This ensures coverage collection remains active across
+the entire asynchronous path of each SMB request.
 
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-Mem abort info:
-ESR = 0x0000000096000005
-EC = 0x25: DABT (current EL), IL = 32 bits
-SET = 0, FnV = 0
-EA = 0, S1PTW = 0
-FSC = 0x05: level 1 translation fault
-Data abort info:
-ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[dfff800000000000] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1] SMP
-Modules linked in:
-CPU: 3 UID: 0 PID: 16435 Comm: stress-ng-procf Not tainted 6.16.0-10385-g79f14b5d84c6 #37 PREEMPT
-Hardware name: QEMU KVM Virtual Machine, BIOS 2025.02-8ubuntu1 06/11/2025
-pstate: 23400005 (nzCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-pc : do_raw_spin_lock+0x84/0x2cc
-lr : _raw_spin_lock+0x24/0x34
-sp : ffff8000966477e0
-x29: ffff800096647860 x28: ffff800096647b88 x27: ffff0001c0c22070
-x26: ffff0003eb2b60c8 x25: ffff0001c0c22018 x24: dfff800000000000
-x23: ffff0000f624e000 x22: ffff0003eb2b6020 x21: ffff0000f624e768
-x20: 0000000000000004 x19: 0000000000000000 x18: 0000000000000000
-x17: 0000000000000000 x16: ffff8000804b9600 x15: ffff700012cc8f04
-x14: 1ffff00012cc8f04 x13: 0000000000000004 x12: ffffffffffffffff
-x11: 1ffff00012cc8f00 x10: ffff80008d9af0d2 x9 : f3f3f304f1f1f1f1
-x8 : 0000000000000000 x7 : 7365733c203e6469 x6 : 20656572743c2023
-x5 : ffff0000e0ce0044 x4 : ffff80008a4deb6e x3 : ffff8000804b9718
-x2 : 0000000000000001 x1 : 0000000000000000 x0 : 0000000000000000
-Call trace:
-do_raw_spin_lock+0x84/0x2cc (P)
-_raw_spin_lock+0x24/0x34
-cifs_debug_dirs_proc_show+0x1ac/0x4c0
-seq_read_iter+0x3b0/0xc28
-proc_reg_read_iter+0x178/0x2a8
-vfs_read+0x5f8/0x88c
-ksys_read+0x120/0x210
-__arm64_sys_read+0x7c/0x90
-invoke_syscall+0x98/0x2b8
-el0_svc_common+0x130/0x23c
-do_el0_svc+0x48/0x58
-el0_svc+0x40/0x140
-el0t_64_sync_handler+0x84/0x12c
-el0t_64_sync+0x1ac/0x1b0
-Code: aa0003f3 f9000feb f2fe7e69 f8386969 (38f86908)
----[ end trace 0000000000000000 ]---
+The kcov context tied to the connection itself, correctly supporting
+multiple outstanding work items per connection.
 
-The root cause is an initialization order problem. The lock is declared
-as a global variable and intended to be initialized during module startup.
-However, the procfs entry that uses this lock can be accessed by userspace
-before the spin_lock_init() call has run. This creates a race window where
-reading the proc file will attempt to use the lock before it is
-initialized, leading to the crash.
+In patch v2, I added the initialization of kcov_handle, which was
+missing in the previous version.
 
-For a global lock with a static lifetime, the correct and robust approach
-is to use compile-time initialization.
+The related work for syzkaller support is currently being developed
+in the following GitHub PR:
+Link: https://github.com/google/syzkaller/pull/5524
 
-Fixes: 844e5c0eb176 ("smb3 client: add way to show directory leases for improved debugging")
+Based on earlier work by Lau.
+Link: https://pwning.tech/ksmbd-syzkaller/
+
+Cc: linux-cifs@vger.kernel.org
+Cc: notselwyn@pwning.tech
 Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
 ---
- fs/smb/client/cifsfs.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ fs/smb/server/connection.c |  7 ++++++-
+ fs/smb/server/connection.h | 22 ++++++++++++++++++++++
+ fs/smb/server/server.c     |  4 ++++
+ 3 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 31930b7266db..3bd85ab2deb1 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -77,7 +77,7 @@ unsigned int global_secflags = CIFSSEC_DEF;
- unsigned int GlobalCurrentXid;	/* protected by GlobalMid_Lock */
- unsigned int GlobalTotalActiveXid; /* prot by GlobalMid_Lock */
- unsigned int GlobalMaxActiveXid;	/* prot by GlobalMid_Lock */
--spinlock_t GlobalMid_Lock; /* protects above & list operations on midQ entries */
-+DEFINE_SPINLOCK(GlobalMid_Lock); /* protects above & list operations on midQ entries */
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 3f04a2977ba8..21352f37384f 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -93,6 +93,9 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+ 	down_write(&conn_list_lock);
+ 	list_add(&conn->conns_list, &conn_list);
+ 	up_write(&conn_list_lock);
++
++	ksmbd_conn_set_kcov_handle(conn, kcov_common_handle());
++
+ 	return conn;
+ }
  
- /*
-  *  Global counters, updated atomically
-@@ -97,7 +97,7 @@ atomic_t total_buf_alloc_count;
- atomic_t total_small_buf_alloc_count;
- #endif/* STATS2 */
- struct list_head	cifs_tcp_ses_list;
--spinlock_t		cifs_tcp_ses_lock;
-+DEFINE_SPINLOCK(cifs_tcp_ses_lock);
- static const struct super_operations cifs_super_ops;
- unsigned int CIFSMaxBufSize = CIFS_MAX_MSGSIZE;
- module_param(CIFSMaxBufSize, uint, 0444);
-@@ -1863,8 +1863,6 @@ init_cifs(void)
- 	GlobalCurrentXid = 0;
- 	GlobalTotalActiveXid = 0;
- 	GlobalMaxActiveXid = 0;
--	spin_lock_init(&cifs_tcp_ses_lock);
--	spin_lock_init(&GlobalMid_Lock);
+@@ -322,6 +325,8 @@ int ksmbd_conn_handler_loop(void *p)
+ 	if (t->ops->prepare && t->ops->prepare(t))
+ 		goto out;
  
- 	cifs_lock_secret = get_random_u32();
++	kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
++
+ 	max_req = server_conf.max_inflight_req;
+ 	conn->last_active = jiffies;
+ 	set_freezable();
+@@ -412,7 +417,7 @@ int ksmbd_conn_handler_loop(void *p)
+ 			break;
+ 		}
+ 	}
+-
++	kcov_remote_stop();
+ out:
+ 	ksmbd_conn_set_releasing(conn);
+ 	/* Wait till all reference dropped to the Server object*/
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index dd3e0e3f7bf0..1071b3e68bc9 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -15,6 +15,7 @@
+ #include <linux/kthread.h>
+ #include <linux/nls.h>
+ #include <linux/unicode.h>
++#include <linux/kcov.h>
  
+ #include "smb_common.h"
+ #include "ksmbd_work.h"
+@@ -109,6 +110,9 @@ struct ksmbd_conn {
+ 	bool				binding;
+ 	atomic_t			refcnt;
+ 	bool				is_aapl;
++#ifdef CONFIG_KCOV
++	u64				kcov_handle;
++#endif
+ };
+ 
+ struct ksmbd_conn_ops {
+@@ -246,4 +250,22 @@ static inline void ksmbd_conn_set_releasing(struct ksmbd_conn *conn)
+ }
+ 
+ void ksmbd_all_conn_set_status(u64 sess_id, u32 status);
++
++static inline void ksmbd_conn_set_kcov_handle(struct ksmbd_conn *conn,
++				       const u64 kcov_handle)
++{
++#ifdef CONFIG_KCOV
++	conn->kcov_handle = kcov_common_handle();
++#endif
++}
++
++static inline u64 ksmbd_conn_get_kcov_handle(struct ksmbd_conn *conn)
++{
++#ifdef CONFIG_KCOV
++	return conn->kcov_handle;
++#else
++	return 0;
++#endif
++}
++
+ #endif /* __CONNECTION_H__ */
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 8c9c49c3a0a4..0757cd6ef4f7 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -264,6 +264,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+ 	struct ksmbd_work *work = container_of(wk, struct ksmbd_work, work);
+ 	struct ksmbd_conn *conn = work->conn;
+ 
++	kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
++
+ 	atomic64_inc(&conn->stats.request_served);
+ 
+ 	__handle_ksmbd_work(work, conn);
+@@ -271,6 +273,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+ 	ksmbd_conn_try_dequeue_request(work);
+ 	ksmbd_free_work_struct(work);
+ 	ksmbd_conn_r_count_dec(conn);
++
++	kcov_remote_stop();
+ }
+ 
+ /**
 -- 
 2.50.0
 
