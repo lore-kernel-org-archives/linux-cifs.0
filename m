@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824DB29CB4F
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 17:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3BA1A08BC
+	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 17:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754501869; cv=none; b=ZWNE5831NuFPwZIYUqibrnvwiFbPk/GRkZEIz2/UQc4rai3oT1Ibej1N3VgBBvPNTUVbapYKqd9oeeh6HCJHbUA8TL9CYOT09Wifo6vCtRpl+dVtenv6J7JkOrgrye34RH1R0kc9pk/jqutDua+BFZG3rTjAx/8z6M1Swo/v/R8=
+	t=1754501875; cv=none; b=SKCquzGRfiVD0KYz1mYryKeSoajWeUTwoBJCOQqdg78nCD7D+QEeNkuXcciFadI5t8V6u39rN2XO27z4xYHYp75rJvi8G3PjbBxVg1dcc7zEMzLnSKQiDrZFeGp91UeWV7PLU9l0IkAnA40kSK9CahEl5h2dyqZlc/YHo2xd7v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754501869; c=relaxed/simple;
-	bh=chVPECEGP2H1bEDH6GU/9mIbdE6LTeAxgCRGiStkrM4=;
+	s=arc-20240116; t=1754501875; c=relaxed/simple;
+	bh=lr07vdmNGZY79oiN8WP3SZdl4eASmmmbEkVopSIbJIc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iD5JKOUZKuMyIS4vEHfYr06vfPAuGigPmGonAW9iDBR85mrIBNCHiBedTx6XLfAvgX2KpkIo4FdMAU4sdAn9oapH929typpzKFUu5xPR31Jf09n8KvSttDiAZsd8sA5nMGI4Pa6qMfOVjcbNsf/RtjGh3s8xpHyqMAndeIRp6nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=mIuCFg+v; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=HO3w9sAwj1pPHFXf7jYTsEMpKUP4VhXSSUtyUpUoC3D6eFrahiBR05pulNUckLgG2EjvLYWRXxTkiHxvH7QVomHWPpR+DnXSmFv/3lvfNRuzUjZWi6NkLhg1wikBmqAOO6JdQ/BwaeePYCWG3AlXUCLr18b6jcpQgY8tqWKEtAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=XY6pJ3tD; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="mIuCFg+v"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="XY6pJ3tD"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=Q8m9AB0Pkg4OME4mAZ4u0V8E66Kn5RWyS7S240vCbLc=; b=mIuCFg+v/ACpdl3YqcxEh+U7YN
-	WbtOQydqsDdao6lqhg+82pJjk2Aj9ky2oSjC1gKJle9Z0Bc+9OcBooNRSSK4cPTQ10h7Km4OHXM2G
-	/2uOM7sZHv4EjGRfWW4icWeRBbQ/qBgXI6d3MLmcproSMLP4P+iFm1M+mvzkZCZy1xb6a3bwOd420
-	X0VKXYfmvpxaFUvbkLOqjkcf/R7UiWOl67vaMHTwBvKUifmYiJzuiuh3MFo0LoQAwwnckYctYaqSG
-	YKm0T2XTNo2UFUCh6h+kKM6jVYk9+nTCzvYxtXRuSkus5VTY0WXgULl2JfaqmAjgEdD1v68Bm0ezd
-	VsBM7zLbwQVBznjJ1WSPvGd4dZoHlcy/XLE/lAf4fw4GeCSWHHF6Ew7Rih1yQPMTm5w+l4Xdb/iba
-	musmOJTyQDKZUkTUnY3HoX6jBnfTtDH+RD1Z5WGRTgYCfJL7icR+/+6JpD34e/qgaYZuS6yPqsFq/
-	SY1VpLk0dfZci5WwJu83uJId;
+	bh=ajTGmmY0/GIe8VbaNEaHIfCski11ctNv2pkwy81Uirw=; b=XY6pJ3tDs0grPbADLmeatBjXSi
+	mBZGaeUqRqssJefKMIVO4Y3pUD4bChQ+fo1d1xMYWeblCf2PPfETuiodJOrot5OZFRuTxAH4s+q+A
+	eB30Jlk0j7McBJIKhq8S7+WeKsuQw68gTXNjKCqR+hv3vFDosrhydCFhAZLS+YEdzLiF2t9PbBM7+
+	TFLb+0fulcvaZUFlyOcuzm3iiO8Gxh8itRO8zYMnhOAy52uxP1Bqi+qcSKAbmKfMPEhz8j4zXXwqI
+	2UBPjwHYhKqZEs7Q5Ta43TzNbT+6nbf+oacglVb43RqfQLl+/wl5y6nqS9CZZNpMDXBZJOwCw5J2t
+	zukyZBr4KsmQK5TsZk+PLDf8m/ajQNbkkPmY8V7EnfpNOVo+dq7K2lqolZ9IVN/uPdt/S3jDoEu7H
+	c4N30oMEbSv3IXuIJfKk8g2OCZ9fcCz5wp8jiuBMyKPamuvpU8QEsx1KL3raN8xnvbWWyIzxtBpbV
+	AqSKyNWY5hbhFMJkVQ6Q/gn2;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uji57-001Olx-28;
-	Wed, 06 Aug 2025 17:37:41 +0000
+	id 1uji5E-001On1-1T;
+	Wed, 06 Aug 2025 17:37:48 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -38,9 +38,9 @@ Cc: metze@samba.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>
-Subject: [PATCH 12/18] smb: server: make use of smbdirect_socket->recv_io.expected
-Date: Wed,  6 Aug 2025 19:35:58 +0200
-Message-ID: <6c13eb7f2e587dc44b3eb4353eade6433405b9b9.1754501401.git.metze@samba.org>
+Subject: [PATCH 13/18] smb: server: make use of struct smbdirect_recv_io
+Date: Wed,  6 Aug 2025 19:35:59 +0200
+Message-ID: <83b1bc51d813b1235e893028ab253c10662db40d.1754501401.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1754501401.git.metze@samba.org>
 References: <cover.1754501401.git.metze@samba.org>
@@ -52,7 +52,8 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The expected incoming message type can be per connection.
+This will allow us to move helper functions into common code soon
+as the client already uses smbdirect_recv_io.
 
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
@@ -61,148 +62,220 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/server/transport_rdma.c | 44 +++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+ fs/smb/server/transport_rdma.c | 61 +++++++++++++++-------------------
+ 1 file changed, 26 insertions(+), 35 deletions(-)
 
 diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index d81f1694a9af..14d338a380a3 100644
+index 14d338a380a3..26d70396b0c1 100644
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
-@@ -141,10 +141,6 @@ struct smb_direct_transport {
- #define KSMBD_TRANS(t) ((struct ksmbd_transport *)&((t)->transport))
- #define SMBD_TRANS(t)	((struct smb_direct_transport *)container_of(t, \
- 				struct smb_direct_transport, transport))
--enum {
--	SMB_DIRECT_MSG_NEGOTIATE_REQ = 0,
--	SMB_DIRECT_MSG_DATA_TRANSFER
+@@ -161,15 +161,6 @@ struct smb_direct_sendmsg {
+ 	u8			packet[];
+ };
+ 
+-struct smb_direct_recvmsg {
+-	struct smb_direct_transport	*transport;
+-	struct list_head	list;
+-	struct ib_sge		sge;
+-	struct ib_cqe		cqe;
+-	bool			first_segment;
+-	u8			packet[];
 -};
- 
- static const struct ksmbd_transport_ops ksmbd_smb_direct_transport_ops;
- 
-@@ -168,7 +164,6 @@ struct smb_direct_sendmsg {
- struct smb_direct_recvmsg {
- 	struct smb_direct_transport	*transport;
- 	struct list_head	list;
--	int			type;
- 	struct ib_sge		sge;
+-
+ struct smb_direct_rdma_rw_msg {
+ 	struct smb_direct_transport	*t;
  	struct ib_cqe		cqe;
- 	bool			first_segment;
-@@ -465,8 +460,10 @@ static void smb_direct_free_sendmsg(struct smb_direct_transport *t,
- 
- static int smb_direct_check_recvmsg(struct smb_direct_recvmsg *recvmsg)
- {
--	switch (recvmsg->type) {
--	case SMB_DIRECT_MSG_DATA_TRANSFER: {
-+	struct smbdirect_socket *sc = &recvmsg->transport->socket;
-+
-+	switch (sc->recv_io.expected) {
-+	case SMBDIRECT_EXPECT_DATA_TRANSFER: {
- 		struct smbdirect_data_transfer *req =
- 			(struct smbdirect_data_transfer *)recvmsg->packet;
- 		struct smb2_hdr *hdr = (struct smb2_hdr *)(recvmsg->packet
-@@ -477,9 +474,9 @@ static int smb_direct_check_recvmsg(struct smb_direct_recvmsg *recvmsg)
- 			    le16_to_cpu(req->credits_requested),
- 			    req->data_length, req->remaining_data_length,
- 			    hdr->ProtocolId, hdr->Command);
--		break;
-+		return 0;
- 	}
--	case SMB_DIRECT_MSG_NEGOTIATE_REQ: {
-+	case SMBDIRECT_EXPECT_NEGOTIATE_REQ: {
- 		struct smbdirect_negotiate_req *req =
- 			(struct smbdirect_negotiate_req *)recvmsg->packet;
- 		ksmbd_debug(RDMA,
-@@ -499,12 +496,15 @@ static int smb_direct_check_recvmsg(struct smb_direct_recvmsg *recvmsg)
- 					128 * 1024)
- 			return -ECONNABORTED;
- 
--		break;
-+		return 0;
- 	}
--	default:
--		return -EINVAL;
-+	case SMBDIRECT_EXPECT_NEGOTIATE_REP:
-+		/* client only */
-+		break;
- 	}
--	return 0;
-+
-+	/* This is an internal error */
-+	return -EINVAL;
+@@ -212,7 +203,7 @@ smb_trans_direct_transfort(struct ksmbd_transport *t)
  }
+ 
+ static inline void
+-*smb_direct_recvmsg_payload(struct smb_direct_recvmsg *recvmsg)
++*smbdirect_recv_io_payload(struct smbdirect_recv_io *recvmsg)
+ {
+ 	return (void *)recvmsg->packet;
+ }
+@@ -225,14 +216,14 @@ static inline bool is_receive_credit_post_required(int receive_credits,
+ }
+ 
+ static struct
+-smb_direct_recvmsg *get_free_recvmsg(struct smb_direct_transport *t)
++smbdirect_recv_io *get_free_recvmsg(struct smb_direct_transport *t)
+ {
+-	struct smb_direct_recvmsg *recvmsg = NULL;
++	struct smbdirect_recv_io *recvmsg = NULL;
+ 
+ 	spin_lock(&t->recvmsg_queue_lock);
+ 	if (!list_empty(&t->recvmsg_queue)) {
+ 		recvmsg = list_first_entry(&t->recvmsg_queue,
+-					   struct smb_direct_recvmsg,
++					   struct smbdirect_recv_io,
+ 					   list);
+ 		list_del(&recvmsg->list);
+ 	}
+@@ -241,7 +232,7 @@ smb_direct_recvmsg *get_free_recvmsg(struct smb_direct_transport *t)
+ }
+ 
+ static void put_recvmsg(struct smb_direct_transport *t,
+-			struct smb_direct_recvmsg *recvmsg)
++			struct smbdirect_recv_io *recvmsg)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
+ 
+@@ -259,7 +250,7 @@ static void put_recvmsg(struct smb_direct_transport *t,
+ }
+ 
+ static void enqueue_reassembly(struct smb_direct_transport *t,
+-			       struct smb_direct_recvmsg *recvmsg,
++			       struct smbdirect_recv_io *recvmsg,
+ 			       int data_length)
+ {
+ 	spin_lock(&t->reassembly_queue_lock);
+@@ -276,11 +267,11 @@ static void enqueue_reassembly(struct smb_direct_transport *t,
+ 	spin_unlock(&t->reassembly_queue_lock);
+ }
+ 
+-static struct smb_direct_recvmsg *get_first_reassembly(struct smb_direct_transport *t)
++static struct smbdirect_recv_io *get_first_reassembly(struct smb_direct_transport *t)
+ {
+ 	if (!list_empty(&t->reassembly_queue))
+ 		return list_first_entry(&t->reassembly_queue,
+-				struct smb_direct_recvmsg, list);
++				struct smbdirect_recv_io, list);
+ 	else
+ 		return NULL;
+ }
+@@ -380,7 +371,7 @@ static void smb_direct_free_transport(struct ksmbd_transport *kt)
+ static void free_transport(struct smb_direct_transport *t)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 
+ 	wake_up_interruptible(&t->wait_send_credits);
+ 
+@@ -458,9 +449,9 @@ static void smb_direct_free_sendmsg(struct smb_direct_transport *t,
+ 	mempool_free(msg, t->sendmsg_mempool);
+ }
+ 
+-static int smb_direct_check_recvmsg(struct smb_direct_recvmsg *recvmsg)
++static int smb_direct_check_recvmsg(struct smbdirect_recv_io *recvmsg)
+ {
+-	struct smbdirect_socket *sc = &recvmsg->transport->socket;
++	struct smbdirect_socket *sc = recvmsg->socket;
+ 
+ 	switch (sc->recv_io.expected) {
+ 	case SMBDIRECT_EXPECT_DATA_TRANSFER: {
+@@ -509,13 +500,13 @@ static int smb_direct_check_recvmsg(struct smb_direct_recvmsg *recvmsg)
  
  static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-@@ -535,8 +535,8 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	ib_dma_sync_single_for_cpu(wc->qp->device, recvmsg->sge.addr,
- 				   recvmsg->sge.length, DMA_FROM_DEVICE);
- 
--	switch (recvmsg->type) {
--	case SMB_DIRECT_MSG_NEGOTIATE_REQ:
-+	switch (sc->recv_io.expected) {
-+	case SMBDIRECT_EXPECT_NEGOTIATE_REQ:
- 		if (wc->byte_len < sizeof(struct smbdirect_negotiate_req)) {
- 			put_recvmsg(t, recvmsg);
- 			smb_direct_disconnect_rdma_connection(t);
-@@ -548,7 +548,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		enqueue_reassembly(t, recvmsg, 0);
- 		wake_up_interruptible(&t->wait_status);
- 		return;
--	case SMB_DIRECT_MSG_DATA_TRANSFER: {
-+	case SMBDIRECT_EXPECT_DATA_TRANSFER: {
- 		struct smbdirect_data_transfer *data_transfer =
- 			(struct smbdirect_data_transfer *)recvmsg->packet;
- 		unsigned int data_length;
-@@ -613,12 +613,15 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 
- 		return;
- 	}
-+	case SMBDIRECT_EXPECT_NEGOTIATE_REP:
-+		/* client only */
-+		break;
- 	}
- 
- 	/*
- 	 * This is an internal error!
- 	 */
--	WARN_ON_ONCE(recvmsg->type != SMB_DIRECT_MSG_DATA_TRANSFER);
-+	WARN_ON_ONCE(sc->recv_io.expected != SMBDIRECT_EXPECT_DATA_TRANSFER);
- 	put_recvmsg(t, recvmsg);
- 	smb_direct_disconnect_rdma_connection(t);
- }
-@@ -807,7 +810,6 @@ static void smb_direct_post_recv_credits(struct work_struct *work)
- 			if (!recvmsg)
- 				break;
- 
--			recvmsg->type = SMB_DIRECT_MSG_DATA_TRANSFER;
- 			recvmsg->first_segment = false;
- 
- 			ret = smb_direct_post_recv(t, recvmsg);
-@@ -1606,6 +1608,8 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
- 		resp->max_receive_size = cpu_to_le32(sp->max_recv_size);
- 		resp->max_fragmented_size =
- 				cpu_to_le32(sp->max_fragmented_recv_size);
-+
-+		sc->recv_io.expected = SMBDIRECT_EXPECT_DATA_TRANSFER;
- 	}
- 
- 	sendmsg->sge[0].addr = ib_dma_map_single(sc->ib.dev,
-@@ -1671,13 +1675,15 @@ static int smb_direct_accept_client(struct smb_direct_transport *t)
- 
- static int smb_direct_prepare_negotiation(struct smb_direct_transport *t)
  {
-+	struct smbdirect_socket *sc = &t->socket;
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 	struct smb_direct_transport *t;
+ 	struct smbdirect_socket *sc;
+ 
+-	recvmsg = container_of(wc->wr_cqe, struct smb_direct_recvmsg, cqe);
+-	t = recvmsg->transport;
+-	sc = &t->socket;
++	recvmsg = container_of(wc->wr_cqe, struct smbdirect_recv_io, cqe);
++	sc = recvmsg->socket;
++	t = container_of(sc, struct smb_direct_transport, socket);
+ 
+ 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
+ 		put_recvmsg(t, recvmsg);
+@@ -627,7 +618,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ }
+ 
+ static int smb_direct_post_recv(struct smb_direct_transport *t,
+-				struct smb_direct_recvmsg *recvmsg)
++				struct smbdirect_recv_io *recvmsg)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+@@ -666,7 +657,7 @@ static int smb_direct_post_recv(struct smb_direct_transport *t,
+ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ 			   unsigned int size, int unused)
+ {
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 	struct smbdirect_data_transfer *data_transfer;
+ 	int to_copy, to_read, data_read, offset;
+ 	u32 data_length, remaining_data_length, data_offset;
+@@ -703,7 +694,7 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ 		offset = st->first_entry_offset;
+ 		while (data_read < size) {
+ 			recvmsg = get_first_reassembly(st);
+-			data_transfer = smb_direct_recvmsg_payload(recvmsg);
++			data_transfer = smbdirect_recv_io_payload(recvmsg);
+ 			data_length = le32_to_cpu(data_transfer->data_length);
+ 			remaining_data_length =
+ 				le32_to_cpu(data_transfer->remaining_data_length);
+@@ -796,7 +787,7 @@ static void smb_direct_post_recv_credits(struct work_struct *work)
+ {
+ 	struct smb_direct_transport *t = container_of(work,
+ 		struct smb_direct_transport, post_recv_credits_work.work);
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 	int receive_credits, credits = 0;
  	int ret;
- 	struct smb_direct_recvmsg *recvmsg;
  
-+	sc->recv_io.expected = SMBDIRECT_EXPECT_NEGOTIATE_REQ;
-+
- 	recvmsg = get_free_recvmsg(t);
- 	if (!recvmsg)
- 		return -ENOMEM;
--	recvmsg->type = SMB_DIRECT_MSG_NEGOTIATE_REQ;
+@@ -1677,7 +1668,7 @@ static int smb_direct_prepare_negotiation(struct smb_direct_transport *t)
+ {
+ 	struct smbdirect_socket *sc = &t->socket;
+ 	int ret;
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
  
- 	ret = smb_direct_post_recv(t, recvmsg);
- 	if (ret) {
+ 	sc->recv_io.expected = SMBDIRECT_EXPECT_NEGOTIATE_REQ;
+ 
+@@ -1806,7 +1797,7 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 
+ static void smb_direct_destroy_pools(struct smb_direct_transport *t)
+ {
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 
+ 	while ((recvmsg = get_free_recvmsg(t)))
+ 		mempool_free(recvmsg, t->recvmsg_mempool);
+@@ -1830,7 +1821,7 @@ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	char name[80];
+ 	int i;
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 
+ 	snprintf(name, sizeof(name), "smb_direct_rqst_pool_%p", t);
+ 	t->sendmsg_cache = kmem_cache_create(name,
+@@ -1846,9 +1837,9 @@ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ 	if (!t->sendmsg_mempool)
+ 		goto err;
+ 
+-	snprintf(name, sizeof(name), "smb_direct_resp_%p", t);
++	snprintf(name, sizeof(name), "smbdirect_recv_io_pool_%p", t);
+ 	t->recvmsg_cache = kmem_cache_create(name,
+-					     sizeof(struct smb_direct_recvmsg) +
++					     sizeof(struct smbdirect_recv_io) +
+ 					     sp->max_recv_size,
+ 					     0, SLAB_HWCACHE_ALIGN, NULL);
+ 	if (!t->recvmsg_cache)
+@@ -1866,7 +1857,7 @@ static int smb_direct_create_pools(struct smb_direct_transport *t)
+ 		recvmsg = mempool_alloc(t->recvmsg_mempool, KSMBD_DEFAULT_GFP);
+ 		if (!recvmsg)
+ 			goto err;
+-		recvmsg->transport = t;
++		recvmsg->socket = sc;
+ 		recvmsg->sge.length = 0;
+ 		list_add(&recvmsg->list, &t->recvmsg_queue);
+ 	}
+@@ -1971,7 +1962,7 @@ static int smb_direct_prepare(struct ksmbd_transport *t)
+ 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
+ 	struct smbdirect_socket *sc = &st->socket;
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct smb_direct_recvmsg *recvmsg;
++	struct smbdirect_recv_io *recvmsg;
+ 	struct smbdirect_negotiate_req *req;
+ 	int ret;
+ 
 -- 
 2.43.0
 
