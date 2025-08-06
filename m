@@ -1,106 +1,118 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4BC28BA92
-	for <linux-cifs@vger.kernel.org>; Wed,  6 Aug 2025 11:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0ACB18DB01;
+	Wed,  6 Aug 2025 12:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754480721; cv=none; b=p8Eqzf6L7GLWFsjdZl1z6h9Pjd4Y0fq27zsuaZovtTZJ5nadL/ABMKUUSCYxSCN4LBXCea/urtQUcUW85n2iATfaSB+Z8Jo50N53Rb3oiYwHzgYX1A8YO0e9hK/joY4wJvE6MRAhaqga9mfxVNoumMFAXuuFb9elphbdoTS/kG4=
+	t=1754482496; cv=none; b=BJMxHJZ/EpD90qff+NMyrtK06+hb2/J29wF/Gy/Lzh9w9Z+yPFaBS4qXkHL9OGSD2rnu1P2zCtyz/61iUINox1swaWE7Mj1jf29krSiWt2yvbT/8do2HmC9tyip17gGEZlsWYS97THqSAp0Gf69rn6nIRo0hC/q1sN9UWtDPWqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754480721; c=relaxed/simple;
-	bh=F5eRXrtsxffdegpuQ0f4xPChPgfV/JPNT5j2y0VgMrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RAX2ELpwKnl7djAGiGi9oPmvvweHFOnmssFRRyNLtapDoevXgArJ6CvDWViYBBQhfK6P6Hybd6fMM6rvdYBO9uBiRPqhQzT3woQX5ux25Bpq51UM7IUClBZp92adhYqlvuFdVqiInVVW+qDiomMPhy7vpEsHSqFz6sdCTg+FRZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mUsa2BFn; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1754482496; c=relaxed/simple;
+	bh=13aXrdq9n5uV9GofeOg/n4r/PFcpRJlUXucuVagEBKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gLd0yJAVflFdlZorR6+/hsmE1vLcxqK9PmzBK63C0tdH0jvYfiE2NGlpaFpFxI2EZsWyI/W7ZnKhIMIvpO4Gws4pIpGBtF9FoaAgKYqMLky7af0IJuF+VWPkAQevTbkmrffJChneKYe4ShJQz4gFSljUEFIhgtXa4C0JE/GraBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=HSokbQ+u; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mUsa2BFn"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3b78b2c6ecfso3814003f8f.0
-        for <linux-cifs@vger.kernel.org>; Wed, 06 Aug 2025 04:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754480717; x=1755085517; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gzJczgeb2E2EatXdWgiOPTAxDTD2f2zBu8DeU1yQO2Q=;
-        b=mUsa2BFnbNPGG+KtAsxrAg4KKJUIQlbfDjU1ZVbwgHYBeSj445hqorARUFAaC6vuWd
-         f5k3SYTBxoBT6VMgKWJTOJixcf3TORX5ogXM978FTjlVRILTHjbuy8nDUxdKGoInt7CB
-         Swm+G4uiqyxJEx4OZggG1W14sq5DL9ciR5tpclVBY2vC1DEFrmrXZVLq6njvs8DhOwQg
-         zGM/RzPs8UT0SYu1q5K6pg52Jna+wF5hrWAicHiAeX1Bqwe3RI+lYyWSPlV+/430nkuF
-         w2UOtRNPvXYFMO1p5bGgWW12TEGO6kEk9wXqT+WHUkvkhAK92H5f4HpxLF8VsP1wQb8d
-         xzJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754480717; x=1755085517;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gzJczgeb2E2EatXdWgiOPTAxDTD2f2zBu8DeU1yQO2Q=;
-        b=Z9R3NbH5kkkxtrQX6kyxvsD57auXYfrF6x7E1+2bdPe0FYWHs6grnD7B3G+kdypaxN
-         OgpTfuoMsmhFBadLhlG8sKS2DGaS2I83sh4P6fT6+V73zcMCEUQJINYrjc+NnL0dWMKS
-         ZbOsebSbjOoInY0D3JfirRHxY37P3ZRvA/RrOfAt9FkPwox525KkmGFwYCr7hyHR5kJV
-         fghALa93gACLrF8kDZ2cnOOefsLdew2mxjJQOIMnKVodXF+Kyew56t+l0hhthhKhfY0f
-         m5FX24EADwRjKjmq9zH8W5Hk+iVTa0CN+PCHd/iQEYLVVzoUU9B6K1BRD5xHc/w2MN5o
-         YEww==
-X-Forwarded-Encrypted: i=1; AJvYcCU7BQzqcZYJE3kY+ab7xU9Y3LAszIG6UqShzDG9Q9J39FKABHvwCqnUn/sHuiGKNtCGqFHO+d8IZe1p@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6DOwMTt8R2G8KF6H8od2QladCFOeo8+FNlnSgwifQp+8BxLe7
-	zQuPBmIvEXln11KsvtKI+j5LYm/ce49uduRv1trVe/fWPhsL5TPmTn3j9rB1X11HJhs=
-X-Gm-Gg: ASbGncuH3a5OeZmj+LsICXnpsC42JG1502RWu6sNUoNrOnrESbtkZ3nl2tdcBga7/GL
-	zOdlMEgIfYCROeVoIwlnNmkWN/vUcX61iPggOCPDCOmYWBPQiXXUY+DYgcxJDuq8RPJQ1mcwME1
-	wh3p8lF1Apj42IH7Z26N7LLBY6+sKzMAWeoUzfaCMsQ6Vj6KkuIlKieKdZFVtEHqVtnwgUPlZTw
-	okUfsOEoDCzDk3CDWP39e0pSub5qVBBZ3R2cveNLvGrMwm56LsSg/Kp9KE9Ea5GvE9Pz5Vx55Ej
-	5n6Pyof5QCOYOhm2xehfemnFN0Jf/AoQXxrl00R0ykSJEqYVBtZWlF9mgNWbrEzqMpQloO28/7B
-	R8NhZErqCVqG2n/C6MWW/rQu8E+U=
-X-Google-Smtp-Source: AGHT+IErH+bIbW86Py9obhBfpJ7Ic4nUmflEhhhvraU68gExR0HV14Ll3Dg9SWn5Dg7piKiH/oo48g==
-X-Received: by 2002:a05:6000:2dca:b0:3b7:973b:39bc with SMTP id ffacd0b85a97d-3b8f41bea48mr2156278f8f.54.1754480716705;
-        Wed, 06 Aug 2025 04:45:16 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-459c58ed07fsm142317845e9.22.2025.08.06.04.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Aug 2025 04:45:16 -0700 (PDT)
-Date: Wed, 6 Aug 2025 14:45:13 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH next] smb: client: Fix use after free in send_done()
-Message-ID: <aJNASZzOWtg8aljM@stanley.mountain>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="HSokbQ+u"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=13aXrdq9n5uV9GofeOg/n4r/PFcpRJlUXucuVagEBKE=; b=HSokbQ+u84qyGlDHP1IrxrXJv2
+	5G60cRettZaiFEXkLd3XWkgyOxIyOgWcBP8uZ6ef101gwTM5Rzva8sgViTtAkTeFKg8DWkdE29PH7
+	O2P5DNQul5UOB+y5SwmZbNbJjUCApQzJy/1OWeVdZT3lU0vQYuwhy9vpRBixjNENRnv3BuyzcAFgT
+	QbJOu2WI3LifVfsg+ID1GllZJoS0YWfcZJf9QZn85nW19/jKIilYNM3noJD7yDx35SgE2AySJWnsR
+	KeItQhF/1i6aMYwOO0cM8/b17Yub+sXG+UQn0wlm85xZDuWNJUy2kcBygCXmy7wxVUoRQQrSf+MGB
+	T+5fP0pK+GrcB2VBAUAClAiXFwOok4+WBLLRuxG4J4vYsvzaC2VDINrkM4ADjnPqAXR15ZPL2Fy5s
+	SFzvgHX0gKMDEK0QUoHl4x2cl9ea/IFKO96zGH21R2N6t9d7GOKNZGSv+wBrk89QiCN0PKrLBcDtT
+	e3GbvVal5EeX3D4AWiQ/zeZL;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1ujd2h-001L8C-03;
+	Wed, 06 Aug 2025 12:14:51 +0000
+Message-ID: <d12e1d6a-d9e8-4bb3-abe4-9bcef1cb8f77@samba.org>
+Date: Wed, 6 Aug 2025 14:14:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ksmbd: add kcov remote coverage support via ksmbd_conn
+To: Yunseong Kim <ysk@kzalloc.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
+ <tom@talpey.com>, linux-cifs@vger.kernel.org, syzkaller@googlegroups.com,
+ linux-kernel@vger.kernel.org, notselwyn@pwning.tech
+References: <20250805155627.1605911-2-ysk@kzalloc.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20250805155627.1605911-2-ysk@kzalloc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-The mempool_free() function frees "request".  Don't free the request
-until after smbd_disconnect_rdma_connection() to avoid a use after free
-bug.
-
-Fixes: 5e65668c75c0 ("smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- fs/smb/client/smbdirect.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 58321e483a1a..162f8d1c548a 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -286,8 +286,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
- 		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
- 			wc->status, wc->opcode);
--		mempool_free(request, request->info->request_mempool);
- 		smbd_disconnect_rdma_connection(request->info);
-+		mempool_free(request, request->info->request_mempool);
- 		return;
- 	}
- 
--- 
-2.47.2
-
+SGkgWXVuc2VvbmcsDQoNCkFtIDA1LjA4LjI1IHVtIDE3OjU2IHNjaHJpZWIgWXVuc2Vvbmcg
+S2ltOg0KPiBLU01CRCBwcm9jZXNzZXMgU01CIHJlcXVlc3RzIG9uIHBlci1jb25uZWN0aW9u
+IHRocmVhZHMgYW5kIHRoZW4gaGFuZHMNCj4gb2ZmIHdvcmsgaXRlbXMgdG8gYSBrd29ya2Vy
+IHBvb2wgZm9yIGFjdHVhbCBjb21tYW5kIHByb2Nlc3NpbmcgYnkNCj4gaGFuZGxlX2tzbWJk
+X3dvcmsoKS4gQmVjYXVzZSBlYWNoIGNvbm5lY3Rpb24gbWF5IGVucXVldWUgbXVsdGlwbGUN
+Cj4gc3RydWN0IGtzbWJkX3dvcmsgaW5zdGFuY2VzLCBhdHRhY2hpbmcgdGhlIGtjb3YgaGFu
+ZGxlIHRvIHRoZSB3b3JrDQo+IGl0c2VsZiBpcyBub3Qgc3VmZmljaWVudDogd2UgbmVlZCBh
+IHN0YWJsZSwgcGVyLWNvbm5lY3Rpb24gaGFuZGxlLg0KPiANCj4gSW50cm9kdWNlIGEga2Nv
+dl9oYW5kbGUgZmllbGQgb24gc3RydWN0IGtzbWJkX2Nvbm4gKHVuZGVyIENPTkZJR19LQ09W
+KQ0KPiBhbmQgaW5pdGlhbGl6ZSBpdCB3aGVuIHRoZSBjb25uZWN0aW9uIGlzIHNldCB1cC4g
+SW4gYm90aA0KPiBrc21iZF9jb25uX2hhbmRsZXJfbG9vcCgpIHdoaWNoIG9ubHkgcmVjZWl2
+ZXMgYSBzdHJ1Y3Qga3NtYmRfY29ubioNCj4gYW5kIGhhbmRsZV9rc21iZF93b3JrKCkgd2hp
+Y2ggcmVjZWl2ZXMgYSBzdHJ1Y3Qga3NtYmRfd29yayosIHN0YXJ0DQo+IGtjb3ZfcmVtb3Rl
+IHdpdGggdGhlIHBlci1jb25uZWN0aW9uIGhhbmRsZSBiZWZvcmUgcHJvY2Vzc2luZyBhbmQg
+c3RvcA0KPiBpdCBhZnRlcndhcmQuIFRoaXMgZW5zdXJlcyBjb3ZlcmFnZSBjb2xsZWN0aW9u
+IHJlbWFpbnMgYWN0aXZlIGFjcm9zcw0KPiB0aGUgZW50aXJlIGFzeW5jaHJvbm91cyBwYXRo
+IG9mIGVhY2ggU01CIHJlcXVlc3QuDQo+IA0KPiBUaGUga2NvdiBjb250ZXh0IHRpZWQgdG8g
+dGhlIGNvbm5lY3Rpb24gaXRzZWxmLCBjb3JyZWN0bHkgc3VwcG9ydGluZw0KPiBtdWx0aXBs
+ZSBvdXRzdGFuZGluZyB3b3JrIGl0ZW1zIHBlciBjb25uZWN0aW9uLg0KPiANCj4gVGhlIHJl
+bGF0ZWQgd29yayBmb3Igc3l6a2FsbGVyIHN1cHBvcnQgaXMgY3VycmVudGx5IGJlaW5nIGRl
+dmVsb3BlZA0KPiBpbiB0aGUgZm9sbG93aW5nIEdpdEh1YiBQUjoNCj4gTGluazogaHR0cHM6
+Ly9naXRodWIuY29tL2dvb2dsZS9zeXprYWxsZXIvcHVsbC81NTI0DQo+IA0KPiBCYXNlZCBv
+biBlYXJsaWVyIHdvcmsgYnkgTGF1Lg0KPiBMaW5rOiBodHRwczovL3B3bmluZy50ZWNoL2tz
+bWJkLXN5emthbGxlci8NCj4gDQo+IENjOiBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZw0K
+PiBDYzogbm90c2Vsd3luQHB3bmluZy50ZWNoDQo+IFNpZ25lZC1vZmYtYnk6IFl1bnNlb25n
+IEtpbSA8eXNrQGt6YWxsb2MuY29tPg0KPiAtLS0NCj4gICBmcy9zbWIvc2VydmVyL2Nvbm5l
+Y3Rpb24uYyB8ICA0ICsrKy0NCj4gICBmcy9zbWIvc2VydmVyL2Nvbm5lY3Rpb24uaCB8IDE0
+ICsrKysrKysrKysrKysrDQo+ICAgZnMvc21iL3NlcnZlci9zZXJ2ZXIuYyAgICAgfCAgNCAr
+KysrDQo+ICAgMyBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9u
+KC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZnMvc21iL3NlcnZlci9jb25uZWN0aW9uLmMgYi9m
+cy9zbWIvc2VydmVyL2Nvbm5lY3Rpb24uYw0KPiBpbmRleCAzZjA0YTI5NzdiYTguLjZjZTIw
+YWVlOGNjMSAxMDA2NDQNCj4gLS0tIGEvZnMvc21iL3NlcnZlci9jb25uZWN0aW9uLmMNCj4g
+KysrIGIvZnMvc21iL3NlcnZlci9jb25uZWN0aW9uLmMNCj4gQEAgLTMyMiw2ICszMjIsOCBA
+QCBpbnQga3NtYmRfY29ubl9oYW5kbGVyX2xvb3Aodm9pZCAqcCkNCj4gICAJaWYgKHQtPm9w
+cy0+cHJlcGFyZSAmJiB0LT5vcHMtPnByZXBhcmUodCkpDQo+ICAgCQlnb3RvIG91dDsNCj4g
+ICANCj4gKwlrY292X3JlbW90ZV9zdGFydF9jb21tb24oa3NtYmRfY29ubl9nZXRfa2Nvdl9o
+YW5kbGUoY29ubikpOw0KPiArDQo+ICAgCW1heF9yZXEgPSBzZXJ2ZXJfY29uZi5tYXhfaW5m
+bGlnaHRfcmVxOw0KPiAgIAljb25uLT5sYXN0X2FjdGl2ZSA9IGppZmZpZXM7DQo+ICAgCXNl
+dF9mcmVlemFibGUoKTsNCj4gQEAgLTQxMiw3ICs0MTQsNyBAQCBpbnQga3NtYmRfY29ubl9o
+YW5kbGVyX2xvb3Aodm9pZCAqcCkNCj4gICAJCQlicmVhazsNCj4gICAJCX0NCj4gICAJfQ0K
+PiAtDQo+ICsJa2Nvdl9yZW1vdGVfc3RvcCgpOw0KPiAgIG91dDoNCj4gICAJa3NtYmRfY29u
+bl9zZXRfcmVsZWFzaW5nKGNvbm4pOw0KPiAgIAkvKiBXYWl0IHRpbGwgYWxsIHJlZmVyZW5j
+ZSBkcm9wcGVkIHRvIHRoZSBTZXJ2ZXIgb2JqZWN0Ki8NCj4gZGlmZiAtLWdpdCBhL2ZzL3Nt
+Yi9zZXJ2ZXIvY29ubmVjdGlvbi5oIGIvZnMvc21iL3NlcnZlci9jb25uZWN0aW9uLmgNCj4g
+aW5kZXggZGQzZTBlM2Y3YmYwLi4wN2NkMGQyN2FjNzcgMTAwNjQ0DQo+IC0tLSBhL2ZzL3Nt
+Yi9zZXJ2ZXIvY29ubmVjdGlvbi5oDQo+ICsrKyBiL2ZzL3NtYi9zZXJ2ZXIvY29ubmVjdGlv
+bi5oDQo+IEBAIC0xNSw2ICsxNSw3IEBADQo+ICAgI2luY2x1ZGUgPGxpbnV4L2t0aHJlYWQu
+aD4NCj4gICAjaW5jbHVkZSA8bGludXgvbmxzLmg+DQo+ICAgI2luY2x1ZGUgPGxpbnV4L3Vu
+aWNvZGUuaD4NCj4gKyNpbmNsdWRlIDxsaW51eC9rY292Lmg+DQo+ICAgDQo+ICAgI2luY2x1
+ZGUgInNtYl9jb21tb24uaCINCj4gICAjaW5jbHVkZSAia3NtYmRfd29yay5oIg0KPiBAQCAt
+MTA5LDYgKzExMCw5IEBAIHN0cnVjdCBrc21iZF9jb25uIHsNCj4gICAJYm9vbAkJCQliaW5k
+aW5nOw0KPiAgIAlhdG9taWNfdAkJCXJlZmNudDsNCj4gICAJYm9vbAkJCQlpc19hYXBsOw0K
+PiArI2lmZGVmIENPTkZJR19LQ09WDQo+ICsJdTY0CQkJCWtjb3ZfaGFuZGxlOw0KPiArI2Vu
+ZGlmDQo+ICAgfTsNCj4gICANCj4gICBzdHJ1Y3Qga3NtYmRfY29ubl9vcHMgew0KPiBAQCAt
+MjQ2LDQgKzI1MCwxNCBAQCBzdGF0aWMgaW5saW5lIHZvaWQga3NtYmRfY29ubl9zZXRfcmVs
+ZWFzaW5nKHN0cnVjdCBrc21iZF9jb25uICpjb25uKQ0KPiAgIH0NCj4gICANCj4gICB2b2lk
+IGtzbWJkX2FsbF9jb25uX3NldF9zdGF0dXModTY0IHNlc3NfaWQsIHUzMiBzdGF0dXMpOw0K
+PiArDQo+ICtzdGF0aWMgaW5saW5lIHU2NCBrc21iZF9jb25uX2dldF9rY292X2hhbmRsZShz
+dHJ1Y3Qga3NtYmRfY29ubiAqY29ubikNCj4gK3sNCj4gKyNpZmRlZiBDT05GSUdfS0NPVg0K
+PiArCXJldHVybiBjb25uLT5rY292X2hhbmRsZTsNCj4gKyNlbHNlDQo+ICsJcmV0dXJuIDA7
+DQo+ICsjZW5kaWYNCj4gK30NCg0KDQpjb25uLT5rY292X2hhbmRsZSBpcyBhIG5ldyBlbGVt
+ZW50IGluIGtzbWJkX2Nvbm4NCmFuZCBJIGNhbid0IGZpbmQgdGhlIHBsYWNlIGluIHRoaXMg
+cGF0Y2ggd2hlcmUgaXQgaXMgaW5pdGlhbGl6ZWQuLi4NCg0KbWV0emUNCg0KDQo=
