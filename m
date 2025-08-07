@@ -1,79 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE474223DF9
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Aug 2025 10:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A7C262FD1;
+	Thu,  7 Aug 2025 14:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754561670; cv=none; b=fY9V5PqrNyMq0F4ofwY5+8BP3JWxHHsCNg8S/+VJIVrKZliwZMMimCpHUskS9bxgL19nwIeqDktsIppljcdI1skbXaznO95iJWW3waS0v9k/dk5DFojDczo9lZjcwcDkj1Q4IbW9UDbe85G6D80DUX3J0t6DRv/MSQtHRagissM=
+	t=1754576868; cv=none; b=eq3vFKVl5jgwtPxHYFLzM6rztC8iEDSriX/E9ziHIFibF4G14s96H3i21fuMTUA3aq3peHiBXfz1vhVcBCfBvA4/9Fxkc5H9NsxRly1z2y6F6xmDmCuhabCrnC/JqJu3e2elmM5z7RGotEga1+QBMTCc1pgw0LseIMGf6xPACTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754561670; c=relaxed/simple;
-	bh=qqgetxXoB79LbqPMFDraeWtm6ShkuPtCd6FJzkqn344=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=cH/yuzYSs5DY+jDbVJlZ/7DINXgAPsLIY+iqiiARR2uTZ593kviHfQA1P89YLX3FPsF5dvA2Pb3rx/Ke5QcOIZK9cEDQJRhGCvDIEQgOwDHBao3qLSsKFRHtkny1CkTqXm0VfpYaM0d1JuCw5y3BSKpPdeWZSEsGjtKrhPM/Cac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AGlN3aiS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1754576868; c=relaxed/simple;
+	bh=Ui2YdGX52qhIubOx9bG69bbpoh4fcB4If/FluerDLno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8VldIwiGIkTJX3rHCe/Hw6BJoZMtgmDtSXCh4cWwYhIH/KERBZY5guID+qNODBq3ksX5Ah9PwySzNVKiNNSHJbHzpltsRtzN+Vejyfk7r+9fbVvZMpOCEpyPvLAFtpLTKlZmnhDHi5zSIlrXReo2GuqT7G4PO5udVTVBX8jzEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Vqo4DixE; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AGlN3aiS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754561667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qqgetxXoB79LbqPMFDraeWtm6ShkuPtCd6FJzkqn344=;
-	b=AGlN3aiSscOoMq0oYfNnWvXo6Th1Vmw0z5OTiSaOiD1G5SFfGeNymXi4TwGdKoZj74zzfw
-	UKUwXCETAGIOXhOtg7kGf8G1tdU6xurJJLHBMLrmvfNUb9mUYABCWXnSGimDKiyaWl/oK0
-	plyX9Ysl4QK8c7lpm61HWz7whIDOQ9M=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-ZtUGMtRfPeaSw6lW-81MFA-1; Thu,
- 07 Aug 2025 06:14:22 -0400
-X-MC-Unique: ZtUGMtRfPeaSw6lW-81MFA-1
-X-Mimecast-MFC-AGG-ID: ZtUGMtRfPeaSw6lW-81MFA_1754561661
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 934D11956050;
-	Thu,  7 Aug 2025 10:14:20 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.17])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3BCF2180035C;
-	Thu,  7 Aug 2025 10:14:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1b3e0ed3-35c5-46ce-932d-02de9ba17ab6@samba.org>
-References: <1b3e0ed3-35c5-46ce-932d-02de9ba17ab6@samba.org> <20250806203705.2560493-1-dhowells@redhat.com> <20250806203705.2560493-17-dhowells@redhat.com>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
-    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
-    linux-kernel@vger.kernel.org, netfs@lists.linux.dev,
-    linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC PATCH 16/31] cifs: Rewrite base TCP transmission
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Vqo4DixE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=iaUztr6gHas6stUyHR0KydIvegK9VgiaXvSMroTPDtU=; b=Vqo4DixERx+lnPS0I+NcIdGgZT
+	cYm4FqyqE0o/bjvY/YElCLl5gq0o0hDlc8X+ohBWxcYwSp3GseCXDAVXuINlix7xc7gVgpbkSvfxw
+	fbih7BMEW3FpvcYN2H6W+0OImgmRuhB23Kunugnbv0y9z5Wqi1sPO/OEBEHq3S/D5NHd7xqRnnCR1
+	Uf+/t/NqlglLlDLzkvAR+tRF5tGJ9MlqerX5zhEUXPE4Ml4Gtv+TWWNbygu/DMutmM59l3yUoIlfq
+	RASH/nhO3TfnJSnFyT7DQTiPcXTmedH98XOx0RjA3fyxzLQVHQnNw/oKIwEFAXOf9j5fSyblvYyGa
+	cBZvsR9zP8bwr0j6CqG3L02uaSU/aKhgnv1lBTtffZ6/s63Op9gjZ8+z6r5vzmgMqTTCByh2lazqK
+	QpKRjR/mZ/9/wJ5QMEpurYLohKV8xrQH8l0msxm5J2Sj6ZEqWUVH4KldGTG9iktJuWUmLdLWspWko
+	71cv+twR2or1UM8MXQdiGPI7;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uk1ao-001ayG-1j;
+	Thu, 07 Aug 2025 14:27:42 +0000
+Message-ID: <aa65df64-68f1-47bb-ab69-9817387f3ab8@samba.org>
+Date: Thu, 7 Aug 2025 16:27:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2577379.1754561655.1@warthog.procyon.org.uk>
-Date: Thu, 07 Aug 2025 11:14:15 +0100
-Message-ID: <2577380.1754561655@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: Using smatch and sparse together (Re: [PATCH next] smb: client:
+ Fix use after free in send_done())
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>
+References: <aJNASZzOWtg8aljM@stanley.mountain>
+ <ad2e9d94-2d95-4351-b800-627f20672209@samba.org>
+ <87646c67-78b8-41c5-9b72-361cb3b733d1@suswa.mountain>
+ <e291d925-bfd9-4202-b5d4-de5bf30ab870@samba.org>
+ <a1a0046c-f47f-4e8a-ae3c-85db58a6cb2f@suswa.mountain>
+ <df4905fb-933e-4055-8363-d6427515773b@samba.org>
+ <d3b63d25-1b03-4c7c-85cc-efd9d74c3a8a@suswa.mountain>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <d3b63d25-1b03-4c7c-85cc-efd9d74c3a8a@suswa.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Stefan Metzmacher <metze@samba.org> wrote:
+Am 07.08.25 um 09:22 schrieb Dan Carpenter:
+> On Thu, Aug 07, 2025 at 08:34:09AM +0200, Stefan Metzmacher wrote:
+>> Am 06.08.25 um 16:39 schrieb Dan Carpenter:
+>>> On Wed, Aug 06, 2025 at 04:17:41PM +0200, Stefan Metzmacher wrote:
+>>>>>> What was the test that triggered the problem?
+>>>>>> Or did you only noticed it by looking at the code?
+>>>>>
+>>>>> This was a Smatch static checker warning.  You need to have the cross
+>>>>> function DB to detect it.
+>>>>
+>>>> Ok, I'll try to integrate it into my build flow...
+>>>>
+>>>> Does it replace sparse or does it run in addition?
+>>>
+>>> In addition.  I find the Sparse endianness checks especially useful.
+>>>
+>>>> If it replaces sparse I guess a small script would
+>>>> run them both?
+>>>>
+>>>> $ cat mychecker.sh:
+>>>> #!/bin/bash
+>>>> set -e
+>>>> sparse $@
+>>>> smatch $@
+>>>>
+>>>> And maybe all others from
+>>>> https://gautammenghani.com/linux,/c/2022/05/19/static-analysis-tools-linux-kernel.html
+>>
+>> I'm using this now:
 
-> > + smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
+This seems to work for me now:
 
-And whilst I'm sure addition works, I would much rather that be bit-OR.
+$ cat custom-checker.sh
+#!/bin/bash
 
-David
+set -e
 
+which sparse > /dev/null 2>&1 && {
+         sparse -Winit-cstring -Wsparse-error -fdiagnostic-prefix=SPARSE $@
+}
+
+which smatch > /dev/null 2>&1 && {
+         smatch -p=kernel --pedantic --succeed $@
+}
+
+$ cat build-fs-smb.sh
+#!/bin/bash
+#
+
+set -ueo pipefail
+
+make modules_prepare
+make -j16 M=fs/smb CF=-D__CHECK_ENDIAN__ W=1ce C=1 KBUILD_MODPOST_WARN=1 KCFLAGS="-Wfatal-errors" CHECK="$(pwd)/custom-checker.sh" $@ 2>&1 | tee build-fs-smb.out
+
+cat build-fs-smb.out | grep -v 'parse error: Function too hairy' | grep -q 'error:' || {
+         rm build-fs-smb.out
+         exit 0
+}
+echo ""
+echo "BUILD-ERRORS:"
+cat build-fs-smb.out | grep -v 'parse error: Function too hairy' | grep 'error:'
+find fs/smb -name '*.o' | xargs rm
+find fs/smb -name '*.ko' | xargs rm
+rm build-fs-smb.out
+exit 1
+
+
+> The DB is too big and too dependent on your .config but I should
+> share the smatch_data/ more regularly.  I started to push that into
+> a separate git repo but I didn't finish that work.  I should do
+> that.
+
+Ok, what's the gain of updating it?
+Does it help when doing fixes on old kernels?
+
+I'm typically doing a full kernel build a week after each rc.
+My idea was to rebuild the whole db after doing that.
+
+Thanks!
+metze
