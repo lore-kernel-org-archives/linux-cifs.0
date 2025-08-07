@@ -1,38 +1,30 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A7C262FD1;
-	Thu,  7 Aug 2025 14:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9F3263C90;
+	Thu,  7 Aug 2025 14:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754576868; cv=none; b=eq3vFKVl5jgwtPxHYFLzM6rztC8iEDSriX/E9ziHIFibF4G14s96H3i21fuMTUA3aq3peHiBXfz1vhVcBCfBvA4/9Fxkc5H9NsxRly1z2y6F6xmDmCuhabCrnC/JqJu3e2elmM5z7RGotEga1+QBMTCc1pgw0LseIMGf6xPACTE=
+	t=1754577810; cv=none; b=TrxYDSlKiC5KDdswT9jLXk6u0PLLZoVy4l3N4pIzmrmGJ4IOKtLNwK9Ap3hYzEPoE7RIC/D4vkGDWBHhZr1P6+7Hs+qdeoGWnqvSIj77Xjvmo8dn5rn/LIcWdqmahuUAulsnSmKGDYrOBhO+6lA2rGgJt2MYnZNmhMhX7UyjK9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754576868; c=relaxed/simple;
-	bh=Ui2YdGX52qhIubOx9bG69bbpoh4fcB4If/FluerDLno=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A8VldIwiGIkTJX3rHCe/Hw6BJoZMtgmDtSXCh4cWwYhIH/KERBZY5guID+qNODBq3ksX5Ah9PwySzNVKiNNSHJbHzpltsRtzN+Vejyfk7r+9fbVvZMpOCEpyPvLAFtpLTKlZmnhDHi5zSIlrXReo2GuqT7G4PO5udVTVBX8jzEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Vqo4DixE; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Vqo4DixE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=iaUztr6gHas6stUyHR0KydIvegK9VgiaXvSMroTPDtU=; b=Vqo4DixERx+lnPS0I+NcIdGgZT
-	cYm4FqyqE0o/bjvY/YElCLl5gq0o0hDlc8X+ohBWxcYwSp3GseCXDAVXuINlix7xc7gVgpbkSvfxw
-	fbih7BMEW3FpvcYN2H6W+0OImgmRuhB23Kunugnbv0y9z5Wqi1sPO/OEBEHq3S/D5NHd7xqRnnCR1
-	Uf+/t/NqlglLlDLzkvAR+tRF5tGJ9MlqerX5zhEUXPE4Ml4Gtv+TWWNbygu/DMutmM59l3yUoIlfq
-	RASH/nhO3TfnJSnFyT7DQTiPcXTmedH98XOx0RjA3fyxzLQVHQnNw/oKIwEFAXOf9j5fSyblvYyGa
-	cBZvsR9zP8bwr0j6CqG3L02uaSU/aKhgnv1lBTtffZ6/s63Op9gjZ8+z6r5vzmgMqTTCByh2lazqK
-	QpKRjR/mZ/9/wJ5QMEpurYLohKV8xrQH8l0msxm5J2Sj6ZEqWUVH4KldGTG9iktJuWUmLdLWspWko
-	71cv+twR2or1UM8MXQdiGPI7;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uk1ao-001ayG-1j;
-	Thu, 07 Aug 2025 14:27:42 +0000
-Message-ID: <aa65df64-68f1-47bb-ab69-9817387f3ab8@samba.org>
-Date: Thu, 7 Aug 2025 16:27:41 +0200
+	s=arc-20240116; t=1754577810; c=relaxed/simple;
+	bh=QuZQ+8PuensyICMO8zkiYPkUYHTa0I+JtAMBVsOLWhY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=UbXumx9zcwyoumC2lC99oaRs5z35dFYJSrMwFTrSG+4tlyqel+K7TRUhxy63doa3SH5TZXFkpZi4jNo78abBXEW7cpnUWj/fwvvJyEbCpfva9mAsJfHkMRBo2GAhlGHbJkhgCd9+3rjwHoaX4YhzM1PFzJgQ5naPGlDhtt3hhgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4byVJt3FYJzYQtyD;
+	Thu,  7 Aug 2025 22:43:26 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 1D65D1A175C;
+	Thu,  7 Aug 2025 22:43:25 +0800 (CST)
+Received: from [10.174.178.209] (unknown [10.174.178.209])
+	by APP4 (Coremail) with SMTP id gCh0CgD3chOKu5RoF3+RCw--.22445S3;
+	Thu, 07 Aug 2025 22:43:23 +0800 (CST)
+Message-ID: <a07e0802-da13-4ae4-b932-1560eb33129d@huaweicloud.com>
+Date: Thu, 7 Aug 2025 22:43:22 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,105 +32,183 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Using smatch and sparse together (Re: [PATCH next] smb: client:
- Fix use after free in send_done())
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+Subject: Re: [PATCH V2 0/4] Fix mid_q_entry memory leaks in SMB client
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: Steve French <smfrench@gmail.com>
+Cc: pshilov@microsoft.com, linux-cifs@vger.kernel.org,
  samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>
-References: <aJNASZzOWtg8aljM@stanley.mountain>
- <ad2e9d94-2d95-4351-b800-627f20672209@samba.org>
- <87646c67-78b8-41c5-9b72-361cb3b733d1@suswa.mountain>
- <e291d925-bfd9-4202-b5d4-de5bf30ab870@samba.org>
- <a1a0046c-f47f-4e8a-ae3c-85db58a6cb2f@suswa.mountain>
- <df4905fb-933e-4055-8363-d6427515773b@samba.org>
- <d3b63d25-1b03-4c7c-85cc-efd9d74c3a8a@suswa.mountain>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <d3b63d25-1b03-4c7c-85cc-efd9d74c3a8a@suswa.mountain>
+ chengzhihao1@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
+ Enzo Matsumiya <ematsumiya@suse.de>
+References: <20250805064708.332465-1-wangzhaolong@huaweicloud.com>
+ <CAH2r5mssz19Qr+fmY62BnHOzwjQmWWU=wHXEVFkyTRGaWn-t0g@mail.gmail.com>
+ <c980644d-0be1-4a88-890d-349b44ada024@huaweicloud.com>
+In-Reply-To: <c980644d-0be1-4a88-890d-349b44ada024@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgD3chOKu5RoF3+RCw--.22445S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Xr15AF13CFy8Zw4rCw4Durg_yoW3Jr15pr
+	1ruF18A3Z0kr97trZxtF1fKrySvrsIgr17Xrs7Ka4rCFZrCr48X34xAF1UWFnIgw4xuryD
+	Gr40vr15Ar1kAw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAK
+	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-Am 07.08.25 um 09:22 schrieb Dan Carpenter:
-> On Thu, Aug 07, 2025 at 08:34:09AM +0200, Stefan Metzmacher wrote:
->> Am 06.08.25 um 16:39 schrieb Dan Carpenter:
->>> On Wed, Aug 06, 2025 at 04:17:41PM +0200, Stefan Metzmacher wrote:
->>>>>> What was the test that triggered the problem?
->>>>>> Or did you only noticed it by looking at the code?
->>>>>
->>>>> This was a Smatch static checker warning.  You need to have the cross
->>>>> function DB to detect it.
->>>>
->>>> Ok, I'll try to integrate it into my build flow...
->>>>
->>>> Does it replace sparse or does it run in addition?
->>>
->>> In addition.  I find the Sparse endianness checks especially useful.
->>>
->>>> If it replaces sparse I guess a small script would
->>>> run them both?
->>>>
->>>> $ cat mychecker.sh:
->>>> #!/bin/bash
->>>> set -e
->>>> sparse $@
->>>> smatch $@
->>>>
->>>> And maybe all others from
->>>> https://gautammenghani.com/linux,/c/2022/05/19/static-analysis-tools-linux-kernel.html
+
+Sorry for the delayed response. I can see exactly what went wrong now.
+
+The issue is that my implementation holds a spinlock (mid_lock) while
+executing the callback, but the callback path can eventually lead to
+crypto_alg_lookup() which tries to acquire a semaphore. This violates
+the kernel's locking rules - we cannot sleep while holding a spinlock.
+
+Perhaps I should consider a more ingenious solution that can safely
+handle these cross-subsystem interactions.
+
+I'll rework the patch to fix this locking issue and send a v3. I'll
+probably need to rethink the whole locking strategy to be more aware
+of what the callbacks actually do and what they might need to sleep for.
+
+Best regards,
+Wang Zhaolong
+
+
+> 
+>> The first three patches (cleanup) look fine and have added to
+>> cifs-2.6.git for-next (also added Enzo Acked-by) but the fourth patch
+>> ("smb: client: fix mid_q_entry memleak leak with per-mid locking")
+>> causes xfstest generic/001 to fail with signing enabled.  See
+>> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/58/steps/34/logs/stdio
+>> and http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/59/steps/34/logs/stdio
 >>
->> I'm using this now:
+> 
+> I am unable to view any information in the link above. Is this information
+> only visible to logged-in users?
+> 
+> 
+>>
+>> [Tue Aug 5 11:03:32 2025] run fstests generic/001 at 2025-08-05 11:03:32
+>> [Tue Aug 5 11:03:33 2025] =============================
+>> [Tue Aug 5 11:03:33 2025] [ BUG: Invalid wait context ]
+>> [Tue Aug 5 11:03:33 2025] 6.16.0 #1 Tainted: G E
+>> [Tue Aug 5 11:03:33 2025] -----------------------------
+>> [Tue Aug 5 11:03:33 2025] cifsd/24912 is trying to lock:
+>> [Tue Aug 5 11:03:33 2025] ffffffffafc14630
+>> (crypto_alg_sem){++++}-{4:4}, at: crypto_alg_lookup+0x40/0x120
+>> [Tue Aug 5 11:03:33 2025] other info that might help us debug this:
+>> [Tue Aug 5 11:03:33 2025] context-{5:5}
+>> [Tue Aug 5 11:03:33 2025] 1 lock held by cifsd/24912:
+>> [Tue Aug 5 11:03:33 2025] #0: ff11000134c25870
+>> (&temp->mid_lock){+.+.}-{3:3}, at: mid_execute_callback+0x19/0x40
+>> [cifs]
+>> [Tue Aug 5 11:03:33 2025] stack backtrace:
+>> [Tue Aug 5 11:03:33 2025] CPU: 1 UID: 0 PID: 24912 Comm: cifsd
+>> Tainted: G E 6.16.0 #1 PREEMPT(voluntary)
+>> [Tue Aug 5 11:03:33 2025] Tainted: [E]=UNSIGNED_MODULE
+>> [Tue Aug 5 11:03:33 2025] Hardware name: Red Hat KVM, BIOS
+>> 1.16.3-4.el9 04/01/2014
+>> [Tue Aug 5 11:03:33 2025] Call Trace:
+>> [Tue Aug 5 11:03:33 2025] <TASK>
+>> [Tue Aug 5 11:03:33 2025] dump_stack_lvl+0x79/0xb0
+>> [Tue Aug 5 11:03:33 2025] __lock_acquire+0xace/0x21c0
+>> [Tue Aug 5 11:03:33 2025] ? check_irq_usage+0xa4/0xa80
+>> [Tue Aug 5 11:03:33 2025] lock_acquire+0x143/0x2d0
+>> [Tue Aug 5 11:03:33 2025] ? crypto_alg_lookup+0x40/0x120
+>> [Tue Aug 5 11:03:33 2025] ? check_noncircular+0x71/0x120
+>> [Tue Aug 5 11:03:33 2025] down_read+0x7c/0x2e0
+>> [Tue Aug 5 11:03:33 2025] ? crypto_alg_lookup+0x40/0x120
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_down_read+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ? lockdep_unlock+0x51/0xc0
+>> [Tue Aug 5 11:03:33 2025] ? __lock_acquire+0x11ee/0x21c0
+>> [Tue Aug 5 11:03:33 2025] crypto_alg_lookup+0x40/0x120
+>> [Tue Aug 5 11:03:33 2025] crypto_alg_mod_lookup+0x53/0x2b0
+>> [Tue Aug 5 11:03:33 2025] crypto_alloc_tfm_node+0x76/0x130
+>> [Tue Aug 5 11:03:33 2025] cifs_alloc_hash+0x44/0x130 [cifs]
+>> [Tue Aug 5 11:03:33 2025] smb3_calc_signature+0x4f0/0x7b0 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_smb3_calc_signature+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? find_held_lock+0x2b/0x80
+>> [Tue Aug 5 11:03:33 2025] ? tcp_recvmsg+0xc9/0x2d0
+>> [Tue Aug 5 11:03:33 2025] ? rcu_is_watching+0x20/0x50
+>> [Tue Aug 5 11:03:33 2025] ? trace_irq_enable.constprop.0+0xac/0xe0
+>> [Tue Aug 5 11:03:33 2025] ? tcp_recvmsg+0xc9/0x2d0
+>> [Tue Aug 5 11:03:33 2025] ? __local_bh_enable_ip+0x90/0xf0
+>> [Tue Aug 5 11:03:33 2025] ? sock_has_perm+0x97/0x1a0
+>> [Tue Aug 5 11:03:33 2025] smb2_verify_signature+0x178/0x290 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_smb2_verify_signature+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? look_up_lock_class+0x5d/0x140
+>> [Tue Aug 5 11:03:33 2025] smb2_check_receive+0x154/0x1c0 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_smb2_check_receive+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __lock_acquire+0x3f1/0x21c0
+>> [Tue Aug 5 11:03:33 2025] ? __lock_acquire+0x3f1/0x21c0
+>> [Tue Aug 5 11:03:33 2025] smb2_writev_callback+0x1f2/0x870 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? lock_acquire+0x143/0x2d0
+>> [Tue Aug 5 11:03:33 2025] ? mid_execute_callback+0x19/0x40 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_smb2_writev_callback+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? do_raw_spin_lock+0x10c/0x190
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_do_raw_spin_lock+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ? _raw_spin_unlock+0x23/0x40
+>> [Tue Aug 5 11:03:33 2025] mid_execute_callback+0x33/0x40 [cifs]
+>> [Tue Aug 5 11:03:33 2025] cifs_demultiplex_thread+0xc95/0x15e0 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] ? find_held_lock+0x2b/0x80
+>> [Tue Aug 5 11:03:33 2025] ? __kthread_parkme+0x4b/0xd0
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_cifs_demultiplex_thread+0x10/0x10 [cifs]
+>> [Tue Aug 5 11:03:33 2025] kthread+0x216/0x3e0
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_kthread+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_kthread+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ? lock_release+0xc4/0x270
+>> [Tue Aug 5 11:03:33 2025] ? rcu_is_watching+0x20/0x50
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_kthread+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ret_from_fork+0x23a/0x2e0
+>> [Tue Aug 5 11:03:33 2025] ? __pfx_kthread+0x10/0x10
+>> [Tue Aug 5 11:03:33 2025] ret_from_fork_asm+0x1a/0x30
+>> [Tue Aug 5 11:03:33 2025] </TASK>
+>>
+>> (it worked without the patch see e.g.
+>> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/60
+>> and http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/56)
+>>
+>> On Tue, Aug 5, 2025 at 1:54 AM Wang Zhaolong
+>> <wangzhaolong@huaweicloud.com> wrote:
+> 
+> 
+> It's quite strange that the lock reported in the stack trace is an internal
+> lock of the crypto module, which only protects the internal logic of crypto.
+> Moreover, I have not yet found a path where the callback for cifs registration
+> is executed within the scope of this lock.
+> 
+> ```c
+> // crypto/api.c
+> static struct crypto_alg *crypto_alg_lookup(const char *name, u32 type,
+>                          u32 mask)
+> {
+>      const u32 fips = CRYPTO_ALG_FIPS_INTERNAL;
+>      struct crypto_alg *alg;
+>      u32 test = 0;
+> 
+>      if (!((type | mask) & CRYPTO_ALG_TESTED))
+>          test |= CRYPTO_ALG_TESTED;
+> 
+>      down_read(&crypto_alg_sem);
+>      ...
+>      up_read(&crypto_alg_sem);
+>      return alg;
+> ```
+> More information is needed to confirm this issue. Could you please provide it?
+> 
+> Best regards,
+> Wang Zhaolong
+> 
 
-This seems to work for me now:
-
-$ cat custom-checker.sh
-#!/bin/bash
-
-set -e
-
-which sparse > /dev/null 2>&1 && {
-         sparse -Winit-cstring -Wsparse-error -fdiagnostic-prefix=SPARSE $@
-}
-
-which smatch > /dev/null 2>&1 && {
-         smatch -p=kernel --pedantic --succeed $@
-}
-
-$ cat build-fs-smb.sh
-#!/bin/bash
-#
-
-set -ueo pipefail
-
-make modules_prepare
-make -j16 M=fs/smb CF=-D__CHECK_ENDIAN__ W=1ce C=1 KBUILD_MODPOST_WARN=1 KCFLAGS="-Wfatal-errors" CHECK="$(pwd)/custom-checker.sh" $@ 2>&1 | tee build-fs-smb.out
-
-cat build-fs-smb.out | grep -v 'parse error: Function too hairy' | grep -q 'error:' || {
-         rm build-fs-smb.out
-         exit 0
-}
-echo ""
-echo "BUILD-ERRORS:"
-cat build-fs-smb.out | grep -v 'parse error: Function too hairy' | grep 'error:'
-find fs/smb -name '*.o' | xargs rm
-find fs/smb -name '*.ko' | xargs rm
-rm build-fs-smb.out
-exit 1
 
 
-> The DB is too big and too dependent on your .config but I should
-> share the smatch_data/ more regularly.  I started to push that into
-> a separate git repo but I didn't finish that work.  I should do
-> that.
 
-Ok, what's the gain of updating it?
-Does it help when doing fixes on old kernels?
-
-I'm typically doing a full kernel build a week after each rc.
-My idea was to rebuild the whole db after doing that.
-
-Thanks!
-metze
