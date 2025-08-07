@@ -1,273 +1,188 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DDE235055
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Aug 2025 07:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF5F226CEB
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Aug 2025 07:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754551332; cv=none; b=hk4KEqijZsmNCbYZaqxUI7uiM2u0HjtlKJ1QaDnLBcDCJxbMKBSrbCYE54kFzMme7iiWr57XkXYxRx6A/vgNmBHi6EuBhOLRidxK8N4oJfemVrgeW58Ter+mbrHZgOU3VQg3WcRydfkB5CfSTUK5+ySCJdlGJR4c6LgZ9dduAy8=
+	t=1754551940; cv=none; b=vFCjcxnw9x5J8CKmF4ywbOg2dnz9VC/8gSIur7eqzCB5LhyE3yuAUznsgRmwBCWrUKCvzaASvGDnV0Ax6HKyRFnQVUjevDNdy75HjOvOvmKJzrlLbeapjbVqsYVaIxJTkeyrWtUYGoeoLRr0JNxWs9Mk/vQxo2eVlYR0oSrfFBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754551332; c=relaxed/simple;
-	bh=M/D9L7h7segnrkos5KQocwnWfHngIf0buMo+VwbAX00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xtpnj0oBFYTA9EkAoP0sWtC3fQtgDRKPdwBO/EBA3WW64/L6Ff/RJ1F/TTmk0ZA0xSMzfboAiABTxptzFXHxuP7418J6A2iVvWnZGb1R2Baca3uJ866HCnOEr235EyhBiNAmqrTueSXd9JEtYuT+1JCxrv8jvuk7CZ5fL52Bs0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IC9Ht17C; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1754551940; c=relaxed/simple;
+	bh=m2hYQk7zzWAMJ9gVmxf9OmGaNbH83xylJLkW2PnfBig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=EZ+8f7BDrastrKjCR0z5NLDmSKg5+97/Vzuw6QzpRwSiTw/604zJlQf3ev8zZ36WCyHM36wc6IzqYqNBgu1j9bG6ZnP2WJzxlkAzC+FqvBC2aB9qARJNPLD2bwrFgNIBFJHqlbiKX+/FezQL2FQ4obl+29jfysxXBQzdBtXM+e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Nc6C6m5l; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IC9Ht17C"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3b794a013bcso437892f8f.2
-        for <linux-cifs@vger.kernel.org>; Thu, 07 Aug 2025 00:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1754551329; x=1755156129; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g3HLjmAlx40U0gLagutzbpJitgljWYj41KcMcgwX6dg=;
-        b=IC9Ht17C8r/2IfKq2TC2lX2ABLNe0Ayo7aGXHcuiIZSWBdnBYVYCLIRh8K8LolKQao
-         xkTGxrYWjVxpOgQ0ssojZej6PjV8lQDbEZPdx7MF3y+y4A+GztqYtIvCs+Hlu3Ib8iiS
-         L0oXe321KiFaw1qr2Q7JD4Dk4HHDFNSRoYuW4leXR9kvvc8EM4Z8lkI0hAPDtcFNunx7
-         QYsarQvdW8VM19v4y8Tg1DCp0JraDIEQLzLko/rEV7dVbDrxqb9QTOPfYGm6mm8bl5zj
-         YXBErvk9+HkCDnTDyS5gctCezwz1/LDphVRlNAXgWAuzAb2scRYsxUZrRA54BGRTd5YE
-         9BsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754551329; x=1755156129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g3HLjmAlx40U0gLagutzbpJitgljWYj41KcMcgwX6dg=;
-        b=FhUT6nC6h3UQOba1qxRfA90/h3TiZjgGYyhGkKTv6SxXmxkHBqDbH7qLvumpn5Og9E
-         sXCpzsu9mRXto8otnrmN4AxZjNvWXEr7mYx+hfGR3OK4qInKECBJXeM0bWSKvHCw/Xjj
-         mgbmBzPC/3V+j1KEin+Z8OPbad53V/D1Px4ctxnDRjgPVtIqbG0EASPhBoxSdtBwf4ms
-         XSDQ3mfU53P9XLvGQGzdpoe2+IWTphYUpCZtjXPl7s/N5LhVwD+DTsi19J9rNa+h2Vl6
-         R8MXwbmtqo4s7iq7sxDvNuoituTcSn1vuTiL1CvRxULc/hNGACRqC8qx5NXVqKeJit31
-         fijg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyL7fOvMOR9bjZOJSVSUeJYi4YV+zHNUfd3QEGr4xopJy3xvDX7nfTxAGjPff6SAqc44zL8OHpfQFy@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8vbdblPNXfWMsPwCpyjbHGJyWRQ+qHVz+yxOU8tQESNYf4Bl3
-	q5nn3kC3c/qH+x/kec+X0QommvPODn0Vi8ynGJt1/C9/6CXZorLAaNgHoe2v78hKyfQ=
-X-Gm-Gg: ASbGncsc4uNXLGzcOIs6tEBnyyjRJ+a+FalHMz5+JnHvfJIbAX0sZtgn4D11d4bZWO6
-	VeaN8EcLvxtgVH/bs+97DGJsxDvv4+04gtfzD8O4YIQQzx2nJ91y5TptSByYwgtE3EYWDg7aeVW
-	sh5JBtXShGRy3QhSHY0kI1/PgP6oyGmQz06+VQ2C6gFfJrxQHbMAwlrIc8cu+ennTSK4aloIYUz
-	eNyJeZMYdzZVrKeITCeSFfIv7awKbRTFo/NKkQBVAwgmuEnXHbS9cWmczkeYExajGDqpxoNfvOQ
-	CtrEdolRSHWvcHSYMe4BOCSWBripnaM2kFbv2XEWlgw63VVOMAyg5LVcNN6CUpMsbLUymzxkgcs
-	f8koskUORz3/TbBOh846I1DV6LpA=
-X-Google-Smtp-Source: AGHT+IFJF9ft/V2r8XW39a98Jr3iwGd1g5e1eaqEtg/nNxjGVTa00pRrYeAhFMDLhO2CCiMXpsg1ww==
-X-Received: by 2002:a05:6000:2893:b0:3b7:8b1b:a9d5 with SMTP id ffacd0b85a97d-3b8f493d8b1mr4634736f8f.51.1754551328550;
-        Thu, 07 Aug 2025 00:22:08 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-459e0a24bf1sm108977615e9.1.2025.08.07.00.22.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Aug 2025 00:22:07 -0700 (PDT)
-Date: Thu, 7 Aug 2025 10:22:05 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: Re: Using smatch and sparse together (Re: [PATCH next] smb: client:
- Fix use after free in send_done())
-Message-ID: <d3b63d25-1b03-4c7c-85cc-efd9d74c3a8a@suswa.mountain>
-References: <aJNASZzOWtg8aljM@stanley.mountain>
- <ad2e9d94-2d95-4351-b800-627f20672209@samba.org>
- <87646c67-78b8-41c5-9b72-361cb3b733d1@suswa.mountain>
- <e291d925-bfd9-4202-b5d4-de5bf30ab870@samba.org>
- <a1a0046c-f47f-4e8a-ae3c-85db58a6cb2f@suswa.mountain>
- <df4905fb-933e-4055-8363-d6427515773b@samba.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Nc6C6m5l"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=m2hYQk7zzWAMJ9gVmxf9OmGaNbH83xylJLkW2PnfBig=; b=Nc6C6m5lECTm9NoOAfebxefTgn
+	9uwcAgB0XT4cmiu4V1uG2r9Ss1mbXmrtA5Gqsvhz0oACd9gC4pudfi21epz1FhW4pus3X5a7IKlis
+	+4dVYoXK7ACeYfhtBOQhC6eYp02QWSaDuoM3gQQP+rSv9ISoAfOBjiUEvCqdPYvC8fDV3NGUbPw4c
+	7rtc/4AtQSw1t6NJ62ffx6vrjEDYrzngmIphh9RN41LjQEdD3U7qiNpp3cnp+aanHxreAoamTFeJe
+	bKw8/PCXyFMyYg7ec+oSDcuKNOvDMBbLWAzp+ysnNI9IHtc3o4PjCubXZhkkzBKd+YHl/mQx7nveJ
+	nWWlZz5HysK1ivF8iGboWPTgGZSY94yDY4S5HqA/7Gtk/WYs1C5Vsd6f71riXmLkU5y6P6d1tLokB
+	90/MZkgtZzntBcXWBh2JRXtSSZIGjzHPjJ/WJ7qZc2zKQUHN6+uJBkXVevvjhNymFoN2kt2N0gROn
+	KGx10EKyIPjBuTvB4lUQbODZ;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1ujv6l-001WJ2-1q;
+	Thu, 07 Aug 2025 07:32:15 +0000
+Message-ID: <d3c50c5c-b87b-4010-a45e-130436d9c3b0@samba.org>
+Date: Thu, 7 Aug 2025 09:32:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df4905fb-933e-4055-8363-d6427515773b@samba.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Samba] Sequence of actions resulting in data loss
+To: Steven French <Steven.French@microsoft.com>
+References: <16aeb380-30d4-4551-9134-4e7d1dc833c0@pasteur.fr>
+ <a70fe80e-5563-467a-8c1f-9fd635662be4@samba.org>
+ <fac383c2-2835-448c-a3fc-561f8aec02fa@pasteur.fr>
+ <dd2f2bf1-f68d-496d-bca6-3f68672952aa@pasteur.fr>
+ <6309360d-088e-49c1-b2db-9ef3169a32d4@pasteur.fr>
+ <39705f0a-eb2d-42a1-a135-8751c8c851b0@samba.org>
+ <86ae837a-3d30-4450-b91c-3186098178ca@pasteur.fr>
+ <20250801121517.32376ad4@devstation.samdom.example.com>
+ <62884dd9-0667-4111-afe6-f22ea7468d8e@pasteur.fr>
+ <2d2289d7-f536-462f-9505-0ba700ad40b7@samba.org>
+ <4ed87f1e-b7e5-473c-83f1-33b79867a86e@tls.msk.ru>
+Content-Language: en-US, de-DE
+Cc: "samba@lists.samba.org" <samba@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <4ed87f1e-b7e5-473c-83f1-33b79867a86e@tls.msk.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------vK5v2eY0G0m0hvTGSizGf7Cn"
 
-On Thu, Aug 07, 2025 at 08:34:09AM +0200, Stefan Metzmacher wrote:
-> Am 06.08.25 um 16:39 schrieb Dan Carpenter:
-> > On Wed, Aug 06, 2025 at 04:17:41PM +0200, Stefan Metzmacher wrote:
-> > > > > What was the test that triggered the problem?
-> > > > > Or did you only noticed it by looking at the code?
-> > > > 
-> > > > This was a Smatch static checker warning.  You need to have the cross
-> > > > function DB to detect it.
-> > > 
-> > > Ok, I'll try to integrate it into my build flow...
-> > > 
-> > > Does it replace sparse or does it run in addition?
-> > 
-> > In addition.  I find the Sparse endianness checks especially useful.
-> > 
-> > > If it replaces sparse I guess a small script would
-> > > run them both?
-> > > 
-> > > $ cat mychecker.sh:
-> > > #!/bin/bash
-> > > set -e
-> > > sparse $@
-> > > smatch $@
-> > > 
-> > > And maybe all others from
-> > > https://gautammenghani.com/linux,/c/2022/05/19/static-analysis-tools-linux-kernel.html
-> 
-> I'm using this now:
-> 
-> $ cat custom-checker.sh
-> #!/bin/bash
-> 
-> set -e
-> 
-> which sparse > /dev/null 2>&1 && {
->         sparse -Winit-cstring -Wsparse-error $@
-> }
-> 
-> which smatch > /dev/null 2>&1 && {
->         smatch -p=kernel --fatal-checks $@
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------vK5v2eY0G0m0hvTGSizGf7Cn
+Content-Type: multipart/mixed; boundary="------------OGjKVEoRdR1qjZsqbz9CYOwe";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Steven French <Steven.French@microsoft.com>
+Cc: "samba@lists.samba.org" <samba@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+Message-ID: <d3c50c5c-b87b-4010-a45e-130436d9c3b0@samba.org>
+Subject: Re: [Samba] Sequence of actions resulting in data loss
+References: <16aeb380-30d4-4551-9134-4e7d1dc833c0@pasteur.fr>
+ <a70fe80e-5563-467a-8c1f-9fd635662be4@samba.org>
+ <fac383c2-2835-448c-a3fc-561f8aec02fa@pasteur.fr>
+ <dd2f2bf1-f68d-496d-bca6-3f68672952aa@pasteur.fr>
+ <6309360d-088e-49c1-b2db-9ef3169a32d4@pasteur.fr>
+ <39705f0a-eb2d-42a1-a135-8751c8c851b0@samba.org>
+ <86ae837a-3d30-4450-b91c-3186098178ca@pasteur.fr>
+ <20250801121517.32376ad4@devstation.samdom.example.com>
+ <62884dd9-0667-4111-afe6-f22ea7468d8e@pasteur.fr>
+ <2d2289d7-f536-462f-9505-0ba700ad40b7@samba.org>
+ <4ed87f1e-b7e5-473c-83f1-33b79867a86e@tls.msk.ru>
+In-Reply-To: <4ed87f1e-b7e5-473c-83f1-33b79867a86e@tls.msk.ru>
 
-I would say don't do fatal checks...  I don't love that option at all.
-It was for another project which limits which checks it enables.
+--------------OGjKVEoRdR1qjZsqbz9CYOwe
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> }
-> 
-> $ cat build-fs-smb.sh
-> make modules_prepare
-> make -j16 M=fs/smb CF=-D__CHECK_ENDIAN__ W=1ce C=1 KBUILD_MODPOST_WARN=1 KCFLAGS="-Wfatal-errors" CHECK="$(pwd)/custom-checker.sh" $@
-> 
-> 
-> I'm currently getting these warnings:
-> 
-> client/sess.c:436 cifs_chan_update_iface() warn: iterator used outside loop: 'iface'
-> client/sess.c:444 cifs_chan_update_iface() warn: iterator used outside loop: 'iface'
+T24gOC83LzI1IDg6MzkgQU0sIE1pY2hhZWwgVG9rYXJldiB3cm90ZToNCj4gT24gMDEuMDgu
+MjAyNSAxNToxOSwgUmFscGggQm9laG1lIHZpYSBzYW1iYSB3cm90ZToNCj4+IE9uIDgvMS8y
+NSAxOjIwIFBNLCBKZWFuLUJhcHRpc3RlIERlbmlzIHZpYSBzYW1iYSB3cm90ZToNCj4+PiBT
+b3JyeSBhYm91dCB0aGF0IGFuZCB0aGFuayB5b3UgZm9yIHdhcm5pbmcgbWUuDQo+Pj4NCj4+
+PiBwY2FwOiBodHRwczovL2RsLnBhc3RldXIuZnIvZm9wL3ZrdWM4N3lKL2ZpbGVfZGVsZXRl
+X3JlcHJvZHVjZXIucGNhcC56c3QNCj4+PiByZXByb2R1Y2VyOiBodHRwczovL2RsLnBhc3Rl
+dXIuZnIvZm9wL2RvUUtjd3Z2L3JlcHJvZHVjZXIzLnNoDQo+Pg0KPj4gbG9va3MgbGlrZSB0
+aGUgY2xpZW50IGlzIGRvaW5nIGl0Og0KPj4NCj4+IGFmdGVyIHRoZSBzZXJ2ZXIgcmlnaHRs
+eSByZWZ1c2VzIHRoZSByZW5hbWUgaW4gcGFja2V0cyAxMDItMTA5ICh0aGUgDQo+PiBjbGll
+bnQgdHJpZXMgbXVsdGlwbGUgdGltZXMpLCBpbiBwYWNrZXQgMTEwIHRoZSBjbGllbnQgaXQg
+c2V0cyBkZWxldGUtIA0KPj4gb24tY2xvc2Ugb24gdGhlIHRoZSBYLnNoIGFuZCBhIGJpdCBs
+YXRlciBhZnRlciB0aGUgbGFzdCBvcGVuIGhhbmRsZSB0byANCj4+IFguc2ggaXMgY2xvc2Vk
+LCB0aGUgc2VydmVyIHJpZ2h0bHkgZGVsZXRlcyB0aGUgZmlsZS4NCj4+DQo+PiBUaGUgZGVs
+ZXRpb24gbWlnaHQgYmUgZG9uZSBieSB0aGUgYG12YCBjb21tYW5kIG9yIGl0IG1pZ2h0IGJl
+IHNvbWUgDQo+PiBjb2RlIGluIHRoZSBjaWZzIGtlcm5lbCBjbGllbnQgdHJpZ2dlcmVkIGJ5
+IHRoZSByZW5hbWUgZmFpbHVyZS4NCj4+DQo+PiBJIGd1ZXNzIHRoZSBuZXh0IHN0ZXAgd291
+bGQgYmUgdG8gd3JpdGUgYSBtaW5pbWFsIEMgUE9TSVggcHJvZ3JhbW0gDQo+PiB0aGF0IHJl
+cGxpY2F0ZXMgdGhpcyB0byBoYXZlIGZ1bGwgY29udHJvbCBvdmVyIHRoZSBhcHBsaWNhdGlv
+bi4gSWYgDQo+PiB0aGF0IHN0aWxsIGZhaWxzIGl0IG11c3QgYmUgc29tZXRoaW5nIGluIHRo
+ZSBjaWZzIGNsaWVudCBpbiB0aGUga2VybmVsLg0KPiANCj4gQlRXLCB0aGlzIGlzIGV4YWN0
+bHkgdGhlIHNjZW5hcmlvIHdoaWNoIEkgcmVwb3J0ZWQgYmFjayBpbiBNYXItMjAyNCwNCj4g
+aHR0cHM6Ly9saXN0cy5zYW1iYS5vcmcvYXJjaGl2ZS9zYW1iYS8yMDI0LU1hcmNoLzI0ODM0
+NC5odG1sDQoNCnRlbGwgU3RldmUhIDopDQoNCkBTdGV2ZTogYXJlIHlvdSBhd2FyZSBvZiB0
+aGlzIGlzc3VlPw0KDQpDaGVlcnMhDQotc2xvdw0KDQotLSANClNlck5ldCBTYW1iYSBUZWFt
+IExlYWQgaHR0cHM6Ly9zZXJuZXQuZGUvDQpTYW1iYSBUZWFtIE1lbWJlciAgICAgIGh0dHBz
+Oi8vc2FtYmEub3JnLw0KU2FtYmEgU3VwcG9ydCBhbmQgRGV2ICBodHRwczovL3NhbWJhLnBs
+dXMvc2VydmljZXMvDQpTQU1CQSsgcGFja2FnZXMgICAgICAgIGh0dHBzOi8vc2FtYmEucGx1
+cy9wcm9kdWN0cy9zYW1iYQ0K
 
-This code is fine.  It's quite hard for Smatch to parse
-	if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
-correctly.
+--------------OGjKVEoRdR1qjZsqbz9CYOwe--
 
-> client/inode.c:1703 cifs_root_iget() warn: passing zero to 'ERR_PTR'
+--------------vK5v2eY0G0m0hvTGSizGf7Cn
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Huh...  This warning showed up in 2023 and I didn't report it.  I
-probably should have.
+-----BEGIN PGP SIGNATURE-----
 
-fs/smb/client/inode.c
-  1693  iget_root:
-  1694          if (!rc) {
-  1695                  if (fattr.cf_flags & CIFS_FATTR_JUNCTION) {
-  1696                          fattr.cf_flags &= ~CIFS_FATTR_JUNCTION;
-  1697                          cifs_autodisable_serverino(cifs_sb);
-  1698                  }
-  1699                  inode = cifs_iget(sb, &fattr);
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmiUVn4FAwAAAAAACgkQqh6bcSY5nka4
+Cg//Y407gF0GNIwk8xY71x3BnmJWZ5ZdOOQ+Das5DjRmHJftbEpFZ0UqzaAk2MNaYLv2K4xhP4PD
+A9117q+c6tGsVE8ezGh0v52HicJVDDPOSJ9ZxQnBZxUUbgw2WtujiaF0fCBqiHRCDJaF0hdCCJ+d
+J3jnW5wibU/pDmKN4gbCRB+lgi7n2Dmo8yfk/Wrr7nKz/p6ikx22Hj0gPxQENoawgZgCra8LG+1C
+L6Qoyh55QXZQ3Xn+zMzW50J/OD2KcwNslXVtm1UoHdnKMHIT49TWg4j9wsid9rr2k6cbHCdvsrDA
+a0Gj8xjnclv97PXBls7oDeOZjaY/GNsg4NAFldtyXRaCtZZ4TtA3prkt5hlXVbk4nMcYNeaDBosY
++LPvCjIceLTR45tznV78B+VHQ//N7rORrVlBhepEmatPqNLW/esKvOKhU1fXF24EUC2Hl3JN6jla
+PBAwfRn3FnOz068HhbMpMApLWO2KLEYqucabKgYOktrBfG922YAcandKtyXDXytr3gCqIfZFYWoq
+eziBERJztu0PxiELipirV07fEC1ZYKqZaJvsDDDs2S2U43xu2YSi43ry3xJJZqzIz8JtHxyFfn+q
+kVBeLEyKP2Vv4KBgIhVrxaV5ThHH+jsna2vlFmcOcYT8h/d+OrfFvtL+TBc24Z5t6KssJZNuvFtZ
+Q6E=
+=gWsP
+-----END PGP SIGNATURE-----
 
-Should this have been:
-
-		inode = cifs_iget(sb, &fattr);
-		if (!inode)
-			rc = -EINVAL;
-
-  1700          }
-  1701  
-  1702          if (!inode) {
-  1703                  inode = ERR_PTR(rc);
-  1704                  goto out;
-  1705          }
-
-> client/inode.c:2295 cifs_mkdir() warn: passing zero to 'ERR_PTR'
-
-Returning ERR_PTR(0) means reporting NULL and it's an idiom in fs/.
-But outside of fs/ then most times it is a bug.  So the warning is
-useful, but in fs/ it's often deliberate like it is here.
-
-> server/smb2pdu.c:3754 smb2_open() warn: Function too hairy.  No more merges.
-> server/smb2pdu.c:3754 smb2_open() parse error: Function too hairy.  Giving up. 18 seconds
-> 
-
-Yeah.  Ignore these.
-
-> Is there a way to use --fatal-checks but turn the 'too hairy' and maybe others into a warning only?
-> Something like -Wno-error=... in gcc.
-
-Yeah.  Let me disable those unless --spammy is enabled.  They're for
-debugging only and I'm probably the only person who is interested in
-them.
-
-> 
-> Or at least turn this into an error:
-> client/smbdirect.c:292 send_done() error: dereferencing freed memory 'request' (line 290)
-> Without --fatal-checks smatch still returns 0.
-> 
-
-Sure.  To be honest, I normally build with the --succeed option which
-is the opposite of --fatal-checks.
-
-> While this returns an error (without --fatal-checks):
-> server/smb2pdu.c:3754 smb2_open() warn: Function too hairy.  No more merges.
-> server/smb2pdu.c:3754 smb2_open() parse error: Function too hairy.  Giving up. 8 seconds
-> 
-> Currently I typically use git rebase -i and then have some like this
-> 
-> exec bash build-fs-smb.sh C=0
-> pick 123456 my first patch
-> exec bash build-fs-smb.sh
-> pick 654321 my 2nd patch
-> exec bash build-fs-smb.sh
-> 
-> So I force C=0 on the initial run in order to avoid hitting the fatal Function too hairy
-> and it then works with my default of C=1 if I don't change fs/smb/server/smb2pdu.c
-> (or with --fatal-checks and other file that has a warning)
-> 
-> I'd actually prefer to use --fatal-checks and C=1 in all cases
-> in order to notice problems I'm introducing...
-
-I use the scripts/new_bugs.pl script.  After I've looked at the day's
-warnings then I run `scripts/new_bugs.pl --store err-list` and only
-review them again when I modify a file.
-
-> 
-> > > How often do I need to run smatch_scripts/build_kernel_data.sh on the whole kernel?
-> > 
-> > The cross function database is really useful for just information
-> > purposes and looking at how functions are called.  You probably
-> > would need to rebuild it four or five times to get useful
-> > information, unfortunately.  I rebuild my every night on the latest
-> > linux-next.
-> 
-> I have the following files generated on a fast machine:
-> 
-> $ ls -alrt smatch_*
-> -rw-r----- 1 metze metze     303104 Aug  6 15:42 smatch_db.sqlite.new
-> -rw-rw-r-- 1 metze metze    3107065 Aug  6 16:37 smatch_compile.warns
-> -rw-rw-r-- 1 metze metze 2848012813 Aug  6 16:37 smatch_warns.txt
-> -rw-rw-r-- 1 metze metze 6016192672 Aug  6 16:38 smatch_warns.txt.sql
-> -rw-rw-r-- 1 metze metze 4202917492 Aug  6 16:39 smatch_warns.txt.caller_info
-> -rw-r--r-- 1 metze metze 8757637120 Aug  6 16:57 smatch_db.sqlite
-> 
-
-Your DB is 8GB.  If you rebuild it enough times, then eventually the
-DB will max out at 32GB.  If it gets to be over 40GB then my builds
-stop finishing in one night so I investigate and shrink it again...
-It's a cycle of adding code until things slow down too much and then
-optimizing it to make it bearable again.
-
-> I copied them all to my laptop where I develop my patches
-> and was able to reproduce the error :-)
-> 
-> Do I need copy all of these or is smatch_db.sqlite enough?
-
-Yep.  Only smatch_db.sqlite.  I should probably delete the other
-files after the DB has been built.
-
-> 
-> Would it be possible that you share your generated file(s)
-> via a download, that might be useful for a lot of people.
-> 
-
-The DB is too big and too dependent on your .config but I should
-share the smatch_data/ more regularly.  I started to push that into
-a separate git repo but I didn't finish that work.  I should do
-that.
-
-regards,
-dan carpenter
-
+--------------vK5v2eY0G0m0hvTGSizGf7Cn--
