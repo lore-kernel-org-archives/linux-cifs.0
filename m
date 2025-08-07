@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D392202C2B;
-	Thu,  7 Aug 2025 05:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08988212B28;
+	Thu,  7 Aug 2025 05:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754544187; cv=none; b=T3/eRWBF1o5c9YNKdvnpYVHQ5VUi6KiFzAqu1EGeEBLA8spcEZr88hIJUNcSxR2qo6TCYFRsphxHnW3vv/2QtQBjU9WiJngzSfFxsu+a5nsLRqtvE+A0m+KQ6zu97wdaTobrJMKb8DaMQnclZtjo3WLs+ms1CTiPt4iHnTQg03E=
+	t=1754545211; cv=none; b=fH0WexBcNcVDd2uzzjKyiQyrgKkAjJSY0qWxI4s2CqF/opSwxd1daC5uxhHBhCidUXrp/aO3/ydwGzD9uolK5q+X2V5q61PyPvgfBsZV0x6iDFTQqQkJyXJtaFb1R/WoZ5jQ5w77QZwrtrYu6liA7Pa1xsLoKm+vjfV+fTBqR3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754544187; c=relaxed/simple;
-	bh=YUwPmVrn6K2WFWpNlidZfL01eDYcnmOzCwGou+i6x2c=;
+	s=arc-20240116; t=1754545211; c=relaxed/simple;
+	bh=ymIalFb0o88HlIxUxHGCi2idWfUAPFM4APNrQlaofa0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tmXgVbw5yykOS78TdDWRTH/+duxL5Mb6nIyoKpibmoDmu8HxbC889MlBMXFYTtzJ9II9MWJ0cNA+5OqF+a5Lh5/Mz85rSBFwIrXDybCsPapfZ8ocIaFqY9Qds7DhsImeTvuJtA0s8jd7YdIUOxEAqQH8NSeOk+G2asjdw5nTPhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Vq5WqrP5; arc=none smtp.client-ip=144.76.82.148
+	 In-Reply-To:Content-Type; b=TUgWec/gux8e8/kao+mf3kmWE4vC9U8R3/L7ysJ2ayMNKpBXxkF+LpS1x59JcyBTn4P2L497D8UNvfA8nB1DEdF3m8QPxq6oH0vsnKytELm4MsDPlRdznTHkCMckd7MM2EEIYeJIj5llK4F2YdmZUmVg5v1zM92o2AJErhcaFGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3BCO6v/6; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Vq5WqrP5"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3BCO6v/6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=6ru3pRMmGQBukf0GXDQ/g5j3M3KKaVhfWOPVpl/umhc=; b=Vq5WqrP5sCnEvoutdYsokfVsMf
-	puYtQ4sXLtLpyQw798T5IYTufDecgUn9jvpe8ZXggb1yK/ztZs/dPthYClJzNGwQ3JgXw/yhUIDFT
-	0CqzMHqZW4lhae7W/B3/ElhzvsaYlsI1oyeHHAxAh6PbToi/+jTxtkx9kcerKNDhnvNme1t/SYKeC
-	6SCrJ8AE9C9GaUJJjPz8lhIkNBfs7MZbBFT84E85g+cStBtmIBTcxnpzZdzyTcwBM5ScvpgfpV4EI
-	ZP4zGzxUUU/s7OK423tOcX6kAAG0GoHjX5AFCuMG9wvFLjgSZ7BwjB8gO9qIbYA2T7fk3cEuLhojf
-	Q4AbssGH+Arr+52LWDYG1qrJkZsYlz0hZA3bvFPbJgKSbKRr53Ep5q3LRb6O0Uk0YWm2Ww+q+O9kr
-	6XxeVXepCN7PEYIb60tRKetKkWYL/yMrlHJ0E9L1RLPSChpjCFpI+TrHA4/aP7NwO9xryYs60t1W+
-	RXiOAqwArVUd3Y4tynEc/O84;
+	bh=ymIalFb0o88HlIxUxHGCi2idWfUAPFM4APNrQlaofa0=; b=3BCO6v/6UTpcn9Tlz9DvO2N0EO
+	ucdQhih4FmNanlKTYtx4K/tJTHtAjiqvb29fS32iruJgo/byKpickN+XzxdpLt/af0hyw9FERT5aw
+	hliFT5QKKPYuLMaMPo0L9yg4J4XUZcWc5PA3eYDS7QpumSDQTMoLKHv8CvbqmkQNh/Lgoe4m7R2g+
+	YvYS8tDh/F2H1b5tkCwDcF6pA+jXkMsHkcYdgXFkaaU33b8UPC5iBxY+n7AHFajLBbYUAmaHXLhvt
+	mWhmMW1ktqL+pA0+tSZI8RjpK/EJ1WvKufbHbA5X85R2EYeClAwnPCF6gvBItQVPjCs0Zwyb8rGlv
+	ifdSm2k2/VZdvinjLbZSdPevdXMGFtmgx6RqX+9Q0e2USdv2FJy2GVrON8xhxDag+WAvOi4ievTF6
+	wT/lLNeNNspN9VA1wYhr7Bo8WiHEvadrFLsNNQPc2egObR7cxI0UupfJplsn9NMnHFoD3ErKVmpYb
+	bAmHi5ERxi0D8Zemaod578p1;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1ujt5h-001UId-0n;
-	Thu, 07 Aug 2025 05:23:01 +0000
-Message-ID: <c213ace1-7845-4454-a746-8a5926ab41d0@samba.org>
-Date: Thu, 7 Aug 2025 07:23:00 +0200
+	id 1ujtMD-001UQx-2F;
+	Thu, 07 Aug 2025 05:40:05 +0000
+Message-ID: <1b3e0ed3-35c5-46ce-932d-02de9ba17ab6@samba.org>
+Date: Thu, 7 Aug 2025 07:40:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,38 +40,43 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/31] netfs: [WIP] Allow the use of MSG_SPLICE_PAGES
- and use netmem allocator
+Subject: Re: [RFC PATCH 16/31] cifs: Rewrite base TCP transmission
 To: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>
 Cc: Paulo Alcantara <pc@manguebit.org>, Shyam Prasad N
  <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
  Wang Zhaolong <wangzhaolong@huaweicloud.com>,
  Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ linux-kernel@vger.kernel.org, netfs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org
 References: <20250806203705.2560493-1-dhowells@redhat.com>
+ <20250806203705.2560493-17-dhowells@redhat.com>
 Content-Language: en-US
 From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250806203705.2560493-1-dhowells@redhat.com>
+In-Reply-To: <20250806203705.2560493-17-dhowells@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi David,
+Am 06.08.25 um 22:36 schrieb David Howells:
+> +int smb_sendmsg(struct TCP_Server_Info *server, struct msghdr *smb_msg,
+> + size_t *sent)
+> +{
+> + int rc = 0;
+> + int retries = 0;
+> + struct socket *ssocket = server->ssocket;
+> +
+> + *sent = 0;
+> +
+> + if (server->noblocksnd)
+> + smb_msg->msg_flags = MSG_DONTWAIT + MSG_NOSIGNAL;
+> + else
+> + smb_msg->msg_flags = MSG_NOSIGNAL;
+> + smb_msg->msg_flags = MSG_SPLICE_PAGES;
+> +
 
-> The aim is to build up a list of fragments for each request using a bvecq.
-> These form a segmented list and can be spliced together when assembling a
-> compound request.  The segmented list can then be passed to sendmsg() with
-> MSG_SPLICE_PAGES in a single call, thereby only having a single loop (in
-> the TCP stack) to shovel data, not loops-over-loops.  Possibly we can
-> dispense with corking also, provided we can tell TCP to flush the record
-> boundaries.  (Note that this also simplifies smbd_send() for RDMA).
+I guess you want '|=' instead of '=' in all 3 lines?
 
-I didn't look at the patches in detail, but I like the simplifications
-for the transport layer and that hopefully allows me to
-move smbd_send() behind sendmsg() with MSG_SPLICE_PAGES in the end.
+I also think msghdr should be setup in the caller completely
+or it should be a local variable in smb_sendmsg() and the caller
+only passes struct iov_iter.
 
-So the current situation is that we memcpy (at least) in sendmsg()
-and with your patches we do a memcpy higher in the stack, but then
-use MSG_SPLICE_PAGES in order to do it twice. Is that correct?
-
-Thanks!
 metze
