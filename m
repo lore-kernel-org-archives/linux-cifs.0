@@ -1,81 +1,171 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477C31E7C34
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 12:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890B216F8E9
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 14:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754655410; cv=none; b=MPZjxKiPsjM71AecBTgEZ0SOaQZEQ7gtmYqw0dJwIV0ardatihhaNFcd8KuyU3rzfm/iXH39SHcs1Q5bmdeknUJYIqMFYEAvc7sIo/SdlkQk0Clyd7n4kJhDyIIEjECXnwuHHeO2MY+U1xBF4V/P3Ji1OtgQ3b1CbhvZBZstfS8=
+	t=1754662528; cv=none; b=Kui4rUBeYDREbb3k0krjavpS9yul8Yn3pqcRmHueuQIzx02P7ZjqSQ/mVONGwJ165pcKXaHv72EvCipmjNR85XWJzd9fc/kMohTxwQg88sa1f1o8csPQPXa4Zu/RxFGZ0qfmPoiHQ014k8Dw8WEg0HFE0+Swy/akScRNJy3osgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754655410; c=relaxed/simple;
-	bh=OYbbsBmlhhx67h41f47YK0gxQsek//YILertc8XlYPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eXZELGZhvu7bocgPGB4mVQNalHbhNciftUgOAEIs/ZvYAVytiHPGjC24OCchR1LabLTHCGQlACuw3tQyBGbC+uAVvU1cPq1Q9ULk/TXFnTEjYmXBmSZ2O3wHTa0lviJqDtduu4QaKDRwqm++QADFF2RTpQhq6fWvgxXc/3UKXKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=AsuPKSlt; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1754662528; c=relaxed/simple;
+	bh=0EnkHEGJ73QH04wvhXkCK8nf+om469IjyS/Wkl6uPyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fDLiHgsd8dt5b8f5p8vme8lAAHH2MoctpP+KS71Hk14sMWz9EMYRruuXNXq6wHrW1d3dJGK74Yc91bLIRtgO5Ek8KdBbWTkhKPwLk3SknymfBgPyZXYkDW5/kQ2WZt13EsDiwtAu71ODLaeAM56iCPf8cAsxOuySYnsEDkIAnHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qavj5MhT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vcMJx+ql; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qavj5MhT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vcMJx+ql; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="AsuPKSlt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=OYbbsBmlhhx67h41f47YK0gxQsek//YILertc8XlYPM=; b=AsuPKSlt5dZMNxqgQUkvUu4NNu
-	Hl5P+jJsWrO94DtcGfEMGF4q2Ufuh73gThBOReh4mhZPtPxp7RHFaNjLbIuXokuziEMZZl/vMYuJx
-	jXUlUgbQLmbzIR+vMHsuirGzc5xrO47zzCPdw7qfaZ8fAqv95d+FPmovrqTJ82Bluj5Pa3t8fhqsF
-	EYBffi4RmsWtkPbemMYbM+jtyl2z44NJLBEmpP4vLe/Bc/ePXAszHukWl5X6gl0+PhEd9Mkl24JQQ
-	HVnfVByU+0wQhUkZ/65cEmlIuHaXAMHb3clXh+UgO0L1iTjhfqjh72ft3XfhX5KCb8kN6EmOfgpTh
-	2gP8EIcb1MAMbEyT+G2pYIqTReu5oo4TihKTp2I4qh+nFJL7r2YvsV2bHW4E24VR2SFI9p+m8Ig6i
-	JVUXfva6K4JFHIGhO6OgtKfEmAMSB7r5RS74wRkFTTLL5P/ip/5UrmEG9JIGiINxUvaHLYkRALpft
-	XrLKbBW9D52Oqe4mCLqKoY4f;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1ukM1X-001njP-01;
-	Fri, 08 Aug 2025 12:16:39 +0000
-Message-ID: <84154c26-ac76-4a2b-9662-b3c4f2df98dd@samba.org>
-Date: Fri, 8 Aug 2025 14:16:38 +0200
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qavj5MhT";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vcMJx+ql";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qavj5MhT";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vcMJx+ql"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id AA61C5BDEE;
+	Fri,  8 Aug 2025 14:15:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754662524; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nCJX2YVHRzsi+NQ8DFEFBBW8/NL0NIQfBKtZHerXTs=;
+	b=qavj5MhTSvJRCF9J0MiircfSlkIm8v927uxY/RydR3WgRSDsurECXTraE3n364Dh4s8dm7
+	wrOvZf+zUBiEMB9KaVdHYcPHMx0v+xxUOfOS5dPP1Zj8VHikmzXn58rih3CTaPwsgEdTyK
+	IQjQUJSoeTnHekNCFOTQ7mALfwNr97M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754662524;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nCJX2YVHRzsi+NQ8DFEFBBW8/NL0NIQfBKtZHerXTs=;
+	b=vcMJx+qllMS5++GYAm0RxaJ5042O3IDvPfV7XxysuUg8yP2EqWluevmzshjG9V+8/1uP6l
+	o6BCxligy4dTNuCg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=qavj5MhT;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=vcMJx+ql
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1754662524; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nCJX2YVHRzsi+NQ8DFEFBBW8/NL0NIQfBKtZHerXTs=;
+	b=qavj5MhTSvJRCF9J0MiircfSlkIm8v927uxY/RydR3WgRSDsurECXTraE3n364Dh4s8dm7
+	wrOvZf+zUBiEMB9KaVdHYcPHMx0v+xxUOfOS5dPP1Zj8VHikmzXn58rih3CTaPwsgEdTyK
+	IQjQUJSoeTnHekNCFOTQ7mALfwNr97M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1754662524;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nCJX2YVHRzsi+NQ8DFEFBBW8/NL0NIQfBKtZHerXTs=;
+	b=vcMJx+qllMS5++GYAm0RxaJ5042O3IDvPfV7XxysuUg8yP2EqWluevmzshjG9V+8/1uP6l
+	o6BCxligy4dTNuCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 356C51392A;
+	Fri,  8 Aug 2025 14:15:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Dp1xOnsGlmg7MQAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Fri, 08 Aug 2025 14:15:23 +0000
+Date: Fri, 8 Aug 2025 11:15:13 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Wang Zhaolong <wangzhaolong@huaweicloud.com>, Stefan Metzmacher <metze@samba.org>, 
+	Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 00/31] netfs: [WIP] Allow the use of MSG_SPLICE_PAGES
+ and use netmem allocator
+Message-ID: <nok4rlj33npje4jwyo3cytuqapcffa4jzomibiyspxcrbc6qg6@77axvtbjzbfm>
+References: <20250806203705.2560493-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] smb: client: make use of smbdirect_socket.status_wait
-To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
- Long Li <longli@microsoft.com>
-References: <cover.1754582143.git.metze@samba.org>
- <c1dd7da5ea65b9867693eb9ecfedf9f35f71b5d3.1754582143.git.metze@samba.org>
- <CAFTVevXk40jHJqdHyt1gfKHC6wuGMTR49mZMjZ1W-e+t_+eNsw@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAFTVevXk40jHJqdHyt1gfKHC6wuGMTR49mZMjZ1W-e+t_+eNsw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250806203705.2560493-1-dhowells@redhat.com>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim]
+X-Spam-Flag: NO
+X-Spam-Level: 
+X-Rspamd-Queue-Id: AA61C5BDEE
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.01
 
-Hi Meetakshi,
+Hi David,
 
-> &sc -> status_wait is initialized in _smbd_get_connection() in line
-> 1691 but it is being used by smbd_ia_open() -> smbd_create_id() before
-> that. This is giving an OOPS on RDMA mount (attached).
-> Could you please check?
+On 08/06, David Howells wrote:
+> (3) Rewrite the base TCP transmission to be able to use MSG_SPLICE_PAGES.
+>
+>     (a) Copy all the data involved in a message into a big buffer formed
+>     	 of a sequence of pages attached to a bvecq.
 
-The problem comes with this patch:
-[PATCH 7/9] smb: client: use status_wait and SMBDIRECT_SOCKET_RESOLVE_{ADDR, ROUTE}_RUNNING for completion
+Nice!
 
-And yesterday I was thinking the whole day about in which patch
-I move init_waitqueue_head(&info->status_wait); to the top and then forgot it.
+>     (b) If encrypting the message just encrypt this buffer.  Converting
+>     	 this to a scatterlist is much simpler (and uses less memory) than
+>     	 encrypting from the protocol elements.
 
-The strange thing is that all tests I made yesterday evening worked just fine
-something between 3-5 times.
+This could've been done a long ago, but since you're on it... crypto API
+supports in-place ops (src == dst), so you can save yet another allocation
+here.
 
-And today I got the crash immediately and was about to debug it.
+This is also possible from SMB2 side because the spec says if encryption
+fails, the request should be failed as a whole.
 
-Thanks that you found it! And sorry for introducing the stupid problem.
+>     (d) Compression should be a matter of vmap()'ing these pages to form
+>     	 the source buffer, allocating a second buffer of pages to form a
+>     	 dest buffer, also in a bvecq, vmapping that and then doing the
+>     	 compression.  The first buffer can then just be replaced by the
+>     	 second.
 
-I'll post v2 soon.
+OTOH, compression can't be in-place because SMB2 says that if
+compression fails, the original uncompressed request must be sent (i.e.
+src must be left untouched until smb_compress() finishes).
 
-Thanks!
-metze
+I don't know how relevant these comments are for you and your patches,
+but HTH.
 
+Directly related to the patches: it would be great if you could handle
+commented out code, either by completely removing them, or by providing
+some in-code fallback mechanism (I'll reply to the patches).
+
+Other than that, +1 for the cleanup/refactoring; I really like the new
+smb_message/transport infrastructure!
+
+
+Cheers,
+
+Enzo
