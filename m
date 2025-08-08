@@ -1,137 +1,173 @@
-Received: from forward101b.mail.yandex.net (forward101b.mail.yandex.net [178.154.239.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F6E281368
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 14:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4A218E377
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 15:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754664819; cv=none; b=tfbI2oTx6EQkO5L5yZhFrIhglDHWdrV+EJLzZg3y8RCsOPRz9Y0hLJ7DfZ3sQagym09jMBAkDzCl9jmVqWgJ5iowmNeJ577SJY6iMj7p1AhNtygrAX59wNgXbAfle17aSSfIzk7Tt9ez54rCj6L7z6Nq7SzK8yIjnNRwEkHk1DM=
+	t=1754665824; cv=none; b=OQvnjTctHYCdP7o+ijBy1ZPqmvcLSWZaTUGWlkCd/Hli6i5pMmBrKnfbnG1+1NTt0x4oa2xNyLRvQXYXgnPDSVMZ1QC6d/D+31MqZO2i5ku9bOCjZpB83fPa5xad8XbaOGUQDVan4N8oQTOTHwlIcrDf1ZOWjNfrB23xlg6SVgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754664819; c=relaxed/simple;
-	bh=ANR1Ch4DsPV4p2L9xFs1Qv5CXlWR2b0+4aqsA+1H2z8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aOVLVksAx/d/f/SwEIPoZvNQZhDA9iIRhPtskambcZndRmPSL1QXMevCac7JQ0SoBPf8szWwNRNkTzfBgtsxaDdbZYfvt5sw7ZkoAlO1r8w80NvxYir4ttYe1l5B/hb0QpgVL9QMDuLadhBHIGzLUEuw7q73fS4MfDGFDxvT9rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=ecu4cOkQ; arc=none smtp.client-ip=178.154.239.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1754665824; c=relaxed/simple;
+	bh=umcvyVklicbzq/kBy0WmrsbaWF0kIcR+4L2lO8UDxYY=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=WUFU9m+LkOujUd4yVeC8ClQbOW7W5pYssqup+EKDW0W3Bq3KIANFJy26G5HSq4LYTW5yWUDWf7NELuN5GnIGJUy7k1pUBT2Smj7pVttVbjaJUVA83jc6lKYeMgALdbStniOjZnd9mkkbn9IrfGdRklciqG1BafkLuqhV8b6y5wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MEvX42r4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="ecu4cOkQ"
-Received: from mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net [IPv6:2a02:6b8:c10:2987:0:640:47b0:0])
-	by forward101b.mail.yandex.net (Yandex) with ESMTPS id CDC20C0137;
-	Fri, 08 Aug 2025 17:53:25 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id OrktRgSFpeA0-v2dDoGBO;
-	Fri, 08 Aug 2025 17:53:25 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1754664805; bh=d0I9Nnfov1UEVBQYlNPT5GY7AP+Mq1yY9ehJI0Z8MAg=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=ecu4cOkQP6eNFnXqn8pY2n2hdtaqfONU4lRZ7pyF++HdMK0O8nwgq6cmA1P8waY9/
-	 10YnGoSC9+jEzPrkmhPQDvFHcrG4HYU20qasDlcd0k6Bjlb+g1vIYBLS/fxfcxsvB+
-	 WilI08Wv5GUJQwwjS1Jaef8J9+ruI3GJW2z+FERQ=
-Authentication-Results: mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] cifs: avoid extra calls to strlen() in cifs_get_spnego_key()
-Date: Fri,  8 Aug 2025 17:52:21 +0300
-Message-ID: <20250808145221.479993-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEvX42r4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754665821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sb1xY4mkvRwciVCfa3SBcbz2VY+53NejsonXd/nwxL4=;
+	b=MEvX42r4q+pqA4cGu6C8QqRY1tZ9IJIyY7fE2L3NsnmkHnIdGsoOGLjUR5F9ac6NZE223W
+	VxelG041HKzcD29yIXzY3t62PGUK6B70ipV3UlBLmlMr+NACgBagXQth3DML6vxb457HH8
+	6T9WDJh2fOYWCTn98sWWNBRpRLGOagQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-0hywt-IUNPy6Fruejruu2w-1; Fri,
+ 08 Aug 2025 11:10:18 -0400
+X-MC-Unique: 0hywt-IUNPy6Fruejruu2w-1
+X-Mimecast-MFC-AGG-ID: 0hywt-IUNPy6Fruejruu2w_1754665816
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FE8F18003FD;
+	Fri,  8 Aug 2025 15:10:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.17])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 28773180029B;
+	Fri,  8 Aug 2025 15:10:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <zt6f2jl6y5wpiuchryc2vdsmtkiia7s5mligm7helffkanxe3o@2f2ksngn5ekk>
+References: <zt6f2jl6y5wpiuchryc2vdsmtkiia7s5mligm7helffkanxe3o@2f2ksngn5ekk> <20250806203705.2560493-1-dhowells@redhat.com> <20250806203705.2560493-25-dhowells@redhat.com>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
+    linux-kernel@vger.kernel.org, netfs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH 24/31] cifs: Convert SMB2 Negotiate Protocol request
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2926139.1754665810.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Aug 2025 16:10:10 +0100
+Message-ID: <2926140.1754665810@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Since 'snprintf()' returns the number of characters emitted, an
-output position may be advanced with this return value rather
-than using an explicit calls to 'strlen()'. Compile tested only.
+Enzo Matsumiya <ematsumiya@suse.de> wrote:
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- fs/smb/client/cifs_spnego.c | 47 ++++++++++++++-----------------------
- kernel/bpf/verifier.c       |  3 +++
- 2 files changed, 21 insertions(+), 29 deletions(-)
+> On 08/06, David Howells wrote:
+> > ...
+> > -static unsigned int
+> >-build_netname_ctxt(struct smb2_netname_neg_context *pneg_ctxt, char *h=
+ostname)
+> >+static size_t smb2_size_netname_ctxt(struct TCP_Server_Info *server)
+> > {
+> >+	size_t data_len;
+> >+
+> >+#if 0
+> > 	struct nls_table *cp =3D load_nls_default();
+> >+	const char *hostname;
+> >
+> >-	pneg_ctxt->ContextType =3D SMB2_NETNAME_NEGOTIATE_CONTEXT_ID;
+> >+	/* Only include up to first 100 bytes of server name in the NetName
+> >+	 * field.
+> >+	 */
+> >+	cifs_server_lock(pserver);
+> >+	hostname =3D pserver->hostname;
+> >+	if (hostname && hostname[0])
+> >+		data_len =3D cifs_size_strtoUTF16(hostname, 100, cp);
+> >+	cifs_server_unlock(pserver);
+> >+#else
+> >+	/* Now, we can't just measure the length of hostname as, unless we ho=
+ld
+> >+	 * the lock, it may change under us, so allow maximum space for it.
+> >+	 */
+> >+	data_len =3D 400;
+> >+#endif
+> >+	return ALIGN8(sizeof(struct smb2_neg_context) + data_len);
+> >+}
+> =
 
-diff --git a/fs/smb/client/cifs_spnego.c b/fs/smb/client/cifs_spnego.c
-index bc1c1e9b288a..43b86fa4d695 100644
---- a/fs/smb/client/cifs_spnego.c
-+++ b/fs/smb/client/cifs_spnego.c
-@@ -124,55 +124,44 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo,
- 	dp = description;
- 	/* start with version and hostname portion of UNC string */
- 	spnego_key = ERR_PTR(-EINVAL);
--	sprintf(dp, "ver=0x%x;host=%s;", CIFS_SPNEGO_UPCALL_VERSION,
--		hostname);
--	dp = description + strlen(description);
-+	dp += sprintf(dp, "ver=0x%x;host=%s;", CIFS_SPNEGO_UPCALL_VERSION,
-+		      hostname);
- 
- 	/* add the server address */
- 	if (server->dstaddr.ss_family == AF_INET)
--		sprintf(dp, "ip4=%pI4", &sa->sin_addr);
-+		dp += sprintf(dp, "ip4=%pI4", &sa->sin_addr);
- 	else if (server->dstaddr.ss_family == AF_INET6)
--		sprintf(dp, "ip6=%pI6", &sa6->sin6_addr);
-+		dp += sprintf(dp, "ip6=%pI6", &sa6->sin6_addr);
- 	else
- 		goto out;
- 
--	dp = description + strlen(description);
--
- 	/* for now, only sec=krb5 and sec=mskrb5 and iakerb are valid */
- 	if (server->sec_kerberos)
--		sprintf(dp, ";sec=krb5");
-+		dp += sprintf(dp, ";sec=krb5");
- 	else if (server->sec_mskerberos)
--		sprintf(dp, ";sec=mskrb5");
-+		dp += sprintf(dp, ";sec=mskrb5");
- 	else if (server->sec_iakerb)
--		sprintf(dp, ";sec=iakerb");
-+		dp += sprintf(dp, ";sec=iakerb");
- 	else {
- 		cifs_dbg(VFS, "unknown or missing server auth type, use krb5\n");
--		sprintf(dp, ";sec=krb5");
-+		dp += sprintf(dp, ";sec=krb5");
- 	}
- 
--	dp = description + strlen(description);
--	sprintf(dp, ";uid=0x%x",
--		from_kuid_munged(&init_user_ns, sesInfo->linux_uid));
-+	dp += sprintf(dp, ";uid=0x%x",
-+		      from_kuid_munged(&init_user_ns, sesInfo->linux_uid));
- 
--	dp = description + strlen(description);
--	sprintf(dp, ";creduid=0x%x",
-+	dp += sprintf(dp, ";creduid=0x%x",
- 		from_kuid_munged(&init_user_ns, sesInfo->cred_uid));
- 
--	if (sesInfo->user_name) {
--		dp = description + strlen(description);
--		sprintf(dp, ";user=%s", sesInfo->user_name);
--	}
-+	if (sesInfo->user_name)
-+		dp += sprintf(dp, ";user=%s", sesInfo->user_name);
- 
--	dp = description + strlen(description);
--	sprintf(dp, ";pid=0x%x", current->pid);
-+	dp += sprintf(dp, ";pid=0x%x", current->pid);
- 
--	if (sesInfo->upcall_target == UPTARGET_MOUNT) {
--		dp = description + strlen(description);
--		sprintf(dp, ";upcall_target=mount");
--	} else {
--		dp = description + strlen(description);
--		sprintf(dp, ";upcall_target=app");
--	}
-+	if (sesInfo->upcall_target == UPTARGET_MOUNT)
-+		dp += sprintf(dp, ";upcall_target=mount");
-+	else
-+		dp += sprintf(dp, ";upcall_target=app");
- 
- 	cifs_dbg(FYI, "key description = %s\n", description);
- 	saved_cred = override_creds(spnego_cred);
--- 
-2.50.1
+> Why was this commented out?  Your comment implies that you can't hold
+> the lock anymore there, but I couldn't find out why (with your patches
+> applied).
+
+The problem is that the hostname may change - and there's a spinlock to
+protect it.  However, now that I'm working out the message size before the
+allocation, I need to find the size of the host name, do the alloc and the=
+n
+copy the hostname in - but I can't hold the spinlock across the alloc, so =
+the
+hostname may change whilst the lock is dropped.
+
+The obvious solution is to just allocate the maximum size for it.  It's no=
+t
+that big and this command isn't used all that often.
+
+Remember that this is a work in progress, so you may find bits like this w=
+here
+I may need to reconsider what I've chosen.
+
+> >-static void
+> >-assemble_neg_contexts(struct smb2_negotiate_req *req,
+> >-		      struct TCP_Server_Info *server, unsigned int *total_len)
+> >+static size_t smb2_size_neg_contexts(struct TCP_Server_Info *server,
+> >+				     size_t offset)
+> > {
+> >-	unsigned int ctxt_len, neg_context_count;
+> > 	struct TCP_Server_Info *pserver;
+> >-	char *pneg_ctxt;
+> >-	char *hostname;
+> >-
+> >-	if (*total_len > 200) {
+> >-		/* In case length corrupted don't want to overrun smb buffer */
+> >-		cifs_server_dbg(VFS, "Bad frame length assembling neg contexts\n");
+> >-		return;
+> >-	}
+> >
+> > 	/*
+> > 	 * round up total_len of fixed part of SMB3 negotiate request to 8
+> > 	 * byte boundary before adding negotiate contexts
+> > 	 */
+> >-	*total_len =3D ALIGN8(*total_len);
+> >+	offset =3D ALIGN8(offset);
+> >+	offset +=3D ALIGN8(sizeof(struct smb2_preauth_neg_context));
+> >+	offset +=3D ALIGN8(sizeof(struct smb2_encryption_neg_context));
+> >
+> >-	pneg_ctxt =3D (*total_len) + (char *)req;
+> >-	req->NegotiateContextOffset =3D cpu_to_le32(*total_len);
+> >+	/*
+> >+	 * secondary channels don't have the hostname field populated
+> >+	 * use the hostname field in the primary channel instead
+> >+	 */
+> >+	pserver =3D SERVER_IS_CHAN(server) ? server->primary_server : server;
+> >+	offset +=3D smb2_size_netname_ctxt(pserver);
+> =
+
+> If you're keeping data_len=3D400 above, you could just drop
+> smb2_size_netname_ctxt() altogether and use
+> "ALIGN8(sizeof(struct smb2_neg_context) + 400)" directly here.
+
+Yeah.  Probably would make sense to do that with a comment saying why 400.
+
+David
 
