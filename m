@@ -1,225 +1,88 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407D5186E2D
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 16:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFADF35948
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 17:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754671775; cv=none; b=VL6hlKAd2xUv9FbQSZE/qI6BJMJiCNmQqWhyPy2yrqzxnqzneKrqyaCHEa1whpeZOFnOU4tUB1uNf7aC9p84YCv+t6B7mySwd9gqNz9kzt6ZDWfdFDWl+/eH0UaELIbZ7FEev6KOeX5konTdAvC79z8nJqsyPXQl6dKgmgnpXTk=
+	t=1754673950; cv=none; b=kju6iCDtM67l16nnroZsx7iBcInkDlAkbnDEVYDLef2f5UHwNPREGiQXa3UynD9rql3iqHQHWT2JAlZLG/gkLKwNWKZFMHxzqOLryEf78MpJoDVyfX4oCEj0z90of9PCheR6JeKm2CbcEE7w3oXFPmBxzYq6RVrGMZaFYv/+AWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754671775; c=relaxed/simple;
-	bh=QxmQD343aWoOPJZAq94nj4TlFaZYdfDGeqsRneVsIoM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pqfSGdNhI+QxyWH/njYAelnM9JgEpBNqOsfB/LgIFlhYpO+7Pulewvf5Lhz/ITcIq16tPtvegf2dXGiX/V1jM3zMZWXvHxy+w/8zBAuKY8NEfoeKptR/fnsax8ZFhVILH3oZhKWLtBFwQaHp74Wm5AFqvM2x0FO4SHeDoIqkIGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=vtpoPwFB; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1754673950; c=relaxed/simple;
+	bh=cKWON+MNVCEnFy9/lmYI3igEZSr+GnOQq6Q+TJmTu14=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CMH/zl5F6VAFStnuS0YgtyjM0DCWOySuUWn6N9x9wbkNeN1Brmq2M40zH3dJby/OMbrqDRSMAYehuQvTzNycLAICMFlYSAhlzHpFPvqFQLlFXx3YT/2OYLgjpIxibGqD+mob3PCtODgddi2rX2GYf7QWzBtaRGprPw4Eq2jGXNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfYgKS0Y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="vtpoPwFB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=4U9yVf7xCG+R85tXYmz34DCnjBOg8a8T4oiGQkIjSmo=; b=vtpoPwFBrQxyRLLaKRR7ygfiGs
-	LsuGcMnMz0s3OiFWasEFM61xSQc8PGg/G2fMgf1E2AWUcwIyPRRGaotuwKa3IZWtvB1dQhlW9i9BP
-	nc4l+hVkxyw2aqrRX1Eal9xylFJW/Lm+/v6nhz6mg9xEGZ0pze/UcfdB9xjqwhpcun7rjmwgZ6OCv
-	9cLR8GBqLHZQp8bEOm+J7jFbJkhEe8MFkbuqNdHFO8ALaeGLWDeIg4NoCufzfoe90QJCOdppP4TAb
-	ntLktUeg8jap+vMr8SKos/S96n4iEG9yvhtBtH8eNrqqG08jgWvWESBr2lyS1Ww+aJumkByzWAnqi
-	U5UflG9Vd1mAPbEAxYMzA1iQPQz3VkMqtSXAeZmedEzLaOiOuD17bOfm9rJRB91fs8HU2luVMjDMm
-	pP0pjvEhfAlCznHelR0zm0kRiRkTVT1+dzT7V3d1CrnP8gYwGEq/XunCHSXITnrUYjFdJL+J1Nrgs
-	1BtgR62DcAxO/GUHLKh66ChL;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1ukQHa-001qWI-1H;
-	Fri, 08 Aug 2025 16:49:30 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: metze@samba.org,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v3 9/9] smb: client: make use of smbdirect_socket.status_wait
-Date: Fri,  8 Aug 2025 18:48:17 +0200
-Message-ID: <f11c9dcd074d5806e1feb76393d93c7800172f88.1754671444.git.metze@samba.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1754671444.git.metze@samba.org>
-References: <cover.1754671444.git.metze@samba.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfYgKS0Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754673947;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=79lZqFsCw1oT9Q6mp5jk4aDocHiI3mHPJRRd8ro+mY8=;
+	b=BfYgKS0YonD7XHN30EFj85+9FwXCekLxZvG8wid/+G/p+Gop/hUrvwKzY6fvwXomO9eI+A
+	QAA05ddY+Fietn8PwzaM63yeDSKh6YgmUp6ZKttypjCLyTt8SLlFn7k0AXjVn8xwo9ev+5
+	ePyMi/gQUhvtzSizE6LOCJOQC6PZYlg=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-321-zLjUtnEaP0qG5uCumLZAPQ-1; Fri,
+ 08 Aug 2025 13:25:44 -0400
+X-MC-Unique: zLjUtnEaP0qG5uCumLZAPQ-1
+X-Mimecast-MFC-AGG-ID: zLjUtnEaP0qG5uCumLZAPQ_1754673942
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F0B601800342;
+	Fri,  8 Aug 2025 17:25:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.17])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A68783001455;
+	Fri,  8 Aug 2025 17:25:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <nok4rlj33npje4jwyo3cytuqapcffa4jzomibiyspxcrbc6qg6@77axvtbjzbfm>
+References: <nok4rlj33npje4jwyo3cytuqapcffa4jzomibiyspxcrbc6qg6@77axvtbjzbfm> <20250806203705.2560493-1-dhowells@redhat.com>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 00/31] netfs: [WIP] Allow the use of MSG_SPLICE_PAGES and use netmem allocator
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2938702.1754673937.1@warthog.procyon.org.uk>
+Date: Fri, 08 Aug 2025 18:25:37 +0100
+Message-ID: <2938703.1754673937@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-This will allow us to have common helper functions soon.
+Hi Enzo,
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/smb/client/smbdirect.c | 32 ++++++++++++++++----------------
- fs/smb/client/smbdirect.h |  2 --
- 2 files changed, 16 insertions(+), 18 deletions(-)
+> >     (d) Compression should be a matter of vmap()'ing these pages to form
+> >     	 the source buffer, allocating a second buffer of pages to form a
+> >     	 dest buffer, also in a bvecq, vmapping that and then doing the
+> >     	 compression.  The first buffer can then just be replaced by the
+> >     	 second.
+> 
+> OTOH, compression can't be in-place because SMB2 says that if
+> compression fails, the original uncompressed request must be sent (i.e.
+> src must be left untouched until smb_compress() finishes).
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index ca6aa298d577..fe7e138704fc 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -214,34 +214,34 @@ static int smbd_conn_upcall(
- 	case RDMA_CM_EVENT_ADDR_RESOLVED:
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RESOLVE_ADDR_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_RESOLVE_ROUTE_NEEDED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_ROUTE_RESOLVED:
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RESOLVE_ROUTE_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_RDMA_CONNECT_NEEDED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_ADDR_ERROR:
- 		log_rdma_event(ERR, "connecting failed event=%s\n", event_name);
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RESOLVE_ADDR_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_RESOLVE_ADDR_FAILED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_ROUTE_ERROR:
- 		log_rdma_event(ERR, "connecting failed event=%s\n", event_name);
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RESOLVE_ROUTE_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_RESOLVE_ROUTE_FAILED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_ESTABLISHED:
- 		log_rdma_event(INFO, "connected event=%s\n", event_name);
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RDMA_CONNECT_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_NEGOTIATE_NEEDED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_CONNECT_ERROR:
-@@ -250,7 +250,7 @@ static int smbd_conn_upcall(
- 		log_rdma_event(ERR, "connecting failed event=%s\n", event_name);
- 		WARN_ON_ONCE(sc->status != SMBDIRECT_SOCKET_RDMA_CONNECT_RUNNING);
- 		sc->status = SMBDIRECT_SOCKET_RDMA_CONNECT_FAILED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		break;
- 
- 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
-@@ -259,12 +259,12 @@ static int smbd_conn_upcall(
- 		if (sc->status == SMBDIRECT_SOCKET_NEGOTIATE_FAILED) {
- 			log_rdma_event(ERR, "event=%s during negotiation\n", event_name);
- 			sc->status = SMBDIRECT_SOCKET_DISCONNECTED;
--			wake_up(&info->status_wait);
-+			wake_up(&sc->status_wait);
- 			break;
- 		}
- 
- 		sc->status = SMBDIRECT_SOCKET_DISCONNECTED;
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		wake_up_interruptible(&sc->recv_io.reassembly.wait_queue);
- 		wake_up_interruptible_all(&info->wait_send_queue);
- 		break;
-@@ -525,7 +525,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		else
- 			sc->status = SMBDIRECT_SOCKET_CONNECTED;
- 
--		wake_up_interruptible(&info->status_wait);
-+		wake_up_interruptible(&sc->status_wait);
- 		return;
- 
- 	/* SMBD data transfer packet */
-@@ -629,7 +629,7 @@ static struct rdma_cm_id *smbd_create_id(
- 		goto out;
- 	}
- 	rc = wait_event_interruptible_timeout(
--		info->status_wait,
-+		sc->status_wait,
- 		sc->status != SMBDIRECT_SOCKET_RESOLVE_ADDR_RUNNING,
- 		msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
- 	/* e.g. if interrupted returns -ERESTARTSYS */
-@@ -656,7 +656,7 @@ static struct rdma_cm_id *smbd_create_id(
- 		goto out;
- 	}
- 	rc = wait_event_interruptible_timeout(
--		info->status_wait,
-+		sc->status_wait,
- 		sc->status != SMBDIRECT_SOCKET_RESOLVE_ROUTE_RUNNING,
- 		msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
- 	/* e.g. if interrupted returns -ERESTARTSYS */
-@@ -1163,7 +1163,7 @@ static int smbd_negotiate(struct smbd_connection *info)
- 		return rc;
- 
- 	rc = wait_event_interruptible_timeout(
--		info->status_wait,
-+		sc->status_wait,
- 		sc->status != SMBDIRECT_SOCKET_NEGOTIATE_RUNNING,
- 		secs_to_jiffies(SMBD_NEGOTIATE_TIMEOUT));
- 	log_rdma_event(INFO, "wait_event_interruptible_timeout rc=%d\n", rc);
-@@ -1390,7 +1390,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 		rdma_disconnect(sc->rdma.cm_id);
- 		log_rdma_event(INFO, "wait for transport being disconnected\n");
- 		wait_event_interruptible(
--			info->status_wait,
-+			sc->status_wait,
- 			sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
- 	}
- 
-@@ -1605,7 +1605,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	sc = &info->socket;
- 	sp = &sc->parameters;
- 
--	init_waitqueue_head(&info->status_wait);
-+	init_waitqueue_head(&sc->status_wait);
- 
- 	sc->status = SMBDIRECT_SOCKET_CREATED;
- 	rc = smbd_ia_open(info, dstaddr, port);
-@@ -1728,7 +1728,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	}
- 
- 	wait_event_interruptible_timeout(
--		info->status_wait,
-+		sc->status_wait,
- 		sc->status != SMBDIRECT_SOCKET_RDMA_CONNECT_RUNNING,
- 		msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
- 
-@@ -1785,7 +1785,7 @@ static struct smbd_connection *_smbd_get_connection(
- 	destroy_caches_and_workqueue(info);
- 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
- 	rdma_disconnect(sc->rdma.cm_id);
--	wait_event(info->status_wait,
-+	wait_event(sc->status_wait,
- 		sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
- 
- allocate_cache_failed:
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index 62458a8fd109..79ab43b7ac19 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -45,8 +45,6 @@ enum keep_alive_status {
- struct smbd_connection {
- 	struct smbdirect_socket socket;
- 
--	wait_queue_head_t status_wait;
--
- 	struct work_struct disconnect_work;
- 	struct work_struct post_send_credits_work;
- 
--- 
-2.43.0
+I've got a change which should achieve this, but it seems I can't test it.
+None of ksmbd, samba and azure seem to support it:-/
+
+David
 
