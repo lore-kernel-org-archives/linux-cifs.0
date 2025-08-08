@@ -1,125 +1,192 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0002264AD
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 20:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEFD19DF9A;
+	Fri,  8 Aug 2025 21:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754685201; cv=none; b=eMZ25hapjlkcovhrpS+KAJEUU1QhU3kcixr9//KYPNvieET6n+3BchNygWMK9ukGOYZvoMfJBN3R08Gzeq9LUTDpE3fCG4/FPoT4NAfNpEGFOO1atrJElrZ6G0MyRqqxpYxBVIqFU0TtOcw03DWnoeLUY0GnM0A/G0zx7g87YKU=
+	t=1754688132; cv=none; b=FpaBJmvo5sBWWKiK34btYiKEoPqOrHnWb+IR+W4bZ29KBf/IClzsf3DkTTgPYrPKn6LUHQRGRAnGuj9TJZ5V+pdXdVurSZ5NYGX+9y72Y741xqUmRha72C/VoNLCgh631Qhhcj0U2TxX89n249SNPAxyWc8sMTvG4FPes5A5IOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754685201; c=relaxed/simple;
-	bh=RS5B5cyKl6ICqS957iW8mhc8OHHq0JfLXet8VhHLYbc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=HxL+ffr8CiubQGogg78EIacoRuYiKWFyfjHceap2ktm+8Y/mYpPMrBWvhJ+epVq8fynaM3Xn8TBOYQsrL7vxeVXmnLGufZvPqjuQxS3l2PaqWcca7+DGFKvBV/0ySYYbmCzO0Lwyry4zY6jsSUVqaitFhygYXkzyPvxEM7U1wBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WA5wgSaw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1754688132; c=relaxed/simple;
+	bh=bLJhCgnltVB7EE4FmIRKXg3wsdMKApA9ExHW3A1d7WI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=IbwfGGA+YUxoIv7kYkDDOQxoVIALgb/zHVljKjgF2h4AtHOvOcqq3KVDEHKP/4uvkOaeZNgUuIoOxRW3D9OQzYCtqNh3GZKzwSltYHdK4eH3hCNzXM8KaSrOsZZRZ/FsXXl9rXFAYWU+GJJV1y+zqmv86X6ghDnnmUNPkiiqA0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcBwV2jw; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WA5wgSaw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754685197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VF/ecjtThhWGy+i8Zkh8JXBPgtOI7EqWXlR0uJBrg+g=;
-	b=WA5wgSaw09JFXQdDFlu0iEdJwqjZgoYD38y4zmGzYNbi5OVzps6lY7ESCgL1+ZB7o71jFZ
-	Ju/AUjYum4LrPprcvAkZ+FZnI/oXwfLGzaGp4lrblArom4tfF3yN8Cc+1D8mnj5MGTfPs4
-	NIS55zWu4H0JPWiEJ1/IChaKB6io5Ac=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-OIDZeLw8PGuix2iF-cifWA-1; Fri,
- 08 Aug 2025 16:33:12 -0400
-X-MC-Unique: OIDZeLw8PGuix2iF-cifWA-1
-X-Mimecast-MFC-AGG-ID: OIDZeLw8PGuix2iF-cifWA_1754685190
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5FABA19560B2;
-	Fri,  8 Aug 2025 20:33:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.17])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6127F180029E;
-	Fri,  8 Aug 2025 20:33:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <dseje3czotanrhlafvy6rp7u5qoksqu6aaboyyh4l36wt42ege@huredpkntg2t>
-References: <dseje3czotanrhlafvy6rp7u5qoksqu6aaboyyh4l36wt42ege@huredpkntg2t> <nok4rlj33npje4jwyo3cytuqapcffa4jzomibiyspxcrbc6qg6@77axvtbjzbfm> <20250806203705.2560493-1-dhowells@redhat.com> <2938703.1754673937@warthog.procyon.org.uk>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 00/31] netfs: [WIP] Allow the use of MSG_SPLICE_PAGES and use netmem allocator
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcBwV2jw"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4b070e57254so28131111cf.3;
+        Fri, 08 Aug 2025 14:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1754688129; x=1755292929; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7ORL7KqSf3Snq5ilYE9ydZ56m+WfiWfk8qGevFR6BwM=;
+        b=bcBwV2jwuaWplAftPDXmEGL9M+iiAdF1oW+FmiSE9po7PBw+BB0qkNRLehMpfKEjyf
+         64rrjDzzatPYUZk8YC7j2doYMK1duMFbknLNpx1nqekV5a1MCaFRCrCZ6hzE28iXI+NN
+         9+eCChI9xuAY79iKiFFSIkkKngrOTQG9dbjwX2e3VaKDFeEmsM2Mj7X8BOsg4XN4qIxw
+         wtvG7GsmoiWVbvLSGO43AfDo4ewadTsY7wanbUmriTD+K0NerXsC2fWYh7cfyTa2eCLd
+         uGgT4c3DjmWc3p6X254pzRyz8DkA//HhBiXP2+G2UGi5/IyqF25nS9TfF4DaOqyB5f9a
+         WCgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1754688129; x=1755292929;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7ORL7KqSf3Snq5ilYE9ydZ56m+WfiWfk8qGevFR6BwM=;
+        b=NIkd7mo9EEOA1APLPtlMqsmg5BXoWcAzQ6rMAW3c8/DFMtAJdephcKme5kxO/Db5uJ
+         ia28Suo180L/Fnn2NKgjUWYT+EUABiplQJ3WKMBvJJYHoLsJcvEWhz21MpVSbnE1FTm7
+         wFbsDOmEwUImKI31u2pRNNSpRVHK1uazmthxcyvM+0MiE1mnYrY5rdp5+pXWDJLWf8dN
+         8OtbSNtjzLX7IVn5ZtvgmfTYQDIGXWlmh8ZyYwrgcXfiRGrYof6MeDZ5NDCah4tDOC0b
+         rXvS1tw9U6QGAbc8blQJX1LV3zpGETYiF4wN6iFk8h2hhbvAOgfda44idXJ2dwFyvb0E
+         H7cA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0YsULl+WHmcD/EdTbIcxT0KUiEU9QxCuezWEAh+W8VVIIu4X71MitchN1SdikG7VGsXtpgsJkSi6O@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3vlphTIi6JD4P1O5bCNcsxxI4iwzEn82Z0bxzUkQNa1FJumye
+	Hsws20UQzI2R4LRrAZ9MOFT0YMKBAn4f2szHtsF/iU2qLf08IAomDYIkrAANOAme9EK5lvP5M3z
+	E+9T2JeiAzGTQV5YsAEI8YyD33SNnD2iOebuB
+X-Gm-Gg: ASbGncuDc37aVWo0UPQCE+vpUjrxoPdoPd/J6W5zffIWa/65GMJb/VYoJrya14W3EN7
+	uFfCxua5REnWaYYU1zkBZhlx8NkQY5oWIA3gbS5xOtEFZ5qtLcoPTUG/tY7cSQaNY0IswXTTGH3
+	whMwlT6i1xyuguQbFlU9hOkj67z3txQdapsI2dG8Ay1/eKzRkG30cIxJ/fYG90uj7pFbcj3kxZz
+	kDw5LtKfwjWZ9KnyoW9xWCKoasj45xSJi3sx2B6
+X-Google-Smtp-Source: AGHT+IGXx6lz7GgPsAz1oQB7YaDnoIO7s26PuCVxcJGGG2ZczK9V5S/QvllyBhHkyI60vwQFiGIxgAQaYbQibQR9Uws=
+X-Received: by 2002:ac8:588d:0:b0:4b0:61bf:c2b with SMTP id
+ d75a77b69052e-4b0aedfe308mr62314831cf.42.1754688129158; Fri, 08 Aug 2025
+ 14:22:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2942077.1754685186.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Aug 2025 21:33:06 +0100
-Message-ID: <2942078.1754685186@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 8 Aug 2025 16:21:57 -0500
+X-Gm-Features: Ac12FXw_2JmezpLxO7RxpWZFgcfSZ0bBTYxxgN-09mMMqx4opUQGBT35y5vf3fU
+Message-ID: <CAH2r5mtLo02s=t_PUh99CniXe3qLaWBypkxqJO8gj1zqwyUoXA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Enzo Matsumiya <ematsumiya@suse.de> wrote:
+Please pull the following changes since commit
+db68e4c80d995b67a92460711038b9223166bda7:
 
-> Anyway, if you want me to test, just send me the patches.
-> I have your linux-fs remote as well, if that's easier.
+  Merge tag 'v6.17-rc-part1-smb3-client-fixes' of
+git://git.samba.org/sfrench/cifs-2.6 (2025-07-31 21:22:04 -0700)
 
-If you look at:
+are available in the Git repository at:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/=
-?h=3Dcifs-experimental
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.17rc-part2-SMB3-client-fixes
 
-You can see a patch with the subject "cifs: [!] FIX transport compression"=
-.
-Grab that and everything up to it.
+for you to fetch changes up to dfe6f14aedbf59bfb7145de5c7da908583ae50fd:
 
-I'm pretty certain it won't work, but I can't test it.  Well, maybe I can
-force it on and look at the packet trace if wireshark can handle it.
+  smb: client: only use a single wait_queue to monitor smbdirect
+connection status (2025-08-07 12:40:11 -0500)
 
-Some things to note:
+----------------------------------------------------------------
+33 smb3/cifs client changesets, mostly smbdirect cleanup
 
- (1) In smb_compress(), netfs_alloc_bvecq_buffer() is used to allocate the
-     destination buffer and attach it to a bvecq, which it also allocates.=
-  An
-     iterator can be set on this to define part of the buffer to operate o=
-n.
+Eight non-smbdirect fixes
+ - Fix null ptr deref caused by delay in global spinlock initialization
+ - Two fixes for native symlink creation with SMB3.1.1 POSIX Extensions
+ - Fix for socket special file creation with SMB3.1.1 POSIX Exensions
+ - Reduce lock contention by splitting out mid_counter_lock
+    - move SMB1 transport code to separate file to reduce module size
+      when support for legacy servers is disabled
+ - Two cleanup patches: rename mid_lock to make it clearer what it protects
+   and one to convert mid flags to bool to make clearer
 
- (2) vmap_bvecq() is used to map the source and the destination buffers.  =
-It
-     extracts the pages and then calls vmap() on them.
+Twenty five smbdirect/RDMA restructuring patches and fixes
+ - Fix for error handling in send done
+ - Remove unneeded empty packet queue
+ - Fix put_receive_buffer error path
+ - Two fixes to recv_done error paths
+ - Remove unused variable
+ - Improve response and recvmsg type handling
+ - Fix handling of incoming message type
+ - Two cleanup fixes for better handling smbdirect recv io
+ - Two cleanup fixes for socket spinlock
+ - Two patches that add socket reassembly struct
+ - Remove unused connection_status enum
+ - Use flag in common header for SMBDIRECT_RECV_IO_MAX_SGE
+ - Two cleanup patches to introduce and use smbdirect send io
+ - Two cleanup patches to introduce and use smbdirect send_io struct
+ - Fix to return error if rdma connect takes longer than 5 seconds
+ - Error logging improvements
+ - Fix redundand call to init_waitqueue_head
+ - Remove unneeded wait queue
+----------------------------------------------------------------
+Paulo Alcantara (3):
+      smb: client: set symlink type as native for POSIX mounts
+      smb: client: default to nonativesocket under POSIX mounts
+      smb: client: fix creating symlinks under POSIX mounts
 
- (3) Space for the compression header is allocated by smb_send_rqst() in t=
-he
-     first bvecq slot along with the rfc1002 header and transform header (=
-if
-     sealing).  A pointer is passed down to smb_compress().
+Stefan Metzmacher (25):
+      smb: client: let send_done() cleanup before calling
+smbd_disconnect_rdma_connection()
+      smb: client: remove separate empty_packet_queue
+      smb: client: make sure we call ib_dma_unmap_single() only if we
+called ib_dma_map_single already
+      smb: client: let recv_done() cleanup before notifying the callers.
+      smb: client: let recv_done() avoid touching data_transfer after
+cleanup/move
+      smb: client: remove unused smbd_connection->fragment_reassembly_remaining
+      smb: smbdirect: introduce smbdirect_socket.recv_io.expected
+      smb: client: make use of smbdirect_socket->recv_io.expected
+      smb: smbdirect: introduce struct smbdirect_recv_io
+      smb: client: make use of struct smbdirect_recv_io
+      smb: smbdirect: introduce smbdirect_socket.recv_io.free.{list,lock}
+      smb: client: make use of smb: smbdirect_socket.recv_io.free.{list,lock}
+      smb: smbdirect: introduce smbdirect_socket.recv_io.reassembly.*
+      smb: client: make use of smbdirect_socket.recv_io.reassembly.*
+      smb: client: remove unused enum smbd_connection_status
+      smb: smbdirect: add SMBDIRECT_RECV_IO_MAX_SGE
+      smb: client: make use of SMBDIRECT_RECV_IO_MAX_SGE
+      smb: smbdirect: introduce struct smbdirect_send_io
+      smb: client: make use of struct smbdirect_send_io
+      smb: smbdirect: add smbdirect_socket.{send,recv}_io.mem.{cache,pool}
+      smb: client: make use of smbdirect_socket.{send,recv}_io.mem.{cache,pool}
+      smb: client: return an error if rdma_connect does not return
+within 5 seconds
+      smb: client: improve logging in smbd_conn_upcall()
+      smb: client: don't call init_waitqueue_head(&info->conn_wait)
+twice in _smbd_get_connection
+      smb: client: only use a single wait_queue to monitor smbdirect
+connection status
 
- (4) It attempts to adjust the values such that the compression header is
-     included in the encrypted section if also sealing.  However, it might=
- be
-     better to have smb_compress() place it in the output buffer.
+Steve French (1):
+      cifs: Move the SMB1 transport code out of transport.c
 
- (5) If compression is successful, smb_compress() switches the original bv=
-ecq
-     and the output bvecq and moves the header segment from the original t=
-o
-     the output.
+Wang Zhaolong (3):
+      smb: client: rename server mid_lock to mid_queue_lock
+      smb: client: add mid_counter_lock to protect the mid counter counter
+      smb: client: smb: client: eliminate mid_flags field
 
- (6) If the compression algo returns -EMSGSIZE, then the compression heade=
-r is
-     excluded from the header segment.
+Yunseong Kim (1):
+      cifs: Fix null-ptr-deref by static initializing global lock
 
-David
+ fs/smb/client/Makefile                     |   2 +-
+ fs/smb/client/cifs_debug.c                 |  24 +-
+ fs/smb/client/cifsfs.c                     |   8 +-
+ fs/smb/client/cifsglob.h                   |  23 +-
+ fs/smb/client/cifsproto.h                  |  15 +
+ fs/smb/client/cifssmb.c                    |   4 +-
+ fs/smb/client/cifstransport.c              | 566 +++++++++++++++++++++++++++
+ fs/smb/client/connect.c                    |  35 +-
+ fs/smb/client/fs_context.c                 |  19 +-
+ fs/smb/client/fs_context.h                 |  18 +-
+ fs/smb/client/link.c                       |  13 +-
+ fs/smb/client/reparse.c                    |   2 +-
+ fs/smb/client/smb1ops.c                    |  19 +-
+ fs/smb/client/smb2inode.c                  |   5 +-
+ fs/smb/client/smb2ops.c                    |  63 ++-
+ fs/smb/client/smb2transport.c              |   4 +-
+ fs/smb/client/smbdirect.c                  | 465 +++++++++++-----------
+ fs/smb/client/smbdirect.h                  |  92 +----
+ fs/smb/client/transport.c                  | 602 ++---------------------------
+ fs/smb/common/smbdirect/smbdirect_socket.h | 118 ++++++
+ 20 files changed, 1066 insertions(+), 1031 deletions(-)
+ create mode 100644 fs/smb/client/cifstransport.c
 
+--
+Thanks,
+
+Steve
