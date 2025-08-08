@@ -1,173 +1,125 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4A218E377
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 15:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DECF283C9F
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Aug 2025 15:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754665824; cv=none; b=OQvnjTctHYCdP7o+ijBy1ZPqmvcLSWZaTUGWlkCd/Hli6i5pMmBrKnfbnG1+1NTt0x4oa2xNyLRvQXYXgnPDSVMZ1QC6d/D+31MqZO2i5ku9bOCjZpB83fPa5xad8XbaOGUQDVan4N8oQTOTHwlIcrDf1ZOWjNfrB23xlg6SVgE=
+	t=1754666437; cv=none; b=TfvSCu52owxxqjkv9cSQOq6OiQTncGDVyBIHYAF3SGK6MCcqIFA5Mt2gY5X1JH/fOcD5rsTQl5ULUS2orEvM8MG/3W7ftzAQQ8brKTjrXrKukq00Dg+ezR3hTB04MUpaCsNaykHoQHEaslwtoZMB64xvQR3mJl0OyLZVkIKO95Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754665824; c=relaxed/simple;
-	bh=umcvyVklicbzq/kBy0WmrsbaWF0kIcR+4L2lO8UDxYY=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=WUFU9m+LkOujUd4yVeC8ClQbOW7W5pYssqup+EKDW0W3Bq3KIANFJy26G5HSq4LYTW5yWUDWf7NELuN5GnIGJUy7k1pUBT2Smj7pVttVbjaJUVA83jc6lKYeMgALdbStniOjZnd9mkkbn9IrfGdRklciqG1BafkLuqhV8b6y5wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MEvX42r4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1754666437; c=relaxed/simple;
+	bh=jNC10H8jHnXfOHCAXgETZS3+qwwP+M3tWwewUCwyB7U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPSsKCOzILB0Hvx4/mTNkyPI+GAwVwsQ3ulkch7IELQ1z569BQH06tdz0eUUhgFYiCnmdfdZ88undRIdS/ayZbi/SUWLce0tQdcu2RGsMetz0vyzatfgsUNHF8YMkofTZYufrvgCP3EuQWod2L2yYuAv61MeINvFsFCkQqt4m4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=V3/tCg4y; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEvX42r4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754665821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sb1xY4mkvRwciVCfa3SBcbz2VY+53NejsonXd/nwxL4=;
-	b=MEvX42r4q+pqA4cGu6C8QqRY1tZ9IJIyY7fE2L3NsnmkHnIdGsoOGLjUR5F9ac6NZE223W
-	VxelG041HKzcD29yIXzY3t62PGUK6B70ipV3UlBLmlMr+NACgBagXQth3DML6vxb457HH8
-	6T9WDJh2fOYWCTn98sWWNBRpRLGOagQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-0hywt-IUNPy6Fruejruu2w-1; Fri,
- 08 Aug 2025 11:10:18 -0400
-X-MC-Unique: 0hywt-IUNPy6Fruejruu2w-1
-X-Mimecast-MFC-AGG-ID: 0hywt-IUNPy6Fruejruu2w_1754665816
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FE8F18003FD;
-	Fri,  8 Aug 2025 15:10:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.17])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 28773180029B;
-	Fri,  8 Aug 2025 15:10:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <zt6f2jl6y5wpiuchryc2vdsmtkiia7s5mligm7helffkanxe3o@2f2ksngn5ekk>
-References: <zt6f2jl6y5wpiuchryc2vdsmtkiia7s5mligm7helffkanxe3o@2f2ksngn5ekk> <20250806203705.2560493-1-dhowells@redhat.com> <20250806203705.2560493-25-dhowells@redhat.com>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
-    linux-kernel@vger.kernel.org, netfs@lists.linux.dev,
-    linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC PATCH 24/31] cifs: Convert SMB2 Negotiate Protocol request
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="V3/tCg4y"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=LkS1ZWLc+1GeU5M3+sRZkHT+aC/G2mfitmhgkHS4qRM=; b=V3/tCg4yJtA4oZEtvud0GmAbNb
+	kKc3iYw2cnOTeWkZ5t5h3ibbB1+j70rw10AZUm4HluoUfjNqNMZeyLF5iA8bpybc0lkrsauv/ntKz
+	r1GJR0DdpUgqRNh7SFq/kPy/NdhyDNe7wyzEXmEa6Eqz/s7Bee3UTYvYJKHbq86DT86mF9+r1sex5
+	DVdV+dy1Pa0+VBdPCqBrhqPccz7bbGKX8iojFT9sNXHPVo0vOI7ewkil1Y/1bxfJSP3+Dcqa3XYx4
+	R1lAOCbAzt4ns1ffO6IkFKBIVVRjMUTg1fjNoF+IrAgKLVzRoRVmxfz7Ywj01C5/s3T7uyrx1Qjmh
+	sUPzighQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
+	id 1ukOtO-00000000FaP-2eBr;
+	Fri, 08 Aug 2025 12:20:26 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: smfrench@gmail.com
+Cc: Jay Shin <jaeshin@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	David Howells <dhowells@redhat.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	linux-cifs@vger.kernel.org
+Subject: [PATCH 1/2] smb: client: fix race with concurrent opens in unlink(2)
+Date: Fri,  8 Aug 2025 12:20:17 -0300
+Message-ID: <20250808152018.527103-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2926139.1754665810.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Aug 2025 16:10:10 +0100
-Message-ID: <2926140.1754665810@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
 
-Enzo Matsumiya <ematsumiya@suse.de> wrote:
+According to some logs reported by customers, CIFS client might end up
+reporting unlinked files as existing in stat(2) due to concurrent
+opens racing with unlink(2).
 
-> On 08/06, David Howells wrote:
-> > ...
-> > -static unsigned int
-> >-build_netname_ctxt(struct smb2_netname_neg_context *pneg_ctxt, char *h=
-ostname)
-> >+static size_t smb2_size_netname_ctxt(struct TCP_Server_Info *server)
-> > {
-> >+	size_t data_len;
-> >+
-> >+#if 0
-> > 	struct nls_table *cp =3D load_nls_default();
-> >+	const char *hostname;
-> >
-> >-	pneg_ctxt->ContextType =3D SMB2_NETNAME_NEGOTIATE_CONTEXT_ID;
-> >+	/* Only include up to first 100 bytes of server name in the NetName
-> >+	 * field.
-> >+	 */
-> >+	cifs_server_lock(pserver);
-> >+	hostname =3D pserver->hostname;
-> >+	if (hostname && hostname[0])
-> >+		data_len =3D cifs_size_strtoUTF16(hostname, 100, cp);
-> >+	cifs_server_unlock(pserver);
-> >+#else
-> >+	/* Now, we can't just measure the length of hostname as, unless we ho=
-ld
-> >+	 * the lock, it may change under us, so allow maximum space for it.
-> >+	 */
-> >+	data_len =3D 400;
-> >+#endif
-> >+	return ALIGN8(sizeof(struct smb2_neg_context) + data_len);
-> >+}
-> =
+Besides sending the removal request to the server, the unlink process
+could involve closing any deferred close as well as marking all
+existing open handles as deleted to prevent them from deferring
+closes, which increases the race window for potential concurrent
+opens.
 
-> Why was this commented out?  Your comment implies that you can't hold
-> the lock anymore there, but I couldn't find out why (with your patches
-> applied).
+Fix this by unhashing the dentry in cifs_unlink() to prevent any
+subsequent opens.  Any open attempts, while we're still unlinking,
+will block on parent's i_rwsem.
 
-The problem is that the hostname may change - and there's a spinlock to
-protect it.  However, now that I'm working out the message size before the
-allocation, I need to find the size of the host name, do the alloc and the=
-n
-copy the hostname in - but I can't hold the spinlock across the alloc, so =
-the
-hostname may change whilst the lock is dropped.
+Reported-by: Jay Shin <jaeshin@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Reviewed-by: David Howells <dhowells@redhat.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-cifs@vger.kernel.org
+---
+ fs/smb/client/inode.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-The obvious solution is to just allocate the maximum size for it.  It's no=
-t
-that big and this command isn't used all that often.
-
-Remember that this is a work in progress, so you may find bits like this w=
-here
-I may need to reconsider what I've chosen.
-
-> >-static void
-> >-assemble_neg_contexts(struct smb2_negotiate_req *req,
-> >-		      struct TCP_Server_Info *server, unsigned int *total_len)
-> >+static size_t smb2_size_neg_contexts(struct TCP_Server_Info *server,
-> >+				     size_t offset)
-> > {
-> >-	unsigned int ctxt_len, neg_context_count;
-> > 	struct TCP_Server_Info *pserver;
-> >-	char *pneg_ctxt;
-> >-	char *hostname;
-> >-
-> >-	if (*total_len > 200) {
-> >-		/* In case length corrupted don't want to overrun smb buffer */
-> >-		cifs_server_dbg(VFS, "Bad frame length assembling neg contexts\n");
-> >-		return;
-> >-	}
-> >
-> > 	/*
-> > 	 * round up total_len of fixed part of SMB3 negotiate request to 8
-> > 	 * byte boundary before adding negotiate contexts
-> > 	 */
-> >-	*total_len =3D ALIGN8(*total_len);
-> >+	offset =3D ALIGN8(offset);
-> >+	offset +=3D ALIGN8(sizeof(struct smb2_preauth_neg_context));
-> >+	offset +=3D ALIGN8(sizeof(struct smb2_encryption_neg_context));
-> >
-> >-	pneg_ctxt =3D (*total_len) + (char *)req;
-> >-	req->NegotiateContextOffset =3D cpu_to_le32(*total_len);
-> >+	/*
-> >+	 * secondary channels don't have the hostname field populated
-> >+	 * use the hostname field in the primary channel instead
-> >+	 */
-> >+	pserver =3D SERVER_IS_CHAN(server) ? server->primary_server : server;
-> >+	offset +=3D smb2_size_netname_ctxt(pserver);
-> =
-
-> If you're keeping data_len=3D400 above, you could just drop
-> smb2_size_netname_ctxt() altogether and use
-> "ALIGN8(sizeof(struct smb2_neg_context) + 400)" directly here.
-
-Yeah.  Probably would make sense to do that with a comment saying why 400.
-
-David
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 75be4b46bc6f..cf9060f0fc08 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -1943,15 +1943,24 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
+-	struct TCP_Server_Info *server;
+-	struct iattr *attrs = NULL;
+ 	__u32 dosattr = 0, origattr = 0;
++	struct TCP_Server_Info *server;
++	struct iattr *attrs = NULL;
++	bool rehash = false;
+ 
+ 	cifs_dbg(FYI, "cifs_unlink, dir=0x%p, dentry=0x%p\n", dir, dentry);
+ 
+ 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
+ 		return -EIO;
+ 
++	/* Unhash dentry in advance to prevent any concurrent opens */
++	spin_lock(&dentry->d_lock);
++	if (!d_unhashed(dentry)) {
++		__d_drop(dentry);
++		rehash = true;
++	}
++	spin_unlock(&dentry->d_lock);
++
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+@@ -2003,7 +2012,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+ 			cifs_drop_nlink(inode);
+ 		}
+ 	} else if (rc == -ENOENT) {
+-		d_drop(dentry);
++		if (simple_positive(dentry))
++			d_delete(dentry);
+ 	} else if (rc == -EBUSY) {
+ 		if (server->ops->rename_pending_delete) {
+ 			rc = server->ops->rename_pending_delete(full_path,
+@@ -2056,6 +2066,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+ 	kfree(attrs);
+ 	free_xid(xid);
+ 	cifs_put_tlink(tlink);
++	if (rehash)
++		d_rehash(dentry);
+ 	return rc;
+ }
+ 
+-- 
+2.50.1
 
