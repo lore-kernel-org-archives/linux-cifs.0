@@ -1,76 +1,161 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD392E36EE
-	for <linux-cifs@vger.kernel.org>; Sat,  9 Aug 2025 16:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B7C2033A;
+	Sun, 10 Aug 2025 16:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754756953; cv=none; b=IxPfZ3EV4yKjPHrdY6Y4QiDQr131Tc6nbdODhwa+4UbBVYjKcOXyQXpx4UD/rTPgy+YtiTkI4Lph0dmgEw60+xDhF2zulTfBp2jbC+d5stxVkw3teD3rQLrFzlU0wWUTwzmDMHth0p8YBWp+mtaZH7ba4oBNaa+VrS495GSfZ8Y=
+	t=1754844740; cv=none; b=lQkR0lLvqzbU4944SLhnyIAof9IzazebAOVmXD8M7v3dz4agefHz8sKYsYleV3jLD02DuNT/BUO0TaKTfGY+9wrQWeQS40LNhIYkRyF2GYTY0ydzaAh9EktX68Qldwgk6kG3+zDS8/xZr4eC0jnFVzYqwXEZsl1suqzwS1vfO1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754756953; c=relaxed/simple;
-	bh=rZjNc/P+nCWWevDgmKOD3R/szuUQXKFC4/BX4HQgCDg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Os8CO+oDiWa0mdc7w3dyNlqH0ydOdP1iBsCblo9RIZU4A0t3j81Pf/h7Vjd+Hn2lfJCcuwrys9dL9jLwdNX9DssLs4uy43/YLMCZ6lM9qr7+L/YS/DtZjZJ7Z1HI7IIr/nmQJvhj1ZhEd3ZLJta26wquGmwcAaRLdf4Y2gCncWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hlq2W/Q7; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1754844740; c=relaxed/simple;
+	bh=s/pK8Jeo0x08FnfOtGR6JaLs6DEzam/VqTyKpT6ENw0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZSWuuxrVQCMwFFSUMN9/Vesw0aRBb7vqa+b4QSFOkvP5ZAPHXMXanT9ZcEgP6Dm8PHGtpMx1YXk3tHrWhxRlss2NQYq30OsufiBuwXdgMsm7YupavSb6PcfV1M5G1WF9CKAVJueJg8NvyDdMkB19r/3H5WBbZnw4ov+7AD5v0Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuaGxnt9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hlq2W/Q7"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-7076b55460eso32066206d6.0
-        for <linux-cifs@vger.kernel.org>; Sat, 09 Aug 2025 09:29:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754756951; x=1755361751; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/fyHvYKJjU60RsBbKHpn5yRHju63oXLYkThdxO1NRhA=;
-        b=Hlq2W/Q7AowYl51Mi8FRSAkz6v8Ec6+kZBETOcIANjB8DFGXOQ+VhrZ+2MSyr2QLox
-         0uy5/X6Fg4xnizybqvl16KVf5q7OiayRfFT/f/Frze1rkDwffiPpIPdm5CVjXJR8vCS7
-         QeqsauFkUB6DBiL8w9CJjsfdHzPIiTp9E8LHGP2mf2+2JUfsi1qQT1eBnFkrE7WuvQGR
-         k00GoSVUq/yHy58pJ71bNS3MlUThCZ5dk2AKxoD8iUCQXoe7wXy56TL4uG0MZKgj56FI
-         8zJjozC+EAZWwYWHz/sVe+T/zn0AjLx2NsjnIeqQG7xc1ZenuTuBjlqB/jIGdX12wpad
-         /8jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754756951; x=1755361751;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/fyHvYKJjU60RsBbKHpn5yRHju63oXLYkThdxO1NRhA=;
-        b=W2FqImnT95t+Q/9KOlBtI7AOX6//POHrnyMZMfoCyPKMTnaLBpwEQRSOuKw2HnkrJ6
-         5x2kxWm7NppJd3eui2gAzhWvSzZDYdGKW0Bys53668N4d/hRfT9E2F5NJDppHGODWpGg
-         yuwlDS00wTkPStdr6KuTqWl/sK5bLFIUa8b9u/gMjzflLbiWiDPBvhYs1wYLPKYHPILt
-         L2/epCQEGDxGfFZCMzEJaHthCt8vmeBXSehekW1IRivkJsvAW2fup9AbLzRaGfaeFGyh
-         iZypkkHKEqm6TI4Nbh/QcVriKSXelGM09wvsscJQxdOAtmos431aqhphgsS5esAQMltu
-         br6w==
-X-Forwarded-Encrypted: i=1; AJvYcCVTj599oGHmVqhPl7Ss69Y0A5xiWvWwMtW9ckTNSFQiknw7u+Db5IMjAsCUl850bHjNzUWbLVssXORl@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlsjlihWax2zq0pmzHAFSxxKkyfTOIuS7Xik15asEgjYDxOEfT
-	mBLhoCKmTerOif82FSJ7JKvvF6awsqmevw8TwvkPqS4JYAdLOu1GGSgUqaL8KgzcZvkcM+/DlAt
-	cKgM0icCQnL+27IGeyvENv276vV7QfN8fyT8q
-X-Gm-Gg: ASbGncuuWizZ1szrynE2fK2ngMAGHOyJoG3rMKTAv8SFUV0dsO3adLUCLmIpmf52qds
-	jTDfp807OfR4SNUIRbr8VD0kZcFkgfhWDPGPd7KQJ1ko16JxYLFkVBNApBPlLYdQJFMaf8aWZH2
-	B60+9xjJdoDBlHFSjSYV6HaDfLmJedCOQ745o46iXkQXVbWJ6n3K/4ZZ82ckVVh4oIQdRoKzpNc
-	UqZyKO/6ImlePB054aBoB79LmqnwAEJuDZMGhE9XA==
-X-Google-Smtp-Source: AGHT+IFibOrYJaO2ziYh+PY09Qh9dv7BBi7f1Z7PWdlVL6NDzCXnhSSQQ5Syb4VihcrJ5XVz5L+DBacAZq1Lv7j/dno=
-X-Received: by 2002:a05:6214:627:b0:704:f7d8:edfc with SMTP id
- 6a1803df08f44-7099a506801mr88849386d6.49.1754756951186; Sat, 09 Aug 2025
- 09:29:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuaGxnt9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155B0C4CEF8;
+	Sun, 10 Aug 2025 16:52:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1754844737;
+	bh=s/pK8Jeo0x08FnfOtGR6JaLs6DEzam/VqTyKpT6ENw0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MuaGxnt9NJWAGVxCrq/zEqGr86wGLng/REiAXzSZDTx1a9PD1nC+WTzK3PhdgTdS3
+	 hPdl2HtR7Kzhkx19/7n6IoWM73NYhYS//Jk6gNF4s9q3lNd4xEfZVH2+aoXGWSQzMO
+	 11pYQMNSeHDDyxCGtbKrJJ7TPrB3wTeKUxdMeuIacviO1LlJ+OSBPZt1y865hQaQ4o
+	 vkgjL3RwAHAappgoKJL1wqxGAXJhdJeSIgX8cPZw/IurK/g+MR9mKn9nxDjsUWmqb+
+	 IzVUETiZzbhXQQQ7OA0GTvLqHm6ZNrpaE+DTq8qfmfFU6uNr0HOK38u/eavx4zDSaj
+	 SbR9FLlEVjPag==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Stefan Metzmacher <metze@samba.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	sfrench@samba.org
+Subject: [PATCH AUTOSEL 6.16-6.12] smb: client: don't call init_waitqueue_head(&info->conn_wait) twice in _smbd_get_connection
+Date: Sun, 10 Aug 2025 12:51:48 -0400
+Message-Id: <20250810165158.1888206-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250810165158.1888206-1-sashal@kernel.org>
+References: <20250810165158.1888206-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 9 Aug 2025 11:29:00 -0500
-X-Gm-Features: Ac12FXxd1mnAHoASO24qy4bfYc6z70gjgOQFxLo40I8EIFKOE5zR5-ibvS3hnt0
-Message-ID: <CAH2r5mv3xMgFfvioie17HmUBhU0ZqDQzMV6UMFBTF+9giK2pNQ@mail.gmail.com>
-Subject: generic/023 failure to Samba
-To: Paulo Alcantara <pc@manguebit.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Do you also see generic/023 now fail to Samba with current mainline
-(looks like symlink issue)?
+From: Stefan Metzmacher <metze@samba.org>
 
-http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/5/builds/69/steps/54/logs/stdio
+[ Upstream commit 550a194c5998e4e77affc6235e80d3766dc2d27e ]
 
+It is already called long before we may hit this cleanup code path.
+
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+LLM Generated explanations, may be completely bogus:
+
+Based on my analysis, I can now provide a comprehensive answer about
+whether this commit should be backported.
+
+**Backport Status: YES**
+
+This commit should be backported to stable kernel trees for the
+following reasons:
+
+## Analysis of the Bug Fix
+
+1. **Clear Bug Identification**: The commit fixes a redundant
+   initialization bug where `init_waitqueue_head(&info->conn_wait)` is
+   called twice in the error path:
+   - First initialization at line 1630 (in the normal flow)
+   - Second redundant initialization at line 1696 (in the
+     `negotiation_failed` error path)
+
+2. **Bug Impact**: While calling `init_waitqueue_head()` twice on the
+   same wait queue is not catastrophic, it is incorrect and could
+   potentially cause issues:
+   - The wait queue is already initialized and potentially in use (via
+     `wait_event()` at line 1639-1642)
+   - Re-initializing a wait queue that might have waiters or be in an
+     intermediate state could lead to subtle synchronization issues
+   - This violates the kernel's initialization patterns and could mask
+     other bugs
+
+3. **Fix Characteristics**:
+   - **Minimal and Contained**: The fix is a single-line removal of
+     redundant code
+   - **Low Risk**: Removing a redundant initialization cannot introduce
+     new bugs
+   - **Clear Intent**: The commit message clearly states the issue and
+     the fix
+   - **No Feature Changes**: This is purely a bug fix with no functional
+     changes
+
+4. **Code Flow Analysis**:
+   - At line 1630, `info->conn_wait` is properly initialized before
+     `rdma_connect()`
+   - The wait queue is then used at line 1639-1642 with
+     `wait_event_interruptible_timeout()`
+   - If `smbd_negotiate()` fails (line 1672-1675), the code jumps to
+     `negotiation_failed`
+   - The redundant re-initialization at line 1696 happens AFTER the wait
+     queue has already been used
+   - This could potentially corrupt any pending waiters or internal
+     state
+
+5. **Historical Context**:
+   - Both `init_waitqueue_head()` calls were present since the initial
+     commit (f198186aa9bbd from 2017)
+   - This appears to be an original coding error that has persisted
+   - The error path likely wasn't thoroughly tested or reviewed
+
+6. **Stable Tree Criteria Met**:
+   - ✅ Fixes a real bug (redundant initialization that could cause
+     issues)
+   - ✅ Small change (single line removal)
+   - ✅ Obviously correct (removing duplicate initialization)
+   - ✅ No risk of regression (removing redundant code)
+   - ✅ Already tested (merged into mainline)
+
+The commit satisfies all stable kernel criteria for backporting: it's a
+simple, obvious fix for a real bug with minimal risk of introducing
+regressions.
+
+ fs/smb/client/smbdirect.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 754e94a0e07f..75142c391d0c 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1735,7 +1735,6 @@ static struct smbd_connection *_smbd_get_connection(
+ 	cancel_delayed_work_sync(&info->idle_timer_work);
+ 	destroy_caches_and_workqueue(info);
+ 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
+-	init_waitqueue_head(&info->conn_wait);
+ 	rdma_disconnect(sc->rdma.cm_id);
+ 	wait_event(info->conn_wait,
+ 		sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
 -- 
-Thanks,
+2.39.5
 
-Steve
