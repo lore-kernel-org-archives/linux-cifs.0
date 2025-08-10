@@ -1,161 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B7C2033A;
-	Sun, 10 Aug 2025 16:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D892035948
+	for <linux-cifs@vger.kernel.org>; Sun, 10 Aug 2025 23:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754844740; cv=none; b=lQkR0lLvqzbU4944SLhnyIAof9IzazebAOVmXD8M7v3dz4agefHz8sKYsYleV3jLD02DuNT/BUO0TaKTfGY+9wrQWeQS40LNhIYkRyF2GYTY0ydzaAh9EktX68Qldwgk6kG3+zDS8/xZr4eC0jnFVzYqwXEZsl1suqzwS1vfO1A=
+	t=1754868574; cv=none; b=RiswfeE55qaHr/T7YScubq7qCpQMnPs8rfMnGmPT4tWmaYpgL9Ta++JmYYfZ/v1G/qpOY5vqPzsuP0w/zXUo/T7R4AwRYMos9tbz6H4J68IUDAMolaA2QZJBPIAIEhnceK10L5NuN79yZC6qR+HwPSDKjSPRZ4VrPAwmPbadCRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754844740; c=relaxed/simple;
-	bh=s/pK8Jeo0x08FnfOtGR6JaLs6DEzam/VqTyKpT6ENw0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZSWuuxrVQCMwFFSUMN9/Vesw0aRBb7vqa+b4QSFOkvP5ZAPHXMXanT9ZcEgP6Dm8PHGtpMx1YXk3tHrWhxRlss2NQYq30OsufiBuwXdgMsm7YupavSb6PcfV1M5G1WF9CKAVJueJg8NvyDdMkB19r/3H5WBbZnw4ov+7AD5v0Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuaGxnt9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1754868574; c=relaxed/simple;
+	bh=Uf8N1ahlwJDeAzHiB5dvYEHlUmV/fZHLmhMrdLxFA2c=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gmtmU6vDgJ23aRQI2Xm+SOUO0TbGLlWVYxeWuEbrkGedSwZLKfqvMwZO4/2h45vkx67v80peqhpcsAdlzuaAeIZGlPjg+OfPZFoYVwz0eKPXRikpTxqvKn2TKNyUkqdgw7A7q5CiCIPMK/QXwsUClQiX7R04R1wvAZ3IWgfQJkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IFoPIsxI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuaGxnt9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155B0C4CEF8;
-	Sun, 10 Aug 2025 16:52:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1754844737;
-	bh=s/pK8Jeo0x08FnfOtGR6JaLs6DEzam/VqTyKpT6ENw0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MuaGxnt9NJWAGVxCrq/zEqGr86wGLng/REiAXzSZDTx1a9PD1nC+WTzK3PhdgTdS3
-	 hPdl2HtR7Kzhkx19/7n6IoWM73NYhYS//Jk6gNF4s9q3lNd4xEfZVH2+aoXGWSQzMO
-	 11pYQMNSeHDDyxCGtbKrJJ7TPrB3wTeKUxdMeuIacviO1LlJ+OSBPZt1y865hQaQ4o
-	 vkgjL3RwAHAappgoKJL1wqxGAXJhdJeSIgX8cPZw/IurK/g+MR9mKn9nxDjsUWmqb+
-	 IzVUETiZzbhXQQQ7OA0GTvLqHm6ZNrpaE+DTq8qfmfFU6uNr0HOK38u/eavx4zDSaj
-	 SbR9FLlEVjPag==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Stefan Metzmacher <metze@samba.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org
-Subject: [PATCH AUTOSEL 6.16-6.12] smb: client: don't call init_waitqueue_head(&info->conn_wait) twice in _smbd_get_connection
-Date: Sun, 10 Aug 2025 12:51:48 -0400
-Message-Id: <20250810165158.1888206-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250810165158.1888206-1-sashal@kernel.org>
-References: <20250810165158.1888206-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFoPIsxI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754868571;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jMxPoQZeiqEcqQUrLPVTlJKYo2zdz3EkPBJ/0rdnkZg=;
+	b=IFoPIsxIPGXdQPP5K5mK5xWR4zcKKWqmSpDoO09n+ufBL5JH6cDrBNNXfwFx8TLC8IMLL6
+	o2hdC/wpjbzzbiLGcVtteV7pJAHi6+5a0yEmoBHsmLITR8LX42svxVqDx2+Ri5o31P1c1e
+	cJsbvnBs0v40X1R1inV6xGM23n9HRP4=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-94-EdnN79zwPaCeFpC4QVhMLg-1; Sun,
+ 10 Aug 2025 19:29:30 -0400
+X-MC-Unique: EdnN79zwPaCeFpC4QVhMLg-1
+X-Mimecast-MFC-AGG-ID: EdnN79zwPaCeFpC4QVhMLg_1754868568
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 17456195608E;
+	Sun, 10 Aug 2025 23:29:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B7B9C3001455;
+	Sun, 10 Aug 2025 23:29:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <dseje3czotanrhlafvy6rp7u5qoksqu6aaboyyh4l36wt42ege@huredpkntg2t>
+References: <dseje3czotanrhlafvy6rp7u5qoksqu6aaboyyh4l36wt42ege@huredpkntg2t> <nok4rlj33npje4jwyo3cytuqapcffa4jzomibiyspxcrbc6qg6@77axvtbjzbfm> <20250806203705.2560493-1-dhowells@redhat.com> <2938703.1754673937@warthog.procyon.org.uk>
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Wang Zhaolong <wangzhaolong@huaweicloud.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Mina Almasry <almasrymina@google.com>, linux-cifs@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 00/31] netfs: [WIP] Allow the use of MSG_SPLICE_PAGES and use netmem allocator
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.16
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <308527.1754868563.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Aug 2025 00:29:23 +0100
+Message-ID: <308528.1754868563@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Stefan Metzmacher <metze@samba.org>
+Hi Enzo,
 
-[ Upstream commit 550a194c5998e4e77affc6235e80d3766dc2d27e ]
+I now have encryption, compression and encryption+compression all working =
+:-)
 
-It is already called long before we may hit this cleanup code path.
+I've pushed my patches here:
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log=
+/?h=3Dcifs-experimental
 
-LLM Generated explanations, may be completely bogus:
+It should work up to "cifs: Don't use corking".
 
-Based on my analysis, I can now provide a comprehensive answer about
-whether this commit should be backported.
+Btw, is is_compressible() actually worth doing?  It seems to copy a lot of
+data (up to 4M) to an extra buffer and then do various analyses on it,
+including doing a sort.
 
-**Backport Status: YES**
+I need to extract a fix for collect_sample(), which I can do tomorrow, but=
+ it
+should look something like:
 
-This commit should be backported to stable kernel trees for the
-following reasons:
+/*
+ * Collect some 2K samples with 2K gaps between.
+ */
+static int collect_sample(const struct iov_iter *source, ssize_t max, u8 *=
+sample)
+{
+	struct iov_iter iter =3D *source;
+	size_t s =3D 0;
 
-## Analysis of the Bug Fix
+	while (iov_iter_count(&iter) >=3D SZ_2K) {
+		size_t part =3D umin(umin(iov_iter_count(&iter), SZ_2K), max);
+		size_t n;
 
-1. **Clear Bug Identification**: The commit fixes a redundant
-   initialization bug where `init_waitqueue_head(&info->conn_wait)` is
-   called twice in the error path:
-   - First initialization at line 1630 (in the normal flow)
-   - Second redundant initialization at line 1696 (in the
-     `negotiation_failed` error path)
+		n =3D copy_from_iter(sample + s, part, &iter);
+		if (n !=3D part)
+			return -EFAULT;
 
-2. **Bug Impact**: While calling `init_waitqueue_head()` twice on the
-   same wait queue is not catastrophic, it is incorrect and could
-   potentially cause issues:
-   - The wait queue is already initialized and potentially in use (via
-     `wait_event()` at line 1639-1642)
-   - Re-initializing a wait queue that might have waiters or be in an
-     intermediate state could lead to subtle synchronization issues
-   - This violates the kernel's initialization patterns and could mask
-     other bugs
+		s +=3D n;
+		max -=3D n;
 
-3. **Fix Characteristics**:
-   - **Minimal and Contained**: The fix is a single-line removal of
-     redundant code
-   - **Low Risk**: Removing a redundant initialization cannot introduce
-     new bugs
-   - **Clear Intent**: The commit message clearly states the issue and
-     the fix
-   - **No Feature Changes**: This is purely a bug fix with no functional
-     changes
+		if (iov_iter_count(&iter) < PAGE_SIZE - SZ_2K)
+			break;
 
-4. **Code Flow Analysis**:
-   - At line 1630, `info->conn_wait` is properly initialized before
-     `rdma_connect()`
-   - The wait queue is then used at line 1639-1642 with
-     `wait_event_interruptible_timeout()`
-   - If `smbd_negotiate()` fails (line 1672-1675), the code jumps to
-     `negotiation_failed`
-   - The redundant re-initialization at line 1696 happens AFTER the wait
-     queue has already been used
-   - This could potentially corrupt any pending waiters or internal
-     state
+		iov_iter_advance(&iter, SZ_2K);
+	}
 
-5. **Historical Context**:
-   - Both `init_waitqueue_head()` calls were present since the initial
-     commit (f198186aa9bbd from 2017)
-   - This appears to be an original coding error that has persisted
-   - The error path likely wasn't thoroughly tested or reviewed
+	return s;
+}
 
-6. **Stable Tree Criteria Met**:
-   - ✅ Fixes a real bug (redundant initialization that could cause
-     issues)
-   - ✅ Small change (single line removal)
-   - ✅ Obviously correct (removing duplicate initialization)
-   - ✅ No risk of regression (removing redundant code)
-   - ✅ Already tested (merged into mainline)
+What's currently upstream won't work and may crash because it assumes that
+ITER_XARRAY is in use - which should now never be true.
 
-The commit satisfies all stable kernel criteria for backporting: it's a
-simple, obvious fix for a real bug with minimal risk of introducing
-regressions.
+Also, there's a bug in wireshark's LZ77 decoder.  See attached patch.
 
- fs/smb/client/smbdirect.c | 1 -
- 1 file changed, 1 deletion(-)
+David
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 754e94a0e07f..75142c391d0c 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1735,7 +1735,6 @@ static struct smbd_connection *_smbd_get_connection(
- 	cancel_delayed_work_sync(&info->idle_timer_work);
- 	destroy_caches_and_workqueue(info);
- 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
--	init_waitqueue_head(&info->conn_wait);
- 	rdma_disconnect(sc->rdma.cm_id);
- 	wait_event(info->conn_wait,
- 		sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
--- 
-2.39.5
+diff --git a/epan/tvbuff_lz77.c b/epan/tvbuff_lz77.c
+index a609912636..13ab5c50ed 100644
+--- a/epan/tvbuff_lz77.c
++++ b/epan/tvbuff_lz77.c
+@@ -68,7 +68,7 @@ static bool do_uncompress(tvbuff_t *tvb, int offset, int=
+ in_size,
+ 						in_off +=3D 2;
+ 						if (match_len =3D=3D 0) {
+ 							/* This case isn't documented */
+-							match_len =3D tvb_get_letohs(tvb, offset+in_off);
++							match_len =3D tvb_get_letohl(tvb, offset+in_off);
+ 							in_off +=3D 4;
+ 						}
+ 						if (match_len < 15+7)
 
