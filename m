@@ -1,24 +1,24 @@
 Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114192253E9
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 10:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3A3226888
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 10:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754907432; cv=none; b=TWDmuNLmB9eE7clxla7+/ar2yMeBu62YXM+HghB3Bn21Vq29pgOkxB2iTf89D5sh1ywZv00WERzps38RIykRJHjK9WhnT0fz7Gf+69Vh6TJIdsB3WAfULmb15xK4HXciqSE3hHKXxe9XmeUHnjeEfQ2Hr6VflPvaS3p4l4xo3es=
+	t=1754907433; cv=none; b=NGVNhRtYAELQZekUFN8QZTm7PU3e9C1zHOWLrgyMHl3s+GI/bv6xMvYVCfuKlQG6/Q1wvRo03dNHQcYbG1cZmxmU1Cdsto1l4E/IQ3KhWnPun3bSa/rehAc91ZweIvgF8yLxxO4x9J4XGwSALVy02khVL7PFvr8A7mLym1ZhyZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754907432; c=relaxed/simple;
-	bh=HDwvPzdpHW98oeq7fUUOimJlla8qzlgUCzf5px3FZmI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=KnHjU9swcydvCaNmS5/74l9Vh9M2apz6bdFuqy6uK335LBNr8dRKQOeEYj0L4XcF1ZnpzuoXthREFRrUhnkeqmHcCCo3nS4BVclPhrqVJdTHz3bsr1rs1dz34GGitlwmf0Y61MUfcqEdvOpWge6rEmeip3ZBdzAlIgpi7Cgptvc=
+	s=arc-20240116; t=1754907433; c=relaxed/simple;
+	bh=42Qj2pu6ZD9kXaMu36PwsauvAotNEEUuPapWHeOC1+w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=RlKs5Wt/Vii8/XpsEKD+9HDbKkvlCa8F1AoHJ4gED+OPN0tDk54JeWYji6NKBNRVQLPZzd5zB944Pd9UDmYkLbJtk2c2yARzZEcDOgDbbrZi/9GxgoN/FEmnNcn3cjdvZRVkI2C44idRFM0WXu8hr50OMnwSxoAteF8iQCbLy4o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-	by 156.147.23.52 with ESMTP; 11 Aug 2025 18:47:08 +0900
+	by 156.147.23.52 with ESMTP; 11 Aug 2025 18:47:10 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: chanho.min@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
-	by 156.147.1.121 with ESMTP; 11 Aug 2025 18:47:08 +0900
+	by 156.147.1.121 with ESMTP; 11 Aug 2025 18:47:09 +0900
 X-Original-SENDERIP: 10.178.31.96
 X-Original-MAILFROM: chanho.min@lge.com
 From: Chanho Min <chanho.min@lge.com>
@@ -31,11 +31,11 @@ Cc: samba-technical@lists.samba.org,
 	sashal@kernel.org,
 	Paulo Alcantara <pc@manguebit.com>,
 	stable@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Chanho Min <chanho.min@lge.com>
-Subject: [PATCH 2/4] smb: client: fix potential UAF in is_valid_oplock_break()
-Date: Mon, 11 Aug 2025 18:46:37 +0900
-Message-Id: <20250811094639.37446-3-chanho.min@lge.com>
+	Chanho Min <chanho.min@lge.com>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 3/4] smb: client: fix potential UAF in smb2_is_valid_lease_break()
+Date: Mon, 11 Aug 2025 18:46:38 +0900
+Message-Id: <20250811094639.37446-4-chanho.min@lge.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250811094639.37446-1-chanho.min@lge.com>
 References: <20250811094639.37446-1-chanho.min@lge.com>
@@ -47,31 +47,29 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 
 From: Paulo Alcantara <pc@manguebit.com>
 
-commit 69ccf040acddf33a3a85ec0f6b45ef84b0f7ec29 upstream.
-
 Skip sessions that are being teared down (status == SES_EXITING) to
 avoid UAF.
 
 Cc: stable@vger.kernel.org # 5.4
 Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[ chanho: Backported to v5.4.y, misc.c was moved from fs/cifs to fs/smb/client ]
+[ chanho: Backported to v5.4.y, smb2misc.c was moved from fs/cifs to fs/smb/client ]
 Signed-off-by: Chanho Min <chanho.min@lge.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/cifs/misc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/cifs/smb2misc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index db1fcdedf289a..4d838d7db7b57 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -473,6 +473,8 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
- 	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each(tmp, &srv->smb_ses_list) {
- 		ses = list_entry(tmp, struct cifs_ses, smb_ses_list);
-+		if (cifs_ses_exiting(ses))
-+			continue;
- 		list_for_each(tmp1, &ses->tcon_list) {
- 			tcon = list_entry(tmp1, struct cifs_tcon, tcon_list);
- 			if (tcon->tid != buf->Tid)
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index d7cbf1b07126c..c47927d257635 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -611,7 +611,8 @@ smb2_is_valid_lease_break(char *buffer)
+ 
+ 		list_for_each(tmp1, &server->smb_ses_list) {
+ 			ses = list_entry(tmp1, struct cifs_ses, smb_ses_list);
+-
++			if (cifs_ses_exiting(ses))
++				continue;
+ 			list_for_each(tmp2, &ses->tcon_list) {
+ 				tcon = list_entry(tmp2, struct cifs_tcon,
+ 						  tcon_list);
