@@ -1,182 +1,192 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD3C8F6F
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 03:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114362D979D
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 07:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754884218; cv=none; b=upb4PRhXIK+jykBxWhzDQ1ZW/oK66ryZnAnBRWQafEWhOD3hMhh5pUoa1Vc1pxk5IK1TCbZiyIzmZyrD6eYDwlKUCEzdyHX4G4fsrAPb6IkKk6vKFfbIxwDXq6kiC1iv2QdPPz2jSn0BBVamE4hU7z2Ui0qFXosDCD0HPDM7h70=
+	t=1754897656; cv=none; b=bG9tJIP9CKQjSD4GM8g/ni0pxhIL+Jt5/qb43M2m8W8anw+3iad972fEQFV2aJLaB3B+Wry4ZD6gYapi2YilEjuSpABui83mCaS1776IW5f9QEwnYhrL0XFYxwyFW4wq8RZINn8oIVfCqhtTlbYVl+cbxCgVsjQzY745BNFkHWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754884218; c=relaxed/simple;
-	bh=eCsWdT6RrQE3d0f/DlQhFXS57vWwxv6DGnRkk4Bye1g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qVhKyV5lVnBz6PStCghfxTg9uGeIHm54Oevpgz8xIxFCIi21ZWyl0d7e3gE8kCBuSWlPnN6nM/brjw8s6Y8kaHwTE6rngw+cc/IsRogtF8jbQmZUY6ench1hL+O2FHy2KeCaa8Herp11q0IcyYeAswu8d65nA2pg1VQwAu6NMbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JvE3WzUO; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1754897656; c=relaxed/simple;
+	bh=dK7SLDDhLK24LOoQxG4hZlXuF4fqefgKWahWen4Gd2I=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=mogA4xdBrOXhGQCBanr5RawrFd/3cQP0EDNJgIJ8wsFD7V7+9j2FQ4K69qnEb7gipQIKSQu4tLpK3Y7n7DQn/cdw1cq8hsUu27rSa/tjwatZx6n1pIG3JI8NkmlvEPPjtFkfMdqRmSZhQqlzZOw+Pj6X85hpXytbv4NAPjc3uv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YXeZoAHB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JvE3WzUO"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-7094f298dc3so34581706d6.2
-        for <linux-cifs@vger.kernel.org>; Sun, 10 Aug 2025 20:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754884215; x=1755489015; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2aF8ie0G7IlCAybCosIY3EFsHxXHoO6LOX4nYuylZfk=;
-        b=JvE3WzUOoq2ARHlevDmfDj0FyfQh95eM6NySoUfrTA9XTsU9oEopVzyb6c+hXhQiJK
-         bGbInQlKcEKT8fLDzjrruMgY1/hYdbwG+nWaC7jtBTFHtvm/Fh3IHI/PMOE/JsnkYiI+
-         aL0MbYbsc86nRtejLu/H/cp9Z8GjprWrkZzvlDpKv6v+255bqfocreFpwI3FhNal6Ujd
-         81jgjyD7MB2BBR6mwNVMp4YWv9aQxql3NSxyc2zMbjfKDd6CuCGq9B/Mt1Knl/acDDkQ
-         V6PqkTI18PRS9uigwenc5SWKIMgx9a6D6KL5aSjD9+ub0TnzmbI+Dgc1bnIweZaprEIl
-         8+Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754884215; x=1755489015;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2aF8ie0G7IlCAybCosIY3EFsHxXHoO6LOX4nYuylZfk=;
-        b=cvyV/pxRLSjGa51+lD9zEadR9q5S1Vgiu2EgOGr1QUudVNDvNlct12VJGK+o61owtU
-         APiu3YfYC1QXvlLxWFxA5smdkzIfUB+vsf3d3RvqZk9M4K6IXEwHVlmf7MjWfGnemm8h
-         Q27N3TlF7/UhI6LQgYF0UCUOKpYcIM+k3onYOJ0xy4zViA+7oHKr9d2Y29nZkMLVkazY
-         jZXliOxeRwU/M4kfNEbHYvWafhgoSBCd/DrSsSw3FB1zEdlduEkWv/r8LyaI9CyoXTKk
-         A9+rM9bbxwz2AIfOHp7LmtpPreXDYRQoaQvcrmROr0y7sfsaxwd3VXUCj/Q3e4uRnua4
-         1fbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWpuQu8YJb3Xw1ul+ggJN02JHeAea10FM5tH9Yde7nWF9/Zzr01enG13heyTkR6+cEkPXBr/jx2mape@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqw8M5HXCuOa70b/tu4oMxJm4E9reAvcD8JTWCXF1LFBpQ0LHo
-	7NKC638N0lZJyLM9e09MNeMVrPmNHmfwqubAbjYWYJgm5mJZ2N0Aar9EiKAy4hV82dgSxPfhPjT
-	QgELInyWAtUn6JTvDce6GEjl/QHmCPsQ=
-X-Gm-Gg: ASbGnculdua6c+F0ucS76BN/Eg0EwEFMJVsgOn0BiPEeICiqQUP975u5csB6hZFNMt4
-	+eIjU/NjnY0/MR9pmY+GQNGdo98MljWDhtPmFHl+g7XUXVl1t+LOJyG5JdjMWqrADKHnfiA0FM8
-	cvjSiH/ZJqwpnxGrud24MKLf1KrFedTDeNHhJvL4kyqcGVC066T5BNvHAOY1peVf8/BZb/XraN9
-	pKkecGdrQ0okTvazE7II35i3usbr7JzPsczLvZXWJSpXvXMuGmX
-X-Google-Smtp-Source: AGHT+IG8qfp8KmDtigzZQnkcyCzhfTA562s/K4M9aXkeGW6TeRxYa9Th+wl9fWVsWeArTatRzBz87WJT4yFV2sJSUyk=
-X-Received: by 2002:a05:6214:e4b:b0:707:5a23:7382 with SMTP id
- 6a1803df08f44-7099a4481a1mr186583316d6.23.1754884215100; Sun, 10 Aug 2025
- 20:50:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXeZoAHB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1754897654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q9vbhTv66yOj5MFJijPbRoZX2tGXwBihvDtRn9EhSDY=;
+	b=YXeZoAHBEptMwhhYXfOx5G6uUVphXKP1+mvdtiTGnRUXJt0roeSnepXnK8UZ9OZV+o9ZXu
+	VEhjBGJt0ZLGyTiURaURTSnSPHohd/FBIsV2WxiR5PVKcU0EkLHASfocP5LK0+n7akSTpb
+	EdjjljnukRgMVUditE3qPVl5ljhUCOI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-KjcMOzISNPWa7lE9yECnSQ-1; Mon,
+ 11 Aug 2025 03:34:10 -0400
+X-MC-Unique: KjcMOzISNPWa7lE9yECnSQ-1
+X-Mimecast-MFC-AGG-ID: KjcMOzISNPWa7lE9yECnSQ_1754897649
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99F1D18002C1;
+	Mon, 11 Aug 2025 07:34:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1BDA3180047F;
+	Mon, 11 Aug 2025 07:34:05 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>,
+    Enzo Matsumiya <ematsumiya@suse.de>
+cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix collect_sample() to handle any iterator type
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250808145221.479993-1-dmantipov@yandex.ru>
-In-Reply-To: <20250808145221.479993-1-dmantipov@yandex.ru>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 10 Aug 2025 22:50:03 -0500
-X-Gm-Features: Ac12FXygIZLqHkdtHpXhiUjwnS7mI1r-23JZMFAlueVVe5eLtxwb3uyyKbMLIkk
-Message-ID: <CAH2r5mub9jHuMkMDE7fej4ucJ_bnmN0F+Ecdhwj_zFyW-C3kxA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: avoid extra calls to strlen() in cifs_get_spnego_key()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <324663.1754897644.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Aug 2025 08:34:04 +0100
+Message-ID: <324664.1754897644@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-tentatively merged into cifs-2.6.git for-next pending more review and testi=
-ng
+collect_sample() is used to gather samples of the data in a Write op for
+analysis to try and determine if the compression algorithm is likely to
+achieve anything more quickly than actually running the compression
+algorithm.
 
-On Fri, Aug 8, 2025 at 9:54=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru>=
- wrote:
->
-> Since 'snprintf()' returns the number of characters emitted, an
-> output position may be advanced with this return value rather
-> than using an explicit calls to 'strlen()'. Compile tested only.
->
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
->  fs/smb/client/cifs_spnego.c | 47 ++++++++++++++-----------------------
->  kernel/bpf/verifier.c       |  3 +++
->  2 files changed, 21 insertions(+), 29 deletions(-)
->
-> diff --git a/fs/smb/client/cifs_spnego.c b/fs/smb/client/cifs_spnego.c
-> index bc1c1e9b288a..43b86fa4d695 100644
-> --- a/fs/smb/client/cifs_spnego.c
-> +++ b/fs/smb/client/cifs_spnego.c
-> @@ -124,55 +124,44 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo,
->         dp =3D description;
->         /* start with version and hostname portion of UNC string */
->         spnego_key =3D ERR_PTR(-EINVAL);
-> -       sprintf(dp, "ver=3D0x%x;host=3D%s;", CIFS_SPNEGO_UPCALL_VERSION,
-> -               hostname);
-> -       dp =3D description + strlen(description);
-> +       dp +=3D sprintf(dp, "ver=3D0x%x;host=3D%s;", CIFS_SPNEGO_UPCALL_V=
-ERSION,
-> +                     hostname);
->
->         /* add the server address */
->         if (server->dstaddr.ss_family =3D=3D AF_INET)
-> -               sprintf(dp, "ip4=3D%pI4", &sa->sin_addr);
-> +               dp +=3D sprintf(dp, "ip4=3D%pI4", &sa->sin_addr);
->         else if (server->dstaddr.ss_family =3D=3D AF_INET6)
-> -               sprintf(dp, "ip6=3D%pI6", &sa6->sin6_addr);
-> +               dp +=3D sprintf(dp, "ip6=3D%pI6", &sa6->sin6_addr);
->         else
->                 goto out;
->
-> -       dp =3D description + strlen(description);
-> -
->         /* for now, only sec=3Dkrb5 and sec=3Dmskrb5 and iakerb are valid=
- */
->         if (server->sec_kerberos)
-> -               sprintf(dp, ";sec=3Dkrb5");
-> +               dp +=3D sprintf(dp, ";sec=3Dkrb5");
->         else if (server->sec_mskerberos)
-> -               sprintf(dp, ";sec=3Dmskrb5");
-> +               dp +=3D sprintf(dp, ";sec=3Dmskrb5");
->         else if (server->sec_iakerb)
-> -               sprintf(dp, ";sec=3Diakerb");
-> +               dp +=3D sprintf(dp, ";sec=3Diakerb");
->         else {
->                 cifs_dbg(VFS, "unknown or missing server auth type, use k=
-rb5\n");
-> -               sprintf(dp, ";sec=3Dkrb5");
-> +               dp +=3D sprintf(dp, ";sec=3Dkrb5");
->         }
->
-> -       dp =3D description + strlen(description);
-> -       sprintf(dp, ";uid=3D0x%x",
-> -               from_kuid_munged(&init_user_ns, sesInfo->linux_uid));
-> +       dp +=3D sprintf(dp, ";uid=3D0x%x",
-> +                     from_kuid_munged(&init_user_ns, sesInfo->linux_uid)=
-);
->
-> -       dp =3D description + strlen(description);
-> -       sprintf(dp, ";creduid=3D0x%x",
-> +       dp +=3D sprintf(dp, ";creduid=3D0x%x",
->                 from_kuid_munged(&init_user_ns, sesInfo->cred_uid));
->
-> -       if (sesInfo->user_name) {
-> -               dp =3D description + strlen(description);
-> -               sprintf(dp, ";user=3D%s", sesInfo->user_name);
-> -       }
-> +       if (sesInfo->user_name)
-> +               dp +=3D sprintf(dp, ";user=3D%s", sesInfo->user_name);
->
-> -       dp =3D description + strlen(description);
-> -       sprintf(dp, ";pid=3D0x%x", current->pid);
-> +       dp +=3D sprintf(dp, ";pid=3D0x%x", current->pid);
->
-> -       if (sesInfo->upcall_target =3D=3D UPTARGET_MOUNT) {
-> -               dp =3D description + strlen(description);
-> -               sprintf(dp, ";upcall_target=3Dmount");
-> -       } else {
-> -               dp =3D description + strlen(description);
-> -               sprintf(dp, ";upcall_target=3Dapp");
-> -       }
-> +       if (sesInfo->upcall_target =3D=3D UPTARGET_MOUNT)
-> +               dp +=3D sprintf(dp, ";upcall_target=3Dmount");
-> +       else
-> +               dp +=3D sprintf(dp, ";upcall_target=3Dapp");
->
->         cifs_dbg(FYI, "key description =3D %s\n", description);
->         saved_cred =3D override_creds(spnego_cred);
-> --
-> 2.50.1
->
->
+However, collect_sample() assumes that the data it is going to be sampling
+is stored in an ITER_XARRAY-type iterator (which it now should never be)
+and doesn't actually check that it is before accessing the underlying
+xarray directly.
 
+Fix this by replacing the code with a loop that just uses the standard
+iterator functions to sample every other 2KiB block, skipping the
+intervening ones.  It's not quite the same as the previous algorithm as it
+doesn't necessarily align to the pages within an ordinary write from the
+pagecache.
 
---=20
-Thanks,
+Note that the btrfs code from which this was derived samples the inode's
+pagecache directly rather than the iterator - but that doesn't necessarily
+work for network filesystems if O_DIRECT is in operation.
 
-Steve
+Fixes: 94ae8c3fee94 ("smb: client: compress: LZ77 code improvements cleanu=
+p")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Enzo Matsumiya <ematsumiya@suse.de>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: Tom Talpey <tom@talpey.com>
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/smb/client/compress.c |   71 +++++++++++++----------------------------=
+------
+ 1 file changed, 21 insertions(+), 50 deletions(-)
+
+diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+index 766b4de13da7..db709f5cd2e1 100644
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -155,58 +155,29 @@ static int cmp_bkt(const void *_a, const void *_b)
+ }
+ =
+
+ /*
+- * TODO:
+- * Support other iter types, if required.
+- * Only ITER_XARRAY is supported for now.
++ * Collect some 2K samples with 2K gaps between.
+  */
+-static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *s=
+ample)
++static int collect_sample(const struct iov_iter *source, ssize_t max, u8 =
+*sample)
+ {
+-	struct folio *folios[16], *folio;
+-	unsigned int nr, i, j, npages;
+-	loff_t start =3D iter->xarray_start + iter->iov_offset;
+-	pgoff_t last, index =3D start / PAGE_SIZE;
+-	size_t len, off, foff;
+-	void *p;
+-	int s =3D 0;
+-
+-	last =3D (start + max - 1) / PAGE_SIZE;
+-	do {
+-		nr =3D xa_extract(iter->xarray, (void **)folios, index, last, ARRAY_SIZ=
+E(folios),
+-				XA_PRESENT);
+-		if (nr =3D=3D 0)
+-			return -EIO;
+-
+-		for (i =3D 0; i < nr; i++) {
+-			folio =3D folios[i];
+-			npages =3D folio_nr_pages(folio);
+-			foff =3D start - folio_pos(folio);
+-			off =3D foff % PAGE_SIZE;
+-
+-			for (j =3D foff / PAGE_SIZE; j < npages; j++) {
+-				size_t len2;
+-
+-				len =3D min_t(size_t, max, PAGE_SIZE - off);
+-				len2 =3D min_t(size_t, len, SZ_2K);
+-
+-				p =3D kmap_local_page(folio_page(folio, j));
+-				memcpy(&sample[s], p, len2);
+-				kunmap_local(p);
+-
+-				s +=3D len2;
+-
+-				if (len2 < SZ_2K || s >=3D max - SZ_2K)
+-					return s;
+-
+-				max -=3D len;
+-				if (max <=3D 0)
+-					return s;
+-
+-				start +=3D len;
+-				off =3D 0;
+-				index++;
+-			}
+-		}
+-	} while (nr =3D=3D ARRAY_SIZE(folios));
++	struct iov_iter iter =3D *source;
++	size_t s =3D 0;
++
++	while (iov_iter_count(&iter) >=3D SZ_2K) {
++		size_t part =3D umin(umin(iov_iter_count(&iter), SZ_2K), max);
++		size_t n;
++
++		n =3D copy_from_iter(sample + s, part, &iter);
++		if (n !=3D part)
++			return -EFAULT;
++
++		s +=3D n;
++		max -=3D n;
++
++		if (iov_iter_count(&iter) < PAGE_SIZE - SZ_2K)
++			break;
++
++		iov_iter_advance(&iter, SZ_2K);
++	}
+ =
+
+ 	return s;
+ }
+
