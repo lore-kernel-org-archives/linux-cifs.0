@@ -1,59 +1,59 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381393FE7
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 03:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05368F6F;
+	Mon, 11 Aug 2025 03:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754883649; cv=none; b=UoJt9mpMBG3bbDlp2KCnCCHdce4QLEmq0Lf+Uhhh8mjLh6iytU8BeRyAjgIUGgXvoZHj3/2D5oWypmYjjO3vtgrmeF+G0ZGaCX4ksa5L5tM6yriGHUPf4uqL511tkGs783rzkK98HpQwjeApd5DCaxaXRv4dBEMDz0auTAtqC7I=
+	t=1754884200; cv=none; b=KolnHFS54tUjaRfd75Igje+73FA5KHuCrkasd/gg92tqgcJntsFmriiS20PzUs5p3o01lJeyiQZZvHOyrdaIy3JPAPobVsWxH6zQv3I2JD3PlOVHP0453O2DD6kRB43k7trAUWfXRRh5A4dM78EELxSOUry5DLvdb0A7mpKudfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754883649; c=relaxed/simple;
-	bh=x4v/9rPIKkynB8Jjr6+k4JjcgC/uLQapR4hxgzwSUL0=;
+	s=arc-20240116; t=1754884200; c=relaxed/simple;
+	bh=vLj7sE/rOpjxfKeHAl+we/21AK9YuVsKrzSembbWi2M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dcQ6F49qy596s1ttmZ5Um6Osf/T9Rnyg1Gylvy0+Fm71WiHBcYMeFGZICBRzCJABUc3UGTBQd5qPb/N5hlS1W6aQIyX0ceGhdtOsE1fAgNJR/JrIEEDr/JwteFMPvnHb35jGooMK7jTKBjZSIowyAezVVM5fdliWI8tckaum3Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoWPNMxw; arc=none smtp.client-ip=209.85.219.48
+	 To:Cc:Content-Type; b=IsAYXxgOSRaW41hlnxL8WJ03c8bY11JlHzFBioBE/nT4qXdebIGWowNQqZbETIXF7pw3CotvJ5u1S5TILA3TYuWahN8u0Q2i66PxzMsSKzf3wHuqo5Bk+clOQG/IwV28qwp3lPvhvLlRQOasy0iQoQVgRiRI5lis3QF4Jmef3Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbtmcCUS; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoWPNMxw"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70744318bb3so34890256d6.3
-        for <linux-cifs@vger.kernel.org>; Sun, 10 Aug 2025 20:40:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbtmcCUS"
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-7077a1563b5so36042176d6.1;
+        Sun, 10 Aug 2025 20:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754883647; x=1755488447; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1754884197; x=1755488997; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ziyj8WUVAHq9tryz3EJdJekvctOVHPHIBPoz9x+fYrE=;
-        b=FoWPNMxwjrcdJXWsHyPXfGjE9HrvJ2Oou5McbpLKuV7c1DHbOmjZwRzEvFe9kaB+f5
-         /qxSgKV926Z2WtwkK4nLAQU3ZOEy3CXE4BxqhupD+1vb2Y/pTP08tx4tYm8fhUnqCxhh
-         zhuB0WwJBjVqo9hePQYJIPMHoe/vUJT3jMSWWPbfWKgSyLAZrBefgwnf3x3DBjcmpwQw
-         iEs0DT+NwL3Ou84TK2neabXqceTx2fham7hSR7eqTr7cwQvuffMsubO2gzE/2hpmpRJ0
-         d/1vl/qX3rBtzGYvaZAk6Bf6Ee+E7NGgUh/Hun8ob2KQuW5qWKH4yMSNT2o16YtqxrJ9
-         xKyw==
+        bh=dU0qTogiP2a033v5TYXMo7DdbYERcKnC4lC7Xn3UtLo=;
+        b=DbtmcCUSHprcNdt4oDTcxHJ3RZqYuWyWXA4buiC7D41H6wbr7IbEzuo7T994ybNgNE
+         fEjs8/McziNSfFheKmF9sQIV+B3AiF+sjRoRDn8wnqsCfBgiRDBpWO4rg3QjsBX/TI89
+         huty39kske8XDK4eTsTVI9/BuOgQwqO2iVLKBEdaXUwauzOyOpUpZ6QedCz6ktf/ZIXX
+         s+sFD1MgCj0oo8m4kUgGmF38dYLJmQ5y+zBZvpm+m8r//9mhneOooMrDuPaJbPw2aJz8
+         Zuz4AukTafLoxKm2XPhvCwuvHJkz1EosbKHwfX6Rld4l+GxNQ6tYGZutI27J44sfdACP
+         42lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754883647; x=1755488447;
+        d=1e100.net; s=20230601; t=1754884197; x=1755488997;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ziyj8WUVAHq9tryz3EJdJekvctOVHPHIBPoz9x+fYrE=;
-        b=D8auX4qUhdrrlxDTYniiVJNLz7cl5hEfJdRcHZCSwyaPt7G1TFR6v36gtusOmE6OlK
-         tXc3G4MryWXGA8o+j+722mpvWlaTZ4UGiCCIK8L1tMWuaDwiXnuBlLfZCt1aLfnFGlw0
-         GNN7RYhFfgLMq9LhyipVMnr29yG/V990ZLb7sAYV0V9pRrUiPcun+fL1aV/hITzwfAaH
-         cS5GT1uyWiOVmPz3CbQ6rmjYuUMwcCtilpMCvU2+YLs7dfjzF0m9kp+X9V62a84nMHVP
-         wOJCrtWRujcqKszRvaV8TR9obrkQ2fVoNNkwx+tYHpbAcX1fYuhVf1wcDRNrXiss+zHE
-         6brQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkEtTlLzS6RGmoHOHwZ4h0QZ8rbU6fzmk0nAW1TBPCN4tBwc9diC1i3o4xBh3ctbboa/4czzzDQ/t5@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhLFnLXB7MEy9Gzwz8CploCbcOK+X4mQ8NW1aA4+J6OOxzMnBm
-	MRVb0PCajycFY/q0iYDP+ytNAuEhIuFVMR25sd+qmbddm2wgoKE0wW6PncPlfT16gUIkaxBSvzU
-	b6B+TM7EMSBTz88lmX7Mr+vFRNT8dYj0=
-X-Gm-Gg: ASbGncuifKtIYWk+Nj3SkfX6Pf7xhIHoNE6hldNdTeWXC0gR8DllHjW/sa2IJDOhs0p
-	/IE/ynJra91wPbAjv4nYsH6cQU1yaSJE7+F647peY6dye1loseCgl9GU2DAQ2j5G/4d19nRURcM
-	Ky++xdd0fVyNclzSpVLzsoHifOBpTus9vV27sKs9P755gZmYEpsVxa2hMbc+xfuIhywM5CGvX8K
-	vARDbJKmNAoP5Je2VfLrAirpXLUkpAJl6iBYz7EFXIQ8eZfqz8h
-X-Google-Smtp-Source: AGHT+IH+iwRqf8v9jviCl8+PAnHP/11qwyWxtoGyjQKk5SQ1MPSH0ecwEP38JMP6P0ZAYmNVqi55JA3D0llFZ35/+oM=
-X-Received: by 2002:a05:6214:21a6:b0:707:3ad0:1f15 with SMTP id
- 6a1803df08f44-7099a227bf3mr150302896d6.18.1754883647018; Sun, 10 Aug 2025
- 20:40:47 -0700 (PDT)
+        bh=dU0qTogiP2a033v5TYXMo7DdbYERcKnC4lC7Xn3UtLo=;
+        b=vHhiR/NbOkgHRuPLGY4BNqCdsqDunv0BvQEQXZblHZcUdkHKnRjzACN/g7g4AGQHnJ
+         V8cNeHiieHUXLOMEmxI6iQAeW3I0UHklNjUZp6FBCqdevu6uCiAyjA6eNIlFpvgWCwo0
+         mYfg0hcY526AO3JU2QksAIZ2IUWOAvJudRMs/+SfNywCb/y8VFxckfUo1zJYoTvJORpD
+         4rsFhF1TtiE1J7GWGMZme8MXEs6cIp+m4Zu94TMe4FDUtQ079X9ET5Dj01V03FT6CJcz
+         LLjCWtGSkuur/GE5zPdRubhNYxD38z8fk6z/yHrf4a+zkSWywRytoSkgrMcUj0ql1/EI
+         VzPg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1d51Nq1SOsBS9dmf+hSgN92hjGjgGAr1n3lVp1u9fosmGeLNSlUl5qJI8K7BIbplaUDu906C/uOqo4PI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrRc9L/My1JZXgIKC5BGt5PmrNHODNECFRScvYPmsqTwgqkN0f
+	BhzFCu4+C2bcuer+p8hjKDXDHF482LLo+mrHG0OscbnAXDNGOM2Ds1oEbg83z/PczOk7R7IEgjR
+	5YKetaej5sP0YzSoaLFWqyIuFY0FyNL2HJA==
+X-Gm-Gg: ASbGncuPnWESBFfOlG14MFOuKk3SvwUJJA/luqhMP7OoWathbTKiBEFzscfQomMHX7c
+	Rwb/klmVmnUsgjYz41FJqm5emYdbQoa5Oz8Q/jvK9AJDvtsemP6uuYmUcjh0U8/0PSw56tlSBic
+	IZl4p1+doG5DoK4m93kZYARXxNXIAEuPOP/xdD8k4JUIXyR09i/Wf8CBLeaKNNV9lM3CusYpCbm
+	aG7W7ODlru/nSPAHDklAuQv8wGXcENwwTU6EO1Xew==
+X-Google-Smtp-Source: AGHT+IF7zha6IkAtgvMpZSM/kef8AJ49qQQvXQxRtK2XDtuVt4EJE2F1Gv8Kr8UddslI+Qv3yCauyP57SlpqHn3q5Kw=
+X-Received: by 2002:a05:6214:20a7:b0:707:6364:792f with SMTP id
+ 6a1803df08f44-7099a2842c6mr128624876d6.11.1754884197387; Sun, 10 Aug 2025
+ 20:49:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,19 +63,20 @@ MIME-Version: 1.0
 References: <20250801090724.2903515-1-wangzhaolong@huaweicloud.com>
 In-Reply-To: <20250801090724.2903515-1-wangzhaolong@huaweicloud.com>
 From: Steve French <smfrench@gmail.com>
-Date: Sun, 10 Aug 2025 22:40:35 -0500
-X-Gm-Features: Ac12FXyM7s4diFMR26VERmJ8PquCbCWIsw1KNM-OW287EvTT8YbumF787ZcNNeU
-Message-ID: <CAH2r5mvoi52XODat6tTGO=508fD+-UZHUwug61wF-U3+cx-hqw@mail.gmail.com>
+Date: Sun, 10 Aug 2025 22:49:46 -0500
+X-Gm-Features: Ac12FXwslo12TH7OKSYMVozbK7r8DgvDFN8SBf_9dWAWAORt8pccei83N3-_dng
+Message-ID: <CAH2r5muBsUA3V+JKHuNj-TeOqW5Bhg6cS+2A+zx17owHCYJw4g@mail.gmail.com>
 Subject: Re: [PATCH -next] smb: client: remove redundant lstrp update in
  negotiate protocol
 To: Wang Zhaolong <wangzhaolong@huaweicloud.com>
-Cc: yi.zhang@huawei.com, yangerkun@huawei.com, chengzhihao1@huawei.com, 
-	CIFS <linux-cifs@vger.kernel.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
+	chengzhihao1@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I may have missed this one in the mailing list last week - any
-thoughts on whether to add it to for-next
+tentatively merged into cifs-2.6.git for-next pending more review and testi=
+ng
 
 On Fri, Aug 1, 2025 at 4:07=E2=80=AFAM Wang Zhaolong
 <wangzhaolong@huaweicloud.com> wrote:
