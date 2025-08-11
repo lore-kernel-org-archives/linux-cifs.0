@@ -1,86 +1,104 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B2B2D3A63;
-	Mon, 11 Aug 2025 12:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F34A170A26;
+	Mon, 11 Aug 2025 14:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754915141; cv=none; b=tqQzH9GtJNZ9/HNYeBIwfeDp2i1Ffx63YVOn6xpK2Wa0DZe1qneu3hA7hamAfEwnTgz7T6bYbfSCfOtUYAOl+7Ypx1IaDcV495bDLdi7v0XEEtp0aKme8/ECfBDqjpPZ4tH9XnileM2zUua3em7dp7S5H1NTDOVlkGeVk4l++MQ=
+	t=1754921721; cv=none; b=Egu9In4EHqpNdD5dhp19YDPalWp2tXOorgow5Zp4oAKNuU8EgwAFpoyeoS4yxUJBJJnMl+EQ1Fmb+zVpJamnun18tymmygoKeHxDwyZg1tSbhSQyJ8cRAcQbLkAG9rBhRkZOgysETapReP3zNekIioGHZ5mMlgfoGlaHLEdY1kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754915141; c=relaxed/simple;
-	bh=fyMJVnzq19HoVjaJWvf7zLPkT0rLDLhUHH3rd92MRNA=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=uN4CxbaMzC5vjqFifRIPALow2Gp7MoxncrfZgca0uFZ/tGvRaM2sx+9OQDGYYCkkH5j7TCA1g9uAGNqwfnAEaitU6fV6VqMOSxYVuAaj1so7OC+Es51t8iHOs9tDkYsZlKaFnL7o5gWjw+ezKhp4ZsQxBwB3s09hqW0UHEd+hRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=FZOHRrf8; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="FZOHRrf8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=HQe9woX2qSiEsy9FbidNroRd+9loJaekn/V3lZ85QLU=; b=FZOHRrf86TSOMsy4/15ub+Z+BD
-	LFbTet6eHpszyszaAIgHBKCELIE6ELVmG9t0q5MtPAXmIDQnu9jk7AaDWU7C4jsRh1EVkP36kjE1C
-	FknDVlbBbi0qjZg36w5NVnF6/nFceObERAjqBq7xb3mJ7fGrtDtIVerLQgUFq8g02YwO6Gc+/9UEb
-	W4ObIv2mkyHZll42KKRpckO6O8vZMEgt3mCe3Nk6eTTV3lw1isaKLX8lgvoHIQ0FOUGaf8i0KVJPL
-	696iQTN4PrVe24KXtS7mR0i28+vlv5ZLEV7MLfvHesRJ6WazuDl6ztgxaBt4ivFhKvAzJ/cJXbP3A
-	fm7trYkw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1ulRai-000000002Wy-3vkP;
-	Mon, 11 Aug 2025 09:25:28 -0300
-Message-ID: <9ab64c5bd90474a5e57c73cc0c48f612@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: David Howells <dhowells@redhat.com>, Steve French <sfrench@samba.org>,
- Enzo Matsumiya <ematsumiya@suse.de>
-Cc: dhowells@redhat.com, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey
- <tom@talpey.com>, linux-cifs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix collect_sample() to handle any iterator type
-In-Reply-To: <324664.1754897644@warthog.procyon.org.uk>
-References: <324664.1754897644@warthog.procyon.org.uk>
-Date: Mon, 11 Aug 2025 09:25:23 -0300
+	s=arc-20240116; t=1754921721; c=relaxed/simple;
+	bh=jlxefgRH0WVE0rzJVyd/8S1bvpbZvv/m7+Vv0eJO7e8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hOC8OMK8oHBjCA1tL8CfBcNFoWN0XnE65sV6WOjwmkcooEu078LMetOJKQW+DFKFKZezXDrl2oX+Q0y3L8ReLkbkLDAmAxwzFEheCS+aHB9y49uZiRInNRl5cC95XXZGEMWGEnesAczxIfbBzJc/BPWkw18PFJuBUoPTrorOoT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c0xVX08dSzYQv92;
+	Mon, 11 Aug 2025 22:15:16 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A02FA1A14EF;
+	Mon, 11 Aug 2025 22:15:14 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgBXIBHw+plocdNUDQ--.57266S4;
+	Mon, 11 Aug 2025 22:15:14 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pshilov@microsoft.com
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	chengzhihao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH V3 0/2] Fix mid_q_entry memory leaks in SMB client and further cleanup
+Date: Mon, 11 Aug 2025 22:07:36 +0800
+Message-Id: <20250811140738.1141817-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXIBHw+plocdNUDQ--.57266S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFyUZw48JFWrXFykuw1xZrb_yoW8WrWkpF
+	WfCFy3Grn8J34SvwsxJa18X3Z5A3WkGa47XFy7tr1vyFn8ZF18Kr1vyrna9Fy7GrZ5Xa4a
+	gr4qyr4j9F17ua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHDUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-David Howells <dhowells@redhat.com> writes:
+This series contains the remaining patch from my previous mid processing
+fix series, plus an additional cleanup patch. The first three patches of
+my earlier series have already been merged into mainline. 
 
-> collect_sample() is used to gather samples of the data in a Write op for
-> analysis to try and determine if the compression algorithm is likely to
-> achieve anything more quickly than actually running the compression
-> algorithm.
->
-> However, collect_sample() assumes that the data it is going to be sampling
-> is stored in an ITER_XARRAY-type iterator (which it now should never be)
-> and doesn't actually check that it is before accessing the underlying
-> xarray directly.
->
-> Fix this by replacing the code with a loop that just uses the standard
-> iterator functions to sample every other 2KiB block, skipping the
-> intervening ones.  It's not quite the same as the previous algorithm as it
-> doesn't necessarily align to the pages within an ordinary write from the
-> pagecache.
->
-> Note that the btrfs code from which this was derived samples the inode's
-> pagecache directly rather than the iterator - but that doesn't necessarily
-> work for network filesystems if O_DIRECT is in operation.
->
-> Fixes: 94ae8c3fee94 ("smb: client: compress: LZ77 code improvements cleanup")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Steve French <sfrench@samba.org>
-> cc: Enzo Matsumiya <ematsumiya@suse.de>
-> cc: Paulo Alcantara <pc@manguebit.org>
-> cc: Shyam Prasad N <sprasad@microsoft.com>
-> cc: Tom Talpey <tom@talpey.com>
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->  fs/smb/client/compress.c |   71 +++++++++++++----------------------------------
->  1 file changed, 21 insertions(+), 50 deletions(-)
+Patch 1/2: The final patch from that series, which improves the helper
+function for mid cancellation conditions. The previous helper function
+had awkward semantics requiring callers to negate the return value,
+and was inefficient due to the extra negation in wait loops.
 
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Patch 2/2: A cleanup patch that removes unnecessary mid_queue_lock usage
+and standardizes mid_state access with READ_ONCE/WRITE_ONCE. This builds
+on the fixes to make the locking model cleaner and more consistent.
+
+These patches are independent and can be applied separately if needed.
+
+V3:
+ - Use mid_lock to protect the update of mid->callback rather than
+   its execution. 
+
+V2:
+ - Inline the mid_execute_callback() in the smb2ops.c to eliminate
+   the sparse warning.
+
+Wang Zhaolong (2):
+  smb: client: fix mid_q_entry memleak leak with per-mid locking
+  smb: client: Clean up mid_queue_lock usage and standardize mid_state
+    access
+
+ fs/smb/client/cifsglob.h      | 21 +++++++++++
+ fs/smb/client/cifssmb.c       |  8 ++--
+ fs/smb/client/cifstransport.c | 69 +++++++++++++++++++++++------------
+ fs/smb/client/connect.c       | 25 ++++++-------
+ fs/smb/client/smb1ops.c       |  5 ++-
+ fs/smb/client/smb2ops.c       | 26 ++++++-------
+ fs/smb/client/smb2pdu.c       | 10 +++--
+ fs/smb/client/smb2transport.c |  3 +-
+ fs/smb/client/transport.c     | 50 ++++++++++++++-----------
+ 9 files changed, 135 insertions(+), 82 deletions(-)
+
+-- 
+2.39.2
+
