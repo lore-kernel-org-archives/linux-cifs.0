@@ -1,192 +1,59 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114362D979D
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 07:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AD51F4180
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 10:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.147.23.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754897656; cv=none; b=bG9tJIP9CKQjSD4GM8g/ni0pxhIL+Jt5/qb43M2m8W8anw+3iad972fEQFV2aJLaB3B+Wry4ZD6gYapi2YilEjuSpABui83mCaS1776IW5f9QEwnYhrL0XFYxwyFW4wq8RZINn8oIVfCqhtTlbYVl+cbxCgVsjQzY745BNFkHWs=
+	t=1754907418; cv=none; b=moXyVbTx5iWOXeqWwDS4YwKGNgjczSSBziPqXZZrlTv3H5YWL/kLhGhyDG1zCW6bi9kwPHnzFXxHs1jlNDMA7egH5gsfb8eSH2UKofi5vosUGr70XapW/btuwmsWbjGJF9yxCT12IHW5FCPXWPv6HQktUSsmxyiF8CesTtMzA/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754897656; c=relaxed/simple;
-	bh=dK7SLDDhLK24LOoQxG4hZlXuF4fqefgKWahWen4Gd2I=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=mogA4xdBrOXhGQCBanr5RawrFd/3cQP0EDNJgIJ8wsFD7V7+9j2FQ4K69qnEb7gipQIKSQu4tLpK3Y7n7DQn/cdw1cq8hsUu27rSa/tjwatZx6n1pIG3JI8NkmlvEPPjtFkfMdqRmSZhQqlzZOw+Pj6X85hpXytbv4NAPjc3uv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YXeZoAHB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXeZoAHB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1754897654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=q9vbhTv66yOj5MFJijPbRoZX2tGXwBihvDtRn9EhSDY=;
-	b=YXeZoAHBEptMwhhYXfOx5G6uUVphXKP1+mvdtiTGnRUXJt0roeSnepXnK8UZ9OZV+o9ZXu
-	VEhjBGJt0ZLGyTiURaURTSnSPHohd/FBIsV2WxiR5PVKcU0EkLHASfocP5LK0+n7akSTpb
-	EdjjljnukRgMVUditE3qPVl5ljhUCOI=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-KjcMOzISNPWa7lE9yECnSQ-1; Mon,
- 11 Aug 2025 03:34:10 -0400
-X-MC-Unique: KjcMOzISNPWa7lE9yECnSQ-1
-X-Mimecast-MFC-AGG-ID: KjcMOzISNPWa7lE9yECnSQ_1754897649
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99F1D18002C1;
-	Mon, 11 Aug 2025 07:34:08 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1BDA3180047F;
-	Mon, 11 Aug 2025 07:34:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
+	s=arc-20240116; t=1754907418; c=relaxed/simple;
+	bh=LSE9BMAlVcfDDCkIHpx1eHqXTO0CSRsabrkNnNPLaV4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=KRyGgOBPWQx+43FGljcawZYdqlbGWZ8jYSH5GeVaaSA1K2lKZARQpE0p5QvMiZXyOP9b0DeN6gARAPnN4KodhygwL51l0WMktV2ffekzWhyGLiRCv03Y+VvWtqfNTl5AdsM5aY8I2/AMT2RouL1d8xIL0NaAptQIj5LviUUpch8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com; spf=pass smtp.mailfrom=lge.com; arc=none smtp.client-ip=156.147.23.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lge.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lge.com
+Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
+	by 156.147.23.53 with ESMTP; 11 Aug 2025 18:46:53 +0900
+X-Original-SENDERIP: 156.147.1.121
+X-Original-MAILFROM: chanho.min@lge.com
+Received: from unknown (HELO localhost.localdomain) (10.178.31.96)
+	by 156.147.1.121 with ESMTP; 11 Aug 2025 18:46:53 +0900
+X-Original-SENDERIP: 10.178.31.96
+X-Original-MAILFROM: chanho.min@lge.com
+From: Chanho Min <chanho.min@lge.com>
 To: Steve French <sfrench@samba.org>,
-    Enzo Matsumiya <ematsumiya@suse.de>
-cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix collect_sample() to handle any iterator type
+	linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	gunho.lee@lge.com,
+	gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	Chanho Min <chanho.min@lge.com>
+Subject: [PATCH 0/4] smb: Backport UAF fixes for v5.4.y
+Date: Mon, 11 Aug 2025 18:46:35 +0900
+Message-Id: <20250811094639.37446-1-chanho.min@lge.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <324663.1754897644.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Aug 2025 08:34:04 +0100
-Message-ID: <324664.1754897644@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-collect_sample() is used to gather samples of the data in a Write op for
-analysis to try and determine if the compression algorithm is likely to
-achieve anything more quickly than actually running the compression
-algorithm.
+This patch series backports four fixes from v5.10.y and later to the v5.4.y,
+addressing potential UAF issues in the SMB client implementation.
+The patches have been adapted to account for the directory rename from fs/smb/client/*
+to fs/cifs/* in v5.4.y, ensuring compatibility with the target kernel.
 
-However, collect_sample() assumes that the data it is going to be sampling
-is stored in an ITER_XARRAY-type iterator (which it now should never be)
-and doesn't actually check that it is before accessing the underlying
-xarray directly.
+Paulo Alcantara (4):
+  smb: client: fix potential UAF in cifs_debug_files_proc_show()
+  smb: client: fix potential UAF in is_valid_oplock_break()
+  smb: client: fix potential UAF in smb2_is_valid_lease_break()
+  smb: client: fix potential UAF in cifs_stats_proc_write()
 
-Fix this by replacing the code with a loop that just uses the standard
-iterator functions to sample every other 2KiB block, skipping the
-intervening ones.  It's not quite the same as the previous algorithm as it
-doesn't necessarily align to the pages within an ordinary write from the
-pagecache.
-
-Note that the btrfs code from which this was derived samples the inode's
-pagecache directly rather than the iterator - but that doesn't necessarily
-work for network filesystems if O_DIRECT is in operation.
-
-Fixes: 94ae8c3fee94 ("smb: client: compress: LZ77 code improvements cleanu=
-p")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/client/compress.c |   71 +++++++++++++----------------------------=
-------
- 1 file changed, 21 insertions(+), 50 deletions(-)
-
-diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
-index 766b4de13da7..db709f5cd2e1 100644
---- a/fs/smb/client/compress.c
-+++ b/fs/smb/client/compress.c
-@@ -155,58 +155,29 @@ static int cmp_bkt(const void *_a, const void *_b)
- }
- =
-
- /*
-- * TODO:
-- * Support other iter types, if required.
-- * Only ITER_XARRAY is supported for now.
-+ * Collect some 2K samples with 2K gaps between.
-  */
--static int collect_sample(const struct iov_iter *iter, ssize_t max, u8 *s=
-ample)
-+static int collect_sample(const struct iov_iter *source, ssize_t max, u8 =
-*sample)
- {
--	struct folio *folios[16], *folio;
--	unsigned int nr, i, j, npages;
--	loff_t start =3D iter->xarray_start + iter->iov_offset;
--	pgoff_t last, index =3D start / PAGE_SIZE;
--	size_t len, off, foff;
--	void *p;
--	int s =3D 0;
--
--	last =3D (start + max - 1) / PAGE_SIZE;
--	do {
--		nr =3D xa_extract(iter->xarray, (void **)folios, index, last, ARRAY_SIZ=
-E(folios),
--				XA_PRESENT);
--		if (nr =3D=3D 0)
--			return -EIO;
--
--		for (i =3D 0; i < nr; i++) {
--			folio =3D folios[i];
--			npages =3D folio_nr_pages(folio);
--			foff =3D start - folio_pos(folio);
--			off =3D foff % PAGE_SIZE;
--
--			for (j =3D foff / PAGE_SIZE; j < npages; j++) {
--				size_t len2;
--
--				len =3D min_t(size_t, max, PAGE_SIZE - off);
--				len2 =3D min_t(size_t, len, SZ_2K);
--
--				p =3D kmap_local_page(folio_page(folio, j));
--				memcpy(&sample[s], p, len2);
--				kunmap_local(p);
--
--				s +=3D len2;
--
--				if (len2 < SZ_2K || s >=3D max - SZ_2K)
--					return s;
--
--				max -=3D len;
--				if (max <=3D 0)
--					return s;
--
--				start +=3D len;
--				off =3D 0;
--				index++;
--			}
--		}
--	} while (nr =3D=3D ARRAY_SIZE(folios));
-+	struct iov_iter iter =3D *source;
-+	size_t s =3D 0;
-+
-+	while (iov_iter_count(&iter) >=3D SZ_2K) {
-+		size_t part =3D umin(umin(iov_iter_count(&iter), SZ_2K), max);
-+		size_t n;
-+
-+		n =3D copy_from_iter(sample + s, part, &iter);
-+		if (n !=3D part)
-+			return -EFAULT;
-+
-+		s +=3D n;
-+		max -=3D n;
-+
-+		if (iov_iter_count(&iter) < PAGE_SIZE - SZ_2K)
-+			break;
-+
-+		iov_iter_advance(&iter, SZ_2K);
-+	}
- =
-
- 	return s;
- }
+ fs/cifs/cifs_debug.c | 4 ++++
+ fs/cifs/cifsglob.h   | 8 ++++++++
+ fs/cifs/misc.c       | 2 ++
+ fs/cifs/smb2misc.c   | 3 ++-
+ 4 files changed, 16 insertions(+), 1 deletion(-)
 
