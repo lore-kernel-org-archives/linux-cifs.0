@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF1E217F35;
-	Tue, 12 Aug 2025 19:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C87A27703A;
+	Tue, 12 Aug 2025 19:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755026737; cv=none; b=Z9nbHUW3KpLZmBoQipY3G+eRi431TqVLqocEt1Jn2PNr8IpOmId3ct+7CbNkpPdPgEX2VKUfdM2N8ATNC/VgJoOqK14e8Ygwl46cAY6Ve9mUSmlt+8nuIKSuCKGnPpJ0wdw2vbxUwAUFL0ypKPGATWMOS9L7j6h2Ycb5rbd3wZ0=
+	t=1755026741; cv=none; b=SrfQy87PcFU+jwIr0ok0ziz307DiBxiWxekCt2aqzorhu4zMrXibx5MjkhSH+HXDFdBEW8lBFLVQ7GPNn6jLN5aOWxlYDFktj2uYuDZ/JNLgVeqjUQAzvPUaIfLnWEVUH6Bgf091pVYzrE3Alk+Heo/j5VsK6gjBvLKVVsCiC7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755026737; c=relaxed/simple;
-	bh=m6YnP9MEJgLyMruIXwZ9GXfXeLuNZw5cp6FI4eovmd4=;
+	s=arc-20240116; t=1755026741; c=relaxed/simple;
+	bh=zrl3LeN9pA9RMVvyHYEMe5I7nqeCQ6ZPvVsiHb389sM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ofSQMUAMaPRhgy3BWADs9uL4Z/vQ26RgvZXa8dgwAqJ6aI835ezT9VXdMf1W3l/7nhzbAFabSAzjE8BMh50uZgiGEXHCKdNnXK8c//VqB0ljH23TH1cd1eGcLbrxugXhlHn9h8lELG4weMSZ5uDaQEEo8zo56wwWIEX3r5GlCfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cj9Flxi+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=dyXcEgUIk1RuyB+l8fIXsz4PSZobMcDYzMCd3hoC+xYrv4NErxZQxvF52myZO8lUEg0Q6PE40k7C2BpJ5pBjUQqM6rkkRZ/LYeGmV1JPxWOr0NR/OCT25SI75hbGjhykomy7W1LTeVL92Dvt5zNXU0quz7YaI9/+drbcPBObHT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Uq8dbi4J; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cj9Flxi+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECF8FC4CEF0;
-	Tue, 12 Aug 2025 19:25:36 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Uq8dbi4J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F687C4CEF0;
+	Tue, 12 Aug 2025 19:25:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755026737;
-	bh=m6YnP9MEJgLyMruIXwZ9GXfXeLuNZw5cp6FI4eovmd4=;
+	s=korg; t=1755026740;
+	bh=zrl3LeN9pA9RMVvyHYEMe5I7nqeCQ6ZPvVsiHb389sM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cj9Flxi+cC7z46mXOmT5nBHkuN4SswsKJA40Bzr2suDCNeIhTZOfZzg4KHsd8U6C4
-	 orPTppx25BhPoBdY+H+cCsf7rMLfXyhsXDgGn6EGdJ+vQZlGN41/w8Mh5J6BWM5w1t
-	 GhV6o4+Y/Cb3FnEhAECpXYnK7/4SQSC0MCxqhzdI=
+	b=Uq8dbi4J8s65n/JIVd+lWQfK4O4MXwctMUdGoZD0ZZYkBWGU4uDnIGwhgjGXWJJNY
+	 2lWSZtCOMGcLnoeKTPY6J/EAAbu31laI7FYLxHzHsRc1tPI4ATamDIhQvN530C7Wzy
+	 deX1GKhWtGPuBtrlU3bHer/uwH/ImU6EVF5VCoKA=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.15 425/480] smb: client: remove separate empty_packet_queue
-Date: Tue, 12 Aug 2025 19:50:33 +0200
-Message-ID: <20250812174414.937000643@linuxfoundation.org>
+Subject: [PATCH 6.15 426/480] smb: client: make sure we call ib_dma_unmap_single() only if we called ib_dma_map_single already
+Date: Tue, 12 Aug 2025 19:50:34 +0200
+Message-ID: <20250812174414.977645508@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250812174357.281828096@linuxfoundation.org>
 References: <20250812174357.281828096@linuxfoundation.org>
@@ -58,14 +58,13 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 24b6afc36db748467e853e166a385df07e443859 ]
+[ Upstream commit 047682c370b6f18fec818b57b0ed8b501bdb79f8 ]
 
-There's no need to maintain two lists, we can just
-have a single list of receive buffers, which are free to use.
+In case of failures either ib_dma_map_single() might not be called yet
+or ib_dma_unmap_single() was already called.
 
-It just added unneeded complexity and resulted in
-ib_dma_unmap_single() not being called from recv_done()
-for empty keepalive packets.
+We should make sure put_receive_buffer() only calls
+ib_dma_unmap_single() if needed.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -77,179 +76,45 @@ Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifs_debug.c |  6 ++--
- fs/smb/client/smbdirect.c  | 62 +++-----------------------------------
- fs/smb/client/smbdirect.h  |  4 ---
- 3 files changed, 7 insertions(+), 65 deletions(-)
+ fs/smb/client/smbdirect.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index c0196be0e65f..9092051776fc 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -432,10 +432,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			server->smbd_conn->receive_credit_target);
- 		seq_printf(m, "\nPending send_pending: %x ",
- 			atomic_read(&server->smbd_conn->send_pending));
--		seq_printf(m, "\nReceive buffers count_receive_queue: %x "
--			"count_empty_packet_queue: %x",
--			server->smbd_conn->count_receive_queue,
--			server->smbd_conn->count_empty_packet_queue);
-+		seq_printf(m, "\nReceive buffers count_receive_queue: %x ",
-+			server->smbd_conn->count_receive_queue);
- 		seq_printf(m, "\nMR responder_resources: %x "
- 			"max_frmr_depth: %x mr_type: %x",
- 			server->smbd_conn->responder_resources,
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index e99e783f1b0e..0ab490c0a9b0 100644
+index 0ab490c0a9b0..5690e8b3d101 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -13,8 +13,6 @@
- #include "cifsproto.h"
- #include "smb2proto.h"
+@@ -1057,6 +1057,7 @@ static int smbd_post_recv(
+ 	if (rc) {
+ 		ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
+ 				    response->sge.length, DMA_FROM_DEVICE);
++		response->sge.length = 0;
+ 		smbd_disconnect_rdma_connection(info);
+ 		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
+ 	}
+@@ -1186,8 +1187,13 @@ static void put_receive_buffer(
+ 	struct smbdirect_socket *sc = &info->socket;
+ 	unsigned long flags;
  
--static struct smbd_response *get_empty_queue_buffer(
--		struct smbd_connection *info);
- static struct smbd_response *get_receive_buffer(
- 		struct smbd_connection *info);
- static void put_receive_buffer(
-@@ -23,8 +21,6 @@ static void put_receive_buffer(
- static int allocate_receive_buffers(struct smbd_connection *info, int num_buf);
- static void destroy_receive_buffers(struct smbd_connection *info);
+-	ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
+-		response->sge.length, DMA_FROM_DEVICE);
++	if (likely(response->sge.length != 0)) {
++		ib_dma_unmap_single(sc->ib.dev,
++				    response->sge.addr,
++				    response->sge.length,
++				    DMA_FROM_DEVICE);
++		response->sge.length = 0;
++	}
  
--static void put_empty_packet(
--		struct smbd_connection *info, struct smbd_response *response);
- static void enqueue_reassembly(
- 		struct smbd_connection *info,
- 		struct smbd_response *response, int data_length);
-@@ -393,7 +389,6 @@ static bool process_negotiation_response(
- static void smbd_post_send_credits(struct work_struct *work)
- {
- 	int ret = 0;
--	int use_receive_queue = 1;
- 	int rc;
- 	struct smbd_response *response;
- 	struct smbd_connection *info =
-@@ -409,18 +404,9 @@ static void smbd_post_send_credits(struct work_struct *work)
- 	if (info->receive_credit_target >
- 		atomic_read(&info->receive_credits)) {
- 		while (true) {
--			if (use_receive_queue)
--				response = get_receive_buffer(info);
--			else
--				response = get_empty_queue_buffer(info);
--			if (!response) {
--				/* now switch to empty packet queue */
--				if (use_receive_queue) {
--					use_receive_queue = 0;
--					continue;
--				} else
--					break;
--			}
-+			response = get_receive_buffer(info);
-+			if (!response)
-+				break;
+ 	spin_lock_irqsave(&info->receive_queue_lock, flags);
+ 	list_add_tail(&response->list, &info->receive_queue);
+@@ -1221,6 +1227,7 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
+ 			goto allocate_failed;
  
- 			response->type = SMBD_TRANSFER_DATA;
- 			response->first_segment = false;
-@@ -511,7 +497,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 				response,
- 				data_length);
- 		} else
--			put_empty_packet(info, response);
-+			put_receive_buffer(info, response);
- 
- 		if (data_length)
- 			wake_up_interruptible(&info->wait_reassembly_queue);
-@@ -1115,17 +1101,6 @@ static int smbd_negotiate(struct smbd_connection *info)
- 	return rc;
- }
- 
--static void put_empty_packet(
--		struct smbd_connection *info, struct smbd_response *response)
--{
--	spin_lock(&info->empty_packet_queue_lock);
--	list_add_tail(&response->list, &info->empty_packet_queue);
--	info->count_empty_packet_queue++;
--	spin_unlock(&info->empty_packet_queue_lock);
--
--	queue_work(info->workqueue, &info->post_send_credits_work);
--}
--
- /*
-  * Implement Connection.FragmentReassemblyBuffer defined in [MS-SMBD] 3.1.1.1
-  * This is a queue for reassembling upper layer payload and present to upper
-@@ -1174,25 +1149,6 @@ static struct smbd_response *_get_first_reassembly(struct smbd_connection *info)
- 	return ret;
- }
- 
--static struct smbd_response *get_empty_queue_buffer(
--		struct smbd_connection *info)
--{
--	struct smbd_response *ret = NULL;
--	unsigned long flags;
--
--	spin_lock_irqsave(&info->empty_packet_queue_lock, flags);
--	if (!list_empty(&info->empty_packet_queue)) {
--		ret = list_first_entry(
--			&info->empty_packet_queue,
--			struct smbd_response, list);
--		list_del(&ret->list);
--		info->count_empty_packet_queue--;
--	}
--	spin_unlock_irqrestore(&info->empty_packet_queue_lock, flags);
--
--	return ret;
--}
--
- /*
-  * Get a receive buffer
-  * For each remote send, we need to post a receive. The receive buffers are
-@@ -1257,10 +1213,6 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
- 	spin_lock_init(&info->receive_queue_lock);
- 	info->count_receive_queue = 0;
- 
--	INIT_LIST_HEAD(&info->empty_packet_queue);
--	spin_lock_init(&info->empty_packet_queue_lock);
--	info->count_empty_packet_queue = 0;
--
- 	init_waitqueue_head(&info->wait_receive_queues);
- 
- 	for (i = 0; i < num_buf; i++) {
-@@ -1294,9 +1246,6 @@ static void destroy_receive_buffers(struct smbd_connection *info)
- 
- 	while ((response = get_receive_buffer(info)))
- 		mempool_free(response, info->response_mempool);
--
--	while ((response = get_empty_queue_buffer(info)))
--		mempool_free(response, info->response_mempool);
- }
- 
- /* Implement idle connection timer [MS-SMBD] 3.1.6.2 */
-@@ -1383,8 +1332,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 
- 	log_rdma_event(INFO, "free receive buffers\n");
- 	wait_event(info->wait_receive_queues,
--		info->count_receive_queue + info->count_empty_packet_queue
--			== sp->recv_credit_max);
-+		info->count_receive_queue == sp->recv_credit_max);
- 	destroy_receive_buffers(info);
- 
- 	/*
-diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
-index 3d552ab27e0f..fb8db71735f3 100644
---- a/fs/smb/client/smbdirect.h
-+++ b/fs/smb/client/smbdirect.h
-@@ -110,10 +110,6 @@ struct smbd_connection {
- 	int count_receive_queue;
- 	spinlock_t receive_queue_lock;
- 
--	struct list_head empty_packet_queue;
--	int count_empty_packet_queue;
--	spinlock_t empty_packet_queue_lock;
--
- 	wait_queue_head_t wait_receive_queues;
- 
- 	/* Reassembly queue */
+ 		response->info = info;
++		response->sge.length = 0;
+ 		list_add_tail(&response->list, &info->receive_queue);
+ 		info->count_receive_queue++;
+ 	}
 -- 
 2.39.5
 
