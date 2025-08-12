@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106D42F6573;
-	Tue, 12 Aug 2025 18:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DF828D830;
+	Tue, 12 Aug 2025 19:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755025200; cv=none; b=VQ8Z0jsPaVpWBMzibkX5pQty2kXhtHaUsCcy2Aa4eG+6URuS58yDJI7yw3M04dWDhzJ/1e+53Que/Mwp3d+w9aUAbQMcYmSm+SZO0umZJR8iVx6Rtg1xmVslY9i6EV5jyrZihu/z2qh0E9x78BhwAPhrdxoe8pYHDN/BBQ1ZhVk=
+	t=1755025204; cv=none; b=fDgAVvGPyTK4t9vMMJNOWQUU/8XN7kbMlAgRoOctFmTWuDP4CCVs4V75OQwYoQySvkQ/qGOB2wN1QrezJi5vN7nxI1ssPIfirfoAx7yg6NHdHWWmr/yOuNcyj2lMaB+L4kJpha/9dcUpSVZeF9eGPPMfxB4XPc5tqCXS2zpUVdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755025200; c=relaxed/simple;
-	bh=15rJ+WGdrOPt/LoRRruCTn5PRPHYhBnbByyknBPTJQM=;
+	s=arc-20240116; t=1755025204; c=relaxed/simple;
+	bh=7j5Pmya7zjRpGeWVw/m9E6DPmI30kUnNtIRfKi1vZs0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f3YbouC21AMkqtsnJ+Tr8WcpMz9ubpJOuUkAr0d2oHHrO1PEHt58UCYeKdNVPGhc9a66zh0a1uvm4yI412ot7K0KzeyhMLA1wD1WDJS6nqWwMd2kWWpecgMuh2VdL9oZnzz6ZXwbSqkLTBQplV+def+pVX75Ho+KwkrSqMGPIPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xWgYcWit; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RY+x4vxqKvUgJGj8MeGAIzaLpJYS32aBir1AcI1h/f+w/ygUZepRiGMdlByiJ81rsWB+DVsvfaUnW1wace4zqp2FL7ytNNEeAxU+Vnjds1Y0ckA6vdQc/bhhVwJfoIk3YmAb8zBllB4n0gAuchv4Mszrdpn4Qcf9biEMTbu44+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zvvwpXG7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xWgYcWit"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C81C4CEF0;
-	Tue, 12 Aug 2025 18:59:59 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zvvwpXG7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD89C4CEF0;
+	Tue, 12 Aug 2025 19:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755025199;
-	bh=15rJ+WGdrOPt/LoRRruCTn5PRPHYhBnbByyknBPTJQM=;
+	s=korg; t=1755025203;
+	bh=7j5Pmya7zjRpGeWVw/m9E6DPmI30kUnNtIRfKi1vZs0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=xWgYcWituB6Fx6Ix4dnORMg6DXJriUAQca4NDnamk9SV3ikRwEf/TeF3W8X9LZKRf
-	 KCmFeoefPRAj7cBfBZbjFrt9c015WktFp0iXiZdfPQZe0iptILE2cjW0d+DE+RTlko
-	 CrlD6yjZDumVLNvbrK2VIRXBe5Y9iaX/WnQqp7So=
+	b=zvvwpXG73YH0KswEC8yORu5Dt3V+Fow82wlQBspYBV4YGy3YIbz0HVU3YAwb+QZWa
+	 sc1AwQI3sk3eXQ/2o56DVumSvmiYOq5ihntI2tVeczqqX//cS/AWWx2l/IYSsRp+Sd
+	 mdcmsw4Fg+RhU6WUfWqyzEEReFzDk38psjBTOFjk=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.16 565/627] smb: client: make sure we call ib_dma_unmap_single() only if we called ib_dma_map_single already
-Date: Tue, 12 Aug 2025 19:34:20 +0200
-Message-ID: <20250812173453.380523675@linuxfoundation.org>
+Subject: [PATCH 6.16 566/627] smb: client: let recv_done() cleanup before notifying the callers.
+Date: Tue, 12 Aug 2025 19:34:21 +0200
+Message-ID: <20250812173453.416345555@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250812173419.303046420@linuxfoundation.org>
 References: <20250812173419.303046420@linuxfoundation.org>
@@ -58,13 +58,17 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 047682c370b6f18fec818b57b0ed8b501bdb79f8 ]
+[ Upstream commit bdd7afc6dca5e0ebbb75583484aa6ea9e03fbb13 ]
 
-In case of failures either ib_dma_map_single() might not be called yet
-or ib_dma_unmap_single() was already called.
+We should call put_receive_buffer() before waking up the callers.
 
-We should make sure put_receive_buffer() only calls
-ib_dma_unmap_single() if needed.
+For the internal error case of response->type being unexpected,
+we now also call smbd_disconnect_rdma_connection() instead
+of not waking up the callers at all.
+
+Note that the SMBD_TRANSFER_DATA case still has problems,
+which will be addressed in the next commit in order to make
+it easier to review this one.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -76,45 +80,53 @@ Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/client/smbdirect.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 0ab490c0a9b0..5690e8b3d101 100644
+index 5690e8b3d101..d26b8cef82d6 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1057,6 +1057,7 @@ static int smbd_post_recv(
- 	if (rc) {
- 		ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
- 				    response->sge.length, DMA_FROM_DEVICE);
-+		response->sge.length = 0;
- 		smbd_disconnect_rdma_connection(info);
- 		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
+@@ -454,7 +454,6 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
+ 		log_rdma_recv(INFO, "wc->status=%d opcode=%d\n",
+ 			wc->status, wc->opcode);
+-		smbd_disconnect_rdma_connection(info);
+ 		goto error;
  	}
-@@ -1186,8 +1187,13 @@ static void put_receive_buffer(
- 	struct smbdirect_socket *sc = &info->socket;
- 	unsigned long flags;
  
--	ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
--		response->sge.length, DMA_FROM_DEVICE);
-+	if (likely(response->sge.length != 0)) {
-+		ib_dma_unmap_single(sc->ib.dev,
-+				    response->sge.addr,
-+				    response->sge.length,
-+				    DMA_FROM_DEVICE);
-+		response->sge.length = 0;
-+	}
+@@ -471,8 +470,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		info->full_packet_received = true;
+ 		info->negotiate_done =
+ 			process_negotiation_response(response, wc->byte_len);
++		put_receive_buffer(info, response);
+ 		complete(&info->negotiate_completion);
+-		break;
++		return;
  
- 	spin_lock_irqsave(&info->receive_queue_lock, flags);
- 	list_add_tail(&response->list, &info->receive_queue);
-@@ -1221,6 +1227,7 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
- 			goto allocate_failed;
+ 	/* SMBD data transfer packet */
+ 	case SMBD_TRANSFER_DATA:
+@@ -529,14 +529,16 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
+ 		}
  
- 		response->info = info;
-+		response->sge.length = 0;
- 		list_add_tail(&response->list, &info->receive_queue);
- 		info->count_receive_queue++;
+ 		return;
+-
+-	default:
+-		log_rdma_recv(ERR,
+-			"unexpected response type=%d\n", response->type);
  	}
+ 
++	/*
++	 * This is an internal error!
++	 */
++	log_rdma_recv(ERR, "unexpected response type=%d\n", response->type);
++	WARN_ON_ONCE(response->type != SMBD_TRANSFER_DATA);
+ error:
+ 	put_receive_buffer(info, response);
++	smbd_disconnect_rdma_connection(info);
+ }
+ 
+ static struct rdma_cm_id *smbd_create_id(
 -- 
 2.39.5
 
