@@ -1,27 +1,27 @@
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273142820B7;
-	Tue, 12 Aug 2025 13:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7662D028A;
+	Tue, 12 Aug 2025 14:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755005559; cv=none; b=Mg/AkgDnBU9zu1MIiojDcAcShbs/OpkCbfCxmhtuWaZyqJt6bOplJflIw/GHcfT1C4l//963JnHgwd3QeUcpxPSDmyYg6Rwy7eX464IkIFeAPkEJ6u761W2UdxCHPFwHRo3uSkpiBpE0BQlcvURdqMrbhlIbEkXvOSwFiQanu6w=
+	t=1755007379; cv=none; b=sQQDny9YNDbt+cmeohH/x9j8pEBOZL67shzfxeBZ5gXEsd+ervuEUb5dQBg9Ppotz6NEfdZmMjFIdP/5q8OEUtfZ6tRRSrCI0kDPUqoRA0dWfGJWpV6qUU1mSU49HEMvnq/ZNDz7vmaaHl8T//FtqCQte71Eq49k69zFQ5rw+6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755005559; c=relaxed/simple;
-	bh=l+N9XNOVXzNBhGXWdPf+WmOpKmREMBi+ktV9EGe52sU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XP90r4VN8GvgySA/7HKX0/7RX8zeABTtFrdvftOcImkalAmBmMkl1RtTc3zYr2fPaKZ9M+4pfwgzHH6Ayv5pVuCgW8Nd/Cusk4uC7TWA2wkZbLAsxeUOlIBnfCGn+ta+9eycDVsFhM4W3yYR7wLfMfdkZL7Pqnf3i0BedeI6rpM=
+	s=arc-20240116; t=1755007379; c=relaxed/simple;
+	bh=DIIUebEI6LWGB2aIzfT+0q8jptuwtlRflf1DGJOJSSc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gbVC0yBc6INfbDxJnz2cGB+9TN8QjwzdMIu4T3qsiXAA+P1r1JzFLWjt6tcVUlzdy43Bsoqck3gJ79wPwuK0fNPHhhMOzBXbjAjQMKkP+2fqtwqtBHL7hMKQwbgnG9UKmAFyD08Yz+KBw83+8M4PbpSih5f3XE4M4HGqnnA6D6s=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c1XVn44TYzYQvGY;
-	Tue, 12 Aug 2025 21:32:33 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c1Y9n5L96zYQv8k;
+	Tue, 12 Aug 2025 22:02:53 +0800 (CST)
 Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 307991A07BB;
-	Tue, 12 Aug 2025 21:32:32 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTP id 5CF431A0E99;
+	Tue, 12 Aug 2025 22:02:52 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP4 (Coremail) with SMTP id gCh0CgBXIBFuQptoIpTCDQ--.9726S4;
-	Tue, 12 Aug 2025 21:32:32 +0800 (CST)
+	by APP4 (Coremail) with SMTP id gCh0CgAHgxOKSZtoNPPEDQ--.47220S4;
+	Tue, 12 Aug 2025 22:02:52 +0800 (CST)
 From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
 To: sfrench@samba.org,
 	pc@manguebit.org
@@ -31,9 +31,9 @@ Cc: linux-cifs@vger.kernel.org,
 	chengzhihao1@huawei.com,
 	yi.zhang@huawei.com,
 	yangerkun@huawei.com
-Subject: [PATCH] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
-Date: Tue, 12 Aug 2025 21:24:52 +0800
-Message-Id: <20250812132452.2974950-1-wangzhaolong@huaweicloud.com>
+Subject: [PATCH V2] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
+Date: Tue, 12 Aug 2025 21:55:12 +0800
+Message-Id: <20250812135512.3087030-1-wangzhaolong@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -42,22 +42,22 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBXIBFuQptoIpTCDQ--.9726S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxKFy3XrWUuF4fWrWktFyxZrb_yoW3XFykpF
-	ySy3yfWr48Gr1UWws7JF4ku34F9348CFy5Cr4xGa4vqayDZrWIgFWqkF1j9FySyayDt3s3
-	Gr4qq3y29F18uFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:gCh0CgAHgxOKSZtoNPPEDQ--.47220S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxKFy3XrWUuF4fWrWktFyxZrb_yoW3Ar1fpF
+	ySyrWSgr48Gr1UWws7JF4ku34F934kCFy5Cr4xG3Wvqa4DZrWIgFWqkF1j9FySyayDt3s3
+	Gr4Dt3y2kF18uFDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
 	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
 	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
 	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
 	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
 	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI
 	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
 	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
 	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
 	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHDUUUUU==
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsUUUUUU==
 X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
 An AA deadlock occurs when network interruption during mount triggers
@@ -68,24 +68,27 @@ The detailed call process is as follows:
       mount.cifs
 -------------------------
 path_mount
-  vfs_get_tree
-    smb3_get_tree
-      cifs_smb3_do_mount
-        sget
-          alloc_super
-            down_write_nested(&s->s_umount, ..);  // Hold lock
-        cifs_root_iget
-          cifs_get_inode_info
-            smb2_query_path_info
-              smb2_compound_op
-                SMB2_open_init
-                  smb2_plain_req_init
-                    smb2_reconnect           // Trigger reconnection
-                      cifs_tree_connect
-                        cifs_get_dfs_tcon_super
-                          __cifs_get_super
-                            iterate_supers_type
-                              down_read(&sb->s_umount); // Deadlock
+  do_new_mount
+    vfs_get_tree
+      smb3_get_tree
+        cifs_smb3_do_mount
+          sget
+            alloc_super
+              down_write_nested(&s->s_umount, ..);  // Hold lock
+          cifs_root_iget
+            cifs_get_inode_info
+              smb2_query_path_info
+                smb2_compound_op
+                  SMB2_open_init
+                    smb2_plain_req_init
+                      smb2_reconnect           // Trigger reconnection
+                        cifs_tree_connect
+                          cifs_get_dfs_tcon_super
+                            __cifs_get_super
+                              iterate_supers_type
+                                down_read(&sb->s_umount); // Deadlock
+    do_new_mount_fc
+      up_write(&sb->s_umount);  // Release lock
 
 During mount phase, if reconnection is triggered, the foreground mount
 process may enter smb2_reconnect prior to the reconnect worker being
@@ -107,6 +110,11 @@ This patch fixes the problem by:
 Fixes: 3ae872de4107 ("smb: client: fix shared DFS root mounts with different prefixes")
 Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
 ---
+
+V2:
+ - Adjust the trace diagram in the commit message to indicate when the lock
+   is released
+
  fs/smb/client/cifs_fs_sb.h |  1 +
  fs/smb/client/cifsfs.c     |  1 +
  fs/smb/client/cifsproto.h  |  2 +-
