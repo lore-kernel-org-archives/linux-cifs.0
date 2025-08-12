@@ -1,204 +1,304 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34FDC2C9
-	for <linux-cifs@vger.kernel.org>; Tue, 12 Aug 2025 04:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273142820B7;
+	Tue, 12 Aug 2025 13:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1754972272; cv=none; b=Ftd48VsFtY0RGK9tu/2KLRqHorqbl0q94gFYw8a3hK0bjB22MHcAcxMqjHLuoGV8oK/R90C98y99ApdCaiZHhd05SncOqe1+iMLsbkDq1SqfbBFM9aX+uZfjwO/NU3CwGVIxANMSdGXcrzWT8eVeQK/ERq0hbLpuPy8quV9H+Ds=
+	t=1755005559; cv=none; b=Mg/AkgDnBU9zu1MIiojDcAcShbs/OpkCbfCxmhtuWaZyqJt6bOplJflIw/GHcfT1C4l//963JnHgwd3QeUcpxPSDmyYg6Rwy7eX464IkIFeAPkEJ6u761W2UdxCHPFwHRo3uSkpiBpE0BQlcvURdqMrbhlIbEkXvOSwFiQanu6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1754972272; c=relaxed/simple;
-	bh=gNw4N7LU/FbJ6XEgldNX5mpJ6VsEjruxBtFk1r+KpFQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ghp9Si1+eQtl7hnwD1IfF6zNzTfzaxKTfiiiBWrSIDx/Moc/PR1MNHkBgkDUmtKUnWpZD+fdfVSqGbetvKRdRorNBKMoi0Mimi+5b2PRdHFuigLlD2oPdZfq2WEDriK/v16r8tXkDZAaqK4xm2GK1tildt75ua9GNRaSIkZdhUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZ090r+X; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZ090r+X"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70884da4b55so53278786d6.3
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Aug 2025 21:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1754972269; x=1755577069; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BRBE98POvm3y1OXAISByb05MPTLMuNS4snXh7kL3Tyg=;
-        b=RZ090r+X8gFmAAezOvIf4ITWjjcpmbPKwA1M1hV4GamHVgBOdPjDaxpH7/SeZC+x1a
-         FFlgje2r+3+729YSA3IdVeJnARDnIWwKH7bZ/4UJJpXBaDd68U0mwi9GLZiCsR6A5fae
-         4Dr+wdE/e1rCKWUY9hOWGicb9xMz3QTDzayM+xKLW4zMqvNjxnco3NUyrJdZJutsbm75
-         9zrJfOI87xB8ujMyR4lsaBiBSiKv+1OryZtZ+6/RrnUHr0BvK97f1Ubr5KAfzFxvHxys
-         xwK7XwuNk1QOV7o++czSGptya9YzMnat1YByFcvGmh0DDxV8zRlvEqy2I9sVK4E9JJLW
-         RHeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1754972269; x=1755577069;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BRBE98POvm3y1OXAISByb05MPTLMuNS4snXh7kL3Tyg=;
-        b=CjeShLC8cMdSpwB8fM7kvhxEmQkJno2lg9ECw1cSfJGGvffXH1e/rQKyTtcI76D+er
-         xfdmtSGxG5b2xsx+OB74B3eOSycifF0SpWyzcA8BKlDq1qeDv/0UXisa2iWpoLYuBsaC
-         FFilHGFksZ0GxJu4YwtWAnEb/1L11akv9s9aNm0+ohFgknLMNSWrAQerMjc1iYzE3fvV
-         uX4pRKucmI0vfdF5Z2yfewVzZBGKG5Eed0PRzl6fDg2V0Khpc4cK2wwjhaGUWiaJoRPc
-         A8MDJartradpbzYQ4+Ql/Gb2MtZ2H0XYCOD/Y8vhpeUViLuxl8vJcatJoWwJW/9M0m6d
-         ZCBA==
-X-Gm-Message-State: AOJu0YyF0N8lBhjXj13uKSAIKNyFn9x/s9uzb5TegRCuhPS4lKsTOgTJ
-	7p5R5TjFnOKFNqP4t2BTDrndaWml8khXbtHYI2aFjHCnvRnxodbgcSEbm38sZy9D52dJm+v/ien
-	YNCzz4DNBbTfx3lGe9Nay+qG+rGE3vvNR9pYg
-X-Gm-Gg: ASbGnculnIua1mIE0T0C8eN/aPRLFma9i3rLIIKqUDQCwrqRInZldNnTXJrUk1fT2Ey
-	UfufppD3sxZpIODymQEN+S8TpX7Afbc8VR1/4OtNPxUoJQbvWPuSweYh2FZpXqa90QyzUWxAUuR
-	O6cHv2cvy9sHz3Bqhy2653Ao9LcDpfUUHJSrzOB02RGk3u+7M0vjFb5xtck3DDaBBmJeGfMzuQl
-	XLrteGR83t1fcuTMd8UrVD0vuTzXWmrJ/6NxaEfTvQLAmrB3rnh
-X-Google-Smtp-Source: AGHT+IFZg5h3gPGj0bDCCeBKUqsI68/fATToWXzteGu6B/C4BErOV98+oU1O6Oj4fh+TmIXIQGU08zX5uc7owcGaFBw=
-X-Received: by 2002:a05:6214:2aad:b0:709:e095:128f with SMTP id
- 6a1803df08f44-709e09536a3mr528716d6.25.1754972269334; Mon, 11 Aug 2025
- 21:17:49 -0700 (PDT)
+	s=arc-20240116; t=1755005559; c=relaxed/simple;
+	bh=l+N9XNOVXzNBhGXWdPf+WmOpKmREMBi+ktV9EGe52sU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XP90r4VN8GvgySA/7HKX0/7RX8zeABTtFrdvftOcImkalAmBmMkl1RtTc3zYr2fPaKZ9M+4pfwgzHH6Ayv5pVuCgW8Nd/Cusk4uC7TWA2wkZbLAsxeUOlIBnfCGn+ta+9eycDVsFhM4W3yYR7wLfMfdkZL7Pqnf3i0BedeI6rpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4c1XVn44TYzYQvGY;
+	Tue, 12 Aug 2025 21:32:33 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 307991A07BB;
+	Tue, 12 Aug 2025 21:32:32 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgBXIBFuQptoIpTCDQ--.9726S4;
+	Tue, 12 Aug 2025 21:32:32 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pc@manguebit.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	chengzhihao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
+Date: Tue, 12 Aug 2025 21:24:52 +0800
+Message-Id: <20250812132452.2974950-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 11 Aug 2025 23:17:37 -0500
-X-Gm-Features: Ac12FXzBDaFBO5kjoLovPIpMy18Rz9iHv72fzhkfQ17S8HQbJSqxfVq1U1IDV5Q
-Message-ID: <CAH2r5muN4QgGt1ZrOFkWFaqwM0V2HBWZn0OGNgZzPHJOTPjxjw@mail.gmail.com>
-Subject: [PATCH][SMB3 client] fix for slab out of bound on mount to ksmbd
-To: CIFS <linux-cifs@vger.kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>, Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000b46cbb063c235244"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgBXIBFuQptoIpTCDQ--.9726S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxKFy3XrWUuF4fWrWktFyxZrb_yoW3XFykpF
+	ySy3yfWr48Gr1UWws7JF4ku34F9348CFy5Cr4xGa4vqayDZrWIgFWqkF1j9FySyayDt3s3
+	Gr4qq3y29F18uFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHDUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
---000000000000b46cbb063c235244
-Content-Type: text/plain; charset="UTF-8"
+An AA deadlock occurs when network interruption during mount triggers
+DFS reconnection logic that calls iterate_supers_type().
 
-smb3: fix for slab out of bounds on mount to ksmbd
+The detailed call process is as follows:
 
-With KASAN enabled, it is possible to get a slab out of bounds
-during mount to ksmbd due to missing check in parse_server_interfaces()
-(see below):
+      mount.cifs
+-------------------------
+path_mount
+  vfs_get_tree
+    smb3_get_tree
+      cifs_smb3_do_mount
+        sget
+          alloc_super
+            down_write_nested(&s->s_umount, ..);  // Hold lock
+        cifs_root_iget
+          cifs_get_inode_info
+            smb2_query_path_info
+              smb2_compound_op
+                SMB2_open_init
+                  smb2_plain_req_init
+                    smb2_reconnect           // Trigger reconnection
+                      cifs_tree_connect
+                        cifs_get_dfs_tcon_super
+                          __cifs_get_super
+                            iterate_supers_type
+                              down_read(&sb->s_umount); // Deadlock
 
- BUG: KASAN: slab-out-of-bounds in
- parse_server_interfaces+0x14ee/0x1880 [cifs]
- Read of size 4 at addr ffff8881433dba98 by task mount/9827
+During mount phase, if reconnection is triggered, the foreground mount
+process may enter smb2_reconnect prior to the reconnect worker being
+scheduled, leading to a deadlock when subsequent DFS tree connect
+attempts reacquire the s_umount lock.
 
- CPU: 5 UID: 0 PID: 9827 Comm: mount Tainted: G
- OE       6.16.0-rc2-kasan #2 PREEMPT(voluntary)
- Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
- Hardware name: Dell Inc. Precision Tower 3620/0MWYPT,
- BIOS 2.13.1 06/14/2019
- Call Trace:
-  <TASK>
- dump_stack_lvl+0x9f/0xf0
- print_report+0xd1/0x670
- __virt_addr_valid+0x22c/0x430
- ? parse_server_interfaces+0x14ee/0x1880 [cifs]
- ? kasan_complete_mode_report_info+0x2a/0x1f0
- ? parse_server_interfaces+0x14ee/0x1880 [cifs]
-   kasan_report+0xd6/0x110
-   parse_server_interfaces+0x14ee/0x1880 [cifs]
-   __asan_report_load_n_noabort+0x13/0x20
-   parse_server_interfaces+0x14ee/0x1880 [cifs]
- ? __pfx_parse_server_interfaces+0x10/0x10 [cifs]
- ? trace_hardirqs_on+0x51/0x60
- SMB3_request_interfaces+0x1ad/0x3f0 [cifs]
- ? __pfx_SMB3_request_interfaces+0x10/0x10 [cifs]
- ? SMB2_tcon+0x23c/0x15d0 [cifs]
- smb3_qfs_tcon+0x173/0x2b0 [cifs]
- ? __pfx_smb3_qfs_tcon+0x10/0x10 [cifs]
- ? cifs_get_tcon+0x105d/0x2120 [cifs]
- ? do_raw_spin_unlock+0x5d/0x200
- ? cifs_get_tcon+0x105d/0x2120 [cifs]
- ? __pfx_smb3_qfs_tcon+0x10/0x10 [cifs]
- cifs_mount_get_tcon+0x369/0xb90 [cifs]
- ? dfs_cache_find+0xe7/0x150 [cifs]
- dfs_mount_share+0x985/0x2970 [cifs]
- ? check_path.constprop.0+0x28/0x50
- ? save_trace+0x54/0x370
- ? __pfx_dfs_mount_share+0x10/0x10 [cifs]
- ? __lock_acquire+0xb82/0x2ba0
- ? __kasan_check_write+0x18/0x20
- cifs_mount+0xbc/0x9e0 [cifs]
- ? __pfx_cifs_mount+0x10/0x10 [cifs]
- ? do_raw_spin_unlock+0x5d/0x200
- ? cifs_setup_cifs_sb+0x29d/0x810 [cifs]
- cifs_smb3_do_mount+0x263/0x1990 [cifs]
+The essential condition for triggering the issue is that the API
+iterate_supers_type() reacquires the s_umount lock. Therefore, one
+possible solution is to avoid using iterate_supers_type() and instead
+directly access the superblock through internal data structures.
 
-Reported-by: Namjae Jeon <linkinjeon@kernel.org>
-Tested-by: Namjae Jeon <linkinjeon@kernel.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
+This patch fixes the problem by:
+- Add vfs_sb back-pointer to cifs_sb_info for direct access
+- Protect list traversal with existing tcon->sb_list_lock
+- Use atomic operations to safely manage super block references
+- Remove complex callback-based iteration in favor of simple loop
+- Rename cifs_put_tcp_super() to cifs_put_super() to avoid confusion
 
-See attached
+Fixes: 3ae872de4107 ("smb: client: fix shared DFS root mounts with different prefixes")
+Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+---
+ fs/smb/client/cifs_fs_sb.h |  1 +
+ fs/smb/client/cifsfs.c     |  1 +
+ fs/smb/client/cifsproto.h  |  2 +-
+ fs/smb/client/dfs.c        |  2 +-
+ fs/smb/client/misc.c       | 84 ++++++++++++++------------------------
+ 5 files changed, 34 insertions(+), 56 deletions(-)
 
+diff --git a/fs/smb/client/cifs_fs_sb.h b/fs/smb/client/cifs_fs_sb.h
+index 5e8d163cb5f8..8c513e4c0efe 100644
+--- a/fs/smb/client/cifs_fs_sb.h
++++ b/fs/smb/client/cifs_fs_sb.h
+@@ -49,10 +49,11 @@
+ 
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+ 	struct list_head tcon_sb_link;
+ 	spinlock_t tlink_tree_lock;
++	struct super_block *vfs_sb;
+ 	struct tcon_link *master_tlink;
+ 	struct nls_table *local_nls;
+ 	struct smb3_fs_context *ctx;
+ 	atomic_t active;
+ 	unsigned int mnt_cifs_flags;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 3bd85ab2deb1..383f651eb43f 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -939,10 +939,11 @@ cifs_get_root(struct smb3_fs_context *ctx, struct super_block *sb)
+ 
+ static int cifs_set_super(struct super_block *sb, void *data)
+ {
+ 	struct cifs_mnt_data *mnt_data = data;
+ 	sb->s_fs_info = mnt_data->cifs_sb;
++	mnt_data->cifs_sb->vfs_sb = sb;
+ 	return set_anon_super(sb, NULL);
+ }
+ 
+ struct dentry *
+ cifs_smb3_do_mount(struct file_system_type *fs_type,
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index c34c533b2efa..6415bb961c1e 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -678,11 +678,11 @@ int copy_path_name(char *dst, const char *src);
+ int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_iov,
+ 			       int resp_buftype,
+ 			       struct cifs_search_info *srch_inf);
+ 
+ struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon);
+-void cifs_put_tcp_super(struct super_block *sb);
++void cifs_put_super(struct super_block *sb);
+ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix);
+ char *extract_hostname(const char *unc);
+ char *extract_sharename(const char *unc);
+ int parse_reparse_point(struct reparse_data_buffer *buf,
+ 			u32 plen, struct cifs_sb_info *cifs_sb,
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index f65a8a90ba27..55bcdde4fe26 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -446,11 +446,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
+ 				     &tl);
+ 	free_dfs_info_param(&ref);
+ 
+ out:
+ 	kfree(tree);
+-	cifs_put_tcp_super(sb);
++	cifs_put_super(sb);
+ 
+ 	if (rc) {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+ 			tcon->status = TID_NEED_TCON;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index da23cc12a52c..3b6920a52daa 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1108,84 +1108,60 @@ int copy_path_name(char *dst, const char *src)
+ 	/* we count the trailing nul */
+ 	name_len++;
+ 	return name_len;
+ }
+ 
+-struct super_cb_data {
+-	void *data;
+-	struct super_block *sb;
+-};
+-
+-static void tcon_super_cb(struct super_block *sb, void *arg)
++static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+ {
+-	struct super_cb_data *sd = arg;
++	struct super_block *sb;
+ 	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *t1 = sd->data, *t2;
+ 
+-	if (sd->sb)
+-		return;
++	if (!tcon)
++		return NULL;
+ 
+-	cifs_sb = CIFS_SB(sb);
+-	t2 = cifs_sb_master_tcon(cifs_sb);
+-
+-	spin_lock(&t2->tc_lock);
+-	if ((t1->ses == t2->ses ||
+-	     t1->ses->dfs_root_ses == t2->ses->dfs_root_ses) &&
+-	    t1->ses->server == t2->ses->server &&
+-	    t2->origin_fullpath &&
+-	    dfs_src_pathname_equal(t2->origin_fullpath, t1->origin_fullpath))
+-		sd->sb = sb;
+-	spin_unlock(&t2->tc_lock);
+-}
++	spin_lock(&tcon->sb_list_lock);
++	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
+ 
+-static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void *),
+-					    void *data)
+-{
+-	struct super_cb_data sd = {
+-		.data = data,
+-		.sb = NULL,
+-	};
+-	struct file_system_type **fs_type = (struct file_system_type *[]) {
+-		&cifs_fs_type, &smb3_fs_type, NULL,
+-	};
+-
+-	for (; *fs_type; fs_type++) {
+-		iterate_supers_type(*fs_type, f, &sd);
+-		if (sd.sb) {
+-			/*
+-			 * Grab an active reference in order to prevent automounts (DFS links)
+-			 * of expiring and then freeing up our cifs superblock pointer while
+-			 * we're doing failover.
+-			 */
+-			cifs_sb_active(sd.sb);
+-			return sd.sb;
+-		}
++		if (!cifs_sb->vfs_sb)
++			continue;
++
++		sb = cifs_sb->vfs_sb;
++
++		/* Safely increment s_active only if it's not zero.
++		 *
++		 * When s_active == 0, the super block is being deactivated
++		 * and should not be used. This prevents UAF scenarios
++		 * where we might grab a reference to a super block that's
++		 * in the middle of destruction.
++		 */
++		if (!atomic_add_unless(&sb->s_active, 1, 0))
++			continue;
++
++		spin_unlock(&tcon->sb_list_lock);
++		return sb;
+ 	}
+-	pr_warn_once("%s: could not find dfs superblock\n", __func__);
+-	return ERR_PTR(-EINVAL);
+-}
++	spin_unlock(&tcon->sb_list_lock);
+ 
+-static void __cifs_put_super(struct super_block *sb)
+-{
+-	if (!IS_ERR_OR_NULL(sb))
+-		cifs_sb_deactive(sb);
++	return NULL;
+ }
+ 
+ struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
+ {
+ 	spin_lock(&tcon->tc_lock);
+ 	if (!tcon->origin_fullpath) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return ERR_PTR(-ENOENT);
+ 	}
+ 	spin_unlock(&tcon->tc_lock);
+-	return __cifs_get_super(tcon_super_cb, tcon);
++
++	return cifs_get_tcon_super(tcon);
+ }
+ 
+-void cifs_put_tcp_super(struct super_block *sb)
++void cifs_put_super(struct super_block *sb)
+ {
+-	__cifs_put_super(sb);
++	if (!IS_ERR_OR_NULL(sb))
++		deactivate_super(sb);
+ }
+ 
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ int match_target_ip(struct TCP_Server_Info *server,
+ 		    const char *host, size_t hostlen,
 -- 
-Thanks,
+2.39.2
 
-Steve
-
---000000000000b46cbb063c235244
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-fix-for-slab-out-of-bounds-on-mount-to-ksmbd.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-fix-for-slab-out-of-bounds-on-mount-to-ksmbd.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_me8161290>
-X-Attachment-Id: f_me8161290
-
-RnJvbSBjNjJjNTEyNTI5YjA3NTRjYmRlZjQ5MmVmOTI3OTdiOWNiNTU0YTU2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMTEgQXVnIDIwMjUgMjM6MTQ6NTUgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBmaXggZm9yIHNsYWIgb3V0IG9mIGJvdW5kcyBvbiBtb3VudCB0byBrc21iZAoKV2l0aCBL
-QVNBTiBlbmFibGVkLCBpdCBpcyBwb3NzaWJsZSB0byBnZXQgYSBzbGFiIG91dCBvZiBib3VuZHMK
-ZHVyaW5nIG1vdW50IHRvIGtzbWJkIGR1ZSB0byBtaXNzaW5nIGNoZWNrIGluIHBhcnNlX3NlcnZl
-cl9pbnRlcmZhY2VzKCkKKHNlZSBiZWxvdyk6CgogQlVHOiBLQVNBTjogc2xhYi1vdXQtb2YtYm91
-bmRzIGluCiBwYXJzZV9zZXJ2ZXJfaW50ZXJmYWNlcysweDE0ZWUvMHgxODgwIFtjaWZzXQogUmVh
-ZCBvZiBzaXplIDQgYXQgYWRkciBmZmZmODg4MTQzM2RiYTk4IGJ5IHRhc2sgbW91bnQvOTgyNwoK
-IENQVTogNSBVSUQ6IDAgUElEOiA5ODI3IENvbW06IG1vdW50IFRhaW50ZWQ6IEcKIE9FICAgICAg
-IDYuMTYuMC1yYzIta2FzYW4gIzIgUFJFRU1QVCh2b2x1bnRhcnkpCiBUYWludGVkOiBbT109T09U
-X01PRFVMRSwgW0VdPVVOU0lHTkVEX01PRFVMRQogSGFyZHdhcmUgbmFtZTogRGVsbCBJbmMuIFBy
-ZWNpc2lvbiBUb3dlciAzNjIwLzBNV1lQVCwKIEJJT1MgMi4xMy4xIDA2LzE0LzIwMTkKIENhbGwg
-VHJhY2U6CiAgPFRBU0s+CiBkdW1wX3N0YWNrX2x2bCsweDlmLzB4ZjAKIHByaW50X3JlcG9ydCsw
-eGQxLzB4NjcwCiBfX3ZpcnRfYWRkcl92YWxpZCsweDIyYy8weDQzMAogPyBwYXJzZV9zZXJ2ZXJf
-aW50ZXJmYWNlcysweDE0ZWUvMHgxODgwIFtjaWZzXQogPyBrYXNhbl9jb21wbGV0ZV9tb2RlX3Jl
-cG9ydF9pbmZvKzB4MmEvMHgxZjAKID8gcGFyc2Vfc2VydmVyX2ludGVyZmFjZXMrMHgxNGVlLzB4
-MTg4MCBbY2lmc10KICAga2FzYW5fcmVwb3J0KzB4ZDYvMHgxMTAKICAgcGFyc2Vfc2VydmVyX2lu
-dGVyZmFjZXMrMHgxNGVlLzB4MTg4MCBbY2lmc10KICAgX19hc2FuX3JlcG9ydF9sb2FkX25fbm9h
-Ym9ydCsweDEzLzB4MjAKICAgcGFyc2Vfc2VydmVyX2ludGVyZmFjZXMrMHgxNGVlLzB4MTg4MCBb
-Y2lmc10KID8gX19wZnhfcGFyc2Vfc2VydmVyX2ludGVyZmFjZXMrMHgxMC8weDEwIFtjaWZzXQog
-PyB0cmFjZV9oYXJkaXJxc19vbisweDUxLzB4NjAKIFNNQjNfcmVxdWVzdF9pbnRlcmZhY2VzKzB4
-MWFkLzB4M2YwIFtjaWZzXQogPyBfX3BmeF9TTUIzX3JlcXVlc3RfaW50ZXJmYWNlcysweDEwLzB4
-MTAgW2NpZnNdCiA/IFNNQjJfdGNvbisweDIzYy8weDE1ZDAgW2NpZnNdCiBzbWIzX3Fmc190Y29u
-KzB4MTczLzB4MmIwIFtjaWZzXQogPyBfX3BmeF9zbWIzX3Fmc190Y29uKzB4MTAvMHgxMCBbY2lm
-c10KID8gY2lmc19nZXRfdGNvbisweDEwNWQvMHgyMTIwIFtjaWZzXQogPyBkb19yYXdfc3Bpbl91
-bmxvY2srMHg1ZC8weDIwMAogPyBjaWZzX2dldF90Y29uKzB4MTA1ZC8weDIxMjAgW2NpZnNdCiA/
-IF9fcGZ4X3NtYjNfcWZzX3Rjb24rMHgxMC8weDEwIFtjaWZzXQogY2lmc19tb3VudF9nZXRfdGNv
-bisweDM2OS8weGI5MCBbY2lmc10KID8gZGZzX2NhY2hlX2ZpbmQrMHhlNy8weDE1MCBbY2lmc10K
-IGRmc19tb3VudF9zaGFyZSsweDk4NS8weDI5NzAgW2NpZnNdCiA/IGNoZWNrX3BhdGguY29uc3Rw
-cm9wLjArMHgyOC8weDUwCiA/IHNhdmVfdHJhY2UrMHg1NC8weDM3MAogPyBfX3BmeF9kZnNfbW91
-bnRfc2hhcmUrMHgxMC8weDEwIFtjaWZzXQogPyBfX2xvY2tfYWNxdWlyZSsweGI4Mi8weDJiYTAK
-ID8gX19rYXNhbl9jaGVja193cml0ZSsweDE4LzB4MjAKIGNpZnNfbW91bnQrMHhiYy8weDllMCBb
-Y2lmc10KID8gX19wZnhfY2lmc19tb3VudCsweDEwLzB4MTAgW2NpZnNdCiA/IGRvX3Jhd19zcGlu
-X3VubG9jaysweDVkLzB4MjAwCiA/IGNpZnNfc2V0dXBfY2lmc19zYisweDI5ZC8weDgxMCBbY2lm
-c10KIGNpZnNfc21iM19kb19tb3VudCsweDI2My8weDE5OTAgW2NpZnNdCgpSZXBvcnRlZC1ieTog
-TmFtamFlIEplb24gPGxpbmtpbmplb25Aa2VybmVsLm9yZz4KVGVzdGVkLWJ5OiBOYW1qYWUgSmVv
-biA8bGlua2luamVvbkBrZXJuZWwub3JnPgpDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwpTaWdu
-ZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMv
-c21iL2NsaWVudC9zbWIyb3BzLmMgfCAxMSArKysrKysrKysrLQogMSBmaWxlIGNoYW5nZWQsIDEw
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50
-L3NtYjJvcHMuYyBiL2ZzL3NtYi9jbGllbnQvc21iMm9wcy5jCmluZGV4IGY3YTBmMWM4MWI0My4u
-ZjM3M2M4Nzc0NjY5IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYworKysgYi9m
-cy9zbWIvY2xpZW50L3NtYjJvcHMuYwpAQCAtNzcyLDYgKzc3MiwxMyBAQCBwYXJzZV9zZXJ2ZXJf
-aW50ZXJmYWNlcyhzdHJ1Y3QgbmV0d29ya19pbnRlcmZhY2VfaW5mb19pb2N0bF9yc3AgKmJ1ZiwK
-IAkJCWJ5dGVzX2xlZnQgLT0gc2l6ZW9mKCpwKTsKIAkJCWJyZWFrOwogCQl9CisJCS8qIFZhbGlk
-YXRlIHRoYXQgTmV4dCBkb2Vzbid0IHBvaW50IGJleW9uZCB0aGUgYnVmZmVyICovCisJCWlmIChu
-ZXh0ID4gYnl0ZXNfbGVmdCkgeworCQkJY2lmc19kYmcoVkZTLCAiJXM6IGludmFsaWQgTmV4dCBw
-b2ludGVyICVsdSA+ICV6ZFxuIiwKKwkJCQkgX19mdW5jX18sIG5leHQsIGJ5dGVzX2xlZnQpOwor
-CQkJcmMgPSAtRUlOVkFMOworCQkJZ290byBvdXQ7CisJCX0KIAkJcCA9IChzdHJ1Y3QgbmV0d29y
-a19pbnRlcmZhY2VfaW5mb19pb2N0bF9yc3AgKikoKHU4ICopcCtuZXh0KTsKIAkJYnl0ZXNfbGVm
-dCAtPSBuZXh0OwogCX0KQEAgLTc4Myw3ICs3OTAsOSBAQCBwYXJzZV9zZXJ2ZXJfaW50ZXJmYWNl
-cyhzdHJ1Y3QgbmV0d29ya19pbnRlcmZhY2VfaW5mb19pb2N0bF9yc3AgKmJ1ZiwKIAl9CiAKIAkv
-KiBBenVyZSByb3VuZHMgdGhlIGJ1ZmZlciBzaXplIHVwIDgsIHRvIGEgMTYgYnl0ZSBib3VuZGFy
-eSAqLwotCWlmICgoYnl0ZXNfbGVmdCA+IDgpIHx8IHAtPk5leHQpCisJaWYgKChieXRlc19sZWZ0
-ID4gOCkgfHwKKwkgICAgKGJ5dGVzX2xlZnQgPj0gb2Zmc2V0b2Yoc3RydWN0IG5ldHdvcmtfaW50
-ZXJmYWNlX2luZm9faW9jdGxfcnNwLCBOZXh0KQorCSAgICAgKyBzaXplb2YocC0+TmV4dCkgJiYg
-cC0+TmV4dCkpCiAJCWNpZnNfZGJnKFZGUywgIiVzOiBpbmNvbXBsZXRlIGludGVyZmFjZSBpbmZv
-XG4iLCBfX2Z1bmNfXyk7CiAKIAlzZXMtPmlmYWNlX2xhc3RfdXBkYXRlID0gamlmZmllczsKLS0g
-CjIuNDMuMAoK
---000000000000b46cbb063c235244--
