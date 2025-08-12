@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7241D416C;
-	Tue, 12 Aug 2025 18:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7153F9D2;
+	Tue, 12 Aug 2025 18:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755023120; cv=none; b=EdEjtFSEvD9hWfMp4MsqPiK6yBoBYwunAdXtqZRjBeDteD+VgrCi4wWY8puiTYP8M4oQSQdeob8vadnyaX1ylU8JyJDCDdVUGOmlXoRe70nVprNzFJ/00odAmBQbdrUVzM+W5GyolhSo6spu21Vo1m74sF6Oyi5brVUgJUV9PMA=
+	t=1755023137; cv=none; b=idjITX1qPge+pJgeeJc+N59h3atq1SePRTRcN5CGPrYbiUJV1dqSK8eC52JCWenGra4+mNMe41BTcPU/+/9viFdzhPp/3JpuC5LvJbDnXJIXYAMy0DI6I5PsmsuHFzqX6IV7E3o7Vm8qK/UD2M8w/Mc8yZv4WgJdP/LYCluR/1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755023120; c=relaxed/simple;
-	bh=duAXvz2RDxtSL7kkLMyXCpRmEckD1Btm5X4vxnX2R/4=;
+	s=arc-20240116; t=1755023137; c=relaxed/simple;
+	bh=ZZBtaeoRCXD+91PrRRIC7lFniN56mTJK1cKycr/tEbg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lcr0gWRlWEPn5uSe3qcOPCOF4FJrCRzUGaoCqh7veGESGtsdFvScRlOiQtYt9MrIUm9dmuL3D1hc1d6I8/I57lIrvOizYZsBPZ5aT72cDen6yTTYHCTeNpAVFYy+ceXj94uu6RFOak0qp8MFstnab7CVSMNU1RI9aZub7G8QZqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JLj5brmw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=G3v4nFTztyFtUDiHCNpLvVXhKcA2uMzgk183L84317fnyqO1nGetrtkGjakTIkkOGO5OGGKCUykDNBmqCK+FtMDn4vAMueS9qJy7lpSee3IQjjzpPxb+Z78Zi+1w1JB4JeivYOgD5v9Kyymlf9vM9zDm3vEcNoEFrSuGkWMOIIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bf8Do4XJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JLj5brmw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF027C4CEF0;
-	Tue, 12 Aug 2025 18:25:19 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bf8Do4XJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF06C4CEF0;
+	Tue, 12 Aug 2025 18:25:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755023120;
-	bh=duAXvz2RDxtSL7kkLMyXCpRmEckD1Btm5X4vxnX2R/4=;
+	s=korg; t=1755023137;
+	bh=ZZBtaeoRCXD+91PrRRIC7lFniN56mTJK1cKycr/tEbg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JLj5brmwBiDI0695l/VtexqIJv8huCZFwAfu5QkgDBScCwl/o0WnsTpWui8jr4kRV
-	 kQJhmD82j3rjeGxGczslgnQsQ+GEROV5awvN5nmokZBfO1TnN8w9/xpUSTAGD2hbKY
-	 tXKXnzr0TfoJFfVi9ewPifpPy5ipgJPzx0WdWt3U=
+	b=bf8Do4XJZ9biubRBoxy3oqau569scZbh6zjkDt+SW7KzjJEJCz1IganLmLN+HdMUR
+	 RhUT2IhNqt0EbHfoa6w8Xf7JsToBsmhTsA6TXGCj7Nquaj9fTUwo4wTdB17S6wDCLF
+	 xTf6B+ceTLwOEJRJr3ftAidi7VdSoQZ3axlUPCmM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -35,9 +35,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Stefan Metzmacher <metze@samba.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 322/369] smb: client: return an error if rdma_connect does not return within 5 seconds
-Date: Tue, 12 Aug 2025 19:30:19 +0200
-Message-ID: <20250812173028.830747662@linuxfoundation.org>
+Subject: [PATCH 6.12 317/369] smb: client: make sure we call ib_dma_unmap_single() only if we called ib_dma_map_single already
+Date: Tue, 12 Aug 2025 19:30:14 +0200
+Message-ID: <20250812173028.650466942@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250812173014.736537091@linuxfoundation.org>
 References: <20250812173014.736537091@linuxfoundation.org>
@@ -58,9 +58,13 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit 03537826f77f1c829d0593d211b38b9c876c1722 ]
+[ Upstream commit 047682c370b6f18fec818b57b0ed8b501bdb79f8 ]
 
-This matches the timeout for tcp connections.
+In case of failures either ib_dma_map_single() might not be called yet
+or ib_dma_unmap_single() was already called.
+
+We should make sure put_receive_buffer() only calls
+ib_dma_unmap_single() if needed.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -72,26 +76,45 @@ Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ fs/smb/client/smbdirect.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 47f2a6cc1c0c..60b160219f0a 100644
+index 0ab490c0a9b0..5690e8b3d101 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -1636,8 +1636,10 @@ static struct smbd_connection *_smbd_get_connection(
- 		goto rdma_connect_failed;
+@@ -1057,6 +1057,7 @@ static int smbd_post_recv(
+ 	if (rc) {
+ 		ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
+ 				    response->sge.length, DMA_FROM_DEVICE);
++		response->sge.length = 0;
+ 		smbd_disconnect_rdma_connection(info);
+ 		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
  	}
+@@ -1186,8 +1187,13 @@ static void put_receive_buffer(
+ 	struct smbdirect_socket *sc = &info->socket;
+ 	unsigned long flags;
  
--	wait_event_interruptible(
--		info->conn_wait, sc->status != SMBDIRECT_SOCKET_CONNECTING);
-+	wait_event_interruptible_timeout(
-+		info->conn_wait,
-+		sc->status != SMBDIRECT_SOCKET_CONNECTING,
-+		msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
+-	ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
+-		response->sge.length, DMA_FROM_DEVICE);
++	if (likely(response->sge.length != 0)) {
++		ib_dma_unmap_single(sc->ib.dev,
++				    response->sge.addr,
++				    response->sge.length,
++				    DMA_FROM_DEVICE);
++		response->sge.length = 0;
++	}
  
- 	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
- 		log_rdma_event(ERR, "rdma_connect failed port=%d\n", port);
+ 	spin_lock_irqsave(&info->receive_queue_lock, flags);
+ 	list_add_tail(&response->list, &info->receive_queue);
+@@ -1221,6 +1227,7 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
+ 			goto allocate_failed;
+ 
+ 		response->info = info;
++		response->sge.length = 0;
+ 		list_add_tail(&response->list, &info->receive_queue);
+ 		info->count_receive_queue++;
+ 	}
 -- 
 2.39.5
 
