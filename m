@@ -1,46 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7153F9D2;
-	Tue, 12 Aug 2025 18:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635872C21E3;
+	Tue, 12 Aug 2025 18:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755023137; cv=none; b=idjITX1qPge+pJgeeJc+N59h3atq1SePRTRcN5CGPrYbiUJV1dqSK8eC52JCWenGra4+mNMe41BTcPU/+/9viFdzhPp/3JpuC5LvJbDnXJIXYAMy0DI6I5PsmsuHFzqX6IV7E3o7Vm8qK/UD2M8w/Mc8yZv4WgJdP/LYCluR/1I=
+	t=1755024632; cv=none; b=NCYbeAB2YSfePETwDPuZwjOTqr32ycsrs/6NwddKNXSvpo4Cu5DzDtbd6l2xFpkPMPlH9YhzwazgygQsuNpkoO51S0R4AntitwWYONTHqNzdLXNhMpcD0g/lUS3MmyvMPUKN2ZDGqpIsX+2PFDTyDWGIsr9dmg0FqGyNmcDnb5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755023137; c=relaxed/simple;
-	bh=ZZBtaeoRCXD+91PrRRIC7lFniN56mTJK1cKycr/tEbg=;
+	s=arc-20240116; t=1755024632; c=relaxed/simple;
+	bh=u/z+8FXBVK6/HeElSy+ZrQdGbl8uuEsnaLtLj+RO410=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G3v4nFTztyFtUDiHCNpLvVXhKcA2uMzgk183L84317fnyqO1nGetrtkGjakTIkkOGO5OGGKCUykDNBmqCK+FtMDn4vAMueS9qJy7lpSee3IQjjzpPxb+Z78Zi+1w1JB4JeivYOgD5v9Kyymlf9vM9zDm3vEcNoEFrSuGkWMOIIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bf8Do4XJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RQX4RsnHYgjUWdXsRXx7pxrpQHCGVa++UoNgF7gcJmFAfyD8h5buN1NTehriP3jnUwLH/h6uMT/FMCWLYYa6N20SPjeCbQjc0CDvchoItnzXgPj0+U8sWZ9quyNMDyJcxhvMqPtkXMPexow5jOE+v7C1kKxgYjYOJwl8aM6Pc8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Sp+5BfGS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bf8Do4XJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF06C4CEF0;
-	Tue, 12 Aug 2025 18:25:37 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Sp+5BfGS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4B45C4CEF0;
+	Tue, 12 Aug 2025 18:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755023137;
-	bh=ZZBtaeoRCXD+91PrRRIC7lFniN56mTJK1cKycr/tEbg=;
+	s=korg; t=1755024632;
+	bh=u/z+8FXBVK6/HeElSy+ZrQdGbl8uuEsnaLtLj+RO410=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bf8Do4XJZ9biubRBoxy3oqau569scZbh6zjkDt+SW7KzjJEJCz1IganLmLN+HdMUR
-	 RhUT2IhNqt0EbHfoa6w8Xf7JsToBsmhTsA6TXGCj7Nquaj9fTUwo4wTdB17S6wDCLF
-	 xTf6B+ceTLwOEJRJr3ftAidi7VdSoQZ3axlUPCmM=
+	b=Sp+5BfGSrYOkKBjZRTj21HkVL5LIIrwGcrQ7aph7Fsv1aIiNgR/VpahHvyN3I4R2+
+	 XUMc2AXKizwemSF3ydF0N1P3TWeWjsPIPHGHMRlVF1XYjduueWE23/ArAJA1SdOiFi
+	 uyqes0MMYsKAOo9yjPgtfs08cbIhIBKvdHZfwZl8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
+	David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 317/369] smb: client: make sure we call ib_dma_unmap_single() only if we called ib_dma_map_single already
-Date: Tue, 12 Aug 2025 19:30:14 +0200
-Message-ID: <20250812173028.650466942@linuxfoundation.org>
+Subject: [PATCH 6.16 431/627] smb: client: allow parsing zero-length AV pairs
+Date: Tue, 12 Aug 2025 19:32:06 +0200
+Message-ID: <20250812173435.674780125@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250812173014.736537091@linuxfoundation.org>
-References: <20250812173014.736537091@linuxfoundation.org>
+In-Reply-To: <20250812173419.303046420@linuxfoundation.org>
+References: <20250812173419.303046420@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -52,69 +49,49 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+6.16-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+From: Paulo Alcantara <pc@manguebit.org>
 
-[ Upstream commit 047682c370b6f18fec818b57b0ed8b501bdb79f8 ]
+[ Upstream commit be77ab6b9fbe348daf3c2d3ee40f23ca5110a339 ]
 
-In case of failures either ib_dma_map_single() might not be called yet
-or ib_dma_unmap_single() was already called.
+Zero-length AV pairs should be considered as valid target infos.
+Don't skip the next AV pairs that follow them.
 
-We should make sure put_receive_buffer() only calls
-ib_dma_unmap_single() if needed.
-
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Cc: David Howells <dhowells@redhat.com>
+Fixes: 0e8ae9b953bc ("smb: client: parse av pair type 4 in CHALLENGE_MESSAGE")
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsencrypt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 0ab490c0a9b0..5690e8b3d101 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1057,6 +1057,7 @@ static int smbd_post_recv(
- 	if (rc) {
- 		ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
- 				    response->sge.length, DMA_FROM_DEVICE);
-+		response->sge.length = 0;
- 		smbd_disconnect_rdma_connection(info);
- 		log_rdma_recv(ERR, "ib_post_recv failed rc=%d\n", rc);
- 	}
-@@ -1186,8 +1187,13 @@ static void put_receive_buffer(
- 	struct smbdirect_socket *sc = &info->socket;
- 	unsigned long flags;
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index 35892df7335c..6be850d2a346 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -343,7 +343,7 @@ static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
+ 	len = AV_LEN(av);
+ 	if (AV_TYPE(av) == NTLMSSP_AV_EOL)
+ 		return NULL;
+-	if (!len || (u8 *)av + sizeof(*av) + len > end)
++	if ((u8 *)av + sizeof(*av) + len > end)
+ 		return NULL;
+ 	return av;
+ }
+@@ -363,7 +363,7 @@ static int find_av_name(struct cifs_ses *ses, u16 type, char **name, u16 maxlen)
  
--	ib_dma_unmap_single(sc->ib.dev, response->sge.addr,
--		response->sge.length, DMA_FROM_DEVICE);
-+	if (likely(response->sge.length != 0)) {
-+		ib_dma_unmap_single(sc->ib.dev,
-+				    response->sge.addr,
-+				    response->sge.length,
-+				    DMA_FROM_DEVICE);
-+		response->sge.length = 0;
-+	}
- 
- 	spin_lock_irqsave(&info->receive_queue_lock, flags);
- 	list_add_tail(&response->list, &info->receive_queue);
-@@ -1221,6 +1227,7 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
- 			goto allocate_failed;
- 
- 		response->info = info;
-+		response->sge.length = 0;
- 		list_add_tail(&response->list, &info->receive_queue);
- 		info->count_receive_queue++;
- 	}
+ 	av_for_each_entry(ses, av) {
+ 		len = AV_LEN(av);
+-		if (AV_TYPE(av) != type)
++		if (AV_TYPE(av) != type || !len)
+ 			continue;
+ 		if (!IS_ALIGNED(len, sizeof(__le16))) {
+ 			cifs_dbg(VFS | ONCE, "%s: bad length(%u) for type %u\n",
 -- 
 2.39.5
 
