@@ -1,47 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from neil.brown.name (neil.brown.name [103.29.64.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7E029BD9D;
-	Tue, 12 Aug 2025 19:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE162D4B6D;
+	Tue, 12 Aug 2025 23:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.29.64.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755026813; cv=none; b=pHz4qWa3r71we8zdQLqo2dd7kYY0qxP4/h+C1YcjVl7et4XKqzjheoAz44C3V7apd3ZkIoMygoCjs8CoUc7u9/tgnhLWSvr7E1N08BplMBHUQ/Zl93pMWZ5+MQZYqSe4mMmI5Gqg6SbtqQLkOk5YA+DWeg7tIFwahPakqfVqdlw=
+	t=1755042784; cv=none; b=iV05z4v0d3gnUvprKJzocxpd0r2v/x7bR9Mh9jt0ryGYbLmOdoHJov/5avMIRmdJVJHHPhrhQSOA+DAWbLBugJ6pahtgJ0P7xSSUUMKfBOnWaWNiLMqkN+jbUW2QuJ/SJK6jB1zYwt4BFy+KzAZZJb825e4kNy7uL4wEoVmkOkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755026813; c=relaxed/simple;
-	bh=f0YYuxN8kBxeAKAjDwfzG+Oj1HcGaj3bTaeLb8y00S4=;
+	s=arc-20240116; t=1755042784; c=relaxed/simple;
+	bh=wY0rj6H9uNX526KJkK3oQKoJg0U9wk/QJcI6qW2yVlg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L6qWVAUePAlYeilMgi4d7fR6UqRs/n9eLwvWJdhHhaYfsqYnVvcxIVU8DAXawkmR9qenEtp569Er0XOwzpkqEH7PduzgBkH44/4Iz4+NMbTn92t8tPMmPUFuAIViXKF1jS2UvpIEx2nE8qXY/48m1P4YcdHrKdIIs0UmLdf72d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=a9ZJ7EFF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="a9ZJ7EFF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D86C4CEF0;
-	Tue, 12 Aug 2025 19:26:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755026813;
-	bh=f0YYuxN8kBxeAKAjDwfzG+Oj1HcGaj3bTaeLb8y00S4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=a9ZJ7EFFb0rG8QPagz29dg8J7ghHX7b6hxwBZ7BR9UVsxSeoLi3W8OdVVtr0YvNOu
-	 lFx6hn//SU59QtuzaGm2MZ37k3pU3fp3SIF6ohfaaaH8+CnHKaEkO4IBDwoCWX99DV
-	 sNmGRdljz11tb7tPnxefEg8P2NjxiX80mbomrxx4=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
+	 MIME-Version; b=rcoyDzD/BnJxPRfGx/DD2XPnTaNox/xWGCU137RLX0x7YyI6s/OxVQCkjLycdkjRTW9GfijiVUVyyYMCanZa6tM0qlyrnsdgftyGc3ra0dmSdbGBiE0b6XEdLZe/4NzfWnmQh/XmvybfrPFUXdDY7O8w3ERFsOTluHYDgAUeWp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name; spf=pass smtp.mailfrom=neil.brown.name; arc=none smtp.client-ip=103.29.64.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brown.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=neil.brown.name
+Received: from 196.186.233.220.static.exetel.com.au ([220.233.186.196] helo=home.neil.brown.name)
+	by neil.brown.name with esmtp (Exim 4.95)
+	(envelope-from <mr@neil.brown.name>)
+	id 1ulynK-005Y1y-Ic;
+	Tue, 12 Aug 2025 23:52:44 +0000
+From: NeilBrown <neil@brown.name>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Xiubo Li <xiubli@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Tyler Hicks <code@tyhicks.com>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Amir Goldstein <amir73il@gmail.com>,
+	Steve French <sfrench@samba.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-afs@lists.infradead.org,
+	netfs@lists.linux.dev,
+	ceph-devel@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	linux-nfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
-	Ralph Boehme <slow@samba.org>,
-	David Howells <dhowells@redhat.com>,
-	Matthew Richardson <m.richardson@ed.ac.uk>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.15 449/480] smb: client: default to nonativesocket under POSIX mounts
-Date: Tue, 12 Aug 2025 19:50:57 +0200
-Message-ID: <20250812174415.921690062@linuxfoundation.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250812174357.281828096@linuxfoundation.org>
-References: <20250812174357.281828096@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	linux-xfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 03/11] VFS: add dentry_lookup_killable()
+Date: Tue, 12 Aug 2025 12:25:06 +1000
+Message-ID: <20250812235228.3072318-4-neil@brown.name>
+X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+In-Reply-To: <20250812235228.3072318-1-neil@brown.name>
+References: <20250812235228.3072318-1-neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,39 +65,82 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.15-stable review patch.  If anyone has any objections, please let me know.
+btrfs/ioctl.c uses a "killable" lock on the directory when creating an
+destroying subvols.  overlayfs also does this.
 
-------------------
+This patch adds dentry_lookup_killable() for these users.
 
-From: Paulo Alcantara <pc@manguebit.org>
+Possibly all dentry_lookup should be killable as there is no down-side,
+but that can come in a later patch.
 
-commit 6b445309eec2bc0594f3e24c7777aeef891d386e upstream.
-
-SMB3.1.1 POSIX mounts require sockets to be created with NFS reparse
-points.
-
-Cc: linux-cifs@vger.kernel.org
-Cc: Ralph Boehme <slow@samba.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: <stable@vger.kernel.org>
-Reported-by: Matthew Richardson <m.richardson@ed.ac.uk>
-Closes: https://marc.info/?i=1124e7cd-6a46-40a6-9f44-b7664a66654b@ed.ac.uk
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: NeilBrown <neil@brown.name>
 ---
- fs/smb/client/fs_context.c |    1 +
- 1 file changed, 1 insertion(+)
+ fs/namei.c            | 37 +++++++++++++++++++++++++++++++++++++
+ include/linux/namei.h |  3 +++
+ 2 files changed, 40 insertions(+)
 
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1674,6 +1674,7 @@ static int smb3_fs_context_parse_param(s
- 				pr_warn_once("conflicting posix mount options specified\n");
- 			ctx->linux_ext = 1;
- 			ctx->no_linux_ext = 0;
-+			ctx->nonativesocket = 1; /* POSIX mounts use NFS style reparse points */
- 		}
- 		break;
- 	case Opt_nocase:
-
+diff --git a/fs/namei.c b/fs/namei.c
+index 85b981248a90..7af9b464886a 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -1837,6 +1837,43 @@ struct dentry *dentry_lookup(struct mnt_idmap *idmap,
+ }
+ EXPORT_SYMBOL(dentry_lookup);
+ 
++/**
++ * dentry_lookup_killable - lookup and lock a name prior to dir ops
++ * @last: the name in the given directory
++ * @base: the directory in which the name is to be found
++ * @lookup_flags: %LOOKUP_xxx flags
++ *
++ * The name is looked up and necessary locks are taken so that
++ * the name can be created or removed.
++ * The "necessary locks" are currently the inode lock on @base.
++ * If a fatal signal arrives, or is already pending, the operation is aborted.
++ * The name @last is NOT expected to already have the hash calculated.
++ * Permission checks are performed to ensure %MAY_EXEC access to @base.
++ * Returns: the dentry, suitably locked, or an ERR_PTR().
++ */
++struct dentry *dentry_lookup_killable(struct mnt_idmap *idmap,
++				      struct qstr *last,
++				      struct dentry *base,
++				      unsigned int lookup_flags)
++{
++	struct dentry *dentry;
++	int err;
++
++	err = lookup_one_common(idmap, last, base);
++	if (err < 0)
++		return ERR_PTR(err);
++
++	err = down_write_killable_nested(&base->d_inode->i_rwsem, I_MUTEX_PARENT);
++	if (err)
++		return ERR_PTR(err);
++
++	dentry = lookup_one_qstr_excl(last, base, lookup_flags);
++	if (IS_ERR(dentry))
++		inode_unlock(base->d_inode);
++	return dentry;
++}
++EXPORT_SYMBOL(dentry_lookup_killable);
++
+ /**
+  * done_dentry_lookup - finish a lookup used for create/delete
+  * @dentry:  the target dentry
+diff --git a/include/linux/namei.h b/include/linux/namei.h
+index 932cb94c3538..facb5852afa9 100644
+--- a/include/linux/namei.h
++++ b/include/linux/namei.h
+@@ -83,6 +83,9 @@ struct dentry *lookup_one_positive_unlocked(struct mnt_idmap *idmap,
+ struct dentry *dentry_lookup(struct mnt_idmap *idmap,
+ 			       struct qstr *last, struct dentry *base,
+ 			       unsigned int lookup_flags);
++struct dentry *dentry_lookup_killable(struct mnt_idmap *idmap,
++				      struct qstr *last, struct dentry *base,
++				      unsigned int lookup_flags);
+ struct dentry *dentry_lookup_noperm(struct qstr *name, struct dentry *base,
+ 				      unsigned int lookup_flags);
+ void done_dentry_lookup(struct dentry *dentry);
+-- 
+2.50.0.107.gf914562f5916.dirty
 
