@@ -1,41 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B092FFDC1;
-	Tue, 12 Aug 2025 18:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7194B2FA0DB;
+	Tue, 12 Aug 2025 18:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755025169; cv=none; b=PB+jKDlRzsAH1cKr9o2E6wLlt1Q5H7WIZNiGhhKS6rKo0lfzQzmu8MwocM2atM38b733cG0LjNDvF1VH9Utq10Tba8G+IQV1cBqXwAsXemZH4Sgn6dntTBwIZ9GSeXvlYLN1lJkjNJsxoBKcrz03Uo4283rcMbHC1idff8yO4qY=
+	t=1755025172; cv=none; b=JQi8eiSdXr7Jn4//7hb4pvVVruYW0PvC0ZsmY1HAzhwe87L080YNBzq2Md/ndGf9Crjt+bf191RCQeBk3aHnhOQnVgwZjIe+RmxvU3RmMzbRxrOiY7CZnsr4JSZbcRK6YQIl2w4QsfhBpkrocU8YGPlMgTU4CsjefDCpDw9yBeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755025169; c=relaxed/simple;
-	bh=/sVL/4oOkwSsnOXUp6nVESNu1w4q+E/k3x6CACZGLWE=;
+	s=arc-20240116; t=1755025172; c=relaxed/simple;
+	bh=wjmzYspl/0NHVPGJS6Ewh1r8YorHiiSZCMMoPKahu94=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JnUpHXVb+yQrtBUzJAIbTjJ524jqG+rlrz7gVtT4e2mzgnwUFmSFHOQz6lM0OrBZUj6yMIjr3awkRtiX97N4TvSH4mAFdWaXzPyTQAnu2yzXmOPrkYuZlCwYaa5Q0SZQ9FxJoyNFI9TLuX3R0XtbfJJ6/29nEpUJdxRi0cVZlGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YgMV0F/L; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cKPM1xXEiGL6/Dic08s/4w9XxM8nCR3PsuPNICck0h8pRvU4nR1Iz4IwsUKrT9UFSzZp/7Pjsq92yMQGET01rrNTAZfC2NcILCXlEmAYjYoqdG9DxdapUnNPio7l40UfWJRffdTBSHg4GyqosvyerSWccCXHb6Of1xS37enRzTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cpTOqraw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YgMV0F/L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA30C4CEF6;
-	Tue, 12 Aug 2025 18:59:28 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cpTOqraw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D457DC4CEF0;
+	Tue, 12 Aug 2025 18:59:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755025169;
-	bh=/sVL/4oOkwSsnOXUp6nVESNu1w4q+E/k3x6CACZGLWE=;
+	s=korg; t=1755025172;
+	bh=wjmzYspl/0NHVPGJS6Ewh1r8YorHiiSZCMMoPKahu94=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YgMV0F/L+NMFmwpvq1j1mIyU00TNtzvEJ8YspfR4R0wdOioxSgsliDBTynkD3cuNA
-	 0wPaEhNO37Hzu7sgB8Z6dU4n5fym2KYYUBcNGIeHWCK22z1f0MCd9khUlhnogBC3Jg
-	 TE5+HNQ91i8a+HERn0WeHIEvdvxVdzyjbldi6K0M=
+	b=cpTOqrawvZ3vdZ+nh/gCtw/KLDeFenZAsaVMESou97GgRqBmsTBZ9ddJJJIVrOGZr
+	 c60rFuzb4RKGw11tr7ZoV2EuFQ85EI20SDaED93H/IWfIULZOO5VQoe9/H9b5zERy5
+	 8rMGjD1jcoJ+UKtuzYONF5NgGBtsp7JwXqqr6MfM=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
 	linux-cifs@vger.kernel.org,
-	Ralph Boehme <slow@samba.org>,
-	David Howells <dhowells@redhat.com>,
-	Matthew Richardson <m.richardson@ed.ac.uk>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.16 589/627] smb: client: default to nonativesocket under POSIX mounts
-Date: Tue, 12 Aug 2025 19:34:44 +0200
-Message-ID: <20250812173454.278647546@linuxfoundation.org>
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.16 563/627] smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()
+Date: Tue, 12 Aug 2025 19:34:18 +0200
+Message-ID: <20250812173453.306156678@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250812173419.303046420@linuxfoundation.org>
 References: <20250812173419.303046420@linuxfoundation.org>
@@ -54,35 +56,62 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Paulo Alcantara <pc@manguebit.org>
+From: Stefan Metzmacher <metze@samba.org>
 
-commit 6b445309eec2bc0594f3e24c7777aeef891d386e upstream.
+[ Upstream commit 5349ae5e05fa37409fd48a1eb483b199c32c889b ]
 
-SMB3.1.1 POSIX mounts require sockets to be created with NFS reparse
-points.
+We should call ib_dma_unmap_single() and mempool_free() before calling
+smbd_disconnect_rdma_connection().
 
+And smbd_disconnect_rdma_connection() needs to be the last function to
+call as all other state might already be gone after it returns.
+
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: Ralph Boehme <slow@samba.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: <stable@vger.kernel.org>
-Reported-by: Matthew Richardson <m.richardson@ed.ac.uk>
-Closes: https://marc.info/?i=1124e7cd-6a46-40a6-9f44-b7664a66654b@ed.ac.uk
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: samba-technical@lists.samba.org
+Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/fs_context.c |    1 +
- 1 file changed, 1 insertion(+)
+ fs/smb/client/smbdirect.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1674,6 +1674,7 @@ static int smb3_fs_context_parse_param(s
- 				pr_warn_once("conflicting posix mount options specified\n");
- 			ctx->linux_ext = 1;
- 			ctx->no_linux_ext = 0;
-+			ctx->nonativesocket = 1; /* POSIX mounts use NFS style reparse points */
- 		}
- 		break;
- 	case Opt_nocase:
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 754e94a0e07f..e99e783f1b0e 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -281,18 +281,20 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
+ 	log_rdma_send(INFO, "smbd_request 0x%p completed wc->status=%d\n",
+ 		request, wc->status);
+ 
+-	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
+-		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
+-			wc->status, wc->opcode);
+-		smbd_disconnect_rdma_connection(request->info);
+-	}
+-
+ 	for (i = 0; i < request->num_sge; i++)
+ 		ib_dma_unmap_single(sc->ib.dev,
+ 			request->sge[i].addr,
+ 			request->sge[i].length,
+ 			DMA_TO_DEVICE);
+ 
++	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
++		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
++			wc->status, wc->opcode);
++		mempool_free(request, info->request_mempool);
++		smbd_disconnect_rdma_connection(info);
++		return;
++	}
++
+ 	if (atomic_dec_and_test(&request->info->send_pending))
+ 		wake_up(&request->info->wait_send_pending);
+ 
+-- 
+2.39.5
+
 
 
