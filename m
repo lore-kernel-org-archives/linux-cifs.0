@@ -1,76 +1,76 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAC1163;
-	Wed, 13 Aug 2025 00:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402BB2C0F87
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Aug 2025 01:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755043281; cv=none; b=mhkrT0POOITMy7Gu4PJVSFZIihL428GpZxf7fqHP1BFe1ZRHlKG+NOOl1PU3b3j/qKJIc8xgL9cC5E5D48ONBlBJTkZuDDUg4X5a86yewpb/5OEH6M9VLqjJ92rWeMwfxfPlU4D2GA8q+a5fu+hX/RpLciyDblC2MVfvK2TRBeo=
+	t=1755047364; cv=none; b=qxvw17f5UORWTWGXv/5BwF57we6E4D+nflvsYfSqmcDNs79Po0/9rVRapC3CEmLTgEFICyW7xsLnv8llo5P5cg0faFYGimUoLEMgCyVUr2UkVTxts0PS6zR5H+KKb4YkIN3mSawzZi5hJY87Ma7q9p2+UxCWtZFY1nqTodOu50U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755043281; c=relaxed/simple;
-	bh=j4r1hppquktqtYidrhW4W0wl7fe8offrZaopf6cG3G0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dhfPFzbd/82yY6tDiLtDkCoR7YhAWEwQrRxkDreopdzzoi0J1d4SylvlE5o7NqN3auxnljo8eqCfyHWmlhj72qisNVPuhDCpMMYThw/dyZDS0GEt7InEtiR8bjf0hsm3TXNvSlPAS4bcWMDa1WdRhGzCE0i8V3omEqwBZBEpvC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=cZbBypAr; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1755047364; c=relaxed/simple;
+	bh=iyHbuS794qJWSMl0okaqpUXn3swWc+Vt9V6hwOjIKuQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tcl+9bQWPCa5ymd5uSWP6jM6jaDvq20e5o/rjjDamZOucqpcXuorp7pRRTXVSAYYMXQtOcFyLHoM1bx6QkS9SlhSPSe1fV3gtvaE7bRJK9YlYj3JjFIrHptBQCpWFRroupsUoz6IpJ/ml4EPmvRhI7itPwCv1fe3uAeKVAJ+kII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=snDZ2sZ9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="cZbBypAr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=j4r1hppquktqtYidrhW4W0wl7fe8offrZaopf6cG3G0=; b=cZbBypArsAwEupU5gvJSbx81kI
-	Qosd5QsgwcTBqjCvjrl9+522yt1DsRHkxW3rP4QAtNBLuPkNqySvn9xNhx4W8UKAuQRjCZFER9Q+q
-	OU7f9ZV2fnoJgxNmuLvs+ROm2HQIttuS7sdzJM4TKl8JXUJt7kHFJ0HzLbIvH539ChpirDHa95hk0
-	0jIldmck0numN0slLAIZ1NO2d/wYZ2QGgElgnPrudAOXVUCPogdbljQ+lo4cAZuF/fAYQ7+h58qa0
-	Y+ivu7VmgfbRR4UATQ5PHl9u0DWkjAMVf4kUbfjIu4pzP85eSzA7U8m0V2v8gQf19C/Fc36DoyW7p
-	DX85i4rQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ulyvN-00000003Gyx-2z1h;
-	Wed, 13 Aug 2025 00:01:01 +0000
-Date: Wed, 13 Aug 2025 01:01:01 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: NeilBrown <neil@brown.name>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Tyler Hicks <code@tyhicks.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org, netfs@lists.linux.dev,
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
-	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/11] VFS: prepare for changes to directory locking
-Message-ID: <20250813000101.GW222315@ZenIV>
-References: <20250812235228.3072318-1-neil@brown.name>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snDZ2sZ9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1218C4CEF7
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Aug 2025 01:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755047363;
+	bh=iyHbuS794qJWSMl0okaqpUXn3swWc+Vt9V6hwOjIKuQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=snDZ2sZ9CA+V7IjKjRkOxnn5uCy7R4JAoHcIZnfo4tN7tQ1TiVR3gKtQUaPNGNKti
+	 Q2jKGVewUZy7XoRKVUGYPEaAuyqvD6aLj54fR7CNm/DpBNwrChA++Eo8AG8VaRwB3I
+	 Y9Ki5H1qpVU/yT7G8QZxDpgo+2OBSG1k1DmiEF3wWt7P4zYuwdXRC1/nIuZUAXo3Ck
+	 AdIaKMTdtFxa9RPDAUjK5yfP1/x1iajpFavNdGRZ5qOMLPVPVbjWZ8rGhExb2vOZdl
+	 5C9VTGbD1xhqzZrFjUJAwVkNfarjpNQGTPwU8l5bKZW47gE/pDKhF6HrnjWtb7F5pQ
+	 mUksbJ0e9Nrww==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-afca41c7d7fso67892866b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Aug 2025 18:09:23 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yzm/cSKGPOYHNeFap0aeXserCfSIe8UJ/aBoVYe31a4NMgJQg98
+	/Ol2uM+V4WsnjGdkSNTyksorcVI0AEE/WlxiwJ/UhW9vFO7kx0ciYFy8wdrbgbBWdlCqDNVXwFQ
+	LKv0WmJMbKJV+FVbWN8LGCIaBGG2VfgM=
+X-Google-Smtp-Source: AGHT+IHNRv9T6lU2HI7jxb9cJ3DbiQJL+YPROXa9axvAHAAfPA+u0t80aECtZAE8etd5G+vTCR/aDcjMpyRSVnIFj1M=
+X-Received: by 2002:a17:906:8d2:b0:af9:bfed:fbae with SMTP id
+ a640c23a62f3a-afca83aa8efmr43803266b.10.1755047362296; Tue, 12 Aug 2025
+ 18:09:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250812235228.3072318-1-neil@brown.name>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+References: <20250812164546.29238-1-metze@samba.org>
+In-Reply-To: <20250812164546.29238-1-metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 13 Aug 2025 10:09:10 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9C79B+U8rEmWnDBCBMp5jsSMBWfkDFErLCQPHFUBB-4A@mail.gmail.com>
+X-Gm-Features: Ac12FXxIDFrkTNQkjh1vqHWpr018EF5jCODh_aaEKcqC7fv5ZbhjZa567-KvyC0
+Message-ID: <CAKYAXd9C79B+U8rEmWnDBCBMp5jsSMBWfkDFErLCQPHFUBB-4A@mail.gmail.com>
+Subject: Re: [PATCH] smb: server: split ksmbd_rdma_stop_listening() out of ksmbd_rdma_destroy()
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 12, 2025 at 12:25:03PM +1000, NeilBrown wrote:
-> This is the first of 3 sets of patches which, together, allow
-> filesystems to opt-out of having the directory inode lock held over
-> directory operations (except readdir).
-
-[just a quick reply for now - I'm going to be away for about an hour,
-then will review and reply]
+On Wed, Aug 13, 2025 at 1:46=E2=80=AFAM Stefan Metzmacher via samba-technic=
+al
+<samba-technical@lists.samba.org> wrote:
+>
+> We can't call destroy_workqueue(smb_direct_wq); before stop_sessions()!
+>
+> Otherwise already existing connections try to use smb_direct_wq as
+> a NULL pointer.
+>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
+d tranport layers")
+> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Applied it to #ksmbd-for-next-next.
+Thanks!
