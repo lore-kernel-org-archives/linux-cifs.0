@@ -1,78 +1,76 @@
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB022110E;
-	Wed, 13 Aug 2025 05:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA5C2C1592;
+	Wed, 13 Aug 2025 06:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755062408; cv=none; b=tK8NlR7/Lvu9GEPrb0bx75QaB8FlYwA+ZOFwygQOavxQlVuMy+2kZhKwrD2Tax1wpMpUdXol4HKfZ7+TIyGAf9ZQkhXYlfOrc6ipVl6XlU7/Xzp8ICZ0RYYEWsbJ9utsjbTZNmFRsNENBYG3PMJ3J2h2bdLOhtP+NARJDKe2sqw=
+	t=1755065880; cv=none; b=Nw/EvLyVFavLULpgaE3VoWCDwJHY6bGS82cUCbcBZFFjDwepSSIJn7t+X/R2S3t+y2K4z/LJGztJoUnM/OnO5N/d7wKziFnUdEOM7B6NUj33el+UQU8z6Cw4ymo4BtI9m82COzrrzTLlK14sdIGqhtdcd9HUYUyowGlmpvdZRiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755062408; c=relaxed/simple;
-	bh=pCg5tUn3Jxoz1Rz+ldIsZRcCH30DqmzroJThlBQBMOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HDGndwLHcPb3Fzqrub4sQhBkdNgT4g1y2LP2JheSxUvgq2TeuzEgjMTYRA5ELSoN6kGRpSYSdbreghcEs34qA5eXVkcHhCDZoUE1Q0K2uCLpdrwKVV8UCzxoVb//Ht5YLCrgfQgEt06lNKwbg/464iP5eXsxXnHcOYV6eR8v/is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=iTDCL4fx; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	s=arc-20240116; t=1755065880; c=relaxed/simple;
+	bh=54AJhgpcSudV+hNAJGayVXcvyuvhyHVqjEdcQPHzdpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mg+h0DMHQKzAb6FhScYI27boTmghSKuw+gHiI1pCU6UutFsmiA6l0/XGmtK0ZuYM+PO6E4HIaSsfZJbWdQirLVD2egjsBeSA2Oxsf0/lcex/0BtkugVKfWzx+NVx0xwa5RxhD7mZTkyhLIuNk5N5gW/KXp0zhuKT33ePLcdFIzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ArM9DLB3; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="iTDCL4fx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=KjOxKUPYOtNCnCd/lus2iP6rL3ZLot/rSauSdHj7XKM=; b=iTDCL4fxLjR1WN6UEkahPvC+Y2
-	GNjJps5E4fZouWLRmdQbBwPPH1mCH8GZuT1VtFvidzQL9pFIjrGIy8ger7QFw7qUyB6DSxBFMCmOF
-	LWPLns4WENW88IC5y4vnenhiTfcrGz8QaFmiqlZW4dgt3+6URBn25Y2dWP0fnObUcRYE8u8S8Js5y
-	356r4/zM5bVk/SCK07iXGFW/ISD/v++GRjYnfAAg17BYdfFru3K+z/kofWvdZPtyUz04rBR64zWhV
-	xRBFvJ9qCQ9oZR61+VgVm7T7iOng5g5A6eo9EhDBsPuoLLKcGhLWYsTuqHrwQk8XzDEDDy/1Shto+
-	7gs0hgMg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1um3u1-000000060h7-0Shj;
-	Wed, 13 Aug 2025 05:19:57 +0000
-Date: Wed, 13 Aug 2025 06:19:57 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: NeilBrown <neil@brown.name>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Tyler Hicks <code@tyhicks.com>, Miklos Szeredi <miklos@szeredi.hu>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org, netfs@lists.linux.dev,
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org,
-	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/11] VFS: use d_alloc_parallel() in
- lookup_one_qstr_excl().
-Message-ID: <20250813051957.GE222315@ZenIV>
-References: <20250812235228.3072318-1-neil@brown.name>
- <20250812235228.3072318-11-neil@brown.name>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ArM9DLB3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=TRStFU0iG8B6s9qs4xh8W9VpCXMpgzKi6Yokp8SG6go=; b=ArM9DLB3p21I7BnUdHUg0OEQFG
+	g2WV7snw7UkP9elqIXS1/WhOIZqJmDFaVXi75cV6TPWQUaShQWKrbPNUtIaPG9ylYmXhO5jFEtdAo
+	ze2ksXfOr6RIa1N7I6kcJ5IER35MftQBd8v78+3E9mJkBnnOjsf3WCQj1Ao7p1WvfAQ9Pj09IWuEh
+	33AgAFz2LrHVvUtKSvxRUZ0VQ9GS+dRQXq/rFWFw84gQUiHL7aI7FxczmfXgaU2tAIEe0/39OMqxW
+	sMeeS1FyevfgDyTD1WPWAEkmCdc3ePHbrvJgENgBGlunYBasW2mEKgHf9FfOtAWVinW+pWSA0Ryzq
+	KXbOS0EF9xXP9j9Eo09ObW1+haZC0Ln4kVarUCwbqkIl/fsHvS0GatGYBtQQjG65zGiE4TFHQwZ/K
+	kIZdieX+1HbVtLFtaBBx+PJR7MGiyKVat3wmoTcqL/OD6ap6bi4DgoiWHkGypxOBy3pBljx3rL9N7
+	H1kJG3ExLY6k3Cw3ni6/oyEP;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1um4o6-002YpX-27;
+	Wed, 13 Aug 2025 06:17:54 +0000
+Message-ID: <527dc1db-762e-4aa0-82a2-f147a76f8133@samba.org>
+Date: Wed, 13 Aug 2025 08:17:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250812235228.3072318-11-neil@brown.name>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6.16 563/627] smb: client: let send_done() cleanup before
+ calling smbd_disconnect_rdma_connection()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org
+Cc: patches@lists.linux.dev, Steve French <smfrench@gmail.com>,
+ Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Steve French <stfrench@microsoft.com>, Sasha Levin <sashal@kernel.org>
+References: <20250812173419.303046420@linuxfoundation.org>
+ <20250812173453.306156678@linuxfoundation.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20250812173453.306156678@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 12, 2025 at 12:25:13PM +1000, NeilBrown wrote:
+Hi Greg,
 
-> + * If it is d_in_lookup() then these conditions can only be checked by the
-> + * file system when carrying out the intent (create or rename).
+Am 12.08.25 um 19:34 schrieb Greg Kroah-Hartman:
+> 6.16-stable review patch.  If anyone has any objections, please let me know.
+> 
+> ------------------
+> 
+> From: Stefan Metzmacher <metze@samba.org>
+> 
+> [ Upstream commit 5349ae5e05fa37409fd48a1eb483b199c32c889b ]
 
-I do not understand.  In which cases would that happen and what would happen
-prior to that patch in the same cases?
+This needs this patch
+https://lore.kernel.org/linux-cifs/20250812164506.29170-1-metze@samba.org/T/#u
+as follow up fix that is not yet upstream.
+
+The same applies to all other branches (6.15, 6.12, 6.6, ...)
+
+metze
+
