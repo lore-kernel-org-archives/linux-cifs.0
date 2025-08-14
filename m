@@ -1,117 +1,244 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0316E253B73
-	for <linux-cifs@vger.kernel.org>; Thu, 14 Aug 2025 21:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F237D1A238C
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Aug 2025 21:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755206689; cv=none; b=QKAyjY/Ii4SuVCmwMCM6ARMYvbLClhier/QhfSauBjJqqt/IiUHJ49ItOeM8ZRxYE7gne5Zd494Ga59tcvYXudzjC8D40dg6dboBDiZ3GBCYhVCGbHM6AXOBhcOrIGGD0jBuMV2M2Szjd972XrnhavNOVwKwbYpppo5LJXSFX1E=
+	t=1755207961; cv=none; b=opMnLCCNZo3mjM9YOiOGthJ8ICNrhk38HjvWYeM1fCL/RbnEdK7aTV0wV/8GSVDdVnVSpB6a46gTOTi8oU8WbobIcfIdFsnFhWjVBtkxEAi18buv3sf2ZbaTPQD/DxuVP2QV45HQK9mtY1OtiXZmzOJ31AZT1h+df+lLp4DfNY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755206689; c=relaxed/simple;
-	bh=UNZ0dhDjdXCxYOELTiaUobTA3eKNfMmnrDjlWB974oQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FKmRXCigvSWwxjU/ORSGk+tWEZtWJUzT0pMMDS8KDU+iADLP6MOtRvR+WwI7VAKfgct6nIKUJIPBs+b9jmvNRAOfMLuwJVQ9oRZA9d8SHnssx940vHRtnzcwqRRlN2Xxx8EZGAEJyFyitxVeRc/W897TWdjZlVD4sjzKvYtkMSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlNFrTxO; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755207961; c=relaxed/simple;
+	bh=V6wXdJLrBZ8RcJqkcHRG6ySv0M1Vq3mIHeW4kuR3MGc=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=DowcyQCNwnwJvmUG6AEnylK37ekIQ+3w5MeQKwB0QUFSsSU7yRvIQrtWZvoC++W9l1tKJoLgBUZaJrnb2QMjuweB6Uf3cqiFjnj5YuqvRgqgc2Q3ES+Enx+NF8I/fZOEPA3bqBHhdZBuUg5sAgRmbNfu9mnFlWZFbow5rAmA1BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L3CT2h3H; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlNFrTxO"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-afcb78ead12so204259166b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Aug 2025 14:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755206686; x=1755811486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/6qZAcA33YsFmMHf2jGdno7I/KieRlxpr3C9zF0dSmI=;
-        b=MlNFrTxOVtznvV3gO9dbLD+5ur389vKaheTjSYqkx7irPNg5HEo9Mijv/keXKyuC62
-         w2gp24rKB93yGLQ52+lx3C6F98kECikHg3SsYgl4FfeY56ILSu62BRfVXKGkXoXsblpT
-         MRnTgPxPV71fmy+yXlgayVoeydiEHW6cnOfOcDfohWnWNBinlW/St6IJPrG8/KAzZmDA
-         nSv/7K4DPNeC68CioCdxaM5sj6KAcohrMX2ucTxnDrED3HAz2nsfTzpYmEyiM+VPzBCa
-         1x1EUm1Be8F3Xv3LkG8xCcZ0nJB6/tvjq/M7bXI/T3BxdqSL0QUQFxcAbKQP1Brl03qD
-         eCZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755206686; x=1755811486;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/6qZAcA33YsFmMHf2jGdno7I/KieRlxpr3C9zF0dSmI=;
-        b=Ur+SejPf4za6RSrmUaZzuII+0zUebAUu+ZUFfL5kGdD1bwf/MubNFAqiBRIZACcjQY
-         9ef3q+mE2ESfrW9ENIUt9m4T77d89ALEUzdLPWd5kjJ0yZQ06GEwjgstNnMFMY3jWiE8
-         d3QJj8+GJ3iT0xef+QITuabxW0uSpJA+OpGF8FYK9BkA8u4faf4R7a/0rxWDlxEp601S
-         bLgwdMykV6Ze2KIOPqpjKj/+gBaqxH9mpXCsf2Vjq1V1iKrhjbU1TwuOxyF+qnmKhMZ3
-         4GZ/Qyo6ePKEB0MtsWuMFBlA5pOnjYfPM7tMIxMpCSztGLDQxVMNu9XgjI42Bq/Fzkhy
-         XHXw==
-X-Gm-Message-State: AOJu0YzngNuqLcuh6u4kj5tbf9i/D43HveJTRNAEhhVO6vZZ5GyC7SGg
-	kwzdGhQnN2XVXWidNto+Z+4RTcpmvCxDWaxFJc67w5vR4UoE4HgugNh3AnNbhA==
-X-Gm-Gg: ASbGncvYmqVH9/B21QqjTiMTmxg2tbSgZF/86uAro0vSuDi+S7YSlxQVhmzabR8V6+4
-	JcsE3v+PHLR4kOeaBjLeL6SpxDycfIhqrUaZtO7d2zj63stLEuz+M81GDiRqYYMoiHVFjVEFxS9
-	0Z6Z/ClFToh+qoJRlXRN0QNiDCMOcopJCJPq3E07n79+WKRdxMhv+IMWBwymzac7NNZXnGueES6
-	KYB4pYgjFUX1A8eGkHWKEMgEe1GK68ldd7qe/gljWqxBWJFhfXtxGHGez2xaojelY7p96GOm8nY
-	qMJfur+dO9iJyCNhj16QrE6gops9YSwtVFGB4qF882x1Jr+kJQlZdphd9IUeFmb50YwF6swa0ej
-	j5AMyDfXi5WFuKJVL3gIxsMhVAZfd0ekEPfRO/iXwh9wTYQ==
-X-Google-Smtp-Source: AGHT+IHycqfGCjGA4hDgOOOOZjB8BqIe6PvLQ7zCVyj84iIKIyBkTlehBhCVzeFPy2jdBsiHN+wxqg==
-X-Received: by 2002:a17:907:9801:b0:af9:32bc:a365 with SMTP id a640c23a62f3a-afcd8d62d52mr17763666b.54.1755206685647;
-        Thu, 14 Aug 2025 14:24:45 -0700 (PDT)
-Received: from sunflower.zrh.bachmakov.org ([2a02:168:636c:1:2ef0:5dff:fed9:23ab])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af9215cdc53sm2612033866b.78.2025.08.14.14.24.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Aug 2025 14:24:45 -0700 (PDT)
-From: Eduard Bachmakov <e.bachmakov@gmail.com>
-To: linux-cifs@vger.kernel.org
-Cc: Eduard Bachmakov <e.bachmakov@gmail.com>
-Subject: [PATCH] cifs-utils: Fix documentation for character remappings.
-Date: Thu, 14 Aug 2025 23:22:14 +0200
-Message-ID: <20250814212256.1653699-2-e.bachmakov@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3CT2h3H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1755207957;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hMrmnnaTuE7E24vkMuvtxjjxa9pOJBVXm+5edbNayAI=;
+	b=L3CT2h3HKYAKcmvpAWvXs/uz0FX1kWp2LHDTKZkPKUwS5qyqkLKgXj70Daf6LXlw7Y9Z8x
+	f45LaDQ5wY24D5K6ZcDfS6EYMUmb4tzxA47zPS9glV8RsUoownxHrVz3a6lilbethFL08y
+	guOyrQOGQiDzTTcjDQOsxVdvi8+EjZA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-487-HEFzikZhPcqMN1yOvb2dkA-1; Thu,
+ 14 Aug 2025 17:45:56 -0400
+X-MC-Unique: HEFzikZhPcqMN1yOvb2dkA-1
+X-Mimecast-MFC-AGG-ID: HEFzikZhPcqMN1yOvb2dkA_1755207955
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F63318004A7;
+	Thu, 14 Aug 2025 21:45:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.21])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 61E0730001A2;
+	Thu, 14 Aug 2025 21:45:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <brauner@kernel.org>,
+    Paulo Alcantara <pc@manguebit.org>, Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Xiaoli Feng <fengxiaoli0714@gmail.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, netfs@lists.linux.dev,
+    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] netfs: Fix unbuffered write error handling
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <915442.1755207950.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 Aug 2025 22:45:50 +0100
+Message-ID: <915443.1755207950@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Current documentation swapped the relevant specs. Additionally,
-elaborate on SFM a bit.
+If all the subrequests in an unbuffered write stream fail, the subrequest
+collector doesn't update the stream->transferred value and it retains its
+initial LONG_MAX value.  Unfortunately, if all active streams fail, then w=
+e
+take the smallest value of { LONG_MAX, LONG_MAX, ... } as the value to set
+in wreq->transferred - which is then returned from ->write_iter().
 
-Supported by fs/cifs/cifs_unicode.c:{convert_to_sfu_char,
-convert_to_sfm_char}.
+LONG_MAX was chosen as the initial value so that all the streams can be
+quickly assessed by taking the smallest value of all stream->transferred -
+but this only works if we've set any of them.
 
-Previously raised in:
+Fix this by adding a flag to indicate whether the value in
+stream->transferred is valid and checking that when we integrate the
+values.  stream->transferred can then be initialised to zero.
 
-  https://lore.kernel.org/linux-cifs/CADCRUiMn_2Vk3HZzU0WKu3xPgo1P-1aqDy+NjEzOz03W-HFChw@mail.gmail.com/
+This was found by running the generic/750 xfstest against cifs with
+cache=3Dnone.  It splices data to the target file.  Once (if) it has used =
+up
+all the available scratch space, the writes start failing with ENOSPC.
+This causes ->write_iter() to fail.  However, it was returning
+wreq->transferred, i.e. LONG_MAX, rather than an error (because it thought
+the amount transferred was non-zero) and iter_file_splice_write() would
+then try to clean up that amount of pipe bufferage - leading to an oops
+when it overran.  The kernel log showed:
 
-Signed-off-by: Eduard Bachmakov <e.bachmakov@gmail.com>
+    CIFS: VFS: Send error in write =3D -28
+
+followed by:
+
+    BUG: kernel NULL pointer dereference, address: 0000000000000008
+
+with:
+
+    RIP: 0010:iter_file_splice_write+0x3a4/0x520
+    do_splice+0x197/0x4e0
+
+or:
+
+    RIP: 0010:pipe_buf_release (include/linux/pipe_fs_i.h:282)
+    iter_file_splice_write (fs/splice.c:755)
+
+Also put a warning check into splice to announce if ->write_iter() returne=
+d
+that it had written more than it was asked to.
+
+Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
+Reported-by: Xiaoli Feng <fengxiaoli0714@gmail.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D220445
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: netfs@lists.linux.dev
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: stable@vger.kernel.org
 ---
- mount.cifs.rst | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/netfs/read_collect.c  |    4 +++-
+ fs/netfs/write_collect.c |   10 ++++++++--
+ fs/netfs/write_issue.c   |    4 ++--
+ fs/splice.c              |    3 +++
+ include/linux/netfs.h    |    1 +
+ 5 files changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/mount.cifs.rst b/mount.cifs.rst
-index d489070..9eee7d5 100644
---- a/mount.cifs.rst
-+++ b/mount.cifs.rst
-@@ -307,10 +307,10 @@ rwpidforward
- 
- mapchars
-   Translate six of the seven reserved characters (not backslash, but
--  including the colon, question mark, pipe, asterik, greater than and
-+  including the colon, question mark, pipe, asterisk, greater than and
-   less than characters) to the remap range (above 0xF000), which also
-   allows the CIFS client to recognize files created with such characters
--  by Windows's Services for Mac. This can also be useful when mounting to
-+  by Windows's Services for Unix. This can also be useful when mounting to
-   most versions of Samba (which also forbids creating and opening files
-   whose names contain any of these seven characters). This has no effect
-   if the server does not support Unicode on the wire. Please note that
-@@ -322,7 +322,8 @@ nomapchars
- 
- mapposix
-   Translate reserved characters similarly to ``mapchars`` but use the
--  mapping from Microsoft "Services For Unix".
-+  mapping from Microsoft "Services For Mac". This additionally remaps the
-+  double quote and a trailing period or space.
- 
- intr
-   currently unimplemented.
--- 
-2.50.1
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index 3e804da1e1eb..a95e7aadafd0 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -281,8 +281,10 @@ static void netfs_collect_read_results(struct netfs_i=
+o_request *rreq)
+ 		} else if (test_bit(NETFS_RREQ_SHORT_TRANSFER, &rreq->flags)) {
+ 			notes |=3D MADE_PROGRESS;
+ 		} else {
+-			if (!stream->failed)
++			if (!stream->failed) {
+ 				stream->transferred +=3D transferred;
++				stream->transferred_valid =3D true;
++			}
+ 			if (front->transferred < front->len)
+ 				set_bit(NETFS_RREQ_SHORT_TRANSFER, &rreq->flags);
+ 			notes |=3D MADE_PROGRESS;
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index 0f3a36852a4d..cbf3d9194c7b 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -254,6 +254,7 @@ static void netfs_collect_write_results(struct netfs_i=
+o_request *wreq)
+ 			if (front->start + front->transferred > stream->collected_to) {
+ 				stream->collected_to =3D front->start + front->transferred;
+ 				stream->transferred =3D stream->collected_to - wreq->start;
++				stream->transferred_valid =3D true;
+ 				notes |=3D MADE_PROGRESS;
+ 			}
+ 			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
+@@ -356,6 +357,7 @@ bool netfs_write_collection(struct netfs_io_request *w=
+req)
+ {
+ 	struct netfs_inode *ictx =3D netfs_inode(wreq->inode);
+ 	size_t transferred;
++	bool transferred_valid =3D false;
+ 	int s;
+ =
+
+ 	_enter("R=3D%x", wreq->debug_id);
+@@ -376,12 +378,16 @@ bool netfs_write_collection(struct netfs_io_request =
+*wreq)
+ 			continue;
+ 		if (!list_empty(&stream->subrequests))
+ 			return false;
+-		if (stream->transferred < transferred)
++		if (stream->transferred_valid &&
++		    stream->transferred < transferred) {
+ 			transferred =3D stream->transferred;
++			transferred_valid =3D true;
++		}
+ 	}
+ =
+
+ 	/* Okay, declare that all I/O is complete. */
+-	wreq->transferred =3D transferred;
++	if (transferred_valid)
++		wreq->transferred =3D transferred;
+ 	trace_netfs_rreq(wreq, netfs_rreq_trace_write_done);
+ =
+
+ 	if (wreq->io_streams[1].active &&
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index 50bee2c4130d..0584cba1a043 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -118,12 +118,12 @@ struct netfs_io_request *netfs_create_write_req(stru=
+ct address_space *mapping,
+ 	wreq->io_streams[0].prepare_write	=3D ictx->ops->prepare_write;
+ 	wreq->io_streams[0].issue_write		=3D ictx->ops->issue_write;
+ 	wreq->io_streams[0].collected_to	=3D start;
+-	wreq->io_streams[0].transferred		=3D LONG_MAX;
++	wreq->io_streams[0].transferred		=3D 0;
+ =
+
+ 	wreq->io_streams[1].stream_nr		=3D 1;
+ 	wreq->io_streams[1].source		=3D NETFS_WRITE_TO_CACHE;
+ 	wreq->io_streams[1].collected_to	=3D start;
+-	wreq->io_streams[1].transferred		=3D LONG_MAX;
++	wreq->io_streams[1].transferred		=3D 0;
+ 	if (fscache_resources_valid(&wreq->cache_resources)) {
+ 		wreq->io_streams[1].avail	=3D true;
+ 		wreq->io_streams[1].active	=3D true;
+diff --git a/fs/splice.c b/fs/splice.c
+index 4d6df083e0c0..f5094b6d00a0 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -739,6 +739,9 @@ iter_file_splice_write(struct pipe_inode_info *pipe, s=
+truct file *out,
+ 		sd.pos =3D kiocb.ki_pos;
+ 		if (ret <=3D 0)
+ 			break;
++		WARN_ONCE(ret > sd.total_len - left,
++			  "Splice Exceeded! ret=3D%zd tot=3D%zu left=3D%zu\n",
++			  ret, sd.total_len, left);
+ =
+
+ 		sd.num_spliced +=3D ret;
+ 		sd.total_len -=3D ret;
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 185bd8196503..98c96d649bf9 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -150,6 +150,7 @@ struct netfs_io_stream {
+ 	bool			active;		/* T if stream is active */
+ 	bool			need_retry;	/* T if this stream needs retrying */
+ 	bool			failed;		/* T if this stream failed */
++	bool			transferred_valid; /* T is ->transferred is valid */
+ };
+ =
+
+ /*
 
