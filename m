@@ -1,181 +1,117 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF48301498;
-	Thu, 14 Aug 2025 13:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0316E253B73
+	for <linux-cifs@vger.kernel.org>; Thu, 14 Aug 2025 21:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755179289; cv=none; b=rTb5V07GBWZngK/qCP0C9WgsTwe6o0sQmZsLzHszyi+XWUaRUt3iZrgDNx5CDbWEyYGpjizCyhYyzmh17lvpa8AgUAPiC6IxsbGiXtKa6b7hOK01QjUWE9fOs0VQc73g3sbBocreBgxU1QeergeEYDIlxQXNJl2g3wB0Rjlj+A4=
+	t=1755206689; cv=none; b=QKAyjY/Ii4SuVCmwMCM6ARMYvbLClhier/QhfSauBjJqqt/IiUHJ49ItOeM8ZRxYE7gne5Zd494Ga59tcvYXudzjC8D40dg6dboBDiZ3GBCYhVCGbHM6AXOBhcOrIGGD0jBuMV2M2Szjd972XrnhavNOVwKwbYpppo5LJXSFX1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755179289; c=relaxed/simple;
-	bh=3nDch1TwnwnOFxnyGs00pASm7HAHD3urGrnQFPRpJis=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ISiDJqpCuCcWbMBThjKavPdFwKr82cnx7yVtYf27l4lUPZqj5bg4C7uErbDQXVNuutY9xYUK2c8GFdj95JfX0k8tEcmEm5SiM18fI2mq2z8H2nyH5rKqGTyF3+Bf+VTqVw0It7uUMRrbpe1gdApk2JeyuvLKaPjcku1MlO8+oaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVmMjtHj; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1755206689; c=relaxed/simple;
+	bh=UNZ0dhDjdXCxYOELTiaUobTA3eKNfMmnrDjlWB974oQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FKmRXCigvSWwxjU/ORSGk+tWEZtWJUzT0pMMDS8KDU+iADLP6MOtRvR+WwI7VAKfgct6nIKUJIPBs+b9jmvNRAOfMLuwJVQ9oRZA9d8SHnssx940vHRtnzcwqRRlN2Xxx8EZGAEJyFyitxVeRc/W897TWdjZlVD4sjzKvYtkMSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlNFrTxO; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVmMjtHj"
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6188b5b11b2so1238311a12.0;
-        Thu, 14 Aug 2025 06:48:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlNFrTxO"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-afcb78ead12so204259166b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Aug 2025 14:24:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755179285; x=1755784085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kknE7rDUjEpODcHDSlY2nJGg21LqzdjsCFp42JS4Ico=;
-        b=SVmMjtHjyDWUAv8RYC77foqLZ64FkzLAVO+E5YBxcj8zgauvxcJk6RQKFlux1yLNP3
-         3f8HP4YvicdbqH91iKsn5YwEc/Faeoq8bMx9a4nQVr0R1TqBvK7ixdfK8UNiQB1YXv99
-         +24TYdIYlFoamRmOz44EZEBIq3rMS3LRQ1PlqRzBUR2ekMDCG5M7X3VoCvLejlYC8xDF
-         xLlHn1ESboMXuSUZsbpJOYP7eu65BRT5rJdCXn5jCNPAOao3AaXUUFlojJcc12OxvV7H
-         Bdj8/FiIZdn17RsylTeCamTst6WBS6+HDdp6dfOIiRGoRv7plTGlO4lNY/ooVDbO94uy
-         rtNg==
+        d=gmail.com; s=20230601; t=1755206686; x=1755811486; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/6qZAcA33YsFmMHf2jGdno7I/KieRlxpr3C9zF0dSmI=;
+        b=MlNFrTxOVtznvV3gO9dbLD+5ur389vKaheTjSYqkx7irPNg5HEo9Mijv/keXKyuC62
+         w2gp24rKB93yGLQ52+lx3C6F98kECikHg3SsYgl4FfeY56ILSu62BRfVXKGkXoXsblpT
+         MRnTgPxPV71fmy+yXlgayVoeydiEHW6cnOfOcDfohWnWNBinlW/St6IJPrG8/KAzZmDA
+         nSv/7K4DPNeC68CioCdxaM5sj6KAcohrMX2ucTxnDrED3HAz2nsfTzpYmEyiM+VPzBCa
+         1x1EUm1Be8F3Xv3LkG8xCcZ0nJB6/tvjq/M7bXI/T3BxdqSL0QUQFxcAbKQP1Brl03qD
+         eCZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755179285; x=1755784085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kknE7rDUjEpODcHDSlY2nJGg21LqzdjsCFp42JS4Ico=;
-        b=SPVIOlOPdCjDSEM/Ppi851QV7x6H7Rrdcj9Z7+nxnfwRi5lrriGZ10ply2ppexLA9E
-         OJutZ01AUg87uKyVwSNzf9VmQAQGewuj4zGHcSylYbqtJ9RC6Gw6H9yYxnDyHpghRhSx
-         /yuAdPfLZdTThdE7iBDtXdryOHumP7zHnUMwZ1dV61uKaK4/CpCQKZys9ocjZLu2HA5p
-         WBCPLdADBFCPSbNQwpqMfk/9sunTZCSpAu5T08gMWjjtWi7M3QJMgDKxhWfmEW974aLn
-         YFlFc8jzZjEPOd4qK7KKxUcglNOBL/4bs6gkfWELJoTewbYtpAanVi5ZbaWO5kfLSguT
-         a6Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPPd1yk+8bkQrdGZayvR3aO78+O39btGP4Hg/Vu1+zg9fvek6R30uUMbHgI0Xzm/maRVLIFTbJA44FiBCJhg==@vger.kernel.org, AJvYcCVGOth4jlR3SQK+ZjfZSmXur7Z0B7o+yLMBEt8s7LC5RBhboqwWeU8iZesqAm9zEnU3/t3VOXJc0962@vger.kernel.org, AJvYcCVjuTGjcKpOuYDJ+gJwWPVw1c5ceo70617t82C6UtPyiwjyz9FpDUMnVPtWkrdFSXeSQt2sQ63QfetI@vger.kernel.org, AJvYcCVw87kqUXv8fkx7nEoilm+uwX5s2QVqNhQwS+FOdRA0nS2w2X6R3vRsL5dHarFu6Key81Uq7HjJgiP4+LM2bA==@vger.kernel.org, AJvYcCW4YVL5ezYSSVLmHS7BA9ubQHEnKVVdNceS8VycGNlj4W8XNSygxfo+BTnmFlC4kSM9DD/vPYcdcdVfXNpW@vger.kernel.org, AJvYcCWK+onlHzVxCAewGSF1hJjxiow87uTEGD0HfXpY41jEkD295G0NE6+y/fckuTvoYh4cMgnFjJ6EIOM=@vger.kernel.org, AJvYcCWrlqX8T5H4KCYH05jz+USPJ/2B6g6X+3LKDD8Wgpl5HPtX0FqJyZer/JW286eHzJkIY30GLGqeA7aM@vger.kernel.org, AJvYcCXD0cTu8rngZ1WDlNbtJjQe7YY7IYOl4P9e6IV5cK9E+jORsKjKH0DpkI07YMSJwA9xnDSIwPRiW41PIA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOjWpIxv9ccUFwMoKZLhoC0Wrop8ActjLNQpy8P6UM47aYKfLK
-	ZX3rLpUvYlfSrO0yECTO1djyptq42TM9UEHWhiwT5EDzrlVXzB7UCMFSAipPGnhR0p9KMsCvT0n
-	Xx76BT5aGZhJ/gcvO8cdwDrnfYle1pdU=
-X-Gm-Gg: ASbGncsJF2IVjEnva+sKKHYhcBv4pR0ab5eZJxUvkm6Cg+LoHAcOh39ibttib2NILjZ
-	oKWxN4AR1fbjptTI2L2ZCrdYHavCnuhgbH6eoWrdJ/TPgIjkKGZVHp9yK07lW0hlMJCkSYstbOl
-	7A8VrOP6a1OFohWsFoHGJ5upHMu9Zawow2AgoKx424V5ZfqiMnf9hNzwsvxUO5KXzgTzIgsgF/w
-	Ev3Ceo=
-X-Google-Smtp-Source: AGHT+IEyNlWqeAhk/LpScYt9w4g0zV4KI7o0RDFgyEsYgfPOIWzZIEz6LWnNRfl0s84eTTaO2QcDUYXHT6IzkeoX6zs=
-X-Received: by 2002:a05:6402:348e:b0:617:b2ab:fba2 with SMTP id
- 4fb4d7f45d1cf-6188c1f81c9mr2881340a12.34.1755179284840; Thu, 14 Aug 2025
- 06:48:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755206686; x=1755811486;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/6qZAcA33YsFmMHf2jGdno7I/KieRlxpr3C9zF0dSmI=;
+        b=Ur+SejPf4za6RSrmUaZzuII+0zUebAUu+ZUFfL5kGdD1bwf/MubNFAqiBRIZACcjQY
+         9ef3q+mE2ESfrW9ENIUt9m4T77d89ALEUzdLPWd5kjJ0yZQ06GEwjgstNnMFMY3jWiE8
+         d3QJj8+GJ3iT0xef+QITuabxW0uSpJA+OpGF8FYK9BkA8u4faf4R7a/0rxWDlxEp601S
+         bLgwdMykV6Ze2KIOPqpjKj/+gBaqxH9mpXCsf2Vjq1V1iKrhjbU1TwuOxyF+qnmKhMZ3
+         4GZ/Qyo6ePKEB0MtsWuMFBlA5pOnjYfPM7tMIxMpCSztGLDQxVMNu9XgjI42Bq/Fzkhy
+         XHXw==
+X-Gm-Message-State: AOJu0YzngNuqLcuh6u4kj5tbf9i/D43HveJTRNAEhhVO6vZZ5GyC7SGg
+	kwzdGhQnN2XVXWidNto+Z+4RTcpmvCxDWaxFJc67w5vR4UoE4HgugNh3AnNbhA==
+X-Gm-Gg: ASbGncvYmqVH9/B21QqjTiMTmxg2tbSgZF/86uAro0vSuDi+S7YSlxQVhmzabR8V6+4
+	JcsE3v+PHLR4kOeaBjLeL6SpxDycfIhqrUaZtO7d2zj63stLEuz+M81GDiRqYYMoiHVFjVEFxS9
+	0Z6Z/ClFToh+qoJRlXRN0QNiDCMOcopJCJPq3E07n79+WKRdxMhv+IMWBwymzac7NNZXnGueES6
+	KYB4pYgjFUX1A8eGkHWKEMgEe1GK68ldd7qe/gljWqxBWJFhfXtxGHGez2xaojelY7p96GOm8nY
+	qMJfur+dO9iJyCNhj16QrE6gops9YSwtVFGB4qF882x1Jr+kJQlZdphd9IUeFmb50YwF6swa0ej
+	j5AMyDfXi5WFuKJVL3gIxsMhVAZfd0ekEPfRO/iXwh9wTYQ==
+X-Google-Smtp-Source: AGHT+IHycqfGCjGA4hDgOOOOZjB8BqIe6PvLQ7zCVyj84iIKIyBkTlehBhCVzeFPy2jdBsiHN+wxqg==
+X-Received: by 2002:a17:907:9801:b0:af9:32bc:a365 with SMTP id a640c23a62f3a-afcd8d62d52mr17763666b.54.1755206685647;
+        Thu, 14 Aug 2025 14:24:45 -0700 (PDT)
+Received: from sunflower.zrh.bachmakov.org ([2a02:168:636c:1:2ef0:5dff:fed9:23ab])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-af9215cdc53sm2612033866b.78.2025.08.14.14.24.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Aug 2025 14:24:45 -0700 (PDT)
+From: Eduard Bachmakov <e.bachmakov@gmail.com>
+To: linux-cifs@vger.kernel.org
+Cc: Eduard Bachmakov <e.bachmakov@gmail.com>
+Subject: [PATCH] cifs-utils: Fix documentation for character remappings.
+Date: Thu, 14 Aug 2025 23:22:14 +0200
+Message-ID: <20250814212256.1653699-2-e.bachmakov@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250813065333.GG222315@ZenIV> <175513726277.2234665.5395852687971371437@noble.neil.brown.name>
-In-Reply-To: <175513726277.2234665.5395852687971371437@noble.neil.brown.name>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Thu, 14 Aug 2025 15:47:53 +0200
-X-Gm-Features: Ac12FXwtQAorrE4W3bWM28WxLsn_dOcgt6iMm2QuEDqDEmfUynv58IGzMVEJihs
-Message-ID: <CAOQ4uxjOvsfV7o5Mnn_VBKYCR15FkmQBDASvwq0UQKPwxh1H2g@mail.gmail.com>
-Subject: Re: [PATCH 11/11] VFS: introduce d_alloc_noblock() and d_alloc_locked()
-To: NeilBrown <neil@brown.name>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Tyler Hicks <code@tyhicks.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-afs@lists.infradead.org, netfs@lists.linux.dev, 
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 14, 2025 at 4:08=E2=80=AFAM NeilBrown <neil@brown.name> wrote:
->
-> On Wed, 13 Aug 2025, Al Viro wrote:
-> > On Tue, Aug 12, 2025 at 12:25:14PM +1000, NeilBrown wrote:
-> > > Several filesystems use the results of readdir to prime the dcache.
-> > > These filesystems use d_alloc_parallel() which can block if there is =
-a
-> > > concurrent lookup.  Blocking in that case is pointless as the lookup
-> > > will add info to the dcache and there is no value in the readdir wait=
-ing
-> > > to see if it should add the info too.
-> > >
-> > > Also these calls to d_alloc_parallel() are made while the parent
-> > > directory is locked.  A proposed change to locking will lock the pare=
-nt
-> > > later, after d_alloc_parallel().  This means it won't be safe to wait=
- in
-> > > d_alloc_parallel() while holding the directory lock.
-> > >
-> > > So this patch introduces d_alloc_noblock() which doesn't block
-> > > but instead returns ERR_PTR(-EWOULDBLOCK).  Filesystems that prime th=
-e
-> > > dcache now use that and ignore -EWOULDBLOCK errors as harmless.
-> > >
-> > > A few filesystems need more than -EWOULDBLOCK - they need to be able =
-to
-> > > create the missing dentry within the readdir.  procfs is a good examp=
-le
-> > > as the inode number is not known until the lookup completes, so readd=
-ir
-> > > must perform a full lookup.
-> > >
-> > > For these filesystems d_alloc_locked() is provided.  It will return a
-> > > dentry which is already d_in_lookup() but will also lock it against
-> > > concurrent lookup.  The filesystem's ->lookup function must co-operat=
-e
-> > > by calling lock_lookup() before proceeding with the lookup.  This way=
- we
-> > > can ensure exclusion between a lookup performed in ->iterate_shared a=
-nd
-> > > a lookup performed in ->lookup.  Currently this exclusion is provided=
- by
-> > > waiting in d_wait_lookup().  The proposed changed to dir locking will
-> > > mean that calling d_wait_lookup() (in readdir) while already holding
-> > > i_rwsem could deadlock.
-> >
-> > The last one is playing fast and loose with one assertion that is used
-> > in quite a few places in correctness proofs - that the only thing other
-> > threads do to in-lookup dentries is waiting on them (and that - only
-> > in d_wait_lookup()).  I can't tell whether it will be a problem without
-> > seeing what you do in the users of that thing, but that creates an
-> > unpleasant areas to watch out for in the future ;-/
->
-> Yeah, it's not my favourite part of the series.
->
-> >
-> > Which filesystems are those, aside of procfs?
-> >
->
-> afs in afs_lookup_atsys().  While looking up a name that ends "@sys" it
-> need to look up the prefix with various alternate suffixes appended.
-> So this isn't readdir related, but is a lookup-within-a-lookup.
->
-> The use of d_add_ci() in xfs is the same basic pattern.
->
-> overlayfs does something in ovl_lookup_real_one() that I don't
-> understand yet but it seems to need a lookup while the directory is
-> locked.
+Current documentation swapped the relevant specs. Additionally,
+elaborate on SFM a bit.
 
-We decoded a connected real directory path (from file handle) and we
-are trying to lookup in overlay a directory that is referencing the
-underlying real dir that we decoded.
+Supported by fs/cifs/cifs_unicode.c:{convert_to_sfu_char,
+convert_to_sfm_char}.
 
-This is the context. Not sure what problem exactly this code gives you.
+Previously raised in:
 
->
-> ovl_cache_update is in the ovl iterate_shared code (which in fact holds
-> an exclusive lock).  I think this is the same pattern as procfs in that
-> an inode number needs to be allocated at lookup time, but there might be
-> more too it.
->
+  https://lore.kernel.org/linux-cifs/CADCRUiMn_2Vk3HZzU0WKu3xPgo1P-1aqDy+NjEzOz03W-HFChw@mail.gmail.com/
 
-It's kind of a hack I guess.
-ovl has those rules (see xino) to compose a consistent inode number
-from real inode number and layer number.
-lookup of children during readdir composes the child stack to realize
-the consistent xino.
+Signed-off-by: Eduard Bachmakov <e.bachmakov@gmail.com>
+---
+ mount.cifs.rst | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-We could do this internally in ovl by doing lookups on the real layers
-and composing the xino, but calling lookup on ovl during readdir was
-so much easier :/
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index d489070..9eee7d5 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -307,10 +307,10 @@ rwpidforward
+ 
+ mapchars
+   Translate six of the seven reserved characters (not backslash, but
+-  including the colon, question mark, pipe, asterik, greater than and
++  including the colon, question mark, pipe, asterisk, greater than and
+   less than characters) to the remap range (above 0xF000), which also
+   allows the CIFS client to recognize files created with such characters
+-  by Windows's Services for Mac. This can also be useful when mounting to
++  by Windows's Services for Unix. This can also be useful when mounting to
+   most versions of Samba (which also forbids creating and opening files
+   whose names contain any of these seven characters). This has no effect
+   if the server does not support Unicode on the wire. Please note that
+@@ -322,7 +322,8 @@ nomapchars
+ 
+ mapposix
+   Translate reserved characters similarly to ``mapchars`` but use the
+-  mapping from Microsoft "Services For Unix".
++  mapping from Microsoft "Services For Mac". This additionally remaps the
++  double quote and a trailing period or space.
+ 
+ intr
+   currently unimplemented.
+-- 
+2.50.1
 
-Thanks,
-Amir.
