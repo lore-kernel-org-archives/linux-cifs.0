@@ -1,87 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0724D319876;
-	Fri, 15 Aug 2025 13:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573951A3A80;
+	Fri, 15 Aug 2025 14:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755266246; cv=none; b=PwH8Vp9Itw8hSQ6wiISmGPqJchOpdCgiLZ1Yn8jrErIT/bukR9ul8WtPlpOXf8tI3mmom9c3VExji08p7lD8UXAViLbFFNoK2vYZefaAN1sYCkKkCH8V/yPLHDduV/o9lhd5WVXJ+uRoZLsJZAsHPC+A4gEwZtYK4Tr4cow3fc4=
+	t=1755266781; cv=none; b=Mj6MMZgNmlFmdsD7EVQIF/C2hYK7etHa9Dm1w4xLvv3tNq+W96pPktsL76JwqJd6YGRrlHuRiYzstMcKzieScDxU+9nRxXjR2LX+U6SE+SnXxp55TSfDjeptaNl44HXaS3sFuE7F0k3gLcZuRVZVu8nCXcb1NyDA8DaP7AMpwkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755266246; c=relaxed/simple;
-	bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aZApRVRzp3XBPfLnSiJWaezQD7RTvfMVz+3HoXq9QRAzLPyeOLy3/KJvq/1ZSVSU0M5QOKxAovkjvrLJnfNmizl1bQh/0ISajzNZDPUnxbz4vYjF3BknnkZuKoIgfUcFLWPteYD2O93FD8WTnGEg3eqsrKU+UuTcydWZvZzGOss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWhnDZk3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755266781; c=relaxed/simple;
+	bh=mz8BcQAidgZTzJpEETP27hLPaHrcJ0D2ABt3tlYl4Ow=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=GG9qgz/O8ho8AiguNLkdgReQ3FIU91WSUWk7WtowHhGzbBSlbNxgC08VeOOL7BFzYAySyrC212Rk98wv4FGduZ26yMMctvhvcVx1MYYeRNowu1evaRFglfMwYDaxF9WcY1KZ9lnBMbKThSxKDhBQI6kVygbQhq0sBBJWRlYNEgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCfdTwFP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWhnDZk3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30412C4CEEB;
-	Fri, 15 Aug 2025 13:57:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCfdTwFP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2942C4CEF0;
+	Fri, 15 Aug 2025 14:06:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755266245;
-	bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qWhnDZk3tXS0Wbgw4bHyEbWlgmHi1yObAJr36OoyruYaEIAlf4mMD3Iik+aBOd8FZ
-	 VNj+iUBlJxQ67YlHq3Fi9CjKLHMGuYz1evn9vTSi23NWbwKNOOBlrob4AAStgoMkEJ
-	 vwpFJIgrTljeo/zUXU8znUXywT8c2SRZ3FeS5QvRLH68qdH7S8oIoLe83PzuF4qeQ9
-	 EYXMrWzxGz7LFbZip0yJlX9gWifE4ci9TObT8lq2/TC1BgUEmlGWuT3njIx+7NRfY8
-	 PYXHr4ROb0HtbGb7p4hjj5ypTiHJupa/jvw7NgFFmEVk95AfozbUQ9HEqUpSP6JXij
-	 Bh5aDvDLcvVIA==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Xiaoli Feng <fengxiaoli0714@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Steve French <sfrench@samba.org>
-Subject: Re: [PATCH] netfs: Fix unbuffered write error handling
-Date: Fri, 15 Aug 2025 15:57:06 +0200
-Message-ID: <20250815-erhoben-gesurft-4de96f87d6d5@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <915443.1755207950@warthog.procyon.org.uk>
-References: <915443.1755207950@warthog.procyon.org.uk>
+	s=k20201202; t=1755266779;
+	bh=mz8BcQAidgZTzJpEETP27hLPaHrcJ0D2ABt3tlYl4Ow=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=PCfdTwFPET0NWdOR0+zktiuyP+1wKtJ9zWfqOwtt4xIYZLq/XbtiGx6Nhvi5Fd9tX
+	 36mPJG5ao14qyc8t4XKf+UaQBLBdBf/jO1CG596Kr4WQwUi2dXt/A16T67ZeNQr3OC
+	 6xVYr6yCrTxhQXNUurYkshEsY3EjHS6HQHOWnjr+azrbTlwYtSxcm+SOcUFfsEDmDl
+	 oYjmgEwneV3GZhP4HhoxvXpU4Qtq/5cTDgyOxSAqX5cgknARdBT8taF43WFFCUOX2+
+	 z2fAJ93yiMsRtFEMzr6A+WYaPxafGGKQw2xq4+g1EyrjS5AkrctvqJpDdT9pV5bR8E
+	 P6lfFfTBBhgzA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3415C39D0C3D;
+	Fri, 15 Aug 2025 14:06:32 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
+References: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc1-smb3-client-fixes
+X-PR-Tracked-Commit-Id: e19d8dd694d261ac26adb2a26121a37c107c81ad
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 55ddcff7358aa7cb20ff71fd2ec3131133b1fc3d
+Message-Id: <175526679088.1083334.10659189674454812210.pr-tracker-bot@kernel.org>
+Date: Fri, 15 Aug 2025 14:06:30 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1415; i=brauner@kernel.org; h=from:subject:message-id; bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTMt9n/6/mnd1uVbxz6WeK3Lybf/4vWpakZ61+6fGlX8 rT8lj/xWEcpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEjtgyMiz45p0jufTG/aAn 3c797/fX5UyaZ1tpKntQX2rh1xLOxdUM/yw2Lb3dzJ3x/590TueepYn+fCLVj5K2syj7J01vTA/ exgYA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
 
-On Thu, 14 Aug 2025 22:45:50 +0100, David Howells wrote:
-> If all the subrequests in an unbuffered write stream fail, the subrequest
-> collector doesn't update the stream->transferred value and it retains its
-> initial LONG_MAX value.  Unfortunately, if all active streams fail, then we
-> take the smallest value of { LONG_MAX, LONG_MAX, ... } as the value to set
-> in wreq->transferred - which is then returned from ->write_iter().
-> 
-> LONG_MAX was chosen as the initial value so that all the streams can be
-> quickly assessed by taking the smallest value of all stream->transferred -
-> but this only works if we've set any of them.
-> 
-> [...]
+The pull request you sent on Thu, 14 Aug 2025 22:06:13 -0500:
 
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc1-smb3-client-fixes
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/55ddcff7358aa7cb20ff71fd2ec3131133b1fc3d
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Thank you!
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[1/1] netfs: Fix unbuffered write error handling
-      https://git.kernel.org/vfs/vfs/c/a3de58b12ce0
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
