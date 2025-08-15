@@ -1,63 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573951A3A80;
-	Fri, 15 Aug 2025 14:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E16307488
+	for <linux-cifs@vger.kernel.org>; Fri, 15 Aug 2025 15:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755266781; cv=none; b=Mj6MMZgNmlFmdsD7EVQIF/C2hYK7etHa9Dm1w4xLvv3tNq+W96pPktsL76JwqJd6YGRrlHuRiYzstMcKzieScDxU+9nRxXjR2LX+U6SE+SnXxp55TSfDjeptaNl44HXaS3sFuE7F0k3gLcZuRVZVu8nCXcb1NyDA8DaP7AMpwkU=
+	t=1755272544; cv=none; b=KzeXWk7tXXD32VH0D7/5XQ6PFMio9ceYxlCxxuMD3svviybZZneCY6b2EAeKHOC4AvFBSpbQy2EjXLboc+s5T2ZpRRS80ONfZdXv62SO1QDfdF2BxmXHznb17d+JTPqChx25NZki9ufHrXLVnYh9QSSyPN4jMzjIf5NrQ+CIHfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755266781; c=relaxed/simple;
-	bh=mz8BcQAidgZTzJpEETP27hLPaHrcJ0D2ABt3tlYl4Ow=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=GG9qgz/O8ho8AiguNLkdgReQ3FIU91WSUWk7WtowHhGzbBSlbNxgC08VeOOL7BFzYAySyrC212Rk98wv4FGduZ26yMMctvhvcVx1MYYeRNowu1evaRFglfMwYDaxF9WcY1KZ9lnBMbKThSxKDhBQI6kVygbQhq0sBBJWRlYNEgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCfdTwFP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755272544; c=relaxed/simple;
+	bh=TvC6a/FsSrK86kiM74bEek4j91JX57WtMeA32bCOxHI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=S4gbUQag5x4JqLRvil+4aM4IaP5cGTkQPNsULJvzNEMnnGcXXqLuBhzLOvUv/ehWRYjSWcT6P+u0/ymE7qdMoKquBYiwEZ9UdGaylBm4RMJJ2t1QtCPN/pHrz5IYAWou33r3CXqahEmcpxfDgFJVSpgYd2LkeUD8xg0lGpENbRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=JCMgDsvh; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCfdTwFP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2942C4CEF0;
-	Fri, 15 Aug 2025 14:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755266779;
-	bh=mz8BcQAidgZTzJpEETP27hLPaHrcJ0D2ABt3tlYl4Ow=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=PCfdTwFPET0NWdOR0+zktiuyP+1wKtJ9zWfqOwtt4xIYZLq/XbtiGx6Nhvi5Fd9tX
-	 36mPJG5ao14qyc8t4XKf+UaQBLBdBf/jO1CG596Kr4WQwUi2dXt/A16T67ZeNQr3OC
-	 6xVYr6yCrTxhQXNUurYkshEsY3EjHS6HQHOWnjr+azrbTlwYtSxcm+SOcUFfsEDmDl
-	 oYjmgEwneV3GZhP4HhoxvXpU4Qtq/5cTDgyOxSAqX5cgknARdBT8taF43WFFCUOX2+
-	 z2fAJ93yiMsRtFEMzr6A+WYaPxafGGKQw2xq4+g1EyrjS5AkrctvqJpDdT9pV5bR8E
-	 P6lfFfTBBhgzA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3415C39D0C3D;
-	Fri, 15 Aug 2025 14:06:32 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
-References: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc1-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e19d8dd694d261ac26adb2a26121a37c107c81ad
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 55ddcff7358aa7cb20ff71fd2ec3131133b1fc3d
-Message-Id: <175526679088.1083334.10659189674454812210.pr-tracker-bot@kernel.org>
-Date: Fri, 15 Aug 2025 14:06:30 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="JCMgDsvh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=8ne5O4VxsjBRC6ta9KutfIbWX6rUe+sScX+06ze5Bpo=; b=JCMgDsvhji4+KkYcmeKNiJz7kQ
+	v9DGcXkQGWFJCoVzxGGldU/EspgU/kMrtd0hm0Qz88Euj38OPzkcClOxanEzJfMT3PUANSbQ6tmRG
+	2Lu7g2uVZOUF5r9tb7FUhf1O6Z/GR14S1TVFhml2PcbnSQrrmpFgfPWl+RDTZ/4Fzd10XxPloR2Qa
+	gSaA5UVb57tbRNTQrAiIgJcQKwoAay7dW3f7L5QisoIA4XVRdDJ+NxnrpSxISiUaMbPjDg2cTbxP4
+	qPLttjp9vUPHkjOUEa2CoshA+IwhBnTlx7qFx5rJH+0KJhYL0jYopL2bI5WZkHTllS2aNtbzjGhaP
+	ISbpHf5YWB3/EWDNoM/vyEsstMNBnUlAD/AkX76Bis47KAW+4pJVfJtAC6ZvvTaPS4V4dvs1fkAVP
+	fJxx/8JwF0IIEX/j+0Ix7nFcad5fHZCWJhai/Er9zJ8l+gjesBGyF6L1nex7ymIktdaC0F+3ytVSl
+	3sktCDcjpM+rfJwo7Hk6x4pV;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1umwZP-0031LW-23;
+	Fri, 15 Aug 2025 15:42:19 +0000
+Message-ID: <aa1772e6-690e-477f-adcb-400ccb17d219@samba.org>
+Date: Fri, 15 Aug 2025 17:42:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+From: Stefan Metzmacher <metze@samba.org>
+Subject: ksmbd: limit repeated connections from clients with the same IP
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 14 Aug 2025 22:06:13 -0500:
+Hi Namjae,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc1-smb3-client-fixes
+this commit relies on IPv4 only, which is wrong!
+Can you please have a look, thanks!
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/55ddcff7358aa7cb20ff71fd2ec3131133b1fc3d
+commit e6bb9193974059ddbb0ce7763fa3882bd60d4dc3
+Author: Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue Aug 5 18:13:13 2025 +0900
 
-Thank you!
+     ksmbd: limit repeated connections from clients with the same IP
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+     Repeated connections from clients with the same IP address may exhaust
+     the max connections and prevent other normal client connections.
+     This patch limit repeated connections from clients with the same IP.
+
+     Reported-by: tianshuo han <hantianshuo233@gmail.com>
+     Cc: stable@vger.kernel.org
+     Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+     Signed-off-by: Steve French <stfrench@microsoft.com>
+
+I came to it because smatch reported this:
+
+Warning: server/connection.c:53 function parameter 'inet_addr' not described in 'ksmbd_conn_alloc'
+
+Thanks!
+metze
