@@ -1,90 +1,87 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A532425DB06
-	for <linux-cifs@vger.kernel.org>; Fri, 15 Aug 2025 12:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0724D319876;
+	Fri, 15 Aug 2025 13:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755261923; cv=none; b=lY3dhZFd0fX5W1xw8u6wqEK9h7GFtb/k5XdivXpEgDDSceH4vjAT80V+qBJvnSEk9H5stQtfOlR46Dp7UwbJBAXI7lUVgBsXHMoAPmCsIsCE/M3m4t44/C4S62PffE8LmCU6SNCuIqOU/Dn5QwX08v0ryb70ypAx931glzUYfJM=
+	t=1755266246; cv=none; b=PwH8Vp9Itw8hSQ6wiISmGPqJchOpdCgiLZ1Yn8jrErIT/bukR9ul8WtPlpOXf8tI3mmom9c3VExji08p7lD8UXAViLbFFNoK2vYZefaAN1sYCkKkCH8V/yPLHDduV/o9lhd5WVXJ+uRoZLsJZAsHPC+A4gEwZtYK4Tr4cow3fc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755261923; c=relaxed/simple;
-	bh=pkhADcm4d2zUamJn3W0p3Eq2a5cPGqHLCMuEn42tPQM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QD0aL4OmOUEWZq2qUwcGAf3F2Tt3Q3hgrKb3PfynFl2b0QqRv0LlvpiewJHxAYwdH4tszdiarywnfr60sIRPY79nJF+ZRLaQVvIrjCkUvYogH++TmYYHjhJKtrNwuupktNTZLDvQ0l4wyr59tU4oqtt0SmhBarAXrDmyyqY7+9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=WuiCfmcI; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1755266246; c=relaxed/simple;
+	bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aZApRVRzp3XBPfLnSiJWaezQD7RTvfMVz+3HoXq9QRAzLPyeOLy3/KJvq/1ZSVSU0M5QOKxAovkjvrLJnfNmizl1bQh/0ISajzNZDPUnxbz4vYjF3BknnkZuKoIgfUcFLWPteYD2O93FD8WTnGEg3eqsrKU+UuTcydWZvZzGOss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWhnDZk3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="WuiCfmcI"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=nZ2IGzRayrl8xt2kkonIr9cFYZvI/Yf/w4ZRxOOUMbM=; b=WuiCfmcI1BQDkRrZ1ZZfSmD/0c
-	wm47jYkOJUIedi+vzbq2rbSjWc2ph3dtdLtJ3pQLK8lMXsd4sf4/AeOIxY9J4Jheu2YfDqHqcBmV3
-	29B4PxGf09hdLOYkQ3fF0Q9jzdGHzCeL8lIAn2tlNxOnPTw6ZVaS4MIXWI5y/i4XnZhMlJCahN695
-	G8I7H4Lf/ZoMX8evAhcZ5M6COqlySB49QtOpOcutF8lXEV0SGgdytOKB3ScFfuqJJVgbAv4BcqD0x
-	xtgd4/CGo+47nettmQvnkepcGU2xKFzcOBDorx9jYlw7plVwipPs/MvVUagF27y8w0QzqCc+GpGd8
-	7Yw+ub6LhbRWtrtGyIr11nOvbiu+W7FqnTNyCj3pVoJSOKJVOvwtZk2bIA/TGcKpSbfO1k1mR+Q34
-	dkQeuRbGPhyHfgvptKc4N2rNoqrNY/JH0DqN/rb4E0s1QtJ4cdJiTsX07tR9bPhB+salluRiamLtJ
-	lw/GjZyH3CP6hYencnMHY/LY;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1umto1-002zyG-24;
-	Fri, 15 Aug 2025 12:45:13 +0000
-Message-ID: <706b8f8e-57f2-4d34-a6f8-c672c921e4f2@samba.org>
-Date: Fri, 15 Aug 2025 14:45:13 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWhnDZk3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30412C4CEEB;
+	Fri, 15 Aug 2025 13:57:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755266245;
+	bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qWhnDZk3tXS0Wbgw4bHyEbWlgmHi1yObAJr36OoyruYaEIAlf4mMD3Iik+aBOd8FZ
+	 VNj+iUBlJxQ67YlHq3Fi9CjKLHMGuYz1evn9vTSi23NWbwKNOOBlrob4AAStgoMkEJ
+	 vwpFJIgrTljeo/zUXU8znUXywT8c2SRZ3FeS5QvRLH68qdH7S8oIoLe83PzuF4qeQ9
+	 EYXMrWzxGz7LFbZip0yJlX9gWifE4ci9TObT8lq2/TC1BgUEmlGWuT3njIx+7NRfY8
+	 PYXHr4ROb0HtbGb7p4hjj5ypTiHJupa/jvw7NgFFmEVk95AfozbUQ9HEqUpSP6JXij
+	 Bh5aDvDLcvVIA==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Xiaoli Feng <fengxiaoli0714@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	netfs@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Steve French <sfrench@samba.org>
+Subject: Re: [PATCH] netfs: Fix unbuffered write error handling
+Date: Fri, 15 Aug 2025 15:57:06 +0200
+Message-ID: <20250815-erhoben-gesurft-4de96f87d6d5@brauner>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <915443.1755207950@warthog.procyon.org.uk>
+References: <915443.1755207950@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: server: split ksmbd_rdma_stop_listening() out of
- ksmbd_rdma_destroy()
-To: Pedro Falcato <pfalcato@suse.de>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
- Tom Talpey <tom@talpey.com>
-References: <20250812164546.29238-1-metze@samba.org>
- <cwxjlestdk3u5u6cqrr7cpblkfrwwx3obibhuk2wnu4ttneofm@y3fg6wpvooev>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <cwxjlestdk3u5u6cqrr7cpblkfrwwx3obibhuk2wnu4ttneofm@y3fg6wpvooev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1415; i=brauner@kernel.org; h=from:subject:message-id; bh=4qznQcuodMDR8UxP8t1F4Kt5zqkLltVV1eg/6EKCeTk=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWTMt9n/6/mnd1uVbxz6WeK3Lybf/4vWpakZ61+6fGlX8 rT8lj/xWEcpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEjtgyMiz45p0jufTG/aAn 3c797/fX5UyaZ1tpKntQX2rh1xLOxdUM/yw2Lb3dzJ3x/590TueepYn+fCLVj5K2syj7J01vTA/ exgYA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-Hi Pedro,
+On Thu, 14 Aug 2025 22:45:50 +0100, David Howells wrote:
+> If all the subrequests in an unbuffered write stream fail, the subrequest
+> collector doesn't update the stream->transferred value and it retains its
+> initial LONG_MAX value.  Unfortunately, if all active streams fail, then we
+> take the smallest value of { LONG_MAX, LONG_MAX, ... } as the value to set
+> in wreq->transferred - which is then returned from ->write_iter().
+> 
+> LONG_MAX was chosen as the initial value so that all the streams can be
+> quickly assessed by taking the smallest value of all stream->transferred -
+> but this only works if we've set any of them.
+> 
+> [...]
 
->> +void ksmbd_rdma_destroy(void)
->> +{
->>   	if (smb_direct_wq) {
->>   		destroy_workqueue(smb_direct_wq);
->>   		smb_direct_wq = NULL;
->> diff --git a/fs/smb/server/transport_rdma.h b/fs/smb/server/transport_rdma.h
->> index 0fb692c40e21..659ed668de2d 100644
->> --- a/fs/smb/server/transport_rdma.h
->> +++ b/fs/smb/server/transport_rdma.h
->> @@ -13,13 +13,15 @@
->>   
->>   #ifdef CONFIG_SMB_SERVER_SMBDIRECT
->>   int ksmbd_rdma_init(void);
->> +void ksmbd_rdma_stop_listening(void);
->>   void ksmbd_rdma_destroy(void);
->>   bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
->>   void init_smbd_max_io_size(unsigned int sz);
->>   unsigned int get_smbd_max_read_write_size(void);
->>   #else
->>   static inline int ksmbd_rdma_init(void) { return 0; }
->> -static inline int ksmbd_rdma_destroy(void) { return 0; }
->> +static inline void ksmbd_rdma_stop_listening(void) { return };
->                                                       ^^ return; (nothing at all would be even better)
-> This seems to have broken our internal linux-next builds.
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-Sorry for that!
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Steve can you remove 'return' so that the line is this:
-static inline void ksmbd_rdma_stop_listening(void) { }
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Thanks!
-metze
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
+
+[1/1] netfs: Fix unbuffered write error handling
+      https://git.kernel.org/vfs/vfs/c/a3de58b12ce0
