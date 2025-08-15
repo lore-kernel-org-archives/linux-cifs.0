@@ -1,132 +1,332 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3535526AF3;
-	Fri, 15 Aug 2025 03:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A4217A310;
+	Fri, 15 Aug 2025 03:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755227187; cv=none; b=lo1vc0pe8a6wLC5SbmRtIRb0eHq0XvVaLW1AoiIn5N81DLmj2jRua7ythyRc3KzbMdu7mlo3ZVDPPQPiJUsUpYpiiEyKUIvJS0y0ZYuljhgq/O7YuSkhw6CjzI4vqj8WpwJ43ckPjLa8uJajxw4eVRVbf+y8FTUiIXJolpqM31A=
+	t=1755228260; cv=none; b=GOrYdlniUXtQWhlfa4E9PKwzPX4+a1DmtctqF8VXrMged9+7N2CJ6nV3eTu8QUgpSSsJZBIn/G0z1NseaCW9wf8/xrnOFrVG9LJYExdR6fw4Gsya2gVCcLnxLtkubts6T05BTm2QIpIHJAK5TDSWuyDT5FPv2Q8ZFfw5CPIR+Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755227187; c=relaxed/simple;
-	bh=UbtTd5cDnA+tL0Z4ZPtN97UkW1xDXL+wKRfOIrUF1Fo=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hh9qlXizwO2NftF0eR0niziwQ0TngNBzTU9Wmds0Jd/CiYiuwLeSffGe1/zS37XhB/kvDD/rLxUrdCCG8q+76R4IaUmcSX3FZISqhzJ3oZL20d/vMAB04N5gsyjO8VmCaMpWTPMWv+Huf+/xE5avKVLmzDBC/YVOFJ9SgJ8jEFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCm+kYpZ; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCm+kYpZ"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-70a928cca6aso9161176d6.2;
-        Thu, 14 Aug 2025 20:06:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755227185; x=1755831985; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y/msescSO6DjiLygH5SQxhYUOUBz7dEiXRHXJI+7dv8=;
-        b=CCm+kYpZVQAwhkuSO1loAdg+V4WBnTktqoTS0dR+wlg6rFBMvqfVhPv9MO1TRAKfKi
-         +sLPRIqO7bYUmyHoEXq2316/AyyR/S4Bw15R+c+BzxuUz+iF8zb3vrN8VBJLWi+dDehR
-         kFRdCZGyx2uAuGY/x+f2mYjUiq0yF94/nlVi1CLw6inwNs14SqVxce22KEa2BOmlU1l5
-         wIHR57XU78hasbcDM/MiWrH455rMbfbIB+6O+1YZbSdVXcApCiEE4XZWOD2kcL3/RMYl
-         b1w9m+Hbq/veEy33/QHtEgNu+vNsqXGXykSMPZ54V+6B6KihByxvDZaD34nwPR0cx5/V
-         rtWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755227185; x=1755831985;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y/msescSO6DjiLygH5SQxhYUOUBz7dEiXRHXJI+7dv8=;
-        b=oij8udTXGUVhKouY0asOYKQd5FESNTf3rwemga7AcdFZtQl9ZL/ipuQbaq9JntD0nT
-         9yHNxWtLoF9Eg3brmVokDPgiCG4F5mR97cIGPod4yUnlROTYGbd3FesbMbC8pSCkj9fP
-         NLCqFipvGLERVFvKd5ZHr4l9z6KChrR4HFtVYAnB1CPem/WAUmRSvPz1N+ewyq+rLHHC
-         +5n1pEn2YnBXEn4hCVWhxLW3bVOOZIhaSp8IOr87fFgOCvJrgjlEB8T5B2d7OZr9obi8
-         A29k8SU9U3IRosPa04sKX/rjCHE3ul/Y2GHS4FEDfxt3G5t6qhyvC3cAI6QS4F5W+B3/
-         CH1g==
-X-Forwarded-Encrypted: i=1; AJvYcCVB8eUZDNYtWnWomkLcsXBBeehl1n0fY+S8lr5Kw2ggxkfN4mKR6ekaNkCxuWoFG67CN3KKrBmZCKq/@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/66r2VSRS0EJG0XRhHXVZIs0cFGCXRm4D4HXxtFvDL/SIvlVN
-	5mrnHqnT4I+5rGMU465t0Iqz3cqJ18RHbpv5pl/1IwzEefaao7c0/uezVfIwrUT6m4jwDAWL4W5
-	D2ZJ2f+pqcV1NMFIpSZ51iiFVt5LLEu39GQ==
-X-Gm-Gg: ASbGncvLFLBnZq9NWDMta0qeSXyhpdGuZ9Yfx4ndi7yMHXu1wgZeHsFFHyQbczCnjf6
-	GnaG8zofRAqMSUzuoTsDoGMVazYdrZB+CLKXq0MEY6x2z+lE6qpwrnYO6UWP9nb8c9gP+Iq7jVc
-	EGgxXpGxf68Rwk8/aQY16lTqfX79uB9yqOZTvSm+HflhUycBo2WAJxrjVD6v5j6P9oIxgeEPybf
-	zTC59zsDHwEceorScOVhu1jF8GdtV33zYDyiJDOeyUCGYg7jN7a
-X-Google-Smtp-Source: AGHT+IG/1pXVT5fuud5x3Oo/+E1+MALLJEWdNuFJJRMGFx0JokLcZ+B1zIJyQq4KPAwIYE2Vxz648vFKk0BSyvBNtPk=
-X-Received: by 2002:a05:6214:20c5:b0:709:31f8:fd9a with SMTP id
- 6a1803df08f44-70ba7c02df1mr3600896d6.27.1755227184960; Thu, 14 Aug 2025
- 20:06:24 -0700 (PDT)
+	s=arc-20240116; t=1755228260; c=relaxed/simple;
+	bh=7CDzsalSvM+eE9NmMVshPuJKnICEntU14YPizv9tMAI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jyLC8T/ezfMkaqylHVQsnbUYNfpNwndH9FpqqtTDN9Lh3zDqTT7BBbLsXobftx4Kf2mM37LLvc0Wka/xMuQOd3pyjKkOITJlTTYj86Wtmp8WgeDOwESXlRDVUkm5atXLyE1JeqEe9kA/1JQJ53PIzPPA9SYc2wNj0jiFf8ZgTEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c36sN2Tf3zKHMnb;
+	Fri, 15 Aug 2025 11:24:08 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id A5C441A17BA;
+	Fri, 15 Aug 2025 11:24:07 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP4 (Coremail) with SMTP id gCh0CgAHzw9VqJ5oB1PoDg--.58085S4;
+	Fri, 15 Aug 2025 11:24:07 +0800 (CST)
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+To: sfrench@samba.org,
+	pc@manguebit.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	chengzhihao1@huawei.com,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH v4] smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect
+Date: Fri, 15 Aug 2025 11:16:18 +0800
+Message-Id: <20250815031618.3758759-1-wangzhaolong@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 14 Aug 2025 22:06:13 -0500
-X-Gm-Features: Ac12FXxeH_6vd5VjaiU_viR1KykxMXTGxBa6cz6cDdEZKa3m_F-CiLpsrEJ1Wc0
-Message-ID: <CAH2r5mtRBY-kVFHxA+w2mgvyG_f5cnbtMqxDgAQjDeecC1jyKQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgAHzw9VqJ5oB1PoDg--.58085S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxKFy3XrWUuF4fWrWktFyxZrb_yoW3KFW8pF
+	ySyrWSgr48Gr1UWws7JF4ku34F934kCFy5Cr4xG3WvqayDZrWIgFWqkF1j9FySyayDt3s3
+	Wr4Dt3y29F18ua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1veHDUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-Please pull the following changes since commit
-8f5ae30d69d7543eee0d70083daf4de8fe15d585:
+An AA deadlock occurs when network interruption during mount triggers
+DFS reconnection logic that calls iterate_supers_type().
 
-  Linux 6.17-rc1 (2025-08-10 19:41:16 +0300)
+The detailed call process is as follows:
 
-are available in the Git repository at:
+      mount.cifs
+-------------------------
+path_mount
+  do_new_mount
+    vfs_get_tree
+      smb3_get_tree
+        cifs_smb3_do_mount
+          sget
+            alloc_super
+              down_write_nested(&s->s_umount, ..);  // Hold lock
+          cifs_root_iget
+            cifs_get_inode_info
+              smb2_query_path_info
+                smb2_compound_op
+                  SMB2_open_init
+                    smb2_plain_req_init
+                      smb2_reconnect           // Trigger reconnection
+                        cifs_tree_connect
+                          cifs_get_dfs_tcon_super
+                            __cifs_get_super
+                              iterate_supers_type
+                                down_read(&sb->s_umount); // Deadlock
+    do_new_mount_fc
+      up_write(&sb->s_umount);  // Release lock
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc1-smb3-client-fixes
+During mount phase, if reconnection is triggered, the foreground mount
+process may enter smb2_reconnect prior to the reconnect worker being
+scheduled, leading to a deadlock when subsequent DFS tree connect
+attempts reacquire the s_umount lock.
 
-for you to fetch changes up to e19d8dd694d261ac26adb2a26121a37c107c81ad:
+The essential condition for triggering the issue is that the API
+iterate_supers_type() reacquires the s_umount lock. Therefore, one
+possible solution is to avoid using iterate_supers_type() and instead
+directly access the superblock through internal data structures.
 
-  smb: client: remove redundant lstrp update in negotiate protocol
-(2025-08-13 11:36:24 -0500)
+This patch fixes the problem by:
+- Add vfs_sb back-pointer to cifs_sb_info for direct access
+- Protect list traversal with existing tcon->sb_list_lock
+- Use atomic operations to safely manage super block references
+- Remove complex callback-based iteration in favor of simple loop
+- Rename cifs_put_tcp_super() to cifs_put_super() to avoid confusion
 
-----------------------------------------------------------------
-Nine smb3 client fixes
-- Fix unlink race and rename races
-- SMB3.1.1 compression fix
-- Avoid unneeded strlen calls in cifs_get_spnego_key
-- Fix slab out of bounds in parse_server_interfaces()
-- Fix mid leak and server buffer leak
-- smbdirect send error path fix
-- update internal version #
-- Fix unneeded response time update in negotiate protocol
+Fixes: 3ae872de4107 ("smb: client: fix shared DFS root mounts with different prefixes")
+Signed-off-by: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+---
 
-----------------------------------------------------------------
-David Howells (1):
-      cifs: Fix collect_sample() to handle any iterator type
+V4:
+ - Perform a null pointer check on the return value of cifs_get_dfs_tcon_super()
+   to prevent NULL ptr dereference with DFS multiuser mount
 
-Dmitry Antipov (1):
-      cifs: avoid extra calls to strlen() in cifs_get_spnego_key()
+V3:
+ - Adjust the trace diagram for the super_lock_shared() section to align with
+   the latest mainline call flow. 
+V2:
+ - Adjust the trace diagram in the commit message to indicate when the lock
+   is released
 
-Paulo Alcantara (2):
-      smb: client: fix race with concurrent opens in unlink(2)
-      smb: client: fix race with concurrent opens in rename(2)
+ fs/smb/client/cifs_fs_sb.h |  1 +
+ fs/smb/client/cifsfs.c     |  1 +
+ fs/smb/client/cifsproto.h  |  2 +-
+ fs/smb/client/dfs.c        |  4 +-
+ fs/smb/client/misc.c       | 84 ++++++++++++++------------------------
+ 5 files changed, 35 insertions(+), 57 deletions(-)
 
-Stefan Metzmacher (1):
-      smb: client: don't wait for info->send_pending == 0 on error
+diff --git a/fs/smb/client/cifs_fs_sb.h b/fs/smb/client/cifs_fs_sb.h
+index 5e8d163cb5f8..8c513e4c0efe 100644
+--- a/fs/smb/client/cifs_fs_sb.h
++++ b/fs/smb/client/cifs_fs_sb.h
+@@ -49,10 +49,11 @@
+ 
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+ 	struct list_head tcon_sb_link;
+ 	spinlock_t tlink_tree_lock;
++	struct super_block *vfs_sb;
+ 	struct tcon_link *master_tlink;
+ 	struct nls_table *local_nls;
+ 	struct smb3_fs_context *ctx;
+ 	atomic_t active;
+ 	unsigned int mnt_cifs_flags;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 3bd85ab2deb1..383f651eb43f 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -939,10 +939,11 @@ cifs_get_root(struct smb3_fs_context *ctx, struct super_block *sb)
+ 
+ static int cifs_set_super(struct super_block *sb, void *data)
+ {
+ 	struct cifs_mnt_data *mnt_data = data;
+ 	sb->s_fs_info = mnt_data->cifs_sb;
++	mnt_data->cifs_sb->vfs_sb = sb;
+ 	return set_anon_super(sb, NULL);
+ }
+ 
+ struct dentry *
+ cifs_smb3_do_mount(struct file_system_type *fs_type,
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index c34c533b2efa..6415bb961c1e 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -678,11 +678,11 @@ int copy_path_name(char *dst, const char *src);
+ int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_iov,
+ 			       int resp_buftype,
+ 			       struct cifs_search_info *srch_inf);
+ 
+ struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon);
+-void cifs_put_tcp_super(struct super_block *sb);
++void cifs_put_super(struct super_block *sb);
+ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix);
+ char *extract_hostname(const char *unc);
+ char *extract_sharename(const char *unc);
+ int parse_reparse_point(struct reparse_data_buffer *buf,
+ 			u32 plen, struct cifs_sb_info *cifs_sb,
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index f65a8a90ba27..37d83aade843 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -429,11 +429,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
+ 				       tcon, tcon->ses->local_nls);
+ 		goto out;
+ 	}
+ 
+ 	sb = cifs_get_dfs_tcon_super(tcon);
+-	if (!IS_ERR(sb))
++	if (!IS_ERR_OR_NULL(sb))
+ 		cifs_sb = CIFS_SB(sb);
+ 
+ 	/* Tree connect to last share in @tcon->tree_name if no DFS referral */
+ 	if (!server->leaf_fullpath ||
+ 	    dfs_cache_noreq_find(server->leaf_fullpath + 1, &ref, &tl)) {
+@@ -446,11 +446,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon)
+ 				     &tl);
+ 	free_dfs_info_param(&ref);
+ 
+ out:
+ 	kfree(tree);
+-	cifs_put_tcp_super(sb);
++	cifs_put_super(sb);
+ 
+ 	if (rc) {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+ 			tcon->status = TID_NEED_TCON;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index da23cc12a52c..3b6920a52daa 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1108,84 +1108,60 @@ int copy_path_name(char *dst, const char *src)
+ 	/* we count the trailing nul */
+ 	name_len++;
+ 	return name_len;
+ }
+ 
+-struct super_cb_data {
+-	void *data;
+-	struct super_block *sb;
+-};
+-
+-static void tcon_super_cb(struct super_block *sb, void *arg)
++static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+ {
+-	struct super_cb_data *sd = arg;
++	struct super_block *sb;
+ 	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *t1 = sd->data, *t2;
+ 
+-	if (sd->sb)
+-		return;
++	if (!tcon)
++		return NULL;
+ 
+-	cifs_sb = CIFS_SB(sb);
+-	t2 = cifs_sb_master_tcon(cifs_sb);
+-
+-	spin_lock(&t2->tc_lock);
+-	if ((t1->ses == t2->ses ||
+-	     t1->ses->dfs_root_ses == t2->ses->dfs_root_ses) &&
+-	    t1->ses->server == t2->ses->server &&
+-	    t2->origin_fullpath &&
+-	    dfs_src_pathname_equal(t2->origin_fullpath, t1->origin_fullpath))
+-		sd->sb = sb;
+-	spin_unlock(&t2->tc_lock);
+-}
++	spin_lock(&tcon->sb_list_lock);
++	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
+ 
+-static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void *),
+-					    void *data)
+-{
+-	struct super_cb_data sd = {
+-		.data = data,
+-		.sb = NULL,
+-	};
+-	struct file_system_type **fs_type = (struct file_system_type *[]) {
+-		&cifs_fs_type, &smb3_fs_type, NULL,
+-	};
+-
+-	for (; *fs_type; fs_type++) {
+-		iterate_supers_type(*fs_type, f, &sd);
+-		if (sd.sb) {
+-			/*
+-			 * Grab an active reference in order to prevent automounts (DFS links)
+-			 * of expiring and then freeing up our cifs superblock pointer while
+-			 * we're doing failover.
+-			 */
+-			cifs_sb_active(sd.sb);
+-			return sd.sb;
+-		}
++		if (!cifs_sb->vfs_sb)
++			continue;
++
++		sb = cifs_sb->vfs_sb;
++
++		/* Safely increment s_active only if it's not zero.
++		 *
++		 * When s_active == 0, the super block is being deactivated
++		 * and should not be used. This prevents UAF scenarios
++		 * where we might grab a reference to a super block that's
++		 * in the middle of destruction.
++		 */
++		if (!atomic_add_unless(&sb->s_active, 1, 0))
++			continue;
++
++		spin_unlock(&tcon->sb_list_lock);
++		return sb;
+ 	}
+-	pr_warn_once("%s: could not find dfs superblock\n", __func__);
+-	return ERR_PTR(-EINVAL);
+-}
++	spin_unlock(&tcon->sb_list_lock);
+ 
+-static void __cifs_put_super(struct super_block *sb)
+-{
+-	if (!IS_ERR_OR_NULL(sb))
+-		cifs_sb_deactive(sb);
++	return NULL;
+ }
+ 
+ struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
+ {
+ 	spin_lock(&tcon->tc_lock);
+ 	if (!tcon->origin_fullpath) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return ERR_PTR(-ENOENT);
+ 	}
+ 	spin_unlock(&tcon->tc_lock);
+-	return __cifs_get_super(tcon_super_cb, tcon);
++
++	return cifs_get_tcon_super(tcon);
+ }
+ 
+-void cifs_put_tcp_super(struct super_block *sb)
++void cifs_put_super(struct super_block *sb)
+ {
+-	__cifs_put_super(sb);
++	if (!IS_ERR_OR_NULL(sb))
++		deactivate_super(sb);
+ }
+ 
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ int match_target_ip(struct TCP_Server_Info *server,
+ 		    const char *host, size_t hostlen,
+-- 
+2.39.2
 
-Steve French (2):
-      smb3: fix for slab out of bounds on mount to ksmbd
-      cifs: update internal version number
-
-Wang Zhaolong (2):
-      smb: client: fix mid_q_entry memleak leak with per-mid locking
-      smb: client: remove redundant lstrp update in negotiate protocol
-
- fs/smb/client/cifs_spnego.c   | 47 +++++++++++-----------------
- fs/smb/client/cifsfs.h        |  4 +--
- fs/smb/client/cifsglob.h      | 21 +++++++++++++
- fs/smb/client/cifstransport.c | 19 ++++++-----
- fs/smb/client/compress.c      | 71 +++++++++++++-----------------------------
- fs/smb/client/connect.c       |  9 +++---
- fs/smb/client/inode.c         | 34 ++++++++++++++++++--
- fs/smb/client/smb2ops.c       | 15 +++++++--
- fs/smb/client/smb2transport.c |  1 +
- fs/smb/client/smbdirect.c     | 10 +++---
- fs/smb/client/transport.c     |  7 ++---
- 11 files changed, 128 insertions(+), 110 deletions(-)
-
---
-Thanks,
-
-Steve
