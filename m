@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465522F4A02;
-	Sun, 17 Aug 2025 14:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD662D661E;
+	Sun, 17 Aug 2025 15:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755441523; cv=none; b=j72D0fQbUFiwzqDmw/7UsEbQDWuzBCYUIhmc/ggrk8qoadw/fnFLcLmgqO0DJta/tO7x74+OeCc5zhAMOKAWbO9zucHIlLlaYsWqpSLcugVDXCBEL+29GlgfRaUoCjpMDwOJe2Uvj8J/oXF56M+X8ZG5CBgaHD2jPVYr/k5H6Rk=
+	t=1755443890; cv=none; b=CDdxVrhgRYj/EG0LNmps8RkHc/Oz1vmC77Aa4/TIv+gS6Y7lMxXXVYuTwA80fAJx/f+0WpVPWaIUc3oQe8syttL7HJBf4ByXcfjO7qGl4A1DiItQF35FMXbKaR5pZ+1iQjo62sSB/tImAC751VJd7G00DmkMhnJ5gIYbbWlBmeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755441523; c=relaxed/simple;
-	bh=KLqM2uYRx2dyK5qVTy+mTpACKI6KUJgQpAVtmTc6YPw=;
+	s=arc-20240116; t=1755443890; c=relaxed/simple;
+	bh=LyPfSJ08gXe2Mafj0QxOtH639p2yKbJSlC+RMG8P6eA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cek3a9/OIdrtGW6CrgAguRefdYUm4WZgtxp+dbUOfDpbl9IjEo5EuqU8uZ3cXztBqnbcHnYienMBN37y8hOnaUeO5+QbspptaSYUBo7hOFEKMySF2O3Fedzujayx6R+VB/wsEtq3FVFDUl0VikU4KJV8jdq3paWpRbZUF39I5Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9fPxEl+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=QVhwK+Nxct4r6fMFxUjocyRQpfEyLCaAwOKoAEcRENYjT3pV3c6MWcmNbWbKO8b4EX8v9/YasV4uMyDVd+ZstypVIKb5EUo8oDtaiFy5SMdW4D7hEM5UbJEtvkRRSpwpZ3IxFV+IVt1EOvTKRBU0GI//crAaD1DHSonMhhYUsno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF44GdGx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9fPxEl+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2F7C4CEF1;
-	Sun, 17 Aug 2025 14:38:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF44GdGx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E5EC4CEF1;
+	Sun, 17 Aug 2025 15:18:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755441523;
-	bh=KLqM2uYRx2dyK5qVTy+mTpACKI6KUJgQpAVtmTc6YPw=;
+	s=k20201202; t=1755443890;
+	bh=LyPfSJ08gXe2Mafj0QxOtH639p2yKbJSlC+RMG8P6eA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f9fPxEl+Gbq5vdOpz9gYm1tai/2EkZ1hCTcYH/ioN0+ckyrFILo6jFMyRTFA/Eo0k
-	 JhWDojgSERSzNnYzCGtTOapQpK6LB44rdBkK/Xfu++SrbhSBcJIgbU6z864sF1ZkqO
-	 qG2VcaExIIpfVknUcAOCUhly6uq2Lkqxm10kPeKwI6S4w2FRZIR8wlvUxkFP7PDwGA
-	 uCYrcZSsd5Y7y5ugcppN1sKrcHO7/nqRaEarjjSU6L/Fza157qT9MriQuSxZLPK0WQ
-	 VGiIhSt40ZaauMZRL0VVYPgeApf/7F+eNYwZLa18ZDI/mrOhe9+YF81Pf5vsXEd5KO
-	 qniRkvXVIJaOQ==
+	b=LF44GdGx52EouSBrPYTvuovh6THAXziEiidagpgL5IH06thCiJhO0coahZ5dCkfoo
+	 SQvC26dvHqY/8kGbUmwyCpL4t2aeIYgq6Z4l9rQWts5AfQLKWPd7DLbJy0u/OwZDnr
+	 8pcXYWvbmWTes6lwkr45FQaCqxlMtVIsHNEaSbIxHaQKiTtIHB/I7JyHPcKmZm1Sgw
+	 W8/bWenlECKBT0sZ1Mx+9E4hU9e4Q2IrNPvWL4xtxKUOJ+35SFSwBzTXErQee4tOg+
+	 nzSVHn9snv2jfdZqmuvrzI7Ba0bk5n+LeCIOhDgyQ9NxAdrEGHprws6pIVzLLBsvH4
+	 wBoB0ggmjX0nw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Stefan Metzmacher <metze@samba.org>,
@@ -36,12 +36,12 @@ Cc: Stefan Metzmacher <metze@samba.org>,
 	samba-technical@lists.samba.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10.y] smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()
-Date: Sun, 17 Aug 2025 10:38:39 -0400
-Message-ID: <20250817143839.1546235-1-sashal@kernel.org>
+Subject: [PATCH 5.4.y] smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()
+Date: Sun, 17 Aug 2025 11:18:07 -0400
+Message-ID: <20250817151807.1835667-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <2025081757-moonwalk-backpedal-fe00@gregkh>
-References: <2025081757-moonwalk-backpedal-fe00@gregkh>
+In-Reply-To: <2025081755-subdivide-astound-6aef@gregkh>
+References: <2025081755-subdivide-astound-6aef@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -75,7 +75,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 7d18b9268817..61aaed0d8746 100644
+index 0842a1af0b98..c8ab767ab138 100644
 --- a/fs/cifs/smbdirect.c
 +++ b/fs/cifs/smbdirect.c
 @@ -272,18 +272,21 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
@@ -103,9 +103,9 @@ index 7d18b9268817..61aaed0d8746 100644
 +		return;
 +	}
 +
- 	if (atomic_dec_and_test(&request->info->send_pending))
- 		wake_up(&request->info->wait_send_pending);
- 
+ 	if (request->has_payload) {
+ 		if (atomic_dec_and_test(&request->info->send_payload_pending))
+ 			wake_up(&request->info->wait_send_payload_pending);
 -- 
 2.50.1
 
