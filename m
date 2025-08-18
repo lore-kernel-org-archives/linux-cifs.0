@@ -1,37 +1,37 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62E21FDD
-	for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 20:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2DF1E51FB
+	for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 20:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755548730; cv=none; b=phq9/PPogXGTMKeY+Oq8KjU8vw+WasLn+c+5wqt5FyFFDk7z2KghZIyDX/IIIZ8l0zJwrzHSut44ICPQcvFn24b3/Ky2zVOg5Naet9QhSRTcK3tCpUE1CInlclr2kyr+GGs9x2DYJxeHmB09RgyPvTpxjCWo83/wbLo5Rhz9iyM=
+	t=1755549067; cv=none; b=EIl55oahpDMJ9zs1jHmg+dqkbCMxkLA/Ij/nuFrATPx45BEiaHWfV8XAvjmDpBuTIuipGWOKKBp4Pvqwf0kX2GPnjDymR8LFKzeDBKuEnQj6GOi0+cJIxv+hfWY7Py+CMETBWKtIp3c3uhdd0rEwcrGLVp42uo7evicfSIOxuqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755548730; c=relaxed/simple;
-	bh=/nE7ce9RnhZqaBcTRXozKel7GBqLy8Vpb/7yhHk5IyM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ObnikXz0D8NoBpNKgGy4esxvvzWUEMEdG5lv0Z+qGpJHDU096nJEqa8ZfZTmB/+Ppe+B7DYW0LNjQGlFMd9xmCwDkUq4crhR4UdhCl8VFtzUJp9a0o6mxmK50j/wrufHAr9gfyovKtXfZBgROdTN8Qb5BzewDpyerXToXolraHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=MIfyifTC; arc=none smtp.client-ip=144.76.82.148
+	s=arc-20240116; t=1755549067; c=relaxed/simple;
+	bh=kyD+HXTbIvpjwuHe64kwXuqnkL+hjSXsRjC27dpPOnw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=seJc9niKLEFOxuiMCIzk+riiWwqCgK+V27jTzy00k/hIrKZSNur80jxrc4P84QDoMjR5PWaW+9b3I8pgHaBNT1UYRiNXvD9f4dpSvDTfXQQhb7z/8sUs7LEoL6y5oBoewefLp2GlpSOc2CHncBe5L3WZVd+sAaEpmaMWZ6Wc+Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=U7Gomt6L; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="MIfyifTC"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="U7Gomt6L"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=/6qw7UXvIeheSrNYve+OT2MBciJ0q6Owf7qjCi5txnA=; b=MIfyifTChNv3oQ017D6HlNu0Xa
-	diTvBZzZHEx7IqrGBiCg6YL9ho05pFbfQMtn1nXgrqgLaN20Tkkgh/bQ1dNvFbfSIV1WxjWdSyMbi
-	Cz47XjKA4PkKHxZ6zAT27RsRyTCg1ohoAh56X2BssyqfdvspUPfjSdIPjPTfoTmQwPj2wOhbF86Kl
-	AWnlKtY9VcP/meVdWM4UdfpK9F05/UcyJheaW9GoM8ciHeHvpaBje983qt4MEZznzcm8c0IpjbCAk
-	3OClp41lwlYe2JsoG8BgfpO3rJTLlPpE9fl9mTG+4Ji2sHzVNeHAc3TcIqAGL3zN1q9oJpzPyPSwF
-	DCcj4c5RF3ZFTQqlTMzheGLyxqNAtOfk1w5iErdyCFOzJlIrjHqiGWzJm6ijItMypxVbtvFYIh8ic
-	FjNh6oV5B3yZAOuGoK/9UxJj9Lbnd4eX//fx/KMklKS8mnyMGnbecTSb4lsiFIxm9DN6QzGFjH1cH
-	1HskZnqBw5qW7IV/F3y/x6hZ;
+	bh=ANUkFkKuMUsNowCTgcYzlhuCPV23pdRt50KVF2MzwqM=; b=U7Gomt6LnJxAuAN+sm9hu3+vE/
+	jLWX3ZqPZSoQavuQCPDu2HJyBVNnsae4k7SxYKHNmk+yHXtHy8oWRm8OiJfF0MK5TLIaVtUU7tIBv
+	ez77XLS3DQ3jZbaTbblf/bYDTknfm3xyq1bEWxE6G5tH48pJB7cL5WDNIKEaaK2V42hvLkMgjR5A0
+	OCD0rjG6ORVJGcJp2n+HxK0AroeTg/3IcSc7FHbqzTj/JDaV3HRyR4kzaWDkztrtk9OU7ie3IsgL/
+	1y5aHftn+pJCH7kYoTgBhzox6C0oNlRb5Gjg5TGxfmAfRjrD4MRfYGJXAc6oO9pbVZ6sesJXe/Abe
+	Ns1IbvXnAL8WtAWCRYtOKhV0XulP5UnVSwH6cPESozJ5RvfO6AMqgC+j7loi8txxMPORU2wD5ZWfd
+	EntZqM7Xz6bFTesf+5qhJpROVkNgFUGZ2X0SZWMIYximXlK46DlaeOfW333+YqwhZ/MaN/YKb3fuA
+	XnyL/Yiu5rbLdFgYnajyyPfn;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uo6Q2-003WkK-0a;
-	Mon, 18 Aug 2025 20:25:26 +0000
-Message-ID: <c2d9d516-d203-44ff-946d-b4833019bfd5@samba.org>
-Date: Mon, 18 Aug 2025 22:25:25 +0200
+	id 1uo6VR-003Wor-26;
+	Mon, 18 Aug 2025 20:31:01 +0000
+Message-ID: <05881546-b505-4c0e-8d95-ee1c24f01fc8@samba.org>
+Date: Mon, 18 Aug 2025 22:31:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,43 +45,37 @@ Cc: Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
  "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
  Samba Technical <samba-technical@lists.samba.org>
 From: Stefan Metzmacher <metze@samba.org>
-Subject: Current state of smbdirect patches
+Subject: Common smbdirect debugging/loggin/tracing...
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi,
 
-I'm at the point where server/transport_rdma.c only has there
-local structures:
+after the move to common smbdirect structures I'm wondering
+what I have to keep related to the debug counters on the
+client side, e.g.
 
-struct smb_direct_device {
-         struct ib_device        *ib_dev;
-         struct list_head        list;
-};
+         /* for debug purposes */
+         unsigned int count_get_receive_buffer;
+         unsigned int count_put_receive_buffer;
+         unsigned int count_reassembly_queue;
+         unsigned int count_enqueue_reassembly_queue;
+         unsigned int count_dequeue_reassembly_queue;
+         unsigned int count_send_empty;
 
-static struct smb_direct_listener {
-         struct rdma_cm_id       *cm_id;
-} smb_direct_listener;
+And the their use (and more) in cifs_debug_data_proc_show().
 
-struct smb_direct_transport {
-         struct ksmbd_transport  transport;
+I'd suggest to remove this stuff and later add some tracepoints
+instead or if really needed some stuff under smbdirect_socket.statistics.
 
-         struct smbdirect_socket socket;
-};
+Also do we need to keep the log_rdma() based message in the client
+and the ksmbd_debug(RDMA) messages on the server as is?
+I guess we want some basic logging for the connect/disconnect handling
+and the rest should be tracepoints...
 
-All others are moved to smbdirect_socket.h.
-
-For the client I'm almost there I just need to
-finish the move of struct smbd_mr.
-
-Should I post all patches including the ones already in for-next and ksmbd-for-next-next?
-But resorted, first all fs/smb/common/smbdirect/ patches, then
-all fs/smb/client patches and finally all fs/smb/server patches.
-
-Maybe we want a smbdirect-for-next branch, which could be a shared ground for
-for-next (client) and ksmbd-for-next[-next] (server)?
-
-So how should I post what I have?
+Is something like logging module parameters and output
+written in stone or can this be changed to be more useful
+and in common between kernel client, kernel server and later
+userspace?
 
 metze
-
