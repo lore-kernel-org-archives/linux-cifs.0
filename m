@@ -1,163 +1,111 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940D731B11D;
-	Mon, 18 Aug 2025 12:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B9F20126A;
+	Mon, 18 Aug 2025 12:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755520776; cv=none; b=VZeojTLQ/+sA6/jMY9TsyljqdVf411zhKbty/KdNOXaaIUDXFopuPIryp1qdNN09/aMunrA0W1gltvuWIPSg48RIJa6H5ewOLkHIIqfJyrRgAeKgUgfOIFG8XBQVczdc6MNsyXoapZjO09Emphx4PGKSWferBkKXZU5XMhzGgcM=
+	t=1755521605; cv=none; b=P38ul2kl4X0PObU9d9Lrz6d0/igGJB8qc3hfFmYpMFQzECNm0eQhXG3FvyPE3xWiN9jj4pu4NoZmFjD1ge6gbETKVveW9RUbKhO/LkQaVU7G+oSfoZ0ZfjUxSGj8F0Iy2O0GCBpgqH6ADxqGoY4iSxAqpw5vr5OOi0KqVK36RYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755520776; c=relaxed/simple;
-	bh=iRiQFMBV+DKdPhtateZaMw71WRCGXS+1o0qcYMlsaNw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BA/AuoVy7T1bDJcoXnCcE0sq46g/D68UrXpWiFGoFLeLKPR1hz4YxV5egp7PtAvV/pJrMGSrCuH1WnkzCg0fGnlvTTdGnL3Yt5kl/SGyyK0izEQvAe3BtwXrrdAkL4pZvpMSfkTIGeaF3se3zmzpNJQT7Xwd8cQ/BYd3CxgLodk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JCkg6G/d; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755521605; c=relaxed/simple;
+	bh=4ag9/39dFWU8GkiOlWASTAeMNygUPvBXL7NuEXQxR7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Hdbyusw3nTxuqMdWBEGdnw9ahi9LJz6v74zsD0NUNlzxrgDjmxXzzNgKENFKW3cmustxW9rqKZbp6S2an+s2HPheNxbISu8hkTfkuCxXkjNyjYlLLfuATRkKzppCSMLC9/9cH9OA2G9NG7tUAjdJDG6nwaYZ0F1KBOn90wn3ue8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qQsitWqI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JCkg6G/d"
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6188b73bef3so7369849a12.3;
-        Mon, 18 Aug 2025 05:39:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755520773; x=1756125573; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ubbjo8h4cvXI+kpbxgHKGsgNRSO5oS6kJQNOdicLg+U=;
-        b=JCkg6G/dEzZAyztvOMPrbTJUURh1ZfaJwZJvoJFNYb1IhakyprOGSklKUBjfkUiDRz
-         ZLxndigssEOiOXVJkEE1SO7jA/Q83wH27/mduR/zIQqBoDewr8m7XnV4lTiwEvW1l6kH
-         YG+W7RkxeuB5QgMdG7wdLpt+k8XQld/5LSTqYqxCLsKsTT2nlMAvZKlVKxLKiJNZpW/M
-         Cm7Xmf58QxLWGb8fxjDaQznds6deqC3AXmsuappwZg3OhtDLpUfyb80Wvf2hNy0ru774
-         6c7sPpDfl5dYsK1/OzTWPs/Fz83B2fvy2vieXvlhLsrmPdkASen6klQoAQd7jS9buzIT
-         bKYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755520773; x=1756125573;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ubbjo8h4cvXI+kpbxgHKGsgNRSO5oS6kJQNOdicLg+U=;
-        b=Ml2paIi0BRiZidRnxAFMA29PlPUhRC2Pjf3myF4lAcGAvpi74r9XundLc3oKE4vTo+
-         5iiPVSH/BOjTGXfKmzWbt6tSmC7ROgBuWL7/IJc5Bt4esHWT9G1osAvMHmP5aPjv33lU
-         xTJHKjxTudTJq6vcU9RChsWfkPeBvgEDArfGG+v1z5K9SIVakF4jPdtVwmXJsy6D8vUt
-         OhDpXpfZwVkg1GNHR6Yc1X/XWJeQLb1w0ndQbUd0XQ7V1cNmU3YOehZoW7loRAKB0lIU
-         ewaeHEmni6VeGtXbBzxda5xlXEmBjg3RpB76+qbPF+bNA1K+jsRW+GMbSq/WzPtjQkur
-         a/YA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGH52+LRpXAuQYgtnvNZkh2xvRGBikEGYyI2kU3YZsABSYTZ8u3+P1o0KkkUJgYvVZvwF9fsw2mfSF@vger.kernel.org, AJvYcCUHzAO8Vlcbwj1aTT2OHmpiqINDYD722CRI1haOnsbMpYoXjs+jXRrPeRP9hWdb8D0k/Va1DX4SuXE=@vger.kernel.org, AJvYcCUbO0DM9dONilK5jCRh/k+10NLexU9h8QGx7OTYkyuf1o9pZqfSuH1to7R4qVbMRarBXNu2KqeaUH7KOtQ57Q==@vger.kernel.org, AJvYcCVJIo6t8ftsTupNlRWC1VpqeDOyhWwvKNXksIj+IvLPTLfHHXAFTVLkNmjBBYdXNjCMELV/OQjTPuFpE0Lh@vger.kernel.org, AJvYcCVehUBlbpVCzwLALZh1Zc8m6BMjqxdxleqW01NiN086UgIUJKkXcdwhcz+CIHklfIcKTntiEZK7IVEd@vger.kernel.org, AJvYcCWKgkWcC5I/qRD+EVGTTQChe8UW1440sD+MogJqkALxV09CwbmuVL0LQ1GdM1Mziz1MSRtSizZ0NPHoc+6akQ==@vger.kernel.org, AJvYcCWmuqJIVhdHseERtcLDubnOqNoa7mm9SaIysp7mDCkOyJC3ftjuzcccXfqXkV14Oumea2Pb84zT2QiM@vger.kernel.org, AJvYcCX/f/0UMtL3kYMtTv9NLfSzy+RljlR0bk9EP1aTfImiSfY6lRnEvnnuVvZTH16Zn7azJpiUFa0lGbuPZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnE4h9ZL8/PjdHeccvqkKQyTZymbijRnJEG8letTMeYXuN+rVk
-	Ea58tGhbbbBuKInNh6mYWWTiCK/sponVjvt4y/8Q2lJORImSHP4t9MYTYMZXBfVnnzb8hInyd3Z
-	hA5Txoc2oDndm6eJj2lNU8J9VX9sH+TzDHxTQoMHKIQ==
-X-Gm-Gg: ASbGnctF7TubNPR8nXjABLwAbAovoikkJJWyA2KxcojMSOmbXvqweSrxDkZ0z8WdyZO
-	hS7gmDYDrbMKsh3Lm+4g7hG/8fh3OQVpBJYJi+EOgspVXLlNS+9zcSFMfuh6tUnSUC3ReVBou4w
-	pPZtiBxVLIqvrnCLZ31DbopEaU4czkD9UadP8R8V45Bdv7U1uUdJUy6ZJe+S5rTT8+d+24bjL9x
-	7Sxwaw=
-X-Google-Smtp-Source: AGHT+IHreI+It7iS6Rfr+brWbz70Us6HtoYs+C56L+JOM9s0ucMSXKqtnWOloo9akQbTFfs/x14TcE577HD2A1hPXyo=
-X-Received: by 2002:a05:6402:278f:b0:612:d3cf:d1e4 with SMTP id
- 4fb4d7f45d1cf-619b707c2a0mr6715378a12.8.1755520772728; Mon, 18 Aug 2025
- 05:39:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qQsitWqI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD79AC4CEEB;
+	Mon, 18 Aug 2025 12:53:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1755521605;
+	bh=4ag9/39dFWU8GkiOlWASTAeMNygUPvBXL7NuEXQxR7s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qQsitWqIzzmSUDsr0D8usEOQWi4JmCBqlGyU7y3KpF5gzPX0VLVT5wUACsZKP1T9e
+	 LodCbUNOoMKz4i/3gVrIQ1ouvq4bUWG4A6dlTc+nNuw+P3DYTWugLd0V5pBVr+d5w8
+	 GhbpcQAcBTk+U3unEM6dISCISyQ0K4iAs4res3kk=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Stefan Metzmacher <metze@samba.org>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.12 043/444] smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()
+Date: Mon, 18 Aug 2025 14:41:09 +0200
+Message-ID: <20250818124450.554409951@linuxfoundation.org>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20250818124448.879659024@linuxfoundation.org>
+References: <20250818124448.879659024@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250812235228.3072318-1-neil@brown.name> <20250812235228.3072318-5-neil@brown.name>
-In-Reply-To: <20250812235228.3072318-5-neil@brown.name>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Mon, 18 Aug 2025 14:39:21 +0200
-X-Gm-Features: Ac12FXwaOAmOjlUtH5bpB7wOuhOZPTQBUdVvt2kp3aUZBDH4-UANLHNzz7IOKqs
-Message-ID: <CAOQ4uxjFPOZe004Cv+tT=NyQg2JOY6MOYQniSjaefVcg+3s-Kg@mail.gmail.com>
-Subject: Re: [PATCH 04/11] VFS: introduce dentry_lookup_continue()
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Tyler Hicks <code@tyhicks.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-afs@lists.infradead.org, netfs@lists.linux.dev, 
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 13, 2025 at 1:53=E2=80=AFAM NeilBrown <neil@brown.name> wrote:
->
-> A few callers operate on a dentry which they already have - unlike the
-> normal case where a lookup proceeds an operation.
->
-> For these callers dentry_lookup_continue() is provided where other
-> callers would use dentry_lookup().  The call will fail if, after the
-> lock was gained, the child is no longer a child of the given parent.
->
-> There are a couple of callers that want to lock a dentry in whatever
-> its current parent is.  For these a NULL parent can be passed, in which
-> case ->d_parent is used.  In this case the call cannot fail.
->
-> The idea behind the name is that the actual lookup occurred some time
-> ago, and now we are continuing with an operation on the dentry.
->
-> When the operation completes done_dentry_lookup() must be called.  An
-> extra reference is taken when the dentry_lookup_continue() call succeeds
-> and will be dropped by done_dentry_lookup().
->
-> This will be used in smb/server, ecryptfs, and overlayfs, each of which
-> have their own lock_parent() or parent_lock() or similar; and a few
-> other places which lock the parent but don't check if the parent is
-> still correct (often because rename isn't supported so parent cannot be
-> incorrect).
->
-> Signed-off-by: NeilBrown <neil@brown.name>
-> ---
->  fs/namei.c            | 39 +++++++++++++++++++++++++++++++++++++++
->  include/linux/namei.h |  2 ++
->  2 files changed, 41 insertions(+)
->
-> diff --git a/fs/namei.c b/fs/namei.c
-> index 7af9b464886a..df21b6fa5a0e 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -1874,6 +1874,45 @@ struct dentry *dentry_lookup_killable(struct mnt_i=
-dmap *idmap,
->  }
->  EXPORT_SYMBOL(dentry_lookup_killable);
->
-> +/**
-> + * dentry_lookup_continue: lock a dentry if it is still in the given par=
-ent, prior to dir ops
-> + * @child: the dentry to lock
-> + * @parent: the dentry of the assumed parent
-> + *
-> + * The child is locked - currently by taking i_rwsem on the parent - to
-> + * prepare for create/remove operations.  If the given parent is not
-> + * %NULL and is no longer the parent of the dentry after the lock is
-> + * gained, the lock is released and the call fails (returns
-> + * ERR_PTR(-EINVAL).
-> + *
-> + * On success a reference to the child is taken and returned.  The lock
-> + * and reference must both be dropped by done_dentry_lookup() after the
-> + * operation completes.
-> + */
-> +struct dentry *dentry_lookup_continue(struct dentry *child,
-> +                                     struct dentry *parent)
-> +{
-> +       struct dentry *p =3D parent;
-> +
-> +again:
-> +       if (!parent)
-> +               p =3D dget_parent(child);
-> +       inode_lock_nested(d_inode(p), I_MUTEX_PARENT);
-> +       if (child->d_parent !=3D p) {
+6.12-stable review patch.  If anyone has any objections, please let me know.
 
-|| d_unhashed(child))
+------------------
 
-;)
+From: Stefan Metzmacher <metze@samba.org>
 
-and what about silly renames? are those also d_unhashed()?
+commit 5349ae5e05fa37409fd48a1eb483b199c32c889b upstream.
 
-Thanks,
-Amir.
+We should call ib_dma_unmap_single() and mempool_free() before calling
+smbd_disconnect_rdma_connection().
+
+And smbd_disconnect_rdma_connection() needs to be the last function to
+call as all other state might already be gone after it returns.
+
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ fs/smb/client/smbdirect.c |   14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -277,18 +277,20 @@ static void send_done(struct ib_cq *cq,
+ 	log_rdma_send(INFO, "smbd_request 0x%p completed wc->status=%d\n",
+ 		request, wc->status);
+ 
+-	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
+-		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
+-			wc->status, wc->opcode);
+-		smbd_disconnect_rdma_connection(request->info);
+-	}
+-
+ 	for (i = 0; i < request->num_sge; i++)
+ 		ib_dma_unmap_single(sc->ib.dev,
+ 			request->sge[i].addr,
+ 			request->sge[i].length,
+ 			DMA_TO_DEVICE);
+ 
++	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
++		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
++			wc->status, wc->opcode);
++		mempool_free(request, info->request_mempool);
++		smbd_disconnect_rdma_connection(info);
++		return;
++	}
++
+ 	if (atomic_dec_and_test(&request->info->send_pending))
+ 		wake_up(&request->info->wait_send_pending);
+ 
+
+
