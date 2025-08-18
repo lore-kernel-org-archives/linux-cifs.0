@@ -1,72 +1,72 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B276D199BC
-	for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 21:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0EC212D83
+	for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 21:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755551808; cv=none; b=qcJk3gLv8if0C+ylMSEmJQiofiTZohCCh5v0GcRmPf4lBdSrUkFXsfXEM4ytwiSQd822eHraqcWiub+t71CV5XxOU5gQhUTmYa84LE2lWfbqq1ayDox+oOAVVAuJxajTq3lpQTiZ5/K9H5xt26NXX/TI2rWmNe5zR52+vdrTXpY=
+	t=1755552969; cv=none; b=iHGQDW+AM9pjCu72q0cX0fIAQ2bbEf4FAnqrXSMR/4XoW1v4GCXaDg2/vxHtOfclxLY2HpGcPVRl9mXuRSDEMWWs+HvaEncyE3j3N/H8ditHjU0PurzfbquFDHm8SSkA6FEI52cwqmFMpbxOVuhUOcXPzVuU+HihCqzBvxoBvwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755551808; c=relaxed/simple;
-	bh=N6U2qlmXc5XuYPKuU/vRgiIXy0vnWBkWmdf/jqkTEUU=;
+	s=arc-20240116; t=1755552969; c=relaxed/simple;
+	bh=dWQRQ4G5D1AgRped0ijjh0w8xHjtRo/0tl+3G4fKW+U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sR4ZeA1lB+yHjIPeGYvVjLhuHQl4KqmNjFOcu3yM7pCva6VIOKdf6dfd7g+8RGQN6ZDIFFMhBkA0j4LF0mQj4IOvxR1pvVq+UxjPnaPip0AVEZjFkKRHCqEcnBpC6H9YxusuvRaK1Q+/fgfbzsP/ameF8b8scfQq+YPyL+Zg4No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ErkpSITq; arc=none smtp.client-ip=209.85.219.48
+	 To:Cc:Content-Type; b=WcLttDhDXy801Jy8XwEKs3HZ2t5854YbQ66RRWg+nmZbsuIz0Oj0DKFzZxZQ0TnlxCFY6Cq9s+UnqobvlK1JnOrmkCQ91Ju8wBfnElDHmfLulofB3QObU8F9YQuqIavmza4g7S1LQkIUJPvP7AV63+uCTnP8RToArkyxYvH3pEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCaTI3Zx; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErkpSITq"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-70a9f6542f7so36311216d6.3
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 14:16:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCaTI3Zx"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e87031323aso488264485a.0
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 14:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755551805; x=1756156605; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755552966; x=1756157766; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oWUVlv2pojTIZeWyJnueWXNvBqStnI18c1h6l2zfAKg=;
-        b=ErkpSITq51itJTsoW32AkyhVzljMbgHkRpXhJ/R2ptzozCq291KO/5lt8G60GjZANA
-         I4hmgzm/0SfuRgni08T0prn/+MMj2zoc+wpQQtWoSw2crq84Ex1yWj3mZNUZ1aJyxUGZ
-         235gg8FG+VHico1zIdA0sagZAhHPilG2D0W0Lg0GF29Vgv1Ck53O2Q+ejllPbrm3mUZT
-         s4lZHZdKP3yb8al/chSmCTMJYuylmVCBTRon9+gM+Ww5Al2chnLN6H6CFuKwhH8V73TM
-         oJNPY+HIa2WvFb7TUXWuDb1c8ZGSqZ+WiWyuk1x5sc3wVsTFdynQIzLsmYzsRWpCZnbm
-         5tXA==
+        bh=G5mC/vEOmShR27O6wi76fydoZyaSh4/O0s70DRwKZfc=;
+        b=CCaTI3ZxpLY5PmgfAQ9pAM14/F+nOfira9e1nKy04Rw3lNcPOEYfUsT2DSpxBlFuP6
+         UNQrHRMwngFteUc8GKOiRZMvLfmOiham9r4MWe2ogXJ4fz2rP1L0NCyCTD6eliDgKXGG
+         ShcF9nlFHTG8elyWElqPMQBX0Q/z1OG4yn0CJHyG7FEAV8aCxpJ+g0wRTuXHEpXlCBk9
+         PULbcAGBv+LPl5+YkJZwAVp51xL0biYhVSPmc0WGdIU0P6DZtAx5HaydK52oyNTPshQr
+         KUIOaVlf8lvhCTemKwVMq/afMpgGxoeF7ApTgo2grVL8QIAQFMvtn0drBtyn+PuZlfqq
+         JzYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755551805; x=1756156605;
+        d=1e100.net; s=20230601; t=1755552966; x=1756157766;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oWUVlv2pojTIZeWyJnueWXNvBqStnI18c1h6l2zfAKg=;
-        b=XnPB4gXrdAbLpGDzeeh8y41vDZACykPm46aWUkV7RHNg8aZMlEcwmfuwfvMxcKipUQ
-         kYQ4LQchuqL+IlfcxCcAu6yA10U1g7iY+KcujScNgD0e07oKhYpUFVcYwWWjBYJV+kjx
-         T8XH/hL5DorKfyl1ToyclBwnrbuO+4arQ5M8SIKvXTGoXBm149P7bcOeF+LGA8WPTKGU
-         vuYLmSB6lTBGCRZusbn0W7FdY2wK6cTKukVQcFF3KYk052jdqkSPiaOGMwdvJ+MNFCe9
-         1C3SE5m7G6LBvr6rzgYburalTRCEWE1OdZ7AjQMUK5QGdkoLZeHNzCL3wbUz9XDDpEgU
-         6bIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWs2y+uhgDzzfbwozpx00HTJZlB1l9u63Du6V9a1xXlUScwJJfRWuD+14bOKL89sIZAotjDVnc2RR1i@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQgnVEK8sYOYiN7IAXfCYSsemBeyKse7lzfVwkRCxfUXnZsXb3
-	LJoM43LFkuSz/4/Ixt9DrirPfRAYtvyufAF6c1UvkDrtqFzMSdxIzTNHbr6AeIxK0D74M4ox0vr
-	gMHCs+eF/kYQ7b9vh2M1HorQUpvbFOBs=
-X-Gm-Gg: ASbGncuGvDmSGW9sFHqrOClL6c+47bdf42sAdn9PCxbUAZXKehqacxnYeARwz2qmGn3
-	AfmzPd+jT+T6dn7SOmAGLUBef6uc2AiTPIGebMGOi4zr4CgyabmEA4TwnLYGq9FiTFJs/cQycq0
-	xS9AN+WvbyCRb1UuOeFztGnvgmuetEXUS5q8HftQ2DvOQZskVPAg939PqSq8yZxeFdrpbaxDJif
-	/0nnBajEjnO8G/q1t3cuwiIaiy+4e/fGXr8zDh1BhwLtcp86tz7tNKGROigPA==
-X-Google-Smtp-Source: AGHT+IFi2SGje0Y2893DKnfTCa0l25x98OF8buxJoMBcEXDVGk1mEhrTbgDHJ+cDcq4vBzms9t0uvv62umtFCvTw3jk=
-X-Received: by 2002:a05:6214:f09:b0:70b:ab91:4c74 with SMTP id
- 6a1803df08f44-70c2b6ffd83mr1701616d6.6.1755551805344; Mon, 18 Aug 2025
- 14:16:45 -0700 (PDT)
+        bh=G5mC/vEOmShR27O6wi76fydoZyaSh4/O0s70DRwKZfc=;
+        b=HtFkKhsb8qFkpAyvceXp7N4eoh4ik2+dREUiM0jnPwqfY6tCcbIm86Lzld+HwO9/zE
+         uhmHMx2+pA9GLNMfA9O9z2M9Inmul6CZOwwu3Uld5FU7fJEjFQw9DWkDAMJ7cMr8rFIW
+         MExf1mdWDLJVWfrsH0crQsuKj+9nZQRBAoYh792iUwbUPbmnYsxO02r9PaBrkuRMtgGO
+         ImGAtJRKH+LyJwhpk22XbCeDDvG512mS+vCkei4dmyqDhasQoUAKKl25gSO1wy4qkDl+
+         ap01f6cAeE+yDIyapXG3j31ExFIV7o+6yLRGwYAezU83frVg21gEMwlaIdpBVS0pLQZJ
+         +K9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVuCI96vVlviM0g5zLGZuyPLKvGqE8onc3kkpEIksxUcGdewRNDAWZMfRGlZ/bHYVDDb0/5PXQD7pZJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YySktUnYaQUOJRXLso7Qde2x5MA8QfrTs5yczZSpp+UzJy4gg7R
+	qAzzlZ/CgdY4lQ8g0zUwE1Vpsaim6BNNHEQ2TtuQI/xI+94qUcsy2hrw7MN1HNKEjsC9MfbYIec
+	/xqGhp5m7E62jf3vWTq6dOhDsdPBkPz8=
+X-Gm-Gg: ASbGncuwQd/sToV2XVMaoYBeUmDuwqzMwnro+bmrJ3w7F744VlRDDhXdmOCOs6TBHhd
+	Vrsq/LBry2KPwKEvAZi57T1EPnu6g098Uf6fThOL+I//JyqHXL7i63yMg8gopQ2QuLXw0QxeS3W
+	zEyXMoCUghKxAusyAHlrG1WuZD5puysNYvRuju+L+IR31xiaqIJK/b4mhj3fiJ5kt6ZrkWFXltJ
+	tyYqsX9s3bpu4OKoVSOKu8CeCkdEAlTmAFUJA+b/mHPLXERn1A=
+X-Google-Smtp-Source: AGHT+IFCD3fWR6YXHpR5xA57y6bIdD9fhdz9RgOmb8Z6skSFYDLwFSNjuIkAJ87UjM5aKAWJSNhWFgEp2B4u2BOAPCw=
+X-Received: by 2002:a05:620a:4611:b0:7e3:495a:2982 with SMTP id
+ af79cd13be357-7e9f3203f7fmr63800285a.0.1755552966242; Mon, 18 Aug 2025
+ 14:36:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c2d9d516-d203-44ff-946d-b4833019bfd5@samba.org>
-In-Reply-To: <c2d9d516-d203-44ff-946d-b4833019bfd5@samba.org>
+References: <05881546-b505-4c0e-8d95-ee1c24f01fc8@samba.org>
+In-Reply-To: <05881546-b505-4c0e-8d95-ee1c24f01fc8@samba.org>
 From: Steve French <smfrench@gmail.com>
-Date: Mon, 18 Aug 2025 16:16:34 -0500
-X-Gm-Features: Ac12FXwFkrVY-BAQyXvf_oMhH1JOC41sBIc0ewltFj6B5gaoPGgg3m6Mz5kzkEE
-Message-ID: <CAH2r5mu_Nm49VaLDvBA_n16MivzUojBBZHwQgS-JNbvL-UsMOg@mail.gmail.com>
-Subject: Re: Current state of smbdirect patches
+Date: Mon, 18 Aug 2025 16:35:54 -0500
+X-Gm-Features: Ac12FXzK3WWfQv2gjrTiA0fcG00Vz4ufIVuhRMAmLI28fp22yC7mEdm-rlI9xWE
+Message-ID: <CAH2r5mtkB_Tbb4Pzba_msMfPs-Tz3ff4udKBRiR1d=f0TTC-PQ@mail.gmail.com>
+Subject: Re: Common smbdirect debugging/loggin/tracing...
 To: Stefan Metzmacher <metze@samba.org>
 Cc: Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>, 
 	Long Li <longli@microsoft.com>, 
@@ -75,66 +75,69 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> Should I post all patches including the ones already in for-next and ksmb=
-d-for-next-next?
-> But resorted, first all fs/smb/common/smbdirect/ patches, then
-> all fs/smb/client patches and finally all fs/smb/server patches.
-
-Yes, that sounds reasonable
-
-> a smbdirect-for-next branch, which could be a shared ground for
-> for-next (client) and ksmbd-for-next[-next] (server)?
-
-I can do that (create an smb3-common-next, and possibly an
-smb3-common-next-next branch if we need to distinguish patches for
-next release vs. next rc),
-but would prefer to wait until we have more of the code moved into
-smb/common.  Probably reasonable to target creating that branch in a
-month or two
-as the common module becomes usable.
-
-
-On Mon, Aug 18, 2025 at 3:25=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
+On Mon, Aug 18, 2025 at 3:31=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
  wrote:
 >
 > Hi,
 >
-> I'm at the point where server/transport_rdma.c only has there
-> local structures:
+> after the move to common smbdirect structures I'm wondering
+> what I have to keep related to the debug counters on the
+> client side, e.g.
 >
-> struct smb_direct_device {
->          struct ib_device        *ib_dev;
->          struct list_head        list;
-> };
+>          /* for debug purposes */
+>          unsigned int count_get_receive_buffer;
+>          unsigned int count_put_receive_buffer;
+>          unsigned int count_reassembly_queue;
+>          unsigned int count_enqueue_reassembly_queue;
+>          unsigned int count_dequeue_reassembly_queue;
+>          unsigned int count_send_empty;
 >
-> static struct smb_direct_listener {
->          struct rdma_cm_id       *cm_id;
-> } smb_direct_listener;
+> And the their use (and more) in cifs_debug_data_proc_show().
 >
-> struct smb_direct_transport {
->          struct ksmbd_transport  transport;
->
->          struct smbdirect_socket socket;
-> };
->
-> All others are moved to smbdirect_socket.h.
->
-> For the client I'm almost there I just need to
-> finish the move of struct smbd_mr.
->
-> Should I post all patches including the ones already in for-next and ksmb=
-d-for-next-next?
-> But resorted, first all fs/smb/common/smbdirect/ patches, then
-> all fs/smb/client patches and finally all fs/smb/server patches.
->
-> Maybe we want a smbdirect-for-next branch, which could be a shared ground=
- for
-> for-next (client) and ksmbd-for-next[-next] (server)?
->
-> So how should I post what I have?
->
-> metze
->
+> I'd suggest to remove this stuff and later add some tracepoints
+> instead or if really needed some stuff under smbdirect_socket.statistics.
+
+I lean toward keeping the smbdirect debug info that is already shown
+in /proc/fs/cifs/DebugData,
+it doesn't have a performance penalty, and "if it was useful before"
+for debugging
+to display smbdirect related info for a mount, it is it is likely
+going to be useful in the future.
+I don't mind changing this in the future, after there is more
+information about what
+additional smbdirect info would be most useful to add to display for
+the client mounts.
+
+> Also do we need to keep the log_rdma() based message in the client
+> and the ksmbd_debug(RDMA) messages on the server as is?
+> I guess we want some basic logging for the connect/disconnect handling
+> and the rest should be tracepoints...
+
+I am not a big fan of old style (static) kernel debug messages but it
+is probably fine to keep
+the existing ones (unless code changes that would remove a few of them,
+that is fine), but typically the only ones that are 'required' are
+cases that are always on
+logged (for connection errors e.g. that the user needs the additional
+info in dmesg to understand).
+
+And yes, the majority of logging should be eBPF friendly dynamic
+tracepoints (Meetakshi may
+have some ideas on tooling that she can extend to make them easier to colle=
+ct)
+
+> Is something like logging module parameters and output
+> written in stone or can this be changed to be more useful
+> and in common between kernel client, kernel server and later
+> userspace?
+
+They can be changed (logging module parms) in this example, but I
+wouldn't be in a huge
+hurry to ditch it, since there are VERY likely things that are client
+specific logging
+for smbdirect that we would not want to to turn on for both client and serv=
+er.
+
 
 
 --=20
