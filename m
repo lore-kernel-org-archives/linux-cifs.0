@@ -1,111 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD662D661E;
-	Sun, 17 Aug 2025 15:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A070C27E060
+	for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 09:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755443890; cv=none; b=CDdxVrhgRYj/EG0LNmps8RkHc/Oz1vmC77Aa4/TIv+gS6Y7lMxXXVYuTwA80fAJx/f+0WpVPWaIUc3oQe8syttL7HJBf4ByXcfjO7qGl4A1DiItQF35FMXbKaR5pZ+1iQjo62sSB/tImAC751VJd7G00DmkMhnJ5gIYbbWlBmeY=
+	t=1755511164; cv=none; b=sRxZBl/iBLRC37r6t7BrdAzMFfW6mPYG7fZ4F8Ea58MKC95PWvqpPrSUK0Ur2VU0Hla4RF6O6W8Imr+Jv9PxYHNHeP4HiCi0KxDnRrxH9dYCUMhznzUtOGV+aNRNYpCZpNCMjYwRB6QSI3I95QtMxROhaApxETMmGrjULLRdxnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755443890; c=relaxed/simple;
-	bh=LyPfSJ08gXe2Mafj0QxOtH639p2yKbJSlC+RMG8P6eA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QVhwK+Nxct4r6fMFxUjocyRQpfEyLCaAwOKoAEcRENYjT3pV3c6MWcmNbWbKO8b4EX8v9/YasV4uMyDVd+ZstypVIKb5EUo8oDtaiFy5SMdW4D7hEM5UbJEtvkRRSpwpZ3IxFV+IVt1EOvTKRBU0GI//crAaD1DHSonMhhYUsno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF44GdGx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755511164; c=relaxed/simple;
+	bh=/C9Csrxdh1sYcqWltONMtXTrt08x9QqeTMlZNgDLvCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=m/tgY7nBQYOtITt6xW2nZmguiz6a2P2/SeSf0B27FPZIh+kFXU5QNBL0wjDR0paAjzbOeF0TNdPi7iSg3JcKJFOnYB6BCSrOjpRfcOLu3SZP+N+yEg3AdBpPCUUghc5V+xYXiNlkVpQurVgtISoAP215v+BBa5k25+9je/9rw/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kuEHS/mf; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF44GdGx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64E5EC4CEF1;
-	Sun, 17 Aug 2025 15:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755443890;
-	bh=LyPfSJ08gXe2Mafj0QxOtH639p2yKbJSlC+RMG8P6eA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LF44GdGx52EouSBrPYTvuovh6THAXziEiidagpgL5IH06thCiJhO0coahZ5dCkfoo
-	 SQvC26dvHqY/8kGbUmwyCpL4t2aeIYgq6Z4l9rQWts5AfQLKWPd7DLbJy0u/OwZDnr
-	 8pcXYWvbmWTes6lwkr45FQaCqxlMtVIsHNEaSbIxHaQKiTtIHB/I7JyHPcKmZm1Sgw
-	 W8/bWenlECKBT0sZ1Mx+9E4hU9e4Q2IrNPvWL4xtxKUOJ+35SFSwBzTXErQee4tOg+
-	 nzSVHn9snv2jfdZqmuvrzI7Ba0bk5n+LeCIOhDgyQ9NxAdrEGHprws6pIVzLLBsvH4
-	 wBoB0ggmjX0nw==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Stefan Metzmacher <metze@samba.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4.y] smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()
-Date: Sun, 17 Aug 2025 11:18:07 -0400
-Message-ID: <20250817151807.1835667-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <2025081755-subdivide-astound-6aef@gregkh>
-References: <2025081755-subdivide-astound-6aef@gregkh>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kuEHS/mf"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3b9d41c1149so3017438f8f.0
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 02:59:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1755511161; x=1756115961; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qZDLlNuYLU9UmeoCuzZO1+X4n+CJQR7oR8AjhafJt6M=;
+        b=kuEHS/mfIyAN3GAxIk1mSA1lt4VDPAKXPuOoZDzsOUvJgimm7zdIbPsix6fbyNMtZt
+         kEfQvqKia2oFQHzd4rOLd+gwM9DlKm0NrXVLZ3KOXKvTPtEoY/y4bbTvAu1qeU46Vg2H
+         mJNChdIixR2De/GddNzrHS+/ktE5suyDaulm96HyhgpdE8i1UjDk2oSIuegAvmDJGAjw
+         WtxG0X1O+dTVQHgR/K83bjTwq8dg1tlt2zOgAfcdWybu7HR9lPN/hnq22Hak9hxdQoyH
+         54FqEsRRakwPnoS5UYxTR68itfMc4INvkLOD0YYXtk3W+JgVvpeeKCQccmoDppARhaBB
+         wcjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755511161; x=1756115961;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qZDLlNuYLU9UmeoCuzZO1+X4n+CJQR7oR8AjhafJt6M=;
+        b=lKRjDeGoqZ0DUgr370inePZyR6r/B76503MgJam7hVXiAwfCMj6YKlMhRgXEIww5C6
+         UGPY5nzEfyblCNZBX/pe69ufPIRdDBs1D26nALIc42tvFN14QWQ9avMqovNV+VgP9OWz
+         kW1HVMdF/dx2ZqcUka7hNGQY4iLseaVvjI2Opj43ZyOKe1Fqk053zjB/hByVTu8AKGTr
+         8ziIkHwQ3XTQYHHJpWxSEF/HdbTnd+0JoJ+5zO+wONOtRozLgWrAiSSRT5ikjk5Jbd9g
+         XAxLOWgZu3pbD6GAxG8S19yN8jBV1KSdu02xvIkbgJ19jXxpv3ChJo20ZW8VR/5FWzNj
+         vkJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPtGfnLHcm+VdkqRGBeNVcDHgj7bMhqqe5p3uOGOuWk+ptCg62FWt8cyCkpBFGGd8FsZgeuqyjHqql@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlaAnUBCnnjl2qFHhTYXYc+BJtfEKpmRHrwSpLkLKWgbS/6kYY
+	gK8GEwXMb1Rxzxzcayog2FFX3bTvBa0HiWl4Bso4xwqGWgPQHiMA4O7KpQ6Y8zEger0=
+X-Gm-Gg: ASbGncunvymBwVLObvcQR02qvGIt3ez3kxvNT3nAgavanVSg9rnwYLjA+C9z/U8Tse5
+	dE+pWhRB8HCDSnpLWiWc5akwYQbDRCkH54WHoJ4+W7u28G9gXlzlYoeYVV/9capx66vl2xk46nw
+	rT1X5CD/iD7Ez8a23upZwGchxnpCA5B9PxFlTF5icE2z5/vBXtcA7qV9p8gFrM1pGglETcA5ba9
+	VQDLp3nHExawE3QO7towDFjPaDFR9A8cf5z2nilLsmagYIoYrEGsW++M1SVz35moMP7uuoENuuL
+	gDsLFQ57pD6klGMh5l8gmq5CwpEOauRbmWYo1uPtd8XFzYfqsN3N86SX1ZIQy745JBP4iG0yUV9
+	u72qYLTi7L2UremJ1gBN74f8YJAVFgAwqjnAX5aAJ2/V89PMry5TP7w==
+X-Google-Smtp-Source: AGHT+IEAVhk6tBtT8QiYf3c/clKbpVmq0dinSHoKmOjMnv18pQ2Ji8dtljdjZJFXIYwlEZU7sho8fA==
+X-Received: by 2002:a05:6000:24c2:b0:3b6:936:976c with SMTP id ffacd0b85a97d-3bb66f0f6f2mr7896857f8f.17.1755511160898;
+        Mon, 18 Aug 2025 02:59:20 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-45a22329b12sm126502615e9.24.2025.08.18.02.59.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Aug 2025 02:59:20 -0700 (PDT)
+Date: Mon, 18 Aug 2025 12:59:17 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH next] smb: client: Fix NULL vs ERR_PTR() returns in
+ cifs_get_tcon_super()
+Message-ID: <aKL5dUyf7UWcQNvW@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-From: Stefan Metzmacher <metze@samba.org>
+The cifs_get_tcon_super() function returns NULL on error but the caller
+expect it to return error pointers instead.  Change it to return error
+pointers.  Otherwise it results in a NULL pointer dereference.
 
-[ Upstream commit 5349ae5e05fa37409fd48a1eb483b199c32c889b ]
-
-We should call ib_dma_unmap_single() and mempool_free() before calling
-smbd_disconnect_rdma_connection().
-
-And smbd_disconnect_rdma_connection() needs to be the last function to
-call as all other state might already be gone after it returns.
-
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-[ Use `request->info` instead of `info` ]
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 0938b093b1ae ("smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- fs/cifs/smbdirect.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ fs/smb/client/misc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 0842a1af0b98..c8ab767ab138 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -272,18 +272,21 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	log_rdma_send(INFO, "smbd_request %p completed wc->status=%d\n",
- 		request, wc->status);
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 3b6920a52daa..d73c36862e97 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1116,7 +1116,7 @@ static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+ 	struct cifs_sb_info *cifs_sb;
  
--	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
--		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
--			wc->status, wc->opcode);
--		smbd_disconnect_rdma_connection(request->info);
--	}
--
- 	for (i = 0; i < request->num_sge; i++)
- 		ib_dma_unmap_single(request->info->id->device,
- 			request->sge[i].addr,
- 			request->sge[i].length,
- 			DMA_TO_DEVICE);
+ 	if (!tcon)
+-		return NULL;
++		return ERR_PTR(-EINVAL);
  
-+	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
-+		struct smbd_connection *info = request->info;
-+		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
-+			wc->status, wc->opcode);
-+		mempool_free(request, info->request_mempool);
-+		smbd_disconnect_rdma_connection(info);
-+		return;
-+	}
-+
- 	if (request->has_payload) {
- 		if (atomic_dec_and_test(&request->info->send_payload_pending))
- 			wake_up(&request->info->wait_send_payload_pending);
+ 	spin_lock(&tcon->sb_list_lock);
+ 	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
+@@ -1141,7 +1141,7 @@ static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&tcon->sb_list_lock);
+ 
+-	return NULL;
++	return ERR_PTR(-ENOENT);
+ }
+ 
+ struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
 -- 
-2.50.1
+2.47.2
 
