@@ -1,42 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40977335BA8;
-	Mon, 18 Aug 2025 13:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6966931B11A;
+	Mon, 18 Aug 2025 14:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755524777; cv=none; b=CVPndgPIKq9cT3mrK34BOsIKHXa8BhBv/m+zkdrQtE3MrncnjSqMtZtGohPUU4MofFDYUn0ioCdST9Qvrjz/Vu6RxYCcdhokWSjo09eu7t+EorPplU+6qkGvHSrd7pEgvTbkC4w/KQeJ7/bB0+Nf0mlxRLU/Cs4wLq9T6SJYupY=
+	t=1755525769; cv=none; b=YsHoCgkdNfq1BC0km+bcdhu1votTLUiZlOmUgqlpP9OWA+0g8gbsIqU/DICXC101uwgCBwBYpksFJ0xBguWD6pYlvmfmd8Wjy/JSDCNJ69Lo0Y11Qjw7fEs21lxV9a7MT0Ui42xKmffejGD/J7/mHn71gL/zYZx1wGZh8x4c0ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755524777; c=relaxed/simple;
-	bh=Irl1Q3zWD7beWeBCIqryy/sBIJ62M789UOylayvbAFY=;
+	s=arc-20240116; t=1755525769; c=relaxed/simple;
+	bh=puUNJUWtaMS8nlTCfzaD6pXcCM3R5WFslJLiAWGYbos=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KComt+dhNUM1qzXHfgmV+hPMoeTMFW0ohukqYLBlXWkmJ1eLTwuKH3pvM57Y48N7gUncyfgIZ385ZyvHeg6eby8pAWR4sqyegrOsO3DK+RncJRkaxlFWu7+9skNUYa3vjoB2YJMyPJx+/IqYrv1S5g2oEU2MBWURf/r+A8B+A3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PY7Tx+KZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=jbCUG/iKTidL+v+ikx0CqXAQ02iU9QZ2mg8yuOPEbDCVN/3Axa8LZTa+Zsa0uvkJU8daLDoA7n+JoRQ1gFRsMKRKWO6CeGvqRAPRzSVSGWZgn7+VG+JdKmfkXbcIT1tuxito6cZe+YhOPrSPu8P4uuUfdBy62Z7LFt3fFlt66tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=W8YhSBUf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PY7Tx+KZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44870C4CEEB;
-	Mon, 18 Aug 2025 13:46:16 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="W8YhSBUf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC51EC4CEEB;
+	Mon, 18 Aug 2025 14:02:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755524777;
-	bh=Irl1Q3zWD7beWeBCIqryy/sBIJ62M789UOylayvbAFY=;
+	s=korg; t=1755525769;
+	bh=puUNJUWtaMS8nlTCfzaD6pXcCM3R5WFslJLiAWGYbos=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PY7Tx+KZbkbJK8Kxa0/iYILeoTEsOfRTOIsRg0FlXUwbjKOunHP/troITBPkgJc2h
-	 br8JzFeMlxef0AzWnJFSocX6PEBfr/9FDsDX1jJeyIVEfbHatrBNXociDQLSgEOp53
-	 oC015NAWsM7DGhVppcgWoUIvSWmELMse3uEz60nE=
+	b=W8YhSBUfu8839JnZZtNFVOXdERzbAIVuxsZULN69Mk/PCrnH/UeWRBObcxVxEdJ6L
+	 EzuuMzO/jWNObtvG+Ndb1m5/0Mi6wN/fk7TeyKX9T9tTcC2lm5LrNUCgm5NbATMfYR
+	 toorcvltQbArTHvgaRdopH57uDKEv4nBDGCH8BzA=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.16 058/570] smb: client: dont wait for info->send_pending == 0 on error
-Date: Mon, 18 Aug 2025 14:40:45 +0200
-Message-ID: <20250818124508.049939641@linuxfoundation.org>
+	David Howells <dhowells@redhat.com>,
+	Pierguido Lambri <plambri@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.16 361/570] smb: client: fix session setup against servers that require SPN
+Date: Mon, 18 Aug 2025 14:45:48 +0200
+Message-ID: <20250818124519.762572033@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250818124505.781598737@linuxfoundation.org>
 References: <20250818124505.781598737@linuxfoundation.org>
@@ -55,54 +54,145 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+From: Paulo Alcantara <pc@manguebit.org>
 
-commit 8c48e1c7520321cc87ff651e96093e2f412785fb upstream.
+[ Upstream commit 33cfdd726381828b9907a61c038a9f48b6690a31 ]
 
-We already called ib_drain_qp() before and that makes sure
-send_done() was called with IB_WC_WR_FLUSH_ERR, but
-didn't called atomic_dec_and_test(&sc->send_io.pending.count)
+Some servers might enforce the SPN to be set in the target info
+blob (AV pairs) when sending NTLMSSP_AUTH message.  In Windows Server,
+this could be enforced with SmbServerNameHardeningLevel set to 2.
 
-So we may never reach the info->send_pending == 0 condition.
+Fix this by always appending SPN (cifs/<hostname>) to the existing
+list of target infos when setting up NTLMv2 response blob.
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: 5349ae5e05fa ("smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Cc: David Howells <dhowells@redhat.com>
+Reported-by: Pierguido Lambri <plambri@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/client/cifsencrypt.c | 79 ++++++++++++++++++++++++++++---------
+ 1 file changed, 61 insertions(+), 18 deletions(-)
 
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1316,10 +1316,6 @@ void smbd_destroy(struct TCP_Server_Info
- 	log_rdma_event(INFO, "cancelling idle timer\n");
- 	cancel_delayed_work_sync(&info->idle_timer_work);
- 
--	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
--	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
--
- 	/* It's not possible for upper layer to get to reassembly */
- 	log_rdma_event(INFO, "drain the reassembly queue\n");
- 	do {
-@@ -1965,7 +1961,11 @@ int smbd_send(struct TCP_Server_Info *se
- 	 */
- 
- 	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
-+		atomic_read(&info->send_pending) == 0 ||
-+		sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED && rc == 0)
-+		rc = -EAGAIN;
- 
+diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
+index 6be850d2a346..3cc686246908 100644
+--- a/fs/smb/client/cifsencrypt.c
++++ b/fs/smb/client/cifsencrypt.c
+@@ -532,17 +532,67 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash, struct shash_
  	return rc;
  }
+ 
++/*
++ * Set up NTLMv2 response blob with SPN (cifs/<hostname>) appended to the
++ * existing list of AV pairs.
++ */
++static int set_auth_key_response(struct cifs_ses *ses)
++{
++	size_t baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
++	size_t len, spnlen, tilen = 0, num_avs = 2 /* SPN + EOL */;
++	struct TCP_Server_Info *server = ses->server;
++	char *spn __free(kfree) = NULL;
++	struct ntlmssp2_name *av;
++	char *rsp = NULL;
++	int rc;
++
++	spnlen = strlen(server->hostname);
++	len = sizeof("cifs/") + spnlen;
++	spn = kmalloc(len, GFP_KERNEL);
++	if (!spn) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	spnlen = scnprintf(spn, len, "cifs/%.*s",
++			   (int)spnlen, server->hostname);
++
++	av_for_each_entry(ses, av)
++		tilen += sizeof(*av) + AV_LEN(av);
++
++	len = baselen + tilen + spnlen * sizeof(__le16) + num_avs * sizeof(*av);
++	rsp = kmalloc(len, GFP_KERNEL);
++	if (!rsp) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	memcpy(rsp + baselen, ses->auth_key.response, tilen);
++	av = (void *)(rsp + baselen + tilen);
++	av->type = cpu_to_le16(NTLMSSP_AV_TARGET_NAME);
++	av->length = cpu_to_le16(spnlen * sizeof(__le16));
++	cifs_strtoUTF16((__le16 *)av->data, spn, spnlen, ses->local_nls);
++	av = (void *)((__u8 *)av + sizeof(*av) + AV_LEN(av));
++	av->type = cpu_to_le16(NTLMSSP_AV_EOL);
++	av->length = 0;
++
++	rc = 0;
++	ses->auth_key.len = len;
++out:
++	ses->auth_key.response = rsp;
++	return rc;
++}
++
+ int
+ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ {
+ 	struct shash_desc *hmacmd5 = NULL;
+-	int rc;
+-	int baselen;
+-	unsigned int tilen;
++	unsigned char *tiblob = NULL; /* target info blob */
+ 	struct ntlmv2_resp *ntlmv2;
+ 	char ntlmv2_hash[16];
+-	unsigned char *tiblob = NULL; /* target info blob */
+ 	__le64 rsp_timestamp;
++	__u64 cc;
++	int rc;
+ 
+ 	if (nls_cp == NULL) {
+ 		cifs_dbg(VFS, "%s called with nls_cp==NULL\n", __func__);
+@@ -588,32 +638,25 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	 * (as Windows 7 does)
+ 	 */
+ 	rsp_timestamp = find_timestamp(ses);
++	get_random_bytes(&cc, sizeof(cc));
+ 
+-	baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
+-	tilen = ses->auth_key.len;
+-	tiblob = ses->auth_key.response;
++	cifs_server_lock(ses->server);
+ 
+-	ses->auth_key.response = kmalloc(baselen + tilen, GFP_KERNEL);
+-	if (!ses->auth_key.response) {
+-		rc = -ENOMEM;
++	tiblob = ses->auth_key.response;
++	rc = set_auth_key_response(ses);
++	if (rc) {
+ 		ses->auth_key.len = 0;
+-		goto setup_ntlmv2_rsp_ret;
++		goto unlock;
+ 	}
+-	ses->auth_key.len += baselen;
+ 
+ 	ntlmv2 = (struct ntlmv2_resp *)
+ 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 	ntlmv2->blob_signature = cpu_to_le32(0x00000101);
+ 	ntlmv2->reserved = 0;
+ 	ntlmv2->time = rsp_timestamp;
+-
+-	get_random_bytes(&ntlmv2->client_chal, sizeof(ntlmv2->client_chal));
++	ntlmv2->client_chal = cc;
+ 	ntlmv2->reserved2 = 0;
+ 
+-	memcpy(ses->auth_key.response + baselen, tiblob, tilen);
+-
+-	cifs_server_lock(ses->server);
+-
+ 	rc = cifs_alloc_hash("hmac(md5)", &hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "Could not allocate HMAC-MD5, rc=%d\n", rc);
+-- 
+2.39.5
+
 
 
