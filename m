@@ -1,108 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F243218D1;
-	Mon, 18 Aug 2025 12:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96DE31CA48;
+	Mon, 18 Aug 2025 13:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755521631; cv=none; b=mFe/WVZlzUsYWPOdeeV8Puams6UlhYiKaiTXRwDY4IW0EY6wR2syCNciQGmzK0MpQt8o9kQTAr8qLf2B4PIFNX/XuGvKIMJKzQM9flZeywgivQKdTKlYxZYDJs5Q2LPXHhY1zuvJ+G4uelUwp3mjJJh/b6PZgJecWDnZLaApziY=
+	t=1755522233; cv=none; b=DvVSTE/fNPvAgj1eRbD2AKxVDcKV+aUwO8zeqWuoyMQVpV6D32kRMEXLlnISWEK0QnqhXkB0cbL98keNlVLzQjW+cLeXWDVY7wjCum2EkNU3tX42J5nrkoB5hkHZ0cWsa/SgwuCo4bhKWQDDMSQO4R3br2AK8adI//BysZ8kvro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755521631; c=relaxed/simple;
-	bh=hUK5XGZZc+nOJmM+vEqh+KCW/0xTI3RCXBdEPpIuuzc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j3zLzuoOHDZHV3Odp7J5kvzVKNHR3aN08CwGaAapZO3Cn9Rs1IYrO5/LZCMalTLL8gOTK4as9X2Oz3E0C8vXfuRbo3AuAYhI16oDJoi5ErnXEM1sujWLnT4f3FyFqec6fmq+mrN7/qlJU0y59gKBWrkYebJ6xjGQdMv9p3oS1W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=dA5dCiR0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="dA5dCiR0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD98DC4CEEB;
-	Mon, 18 Aug 2025 12:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1755521631;
-	bh=hUK5XGZZc+nOJmM+vEqh+KCW/0xTI3RCXBdEPpIuuzc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dA5dCiR04fj/TtNcaPNxXD9Xv9Fg3jksbYyrrJCeUsNdsFcZ6uCKaU2sZKqv8O8Vo
-	 1Xa+5wqAJttnpcBXdQZtI5blf/YHf8WYPov9435C3a3Hd+5sIr/fQuqyfc+IplPyWO
-	 nZE3aO4AwFlJRFpL6eN7a7zpYnhJ1pVef3jdf7G8=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.12 044/444] smb: client: dont wait for info->send_pending == 0 on error
-Date: Mon, 18 Aug 2025 14:41:10 +0200
-Message-ID: <20250818124450.590678467@linuxfoundation.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250818124448.879659024@linuxfoundation.org>
-References: <20250818124448.879659024@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	s=arc-20240116; t=1755522233; c=relaxed/simple;
+	bh=3eSzentkqOibXZaENmGblqSTCJYk6IoR9S8VOJLZgsE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R8ToxDeH4+q+YBw3iI2E61Gh1q0d6pRPhtyCMjdOd6gaxnEIO3PI899aT7+nZSr7rO/n3IjYKGFgFlD3kNWsLJS/ceSnhepyBIMXEk8P5S1jvf6e6lGkYXI/YF4gL8h3a+5XccongXHgjDgUFbTkvSqDlbk0zAkycIOT9u5RdnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4c5CZr3RglzKHMVL;
+	Mon, 18 Aug 2025 21:03:48 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id D97FB1A0875;
+	Mon, 18 Aug 2025 21:03:47 +0800 (CST)
+Received: from [10.174.178.209] (unknown [10.174.178.209])
+	by APP4 (Coremail) with SMTP id gCh0CgDHjxCwJKNoY2JrEA--.45177S3;
+	Mon, 18 Aug 2025 21:03:46 +0800 (CST)
+Message-ID: <89a2023c-e383-4780-83e3-ba8f9e44c015@huaweicloud.com>
+Date: Mon, 18 Aug 2025 21:03:44 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH next] smb: client: Fix NULL vs ERR_PTR() returns in
+ cifs_get_tcon_super()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <aKL5dUyf7UWcQNvW@stanley.mountain>
+From: Wang Zhaolong <wangzhaolong@huaweicloud.com>
+In-Reply-To: <aKL5dUyf7UWcQNvW@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgDHjxCwJKNoY2JrEA--.45177S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uw1kXF1fJryxXr43WF4Uurg_yoW8tr4UpF
+	4Yk34UCFs8J3yDXw4xZFn5C3WF9w1DCFyDCrn5C3Wvvw45ZrWjqFyUK34jvF1SyrWUW348
+	WFsFyasIv3y8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
+	7KsUUUUUU==
+X-CM-SenderInfo: pzdqw6xkdrz0tqj6x35dzhxuhorxvhhfrp/
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
 
-------------------
 
-From: Stefan Metzmacher <metze@samba.org>
+> The cifs_get_tcon_super() function returns NULL on error but the caller
+> expect it to return error pointers instead.  Change it to return error
+> pointers.  Otherwise it results in a NULL pointer dereference.
+> 
+> Fixes: 0938b093b1ae ("smb: client: Fix mount deadlock by avoiding super block iteration in DFS reconnect")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-commit 8c48e1c7520321cc87ff651e96093e2f412785fb upstream.
+Hi Dan,
 
-We already called ib_drain_qp() before and that makes sure
-send_done() was called with IB_WC_WR_FLUSH_ERR, but
-didn't called atomic_dec_and_test(&sc->send_io.pending.count)
+Thank you for your patch and for taking the time to address this issue.
 
-So we may never reach the info->send_pending == 0 condition.
+I would like to mention that I have recently sent out the V4 version of
+the patch series, which addresses the issues related to `cifs_get_tcon_super()`.
+In the latest version, the issue of NULL pointer dereference has already
+been resolved.
 
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: 5349ae5e05fa ("smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/smbdirect.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+https://lore.kernel.org/all/CAH2r5msLMNdqdo6EBuTvrQ0hwrqSRC-LSZuN2WpwV+PkDwsCOw@mail.gmail.com/
 
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1316,10 +1316,6 @@ void smbd_destroy(struct TCP_Server_Info
- 	log_rdma_event(INFO, "cancelling idle timer\n");
- 	cancel_delayed_work_sync(&info->idle_timer_work);
- 
--	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
--	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
--
- 	/* It's not possible for upper layer to get to reassembly */
- 	log_rdma_event(INFO, "drain the reassembly queue\n");
- 	do {
-@@ -1965,7 +1961,11 @@ int smbd_send(struct TCP_Server_Info *se
- 	 */
- 
- 	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
-+		atomic_read(&info->send_pending) == 0 ||
-+		sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED && rc == 0)
-+		rc = -EAGAIN;
- 
- 	return rc;
- }
+I avoid null pointer dereferencing by performing a null pointer check on
+the return value of cifs_get_dfs_tcon_super().
 
+
+> ---
+>   fs/smb/client/misc.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+> index 3b6920a52daa..d73c36862e97 100644
+> --- a/fs/smb/client/misc.c
+> +++ b/fs/smb/client/misc.c
+> @@ -1116,7 +1116,7 @@ static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+>   	struct cifs_sb_info *cifs_sb;
+>   
+>   	if (!tcon)
+> -		return NULL;
+> +		return ERR_PTR(-EINVAL);
+>   
+>   	spin_lock(&tcon->sb_list_lock);
+>   	list_for_each_entry(cifs_sb, &tcon->cifs_sb_list, tcon_sb_link) {
+> @@ -1141,7 +1141,7 @@ static struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon)
+>   	}
+>   	spin_unlock(&tcon->sb_list_lock);
+>   
+> -	return NULL;
+> +	return ERR_PTR(-ENOENT);
+>   }
+>   
+>   struct super_block *cifs_get_dfs_tcon_super(struct cifs_tcon *tcon)
+
+Additionally, I think it somewhat peculiar that in the current
+implementation, cifs_get_tcon_super() returns -EINVAL.
+
+I would greatly appreciate it if you could review my latest patch series to
+confirm if it resolves the concerns. If there are any additional improvements, I
+would be happy to collaborate further to ensure the best possible solution.
+
+Best regards,
+Wang Zhaolong
 
