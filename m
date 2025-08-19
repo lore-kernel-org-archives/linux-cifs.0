@@ -1,104 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B141DA4E
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Aug 2025 02:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679831DA4E;
+	Tue, 19 Aug 2025 02:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755571649; cv=none; b=aZ6g8LZ4TaQSm1S/ZgNlu2hoWlYIQzcjAqJciEgpxcZDJg6ITru68QifMSN14fAToQkb8Kp/jf52OBR+QCBD/1VxwA+RKFjD4x1O1MBR80Jp0b576sh+m06MN3tesm+W49Tr777rZ+jO5u1zO3Nryihz9l89AgUZtJmY3lh2918=
+	t=1755571701; cv=none; b=kPYHq8ORZvXYjWksEAQI3IkR2WQ/VmnKYbVzQiUzemUyReZH2txTrdxpO7EF/ETO0f5ndNe5eAxy1XtYoxsPtRTGm5mK8zsTjvXlX8YbfBgb9S0r/ZM8yTd5WhBv9/cxEEMOy32ZtoNFl9nKyno6vgZ/vO/zrvcaEkzfESsNZZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755571649; c=relaxed/simple;
-	bh=887WRRVjnbigM/7ON7rCWHqrq9BjliCaN3UdiEL0QlQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s+TZCzW7IdTgQNYo8LTOWWSZYuvtXGkolwmosHheRxduVzadVqpfL5wBdZSPbxPWtJK2r8dh4aQuEHCWG5EfRT7iCcGMauvs1A/qrDiaiu5sKUkKIP8C7LPoCEd3ep/eHLQOSCCK8j4HbrlcyVnyvSAR+6jRcPdDoq/3n7R97bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bXMeXLXF; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bXMeXLXF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9810CC4CEED
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Aug 2025 02:47:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755571649;
-	bh=887WRRVjnbigM/7ON7rCWHqrq9BjliCaN3UdiEL0QlQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bXMeXLXFVqudH21ps9kG1uh+2rEJ27oOpMjNQRjyNGfGdxTXu+Vb2zqP2Yx0msSA4
-	 Xfs8DZ+oboGi6gDIam9+3f8igdThn9JgaSLjEgFrkRlt6gontj72rx66ZoSX0ONQXV
-	 R/ZKWUbUNuZDdVD8de44sYAMtsREcmGX74dulKlzD8cA+XzD1o7CfdNHDT+s068ZBB
-	 AFm/sC9eMODw+BWoWrtez6fmR9PyjaIFk7tuzQInsWJj7PGJ0WddGsNPD+FKCE5owk
-	 BfUdOUugzSrKeHE/Xtl4VkVD/o0ipC23Piumm4xQDZMedLO9V28fKIlQ4HklJE6SHM
-	 s31NmYpX3ikcQ==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-afcb7a3ee3cso739389966b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Aug 2025 19:47:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVnxwvuGhkWC4VuFszj3CP64aFwK1MQj9gkaRZdaPQXD17LpnamdubdrEEHZgJJwmLGtrkETkk3r/st@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzotn7covIVg22I0lsKM/svoRPrKoiy4QMO4wVlFcti2dAwFoST
-	SkSC3mPDLgXDy4MnGewE6bDMXKlzOWKOv8r2N+MYtQcBBWZ2mqW1guOFErmOhXp91tPUKMjzGXE
-	/5+WJAUnD8Frm95Ge5NBIoRx6r19UHh8=
-X-Google-Smtp-Source: AGHT+IHbcgWIgLjwxnP6ifJJwJ8gLsF1v1Haocw3LiHwz9NZgkZd1CGGhSk0Nr5I39m+rB1kDDc1373wFlHrNpJrAR0=
-X-Received: by 2002:a17:907:7fa1:b0:ad8:87ae:3f66 with SMTP id
- a640c23a62f3a-afddd249ab4mr76817766b.60.1755571648234; Mon, 18 Aug 2025
- 19:47:28 -0700 (PDT)
+	s=arc-20240116; t=1755571701; c=relaxed/simple;
+	bh=DIHpUinyjnwiM1J+nYXRaCDItBY4mUGiNKQwpS3s+0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=aNuauvJB3UfWqEu9x9LkTmYz3lJ1Z8nAfuKJvHFluZ5dDzbU2GM9fSBIcmY3dXG818Sz2FAwCxA21OzJLQRkQTf8i6aMKITgcD9or7kUiBCtKfMDi6fz7eVg+0lfy8iPxyNfgBnCvDBF/+ydnrnbKkNZzoOwj74tpcvUV2B3dZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4c5Yn416Kyz2Cg9D;
+	Tue, 19 Aug 2025 10:43:52 +0800 (CST)
+Received: from kwepemk100003.china.huawei.com (unknown [7.202.194.51])
+	by mail.maildlp.com (Postfix) with ESMTPS id 52FD3180042;
+	Tue, 19 Aug 2025 10:48:14 +0800 (CST)
+Received: from [10.174.178.209] (10.174.178.209) by
+ kwepemk100003.china.huawei.com (7.202.194.51) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 19 Aug 2025 10:48:13 +0800
+Message-ID: <3059e4f5-8ad7-44f0-80fa-61e3838ed54a@huawei.com>
+Date: Tue, 19 Aug 2025 10:48:13 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c2d9d516-d203-44ff-946d-b4833019bfd5@samba.org>
-In-Reply-To: <c2d9d516-d203-44ff-946d-b4833019bfd5@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 19 Aug 2025 11:47:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd99qOQ7HX++=KbaL0H3S1Pg2XFwKvdWUeEvre6vMYkqew@mail.gmail.com>
-X-Gm-Features: Ac12FXxcs2VEwEzvZfhRHqupBYtvU5gx39PYmQL27Uj8B2pQoDtTYsGb0_SCO3g
-Message-ID: <CAKYAXd99qOQ7HX++=KbaL0H3S1Pg2XFwKvdWUeEvre6vMYkqew@mail.gmail.com>
-Subject: Re: Current state of smbdirect patches
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	Samba Technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH next] smb: client: Fix NULL vs ERR_PTR() returns in
+ cifs_get_tcon_super()
+To: Steve French <smfrench@gmail.com>, Dan Carpenter
+	<dan.carpenter@linaro.org>, Paulo Alcantara <pc@manguebit.org>
+CC: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
+	<sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+	<bharathsm@microsoft.com>, <linux-cifs@vger.kernel.org>,
+	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
+	<kernel-janitors@vger.kernel.org>
+References: <aKL5dUyf7UWcQNvW@stanley.mountain>
+ <89a2023c-e383-4780-83e3-ba8f9e44c015@huaweicloud.com>
+ <CAH2r5muVjS+Y_NFSWwYoisPGfynyTkmynjpQHi2_Kk6Z8AiG0w@mail.gmail.com>
+From: Wang Zhaolong <wangzhaolong1@huawei.com>
+In-Reply-To: <CAH2r5muVjS+Y_NFSWwYoisPGfynyTkmynjpQHi2_Kk6Z8AiG0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100003.china.huawei.com (7.202.194.51)
 
-On Tue, Aug 19, 2025 at 5:25=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Hi,
->
-> I'm at the point where server/transport_rdma.c only has there
-> local structures:
->
-> struct smb_direct_device {
->          struct ib_device        *ib_dev;
->          struct list_head        list;
-> };
->
-> static struct smb_direct_listener {
->          struct rdma_cm_id       *cm_id;
-> } smb_direct_listener;
->
-> struct smb_direct_transport {
->          struct ksmbd_transport  transport;
->
->          struct smbdirect_socket socket;
-> };
->
-> All others are moved to smbdirect_socket.h.
->
-> For the client I'm almost there I just need to
-> finish the move of struct smbd_mr.
->
-> Should I post all patches including the ones already in for-next and ksmb=
-d-for-next-next?
-> But resorted, first all fs/smb/common/smbdirect/ patches, then
-> all fs/smb/client patches and finally all fs/smb/server patches.
->
-> Maybe we want a smbdirect-for-next branch, which could be a shared ground=
- for
-> for-next (client) and ksmbd-for-next[-next] (server)?
->
-> So how should I post what I have?
-The simplest way is to put the client/server's smbdirect patches on
-top of #for-next.
-Because you are changing the /common directory together and it would
-be nice if it was merged and tested in linux-next.
->
-> metze
->
+> Since Paulo pointed out a problem with v4 of this patch, an obvious
+> question is Dan's patch "independent enough" to take or would it make
+> the v5 of your patch harder.  Let me know when there is a v5 of the
+> patch so we can do more testing and review
+> 
+> On Mon, Aug 18, 2025 at 8:30 AM Wang Zhaolong
+> <wangzhaolong@huaweicloud.com> wrote:
+>>
+Hi Steve, Paulo, and Dan,
+
+Thank you very much for your attention to this patch.
+
+The NULL pointer issue has already been addressed in the V4
+version of the patch. I have considered submitting a V5 version
+of the patch, but I have not yet decided whether to proceed with it.
+
+While further analyzing the code, I discovered the following
+potential issues in the implementation of `cifs_tree_connect()` in
+`dfs.c`, which calls `cifs_get_dfs_tcon_super()`:
+
+1. `cifs_get_dfs_tcon_super()` only returns a single superblock reference.
+    Using this superblock, it retrieves the associated `cifs_sb`. However,
+    a single tcon is supposed to be associated with multiple `cifs_sb`
+    instances. I am unsure whether there is a mechanism that guarantees a
+    DFS tcon (where `tcon->origin_fullpath` is non-NULL) has exactly one
+    associated `cifs_sb`. My current patch series only retrieves the first
+    `cifs_sb` that satisfies the condition, which may not be sufficient.
+
+2. The only purpose of retrieving the `cifs_sb` is to update the `prepath`
+    field of the `cifs_sb` in `tree_connect_dfs_target()` by calling
+    `cifs_update_super_prepath()`. No other information from the VFS-layer
+    superblock is used. However, retrieving the superblock is also meant to
+    pin it in memory to prevent it from being released. Therefore, I am
+    considering whether to simplify the process of updating the prepath.
+
+If I decide to submit a V5 version of the patch, I will need to fully investigate:
+1. Whether a DFS tcon can be associated with multiple `cifs_sb` instances.
+2. If multiple `cifs_sb` instances are associated with a DFS tcon, whether
+    the `prepath` field of all associated `cifs_sb` instances needs to be
+     updated.
+
+Only after thoroughly understanding these two points can I come up with a
+better implementation for the V5 patch.
+
+Resolving these questions will take some time. If anyone can provide
+guidance or assistance, I would greatly appreciate it.
+
+Best regards,
+Wang Zhaolong
+Wang Zhaolong
