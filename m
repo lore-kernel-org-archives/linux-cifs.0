@@ -1,131 +1,213 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4886286884;
-	Tue, 19 Aug 2025 08:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07091255F5E;
+	Tue, 19 Aug 2025 08:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755591054; cv=none; b=WA2UFgHQh6M196dGDGRDzaWGZbRwLWWUAAT6o8cgdyDpiySzHwrdigk7rHY/x2+IckJXJUcNetzDtkIHBB9eyT5bB1/sCw2MHN9gxhiV+4NyiWD6k4qtt8VFjGYx3M5/ZXI07syHDUDaXA2FUOicX9zR3O5SKNinAW7Hi7B0jUc=
+	t=1755592666; cv=none; b=WWlY1Q0VVT93mrzU50voTLX2r/srHdG/Wz2S8mAGwTsCFhLd5dOu52nm0b9XgnhZCcnZxM+A1hPl8zDbCJpknyLRN0Qcn6OLERVUeqppH4yFGEFOYaY8+NrDZDfBFVMzvQeyzF6JJ2D05s3in34+hBAhX6opg+dRSx7HPPZCIcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755591054; c=relaxed/simple;
-	bh=Mem68XA4CBvVrxnZFm9GLUSQPJOaH1jSUqJBHty3Mn0=;
+	s=arc-20240116; t=1755592666; c=relaxed/simple;
+	bh=ov/SDoBL+KsjXinmNBAv6oD0ygTe84CUkHPGDAYLt90=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fd62V2N2mWcWlEh0fLcD/Esetqlnjs8dVcbVS0QbcOQKldt16xIfmIcJGEGZY+FUtfRGbif5RLhWa51H0wrrg8f4TUht3BGH/RZh+JtPNdAf2m/rZF52LQuMWw/vpKogHMtuYzd4BbsFZmfkc2n98W74kJMMS3QQ4H3jDHqGMdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=paEjngKm; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=pwi8kncZlyUYUOf8gtiWsB5E9ZuCeXd1ASDAQHq/gP5BKFfXms6rbi6SMWcWLauoGF5H38S6yGq/yxCDxsB8FWZrnfmpFNKnv1T9gL8dvqUpbUWyb7oVp/rxRN+XJWszYJILayioRflH1MEbiJQ+PDNrD+7ElEJDPr7zBzHyU8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HbD+nLdc; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="paEjngKm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680B0C116B1;
-	Tue, 19 Aug 2025 08:10:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755591054;
-	bh=Mem68XA4CBvVrxnZFm9GLUSQPJOaH1jSUqJBHty3Mn0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=paEjngKmnO+QwgqvaZr2brJHyXDS2VnA0YxVuRGCj7LPiO1i4TSii33GeECXpsTui
-	 EzdiJ1ZooPBhluk6oLNUZ875Vpbd+jOzFsMGgPErlO8xvHn0zXuvC4wlhOoELs7MsQ
-	 IdC5b81q0XbT3hD//gyua/9FkG2FckzfXHjcQQT0l0+e+2WMiqZpb+srOzHsV1zko0
-	 KSagEqG6Q5X/ZxUfHajffiZ2mGq7ESMomiEH2T3xS1SrDzxAXcmgaqxhVqXT9hZ892
-	 XDIxkyAmko3pULWCFNG8iXouomUyggSs68S2hyo0yK+lWkqgOUJlYhCDW8hGcru0m1
-	 7/pCPyUI3d5Vw==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6188945f471so8314920a12.0;
-        Tue, 19 Aug 2025 01:10:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUA1hojWf4dPCB2sax1vnm+lLlGLN6hhFMxkXMYLG4kFt2lVGWSXKRPVahyXJOhUDSEkJEr2Dz28SYa@vger.kernel.org, AJvYcCV/xEw64FGlwQqNqeQ4BvvT2QCfSsF63aJc7PPrkOTMElag3lf3suEAJc+y0+fFlJUYViwaFlw9@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsS2VV4zZ6sJIGRHjl6PHQ2kXoMuubnZhICwfLfKZrsFOTG2Ln
-	f0ygNQWrBGg6t2aVUW3PpmIIbIPi/F2S0JoJGmJIOFJIufnWJzVXuKcow4r8sAvmkv+tkrVUm0E
-	Kp610BvkVHI150I2fNP4DpHl4OrL3ODI=
-X-Google-Smtp-Source: AGHT+IEcZyfGsiOFie2luy3fEI8Nb2QlkZUgkU7UA/Gw2GUbUPFLs5+mV5Il1Iqad4pMkJpKq63kvsNonnx+HvDMfvA=
-X-Received: by 2002:a05:6402:270b:b0:618:3502:80c9 with SMTP id
- 4fb4d7f45d1cf-61a7fa6c1f5mr1422965a12.10.1755591052956; Tue, 19 Aug 2025
- 01:10:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbD+nLdc"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6188b654241so8938557a12.1;
+        Tue, 19 Aug 2025 01:37:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755592663; x=1756197463; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eFsGbO5uv2uZgsEZblgTie/lOV7b8K80hkUH8T7DIVU=;
+        b=HbD+nLdciHnzHGLZWK7rd9vx0k0s77RcTGDq8lOzaIT+iDewhaTDddhEYxHG4qw7rh
+         B1NvvruURnsOqmVA1Nrf1F/vD87IPKfcqDRejCCUkn8/EM5pXAvxfs2dkF1/mgAxFLQu
+         VM7ywV7oxpnn8wnbtOxxabzCMlmaOr7eLRCEPe5OcnHVoaEf3UOMts0s+3HRALMd4Pfp
+         yb4bsrne6PJG10xbjRgiovkXGwXUfiASPJt5wIT7ntNnDZj9PqM7y5sbtz30I/c/APfa
+         T5o/jXRmXUaSn1qKFliWXSvu/PxggqmeoSApI4UF+nw1FMmgbJetKueGHJO6tXgPflGN
+         wZPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755592663; x=1756197463;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eFsGbO5uv2uZgsEZblgTie/lOV7b8K80hkUH8T7DIVU=;
+        b=GbckA80S61lQ0FmSJ/5ztmHpIFNvst27brsThRMb49dpxu9iCfsk75+TduGDkZiO7W
+         J5BNoVoSz6CaoqFg+5Ur7MbIcIFKNR3wnzdlyBSV7BdS0suJpZthcehyu7QmtdMKv9O/
+         q4bUe3h9SxlSiyQkFb3sdP4xjDQMQyrk+YEvlzwSNXVnOyY5FFamCSYrSHe6d7fHBvNZ
+         +FBFg47TQOcKmfIHn5dUQEIYdlzLY5Ufa0T31ppY8ppv2Ac+97xsW4uOR3HVwjrmvMqD
+         9G6MBh8pyZ0J3ZvJydtuumqGMkAOoVoisGAsgrJDApU2SAULiYDBe915thBfod6ll5Rz
+         oujg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOsiP1464NzzQh3WzreCrFHFnIwQGXVInlAGJWViWbIzJol9/GSq/j2X0d6tf056fcYvxNeMEv/2yT@vger.kernel.org, AJvYcCUXOv5DdF2hpb5lmRczwUv7p3jgU//L/F1NV/iFJ4DOXJPu4sgGvH1eOSqBxQy04Khea4eLMdM1igYlDP9m4A==@vger.kernel.org, AJvYcCV1V4yajExvvO6y3YRNXCe6gi73ZdYXalQC+ovfmVHJpyHMTWSvio3pDQqBwwmFfwppB9uV6y919e8=@vger.kernel.org, AJvYcCV1uynxGQfVPGCeewu+nXUYe6x8Eg5L6Wzot/zf4foycowdbQEC7eaUjXHf9717ldvs+4n4gxDA/XkVCg==@vger.kernel.org, AJvYcCVnG2Vv3oiREGpxvl0SdKVVN1HuZEclV8HHApm/iX7eakfGsJQGFTULqbA52Mt7AozSPWYq/4b353Ft@vger.kernel.org, AJvYcCWOAKHOImEHcKf3Vrl66I4SfDsbrANijYoPN95Oh1TYJ3GSR164mAeX7H8+5X0wx5fwx8bgYgGyOjHfuZh+@vger.kernel.org, AJvYcCXEznR2b3GRPEiHg/61Z9vxqEyTo8L+8ZN63bRJwe90t6aZadX13KIlmfRcmx2zj6PjKLPqmkxDhtan/1jEGA==@vger.kernel.org, AJvYcCXsNJvpXGrtSi6lbopAh993v3NYlL8eI1sc+GzzoeUp3x1T+J6WXzuk6VQFv/onmMdfAzEbI5B5yJ/2@vger.kernel.org
+X-Gm-Message-State: AOJu0YxruDJCD/jFhY51OgsbHuZP33F5unKwJfsEhMH+szfytiT5tMZ6
+	9rhwkSxir8u+Zdvya9/EM0mRG9fNTtcdeuxcbfEv/Ql/ZodrmyXamr3JKOb/lli5JhyhE+t4eQJ
+	xubISonmenC/LpaGSbqMNPwje4LMAA4A=
+X-Gm-Gg: ASbGncvFAVpBL5pKgjzSv6iuPA5cXcHN+/N7ZTj6EkZD8iMLb5APF9OCikGtMQI2hYq
+	pLgLv1Xu5BJGtCmRKTWUMKILZyPHumeCnMuQe3PiU27N9ipAprtnt5xaFN/1KshaCZ2d1jamWR0
+	c4YtJ2RlYB2ItzQnxEYYa3hR1WsSYnW/Z6/6pVvL8lw+Wh0O7ZGLKF3vwXr6fPN5A9CeAcJZJhp
+	dZn3/w=
+X-Google-Smtp-Source: AGHT+IFPkGLsERbAFWtJMeBST+thbMymAyNwr9qtEZC9tmGauxnR7YuwZ/KcrAjTg48I0n7BxxoUhzcNK86fTEQQ3U8=
+X-Received: by 2002:a05:6402:2110:b0:61a:8956:80da with SMTP id
+ 4fb4d7f45d1cf-61a89568752mr355544a12.17.1755592662958; Tue, 19 Aug 2025
+ 01:37:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <50eb7a8c7f567f0a87b6e11d2ad835cdbb9546b4.1755525878.git.lucien.xin@gmail.com>
- <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
-In-Reply-To: <5d5ac074-1790-410e-acf9-0e559cb7eacb@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 19 Aug 2025 17:10:40 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
-X-Gm-Features: Ac12FXyiQuPEOg9fCPvN1r6JfTMy5hj0Blb3dqMBqsD73rGciFUNEEgDAVfLZ14
-Message-ID: <CAKYAXd-L12tTQyMtTG9+8=XjWY0NDKbYybGXUjPrGin5yYtx3A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, 
-	kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>, 
-	Jeff Layton <jlayton@kernel.org>, Benjamin Coddington <bcodding@redhat.com>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <CAOQ4uxjFPOZe004Cv+tT=NyQg2JOY6MOYQniSjaefVcg+3s-Kg@mail.gmail.com>
+ <175555395905.2234665.9441673384189011517@noble.neil.brown.name>
+In-Reply-To: <175555395905.2234665.9441673384189011517@noble.neil.brown.name>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Tue, 19 Aug 2025 10:37:30 +0200
+X-Gm-Features: Ac12FXy8T19V7sCZ2PjPpODnDn2SH0EuiMx3-E257rrZ7RxWX_LLM7LKSQroU_c
+Message-ID: <CAOQ4uxjh1RmAEWV22V_tdazOGxekmKUy6bdu13OhtoXboT3neg@mail.gmail.com>
+Subject: Re: [PATCH 04/11] VFS: introduce dentry_lookup_continue()
+To: NeilBrown <neil@brown.name>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Tyler Hicks <code@tyhicks.com>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Richard Weinberger <richard@nod.at>, 
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org, 
+	linux-afs@lists.infradead.org, netfs@lists.linux.dev, 
+	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 18, 2025 at 11:31=E2=80=AFPM Stefan Metzmacher <metze@samba.org=
-> wrote:
+On Mon, Aug 18, 2025 at 11:53=E2=80=AFPM NeilBrown <neil@brown.name> wrote:
 >
-> Hi,
->
-> > diff --git a/include/linux/socket.h b/include/linux/socket.h
-> > index 3b262487ec06..a7c05b064583 100644
-> > --- a/include/linux/socket.h
-> > +++ b/include/linux/socket.h
-> > @@ -386,6 +386,7 @@ struct ucred {
-> >   #define SOL_MCTP    285
-> >   #define SOL_SMC             286
-> >   #define SOL_VSOCK   287
-> > +#define SOL_QUIC     288
+> On Mon, 18 Aug 2025, Amir Goldstein wrote:
+> > On Wed, Aug 13, 2025 at 1:53=E2=80=AFAM NeilBrown <neil@brown.name> wro=
+te:
+> > >
+> > > A few callers operate on a dentry which they already have - unlike th=
+e
+> > > normal case where a lookup proceeds an operation.
+> > >
+> > > For these callers dentry_lookup_continue() is provided where other
+> > > callers would use dentry_lookup().  The call will fail if, after the
+> > > lock was gained, the child is no longer a child of the given parent.
+> > >
+> > > There are a couple of callers that want to lock a dentry in whatever
+> > > its current parent is.  For these a NULL parent can be passed, in whi=
+ch
+> > > case ->d_parent is used.  In this case the call cannot fail.
+> > >
+> > > The idea behind the name is that the actual lookup occurred some time
+> > > ago, and now we are continuing with an operation on the dentry.
+> > >
+> > > When the operation completes done_dentry_lookup() must be called.  An
+> > > extra reference is taken when the dentry_lookup_continue() call succe=
+eds
+> > > and will be dropped by done_dentry_lookup().
+> > >
+> > > This will be used in smb/server, ecryptfs, and overlayfs, each of whi=
+ch
+> > > have their own lock_parent() or parent_lock() or similar; and a few
+> > > other places which lock the parent but don't check if the parent is
+> > > still correct (often because rename isn't supported so parent cannot =
+be
+> > > incorrect).
+> > >
+> > > Signed-off-by: NeilBrown <neil@brown.name>
+> > > ---
+> > >  fs/namei.c            | 39 +++++++++++++++++++++++++++++++++++++++
+> > >  include/linux/namei.h |  2 ++
+> > >  2 files changed, 41 insertions(+)
+> > >
+> > > diff --git a/fs/namei.c b/fs/namei.c
+> > > index 7af9b464886a..df21b6fa5a0e 100644
+> > > --- a/fs/namei.c
+> > > +++ b/fs/namei.c
+> > > @@ -1874,6 +1874,45 @@ struct dentry *dentry_lookup_killable(struct m=
+nt_idmap *idmap,
+> > >  }
+> > >  EXPORT_SYMBOL(dentry_lookup_killable);
+> > >
+> > > +/**
+> > > + * dentry_lookup_continue: lock a dentry if it is still in the given=
+ parent, prior to dir ops
+> > > + * @child: the dentry to lock
+> > > + * @parent: the dentry of the assumed parent
+> > > + *
+> > > + * The child is locked - currently by taking i_rwsem on the parent -=
+ to
+> > > + * prepare for create/remove operations.  If the given parent is not
+> > > + * %NULL and is no longer the parent of the dentry after the lock is
+> > > + * gained, the lock is released and the call fails (returns
+> > > + * ERR_PTR(-EINVAL).
+> > > + *
+> > > + * On success a reference to the child is taken and returned.  The l=
+ock
+> > > + * and reference must both be dropped by done_dentry_lookup() after =
+the
+> > > + * operation completes.
+> > > + */
+> > > +struct dentry *dentry_lookup_continue(struct dentry *child,
+> > > +                                     struct dentry *parent)
+> > > +{
+> > > +       struct dentry *p =3D parent;
+> > > +
+> > > +again:
+> > > +       if (!parent)
+> > > +               p =3D dget_parent(child);
+> > > +       inode_lock_nested(d_inode(p), I_MUTEX_PARENT);
+> > > +       if (child->d_parent !=3D p) {
 > >
-> >   /* IPX options */
-> >   #define IPX_TYPE    1
-> > diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-> > index ced0fc3c3aa5..34becd90d3a6 100644
-> > --- a/include/uapi/linux/in.h
-> > +++ b/include/uapi/linux/in.h
-> > @@ -85,6 +85,8 @@ enum {
-> >   #define IPPROTO_RAW         IPPROTO_RAW
-> >     IPPROTO_SMC =3D 256,                /* Shared Memory Communications=
-         */
-> >   #define IPPROTO_SMC         IPPROTO_SMC
-> > +  IPPROTO_QUIC =3D 261,                /* A UDP-Based Multiplexed and =
-Secure Transport */
-> > +#define IPPROTO_QUIC         IPPROTO_QUIC
-> >     IPPROTO_MPTCP =3D 262,              /* Multipath TCP connection    =
-         */
-> >   #define IPPROTO_MPTCP               IPPROTO_MPTCP
-> >     IPPROTO_MAX
+> > || d_unhashed(child))
+> >
+> > ;)
 >
-> Can these constants be accepted, soon?
+> As you say!
 >
-> Samba 4.23.0 to be released early September will ship userspace code to
-> use them. It would be good to have them correct when kernel's start to
-> support this...
-I'd like to test ksmbd with smbclient of samba, which includes quic support=
-.
-Which Samba branch should I use? How do I enable quic in Samba?
-Do I need to update smb.conf?
+> >
+> > and what about silly renames? are those also d_unhashed()?
+>
+> With NFS it is not unhashed (i.e.  it is still hashed, but with a
+> different name).  I haven't checked AFS.
+>
+> But does it matter?  As long as it has the right parent and is not
+> unhashed, it is a suitable dentry to pass to vfs_unlink() etc.
+>
+> If this race happened with NFS then ovl could try to remove the .nfsXXX
+> file and would get ETXBUSY due to DCACH_NFSFS_RENAMED.  I don't think
+> this is a problem.
+>
 
-Thanks.
+Not a problem IMO.
+
+FYI, ovl does not accept NFS as a valid upper fs
+on account of ->d_revalidate() and no RENAME_WHITEOUT support.
+
+        if (ovl_dentry_remote(ofs->workdir) &&
+            (!d_type || !rename_whiteout || ofs->noxattr)) {
+                pr_err("upper fs missing required features.\n");
+                err =3D -EINVAL;
+                goto out;
+        }
+
+> If we really wanted to be sure the name hadn't changed we could do a
+> lookup and check that the same dentry is returned.
 >
-> It would also mean less risk for conflicting projects with the need for s=
-uch numbers.
->
-> I think it's useful to use a value lower than IPPROTO_MAX, because it mea=
-ns
-> the kernel module can also be build against older kernels as out of tree =
-module
-> and still it would be transparent for userspace consumers like samba.
-> There are hardcoded checks for IPPROTO_MAX in inet_create, inet6_create, =
-inet_diag_register
-> and the value of IPPROTO_MAX is 263 starting with commit
-> d25a92ccae6bed02327b63d138e12e7806830f78 in 6.11.
->
-> Thanks!
-> metze
+> OVL is by nature exposed to possible races if something else tried to
+> modify the upper directory tree.  I don't think it needs to provide
+> perfect semantics in that case, it only needs to fail-safe.  I think
+> this recent change is enough to be safe in the face of concurrent
+> unlinks.
+
+<nod>
+
+Thanks,
+Amir.
