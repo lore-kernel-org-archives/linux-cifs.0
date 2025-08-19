@@ -1,214 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8551F30BF5A;
-	Tue, 19 Aug 2025 17:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CCB25C711
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Aug 2025 23:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755624930; cv=none; b=Hu76iUObg+Tnow2Y2gDxFD7F3UcVocuxb6Uns+AfPRbxFlxufm2Pcrl2Gz6iR6hZB5KegKFjLN7K6GkVyyErKgCUvsXvH8/fvjwYqRYQceFM/KTQQIHcCdjFmua1ukdjGyeGtJXyueqwMxCmcIZBcmyTaDbCOThp1H9Yq2pGubk=
+	t=1755645266; cv=none; b=Cbj3e02X3ltgs6JF2iU7LK2c2BJcSM9JXPU0rzPaYoJKh26lX77Shr03KH1BRGRiMQIY2dLXuuURr3iF2wIBRszFHMrFwkASXxnc167Fq2Pg9Elxg5HGI17RUbK7q+VdW8JJ2V+u87kS51qkRGnlytyOQ6HLINz4094F5a28wcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755624930; c=relaxed/simple;
-	bh=OTOPQ3Is0zl/ogQEnI/r62ExdlOKWn+vUJSQVkwLYaY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ihj5YUjU4+aYbK/3IELnpkYG/cp6lwMAXDQbuz+BFJfPMsv3KL9LUSa3ww+uWE2m59NlAUvl2qTixkFcc+7oYw2HcZ2qQQ0HeG5RVBeXaIbu85NQDKVji6SW/BhJzhMO8xhhoDsY5qkheRmCpcU/Cq3DDy8TvyiFRcEhmGxq/yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syUij7d+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755645266; c=relaxed/simple;
+	bh=SUTSj7EVQitAEn0jmhQCrVHteuQ63IdDjK8L5BvFziM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IYdNWT6UFV7UUT+0oA4dxawHirqB7rEi+WbE3aRQ+3Sb9XFfecw854wIqGnCMER35BH2pJIclrAYwOIWDZOomAgdcO5QRaIQDQL7n/zuZ03e26eclNyh2p9de5oLLR6y7RkepLFeU7LQcCFnVWAo+Afvku0ZSKJgAHpjZcEr8h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgnzVjEn; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syUij7d+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB24C113D0;
-	Tue, 19 Aug 2025 17:35:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755624930;
-	bh=OTOPQ3Is0zl/ogQEnI/r62ExdlOKWn+vUJSQVkwLYaY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=syUij7d+eOuxOQCW7Fjn5NpaDyWoQHcP7PAtnv2v1jDo480qPme2H3mWAuQsH1jDA
-	 unvA3cL4pK/LiXld6zv/nspYDJnvirUNe0pW6FIsV3qcNTkupX4z2kTDNWuKllgbI3
-	 +9V28wchS5STDEdTSI2UP5TgpI5V9/el39YvyW7hrpPg2LSeJ8YmIEHBkrvNkypcST
-	 HGbRoL0Bf0PPKLYOVmlbl3nnEvMS+VMKGu+qi1gr3V+TPYqV3NCro6bDk6MXZhC+9/
-	 kW9Jz8htt5tmVYUYhvhXH9alxZfV0Nic7h2igtqROccbch+gN2l4zGPFRg7isUCqJe
-	 3C2B+/n6gcYTg==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>,
-	sfrench@samba.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.16-6.1] smb: client: fix race with concurrent opens in rename(2)
-Date: Tue, 19 Aug 2025 13:35:17 -0400
-Message-ID: <20250819173521.1079913-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250819173521.1079913-1-sashal@kernel.org>
-References: <20250819173521.1079913-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgnzVjEn"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4b109c482c8so99972301cf.3
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Aug 2025 16:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755645264; x=1756250064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dRIhHDI7n6du0QbPIi7uv6qYe3yHhaHsPB+EW8K+U/Q=;
+        b=cgnzVjEnvfc8OG8IGRsBAl9DMqNrQcQWOJIe4MgLYJYAnJ3RkSHsfMD9RqWeQ3Y48P
+         IU+Fl2Jo8UtHo6qJwbYY1cm2y9K/Winlsfmkcj0R/b3TXCsqt1BRso4DvpLhIs5wWYfV
+         J2z4JsWrBWvBcaBT/d9SQRpHasezXpjyNibWkYGA9Njgc62LkD+TdnuRtoVphnu1QaxD
+         qFgWZIhRKMPcljr1nxSRfdgBLVDxWXmPV40Eo951gc0AfNX1PIXSzBQyEstGREuVF2fG
+         1kjN9vewh31Gpp4KJeFpRbTr0f38RI4tl7CF+8DXXkhDHaXZSMNQfBVxxi3b40iqDEBy
+         uwWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755645264; x=1756250064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dRIhHDI7n6du0QbPIi7uv6qYe3yHhaHsPB+EW8K+U/Q=;
+        b=Sur0vevJg76pqHUlVauW08EQ8CPgfYcQ61XgKSGY5spN1l/+NVD+T490uswUI9P9JK
+         i3ICtaMMllCdBA7hrjn5wI93KOPqiK4Zf83MVNEI1BvkZPgL/rZ/fVEZCdgp1LQHlePQ
+         fWP8XcVZTo9AB740YEjNcDuWA/N7SD4yjqSe9cOdxICPCFVmgC1MbQxIVdn8ra4PNfHp
+         ICFFKxddnHQmt6rc85WixoXcke2EITnCppQrULT1lWBFRCCRgYa9pYrOmf1s5Be4z/0c
+         5OOX6yTuI4p7tYrkJOl2Zt8iT1z2FHXQfiyzD57dxvTjPOeT73f9wBhzhmEZ+lMRTzlk
+         kViw==
+X-Gm-Message-State: AOJu0Yzc95XTyJB6681ebjg11ZTzHuHYpvlsQ3szbJLrfGWcjI7uO5rz
+	45r45g0SP5uo/DcHDXqQjcxT0dWnmtx3v+pM+5vPNeW54WYLtgRnUC73RafLhWbBA2IE7W62SXI
+	uOG06QVFxNtj8e7/qhFAxsalpzB2TQzk=
+X-Gm-Gg: ASbGncsGQrgKY0YXGPjUHdyguk8foeuaNiAyxVoPIUnnlYGS3x7cRmgnxSbHZT1MVgv
+	k00RXUdkdEKrXVrVBe3uubTHl38vkYRLgzIJDPl1VDfw4UNB4wlvaMstuu3FP2tnVXl/vsREDLj
+	vEDOiuk4sPDAyoEsDx2cyGZq2zO7G3MiMwqhp9Mg19pbrzobFLBbW/K/u9lIMoUebWkzpzoxJuD
+	44DrSBqGHLwbvRnvWsu0Fu2XOmet9bDdb19t1GB
+X-Google-Smtp-Source: AGHT+IFii8rYzWPheE86vrgK/y9vVXDWIVznzdwKtFVvVf3xW3VvEMWrHBlJYJweFepd0qaUdCjQQj+v4YL+oAeLWzQ=
+X-Received: by 2002:a05:622a:1a11:b0:4b0:a07f:c1d0 with SMTP id
+ d75a77b69052e-4b291a44fedmr11606651cf.5.1755645263695; Tue, 19 Aug 2025
+ 16:14:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.16.1
-Content-Transfer-Encoding: 8bit
-
-From: Paulo Alcantara <pc@manguebit.org>
-
-[ Upstream commit d84291fc7453df7881a970716f8256273aca5747 ]
-
-Besides sending the rename request to the server, the rename process
-also involves closing any deferred close, waiting for outstanding I/O
-to complete as well as marking all existing open handles as deleted to
-prevent them from deferring closes, which increases the race window
-for potential concurrent opens on the target file.
-
-Fix this by unhashing the dentry in advance to prevent any concurrent
-opens on the target.
-
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
+References: <20250814212256.1653699-2-e.bachmakov@gmail.com>
+In-Reply-To: <20250814212256.1653699-2-e.bachmakov@gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 19 Aug 2025 18:14:12 -0500
+X-Gm-Features: Ac12FXw_X8lmFSf4piRzp9I_CRQPcmPIJDIaUc2jUhhs1wdCHfoOwYLDa80ZldE
+Message-ID: <CAH2r5mvT+u5tNo-H2HOmEBvH-+0mTvEg2qgOtS2p7=J+6X+fcw@mail.gmail.com>
+Subject: Re: [PATCH] cifs-utils: Fix documentation for character remappings.
+To: Eduard Bachmakov <e.bachmakov@gmail.com>
 Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-LLM Generated explanations, may be completely bogus:
+good catch.
 
-Based on my analysis, here is my determination:
+merged into cifs-utils for-next
 
-**YES**
+There also are some undocumented ones that would be great if someone
+would add (and probably some that could be made clearer as well, or
+rearranged so less important ones are less distracting) - looking
+through fs/smb/client/fs_context.c and comparing to mount.cifs.8 could
+find a few mount parms missing descriptions.
 
-This commit should be backported to stable kernel trees for the
-following reasons:
+On Thu, Aug 14, 2025 at 4:26=E2=80=AFPM Eduard Bachmakov <e.bachmakov@gmail=
+.com> wrote:
+>
+> Current documentation swapped the relevant specs. Additionally,
+> elaborate on SFM a bit.
+>
+> Supported by fs/cifs/cifs_unicode.c:{convert_to_sfu_char,
+> convert_to_sfm_char}.
+>
+> Previously raised in:
+>
+>   https://lore.kernel.org/linux-cifs/CADCRUiMn_2Vk3HZzU0WKu3xPgo1P-1aqDy+=
+NjEzOz03W-HFChw@mail.gmail.com/
+>
+> Signed-off-by: Eduard Bachmakov <e.bachmakov@gmail.com>
+> ---
+>  mount.cifs.rst | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/mount.cifs.rst b/mount.cifs.rst
+> index d489070..9eee7d5 100644
+> --- a/mount.cifs.rst
+> +++ b/mount.cifs.rst
+> @@ -307,10 +307,10 @@ rwpidforward
+>
+>  mapchars
+>    Translate six of the seven reserved characters (not backslash, but
+> -  including the colon, question mark, pipe, asterik, greater than and
+> +  including the colon, question mark, pipe, asterisk, greater than and
+>    less than characters) to the remap range (above 0xF000), which also
+>    allows the CIFS client to recognize files created with such characters
+> -  by Windows's Services for Mac. This can also be useful when mounting t=
+o
+> +  by Windows's Services for Unix. This can also be useful when mounting =
+to
+>    most versions of Samba (which also forbids creating and opening files
+>    whose names contain any of these seven characters). This has no effect
+>    if the server does not support Unicode on the wire. Please note that
+> @@ -322,7 +322,8 @@ nomapchars
+>
+>  mapposix
+>    Translate reserved characters similarly to ``mapchars`` but use the
+> -  mapping from Microsoft "Services For Unix".
+> +  mapping from Microsoft "Services For Mac". This additionally remaps th=
+e
+> +  double quote and a trailing period or space.
+>
+>  intr
+>    currently unimplemented.
+> --
+> 2.50.1
+>
+>
 
-## Bug Fix for Real User-Facing Issue
 
-1. **Fixes a concrete race condition**: The commit addresses a real race
-   condition between concurrent `open()` and `rename()` operations that
-   can lead to incorrect filesystem behavior. The race window exists
-   because rename involves multiple steps (closing deferred handles,
-   waiting for I/O, marking handles as deleted) before the actual rename
-   request.
+--=20
+Thanks,
 
-2. **Data consistency issue**: Without this fix, concurrent opens during
-   rename can succeed when they shouldn't, potentially leading to:
-   - Applications opening files that are supposed to be renamed
-   - Inconsistent filesystem state visible to userspace
-   - Potential data corruption scenarios
-
-## Minimal and Contained Fix
-
-3. **Small, focused change**: The fix adds only ~20 lines of code:
-   - Unhashes the target dentry before the rename operation begins
-   - Rehashes it on error paths or completion
-   - This follows the exact same pattern as the previous fix for
-     `unlink()` (commit 0af1561b2d60)
-
-4. **Well-tested pattern**: The fix uses the same approach successfully
-   applied to the unlink race (0af1561b2d60), demonstrating this is a
-   proven solution pattern.
-
-## Critical Subsystem Impact
-
-5. **Affects core filesystem operations**: The SMB/CIFS client is widely
-   used for network filesystems in enterprise environments. Race
-   conditions in fundamental operations like rename can affect many
-   users.
-
-6. **VFS-level coordination**: The fix properly coordinates with VFS
-   layer expectations (note the comment that "VFS already unhashes the
-   target when renaming directories"), extending this protection to
-   files.
-
-## Clear Backporting Criteria Met
-
-7. **Meets stable kernel rules**:
-   - Fixes a real bug that affects users (race condition)
-   - Under 100 lines with context
-   - Obviously correct (follows established pattern)
-   - Already exists in mainline
-   - Not a theoretical issue - has concrete impact
-
-8. **No architectural changes**: The fix doesn't introduce new features
-   or change existing architecture - it simply adds proper
-   synchronization using existing VFS mechanisms (`d_drop`/`d_rehash`).
-
-## Supporting Evidence
-
-The commit is part of a series addressing similar race conditions (see
-the related unlink fix), indicating this is a systematic issue being
-addressed. The involvement of notable kernel developers (David Howells,
-Al Viro) in review shows this is a well-understood problem with proper
-solution.
-
-The fix is especially important because SMB/CIFS is commonly used in
-production environments where data consistency during concurrent
-operations is critical. Without this fix, applications may experience
-unexpected behavior when files are being renamed while other processes
-attempt to open them.
-
- fs/smb/client/inode.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cf9060f0fc08..fe453a4b3dc8 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2474,6 +2474,7 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 	struct cifs_sb_info *cifs_sb;
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *tcon;
-+	bool rehash = false;
- 	unsigned int xid;
- 	int rc, tmprc;
- 	int retry_count = 0;
-@@ -2489,6 +2490,17 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
- 		return -EIO;
- 
-+	/*
-+	 * Prevent any concurrent opens on the target by unhashing the dentry.
-+	 * VFS already unhashes the target when renaming directories.
-+	 */
-+	if (d_is_positive(target_dentry) && !d_is_dir(target_dentry)) {
-+		if (!d_unhashed(target_dentry)) {
-+			d_drop(target_dentry);
-+			rehash = true;
-+		}
-+	}
-+
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
-@@ -2530,6 +2542,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 		}
- 	}
- 
-+	if (!rc)
-+		rehash = false;
- 	/*
- 	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
- 	 */
-@@ -2588,12 +2602,16 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 			goto cifs_rename_exit;
- 		rc = cifs_do_rename(xid, source_dentry, from_name,
- 				    target_dentry, to_name);
-+		if (!rc)
-+			rehash = false;
- 	}
- 
- 	/* force revalidate to go get info when needed */
- 	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
- 
- cifs_rename_exit:
-+	if (rehash)
-+		d_rehash(target_dentry);
- 	kfree(info_buf_source);
- 	free_dentry_path(page2);
- 	free_dentry_path(page1);
--- 
-2.50.1
-
+Steve
