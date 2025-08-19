@@ -1,213 +1,267 @@
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07091255F5E;
-	Tue, 19 Aug 2025 08:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2471927E1C5;
+	Tue, 19 Aug 2025 14:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755592666; cv=none; b=WWlY1Q0VVT93mrzU50voTLX2r/srHdG/Wz2S8mAGwTsCFhLd5dOu52nm0b9XgnhZCcnZxM+A1hPl8zDbCJpknyLRN0Qcn6OLERVUeqppH4yFGEFOYaY8+NrDZDfBFVMzvQeyzF6JJ2D05s3in34+hBAhX6opg+dRSx7HPPZCIcw=
+	t=1755615405; cv=none; b=RIxOOPQ8Szu4bDpn16g4JO8Up9HAJyqV41Sb4gZgtj2XTyFHEe3l0T71KZEt6w4nMnzTku/QJqAYQRGVThq6NjWVASznxouzILwWQpGnfKtD2CK4jGbLed2rH3AlDUCbXAtRky47PJTOjKy/t1P6InJ8tIeHfE2olGERSRI2Wj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755592666; c=relaxed/simple;
-	bh=ov/SDoBL+KsjXinmNBAv6oD0ygTe84CUkHPGDAYLt90=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pwi8kncZlyUYUOf8gtiWsB5E9ZuCeXd1ASDAQHq/gP5BKFfXms6rbi6SMWcWLauoGF5H38S6yGq/yxCDxsB8FWZrnfmpFNKnv1T9gL8dvqUpbUWyb7oVp/rxRN+XJWszYJILayioRflH1MEbiJQ+PDNrD+7ElEJDPr7zBzHyU8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HbD+nLdc; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1755615405; c=relaxed/simple;
+	bh=bUsDKewtvp1b2vKlIYgLqyZp8TdJkhLH1lo33Ru1UKg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WkeydzImCkRXU9E1pEiOzGBad/p7NnEmn2P9yVs7sY4WkuZtqLrnDlN64McKJYCJvQ8NWbYcx6I/vh2SypJDKg6yZGi8K7W0ccUE1ZUzzhBUdBIFFqaRN5wNtHPdFw8AZbm2gMO9CvyMLgyhky3Cd9SIRmhvucJby3fEdKuLf1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kzalloc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HbD+nLdc"
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6188b654241so8938557a12.1;
-        Tue, 19 Aug 2025 01:37:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755592663; x=1756197463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eFsGbO5uv2uZgsEZblgTie/lOV7b8K80hkUH8T7DIVU=;
-        b=HbD+nLdciHnzHGLZWK7rd9vx0k0s77RcTGDq8lOzaIT+iDewhaTDddhEYxHG4qw7rh
-         B1NvvruURnsOqmVA1Nrf1F/vD87IPKfcqDRejCCUkn8/EM5pXAvxfs2dkF1/mgAxFLQu
-         VM7ywV7oxpnn8wnbtOxxabzCMlmaOr7eLRCEPe5OcnHVoaEf3UOMts0s+3HRALMd4Pfp
-         yb4bsrne6PJG10xbjRgiovkXGwXUfiASPJt5wIT7ntNnDZj9PqM7y5sbtz30I/c/APfa
-         T5o/jXRmXUaSn1qKFliWXSvu/PxggqmeoSApI4UF+nw1FMmgbJetKueGHJO6tXgPflGN
-         wZPw==
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-76e2e61108dso392749b3a.0;
+        Tue, 19 Aug 2025 07:56:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755592663; x=1756197463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eFsGbO5uv2uZgsEZblgTie/lOV7b8K80hkUH8T7DIVU=;
-        b=GbckA80S61lQ0FmSJ/5ztmHpIFNvst27brsThRMb49dpxu9iCfsk75+TduGDkZiO7W
-         J5BNoVoSz6CaoqFg+5Ur7MbIcIFKNR3wnzdlyBSV7BdS0suJpZthcehyu7QmtdMKv9O/
-         q4bUe3h9SxlSiyQkFb3sdP4xjDQMQyrk+YEvlzwSNXVnOyY5FFamCSYrSHe6d7fHBvNZ
-         +FBFg47TQOcKmfIHn5dUQEIYdlzLY5Ufa0T31ppY8ppv2Ac+97xsW4uOR3HVwjrmvMqD
-         9G6MBh8pyZ0J3ZvJydtuumqGMkAOoVoisGAsgrJDApU2SAULiYDBe915thBfod6ll5Rz
-         oujg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOsiP1464NzzQh3WzreCrFHFnIwQGXVInlAGJWViWbIzJol9/GSq/j2X0d6tf056fcYvxNeMEv/2yT@vger.kernel.org, AJvYcCUXOv5DdF2hpb5lmRczwUv7p3jgU//L/F1NV/iFJ4DOXJPu4sgGvH1eOSqBxQy04Khea4eLMdM1igYlDP9m4A==@vger.kernel.org, AJvYcCV1V4yajExvvO6y3YRNXCe6gi73ZdYXalQC+ovfmVHJpyHMTWSvio3pDQqBwwmFfwppB9uV6y919e8=@vger.kernel.org, AJvYcCV1uynxGQfVPGCeewu+nXUYe6x8Eg5L6Wzot/zf4foycowdbQEC7eaUjXHf9717ldvs+4n4gxDA/XkVCg==@vger.kernel.org, AJvYcCVnG2Vv3oiREGpxvl0SdKVVN1HuZEclV8HHApm/iX7eakfGsJQGFTULqbA52Mt7AozSPWYq/4b353Ft@vger.kernel.org, AJvYcCWOAKHOImEHcKf3Vrl66I4SfDsbrANijYoPN95Oh1TYJ3GSR164mAeX7H8+5X0wx5fwx8bgYgGyOjHfuZh+@vger.kernel.org, AJvYcCXEznR2b3GRPEiHg/61Z9vxqEyTo8L+8ZN63bRJwe90t6aZadX13KIlmfRcmx2zj6PjKLPqmkxDhtan/1jEGA==@vger.kernel.org, AJvYcCXsNJvpXGrtSi6lbopAh993v3NYlL8eI1sc+GzzoeUp3x1T+J6WXzuk6VQFv/onmMdfAzEbI5B5yJ/2@vger.kernel.org
-X-Gm-Message-State: AOJu0YxruDJCD/jFhY51OgsbHuZP33F5unKwJfsEhMH+szfytiT5tMZ6
-	9rhwkSxir8u+Zdvya9/EM0mRG9fNTtcdeuxcbfEv/Ql/ZodrmyXamr3JKOb/lli5JhyhE+t4eQJ
-	xubISonmenC/LpaGSbqMNPwje4LMAA4A=
-X-Gm-Gg: ASbGncvFAVpBL5pKgjzSv6iuPA5cXcHN+/N7ZTj6EkZD8iMLb5APF9OCikGtMQI2hYq
-	pLgLv1Xu5BJGtCmRKTWUMKILZyPHumeCnMuQe3PiU27N9ipAprtnt5xaFN/1KshaCZ2d1jamWR0
-	c4YtJ2RlYB2ItzQnxEYYa3hR1WsSYnW/Z6/6pVvL8lw+Wh0O7ZGLKF3vwXr6fPN5A9CeAcJZJhp
-	dZn3/w=
-X-Google-Smtp-Source: AGHT+IFPkGLsERbAFWtJMeBST+thbMymAyNwr9qtEZC9tmGauxnR7YuwZ/KcrAjTg48I0n7BxxoUhzcNK86fTEQQ3U8=
-X-Received: by 2002:a05:6402:2110:b0:61a:8956:80da with SMTP id
- 4fb4d7f45d1cf-61a89568752mr355544a12.17.1755592662958; Tue, 19 Aug 2025
- 01:37:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755615402; x=1756220202;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vKxtMwITbgg+OywFpBH8T4AA1fvAKojwdWxhEzg459M=;
+        b=Rh7qm96PxA9gk46oFcRhc+lLw9563BmNdMY01wXVvoeSWBXzcJ/OmJDSqWdcbUmJ4D
+         4HhpeTlZeXfP5QTLF9CdfWHTc1gxyW6FntDSnfi6BF/GCqo5uXZMfiLgo+KbFvZyZXEG
+         +nGeZWGeAXJ2O8g9tVNhPCkVOB3P3xPbenbitCPKkf5laT3Tp87I1u5oP+w+/m27aaLG
+         Be/HB4OMuJ74Mk2NIMol050FB/4y3u0j4IWMc2peI6HMbxhbaTipj1QehWsIXU4lul/e
+         s1dwW2kJJg0fTsn1GJP7La0HTXgOjGqqpLiXnq2nDkS4d5EWBT643W+iU5SyPwQiV71n
+         jM8w==
+X-Forwarded-Encrypted: i=1; AJvYcCXeNTXU7rhCfMAgDJ1zno+oN6O0MNS4VyjC8atUrEOBQ+Qx7Qi/hXDQzGObZ8/jc4t/iuZaMzi7yQw8@vger.kernel.org, AJvYcCXeSN5OFzuDAy/onVwbLRzrcRRmTPo6pl1OjudXYIchCoAMOoB5rTUJsW+RteTd0gKW9xjSxf8X4LN3RkoR@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHqxBfe33SJY4UGOVKw4zrAbjVrwthavzJQj7I53Yg6R3PSwje
+	92cIQCKIez18S6NmrpXvO3gVFbM+gj8cK0vfUtBbqHn/86Fo1/ABXWha
+X-Gm-Gg: ASbGncvr+8SXqL12+umF4fCzjqre12WjDt8HerCu8suIE4nJbLYhFLA+nHCHs0MvBNY
+	NAnwLLF6vxe4K3STxy5aIYKVA/hRf8wDSMUkm+qx+PSkfjZooTSq4qEn/vuV/tG+PymQxtM7Dmj
+	MuRbEW3Pm6hUpxzRRRVllFFIUCs3+XVVp1ESxTYUzev+Hyu/8Gs21lGHn2X+mXiBjSvQ632a7Ky
+	Ab7T9Z19fG4ltGrBzwcDJlfwL2SjK/efA3apdoNZZ2uZcsO9VljukNZzRAEggXfjAev7znJSEQJ
+	CRNPPf1qnicWIlKFjhXBs7HxaQY7miVDrBoCy43/Y8dX+5pbiPx8rE6WKOMorMvKQ0073NLXZ9a
+	JEw2wwwZvLPXJswQ0XQCUF/aKtkj3UXMhSMi4U3AQMJk=
+X-Google-Smtp-Source: AGHT+IFiBXFUk8G1EL2FF8x3trLuns2m/hrb1OvL5B3+4opDQT4FS5T6ik8kXL0ZR6nR6/hhZMi5Kw==
+X-Received: by 2002:a05:6a20:2451:b0:23f:f550:6e2b with SMTP id adf61e73a8af0-2430d4bf98cmr2009854637.6.1755615402247;
+        Tue, 19 Aug 2025 07:56:42 -0700 (PDT)
+Received: from [192.168.50.136] ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b472d73aa36sm10823572a12.35.2025.08.19.07.56.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Aug 2025 07:56:41 -0700 (PDT)
+Message-ID: <13b10448-9743-4f05-9662-370862c2040e@kzalloc.com>
+Date: Tue, 19 Aug 2025 23:56:36 +0900
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOQ4uxjFPOZe004Cv+tT=NyQg2JOY6MOYQniSjaefVcg+3s-Kg@mail.gmail.com>
- <175555395905.2234665.9441673384189011517@noble.neil.brown.name>
-In-Reply-To: <175555395905.2234665.9441673384189011517@noble.neil.brown.name>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Tue, 19 Aug 2025 10:37:30 +0200
-X-Gm-Features: Ac12FXy8T19V7sCZ2PjPpODnDn2SH0EuiMx3-E257rrZ7RxWX_LLM7LKSQroU_c
-Message-ID: <CAOQ4uxjh1RmAEWV22V_tdazOGxekmKUy6bdu13OhtoXboT3neg@mail.gmail.com>
-Subject: Re: [PATCH 04/11] VFS: introduce dentry_lookup_continue()
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Tyler Hicks <code@tyhicks.com>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Richard Weinberger <richard@nod.at>, 
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Carlos Maiolino <cem@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-afs@lists.infradead.org, netfs@lists.linux.dev, 
-	ceph-devel@vger.kernel.org, ecryptfs@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] ksmbd: add kcov remote coverage support via ksmbd_conn
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Stefan Metzmacher <metze@samba.org>,
+ Paulo Alcantara <pc@manguebit.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
+ linux-cifs@vger.kernel.org, syzkaller@googlegroups.com,
+ linux-kernel@vger.kernel.org, notselwyn@pwning.tech
+References: <20250806143955.122816-2-ysk@kzalloc.com>
+ <CAKYAXd-7ojpN=jc+R2wwxyQsZCTBJT6tEYszb4VOgbPeWn1NKA@mail.gmail.com>
+Content-Language: en-US
+From: Yunseong Kim <ysk@kzalloc.com>
+Organization: kzalloc
+In-Reply-To: <CAKYAXd-7ojpN=jc+R2wwxyQsZCTBJT6tEYszb4VOgbPeWn1NKA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 18, 2025 at 11:53=E2=80=AFPM NeilBrown <neil@brown.name> wrote:
->
-> On Mon, 18 Aug 2025, Amir Goldstein wrote:
-> > On Wed, Aug 13, 2025 at 1:53=E2=80=AFAM NeilBrown <neil@brown.name> wro=
-te:
-> > >
-> > > A few callers operate on a dentry which they already have - unlike th=
-e
-> > > normal case where a lookup proceeds an operation.
-> > >
-> > > For these callers dentry_lookup_continue() is provided where other
-> > > callers would use dentry_lookup().  The call will fail if, after the
-> > > lock was gained, the child is no longer a child of the given parent.
-> > >
-> > > There are a couple of callers that want to lock a dentry in whatever
-> > > its current parent is.  For these a NULL parent can be passed, in whi=
-ch
-> > > case ->d_parent is used.  In this case the call cannot fail.
-> > >
-> > > The idea behind the name is that the actual lookup occurred some time
-> > > ago, and now we are continuing with an operation on the dentry.
-> > >
-> > > When the operation completes done_dentry_lookup() must be called.  An
-> > > extra reference is taken when the dentry_lookup_continue() call succe=
-eds
-> > > and will be dropped by done_dentry_lookup().
-> > >
-> > > This will be used in smb/server, ecryptfs, and overlayfs, each of whi=
-ch
-> > > have their own lock_parent() or parent_lock() or similar; and a few
-> > > other places which lock the parent but don't check if the parent is
-> > > still correct (often because rename isn't supported so parent cannot =
-be
-> > > incorrect).
-> > >
-> > > Signed-off-by: NeilBrown <neil@brown.name>
-> > > ---
-> > >  fs/namei.c            | 39 +++++++++++++++++++++++++++++++++++++++
-> > >  include/linux/namei.h |  2 ++
-> > >  2 files changed, 41 insertions(+)
-> > >
-> > > diff --git a/fs/namei.c b/fs/namei.c
-> > > index 7af9b464886a..df21b6fa5a0e 100644
-> > > --- a/fs/namei.c
-> > > +++ b/fs/namei.c
-> > > @@ -1874,6 +1874,45 @@ struct dentry *dentry_lookup_killable(struct m=
-nt_idmap *idmap,
-> > >  }
-> > >  EXPORT_SYMBOL(dentry_lookup_killable);
-> > >
-> > > +/**
-> > > + * dentry_lookup_continue: lock a dentry if it is still in the given=
- parent, prior to dir ops
-> > > + * @child: the dentry to lock
-> > > + * @parent: the dentry of the assumed parent
-> > > + *
-> > > + * The child is locked - currently by taking i_rwsem on the parent -=
- to
-> > > + * prepare for create/remove operations.  If the given parent is not
-> > > + * %NULL and is no longer the parent of the dentry after the lock is
-> > > + * gained, the lock is released and the call fails (returns
-> > > + * ERR_PTR(-EINVAL).
-> > > + *
-> > > + * On success a reference to the child is taken and returned.  The l=
-ock
-> > > + * and reference must both be dropped by done_dentry_lookup() after =
-the
-> > > + * operation completes.
-> > > + */
-> > > +struct dentry *dentry_lookup_continue(struct dentry *child,
-> > > +                                     struct dentry *parent)
-> > > +{
-> > > +       struct dentry *p =3D parent;
-> > > +
-> > > +again:
-> > > +       if (!parent)
-> > > +               p =3D dget_parent(child);
-> > > +       inode_lock_nested(d_inode(p), I_MUTEX_PARENT);
-> > > +       if (child->d_parent !=3D p) {
-> >
-> > || d_unhashed(child))
-> >
-> > ;)
->
-> As you say!
->
-> >
-> > and what about silly renames? are those also d_unhashed()?
->
-> With NFS it is not unhashed (i.e.  it is still hashed, but with a
-> different name).  I haven't checked AFS.
->
-> But does it matter?  As long as it has the right parent and is not
-> unhashed, it is a suitable dentry to pass to vfs_unlink() etc.
->
-> If this race happened with NFS then ovl could try to remove the .nfsXXX
-> file and would get ETXBUSY due to DCACH_NFSFS_RENAMED.  I don't think
-> this is a problem.
->
+Hi Namjae,
 
-Not a problem IMO.
+Thank you for the review and the detailed questions.
 
-FYI, ovl does not accept NFS as a valid upper fs
-on account of ->d_revalidate() and no RENAME_WHITEOUT support.
+On 8/19/25 5:00 PM, Namjae Jeon wrote:
+> On Wed, Aug 6, 2025 at 11:41 PM Yunseong Kim <ysk@kzalloc.com> wrote:
+>>
+> Hi Yunseong,
+>> KSMBD processes SMB requests on per-connection threads and then hands
+>> off work items to a kworker pool for actual command processing by
+>> handle_ksmbd_work(). Because each connection may enqueue multiple
+>> struct ksmbd_work instances, attaching the kcov handle to the work
+>> itself is not sufficient: we need a stable, per-connection handle.
+>>
+>> Introduce a kcov_handle field on struct ksmbd_conn (under CONFIG_KCOV)
+>> and initialize it when the connection is set up. In both
+>> ksmbd_conn_handler_loop() which only receives a struct ksmbd_conn*
+>> and handle_ksmbd_work() which receives a struct ksmbd_work*, start
+>> kcov_remote with the per-connection handle before processing and stop
+>> it afterward. This ensures coverage collection remains active across
+>> the entire asynchronous path of each SMB request.
+> I'm a bit unclear on the overall impact. Do you have the goal to measure
+> the code coverage of all ksmbd components ?
 
-        if (ovl_dentry_remote(ofs->workdir) &&
-            (!d_type || !rename_whiteout || ofs->noxattr)) {
-                pr_err("upper fs missing required features.\n");
-                err =3D -EINVAL;
-                goto out;
-        }
+Yes, exactly. The ultimate goal is to effectively fuzz ksmbd using
+syzkaller. To achieve this, it is essential to maximize the code coverage
+of the core components involved in handling SMB requests.
 
-> If we really wanted to be sure the name hadn't changed we could do a
-> lookup and check that the same dentry is returned.
->
-> OVL is by nature exposed to possible races if something else tried to
-> modify the upper directory tree.  I don't think it needs to provide
-> perfect semantics in that case, it only needs to fail-safe.  I think
-> this recent change is enough to be safe in the face of concurrent
-> unlinks.
+The primary motivation for this patch is to address the limitations of KCOV
+within ksmbd's asynchronous architecture. Ksmbd receives requests on
+connection threads but offloads the actual command processing to a kworker
+pool via handle_ksmbd_work(). Previously, the coverage from code executed
+in the worker threads was not associated with the initial connection's KCOV
+handle, resulting in lost coverage data.
 
-<nod>
+By introducing a stable KCOV handle on struct ksmbd_conn, this patch
+ensures that code coverage is accurately tracked across the entire
+execution path of an SMB request, from reception to the completion of
+asynchronous processing. This is the key impact of this change.
 
-Thanks,
-Amir.
+> Is there the next patch set or any plan for next work, or is this patch enough
+> to check all functions of ksmbd with syzkaller?
+
+This patch provides the necessary kernel-side infrastructure required to
+collect accurate coverage data. It is a crucial prerequisite.
+
+However, this patch alone is not sufficient to check all ksmbd functions.
+To actually exercise and test ksmbd's functionalities, corresponding
+user-space support in syzkaller (such as syscall descriptions) is required
+o leverage this infrastructure. As mentioned in the commit message, that
+work is currently in progress here:
+
+Link: https://github.com/google/syzkaller/pull/5524
+
+I am currently investigating cases where Samba, as you previously mentioned,
+is mounted on the client and actually writing files exceeds the permissions.
+In this process, I discovered a potentially serious vulnerability in netfs.
+I have separately reported this issue privately to David Howells.
+
+> Thanks.
+
+In summary, both this kernel patch and the ongoing syzkaller PR need to be
+merged to enable effective fuzzing and coverage analysis of ksmbd.
+
+>> The kcov context tied to the connection itself, correctly supporting
+>> multiple outstanding work items per connection.
+>>
+>> In patch v2, I added the missing initialization of kcov_handle. In v3,
+>> I fixed an kcov_hanlde argument was previously unused on
+>> ksmbd_conn_set_kcov_handle().
+>>
+>> The related work for syzkaller support is currently being developed
+>> in the following GitHub PR:
+>> Link: https://github.com/google/syzkaller/pull/5524
+>>
+>> Based on earlier work by Lau.
+>> Link: https://pwning.tech/ksmbd-syzkaller/
+>>
+>> Cc: linux-cifs@vger.kernel.org
+>> Cc: notselwyn@pwning.tech
+>> Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
+>> ---
+>>  fs/smb/server/connection.c |  7 ++++++-
+>>  fs/smb/server/connection.h | 22 ++++++++++++++++++++++
+>>  fs/smb/server/server.c     |  4 ++++
+>>  3 files changed, 32 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+>> index 3f04a2977ba8..21352f37384f 100644
+>> --- a/fs/smb/server/connection.c
+>> +++ b/fs/smb/server/connection.c
+>> @@ -93,6 +93,9 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+>>         down_write(&conn_list_lock);
+>>         list_add(&conn->conns_list, &conn_list);
+>>         up_write(&conn_list_lock);
+>> +
+>> +       ksmbd_conn_set_kcov_handle(conn, kcov_common_handle());
+>> +
+>>         return conn;
+>>  }
+>>
+>> @@ -322,6 +325,8 @@ int ksmbd_conn_handler_loop(void *p)
+>>         if (t->ops->prepare && t->ops->prepare(t))
+>>                 goto out;
+>>
+>> +       kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
+>> +
+>>         max_req = server_conf.max_inflight_req;
+>>         conn->last_active = jiffies;
+>>         set_freezable();
+>> @@ -412,7 +417,7 @@ int ksmbd_conn_handler_loop(void *p)
+>>                         break;
+>>                 }
+>>         }
+>> -
+>> +       kcov_remote_stop();
+>>  out:
+>>         ksmbd_conn_set_releasing(conn);
+>>         /* Wait till all reference dropped to the Server object*/
+>> diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+>> index dd3e0e3f7bf0..a90bd1b3e1df 100644
+>> --- a/fs/smb/server/connection.h
+>> +++ b/fs/smb/server/connection.h
+>> @@ -15,6 +15,7 @@
+>>  #include <linux/kthread.h>
+>>  #include <linux/nls.h>
+>>  #include <linux/unicode.h>
+>> +#include <linux/kcov.h>
+>>
+>>  #include "smb_common.h"
+>>  #include "ksmbd_work.h"
+>> @@ -109,6 +110,9 @@ struct ksmbd_conn {
+>>         bool                            binding;
+>>         atomic_t                        refcnt;
+>>         bool                            is_aapl;
+>> +#ifdef CONFIG_KCOV
+>> +       u64                             kcov_handle;
+>> +#endif
+>>  };
+>>
+>>  struct ksmbd_conn_ops {
+>> @@ -246,4 +250,22 @@ static inline void ksmbd_conn_set_releasing(struct ksmbd_conn *conn)
+>>  }
+>>
+>>  void ksmbd_all_conn_set_status(u64 sess_id, u32 status);
+>> +
+>> +static inline void ksmbd_conn_set_kcov_handle(struct ksmbd_conn *conn,
+>> +                                      const u64 kcov_handle)
+>> +{
+>> +#ifdef CONFIG_KCOV
+>> +       conn->kcov_handle = kcov_handle;
+>> +#endif
+>> +}
+>> +
+>> +static inline u64 ksmbd_conn_get_kcov_handle(struct ksmbd_conn *conn)
+>> +{
+>> +#ifdef CONFIG_KCOV
+>> +       return conn->kcov_handle;
+>> +#else
+>> +       return 0;
+>> +#endif
+>> +}
+>> +
+>>  #endif /* __CONNECTION_H__ */
+>> diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+>> index 8c9c49c3a0a4..0757cd6ef4f7 100644
+>> --- a/fs/smb/server/server.c
+>> +++ b/fs/smb/server/server.c
+>> @@ -264,6 +264,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+>>         struct ksmbd_work *work = container_of(wk, struct ksmbd_work, work);
+>>         struct ksmbd_conn *conn = work->conn;
+>>
+>> +       kcov_remote_start_common(ksmbd_conn_get_kcov_handle(conn));
+>> +
+>>         atomic64_inc(&conn->stats.request_served);
+>>
+>>         __handle_ksmbd_work(work, conn);
+>> @@ -271,6 +273,8 @@ static void handle_ksmbd_work(struct work_struct *wk)
+>>         ksmbd_conn_try_dequeue_request(work);
+>>         ksmbd_free_work_struct(work);
+>>         ksmbd_conn_r_count_dec(conn);
+>> +
+>> +       kcov_remote_stop();
+>>  }
+>>
+>>  /**
+>> --
+>> 2.50.0
+>>
+Please let me know if you have any further questions.
+
+Best regards,
+Yunseong Kim.
+
+
