@@ -1,200 +1,152 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDAF27F01D
-	for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 16:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49CB334371
+	for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 17:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755708155; cv=none; b=sorvQ5VSiKYmf6dL2yAxtZmjewzPbwRHQKQsJsBelJKiT8nrLQ5cLpCnHS2/s3ZJ+PNxhcb9clTuNs1XHJpXA/UFWltM8r9bxwvN9696vSu5nSGvDwooFh4aE2WkPkkdodxeZ2cYG+RlfR2U2gVPz1pNUl36E/f7M5MbGUmVyb8=
+	t=1755709866; cv=none; b=ZC+r0/gRZncncI7cwVpS+EADmWhJ5K2AisCu6mw8A+wdbJlNlvIgDDOug09pQlRDNPELUVCmLugx4DV4OiqzAiATCmrw47CLY+0W0LqThBHHw1yph+sLYvuuHWWtdfJ1C9ItxztDaQKQqj/8rSfxyQoK8VbjHiS/PCwpKkA57nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755708155; c=relaxed/simple;
-	bh=ranyu9ElWKF1DkrzGI963BiZl5RzZoSj1CR35AMX1qo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MjuNTRup0VrgLFU+yO10wpI9fT+spKPPeb3ImL7s+y/y3Dy3JShzhLeDZT15k/EEhFan7N1E0uBBrclMlWX67KEkbBx4BmpC4xx4kZkWLuZpESe4WA2xcCPJG1wK6bq27RVxQbiMRNhU0/0yKvV1UuBPp9dbyT/oqXsI4/YsBJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VsCYgaS7; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1755709866; c=relaxed/simple;
+	bh=WEZkXEJg+hGB+jnpYbUZvIYD5Hy2rCcX9Uf7esTs+7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=Jw9gPuOhmdoXteyH3d/ozTvsFSLvC0OenYgiLB4O6LGxOEi09QOvwR52lq0lcUOg/dSCzDugrPqIj1el3YLhJGUs6yfGPlHNaTW2QgHoK67v7N4zFtAmoXT6Y8gldqsxaBqi1gan2Y2ViVxohEtAoyJIUtvsZl3HJxP3yBv0C5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=nfDaDrZh; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VsCYgaS7"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-70a88de7d4fso1291236d6.0
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 09:42:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755708153; x=1756312953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G3d2nwi9sN5VUjMQgo7++bKqmajRwd8bLQm7+o5mppY=;
-        b=VsCYgaS75q0++WmrWeNwkKn/b4ECGJq853DzsjTvMnrJ+ZRbxm246GPC81v8J+TEiA
-         7eco2EBLWPbP3oCT7MaXr25wsyeTPtdKRWUH/Ac3FDE7wx5R18qLx2BPMquXX2O8x4Nx
-         yT5W7Z+cBl68fZ2BhS5kMuwP3vAfvrcw+86+cox8QbWJgGVHkilwFlBEI1x5P113cw1L
-         3+DrrhbvUROdKK+3Qci8yg02eKGKYdU4hn1HB3axhqzFL4s5Q7GzS0Ag4EAzbaefYYbe
-         XZbM6WZus/geIFI7iJ3YeR4BFEFbas1EUlZmWdLryQEp8QqIgpmDMCsU6XyxT2omYgff
-         82ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755708153; x=1756312953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G3d2nwi9sN5VUjMQgo7++bKqmajRwd8bLQm7+o5mppY=;
-        b=NjK7eudYHa5ZnRgLz3eBPyTm4qftnZSQxb+mC6hHny2tYnnZX1VvmPbmPiYOKVyN33
-         Xu8tOdNtOaQ6zdHV641gDum+IMZBiiVyTQ6VNRlpULo2LtKd07cVr4S62eKUD1BrWujl
-         kfkxnrdTNFTWx+dhCyiVPqvig58Yaht5e/SSOweoB8Bi7L0gkpmIDExelsdmwYMmZwb6
-         BOz8bN4fCOPbbZptfKswC2IdNxJpoDLZoM1NOJw9LniPiNhLjxQ07igQbg5dYWCztxrJ
-         s7N207Rx5wG9Sf9+8NtHIj+x8XYumvYd2pyIR0/aNUAuTO/gNb6tafl1Ufj0qa1rWBwT
-         L0og==
-X-Gm-Message-State: AOJu0Yw27xQ8INRL0+gTvGH+bBDbo4mBPSbE+orh/x2JRU7FQ/8WFfx6
-	CUY0Z5mOW/YN+d+Sz1qiO+n9wiKqrjbrYrALEMv+Y6I8jfrxu3TXeTFOHgjFfaZ9QK2yq8Iv8lu
-	ps20C917woncuFImg98fCycxFcLWnW/oHjw==
-X-Gm-Gg: ASbGncvLwXKFv3/UgCKUBx4+Zpgylrjf2i9cyUh5UdRRhI26IpvtjdP8xvhfg1XaWMk
-	PM8sXFIeXGEABqtVIeeWaPlroOTjshchCEhzW8r17LHx76QbILlbeD7i8kW94Sv/qVfQFrneWZB
-	zTr4aQ7iA/bXNSl2EWa4EDiXIFAVtnipH+0OQebDOTOhtItCsZXJK2hTCq7zWum3HOKwvsUiOWl
-	oa2EMtIiGeGHkHirhLHzGSEMldl3hHcGN0Msf4F3PU41Ma90RA=
-X-Google-Smtp-Source: AGHT+IFk3ofVl0jn+t+76vP2oa38U90BLxbJDx16sg8pejkshTBi804H3x3mFHzEjuRNBB3RpVcjC8Q6G2PBpek03wA=
-X-Received: by 2002:a05:6214:1c0f:b0:70b:c8fd:47af with SMTP id
- 6a1803df08f44-70d77000414mr45539216d6.30.1755708152959; Wed, 20 Aug 2025
- 09:42:32 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="nfDaDrZh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=WEZkXEJg+hGB+jnpYbUZvIYD5Hy2rCcX9Uf7esTs+7U=; b=nfDaDrZh274HL8YnoJmE79dM29
+	o4seJKqfy/B8NXkEdT/5+CTofbyvhPgi82JwMSWunSEN+/LCaYMdS4mMAlasrlG79jWj8Ba9gSZvm
+	PsCY3yqAw47LIc1en7Tf0qGR9Xi2A/jhWnQjblNuGGYPSuKIqjBFyT+PTy/tGOJu+P4tR8FxChrZP
+	9BoS2ODUM2E1/j20am127r60gvPnPadc2pE9Uhtzx3h/x2ZhlfU5gJQQImU6WDmwBbmd5Vv+9TnH/
+	ThfzJcV8bnT2KzXu2uSo5yGLSHycJLnxIz3t4qQn296pyKrJF04aWYgI9/w76sMSHttlQO7nWvG0w
+	RCFB80838gqstDw6Q7j5cJtP1WlUz47SHruD/CFwgb6B6f4OY88K1BxBGnqu9ZefZU8ipW/chtrTu
+	TqaHJz6LtFD0ClLArjwh0WAzFvIE+sfkv3jRwbL6KkiUcyJu955Ky7LhZeZZ/MWy9YIfg7Cr6SgS4
+	WndwWP+wCFXvurwOmAEcwm1L;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uomKt-003szc-2J;
+	Wed, 20 Aug 2025 17:10:55 +0000
+Message-ID: <b5349366-04ee-48cd-8126-9af10c2404ea@samba.org>
+Date: Wed, 20 Aug 2025 19:10:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820142413.920482-1-pkerling@rx2.rx-server.de> <CAH2r5mupCJs6K3Y9N=oUp6oEAMV2S5=_d0nxirk74ZQ24gH7Eg@mail.gmail.com>
-In-Reply-To: <CAH2r5mupCJs6K3Y9N=oUp6oEAMV2S5=_d0nxirk74ZQ24gH7Eg@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 20 Aug 2025 11:42:21 -0500
-X-Gm-Features: Ac12FXxGrwEfJ7u_C8ZM-KfcaGzLSgNG3uUSJ2N6T6WDZ-L28AIjrQYT1UeiH58
-Message-ID: <CAH2r5muNhfk-CHLYLcKMU+yXGqfiQtrZZ5ogf0PJcTsGTiBAJQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: allow a filename to contain colons on SMB3.1.1
- posix extensions
-To: Philipp Kerling <pkerling@casix.org>
-Cc: linux-cifs@vger.kernel.org, linkinjeon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Fwd: [PATCH] ksmbd: allow a filename to contain colons on
+ SMB3.1.1 posix extensions
+To: Steve French <smfrench@gmail.com>
+References: <20250820142413.920482-1-pkerling@rx2.rx-server.de>
+ <CAH2r5mupCJs6K3Y9N=oUp6oEAMV2S5=_d0nxirk74ZQ24gH7Eg@mail.gmail.com>
+ <CAH2r5muNhfk-CHLYLcKMU+yXGqfiQtrZZ5ogf0PJcTsGTiBAJQ@mail.gmail.com>
+ <CAH2r5mtB0aNQMYzUhgu0_xRzkWL1xYoRa6b5a5CiKUhV+WU_QQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+From: Ralph Boehme <slow@samba.org>
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ R3NApzHw2ZqQDtSdciR9og==
+In-Reply-To: <CAH2r5mtB0aNQMYzUhgu0_xRzkWL1xYoRa6b5a5CiKUhV+WU_QQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------tt0ffR1Ov6DmzMfCq6rK3r2G"
 
-This remapping of colon (and other reserved characters) is done by
-default when not mounting with SMB3.1.1 Linux/POSIX extensions, but
-presumably would only be needed for colon with the SMB3.1.1
-Linux/POSIX extensions (since colon is the only one that is 'required'
-by the protocol to mean something different)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------tt0ffR1Ov6DmzMfCq6rK3r2G
+Content-Type: multipart/mixed; boundary="------------RrmNcCiGURyy7E02kAtUKq9M";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Steve French <smfrench@gmail.com>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ CIFS <linux-cifs@vger.kernel.org>
+Message-ID: <b5349366-04ee-48cd-8126-9af10c2404ea@samba.org>
+Subject: Re: Fwd: [PATCH] ksmbd: allow a filename to contain colons on
+ SMB3.1.1 posix extensions
+References: <20250820142413.920482-1-pkerling@rx2.rx-server.de>
+ <CAH2r5mupCJs6K3Y9N=oUp6oEAMV2S5=_d0nxirk74ZQ24gH7Eg@mail.gmail.com>
+ <CAH2r5muNhfk-CHLYLcKMU+yXGqfiQtrZZ5ogf0PJcTsGTiBAJQ@mail.gmail.com>
+ <CAH2r5mtB0aNQMYzUhgu0_xRzkWL1xYoRa6b5a5CiKUhV+WU_QQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mtB0aNQMYzUhgu0_xRzkWL1xYoRa6b5a5CiKUhV+WU_QQ@mail.gmail.com>
 
-On Wed, Aug 20, 2025 at 11:37=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
->
-> Samba allows this with POSIX extensions negotiated (creating file with
-> : in the name) but I am wondering if a better way to solve this (to
-> avoid any confusion with alternate data streams) is to change the
-> client to use SFM_COLON (ie the remap in Unicode where colon is
-> remapped to 0xF022 instead of 0x003A)
->
-> On Wed, Aug 20, 2025 at 9:35=E2=80=AFAM Philipp Kerling <pkerling@casix.o=
-rg> wrote:
-> >
-> > If the client sends SMB2_CREATE_POSIX_CONTEXT to ksmbd, allow the filen=
-ame to contain
-> > a colon (':'). This requires disabling the support for Alternate Data S=
-treams (ADS),
-> > which are denoted by a colon-separated suffix to the filename on Window=
-s. This should
-> > not be an issue, since this concept is not known to POSIX anyway and th=
-e client has
-> > to explicitly request a POSIX context to get this behavior.
-> >
-> > Link: https://lore.kernel.org/all/f9401718e2be2ab22058b45a6817db912784e=
-f61.camel@rx2.rx-server.de/
-> > Signed-off-by: Philipp Kerling <pkerling@casix.org>
-> > ---
-> >  fs/smb/server/smb2pdu.c   | 25 ++++++++++++++-----------
-> >  fs/smb/server/vfs_cache.h |  2 ++
-> >  2 files changed, 16 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> > index 0d92ce49aed7..a565fc36cee6 100644
-> > --- a/fs/smb/server/smb2pdu.c
-> > +++ b/fs/smb/server/smb2pdu.c
-> > @@ -2951,18 +2951,19 @@ int smb2_open(struct ksmbd_work *work)
-> >                 }
-> >
-> >                 ksmbd_debug(SMB, "converted name =3D %s\n", name);
-> > -               if (strchr(name, ':')) {
-> > -                       if (!test_share_config_flag(work->tcon->share_c=
-onf,
-> > -                                                   KSMBD_SHARE_FLAG_ST=
-REAMS)) {
-> > -                               rc =3D -EBADF;
-> > -                               goto err_out2;
-> > -                       }
-> > -                       rc =3D parse_stream_name(name, &stream_name, &s=
-_type);
-> > -                       if (rc < 0)
-> > -                               goto err_out2;
-> > -               }
-> >
-> >                 if (posix_ctxt =3D=3D false) {
-> > +                       if (strchr(name, ':')) {
-> > +                               if (!test_share_config_flag(work->tcon-=
->share_conf,
-> > +                                                       KSMBD_SHARE_FLA=
-G_STREAMS)) {
-> > +                                       rc =3D -EBADF;
-> > +                                       goto err_out2;
-> > +                               }
-> > +                               rc =3D parse_stream_name(name, &stream_=
-name, &s_type);
-> > +                               if (rc < 0)
-> > +                                       goto err_out2;
-> > +                       }
-> > +
-> >                         rc =3D ksmbd_validate_filename(name);
-> >                         if (rc < 0)
-> >                                 goto err_out2;
-> > @@ -3443,6 +3444,8 @@ int smb2_open(struct ksmbd_work *work)
-> >         fp->attrib_only =3D !(req->DesiredAccess & ~(FILE_READ_ATTRIBUT=
-ES_LE |
-> >                         FILE_WRITE_ATTRIBUTES_LE | FILE_SYNCHRONIZE_LE)=
-);
-> >
-> > +       fp->is_posix_ctxt =3D posix_ctxt;
-> > +
-> >         /* fp should be searchable through ksmbd_inode.m_fp_list
-> >          * after daccess, saccess, attrib_only, and stream are
-> >          * initialized.
-> > @@ -5988,7 +5991,7 @@ static int smb2_rename(struct ksmbd_work *work,
-> >         if (IS_ERR(new_name))
-> >                 return PTR_ERR(new_name);
-> >
-> > -       if (strchr(new_name, ':')) {
-> > +       if (fp->is_posix_ctxt =3D=3D false && strchr(new_name, ':')) {
-> >                 int s_type;
-> >                 char *xattr_stream_name, *stream_name =3D NULL;
-> >                 size_t xattr_stream_size;
-> > diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-> > index 0708155b5caf..78b506c5ef03 100644
-> > --- a/fs/smb/server/vfs_cache.h
-> > +++ b/fs/smb/server/vfs_cache.h
-> > @@ -112,6 +112,8 @@ struct ksmbd_file {
-> >         bool                            is_durable;
-> >         bool                            is_persistent;
-> >         bool                            is_resilient;
-> > +
-> > +       bool                            is_posix_ctxt;
-> >  };
-> >
-> >  static inline void set_ctx_actor(struct dir_context *ctx,
-> > --
-> > 2.50.1
-> >
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+--------------RrmNcCiGURyy7E02kAtUKq9M
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
+T24gOC8yMC8yNSA2OjQzIFBNLCBTdGV2ZSBGcmVuY2ggd3JvdGU6DQo+IEFkZGluZyBzYW1i
+YS10ZWNobmljYWwgaW4gY2FzZSBvcGluaW9ucyBvbiB0aGlzDQoNCnllcy4gOikNCg0KTm8g
+cmVtYXBwaW5nIGZvciBQT1NJWCBwbGVhc2UuIFRoYXQgbWVhbnMgbm8gc3RyZWFtcyBzdXBw
+b3J0IGZvciBQT1NJWCANCmFuZCB0aGF0J3MgZ29vZC4NCg==
 
+--------------RrmNcCiGURyy7E02kAtUKq9M--
 
---=20
-Thanks,
+--------------tt0ffR1Ov6DmzMfCq6rK3r2G
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Steve
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmimAZ8FAwAAAAAACgkQqh6bcSY5nkah
+1Q//Rvcp08uAkwJsMOTdK7xev+Qdvv8Z2WV0U5CcgNoCvae1c02INfFlzuqqEKnf6vInuCbqVl6L
+dDscyzHxEfF/wGj34ZhC0oAsxRAGrUeFUEApMANjUvMD5dvGDOPSDgY4dVIjPZcatAfjPoVokKKc
+364vvCysje06xc4YAk7kPpc0cRKL19G4K60x2osXaRYSxJNF2kab7H3CVpfOWYcYUmc1oDMNPB/k
+hJM3SXklCkeD46cyne7gIzioLZZqbXByx3/DcKhHGbAbC8g1mgb8FBIFN8nmz1VfQ4ZyrCoLiRSH
+floSJD2a4hxuhvZp9IRi8/PGcalOWuBaGR85XE6CIbSMfeJmq/BLYG4bkpL6V2gPKUUTgn6uof+L
+0WvA0mm1f91Vmry9sQpJzF14T+Re0+m7DHPsGQ4jIdSmr2mIaEo4ZQC7T4O+VNbMv8RbaeK5wlQt
+GSKijgpn9FllpxeyPWr1KGHqdPvwc5Ekcy+tOfmCpmSS3X4kRLqK7bXECWTKoMFBveGpG+S6dHj4
+893WllPNji1pFwU0ByXz+4cf/P7ftj53sfkysuainmD046/uJY2SiSCGyHJYbfzjHbnthgykU92B
+HCql5k7LYLEhqbJUqYnBcJhPP4xI707G87mS4bLgSGwG4iJ8wTUdu3FxE4AEJL96invWrMnzVg9H
+Xx4=
+=J49c
+-----END PGP SIGNATURE-----
+
+--------------tt0ffR1Ov6DmzMfCq6rK3r2G--
