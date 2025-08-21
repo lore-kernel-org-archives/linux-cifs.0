@@ -1,110 +1,97 @@
 Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAF919E7E2;
-	Thu, 21 Aug 2025 02:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EC2277C90
+	for <linux-cifs@vger.kernel.org>; Thu, 21 Aug 2025 03:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755741779; cv=none; b=qZW/N4bpe5BVgwMEVrUvcPG46IPTWFAmgJ/l0DrJzJbzGga2WydnxMsp6ZQegfF2iEkBkPGaYWgeXtvV1+Ch00yJ7cacxLJy4lOy0yM33gR2WGSE4eJbMbuEe0tgr9TTQi5Q+TNjApOHv9+Opi+wue3Jy6vXmAI4KM3gyivCIPk=
+	t=1755745545; cv=none; b=Z/l2wa1jc8opN+TPAQhf5m86SSTyr1HendBP3xye2sve5mmHaGMksJE2kQuAN7rK7sbx31cPc2kJHGYMNfUXl3TyMuzEvp6OXVx2oSy4dwUoS0vbQLnK0d/+eOY1zE4IpCDu8dG+Jv8ZKn6aoQeQd4J9CI0KSVayTjk/zj1ynWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755741779; c=relaxed/simple;
-	bh=q/bb9gTQN/O3uOOQMCaFMGKV2OTwlVVRp0KuduQ/434=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dAESJvb6vylgkhdPyiRNBs7GYn7tbKCRQ8qsHEgiBMqamFJgDwspVIhAjmHwYyRtDjTc56NV92UHvfThxEZpJ3h/Q8ZlvwaGEnmL44mBD68vxqqwOGHiSHRAl5BPThzQsS13e5dRpLW2r9pP+A+GwIe/+gqozhn4BE7Nthujphs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kasvz05S; arc=none smtp.client-ip=209.85.222.180
+	s=arc-20240116; t=1755745545; c=relaxed/simple;
+	bh=hx7x5g9FwLwz1UZrqYmphj9WvoTDTNcyXxMx4qEoyAo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SnD5dnBuHcW5gExNclof7fuKh+arf+6+9CaOHWtG6x41hWzGcXiz+wYlB2YQuhicI3E/bxPwWNliGMMUXL2Q5SGQmN/p4RJ5B8wuRr46y61rYLQDG/W1y/c3CRipkGA/frBoq0FkHs3/P/U3HLLVBE9Hw3tkQuWVnlIL112JFqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVDd/kP4; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kasvz05S"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e8704c7a46so62140085a.1;
-        Wed, 20 Aug 2025 19:02:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVDd/kP4"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e87031ce70so36952485a.0
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 20:05:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755741777; x=1756346577; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uChfv3dbEQUO8eMCGtEccp07YhaPFLJJZXa93OWzg6Q=;
-        b=kasvz05SMMY1GHfToevo6DPuezcBxoDdtVI2A8R3UYlLuOZ52ge40yVgGGOu3A3TCl
-         gAFUDxUiTSIsf4reCO1JpN8eR/S/kVs7gaPynfiF3hhxJO82Aqg5twiwID9sT8jdKjjG
-         Wx6pSbIiTz2mxzvq3i1Wehm/89ytLldLgrqk+XQjIrzHzMnSobhOnovVl13Vd3kP1Hj6
-         Ez7rTVJHA8GikU2tBmAGfPtLdd11fILxMQlBTw2xn5Oo3X/fHHOOCcJzqLfBwenGyGRc
-         sl3dKinhD5orL6YNg+19uIUyhKT+WALLw+gzWqQhNZS+6aVBpOVy9ntKkDpBykRF4Ai3
-         5dDA==
+        d=gmail.com; s=20230601; t=1755745543; x=1756350343; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hx7x5g9FwLwz1UZrqYmphj9WvoTDTNcyXxMx4qEoyAo=;
+        b=RVDd/kP4yXzSTcTQEmxwTdRAuy0v3eTPYlXNix/YoBLy77D1Bo2TIu/JdWBQgWmtjJ
+         JhBjLzuuZODDLfOfPDfn59Zuv4LwjEll2tFJXOwLvVgnjWQ1GUNBZ92oeImvpdYfJT0J
+         6uRLFk/Qprwo2oXOhlV3qHzeM/3ulT61dfCRNDHksS9t3XBMBgGLIyN+WPOc/PWsr71O
+         pQCvs46R4mWGAH/MsV5M7Zv0k0Qh6qSR14AGfxNH5eEpJhvxoTRB+MBTbTh0u5lVkxFn
+         X/JepnHX/7bMN+hQQrWtHgNtAw5lBRFY3B7vl5WAiOBA1L4zS4L4xlfbWSgTJ+VccT5K
+         ZEkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755741777; x=1756346577;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uChfv3dbEQUO8eMCGtEccp07YhaPFLJJZXa93OWzg6Q=;
-        b=JgeJxtNppjSi5yaX+lz1aF1K7jkB/2WD5tsRPXkCnkgvejjIgja2yJivg5pHMJPIhB
-         VjX6IuAs9lZLh1NAQm+y7iGsHOnzWZcqIKY6pBiOHrKEyPv5Gsr7ppqnG4TbtXoJ0uCh
-         kg1uIZeykLIHq41tV1d6AnpSxoAxvjFA+Mi6YYXnR5sgxvPbrSt1cxjpq20KgmXstfU/
-         xA/f5HBaa5N2+JYjkMBo0sELk1ZciFJJ08O8Qny7LcEuZrerUhFkm+jMX3kPFPN4qPMu
-         9iKCq2brxbhz7y9KnImnCMpytZMHEMGsmNG6xDGnpBdPlZRUhfZt81KgQ2LaqSAL3czg
-         gNvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUr+fxnSmhnlAOAo2nPm5fKEhpsde0Qd7aN9jQe60Cm8MNZzvoeZ2XLwV8whB5gYcyMNo4tJiUgD5O8vnps@vger.kernel.org, AJvYcCWvHkZsPprehMHUUYLMbkU+j6z+NlBHEZE99tTx3LWj1hG+JZBGCZ/L7smqFuqgM3Uwi/PW4igJGAJl@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxMHr2AiOMGY/bTPW/wYRVDqqv7D6lsBVJAgi8CLHMAQkNwGUD
-	L0421khS/fE4IpbcG+/gMjyoT25zBo2CrdAaTBXK5tNJ8SguOa41ykW94/lPEq/CSyIrJYxEyd0
-	OyLU9CS44BAcU7r4dPgdaikDSle/+F1GFsQQf
-X-Gm-Gg: ASbGncu14SbEu+zrHbXklH9D70EaBbE8/Lz5fUUvmmDPEKT04ICWdcd3s7FFBDFqs4t
-	equ6svetD1jv6E7Ygb4042ucL3b7ddmNT6ILHjPzX4UJIkffWjbp32mjNmnV1eKl+nFAHKT6miH
-	tbxn6Zvvb9iZovFy/fhqvvd9rx3J2PtLcRSeMRyG3zc+695NLsXLPMpIndi43ENIQ0BkFiT1w+O
-	0J0cWPbbLecX2Yt+/AlsHqL8y6+ssU77cNq4JFJUoCY0itvQvU=
-X-Google-Smtp-Source: AGHT+IFH1O4qBTSjA04bPjX7F2AhQ8hW+zCerUQe54wrBaRP/uBghNK/ND/L4HDQzKomSt+BYBf8sDaseZ17HBoj95c=
-X-Received: by 2002:a05:620a:3190:b0:7e8:710d:a514 with SMTP id
- af79cd13be357-7ea08e43716mr93848385a.53.1755741776612; Wed, 20 Aug 2025
- 19:02:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1755745543; x=1756350343;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hx7x5g9FwLwz1UZrqYmphj9WvoTDTNcyXxMx4qEoyAo=;
+        b=i5g/gKIWa9zdFLDAIjdFQUfHh/LNN3zawsbxUSTUl28W9q5bWxbQgvUMn2l0LkAhGc
+         SivGK+e6phX8FpjBdWLUvnLTggNZ9DCGQGlKwEgLvXLM1lhYwv1IwH6C/qkm/ixIU/YD
+         sVLaBvU1adEquhf87UQj5OKKWShwBBM/Nq3CpLb2MEzTRKykvQWd3t684KZVhUevOBCk
+         JMuL/RwYVJ8EvVxwrR0JjSSsFiGiA0n2PT0IKJKV+l85BWqM9ubPLSvNCxuO+g3WFcvv
+         7QF3xiSQq555u5Z17AFcrx8+7gMoBaQKcI3onkkyyZbjI+P8XogXpCewSatFOYU3fzhy
+         zdcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxRPznq6FmD+xaw8NNpC1VD5ERT8E5AdTSY0qjL554+YZ+LsahlYSLeJOQqSxYX8uRg1Xyuq+a2vnI@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPR3DsjLyEwrWbi2I+Xjo9HWquO5Up8tXoofs99YWG36ORHw3E
+	6kP+mebbsnmOYvuycic4i9DygD7xMkO/Z+xA6NBySt9mSkUZ6wMf7Zv49DtJgCldt0mT8xxAbJz
+	eN+DutNi66NXkOZgi6bc2ygcaCxnFlwY=
+X-Gm-Gg: ASbGncvuSUqL5LGE0y1Mps1leaNltLtjP8SO+He6DoW4c0VDrOzZV8Caj6br4yThCCx
+	e+tkLYwCO+xsehF87v28gQ8qojSW1fahwOZuPrgwYgP4700Fw9gbf3vuJWnsXyXjQNGBQRuSLeo
+	Zz+vbWaJfgjS5uL6YX2rAYJ8xMc+mv9e4aefm94iLpCLIr1wnJ7VS6NeENufC3CN1M2oeS+miKi
+	wpt6oRvkVHupXtep0VKuHDYQFnZfKVvdL4V+kqX
+X-Google-Smtp-Source: AGHT+IF5YHc5QP+2T+JBdwn4a6J1sze71z+IbyONRGi6XRGHgqrqK/UgyCTQAjLKQyExxE1aPG4/qpuH3Zo8hS8aUrs=
+X-Received: by 2002:a05:6214:c4e:b0:70b:43bf:29ce with SMTP id
+ 6a1803df08f44-70d88e0a6bfmr8867476d6.3.1755745542630; Wed, 20 Aug 2025
+ 20:05:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250820142413.920482-1-pkerling@rx2.rx-server.de>
+ <CAH2r5mupCJs6K3Y9N=oUp6oEAMV2S5=_d0nxirk74ZQ24gH7Eg@mail.gmail.com> <aKYD0r1PLQFRWXyZ@jeremy-HP-Z840-Workstation>
+In-Reply-To: <aKYD0r1PLQFRWXyZ@jeremy-HP-Z840-Workstation>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 20 Aug 2025 21:02:45 -0500
-X-Gm-Features: Ac12FXx99RwOD6LIDlz9lcKmgeewb4DN6PYRoc4wZWKQ4muA9weLs57PbzDyOuw
-Message-ID: <CAH2r5msSBLTFkG1FGLFD9rUjQ+8xSHdnUaoZ4zsBGrG33zGrcg@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+Date: Wed, 20 Aug 2025 22:05:31 -0500
+X-Gm-Features: Ac12FXwYNYHNq4eJs-8piF8C6epRVQlnKfKfBqxYLlgd_62SYTDuPICzbaR2UuM
+Message-ID: <CAH2r5mv=Ws3W3+mF3M1f0mfHhAXF01cfJqK+QVQ3Zf-q8_Ltxg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: allow a filename to contain colons on SMB3.1.1
+ posix extensions
+To: Jeremy Allison <jra@samba.org>
+Cc: Philipp Kerling <pkerling@casix.org>, linux-cifs@vger.kernel.org, linkinjeon@kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9:
+On Wed, Aug 20, 2025 at 12:20=E2=80=AFPM Jeremy Allison <jra@samba.org> wro=
+te:
+>
+> On Wed, Aug 20, 2025 at 11:37:25AM -0500, Steve French wrote:
+> >Samba allows this with POSIX extensions negotiated (creating file with
+> >: in the name) but I am wondering if a better way to solve this (to
+> >avoid any confusion with alternate data streams) is to change the
+> >client to use SFM_COLON (ie the remap in Unicode where colon is
+> >remapped to 0xF022 instead of 0x003A)
+>
+> No. Only do that mapping to Windows servers.
+>
+> POSIX servers should properly store the real ':' character.
 
-  Linux 6.17-rc2 (2025-08-17 15:22:10 -0700)
+makes sense
 
-are available in the Git repository at:
 
-  git://git.samba.org/ksmbd.git tags/6.17-rc2-ksmbd-server-fixes
-
-for you to fetch changes up to 89bb430f621124af39bb31763c4a8b504c9651e2:
-
-  ksmbd: fix refcount leak causing resource not released (2025-08-17
-19:33:29 -0500)
-
-----------------------------------------------------------------
-Three ksmbd smb3 server fixes
-- fix refcount issue that can cause memory leak
-- rate limit repeated connections from IPv6, not just IPv4 addresses
-- fix potential null pointer access of smb direct work queue
-----------------------------------------------------------------
-Namjae Jeon (1):
-      ksmbd: extend the connection limiting mechanism to support IPv6
-
-Stefan Metzmacher (1):
-      smb: server: split ksmbd_rdma_stop_listening() out of ksmbd_rdma_destroy()
-
-Ziyan Xu (1):
-      ksmbd: fix refcount leak causing resource not released
-
- fs/smb/server/connection.c     |  3 ++-
- fs/smb/server/connection.h     |  7 ++++++-
- fs/smb/server/oplock.c         | 13 ++++++++++---
- fs/smb/server/transport_rdma.c |  5 ++++-
- fs/smb/server/transport_rdma.h |  4 +++-
- fs/smb/server/transport_tcp.c  | 26 +++++++++++++++++++++++---
- 6 files changed, 48 insertions(+), 10 deletions(-)
-
--- 
+--=20
 Thanks,
 
 Steve
