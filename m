@@ -1,75 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40001D86DC
-	for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 23:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAF919E7E2;
+	Thu, 21 Aug 2025 02:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755732931; cv=none; b=epOJ9tBv+Y//Tn66t1Lf/Ym10jPAoWKC3SIzBtpYktOvNHreiF0KFAgfxd0Bo6QmwV2IaXn/wtUwtihTQvp5BTmJ1j7wPJD9ptYGiw/zZp6ebmggXmdiHk3RcCObn2AC84R2OpX7brpta6Ig585uqNrJT5vy2tnG2vc5BKKo7p8=
+	t=1755741779; cv=none; b=qZW/N4bpe5BVgwMEVrUvcPG46IPTWFAmgJ/l0DrJzJbzGga2WydnxMsp6ZQegfF2iEkBkPGaYWgeXtvV1+Ch00yJ7cacxLJy4lOy0yM33gR2WGSE4eJbMbuEe0tgr9TTQi5Q+TNjApOHv9+Opi+wue3Jy6vXmAI4KM3gyivCIPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755732931; c=relaxed/simple;
-	bh=GM0w+XrcXE9FoT6McUaZM1wxs7WZtex0oSn3cvXFAQg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZoIum2x73FW7RAl6aRUwvM6vJpaz3446dMa6luF+gngN0mJk0479gDSdFqL5Qa4UO5RHh1maFVgV82HfnrN8VOQBjhvKj/ebHNGLsvORLlMbtDXAtxy29mH3t7SUCpkfz3D+d+0Or/3PyvMKVY8YwTglwrrFOkg0LyO96BdiCYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kW8BmwF/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755741779; c=relaxed/simple;
+	bh=q/bb9gTQN/O3uOOQMCaFMGKV2OTwlVVRp0KuduQ/434=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dAESJvb6vylgkhdPyiRNBs7GYn7tbKCRQ8qsHEgiBMqamFJgDwspVIhAjmHwYyRtDjTc56NV92UHvfThxEZpJ3h/Q8ZlvwaGEnmL44mBD68vxqqwOGHiSHRAl5BPThzQsS13e5dRpLW2r9pP+A+GwIe/+gqozhn4BE7Nthujphs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kasvz05S; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kW8BmwF/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D686C4CEE7
-	for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 23:35:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755732931;
-	bh=GM0w+XrcXE9FoT6McUaZM1wxs7WZtex0oSn3cvXFAQg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kW8BmwF/GF/7HDB7MV+3gpiiGMaYw+bTaeP5Uh9oj52AspmBcpbM/dkpO+a7uu02+
-	 /6ODRnLolACq1mUWMIF4NZK6z5FzegP7/aJZJPVl7sgV2+GbinTMZDi7X4IRK1c3dp
-	 so8zwVKwuyKDylgVmHaTmPCJkxlf8j7qzrhTIlOatw2paqEsHCk5h6/7gP/Z3/Gs1I
-	 iUfV69HnHMwfJEfUiX39eTCK798NOR0TJnzjK+/uR8mzglrD6sBUVgm/JHnG11HlZC
-	 pQvlg+oP077eii7y1jYeKgDbFjS2MNF3OQA2y+I53uUOmfEy6jhBTonD61Y+JewHqK
-	 mEZfuTVMzFDMw==
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-afcb7a2befdso61566966b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Aug 2025 16:35:31 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwizNCgdSWKR+90qqHzSsxaXHHVp5Vw0GW7aAafrTLU5HEHeFFx
-	cQZgET1Jm699NCjEK6WWzWtrn3BwlQEf446s7TZfNYUrcz9souVUAUgBSqtjqdwPzzzEbXDM8jO
-	5q85XmBWuAIz7kru0KL9FEqkhm4Sj5BA=
-X-Google-Smtp-Source: AGHT+IFWHZGp1fjwLdPn4hUD+Ul+MO8DUjsQBkQDxCUUbuqOdOR37CwpOIyIiUVv2TV7ISUWggpCN2ASjHyNu6ccNyQ=
-X-Received: by 2002:a17:907:7ba3:b0:ae3:5368:be85 with SMTP id
- a640c23a62f3a-afe07bb499bmr43430566b.47.1755732929923; Wed, 20 Aug 2025
- 16:35:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kasvz05S"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7e8704c7a46so62140085a.1;
+        Wed, 20 Aug 2025 19:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755741777; x=1756346577; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uChfv3dbEQUO8eMCGtEccp07YhaPFLJJZXa93OWzg6Q=;
+        b=kasvz05SMMY1GHfToevo6DPuezcBxoDdtVI2A8R3UYlLuOZ52ge40yVgGGOu3A3TCl
+         gAFUDxUiTSIsf4reCO1JpN8eR/S/kVs7gaPynfiF3hhxJO82Aqg5twiwID9sT8jdKjjG
+         Wx6pSbIiTz2mxzvq3i1Wehm/89ytLldLgrqk+XQjIrzHzMnSobhOnovVl13Vd3kP1Hj6
+         Ez7rTVJHA8GikU2tBmAGfPtLdd11fILxMQlBTw2xn5Oo3X/fHHOOCcJzqLfBwenGyGRc
+         sl3dKinhD5orL6YNg+19uIUyhKT+WALLw+gzWqQhNZS+6aVBpOVy9ntKkDpBykRF4Ai3
+         5dDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755741777; x=1756346577;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uChfv3dbEQUO8eMCGtEccp07YhaPFLJJZXa93OWzg6Q=;
+        b=JgeJxtNppjSi5yaX+lz1aF1K7jkB/2WD5tsRPXkCnkgvejjIgja2yJivg5pHMJPIhB
+         VjX6IuAs9lZLh1NAQm+y7iGsHOnzWZcqIKY6pBiOHrKEyPv5Gsr7ppqnG4TbtXoJ0uCh
+         kg1uIZeykLIHq41tV1d6AnpSxoAxvjFA+Mi6YYXnR5sgxvPbrSt1cxjpq20KgmXstfU/
+         xA/f5HBaa5N2+JYjkMBo0sELk1ZciFJJ08O8Qny7LcEuZrerUhFkm+jMX3kPFPN4qPMu
+         9iKCq2brxbhz7y9KnImnCMpytZMHEMGsmNG6xDGnpBdPlZRUhfZt81KgQ2LaqSAL3czg
+         gNvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUr+fxnSmhnlAOAo2nPm5fKEhpsde0Qd7aN9jQe60Cm8MNZzvoeZ2XLwV8whB5gYcyMNo4tJiUgD5O8vnps@vger.kernel.org, AJvYcCWvHkZsPprehMHUUYLMbkU+j6z+NlBHEZE99tTx3LWj1hG+JZBGCZ/L7smqFuqgM3Uwi/PW4igJGAJl@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxMHr2AiOMGY/bTPW/wYRVDqqv7D6lsBVJAgi8CLHMAQkNwGUD
+	L0421khS/fE4IpbcG+/gMjyoT25zBo2CrdAaTBXK5tNJ8SguOa41ykW94/lPEq/CSyIrJYxEyd0
+	OyLU9CS44BAcU7r4dPgdaikDSle/+F1GFsQQf
+X-Gm-Gg: ASbGncu14SbEu+zrHbXklH9D70EaBbE8/Lz5fUUvmmDPEKT04ICWdcd3s7FFBDFqs4t
+	equ6svetD1jv6E7Ygb4042ucL3b7ddmNT6ILHjPzX4UJIkffWjbp32mjNmnV1eKl+nFAHKT6miH
+	tbxn6Zvvb9iZovFy/fhqvvd9rx3J2PtLcRSeMRyG3zc+695NLsXLPMpIndi43ENIQ0BkFiT1w+O
+	0J0cWPbbLecX2Yt+/AlsHqL8y6+ssU77cNq4JFJUoCY0itvQvU=
+X-Google-Smtp-Source: AGHT+IFH1O4qBTSjA04bPjX7F2AhQ8hW+zCerUQe54wrBaRP/uBghNK/ND/L4HDQzKomSt+BYBf8sDaseZ17HBoj95c=
+X-Received: by 2002:a05:620a:3190:b0:7e8:710d:a514 with SMTP id
+ af79cd13be357-7ea08e43716mr93848385a.53.1755741776612; Wed, 20 Aug 2025
+ 19:02:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250820142413.920482-1-pkerling@rx2.rx-server.de>
-In-Reply-To: <20250820142413.920482-1-pkerling@rx2.rx-server.de>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 21 Aug 2025 08:35:18 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-i2YFYOf6N9a-E-YQJ+An8JieZAnRbM80L81uLdn4j-Q@mail.gmail.com>
-X-Gm-Features: Ac12FXxjLIu0T7kbryx9KQN0_tQLH7MYIUIzdstbSV93FehHieuudgz7c_5qyws
-Message-ID: <CAKYAXd-i2YFYOf6N9a-E-YQJ+An8JieZAnRbM80L81uLdn4j-Q@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: allow a filename to contain colons on SMB3.1.1
- posix extensions
-To: Philipp Kerling <pkerling@casix.org>
-Cc: linux-cifs@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 20 Aug 2025 21:02:45 -0500
+X-Gm-Features: Ac12FXx99RwOD6LIDlz9lcKmgeewb4DN6PYRoc4wZWKQ4muA9weLs57PbzDyOuw
+Message-ID: <CAH2r5msSBLTFkG1FGLFD9rUjQ+8xSHdnUaoZ4zsBGrG33zGrcg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 20, 2025 at 11:24=E2=80=AFPM Philipp Kerling <pkerling@casix.or=
-g> wrote:
->
-> If the client sends SMB2_CREATE_POSIX_CONTEXT to ksmbd, allow the filenam=
-e to contain
-> a colon (':'). This requires disabling the support for Alternate Data Str=
-eams (ADS),
-> which are denoted by a colon-separated suffix to the filename on Windows.=
- This should
-> not be an issue, since this concept is not known to POSIX anyway and the =
-client has
-> to explicitly request a POSIX context to get this behavior.
->
-> Link: https://lore.kernel.org/all/f9401718e2be2ab22058b45a6817db912784ef6=
-1.camel@rx2.rx-server.de/
-> Signed-off-by: Philipp Kerling <pkerling@casix.org>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Please pull the following changes since commit
+c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9:
+
+  Linux 6.17-rc2 (2025-08-17 15:22:10 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/6.17-rc2-ksmbd-server-fixes
+
+for you to fetch changes up to 89bb430f621124af39bb31763c4a8b504c9651e2:
+
+  ksmbd: fix refcount leak causing resource not released (2025-08-17
+19:33:29 -0500)
+
+----------------------------------------------------------------
+Three ksmbd smb3 server fixes
+- fix refcount issue that can cause memory leak
+- rate limit repeated connections from IPv6, not just IPv4 addresses
+- fix potential null pointer access of smb direct work queue
+----------------------------------------------------------------
+Namjae Jeon (1):
+      ksmbd: extend the connection limiting mechanism to support IPv6
+
+Stefan Metzmacher (1):
+      smb: server: split ksmbd_rdma_stop_listening() out of ksmbd_rdma_destroy()
+
+Ziyan Xu (1):
+      ksmbd: fix refcount leak causing resource not released
+
+ fs/smb/server/connection.c     |  3 ++-
+ fs/smb/server/connection.h     |  7 ++++++-
+ fs/smb/server/oplock.c         | 13 ++++++++++---
+ fs/smb/server/transport_rdma.c |  5 ++++-
+ fs/smb/server/transport_rdma.h |  4 +++-
+ fs/smb/server/transport_tcp.c  | 26 +++++++++++++++++++++++---
+ 6 files changed, 48 insertions(+), 10 deletions(-)
+
+-- 
+Thanks,
+
+Steve
