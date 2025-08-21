@@ -1,35 +1,35 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FD12EF65C
-	for <linux-cifs@vger.kernel.org>; Thu, 21 Aug 2025 09:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705631E47A5
+	for <linux-cifs@vger.kernel.org>; Thu, 21 Aug 2025 09:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755768300; cv=none; b=dflDEuBNeTuVp9y1sut/iI7gBZFu4Xv7q1Q8J6Bc7voFZDbDUlLZ6BwWCzAa+yAL4kV1xbBHg8P0wQME+BxgIrp/0Ph5cLBFOQTAFJL0HvyzbxYccaixla50O6HvQEDwewDYOwiDAO6tK9hbXRismOzlxowQOE/XuVuU3A6Gff8=
+	t=1755768493; cv=none; b=gRF4g/8TxFUTebYI5P9K8Ra5y0LmxFKp2ZzxnSpjNr/Ol98/sqX1TYdUnr9nS9ENaI/8+l4cW1MlpU7MUm+JQ3BzSeMcT8cxZB0gA+N5UjiM27sJJ2K+OGQaEH5ZTOltAC/GfyQoTn9c+HYYwfVAI+jwC3b24++xPdua7dScHMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755768300; c=relaxed/simple;
+	s=arc-20240116; t=1755768493; c=relaxed/simple;
 	bh=ULUNNtXkr7TVaCNcFaJ3+7bLUw43UcVzGG/lUI7ZKac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AjgaSGQiI0z/Xc5wqXe1Mqw1tTFn7nVN7kiBeNRIA/5YCwsggqO0KV2gfmU0HDeEDo6RVha4I2+UbmVA2wpxUoRS46DrG0gvBLQ4ZN38RnpKCaSz73PtGpvcm6VVIORjpZLU9blgWXhQY8tuO4vp3gY6f2HFuFlcMFUdulZC33M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Rwv9t2OR; arc=none smtp.client-ip=144.76.82.148
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tYOpzVhURY4UaJ8XDr3TjxVjzqALy/K/dmg9efamSrhYurHjw/KV1LY1l5N6eXP3I8MZYaIZl09kYYyHArnHAv0nPa8DyJHF0e1CSZW+XbrK1nJIf2KVXwaK5kQSLhEYcQG7YYNIkMW7tYSAucTCUv7IoB29ZiQpEfkecvt3Nds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=rdvXOaHc; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Rwv9t2OR"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="rdvXOaHc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=gVg57MG7EfHADLIgfauckXcgeTFmxDFiDyqpHAzKoeg=; b=Rwv9t2ORaZgE3DmnEjXe2oOK7p
-	Ldmqm7ennnTS3+t2YU568rmr/fGEj9pdPrRS8JPQk8zgPsWVIoFYtzAvQ3VQwAdccHHCdGVY+3nLK
-	tjrp2hiSnFjxVKdvHa4I3tVfY3t/GnNFcAvGdT7jqCpgItrO7LmcOdt2Ue7WzY2clM2jm3O5iqmWx
-	gJ97Kc+TKIkfKzX8OQD6eVVYkUdAT4uoXXnWGUg7vihr55Aru9EiVLflAhWj9GrIvAslBtzru26Wp
-	oUBcoFJs2uxEg73Z/zRMcDwKBay8RQtzwOQmqqzjHtx7vtcGBLm3SSe7dOeksblpNeltMNbaUmW1M
-	F+gcuazY3LGBiqDzO6Rzbp15ubUDkmV/BO1OrxJQcpstDYArCCF6X/JjPfR/MTeS+r44PHlHJJNRU
-	lIN9XPfsq9sHlWSi2F2pQF+wywALt7uwDC17Fxxe8vHStHObc7CMqDFMNJX/koFUNxsPHbgUSeyon
-	9zBvDbPbBNT8DzRs6aYZQ/20;
+	bh=gVg57MG7EfHADLIgfauckXcgeTFmxDFiDyqpHAzKoeg=; b=rdvXOaHcax4CoqR3vRi5ziiBpq
+	KIdAiSJpebYFVt7r3l5tdDCNjz3PvRwyvRMA6eBCpLmT+XJRoh+DcZtrcNeTSFSqK8qnxQ5TPyRDb
+	Z8Li6X8ygfCnMrOIBtzVMoGw7TfG0AL1JK282TqIAU7HSAGD3BIIf3og62s7TTQEt8jabdqluuGPm
+	sm42x+FPYzCd1HGBEP1TbEMjCaOUPosRvDDtyIM+dz8GNGChp46/cmb+kKkN2PLkg+fHIIhLBn6VH
+	d1F2nl+g58zcbPpqmeUnplycZt8zOu+wWaFiw2l0nzMQ5jjdto+rX+ZoixhepxMqbFKvoWL20/NIF
+	a6KoqAelQ7XMpw5T5chAV2XaF9rDFDnqQ8wG3mp6ca0/5aMmOJL5H+xHf5yiRU+RPgDkTvedk7wwf
+	aP1UiWfS0W+mn+YnFCE1HaD+wuzivvrTaLKg4SvtEXDPrcn2BLlwTPAeM0ashQFUUfRTBePdLuHPO
+	/j1PzovVbtgbatjIBAyjVddA;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1up1XT-0002vW-2E;
-	Thu, 21 Aug 2025 09:24:55 +0000
+	id 1up1aY-0002z8-2S;
+	Thu, 21 Aug 2025 09:28:06 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -37,9 +37,9 @@ Cc: metze@samba.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>
-Subject: [PATCH 1/4] smb: server: fix IRD/ORD negotiation with the client
-Date: Thu, 21 Aug 2025 11:24:35 +0200
-Message-ID: <20250821092439.35478-1-metze@samba.org>
+Subject: [PATCH v2] smb: server: fix IRD/ORD negotiation with the client
+Date: Thu, 21 Aug 2025 11:27:51 +0200
+Message-ID: <20250821092751.35815-1-metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
