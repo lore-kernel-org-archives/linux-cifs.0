@@ -1,110 +1,209 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFB71AF0AF;
-	Thu, 21 Aug 2025 21:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BD92652B4;
+	Fri, 22 Aug 2025 03:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755810675; cv=none; b=KrPQor6anCVr/ajmntJNZLiKmERqfQYdPQupsoYIKdG3W9LvN6uZU+82pZWqgJ1WQkNNRD8BG5a/1wJ7/oaWRIiZLY4Z50ZTvwT+loA5cNFd0BduNSdMOGunoyrRhuYNINvBFRwOWk1XZvp2INhg23OoO7LLdK8/HokGG93nigU=
+	t=1755832084; cv=none; b=erxwrKxigNrMCX/7tYXeO0K1diU7JsUWvZwA/PHT1PfRUlYDbXVQlmZLWhkVe7eS6MYmpHFCYxvdzOsSU1SjfQpUzk3NKh7SzEX2Hqr4emB2wK+uVRxNf4BlcrzJs8oeova21l5rThgdO71/NerImhmxVF4qIviT5q4OGjTaUMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755810675; c=relaxed/simple;
-	bh=9P2i88Ia0NANevxOTp5LAojt2DDhtMw67A8/kG5zJA0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TtOJXwlRkYuA0LX4ocqCygL6zpY/H8K9yUGMQV8BLTsFrdT/dBwFEoehaTUHy3DU/U6yebcNTJT46i2ujSB/d6UBKfDp6nkdqXWNPuUMYXyeA6HH2gPXqfVYn8G//nwRsCaWpnuk8UEX16M8LgTdK1/Qnz8HEvKI5QBJFJxSNrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=ubtSe231; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1755832084; c=relaxed/simple;
+	bh=SCWJsd9vjE1VJ9L3wefl1VGRbBT52yKi9plp6KLTV/M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pemkkggPRbPeP8RGGkaO9Pgfy+KK3/FagthQ0cXR9uA28eOkU79IEJJKmDwyeD1QZl8ca2m/A0guWEihPUfnjA0YQogsFtzMLMrRQXJxjF1/H/C8hxSaxZ2siNlc/SIBjO+pXFt2xqSFcpd/JzJp6Fg69UKGFKgZC4e3PTbzohI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pq826WrM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ubtSe231"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=tqU0oHf+rGk3eaMDsAPhNeDW/ojF2ZT8hSdz45ahNO4=; b=ubtSe231K9sYmEaFEvk8mQdHJa
-	FNWtlo2OeKenV3fdi/wCAsl0DacPrfUiINbL+qhDiodEJoM1uhDcnKmHgroetrVumK2ka4OgJIhlQ
-	wOL5bmk8wJyWElK1DNj133TJVgMkFPK1Hxk+huUbzn6BxTJ12Q+nCJtD2tuvYF/3VLC9ov5S0dbyA
-	HHqR9vHfks86jZnd1fZdJPcb+3SmBD/pnSZiH5HNjH36IuZxq7C76Ehobp7Z1ZQU9NReokkQkQgTQ
-	1pHsXkcaDBsDKffIuEEenytVdOYtC5tZ3NvvRjPYTBoUGfyR45hBbDX4ldEQFYL4h7+tPlvQtIeU1
-	Zrgy97oZ+EyTzni556BIAXVMaJwU82+gVffRZdvUFxxXM43vp60h+1tytGw6xInpXIkFWgEKQCfm5
-	Od9QTrcVUcgavQQEWXCcQdPpT8S4y7ZvSJnzt/ISqbjAOj6T6QaRjYduYztdvx2eJEjHiO1MDiW43
-	s5ll3XyVQ86BQIw2RAuQRN8f;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1upCYx-0009tU-09;
-	Thu, 21 Aug 2025 21:11:11 +0000
-Message-ID: <425ee0dd-328c-484b-bd05-3e043def463b@samba.org>
-Date: Thu, 21 Aug 2025 23:11:10 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pq826WrM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1398C4CEEB;
+	Fri, 22 Aug 2025 03:08:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1755832084;
+	bh=SCWJsd9vjE1VJ9L3wefl1VGRbBT52yKi9plp6KLTV/M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pq826WrMct/ELjpuRCD360hXL5d6eRZjJlhvi1ZvcFso6C915lRq4I8Y/MQvxFvuk
+	 c61/R4JqIAiKBru31s6kf8r+L9NUyoUKZCg6JNEZe0OcRQuHHIMqM/76MFRuT22g53
+	 EvSqtDBdC+41GoPOdTB132X/U0RD6+K8MlKPfINpB+ZXjeAXb553Z4Sm5j5PG3Gy3X
+	 lC1UGWW/biRSQpqlW/VV98IVGwveT907OhGljIOMQ0ZFb9OvETPWO4iIzZwUjETta/
+	 neRSqnMgpnVKPZyGmhuL1i4ab5jXoogzvcbjqSkVXHBUNsTIryEqKRjwSDMQcl9deU
+	 FAFNC8olFBgiQ==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Xiaoli Feng <fengxiaoli0714@gmail.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Steve French <sfrench@samba.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	netfs@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Christian Brauner <brauner@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.12.y] netfs: Fix unbuffered write error handling
+Date: Thu, 21 Aug 2025 23:08:00 -0400
+Message-ID: <20250822030800.1054685-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <2025082157-dedicator-hurled-4d65@gregkh>
+References: <2025082157-dedicator-hurled-4d65@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: struct rdma_conn_param uses u8 for responder_resources,
- initiator_depth and private_data_len
-To: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Cc: Tom Talpey <tom@talpey.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- Samba Technical <samba-technical@lists.samba.org>,
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>
-References: <8c6027ac-09dc-4ee6-ba82-4afd897dabf6@samba.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <8c6027ac-09dc-4ee6-ba82-4afd897dabf6@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Am 21.08.25 um 23:04 schrieb Stefan Metzmacher via samba-technical:
-> Hi,
-> 
-> this mail is triggered by the discussion in this thread on
-> linux-cifs:
-> https://lore.kernel.org/linux-cifs/f551bf7f-697a-4298-a62c-74da18992204@samba.org/T/#t
-> 
-> In include/rdma/rdma_cm.h we have this:
-> 
-> struct rdma_conn_param {
->          const void *private_data;
->          u8 private_data_len;
->          u8 responder_resources;
->          u8 initiator_depth;
->          u8 flow_control;
->          u8 retry_count;         /* ignored when accepting */
->          u8 rnr_retry_count;
->          /* Fields below ignored if a QP is created on the rdma_cm_id. */
->          u8 srq;
->          u32 qp_num;
->          u32 qkey;
-> };
+From: David Howells <dhowells@redhat.com>
 
-struct iw_cm_event {
-         enum iw_cm_event_type event;
-         int                      status;
-         struct sockaddr_storage local_addr;
-         struct sockaddr_storage remote_addr;
-         void *private_data;
-         void *provider_data;
-         u8 private_data_len;
-         u8 ord;
-         u8 ird;
-};
+[ Upstream commit a3de58b12ce074ec05b8741fa28d62ccb1070468 ]
 
-Also has them as u8...
+If all the subrequests in an unbuffered write stream fail, the subrequest
+collector doesn't update the stream->transferred value and it retains its
+initial LONG_MAX value.  Unfortunately, if all active streams fail, then we
+take the smallest value of { LONG_MAX, LONG_MAX, ... } as the value to set
+in wreq->transferred - which is then returned from ->write_iter().
 
-> The iwarp MPA v2 negotiation can handle values up to
-> 0x3fff for responder_resources and initiator_depth.
-> And private_data_len can be 0xffff for MPA v1 and
-> 0xffff - 4 for MPA v2.
-> 
-> I just found that ROCE only supports u8 in the CM ConnectRequest
-> (and I guess it's ROCE v1 and v2 as well as Infiniband,
-> but I've only every seen ROCE v2 captures).
-> 
-> BTW: does ROCE also support private data and if how much?
-> 
-> So is it desired to limit iwarp to u8 values too?
-> 
-> Thanks!
-> metze
-> 
+LONG_MAX was chosen as the initial value so that all the streams can be
+quickly assessed by taking the smallest value of all stream->transferred -
+but this only works if we've set any of them.
+
+Fix this by adding a flag to indicate whether the value in
+stream->transferred is valid and checking that when we integrate the
+values.  stream->transferred can then be initialised to zero.
+
+This was found by running the generic/750 xfstest against cifs with
+cache=none.  It splices data to the target file.  Once (if) it has used up
+all the available scratch space, the writes start failing with ENOSPC.
+This causes ->write_iter() to fail.  However, it was returning
+wreq->transferred, i.e. LONG_MAX, rather than an error (because it thought
+the amount transferred was non-zero) and iter_file_splice_write() would
+then try to clean up that amount of pipe bufferage - leading to an oops
+when it overran.  The kernel log showed:
+
+    CIFS: VFS: Send error in write = -28
+
+followed by:
+
+    BUG: kernel NULL pointer dereference, address: 0000000000000008
+
+with:
+
+    RIP: 0010:iter_file_splice_write+0x3a4/0x520
+    do_splice+0x197/0x4e0
+
+or:
+
+    RIP: 0010:pipe_buf_release (include/linux/pipe_fs_i.h:282)
+    iter_file_splice_write (fs/splice.c:755)
+
+Also put a warning check into splice to announce if ->write_iter() returned
+that it had written more than it was asked to.
+
+Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
+Reported-by: Xiaoli Feng <fengxiaoli0714@gmail.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220445
+Signed-off-by: David Howells <dhowells@redhat.com>
+Link: https://lore.kernel.org/915443.1755207950@warthog.procyon.org.uk
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: netfs@lists.linux.dev
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: stable@vger.kernel.org
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+[ Dropped read_collect.c hunk ]
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/netfs/write_collect.c | 10 ++++++++--
+ fs/netfs/write_issue.c   |  4 ++--
+ fs/splice.c              |  3 +++
+ include/linux/netfs.h    |  1 +
+ 4 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index a968688a7323..c349867d74c3 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -433,6 +433,7 @@ static void netfs_collect_write_results(struct netfs_io_request *wreq)
+ 			if (front->start + front->transferred > stream->collected_to) {
+ 				stream->collected_to = front->start + front->transferred;
+ 				stream->transferred = stream->collected_to - wreq->start;
++				stream->transferred_valid = true;
+ 				notes |= MADE_PROGRESS;
+ 			}
+ 			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
+@@ -538,6 +539,7 @@ void netfs_write_collection_worker(struct work_struct *work)
+ 	struct netfs_io_request *wreq = container_of(work, struct netfs_io_request, work);
+ 	struct netfs_inode *ictx = netfs_inode(wreq->inode);
+ 	size_t transferred;
++	bool transferred_valid = false;
+ 	int s;
+ 
+ 	_enter("R=%x", wreq->debug_id);
+@@ -568,12 +570,16 @@ void netfs_write_collection_worker(struct work_struct *work)
+ 			netfs_put_request(wreq, false, netfs_rreq_trace_put_work);
+ 			return;
+ 		}
+-		if (stream->transferred < transferred)
++		if (stream->transferred_valid &&
++		    stream->transferred < transferred) {
+ 			transferred = stream->transferred;
++			transferred_valid = true;
++		}
+ 	}
+ 
+ 	/* Okay, declare that all I/O is complete. */
+-	wreq->transferred = transferred;
++	if (transferred_valid)
++		wreq->transferred = transferred;
+ 	trace_netfs_rreq(wreq, netfs_rreq_trace_write_done);
+ 
+ 	if (wreq->io_streams[1].active &&
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index bf6d507578e5..b7830a15ae40 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -115,12 +115,12 @@ struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
+ 	wreq->io_streams[0].prepare_write	= ictx->ops->prepare_write;
+ 	wreq->io_streams[0].issue_write		= ictx->ops->issue_write;
+ 	wreq->io_streams[0].collected_to	= start;
+-	wreq->io_streams[0].transferred		= LONG_MAX;
++	wreq->io_streams[0].transferred		= 0;
+ 
+ 	wreq->io_streams[1].stream_nr		= 1;
+ 	wreq->io_streams[1].source		= NETFS_WRITE_TO_CACHE;
+ 	wreq->io_streams[1].collected_to	= start;
+-	wreq->io_streams[1].transferred		= LONG_MAX;
++	wreq->io_streams[1].transferred		= 0;
+ 	if (fscache_resources_valid(&wreq->cache_resources)) {
+ 		wreq->io_streams[1].avail	= true;
+ 		wreq->io_streams[1].active	= true;
+diff --git a/fs/splice.c b/fs/splice.c
+index 38f8c9426731..ed8177f6d620 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -744,6 +744,9 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
+ 		sd.pos = kiocb.ki_pos;
+ 		if (ret <= 0)
+ 			break;
++		WARN_ONCE(ret > sd.total_len - left,
++			  "Splice Exceeded! ret=%zd tot=%zu left=%zu\n",
++			  ret, sd.total_len, left);
+ 
+ 		sd.num_spliced += ret;
+ 		sd.total_len -= ret;
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 474481ee8b7c..83d313718cd5 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -150,6 +150,7 @@ struct netfs_io_stream {
+ 	bool			active;		/* T if stream is active */
+ 	bool			need_retry;	/* T if this stream needs retrying */
+ 	bool			failed;		/* T if this stream failed */
++	bool			transferred_valid; /* T is ->transferred is valid */
+ };
+ 
+ /*
+-- 
+2.50.1
 
