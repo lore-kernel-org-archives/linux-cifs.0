@@ -1,209 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BD92652B4;
-	Fri, 22 Aug 2025 03:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D2F233155;
+	Fri, 22 Aug 2025 03:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755832084; cv=none; b=erxwrKxigNrMCX/7tYXeO0K1diU7JsUWvZwA/PHT1PfRUlYDbXVQlmZLWhkVe7eS6MYmpHFCYxvdzOsSU1SjfQpUzk3NKh7SzEX2Hqr4emB2wK+uVRxNf4BlcrzJs8oeova21l5rThgdO71/NerImhmxVF4qIviT5q4OGjTaUMM=
+	t=1755832336; cv=none; b=Os/65smNFE66JYBw4MMtxxnECFqEI8jnTVVcXLAAV7hui0FVV1Iu7QkvJJaZXFhAKG3K7kUakU1n09JNfv/gsT6E7nM7lLh+PsFbbD4nm/TmT3Fx+alcVZssrgp6dt3YjZDNQ4X3Zn4QEOvShped5vXfEH2Fl6/VL0made1OFEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755832084; c=relaxed/simple;
-	bh=SCWJsd9vjE1VJ9L3wefl1VGRbBT52yKi9plp6KLTV/M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pemkkggPRbPeP8RGGkaO9Pgfy+KK3/FagthQ0cXR9uA28eOkU79IEJJKmDwyeD1QZl8ca2m/A0guWEihPUfnjA0YQogsFtzMLMrRQXJxjF1/H/C8hxSaxZ2siNlc/SIBjO+pXFt2xqSFcpd/JzJp6Fg69UKGFKgZC4e3PTbzohI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pq826WrM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1755832336; c=relaxed/simple;
+	bh=xgIaFQ68tlgBevrsv47YroVIQGCGYCdpFKVo25GB6FA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qDU/5LqrVR0WCO5PZFOr7/Mq3xv2/ANPQ8aeS2xapfgI76bjMjhzdTKNLTo+g5I18wSpkJ2MsSEezrTRY8nBvugmhT2HEp6X+MHRIDbBNIREjVQ22vuz33dLdL/DUmSBNGUh7spQFDl2clQkEkLPwciMhnFNZ9bw/IhoUav16Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=meEz8aOE; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pq826WrM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1398C4CEEB;
-	Fri, 22 Aug 2025 03:08:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1755832084;
-	bh=SCWJsd9vjE1VJ9L3wefl1VGRbBT52yKi9plp6KLTV/M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pq826WrMct/ELjpuRCD360hXL5d6eRZjJlhvi1ZvcFso6C915lRq4I8Y/MQvxFvuk
-	 c61/R4JqIAiKBru31s6kf8r+L9NUyoUKZCg6JNEZe0OcRQuHHIMqM/76MFRuT22g53
-	 EvSqtDBdC+41GoPOdTB132X/U0RD6+K8MlKPfINpB+ZXjeAXb553Z4Sm5j5PG3Gy3X
-	 lC1UGWW/biRSQpqlW/VV98IVGwveT907OhGljIOMQ0ZFb9OvETPWO4iIzZwUjETta/
-	 neRSqnMgpnVKPZyGmhuL1i4ab5jXoogzvcbjqSkVXHBUNsTIryEqKRjwSDMQcl9deU
-	 FAFNC8olFBgiQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Xiaoli Feng <fengxiaoli0714@gmail.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Steve French <sfrench@samba.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Christian Brauner <brauner@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12.y] netfs: Fix unbuffered write error handling
-Date: Thu, 21 Aug 2025 23:08:00 -0400
-Message-ID: <20250822030800.1054685-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <2025082157-dedicator-hurled-4d65@gregkh>
-References: <2025082157-dedicator-hurled-4d65@gregkh>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="meEz8aOE"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-70d9a65c353so3013956d6.2;
+        Thu, 21 Aug 2025 20:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1755832334; x=1756437134; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oUCwBP5hS+RhTy0i1m8L/lHk9qguwYZ1lnkT/6sAsuM=;
+        b=meEz8aOEeAYnzzjOv/f886UNGGclxYOwK6PsKHv7cnUCr6lqDt132xiCH0WZON8PIN
+         fH+UGGkto2NqmXaDoeVvh5DDOE/XMIfRBpS+pNVDNkei3rhR9YvH/ClkZwjOAHlVtNUL
+         iEy8owzLFZXisJ294VglGFVO6iyRYGYESCV7YUbFQublpKIzf1sDFF8WCf9Sxj3T+pFw
+         UXq/4Af5MNWsIddm2mE56JFttiITP1uzNEgbMlGAMwj033G5+hMZExQ6/9obVT5YFqzS
+         PcT0qf+7TzKd42B1F8wNUf5Noo0ajUVOn0CQa8ngZrZLngDDf9ETTdhaoT1jSU3GEFWl
+         lXBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755832334; x=1756437134;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oUCwBP5hS+RhTy0i1m8L/lHk9qguwYZ1lnkT/6sAsuM=;
+        b=YO3wFf66FyBoqdxYbjzVHDFUnjMPd3F198Fw/6ouYoOkBeK1el4CEtvMYADA7Z+cuO
+         aVFMcI6fl8phxhum4rmNepdmfnciR6Apq1QkPn0nUaqJ3R9JjZnyBmFb58g80L1KP9yI
+         UxNFDiP25/8kxP8dZYJ/yYr2oKSdxJPLmk989YVb3va3WWWBhhvjdjNN2TuS0H9WP8Dp
+         ubIJFpUEPRuPkcN1HZAP7yHjcTTHSHfdXIe5Dxkqe703Z3s5PPYTpKc+euKt/ZHIN7iG
+         Fpp7Jof7konHS0ZMDSu68zOyTXbxM/1+TNZKDdjwEUNRZKcIQZaoQlVrpaaBNkgKUWA2
+         hBhg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkEdAJrucxjSvRcFhM+JLRsb3KB1CfrVJcX9VpKXhxKpVY7qxzRw3xr7Bex2RFvMqSsmfNDd26trRwBZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJLt40MQLJWBcDE7H0TXbWIjQWQ3F9oqoZ/B0A5iaEJq+PlSCD
+	F+EdfkMgQqcTn/Ap0noYXKesN5bc+jv25Zp0HnAI931MsSQ7wIdjLfjtpD3Zdev8yITksLcG8E7
+	QQeZh5QwmG8lRBqtEo9Rea4fvxu+5md7nV2qC
+X-Gm-Gg: ASbGncu46rMuck7H6Bk0zsAPm5mx7xcH3oYHOeoEvwaUK0+FuWlHpf9vc6MpixfdU13
+	mNf3qHsJqA26pfU13skP+N8J8XS4rRyaxDx12HRQr/RVCCZQY176fAuGb/noOPd5VnZF2/g9Bw/
+	Y7woGTcqwLZSLdv0YBSxr6zRMX/jaXewzp2q7gjk5KJj3dCty2AFmApsNXswO+JnlQHDw+EwKBa
+	/+Etkfi2Zf5GpGC1YcBwSh6o/wwpYrFaWFfJbrED2PgZa6MH9cdOncmKYcIB8Ut2U3JT7y4mI/m
+	YxWRwwr6ONo5XkHrF5xCHYmU41NgeQo=
+X-Google-Smtp-Source: AGHT+IERDV0huF80juR1IF8eB3NI3HvYVAS2icY5Pws/DXKpP/RZ/KkMEKJx7W7uca60lnz7UotrWohoAwOwnqJVRDU=
+X-Received: by 2002:ad4:5766:0:b0:70d:8eb5:2c8b with SMTP id
+ 6a1803df08f44-70d9737c149mr22193376d6.48.1755832333995; Thu, 21 Aug 2025
+ 20:12:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 21 Aug 2025 22:12:02 -0500
+X-Gm-Features: Ac12FXxDv_Qc8LFoAp8SWeFM3B9Hfri5wU-DYOX2zhS50Ew_iubdCQdB_7kvaEQ
+Message-ID: <CAH2r5mtBRtF=ZtzjRWfdMwtvGzJ-oJ5_H2wfoBpkoZJJpfaebQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: David Howells <dhowells@redhat.com>
+Please pull the following changes since commit
+c17b750b3ad9f45f2b6f7e6f7f4679844244f0b9:
 
-[ Upstream commit a3de58b12ce074ec05b8741fa28d62ccb1070468 ]
+  Linux 6.17-rc2 (2025-08-17 15:22:10 -0700)
 
-If all the subrequests in an unbuffered write stream fail, the subrequest
-collector doesn't update the stream->transferred value and it retains its
-initial LONG_MAX value.  Unfortunately, if all active streams fail, then we
-take the smallest value of { LONG_MAX, LONG_MAX, ... } as the value to set
-in wreq->transferred - which is then returned from ->write_iter().
+are available in the Git repository at:
 
-LONG_MAX was chosen as the initial value so that all the streams can be
-quickly assessed by taking the smallest value of all stream->transferred -
-but this only works if we've set any of them.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.17-rc2-smb3-client-fix
 
-Fix this by adding a flag to indicate whether the value in
-stream->transferred is valid and checking that when we integrate the
-values.  stream->transferred can then be initialised to zero.
+for you to fetch changes up to 453a6d2a68e54a483d67233c6e1e24c4095ee4be:
 
-This was found by running the generic/750 xfstest against cifs with
-cache=none.  It splices data to the target file.  Once (if) it has used up
-all the available scratch space, the writes start failing with ENOSPC.
-This causes ->write_iter() to fail.  However, it was returning
-wreq->transferred, i.e. LONG_MAX, rather than an error (because it thought
-the amount transferred was non-zero) and iter_file_splice_write() would
-then try to clean up that amount of pipe bufferage - leading to an oops
-when it overran.  The kernel log showed:
+  cifs: Fix oops due to uninitialised variable (2025-08-19 11:16:14 -0500)
 
-    CIFS: VFS: Send error in write = -28
+----------------------------------------------------------------
+Fix for netfs smb3 oops
 
-followed by:
+----------------------------------------------------------------
+David Howells (1):
+      cifs: Fix oops due to uninitialised variable
 
-    BUG: kernel NULL pointer dereference, address: 0000000000000008
+ fs/smb/client/smb2ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-with:
 
-    RIP: 0010:iter_file_splice_write+0x3a4/0x520
-    do_splice+0x197/0x4e0
-
-or:
-
-    RIP: 0010:pipe_buf_release (include/linux/pipe_fs_i.h:282)
-    iter_file_splice_write (fs/splice.c:755)
-
-Also put a warning check into splice to announce if ->write_iter() returned
-that it had written more than it was asked to.
-
-Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
-Reported-by: Xiaoli Feng <fengxiaoli0714@gmail.com>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220445
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/915443.1755207950@warthog.procyon.org.uk
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: netfs@lists.linux.dev
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: stable@vger.kernel.org
-Signed-off-by: Christian Brauner <brauner@kernel.org>
-[ Dropped read_collect.c hunk ]
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/netfs/write_collect.c | 10 ++++++++--
- fs/netfs/write_issue.c   |  4 ++--
- fs/splice.c              |  3 +++
- include/linux/netfs.h    |  1 +
- 4 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index a968688a7323..c349867d74c3 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -433,6 +433,7 @@ static void netfs_collect_write_results(struct netfs_io_request *wreq)
- 			if (front->start + front->transferred > stream->collected_to) {
- 				stream->collected_to = front->start + front->transferred;
- 				stream->transferred = stream->collected_to - wreq->start;
-+				stream->transferred_valid = true;
- 				notes |= MADE_PROGRESS;
- 			}
- 			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
-@@ -538,6 +539,7 @@ void netfs_write_collection_worker(struct work_struct *work)
- 	struct netfs_io_request *wreq = container_of(work, struct netfs_io_request, work);
- 	struct netfs_inode *ictx = netfs_inode(wreq->inode);
- 	size_t transferred;
-+	bool transferred_valid = false;
- 	int s;
- 
- 	_enter("R=%x", wreq->debug_id);
-@@ -568,12 +570,16 @@ void netfs_write_collection_worker(struct work_struct *work)
- 			netfs_put_request(wreq, false, netfs_rreq_trace_put_work);
- 			return;
- 		}
--		if (stream->transferred < transferred)
-+		if (stream->transferred_valid &&
-+		    stream->transferred < transferred) {
- 			transferred = stream->transferred;
-+			transferred_valid = true;
-+		}
- 	}
- 
- 	/* Okay, declare that all I/O is complete. */
--	wreq->transferred = transferred;
-+	if (transferred_valid)
-+		wreq->transferred = transferred;
- 	trace_netfs_rreq(wreq, netfs_rreq_trace_write_done);
- 
- 	if (wreq->io_streams[1].active &&
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index bf6d507578e5..b7830a15ae40 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -115,12 +115,12 @@ struct netfs_io_request *netfs_create_write_req(struct address_space *mapping,
- 	wreq->io_streams[0].prepare_write	= ictx->ops->prepare_write;
- 	wreq->io_streams[0].issue_write		= ictx->ops->issue_write;
- 	wreq->io_streams[0].collected_to	= start;
--	wreq->io_streams[0].transferred		= LONG_MAX;
-+	wreq->io_streams[0].transferred		= 0;
- 
- 	wreq->io_streams[1].stream_nr		= 1;
- 	wreq->io_streams[1].source		= NETFS_WRITE_TO_CACHE;
- 	wreq->io_streams[1].collected_to	= start;
--	wreq->io_streams[1].transferred		= LONG_MAX;
-+	wreq->io_streams[1].transferred		= 0;
- 	if (fscache_resources_valid(&wreq->cache_resources)) {
- 		wreq->io_streams[1].avail	= true;
- 		wreq->io_streams[1].active	= true;
-diff --git a/fs/splice.c b/fs/splice.c
-index 38f8c9426731..ed8177f6d620 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -744,6 +744,9 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
- 		sd.pos = kiocb.ki_pos;
- 		if (ret <= 0)
- 			break;
-+		WARN_ONCE(ret > sd.total_len - left,
-+			  "Splice Exceeded! ret=%zd tot=%zu left=%zu\n",
-+			  ret, sd.total_len, left);
- 
- 		sd.num_spliced += ret;
- 		sd.total_len -= ret;
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 474481ee8b7c..83d313718cd5 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -150,6 +150,7 @@ struct netfs_io_stream {
- 	bool			active;		/* T if stream is active */
- 	bool			need_retry;	/* T if this stream needs retrying */
- 	bool			failed;		/* T if this stream failed */
-+	bool			transferred_valid; /* T is ->transferred is valid */
- };
- 
- /*
 -- 
-2.50.1
+Thanks,
 
+Steve
