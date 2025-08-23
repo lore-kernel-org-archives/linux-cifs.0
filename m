@@ -1,73 +1,73 @@
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378E812B93;
-	Sat, 23 Aug 2025 15:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A60C2ED141;
+	Sat, 23 Aug 2025 15:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755963665; cv=none; b=DwNDbkqiQu29E25OPjimJMca4FdNl53nVdIVIzF92yvg8SC8PVjyRY3XQbDkQpTD2xEPXixVKN9BgHEPStQlm7ue4ZUxNRwQKbl788gb/r9fByauIE4nKe6TIHVgEnOQnv/JmFnNw0GhASXUnhvuOmQmjcNyKeEuSsm82FsMtSU=
+	t=1755964690; cv=none; b=VO8YBLbMrdKE9l/2PMwnXw4urNmaHtD9PG2m2MevDIGuggudP5Pdu4m6N/RvnSuJLc09v7lEGU9oRQm7GbzKi/Nx+tBLt8ueZNOuA928Kes1FyoAbTH4sReacpZ7Ec906YAxQj46gZHd0HTkNQ8Oyc431wBrhtPdrQa0E5k0nZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755963665; c=relaxed/simple;
-	bh=6iU2aynSLSee+E5Dopkej0Rgy69kifMRkgq2/0PXcH8=;
+	s=arc-20240116; t=1755964690; c=relaxed/simple;
+	bh=CEss89D4rBcDaOXEtNPRHdQhEDfgyqGuolIWnEOZN24=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SuXcBxlYGy2jcKuaYlbMwiBln7fwd1/iLfdJo7IuBAXI79OG4ToXL6ogbpZUWptJKHtnJzFUdqu+e25audmHytpmcAstyD84Hv/TKSQvwr5rjDKNGDe74mM3oma/U7WXvnFuYdjjKHzEuxSRSW+4Gpo3yJse+3BJbiVidzDGStU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YL2mtwNG; arc=none smtp.client-ip=209.85.166.172
+	 To:Cc:Content-Type; b=S8Ad0+yI8uTv2Fu6mcwUKI4HxVY67cxZMCk+194y/L9iS8lsMLe7OIJHRwExzWsJZ3yhNfWjtGOGG1oYUz1MYDxZ6hfDdfCtidD3pIU0rZuRCIx3BW3atESdhqqRw62NJ/irKHiM7Whn9wuDPCIsvHEx1PfBgQD//l/t9mRoUjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5bXb6S4; arc=none smtp.client-ip=209.85.166.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YL2mtwNG"
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3e7c238bc0eso10295535ab.3;
-        Sat, 23 Aug 2025 08:41:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5bXb6S4"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3e566327065so18259235ab.0;
+        Sat, 23 Aug 2025 08:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755963663; x=1756568463; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1755964687; x=1756569487; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
-        b=YL2mtwNGAm4BkWOAfJnPVvW2/MImqlbz1VBii1qL2v16cb7GuT1Uo0FmAMs6N+b5Xp
-         yvcvYiS7JSpUIxbHw2JR8/+FVKsu9KFNDxbU1TuOAjoIbdL55N9YZluL4lLICe01i5Sa
-         ruFDH3C+821dS1Dobqvw/Agd3OSV+n6m7ul9KWZz41UeeMeYIiFr7XO+TdizzBW8RSW8
-         wZ2/HqJwcJRzie4kIg0Qoc9MPjbuKb8QcADBENX3t3dTg7u+yWDIGFVRODbeI08q866u
-         ZZbvJ1+A49PVWJtz0wSSRg/9xAF4h8Q+oQicmt4okjUEpxrxCj1BLINTvJPQad16ptPm
-         Anuw==
+        bh=6uOB/+tg1Dp4KQdja5HyNTCSLbeGrw8GP5vJj1HJRJ4=;
+        b=P5bXb6S4ya2pnmCH/jFrfaOJwhDtPTSS/hmQ2ql371zjqPELn1RqRm8NTWxFS/BnRm
+         joSHIAaA00QT9FEVUaXY818RiSfl/mfCW8twSdb1RMZjMwDZ3NGvWoqd2VEitN+Eig/b
+         WirtstdpDtsgwfm1kruxwcrmjO7Nzzo4q7Iv4KajbGpHlfaS2HKxCruenB9Gq7vjzULt
+         sq/gdcgu6n/skMaMJ6nc7Mudqacn3PJjewcBoLqPFtNhqOVyaaYbc+iZGwXLwfBDfQHS
+         Tgs5KuHShUNbt7XGqtaEhgW9x9TuvUGD0RsTPDOWshYpOc19HPtLUFSeYl4l+T7Jc8SI
+         vC3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755963663; x=1756568463;
+        d=1e100.net; s=20230601; t=1755964687; x=1756569487;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
-        b=g+6DirlkdTL8OimIhOcBGwbUpF6qT17OyHD3jhf8UVYNHuoWnIEwnm97VngIW4d663
-         1srymoLBMJP+q655A8RHBqAY4f4HNJLz0NPKc+yqQmU+8iv9prFZw+9HZRvJK4zEJprz
-         cL7nCP7MuS+ui3CgtNxVH75WS+EHfMOqB5lxzyNVgAhSJS8svptKxCUdMpHmKo5SVpwY
-         CAy9mWWSoC3xx/s/OQqHGlJHJCEAzy1By5ptG/dEDb+g5KBVfzjbWr0U0MH8R4gY8eUZ
-         pQy1S17o8GcBbNoMcE8TEuM+116jINcsclVJzLokpzjizw73CKgmY+pBs8yP1KDSVYXi
-         d1pA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqW8rPWOrwUZCc2b5H0VkowKk1e4V1HbQxmlIOteZ8zjPJtegKHdDNmKSQ6cjZdcOaKOObtaZeErHF@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiNmt2Qvc8Pl3uwTTojKHKyY1njdJo80CMj4rWXqcZjvyhDiPn
-	NJg18fDafJ3jWcs21FJwVvROmeCSy5BYG04qad+S+Ns/Wx9HN/Y9Gomjiy8YEUTGuAB/8TuLHDp
-	oxYl6FthjDC/5EEFZqngPY0TeBWsJucI=
-X-Gm-Gg: ASbGncupcZRfAODg3QlciLOOrAEAqzanuZ0cBQg4MFc/rDrAOIIfZ5+L+ahuR99Wckt
-	tQ63eh069FFPjjjqdk/EddBBuvHosRidNEE/hd2xuf63mr+MazS4H+VsqoSOKxJGFdoS+d9SSqC
-	W6c7fgYI9yjQu4WfVU00wWkgjajakQ06wBpv/XvQgirpc9JB8nx5retk8INhc3CJsIalXfJP1kO
-	qu2WaeZnA==
-X-Google-Smtp-Source: AGHT+IESYRh8i7xlc71145sLwSk6o7jgXXpkeEyxFOYt+GdWSWEwp55HWkwzH5gnJnP9Y4VANKPEMbZ8VhasRb2Fw20=
-X-Received: by 2002:a05:6e02:1541:b0:3ea:9da1:b653 with SMTP id
- e9e14a558f8ab-3ea9da1bb37mr37217535ab.16.1755963663223; Sat, 23 Aug 2025
- 08:41:03 -0700 (PDT)
+        bh=6uOB/+tg1Dp4KQdja5HyNTCSLbeGrw8GP5vJj1HJRJ4=;
+        b=jPL/11oykXVT/93WBGnBF2qdo4TpCpTVmDVs9vjAa6UwLfxLl9d6Uak05ZPCITjMez
+         +FYwZvBvlll7jxZvwnFbIm1dmPIjbybStiZLirXlatW6vAzPSfMVOr0tTJ1SSGrtIUhu
+         dgkGf4C09MXBh7eRbiLZFILXbMA3LHz8UXHD3uVM9pkGUekNPs1ApH51fEq7cKAupzmI
+         UUAwXZ+mk8zuB3dljjnm6v8FNGWyCyq1qfLqVv4s7dhjsLkEGYbAKlML7c3vmB1FuH5c
+         Ho8cWf0PO4zczCqt0Hp+oylX5AbGC4I4l8Y9iW1KXZCIYrAmduoe97Fc2ftPetfSkxmN
+         C2lA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/1lD3UPHbEPOo9QPppLJrlHxj9RD6iAGCysOeRJNIaKTaKhRdr3I5qBrJmjfkxIeaReQOzHxKQF6G@vger.kernel.org
+X-Gm-Message-State: AOJu0YznwpUc1w6ybCem030CPjrMAObtdBxQxuQu18iBAvlXDG4rBXrI
+	xnDIHv0VGjUc1jXDxdYe0qIhOaHo/H/HgT5eLS5FrR+h/sjjAB3P6xhrKgNYx7D4Jp1VqnwAZmS
+	l0PQviyUheMWFP/uVoJL6++uUYFDc2DM=
+X-Gm-Gg: ASbGnctfXetrvgkiVNFeIDRS5g7K7g71ZtGP62Dj8hPUYKX0r2+BJMUZe9HN2M6lpLB
+	l6eUA4FiXt1/omUtXPZ8UxggVVB15Dp0k0PbgE0div5ELc++JoPuUvpvz/GkersGl3BfFaMm71r
+	ZkwJvGCbMYpMIkzS6T1iXYsvVPA8qcXyln5Es6Mm14YQmex5A4/70tkjr5TJ3YyxnIAfLZ4HTvq
+	HgcVwjHOQ==
+X-Google-Smtp-Source: AGHT+IF7DvIt1E0z/6wT3rwFB77I1aID7CBLWX3CGdHH8OwOrHIkXssQnxHCXzuBMqbZLo+ZAHWp7pyACv5yRG02Iw0=
+X-Received: by 2002:a05:6e02:2604:b0:3e6:6f40:ccfd with SMTP id
+ e9e14a558f8ab-3e6d7479749mr141369325ab.5.1755964687293; Sat, 23 Aug 2025
+ 08:58:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <507c85525538f0dc64e536f7ccdd7862b542a227.1755525878.git.lucien.xin@gmail.com>
- <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
-In-Reply-To: <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
+References: <cover.1755525878.git.lucien.xin@gmail.com> <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
+ <1cf31726-bfb9-4909-a077-6c2c45e0720a@redhat.com>
+In-Reply-To: <1cf31726-bfb9-4909-a077-6c2c45e0720a@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Sat, 23 Aug 2025 11:40:52 -0400
-X-Gm-Features: Ac12FXzb4OuOZTD0SjAL8bodcf6jguLEYM91QZYQC9_n7a90QBtcGXoJbtIyI_M
-Message-ID: <CADvbK_eLTAQkFPNF58fBRqeZzRycBX0EeNk-P=HPc+Z-__JU9g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 08/15] quic: add path management
+Date: Sat, 23 Aug 2025 11:57:56 -0400
+X-Gm-Features: Ac12FXxwa94_Bx2cdn5RolEYeYrrVdm5JXgdGyE99iwZrdO0j4BDHWfh7nVrIGc
+Message-ID: <CADvbK_fLKuUaB1_M4DyLC6V==7ThXt+4heyZykBrLM5nL28DYw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/15] quic: add connection id management
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
 	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
@@ -85,79 +85,140 @@ Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 10:18=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
+On Thu, Aug 21, 2025 at 9:55=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
 > On 8/18/25 4:04 PM, Xin Long wrote:
-> > +/* Lookup a quic_udp_sock in the global hash table. If not found, crea=
-tes and returns a new one
-> > + * associated with the given kernel socket.
-> > + */
-> > +static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk, uni=
-on quic_addr *a, u16 port)
-> > +{
-> > +     struct net *net =3D sock_net(sk);
-> > +     struct quic_hash_head *head;
-> > +     struct quic_udp_sock *us;
-> > +
-> > +     head =3D quic_udp_sock_head(net, port);
-> > +     hlist_for_each_entry(us, &head->head, node) {
-> > +             if (net !=3D sock_net(us->sk))
-> > +                     continue;
-> > +             if (a) {
-> > +                     if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
-> > +                         (!us->bind_ifindex || !sk->sk_bound_dev_if ||
-> > +                          us->bind_ifindex =3D=3D sk->sk_bound_dev_if)=
-)
-> > +                             return us;
-> > +                     continue;
-> > +             }
-> > +             if (ntohs(us->addr.v4.sin_port) =3D=3D port)
-> > +                     return us;
-> > +     }
-> > +     return NULL;
-> > +}
+> > This patch introduces 'struct quic_conn_id_set' for managing Connection
+> > IDs (CIDs), which are represented by 'struct quic_source_conn_id'
+> > and 'struct quic_dest_conn_id'.
+> >
+> > It provides helpers to add and remove CIDs from the set, and handles
+> > insertion of source CIDs into the global connection ID hash table
+> > when necessary.
+> >
+> > - quic_conn_id_add(): Add a new Connection ID to the set, and inserts
+> >   it to conn_id hash table if it is a source conn_id.
+> >
+> > - quic_conn_id_remove(): Remove connection IDs the set with sequence
+> >   numbers less than or equal to a number.
 >
-> The function description does not match the actual function implementatio=
-n.
-Right, I forgot to update the description after moving the creation out.
+> It's unclear how many connections are expected to be contained in each
+> set. If more than an handful you should consider using RB-tree instead
+> of lists.
+>
+We limit the max number of issued CIDs to 8 per connection, and the CID
+per connection traversal is not on the data path, so it's fine to use
+lists here.
+
+Note that one connection/sk has one source CID set which contains a
+couple of CIDs used for connection migration, and one dest CID set
+to saving peer's CIDs.
+
+> [...]
+> > +static void quic_source_conn_id_free(struct quic_source_conn_id *s_con=
+n_id)
+> > +{
+> > +     u8 *data =3D s_conn_id->common.id.data;
+> > +     struct quic_hash_head *head;
+> > +
+> > +     if (!hlist_unhashed(&s_conn_id->node)) {
+> > +             head =3D quic_source_conn_id_head(sock_net(s_conn_id->sk)=
+, data);
+> > +             spin_lock_bh(&head->s_lock);
+> > +             hlist_del_init(&s_conn_id->node);
+> > +             spin_unlock_bh(&head->s_lock);
+> > +     }
+> > +
+> > +     /* Freeing is deferred via RCU to avoid use-after-free during con=
+current lookups. */
+> > +     call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
+> > +}
+> > +
+> > +static void quic_conn_id_del(struct quic_common_conn_id *common)
+> > +{
+> > +     list_del(&common->list);
+> > +     if (!common->hashed) {
+> > +             kfree(common);
+> > +             return;
+> > +     }
+> > +     quic_source_conn_id_free((struct quic_source_conn_id *)common);
+>
+> It looks like the above cast is not needed.
+there will be a compiling error:
+
+/root/quic/modules/net/quic/connid.c:68:66: note: expected =E2=80=98struct
+quic_source_conn_id *=E2=80=99 but argument is of type =E2=80=98struct
+quic_common_conn_id *=E2=80=99
+   68 | static void quic_source_conn_id_free(struct
+quic_source_conn_id *s_conn_id)
+
+Or you mean change the parameter type of quic_source_conn_id_free() to:
+
+static void quic_source_conn_id_free(struct quic_common_conn_id *common)
 
 >
+> > +}
 > > +
-> > +/* Binds a QUIC path to a local port and sets up a UDP socket. */
-> > +int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 =
-path)
+> > +/* Add a connection ID with sequence number and associated private dat=
+a to the connection ID set. */
+> > +int quic_conn_id_add(struct quic_conn_id_set *id_set,
+> > +                  struct quic_conn_id *conn_id, u32 number, void *data=
+)
 > > +{
-> > +     union quic_addr *a =3D quic_path_saddr(paths, path);
-> > +     int rover, low, high, remaining;
-> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_source_conn_id *s_conn_id;
+> > +     struct quic_dest_conn_id *d_conn_id;
+> > +     struct quic_common_conn_id *common;
 > > +     struct quic_hash_head *head;
-> > +     struct quic_udp_sock *us;
-> > +     u16 port;
+> > +     struct list_head *list;
 > > +
-> > +     port =3D ntohs(a->v4.sin_port);
-> > +     if (port) {
-> > +             head =3D quic_udp_sock_head(net, port);
-> > +             mutex_lock(&head->m_lock);
-> > +             us =3D quic_udp_sock_lookup(sk, a, port);
-> > +             if (!quic_udp_sock_get(us)) {
-> > +                     us =3D quic_udp_sock_create(sk, a);
-> > +                     if (!us) {
-> > +                             mutex_unlock(&head->m_lock);
-> > +                             return -EINVAL;
-> > +                     }
+> > +     /* Locate insertion point to keep list ordered by number. */
+> > +     list =3D &id_set->head;
+> > +     list_for_each_entry(common, list, list) {
+> > +             if (number =3D=3D common->number)
+> > +                     return 0; /* Ignore if it is already exists on th=
+e list. */
+> > +             if (number < common->number) {
+> > +                     list =3D &common->list;
+> > +                     break;
 > > +             }
-> > +             mutex_unlock(&head->m_lock);
-> > +
-> > +             quic_udp_sock_put(paths->path[path].udp_sk);
-> > +             paths->path[path].udp_sk =3D us;
-> > +             return 0;
 > > +     }
 > > +
-> > +     inet_get_local_port_range(net, &low, &high);
+> > +     if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
+> > +             return -EINVAL;
+> > +     common =3D kzalloc(id_set->entry_size, GFP_ATOMIC);
+> > +     if (!common)
+> > +             return -ENOMEM;
+> > +     common->id =3D *conn_id;
+> > +     common->number =3D number;
+> > +     if (id_set->entry_size =3D=3D sizeof(struct quic_dest_conn_id)) {
+> > +             /* For destination connection IDs, copy the stateless res=
+et token if available. */
+> > +             if (data) {
+> > +                     d_conn_id =3D (struct quic_dest_conn_id *)common;
+> > +                     memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN=
+_LEN);
+> > +             }
+> > +     } else {
+> > +             /* For source connection IDs, mark as hashed and insert i=
+nto the global source
+> > +              * connection ID hashtable.
+> > +              */
+> > +             common->hashed =3D 1;
+> > +             s_conn_id =3D (struct quic_source_conn_id *)common;
+> > +             s_conn_id->sk =3D data;
+> > +
+> > +             head =3D quic_source_conn_id_head(sock_net(s_conn_id->sk)=
+, common->id.data);
+> > +             spin_lock_bh(&head->s_lock);
+> > +             hlist_add_head(&s_conn_id->node, &head->head);
+> > +             spin_unlock_bh(&head->s_lock);
+> > +     }
+> > +     list_add_tail(&common->list, list);
 >
-> you could/should use inet_sk_get_local_port_range().
+> It's unclear if/how id_set->list is protected vs concurrent accesses.
 >
-True, will update.
+id_set is per connection/socket, it's always protected by sock lock.
+I will leave an annotation in the description of the function for that.
 
 Thanks.
