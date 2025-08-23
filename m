@@ -1,311 +1,163 @@
-Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF1B239E63;
-	Fri, 22 Aug 2025 17:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.157.127
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755882724; cv=fail; b=QsGj6ICvmHl45ufBfFg1QZXnoWn5cs+l5XWn+elKk6G8bZp7M3ql8hBryZNe18FnFPrrFReWphK9RP7dZFzDHZFQrCUTIqhZ4TLoN5+pb6AgUuFVwfB3bAJ/Kpli1K75DP2oDkCtsRCcVUJ/G+J+o7ybLlEUR5Kpfy3VRNQroME=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755882724; c=relaxed/simple;
-	bh=UegzIFnSxXBXOEETkvQ1yfxQ/95C7eQW0NbOt34HMUE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=S7DOOoTTvPiu7I/6i9Nje/sYcrw203stnkg8k5xel1F5+ZAFRoUeij3GobxYR4SCFBx7gAjyohTpLEWcRQ/3EhNyq1tg/pltrgL9bzxLGlSPVXpuSiRyulu9sXKsALi40i4y9h8rIfJjOqz9QD0CvJ/iCZC4KUhXwuiDi3Pej0w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=hCXpxoQY; dkim=pass (1024-bit key) header.d=akamai365.onmicrosoft.com header.i=@akamai365.onmicrosoft.com header.b=nF+TVpop; arc=fail smtp.client-ip=67.231.157.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378E812B93;
+	Sat, 23 Aug 2025 15:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1755963665; cv=none; b=DwNDbkqiQu29E25OPjimJMca4FdNl53nVdIVIzF92yvg8SC8PVjyRY3XQbDkQpTD2xEPXixVKN9BgHEPStQlm7ue4ZUxNRwQKbl788gb/r9fByauIE4nKe6TIHVgEnOQnv/JmFnNw0GhASXUnhvuOmQmjcNyKeEuSsm82FsMtSU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1755963665; c=relaxed/simple;
+	bh=6iU2aynSLSee+E5Dopkej0Rgy69kifMRkgq2/0PXcH8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SuXcBxlYGy2jcKuaYlbMwiBln7fwd1/iLfdJo7IuBAXI79OG4ToXL6ogbpZUWptJKHtnJzFUdqu+e25audmHytpmcAstyD84Hv/TKSQvwr5rjDKNGDe74mM3oma/U7WXvnFuYdjjKHzEuxSRSW+4Gpo3yJse+3BJbiVidzDGStU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YL2mtwNG; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="hCXpxoQY";
-	dkim=pass (1024-bit key) header.d=akamai365.onmicrosoft.com header.i=@akamai365.onmicrosoft.com header.b="nF+TVpop"
-Received: from pps.filterd (m0409411.ppops.net [127.0.0.1])
-	by m0409411.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 57MDMsbs012843;
-	Fri, 22 Aug 2025 18:11:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=jan2016.eng;
-	 bh=vdYqv6J7ViVp2jb67jkEH3wrhm3Fdo1dpB5oaiiCjDM=; b=hCXpxoQYUA10
-	qY6sAaFD8ssFFwlj1SBkZKHIFkJMQHD4RQHaN0bJ0+c/gK76Jg3Gitx80NRV6+zt
-	Qjl0sqBpty2kg7wGxG27und3skNaMT3XgJ532z0fehCpoGKY0av2GaqsmVooA8I5
-	Q2AtAWBcSf91MWmCx9clWn09XvfFlJu56VtEYwBgNscer+sRha6ykPuFgpkWP6Cq
-	XhzTtzAu6zVot2/XGYjORdyLFmkq7+79EliX+oRC9VU/x8Q1m0yybuRRvYBLhq++
-	EQ0CIWoM2rGW8Et4KyG0cg8bL8tIW3Y2UBSwCMohNBcaodNGbii5D5itUnyn7+jr
-	RlH8bTmR8w==
-Received: from prod-mail-ppoint7 (a72-247-45-33.deploy.static.akamaitechnologies.com [72.247.45.33] (may be forged))
-	by m0409411.ppops.net-00190b01. (PPS) with ESMTPS id 48nempgdyr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Aug 2025 18:11:05 +0100 (BST)
-Received: from pps.filterd (prod-mail-ppoint7.akamai.com [127.0.0.1])
-	by prod-mail-ppoint7.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 57MGSOws018686;
-	Fri, 22 Aug 2025 13:11:05 -0400
-Received: from email.msg.corp.akamai.com ([172.27.91.25])
-	by prod-mail-ppoint7.akamai.com (PPS) with ESMTPS id 48myf2crw2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Aug 2025 13:11:05 -0400
-Received: from usma1ex-exedge1.msg.corp.akamai.com (172.27.91.34) by
- usma1ex-dag4mb6.msg.corp.akamai.com (172.27.91.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 22 Aug 2025 13:11:04 -0400
-Received: from usma1ex-exedge2.msg.corp.akamai.com (172.27.91.35) by
- usma1ex-exedge1.msg.corp.akamai.com (172.27.91.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26; Fri, 22 Aug 2025 13:11:04 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (184.51.33.212)
- by usma1ex-exedge2.msg.corp.akamai.com (172.27.91.35) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.26 via Frontend Transport; Fri, 22 Aug 2025 13:11:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ENoBL+meBBVlNSRmHZBqn/Ktqo1Nu7AtZNiaSC4VlO2cBHQEqkx8UvYz55bOgCyVqQdAk+bsld69JMZ8WbT4c2r0hqipvETX3mUi4xY36evCy22xf0KSpPZ2KIw8SWZyje+BcGJHC6jfPSATD9ZKGJ/OCAFAyNHhNDaEvAOzImOoblAXnSfrdP4cltdZM6/UV+fUXiWwOSPElViHwh6CZonI7EG+sXGMmop2dcJCrGpKx2hB1mzTJQjwjYVOKArbBegRlapJzQt05BPG5tbvmTOkZVbAVkhBBOi74FKODO3sXkaQebIN3DnO695mbiMjrkAF6RGb7SB9d+RHZhPmZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vdYqv6J7ViVp2jb67jkEH3wrhm3Fdo1dpB5oaiiCjDM=;
- b=eEIAJ+z/XLx2VlNTknxF5ch0eqxcUwEZ63XBujYuvzVHaFV9V1XmOsPVS+lu2P8KXe6hHB1uaSMDui7LbuKp8K9kj6JRzK7YruwMLCpPsYxUGl9UfMa0DonJoaiJCR65D+qZ+z/Y4bbkYHmXnw2z4YtQsrLmkXpHqnmyZwT6HcLV3oIiWvuH4JtlXztWlbT7zB3Z99UV3khPUJgV4bzaeUqTQKEgodj1nUUrV5h0/Dn/lXtoqyFNPyFdm8nFGiXWjdfGVRfgIrerjqTZ9evHb+dpwr7goZ/Fb4RR94BtubH9150/Q3bEodKnOnqEOcig5nq8suDwJib1NR/0WZQM7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=akamai.com; dmarc=pass action=none header.from=akamai.com;
- dkim=pass header.d=akamai.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YL2mtwNG"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3e7c238bc0eso10295535ab.3;
+        Sat, 23 Aug 2025 08:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=akamai365.onmicrosoft.com; s=selector1-akamai365-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vdYqv6J7ViVp2jb67jkEH3wrhm3Fdo1dpB5oaiiCjDM=;
- b=nF+TVpopZVR1VYOQKB6kQ2AuhoC99GHZCMxBoiqwIqfLIXeACRYQ6iY4YC+yXhJ7FpGPXT48eCblp0M13UwlqldtUNNxSzpd7Za2YpmB5ISbgToRGUAtBgbFUB5FB8/6zhkiODd8PNCttZ2XMNlnEXdK/q8BlXzFKp5u9LgZYYw=
-Received: from CH2PR17MB3669.namprd17.prod.outlook.com (2603:10b6:610:47::24)
- by MW4PR17MB5530.namprd17.prod.outlook.com (2603:10b6:303:125::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8989.14; Fri, 22 Aug
- 2025 17:11:02 +0000
-Received: from CH2PR17MB3669.namprd17.prod.outlook.com
- ([fe80::ecdc:2512:2236:c203]) by CH2PR17MB3669.namprd17.prod.outlook.com
- ([fe80::ecdc:2512:2236:c203%6]) with mapi id 15.20.9052.017; Fri, 22 Aug 2025
- 17:11:01 +0000
-Message-ID: <7fd0f513-df05-43f4-b1dc-0fdb74e78378@akamai.com>
-Date: Fri, 22 Aug 2025 13:10:33 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/15] quic: add connection id management
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman
-	<horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
-        Moritz Buhl
-	<mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
-        Pengtao He
-	<hepengtao@xiaomi.com>, <linux-cifs@vger.kernel.org>,
-        Steve French
-	<smfrench@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Paulo Alcantara
-	<pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
-        <kernel-tls-handshake@lists.linux.dev>,
-        Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
-        Benjamin Coddington <bcodding@redhat.com>,
-        Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        "Alexander
- Aring" <aahringo@redhat.com>,
-        David Howells <dhowells@redhat.com>,
-        Cong Wang
-	<xiyou.wangcong@gmail.com>,
-        "D . Wythe" <alibuda@linux.alibaba.com>,
-        illiliti
-	<illiliti@protonmail.com>,
-        Sabrina Dubroca <sd@queasysnail.net>,
-        "Marcelo
- Ricardo Leitner" <marcelo.leitner@gmail.com>,
-        Daniel Stenberg
-	<daniel@haxx.se>,
-        Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1755525878.git.lucien.xin@gmail.com>
- <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Jason Baron <jbaron@akamai.com>
-In-Reply-To: <e7d5e3954c0d779e999dc50a9b03d9f7ed94dbd2.1755525878.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN0PR05CA0020.namprd05.prod.outlook.com
- (2603:10b6:208:52c::34) To CH2PR17MB3669.namprd17.prod.outlook.com
- (2603:10b6:610:47::24)
+        d=gmail.com; s=20230601; t=1755963663; x=1756568463; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
+        b=YL2mtwNGAm4BkWOAfJnPVvW2/MImqlbz1VBii1qL2v16cb7GuT1Uo0FmAMs6N+b5Xp
+         yvcvYiS7JSpUIxbHw2JR8/+FVKsu9KFNDxbU1TuOAjoIbdL55N9YZluL4lLICe01i5Sa
+         ruFDH3C+821dS1Dobqvw/Agd3OSV+n6m7ul9KWZz41UeeMeYIiFr7XO+TdizzBW8RSW8
+         wZ2/HqJwcJRzie4kIg0Qoc9MPjbuKb8QcADBENX3t3dTg7u+yWDIGFVRODbeI08q866u
+         ZZbvJ1+A49PVWJtz0wSSRg/9xAF4h8Q+oQicmt4okjUEpxrxCj1BLINTvJPQad16ptPm
+         Anuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1755963663; x=1756568463;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GK970f6W8v3dUSj26yOJRFemswkS/yBYwR0vBetrEbo=;
+        b=g+6DirlkdTL8OimIhOcBGwbUpF6qT17OyHD3jhf8UVYNHuoWnIEwnm97VngIW4d663
+         1srymoLBMJP+q655A8RHBqAY4f4HNJLz0NPKc+yqQmU+8iv9prFZw+9HZRvJK4zEJprz
+         cL7nCP7MuS+ui3CgtNxVH75WS+EHfMOqB5lxzyNVgAhSJS8svptKxCUdMpHmKo5SVpwY
+         CAy9mWWSoC3xx/s/OQqHGlJHJCEAzy1By5ptG/dEDb+g5KBVfzjbWr0U0MH8R4gY8eUZ
+         pQy1S17o8GcBbNoMcE8TEuM+116jINcsclVJzLokpzjizw73CKgmY+pBs8yP1KDSVYXi
+         d1pA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqW8rPWOrwUZCc2b5H0VkowKk1e4V1HbQxmlIOteZ8zjPJtegKHdDNmKSQ6cjZdcOaKOObtaZeErHF@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiNmt2Qvc8Pl3uwTTojKHKyY1njdJo80CMj4rWXqcZjvyhDiPn
+	NJg18fDafJ3jWcs21FJwVvROmeCSy5BYG04qad+S+Ns/Wx9HN/Y9Gomjiy8YEUTGuAB/8TuLHDp
+	oxYl6FthjDC/5EEFZqngPY0TeBWsJucI=
+X-Gm-Gg: ASbGncupcZRfAODg3QlciLOOrAEAqzanuZ0cBQg4MFc/rDrAOIIfZ5+L+ahuR99Wckt
+	tQ63eh069FFPjjjqdk/EddBBuvHosRidNEE/hd2xuf63mr+MazS4H+VsqoSOKxJGFdoS+d9SSqC
+	W6c7fgYI9yjQu4WfVU00wWkgjajakQ06wBpv/XvQgirpc9JB8nx5retk8INhc3CJsIalXfJP1kO
+	qu2WaeZnA==
+X-Google-Smtp-Source: AGHT+IESYRh8i7xlc71145sLwSk6o7jgXXpkeEyxFOYt+GdWSWEwp55HWkwzH5gnJnP9Y4VANKPEMbZ8VhasRb2Fw20=
+X-Received: by 2002:a05:6e02:1541:b0:3ea:9da1:b653 with SMTP id
+ e9e14a558f8ab-3ea9da1bb37mr37217535ab.16.1755963663223; Sat, 23 Aug 2025
+ 08:41:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR17MB3669:EE_|MW4PR17MB5530:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5de39f9d-27e2-4b12-d00a-08dde19edee6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?R2tqRWZ1SWl6dHNjT2tJRHVXaGdwaGFpT01yb0k5MU9rc25ZN2RBekJPRHdn?=
- =?utf-8?B?NlhVRHNUUXNabzhwejYzVjM3TWgyak1SUGtNOGpWWEZBMzNsZXpPZVdkQlJM?=
- =?utf-8?B?ZDc5Qkp0bVdSaW82YVNNRTZMVkJSZzAyRTNjQ2hoaGRvSlhZaS9leU56c2lQ?=
- =?utf-8?B?VTNYYVVJNU5USXpRZ1FQTWRVa0ZUaWJXZFVNb3VVSEU3RUxpWUljMENnVlZL?=
- =?utf-8?B?dk9QNHd3dW5tNDgxMWhjWXdKcVVQVGxRYXhDSG5TZ0JNZGpMcDNPWHIrOTNq?=
- =?utf-8?B?UXVzVTBBdlJ1cUR6bFcyVXUvV1ZMeUwxN1Z2Q1FsdXdSLzBmMzlJVTFSTE1D?=
- =?utf-8?B?aDBHTWpWQnFCNERIRHM1TDR0ZzBpdDVIeDBOanYvSWFjQWpqTUg5MW9KZE5a?=
- =?utf-8?B?NzJzTXg4RjY4eXhIZStZUThMWTBNV3QzTnlmZTV6cEVMMlVIWi9yZzdkaUtV?=
- =?utf-8?B?cU5pWDU0ckQ5ZTlvem1PV2VSR1lNUDg3Q2R1a2VVVnBtV0poVm9Da3VTRnJR?=
- =?utf-8?B?SkowelVmTUY4eHBHalQrRHpHM3piS1Y2dEk3SC9hUzdXZ1VQYVJTU0hOUHd2?=
- =?utf-8?B?Vm85K3YrWkZuSTFLblhJbXpxc3dreGdkZGVITHY4U29hV3ZoOU5idHEwd3l0?=
- =?utf-8?B?YnBaS1BHd080S2RKYnB4S24rSzhHLzhBeWw3c1ZnNm5MWXljK2c2V3lJMDRo?=
- =?utf-8?B?elhqai9DbWxPQlhMczM5cDVSZW5IY0VNSGN2c1lqZGF5Vm43UmU2UmJLaTly?=
- =?utf-8?B?Tjh4SkFLczFUdU5tc1JidUtqSVJIVXRsQnduY2R0QVpOVkVIaTlPRlBpTFVI?=
- =?utf-8?B?OHVoYndPMVNDMVFjbERVczY5Szljb29uN3Zzc2ZQOEhGZU1ObTZvSkVJY1Fn?=
- =?utf-8?B?VVF5T0FkdTZxWFBORUdQY3hNKzdabGFKalhNSzgyajJRVWFHdzU4ZFI2SXM0?=
- =?utf-8?B?WG9pcE9CY3crUmVCOU5mM2VvaFVHSEpTYzJ3TzRPSUNBeHphbldzclFzQ3lH?=
- =?utf-8?B?VFlTcG44WTlGa0JCZ1RNTDhmNDh4ZEdsRERBbkpRdFFDY2xISlZjd3E1alJC?=
- =?utf-8?B?b2NrK2k5MlBBZXZQbVRLaTFpaks3ellnMmYrQzJmR0FVa24rNkhLbnMyalNB?=
- =?utf-8?B?QWd4Wi9zSUR6VmJjdThlZ05VQ0Zkb1dnRDhHbGIxMGxpUVF6Y3ljR3pQWGhv?=
- =?utf-8?B?UWlzSkxISzZUaU9Udmo5Z202YlhLbGFSbTRSNnkvR0hXQ0F4WW9LWTVPQURU?=
- =?utf-8?B?akFpTWdLdHh6a3paQ1JpNkQ3SXowVEdKUC9lanNOdG5zMERrMnRiWG5jcVlp?=
- =?utf-8?B?NGhLK1RnTi9OL0pyNHNhUnRKMy9nSHo3TDdqdFpjc2RaZmFqenpEV0l5R3VL?=
- =?utf-8?B?MlptdGZzMVdPN25iZ3BGbmxVMi9pL1ppS0xQZHZxUE0xVm8yNFVLajFlVy9p?=
- =?utf-8?B?UHllWVFMU0tKbjJhZEpLUlJkRDVGV0Vxdm5aNUliUWI3RmNnbTBJdDZjb3ZG?=
- =?utf-8?B?YU8vck10MHAxNmdnQUNBTDFzb3VGaHNnTmlJbFFYUmZjTTdsaThwSk9Yak5i?=
- =?utf-8?B?djNMUmM0d085VzdyT1NtVUJiSzRBenVNbkQrOHJZV3NBNWQ2R0FPMUNnTGo4?=
- =?utf-8?B?dmVkZ3lrVnlQeDh0R3puWFFMK3JpRExxRVFvK2x0UkF1MXFEVzBYT24vUVRk?=
- =?utf-8?B?SkRPaTVHVXl2WUNUR1U2ZzNuYXRiNlkwcUpVMGpIM01jUG45WExHb0RiVFFh?=
- =?utf-8?B?ZXNyTXlHazdOQjNBWklHOUcrV1Q2Qk11Rk1hZW12Tk1jdUxKMWVnbVVmNEgy?=
- =?utf-8?B?ZVdhNTlOOGhtQlJiYWVKNkU0WGhKK0VpT3RzRSsyZlIrRlU5dERoeE1pcWE3?=
- =?utf-8?B?a2o2VU1tc1ZPbXNFOU5pTUYwWjBRWEVCS2RrUXBVdDd0OVRyOVllRCtGeUVO?=
- =?utf-8?Q?ufgPKfCtEHU=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR17MB3669.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K09nNE9iS2l6K0E5YzdycEtQbFcyVVhUWW41TjVvV0lwNEJpbEo4S2VYQ3kz?=
- =?utf-8?B?ajEzVEZwRmdwSC9sU1Z5N0RZM0x2WW1WUWVKWDBJRDdxeXY3VG9TMnlUeHdK?=
- =?utf-8?B?UVZ6Z1JLV3IxRFZmbS9GdVAzSXhnSjVGSDB4K3FVblpLRXFScHpQdXNLVDJI?=
- =?utf-8?B?VERsTnh4ME1SM01oYXJpV2NPd0J6MlV1Y2tBRWZRWDZCT0VhNEhyUkxYbFZn?=
- =?utf-8?B?aFNjYTcvV2JuQkhvdWJnRDdaTmhNTWU2TVA2NVVwQVoxWDY3dThlNi8wd3pw?=
- =?utf-8?B?VjhrZlJKRGdITWxhd0NvUkt3RmZSZHowVHBJeVBidys1Q3ZBbE1KdTEyR25P?=
- =?utf-8?B?Y1lLVy9OTXhUM05iU1VLUjlLYUpuS01YbHpkb3RaSUUvbU14aVcxUktYUHdH?=
- =?utf-8?B?Q3N2MTUyWGVrRUU0M3hNRUUyWGJVaUYzZk11cFN5MXlqWG1FbXBoWU52eWhW?=
- =?utf-8?B?cWU5UmQ5NXJwbTBtcW1QWk1yaVpmUWF0QTVUck9Bd04vbEJPdnlCc3BBaHE1?=
- =?utf-8?B?Q2l2M2xHWS8wR21Rb2ZrUS83OVZFVWs4Y0xRRXdDZ2t4bnNWUXA3elFwNTgx?=
- =?utf-8?B?ajQvenlkU0s5bkNtMXV4RjZ3dE5yNVoveTV3aWtJcDJCWDlrcmJaQkJKeTd0?=
- =?utf-8?B?TFJzYmhLZ0krd2xaSlpUUkJxZFJ3eGZiUUJPcEs2SjdxNlJzTkRNSm9Cd3Mz?=
- =?utf-8?B?KzBDSGZ2Y1BuQ1BJcG44Z1V4RkVpQVF3K0czRm9aQ0o2M3gydFU2M3luNDFQ?=
- =?utf-8?B?NHJBSFZiS0Y4YlFKQkZQWjZnaVN2elduZ1dNYzFBU2NFZjAzMlY0OGR1OUQz?=
- =?utf-8?B?NHJvWC9OTXpKeGs5azFyblluZDUzSjk4VHk1NU1ic0gyVjJTUnY3VzcrUXBV?=
- =?utf-8?B?L2MwVENJeVhUdUs2NnhyVFFORHRlbXdGMlprYkI4K3NkelUwSC9QQzc5Wjdk?=
- =?utf-8?B?UWYzaEdoSzlVZXRNaWpXNHZtZDJObkpaZkpmV3JoWlphSjJ4OWppbG1vUGZ5?=
- =?utf-8?B?U3luT2cxcXdRc2lmaXhjZFBGenJmWDBSSEkzM3VCYkM1WVNuTExhOEZCTTd5?=
- =?utf-8?B?bUh0K01TR3l1UG8vNVZ5YzRZMmE5a3NFNnVCSzFTR01qNXlBaUZqVmtlVlJ4?=
- =?utf-8?B?MXBVM2hBU3dObE5RSEhyeEIyY3RrMFhibk9kZjQ0VzIrYXZObEVzQ2NnczZ6?=
- =?utf-8?B?ZGV2UVFuYitmcGs3dWxxa0dMZ1VGQ2RjN3o1VXZKVTV1VWx6clYyQWN3TExi?=
- =?utf-8?B?Tms1OUFDcGNGTlZ2NDRsbDFvZWNramg5cy8wY2k5SjRzbFRpcnVvRWpWY1ND?=
- =?utf-8?B?NzRIYXpxN0lrVXlLSkF4U3JnSjU3UjBBYW50Z3RKZm02LzNXMnVYb1Z5MmVq?=
- =?utf-8?B?Y1MxVjhRVUZTdjVBSmcrT3pDTjR1UXhRNnlsOWJ1L2EyQ1BzVVZpWjQ3ZkFV?=
- =?utf-8?B?a0kwaUhGcTNMZGZISUcrbUdvOWpJeEsxSkIyalhnS1I0ZzZlWjN6aXJIZjc2?=
- =?utf-8?B?TWVOQzQ2MDJ5eng5aXVzUThUd0ZHMmswSFJMSHptQnpHdzF2dEpuRSs0NHJ1?=
- =?utf-8?B?cCtvRmhKOGM4WHNYMkU4MEJZMStyZHJ0S0s0QXQ2SFZ5a3p3SnlENkoybEZ0?=
- =?utf-8?B?UDhpT2dnSHlGVVM3d1lGK1dHK0xUSXNXZnhNckxhTkVKRmZDT2VGNkxnZ3NP?=
- =?utf-8?B?UjF2cnBGRFNGeE1IK25lVHVjSWh1K1dZQ1JSaUdWMXIxVUxQQlNLM1N3NHpU?=
- =?utf-8?B?TTFDNFVzaVFtZkVJUW8vdlo2Vnd5VlFiOTg3ZlNZMjJLMFpSeGNVaEJHS3B1?=
- =?utf-8?B?bE8vU2JuUjdGRTVuTG5iWUt0UDFXRUI3dlFQNWVFZUdkOFp2MmdWRXhJZjFM?=
- =?utf-8?B?dzA3WS93dHlDVnVxMVpRVjlKTzVnbXptNlZUVFliUmJwMnk5WWxDZHBSYkNs?=
- =?utf-8?B?VFBNOEp2aHBSVjFyV0FMRHJLeDJZY0h6QStvOE9nYVFFZzZvNHRkTHA5OEJ3?=
- =?utf-8?B?UjEvd3JjVENoZEFROVFwd0dGNWNUNEZYLzBDeURGMHJHYXhCaGp5S0JMU2lB?=
- =?utf-8?B?TjVsSTlFMkRuM0xlVDcvc2dtSHh0cFpYTXovQ0RFdjA2Q3F4QjVmQ1R2N1Jv?=
- =?utf-8?Q?cOnvMDguunJCDjuYwZoPjHrsN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5de39f9d-27e2-4b12-d00a-08dde19edee6
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR17MB3669.namprd17.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2025 17:11:01.8660
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 514876bd-5965-4b40-b0c8-e336cf72c743
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 11s/7R8qfiCLIgAZO2yZI770/y4tG6wVzPhmUg1712klv6NPS8dQ+3QdqidGGlEhkGVDeTWfN+hENnlG8DLEPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR17MB5530
-X-OriginatorOrg: akamai.com
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-22_04,2025-08-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0 mlxscore=0
- suspectscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2508110000
- definitions=main-2508220156
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwODIwMDExMCBTYWx0ZWRfX4poyRCJPWrr0
- bHgmrW0Lttxn8C6PFskP1jXQzEt2uo3Mp7j28Wo7IXRyVbfzqfn+Ey67N89jyAJL2oie6eDlkc0
- 5w4RxGQvBQ1SuPMJpAUaKIw5HmL5K+jf9NP/RePLOT8BzlAdM+sGvJ3xv+o7zpvmRA4VxxQ59ge
- R42JinRHMTv6ZXz3C2b5XMIYUyYQAIIClg0mz9bL0x0TuRcn9FnSfF4NaJLO9sjF/wex88nh1u4
- e3yzQFNNPd6iVM+gt8bOeTPKTMH3oErVKZBVpYe3SJJf2mwi9AitBNsHq56eW+pCIYTc5FQocFE
- u2wKHZu3UEmcyfb0YoeLt2NOzW0TnXnX9J2G63L6QbUj02k75kz3ajry3tCvQNGfc21C6kH68il
- ODJQ+xDi5+NZEAjnp/7c0+WhAO884w==
-X-Authority-Analysis: v=2.4 cv=T4LVj/KQ c=1 sm=1 tr=0 ts=68a8a4a9 cx=c_pps
- a=3lD5tZmBJQAvN++OlPJl4w==:117 a=3lD5tZmBJQAvN++OlPJl4w==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
- a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=2OwXVqhp2XgA:10 a=g1y_e2JewP0A:10 a=48vgC7mUAAAA:8 a=pGLkceISAAAA:8
- a=ZYoOwGVJ7LitIazS4x4A:9 a=QEXdDO2ut3YA:10 a=DXsff8QfwkrTrK3sU8N1:22
- a=Z5ABNNGmrOfJ6cZ5bIyy:22 a=bWyr8ysk75zN3GCy5bjg:22
-X-Proofpoint-GUID: b-4E5tZ0gTLVzeOnln4C5mpcuhoWWzT0
-X-Proofpoint-ORIG-GUID: b-4E5tZ0gTLVzeOnln4C5mpcuhoWWzT0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-08-22_04,2025-08-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0
- priorityscore=1501 impostorscore=0 clxscore=1011 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2508110000 definitions=main-2508200110
+References: <cover.1755525878.git.lucien.xin@gmail.com> <507c85525538f0dc64e536f7ccdd7862b542a227.1755525878.git.lucien.xin@gmail.com>
+ <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
+In-Reply-To: <a45ba272-685f-41dd-8582-6bbc5bc086bb@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Sat, 23 Aug 2025 11:40:52 -0400
+X-Gm-Features: Ac12FXzb4OuOZTD0SjAL8bodcf6jguLEYM91QZYQC9_n7a90QBtcGXoJbtIyI_M
+Message-ID: <CADvbK_eLTAQkFPNF58fBRqeZzRycBX0EeNk-P=HPc+Z-__JU9g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 08/15] quic: add path management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Xin,
+On Thu, Aug 21, 2025 at 10:18=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 8/18/25 4:04 PM, Xin Long wrote:
+> > +/* Lookup a quic_udp_sock in the global hash table. If not found, crea=
+tes and returns a new one
+> > + * associated with the given kernel socket.
+> > + */
+> > +static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk, uni=
+on quic_addr *a, u16 port)
+> > +{
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_hash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +
+> > +     head =3D quic_udp_sock_head(net, port);
+> > +     hlist_for_each_entry(us, &head->head, node) {
+> > +             if (net !=3D sock_net(us->sk))
+> > +                     continue;
+> > +             if (a) {
+> > +                     if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
+> > +                         (!us->bind_ifindex || !sk->sk_bound_dev_if ||
+> > +                          us->bind_ifindex =3D=3D sk->sk_bound_dev_if)=
+)
+> > +                             return us;
+> > +                     continue;
+> > +             }
+> > +             if (ntohs(us->addr.v4.sin_port) =3D=3D port)
+> > +                     return us;
+> > +     }
+> > +     return NULL;
+> > +}
+>
+> The function description does not match the actual function implementatio=
+n.
+Right, I forgot to update the description after moving the creation out.
 
-On 8/18/25 10:04 AM, Xin Long wrote:
-> !-------------------------------------------------------------------|
->    This Message Is From an External Sender
->    This message came from outside your organization.
-> |-------------------------------------------------------------------!
-> 
-> This patch introduces 'struct quic_conn_id_set' for managing Connection
-> IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-> and 'struct quic_dest_conn_id'.
-> 
-> It provides helpers to add and remove CIDs from the set, and handles
-> insertion of source CIDs into the global connection ID hash table
-> when necessary.
-> 
-> - quic_conn_id_add(): Add a new Connection ID to the set, and inserts
->    it to conn_id hash table if it is a source conn_id.
-> 
-> - quic_conn_id_remove(): Remove connection IDs the set with sequence
->    numbers less than or equal to a number.
-> 
-> It also adds utilities to look up CIDs by value or sequence number,
-> search the global hash table for incoming packets, and check for
-> stateless reset tokens among destination CIDs. These functions are
-> essential for RX path connection lookup and stateless reset processing.
-> 
-> - quic_conn_id_find(): Find a Connection ID in the set by seq number.
-> 
-> - quic_conn_id_lookup(): Lookup a Connection ID from global hash table
->    using the ID value, typically used for socket lookup on the RX path.
-> 
-> - quic_conn_id_token_exists(): Check if a stateless reset token exists
->    in any dest Connection ID (used during stateless reset processing).
-> 
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
+>
+> > +
+> > +/* Binds a QUIC path to a local port and sets up a UDP socket. */
+> > +int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 =
+path)
+> > +{
+> > +     union quic_addr *a =3D quic_path_saddr(paths, path);
+> > +     int rover, low, high, remaining;
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_hash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +     u16 port;
+> > +
+> > +     port =3D ntohs(a->v4.sin_port);
+> > +     if (port) {
+> > +             head =3D quic_udp_sock_head(net, port);
+> > +             mutex_lock(&head->m_lock);
+> > +             us =3D quic_udp_sock_lookup(sk, a, port);
+> > +             if (!quic_udp_sock_get(us)) {
+> > +                     us =3D quic_udp_sock_create(sk, a);
+> > +                     if (!us) {
+> > +                             mutex_unlock(&head->m_lock);
+> > +                             return -EINVAL;
+> > +                     }
+> > +             }
+> > +             mutex_unlock(&head->m_lock);
+> > +
+> > +             quic_udp_sock_put(paths->path[path].udp_sk);
+> > +             paths->path[path].udp_sk =3D us;
+> > +             return 0;
+> > +     }
+> > +
+> > +     inet_get_local_port_range(net, &low, &high);
+>
+> you could/should use inet_sk_get_local_port_range().
+>
+True, will update.
 
-Thanks Xin for all your work on this!
-
-For QUIC-LB, where the server endpoint may want to choose a specific 
-source CID to enable 'stateless' routing, I don't currently see an API 
-to allow that? It appears source CIDs are created with random values and 
-while userspace can get/set the indexes of the current ones in use, I 
-don't see a way to set specific CID values?
-
-For reference here is a proposal around it -
-https://datatracker.ietf.org/doc/draft-ietf-quic-load-balancers/
-
-In the reference above, the source CID is encrypted to help protect 
-traceability if the connection migrates. Thus, if the kernel were to 
-support such a feature, I don't think it wants to enforce a specific 
-encoding scheme, but perhaps it might want to be a privileged operation, 
-perhaps requiring CAP_NET_ADMIN to set specific source CIDs.
-
-Thanks,
-
--Jason
+Thanks.
