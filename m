@@ -1,185 +1,126 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E8F1EDA0B;
-	Sat, 23 Aug 2025 18:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E8412F5A5
+	for <linux-cifs@vger.kernel.org>; Sun, 24 Aug 2025 02:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1755974335; cv=none; b=i3JRq12UHa9PufGACMZas0XQnnO1gzAv0Of+CaJR3XRqvli4al9gSW78alknqiwUVt+r8hGP3vLTVg0poTFT83mtgHz7/U2Qa2oMSxVTV6at5M2+/beKMIKwifvDstZgri+WalNEEO7MhyknOmnCAFIcQtKn1c04PGMQOZ2CGDU=
+	t=1756002579; cv=none; b=LmAA1XgH7fx5ESU+K+pH8tkIFZzcO3ER602dR8xpZeqQFbfGnwlY6lNuhbpT3ArG5l13kb+Sr43exMLexc3crHx5q5lmWrXQBgEMWlTLUyg5MZDS2QMr+gLjVyVujRwCOGDN9CSo/foHaiuXl/RExidCyTWktKaetcSo1rZ6hfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1755974335; c=relaxed/simple;
-	bh=oDVXvpiKxpr3c0kqrtTAXtEiqo4KWRDKicFiwWIhotI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QjnaVsXbdQO1bP2RinLd9aPi94wykRSDuXoFnuvay5hKt+o/FoMAo+kfzrJdZwcuEtgHHuJ+uZc69LxhaeR6I30a9E84VzOQlR6K4E7nlN4xQ33lhLxknjtiUT2sxneoCNigkB7Lf4JQXuJiv/UeBctk5N8y79RJUoYIkjbfV4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvPV6UbX; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1756002579; c=relaxed/simple;
+	bh=E+TKvqF9QvhV2MSVUxkh/K8H0TagSIMgwvPsB0QopYU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=E4sGFPf4NzMoeckGS3JMSy5YtUDbgbaPBU55Z9iu+ZazT/9BfZgg8Qjgd14Zm2dayAKoQJXMnyISkioc7+amNM5hFiIB6TIJfI2rK/q0VTDjZyG5BIkGCN7Wxe9h4kiHx2yUR9cIP+ew43BXrnRf8trsUd4z9hng+Tv67IKtl0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AKH/8I15; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvPV6UbX"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3e67e6a1cc8so18259315ab.1;
-        Sat, 23 Aug 2025 11:38:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKH/8I15"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-70d93f579fdso21860936d6.1
+        for <linux-cifs@vger.kernel.org>; Sat, 23 Aug 2025 19:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1755974333; x=1756579133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1jUIUF6ZY6U8MjwBCMuchcHLJGd676CBVlVvwermg10=;
-        b=RvPV6UbXP9r7ClijpX3X6zHPW+BfzxvcMVyL1f4cmHeY+v8ISvqmQV67JCMNhFOv93
-         2Xs2AuQdgdLqnCmOGKZXwFOUObjrgTJIi1NAqq2SjIfpGPAt4CyK9uCMdGX9cVzqy/x8
-         zKRpssL6qhrViBt7N9cu8Pfm1vXkD9xNMznKHZwV3jHMwk76VulFRx+/Q3U9GMQuth8X
-         dBZkeW3UYG+VmNn/OUL3FST93E5Ijnlmr5ctDN+D9OAxZEwDuwcnyrP6aNVWUcT7nYoo
-         m978WLqYJtE56XO/SyfgkgAyM72udVXE+3x/Xfq2GzSVHU4hWnflsJ7V3wA7wdsQ2sjb
-         jTjg==
+        d=gmail.com; s=20230601; t=1756002576; x=1756607376; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YWYoctmURaLTOb5MBEKCUj59vUPi5jpIUVDshcozoBI=;
+        b=AKH/8I15gMZCxGRtDr8ylVdfTeZ0RNb78t2cPYVY5YQaR2yDFvc1jOjvmcmeIY8dnp
+         V6t88ZPiJrKX2Rh1L6dFkjjTlb92a7YPcul33Kr5sy0xXRUykpSwlGEg/3c9myEoFphm
+         pSPcrkyLU4uLLxvE0du81ykllvwbX3V+eabb6KfiabDobzatZkBrUNvIoMfbDPFijveQ
+         r9DuLgVOcUavpn3DiQckjcq2yfOP4JFg+FZJ1UFfTkUqbrzQx9K2jXJPq8LYh7TYmAZB
+         vW3nFc8yDYvbPZ3vx01u0y/5dFmG7cc/ghbABDwDOu4drwjANXri/14ynwHLn7s+sf4a
+         sXnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1755974333; x=1756579133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1jUIUF6ZY6U8MjwBCMuchcHLJGd676CBVlVvwermg10=;
-        b=sPwPnOCilRQRdufYxrolSYyAslIjemWGL8lTnJB/Qs2/xUC6LgqP+JVCgQyzahmGNx
-         5EMACWXWiTvAQR3guB6iOzuihki+GzwUnLUVHj4gxZZ27dZx5Zq2NS3tjU1kClYqs1Nr
-         FRi/SBifhVDTbMsQXj02qyVPK0/CY9RnYRQXoOfC5YGtMsxnP6ddZ3urm1SptWM5yo24
-         uSog6q0nZDMN69rQM+BIVXQAwoifM5DQoy4hLMPVLIy2wxwGeIBlS+QqHMf+hYxfgWHZ
-         Bf5w/95NS+re58eE8XpFBy+b/BY4+wk0YiCGVYaMQjNfUQrrhZAaycz7tHrDE0Cn8isQ
-         cByQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUx1NuVQSjKz7PC8obekEHZekijVp6Dyv5enMNZIEKYCNzjXZvqbaVW+IH2gzEd7UdylnupelCke3WV@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz0Hq/UTacpOnCvzLhZTniRYowFH9t0GZ3mSAhtnd8g4QO9xxt
-	kql6IkEG7jUVB6abX8DuBNGnhhKS/lXLsf3Ud1zlaBqq+fld5TH2kfmZf8kxc3lh1r7Bv8Ks938
-	tXE2qUosDmB0icQ9HuScZsI6WAWXsEh4=
-X-Gm-Gg: ASbGncsgZ/LdImJkGv93Gzm6xPQrDRgavNt0hWvGB+axDEsnEK8FmY8M8kBExuYn5bK
-	XkiA0LfrXrUGYaX1gFG41VssCRo4fVqDIi4PfOQSkZlptsxeovfx7NgLrmOCoFeagBCkNO8mIhr
-	lWI5XA/Fjtz6Zh3OHywOVxTftKkfADwWq+KKL/lShga/XTggQEXHaU8RGzFJ0QeH0oeugen5QIB
-	o5VXsEfHQ==
-X-Google-Smtp-Source: AGHT+IHjqCRqA5bCUScez5a0pAsH33Kb+WtLn6JdoplwFwpk8wVaOFWIXmhQcq/pIGPV6GcDpv3H4C8jNquyCWCSAcI=
-X-Received: by 2002:a05:6e02:1a86:b0:3eb:b611:2d0d with SMTP id
- e9e14a558f8ab-3ebb61130fcmr6651985ab.10.1755974332802; Sat, 23 Aug 2025
- 11:38:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756002576; x=1756607376;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YWYoctmURaLTOb5MBEKCUj59vUPi5jpIUVDshcozoBI=;
+        b=kghtoj2POwf7hJOE8NIpPUp3fUdkdHxsMO9eWCuM3O+aSyBbDYT5ROh4dk6Nw2Vsgk
+         lcgKD9eXlKx/6c2eoJFLic6CjBMs2Cpw8kVcgxaH47NJZu0RU5/zKdo5glS9Id8CBqOJ
+         ajtL/unBaFSNkUnxZIZ0SHoWkI85ajzAk6ATROD8eAGy1QS76+kbdbY3IGaQE3qGV4xe
+         0DR/TRNmIE59s0V7PZeV5qeHHiWXfdcANPzrM9xYf1BFanJp8nKOzl/2F+P2u9BgKwgG
+         L1iv//dy0r+2gs68tgNE3weOjw80VxtYlw1QOkgdwaH7mkjsDhku4zVjmg8WbibjQIQb
+         W9gw==
+X-Gm-Message-State: AOJu0YwWtjl8YYClRnH+vFmUxPfX0EzRruL3JiMmohXLb+WvInW0Ilfl
+	Nr5qKcK59vN6GVH15r0TrwFOpRV/cEizguo5XpsUYkCeL9Co+uBcMr57GaFKMBuVUDZ7pGJiDEo
+	LMiYj009XQiOYu/cPYCWbMBbUNMJqfhP8bWIA
+X-Gm-Gg: ASbGnctIH0NVT8GLmTcOCGZR0zXfrianiXaulHd6VusnUzM0lCVcqtPSo3mlu8FnlrG
+	Y8sKEoMzUVV4bacVn98mocaZPVEOiRhU4z9aCgfYYt2n1n2qOu9FcYlrV/9seOLagWKqvyybDJd
+	2W/gqHCVKdPR4Sv9sQsL9xVLDZGwwzpRcwNngS5NgiRWw9QfQedpI0yjgXTd0y1UILl7cP+Rn4m
+	yz3GQtDGJHrwZhFeP4M0suZQHwIL/c2DzdrNBXdeOuo32TAq4Z84Xjhpno=
+X-Google-Smtp-Source: AGHT+IEsJ57nkeIF3HT7PqM7T5bRGVaTMCt+5dNETIQ+opqHvvDBr2lj+Uwepq1xJ4EbueQHEmh6QhOI2eY/FyAFbUQ=
+X-Received: by 2002:a05:6214:21cd:b0:709:f305:705d with SMTP id
+ 6a1803df08f44-70d9722c613mr96611336d6.19.1756002576245; Sat, 23 Aug 2025
+ 19:29:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1755525878.git.lucien.xin@gmail.com> <0456736751c8beb50a089368d8adb71ecccb32b1.1755525878.git.lucien.xin@gmail.com>
- <ec99ef48-c805-4ce8-99d5-dcf254f6e189@redhat.com>
-In-Reply-To: <ec99ef48-c805-4ce8-99d5-dcf254f6e189@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sat, 23 Aug 2025 14:38:41 -0400
-X-Gm-Features: Ac12FXzw8WAlfIH_Sg1ayu84V-ToxTSjwW2bXEf5ZWX563u_u__-ehR5B6Rhpm4
-Message-ID: <CADvbK_d+BqJdwDW1ngX4qh_dySQQcLuO5oEZKEFmNzm=P9NPeA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 02/15] net: build socket infrastructure for
- QUIC protocol
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 23 Aug 2025 21:29:24 -0500
+X-Gm-Features: Ac12FXwZPwo_7Fmi8_yCb1tjvU2PmHOL1VnizxW6ut2nQNBeoSpsO3SVSYEiBHE
+Message-ID: <CAH2r5msoo=8URS+thrOxYs9-PLW96w8vT6kQUeePcBU21-Rm6Q@mail.gmail.com>
+Subject: [PATCH][SMB3 client] fix copy_file_range() return codes to fix
+ generic/157 test
+To: CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000c8423e063d1335d8"
+
+--000000000000c8423e063d1335d8
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 21, 2025 at 7:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 8/18/25 4:04 PM, Xin Long wrote:
-> > diff --git a/net/Makefile b/net/Makefile
-> > index aac960c41db6..7c6de28e9aa5 100644
-> > --- a/net/Makefile
-> > +++ b/net/Makefile
-> > @@ -42,6 +42,7 @@ obj-$(CONFIG_PHONET)                +=3D phonet/
-> >  ifneq ($(CONFIG_VLAN_8021Q),)
-> >  obj-y                                +=3D 8021q/
-> >  endif
-> > +obj-$(CONFIG_IP_QUIC)                +=3D quic/
-> >  obj-$(CONFIG_IP_SCTP)                +=3D sctp/
-> >  obj-$(CONFIG_RDS)            +=3D rds/
-> >  obj-$(CONFIG_WIRELESS)               +=3D wireless/
-> > diff --git a/net/quic/Kconfig b/net/quic/Kconfig
-> > new file mode 100644
-> > index 000000000000..b64fa398750e
-> > --- /dev/null
-> > +++ b/net/quic/Kconfig
-> > @@ -0,0 +1,35 @@
-> > +# SPDX-License-Identifier: GPL-2.0-or-later
-> > +#
-> > +# QUIC configuration
-> > +#
-> > +
-> > +menuconfig IP_QUIC
-> > +     tristate "QUIC: A UDP-Based Multiplexed and Secure Transport (Exp=
-erimental)"
-> > +     depends on INET
-> > +     depends on IPV6
->
-> What if IPV6=3Dm ?
-I think 'depends on IPV6' will include IPV6=3Dm.
+We were returning -EOPNOTSUPP for various remap_file_range cases
+but for some of these the copy_file_range_syscall() requires -EINVAL
+to be returned (e.g. where source and target file ranges overlap and
+source and target are the same file). This fixes xfstest generic/157
+which checks various reflink return codes and which was expecting
+EINVAL for that (and also e.g. for when the src
+offset is beyond end of file).
 
->
-> > +     select CRYPTO
-> > +     select CRYPTO_HMAC
-> > +     select CRYPTO_HKDF
-> > +     select CRYPTO_AES
-> > +     select CRYPTO_GCM
-> > +     select CRYPTO_CCM
-> > +     select CRYPTO_CHACHA20POLY1305
-> > +     select NET_UDP_TUNNEL
->
-> Possibly:
->         default n
-I missed that..
+See attached
 
->
-> ?
-> [...]
-> > +static int quic_init_sock(struct sock *sk)
-> > +{
-> > +     sk->sk_destruct =3D inet_sock_destruct;
-> > +     sk->sk_write_space =3D quic_write_space;
-> > +     sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
-> > +
-> > +     WRITE_ONCE(sk->sk_sndbuf, READ_ONCE(sysctl_quic_wmem[1]));
-> > +     WRITE_ONCE(sk->sk_rcvbuf, READ_ONCE(sysctl_quic_rmem[1]));
-> > +
-> > +     local_bh_disable();
->
-> Why?
-Good catch, there was a quic_put_port() before, and I forgot to
-delete local_bh_disable()f while removing quic_put_port().
+-- 
+Thanks,
 
->
-> > +     sk_sockets_allocated_inc(sk);
-> > +     sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
-> > +     local_bh_enable();
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void quic_destroy_sock(struct sock *sk)
-> > +{
-> > +     local_bh_disable();
->
-> Same question :)
->
-> [...]
-> > +static int quic_disconnect(struct sock *sk, int flags)
-> > +{
-> > +     quic_set_state(sk, QUIC_SS_CLOSED); /* for a listen socket only *=
-/
-> > +     return 0;
-> > +}
->
-> disconnect() primary use-case is creating a lot of syzkaller reports.
-> Since there should be no legacy/backward compatibility issue, I suggest
-> considering a simple implementation always failing.
->
-OK. This means shutdown(listensk) won't work.
+Steve
 
-Thanks Paolo for all the helpful feedback!
+--000000000000c8423e063d1335d8
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-client-fix-return-code-mapping-of-remap_file_ra.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-client-fix-return-code-mapping-of-remap_file_ra.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mep2jtom0>
+X-Attachment-Id: f_mep2jtom0
+
+RnJvbSBjNWIxYmYxMGQ3ZTQ0MTk2OWEyMWJhYjUzNTNhZGMyNzBiYTg1YTFmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMjMgQXVnIDIwMjUgMjE6MTU6NTkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzIGNsaWVudDogZml4IHJldHVybiBjb2RlIG1hcHBpbmcgb2YgcmVtYXBfZmlsZV9yYW5nZQoK
+V2Ugd2VyZSByZXR1cm5pbmcgLUVPUE5PVFNVUFAgZm9yIHZhcmlvdXMgcmVtYXBfZmlsZV9yYW5n
+ZSBjYXNlcwpidXQgZm9yIHNvbWUgb2YgdGhlc2UgdGhlIGNvcHlfZmlsZV9yYW5nZV9zeXNjYWxs
+KCkgcmVxdWlyZXMgLUVJTlZBTAp0byBiZSByZXR1cm5lZCAoZS5nLiB3aGVyZSBzb3VyY2UgYW5k
+IHRhcmdldCBmaWxlIHJhbmdlcyBvdmVybGFwIGFuZApzb3VyY2UgYW5kIHRhcmdldCBhcmUgdGhl
+IHNhbWUgZmlsZSkuIFRoaXMgZml4ZXMgeGZzdGVzdCBnZW5lcmljLzE1Nwp3aGljaCB3YXMgZXhw
+ZWN0aW5nIEVJTlZBTCBmb3IgdGhhdCAoYW5kIGFsc28gZS5nLiBmb3Igd2hlbiB0aGUgc3JjCm9m
+ZnNldCBpcyBiZXlvbmQgZW5kIG9mIGZpbGUpLgoKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcK
+U2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0K
+IGZzL3NtYi9jbGllbnQvY2lmc2ZzLmMgfCAxNCArKysrKysrKysrKysrKwogMSBmaWxlIGNoYW5n
+ZWQsIDE0IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2NpZnNmcy5j
+IGIvZnMvc21iL2NsaWVudC9jaWZzZnMuYwppbmRleCAzYmQ4NWFiMmRlYjEuLmUxODQ4Mjc2YmFi
+NCAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzZnMuYworKysgYi9mcy9zbWIvY2xpZW50
+L2NpZnNmcy5jCkBAIC0xMzU4LDYgKzEzNTgsMjAgQEAgc3RhdGljIGxvZmZfdCBjaWZzX3JlbWFw
+X2ZpbGVfcmFuZ2Uoc3RydWN0IGZpbGUgKnNyY19maWxlLCBsb2ZmX3Qgb2ZmLAogCQkJdHJ1bmNh
+dGVfc2V0c2l6ZSh0YXJnZXRfaW5vZGUsIG5ld19zaXplKTsKIAkJCWZzY2FjaGVfcmVzaXplX2Nv
+b2tpZShjaWZzX2lub2RlX2Nvb2tpZSh0YXJnZXRfaW5vZGUpLAogCQkJCQkgICAgICBuZXdfc2l6
+ZSk7CisJCX0gZWxzZSBpZiAocmMgPT0gLUVPUE5PVFNVUFApIHsKKwkJCS8qCisJCQkgKiBjb3B5
+X2ZpbGVfcmFuZ2Ugc3lzY2FsbCBtYW4gcGFnZSBpbmRpY2F0ZXMgRUlOVkFMCisJCQkgKiBpcyBy
+ZXR1cm5lZCBlLmcgd2hlbiAiZmRfaW4gYW5kIGZkX291dCByZWZlciB0byB0aGUKKwkJCSAqIHNh
+bWUgZmlsZSBhbmQgdGhlIHNvdXJjZSBhbmQgdGFyZ2V0IHJhbmdlcyBvdmVybGFwLiIKKwkJCSAq
+IFRlc3QgZ2VuZXJpYy8xNTcgd2FzIHdoYXQgc2hvd2VkIHRoZXNlIGNhc2VzIHdoZXJlCisJCQkg
+KiB3ZSBuZWVkIHRvIHJlbWFwIEVPUE5PVFNVUFAgdG8gRUlOVkFMCisJCQkgKi8KKwkJCWlmIChv
+ZmYgPj0gc3JjX2lub2RlLT5pX3NpemUpIHsKKwkJCQlyYyA9IC1FSU5WQUw7CisJCQl9IGVsc2Ug
+aWYgKHNyY19pbm9kZSA9PSB0YXJnZXRfaW5vZGUpIHsKKwkJCQlpZiAob2ZmICsgbGVuID4gZGVz
+dG9mZikKKwkJCQkJcmMgPSAtRUlOVkFMOworCQkJfQogCQl9CiAJCWlmIChyYyA9PSAwICYmIG5l
+d19zaXplID4gdGFyZ2V0X2NpZnNpLT5uZXRmcy56ZXJvX3BvaW50KQogCQkJdGFyZ2V0X2NpZnNp
+LT5uZXRmcy56ZXJvX3BvaW50ID0gbmV3X3NpemU7Ci0tIAoyLjQ4LjEKCg==
+--000000000000c8423e063d1335d8--
