@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F7D2AE90
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 20:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22B42AE90
+	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 20:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756154834; cv=none; b=U87sHpzA3100aXsGliu7O+J9k/k5LEfMZLFJpS0Q+GO3LLvjonqWlPIEPLjtPPwd8xoYJFP012jxJGaLwGo6RcYO0ir26eD2bUXU078ysuqik1rtgG3ZUf2Wg8nrFOPWxFdyGTBL5xoES7zlFLzXMiy20rK46jF1wDt1jPWGSts=
+	t=1756154844; cv=none; b=UAAo9/7Lw9AXJktE6G91s+0nEcB/sqbGyWD882IOoB2NfwISJLCbVjwuZam73BpBvKjvA5GE5r8emDeeCg427eRoVnvlPyD7fojsyVs1UCDFewUgR3uhWc/6RBr+5zBZBvD6HDxjCQDXPZ1bv/odXRSq9AEVI2py48yq7T01B7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756154834; c=relaxed/simple;
-	bh=fcW/6wiTpyuYU+k0QtiQFmQfpDkBI24yS80dYWEJqQs=;
+	s=arc-20240116; t=1756154844; c=relaxed/simple;
+	bh=LFIHZqPcbbW1VkzcaXikj30cl3MRH1VmE2D/I+XXMsg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PhMyj9vkZ11e8yc5BGRCXxKZ1mfgH8ewbjUzwmq6Cw2G4GPinIQNRns+yYsiXYNI8hwxWac+O0uagSmmpCQ5hzT1gPtDLrzqtAXWbdFM4mnV8+sHo+7aXS/WpUyH9l49LKJwve82owzIIE5bj5wiDaPMyMF24NOuTD3zQY5pJpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=O+pzgjfo; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=tNzW4jmNFMxwbwgyZE0ZLYdJS93PFNTF8WpsHX9p75SQTKEryuZNHvhv1pEnAdIIiiwELL1MlmWpGtg4TCuEOvSgdI6fpEPpa3OX+DSStpw6ZjrUXnz3oofYtm63Z0JAj27dkb1Od0Ik+L4T+U0Ueg3lG/LC/fbjRu44wKJ4hcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=MY2+mHaI; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="O+pzgjfo"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="MY2+mHaI"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=WY7FlQ1xdCbSs80M6oO3Fud5yDCsPp1VxliFdR5dWe0=; b=O+pzgjfoswqUXpncAB8WtuxYcK
-	bImNCgOuiVCA8q408FjDRMpdgTG4rCGrnNh9bGLzPuroZzMJFjFuEczxr358Mae/06MZsWPav6/EO
-	QRwIF2g8otkTJrdvwkny2qMdk90PuVs8UahdGW/6SkhU5WwsQuXyFgdQNB+AXDhUde59q6tMyt67+
-	kXs9VNHNAZfSsxRQow1joB81CdCbVAOnyQTQ9ZRFcehHBXvhFlP3E0unqMyuKfkkT7d+CWfooEKIq
-	kyNNLm0wCOBICjJq7otGVZBxOSO2FCx+rIOt5htH5MCykr/AEvU4/wRP4OyUfqqob8B3kE/q+0jAw
-	RlBoc7jQfHtg2FdtRnqYZetqttZr/SHF5dKl4h8xnUxRD19BTQyewuzvWnAxg7OCQJBXXbL3i4xj9
-	ABd5TAbwz92GmOvZMuYlURRUHp96eVn3zpZFv1Ecs0w3hdDb7DQ5RI0OyxLJHxDGMnlSUkVdWqAu9
-	VXOGHjLvnOWj7tj/H8GbRWQf;
+	bh=wHKNpfS/FLWiLkNSzBcpV+mnjq4zZa7/mYsvpUfrZcM=; b=MY2+mHaItoZGWdvVr07Xzw1DjS
+	S0YOz9RuHc3hz5Nc/I8RyXakoijDq2kDEnjBdRe8CcisNr6oktx+IXlUqEjubQuXXu8bl9/5Krmdy
+	6REwpI0R7wOv+m49hqXIu9dXE2QZYUYJTozqbkojZuS95kw0OTVnZ25mXmes9gZ7NrAg7DgAxDZEg
+	wF9RjssTYKMU1CCj9n4fnpEMfzF6q7nDL+Id0hBZrERMQ0/s9eaAFiUP2Dn1toohnCxtn1qYguwiJ
+	rLS4NWANTJoNmOATshI34aPGIoxt/Wig0Q0gxp0BmDQG79QfxilhkvpqcB8WlfsUFLZw/mgR1xBwd
+	7xE+y5/Azx/NDhZ9CKny9QPwKTSYeLfG6biIjLMEMCAznTI9pTMN9kaUaLMAYUCPVWQHhLkgVbpJ7
+	vEnzb/tLlgDzLOzgN8tiTVscicDKGuIzb16yEs0mKsfD/EaWtuP/T6FDL+QYeSlHJ9GyAu60ileVw
+	jZnRbcdwcV4BEcytDrjAEC5i;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uqe5t-000kGv-2q;
-	Mon, 25 Aug 2025 20:47:10 +0000
+	id 1uqe62-000kJB-34;
+	Mon, 25 Aug 2025 20:47:19 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -38,9 +38,9 @@ Cc: metze@samba.org,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>
-Subject: [PATCH v4 032/142] smb: client: make use of ib_wc_status_msg() and skip IB_WC_WR_FLUSH_ERR logging
-Date: Mon, 25 Aug 2025 22:39:53 +0200
-Message-ID: <a3fb8f061368a0f2fa6cc40b64ea8d744a0eabb0.1756139607.git.metze@samba.org>
+Subject: [PATCH v4 033/142] smb: client: remove info->wait_receive_queues handling in smbd_destroy()
+Date: Mon, 25 Aug 2025 22:39:54 +0200
+Message-ID: <19e7299ed26036970779103412337424986899fe.1756139607.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1756139607.git.metze@samba.org>
 References: <cover.1756139607.git.metze@samba.org>
@@ -52,8 +52,23 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There's no need to get log message for every IB_WC_WR_FLUSH_ERR
-completion, but any other error should be logged at level ERR.
+We already call ib_drain_qp() before, which is an sync operation
+that only returns in the queues are fully drained.
+
+ib_drain_qp() completes pending requests with IB_WC_WR_FLUSH_ERR
+so we have already called put_receive_buffer().
+
+So all smbdirect_recv_io objects are either in the
+smbdirect_socket.recv_io.free.list or
+smbdirect_socket.recv_io.reassembly.list.
+
+Then we explicitly iterate smbdirect_socket.recv_io.reassembly.list
+and call put_receive_buffer(), so every object is
+in smbdirect_socket.recv_io.free.list.
+
+It means info->count_receive_queue == sp->recv_credit_max was
+already true and calling wait_event(info->wait_receive_queues...
+is pointless.
 
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
@@ -62,57 +77,119 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/smbdirect.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ fs/smb/client/cifs_debug.c |  2 --
+ fs/smb/client/smbdirect.c  | 13 -------------
+ fs/smb/client/smbdirect.h  |  4 ----
+ 3 files changed, 19 deletions(-)
 
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index b80ddacd8c8f..3717a0081847 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -481,8 +481,6 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 			server->smbd_conn->receive_credit_target);
+ 		seq_printf(m, "\nPending send_pending: %x ",
+ 			atomic_read(&sc->send_io.pending.count));
+-		seq_printf(m, "\nReceive buffers count_receive_queue: %x ",
+-			server->smbd_conn->count_receive_queue);
+ 		seq_printf(m, "\nMR responder_resources: %x "
+ 			"max_frmr_depth: %x mr_type: %x",
+ 			server->smbd_conn->responder_resources,
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 40aafc606ac8..ec3ebf6e3c88 100644
+index ec3ebf6e3c88..b1ecfdbbc67d 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -388,8 +388,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 	struct smbd_connection *info =
- 		container_of(sc, struct smbd_connection, socket);
+@@ -514,7 +514,6 @@ static void smbd_post_send_credits(struct work_struct *work)
+ 	struct smbdirect_socket *sc = &info->socket;
  
--	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%d\n",
--		request, wc->status);
-+	log_rdma_send(INFO, "smbdirect_send_io 0x%p completed wc->status=%s\n",
-+		request, ib_wc_status_msg(wc->status));
- 
- 	for (i = 0; i < request->num_sge; i++)
- 		ib_dma_unmap_single(sc->ib.dev,
-@@ -398,8 +398,9 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
- 			DMA_TO_DEVICE);
- 
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_SEND) {
--		log_rdma_send(ERR, "wc->status=%d wc->opcode=%d\n",
--			wc->status, wc->opcode);
-+		if (wc->status != IB_WC_WR_FLUSH_ERR)
-+			log_rdma_send(ERR, "wc->status=%s wc->opcode=%d\n",
-+				ib_wc_status_msg(wc->status), wc->opcode);
- 		mempool_free(request, sc->send_io.mem.pool);
- 		smbd_disconnect_rdma_connection(info);
+ 	if (sc->status != SMBDIRECT_SOCKET_CONNECTED) {
+-		wake_up_all(&info->wait_receive_queues);
  		return;
-@@ -566,13 +567,16 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	int data_length = 0;
- 	bool negotiate_done = false;
- 
--	log_rdma_recv(INFO, "response=0x%p type=%d wc status=%d wc opcode %d byte_len=%d pkey_index=%u\n",
--		      response, sc->recv_io.expected, wc->status, wc->opcode,
-+	log_rdma_recv(INFO,
-+		      "response=0x%p type=%d wc status=%s wc opcode %d byte_len=%d pkey_index=%u\n",
-+		      response, sc->recv_io.expected,
-+		      ib_wc_status_msg(wc->status), wc->opcode,
- 		      wc->byte_len, wc->pkey_index);
- 
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
--		log_rdma_recv(INFO, "wc->status=%d opcode=%d\n",
--			wc->status, wc->opcode);
-+		if (wc->status != IB_WC_WR_FLUSH_ERR)
-+			log_rdma_recv(ERR, "wc->status=%s opcode=%d\n",
-+				ib_wc_status_msg(wc->status), wc->opcode);
- 		goto error;
  	}
  
+@@ -1331,7 +1330,6 @@ static struct smbdirect_recv_io *get_receive_buffer(struct smbd_connection *info
+ 			&sc->recv_io.free.list,
+ 			struct smbdirect_recv_io, list);
+ 		list_del(&ret->list);
+-		info->count_receive_queue--;
+ 		info->count_get_receive_buffer++;
+ 	}
+ 	spin_unlock_irqrestore(&sc->recv_io.free.lock, flags);
+@@ -1361,7 +1359,6 @@ static void put_receive_buffer(
+ 
+ 	spin_lock_irqsave(&sc->recv_io.free.lock, flags);
+ 	list_add_tail(&response->list, &sc->recv_io.free.list);
+-	info->count_receive_queue++;
+ 	info->count_put_receive_buffer++;
+ 	spin_unlock_irqrestore(&sc->recv_io.free.lock, flags);
+ 
+@@ -1375,10 +1372,6 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
+ 	struct smbdirect_recv_io *response;
+ 	int i;
+ 
+-	info->count_receive_queue = 0;
+-
+-	init_waitqueue_head(&info->wait_receive_queues);
+-
+ 	for (i = 0; i < num_buf; i++) {
+ 		response = mempool_alloc(sc->recv_io.mem.pool, GFP_KERNEL);
+ 		if (!response)
+@@ -1387,7 +1380,6 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
+ 		response->socket = sc;
+ 		response->sge.length = 0;
+ 		list_add_tail(&response->list, &sc->recv_io.free.list);
+-		info->count_receive_queue++;
+ 	}
+ 
+ 	return 0;
+@@ -1398,7 +1390,6 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
+ 				&sc->recv_io.free.list,
+ 				struct smbdirect_recv_io, list);
+ 		list_del(&response->list);
+-		info->count_receive_queue--;
+ 
+ 		mempool_free(response, sc->recv_io.mem.pool);
+ 	}
+@@ -1448,7 +1439,6 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ {
+ 	struct smbd_connection *info = server->smbd_conn;
+ 	struct smbdirect_socket *sc;
+-	struct smbdirect_socket_parameters *sp;
+ 	struct smbdirect_recv_io *response;
+ 	unsigned long flags;
+ 
+@@ -1457,7 +1447,6 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 		return;
+ 	}
+ 	sc = &info->socket;
+-	sp = &sc->parameters;
+ 
+ 	log_rdma_event(INFO, "cancelling and disable disconnect_work\n");
+ 	disable_work_sync(&sc->disconnect_work);
+@@ -1499,8 +1488,6 @@ void smbd_destroy(struct TCP_Server_Info *server)
+ 	sc->recv_io.reassembly.data_length = 0;
+ 
+ 	log_rdma_event(INFO, "free receive buffers\n");
+-	wait_event(info->wait_receive_queues,
+-		info->count_receive_queue == sp->recv_credit_max);
+ 	destroy_receive_buffers(info);
+ 
+ 	/*
+diff --git a/fs/smb/client/smbdirect.h b/fs/smb/client/smbdirect.h
+index 1c4e03491964..693876f2d836 100644
+--- a/fs/smb/client/smbdirect.h
++++ b/fs/smb/client/smbdirect.h
+@@ -84,10 +84,6 @@ struct smbd_connection {
+ 	/* Activity accounting */
+ 	wait_queue_head_t wait_post_send;
+ 
+-	/* Receive queue */
+-	int count_receive_queue;
+-	wait_queue_head_t wait_receive_queues;
+-
+ 	bool send_immediate;
+ 
+ 	struct workqueue_struct *workqueue;
 -- 
 2.43.0
 
