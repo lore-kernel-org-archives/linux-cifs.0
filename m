@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8EF1DE4C4
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 20:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DF829A326
+	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 20:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756155077; cv=none; b=lAYfw+nkhWpIO+h3VrL+QpVS9Cl2sYl4pdUHAdWEcsJv/aFTGKHzkA6H/CQfCvVvFgJ9yKUefhJbbvlA5NyLpNpKxVwNTYy8URCWkonAFBBzwbtWzEkrqUXLekhX4u7Pi/ZG/45GMduYqRMor3NDymLD/0QATI9NTXX2FXmPNNw=
+	t=1756155087; cv=none; b=osS8COLELRkmGFRLRcpEIpDENq5b4bqfWu+7c1oDwFhsbtfnB4qWqHodQ284DU/OeKum/DxtF7BLfDONlJEX+oViKszriws9e6jHBPRweXiJYXMH1Tiy0FLdfjcH78U1COXMAZEU6E0tZ7tKH/hu1J7bIw0maHHMPHhB0lmIXtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756155077; c=relaxed/simple;
-	bh=8AT1V8z8Kx6Y3XsXJmKMPtnAbXijvai2BIV9qpBM6+I=;
+	s=arc-20240116; t=1756155087; c=relaxed/simple;
+	bh=jETr4K4nwpvhEx57VBR6i992FwPDLBG47Qw3xM0JgMY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CoT2b5FEU3G4OPh06UgTJyOvkzFOYXC7kGXn7xYKDytzKyTOasyWYAHMQHts57OAYazs6DDgQAfLsdeZmHVvi/auz+tC5eimoJd1deavLub6bmVPTInG8kPEtiuM7BoRshCuYgAUw/GUqIxXPxj9fLPD/yhCnsTVR6vj+jJ1Plg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=dgpZZ/VA; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=RZMr4yohu4pzzYealbUeo7ULVoZSU+dGNTId0ObGyCPDrfUYJHn0ija7TXW5F5O7iNwOgo8meQAgf3cD5BSCv1xwAjMSuofwrjLcwcXOobgkxkpA97u1CNqd/LdTEOQ6gab30cnl7+Lt996BIXYa7FL6gH1fR6is2RjaKde7lvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=xee8lry2; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="dgpZZ/VA"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="xee8lry2"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=TFKF4fFajYdrmh+hos6tBoUXD19ijvUBLvq5P/aeR0w=; b=dgpZZ/VAVvfQBG8stXN+dRwk/k
-	3Cmv5Pr4KiOpNu1L4nhBZRMzGGwuB+krjxLRy+SL9Kzg/Q5QJELt/8c8y2/nyOtsuhaLBgd6YjhvZ
-	R2n60yJQ1nAdOByVisElxYUSBJWBten7x5v6jgreUCsQ62HdkeSA92neVZCyYje4OhwTzVT1JoyYZ
-	Zt+pEr9uyx1GmxYPjupPgSTx5Sw7SHtZ/wV+5rw2/CJCYDvftX/STAL7oIz56ZS9gN/kuY4HLX5wA
-	rK3GkcUzxK0vAydaqYKxj+H5IW6qhjQW4h8gYrKqB049hH5nmow21kZuitd5NydS7oU7vHyAaWY9A
-	XPpDGQaGCHM66GGSU/aFrVJlcoOqgBDV7m8QJD1CfSkgGOXaQMkcxlrBbghXvOJe7cNYHUpXZMZ0i
-	SjhCnzwpNQ+CKaOiKFPbu5xRJhA5Wf2a2hQnfnfccbaisXj9IH2rZrzBZ7EJ5GsRLw+klRJJbttCc
-	EgCHXFa8uo/EaSd1BXPy/fzx;
+	bh=b6QrtdE2zFPaI+c7nHpgDGlX4yspyEGgSHb0WNqTt+U=; b=xee8lry2qqpVnMKOMxlmzHL3oF
+	aQNKncKNCqidyOdgJkxwZogJPKdMBzYys2OFCIkDJsiSDHpmdvA5r+8Qs9k8uq32hfW5f/qJ+MR58
+	duxdzy/mTr6n84vXQmQAHns3gcM4Yyrkc5utVRBf99h2WRy2lhNSJFE0zMPVzjSpGwWpvahjHqssH
+	IeYRUExZyCjOU+bSa8nsIzTLd4AvRADoQvSgdSYSlVsMZgTbiHBxiuESxxuezvZlm4jOzPzhtzOKj
+	nN01mYw8UCERZaDgC2p3M1GYxXNFK/sPJg95eSeoBEkRokAi9kfktWaXeRe/kCHIpo+urUEU7VJji
+	hVylwgc0xEOpdse7SF1Yr3e4z46O5MUYWJiOzEXIQTl7vLG7/OiNCczR9dgNc8GnWPyQYQp3wysT3
+	Zu8crO2leY4UXMYfEX6MHkuQE1UBLqnwhxLn1NQfSTspgxkj+ENk7JHCosr2dGz8IddggwvPYZwuB
+	9jaa2Fcd8FdbEsqASu0w0nZ1;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uqe9n-000l3c-2a;
-	Mon, 25 Aug 2025 20:51:12 +0000
+	id 1uqe9y-000l71-1N;
+	Mon, 25 Aug 2025 20:51:22 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -38,9 +38,9 @@ Cc: metze@samba.org,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
 	Long Li <longli@microsoft.com>
-Subject: [PATCH v4 056/142] smb: client: pass struct smbdirect_socket to {allocate,destroy}_receive_buffers()
-Date: Mon, 25 Aug 2025 22:40:17 +0200
-Message-ID: <52fc1266851b014a6e1418121c4ee789beb95464.1756139607.git.metze@samba.org>
+Subject: [PATCH v4 057/142] smb: client: pass struct smbdirect_socket to {allocate,destroy}_caches_and_workqueue()
+Date: Mon, 25 Aug 2025 22:40:18 +0200
+Message-ID: <0fab296f447ca4cec527375430e39ccfd58ea286.1756139607.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1756139607.git.metze@samba.org>
 References: <cover.1756139607.git.metze@samba.org>
@@ -62,73 +62,81 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/client/smbdirect.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ fs/smb/client/smbdirect.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 01f4b1ee727a..b23e9d8fd9c4 100644
+index b23e9d8fd9c4..d7ed5534669a 100644
 --- a/fs/smb/client/smbdirect.c
 +++ b/fs/smb/client/smbdirect.c
-@@ -25,8 +25,8 @@ static struct smbdirect_recv_io *get_receive_buffer(
- static void put_receive_buffer(
- 		struct smbdirect_socket *sc,
- 		struct smbdirect_recv_io *response);
--static int allocate_receive_buffers(struct smbd_connection *info, int num_buf);
--static void destroy_receive_buffers(struct smbd_connection *info);
-+static int allocate_receive_buffers(struct smbdirect_socket *sc, int num_buf);
-+static void destroy_receive_buffers(struct smbdirect_socket *sc);
- 
- static void enqueue_reassembly(
- 		struct smbd_connection *info,
-@@ -1363,9 +1363,8 @@ static void put_receive_buffer(
+@@ -1579,10 +1579,8 @@ int smbd_reconnect(struct TCP_Server_Info *server)
+ 	return -ENOENT;
  }
  
- /* Preallocate all receive buffer on transport establishment */
--static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
-+static int allocate_receive_buffers(struct smbdirect_socket *sc, int num_buf)
+-static void destroy_caches_and_workqueue(struct smbd_connection *info)
++static void destroy_caches_and_workqueue(struct smbdirect_socket *sc)
  {
 -	struct smbdirect_socket *sc = &info->socket;
- 	struct smbdirect_recv_io *response;
- 	int i;
- 
-@@ -1393,9 +1392,8 @@ static int allocate_receive_buffers(struct smbd_connection *info, int num_buf)
- 	return -ENOMEM;
- }
- 
--static void destroy_receive_buffers(struct smbd_connection *info)
-+static void destroy_receive_buffers(struct smbdirect_socket *sc)
- {
--	struct smbdirect_socket *sc = &info->socket;
- 	struct smbdirect_recv_io *response;
- 
- 	while ((response = get_receive_buffer(sc)))
-@@ -1507,7 +1505,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
- 	sc->recv_io.reassembly.data_length = 0;
- 
- 	log_rdma_event(INFO, "free receive buffers\n");
--	destroy_receive_buffers(info);
-+	destroy_receive_buffers(sc);
- 
- 	/*
- 	 * For performance reasons, memory registration and deregistration
-@@ -1585,7 +1583,7 @@ static void destroy_caches_and_workqueue(struct smbd_connection *info)
- {
- 	struct smbdirect_socket *sc = &info->socket;
- 
--	destroy_receive_buffers(info);
-+	destroy_receive_buffers(sc);
+-
+ 	destroy_receive_buffers(sc);
  	destroy_workqueue(sc->workqueue);
  	mempool_destroy(sc->recv_io.mem.pool);
- 	kmem_cache_destroy(sc->recv_io.mem.cache);
-@@ -1646,7 +1644,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+@@ -1592,9 +1590,8 @@ static void destroy_caches_and_workqueue(struct smbd_connection *info)
+ }
+ 
+ #define MAX_NAME_LEN	80
+-static int allocate_caches_and_workqueue(struct smbd_connection *info)
++static int allocate_caches_and_workqueue(struct smbdirect_socket *sc)
+ {
+-	struct smbdirect_socket *sc = &info->socket;
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+ 	char name[MAX_NAME_LEN];
+ 	int rc;
+@@ -1602,7 +1599,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ 	if (WARN_ON_ONCE(sp->max_recv_size < sizeof(struct smbdirect_data_transfer)))
+ 		return -ENOMEM;
+ 
+-	scnprintf(name, MAX_NAME_LEN, "smbdirect_send_io_%p", info);
++	scnprintf(name, MAX_NAME_LEN, "smbdirect_send_io_%p", sc);
+ 	sc->send_io.mem.cache =
+ 		kmem_cache_create(
+ 			name,
+@@ -1618,7 +1615,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ 	if (!sc->send_io.mem.pool)
+ 		goto out1;
+ 
+-	scnprintf(name, MAX_NAME_LEN, "smbdirect_recv_io_%p", info);
++	scnprintf(name, MAX_NAME_LEN, "smbdirect_recv_io_%p", sc);
+ 
+ 	struct kmem_cache_args response_args = {
+ 		.align		= __alignof__(struct smbdirect_recv_io),
+@@ -1639,7 +1636,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ 	if (!sc->recv_io.mem.pool)
+ 		goto out3;
+ 
+-	scnprintf(name, MAX_NAME_LEN, "smbd_%p", info);
++	scnprintf(name, MAX_NAME_LEN, "smbd_%p", sc);
+ 	sc->workqueue = create_workqueue(name);
  	if (!sc->workqueue)
  		goto out4;
+@@ -1825,7 +1822,7 @@ static struct smbd_connection *_smbd_get_connection(
  
--	rc = allocate_receive_buffers(info, sp->recv_credit_max);
-+	rc = allocate_receive_buffers(sc, sp->recv_credit_max);
+ 	log_rdma_event(INFO, "rdma_connect connected\n");
+ 
+-	rc = allocate_caches_and_workqueue(info);
++	rc = allocate_caches_and_workqueue(sc);
  	if (rc) {
- 		log_rdma_event(ERR, "failed to allocate receive buffers\n");
- 		goto out5;
+ 		log_rdma_event(ERR, "cache allocation failed\n");
+ 		goto allocate_cache_failed;
+@@ -1865,7 +1862,7 @@ static struct smbd_connection *_smbd_get_connection(
+ 
+ negotiation_failed:
+ 	disable_delayed_work_sync(&sc->idle.timer_work);
+-	destroy_caches_and_workqueue(info);
++	destroy_caches_and_workqueue(sc);
+ 	sc->status = SMBDIRECT_SOCKET_NEGOTIATE_FAILED;
+ 	rdma_disconnect(sc->rdma.cm_id);
+ 	wait_event(sc->status_wait,
 -- 
 2.43.0
 
