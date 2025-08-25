@@ -1,36 +1,36 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4B228751B
-	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 21:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF85828751B
+	for <linux-cifs@vger.kernel.org>; Mon, 25 Aug 2025 21:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756155896; cv=none; b=t+61kKTFkPHfvEK/9gDt0psCmzUuvJOaS/yoMJ9wNKpPy9wAurPXiz64aWAMH9PL47Fc4L/859bJhXuTJ0bXBjOC7X6A37qR4+AkkxQNsgDi+auAWqSIGUAwmUR973IdePzsXe6CuC+g50mVnj5/8Fc23vEmcf1xzKzk1DFRsEE=
+	t=1756155906; cv=none; b=Zw6XJcYckKN6qkxwuKkTpJERpuMKhcu7I/BnLiGxs0APJyCvBJk51x27728Wk1NRANc1CGKughWR57jC9+l5+Kiu33XZTFHzDpybdAk0sCqFMWjrCdojV5MLlDq1H1db2AEpxj6mhrQz8asV2Qz4GA+ZTszILPuQBhcghOHxY6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756155896; c=relaxed/simple;
-	bh=kwQiNbRrYtnbXqvo4MWS+0PQ2dpdaS4PUeghV2Dggl8=;
+	s=arc-20240116; t=1756155906; c=relaxed/simple;
+	bh=+LueSh6+gOmP/tOY50tt/ppmmaxXZ45EhpvwQ7Y5DeE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qpJBPvfgrjmPIWq3AkFt5u1wbTKb1v4zZSCSwBB8z3faZisacvKZqhhYc350cWIiQUDGvr2LK7tSgKakk70/evji/Wd/DxTo59DPwqyh+3DYFoWHbPpU4TR+a1tPwIWQXruAkxq13Mz/tcI92Ps3UqK6j1clwitnjQP22yDB5x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Ve4BI09+; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=ffNIvQdxkVSmcZzMSvDfJ5g2lEGjxpa43h2RGmAQ6Z7ZcolaLxGNTlLecUxf9AgF91dIlUYgxGVzngddaLFfyz3FyqWn4czKmo9K5G38EeVSyQYKDm/v6wy/2NKpCs7GLFuPX43ddjhygthyijK5HO9MKyVs4dCiHfNV703vQz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=gcp3yE98; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Ve4BI09+"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="gcp3yE98"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=esh5/BLG4ViP7Rsvd+k49zuMzjhOnNnug8OGAehW8i8=; b=Ve4BI09+1J8fBjweehNISuR8B6
-	Et9yBTiAeCxrLaeu3iZQ4bZFG3pAIWOVb0A8ia475PRL3bsZc3SpJhRR9AafPmXoNEe+a3R2Wsm92
-	M/b6yZFxS3KnPN9FxJ5ANYSYz/BVLBJiKkCDDx/82yVcGhUOtfi9NMqDZvE9s+6XMISo6x/TjxIQo
-	pCC7+saXVPF8BzJWt2OaK+1n0e7VAeflKo6zYUHQNtBQG2juC534JCQpbgVLL1lpSqwL7Je+0Iemb
-	7qWrKFtsjRwJvZMgBqXtP6qXKFiOR6wpIjeuIVaCTR5AV8rMFQltFHAwUKgmOb01A/QCFFraRcNib
-	MmAvLvV+nCcNmQZWAcpNp5QBTESP2arVFZ8vEz2+r8hkVRbWBJhd5oqJzTpBMcSJsOO3qO9PO3HXB
-	XDw7vY7SVi83R2JSkquH+J2Il8zeq3aY8JSYfBhFjD+GetmzxKRnoKyewL5bp08yxlQ64DeRadzl2
-	SD3Yu00o5gYQhtmsqU5MVCzn;
+	bh=RJ8ch65eUboITu5ixn4t4Z+9kEC41oIacj4i7Z+Jjbw=; b=gcp3yE98tSkxswMqFd+13e297N
+	wLCiYwxtHCIvmg7I5fnKTyzqi5iMO7pwfiCo4Aq6iKOArQ8j14QXTudVGSKhEnJGbV/vtdWdyRf8V
+	ICriqj3zIuwTgNjSe0aL3JZJQfKLEhn43gBFlnuyLgYP3r5A+KMiN5AnxjqbdghKQoDeGSjUtxvJs
+	TJBBcOTcQ9uf+5RQLC0B6PNrCbR2MzmEaLdUSwcvkTlPjks+j+9qZ86BcbGJ6wlVRuVnLuqzDC0/a
+	TGo8QLypMhPsJ/RcYmjQqMRHxyLnAmrfyve3s1bdXmMhPBmYvkcMh72lujun91UmJ5M56oRa8ERrT
+	4QBlhwmjg3f0MyZxgeT1uuewRepfl2WrUbl3l3VB9pTQ1LT7+YDx+gEfwYcA0p1jdUH5+9tpPEGyd
+	zxbpbDMf5dRdEUNthCxU1H2Fn4OolwpA/ilyTzX88PMi5GDjctf/tRbKFBWpl3eryOfa+X05lliyp
+	u7qaJOBySVKc8wmo4aJdBeUT;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1uqeN1-000nps-35;
-	Mon, 25 Aug 2025 21:04:52 +0000
+	id 1uqeNB-000nrJ-0N;
+	Mon, 25 Aug 2025 21:05:01 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
@@ -38,9 +38,9 @@ Cc: metze@samba.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>
-Subject: [PATCH v4 138/142] smb: server: pass struct smbdirect_socket to smb_direct_create_header()
-Date: Mon, 25 Aug 2025 22:41:39 +0200
-Message-ID: <000a2540a9a4af06f09cabfae971f817fe163c9d.1756139608.git.metze@samba.org>
+Subject: [PATCH v4 139/142] smb: server: pass struct smbdirect_socket to post_sendmsg()
+Date: Mon, 25 Aug 2025 22:41:40 +0200
+Message-ID: <47101bb14a30c9d368d00c1edda236c83333f52e.1756139608.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1756139607.git.metze@samba.org>
 References: <cover.1756139607.git.metze@samba.org>
@@ -62,35 +62,44 @@ Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/server/transport_rdma.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ fs/smb/server/transport_rdma.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 600c541a919b..0c11855a2a8a 100644
+index 0c11855a2a8a..289325640a04 100644
 --- a/fs/smb/server/transport_rdma.c
 +++ b/fs/smb/server/transport_rdma.c
-@@ -995,11 +995,10 @@ static int calc_rw_credits(struct smbdirect_socket *sc,
- 			    sc->rw_io.credits.num_pages);
+@@ -1104,11 +1104,10 @@ static int get_mapped_sg_list(struct ib_device *device, void *buf, int size,
+ 	return ib_dma_map_sg(device, sg_list, npages, dir);
  }
  
--static int smb_direct_create_header(struct smb_direct_transport *t,
-+static int smb_direct_create_header(struct smbdirect_socket *sc,
- 				    int size, int remaining_data_length,
- 				    struct smbdirect_send_io **sendmsg_out)
+-static int post_sendmsg(struct smb_direct_transport *t,
++static int post_sendmsg(struct smbdirect_socket *sc,
+ 			struct smbdirect_send_batch *send_ctx,
+ 			struct smbdirect_send_io *msg)
  {
 -	struct smbdirect_socket *sc = &t->socket;
- 	struct smbdirect_socket_parameters *sp = &sc->parameters;
- 	struct smbdirect_send_io *sendmsg;
- 	struct smbdirect_data_transfer *packet;
-@@ -1163,7 +1162,7 @@ static int smb_direct_post_send_data(struct smb_direct_transport *t,
- 	for (i = 0; i < niov; i++)
- 		data_length += iov[i].iov_len;
+ 	int i;
  
--	ret = smb_direct_create_header(t, data_length, remaining_data_length,
-+	ret = smb_direct_create_header(sc, data_length, remaining_data_length,
- 				       &msg);
+ 	for (i = 0; i < msg->num_sge; i++)
+@@ -1199,7 +1198,7 @@ static int smb_direct_post_send_data(struct smb_direct_transport *t,
+ 		}
+ 	}
+ 
+-	ret = post_sendmsg(t, send_ctx, msg);
++	ret = post_sendmsg(sc, send_ctx, msg);
+ 	if (ret)
+ 		goto err;
+ 	return 0;
+@@ -1625,7 +1624,7 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
+ 	sendmsg->sge[0].length = sizeof(*resp);
+ 	sendmsg->sge[0].lkey = sc->ib.pd->local_dma_lkey;
+ 
+-	ret = post_sendmsg(t, NULL, sendmsg);
++	ret = post_sendmsg(sc, NULL, sendmsg);
  	if (ret) {
- 		atomic_inc(&sc->send_io.credits.count);
+ 		smb_direct_free_sendmsg(sc, sendmsg);
+ 		return ret;
 -- 
 2.43.0
 
