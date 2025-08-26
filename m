@@ -1,134 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030B1350D7C;
-	Tue, 26 Aug 2025 14:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6423568E8
+	for <linux-cifs@vger.kernel.org>; Tue, 26 Aug 2025 15:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756218825; cv=none; b=Tyw11Lv2S2tfwe7xk67FSjFaeeYBV2ItaJiRBcfbC2+KIaNSSIJ4uzUepeW626Cro/SPfhGC6N4NKDYBr4AHpCjkJymrNiBym3M9JrlKrldXjPL8K19FEoTOYMStw4aMjlC/1cG5rW4PfM1j/7NWYjBSX+72AUbl+ie9SnhrV3M=
+	t=1756222871; cv=none; b=k4w5JRZcFN1CKUAaQkhRC3fisWJJOZoznOOMxNWuOVMPVqIvn51MY4F/yhex3TiP10YvpfxAwTSX9LpmKq/NWEIixD5qJwiI/du9eobIbm414Is8H56bewrJi+DEoiSmC8HZpTOcnDAVVvY3wZYYx/cP1cPzAJj0wcam/+vHHE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756218825; c=relaxed/simple;
-	bh=Td0PuyMOHlyZ4vgFi1dm7A+Y4Lq+E7+6qVbRAR3ZB2M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tj4N6JVBhEx3H45d5vTK6rs7dKzwMNA+tHon0DeJTA6VvsLRdYcFrwA/9tjcBUEDwPgZmwA5F67BlIqWqA5bztUJunN2kP85YogQiilKkrHcBJGokT7/BqUGVHL94N7VtjJd+2jucoGW4Q42AjdIvi0W2GaLDUGwkdqXVvqZi70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=TBIHiLMt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756222871; c=relaxed/simple;
+	bh=pEp3IJXmmCTgNdYq9GBP+pw7hhtQPwM3/c1PJBTV0XA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=XRyVXwtVHbjjGVrmY9WJRwlwf6Ry1E3VRsU1J6CJsb27Puo7duCLAML5129YxZvavsr2T9+2be79isTW8s4PxIeE0gcW4lZRE/9hdQ4VsXBOqNDdy/CHK/GQatEPSerioMQdKDmf2o8qc2hMPF5iqwEG/HNcm96vgmz/z9FNHsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THVl6cg8; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="TBIHiLMt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D34C4CEF1;
-	Tue, 26 Aug 2025 14:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756218824;
-	bh=Td0PuyMOHlyZ4vgFi1dm7A+Y4Lq+E7+6qVbRAR3ZB2M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TBIHiLMtAt4cmN6xZSYtHOBBWqp27GmZaXvEWQ6WGnmNKhKGOx2D9rPc4fTBKT3Zw
-	 mOa762WcUYR4v/i4HoHao34SmrtQwPT1m8KaUSWPO4L9jnth+47JiPoeDK+KQvsda8
-	 3/QyH6bn+OVBYRApBQ+ubEOZgCUTB4SaDkKgCT3A=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4 146/403] smb: client: let recv_done() cleanup before notifying the callers.
-Date: Tue, 26 Aug 2025 13:07:52 +0200
-Message-ID: <20250826110910.809760168@linuxfoundation.org>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20250826110905.607690791@linuxfoundation.org>
-References: <20250826110905.607690791@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THVl6cg8"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7e8704da966so392824485a.1
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Aug 2025 08:41:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756222864; x=1756827664; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=S4Qxtfh0XTA1uBqaz5CYZj55f9pkrEroKUb8W6Xu5Gg=;
+        b=THVl6cg8hQ+ckynsSnnColpygqVTOUcrj3LQjzutaJhUJlYRFJ1m8Wu6uD3lWbe1II
+         Bco1LrR7q1bEfZ8oouXVMoB3SA7rBjilkGlk6qomo6XDchduRYBBMyLlnYw4WA2pE0j0
+         4p2NYEqLFuMCH/Cep5j0keXpZV1jkE26uRraegLQcDpJfB0nBHN3qmO2kltxF9i1m6Zb
+         zwvVveSjx6cBMNT+pmwWswuz2QaAl9ovQZbzIQZwwgYeYEJAP6vKQrh6yP0uQz5PMpWS
+         u6zcs7AAocwKa3JuYrPrnYFyIAD1zs0wy/GxpTCdqduQqlriR+nJxueCvVpioH7d0Acu
+         NlVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756222864; x=1756827664;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S4Qxtfh0XTA1uBqaz5CYZj55f9pkrEroKUb8W6Xu5Gg=;
+        b=ILGqYKk3m1U3+DmIUxVf2QQwXhr0Dw35EN4wzVg9I+xzngqzhVqsxJl2pHwNGejl+y
+         A9kFqaq9cgfaadozSgIAmZYyOuKQv8OMu4TC7EqKJcrib0JLWPJ+LGDwHf4ow5IoKr7d
+         YJPsXeNy5fAlMVYIn5QqZTP9iPlx8gWOkCGCKqsgwcZDKXwYEx+aOVDIZynSVtU6dp+S
+         /GtWH0W69l8jROh/gpXOqgkVQGnqBKiWxmGp2TfmUjDm6cqsWamFZ/NtqC8DHTM8dhEh
+         eSrqQjxiOp/Yl2NBF6WDm/MjOMBtOKABX/+sBIv/oiYFPIh8ozpgwJhGhdC0rU8FPb5p
+         8Lnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCJ5PD+vXqQCjc9S+AsoPCY69wuVfYpAuENOZghJFNhi/HxEFWzbBR7u6OFe9u1hWphnGajBYBCtXd@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws/WhavrUNiyobFmYmaO+4YQRk9yA2NdV+RAa2pebeRwBW/RXo
+	mHDWQIOmWo12fabq6xua5GfbOcCy93UniCfFISogJbb1ONCE3/NYQe+s/2dff0HWdJC6YTT3wEw
+	+efzmIT0bESYVgFol+L8M951seSeVtVk=
+X-Gm-Gg: ASbGncsvrFzOD0/2fP3MPqMux2LxOVwqpWhxfxalmjjpak05KdRxwSpYN0EZWaMKPB3
+	wOI8ux2/qPa59EULgJPL3vLYmA7oCVzCrO1v5C/potr5+nuROebn4imCNc3TYmCX7y9Gw9e6suX
+	mi2WMKEsBfYkb+OefS8aezllIZvzdBzRADHKFZL5uxpcOIF5CI5nXUeEp1kNYjBru2LH5xlh8n6
+	pDg+60/tksC+9CAAPi/cjPwGVFlc58+sfIQg6+dSVf47EmQDqecmHAl2FOH0WWOnu10ozXoW3UO
+	R0Amqu6kr00MpMKBp3f4
+X-Google-Smtp-Source: AGHT+IFaWRcwWSYYL2GJ0tpaJjji9bJet8F3zFdssn2sdZB5LvdFAov6MicGKG93ElUd/OofeiRdVc4rUNf5x6XODJg=
+X-Received: by 2002:ad4:4eae:0:b0:707:76a8:ee9b with SMTP id
+ 6a1803df08f44-70d9738c033mr171436726d6.37.1756222864171; Tue, 26 Aug 2025
+ 08:41:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 26 Aug 2025 10:40:53 -0500
+X-Gm-Features: Ac12FXxsiiZG7BKsv-_eN2DLSK9HWXzc-emowStdhvK1Oef0ABx-oEDMbutKbyk
+Message-ID: <CAH2r5mvpzK1NMmbKE-wUDHLhtm_fiPAp=zVm1egw3=cLbUh38w@mail.gmail.com>
+Subject: smb2_copychunk_range() reset max_bytes_chunk to 0
+To: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.org>
+Content-Type: text/plain; charset="UTF-8"
 
-5.4-stable review patch.  If anyone has any objections, please let me know.
+I noticed what looks like a bug in smb2_copychunk_range() - I see it
+when ksmbd returns ChunkBytesWritten as 0 we reset the
+tcon->max_bytes_chunk to 0 which causes all subsequent copy_chunks to
+ksmbd to fail with invalid parameter.  I don't see it Samba (but maybe
+because they never returned ChunksBytesWritten as 0).  Any thoughts -
+the logic looks wrong?
 
-------------------
+/* Check that server is not asking us to grow size */
+if (le32_to_cpu(retbuf->ChunkBytesWritten) < tcon->max_bytes_chunk)
+     tcon->max_bytes_chunk = le32_to_cpu(retbuf->ChunkBytesWritten);
+else
+     goto cchunk_out; /* server gave us bogus size */
 
-From: Stefan Metzmacher <metze@samba.org>
 
-[ Upstream commit bdd7afc6dca5e0ebbb75583484aa6ea9e03fbb13 ]
-
-We should call put_receive_buffer() before waking up the callers.
-
-For the internal error case of response->type being unexpected,
-we now also call smbd_disconnect_rdma_connection() instead
-of not waking up the callers at all.
-
-Note that the SMBD_TRANSFER_DATA case still has problems,
-which will be addressed in the next commit in order to make
-it easier to review this one.
-
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/smbdirect.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 0842a1af0b98..72df002e8ae3 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -495,7 +495,6 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	if (wc->status != IB_WC_SUCCESS || wc->opcode != IB_WC_RECV) {
- 		log_rdma_recv(INFO, "wc->status=%d opcode=%d\n",
- 			wc->status, wc->opcode);
--		smbd_disconnect_rdma_connection(info);
- 		goto error;
- 	}
- 
-@@ -512,8 +511,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 		info->full_packet_received = true;
- 		info->negotiate_done =
- 			process_negotiation_response(response, wc->byte_len);
-+		put_receive_buffer(info, response);
- 		complete(&info->negotiate_completion);
--		break;
-+		return;
- 
- 	/* SMBD data transfer packet */
- 	case SMBD_TRANSFER_DATA:
-@@ -565,14 +565,16 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 
- 		queue_work(info->workqueue, &info->recv_done_work);
- 		return;
--
--	default:
--		log_rdma_recv(ERR,
--			"unexpected response type=%d\n", response->type);
- 	}
- 
-+	/*
-+	 * This is an internal error!
-+	 */
-+	log_rdma_recv(ERR, "unexpected response type=%d\n", response->type);
-+	WARN_ON_ONCE(response->type != SMBD_TRANSFER_DATA);
- error:
- 	put_receive_buffer(info, response);
-+	smbd_disconnect_rdma_connection(info);
- }
- 
- static struct rdma_cm_id *smbd_create_id(
 -- 
-2.39.5
+Thanks,
 
-
-
+Steve
