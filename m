@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA6938DD8;
-	Tue, 26 Aug 2025 12:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCFF184540;
+	Tue, 26 Aug 2025 13:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756212607; cv=none; b=LoAj634ciIa9ums2GgjPwnNu40JQPfd7QHtn9DdCIyDlKV3/QieNAvkym2/Ix9q9Wg4gOgbIw9Rr/ZPEf4qncH6PQC5ogN2KqYkYrrtpaF9Lb9fQs8bo5rOFcyZulN99mT1WwHiD6N52dKzo/bSdX+b2iaqanYzbsheGFrqqcx0=
+	t=1756213849; cv=none; b=hdy54hBzYg2UlLmXfMUQhhhYl1bc7ANnwooR/PX50uURnbJR5TyXaWp2o74KaiEPGxblzR5vWft1rR48WcYISEzwILy6Apt826cPNDi6wlhn0BbxMFwknHu8kGvwxjk9t5ty+NqzX0cWq5f51SAUkcqgfJ0cNzqjpHWAAFvRchs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756212607; c=relaxed/simple;
-	bh=fSC//JZcfqNjjxceabuhKYZKg0/ytUODfn8kAxuiE5I=;
+	s=arc-20240116; t=1756213849; c=relaxed/simple;
+	bh=KSB1bBsl3O8s6X3B5qGEPwQ0RzvhBjh8pOnewE1D+ng=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y25XqXRDJHQjKwhUhSCuvJvDXwP+QpFmZgTS++vFU4bfIb30d5qw7dE0NZcoYsDAaGjls4/ig4Omw0o0VHFWTVIrj8Ud6eHNm4Ce3pQgp0ZTAke1gZXfn4JtpQvQrywKpyCWbsiu1LZ1xIMW56DMDOmqhRNN+jXqVbVBnMDrOvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=k6V365ZO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KKqZIXw8mFGatjERjEhlujXdepV53YIctU0BIwosPTSSd1tBjg76I2CIupBYhfD3AkJmBuPLBNonCeRuJtrOyyw5EORtxjm3j143mKF2QcwcOQ7jNYW2X6juIVRE1ZFmi6rBf4olvfyhbfkGIMMlt55tlvSrmxo7WS0R+D1Rh5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rjCQNYs/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="k6V365ZO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90248C4CEF1;
-	Tue, 26 Aug 2025 12:50:06 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rjCQNYs/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C573C4CEF1;
+	Tue, 26 Aug 2025 13:10:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756212606;
-	bh=fSC//JZcfqNjjxceabuhKYZKg0/ytUODfn8kAxuiE5I=;
+	s=korg; t=1756213848;
+	bh=KSB1bBsl3O8s6X3B5qGEPwQ0RzvhBjh8pOnewE1D+ng=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=k6V365ZOfiiIdQUhZJJYP+6dkWgpI+OI/10VaoZGiP6EOftykT7UBa9cXUNJdzue0
-	 5N+KAYrqH3rmG/Vs8MHk7AkdeuMyfbQn/WkgrpFsI9qCLnZwXE9g8/7RmASAAAtjSH
-	 51lOFLzhDz2FbsS/qE3JccIAUmEaczXH/sxkh1yY=
+	b=rjCQNYs/3/8MULJyUSkZEu8ZVEDJoavGiXysnpFet2g1H4uztytWXlDdfCYiELt2d
+	 YZa12uY7c41WZ/Tq5dnIUxZI4qox1P2AYS+Psu6glD2OTPtODp9uCJ17dY+uQBB1D5
+	 bQwAiNx8clooUe1jPe3QBas4AA7IzAJ2UnKlaCM8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.6 034/587] smb: client: dont wait for info->send_pending == 0 on error
-Date: Tue, 26 Aug 2025 13:03:03 +0200
-Message-ID: <20250826110953.819783468@linuxfoundation.org>
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6 502/587] smb: server: split ksmbd_rdma_stop_listening() out of ksmbd_rdma_destroy()
+Date: Tue, 26 Aug 2025 13:10:51 +0200
+Message-ID: <20250826111005.755074187@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20250826110952.942403671@linuxfoundation.org>
 References: <20250826110952.942403671@linuxfoundation.org>
@@ -57,52 +58,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Stefan Metzmacher <metze@samba.org>
 
-commit 8c48e1c7520321cc87ff651e96093e2f412785fb upstream.
+[ Upstream commit bac7b996d42e458a94578f4227795a0d4deef6fa ]
 
-We already called ib_drain_qp() before and that makes sure
-send_done() was called with IB_WC_WR_FLUSH_ERR, but
-didn't called atomic_dec_and_test(&sc->send_io.pending.count)
+We can't call destroy_workqueue(smb_direct_wq); before stop_sessions()!
 
-So we may never reach the info->send_pending == 0 condition.
+Otherwise already existing connections try to use smb_direct_wq as
+a NULL pointer.
 
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <smfrench@gmail.com>
 Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Fixes: 5349ae5e05fa ("smb: client: let send_done() cleanup before calling smbd_disconnect_rdma_connection()")
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/smbdirect.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/server/connection.c     | 3 ++-
+ fs/smb/server/transport_rdma.c | 5 ++++-
+ fs/smb/server/transport_rdma.h | 4 +++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -1338,10 +1338,6 @@ void smbd_destroy(struct TCP_Server_Info
- 	log_rdma_event(INFO, "cancelling idle timer\n");
- 	cancel_delayed_work_sync(&info->idle_timer_work);
- 
--	log_rdma_event(INFO, "wait for all send posted to IB to finish\n");
--	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
--
- 	/* It's not possible for upper layer to get to reassembly */
- 	log_rdma_event(INFO, "drain the reassembly queue\n");
- 	do {
-@@ -2053,7 +2049,11 @@ int smbd_send(struct TCP_Server_Info *se
- 	 */
- 
- 	wait_event(info->wait_send_pending,
--		atomic_read(&info->send_pending) == 0);
-+		atomic_read(&info->send_pending) == 0 ||
-+		sc->status != SMBDIRECT_SOCKET_CONNECTED);
-+
-+	if (sc->status != SMBDIRECT_SOCKET_CONNECTED && rc == 0)
-+		rc = -EAGAIN;
- 
- 	return rc;
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 66b20c3d963e..f5ebc200dd73 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -503,7 +503,8 @@ void ksmbd_conn_transport_destroy(void)
+ {
+ 	mutex_lock(&init_lock);
+ 	ksmbd_tcp_destroy();
+-	ksmbd_rdma_destroy();
++	ksmbd_rdma_stop_listening();
+ 	stop_sessions();
++	ksmbd_rdma_destroy();
+ 	mutex_unlock(&init_lock);
  }
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 6c3a57bff147..a4ff1167c9a1 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -2193,7 +2193,7 @@ int ksmbd_rdma_init(void)
+ 	return 0;
+ }
+ 
+-void ksmbd_rdma_destroy(void)
++void ksmbd_rdma_stop_listening(void)
+ {
+ 	if (!smb_direct_listener.cm_id)
+ 		return;
+@@ -2202,7 +2202,10 @@ void ksmbd_rdma_destroy(void)
+ 	rdma_destroy_id(smb_direct_listener.cm_id);
+ 
+ 	smb_direct_listener.cm_id = NULL;
++}
+ 
++void ksmbd_rdma_destroy(void)
++{
+ 	if (smb_direct_wq) {
+ 		destroy_workqueue(smb_direct_wq);
+ 		smb_direct_wq = NULL;
+diff --git a/fs/smb/server/transport_rdma.h b/fs/smb/server/transport_rdma.h
+index 77aee4e5c9dc..a2291b77488a 100644
+--- a/fs/smb/server/transport_rdma.h
++++ b/fs/smb/server/transport_rdma.h
+@@ -54,13 +54,15 @@ struct smb_direct_data_transfer {
+ 
+ #ifdef CONFIG_SMB_SERVER_SMBDIRECT
+ int ksmbd_rdma_init(void);
++void ksmbd_rdma_stop_listening(void);
+ void ksmbd_rdma_destroy(void);
+ bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
+ void init_smbd_max_io_size(unsigned int sz);
+ unsigned int get_smbd_max_read_write_size(void);
+ #else
+ static inline int ksmbd_rdma_init(void) { return 0; }
+-static inline int ksmbd_rdma_destroy(void) { return 0; }
++static inline void ksmbd_rdma_stop_listening(void) { }
++static inline void ksmbd_rdma_destroy(void) { }
+ static inline bool ksmbd_rdma_capable_netdev(struct net_device *netdev) { return false; }
+ static inline void init_smbd_max_io_size(unsigned int sz) { }
+ static inline unsigned int get_smbd_max_read_write_size(void) { return 0; }
+-- 
+2.50.1
+
 
 
