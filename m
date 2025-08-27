@@ -1,146 +1,92 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FB8CA5A
-	for <linux-cifs@vger.kernel.org>; Wed, 27 Aug 2025 20:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7082D0601
+	for <linux-cifs@vger.kernel.org>; Wed, 27 Aug 2025 21:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756325017; cv=none; b=fI7XnQz0AHngj+H/ShmTZCy4nxPuDiNruJwpPgIGFpb3/MhuZ5YLpukoPeE5RLbH2Aezz4vbNfIW+LQvpOXtq1tPys52Cb4MxHISnYc7Zyjr+iYlhV7rVZ7DymcFV5XkQHpFtcND/JaUops0o3wU2l+WQxVrQTV3W2xUxZJY4pU=
+	t=1756331936; cv=none; b=Mg8z4ADkXE+YKlD5fgK/nLYo6dXl5OOvCOdC07EkX2nzD0p7UqjaCmX4VmP2my0ORlc7c4gkd3GoBfG2an/J+v9eWDhymWaf/du4i65YvD9DP0HlAz0PzdEvqrBwfiAsSaPk7rrYa2/Q0HFQRcetUfgkJOz1LWo569BN0a0TEdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756325017; c=relaxed/simple;
-	bh=/uB2rItIahE4Hcta2m8d0v1BW2hpbpgJ9fUR+2xREZQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WKhnmDqNFZOXSi57FmRVQ64MswaJZTGJL0nbyEV67dm0nLtWIcxUZTtK6zKkFNvhTe8BYFJ4qOx0vVpClDO/gvzyZebYU/1jKQ19bcavvkLXlVtFc6VD7iik2EBhw7nZ9D67knQgM9mmugwzuKIBtv63Q3cBTRJfn9+crVwcSQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cC8QzqzH; arc=none smtp.client-ip=209.85.219.43
+	s=arc-20240116; t=1756331936; c=relaxed/simple;
+	bh=JMen7NBAn82i+cQk+lt8r7DC5nLvXvmXVHIEN5KsKxI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=b7dPNE534IGSq+P26T+JcWtbxTTWi47gY4DfyjxGSqn8gPJJME9l7OXzY+4n7ZPVdoHM4WRqXailtwa1MuyyuCxaWtCkVWUGcitmCnO2hkkQKZXl8AKfccQECiuxrSMzLFjn2hSJIOA+GdBUbIjze+ag00CCDpJ9eYrDkh9kZ8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AH7jITyd; arc=none smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cC8QzqzH"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-70dd5de762cso2809736d6.1
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Aug 2025 13:03:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AH7jITyd"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-70ba7aa136fso3355686d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 27 Aug 2025 14:58:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1756325015; x=1756929815; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PbMg2iZBF50w9bvltl4tIdLeh/aZoJYuThqFn7NRr7U=;
-        b=cC8QzqzHLa/L9fh3jeZfMxWQIbn+2HZUngbVykdXa5+yNOkBvywjNcf7AEo09gLfWM
-         KocWXyV/Wa6Bry/U8r3jzS+7SLTd2fVfbOiJ6BgPKPzYitIi382V2LhjCBVqeNViKHOk
-         d0pj+Bey5Gk8ySgvLWIAlThiS2rs3Tq3xfe/HSt6nCrdKjZKlu1C+uCwDj0QxKPfuaEM
-         VMkH1erZPrZJozcqbwiSdxv9Nz+DltFEF2uIaqPvvtyTANb3ystkKGYVk1rDQCFf+3PK
-         Iv0YYsuEp58oei06Fgnhy9WSgCXk+vwPrh2BFQSeOXyOgKEBZDIuyv2a+jlCTLZjJ5s0
-         3itQ==
+        d=gmail.com; s=20230601; t=1756331934; x=1756936734; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yzIjV4c89S7ROlNCOSrQhiHr1PdqwszQTn/WOp2kg5M=;
+        b=AH7jITydwOeeMYsR8hcFxGItTXypO+LRIkI7ge948psqX8U9OQQHA0a2FC2dlg1T22
+         8PVnh1p2MorPQbmD5nDDce2fKd2GOfJQZqPsrbDGI0nQpsk9ran56H0FJxXM7Za+y4oY
+         nnH/GPb/dUUQTYt8kvDOwte9rmPBZFDhm4PCv4XHDTz/lkcvSMs4dYlHFekvW6zUzo1m
+         KqoHgbOogJuYGH3yWPZRpt8YZyh0yhXycO0IDGdpf7WU9OnTBb/nTk905KK8NxXYcjv2
+         KupvGseobM3YEiXBa2xF3wLripPn0u1VAxbliHP+M16msBpWYdPvwAO2Wjj/cD9Aze0B
+         J0xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1756325015; x=1756929815;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PbMg2iZBF50w9bvltl4tIdLeh/aZoJYuThqFn7NRr7U=;
-        b=YSvgOzQe/RHR69ACL54cL25i9Reo4vUTn4Rq0XsEbFSa8CyyyJkEE1DYvXDpUxAhO0
-         y6V48sJPPk+co+OU7NDUHyDUI5fu/zZm2W5r0m/wJKdsLB2rJkH/zmxi7xmwXRc2pIga
-         YESO6Ne21v6/8FWgOMw7boyyMo55vBEI5xJm/1SK+nMv6J8c5p2NOitGsVb8cEOZ6/uS
-         Oijq+K4+RQtCy2XB2VJn0NAjAj927XIOjCofp0hZF030JlzcAvH93f1S9TuiJyqc//DU
-         2lkNGUNqgrlS1HPtaK1yFfVyLx65YICSWvDvGrVU0rgTYQ6+fv1nRUwWOkpc/F4NNffT
-         +iBg==
-X-Forwarded-Encrypted: i=1; AJvYcCVt1MwsjAJCpPcq4vCJJSyCuOZo1p5h3tOOquwLrL3r1SaYZJCPOOWF/TO0ATwkZrNyuxzNgcdQZKrh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0Uy8ae/aeOSwI7YYlZNQiPXiMZDR1eAK6WX07bHlmed9/Wybt
-	i+UkRFeH+p11iB7DzbXWnb2nmU2u4fikOpUZnBIFlmVguSWYyVlSE7yFmUi77QLavnH6/WhKh3a
-	Qseer9NeL1hJu2s1yBs9GmayQc2ps7Qw=
-X-Gm-Gg: ASbGncvn1XFmLxxlMgBf7uJPHNUGFjwK40Bff/2rMGj23hoQOymsdcpEBezzPjEy6Yp
-	KqjME8/VUrLy86yJBDNL7HavTMerKcnXdmI9mRnnTfV86x7i0tgSLI08XDEO3gtmw+/oXdmdvTt
-	KzrStvP97Q7ojChZVZkUyoWWBHDQ4BHF3PsFFBVKih4XSOlyaCW9fplqeHopVC4OsIT0U5r855Q
-	IVX6FPcwjNIPkeWgRyvZG+2LhC6wWCkDNgxgDJigJ/g2n86qj/iSr3sUxkXZWHSPswBaRXT6t3y
-	KKLbcgYx1gtZ9vqx6+tEjw==
-X-Google-Smtp-Source: AGHT+IGvR9Gopsnrfnv3RsqoGfwVXlA895U4Bna9kgMu39ZeDGlbhCSyjzjh40Dwdu8dELMXQbQY/g9N4Qw8chD4d1o=
-X-Received: by 2002:a05:6214:1cc1:b0:70d:a94f:eb47 with SMTP id
- 6a1803df08f44-70da94ff287mr163620996d6.11.1756325013863; Wed, 27 Aug 2025
- 13:03:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1756331934; x=1756936734;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yzIjV4c89S7ROlNCOSrQhiHr1PdqwszQTn/WOp2kg5M=;
+        b=uWr6GqhjHCHLMBhenBBhl/8CclpDl3ZokXn8pnCFALyOTZZZRwIyQu1vw8aQ49mWPU
+         XemIVnq+4UZrHpFpruWc+Es+x1fNf2cukiwRFdfs4Ab7/9I02itHVLPLBma9G09aFTB+
+         /cy/buvXCJTHdvovLuXbNL+e1od1l5AP6b1ePJRunq7n1qJZpkSADmnhjHLcELkgJFNO
+         IjEElnYzOdDDh7mmxonNeWmnKlN6fCadrCq5KMMcENb5l9yy9xX/JcmY+2hqN3yfwMo+
+         VUwobyWojVuT2+c0WxgxvPJkrOhi0ORMzTgqzhXmQaW01Ef4HLNnyh4ZlnI/x20IraRD
+         uoWA==
+X-Gm-Message-State: AOJu0YzjoU8yaphXh3qqlFaPr/4TrnUvnbXGPDAi5uHJJqdnEXez7FMA
+	8uCxt/MSqyaJTspYwsRTM5yY3asWh1DjaYDnQhqsoXdDGUTsKwtf0UiwTQIHfNFW2gwhwc1UpQq
+	94qmVsJ19I0LtKY2+aZ8VL0Q/5Hs2UeY=
+X-Gm-Gg: ASbGncsg/Ols1GY3Zm+SQluYaMhGvGgZ0NrjcEl8OufXHc64uCn3BrZhNVx8D/R5Vd3
+	B/xWpehO/+E3w307j1lSxniSgSh5DeZcRjCtFKzBs/ygc/fp8kGwkcAZP0IqtsHQwbzO/7rmDk6
+	AfIO8vzOP18N+8jik6OOcHuzC1oRPxHoLuFiMeqKqZsoC2qef3Q35QgKnr8BjDqZKolr9gVx88L
+	27sHQvUig8MryxmmLa5x2HLFEf1+QqzFMJlweBT/at35ozfmA23b6FxcZxqfbRoEXIT5ZcUssBn
+	/qRRV4vs4vYpP4QPmQCgBg==
+X-Google-Smtp-Source: AGHT+IFQGRy2dINZWM2cBm7b/gKQA3ZkUZHpgxrkb20v7dWYad9TbewPcF8RdfSiBrc3TXa7QaM1lsCOQxWqXifFIyE=
+X-Received: by 2002:a05:6214:1c4b:b0:709:f2ed:bfec with SMTP id
+ 6a1803df08f44-70d9720cc01mr213882196d6.49.1756331933889; Wed, 27 Aug 2025
+ 14:58:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aK9NPzbY9M_9eKuv@homelab>
-In-Reply-To: <aK9NPzbY9M_9eKuv@homelab>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 27 Aug 2025 15:03:22 -0500
-X-Gm-Features: Ac12FXzT5j85uvaUwuToH9BZp8ybhHwDmgslW2zYSlEpHJUVxteHmRT4WIfmndU
-Message-ID: <CAH2r5mvKJyf9JtRRCRB6Y+9y9RDUpoJW9Cgar7Fs9dgO-zwhLg@mail.gmail.com>
-Subject: Re: [PATCH] fs/smb: Fix inconsistent refcnt update
-To: Shuhao Fu <sfual@cse.ust.hk>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
+Date: Wed, 27 Aug 2025 16:58:42 -0500
+X-Gm-Features: Ac12FXyQEZbB7fOY79Kx6W1muMTDNT8p9OlXXf7csm10E5_huxhfwL6_5J2uj58
+Message-ID: <CAH2r5muHpZOTU+CHrmG1OnpvXNmfia8CxAs8v_uEPOZrHFr-1w@mail.gmail.com>
+Subject: smbdirect patches for 6.18
+To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, 
+	"Stefan (metze) Metzmacher" <metze@samba.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Tom Talpey <tom@talpey.com>, 
+	Long Li <longli@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git pending testing (and added Cc:stable and
-Acked-by from Paulo)
+I have updated the cifs-2.6.git for-next-next branch with the 144
+smbdirect client and server changesets (on top of for-next which is
+6.17-rc2 plus a few cifs.ko patches unrelated to RDMA/smbdirect)
 
-Let me know if any objections etc
+https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/for-next-next
 
-On Wed, Aug 27, 2025 at 1:33=E2=80=AFPM Shuhao Fu <sfual@cse.ust.hk> wrote:
->
-> A possible inconsistent update of refcount was identified in `smb2_compou=
-nd_op`.
-> Such inconsistent update could lead to possible resource leaks.
->
-> Why it is a possible bug:
-> 1. In the comment section of the function, it clearly states that the
-> reference to `cfile` should be dropped after calling this function.
-> 2. Every control flow path would check and drop the reference to
-> `cfile`, except the patched one.
-> 3. Existing callers would not handle refcount update of `cfile` if
-> -ENOMEM is returned.
->
-> To fix the bug, an extra goto label "out" is added, to make sure that the
-> cleanup logic would always be respected. As the problem is caused by the
-> allocation failure of `vars`, the cleanup logic between label "finished"
-> and "out" can be safely ignored. According to the definition of function
-> `is_replayable_error`, the error code of "-ENOMEM" is not recoverable.
-> Therefore, the replay logic also gets ignored.
->
-> Signed-off-by: Shuhao Fu <sfual@cse.ust.hk>
-> ---
->  fs/smb/client/smb2inode.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-> index 2a0316c51..31c13fb5b 100644
-> --- a/fs/smb/client/smb2inode.c
-> +++ b/fs/smb/client/smb2inode.c
-> @@ -207,8 +207,10 @@ static int smb2_compound_op(const unsigned int xid, =
-struct cifs_tcon *tcon,
->         server =3D cifs_pick_channel(ses);
->
->         vars =3D kzalloc(sizeof(*vars), GFP_ATOMIC);
-> -       if (vars =3D=3D NULL)
-> -               return -ENOMEM;
-> +       if (vars =3D=3D NULL) {
-> +               rc =3D -ENOMEM;
-> +               goto out;
-> +       }
->         rqst =3D &vars->rqst[0];
->         rsp_iov =3D &vars->rsp_iov[0];
->
-> @@ -864,6 +866,7 @@ static int smb2_compound_op(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->             smb2_should_replay(tcon, &retries, &cur_sleep))
->                 goto replay_again;
->
-> +out:
->         if (cfile)
->                 cifsFileInfo_put(cfile);
->
-> --
-> 2.39.5
->
->
+Metze,
+It also looks like there are at least two "Fixes" that qualify to be
+merged earlier.
+Do you want me to merge these two into for-next (so we can send it for
+rc4 or rc5?)
 
+8170223a650e smb: server: fix IRD/ORD negotiation with the client
+5dd0894d057a smb: client: fix sending the iwrap custom IRD/ORD
+negotiation messages
 
---=20
+And if so presumably Meetakshi can do some additional tests with just those two?
+
+-- 
 Thanks,
 
 Steve
