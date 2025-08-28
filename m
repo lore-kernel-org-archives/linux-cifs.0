@@ -1,38 +1,38 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCAD30C630
-	for <linux-cifs@vger.kernel.org>; Thu, 28 Aug 2025 10:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B45266581
+	for <linux-cifs@vger.kernel.org>; Thu, 28 Aug 2025 10:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756377535; cv=none; b=oqadNVsLcK0EcI3KK285oy/WnpmJUeG+PWsBDLVqqsBKsobpiiAu1craQ6OERP2sGXojIuSaXhgfVoOLU81/Z4CyZFvXfmaLzSQttVs48feMHPtH1hiV/8zZ8PkuX5dOB9864sXiePwQ8Woh1DrVr+nw1+gzkGcuizScbL4yftM=
+	t=1756378159; cv=none; b=AnhdXphtx0cFhyvSZexerytJyxHWqDSNHfhjuBUOpz1if6cqUe12BljEjN+ZLRfULEjaTg6Y6wHlnexazg/cjTv1ntI7/qE1P7f443Fk4ADI0nFvfivVzGExa8m7n1LSvu+X3QXy+xSzj/7po/4mSn6siv7q466mVhWFW7KSDKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756377535; c=relaxed/simple;
-	bh=42pZZoHJh1Fygwzm5WJNdngeVSBjEFWpBvooRcvyjsg=;
+	s=arc-20240116; t=1756378159; c=relaxed/simple;
+	bh=n8+eU0VrPhhIi6FgJbsrIQDdy2YerxEjVsET8cvJHhE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WpK6VDsxuwSCVNzp57AKDyc1N3KgOiFZOtO6ajL3DY4i3qQYSku2P/t08s8hQ/DMlbSVDcMBF46GEbWhorDb5EvXNgayMdGnzfm77Y85U0f9vOLJuRrJIWv0MnQZtsPeYliBwyZkzDhgqkRpgjhBcZbH/mKksnfy2wctykPJLSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=oAbOUD4k; arc=none smtp.client-ip=144.76.82.148
+	 In-Reply-To:Content-Type; b=f3Uoj3K3ukbdgCgF96DV2/z+RpXFfmoqJeE29jOSTVvcj12Y3wVTHDS9oTgtkoCW77HfvTsKNJ0hrPokgEnwBJZJ/41+x2aJPDPRZGDIFAVjgrEVq/liATzE/SmqsyUSQtrdNT/eBb03yVAe02q5VIg4K/hiW3dSD/R+6cYeEQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NU02UUC5; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="oAbOUD4k"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NU02UUC5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=xKNP/W7O4r1Zo2EvKARJG4j2NOBhTdz16H7JuwkLQPc=; b=oAbOUD4kJipFn5hJLqKe+fHWDb
-	2Ox2Lzi05KC0oFsOJK6hWnIeKSKMY99+cbJrn5RkuIaUhkacjnxHuoXG2YKuzPkqdzY6LPhRDVk1K
-	ltDnLFIhfOslutbUTKAuzuVB16nvPaIXv+bBMSxUEf3aVw8feZ3a5jszfWG8aPwd3+P+W/MHbKB02
-	O3HCM6KorGMsUuHbrg1accdfVDwz9XlQv2ImHqc6IbcF/1KgDw4SaMFxMYr57HIPEvZg15OABbHuX
-	Mgg6JM1hRjjlgdN94ru8scWk1t5mwZMkLMV6zZtDHFbQRiJV2glsihNwsQYvthJIdom49lnpOteEA
-	N2MHixoiEZfwgS573DUwjVB6qBqEjmvuIWjsNqazieMp4gkHmc8HOxh9wuEDbWBtwmXe+XoKkIQdu
-	5jNd+GtEYilLUJY2lq2MbBFm6rOeGkVIj9D2z94eTcRG8ickC1PbMuezYRlpzXDKmgwDWH4RJeDSj
-	hrc1RAUlTeAlxDpCHbDKW8mh;
+	bh=4u4tRB9Jft3hCsCmQIN/yW4yT45w6uGXsbqKC1vuEDI=; b=NU02UUC5VJTsaDEph/yTEiqwpc
+	d+7jcsOjj+HLMyUQ19jm1WfwIvFZnVnI5HTv6o6F5/nbjGxs8Ew5FWQ+rSpl4287Ukw5nIR+66N2e
+	S3sAnjZUIS76mDoGqvXMrvcRvPCMCF5N2g414anrLZlwWk1SgK4zhNy9jTr4B+27ZFamVaReRf2K5
+	l/0I6Cg4mvJsY4LxdBEYOsKM3WNRAI8twIcyVB9Xa088Ae+My4NLp8uiyji1DFIx9pg3x1EeMiupj
+	lzChG/BMrkQbYyhfD4JMYEwfjnULYCqHBQjPzzr6/xrp2G74bzbA/5gGGxFMbM2UAwNAwxMWJP5/N
+	epGZDhgKLpUT8gcyNrW5v5usHRjcKSMklMTIx9E2BhGa8es2Dg3hS6J6TW7vsqDuZZONMdHbl1Ed0
+	cvwnH61AjV2FBJ7HgIyuB3TDigdStYw3Nx+gK6oHj1guF04/4ciCetkjVRMTwGiHmH227/wqbSl3J
+	O7bCkhqwCgLnR/NO4LRlR6Tx;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1ura1r-001FCp-0T;
-	Thu, 28 Aug 2025 10:38:51 +0000
-Message-ID: <0e3039e8-794b-47d8-809c-3ae327146b85@samba.org>
-Date: Thu, 28 Aug 2025 12:38:50 +0200
+	id 1uraBv-001FM4-0R;
+	Thu, 28 Aug 2025 10:49:15 +0000
+Message-ID: <2375a643-9163-49b0-b9ae-65378cbd1b78@samba.org>
+Date: Thu, 28 Aug 2025 12:49:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,80 +48,52 @@ Cc: Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>,
 References: <CAH2r5muHpZOTU+CHrmG1OnpvXNmfia8CxAs8v_uEPOZrHFr-1w@mail.gmail.com>
  <1f5a4297-8086-4914-af44-1cf76393c8c7@samba.org>
  <CAFTVevUWWrPgs=Kb6E3WtSiyTmWtoD8QYiONJ1hYkS37ri=NrA@mail.gmail.com>
+ <CAFTVevVn8sZr6uyBpA9uF80reRNty2izFCLWU_t-6gyAx-K3gQ@mail.gmail.com>
 Content-Language: en-US
 From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAFTVevUWWrPgs=Kb6E3WtSiyTmWtoD8QYiONJ1hYkS37ri=NrA@mail.gmail.com>
+In-Reply-To: <CAFTVevVn8sZr6uyBpA9uF80reRNty2izFCLWU_t-6gyAx-K3gQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Meetakshi,
 
-> I ran some xfstests after building Steve's current for-next-next, with
-> all 144 smbdirect client and server patches.
-
-Thanks!
-
-> All tests pass save generic/258 (negative timestamps test).
-
-Can you past a list with all tests and time they take,
-so that I can add some more fast tests to testing I typically do.
-
-Currently I have these:
-
-cifs/001 2s ...  3s
-generic/001 71s ...  51s
-generic/002 3s ...  2s
-generic/005 9s ...  5s
-generic/006 288s ...  50s
-generic/007 325s ...  104s
-generic/008 5s ...  3s
-generic/011 275s ...  136s
-
-The times on the left are against ksmbd in a VM the times
-on the right against Windows 2025 on bare metal.
-
-> generic/258 0s ... [failed, exit status 1]- output mismatch (see
-> /home/met/xfstests/results//smb3/generic/258.out.bad)
->      --- tests/generic/258.out   2025-05-19 08:53:10.883041010 +0000
->      +++ /home/met/xfstests/results//smb3/generic/258.out.bad
-> 2025-08-28 08:45:31.148495408 +0000
->      @@ -3,3 +3,6 @@
->       Testing for negative seconds since epoch
->       Remounting to flush cache
->       Testing for negative seconds since epoch
->      +Timestamp wrapped: 1756370731
->      +Timestamp wrapped
->      +(see /home/met/xfstests/results//smb3/generic/258.full for details)
->      ...
->      (Run 'diff -u /home/met/xfstests/tests/generic/258.out
-> /home/met/xfstests/results//smb3/generic/258.out.bad'  to see the
-> entire diff)
+> A concerning log I saw on the ksmbd server side:
 > 
-> This test fails against ksmbd even without RDMA. It seems like a
-> server problem because the same test passes against the Azure SMB
-> Server.
+> [ 5437.417703] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for
+>> 10000us 4 times, consider switching to WQ_UNBOUND
+> ....
+> [ 5446.096614] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for
+>> 10000us 7 times, consider switching to WQ_UNBOUND
+> 
+> I am not sure if I will have the time to help debug these issues.
 
-I can't reproduce it here it just works fine with a patched
-client using siw.ko against:
+I see these for various workqueues. Running against ksmbd
+over tcp I'm getting these:
 
-- Windows 2025 with a Chelsio T520-BT card
-- ksmbd (without the patches) using siw.ko
-- ksmbd (with the patches) using siw.ko
+[Do Aug 28 12:44:03 2025] workqueue: delayed_fput hogged CPU for >10000us 4 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:44:05 2025] workqueue: delayed_fput hogged CPU for >10000us 5 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:44:07 2025] workqueue: delayed_fput hogged CPU for >10000us 7 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:44:12 2025] workqueue: delayed_fput hogged CPU for >10000us 11 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:44:18 2025] workqueue: delayed_fput hogged CPU for >10000us 19 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:44:35 2025] workqueue: delayed_fput hogged CPU for >10000us 35 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:28 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 4 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:28 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 5 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:29 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 7 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:29 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 11 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:30 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 19 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:33 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 35 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:36 2025] workqueue: delayed_fput hogged CPU for >10000us 67 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:37 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 67 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:41 2025] workqueue: delayed_fput hogged CPU for >10000us 131 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:49 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 131 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:45:49 2025] workqueue: delayed_fput hogged CPU for >10000us 259 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:46:03 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 259 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:46:05 2025] workqueue: delayed_fput hogged CPU for >10000us 515 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:46:24 2025] workqueue: handle_ksmbd_work [ksmbd] hogged CPU for >10000us 515 times, consider switching to WQ_UNBOUND
+[Do Aug 28 12:46:53 2025] workqueue: delayed_fput hogged CPU for >10000us 1027 times, consider switching to WQ_UNBOUND
 
-On ksmbd I'm using this trivial config:
+I also saw ib_core (when using rdma) and others.
 
-# less /etc/ksmbd/ksmbd.conf
-[globals]
-
-[test]
-         path = /data/test
-         read only = no
-
-[scratch]
-         path = /data/scratch
-         read only = no
-
-/data/test and /data/scratch are on the following mount:
-/dev/sda1 on / type ext4 (rw,relatime,errors=remount-ro)
+So I don't think it's critical.
 
 metze
