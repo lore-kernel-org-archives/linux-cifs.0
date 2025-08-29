@@ -1,141 +1,135 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1D62BE032
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Aug 2025 11:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6701414F9FB;
+	Fri, 29 Aug 2025 13:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756467705; cv=none; b=t0/Py6enBjH8Bj8l2rKyPlrini7h2pT2BnwKO70JlqXcJEaFaKiZg6+6o0rB90tsCkxsoKUx343VzwSc/PtB5fwRWd+9vz0XfOiAgXDBwI1nNjqMaEXcw/QDqK7cyX0RdQVxw8tBJ7kXegnED8vRzDVG2gkO1NbKFsUAI0/vAqg=
+	t=1756472468; cv=none; b=hGuP456lIsqghQismgUXDrLivNvUqAymODQFEvT/L0Z2CAdrXeJyssdmV+fXZU6j63MkBtR89JSR1BZkV8oNuPpznVG8ZM17U92qovVlihh0iEvfsZpjUnngCUklXXvD38decDvclXjvIoDglNUywxo7Jjpt6RU9323LgmAM6p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756467705; c=relaxed/simple;
-	bh=Kl7R2kSgRrJ/G9k6bv3Q8j6NS1X8/WDfjhRe5Lze1cQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hxoXo9qPEOQ9pG76W47/+JvQ1sYGx2pQ3vybiz0V/GSnJVyheGGUbtVEaVWNiBssXawyo9CBifA+FYQoKudK4cRYdQPzQW47+iKbs6xzFg+UhOWffKXWT0X4pzv6paq0pWWyaULb2wLRe5wxR2pBZs30rzB8r5tbxooS7YmJUCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1FFJS1Pf; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1756472468; c=relaxed/simple;
+	bh=huEmYKtpngB9RmDN6wRbSbdKSJH3TWBnhI3yoCvi/xU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DLnvVW6bSsGb8tl5KAPgF8z6s8c+wL+upzshnS1qzjBE806ZED176dnV68v+lTRe/DaxOrpJhRGh79St2hxAPSSB1nh9i9kzByb88zNwYf9xyMSRt6i0r5Go0GVxp96Wkv3d9vrzfqI1+kYS1bYuA2r6igz6EVRjGnHc8xmVKTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKCR9zTS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1FFJS1Pf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=lA+5nGJAjx3gqbvnBYhwThLNYsg3mRmlH7d2M7OsnuU=; b=1FFJS1PfdPZZQdcKLsKEEWVmHZ
-	54RJs4WWFDq/LTvCqt6pH4QhBqVRab21hdi0IjsXT3aBh86QBoSFN19rxXGoNG7AYvYmfy5fHCQUu
-	j1mZ9vnPh5xt3vum3i1+omDI+o1yXGzDjlbiQY8Vf8qlwkmsHb+9y3/Akd65/eQQzZwQWFC9ROC0L
-	UNUv7F1MqrpwlB7SJJYF/+8yO61MtNURxV+G/LstplMBjKe+Qq16Xc9Bh8PnOtu15lKlmAubH6bxn
-	nU7DX0meNm6yo8xfeCouq1MWglvmiHXFSc0SKpyqhcoHWw74+BOq9J/wkvfsmX4FfSx4+yfDYGKAl
-	Ay+IM5N+htWxxX77z9hx31EPJQjB6oREjLRRC9kWLLcjM2JJvH+0mZu39/rICtNpjfwCvBcxLvA4y
-	RjTABoD5Xk+SQDIOzDpgS468lU8Lq36K7plpG6Jg8Zm0bZ0jTEgIYQ0QNky8BkVEREL3wdqO6urHL
-	UJ1fuMKorb8HDGfdj6y7m5r4;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1urxU7-001Q6C-1R;
-	Fri, 29 Aug 2025 11:41:35 +0000
-Message-ID: <c18ba6b4-847e-4470-bd0e-9e5232add730@samba.org>
-Date: Fri, 29 Aug 2025 13:41:34 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKCR9zTS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EA3BC4CEF0;
+	Fri, 29 Aug 2025 13:01:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756472467;
+	bh=huEmYKtpngB9RmDN6wRbSbdKSJH3TWBnhI3yoCvi/xU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FKCR9zTS39TL+CT4FGE3zmcte3Lcdogid/aX/TT42gdmxRnMM8Vh03urXpDNmisTH
+	 nPAPmS6HghA0IL5LbeF/npNmFuR08fLNdXbfjfDTf5A9EjP31elTOvviQnIYx+ZiyK
+	 1doh17YzPoR0JmUL8yg7T0Kly3iMpkMS55qBMpeYiWj98NGFGpvqy5yXerJDWDkVgR
+	 v5B4mjPFKeTEg8svXIv1v/iKjwyD9u5IbUWFEDn8Syn8PzRyJHJFnRxBrtp8pXmGmC
+	 aBboCCuNs6ai+OGuoHXK5++fwJpPJtsRR7wvTaYPDuaZCwouCFiIrG/apgP7EKoPuM
+	 nzZabLanOV7RA==
+Received: by pali.im (Postfix)
+	id 6B11085D; Fri, 29 Aug 2025 15:01:04 +0200 (CEST)
+Date: Fri, 29 Aug 2025 15:01:04 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <smfrench@gmail.com>
+Cc: ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Jeremy Allison <jra@samba.org>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Do not use UID and GID from EAs
+Message-ID: <20250829130104.jtjp2jlmd6infvtc@pali>
+References: <20240913200204.10660-1-pali@kernel.org>
+ <20240913201041.cwueaflcxhewnvwj@pali>
+ <20240917200600.6smfxhrppkyjuyku@pali>
+ <ZunlTDxPLn4yryW3@jeremy-rocky-laptop.localdomain>
+ <20240917202921.ty32zzmhrg33knpy@pali>
+ <ZunnGhOogEQU2Hje@jeremy-rocky-laptop.localdomain>
+ <20240917203431.w5dejuwfkmabrewz@pali>
+ <CAN05THTVav8HOCk6V+5eg-BTESZDBx2BuQOF1c=Vn2dFv_UNxw@mail.gmail.com>
+ <CAH2r5muUioziUN7mRFUAOV3tGPMLnb949j70GKYnRM2LygAWVQ@mail.gmail.com>
+ <20250811105258.t3r65wsytkmyguem@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [cifs:for-next-next 28/146] fs/smb/client/smbdirect.c:1856:25:
- warning: stack frame size (1272) exceeds limit (1024) in
- 'smbd_get_connection'
-To: Steve French <smfrench@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Steve French <stfrench@microsoft.com>, kernel test robot <lkp@intel.com>
-References: <202508291432.M5gWPqJX-lkp@intel.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <202508291432.M5gWPqJX-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250811105258.t3r65wsytkmyguem@pali>
+User-Agent: NeoMutt/20180716
 
-Hi Steve,
-
-this is strange, but the following should fix the problem:
-
---- a/fs/smb/common/smbdirect/smbdirect_socket.h
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -259,9 +259,11 @@ struct smbdirect_socket {
-
-  static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
-  {
--       *sc = (struct smbdirect_socket) {
--               .status = SMBDIRECT_SOCKET_CREATED,
--       };
-+       /*
-+        * This also sets status = SMBDIRECT_SOCKET_CREATED
-+        */
-+       BUILD_BUG_ON(SMBDIRECT_SOCKET_CREATED != 0);
-+       memset(sc, 0, sizeof(*sc));
-
-         init_waitqueue_head(&sc->status_wait);
-
-
-It needs to be squashed into this commit:
-f2e2769275f4aa6e4d5fa98004301e91282a094a smb: smbdirect: introduce smbdirect_socket_init()
-
-Can you do that?
-
-I'm not sure if the following should be added
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202508291432.M5gWPqJX-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202508291615.Mxyg9D9N-lkp@intel.com/
-
-Thanks!
-metze
-
-Am 29.08.25 um 09:06 schrieb kernel test robot:
-> tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next-next
-> head:   b79712ce1752aa38da9553b06767f68367b0d7ff
-> commit: 36d70a0c8405556dea3d4e9beef708d7ed3c2b07 [28/146] smb: client: make use of smbdirect_socket_init()
-> config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20250829/202508291432.M5gWPqJX-lkp@intel.com/config)
-> compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250829/202508291432.M5gWPqJX-lkp@intel.com/reproduce)
+On Monday 11 August 2025 12:52:58 Pali Rohár wrote:
+> On Tuesday 17 September 2024 16:19:08 Steve French wrote:
+> > On Tue, Sep 17, 2024 at 3:45 PM ronnie sahlberg
+> > <ronniesahlberg@gmail.com> wrote:
+> > >
+> > > On Wed, 18 Sept 2024 at 06:37, Pali Rohár <pali@kernel.org> wrote:
+> > > >
+> > > > On Tuesday 17 September 2024 13:31:22 Jeremy Allison wrote:
+> > > > > On Tue, Sep 17, 2024 at 10:29:21PM +0200, Pali Rohár wrote:
+> > > > > > On Tuesday 17 September 2024 13:23:40 Jeremy Allison wrote:
+> > > > > > > On Tue, Sep 17, 2024 at 10:06:00PM +0200, Pali Rohár wrote:
+> > > > > > > > And seems that SMB2_OP_QUERY_WSL_EA is useful not only for reparse
+> > > > > > > > points, but also for any regular file or directory as it can contain
+> > > > > > > > UNIX mode and UID/GID ownership.
+> > > > > > >
+> > > > > > > uid/gid should *never* be exposed over the wire for SMB.
+> > > > > > >
+> > > > > > > That way lies madness.
+> > > > > >
+> > > > > > Hello Jeremy, if I understood wsl_to_fattr() function correctly then it
+> > > > > > is already doing it, it fills uid/gid for stat() from data which were
+> > > > > > exposed over the wire for SMB. Could you check that function if it is
+> > > > > > truth?
+> > > > >
+> > > > > I'm sure the Windows implementation is doing it - however, any Linux
+> > > > > server implementations should not do this (IMHO).
+> > > > >
+> > > > > It will break all SID -> uid / gid mapping that servers must
+> > > > > carefully set up.
+> > > > >
+> > > > > On the wire - SIDs must be the only source of identity.
+> > > >
+> > > > Ok. But then I do not understand why Linux client parses and uses uid
+> > > > and gids which are sent over the wire. If you are saying that the SIDs
+> > > > must be the only source of truth then Linux client should rather ignore
+> > > > uid and gid values?
+> > >
+> > > What I think Jeremy is refering to is that mixing uids and sids in the
+> > > protocol itself is
+> > > a protocol design mistake.
+> > > Because this means that some PDUs in the protocol operate on SIDs but
+> > > others operate on
+> > > UID/GIDs and this means there is great risk of mistakes and have the
+> > > sid<->uid mapping return
+> > > different results depending on the actual PDU.
+> > >
+> > > Sometimes the sid<->uid mapping happens in the server, at other times
+> > > the mapping happens in the client
+> > > and it is very difficult to guarantee that the mapping is consistent
+> > > across PDUs in the protocol as well as across different clients.
+> > 
+> > Yes - agreed.
+> > 
+> > SIDs are globally unique and should always be used/sent over the wire
+> > (never send or use the local uid/gid which is not guaranteed to be
+> > unique).  Whether retrieving ownership information via
+> > the SMB ACL or via an SMB3.1.1 POSIX response, the SID is the correct
+> > thing to send/use in the protocol.  For cases where the client is not
+> > domain joined, the UID/GID can be encoded in the SID, for cases that
+> > are domain joined the Linux UIDs/GIDs can be mapped consistently via
+> > the SID.
+> > 
+> > -- 
+> > Thanks,
+> > 
+> > Steve
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202508291432.M5gWPqJX-lkp@intel.com/
+> Hello Steve, based on the above discussion I'm proposing a change which
+> stops parsing UID and GID values stored in EAs on the SMB server for
+> SMB2 and SMB3 dialects. Change is in the attachment.
+> 
+> Steve, Ronnie, Jeremy and Paulo, could you review this change?
 
-
-> All warnings (new ones prefixed by >>):
-> 
->>> fs/smb/client/smbdirect.c:1856:25: warning: stack frame size (1272) exceeds limit (1024) in 'smbd_get_connection' [-Wframe-larger-than]
->      1856 | struct smbd_connection *smbd_get_connection(
->           |                         ^
->     1 warning generated.
-
-> 
-> vim +/smbd_get_connection +1856 fs/smb/client/smbdirect.c
-> 
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1855
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17 @1856  struct smbd_connection *smbd_get_connection(
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1857  	struct TCP_Server_Info *server, struct sockaddr *dstaddr)
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1858  {
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1859  	struct smbd_connection *ret;
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1860  	int port = SMBD_PORT;
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1861
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1862  try_again:
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1863  	ret = _smbd_get_connection(server, dstaddr, port);
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1864
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1865  	/* Try SMB_PORT if SMBD_PORT doesn't work */
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1866  	if (!ret && port == SMBD_PORT) {
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1867  		port = SMB_PORT;
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1868  		goto try_again;
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1869  	}
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1870  	return ret;
-> 399f9539d951adf fs/cifs/smbdirect.c Long Li 2017-11-17  1871  }
-> f64b78fd1835d1d fs/cifs/smbdirect.c Long Li 2017-11-22  1872
-> 
-> :::::: The code at line 1856 was first introduced by commit
-> :::::: 399f9539d951adf26a1078e38c1b0f10cf6c3e71 CIFS: SMBD: Implement function to create a SMB Direct connection
-> 
-> :::::: TO: Long Li <longli@microsoft.com>
-> :::::: CC: Steve French <smfrench@gmail.com>
-> 
-
+Hello, have you looked at the proposed change in the previous email?
