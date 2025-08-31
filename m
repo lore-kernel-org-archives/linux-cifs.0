@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177A526E701;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769FF26F2A6;
 	Sun, 31 Aug 2025 12:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756643800; cv=none; b=R8mXl9kHu2kY5LIsn7pK2iOyWF6bpahJsAhCSIH7oEC9RdiQ8PlkED8tyqN6FnUhwI45KpgH95QRbrNdaHnIC+M123+Z8kDbZkH3191zFIaeGibYe/OO1bUW/Q6IOQdqroqGgGqHmgjhHY/Jf8RAjizPNZD584VRpmornhOb9Dk=
+	t=1756643800; cv=none; b=A1mvEqWthVLIkPPd/JGyDIKRO4a86bl/wD0cl8KehCjXTrvgR4a4FIvgY+Qy8rgyC+q9fMVa14PaW0TywU3nDmi6SHOyYDKgDmH52CSZEPv/USnJt0U8A2DFXRJhyDECxAfbJA3YjUPDy7JueFdDBRmJa+IglRMu+mScguca8VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756643800; c=relaxed/simple;
-	bh=kkY3dV4+g16/UFiBKJIvabwDCXuiAib+78j5fAdmQGk=;
+	bh=uA/HDvBMaiWbGDSPGBQm5JB6alpNsa8hljEovxFjYFE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WbAy0u6+LSdhuBrZmpxQ4X4BToW80nZ90Qzj5Miyu80X4BWztvEFyXRWgbkR0pHvYMqymgNYXYWzMPYBMeEOe4zpHfX5MxXPeVLMyx+FX6VZAPdLDpPZnbb64AIrawd2KmPASH1rXD0SukBKnV2RQ/B0shu0rnHWlsjdKjZlOSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZhUQU/nk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=RzXUgDG5QyyZ7S8t8e2dUTSHIianLGHgR/2sNgXgSszbhYygv0aPw/VVmNk+9TDJAlpdF5+KsDsU/ctJevTWILrdh5P1vyNpa7CTxfEfFZxBPUzFCM8k9+J7N8d2diYEP+ZbcrtpITwrhUyOpIp3S/y2MZSlTXHNz3BJk0XRnhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xst19Egx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZhUQU/nk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99044C4CEED;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xst19Egx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB061C4CEF5;
 	Sun, 31 Aug 2025 12:36:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756643799;
-	bh=kkY3dV4+g16/UFiBKJIvabwDCXuiAib+78j5fAdmQGk=;
+	s=k20201202; t=1756643800;
+	bh=uA/HDvBMaiWbGDSPGBQm5JB6alpNsa8hljEovxFjYFE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZhUQU/nkFV1VGPa+BR723dyJm889IfogsIyd4x3KT69Ku0A24WNDuHz3j9n1aiQ7s
-	 FAYaLOGuyPZ968/itVi6IlJMLKinLr1sN2ZmBRWk/4bPxZKZXwFpe2uwhp6zjR+1wn
-	 btM+H1g9hSCNCu+LG0qJ7utoZ3XNUY7ARQ4yJ1j6tQlsBwPVcucTjwiAWz8wE90OjF
-	 T67s7K4dJNnN72fuCU1A9Q2vyhUHelq29vN1HrUxPUi4A9lS7jOJTVoZPeG3EAEj8U
-	 5/1yOiSGF648h81skCiE6B/WohXCZOni7vU8jrUtvNgR0lvst271MzrBwUitz2mlVv
-	 IBx3bzMu/fqsQ==
+	b=Xst19Egx39dh/ALGVIAgUA17QxKkzijLuU4k9BH6KNEi4Rcxe877rwbRpAMUDdo+M
+	 R4w+fStIarbJTYA81TYOGDmWFxk2ObZPhZ08PmppgJJBKdpnxlO1nKy2/P/2YiYTJi
+	 JlGiOvSaEXeAiTrnZscCK/e9yDCqfIU/8D9aC8POZ8HraAbwPkqS5tDPrbaCJbdKd+
+	 6e09IyrszbFGD/EEyYK+Q58Jel5kfMXTWnTjxEB6SWmlVRjUfZlhr6uvYtxVKzCnK3
+	 6nMhUFoS4nCjpoUC5w3o6tXs6dWyxpEs9qUKrDWjlUlp/6lZ+8drYiOA0praCSLh1q
+	 DOIIAk8MuYBWw==
 Received: by pali.im (Postfix)
-	id 1BD58EB3; Sun, 31 Aug 2025 14:36:36 +0200 (CEST)
+	id 217B912ED; Sun, 31 Aug 2025 14:36:37 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 26/35] cifs: Add SMB2+ support into cifs_rename_pending_delete() function.
-Date: Sun, 31 Aug 2025 14:35:53 +0200
-Message-Id: <20250831123602.14037-27-pali@kernel.org>
+Subject: [PATCH 31/35] cifs: Deduplicate smb2_unlink() and smb2_rmdir() into one common function
+Date: Sun, 31 Aug 2025 14:35:58 +0200
+Message-Id: <20250831123602.14037-32-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250831123602.14037-1-pali@kernel.org>
 References: <20250831123602.14037-1-pali@kernel.org>
@@ -49,218 +49,98 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Currently the cifs_rename_pending_delete() function calls directly the SMB1
-functions and therefore cannot be used by SMB2+ dialects.
+These two functions smb2_unlink() and smb2_rmdir() share lot of common
+logic. Deduplicate them into one common static function smb2_remove().
 
-Change cifs_rename_pending_delete() code to use tcon->ses->server->ops->
-callbacks instead of direct SMB1 functions. This allows to use this
-function also by SMB2 and SMB3 dialects.
-
-Mark the function cifs_rename_pending_delete() as static in inode.c and
-calls it directly. As it is now dialect neutral, remove it from struct
-smb_version_operations callback list.
-
-This change allows to use silly rename in SMB2+ by follow up changes.
+No functional change. All logic and handling stay same.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifsglob.h  |  3 ---
- fs/smb/client/cifsproto.h |  3 ---
- fs/smb/client/inode.c     | 56 +++++++++++++++++----------------------
- fs/smb/client/smb1ops.c   |  1 -
- 4 files changed, 24 insertions(+), 39 deletions(-)
+ fs/smb/client/smb2inode.c | 57 +++++++++++++++++++++++----------------
+ 1 file changed, 34 insertions(+), 23 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index ec5608924ce7..592a4faa3440 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -453,9 +453,6 @@ struct smb_version_operations {
- 	/* unlink file */
- 	int (*unlink)(const unsigned int, struct cifs_tcon *, const char *,
- 		      struct cifs_sb_info *, struct dentry *);
--	/* open, rename and delete file */
--	int (*rename_pending_delete)(const char *, struct dentry *,
--				     const unsigned int);
- 	/* send rename request */
- 	int (*rename)(const unsigned int xid,
- 		      struct cifs_tcon *tcon,
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index f248b18f1cf3..a29662a4d83d 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -242,9 +242,6 @@ extern int cifs_get_inode_info_unix(struct inode **pinode,
- 			struct super_block *sb, unsigned int xid);
- extern int cifs_set_file_info(struct inode *inode, struct iattr *attrs,
- 			      unsigned int xid, const char *full_path, __u32 dosattr);
--extern int cifs_rename_pending_delete(const char *full_path,
--				      struct dentry *dentry,
--				      const unsigned int xid);
- extern int sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
- 				struct cifs_fattr *fattr, uint sidtype);
- extern int cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 9a5504a3406d..c3f101d10488 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1684,7 +1684,6 @@ cifs_set_file_info(struct inode *inode, struct iattr *attrs, unsigned int xid,
- 	return server->ops->set_file_info(inode, full_path, &info_buf, xid);
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index a3b1ed53a860..0dd4a77dfb64 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -1332,43 +1332,54 @@ smb2_mkdir_setinfo(struct inode *inode, const char *name,
+ 		cifs_i->cifsAttrs = dosattrs;
  }
  
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- /*
-  * Open the given file (if it isn't already), set the DELETE_PENDING bit
-  * and rename it to a random name that hopefully won't conflict with
-@@ -1697,9 +1696,11 @@ cifs_set_file_info(struct inode *inode, struct iattr *attrs, unsigned int xid,
- #define SILLYNAME_LEN (SILLYNAME_PREFIX_LEN + \
- 		SILLYNAME_FILEID_LEN + \
- 		SILLYNAME_COUNTER_LEN)
 -int
--cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
--			   const unsigned int xid)
+-smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+-	   struct cifs_sb_info *cifs_sb)
 +static int
-+cifs_rename_pending_delete(const unsigned int xid,
-+			   struct cifs_tcon *tcon,
-+			   const char *full_path,
-+			   struct dentry *dentry)
++smb2_remove(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
++	    struct cifs_sb_info *cifs_sb, struct dentry *dentry, bool is_dir)
  {
- 	int oplock = 0;
- 	int rc;
-@@ -1708,8 +1709,6 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	struct inode *inode = d_inode(dentry);
- 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
--	struct tcon_link *tlink;
--	struct cifs_tcon *tcon;
- 	__u32 dosattr, origattr;
- 	char *sillyname_full_path = NULL;
- 	bool can_rename_opened_file = true;
-@@ -1719,11 +1718,6 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	const char *dirpath_end;
- 	size_t dirpath_len;
+ 	struct cifs_open_parms oparms;
++	int op_flags;
++	int op;
++	int rc;
  
--	tlink = cifs_sb_tlink(cifs_sb);
--	if (IS_ERR(tlink))
--		return PTR_ERR(tlink);
--	tcon = tlink_tcon(tlink);
+-	drop_cached_dir_by_name(xid, tcon, name, cifs_sb);
+-	oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE,
+-			     FILE_OPEN, CREATE_NOT_FILE | OPEN_REPARSE_POINT, ACL_NO_MODE);
+-	return smb2_compound_op(xid, tcon, cifs_sb,
+-				name, &oparms, NULL,
+-				&(int){SMB2_OP_RMDIR}, 1,
+-				NULL, NULL, NULL, NULL);
+-}
 -
- 	/* construct random name ".smb<inodenum><counter>" */
- 	while (true) {
- 		static unsigned int sillycounter; /* globally unique */
-@@ -1753,8 +1747,10 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	/*
- 	 * We cannot rename the opened file if the SMB1 server doesn't
- 	 * support CAP_INFOLEVEL_PASSTHRU. But we can rename file via path.
-+	 * SMB2+ always supports renaming of the opened file.
- 	 */
--	if (!(tcon->ses->capabilities & CAP_INFOLEVEL_PASSTHRU))
-+	if (tcon->ses->server->vals->protocol_id == SMB10_PROT_ID &&
-+	    !(tcon->ses->capabilities & CAP_INFOLEVEL_PASSTHRU))
- 		can_rename_opened_file = false;
+-int
+-smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+-	    struct cifs_sb_info *cifs_sb, struct dentry *dentry)
+-{
+-	struct cifs_open_parms oparms;
++	if (is_dir)
++		drop_cached_dir_by_name(xid, tcon, name, cifs_sb);
  
- 	dirpath_end = strrchr(full_path, CIFS_DIR_SEP(cifs_sb));
-@@ -1821,16 +1817,16 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 		.fid = &fid,
- 	};
- 
--	rc = CIFS_open(xid, &oparms, &oplock, NULL);
-+	rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
- 	if (rc != 0)
- 		goto undo_rename_path;
- 
- 	/* rename the opened file (if it was not already renamed before the open) */
- 	if (can_rename_opened_file) {
--		rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, sillyname,
-+		rc = tcon->ses->server->ops->rename_opened_file(
-+				   xid, tcon, &fid, sillyname_full_path,
- 				   false /* overwrite */,
--				   cifs_sb->local_nls,
--				   cifs_remap(cifs_sb));
-+				   cifs_sb);
- 		if (rc != 0) {
- 			rc = -EBUSY;
- 			goto undo_close;
-@@ -1839,8 +1835,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 
- 	/* try to set DELETE_PENDING */
- 	if (!test_bit(CIFS_INO_DELETE_PENDING, &cifsInode->flags)) {
--		rc = CIFSSMBSetFileDisposition(xid, tcon, true, fid.netfid,
--					       current->tgid);
-+		rc = tcon->ses->server->ops->set_file_disp(xid, tcon, &fid, true);
- 		/*
- 		 * some samba versions return -ENOENT when we try to set the
- 		 * file disposition here. Likely a samba bug, but work around
-@@ -1856,11 +1851,10 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 		set_bit(CIFS_INO_DELETE_PENDING, &cifsInode->flags);
++	if (is_dir) {
++		op = SMB2_OP_RMDIR;
++		op_flags = CREATE_NOT_FILE;
++	} else {
++		op = SMB2_OP_DELETE;
++		op_flags = CREATE_NOT_DIR;
++	}
+ 	oparms = CIFS_OPARMS(cifs_sb, tcon, name,
+ 			     DELETE, FILE_OPEN,
+-			     CREATE_NOT_DIR | OPEN_REPARSE_POINT,
++			     OPEN_REPARSE_POINT | op_flags,
+ 			     ACL_NO_MODE);
+-	int rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
+-				  NULL, &(int){SMB2_OP_DELETE}, 1,
+-				  NULL, NULL, NULL, dentry);
+-	if (rc == -EINVAL) {
++	rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
++			      NULL, &op, 1, NULL, NULL, NULL, dentry);
++	if (rc == -EINVAL && dentry) {
+ 		cifs_dbg(FYI, "invalid lease key, resending request without lease");
+ 		rc = smb2_compound_op(xid, tcon, cifs_sb, name, &oparms,
+-				      NULL, &(int){SMB2_OP_DELETE}, 1,
++				      NULL, &op, 1,
+ 				      NULL, NULL, NULL, NULL);
  	}
- 
--	CIFSSMBClose(xid, tcon, fid.netfid);
-+	tcon->ses->server->ops->close(xid, tcon, &fid);
- 
- out:
- 	kfree(sillyname_full_path);
--	cifs_put_tlink(tlink);
  	return rc;
- 
- 	/*
-@@ -1870,14 +1864,16 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	 */
- undo_rename_opened_file:
- 	if (can_rename_opened_file)
--		CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, dentry->d_name.name,
-+		tcon->ses->server->ops->rename_opened_file(
-+				xid, tcon, &fid, full_path,
- 				true /* overwrite */,
--				cifs_sb->local_nls, cifs_remap(cifs_sb));
-+				cifs_sb);
- undo_close:
--	CIFSSMBClose(xid, tcon, fid.netfid);
-+	tcon->ses->server->ops->close(xid, tcon, &fid);
- undo_rename_path:
- 	if (!can_rename_opened_file)
--		CIFSSMBRename(xid, tcon, dentry,
-+		tcon->ses->server->ops->rename(
-+				xid, tcon, dentry,
- 				sillyname_full_path,
- 				full_path,
- 				cifs_sb);
-@@ -1888,7 +1884,6 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 	}
- 	goto out;
  }
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
  
- /* copied from fs/nfs/dir.c with small changes */
- static void
-@@ -1981,13 +1976,10 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
- 	} else if (rc == -ENOENT) {
- 		d_drop(dentry);
- 	} else if (rc == -EBUSY) {
--		if (server->ops->rename_pending_delete) {
--			rc = server->ops->rename_pending_delete(full_path,
--								dentry, xid);
--			if (rc == 0) {
--				cifs_mark_open_handles_for_deleted_file(inode, full_path);
--				cifs_drop_nlink(inode);
--			}
-+		rc = cifs_rename_pending_delete(xid, tcon, full_path, dentry);
-+		if (rc == 0) {
-+			cifs_mark_open_handles_for_deleted_file(inode, full_path);
-+			cifs_drop_nlink(inode);
- 		}
- 	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
- 		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index 26798db5c00b..746dd9aa6b1b 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -1422,7 +1422,6 @@ struct smb_version_operations smb1_operations = {
- 	.mkdir_setinfo = cifs_mkdir_setinfo,
- 	.rmdir = CIFSSMBRmDir,
- 	.unlink = CIFSSMBDelFile,
--	.rename_pending_delete = cifs_rename_pending_delete,
- 	.rename = CIFSSMBRename,
- 	.rename_opened_file = cifs_rename_opened_file,
- 	.create_hardlink = CIFSCreateHardLink,
++int
++smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
++	   struct cifs_sb_info *cifs_sb)
++{
++	return smb2_remove(xid, tcon, name, cifs_sb, NULL, true /* is_dir */);
++}
++
++int
++smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
++	    struct cifs_sb_info *cifs_sb, struct dentry *dentry)
++{
++	return smb2_remove(xid, tcon, name, cifs_sb, dentry, false /* is_dir */);
++}
++
+ static int smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 			      const char *from_name, const char *to_name,
+ 			      struct cifs_sb_info *cifs_sb,
 -- 
 2.20.1
 
