@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F99826B2CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFF026B942;
 	Sun, 31 Aug 2025 12:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756643798; cv=none; b=lc6yui3MF8wXwRNZfjeFcVHIRNIPLXja0U7flIBnVLz8MMz91rYMN3jqEulHtJnO+1pb9Fs84O/e9s0oRU+OIPSRcaEG2e5UaWIDYM+4Lhp9OQC8iXD2uK/XTEybPfph+isNyKXkNcvYCV+MElTykptgVhZwLn4SCyLzgSBw3BY=
+	t=1756643798; cv=none; b=VCDXENep3TK6dkWIVwEVmMo7CVHwC+pNCspr3fwaxslejPiCpJJBz22ZB7py0Vi3PKLd0NX6tAY9z3rVGZ6NaHX6MeJZhrZQHJTvaS9+ug6qM2qJ7nUoY/pndYDntoMW6hVJHziPBP88JgQxb0HxtODvHll4M7mK1e85w1yY3H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756643798; c=relaxed/simple;
-	bh=hOE+inZuHZaLIQCHjscJllPWfxWi/52CVw/HvGIY4Ek=;
+	bh=BndpzTZJgGQ5KAp6GobzpPt6z1nG2dr2yHF9QYRGqmo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B36PpX05E9LWehGUcI43IgZfoiWFmaz21qcsO3meKcBkE5fdbQHd+DVm9xLMtKphLSAdP7zc2pr3RNiwhR4CyM5eCfASQetSE+QqbZEWxIqunEh+fKws/dfEcQjZwXU45Y78vfRh0oCxMDcmBlXL2XH3RqIb1rI/bczB6ZzTwQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOKqoz04; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=pE8Z8UH+WFs9jb6HuVUFzyNbbvDizc5MvbQxr05Hk/BPNreHGs79drUpu5yBz3/oIRu3lG1eb/LDy5LXSmXFIiMk9ZOrNUrQVxKZMs9NR4yjxw59s8GfZ5MK704UxBQCGiIXKfZhod4FMFIZgYuO5hQw/31Ht6LvDWZ02Vk3his=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pk5HlR9a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOKqoz04"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E78C4CEFC;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pk5HlR9a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82794C4CEED;
 	Sun, 31 Aug 2025 12:36:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756643798;
-	bh=hOE+inZuHZaLIQCHjscJllPWfxWi/52CVw/HvGIY4Ek=;
+	bh=BndpzTZJgGQ5KAp6GobzpPt6z1nG2dr2yHF9QYRGqmo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YOKqoz041/IhI6ZjPYvY3Fx8W7DB/sCLuLhBamA5ihjZ+K/NPkE4bsrf9J7sAE61b
-	 /CkDxMmEJqCzgRnqCfomIVxN4kxXOyiVjAR7645vJpZ5y/gWYgVprVGs8+rh3FzA91
-	 Sz8yYtlyLKgDUM6LNrZmTUsnRqKJDGgtsCgPC5TszvtUAHAYg1BrY01vrT1LOsYMRO
-	 xWeamE4+Fx6LIsudGnTj/4nOeDgYls1NFQvLkSwXUT/npm++p+OhuI82/YRFk5m2qa
-	 FM8x/3ar4sTW90xOHC3IyNZIEkX+LSf1nMnYlisv8GlfdwMzALnNUUMEdZ0gFku4oy
-	 quci1DWzdBIaw==
+	b=Pk5HlR9a3ZewV0KhjQxW0El0EfA02bYCIaaQE6m2cMlHR3Fk7D8gQQqUcqEmrVr+v
+	 0GzvPJJ3nBv+HBziEMURGVXiLp15Bx1Ohk3/H/lWk5CJbnya+9NCoaBo8ajZkL+0d2
+	 otFD8GkLihydpkJrsU7iWD6xRk9G2HySxz3C7lczg4L8Q0wsRJLJHaX2gpJj5e+sNy
+	 ATuzhXUsRz0IdoDIlwV49UNK9VvFbNF5kgIuI3gVZb+Z4J6KBh8zyxISVj0oYVdeEI
+	 yMYNJFUce/W1OaSvf3kYe4RPkaqg1JWMTpK5fayPYaE6y/Z5w7+sx7Pe7VC8wzQyME
+	 bIXV3L39WdtzQ==
 Received: by pali.im (Postfix)
-	id 7984013DE; Sun, 31 Aug 2025 14:36:37 +0200 (CEST)
+	id C97641857; Sun, 31 Aug 2025 14:36:37 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 33/35] cifs: Add a new open flag CREATE_OPTION_EXCLUSIVE to open with deny all shared reservation
-Date: Sun, 31 Aug 2025 14:36:00 +0200
-Message-Id: <20250831123602.14037-34-pali@kernel.org>
+Subject: [PATCH 35/35] cifs: Use CREATE_OPTION_EXCLUSIVE when doing SMB1 rmdir on NT server
+Date: Sun, 31 Aug 2025 14:36:02 +0200
+Message-Id: <20250831123602.14037-36-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250831123602.14037-1-pali@kernel.org>
 References: <20250831123602.14037-1-pali@kernel.org>
@@ -49,77 +49,83 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This is just an internal flag for cifs.ko code, not exported to userspace.
-It allows cifs.ko code to take an exclusive open with deny all shared
-reservation. It is going to be used by the upcoming fixes for the unlink()
-and rmdir() silly rename support.
+Windows NT servers just set the DELETE_PENDING flag when executing the SMB1
+SMB_COM_DELETE_DIRECTORY command. This is opposite of the SMB_COM_DELETE
+command (can be used only on files) which completely removes the file and
+not just transition it into DELETE_PENDING state.
+
+This means that the SMB1 rmdir against Windows NT servers has same issues
+as SMB2+ rmdir and silly rename needs to be used. As in SMB2+ rmdir, use
+the CREATE_OPTION_EXCLUSIVE logic for issuing SMB1 rmdir when communicating
+with NT-based SMB1 server.
+
+With this change Linux rmdir() syscall called on SMB1 mounts from Windows
+NT servers cause that on success the path would not exist anymore and new
+file or directory with that path can be created.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifspdu.h |  1 +
- fs/smb/client/cifssmb.c | 12 ++++++++++--
- fs/smb/client/smb2pdu.c |  6 +++++-
- 3 files changed, 16 insertions(+), 3 deletions(-)
+ fs/smb/client/cifssmb.c | 45 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
-index cb1f99d22dd7..90b0b82e23b1 100644
---- a/fs/smb/client/cifspdu.h
-+++ b/fs/smb/client/cifspdu.h
-@@ -395,6 +395,7 @@
- #define CREATE_OPTIONS_MASK     0x007FFFFF
- #define CREATE_OPTION_READONLY	0x10000000
- #define CREATE_OPTION_SPECIAL   0x20000000   /* system. NB not sent over wire */
-+#define CREATE_OPTION_EXCLUSIVE 0x40000000   /* exclusive open, NB not set over wire */
- 
- /* ImpersonationLevel flags */
- #define SECURITY_ANONYMOUS      0
 diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 3a0452479a69..37bc0541bc21 100644
+index 37bc0541bc21..31638b71ee0c 100644
 --- a/fs/smb/client/cifssmb.c
 +++ b/fs/smb/client/cifssmb.c
-@@ -1125,7 +1125,11 @@ SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
- 		pSMB->OpenFlags |= cpu_to_le16(REQ_MORE_INFO);
+@@ -823,8 +823,53 @@ CIFSSMBRmDir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 	int bytes_returned;
+ 	int name_len;
+ 	int remap = cifs_remap(cifs_sb);
++	struct cifs_open_parms oparms;
++	struct cifs_fid fid;
++	int oplock;
  
- 	pSMB->Mode = cpu_to_le16(access_flags_to_smbopen_mode(access_flags));
--	pSMB->Mode |= cpu_to_le16(SMBOPEN_DENY_NONE);
+ 	cifs_dbg(FYI, "In CIFSSMBRmDir\n");
 +
-+	if (create_options & CREATE_OPTION_EXCLUSIVE)
-+		pSMB->Mode |= cpu_to_le16(SMBOPEN_DENY_ALL);
-+	else
-+		pSMB->Mode |= cpu_to_le16(SMBOPEN_DENY_NONE);
- 
- 	if (create_options & CREATE_WRITE_THROUGH)
- 		pSMB->Mode |= cpu_to_le16(SMBOPEN_WRITE_THROUGH);
-@@ -1281,7 +1285,11 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
- 	if (create_options & CREATE_OPTION_READONLY)
- 		req->FileAttributes |= cpu_to_le32(ATTR_READONLY);
- 
--	req->ShareAccess = cpu_to_le32(FILE_SHARE_ALL);
-+	if (create_options & CREATE_OPTION_EXCLUSIVE)
-+		req->ShareAccess = cpu_to_le32(FILE_NO_SHARE);
-+	else
-+		req->ShareAccess = cpu_to_le32(FILE_SHARE_ALL);
++	/*
++	 * Do not send SMB_COM_DELETE_DIRECTORY to NT servers. NT servers just
++	 * sets the DELETE PENDING state on the directory and in case that
++	 * directory is opened by some other client, it stay in this state and
++	 * direntry stay present in the parent directory.
++	 *
++	 * So for NT servers use NT OPEN in exclusive mode. It fails when some
++	 * other SMB client has the directory opened, and it triggers the
++	 * sillyrename code path. After successful NT OPEN in exclusive mode,
++	 * sets the DELETE PENDING state and close the directory.
++	 *
++	 * Servers with UNIX extensions should support SMB_COM_DELETE_DIRECTORY
++	 * with correct UNIX semantics, so use this NT OPEN + DELETE PENDING
++	 * only against non-UNIX NT servers.
++	 */
++	if ((tcon->ses->capabilities & CAP_NT_SMBS) &&
++	    !(cap_unix(tcon->ses) &&
++	      (le64_to_cpu(tcon->fsUnixInfo.Capability) & CIFS_UNIX_POSIX_PATH_OPS_CAP))) {
++		oparms = CIFS_OPARMS(cifs_sb, tcon, name, DELETE, FILE_OPEN,
++				     CREATE_OPTION_EXCLUSIVE | CREATE_NOT_FILE | OPEN_REPARSE_POINT,
++				     ACL_NO_MODE);
++		oparms.fid = &fid;
++		oplock = 0;
++		rc = CIFS_open(xid, &oparms, &oplock, NULL);
++		if (rc)
++			return rc;
++		rc = CIFSSMBSetFileDisposition(xid, tcon, true, fid.netfid, current->tgid);
++		/*
++		 * some samba versions return -ENOENT when we try to set the
++		 * file disposition here. Likely a samba bug, but work around
++		 * it for now. This means that some cifsXXX files may hang
++		 * around after they shouldn't.
++		 *
++		 * BB: remove this hack after more servers have the fix
++		 */
++		if (rc == -ENOENT)
++			rc = 0;
++		CIFSSMBClose(xid, tcon, fid.netfid);
++		return rc;
++	}
 +
- 	req->CreateDisposition = cpu_to_le32(disposition);
- 	req->CreateOptions = cpu_to_le32(create_options & CREATE_OPTIONS_MASK);
- 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index a6c69b01ec6b..8315213d699e 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3034,7 +3034,11 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	req->DesiredAccess = cpu_to_le32(oparms->desired_access);
- 	/* File attributes ignored on open (used in create though) */
- 	req->FileAttributes = cpu_to_le32(file_attributes);
--	req->ShareAccess = FILE_SHARE_ALL_LE;
-+
-+	if (oparms->create_options & CREATE_OPTION_EXCLUSIVE)
-+		req->ShareAccess = cpu_to_le32(FILE_NO_SHARE);
-+	else
-+		req->ShareAccess = cpu_to_le32(FILE_SHARE_ALL);
- 
- 	req->CreateDisposition = cpu_to_le32(oparms->disposition);
- 	req->CreateOptions = cpu_to_le32(oparms->create_options & CREATE_OPTIONS_MASK);
+ RmDirRetry:
+ 	rc = smb_init(SMB_COM_DELETE_DIRECTORY, 0, tcon, (void **) &pSMB,
+ 		      (void **) &pSMBr);
 -- 
 2.20.1
 
