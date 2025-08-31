@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B42825BF18;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B48F25BF1B;
 	Sun, 31 Aug 2025 12:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756643795; cv=none; b=kgPUtRRmHj7z6XjdtGdE6nl4+gb72+cfOLt2EwLLxaPVsB+zXWpoAZd3ZS9TK158D1efKMSOJg+CGVsOx1zCuc+D4TYyyS8SWysYH+u9Gt1E295wEn9GsYz5BD/e7da6ZompbwjHNBidlWa+U2l1oOHdlsTznpNhqYi9PhV9rgY=
+	t=1756643795; cv=none; b=rQQeygHRvkjfQerUMxSU14c2PdYXzbNQNAiEQGjB9meKYM8ScxY0gMrQsAZn/kH+4h7NPCSCIx64ivX9xaQH7hv+Uv1pIecPLAPfLRPe07e+DhqH+jX4OAcJASOEpxV6H4i3fxh9yeDUw9tWCdaGM46XJXm+92duN1/rKOsSj34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756643795; c=relaxed/simple;
-	bh=wBAUeZrOIYEFOy72ePFEAHGR9uOeu4N2neoE8ztNYoA=;
+	bh=2yaxe8JvAoaujWsh6C/ntd9QE+7VcZOUC9n6I84/Phs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VHrzfvFVKL9JUdLn99iCsduUv0rSCCLKxSXEW9pX9UJfbNKHGEDrvXsnKE9Hmt/sUjDKscM5yke1UG7AanlnP5TppdWx3VF/F/OYXiim9Q4A4Ke5BR5v5sFGfDu20iLfsbIrlgRiZlAplnPOX4+VDHtpEum1zheWSAgdY2r+FSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pM0smwug; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=o8HZAeot1Mzb3721NViRPyGMVjQTUzDOo8yEMPPmPEYGcU5Wyh7IodHkrc03o1N1lxYytmu7S04+S2Cyqrdn/ijj+InR85vESQ+tLhD1Pq0VH0qeI/j3izOt0K74P0U2ctl0hFCr2OVqMCMB4R5mq9U7QD3K3cu6c/wyLjGspsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iJlIgbxW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pM0smwug"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E78F6C4CEF8;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iJlIgbxW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1B29C4CEF6;
 	Sun, 31 Aug 2025 12:36:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756643795;
-	bh=wBAUeZrOIYEFOy72ePFEAHGR9uOeu4N2neoE8ztNYoA=;
+	bh=2yaxe8JvAoaujWsh6C/ntd9QE+7VcZOUC9n6I84/Phs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pM0smwugvCwjBRTJQxInP7tHWyGA6ZTDWUzgARrw9ZpGYohayL1CWzvGz+QZL9+VQ
-	 5q/KHvDg2cJjMjMUN9FbRHVfrEawLlMJtgWxLVMSoQeGG1V1RpxQuMbG+m/gdWXcem
-	 BvL6ifzw6PiS5Yq6LmkY+XiBDo6pRtNTPOFuazAsBHU5N798TPtfkyiSlDJOPlmDBo
-	 ww47vjMtTmhN9M7Gqn8Qdo/iGuR23L1OCNDsXML9WNgDW5sYoVdeEmKMnxJs44IPAE
-	 vddP5yRH+00iMKh3vj2IGyYg/LehhmyWD1oi/D/GSK9eEmgWBv3wF5yXu6VC0Q9Hv9
-	 FV/OYKa3n2gOQ==
+	b=iJlIgbxWuvAvhorbe5j+m5xZR80aeqoHXvlZr9qahtFtPGiqNFdnvds9m2LoMbl8H
+	 AAINj0tJptOQ1ZFKD6SrnEODpYzCDze8aLKwXARKPfYG/yCSSmm3x0WsWwQsG+YbwJ
+	 GoFP5ZaXl+cN/Q3PCm1orsjKTS70y+/3kY5swmp/+eF0N24BeP07aL20v7OjsD/zzZ
+	 myymSa00xEg/Q80A6+moVKfQ4e1Vjz3nQPsE84YpF+CSqnvlKRTkl7ZaucIcIrjorU
+	 R0ZvpmlC3LRPjkLjdUO7YmoHlXQ2EXiTkaYdHiEjwp0cm9cKyP8hF05pX1K5SfbTIt
+	 YO9zQuavWjeDA==
 Received: by pali.im (Postfix)
-	id 969EFF96; Sun, 31 Aug 2025 14:36:31 +0200 (CEST)
+	id 1B937D70; Sun, 31 Aug 2025 14:36:31 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 05/35] cifs: Remove CIFSSMBSetPathInfoFB() fallback function
-Date: Sun, 31 Aug 2025 14:35:32 +0200
-Message-Id: <20250831123602.14037-6-pali@kernel.org>
+Subject: [PATCH 02/35] cifs: Allow fallback code in smb_set_file_info() also for directories
+Date: Sun, 31 Aug 2025 14:35:29 +0200
+Message-Id: <20250831123602.14037-3-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250831123602.14037-1-pali@kernel.org>
 References: <20250831123602.14037-1-pali@kernel.org>
@@ -49,78 +49,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This fallback function CIFSSMBSetPathInfoFB() is called only from
-CIFSSMBSetPathInfo() function. CIFSSMBSetPathInfo() is used in
-smb_set_file_info() which contains all required fallback code, including
-fallback via filehandle.
+On NT systems, it is possible to do SMB open call also for directories.
+Open argument CREATE_NOT_DIR disallows opening directories. So in fallback
+code path in smb_set_file_info() remove CREATE_NOT_DIR restriction to allow
+it also for directories.
 
-So the CIFSSMBSetPathInfoFB() is just code duplication, which is not needed
-anymore. Therefore remove it.
-
-This change depends on other changes which are extending
-cifs_mkdir_setinfo() and smb_set_file_info() functions:
-"Fix changing times and read-only attr over SMB1 smb_set_file_info()
-function" and "Add fallback code path for cifs_mkdir_setinfo()"
+Similar fallback is implemented also in CIFSSMBSetPathInfoFB() function and
+this function already allows to call operation for directories.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifssmb.c | 36 ------------------------------------
- 1 file changed, 36 deletions(-)
+ fs/smb/client/smb1ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 42ab901a08e7..0d773860fd6c 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -5518,38 +5518,6 @@ CIFSSMBSetFileDisposition(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
--static int
--CIFSSMBSetPathInfoFB(const unsigned int xid, struct cifs_tcon *tcon,
--		     const char *fileName, const FILE_BASIC_INFO *data,
--		     const struct nls_table *nls_codepage,
--		     struct cifs_sb_info *cifs_sb)
--{
--	int oplock = 0;
--	struct cifs_open_parms oparms;
--	struct cifs_fid fid;
--	int rc;
--
--	oparms = (struct cifs_open_parms) {
--		.tcon = tcon,
--		.cifs_sb = cifs_sb,
--		.desired_access = GENERIC_WRITE,
--		.create_options = cifs_create_options(cifs_sb, 0),
--		.disposition = FILE_OPEN,
--		.path = fileName,
--		.fid = &fid,
--	};
--
--	rc = CIFS_open(xid, &oparms, &oplock, NULL);
--	if (rc)
--		goto out;
--
--	rc = CIFSSMBSetFileInfo(xid, tcon, data, fid.netfid, current->tgid);
--	CIFSSMBClose(xid, tcon, fid.netfid);
--out:
--
--	return rc;
--}
--
- int
- CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
- 		   const char *fileName, const FILE_BASIC_INFO *data,
-@@ -5626,10 +5594,6 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (rc == -EAGAIN)
- 		goto SetTimesRetry;
- 
--	if (rc == -EOPNOTSUPP)
--		return CIFSSMBSetPathInfoFB(xid, tcon, fileName, data,
--					    nls_codepage, cifs_sb);
--
- 	return rc;
- }
- 
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 1772f30419a9..cc4feebbdd11 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -980,7 +980,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 		.tcon = tcon,
+ 		.cifs_sb = cifs_sb,
+ 		.desired_access = SYNCHRONIZE | FILE_WRITE_ATTRIBUTES,
+-		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR),
++		.create_options = cifs_create_options(cifs_sb, 0),
+ 		.disposition = FILE_OPEN,
+ 		.path = full_path,
+ 		.fid = &fid,
 -- 
 2.20.1
 
