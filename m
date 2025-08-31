@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A5E264636;
-	Sun, 31 Aug 2025 12:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D83C264A90;
+	Sun, 31 Aug 2025 12:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756643797; cv=none; b=eKaCWfqbn0AHflVuRiIjKTKBeN0YGfsHEI/vEbgHnJPIF1zVFSH7G3SkJtVIEQvAaIjEZBo8L+MhtbA2vozOoGDjTzyzMDdE1TAoXsIbTzp/xskGz+BTn8+X3AGveyOVD88t5nDIzc3bjgS78IJnjrPDBM9IRrQaubJuQ31ygoc=
+	t=1756643797; cv=none; b=DL47cUWyQVHOPejqo45nB/bis+WfeKYOIGdVYyBYwPsw928FqT5rk604mHmdza7Ybb1FMRntuL3ePPSBnJQ4hdxZlsxpfc3bc5ZKvIA0Y/FQwX99uwfoMm1JJ3ur7NQmG+D2VB5cXDHOA+8rM7okEpaQO7jxUBj8rvfa8NLrH9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1756643797; c=relaxed/simple;
-	bh=OZ8Nhb8bdpAwvT+5qtyxnSoZYNOZJt10537C8Kt76O0=;
+	bh=pjmshuuowk3VsHfdSRy9TJR/wkRXjxdcCJg5ne0gJxY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lZRy4E+mgbTIWWZDPqWjP44ca49Ewu+EfiIaxPVbnYtpxj3UW20fSt+u/qtNihxhT9N88aq4NKRjVkp2+tyJU5iTNS2N7hscydUu5u6MVkw3g25EpdqnHmvpEGuYvswtJvw+QwO5QD+NDepVMQw7OtlS8qWnMFfkMRF2LtdxdQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqNXy8IA; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=pF97BxTJEUNzNCn/t66Ypf3F22bFslmqmQQhzJM7nRUKoYCFB6I2VCUp9/oM+yoIFQ55hSwQQGq2kZZOnUmoJ2/CSQOIPLS8CSCJH8Qh/v7BldTlAB387NJhGfS2FMn5jcCK4MR7mGVPeFniwAni4QHARnu5bclMTguPBrTb5C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHRTlVg6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqNXy8IA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D5AC4CEFB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHRTlVg6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39DCC4CEF5;
 	Sun, 31 Aug 2025 12:36:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1756643796;
-	bh=OZ8Nhb8bdpAwvT+5qtyxnSoZYNOZJt10537C8Kt76O0=;
+	bh=pjmshuuowk3VsHfdSRy9TJR/wkRXjxdcCJg5ne0gJxY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZqNXy8IAgbgNCAOItd6y5Z7Z8P5AF019nyyTE+9Vgecdf/czYUFab4mIUlEnSxC9d
-	 JrrBSvunZqsqN0OS8FyT7vkScgWcP9jI+zD17k9TsLAyExp/SW9VSkJyvdIYVvl/aR
-	 oJ6rwEwQ+o3w3EJJLKkuwiILMeWH8HARybCz+09ZU6i1qXTpFo+Ov4nchwP5PUzpaZ
-	 2aOzriLfi6MaZwh3YSRL7XRhtpR3dsVSJ3vUclQiZvE++IhIrCwzCtPXXHThJDORfv
-	 Odiq6jFcgREWNuynohFvR1B1DOKiiesUuUsixuUbVM9Qz/3zVwGctG+JjvYbc/imFD
-	 a/AT3JztUGpjQ==
+	b=WHRTlVg6RbMsdGjLyMPFeGaHSsFQu4tqzS6VxSyDbhUzyYut53oq3zMemL5FUdmOz
+	 XlCVMEG9Y2TUz1krMrxt2aOwlXoOUEGWf3/e7x0DVoSAcOAZ2oD1dE1C2kUwSylpOa
+	 cTPwq9iVFdk98boHbtxFVTA9IWNbahwDMNs2JxUQlaTjfqbwug87BomaiZTcRuk5bC
+	 Sh2mjZ3k7nVLf0nF2VOvHoGJEsUTxkg4UoEsoI81JDfZNY+AzwAXaFu1zqxMk63tQE
+	 Jpb9J4/fb+JROdIgLhcUIvIPSeQXeSTBRxSegVD+gTJhwiysLJmDPClN0d9M2xGq0y
+	 ynUKdAuDwIlDQ==
 Received: by pali.im (Postfix)
-	id DEF3B1857; Sun, 31 Aug 2025 14:36:33 +0200 (CEST)
+	id 24DCC198B; Sun, 31 Aug 2025 14:36:34 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.com>,
 	ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 16/35] cifs: Add comments for DeletePending assignments in open functions
-Date: Sun, 31 Aug 2025 14:35:43 +0200
-Message-Id: <20250831123602.14037-17-pali@kernel.org>
+Subject: [PATCH 17/35] cifs: Use NT_STATUS_DELETE_PENDING for filling fi.DeletePending in cifs_query_path_info()
+Date: Sun, 31 Aug 2025 14:35:44 +0200
+Message-Id: <20250831123602.14037-18-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250831123602.14037-1-pali@kernel.org>
 References: <20250831123602.14037-1-pali@kernel.org>
@@ -49,66 +49,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On more places is set DeletePending member to 0. Add comments why is 0 the
-correct value. Paths in DELETE_PENDING state cannot be opened by new calls.
-So if the newly issued open for that path succeed then it means that the
-path cannot be in DELETE_PENDING state.
+Function CIFSSMBQPathInfo() returns NT_STATUS_DELETE_PENDING status code
+when the path is in the delete pending state. So use this information when
+filling the fi.DeletePending member in cifs_query_path_info() function.
+
+Depends on "cifs: Change translation of STATUS_DELETE_PENDING to -EBUSY".
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/cifssmb.c   | 4 ++--
- fs/smb/client/smb2inode.c | 2 +-
- fs/smb/client/smb2pdu.c   | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ fs/smb/client/cifssmb.c | 6 ++++++
+ fs/smb/client/smb1ops.c | 6 +++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index f12bc0f4d0c1..6dabff82f6ae 100644
+index 6dabff82f6ae..2427752bc224 100644
 --- a/fs/smb/client/cifssmb.c
 +++ b/fs/smb/client/cifssmb.c
-@@ -1163,7 +1163,7 @@ SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
- 				cpu_to_le64(le32_to_cpu(pSMBr->EndOfFile));
- 			pfile_info->EndOfFile = pfile_info->AllocationSize;
- 			pfile_info->NumberOfLinks = cpu_to_le32(1);
--			pfile_info->DeletePending = 0;
-+			pfile_info->DeletePending = 0; /* successful open = not delete pending */
- 		}
- 	}
+@@ -35,6 +35,7 @@
+ #include "cifs_debug.h"
+ #include "fscache.h"
+ #include "smbdirect.h"
++#include "nterr.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dfs_cache.h"
+ #endif
+@@ -3902,6 +3903,11 @@ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+ 	if (rc) {
+ 		cifs_dbg(FYI, "Send error in QPathInfo = %d\n", rc);
++		/* Fill at least the DeletePending for -EBUSY error code */
++		if (rc == -EBUSY && data)
++			data->DeletePending =
++			  (pSMBr->hdr.Flags2 & SMBFLG2_ERR_STATUS) &&
++			  pSMBr->hdr.Status.CifsError == cpu_to_le32(NT_STATUS_DELETE_PENDING);
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
  
-@@ -1288,7 +1288,7 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
- 		buf->AllocationSize = rsp->AllocationSize;
- 		buf->EndOfFile = rsp->EndOfFile;
- 		buf->NumberOfLinks = cpu_to_le32(1);
--		buf->DeletePending = 0;
-+		buf->DeletePending = 0; /* successful open = not delete pending */
- 	}
- 
- 	cifs_buf_release(req);
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 460e75614ef1..6c9da150a402 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -698,7 +698,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
- 		idata->fi.EndOfFile = create_rsp->EndofFile;
- 		if (le32_to_cpu(idata->fi.NumberOfLinks) == 0)
- 			idata->fi.NumberOfLinks = cpu_to_le32(1); /* dummy value */
--		idata->fi.DeletePending = 0;
-+		idata->fi.DeletePending = 0; /* successful open = not delete pending */
- 		idata->fi.Directory = !!(le32_to_cpu(create_rsp->FileAttributes) & ATTR_DIRECTORY);
- 
- 		/* smb2_parse_contexts() fills idata->fi.IndexNumber */
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 2df93a75e3b8..58800490142e 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3277,7 +3277,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 		buf->EndOfFile = rsp->EndofFile;
- 		buf->Attributes = rsp->FileAttributes;
- 		buf->NumberOfLinks = cpu_to_le32(1);
--		buf->DeletePending = 0;
-+		buf->DeletePending = 0; /* successful open = not delete pending */
- 	}
- 
- 
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 176bc2a211bf..618470db6444 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -628,7 +628,11 @@ static int cifs_query_path_info(const unsigned int xid,
+ 				fi.EASize = di->EaSize;
+ 			}
+ 			fi.NumberOfLinks = cpu_to_le32(1);
+-			fi.DeletePending = 0;
++			/*
++			 * Do not change fi.DeletePending as it is set by the above
++			 * CIFSSMBQPathInfo() call even on error. By default it is
++			 * initialized to zero (false).
++			 */
+ 			fi.Directory = !!(le32_to_cpu(fi.Attributes) & ATTR_DIRECTORY);
+ 			cifs_buf_release(search_info.ntwrk_buf_start);
+ 		} else if (!full_path[0]) {
 -- 
 2.20.1
 
