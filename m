@@ -1,70 +1,130 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA14C481B1
-	for <linux-cifs@vger.kernel.org>; Sat, 30 Aug 2025 13:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9551BC58;
+	Sun, 31 Aug 2025 09:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756558910; cv=none; b=OLyiTRO1a7/NQPR+iwKdkQ5I51N/k5uoKtoFZjH3DZKQsGXCVR+2wAR+C/RevM//sWf8pyVadNqz3O4pBT0v6GdO4RH6QW+/iGMStfgmXgbJWY/vDB9qauUDo+kBjSarWhOx1Ue4/90Alfuk+47h3U1vsRpI8Hz+FdxDA82iyfo=
+	t=1756633454; cv=none; b=Jh/s/MY0sB+38woU2/iCFPRXCLkwZBIgGwfIoulUiQnw+z9ai7sFa0paOtiwKq8tokBmpi39gnDl+xPRP0C3oiZnowE8mua2L6boKxAyf6aD3zJZKjE2ge8tU/Gmv37PBP1eLQ6eISDBDq1VuT+2dWhbFvR5nCXbYO4pR0/IFOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756558910; c=relaxed/simple;
-	bh=1xN84HVnh5TKVt5zCoR4FPrED9BI3DwgO0JPtFWLZwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ABtenY6RRIJXphhV3/gC3bYC44wa5Vey+lyQ8QzI+SuHM841zZqdD1UGo9QrudhU1Oerv66i6RL59O65nnJ34tHvs9Aifs8wTukKjh3KCr0gF6s5JWTPCI62yh6oQ0iBX1TMkIZxRzK5sW4G6XjzvHrkH++KbMxrWR4WNmomagQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=HnPkC1En; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1756633454; c=relaxed/simple;
+	bh=gSoOfX9liPNKKFwXCdm/G8ev8WQe2y01AGSWbj35bn0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rCYkaxk0M9vtWQQ/lok2Jw33HnpYVffMkNdPgJGfvCmZmyEhGajs15twXkLwV2aRUrGzJwpXGwMkEzGT3x/8o3l0OHk2ckidjd/Vg5avAGSbDz7A8xtZV3vkBBs9KY637A8FJ4FA1/QmN4D4qet/HoeKqoMtVh2CZ4JQXT1Ru0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYkW2DyN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="HnPkC1En"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=w2r31b6ZTZZA1hM3FAitQ+11WoJRiWHiNo6ir0lqUzA=; b=HnPkC1EnBTCOFeXQmdM1hhfEjz
-	sfgcLJsHV+N7VkeNXAamtlMVl2IptrEfifO9VfB7+NbKaqSzeCTaya6mUpcem5SDGSIXE4TL0CAt4
-	kHxFad++mEPoWLOrWw5zuQb6Wtn1BRWpgK//EdHcKpoE/uFGlu1TubYJQZKaMLIyvJH/k0d5ax5DX
-	AMViecKVJEOOX78kKJswdHOYI0qhZeHIXZ0p9f4gsd94JQKYoEQJr+PBIGjkeMsSS3Y2DpexL79G5
-	uWAIhEnAhqKwhJygVjB9MOav9OHQamvbiC4SB1v6KOWrhwHii3F7G0F5VSDq2w4sJ8UIqF6ltgVRP
-	eOQujMZVit7wUi3NqOYtm3ryZgKtSu2wfhHbZOM5kvLx6X5k4XL9StUJjUSwjYGXltItuEyAsZcqk
-	D+fxZoeyjbj24Yw4/26Al87zgPsxsS4YZR5zoD99YZ/VtgJgu2D0GSLPWwmbFnyp/A0LY7i0ClCS2
-	8GP02QdtkuMJ+7DFdp1SaCTW;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1usLD9-001acg-1v;
-	Sat, 30 Aug 2025 13:01:39 +0000
-Message-ID: <6197b8f3-7f44-42a8-a2f5-061888898865@samba.org>
-Date: Sat, 30 Aug 2025 15:01:38 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYkW2DyN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D42C4CEED;
+	Sun, 31 Aug 2025 09:44:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1756633454;
+	bh=gSoOfX9liPNKKFwXCdm/G8ev8WQe2y01AGSWbj35bn0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aYkW2DyNlVmgY/xWu/JaUKKYOsOGQ57K380l6IPiavzh+FqIbZzjpVAoX/+sB4zIw
+	 1TA1YMQPb2LdRmKivP9JMlD6kJEiG1ymNNUkjrU2bs/JWZtDeKob3k26CRtCeATbJi
+	 NookxlOyuUlFYn1Ije8oAFYFtOdST9sUeMi+JwIWu9TTY2arIy18iJ9njxT8EnfzSg
+	 dPBpN5+JnSyeycllVInyz3pO8q/FmROlt9xNZtB8b+5uRGc2fT8Am+G2N0rbKbmEVt
+	 Jzf1JDVonYhkbUUrW8/2WSJ6SNYzHi7uUB4eMw9RTD+DscSl6Ng6dsiohtpoUdwfuB
+	 X5vGuM1iYukdA==
+Received: by pali.im (Postfix)
+	id 0C24F598; Sun, 31 Aug 2025 11:44:10 +0200 (CEST)
+Date: Sun, 31 Aug 2025 11:44:10 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] cifs: Create native Window socket file compatible
+ also with WSL subsystem
+Message-ID: <20250831094410.igrsfze7ci5mxkla@pali>
+References: <20250712161012.17622-1-pali@kernel.org>
+ <20250712161012.17622-2-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [cifs:for-next-next 28/146] fs/smb/client/smbdirect.c:1856:25:
- warning: stack frame size (1272) exceeds limit (1024) in
- 'smbd_get_connection'
-To: Steve French <smfrench@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- Steve French <stfrench@microsoft.com>, kernel test robot <lkp@intel.com>,
- Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-References: <202508291432.M5gWPqJX-lkp@intel.com>
- <c18ba6b4-847e-4470-bd0e-9e5232add730@samba.org>
- <CAH2r5mvksbiH-D4FbVb0PVg1vnik+WU7d0kxRUk0S9h9S+=zvw@mail.gmail.com>
- <2854f742-a0bc-4456-a372-9fa2d4e2ee3f@samba.org>
- <CAH2r5muGufmSdjxqTv9wcpbZoMsoEq=1ufFo_Yty352uDf+3-w@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAH2r5muGufmSdjxqTv9wcpbZoMsoEq=1ufFo_Yty352uDf+3-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250712161012.17622-2-pali@kernel.org>
+User-Agent: NeoMutt/20180716
 
-Am 30.08.25 um 00:31 schrieb Steve French:
-> updated " smb: smbdirect: introduce smbdirect_socket_init()" patch attached
+Hello, I would like to remind this change.
+
+On Saturday 12 July 2025 18:10:12 Pali Rohár wrote:
+> After creating a native socket via the IO_REPARSE_TAG_AF_UNIX reparse
+> point, try to set also the WSL EA $LXMOD.
 > 
-> Also updated cifs-2.6.git for-next-next
-
-Thanks! Looks good now.
-
-metze
-
+> This makes the native Win32 / NT socket file recognized also under
+> WSL subsystem. WSL subsystem uses same reparse point tag but requires also
+> to be EA $LXMOD set.
+> 
+> Fixes: 45a99d5d1173 ("cifs: Add support for creating native Windows sockets")
+> Signed-off-by: Pali Rohár <pali@kernel.org>
+> ---
+>  fs/smb/client/reparse.c | 28 ++++++++++++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> index ee4af153e7af..74a36957e8cb 100644
+> --- a/fs/smb/client/reparse.c
+> +++ b/fs/smb/client/reparse.c
+> @@ -381,7 +381,7 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
+>  
+>  static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  				struct dentry *dentry, struct cifs_tcon *tcon,
+> -				const char *full_path)
+> +				const char *full_path, umode_t mode)
+>  {
+>  	struct reparse_data_buffer buf = {
+>  		.ReparseTag = cpu_to_le32(IO_REPARSE_TAG_AF_UNIX),
+> @@ -395,6 +395,8 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  		.iov_base = &buf,
+>  		.iov_len = sizeof(buf),
+>  	};
+> +	const __le64 xattr_mode_val = cpu_to_le64(mode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  	struct inode *new;
+>  	int rc = 0;
+>  
+> @@ -405,6 +407,28 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  		d_instantiate(dentry, new);
+>  	else
+>  		rc = PTR_ERR(new);
+> +
+> +	/*
+> +	 * Try to set also optional WSL EA $LXMOD but ignore errors.
+> +	 * WSL socket and native Win32/NT sockets uses same reparse point
+> +	 * tag IO_REPARSE_TAG_AF_UNIX. WSL subsystem additionally requires
+> +	 * EA $LXMOD to be set with the S_IFSOCK value. So setting this EA
+> +	 * allows native socket to be recognized also by WSL subsystem.
+> +	 * Note that setting of both EAs and reparse points is not supported
+> +	 * by NTFS filesystem on Windows 8 / Windows Server 2012 and always
+> +	 * fails. So ignore failures from this set_EA call.
+> +	 */
+> +#ifdef CONFIG_CIFS_XATTR
+> +	if (!rc && tcon->ses->server->ops->set_EA &&
+> +	    (le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
+> +		tcon->ses->server->ops->set_EA(xid, tcon, full_path,
+> +					       true /* open reparse point */,
+> +					       SMB2_WSL_XATTR_MODE,
+> +					       &xattr_mode_val,
+> +					       SMB2_WSL_XATTR_MODE_SIZE,
+> +					       cifs_sb->local_nls, cifs_sb);
+> +#endif
+> +
+>  	cifs_free_open_info(&data);
+>  	return rc;
+>  }
+> @@ -714,7 +738,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
+>  	struct smb3_fs_context *ctx = CIFS_SB(inode->i_sb)->ctx;
+>  
+>  	if (S_ISSOCK(mode) && !ctx->nonativesocket && ctx->reparse_type != CIFS_REPARSE_TYPE_NONE)
+> -		return create_native_socket(xid, inode, dentry, tcon, full_path);
+> +		return create_native_socket(xid, inode, dentry, tcon, full_path, mode);
+>  
+>  	switch (ctx->reparse_type) {
+>  	case CIFS_REPARSE_TYPE_NFS:
+> -- 
+> 2.20.1
+> 
