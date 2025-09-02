@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AA02848A1;
-	Tue,  2 Sep 2025 13:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EAF3101D5;
+	Tue,  2 Sep 2025 13:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756820238; cv=none; b=maMFFD4cGvhhHONFy1eN8CkuYl7eIQzJium9dLWeCLVQNboZTTLe8CUcCNBVBUfIWP6JxhLd3RdkBRQQ2gTCRjcNj3R2X+SOjcmZZ6uPFRlZFPrW2esTK7J3Sq3nwjdTvHnChW/N/aF40FgCvqMDRBPoXa9K/+VRj2oiuKqGVrc=
+	t=1756820454; cv=none; b=fAZVnWpNU4dL4xOKt68Argk2qC0AgnvVVdstynNQfODxA0xbhSWrC2sllj3eU8Tl4dk0elnr1DxQMK0o1/8n4N1HCjnTwvQ1JuxNhPl4WNzDyfpEeiH0jfjK7T8WPULahO7YaO4gDu9ImAVq4Wh9XGtDmQCPRytByyPF630J6n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756820238; c=relaxed/simple;
-	bh=+vdstVZ4juHqCo3Vna11yyYBcSTfZZvBpFZUGL+22oA=;
+	s=arc-20240116; t=1756820454; c=relaxed/simple;
+	bh=A37fS3R1j1h4sdBR6Iz7acBbXaDPmdjX+Dxj/eBrMHg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U0Q3ljFavc+lP3fa5YZJOiqMLxJmOACwBbhjPGmMgslUbDfOIrGBE7Sbc8TAMcSX6nd/RWVSutBMzs/bNX64RABS0qDf6wXmsMqRtAAZLMIJrfLLe11x4K/sFuEdGauWsmB1GdV55k9do/NsGIoyIlVK0BGTyOJLPY/Qdl7EVoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uPa9Wr44; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZsfUy8meF5Pu/vDXPzrw53iaWAA+zdITGRxkbEf1M4jfgp+i3Un0U19/2CUWu9I2TJzRvNHN2TNb1+k1upjWsK4Y7rYbd5L9Mzohhhb4k1vA+IT1pODALA0elZ8qYTUE9IduFBrDHRB4gu+C0VqQUX4gUnzmpUfZpaKK0915LOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Wx/hwEYp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uPa9Wr44"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37980C4CEED;
-	Tue,  2 Sep 2025 13:37:14 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Wx/hwEYp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82F49C4CEED;
+	Tue,  2 Sep 2025 13:40:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756820234;
-	bh=+vdstVZ4juHqCo3Vna11yyYBcSTfZZvBpFZUGL+22oA=;
+	s=korg; t=1756820453;
+	bh=A37fS3R1j1h4sdBR6Iz7acBbXaDPmdjX+Dxj/eBrMHg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uPa9Wr44olchefg65PLeLWkRrjkoqXD4B4exVozpUVSp0BJKaI/cwBJ8iODB2pC8Q
-	 0cmR3xvtHotN8hUd8iXmwD3S8LMKqa35I2cOIVreoZ4phUVLImzfd9WwqbgqeXGWZK
-	 k9K7HobUdhPUNaLesrQyVmN1gk+Cnjk7pUijtBeU=
+	b=Wx/hwEYpoSQ2wAlvM4xaqYPxzoZFta2VIabPSZELEx5VmD4w/0DJXRKyfMZWyjJG8
+	 OUeFm/WSw/Wo9q0qN9vnxodiV0+KfcQx6nwXhMrLp6cvkreWf6C6TFnrNUmLhbmUOo
+	 PVqJVv41pKUNQVlkvL9ma0eRl5dFQUDdjCbVB15U=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -34,12 +34,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 09/75] smb: client: fix race with concurrent opens in unlink(2)
-Date: Tue,  2 Sep 2025 15:20:21 +0200
-Message-ID: <20250902131935.482135582@linuxfoundation.org>
+Subject: [PATCH 6.1 06/50] smb: client: fix race with concurrent opens in unlink(2)
+Date: Tue,  2 Sep 2025 15:20:57 +0200
+Message-ID: <20250902131930.765189186@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250902131935.107897242@linuxfoundation.org>
-References: <20250902131935.107897242@linuxfoundation.org>
+In-Reply-To: <20250902131930.509077918@linuxfoundation.org>
+References: <20250902131930.509077918@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -85,10 +85,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index d93ebd58ecae1..df01029918fd4 100644
+index 634f28f0d331e..ffc05ebc92f43 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -1856,15 +1856,24 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+@@ -1649,15 +1649,24 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
  	struct tcon_link *tlink;
  	struct cifs_tcon *tcon;
@@ -114,9 +114,9 @@ index d93ebd58ecae1..df01029918fd4 100644
  	tlink = cifs_sb_tlink(cifs_sb);
  	if (IS_ERR(tlink))
  		return PTR_ERR(tlink);
-@@ -1915,7 +1924,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+@@ -1706,7 +1715,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+ 		if (inode)
  			cifs_drop_nlink(inode);
- 		}
  	} else if (rc == -ENOENT) {
 -		d_drop(dentry);
 +		if (simple_positive(dentry))
@@ -124,7 +124,7 @@ index d93ebd58ecae1..df01029918fd4 100644
  	} else if (rc == -EBUSY) {
  		if (server->ops->rename_pending_delete) {
  			rc = server->ops->rename_pending_delete(full_path,
-@@ -1968,6 +1978,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+@@ -1757,6 +1767,8 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
  	kfree(attrs);
  	free_xid(xid);
  	cifs_put_tlink(tlink);
