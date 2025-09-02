@@ -1,124 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A2A32F777;
-	Mon,  1 Sep 2025 17:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518F132F760
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Sep 2025 05:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756746178; cv=none; b=jAn+YXVC/6IrK3+bMo4UCTLJnIBy4809A3GLy7IqeXB9cneAknheWLskl1ZGmZtD0wV9S4qvn1j7JIWUgeC6DYtOS7RAiFKeljOBn09bzLQE2Z35uO4/ww6Skcno4d+4Usv9e/aLbpEw932lm+egVIozGdR7153o+j8oci4zInQ=
+	t=1756792587; cv=none; b=uY9zHUnRG0EIwL7Uck+4Dzx2H4vlxgCHQ6GnjNHrOCZzgYrIZkE67xl99rWq8QOwjTgMVE4nEuJeplHhgbYEbsH/EciLwmM07+Q0K/QVWq2Q0cAvH/NMH2lGuq6tqN6B6wQ0hp4JBzIsuhDLYV4Ci66MCwjfcqsBQdh9WHqxoSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756746178; c=relaxed/simple;
-	bh=Mia/xDpMi2KaskL83NHZqheX+zhVtceAPCQiz2ekhVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HI7jHng9eqjXoga1MwTwWWExy379v3+Mva6jZkE3xdIbJ8j+fs/qhH1wR7SrqS/lZwJy0mh5uLoWZ5GsMA0gHpslNqkmrlTJsrbTs2OJthi7Zs4qMF7+EgvbIBi8NnW5pk+N5XV9FBEnAN58AlfvK9egjOWOtvZJD6LS2jBZv9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iy5EHgqW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756792587; c=relaxed/simple;
+	bh=SmPXSn8TQcbCrpvVl625K9Ej0u8goVP66Cz9lxvI/hk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ksqquqF/w981oLLCbCCj+JD3/NsyAlYhxkS02O1Vmwb2Qxu5hTOLdlzcoBXdsQfHOv4NYmN8xRonGsItOnJ5E96AEYpglElFUrPUKmBihQZyZ1KM9/L0RnKng4ssTM4daO9h+gwAvqgU68zXwOGQ7TBR7+GScAZMJHD4+kzTdls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OqZ25PIh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iy5EHgqW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB26C4CEF1;
-	Mon,  1 Sep 2025 17:02:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OqZ25PIh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC1A3C4AF0B
+	for <linux-cifs@vger.kernel.org>; Tue,  2 Sep 2025 05:56:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1756746177;
-	bh=Mia/xDpMi2KaskL83NHZqheX+zhVtceAPCQiz2ekhVM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Iy5EHgqW5aXEt+t6fw4ZfT70/uWtgztA+RaODRcNK6hqyVb2UAFnd/HQ0lmWWMnWP
-	 wc0v/6wDjPpe9K+PBQ5czicG4QH7Y/gxaVnJe8PpqoHMB2/e7+3fzTnHptyld89vIa
-	 pgD99WqfKxROb8fb5TcA6XRK43DocGynjgnwWGUgN2aqy5WTdpoUnGSLb+awumUxv2
-	 kHeeXx89ua0lKd/+XYYWYQv2PoFtCkG69ALaKGFPn4Z2sCBn2QAfPqyeuRkPH/0+JH
-	 7rJr+veUlU7nqfp7jITCifKFDaFrDNvIxIP5t1iUbwqM9HVHha7EUK/HRS0+gVKvSf
-	 nT5VR0W7piaJw==
-Received: by pali.im (Postfix)
-	id 16D0131D; Mon,  1 Sep 2025 19:02:54 +0200 (CEST)
-Date: Mon, 1 Sep 2025 19:02:53 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
-	ronnie sahlberg <ronniesahlberg@gmail.com>,
-	Ralph =?utf-8?B?QsO2aG1l?= <slow@samba.org>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/35] cifs: Fix SMB rmdir() and unlink() against Windows
- SMB servers
-Message-ID: <20250901170253.mv63jewqkdo5yqj7@pali>
-References: <20250831123602.14037-1-pali@kernel.org>
- <dfa557ed-eb34-4eaf-9e17-7cae221e74fd@samba.org>
+	s=k20201202; t=1756792586;
+	bh=SmPXSn8TQcbCrpvVl625K9Ej0u8goVP66Cz9lxvI/hk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=OqZ25PIh2t+iW6YXsrsoD5W1xf8QIEJXV5JZqCIRTFbOO2ld9njluHjwK/OVZLO8l
+	 GkI8eRzzxaV9nZZ1QU8x6cZPlMJyCHvVp8uk8jifS5OcncspRsELBWcjGNaUYkp8ZL
+	 4iE0a1sKxTpMDO2DSTQj1mULGR2N0Jlx7QqwStxuT1faSzAGghuqOfqxM0BRbJtAjM
+	 p+MiA8jH+9hAXG4b4otokxiO45J6OyX3fyMmdafOwbpSTY1ghcaWhQu75k9etmn6iF
+	 x2XxR+pkvhWGIBgR54wLqIVPN0OyMcM+CvoLRzHx4B86HtLVYpCTekCES8kz66vVEZ
+	 uHnRC1by+dZLQ==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-61ce4c32a36so7864461a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 01 Sep 2025 22:56:26 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yy9khlwpbB74HegEsHUBm+vsY8arAiF+dfqvWYthV8BEwriZ2Zv
+	FNekvoDOqHRMTQsGdKJ2PlA5HoN4r9OTx5jCdje5zjPZApSVv24DFfwBlNonFWPnsZ3yfi20XhH
+	J7Zqrh7HVe/nRH8bZhQF3sI+LwN4a71U=
+X-Google-Smtp-Source: AGHT+IHbvrrDO8xSGMbkKbG8uqcPcLH7DDJ5zdlKDJlwIrxJ9iNhJ7GPRvOSPyhUp5AtFV38OPdExXAEBeGrTlVOK0Y=
+X-Received: by 2002:a05:6402:34c6:b0:61c:7a13:f1d0 with SMTP id
+ 4fb4d7f45d1cf-61d2688c0f9mr10694327a12.10.1756792585399; Mon, 01 Sep 2025
+ 22:56:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dfa557ed-eb34-4eaf-9e17-7cae221e74fd@samba.org>
-User-Agent: NeoMutt/20180716
+References: <CAH2r5mvpzK1NMmbKE-wUDHLhtm_fiPAp=zVm1egw3=cLbUh38w@mail.gmail.com>
+In-Reply-To: <CAH2r5mvpzK1NMmbKE-wUDHLhtm_fiPAp=zVm1egw3=cLbUh38w@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 2 Sep 2025 14:56:13 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-LNgCYkxUDhOaYVTqWd2BBpbaNQNnzQHNWPypMDiKpQA@mail.gmail.com>
+X-Gm-Features: Ac12FXwS5kduWrVU8UIDdPEPSKuTXSglHvaBLTwNcwbY-0D5cBJuOEDAo6osPIs
+Message-ID: <CAKYAXd-LNgCYkxUDhOaYVTqWd2BBpbaNQNnzQHNWPypMDiKpQA@mail.gmail.com>
+Subject: Re: smb2_copychunk_range() reset max_bytes_chunk to 0
+To: Steve French <smfrench@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@manguebit.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello!
-
-On Monday 01 September 2025 09:55:45 Stefan Metzmacher wrote:
-> Hi Pali,
-> 
-> > This patch series improves Linux rmdir() and unlink() syscalls called on
-> > SMB mounts exported from Windows SMB servers which do not implement
-> > POSIX semantics of the file and directory removal.
-> > 
-> > This patch series should have no impact and no function change when
-> > communicating with the POSIX SMB servers, as they should implement
-> > proper rmdir and unlink logic.
-> 
-> Please note that even servers implementing posix/unix extensions,
-> may also have windows clients connected operating on the same files/directories.
-> And in that case even posix clients will see the windows behaviour
-> of DELETE_PENDING for set disposition or on rename
-> NT_STATUS_ACCESS_DENIED or NT_STATUS_DIRECTORY_NOT_EMPTY.
-
-Ok. So does it mean that the issue described here applies also for POSIX
-SMB server?
-
-If yes, then I would propose to first fix the problem with
-Windows/non-POSIX SMB server and then with others. So it is not too big.
-
-> > When issuing remove path command against non-POSIX / Windows SMB server,
-> > it let the directory entry which is being removed in the directory until
-> > all users / clients close all handles / references to that path.
-> > 
-> > POSIX requires from rmdir() and unlink() syscalls that after successful
-> > call, the requested path / directory entry is released and allows to
-> > create a new file or directory with that name. This is currently not
-> > working against non-POSIX / Windows SMB servers.
-> > 
-> > To workaround this problem fix and improve existing cifs silly rename
-> > code and extend it also to SMB2 and SMB3 dialects when communicating
-> > with Windows SMB servers. Silly rename is applied only when it is
-> > necessary (when some other client has opened file or directory).
-> > If no other client has the file / dir open then silly rename is not
-> > used.
-> 
-> If I 'git grep -i silly fs/smb/client' there's no hit, can you
-> please explain what code do you mean with silly rename?
-
-Currently (without this patch series) it is CIFSSMBRenameOpenFile()
-function when called with NULL as 3rd argument.
-
-Cleanup is done in PATCH 11/35, where are more details.
-
-Originally the "Silly rename" is the term used by NFS client, when it
-does rename instead of unlink when the path is in use.
-I reused this term.
-
-
-So for SMB this "silly rename" means:
-- open path with DELETE access and get its handle
-- rename path (via opened handle) to some unique (auto generated) name
-- set delete pending state on the path (via opened handle)
-- close handle
-
-(plus some stuff around to remove READ_ONLY attr which may disallow to
-open path with DELETE ACCESS)
-
-So above silly rename means that the original path is not occupied
-anymore (thanks to rename) and the original file / dir is removed after
-all clients / users release handles (thanks to set delete pending).
-
-It is clear now clear? Or do you need to explain some other steps?
-Sometimes some parts are too obvious for me and I unintentionally omit
-description for something which is important. And seems that this is
-such case. So it is my mistake, I should have explain it better.
+On Wed, Aug 27, 2025 at 12:41=E2=80=AFAM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> I noticed what looks like a bug in smb2_copychunk_range() - I see it
+> when ksmbd returns ChunkBytesWritten as 0 we reset the
+> tcon->max_bytes_chunk to 0 which causes all subsequent copy_chunks to
+> ksmbd to fail with invalid parameter.  I don't see it Samba (but maybe
+> because they never returned ChunksBytesWritten as 0).  Any thoughts -
+> the logic looks wrong?
+cifs.ko request to copy overlapped range within the same file.
+ksmbd is using vfs_copy_file_range for this, vfs_copy_file_range() does not
+allow overlapped copying within the same file.
+In this case, I can change it to fallback to do_splice_direct().
+BTW, Does the generic/017 issue pass against samba?
+>
+> /* Check that server is not asking us to grow size */
+> if (le32_to_cpu(retbuf->ChunkBytesWritten) < tcon->max_bytes_chunk)
+>      tcon->max_bytes_chunk =3D le32_to_cpu(retbuf->ChunkBytesWritten);
+> else
+>      goto cchunk_out; /* server gave us bogus size */
+>
+>
+> --
+> Thanks,
+>
+> Steve
