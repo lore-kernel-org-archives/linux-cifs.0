@@ -1,141 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17CE731AF17;
-	Tue,  2 Sep 2025 13:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289131B21BF;
+	Tue,  2 Sep 2025 15:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756820457; cv=none; b=V7NNjb+VaEV9v4tSVqx/7AFGEFkP34DUIdtXRv/o7u9VrNhLwbsQvpzp1wfkWAuDdGk+6NCvjDrfYfm65odRaGRvCRb2LTe3s7jCrCWWtlsnGOtrBX0NWakiQYbvp8CymuWZh1Tdy39hvwmLNJK/by+DK9mZklIvPRu9fpV7Q4g=
+	t=1756826247; cv=none; b=HTlkLW1rsIAwXctx02FGcfzFJLclBiMngDbtaI/tGsf3P6OtzLPkoAJAyU6VNfew6/hjfsE87IRgBTQaYIbVAn4WH5jcaIyvHxdE55eX8FiLBSFuBGB7h4FZvQnek516vCW0rA+Bke2Iawe5vZo+hxI2JTIHtSFnplDZI75EvUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756820457; c=relaxed/simple;
-	bh=tucydh6EBTEde6NuQSp6ACBXqPS3uIYqwnSapHBqS+4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZHAB7cDTLLCOUCgN/8HT30PkQ98EsFbmflASHPBGpeJZAX044oMoxi9rtI2CzCLIGRnvIgnIVyRuNTcXgSFcrx77I0jdzuRgdZhsTAzdpTNNP1RbUaReioYgA1jublRdLCV5BuGMKDBZqVgDfhpZDVbFxWvAs3Vtp4bLWXbRVCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qEMFoFYa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1756826247; c=relaxed/simple;
+	bh=DaDHPfQzPs8avtxHI0O8Tcq3B0YhEDFGBLLNmSVlmxs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=numk4BhqbFhq2lqFNH7GIA8+trSPERK1e42aDELUt61cL2Sv9PFFZSs0VKrKDngcdD6yB0lL+eQOmsyMWavTnFPptYqay5pOuJYYRJSp5XNSRNBONwB0Lr1FAqjKg+UFONabWyMJhbz5+aF5uZcFb7/WyFcVvZB+RSvzbGnqO+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=QnaDHyX3; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qEMFoFYa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91FDAC4CEF5;
-	Tue,  2 Sep 2025 13:40:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756820457;
-	bh=tucydh6EBTEde6NuQSp6ACBXqPS3uIYqwnSapHBqS+4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qEMFoFYaa2jJuQbwnNlRfPQ3JKwVhFsf4u30u996xm0AOSAm1iolGao5eA4XJD/76
-	 0jMCiLQp/yT1MJX97GU/7O47xi2feDEoEaxKMUoM4/GZLFp8wZOpm8kzUSgvQG8d8I
-	 A7148Bnq5AHmp6/KphQLID+L5TO3xl6iAEpxzL+E=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 07/50] smb: client: fix race with concurrent opens in rename(2)
-Date: Tue,  2 Sep 2025 15:20:58 +0200
-Message-ID: <20250902131930.803959712@linuxfoundation.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250902131930.509077918@linuxfoundation.org>
-References: <20250902131930.509077918@linuxfoundation.org>
-User-Agent: quilt/0.68
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="QnaDHyX3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=grms1MjD6n9Wh6WN8Bqxb2fUhbvXX1gpg/Zy9bm76HM=; b=QnaDHyX3h4B5j1sQctnWqqvGVB
+	5A3Di1knra4kC5Qvr6S83KuixbJnMxiA5GkMloFL/XnRG+LIhvqmK/cwyNzLge9mKvAtMRFTFzmA1
+	igRHdFGUoNkj/q4Ot2b21sH0pLLx5kYxbZ/pkHgtYfq185QUNQ9P4kikxpA6+4Oei6Zq7hRF7QAzs
+	ZHK3PkwlWISU41ZHZe3UGqtDztX15Tshd+ktZQVXjLWKDKffUi1F4zaV+b7FjKcBoEKoY8n0jR1Cx
+	0cKCh0i7Z1jHTyBqe3WzPA/Roa2bELMXK0CpxVa31a0HgxuF+WU+EVUSnQ0YhFLegc11XjQs0LDpl
+	ozcNekkO/Y036T9x4Ta0Q+oNaWARvZ1cX9xU5YBd9LoTo+pjQ45krDKfaFY8veXanFrgcMh7q545M
+	5xyUkEQX90XDsW2DjSoqfS31Lj4/ijeRC44TrQ0KO1fUSqiXJfBr7G11thn7N3RixQjReNiRtIGER
+	pFOxHhyxRzWx0Q4UnYigGtHE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1utSl0-0024d7-2Z;
+	Tue, 02 Sep 2025 15:17:14 +0000
+Message-ID: <6660f6bd-ea74-4b25-b7dd-280833b5568c@samba.org>
+Date: Tue, 2 Sep 2025 17:17:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/35] cifs: Fix SMB rmdir() and unlink() against Windows
+ SMB servers
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+ ronnie sahlberg <ronniesahlberg@gmail.com>, =?UTF-8?Q?Ralph_B=C3=B6hme?=
+ <slow@samba.org>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250831123602.14037-1-pali@kernel.org>
+ <dfa557ed-eb34-4eaf-9e17-7cae221e74fd@samba.org>
+ <20250901170253.mv63jewqkdo5yqj7@pali>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20250901170253.mv63jewqkdo5yqj7@pali>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+Hi Pali,
 
-------------------
+>>> This patch series improves Linux rmdir() and unlink() syscalls called on
+>>> SMB mounts exported from Windows SMB servers which do not implement
+>>> POSIX semantics of the file and directory removal.
+>>>
+>>> This patch series should have no impact and no function change when
+>>> communicating with the POSIX SMB servers, as they should implement
+>>> proper rmdir and unlink logic.
+>>
+>> Please note that even servers implementing posix/unix extensions,
+>> may also have windows clients connected operating on the same files/directories.
+>> And in that case even posix clients will see the windows behaviour
+>> of DELETE_PENDING for set disposition or on rename
+>> NT_STATUS_ACCESS_DENIED or NT_STATUS_DIRECTORY_NOT_EMPTY.
+> 
+> Ok. So does it mean that the issue described here applies also for POSIX
+> SMB server?
 
-From: Paulo Alcantara <pc@manguebit.org>
+I guess so.
 
-[ Upstream commit d84291fc7453df7881a970716f8256273aca5747 ]
+> If yes, then I would propose to first fix the problem with
+> Windows/non-POSIX SMB server and then with others. So it is not too big.
 
-Besides sending the rename request to the server, the rename process
-also involves closing any deferred close, waiting for outstanding I/O
-to complete as well as marking all existing open handles as deleted to
-prevent them from deferring closes, which increases the race window
-for potential concurrent opens on the target file.
+That's up to Steve. But isn't it just a matter of removing the
+if statement that checks for posix?
 
-Fix this by unhashing the dentry in advance to prevent any concurrent
-opens on the target.
+>>> When issuing remove path command against non-POSIX / Windows SMB server,
+>>> it let the directory entry which is being removed in the directory until
+>>> all users / clients close all handles / references to that path.
+>>>
+>>> POSIX requires from rmdir() and unlink() syscalls that after successful
+>>> call, the requested path / directory entry is released and allows to
+>>> create a new file or directory with that name. This is currently not
+>>> working against non-POSIX / Windows SMB servers.
+>>>
+>>> To workaround this problem fix and improve existing cifs silly rename
+>>> code and extend it also to SMB2 and SMB3 dialects when communicating
+>>> with Windows SMB servers. Silly rename is applied only when it is
+>>> necessary (when some other client has opened file or directory).
+>>> If no other client has the file / dir open then silly rename is not
+>>> used.
+>>
+>> If I 'git grep -i silly fs/smb/client' there's no hit, can you
+>> please explain what code do you mean with silly rename?
+> 
+> Currently (without this patch series) it is CIFSSMBRenameOpenFile()
+> function when called with NULL as 3rd argument.
+> 
+> Cleanup is done in PATCH 11/35, where are more details.
+> 
+> Originally the "Silly rename" is the term used by NFS client, when it
+> does rename instead of unlink when the path is in use.
+> I reused this term.
+> 
+> 
+> So for SMB this "silly rename" means:
+> - open path with DELETE access and get its handle
+> - rename path (via opened handle) to some unique (auto generated) name
+> - set delete pending state on the path (via opened handle)
+> - close handle
+> 
+> (plus some stuff around to remove READ_ONLY attr which may disallow to
+> open path with DELETE ACCESS)
+> 
+> So above silly rename means that the original path is not occupied
+> anymore (thanks to rename) and the original file / dir is removed after
+> all clients / users release handles (thanks to set delete pending).
+> 
+> It is clear now clear? Or do you need to explain some other steps?
+> Sometimes some parts are too obvious for me and I unintentionally omit
+> description for something which is important. And seems that this is
+> such case. So it is my mistake, I should have explain it better.
 
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/inode.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+I think I understand what it tries to do, thanks for explaining.
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index ffc05ebc92f43..f3ed5134ecfa9 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2165,6 +2165,7 @@ cifs_rename2(struct user_namespace *mnt_userns, struct inode *source_dir,
- 	struct cifs_sb_info *cifs_sb;
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *tcon;
-+	bool rehash = false;
- 	unsigned int xid;
- 	int rc, tmprc;
- 	int retry_count = 0;
-@@ -2180,6 +2181,17 @@ cifs_rename2(struct user_namespace *mnt_userns, struct inode *source_dir,
- 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
- 		return -EIO;
- 
-+	/*
-+	 * Prevent any concurrent opens on the target by unhashing the dentry.
-+	 * VFS already unhashes the target when renaming directories.
-+	 */
-+	if (d_is_positive(target_dentry) && !d_is_dir(target_dentry)) {
-+		if (!d_unhashed(target_dentry)) {
-+			d_drop(target_dentry);
-+			rehash = true;
-+		}
-+	}
-+
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
-@@ -2219,6 +2231,8 @@ cifs_rename2(struct user_namespace *mnt_userns, struct inode *source_dir,
- 		}
- 	}
- 
-+	if (!rc)
-+		rehash = false;
- 	/*
- 	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
- 	 */
-@@ -2277,6 +2291,8 @@ cifs_rename2(struct user_namespace *mnt_userns, struct inode *source_dir,
- 			goto cifs_rename_exit;
- 		rc = cifs_do_rename(xid, source_dentry, from_name,
- 				    target_dentry, to_name);
-+		if (!rc)
-+			rehash = false;
- 	}
- 
- 	/* force revalidate to go get info when needed */
-@@ -2286,6 +2302,8 @@ cifs_rename2(struct user_namespace *mnt_userns, struct inode *source_dir,
- 		target_dir->i_mtime = current_time(source_dir);
- 
- cifs_rename_exit:
-+	if (rehash)
-+		d_rehash(target_dentry);
- 	kfree(info_buf_source);
- 	free_dentry_path(page2);
- 	free_dentry_path(page1);
--- 
-2.50.1
+I was just wondering why the rename on a busy handle would work
+while delete won't work. I'd guess the chances are high that both fail.
 
+Do you have network captures showing the old and new behavior
+that's often easier to understand than looking at patches alone.
 
-
+metze
