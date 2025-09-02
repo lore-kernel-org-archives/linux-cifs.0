@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AD22D9ECA;
-	Tue,  2 Sep 2025 13:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C5C30F533;
+	Tue,  2 Sep 2025 13:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756819845; cv=none; b=EP6uYl60b8J/2da3nCwTIQBvUFb3ijLf6rSRZidGAKnPmFAltmqEsYTmC7DsiDVVzVLgmz2N5BUwxOFz//b+GOIMW3FPeqvYFzXkYBhCu0Vy/DGoWiN2ci8/Bn6QUUA3MVy4b4vX9v0c9y2nSe/D1SULmlNeaGVvi6Y/M9MwgF4=
+	t=1756820136; cv=none; b=l95B39TVSLY5fVGLrfPLopb0cvxnohh4sRio0Y/PBPaCgLsx6TPLzF1ngAZiGh2Gn0sDYZvtPLoXezmnYv+y7323KJDY/E4x6sGcMC7VhxI2Mt1NNPR9zA7tXX2QVEkoEP/xFeiI8rvCBHoV4xJejilmzLnePtDmfen9HiwU4pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756819845; c=relaxed/simple;
-	bh=+NtwQ/LZkk1iLSgyjFL55ZNokLbRqql1uStoQH3lXwE=;
+	s=arc-20240116; t=1756820136; c=relaxed/simple;
+	bh=ibRPVFXtxV12eMzYwOJTp18qbMLcnVNcvmSNgdLLPBk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SIcdf0LzS4p5PnmST5X65PZReLG4xHxE4SO7m1z9n/MslvC6zY8krF3iXu3+3e1RI7rB9fg7OK6z/Q+8IzSCVfdeu4XYEbxd3l/yNYAwpFr7EWf364hemYq2CuDY48fRW7B4T9uVTu3cMqdJPK6rVWoBUwVPVS9u6CoFYMU2P0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=P52YZbqN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=aiqw6tbvJmtboVGQXUoTm3qROyeIasSN8OPQH/1MYmnopB8ivbCObic+iZvRok6w5B2OgCcxYIEkwZBsCfFrwFGCWR/zKY7/7n4RBpT6zYREaN8D9rVbxXOZ+RFPjvt6hItcjcNBvHK966aLiEJzrt2+we4mNTXxm33XbcqOtQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=e+ADRmoG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="P52YZbqN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34977C4CEED;
-	Tue,  2 Sep 2025 13:30:44 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="e+ADRmoG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D9BC4CEED;
+	Tue,  2 Sep 2025 13:35:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1756819844;
-	bh=+NtwQ/LZkk1iLSgyjFL55ZNokLbRqql1uStoQH3lXwE=;
+	s=korg; t=1756820136;
+	bh=ibRPVFXtxV12eMzYwOJTp18qbMLcnVNcvmSNgdLLPBk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P52YZbqNhwZ6ZRmDsEcVI+iOWN49yOrAj3KW/lF/EyY/u7iQNU1aFRZtEkRR3rgg/
-	 ZWHNytnoBy7YlYcRpin7c0tbSdjX1fbbHpB935nsD/Mbo+/qr8VEGRz8u5U3X7WD8S
-	 QXbFo9RU+ZqNWnNAtGuq6vMuEE4CEXqd54Gmr0qs=
+	b=e+ADRmoG2SC4REv+blKDWdQjCBJZrw+rEFq6NaUqdF7Rwyo3yiDdYDG3rVPYwuQXT
+	 5m83G9XNN7Y1W4mLw1cd7sHJCGelkqGTf9GS24A+D0HSvgEyzxg6uTAfawEiBtt9HJ
+	 H7aWwsa3+QAsa3U1IB+i7XM8rITKOymd6sNaN1iE=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,12 +33,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12 14/95] smb: client: fix race with concurrent opens in rename(2)
-Date: Tue,  2 Sep 2025 15:19:50 +0200
-Message-ID: <20250902131940.160939436@linuxfoundation.org>
+Subject: [PATCH 6.6 10/75] smb: client: fix race with concurrent opens in rename(2)
+Date: Tue,  2 Sep 2025 15:20:22 +0200
+Message-ID: <20250902131935.520307071@linuxfoundation.org>
 X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20250902131939.601201881@linuxfoundation.org>
-References: <20250902131939.601201881@linuxfoundation.org>
+In-Reply-To: <20250902131935.107897242@linuxfoundation.org>
+References: <20250902131935.107897242@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -50,7 +50,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.12-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -78,10 +78,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 18 insertions(+)
 
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 02f78e58e11d0..c0df2c1841243 100644
+index df01029918fd4..6c16c4f34d882 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
-@@ -2441,6 +2441,7 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+@@ -2379,6 +2379,7 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
  	struct cifs_sb_info *cifs_sb;
  	struct tcon_link *tlink;
  	struct cifs_tcon *tcon;
@@ -89,7 +89,7 @@ index 02f78e58e11d0..c0df2c1841243 100644
  	unsigned int xid;
  	int rc, tmprc;
  	int retry_count = 0;
-@@ -2456,6 +2457,17 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+@@ -2394,6 +2395,17 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
  	if (unlikely(cifs_forced_shutdown(cifs_sb)))
  		return -EIO;
  
@@ -107,7 +107,7 @@ index 02f78e58e11d0..c0df2c1841243 100644
  	tlink = cifs_sb_tlink(cifs_sb);
  	if (IS_ERR(tlink))
  		return PTR_ERR(tlink);
-@@ -2497,6 +2509,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+@@ -2433,6 +2445,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
  		}
  	}
  
@@ -116,7 +116,7 @@ index 02f78e58e11d0..c0df2c1841243 100644
  	/*
  	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
  	 */
-@@ -2555,12 +2569,16 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+@@ -2491,12 +2505,16 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
  			goto cifs_rename_exit;
  		rc = cifs_do_rename(xid, source_dentry, from_name,
  				    target_dentry, to_name);
