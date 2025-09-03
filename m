@@ -1,45 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC7D28134F
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Sep 2025 12:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A362DE70B
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Sep 2025 12:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756900932; cv=none; b=gANCvYyc3tmUqxkz4rX+1bvooVSas2rzoRXNZrlk0CkbmHy4EHI73ZO+55bSQrNE5UTc5/F5QoXp2khnaTLufzDMLOoewqXajfz/p3TV9UeMqWHlT+4JzFmxvWTeSAth2BqAp1KBJXYFpqHV0wOcqkqDE1zIhdE+etTOo/Z8JAE=
+	t=1756900949; cv=none; b=rNm4ZrLahC+4k5Pufrk0QG1RSUh0MWcLYQCRe2SCP6HultQ81eGC2yrrXOVXJQTJvwg3oOoif09I+qZ7ulIlJHM37tFRBy4Io2pthjgARG6icVVf9DkaG3JvbvmSHPzTbsnPjyx3ToGoGmRLI9vBHH2wPzp/n1x1yjFTrVWKb40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756900932; c=relaxed/simple;
-	bh=lgkHpwlpSJLJmES/dXoWXanhZTG+O6JwBTaZVF77ZIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aLP37URHBdmHlfkaTuNuaKCZ+5Ov7TPDbi7bJymV1gDVlykU6Bku/+WFruT4gsY0g8Yk7GDBv2AUxJzwT+tI4/BGHjrEyGsLwXFLwpxY1oHYjykdbP6aHYuORAjxi0OdTc/qSWOWZQQErcPY/eozyOhtltNHaMlaUK0HuoVtnVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G7wtxjQw; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1756900949; c=relaxed/simple;
+	bh=KoNPUn7kI8MGjzCwP8b/gzQgxcS+YbXibeTIk0hv5pU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gF7Yh6v9pYRnDaS6H+v9V7sse+lUyy/tiPIVPAI0W3hbFj8wwJShXWKNh2T5iC5OkJefuEduUfiqFGQKRIrwnUqim3woLHevikcbuhIsh/tpKaNbTPQVMLFKcKOHUKj5+fCpRZFv5mVpfnKJp+7sOxr0JK+vaoqAEcu9tdM5U4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=To6TInIl; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7wtxjQw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="To6TInIl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1756900930;
+	s=mimecast20190719; t=1756900946;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=CatxfhLxYasU2u6fzfcnGLX+yDMii7A5Aq7MzACcHMo=;
-	b=G7wtxjQwQGzcVvdtkSb/cf5jhibDXusGqivHporOTb/c65JHQKbV6iLYJQ1Y5S/AlYuABU
-	nhdZExtMVvygch9zzWV9oBDW3uvJ5aCTIAIEZU93UWCnkUKz66+4iIiueURow9ioy4clpd
-	MzWvk8itBo0KuHGMGC+z4rhlK6D8HiQ=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XqEopCUVV6AIxWgJeMrxsHn0rkjOl/HkbJLHlKDiYUQ=;
+	b=To6TInIlhy+gdYH9RjTBYEJiuiGicYBucp8UzgOsTrRD3g71TPjeNlUKV8vhMPKOb9F4N5
+	+7+duoYmfcCvg6XcIhypYBjLT5K9TITx7dSfyyKUX+T/UYqtNVkrD2C8gBL04PlKHmxPpY
+	EKLxXcNYjsBYJxRurrok+BhE3R5Nt4w=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-489-Rjl-21kLP2KelauHP009Zg-1; Wed,
- 03 Sep 2025 08:02:06 -0400
-X-MC-Unique: Rjl-21kLP2KelauHP009Zg-1
-X-Mimecast-MFC-AGG-ID: Rjl-21kLP2KelauHP009Zg_1756900924
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-7OHjWuu0Mmy7MlEaHpbjCA-1; Wed,
+ 03 Sep 2025 08:02:23 -0400
+X-MC-Unique: 7OHjWuu0Mmy7MlEaHpbjCA-1
+X-Mimecast-MFC-AGG-ID: 7OHjWuu0Mmy7MlEaHpbjCA_1756900941
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE81A19560A0;
-	Wed,  3 Sep 2025 12:02:03 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F36C1955D61;
+	Wed,  3 Sep 2025 12:02:16 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.6])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 85EBD3000198;
-	Wed,  3 Sep 2025 12:02:00 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2FE8819560B8;
+	Wed,  3 Sep 2025 12:02:11 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Al Viro <viro@zeniv.linux.org.uk>,
 	Christian Brauner <christian@brauner.io>
@@ -52,10 +54,16 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] vfs, afs, bash: Fix miscomparison of foreign user IDs in the VFS
-Date: Wed,  3 Sep 2025 13:01:52 +0100
-Message-ID: <20250903120157.899182-1-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Etienne Champetier <champetier.etienne@gmail.com>,
+	Chet Ramey <chet.ramey@case.edu>,
+	Cheyenne Wills <cwills@sinenomine.net>,
+	Christian Brauner <brauner@kernel.org>
+Subject: [PATCH 2/2] afs, bash: Fix open(O_CREAT) on an extant AFS file in a sticky dir
+Date: Wed,  3 Sep 2025 13:01:54 +0100
+Message-ID: <20250903120157.899182-3-dhowells@redhat.com>
+In-Reply-To: <20250903120157.899182-1-dhowells@redhat.com>
+References: <20250903120157.899182-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,85 +71,194 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Al, Christian,
+Since version 1.11 (January 1992) Bash has a work around in redir_open()
+that causes open(O_CREAT) of a file to be retried without O_CREAT if open()
+fails with an EACCES error if bash was built with AFS workarounds
+configured:
 
-Here's a pair of fixes that deal with some places the VFS mishandles
-foreign user ID checks.  By "foreign" I mean that the user IDs from the
-filesystem do not belong in the same number space as the system's user IDs.
-Network filesystems are prime examples of this, but it may also impact
-things like USB drives or cdroms.
+        #if defined (AFS)
+              if ((fd < 0) && (errno == EACCES))
+            {
+              fd = open (filename, flags & ~O_CREAT, mode);
+              errno = EACCES;    /* restore errno */
+            }
 
-Take AFS as example: Whilst each file does have a numeric user ID, the file
-may be accessed from a world-accessible public-facing server from some
-other organisation with its own idea of what that user ID refers to.  IDs
-from AFS may also collide with the system's own set of IDs and may also be
-unrepresentable as a 32-bit UID (in the case of AuriStor servers).
+        #endif /* AFS */
 
-Further, kAFS uses a key containing an authentication token to specify the
-subject doing an RPC operation to the server - and, as such, this needs to
-be used instead of current_fsuid() in determining whether the current user
-has ownership rights over a file.
+The ~O_CREAT fallback logic was introduced to workaround a bug[1] in the
+IBM AFS 3.1 cache manager and server which can return EACCES in preference
+to EEXIST if the requested file exists but the caller is neither granted
+explicit PRSFS_READ permission nor is the file owner and is granted
+PRSFS_INSERT permission on the directory.  IBM AFS 3.2 altered the cache
+manager permission checks but failed to correct the permission checks in
+the AFS server.  As of this writing, all IBM AFS derived servers continue
+to return EACCES in preference to EEXIST when these conditions are met.
+Bug reports have been filed with all implementations.
 
-Additionally, filesystems (CIFS being a notable example) may also have user
-identifiers that aren't simple integers.
+As an unintended side effect, the Bash fallback logic also undermines the
+Linux kernel protections against O_CREAT opening FIFOs and regular files
+not owned by the user in world writeable sticky directories - unless the
+owner is the same as that of the directory - as was added in commit
+30aba6656f61e ("namei: allow restricted O_CREAT of FIFOs and regular
+files").
 
-Now the problem in the VFS is that there are a number of places where it
-assumes it can directly compare i_uid (possibly id-mapped) to either than
-on another inode or a UID drawn from elsewhere (e.g. current_uid()) - but
-this doesn't work right.
+As a result the Bash fallback logic masks an incompatibility between the
+ownership checks performed by may_create_in_sticky() and network
+filesystems such as AFS where the uid namespace is disjoint from the uid
+namespace of the local system.
 
-This causes the write-to-sticky check to work incorrectly for AFS (though
-this is currently masked by a workaround in bash that is slated to be
-removed) whereby open(O_CREAT) of such a file will fail when it shouldn't.
+However, the bash work around is going to be removed[2].
 
-Two patches are provided:
+Fix this in the kernel by using a preceding patch that allows the user ID
+comparisons to be overridden by:
 
- (1) Add a pair of inode operations, one to compare the ownership of a pair
-     of inodes and the other to see if the current process has ownership
-     rights over an inode.  Usage of this is then extended out into the
-     VFS, replacing comparisons between i_uid and i_uid and between i_uid
-     and current_fsuid().  The default, it the inode ops are unimplemented,
-     is to do those direct i_uid comparisons.
+ (1) Implement the ->is_owned_by_me() inode op for kafs to determine if the
+     caller owns the file by checking to see if the server indicated the
+     ADMINISTER bit was set in the access rights returned by the
+     FS.FetchStatus and suchlike instead of checking the i_uid to
+     current_fsuid().
 
- (2) Fixes the bash workaround issue with regard to AFS, overriding the
-     checks as to whether two inodes have the same owner and the check as
-     to whether the current user owns an inode to work within the AFS
-     model.
+     Unfortunately, this check doesn't work for directories, but none of
+     the ops should require that.
 
-kAFS uses the result of a status-fetch with a suitable key to determine
-file ownership (if the ADMINISTER bit is set) and just compares the 64-bit
-owner IDs to determine if two inodes have the same ownership.
+     Note that anonymous accesses to AFS will never see the ADMINISTER bit
+     being set and so will not be perceived as owning an anonymously-owned
+     file.
 
-Note that chown may also need modifying in some way - but that can't
-necessarily supply the information required (for instance, an AuriStor YFS ID
-is 64 bits, but chown can only handle a 32-bit integer; CIFS might use a
-GUID).
+ (2) Implement the ->have_same_owner() inode op, for kafs to compare the
+     AFS owner IDs retrieved by FS.FetchStatus (which are 64-bit integers
+     with AuriStor's YFS server and, as such, won't fit in a kuid_t).
 
-The patches can be found here:
+     Note that whilst an anonymously-owned file will match an
+     anonymously-owned parent directory, an anonymously-owned directory
+     cannot have the sticky bit set.
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=afs-sticky-2
+This can be tested by creating a sticky directory (the user must have a
+token to do this) and creating a file in it.  Then strace bash doing "echo
+foo >>file" and look at whether bash does a single, successful O_CREAT open
+on the file or whether that one fails and then bash does one without
+O_CREAT that succeeds.
 
-Thanks,
-David
+Fixes: 30aba6656f61 ("namei: allow restricted O_CREAT of FIFOs and regular files")
+Reported-by: Etienne Champetier <champetier.etienne@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jeffrey Altman <jaltman@auristor.com>
+cc: Chet Ramey <chet.ramey@case.edu>
+cc: Cheyenne Wills <cwills@sinenomine.net>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: linux-afs@lists.infradead.org
+cc: openafs-devel@openafs.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+Link: https://groups.google.com/g/gnu.bash.bug/c/6PPTfOgFdL4/m/2AQU-S1N76UJ [1]
+Link: https://git.savannah.gnu.org/cgit/bash.git/tree/redir.c?h=bash-5.3-rc1#n733 [2]
+---
+ fs/afs/dir.c      |  2 ++
+ fs/afs/file.c     |  2 ++
+ fs/afs/internal.h |  3 +++
+ fs/afs/security.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 53 insertions(+)
 
-David Howells (2):
-  vfs: Allow filesystems with foreign owner IDs to override UID checks
-  afs, bash: Fix open(O_CREAT) on an extant AFS file in a sticky dir
-
- Documentation/filesystems/vfs.rst |  21 ++++
- fs/afs/dir.c                      |   2 +
- fs/afs/file.c                     |   2 +
- fs/afs/internal.h                 |   3 +
- fs/afs/security.c                 |  46 +++++++++
- fs/attr.c                         |  58 ++++++-----
- fs/coredump.c                     |   2 +-
- fs/inode.c                        |  11 +-
- fs/internal.h                     |   1 +
- fs/locks.c                        |   7 +-
- fs/namei.c                        | 161 ++++++++++++++++++++++++------
- fs/remap_range.c                  |  20 ++--
- include/linux/fs.h                |   6 +-
- 13 files changed, 269 insertions(+), 71 deletions(-)
+diff --git a/fs/afs/dir.c b/fs/afs/dir.c
+index bfb69e066672..644782a416d7 100644
+--- a/fs/afs/dir.c
++++ b/fs/afs/dir.c
+@@ -65,6 +65,8 @@ const struct inode_operations afs_dir_inode_operations = {
+ 	.permission	= afs_permission,
+ 	.getattr	= afs_getattr,
+ 	.setattr	= afs_setattr,
++	.is_owned_by_me	= afs_is_owned_by_me,
++	.have_same_owner = afs_have_same_owner,
+ };
+ 
+ const struct address_space_operations afs_dir_aops = {
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index f66a92294284..399a40c45d0a 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -47,6 +47,8 @@ const struct inode_operations afs_file_inode_operations = {
+ 	.getattr	= afs_getattr,
+ 	.setattr	= afs_setattr,
+ 	.permission	= afs_permission,
++	.is_owned_by_me	= afs_is_owned_by_me,
++	.have_same_owner = afs_have_same_owner,
+ };
+ 
+ const struct address_space_operations afs_file_aops = {
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index 1124ea4000cb..8c2ca00ac237 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -1515,6 +1515,9 @@ extern struct key *afs_request_key(struct afs_cell *);
+ extern struct key *afs_request_key_rcu(struct afs_cell *);
+ extern int afs_check_permit(struct afs_vnode *, struct key *, afs_access_t *);
+ extern int afs_permission(struct mnt_idmap *, struct inode *, int);
++int afs_is_owned_by_me(struct mnt_idmap *idmap, struct inode *inode);
++int afs_have_same_owner(struct mnt_idmap *idmap, struct inode *inode1,
++			struct inode *inode2);
+ extern void __exit afs_clean_up_permit_cache(void);
+ 
+ /*
+diff --git a/fs/afs/security.c b/fs/afs/security.c
+index 6a7744c9e2a2..19b11c7cb1ff 100644
+--- a/fs/afs/security.c
++++ b/fs/afs/security.c
+@@ -477,6 +477,52 @@ int afs_permission(struct mnt_idmap *idmap, struct inode *inode,
+ 	return ret;
+ }
+ 
++/*
++ * Determine if an inode is owned by 'me' - whatever that means for the
++ * filesystem.  In the case of AFS, this means that the file is owned by the
++ * AFS user represented by the Rx Security Class token held in a key.  Returns
++ * 0 if owned by me, 1 if not; can also return an error.
++ */
++int afs_is_owned_by_me(struct mnt_idmap *idmap, struct inode *inode)
++{
++	struct afs_vnode *vnode = AFS_FS_I(inode);
++	afs_access_t access;
++	struct key *key;
++	int ret;
++
++	if (S_ISDIR(inode->i_mode))
++		return 1; /* The ADMIN right check doesn't work for directories. */
++
++	key = afs_request_key(vnode->volume->cell);
++	if (IS_ERR(key))
++		return PTR_ERR(key);
++
++	/* Get the access rights for the key on this file. */
++	ret = afs_check_permit(vnode, key, &access);
++	if (ret < 0)
++		goto error;
++
++	/* We get the ADMINISTER bit if we own the file. */
++	ret = (access & AFS_ACE_ADMINISTER) ? 0 : 1;
++error:
++	key_put(key);
++	return ret;
++}
++
++/*
++ * Determine if a file has the same owner as its parent - whatever that means
++ * for the filesystem.  In the case of AFS, this means comparing their AFS
++ * UIDs.  Returns 0 if same, 1 if not same; can also return an error.
++ */
++int afs_have_same_owner(struct mnt_idmap *idmap, struct inode *inode1,
++			struct inode *inode2)
++{
++	const struct afs_vnode *vnode1 = AFS_FS_I(inode1);
++	const struct afs_vnode *vnode2 = AFS_FS_I(inode2);
++
++	return vnode1->status.owner != vnode2->status.owner;
++}
++
+ void __exit afs_clean_up_permit_cache(void)
+ {
+ 	int i;
 
