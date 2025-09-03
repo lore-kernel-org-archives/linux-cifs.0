@@ -1,62 +1,147 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA54D2E5B19
-	for <linux-cifs@vger.kernel.org>; Tue,  2 Sep 2025 19:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC7D28134F
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Sep 2025 12:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756841956; cv=none; b=CgTnAoxN5ErT/SD1yWfDcVFz/DKSt5l+CNEL/WJY7FkDGBAOP98Bp9svBGM5pcUiA9OyOQUWvdRb/3jtcWNCDxSob/8SnW30svf7I/hkTnLYhKY8TqkzssetjqZ1x2EmDKjOlLe7JySTv24JtmaUPIMoUY+JWpfNlue3a7UfOoU=
+	t=1756900932; cv=none; b=gANCvYyc3tmUqxkz4rX+1bvooVSas2rzoRXNZrlk0CkbmHy4EHI73ZO+55bSQrNE5UTc5/F5QoXp2khnaTLufzDMLOoewqXajfz/p3TV9UeMqWHlT+4JzFmxvWTeSAth2BqAp1KBJXYFpqHV0wOcqkqDE1zIhdE+etTOo/Z8JAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756841956; c=relaxed/simple;
-	bh=vdMCkfcKF6tNERNxxBpmHwLIk/45k96IRsnj9GOZBWU=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=YrFOK4xNk9uGtGg914XJYw97HuVSomqV/PxSh3MdqRRsecygss5xAVUQoS53l4+Bwnx51EfMbQouz+jo15C+7o0VShgYg9vYhnw/0Pyv6nWi1NdA6qF1d/xygMiJ2Q21J0qH4xUaeLYDCej8JOyHxLQWzNRrye9WHendB8RVO5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=KrI0VEpn; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1756900932; c=relaxed/simple;
+	bh=lgkHpwlpSJLJmES/dXoWXanhZTG+O6JwBTaZVF77ZIg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aLP37URHBdmHlfkaTuNuaKCZ+5Ov7TPDbi7bJymV1gDVlykU6Bku/+WFruT4gsY0g8Yk7GDBv2AUxJzwT+tI4/BGHjrEyGsLwXFLwpxY1oHYjykdbP6aHYuORAjxi0OdTc/qSWOWZQQErcPY/eozyOhtltNHaMlaUK0HuoVtnVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G7wtxjQw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="KrI0VEpn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=u+dqfpN6oUk3CUie/KPGc6VEosh0jVHKKjH1dvfxLW0=; b=KrI0VEpnbK1dMi6NEAF/EHJTO3
-	oCjVx6RIeyWUSgV97DIQ7qc6/ZzCh7Woqx5EqMgsJxtxlbADGWpD2Zg/pcxoSK8Im2DNUUzoRTw/r
-	G2AWrI8bdppr1sqnQEn8VeU45uJQvhXEXFeiOCZr92dspQdhNf63QM9JVPmv5a/1dSummnC0yF9VL
-	WXrgiqWF27qv/TOxgRueBsL5tQdIQ0QMGH3ba6zTHzGLJNUnZB+M3g+KeJ9+5ZWj4b3Yhek9DgaRB
-	MOOsSTzDSQ5jsCxVhg0b4T26pcTN7/VR8hB7STg/yyxA1p7R72Oik7OnAR9pzuyCSt1DjfqQiH7wv
-	8w+X9Rsg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1utWqW-00000000iMP-2ItP;
-	Tue, 02 Sep 2025 16:39:12 -0300
-Message-ID: <b29ed180e00cf6197644e54d944c59fc@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Ralph Boehme <slow@samba.org>, Steve French <smfrench@gmail.com>
-Cc: Jean-Baptiste Denis <jbdenis@pasteur.fr>, Frank Sorenson
- <sorenson@redhat.com>, Olga Kornievskaia <okorniev@redhat.com>, Benjamin
- Coddington <bcodding@redhat.com>, Scott Mayhew <smayhew@redhat.com>, CIFS
- <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH v2] smb: client: fix data loss due to broken rename(2)
-In-Reply-To: <e66bfd26-9766-4075-bb8e-89df33e88e59@samba.org>
-References: <20250902165451.892165-1-pc@manguebit.org>
- <cd16cf45-efc8-4324-9d40-0b92f15f179a@samba.org>
- <CAH2r5mvqJXfgQwKLSWrfBDw8Rc88ys8a_cWB5DtD19HSDmFn5w@mail.gmail.com>
- <e66bfd26-9766-4075-bb8e-89df33e88e59@samba.org>
-Date: Tue, 02 Sep 2025 16:39:12 -0300
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7wtxjQw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1756900930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CatxfhLxYasU2u6fzfcnGLX+yDMii7A5Aq7MzACcHMo=;
+	b=G7wtxjQwQGzcVvdtkSb/cf5jhibDXusGqivHporOTb/c65JHQKbV6iLYJQ1Y5S/AlYuABU
+	nhdZExtMVvygch9zzWV9oBDW3uvJ5aCTIAIEZU93UWCnkUKz66+4iIiueURow9ioy4clpd
+	MzWvk8itBo0KuHGMGC+z4rhlK6D8HiQ=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-489-Rjl-21kLP2KelauHP009Zg-1; Wed,
+ 03 Sep 2025 08:02:06 -0400
+X-MC-Unique: Rjl-21kLP2KelauHP009Zg-1
+X-Mimecast-MFC-AGG-ID: Rjl-21kLP2KelauHP009Zg_1756900924
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE81A19560A0;
+	Wed,  3 Sep 2025 12:02:03 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.6])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 85EBD3000198;
+	Wed,  3 Sep 2025 12:02:00 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jeffrey Altman <jaltman@auristor.com>,
+	Steve French <sfrench@samba.org>,
+	linux-afs@lists.infradead.org,
+	openafs-devel@openafs.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] vfs, afs, bash: Fix miscomparison of foreign user IDs in the VFS
+Date: Wed,  3 Sep 2025 13:01:52 +0100
+Message-ID: <20250903120157.899182-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Ralph Boehme <slow@samba.org> writes:
+Hi Al, Christian,
 
-> Likely? How? Does a Windows client also do this stuff when the rename 
-> destination is open? All this additionaly complexity is only waiting for 
-> bugs to happen and now that we have POSIX Extensions back we should 
-> phase out this crap.
+Here's a pair of fixes that deal with some places the VFS mishandles
+foreign user ID checks.  By "foreign" I mean that the user IDs from the
+filesystem do not belong in the same number space as the system's user IDs.
+Network filesystems are prime examples of this, but it may also impact
+things like USB drives or cdroms.
 
-Claiming POSIX support and being unable to rename open files, that would
-be even worse, no?
+Take AFS as example: Whilst each file does have a numeric user ID, the file
+may be accessed from a world-accessible public-facing server from some
+other organisation with its own idea of what that user ID refers to.  IDs
+from AFS may also collide with the system's own set of IDs and may also be
+unrepresentable as a 32-bit UID (in the case of AuriStor servers).
+
+Further, kAFS uses a key containing an authentication token to specify the
+subject doing an RPC operation to the server - and, as such, this needs to
+be used instead of current_fsuid() in determining whether the current user
+has ownership rights over a file.
+
+Additionally, filesystems (CIFS being a notable example) may also have user
+identifiers that aren't simple integers.
+
+Now the problem in the VFS is that there are a number of places where it
+assumes it can directly compare i_uid (possibly id-mapped) to either than
+on another inode or a UID drawn from elsewhere (e.g. current_uid()) - but
+this doesn't work right.
+
+This causes the write-to-sticky check to work incorrectly for AFS (though
+this is currently masked by a workaround in bash that is slated to be
+removed) whereby open(O_CREAT) of such a file will fail when it shouldn't.
+
+Two patches are provided:
+
+ (1) Add a pair of inode operations, one to compare the ownership of a pair
+     of inodes and the other to see if the current process has ownership
+     rights over an inode.  Usage of this is then extended out into the
+     VFS, replacing comparisons between i_uid and i_uid and between i_uid
+     and current_fsuid().  The default, it the inode ops are unimplemented,
+     is to do those direct i_uid comparisons.
+
+ (2) Fixes the bash workaround issue with regard to AFS, overriding the
+     checks as to whether two inodes have the same owner and the check as
+     to whether the current user owns an inode to work within the AFS
+     model.
+
+kAFS uses the result of a status-fetch with a suitable key to determine
+file ownership (if the ADMINISTER bit is set) and just compares the 64-bit
+owner IDs to determine if two inodes have the same ownership.
+
+Note that chown may also need modifying in some way - but that can't
+necessarily supply the information required (for instance, an AuriStor YFS ID
+is 64 bits, but chown can only handle a 32-bit integer; CIFS might use a
+GUID).
+
+The patches can be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=afs-sticky-2
+
+Thanks,
+David
+
+David Howells (2):
+  vfs: Allow filesystems with foreign owner IDs to override UID checks
+  afs, bash: Fix open(O_CREAT) on an extant AFS file in a sticky dir
+
+ Documentation/filesystems/vfs.rst |  21 ++++
+ fs/afs/dir.c                      |   2 +
+ fs/afs/file.c                     |   2 +
+ fs/afs/internal.h                 |   3 +
+ fs/afs/security.c                 |  46 +++++++++
+ fs/attr.c                         |  58 ++++++-----
+ fs/coredump.c                     |   2 +-
+ fs/inode.c                        |  11 +-
+ fs/internal.h                     |   1 +
+ fs/locks.c                        |   7 +-
+ fs/namei.c                        | 161 ++++++++++++++++++++++++------
+ fs/remap_range.c                  |  20 ++--
+ include/linux/fs.h                |   6 +-
+ 13 files changed, 269 insertions(+), 71 deletions(-)
+
