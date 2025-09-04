@@ -1,193 +1,101 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC06296BA2
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Sep 2025 20:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4498819AD8B;
+	Thu,  4 Sep 2025 02:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1756932909; cv=none; b=UU7iMeMpkHBmZINMcqHCnWqj9654btsTRVCGZ8h00lF9ZigTeyJN0qkKAp1SfFdIiQfZooSZZBbF1f5QnLSr/prNxVIbnkFD0jYqDftp9dBAbEDfyGSvho4zdNvcd1qtNbUpfpRoYeD3S60thqs6v7MDEhEGwIQhdYcg4awywQo=
+	t=1756954007; cv=none; b=phL4EY5WLA6RrPokFF5cC07+D423IWtY8MuL3xjZCuz8kSWMyu0zZbR7+dzRp4iUL5Qg35x8otcyBpfcfr/xIn0bMC/zq9daaq5JoYhcV/hStFc0JUvZGBRmfVVU9itMCThpuq7JOmayq+j72fO7oFM7xpgcTzi7ateXnQ5H47g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1756932909; c=relaxed/simple;
-	bh=IuPzRDbgIWqpoD2fnJn1bNOD0L2geL9AfpL46fzYbxQ=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=lbqrX0jl1ENj8mm4kw58Ohlhd7UeS5VbwbnbpruO+60epqc2RBIOAO6I+aUauO1J7lmnHial1GD4EMPO+iLo+NyiNPoBMpiBMf0rh7YjtK3OZ4dR7PELLXy+YWxQWZiKKP4ge111IJRSD8FunTLCmuyR2FwSqyz/h6r2yIr5Fe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=xccUgyTX; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1756954007; c=relaxed/simple;
+	bh=TFZJyppGpgM785beXgOJE2uko5s++996WRpRlm49wlU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=XAsZyBFgBvmCyJYNOA5gMQ0Hjd5g0b2JauD5ivtwX3eSyTC0z3RT9qEVMpjnOk4GJ3lyJ+4G2U9a52tqdG9Al/8SSJgiwUiS5eUy2Njy25obhGJutXI/t6GJoNNxRdSU1KK+srnduhBg4icBbI76uQEAKuhy9RWf/hpuWiqS1PU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEx4GWbu; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="xccUgyTX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SFArAdAUmZueUkSTLBMIx1+tKSwSKdsOu/uMh7GfjE0=; b=xccUgyTXcKgbIf1uYHfDyT6Mqv
-	Qd08MBfCj9tozkAkPRoRthixsR38CpIdRj6xIza+mWv3IOYXIMUjJcC+sUpxjaNWyyDdk787vPGWt
-	wiNh4mq6yPKquRAo/E44ad86pDeDPLe9O9AAz129Kfzrkcb/P3dxIYgu0RhFK3QgeZhDzLO5CPuG5
-	yJbT0vPjoEBoRQrqE9gMpmx07tlvN1pS9uL3b6KEmGrrp9dSSk49VHg+I4Q7C4Kh1E5VrIebHhSQC
-	FQfG2tiiGXxFm9+1nbGK6yvJt6k8E21SCNxrVyxLEataL1PxFfvzJIuA93qdIUS30dHAyrm2WgRMf
-	OUNif8LA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.98.2)
-	id 1utuVU-00000000mbi-363n;
-	Wed, 03 Sep 2025 17:55:04 -0300
-Message-ID: <2aabde07717d77556ef8a02a1716f881@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc: Ralph Boehme <slow@samba.org>, smfrench@gmail.com, Jean-Baptiste Denis
- <jbdenis@pasteur.fr>, Frank Sorenson <sorenson@redhat.com>, Olga
- Kornievskaia <okorniev@redhat.com>, Benjamin Coddington
- <bcodding@redhat.com>, Scott Mayhew <smayhew@redhat.com>,
- linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2] smb: client: fix data loss due to broken rename(2)
-In-Reply-To: <CAN05THQ0hGERkn+KVjbX_1z0AzZ4EeSBfjiQ_Ap=1+Ni4FGkQA@mail.gmail.com>
-References: <20250902165451.892165-1-pc@manguebit.org>
- <cd16cf45-efc8-4324-9d40-0b92f15f179a@samba.org>
- <da2380aa8e3718066bfc151bf60e54ea@manguebit.org>
- <d3702a1b-0dfc-4d56-8f0c-0cd588f151b2@samba.org>
- <faf6c4eaa69a36617d65327b98ed105d@manguebit.org>
- <CAN05THSWdDsuqBTkdL5H2tjBwNgPeO4k6fYFEqkYS_P3oc0t8Q@mail.gmail.com>
- <CAN05THSmQ-75m4dVDBiXoLLNcXnMCJbnCVCK-=ev0F98eDDwxg@mail.gmail.com>
- <28081fd56fa72705de6616f5c29f3695@manguebit.org>
- <CAN05THQ0hGERkn+KVjbX_1z0AzZ4EeSBfjiQ_Ap=1+Ni4FGkQA@mail.gmail.com>
-Date: Wed, 03 Sep 2025 17:55:04 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEx4GWbu"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-7209bd264f0so18755746d6.1;
+        Wed, 03 Sep 2025 19:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1756954005; x=1757558805; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3IhbpWeMVcBjFY/vJMFt8gcYgr0JiVin6Pv1b6AVKHA=;
+        b=dEx4GWbu+ddfX2BmAeafY0aN34DC7vzvNQwGeoepNbeqtptt0/ozRu/6L6kdDwSg8y
+         gDgZEsgFVwLxXVHctWVx7vWn1ie0CU34ArZxtuiFMss3bAYzNz1WLrB5Ds4NO8/NVos1
+         k7sshqFiLb2F4f66ue1LcQcR6Ln4/FDlTeLF5NxC/Xr6kTvIzoCTA+gKo15QIMG3EEFN
+         UgL+J0Qb9QZhhKSnX924zkR7OaLEwGYGsXb8Nh8G+oFZYEV52tcmm5mdOV+Fz3WSMukz
+         /8+X83/WMwE8ttORJfTtEKCqXHKA8Eo4nZ9ctAkj+nwYdHnIiOxZGNeX/ro8YeDu/190
+         bTWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1756954005; x=1757558805;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3IhbpWeMVcBjFY/vJMFt8gcYgr0JiVin6Pv1b6AVKHA=;
+        b=Hf53wS2FBe27lMGuXIZsM2mw9JLz+NirUOs4IJT6s4n4B5zUkJQ48sK81dYOIvaZyK
+         7n/k1VdlT9iD2/SVK111tkNw+9OT3vmRiZiWuhV6H5Zcy0gzM2DZZPZGzlqcmUEJYCyH
+         miqer3peW5M05+ZGz+zNdvzPiyJOeu0R9PxfhldsCig31hXhQfGrj3fybokIOhAXsHOd
+         jv6q6JhJOxfV3OPRdYSLTfHH8d10hmK8MLIKZYZQNhC3BLjLJPUMdI5jlFUbb/wVqF2e
+         npgFgyIazmAokG4J13m3gK2xqL3TA/+wCSHOEV2WQ0yaA0ZSF9RHm18EZT2ryFe46iOV
+         lXVg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1XfrFHS6UYdN+pOjrkSBLiQDrorU/5yopjE0myQO16eR4UHLxLUOWiozr0lShNrQrvfFhMc/TW5hNwh/2@vger.kernel.org, AJvYcCWs29XRIOqXXiWSXREXY21h6c/mGYHSfol4s2M2JGTiXxbfhN/SZmeh/veUF/5E8Pc/0AlS4wtonLCU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOwxKLkGMQkuHL/vm0cB4THG/2VANxBrfn0sM9W5Pvin8ArR7E
+	/SGf4N1wdK6EXWmkyXGTWIPMwNeNAQgtPQevAovwia2Lu6Yqtzf57cmq6PO33gl/BrYX0tydJjb
+	cVFzxPEEcK+hQGuPxQDxtpP9+TvhoIqI=
+X-Gm-Gg: ASbGncuxJrgl6gGPNQ3GQkGMLsmZGIFpM4A49taSMNHzLTvE7DA3XDDvaXTWo7jZNh/
+	U8fli++CFCmdYChMyap/WxTDs/GqZF8Km82DuEyIHV36KkASu7cU1rJ2co+s+1kNm542eohDnsn
+	t5T5PUrktRZiOvn0b8IAFvYm6/OyefWA83zbDTwrW1HUQ7GE2/5iOxpk9FAeNNF5mZL2TE7qoj7
+	FZsjR0YdxgYLsdU6wfE6NLqI0DuaXnfuTB9LBbrVsKxOX9fZxl1+qwTV+LXhcHyP246dfnlTCTo
+	H/ugx+ThEaVX1lCuvme30NBE+9HWDiovV2yBAMvUyAiaSWNbTAj4EanHn2IvXoDZgl4XHNOiEFr
+	6
+X-Google-Smtp-Source: AGHT+IGytADtHdg1qJ4UWeh3qQAmZx2u7rgOEcAoWiD4v/EzjzcDZni4g+vvDW9wNW4rCG4X1sr3dMWLlR0QEkxHbVI=
+X-Received: by 2002:a05:6214:260b:b0:721:f163:8678 with SMTP id
+ 6a1803df08f44-721f1638732mr78294166d6.30.1756954005044; Wed, 03 Sep 2025
+ 19:46:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 3 Sep 2025 21:46:33 -0500
+X-Gm-Features: Ac12FXwB7M1Hr0IivoMKxINa1EzgkBmxbSmeNOoR8dzN5iNhTHNEfoveeDbDXME
+Message-ID: <CAH2r5muAY1obqbwyP_KR_mZedEaARQhMyDyKenDv4UOW3cD4bA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-ronnie sahlberg <ronniesahlberg@gmail.com> writes:
+Please pull the following changes since commit
+b320789d6883cc00ac78ce83bccbfe7ed58afcf0:
 
-> On Thu, 4 Sept 2025 at 06:28, Paulo Alcantara <pc@manguebit.org> wrote:
->>
->> ronnie sahlberg <ronniesahlberg@gmail.com> writes:
->>
->> > On Thu, 4 Sept 2025 at 05:55, ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
->> >>
->> >> On Thu, 4 Sept 2025 at 04:46, Paulo Alcantara <pc@manguebit.org> wrote:
->> >> >
->> >> > Ralph Boehme <slow@samba.org> writes:
->> >> >
->> >> > > Hi Paulo,
->> >> > >
->> >> > > On 9/2/25 9:09 PM, Paulo Alcantara wrote:
->> >> > >> Ralph Boehme <slow@samba.org> writes:
->> >> > >>
->> >> > >>> Why not simply fail the rename instead of trying to implement some
->> >> > >>> clever but complex and error prone fallback?
->> >> > >>
->> >> > >> We're doing this for SMB1 for a very long time and haven't heard of any
->> >> > >> issues so far.  I've got a "safer" version [1] that does everything a
->> >> > >> single compound request but then implemented this non-compound version
->> >> > >> due to an existing Azure bug that seems to limit the compound in 4
->> >> > >> commands, AFAICT.  Most applications depend on such behavior working,
->> >> > >> which is renaming open files.
->> >> > >
->> >> > > maybe I'm barking of the wrong tree, but you *can* rename open files:
->> >> > >
->> >> > > $ bin/smbclient -U 'USER%PASS' //IP/C\$
->> >> > > smb: \> cd Users\administrator.WINCLUSTER\Desktop\
->> >> > > smb: \Users\administrator.WINCLUSTER\Desktop\> open
->> >> > > t-ph-oplock-b-downgraded-s.cab
->> >> > > open file
->> >> > > \Users\administrator.WINCLUSTER\Desktop\t-ph-oplock-b-downgraded-s.cab:
->> >> > > for read/write fnum 1
->> >> > > smb: \Users\administrator.WINCLUSTER\Desktop\> rename
->> >> > > t-ph-oplock-b-downgraded-s.cab renamed
->> >> > > smb: \Users\administrator.WINCLUSTER\Desktop\>
->> >> > >
->> >> > > ...given the open is with SHARE_DELETE (had to tweak smbclient to
->> >> > > actually allow that).
->> >> >
->> >> > Interesting.
->> >> >
->> >> > cifs.ko will get STATUS_ACCESS_DENIED when attempting to rename the open
->> >> > file.  The file was open with SHARE_READ|SHARE_WRITE|SHARE_DELETE, BTW.
->> >> >
->> >> > Also, note that cifs.ko will not reuse the open handle, rather it will
->> >> > send a compound request of create+set_info(rename)+close to the file
->> >> > which will fail with STATUS_ACCESS_DENIED.
->> >> >
->> >> > What am I missing?
->> >> >
->> >> > > If the rename destination is open and the server rightly fails the
->> >> > > rename for that reason, then masking that error is a mistake imho.
->> >> > >
->> >> > > When doing
->> >> > >
->> >> > > $ mv a b
->> >> > >
->> >> > > the user asked to rename a, he did NOT ask to rename b which becomes
->> >> > > important, because if you do
->> >> > >
->> >> > > rename("b", ".renamehackXXXX")
->> >> > >
->> >> > > under the hood and then reattempt the rename
->> >> > >
->> >> > > rename("a", "b")
->> >> > >
->> >> > > and then the user subsequently does
->> >> > >
->> >> > > $ mv b ..
->> >> > > $ cd ..
->> >> > > $ rmdir DIR
->> >> > >
->> >> > > where DIR is the directory all of the above was performed inside, the
->> >> > > rmdir will fail with ENOTEMPTY and *now* the user is confused.
->> >> >
->> >> > Yes, I understand your point.  That's really confusing.
->> >> >
->> >> > How can we resolve above cases without performing the silly renames
->> >> > then?
->> >> >
->> >>
->> >> I think you can't.  CIFS, without the posix extensions, is basically
->> >> not posix and never will be.
->> >> You can make it close but it will never be perfect and you will have
->> >> to decide on how/what posix semantics you need to give up.
->> >>
->> >> What compounds the issue is that cifs on linux (without the posix
->> >> extensions) will also always be a second class citizen.
->> >> Genuine windows clients own this protocol and they expect their own
->> >> non-posix semantics for their vfs, so you can't do anything that
->> >> impacts windows clients, they are the first class citizen here.
->> >>
->> >> The two main issues I see with the silly renames are the "-ENOTEMPTY"
->> >> error when trying to delete the "empty" directory, but also
->> >> that you can not hide them from windows clients. And what happens if
->> >> the windows clients start accessing them?
->> >>
->> >> I think the only real solution is to say "if you need posix semantics
->> >> then you need to use the posix extensions".
->> >
->> > Another potential issue is about QUERY_INFO.
->> > Many of the information classes in FSCC return the filename as as part
->> > of the data.
->> > What filename should be returned for a silly renamed file?
->> >
->> > Maybe it doesn't matter  but maybe there is some obscure windows
->> > application out there that do care and gets surprised.
->>
->> I don't think that matters as file deletion is pending on the server and
->> QUERY_INFO won't work.
->>
->> What am I missing?
->
-> You missed nothing. I didn't think it through.
->
-> But another potential issue is the possibility of a DOS from malicious
-> windows clients.
-> If the files are "hidden" from linux clients.
-> How would a linux client recover if a maliciious windows client just
-> creates an ordinary file with a filename that matches the "silly
-> rename prefix".
-> The file can not be seen or deleted from linux clients and thus the
-> directory becomes undeletable too?
+  Linux 6.17-rc4 (2025-08-31 15:33:07 -0700)
 
-Yes, that's a good point.  Thanks!
+are available in the Git repository at:
 
-One way to solve that would be doing something similar as AFS currently
-does, which is finding the next non-existing silly filename that could
-used by calling lookup_noperm() and then incrementing @sillycounter
-until it gets the first negative dentry.
+  git://git.samba.org/ksmbd.git tags/v6.17-rc4-ksmbd-fix
+
+for you to fetch changes up to b5ee94ac651aa42612095c4a75ff7f5c47cd9315:
+
+  ksmbd: allow a filename to contain colons on SMB3.1.1 posix
+extensions (2025-08-31 17:48:38 -0500)
+
+----------------------------------------------------------------
+ksmbd server fix
+- fix handling filenames with ":" (colon) in them
+----------------------------------------------------------------
+Philipp Kerling (1):
+      ksmbd: allow a filename to contain colons on SMB3.1.1 posix extensions
+
+ fs/smb/server/smb2pdu.c   | 25 ++++++++++++++-----------
+ fs/smb/server/vfs_cache.h |  2 ++
+ 2 files changed, 16 insertions(+), 11 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
