@@ -1,339 +1,122 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE99B3164D7;
-	Thu,  4 Sep 2025 18:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18A279DA8
+	for <linux-cifs@vger.kernel.org>; Thu,  4 Sep 2025 21:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757010434; cv=none; b=j0GXd6bP3z/6PE3t/G/+D7u8SWdvqzpK3rkVbg8QziJMe7OTZhuLilyqHwCpPaH0co5OTFfuKz2pebbCj7t9Ps+KbA93b+fCcnr6Y20Iv+ByvVtCfezkYIaueKqjs6JBBNtGeeKrP4A0VZl4AHiBvUpMFinXnBEYEhNOctqCRfs=
+	t=1757020733; cv=none; b=fG7Ae841rAWyQwUa0SlqeQfMLjya6mT4H15GgSEU6GXIA2TQGx7k5UVFPyrPc+SKMTqP33K/OnQ3iVmYRsPBgkwYSCPiEp0IPODPHWHyTRGtJuk2/8oTpRZqJ6DjnsFg0wS3e0tNEFFSnv0z7skb4OfFgs6YE8hFG5IfnTr/5z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757010434; c=relaxed/simple;
-	bh=lVQu9EhBxvprTqLExHhnaoGxwwD4eVMuREz06ELDQMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K5NT73S2NWrcXpag/dJ3/5HFPf0qWGd+FpujnWNgJPEj2IJZ01soCvrUggOzLO/ME8M4vCEtqLjTcOvlFEWKe+nbDU4wy/OOVwSY+GjAffLShWHDUivqXqOaYgGB/wBsjRlSQ6rLFtJqi5JWl6Kh/sUuLkEvOi8wbVQnJ1vsmQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=NjjbSXCA; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1757020733; c=relaxed/simple;
+	bh=toUy770fWT5ZQQS6Bye69imEYlcZlWlQHnEEVSfF/jU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tyw87qOTH7jCiyN7SW7Ndax5mVrlfF1YNYhFwEjS5nIt2hNR9Dkxh80m9/Ugxt0uKedy2BiRN96ZOYi+1rWaHP6mxu5mxQ6H+yiYVCkNmGpx+ZOI1wUzWvG6PQvyDbIOc4CWn6gnOWqE7LKiaUKOGhKbqdgbmZWqM+J6zENB83E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R5PpxJEV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="NjjbSXCA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=oZU94zf4qOJWw3Y2ZIiCNprOQcuL1l2VPK5OelIsrbE=; b=NjjbSXCAQtBGV5wQLLT7IUmjFO
-	/jNi0fedqCva+rqPsXLMO0CSGqxRUt035VdnCkdp5Y5LXQh/6CjwYlFDJ3goM0QMp/m8jDT6JCCvw
-	vIzxUOm8xhmIP8jYYX9rN2Fo7aYs2414FUxkT6LKH4KZp+NxeZEYyPVUtwytbX774y2qNbU4pxFrb
-	X3ENp4iyL2Js+GdBbQ5CskYw10fk7lsATkBkce87LQO40KzOOlAhbplNDGtYnS90OTNc9X1KKIrfB
-	hdC2fihRhu3qJsdA/f3xh0hl6B/U1DZVUbiIZii9p/Wgocavq8jCgFHWHsDxuHhJbrqdBHOqS2Hoe
-	9mcA4k/6hegR6do3sVlOCkUTr/1UbcJ/7yknVUkHpLoAKD+sjlQ7f0nzNqU4OdulQL6DCw7vATRR5
-	EA7320Xi0X40YhY8LMwk2XAzu4Uz+BuComAyr9sMRHyhPUGD7fwCC1Msppe+QCX7a6ZmD+0SjXNX8
-	oW/kPPu/kwBQksz7SzNqUGHt;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uuEft-002S3j-2a;
-	Thu, 04 Sep 2025 18:27:09 +0000
-Message-ID: <f88d11c2-f716-4f5d-ab37-fec73f2f5d97@samba.org>
-Date: Thu, 4 Sep 2025 20:27:09 +0200
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5PpxJEV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757020730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1iJ0BuIyKASK0eSWO2S5y6aZpYu0xtpDA/7PvZ3J/90=;
+	b=R5PpxJEVGzcBYl/vFRXRj15XdYGV2HNJewkJ8c7x4WuNKJW47VTObUM4tGYa6PXkP54O3W
+	2GIs3nlpH5ppH1qAZ6ZY6y+Q44ITAme9ZP90xfBMjKuixbKzEovYdr8OB8N84ypFKDj6uL
+	3trNW+5V0lK+wQZWqjO0bRsne3esC+A=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-494-HiyZMTghMRGnWATvJvbbZA-1; Thu,
+ 04 Sep 2025 17:18:45 -0400
+X-MC-Unique: HiyZMTghMRGnWATvJvbbZA-1
+X-Mimecast-MFC-AGG-ID: HiyZMTghMRGnWATvJvbbZA_1757020724
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F3CB1800378;
+	Thu,  4 Sep 2025 21:18:44 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.6])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C2A5B3002D27;
+	Thu,  4 Sep 2025 21:18:42 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	linux-cifs@vger.kernel.org
+Subject: [RFC PATCH 0/2] cifs: Organise declarations in the cifs client header files
+Date: Thu,  4 Sep 2025 22:18:31 +0100
+Message-ID: <20250904211839.1152340-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: server: let smb_direct_writev() respect
- SMB_DIRECT_MAX_SEND_SGES
-To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
- Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- linux-rdma@vger.kernel.org
-References: <20250904181059.1594876-1-metze@samba.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250904181059.1594876-1-metze@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 Hi Steve,
 
-this is intended for 6.17 as it fixes a deadlock I was
-hitting when I run generic/011. I don't know why it only
-happened starting last Friday. I first thought it was a regression
-introduced by the patches I was working on on Friday, but
-after days of debugging using bpfstrace I noticed siw_post_send()
-was called twice with the same qp->sq_get/set values while still
-returning 0, as a result smb_direct_writev() was waiting forever
-for a completion and st->send_pending becoming 0.
+Would you be interested in this pair of patches?  The second patch
+organises the declarations in the cifs client header files, naming the
+arguments the same as for the implementations, inserting divider comments,
+ordering them the same as they're found in the files and dividing them
+better between general, smb1 and smb2/3 categories.
 
-         wait_event(st->wait_send_pending,
-                    atomic_read(&st->send_pending) == 0);
+The organisation is entirely scripted with the script in the second patch's
+commit message.  The first patch does a bit of preparation to make sure
+that the second patch's output will build.
 
-This requires the patches in for-next-next to be rebased on top
-and this will generate some complicts I need to resolve.
-Should I post a v5 of the patches or should I provide a branch
-that can replace for-next-next?
+David
 
-With this fix the siw.ko patch is optional for ksmbd a usecase,
-but it can be found here if someone is looking for it:
-https://lore.kernel.org/linux-rdma/20250904173608.1590444-1-metze@samba.org/
+David Howells (2):
+  cifs: Do some preparation prior to organising the function
+    declarations
+  cifs: Clean up declarations
 
-Thanks!
-metze
-
-Am 04.09.25 um 20:10 schrieb Stefan Metzmacher:
-> We should not use more sges for ib_post_send() than we told the rdma
-> device in rdma_create_qp()!
-> 
-> Otherwise ib_post_send() will return -EINVAL, so we disconnect the
-> connection. Or with the current siw.ko we'll get 0 from ib_post_send(),
-> but will never ever get a completion for the request. I've already sent a
-> fix for siw.ko...
-> 
-> So we need to make sure smb_direct_writev() limits the number of vectors
-> we pass to individual smb_direct_post_send_data() calls, so that we
-> don't go over the queue pair limits.
-> 
-> Commit 621433b7e25d ("ksmbd: smbd: relax the count of sges required")
-> was very strange and I guess only needed because
-> SMB_DIRECT_MAX_SEND_SGES was 8 at that time. It basically removed the
-> check that the rdma device is able to handle the number of sges we try
-> to use.
-> 
-> While the real problem was added by commit ddbdc861e37c ("ksmbd: smbd:
-> introduce read/write credits for RDMA read/write") as it used the
-> minumun of device->attrs.max_send_sge and device->attrs.max_sge_rd, with
-> the problem that device->attrs.max_sge_rd is always 1 for iWarp. And
-> that limitation should only apply to RDMA Read operations. For now we
-> keep that limitation for RDMA Write operations too, fixing that is a
-> task for another day as it's not really required a bug fix.
-> 
-> Commit 2b4eeeaa9061 ("ksmbd: decrease the number of SMB3 smbdirect
-> server SGEs") lowered SMB_DIRECT_MAX_SEND_SGES to 6, which is also used
-> by our client code. And that client code enforces
-> device->attrs.max_send_sge >= 6 since commit d2e81f92e5b7 ("Decrease the
-> number of SMB3 smbdirect client SGEs") and (briefly looking) only the
-> i40w driver provides only 3, see I40IW_MAX_WQ_FRAGMENT_COUNT. But
-> currently we'd require 4 anyway, so that would not work anyway, but now
-> it fails early.
-> 
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Steve French <smfrench@gmail.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Hyunchul Lee <hyc.lee@gmail.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: linux-rdma@vger.kernel.org
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-> Fixes: ddbdc861e37c ("ksmbd: smbd: introduce read/write credits for RDMA read/write")
-> Fixes: 621433b7e25d ("ksmbd: smbd: relax the count of sges required")
-> Fixes: 2b4eeeaa9061 ("ksmbd: decrease the number of SMB3 smbdirect server SGEs")
-> Signed-off-by: Stefan Metzmacher <metze@samba.org>
-> ---
->   fs/smb/server/transport_rdma.c | 157 ++++++++++++++++++++++-----------
->   1 file changed, 107 insertions(+), 50 deletions(-)
-> 
-> diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-> index 6cfca9a00060..3fb1b797a080 100644
-> --- a/fs/smb/server/transport_rdma.c
-> +++ b/fs/smb/server/transport_rdma.c
-> @@ -1219,78 +1219,130 @@ static int smb_direct_writev(struct ksmbd_transport *t,
->   			     bool need_invalidate, unsigned int remote_key)
->   {
->   	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
-> -	int remaining_data_length;
-> -	int start, i, j;
-> -	int max_iov_size = st->max_send_size -
-> +	size_t remaining_data_length;
-> +	size_t iov_idx;
-> +	size_t iov_ofs;
-> +	size_t max_iov_size = st->max_send_size -
->   			sizeof(struct smb_direct_data_transfer);
->   	int ret;
-> -	struct kvec vec;
->   	struct smb_direct_send_ctx send_ctx;
-> +	int error = 0;
->   
->   	if (st->status != SMB_DIRECT_CS_CONNECTED)
->   		return -ENOTCONN;
->   
->   	//FIXME: skip RFC1002 header..
-> +	if (WARN_ON_ONCE(niovs <= 1 || iov[0].iov_len != 4))
-> +		return -EINVAL;
->   	buflen -= 4;
-> +	iov_idx = 1;
-> +	iov_ofs = 0;
->   
->   	remaining_data_length = buflen;
->   	ksmbd_debug(RDMA, "Sending smb (RDMA): smb_len=%u\n", buflen);
->   
->   	smb_direct_send_ctx_init(st, &send_ctx, need_invalidate, remote_key);
-> -	start = i = 1;
-> -	buflen = 0;
-> -	while (true) {
-> -		buflen += iov[i].iov_len;
-> -		if (buflen > max_iov_size) {
-> -			if (i > start) {
-> -				remaining_data_length -=
-> -					(buflen - iov[i].iov_len);
-> -				ret = smb_direct_post_send_data(st, &send_ctx,
-> -								&iov[start], i - start,
-> -								remaining_data_length);
-> -				if (ret)
-> +	while (remaining_data_length) {
-> +		struct kvec vecs[SMB_DIRECT_MAX_SEND_SGES - 1]; /* minus smbdirect hdr */
-> +		size_t possible_bytes = max_iov_size;
-> +		size_t possible_vecs;
-> +		size_t bytes = 0;
-> +		size_t nvecs = 0;
-> +
-> +		/*
-> +		 * For the last message remaining_data_length should be
-> +		 * have been 0 already!
-> +		 */
-> +		if (WARN_ON_ONCE(iov_idx >= niovs)) {
-> +			error = -EINVAL;
-> +			goto done;
-> +		}
-> +
-> +		/*
-> +		 * We have 2 factors which limit the arguments we pass
-> +		 * to smb_direct_post_send_data():
-> +		 *
-> +		 * 1. The number of supported sges for the send,
-> +		 *    while one is reserved for the smbdirect header.
-> +		 *    And we currently need one SGE per page.
-> +		 * 2. The number of negotiated payload bytes per send.
-> +		 */
-> +		possible_vecs = min_t(size_t, ARRAY_SIZE(vecs), niovs - iov_idx);
-> +
-> +		while (iov_idx < niovs && possible_vecs && possible_bytes) {
-> +			struct kvec *v = &vecs[nvecs];
-> +			int page_count;
-> +
-> +			v->iov_base = ((u8 *)iov[iov_idx].iov_base) + iov_ofs;
-> +			v->iov_len = min_t(size_t,
-> +					   iov[iov_idx].iov_len - iov_ofs,
-> +					   possible_bytes);
-> +			page_count = get_buf_page_count(v->iov_base, v->iov_len);
-> +			if (page_count > possible_vecs) {
-> +				/*
-> +				 * If the number of pages in the buffer
-> +				 * is to much (because we currently require
-> +				 * one SGE per page), we need to limit the
-> +				 * length.
-> +				 *
-> +				 * We know possible_vecs is at least 1,
-> +				 * so we always keep the first page.
-> +				 *
-> +				 * We need to calculate the number extra
-> +				 * pages (epages) we can also keep.
-> +				 *
-> +				 * We calculate the number of bytes in the
-> +				 * first page (fplen), this should never be
-> +				 * larger than v->iov_len because page_count is
-> +				 * at least 2, but adding a limitation feels
-> +				 * better.
-> +				 *
-> +				 * Then we calculate the number of bytes (elen)
-> +				 * we can keep for the extra pages.
-> +				 */
-> +				size_t epages = possible_vecs - 1;
-> +				size_t fpofs = offset_in_page(v->iov_base);
-> +				size_t fplen = min_t(size_t, PAGE_SIZE - fpofs, v->iov_len);
-> +				size_t elen = min_t(size_t, v->iov_len - fplen, epages*PAGE_SIZE);
-> +
-> +				v->iov_len = fplen + elen;
-> +				page_count = get_buf_page_count(v->iov_base, v->iov_len);
-> +				if (WARN_ON_ONCE(page_count > possible_vecs)) {
-> +					/*
-> +					 * Something went wrong in the above
-> +					 * logic...
-> +					 */
-> +					error = -EINVAL;
->   					goto done;
-> -			} else {
-> -				/* iov[start] is too big, break it */
-> -				int nvec  = (buflen + max_iov_size - 1) /
-> -						max_iov_size;
-> -
-> -				for (j = 0; j < nvec; j++) {
-> -					vec.iov_base =
-> -						(char *)iov[start].iov_base +
-> -						j * max_iov_size;
-> -					vec.iov_len =
-> -						min_t(int, max_iov_size,
-> -						      buflen - max_iov_size * j);
-> -					remaining_data_length -= vec.iov_len;
-> -					ret = smb_direct_post_send_data(st, &send_ctx, &vec, 1,
-> -									remaining_data_length);
-> -					if (ret)
-> -						goto done;
->   				}
-> -				i++;
-> -				if (i == niovs)
-> -					break;
->   			}
-> -			start = i;
-> -			buflen = 0;
-> -		} else {
-> -			i++;
-> -			if (i == niovs) {
-> -				/* send out all remaining vecs */
-> -				remaining_data_length -= buflen;
-> -				ret = smb_direct_post_send_data(st, &send_ctx,
-> -								&iov[start], i - start,
-> -								remaining_data_length);
-> -				if (ret)
-> -					goto done;
-> -				break;
-> +			possible_vecs -= page_count;
-> +			nvecs += 1;
-> +			possible_bytes -= v->iov_len;
-> +			bytes += v->iov_len;
-> +
-> +			iov_ofs += v->iov_len;
-> +			if (iov_ofs >= iov[iov_idx].iov_len) {
-> +				iov_idx += 1;
-> +				iov_ofs = 0;
->   			}
->   		}
-> +
-> +		remaining_data_length -= bytes;
-> +
-> +		ret = smb_direct_post_send_data(st, &send_ctx,
-> +						vecs, nvecs,
-> +						remaining_data_length);
-> +		if (unlikely(ret)) {
-> +			error = ret;
-> +			goto done;
-> +		}
->   	}
->   
->   done:
->   	ret = smb_direct_flush_send_list(st, &send_ctx, true);
-> +	if (unlikely(!ret && error))
-> +		ret = error;
->   
->   	/*
->   	 * As an optimization, we don't wait for individual I/O to finish
-> @@ -1757,6 +1809,11 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
->   		return -EINVAL;
->   	}
->   
-> +	if (device->attrs.max_send_sge < SMB_DIRECT_MAX_SEND_SGES) {
-> +		pr_err("warning: device max_send_sge = %d too small\n",
-> +		       device->attrs.max_send_sge);
-> +		return -EINVAL;
-> +	}
->   	if (device->attrs.max_recv_sge < SMB_DIRECT_MAX_RECV_SGES) {
->   		pr_err("warning: device max_recv_sge = %d too small\n",
->   		       device->attrs.max_recv_sge);
-> @@ -1780,7 +1837,7 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
->   
->   	cap->max_send_wr = max_send_wrs;
->   	cap->max_recv_wr = t->recv_credit_max;
-> -	cap->max_send_sge = max_sge_per_wr;
-> +	cap->max_send_sge = SMB_DIRECT_MAX_SEND_SGES;
->   	cap->max_recv_sge = SMB_DIRECT_MAX_RECV_SGES;
->   	cap->max_inline_data = 0;
->   	cap->max_rdma_ctxs = t->max_rw_credits;
+ fs/smb/client/cached_dir.h    |   19 -
+ fs/smb/client/cifs_debug.c    |    4 +-
+ fs/smb/client/cifs_debug.h    |    5 -
+ fs/smb/client/cifs_spnego.h   |    2 -
+ fs/smb/client/cifs_swn.h      |   15 +-
+ fs/smb/client/cifs_unicode.c  |    1 +
+ fs/smb/client/cifs_unicode.h  |   16 -
+ fs/smb/client/cifsacl.c       |    1 +
+ fs/smb/client/cifsfs.c        |    5 +-
+ fs/smb/client/cifsfs.h        |   64 --
+ fs/smb/client/cifsglob.h      |   19 +-
+ fs/smb/client/cifspdu.h       |   12 -
+ fs/smb/client/cifsproto.h     | 1228 ++++++++++++++++-----------------
+ fs/smb/client/cifssmb.c       |    1 +
+ fs/smb/client/cifstransport.c |    1 +
+ fs/smb/client/compress.c      |   15 +
+ fs/smb/client/compress.h      |   18 +-
+ fs/smb/client/connect.c       |    1 +
+ fs/smb/client/dfs.h           |    4 -
+ fs/smb/client/dfs_cache.h     |   16 -
+ fs/smb/client/dir.c           |    1 +
+ fs/smb/client/dns_resolve.h   |    3 -
+ fs/smb/client/file.c          |    1 +
+ fs/smb/client/fs_context.c    |    2 +-
+ fs/smb/client/fs_context.h    |    9 -
+ fs/smb/client/fscache.h       |   13 +-
+ fs/smb/client/inode.c         |    1 +
+ fs/smb/client/ioctl.c         |    1 +
+ fs/smb/client/link.c          |    1 +
+ fs/smb/client/misc.c          |    1 +
+ fs/smb/client/netlink.h       |    3 -
+ fs/smb/client/netmisc.c       |    2 +-
+ fs/smb/client/nterr.h         |    2 -
+ fs/smb/client/ntlmssp.h       |   13 -
+ fs/smb/client/reparse.h       |   11 -
+ fs/smb/client/sess.c          |    1 +
+ fs/smb/client/smb1ops.c       |    2 +
+ fs/smb/client/smb1proto.h     |  230 ++++++
+ fs/smb/client/smb2pdu.h       |    2 -
+ fs/smb/client/smb2proto.h     |  536 +++++++-------
+ fs/smb/client/smbdirect.h     |   27 +-
+ 41 files changed, 1157 insertions(+), 1152 deletions(-)
+ create mode 100644 fs/smb/client/smb1proto.h
 
