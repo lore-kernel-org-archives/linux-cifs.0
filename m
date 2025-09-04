@@ -1,123 +1,312 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D049A30BF62;
-	Thu,  4 Sep 2025 16:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E57341ACF;
+	Thu,  4 Sep 2025 18:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757004339; cv=none; b=a8TDDYizp/glSXsCfjbMvrReQlQKM6QJzgQgWs6aELxjCfMyEsd699803T8bngjKlBQZBEdLhAtUAfR3I2dXlbcKyKro5AzCxn9/K/HqKhRNnlxyoncI4KHTpTROB19/HPZlgCYShsIAumNQmz0kgpUJi/YGBDLt5JDTSbw0u1A=
+	t=1757009478; cv=none; b=dnPN5hYYPSs7Cvmbtj2wgz+uJzY8TdR+bovTOXQUKrjdlKelH6M3+OdAhEHrTNhYz9S2vyiBNAJpyvVCLIFka9zL4y7r0npTPjAn7TT0asL6NwkFn55pjHuG6mBezJJ/WicKR5ilrx96QQzHYhK4Z+4ik9Y64/hB1WE7kd/Byjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757004339; c=relaxed/simple;
-	bh=z58fohIHjEeQhEpGCki3vj0PFTuHZ0s0bq9O6Orn1Hk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Us0INkKyIrz54gCNDIe2qEsuu3PiTZVx6nvmGHmb480fqlyrZpYKI/OK8ezMYDsUBkruEXqoTHOX0nMv8deCeo8c0ILQivghO9C+n0FoTI2AdgbdgMql4emMddIpAV0pifgZvPljmhBJ9kpXp+Q9K2/8poAJ1py59Nxm7ppsKfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TuqE+LEe; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1757009478; c=relaxed/simple;
+	bh=jJrDOxd3dLrB1uSC4dO4POJ7QpSpLTBVDZrUf0xF9Wc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ByBn3Ml44Jgl10tkKY3qHW7NZMOJxRN5BnGGqvzOpgidDfYYuOUpjWJtRM/tWw8zoYQRn3kRso9iD7Iv/zFYmzlEAE2PK88a8OFCHkQAF69hSPMgmgkwiXofuvWaivnySEPsZMMXREMlqhxfRQ89eMCvrgtMaxJRKFiaAZD/454=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Nch4Okn3; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuqE+LEe"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-722d5d8fa11so9703136d6.3;
-        Thu, 04 Sep 2025 09:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757004337; x=1757609137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ia2wL09QeCuJKNsIERP8tUdHVHMgM08COMkA9RM3w9s=;
-        b=TuqE+LEe6XrUKi5k8YtEnASxH5vkF6UDPfqVBoTey0p4bKZOQEdIRk80jitzTw6oID
-         Jzcx4CpAztPp7oOlZvSmrZgf6Yn+ud9D3v+Fty1Mv4Bhoi7j5oYZI9Ecf7RmggHvfO77
-         t7PzdlkWPfSKXh01BpXCtUmnWX81nv8S+cLioZFTLjrTZQaHOs22XF0yelKpyyo5Ci5z
-         XD/Ag/YyEDOAjIqHjlWVM1b7eAcn4o7mzminxwPVQa0WJHVa5sPiEgXT6Ha3454CLjd5
-         vqB2b/fKxzvHgfB86URAFkyOL8mLbaCLz3DApU9lLqYq8UbXLuwlPBHTcC8fIR6MigOb
-         c+jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757004337; x=1757609137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ia2wL09QeCuJKNsIERP8tUdHVHMgM08COMkA9RM3w9s=;
-        b=osSfhz2sXm/syZ9PWW1GVgQCyBIm7TZZ2h8N9bo1g7OSoD36HhGDaqH1bNwmAtIUHV
-         VTFA5Nskt/VOKEIKr7LcDZmCiXjNlplP7q6+rpEnwlu/vrLXg/Pw1aoLfgYTlYODz2nr
-         5R/7vRqPnHId5q5sC+gSwKlPSnZttFGbr4gGKhtbtO/DR/OSAPnZwExcID3cGvByvJJ/
-         nEg6tr69r+C/m2DdKuesbz2AVrKteZpiig5NykfYgRHlcH8B28h9X8jt8EZnsX8kI9+9
-         ZAqVlrXUOX8psdf7E91Wk8qQtJbErpzUq3c9M3rtGtWztrH3CmafTebbWA3ZYbkSCfZ9
-         iO3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUMl8RU+5qeb++W3Kki0ynegwy77I9y5rlz6cwkiW/FhwrZPUEZmhAggCfmkDcF92t5iyKdR+JKvveG@vger.kernel.org, AJvYcCUzS5S1ddc0fh9Rb91Cv76cjUMBB2tby0TUDJMYDbuiVmKgW2Hm+dWW9StDSZgK6VIS1WdEnWH46UgIOET4@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnWQo627AwGuFEcvLy1WROPIEzyZ/A/YHU7QRMgGZnlOF3v2py
-	Z9jMdIkU+WqlH3JjJKjNui0qfg4WWKzBym9MhYrzn1zgRMjP6aFlyR7HhKS6XdN9E58bZ7OXO7V
-	sllJTJ0TFe2mr4rFgT0WdcFqXz3bbUtk=
-X-Gm-Gg: ASbGncuVM/Zpzzod+OpV42Tw9zzs8EXWy4CX211Z6XCuqj+l1qgJVeKIpAYfD+qxHiI
-	U4QmyaNDd36UptLs+GXPbXKoABaolNNdsZZViJcGqW1DHsXLtSBNnhfhI4eRsifrY1Z9vcDiCyQ
-	dXI0P88kKZ1t46SQ9AmygN8Be1spyGmXSyUBWo1fDtjgsfomMZuZhMSpfUWrwlhYQ8kuM/NTzEI
-	hXdHLfWVT7Finh/PWQyzQ7Gqb4sTS1ZLAl4/LdWJnqnj5P9JeJtCESWv+Hxt7lcEG77pgS3f7tL
-	RSIfNILfrfawpiMh+uMlugdWQnCXATLeFnqJkYwc6N5SKEGF7jj/EnGGkJUkpRQrrQ==
-X-Google-Smtp-Source: AGHT+IEOxRfRzqGB/cImgAzKezg7nrkWN8WIrkfhgbzxJ6FrrSUzVS8xZTgfzxjmRnWACFC/rVa5oZtvvBBmGBWnmqE=
-X-Received: by 2002:a05:6214:19e6:b0:729:9ec8:a1a6 with SMTP id
- 6a1803df08f44-7299ec8a2ccmr27704906d6.53.1757004336633; Thu, 04 Sep 2025
- 09:45:36 -0700 (PDT)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Nch4Okn3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=sIFnMhg6Zy70elxx9bXPS/PX1TWz6D8vQq0QtLRDqGk=; b=Nch4Okn3sxQD+2QZNepsDJuykg
+	LyD4+QP3fq3Y0EKZuTWhjS7apHnXeHymKEEGBVV1rnN9/H49QsNhvvdU2c1wL+JJvvGhFJOkK3eVU
+	NgOD9pUrXpcdj4+qer7g8NousfFl17WR4EuN9TKywVksIggg+QqWYCN5350284n/BN9ODrwp0yDqm
+	kyk+9nZNydqG1nxV9HSoW0JlyHtZsQfPtYkYGN/k1BioYB4MOmlTo49RAK0v7Z8YmvSCXPwZqEKeN
+	dR7p22Yi3unNrmT8h2cAgEThzjE2nP9VHRHFy7S4UJNLndmWgDfQU6OKKR29cuWqv2rstKPkT6x/A
+	54Kt8Agqk9v+9goB5A+t6UDOtgUPX168QMUSF5NS9IqFvVk17pmiyReDmes8K0uel/i9gUEy/CFG4
+	scT+rqUEzcT/MC9kcUCEMIQ9gWz0rh0wapyOxMfcQt191015AD7gDOWeyN8Jx5AdemNApD18pDhI7
+	2fABk2s9cVMEVnXgKArNpRcq;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1uuEQS-002Ru9-1i;
+	Thu, 04 Sep 2025 18:11:12 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Hyunchul Lee <hyc.lee@gmail.com>,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH] smb: server: let smb_direct_writev() respect SMB_DIRECT_MAX_SEND_SGES
+Date: Thu,  4 Sep 2025 20:10:59 +0200
+Message-ID: <20250904181059.1594876-1-metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250904122843.1681269-1-m.semenov@tssltd.ru>
-In-Reply-To: <20250904122843.1681269-1-m.semenov@tssltd.ru>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 4 Sep 2025 11:45:25 -0500
-X-Gm-Features: Ac12FXz8JCL0cueiu-FAiIyvutc7K5G4KwOL5gaJEZUTzbvJ9TsJjvr8PLVZ_uY
-Message-ID: <CAH2r5mugqRXD_OH5m_+1dyPyTEmH-Rpdq_6zDiGB8_XOHOMH9w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: prevent NULL pointer dereference in UTF16 conversion
-To: Makar Semyonov <m.semenov@tssltd.ru>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-merged into cifs-2.6.git for-next and added Cc: stable
+We should not use more sges for ib_post_send() than we told the rdma
+device in rdma_create_qp()!
 
-On Thu, Sep 4, 2025 at 7:36=E2=80=AFAM Makar Semyonov <m.semenov@tssltd.ru>=
- wrote:
->
-> There can be a NULL pointer dereference bug here. NULL is passed to
-> __cifs_sfu_make_node without checks, which passes it unchecked to
-> cifs_strndup_to_utf16, which in turn passes it to
-> cifs_local_to_utf16_bytes where '*from' is dereferenced, causing a crash.
->
-> This patch adds a check for NULL 'src' in cifs_strndup_to_utf16 and
-> returns NULL early to prevent dereferencing NULL pointer.
->
-> Found by Linux Verification Center (linuxtesting.org) with SVACE
->
-> Signed-off-by: Makar Semyonov <m.semenov@tssltd.ru>
-> ---
->  fs/smb/client/cifs_unicode.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
-> index 4cc6e0896fad..1a9324bec7d6 100644
-> --- a/fs/smb/client/cifs_unicode.c
-> +++ b/fs/smb/client/cifs_unicode.c
-> @@ -628,6 +628,9 @@ cifs_strndup_to_utf16(const char *src, const int maxl=
-en, int *utf16_len,
->  {
->         int len;
->         __le16 *dst;
-> +
-> +       if (!src)
-> +               return NULL;
->
->         len =3D cifs_local_to_utf16_bytes(src, maxlen, cp);
->         len +=3D 2; /* NULL */
-> --
-> 2.43.0
->
->
+Otherwise ib_post_send() will return -EINVAL, so we disconnect the
+connection. Or with the current siw.ko we'll get 0 from ib_post_send(),
+but will never ever get a completion for the request. I've already sent a
+fix for siw.ko...
 
+So we need to make sure smb_direct_writev() limits the number of vectors
+we pass to individual smb_direct_post_send_data() calls, so that we
+don't go over the queue pair limits.
 
---=20
-Thanks,
+Commit 621433b7e25d ("ksmbd: smbd: relax the count of sges required")
+was very strange and I guess only needed because
+SMB_DIRECT_MAX_SEND_SGES was 8 at that time. It basically removed the
+check that the rdma device is able to handle the number of sges we try
+to use.
 
-Steve
+While the real problem was added by commit ddbdc861e37c ("ksmbd: smbd:
+introduce read/write credits for RDMA read/write") as it used the
+minumun of device->attrs.max_send_sge and device->attrs.max_sge_rd, with
+the problem that device->attrs.max_sge_rd is always 1 for iWarp. And
+that limitation should only apply to RDMA Read operations. For now we
+keep that limitation for RDMA Write operations too, fixing that is a
+task for another day as it's not really required a bug fix.
+
+Commit 2b4eeeaa9061 ("ksmbd: decrease the number of SMB3 smbdirect
+server SGEs") lowered SMB_DIRECT_MAX_SEND_SGES to 6, which is also used
+by our client code. And that client code enforces
+device->attrs.max_send_sge >= 6 since commit d2e81f92e5b7 ("Decrease the
+number of SMB3 smbdirect client SGEs") and (briefly looking) only the
+i40w driver provides only 3, see I40IW_MAX_WQ_FRAGMENT_COUNT. But
+currently we'd require 4 anyway, so that would not work anyway, but now
+it fails early.
+
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Cc: linux-rdma@vger.kernel.org
+Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
+Fixes: ddbdc861e37c ("ksmbd: smbd: introduce read/write credits for RDMA read/write")
+Fixes: 621433b7e25d ("ksmbd: smbd: relax the count of sges required")
+Fixes: 2b4eeeaa9061 ("ksmbd: decrease the number of SMB3 smbdirect server SGEs")
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ fs/smb/server/transport_rdma.c | 157 ++++++++++++++++++++++-----------
+ 1 file changed, 107 insertions(+), 50 deletions(-)
+
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index 6cfca9a00060..3fb1b797a080 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -1219,78 +1219,130 @@ static int smb_direct_writev(struct ksmbd_transport *t,
+ 			     bool need_invalidate, unsigned int remote_key)
+ {
+ 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
+-	int remaining_data_length;
+-	int start, i, j;
+-	int max_iov_size = st->max_send_size -
++	size_t remaining_data_length;
++	size_t iov_idx;
++	size_t iov_ofs;
++	size_t max_iov_size = st->max_send_size -
+ 			sizeof(struct smb_direct_data_transfer);
+ 	int ret;
+-	struct kvec vec;
+ 	struct smb_direct_send_ctx send_ctx;
++	int error = 0;
+ 
+ 	if (st->status != SMB_DIRECT_CS_CONNECTED)
+ 		return -ENOTCONN;
+ 
+ 	//FIXME: skip RFC1002 header..
++	if (WARN_ON_ONCE(niovs <= 1 || iov[0].iov_len != 4))
++		return -EINVAL;
+ 	buflen -= 4;
++	iov_idx = 1;
++	iov_ofs = 0;
+ 
+ 	remaining_data_length = buflen;
+ 	ksmbd_debug(RDMA, "Sending smb (RDMA): smb_len=%u\n", buflen);
+ 
+ 	smb_direct_send_ctx_init(st, &send_ctx, need_invalidate, remote_key);
+-	start = i = 1;
+-	buflen = 0;
+-	while (true) {
+-		buflen += iov[i].iov_len;
+-		if (buflen > max_iov_size) {
+-			if (i > start) {
+-				remaining_data_length -=
+-					(buflen - iov[i].iov_len);
+-				ret = smb_direct_post_send_data(st, &send_ctx,
+-								&iov[start], i - start,
+-								remaining_data_length);
+-				if (ret)
++	while (remaining_data_length) {
++		struct kvec vecs[SMB_DIRECT_MAX_SEND_SGES - 1]; /* minus smbdirect hdr */
++		size_t possible_bytes = max_iov_size;
++		size_t possible_vecs;
++		size_t bytes = 0;
++		size_t nvecs = 0;
++
++		/*
++		 * For the last message remaining_data_length should be
++		 * have been 0 already!
++		 */
++		if (WARN_ON_ONCE(iov_idx >= niovs)) {
++			error = -EINVAL;
++			goto done;
++		}
++
++		/*
++		 * We have 2 factors which limit the arguments we pass
++		 * to smb_direct_post_send_data():
++		 *
++		 * 1. The number of supported sges for the send,
++		 *    while one is reserved for the smbdirect header.
++		 *    And we currently need one SGE per page.
++		 * 2. The number of negotiated payload bytes per send.
++		 */
++		possible_vecs = min_t(size_t, ARRAY_SIZE(vecs), niovs - iov_idx);
++
++		while (iov_idx < niovs && possible_vecs && possible_bytes) {
++			struct kvec *v = &vecs[nvecs];
++			int page_count;
++
++			v->iov_base = ((u8 *)iov[iov_idx].iov_base) + iov_ofs;
++			v->iov_len = min_t(size_t,
++					   iov[iov_idx].iov_len - iov_ofs,
++					   possible_bytes);
++			page_count = get_buf_page_count(v->iov_base, v->iov_len);
++			if (page_count > possible_vecs) {
++				/*
++				 * If the number of pages in the buffer
++				 * is to much (because we currently require
++				 * one SGE per page), we need to limit the
++				 * length.
++				 *
++				 * We know possible_vecs is at least 1,
++				 * so we always keep the first page.
++				 *
++				 * We need to calculate the number extra
++				 * pages (epages) we can also keep.
++				 *
++				 * We calculate the number of bytes in the
++				 * first page (fplen), this should never be
++				 * larger than v->iov_len because page_count is
++				 * at least 2, but adding a limitation feels
++				 * better.
++				 *
++				 * Then we calculate the number of bytes (elen)
++				 * we can keep for the extra pages.
++				 */
++				size_t epages = possible_vecs - 1;
++				size_t fpofs = offset_in_page(v->iov_base);
++				size_t fplen = min_t(size_t, PAGE_SIZE - fpofs, v->iov_len);
++				size_t elen = min_t(size_t, v->iov_len - fplen, epages*PAGE_SIZE);
++
++				v->iov_len = fplen + elen;
++				page_count = get_buf_page_count(v->iov_base, v->iov_len);
++				if (WARN_ON_ONCE(page_count > possible_vecs)) {
++					/*
++					 * Something went wrong in the above
++					 * logic...
++					 */
++					error = -EINVAL;
+ 					goto done;
+-			} else {
+-				/* iov[start] is too big, break it */
+-				int nvec  = (buflen + max_iov_size - 1) /
+-						max_iov_size;
+-
+-				for (j = 0; j < nvec; j++) {
+-					vec.iov_base =
+-						(char *)iov[start].iov_base +
+-						j * max_iov_size;
+-					vec.iov_len =
+-						min_t(int, max_iov_size,
+-						      buflen - max_iov_size * j);
+-					remaining_data_length -= vec.iov_len;
+-					ret = smb_direct_post_send_data(st, &send_ctx, &vec, 1,
+-									remaining_data_length);
+-					if (ret)
+-						goto done;
+ 				}
+-				i++;
+-				if (i == niovs)
+-					break;
+ 			}
+-			start = i;
+-			buflen = 0;
+-		} else {
+-			i++;
+-			if (i == niovs) {
+-				/* send out all remaining vecs */
+-				remaining_data_length -= buflen;
+-				ret = smb_direct_post_send_data(st, &send_ctx,
+-								&iov[start], i - start,
+-								remaining_data_length);
+-				if (ret)
+-					goto done;
+-				break;
++			possible_vecs -= page_count;
++			nvecs += 1;
++			possible_bytes -= v->iov_len;
++			bytes += v->iov_len;
++
++			iov_ofs += v->iov_len;
++			if (iov_ofs >= iov[iov_idx].iov_len) {
++				iov_idx += 1;
++				iov_ofs = 0;
+ 			}
+ 		}
++
++		remaining_data_length -= bytes;
++
++		ret = smb_direct_post_send_data(st, &send_ctx,
++						vecs, nvecs,
++						remaining_data_length);
++		if (unlikely(ret)) {
++			error = ret;
++			goto done;
++		}
+ 	}
+ 
+ done:
+ 	ret = smb_direct_flush_send_list(st, &send_ctx, true);
++	if (unlikely(!ret && error))
++		ret = error;
+ 
+ 	/*
+ 	 * As an optimization, we don't wait for individual I/O to finish
+@@ -1757,6 +1809,11 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 		return -EINVAL;
+ 	}
+ 
++	if (device->attrs.max_send_sge < SMB_DIRECT_MAX_SEND_SGES) {
++		pr_err("warning: device max_send_sge = %d too small\n",
++		       device->attrs.max_send_sge);
++		return -EINVAL;
++	}
+ 	if (device->attrs.max_recv_sge < SMB_DIRECT_MAX_RECV_SGES) {
+ 		pr_err("warning: device max_recv_sge = %d too small\n",
+ 		       device->attrs.max_recv_sge);
+@@ -1780,7 +1837,7 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 
+ 	cap->max_send_wr = max_send_wrs;
+ 	cap->max_recv_wr = t->recv_credit_max;
+-	cap->max_send_sge = max_sge_per_wr;
++	cap->max_send_sge = SMB_DIRECT_MAX_SEND_SGES;
+ 	cap->max_recv_sge = SMB_DIRECT_MAX_RECV_SGES;
+ 	cap->max_inline_data = 0;
+ 	cap->max_rdma_ctxs = t->max_rw_credits;
+-- 
+2.43.0
+
