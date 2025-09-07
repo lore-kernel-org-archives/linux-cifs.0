@@ -1,61 +1,60 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81739299949;
-	Sun,  7 Sep 2025 18:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA83B283FE4;
+	Sun,  7 Sep 2025 18:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757268016; cv=none; b=Oj92AaiVSqa7NeUuveJPQNF7XcHbxtbVYPUEU8H3o3iXWDmjgWraX6pLyLS2/m/P2Qp3J1Eg5VDlMRvK0hyKoJkSvlag/fRPuAbxu0+nNjUaAdupdHB2tAPQRSkaJjrq+kqVMuNDpw/UApLy25S0AETt6eoR6eMmFBwTHkKPnic=
+	t=1757270012; cv=none; b=ab3d5puf++ogiGtwBYLNLOBOunQ+igdxU6Vtm/A1aSMmIvCDkAhv1u6/28wOFgjhoU9GAL6SiAu/NktOcA9LKcLwlYONzbWqZZDxIK/j5s544tXFkVyo34h7B+m1fEftCIHuYgHhG30M8Ncpbt+84PA3iUSEQLfxGAlu2Xt2Sts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757268016; c=relaxed/simple;
-	bh=wR6Qn/iJVvGj9+UopMwDQejhovyzoGsDoobugjT4Wn8=;
+	s=arc-20240116; t=1757270012; c=relaxed/simple;
+	bh=2haumMTs1BksSWy181iFOdCCj5/UTBkAOBVDbcBWcAI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q3m6FELw7ElA6T8aecI0oQKm6H2YdnQYoplFhx/YH9nXxl56jGMzw4HvIXjD9D8U/hgbPb0ESkYfGxCMX2cH9C7zTcS7Cr1HRGewceHt2e12Bby2bZtYzh5M2J5T30ewZNoVFNHmU0Q1XsklON0sJNQ6z+cdZvkEL1MIdjlA8/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fWGPYJqg; arc=none smtp.client-ip=209.85.219.46
+	 To:Cc:Content-Type; b=FSh27KTxjEUVH/8dmWAWsRVLx/EdQeiSiYVz8y/CZqOoY/FrDWbT3SZnlKvAHHQRIge6AACIkFV45xzMgrKqF+tMSGLC1c6t0ezNoVAZVV8gOV2660BqdSU3UznE1YuiF5beSphw0grZeTy8XZ73f9XSiEbXHCYJX6qtvj6TnL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jrne/gQh; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWGPYJqg"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-731de180464so15455896d6.1;
-        Sun, 07 Sep 2025 11:00:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrne/gQh"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b49c1c130c9so2507149a12.0;
+        Sun, 07 Sep 2025 11:33:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1757268012; x=1757872812; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1757270010; x=1757874810; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jfaSv/cVEcz4RWtVPMWk+nhXbO5eAmsXM5GQKveovdw=;
-        b=fWGPYJqgLS4iHjHMiqMfqD4SFrIchOo2BIbszuM9y3evwaEEn/rOW7AbOyyKUdMWAZ
-         BChb8GRxKj/aOTZ6WrB+fGQBfYJbUXYjjti+6hoGuFJ2bkbHAqY1rvwMmRNWArlj6le4
-         gbu0wdgdajh91YqbyYVwjG8Neo6Pk8brWxOiwkHpLjT3FvqAxqTLlhwicgKiD3IX8i24
-         u8rEZ7KBbhRfqEoXhu8FeChcWLXQ724j7cYEodXArIt/m6JKDlw0DqOKMHQSLV7g9iS4
-         0xIOC1Wrih9Oo/QpFPN/PI3lDAp1l7taFi2+8JwtuEQ6PtGuwrJghC77tN3ftSOqnBOt
-         8vzw==
+        bh=1prghCX2j/ZdYOZtRxnhLixcEap1cTasQWjSnDFEOK4=;
+        b=jrne/gQhaoaoecHf9o+uEt/Kut7uuEDR8yxPmxbuH30yxr0WwbZvbZ6Q8lXLu6y75O
+         9QmQTPyTZOKylWrgZTB4luLbmXoP/n16XP4GwAgxwewP+mFF/CbUSN9MwkhDhwCOrdHX
+         ToDOOmS9Ccgoq6rgW5xJUTnci3hLD7Z3+y1CQfUR6RbbTLeP+5r1ztK6vaIdHKS080kE
+         KF8HF4uf+KX+M7XtH6HRe8L1lVxrOYYnxwmA3DbGsFRBMpP0dGteiSxB/KA+JRyw31w5
+         5tbXPJez7zzzlREvYP2AGuWjzVEKrbbG4JniaWlW1pmPfa035gteKEK1Kfz07zcgloFw
+         amUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757268012; x=1757872812;
+        d=1e100.net; s=20230601; t=1757270010; x=1757874810;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jfaSv/cVEcz4RWtVPMWk+nhXbO5eAmsXM5GQKveovdw=;
-        b=eBX4+Hl2WveYkTb+2HYFWdLyE2CYZX5NpTTJM1pfo7cv7wG0RDoXFfZ1lS/N37iVZj
-         apO99PtxN/ii157/hySLUwspN1qgS9yXI39PJ5bIWWiuxx2rs0fC5C10oEdS0DFeTx1F
-         uM1xx30d/YTeAHauo3NTSg4CobXuPTTCUN5cwlHaE+5DASUk7zT1tIROZInYo7TMRpS0
-         YTQDmlRBIWdgcIj+WHCzp5iiDcW6k6jqLcrUK5mcWXN51zwYjG9Rhv0Razqie0XhGhKs
-         LetDno0f/xl//UChSWqLwW6jiExVEJ3w1mV0Zcl2QCFWpJ74jK7m7UsJCMsgX044j+pq
-         Ttcg==
-X-Forwarded-Encrypted: i=1; AJvYcCWaCV5Vm6ZLgpnHOY/V9DFJACwNLp56umpRTUt5VuJMZSQVPbdRGYTKYbabBwprW5EfI8Mv270+w6cwcZSN@vger.kernel.org, AJvYcCXxpPQGQXbkfEXJz6ZhHafmnp5CPvnZZv3oMjw80r6hLd8pQRz8CrZI63RaRoNgK3MxNSEUTLuqG62CCfE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUE/rcdtqkrGmR8eNVIsxDoHE66QoYyG/K3co11JDZMFfPlOdc
-	fNLuh7+MuSqSMkwPsm4sW/khGHq9CePjwQRsCMjWtGcuu2JGb7zOQiyvbI1/fz+Udku5FkUQCDj
-	m+5RhAfHxVDlTuIS0zgI2iMT8LPD0gCQ=
-X-Gm-Gg: ASbGncuxG4V8qxi4YdSMkC2K6905TYDJuhkjJHZO7kds2WUPGcXaAibZ7HTLU455L72
-	tdGq9BMfyXV6IMGURu5QoomPAIuFKzQORWcpT2T1EbEbhJETI+EhT9QXuHhJVqhgJdlNqQLyNdi
-	7AryLVPsevn606ABQjfzTmWCgZDMw9crM7iuQFP4sZ91EmnzGOV8e5+Hbvhc3QSMJfgmfiRpILB
-	sSkBYMcQGQlBhlFMgQrLcBUrYo4V4LlzVbnakO/sUZddNuG8Exz2+A/qwL5uf1Ny3aBs6ZI+eJX
-	td0T46oUdKVw9sC/5BmRuAI5U+4IRPw5rSbCyPe06M3fef4WAKNE3mTgbULRsZFrwBSswUG6bi9
-	B
-X-Google-Smtp-Source: AGHT+IEmKAfjxKzDldhOpQ72mvvR40dDcW9UFQ2BP98shbODdlGx0iW4XeAHG7xN6CwL3SICIWIyeY3P9V4Ggez/bkA=
-X-Received: by 2002:ad4:5c6c:0:b0:746:4ca1:fbc with SMTP id
- 6a1803df08f44-7464ca1176fmr24532606d6.23.1757268012271; Sun, 07 Sep 2025
- 11:00:12 -0700 (PDT)
+        bh=1prghCX2j/ZdYOZtRxnhLixcEap1cTasQWjSnDFEOK4=;
+        b=HkE/O9WnTUZ92e4Rd8yWMREvc4BTbxzlEfaDlK+VJp1mBK94recLSyKhUc581N1rSa
+         no8JSNWb11QQRS4B16avAWD88jSSRtpxXQKt0n1QpaOpYd/TDF2gBS6au3VsjSfkhcKi
+         Cvxipp53tZWSqdixe1J8amCoawgHXOgh3o/vOAhmdVdQURFndUPbqspdChZEz90Z2SEF
+         8BappoEDPu13h+jQhBnyYm0f8vXPLLMhzt6oN/mgv+Cob3/nMHpleCIIKoZXQ42nWhIz
+         n9YMsFDRVlUGWLgKEiAXKRc0Va1VcFIbuQP5kkDchbuv2s7DXTWLSUGEMz5WQJtHJG4j
+         UJqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7lKCTeKxUP61SBiq2Ysa7PTKPQMIeAu5nMbzAQqVYWSLQtb11GavhU1u9+eWgqJoSUraGjd8HuM14mpZ2@vger.kernel.org, AJvYcCUeoE7ILUUM5smLTVMQEOghJFMbnjaoWye/ZXvLb4J87ibwWUJ4Z07poZXRn1MYKDn3AMkDzW4gXS1w@vger.kernel.org, AJvYcCX/fLS5IYFbWLW6OkofMkvuhh8cgbmDi8503JI+jDyeilloPrGJf6bnC19e+CbNLMzczkDnkgflMttgI99G@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkTbRyYQL9HZvfvVOYBRCS6UOwKvhD+SNguvO0/yl9gBFf0ioW
+	U++dOTPPr8ZGX8Tjbc0z19xU8hCfpKKJWbVGduSyrJ/8AX8PQyPcYuWz+G4GFtuiOA7SmOCgsyC
+	454t0bsg1FagOYioZvn2x+Z0wqKqh1Ko=
+X-Gm-Gg: ASbGncuN93lonpRDUbggREg93bpSGfWUFaRtk3lqfJp32i8WIcInHlbPBFnFbHXx48q
+	xVbNmXH9TnFvJeFjzM2npfG5GltHW6gE9xfaBvg3kUWfZ5u2Ch84ttN3v9hDkJmD40b1fgD/FXS
+	4xPbClBafhjC8D92EoPxiyKrZfLxUHa9cU9KEblymEG3AXZ2dbqck211mMkSonD6zOzwkH8oZeM
+	ms+x9MIkmnWYCfeLj4lV2aVyO/XSpQt5kEADMos2GEMNnQ/6ltN/MyH7kwZwjcZeVP8BWodJsW9
+	qsQ=
+X-Google-Smtp-Source: AGHT+IFR/gRhNkc1YOW9Zi7R1cnc2A7iUPAIgKgthiJn5F7NTQaDezr7EVExPYq6YHZKpDdlHlFdPKtYZHtahoQRI5w=
+X-Received: by 2002:a17:903:2341:b0:24b:25f:5f7f with SMTP id
+ d9443c01a7336-2517301ce47mr64467415ad.60.1757270010091; Sun, 07 Sep 2025
+ 11:33:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -64,39 +63,22 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250907032003.386794-1-ebiggers@kernel.org> <CAH2r5mutq5vZwKNyZ6nforOierKSH9si+47XoFV7PZSKxuvqHQ@mail.gmail.com>
 In-Reply-To: <CAH2r5mutq5vZwKNyZ6nforOierKSH9si+47XoFV7PZSKxuvqHQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 7 Sep 2025 13:00:00 -0500
-X-Gm-Features: AS18NWAIgrDZA9JooWeyLBgFoKfrc5lPq-gjrXTE07eYEaLxrA37VXfU2LY6tQA
-Message-ID: <CAH2r5mtcexEYcfBosnt+12TCU8rS1ZvJtPfTCTYgZWVQsBt1Fg@mail.gmail.com>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Mon, 8 Sep 2025 04:33:18 +1000
+X-Gm-Features: AS18NWCpN9KIq6ir13rA4hDgL4YVOU6GMbSEJ81vt4fcEK9IDcVMKkK-7j9FVDM
+Message-ID: <CAN05THRE0powMS-AgXHfGT_rbkrqBA09PDA6ydzcCGzSnA-V9w@mail.gmail.com>
 Subject: Re: [PATCH] smb: Use arc4 library instead of duplicate arc4 code
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+To: Steve French <smfrench@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-cifs@vger.kernel.org, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Shyam Prasad N <sprasad@microsoft.com>, 
 	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
 	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-crypto@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This was the original commit:
-
-commit 71c02863246167b3d1639b8278681ca8ebedcb4e
-Author: Ronnie Sahlberg <lsahlber@redhat.com>
-Date:   Thu Aug 19 20:34:59 2021 +1000
-
-    cifs: fork arc4 and create a separate module for it for cifs and other =
-users
-
-    We can not drop ARC4 and basically destroy CIFS connectivity for
-    almost all CIFS users so create a new forked ARC4 module that CIFS and =
-other
-    subsystems that have a hard dependency on ARC4 can use.
-
-    Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-
-On Sun, Sep 7, 2025 at 12:59=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
+On Mon, 8 Sept 2025 at 03:59, Steve French <smfrench@gmail.com> wrote:
 >
 > Ronnie may have additional context, but it may have been forked due to
 > unrelated restrictions on the arc4 module (that had nothing to do with
@@ -104,6 +86,17 @@ rote:
 >
 > Ronnie,
 > Do you remember the context?
+
+Yepp.
+The context was that to my understanding it was suggested that the
+arc4 module would be going away
+and would be removed so cifs had to stop using it. (or create its own
+private copy)
+
+Must been a misunderstanding of what/how would happen with arc4 when
+it was retired.
+
+
 >
 > On Sat, Sep 6, 2025 at 10:22=E2=80=AFPM Eric Biggers <ebiggers@kernel.org=
 > wrote:
@@ -385,10 +378,3 @@ n);
 > Thanks,
 >
 > Steve
-
-
-
---=20
-Thanks,
-
-Steve
