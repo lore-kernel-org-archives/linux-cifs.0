@@ -1,309 +1,288 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ACE1A0728;
-	Sun,  7 Sep 2025 03:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1893D214228;
+	Sun,  7 Sep 2025 11:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757215326; cv=none; b=dCkwbE0IRffRwbyhQNVl5WfT+knN+kkNoTKfRn8fMAVaDbi+0jgBbC9Nga6NMA5g9CjJY0Tndks5tbpS0gm9n7v+PgsPcIvUPbojQRdncr6FJYAu+q/9zFyLJprGIIJcyhgJNk5Idyx0GIRLsoTeusAcIf+pjdJF9/PoU5kcBqc=
+	t=1757243111; cv=none; b=qbvM3lKNFesq5x8N6eZDS4LTX/ADEMxGQLjJUNJTDINLWixhG4/XcymmYRNaP/dxOl3Qsks3ToW0r2X6c5EhgKUnoJ1o6mmt5za8OpcquNE/nQQ7rdtFNNTkAoqmSrXTg6nvZZwDltiZTQXSjxBad1njvFOEnoKuqq24BFzfDqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757215326; c=relaxed/simple;
-	bh=tInP6J7NJp//z767MSb09gQ5BOw84i+fFF4Se4q9AeE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U/7zzxYvhA8bFipXSpudPzglpax7FjJrVOvRaMegtkKge+qIIjpC4zzzV1a+MFclJZuEbdaXlarJddJHzH3C7PXofpXs/TU9AijTTUp167iyh4X/1MXt9sQoOz4pel8UQZSY507i4R4yup0L3DHC0bsHleVR5b+6d0yQnJ88+5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9zYPG2c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1757243111; c=relaxed/simple;
+	bh=JdTNibIilDd+UfC1ULHBnf6cE5P7BiFfeZWqhObsgMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IPbe4fveB23dzC6/Ljj7oE0BlEIoonladaAFSBUu4sm+Qoq3HyjFoUppxReroqoY0QfaMmMNt4D8njNaDANzP2lHQyt1Q2uCNg7brji3XnZXt1q3rlctwEKZ0MBmaL8i58UPXzGgJ1sfiSInSJiWkRn0jzXifNMRWOsv7Cdt94Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cYEvZ9ud; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9zYPG2c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B008DC4CEF4;
-	Sun,  7 Sep 2025 03:22:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cYEvZ9ud"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1D6C4CEF0;
+	Sun,  7 Sep 2025 11:05:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757215326;
-	bh=tInP6J7NJp//z767MSb09gQ5BOw84i+fFF4Se4q9AeE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=k9zYPG2c5Xzn7cQ8M1dCgA9gSknrXT14mFB90EnnCKxRm0YFuhf6ucVAx9cBB6qwe
-	 RpuYB1k6P//GmCHIKccZM+G1zR7CXxAih2q1VECvvnHgfs681oLLdOXPCY4rF8l31d
-	 pSLX1s9VdoJT7xIKY5FXuv+Q6RtsowFsgR54EaclSdAC8Sw2vg7WThrzJwsuOBYDcd
-	 2jRuuY0cJ+HeOCpt97Ao2ifZeu5yVSxxeC8KcJgeXUlKjE+XalfJBoOCY1rSOfD54K
-	 HnPNKwa3QeXp+i3UjfY58fcxkbjCrJeQLpw9wUleybh+jarhgj3GfjqQIq9NdHsMcR
-	 3zYPgG5ipvaew==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-cifs@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] smb: Use arc4 library instead of duplicate arc4 code
-Date: Sat,  6 Sep 2025 20:20:03 -0700
-Message-ID: <20250907032003.386794-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.50.1
+	s=k20201202; t=1757243110;
+	bh=JdTNibIilDd+UfC1ULHBnf6cE5P7BiFfeZWqhObsgMM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cYEvZ9udBXnyl52c6GpP9UJ/mNLMl4CUL2VAomhN6HlWAXWQB3McUvMazJdXYzDVd
+	 yO2oj1HDE5/8TOoTx+acsLiMkc8sgP7JrsWyEuU+ha1MsS31kTp/45gSzmn2CuTjlD
+	 5lBOZiTOPwtcEeh3Qb72ZsnHN1KV/C2i9vAQVqD+RJsHMZbpdecmLAwBfwv5vrHpfv
+	 jh3AOb0z1UfKIQu9N2eJ3W9u1e/cNPS1s4Qw7YqV3PM3wlPNjNhNJMNYPxNFgtVZgJ
+	 OV9BCWSPT7+gqiJ7nbS0N5WG8AG5w1Aygvq41aCZqYkCsFRBCGp5u23P0x+SRqkXoi
+	 LOzZPRVy2vPDg==
+Received: by pali.im (Postfix)
+	id 95653A1B; Sun,  7 Sep 2025 13:05:06 +0200 (CEST)
+Date: Sun, 7 Sep 2025 13:05:06 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
+	ronnie sahlberg <ronniesahlberg@gmail.com>,
+	Ralph =?utf-8?B?QsO2aG1l?= <slow@samba.org>,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/35] cifs: Fix SMB rmdir() and unlink() against Windows
+ SMB servers
+Message-ID: <20250907110506.czjh3td4qf5ieb4m@pali>
+References: <20250831123602.14037-1-pali@kernel.org>
+ <dfa557ed-eb34-4eaf-9e17-7cae221e74fd@samba.org>
+ <20250901170253.mv63jewqkdo5yqj7@pali>
+ <6660f6bd-ea74-4b25-b7dd-280833b5568c@samba.org>
+ <20250902163053.zzgd5ee4qguciajj@pali>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="nwyq3576ahj5weja"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250902163053.zzgd5ee4qguciajj@pali>
+User-Agent: NeoMutt/20180716
+
+
+--nwyq3576ahj5weja
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-fs/smb/common/cifs_arc4.c has an implementation of ARC4, but a copy of
-this same code is also present in lib/crypto/arc4.c to serve the other
-users of this legacy algorithm in the kernel.  Remove the duplicate
-implementation in fs/smb/, which seems to have been added because of a
-misunderstanding, and just use the lib/crypto/ one.
+On Tuesday 02 September 2025 18:30:53 Pali Rohár wrote:
+> On Tuesday 02 September 2025 17:17:14 Stefan Metzmacher wrote:
+> > Do you have network captures showing the old and new behavior
+> > that's often easier to understand than looking at patches alone.
+> > 
+> > metze
+> 
+> I do not have them right now, but I can run test scenario and capture
+> them, this is not problem. Test case is pretty straightforward.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- fs/smb/client/Kconfig       |  1 +
- fs/smb/client/cifsencrypt.c |  8 ++--
- fs/smb/common/Makefile      |  1 -
- fs/smb/common/arc4.h        | 23 ------------
- fs/smb/common/cifs_arc4.c   | 75 -------------------------------------
- fs/smb/server/Kconfig       |  1 +
- fs/smb/server/auth.c        |  9 ++---
- 7 files changed, 10 insertions(+), 108 deletions(-)
- delete mode 100644 fs/smb/common/arc4.h
- delete mode 100644 fs/smb/common/cifs_arc4.c
+In attachments are network traces of both the old and new behaviors.
+In the old behavior is visible that after calling "rm object", the
+object is still in the followup "ls" output and calling "mkdir object"
+is failing, also "stat object" is failing.
+In the new behavior is visible that "rm object" is using exclusive
+removal, which fails, and then fallback to rename+deletepending which
+success. After that in the followup "ls" output the object entry is not
+there, there is only renamed ".smb<num>", and "mkdir object" pass and
+creates new directory "object".
 
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index 9f05f94e265a6..a4c02199fef48 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -13,10 +13,11 @@ config CIFS
- 	select CRYPTO_AEAD2
- 	select CRYPTO_CCM
- 	select CRYPTO_GCM
- 	select CRYPTO_ECB
- 	select CRYPTO_AES
-+	select CRYPTO_LIB_ARC4
- 	select KEYS
- 	select DNS_RESOLVER
- 	select ASN1
- 	select OID_REGISTRY
- 	select NETFS_SUPPORT
-diff --git a/fs/smb/client/cifsencrypt.c b/fs/smb/client/cifsencrypt.c
-index 3cc6862469087..7b7c8c38fdd08 100644
---- a/fs/smb/client/cifsencrypt.c
-+++ b/fs/smb/client/cifsencrypt.c
-@@ -20,12 +20,12 @@
- #include <linux/ctype.h>
- #include <linux/random.h>
- #include <linux/highmem.h>
- #include <linux/fips.h>
- #include <linux/iov_iter.h>
--#include "../common/arc4.h"
- #include <crypto/aead.h>
-+#include <crypto/arc4.h>
- 
- static size_t cifs_shash_step(void *iter_base, size_t progress, size_t len,
- 			      void *priv, void *priv2)
- {
- 	struct shash_desc *shash = priv;
-@@ -723,13 +723,13 @@ calc_seckey(struct cifs_ses *ses)
- 	if (!ctx_arc4) {
- 		cifs_dbg(VFS, "Could not allocate arc4 context\n");
- 		return -ENOMEM;
- 	}
- 
--	cifs_arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
--	cifs_arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
--			CIFS_CPHTXT_SIZE);
-+	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
-+	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-+		   CIFS_CPHTXT_SIZE);
- 
- 	/* make secondary_key/nonce as session key */
- 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
- 	/* and make len as that of session key only */
- 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
-diff --git a/fs/smb/common/Makefile b/fs/smb/common/Makefile
-index c66dbbc1469c3..9e0730a385fb1 100644
---- a/fs/smb/common/Makefile
-+++ b/fs/smb/common/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- #
- # Makefile for Linux filesystem routines that are shared by client and server.
- #
- 
--obj-$(CONFIG_SMBFS) += cifs_arc4.o
- obj-$(CONFIG_SMBFS) += cifs_md4.o
-diff --git a/fs/smb/common/arc4.h b/fs/smb/common/arc4.h
-deleted file mode 100644
-index 12e71ec033a18..0000000000000
---- a/fs/smb/common/arc4.h
-+++ /dev/null
-@@ -1,23 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0+ */
--/*
-- * Common values for ARC4 Cipher Algorithm
-- */
--
--#ifndef _CRYPTO_ARC4_H
--#define _CRYPTO_ARC4_H
--
--#include <linux/types.h>
--
--#define ARC4_MIN_KEY_SIZE	1
--#define ARC4_MAX_KEY_SIZE	256
--#define ARC4_BLOCK_SIZE		1
--
--struct arc4_ctx {
--	u32 S[256];
--	u32 x, y;
--};
--
--int cifs_arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len);
--void cifs_arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int len);
--
--#endif /* _CRYPTO_ARC4_H */
-diff --git a/fs/smb/common/cifs_arc4.c b/fs/smb/common/cifs_arc4.c
-deleted file mode 100644
-index df360ca47826a..0000000000000
---- a/fs/smb/common/cifs_arc4.c
-+++ /dev/null
-@@ -1,75 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- * Cryptographic API
-- *
-- * ARC4 Cipher Algorithm
-- *
-- * Jon Oberheide <jon@oberheide.org>
-- */
--
--#include <linux/module.h>
--#include "arc4.h"
--
--MODULE_DESCRIPTION("ARC4 Cipher Algorithm");
--MODULE_LICENSE("GPL");
--
--int cifs_arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len)
--{
--	int i, j = 0, k = 0;
--
--	ctx->x = 1;
--	ctx->y = 0;
--
--	for (i = 0; i < 256; i++)
--		ctx->S[i] = i;
--
--	for (i = 0; i < 256; i++) {
--		u32 a = ctx->S[i];
--
--		j = (j + in_key[k] + a) & 0xff;
--		ctx->S[i] = ctx->S[j];
--		ctx->S[j] = a;
--		if (++k >= key_len)
--			k = 0;
--	}
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(cifs_arc4_setkey);
--
--void cifs_arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int len)
--{
--	u32 *const S = ctx->S;
--	u32 x, y, a, b;
--	u32 ty, ta, tb;
--
--	if (len == 0)
--		return;
--
--	x = ctx->x;
--	y = ctx->y;
--
--	a = S[x];
--	y = (y + a) & 0xff;
--	b = S[y];
--
--	do {
--		S[y] = a;
--		a = (a + b) & 0xff;
--		S[x] = b;
--		x = (x + 1) & 0xff;
--		ta = S[x];
--		ty = (y + ta) & 0xff;
--		tb = S[ty];
--		*out++ = *in++ ^ S[a];
--		if (--len == 0)
--			break;
--		y = ty;
--		a = ta;
--		b = tb;
--	} while (true);
--
--	ctx->x = x;
--	ctx->y = y;
--}
--EXPORT_SYMBOL_GPL(cifs_arc4_crypt);
-diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
-index 4a23a5e7e8fec..098cac98d31e6 100644
---- a/fs/smb/server/Kconfig
-+++ b/fs/smb/server/Kconfig
-@@ -8,10 +8,11 @@ config SMB_SERVER
- 	select NLS_UCS2_UTILS
- 	select CRYPTO
- 	select CRYPTO_MD5
- 	select CRYPTO_HMAC
- 	select CRYPTO_ECB
-+	select CRYPTO_LIB_ARC4
- 	select CRYPTO_LIB_DES
- 	select CRYPTO_LIB_SHA256
- 	select CRYPTO_SHA256
- 	select CRYPTO_CMAC
- 	select CRYPTO_SHA512
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index d99871c214518..b4020bb55a268 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -18,20 +18,20 @@
- 
- #include "auth.h"
- #include "glob.h"
- 
- #include <linux/fips.h>
-+#include <crypto/arc4.h>
- #include <crypto/des.h>
- 
- #include "server.h"
- #include "smb_common.h"
- #include "connection.h"
- #include "mgmt/user_session.h"
- #include "mgmt/user_config.h"
- #include "crypto_ctx.h"
- #include "transport_ipc.h"
--#include "../common/arc4.h"
- 
- /*
-  * Fixed format data defining GSS header and fixed string
-  * "not_defined_in_RFC4178@please_ignore".
-  * So sec blob data in neg phase could be generated statically.
-@@ -363,14 +363,13 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
- 
- 		ctx_arc4 = kmalloc(sizeof(*ctx_arc4), KSMBD_DEFAULT_GFP);
- 		if (!ctx_arc4)
- 			return -ENOMEM;
- 
--		cifs_arc4_setkey(ctx_arc4, sess->sess_key,
--				 SMB2_NTLMV2_SESSKEY_SIZE);
--		cifs_arc4_crypt(ctx_arc4, sess->sess_key,
--				(char *)authblob + sess_key_off, sess_key_len);
-+		arc4_setkey(ctx_arc4, sess->sess_key, SMB2_NTLMV2_SESSKEY_SIZE);
-+		arc4_crypt(ctx_arc4, sess->sess_key,
-+			   (char *)authblob + sess_key_off, sess_key_len);
- 		kfree_sensitive(ctx_arc4);
- 	}
- 
- 	return ret;
- }
+--nwyq3576ahj5weja
+Content-Type: application/gzip
+Content-Disposition: attachment; filename="smb_old.pcap.gz"
+Content-Transfer-Encoding: base64
 
-base-commit: b320789d6883cc00ac78ce83bccbfe7ed58afcf0
--- 
-2.50.1
+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
 
+--nwyq3576ahj5weja
+Content-Type: application/gzip
+Content-Disposition: attachment; filename="smb_new.pcap.gz"
+Content-Transfer-Encoding: base64
+
+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
+
+--nwyq3576ahj5weja--
