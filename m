@@ -1,116 +1,116 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BCD2F0C6E
-	for <linux-cifs@vger.kernel.org>; Mon,  8 Sep 2025 09:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533631C4A13
+	for <linux-cifs@vger.kernel.org>; Mon,  8 Sep 2025 12:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757323127; cv=none; b=ap3/ueLAdjVva0ro760IjUWRa8e6cyqtbQMzmmJTVQbzWQL13wyjjXUSVciiJkjOE8Q6WrCRZGwDgu+MXvApN3AFhnCcIGiGl57mo/Ql0htT3SQ5jg0U0ZIiXK9egCNLzPN5MKEtKsFLuHHzjvdMtP79MojTCjIL3EmrfTaDOPQ=
+	t=1757333311; cv=none; b=k1KDwqrkSPLkfzgrRRDTmiUCVJXKiXg58ZeRj0zZWmJ6dv9/XeauYNdmsv6sk6kh1qWmMZvFSKdUhh9ZpQccyh3GtmAZVS/PNr4C0PzkgMd90Kkjs6/YckOCjWsVhy+GtCEH+Q/t/KptAfQ7a3X8cnBCU/NjRkJ9EIk75VFEJNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757323127; c=relaxed/simple;
-	bh=0FHEStZ3V8PkXZmk7YsJQztkfizgxZ+gPxBQK0ZooTk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WLKvvS0c1caZgIbBV+rNWI4VdZz1hp1M/UmBIdV78eiYz2t3YjIgOZSJ97+vpKQcS/hk1N7I8D7MLYVvDHZwbhj1MTmoMT8li40SmUIZJrX0oMup7qm6c4srgQhqXCHGXad2Zy9J4sOOw/AcQjinI+KgJ1RTBiYTPVTEY9bXOXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=HbYCt3EP; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="HbYCt3EP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=K2P+4RW/NoGTiBE3/+HNNEvKYfYK8WVFWoWCp/BWX1E=; b=HbYCt3EPUDznij8FRanVfoSPlE
-	kRbiRqptX9a3AV5c8j//DkNodW7QSOlQe/jkgDFTM47dK3deByP1VBvweJmgJLc6CM2A9wZPmsUUt
-	gkpwwr2czRHTVQLBnoDBaEFX/smLHNjYRK50AQz7aqE85yYjPl30yYNr91Xmr5Rr8GaEqE9nOvDty
-	V1gCybFGXlsVfjOWDQ1TtfUqd3jQOdGhh3w4Qhv1yRraEQmgGC5jaazFDyB4VvecMkDML9tur5o0r
-	AnTPAu3bdoqDY9Qozw0qCHIPTTkW8vA53EqroUBfIRCymVAEp5oNF4pQQ2qt2ydcCBPBjOAlmiKYU
-	qVERlLYMt0LMJEKPLHhE58kTU+qY4OMBFWmnX2BavHiyKsU88iw7VxejRFFNNVXmt9WTONvOJtG8z
-	CVdSF8tuKdWZA5Pjl5CJ9bKtXHsRlE3EFM6nwWVEmrSIwpoXDJQzHNlAG+82S3TSkGY5kwaglseqA
-	VvGsxEKtQT4VJAr7ERiLQXhU;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uvY1K-0030aN-0K;
-	Mon, 08 Sep 2025 09:18:42 +0000
-Message-ID: <6e143477-2240-4034-a5ff-02d7c412382a@samba.org>
-Date: Mon, 8 Sep 2025 11:18:41 +0200
+	s=arc-20240116; t=1757333311; c=relaxed/simple;
+	bh=mHCYpz6IxNvgdVopf/5ZKJR8E14cluHsC5WO+lKQ2UY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=leptqkNeqEM7DCnr49BsQ+vxW8yZ6g+V2Niq5nRXDkOiP1etnlC3qcyratErj6K/FvyVLh2Q9y/jcS6iXCqsY/QAw8R6hPYi4ahcEJ41mT7gS3hQlIOgaPseTDe4ER8OSMgBcSi9ic+hRoK4TuLow2TOMdxQUvpgvZeby30Dnd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn; spf=pass smtp.mailfrom=iie.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
+Received: from localhost.localdomain (unknown [159.226.95.28])
+	by APP-01 (Coremail) with SMTP id qwCowACnAqUKx75oFtOmAQ--.37134S2;
+	Mon, 08 Sep 2025 20:07:38 +0800 (CST)
+From: Chen Yufeng <chenyufeng@iie.ac.cn>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	linux-cifs@vger.kernel.org,
+	Chen Yufeng <chenyufeng@iie.ac.cn>
+Subject: [PATCH] smb: validate command payload size in smb2_check_message
+Date: Mon,  8 Sep 2025 20:07:23 +0800
+Message-ID: <20250908120723.1614-1-chenyufeng@iie.ac.cn>
+X-Mailer: git-send-email 2.43.0.windows.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 098/142] smb: server: make use of
- smbdirect_socket.send_io.pending.{count,wait_queue}
-To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
- Tom Talpey <tom@talpey.com>
-References: <cover.1756139607.git.metze@samba.org>
- <15e99e9490c6562e81d0f525526a91ee05f822a1.1756139607.git.metze@samba.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <15e99e9490c6562e81d0f525526a91ee05f822a1.1756139607.git.metze@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowACnAqUKx75oFtOmAQ--.37134S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFyxXw15WF4rGFy3GryUKFg_yoW5Jw4Upr
+	y3Xr43ArZYq3ZxCrn7Jrs8Za4rZwnYkwsrJrsFv3WSqF97Xr97AFyvyas09ayYgryrGw1x
+	KFs0vrnFvF17u3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvq14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	AVWUtwCY02Avz4vE14v_Xr1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JUc189UUUUU=
+X-CM-SenderInfo: xfkh05xxih0wo6llvhldfou0/1tbiDAgTEmi+slUj4AABs2
 
-Am 25.08.25 um 22:40 schrieb Stefan Metzmacher:
-> This will is used by the client already and will allow to create
-> common helper functions.
-> 
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Steve French <smfrench@gmail.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Signed-off-by: Stefan Metzmacher <metze@samba.org>
-> ---
->   fs/smb/server/transport_rdma.c | 26 ++++++++++----------------
->   1 file changed, 10 insertions(+), 16 deletions(-)
-> 
-> diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-> index 62e13112a2b6..fd8d3fbdfa6c 100644
-> --- a/fs/smb/server/transport_rdma.c
-> +++ b/fs/smb/server/transport_rdma.c
-> @@ -106,9 +106,6 @@ struct smb_direct_transport {
->   	wait_queue_head_t	wait_send_credits;
->   	wait_queue_head_t	wait_rw_credits;
->   
-> -	wait_queue_head_t	wait_send_pending;
-> -	atomic_t		send_pending;
-> -
->   	struct work_struct	post_recv_credits_work;
->   	struct work_struct	send_immediate_work;
->   
-> @@ -341,9 +338,6 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
->   
->   	spin_lock_init(&t->receive_credit_lock);
->   
-> -	init_waitqueue_head(&t->wait_send_pending);
-> -	atomic_set(&t->send_pending, 0);
-> -
->   	spin_lock_init(&t->lock_new_recv_credits);
->   
->   	INIT_WORK(&t->post_recv_credits_work,
-> @@ -380,7 +374,7 @@ static void free_transport(struct smb_direct_transport *t)
->   	}
->   
->   	wake_up_all(&t->wait_send_credits);
-> -	wake_up_all(&t->wait_send_pending);
-> +	wake_up_all(&sc->send_io.pending.wait_queue);
->   
->   	disable_work_sync(&t->post_recv_credits_work);
->   	disable_work_sync(&t->send_immediate_work);
-> @@ -834,8 +828,8 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
->   		smb_direct_disconnect_rdma_connection(t);
->   	}
->   
-> -	if (atomic_dec_and_test(&t->send_pending))
-> -		wake_up(&t->wait_send_pending);
-> +	if (atomic_dec_and_test(&sc->send_io.pending.count))
-> +		wake_up(&sc->send_io.pending.wait_queue);
+The vulnerability addressed in the patch for smb2_check_message shares 
+similarities with the previously identified issue in ksmbd_smb2_check_message 
+from 2b9b8f3b68ed("ksmbd: validate command payload size").
+Both functions are responsible for validating SMB2 messages, and the core 
+issue lies in the improper or insufficient validation of the StructureSize2 
+field, which indicates the command payload size.
 
-In the rebase on top of "smb: server: let smb_direct_writev() respect SMB_DIRECT_MAX_SEND_SGES"
-sc->send_io.pending.wait_queue will become sc->send_io.pending.zero_wait_queue in
-order to make it clear it's woken when count reaches 0.
+Signed-off-by: Chen Yufeng <chenyufeng@iie.ac.cn>
+---
+ fs/smb/client/smb2misc.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-metze
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index cddf273c14ae..2b5f42adc401 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -143,6 +143,7 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 	int command;
+ 	__u32 calc_len; /* calculated length */
+ 	__u64 mid;
++	__u32 req_struct_size;
+ 
+ 	/* If server is a channel, select the primary channel */
+ 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
+@@ -209,16 +210,9 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 	}
+ 
+ 	if (smb2_rsp_struct_sizes[command] != pdu->StructureSize2) {
+-		if (command != SMB2_OPLOCK_BREAK_HE && (shdr->Status == 0 ||
+-		    pdu->StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2_LE)) {
+-			/* error packets have 9 byte structure size */
+-			cifs_dbg(VFS, "Invalid response size %u for command %d\n",
+-				 le16_to_cpu(pdu->StructureSize2), command);
+-			return 1;
+-		} else if (command == SMB2_OPLOCK_BREAK_HE
+-			   && (shdr->Status == 0)
+-			   && (le16_to_cpu(pdu->StructureSize2) != 44)
+-			   && (le16_to_cpu(pdu->StructureSize2) != 36)) {
++		if (!(command == SMB2_OPLOCK_BREAK_HE &&
++		    (le16_to_cpu(pdu->StructureSize2) == 44 ||
++		    le16_to_cpu(pdu->StructureSize2) == 36))) {
+ 			/* special case for SMB2.1 lease break message */
+ 			cifs_dbg(VFS, "Invalid response size %d for oplock break\n",
+ 				 le16_to_cpu(pdu->StructureSize2));
+@@ -226,6 +220,14 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 		}
+ 	}
+ 
++	req_struct_size = le16_to_cpu(pdu->StructureSize2) +
++		__SMB2_HEADER_STRUCTURE_SIZE;
++	if (command == SMB2_LOCK_HE)
++		req_struct_size -= sizeof(struct smb2_lock_element);
++
++	if (req_struct_size > len + 1)
++		return 1;
++
+ 	calc_len = smb2_calc_size(buf);
+ 
+ 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
+-- 
+2.34.1
+
