@@ -1,122 +1,150 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0021312CDA5
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 09:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B021B425C
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 15:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757496678; cv=none; b=ePEkz3rjD33LsWWOT5zu642kIEp8evwzQMZVpmOFLUNIHaO8PeacajqmlqdMetLhjhGMdTN7e70YNu53Gu/fMTPNygP29ZI+Rm8gTYNQX6hUzMGYcKcu2YZcBZAxAI7nOFmrk0A6cKsXGlocAQPutRodxoZTXb68w9KzBTwIKf8=
+	t=1757517624; cv=none; b=RL6XQKcRe7UT35mF5/Iz3EhzfEPGGvvWBEkVU3Lpui0oiXh6WUXhl3X6NCXobWjgBt9p7PCDvCO04cL5D6WaPntK6Rp+d0C9Py90hfDISJeYweD+LsqZO+41Op8CtLgBrDlVNoGZoMFy2gyHDH10FNJtsvrE9juXzmoIfMmLuQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757496678; c=relaxed/simple;
-	bh=GRSzaGpG/1Xr/xQMzkU/cR7wAlBMfgRGNzsp1bxaV/s=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=HsN/JoKftPMUQHLzj+80RZPkSoe5dwVbWNUp1pd7RZJf64V5ryneWHEqipqyIFY5awCupTeVt1tp7zLkKIlehtp3ZkAkPD5AZSTfZOBI8/YwikViQwM7w7MA52EeNCdO+Lzo69mTeZ6x5tHDWI3gnidpi6o74O4Scyv3PvGLCQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=meltin.net; spf=pass smtp.mailfrom=meltin.net; dkim=pass (2048-bit key) header.d=meltin.net header.i=@meltin.net header.b=FKu7Pfls; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=meltin.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meltin.net
+	s=arc-20240116; t=1757517624; c=relaxed/simple;
+	bh=kv8B0O1HobxaoHy5RFbs2AfcQk0dCx425bnynxZBSGw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=quC6G6FKJd01nF5grcGAgXa0BTrPz0V/bB278qKQ15MAPIKm7xwOfmOc3krYSP03XapDv1Dzdb1WU1Bhc8y7Z1N1pFxacIpVLYY/ubxGfAUNIpF3N/SbyKt9KEYAq4Bi3sBAMCXR8BY8XfXwYYrukmyQU6uc6EtBSuInr107Gp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCiTStcR; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meltin.net header.i=@meltin.net header.b="FKu7Pfls"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meltin.net;
-	s=202409; t=1757496673;
-	bh=l4Wc7wiJDcgKf4QsZpzLLHYgzcGBGhYMkF50CJwWq/Y=;
-	h=Date:From:To:Subject:From;
-	b=FKu7PflsCzYl80vkxmsiaIQddzgfNWfYFYLNPXN6UrdWedpdQsVT9xbbyRPBWrjk0
-	 mf4u3riurTtfYUqwhfbrX/ZNYYmrRKohxXcQHhVC7yUhJxtB/h+bUYU2C9LefUSoKB
-	 W8IqPNKbDGgt4q3YOXlvowLPYlPb0jDLcEXgit6HymBGnp8RuAztKtoLjTW4py+4HY
-	 wtOcmPP4UBB4k8hRmHvPvoDaHWVehAvNIxYVkVCGH8OYFmuQHhdBGq3F51YVzPd912
-	 kF0ahC616jG5k7pCwdT/vl+HpxRpC0tSr6qqo0RB/ethl4+NwMm7Q+hz3N0WqayqgX
-	 4nL4JHCC0Y1Hw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cMFmx1Wyqz4wB1;
-	Wed, 10 Sep 2025 19:31:13 +1000 (AEST)
-Date: Wed, 10 Sep 2025 19:31:10 +1000
-From: Martin Schwenke <martin@meltin.net>
-To: linux-cifs@vger.kernel.org
-Subject: [PATCH] docs: update username= option to drop invalid examples
-Message-ID: <20250910193110.6978809d@martins.ozlabs.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCiTStcR"
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b045d56e181so1037449066b.2
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 08:20:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757517619; x=1758122419; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YddFOBIDIxcf8W9M4VBDWjnSHo4iGUOtLHzqiAb0UxM=;
+        b=bCiTStcRQJ7xrg21i/sgEpm/ygLBpy9zdwRVEzXn8+98ZY1au2au+aPGRrIotyHFCt
+         eegZgUNvMge6OUhKtCuUXppF1wMlKtRxvZVdurplQAkq7L0J81TY1CSdyp+AZdwXWqXk
+         USczer5pTCIgERYOnlLoxU8OpK3PQ55nf1oe+xsNl0y3cKAQgL3RRnUWcLRDyoRQT1xL
+         ydhb+VuIPex9AXWawnmiDT00wV9pfUY/zWm84klmkMTFSepoYUF4bHTMhnjDCZ7Fkpvx
+         R22HmAoJ5YTPjYOZ3k6THSrwTdM6bLonAGc5MU+GAVzOZqEDXvUoRo1667m3gfyqIyuH
+         Kj/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757517619; x=1758122419;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YddFOBIDIxcf8W9M4VBDWjnSHo4iGUOtLHzqiAb0UxM=;
+        b=HrZKVJDrSdDGZhC4KGBziTspOMyOknzBYSvPqCy7UPx6OMsqpoRQv3gcSq5fI0WxL5
+         5lXautzb81tTk10VDFaKIaWid2Pp4Oxt4f+SBEUdLg4OZdW9cxHwAqQuZpQPtAPIM5rK
+         BBuxnpAzd4sF+p5+oexEFiIDnCBbr68KPkkJlBEMSvyKGKpJ7QJVQxHnh5L0pX/WmnkT
+         m0c+7LpPWrnAtdNRhs31o49vHZ4TmSYO/PjuW59ZYHk4rCLS//3zfuFIKo+5bDiiM57k
+         VrgL733Ce+8SJmkWyMV4WwriALDUMhTEi5N7ghSsdBX2NtKaPlh/ELW4qqC8TNNWoQ72
+         M+GA==
+X-Forwarded-Encrypted: i=1; AJvYcCUETRIYwj9yU+ZUQS8PmsNlJai34rxF4dJM8hhT8UjDYJipd92TSmbJLWbIHxeGZ6IASdyQjBG3Zlte@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywue0lfnRtJo0dOJx6slHTmUSxPXXRYfxEuy5LE9vHgXm0yG/wT
+	UY7gZyqnpCgAa3znienSvWjL7uOodZ9OYgUG7Eg471fq+On2hea9QzfcEMjluUD+uL3BH2IzCd+
+	pW3asvghrpNO0o+9saCHQo9QNbSt56B4=
+X-Gm-Gg: ASbGncu/MJnAfUCCsuapE5pNBSu5cE4uyMf/EZu/ZRwnAfkIYopdVq7eSJxgr7eiXHV
+	2hC1Jyugc0DOeF5eMJN6b8KSd26El8NOhO0a88Wqw/qw7h4JG5WJNwJh9hyBKwvJbZRs2BsLPl8
+	fwfYrL8Y9wRBfQn1XwrWTC3/ayROZ6r+DbpO9DRHIKOH8MQhHjOI2zLzvRMyNjhmXMv/9vyIGI3
+	DLy+bhT5KJWu65u
+X-Google-Smtp-Source: AGHT+IFEDD/EJRTUJeo50foI0Xse2fOk/2Go/a4VgKQGbKl/+u2PY0/xyGLg4lYDrJv0uH4s6HjqIwD3JLfl3LwmbPc=
+X-Received: by 2002:a17:907:1c93:b0:b04:3e15:7289 with SMTP id
+ a640c23a62f3a-b04b15434ddmr1549316866b.33.1757517619105; Wed, 10 Sep 2025
+ 08:20:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/5c/aLaCHl1AnSsHOUw/NeJC"
+References: <CANT5p=ofG-CQF_Rmv15+HAe0Jd1u1r=uqa-nYyDFOBOJ-0-jng@mail.gmail.com>
+ <ddd6lpyi36bfbe5qhaqc25m2nfw4rfh7rwjzrsx2chkf3p5zji@4xq5ew2qisha>
+In-Reply-To: <ddd6lpyi36bfbe5qhaqc25m2nfw4rfh7rwjzrsx2chkf3p5zji@4xq5ew2qisha>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Wed, 10 Sep 2025 20:50:07 +0530
+X-Gm-Features: Ac12FXya01MYw6-tkQB8cMPe7kIn-Yz4qPEGmku-lCMTHqCjwucK2NEowV0yuXQ
+Message-ID: <CANT5p=r+Ce0FD7yjzJU4kq3v0UyzFNjgTz0eZ_=54fTe_H6_BQ@mail.gmail.com>
+Subject: Re: Growing memory usage on 6.6 kernel
+To: Enzo Matsumiya <ematsumiya@suse.de>, yangerkun@huawei.com
+Cc: David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@manguebit.com>, 
+	Matthew Wilcox <willy@infradead.org>, Steve French <smfrench@gmail.com>, 
+	CIFS <linux-cifs@vger.kernel.org>, Bharath SM <bharathsm.hsk@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---MP_/5c/aLaCHl1AnSsHOUw/NeJC
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+On Fri, Sep 5, 2025 at 7:51=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de> =
+wrote:
+>
+> Hi Shyam,
+>
+> On 09/05, Shyam Prasad N wrote:
+> >Hi David / Paulo / Matthew,
+> >
+> >We have a customer who is reporting a behaviour change in the way that
+> >cifs.ko manages pages with Azure Linux running 6.6 kernel. This kernel
+> >is generally on par with stable 6.6 tree.
+> >They have a test program which simply opens a file, writes to it and
+> >closes it (it chooses one of 100 files at random). It spawns multiple
+> >threads which do this in parallel.
+> >They reported that the memory usage keeps growing and that at some
+> >point, the VM becomes unusable.
+> >
+> >I checked what's going on, I see that there is no memory being leaked.
+> >The output of free command reports approximately the same available
+> >memory as it runs. However, I see that the "Inactive" section of
+> >/proc/meminfo keeps growing:
+> >https://man7.org/linux/man-pages/man5/proc_meminfo.5.html
+> >
+> >              Active %lu
+> >                     Memory that has been used more recently and usually
+> >                     not reclaimed unless absolutely necessary.
+> >
+> >              Inactive %lu
+> >                     Memory which has been less recently used.  It is
+> >                     more eligible to be reclaimed for other purposes.
+> >
+> >I see that this behaviour is not the same on Ubuntu's 6.8 kernel. The
+> >inactive memory does not grow.
+> >And on the same 6.6 kernel, a trial on ext4 filesystem also shows
+> >similar results. The inactive count does not grow.
+> >
+> >My understanding is that these are reclaimable pages, which is why
+> >free is not showing a growth in memory.
+> >But the customer is claiming that they can consistently reproduce this
+> >issue and that the VM goes unresponsive as this memory keeps growing.
+> >
+> >Any idea what may be causing this?
+> >Is there a known fix in more recent kernels that you're aware of which
+> >needs to be backported?
+>
+> We had a very similar bug in our v6.4-based SLES, it's a folio leak.
+> We fixed it with this downstream patch:
+>
+> https://lists.linaro.org/archives/list/linux-stable-mirror@lists.linaro.o=
+rg/message/FY4GYKLWIMQKGPI4CDDANZH2AFIK6NM4/
+>
+> Copying a single large (100GB+) file also makes the VM unresponsive.
+>
+> HTH
+>
+>
+> Cheers,
+>
+> Enzo
 
-When hurrying and scanning the documentation, my eye was drawn to the
-examples ``user%password`` or ``workgroup/user`` and
-``workgroup/user%password``, especially because they were rendered in
-bold in my terminal.  I didn't read them in the context of them being
-deprecated and experienced a non-zero amount of frustration when they
-didn't work.  Given that these no longer work at all, remove them and
-add clarity.
+Hi Enzo,
 
-peace & happiness,
-martin
+Thanks a lot for this pointer. This helps us with a lot of context.
 
---MP_/5c/aLaCHl1AnSsHOUw/NeJC
-Content-Type: text/x-patch
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename=0001-docs-update-username-option-to-drop-invalid-examples.patch
+@Steve French It looks like this patch was submitted to stable. But
+because the format was not correct gregkh rejected it and asked it to
+be submitted again. That patch was never resubmitted.
+I think we need to do this on priority. As customers seem to complain
+about data corruption under memory pressure.
 
-From 036719fde9b55a07831bf015e0e58ed2fbf7bc05 Mon Sep 17 00:00:00 2001
-From: Martin Schwenke <martin@meltin.net>
-Date: Wed, 10 Sep 2025 19:07:48 +1000
-Subject: [PATCH] docs: update username= option to drop invalid examples
-
-When hurrying and scanning the documentation, my eye was drawn to the
-examples ``user%password`` or ``workgroup/user`` and
-``workgroup/user%password``, especially because they were rendered in
-bold in my terminal.  I didn't read them in the context of them being
-deprecated and experienced a non-zero amount of frustration when they
-didn't work.  Given that these no longer work at all, remove them and
-add clarity.
-
-Signed-off-by: Martin Schwenke <martin@meltin.net>
----
- mount.cifs.rst | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
-
-diff --git a/mount.cifs.rst b/mount.cifs.rst
-index d489070..936cacb 100644
---- a/mount.cifs.rst
-+++ b/mount.cifs.rst
-@@ -57,17 +57,14 @@ username=arg|user=arg
-   specifies the username to connect as. If this is not
-   given, then the environment variable USER is used.
- 
--  Earlier versions of mount.cifs also allowed one to specify the
--  username in a ``user%password`` or ``workgroup/user`` or
--  ``workgroup/user%password`` to allow the password and workgroup to
--  be specified as part of the username. Support for those alternate
--  username formats is now deprecated and should no longer be
--  used. Users should use the discrete ``password=`` and ``domain=`` to
--  specify those values. While some versions of the cifs kernel module
--  accept ``user=`` as an abbreviation for this option, its use can
--  confuse the standard mount program into thinking that this is a
--  non-superuser mount. It is therefore recommended to use the full
--  ``username=`` option name.
-+  Users must use the discrete ``password=`` and ``domain=`` options to
-+  specify relevant values. Including these in the ``username=`` option
-+  is no longer supported.
-+
-+  While some versions of the cifs kernel module accept ``user=`` as an
-+  abbreviation for this option, its use can confuse the standard mount
-+  program into thinking that this is a non-superuser mount. It is
-+  therefore recommended to use the full ``username=`` option name.
- 
- password=arg|pass=arg
-   specifies the CIFS password. If this option is not given then the
--- 
-2.47.3
-
-
---MP_/5c/aLaCHl1AnSsHOUw/NeJC--
+--=20
+Regards,
+Shyam
