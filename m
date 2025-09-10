@@ -1,191 +1,162 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2001A08A3
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 19:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05EA2F2908
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 20:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757531129; cv=none; b=TLtXfut06zyRWUPjihSZLkDhtPqP+g8aQohfr/dwCaNKGHRmpEmb5Dm1oa70sc4W5XQ9Q4/LaZ2bJKHj0Vp35cP7P+qlOYH5vi6WtAT7tar8n7lkhLgmh4ibEtg1Gwi1P44aovpsp6CauO7k/asf88ceZLOfLtpi3TlvUYOuNbw=
+	t=1757536107; cv=none; b=CqRtElmQEK9myogrGaCVNn1M1yUi9mNe6sJukZ4Zq2vmPXP2PQ38TxUvmtuloR0OI5ZSCZW6IO6ynH6ZRGkYzd3vJ+/byGeMCVQBPeOoJ85Ej0mDEJWOCHed1LYwJcI9krv4CqB9ED3Qj4aaxIlVxEW2gmzmK6URAAMesL+Vobw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757531129; c=relaxed/simple;
-	bh=zvVFgUtG2PYlbQf5kGEZfIscAX6V6qnDUqHoTPEhSZc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S8Jjxmgbt1/6faVjaH/YtDQV6x6IDP+XyVHwEQDUc7N1/WPVQaI/iJLxqnhcF0TkxVaDw8kyDRIT9JqBCs3d6mV1SJMdXvZrvR+1fyglR9f1pS3o5Ud86lcG2JCldeyfPPfyI6yasPxNKcV04dzI7Opv8iHwKJSe1JpCs4Ba+xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=gWXrCIrt; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1757536107; c=relaxed/simple;
+	bh=Xko8QyVLkghzk+iRlobeMXjKo0UBP1Sgk5r5q5Wu0Z4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m76QtqQYEMOKl8xcxiLXuB36WkJ/lALMa+7ITlFXhNqhHM509svupxJbTxP2R6zpH3PmogEc+69msHN2Aeve8yehYsYfW+1Fbca4aPImAFGcDKWvfegNhksuDT/5/Ef6hD/DujjhSaP99D8jHqNnGNtWrOxC8A2ip6L+Gs2ggc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1N2xpEO; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="gWXrCIrt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=YiL6GulIFr+mlSqJ4d1AWNF4hfFaAl0s8YiAXyR4kBI=; b=gWXrCIrtduAE1K1h0BVyS6jHHO
-	rbFiZ16lsPABQKXHbs45oAVZt1kQhaxuvFIJhqJQ4WrqEaSzTo3v4VqXxfWy1N5pdiBpJYEh/KTOe
-	QrIBqXYKCkpEMCDyB3C5iy44yQ09vrPuLr1EQG3+RHm65wSrdJ0JYkWT5hi3UcHfMDGoFEAKXAmZH
-	fW+pYnQ3WY+jNlrL5DN/ffBSJuoi1E78BIVmBWzqqd+E0+nBMA8TdO+WMw3d0uxnuG+Agp/N9b6M3
-	KXgQ4fRLLtUxXZGCaAn+AehvtsqXZQjNg8lp6H7uTb/El3HtElqIwgeSLlkH8mXf8045WRukZdoPN
-	rqVPGjipalCvMY5O0CKeDDa8oDOa78MUSQaYYIXMzx+2HYEAWDWHpkYAc5pz18B/qavKV3gNuAcbc
-	Ohh08L8DYrAvSFSc4lBDyykc3q8PVhPxBMvtRLUSvIjZTpcPJRRsPu18FGSbDPhfOgQOgCSdlM/Ov
-	HeEQxXc8PR6rV7uiqLYgIGH/;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1uwQ87-003TWY-0V;
-	Wed, 10 Sep 2025 19:05:19 +0000
-Message-ID: <642872f4-e076-4588-b011-920479b06949@samba.org>
-Date: Wed, 10 Sep 2025 21:05:17 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1N2xpEO"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-70df92872ceso156626d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 13:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1757536105; x=1758140905; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EoD+jf8a6jOSihiLhiZa52QhcqKVRTwi8Wfw11HdQ9A=;
+        b=d1N2xpEOYA8D2RFFXnf6CDGpZmf0hXiteqZb+17zPt5v68nKfzXCZ8mSoMQnmgW4dn
+         XyMjIB4mA6QOn0oNPvFI+DjKsrcmSppsKJswr0ghDkOnT9VQ3Ek2Nbt72Yx/SIMLLakE
+         8uxzZOE3ZULf0kH4SepKD4iAxYkEJyn7I9ArIO137Ls/FNt6ROBEDJvhB7E959f8Q6+y
+         J5JGUUgoOuSoqjqFHxDZWU4XYfgQct1gj6eTb+n3aRxFPnhU8Dh8v+nm2W6Zud7Jc8gr
+         2Tr6dFuKN1vHJt4Sp9W0MSwygd6X0+FvSG4CbFtwiz0i/Mj1cIU2NTc++TPRARa1osLl
+         vXGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1757536105; x=1758140905;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EoD+jf8a6jOSihiLhiZa52QhcqKVRTwi8Wfw11HdQ9A=;
+        b=eNefn0yXcZtp0+UhsdT8ixup926jv+/q4OaXYwSHKZNXuNY4pEjzyaF5f4NsnAWRZW
+         W7kMIhbA3sUYL0gmshEPLj6U68doPlRArGl5AePKVbfuAGzfFFHF+3Lkc95fgoDuP8M+
+         FbJAhUFi9hIKQNiDSTGdO0YCXIFzHVtg93L6XKzcqhuCLgtTVs/g2oIDGNu6kIx0ZcXo
+         Kf3q5fypQA15WQGbAxsVaUPOBjkPDFlnH8hu/ke70m5L97IjP4qphLZYbGUVXow5gkkE
+         m7rFJIzHr2eFyodov6bRnV1eEOEmXn0aEdE+3tJb2LXRyXlg4l0FE0ig3qu9LRgoonkD
+         Yatg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIZqkqTmJ1KrmEL2iZf8B6x2r+wzVsou2443/nIr4Z1xgcRQ50jiSjL1e8G2CX8QHvxymmgnB3OyuR@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtBZwgGiTyn78Ssab5XPQdF/ZgZQTXK0Ey0OsXG7M7I9QUj3Ys
+	kZCMasIn1FZk2G6yC/Os3k+no4FUuprU9NVWtpsVqSDxCRr41Yz4t8+BCJpqEEfyQz+ZAUwBmev
+	qCKOaMfpm+tyzf4DQrGkTey5jJaHF11U=
+X-Gm-Gg: ASbGncsbTbq47H21hse+/3xGmMSeYRilxOLfAcXWWMLKnJ5GjDLEq7urdO0sgnHDeDY
+	/gbovDBtoExvGxd2jTlnPNen+IHWVjM7it3cp7J9Qcd/PuYLqZ72RQ/mqpuqOmwCAqYhZxsY/sI
+	QFRRXCccirn8hA7cfdi44Mlrht6J1kdXb3OZ6zvQZsa2XLoqEhou9oqJT2qgk5AVQJQI/hiSYq4
+	RMjzAVHRLw6VtSPTCj+g1Pr3QixTACLA4Oe4Na6QuCBYP9BQ3DX85LNpvwVKzY6v24JHjVf1qqJ
+	CS/EPSjWZwrHjtj6Y5XkHqerLld7NGJrGSP9UDRbJtV0Wd91z2KUq7FFVpjvl4I2ljMBhjRy8MT
+	UhKce4Y86lEg=
+X-Google-Smtp-Source: AGHT+IFKakBwYP74rJ88DzfdJVV1aGp5+fkJMCp7pOJ0vCm7iGGmkE/jHeOrycAsem3ie7ZJP2Vxn+zv+pDvJdQO0/8=
+X-Received: by 2002:ad4:5aad:0:b0:758:2117:821d with SMTP id
+ 6a1803df08f44-762262da023mr13048626d6.24.1757536104692; Wed, 10 Sep 2025
+ 13:28:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: replace for-next-next... Re: [PATCH v4 000/142] smb:
- smbdirect/client/server: make use of common structures
-To: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, Namjae Jeon <linkinjeon@kernel.org>
-References: <cover.1756139607.git.metze@samba.org>
- <e6c0ddfe-8942-47a0-8277-b4176a5918e0@samba.org>
- <CAH2r5msKSbUfOVXUabNQep3s2H4kW0AMnDh0XA68Pk3_oqaHCQ@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <CAH2r5msKSbUfOVXUabNQep3s2H4kW0AMnDh0XA68Pk3_oqaHCQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250909202749.2443617-1-henrique.carvalho@suse.com> <CAH2r5ms_Nr0qt=Ntg4dBNXxrPhCNdKPg5qWW1BhBkt281fw2yQ@mail.gmail.com>
+In-Reply-To: <CAH2r5ms_Nr0qt=Ntg4dBNXxrPhCNdKPg5qWW1BhBkt281fw2yQ@mail.gmail.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 10 Sep 2025 15:28:13 -0500
+X-Gm-Features: AS18NWCNmYnjg4A1foJeFwN28A6zzIlDiu7n1TIAkJn4QwuFykRpCngiuKkNZvM
+Message-ID: <CAH2r5muyRvOn_OgKimn05V8o-XDt8SVdDzVU7peRmT_KGNzdkQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: skip cifs_lookup on mkdir
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: ematsumiya@suse.de, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Steve, hi Namjae,
+Henrique, I can repro the failure in generic/005 with your patches,
+but am fascinated that one of your patches may have worked around the
+generic/637 problem at least in some cases, but am having difficulty
+bisecting this.
 
-I found "ksmbd: smbdirect: validate data_offset and data_length field of smb_direct_data_transfer"
-https://git.samba.org/?p=ksmbd.git;a=commitdiff;h=927f8fe05e334d016c598d2cc965161c2808d9ba
-in ksmbd-for-next-next.
-
-I added a Fixes and Reviewed-by tag
-https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=fa36db4e8d62aa9c3ba1200323d8e01e4eb88b19
-and two additional patches:
-ksmbd: smbdirect: verify remaining_data_length respects max_fragmented_recv_size
-https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=9e881174900e53dd2b17c0c0933cc4395ceb47a6
-smb: client: let recv_done verify data_offset, data_length and remaining_data_length
-https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=174faeea9ee496b724206d405b74db8b05729f11
-
-I think these should go into 6.17.
-
-As there as conflicts with for-next-next I rebased it again
-and made sure each commit compiles and the result still passes
-the tests I made last time.
-
-The result can be found under
-git fetch https://git.samba.org/metze/linux/wip.git for-6.18/fs-smb-20250910-v6
-https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-6.18/fs-smb-20250910-v6
-
-Please have a look and replace for-next-next again...
-The diff against the current for-next-next (e2e99af785ee91ce20c6d583e396660494db77a2)
-and for-6.18/fs-smb-20250910-v6 (1fb2a52741e836f54a4691cbd74d9d70d736e506) follows below.
-
-Thanks!
-metze
-
-  fs/smb/client/smbdirect.c                  | 19 ++++++++++++++++++-
-  fs/smb/common/smbdirect/smbdirect_socket.h |  2 +-
-  fs/smb/server/transport_rdma.c             | 25 +++++++++++++++++--------
-  3 files changed, 36 insertions(+), 10 deletions(-)
-
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 322334097e30..6215a6e91c67 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -548,7 +548,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-  	struct smbdirect_socket *sc = response->socket;
-  	struct smbdirect_socket_parameters *sp = &sc->parameters;
-  	u16 old_recv_credit_target;
--	int data_length = 0;
-+	u32 data_offset = 0;
-+	u32 data_length = 0;
-+	u32 remaining_data_length = 0;
-  	bool negotiate_done = false;
-
-  	log_rdma_recv(INFO,
-@@ -600,7 +602,22 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-  	/* SMBD data transfer packet */
-  	case SMBDIRECT_EXPECT_DATA_TRANSFER:
-  		data_transfer = smbdirect_recv_io_payload(response);
-+
-+		if (wc->byte_len <
-+		    offsetof(struct smbdirect_data_transfer, padding))
-+			goto error;
-+
-+		remaining_data_length = le32_to_cpu(data_transfer->remaining_data_length);
-+		data_offset = le32_to_cpu(data_transfer->data_offset);
-  		data_length = le32_to_cpu(data_transfer->data_length);
-+		if (wc->byte_len < data_offset ||
-+		    wc->byte_len < (u64)data_offset + data_length)
-+			goto error;
-+
-+		if (remaining_data_length > sp->max_fragmented_recv_size ||
-+		    data_length > sp->max_fragmented_recv_size ||
-+		    (u64)remaining_data_length + (u64)data_length > (u64)sp->max_fragmented_recv_size)
-+			goto error;
-
-  		if (data_length) {
-  			if (sc->recv_io.reassembly.full_packet_received)
-diff --git a/fs/smb/common/smbdirect/smbdirect_socket.h b/fs/smb/common/smbdirect/smbdirect_socket.h
-index 8542de12002a..91eb02fb1600 100644
---- a/fs/smb/common/smbdirect/smbdirect_socket.h
-+++ b/fs/smb/common/smbdirect/smbdirect_socket.h
-@@ -63,7 +63,7 @@ const char *smbdirect_socket_status_string(enum smbdirect_socket_status status)
-  	case SMBDIRECT_SOCKET_DISCONNECTING:
-  		return "DISCONNECTING";
-  	case SMBDIRECT_SOCKET_DISCONNECTED:
--		return "DISCONNECTED,";
-+		return "DISCONNECTED";
-  	case SMBDIRECT_SOCKET_DESTROYED:
-  		return "DESTROYED";
-  	}
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 33d2f5bdb827..e371d8f4c80b 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -538,7 +538,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-  	case SMBDIRECT_EXPECT_DATA_TRANSFER: {
-  		struct smbdirect_data_transfer *data_transfer =
-  			(struct smbdirect_data_transfer *)recvmsg->packet;
--		unsigned int data_length;
-+		u32 remaining_data_length, data_offset, data_length;
-  		u16 old_recv_credit_target;
-
-  		if (wc->byte_len <
-@@ -548,15 +548,24 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
-  			return;
-  		}
-
-+		remaining_data_length = le32_to_cpu(data_transfer->remaining_data_length);
-  		data_length = le32_to_cpu(data_transfer->data_length);
--		if (data_length) {
--			if (wc->byte_len < sizeof(struct smbdirect_data_transfer) +
--			    (u64)data_length) {
--				put_recvmsg(sc, recvmsg);
--				smb_direct_disconnect_rdma_connection(sc);
--				return;
--			}
-+		data_offset = le32_to_cpu(data_transfer->data_offset);
-+		if (wc->byte_len < data_offset ||
-+		    wc->byte_len < (u64)data_offset + data_length) {
-+			put_recvmsg(sc, recvmsg);
-+			smb_direct_disconnect_rdma_connection(sc);
-+			return;
-+		}
-+		if (remaining_data_length > sp->max_fragmented_recv_size ||
-+		    data_length > sp->max_fragmented_recv_size ||
-+		    (u64)remaining_data_length + (u64)data_length > (u64)sp->max_fragmented_recv_size) {
-+			put_recvmsg(sc, recvmsg);
-+			smb_direct_disconnect_rdma_connection(sc);
-+			return;
-+		}
-
-+		if (data_length) {
-  			if (sc->recv_io.reassembly.full_packet_received)
-  				recvmsg->first_segment = true;
+On Wed, Sep 10, 2025 at 12:50=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+>
+> Interesting that running with three of your patches, I no longer see
+> the failure in generic/637 (dir lease related file contents bug) but I
+> do see two unexpected failures in generic/005 and generic/586:
+>
+> http://smb311-linux-testing.southcentralus.cloudapp.azure.com/#/builders/=
+5/builds/116
+>
+> e.g.
+>
+> generic/005 5s ... - output mismatch (see
+> /data/xfstests-dev/results//smb21/generic/005.out.bad)
+>     --- tests/generic/005.out 2024-05-15 02:56:10.033955659 -0500
+>     +++ /data/xfstests-dev/results//smb21/generic/005.out.bad
+> 2025-09-10 08:33:45.271123450 -0500
+>     @@ -1,8 +1,51 @@
+>      QA output created by 005
+>     +ln: failed to create symbolic link 'symlink_00': No such file or dir=
+ectory
+>     +ln: failed to create symbolic link 'symlink_01': No such file or dir=
+ectory
+>     +ln: failed to create symbolic link 'symlink_02': No such file or dir=
+ectory
+>     +ln: failed to create symbolic link 'symlink_03': No such file or dir=
+ectory
+>     +ln: failed to create symbolic link 'symlink_04': No such file or dir=
+ectory
+>     +ln: failed to create symbolic link 'symlink_05': No such file or dir=
+ectory
+>
+> Do you also see these test failures?
+>
+> On Tue, Sep 9, 2025 at 3:30=E2=80=AFPM Henrique Carvalho
+> <henrique.carvalho@suse.com> wrote:
+> >
+> > For mkdir the final component is looked up with LOOKUP_CREATE |
+> > LOOKUP_EXCL.
+> >
+> > We don't need an existence check in mkdir; return NULL and let mkdir
+> > create or fail with -EEXIST (on STATUS_OBJECT_NAME_COLLISION).
+> >
+> > Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> > ---
+> >  fs/smb/client/dir.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+> > index 5223edf6d11a..d26a14ba6d9b 100644
+> > --- a/fs/smb/client/dir.c
+> > +++ b/fs/smb/client/dir.c
+> > @@ -684,6 +684,10 @@ cifs_lookup(struct inode *parent_dir_inode, struct=
+ dentry *direntry,
+> >         void *page;
+> >         int retry_count =3D 0;
+> >
+> > +       /* if in mkdir, let create path handle it */
+> > +       if (flags =3D=3D (LOOKUP_CREATE | LOOKUP_EXCL))
+> > +               return NULL;
+> > +
+> >         xid =3D get_xid();
+> >
+> >         cifs_dbg(FYI, "parent inode =3D 0x%p name is: %pd and dentry =
+=3D 0x%p\n",
+> > --
+> > 2.50.1
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
 
 
+--=20
+Thanks,
 
+Steve
