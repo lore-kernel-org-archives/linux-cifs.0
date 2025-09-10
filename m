@@ -1,104 +1,122 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA09258EE9
-	for <linux-cifs@vger.kernel.org>; Tue,  9 Sep 2025 20:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0021312CDA5
+	for <linux-cifs@vger.kernel.org>; Wed, 10 Sep 2025 09:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757449838; cv=none; b=BikyWqaJu0peRP8QAzB7nM0SCVLpj2S9pREl0x0up56jXFFIXA+gxZiVd9pT5sqPTNKLHYlPwxT0HaiIPSODu5uv/PpqLM8KR2T8T/iHbHBUB/4EQdEbZ5n2usd1XxgUSKG2kGKijFUYRbilpuZTl/WJNjpVNvo8v8s6+yW9Sq0=
+	t=1757496678; cv=none; b=ePEkz3rjD33LsWWOT5zu642kIEp8evwzQMZVpmOFLUNIHaO8PeacajqmlqdMetLhjhGMdTN7e70YNu53Gu/fMTPNygP29ZI+Rm8gTYNQX6hUzMGYcKcu2YZcBZAxAI7nOFmrk0A6cKsXGlocAQPutRodxoZTXb68w9KzBTwIKf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757449838; c=relaxed/simple;
-	bh=9rZo4/N+H4o1CU2KJuozNET5QIOSGtktiu/q+gl9TBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IN3JiBzqQ4wYQIU0gQAQDb4c+W5A4e8eKz0s6TRApbD0kJTiIA0LRFCbAnAWpoO/5o5AQqJWEmClQrj1avMDEGr2QKGNOn0DlEgBKOcTFUbodN6YzMMiIpcTLoFk/MPpHNOtmWPHYaK0dGCOYID0OMWF5C67LvQ4g3vwXDspIJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NqG5fjKW; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1757496678; c=relaxed/simple;
+	bh=GRSzaGpG/1Xr/xQMzkU/cR7wAlBMfgRGNzsp1bxaV/s=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=HsN/JoKftPMUQHLzj+80RZPkSoe5dwVbWNUp1pd7RZJf64V5ryneWHEqipqyIFY5awCupTeVt1tp7zLkKIlehtp3ZkAkPD5AZSTfZOBI8/YwikViQwM7w7MA52EeNCdO+Lzo69mTeZ6x5tHDWI3gnidpi6o74O4Scyv3PvGLCQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=meltin.net; spf=pass smtp.mailfrom=meltin.net; dkim=pass (2048-bit key) header.d=meltin.net header.i=@meltin.net header.b=FKu7Pfls; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=meltin.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meltin.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NqG5fjKW"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3e7512c8669so950262f8f.0
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Sep 2025 13:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1757449834; x=1758054634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ibeh22deR57LT1xlTRcFSIHTIlIUMdyvrZyHblfrOMI=;
-        b=NqG5fjKWCwZCkGGLC6eo1KV1Vp0D0MpjWbQHCaK+kVm1ssAo+mENgC0lwINLiGa2Ar
-         oY4cxG8J4ftAnQ2XpAkt5KHTwBBx2GRBncbG56xdTLM4yoYRpxLLYgHokGyXt/EJsEcN
-         edPZ0cT1esoFYnwtnAE60xvoa645Cf5p+lRaKatAc+/FaNcZg9y41nitE+MEbyni2Tad
-         B6XgrRaPalxovipaoTmXzjIMeNC9Pf3uZZnkDR2mKxUlWbRHZWxSSDiUSd4sFSVnX2or
-         ZCHErkGKr3z4T1QDd46YBnhp531u34/CZlsluMbZ4+oRCe5NBsMihMh+xw7wnyLhvbYL
-         EbAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1757449834; x=1758054634;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ibeh22deR57LT1xlTRcFSIHTIlIUMdyvrZyHblfrOMI=;
-        b=XNeEqhAsEdr79oRlEo+qtbBa1e6ZnG+NWwPqM8ZHzxTpqU2ziNQHYdIeB+wYs8tpDF
-         WfG8xxcWK6HF9FjFaeXIpsm78IYdKX/wAeD8X58dCbaLkt3IetYFzxIemPet5ZAqtQ5Y
-         DZK5gedzLENHKsULJLBMZhQdJjJPlCPs59xPGzPzsBzjznmoDlgY4ouHkp3ym2Bsv0aE
-         io0C5ehge2F0pnpLy1ZqslPIRYrjhtE1WJ9X6gooMEmLSgv1QqGVX7WUp4HnaWwol8+D
-         ul5VGXQLbquS71fgGSmj/qwqJuJdvMKK+Dbq/1Bgva72F2oP7m4TcVWxpE0o+Mamt/s0
-         S6OA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzogc/Ctg7wqbIhjraLRKGU2K1BjK8e5cHGgInDYLxuaCMX9hNKyd/O2BSjr5og1mEtMQSMdvx/3Yk@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCXhFzqcjmqY4o9g2YbVUM8a7g80nGxuu82XKPVCLb47p8X4c+
-	rPzwjhNIiz1iXBObQJ5/FCw7sjjfNuZximMr++BIsnsaPlWbebfc5Vsgg5E09P8W0JA=
-X-Gm-Gg: ASbGncthPrqcaP2WIWlTAcre51hmNO0xHJB0ToyrO1WJzc2iI9E2lRVf2sy5lAZ6oSA
-	XHRADedmlMedyhNntk07berZQK8YNLGcprvvkY7hDfVV0MIZ6aU0ZDxaYONj3xd2k0icrn24U+S
-	/1gaNDM4Vi9UnGe1IIeHCGi1qFh3r/aWOHE1cY2tkJ3ePP8EWDj5Zq7elJlkQ8t5aJg7akKzaUv
-	R9l/7YW/Rc2bA5sk6/pzHv97ZgogfBO+4Cd9K2x2TVxRByYhvY8O0PIT9CiGeUNqkYmllpP/GH/
-	22Veo/7lNW+mreAG9St7L/+E/RzTR1NMvPCTvqOtJssH3IHCSVvgWizW6yKR3kZEcvF7VKfmX/w
-	nt/nkeRZ47HDoIolOgTmCfReD9WR28+5/KeDy2xwYDmW6r/Sgp7lo
-X-Google-Smtp-Source: AGHT+IEa5sHD1L6N19anEqAAHQciex4DxWqwZ04mGvxLRxrKxLDVn94wjV412kpt6eqS5/cmf7bnzw==
-X-Received: by 2002:a05:6000:40dd:b0:3d4:a64:6725 with SMTP id ffacd0b85a97d-3e636d901d5mr5460410f8f.10.1757449834489;
-        Tue, 09 Sep 2025 13:30:34 -0700 (PDT)
-Received: from precision ([2804:7f0:bc01:dbd7:ec48:e5b6:7564:d345])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-774662f7f1csm2964550b3a.97.2025.09.09.13.30.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Sep 2025 13:30:33 -0700 (PDT)
-From: Henrique Carvalho <henrique.carvalho@suse.com>
-To: smfrench@gmail.com
-Cc: ematsumiya@suse.de,
-	linux-cifs@vger.kernel.org,
-	Henrique Carvalho <henrique.carvalho@suse.com>
-Subject: [PATCH] smb: client: skip cifs_lookup on mkdir
-Date: Tue,  9 Sep 2025 17:27:49 -0300
-Message-ID: <20250909202749.2443617-1-henrique.carvalho@suse.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=meltin.net header.i=@meltin.net header.b="FKu7Pfls"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meltin.net;
+	s=202409; t=1757496673;
+	bh=l4Wc7wiJDcgKf4QsZpzLLHYgzcGBGhYMkF50CJwWq/Y=;
+	h=Date:From:To:Subject:From;
+	b=FKu7PflsCzYl80vkxmsiaIQddzgfNWfYFYLNPXN6UrdWedpdQsVT9xbbyRPBWrjk0
+	 mf4u3riurTtfYUqwhfbrX/ZNYYmrRKohxXcQHhVC7yUhJxtB/h+bUYU2C9LefUSoKB
+	 W8IqPNKbDGgt4q3YOXlvowLPYlPb0jDLcEXgit6HymBGnp8RuAztKtoLjTW4py+4HY
+	 wtOcmPP4UBB4k8hRmHvPvoDaHWVehAvNIxYVkVCGH8OYFmuQHhdBGq3F51YVzPd912
+	 kF0ahC616jG5k7pCwdT/vl+HpxRpC0tSr6qqo0RB/ethl4+NwMm7Q+hz3N0WqayqgX
+	 4nL4JHCC0Y1Hw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4cMFmx1Wyqz4wB1;
+	Wed, 10 Sep 2025 19:31:13 +1000 (AEST)
+Date: Wed, 10 Sep 2025 19:31:10 +1000
+From: Martin Schwenke <martin@meltin.net>
+To: linux-cifs@vger.kernel.org
+Subject: [PATCH] docs: update username= option to drop invalid examples
+Message-ID: <20250910193110.6978809d@martins.ozlabs.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="MP_/5c/aLaCHl1AnSsHOUw/NeJC"
 
-For mkdir the final component is looked up with LOOKUP_CREATE |
-LOOKUP_EXCL.
+--MP_/5c/aLaCHl1AnSsHOUw/NeJC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-We don't need an existence check in mkdir; return NULL and let mkdir
-create or fail with -EEXIST (on STATUS_OBJECT_NAME_COLLISION).
+When hurrying and scanning the documentation, my eye was drawn to the
+examples ``user%password`` or ``workgroup/user`` and
+``workgroup/user%password``, especially because they were rendered in
+bold in my terminal.  I didn't read them in the context of them being
+deprecated and experienced a non-zero amount of frustration when they
+didn't work.  Given that these no longer work at all, remove them and
+add clarity.
 
-Signed-off-by: Henrique Carvalho <henrique.carvalho@suse.com>
+peace & happiness,
+martin
+
+--MP_/5c/aLaCHl1AnSsHOUw/NeJC
+Content-Type: text/x-patch
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename=0001-docs-update-username-option-to-drop-invalid-examples.patch
+
+From 036719fde9b55a07831bf015e0e58ed2fbf7bc05 Mon Sep 17 00:00:00 2001
+From: Martin Schwenke <martin@meltin.net>
+Date: Wed, 10 Sep 2025 19:07:48 +1000
+Subject: [PATCH] docs: update username= option to drop invalid examples
+
+When hurrying and scanning the documentation, my eye was drawn to the
+examples ``user%password`` or ``workgroup/user`` and
+``workgroup/user%password``, especially because they were rendered in
+bold in my terminal.  I didn't read them in the context of them being
+deprecated and experienced a non-zero amount of frustration when they
+didn't work.  Given that these no longer work at all, remove them and
+add clarity.
+
+Signed-off-by: Martin Schwenke <martin@meltin.net>
 ---
- fs/smb/client/dir.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ mount.cifs.rst | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 5223edf6d11a..d26a14ba6d9b 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -684,6 +684,10 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 	void *page;
- 	int retry_count = 0;
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index d489070..936cacb 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -57,17 +57,14 @@ username=arg|user=arg
+   specifies the username to connect as. If this is not
+   given, then the environment variable USER is used.
  
-+	/* if in mkdir, let create path handle it */
-+	if (flags == (LOOKUP_CREATE | LOOKUP_EXCL))
-+		return NULL;
+-  Earlier versions of mount.cifs also allowed one to specify the
+-  username in a ``user%password`` or ``workgroup/user`` or
+-  ``workgroup/user%password`` to allow the password and workgroup to
+-  be specified as part of the username. Support for those alternate
+-  username formats is now deprecated and should no longer be
+-  used. Users should use the discrete ``password=`` and ``domain=`` to
+-  specify those values. While some versions of the cifs kernel module
+-  accept ``user=`` as an abbreviation for this option, its use can
+-  confuse the standard mount program into thinking that this is a
+-  non-superuser mount. It is therefore recommended to use the full
+-  ``username=`` option name.
++  Users must use the discrete ``password=`` and ``domain=`` options to
++  specify relevant values. Including these in the ``username=`` option
++  is no longer supported.
 +
- 	xid = get_xid();
++  While some versions of the cifs kernel module accept ``user=`` as an
++  abbreviation for this option, its use can confuse the standard mount
++  program into thinking that this is a non-superuser mount. It is
++  therefore recommended to use the full ``username=`` option name.
  
- 	cifs_dbg(FYI, "parent inode = 0x%p name is: %pd and dentry = 0x%p\n",
+ password=arg|pass=arg
+   specifies the CIFS password. If this option is not given then the
 -- 
-2.50.1
+2.47.3
 
+
+--MP_/5c/aLaCHl1AnSsHOUw/NeJC--
