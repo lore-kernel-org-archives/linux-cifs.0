@@ -1,227 +1,84 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995BE1DDC33
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Sep 2025 15:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155AB2206A9
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Sep 2025 16:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757605519; cv=none; b=nAo11GFS3WncnTkz6mgUWTZ1rAouFKHkf1Hge57FbIv3lGwxzq2bK6Vf3b8xUpT9DkgawAV+0Rip7aZVaQz3jJpveJRMR6+RfZL/bUcmgo0Kr6VkVYVvXQY/kW42gP5KCgfuhTl9rqMD8jmMluWLYqVBUANyYsDjcw0lPz0r7/g=
+	t=1757607923; cv=none; b=Oqnzq3R0mcxVRSOJb7LHCHL3s2cN2EkqrfsGEU37cis9aRxdPEg9kfEtsK+490ENYs4hEQDEIixQEkD4Y2idRAzSQJL8rmtSwQEboDMJf+Y9H+Sh7hl8OEjC9qhtjb22qMUFyr/2HzKBOhpwcrvtOcCEx8vL/fzGVk93v4mbP5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757605519; c=relaxed/simple;
-	bh=uoulG3lk05c/hweFS/6gKSueAPpN4OWgsVeMOXdlTmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h5b9MtYxoAgwcRl9ECq2VAxTwTTMM5lDQY8hRPLxbncspFR9YqgWjG6TPOHz+5EWDXf3b4ezhv9+e8leD/1We0DbqkQHSffJimCosRbnQrsVui8v6RgDLM9i+bh0WJJ3KSIdLSJaBAeyrni2eBpwqt6pnAtnztLwZUYu0N0tYmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NCWiCdmJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=L/zgXwUq; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F84Y/eec; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=6/n6rb3s; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1757607923; c=relaxed/simple;
+	bh=PR52AW0jMRA9Md4fiLVlHH2qtbQtKTkdmats5dfyD60=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CED+CZRm9abUPpAyeX10IHlH5n3X/+T74IfFb6CVZDKur/bHntqXHRCVTyIdxzxd6rXtsajtRXYAcwp/TtNj5FUwyc0KKOPzl4t/YslHSQTqyZeEToc7VXnRWZjdA8PNvgWlZpEfMxwidcy3Aan3bMcErNp7ZpVk21EpeMNhROs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KoYZXo/0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NCWiCdmJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="L/zgXwUq";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F84Y/eec";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="6/n6rb3s"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KoYZXo/0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1757607920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R0g49O2ePZuKTHbko+2wbGHRgCoDqRTUsVjaYJFlrjw=;
+	b=KoYZXo/02nmqZA5q8OyL/SMp/vlEYsvOYoaRnE3y4H43HiP1Vzx/U3MZczTZGNhrH+DjHt
+	Tdf51YfuzMxIesUiM70BYf2zz0KolSJ7OidX+xWLTi0gSo21hHHvHdsa9JpnizffOqlqa3
+	1ImNQvo8Oq95y1NFw3VJFECpVfjC0qk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-421-hpBmv8mXPpuLQpNsCpmnpQ-1; Thu,
+ 11 Sep 2025 12:25:14 -0400
+X-MC-Unique: hpBmv8mXPpuLQpNsCpmnpQ-1
+X-Mimecast-MFC-AGG-ID: hpBmv8mXPpuLQpNsCpmnpQ_1757607912
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 809CD401BF;
-	Thu, 11 Sep 2025 15:45:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757605515; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HGbDCMs51FFiodmFmwMfYykXg2bo5d18UwDV5CSZrws=;
-	b=NCWiCdmJvw2xhS/oKz1FJidSQfVvVccMbgPnzEsOxj63Sm3iurDC2T4NP+jSjjSZjqgPq9
-	JCOKKIs/VXJJl5A3i+HQ52PP0Zx/K0vCe1V64AhtXwimMw+m/8ANXjEFlVEEyk5JRy8z9m
-	rDo5Oo/3VF/WWpyRAr+129FO1GFd1mA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757605515;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HGbDCMs51FFiodmFmwMfYykXg2bo5d18UwDV5CSZrws=;
-	b=L/zgXwUqoOQ0sB2Lnr521tnA1MOScoxCFqOxMPjkse6k1zkyj1epX/F6Eax4xbQxpeDCXI
-	sDetouNKddVRiICA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1757605514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HGbDCMs51FFiodmFmwMfYykXg2bo5d18UwDV5CSZrws=;
-	b=F84Y/eec7sUK7kxcPZxwr+vGYjm1ROkCsUmHTQZqRPlY6+FtDkfIAjIcgJjphmWSJuOcD2
-	Wx7J3UmYGFRZMFOoxOO4EjAWT0tOPoxku2C5KtHPOADU+3JHV5qOKFsx/7JUvxyHy/n+cZ
-	y12tgiZOLvvLMhv1Bn2Zqqij61fE7gg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1757605514;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HGbDCMs51FFiodmFmwMfYykXg2bo5d18UwDV5CSZrws=;
-	b=6/n6rb3sePWMzjVU79an47D9JKc+IDAG8/iavLvw8aShJvkQxvLd+cPrlD4MnFCmqh+HeP
-	hobMxGhROB6KrICw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0426E13301;
-	Thu, 11 Sep 2025 15:45:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id aEM0L4nuwmhlCwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Thu, 11 Sep 2025 15:45:13 +0000
-Date: Thu, 11 Sep 2025 12:45:11 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B98E4180057D;
+	Thu, 11 Sep 2025 16:25:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.6])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 89DAB18004A3;
+	Thu, 11 Sep 2025 16:25:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <2780505c-b531-7731-3c3d-910a22bf0802@huawei.com>
+References: <2780505c-b531-7731-3c3d-910a22bf0802@huawei.com> <20250911030120.1076413-1-yangerkun@huawei.com>
 To: yangerkun <yangerkun@huawei.com>
-Cc: Shyam Prasad N <nspmangalore@gmail.com>, 
-	Greg KH <gregkh@linuxfoundation.org>, sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com, 
-	sprasad@microsoft.com, tom@talpey.com, dhowells@redhat.com, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, stable@kernel.org, yangerkun@huaweicloud.com
+Cc: dhowells@redhat.com, sfrench@samba.org, gregkh@linuxfoundation.org,
+    pc@manguebit.com, lsahlber@redhat.com, sprasad@microsoft.com,
+    tom@talpey.com, willy@infradead.org, linux-cifs@vger.kernel.org,
+    samba-technical@lists.samba.org, stable@kernel.org,
+    nspmangalore@gmail.com, ematsumiya@suse.de,
+    yangerkun@huaweicloud.com
 Subject: Re: [PATCH v3] cifs: fix pagecache leak when do writepages
-Message-ID: <clprezewclxsoxwzdxcc5zmclux47svnwylpsr6ncycrmksgov@et2dcfqs5gnm>
-References: <20250911030120.1076413-1-yangerkun@huawei.com>
- <2780505c-b531-7731-3c3d-910a22bf0802@huawei.com>
- <2025091109-happiness-cussed-d869@gregkh>
- <ff670765-d3e2-bc0a-5cef-c18757fe3ee0@huawei.com>
- <2025091157-imply-dugout-3b39@gregkh>
- <95935128-69fa-2641-c2a7-9d9660e2f9ba@huawei.com>
- <CANT5p=rE+=g7KA0RKOxs2UCnMEKfr3cm2V_+mwdb1g7+yV8NtA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CANT5p=rE+=g7KA0RKOxs2UCnMEKfr3cm2V_+mwdb1g7+yV8NtA@mail.gmail.com>
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linuxfoundation.org,samba.org,manguebit.com,redhat.com,microsoft.com,talpey.com,vger.kernel.org,lists.samba.org,kernel.org,huaweicloud.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -3.80
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1955608.1757607906.1@warthog.procyon.org.uk>
+Date: Thu, 11 Sep 2025 17:25:06 +0100
+Message-ID: <1955609.1757607906@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 09/11, Shyam Prasad N wrote:
->On Thu, Sep 11, 2025 at 4:55=E2=80=AFPM yangerkun <yangerkun@huawei.com> w=
-rote:
->>
->>
->>
->> =E5=9C=A8 2025/9/11 19:17, Greg KH =E5=86=99=E9=81=93:
->> > On Thu, Sep 11, 2025 at 07:09:30PM +0800, yangerkun wrote:
->> >>
->> >>
->> >> =E5=9C=A8 2025/9/11 18:53, Greg KH =E5=86=99=E9=81=93:
->> >>> On Thu, Sep 11, 2025 at 11:22:57AM +0800, yangerkun wrote:
->> >>>> Hello,
->> >>>>
->> >>>> In stable version 6.6, IO operations for CIFS cause system memory l=
-eaks
->> >>>> shortly after starting; our test case triggers this issue, and othe=
-r users
->> >>>> have reported it as well [1].
->> >>>>
->> >>>> This problem does not occur in the mainline kernel after commit 3ee=
-1a1fc3981
->> >>>> ("cifs: Cut over to using netfslib") (v6.10-rc1), but backporting t=
-his fix
->> >>>> to stable versions 6.6 through 6.9 is challenging. Therefore, I hav=
-e decided
->> >>>> to address the issue with a separate patch.
->> >>>>
->> >>>> Hi Greg,
->> >>>>
->> >>>> I have reviewed [2] to understand the process for submitting patche=
-s to
->> >>>> stable branches. However, this patch may not fit their criteria sin=
-ce it is
->> >>>> not a backport from mainline. Is there anything else I should do to=
- make
->> >>>> this patch appear more formal?
->> >>>
->> >>> Yes, please include the info as to why this is not a backport from
->> >>> upstream, and why it can only go into this one specific tree and get=
- the
->> >>> developers involved to agree with this.
->> >>
->> >> Alright, the reason I favor this single patch is that the mainline so=
-lution
->> >> involves a major refactor [1] to change the I/O path to netfslib.
->> >> Backporting it would cause many conflicts, and such a large patch set=
- would
->> >> introduce numerous KABI changes. Therefore, this single patch is prov=
-ided
->> >> here instead...
->> >
->> > There is no stable kernel api, sorry, that is not a valid reason.  And
->> > we've taken large patch sets in the past.
->> >
->> > But if you can get the maintainers of the code to agree that this is t=
-he
->> > best solution, we'll be glad to take it.
->>
->> OK, Steve, can you help give a feedback for this patch?
->>
->> Thanks,
->> Yang Erkun.
->>
->> >
->> > thanks,
->> >
->> > greg k-h
->> >
->
->Hi Greg,
->
->Steve can give you the final confirmation, but I can add some context here.
->
->This bug was never fixed upstream since the write/read code path was
->entirely refactored (with most of the folio maintenance
->responsibilities offloaded to netfs).
->We've recently had at least a couple of customers complaining about
->this in Microsoft, following which we've been able to repro the
->growing memory usage with a certain type of application workload.
->We've also been able to verify that the issue does not reproduce when
->cifs.ko was built with this patch against the 6.6 kernel of Azure
->Linux (and that kernel is mostly equivalent to stable 6.6). If you
->need a confirmation that this patch fixes the issue even on stable
->6.6, we can do that check.
->
->Additionally @Enzo Matsumiya also mentioned that SLES had to backport
->this change to their v6.4 kernel to fix this folio leak.
+yangerkun <yangerkun@huawei.com> wrote:
 
-That's right.
+> >     	if (folio->mapping != mapping ||
+> >   	    !folio_test_dirty(folio)) {
+> >   		start += folio_size(folio);
+> > +		folio_put(folio);
+> >   		folio_unlock(folio);
+> >   		goto search_again;
 
-Just a note that we did it for v6.4 because we had backported the fixed
-commit (f3dc1bdb6b0) to begin with.
-But I haven't checked if stable-v6.4 (i.e. without cifs_writepages_begin())
-is affected.
+I wonder if the put should be prior to the unlock.  It probably doesn't matter
+as we keep control of the folio until both have happened.
 
+David
 
-Cheers,
-
-Enzo
