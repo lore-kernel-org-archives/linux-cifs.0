@@ -1,72 +1,80 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398221DA55
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Sep 2025 18:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C19168BD
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Sep 2025 01:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757614666; cv=none; b=pFKbnftRbhke9zPiVv8WeiUQdNgoNER9+4PKrwIdy2JjjTQJ6ufEnDFDY1qkVCLFcBTgtzS5/gtT/6xYImAqelAHYCEijRk+UKrsZP0SvgGGeWKckq8gmx5Q6F/PR08ivRAR4oo2JfH59jE390WiUW7TRvmKcHtssWPcqWxPuzo=
+	t=1757639583; cv=none; b=NEKBE3QbFQ3MRpW7AiSt8w7puTMA0aWSUIrxPBkWalnCTCJN+Ru0CVJLYiTV9qqCnXGi+trc7HR2Z3376SxfdU/X6fl55HFQh87eBjRbf4GrTx12BBRw8BPwGEJmI8Xt9eraTgvx1EIUhFz1UoY4EqZEPGRtHd2mZZaevMRqGo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757614666; c=relaxed/simple;
-	bh=YYz8tWbLOemzDoqau8FtWsPcBZJizFNlWXNUYaKCidY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FnkL7Fd9Ow9x2Dz4EexuCyjA8Wu24nUK0EhKh2gEp2UojkW1Z98AJDQV+c9woizvU5wdOq9namHU62WcZ9bLJSMnFIZhG2omH4u+bKHUrxhgYUqtHzrqPB0PtNyFFYkjvfnQ7egu5OXi8T9Prl2tmdPgWK07VksUBC9DDliBi38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ADPKr9UR; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ADPKr9UR"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=WFUCNCHe+0otnnl9WC8jbDApQRqhgsqIqvfkYyj6Vek=; b=ADPKr9URaaRaESn89LiXR/cWpP
-	Gt0M7rdMfL/ggm/57JdYMbFg2lLII6JKFnx5+nT0csgyti4Fg8la9bOEklyDagn+2MZ0Ter8tXOmw
-	bsTGd7FgrF8AF5vD5HubfKn48PXVj0C6Auv85BF+5+4SPqrQSdcvYYxX3wwfoWMYjouqtHX+/xH2f
-	vgGlndErUzB8bqPN3rOBWB7jYP2k3KdWqPN3778gem7xmWErGmcpVyI9aaOxcig5xwrK5QbUyW2SA
-	DPZ6NkSOiG5Ji2zx8cc6vK+8FYoVSWtg/TB7WVQEyyC+QLz1d1N34pXBFrl2RcfnHrFjz0rfM8Dkh
-	8HUusGYw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uwlrK-0000000Fm9W-1UIm;
-	Thu, 11 Sep 2025 18:17:26 +0000
-Date: Thu, 11 Sep 2025 19:17:26 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: yangerkun <yangerkun@huawei.com>, sfrench@samba.org,
-	gregkh@linuxfoundation.org, pc@manguebit.com, lsahlber@redhat.com,
-	sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, stable@kernel.org,
-	nspmangalore@gmail.com, ematsumiya@suse.de,
-	yangerkun@huaweicloud.com
-Subject: Re: [PATCH v3] cifs: fix pagecache leak when do writepages
-Message-ID: <aMMSNnJA6VknuVMB@casper.infradead.org>
-References: <2780505c-b531-7731-3c3d-910a22bf0802@huawei.com>
- <20250911030120.1076413-1-yangerkun@huawei.com>
- <1955609.1757607906@warthog.procyon.org.uk>
+	s=arc-20240116; t=1757639583; c=relaxed/simple;
+	bh=lLyZrw2eC1dRC4NgNv7Uqk4TIEyF+RQuSowo4CthPh4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=CLHx3WSXUUL3u2Ygzk/u6oaWxPYfDLlCScThVbCqtFmMbPfQMulTPdXiCMzamGtIQ51xrNlV2/jBJVP+ewzqaBuF9UzgT4AOUU6edbVsMfVCIE5kXln69bAbgH8qbFym6OYjVqfOFeGGor8J+/ge+/fkRVYZ0WSh6lSyLRVkaAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4cNGWr1LtPz2CgZp;
+	Fri, 12 Sep 2025 09:08:24 +0800 (CST)
+Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
+	by mail.maildlp.com (Postfix) with ESMTPS id 203FA1400DC;
+	Fri, 12 Sep 2025 09:12:57 +0800 (CST)
+Received: from [10.174.177.210] (10.174.177.210) by
+ kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 12 Sep 2025 09:12:56 +0800
+Message-ID: <fce6ed78-87b4-2656-d8b1-02a83c8e1f91@huawei.com>
+Date: Fri, 12 Sep 2025 09:12:55 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1955609.1757607906@warthog.procyon.org.uk>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v3] cifs: fix pagecache leak when do writepages
+To: Matthew Wilcox <willy@infradead.org>, David Howells <dhowells@redhat.com>
+CC: <sfrench@samba.org>, <gregkh@linuxfoundation.org>, <pc@manguebit.com>,
+	<sprasad@microsoft.com>, <tom@talpey.com>, <linux-cifs@vger.kernel.org>,
+	<samba-technical@lists.samba.org>, <stable@kernel.org>,
+	<nspmangalore@gmail.com>, <ematsumiya@suse.de>, <yangerkun@huaweicloud.com>
+References: <2780505c-b531-7731-3c3d-910a22bf0802@huawei.com>
+ <20250911030120.1076413-1-yangerkun@huawei.com>
+ <1955609.1757607906@warthog.procyon.org.uk>
+ <aMMSNnJA6VknuVMB@casper.infradead.org>
+From: yangerkun <yangerkun@huawei.com>
+In-Reply-To: <aMMSNnJA6VknuVMB@casper.infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemf100006.china.huawei.com (7.202.181.220)
 
-On Thu, Sep 11, 2025 at 05:25:06PM +0100, David Howells wrote:
-> yangerkun <yangerkun@huawei.com> wrote:
-> 
-> > >     	if (folio->mapping != mapping ||
-> > >   	    !folio_test_dirty(folio)) {
-> > >   		start += folio_size(folio);
-> > > +		folio_put(folio);
-> > >   		folio_unlock(folio);
-> > >   		goto search_again;
-> 
-> I wonder if the put should be prior to the unlock.  It probably doesn't matter
-> as we keep control of the folio until both have happened.
 
-Well, folio->mapping != mapping is the condition for 'this folio has
-been truncated', so this folio_put() may well be the last one.  I'd
-put it after the folio_unlock() for safety.
+
+在 2025/9/12 2:17, Matthew Wilcox 写道:
+> On Thu, Sep 11, 2025 at 05:25:06PM +0100, David Howells wrote:
+>> yangerkun <yangerkun@huawei.com> wrote:
+>>
+>>>>      	if (folio->mapping != mapping ||
+>>>>    	    !folio_test_dirty(folio)) {
+>>>>    		start += folio_size(folio);
+>>>> +		folio_put(folio);
+>>>>    		folio_unlock(folio);
+>>>>    		goto search_again;
+>>
+>> I wonder if the put should be prior to the unlock.  It probably doesn't matter
+>> as we keep control of the folio until both have happened.
 > 
+> Well, folio->mapping != mapping is the condition for 'this folio has
+> been truncated', so this folio_put() may well be the last one.  I'd
+> put it after the folio_unlock() for safety.
+>>
+> 
+
+Thanks for pointing this out. Yes, I have check usage from other file
+systems; using folio_put after folio_unlock is a better approach.
+
+Thanks,
+Erkun.
