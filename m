@@ -1,96 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BC51DE2DC
-	for <linux-cifs@vger.kernel.org>; Tue, 16 Sep 2025 01:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B4C29B8EF
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Sep 2025 09:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1757985090; cv=none; b=Xa/KVDEXYXoWkjHhCqKUAsKSVuxbi2rLwtOXZjlWOML6yaG5voMES/PXICVl+SJ/voLGTl1+fhlTuUO2gimCVphzOF5MdxpOxaP2zdveIF+8ht1b5jqz+irKo5pjsz3OME2W93ILgCmHZxsvqJHB/O/JjhLOHI/SGJKvuxurm8A=
+	t=1758016086; cv=none; b=Y0XyTOwgzzTtE97inVnOnCQ7hxUeCKdCJ16VC4RrctbK25l3hMbsKbAtT+fwbsfSdhV1mxQUqo4gSEbu4xgDh1tn/mZZtnt/wcvstUrTrvEDN+szAF4MpYvb03noCRCclkRCcX3hSDak+/L3SgRGOJesP549blvJ/nx1wSFCZ3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1757985090; c=relaxed/simple;
-	bh=pywoNX5Fj0ThFie7i1F+fNV/378eQvTd2KEdBeM7gXQ=;
+	s=arc-20240116; t=1758016086; c=relaxed/simple;
+	bh=T+Vf2dDOixMwZJgqQOACk6vB5Gd3gpAlFSucc0OqV4s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eLFWCieC0pxMIZAKy2XAEh7MYbUpRnK3JGCwvnXnwoFGXdXECRYYiIAtSnTRcCnz0bbkrNSQ5B4/HbStIfRIUieCQe5e2IN+m2pq9wpIfnZ3cfOwqMIte/W/0Z2jeDmXDYuPEOPVmIT8FHU8Gs12mHoWyVWxpM66Y3J0PGm4idw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uO2/3J0s; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=DZLb9nVOc5YcMpCI+LLmbVkjUWhNKlwsUTFcsN/KFW5vgZ9IjQjuDi5t7GgDl12UFfSHid+aSFVEKyT8NNkYiAdmtnWc0FSfLggxvU+NhRHMe6hK+zG3MZvsqMkDV/j1p1f9DX2s2f9cJBeeR0hk1wROd134my959T5M6MrYuw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYQz/4ja; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uO2/3J0s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B86DC4CEFD
-	for <linux-cifs@vger.kernel.org>; Tue, 16 Sep 2025 01:11:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYQz/4ja"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 529DEC4CEEB
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Sep 2025 09:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1757985089;
-	bh=pywoNX5Fj0ThFie7i1F+fNV/378eQvTd2KEdBeM7gXQ=;
+	s=k20201202; t=1758016086;
+	bh=T+Vf2dDOixMwZJgqQOACk6vB5Gd3gpAlFSucc0OqV4s=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=uO2/3J0sejlTx7uljyYcFXBbeycir04KbUK3Wusg06qN5AW0kt90eJw4mZAAWZFVY
-	 uf1lFJyU6PtI6cLUKvIruG2a+WwdjU1cAQYuHXO6uT3hwFcPYv+BKwmlww7eRBm7t6
-	 IrSapVaiLbTgDAvL2pi3X181/dcsOMXafK5sqj9KV1Tbbg+E3x8nneyk4yerP2ub28
-	 uJwgJy8w+FiwqA9bjb9XaiTne8Z8OfLKNiso2o9RP+SpyVYOBVmU0+VNl/8wiCC2CI
-	 DHr6I1DS1RJf/u7ZU/+3Bbb5cbfkPv2hUvEBbhdTGQvQmNcUgHyeEo/bZcxaVOXYtP
-	 Zejnj6qIZJbrw==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-62f1987d44aso3540473a12.0
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Sep 2025 18:11:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWxoRfhcUj9DfBF125LlbWMpP9ChLfS8iEa4OOeP5xFRbXtnuff7HLoTwmbsTkctegM/s8XaLpeO8YP@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn1U9p9NzE1WAsaK8PjbYUg8hDwLas/0a0TYoC+15epMQAFCc2
-	W3VlD399IRERLAReCs5BqE+SmMdC0mu32aV+gcYvyjcYdmhQuWy+IccHgWRQePpwGhSJWLdCfG0
-	yoP3tgMdC8bH19/y0BlUgHk8obNWId7o=
-X-Google-Smtp-Source: AGHT+IHv/n1JN8GWUKal59MvrweGIKVpUCxC3bbV7i0oHx+AET14Dl7KMMRsAqGMDIFeX1Yo7dHDbI6e6oQsgP709IY=
-X-Received: by 2002:a05:6402:2711:b0:62f:6713:1b22 with SMTP id
- 4fb4d7f45d1cf-62f67131cdcmr207838a12.24.1757985087942; Mon, 15 Sep 2025
- 18:11:27 -0700 (PDT)
+	b=AYQz/4jaHc01xp0lHsYgtxa3o3ICkaIKfmv9RTdYHBg/osvx3Ztfw3XUoEwCUd+cQ
+	 SuLctIuU6M1dxqjgBzU/6qCFGqOd9kr+4ipi2+d5ehmlRcFfVzSdeTQQnIpatOn3s7
+	 0bRpLiiAQDg2xBeAHYjbKgzey+Pwz2f7mMCrGA+dvY3CdubV6OiRK6uQ+t2wFr5O2O
+	 0bAGH/29s1xS0T6bXHG4djHdx/8D5elIXSWzjbGuJvh12QNKZ+jpGKP0YbuRd78Ly1
+	 oRBL+p7MKKGVizSTlj0yB1kCDxbE9hbk15thxkSzmRuj69TDLV4llwPbu3JCBKEHQv
+	 2o55s23PlVCFQ==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6228de280ccso10472581a12.3
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Sep 2025 02:48:06 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWPWN43x7xJVdBi4VnmuYB4BpfNAki2tL/yY3jYSDfJT3GyoErBZSlmx9A8uwC79BhtAKd52gVTgAl5@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUfIqtuH6QXfYzSE6OhexfX/f6CLbp/HBeuB9wXcPFn49N/501
+	VC0mZKelWlf9TDycsDQ9em4LjwBuk8Dq0+QNq47NACFJj554YqiDqZMwkD75pT/GNLOgqZTh32x
+	o1PJsxg39E0Ae/YGlb3SuU7KiVkrDgUQ=
+X-Google-Smtp-Source: AGHT+IG5MpzkyHuBeYurcLYOABwn+9j18biIyZwShzF6P5WhNTG6F2NRQfL2YCbVZrlN0DmxOAZaYM3OsJVbJ6d5aS8=
+X-Received: by 2002:a05:6402:274e:b0:62f:50cb:764d with SMTP id
+ 4fb4d7f45d1cf-62f50cb78aemr3983894a12.1.1758016084874; Tue, 16 Sep 2025
+ 02:48:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250915224408.1132493-2-ysk@kzalloc.com>
-In-Reply-To: <20250915224408.1132493-2-ysk@kzalloc.com>
+References: <8da4d540-652c-4845-9feb-0d53eeb3b5ed@kzalloc.com>
+In-Reply-To: <8da4d540-652c-4845-9feb-0d53eeb3b5ed@kzalloc.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 16 Sep 2025 10:11:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_h9otb5kfixtwAgXfeFbmsvc5xmuoBsDNovmHFwGOEEQ@mail.gmail.com>
-X-Gm-Features: AS18NWDcKPBMDX2P_tfLuiBXo4aQ7qWNaXQnQMmtVrPehIGjufNwmyIx6u-D74E
-Message-ID: <CAKYAXd_h9otb5kfixtwAgXfeFbmsvc5xmuoBsDNovmHFwGOEEQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Fix race condition in RPC handle list access
+Date: Tue, 16 Sep 2025 18:47:52 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_ZG-ngCCtnG_Uxm=CHkWS6x+=JzM9TXpxGUiH-A7j1TQ@mail.gmail.com>
+X-Gm-Features: AS18NWC8XScJsd_6-4oai0r4YYqwaLwcCHqfar6YXOpp9Gi5A1u9ol828uKaJPc
+Message-ID: <CAKYAXd_ZG-ngCCtnG_Uxm=CHkWS6x+=JzM9TXpxGUiH-A7j1TQ@mail.gmail.com>
+Subject: Re: [RFC] ksmbd: Deprecate MD5 support and enhance AES-GCM for SMB
+ 3.1.1 compliance
 To: Yunseong Kim <ysk@kzalloc.com>
-Cc: Steve French <smfrench@gmail.com>, Norbert Szetei <norbert@doyensec.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Jinjie Ruan <ruanjinjie@huawei.com>, Dawei Li <set_pte_at@outlook.com>, 
-	linux-cifs@vger.kernel.org, open list <linux-kernel@vger.kernel.org>, 
-	stable@vger.kernel.org
+Cc: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 16, 2025 at 7:44=E2=80=AFAM Yunseong Kim <ysk@kzalloc.com> wrot=
+On Tue, Sep 16, 2025 at 8:07=E2=80=AFAM Yunseong Kim <ysk@kzalloc.com> wrot=
 e:
 >
-> The 'sess->rpc_handle_list' XArray manages RPC handles within a ksmbd
-> session. Access to this list is intended to be protected by
-> 'sess->rpc_lock' (an rw_semaphore). However, the locking implementation w=
-as
-> flawed, leading to potential race conditions.
+> Hi all,
+Hi Yunseong,
 >
-> In ksmbd_session_rpc_open(), the code incorrectly acquired only a read lo=
-ck
-> before calling xa_store() and xa_erase(). Since these operations modify
-> the XArray structure, a write lock is required to ensure exclusive access
-> and prevent data corruption from concurrent modifications.
+> I'm looking into contributing to the ksmbd crypto module, specifically
+> around crypto handling in crypto_ctx.c. I wanted to send this RFC to gaug=
+e
+> interest and get feedback before preparing patches.
 >
-> Furthermore, ksmbd_session_rpc_method() accessed the list using xa_load()
-> without holding any lock at all. This could lead to reading inconsistent
-> data or a potential use-after-free if an entry is concurrently removed an=
+> First, regarding MD5 support: The current code includes HMAC-MD5
+> (via crypto_alloc_shash("hmac(md5)")) which appears to be for legacy SMB1
+> compatibility. SMB1 is widely deprecated due to security issues, and MD5
+> itself is vulnerable to collision attacks, making it unsuitable for moder=
+n
+> use. I propose deprecating or removing this support entirely, perhaps wit=
+h
+> a config option (e.g., CONFIG_KSMBD_LEGACY_SMB1) for those who absolutely
+> need it, but defaulting to off. This would align ksmbd with security best
+> practices, similar to how Windows has disabled SMB1 by default.
+Steve answered it.
+>
+> Second, for SMB 3.1.1 compliance: The code already supports AES-GCM via
+> crypto_alloc_aead("gcm(aes)"), but to fully adhere to the spec (MS-SMB2),
+> we should explicitly handle AES-128-GCM as the default cipher, with
+> AES-256-GCM as an optional stronger variant. AES-256-GCM isn't mandatory
+> but is recommended for higher security (e.g., in Windows Server 2022+).
+This cipher array in SMB2_ENCRYPTION_CAPABILITIES is ordered by
+the client's preference, with the most preferred cipher at the beginning an=
 d
-> the pointer is dereferenced.
+the least preferred at the end. This allows the client to signal its
+ideal choice
+to the server.
+The server chooses the first cipher in the client's array that it also supp=
+orts.
+Are you saying that the ksmbd server does have to choose AES-256-GCM
+if it is not the first cipher in the client's array ?
 >
-> Fix these issues by:
-> 1. Using down_write() and up_write() in ksmbd_session_rpc_open()
->    to ensure exclusive access during XArray modification, and ensuring
->    the lock is correctly released on error paths.
-> 2. Adding down_read() and up_read() in ksmbd_session_rpc_method()
->    to safely protect the lookup.
+> This would involve:
+>  - Adding key length checks and setkey logic in the caller side
+>    (e.g., negotiate or session setup).
+>  - Updating the negotiate context to include cipher selection
+>    (0x0001 for AES-128-GCM, 0x0002 for AES-256-GCM).
+I'm not sure what you're trying to change. Are you trying to change a macro
+defined in smb2pdu.h?
+
+>  - Potentially separating signing (AES-CMAC) from encryption ciphers for
+>    clarity.
 >
-> Fixes: a1f46c99d9ea ("ksmbd: fix use-after-free in ksmbd_session_rpc_open=
-")
-> Fixes: b685757c7b08 ("ksmbd: Implements sess->rpc_handle_list as xarray")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
-Applied it to #ksmbd-for-next-next.
+> Is this direction worth pursuing? I'd like to prepare patches for review
+> if there's consensus. Any thoughts on priorities, potential pitfalls, or
+> related work in progress?
+Could you elaborate more about the 3 items you suggested ?
+>
+> Thanks for your time.
 Thanks!
+>
+> Yunseong
